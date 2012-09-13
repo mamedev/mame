@@ -261,26 +261,24 @@ GFXDECODE_END
 /***************************************************************************
   Machine drivers
 ***************************************************************************/
-static MACHINE_START( circus )
+void circus_state::machine_start()
 {
-	circus_state *state = machine.driver_data<circus_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_samples = machine.device<samples_device>("samples");
-	state->m_discrete = machine.device("discrete");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_samples = machine().device<samples_device>("samples");
+	m_discrete = machine().device("discrete");
 
-	state->save_item(NAME(state->m_clown_x));
-	state->save_item(NAME(state->m_clown_y));
-	state->save_item(NAME(state->m_clown_z));
+	save_item(NAME(m_clown_x));
+	save_item(NAME(m_clown_y));
+	save_item(NAME(m_clown_z));
 }
 
-static MACHINE_RESET( circus )
+void circus_state::machine_reset()
 {
-	circus_state *state = machine.driver_data<circus_state>();
 
-	state->m_clown_x = 0;
-	state->m_clown_y = 0;
-	state->m_clown_z = 0;
+	m_clown_x = 0;
+	m_clown_y = 0;
+	m_clown_z = 0;
 }
 
 
@@ -290,8 +288,6 @@ static MACHINE_CONFIG_START( circus, circus_state )
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16)	/* 705.562kHz */
 	MCFG_CPU_PROGRAM_MAP(circus_map)
 
-	MCFG_MACHINE_START(circus)
-	MCFG_MACHINE_RESET(circus)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)			/* needed for proper hardware collisions */
@@ -306,7 +302,6 @@ static MACHINE_CONFIG_START( circus, circus_state )
 	MCFG_PALETTE_LENGTH(2)
 
 	MCFG_PALETTE_INIT(black_and_white)
-	MCFG_VIDEO_START(circus)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -327,8 +322,6 @@ static MACHINE_CONFIG_START( robotbwl, circus_state )
 	MCFG_CPU_PROGRAM_MAP(circus_map)
 	// does not generate irq!
 
-	MCFG_MACHINE_START(circus)
-	MCFG_MACHINE_RESET(circus)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -342,7 +335,6 @@ static MACHINE_CONFIG_START( robotbwl, circus_state )
 	MCFG_PALETTE_LENGTH(2)
 
 	MCFG_PALETTE_INIT(black_and_white)
-	MCFG_VIDEO_START(circus)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -370,8 +362,6 @@ static MACHINE_CONFIG_START( crash, circus_state )
 	MCFG_CPU_PROGRAM_MAP(circus_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", crash_scanline, "screen", 0, 1)
 
-	MCFG_MACHINE_START(circus)
-	MCFG_MACHINE_RESET(circus)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -385,7 +375,6 @@ static MACHINE_CONFIG_START( crash, circus_state )
 	MCFG_PALETTE_LENGTH(2)
 
 	MCFG_PALETTE_INIT(black_and_white)
-	MCFG_VIDEO_START(circus)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -404,8 +393,6 @@ static MACHINE_CONFIG_START( ripcord, circus_state )
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
 	MCFG_CPU_PROGRAM_MAP(circus_map)
 
-	MCFG_MACHINE_START(circus)
-	MCFG_MACHINE_RESET(circus)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)			/* needed for proper hardware collisions */
@@ -420,7 +407,6 @@ static MACHINE_CONFIG_START( ripcord, circus_state )
 	MCFG_PALETTE_LENGTH(2)
 
 	MCFG_PALETTE_INIT(black_and_white)
-	MCFG_VIDEO_START(circus)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

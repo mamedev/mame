@@ -569,35 +569,33 @@ static const sn76496_config psg_intf =
 
 /* Machine Drivers */
 
-static MACHINE_RESET( docastle )
+void docastle_state::machine_reset()
 {
-	docastle_state *state = machine.driver_data<docastle_state>();
 	int i;
 
 	for (i = 0; i < 9; i++)
 	{
-		state->m_buffer0[i] = 0;
-		state->m_buffer1[i] = 0;
+		m_buffer0[i] = 0;
+		m_buffer1[i] = 0;
 	}
 
-	state->m_adpcm_pos = state->m_adpcm_idle = 0;
-	state->m_adpcm_data = -1;
-	state->m_adpcm_status = 0;
+	m_adpcm_pos = m_adpcm_idle = 0;
+	m_adpcm_data = -1;
+	m_adpcm_status = 0;
 }
 
-static MACHINE_START( docastle )
+void docastle_state::machine_start()
 {
-	docastle_state *state = machine.driver_data<docastle_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_slave = machine.device<cpu_device>("slave");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_slave = machine().device<cpu_device>("slave");
 
-	state->save_item(NAME(state->m_adpcm_pos));
-	state->save_item(NAME(state->m_adpcm_data));
-	state->save_item(NAME(state->m_adpcm_idle));
-	state->save_item(NAME(state->m_adpcm_status));
-	state->save_item(NAME(state->m_buffer0));
-	state->save_item(NAME(state->m_buffer1));
+	save_item(NAME(m_adpcm_pos));
+	save_item(NAME(m_adpcm_data));
+	save_item(NAME(m_adpcm_idle));
+	save_item(NAME(m_adpcm_status));
+	save_item(NAME(m_buffer0));
+	save_item(NAME(m_buffer1));
 }
 
 static MACHINE_CONFIG_START( docastle, docastle_state )
@@ -627,11 +625,7 @@ static MACHINE_CONFIG_START( docastle, docastle_state )
 	MCFG_GFXDECODE(docastle)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_PALETTE_INIT(docastle)
-	MCFG_VIDEO_START(docastle)
 
-	MCFG_MACHINE_RESET( docastle )
-	MCFG_MACHINE_START( docastle )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -664,7 +658,7 @@ static MACHINE_CONFIG_DERIVED( dorunrun, docastle )
 	MCFG_CPU_PROGRAM_MAP(dorunrun_map2)
 
 	/* video hardware */
-	MCFG_VIDEO_START(dorunrun)
+	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( idsoccer, docastle )
@@ -678,7 +672,7 @@ static MACHINE_CONFIG_DERIVED( idsoccer, docastle )
 	MCFG_CPU_PROGRAM_MAP(idsoccer_map2)
 
 	/* video hardware */
-	MCFG_VIDEO_START(dorunrun)
+	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* Crystal verified on American Soccer board. */

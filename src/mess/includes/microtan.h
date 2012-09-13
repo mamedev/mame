@@ -49,6 +49,8 @@ public:
 	DECLARE_WRITE8_MEMBER(microtan_videoram_w);
 	DECLARE_DRIVER_INIT(microtan);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -57,7 +59,7 @@ public:
 extern const via6522_interface microtan_via6522_0;
 extern const via6522_interface microtan_via6522_1;
 
-MACHINE_RESET( microtan );
+
 
 SNAPSHOT_LOAD( microtan );
 QUICKLOAD_LOAD( microtan_hexfile );

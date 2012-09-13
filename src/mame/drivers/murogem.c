@@ -119,6 +119,7 @@ public:
 
 	required_shared_ptr<UINT8> m_videoram;
 	DECLARE_WRITE8_MEMBER(outport_w);
+	virtual void palette_init();
 };
 
 
@@ -198,7 +199,7 @@ static GFXDECODE_START( murogem )
 GFXDECODE_END
 
 
-static PALETTE_INIT(murogem)
+void murogem_state::palette_init()
 {}
 
 static SCREEN_UPDATE_IND16(murogem)
@@ -259,7 +260,6 @@ static MACHINE_CONFIG_START( murogem, murogem_state )
 	MCFG_GFXDECODE(murogem)
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_PALETTE_INIT(murogem)
 
 	MCFG_MC6845_ADD("crtc", MC6845, 750000, mc6845_intf) /* ? MHz */
 

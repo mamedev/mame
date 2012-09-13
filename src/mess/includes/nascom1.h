@@ -47,6 +47,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nascom1_port_01_w);
 	DECLARE_READ8_MEMBER(nascom1_port_02_r);
 	DECLARE_DRIVER_INIT(nascom1);
+	virtual void machine_reset();
 };
 
 
@@ -63,8 +64,8 @@ SNAPSHOT_LOAD( nascom1 );
 READ8_DEVICE_HANDLER( nascom1_hd6402_si );
 WRITE8_DEVICE_HANDLER( nascom1_hd6402_so );
 
-MACHINE_RESET( nascom1 );
-MACHINE_RESET( nascom2 );
+
+
 
 /*----------- defined in video/nascom1.c -----------*/
 

@@ -21,7 +21,7 @@ const gfx_layout ut88_charlayout =
 	8*8					/* size of one char */
 };
 
-VIDEO_START( ut88 )
+VIDEO_START_MEMBER(ut88_state,ut88)
 {
 }
 

@@ -930,19 +930,18 @@ static TIMER_CALLBACK( setup_machine_state )
 }
 
 
-MACHINE_RESET( pmd85 )
+void pmd85_state::machine_reset()
 {
-	pmd85_state *state = machine.driver_data<pmd85_state>();
 	int i, j;
 
 	/* checking for Rom Module */
-	switch (state->m_model)
+	switch (m_model)
 	{
 		case PMD85_1:
 		case PMD85_2A:
 		case PMD85_3:
 		case C2717:
-			state->m_rom_module_present = (machine.root_device().ioport("DSW0")->read() & 0x01) ? 1 : 0;
+			m_rom_module_present = (machine().root_device().ioport("DSW0")->read() & 0x01) ? 1 : 0;
 			break;
 		case ALFA:
 		case MATO:
@@ -951,15 +950,15 @@ MACHINE_RESET( pmd85 )
 
 	for (i = 0; i < 4; i++)
 		for (j = 0; j < 3; j++)
-			state->m_ppi_port_outputs[i][j] = 0;
+			m_ppi_port_outputs[i][j] = 0;
 
 	/* memory initialization */
-	memset(machine.device<ram_device>(RAM_TAG)->pointer(), 0, sizeof(unsigned char)*0x10000);
-	state->m_pmd853_memory_mapping = 1;
-	state->m_startup_mem_map = 1;
-	state->update_memory(machine);
+	memset(machine().device<ram_device>(RAM_TAG)->pointer(), 0, sizeof(unsigned char)*0x10000);
+	m_pmd853_memory_mapping = 1;
+	m_startup_mem_map = 1;
+	update_memory(machine());
 
-	machine.scheduler().timer_set(attotime::zero, FUNC(setup_machine_state));
+	machine().scheduler().timer_set(attotime::zero, FUNC(setup_machine_state));
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(pmd85_state::pmd85_opbaseoverride), state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(pmd85_state::pmd85_opbaseoverride), this));
 }

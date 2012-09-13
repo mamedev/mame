@@ -54,6 +54,10 @@ public:
 	DECLARE_READ8_MEMBER(input_1p_r);
 	DECLARE_READ8_MEMBER(input_2p_r);
 	DECLARE_DRIVER_INIT(jongkyo);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -63,7 +67,7 @@ public:
  *
  *************************************/
 
-static VIDEO_START( jongkyo )
+void jongkyo_state::video_start()
 {
 
 }
@@ -428,10 +432,10 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static PALETTE_INIT(jongkyo)
+void jongkyo_state::palette_init()
 {
 	int i;
-	UINT8* proms = machine.root_device().memregion("proms")->base();
+	UINT8* proms = machine().root_device().memregion("proms")->base();
 	for (i = 0; i < 0x40; i++)
 	{
 		int data = proms[i];
@@ -440,7 +444,7 @@ static PALETTE_INIT(jongkyo)
 		int g = (data  >> 3) & 0x07;
 		int b = (data  >> 6) & 0x03;
 
-		 palette_set_color_rgb(machine, i, r << 5, g << 5, b << 6 );
+		 palette_set_color_rgb(machine(), i, r << 5, g << 5, b << 6 );
 
 	}
 }
@@ -468,21 +472,19 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
-static MACHINE_START( jongkyo )
+void jongkyo_state::machine_start()
 {
-	jongkyo_state *state = machine.driver_data<jongkyo_state>();
 
-	state->save_item(NAME(state->m_videoram2));
-	state->save_item(NAME(state->m_rom_bank));
-	state->save_item(NAME(state->m_mux_data));
+	save_item(NAME(m_videoram2));
+	save_item(NAME(m_rom_bank));
+	save_item(NAME(m_mux_data));
 }
 
-static MACHINE_RESET( jongkyo )
+void jongkyo_state::machine_reset()
 {
-	jongkyo_state *state = machine.driver_data<jongkyo_state>();
 
-	state->m_rom_bank = 0;
-	state->m_mux_data = 0;
+	m_rom_bank = 0;
+	m_mux_data = 0;
 }
 
 
@@ -494,8 +496,6 @@ static MACHINE_CONFIG_START( jongkyo, jongkyo_state )
 	MCFG_CPU_IO_MAP(jongkyo_portmap)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(jongkyo)
-	MCFG_MACHINE_RESET(jongkyo)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -506,9 +506,7 @@ static MACHINE_CONFIG_START( jongkyo, jongkyo_state )
 	MCFG_SCREEN_UPDATE_STATIC(jongkyo)
 
 	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT(jongkyo)
 
-	MCFG_VIDEO_START(jongkyo)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, JONGKYO_CLOCK/8)

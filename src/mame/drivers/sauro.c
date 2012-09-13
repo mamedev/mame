@@ -405,7 +405,7 @@ static MACHINE_CONFIG_DERIVED( trckydoc, tecfri )
 
 	MCFG_GFXDECODE(trckydoc)
 
-	MCFG_VIDEO_START(trckydoc)
+	MCFG_VIDEO_START_OVERRIDE(sauro_state,trckydoc)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(trckydoc)
 
@@ -423,7 +423,7 @@ static MACHINE_CONFIG_DERIVED( sauro, tecfri )
 
 	MCFG_GFXDECODE(sauro)
 
-	MCFG_VIDEO_START(sauro)
+	MCFG_VIDEO_START_OVERRIDE(sauro_state,sauro)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(sauro)
 

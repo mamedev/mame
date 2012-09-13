@@ -31,23 +31,22 @@ void exidy_video_config(running_machine &machine, UINT8 _collision_mask, UINT8 _
  *
  *************************************/
 
-VIDEO_START( exidy )
+void exidy_state::video_start()
 {
-	exidy_state *state = machine.driver_data<exidy_state>();
 
-	machine.primary_screen->register_screen_bitmap(state->m_background_bitmap);
-	state->m_motion_object_1_vid.allocate(16, 16);
-	state->m_motion_object_2_vid.allocate(16, 16);
-	state->m_motion_object_2_clip.allocate(16, 16);
+	machine().primary_screen->register_screen_bitmap(m_background_bitmap);
+	m_motion_object_1_vid.allocate(16, 16);
+	m_motion_object_2_vid.allocate(16, 16);
+	m_motion_object_2_clip.allocate(16, 16);
 
-	state_save_register_global(machine, state->m_collision_mask);
-	state_save_register_global(machine, state->m_collision_invert);
-	state_save_register_global(machine, state->m_is_2bpp);
-	state_save_register_global(machine, state->m_int_condition);
-	state_save_register_global_bitmap(machine, &state->m_background_bitmap);
-	state_save_register_global_bitmap(machine, &state->m_motion_object_1_vid);
-	state_save_register_global_bitmap(machine, &state->m_motion_object_2_vid);
-	state_save_register_global_bitmap(machine, &state->m_motion_object_2_clip);
+	state_save_register_global(machine(), m_collision_mask);
+	state_save_register_global(machine(), m_collision_invert);
+	state_save_register_global(machine(), m_is_2bpp);
+	state_save_register_global(machine(), m_int_condition);
+	state_save_register_global_bitmap(machine(), &m_background_bitmap);
+	state_save_register_global_bitmap(machine(), &m_motion_object_1_vid);
+	state_save_register_global_bitmap(machine(), &m_motion_object_2_vid);
+	state_save_register_global_bitmap(machine(), &m_motion_object_2_clip);
 }
 
 

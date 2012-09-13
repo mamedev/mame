@@ -38,7 +38,9 @@ public:
 	UINT8 m_port_202f;
 	UINT8 m_port_303f;
 	UINT8 m_port_707f;
-	INT8 m_frame_count;
+	INT8 m_frame_count;	
+	DECLARE_VIDEO_START(p2000m);
+	DECLARE_PALETTE_INIT(p2000m);
 };
 
 

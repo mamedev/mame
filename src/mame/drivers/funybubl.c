@@ -200,19 +200,18 @@ GFXDECODE_END
 
 
 
-static MACHINE_START( funybubl )
+void funybubl_state::machine_start()
 {
-	funybubl_state *state = machine.driver_data<funybubl_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_banked_vram));
+	save_item(NAME(m_banked_vram));
 
-	state->membank("bank1")->configure_entries(0, 2, &state->m_banked_vram[0x0000], 0x1000);
-	state->membank("bank2")->configure_entries(0, 0x10, ROM, 0x4000);
+	membank("bank1")->configure_entries(0, 2, &m_banked_vram[0x0000], 0x1000);
+	membank("bank2")->configure_entries(0, 0x10, ROM, 0x4000);
 
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->set_entry(0);
 }
 
 
@@ -227,7 +226,6 @@ static MACHINE_CONFIG_START( funybubl, funybubl_state )
 	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)		 /* 4 MHz?? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(funybubl)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -241,7 +239,6 @@ static MACHINE_CONFIG_START( funybubl, funybubl_state )
 	MCFG_GFXDECODE(funybubl)
 	MCFG_PALETTE_LENGTH(0x400)
 
-	MCFG_VIDEO_START(funybubl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

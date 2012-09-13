@@ -159,7 +159,8 @@ public:
 	DECLARE_WRITE16_MEMBER( c355_obj_ram_w );
 	DECLARE_READ16_MEMBER( c355_obj_position_r );
 	DECLARE_WRITE16_MEMBER( c355_obj_position_w );
-
+	DECLARE_MACHINE_START(namcos2);
+	DECLARE_MACHINE_RESET(namcos2);
 protected:
 	// C355 Motion Object internals
 	template<class _BitmapClass>
@@ -295,9 +296,6 @@ public:
 /*----------- defined in machine/namcos2.c -----------*/
 
 extern void (*namcos2_kickstart)(running_machine &machine, int internal);
-
-MACHINE_START( namcos2 );
-MACHINE_RESET( namcos2 );
 
 READ16_HANDLER( namcos2_flap_prot_r );
 

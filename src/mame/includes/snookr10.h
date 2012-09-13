@@ -24,14 +24,18 @@ public:
 	DECLARE_WRITE8_MEMBER(snookr10_colorram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(apple10_get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_VIDEO_START(apple10);
+	DECLARE_PALETTE_INIT(apple10);
 };
 
 
 /*----------- defined in video/snookr10.c -----------*/
 
-PALETTE_INIT( snookr10 );
-PALETTE_INIT( apple10 );
-VIDEO_START( snookr10 );
-VIDEO_START( apple10 );
+
+
+
+
 SCREEN_UPDATE_IND16( snookr10 );
 

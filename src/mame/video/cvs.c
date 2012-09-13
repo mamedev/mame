@@ -25,13 +25,13 @@
  * colours are taken from SRAM and are programmable   *
  ******************************************************/
 
-PALETTE_INIT( cvs )
+PALETTE_INIT_MEMBER(cvs_state,cvs)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i, attr;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x10);
+	machine().colortable = colortable_alloc(machine(), 0x10);
 
 	/* color mapping PROM */
 	for (attr = 0; attr < 0x100; attr++)
@@ -43,25 +43,25 @@ PALETTE_INIT( cvs )
 			/* bits 0 and 2 are swapped */
 			ctabentry = BITSWAP8(ctabentry,7,6,5,4,3,0,1,2);
 
-			colortable_entry_set_value(machine.colortable, (attr << 3) | i, ctabentry);
+			colortable_entry_set_value(machine().colortable, (attr << 3) | i, ctabentry);
 		}
 	}
 
 	/* background collision map */
 	for (i = 0; i < 8; i++)
 	{
-		colortable_entry_set_value(machine.colortable, 0x800 + i, 0);
-		colortable_entry_set_value(machine.colortable, 0x808 + i, i & 0x04);
-		colortable_entry_set_value(machine.colortable, 0x810 + i, i & 0x02);
-		colortable_entry_set_value(machine.colortable, 0x818 + i, i & 0x06);
+		colortable_entry_set_value(machine().colortable, 0x800 + i, 0);
+		colortable_entry_set_value(machine().colortable, 0x808 + i, i & 0x04);
+		colortable_entry_set_value(machine().colortable, 0x810 + i, i & 0x02);
+		colortable_entry_set_value(machine().colortable, 0x818 + i, i & 0x06);
 	}
 
 	/* sprites */
 	for (i = 0; i < 8; i++)
-		colortable_entry_set_value(machine.colortable, SPRITE_PEN_BASE + i, i | 0x08);
+		colortable_entry_set_value(machine().colortable, SPRITE_PEN_BASE + i, i | 0x08);
 
 	/* bullet */
-	colortable_entry_set_value(machine.colortable, BULLET_STAR_PEN, 7);
+	colortable_entry_set_value(machine().colortable, BULLET_STAR_PEN, 7);
 }
 
 
@@ -121,21 +121,20 @@ WRITE8_MEMBER(cvs_state::cvs_scroll_w)
 }
 
 
-VIDEO_START( cvs )
+VIDEO_START_MEMBER(cvs_state,cvs)
 {
-	cvs_state *state = machine.driver_data<cvs_state>();
 
-	cvs_init_stars(machine);
+	cvs_init_stars(machine());
 
 	/* create helper bitmaps */
-	machine.primary_screen->register_screen_bitmap(state->m_background_bitmap);
-	machine.primary_screen->register_screen_bitmap(state->m_collision_background);
-	machine.primary_screen->register_screen_bitmap(state->m_scrolled_collision_background);
+	machine().primary_screen->register_screen_bitmap(m_background_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_collision_background);
+	machine().primary_screen->register_screen_bitmap(m_scrolled_collision_background);
 
 	/* register save */
-	state->save_item(NAME(state->m_background_bitmap));
-	state->save_item(NAME(state->m_collision_background));
-	state->save_item(NAME(state->m_scrolled_collision_background));
+	save_item(NAME(m_background_bitmap));
+	save_item(NAME(m_collision_background));
+	save_item(NAME(m_scrolled_collision_background));
 }
 
 

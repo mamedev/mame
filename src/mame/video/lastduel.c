@@ -79,36 +79,34 @@ TILE_GET_INFO_MEMBER(lastduel_state::get_fix_info)
 
 ***************************************************************************/
 
-VIDEO_START( lastduel )
+VIDEO_START_MEMBER(lastduel_state,lastduel)
 {
-	lastduel_state *state = machine.driver_data<lastduel_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lastduel_state::ld_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lastduel_state::ld_get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lastduel_state::get_fix_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lastduel_state::ld_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lastduel_state::ld_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lastduel_state::get_fix_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	state->m_fg_tilemap->set_transmask(0, 0xffff, 0x0001);
-	state->m_fg_tilemap->set_transmask(1, 0xf07f, 0x0f81);
-	state->m_tx_tilemap->set_transparent_pen(3);
+	m_fg_tilemap->set_transmask(0, 0xffff, 0x0001);
+	m_fg_tilemap->set_transmask(1, 0xf07f, 0x0f81);
+	m_tx_tilemap->set_transparent_pen(3);
 
-	state->m_sprite_flipy_mask = 0x40;
-	state->m_sprite_pri_mask = 0x00;
-	state->m_tilemap_priority = 0;
+	m_sprite_flipy_mask = 0x40;
+	m_sprite_pri_mask = 0x00;
+	m_tilemap_priority = 0;
 }
 
-VIDEO_START( madgear )
+VIDEO_START_MEMBER(lastduel_state,madgear)
 {
-	lastduel_state *state = machine.driver_data<lastduel_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lastduel_state::get_bg_tile_info),state),TILEMAP_SCAN_COLS,16,16,64,32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lastduel_state::get_fg_tile_info),state),TILEMAP_SCAN_COLS,16,16,64,32);
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lastduel_state::get_fix_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lastduel_state::get_bg_tile_info),this),TILEMAP_SCAN_COLS,16,16,64,32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lastduel_state::get_fg_tile_info),this),TILEMAP_SCAN_COLS,16,16,64,32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lastduel_state::get_fix_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
-	state->m_fg_tilemap->set_transmask(0, 0xffff, 0x8000);
-	state->m_fg_tilemap->set_transmask(1, 0x80ff, 0xff00);
-	state->m_tx_tilemap->set_transparent_pen(3);
-	state->m_bg_tilemap->set_transparent_pen(15);
+	m_fg_tilemap->set_transmask(0, 0xffff, 0x8000);
+	m_fg_tilemap->set_transmask(1, 0x80ff, 0xff00);
+	m_tx_tilemap->set_transparent_pen(3);
+	m_bg_tilemap->set_transparent_pen(15);
 
-	state->m_sprite_flipy_mask = 0x80;
-	state->m_sprite_pri_mask = 0x10;
+	m_sprite_flipy_mask = 0x80;
+	m_sprite_pri_mask = 0x10;
 }
 
 

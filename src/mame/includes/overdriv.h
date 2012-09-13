@@ -40,6 +40,8 @@ public:
 	DECLARE_WRITE16_MEMBER(overdriv_cpuB_irq6_w);
 	DECLARE_READ8_MEMBER(overdriv_1_sound_r);
 	DECLARE_READ8_MEMBER(overdriv_2_sound_r);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 /*----------- defined in video/overdriv.c -----------*/

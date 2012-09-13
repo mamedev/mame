@@ -52,6 +52,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out2_changed);
 	DECLARE_DRIVER_INIT(photoply);
+	virtual void machine_start();
 };
 
 
@@ -306,17 +307,16 @@ static void photoply_set_keyb_int(running_machine &machine, int state)
 }
 
 
-static MACHINE_START( photoply )
+void photoply_state::machine_start()
 {
-	photoply_state *state = machine.driver_data<photoply_state>();
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
-	state->m_pit8253 = machine.device( "pit8254" );
-	state->m_pic8259_1 = machine.device( "pic8259_1" );
-	state->m_pic8259_2 = machine.device( "pic8259_2" );
-	state->m_dma8237_1 = machine.device( "dma8237_1" );
-	state->m_dma8237_2 = machine.device( "dma8237_2" );
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	m_pit8253 = machine().device( "pit8254" );
+	m_pic8259_1 = machine().device( "pic8259_1" );
+	m_pic8259_2 = machine().device( "pic8259_2" );
+	m_dma8237_1 = machine().device( "dma8237_1" );
+	m_dma8237_2 = machine().device( "dma8237_2" );
 
-	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, photoply_set_keyb_int);
+	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, photoply_set_keyb_int);
 }
 
 static const gfx_layout CGA_charlayout =
@@ -345,7 +345,6 @@ static MACHINE_CONFIG_START( photoply, photoply_state )
 
 	MCFG_GFXDECODE( photoply )
 
-	MCFG_MACHINE_START(photoply)
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 //  MCFG_FRAGMENT_ADD( at_kbdc8042 )

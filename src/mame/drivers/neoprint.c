@@ -53,10 +53,12 @@ public:
 	DECLARE_DRIVER_INIT(98best44);
 	DECLARE_DRIVER_INIT(npcartv1);
 	DECLARE_DRIVER_INIT(nprsp);
+	virtual void video_start();
+	DECLARE_MACHINE_RESET(nprsp);
 };
 
 
-VIDEO_START(neoprint)
+void neoprint_state::video_start()
 {
 }
 
@@ -481,7 +483,6 @@ static MACHINE_CONFIG_START( neoprint, neoprint_state )
 
 	MCFG_PALETTE_LENGTH(0x10000)
 
-	MCFG_VIDEO_START(neoprint)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -493,10 +494,9 @@ static MACHINE_CONFIG_START( neoprint, neoprint_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_RESET( nprsp )
+MACHINE_RESET_MEMBER(neoprint_state,nprsp)
 {
-	neoprint_state *state = machine.driver_data<neoprint_state>();
-	state->m_bank_val = 0;
+	m_bank_val = 0;
 }
 
 static MACHINE_CONFIG_START( nprsp, neoprint_state )
@@ -521,11 +521,10 @@ static MACHINE_CONFIG_START( nprsp, neoprint_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(nprsp)
 
-	MCFG_MACHINE_RESET(nprsp)
+	MCFG_MACHINE_RESET_OVERRIDE(neoprint_state,nprsp)
 
 	MCFG_PALETTE_LENGTH(0x10000)
 
-	MCFG_VIDEO_START(neoprint)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

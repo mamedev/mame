@@ -56,4 +56,6 @@ public:
 	DECLARE_DRIVER_INIT(coolpool);
 	DECLARE_DRIVER_INIT(amerdart);
 	DECLARE_DRIVER_INIT(9ballsht);
+	DECLARE_MACHINE_RESET(amerdart);
+	DECLARE_MACHINE_RESET(coolpool);
 };

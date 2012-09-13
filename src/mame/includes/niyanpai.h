@@ -77,12 +77,14 @@ public:
 	DECLARE_WRITE16_MEMBER(niyanpai_clutsel_2_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(musobana_outcoin_flag_r);
 	DECLARE_DRIVER_INIT(niyanpai);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/niyanpai.c -----------*/
 
 SCREEN_UPDATE_IND16( niyanpai );
-VIDEO_START( niyanpai );
+
 
 

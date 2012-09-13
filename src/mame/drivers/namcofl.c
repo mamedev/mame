@@ -566,23 +566,21 @@ static TIMER_DEVICE_CALLBACK( mcu_adc_cb )
 }
 
 
-static MACHINE_START( namcofl )
+MACHINE_START_MEMBER(namcofl_state,namcofl)
 {
-	namcofl_state *state = machine.driver_data<namcofl_state>();
-	state->m_raster_interrupt_timer = machine.scheduler().timer_alloc(FUNC(raster_interrupt_callback));
+	m_raster_interrupt_timer = machine().scheduler().timer_alloc(FUNC(raster_interrupt_callback));
 }
 
 
-static MACHINE_RESET( namcofl )
+MACHINE_RESET_MEMBER(namcofl_state,namcofl)
 {
-	namcofl_state *state = machine.driver_data<namcofl_state>();
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(machine.primary_screen->visible_area().max_y + 3), FUNC(network_interrupt_callback));
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(machine.primary_screen->visible_area().max_y + 1), FUNC(vblank_interrupt_callback));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(machine().primary_screen->visible_area().max_y + 3), FUNC(network_interrupt_callback));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(machine().primary_screen->visible_area().max_y + 1), FUNC(vblank_interrupt_callback));
 
-	state->membank("bank1")->set_base(state->memregion("maincpu")->base() );
-	state->membank("bank2")->set_base(state->m_workram );
+	membank("bank1")->set_base(memregion("maincpu")->base() );
+	membank("bank2")->set_base(m_workram );
 
-	memset(state->m_workram, 0x00, 0x100000);
+	memset(m_workram, 0x00, 0x100000);
 }
 
 
@@ -598,8 +596,8 @@ static MACHINE_CONFIG_START( namcofl, namcofl_state )
 	MCFG_TIMER_ADD_PERIODIC("mcu_irq2", mcu_irq2_cb, attotime::from_hz(60))
 	MCFG_TIMER_ADD_PERIODIC("mcu_adc",  mcu_adc_cb, attotime::from_hz(60))
 
-	MCFG_MACHINE_START(namcofl)
-	MCFG_MACHINE_RESET(namcofl)
+	MCFG_MACHINE_START_OVERRIDE(namcofl_state,namcofl)
+	MCFG_MACHINE_RESET_OVERRIDE(namcofl_state,namcofl)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -612,7 +610,7 @@ static MACHINE_CONFIG_START( namcofl, namcofl_state )
 
 	MCFG_GFXDECODE(2)
 
-	MCFG_VIDEO_START(namcofl)
+	MCFG_VIDEO_START_OVERRIDE(namcofl_state,namcofl)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_C352_ADD("c352", 48384000/2)

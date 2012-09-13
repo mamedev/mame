@@ -28,22 +28,25 @@ public:
 	DECLARE_WRITE8_MEMBER(galaxy_latch_w);
 	DECLARE_DRIVER_INIT(galaxy);
 	DECLARE_DRIVER_INIT(galaxyp);
+	virtual void video_start();
+	DECLARE_MACHINE_RESET(galaxy);
+	DECLARE_MACHINE_RESET(galaxyp);
 };
 
 
 /*----------- defined in machine/galaxy.c -----------*/
 
-MACHINE_RESET( galaxy );
+
 INTERRUPT_GEN( galaxy_interrupt );
 SNAPSHOT_LOAD( galaxy );
 
-MACHINE_RESET( galaxyp );
+
 
 
 
 /*----------- defined in video/galaxy.c -----------*/
 
-VIDEO_START( galaxy );
+
 SCREEN_UPDATE_IND16( galaxy );
 
 void galaxy_set_timer(running_machine &machine);

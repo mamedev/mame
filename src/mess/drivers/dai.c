@@ -202,8 +202,6 @@ static MACHINE_CONFIG_START( dai, dai_state )
 	MCFG_CPU_IO_MAP(dai_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START( dai )
-	MCFG_MACHINE_RESET( dai )
 
 	MCFG_PIT8253_ADD( "pit8253", dai_pit8253_intf )
 
@@ -219,9 +217,7 @@ static MACHINE_CONFIG_START( dai, dai_state )
 
 	MCFG_GFXDECODE(dai)
 	MCFG_PALETTE_LENGTH(sizeof (dai_palette) / 3)
-	MCFG_PALETTE_INIT( dai )
 
-	MCFG_VIDEO_START( dai )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

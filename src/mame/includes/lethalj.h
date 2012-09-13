@@ -28,13 +28,14 @@ public:
 	DECLARE_DRIVER_INIT(cfarm);
 	DECLARE_DRIVER_INIT(ripribit);
 	DECLARE_DRIVER_INIT(cclownz);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/lethalj.c -----------*/
 
 
-VIDEO_START( lethalj );
+
 
 
 void lethalj_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);

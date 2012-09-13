@@ -95,6 +95,9 @@ public:
 	void pcw16_write_mem(UINT8 bank, UINT16 offset, UINT8 data);
 	UINT8 read_bank_data(UINT8 type, UINT16 offset);
 	void write_bank_data(UINT8 type, UINT16 offset, UINT8 data);
+	virtual void machine_start();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 

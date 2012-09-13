@@ -126,6 +126,10 @@ public:
 	int m_tape_motor_mode;
 	DECLARE_DRIVER_INIT(intvkbd);
 	DECLARE_DRIVER_INIT(intv);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_MACHINE_RESET(intvecs);
 };
 
 /*----------- defined in video/intv.c -----------*/

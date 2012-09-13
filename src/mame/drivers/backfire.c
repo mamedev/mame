@@ -77,32 +77,33 @@ public:
 	DECLARE_READ32_MEMBER(backfire_eeprom_r);
 	DECLARE_WRITE32_MEMBER(backfire_eeprom_w);
 	DECLARE_DRIVER_INIT(backfire);
+	virtual void machine_start();
+	virtual void video_start();
 };
 
 //UINT32 *backfire_180010, *backfire_188010;
 
 /* I'm using the functions in deco16ic.c ... same chips, why duplicate code? */
-static VIDEO_START( backfire )
+void backfire_state::video_start()
 {
-	backfire_state *state = machine.driver_data<backfire_state>();
 
-	state->m_spriteram_1 = auto_alloc_array(machine, UINT16, 0x2000/2);
-	state->m_spriteram_2 = auto_alloc_array(machine, UINT16, 0x2000/2);
+	m_spriteram_1 = auto_alloc_array(machine(), UINT16, 0x2000/2);
+	m_spriteram_2 = auto_alloc_array(machine(), UINT16, 0x2000/2);
 
 	/* and register the allocated ram so that save states still work */
-	state->save_item(NAME(state->m_pf1_rowscroll));
-	state->save_item(NAME(state->m_pf2_rowscroll));
-	state->save_item(NAME(state->m_pf3_rowscroll));
-	state->save_item(NAME(state->m_pf4_rowscroll));
+	save_item(NAME(m_pf1_rowscroll));
+	save_item(NAME(m_pf2_rowscroll));
+	save_item(NAME(m_pf3_rowscroll));
+	save_item(NAME(m_pf4_rowscroll));
 
-	state->m_left =  auto_bitmap_ind16_alloc(machine, 80*8, 32*8);
-	state->m_right = auto_bitmap_ind16_alloc(machine, 80*8, 32*8);
+	m_left =  auto_bitmap_ind16_alloc(machine(), 80*8, 32*8);
+	m_right = auto_bitmap_ind16_alloc(machine(), 80*8, 32*8);
 
-	state->save_pointer(NAME(state->m_spriteram_1), 0x2000/2);
-	state->save_pointer(NAME(state->m_spriteram_2), 0x2000/2);
+	save_pointer(NAME(m_spriteram_1), 0x2000/2);
+	save_pointer(NAME(m_spriteram_2), 0x2000/2);
 
-	state->save_item(NAME(*state->m_left));
-	state->save_item(NAME(*state->m_right));
+	save_item(NAME(*m_left));
+	save_item(NAME(*m_right));
 }
 
 
@@ -471,16 +472,15 @@ static const deco16ic_interface backfire_deco16ic_tilegen2_intf =
 	2,3
 };
 
-static MACHINE_START( backfire )
+void backfire_state::machine_start()
 {
-	backfire_state *state = machine.driver_data<backfire_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_deco_tilegen1 = machine.device("tilegen1");
-	state->m_deco_tilegen2 = machine.device("tilegen2");
-	state->m_lscreen = machine.device("lscreen");
-	state->m_rscreen = machine.device("rscreen");
-	state->m_eeprom = machine.device<eeprom_device>("eeprom");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_deco_tilegen1 = machine().device("tilegen1");
+	m_deco_tilegen2 = machine().device("tilegen2");
+	m_lscreen = machine().device("lscreen");
+	m_rscreen = machine().device("rscreen");
+	m_eeprom = machine().device<eeprom_device>("eeprom");
 }
 
 UINT16 backfire_pri_callback(UINT16 x)
@@ -504,7 +504,6 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_MACHINE_START(backfire)
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(2048)
@@ -525,7 +524,6 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(backfire_right)
 
-	MCFG_VIDEO_START(backfire)
 
 	MCFG_DECO16IC_ADD("tilegen1", backfire_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", backfire_deco16ic_tilegen2_intf)

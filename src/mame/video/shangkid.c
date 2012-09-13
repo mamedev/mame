@@ -45,10 +45,9 @@ TILE_GET_INFO_MEMBER(shangkid_state::get_bg_tile_info){
 		(machine().root_device().memregion( "proms" )->base()[0x800+color*4]==2)?1:0;
 }
 
-VIDEO_START( shangkid )
+VIDEO_START_MEMBER(shangkid_state,shangkid)
 {
-	shangkid_state *state = machine.driver_data<shangkid_state>();
-	state->m_background = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(shangkid_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_background = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(shangkid_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 }
 
 WRITE8_MEMBER(shangkid_state::shangkid_videoram_w)
@@ -198,13 +197,13 @@ SCREEN_UPDATE_IND16( shangkid )
 }
 
 
-PALETTE_INIT( dynamski )
+PALETTE_INIT_MEMBER(shangkid_state,dynamski)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x20);
+	machine().colortable = colortable_alloc(machine(), 0x20);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -212,7 +211,7 @@ PALETTE_INIT( dynamski )
 		UINT16 data = (color_prom[i | 0x20] << 8) | color_prom[i];
 		rgb_t color = MAKE_RGB(pal5bit(data >> 1), pal5bit(data >> 6), pal5bit(data >> 11));
 
-		colortable_palette_set_color(machine.colortable, i, color);
+		colortable_palette_set_color(machine().colortable, i, color);
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -222,14 +221,14 @@ PALETTE_INIT( dynamski )
 	for (i = 0; i < 0x40; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	/* sprites */
 	for (i = 0x40; i < 0x80; i++)
 	{
 		UINT8 ctabentry = (color_prom[(i - 0x40) + 0x100] & 0x0f) | 0x10;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 

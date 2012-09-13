@@ -131,15 +131,15 @@ INPUT_PORTS_END
 
 
 /* Initialize the palette */
-static PALETTE_INIT( apple2gs )
+PALETTE_INIT_MEMBER(apple2gs_state,apple2gs)
 {
 	int i;
 
-	PALETTE_INIT_CALL(apple2);
+	PALETTE_INIT_CALL_MEMBER(apple2);
 
 	for (i = 0; i < 16; i++)
 	{
-		palette_set_color_rgb(machine, i,
+		palette_set_color_rgb(machine(), i,
 			apple2gs_palette[(3*i)]*17,
 			apple2gs_palette[(3*i)+1]*17,
 			apple2gs_palette[(3*i)+2]*17);
@@ -248,11 +248,11 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_PALETTE_LENGTH( 16+256 )
 	MCFG_GFXDECODE( apple2gs )
 
-	MCFG_MACHINE_START( apple2gs )
-	MCFG_MACHINE_RESET( apple2gs )
+	MCFG_MACHINE_START_OVERRIDE(apple2gs_state, apple2gs )
+	MCFG_MACHINE_RESET_OVERRIDE(apple2gs_state, apple2gs )
 
-	MCFG_PALETTE_INIT( apple2gs )
-	MCFG_VIDEO_START( apple2gs )
+	MCFG_PALETTE_INIT_OVERRIDE(apple2gs_state, apple2gs )
+	MCFG_VIDEO_START_OVERRIDE(apple2gs_state, apple2gs )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -296,7 +296,7 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2gsr1, apple2gs )
-	MCFG_MACHINE_START( apple2gsr1 )
+	MCFG_MACHINE_START_OVERRIDE(apple2gs_state, apple2gsr1 )
 
     MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1280K")  // 256K on board + 1M in the expansion slot was common for ROM 01

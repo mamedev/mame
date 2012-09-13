@@ -28,12 +28,16 @@ public:
 	DECLARE_WRITE8_MEMBER(pooyan_colorram_w);
 	DECLARE_WRITE8_MEMBER(pooyan_flipscreen_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/pooyan.c -----------*/
 
 
-PALETTE_INIT( pooyan );
-VIDEO_START( pooyan );
+
+
 SCREEN_UPDATE_IND16( pooyan );

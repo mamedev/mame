@@ -451,59 +451,57 @@ static const ym2203_interface ym2203_config =
  *
  *************************************/
 
-static MACHINE_START( lockon )
+void lockon_state::machine_start()
 {
-	lockon_state *state = machine.driver_data<lockon_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_ground = machine.device("ground");
-	state->m_object = machine.device("object");
-	state->m_f2203_1l = machine.device("f2203.1l");
-	state->m_f2203_2l = machine.device("f2203.2l");
-	state->m_f2203_3l = machine.device("f2203.3l");
-	state->m_f2203_1r = machine.device("f2203.1r");
-	state->m_f2203_2r = machine.device("f2203.2r");
-	state->m_f2203_3r = machine.device("f2203.3r");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_ground = machine().device("ground");
+	m_object = machine().device("object");
+	m_f2203_1l = machine().device("f2203.1l");
+	m_f2203_2l = machine().device("f2203.2l");
+	m_f2203_3l = machine().device("f2203.3l");
+	m_f2203_1r = machine().device("f2203.1r");
+	m_f2203_2r = machine().device("f2203.2r");
+	m_f2203_3r = machine().device("f2203.3r");
 
-	state->save_item(NAME(state->m_ground_ctrl));
-	state->save_item(NAME(state->m_scroll_h));
-	state->save_item(NAME(state->m_scroll_v));
-	state->save_item(NAME(state->m_xsal));
-	state->save_item(NAME(state->m_x0ll));
-	state->save_item(NAME(state->m_dx0ll));
-	state->save_item(NAME(state->m_dxll));
-	state->save_item(NAME(state->m_ysal));
-	state->save_item(NAME(state->m_y0ll));
-	state->save_item(NAME(state->m_dy0ll));
-	state->save_item(NAME(state->m_dyll));
-	state->save_item(NAME(state->m_iden));
-	state->save_item(NAME(state->m_obj_pal_latch));
-	state->save_item(NAME(state->m_obj_pal_addr));
-	state->save_item(NAME(state->m_ctrl_reg));
-	state->save_item(NAME(state->m_main_inten));
+	save_item(NAME(m_ground_ctrl));
+	save_item(NAME(m_scroll_h));
+	save_item(NAME(m_scroll_v));
+	save_item(NAME(m_xsal));
+	save_item(NAME(m_x0ll));
+	save_item(NAME(m_dx0ll));
+	save_item(NAME(m_dxll));
+	save_item(NAME(m_ysal));
+	save_item(NAME(m_y0ll));
+	save_item(NAME(m_dy0ll));
+	save_item(NAME(m_dyll));
+	save_item(NAME(m_iden));
+	save_item(NAME(m_obj_pal_latch));
+	save_item(NAME(m_obj_pal_addr));
+	save_item(NAME(m_ctrl_reg));
+	save_item(NAME(m_main_inten));
 }
 
-static MACHINE_RESET( lockon )
+void lockon_state::machine_reset()
 {
-	lockon_state *state = machine.driver_data<lockon_state>();
 
-	state->m_ground_ctrl = 0;
-	state->m_scroll_h = 0;
-	state->m_scroll_v = 0;
-	state->m_xsal = 0;
-	state->m_x0ll = 0;
-	state->m_dx0ll = 0;
-	state->m_dxll = 0;
-	state->m_ysal = 0;
-	state->m_y0ll = 0;
-	state->m_dy0ll = 0;
-	state->m_dyll = 0;
-	state->m_iden = 0;
-	state->m_obj_pal_latch = 0;
-	state->m_obj_pal_addr = 0;
-	state->m_ctrl_reg = 0;
-	state->m_main_inten = 0;
+	m_ground_ctrl = 0;
+	m_scroll_h = 0;
+	m_scroll_v = 0;
+	m_xsal = 0;
+	m_x0ll = 0;
+	m_dx0ll = 0;
+	m_dxll = 0;
+	m_ysal = 0;
+	m_y0ll = 0;
+	m_dy0ll = 0;
+	m_dyll = 0;
+	m_iden = 0;
+	m_obj_pal_latch = 0;
+	m_obj_pal_addr = 0;
+	m_ctrl_reg = 0;
+	m_main_inten = 0;
 }
 
 static MACHINE_CONFIG_START( lockon, lockon_state )
@@ -524,8 +522,6 @@ static MACHINE_CONFIG_START( lockon, lockon_state )
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(10000, 4700, 10000e-12) * 4096)
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(lockon)
-	MCFG_MACHINE_RESET(lockon)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
@@ -535,10 +531,8 @@ static MACHINE_CONFIG_START( lockon, lockon_state )
 	MCFG_SCREEN_VBLANK_STATIC(lockon)
 
 	MCFG_GFXDECODE(lockon)
-	MCFG_PALETTE_INIT(lockon)
 	MCFG_PALETTE_LENGTH(1024 + 2048)
 
-	MCFG_VIDEO_START(lockon)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

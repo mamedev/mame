@@ -116,6 +116,8 @@ public:
 	DECLARE_READ8_MEMBER(junofrst_portA_r);
 	DECLARE_WRITE8_MEMBER(junofrst_portB_w);
 	DECLARE_DRIVER_INIT(junofrst);
+	DECLARE_MACHINE_START(junofrst);
+	DECLARE_MACHINE_RESET(junofrst);
 };
 
 
@@ -384,38 +386,36 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_START( junofrst )
+MACHINE_START_MEMBER(junofrst_state,junofrst)
 {
-	junofrst_state *state = machine.driver_data<junofrst_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_i8039 = machine.device("mcu");
-	state->m_soundcpu = machine.device<cpu_device>("audiocpu");
-	state->m_filter_0_0 = machine.device("filter.0.0");
-	state->m_filter_0_1 = machine.device("filter.0.1");
-	state->m_filter_0_2 = machine.device("filter.0.2");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_i8039 = machine().device("mcu");
+	m_soundcpu = machine().device<cpu_device>("audiocpu");
+	m_filter_0_0 = machine().device("filter.0.0");
+	m_filter_0_1 = machine().device("filter.0.1");
+	m_filter_0_2 = machine().device("filter.0.2");
 
-	state->save_item(NAME(state->m_i8039_status));
-	state->save_item(NAME(state->m_last_irq));
-	state->save_item(NAME(state->m_irq_toggle));
-	state->save_item(NAME(state->m_irq_enable));
-	state->save_item(NAME(state->m_flip_x));
-	state->save_item(NAME(state->m_flip_y));
-	state->save_item(NAME(state->m_blitterdata));
+	save_item(NAME(m_i8039_status));
+	save_item(NAME(m_last_irq));
+	save_item(NAME(m_irq_toggle));
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_flip_x));
+	save_item(NAME(m_flip_y));
+	save_item(NAME(m_blitterdata));
 }
 
-static MACHINE_RESET( junofrst )
+MACHINE_RESET_MEMBER(junofrst_state,junofrst)
 {
-	junofrst_state *state = machine.driver_data<junofrst_state>();
 
-	state->m_i8039_status = 0;
-	state->m_last_irq = 0;
-	state->m_flip_x = 0;
-	state->m_flip_y = 0;
-	state->m_blitterdata[0] = 0;
-	state->m_blitterdata[1] = 0;
-	state->m_blitterdata[2] = 0;
-	state->m_blitterdata[3] = 0;
+	m_i8039_status = 0;
+	m_last_irq = 0;
+	m_flip_x = 0;
+	m_flip_y = 0;
+	m_blitterdata[0] = 0;
+	m_blitterdata[1] = 0;
+	m_blitterdata[2] = 0;
+	m_blitterdata[3] = 0;
 }
 
 static INTERRUPT_GEN( junofrst_30hz_irq )
@@ -442,8 +442,8 @@ static MACHINE_CONFIG_START( junofrst, junofrst_state )
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_io_map)
 
-	MCFG_MACHINE_START(junofrst)
-	MCFG_MACHINE_RESET(junofrst)
+	MCFG_MACHINE_START_OVERRIDE(junofrst_state,junofrst)
+	MCFG_MACHINE_RESET_OVERRIDE(junofrst_state,junofrst)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -84,10 +84,9 @@ static const UINT8 MHB2501[] = {
 };
 
 
-VIDEO_START( sapi1 )
+VIDEO_START_MEMBER(sapi1_state,sapi1)
 {
-	sapi1_state *state = machine.driver_data<sapi1_state>();
-	state->m_refresh_counter = 0;
+	m_refresh_counter = 0;
 }
 
 SCREEN_UPDATE_IND16( sapi1 )
@@ -140,7 +139,7 @@ SCREEN_UPDATE_IND16( sapi1 )
 }
 
 
-VIDEO_START( sapizps3 )
+VIDEO_START_MEMBER(sapi1_state,sapizps3)
 {
 }
 

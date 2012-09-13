@@ -87,9 +87,9 @@ WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
 
 ***************************************************************************/
 
-PALETTE_INIT( skyfox )
+void skyfox_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 256; i++)
@@ -115,13 +115,13 @@ PALETTE_INIT( skyfox )
 		bit3 = (color_prom[i + 2*256] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 
 	/* Grey scale for the background??? */
 	for (i = 0; i < 256; i++)
 	{
-		palette_set_color(machine,i + 256, MAKE_RGB(i, i, i));
+		palette_set_color(machine(),i + 256, MAKE_RGB(i, i, i));
 	}
 }
 

@@ -30,10 +30,13 @@ public:
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_WRITE8_MEMBER(tile_bank_w);
 	DECLARE_DRIVER_INIT(poker72);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
-static VIDEO_START(poker72)
+void poker72_state::video_start()
 {
 }
 
@@ -315,7 +318,7 @@ static GFXDECODE_START( poker72 )
 GFXDECODE_END
 
 /* default 444 palette for debug purpose */
-static PALETTE_INIT( poker72 )
+void poker72_state::palette_init()
 {
 	int x,r,g,b;
 
@@ -324,7 +327,7 @@ static PALETTE_INIT( poker72 )
 		r = (x & 0xf)*0x10;
 		g = ((x & 0x3c)>>2)*0x10;
 		b = ((x & 0xf0)>>4)*0x10;
-		palette_set_color(machine,x,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),x,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -338,11 +341,11 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static MACHINE_RESET( poker72 )
+void poker72_state::machine_reset()
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
-	machine.root_device().membank("bank1")->set_base(&ROM[0]);
+	machine().root_device().membank("bank1")->set_base(&ROM[0]);
 }
 
 static MACHINE_CONFIG_START( poker72, poker72_state )
@@ -353,7 +356,6 @@ static MACHINE_CONFIG_START( poker72, poker72_state )
 	MCFG_CPU_PROGRAM_MAP(poker72_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_RESET(poker72)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -365,9 +367,7 @@ static MACHINE_CONFIG_START( poker72, poker72_state )
 
 	MCFG_GFXDECODE(poker72)
 	MCFG_PALETTE_LENGTH(0xe00)
-	MCFG_PALETTE_INIT(poker72)
 
-	MCFG_VIDEO_START(poker72)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

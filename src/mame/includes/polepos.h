@@ -76,6 +76,9 @@ public:
 	DECLARE_DRIVER_INIT(polepos2);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
+	DECLARE_MACHINE_RESET(polepos);
+	DECLARE_VIDEO_START(polepos);
+	DECLARE_PALETTE_INIT(polepos);
 };
 
 
@@ -114,8 +117,8 @@ DISCRETE_SOUND_EXTERN( polepos );
 
 /*----------- defined in video/polepos.c -----------*/
 
-VIDEO_START( polepos );
-PALETTE_INIT( polepos );
+
+
 SCREEN_UPDATE_IND16( polepos );
 
 

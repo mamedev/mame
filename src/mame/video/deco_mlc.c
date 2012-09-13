@@ -17,18 +17,17 @@
 
 /******************************************************************************/
 
-VIDEO_START( mlc )
+VIDEO_START_MEMBER(deco_mlc_state,mlc)
 {
-	deco_mlc_state *state = machine.driver_data<deco_mlc_state>();
-	if (machine.gfx[0]->granularity()==16)
-		state->m_colour_mask=0x7f;
-	else if (machine.gfx[0]->granularity()==32)
-		state->m_colour_mask=0x3f;
+	if (machine().gfx[0]->granularity()==16)
+		m_colour_mask=0x7f;
+	else if (machine().gfx[0]->granularity()==32)
+		m_colour_mask=0x3f;
 	else
-		state->m_colour_mask=0x1f;
+		m_colour_mask=0x1f;
 
-//  temp_bitmap = auto_bitmap_rgb32_alloc( machine, 512, 512 );
-	state->m_mlc_buffered_spriteram = auto_alloc_array(machine, UINT32, 0x3000/4);
+//  temp_bitmap = auto_bitmap_rgb32_alloc( machine(), 512, 512 );
+	m_mlc_buffered_spriteram = auto_alloc_array(machine(), UINT32, 0x3000/4);
 }
 
 #ifdef UNUSED_FUNCTION

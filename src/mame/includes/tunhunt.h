@@ -22,12 +22,14 @@ public:
 	DECLARE_READ8_MEMBER(dsw2_3r);
 	DECLARE_READ8_MEMBER(dsw2_4r);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/tunhunt.c -----------*/
 
 
-PALETTE_INIT( tunhunt );
-VIDEO_START( tunhunt );
+
+
 SCREEN_UPDATE_IND16( tunhunt );

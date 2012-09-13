@@ -464,37 +464,35 @@ static const msm5205_interface yunsung8_msm5205_interface =
 };
 
 
-static MACHINE_START( yunsung8 )
+void yunsung8_state::machine_start()
 {
-	yunsung8_state *state = machine.driver_data<yunsung8_state>();
-	UINT8 *MAIN = state->memregion("maincpu")->base();
-	UINT8 *AUDIO = state->memregion("audiocpu")->base();
+	UINT8 *MAIN = memregion("maincpu")->base();
+	UINT8 *AUDIO = memregion("audiocpu")->base();
 
-	state->m_videoram_0 = state->m_videoram + 0x0000;	// Ram is banked
-	state->m_videoram_1 = state->m_videoram + 0x2000;
+	m_videoram_0 = m_videoram + 0x0000;	// Ram is banked
+	m_videoram_1 = m_videoram + 0x2000;
 
-	state->membank("bank1")->configure_entries(0, 3, &MAIN[0x00000], 0x4000);
-	state->membank("bank1")->configure_entries(3, 5, &MAIN[0x10000], 0x4000);
-	state->membank("bank2")->configure_entries(0, 3, &AUDIO[0x00000], 0x4000);
-	state->membank("bank2")->configure_entries(3, 5, &AUDIO[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 3, &MAIN[0x00000], 0x4000);
+	membank("bank1")->configure_entries(3, 5, &MAIN[0x10000], 0x4000);
+	membank("bank2")->configure_entries(0, 3, &AUDIO[0x00000], 0x4000);
+	membank("bank2")->configure_entries(3, 5, &AUDIO[0x10000], 0x4000);
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_videoram));
-	state->save_item(NAME(state->m_layers_ctrl));
-	state->save_item(NAME(state->m_videobank));
-	state->save_item(NAME(state->m_adpcm));
-	state->save_item(NAME(state->m_toggle));
+	save_item(NAME(m_videoram));
+	save_item(NAME(m_layers_ctrl));
+	save_item(NAME(m_videobank));
+	save_item(NAME(m_adpcm));
+	save_item(NAME(m_toggle));
 }
 
-static MACHINE_RESET( yunsung8 )
+void yunsung8_state::machine_reset()
 {
-	yunsung8_state *state = machine.driver_data<yunsung8_state>();
 
-	state->m_videobank = 0;
-	state->m_layers_ctrl = 0;
-	state->m_adpcm = 0;
-	state->m_toggle = 0;
+	m_videobank = 0;
+	m_layers_ctrl = 0;
+	m_adpcm = 0;
+	m_toggle = 0;
 }
 
 
@@ -510,8 +508,6 @@ static MACHINE_CONFIG_START( yunsung8, yunsung8_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* NMI caused by the MSM5205? */
 
-	MCFG_MACHINE_START(yunsung8)
-	MCFG_MACHINE_RESET(yunsung8)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -524,7 +520,6 @@ static MACHINE_CONFIG_START( yunsung8, yunsung8_state )
 	MCFG_GFXDECODE(yunsung8)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(yunsung8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

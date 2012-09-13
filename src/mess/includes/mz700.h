@@ -76,6 +76,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mz800_cgram_w);
 	DECLARE_DRIVER_INIT(mz800);
 	DECLARE_DRIVER_INIT(mz700);
+	virtual void machine_start();
+	virtual void palette_init();
+	DECLARE_VIDEO_START(mz800);
 };
 
 
@@ -86,7 +89,7 @@ extern const struct pit8253_config mz800_pit8253_config;
 extern const i8255_interface mz700_ppi8255_interface;
 extern const z80pio_interface mz800_z80pio_config;
 
-MACHINE_START( mz700 );
+
 
 /* bank switching */
 
@@ -97,9 +100,9 @@ MACHINE_START( mz700 );
 
 /*----------- defined in video/mz700.c -----------*/
 
-PALETTE_INIT( mz700 );
+
 SCREEN_UPDATE_IND16( mz700 );
-VIDEO_START( mz800 );
+
 SCREEN_UPDATE_IND16( mz800 );
 
 

@@ -266,6 +266,19 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(bbcm_direct_handler);
 	DECLARE_DRIVER_INIT(bbc);
 	DECLARE_DRIVER_INIT(bbcm);
+	DECLARE_MACHINE_START(bbca);
+	DECLARE_MACHINE_RESET(bbca);
+	DECLARE_VIDEO_START(bbca);
+	DECLARE_PALETTE_INIT(bbc);
+	DECLARE_MACHINE_START(bbcm);
+	DECLARE_MACHINE_RESET(bbcm);
+	DECLARE_VIDEO_START(bbcm);
+	DECLARE_MACHINE_START(bbcb);
+	DECLARE_MACHINE_RESET(bbcb);
+	DECLARE_VIDEO_START(bbcb);
+	DECLARE_MACHINE_START(bbcbp);
+	DECLARE_MACHINE_RESET(bbcbp);
+	DECLARE_VIDEO_START(bbcbp);
 };
 
 
@@ -279,15 +292,15 @@ extern const via6522_interface bbcb_system_via;
 extern const via6522_interface bbcb_user_via;
 extern const wd17xx_interface bbc_wd17xx_interface;
 
-MACHINE_START( bbca );
-MACHINE_START( bbcb );
-MACHINE_START( bbcbp );
-MACHINE_START( bbcm );
 
-MACHINE_RESET( bbca );
-MACHINE_RESET( bbcb );
-MACHINE_RESET( bbcbp );
-MACHINE_RESET( bbcm );
+
+
+
+
+
+
+
+
 
 INTERRUPT_GEN( bbcb_keyscan );
 INTERRUPT_GEN( bbcm_keyscan );
@@ -317,10 +330,10 @@ extern const uPD7002_interface bbc_uPD7002;
 
 /*----------- defined in video/bbc.c -----------*/
 
-VIDEO_START( bbca );
-VIDEO_START( bbcb );
-VIDEO_START( bbcbp );
-VIDEO_START( bbcm );
+
+
+
+
 SCREEN_UPDATE_IND16( bbc );
 
 void bbc_draw_RGB_in(device_t *device, int offset, int data);

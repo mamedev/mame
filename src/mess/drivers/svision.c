@@ -325,28 +325,28 @@ static const unsigned char svisionn_palette[] =
 	245, 249, 248
 };
 
-static PALETTE_INIT( svision )
+void svision_state::palette_init()
 {
 	int i;
 
 	for( i = 0; i < sizeof(svision_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, svision_palette[i*3], svision_palette[i*3+1], svision_palette[i*3+2] );
+		palette_set_color_rgb(machine(), i, svision_palette[i*3], svision_palette[i*3+1], svision_palette[i*3+2] );
 	}
 }
-static PALETTE_INIT( svisionn )
+PALETTE_INIT_MEMBER(svision_state,svisionn)
 {
 	int i;
 
 	for ( i = 0; i < sizeof(svisionn_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, svisionn_palette[i*3], svisionn_palette[i*3+1], svisionn_palette[i*3+2] );
+		palette_set_color_rgb(machine(), i, svisionn_palette[i*3], svisionn_palette[i*3+1], svisionn_palette[i*3+2] );
 	}
 }
-static PALETTE_INIT( svisionp )
+PALETTE_INIT_MEMBER(svision_state,svisionp)
 {
 	int i;
 
 	for ( i = 0; i < sizeof(svisionn_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, svisionp_palette[i*3], svisionp_palette[i*3+1], svisionp_palette[i*3+2] );
+		palette_set_color_rgb(machine(), i, svisionp_palette[i*3], svisionp_palette[i*3+1], svisionp_palette[i*3+2] );
 	}
 }
 
@@ -486,30 +486,28 @@ static DEVICE_IMAGE_LOAD( svision_cart )
 	return IMAGE_INIT_PASS;
 }
 
-static MACHINE_RESET( svision )
+void svision_state::machine_reset()
 {
-	svision_state *state = machine.driver_data<svision_state>();
-	state->m_svision.timer_shot = FALSE;
-	*state->m_dma_finished = FALSE;
-	state->membank("bank1")->set_base(state->memregion("user1")->base());
+	m_svision.timer_shot = FALSE;
+	*m_dma_finished = FALSE;
+	membank("bank1")->set_base(memregion("user1")->base());
 }
 
 
-static MACHINE_RESET( tvlink )
+MACHINE_RESET_MEMBER(svision_state,tvlink)
 {
-	svision_state *state = machine.driver_data<svision_state>();
-	state->m_svision.timer_shot = FALSE;
-	*state->m_dma_finished = FALSE;
-	state->membank("bank1")->set_base(state->memregion("user1")->base());
-	state->m_tvlink.palette_on = FALSE;
+	m_svision.timer_shot = FALSE;
+	*m_dma_finished = FALSE;
+	membank("bank1")->set_base(memregion("user1")->base());
+	m_tvlink.palette_on = FALSE;
 
-	memset(state->m_reg + 0x800, 0xff, 0x40); // normally done from state->m_tvlink microcontroller
-	state->m_reg[0x82a] = 0xdf;
+	memset(m_reg + 0x800, 0xff, 0x40); // normally done from m_tvlink microcontroller
+	m_reg[0x82a] = 0xdf;
 
-	state->m_tvlink.palette[0] = MAKE24_RGB32(svisionp_palette[(PALETTE_START+0)*3+0], svisionp_palette[(PALETTE_START+0)*3+1], svisionp_palette[(PALETTE_START+0)*3+2]);
-	state->m_tvlink.palette[1] = MAKE24_RGB32(svisionp_palette[(PALETTE_START+1)*3+0], svisionp_palette[(PALETTE_START+1)*3+1], svisionp_palette[(PALETTE_START+1)*3+2]);
-	state->m_tvlink.palette[2] = MAKE24_RGB32(svisionp_palette[(PALETTE_START+2)*3+0], svisionp_palette[(PALETTE_START+2)*3+1], svisionp_palette[(PALETTE_START+2)*3+2]);
-	state->m_tvlink.palette[3] = MAKE24_RGB32(svisionp_palette[(PALETTE_START+3)*3+0], svisionp_palette[(PALETTE_START+3)*3+1], svisionp_palette[(PALETTE_START+3)*3+2]);
+	m_tvlink.palette[0] = MAKE24_RGB32(svisionp_palette[(PALETTE_START+0)*3+0], svisionp_palette[(PALETTE_START+0)*3+1], svisionp_palette[(PALETTE_START+0)*3+2]);
+	m_tvlink.palette[1] = MAKE24_RGB32(svisionp_palette[(PALETTE_START+1)*3+0], svisionp_palette[(PALETTE_START+1)*3+1], svisionp_palette[(PALETTE_START+1)*3+2]);
+	m_tvlink.palette[2] = MAKE24_RGB32(svisionp_palette[(PALETTE_START+2)*3+0], svisionp_palette[(PALETTE_START+2)*3+1], svisionp_palette[(PALETTE_START+2)*3+2]);
+	m_tvlink.palette[3] = MAKE24_RGB32(svisionp_palette[(PALETTE_START+3)*3+0], svisionp_palette[(PALETTE_START+3)*3+1], svisionp_palette[(PALETTE_START+3)*3+2]);
 }
 
 static MACHINE_CONFIG_START( svision, svision_state )
@@ -518,7 +516,6 @@ static MACHINE_CONFIG_START( svision, svision_state )
 	MCFG_CPU_PROGRAM_MAP(svision_mem)
 	MCFG_CPU_VBLANK_INT("screen", svision_frame_int)
 
-	MCFG_MACHINE_RESET( svision )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -528,7 +525,6 @@ static MACHINE_CONFIG_START( svision, svision_state )
 	MCFG_SCREEN_UPDATE_STATIC( svision )
 
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(svision_palette) * 3)
-	MCFG_PALETTE_INIT( svision )
 
 	MCFG_DEFAULT_LAYOUT(layout_svision)
 
@@ -558,7 +554,7 @@ static MACHINE_CONFIG_DERIVED( svisionp, svision )
 	MCFG_CPU_CLOCK(4430000)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_PALETTE_INIT( svisionp )
+	MCFG_PALETTE_INIT_OVERRIDE(svision_state, svisionp )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( svisionn, svision )
@@ -566,14 +562,14 @@ static MACHINE_CONFIG_DERIVED( svisionn, svision )
 	MCFG_CPU_CLOCK(3560000/*?*/)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_PALETTE_INIT( svisionn )
+	MCFG_PALETTE_INIT_OVERRIDE(svision_state, svisionn )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tvlinkp, svisionp )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tvlink_mem)
 
-	MCFG_MACHINE_RESET( tvlink )
+	MCFG_MACHINE_RESET_OVERRIDE(svision_state, tvlink )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC( tvlink )

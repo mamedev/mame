@@ -177,6 +177,10 @@ public:
 	DECLARE_DRIVER_INIT(smsj);
 	DECLARE_DRIVER_INIT(sms1);
 	DECLARE_DRIVER_INIT(smssdisp);
+	DECLARE_MACHINE_START(sms);
+	DECLARE_MACHINE_RESET(sms);
+	DECLARE_VIDEO_START(gamegear);
+	DECLARE_VIDEO_START(sms1);
 };
 
 
@@ -193,8 +197,8 @@ WRITE_LINE_DEVICE_HANDLER( sms_store_int_callback );
 DEVICE_START( sms_cart );
 DEVICE_IMAGE_LOAD( sms_cart );
 
-MACHINE_START( sms );
-MACHINE_RESET( sms );
+
+
 
 
 #define IO_EXPANSION    (0x80)	/* Expansion slot enable (1= disabled, 0= enabled) */
@@ -206,8 +210,8 @@ MACHINE_RESET( sms );
 
 
 
-VIDEO_START( sms1 );
-VIDEO_START( gamegear );
+
+
 SCREEN_UPDATE_RGB32( sms1 );
 SCREEN_UPDATE_RGB32( sms );
 SCREEN_UPDATE_RGB32( gamegear );

@@ -115,6 +115,8 @@ public:
 	DECLARE_DRIVER_INIT(pturn);
 	TILE_GET_INFO_MEMBER(get_pturn_tile_info);
 	TILE_GET_INFO_MEMBER(get_pturn_bg_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -153,13 +155,12 @@ TILE_GET_INFO_MEMBER(pturn_state::get_pturn_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1,tileno+m_bgbank*256,palno,0);
 }
 
-static VIDEO_START(pturn)
+void pturn_state::video_start()
 {
-	pturn_state *state = machine.driver_data<pturn_state>();
-	state->m_fgmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pturn_state::get_pturn_tile_info),state),TILEMAP_SCAN_ROWS,8, 8,32,32);
-	state->m_fgmap->set_transparent_pen(0);
-	state->m_bgmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pturn_state::get_pturn_bg_tile_info),state),TILEMAP_SCAN_ROWS,8, 8,32,32*8);
-	state->m_bgmap->set_transparent_pen(0);
+	m_fgmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pturn_state::get_pturn_tile_info),this),TILEMAP_SCAN_ROWS,8, 8,32,32);
+	m_fgmap->set_transparent_pen(0);
+	m_bgmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pturn_state::get_pturn_bg_tile_info),this),TILEMAP_SCAN_ROWS,8, 8,32,32*8);
+	m_bgmap->set_transparent_pen(0);
 }
 
 static SCREEN_UPDATE_IND16(pturn)
@@ -476,11 +477,10 @@ static INTERRUPT_GEN( pturn_main_intgen )
 	}
 }
 
-static MACHINE_RESET( pturn )
+void pturn_state::machine_reset()
 {
-	pturn_state *state = machine.driver_data<pturn_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	state->soundlatch_clear_byte_w(*space,0,0);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	soundlatch_clear_byte_w(*space,0,0);
 }
 
 static MACHINE_CONFIG_START( pturn, pturn_state )
@@ -492,7 +492,6 @@ static MACHINE_CONFIG_START( pturn, pturn_state )
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_PERIODIC_INT(pturn_sub_intgen,3*60)
 
-	MCFG_MACHINE_RESET(pturn)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -504,7 +503,6 @@ static MACHINE_CONFIG_START( pturn, pturn_state )
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 
-	MCFG_VIDEO_START(pturn)
 	MCFG_GFXDECODE(pturn)
 
 	/* sound hardware */

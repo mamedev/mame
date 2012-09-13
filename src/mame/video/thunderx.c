@@ -48,15 +48,14 @@ void thunderx_sprite_callback( running_machine &machine, int *code,int *color, i
 
 ***************************************************************************/
 
-VIDEO_START( scontra )
+void thunderx_state::video_start()
 {
-	thunderx_state *state = machine.driver_data<thunderx_state>();
-	state->m_layer_colorbase[0] = 48;
-	state->m_layer_colorbase[1] = 0;
-	state->m_layer_colorbase[2] = 16;
-	state->m_sprite_colorbase = 32;
+	m_layer_colorbase[0] = 48;
+	m_layer_colorbase[1] = 0;
+	m_layer_colorbase[2] = 16;
+	m_sprite_colorbase = 32;
 
-	palette_set_shadow_factor(machine,7.0/8.0);
+	palette_set_shadow_factor(machine(),7.0/8.0);
 }
 
 

@@ -133,11 +133,10 @@ TILEMAP_MAPPER_MEMBER(battlane_state::battlane_tilemap_scan_rows_2x2)
 
 ***************************************************************************/
 
-VIDEO_START( battlane )
+void battlane_state::video_start()
 {
-	battlane_state *state = machine.driver_data<battlane_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(battlane_state::get_tile_info_bg),state), tilemap_mapper_delegate(FUNC(battlane_state::battlane_tilemap_scan_rows_2x2),state), 16, 16, 32, 32);
-	state->m_screen_bitmap.allocate(32 * 8, 32 * 8);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(battlane_state::get_tile_info_bg),this), tilemap_mapper_delegate(FUNC(battlane_state::battlane_tilemap_scan_rows_2x2),this), 16, 16, 32, 32);
+	m_screen_bitmap.allocate(32 * 8, 32 * 8);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

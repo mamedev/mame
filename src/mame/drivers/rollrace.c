@@ -246,7 +246,6 @@ static MACHINE_CONFIG_START( rollrace, rollrace_state )
 	MCFG_GFXDECODE(rollrace)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(rollrace)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

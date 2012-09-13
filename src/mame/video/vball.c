@@ -37,15 +37,14 @@ TILE_GET_INFO_MEMBER(vball_state::get_bg_tile_info)
 }
 
 
-VIDEO_START( vb )
+void vball_state::video_start()
 {
-	vball_state *state = machine.driver_data<vball_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(vball_state::get_bg_tile_info),state),tilemap_mapper_delegate(FUNC(vball_state::background_scan),state), 8, 8,64,64);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(vball_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(vball_state::background_scan),this), 8, 8,64,64);
 
-	state->m_bg_tilemap->set_scroll_rows(32);
-	state->m_gfxset=0;
-	state->m_vb_bgprombank=0xff;
-	state->m_vb_spprombank=0xff;
+	m_bg_tilemap->set_scroll_rows(32);
+	m_gfxset=0;
+	m_vb_bgprombank=0xff;
+	m_vb_spprombank=0xff;
 }
 
 WRITE8_MEMBER(vball_state::vb_videoram_w)

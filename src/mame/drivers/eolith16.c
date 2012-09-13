@@ -31,6 +31,8 @@ public:
 	DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_READ16_MEMBER(vram_r);
 	DECLARE_DRIVER_INIT(eolith16);
+	DECLARE_VIDEO_START(eolith16);
+	DECLARE_PALETTE_INIT(eolith16);
 };
 
 
@@ -119,10 +121,9 @@ static INPUT_PORTS_START( eolith16 )
 	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
 INPUT_PORTS_END
 
-static VIDEO_START( eolith16 )
+VIDEO_START_MEMBER(eolith16_state,eolith16)
 {
-	eolith16_state *state = machine.driver_data<eolith16_state>();
-	state->m_vram = auto_alloc_array(machine, UINT16, 0x10000);
+	m_vram = auto_alloc_array(machine(), UINT16, 0x10000);
 }
 
 static SCREEN_UPDATE_IND16( eolith16 )
@@ -150,7 +151,7 @@ static SCREEN_UPDATE_IND16( eolith16 )
 
 
 // setup a custom palette because pixels use 8 bits per color
-static PALETTE_INIT( eolith16 )
+PALETTE_INIT_MEMBER(eolith16_state,eolith16)
 {
 	int c;
 
@@ -169,7 +170,7 @@ static PALETTE_INIT( eolith16 )
 		bit1 = (c >> 7) & 0x01;
 		b = 0x55 * bit0 + 0xaa * bit1;
 
-		palette_set_color(machine,c,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),c,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -192,8 +193,8 @@ static MACHINE_CONFIG_START( eolith16, eolith16_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(eolith16)
-	MCFG_VIDEO_START(eolith16)
+	MCFG_PALETTE_INIT_OVERRIDE(eolith16_state,eolith16)
+	MCFG_VIDEO_START_OVERRIDE(eolith16_state,eolith16)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

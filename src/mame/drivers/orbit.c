@@ -271,23 +271,21 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( orbit )
+void orbit_state::machine_start()
 {
-	orbit_state *state = machine.driver_data<orbit_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_discrete = machine.device("discrete");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_discrete = machine().device("discrete");
 
-	state->save_item(NAME(state->m_misc_flags));
-	state->save_item(NAME(state->m_flip_screen));
+	save_item(NAME(m_misc_flags));
+	save_item(NAME(m_flip_screen));
 }
 
-static MACHINE_RESET( orbit )
+void orbit_state::machine_reset()
 {
-	orbit_state *state = machine.driver_data<orbit_state>();
 
-	update_misc_flags(machine, 0);
-	state->m_flip_screen = 0;
+	update_misc_flags(machine(), 0);
+	m_flip_screen = 0;
 }
 
 
@@ -306,8 +304,6 @@ static MACHINE_CONFIG_START( orbit, orbit_state )
 
 	MCFG_TIMER_ADD_SCANLINE("32v", nmi_32v, "screen", 0, 32)
 
-	MCFG_MACHINE_START(orbit)
-	MCFG_MACHINE_RESET(orbit)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -317,7 +313,6 @@ static MACHINE_CONFIG_START( orbit, orbit_state )
 	MCFG_GFXDECODE(orbit)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-	MCFG_VIDEO_START(orbit)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

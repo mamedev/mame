@@ -461,19 +461,18 @@ static TIMER_DEVICE_CALLBACK( polepos_scanline )
 }
 
 
-static MACHINE_RESET( polepos )
+MACHINE_RESET_MEMBER(polepos_state,polepos)
 {
-	polepos_state *state = machine.driver_data<polepos_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
 	for (i = 0; i < 8; i++)
-		state->polepos_latch_w(*space, i, 0);
+		polepos_latch_w(*space, i, 0);
 
 	/* set the interrupt vectors (this shouldn't be needed) */
-	machine.device("sub")->execute().set_input_line_vector(0, Z8000_NVI);
-	machine.device("sub2")->execute().set_input_line_vector(0, Z8000_NVI);
+	machine().device("sub")->execute().set_input_line_vector(0, Z8000_NVI);
+	machine().device("sub2")->execute().set_input_line_vector(0, Z8000_NVI);
 }
 
 
@@ -901,7 +900,7 @@ static MACHINE_CONFIG_START( polepos, polepos_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* some interleaving */
 
-	MCFG_MACHINE_RESET(polepos)
+	MCFG_MACHINE_RESET_OVERRIDE(polepos_state,polepos)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_ADD_SCANLINE("scantimer", polepos_scanline, "screen", 0, 1)
@@ -915,8 +914,8 @@ static MACHINE_CONFIG_START( polepos, polepos_state )
 	MCFG_PALETTE_LENGTH(0x0f00)
 	MCFG_DEFAULT_LAYOUT(layout_polepos)
 
-	MCFG_PALETTE_INIT(polepos)
-	MCFG_VIDEO_START(polepos)
+	MCFG_PALETTE_INIT_OVERRIDE(polepos_state,polepos)
+	MCFG_VIDEO_START_OVERRIDE(polepos_state,polepos)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -980,7 +979,7 @@ static MACHINE_CONFIG_START( topracern, polepos_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* some interleaving */
 
-	MCFG_MACHINE_RESET(polepos)
+	MCFG_MACHINE_RESET_OVERRIDE(polepos_state,polepos)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_ADD_SCANLINE("scantimer", polepos_scanline, "screen", 0, 1)
@@ -994,8 +993,8 @@ static MACHINE_CONFIG_START( topracern, polepos_state )
 	MCFG_PALETTE_LENGTH(0x0f00)
 	MCFG_DEFAULT_LAYOUT(layout_topracer)
 
-	MCFG_PALETTE_INIT(polepos)
-	MCFG_VIDEO_START(polepos)
+	MCFG_PALETTE_INIT_OVERRIDE(polepos_state,polepos)
+	MCFG_VIDEO_START_OVERRIDE(polepos_state,polepos)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -42,11 +42,12 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
 	DECLARE_DRIVER_INIT(undrfire);
 	DECLARE_DRIVER_INIT(cbombers);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/undrfire.c -----------*/
 
-VIDEO_START( undrfire );
+
 SCREEN_UPDATE_IND16( undrfire );
 SCREEN_UPDATE_IND16( cbombers );

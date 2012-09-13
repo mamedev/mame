@@ -108,6 +108,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_jackie_reel1_tile_info);
 	TILE_GET_INFO_MEMBER(get_jackie_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_jackie_reel3_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -180,19 +182,18 @@ TILE_GET_INFO_MEMBER(jackie_state::get_jackie_reel3_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, 0, 0);
 }
 
-static VIDEO_START(jackie)
+void jackie_state::video_start()
 {
-	jackie_state *state = machine.driver_data<jackie_state>();
-	state->m_reel1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(jackie_state::get_jackie_reel1_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	state->m_reel2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(jackie_state::get_jackie_reel2_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	state->m_reel3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(jackie_state::get_jackie_reel3_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(jackie_state::get_jackie_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(jackie_state::get_jackie_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(jackie_state::get_jackie_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 
-	state->m_reel1_tilemap->set_scroll_cols(64);
-	state->m_reel2_tilemap->set_scroll_cols(64);
-	state->m_reel3_tilemap->set_scroll_cols(64);
+	m_reel1_tilemap->set_scroll_cols(64);
+	m_reel2_tilemap->set_scroll_cols(64);
+	m_reel3_tilemap->set_scroll_cols(64);
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(jackie_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,	8,  8,	64, 32);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(jackie_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,	8,  8,	64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 
@@ -246,13 +247,12 @@ static SCREEN_UPDATE_IND16(jackie)
 
 
 
-static MACHINE_RESET( jackie )
+void jackie_state::machine_reset()
 {
-	jackie_state *state = machine.driver_data<jackie_state>();
-	state->m_irq_enable	=	1;
-	state->m_nmi_enable	=	0;
-	state->m_hopper		=	0;
-	state->m_bg_enable	=	1;
+	m_irq_enable	=	1;
+	m_nmi_enable	=	0;
+	m_hopper		=	0;
+	m_bg_enable	=	1;
 }
 
 
@@ -579,7 +579,6 @@ static MACHINE_CONFIG_START( jackie, jackie_state )
 	MCFG_CPU_IO_MAP(jackie_io_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", jackie_irq, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET(jackie)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -592,7 +591,6 @@ static MACHINE_CONFIG_START( jackie, jackie_state )
 	MCFG_GFXDECODE(jackie)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(jackie)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

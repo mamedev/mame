@@ -214,8 +214,6 @@ static MACHINE_CONFIG_START( mrjong, mrjong_state )
 	MCFG_GFXDECODE(mrjong)
 	MCFG_PALETTE_LENGTH(4*32)
 
-	MCFG_PALETTE_INIT(mrjong)
-	MCFG_VIDEO_START(mrjong)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

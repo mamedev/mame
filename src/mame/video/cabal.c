@@ -40,15 +40,14 @@ TILE_GET_INFO_MEMBER(cabal_state::get_text_tile_info)
 }
 
 
-VIDEO_START( cabal )
+void cabal_state::video_start()
 {
-	cabal_state *state = machine.driver_data<cabal_state>();
 
-	state->m_background_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cabal_state::get_back_tile_info),state),TILEMAP_SCAN_ROWS,16,16,16,16);
-	state->m_text_layer       = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cabal_state::get_text_tile_info),state),TILEMAP_SCAN_ROWS,  8,8,32,32);
+	m_background_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cabal_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,16,16);
+	m_text_layer       = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cabal_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,32,32);
 
-	state->m_text_layer->set_transparent_pen(3);
-	state->m_background_layer->set_transparent_pen(15);
+	m_text_layer->set_transparent_pen(3);
+	m_background_layer->set_transparent_pen(15);
 }
 
 

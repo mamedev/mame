@@ -439,10 +439,10 @@ DRIVER_INIT_MEMBER(mtech_state,mt_crt)
 	m_cart_is_genesis[0] = !pin[0] ? 1 : 0;;
 }
 
-static VIDEO_START(mtnew)
+VIDEO_START_MEMBER(mtech_state,mtnew)
 {
-	init_for_megadrive(machine); // create an sms vdp too, for compatibility mode
-	VIDEO_START_CALL(megadriv);
+	init_for_megadrive(machine()); // create an sms vdp too, for compatibility mode
+	VIDEO_START_CALL_LEGACY(megadriv);
 }
 
 //attotime::never
@@ -467,14 +467,13 @@ static SCREEN_VBLANK(mtnew)
 		SCREEN_VBLANK_CALL(megatech_md_sms);
 }
 
-static MACHINE_RESET(mtnew)
+MACHINE_RESET_MEMBER(mtech_state,mtnew)
 {
-	mtech_state *state = machine.driver_data<mtech_state>();
-	state->m_mt_bank_addr = 0;
+	m_mt_bank_addr = 0;
 
-	MACHINE_RESET_CALL(megadriv);
-	MACHINE_RESET_CALL(megatech_md_sms);
-	megatech_select_game(machine, 0);
+	MACHINE_RESET_CALL_LEGACY(megadriv);
+	MACHINE_RESET_CALL_LEGACY(megatech_md_sms);
+	megatech_select_game(machine(), 0);
 }
 
 static SCREEN_UPDATE_RGB32( megatech_menu )
@@ -510,9 +509,9 @@ static MACHINE_CONFIG_START( megatech, mtech_state )
 	MCFG_CPU_PROGRAM_MAP(megatech_bios_map)
 	MCFG_CPU_IO_MAP(megatech_bios_portmap)
 
-	MCFG_MACHINE_RESET(mtnew)
+	MCFG_MACHINE_RESET_OVERRIDE(mtech_state,mtnew)
 
-	MCFG_VIDEO_START(mtnew)
+	MCFG_VIDEO_START_OVERRIDE(mtech_state,mtnew)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhovu)
 

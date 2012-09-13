@@ -35,6 +35,8 @@ public:
 	DECLARE_WRITE8_MEMBER(redalert_ay8910_latch_2_w);
 	DECLARE_WRITE8_MEMBER(redalert_voice_command_w);
 	DECLARE_WRITE8_MEMBER(demoneye_audio_command_w);
+	DECLARE_VIDEO_START(redalert);
+	DECLARE_VIDEO_START(ww3);
 };
 
 

@@ -76,6 +76,10 @@ public:
 	DECLARE_READ8_MEMBER(input_2p_r);
 	DECLARE_DRIVER_INIT(ngalsumr);
 	DECLARE_DRIVER_INIT(royalqn);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -85,11 +89,10 @@ READ8_MEMBER(nightgal_state::blitter_status_r)
 	return 0x80;
 }
 
-static VIDEO_START( nightgal )
+void nightgal_state::video_start()
 {
-	nightgal_state *state = machine.driver_data<nightgal_state>();
 
-	state->save_item(NAME(state->m_blit_buffer));
+	save_item(NAME(m_blit_buffer));
 }
 
 static SCREEN_UPDATE_IND16( nightgal )
@@ -252,9 +255,9 @@ WRITE8_MEMBER(nightgal_state::sexygal_nsc_true_blitter_w)
 }
 
 /* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
-static PALETTE_INIT( nightgal )
+void nightgal_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double weights_rg[3], weights_b[2];
@@ -266,7 +269,7 @@ static PALETTE_INIT( nightgal )
 			2, resistances_b,  weights_b,  0, 0,
 			0, 0, 0, 0, 0);
 
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		int bit0, bit1, bit2;
 		int r, g, b;
@@ -288,7 +291,7 @@ static PALETTE_INIT( nightgal )
 		bit1 = BIT(color_prom[i], 7);
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -830,35 +833,33 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_START( nightgal )
+void nightgal_state::machine_start()
 {
-	nightgal_state *state = machine.driver_data<nightgal_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_subcpu = machine.device<cpu_device>("sub");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_subcpu = machine().device<cpu_device>("sub");
 
-	state->save_item(NAME(state->m_nsc_latch));
-	state->save_item(NAME(state->m_z80_latch));
-	state->save_item(NAME(state->m_mux_data));
+	save_item(NAME(m_nsc_latch));
+	save_item(NAME(m_z80_latch));
+	save_item(NAME(m_mux_data));
 
-	state->save_item(NAME(state->m_blit_raw_data));
-	state->save_item(NAME(state->m_true_blit));
-	state->save_item(NAME(state->m_pen_data));
-	state->save_item(NAME(state->m_pen_raw_data));
+	save_item(NAME(m_blit_raw_data));
+	save_item(NAME(m_true_blit));
+	save_item(NAME(m_pen_data));
+	save_item(NAME(m_pen_raw_data));
 }
 
-static MACHINE_RESET( nightgal )
+void nightgal_state::machine_reset()
 {
-	nightgal_state *state = machine.driver_data<nightgal_state>();
 
-	state->m_nsc_latch = 0;
-	state->m_z80_latch = 0;
-	state->m_mux_data = 0;
+	m_nsc_latch = 0;
+	m_z80_latch = 0;
+	m_mux_data = 0;
 
-	memset(state->m_blit_raw_data, 0, ARRAY_LENGTH(state->m_blit_raw_data));
-	memset(state->m_true_blit, 0, ARRAY_LENGTH(state->m_true_blit));
-	memset(state->m_pen_data, 0, ARRAY_LENGTH(state->m_pen_data));
-	memset(state->m_pen_raw_data, 0, ARRAY_LENGTH(state->m_pen_raw_data));
+	memset(m_blit_raw_data, 0, ARRAY_LENGTH(m_blit_raw_data));
+	memset(m_true_blit, 0, ARRAY_LENGTH(m_true_blit));
+	memset(m_pen_data, 0, ARRAY_LENGTH(m_pen_data));
+	memset(m_pen_raw_data, 0, ARRAY_LENGTH(m_pen_raw_data));
 }
 
 static MACHINE_CONFIG_START( royalqn, nightgal_state )
@@ -874,8 +875,6 @@ static MACHINE_CONFIG_START( royalqn, nightgal_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_MACHINE_START(nightgal)
-	MCFG_MACHINE_RESET(nightgal)
 
 	/* video hardware */
 	/* TODO: blitter clock is MASTER_CLOCK / 4, 320 x 264 pixels, 256 x 224 of visible area */
@@ -885,11 +884,9 @@ static MACHINE_CONFIG_START( royalqn, nightgal_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_STATIC(nightgal)
-	MCFG_PALETTE_INIT(nightgal)
 
 	MCFG_PALETTE_LENGTH(0x10)
 
-	MCFG_VIDEO_START(nightgal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

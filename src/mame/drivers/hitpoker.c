@@ -80,17 +80,17 @@ public:
 	DECLARE_WRITE8_MEMBER(hitpoker_pic_w);
 	DECLARE_READ8_MEMBER(test_r);
 	DECLARE_DRIVER_INIT(hitpoker);
+	virtual void video_start();
 };
 
 
 #define CRTC_CLOCK XTAL_3_579545MHz
 
-static VIDEO_START(hitpoker)
+void hitpoker_state::video_start()
 {
-	hitpoker_state *state = machine.driver_data<hitpoker_state>();
-	state->m_videoram = auto_alloc_array(machine, UINT8, 0x35ff);
-	state->m_paletteram = auto_alloc_array(machine, UINT8, 0x1000);
-	state->m_colorram = auto_alloc_array(machine, UINT8, 0x2000);
+	m_videoram = auto_alloc_array(machine(), UINT8, 0x35ff);
+	m_paletteram = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_colorram = auto_alloc_array(machine(), UINT8, 0x2000);
 }
 
 static SCREEN_UPDATE_IND16(hitpoker)
@@ -512,7 +512,6 @@ static MACHINE_CONFIG_START( hitpoker, hitpoker_state )
 	MCFG_GFXDECODE(hitpoker)
 	MCFG_PALETTE_LENGTH(0x800)
 
-	MCFG_VIDEO_START(hitpoker)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

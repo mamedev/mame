@@ -135,21 +135,27 @@ public:
     write8_delegate write_delegates_2gs0400[2];
     write8_delegate write_delegates_2gs2000[2];
     write8_delegate write_delegates_2gs4000[2];
+	DECLARE_MACHINE_START(apple2gs);
+	DECLARE_MACHINE_RESET(apple2gs);
+	DECLARE_VIDEO_START(apple2gs);
+	DECLARE_PALETTE_INIT(apple2gs);
+	DECLARE_MACHINE_START(apple2gsr1);
+	DECLARE_MACHINE_START(apple2gscommon);
 };
 
 
 /*----------- defined in machine/apple2gs.c -----------*/
 
-MACHINE_START( apple2gs );
-MACHINE_START( apple2gsr1 );
-MACHINE_RESET( apple2gs );
+
+
+
 
 void apple2gs_doc_irq(device_t *device, int state);
 
 
 /*----------- defined in video/apple2gs.c -----------*/
 
-VIDEO_START( apple2gs );
+
 SCREEN_UPDATE_IND16( apple2gs );
 
 

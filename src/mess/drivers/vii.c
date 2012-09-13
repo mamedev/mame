@@ -136,6 +136,9 @@ public:
 	DECLARE_DRIVER_INIT(walle);
 	DECLARE_DRIVER_INIT(vii);
 	DECLARE_DRIVER_INIT(batman);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 enum
@@ -178,7 +181,7 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 *     Video Hardware     *
 *************************/
 
-static VIDEO_START( vii )
+void vii_state::video_start()
 {
 }
 
@@ -987,35 +990,34 @@ static TIMER_CALLBACK( tmb2_tick )
 	state->m_io_regs[0x22] |= 2;
 }
 
-static MACHINE_START( vii )
+void vii_state::machine_start()
 {
-	vii_state *state = machine.driver_data<vii_state>();
 
-	memset(state->m_video_regs, 0, 0x100 * sizeof(UINT16));
-	memset(state->m_io_regs, 0, 0x100 * sizeof(UINT16));
-	state->m_current_bank = 0;
+	memset(m_video_regs, 0, 0x100 * sizeof(UINT16));
+	memset(m_io_regs, 0, 0x100 * sizeof(UINT16));
+	m_current_bank = 0;
 
-	state->m_controller_input[0] = 0;
-	state->m_controller_input[4] = 0;
-	state->m_controller_input[6] = 0xff;
-	state->m_controller_input[7] = 0;
+	m_controller_input[0] = 0;
+	m_controller_input[4] = 0;
+	m_controller_input[6] = 0xff;
+	m_controller_input[7] = 0;
 
-	UINT8 *rom = state->memregion( "cart" )->base();
+	UINT8 *rom = memregion( "cart" )->base();
 	if (rom)
 	{ // to prevent batman crash
-		memcpy(state->m_p_cart, rom + 0x4000*2, (0x400000 - 0x4000) * 2);
+		memcpy(m_p_cart, rom + 0x4000*2, (0x400000 - 0x4000) * 2);
 	}
 
-	state->m_video_regs[0x36] = 0xffff;
-	state->m_video_regs[0x37] = 0xffff;
+	m_video_regs[0x36] = 0xffff;
+	m_video_regs[0x37] = 0xffff;
 
-	state->m_tmb1 = machine.scheduler().timer_alloc(FUNC(tmb1_tick));
-	state->m_tmb2 = machine.scheduler().timer_alloc(FUNC(tmb2_tick));
-	state->m_tmb1->reset();
-	state->m_tmb2->reset();
+	m_tmb1 = machine().scheduler().timer_alloc(FUNC(tmb1_tick));
+	m_tmb2 = machine().scheduler().timer_alloc(FUNC(tmb2_tick));
+	m_tmb1->reset();
+	m_tmb2->reset();
 }
 
-static MACHINE_RESET( vii )
+void vii_state::machine_reset()
 {
 }
 
@@ -1094,14 +1096,11 @@ static MACHINE_CONFIG_START( vii, vii_state )
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
 	MCFG_CPU_VBLANK_INT("screen", vii_vblank)
 
-	MCFG_MACHINE_START( vii )
-	MCFG_MACHINE_RESET( vii )
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_VIDEO_START( vii )
 	MCFG_SCREEN_UPDATE_STATIC( vii )
 	MCFG_PALETTE_LENGTH(32768)
 
@@ -1119,14 +1118,11 @@ static MACHINE_CONFIG_START( vsmile, vii_state )
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
 	MCFG_CPU_VBLANK_INT("screen", vii_vblank)
 
-	MCFG_MACHINE_START( vii )
-	MCFG_MACHINE_RESET( vii )
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_VIDEO_START( vii )
 	MCFG_SCREEN_UPDATE_STATIC( vii )
 	MCFG_PALETTE_LENGTH(32768)
 
@@ -1147,8 +1143,6 @@ static MACHINE_CONFIG_START( batman, vii_state )
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
 	MCFG_CPU_VBLANK_INT("screen", vii_vblank)
 
-	MCFG_MACHINE_START( vii )
-	MCFG_MACHINE_RESET( vii )
 
 	MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)
 
@@ -1156,7 +1150,6 @@ static MACHINE_CONFIG_START( batman, vii_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_VIDEO_START( vii )
 	MCFG_SCREEN_UPDATE_STATIC( vii )
 	MCFG_PALETTE_LENGTH(32768)
 MACHINE_CONFIG_END

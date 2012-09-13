@@ -53,6 +53,9 @@ public:
 	DECLARE_DRIVER_INIT(lazercmd);
 	DECLARE_DRIVER_INIT(bbonk);
 	DECLARE_DRIVER_INIT(medlanes);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 

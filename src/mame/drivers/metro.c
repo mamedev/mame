@@ -3384,31 +3384,29 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static MACHINE_START( metro )
+MACHINE_START_MEMBER(metro_state,metro)
 {
-	metro_state *state = machine.driver_data<metro_state>();
 
-	state->save_item(NAME(state->m_blitter_bit));
-	state->save_item(NAME(state->m_irq_line));
-	state->save_item(NAME(state->m_requested_int));
-	state->save_item(NAME(state->m_soundstatus));
-	state->save_item(NAME(state->m_porta));
-	state->save_item(NAME(state->m_portb));
-	state->save_item(NAME(state->m_busy_sndcpu));
-	state->save_item(NAME(state->m_gakusai_oki_bank_lo));
-	state->save_item(NAME(state->m_gakusai_oki_bank_hi));
-	state->save_item(NAME(state->m_sprite_xoffs));
-	state->save_item(NAME(state->m_sprite_yoffs));
-	state->save_item(NAME(state->m_bg_tilemap_enable));
-	state->save_item(NAME(state->m_bg_tilemap_enable16));
+	save_item(NAME(m_blitter_bit));
+	save_item(NAME(m_irq_line));
+	save_item(NAME(m_requested_int));
+	save_item(NAME(m_soundstatus));
+	save_item(NAME(m_porta));
+	save_item(NAME(m_portb));
+	save_item(NAME(m_busy_sndcpu));
+	save_item(NAME(m_gakusai_oki_bank_lo));
+	save_item(NAME(m_gakusai_oki_bank_hi));
+	save_item(NAME(m_sprite_xoffs));
+	save_item(NAME(m_sprite_yoffs));
+	save_item(NAME(m_bg_tilemap_enable));
+	save_item(NAME(m_bg_tilemap_enable16));
 }
 
-static MACHINE_RESET( metro )
+MACHINE_RESET_MEMBER(metro_state,metro)
 {
-	metro_state *state = machine.driver_data<metro_state>();
 
-	if (state->m_irq_line == -1)
-		machine.device("maincpu")->execute().set_irq_acknowledge_callback(metro_irq_callback);
+	if (m_irq_line == -1)
+		machine().device("maincpu")->execute().set_irq_acknowledge_callback(metro_irq_callback);
 }
 
 
@@ -3426,8 +3424,8 @@ static MACHINE_CONFIG_START( balcube, metro_state )
 	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3440,7 +3438,7 @@ static MACHINE_CONFIG_START( balcube, metro_state )
 	MCFG_GFXDECODE(i4220)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4220)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3460,8 +3458,8 @@ static MACHINE_CONFIG_START( daitoa, metro_state )
 	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3474,7 +3472,7 @@ static MACHINE_CONFIG_START( daitoa, metro_state )
 	MCFG_GFXDECODE(i4220)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4220)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3494,8 +3492,8 @@ static MACHINE_CONFIG_START( msgogo, metro_state )
 	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt) // timing is off, shaking sprites in intro
 	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 60) // ?
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3508,7 +3506,7 @@ static MACHINE_CONFIG_START( msgogo, metro_state )
 	MCFG_GFXDECODE(i4220)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4220)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3528,8 +3526,8 @@ static MACHINE_CONFIG_START( bangball, metro_state )
 	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 60) // ?
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3542,7 +3540,7 @@ static MACHINE_CONFIG_START( bangball, metro_state )
 	MCFG_GFXDECODE(i4220)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4220)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3562,8 +3560,8 @@ static MACHINE_CONFIG_START( batlbubl, metro_state )
 	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 60) // ?
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3576,7 +3574,7 @@ static MACHINE_CONFIG_START( batlbubl, metro_state )
 	MCFG_GFXDECODE(i4220)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4220)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3600,8 +3598,8 @@ static MACHINE_CONFIG_START( daitorid, metro_state )
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(daitorid_sound_io_map)
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3614,7 +3612,7 @@ static MACHINE_CONFIG_START( daitorid, metro_state )
 	MCFG_GFXDECODE(i4220)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4220)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3643,8 +3641,8 @@ static MACHINE_CONFIG_START( dharma, metro_state )
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3657,7 +3655,7 @@ static MACHINE_CONFIG_START( dharma, metro_state )
 	MCFG_GFXDECODE(i4100)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4100)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3685,8 +3683,8 @@ static MACHINE_CONFIG_START( karatour, metro_state )
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3699,7 +3697,7 @@ static MACHINE_CONFIG_START( karatour, metro_state )
 	MCFG_GFXDECODE(i4100)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4100)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3727,8 +3725,8 @@ static MACHINE_CONFIG_START( 3kokushi, metro_state )
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3741,7 +3739,7 @@ static MACHINE_CONFIG_START( 3kokushi, metro_state )
 	MCFG_GFXDECODE(i4220)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4220)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3769,8 +3767,8 @@ static MACHINE_CONFIG_START( lastfort, metro_state )
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3783,7 +3781,7 @@ static MACHINE_CONFIG_START( lastfort, metro_state )
 	MCFG_GFXDECODE(i4100)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4100)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3810,8 +3808,8 @@ static MACHINE_CONFIG_START( lastforg, metro_state )
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3824,7 +3822,7 @@ static MACHINE_CONFIG_START( lastforg, metro_state )
 	MCFG_GFXDECODE(i4100)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4100)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3845,8 +3843,8 @@ static MACHINE_CONFIG_START( dokyusei, metro_state )
 	MCFG_CPU_PROGRAM_MAP(dokyusei_map)
 	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3859,7 +3857,7 @@ static MACHINE_CONFIG_START( dokyusei, metro_state )
 	MCFG_GFXDECODE(i4300)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4300)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4300)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3880,8 +3878,8 @@ static MACHINE_CONFIG_START( dokyusp, metro_state )
 	MCFG_CPU_PROGRAM_MAP(dokyusp_map)
 	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
@@ -3895,7 +3893,7 @@ static MACHINE_CONFIG_START( dokyusp, metro_state )
 	MCFG_GFXDECODE(i4300)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4300)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4300)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3917,8 +3915,8 @@ static MACHINE_CONFIG_START( gakusai, metro_state )
 	MCFG_CPU_PROGRAM_MAP(gakusai_map)
 	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
@@ -3932,7 +3930,7 @@ static MACHINE_CONFIG_START( gakusai, metro_state )
 	MCFG_GFXDECODE(i4300)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4300)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4300)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3954,8 +3952,8 @@ static MACHINE_CONFIG_START( gakusai2, metro_state )
 	MCFG_CPU_PROGRAM_MAP(gakusai2_map)
 	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
@@ -3969,7 +3967,7 @@ static MACHINE_CONFIG_START( gakusai2, metro_state )
 	MCFG_GFXDECODE(i4300)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4300)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4300)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3997,8 +3995,8 @@ static MACHINE_CONFIG_START( pangpoms, metro_state )
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4011,7 +4009,7 @@ static MACHINE_CONFIG_START( pangpoms, metro_state )
 	MCFG_GFXDECODE(i4100)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4100)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -4039,8 +4037,8 @@ static MACHINE_CONFIG_START( poitto, metro_state )
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4053,7 +4051,7 @@ static MACHINE_CONFIG_START( poitto, metro_state )
 	MCFG_GFXDECODE(i4100)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4100)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -4081,8 +4079,8 @@ static MACHINE_CONFIG_START( pururun, metro_state )
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(daitorid_sound_io_map)
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4095,7 +4093,7 @@ static MACHINE_CONFIG_START( pururun, metro_state )
 	MCFG_GFXDECODE(i4100)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4100)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -4124,8 +4122,8 @@ static MACHINE_CONFIG_START( skyalert, metro_state )
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4138,7 +4136,7 @@ static MACHINE_CONFIG_START( skyalert, metro_state )
 	MCFG_GFXDECODE(i4100)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4100)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -4166,8 +4164,8 @@ static MACHINE_CONFIG_START( toride2g, metro_state )
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4180,7 +4178,7 @@ static MACHINE_CONFIG_START( toride2g, metro_state )
 	MCFG_GFXDECODE(i4100)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4100)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -4202,8 +4200,8 @@ static MACHINE_CONFIG_START( mouja, metro_state )
 	MCFG_CPU_PROGRAM_MAP(mouja_map)
 	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4216,7 +4214,7 @@ static MACHINE_CONFIG_START( mouja, metro_state )
 	MCFG_GFXDECODE(i4300)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4300)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4300)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -4247,8 +4245,8 @@ static MACHINE_CONFIG_START( blzntrnd, metro_state )
 	MCFG_CPU_PROGRAM_MAP(blzntrnd_sound_map)
 	MCFG_CPU_IO_MAP(blzntrnd_sound_io_map)
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4261,7 +4259,7 @@ static MACHINE_CONFIG_START( blzntrnd, metro_state )
 	MCFG_GFXDECODE(blzntrnd)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(blzntrnd)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,blzntrnd)
 
 	MCFG_K053936_ADD("k053936", blzntrnd_k053936_intf)
 
@@ -4295,8 +4293,8 @@ static MACHINE_CONFIG_START( gstrik2, metro_state )
 	MCFG_CPU_PROGRAM_MAP(blzntrnd_sound_map)
 	MCFG_CPU_IO_MAP(blzntrnd_sound_io_map)
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4309,7 +4307,7 @@ static MACHINE_CONFIG_START( gstrik2, metro_state )
 	MCFG_GFXDECODE(gstrik2)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(gstrik2)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,gstrik2)
 
 	MCFG_K053936_ADD("k053936", gstrik2_k053936_intf)
 
@@ -4333,8 +4331,8 @@ static MACHINE_CONFIG_START( puzzlet, metro_state )
 	MCFG_CPU_IO_MAP(puzzlet_io_map)
 	MCFG_CPU_VBLANK_INT("screen", puzzlet_interrupt)
 
-	MCFG_MACHINE_START(metro)
-	MCFG_MACHINE_RESET(metro)
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4347,7 +4345,7 @@ static MACHINE_CONFIG_START( puzzlet, metro_state )
 	MCFG_GFXDECODE(i4300)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_i4300)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4300)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

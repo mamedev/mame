@@ -1105,12 +1105,11 @@ DRIVER_INIT_MEMBER(hp48_state,hp48)
 	m_port_size[1] = 0;
 }
 
-MACHINE_RESET( hp48 )
+void hp48_state::machine_reset()
 {
-	hp48_state *state = machine.driver_data<hp48_state>();
 	LOG(( "hp48: machine reset called\n" ));
-	hp48_reset_modules( machine );
-	hp48_update_annunciators(state);
+	hp48_reset_modules( machine() );
+	hp48_update_annunciators(this);
 }
 
 static void hp48_machine_start( running_machine &machine, hp48_models model )
@@ -1210,29 +1209,29 @@ static void hp48_machine_start( running_machine &machine, hp48_models model )
 }
 
 
-MACHINE_START( hp48s )
+MACHINE_START_MEMBER(hp48_state,hp48s)
 {
-	hp48_machine_start( machine, HP48_S );
+	hp48_machine_start( machine(), HP48_S );
 }
 
 
-MACHINE_START( hp48sx )
+MACHINE_START_MEMBER(hp48_state,hp48sx)
 {
-	hp48_machine_start( machine, HP48_SX );
+	hp48_machine_start( machine(), HP48_SX );
 }
 
 
-MACHINE_START( hp48g )
+MACHINE_START_MEMBER(hp48_state,hp48g)
 {
-	hp48_machine_start( machine, HP48_G );
+	hp48_machine_start( machine(), HP48_G );
 }
 
-MACHINE_START( hp48gx )
+MACHINE_START_MEMBER(hp48_state,hp48gx)
 {
-	hp48_machine_start( machine, HP48_GX );
+	hp48_machine_start( machine(), HP48_GX );
 }
 
-MACHINE_START( hp48gp )
+MACHINE_START_MEMBER(hp48_state,hp48gp)
 {
-	hp48_machine_start( machine, HP48_GP );
+	hp48_machine_start( machine(), HP48_GP );
 }

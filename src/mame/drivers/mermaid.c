@@ -362,46 +362,44 @@ GFXDECODE_END
 
 /* Machine Driver */
 
-static MACHINE_START( mermaid )
+void mermaid_state::machine_start()
 {
-	mermaid_state *state = machine.driver_data<mermaid_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_ay1 = machine.device("ay1");
-	state->m_ay2 = machine.device("ay2");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_ay1 = machine().device("ay1");
+	m_ay2 = machine().device("ay2");
 
-	state->save_item(NAME(state->m_coll_bit0));
-	state->save_item(NAME(state->m_coll_bit1));
-	state->save_item(NAME(state->m_coll_bit2));
-	state->save_item(NAME(state->m_coll_bit3));
-	state->save_item(NAME(state->m_coll_bit6));
-	state->save_item(NAME(state->m_rougien_gfxbank1));
-	state->save_item(NAME(state->m_rougien_gfxbank2));
+	save_item(NAME(m_coll_bit0));
+	save_item(NAME(m_coll_bit1));
+	save_item(NAME(m_coll_bit2));
+	save_item(NAME(m_coll_bit3));
+	save_item(NAME(m_coll_bit6));
+	save_item(NAME(m_rougien_gfxbank1));
+	save_item(NAME(m_rougien_gfxbank2));
 
-	state->save_item(NAME(state->m_adpcm_pos));
-	state->save_item(NAME(state->m_adpcm_end));
-	state->save_item(NAME(state->m_adpcm_idle));
-	state->save_item(NAME(state->m_adpcm_data));
-	state->save_item(NAME(state->m_adpcm_trigger));
-	state->save_item(NAME(state->m_adpcm_rom_sel));
-	state->save_item(NAME(state->m_adpcm_play_reg));
+	save_item(NAME(m_adpcm_pos));
+	save_item(NAME(m_adpcm_end));
+	save_item(NAME(m_adpcm_idle));
+	save_item(NAME(m_adpcm_data));
+	save_item(NAME(m_adpcm_trigger));
+	save_item(NAME(m_adpcm_rom_sel));
+	save_item(NAME(m_adpcm_play_reg));
 }
 
-static MACHINE_RESET( mermaid )
+void mermaid_state::machine_reset()
 {
-	mermaid_state *state = machine.driver_data<mermaid_state>();
 
-	state->m_coll_bit0 = 0;
-	state->m_coll_bit1 = 0;
-	state->m_coll_bit2 = 0;
-	state->m_coll_bit3 = 0;
-	state->m_coll_bit6 = 0;
-	state->m_rougien_gfxbank1 = 0;
-	state->m_rougien_gfxbank2 = 0;
+	m_coll_bit0 = 0;
+	m_coll_bit1 = 0;
+	m_coll_bit2 = 0;
+	m_coll_bit3 = 0;
+	m_coll_bit6 = 0;
+	m_rougien_gfxbank1 = 0;
+	m_rougien_gfxbank2 = 0;
 
-	state->m_adpcm_idle = 1;
-	state->m_adpcm_rom_sel = 0;
-	state->m_adpcm_play_reg = 0;
+	m_adpcm_idle = 1;
+	m_adpcm_rom_sel = 0;
+	m_adpcm_play_reg = 0;
 }
 
 /* Similar to Jantotsu, apparently the HW has three ports that controls what kind of sample should be played. Every sample size is 0x1000. */
@@ -456,8 +454,6 @@ static MACHINE_CONFIG_START( mermaid, mermaid_state )
 	MCFG_CPU_PROGRAM_MAP(mermaid_map)
 	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
-	MCFG_MACHINE_START(mermaid)
-	MCFG_MACHINE_RESET(mermaid)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -471,8 +467,6 @@ static MACHINE_CONFIG_START( mermaid, mermaid_state )
 	MCFG_GFXDECODE(mermaid)
 	MCFG_PALETTE_LENGTH(4*16+2*2)
 
-	MCFG_PALETTE_INIT(mermaid)
-	MCFG_VIDEO_START(mermaid)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -490,7 +484,7 @@ static MACHINE_CONFIG_DERIVED( rougien, mermaid )
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rougien_map)
 
-	MCFG_PALETTE_INIT(rougien)
+	MCFG_PALETTE_INIT_OVERRIDE(mermaid_state,rougien)
 
 	MCFG_SOUND_ADD("adpcm", MSM5205, 384000)
 	MCFG_SOUND_CONFIG(msm5205_config)

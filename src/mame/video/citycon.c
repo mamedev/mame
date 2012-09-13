@@ -50,14 +50,13 @@ TILE_GET_INFO_MEMBER(citycon_state::get_bg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( citycon )
+void citycon_state::video_start()
 {
-	citycon_state *state = machine.driver_data<citycon_state>();
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(citycon_state::get_fg_tile_info),state), tilemap_mapper_delegate(FUNC(citycon_state::citycon_scan),state), 8, 8, 128, 32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(citycon_state::get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(citycon_state::citycon_scan),state), 8, 8, 128, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(citycon_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(citycon_state::citycon_scan),this), 8, 8, 128, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(citycon_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(citycon_state::citycon_scan),this), 8, 8, 128, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
-	state->m_fg_tilemap->set_scroll_rows(32);
+	m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_scroll_rows(32);
 }
 
 

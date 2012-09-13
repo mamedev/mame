@@ -66,6 +66,7 @@ public:
 	DECLARE_WRITE32_MEMBER(tmmjprd_brt_1_w);
 	DECLARE_WRITE32_MEMBER(tmmjprd_brt_2_w);
 	DECLARE_WRITE32_MEMBER(tmmjprd_eeprom_write);
+	virtual void video_start();
 };
 
 
@@ -337,15 +338,14 @@ static SCREEN_UPDATE_IND16( tmmjprd_right )
 	return 0;
 }
 
-static VIDEO_START(tmmjprd)
+void tmmjprd_state::video_start()
 {
-	tmmjprd_state *state = machine.driver_data<tmmjprd_state>();
 	/* the tilemaps are bigger than the regions the cpu can see, need to allocate the ram here */
 	/* or maybe not for this game/hw .... */
-	state->m_tilemap_ram[0] = auto_alloc_array_clear(machine, UINT32, 0x8000);
-	state->m_tilemap_ram[1] = auto_alloc_array_clear(machine, UINT32, 0x8000);
-	state->m_tilemap_ram[2] = auto_alloc_array_clear(machine, UINT32, 0x8000);
-	state->m_tilemap_ram[3] = auto_alloc_array_clear(machine, UINT32, 0x8000);
+	m_tilemap_ram[0] = auto_alloc_array_clear(machine(), UINT32, 0x8000);
+	m_tilemap_ram[1] = auto_alloc_array_clear(machine(), UINT32, 0x8000);
+	m_tilemap_ram[2] = auto_alloc_array_clear(machine(), UINT32, 0x8000);
+	m_tilemap_ram[3] = auto_alloc_array_clear(machine(), UINT32, 0x8000);
 }
 
 READ32_MEMBER(tmmjprd_state::tmmjprd_tilemap0_r)
@@ -780,7 +780,6 @@ static MACHINE_CONFIG_START( tmmjprd, tmmjprd_state )
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
 	MCFG_SCREEN_UPDATE_STATIC(tmmjprd_right)
 
-	MCFG_VIDEO_START(tmmjprd)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

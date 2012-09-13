@@ -96,6 +96,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_bgtile_info);
 	TILE_GET_INFO_MEMBER(get_infotile_info);
 	TILE_GET_INFO_MEMBER(get_txttile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -110,13 +112,13 @@ public:
 
 ***************************************************************************/
 
-static PALETTE_INIT( panicr )
+void panicr_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x100);
+	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -125,7 +127,7 @@ static PALETTE_INIT( panicr )
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -141,7 +143,7 @@ static PALETTE_INIT( panicr )
 		else
 			ctabentry = (color_prom[i] & 0x3f) | 0x80;
 
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	// tile lookup table
@@ -149,7 +151,7 @@ static PALETTE_INIT( panicr )
 	{
 		UINT8 ctabentry = (color_prom[i] & 0x3f) | 0x00;
 
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	// sprite lookup table
@@ -162,7 +164,7 @@ static PALETTE_INIT( panicr )
 		else
 			ctabentry = (color_prom[i] & 0x3f) | 0x40;
 
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 
@@ -211,15 +213,14 @@ TILE_GET_INFO_MEMBER(panicr_state::get_txttile_info)
 }
 
 
-static VIDEO_START( panicr )
+void panicr_state::video_start()
 {
-	panicr_state *state = machine.driver_data<panicr_state>();
 
-	state->m_bgtilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(panicr_state::get_bgtile_info),state),TILEMAP_SCAN_ROWS,16,16,1024,16 );
-	state->m_infotilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(panicr_state::get_infotile_info),state),TILEMAP_SCAN_ROWS,16,16,1024,16 ); // 3 more bitplanes, contains collision and priority data
+	m_bgtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(panicr_state::get_bgtile_info),this),TILEMAP_SCAN_ROWS,16,16,1024,16 );
+	m_infotilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(panicr_state::get_infotile_info),this),TILEMAP_SCAN_ROWS,16,16,1024,16 ); // 3 more bitplanes, contains collision and priority data
 
-	state->m_txttilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(panicr_state::get_txttile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32 );
-	colortable_configure_tilemap_groups(machine.colortable, state->m_txttilemap, machine.gfx[0], 0);
+	m_txttilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(panicr_state::get_txttile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
+	colortable_configure_tilemap_groups(machine().colortable, m_txttilemap, machine().gfx[0], 0);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
@@ -518,9 +519,7 @@ static MACHINE_CONFIG_START( panicr, panicr_state )
 
 	MCFG_GFXDECODE(panicr)
 	MCFG_PALETTE_LENGTH(256*3)
-	MCFG_PALETTE_INIT(panicr)
 
-	MCFG_VIDEO_START(panicr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

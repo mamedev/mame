@@ -76,9 +76,11 @@ public:
 	DECLARE_WRITE8_MEMBER(timer_w);
 	DECLARE_WRITE8_MEMBER(mz2000_tvram_attr_w);
 	DECLARE_WRITE8_MEMBER(mz2000_gvram_mask_w);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
-static VIDEO_START( mz2000 )
+void mz2000_state::video_start()
 {
 }
 
@@ -506,20 +508,19 @@ static INPUT_PORTS_START( mz2000 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(mz2000)
+void mz2000_state::machine_reset()
 {
-	mz2000_state *state = machine.driver_data<mz2000_state>();
 
-	state->m_ipl_enable = 1;
-	state->m_tvram_enable = 0;
-	state->m_gvram_enable = 0;
+	m_ipl_enable = 1;
+	m_tvram_enable = 0;
+	m_gvram_enable = 0;
 
-	beep_set_frequency(machine.device(BEEPER_TAG),4096);
-	beep_set_state(machine.device(BEEPER_TAG),0);
+	beep_set_frequency(machine().device(BEEPER_TAG),4096);
+	beep_set_state(machine().device(BEEPER_TAG),0);
 
-	state->m_color_mode = machine.root_device().ioport("CONFIG")->read() & 1;
-	state->m_has_fdc = (machine.root_device().ioport("CONFIG")->read() & 2) >> 1;
-	state->m_hi_mode = (machine.root_device().ioport("CONFIG")->read() & 4) >> 2;
+	m_color_mode = machine().root_device().ioport("CONFIG")->read() & 1;
+	m_has_fdc = (machine().root_device().ioport("CONFIG")->read() & 2) >> 1;
+	m_hi_mode = (machine().root_device().ioport("CONFIG")->read() & 4) >> 2;
 
 	{
 		int i;
@@ -527,11 +528,11 @@ static MACHINE_RESET(mz2000)
 
 		for(i=0;i<8;i++)
 		{
-			r = (state->m_color_mode) ? (i & 2)>>1 : 0;
-			g = (state->m_color_mode) ? (i & 4)>>2 : ((i) ? 1 : 0);
-			b = (state->m_color_mode) ? (i & 1)>>0 : 0;
+			r = (m_color_mode) ? (i & 2)>>1 : 0;
+			g = (m_color_mode) ? (i & 4)>>2 : ((i) ? 1 : 0);
+			b = (m_color_mode) ? (i & 1)>>0 : 0;
 
-			palette_set_color_rgb(machine, i,pal1bit(r),pal1bit(g),pal1bit(b));
+			palette_set_color_rgb(machine(), i,pal1bit(r),pal1bit(g),pal1bit(b));
 		}
 	}
 }
@@ -830,7 +831,6 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	MCFG_CPU_PROGRAM_MAP(mz2000_map)
 	MCFG_CPU_IO_MAP(mz2000_io)
 
-	MCFG_MACHINE_RESET(mz2000)
 
 	MCFG_I8255_ADD( "i8255_0", ppi8255_intf )
 	MCFG_Z80PIO_ADD( "z80pio_1", MASTER_CLOCK, mz2000_pio1_intf )
@@ -853,7 +853,6 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	MCFG_GFXDECODE(mz2000)
 	MCFG_PALETTE_LENGTH(8)
 
-	MCFG_VIDEO_START(mz2000)
 	MCFG_SCREEN_UPDATE_STATIC(mz2000)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

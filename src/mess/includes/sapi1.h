@@ -37,21 +37,16 @@ public:
 	UINT8 m_term_data;
 	DECLARE_DRIVER_INIT(sapi1);
 	DECLARE_DRIVER_INIT(sapizps3);
+	DECLARE_MACHINE_START(sapi1);
+	DECLARE_MACHINE_RESET(sapi1);
+	DECLARE_VIDEO_START(sapi1);
+	DECLARE_MACHINE_RESET(sapizps3);
+	DECLARE_VIDEO_START(sapizps3);
 };
-
-
-/*----------- defined in machine/sapi1.c -----------*/
-
-extern MACHINE_START( sapi1 );
-extern MACHINE_RESET( sapi1 );
-extern MACHINE_RESET( sapizps3 );
-
 
 /*----------- defined in video/sapi1.c -----------*/
 
-extern VIDEO_START( sapi1 );
 extern SCREEN_UPDATE_IND16( sapi1 );
-extern VIDEO_START( sapizps3 );
 extern SCREEN_UPDATE_IND16( sapizps3 );
 
 #endif

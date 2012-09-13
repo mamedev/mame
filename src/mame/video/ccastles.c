@@ -15,30 +15,29 @@
  *
  *************************************/
 
-VIDEO_START( ccastles )
+void ccastles_state::video_start()
 {
-	ccastles_state *state = machine.driver_data<ccastles_state>();
 	static const int resistances[3] = { 22000, 10000, 4700 };
 
 	/* get pointers to our PROMs */
-	state->m_syncprom = machine.root_device().memregion("proms")->base() + 0x000;
-	state->m_wpprom = machine.root_device().memregion("proms")->base() + 0x200;
-	state->m_priprom = machine.root_device().memregion("proms")->base() + 0x300;
+	m_syncprom = machine().root_device().memregion("proms")->base() + 0x000;
+	m_wpprom = machine().root_device().memregion("proms")->base() + 0x200;
+	m_priprom = machine().root_device().memregion("proms")->base() + 0x300;
 
 	/* compute the color output resistor weights at startup */
 	compute_resistor_weights(0,	255, -1.0,
-			3,	resistances, state->m_rweights, 1000, 0,
-			3,	resistances, state->m_gweights, 1000, 0,
-			3,	resistances, state->m_bweights, 1000, 0);
+			3,	resistances, m_rweights, 1000, 0,
+			3,	resistances, m_gweights, 1000, 0,
+			3,	resistances, m_bweights, 1000, 0);
 
 	/* allocate a bitmap for drawing sprites */
-	machine.primary_screen->register_screen_bitmap(state->m_spritebitmap);
+	machine().primary_screen->register_screen_bitmap(m_spritebitmap);
 
 	/* register for savestates */
-	state->save_item(NAME(state->m_video_control));
-	state->save_item(NAME(state->m_bitmode_addr));
-	state->save_item(NAME(state->m_hscroll));
-	state->save_item(NAME(state->m_vscroll));
+	save_item(NAME(m_video_control));
+	save_item(NAME(m_bitmode_addr));
+	save_item(NAME(m_hscroll));
+	save_item(NAME(m_vscroll));
 }
 
 

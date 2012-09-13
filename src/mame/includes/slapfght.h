@@ -120,6 +120,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);
+	DECLARE_MACHINE_RESET(slapfight);
+	DECLARE_VIDEO_START(perfrman);
+	DECLARE_VIDEO_START(slapfight);
 };
 
 
@@ -139,7 +142,7 @@ public:
 
 /*----------- defined in machine/slapfght.c -----------*/
 
-MACHINE_RESET( slapfight );
+
 
 
 
@@ -155,6 +158,6 @@ INTERRUPT_GEN( getstar_interrupt );
 
 SCREEN_UPDATE_IND16( slapfight );
 SCREEN_UPDATE_IND16( perfrman );
-VIDEO_START( slapfight );
-VIDEO_START( perfrman );
+
+
 

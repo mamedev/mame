@@ -154,6 +154,9 @@ public:
 	DECLARE_DRIVER_INIT(timekill);
 	DECLARE_DRIVER_INIT(gt3d);
 	DECLARE_DRIVER_INIT(gt3dl);
+	virtual void machine_reset();
+	virtual void video_start();
+	DECLARE_MACHINE_RESET(drivedge);
 };
 
 
@@ -164,7 +167,7 @@ void itech32_update_interrupts(running_machine &machine, int vint, int xint, int
 
 /*----------- defined in video/itech32.c -----------*/
 
-VIDEO_START( itech32 );
+
 
 
 

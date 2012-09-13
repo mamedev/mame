@@ -137,13 +137,16 @@ public:
 	void lynx_multiply();
 	UINT8 lynx_timer_read(int which, int offset);
 	void lynx_timer_write(int which, int offset, UINT8 data);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in machine/lynx.c -----------*/
 
-MACHINE_START( lynx );
-MACHINE_RESET( lynx );
+
+
 
 void lynx_timer_count_down(running_machine &machine, int nr);
 

@@ -41,13 +41,18 @@ public:
 	DECLARE_WRITE8_MEMBER(rmgoldyh_rombank_w);
 	DECLARE_WRITE16_MEMBER(srmp2_adpcm_code_w);
 	DECLARE_WRITE8_MEMBER(srmp3_adpcm_code_w);
+	DECLARE_MACHINE_START(srmp2);
+	DECLARE_PALETTE_INIT(srmp2);
+	DECLARE_MACHINE_START(srmp3);
+	DECLARE_PALETTE_INIT(srmp3);
+	DECLARE_MACHINE_START(rmgoldyh);
 };
 
 
 /*----------- defined in video/srmp2.c -----------*/
 
-PALETTE_INIT( srmp2 );
+
 SCREEN_UPDATE_IND16( srmp2 );
-PALETTE_INIT( srmp3 );
+
 SCREEN_UPDATE_IND16( srmp3 );
 SCREEN_UPDATE_IND16( mjyuugi );

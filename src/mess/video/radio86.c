@@ -122,8 +122,8 @@ static const rgb_t radio86_palette[3] = {
 	MAKE_RGB(0xff, 0xff, 0xff)	// highlight
 };
 
-PALETTE_INIT( radio86 )
+PALETTE_INIT_MEMBER(radio86_state,radio86)
 {
-	palette_set_colors(machine, 0, radio86_palette, ARRAY_LENGTH(radio86_palette));
+	palette_set_colors(machine(), 0, radio86_palette, ARRAY_LENGTH(radio86_palette));
 }
 

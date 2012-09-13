@@ -110,6 +110,12 @@ public:
 	DECLARE_DRIVER_INIT(trs80m4p);
 	DECLARE_DRIVER_INIT(lnw80);
 	DECLARE_DRIVER_INIT(trs80);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	DECLARE_MACHINE_RESET(trs80m4);
+	DECLARE_MACHINE_RESET(lnw80);
+	DECLARE_PALETTE_INIT(lnw80);
 };
 
 
@@ -117,10 +123,10 @@ public:
 
 extern const wd17xx_interface trs80_wd17xx_interface;
 
-MACHINE_START( trs80 );
-MACHINE_RESET( trs80 );
-MACHINE_RESET( trs80m4 );
-MACHINE_RESET( lnw80 );
+
+
+
+
 
 
 INTERRUPT_GEN( trs80_rtc_interrupt );
@@ -130,7 +136,7 @@ INTERRUPT_GEN( trs80_fdc_interrupt );
 
 /*----------- defined in video/trs80.c -----------*/
 
-VIDEO_START( trs80 );
+
 SCREEN_UPDATE_IND16( trs80 );
 SCREEN_UPDATE_IND16( ht1080z );
 SCREEN_UPDATE_IND16( meritum );
@@ -139,7 +145,7 @@ SCREEN_UPDATE_IND16( radionic );
 SCREEN_UPDATE_IND16( trs80m4 );
 
 
-PALETTE_INIT( lnw80 );
+
 
 
 #endif	/* TRS80_H_ */

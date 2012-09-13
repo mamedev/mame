@@ -42,11 +42,12 @@ public:
 	DECLARE_READ8_MEMBER(starfire_videoram_r);
 	DECLARE_DRIVER_INIT(starfire);
 	DECLARE_DRIVER_INIT(fireone);
+	virtual void video_start();
 };
 
 /*----------- defined in video/starfire.c -----------*/
 
 SCREEN_UPDATE_RGB32( starfire );
-VIDEO_START( starfire );
+
 
 

@@ -228,6 +228,10 @@ public:
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_DRIVER_INIT(bus);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -255,10 +259,9 @@ TILE_GET_INFO_MEMBER(tmspoker_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER( 0 /* bank */, code, 0 /* color */, 0);
 }
 
-static VIDEO_START( tmspoker )
+void tmspoker_state::video_start()
 {
-	tmspoker_state *state = machine.driver_data<tmspoker_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tmspoker_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tmspoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16( tmspoker )
@@ -268,7 +271,7 @@ static SCREEN_UPDATE_IND16( tmspoker )
 	return 0;
 }
 
-static PALETTE_INIT( tmspoker )
+void tmspoker_state::palette_init()
 {
 }
 
@@ -292,20 +295,20 @@ static INTERRUPT_GEN( tmspoker_interrupt )
 *     Start & Reset     *
 ************************/
 
-static MACHINE_START( tmspoker )
+void tmspoker_state::machine_start()
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	machine.root_device().membank("bank1")->configure_entries(0, 2, &ROM[0], 0x1000);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	machine().root_device().membank("bank1")->configure_entries(0, 2, &ROM[0], 0x1000);
 }
 
 
-static MACHINE_RESET( tmspoker )
+void tmspoker_state::machine_reset()
 {
-	UINT8 seldsw = (machine.root_device().ioport("SELDSW")->read() );
+	UINT8 seldsw = (machine().root_device().ioport("SELDSW")->read() );
 
 	popmessage("ROM Bank: %02X", seldsw);
 
-	machine.root_device().membank("bank1")->set_entry(seldsw);
+	machine().root_device().membank("bank1")->set_entry(seldsw);
 }
 
 
@@ -568,8 +571,6 @@ static MACHINE_CONFIG_START( tmspoker, tmspoker_state )
 	MCFG_CPU_VBLANK_INT("screen", tmspoker_interrupt)
 
 //  MCFG_NVRAM_HANDLER(generic_0fill)
-	MCFG_MACHINE_START(tmspoker)
-	MCFG_MACHINE_RESET(tmspoker)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -580,10 +581,8 @@ static MACHINE_CONFIG_START( tmspoker, tmspoker_state )
 
 	MCFG_GFXDECODE(tmspoker)
 
-	MCFG_PALETTE_INIT(tmspoker)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(tmspoker)
 	MCFG_SCREEN_UPDATE_STATIC(tmspoker)
 
 	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/4, mc6845_intf) /* guess */

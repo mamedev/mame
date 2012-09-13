@@ -145,6 +145,8 @@ public:
 	DECLARE_WRITE8_MEMBER(m1_pia_portb_w);
 	DECLARE_WRITE8_MEMBER(m1_meter_w);
 	DECLARE_DRIVER_INIT(m1);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -538,12 +540,11 @@ static void m1_stepper_reset(running_machine &machine)
 	state->m_optic_pattern = pattern;
 }
 
-static MACHINE_RESET( m1 )
+void maygay1b_state::machine_reset()
 {
-	maygay1b_state *state = machine.driver_data<maygay1b_state>();
-	state->m_vfd->reset();	// reset display1
-	state->m_duart68681 = machine.device( "duart68681" );
-	m1_stepper_reset(machine);
+	m_vfd->reset();	// reset display1
+	m_duart68681 = machine().device( "duart68681" );
+	m1_stepper_reset(machine());
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -731,17 +732,17 @@ static INPUT_PORTS_START( m1 )
 
 INPUT_PORTS_END
 
-static MACHINE_START( m1 )
+void maygay1b_state::machine_start()
 {
 	int i;
 
 // setup 8 mechanical meters ////////////////////////////////////////////
-	MechMtr_config(machine,8);
+	MechMtr_config(machine(),8);
 
 // setup 6 default 96 half step reels ///////////////////////////////////
 	for ( i = 0; i < 6; i++ )
 	{
-		stepper_config(machine, i, &starpoint_interface_48step);
+		stepper_config(machine(), i, &starpoint_interface_48step);
 	}
 
 }
@@ -911,8 +912,6 @@ static const duart68681_config maygaym1_duart68681_config =
 
 static MACHINE_CONFIG_START( m1, maygay1b_state )
 
-	MCFG_MACHINE_START(m1)
-	MCFG_MACHINE_RESET(m1)
 	MCFG_CPU_ADD("maincpu", M6809, M1_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(m1_memmap)
 

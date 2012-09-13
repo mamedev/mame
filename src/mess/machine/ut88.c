@@ -66,12 +66,11 @@ static TIMER_CALLBACK( ut88_reset )
 	state->membank("bank1")->set_entry(0);
 }
 
-MACHINE_RESET( ut88 )
+MACHINE_RESET_MEMBER(ut88_state,ut88)
 {
-	ut88_state *state = machine.driver_data<ut88_state>();
-	machine.scheduler().timer_set(attotime::from_usec(10), FUNC(ut88_reset));
-	state->membank("bank1")->set_entry(1);
-	state->m_keyboard_mask = 0;
+	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(ut88_reset));
+	membank("bank1")->set_entry(1);
+	m_keyboard_mask = 0;
 }
 
 
@@ -162,15 +161,14 @@ DRIVER_INIT_MEMBER(ut88_state,ut88mini)
 {
 }
 
-MACHINE_START( ut88mini )
+MACHINE_START_MEMBER(ut88_state,ut88mini)
 {
-	machine.scheduler().timer_pulse(attotime::from_hz(60), FUNC(update_display));
+	machine().scheduler().timer_pulse(attotime::from_hz(60), FUNC(update_display));
 }
 
-MACHINE_RESET( ut88mini )
+MACHINE_RESET_MEMBER(ut88_state,ut88mini)
 {
-	ut88_state *state = machine.driver_data<ut88_state>();
-	state->m_lcd_digit[0] = state->m_lcd_digit[1] = state->m_lcd_digit[2] = 0;
-	state->m_lcd_digit[3] = state->m_lcd_digit[4] = state->m_lcd_digit[5] = 0;
+	m_lcd_digit[0] = m_lcd_digit[1] = m_lcd_digit[2] = 0;
+	m_lcd_digit[3] = m_lcd_digit[4] = m_lcd_digit[5] = 0;
 }
 

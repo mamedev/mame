@@ -170,6 +170,8 @@ public:
 	DECLARE_DRIVER_INIT(kdeadeye);
 	DECLARE_DRIVER_INIT(konamigv);
 	DECLARE_DRIVER_INIT(btchamp);
+	DECLARE_MACHINE_START(konamigv);
+	DECLARE_MACHINE_RESET(konamigv);
 };
 
 /* EEPROM handlers */
@@ -306,25 +308,24 @@ DRIVER_INIT_MEMBER(konamigv_state,konamigv)
 	psx_driver_init(machine());
 }
 
-static MACHINE_START( konamigv )
+MACHINE_START_MEMBER(konamigv_state,konamigv)
 {
-	konamigv_state *state = machine.driver_data<konamigv_state>();
 
-	state->save_item(NAME(state->m_sector_buffer));
-	state->save_item(NAME(state->m_flash_address));
-	state->save_item(NAME(state->m_trackball_prev));
-	state->save_item(NAME(state->m_trackball_data));
-	state->save_item(NAME(state->m_btc_trackball_prev));
-	state->save_item(NAME(state->m_btc_trackball_data));
+	save_item(NAME(m_sector_buffer));
+	save_item(NAME(m_flash_address));
+	save_item(NAME(m_trackball_prev));
+	save_item(NAME(m_trackball_data));
+	save_item(NAME(m_btc_trackball_prev));
+	save_item(NAME(m_btc_trackball_data));
 }
 
-static MACHINE_RESET( konamigv )
+MACHINE_RESET_MEMBER(konamigv_state,konamigv)
 {
 	/* also hook up CDDA audio to the CD-ROM drive */
 	void *cdrom;
-	scsidev_device *scsidev = machine.device<scsidev_device>("scsi:cdrom");
+	scsidev_device *scsidev = machine().device<scsidev_device>("scsi:cdrom");
 	scsidev->GetDevice( &cdrom );
-	cdda_set_cdrom(machine.device("cdda"), cdrom);
+	cdda_set_cdrom(machine().device("cdda"), cdrom);
 }
 
 static void spu_irq(device_t *device, UINT32 data)
@@ -343,8 +344,8 @@ static MACHINE_CONFIG_START( konamigv, konamigv_state )
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( scsi_dma_read ), (konamigv_state *) owner ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( scsi_dma_write ), (konamigv_state *) owner ) )
 
-	MCFG_MACHINE_START( konamigv )
-	MCFG_MACHINE_RESET( konamigv )
+	MCFG_MACHINE_START_OVERRIDE(konamigv_state, konamigv )
+	MCFG_MACHINE_RESET_OVERRIDE(konamigv_state, konamigv )
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 

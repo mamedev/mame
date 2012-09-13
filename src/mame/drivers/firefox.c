@@ -96,6 +96,8 @@ public:
 	DECLARE_WRITE8_MEMBER(riot_porta_w);
 	DECLARE_WRITE_LINE_MEMBER(riot_irq);
 	TILE_GET_INFO_MEMBER(bgtile_get_info);
+	virtual void machine_start();
+	virtual void video_start();
 };
 
 
@@ -204,12 +206,11 @@ WRITE8_MEMBER(firefox_state::tileram_w)
 }
 
 
-static VIDEO_START( firefox )
+void firefox_state::video_start()
 {
-	firefox_state *state = machine.driver_data<firefox_state>();
-	state->m_bgtiles = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(firefox_state::bgtile_get_info),state), TILEMAP_SCAN_ROWS, 8,8, 64,64);
-	state->m_bgtiles->set_transparent_pen(0);
-	state->m_bgtiles->set_scrolldy(machine.primary_screen->visible_area().min_y, 0);
+	m_bgtiles = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(firefox_state::bgtile_get_info),this), TILEMAP_SCAN_ROWS, 8,8, 64,64);
+	m_bgtiles->set_transparent_pen(0);
+	m_bgtiles->set_scrolldy(machine().primary_screen->visible_area().min_y, 0);
 }
 
 
@@ -481,17 +482,16 @@ static void firq_gen(running_machine &machine, phillips_22vp931_device &laserdis
 }
 
 
-static MACHINE_START( firefox )
+void firefox_state::machine_start()
 {
-	firefox_state *state = machine.driver_data<firefox_state>();
-	state->membank("bank1")->configure_entries(0, 32, state->memregion("maincpu")->base() + 0x10000, 0x1000);
-	state->m_nvram_1c = machine.device<x2212_device>("nvram_1c");
-	state->m_nvram_1d = machine.device<x2212_device>("nvram_1d");
+	membank("bank1")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x1000);
+	m_nvram_1c = machine().device<x2212_device>("nvram_1c");
+	m_nvram_1d = machine().device<x2212_device>("nvram_1d");
 
-	state->m_laserdisc->set_data_ready_callback(phillips_22vp931_device::data_ready_delegate(FUNC(firq_gen), &machine));
+	m_laserdisc->set_data_ready_callback(phillips_22vp931_device::data_ready_delegate(FUNC(firq_gen), &machine()));
 
-	state->m_control_num = 0;
-	state->m_sprite_bank = 0;
+	m_control_num = 0;
+	m_sprite_bank = 0;
 }
 
 
@@ -708,14 +708,12 @@ static MACHINE_CONFIG_START( firefox, firefox_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
-	MCFG_MACHINE_START(firefox)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz((double)MASTER_XTAL/8/16/16/16/16))
 
 	/* video hardware */
 	MCFG_GFXDECODE(firefox)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(firefox)
 
 	MCFG_LASERDISC_22VP931_ADD("laserdisc")
 	MCFG_LASERDISC_OVERLAY_STATIC(64*8, 525, firefox)

@@ -148,8 +148,6 @@ static MACHINE_CONFIG_START( trucocl, trucocl_state )
 	MCFG_GFXDECODE(trucocl)
 	MCFG_PALETTE_LENGTH(32)
 
-	MCFG_PALETTE_INIT(trucocl)
-	MCFG_VIDEO_START(trucocl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

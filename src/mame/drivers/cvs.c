@@ -988,53 +988,51 @@ static const s2636_interface s2636_2_config =
 };
 
 
-MACHINE_START( cvs )
+MACHINE_START_MEMBER(cvs_state,cvs)
 {
-	cvs_state *state = machine.driver_data<cvs_state>();
 
 	/* allocate memory */
-	if (machine.gfx[1] != NULL)
-		machine.gfx[1]->set_source(state->m_character_ram);
+	if (machine().gfx[1] != NULL)
+		machine().gfx[1]->set_source(m_character_ram);
 
-	start_393hz_timer(machine);
+	start_393hz_timer(machine());
 
 	/* set devices */
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_speech = machine.device("speech");
-	state->m_dac3 = machine.device<dac_device>("dac3");
-	state->m_tms = machine.device("tms");
-	state->m_s2636_0 = machine.device("s2636_0");
-	state->m_s2636_1 = machine.device("s2636_1");
-	state->m_s2636_2 = machine.device("s2636_2");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_speech = machine().device("speech");
+	m_dac3 = machine().device<dac_device>("dac3");
+	m_tms = machine().device("tms");
+	m_s2636_0 = machine().device("s2636_0");
+	m_s2636_1 = machine().device("s2636_1");
+	m_s2636_2 = machine().device("s2636_2");
 
 	/* register state save */
-	state->save_item(NAME(state->m_color_ram));
-	state->save_item(NAME(state->m_palette_ram));
-	state->save_item(NAME(state->m_character_ram));
-	state->save_item(NAME(state->m_character_banking_mode));
-	state->save_item(NAME(state->m_character_ram_page_start));
-	state->save_item(NAME(state->m_speech_rom_bit_address));
-	state->save_item(NAME(state->m_cvs_393hz_clock));
-	state->save_item(NAME(state->m_collision_register));
-	state->save_item(NAME(state->m_total_stars));
-	state->save_item(NAME(state->m_stars_on));
-	state->save_item(NAME(state->m_scroll_reg));
-	state->save_item(NAME(state->m_stars_scroll));
+	save_item(NAME(m_color_ram));
+	save_item(NAME(m_palette_ram));
+	save_item(NAME(m_character_ram));
+	save_item(NAME(m_character_banking_mode));
+	save_item(NAME(m_character_ram_page_start));
+	save_item(NAME(m_speech_rom_bit_address));
+	save_item(NAME(m_cvs_393hz_clock));
+	save_item(NAME(m_collision_register));
+	save_item(NAME(m_total_stars));
+	save_item(NAME(m_stars_on));
+	save_item(NAME(m_scroll_reg));
+	save_item(NAME(m_stars_scroll));
 }
 
-MACHINE_RESET( cvs )
+MACHINE_RESET_MEMBER(cvs_state,cvs)
 {
-	cvs_state *state = machine.driver_data<cvs_state>();
 
-	state->m_character_banking_mode = 0;
-	state->m_character_ram_page_start = 0;
-	state->m_speech_rom_bit_address = 0;
-	state->m_cvs_393hz_clock = 0;
-	state->m_collision_register = 0;
-	state->m_stars_on = 0;
-	state->m_scroll_reg = 0;
-	state->m_stars_scroll = 0;
+	m_character_banking_mode = 0;
+	m_character_ram_page_start = 0;
+	m_speech_rom_bit_address = 0;
+	m_cvs_393hz_clock = 0;
+	m_collision_register = 0;
+	m_stars_on = 0;
+	m_scroll_reg = 0;
+	m_stars_scroll = 0;
 }
 
 
@@ -1054,16 +1052,16 @@ static MACHINE_CONFIG_START( cvs, cvs_state )
 	MCFG_CPU_PROGRAM_MAP(cvs_speech_cpu_map)
 	MCFG_CPU_IO_MAP(cvs_speech_cpu_io_map)
 
-	MCFG_MACHINE_START(cvs)
-	MCFG_MACHINE_RESET(cvs)
+	MCFG_MACHINE_START_OVERRIDE(cvs_state,cvs)
+	MCFG_MACHINE_RESET_OVERRIDE(cvs_state,cvs)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_VIDEO_START(cvs)
+	MCFG_VIDEO_START_OVERRIDE(cvs_state,cvs)
 
 	MCFG_GFXDECODE(cvs)
 	MCFG_PALETTE_LENGTH((256+4)*8+8+1)
-	MCFG_PALETTE_INIT(cvs)
+	MCFG_PALETTE_INIT_OVERRIDE(cvs_state,cvs)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(32*8, 32*8)

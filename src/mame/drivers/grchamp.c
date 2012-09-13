@@ -76,10 +76,10 @@
  *
  *************************************/
 
-static MACHINE_RESET( grchamp )
+void grchamp_state::machine_reset()
 {
 	/* if the coin system is 1 way, lock Coin B (Page 40) */
-	coin_lockout_w(machine, 1, (machine.root_device().ioport("DSWB")->read() & 0x10) ? 1 : 0);
+	coin_lockout_w(machine(), 1, (machine().root_device().ioport("DSWB")->read() & 0x10) ? 1 : 0);
 }
 
 
@@ -684,7 +684,6 @@ static MACHINE_CONFIG_START( grchamp, grchamp_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, (double)SOUND_CLOCK/4/16/16/10/16)
 
-	MCFG_MACHINE_RESET(grchamp)
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -696,8 +695,6 @@ static MACHINE_CONFIG_START( grchamp, grchamp_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(grchamp)
 
-	MCFG_PALETTE_INIT(grchamp)
-	MCFG_VIDEO_START(grchamp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

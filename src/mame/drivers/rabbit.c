@@ -136,6 +136,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_rabbit_tilemap1_tile_info);
 	TILE_GET_INFO_MEMBER(get_rabbit_tilemap2_tile_info);
 	TILE_GET_INFO_MEMBER(get_rabbit_tilemap3_tile_info);
+	virtual void video_start();
 };
 
 
@@ -386,33 +387,32 @@ static void draw_sprite_bitmap( running_machine &machine, bitmap_ind16 &bitmap, 
 
 
 }
-static VIDEO_START(rabbit)
+void rabbit_state::video_start()
 {
-	rabbit_state *state = machine.driver_data<rabbit_state>();
 	/* the tilemaps are bigger than the regions the cpu can see, need to allocate the ram here */
 	/* or maybe not for this game/hw .... */
-	state->m_tilemap_ram[0] = auto_alloc_array_clear(machine, UINT32, 0x20000/4);
-	state->m_tilemap_ram[1] = auto_alloc_array_clear(machine, UINT32, 0x20000/4);
-	state->m_tilemap_ram[2] = auto_alloc_array_clear(machine, UINT32, 0x20000/4);
-	state->m_tilemap_ram[3] = auto_alloc_array_clear(machine, UINT32, 0x20000/4);
+	m_tilemap_ram[0] = auto_alloc_array_clear(machine(), UINT32, 0x20000/4);
+	m_tilemap_ram[1] = auto_alloc_array_clear(machine(), UINT32, 0x20000/4);
+	m_tilemap_ram[2] = auto_alloc_array_clear(machine(), UINT32, 0x20000/4);
+	m_tilemap_ram[3] = auto_alloc_array_clear(machine(), UINT32, 0x20000/4);
 
-	state->m_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(rabbit_state::get_rabbit_tilemap0_tile_info),state),TILEMAP_SCAN_ROWS,16, 16, 128,32);
-	state->m_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(rabbit_state::get_rabbit_tilemap1_tile_info),state),TILEMAP_SCAN_ROWS,16, 16, 128,32);
-	state->m_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(rabbit_state::get_rabbit_tilemap2_tile_info),state),TILEMAP_SCAN_ROWS,16, 16, 128,32);
-	state->m_tilemap[3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(rabbit_state::get_rabbit_tilemap3_tile_info),state),TILEMAP_SCAN_ROWS, 8,  8, 128,32);
+	m_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(rabbit_state::get_rabbit_tilemap0_tile_info),this),TILEMAP_SCAN_ROWS,16, 16, 128,32);
+	m_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(rabbit_state::get_rabbit_tilemap1_tile_info),this),TILEMAP_SCAN_ROWS,16, 16, 128,32);
+	m_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(rabbit_state::get_rabbit_tilemap2_tile_info),this),TILEMAP_SCAN_ROWS,16, 16, 128,32);
+	m_tilemap[3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(rabbit_state::get_rabbit_tilemap3_tile_info),this),TILEMAP_SCAN_ROWS, 8,  8, 128,32);
 
 	/* the tilemaps mix 4bpp and 8bbp tiles, we split these into 2 groups, and set a different transpen for each group */
-    state->m_tilemap[0]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-    state->m_tilemap[0]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
-    state->m_tilemap[1]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-    state->m_tilemap[1]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
-    state->m_tilemap[2]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-    state->m_tilemap[2]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
-    state->m_tilemap[3]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-    state->m_tilemap[3]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
+    m_tilemap[0]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    m_tilemap[0]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
+    m_tilemap[1]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    m_tilemap[1]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
+    m_tilemap[2]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    m_tilemap[2]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
+    m_tilemap[3]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    m_tilemap[3]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
 
-	state->m_sprite_bitmap = auto_bitmap_ind16_alloc(machine,0x1000,0x1000);
-	state->m_sprite_clip.set(0, 0x1000-1, 0, 0x1000-1);
+	m_sprite_bitmap = auto_bitmap_ind16_alloc(machine(),0x1000,0x1000);
+	m_sprite_clip.set(0, 0x1000-1, 0, 0x1000-1);
 }
 
 /*
@@ -896,7 +896,6 @@ static MACHINE_CONFIG_START( rabbit, rabbit_state )
 	MCFG_PALETTE_LENGTH(0x4000)
 	MCFG_PALETTE_INIT( all_black )
 
-	MCFG_VIDEO_START(rabbit)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -1005,20 +1005,19 @@ DRIVER_INIT_MEMBER(c65_state,c65pal)
 	m_pal = 1;
 }
 
-MACHINE_START( c65 )
+MACHINE_START_MEMBER(c65_state,c65)
 {
-	c65_state *state = machine.driver_data<c65_state>();
 	/* clear upper memory */
-	memset(machine.device<ram_device>(RAM_TAG)->pointer() + 128*1024, 0xff, machine.device<ram_device>(RAM_TAG)->size() -  128*1024);
+	memset(machine().device<ram_device>(RAM_TAG)->pointer() + 128*1024, 0xff, machine().device<ram_device>(RAM_TAG)->size() -  128*1024);
 
 //removed   cbm_drive_0_config (SERIAL, 10);
 //removed   cbm_drive_1_config (SERIAL, 11);
-	state->m_vicaddr = state->m_memory;
+	m_vicaddr = m_memory;
 
-	state->m_c64mode = 0;
+	m_c64mode = 0;
 
-	c65_bankswitch_interface(machine, 0xff);
-	c65_bankswitch (machine);
+	c65_bankswitch_interface(machine(), 0xff);
+	c65_bankswitch (machine());
 }
 
 

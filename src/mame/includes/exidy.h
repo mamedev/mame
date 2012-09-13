@@ -65,13 +65,15 @@ public:
 	DECLARE_DRIVER_INIT(venture);
 	DECLARE_DRIVER_INIT(spectar);
 	DECLARE_DRIVER_INIT(phantoma);
+	virtual void video_start();
+	DECLARE_MACHINE_START(teetert);
 };
 
 
 /*----------- defined in video/exidy.c -----------*/
 
 void exidy_video_config(running_machine &machine, UINT8 _collision_mask, UINT8 _collision_invert, int _is_2bpp);
-VIDEO_START( exidy );
+
 SCREEN_UPDATE_IND16( exidy );
 
 INTERRUPT_GEN( exidy_vblank_interrupt );

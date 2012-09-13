@@ -718,6 +718,8 @@ public:
 	DECLARE_DRIVER_INIT(racjamdx);
 	DECLARE_DRIVER_INIT(bujutsu);
 	DECLARE_DRIVER_INIT(cobra);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 void cobra_renderer::render_color_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
@@ -983,14 +985,13 @@ static void cobra_video_exit(running_machine *machine)
 	state->m_renderer->gfx_exit(*machine);
 }
 
-VIDEO_START( cobra )
+void cobra_state::video_start()
 {
-	cobra_state *cobra = machine.driver_data<cobra_state>();
 
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cobra_video_exit), &machine));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cobra_video_exit), &machine()));
 
-	cobra->m_renderer = auto_alloc(machine, cobra_renderer(machine));
-	cobra->m_renderer->gfx_init(machine);
+	m_renderer = auto_alloc(machine(), cobra_renderer(machine()));
+	m_renderer->gfx_init(machine());
 }
 
 SCREEN_UPDATE_RGB32( cobra )
@@ -3197,13 +3198,12 @@ static INTERRUPT_GEN( cobra_vblank )
 	}
 }
 
-static MACHINE_RESET( cobra )
+void cobra_state::machine_reset()
 {
-	cobra_state *cobra = machine.driver_data<cobra_state>();
 
-	cobra->m_sub_interrupt = 0xff;
+	m_sub_interrupt = 0xff;
 
-	UINT8 *ide_features = ide_get_features(machine.device("ide"), 0);
+	UINT8 *ide_features = ide_get_features(machine().device("ide"), 0);
 
 	// Cobra expects these settings or the BIOS fails
 	ide_features[51*2+0] = 0;			/* 51: PIO data transfer cycle timing mode */
@@ -3211,16 +3211,16 @@ static MACHINE_RESET( cobra )
 	ide_features[67*2+0] = 0xe0;		/* 67: minimum PIO transfer cycle time without flow control */
 	ide_features[67*2+1] = 0x01;
 
-	cobra->m_renderer->gfx_reset(machine);
+	m_renderer->gfx_reset(machine());
 
-	cobra->m_sound_dma_ptr = 0;
+	m_sound_dma_ptr = 0;
 
-	cobra->m_dmadac[0] = machine.device<dmadac_sound_device>("dac1");
-	cobra->m_dmadac[1] = machine.device<dmadac_sound_device>("dac2");
-	dmadac_enable(&cobra->m_dmadac[0], 1, 1);
-	dmadac_enable(&cobra->m_dmadac[1], 1, 1);
-	dmadac_set_frequency(&cobra->m_dmadac[0], 1, 44100);
-	dmadac_set_frequency(&cobra->m_dmadac[1], 1, 44100);
+	m_dmadac[0] = machine().device<dmadac_sound_device>("dac1");
+	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
+	dmadac_enable(&m_dmadac[0], 1, 1);
+	dmadac_enable(&m_dmadac[1], 1, 1);
+	dmadac_set_frequency(&m_dmadac[0], 1, 44100);
+	dmadac_set_frequency(&m_dmadac[1], 1, 44100);
 }
 
 static const ide_config ide_intf = 
@@ -3247,7 +3247,6 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(15005))
 
-	MCFG_MACHINE_RESET(cobra)
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, mpc106_pci_r, mpc106_pci_w)
@@ -3255,7 +3254,6 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
 
 	/* video hardware */
-	MCFG_VIDEO_START(cobra)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

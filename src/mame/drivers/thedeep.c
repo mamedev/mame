@@ -50,18 +50,17 @@ WRITE8_MEMBER(thedeep_state::thedeep_sound_w)
 }
 
 
-static MACHINE_RESET( thedeep )
+void thedeep_state::machine_reset()
 {
-	thedeep_state *state = machine.driver_data<thedeep_state>();
-	state->membank("bank1")->set_base(state->memregion("maincpu")->base() + 0x10000 + 0 * 0x4000);
-	state->m_scroll[0] = 0;
-	state->m_scroll[1] = 0;
-	state->m_scroll[2] = 0;
-	state->m_scroll[3] = 0;
-	state->m_protection_command = 0;
-	state->m_protection_index = -1;
-	state->m_protection_irq = 0;
-	state->m_rombank = -1;
+	membank("bank1")->set_base(memregion("maincpu")->base() + 0x10000 + 0 * 0x4000);
+	m_scroll[0] = 0;
+	m_scroll[1] = 0;
+	m_scroll[2] = 0;
+	m_scroll[3] = 0;
+	m_protection_command = 0;
+	m_protection_index = -1;
+	m_protection_irq = 0;
+	m_rombank = -1;
 }
 
 WRITE8_MEMBER(thedeep_state::thedeep_protection_w)
@@ -462,7 +461,6 @@ static MACHINE_CONFIG_START( thedeep, thedeep_state )
 	MCFG_CPU_VBLANK_INT("screen",thedeep_mcu_irq ) // unknown source, but presumably vblank
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_MACHINE_RESET(thedeep)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -475,8 +473,6 @@ static MACHINE_CONFIG_START( thedeep, thedeep_state )
 	MCFG_GFXDECODE(thedeep)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_PALETTE_INIT(thedeep)
-	MCFG_VIDEO_START(thedeep)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -227,7 +227,6 @@ static MACHINE_CONFIG_START( solomon, solomon_state )
 	MCFG_GFXDECODE(solomon)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(solomon)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

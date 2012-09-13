@@ -124,31 +124,29 @@ static void update_irqs(running_machine &machine)
  *
  *************************************/
 
-static MACHINE_START( jpmimpct )
+MACHINE_START_MEMBER(jpmimpct_state,jpmimpct)
 {
-	jpmimpct_state *state = machine.driver_data<jpmimpct_state>();
-	state_save_register_global(machine, state->m_tms_irq);
-	state_save_register_global(machine, state->m_duart_1_irq);
-	state_save_register_global(machine, state->m_touch_cnt);
-	state_save_register_global_array(machine, state->m_touch_data);
+	state_save_register_global(machine(), m_tms_irq);
+	state_save_register_global(machine(), m_duart_1_irq);
+	state_save_register_global(machine(), m_touch_cnt);
+	state_save_register_global_array(machine(), m_touch_data);
 
 	/* TODO! */
-	state_save_register_global(machine, state->m_duart_1.ISR);
-	state_save_register_global(machine, state->m_duart_1.IMR);
-	state_save_register_global(machine, state->m_duart_1.CT);
+	state_save_register_global(machine(), m_duart_1.ISR);
+	state_save_register_global(machine(), m_duart_1.IMR);
+	state_save_register_global(machine(), m_duart_1.CT);
 }
 
 
-static MACHINE_RESET( jpmimpct )
+MACHINE_RESET_MEMBER(jpmimpct_state,jpmimpct)
 {
-	jpmimpct_state *state = machine.driver_data<jpmimpct_state>();
-	memset(&state->m_duart_1, 0, sizeof(state->m_duart_1));
+	memset(&m_duart_1, 0, sizeof(m_duart_1));
 
 	/* Reset states */
-	state->m_duart_1_irq = state->m_tms_irq = 0;
-	state->m_touch_cnt = 0;
+	m_duart_1_irq = m_tms_irq = 0;
+	m_touch_cnt = 0;
 
-//  state->m_duart_1.IVR=0x0f;
+//  m_duart_1.IVR=0x0f;
 }
 
 
@@ -824,8 +822,8 @@ static MACHINE_CONFIG_START( jpmimpct, jpmimpct_state )
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
-	MCFG_MACHINE_START(jpmimpct)
-	MCFG_MACHINE_RESET(jpmimpct)
+	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,jpmimpct)
+	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_state,jpmimpct)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_TIMER_ADD( "duart_1_timer", duart_1_timer_event)
@@ -839,7 +837,7 @@ static MACHINE_CONFIG_START( jpmimpct, jpmimpct_state )
 	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_VIDEO_START(jpmimpct)
+	MCFG_VIDEO_START_OVERRIDE(jpmimpct_state,jpmimpct)
 MACHINE_CONFIG_END
 
 
@@ -973,35 +971,33 @@ static I8255_INTERFACE (ppi8255_intf)
 	DEVCB_DRIVER_MEMBER(jpmimpct_state,display_c_w)
 };
 
-static MACHINE_START( impctawp )
+MACHINE_START_MEMBER(jpmimpct_state,impctawp)
 {
-	jpmimpct_state *state = machine.driver_data<jpmimpct_state>();
-	state_save_register_global(machine, state->m_duart_1_irq);
-	state_save_register_global(machine, state->m_touch_cnt);
-	state_save_register_global_array(machine, state->m_touch_data);
+	state_save_register_global(machine(), m_duart_1_irq);
+	state_save_register_global(machine(), m_touch_cnt);
+	state_save_register_global_array(machine(), m_touch_data);
 
 	/* TODO! */
-	state_save_register_global(machine, state->m_duart_1.ISR);
-	state_save_register_global(machine, state->m_duart_1.IMR);
-	state_save_register_global(machine, state->m_duart_1.CT);
+	state_save_register_global(machine(), m_duart_1.ISR);
+	state_save_register_global(machine(), m_duart_1.IMR);
+	state_save_register_global(machine(), m_duart_1.CT);
 
-	stepper_config(machine, 0, &starpoint_interface_48step);
-	stepper_config(machine, 1, &starpoint_interface_48step);
-	stepper_config(machine, 2, &starpoint_interface_48step);
-	stepper_config(machine, 3, &starpoint_interface_48step);
-	stepper_config(machine, 4, &starpoint_interface_48step);
-	stepper_config(machine, 5, &starpoint_interface_48step);
-	stepper_config(machine, 6, &starpoint_interface_48step);
+	stepper_config(machine(), 0, &starpoint_interface_48step);
+	stepper_config(machine(), 1, &starpoint_interface_48step);
+	stepper_config(machine(), 2, &starpoint_interface_48step);
+	stepper_config(machine(), 3, &starpoint_interface_48step);
+	stepper_config(machine(), 4, &starpoint_interface_48step);
+	stepper_config(machine(), 5, &starpoint_interface_48step);
+	stepper_config(machine(), 6, &starpoint_interface_48step);
 }
 
-static MACHINE_RESET( impctawp )
+MACHINE_RESET_MEMBER(jpmimpct_state,impctawp)
 {
-	jpmimpct_state *state = machine.driver_data<jpmimpct_state>();
-	memset(&state->m_duart_1, 0, sizeof(state->m_duart_1));
+	memset(&m_duart_1, 0, sizeof(m_duart_1));
 
 	/* Reset states */
-	state->m_duart_1_irq = 0;
-	state->m_vfd->reset();
+	m_duart_1_irq = 0;
+	m_vfd->reset();
 }
 /*************************************
  *
@@ -1377,8 +1373,8 @@ static MACHINE_CONFIG_START( impctawp, jpmimpct_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 	MCFG_ROC10937_ADD("vfd",0,RIGHT_TO_LEFT)
 
-	MCFG_MACHINE_START(impctawp)
-	MCFG_MACHINE_RESET(impctawp)
+	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,impctawp)
+	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_state,impctawp)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_I8255_ADD( "ppi8255", ppi8255_intf )

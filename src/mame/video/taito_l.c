@@ -57,24 +57,23 @@ TILE_GET_INFO_MEMBER(taitol_state::get_ch1a_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( taitol )
+VIDEO_START_MEMBER(taitol_state,taitol)
 {
-	taitol_state *state = machine.driver_data<taitol_state>();
 	int i;
 
-	state->m_bg18_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taitol_state::get_bg18_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_bg19_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taitol_state::get_bg19_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_ch1a_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taitol_state::get_ch1a_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg18_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(taitol_state::get_bg18_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg19_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(taitol_state::get_bg19_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_ch1a_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(taitol_state::get_ch1a_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	state->m_bg18_tilemap->set_transparent_pen(0);
-	state->m_ch1a_tilemap->set_transparent_pen(0);
+	m_bg18_tilemap->set_transparent_pen(0);
+	m_ch1a_tilemap->set_transparent_pen(0);
 
 	for (i = 0; i < 256; i++)
-		palette_set_color(machine, i, MAKE_RGB(0, 0, 0));
+		palette_set_color(machine(), i, MAKE_RGB(0, 0, 0));
 
-	state->m_ch1a_tilemap->set_scrolldx(-8, -8);
-	state->m_bg18_tilemap->set_scrolldx(28, -11);
-	state->m_bg19_tilemap->set_scrolldx(38, -21);
+	m_ch1a_tilemap->set_scrolldx(-8, -8);
+	m_bg18_tilemap->set_scrolldx(28, -11);
+	m_bg19_tilemap->set_scrolldx(38, -21);
 }
 
 

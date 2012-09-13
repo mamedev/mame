@@ -1294,34 +1294,32 @@ static const ym3812_interface ym3812_config =
 };
 
 
-static MACHINE_START( common )
+MACHINE_START_MEMBER(aerofgt_state,common)
 {
-	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->save_item(NAME(state->m_pending_command));
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	save_item(NAME(m_pending_command));
 }
 
-static MACHINE_START( aerofgt )
+MACHINE_START_MEMBER(aerofgt_state,aerofgt)
 {
-	UINT8 *rom = machine.root_device().memregion("audiocpu")->base();
+	UINT8 *rom = machine().root_device().memregion("audiocpu")->base();
 
-	machine.root_device().membank("bank1")->configure_entries(0, 4, &rom[0x10000], 0x8000);
+	machine().root_device().membank("bank1")->configure_entries(0, 4, &rom[0x10000], 0x8000);
 
-	MACHINE_START_CALL(common);
+	MACHINE_START_CALL_MEMBER(common);
 }
 
-static MACHINE_RESET( common )
+MACHINE_RESET_MEMBER(aerofgt_state,common)
 {
-	aerofgt_state *state = machine.driver_data<aerofgt_state>();
-	state->m_pending_command = 0;
+	m_pending_command = 0;
 }
 
-static MACHINE_RESET( aerofgt )
+MACHINE_RESET_MEMBER(aerofgt_state,aerofgt)
 {
-	MACHINE_RESET_CALL(common);
+	MACHINE_RESET_CALL_MEMBER(common);
 
-	machine.root_device().membank("bank1")->set_entry(0);	/* needed by spinlbrk */
+	machine().root_device().membank("bank1")->set_entry(0);	/* needed by spinlbrk */
 }
 
 static MACHINE_CONFIG_START( pspikes, aerofgt_state )
@@ -1336,8 +1334,8 @@ static MACHINE_CONFIG_START( pspikes, aerofgt_state )
 	MCFG_CPU_IO_MAP(turbofrc_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
-	MCFG_MACHINE_START(aerofgt)
-	MCFG_MACHINE_RESET(aerofgt)
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1350,7 +1348,7 @@ static MACHINE_CONFIG_START( pspikes, aerofgt_state )
 	MCFG_GFXDECODE(pspikes)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(pspikes)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1372,8 +1370,8 @@ static MACHINE_CONFIG_START( spikes91, aerofgt_state )
 
 	/* + Z80 for sound */
 
-	MCFG_MACHINE_START(common)
-	MCFG_MACHINE_RESET(common)
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1386,7 +1384,7 @@ static MACHINE_CONFIG_START( spikes91, aerofgt_state )
 	MCFG_GFXDECODE(spikes91)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(pspikes)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
 	/* sound hardware */
 	/* the sound hardware is completely different on this:
@@ -1404,8 +1402,8 @@ static MACHINE_CONFIG_START( pspikesb, aerofgt_state )
 	MCFG_CPU_PROGRAM_MAP(pspikesb_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)/* all irq vectors are the same */
 
-	MCFG_MACHINE_START(common)
-	MCFG_MACHINE_RESET(common)
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1418,7 +1416,7 @@ static MACHINE_CONFIG_START( pspikesb, aerofgt_state )
 	MCFG_GFXDECODE(pspikesb)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(pspikes)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1434,8 +1432,8 @@ static MACHINE_CONFIG_START( pspikesc, aerofgt_state )
 	MCFG_CPU_PROGRAM_MAP(pspikesc_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)/* all irq vectors are the same */
 
-	MCFG_MACHINE_START(common)
-	MCFG_MACHINE_RESET(common)
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1448,7 +1446,7 @@ static MACHINE_CONFIG_START( pspikesc, aerofgt_state )
 	MCFG_GFXDECODE(pspikes)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(pspikes)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1469,8 +1467,8 @@ static MACHINE_CONFIG_START( karatblz, aerofgt_state )
 	MCFG_CPU_IO_MAP(turbofrc_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
-	MCFG_MACHINE_START(aerofgt)
-	MCFG_MACHINE_RESET(aerofgt)
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1483,7 +1481,7 @@ static MACHINE_CONFIG_START( karatblz, aerofgt_state )
 	MCFG_GFXDECODE(turbofrc)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(karatblz)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,karatblz)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1508,8 +1506,8 @@ static MACHINE_CONFIG_START( spinlbrk, aerofgt_state )
 	MCFG_CPU_IO_MAP(turbofrc_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
-	MCFG_MACHINE_START(aerofgt)
-	MCFG_MACHINE_RESET(aerofgt)
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1522,7 +1520,7 @@ static MACHINE_CONFIG_START( spinlbrk, aerofgt_state )
 	MCFG_GFXDECODE(turbofrc)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(spinlbrk)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,spinlbrk)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1547,8 +1545,8 @@ static MACHINE_CONFIG_START( turbofrc, aerofgt_state )
 	MCFG_CPU_IO_MAP(turbofrc_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
-	MCFG_MACHINE_START(aerofgt)
-	MCFG_MACHINE_RESET(aerofgt)
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1561,7 +1559,7 @@ static MACHINE_CONFIG_START( turbofrc, aerofgt_state )
 	MCFG_GFXDECODE(turbofrc)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(turbofrc)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1586,8 +1584,8 @@ static MACHINE_CONFIG_START( aerofgtb, aerofgt_state )
 	MCFG_CPU_IO_MAP(aerofgt_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
-	MCFG_MACHINE_START(aerofgt)
-	MCFG_MACHINE_RESET(aerofgt)
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1601,7 +1599,7 @@ static MACHINE_CONFIG_START( aerofgtb, aerofgt_state )
 	MCFG_GFXDECODE(aerofgtb)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(turbofrc)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1626,8 +1624,8 @@ static MACHINE_CONFIG_START( aerofgt, aerofgt_state )
 	MCFG_CPU_IO_MAP(aerofgt_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
-	MCFG_MACHINE_START(aerofgt)
-	MCFG_MACHINE_RESET(aerofgt)
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1641,7 +1639,7 @@ static MACHINE_CONFIG_START( aerofgt, aerofgt_state )
 	MCFG_GFXDECODE(aerofgt)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(turbofrc)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1664,8 +1662,8 @@ static MACHINE_CONFIG_START( aerfboot, aerofgt_state )
 	MCFG_CPU_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(aerfboot_sound_map)
 
-	MCFG_MACHINE_START(common)
-	MCFG_MACHINE_RESET(common)
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1679,7 +1677,7 @@ static MACHINE_CONFIG_START( aerfboot, aerofgt_state )
 	MCFG_GFXDECODE(aerfboot)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(turbofrc)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1695,8 +1693,8 @@ static MACHINE_CONFIG_START( aerfboo2, aerofgt_state )
 	MCFG_CPU_PROGRAM_MAP(aerfboo2_map)
 	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MCFG_MACHINE_START(common)
-	MCFG_MACHINE_RESET(common)
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1710,7 +1708,7 @@ static MACHINE_CONFIG_START( aerfboo2, aerofgt_state )
 	MCFG_GFXDECODE(aerfboo2)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(turbofrc)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1729,8 +1727,8 @@ static MACHINE_CONFIG_START( wbbc97, aerofgt_state )
 	MCFG_CPU_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(wbbc97_sound_map)
 								/* IRQs are triggered by the YM3812 */
-	MCFG_MACHINE_START(common)
-	MCFG_MACHINE_RESET(common)
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1743,7 +1741,7 @@ static MACHINE_CONFIG_START( wbbc97, aerofgt_state )
 	MCFG_GFXDECODE(wbbc97)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(wbbc97)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,wbbc97)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

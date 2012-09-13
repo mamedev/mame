@@ -521,6 +521,9 @@ public:
 	DECLARE_DRIVER_INIT(pwrshovl);
 	DECLARE_DRIVER_INIT(batlgear);
 	DECLARE_DRIVER_INIT(landhigh);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -564,21 +567,20 @@ static void taitotz_exit(running_machine &machine)
     */
 }
 
-static VIDEO_START( taitotz )
+void taitotz_state::video_start()
 {
-	taitotz_state *state = machine.driver_data<taitotz_state>();
 
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
 
-	state->m_screen_ram = auto_alloc_array(machine, UINT32, 0x200000);
-	state->m_frame_ram = auto_alloc_array(machine, UINT32, 0x80000);
-	state->m_texture_ram = auto_alloc_array(machine, UINT32, 0x800000);
+	m_screen_ram = auto_alloc_array(machine(), UINT32, 0x200000);
+	m_frame_ram = auto_alloc_array(machine(), UINT32, 0x80000);
+	m_texture_ram = auto_alloc_array(machine(), UINT32, 0x800000);
 
 	/* create renderer */
-	state->m_renderer = auto_alloc(machine, taitotz_renderer(machine, width, height, state->m_texture_ram));
+	m_renderer = auto_alloc(machine(), taitotz_renderer(machine(), width, height, m_texture_ram));
 
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitotz_exit), &machine));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitotz_exit), &machine()));
 }
 
 static const float dot3_tex_table[32] =
@@ -2422,26 +2424,24 @@ static void set_ide_drive_serial_number(device_t *device, int drive, const char 
 }
 
 
-static MACHINE_RESET( taitotz )
+void taitotz_state::machine_reset()
 {
-	taitotz_state *state = machine.driver_data<taitotz_state>();
-	machine.device("ide")->reset();
+	machine().device("ide")->reset();
 
-	if (state->m_hdd_serial_number != NULL)
+	if (m_hdd_serial_number != NULL)
 	{
-		set_ide_drive_serial_number(machine.device("ide"), 0, state->m_hdd_serial_number);
+		set_ide_drive_serial_number(machine().device("ide"), 0, m_hdd_serial_number);
 	}
 }
 
-static MACHINE_START( taitotz )
+void taitotz_state::machine_start()
 {
-	taitotz_state *state = machine.driver_data<taitotz_state>();
 
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine.device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(machine().device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine.device("maincpu"), 0x40000000, 0x40ffffff, FALSE, state->m_work_ram);
+	ppcdrc_add_fastram(machine().device("maincpu"), 0x40000000, 0x40ffffff, FALSE, m_work_ram);
 }
 
 
@@ -2493,8 +2493,6 @@ static MACHINE_CONFIG_START( taitotz, taitotz_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(120))
 
-	MCFG_MACHINE_START( taitotz )
-	MCFG_MACHINE_RESET( taitotz )
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -2506,7 +2504,6 @@ static MACHINE_CONFIG_START( taitotz, taitotz_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 	MCFG_SCREEN_UPDATE_STATIC(taitotz)
 
-	MCFG_VIDEO_START(taitotz)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( landhigh, taitotz )

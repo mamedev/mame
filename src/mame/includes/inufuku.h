@@ -46,6 +46,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(soundflag_r);
 	TILE_GET_INFO_MEMBER(get_inufuku_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_inufuku_tx_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -53,4 +56,4 @@ public:
 
 
 SCREEN_UPDATE_IND16( inufuku );
-VIDEO_START( inufuku );
+

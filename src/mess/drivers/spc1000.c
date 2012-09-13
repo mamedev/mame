@@ -38,6 +38,7 @@ public:
 	DECLARE_WRITE8_MEMBER(spc1000_video_ram_w);
 	DECLARE_READ8_MEMBER(spc1000_video_ram_r);
 	DECLARE_READ8_MEMBER(spc1000_keyboard_r);
+	virtual void machine_reset();
 };
 
 
@@ -221,12 +222,11 @@ static INPUT_PORTS_START( spc1000 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(spc1000)
+void spc1000_state::machine_reset()
 {
-	spc1000_state *state = machine.driver_data<spc1000_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *mem = state->memregion("maincpu")->base();
-	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *mem = memregion("maincpu")->base();
+	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
 	space->install_read_bank(0x0000, 0x7fff, "bank1");
 	space->install_read_bank(0x8000, 0xffff, "bank3");
@@ -234,12 +234,12 @@ static MACHINE_RESET(spc1000)
 	space->install_write_bank(0x0000, 0x7fff, "bank2");
 	space->install_write_bank(0x8000, 0xffff, "bank4");
 
-	state->membank("bank1")->set_base(mem);
-	state->membank("bank2")->set_base(ram);
-	state->membank("bank3")->set_base(mem);
-	state->membank("bank4")->set_base(ram + 0x8000);
+	membank("bank1")->set_base(mem);
+	membank("bank2")->set_base(ram);
+	membank("bank3")->set_base(mem);
+	membank("bank4")->set_base(ram + 0x8000);
 
-	state->m_IPLK = 1;
+	m_IPLK = 1;
 }
 
 static READ8_DEVICE_HANDLER( spc1000_mc6847_videoram_r )
@@ -302,7 +302,6 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	MCFG_CPU_PROGRAM_MAP(spc1000_mem)
 	MCFG_CPU_IO_MAP(spc1000_io)
 
-	MCFG_MACHINE_RESET(spc1000)
 
     /* video hardware */
     MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")

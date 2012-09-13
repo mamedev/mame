@@ -456,7 +456,7 @@ static INTERRUPT_GEN( fakechange_interrupt_gen )
 	{
 		state->m_tenspot_current_game++;
 		state->m_tenspot_current_game%=10;
-		tenspot_set_game_bank(device->machine(), state->m_tenspot_current_game, 1);
+		state->tenspot_set_game_bank(device->machine(), state->m_tenspot_current_game, 1);
 		device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
@@ -2096,8 +2096,6 @@ static MACHINE_CONFIG_START( galaxian_base, galaxian_state )
 	MCFG_SCREEN_RAW_PARAMS(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND, GALAXIAN_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(galaxian)
 
-	MCFG_PALETTE_INIT(galaxian)
-	MCFG_VIDEO_START(galaxian)
 
 	/* blinking frequency is determined by 555 counter with Ra=100k, Rb=10k, C=10uF */
 	MCFG_TIMER_ADD_PERIODIC("stars", galaxian_stars_blink_timer, PERIOD_OF_555_ASTABLE(100000, 10000, 0.00001))
@@ -2510,7 +2508,7 @@ static MACHINE_CONFIG_DERIVED( moonwar, scobra )
 	MCFG_I8255A_ADD( "ppi8255_0", moonwar_ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", konami_ppi8255_1_intf )
 
-	MCFG_PALETTE_INIT(moonwar) // bullets are less yellow
+	MCFG_PALETTE_INIT_OVERRIDE(galaxian_state,moonwar) // bullets are less yellow
 MACHINE_CONFIG_END
 
 
@@ -2915,7 +2913,7 @@ READ8_MEMBER(galaxian_state::tenspot_dsw_read)
 }
 
 
-void tenspot_set_game_bank(running_machine& machine, int bank, int from_game)
+void galaxian_state::tenspot_set_game_bank(running_machine& machine, int bank, int from_game)
 {
 	char tmp[64];
 	UINT8* srcregion;
@@ -2953,7 +2951,7 @@ void tenspot_set_game_bank(running_machine& machine, int bank, int from_game)
 	dstregion = machine.root_device().memregion("proms")->base();
 	memcpy(dstregion, srcregion, 0x20);
 
-	PALETTE_INIT_CALL(galaxian);
+	galaxian_state::palette_init();
 }
 
 DRIVER_INIT_MEMBER(galaxian_state,tenspot)

@@ -47,13 +47,16 @@ public:
 	DECLARE_WRITE16_MEMBER(galpani2_eeprom_w);
 	DECLARE_WRITE8_MEMBER(galpani2_oki1_bank_w);
 	DECLARE_WRITE8_MEMBER(galpani2_oki2_bank_w);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/galpani2.c -----------*/
 
-PALETTE_INIT( galpani2 );
-VIDEO_START( galpani2 );
+
+
 SCREEN_UPDATE_IND16( galpani2 );
 
 WRITE16_HANDLER( galpani2_palette_0_w );

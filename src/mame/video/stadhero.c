@@ -55,11 +55,10 @@ TILE_GET_INFO_MEMBER(stadhero_state::get_pf1_tile_info)
 			0);
 }
 
-VIDEO_START( stadhero )
+void stadhero_state::video_start()
 {
-	stadhero_state *state = machine.driver_data<stadhero_state>();
-	state->m_pf1_tilemap =     &machine.tilemap().create(tilemap_get_info_delegate(FUNC(stadhero_state::get_pf1_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,32,32);
-	state->m_pf1_tilemap->set_transparent_pen(0);
+	m_pf1_tilemap =     &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stadhero_state::get_pf1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_pf1_tilemap->set_transparent_pen(0);
 }
 
 /******************************************************************************/

@@ -522,48 +522,46 @@ static const ym2203_interface ym2203_config =
 };
 
 
-static MACHINE_START( chinagat )
+MACHINE_START_MEMBER(ddragon_state,chinagat)
 {
-	ddragon_state *state = machine.driver_data<ddragon_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_sub_cpu = machine.device("sub");
-	state->m_snd_cpu = machine.device("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_sub_cpu = machine().device("sub");
+	m_snd_cpu = machine().device("audiocpu");
 
 	/* configure banks */
-	state->membank("bank1")->configure_entries(0, 8, state->memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	/* register for save states */
-	state->save_item(NAME(state->m_scrollx_hi));
-	state->save_item(NAME(state->m_scrolly_hi));
-	state->save_item(NAME(state->m_adpcm_sound_irq));
-	state->save_item(NAME(state->m_adpcm_addr));
-	state->save_item(NAME(state->m_pcm_shift));
-	state->save_item(NAME(state->m_pcm_nibble));
-	state->save_item(NAME(state->m_i8748_P1));
-	state->save_item(NAME(state->m_i8748_P2));
-	state->save_item(NAME(state->m_mcu_command));
+	save_item(NAME(m_scrollx_hi));
+	save_item(NAME(m_scrolly_hi));
+	save_item(NAME(m_adpcm_sound_irq));
+	save_item(NAME(m_adpcm_addr));
+	save_item(NAME(m_pcm_shift));
+	save_item(NAME(m_pcm_nibble));
+	save_item(NAME(m_i8748_P1));
+	save_item(NAME(m_i8748_P2));
+	save_item(NAME(m_mcu_command));
 #if 0
-	state->save_item(NAME(state->m_m5205_clk));
+	save_item(NAME(m_m5205_clk));
 #endif
 }
 
 
-static MACHINE_RESET( chinagat )
+MACHINE_RESET_MEMBER(ddragon_state,chinagat)
 {
-	ddragon_state *state = machine.driver_data<ddragon_state>();
 
-	state->m_scrollx_hi = 0;
-	state->m_scrolly_hi = 0;
-	state->m_adpcm_sound_irq = 0;
-	state->m_adpcm_addr = 0;
-	state->m_pcm_shift = 0;
-	state->m_pcm_nibble = 0;
-	state->m_i8748_P1 = 0;
-	state->m_i8748_P2 = 0;
-	state->m_mcu_command = 0;
+	m_scrollx_hi = 0;
+	m_scrolly_hi = 0;
+	m_adpcm_sound_irq = 0;
+	m_adpcm_addr = 0;
+	m_pcm_shift = 0;
+	m_pcm_nibble = 0;
+	m_i8748_P1 = 0;
+	m_i8748_P2 = 0;
+	m_mcu_command = 0;
 #if 0
-	state->m_m5205_clk = 0;
+	m_m5205_clk = 0;
 #endif
 }
 
@@ -583,8 +581,8 @@ static MACHINE_CONFIG_START( chinagat, ddragon_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
-	MCFG_MACHINE_START(chinagat)
-	MCFG_MACHINE_RESET(chinagat)
+	MCFG_MACHINE_START_OVERRIDE(ddragon_state,chinagat)
+	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,chinagat)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -594,7 +592,7 @@ static MACHINE_CONFIG_START( chinagat, ddragon_state )
 	MCFG_GFXDECODE(chinagat)
 	MCFG_PALETTE_LENGTH(384)
 
-	MCFG_VIDEO_START(chinagat)
+	MCFG_VIDEO_START_OVERRIDE(ddragon_state,chinagat)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -627,8 +625,8 @@ static MACHINE_CONFIG_START( saiyugoub1, ddragon_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* heavy interleaving to sync up sprite<->main cpu's */
 
-	MCFG_MACHINE_START(chinagat)
-	MCFG_MACHINE_RESET(chinagat)
+	MCFG_MACHINE_START_OVERRIDE(ddragon_state,chinagat)
+	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,chinagat)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -638,7 +636,7 @@ static MACHINE_CONFIG_START( saiyugoub1, ddragon_state )
 	MCFG_GFXDECODE(chinagat)
 	MCFG_PALETTE_LENGTH(384)
 
-	MCFG_VIDEO_START(chinagat)
+	MCFG_VIDEO_START_OVERRIDE(ddragon_state,chinagat)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -668,8 +666,8 @@ static MACHINE_CONFIG_START( saiyugoub2, ddragon_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
-	MCFG_MACHINE_START(chinagat)
-	MCFG_MACHINE_RESET(chinagat)
+	MCFG_MACHINE_START_OVERRIDE(ddragon_state,chinagat)
+	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,chinagat)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -679,7 +677,7 @@ static MACHINE_CONFIG_START( saiyugoub2, ddragon_state )
 	MCFG_GFXDECODE(chinagat)
 	MCFG_PALETTE_LENGTH(384)
 
-	MCFG_VIDEO_START(chinagat)
+	MCFG_VIDEO_START_OVERRIDE(ddragon_state,chinagat)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

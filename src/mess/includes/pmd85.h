@@ -36,6 +36,9 @@ public:
 	DECLARE_DRIVER_INIT(pmd853);
 	DECLARE_DRIVER_INIT(alfa);
 	DECLARE_DRIVER_INIT(c2717);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 

@@ -413,40 +413,37 @@ static const k053936_interface f1gp2_k053936_intf =
 };
 
 
-static MACHINE_START( f1gpb )
+MACHINE_START_MEMBER(f1gp_state,f1gpb)
 {
-	f1gp_state *state = machine.driver_data<f1gp_state>();
 
-	state->save_item(NAME(state->m_pending_command));
-	state->save_item(NAME(state->m_roz_bank));
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_gfxctrl));
-	state->save_item(NAME(state->m_scroll));
+	save_item(NAME(m_pending_command));
+	save_item(NAME(m_roz_bank));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_gfxctrl));
+	save_item(NAME(m_scroll));
 }
 
-static MACHINE_START( f1gp )
+MACHINE_START_MEMBER(f1gp_state,f1gp)
 {
-	f1gp_state *state = machine.driver_data<f1gp_state>();
-	UINT8 *ROM = state->memregion("audiocpu")->base();
+	UINT8 *ROM = memregion("audiocpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x8000);
+	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x8000);
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_k053936 = machine.device("k053936");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_k053936 = machine().device("k053936");
 
-	MACHINE_START_CALL(f1gpb);
+	MACHINE_START_CALL_MEMBER(f1gpb);
 }
 
-static MACHINE_RESET( f1gp )
+MACHINE_RESET_MEMBER(f1gp_state,f1gp)
 {
-	f1gp_state *state = machine.driver_data<f1gp_state>();
 
-	state->m_pending_command = 0;
-	state->m_roz_bank = 0;
-	state->m_flipscreen = 0;
-	state->m_gfxctrl = 0;
-	state->m_scroll[0] = 0;
-	state->m_scroll[1] = 0;
+	m_pending_command = 0;
+	m_roz_bank = 0;
+	m_flipscreen = 0;
+	m_gfxctrl = 0;
+	m_scroll[0] = 0;
+	m_scroll[1] = 0;
 }
 
 static MACHINE_CONFIG_START( f1gp, f1gp_state )
@@ -466,8 +463,8 @@ static MACHINE_CONFIG_START( f1gp, f1gp_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
-	MCFG_MACHINE_START(f1gp)
-	MCFG_MACHINE_RESET(f1gp)
+	MCFG_MACHINE_START_OVERRIDE(f1gp_state,f1gp)
+	MCFG_MACHINE_RESET_OVERRIDE(f1gp_state,f1gp)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -479,7 +476,7 @@ static MACHINE_CONFIG_START( f1gp, f1gp_state )
 	MCFG_GFXDECODE(f1gp)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(f1gp)
+	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gp)
 
 	MCFG_K053936_ADD("k053936", f1gp_k053936_intf)
 
@@ -509,8 +506,8 @@ static MACHINE_CONFIG_START( f1gpb, f1gp_state )
 	/* NO sound CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
-	MCFG_MACHINE_START(f1gpb)
-	MCFG_MACHINE_RESET(f1gp)
+	MCFG_MACHINE_START_OVERRIDE(f1gp_state,f1gpb)
+	MCFG_MACHINE_RESET_OVERRIDE(f1gp_state,f1gp)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -522,7 +519,7 @@ static MACHINE_CONFIG_START( f1gpb, f1gp_state )
 	MCFG_GFXDECODE(f1gp)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(f1gpb)
+	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gpb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -548,7 +545,7 @@ static MACHINE_CONFIG_DERIVED( f1gp2, f1gp )
 	MCFG_DEVICE_REMOVE("k053936")
 	MCFG_K053936_ADD("k053936", f1gp2_k053936_intf)
 
-	MCFG_VIDEO_START(f1gp2)
+	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gp2)
 MACHINE_CONFIG_END
 
 

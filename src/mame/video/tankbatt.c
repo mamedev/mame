@@ -15,16 +15,16 @@
   Convert the color PROMs into a more useable format.
 
 ***************************************************************************/
-PALETTE_INIT( tankbatt )
+void tankbatt_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	#define RES_1	0xc0 /* this is a guess */
 	#define RES_2	0x3f /* this is a guess */
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x100);
+	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -49,13 +49,13 @@ PALETTE_INIT( tankbatt )
 		b = RES_1 * bit3;
 		if (bit3) b += RES_2 * bit0;
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	for (i = 0; i < 0x200; i += 2)
 	{
-		colortable_entry_set_value(machine.colortable, i + 0, 0);
-		colortable_entry_set_value(machine.colortable, i + 1, i >> 1);
+		colortable_entry_set_value(machine().colortable, i + 0, 0);
+		colortable_entry_set_value(machine().colortable, i + 1, i >> 1);
 	}
 }
 
@@ -75,10 +75,9 @@ TILE_GET_INFO_MEMBER(tankbatt_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-VIDEO_START( tankbatt )
+void tankbatt_state::video_start()
 {
-	tankbatt_state *state = machine.driver_data<tankbatt_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tankbatt_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tankbatt_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static void draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)

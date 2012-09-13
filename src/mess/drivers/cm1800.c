@@ -48,6 +48,7 @@ public:
 	UINT8 m_term_data;
 
 	required_device<generic_terminal_device> m_terminal;
+	virtual void machine_reset();
 };
 
 READ8_MEMBER( cm1800_state::term_status_r )
@@ -84,7 +85,7 @@ static INPUT_PORTS_START( cm1800 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(cm1800)
+void cm1800_state::machine_reset()
 {
 }
 
@@ -99,7 +100,6 @@ static MACHINE_CONFIG_START( cm1800, cm1800_state )
 	MCFG_CPU_PROGRAM_MAP(cm1800_mem)
 	MCFG_CPU_IO_MAP(cm1800_io)
 
-	MCFG_MACHINE_RESET(cm1800)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)

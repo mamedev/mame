@@ -34,12 +34,16 @@ public:
 	DECLARE_WRITE8_MEMBER(sonson_scrollx_w);
 	DECLARE_WRITE8_MEMBER(sonson_flipscreen_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/sonson.c -----------*/
 
 
-PALETTE_INIT( sonson );
-VIDEO_START( sonson );
+
+
 SCREEN_UPDATE_IND16( sonson );

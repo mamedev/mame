@@ -3,13 +3,12 @@
 #include "includes/othunder.h"
 
 
-VIDEO_START( othunder )
+void othunder_state::video_start()
 {
 	/* Up to $800/8 big sprites, requires 0x100 * sizeof(*spritelist)
        Multiply this by 32 to give room for the number of small sprites,
        which are what actually get put in the structure. */
-	othunder_state *state = machine.driver_data<othunder_state>();
-	state->m_spritelist = auto_alloc_array(machine, struct othunder_tempsprite, 0x2000);
+	m_spritelist = auto_alloc_array(machine(), struct othunder_tempsprite, 0x2000);
 }
 
 

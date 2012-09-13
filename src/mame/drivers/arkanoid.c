@@ -972,49 +972,47 @@ static const ay8910_interface hexa_ay8910_config =
 
 /* Machine Drivers */
 
-static MACHINE_START( arkanoid )
+MACHINE_START_MEMBER(arkanoid_state,arkanoid)
 {
-	arkanoid_state *state = machine.driver_data<arkanoid_state>();
 
-	state->m_mcu = machine.device("mcu");
+	m_mcu = machine().device("mcu");
 
-	state->save_item(NAME(state->m_bootleg_cmd));
+	save_item(NAME(m_bootleg_cmd));
 
-	state->save_item(NAME(state->m_paddle_select));
-	state->save_item(NAME(state->m_z80write));
-	state->save_item(NAME(state->m_fromz80));
-	state->save_item(NAME(state->m_m68705write));
-	state->save_item(NAME(state->m_toz80));
+	save_item(NAME(m_paddle_select));
+	save_item(NAME(m_z80write));
+	save_item(NAME(m_fromz80));
+	save_item(NAME(m_m68705write));
+	save_item(NAME(m_toz80));
 
-	state->save_item(NAME(state->m_port_a_in));
-	state->save_item(NAME(state->m_port_a_out));
-	state->save_item(NAME(state->m_ddr_a));
+	save_item(NAME(m_port_a_in));
+	save_item(NAME(m_port_a_out));
+	save_item(NAME(m_ddr_a));
 
-	state->save_item(NAME(state->m_port_c_out));
-	state->save_item(NAME(state->m_ddr_c));
+	save_item(NAME(m_port_c_out));
+	save_item(NAME(m_ddr_c));
 
-	state->save_item(NAME(state->m_gfxbank));
-	state->save_item(NAME(state->m_palettebank));
+	save_item(NAME(m_gfxbank));
+	save_item(NAME(m_palettebank));
 }
 
-static MACHINE_RESET( arkanoid )
+MACHINE_RESET_MEMBER(arkanoid_state,arkanoid)
 {
-	arkanoid_state *state = machine.driver_data<arkanoid_state>();
 
-	state->m_port_a_in = 0;
-	state->m_port_a_out = 0;
-	state->m_z80write = 0;
-	state->m_m68705write = 0;
+	m_port_a_in = 0;
+	m_port_a_out = 0;
+	m_z80write = 0;
+	m_m68705write = 0;
 
-	state->m_bootleg_cmd = 0;
-	state->m_paddle_select = 0;
-	state->m_fromz80 = 0;
-	state->m_toz80 = 0;
-	state->m_ddr_a = 0;
-	state->m_ddr_c = 0;
-	state->m_port_c_out = 0;
-	state->m_gfxbank = 0;
-	state->m_palettebank = 0;
+	m_bootleg_cmd = 0;
+	m_paddle_select = 0;
+	m_fromz80 = 0;
+	m_toz80 = 0;
+	m_ddr_a = 0;
+	m_ddr_c = 0;
+	m_port_c_out = 0;
+	m_gfxbank = 0;
+	m_palettebank = 0;
 }
 
 static MACHINE_CONFIG_START( arkanoid, arkanoid_state )
@@ -1029,8 +1027,8 @@ static MACHINE_CONFIG_START( arkanoid, arkanoid_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))					// 100 CPU slices per second to synchronize between the MCU and the main CPU
 
-	MCFG_MACHINE_START(arkanoid)
-	MCFG_MACHINE_RESET(arkanoid)
+	MCFG_MACHINE_START_OVERRIDE(arkanoid_state,arkanoid)
+	MCFG_MACHINE_RESET_OVERRIDE(arkanoid_state,arkanoid)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1044,7 +1042,7 @@ static MACHINE_CONFIG_START( arkanoid, arkanoid_state )
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MCFG_VIDEO_START(arkanoid)
+	MCFG_VIDEO_START_OVERRIDE(arkanoid_state,arkanoid)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1062,8 +1060,8 @@ static MACHINE_CONFIG_START( hexa, arkanoid_state )
 	MCFG_CPU_PROGRAM_MAP(hexa_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(arkanoid)
-	MCFG_MACHINE_RESET(arkanoid)
+	MCFG_MACHINE_START_OVERRIDE(arkanoid_state,arkanoid)
+	MCFG_MACHINE_RESET_OVERRIDE(arkanoid_state,arkanoid)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1077,7 +1075,7 @@ static MACHINE_CONFIG_START( hexa, arkanoid_state )
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MCFG_VIDEO_START(arkanoid)
+	MCFG_VIDEO_START_OVERRIDE(arkanoid_state,arkanoid)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

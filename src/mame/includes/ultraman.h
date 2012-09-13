@@ -30,6 +30,9 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_cmd_w);
 	DECLARE_WRITE16_MEMBER(sound_irq_trigger_w);
 	DECLARE_WRITE16_MEMBER(ultraman_gfxctrl_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -42,5 +45,5 @@ extern void ultraman_zoom_callback_1(running_machine &machine, int *code,int *co
 extern void ultraman_zoom_callback_2(running_machine &machine, int *code,int *color,int *flags);
 
 
-VIDEO_START( ultraman );
+
 SCREEN_UPDATE_IND16( ultraman );

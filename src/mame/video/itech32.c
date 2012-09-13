@@ -161,42 +161,41 @@ INLINE void enable_clipping(itech32_state *state)
  *
  *************************************/
 
-VIDEO_START( itech32 )
+void itech32_state::video_start()
 {
-	itech32_state *state = machine.driver_data<itech32_state>();
 	int i;
 
 	/* allocate memory */
-	state->m_videoram = auto_alloc_array(machine, UINT16, VRAM_WIDTH * (state->m_vram_height + 16) * 2);
-	memset(state->m_videoram, 0xff, VRAM_WIDTH * (state->m_vram_height + 16) * 2 * 2);
+	m_videoram = auto_alloc_array(machine(), UINT16, VRAM_WIDTH * (m_vram_height + 16) * 2);
+	memset(m_videoram, 0xff, VRAM_WIDTH * (m_vram_height + 16) * 2 * 2);
 
 	/* videoplane[0] is the foreground; videoplane[1] is the background */
-	state->m_videoplane[0] = &state->m_videoram[0 * VRAM_WIDTH * (state->m_vram_height + 16) + 8 * VRAM_WIDTH];
-	state->m_videoplane[1] = &state->m_videoram[1 * VRAM_WIDTH * (state->m_vram_height + 16) + 8 * VRAM_WIDTH];
+	m_videoplane[0] = &m_videoram[0 * VRAM_WIDTH * (m_vram_height + 16) + 8 * VRAM_WIDTH];
+	m_videoplane[1] = &m_videoram[1 * VRAM_WIDTH * (m_vram_height + 16) + 8 * VRAM_WIDTH];
 
 	/* set the masks */
-	state->m_vram_mask = VRAM_WIDTH * state->m_vram_height - 1;
-	state->m_vram_xmask = VRAM_WIDTH - 1;
-	state->m_vram_ymask = state->m_vram_height - 1;
+	m_vram_mask = VRAM_WIDTH * m_vram_height - 1;
+	m_vram_xmask = VRAM_WIDTH - 1;
+	m_vram_ymask = m_vram_height - 1;
 
 	/* clear the planes initially */
-	for (i = 0; i < VRAM_WIDTH * state->m_vram_height; i++)
-		state->m_videoplane[0][i] = state->m_videoplane[1][i] = 0xff;
+	for (i = 0; i < VRAM_WIDTH * m_vram_height; i++)
+		m_videoplane[0][i] = m_videoplane[1][i] = 0xff;
 
 	/* fetch the GROM base */
-	state->m_grom_base = state->memregion("gfx1")->base();
-	state->m_grom_size = state->memregion("gfx1")->bytes();
-	state->m_grom_bank = 0;
-	state->m_grom_bank_mask = state->m_grom_size >> 24;
-	if (state->m_grom_bank_mask == 2)
-		state->m_grom_bank_mask = 3;
+	m_grom_base = memregion("gfx1")->base();
+	m_grom_size = memregion("gfx1")->bytes();
+	m_grom_bank = 0;
+	m_grom_bank_mask = m_grom_size >> 24;
+	if (m_grom_bank_mask == 2)
+		m_grom_bank_mask = 3;
 
 	/* reset statics */
-	memset(state->m_video, 0, 0x80);
+	memset(m_video, 0, 0x80);
 
-	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(scanline_interrupt));
-	state->m_enable_latch[0] = 1;
-	state->m_enable_latch[1] = (state->m_planes > 1) ? 1 : 0;
+	m_scanline_timer = machine().scheduler().timer_alloc(FUNC(scanline_interrupt));
+	m_enable_latch[0] = 1;
+	m_enable_latch[1] = (m_planes > 1) ? 1 : 0;
 }
 
 

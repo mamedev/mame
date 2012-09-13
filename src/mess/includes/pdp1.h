@@ -255,13 +255,17 @@ public:
 	int m_pos;
 	int m_case_shift;
 	device_t *m_crt;
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 
 /*----------- defined in video/pdp1.c -----------*/
 
-VIDEO_START( pdp1 );
+
 SCREEN_VBLANK( pdp1 );
 SCREEN_UPDATE_IND16( pdp1 );
 

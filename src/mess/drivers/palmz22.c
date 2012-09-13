@@ -99,6 +99,8 @@ public:
 
 	UINT32 m_port[8];
 	DECLARE_DRIVER_INIT(palmz22);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 /***************************************************************************
@@ -238,19 +240,17 @@ static INPUT_CHANGED( palmz22_input_changed )
 
 // MACHINE
 
-static MACHINE_START( palmz22 )
+void palmz22_state::machine_start()
 {
-	palmz22_state *state = machine.driver_data<palmz22_state>();
-	state->m_s3c2410 = machine.device( "s3c2410");
-	state->m_nand = machine.device<nand_device>("nand");
-	state->m_nand->set_data_ptr( state->memregion("nand")->base());
+	m_s3c2410 = machine().device( "s3c2410");
+	m_nand = machine().device<nand_device>("nand");
+	m_nand->set_data_ptr( memregion("nand")->base());
 }
 
-static MACHINE_RESET( palmz22 )
+void palmz22_state::machine_reset()
 {
-	palmz22_state *state = machine.driver_data<palmz22_state>();
-	machine.device("maincpu")->reset();
-	memset( state->m_port, 0, sizeof( state->m_port));
+	machine().device("maincpu")->reset();
+	memset( m_port, 0, sizeof( m_port));
 }
 
 /***************************************************************************
@@ -308,8 +308,6 @@ static MACHINE_CONFIG_START( palmz22, palmz22_state )
 
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2410", s3c2410_device, screen_update)
 
-	MCFG_MACHINE_START(palmz22)
-	MCFG_MACHINE_RESET(palmz22)
 
 	MCFG_S3C2410_ADD("s3c2410", 12000000, palmz22_s3c2410_intf)
 

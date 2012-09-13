@@ -292,102 +292,98 @@ static INPUT_PORTS_START( hec2hrp )
 INPUT_PORTS_END
 
 /*****************************************************************************/
-static MACHINE_START( hec2hrp )
+MACHINE_START_MEMBER(hec2hrp_state,hec2hrp)
 /*****************************************************************************/
 {
-	hector_init(machine);
+	hector_init(machine());
 }
 
-static MACHINE_RESET(hec2hrp)
+MACHINE_RESET_MEMBER(hec2hrp_state,hec2hrp)
 {
 	// Machines init
-	hector_reset(machine, 1, 0);
+	hector_reset(machine(), 1, 0);
 }
 /*****************************************************************************/
-static MACHINE_START( hec2hrx )
+MACHINE_START_MEMBER(hec2hrp_state,hec2hrx)
 /*****************************************************************************/
 {
-	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
-	UINT8 *RAM   = machine.root_device().memregion("maincpu"  )->base();	// pointer to mess ram
+	UINT8 *RAM   = machine().root_device().memregion("maincpu"  )->base();	// pointer to mess ram
 	//Patch rom possible !
 	//RAMD2[0xff6b] = 0x0ff; // force verbose mode hector !
 
 	// Memory install for bank switching
-	state->membank("bank1")->configure_entry(HECTOR_BANK_PROG , &RAM[0xc000]   ); // Mess ram
-	state->membank("bank1")->configure_entry(HECTOR_BANK_VIDEO, state->m_hector_videoram_hrx); // Video ram
+	membank("bank1")->configure_entry(HECTOR_BANK_PROG , &RAM[0xc000]   ); // Mess ram
+	membank("bank1")->configure_entry(HECTOR_BANK_VIDEO, m_hector_videoram_hrx); // Video ram
 
 	// Set bank HECTOR_BANK_PROG as basic bank
-	state->membank("bank1")->set_entry(HECTOR_BANK_PROG);
+	membank("bank1")->set_entry(HECTOR_BANK_PROG);
 
 /******************************************************SPECIFIQUE MX ***************************/
-	state->membank("bank2")->configure_entry(HECTORMX_BANK_PAGE0 , &RAM[0x0000]                    ); // Mess ram
-	state->membank("bank2")->configure_entry(HECTORMX_BANK_PAGE1 , machine.root_device().memregion("page1")->base() ); // Rom page 1
-	state->membank("bank2")->configure_entry(HECTORMX_BANK_PAGE2 , machine.root_device().memregion("page2")->base() ); // Rom page 2
-	state->membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
+	membank("bank2")->configure_entry(HECTORMX_BANK_PAGE0 , &RAM[0x0000]                    ); // Mess ram
+	membank("bank2")->configure_entry(HECTORMX_BANK_PAGE1 , machine().root_device().memregion("page1")->base() ); // Rom page 1
+	membank("bank2")->configure_entry(HECTORMX_BANK_PAGE2 , machine().root_device().memregion("page2")->base() ); // Rom page 2
+	membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
 /******************************************************SPECIFIQUE MX ***************************/
 
 /*************************************************SPECIFIQUE DISK II ***************************/
-	state->membank("bank3")->configure_entry(DISCII_BANK_ROM , machine.root_device().memregion("rom_disc2")->base() ); // ROM
-	state->membank("bank3")->configure_entry(DISCII_BANK_RAM , state->memregion("disc2mem" )->base() ); // RAM
-	state->membank("bank3")->set_entry(DISCII_BANK_ROM);
+	membank("bank3")->configure_entry(DISCII_BANK_ROM , machine().root_device().memregion("rom_disc2")->base() ); // ROM
+	membank("bank3")->configure_entry(DISCII_BANK_RAM , memregion("disc2mem" )->base() ); // RAM
+	membank("bank3")->set_entry(DISCII_BANK_ROM);
 /*************************************************SPECIFIQUE DISK II ***************************/
 
 	// As video HR ram is in bank, use extern memory
-	state->m_hector_videoram.set_target(state->m_hector_videoram_hrx,state->m_hector_videoram.bytes());
+	m_hector_videoram.set_target(m_hector_videoram_hrx,m_hector_videoram.bytes());
 
-	hector_init(machine);
-	hector_disc2_init(machine); // Init of the Disc II !
+	hector_init(machine());
+	hector_disc2_init(machine()); // Init of the Disc II !
 }
 /*****************************************************************************/
-static MACHINE_START( hec2mdhrx )
+MACHINE_START_MEMBER(hec2hrp_state,hec2mdhrx)
 /*****************************************************************************/
 //minidisc
 {
-	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
-	UINT8 *RAM   = machine.root_device().memregion("maincpu"  )->base();	// pointer to mess ram
+	UINT8 *RAM   = machine().root_device().memregion("maincpu"  )->base();	// pointer to mess ram
 
 	// Memory install for bank switching
-	state->membank("bank1")->configure_entry(HECTOR_BANK_PROG , &RAM[0xc000]   ); // Mess ram
-	state->membank("bank1")->configure_entry(HECTOR_BANK_VIDEO, state->m_hector_videoram_hrx); // Video ram
+	membank("bank1")->configure_entry(HECTOR_BANK_PROG , &RAM[0xc000]   ); // Mess ram
+	membank("bank1")->configure_entry(HECTOR_BANK_VIDEO, m_hector_videoram_hrx); // Video ram
 
 	// Set bank HECTOR_BANK_PROG as basic bank
-	state->membank("bank1")->set_entry(HECTOR_BANK_PROG);
+	membank("bank1")->set_entry(HECTOR_BANK_PROG);
 	//Here the bank 5 is not used for the language switch but for the floppy ROM.....
 	/******************************************************SPECIFIQUE Mini disque ***************************/
-	state->membank("bank2")->configure_entry(HECTOR_BANK_BASE , &RAM[0x0000]                    ); // Rom base page
-	state->membank("bank2")->configure_entry(HECTOR_BANK_DISC , state->memregion("page2")->base() ); // Rom page mini disc
-	state->membank("bank2")->set_entry(HECTOR_BANK_BASE);
+	membank("bank2")->configure_entry(HECTOR_BANK_BASE , &RAM[0x0000]                    ); // Rom base page
+	membank("bank2")->configure_entry(HECTOR_BANK_DISC , memregion("page2")->base() ); // Rom page mini disc
+	membank("bank2")->set_entry(HECTOR_BANK_BASE);
 	/******************************************************SPECIFIQUE Mini disque ***************************/
 
 	// As video HR ram is in bank, use extern memory
-	state->m_hector_videoram.set_target(state->m_hector_videoram_hrx,state->m_hector_videoram.bytes());
+	m_hector_videoram.set_target(m_hector_videoram_hrx,m_hector_videoram.bytes());
 
-	hector_init(machine);
-	hector_minidisc_init(machine);
+	hector_init(machine());
+	hector_minidisc_init(machine());
 }
-static MACHINE_RESET(hec2hrx)
+MACHINE_RESET_MEMBER(hec2hrp_state,hec2hrx)
 {
-	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
 	//Hector Memory
-	state->membank("bank1")->set_entry(HECTOR_BANK_PROG);
-	state->membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
+	membank("bank1")->set_entry(HECTOR_BANK_PROG);
+	membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
 	//DISK II Memory
-	state->membank("bank3")->set_entry(DISCII_BANK_ROM);
+	membank("bank3")->set_entry(DISCII_BANK_ROM);
 
 	// Machines init
-	hector_reset(machine, 1, 1);
-	hector_disc2_reset(machine);
+	hector_reset(machine(), 1, 1);
+	hector_disc2_reset(machine());
 }
 //minidisc
-static MACHINE_RESET(hec2mdhrx)
+MACHINE_RESET_MEMBER(hec2hrp_state,hec2mdhrx)
 {
-	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
 	//Hector Memory
-	state->membank("bank1")->set_entry(HECTOR_BANK_PROG);
-	state->membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
+	membank("bank1")->set_entry(HECTOR_BANK_PROG);
+	membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
 
 	// Machines init
-	hector_reset(machine, 1, 0);
+	hector_reset(machine(), 1, 0);
 }
 
 /* Cassette definition */
@@ -445,8 +441,8 @@ static MACHINE_CONFIG_START( hec2hr, hec2hrp_state )
 	MCFG_CPU_PROGRAM_MAP(hec2hrp_mem)
 	MCFG_CPU_IO_MAP(hec2hrp_io)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,50) /*  put on the Z80 irq in Hz*/
-	MCFG_MACHINE_RESET(hec2hrp)
-	MCFG_MACHINE_START(hec2hrp)
+	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrp)
+	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -457,7 +453,7 @@ static MACHINE_CONFIG_START( hec2hr, hec2hrp_state )
 	MCFG_SCREEN_UPDATE_STATIC(hec2hrp)
 
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_VIDEO_START(hec2hrp)
+	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -488,8 +484,8 @@ static MACHINE_CONFIG_START( hec2hrp, hec2hrp_state )
 	MCFG_CPU_PROGRAM_MAP(hec2hrp_mem)
 	MCFG_CPU_IO_MAP(hec2hrp_io)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,50) /*  put on the Z80 irq in Hz*/
-	MCFG_MACHINE_RESET(hec2hrp)
-	MCFG_MACHINE_START(hec2hrp)
+	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrp)
+	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -500,7 +496,7 @@ static MACHINE_CONFIG_START( hec2hrp, hec2hrp_state )
 	MCFG_SCREEN_UPDATE_STATIC(hec2hrp)
 
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_VIDEO_START(hec2hrp)
+	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -538,8 +534,8 @@ static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 	MCFG_CPU_IO_MAP(hecdisc2_io)
 	MCFG_UPD765A_ADD("upd765", hector_disc2_upd765_interface)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(hector_disc2_floppy_interface)
-	MCFG_MACHINE_RESET(hec2hrx)
-	MCFG_MACHINE_START(hec2hrx)
+	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
+	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -550,7 +546,7 @@ static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 	MCFG_SCREEN_UPDATE_STATIC(hec2hrp)
 
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_VIDEO_START(hec2hrp)
+	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -580,8 +576,8 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 	MCFG_CPU_PROGRAM_MAP(hec2hrx_mem)
 	MCFG_CPU_IO_MAP(hec2hrx_io)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,50) //  put on the Z80 irq in Hz
-	MCFG_MACHINE_RESET(hec2hrx)
-	MCFG_MACHINE_START(hec2hrx)
+	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
+	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
 
 	/* Disc II unit */
 	MCFG_CPU_ADD("disc2cpu",Z80, XTAL_4MHz)
@@ -599,7 +595,7 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 	MCFG_SCREEN_UPDATE_STATIC(hec2hrp)
 
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_VIDEO_START(hec2hrp)
+	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -630,8 +626,8 @@ static MACHINE_CONFIG_START( hec2mdhrx, hec2hrp_state )
 	MCFG_CPU_PROGRAM_MAP(hec2hrx_mem)
 	MCFG_CPU_IO_MAP(hec2mdhrx_io)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,50) //  put on the Z80 irq in Hz
-	MCFG_MACHINE_RESET(hec2mdhrx)
-	MCFG_MACHINE_START(hec2mdhrx)
+	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2mdhrx)
+	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2mdhrx)
 
 	/* Mini Disc */
 	MCFG_FD1793_ADD("wd179x", hector_wd17xx_interface )
@@ -647,7 +643,7 @@ static MACHINE_CONFIG_START( hec2mdhrx, hec2hrp_state )
 
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(black_and_white)
-	MCFG_VIDEO_START(hec2hrp)
+	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -678,8 +674,8 @@ static MACHINE_CONFIG_START( hec2mx80, hec2hrp_state )
 	MCFG_CPU_PROGRAM_MAP(hec2hrx_mem)
 	MCFG_CPU_IO_MAP(hec2mx80_io)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,50) //  put on the Z80 irq in Hz
-	MCFG_MACHINE_RESET(hec2hrx)
-	MCFG_MACHINE_START(hec2hrx)
+	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
+	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
 
 	/* Disc II unit */
 	MCFG_CPU_ADD("disc2cpu",Z80, XTAL_4MHz)
@@ -697,7 +693,7 @@ static MACHINE_CONFIG_START( hec2mx80, hec2hrp_state )
 	MCFG_SCREEN_UPDATE_STATIC(hec2hrp)
 
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_VIDEO_START(hec2hrp)
+	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

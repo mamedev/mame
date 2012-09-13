@@ -320,37 +320,35 @@ static const k051316_interface chqflag_k051316_intf_2 =
 	chqflag_zoom_callback_1
 };
 
-static MACHINE_START( chqflag )
+void chqflag_state::machine_start()
 {
-	chqflag_state *state = machine.driver_data<chqflag_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
+	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_k051316_1 = machine.device("k051316_1");
-	state->m_k051316_2 = machine.device("k051316_2");
-	state->m_k051960 = machine.device("k051960");
-	state->m_k007232_1 = machine.device("k007232_1");
-	state->m_k007232_2 = machine.device("k007232_2");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_k051316_1 = machine().device("k051316_1");
+	m_k051316_2 = machine().device("k051316_2");
+	m_k051960 = machine().device("k051960");
+	m_k007232_1 = machine().device("k007232_1");
+	m_k007232_2 = machine().device("k007232_2");
 
-	state->save_item(NAME(state->m_k051316_readroms));
-	state->save_item(NAME(state->m_last_vreg));
-	state->save_item(NAME(state->m_analog_ctrl));
-	state->save_item(NAME(state->m_accel));
-	state->save_item(NAME(state->m_wheel));
+	save_item(NAME(m_k051316_readroms));
+	save_item(NAME(m_last_vreg));
+	save_item(NAME(m_analog_ctrl));
+	save_item(NAME(m_accel));
+	save_item(NAME(m_wheel));
 }
 
-static MACHINE_RESET( chqflag )
+void chqflag_state::machine_reset()
 {
-	chqflag_state *state = machine.driver_data<chqflag_state>();
 
-	state->m_k051316_readroms = 0;
-	state->m_last_vreg = 0;
-	state->m_analog_ctrl = 0;
-	state->m_accel = 0;
-	state->m_wheel = 0;
+	m_k051316_readroms = 0;
+	m_last_vreg = 0;
+	m_analog_ctrl = 0;
+	m_accel = 0;
+	m_wheel = 0;
 }
 
 static MACHINE_CONFIG_START( chqflag, chqflag_state )
@@ -365,8 +363,6 @@ static MACHINE_CONFIG_START( chqflag, chqflag_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(chqflag)
-	MCFG_MACHINE_RESET(chqflag)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -381,7 +377,6 @@ static MACHINE_CONFIG_START( chqflag, chqflag_state )
 
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(chqflag)
 
 	MCFG_K051960_ADD("k051960", chqflag_k051960_intf)
 	MCFG_K051316_ADD("k051316_1", chqflag_k051316_intf_1)

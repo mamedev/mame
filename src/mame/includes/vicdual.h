@@ -74,6 +74,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(brdrline_lives);
 	DECLARE_CUSTOM_INPUT_MEMBER(samurai_protection_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed);
+	DECLARE_MACHINE_START(frogs_audio);
 };
 
 
@@ -92,7 +93,7 @@ SCREEN_UPDATE_RGB32( vicdual_bw_or_color );
 
 /*----------- defined in audio/vicdual.c -----------*/
 
-MACHINE_START( frogs_audio );
+
 MACHINE_CONFIG_EXTERN( frogs_audio );
 MACHINE_CONFIG_EXTERN( headon_audio );
 WRITE8_HANDLER( frogs_audio_w );

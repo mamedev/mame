@@ -800,44 +800,42 @@ static void ninjaw_postload(running_machine &machine)
 	reset_sound_region(machine);
 }
 
-static MACHINE_START( ninjaw )
+void ninjaw_state::machine_start()
 {
-	ninjaw_state *state = machine.driver_data<ninjaw_state>();
 
-	state->membank("bank10")->configure_entries(0, 8, state->memregion("audiocpu")->base() + 0xc000, 0x4000);
+	membank("bank10")->configure_entries(0, 8, memregion("audiocpu")->base() + 0xc000, 0x4000);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_subcpu = machine.device<cpu_device>("sub");
-	state->m_tc0140syt = machine.device("tc0140syt");
-	state->m_tc0100scn_1 = machine.device("tc0100scn_1");
-	state->m_tc0100scn_2 = machine.device("tc0100scn_2");
-	state->m_tc0100scn_3 = machine.device("tc0100scn_3");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_subcpu = machine().device<cpu_device>("sub");
+	m_tc0140syt = machine().device("tc0140syt");
+	m_tc0100scn_1 = machine().device("tc0100scn_1");
+	m_tc0100scn_2 = machine().device("tc0100scn_2");
+	m_tc0100scn_3 = machine().device("tc0100scn_3");
 
-	state->m_lscreen = machine.device("lscreen");
-	state->m_mscreen = machine.device("mscreen");
-	state->m_rscreen = machine.device("rscreen");
+	m_lscreen = machine().device("lscreen");
+	m_mscreen = machine().device("mscreen");
+	m_rscreen = machine().device("rscreen");
 
-	state->m_2610_1l = machine.device("2610.1.l");
-	state->m_2610_1r = machine.device("2610.1.r");
-	state->m_2610_2l = machine.device("2610.2.l");
-	state->m_2610_2r = machine.device("2610.2.r");
+	m_2610_1l = machine().device("2610.1.l");
+	m_2610_1r = machine().device("2610.1.r");
+	m_2610_2l = machine().device("2610.2.l");
+	m_2610_2r = machine().device("2610.2.r");
 
-	state->save_item(NAME(state->m_cpua_ctrl));
-	state->save_item(NAME(state->m_banknum));
-	state->save_item(NAME(state->m_pandata));
-	machine.save().register_postload(save_prepost_delegate(FUNC(ninjaw_postload), &machine));
+	save_item(NAME(m_cpua_ctrl));
+	save_item(NAME(m_banknum));
+	save_item(NAME(m_pandata));
+	machine().save().register_postload(save_prepost_delegate(FUNC(ninjaw_postload), &machine()));
 }
 
-static MACHINE_RESET( ninjaw )
+void ninjaw_state::machine_reset()
 {
-	ninjaw_state *state = machine.driver_data<ninjaw_state>();
-	state->m_cpua_ctrl = 0xff;
-	state->m_banknum = 0;
-	memset(state->m_pandata, 0, sizeof(state->m_pandata));
+	m_cpua_ctrl = 0xff;
+	m_banknum = 0;
+	memset(m_pandata, 0, sizeof(m_pandata));
 
 	/**** mixer control enable ****/
-	machine.sound().system_enable(true);	/* mixer enabled */
+	machine().sound().system_enable(true);	/* mixer enabled */
 }
 
 static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
@@ -856,8 +854,6 @@ static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* CPU slices */
 
-	MCFG_MACHINE_START(ninjaw)
-	MCFG_MACHINE_RESET(ninjaw)
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", ninjaw_io_intf)
 
@@ -887,7 +883,6 @@ static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 3*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(ninjaw_right)
 
-	MCFG_VIDEO_START(ninjaw)
 
 	MCFG_TC0100SCN_ADD("tc0100scn_1", darius2_tc0100scn_intf_l)
 	MCFG_TC0100SCN_ADD("tc0100scn_2", darius2_tc0100scn_intf_m)
@@ -939,8 +934,6 @@ static MACHINE_CONFIG_START( darius2, ninjaw_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* CPU slices */
 
-	MCFG_MACHINE_START(ninjaw)
-	MCFG_MACHINE_RESET(ninjaw)
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", ninjaw_io_intf)
 
@@ -970,7 +963,6 @@ static MACHINE_CONFIG_START( darius2, ninjaw_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 3*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(ninjaw_right)
 
-	MCFG_VIDEO_START(ninjaw)
 
 	MCFG_TC0100SCN_ADD("tc0100scn_1", darius2_tc0100scn_intf_l)
 	MCFG_TC0100SCN_ADD("tc0100scn_2", darius2_tc0100scn_intf_m)

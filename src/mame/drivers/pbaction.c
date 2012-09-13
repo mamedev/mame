@@ -255,21 +255,19 @@ static INTERRUPT_GEN( pbaction_interrupt )
 }
 
 
-static MACHINE_START( pbaction )
+void pbaction_state::machine_start()
 {
-	pbaction_state *state = machine.driver_data<pbaction_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_scroll));
+	save_item(NAME(m_scroll));
 }
 
-static MACHINE_RESET( pbaction )
+void pbaction_state::machine_reset()
 {
-	pbaction_state *state = machine.driver_data<pbaction_state>();
 
-	state->m_scroll = 0;
+	m_scroll = 0;
 }
 
 static INTERRUPT_GEN( vblank_irq )
@@ -293,8 +291,6 @@ static MACHINE_CONFIG_START( pbaction, pbaction_state )
 	MCFG_CPU_PERIODIC_INT(pbaction_interrupt,2*60)	/* ??? */
 									/* IRQs are caused by the main CPU */
 
-	MCFG_MACHINE_START(pbaction)
-	MCFG_MACHINE_RESET(pbaction)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -307,7 +303,6 @@ static MACHINE_CONFIG_START( pbaction, pbaction_state )
 	MCFG_GFXDECODE(pbaction)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(pbaction)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

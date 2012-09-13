@@ -48,6 +48,11 @@ public:
 	TILE_GET_INFO_MEMBER(get_alpha2_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);
+	DECLARE_MACHINE_START(cyberbal);
+	DECLARE_MACHINE_RESET(cyberbal);
+	DECLARE_VIDEO_START(cyberbal);
+	DECLARE_MACHINE_RESET(cyberbal2p);
+	DECLARE_VIDEO_START(cyberbal2p);
 };
 
 
@@ -68,8 +73,8 @@ READ16_HANDLER( cyberbal_paletteram_1_r );
 WRITE16_HANDLER( cyberbal_paletteram_0_w );
 WRITE16_HANDLER( cyberbal_paletteram_1_w );
 
-VIDEO_START( cyberbal );
-VIDEO_START( cyberbal2p );
+
+
 SCREEN_UPDATE_IND16( cyberbal_left );
 SCREEN_UPDATE_IND16( cyberbal_right );
 SCREEN_UPDATE_IND16( cyberbal2p );

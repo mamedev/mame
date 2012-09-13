@@ -176,9 +176,9 @@ static void video_start_cyberbal_common(running_machine &machine, int screens)
 }
 
 
-VIDEO_START( cyberbal )
+VIDEO_START_MEMBER(cyberbal_state,cyberbal)
 {
-	video_start_cyberbal_common(machine, 2);
+	video_start_cyberbal_common(machine(), 2);
 
 	/* adjust the sprite positions */
 	atarimo_set_xscroll(0, 4);
@@ -186,9 +186,9 @@ VIDEO_START( cyberbal )
 }
 
 
-VIDEO_START( cyberbal2p )
+VIDEO_START_MEMBER(cyberbal_state,cyberbal2p)
 {
-	video_start_cyberbal_common(machine, 1);
+	video_start_cyberbal_common(machine(), 1);
 
 	/* adjust the sprite positions */
 	atarimo_set_xscroll(0, 5);

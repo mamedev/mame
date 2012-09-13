@@ -194,28 +194,26 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_START( tutankhm )
+MACHINE_START_MEMBER(tutankhm_state,tutankhm)
 {
-	tutankhm_state *state = machine.driver_data<tutankhm_state>();
 
-	state->membank("bank1")->configure_entries(0, 16, state->memregion("maincpu")->base() + 0x10000, 0x1000);
+	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x1000);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
 
-	state->save_item(NAME(state->m_irq_toggle));
-	state->save_item(NAME(state->m_irq_enable));
-	state->save_item(NAME(state->m_flip_x));
-	state->save_item(NAME(state->m_flip_y));
+	save_item(NAME(m_irq_toggle));
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_flip_x));
+	save_item(NAME(m_flip_y));
 }
 
-static MACHINE_RESET( tutankhm )
+MACHINE_RESET_MEMBER(tutankhm_state,tutankhm)
 {
-	tutankhm_state *state = machine.driver_data<tutankhm_state>();
 
-	state->m_irq_toggle = 0;
-	state->m_irq_enable = 0;
-	state->m_flip_x = 0;
-	state->m_flip_y = 0;
+	m_irq_toggle = 0;
+	m_irq_enable = 0;
+	m_flip_x = 0;
+	m_flip_y = 0;
 }
 
 static MACHINE_CONFIG_START( tutankhm, tutankhm_state )
@@ -225,8 +223,8 @@ static MACHINE_CONFIG_START( tutankhm, tutankhm_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", tutankhm_interrupt)
 
-	MCFG_MACHINE_START(tutankhm)
-	MCFG_MACHINE_RESET(tutankhm)
+	MCFG_MACHINE_START_OVERRIDE(tutankhm_state,tutankhm)
+	MCFG_MACHINE_RESET_OVERRIDE(tutankhm_state,tutankhm)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

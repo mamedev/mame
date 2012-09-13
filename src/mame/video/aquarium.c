@@ -141,15 +141,14 @@ WRITE16_MEMBER(aquarium_state::aquarium_bak_videoram_w)
 	m_bak_tilemap->mark_tile_dirty(offset / 2);
 }
 
-VIDEO_START(aquarium)
+void aquarium_state::video_start()
 {
-	aquarium_state *state = machine.driver_data<aquarium_state>();
-	state->m_txt_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aquarium_state::get_aquarium_txt_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_bak_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aquarium_state::get_aquarium_bak_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_mid_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aquarium_state::get_aquarium_mid_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_txt_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(aquarium_state::get_aquarium_txt_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_bak_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(aquarium_state::get_aquarium_bak_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_mid_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(aquarium_state::get_aquarium_mid_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	state->m_txt_tilemap->set_transparent_pen(0);
-	state->m_mid_tilemap->set_transparent_pen(0);
+	m_txt_tilemap->set_transparent_pen(0);
+	m_mid_tilemap->set_transparent_pen(0);
 }
 
 SCREEN_UPDATE_IND16(aquarium)

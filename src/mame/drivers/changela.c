@@ -419,87 +419,85 @@ static INTERRUPT_GEN( chl_mcu_irq )
 	generic_pulse_irq_line(state->m_mcu, 0, 1);
 }
 
-static MACHINE_START(changela)
+void changela_state::machine_start()
 {
-	changela_state *state = machine.driver_data<changela_state>();
 
-	state->m_mcu = machine.device("mcu");
+	m_mcu = machine().device("mcu");
 
 	/* video */
-	state->save_item(NAME(state->m_slopeROM_bank));
-	state->save_item(NAME(state->m_tree_en));
-	state->save_item(NAME(state->m_horizon));
-	state->save_item(NAME(state->m_mem_dev_selected));
-	state->save_item(NAME(state->m_v_count_river));
-	state->save_item(NAME(state->m_v_count_tree));
-	state->save_item(NAME(state->m_tree_on));
+	save_item(NAME(m_slopeROM_bank));
+	save_item(NAME(m_tree_en));
+	save_item(NAME(m_horizon));
+	save_item(NAME(m_mem_dev_selected));
+	save_item(NAME(m_v_count_river));
+	save_item(NAME(m_v_count_tree));
+	save_item(NAME(m_tree_on));
 
 	/* mcu */
-	state->save_item(NAME(state->m_port_a_in));
-	state->save_item(NAME(state->m_port_a_out));
-	state->save_item(NAME(state->m_ddr_a));
-	state->save_item(NAME(state->m_port_b_out));
-	state->save_item(NAME(state->m_ddr_b));
-	state->save_item(NAME(state->m_port_c_in));
-	state->save_item(NAME(state->m_port_c_out));
-	state->save_item(NAME(state->m_ddr_c));
+	save_item(NAME(m_port_a_in));
+	save_item(NAME(m_port_a_out));
+	save_item(NAME(m_ddr_a));
+	save_item(NAME(m_port_b_out));
+	save_item(NAME(m_ddr_b));
+	save_item(NAME(m_port_c_in));
+	save_item(NAME(m_port_c_out));
+	save_item(NAME(m_ddr_c));
 
-	state->save_item(NAME(state->m_mcu_out));
-	state->save_item(NAME(state->m_mcu_in));
-	state->save_item(NAME(state->m_mcu_pc_1));
-	state->save_item(NAME(state->m_mcu_pc_0));
+	save_item(NAME(m_mcu_out));
+	save_item(NAME(m_mcu_in));
+	save_item(NAME(m_mcu_pc_1));
+	save_item(NAME(m_mcu_pc_0));
 
 	/* misc */
-	state->save_item(NAME(state->m_tree0_col));
-	state->save_item(NAME(state->m_tree1_col));
-	state->save_item(NAME(state->m_left_bank_col));
-	state->save_item(NAME(state->m_right_bank_col));
-	state->save_item(NAME(state->m_boat_shore_col));
-	state->save_item(NAME(state->m_collision_reset));
-	state->save_item(NAME(state->m_tree_collision_reset));
-	state->save_item(NAME(state->m_prev_value_31));
-	state->save_item(NAME(state->m_dir_31));
+	save_item(NAME(m_tree0_col));
+	save_item(NAME(m_tree1_col));
+	save_item(NAME(m_left_bank_col));
+	save_item(NAME(m_right_bank_col));
+	save_item(NAME(m_boat_shore_col));
+	save_item(NAME(m_collision_reset));
+	save_item(NAME(m_tree_collision_reset));
+	save_item(NAME(m_prev_value_31));
+	save_item(NAME(m_dir_31));
 }
 
-static MACHINE_RESET (changela)
+void changela_state::machine_reset()
 {
-	changela_state *state = machine.driver_data<changela_state>();
 
 	/* video */
-	state->m_slopeROM_bank = 0;
-	state->m_tree_en = 0;
-	state->m_horizon = 0;
-	state->m_mem_dev_selected = 0;
-	state->m_v_count_river = 0;
-	state->m_v_count_tree = 0;
-	state->m_tree_on[0] = 0;
-	state->m_tree_on[1] = 0;
+	m_slopeROM_bank = 0;
+	m_tree_en = 0;
+	m_horizon = 0;
+	m_mem_dev_selected = 0;
+	m_v_count_river = 0;
+	m_v_count_tree = 0;
+	m_tree_on[0] = 0;
+	m_tree_on[1] = 0;
 
 	/* mcu */
-	state->m_mcu_pc_1 = 0;
-	state->m_mcu_pc_0 = 0;
+	m_mcu_pc_1 = 0;
+	m_mcu_pc_0 = 0;
 
-	state->m_port_a_in = 0;
-	state->m_port_a_out = 0;
-	state->m_ddr_a = 0;
-	state->m_port_b_out = 0;
-	state->m_ddr_b = 0;
-	state->m_port_c_in = 0;
-	state->m_port_c_out = 0;
-	state->m_ddr_c = 0;
-	state->m_mcu_out = 0;
-	state->m_mcu_in = 0;
+	m_port_a_in = 0;
+	m_port_a_out = 0;
+	m_ddr_a = 0;
+	m_port_b_out = 0;
+	m_ddr_b = 0;
+	m_port_c_in = 0;
+	m_port_c_out = 0;
+	m_ddr_c = 0;
+	m_mcu_out = 0;
+	m_mcu_in = 0;
 
 	/* misc */
-	state->m_tree0_col = 0;
-	state->m_tree1_col = 0;
-	state->m_left_bank_col = 0;
-	state->m_right_bank_col = 0;
-	state->m_boat_shore_col = 0;
-	state->m_collision_reset = 0;
-	state->m_tree_collision_reset = 0;
-	state->m_prev_value_31 = 0;
-	state->m_dir_31 = 0;
+	m_tree0_col = 0;
+	m_tree1_col = 0;
+	m_left_bank_col = 0;
+	m_right_bank_col = 0;
+	m_boat_shore_col = 0;
+	m_collision_reset = 0;
+	m_tree_collision_reset = 0;
+	m_prev_value_31 = 0;
+	m_dir_31 = 0;
 }
 
 static MACHINE_CONFIG_START( changela, changela_state )
@@ -512,8 +510,6 @@ static MACHINE_CONFIG_START( changela, changela_state )
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_VBLANK_INT("screen",chl_mcu_irq)
 
-	MCFG_MACHINE_START(changela)
-	MCFG_MACHINE_RESET(changela)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -523,7 +519,6 @@ static MACHINE_CONFIG_START( changela, changela_state )
 
 	MCFG_PALETTE_LENGTH(0x40)
 
-	MCFG_VIDEO_START(changela)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

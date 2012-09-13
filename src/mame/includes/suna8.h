@@ -98,6 +98,11 @@ public:
 	DECLARE_DRIVER_INIT(brickzn);
 	DECLARE_DRIVER_INIT(hardhead);
 	DECLARE_DRIVER_INIT(suna8);
+	DECLARE_VIDEO_START(suna8_textdim12);
+	DECLARE_VIDEO_START(suna8_textdim8);
+	DECLARE_MACHINE_RESET(brickzn);
+	DECLARE_VIDEO_START(suna8_textdim0);
+	DECLARE_MACHINE_RESET(hardhea2);
 };
 
 
@@ -113,7 +118,7 @@ SAMPLES_START( suna8_sh_start );
 
 
 
-VIDEO_START( suna8_textdim0 );
-VIDEO_START( suna8_textdim8 );
-VIDEO_START( suna8_textdim12 );
+
+
+
 SCREEN_UPDATE_IND16( suna8 );

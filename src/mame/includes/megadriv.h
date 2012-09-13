@@ -270,6 +270,10 @@ public:
 	DECLARE_DRIVER_INIT(pclubjv4);
 	DECLARE_DRIVER_INIT(pclubjv5);
 	void segac2_common_init(running_machine& machine, int (*func)(int in));
+	DECLARE_VIDEO_START(segac2_new);
+	DECLARE_MACHINE_START(segac2);
+	DECLARE_MACHINE_RESET(segac2);
+
 };
 
 class mplay_state : public md_base_state
@@ -306,6 +310,8 @@ public:
 	UINT16 *m_ic36_ram;
 	DECLARE_WRITE_LINE_MEMBER( int_callback );
 	DECLARE_DRIVER_INIT(megaplay);
+	DECLARE_VIDEO_START(megplay);
+	DECLARE_MACHINE_RESET(megaplay);
 };
 
 class mtech_state : public md_base_state
@@ -339,6 +345,8 @@ public:
 	UINT8* m_megatech_banked_ram;
 	DECLARE_DRIVER_INIT(mt_crt);
 	DECLARE_DRIVER_INIT(mt_slot);
+	DECLARE_VIDEO_START(mtnew);
+	DECLARE_MACHINE_RESET(mtnew);
 };
 
 typedef struct _megadriv_cart  megadriv_cart;
@@ -390,14 +398,6 @@ public:
 
 };
 
-class pico_state : public md_cons_state
-{
-public:
-	pico_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_cons_state(mconfig, type, tag) { }
-
-	UINT8 m_page_register;
-};
 
 class mdsvp_state : public md_cons_state
 {

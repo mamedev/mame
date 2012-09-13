@@ -103,17 +103,17 @@ ResetAllSubCPUs( running_machine &machine, int state )
 	}
 }
 
-MACHINE_START( namcos2 )
+MACHINE_START_MEMBER(namcos2_shared_state,namcos2)
 {
 	namcos2_kickstart = NULL;
-	namcos2_eeprom = auto_alloc_array(machine, UINT8, namcos2_eeprom_size);
-	machine.device<nvram_device>("nvram")->set_base(namcos2_eeprom, namcos2_eeprom_size);
-	namcos2_posirq_timer = machine.scheduler().timer_alloc(FUNC(namcos2_posirq_tick));
+	namcos2_eeprom = auto_alloc_array(machine(), UINT8, namcos2_eeprom_size);
+	machine().device<nvram_device>("nvram")->set_base(namcos2_eeprom, namcos2_eeprom_size);
+	namcos2_posirq_timer = machine().scheduler().timer_alloc(FUNC(namcos2_posirq_tick));
 }
 
-MACHINE_RESET( namcos2 )
+MACHINE_RESET_MEMBER(namcos2_shared_state,namcos2)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	mFinalLapProtCount = 0;
 	namcos2_mcu_analog_ctrl = 0;
 	namcos2_mcu_analog_data = 0xaa;
@@ -123,10 +123,10 @@ MACHINE_RESET( namcos2 )
 	/* Initialise the bank select in the sound CPU */
 	namcos2_sound_bankselect_w(space, 0, 0); /* Page in bank 0 */
 
-	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
 
 	/* Place CPU2 & CPU3 into the reset condition */
-	ResetAllSubCPUs( machine, ASSERT_LINE );
+	ResetAllSubCPUs( machine(), ASSERT_LINE );
 
 	/* Initialise interrupt handlers */
 	InitC148();

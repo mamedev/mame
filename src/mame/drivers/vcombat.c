@@ -122,6 +122,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sound_update);
 	DECLARE_DRIVER_INIT(shadfgtr);
 	DECLARE_DRIVER_INIT(vcombat);
+	DECLARE_MACHINE_RESET(vcombat);
+	DECLARE_MACHINE_RESET(shadfgtr);
 };
 
 static UINT32 update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)
@@ -402,21 +404,19 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, vcombat_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_RESET( vcombat )
+MACHINE_RESET_MEMBER(vcombat_state,vcombat)
 {
-	vcombat_state *state = machine.driver_data<vcombat_state>();
-	i860_set_pin(machine.device("vid_0"), DEC_PIN_BUS_HOLD, 1);
-	i860_set_pin(machine.device("vid_1"), DEC_PIN_BUS_HOLD, 1);
+	i860_set_pin(machine().device("vid_0"), DEC_PIN_BUS_HOLD, 1);
+	i860_set_pin(machine().device("vid_1"), DEC_PIN_BUS_HOLD, 1);
 
-	state->m_crtc_select = 0;
+	m_crtc_select = 0;
 }
 
-static MACHINE_RESET( shadfgtr )
+MACHINE_RESET_MEMBER(vcombat_state,shadfgtr)
 {
-	vcombat_state *state = machine.driver_data<vcombat_state>();
-	i860_set_pin(machine.device("vid_0"), DEC_PIN_BUS_HOLD, 1);
+	i860_set_pin(machine().device("vid_0"), DEC_PIN_BUS_HOLD, 1);
 
-	state->m_crtc_select = 0;
+	m_crtc_select = 0;
 }
 
 
@@ -596,7 +596,7 @@ static MACHINE_CONFIG_START( vcombat, vcombat_state )
 	MCFG_CPU_PERIODIC_INT(irq1_line_hold, 15000)	/* Remove this if MC6845 is enabled */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_MACHINE_RESET(vcombat)
+	MCFG_MACHINE_RESET_OVERRIDE(vcombat_state,vcombat)
 
 /* Temporary hack for experimenting with timing. */
 #if 0
@@ -639,7 +639,7 @@ static MACHINE_CONFIG_START( shadfgtr, vcombat_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_MACHINE_RESET(shadfgtr)
+	MCFG_MACHINE_RESET_OVERRIDE(vcombat_state,shadfgtr)
 
 	MCFG_TLC34076_ADD("tlc34076", tlc34076_6_bit_intf)
 

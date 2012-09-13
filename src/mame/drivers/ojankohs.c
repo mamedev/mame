@@ -789,68 +789,66 @@ static const msm5205_interface msm5205_config =
 };
 
 
-static MACHINE_START( common )
+MACHINE_START_MEMBER(ojankohs_state,common)
 {
-	ojankohs_state *state = machine.driver_data<ojankohs_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_msm = machine.device("msm");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_msm = machine().device("msm");
 
-	state->save_item(NAME(state->m_gfxreg));
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_flipscreen_old));
-	state->save_item(NAME(state->m_scrollx));
-	state->save_item(NAME(state->m_scrolly));
-	state->save_item(NAME(state->m_screen_refresh));
-	state->save_item(NAME(state->m_portselect));
-	state->save_item(NAME(state->m_adpcm_reset));
-	state->save_item(NAME(state->m_adpcm_data));
-	state->save_item(NAME(state->m_vclk_left));
+	save_item(NAME(m_gfxreg));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_flipscreen_old));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
+	save_item(NAME(m_screen_refresh));
+	save_item(NAME(m_portselect));
+	save_item(NAME(m_adpcm_reset));
+	save_item(NAME(m_adpcm_data));
+	save_item(NAME(m_vclk_left));
 }
 
-static MACHINE_START( ojankohs )
+MACHINE_START_MEMBER(ojankohs_state,ojankohs)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
-	machine.root_device().membank("bank1")->configure_entries(0, 0x40, &ROM[0x10000], 0x4000);
+	machine().root_device().membank("bank1")->configure_entries(0, 0x40, &ROM[0x10000], 0x4000);
 
-	MACHINE_START_CALL(common);
+	MACHINE_START_CALL_MEMBER(common);
 }
 
-static MACHINE_START( ojankoy )
+MACHINE_START_MEMBER(ojankohs_state,ojankoy)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
-	machine.root_device().membank("bank1")->configure_entries(0, 0x20, &ROM[0x10000], 0x4000);
+	machine().root_device().membank("bank1")->configure_entries(0, 0x20, &ROM[0x10000], 0x4000);
 
-	MACHINE_START_CALL(common);
+	MACHINE_START_CALL_MEMBER(common);
 }
 
-static MACHINE_START( ojankoc )
+MACHINE_START_MEMBER(ojankohs_state,ojankoc)
 {
-	UINT8 *ROM = machine.root_device().memregion("user1")->base();
+	UINT8 *ROM = machine().root_device().memregion("user1")->base();
 
-	machine.root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x0000], 0x8000);
+	machine().root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x0000], 0x8000);
 
-	MACHINE_START_CALL(common);
+	MACHINE_START_CALL_MEMBER(common);
 }
 
-static MACHINE_RESET( ojankohs )
+void ojankohs_state::machine_reset()
 {
-	ojankohs_state *state = machine.driver_data<ojankohs_state>();
 
-	state->m_portselect = 0;
+	m_portselect = 0;
 
-	state->m_adpcm_reset = 0;
-	state->m_adpcm_data = 0;
-	state->m_vclk_left = 0;
+	m_adpcm_reset = 0;
+	m_adpcm_data = 0;
+	m_vclk_left = 0;
 
-	state->m_gfxreg = 0;
-	state->m_flipscreen = 0;
-	state->m_flipscreen_old = 0;
-	state->m_scrollx = 0;
-	state->m_scrolly = 0;
-	state->m_screen_refresh = 0;
+	m_gfxreg = 0;
+	m_flipscreen = 0;
+	m_flipscreen_old = 0;
+	m_scrollx = 0;
+	m_scrolly = 0;
+	m_screen_refresh = 0;
 }
 
 static MACHINE_CONFIG_START( ojankohs, ojankohs_state )
@@ -861,8 +859,7 @@ static MACHINE_CONFIG_START( ojankohs, ojankohs_state )
 	MCFG_CPU_IO_MAP(ojankohs_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(ojankohs)
-	MCFG_MACHINE_RESET(ojankohs)
+	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankohs)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -876,7 +873,7 @@ static MACHINE_CONFIG_START( ojankohs, ojankohs_state )
 	MCFG_GFXDECODE(ojankohs)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(ojankohs)
+	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankohs)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -898,8 +895,7 @@ static MACHINE_CONFIG_START( ojankoy, ojankohs_state )
 	MCFG_CPU_IO_MAP(ojankoy_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(ojankoy)
-	MCFG_MACHINE_RESET(ojankohs)
+	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankoy)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -912,9 +908,9 @@ static MACHINE_CONFIG_START( ojankoy, ojankohs_state )
 
 	MCFG_GFXDECODE(ojankohs)
 	MCFG_PALETTE_LENGTH(1024)
-	MCFG_PALETTE_INIT(ojankoy)
+	MCFG_PALETTE_INIT_OVERRIDE(ojankohs_state,ojankoy)
 
-	MCFG_VIDEO_START(ojankoy)
+	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankoy)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -936,8 +932,7 @@ static MACHINE_CONFIG_START( ccasino, ojankohs_state )
 	MCFG_CPU_IO_MAP(ccasino_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(ojankohs)
-	MCFG_MACHINE_RESET(ojankohs)
+	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankohs)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -951,7 +946,7 @@ static MACHINE_CONFIG_START( ccasino, ojankohs_state )
 	MCFG_GFXDECODE(ojankohs)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(ojankoy)
+	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankoy)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -973,8 +968,7 @@ static MACHINE_CONFIG_START( ojankoc, ojankohs_state )
 	MCFG_CPU_IO_MAP(ojankoc_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(ojankoc)
-	MCFG_MACHINE_RESET(ojankohs)
+	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankoc)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -987,7 +981,7 @@ static MACHINE_CONFIG_START( ojankoc, ojankohs_state )
 
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_VIDEO_START(ojankoc)
+	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankoc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

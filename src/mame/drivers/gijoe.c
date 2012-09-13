@@ -271,26 +271,24 @@ static const k053247_interface gijoe_k053247_intf =
 	gijoe_sprite_callback
 };
 
-static MACHINE_START( gijoe )
+void gijoe_state::machine_start()
 {
-	gijoe_state *state = machine.driver_data<gijoe_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_k054539 = machine.device("k054539");
-	state->m_k056832 = machine.device("k056832");
-	state->m_k053246 = machine.device("k053246");
-	state->m_k053251 = machine.device("k053251");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_k054539 = machine().device("k054539");
+	m_k056832 = machine().device("k056832");
+	m_k053246 = machine().device("k053246");
+	m_k053251 = machine().device("k053251");
 
-	state->m_dmadelay_timer = machine.scheduler().timer_alloc(FUNC(dmaend_callback));
+	m_dmadelay_timer = machine().scheduler().timer_alloc(FUNC(dmaend_callback));
 
-	state->save_item(NAME(state->m_cur_control2));
+	save_item(NAME(m_cur_control2));
 }
 
-static MACHINE_RESET( gijoe )
+void gijoe_state::machine_reset()
 {
-	gijoe_state *state = machine.driver_data<gijoe_state>();
-	state->m_cur_control2 = 0;
+	m_cur_control2 = 0;
 }
 
 static MACHINE_CONFIG_START( gijoe, gijoe_state )
@@ -303,8 +301,6 @@ static MACHINE_CONFIG_START( gijoe, gijoe_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)	/* Amuse & confirmed. z80e */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(gijoe)
-	MCFG_MACHINE_RESET(gijoe)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
@@ -320,7 +316,6 @@ static MACHINE_CONFIG_START( gijoe, gijoe_state )
 
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(gijoe)
 
 	MCFG_K056832_ADD("k056832", gijoe_k056832_intf)
 	MCFG_K053246_ADD("k053246", gijoe_k053247_intf)

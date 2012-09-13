@@ -148,15 +148,15 @@ static void video_start_common(running_machine &machine, int pagecount)
 }
 
 
-VIDEO_START( system1 )
+void system1_state::video_start()
 {
-	video_start_common(machine, 2);
+	video_start_common(machine(), 2);
 }
 
 
-VIDEO_START( system2 )
+VIDEO_START_MEMBER(system1_state,system2)
 {
-	video_start_common(machine, 8);
+	video_start_common(machine(), 8);
 }
 
 

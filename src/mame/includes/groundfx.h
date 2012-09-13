@@ -36,10 +36,11 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
 	DECLARE_DRIVER_INIT(groundfx);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/groundfx.c -----------*/
 
-VIDEO_START( groundfx );
+
 SCREEN_UPDATE_IND16( groundfx );

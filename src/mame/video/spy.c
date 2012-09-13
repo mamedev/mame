@@ -44,14 +44,13 @@ void spy_sprite_callback( running_machine &machine, int *code, int *color, int *
 
 ***************************************************************************/
 
-VIDEO_START( spy )
+void spy_state::video_start()
 {
-	spy_state *state = machine.driver_data<spy_state>();
 
-	state->m_layer_colorbase[0] = 48;
-	state->m_layer_colorbase[1] = 0;
-	state->m_layer_colorbase[2] = 16;
-	state->m_sprite_colorbase = 32;
+	m_layer_colorbase[0] = 48;
+	m_layer_colorbase[1] = 0;
+	m_layer_colorbase[2] = 16;
+	m_sprite_colorbase = 32;
 }
 
 

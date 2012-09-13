@@ -195,10 +195,12 @@ public:
 	DECLARE_WRITE8_MEMBER(outport6_w);
 	DECLARE_WRITE8_MEMBER(outport7_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
-static VIDEO_START(mpoker)
+void mpoker_state::video_start()
 {
 
 }
@@ -225,7 +227,7 @@ static SCREEN_UPDATE_IND16(mpoker)
 	return 0;
 }
 
-static PALETTE_INIT(mpoker)
+void mpoker_state::palette_init()
 {
 	int i;
 
@@ -238,7 +240,7 @@ static PALETTE_INIT(mpoker)
 		else
 			color = RGB_BLACK;
 
-		palette_set_color(machine, i, color);
+		palette_set_color(machine(), i, color);
 	}
 }
 
@@ -599,8 +601,6 @@ static MACHINE_CONFIG_START( mpoker, mpoker_state )
 	MCFG_GFXDECODE(mpoker)
 	MCFG_PALETTE_LENGTH(0x200)
 
-	MCFG_PALETTE_INIT(mpoker)
-	MCFG_VIDEO_START(mpoker)
 
 	/* sound hardware */
 //  MCFG_SPEAKER_STANDARD_MONO("mono")

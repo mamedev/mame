@@ -36,12 +36,13 @@ public:
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
 	TILE_GET_INFO_MEMBER(get_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/dcon.c -----------*/
 
 
-VIDEO_START( dcon );
+
 SCREEN_UPDATE_IND16( dcon );
 SCREEN_UPDATE_IND16( sdgndmps );

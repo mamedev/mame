@@ -91,6 +91,7 @@ public:
 	DECLARE_READ8_MEMBER( irq_status_r );
 	DECLARE_WRITE8_MEMBER( irq_ack_w );
 	DECLARE_WRITE8_MEMBER( irq_mask_w );
+	DECLARE_PALETTE_INIT(pce220);
 };
 
 class pcg850v_state : public pce220_state
@@ -913,10 +914,10 @@ static TIMER_DEVICE_CALLBACK(pce220_timer_callback)
 	}
 }
 
-static PALETTE_INIT(pce220)
+PALETTE_INIT_MEMBER(pce220_state,pce220)
 {
-	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
+	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
+	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
 }
 
 
@@ -936,7 +937,7 @@ static MACHINE_CONFIG_START( pce220, pce220_state )
     MCFG_SCREEN_VISIBLE_AREA(0, 24*6-1, 0, 4*8-1)
 
     MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(pce220)
+	MCFG_PALETTE_INIT_OVERRIDE(pce220_state,pce220)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */
@@ -971,7 +972,7 @@ static MACHINE_CONFIG_START( pcg850v, pcg850v_state )
     MCFG_SCREEN_VISIBLE_AREA(0, 144-1, 0, 48-1)
 
     MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(pce220)
+	MCFG_PALETTE_INIT_OVERRIDE(pce220_state,pce220)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */

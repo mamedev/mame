@@ -22,15 +22,17 @@ public:
 	DECLARE_READ16_MEMBER(comad_timer_r);
 	DECLARE_READ16_MEMBER(zipzap_random_read);
 	DECLARE_READ8_MEMBER(comad_okim6295_r);
+	DECLARE_VIDEO_START(galpanic);
+	DECLARE_PALETTE_INIT(galpanic);
 };
 
 
 /*----------- defined in video/galpanic.c -----------*/
 
-PALETTE_INIT( galpanic );
+
 WRITE16_HANDLER( galpanic_bgvideoram_w );
 WRITE16_HANDLER( galpanic_paletteram_w );
-VIDEO_START( galpanic );
+
 SCREEN_UPDATE_IND16( galpanic );
 SCREEN_UPDATE_IND16( comad );
 

@@ -130,9 +130,9 @@ static void ym2151_irq_gen(device_t *device, int state)
 }
 
 
-static MACHINE_RESET( rpunch )
+void rpunch_state::machine_reset()
 {
-	UINT8 *snd = machine.root_device().memregion("upd")->base();
+	UINT8 *snd = machine().root_device().memregion("upd")->base();
 	memcpy(snd, snd + 0x20000, 0x20000);
 }
 
@@ -470,7 +470,6 @@ static MACHINE_CONFIG_START( rpunch, rpunch_state )
 	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_RESET(rpunch)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -482,7 +481,6 @@ static MACHINE_CONFIG_START( rpunch, rpunch_state )
 	MCFG_GFXDECODE(rpunch)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(rpunch)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

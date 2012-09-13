@@ -38,6 +38,8 @@ public:
 	DECLARE_READ8_MEMBER(analog_r);
 	DECLARE_WRITE8_MEMBER(input_port_select_w);
 	DECLARE_READ8_MEMBER(input_port_r);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -166,14 +168,13 @@ static I8255A_INTERFACE( ppi8255_1_intf )
 	DEVCB_NULL							/* Port C write */
 };
 
-static MACHINE_START( clayshoo )
+void clayshoo_state::machine_start()
 {
-	clayshoo_state *state = machine.driver_data<clayshoo_state>();
-	create_analog_timers(machine);
+	create_analog_timers(machine());
 
 	/* register for state saving */
-	state->save_item(NAME(state->m_input_port_select));
-	state->save_item(NAME(state->m_analog_port_val));
+	save_item(NAME(m_input_port_select));
+	save_item(NAME(m_analog_port_val));
 }
 
 
@@ -317,12 +318,11 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_RESET( clayshoo )
+void clayshoo_state::machine_reset()
 {
-	clayshoo_state *state = machine.driver_data<clayshoo_state>();
 
-	state->m_input_port_select = 0;
-	state->m_analog_port_val = 0;
+	m_input_port_select = 0;
+	m_analog_port_val = 0;
 }
 
 static MACHINE_CONFIG_START( clayshoo, clayshoo_state )
@@ -333,8 +333,6 @@ static MACHINE_CONFIG_START( clayshoo, clayshoo_state )
 	MCFG_CPU_IO_MAP(main_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(clayshoo)
-	MCFG_MACHINE_RESET(clayshoo)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

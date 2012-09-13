@@ -118,11 +118,10 @@
 #include "cpu/i8085/i8085.h"
 #include "includes/tiamc1.h"
 
-static MACHINE_RESET( tiamc1 )
+void tiamc1_state::machine_reset()
 {
-	tiamc1_state *state = machine.driver_data<tiamc1_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	state->tiamc1_bankswitch_w(*space, 0, 0);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	tiamc1_bankswitch_w(*space, 0, 0);
 }
 
 WRITE8_MEMBER(tiamc1_state::tiamc1_control_w)
@@ -227,7 +226,6 @@ static MACHINE_CONFIG_START( tiamc1, tiamc1_state )
 
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MCFG_MACHINE_RESET(tiamc1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -240,8 +238,6 @@ static MACHINE_CONFIG_START( tiamc1, tiamc1_state )
 	MCFG_GFXDECODE(tiamc1)
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_PALETTE_INIT(tiamc1)
-	MCFG_VIDEO_START(tiamc1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

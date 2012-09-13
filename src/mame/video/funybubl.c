@@ -23,7 +23,7 @@ WRITE8_MEMBER(funybubl_state::funybubl_paldatawrite)
 }
 
 
-VIDEO_START(funybubl)
+void funybubl_state::video_start()
 {
 }
 

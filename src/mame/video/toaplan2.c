@@ -78,112 +78,106 @@ static void truxton2_postload(running_machine &machine)
 		machine.gfx[2]->mark_dirty(i);
 }
 
-VIDEO_START( toaplan2 )
+VIDEO_START_MEMBER(toaplan2_state,toaplan2)
 {
-	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
 	/* cache the VDP device */
-	state->m_vdp0 = machine.device<gp9001vdp_device>("gp9001vdp0");
-	state->m_vdp1 = machine.device<gp9001vdp_device>("gp9001vdp1");
+	m_vdp0 = machine().device<gp9001vdp_device>("gp9001vdp0");
+	m_vdp1 = machine().device<gp9001vdp_device>("gp9001vdp1");
 
 	/* our current VDP implementation needs this bitmap to work with */
-	machine.primary_screen->register_screen_bitmap(state->m_custom_priority_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_custom_priority_bitmap);
 
-	if (state->m_vdp0 != NULL)
+	if (m_vdp0 != NULL)
 	{
-		state->m_secondary_render_bitmap.reset();
-		state->m_vdp0->custom_priority_bitmap = &state->m_custom_priority_bitmap;
+		m_secondary_render_bitmap.reset();
+		m_vdp0->custom_priority_bitmap = &m_custom_priority_bitmap;
 	}
 
-	if (state->m_vdp1 != NULL)
+	if (m_vdp1 != NULL)
 	{
-		machine.primary_screen->register_screen_bitmap(state->m_secondary_render_bitmap);
-		state->m_vdp1->custom_priority_bitmap = &state->m_custom_priority_bitmap;
+		machine().primary_screen->register_screen_bitmap(m_secondary_render_bitmap);
+		m_vdp1->custom_priority_bitmap = &m_custom_priority_bitmap;
 	}
 
-	register_state_save(machine);
+	register_state_save(machine());
 }
 
-VIDEO_START( truxton2 )
+VIDEO_START_MEMBER(toaplan2_state,truxton2)
 {
-	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
-	VIDEO_START_CALL( toaplan2 );
+	VIDEO_START_CALL_MEMBER( toaplan2 );
 
 	/* Create the Text tilemap for this game */
-	machine.gfx[2]->set_source(reinterpret_cast<UINT8 *>(state->m_tx_gfxram16.target()));
-	machine.save().register_postload(save_prepost_delegate(FUNC(truxton2_postload), &machine));
+	machine().gfx[2]->set_source(reinterpret_cast<UINT8 *>(m_tx_gfxram16.target()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(truxton2_postload), &machine()));
 
-	truxton2_create_tx_tilemap(machine);
-	state->m_tx_tilemap->set_scrolldx(0x1d4 +1, 0x2a);
+	truxton2_create_tx_tilemap(machine());
+	m_tx_tilemap->set_scrolldx(0x1d4 +1, 0x2a);
 }
 
-VIDEO_START( fixeightbl )
+VIDEO_START_MEMBER(toaplan2_state,fixeightbl)
 {
-	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
-	VIDEO_START_CALL( toaplan2 );
+	VIDEO_START_CALL_MEMBER( toaplan2 );
 
 	/* Create the Text tilemap for this game */
-	truxton2_create_tx_tilemap(machine);
+	truxton2_create_tx_tilemap(machine());
 
 	/* This bootleg has additional layer offsets on the VDP */
-	state->m_vdp0->bg.extra_xoffset.normal  = -0x1d6  -26;
-	state->m_vdp0->bg.extra_yoffset.normal  = -0x1ef  -15;
+	m_vdp0->bg.extra_xoffset.normal  = -0x1d6  -26;
+	m_vdp0->bg.extra_yoffset.normal  = -0x1ef  -15;
 
-	state->m_vdp0->fg.extra_xoffset.normal  = -0x1d8  -22;
-	state->m_vdp0->fg.extra_yoffset.normal  = -0x1ef  -15;
+	m_vdp0->fg.extra_xoffset.normal  = -0x1d8  -22;
+	m_vdp0->fg.extra_yoffset.normal  = -0x1ef  -15;
 
-	state->m_vdp0->top.extra_xoffset.normal = -0x1da  -18;
-	state->m_vdp0->top.extra_yoffset.normal = -0x1ef  -15;
+	m_vdp0->top.extra_xoffset.normal = -0x1da  -18;
+	m_vdp0->top.extra_yoffset.normal = -0x1ef  -15;
 
-	state->m_vdp0->sp.extra_xoffset.normal  = 8;//-0x1cc  -64;
-	state->m_vdp0->sp.extra_yoffset.normal  = 8;//-0x1ef  -128;
+	m_vdp0->sp.extra_xoffset.normal  = 8;//-0x1cc  -64;
+	m_vdp0->sp.extra_yoffset.normal  = 8;//-0x1ef  -128;
 
-	state->m_vdp0->init_scroll_regs();
+	m_vdp0->init_scroll_regs();
 
-	state->m_tx_tilemap->set_scrolldx(0, 0);
+	m_tx_tilemap->set_scrolldx(0, 0);
 }
 
-VIDEO_START( bgaregga )
+VIDEO_START_MEMBER(toaplan2_state,bgaregga)
 {
-	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
-	VIDEO_START_CALL( toaplan2 );
+	VIDEO_START_CALL_MEMBER( toaplan2 );
 
 	/* Create the Text tilemap for this game */
-	truxton2_create_tx_tilemap(machine);
-	state->m_tx_tilemap->set_scrolldx(0x1d4, 0x2a);
+	truxton2_create_tx_tilemap(machine());
+	m_tx_tilemap->set_scrolldx(0x1d4, 0x2a);
 }
 
-VIDEO_START( bgareggabl )
+VIDEO_START_MEMBER(toaplan2_state,bgareggabl)
 {
-	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
-	VIDEO_START_CALL( toaplan2 );
+	VIDEO_START_CALL_MEMBER( toaplan2 );
 
 	/* Create the Text tilemap for this game */
-	truxton2_create_tx_tilemap(machine);
-	state->m_tx_tilemap->set_scrolldx(0x04, 0x2a);
+	truxton2_create_tx_tilemap(machine());
+	m_tx_tilemap->set_scrolldx(0x04, 0x2a);
 }
 
-VIDEO_START( batrider )
+VIDEO_START_MEMBER(toaplan2_state,batrider)
 {
-	toaplan2_state *state = machine.driver_data<toaplan2_state>();
-	VIDEO_START_CALL( toaplan2 );
+	VIDEO_START_CALL_MEMBER( toaplan2 );
 
-	state->m_vdp0->sp.use_sprite_buffer = 0; // disable buffering on this game
+	m_vdp0->sp.use_sprite_buffer = 0; // disable buffering on this game
 
 	/* Create the Text tilemap for this game */
-	state->m_tx_gfxram16.allocate(RAIZING_TX_GFXRAM_SIZE/2);
-	machine.gfx[2]->set_source(reinterpret_cast<UINT8 *>(state->m_tx_gfxram16.target()));
-	machine.save().register_postload(save_prepost_delegate(FUNC(truxton2_postload), &machine));
+	m_tx_gfxram16.allocate(RAIZING_TX_GFXRAM_SIZE/2);
+	machine().gfx[2]->set_source(reinterpret_cast<UINT8 *>(m_tx_gfxram16.target()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(truxton2_postload), &machine()));
 
-	truxton2_create_tx_tilemap(machine);
-	state->m_tx_tilemap->set_scrolldx(0x1d4, 0x2a);
+	truxton2_create_tx_tilemap(machine());
+	m_tx_tilemap->set_scrolldx(0x1d4, 0x2a);
 
 	/* Has special banking */
-	state->m_vdp0->gp9001_gfxrom_is_banked = 1;
+	m_vdp0->gp9001_gfxrom_is_banked = 1;
 }
 
 WRITE16_MEMBER(toaplan2_state::toaplan2_txvideoram16_w)

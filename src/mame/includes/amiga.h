@@ -432,6 +432,11 @@ public:
 	DECLARE_DRIVER_INIT(mquake);
 	DECLARE_DRIVER_INIT(amiga);
 	DECLARE_DRIVER_INIT(cdtv);
+	DECLARE_MACHINE_RESET(mquake);
+	DECLARE_MACHINE_RESET(amiga);
+	DECLARE_VIDEO_START(amiga);
+	DECLARE_PALETTE_INIT(amiga);
+	DECLARE_VIDEO_START(amiga_aga);
 };
 
 
@@ -443,7 +448,7 @@ void amiga_chip_ram_w8(amiga_state *state, offs_t offset, UINT8 data);
 
 void amiga_machine_config(running_machine &machine, const amiga_machine_interface *intf);
 
-MACHINE_RESET( amiga );
+
 
 READ16_HANDLER( amiga_cia_r );
 WRITE16_HANDLER( amiga_cia_w );
@@ -498,8 +503,8 @@ void amiga_audio_data_w(device_t *device, int which, UINT16 data);
 
 extern const UINT16 amiga_expand_byte[256];
 
-PALETTE_INIT( amiga );
-VIDEO_START( amiga );
+
+
 SCREEN_UPDATE_IND16( amiga );
 
 void amiga_copper_setpc(running_machine &machine, UINT32 pc);
@@ -513,7 +518,7 @@ void amiga_sprite_enable_comparitor(running_machine &machine, int which, int ena
 
 /*----------- defined in video/amigaaga.c -----------*/
 
-VIDEO_START( amiga_aga );
+
 SCREEN_UPDATE_RGB32( amiga_aga );
 
 void amiga_aga_render_scanline(running_machine &machine, bitmap_rgb32 &bitmap, int scanline);

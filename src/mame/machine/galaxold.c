@@ -85,20 +85,20 @@ static void machine_reset_common(running_machine &machine, int line)
 	int_timer->adjust(machine.primary_screen->time_until_pos(0));
 }
 
-MACHINE_RESET( galaxold )
+MACHINE_RESET_MEMBER(galaxold_state,galaxold)
 {
-	machine_reset_common(machine, INPUT_LINE_NMI);
+	machine_reset_common(machine(), INPUT_LINE_NMI);
 }
 
-MACHINE_RESET( devilfsg )
+MACHINE_RESET_MEMBER(galaxold_state,devilfsg)
 {
-	machine_reset_common(machine, 0);
+	machine_reset_common(machine(), 0);
 }
 
-MACHINE_RESET( hunchbkg )
+MACHINE_RESET_MEMBER(galaxold_state,hunchbkg)
 {
-	machine_reset_common(machine, 0);
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(hunchbkg_irq_callback);
+	machine_reset_common(machine(), 0);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(hunchbkg_irq_callback);
 }
 
 WRITE8_MEMBER(galaxold_state::galaxold_coin_lockout_w)

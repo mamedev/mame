@@ -554,22 +554,20 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static MACHINE_START( yunsun16 )
+void yunsun16_state::machine_start()
 {
-	yunsun16_state *state = machine.driver_data<yunsun16_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_sprites_scrolldx));
-	state->save_item(NAME(state->m_sprites_scrolldy));
+	save_item(NAME(m_sprites_scrolldx));
+	save_item(NAME(m_sprites_scrolldy));
 }
 
-static MACHINE_RESET( yunsun16 )
+void yunsun16_state::machine_reset()
 {
-	yunsun16_state *state = machine.driver_data<yunsun16_state>();
 
-	state->m_sprites_scrolldx = -0x40;
-	state->m_sprites_scrolldy = -0x0f;
+	m_sprites_scrolldx = -0x40;
+	m_sprites_scrolldy = -0x0f;
 }
 
 /***************************************************************************
@@ -598,8 +596,6 @@ static MACHINE_CONFIG_START( magicbub, yunsun16_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_port_map)
 
-	MCFG_MACHINE_START(yunsun16)
-	MCFG_MACHINE_RESET(yunsun16)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -612,7 +608,6 @@ static MACHINE_CONFIG_START( magicbub, yunsun16_state )
 	MCFG_GFXDECODE(yunsun16)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(yunsun16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -639,8 +634,6 @@ static MACHINE_CONFIG_START( shocking, yunsun16_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MCFG_MACHINE_START(yunsun16)
-	MCFG_MACHINE_RESET(yunsun16)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -653,7 +646,6 @@ static MACHINE_CONFIG_START( shocking, yunsun16_state )
 	MCFG_GFXDECODE(yunsun16)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(yunsun16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

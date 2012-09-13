@@ -238,34 +238,33 @@ static const ym3812_interface ym3812_config =
 
 
 
-static MACHINE_START( deniam )
+void deniam_state::machine_start()
 {
-	deniam_state *state = machine.driver_data<deniam_state>();
 
-	state->m_audio_cpu = machine.device("audiocpu");
+	m_audio_cpu = machine().device("audiocpu");
 
-	state->save_item(NAME(state->m_display_enable));
-	state->save_item(NAME(state->m_coinctrl));
+	save_item(NAME(m_display_enable));
+	save_item(NAME(m_coinctrl));
 
-	state->save_item(NAME(state->m_bg_scrollx_offs));
-	state->save_item(NAME(state->m_bg_scrolly_offs));
-	state->save_item(NAME(state->m_fg_scrollx_offs));
-	state->save_item(NAME(state->m_fg_scrolly_offs));
-	state->save_item(NAME(state->m_bg_scrollx_reg));
-	state->save_item(NAME(state->m_bg_scrolly_reg));
-	state->save_item(NAME(state->m_fg_scrollx_reg));
-	state->save_item(NAME(state->m_fg_scrolly_reg));
-	state->save_item(NAME(state->m_bg_page_reg));
-	state->save_item(NAME(state->m_fg_page_reg));
-	state->save_item(NAME(state->m_bg_page));
-	state->save_item(NAME(state->m_fg_page));
+	save_item(NAME(m_bg_scrollx_offs));
+	save_item(NAME(m_bg_scrolly_offs));
+	save_item(NAME(m_fg_scrollx_offs));
+	save_item(NAME(m_fg_scrolly_offs));
+	save_item(NAME(m_bg_scrollx_reg));
+	save_item(NAME(m_bg_scrolly_reg));
+	save_item(NAME(m_fg_scrollx_reg));
+	save_item(NAME(m_fg_scrolly_reg));
+	save_item(NAME(m_bg_page_reg));
+	save_item(NAME(m_fg_page_reg));
+	save_item(NAME(m_bg_page));
+	save_item(NAME(m_fg_page));
 }
 
 
-static MACHINE_RESET( deniam )
+void deniam_state::machine_reset()
 {
 	/* logicpr2 does not reset the bank base on startup */
-	machine.device<okim6295_device>("oki")->set_bank_base(0x00000);
+	machine().device<okim6295_device>("oki")->set_bank_base(0x00000);
 }
 
 static MACHINE_CONFIG_START( deniam16b, deniam_state )
@@ -279,8 +278,6 @@ static MACHINE_CONFIG_START( deniam16b, deniam_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
-	MCFG_MACHINE_START(deniam)
-	MCFG_MACHINE_RESET(deniam)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -294,7 +291,6 @@ static MACHINE_CONFIG_START( deniam16b, deniam_state )
 	MCFG_GFXDECODE(deniam)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(deniam)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -314,8 +310,6 @@ static MACHINE_CONFIG_START( deniam16c, deniam_state )
 	MCFG_CPU_PROGRAM_MAP(deniam16c_map)
 	MCFG_CPU_VBLANK_INT("screen", irq4_line_assert)
 
-	MCFG_MACHINE_START(deniam)
-	MCFG_MACHINE_RESET(deniam)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -329,7 +323,6 @@ static MACHINE_CONFIG_START( deniam16c, deniam_state )
 	MCFG_GFXDECODE(deniam)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(deniam)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

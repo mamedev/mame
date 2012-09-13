@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(shuuz_state::get_playfield_tile_info)
  *
  *************************************/
 
-VIDEO_START( shuuz )
+VIDEO_START_MEMBER(shuuz_state,shuuz)
 {
 	static const atarimo_desc modesc =
 	{
@@ -71,13 +71,12 @@ VIDEO_START( shuuz )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
-	shuuz_state *state = machine.driver_data<shuuz_state>();
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(shuuz_state::get_playfield_tile_info),state), TILEMAP_SCAN_COLS,  8,8, 64,64);
+	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(shuuz_state::get_playfield_tile_info),this), TILEMAP_SCAN_COLS,  8,8, 64,64);
 
 	/* initialize the motion objects */
-	atarimo_init(machine, 0, &modesc);
+	atarimo_init(machine(), 0, &modesc);
 }
 
 

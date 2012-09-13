@@ -628,28 +628,26 @@ static void video_regdump(running_machine &machine, int ref, int params, const c
     }
 }
 
-VIDEO_START( nimbus )
+void rmnimbus_state::video_start()
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-    state->m_debug_video=0;
+    m_debug_video=0;
 
     logerror("VIDEO_START\n");
 
-	if (machine.debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-        debug_console_register_command(machine, "nimbus_vid_debug", CMDFLAG_NONE, 0, 0, 1, video_debug);
-        debug_console_register_command(machine, "nimbus_vid_regdump", CMDFLAG_NONE, 0, 0, 1, video_regdump);
+        debug_console_register_command(machine(), "nimbus_vid_debug", CMDFLAG_NONE, 0, 0, 1, video_debug);
+        debug_console_register_command(machine(), "nimbus_vid_regdump", CMDFLAG_NONE, 0, 0, 1, video_regdump);
     }
 }
 
-VIDEO_RESET( nimbus )
+void rmnimbus_state::video_reset()
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
     // When we reset clear the video registers and video memory.
-    memset(&state->m_vidregs,0x00,sizeof(state->m_vidregs));
-    memset(&state->m_video_mem,0,sizeof(state->m_video_mem));
+    memset(&m_vidregs,0x00,sizeof(m_vidregs));
+    memset(&m_video_mem,0,sizeof(m_video_mem));
 
-    state->m_bpp=4;          // bits per pixel
+    m_bpp=4;          // bits per pixel
     logerror("Video reset\n");
 }
 

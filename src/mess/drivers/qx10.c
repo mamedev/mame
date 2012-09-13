@@ -138,6 +138,7 @@ public:
 		UINT8 rx;
 	}m_rs232c;
 
+	virtual void palette_init();
 };
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
@@ -971,7 +972,7 @@ static UPD7220_INTERFACE( hgdc_intf )
 	DEVCB_NULL
 };
 
-static PALETTE_INIT( gdc )
+void qx10_state::palette_init()
 {
 	// ...
 }
@@ -1019,7 +1020,6 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_GFXDECODE(qx10)
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(gdc)
 
 	/* Devices */
 	MCFG_PIT8253_ADD("pit8253_1", qx10_pit8253_1_config)

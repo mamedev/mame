@@ -56,6 +56,8 @@ public:
 	UINT8 m_4c;
 	UINT8 m_cursor_col;
 	UINT8 m_cursor_row;
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 READ8_MEMBER( unior_state::unior_4c_r )
@@ -236,16 +238,15 @@ static INPUT_PORTS_START( unior )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(unior)
+void unior_state::machine_reset()
 {
-	machine.device("maincpu")->state().set_state_int(I8085_PC, 0xF800);
+	machine().device("maincpu")->state().set_state_int(I8085_PC, 0xF800);
 }
 
-static VIDEO_START( unior )
+void unior_state::video_start()
 {
-	unior_state *state = machine.driver_data<unior_state>();
-	state->m_p_chargen = machine.root_device().memregion("chargen")->base();
-	state->m_p_vram = state->memregion("vram")->base();
+	m_p_chargen = machine().root_device().memregion("chargen")->base();
+	m_p_vram = memregion("vram")->base();
 }
 
 static SCREEN_UPDATE_IND16( unior )
@@ -318,7 +319,6 @@ static MACHINE_CONFIG_START( unior, unior_state )
 	MCFG_CPU_PROGRAM_MAP(unior_mem)
 	MCFG_CPU_IO_MAP(unior_io)
 
-	MCFG_MACHINE_RESET(unior)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -326,7 +326,6 @@ static MACHINE_CONFIG_START( unior, unior_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_VIDEO_START(unior)
 	MCFG_SCREEN_UPDATE_STATIC(unior)
 	MCFG_GFXDECODE(unior)
 	MCFG_PALETTE_LENGTH(2)

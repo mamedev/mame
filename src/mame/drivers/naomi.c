@@ -2492,12 +2492,11 @@ static INPUT_PORTS_START( aw1w )
 	PORT_INCLUDE( naomi_debug )
 INPUT_PORTS_END
 
-static MACHINE_RESET( naomi )
+MACHINE_RESET_MEMBER(dc_state,naomi)
 {
-	dc_state *state = machine.driver_data<dc_state>();
 
-	MACHINE_RESET_CALL(dc);
-	aica_set_ram_base(machine.device("aica"), state->dc_sound_ram, 8*1024*1024);
+	dc_state::machine_reset();
+	aica_set_ram_base(machine().device("aica"), dc_sound_ram, 8*1024*1024);
 }
 
 /*
@@ -2516,8 +2515,7 @@ static MACHINE_CONFIG_START( naomi_aw_base, dc_state )
 
 	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu", dc_maple_irq )
 
-	MCFG_MACHINE_START( dc )
-	MCFG_MACHINE_RESET( naomi )
+	MCFG_MACHINE_RESET_OVERRIDE(dc_state,naomi)
 
 	MCFG_EEPROM_93C46_ADD("main_eeprom")
 	MCFG_EEPROM_DEFAULT_VALUE(0)
@@ -2532,7 +2530,6 @@ static MACHINE_CONFIG_START( naomi_aw_base, dc_state )
 
 	MCFG_PALETTE_LENGTH(0x1000)
 
-	MCFG_VIDEO_START(dc)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("aica", AICA, 0)

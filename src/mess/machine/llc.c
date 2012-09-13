@@ -125,14 +125,13 @@ DRIVER_INIT_MEMBER(llc_state,llc1)
 {
 }
 
-MACHINE_RESET( llc1 )
+MACHINE_RESET_MEMBER(llc_state,llc1)
 {
-	llc_state *state = machine.driver_data<llc_state>();
-	state->m_term_status = 0;
-	state->m_llc1_key = 0;
+	m_term_status = 0;
+	m_llc1_key = 0;
 }
 
-MACHINE_START(llc1)
+MACHINE_START_MEMBER(llc_state,llc1)
 {
 }
 
@@ -151,22 +150,21 @@ DRIVER_INIT_MEMBER(llc_state,llc2)
 	m_p_videoram.set_target( machine().device<ram_device>(RAM_TAG)->pointer() + 0xc000,m_p_videoram.bytes());
 }
 
-MACHINE_RESET( llc2 )
+MACHINE_RESET_MEMBER(llc_state,llc2)
 {
-	llc_state *state = machine.driver_data<llc_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	space->unmap_write(0x0000, 0x3fff);
-	state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base());
+	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
 
 	space->unmap_write(0x4000, 0x5fff);
-	state->membank("bank2")->set_base(machine.root_device().memregion("maincpu")->base() + 0x4000);
+	membank("bank2")->set_base(machine().root_device().memregion("maincpu")->base() + 0x4000);
 
 	space->unmap_write(0x6000, 0xbfff);
-	state->membank("bank3")->set_base(machine.root_device().memregion("maincpu")->base() + 0x6000);
+	membank("bank3")->set_base(machine().root_device().memregion("maincpu")->base() + 0x6000);
 
 	space->install_write_bank(0xc000, 0xffff, "bank4");
-	state->membank("bank4")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0xc000);
+	membank("bank4")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0xc000);
 
 }
 

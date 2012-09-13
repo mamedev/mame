@@ -15,6 +15,8 @@ class tim011_state : public driver_device
 public:
 	tim011_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -35,11 +37,11 @@ static INPUT_PORTS_START( tim011 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(tim011)
+void tim011_state::machine_reset()
 {
 }
 
-static VIDEO_START( tim011 )
+void tim011_state::video_start()
 {
 }
 
@@ -55,7 +57,6 @@ static MACHINE_CONFIG_START( tim011,tim011_state )
 	MCFG_CPU_IO_MAP(tim011_io)
 	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
 
-	MCFG_MACHINE_RESET(tim011)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -63,7 +64,6 @@ static MACHINE_CONFIG_START( tim011,tim011_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_VIDEO_START(tim011)
 	MCFG_SCREEN_UPDATE_STATIC(tim011)
 	MCFG_PALETTE_LENGTH(4)
 	MCFG_PALETTE_INIT(black_and_white)

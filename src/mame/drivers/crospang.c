@@ -327,21 +327,19 @@ static const ym3812_interface ym3812_config =
 };
 
 
-static MACHINE_START( crospang )
+void crospang_state::machine_start()
 {
-	crospang_state *state = machine.driver_data<crospang_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_bestri_tilebank));
+	save_item(NAME(m_bestri_tilebank));
 
 }
 
-static MACHINE_RESET( crospang )
+void crospang_state::machine_reset()
 {
-	crospang_state *state = machine.driver_data<crospang_state>();
 
-	state->m_bestri_tilebank = 0;
+	m_bestri_tilebank = 0;
 
 }
 
@@ -357,8 +355,6 @@ static MACHINE_CONFIG_START( crospang, crospang_state )
 	MCFG_CPU_PROGRAM_MAP(crospang_sound_map)
 	MCFG_CPU_IO_MAP(crospang_sound_io_map)
 
-	MCFG_MACHINE_START(crospang)
-	MCFG_MACHINE_RESET(crospang)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -371,7 +367,6 @@ static MACHINE_CONFIG_START( crospang, crospang_state )
 	MCFG_PALETTE_LENGTH(0x300)
 	MCFG_GFXDECODE(crospang)
 
-	MCFG_VIDEO_START(crospang)
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 0);

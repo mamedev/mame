@@ -39,26 +39,24 @@ static void update_interrupts(running_machine &machine)
 }
 
 
-static MACHINE_START( atarig42 )
+MACHINE_START_MEMBER(atarig42_state,atarig42)
 {
-	atarig42_state *state = machine.driver_data<atarig42_state>();
-	atarigen_init(machine);
+	atarigen_init(machine());
 
-	state->save_item(NAME(state->m_analog_data));
-	state->save_item(NAME(state->m_sloop_bank));
-	state->save_item(NAME(state->m_sloop_next_bank));
-	state->save_item(NAME(state->m_sloop_offset));
-	state->save_item(NAME(state->m_sloop_state));
+	save_item(NAME(m_analog_data));
+	save_item(NAME(m_sloop_bank));
+	save_item(NAME(m_sloop_next_bank));
+	save_item(NAME(m_sloop_offset));
+	save_item(NAME(m_sloop_state));
 }
 
 
-static MACHINE_RESET( atarig42 )
+MACHINE_RESET_MEMBER(atarig42_state,atarig42)
 {
-	atarig42_state *state = machine.driver_data<atarig42_state>();
 
-	atarigen_eeprom_reset(state);
-	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine.primary_screen, atarig42_scanline_update, 8);
+	atarigen_eeprom_reset(this);
+	atarigen_interrupt_reset(this, update_interrupts);
+	atarigen_scanline_timer_reset(*machine().primary_screen, atarig42_scanline_update, 8);
 	atarijsa_reset();
 }
 
@@ -558,8 +556,8 @@ static MACHINE_CONFIG_START( atarig42, atarig42_state )
 	/* ASIC65 */
 	MCFG_FRAGMENT_ADD(asic65)
 
-	MCFG_MACHINE_START(atarig42)
-	MCFG_MACHINE_RESET(atarig42)
+	MCFG_MACHINE_START_OVERRIDE(atarig42_state,atarig42)
+	MCFG_MACHINE_RESET_OVERRIDE(atarig42_state,atarig42)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
@@ -574,7 +572,7 @@ static MACHINE_CONFIG_START( atarig42, atarig42_state )
 	MCFG_SCREEN_UPDATE_STATIC(atarig42)
 	MCFG_SCREEN_VBLANK_STATIC(atarig42)
 
-	MCFG_VIDEO_START(atarig42)
+	MCFG_VIDEO_START_OVERRIDE(atarig42_state,atarig42)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(jsa_iii_mono)

@@ -132,6 +132,8 @@ public:
 	DECLARE_READ8_MEMBER(portC_r);
 	DECLARE_DRIVER_INIT(geimulti);
 	DECLARE_DRIVER_INIT(setbank);
+	virtual void palette_init();
+	DECLARE_PALETTE_INIT(quizvid);
 };
 
 
@@ -163,23 +165,23 @@ WRITE8_MEMBER(gei_state::gei_bitmap_w)
 		m_bitmap.pix16(sy, sx+i) = m_color[8-i-1];
 }
 
-static PALETTE_INIT(gei)
+void gei_state::palette_init()
 {
 	int i;
 
 	for (i = 0; i < 8; i++ )
 	{
-		palette_set_color(machine, i, MAKE_RGB(pal1bit(i >> 2), pal1bit(i), pal1bit(i >> 1)));
+		palette_set_color(machine(), i, MAKE_RGB(pal1bit(i >> 2), pal1bit(i), pal1bit(i >> 1)));
 	}
 }
 
-static PALETTE_INIT(quizvid)
+PALETTE_INIT_MEMBER(gei_state,quizvid)
 {
 	int i;
 
 	for (i = 0; i < 8; i++ )
 	{
-		palette_set_color(machine, i, MAKE_RGB(pal1bit(i >> 1), pal1bit(i), pal1bit(i >> 2)));
+		palette_set_color(machine(), i, MAKE_RGB(pal1bit(i >> 1), pal1bit(i), pal1bit(i >> 2)));
 	}
 }
 
@@ -1126,7 +1128,6 @@ static MACHINE_CONFIG_START( getrivia, gei_state )
 	MCFG_SCREEN_VISIBLE_AREA(48, 511-48, 16, 255-16)
 
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(gei)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1155,7 +1156,7 @@ static MACHINE_CONFIG_DERIVED( quizvid, findout )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(quizvid_map)
 
-	MCFG_PALETTE_INIT(quizvid)
+	MCFG_PALETTE_INIT_OVERRIDE(gei_state,quizvid)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gselect, getrivia )

@@ -635,39 +635,36 @@ static const ym2151_interface ym2151_config =
                                 Machine Drivers
 ***************************************************************************/
 
-static MACHINE_RESET( hyprduel )
+void hyprduel_state::machine_reset()
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 
 	/* start with cpu2 halted */
-	machine.device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	state->m_subcpu_resetline = 1;
-	state->m_cpu_trigger = 0;
+	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_subcpu_resetline = 1;
+	m_cpu_trigger = 0;
 
-	state->m_requested_int = 0x00;
-	state->m_blitter_bit = 2;
-	*state->m_irq_enable = 0xff;
+	m_requested_int = 0x00;
+	m_blitter_bit = 2;
+	*m_irq_enable = 0xff;
 }
 
-static MACHINE_START( hyprduel )
+MACHINE_START_MEMBER(hyprduel_state,hyprduel)
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_subcpu = machine.device<cpu_device>("sub");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_subcpu = machine().device<cpu_device>("sub");
 
-	state->save_item(NAME(state->m_blitter_bit));
-	state->save_item(NAME(state->m_requested_int));
-	state->save_item(NAME(state->m_subcpu_resetline));
-	state->save_item(NAME(state->m_cpu_trigger));
+	save_item(NAME(m_blitter_bit));
+	save_item(NAME(m_requested_int));
+	save_item(NAME(m_subcpu_resetline));
+	save_item(NAME(m_cpu_trigger));
 }
 
-static MACHINE_START( magerror )
+MACHINE_START_MEMBER(hyprduel_state,magerror)
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 
-	MACHINE_START_CALL(hyprduel);
-	state->m_magerror_irq_timer->adjust(attotime::zero, 0, attotime::from_hz(968));		/* tempo? */
+	MACHINE_START_CALL_MEMBER(hyprduel);
+	m_magerror_irq_timer->adjust(attotime::zero, 0, attotime::from_hz(968));		/* tempo? */
 }
 
 static MACHINE_CONFIG_START( hyprduel, hyprduel_state )
@@ -680,8 +677,7 @@ static MACHINE_CONFIG_START( hyprduel, hyprduel_state )
 	MCFG_CPU_ADD("sub", M68000,20000000/2)		/* 10MHz */
 	MCFG_CPU_PROGRAM_MAP(hyprduel_map2)
 
-	MCFG_MACHINE_START(hyprduel)
-	MCFG_MACHINE_RESET(hyprduel)
+	MCFG_MACHINE_START_OVERRIDE(hyprduel_state,hyprduel)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
@@ -696,7 +692,7 @@ static MACHINE_CONFIG_START( hyprduel, hyprduel_state )
 	MCFG_GFXDECODE(14220)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(hyprduel_14220)
+	MCFG_VIDEO_START_OVERRIDE(hyprduel_state,hyprduel_14220)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -722,8 +718,7 @@ static MACHINE_CONFIG_START( magerror, hyprduel_state )
 	MCFG_CPU_ADD("sub", M68000,20000000/2)		/* 10MHz */
 	MCFG_CPU_PROGRAM_MAP(magerror_map2)
 
-	MCFG_MACHINE_START(magerror)
-	MCFG_MACHINE_RESET(hyprduel)
+	MCFG_MACHINE_START_OVERRIDE(hyprduel_state,magerror)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
@@ -738,7 +733,7 @@ static MACHINE_CONFIG_START( magerror, hyprduel_state )
 	MCFG_GFXDECODE(14220)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(magerror_14220)
+	MCFG_VIDEO_START_OVERRIDE(hyprduel_state,magerror_14220)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

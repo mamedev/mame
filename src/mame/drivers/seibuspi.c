@@ -1801,46 +1801,44 @@ static IRQ_CALLBACK(spi_irq_callback)
 
 /* SPI */
 
-static MACHINE_START( spi )
+MACHINE_START_MEMBER(seibuspi_state,spi)
 {
-	seibuspi_state *state = machine.driver_data<seibuspi_state>();
-	state->m_z80_rom = auto_alloc_array(machine, UINT8, 0x40000);
+	m_z80_rom = auto_alloc_array(machine(), UINT8, 0x40000);
 }
 
-static MACHINE_RESET( spi )
+MACHINE_RESET_MEMBER(seibuspi_state,spi)
 {
-	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	int i;
-	UINT8 *sound = state->memregion("ymf")->base();
+	UINT8 *sound = memregion("ymf")->base();
 
-	UINT8 *rombase = state->memregion("user1")->base();
+	UINT8 *rombase = memregion("user1")->base();
 	UINT8 flash_data = rombase[0x1ffffc];
 
-	machine.device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(spi_irq_callback);
+	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(spi_irq_callback);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000680, 0x00000683, read32_delegate(FUNC(seibuspi_state::sound_fifo_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00000688, 0x0000068b, write32_delegate(FUNC(seibuspi_state::z80_prg_fifo_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0000068c, 0x0000068f, write32_delegate(FUNC(seibuspi_state::z80_enable_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000680, 0x00000683, read32_delegate(FUNC(seibuspi_state::sound_fifo_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00000688, 0x0000068b, write32_delegate(FUNC(seibuspi_state::z80_prg_fifo_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0000068c, 0x0000068f, write32_delegate(FUNC(seibuspi_state::z80_enable_w),this));
 
-	state->membank("bank4")->set_base(state->m_z80_rom);
-	state->membank("bank5")->set_base(state->m_z80_rom);
+	membank("bank4")->set_base(m_z80_rom);
+	membank("bank5")->set_base(m_z80_rom);
 
 	/* If the first value doesn't match, the game shows a checksum error */
 	/* If any of the other values are wrong, the game goes to update mode */
-	state->m_flash[0]->write(0, 0xff);
-	state->m_flash[0]->write(0, 0x10);
-	state->m_flash[0]->write(0, flash_data);			/* country code */
+	m_flash[0]->write(0, 0xff);
+	m_flash[0]->write(0, 0x10);
+	m_flash[0]->write(0, flash_data);			/* country code */
 
 	for (i=0; i < 0x100000; i++)
 	{
-		state->m_flash[0]->write(0, 0xff);
-		sound[i] = state->m_flash[0]->read(i);
+		m_flash[0]->write(0, 0xff);
+		sound[i] = m_flash[0]->read(i);
 	}
 	for (i=0; i < 0x100000; i++)
 	{
-		state->m_flash[1]->write(0, 0xff);
-		sound[0x100000+i] = state->m_flash[1]->read(i);
+		m_flash[1]->write(0, 0xff);
+		sound[0x100000+i] = m_flash[1]->read(i);
 	}
 }
 
@@ -1856,8 +1854,8 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
-	MCFG_MACHINE_START(spi)
-	MCFG_MACHINE_RESET(spi)
+	MCFG_MACHINE_START_OVERRIDE(seibuspi_state,spi)
+	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state,spi)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
@@ -1877,7 +1875,7 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 	MCFG_GFXDECODE(spi)
 	MCFG_PALETTE_LENGTH(6144)
 
-	MCFG_VIDEO_START(spi)
+	MCFG_VIDEO_START_OVERRIDE(seibuspi_state,spi)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1887,34 +1885,32 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_START( sxx2f )
+MACHINE_START_MEMBER(seibuspi_state,sxx2f)
 {
-	seibuspi_state *state = machine.driver_data<seibuspi_state>();
-	state->m_z80_rom = auto_alloc_array(machine, UINT8, 0x40000);
+	m_z80_rom = auto_alloc_array(machine(), UINT8, 0x40000);
 }
 
-static MACHINE_RESET( sxx2f )
+MACHINE_RESET_MEMBER(seibuspi_state,sxx2f)
 {
-	seibuspi_state *state = machine.driver_data<seibuspi_state>();
-	UINT8 *rom = state->memregion("soundcpu")->base();
+	UINT8 *rom = memregion("soundcpu")->base();
 
-	state->membank("bank4")->set_base(state->m_z80_rom);
-	state->membank("bank5")->set_base(state->m_z80_rom);
+	membank("bank4")->set_base(m_z80_rom);
+	membank("bank5")->set_base(m_z80_rom);
 
-	memcpy(state->m_z80_rom, rom, 0x40000);
+	memcpy(m_z80_rom, rom, 0x40000);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0000068c, 0x0000068f, write32_delegate(FUNC(seibuspi_state::eeprom_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000680, 0x00000683, read32_delegate(FUNC(seibuspi_state::sb_coin_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0000068c, 0x0000068f, write32_delegate(FUNC(seibuspi_state::eeprom_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000680, 0x00000683, read32_delegate(FUNC(seibuspi_state::sb_coin_r),this));
 
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(spi_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(spi_irq_callback);
 
-	state->m_sb_coin_latch = 0;
+	m_sb_coin_latch = 0;
 }
 
 static MACHINE_CONFIG_DERIVED( sxx2f, spi ) /* Intel i386DX @ 25MHz, YMF271 @ 16.9344MHz, Z80 @ 7.159MHz(?) */
 
-	MCFG_MACHINE_START(sxx2f)
-	MCFG_MACHINE_RESET(sxx2f)
+	MCFG_MACHINE_START_OVERRIDE(seibuspi_state,sxx2f)
+	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state,sxx2f)
 
 	MCFG_DEVICE_REMOVE("flash0")
 	MCFG_DEVICE_REMOVE("flash1")
@@ -1935,8 +1931,8 @@ static MACHINE_CONFIG_DERIVED( sxx2g, spi ) /* single board version using measur
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_MACHINE_START(sxx2f)
-	MCFG_MACHINE_RESET(sxx2f)
+	MCFG_MACHINE_START_OVERRIDE(seibuspi_state,sxx2f)
+	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state,sxx2f)
 
 	MCFG_DEVICE_REMOVE("flash0")
 	MCFG_DEVICE_REMOVE("flash1")
@@ -2187,9 +2183,9 @@ DRIVER_INIT_MEMBER(seibuspi_state,rfjet2k)
 	init_rfjet_common(machine());
 }
 
-static MACHINE_RESET( seibu386 )
+MACHINE_RESET_MEMBER(seibuspi_state,seibu386)
 {
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(spi_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(spi_irq_callback);
 }
 
 static MACHINE_CONFIG_START( seibu386, seibuspi_state )
@@ -2199,7 +2195,7 @@ static MACHINE_CONFIG_START( seibu386, seibuspi_state )
 	MCFG_CPU_PROGRAM_MAP(seibu386_map)
 	MCFG_CPU_VBLANK_INT("screen", spi_interrupt)
 
-	MCFG_MACHINE_RESET(seibu386)
+	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state,seibu386)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
@@ -2213,7 +2209,7 @@ static MACHINE_CONFIG_START( seibu386, seibuspi_state )
 	MCFG_GFXDECODE(spi)
 	MCFG_PALETTE_LENGTH(6144)
 
-	MCFG_VIDEO_START(spi)
+	MCFG_VIDEO_START_OVERRIDE(seibuspi_state,spi)
 	MCFG_SCREEN_UPDATE_STATIC(spi)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2254,7 +2250,7 @@ static MACHINE_CONFIG_START( sys386f2, seibuspi_state )
 
 	/* no z80? */
 
-	MCFG_MACHINE_RESET(seibu386)
+	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state,seibu386)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
@@ -2268,7 +2264,7 @@ static MACHINE_CONFIG_START( sys386f2, seibuspi_state )
 	MCFG_GFXDECODE(sys386f2)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(sys386f2)
+	MCFG_VIDEO_START_OVERRIDE(seibuspi_state,sys386f2)
 	MCFG_SCREEN_UPDATE_STATIC(sys386f2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

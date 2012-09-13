@@ -55,7 +55,7 @@ TILE_GET_INFO_MEMBER(batman_state::get_playfield2_tile_info)
  *
  *************************************/
 
-VIDEO_START( batman )
+VIDEO_START_MEMBER(batman_state,batman)
 {
 	static const atarimo_desc modesc =
 	{
@@ -93,21 +93,20 @@ VIDEO_START( batman )
 		0,					/* resulting value to indicate "special" */
 		NULL				/* callback routine for special entries */
 	};
-	batman_state *state = machine.driver_data<batman_state>();
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(batman_state::get_playfield_tile_info),state), TILEMAP_SCAN_COLS,  8,8, 64,64);
+	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(batman_state::get_playfield_tile_info),this), TILEMAP_SCAN_COLS,  8,8, 64,64);
 
 	/* initialize the second playfield */
-	state->m_playfield2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(batman_state::get_playfield2_tile_info),state), TILEMAP_SCAN_COLS,  8,8, 64,64);
-	state->m_playfield2_tilemap->set_transparent_pen(0);
+	m_playfield2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(batman_state::get_playfield2_tile_info),this), TILEMAP_SCAN_COLS,  8,8, 64,64);
+	m_playfield2_tilemap->set_transparent_pen(0);
 
 	/* initialize the motion objects */
-	atarimo_init(machine, 0, &modesc);
+	atarimo_init(machine(), 0, &modesc);
 
 	/* initialize the alphanumerics */
-	state->m_alpha_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(batman_state::get_alpha_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 64,32);
-	state->m_alpha_tilemap->set_transparent_pen(0);
+	m_alpha_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(batman_state::get_alpha_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,32);
+	m_alpha_tilemap->set_transparent_pen(0);
 }
 
 

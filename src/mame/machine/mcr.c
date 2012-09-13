@@ -155,20 +155,20 @@ const z80sio_interface nflfoot_sio_intf =
  *
  *************************************/
 
-MACHINE_START( mcr )
+MACHINE_START_MEMBER(mcr_state,mcr)
 {
-	state_save_register_global(machine, mcr_cocktail_flip);
+	state_save_register_global(machine(), mcr_cocktail_flip);
 }
 
 
-MACHINE_START( nflfoot )
+MACHINE_START_MEMBER(mcr_state,nflfoot)
 {
 	/* allocate a timer for the IPU watchdog */
-	ipu_watchdog_timer = machine.scheduler().timer_alloc(FUNC(ipu_watchdog_reset));
+	ipu_watchdog_timer = machine().scheduler().timer_alloc(FUNC(ipu_watchdog_reset));
 }
 
 
-MACHINE_RESET( mcr )
+MACHINE_RESET_MEMBER(mcr_state,mcr)
 {
 	/* reset cocktail flip */
 	mcr_cocktail_flip = 0;

@@ -284,35 +284,34 @@ static TIMER_CALLBACK( via_0_ca1_timer_callback )
  *
  *************************************/
 
-static VIDEO_START( common )
+VIDEO_START_MEMBER(gameplan_state,common)
 {
-	gameplan_state *state = machine.driver_data<gameplan_state>();
 
-	state->m_videoram_size = (HBSTART - HBEND) * (VBSTART - VBEND);
-	state->m_videoram = auto_alloc_array(machine, UINT8, state->m_videoram_size);
+	m_videoram_size = (HBSTART - HBEND) * (VBSTART - VBEND);
+	m_videoram = auto_alloc_array(machine(), UINT8, m_videoram_size);
 
-	state->m_via_0_ca1_timer = machine.scheduler().timer_alloc(FUNC(via_0_ca1_timer_callback));
+	m_via_0_ca1_timer = machine().scheduler().timer_alloc(FUNC(via_0_ca1_timer_callback));
 
 	/* register for save states */
-	state->save_pointer(NAME(state->m_videoram), state->m_videoram_size);
+	save_pointer(NAME(m_videoram), m_videoram_size);
 }
 
 
-static VIDEO_START( gameplan )
+VIDEO_START_MEMBER(gameplan_state,gameplan)
 {
-	VIDEO_START_CALL(common);
+	VIDEO_START_CALL_MEMBER(common);
 }
 
 
-static VIDEO_START( leprechn )
+VIDEO_START_MEMBER(gameplan_state,leprechn)
 {
-	VIDEO_START_CALL(common);
+	VIDEO_START_CALL_MEMBER(common);
 }
 
 
-static VIDEO_START( trvquest )
+VIDEO_START_MEMBER(gameplan_state,trvquest)
 {
-	VIDEO_START_CALL(common);
+	VIDEO_START_CALL_MEMBER(common);
 }
 
 
@@ -323,10 +322,9 @@ static VIDEO_START( trvquest )
  *
  *************************************/
 
-static VIDEO_RESET( gameplan )
+VIDEO_RESET_MEMBER(gameplan_state,gameplan)
 {
-	gameplan_state *state = machine.driver_data<gameplan_state>();
-	state->m_via_0_ca1_timer->adjust(machine.primary_screen->time_until_pos(VBSTART));
+	m_via_0_ca1_timer->adjust(machine().primary_screen->time_until_pos(VBSTART));
 }
 
 
@@ -338,10 +336,10 @@ static VIDEO_RESET( gameplan )
  *************************************/
 
 MACHINE_CONFIG_FRAGMENT( gameplan_video )
-	MCFG_VIDEO_START(gameplan)
-	MCFG_VIDEO_RESET(gameplan)
+	MCFG_VIDEO_START_OVERRIDE(gameplan_state,gameplan)
+	MCFG_VIDEO_RESET_OVERRIDE(gameplan_state,gameplan)
 
-	MCFG_VIDEO_START(gameplan)
+	MCFG_VIDEO_START_OVERRIDE(gameplan_state,gameplan)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(GAMEPLAN_PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
@@ -350,14 +348,14 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_FRAGMENT( leprechn_video )
-	MCFG_VIDEO_START(leprechn)
+	MCFG_VIDEO_START_OVERRIDE(gameplan_state,leprechn)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(leprechn)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_DERIVED( trvquest_video, gameplan_video )
-	MCFG_VIDEO_START(trvquest)
+	MCFG_VIDEO_START_OVERRIDE(gameplan_state,trvquest)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(gameplan)
 MACHINE_CONFIG_END

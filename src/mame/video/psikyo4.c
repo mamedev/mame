@@ -141,7 +141,7 @@ SCREEN_UPDATE_IND16( psikyo4_right )
 	return 0;
 }
 
-VIDEO_START( psikyo4 )
+void psikyo4_state::video_start()
 {
-	machine.gfx[0]->set_granularity(32); /* 256 colour sprites with palette selectable on 32 colour boundaries */
+	machine().gfx[0]->set_granularity(32); /* 256 colour sprites with palette selectable on 32 colour boundaries */
 }

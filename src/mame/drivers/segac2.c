@@ -102,23 +102,21 @@ static void recompute_palette_tables( running_machine &machine );
 
 ******************************************************************************/
 
-static MACHINE_START( segac2 )
+MACHINE_START_MEMBER(segac2_state,segac2)
 {
-	segac2_state *state = machine.driver_data<segac2_state>();
 
-	state_save_register_global_array(machine, state->m_misc_io_data);
-	state_save_register_global(machine, state->m_prot_write_buf);
-	state_save_register_global(machine, state->m_prot_read_buf);
+	state_save_register_global_array(machine(), m_misc_io_data);
+	state_save_register_global(machine(), m_prot_write_buf);
+	state_save_register_global(machine(), m_prot_read_buf);
 }
 
 
-static MACHINE_RESET( segac2 )
+MACHINE_RESET_MEMBER(segac2_state,segac2)
 {
-	segac2_state *state = machine.driver_data<segac2_state>();
 //  megadriv_framerate = 60;
 
 
-//  megadriv_scanline_timer = machine.device<timer_device>("md_scan_timer");
+//  megadriv_scanline_timer = machine().device<timer_device>("md_scan_timer");
 //  megadriv_scanline_timer->adjust(attotime::zero);
 	segac2_bg_pal_lookup[0] = 0x00;
 	segac2_bg_pal_lookup[1] = 0x10;
@@ -130,23 +128,23 @@ static MACHINE_RESET( segac2 )
 	segac2_sp_pal_lookup[2] = 0x20;
 	segac2_sp_pal_lookup[3] = 0x30;
 
-	megadriv_reset_vdp(machine);
+	megadriv_reset_vdp(machine());
 
 	/* determine how many sound banks */
-	state->m_sound_banks = 0;
-	if (state->memregion("upd")->base())
-		state->m_sound_banks = state->memregion("upd")->bytes() / 0x20000;
+	m_sound_banks = 0;
+	if (memregion("upd")->base())
+		m_sound_banks = memregion("upd")->bytes() / 0x20000;
 
 	/* reset the protection */
-	state->m_prot_write_buf = 0;
-	state->m_prot_read_buf = 0;
-	state->m_segac2_alt_palette_mode = 0;
+	m_prot_write_buf = 0;
+	m_prot_read_buf = 0;
+	m_segac2_alt_palette_mode = 0;
 
-	state->m_palbank = 0;
-	state->m_bg_palbase = 0;
-	state->m_sp_palbase = 0;
+	m_palbank = 0;
+	m_bg_palbase = 0;
+	m_sp_palbase = 0;
 
-	recompute_palette_tables(machine);
+	recompute_palette_tables(machine());
 
 }
 
@@ -1268,9 +1266,9 @@ static const ym3438_interface ym3438_intf =
 
 ******************************************************************************/
 
-static VIDEO_START(segac2_new)
+VIDEO_START_MEMBER(segac2_state,segac2_new)
 {
-	VIDEO_START_CALL(megadriv);
+	VIDEO_START_CALL_LEGACY(megadriv);
 }
 
 // C2 doesn't use the internal VDP CRAM, instead it uses the digital output of the chip
@@ -1375,8 +1373,8 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	MCFG_CPU_ADD("maincpu", M68000, XL2_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_START(segac2)
-	MCFG_MACHINE_RESET(segac2)
+	MCFG_MACHINE_START_OVERRIDE(segac2_state,segac2)
+	MCFG_MACHINE_RESET_OVERRIDE(segac2_state,segac2)
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
 //  MCFG_FRAGMENT_ADD(megadriv_timers)
@@ -1401,7 +1399,7 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 
 	MCFG_PALETTE_LENGTH(2048*3)
 
-	MCFG_VIDEO_START(segac2_new)
+	MCFG_VIDEO_START_OVERRIDE(segac2_state,segac2_new)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

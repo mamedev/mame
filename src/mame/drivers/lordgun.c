@@ -678,7 +678,6 @@ static MACHINE_CONFIG_START( lordgun, lordgun_state )
 	MCFG_GFXDECODE(lordgun)
 	MCFG_PALETTE_LENGTH(0x800 * 8)	// 0x800 real colors, repeated per priority level
 
-	MCFG_VIDEO_START(lordgun)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -721,7 +720,6 @@ static MACHINE_CONFIG_START( aliencha, lordgun_state )
 	MCFG_GFXDECODE(lordgun)
 	MCFG_PALETTE_LENGTH(0x800 * 8)	// 0x800 real colors, repeated per priority level
 
-	MCFG_VIDEO_START(lordgun)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

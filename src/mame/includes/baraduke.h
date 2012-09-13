@@ -36,12 +36,14 @@ public:
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/baraduke.c -----------*/
 
-VIDEO_START( baraduke );
+
 SCREEN_UPDATE_IND16( baraduke );
 SCREEN_VBLANK( baraduke );
-PALETTE_INIT( baraduke );
+

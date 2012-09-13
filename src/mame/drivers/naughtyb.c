@@ -436,8 +436,6 @@ static MACHINE_CONFIG_START( naughtyb, naughtyb_state )
 	MCFG_GFXDECODE(naughtyb)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(naughtyb)
-	MCFG_VIDEO_START(naughtyb)
 
 	/* sound hardware */
 	/* uses the TMS3615NS for sound */
@@ -470,8 +468,6 @@ static MACHINE_CONFIG_START( popflame, naughtyb_state )
 	MCFG_GFXDECODE(naughtyb)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(naughtyb)
-	MCFG_VIDEO_START(naughtyb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

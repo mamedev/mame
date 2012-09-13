@@ -43,18 +43,17 @@ static void update_interrupts(running_machine &machine)
 }
 
 
-static MACHINE_START( toobin )
+MACHINE_START_MEMBER(toobin_state,toobin)
 {
-	atarigen_init(machine);
+	atarigen_init(machine());
 }
 
 
-static MACHINE_RESET( toobin )
+MACHINE_RESET_MEMBER(toobin_state,toobin)
 {
-	toobin_state *state = machine.driver_data<toobin_state>();
 
-	atarigen_eeprom_reset(state);
-	atarigen_interrupt_reset(state, update_interrupts);
+	atarigen_eeprom_reset(this);
+	atarigen_interrupt_reset(this, update_interrupts);
 	atarijsa_reset();
 }
 
@@ -228,8 +227,8 @@ static MACHINE_CONFIG_START( toobin, toobin_state )
 	MCFG_CPU_ADD("maincpu", M68010, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_START(toobin)
-	MCFG_MACHINE_RESET(toobin)
+	MCFG_MACHINE_START_OVERRIDE(toobin_state,toobin)
+	MCFG_MACHINE_RESET_OVERRIDE(toobin_state,toobin)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
@@ -243,7 +242,7 @@ static MACHINE_CONFIG_START( toobin, toobin_state )
 	MCFG_GFXDECODE(toobin)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(toobin)
+	MCFG_VIDEO_START_OVERRIDE(toobin_state,toobin)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(jsa_i_stereo_pokey)

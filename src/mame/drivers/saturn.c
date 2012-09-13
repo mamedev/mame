@@ -1745,93 +1745,91 @@ static TIMER_CALLBACK(stv_rtc_increment)
 	//if((state->m_smpc.rtc_data[0] & 0xf0) >= 0xa0)               { state->m_smpc.rtc_data[0] = 0; } //roll over
 }
 
-static MACHINE_START( stv )
+MACHINE_START_MEMBER(saturn_state,stv)
 {
-	saturn_state *state = machine.driver_data<saturn_state>();
 	system_time systime;
-	machine.base_datetime(systime);
+	machine().base_datetime(systime);
 
-	state->m_maincpu = downcast<legacy_cpu_device*>( machine.device<cpu_device>("maincpu") );
-	state->m_slave = downcast<legacy_cpu_device*>( machine.device("slave") );
-	state->m_audiocpu = downcast<legacy_cpu_device*>( machine.device<cpu_device>("audiocpu") );
+	m_maincpu = downcast<legacy_cpu_device*>( machine().device<cpu_device>("maincpu") );
+	m_slave = downcast<legacy_cpu_device*>( machine().device("slave") );
+	m_audiocpu = downcast<legacy_cpu_device*>( machine().device<cpu_device>("audiocpu") );
 
-	scsp_set_ram_base(machine.device("scsp"), state->m_sound_ram);
+	scsp_set_ram_base(machine().device("scsp"), m_sound_ram);
 
 	// save states
-	state_save_register_global_pointer(machine, state->m_scu_regs, 0x100/4);
-	state_save_register_global_pointer(machine, state->m_scsp_regs,  0x1000/2);
-	state_save_register_global(machine, state->m_NMI_reset);
-	state_save_register_global(machine, state->m_en_68k);
-//  state_save_register_global(machine, scanline);
-	state_save_register_global(machine, state->m_smpc.IOSEL1);
-	state_save_register_global(machine, state->m_smpc.IOSEL2);
-	state_save_register_global(machine, state->m_smpc.EXLE1);
-	state_save_register_global(machine, state->m_smpc.EXLE2);
-	state_save_register_global(machine, state->m_smpc.PDR1);
-	state_save_register_global(machine, state->m_smpc.PDR2);
-	state_save_register_global(machine, state->m_port_sel);
-	state_save_register_global(machine, state->m_mux_data);
-	state_save_register_global(machine, scsp_last_line);
+	state_save_register_global_pointer(machine(), m_scu_regs, 0x100/4);
+	state_save_register_global_pointer(machine(), m_scsp_regs,  0x1000/2);
+	state_save_register_global(machine(), m_NMI_reset);
+	state_save_register_global(machine(), m_en_68k);
+//  state_save_register_global(machine(), scanline);
+	state_save_register_global(machine(), m_smpc.IOSEL1);
+	state_save_register_global(machine(), m_smpc.IOSEL2);
+	state_save_register_global(machine(), m_smpc.EXLE1);
+	state_save_register_global(machine(), m_smpc.EXLE2);
+	state_save_register_global(machine(), m_smpc.PDR1);
+	state_save_register_global(machine(), m_smpc.PDR2);
+	state_save_register_global(machine(), m_port_sel);
+	state_save_register_global(machine(), m_mux_data);
+	state_save_register_global(machine(), scsp_last_line);
 
-	stv_register_protection_savestates(machine); // machine/stvprot.c
+	stv_register_protection_savestates(machine()); // machine/stvprot.c
 
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(stvcd_exit), &machine));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(stvcd_exit), &machine()));
 
-	state->m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
-    state->m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
-    state->m_smpc.rtc_data[2] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-    state->m_smpc.rtc_data[3] = DectoBCD(systime.local_time.mday);
-    state->m_smpc.rtc_data[4] = DectoBCD(systime.local_time.hour);
-    state->m_smpc.rtc_data[5] = DectoBCD(systime.local_time.minute);
-    state->m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
+	m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
+    m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
+    m_smpc.rtc_data[2] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
+    m_smpc.rtc_data[3] = DectoBCD(systime.local_time.mday);
+    m_smpc.rtc_data[4] = DectoBCD(systime.local_time.hour);
+    m_smpc.rtc_data[5] = DectoBCD(systime.local_time.minute);
+    m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
 
-	state->m_stv_rtc_timer = machine.scheduler().timer_alloc(FUNC(stv_rtc_increment));
+	m_stv_rtc_timer = machine().scheduler().timer_alloc(FUNC(stv_rtc_increment));
 }
 
 
-static MACHINE_START( saturn )
+MACHINE_START_MEMBER(saturn_state,saturn)
 {
-	saturn_state *state = machine.driver_data<saturn_state>();
 	system_time systime;
-	machine.base_datetime(systime);
+	machine().base_datetime(systime);
 
-	state->m_maincpu = downcast<legacy_cpu_device*>( machine.device<cpu_device>("maincpu") );
-	state->m_slave = downcast<legacy_cpu_device*>( machine.device("slave") );
-	state->m_audiocpu = downcast<legacy_cpu_device*>( machine.device<cpu_device>("audiocpu") );
+	m_maincpu = downcast<legacy_cpu_device*>( machine().device<cpu_device>("maincpu") );
+	m_slave = downcast<legacy_cpu_device*>( machine().device("slave") );
+	m_audiocpu = downcast<legacy_cpu_device*>( machine().device<cpu_device>("audiocpu") );
 
-	scsp_set_ram_base(machine.device("scsp"), state->m_sound_ram);
+	scsp_set_ram_base(machine().device("scsp"), m_sound_ram);
 
 	// save states
-	state_save_register_global_pointer(machine, state->m_scu_regs, 0x100/4);
-	state_save_register_global_pointer(machine, state->m_scsp_regs,  0x1000/2);
-	state_save_register_global(machine, state->m_NMI_reset);
-	state_save_register_global(machine, state->m_en_68k);
-	state_save_register_global(machine, state->m_smpc.IOSEL1);
-	state_save_register_global(machine, state->m_smpc.IOSEL2);
-	state_save_register_global(machine, state->m_smpc.EXLE1);
-	state_save_register_global(machine, state->m_smpc.EXLE2);
-	state_save_register_global(machine, state->m_smpc.PDR1);
-	state_save_register_global(machine, state->m_smpc.PDR2);
-//  state_save_register_global(machine, state->m_port_sel);
-//  state_save_register_global(machine, mux_data);
-	state_save_register_global(machine, scsp_last_line);
-	state_save_register_global(machine, state->m_smpc.intback_stage);
-	state_save_register_global(machine, state->m_smpc.pmode);
-	state_save_register_global(machine, state->m_smpc.SR);
-	state_save_register_global_array(machine, state->m_smpc.SMEM);
-	state_save_register_global_pointer(machine, state->m_cart_dram, 0x400000/4);
+	state_save_register_global_pointer(machine(), m_scu_regs, 0x100/4);
+	state_save_register_global_pointer(machine(), m_scsp_regs,  0x1000/2);
+	state_save_register_global(machine(), m_NMI_reset);
+	state_save_register_global(machine(), m_en_68k);
+	state_save_register_global(machine(), m_smpc.IOSEL1);
+	state_save_register_global(machine(), m_smpc.IOSEL2);
+	state_save_register_global(machine(), m_smpc.EXLE1);
+	state_save_register_global(machine(), m_smpc.EXLE2);
+	state_save_register_global(machine(), m_smpc.PDR1);
+	state_save_register_global(machine(), m_smpc.PDR2);
+//  state_save_register_global(machine(), m_port_sel);
+//  state_save_register_global(machine(), mux_data);
+	state_save_register_global(machine(), scsp_last_line);
+	state_save_register_global(machine(), m_smpc.intback_stage);
+	state_save_register_global(machine(), m_smpc.pmode);
+	state_save_register_global(machine(), m_smpc.SR);
+	state_save_register_global_array(machine(), m_smpc.SMEM);
+	state_save_register_global_pointer(machine(), m_cart_dram, 0x400000/4);
 
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(stvcd_exit), &machine));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(stvcd_exit), &machine()));
 
-	state->m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
-    state->m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
-    state->m_smpc.rtc_data[2] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-    state->m_smpc.rtc_data[3] = DectoBCD(systime.local_time.mday);
-    state->m_smpc.rtc_data[4] = DectoBCD(systime.local_time.hour);
-    state->m_smpc.rtc_data[5] = DectoBCD(systime.local_time.minute);
-    state->m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
+	m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
+    m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
+    m_smpc.rtc_data[2] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
+    m_smpc.rtc_data[3] = DectoBCD(systime.local_time.mday);
+    m_smpc.rtc_data[4] = DectoBCD(systime.local_time.hour);
+    m_smpc.rtc_data[5] = DectoBCD(systime.local_time.minute);
+    m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
 
-	state->m_stv_rtc_timer = machine.scheduler().timer_alloc(FUNC(stv_rtc_increment));
+	m_stv_rtc_timer = machine().scheduler().timer_alloc(FUNC(stv_rtc_increment));
 }
 
 
@@ -2033,114 +2031,112 @@ static WRITE32_HANDLER( saturn_cs1_w )
 		state->m_cart_backupram[offset*2+1] = (data & 0x000000ff) >> 0;
 }
 
-static MACHINE_RESET( saturn )
+MACHINE_RESET_MEMBER(saturn_state,saturn)
 {
-	saturn_state *state = machine.driver_data<saturn_state>();
 	// don't let the slave cpu and the 68k go anywhere
-	machine.device("slave")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("slave")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	state->m_smpc.SR = 0x40;	// this bit is always on according to docs
+	m_smpc.SR = 0x40;	// this bit is always on according to docs
 
-	state->m_en_68k = 0;
-	state->m_NMI_reset = 0;
+	m_en_68k = 0;
+	m_NMI_reset = 0;
 
-	DMA_STATUS = 0;
+	m_scu_regs[31] = 0; //DMA_STATUS = 0;
 
 	//memset(stv_m_workram_l, 0, 0x100000);
 	//memset(stv_m_workram_h, 0, 0x100000);
 
-	machine.device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
-	machine.device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
+	machine().device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
+	machine().device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
 
-	stvcd_reset( machine );
+	stvcd_reset( machine() );
 
-	state->m_cart_type = state->ioport("CART_AREA")->read() & 7;
+	m_cart_type = ioport("CART_AREA")->read() & 7;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x027fffff, FUNC(saturn_null_ram_r), FUNC(saturn_null_ram_w));
-	machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x027fffff, FUNC(saturn_null_ram_r), FUNC(saturn_null_ram_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x027fffff, FUNC(saturn_null_ram_r), FUNC(saturn_null_ram_w));
+	machine().device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x027fffff, FUNC(saturn_null_ram_r), FUNC(saturn_null_ram_w));
 
-	if(state->m_cart_type == 5)
+	if(m_cart_type == 5)
 	{
 		//  AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
-		machine.device("slave")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
+		machine().device("slave")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
 
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x0247ffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
-		machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x0247ffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x0267ffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
-		machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x0267ffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x0247ffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
+		machine().device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x0247ffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x0267ffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
+		machine().device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x0267ffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
 	}
 
-	if(state->m_cart_type == 6)
+	if(m_cart_type == 6)
 	{
 		//  AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
-		machine.device("slave")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
+		machine().device("slave")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
 
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x025fffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
-		machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x025fffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x027fffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
-		machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x027fffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x025fffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
+		machine().device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x025fffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x027fffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
+		machine().device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x027fffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
 	}
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x04000000, 0x047fffff);
-	machine.device("slave")->memory().space(AS_PROGRAM)->nop_readwrite(0x04000000, 0x047fffff);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x04000000, 0x047fffff);
+	machine().device("slave")->memory().space(AS_PROGRAM)->nop_readwrite(0x04000000, 0x047fffff);
 
-	if(state->m_cart_type > 0 && state->m_cart_type < 5)
+	if(m_cart_type > 0 && m_cart_type < 5)
 	{
 	//  AM_RANGE(0x04000000, 0x047fffff) AM_RAM //backup RAM area, dynamically allocated
 		UINT32 mask;
-		mask = 0x7fffff >> (4-state->m_cart_type);
+		mask = 0x7fffff >> (4-m_cart_type);
 		//mask = 0x7fffff >> 4-4 = 0x7fffff 32mbit
 		//mask = 0x7fffff >> 4-3 = 0x3fffff 16mbit
 		//mask = 0x7fffff >> 4-2 = 0x1fffff 8mbit
 		//mask = 0x7fffff >> 4-1 = 0x0fffff 4mbit
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x04000000, 0x04000000 | mask, FUNC(saturn_cs1_r), FUNC(saturn_cs1_w));
-		machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x04000000, 0x04000000 | mask, FUNC(saturn_cs1_r), FUNC(saturn_cs1_w));
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x04000000, 0x04000000 | mask, FUNC(saturn_cs1_r), FUNC(saturn_cs1_w));
+		machine().device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x04000000, 0x04000000 | mask, FUNC(saturn_cs1_r), FUNC(saturn_cs1_w));
 	}
 
 
 	/* TODO: default value is probably 7 */
-	state->m_scu.start_factor[0] = -1;
-	state->m_scu.start_factor[1] = -1;
-	state->m_scu.start_factor[2] = -1;
+	m_scu.start_factor[0] = -1;
+	m_scu.start_factor[1] = -1;
+	m_scu.start_factor[2] = -1;
 
-	state->m_vdp2.old_crmd = -1;
-	state->m_vdp2.old_tvmd = -1;
+	m_vdp2.old_crmd = -1;
+	m_vdp2.old_tvmd = -1;
 
-	state->m_stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
+	m_stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 }
 
 
-static MACHINE_RESET( stv )
+MACHINE_RESET_MEMBER(saturn_state,stv)
 {
-	saturn_state *state = machine.driver_data<saturn_state>();
 
 	// don't let the slave cpu and the 68k go anywhere
-	machine.device("slave")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("slave")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	state->m_en_68k = 0;
-	state->m_NMI_reset = 0;
+	m_en_68k = 0;
+	m_NMI_reset = 0;
 
-	state->m_port_sel = state->m_mux_data = 0;
+	m_port_sel = m_mux_data = 0;
 
-	machine.device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
-	machine.device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
+	machine().device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
+	machine().device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
 
-	stvcd_reset(machine);
+	stvcd_reset(machine());
 
-	state->m_stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
-	state->m_prev_bankswitch = 0xff;
+	m_stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
+	m_prev_bankswitch = 0xff;
 
 	/* TODO: default value is probably 7 */
-	state->m_scu.start_factor[0] = -1;
-	state->m_scu.start_factor[1] = -1;
-	state->m_scu.start_factor[2] = -1;
+	m_scu.start_factor[0] = -1;
+	m_scu.start_factor[1] = -1;
+	m_scu.start_factor[2] = -1;
 
-	state->m_vdp2.old_crmd = -1;
-	state->m_vdp2.old_tvmd = -1;
+	m_vdp2.old_crmd = -1;
+	m_vdp2.old_tvmd = -1;
 }
 
 struct cdrom_interface saturn_cdrom =
@@ -2199,8 +2195,8 @@ static MACHINE_CONFIG_START( saturn, saturn_state )
 	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
-	MCFG_MACHINE_START(saturn)
-	MCFG_MACHINE_RESET(saturn)
+	MCFG_MACHINE_START_OVERRIDE(saturn_state,saturn)
+	MCFG_MACHINE_RESET_OVERRIDE(saturn_state,saturn)
 
 	MCFG_NVRAM_HANDLER(saturn)
 
@@ -2220,7 +2216,7 @@ static MACHINE_CONFIG_START( saturn, saturn_state )
 
 	MCFG_GFXDECODE(stv)
 
-	MCFG_VIDEO_START(stv_vdp2)
+	MCFG_VIDEO_START_OVERRIDE(saturn_state,stv_vdp2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2287,8 +2283,8 @@ static MACHINE_CONFIG_START( stv, saturn_state )
 	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
-	MCFG_MACHINE_START(stv)
-	MCFG_MACHINE_RESET(stv)
+	MCFG_MACHINE_START_OVERRIDE(saturn_state,stv)
+	MCFG_MACHINE_RESET_OVERRIDE(saturn_state,stv)
 
 	MCFG_EEPROM_93C46_ADD("eeprom") /* Actually 93c45 */
 
@@ -2309,7 +2305,7 @@ static MACHINE_CONFIG_START( stv, saturn_state )
 
 	MCFG_GFXDECODE(stv)
 
-	MCFG_VIDEO_START(stv_vdp2)
+	MCFG_VIDEO_START_OVERRIDE(saturn_state,stv_vdp2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

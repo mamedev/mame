@@ -58,6 +58,7 @@ public:
 	UINT8 m_disp_1;
 	UINT8 m_disp_2;
 	UINT8 bit_to_dec(UINT8 val);
+	virtual void machine_reset();
 };
 
 
@@ -125,7 +126,7 @@ static INPUT_PORTS_START( k1003 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(k1003)
+void k1003_state::machine_reset()
 {
 }
 
@@ -135,7 +136,6 @@ static MACHINE_CONFIG_START( k1003, k1003_state )
 	MCFG_CPU_PROGRAM_MAP(k1003_mem)
 	MCFG_CPU_IO_MAP(k1003_io)
 
-	MCFG_MACHINE_RESET(k1003)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_k1003)

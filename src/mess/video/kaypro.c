@@ -9,11 +9,11 @@
 
 ************************************************************/
 
-PALETTE_INIT( kaypro )
+PALETTE_INIT_MEMBER(kaypro_state,kaypro)
 {
-	palette_set_color(machine, 0, RGB_BLACK); /* black */
-	palette_set_color(machine, 1, MAKE_RGB(0, 220, 0)); /* green */
-	palette_set_color(machine, 2, MAKE_RGB(0, 110, 0)); /* low intensity green */
+	palette_set_color(machine(), 0, RGB_BLACK); /* black */
+	palette_set_color(machine(), 1, MAKE_RGB(0, 220, 0)); /* green */
+	palette_set_color(machine(), 2, MAKE_RGB(0, 110, 0)); /* low intensity green */
 }
 
 SCREEN_UPDATE_IND16( kayproii )
@@ -313,8 +313,7 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_videoram_w )
 	m_p_videoram[m_mc6845_video_address] = data;
 }
 
-VIDEO_START( kaypro )
+VIDEO_START_MEMBER(kaypro_state,kaypro)
 {
-	kaypro_state *state = machine.driver_data<kaypro_state>();
-	state->m_p_chargen = state->memregion("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }

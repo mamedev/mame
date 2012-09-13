@@ -37,13 +37,15 @@ public:
 	DECLARE_WRITE8_MEMBER(simpsons_k052109_w);
 	DECLARE_READ8_MEMBER(simpsons_k053247_r);
 	DECLARE_WRITE8_MEMBER(simpsons_k053247_w);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 /*----------- defined in machine/simpsons.c -----------*/
 
 READ8_DEVICE_HANDLER( simpsons_sound_r );
-MACHINE_RESET( simpsons );
-MACHINE_START( simpsons );
+
+
 
 /*----------- defined in video/simpsons.c -----------*/
 

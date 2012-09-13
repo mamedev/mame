@@ -300,8 +300,6 @@ static MACHINE_CONFIG_START( tankbatt, tankbatt_state )
 	MCFG_GFXDECODE(tankbatt)
 	MCFG_PALETTE_LENGTH(256*2)
 
-	MCFG_PALETTE_INIT(tankbatt)
-	MCFG_VIDEO_START(tankbatt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -137,32 +137,31 @@ TILEMAP_MAPPER_MEMBER(sidearms_state::sidearms_tilemap_scan)
 	return ((offset & 0xf801) | ((offset & 0x0700) >> 7) | ((offset & 0x00fe) << 3)) & 0x7fff;
 }
 
-VIDEO_START( sidearms )
+void sidearms_state::video_start()
 {
-	sidearms_state *state = machine.driver_data<sidearms_state>();
-	state->m_tilerom = state->memregion("gfx4")->base();
+	m_tilerom = memregion("gfx4")->base();
 
-	if (!state->m_gameid)
+	if (!m_gameid)
 	{
-		state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sidearms_state::get_sidearms_bg_tile_info),state), tilemap_mapper_delegate(FUNC(sidearms_state::sidearms_tilemap_scan),state),
+		m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sidearms_state::get_sidearms_bg_tile_info),this), tilemap_mapper_delegate(FUNC(sidearms_state::sidearms_tilemap_scan),this),
 			 32, 32, 128, 128);
 
-		state->m_bg_tilemap->set_transparent_pen(15);
+		m_bg_tilemap->set_transparent_pen(15);
 	}
 	else
 	{
-		state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sidearms_state::get_philko_bg_tile_info),state), tilemap_mapper_delegate(FUNC(sidearms_state::sidearms_tilemap_scan),state), 32, 32, 128, 128);
+		m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sidearms_state::get_philko_bg_tile_info),this), tilemap_mapper_delegate(FUNC(sidearms_state::sidearms_tilemap_scan),this), 32, 32, 128, 128);
 	}
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sidearms_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sidearms_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,
 		 8, 8, 64, 64);
 
-	state->m_fg_tilemap->set_transparent_pen(3);
+	m_fg_tilemap->set_transparent_pen(3);
 
-	state->m_hflop_74a_n = 1;
-	state->m_latch_374 = state->m_vcount_191 = state->m_hcount_191 = 0;
+	m_hflop_74a_n = 1;
+	m_latch_374 = m_vcount_191 = m_hcount_191 = 0;
 
-	state->m_flipon = state->m_charon = state->m_staron = state->m_objon = state->m_bgon = 0;
+	m_flipon = m_charon = m_staron = m_objon = m_bgon = 0;
 }
 
 static void draw_sprites_region(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset, int end_offset )

@@ -286,23 +286,22 @@ SCREEN_UPDATE_IND16( oric )
 }
 
 
-VIDEO_START( oric )
+void oric_state::video_start()
 {
-	oric_state *state = machine.driver_data<oric_state>();
 	// initialise variables
-	state->m_vh_state.active_foreground_colour = 0;
-	state->m_vh_state.active_background_colour = 0;
-	state->m_vh_state.foreground_colour = 0;
-	state->m_vh_state.background_colour = 0;
-	state->m_vh_state.mode = 0;
-	state->m_vh_state.text_attributes = 0;
-	state->m_vh_state.read_addr = 0;
-	state->m_vh_state.char_data = 0;
-	state->m_vh_state.char_base = 0;
+	m_vh_state.active_foreground_colour = 0;
+	m_vh_state.active_background_colour = 0;
+	m_vh_state.foreground_colour = 0;
+	m_vh_state.background_colour = 0;
+	m_vh_state.mode = 0;
+	m_vh_state.text_attributes = 0;
+	m_vh_state.read_addr = 0;
+	m_vh_state.char_data = 0;
+	m_vh_state.char_base = 0;
 	/* initialise flash timer */
-	state->m_vh_state.flash_count = 0;
-	machine.scheduler().timer_pulse(attotime::from_hz(50), FUNC(oric_vh_timer_callback));
+	m_vh_state.flash_count = 0;
+	machine().scheduler().timer_pulse(attotime::from_hz(50), FUNC(oric_vh_timer_callback));
 	/* mode */
-	oric_vh_update_attribute(machine,(1<<3)|(1<<4));
+	oric_vh_update_attribute(machine(),(1<<3)|(1<<4));
 }
 

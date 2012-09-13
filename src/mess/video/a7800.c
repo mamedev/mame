@@ -48,34 +48,33 @@
   Start the video hardware emulation.
 
 ***************************************************************************/
-VIDEO_START( a7800 )
+void a7800_state::video_start()
 {
-	a7800_state *state = machine.driver_data<a7800_state>();
 	int i;
 
 	for(i=0; i<8; i++)
 	{
-		state->m_maria_palette[i][0]=0;
-		state->m_maria_palette[i][1]=0;
-		state->m_maria_palette[i][2]=0;
-		state->m_maria_palette[i][3]=0;
+		m_maria_palette[i][0]=0;
+		m_maria_palette[i][1]=0;
+		m_maria_palette[i][2]=0;
+		m_maria_palette[i][3]=0;
 	}
 
-	state->m_maria_write_mode=0;
-	state->m_maria_scanline=0;
-	state->m_maria_dmaon=0;
-	state->m_maria_vblank=0x80;
-	state->m_maria_dll=0;
-	state->m_maria_dodma=0;
-	state->m_maria_wsync=0;
+	m_maria_write_mode=0;
+	m_maria_scanline=0;
+	m_maria_dmaon=0;
+	m_maria_vblank=0x80;
+	m_maria_dll=0;
+	m_maria_dodma=0;
+	m_maria_wsync=0;
 
-	state->m_maria_color_kill = 0;
-	state->m_maria_cwidth = 0;
-	state->m_maria_bcntl = 0;
-	state->m_maria_kangaroo = 0;
-	state->m_maria_rm = 0;
+	m_maria_color_kill = 0;
+	m_maria_cwidth = 0;
+	m_maria_bcntl = 0;
+	m_maria_kangaroo = 0;
+	m_maria_rm = 0;
 
-	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }
 
 /***************************************************************************

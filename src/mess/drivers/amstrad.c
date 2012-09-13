@@ -317,14 +317,14 @@ INPUT_PORTS_END
 static INPUT_CHANGED( cpc_monitor_changed )
 {
 	running_machine &machine = field.machine();
-
+	amstrad_state *drvstate = machine.driver_data<amstrad_state>();
 	if ( (machine.root_device().ioport("green_display")->read()) & 0x01 )
 	{
-		PALETTE_INIT_CALL( amstrad_cpc_green );
+		drvstate->PALETTE_INIT_CALL_MEMBER( amstrad_cpc_green );
 	}
 	else
 	{
-		PALETTE_INIT_CALL( amstrad_cpc );
+		drvstate->PALETTE_INIT_CALL_MEMBER( amstrad_cpc );
 	}
 }
 
@@ -883,8 +883,8 @@ static MACHINE_CONFIG_START( amstrad, amstrad_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START( amstrad )
-	MCFG_MACHINE_RESET( amstrad )
+	MCFG_MACHINE_START_OVERRIDE(amstrad_state, amstrad )
+	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, amstrad )
 
 	MCFG_I8255_ADD( "ppi8255", amstrad_ppi8255_interface )
 
@@ -897,11 +897,11 @@ static MACHINE_CONFIG_START( amstrad, amstrad_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
 	MCFG_PALETTE_LENGTH(32)
-	MCFG_PALETTE_INIT(amstrad_cpc)
+	MCFG_PALETTE_INIT_OVERRIDE(amstrad_state,amstrad_cpc)
 
 	MCFG_MC6845_ADD( "mc6845", MC6845, XTAL_16MHz / 16, amstrad_mc6845_intf )
 
-	MCFG_VIDEO_START(amstrad)
+	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -934,10 +934,10 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( kccomp, amstrad )
-	MCFG_MACHINE_START(kccomp)
-	MCFG_MACHINE_RESET(kccomp)
+	MCFG_MACHINE_START_OVERRIDE(amstrad_state,kccomp)
+	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state,kccomp)
 
-	MCFG_PALETTE_INIT(kccomp)
+	MCFG_PALETTE_INIT_OVERRIDE(amstrad_state,kccomp)
 MACHINE_CONFIG_END
 
 
@@ -949,8 +949,8 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START( plus )
-	MCFG_MACHINE_RESET( plus )
+	MCFG_MACHINE_START_OVERRIDE(amstrad_state, plus )
+	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, plus )
 
 	MCFG_I8255_ADD( "ppi8255", amstrad_ppi8255_interface )
 
@@ -963,11 +963,11 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
 	MCFG_PALETTE_LENGTH(4096)
-	MCFG_PALETTE_INIT(amstrad_plus)
+	MCFG_PALETTE_INIT_OVERRIDE(amstrad_state,amstrad_plus)
 
 	MCFG_MC6845_ADD( "mc6845", MC6845, XTAL_40MHz / 40, amstrad_plus_mc6845_intf )
 
-	MCFG_VIDEO_START(amstrad)
+	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1007,8 +1007,8 @@ static MACHINE_CONFIG_START( gx4000, amstrad_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START( gx4000 )
-	MCFG_MACHINE_RESET( gx4000 )
+	MCFG_MACHINE_START_OVERRIDE(amstrad_state, gx4000 )
+	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, gx4000 )
 
 	MCFG_I8255_ADD( "ppi8255", amstrad_ppi8255_interface )
 
@@ -1021,11 +1021,11 @@ static MACHINE_CONFIG_START( gx4000, amstrad_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
 	MCFG_PALETTE_LENGTH(4096)
-	MCFG_PALETTE_INIT(amstrad_plus)
+	MCFG_PALETTE_INIT_OVERRIDE(amstrad_state,amstrad_plus)
 
 	MCFG_MC6845_ADD( "mc6845", MC6845, XTAL_40MHz / 40, amstrad_plus_mc6845_intf )
 
-	MCFG_VIDEO_START(amstrad)
+	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1042,14 +1042,14 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( aleste, amstrad )
-	MCFG_MACHINE_START(aleste)
-	MCFG_MACHINE_RESET(aleste)
+	MCFG_MACHINE_START_OVERRIDE(amstrad_state,aleste)
+	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state,aleste)
 
 	MCFG_SOUND_REPLACE("ay", AY8910, XTAL_16MHz / 16)
 	MCFG_SOUND_CONFIG(ay8912_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_PALETTE_LENGTH(32+64)
-	MCFG_PALETTE_INIT(aleste)
+	MCFG_PALETTE_INIT_OVERRIDE(amstrad_state,aleste)
 	MCFG_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
 	MCFG_UPD765A_MODIFY("upd765", aleste_8272_interface)
 

@@ -79,6 +79,8 @@ public:
 	UINT32		*m_pc_ram;
 	DECLARE_WRITE_LINE_MEMBER(su2000_pic8259_1_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -256,40 +258,39 @@ static IRQ_CALLBACK( pc_irq_callback )
  *
  *************************************/
 
-static MACHINE_START( su2000 )
+void su2000_state::machine_start()
 {
-	su2000_state *state = machine.driver_data<su2000_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	state->m_pit8254 = machine.device("pit8254");
-	state->m_pic8259_1 = machine.device("pic8259_1");
-	state->m_pic8259_2 = machine.device("pic8259_2");
-	state->m_dma8237_1 = machine.device("dma8237_1");
-	state->m_dma8237_2 = machine.device("dma8237_2");
+	m_pit8254 = machine().device("pit8254");
+	m_pic8259_1 = machine().device("pic8259_1");
+	m_pic8259_2 = machine().device("pic8259_2");
+	m_dma8237_1 = machine().device("dma8237_1");
+	m_dma8237_2 = machine().device("dma8237_2");
 
 	/* Configure RAM */
-	state->m_pc_ram = auto_alloc_array_clear(machine, UINT32, PC_RAM_SIZE);
+	m_pc_ram = auto_alloc_array_clear(machine(), UINT32, PC_RAM_SIZE);
 
 	/* Conventional memory */
-	state->membank("mem_bank")->set_base(state->m_pc_ram);
+	membank("mem_bank")->set_base(m_pc_ram);
 
 	/* HMA */
 	offs_t ram_limit = 0x100000 + PC_RAM_SIZE - 0x0a0000;
 	space->install_read_bank(0x100000, ram_limit - 1, "hma_bank");
 	space->install_write_bank(0x100000, ram_limit - 1, "hma_bank");
-	state->membank("hma_bank")->set_base(state->m_pc_ram + 0xa0000);
+	membank("hma_bank")->set_base(m_pc_ram + 0xa0000);
 
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(pc_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(pc_irq_callback);
 
-	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, su2000_set_keyb_int);
+	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, su2000_set_keyb_int);
 
-	kbdc8042_init(machine, &at8042);
+	kbdc8042_init(machine(), &at8042);
 
-	pc_vga_init(machine, vga_setting, NULL);
-	pc_vga_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine.device("maincpu")->memory().space(AS_IO), 0x0000);
+	pc_vga_init(machine(), vga_setting, NULL);
+	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
-static MACHINE_RESET( su2000 )
+void su2000_state::machine_reset()
 {
 
 }
@@ -327,8 +328,6 @@ static MACHINE_CONFIG_START( su2000, su2000_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // TODO
 
-	MCFG_MACHINE_START(su2000)
-	MCFG_MACHINE_RESET(su2000)
 	MCFG_FRAGMENT_ADD(pcat_common)
 MACHINE_CONFIG_END
 

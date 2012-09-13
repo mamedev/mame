@@ -75,6 +75,10 @@ public:
 	TILE_GET_INFO_MEMBER(alpha1_get_tile_info);
 	TILE_GET_INFO_MEMBER(alpha2_get_tile_info);
 	TILE_GET_INFO_MEMBER(field_get_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -93,7 +97,7 @@ DISCRETE_SOUND_EXTERN( abaseb );
 
 /*----------- defined in video/atarifb.c -----------*/
 
-VIDEO_START( atarifb );
+
 SCREEN_UPDATE_IND16( atarifb );
 SCREEN_UPDATE_IND16( abaseb );
 SCREEN_UPDATE_IND16( soccer );

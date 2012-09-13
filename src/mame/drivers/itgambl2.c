@@ -66,6 +66,9 @@ public:
 	int m_test_x;
 	int m_test_y;
 	int m_start_offs;
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -73,12 +76,11 @@ public:
 *     Video Hardware     *
 *************************/
 
-static VIDEO_START( itgambl2 )
+void itgambl2_state::video_start()
 {
-	itgambl2_state *state = machine.driver_data<itgambl2_state>();
-	state->m_test_x = 256;
-	state->m_test_y = 256;
-	state->m_start_offs = 0;
+	m_test_x = 256;
+	m_test_y = 256;
+	m_start_offs = 0;
 }
 
 /* (dirty) debug code for looking 8bpps blitter-based gfxs */
@@ -235,14 +237,14 @@ GFXDECODE_END
 *      Machine Reset      *
 **************************/
 
-static MACHINE_RESET( itgambl2 )
+void itgambl2_state::machine_reset()
 {
 	/* stop the CPU, we have no code for it anyway */
-	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 /* default 444 palette for debug purpose*/
-static PALETTE_INIT( itgambl2 )
+void itgambl2_state::palette_init()
 {
 	int x,r,g,b;
 
@@ -251,7 +253,7 @@ static PALETTE_INIT( itgambl2 )
 		r = (x & 0xf)*0x10;
 		g = ((x & 0x3c)>>2)*0x10;
 		b = ((x & 0xf0)>>4)*0x10;
-		palette_set_color(machine,x,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),x,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -273,12 +275,9 @@ static MACHINE_CONFIG_START( itgambl2, itgambl2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_STATIC( itgambl2 )
 
-	MCFG_MACHINE_RESET( itgambl2 )
-	MCFG_PALETTE_INIT( itgambl2 )
 
 	MCFG_GFXDECODE(itgambl2)
 	MCFG_PALETTE_LENGTH(0x200)
-	MCFG_VIDEO_START( itgambl2 )
 
     /* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

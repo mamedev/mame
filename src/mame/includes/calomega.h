@@ -41,11 +41,13 @@ public:
 	DECLARE_DRIVER_INIT(comg080);
 	DECLARE_DRIVER_INIT(jjpoker);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/calomega.c -----------*/
 
-PALETTE_INIT( calomega );
-VIDEO_START( calomega );
+
+
 SCREEN_UPDATE_IND16( calomega );

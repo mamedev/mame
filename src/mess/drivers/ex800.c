@@ -153,6 +153,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ex800_iosel_w);
 	DECLARE_READ8_MEMBER(ex800_gate7a_r);
 	DECLARE_WRITE8_MEMBER(ex800_gate7a_w);
+	virtual void machine_start();
 };
 
 
@@ -202,11 +203,10 @@ static INPUT_CHANGED( online_switch )
 }
 
 
-static MACHINE_START(ex800)
+void ex800_state::machine_start()
 {
-	ex800_state *state = machine.driver_data<ex800_state>();
-	state->m_irq_state = ASSERT_LINE;
-	device_t *speaker = machine.device(BEEPER_TAG);
+	m_irq_state = ASSERT_LINE;
+	device_t *speaker = machine().device(BEEPER_TAG);
 	/* Setup beep */
 	beep_set_state(speaker, 0);
 	beep_set_frequency(speaker, 4000); /* measured at 4000 Hz */
@@ -451,7 +451,6 @@ static MACHINE_CONFIG_START( ex800, ex800_state )
     MCFG_CPU_PROGRAM_MAP(ex800_mem)
 	MCFG_CPU_IO_MAP(ex800_io)
 
-	MCFG_MACHINE_START(ex800)
 
 	MCFG_DEFAULT_LAYOUT(layout_ex800)
 

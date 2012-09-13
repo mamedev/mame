@@ -41,6 +41,8 @@ public:
 	DECLARE_READ8_MEMBER(vendetta_sound_r);
 	DECLARE_DRIVER_INIT(vendetta);
 	DECLARE_DRIVER_INIT(esckids);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 /*----------- defined in video/vendetta.c -----------*/

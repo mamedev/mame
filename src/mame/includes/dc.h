@@ -92,6 +92,10 @@ class dc_state : public driver_device
 	DECLARE_DRIVER_INIT(dc);
 	DECLARE_DRIVER_INIT(dcus);
 	DECLARE_DRIVER_INIT(dcjp);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	DECLARE_MACHINE_RESET(naomi);
 };
 
 /*----------- defined in machine/dc.c -----------*/
@@ -117,8 +121,8 @@ WRITE64_DEVICE_HANDLER( dc_aica_reg_w );
 READ32_DEVICE_HANDLER( dc_arm_aica_r );
 WRITE32_DEVICE_HANDLER( dc_arm_aica_w );
 
-MACHINE_START( dc );
-MACHINE_RESET( dc );
+
+
 
 int dc_compute_interrupt_level(running_machine &machine);
 void dc_update_interrupt_status(running_machine &machine);
@@ -302,7 +306,7 @@ READ32_HANDLER( elan_regs_r );
 WRITE32_HANDLER( elan_regs_w );
 WRITE64_HANDLER( ta_fifo_poly_w );
 WRITE64_HANDLER( ta_fifo_yuv_w );
-VIDEO_START(dc);
+
 SCREEN_UPDATE_RGB32(dc);
 
 /*--------------- CORE registers --------------*/

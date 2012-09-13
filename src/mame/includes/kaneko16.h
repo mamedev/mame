@@ -60,6 +60,9 @@ public:
 	DECLARE_DRIVER_INIT(samplebank);
 
 
+	DECLARE_MACHINE_RESET(gtmr);
+	DECLARE_VIDEO_START(kaneko16);
+	DECLARE_MACHINE_RESET(mgcrystl);
 };
 
 class kaneko16_gtmr_state : public kaneko16_state
@@ -107,7 +110,8 @@ public:
 	DECLARE_WRITE16_MEMBER(kaneko16_bg15_reg_w);
 
 	DECLARE_DRIVER_INIT(berlwall);
-
+	DECLARE_PALETTE_INIT(berlwall);
+	DECLARE_VIDEO_START(berlwall);
 };
 
 class kaneko16_shogwarr_state : public kaneko16_state
@@ -130,14 +134,14 @@ public:
 
 /*----------- defined in drivers/kaneko16.c -----------*/
 
-MACHINE_RESET( kaneko16 );
+
 
 /*----------- defined in video/kaneko16.c -----------*/
 
-PALETTE_INIT( berlwall );
 
-VIDEO_START( kaneko16 );
-VIDEO_START( berlwall );
+
+
+
 
 SCREEN_UPDATE_IND16( kaneko16 );
 SCREEN_UPDATE_IND16( berlwall );

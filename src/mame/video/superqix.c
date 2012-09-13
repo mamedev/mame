@@ -47,26 +47,24 @@ TILE_GET_INFO_MEMBER(superqix_state::sqix_get_bg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( pbillian )
+VIDEO_START_MEMBER(superqix_state,pbillian)
 {
-	superqix_state *state = machine.driver_data<superqix_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(superqix_state::pb_get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(superqix_state::pb_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8,32,32);
 }
 
-VIDEO_START( superqix )
+VIDEO_START_MEMBER(superqix_state,superqix)
 {
-	superqix_state *state = machine.driver_data<superqix_state>();
-	state->m_fg_bitmap[0] = auto_bitmap_ind16_alloc(machine, 256, 256);
-	state->m_fg_bitmap[1] = auto_bitmap_ind16_alloc(machine, 256, 256);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(superqix_state::sqix_get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_fg_bitmap[0] = auto_bitmap_ind16_alloc(machine(), 256, 256);
+	m_fg_bitmap[1] = auto_bitmap_ind16_alloc(machine(), 256, 256);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(superqix_state::sqix_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 
-	state->m_bg_tilemap->set_transmask(0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
-	state->m_bg_tilemap->set_transmask(1,0x0001,0xfffe); /* split type 1 has pen 0 transparent in front half */
+	m_bg_tilemap->set_transmask(0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
+	m_bg_tilemap->set_transmask(1,0x0001,0xfffe); /* split type 1 has pen 0 transparent in front half */
 
-	state->save_item(NAME(state->m_gfxbank));
-	state->save_item(NAME(state->m_show_bitmap));
-	state->save_item(NAME(*state->m_fg_bitmap[0]));
-	state->save_item(NAME(*state->m_fg_bitmap[1]));
+	save_item(NAME(m_gfxbank));
+	save_item(NAME(m_show_bitmap));
+	save_item(NAME(*m_fg_bitmap[0]));
+	save_item(NAME(*m_fg_bitmap[1]));
 }
 
 

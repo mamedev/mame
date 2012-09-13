@@ -1665,11 +1665,10 @@ static const eeprom_interface eeprom_interface_tattass =
 
 /**********************************************************************************/
 
-static MACHINE_RESET( deco32 )
+MACHINE_RESET_MEMBER(deco32_state,deco32)
 {
-	deco32_state *state = machine.driver_data<deco32_state>();
-	state->m_raster_irq_timer = machine.device<timer_device>("int_timer");
-	decoprot_reset(machine);
+	m_raster_irq_timer = machine().device<timer_device>("int_timer");
+	decoprot_reset(machine());
 }
 
 static INTERRUPT_GEN( deco32_vbl_interrupt )
@@ -1741,7 +1740,7 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz/4/3)  /* pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_RESET(deco32)
+	MCFG_MACHINE_RESET_OVERRIDE(deco32_state,deco32)
 
 	MCFG_TIMER_ADD("int_timer", interrupt_gen)
 
@@ -1763,7 +1762,7 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 	decospr_device::set_pri_callback(*device, captaven_pri_callback);
 
 
-	MCFG_VIDEO_START(captaven)
+	MCFG_VIDEO_START_OVERRIDE(deco32_state,captaven)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1811,7 +1810,7 @@ static MACHINE_CONFIG_START( fghthist, deco32_state )
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
 
-	MCFG_VIDEO_START(fghthist)
+	MCFG_VIDEO_START_OVERRIDE(deco32_state,fghthist)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1857,7 +1856,7 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state )
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
 
-	MCFG_VIDEO_START(fghthist)
+	MCFG_VIDEO_START_OVERRIDE(deco32_state,fghthist)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1949,7 +1948,7 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 	MCFG_CPU_ADD("audiocpu", H6280, 32220000/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_RESET(deco32)
+	MCFG_MACHINE_RESET_OVERRIDE(deco32_state,deco32)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	MCFG_TIMER_ADD("int_timer", interrupt_gen)
@@ -1970,7 +1969,7 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 	MCFG_GFXDECODE(dragngun)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(dragngun)
+	MCFG_VIDEO_START_OVERRIDE(dragngun_state,dragngun)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2025,7 +2024,7 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* to improve main<->audio comms */
 
-	MCFG_MACHINE_RESET(deco32)
+	MCFG_MACHINE_RESET_OVERRIDE(deco32_state,deco32)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	MCFG_TIMER_ADD("int_timer", interrupt_gen)
@@ -2046,7 +2045,7 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 	MCFG_GFXDECODE(dragngun)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(lockload)
+	MCFG_VIDEO_START_OVERRIDE(dragngun_state,lockload)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2134,7 +2133,7 @@ static MACHINE_CONFIG_START( tattass, deco32_state )
 	MCFG_GFXDECODE(tattass)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(nslasher)
+	MCFG_VIDEO_START_OVERRIDE(deco32_state,nslasher)
 
 	/* sound hardware */
 	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
@@ -2173,7 +2172,7 @@ static MACHINE_CONFIG_START( nslasher, deco32_state )
 	MCFG_GFXDECODE(nslasher)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(nslasher)
+	MCFG_VIDEO_START_OVERRIDE(deco32_state,nslasher)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

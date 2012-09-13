@@ -62,60 +62,58 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_extra_tile_info)
 
 
 
-VIDEO_START( ms32 )
+void ms32_state::video_start()
 {
-	ms32_state *state = machine.driver_data<ms32_state>();
 
-	state->m_priram_8   = auto_alloc_array_clear(machine, UINT8, 0x2000);
-	state->m_palram_16  = auto_alloc_array_clear(machine, UINT16, 0x20000);
-	state->m_rozram_16  = auto_alloc_array_clear(machine, UINT16, 0x10000);
-	state->m_lineram_16 = auto_alloc_array_clear(machine, UINT16, 0x1000);
-	state->m_sprram_16  = auto_alloc_array_clear(machine, UINT16, 0x20000);
-	state->m_bgram_16   = auto_alloc_array_clear(machine, UINT16, 0x4000);
-	state->m_txram_16   = auto_alloc_array_clear(machine, UINT16, 0x4000);
+	m_priram_8   = auto_alloc_array_clear(machine(), UINT8, 0x2000);
+	m_palram_16  = auto_alloc_array_clear(machine(), UINT16, 0x20000);
+	m_rozram_16  = auto_alloc_array_clear(machine(), UINT16, 0x10000);
+	m_lineram_16 = auto_alloc_array_clear(machine(), UINT16, 0x1000);
+	m_sprram_16  = auto_alloc_array_clear(machine(), UINT16, 0x20000);
+	m_bgram_16   = auto_alloc_array_clear(machine(), UINT16, 0x4000);
+	m_txram_16   = auto_alloc_array_clear(machine(), UINT16, 0x4000);
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_tx_tile_info),state),TILEMAP_SCAN_ROWS,8, 8,64,64);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_bg_tile_info),state),TILEMAP_SCAN_ROWS,16,16,64,64);
-	state->m_bg_tilemap_alt = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_bg_tile_info),state),TILEMAP_SCAN_ROWS,16,16,256,16); // alt layout, controller by register?
-	state->m_roz_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_roz_tile_info),state),TILEMAP_SCAN_ROWS,16,16,128,128);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_tx_tile_info),this),TILEMAP_SCAN_ROWS,8, 8,64,64);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_bg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,64);
+	m_bg_tilemap_alt = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_bg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,256,16); // alt layout, controller by register?
+	m_roz_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_roz_tile_info),this),TILEMAP_SCAN_ROWS,16,16,128,128);
 
 
 	/* set up tile layers */
-	machine.primary_screen->register_screen_bitmap(state->m_temp_bitmap_tilemaps);
-	machine.primary_screen->register_screen_bitmap(state->m_temp_bitmap_sprites);
-	machine.primary_screen->register_screen_bitmap(state->m_temp_bitmap_sprites_pri); // not actually being used for rendering, we embed pri info in the raw colour bitmap
+	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_tilemaps);
+	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites);
+	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites_pri); // not actually being used for rendering, we embed pri info in the raw colour bitmap
 
-	state->m_temp_bitmap_tilemaps.fill(0);
-	state->m_temp_bitmap_sprites.fill(0);
-	state->m_temp_bitmap_sprites_pri.fill(0);
+	m_temp_bitmap_tilemaps.fill(0);
+	m_temp_bitmap_sprites.fill(0);
+	m_temp_bitmap_sprites_pri.fill(0);
 
-	state->m_tx_tilemap->set_transparent_pen(0);
-	state->m_bg_tilemap->set_transparent_pen(0);
-	state->m_bg_tilemap_alt->set_transparent_pen(0);
-	state->m_roz_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap_alt->set_transparent_pen(0);
+	m_roz_tilemap->set_transparent_pen(0);
 
-	state->m_reverse_sprite_order = 1;
+	m_reverse_sprite_order = 1;
 
 	/* i hate per game patches...how should priority really work? tetrisp2.c ? i can't follow it */
-	if (!strcmp(machine.system().name,"kirarast"))	state->m_reverse_sprite_order = 0;
-	if (!strcmp(machine.system().name,"tp2m32"))	state->m_reverse_sprite_order = 0;
-	if (!strcmp(machine.system().name,"47pie2"))	state->m_reverse_sprite_order = 0;
-	if (!strcmp(machine.system().name,"47pie2o"))	state->m_reverse_sprite_order = 0;
-	if (!strcmp(machine.system().name,"hayaosi3"))	state->m_reverse_sprite_order = 0;
-	if (!strcmp(machine.system().name,"bnstars"))	state->m_reverse_sprite_order = 0;
-	if (!strcmp(machine.system().name,"wpksocv2"))	state->m_reverse_sprite_order = 0;
+	if (!strcmp(machine().system().name,"kirarast"))	m_reverse_sprite_order = 0;
+	if (!strcmp(machine().system().name,"tp2m32"))	m_reverse_sprite_order = 0;
+	if (!strcmp(machine().system().name,"47pie2"))	m_reverse_sprite_order = 0;
+	if (!strcmp(machine().system().name,"47pie2o"))	m_reverse_sprite_order = 0;
+	if (!strcmp(machine().system().name,"hayaosi3"))	m_reverse_sprite_order = 0;
+	if (!strcmp(machine().system().name,"bnstars"))	m_reverse_sprite_order = 0;
+	if (!strcmp(machine().system().name,"wpksocv2"))	m_reverse_sprite_order = 0;
 
 	// tp2m32 doesn't set the brightness registers so we need sensible defaults
-	state->m_brt[0] = state->m_brt[1] = 0xffff;
+	m_brt[0] = m_brt[1] = 0xffff;
 }
 
-VIDEO_START( f1superb )
+VIDEO_START_MEMBER(ms32_state,f1superb)
 {
-	ms32_state *state = machine.driver_data<ms32_state>();
-	VIDEO_START_CALL( ms32 );
+	ms32_state::video_start();
 
-	state->m_f1superb_extraram_16  = auto_alloc_array_clear(machine, UINT16, 0x10000);
-	state->m_extra_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_extra_tile_info),state),TILEMAP_SCAN_ROWS,2048,1,1,0x400);
+	m_f1superb_extraram_16  = auto_alloc_array_clear(machine(), UINT16, 0x10000);
+	m_extra_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_extra_tile_info),this),TILEMAP_SCAN_ROWS,2048,1,1,0x400);
 
 }
 

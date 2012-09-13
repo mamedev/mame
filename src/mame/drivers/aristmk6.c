@@ -17,10 +17,11 @@ public:
 	UINT32 m_test_x,m_test_y,m_start_offs;
 	UINT8 m_type;
 	DECLARE_READ64_MEMBER(test_r);
+	virtual void video_start();
 };
 
 
-VIDEO_START(aristmk6)
+void aristmk6_state::video_start()
 {
 }
 
@@ -146,7 +147,6 @@ static MACHINE_CONFIG_START( aristmk6, aristmk6_state )
 
 	MCFG_PALETTE_LENGTH(0x1000)
 
-	MCFG_VIDEO_START(aristmk6)
 MACHINE_CONFIG_END
 
 ROM_START( aristmk6 )

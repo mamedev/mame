@@ -17,9 +17,9 @@ static void register_savestate( running_machine &machine )
 	state->save_item(NAME(state->m_flipscreen));
 }
 
-VIDEO_START( actfancr )
+void actfancr_state::video_start()
 {
-	register_savestate(machine);
+	register_savestate(machine());
 }
 
 /******************************************************************************/

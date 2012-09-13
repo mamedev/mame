@@ -45,10 +45,10 @@ static const UINT8 kc85_palette[KC85_PALETTE_SIZE * 3] =
 
 
 /* Initialise the palette */
-PALETTE_INIT( kc85 )
+PALETTE_INIT_MEMBER(kc_state,kc85)
 {
 	for (int i = 0; i < sizeof(kc85_palette) / 3; i++ )
-		palette_set_color_rgb(machine, i, kc85_palette[i*3], kc85_palette[i*3+1], kc85_palette[i*3+2]);
+		palette_set_color_rgb(machine(), i, kc85_palette[i*3], kc85_palette[i*3+1], kc85_palette[i*3+2]);
 }
 
 /* set new blink state */

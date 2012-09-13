@@ -442,40 +442,37 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 ***************************************************************************/
 
-VIDEO_START( seta2 )
+VIDEO_START_MEMBER(seta2_state,seta2)
 {
-	seta2_state *state = machine.driver_data<seta2_state>();
 
-	machine.gfx[2]->set_granularity(16);
-	machine.gfx[3]->set_granularity(16);
-	machine.gfx[4]->set_granularity(16);
-	machine.gfx[5]->set_granularity(16);
+	machine().gfx[2]->set_granularity(16);
+	machine().gfx[3]->set_granularity(16);
+	machine().gfx[4]->set_granularity(16);
+	machine().gfx[5]->set_granularity(16);
 
-	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, state->m_spriteram.bytes()/2);
+	m_buffered_spriteram = auto_alloc_array(machine(), UINT16, m_spriteram.bytes()/2);
 
-	state->m_xoffset = 0;
-	state->m_yoffset = 0;
+	m_xoffset = 0;
+	m_yoffset = 0;
 
 	//TODO:FIX
-    //state_save_register_global_pointer(machine, state->m_vregs, 0x40);
+    //state_save_register_global_pointer(machine(), m_vregs, 0x40);
 }
 
-VIDEO_START( seta2_xoffset )
+VIDEO_START_MEMBER(seta2_state,seta2_xoffset)
 {
-	seta2_state *state = machine.driver_data<seta2_state>();
 
-	VIDEO_START_CALL(seta2);
+	VIDEO_START_CALL_MEMBER(seta2);
 
-	state->m_xoffset = 0x200;
+	m_xoffset = 0x200;
 }
 
-VIDEO_START( seta2_yoffset )
+VIDEO_START_MEMBER(seta2_state,seta2_yoffset)
 {
-	seta2_state *state = machine.driver_data<seta2_state>();
 
-	VIDEO_START_CALL(seta2);
+	VIDEO_START_CALL_MEMBER(seta2);
 
-	state->m_yoffset = 0x10;
+	m_yoffset = 0x10;
 }
 
 SCREEN_UPDATE_IND16( seta2 )

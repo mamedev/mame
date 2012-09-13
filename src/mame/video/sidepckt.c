@@ -2,12 +2,12 @@
 #include "includes/sidepckt.h"
 
 
-PALETTE_INIT( sidepckt )
+void sidepckt_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -24,13 +24,13 @@ PALETTE_INIT( sidepckt )
 		bit3 = (color_prom[i] >> 3) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 		/* blue component */
-		bit0 = (color_prom[i + machine.total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[i + machine.total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[i + machine.total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[i + machine.total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[i + machine().total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[i + machine().total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[i + machine().total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[i + machine().total_colors()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -61,15 +61,14 @@ TILE_GET_INFO_MEMBER(sidepckt_state::get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( sidepckt )
+void sidepckt_state::video_start()
 {
-	sidepckt_state *state = machine.driver_data<sidepckt_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sidepckt_state::get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sidepckt_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	state->m_bg_tilemap->set_transmask(0,0xff,0x00); /* split type 0 is totally transparent in front half */
-	state->m_bg_tilemap->set_transmask(1,0x01,0xfe); /* split type 1 has pen 0 transparent in front half */
+	m_bg_tilemap->set_transmask(0,0xff,0x00); /* split type 0 is totally transparent in front half */
+	m_bg_tilemap->set_transmask(1,0x01,0xfe); /* split type 1 has pen 0 transparent in front half */
 
-	machine.tilemap().set_flip_all(TILEMAP_FLIPX);
+	machine().tilemap().set_flip_all(TILEMAP_FLIPX);
 }
 
 

@@ -181,14 +181,13 @@ static const ym2203_interface ym2203_interface_2 =
 
 
 
-static MACHINE_START( labyrunr )
+void labyrunr_state::machine_start()
 {
-	labyrunr_state *state = machine.driver_data<labyrunr_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
 
-	state->m_k007121 = machine.device("k007121");
+	m_k007121 = machine().device("k007121");
 }
 
 static MACHINE_CONFIG_START( labyrunr, labyrunr_state )
@@ -199,7 +198,6 @@ static MACHINE_CONFIG_START( labyrunr, labyrunr_state )
 	MCFG_CPU_VBLANK_INT("screen", labyrunr_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT(labyrunr_timer_interrupt, 4*60)
 
-	MCFG_MACHINE_START(labyrunr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -212,8 +210,6 @@ static MACHINE_CONFIG_START( labyrunr, labyrunr_state )
 	MCFG_GFXDECODE(labyrunr)
 	MCFG_PALETTE_LENGTH(2*8*16*16)
 
-	MCFG_PALETTE_INIT(labyrunr)
-	MCFG_VIDEO_START(labyrunr)
 
 	MCFG_K007121_ADD("k007121")
 	MCFG_K051733_ADD("k051733")

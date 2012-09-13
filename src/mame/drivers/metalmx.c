@@ -264,7 +264,7 @@ Logic:
  *
  *************************************/
 
-static MACHINE_RESET( metalmx );
+
 
 
 /*************************************
@@ -273,7 +273,7 @@ static MACHINE_RESET( metalmx );
  *
  *************************************/
 
-static VIDEO_START( metalmx )
+void metalmx_state::video_start()
 {
 
 }
@@ -750,7 +750,6 @@ static MACHINE_CONFIG_START( metalmx, metalmx_state )
 	MCFG_CPU_CONFIG(dsp32c_config)
 	MCFG_CPU_PROGRAM_MAP(dsp32c_2_map)
 
-	MCFG_MACHINE_RESET(metalmx)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -762,7 +761,6 @@ static MACHINE_CONFIG_START( metalmx, metalmx_state )
 	MCFG_PALETTE_LENGTH(65536)
 	MCFG_PALETTE_INIT(RRRRR_GGGGGG_BBBBB)
 
-	MCFG_VIDEO_START(metalmx)
 
 	MCFG_FRAGMENT_ADD(cage)
 MACHINE_CONFIG_END
@@ -778,12 +776,11 @@ DRIVER_INIT_MEMBER(metalmx_state,metalmx)
 	cage_set_irq_handler(cage_irq_callback);
 }
 
-static MACHINE_RESET( metalmx )
+void metalmx_state::machine_reset()
 {
-	metalmx_state *state = machine.driver_data<metalmx_state>();
 
-	state->m_dsp32c_1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	state->m_dsp32c_2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp32c_1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp32c_2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 

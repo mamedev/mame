@@ -128,14 +128,13 @@ void jpmimpct_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int s
  *
  *************************************/
 
-VIDEO_START( jpmimpct )
+VIDEO_START_MEMBER(jpmimpct_state,jpmimpct)
 {
-	jpmimpct_state *state = machine.driver_data<jpmimpct_state>();
-	memset(&state->m_bt477, 0, sizeof(state->m_bt477));
+	memset(&m_bt477, 0, sizeof(m_bt477));
 
-	state_save_register_global(machine, state->m_bt477.address);
-	state_save_register_global(machine, state->m_bt477.addr_cnt);
-	state_save_register_global(machine, state->m_bt477.pixmask);
-	state_save_register_global(machine, state->m_bt477.command);
-	state_save_register_global(machine, state->m_bt477.color);
+	state_save_register_global(machine(), m_bt477.address);
+	state_save_register_global(machine(), m_bt477.addr_cnt);
+	state_save_register_global(machine(), m_bt477.pixmask);
+	state_save_register_global(machine(), m_bt477.command);
+	state_save_register_global(machine(), m_bt477.color);
 }

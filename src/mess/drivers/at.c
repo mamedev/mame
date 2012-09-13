@@ -380,8 +380,8 @@ static SLOT_INTERFACE_START(pc_isa16_cards)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( at_motherboard )
-	MCFG_MACHINE_START( at )
-	MCFG_MACHINE_RESET( at )
+	MCFG_MACHINE_START_OVERRIDE(at_state, at )
+	MCFG_MACHINE_RESET_OVERRIDE(at_state, at )
 
 	MCFG_PIT8254_ADD( "pit8254", at_pit8254_config )
 

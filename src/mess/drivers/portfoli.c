@@ -645,10 +645,10 @@ INPUT_PORTS_END
 //  PALETTE_INIT( portfolio )
 //-------------------------------------------------
 
-static PALETTE_INIT( portfolio )
+void portfolio_state::palette_init()
 {
-	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
+	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
+	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
 }
 
 //-------------------------------------------------
@@ -845,7 +845,6 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(portfolio)
 
 	MCFG_GFXDECODE(portfolio)
 

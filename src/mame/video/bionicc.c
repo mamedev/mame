@@ -89,18 +89,17 @@ TILE_GET_INFO_MEMBER(bionicc_state::get_tx_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( bionicc )
+void bionicc_state::video_start()
 {
-	bionicc_state *state = machine.driver_data<bionicc_state>();
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bionicc_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bionicc_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bionicc_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bionicc_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bionicc_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bionicc_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
 
-	state->m_tx_tilemap->set_transparent_pen(3);
-	state->m_fg_tilemap->set_transmask(0, 0xffff, 0x8000); /* split type 0 is completely transparent in front half */
-	state->m_fg_tilemap->set_transmask(1, 0xffc1, 0x803e); /* split type 1 has pens 1-5 opaque in front half */
-	state->m_bg_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(3);
+	m_fg_tilemap->set_transmask(0, 0xffff, 0x8000); /* split type 0 is completely transparent in front half */
+	m_fg_tilemap->set_transmask(1, 0xffc1, 0x803e); /* split type 1 has pens 1-5 opaque in front half */
+	m_bg_tilemap->set_transparent_pen(15);
 }
 
 

@@ -75,6 +75,7 @@ public:
 	DECLARE_READ8_MEMBER(ronjan_prot_status_r);
 	DECLARE_READ8_MEMBER(ronjan_patched_prot_r);
 	DECLARE_DRIVER_INIT(ronjan);
+	virtual void video_start();
 };
 
 
@@ -162,7 +163,7 @@ const address_space_config *janshi_vdp_device::memory_space_config(address_space
 
 
 
-static VIDEO_START( pinkiri8 )
+void pinkiri8_state::video_start()
 {
 
 }
@@ -1143,7 +1144,6 @@ static MACHINE_CONFIG_START( pinkiri8, pinkiri8_state )
 	MCFG_GFXDECODE(pinkiri8)
 	MCFG_PALETTE_LENGTH(0x2000)
 
-	MCFG_VIDEO_START(pinkiri8)
 
 	MCFG_DEVICE_ADD("janshivdp", JANSHIVDP, 0)
 

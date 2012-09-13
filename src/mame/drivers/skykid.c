@@ -88,13 +88,12 @@ WRITE8_MEMBER(skykid_state::skykid_irq_2_ctrl_w)
 		machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
-static MACHINE_START( skykid )
+void skykid_state::machine_start()
 {
-	skykid_state *state = machine.driver_data<skykid_state>();
 	/* configure the banks */
-	state->membank("bank1")->configure_entries(0, 2, state->memregion("maincpu")->base() + 0x10000, 0x2000);
+	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x2000);
 
-	state_save_register_global(machine, state->m_inputport_selected);
+	state_save_register_global(machine(), m_inputport_selected);
 }
 
 
@@ -455,7 +454,6 @@ static MACHINE_CONFIG_START( skykid, skykid_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* we need heavy synch */
 
-	MCFG_MACHINE_START(skykid)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -468,8 +466,6 @@ static MACHINE_CONFIG_START( skykid, skykid_state )
 	MCFG_GFXDECODE(skykid)
 	MCFG_PALETTE_LENGTH(64*4+128*4+64*8)
 
-	MCFG_PALETTE_INIT(skykid)
-	MCFG_VIDEO_START(skykid)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

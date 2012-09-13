@@ -22,10 +22,9 @@ XTAL        :   18.432 MHz
 #include "audio/wiping.h"
 #include "includes/clshroad.h"
 
-static MACHINE_RESET( clshroad )
+void clshroad_state::machine_reset()
 {
-	clshroad_state *state = machine.driver_data<clshroad_state>();
-	state->flip_screen_set(0);
+	flip_screen_set(0);
 }
 
 
@@ -238,7 +237,6 @@ static MACHINE_CONFIG_START( firebatl, clshroad_state )
 	MCFG_CPU_PROGRAM_MAP(clshroad_sound_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ, no NMI */
 
-	MCFG_MACHINE_RESET(clshroad)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -251,8 +249,8 @@ static MACHINE_CONFIG_START( firebatl, clshroad_state )
 	MCFG_GFXDECODE(firebatl)
 	MCFG_PALETTE_LENGTH(512+64*4)
 
-	MCFG_PALETTE_INIT(firebatl)
-	MCFG_VIDEO_START(firebatl)
+	MCFG_PALETTE_INIT_OVERRIDE(clshroad_state,firebatl)
+	MCFG_VIDEO_START_OVERRIDE(clshroad_state,firebatl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -272,7 +270,6 @@ static MACHINE_CONFIG_START( clshroad, clshroad_state )
 	MCFG_CPU_PROGRAM_MAP(clshroad_sound_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ, no NMI */
 
-	MCFG_MACHINE_RESET(clshroad)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -285,8 +282,8 @@ static MACHINE_CONFIG_START( clshroad, clshroad_state )
 	MCFG_GFXDECODE(clshroad)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(clshroad)
-	MCFG_VIDEO_START(clshroad)
+	MCFG_PALETTE_INIT_OVERRIDE(clshroad_state,clshroad)
+	MCFG_VIDEO_START_OVERRIDE(clshroad_state,clshroad)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -2,7 +2,7 @@
 #include "includes/usgames.h"
 
 
-PALETTE_INIT(usgames)
+void usgames_state::palette_init()
 {
 	int j;
 
@@ -25,7 +25,7 @@ PALETTE_INIT(usgames)
 		g = 0x7f * g * (i + 1);
 		b = 0x7f * b * (i + 1);
 
-		palette_set_color(machine,j,MAKE_RGB(r, g, b));
+		palette_set_color(machine(),j,MAKE_RGB(r, g, b));
 	}
 }
 
@@ -41,11 +41,10 @@ TILE_GET_INFO_MEMBER(usgames_state::get_usgames_tile_info)
 	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
 }
 
-VIDEO_START(usgames)
+void usgames_state::video_start()
 {
-	usgames_state *state = machine.driver_data<usgames_state>();
-	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(usgames_state::get_usgames_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,32);
-	machine.gfx[0]->set_source(state->m_charram);
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(usgames_state::get_usgames_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	machine().gfx[0]->set_source(m_charram);
 }
 
 

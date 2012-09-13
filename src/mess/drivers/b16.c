@@ -41,6 +41,8 @@ public:
 
 	mc6845_device *m_mc6845;
 	i8237_device  *m_dma8237;
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 #define mc6845_h_char_total 	(m_crtc_vreg[0])
@@ -233,15 +235,14 @@ static GFXDECODE_START( b16 )
 	GFXDECODE_ENTRY( "pcg", 0x0000, b16_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_START(b16)
+void b16_state::machine_start()
 {
-	b16_state *state = machine.driver_data<b16_state>();
 
-	state->m_dma8237 = machine.device<i8237_device>( "dma8237" );
-	state->m_mc6845 = machine.device<mc6845_device>("crtc");
+	m_dma8237 = machine().device<i8237_device>( "dma8237" );
+	m_mc6845 = machine().device<mc6845_device>("crtc");
 }
 
-static MACHINE_RESET(b16)
+void b16_state::machine_reset()
 {
 }
 
@@ -282,8 +283,6 @@ static MACHINE_CONFIG_START( b16, b16_state )
 	MCFG_CPU_PROGRAM_MAP(b16_map)
 	MCFG_CPU_IO_MAP(b16_io)
 
-	MCFG_MACHINE_START(b16)
-	MCFG_MACHINE_RESET(b16)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

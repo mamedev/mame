@@ -61,6 +61,20 @@ public:
 	TILE_GET_INFO_MEMBER(get_gx_psac3_alt_tile_info);
 	TILE_GET_INFO_MEMBER(get_gx_psac1a_tile_info);
 	TILE_GET_INFO_MEMBER(get_gx_psac1b_tile_info);
+	DECLARE_MACHINE_START(konamigx);
+	DECLARE_MACHINE_RESET(konamigx);
+	DECLARE_VIDEO_START(konamigx_5bpp);
+	DECLARE_VIDEO_START(dragoonj);
+	DECLARE_VIDEO_START(le2);
+	DECLARE_VIDEO_START(konamigx_6bpp);
+	DECLARE_VIDEO_START(konamigx_6bpp_2);
+	DECLARE_VIDEO_START(opengolf);
+	DECLARE_VIDEO_START(racinfrc);
+	DECLARE_VIDEO_START(konamigx_type3);
+	DECLARE_VIDEO_START(konamigx_type4);
+	DECLARE_VIDEO_START(konamigx_type4_vsn);
+	DECLARE_VIDEO_START(konamigx_type4_sd2);
+	DECLARE_VIDEO_START(winspike);
 };
 
 
@@ -134,18 +148,18 @@ void konamigx_mixer_primode(int mode);
 void konamigx_objdma(void);
 extern UINT16 *K053247_ram;
 
-VIDEO_START(konamigx_5bpp);
-VIDEO_START(konamigx_6bpp);
-VIDEO_START(konamigx_6bpp_2);
-VIDEO_START(konamigx_type3);
-VIDEO_START(konamigx_type4);
-VIDEO_START(konamigx_type4_sd2);
-VIDEO_START(konamigx_type4_vsn);
-VIDEO_START(le2);
-VIDEO_START(dragoonj);
-VIDEO_START(winspike);
-VIDEO_START(opengolf);
-VIDEO_START(racinfrc);
+
+
+
+
+
+
+
+
+
+
+
+
 SCREEN_UPDATE_RGB32(konamigx);
 SCREEN_UPDATE_RGB32(konamigx_left);
 SCREEN_UPDATE_RGB32(konamigx_right);

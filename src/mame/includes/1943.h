@@ -43,6 +43,9 @@ public:
 	TILE_GET_INFO_MEMBER(c1943_get_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(c1943_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(c1943_get_fg_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 

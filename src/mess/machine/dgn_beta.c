@@ -1104,24 +1104,23 @@ static void dgnbeta_reset(running_machine &machine)
     state->m_wd2797_written=0;
 }
 
-MACHINE_START( dgnbeta )
+void dgn_beta_state::machine_start()
 {
-	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	logerror("MACHINE_START( dgnbeta )\n");
 
-	if (machine.device<cpu_device>(MAINCPU_TAG)->debug()) {
-		machine.device<cpu_device>(MAINCPU_TAG)->debug()->set_dasm_override(dgnbeta_dasm_override);
+	if (machine().device<cpu_device>(MAINCPU_TAG)->debug()) {
+		machine().device<cpu_device>(MAINCPU_TAG)->debug()->set_dasm_override(dgnbeta_dasm_override);
 	}
 
-	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(dgnbeta_reset),&machine));
-	dgnbeta_reset(machine);
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(dgnbeta_reset),&machine()));
+	dgnbeta_reset(machine());
 	/* setup debug commands */
-	if (machine.debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		debug_console_register_command(machine, "beta_dat_log", CMDFLAG_NONE, 0, 0, 0, execute_beta_dat_log);
-		debug_console_register_command(machine, "beta_key_dump", CMDFLAG_NONE, 0, 0, 0, execute_beta_key_dump);
+		debug_console_register_command(machine(), "beta_dat_log", CMDFLAG_NONE, 0, 0, 0, execute_beta_dat_log);
+		debug_console_register_command(machine(), "beta_key_dump", CMDFLAG_NONE, 0, 0, 0, execute_beta_key_dump);
 	}
-	state->m_LogDatWrites=0;
+	m_LogDatWrites=0;
 }
 
 

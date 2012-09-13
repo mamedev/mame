@@ -13,19 +13,19 @@
 #include "includes/polyplay.h"
 
 
-PALETTE_INIT( polyplay )
+void polyplay_state::palette_init()
 {
-	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00));
-	palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0xff));
+	palette_set_color(machine(),0,MAKE_RGB(0x00,0x00,0x00));
+	palette_set_color(machine(),1,MAKE_RGB(0xff,0xff,0xff));
 
-	palette_set_color(machine,2,MAKE_RGB(0x00,0x00,0x00));
-	palette_set_color(machine,3,MAKE_RGB(0xff,0x00,0x00));
-	palette_set_color(machine,4,MAKE_RGB(0x00,0xff,0x00));
-	palette_set_color(machine,5,MAKE_RGB(0xff,0xff,0x00));
-	palette_set_color(machine,6,MAKE_RGB(0x00,0x00,0xff));
-	palette_set_color(machine,7,MAKE_RGB(0xff,0x00,0xff));
-	palette_set_color(machine,8,MAKE_RGB(0x00,0xff,0xff));
-	palette_set_color(machine,9,MAKE_RGB(0xff,0xff,0xff));
+	palette_set_color(machine(),2,MAKE_RGB(0x00,0x00,0x00));
+	palette_set_color(machine(),3,MAKE_RGB(0xff,0x00,0x00));
+	palette_set_color(machine(),4,MAKE_RGB(0x00,0xff,0x00));
+	palette_set_color(machine(),5,MAKE_RGB(0xff,0xff,0x00));
+	palette_set_color(machine(),6,MAKE_RGB(0x00,0x00,0xff));
+	palette_set_color(machine(),7,MAKE_RGB(0xff,0x00,0xff));
+	palette_set_color(machine(),8,MAKE_RGB(0x00,0xff,0xff));
+	palette_set_color(machine(),9,MAKE_RGB(0xff,0xff,0xff));
 }
 
 
@@ -39,10 +39,9 @@ WRITE8_MEMBER(polyplay_state::polyplay_characterram_w)
 	}
 }
 
-VIDEO_START( polyplay )
+void polyplay_state::video_start()
 {
-	polyplay_state *state = machine.driver_data<polyplay_state>();
-	machine.gfx[1]->set_source(state->m_characterram);
+	machine().gfx[1]->set_source(m_characterram);
 }
 
 

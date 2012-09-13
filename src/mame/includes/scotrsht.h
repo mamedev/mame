@@ -23,12 +23,14 @@ public:
 	DECLARE_WRITE8_MEMBER(scotrsht_charbank_w);
 	DECLARE_WRITE8_MEMBER(scotrsht_palettebank_w);
 	TILE_GET_INFO_MEMBER(scotrsht_get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/scotrsht.c -----------*/
 
 
-PALETTE_INIT( scotrsht );
-VIDEO_START( scotrsht );
+
+
 SCREEN_UPDATE_IND16( scotrsht );

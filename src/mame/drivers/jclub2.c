@@ -140,6 +140,9 @@ public:
 	DECLARE_DRIVER_INIT(darkhors);
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
+	DECLARE_VIDEO_START(darkhors);
+	DECLARE_VIDEO_START(jclub2);
+	DECLARE_VIDEO_START(jclub2o);
 };
 
 
@@ -153,7 +156,7 @@ public:
 
 ***************************************************************************/
 
-static VIDEO_START( darkhors );
+
 static SCREEN_UPDATE_IND16( darkhors );
 
 
@@ -217,15 +220,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-static VIDEO_START( darkhors )
+VIDEO_START_MEMBER(darkhors_state,darkhors)
 {
-	darkhors_state *state = machine.driver_data<darkhors_state>();
-	state->m_tmap =	&machine.tilemap().create(tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
-	state->m_tmap2= &machine.tilemap().create(tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_1),state), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
-	state->m_tmap->set_transparent_pen(0);
-	state->m_tmap2->set_transparent_pen(0);
+	m_tmap =	&machine().tilemap().create(tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
+	m_tmap2= &machine().tilemap().create(tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
+	m_tmap->set_transparent_pen(0);
+	m_tmap2->set_transparent_pen(0);
 
-	machine.gfx[0]->set_granularity(64); /* 256 colour sprites with palette selectable on 64 colour boundaries */
+	machine().gfx[0]->set_granularity(64); /* 256 colour sprites with palette selectable on 64 colour boundaries */
 }
 
 static SCREEN_UPDATE_IND16( darkhors )
@@ -701,7 +703,7 @@ static MACHINE_CONFIG_START( darkhors, darkhors_state )
 	MCFG_GFXDECODE(darkhors)
 	MCFG_PALETTE_LENGTH(0x10000)
 
-	MCFG_VIDEO_START(darkhors)
+	MCFG_VIDEO_START_OVERRIDE(darkhors_state,darkhors)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -712,7 +714,7 @@ MACHINE_CONFIG_END
 
 
 
-static VIDEO_START(jclub2)
+VIDEO_START_MEMBER(darkhors_state,jclub2)
 {
 
 }
@@ -749,7 +751,7 @@ static MACHINE_CONFIG_START( jclub2, darkhors_state )
 
 	MCFG_PALETTE_LENGTH(0x10000)
 
-	MCFG_VIDEO_START(jclub2)
+	MCFG_VIDEO_START_OVERRIDE(darkhors_state,jclub2)
 MACHINE_CONFIG_END
 
 
@@ -778,7 +780,7 @@ static const st0016_interface st0016_config =
 	&st0016_charram
 };
 
-static VIDEO_START(jclub2o)
+VIDEO_START_MEMBER(darkhors_state,jclub2o)
 {
 
 }
@@ -814,7 +816,7 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
 	st0020_device::set_is_jclub2o(*device, 1);
 
-	MCFG_VIDEO_START(jclub2o)
+	MCFG_VIDEO_START_OVERRIDE(darkhors_state,jclub2o)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

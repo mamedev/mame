@@ -202,20 +202,18 @@ GFXDECODE_END
 
 /* Machine Driver */
 
-static MACHINE_START( bogeyman )
+void bogeyman_state::machine_start()
 {
-	bogeyman_state *state = machine.driver_data<bogeyman_state>();
 
-	state->save_item(NAME(state->m_psg_latch));
-	state->save_item(NAME(state->m_last_write));
+	save_item(NAME(m_psg_latch));
+	save_item(NAME(m_last_write));
 }
 
-static MACHINE_RESET( bogeyman )
+void bogeyman_state::machine_reset()
 {
-	bogeyman_state *state = machine.driver_data<bogeyman_state>();
 
-	state->m_psg_latch = 0;
-	state->m_last_write = 0;
+	m_psg_latch = 0;
+	m_last_write = 0;
 }
 
 WRITE8_MEMBER(bogeyman_state::bogeyman_colbank_w)
@@ -245,8 +243,6 @@ static MACHINE_CONFIG_START( bogeyman, bogeyman_state )
 	MCFG_CPU_PROGRAM_MAP(bogeyman_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 16*60) // Controls sound
 
-	MCFG_MACHINE_START(bogeyman)
-	MCFG_MACHINE_RESET(bogeyman)
 
 	// video hardware
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -261,8 +257,6 @@ static MACHINE_CONFIG_START( bogeyman, bogeyman_state )
 	MCFG_GFXDECODE(bogeyman)
 	MCFG_PALETTE_LENGTH(16+256)
 
-	MCFG_PALETTE_INIT(bogeyman)
-	MCFG_VIDEO_START(bogeyman)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

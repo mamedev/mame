@@ -10,12 +10,12 @@
 #include "includes/lvcards.h"
 
 
-PALETTE_INIT( ponttehk )
+PALETTE_INIT_MEMBER(lvcards_state,ponttehk)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	for ( i = 0; i < machine.total_colors(); i++ )
+	for ( i = 0; i < machine().total_colors(); i++ )
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -27,31 +27,31 @@ PALETTE_INIT( ponttehk )
 		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		/* green component */
-		bit0 = (color_prom[machine.total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[machine.total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[machine.total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[machine.total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[machine().total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[machine().total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[machine().total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[machine().total_colors()] >> 3) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		/* blue component */
-		bit0 = (color_prom[2*machine.total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[2*machine.total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[2*machine.total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[2*machine.total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[2*machine().total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[2*machine().total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[2*machine().total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[2*machine().total_colors()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
 }
 
-PALETTE_INIT( lvcards ) //Ever so slightly different, but different enough.
+void lvcards_state::palette_init()//Ever so slightly different, but different enough.
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	for ( i = 0; i < machine.total_colors(); i++ )
+	for ( i = 0; i < machine().total_colors(); i++ )
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -63,20 +63,20 @@ PALETTE_INIT( lvcards ) //Ever so slightly different, but different enough.
 		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		/* green component */
-		bit0 = (color_prom[machine.total_colors()] >> 0) & 0x11;
-		bit1 = (color_prom[machine.total_colors()] >> 1) & 0x11;
-		bit2 = (color_prom[machine.total_colors()] >> 2) & 0x11;
-		bit3 = (color_prom[machine.total_colors()] >> 3) & 0x11;
+		bit0 = (color_prom[machine().total_colors()] >> 0) & 0x11;
+		bit1 = (color_prom[machine().total_colors()] >> 1) & 0x11;
+		bit2 = (color_prom[machine().total_colors()] >> 2) & 0x11;
+		bit3 = (color_prom[machine().total_colors()] >> 3) & 0x11;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		/* blue component */
-		bit0 = (color_prom[2*machine.total_colors()] >> 0) & 0x11;
-		bit1 = (color_prom[2*machine.total_colors()] >> 1) & 0x11;
-		bit2 = (color_prom[2*machine.total_colors()] >> 2) & 0x11;
-		bit3 = (color_prom[2*machine.total_colors()] >> 3) & 0x11;
+		bit0 = (color_prom[2*machine().total_colors()] >> 0) & 0x11;
+		bit1 = (color_prom[2*machine().total_colors()] >> 1) & 0x11;
+		bit2 = (color_prom[2*machine().total_colors()] >> 2) & 0x11;
+		bit3 = (color_prom[2*machine().total_colors()] >> 3) & 0x11;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -104,10 +104,9 @@ TILE_GET_INFO_MEMBER(lvcards_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
-VIDEO_START( lvcards )
+void lvcards_state::video_start()
 {
-	lvcards_state *state = machine.driver_data<lvcards_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lvcards_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lvcards_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 }
 

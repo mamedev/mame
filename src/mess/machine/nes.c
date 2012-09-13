@@ -202,21 +202,20 @@ int nes_ppu_vidaccess( device_t *device, int address, int data )
 	return data;
 }
 
-MACHINE_RESET( nes )
+void nes_state::machine_reset()
 {
-	nes_state *state = machine.driver_data<nes_state>();
 
 	/* Reset the mapper variables. Will also mark the char-gen ram as dirty */
-	if (state->m_disk_expansion && state->m_pcb_id == NO_BOARD)
-		state->m_ppu->set_hblank_callback(fds_irq);
+	if (m_disk_expansion && m_pcb_id == NO_BOARD)
+		m_ppu->set_hblank_callback(fds_irq);
 	else
-		nes_pcb_reset(machine);
+		nes_pcb_reset(machine());
 
 	/* Reset the serial input ports */
-	state->m_in_0.shift = 0;
-	state->m_in_1.shift = 0;
+	m_in_0.shift = 0;
+	m_in_1.shift = 0;
 
-	machine.device("maincpu")->reset();
+	machine().device("maincpu")->reset();
 }
 
 static TIMER_CALLBACK( nes_irq_callback )
@@ -288,33 +287,32 @@ static void nes_state_register( running_machine &machine )
 	machine.save().register_postload(save_prepost_delegate(FUNC(nes_banks_restore), state));
 }
 
-MACHINE_START( nes )
+void nes_state::machine_start()
 {
-	nes_state *state = machine.driver_data<nes_state>();
 
-	state->m_ppu = machine.device<ppu2c0x_device>("ppu");
-	init_nes_core(machine);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(nes_machine_stop),&machine));
+	m_ppu = machine().device<ppu2c0x_device>("ppu");
+	init_nes_core(machine());
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(nes_machine_stop),&machine()));
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_sound = machine.device("nessound");
-	state->m_cart = machine.device("cart");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_sound = machine().device("nessound");
+	m_cart = machine().device("cart");
 
 	// If we're starting famicom with no disk inserted, we still haven't initialized the VRAM needed for
 	// video emulation, so we need to take care of it now
-	if (!state->m_vram)
+	if (!m_vram)
 	{
-		state->m_vram = auto_alloc_array(machine, UINT8, 0x4000);
+		m_vram = auto_alloc_array(machine(), UINT8, 0x4000);
 		for (int i = 0; i < 8; i++)
 		{
-			state->m_chr_map[i].source = CHRRAM;
-			state->m_chr_map[i].origin = i * 0x400; // for save state uses!
-			state->m_chr_map[i].access = &state->m_vram[state->m_chr_map[i].origin];
+			m_chr_map[i].source = CHRRAM;
+			m_chr_map[i].origin = i * 0x400; // for save state uses!
+			m_chr_map[i].access = &m_vram[m_chr_map[i].origin];
 		}
 	}
 
-	state->m_irq_timer = machine.scheduler().timer_alloc(FUNC(nes_irq_callback));
-	nes_state_register(machine);
+	m_irq_timer = machine().scheduler().timer_alloc(FUNC(nes_irq_callback));
+	nes_state_register(machine());
 }
 
 static void nes_machine_stop( running_machine &machine )

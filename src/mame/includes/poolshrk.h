@@ -29,6 +29,8 @@ public:
 	DECLARE_READ8_MEMBER(poolshrk_irq_reset_r);
 	DECLARE_DRIVER_INIT(poolshrk);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -44,6 +46,6 @@ DISCRETE_SOUND_EXTERN( poolshrk );
 
 /*----------- defined in video/poolshrk.c -----------*/
 
-VIDEO_START( poolshrk );
+
 SCREEN_UPDATE_IND16( poolshrk );
 

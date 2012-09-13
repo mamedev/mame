@@ -79,13 +79,15 @@ public:
 	DECLARE_WRITE8_MEMBER(mario_sh3_w);
 	DECLARE_WRITE8_MEMBER(mario_z80dma_rdy_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 /*----------- defined in video/mario.c -----------*/
 
 
-PALETTE_INIT( mario );
-VIDEO_START( mario );
+
+
 SCREEN_UPDATE_IND16( mario );
 
 

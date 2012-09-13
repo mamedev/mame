@@ -568,48 +568,46 @@ static INTERRUPT_GEN( slave_interrupt )
 
 /* Machine Initialization */
 
-static MACHINE_START( airbustr )
+void airbustr_state::machine_start()
 {
-	airbustr_state *state = machine.driver_data<airbustr_state>();
-	UINT8 *MASTER = state->memregion("master")->base();
-	UINT8 *SLAVE = state->memregion("slave")->base();
-	UINT8 *AUDIO = state->memregion("audiocpu")->base();
+	UINT8 *MASTER = memregion("master")->base();
+	UINT8 *SLAVE = memregion("slave")->base();
+	UINT8 *AUDIO = memregion("audiocpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 3, &MASTER[0x00000], 0x4000);
-	state->membank("bank1")->configure_entries(3, 5, &MASTER[0x10000], 0x4000);
-	state->membank("bank2")->configure_entries(0, 3, &SLAVE[0x00000], 0x4000);
-	state->membank("bank2")->configure_entries(3, 5, &SLAVE[0x10000], 0x4000);
-	state->membank("bank3")->configure_entries(0, 3, &AUDIO[0x00000], 0x4000);
-	state->membank("bank3")->configure_entries(3, 5, &AUDIO[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 3, &MASTER[0x00000], 0x4000);
+	membank("bank1")->configure_entries(3, 5, &MASTER[0x10000], 0x4000);
+	membank("bank2")->configure_entries(0, 3, &SLAVE[0x00000], 0x4000);
+	membank("bank2")->configure_entries(3, 5, &SLAVE[0x10000], 0x4000);
+	membank("bank3")->configure_entries(0, 3, &AUDIO[0x00000], 0x4000);
+	membank("bank3")->configure_entries(3, 5, &AUDIO[0x10000], 0x4000);
 
-	state->m_master = machine.device("master");
-	state->m_slave = machine.device("slave");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_pandora = machine.device("pandora");
+	m_master = machine().device("master");
+	m_slave = machine().device("slave");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_pandora = machine().device("pandora");
 
-	state->save_item(NAME(state->m_soundlatch_status));
-	state->save_item(NAME(state->m_soundlatch2_status));
-	state->save_item(NAME(state->m_bg_scrollx));
-	state->save_item(NAME(state->m_bg_scrolly));
-	state->save_item(NAME(state->m_fg_scrollx));
-	state->save_item(NAME(state->m_fg_scrolly));
-	state->save_item(NAME(state->m_highbits));
+	save_item(NAME(m_soundlatch_status));
+	save_item(NAME(m_soundlatch2_status));
+	save_item(NAME(m_bg_scrollx));
+	save_item(NAME(m_bg_scrolly));
+	save_item(NAME(m_fg_scrollx));
+	save_item(NAME(m_fg_scrolly));
+	save_item(NAME(m_highbits));
 }
 
-static MACHINE_RESET( airbustr )
+void airbustr_state::machine_reset()
 {
-	airbustr_state *state = machine.driver_data<airbustr_state>();
 
-	state->m_soundlatch_status = state->m_soundlatch2_status = 0;
-	state->m_bg_scrollx = 0;
-	state->m_bg_scrolly = 0;
-	state->m_fg_scrollx = 0;
-	state->m_fg_scrolly = 0;
-	state->m_highbits = 0;
+	m_soundlatch_status = m_soundlatch2_status = 0;
+	m_bg_scrollx = 0;
+	m_bg_scrolly = 0;
+	m_fg_scrollx = 0;
+	m_fg_scrolly = 0;
+	m_highbits = 0;
 
-	state->membank("bank1")->set_entry(0x02);
-	state->membank("bank2")->set_entry(0x02);
-	state->membank("bank3")->set_entry(0x02);
+	membank("bank1")->set_entry(0x02);
+	membank("bank2")->set_entry(0x02);
+	membank("bank3")->set_entry(0x02);
 }
 
 /* Machine Driver */
@@ -641,8 +639,6 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	// Palette RAM is filled by sub cpu with data supplied by main cpu
 							// Maybe a high value is safer in order to avoid glitches
-	MCFG_MACHINE_START(airbustr)
-	MCFG_MACHINE_RESET(airbustr)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
 
 	/* video hardware */
@@ -659,7 +655,6 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", airbustr_pandora_config)
 
-	MCFG_VIDEO_START(airbustr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

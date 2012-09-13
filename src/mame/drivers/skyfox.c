@@ -219,22 +219,20 @@ static INTERRUPT_GEN( skyfox_interrupt )
 	state->m_bg_pos += (state->m_bg_ctrl >> 1) & 0x7;	// maybe..
 }
 
-static MACHINE_START( skyfox )
+void skyfox_state::machine_start()
 {
-	skyfox_state *state = machine.driver_data<skyfox_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
 
-	state->save_item(NAME(state->m_bg_pos));
-	state->save_item(NAME(state->m_bg_ctrl));
+	save_item(NAME(m_bg_pos));
+	save_item(NAME(m_bg_ctrl));
 }
 
-static MACHINE_RESET( skyfox )
+void skyfox_state::machine_reset()
 {
-	skyfox_state *state = machine.driver_data<skyfox_state>();
 
-	state->m_bg_pos = 0;
-	state->m_bg_ctrl = 0;
+	m_bg_pos = 0;
+	m_bg_ctrl = 0;
 }
 
 static MACHINE_CONFIG_START( skyfox, skyfox_state )
@@ -247,8 +245,6 @@ static MACHINE_CONFIG_START( skyfox, skyfox_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/8) /* Verified at 1.789772MHz */
 	MCFG_CPU_PROGRAM_MAP(skyfox_sound_map)
 
-	MCFG_MACHINE_START(skyfox)
-	MCFG_MACHINE_RESET(skyfox)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -261,7 +257,6 @@ static MACHINE_CONFIG_START( skyfox, skyfox_state )
 	MCFG_GFXDECODE(skyfox)
 	MCFG_PALETTE_LENGTH(256+256)	/* 256 static colors (+256 for the background??) */
 
-	MCFG_PALETTE_INIT(skyfox)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

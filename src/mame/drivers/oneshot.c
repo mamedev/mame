@@ -340,33 +340,31 @@ static const ym3812_interface ym3812_config =
 	irq_handler
 };
 
-static MACHINE_START( oneshot )
+void oneshot_state::machine_start()
 {
-	oneshot_state *state = machine.driver_data<oneshot_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_gun_x_p1));
-	state->save_item(NAME(state->m_gun_y_p1));
-	state->save_item(NAME(state->m_gun_x_p2));
-	state->save_item(NAME(state->m_gun_y_p2));
-	state->save_item(NAME(state->m_gun_x_shift));
-	state->save_item(NAME(state->m_p1_wobble));
-	state->save_item(NAME(state->m_p2_wobble));
+	save_item(NAME(m_gun_x_p1));
+	save_item(NAME(m_gun_y_p1));
+	save_item(NAME(m_gun_x_p2));
+	save_item(NAME(m_gun_y_p2));
+	save_item(NAME(m_gun_x_shift));
+	save_item(NAME(m_p1_wobble));
+	save_item(NAME(m_p2_wobble));
 }
 
-static MACHINE_RESET( oneshot )
+void oneshot_state::machine_reset()
 {
-	oneshot_state *state = machine.driver_data<oneshot_state>();
 
-	state->m_gun_x_p1 = 0;
-	state->m_gun_y_p1 = 0;
-	state->m_gun_x_p2 = 0;
-	state->m_gun_y_p2 = 0;
-	state->m_gun_x_shift = 0;
-	state->m_p1_wobble = 0;
-	state->m_p2_wobble = 0;
+	m_gun_x_p1 = 0;
+	m_gun_y_p1 = 0;
+	m_gun_x_p2 = 0;
+	m_gun_y_p2 = 0;
+	m_gun_x_shift = 0;
+	m_p1_wobble = 0;
+	m_p2_wobble = 0;
 }
 
 static MACHINE_CONFIG_START( oneshot, oneshot_state )
@@ -379,8 +377,6 @@ static MACHINE_CONFIG_START( oneshot, oneshot_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 5000000)
 	MCFG_CPU_PROGRAM_MAP(oneshot_sound_map)
 
-	MCFG_MACHINE_START(oneshot)
-	MCFG_MACHINE_RESET(oneshot)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -393,7 +389,6 @@ static MACHINE_CONFIG_START( oneshot, oneshot_state )
 	MCFG_GFXDECODE(oneshot)
 	MCFG_PALETTE_LENGTH(0x400)
 
-	MCFG_VIDEO_START(oneshot)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

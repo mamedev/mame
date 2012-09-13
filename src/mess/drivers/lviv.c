@@ -433,7 +433,6 @@ static MACHINE_CONFIG_START( lviv, lviv_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_RESET( lviv )
 
 	MCFG_I8255_ADD( "ppi8255_0", lviv_ppi8255_interface_0 )
 
@@ -449,9 +448,7 @@ static MACHINE_CONFIG_START( lviv, lviv_state )
 	MCFG_SCREEN_UPDATE_STATIC( lviv )
 
 	MCFG_PALETTE_LENGTH(sizeof (lviv_palette) / 3)
-	MCFG_PALETTE_INIT( lviv )
 
-	MCFG_VIDEO_START( lviv )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

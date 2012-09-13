@@ -27,12 +27,13 @@ public:
 	DECLARE_WRITE8_MEMBER(mjkjidai_ctrl_w);
 	DECLARE_WRITE8_MEMBER(adpcm_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/mjkjidai.c -----------*/
 
-VIDEO_START( mjkjidai );
+
 SCREEN_UPDATE_IND16( mjkjidai );
 
 

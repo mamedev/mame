@@ -51,6 +51,10 @@ public:
 	DECLARE_WRITE8_MEMBER(gridlee_cocktail_flip_w);
 	DECLARE_WRITE8_MEMBER(gridlee_videoram_w);
 	DECLARE_WRITE8_MEMBER(gridlee_palette_select_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -87,7 +91,7 @@ extern const device_type GRIDLEE;
 
 /* video driver data & functions */
 
-PALETTE_INIT( gridlee );
-VIDEO_START( gridlee );
+
+
 SCREEN_UPDATE_IND16( gridlee );
 

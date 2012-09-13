@@ -997,13 +997,13 @@ ADDRESS_MAP_END
  Machine Reset
  ***************************************************************************/
 
-static MACHINE_RESET( dn3500 )
+void apollo_state::machine_reset()
 {
-	device_t *cpu = machine.device(MAINCPU);
+	device_t *cpu = machine().device(MAINCPU);
 
-	MLOG1(("machine_reset_dn3500"));
+	//MLOG1(("machine_reset_dn3500"));
 
-	MACHINE_RESET_CALL(apollo);
+	MACHINE_RESET_CALL_MEMBER(apollo);
 
 	// set configuration
 	omti8621_set_verbose(apollo_config(APOLLO_CONF_DISK_TRACE));
@@ -1016,16 +1016,16 @@ static MACHINE_RESET( dn3500 )
 
 		// check label of physical volume and get sector data of logical volume 1
 		// Note: sector data starts with 32 byte block header
-		if (omti8621_get_sector(machine.device(APOLLO_WDC_TAG), 0, db,	sizeof(db), 0) == sizeof(db) &&
+		if (omti8621_get_sector(machine().device(APOLLO_WDC_TAG), 0, db,	sizeof(db), 0) == sizeof(db) &&
 			memcmp (db+0x22, "APOLLO", 6) == 0 &&
-			omti8621_get_sector(machine.device(APOLLO_WDC_TAG), sector1, db,	sizeof(db), 0) == sizeof(db))
+			omti8621_get_sector(machine().device(APOLLO_WDC_TAG), sector1, db,	sizeof(db), 0) == sizeof(db))
 		{
-			MLOG2(("machine_reset_dn3500: node ID is %06X (from ROM)", node_id));
+//			MLOG2(("machine_reset_dn3500: node ID is %06X (from ROM)", node_id));
 
 			// set node_id from UID of logical volume 1 of logical unit 0
 			node_id = (((db[0x49] << 8) | db[0x4a]) << 8) | db[0x4b];
 
-			MLOG2(("machine_reset_dn3500: node ID is %06X (from disk)", node_id));
+//			MLOG2(("machine_reset_dn3500: node ID is %06X (from disk)", node_id));
 		}
 	}
 
@@ -1040,7 +1040,7 @@ static void apollo_reset_instr_callback(device_t *device)
 	DLOG1(("apollo_reset_instr_callback"));
 
 	// reset the CPU board devices
-	MACHINE_RESET_CALL(apollo);
+	apollo->MACHINE_RESET_CALL_MEMBER(apollo);
 	apollo->dma8237_1->reset();
 	apollo->dma8237_2->reset();
 	apollo->pic8259_master->reset();
@@ -1062,14 +1062,14 @@ static void apollo_reset_instr_callback(device_t *device)
  Machine Start
  ***************************************************************************/
 
-static MACHINE_START( dn3500 ) {
-	memory_share *messram = machine.root_device().memshare("messram");
-	MLOG1(("machine_start_dn3500: ram size is %d MB", (int)messram->bytes()/(1024*1024)));
+void apollo_state::machine_start(){
+	memory_share *messram = machine().root_device().memshare("messram");
+	//MLOG1(("machine_start_dn3500: ram size is %d MB", (int)messram->bytes()/(1024*1024)));
 
 	// clear ram
 	memset(messram->ptr(), 0x55, messram->bytes());
 
-	MACHINE_START_CALL(apollo);
+	MACHINE_START_CALL_MEMBER(apollo);
 }
 
 /***************************************************************************
@@ -1206,8 +1206,6 @@ static MACHINE_CONFIG_START( dn3500, apollo_state )
 	MCFG_CPU_PROGRAM_MAP(dn3500_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START( dn3500 )
-	MCFG_MACHINE_RESET( dn3500 )
 
 	MCFG_FRAGMENT_ADD( apollo )
 
@@ -1249,8 +1247,6 @@ static MACHINE_CONFIG_DERIVED( dn3000, dn3500 )
 	MCFG_CPU_PROGRAM_MAP(dn3000_map)
 	MCFG_DEVICE_REMOVE( APOLLO_SIO2_TAG )
 
-	MCFG_MACHINE_START( dn3500 )
-	MCFG_MACHINE_RESET( dn3500 )
 
 	MCFG_RAM_MODIFY("messram")
 	MCFG_RAM_DEFAULT_SIZE("8M")
@@ -1283,8 +1279,6 @@ static MACHINE_CONFIG_DERIVED( dn5500, dn3500 )
 	MCFG_CPU_REPLACE(MAINCPU, M68040, 25000000) /* 25 MHz */
 	MCFG_CPU_PROGRAM_MAP(dn5500_map)
 
-	MCFG_MACHINE_START( dn3500 )
-	MCFG_MACHINE_RESET( dn3500 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dsp5500, dn5500 )

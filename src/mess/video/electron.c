@@ -38,16 +38,15 @@ Mode changes are 'immediate', so any change in RAM access timing occurs exactly 
 static TIMER_CALLBACK( electron_scanline_interrupt );
 
 
-VIDEO_START( electron )
+void electron_state::video_start()
 {
-	electron_state *state = machine.driver_data<electron_state>();
 	int i;
 	for( i = 0; i < 256; i++ ) {
-		state->m_map4[i] = ( ( i & 0x10 ) >> 3 ) | ( i & 0x01 );
-		state->m_map16[i] = ( ( i & 0x40 ) >> 3 ) | ( ( i & 0x10 ) >> 2 ) | ( ( i & 0x04 ) >> 1 ) | ( i & 0x01 );
+		m_map4[i] = ( ( i & 0x10 ) >> 3 ) | ( i & 0x01 );
+		m_map16[i] = ( ( i & 0x40 ) >> 3 ) | ( ( i & 0x10 ) >> 2 ) | ( ( i & 0x04 ) >> 1 ) | ( i & 0x01 );
 	}
-	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(electron_scanline_interrupt));
-	state->m_scanline_timer->adjust( machine.primary_screen->time_until_pos(0), 0, machine.primary_screen->scan_period() );
+	m_scanline_timer = machine().scheduler().timer_alloc(FUNC(electron_scanline_interrupt));
+	m_scanline_timer->adjust( machine().primary_screen->time_until_pos(0), 0, machine().primary_screen->scan_period() );
 }
 
 INLINE UINT8 read_vram( electron_state *state, UINT16 addr )

@@ -44,46 +44,43 @@ Known to exist but not dumped:
  *
  *************************************/
 
-static MACHINE_START( midvunit )
+void midvunit_state::machine_start()
 {
-	midvunit_state *state = machine.driver_data<midvunit_state>();
-	state_save_register_global(machine, state->m_cmos_protected);
-	state_save_register_global(machine, state->m_control_data);
-	state_save_register_global(machine, state->m_adc_data);
-	state_save_register_global(machine, state->m_adc_shift);
-	state_save_register_global(machine, state->m_last_port0);
-	state_save_register_global(machine, state->m_shifter_state);
-	state_save_register_global(machine, state->m_timer_rate);
+	state_save_register_global(machine(), m_cmos_protected);
+	state_save_register_global(machine(), m_control_data);
+	state_save_register_global(machine(), m_adc_data);
+	state_save_register_global(machine(), m_adc_shift);
+	state_save_register_global(machine(), m_last_port0);
+	state_save_register_global(machine(), m_shifter_state);
+	state_save_register_global(machine(), m_timer_rate);
 }
 
 
-static MACHINE_RESET( midvunit )
+void midvunit_state::machine_reset()
 {
-	midvunit_state *state = machine.driver_data<midvunit_state>();
-	dcs_reset_w(machine, 1);
-	dcs_reset_w(machine, 0);
+	dcs_reset_w(machine(), 1);
+	dcs_reset_w(machine(), 0);
 
-	memcpy(state->m_ram_base, state->memregion("user1")->base(), 0x20000*4);
-	machine.device("maincpu")->reset();
+	memcpy(m_ram_base, memregion("user1")->base(), 0x20000*4);
+	machine().device("maincpu")->reset();
 
-	state->m_timer[0] = machine.device<timer_device>("timer0");
-	state->m_timer[1] = machine.device<timer_device>("timer1");
+	m_timer[0] = machine().device<timer_device>("timer0");
+	m_timer[1] = machine().device<timer_device>("timer1");
 }
 
 
-static MACHINE_RESET( midvplus )
+MACHINE_RESET_MEMBER(midvunit_state,midvplus)
 {
-	midvunit_state *state = machine.driver_data<midvunit_state>();
-	dcs_reset_w(machine, 1);
-	dcs_reset_w(machine, 0);
+	dcs_reset_w(machine(), 1);
+	dcs_reset_w(machine(), 0);
 
-	memcpy(state->m_ram_base, state->memregion("user1")->base(), 0x20000*4);
-	machine.device("maincpu")->reset();
+	memcpy(m_ram_base, memregion("user1")->base(), 0x20000*4);
+	machine().device("maincpu")->reset();
 
-	state->m_timer[0] = machine.device<timer_device>("timer0");
-	state->m_timer[1] = machine.device<timer_device>("timer1");
+	m_timer[0] = machine().device<timer_device>("timer0");
+	m_timer[1] = machine().device<timer_device>("timer1");
 
-	machine.device("ide")->reset();
+	machine().device("ide")->reset();
 }
 
 
@@ -1019,8 +1016,6 @@ static MACHINE_CONFIG_START( midvcommon, midvunit_state )
 	MCFG_CPU_ADD("maincpu", TMS32031, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(midvunit_map)
 
-	MCFG_MACHINE_START(midvunit)
-	MCFG_MACHINE_RESET(midvunit)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_ADD("timer0", NULL)
@@ -1033,7 +1028,6 @@ static MACHINE_CONFIG_START( midvcommon, midvunit_state )
 	MCFG_SCREEN_RAW_PARAMS(MIDVUNIT_VIDEO_CLOCK/2, 666, 0, 512, 432, 0, 400)
 	MCFG_SCREEN_UPDATE_STATIC(midvunit)
 
-	MCFG_VIDEO_START(midvunit)
 MACHINE_CONFIG_END
 
 
@@ -1057,7 +1051,7 @@ static MACHINE_CONFIG_DERIVED( midvplus, midvcommon )
 	MCFG_TMS3203X_CONFIG(midvplus_config)
 	MCFG_CPU_PROGRAM_MAP(midvplus_map)
 
-	MCFG_MACHINE_RESET(midvplus)
+	MCFG_MACHINE_RESET_OVERRIDE(midvunit_state,midvplus)
 	MCFG_DEVICE_REMOVE("nvram")
 	MCFG_NVRAM_HANDLER(midway_serial_pic2)
 

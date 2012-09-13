@@ -110,7 +110,7 @@ static const int colortable_source[] =
 	0x01, 0x02
 };
 
-static PALETTE_INIT( skydiver )
+void skydiver_state::palette_init()
 {
 	int i;
 
@@ -125,7 +125,7 @@ static PALETTE_INIT( skydiver )
 		default:  color = MAKE_RGB(0xa0, 0xa0, 0xa0); break; /* grey */
 		}
 
-		palette_set_color(machine, i, color);
+		palette_set_color(machine(), i, color);
 	}
 }
 
@@ -380,7 +380,6 @@ static MACHINE_CONFIG_START( skydiver, skydiver_state )
 	MCFG_CPU_PERIODIC_INT(skydiver_interrupt, 5*60)
 	MCFG_WATCHDOG_VBLANK_INIT(8)	// 128V clocks the same as VBLANK
 
-	MCFG_MACHINE_RESET(skydiver)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -393,8 +392,6 @@ static MACHINE_CONFIG_START( skydiver, skydiver_state )
 	MCFG_GFXDECODE(skydiver)
 	MCFG_PALETTE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
 
-	MCFG_PALETTE_INIT(skydiver)
-	MCFG_VIDEO_START(skydiver)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -233,15 +233,15 @@ static const rgb_t a7800p_palette[256*3] =
 
 
 /* Initialise the palette */
-static PALETTE_INIT(a7800)
+void a7800_state::palette_init()
 {
-	palette_set_colors(machine, 0, a7800_palette, ARRAY_LENGTH(a7800_palette));
+	palette_set_colors(machine(), 0, a7800_palette, ARRAY_LENGTH(a7800_palette));
 }
 
 
-static PALETTE_INIT(a7800p)
+PALETTE_INIT_MEMBER(a7800_state,a7800p)
 {
-	palette_set_colors(machine, 0, a7800p_palette, ARRAY_LENGTH(a7800p_palette));
+	palette_set_colors(machine(), 0, a7800p_palette, ARRAY_LENGTH(a7800p_palette));
 }
 
 
@@ -255,7 +255,6 @@ static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
 	MCFG_CPU_PROGRAM_MAP(a7800_mem)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", a7800_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET(a7800)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -266,9 +265,7 @@ static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
 	MCFG_SCREEN_UPDATE_STATIC(a7800)
 
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(a7800_palette))
-	MCFG_PALETTE_INIT(a7800)
 
-	MCFG_VIDEO_START(a7800)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -305,7 +302,7 @@ static MACHINE_CONFIG_DERIVED( a7800_pal, a7800_ntsc )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(640,312)
 	MCFG_SCREEN_VISIBLE_AREA(0,319,50,50+225)
-	MCFG_PALETTE_INIT( a7800p )
+	MCFG_PALETTE_INIT_OVERRIDE(a7800_state, a7800p )
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("pokey")

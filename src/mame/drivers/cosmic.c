@@ -958,32 +958,30 @@ static const samples_interface cosmicg_samples_interface =
 };
 
 
-static MACHINE_START( cosmic )
+MACHINE_START_MEMBER(cosmic_state,cosmic)
 {
-	cosmic_state *state = machine.driver_data<cosmic_state>();
 
-	state->m_samples = machine.device<samples_device>("samples");
-	state->m_dac = machine.device<dac_device>("dac");
+	m_samples = machine().device<samples_device>("samples");
+	m_dac = machine().device<dac_device>("dac");
 
-	state->save_item(NAME(state->m_sound_enabled));
-	state->save_item(NAME(state->m_march_select));
-	state->save_item(NAME(state->m_gun_die_select));
-	state->save_item(NAME(state->m_dive_bomb_b_select));
-	state->save_item(NAME(state->m_pixel_clock));
+	save_item(NAME(m_sound_enabled));
+	save_item(NAME(m_march_select));
+	save_item(NAME(m_gun_die_select));
+	save_item(NAME(m_dive_bomb_b_select));
+	save_item(NAME(m_pixel_clock));
 
-	state->save_item(NAME(state->m_background_enable));
-	state->save_item(NAME(state->m_color_registers));
+	save_item(NAME(m_background_enable));
+	save_item(NAME(m_color_registers));
 }
 
-static MACHINE_RESET( cosmic )
+MACHINE_RESET_MEMBER(cosmic_state,cosmic)
 {
-	cosmic_state *state = machine.driver_data<cosmic_state>();
 
-	state->m_pixel_clock = 0;
-	state->m_background_enable = 0;
-	state->m_color_registers[0] = 0;
-	state->m_color_registers[1] = 0;
-	state->m_color_registers[2] = 0;
+	m_pixel_clock = 0;
+	m_background_enable = 0;
+	m_color_registers[0] = 0;
+	m_color_registers[1] = 0;
+	m_color_registers[2] = 0;
 }
 
 
@@ -992,8 +990,8 @@ static MACHINE_CONFIG_START( cosmic, cosmic_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,Z80_MASTER_CLOCK/6)	/* 1.8026 MHz*/
 
-	MCFG_MACHINE_START(cosmic)
-	MCFG_MACHINE_RESET(cosmic)
+	MCFG_MACHINE_START_OVERRIDE(cosmic_state,cosmic)
+	MCFG_MACHINE_RESET_OVERRIDE(cosmic_state,cosmic)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1025,7 +1023,7 @@ static MACHINE_CONFIG_DERIVED( panic, cosmic )
 	MCFG_GFXDECODE(panic)
 	MCFG_PALETTE_LENGTH(16+8*4)
 
-	MCFG_PALETTE_INIT(panic)
+	MCFG_PALETTE_INIT_OVERRIDE(cosmic_state,panic)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(panic)
 
@@ -1050,7 +1048,7 @@ static MACHINE_CONFIG_DERIVED( cosmica, cosmic )
 	MCFG_GFXDECODE(cosmica)
 	MCFG_PALETTE_LENGTH(8+16*4)
 
-	MCFG_PALETTE_INIT(cosmica)
+	MCFG_PALETTE_INIT_OVERRIDE(cosmic_state,cosmica)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(cosmica)
 
@@ -1077,8 +1075,8 @@ static MACHINE_CONFIG_START( cosmicg, cosmic_state )
 	MCFG_CPU_PROGRAM_MAP(cosmicg_map)
 	MCFG_CPU_IO_MAP(cosmicg_io_map)
 
-	MCFG_MACHINE_START(cosmic)
-	MCFG_MACHINE_RESET(cosmic)
+	MCFG_MACHINE_START_OVERRIDE(cosmic_state,cosmic)
+	MCFG_MACHINE_RESET_OVERRIDE(cosmic_state,cosmic)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1089,7 +1087,7 @@ static MACHINE_CONFIG_START( cosmicg, cosmic_state )
 
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_PALETTE_INIT(cosmicg)
+	MCFG_PALETTE_INIT_OVERRIDE(cosmic_state,cosmicg)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1112,7 +1110,7 @@ static MACHINE_CONFIG_DERIVED( magspot, cosmic )
 	MCFG_GFXDECODE(panic)
 	MCFG_PALETTE_LENGTH(16+8*4)
 
-	MCFG_PALETTE_INIT(magspot)
+	MCFG_PALETTE_INIT_OVERRIDE(cosmic_state,magspot)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(magspot)
 
@@ -1144,7 +1142,7 @@ static MACHINE_CONFIG_DERIVED( nomnlnd, cosmic )
 	MCFG_GFXDECODE(panic)
 	MCFG_PALETTE_LENGTH(16+8*4)
 
-	MCFG_PALETTE_INIT(nomnlnd)
+	MCFG_PALETTE_INIT_OVERRIDE(cosmic_state,nomnlnd)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(nomnlnd)
 

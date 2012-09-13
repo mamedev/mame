@@ -57,11 +57,12 @@ public:
 	DECLARE_DRIVER_INIT(prtytime);
 	DECLARE_DRIVER_INIT(osman);
 	DECLARE_DRIVER_INIT(chainrec);
+	virtual void video_start();
 };
 
 
 
 /*----------- defined in video/simpl156.c -----------*/
 
-VIDEO_START( simpl156 );
+
 SCREEN_UPDATE_IND16( simpl156 );

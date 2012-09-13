@@ -106,6 +106,9 @@ public:
 	DECLARE_WRITE16_MEMBER(oki1_bank_w);
 	DECLARE_WRITE16_MEMBER(oki2_bank_w);
 	DECLARE_DRIVER_INIT(pasha2);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -339,12 +342,11 @@ static INPUT_PORTS_START( pasha2 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START3 )
 INPUT_PORTS_END
 
-static VIDEO_START( pasha2 )
+void pasha2_state::video_start()
 {
-	pasha2_state *state = machine.driver_data<pasha2_state>();
 
-	state->save_item(NAME(state->m_bitmap0));
-	state->save_item(NAME(state->m_bitmap1));
+	save_item(NAME(m_bitmap0));
+	save_item(NAME(m_bitmap1));
 }
 
 static SCREEN_UPDATE_IND16( pasha2 )
@@ -396,20 +398,18 @@ static SCREEN_UPDATE_IND16( pasha2 )
 	return 0;
 }
 
-static MACHINE_START( pasha2 )
+void pasha2_state::machine_start()
 {
-	pasha2_state *state = machine.driver_data<pasha2_state>();
 
-	state->save_item(NAME(state->m_old_bank));
-	state->save_item(NAME(state->m_vbuffer));
+	save_item(NAME(m_old_bank));
+	save_item(NAME(m_vbuffer));
 }
 
-static MACHINE_RESET( pasha2 )
+void pasha2_state::machine_reset()
 {
-	pasha2_state *state = machine.driver_data<pasha2_state>();
 
-	state->m_old_bank = -1;
-	state->m_vbuffer = 0;
+	m_old_bank = -1;
+	m_vbuffer = 0;
 }
 
 static MACHINE_CONFIG_START( pasha2, pasha2_state )
@@ -420,8 +420,6 @@ static MACHINE_CONFIG_START( pasha2, pasha2_state )
 	MCFG_CPU_IO_MAP(pasha2_io)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(pasha2)
-	MCFG_MACHINE_RESET(pasha2)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
@@ -434,7 +432,6 @@ static MACHINE_CONFIG_START( pasha2, pasha2_state )
 
 	MCFG_PALETTE_LENGTH(0x200)
 
-	MCFG_VIDEO_START(pasha2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

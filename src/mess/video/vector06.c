@@ -10,7 +10,7 @@
 #include "includes/vector06.h"
 
 
-VIDEO_START( vector06 )
+void vector06_state::video_start()
 {
 }
 
@@ -53,8 +53,8 @@ SCREEN_UPDATE_IND16( vector06 )
 	return 0;
 }
 
-PALETTE_INIT( vector06 )
+void vector06_state::palette_init()
 {
 	for (UINT8 i=0; i<16; i++)
-		palette_set_color( machine, i, RGB_BLACK );
+		palette_set_color( machine(), i, RGB_BLACK );
 }

@@ -306,100 +306,93 @@ static TIMER_DEVICE_CALLBACK( model2_timer_cb )
 	state->m_timerrun[tnum] = 0;
 }
 
-static MACHINE_START(model2)
+MACHINE_START_MEMBER(model2_state,model2)
 {
-	model2_state *state = machine.driver_data<model2_state>();
-	state->m_copro_fifoin_data = auto_alloc_array_clear(machine, UINT32, COPRO_FIFOIN_SIZE);
-	state->m_copro_fifoout_data = auto_alloc_array_clear(machine, UINT32, COPRO_FIFOOUT_SIZE);
+	m_copro_fifoin_data = auto_alloc_array_clear(machine(), UINT32, COPRO_FIFOIN_SIZE);
+	m_copro_fifoout_data = auto_alloc_array_clear(machine(), UINT32, COPRO_FIFOOUT_SIZE);
 }
 
-static MACHINE_RESET(model2_common)
+MACHINE_RESET_MEMBER(model2_state,model2_common)
 {
-	model2_state *state = machine.driver_data<model2_state>();
 	int i;
 
-	state->m_intreq = 0;
-	state->m_intena = 0;
-	state->m_coproctl = 0;
-	state->m_coprocnt = 0;
-	state->m_geoctl = 0;
-	state->m_geocnt = 0;
-	state->m_ctrlmode = 0;
-	state->m_analog_channel = 0;
+	m_intreq = 0;
+	m_intena = 0;
+	m_coproctl = 0;
+	m_coprocnt = 0;
+	m_geoctl = 0;
+	m_geocnt = 0;
+	m_ctrlmode = 0;
+	m_analog_channel = 0;
 
-	state->m_timervals[0] = 0xfffff;
-	state->m_timervals[1] = 0xfffff;
-	state->m_timervals[2] = 0xfffff;
-	state->m_timervals[3] = 0xfffff;
+	m_timervals[0] = 0xfffff;
+	m_timervals[1] = 0xfffff;
+	m_timervals[2] = 0xfffff;
+	m_timervals[3] = 0xfffff;
 
-	state->m_timerrun[0] = state->m_timerrun[1] = state->m_timerrun[2] = state->m_timerrun[3] = 0;
+	m_timerrun[0] = m_timerrun[1] = m_timerrun[2] = m_timerrun[3] = 0;
 
-	state->m_timers[0] = machine.device<timer_device>("timer0");
-	state->m_timers[1] = machine.device<timer_device>("timer1");
-	state->m_timers[2] = machine.device<timer_device>("timer2");
-	state->m_timers[3] = machine.device<timer_device>("timer3");
+	m_timers[0] = machine().device<timer_device>("timer0");
+	m_timers[1] = machine().device<timer_device>("timer1");
+	m_timers[2] = machine().device<timer_device>("timer2");
+	m_timers[3] = machine().device<timer_device>("timer3");
 	for (i=0; i<4; i++)
-		state->m_timers[i]->reset();
+		m_timers[i]->reset();
 }
 
-static MACHINE_RESET(model2o)
+MACHINE_RESET_MEMBER(model2_state,model2o)
 {
-	model2_state *state = machine.driver_data<model2_state>();
-	MACHINE_RESET_CALL(model2_common);
+	MACHINE_RESET_CALL_MEMBER(model2_common);
 
 	// hold TGP in halt until we have code
-	machine.device("tgp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	machine().device("tgp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
-	state->m_dsp_type = DSP_TYPE_TGP;
+	m_dsp_type = DSP_TYPE_TGP;
 }
 
-static MACHINE_RESET(model2_scsp)
+MACHINE_RESET_MEMBER(model2_state,model2_scsp)
 {
-	model2_state *state = machine.driver_data<model2_state>();
-	state->membank("bank4")->set_base(state->memregion("scsp")->base() + 0x200000);
-	state->membank("bank5")->set_base(state->memregion("scsp")->base() + 0x600000);
+	membank("bank4")->set_base(memregion("scsp")->base() + 0x200000);
+	membank("bank5")->set_base(memregion("scsp")->base() + 0x600000);
 
 	// copy the 68k vector table into RAM
-	memcpy(state->m_soundram, state->memregion("audiocpu")->base() + 0x80000, 16);
-	machine.device("audiocpu")->reset();
-	scsp_set_ram_base(machine.device("scsp"), state->m_soundram);
+	memcpy(m_soundram, memregion("audiocpu")->base() + 0x80000, 16);
+	machine().device("audiocpu")->reset();
+	scsp_set_ram_base(machine().device("scsp"), m_soundram);
 }
 
-static MACHINE_RESET(model2)
+MACHINE_RESET_MEMBER(model2_state,model2)
 {
-	model2_state *state = machine.driver_data<model2_state>();
-	MACHINE_RESET_CALL(model2_common);
-	MACHINE_RESET_CALL(model2_scsp);
+	MACHINE_RESET_CALL_MEMBER(model2_common);
+	MACHINE_RESET_CALL_MEMBER(model2_scsp);
 
 	// hold TGP in halt until we have code
-	machine.device("tgp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	machine().device("tgp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
-	state->m_dsp_type = DSP_TYPE_TGP;
+	m_dsp_type = DSP_TYPE_TGP;
 }
 
-static MACHINE_RESET(model2b)
+MACHINE_RESET_MEMBER(model2_state,model2b)
 {
-	model2_state *state = machine.driver_data<model2_state>();
-	MACHINE_RESET_CALL(model2_common);
-	MACHINE_RESET_CALL(model2_scsp);
+	MACHINE_RESET_CALL_MEMBER(model2_common);
+	MACHINE_RESET_CALL_MEMBER(model2_scsp);
 
-	machine.device("dsp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	machine().device("dsp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	// set FIFOIN empty flag on SHARC
-	machine.device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG0, ASSERT_LINE);
+	machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG0, ASSERT_LINE);
 	// clear FIFOOUT buffer full flag on SHARC
-	machine.device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
+	machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
 
-	state->m_dsp_type = DSP_TYPE_SHARC;
+	m_dsp_type = DSP_TYPE_SHARC;
 }
 
-static MACHINE_RESET(model2c)
+MACHINE_RESET_MEMBER(model2_state,model2c)
 {
-	model2_state *state = machine.driver_data<model2_state>();
-	MACHINE_RESET_CALL(model2_common);
-	MACHINE_RESET_CALL(model2_scsp);
+	MACHINE_RESET_CALL_MEMBER(model2_common);
+	MACHINE_RESET_CALL_MEMBER(model2_scsp);
 
-	state->m_dsp_type = DSP_TYPE_TGPX4;
+	m_dsp_type = DSP_TYPE_TGPX4;
 }
 
 static void chcolor(running_machine &machine, pen_t color, UINT16 data)
@@ -1983,8 +1976,8 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 	MCFG_CPU_CONFIG(tgp_config)
 	MCFG_CPU_PROGRAM_MAP(copro_tgp_map)
 
-	MCFG_MACHINE_START(model2)
-	MCFG_MACHINE_RESET(model2o)
+	MCFG_MACHINE_START_OVERRIDE(model2_state,model2)
+	MCFG_MACHINE_RESET_OVERRIDE(model2_state,model2o)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
@@ -2012,7 +2005,7 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(model2)
+	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2042,8 +2035,8 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_CPU_CONFIG(tgp_config)
 	MCFG_CPU_PROGRAM_MAP(copro_tgp_map)
 
-	MCFG_MACHINE_START(model2)
-	MCFG_MACHINE_RESET(model2)
+	MCFG_MACHINE_START_OVERRIDE(model2_state,model2)
+	MCFG_MACHINE_RESET_OVERRIDE(model2_state,model2)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
@@ -2070,7 +2063,7 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(model2)
+	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2145,8 +2138,8 @@ static MACHINE_CONFIG_START( model2b, model2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(18000))
 
-	MCFG_MACHINE_START(model2)
-	MCFG_MACHINE_RESET(model2b)
+	MCFG_MACHINE_START_OVERRIDE(model2_state,model2)
+	MCFG_MACHINE_RESET_OVERRIDE(model2_state,model2b)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
@@ -2173,7 +2166,7 @@ static MACHINE_CONFIG_START( model2b, model2_state )
 
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(model2)
+	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2192,8 +2185,8 @@ static MACHINE_CONFIG_START( model2c, model2_state )
 	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(model2_snd)
 
-	MCFG_MACHINE_START(model2)
-	MCFG_MACHINE_RESET(model2c)
+	MCFG_MACHINE_START_OVERRIDE(model2_state,model2)
+	MCFG_MACHINE_RESET_OVERRIDE(model2_state,model2c)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
@@ -2220,7 +2213,7 @@ static MACHINE_CONFIG_START( model2c, model2_state )
 
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(model2)
+	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

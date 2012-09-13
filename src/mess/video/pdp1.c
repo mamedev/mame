@@ -41,22 +41,21 @@ INLINE void pdp1_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
 /*
     video init
 */
-VIDEO_START( pdp1 )
+void pdp1_state::video_start()
 {
-	pdp1_state *state = machine.driver_data<pdp1_state>();
-	state->m_typewriter_color = color_typewriter_black;
+	m_typewriter_color = color_typewriter_black;
 
 	/* alloc bitmaps for our private fun */
-	state->m_panel_bitmap.allocate(panel_window_width, panel_window_height, BITMAP_FORMAT_IND16);
-	state->m_typewriter_bitmap.allocate(typewriter_window_width, typewriter_window_height, BITMAP_FORMAT_IND16);
+	m_panel_bitmap.allocate(panel_window_width, panel_window_height, BITMAP_FORMAT_IND16);
+	m_typewriter_bitmap.allocate(typewriter_window_width, typewriter_window_height, BITMAP_FORMAT_IND16);
 
 	/* set up out bitmaps */
-	pdp1_draw_panel_backdrop(machine, state->m_panel_bitmap);
+	pdp1_draw_panel_backdrop(machine(), m_panel_bitmap);
 
 	const rectangle typewriter_bitmap_bounds(0, typewriter_window_width-1, 0, typewriter_window_height-1);
-	state->m_typewriter_bitmap.fill(pen_typewriter_bg, typewriter_bitmap_bounds);
+	m_typewriter_bitmap.fill(pen_typewriter_bg, typewriter_bitmap_bounds);
 
-	state->m_crt = machine.device("crt");
+	m_crt = machine().device("crt");
 }
 
 

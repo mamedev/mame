@@ -469,40 +469,38 @@ static void nbmj8891_gfxdraw(running_machine &machine)
 
 
 ******************************************************************************/
-VIDEO_START( nbmj8891_1layer )
+VIDEO_START_MEMBER(nbmj8891_state,nbmj8891_1layer)
 {
-	nbmj8891_state *state = machine.driver_data<nbmj8891_state>();
-	UINT8 *CLUT = state->memregion("protection")->base();
+	UINT8 *CLUT = memregion("protection")->base();
 	int i;
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
 
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap0);
-	state->m_videoram0 = auto_alloc_array(machine, UINT8, width * height);
-	state->m_palette = auto_alloc_array(machine, UINT8, 0x200);
-	state->m_clut = auto_alloc_array(machine, UINT8, 0x800);
-	memset(state->m_videoram0, 0xff, (width * height * sizeof(char)));
-	state->m_gfxdraw_mode = 0;
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmap0);
+	m_videoram0 = auto_alloc_array(machine(), UINT8, width * height);
+	m_palette = auto_alloc_array(machine(), UINT8, 0x200);
+	m_clut = auto_alloc_array(machine(), UINT8, 0x800);
+	memset(m_videoram0, 0xff, (width * height * sizeof(char)));
+	m_gfxdraw_mode = 0;
 
 	if (nb1413m3_type == NB1413M3_TAIWANMB)
-		for (i = 0; i < 0x0800; i++) state->m_clut[i] = CLUT[i];
+		for (i = 0; i < 0x0800; i++) m_clut[i] = CLUT[i];
 }
 
-VIDEO_START( nbmj8891_2layer )
+void nbmj8891_state::video_start()
 {
-	nbmj8891_state *state = machine.driver_data<nbmj8891_state>();
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
 
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap0);
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap1);
-	state->m_videoram0 = auto_alloc_array(machine, UINT8, width * height);
-	state->m_videoram1 = auto_alloc_array(machine, UINT8, width * height);
-	state->m_palette = auto_alloc_array(machine, UINT8, 0x200);
-	state->m_clut = auto_alloc_array(machine, UINT8, 0x800);
-	memset(state->m_videoram0, 0xff, (width * height * sizeof(UINT8)));
-	memset(state->m_videoram1, 0xff, (width * height * sizeof(UINT8)));
-	state->m_gfxdraw_mode = 1;
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmap0);
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmap1);
+	m_videoram0 = auto_alloc_array(machine(), UINT8, width * height);
+	m_videoram1 = auto_alloc_array(machine(), UINT8, width * height);
+	m_palette = auto_alloc_array(machine(), UINT8, 0x200);
+	m_clut = auto_alloc_array(machine(), UINT8, 0x800);
+	memset(m_videoram0, 0xff, (width * height * sizeof(UINT8)));
+	memset(m_videoram1, 0xff, (width * height * sizeof(UINT8)));
+	m_gfxdraw_mode = 1;
 }
 
 /******************************************************************************

@@ -47,6 +47,8 @@ public:
 	DECLARE_WRITE8_MEMBER(led_writes);
 	DECLARE_WRITE8_MEMBER(nmi_line_w);
 	DECLARE_DRIVER_INIT(esh);
+	virtual void machine_start();
+	virtual void palette_init();
 };
 
 
@@ -223,13 +225,13 @@ static INPUT_PORTS_START( esh )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static PALETTE_INIT( esh )
+void esh_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* Oddly enough, the top 4 bits of each byte is 0 */
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		int r,g,b;
 		int bit0,bit1,bit2;
@@ -254,11 +256,11 @@ static PALETTE_INIT( esh )
 		bit2 = (color_prom[i+0x100] >> 6) & 0x01;
 		b = (0x97 * bit2) + (0x47 * bit1) + (0x21 * bit0);
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 	}
 
 	/* make color 0 transparent */
-	palette_set_color(machine, 0, MAKE_ARGB(0,0,0,0));
+	palette_set_color(machine(), 0, MAKE_ARGB(0,0,0,0));
 }
 
 static const gfx_layout esh_gfx_layout =
@@ -288,7 +290,7 @@ static INTERRUPT_GEN( vblank_callback_esh )
 	device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(irq_stop));
 }
 
-static MACHINE_START( esh )
+void esh_state::machine_start()
 {
 }
 
@@ -304,7 +306,6 @@ static MACHINE_CONFIG_START( esh, esh_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_MACHINE_START(esh)
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
 	MCFG_LASERDISC_OVERLAY_STATIC(256, 256, esh)
@@ -313,7 +314,6 @@ static MACHINE_CONFIG_START( esh, esh_state )
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(esh)
 
 	MCFG_GFXDECODE(esh)
 

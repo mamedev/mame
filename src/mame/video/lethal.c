@@ -47,33 +47,32 @@ void lethalen_tile_callback( running_machine &machine, int layer, int *code, int
 	*color = state->m_layer_colorbase[layer] + ((*color & 0x3c) << 2);
 }
 
-VIDEO_START(lethalen)
+void lethal_state::video_start()
 {
-	lethal_state *state = machine.driver_data<lethal_state>();
 
 	// this game uses external linescroll RAM
-	k056832_SetExtLinescroll(state->m_k056832);
+	k056832_SetExtLinescroll(m_k056832);
 
 	// the US and Japanese cabinets apparently use different mirror setups
-	if (!strcmp(machine.system().name, "lethalenj"))
+	if (!strcmp(machine().system().name, "lethalenj"))
 	{
-		k056832_set_layer_offs(state->m_k056832, 0, -195, 0);
-		k056832_set_layer_offs(state->m_k056832, 1, -193, 0);
-		k056832_set_layer_offs(state->m_k056832, 2, -191, 0);
-		k056832_set_layer_offs(state->m_k056832, 3, -189, 0);
+		k056832_set_layer_offs(m_k056832, 0, -195, 0);
+		k056832_set_layer_offs(m_k056832, 1, -193, 0);
+		k056832_set_layer_offs(m_k056832, 2, -191, 0);
+		k056832_set_layer_offs(m_k056832, 3, -189, 0);
 	}
 	else
 	{
-		k056832_set_layer_offs(state->m_k056832, 0, 188, 0);
-		k056832_set_layer_offs(state->m_k056832, 1, 190, 0);
-		k056832_set_layer_offs(state->m_k056832, 2, 192, 0);
-		k056832_set_layer_offs(state->m_k056832, 3, 194, 0);
+		k056832_set_layer_offs(m_k056832, 0, 188, 0);
+		k056832_set_layer_offs(m_k056832, 1, 190, 0);
+		k056832_set_layer_offs(m_k056832, 2, 192, 0);
+		k056832_set_layer_offs(m_k056832, 3, 194, 0);
 	}
 
-	state->m_layer_colorbase[0] = 0x00;
-	state->m_layer_colorbase[1] = 0x40;
-	state->m_layer_colorbase[2] = 0x80;
-	state->m_layer_colorbase[3] = 0xc0;
+	m_layer_colorbase[0] = 0x00;
+	m_layer_colorbase[1] = 0x40;
+	m_layer_colorbase[2] = 0x80;
+	m_layer_colorbase[3] = 0xc0;
 }
 
 WRITE8_MEMBER(lethal_state::lethalen_palette_control)

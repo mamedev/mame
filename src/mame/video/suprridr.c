@@ -35,14 +35,13 @@ TILE_GET_INFO_MEMBER(suprridr_state::get_tile_info2)
  *
  *************************************/
 
-VIDEO_START( suprridr )
+void suprridr_state::video_start()
 {
-	suprridr_state *state = machine.driver_data<suprridr_state>();
-	state->m_fg_tilemap          = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(suprridr_state::get_tile_info2),state), TILEMAP_SCAN_ROWS,  8,8, 32,32);
-	state->m_bg_tilemap          = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(suprridr_state::get_tile_info),state),  TILEMAP_SCAN_ROWS,       8,8, 32,32);
-	state->m_bg_tilemap_noscroll = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(suprridr_state::get_tile_info),state),  TILEMAP_SCAN_ROWS,       8,8, 32,32);
+	m_fg_tilemap          = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(suprridr_state::get_tile_info2),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	m_bg_tilemap          = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(suprridr_state::get_tile_info),this),  TILEMAP_SCAN_ROWS,       8,8, 32,32);
+	m_bg_tilemap_noscroll = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(suprridr_state::get_tile_info),this),  TILEMAP_SCAN_ROWS,       8,8, 32,32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 
@@ -53,9 +52,9 @@ VIDEO_START( suprridr )
  *
  *************************************/
 
-PALETTE_INIT( suprridr )
+void suprridr_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 96; i++)
@@ -77,7 +76,7 @@ PALETTE_INIT( suprridr )
 		bit1 = (*color_prom >> 7) & 0x01;
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }

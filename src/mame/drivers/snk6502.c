@@ -781,35 +781,35 @@ static const mc6845_interface mc6845_intf =
  *
  *************************************/
 
-static MACHINE_RESET( sasuke )
+MACHINE_RESET_MEMBER(snk6502_state,sasuke)
 {
-	snk6502_set_music_clock(machine, M_LN2 * (RES_K(18) + RES_K(1)) * CAP_U(1));
+	snk6502_set_music_clock(machine(), M_LN2 * (RES_K(18) + RES_K(1)) * CAP_U(1));
 
 	// adjusted (measured through audio recording of pcb)
-	snk6502_set_music_freq(machine, 35300);
+	snk6502_set_music_freq(machine(), 35300);
 
-	sasuke_start_counter(machine);
+	sasuke_start_counter(machine());
 }
 
-static MACHINE_RESET( satansat )
+MACHINE_RESET_MEMBER(snk6502_state,satansat)
 {
 	// same as sasuke (assumption?)
 	// NOTE: this was set before sasuke was adjusted to a lower freq, please don't modify until measured/confirmed on pcb
-	snk6502_set_music_freq(machine, 38000);
+	snk6502_set_music_freq(machine(), 38000);
 
-	sasuke_start_counter(machine);
+	sasuke_start_counter(machine());
 }
 
-static MACHINE_RESET( vanguard )
+MACHINE_RESET_MEMBER(snk6502_state,vanguard)
 {
 	// 41.6 Hz update (measured)
-	snk6502_set_music_clock(machine, 1 / 41.6);
+	snk6502_set_music_clock(machine(), 1 / 41.6);
 }
 
-static MACHINE_RESET( pballoon )
+MACHINE_RESET_MEMBER(snk6502_state,pballoon)
 {
 	// 40.3 Hz update (measured)
-	snk6502_set_music_clock(machine, 1 / 40.3);
+	snk6502_set_music_clock(machine(), 1 / 40.3);
 }
 
 
@@ -826,7 +826,7 @@ static MACHINE_CONFIG_START( sasuke, snk6502_state )
 	MCFG_CPU_PROGRAM_MAP(sasuke_map)
 	MCFG_CPU_VBLANK_INT("screen",satansat_interrupt)
 
-	MCFG_MACHINE_RESET(sasuke)
+	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,sasuke)
 
 	// video hardware
 
@@ -840,8 +840,8 @@ static MACHINE_CONFIG_START( sasuke, snk6502_state )
 	MCFG_GFXDECODE(sasuke)
 	MCFG_PALETTE_LENGTH(32)
 
-	MCFG_PALETTE_INIT(satansat)
-	MCFG_VIDEO_START(satansat)
+	MCFG_PALETTE_INIT_OVERRIDE(snk6502_state,satansat)
+	MCFG_VIDEO_START_OVERRIDE(snk6502_state,satansat)
 
 	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / 16, mc6845_intf)
 
@@ -874,7 +874,7 @@ static MACHINE_CONFIG_DERIVED( satansat, sasuke )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(satansat_map)
 
-	MCFG_MACHINE_RESET(satansat)
+	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,satansat)
 
 	// video hardware
 	MCFG_GFXDECODE(satansat)
@@ -899,7 +899,7 @@ static MACHINE_CONFIG_START( vanguard, snk6502_state )
 	MCFG_CPU_PROGRAM_MAP(vanguard_map)
 	MCFG_CPU_VBLANK_INT("screen",snk6502_interrupt)
 
-	MCFG_MACHINE_RESET(vanguard)
+	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,vanguard)
 
 	// video hardware
 
@@ -913,8 +913,8 @@ static MACHINE_CONFIG_START( vanguard, snk6502_state )
 	MCFG_GFXDECODE(vanguard)
 	MCFG_PALETTE_LENGTH(64)
 
-	MCFG_PALETTE_INIT(snk6502)
-	MCFG_VIDEO_START(snk6502)
+	MCFG_PALETTE_INIT_OVERRIDE(snk6502_state,snk6502)
+	MCFG_VIDEO_START_OVERRIDE(snk6502_state,snk6502)
 
 	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / 16, mc6845_intf)
 
@@ -967,9 +967,9 @@ static MACHINE_CONFIG_DERIVED( pballoon, nibbler )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pballoon_map)
 
-	MCFG_MACHINE_RESET(pballoon)
+	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,pballoon)
 
-	MCFG_VIDEO_START( pballoon )
+	MCFG_VIDEO_START_OVERRIDE(snk6502_state, pballoon )
 MACHINE_CONFIG_END
 
 

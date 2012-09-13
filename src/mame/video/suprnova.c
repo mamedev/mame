@@ -346,42 +346,40 @@ WRITE32_MEMBER(skns_state::skns_v3_regs_w)
 }
 
 
-VIDEO_START(skns)
+void skns_state::video_start()
 {
-	skns_state *state = machine.driver_data<skns_state>();
 
-	state->m_spritegen = machine.device<sknsspr_device>("spritegen");
+	m_spritegen = machine().device<sknsspr_device>("spritegen");
 
-	state->m_tilemap_A = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(skns_state::get_tilemap_A_tile_info),state),TILEMAP_SCAN_ROWS,16,16,64, 64);
-		state->m_tilemap_A->set_transparent_pen(0);
+	m_tilemap_A = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(skns_state::get_tilemap_A_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64, 64);
+		m_tilemap_A->set_transparent_pen(0);
 
-	state->m_tilemap_B = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(skns_state::get_tilemap_B_tile_info),state),TILEMAP_SCAN_ROWS,16,16,64, 64);
-		state->m_tilemap_B->set_transparent_pen(0);
+	m_tilemap_B = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(skns_state::get_tilemap_B_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64, 64);
+		m_tilemap_B->set_transparent_pen(0);
 
-	state->m_sprite_bitmap.allocate(1024,1024);
+	m_sprite_bitmap.allocate(1024,1024);
 
-	state->m_tilemap_bitmap_lower.allocate(320,240);
-	state->m_tilemap_bitmapflags_lower.allocate(320,240);
+	m_tilemap_bitmap_lower.allocate(320,240);
+	m_tilemap_bitmapflags_lower.allocate(320,240);
 
-	state->m_tilemap_bitmap_higher.allocate(320,240);
-	state->m_tilemap_bitmapflags_higher.allocate(320,240);
+	m_tilemap_bitmap_higher.allocate(320,240);
+	m_tilemap_bitmapflags_higher.allocate(320,240);
 
-	machine.gfx[2]->set_granularity(256);
-	machine.gfx[3]->set_granularity(256);
+	machine().gfx[2]->set_granularity(256);
+	machine().gfx[3]->set_granularity(256);
 }
 
-VIDEO_RESET( skns )
+void skns_state::video_reset()
 {
-	skns_state *state = machine.driver_data<skns_state>();
-	state->m_depthA = state->m_depthB = 0;
-	state->m_use_spc_bright = state->m_use_v3_bright = 1;
-	state->m_bright_spc_b= state->m_bright_spc_g = state->m_bright_spc_r = 0x00;
-	state->m_bright_spc_b_trans = state->m_bright_spc_g_trans = state->m_bright_spc_r_trans = 0x00;
-	state->m_bright_v3_b = state->m_bright_v3_g = state->m_bright_v3_r = 0x00;
-	state->m_bright_v3_b_trans = state->m_bright_v3_g_trans = state->m_bright_v3_r_trans = 0x00;
+	m_depthA = m_depthB = 0;
+	m_use_spc_bright = m_use_v3_bright = 1;
+	m_bright_spc_b= m_bright_spc_g = m_bright_spc_r = 0x00;
+	m_bright_spc_b_trans = m_bright_spc_g_trans = m_bright_spc_r_trans = 0x00;
+	m_bright_v3_b = m_bright_v3_g = m_bright_v3_r = 0x00;
+	m_bright_v3_b_trans = m_bright_v3_g_trans = m_bright_v3_r_trans = 0x00;
 
-	state->m_spc_changed = state->m_v3_changed = state->m_palette_updated = 0;
-	state->m_alt_enable_background = state->m_alt_enable_sprites = 1;
+	m_spc_changed = m_v3_changed = m_palette_updated = 0;
+	m_alt_enable_background = m_alt_enable_sprites = 1;
 }
 
 static void supernova_draw_a( running_machine &machine, bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_flags, const rectangle &cliprect, int tran )

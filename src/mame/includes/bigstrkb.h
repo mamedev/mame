@@ -29,10 +29,11 @@ public:
 	TILE_GET_INFO_MEMBER(get_bsb_tile_info);
 	TILE_GET_INFO_MEMBER(get_bsb_tile2_info);
 	TILE_GET_INFO_MEMBER(get_bsb_tile3_info);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/bigstrkb.c -----------*/
 
-VIDEO_START(bigstrkb);
+
 SCREEN_UPDATE_IND16(bigstrkb);

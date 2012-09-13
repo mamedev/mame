@@ -207,14 +207,13 @@ DRIVER_INIT_MEMBER(poly88_state,poly88)
 	machine().scheduler().timer_pulse(attotime::from_hz(24000), FUNC(keyboard_callback));
 }
 
-MACHINE_RESET(poly88)
+void poly88_state::machine_reset()
 {
-	poly88_state *state = machine.driver_data<poly88_state>();
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(poly88_irq_callback);
-	state->m_intr = 0;
-	state->m_last_code = 0;
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(poly88_irq_callback);
+	m_intr = 0;
+	m_last_code = 0;
 
-	machine.scheduler().timer_set(attotime::zero, FUNC(setup_machine_state));
+	machine().scheduler().timer_set(attotime::zero, FUNC(setup_machine_state));
 }
 
 INTERRUPT_GEN( poly88_interrupt )

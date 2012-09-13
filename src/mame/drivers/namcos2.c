@@ -1623,8 +1623,8 @@ static MACHINE_CONFIG_START( default, namcos2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000)) /* CPU slices per frame */
 
-	MCFG_MACHINE_START(namcos2)
-	MCFG_MACHINE_RESET(namcos2)
+	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -1697,8 +1697,8 @@ static MACHINE_CONFIG_START( gollygho, namcos2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
-	MCFG_MACHINE_START(namcos2)
-	MCFG_MACHINE_RESET(namcos2)
+	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -1744,8 +1744,8 @@ static MACHINE_CONFIG_START( finallap, namcos2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
-	MCFG_MACHINE_START(namcos2)
-	MCFG_MACHINE_RESET(namcos2)
+	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -1759,7 +1759,7 @@ static MACHINE_CONFIG_START( finallap, namcos2_state )
 	MCFG_GFXDECODE(finallap)
 	MCFG_PALETTE_LENGTH(0x2000)
 
-	MCFG_VIDEO_START_OVERRIDE(namcos2_state, video_start_finallap)
+	MCFG_VIDEO_START_OVERRIDE(namcos2_state, finallap)
 	
 	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
 
@@ -1795,8 +1795,8 @@ static MACHINE_CONFIG_START( sgunner, namcos2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
-	MCFG_MACHINE_START(namcos2)
-	MCFG_MACHINE_RESET(namcos2)
+	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -1810,7 +1810,7 @@ static MACHINE_CONFIG_START( sgunner, namcos2_state )
 	MCFG_GFXDECODE(sgunner)
 	MCFG_PALETTE_LENGTH(0x2000)
 
-	MCFG_VIDEO_START_OVERRIDE(namcos2_state, video_start_sgunner)
+	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1844,8 +1844,8 @@ static MACHINE_CONFIG_START( luckywld, namcos2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
-	MCFG_MACHINE_START(namcos2)
-	MCFG_MACHINE_RESET(namcos2)
+	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -1859,7 +1859,7 @@ static MACHINE_CONFIG_START( luckywld, namcos2_state )
 	MCFG_GFXDECODE(luckywld)
 	MCFG_PALETTE_LENGTH(0x2000)
 
-	MCFG_VIDEO_START_OVERRIDE(namcos2_state, video_start_luckywld)
+	MCFG_VIDEO_START_OVERRIDE(namcos2_state, luckywld)
 
 	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
 
@@ -1895,8 +1895,8 @@ static MACHINE_CONFIG_START( metlhawk, namcos2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
-	MCFG_MACHINE_START(namcos2)
-	MCFG_MACHINE_RESET(namcos2)
+	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -1910,7 +1910,7 @@ static MACHINE_CONFIG_START( metlhawk, namcos2_state )
 	MCFG_GFXDECODE(metlhawk)
 	MCFG_PALETTE_LENGTH(0x2000)
 
-	MCFG_VIDEO_START_OVERRIDE(namcos2_state, video_start_metlhawk)
+	MCFG_VIDEO_START_OVERRIDE(namcos2_state, metlhawk)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

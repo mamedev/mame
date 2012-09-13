@@ -2547,58 +2547,57 @@ static SLOT_INTERFACE_START(x68000_exp_cards)
 	SLOT_INTERFACE("cz6bs1",X68K_SCSIEXT)  // Sharp CZ-6BS1 SCSI-1 controller
 SLOT_INTERFACE_END
 
-static MACHINE_RESET( x68000 )
+MACHINE_RESET_MEMBER(x68k_state,x68000)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
 	/* The last half of the IPLROM is mapped to 0x000000 on reset only
        Just copying the inital stack pointer and program counter should
        more or less do the same job */
 
 	int drive;
-	UINT8* romdata = state->memregion("user2")->base();
+	UINT8* romdata = memregion("user2")->base();
 	attotime irq_time;
 
-	memset(machine.device<ram_device>(RAM_TAG)->pointer(),0,machine.device<ram_device>(RAM_TAG)->size());
-	memcpy(machine.device<ram_device>(RAM_TAG)->pointer(),romdata,8);
+	memset(machine().device<ram_device>(RAM_TAG)->pointer(),0,machine().device<ram_device>(RAM_TAG)->size());
+	memcpy(machine().device<ram_device>(RAM_TAG)->pointer(),romdata,8);
 
 	// init keyboard
-	state->m_keyboard.delay = 500;  // 3*100+200
-	state->m_keyboard.repeat = 110;  // 4^2*5+30
+	m_keyboard.delay = 500;  // 3*100+200
+	m_keyboard.repeat = 110;  // 4^2*5+30
 
 	// check for disks
 	for(drive=0;drive<4;drive++)
 	{
-		device_image_interface *image = dynamic_cast<device_image_interface *>(floppy_get_device(machine, drive));
+		device_image_interface *image = dynamic_cast<device_image_interface *>(floppy_get_device(machine(), drive));
 		if(image->exists())
-			state->m_fdc.disk_inserted[drive] = 1;
+			m_fdc.disk_inserted[drive] = 1;
 		else
-			state->m_fdc.disk_inserted[drive] = 0;
+			m_fdc.disk_inserted[drive] = 0;
 	}
 
 	// initialise CRTC, set registers to defaults for the standard text mode (768x512)
-	state->m_crtc.reg[0] = 137;  // Horizontal total  (in characters)
-	state->m_crtc.reg[1] = 14;   // Horizontal sync end
-	state->m_crtc.reg[2] = 28;   // Horizontal start
-	state->m_crtc.reg[3] = 124;  // Horizontal end
-	state->m_crtc.reg[4] = 567;  // Vertical total
-	state->m_crtc.reg[5] = 5;    // Vertical sync end
-	state->m_crtc.reg[6] = 40;   // Vertical start
-	state->m_crtc.reg[7] = 552;  // Vertical end
-	state->m_crtc.reg[8] = 27;   // Horizontal adjust
+	m_crtc.reg[0] = 137;  // Horizontal total  (in characters)
+	m_crtc.reg[1] = 14;   // Horizontal sync end
+	m_crtc.reg[2] = 28;   // Horizontal start
+	m_crtc.reg[3] = 124;  // Horizontal end
+	m_crtc.reg[4] = 567;  // Vertical total
+	m_crtc.reg[5] = 5;    // Vertical sync end
+	m_crtc.reg[6] = 40;   // Vertical start
+	m_crtc.reg[7] = 552;  // Vertical end
+	m_crtc.reg[8] = 27;   // Horizontal adjust
 
-	mfp_init(machine);
+	mfp_init(machine());
 
-	state->m_scanline = machine.primary_screen->vpos();// = state->m_crtc.reg[6];  // Vertical start
+	m_scanline = machine().primary_screen->vpos();// = m_crtc.reg[6];  // Vertical start
 
 	// start VBlank timer
-	state->m_crtc.vblank = 1;
-	irq_time = machine.primary_screen->time_until_pos(state->m_crtc.reg[6],2);
-	state->m_vblank_irq->adjust(irq_time);
+	m_crtc.vblank = 1;
+	irq_time = machine().primary_screen->time_until_pos(m_crtc.reg[6],2);
+	m_vblank_irq->adjust(irq_time);
 
 	// start HBlank timer
-	state->m_scanline_timer->adjust(machine.primary_screen->scan_period(), 1);
+	m_scanline_timer->adjust(machine().primary_screen->scan_period(), 1);
 
-	state->m_mfp.gpio = 0xfb;
+	m_mfp.gpio = 0xfb;
 
 	// reset output values
 	output_set_value("key_led_kana",1);
@@ -2613,74 +2612,72 @@ static MACHINE_RESET( x68000 )
 		output_set_indexed_value("eject_drv",drive,1);
 		output_set_indexed_value("ctrl_drv",drive,1);
 		output_set_indexed_value("access_drv",drive,1);
-		floppy_install_unload_proc(floppy_get_device(machine, drive), x68k_unload_proc);
-		floppy_install_load_proc(floppy_get_device(machine, drive), x68k_load_proc);
+		floppy_install_unload_proc(floppy_get_device(machine(), drive), x68k_unload_proc);
+		floppy_install_load_proc(floppy_get_device(machine(), drive), x68k_load_proc);
 	}
 
 	// reset CPU
-	machine.device("maincpu")->reset();
+	machine().device("maincpu")->reset();
 }
 
-static MACHINE_START( x68000 )
+MACHINE_START_MEMBER(x68k_state,x68000)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	x68k_state *state = machine.driver_data<x68k_state>();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/*  Install RAM handlers  */
-	state->m_spriteram = (UINT16*)(*state->memregion("user1"));
+	m_spriteram = (UINT16*)(*memregion("user1"));
 	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_emptyram_r));
 	space->install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_emptyram_w));
-	space->install_readwrite_bank(0x000000,machine.device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,"bank1");
-	state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
+	space->install_readwrite_bank(0x000000,machine().device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,"bank1");
+	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 	space->install_legacy_read_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram_r));
 	space->install_legacy_write_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram_w));
-	state->membank("bank2")->set_base(state->m_gvram16);  // so that code in VRAM is executable - needed for Terra Cresta
+	membank("bank2")->set_base(m_gvram16);  // so that code in VRAM is executable - needed for Terra Cresta
 	space->install_legacy_read_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram_r));
 	space->install_legacy_write_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram_w));
-	state->membank("bank3")->set_base(state->m_tvram16);  // so that code in VRAM is executable - needed for Terra Cresta
+	membank("bank3")->set_base(m_tvram16);  // so that code in VRAM is executable - needed for Terra Cresta
 	space->install_legacy_read_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram_r));
 	space->install_legacy_write_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram_w));
-	state->membank("bank4")->set_base(state->m_nvram16);  // so that code in SRAM is executable, there is an option for booting from SRAM
+	membank("bank4")->set_base(m_nvram16);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
-	state->m_kb_timer->adjust(attotime::zero, 0, attotime::from_msec(5));  // every 5ms
+	m_kb_timer->adjust(attotime::zero, 0, attotime::from_msec(5));  // every 5ms
 
 	// start mouse timer
-	state->m_mouse_timer->adjust(attotime::zero, 0, attotime::from_msec(1));  // a guess for now
-	state->m_mouse.inputtype = 0;
+	m_mouse_timer->adjust(attotime::zero, 0, attotime::from_msec(1));  // a guess for now
+	m_mouse.inputtype = 0;
 
 	// start LED timer
-	state->m_led_timer->adjust(attotime::zero, 0, attotime::from_msec(400));
+	m_led_timer->adjust(attotime::zero, 0, attotime::from_msec(400));
 }
 
-static MACHINE_START( x68030 )
+MACHINE_START_MEMBER(x68k_state,x68030)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	x68k_state *state = machine.driver_data<x68k_state>();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/*  Install RAM handlers  */
-	state->m_spriteram = (UINT16*)(*state->memregion("user1"));
+	m_spriteram = (UINT16*)(*memregion("user1"));
 	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_rom0_r),0xffffffff);
 	space->install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_rom0_w),0xffffffff);
-	space->install_readwrite_bank(0x000000,machine.device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,"bank1");
-	state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
+	space->install_readwrite_bank(0x000000,machine().device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,"bank1");
+	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 	space->install_legacy_read_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram32_r));
 	space->install_legacy_write_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram32_w));
-	state->membank("bank2")->set_base(state->m_gvram32);  // so that code in VRAM is executable - needed for Terra Cresta
+	membank("bank2")->set_base(m_gvram32);  // so that code in VRAM is executable - needed for Terra Cresta
 	space->install_legacy_read_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram32_r));
 	space->install_legacy_write_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram32_w));
-	state->membank("bank3")->set_base(state->m_tvram32);  // so that code in VRAM is executable - needed for Terra Cresta
+	membank("bank3")->set_base(m_tvram32);  // so that code in VRAM is executable - needed for Terra Cresta
 	space->install_legacy_read_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram32_r));
 	space->install_legacy_write_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram32_w));
-	state->membank("bank4")->set_base(state->m_nvram32);  // so that code in SRAM is executable, there is an option for booting from SRAM
+	membank("bank4")->set_base(m_nvram32);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
-	state->m_kb_timer->adjust(attotime::zero, 0, attotime::from_msec(5));  // every 5ms
+	m_kb_timer->adjust(attotime::zero, 0, attotime::from_msec(5));  // every 5ms
 
 	// start mouse timer
-	state->m_mouse_timer->adjust(attotime::zero, 0, attotime::from_msec(1));  // a guess for now
-	state->m_mouse.inputtype = 0;
+	m_mouse_timer->adjust(attotime::zero, 0, attotime::from_msec(1));  // a guess for now
+	m_mouse.inputtype = 0;
 
 	// start LED timer
-	state->m_led_timer->adjust(attotime::zero, 0, attotime::from_msec(400));
+	m_led_timer->adjust(attotime::zero, 0, attotime::from_msec(400));
 }
 
 DRIVER_INIT_MEMBER(x68k_state,x68000)
@@ -2747,8 +2744,8 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	MCFG_CPU_VBLANK_INT("screen", x68k_vsync_irq)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START( x68000 )
-	MCFG_MACHINE_RESET( x68000 )
+	MCFG_MACHINE_START_OVERRIDE(x68k_state, x68000 )
+	MCFG_MACHINE_RESET_OVERRIDE(x68k_state, x68000 )
 
 	/* device hardware */
 	MCFG_MC68901_ADD(MC68901_TAG, 4000000, mfp_interface)
@@ -2771,9 +2768,9 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	MCFG_SCREEN_UPDATE_STATIC( x68000 )
 
 	MCFG_PALETTE_LENGTH(65536)
-	MCFG_PALETTE_INIT( x68000 )
+	MCFG_PALETTE_INIT_OVERRIDE(x68k_state, x68000 )
 
-	MCFG_VIDEO_START( x68000 )
+	MCFG_VIDEO_START_OVERRIDE(x68k_state, x68000 )
 
 	MCFG_DEFAULT_LAYOUT( layout_x68000 )
 
@@ -2855,8 +2852,8 @@ static MACHINE_CONFIG_START( x68030, x68k_state )
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)  /* 25 MHz 68EC030 */
 	MCFG_CPU_PROGRAM_MAP(x68030_map)
 
-	MCFG_MACHINE_START( x68030 )
-	MCFG_MACHINE_RESET( x68000 )
+	MCFG_MACHINE_START_OVERRIDE(x68k_state, x68030 )
+	MCFG_MACHINE_RESET_OVERRIDE(x68k_state, x68000 )
 
 	MCFG_NVRAM_ADD_0FILL("nvram32")
 

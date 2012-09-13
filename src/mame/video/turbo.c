@@ -39,7 +39,7 @@ static const UINT32 sprite_expand[16] =
  *
  *************************************/
 
-PALETTE_INIT( turbo )
+PALETTE_INIT_MEMBER(turbo_state,turbo)
 {
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -73,12 +73,12 @@ PALETTE_INIT( turbo )
 		bit1 = (i >> 7) & 1;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
 
-PALETTE_INIT( subroc3d )
+PALETTE_INIT_MEMBER(turbo_state,subroc3d)
 {
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -112,12 +112,12 @@ PALETTE_INIT( subroc3d )
 		bit1 = (i >> 7) & 1;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
 
-PALETTE_INIT( buckrog )
+PALETTE_INIT_MEMBER(turbo_state,buckrog)
 {
 	static const int resistances[4] = { 2200, 1000, 500, 250 };
 	double rweights[3], gweights[3], bweights[4];
@@ -153,7 +153,7 @@ PALETTE_INIT( buckrog )
 		bit3 = (i >> 7) & 1;
 		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -172,25 +172,23 @@ TILE_GET_INFO_MEMBER(turbo_state::get_fg_tile_info)
 }
 
 
-VIDEO_START( turbo )
+VIDEO_START_MEMBER(turbo_state,turbo)
 {
-	turbo_state *state = machine.driver_data<turbo_state>();
 
 	/* initialize the foreground tilemap */
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(turbo_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(turbo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
 }
 
 
-VIDEO_START( buckrog )
+VIDEO_START_MEMBER(turbo_state,buckrog)
 {
-	turbo_state *state = machine.driver_data<turbo_state>();
 
 	/* initialize the foreground tilemap */
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(turbo_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(turbo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
 
 	/* allocate the bitmap RAM */
-	state->m_buckrog_bitmap_ram = auto_alloc_array(machine, UINT8, 0xe000);
-	state->save_pointer(NAME(state->m_buckrog_bitmap_ram), 0xe000);
+	m_buckrog_bitmap_ram = auto_alloc_array(machine(), UINT8, 0xe000);
+	save_pointer(NAME(m_buckrog_bitmap_ram), 0xe000);
 }
 
 

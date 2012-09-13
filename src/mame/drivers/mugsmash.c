@@ -399,12 +399,11 @@ static const ym2151_interface ym2151_config =
 	DEVCB_LINE(irq_handler)
 };
 
-static MACHINE_START( mugsmash )
+void mugsmash_state::machine_start()
 {
-	mugsmash_state *state = machine.driver_data<mugsmash_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 }
 
 static MACHINE_CONFIG_START( mugsmash, mugsmash_state )
@@ -416,7 +415,6 @@ static MACHINE_CONFIG_START( mugsmash, mugsmash_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* Guess */
 	MCFG_CPU_PROGRAM_MAP(mugsmash_sound_map)
 
-	MCFG_MACHINE_START(mugsmash)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -428,7 +426,6 @@ static MACHINE_CONFIG_START( mugsmash, mugsmash_state )
 
 	MCFG_PALETTE_LENGTH(0x300)
 
-	MCFG_VIDEO_START(mugsmash)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

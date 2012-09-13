@@ -92,7 +92,7 @@ static const UINT8 prom[] = {
 
 
 
-VIDEO_START( mc8020 )
+VIDEO_START_MEMBER(mc80_state,mc8020)
 {
 }
 
@@ -137,10 +137,9 @@ SCREEN_UPDATE_IND16( mc8020 )
 /*****************************************************************************/
 
 
-VIDEO_START( mc8030 )
+VIDEO_START_MEMBER(mc80_state,mc8030)
 {
-	mc80_state *state = machine.driver_data<mc80_state>();
-	state->m_p_videoram.set_target(state->memregion("vram")->base(),state->m_p_videoram.bytes());
+	m_p_videoram.set_target(memregion("vram")->base(),m_p_videoram.bytes());
 }
 
 SCREEN_UPDATE_IND16( mc8030 )

@@ -30,6 +30,11 @@ public:
 	DECLARE_DRIVER_INIT(condor);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	DECLARE_MACHINE_RESET(phoenix);
+	DECLARE_VIDEO_START(phoenix);
+	DECLARE_PALETTE_INIT(phoenix);
+	DECLARE_PALETTE_INIT(survival);
+	DECLARE_PALETTE_INIT(pleiads);
 };
 
 
@@ -80,10 +85,10 @@ extern const device_type PHOENIX;
 
 /*----------- defined in video/phoenix.c -----------*/
 
-PALETTE_INIT( phoenix );
-PALETTE_INIT( survival );
-PALETTE_INIT( pleiads );
-VIDEO_START( phoenix );
+
+
+
+
 SCREEN_UPDATE_IND16( phoenix );
 
 

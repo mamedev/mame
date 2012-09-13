@@ -219,15 +219,19 @@ public:
 	DECLARE_DRIVER_INIT(calipso);
 	DECLARE_DRIVER_INIT(moonwar);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_PALETTE_INIT(moonwar);
+	void tenspot_set_game_bank(running_machine& machine, int bank, int from_game);
 };
 
 
 /*----------- defined in video/galaxian.c -----------*/
 
-PALETTE_INIT( galaxian );
-PALETTE_INIT( moonwar );
 
-VIDEO_START( galaxian );
+
+
+
 SCREEN_UPDATE_RGB32( galaxian );
 
 
@@ -288,9 +292,3 @@ void calipso_extend_sprite_info(running_machine &machine, const UINT8 *base, UIN
 /* Jumpbug extensions */
 void jumpbug_extend_tile_info(running_machine &machine, UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
 void jumpbug_extend_sprite_info(running_machine &machine, const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
-
-/*----------- defined in drivers/galaxian.c -----------*/
-
-/* Ten Spot extensions */
-void tenspot_set_game_bank(running_machine &machine, int bank, int from_game);
-

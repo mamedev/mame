@@ -1348,14 +1348,13 @@ void decocass_machine_state_save_init( running_machine &machine )
  *
  ***************************************************************************/
 
-MACHINE_START( decocass )
+void decocass_state::machine_start()
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_mcu = machine.device("mcu");
-	state->m_cassette = machine.device("cassette");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_mcu = machine().device("mcu");
+	m_cassette = machine().device("cassette");
 }
 
 static void decocass_reset_common( running_machine &machine )
@@ -1412,278 +1411,250 @@ static void decocass_reset_common( running_machine &machine )
 	state->m_center_v_shift = 0;
 }
 
-MACHINE_RESET( decocass )
+void decocass_state::machine_reset()
 {
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 }
 
-MACHINE_RESET( ctsttape )
+MACHINE_RESET_MEMBER(decocass_state,ctsttape)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #1 (DE-0061)\n"));
-	state->m_dongle_r = decocass_type1_pass_136_r;
+	m_dongle_r = decocass_type1_pass_136_r;
 }
 
-MACHINE_RESET( chwy )
+MACHINE_RESET_MEMBER(decocass_state,chwy)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #1 (DE-0061 own PROM)\n"));
-	state->m_dongle_r = decocass_type1_latch_27_pass_3_inv_2_r;
+	m_dongle_r = decocass_type1_latch_27_pass_3_inv_2_r;
 }
 
-MACHINE_RESET( cdsteljn )
+MACHINE_RESET_MEMBER(decocass_state,cdsteljn)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #1 (A-0061)\n"));
-	state->m_dongle_r = decocass_type1_latch_27_pass_3_inv_2_r;
+	m_dongle_r = decocass_type1_latch_27_pass_3_inv_2_r;
 }
 
-MACHINE_RESET( cterrani )
+MACHINE_RESET_MEMBER(decocass_state,cterrani)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #1 (DE-0061 straight)\n"));
-	state->m_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
-	state->m_type1_inmap = MAKE_MAP(0,1,2,3,4,5,6,7);
-	state->m_type1_outmap = MAKE_MAP(0,1,2,3,4,5,6,7);
+	m_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
+	m_type1_inmap = MAKE_MAP(0,1,2,3,4,5,6,7);
+	m_type1_outmap = MAKE_MAP(0,1,2,3,4,5,6,7);
 }
 
-MACHINE_RESET( castfant )
+MACHINE_RESET_MEMBER(decocass_state,castfant)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #1 (DE-0061)\n"));
-	state->m_dongle_r = decocass_type1_latch_16_pass_3_inv_1_r;
+	m_dongle_r = decocass_type1_latch_16_pass_3_inv_1_r;
 }
 
-MACHINE_RESET( csuperas )
+MACHINE_RESET_MEMBER(decocass_state,csuperas)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #1 (DE-0061 flip 4-5)\n"));
-	state->m_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
-	state->m_type1_inmap = MAKE_MAP(0,1,2,3,5,4,6,7);
-	state->m_type1_outmap = MAKE_MAP(0,1,2,3,5,4,6,7);
+	m_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
+	m_type1_inmap = MAKE_MAP(0,1,2,3,5,4,6,7);
+	m_type1_outmap = MAKE_MAP(0,1,2,3,5,4,6,7);
 }
 
-MACHINE_RESET( clocknch )
+MACHINE_RESET_MEMBER(decocass_state,clocknch)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #1 (DE-0061 flip 2-3)\n"));
-	state->m_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
-	state->m_type1_inmap = MAKE_MAP(0,1,3,2,4,5,6,7);
-	state->m_type1_outmap = MAKE_MAP(0,1,3,2,4,5,6,7);
+	m_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
+	m_type1_inmap = MAKE_MAP(0,1,3,2,4,5,6,7);
+	m_type1_outmap = MAKE_MAP(0,1,3,2,4,5,6,7);
 }
 
-MACHINE_RESET( cprogolf )
+MACHINE_RESET_MEMBER(decocass_state,cprogolf)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #1 (DE-0061 flip 0-1)\n"));
-	state->m_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
-	state->m_type1_inmap = MAKE_MAP(1,0,2,3,4,5,6,7);
-	state->m_type1_outmap = MAKE_MAP(1,0,2,3,4,5,6,7);
+	m_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
+	m_type1_inmap = MAKE_MAP(1,0,2,3,4,5,6,7);
+	m_type1_outmap = MAKE_MAP(1,0,2,3,4,5,6,7);
 }
 
-MACHINE_RESET( cprogolfj )
+MACHINE_RESET_MEMBER(decocass_state,cprogolfj)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #1 (A-0061 flip 0-1)\n"));
-	state->m_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
-	state->m_type1_inmap = MAKE_MAP(1,0,2,3,4,5,6,7);
-	state->m_type1_outmap = MAKE_MAP(1,0,2,3,4,5,6,7);
+	m_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
+	m_type1_inmap = MAKE_MAP(1,0,2,3,4,5,6,7);
+	m_type1_outmap = MAKE_MAP(1,0,2,3,4,5,6,7);
 }
 
-MACHINE_RESET( cluckypo )
+MACHINE_RESET_MEMBER(decocass_state,cluckypo)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #1 (DE-0061 flip 1-3)\n"));
-	state->m_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
-	state->m_type1_inmap = MAKE_MAP(0,3,2,1,4,5,6,7);
-	state->m_type1_outmap = MAKE_MAP(0,3,2,1,4,5,6,7);
+	m_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
+	m_type1_inmap = MAKE_MAP(0,3,2,1,4,5,6,7);
+	m_type1_outmap = MAKE_MAP(0,3,2,1,4,5,6,7);
 }
 
-MACHINE_RESET( ctisland )
+MACHINE_RESET_MEMBER(decocass_state,ctisland)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #1 (DE-0061 flip 0-2)\n"));
-	state->m_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
-	state->m_type1_inmap = MAKE_MAP(2,1,0,3,4,5,6,7);
-	state->m_type1_outmap = MAKE_MAP(2,1,0,3,4,5,6,7);
+	m_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
+	m_type1_inmap = MAKE_MAP(2,1,0,3,4,5,6,7);
+	m_type1_outmap = MAKE_MAP(2,1,0,3,4,5,6,7);
 }
 
-MACHINE_RESET( cexplore )
+MACHINE_RESET_MEMBER(decocass_state,cexplore)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #1 (DE-0061 own PROM)\n"));
-	state->m_dongle_r = decocass_type1_latch_26_pass_5_inv_2_r;
+	m_dongle_r = decocass_type1_latch_26_pass_5_inv_2_r;
 }
 
-MACHINE_RESET( cdiscon1 )
+MACHINE_RESET_MEMBER(decocass_state,cdiscon1)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #2 (CS82-007)\n"));
-	state->m_dongle_r = decocass_type2_r;
-	state->m_dongle_w = decocass_type2_w;
+	m_dongle_r = decocass_type2_r;
+	m_dongle_w = decocass_type2_w;
 }
 
-MACHINE_RESET( ctornado )
+MACHINE_RESET_MEMBER(decocass_state,ctornado)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #2 (CS82-007)\n"));
-	state->m_dongle_r = decocass_type2_r;
-	state->m_dongle_w = decocass_type2_w;
+	m_dongle_r = decocass_type2_r;
+	m_dongle_w = decocass_type2_w;
 }
 
-MACHINE_RESET( cmissnx )
+MACHINE_RESET_MEMBER(decocass_state,cmissnx)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #2 (CS82-007)\n"));
-	state->m_dongle_r = decocass_type2_r;
-	state->m_dongle_w = decocass_type2_w;
+	m_dongle_r = decocass_type2_r;
+	m_dongle_w = decocass_type2_w;
 }
 
-MACHINE_RESET( cptennis )
+MACHINE_RESET_MEMBER(decocass_state,cptennis)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #2 (CS82-007)\n"));
-	state->m_dongle_r = decocass_type2_r;
-	state->m_dongle_w = decocass_type2_w;
+	m_dongle_r = decocass_type2_r;
+	m_dongle_w = decocass_type2_w;
 }
 
-MACHINE_RESET( cfishing )
+MACHINE_RESET_MEMBER(decocass_state,cfishing)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #3 (PAL)\n"));
-	state->m_dongle_r = decocass_type3_r;
-	state->m_dongle_w = decocass_type3_w;
-	state->m_type3_swap = TYPE3_SWAP_01;
-
-}
-
-MACHINE_RESET( cbtime )
-{
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
-	LOG(0,("dongle type #3 (PAL)\n"));
-	state->m_dongle_r = decocass_type3_r;
-	state->m_dongle_w = decocass_type3_w;
-	state->m_type3_swap = TYPE3_SWAP_12;
+	m_dongle_r = decocass_type3_r;
+	m_dongle_w = decocass_type3_w;
+	m_type3_swap = TYPE3_SWAP_01;
 
 }
 
-MACHINE_RESET( cburnrub )
+MACHINE_RESET_MEMBER(decocass_state,cbtime)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #3 (PAL)\n"));
-	state->m_dongle_r = decocass_type3_r;
-	state->m_dongle_w = decocass_type3_w;
-	state->m_type3_swap = TYPE3_SWAP_67;
+	m_dongle_r = decocass_type3_r;
+	m_dongle_w = decocass_type3_w;
+	m_type3_swap = TYPE3_SWAP_12;
+
 }
 
-MACHINE_RESET( cgraplop )
+MACHINE_RESET_MEMBER(decocass_state,cburnrub)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #3 (PAL)\n"));
-	state->m_dongle_r = decocass_type3_r;
-	state->m_dongle_w = decocass_type3_w;
-	state->m_type3_swap = TYPE3_SWAP_56;
+	m_dongle_r = decocass_type3_r;
+	m_dongle_w = decocass_type3_w;
+	m_type3_swap = TYPE3_SWAP_67;
 }
 
-MACHINE_RESET( cgraplop2 )
+MACHINE_RESET_MEMBER(decocass_state,cgraplop)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #3 (PAL)\n"));
-	state->m_dongle_r = decocass_type3_r;
-	state->m_dongle_w = decocass_type3_w;
-	state->m_type3_swap = TYPE3_SWAP_67;
+	m_dongle_r = decocass_type3_r;
+	m_dongle_w = decocass_type3_w;
+	m_type3_swap = TYPE3_SWAP_56;
 }
 
-MACHINE_RESET( clapapa )
+MACHINE_RESET_MEMBER(decocass_state,cgraplop2)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #3 (PAL)\n"));
-	state->m_dongle_r = decocass_type3_r;
-	state->m_dongle_w = decocass_type3_w;
-	state->m_type3_swap = TYPE3_SWAP_34_7;
+	m_dongle_r = decocass_type3_r;
+	m_dongle_w = decocass_type3_w;
+	m_type3_swap = TYPE3_SWAP_67;
 }
 
-MACHINE_RESET( cskater )
+MACHINE_RESET_MEMBER(decocass_state,clapapa)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #3 (PAL)\n"));
-	state->m_dongle_r = decocass_type3_r;
-	state->m_dongle_w = decocass_type3_w;
-	state->m_type3_swap = TYPE3_SWAP_45;
+	m_dongle_r = decocass_type3_r;
+	m_dongle_w = decocass_type3_w;
+	m_type3_swap = TYPE3_SWAP_34_7;
 }
 
-MACHINE_RESET( cprobowl )
+MACHINE_RESET_MEMBER(decocass_state,cskater)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #3 (PAL)\n"));
-	state->m_dongle_r = decocass_type3_r;
-	state->m_dongle_w = decocass_type3_w;
-	state->m_type3_swap = TYPE3_SWAP_34_0;
+	m_dongle_r = decocass_type3_r;
+	m_dongle_w = decocass_type3_w;
+	m_type3_swap = TYPE3_SWAP_45;
 }
 
-MACHINE_RESET( cnightst )
+MACHINE_RESET_MEMBER(decocass_state,cprobowl)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #3 (PAL)\n"));
-	state->m_dongle_r = decocass_type3_r;
-	state->m_dongle_w = decocass_type3_w;
-	state->m_type3_swap = TYPE3_SWAP_13;
+	m_dongle_r = decocass_type3_r;
+	m_dongle_w = decocass_type3_w;
+	m_type3_swap = TYPE3_SWAP_34_0;
 }
 
-MACHINE_RESET( cpsoccer )
+MACHINE_RESET_MEMBER(decocass_state,cnightst)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #3 (PAL)\n"));
-	state->m_dongle_r = decocass_type3_r;
-	state->m_dongle_w = decocass_type3_w;
-	state->m_type3_swap = TYPE3_SWAP_24;
+	m_dongle_r = decocass_type3_r;
+	m_dongle_w = decocass_type3_w;
+	m_type3_swap = TYPE3_SWAP_13;
 }
 
-MACHINE_RESET( csdtenis )
+MACHINE_RESET_MEMBER(decocass_state,cpsoccer)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #3 (PAL)\n"));
-	state->m_dongle_r = decocass_type3_r;
-	state->m_dongle_w = decocass_type3_w;
-	state->m_type3_swap = TYPE3_SWAP_23_56;
+	m_dongle_r = decocass_type3_r;
+	m_dongle_w = decocass_type3_w;
+	m_type3_swap = TYPE3_SWAP_24;
 }
 
-MACHINE_RESET( czeroize )
+MACHINE_RESET_MEMBER(decocass_state,csdtenis)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	UINT8 *mem = state->memregion("dongle")->base();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #3 (PAL)\n"));
-	state->m_dongle_r = decocass_type3_r;
-	state->m_dongle_w = decocass_type3_w;
-	state->m_type3_swap = TYPE3_SWAP_23_56;
+	m_dongle_r = decocass_type3_r;
+	m_dongle_w = decocass_type3_w;
+	m_type3_swap = TYPE3_SWAP_23_56;
+}
+
+MACHINE_RESET_MEMBER(decocass_state,czeroize)
+{
+	UINT8 *mem = memregion("dongle")->base();
+	decocass_reset_common(machine());
+	LOG(0,("dongle type #3 (PAL)\n"));
+	m_dongle_r = decocass_type3_r;
+	m_dongle_w = decocass_type3_w;
+	m_type3_swap = TYPE3_SWAP_23_56;
 
 	/*
      * FIXME: remove if the original ROM is available.
@@ -1699,50 +1670,45 @@ MACHINE_RESET( czeroize )
 	mem[0x08a1] = 0xf7;
 }
 
-MACHINE_RESET( cppicf )
+MACHINE_RESET_MEMBER(decocass_state,cppicf)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #3 (PAL)\n"));
-	state->m_dongle_r = decocass_type3_r;
-	state->m_dongle_w = decocass_type3_w;
-	state->m_type3_swap = TYPE3_SWAP_01;
+	m_dongle_r = decocass_type3_r;
+	m_dongle_w = decocass_type3_w;
+	m_type3_swap = TYPE3_SWAP_01;
 }
 
-MACHINE_RESET( cfghtice )
+MACHINE_RESET_MEMBER(decocass_state,cfghtice)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #3 (PAL)\n"));
-	state->m_dongle_r = decocass_type3_r;
-	state->m_dongle_w = decocass_type3_w;
-	state->m_type3_swap = TYPE3_SWAP_25;
+	m_dongle_r = decocass_type3_r;
+	m_dongle_w = decocass_type3_w;
+	m_type3_swap = TYPE3_SWAP_25;
 }
 
-MACHINE_RESET( type4 )
+MACHINE_RESET_MEMBER(decocass_state,type4)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #4 (32K ROM)\n"));
-	state->m_dongle_r = decocass_type4_r;
-	state->m_dongle_w = decocass_type4_w;
+	m_dongle_r = decocass_type4_r;
+	m_dongle_w = decocass_type4_w;
 }
 
-MACHINE_RESET( cbdash )
+MACHINE_RESET_MEMBER(decocass_state,cbdash)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("dongle type #5 (NOP)\n"));
-	state->m_dongle_r = decocass_type5_r;
-	state->m_dongle_w = decocass_type5_w;
+	m_dongle_r = decocass_type5_r;
+	m_dongle_w = decocass_type5_w;
 }
 
-MACHINE_RESET( cflyball )
+MACHINE_RESET_MEMBER(decocass_state,cflyball)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	decocass_reset_common(machine);
+	decocass_reset_common(machine());
 	LOG(0,("no dongle\n"));
-	state->m_dongle_r = decocass_nodong_r;
+	m_dongle_r = decocass_nodong_r;
 }
 
 /***************************************************************************

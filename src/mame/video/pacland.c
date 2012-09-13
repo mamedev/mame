@@ -88,63 +88,62 @@ static void switch_palette(running_machine &machine)
 	}
 }
 
-PALETTE_INIT( pacland )
+void pacland_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	pacland_state *state = machine.driver_data<pacland_state>();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 256);
+	machine().colortable = colortable_alloc(machine(), 256);
 
-	state->m_color_prom = color_prom;	/* we'll need this later */
+	m_color_prom = color_prom;	/* we'll need this later */
 	/* skip the palette data, it will be initialized later */
 	color_prom += 2 * 0x400;
 	/* color_prom now points to the beginning of the lookup table */
 
 	for (i = 0;i < 0x400;i++)
-		colortable_entry_set_value(machine.colortable, machine.gfx[0]->colorbase() + i, *color_prom++);
+		colortable_entry_set_value(machine().colortable, machine().gfx[0]->colorbase() + i, *color_prom++);
 
 	/* Background */
 	for (i = 0;i < 0x400;i++)
-		colortable_entry_set_value(machine.colortable, machine.gfx[1]->colorbase() + i, *color_prom++);
+		colortable_entry_set_value(machine().colortable, machine().gfx[1]->colorbase() + i, *color_prom++);
 
 	/* Sprites */
 	for (i = 0;i < 0x400;i++)
-		colortable_entry_set_value(machine.colortable, machine.gfx[2]->colorbase() + i, *color_prom++);
+		colortable_entry_set_value(machine().colortable, machine().gfx[2]->colorbase() + i, *color_prom++);
 
-	state->m_palette_bank = 0;
-	switch_palette(machine);
+	m_palette_bank = 0;
+	switch_palette(machine());
 
 	/* precalculate transparency masks for sprites */
-	state->m_transmask[0] = auto_alloc_array(machine, UINT32, 64);
-	state->m_transmask[1] = auto_alloc_array(machine, UINT32, 64);
-	state->m_transmask[2] = auto_alloc_array(machine, UINT32, 64);
+	m_transmask[0] = auto_alloc_array(machine(), UINT32, 64);
+	m_transmask[1] = auto_alloc_array(machine(), UINT32, 64);
+	m_transmask[2] = auto_alloc_array(machine(), UINT32, 64);
 	for (i = 0; i < 64; i++)
 	{
 		int palentry;
 
 		/* start with no transparency */
-		state->m_transmask[0][i] = state->m_transmask[1][i] =  state->m_transmask[2][i] = 0;
+		m_transmask[0][i] = m_transmask[1][i] =  m_transmask[2][i] = 0;
 
 		/* iterate over all palette entries except the last one */
 		for (palentry = 0; palentry < 0x100; palentry++)
 		{
-			UINT32 mask = colortable_get_transpen_mask(machine.colortable, machine.gfx[2], i, palentry);
+			UINT32 mask = colortable_get_transpen_mask(machine().colortable, machine().gfx[2], i, palentry);
 
 			/* transmask[0] is a mask that is used to draw only high priority sprite pixels; thus, pens
                $00-$7F are opaque, and others are transparent */
 			if (palentry >= 0x80)
-				state->m_transmask[0][i] |= mask;
+				m_transmask[0][i] |= mask;
 
 			/* transmask[1] is a normal drawing masking with palette entries $7F and $FF transparent */
 			if ((palentry & 0x7f) == 0x7f)
-				state->m_transmask[1][i] |= mask;
+				m_transmask[1][i] |= mask;
 
 			/* transmask[2] is a mask of the topmost priority sprite pixels; thus pens $F0-$FE are
                opaque, and others are transparent */
 			if (palentry < 0xf0 || palentry == 0xff)
-				state->m_transmask[2][i] |= mask;
+				m_transmask[2][i] |= mask;
 		}
 	}
 }
@@ -190,32 +189,31 @@ TILE_GET_INFO_MEMBER(pacland_state::get_fg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( pacland )
+void pacland_state::video_start()
 {
-	pacland_state *state = machine.driver_data<pacland_state>();
 	int color;
 
-	machine.primary_screen->register_screen_bitmap(state->m_fg_bitmap);
-	state->m_fg_bitmap.fill(0xffff);
+	machine().primary_screen->register_screen_bitmap(m_fg_bitmap);
+	m_fg_bitmap.fill(0xffff);
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pacland_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pacland_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pacland_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pacland_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
-	state->m_fg_tilemap->set_scroll_rows(32);
+	m_fg_tilemap->set_scroll_rows(32);
 
 	/* create one group per color code; for each group, set the transparency mask
        to correspond to the pens that are 0x7f or 0xff */
-	assert(machine.gfx[0]->colors() <= TILEMAP_NUM_GROUPS);
-	for (color = 0; color < machine.gfx[0]->colors(); color++)
+	assert(machine().gfx[0]->colors() <= TILEMAP_NUM_GROUPS);
+	for (color = 0; color < machine().gfx[0]->colors(); color++)
 	{
-		UINT32 mask = colortable_get_transpen_mask(machine.colortable, machine.gfx[0], color, 0x7f);
-		mask |= colortable_get_transpen_mask(machine.colortable, machine.gfx[0], color, 0xff);
-		state->m_fg_tilemap->set_transmask(color, mask, 0);
+		UINT32 mask = colortable_get_transpen_mask(machine().colortable, machine().gfx[0], color, 0x7f);
+		mask |= colortable_get_transpen_mask(machine().colortable, machine().gfx[0], color, 0xff);
+		m_fg_tilemap->set_transmask(color, mask, 0);
 	}
 
-	state_save_register_global(machine, state->m_palette_bank);
-	state_save_register_global(machine, state->m_scroll0);
-	state_save_register_global(machine, state->m_scroll1);
+	state_save_register_global(machine(), m_palette_bank);
+	state_save_register_global(machine(), m_scroll0);
+	state_save_register_global(machine(), m_scroll1);
 }
 
 

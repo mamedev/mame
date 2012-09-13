@@ -25,9 +25,10 @@ public:
 	required_shared_ptr<UINT8> m_vram;
 //  DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_DRIVER_INIT(intrscti);
+	virtual void video_start();
 };
 
-static VIDEO_START(intrscti)
+void intrscti_state::video_start()
 {
 }
 
@@ -175,7 +176,6 @@ static MACHINE_CONFIG_START( intrscti, intrscti_state )
 	MCFG_GFXDECODE(intrscti)
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(intrscti)
 MACHINE_CONFIG_END
 
 

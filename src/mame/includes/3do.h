@@ -185,6 +185,8 @@ public:
 	DECLARE_WRITE32_MEMBER(_3do_madam_w);
 	DECLARE_READ32_MEMBER(_3do_clio_r);
 	DECLARE_WRITE32_MEMBER(_3do_clio_w);
+	virtual void machine_reset();
+	DECLARE_VIDEO_START(_3do);
 };
 
 /*----------- defined in machine/3do.c -----------*/
@@ -198,7 +200,7 @@ void _3do_madam_init( running_machine &machine );
 void _3do_clio_init( running_machine &machine, screen_device *screen );
 
 
-VIDEO_START( _3do );
+
 SCREEN_UPDATE_RGB32( _3do );
 
 #endif /* _3DO_H_ */

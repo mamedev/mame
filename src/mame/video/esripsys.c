@@ -57,28 +57,27 @@ static TIMER_CALLBACK( hblank_end_callback )
 	state->m_hblank = 1;
 }
 
-VIDEO_START( esripsys )
+void esripsys_state::video_start()
 {
-	esripsys_state *state = machine.driver_data<esripsys_state>();
-	struct line_buffer_t *line_buffer = state->m_line_buffer;
+	struct line_buffer_t *line_buffer = m_line_buffer;
 	int i;
 
 	/* Allocate memory for the two 512-pixel line buffers */
-	line_buffer[0].colour_buf = auto_alloc_array(machine, UINT8, 512);
-	line_buffer[0].intensity_buf = auto_alloc_array(machine, UINT8, 512);
-	line_buffer[0].priority_buf = auto_alloc_array(machine, UINT8, 512);
+	line_buffer[0].colour_buf = auto_alloc_array(machine(), UINT8, 512);
+	line_buffer[0].intensity_buf = auto_alloc_array(machine(), UINT8, 512);
+	line_buffer[0].priority_buf = auto_alloc_array(machine(), UINT8, 512);
 
-	line_buffer[1].colour_buf = auto_alloc_array(machine, UINT8, 512);
-	line_buffer[1].intensity_buf = auto_alloc_array(machine, UINT8, 512);
-	line_buffer[1].priority_buf = auto_alloc_array(machine, UINT8, 512);
+	line_buffer[1].colour_buf = auto_alloc_array(machine(), UINT8, 512);
+	line_buffer[1].intensity_buf = auto_alloc_array(machine(), UINT8, 512);
+	line_buffer[1].priority_buf = auto_alloc_array(machine(), UINT8, 512);
 
 	/* Create and initialise the HBLANK timers */
-	state->m_hblank_start_timer = machine.scheduler().timer_alloc(FUNC(hblank_start_callback));
-	state->m_hblank_end_timer = machine.scheduler().timer_alloc(FUNC(hblank_end_callback));
-	state->m_hblank_start_timer->adjust(machine.primary_screen->time_until_pos(0, ESRIPSYS_HBLANK_START));
+	m_hblank_start_timer = machine().scheduler().timer_alloc(FUNC(hblank_start_callback));
+	m_hblank_end_timer = machine().scheduler().timer_alloc(FUNC(hblank_end_callback));
+	m_hblank_start_timer->adjust(machine().primary_screen->time_until_pos(0, ESRIPSYS_HBLANK_START));
 
 	/* Create the sprite scaling table */
-	state->m_scale_table = auto_alloc_array(machine, UINT8, 64 * 64);
+	m_scale_table = auto_alloc_array(machine(), UINT8, 64 * 64);
 
 	for (i = 0; i < 64; ++i)
 	{
@@ -106,12 +105,12 @@ VIDEO_START( esripsys )
 			if (i & 0x20)
 				p5 = BIT(j, 0);
 
-			state->m_scale_table[i * 64 + j - 1] = p0 | p1 | p2 | p3 | p4 | p5;
+			m_scale_table[i * 64 + j - 1] = p0 | p1 | p2 | p3 | p4 | p5;
 		}
 	}
 
 	/* Now create a lookup table for scaling the sprite 'fig' value */
-	state->m_fig_scale_table = auto_alloc_array(machine, UINT8, 1024 * 64);
+	m_fig_scale_table = auto_alloc_array(machine(), UINT8, 1024 * 64);
 
 	for (i = 0; i < 1024; ++i)
 	{
@@ -124,31 +123,31 @@ VIDEO_START( esripsys )
 
 			while (input_pixels)
 			{
-				if (state->m_scale_table[scale * 64 + (scaled_pixels & 0x3f)] == 0)
+				if (m_scale_table[scale * 64 + (scaled_pixels & 0x3f)] == 0)
 					input_pixels--;
 
 				scaled_pixels++;
 			}
 
-			state->m_fig_scale_table[i * 64 + scale] = scaled_pixels - 1;
+			m_fig_scale_table[i * 64 + scale] = scaled_pixels - 1;
 		}
 	}
 
 	/* Register stuff for state saving */
-	state_save_register_global_pointer(machine, line_buffer[0].colour_buf, 512);
-	state_save_register_global_pointer(machine, line_buffer[0].intensity_buf, 512);
-	state_save_register_global_pointer(machine, line_buffer[0].priority_buf, 512);
+	state_save_register_global_pointer(machine(), line_buffer[0].colour_buf, 512);
+	state_save_register_global_pointer(machine(), line_buffer[0].intensity_buf, 512);
+	state_save_register_global_pointer(machine(), line_buffer[0].priority_buf, 512);
 
-	state_save_register_global_pointer(machine, line_buffer[1].colour_buf, 512);
-	state_save_register_global_pointer(machine, line_buffer[1].intensity_buf, 512);
-	state_save_register_global_pointer(machine, line_buffer[1].priority_buf, 512);
+	state_save_register_global_pointer(machine(), line_buffer[1].colour_buf, 512);
+	state_save_register_global_pointer(machine(), line_buffer[1].intensity_buf, 512);
+	state_save_register_global_pointer(machine(), line_buffer[1].priority_buf, 512);
 
-	state_save_register_global(machine, state->m_video_firq);
-	state_save_register_global(machine, state->m_bg_intensity);
-	state_save_register_global(machine, state->m_hblank);
-	state_save_register_global(machine, state->m_video_firq_en);
-	state_save_register_global(machine, state->m_frame_vbl);
-	state_save_register_global(machine, state->m_12sel);
+	state_save_register_global(machine(), m_video_firq);
+	state_save_register_global(machine(), m_bg_intensity);
+	state_save_register_global(machine(), m_hblank);
+	state_save_register_global(machine(), m_video_firq_en);
+	state_save_register_global(machine(), m_frame_vbl);
+	state_save_register_global(machine(), m_12sel);
 }
 
 SCREEN_UPDATE_RGB32( esripsys )

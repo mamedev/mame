@@ -11,7 +11,7 @@
 #include "includes/pk8020.h"
 #include "machine/ram.h"
 
-VIDEO_START( pk8020 )
+void pk8020_state::video_start()
 {
 }
 
@@ -49,10 +49,10 @@ SCREEN_UPDATE_IND16( pk8020 )
 	return 0;
 }
 
-PALETTE_INIT( pk8020 )
+void pk8020_state::palette_init()
 {
 	int i;
 	for(i=0;i<16;i++) {
-		palette_set_color( machine, i, MAKE_RGB(i*0x10,i*0x10,i*0x10) );
+		palette_set_color( machine(), i, MAKE_RGB(i*0x10,i*0x10,i*0x10) );
 	}
 }

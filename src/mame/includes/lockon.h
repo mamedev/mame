@@ -99,13 +99,17 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_vol);
 	DECLARE_WRITE8_MEMBER(ym2203_out_b);
 	TILE_GET_INFO_MEMBER(get_lockon_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/lockon.c -----------*/
 
-PALETTE_INIT( lockon );
-VIDEO_START( lockon );
+
+
 SCREEN_UPDATE_IND16( lockon );
 SCREEN_VBLANK( lockon );
 

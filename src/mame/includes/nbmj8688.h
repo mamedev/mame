@@ -78,22 +78,31 @@ public:
 	DECLARE_DRIVER_INIT(crystalg);
 	DECLARE_DRIVER_INIT(citylove);
 	DECLARE_DRIVER_INIT(kanatuen);
+	DECLARE_VIDEO_START(mbmj8688_pure_12bit);
+	DECLARE_PALETTE_INIT(mbmj8688_12bit);
+	DECLARE_VIDEO_START(mbmj8688_pure_16bit_LCD);
+	DECLARE_PALETTE_INIT(mbmj8688_16bit);
+	DECLARE_VIDEO_START(mbmj8688_8bit);
+	DECLARE_PALETTE_INIT(mbmj8688_8bit);
+	DECLARE_VIDEO_START(mbmj8688_hybrid_16bit);
+	DECLARE_VIDEO_START(mbmj8688_hybrid_12bit);
+	DECLARE_VIDEO_START(mbmj8688_pure_16bit);
 };
 
 
 /*----------- defined in video/nbmj8688.c -----------*/
 
-PALETTE_INIT( mbmj8688_8bit );
-PALETTE_INIT( mbmj8688_12bit );
-PALETTE_INIT( mbmj8688_16bit );
+
+
+
 SCREEN_UPDATE_IND16( mbmj8688 );
 SCREEN_UPDATE_IND16( mbmj8688_lcd0 );
 SCREEN_UPDATE_IND16( mbmj8688_lcd1 );
-VIDEO_START( mbmj8688_8bit );
-VIDEO_START( mbmj8688_hybrid_12bit );
-VIDEO_START( mbmj8688_pure_12bit );
-VIDEO_START( mbmj8688_hybrid_16bit );
-VIDEO_START( mbmj8688_pure_16bit );
-VIDEO_START( mbmj8688_pure_16bit_LCD );
+
+
+
+
+
+
 
 

@@ -229,42 +229,40 @@ UINT8 samcoupe_mouse_r(running_machine &machine)
 	return result;
 }
 
-MACHINE_START( samcoupe )
+void samcoupe_state::machine_start()
 {
-	samcoupe_state *state = machine.driver_data<samcoupe_state>();
-	state->m_mouse_reset = machine.scheduler().timer_alloc(FUNC(samcoupe_mouse_reset));
+	m_mouse_reset = machine().scheduler().timer_alloc(FUNC(samcoupe_mouse_reset));
 
 	/* schedule our video updates */
-	state->m_video_update_timer = machine.scheduler().timer_alloc(FUNC(sam_video_update_callback));
-	state->m_video_update_timer->adjust(machine.primary_screen->time_until_pos(0, 0));
+	m_video_update_timer = machine().scheduler().timer_alloc(FUNC(sam_video_update_callback));
+	m_video_update_timer->adjust(machine().primary_screen->time_until_pos(0, 0));
 }
 
 /***************************************************************************
     RESET
 ***************************************************************************/
 
-MACHINE_RESET( samcoupe )
+void samcoupe_state::machine_reset()
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	address_space *spaceio = machine.device("maincpu")->memory().space(AS_IO);
-	samcoupe_state *state = machine.driver_data<samcoupe_state>();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *spaceio = machine().device("maincpu")->memory().space(AS_IO);
 
 	/* initialize state */
-	state->m_lmpr = 0x0f;      /* ROM0 paged in, ROM1 paged out RAM Banks */
-	state->m_hmpr = 0x01;
-	state->m_vmpr = 0x81;
-	state->m_line_int = 0xff;  /* line interrupts disabled */
-	state->m_status = 0x1f;    /* no interrupts active */
+	m_lmpr = 0x0f;      /* ROM0 paged in, ROM1 paged out RAM Banks */
+	m_hmpr = 0x01;
+	m_vmpr = 0x81;
+	m_line_int = 0xff;  /* line interrupts disabled */
+	m_status = 0x1f;    /* no interrupts active */
 
 	/* initialize mouse */
-	state->m_mouse_index = 0;
-	state->m_mouse_data[0] = 0xff;
-	state->m_mouse_data[1] = 0xff;
+	m_mouse_index = 0;
+	m_mouse_data[0] = 0xff;
+	m_mouse_data[1] = 0xff;
 
-	if (machine.root_device().ioport("config")->read() & 0x01)
+	if (machine().root_device().ioport("config")->read() & 0x01)
 	{
 		/* install RTC */
-		device_t *rtc = machine.device("sambus_clock");
+		device_t *rtc = machine().device("sambus_clock");
 		spaceio->install_legacy_readwrite_handler(*rtc, 0xef, 0xef, 0xffff, 0xff00, FUNC(samcoupe_rtc_r), FUNC(samcoupe_rtc_w));
 	}
 	else

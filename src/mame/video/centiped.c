@@ -93,42 +93,38 @@ static void init_common(running_machine &machine)
 }
 
 
-VIDEO_START( centiped )
+VIDEO_START_MEMBER(centiped_state,centiped)
 {
-	init_common(machine);
-	init_penmask(machine);
+	init_common(machine());
+	init_penmask(machine());
 
-	centiped_state *state = machine.driver_data<centiped_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(centiped_state::centiped_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(centiped_state::centiped_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
-VIDEO_START( warlords )
+VIDEO_START_MEMBER(centiped_state,warlords)
 {
-	init_common(machine);
+	init_common(machine());
 
-	centiped_state *state = machine.driver_data<centiped_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(centiped_state::warlords_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(centiped_state::warlords_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
-VIDEO_START( milliped )
+VIDEO_START_MEMBER(centiped_state,milliped)
 {
-	init_common(machine);
-	init_penmask(machine);
+	init_common(machine());
+	init_penmask(machine());
 
-	centiped_state *state = machine.driver_data<centiped_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(centiped_state::milliped_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(centiped_state::milliped_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
-VIDEO_START( bullsdrt )
+VIDEO_START_MEMBER(centiped_state,bullsdrt)
 {
-	init_common(machine);
-	init_penmask(machine);
+	init_common(machine());
+	init_penmask(machine());
 
-	centiped_state *state = machine.driver_data<centiped_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(centiped_state::bullsdrt_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(centiped_state::bullsdrt_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -283,12 +279,12 @@ WRITE8_MEMBER(centiped_state::centiped_paletteram_w)
 
 ***************************************************************************/
 
-PALETTE_INIT( warlords )
+PALETTE_INIT_MEMBER(centiped_state,warlords)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		UINT8 pen;
 		int r, g, b;
@@ -313,7 +309,7 @@ PALETTE_INIT( warlords )
 			r = g = b = grey;
 		}
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 

@@ -115,6 +115,11 @@ public:
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info_bigfight_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_bigfight_1);
+	DECLARE_MACHINE_RESET(apache3);
+	DECLARE_VIDEO_START(apache3);
+	DECLARE_VIDEO_START(roundup5);
+	DECLARE_VIDEO_START(cyclwarr);
+	DECLARE_VIDEO_START(bigfight);
 };
 
 
@@ -131,10 +136,10 @@ void tatsumi_reset(running_machine &machine);
 
 
 
-VIDEO_START( apache3 );
-VIDEO_START( roundup5 );
-VIDEO_START( cyclwarr );
-VIDEO_START( bigfight );
+
+
+
+
 
 SCREEN_UPDATE_RGB32( roundup5 );
 SCREEN_UPDATE_RGB32( apache3 );

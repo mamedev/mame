@@ -38,6 +38,9 @@ public:
 	DECLARE_READ32_MEMBER(ip6_unk3_r);
 	DECLARE_WRITE32_MEMBER(ip6_unk3_w);
 	DECLARE_DRIVER_INIT(sgi_ip6);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -66,7 +69,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
     VIDEO HARDWARE
 ***************************************************************************/
 
-static VIDEO_START( sgi_ip6 )
+void sgi_ip6_state::video_start()
 {
 }
 
@@ -192,16 +195,15 @@ static INTERRUPT_GEN( sgi_ip6_vbl )
 {
 }
 
-static MACHINE_START( sgi_ip6 )
+void sgi_ip6_state::machine_start()
 {
 }
 
-static MACHINE_RESET( sgi_ip6 )
+void sgi_ip6_state::machine_reset()
 {
-	sgi_ip6_state *state = machine.driver_data<sgi_ip6_state>();
-	state->m_ip6_regs.unknown_byte_0 = 0x80;
-	state->m_ip6_regs.unknown_byte_1 = 0x80;
-	state->m_ip6_regs.unknown_half_0 = 0;
+	m_ip6_regs.unknown_byte_0 = 0x80;
+	m_ip6_regs.unknown_byte_1 = 0x80;
+	m_ip6_regs.unknown_half_0 = 0;
 }
 
 /***************************************************************************
@@ -232,7 +234,6 @@ static MACHINE_CONFIG_START( sgi_ip6, sgi_ip6_state )
 	MCFG_CPU_PROGRAM_MAP( sgi_ip6_map )
 	MCFG_CPU_VBLANK_INT("screen", sgi_ip6_vbl)
 
-	MCFG_MACHINE_RESET( sgi_ip6 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -242,9 +243,7 @@ static MACHINE_CONFIG_START( sgi_ip6, sgi_ip6_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_STATIC(sgi_ip6)
 
-	MCFG_MACHINE_START( sgi_ip6 )
 
-	MCFG_VIDEO_START(sgi_ip6)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( sgi_ip6 )

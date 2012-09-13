@@ -385,18 +385,17 @@ static void signal_sound_irq(running_machine &machine, int which);
  *
  *************************************/
 
-static MACHINE_RESET( system32 )
+MACHINE_RESET_MEMBER(segas32_state,system32)
 {
-	segas32_state *state = machine.driver_data<segas32_state>();
 	/* initialize the interrupt controller */
-	memset(state->m_v60_irq_control, 0xff, sizeof(state->m_v60_irq_control));
+	memset(m_v60_irq_control, 0xff, sizeof(m_v60_irq_control));
 
 	/* allocate timers */
-	state->m_v60_irq_timer[0] = machine.device<timer_device>("v60_irq0");
-	state->m_v60_irq_timer[1] = machine.device<timer_device>("v60_irq1");
+	m_v60_irq_timer[0] = machine().device<timer_device>("v60_irq0");
+	m_v60_irq_timer[1] = machine().device<timer_device>("v60_irq1");
 
 	/* clear IRQ lines */
-	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -2200,7 +2199,7 @@ static MACHINE_CONFIG_START( system32, segas32_state )
 	MCFG_CPU_PROGRAM_MAP(system32_sound_map)
 	MCFG_CPU_IO_MAP(system32_sound_portmap)
 
-	MCFG_MACHINE_RESET(system32)
+	MCFG_MACHINE_RESET_OVERRIDE(segas32_state,system32)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -2217,7 +2216,7 @@ static MACHINE_CONFIG_START( system32, segas32_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(system32)
 
-	MCFG_VIDEO_START(system32)
+	MCFG_VIDEO_START_OVERRIDE(segas32_state,system32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2259,7 +2258,7 @@ static MACHINE_CONFIG_START( multi32, segas32_state )
 	MCFG_CPU_PROGRAM_MAP(multi32_sound_map)
 	MCFG_CPU_IO_MAP(multi32_sound_portmap)
 
-	MCFG_MACHINE_RESET(system32)
+	MCFG_MACHINE_RESET_OVERRIDE(segas32_state,system32)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -2283,7 +2282,7 @@ static MACHINE_CONFIG_START( multi32, segas32_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(multi32_right)
 
-	MCFG_VIDEO_START(multi32)
+	MCFG_VIDEO_START_OVERRIDE(segas32_state,multi32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

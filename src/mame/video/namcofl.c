@@ -117,10 +117,9 @@ static int FLobjcode2tile( running_machine &machine, int code )
 	return code;
 }
 
-VIDEO_START( namcofl )
+VIDEO_START_MEMBER(namcofl_state,namcofl)
 {
-	namcofl_state *state = machine.driver_data<namcofl_state>();
-	state->namco_tilemap_init(NAMCOFL_TILEGFX, machine.root_device().memregion(NAMCOFL_TILEMASKREGION)->base(), TilemapCB );
-	state->c355_obj_init(NAMCOFL_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(FUNC(FLobjcode2tile), &machine));
-	state->c169_roz_init(NAMCOFL_ROTGFX,NAMCOFL_ROTMASKREGION);
+	namco_tilemap_init(NAMCOFL_TILEGFX, machine().root_device().memregion(NAMCOFL_TILEMASKREGION)->base(), TilemapCB );
+	c355_obj_init(NAMCOFL_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(FUNC(FLobjcode2tile), &machine()));
+	c169_roz_init(NAMCOFL_ROTGFX,NAMCOFL_ROTMASKREGION);
 }

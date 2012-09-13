@@ -17,12 +17,14 @@ public:
 
 	UINT8 m_key_row;
 	DECLARE_DRIVER_INIT(kramermc);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in machine/kramermc.c -----------*/
 
-MACHINE_RESET( kramermc );
+
 
 extern const z80pio_interface kramermc_z80pio_intf;
 
@@ -30,7 +32,7 @@ extern const z80pio_interface kramermc_z80pio_intf;
 
 extern const gfx_layout kramermc_charlayout;
 
-VIDEO_START( kramermc );
+
 SCREEN_UPDATE_IND16( kramermc );
 
 

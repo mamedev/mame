@@ -377,35 +377,33 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
-static MACHINE_START( exerion )
+void exerion_state::machine_start()
 {
-	exerion_state *state = machine.driver_data<exerion_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
 
-	state->save_item(NAME(state->m_porta));
-	state->save_item(NAME(state->m_portb));
-	state->save_item(NAME(state->m_cocktail_flip));
-	state->save_item(NAME(state->m_char_palette));
-	state->save_item(NAME(state->m_sprite_palette));
-	state->save_item(NAME(state->m_char_bank));
-	state->save_item(NAME(state->m_background_latches));
+	save_item(NAME(m_porta));
+	save_item(NAME(m_portb));
+	save_item(NAME(m_cocktail_flip));
+	save_item(NAME(m_char_palette));
+	save_item(NAME(m_sprite_palette));
+	save_item(NAME(m_char_bank));
+	save_item(NAME(m_background_latches));
 }
 
-static MACHINE_RESET( exerion )
+void exerion_state::machine_reset()
 {
-	exerion_state *state = machine.driver_data<exerion_state>();
 	int i;
 
-	state->m_porta = 0;
-	state->m_portb = 0;
-	state->m_cocktail_flip = 0;
-	state->m_char_palette = 0;
-	state->m_sprite_palette = 0;
-	state->m_char_bank = 0;
+	m_porta = 0;
+	m_portb = 0;
+	m_cocktail_flip = 0;
+	m_char_palette = 0;
+	m_sprite_palette = 0;
+	m_char_bank = 0;
 
 	for (i = 0; i < 13; i++)
-		state->m_background_latches[i] = 0;
+		m_background_latches[i] = 0;
 }
 
 static MACHINE_CONFIG_START( exerion, exerion_state )
@@ -416,8 +414,6 @@ static MACHINE_CONFIG_START( exerion, exerion_state )
 	MCFG_CPU_ADD("sub", Z80, EXERION_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MCFG_MACHINE_START(exerion)
-	MCFG_MACHINE_RESET(exerion)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -427,8 +423,6 @@ static MACHINE_CONFIG_START( exerion, exerion_state )
 	MCFG_GFXDECODE(exerion)
 	MCFG_PALETTE_LENGTH(256*3)
 
-	MCFG_PALETTE_INIT(exerion)
-	MCFG_VIDEO_START(exerion)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

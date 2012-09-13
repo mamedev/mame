@@ -80,21 +80,20 @@ DRIVER_INIT_MEMBER(stfight_state,stfight)
 	m_decrypt[0xb5] = 0x00;
 }
 
-MACHINE_RESET( stfight )
+void stfight_state::machine_reset()
 {
-	stfight_state *state = machine.driver_data<stfight_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	state->m_adpcm_data_offs = state->m_adpcm_data_end = 0;
-	state->m_toggle = 0;
-	state->m_fm_data = 0;
-	state->m_coin_mech_latch[0] = 0x02;
-	state->m_coin_mech_latch[1] = 0x01;
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	m_adpcm_data_offs = m_adpcm_data_end = 0;
+	m_toggle = 0;
+	m_fm_data = 0;
+	m_coin_mech_latch[0] = 0x02;
+	m_coin_mech_latch[1] = 0x01;
 
-	state->m_coin_mech_query_active = 0;
-	state->m_coin_mech_query = 0;
+	m_coin_mech_query_active = 0;
+	m_coin_mech_query = 0;
 
     // initialise rom bank
-    state->stfight_bank_w(*space, 0, 0 );
+    stfight_bank_w(*space, 0, 0 );
 }
 
 // It's entirely possible that this bank is never switched out

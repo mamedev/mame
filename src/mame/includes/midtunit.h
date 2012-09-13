@@ -63,6 +63,8 @@ public:
 	DECLARE_DRIVER_INIT(nbajam);
 	DECLARE_DRIVER_INIT(jdreddp);
 	DECLARE_DRIVER_INIT(mk2);
+	DECLARE_MACHINE_RESET(midtunit);
+	DECLARE_VIDEO_START(midtunit);
 };
 
 /*----------- defined in machine/midtunit.c -----------*/
@@ -70,7 +72,7 @@ public:
 
 
 
-MACHINE_RESET( midtunit );
+
 
 
 
@@ -78,9 +80,9 @@ MACHINE_RESET( midtunit );
 
 extern UINT8 midtunit_gfx_rom_large;
 
-VIDEO_START( midtunit );
-VIDEO_START( midwunit );
-VIDEO_START( midxunit );
+
+
+
 
 
 

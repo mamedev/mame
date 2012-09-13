@@ -1072,8 +1072,8 @@ static MACHINE_CONFIG_START( msx, msx_state )
 	MCFG_CPU_VBLANK_INT("screen", msx_interrupt)	/* Needed for mouse updates */
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START( msx )
-	MCFG_MACHINE_RESET( msx )
+	MCFG_MACHINE_START_OVERRIDE(msx_state, msx )
+	MCFG_MACHINE_RESET_OVERRIDE(msx_state, msx )
 
 	MCFG_I8255_ADD( "ppi8255", msx_ppi8255_interface )
 
@@ -1151,8 +1151,8 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 	MCFG_TIMER_ADD_SCANLINE("scantimer", msx2_interrupt, "screen", 0, 1)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START( msx2 )
-	MCFG_MACHINE_RESET( msx2 )
+	MCFG_MACHINE_START_OVERRIDE(msx_state, msx2 )
+	MCFG_MACHINE_RESET_OVERRIDE(msx_state, msx2 )
 
 	MCFG_I8255_ADD( "ppi8255", msx_ppi8255_interface )
 

@@ -256,46 +256,44 @@ WRITE16_MEMBER(gaelco2_state::gaelco2_palette_w)
 
 ***************************************************************************/
 
-VIDEO_START( gaelco2 )
+VIDEO_START_MEMBER(gaelco2_state,gaelco2)
 {
-	gaelco2_state *state = machine.driver_data<gaelco2_state>();
-	state->m_videoram = state->m_spriteram->live();
+	m_videoram = m_spriteram->live();
 
 	/* create tilemaps */
-	state->m_pant[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_gaelco2_screen0),state),TILEMAP_SCAN_ROWS,16,16,64,32);
-	state->m_pant[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_gaelco2_screen1),state),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_gaelco2_screen0),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_gaelco2_screen1),this),TILEMAP_SCAN_ROWS,16,16,64,32);
 
 	/* set tilemap properties */
-	state->m_pant[0]->set_transparent_pen(0);
-	state->m_pant[1]->set_transparent_pen(0);
+	m_pant[0]->set_transparent_pen(0);
+	m_pant[1]->set_transparent_pen(0);
 
-	state->m_pant[0]->set_scroll_rows(512);
-	state->m_pant[0]->set_scroll_cols(1);
-	state->m_pant[1]->set_scroll_rows(512);
-	state->m_pant[1]->set_scroll_cols(1);
+	m_pant[0]->set_scroll_rows(512);
+	m_pant[0]->set_scroll_cols(1);
+	m_pant[1]->set_scroll_rows(512);
+	m_pant[1]->set_scroll_cols(1);
 
-	state->m_dual_monitor = 0;
+	m_dual_monitor = 0;
 }
 
-VIDEO_START( gaelco2_dual )
+VIDEO_START_MEMBER(gaelco2_state,gaelco2_dual)
 {
-	gaelco2_state *state = machine.driver_data<gaelco2_state>();
-	state->m_videoram = state->m_spriteram->live();
+	m_videoram = m_spriteram->live();
 
 	/* create tilemaps */
-	state->m_pant[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_gaelco2_screen0_dual),state),TILEMAP_SCAN_ROWS,16,16,64,32);
-	state->m_pant[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_gaelco2_screen1_dual),state),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_gaelco2_screen0_dual),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_gaelco2_screen1_dual),this),TILEMAP_SCAN_ROWS,16,16,64,32);
 
 	/* set tilemap properties */
-	state->m_pant[0]->set_transparent_pen(0);
-	state->m_pant[1]->set_transparent_pen(0);
+	m_pant[0]->set_transparent_pen(0);
+	m_pant[1]->set_transparent_pen(0);
 
-	state->m_pant[0]->set_scroll_rows(512);
-	state->m_pant[0]->set_scroll_cols(1);
-	state->m_pant[1]->set_scroll_rows(512);
-	state->m_pant[1]->set_scroll_cols(1);
+	m_pant[0]->set_scroll_rows(512);
+	m_pant[0]->set_scroll_cols(1);
+	m_pant[1]->set_scroll_rows(512);
+	m_pant[1]->set_scroll_cols(1);
 
-	state->m_dual_monitor = 1;
+	m_dual_monitor = 1;
 }
 
 /***************************************************************************

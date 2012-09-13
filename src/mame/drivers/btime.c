@@ -1396,68 +1396,63 @@ static DISCRETE_SOUND_START( btime_sound )
 DISCRETE_SOUND_END
 
 
-static MACHINE_START( btime )
+MACHINE_START_MEMBER(btime_state,btime)
 {
-	btime_state *state = machine.driver_data<btime_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_btime_palette));
-	state->save_item(NAME(state->m_bnj_scroll1));
-	state->save_item(NAME(state->m_bnj_scroll2));
-	state->save_item(NAME(state->m_btime_tilemap));
-	state->save_item(NAME(state->m_audio_nmi_enabled));
-	state->save_item(NAME(state->m_audio_nmi_state));
+	save_item(NAME(m_btime_palette));
+	save_item(NAME(m_bnj_scroll1));
+	save_item(NAME(m_bnj_scroll2));
+	save_item(NAME(m_btime_tilemap));
+	save_item(NAME(m_audio_nmi_enabled));
+	save_item(NAME(m_audio_nmi_state));
 }
 
-static MACHINE_START( mmonkey )
+MACHINE_START_MEMBER(btime_state,mmonkey)
 {
-	btime_state *state = machine.driver_data<btime_state>();
 
-	MACHINE_START_CALL(btime);
+	MACHINE_START_CALL_MEMBER(btime);
 
-	state->save_item(NAME(state->m_protection_command));
-	state->save_item(NAME(state->m_protection_status));
-	state->save_item(NAME(state->m_protection_value));
-	state->save_item(NAME(state->m_protection_ret));
+	save_item(NAME(m_protection_command));
+	save_item(NAME(m_protection_status));
+	save_item(NAME(m_protection_value));
+	save_item(NAME(m_protection_ret));
 }
 
-static MACHINE_RESET( btime )
+MACHINE_RESET_MEMBER(btime_state,btime)
 {
-	btime_state *state = machine.driver_data<btime_state>();
 
 	/* by default, the audio NMI is disabled, except for bootlegs which don't use the enable */
-	state->m_audio_nmi_enabled = (state->m_audio_nmi_enable_type == AUDIO_ENABLE_NONE);
+	m_audio_nmi_enabled = (m_audio_nmi_enable_type == AUDIO_ENABLE_NONE);
 
-	state->m_btime_palette = 0;
-	state->m_bnj_scroll1 = 0;
-	state->m_bnj_scroll2 = 0;
-	state->m_btime_tilemap[0] = 0;
-	state->m_btime_tilemap[1] = 0;
-	state->m_btime_tilemap[2] = 0;
-	state->m_btime_tilemap[3] = 0;
-	state->m_audio_nmi_state = 0;
+	m_btime_palette = 0;
+	m_bnj_scroll1 = 0;
+	m_bnj_scroll2 = 0;
+	m_btime_tilemap[0] = 0;
+	m_btime_tilemap[1] = 0;
+	m_btime_tilemap[2] = 0;
+	m_btime_tilemap[3] = 0;
+	m_audio_nmi_state = 0;
 }
 
-static MACHINE_RESET( lnc )
+MACHINE_RESET_MEMBER(btime_state,lnc)
 {
-	btime_state *state = machine.driver_data<btime_state>();
-	*state->m_lnc_charbank = 1;
+	*m_lnc_charbank = 1;
 
-	MACHINE_RESET_CALL(btime);
+	MACHINE_RESET_CALL_MEMBER(btime);
 }
 
-static MACHINE_RESET( mmonkey )
+MACHINE_RESET_MEMBER(btime_state,mmonkey)
 {
-	btime_state *state = machine.driver_data<btime_state>();
 
-	MACHINE_RESET_CALL(lnc);
+	MACHINE_RESET_CALL_MEMBER(lnc);
 
-	state->m_protection_command = 0;
-	state->m_protection_status = 0;
-	state->m_protection_value = 0;
-	state->m_protection_ret = 0;
+	m_protection_command = 0;
+	m_protection_status = 0;
+	m_protection_value = 0;
+	m_protection_ret = 0;
 }
 
 static MACHINE_CONFIG_START( btime, btime_state )
@@ -1475,14 +1470,14 @@ static MACHINE_CONFIG_START( btime, btime_state )
 	MCFG_SCREEN_RAW_PARAMS(HCLK, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_STATIC(btime)
 
-	MCFG_MACHINE_START(btime)
-	MCFG_MACHINE_RESET(btime)
+	MCFG_MACHINE_START_OVERRIDE(btime_state,btime)
+	MCFG_MACHINE_RESET_OVERRIDE(btime_state,btime)
 
 	MCFG_GFXDECODE(btime)
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_PALETTE_INIT(btime)
-	MCFG_VIDEO_START(btime)
+	MCFG_PALETTE_INIT_OVERRIDE(btime_state,btime)
+	MCFG_VIDEO_START_OVERRIDE(btime_state,btime)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1529,13 +1524,13 @@ static MACHINE_CONFIG_DERIVED( lnc, btime )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(lnc_map)
 
-	MCFG_MACHINE_RESET(lnc)
+	MCFG_MACHINE_RESET_OVERRIDE(btime_state,lnc)
 
 	/* video hardware */
 	MCFG_GFXDECODE(lnc)
 	MCFG_PALETTE_LENGTH(8)
 
-	MCFG_PALETTE_INIT(lnc)
+	MCFG_PALETTE_INIT_OVERRIDE(btime_state,lnc)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(lnc)
 MACHINE_CONFIG_END
@@ -1557,8 +1552,8 @@ static MACHINE_CONFIG_DERIVED( mmonkey, wtennis )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mmonkey_map)
 
-	MCFG_MACHINE_START(mmonkey)
-	MCFG_MACHINE_RESET(mmonkey)
+	MCFG_MACHINE_START_OVERRIDE(btime_state,mmonkey)
+	MCFG_MACHINE_RESET_OVERRIDE(btime_state,mmonkey)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sdtennis, btime )
@@ -1572,7 +1567,7 @@ static MACHINE_CONFIG_DERIVED( sdtennis, btime )
 	MCFG_GFXDECODE(bnj)
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_VIDEO_START(bnj)
+	MCFG_VIDEO_START_OVERRIDE(btime_state,bnj)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(bnj)
 MACHINE_CONFIG_END

@@ -45,9 +45,9 @@ static int intensity(int bits)
 }
 
 
-static PALETTE_INIT( fgoal )
+void fgoal_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* for B/W screens PCB can be jumpered to use lower half of PROM */
@@ -55,17 +55,17 @@ static PALETTE_INIT( fgoal )
 	for (i = 0; i < 128; i++)
 	{
 		UINT8 color = color_prom[0x80 | i] & 63;
-		palette_set_color_rgb(machine, i, intensity(color >> 4), intensity(color >> 2), intensity(color >> 0));
+		palette_set_color_rgb(machine(), i, intensity(color >> 4), intensity(color >> 2), intensity(color >> 0));
 	}
 
 	for (i = 0; i < 8; i++)
 	{
-		palette_set_color(machine, 128 + 0*8 + i, MAKE_RGB(0x2e,0x80,0x2e));
-		palette_set_color(machine, 128 + 1*8 + i, MAKE_RGB(0x2e,0x2e,0x2e));
+		palette_set_color(machine(), 128 + 0*8 + i, MAKE_RGB(0x2e,0x80,0x2e));
+		palette_set_color(machine(), 128 + 1*8 + i, MAKE_RGB(0x2e,0x2e,0x2e));
 	}
 
 	/* ball is a fixed color */
-	palette_set_color_rgb(machine, 128 + 16, intensity(0x38 >> 4), intensity(0x38 >> 2), intensity(0x38 >> 0));
+	palette_set_color_rgb(machine(), 128 + 16, intensity(0x38 >> 4), intensity(0x38 >> 2), intensity(0x38 >> 0));
 }
 
 
@@ -328,35 +328,33 @@ GFXDECODE_END
 
 
 
-static MACHINE_START( fgoal )
+void fgoal_state::machine_start()
 {
-	fgoal_state *state = machine.driver_data<fgoal_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_mb14241 = machine.device("mb14241");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_mb14241 = machine().device("mb14241");
 
-	state->save_item(NAME(state->m_xpos));
-	state->save_item(NAME(state->m_ypos));
-	state->save_item(NAME(state->m_current_color));
-	state->save_item(NAME(state->m_fgoal_player));
-	state->save_item(NAME(state->m_row));
-	state->save_item(NAME(state->m_col));
-	state->save_item(NAME(state->m_prev_coin));
+	save_item(NAME(m_xpos));
+	save_item(NAME(m_ypos));
+	save_item(NAME(m_current_color));
+	save_item(NAME(m_fgoal_player));
+	save_item(NAME(m_row));
+	save_item(NAME(m_col));
+	save_item(NAME(m_prev_coin));
 }
 
-static MACHINE_RESET( fgoal )
+void fgoal_state::machine_reset()
 {
-	fgoal_state *state = machine.driver_data<fgoal_state>();
 
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0), FUNC(interrupt_callback));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), FUNC(interrupt_callback));
 
-	state->m_xpos = 0;
-	state->m_ypos = 0;
-	state->m_current_color = 0;
-	state->m_fgoal_player = 0;
-	state->m_row = 0;
-	state->m_col = 0;
-	state->m_prev_coin = 0;
+	m_xpos = 0;
+	m_ypos = 0;
+	m_current_color = 0;
+	m_fgoal_player = 0;
+	m_row = 0;
+	m_col = 0;
+	m_prev_coin = 0;
 }
 
 static MACHINE_CONFIG_START( fgoal, fgoal_state )
@@ -365,8 +363,6 @@ static MACHINE_CONFIG_START( fgoal, fgoal_state )
 	MCFG_CPU_ADD("maincpu", M6800, 10065000 / 10) /* ? */
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 
-	MCFG_MACHINE_START(fgoal)
-	MCFG_MACHINE_RESET(fgoal)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -381,8 +377,6 @@ static MACHINE_CONFIG_START( fgoal, fgoal_state )
 	MCFG_GFXDECODE(fgoal)
 	MCFG_PALETTE_LENGTH(128 + 16 + 1)
 
-	MCFG_PALETTE_INIT(fgoal)
-	MCFG_VIDEO_START(fgoal)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

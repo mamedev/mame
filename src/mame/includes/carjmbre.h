@@ -28,6 +28,9 @@ public:
 	DECLARE_WRITE8_MEMBER(carjmbre_8806_w);
 	DECLARE_WRITE8_MEMBER(carjmbre_videoram_w);
 	TILE_GET_INFO_MEMBER(get_carjmbre_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -35,8 +38,8 @@ public:
 /*----------- defined in video/carjmbre.c -----------*/
 
 
-PALETTE_INIT( carjmbre );
-VIDEO_START( carjmbre );
+
+
 SCREEN_UPDATE_IND16( carjmbre );
 
 

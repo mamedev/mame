@@ -199,43 +199,39 @@ WRITE8_MEMBER(liberate_state::prosport_bg_vram_w)
 
 /***************************************************************************/
 
-VIDEO_START( prosoccr )
+VIDEO_START_MEMBER(liberate_state,prosoccr)
 {
-	liberate_state *state = machine.driver_data<liberate_state>();
-	state->m_back_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(liberate_state::get_back_tile_info),state), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),state), 16, 16, 32, 32);
-	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),state), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),state), 8, 8, 32, 32);
+	m_back_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(liberate_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),this), 16, 16, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),this), 8, 8, 32, 32);
 
-	state->m_fix_tilemap->set_transparent_pen(0);
+	m_fix_tilemap->set_transparent_pen(0);
 
-	state->m_charram = auto_alloc_array(machine, UINT8, 0x1800 * 2);
+	m_charram = auto_alloc_array(machine(), UINT8, 0x1800 * 2);
 }
 
-VIDEO_START( boomrang )
+VIDEO_START_MEMBER(liberate_state,boomrang)
 {
-	liberate_state *state = machine.driver_data<liberate_state>();
-	state->m_back_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(liberate_state::get_back_tile_info),state), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),state), 16, 16, 32, 32);
-	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),state), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),state), 8, 8, 32, 32);
+	m_back_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(liberate_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),this), 16, 16, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),this), 8, 8, 32, 32);
 
-	state->m_back_tilemap->set_transmask(0, 0x0001, 0x007e); /* Bottom 1 pen/Top 7 pens */
-	state->m_fix_tilemap->set_transparent_pen(0);
+	m_back_tilemap->set_transmask(0, 0x0001, 0x007e); /* Bottom 1 pen/Top 7 pens */
+	m_fix_tilemap->set_transparent_pen(0);
 }
 
-VIDEO_START( liberate )
+VIDEO_START_MEMBER(liberate_state,liberate)
 {
-	liberate_state *state = machine.driver_data<liberate_state>();
-	state->m_back_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(liberate_state::get_back_tile_info),state), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),state), 16, 16, 32, 32);
-	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),state), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),state), 8, 8, 32, 32);
+	m_back_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(liberate_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),this), 16, 16, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),this), 8, 8, 32, 32);
 
-	state->m_fix_tilemap->set_transparent_pen(0);
+	m_fix_tilemap->set_transparent_pen(0);
 }
 
-VIDEO_START( prosport )
+VIDEO_START_MEMBER(liberate_state,prosport)
 {
-	liberate_state *state = machine.driver_data<liberate_state>();
-	state->m_back_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(liberate_state::prosport_get_back_tile_info),state), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),state), 16, 16, 32, 32);
-	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),state), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),state), 8, 8, 32, 32);
+	m_back_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(liberate_state::prosport_get_back_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),this), 16, 16, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),this), 8, 8, 32, 32);
 
-	state->m_fix_tilemap->set_transparent_pen(0);
+	m_fix_tilemap->set_transparent_pen(0);
 }
 
 /***************************************************************************/
@@ -248,9 +244,9 @@ WRITE8_MEMBER(liberate_state::prosport_paletteram_w)
 	palette_set_color_rgb(machine(), offset, pal3bit(~data >> 0), pal3bit(~data >> 3), pal2bit(~data >> 6));
 }
 
-PALETTE_INIT( liberate )
+PALETTE_INIT_MEMBER(liberate_state,liberate)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i, bit0, bit1, bit2, g, r, b;
 
 	for (i = 0;i < 32;i++)
@@ -274,9 +270,9 @@ PALETTE_INIT( liberate )
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		color_prom++;
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 	}
-	palette_set_color(machine,32,MAKE_RGB(0,0,0)); /* Allocate black for when no background is displayed */
+	palette_set_color(machine(),32,MAKE_RGB(0,0,0)); /* Allocate black for when no background is displayed */
 }
 
 /***************************************************************************/

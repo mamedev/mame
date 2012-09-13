@@ -93,13 +93,19 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_16color_tile_info);
+	DECLARE_MACHINE_START(chinagat);
+	DECLARE_MACHINE_RESET(chinagat);
+	DECLARE_VIDEO_START(chinagat);
+	DECLARE_MACHINE_START(ddragon);
+	DECLARE_MACHINE_RESET(ddragon);
+	DECLARE_VIDEO_START(ddragon);
 };
 
 
 /*----------- defined in video/ddragon.c -----------*/
 
 
-VIDEO_START( chinagat );
-VIDEO_START( ddragon );
+
+
 SCREEN_UPDATE_IND16( ddragon );
 

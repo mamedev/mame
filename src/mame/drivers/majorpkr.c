@@ -492,6 +492,7 @@ public:
 	DECLARE_DRIVER_INIT(majorpkr);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
+	virtual void video_start();
 };
 
 
@@ -524,15 +525,14 @@ TILE_GET_INFO_MEMBER(majorpkr_state::fg_get_tile_info)
 }
 
 
-static VIDEO_START(majorpkr)
+void majorpkr_state::video_start()
 {
-	majorpkr_state *state = machine.driver_data<majorpkr_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(majorpkr_state::bg_get_tile_info),state), TILEMAP_SCAN_ROWS, 16, 8, 36, 28);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(majorpkr_state::fg_get_tile_info),state), TILEMAP_SCAN_ROWS, 16, 8, 36, 28);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(majorpkr_state::bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 36, 28);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(majorpkr_state::fg_get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 36, 28);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_generic_paletteram_8.allocate(4 * 0x800);
+	m_generic_paletteram_8.allocate(4 * 0x800);
 }
 
 
@@ -1046,7 +1046,6 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 	MCFG_GFXDECODE(majorpkr)
 	MCFG_PALETTE_LENGTH(0x100 * 16)
 
-	MCFG_VIDEO_START(majorpkr)
 	MCFG_SCREEN_UPDATE_STATIC(majorpkr)
 
 	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf) /* verified */

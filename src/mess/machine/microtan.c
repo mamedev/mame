@@ -570,15 +570,14 @@ DRIVER_INIT_MEMBER(microtan_state,microtan)
 	m_timer = machine().scheduler().timer_alloc(FUNC(microtan_read_cassette));
 }
 
-MACHINE_RESET( microtan )
+void microtan_state::machine_reset()
 {
-	microtan_state *state = machine.driver_data<microtan_state>();
 	int i;
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 
 	for (i = 1; i < 10;  i++)
 	{
-		state->m_keyrows[i] = machine.root_device().ioport(keynames[i-1])->read();
+		m_keyrows[i] = machine().root_device().ioport(keynames[i-1])->read();
 	}
-	set_led_status(machine, 1, (state->m_keyrows[3] & 0x80) ? 0 : 1);
+	set_led_status(machine(), 1, (m_keyrows[3] & 0x80) ? 0 : 1);
 }

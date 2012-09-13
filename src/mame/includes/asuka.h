@@ -45,6 +45,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_2151_w);
 	DECLARE_WRITE8_MEMBER(asuka_msm5205_start_w);
 	DECLARE_WRITE8_MEMBER(asuka_msm5205_stop_w);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 

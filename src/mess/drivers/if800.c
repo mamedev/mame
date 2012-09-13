@@ -23,6 +23,8 @@ public:
 	required_device<upd7220_device> m_hgdc;
 
 	required_shared_ptr<UINT8> m_video_ram;
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
@@ -58,12 +60,12 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( if800 )
 INPUT_PORTS_END
 
-static MACHINE_START(if800)
+void if800_state::machine_start()
 {
 }
 
 
-static MACHINE_RESET(if800)
+void if800_state::machine_reset()
 {
 }
 
@@ -87,8 +89,6 @@ static MACHINE_CONFIG_START( if800, if800_state )
 	MCFG_CPU_PROGRAM_MAP(if800_map)
 	MCFG_CPU_IO_MAP(if800_io)
 
-	MCFG_MACHINE_START(if800)
-	MCFG_MACHINE_RESET(if800)
 
 //  MCFG_PIC8259_ADD( "pic8259", if800_pic8259_config )
 	MCFG_UPD7220_ADD("upd7220", 8000000/4, hgdc_intf, upd7220_map)
@@ -104,7 +104,7 @@ static MACHINE_CONFIG_START( if800, if800_state )
 	MCFG_PALETTE_LENGTH(8)
 //  MCFG_PALETTE_INIT(black_and_white)
 
-//  MCFG_VIDEO_START(if800)
+//  MCFG_VIDEO_START_OVERRIDE(if800_state,if800)
 MACHINE_CONFIG_END
 
 /* ROM definition */

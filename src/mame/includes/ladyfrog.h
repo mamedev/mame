@@ -53,6 +53,11 @@ public:
 	DECLARE_WRITE8_MEMBER(ladyfrog_scrlram_w);
 	DECLARE_WRITE8_MEMBER(unk_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	DECLARE_VIDEO_START(toucheme);
+	DECLARE_VIDEO_START(ladyfrog_common);
 };
 
 
@@ -60,6 +65,6 @@ public:
 
 
 
-VIDEO_START( ladyfrog );
-VIDEO_START( toucheme );
+
+
 SCREEN_UPDATE_IND16( ladyfrog );

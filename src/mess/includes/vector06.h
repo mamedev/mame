@@ -59,6 +59,10 @@ public:
 	UINT8 m_romdisk_lsb;
 	UINT8 m_vblank_state;
 	void vector06_set_video_mode(int width);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 

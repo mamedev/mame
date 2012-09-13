@@ -31,6 +31,8 @@ public:
 	DECLARE_READ8_MEMBER(mikro80_tape_r);
 	DECLARE_DRIVER_INIT(radio99);
 	DECLARE_DRIVER_INIT(mikro80);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 

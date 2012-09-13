@@ -206,36 +206,34 @@ GFXDECODE_END
 
 
 
-static MACHINE_START( dogfgt )
+void dogfgt_state::machine_start()
 {
-	dogfgt_state *state = machine.driver_data<dogfgt_state>();
 
-	state->m_subcpu = machine.device<cpu_device>("sub");
+	m_subcpu = machine().device<cpu_device>("sub");
 
-	state->save_item(NAME(state->m_bm_plane));
-	state->save_item(NAME(state->m_lastflip));
-	state->save_item(NAME(state->m_pixcolor));
-	state->save_item(NAME(state->m_lastpixcolor));
-	state->save_item(NAME(state->m_soundlatch));
-	state->save_item(NAME(state->m_last_snd_ctrl));
+	save_item(NAME(m_bm_plane));
+	save_item(NAME(m_lastflip));
+	save_item(NAME(m_pixcolor));
+	save_item(NAME(m_lastpixcolor));
+	save_item(NAME(m_soundlatch));
+	save_item(NAME(m_last_snd_ctrl));
 
-	state->save_item(NAME(state->m_scroll));
+	save_item(NAME(m_scroll));
 }
 
-static MACHINE_RESET( dogfgt )
+void dogfgt_state::machine_reset()
 {
-	dogfgt_state *state = machine.driver_data<dogfgt_state>();
 	int i;
 
-	state->m_bm_plane = 0;
-	state->m_lastflip = 0;
-	state->m_pixcolor = 0;
-	state->m_lastpixcolor = 0;
-	state->m_soundlatch = 0;
-	state->m_last_snd_ctrl = 0;
+	m_bm_plane = 0;
+	m_lastflip = 0;
+	m_pixcolor = 0;
+	m_lastpixcolor = 0;
+	m_soundlatch = 0;
+	m_last_snd_ctrl = 0;
 
 	for (i = 0; i < 3; i++)
-		state->m_scroll[i] = 0;
+		m_scroll[i] = 0;
 }
 
 
@@ -251,8 +249,6 @@ static MACHINE_CONFIG_START( dogfgt, dogfgt_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(dogfgt)
-	MCFG_MACHINE_RESET(dogfgt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -265,8 +261,6 @@ static MACHINE_CONFIG_START( dogfgt, dogfgt_state )
 	MCFG_GFXDECODE(dogfgt)
 	MCFG_PALETTE_LENGTH(16+64)
 
-	MCFG_PALETTE_INIT(dogfgt)
-	MCFG_VIDEO_START(dogfgt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

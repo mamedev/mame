@@ -83,25 +83,24 @@ static void olds_write_reg( running_machine &machine, UINT16 addr, UINT32 val )
 	state->m_sharedprotram[(olds_prot_addr(addr) - 0x400000) / 2 + 1] = val & 0xffff;
 }
 
-static MACHINE_RESET( olds )
+MACHINE_RESET_MEMBER(pgm_028_025_state,olds)
 {
-	pgm_028_025_state *state = machine.driver_data<pgm_028_025_state>();
-	UINT16 *mem16 = (UINT16 *)state->memregion("user2")->base();
+	UINT16 *mem16 = (UINT16 *)memregion("user2")->base();
 	int i;
 
-	MACHINE_RESET_CALL(pgm);
+	MACHINE_RESET_CALL_MEMBER(pgm);
 
 	/* populate shared protection ram with data read from pcb .. */
 	for (i = 0; i < 0x4000 / 2; i++)
 	{
-		state->m_sharedprotram[i] = mem16[i];
+		m_sharedprotram[i] = mem16[i];
 	}
 
 	//ROM:004008B4                 .word 0xFBA5
 	for(i = 0; i < 0x4000 / 2; i++)
 	{
-		if (state->m_sharedprotram[i] == (0xffff - i))
-			state->m_sharedprotram[i] = 0x4e75;
+		if (m_sharedprotram[i] == (0xffff - i))
+			m_sharedprotram[i] = 0x4e75;
 	}
 }
 
@@ -226,7 +225,7 @@ MACHINE_CONFIG_START( pgm_028_025_ol, pgm_028_025_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(olds_mem)
 
-	MCFG_MACHINE_RESET(olds)
+	MCFG_MACHINE_RESET_OVERRIDE(pgm_028_025_state,olds)
 MACHINE_CONFIG_END
 
 

@@ -84,6 +84,7 @@ public:
 
 	/* peripheral state */
 	UINT8 m_pid;						/* peripheral identification */
+	virtual void palette_init();
 };
 
 #endif

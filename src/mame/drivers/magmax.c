@@ -74,23 +74,21 @@ static TIMER_CALLBACK( scanline_callback )
 	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
 }
 
-static MACHINE_START( magmax )
+void magmax_state::machine_start()
 {
-	magmax_state *state = machine.driver_data<magmax_state>();
 	/* Create interrupt timer */
-	state->m_interrupt_timer = machine.scheduler().timer_alloc(FUNC(scanline_callback));
+	m_interrupt_timer = machine().scheduler().timer_alloc(FUNC(scanline_callback));
 
 	/* Set up save state */
-	state_save_register_global(machine, state->m_sound_latch);
-	state_save_register_global(machine, state->m_LS74_clr);
-	state_save_register_global(machine, state->m_LS74_q);
-	state_save_register_global(machine, state->m_gain_control);
+	state_save_register_global(machine(), m_sound_latch);
+	state_save_register_global(machine(), m_LS74_clr);
+	state_save_register_global(machine(), m_LS74_q);
+	state_save_register_global(machine(), m_gain_control);
 }
 
-static MACHINE_RESET( magmax )
+void magmax_state::machine_reset()
 {
-	magmax_state *state = machine.driver_data<magmax_state>();
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(64), 64);
+	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(64), 64);
 
 #if 0
 	{
@@ -357,8 +355,6 @@ static MACHINE_CONFIG_START( magmax, magmax_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(magmax)
-	MCFG_MACHINE_RESET(magmax)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -370,8 +366,6 @@ static MACHINE_CONFIG_START( magmax, magmax_state )
 	MCFG_GFXDECODE(magmax)
 	MCFG_PALETTE_LENGTH(1*16 + 16*16 + 256)
 
-	MCFG_PALETTE_INIT(magmax)
-	MCFG_VIDEO_START(magmax)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

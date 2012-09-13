@@ -89,11 +89,10 @@ WRITE16_MEMBER(suna16_state::bestbest_flipscreen_w)
 
 ***************************************************************************/
 
-VIDEO_START( suna16 )
+void suna16_state::video_start()
 {
-	suna16_state *state = machine.driver_data<suna16_state>();
 
-	state->m_paletteram = auto_alloc_array(machine, UINT16, machine.total_colors());
+	m_paletteram = auto_alloc_array(machine(), UINT16, machine().total_colors());
 }
 
 READ16_MEMBER(suna16_state::suna16_paletteram16_r)

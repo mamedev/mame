@@ -423,26 +423,25 @@ static void osborne1_load_proc(device_image_interface &image)
 	}
 }
 
-MACHINE_RESET( osborne1 )
+void osborne1_state::machine_reset()
 {
-	osborne1_state *state = machine.driver_data<osborne1_state>();
 	int drive;
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space* space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/* Initialize memory configuration */
-	state->osborne1_bankswitch_w( *space, 0x00, 0 );
+	osborne1_bankswitch_w( *space, 0x00, 0 );
 
-	state->m_pia_0_irq_state = FALSE;
-	state->m_pia_1_irq_state = FALSE;
-	state->m_in_irq_handler = 0;
+	m_pia_0_irq_state = FALSE;
+	m_pia_1_irq_state = FALSE;
+	m_in_irq_handler = 0;
 
-	state->m_p_chargen = state->memregion( "chargen" )->base();
+	m_p_chargen = memregion( "chargen" )->base();
 
-	memset( machine.device<ram_device>(RAM_TAG)->pointer() + 0x10000, 0xFF, 0x1000 );
+	memset( machine().device<ram_device>(RAM_TAG)->pointer() + 0x10000, 0xFF, 0x1000 );
 
 	for(drive=0;drive<2;drive++)
-		floppy_install_load_proc(floppy_get_device(machine, drive), osborne1_load_proc);
+		floppy_install_load_proc(floppy_get_device(machine(), drive), osborne1_load_proc);
 
-	space->set_direct_update_handler(direct_update_delegate(FUNC(osborne1_state::osborne1_opbase), state));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(osborne1_state::osborne1_opbase), this));
 }
 
 

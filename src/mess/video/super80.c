@@ -63,9 +63,9 @@ static void palette_set_colors_rgb(running_machine &machine, const UINT8 *colors
 	}
 }
 
-PALETTE_INIT( super80m )
+PALETTE_INIT_MEMBER(super80_state,super80m)
 {
-	palette_set_colors_rgb(machine, super80_rgb_palette);
+	palette_set_colors_rgb(machine(), super80_rgb_palette);
 }
 
 
@@ -280,11 +280,10 @@ SCREEN_UPDATE_IND16( super80m )
 	return 0;
 }
 
-VIDEO_START( super80 )
+VIDEO_START_MEMBER(super80_state,super80)
 {
-	super80_state *state = machine.driver_data<super80_state>();
-	state->m_vidpg = 0xfe00;
-	state->m_p_chargen = state->memregion("chargen")->base();
+	m_vidpg = 0xfe00;
+	m_p_chargen = memregion("chargen")->base();
 }
 
 /**************************** I/O PORTS *****************************************************************/
@@ -378,12 +377,11 @@ void super80_state::mc6845_cursor_configure()
 	if (curs_type == 3) for (i = r11; i < r10;i++) m_mc6845_cursor[i]=0; // now take a bite out of the middle
 }
 
-VIDEO_START( super80v )
+VIDEO_START_MEMBER(super80_state,super80v)
 {
-	super80_state *state = machine.driver_data<super80_state>();
-	state->m_p_pcgram = machine.root_device().memregion("maincpu")->base()+0xf000;
-	state->m_p_videoram = machine.root_device().memregion("videoram")->base();
-	state->m_p_colorram = state->memregion("colorram")->base();
+	m_p_pcgram = machine().root_device().memregion("maincpu")->base()+0xf000;
+	m_p_videoram = machine().root_device().memregion("videoram")->base();
+	m_p_colorram = memregion("colorram")->base();
 }
 
 SCREEN_UPDATE_RGB32( super80v )

@@ -74,10 +74,12 @@ public:
 	device_t	*m_pic8259_2;
 	DECLARE_WRITE_LINE_MEMBER(quakeat_pic8259_1_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
+	virtual void machine_start();
+	virtual void video_start();
 };
 
 
-static VIDEO_START(quake)
+void quakeat_state::video_start()
 {
 }
 
@@ -155,13 +157,12 @@ static IRQ_CALLBACK(irq_callback)
 	return pic8259_acknowledge( state->m_pic8259_1);
 }
 
-static MACHINE_START(quakeat)
+void quakeat_state::machine_start()
 {
-	quakeat_state *state = machine.driver_data<quakeat_state>();
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 
-	state->m_pic8259_1 = machine.device( "pic8259_1" );
-	state->m_pic8259_2 = machine.device( "pic8259_2" );
+	m_pic8259_1 = machine().device( "pic8259_1" );
+	m_pic8259_2 = machine().device( "pic8259_2" );
 }
 /*************************************************************/
 
@@ -171,7 +172,6 @@ static MACHINE_CONFIG_START( quake, quakeat_state )
 	MCFG_CPU_PROGRAM_MAP(quake_map)
 	MCFG_CPU_IO_MAP(quake_io)
 
-	MCFG_MACHINE_START(quakeat)
 
 	MCFG_PIC8259_ADD( "pic8259_1", quakeat_pic8259_1_config )
 	MCFG_PIC8259_ADD( "pic8259_2", quakeat_pic8259_2_config )
@@ -186,7 +186,6 @@ static MACHINE_CONFIG_START( quake, quakeat_state )
 
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(quake)
 MACHINE_CONFIG_END
 
 

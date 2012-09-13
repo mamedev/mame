@@ -45,6 +45,9 @@ public:
 	DECLARE_WRITE8_MEMBER(fastlane_k2_k007232_w);
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
+	virtual void machine_start();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -53,6 +56,6 @@ public:
 /*----------- defined in video/fastlane.c -----------*/
 
 
-PALETTE_INIT( fastlane );
-VIDEO_START( fastlane );
+
+
 SCREEN_UPDATE_IND16( fastlane );

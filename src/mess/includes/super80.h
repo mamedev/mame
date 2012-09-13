@@ -77,25 +77,28 @@ public:
 	void mc6845_cursor_configure();
 	DECLARE_DRIVER_INIT(super80);
 	DECLARE_DRIVER_INIT(super80v);
+	DECLARE_VIDEO_START(super80);
+	DECLARE_VIDEO_START(super80v);
+	DECLARE_PALETTE_INIT(super80m);
 };
 
 
 /*----------- defined in video/super80.c -----------*/
 
-PALETTE_INIT( super80m );
+
 SCREEN_UPDATE_IND16( super80 );
 SCREEN_UPDATE_IND16( super80d );
 SCREEN_UPDATE_IND16( super80e );
 SCREEN_UPDATE_IND16( super80m );
-VIDEO_START( super80 );
+
 SCREEN_VBLANK( super80m );
-VIDEO_START( super80v );
+
 SCREEN_UPDATE_RGB32( super80v );
 MC6845_UPDATE_ROW( super80v_update_row );
 
 /*----------- defined in machine/super80.c -----------*/
 
-MACHINE_RESET( super80 );
+
 
 extern const z80pio_interface super80_pio_intf;
 

@@ -30,10 +30,9 @@ READ32_MEMBER(eolith_state::eolith_vram_r)
 	return m_vram[offset+(0x40000/4)*m_buffer];
 }
 
-VIDEO_START( eolith )
+VIDEO_START_MEMBER(eolith_state,eolith)
 {
-	eolith_state *state = machine.driver_data<eolith_state>();
-	state->m_vram = auto_alloc_array(machine, UINT32, 0x40000*2/4);
+	m_vram = auto_alloc_array(machine(), UINT32, 0x40000*2/4);
 }
 
 SCREEN_UPDATE_IND16( eolith )

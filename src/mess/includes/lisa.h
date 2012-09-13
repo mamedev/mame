@@ -160,6 +160,9 @@ public:
 	DECLARE_DRIVER_INIT(lisa210);
 	DECLARE_DRIVER_INIT(mac_xl);
 	DECLARE_DRIVER_INIT(lisa2);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -168,14 +171,14 @@ public:
 extern const via6522_interface lisa_via6522_0_intf;
 extern const via6522_interface lisa_via6522_1_intf;
 
-VIDEO_START( lisa );
+
 SCREEN_UPDATE_IND16( lisa );
 
 extern NVRAM_HANDLER(lisa);
 
 
-MACHINE_START( lisa );
-MACHINE_RESET( lisa );
+
+
 
 INTERRUPT_GEN( lisa_interrupt );
 

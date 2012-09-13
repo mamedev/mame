@@ -51,6 +51,8 @@ public:
 	DECLARE_WRITE8_MEMBER(skyarmy_colorram_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	TILE_GET_INFO_MEMBER(get_skyarmy_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 WRITE8_MEMBER(skyarmy_state::skyarmy_flip_screen_x_w)
@@ -85,9 +87,9 @@ WRITE8_MEMBER(skyarmy_state::skyarmy_colorram_w)
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-static PALETTE_INIT( skyarmy )
+void skyarmy_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0;i < 32;i++)
@@ -109,17 +111,16 @@ static PALETTE_INIT( skyarmy )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
 
-static VIDEO_START( skyarmy )
+void skyarmy_state::video_start()
 {
-	skyarmy_state *state = machine.driver_data<skyarmy_state>();
 
-	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(skyarmy_state::get_skyarmy_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_tilemap->set_scroll_cols(32);
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(skyarmy_state::get_skyarmy_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap->set_scroll_cols(32);
 }
 
 
@@ -297,8 +298,6 @@ static MACHINE_CONFIG_START( skyarmy, skyarmy_state )
 	MCFG_GFXDECODE(skyarmy)
 	MCFG_PALETTE_LENGTH(32)
 
-	MCFG_PALETTE_INIT(skyarmy)
-	MCFG_VIDEO_START(skyarmy)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -236,28 +236,26 @@ static const k007420_interface rockrage_k007420_intf =
 };
 
 
-static MACHINE_START( rockrage )
+void rockrage_state::machine_start()
 {
-	rockrage_state *state = machine.driver_data<rockrage_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
+	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_k007342 = machine.device("k007342");
-	state->m_k007420 = machine.device("k007420");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_k007342 = machine().device("k007342");
+	m_k007420 = machine().device("k007420");
 
-	state->save_item(NAME(state->m_vreg));
-	state->save_item(NAME(state->m_layer_colorbase));
+	save_item(NAME(m_vreg));
+	save_item(NAME(m_layer_colorbase));
 }
 
-static MACHINE_RESET( rockrage )
+void rockrage_state::machine_reset()
 {
-	rockrage_state *state = machine.driver_data<rockrage_state>();
 
-	state->m_vreg = 0;
-	state->m_layer_colorbase[0] = 0x00;
-	state->m_layer_colorbase[1] = 0x10;
+	m_vreg = 0;
+	m_layer_colorbase[0] = 0x00;
+	m_layer_colorbase[1] = 0x10;
 }
 
 static MACHINE_CONFIG_START( rockrage, rockrage_state )
@@ -270,8 +268,6 @@ static MACHINE_CONFIG_START( rockrage, rockrage_state )
 	MCFG_CPU_ADD("audiocpu", M6809, 1500000)		/* 24MHz/16 */
 	MCFG_CPU_PROGRAM_MAP(rockrage_sound_map)
 
-	MCFG_MACHINE_START(rockrage)
-	MCFG_MACHINE_RESET(rockrage)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -287,7 +283,6 @@ static MACHINE_CONFIG_START( rockrage, rockrage_state )
 	MCFG_GFXDECODE(rockrage)
 	MCFG_PALETTE_LENGTH(64 + 2*16*16)
 
-	MCFG_PALETTE_INIT(rockrage)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

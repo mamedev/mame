@@ -11,9 +11,9 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( dogfgt )
+void dogfgt_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* first 16 colors are RAM */
@@ -37,7 +37,7 @@ PALETTE_INIT( dogfgt )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i + 16, MAKE_RGB(r,g,b));
+		palette_set_color(machine(), i + 16, MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -65,16 +65,15 @@ TILE_GET_INFO_MEMBER(dogfgt_state::get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( dogfgt )
+void dogfgt_state::video_start()
 {
-	dogfgt_state *state = machine.driver_data<dogfgt_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dogfgt_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dogfgt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	state->m_bitmapram = auto_alloc_array(machine, UINT8, BITMAPRAM_SIZE);
-	state->save_pointer(NAME(state->m_bitmapram), BITMAPRAM_SIZE);
+	m_bitmapram = auto_alloc_array(machine(), UINT8, BITMAPRAM_SIZE);
+	save_pointer(NAME(m_bitmapram), BITMAPRAM_SIZE);
 
-	machine.primary_screen->register_screen_bitmap(state->m_pixbitmap);
-	state->save_item(NAME(state->m_pixbitmap));
+	machine().primary_screen->register_screen_bitmap(m_pixbitmap);
+	save_item(NAME(m_pixbitmap));
 }
 
 

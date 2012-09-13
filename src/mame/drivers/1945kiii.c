@@ -75,6 +75,8 @@ public:
 	DECLARE_WRITE16_MEMBER(k3_scrolly_w);
 	DECLARE_WRITE16_MEMBER(k3_soundbanks_w);
 	TILE_GET_INFO_MEMBER(get_k3_bg_tile_info);
+	virtual void machine_start();
+	virtual void video_start();
 };
 
 
@@ -90,10 +92,9 @@ TILE_GET_INFO_MEMBER(k3_state::get_k3_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, tileno, 0, 0);
 }
 
-static VIDEO_START(k3)
+void k3_state::video_start()
 {
-	k3_state *state = machine.driver_data<k3_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k3_state::get_k3_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 64);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k3_state::get_k3_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 64);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -248,7 +249,7 @@ static GFXDECODE_START( 1945kiii )
 GFXDECODE_END
 
 
-static MACHINE_START( 1945kiii )
+void k3_state::machine_start()
 {
 }
 
@@ -258,7 +259,6 @@ static MACHINE_CONFIG_START( k3, k3_state )
 	MCFG_CPU_PROGRAM_MAP(k3_map)
 	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MCFG_MACHINE_START(1945kiii)
 
 	MCFG_GFXDECODE(1945kiii)
 
@@ -271,7 +271,6 @@ static MACHINE_CONFIG_START( k3, k3_state )
 
 	MCFG_PALETTE_LENGTH(0x800)
 
-	MCFG_VIDEO_START(k3)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

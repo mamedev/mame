@@ -61,6 +61,7 @@ public:
 
 	required_shared_ptr<UINT8> m_tileram;
 	DECLARE_READ8_MEMBER(unknown_r);
+	virtual void palette_init();
 };
 
 
@@ -282,9 +283,9 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static PALETTE_INIT(carrera)
+void carrera_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int br_bit0, br_bit1, bit0, bit1, r, g, b;
 	int	i;
 
@@ -303,7 +304,7 @@ static PALETTE_INIT(carrera)
 		bit1 = (color_prom[0] >> 5) & 0x01;
 		r = 0x0e * br_bit0 + 0x1f * br_bit1 + 0x43 * bit0 + 0x8f * bit1;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 }
@@ -343,7 +344,6 @@ static MACHINE_CONFIG_START( carrera, carrera_state )
 
 	MCFG_GFXDECODE(carrera)
 	MCFG_PALETTE_LENGTH(32)
-	MCFG_PALETTE_INIT(carrera)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

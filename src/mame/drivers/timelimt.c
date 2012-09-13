@@ -19,15 +19,13 @@ Notes:
 /***************************************************************************/
 
 
-static MACHINE_START( timelimt )
+void timelimt_state::machine_start()
 {
-	machine.driver_data<timelimt_state>()->soundlatch_setclearedvalue( 0 );
 }
 
-static MACHINE_RESET( timelimt )
+void timelimt_state::machine_reset()
 {
-	timelimt_state *state = machine.driver_data<timelimt_state>();
-	state->m_nmi_enabled = 0;
+	m_nmi_enabled = 0;
 }
 
 WRITE8_MEMBER(timelimt_state::nmi_enable_w)
@@ -240,8 +238,6 @@ static MACHINE_CONFIG_START( timelimt, timelimt_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
 
-	MCFG_MACHINE_START(timelimt)
-	MCFG_MACHINE_RESET(timelimt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -254,8 +250,6 @@ static MACHINE_CONFIG_START( timelimt, timelimt_state )
 	MCFG_GFXDECODE(timelimt)
 	MCFG_PALETTE_LENGTH(64+32)
 
-	MCFG_PALETTE_INIT(timelimt)
-	MCFG_VIDEO_START(timelimt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

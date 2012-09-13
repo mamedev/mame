@@ -46,6 +46,9 @@ public:
 	DECLARE_WRITE8_MEMBER(boxer_irq_reset_w);
 	DECLARE_WRITE8_MEMBER(boxer_crowd_w);
 	DECLARE_WRITE8_MEMBER(boxer_led_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 /*************************************
@@ -110,13 +113,13 @@ static TIMER_CALLBACK( periodic_callback )
  *
  *************************************/
 
-static PALETTE_INIT( boxer )
+void boxer_state::palette_init()
 {
-	palette_set_color(machine,0, MAKE_RGB(0x00,0x00,0x00));
-	palette_set_color(machine,1, MAKE_RGB(0xff,0xff,0xff));
+	palette_set_color(machine(),0, MAKE_RGB(0x00,0x00,0x00));
+	palette_set_color(machine(),1, MAKE_RGB(0xff,0xff,0xff));
 
-	palette_set_color(machine,2, MAKE_RGB(0xff,0xff,0xff));
-	palette_set_color(machine,3, MAKE_RGB(0x00,0x00,0x00));
+	palette_set_color(machine(),2, MAKE_RGB(0xff,0xff,0xff));
+	palette_set_color(machine(),3, MAKE_RGB(0x00,0x00,0x00));
 }
 
 static void draw_boxer( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -422,23 +425,21 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( boxer )
+void boxer_state::machine_start()
 {
-	boxer_state *state = machine.driver_data<boxer_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
 
-	state->save_item(NAME(state->m_pot_state));
-	state->save_item(NAME(state->m_pot_latch));
+	save_item(NAME(m_pot_state));
+	save_item(NAME(m_pot_latch));
 }
 
-static MACHINE_RESET( boxer )
+void boxer_state::machine_reset()
 {
-	boxer_state *state = machine.driver_data<boxer_state>();
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0), FUNC(periodic_callback));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), FUNC(periodic_callback));
 
-	state->m_pot_state = 0;
-	state->m_pot_latch = 0;
+	m_pot_state = 0;
+	m_pot_latch = 0;
 }
 
 
@@ -448,8 +449,6 @@ static MACHINE_CONFIG_START( boxer, boxer_state )
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16)
 	MCFG_CPU_PROGRAM_MAP(boxer_map)
 
-	MCFG_MACHINE_START(boxer)
-	MCFG_MACHINE_RESET(boxer)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -460,7 +459,6 @@ static MACHINE_CONFIG_START( boxer, boxer_state )
 
 	MCFG_GFXDECODE(boxer)
 	MCFG_PALETTE_LENGTH(4)
-	MCFG_PALETTE_INIT(boxer)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

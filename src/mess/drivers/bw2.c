@@ -557,10 +557,10 @@ static const struct pit8253_config pit_intf =
 
 /* Video */
 
-static PALETTE_INIT( bw2 )
+void bw2_state::palette_init()
 {
-    palette_set_color_rgb(machine, 0, 0xa5, 0xad, 0xa5);
-    palette_set_color_rgb(machine, 1, 0x31, 0x39, 0x10);
+    palette_set_color_rgb(machine(), 0, 0xa5, 0xad, 0xa5);
+    palette_set_color_rgb(machine(), 1, 0x31, 0x39, 0x10);
 }
 
 static MSM6255_CHAR_RAM_READ( bw2_charram_r )
@@ -678,7 +678,6 @@ static MACHINE_CONFIG_START( bw2, bw2_state )
 	MCFG_DEFAULT_LAYOUT( layout_lcd )
 
 	MCFG_PALETTE_LENGTH( 2 )
-	MCFG_PALETTE_INIT( bw2 )
 
 	// devices
 	MCFG_PIT8253_ADD(PIT8253_TAG, pit_intf)

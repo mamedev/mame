@@ -44,6 +44,8 @@ public:
 	DECLARE_READ8_MEMBER(pengadvb_ppi_port_b_r);
 	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
 	DECLARE_DRIVER_INIT(pengadvb);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -247,23 +249,21 @@ static void pengadvb_postload(running_machine &machine)
 	mem_map_banks(machine);
 }
 
-static MACHINE_START( pengadvb )
+void pengadvb_state::machine_start()
 {
-	pengadvb_state *state = machine.driver_data<pengadvb_state>();
 
-	state_save_register_global_pointer(machine, state->m_main_mem, 0x4000);
-	state_save_register_global(machine, state->m_mem_map);
-	state_save_register_global_array(machine, state->m_mem_banks);
-	machine.save().register_postload(save_prepost_delegate(FUNC(pengadvb_postload), &machine));
+	state_save_register_global_pointer(machine(), m_main_mem, 0x4000);
+	state_save_register_global(machine(), m_mem_map);
+	state_save_register_global_array(machine(), m_mem_banks);
+	machine().save().register_postload(save_prepost_delegate(FUNC(pengadvb_postload), &machine()));
 }
 
-static MACHINE_RESET( pengadvb )
+void pengadvb_state::machine_reset()
 {
-	pengadvb_state *state = machine.driver_data<pengadvb_state>();
 
-	state->m_mem_map = 0;
-	state->m_mem_banks[0] = state->m_mem_banks[1] = state->m_mem_banks[2] = state->m_mem_banks[3] = 0;
-	mem_map_banks(machine);
+	m_mem_map = 0;
+	m_mem_banks[0] = m_mem_banks[1] = m_mem_banks[2] = m_mem_banks[3] = 0;
+	mem_map_banks(machine());
 }
 
 
@@ -273,8 +273,6 @@ static MACHINE_CONFIG_START( pengadvb, pengadvb_state )
 	MCFG_CPU_PROGRAM_MAP(program_mem)
 	MCFG_CPU_IO_MAP(io_mem)
 
-	MCFG_MACHINE_START( pengadvb )
-	MCFG_MACHINE_RESET( pengadvb )
 
     MCFG_I8255_ADD( "ppi8255", pengadvb_ppi8255_interface)
 

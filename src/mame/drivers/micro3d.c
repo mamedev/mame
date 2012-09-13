@@ -352,7 +352,6 @@ static MACHINE_CONFIG_START( micro3d, micro3d_state )
 	MCFG_DUART68681_ADD("duart68681", XTAL_3_6864MHz, micro3d_duart68681_config)
 	MCFG_MC68901_ADD("mc68901", 4000000, mfp_intf)
 
-	MCFG_MACHINE_RESET(micro3d)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
 
@@ -362,8 +361,6 @@ static MACHINE_CONFIG_START( micro3d, micro3d_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/8*4, 192*4, 0, 144*4, 434, 0, 400)
 	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
 
-	MCFG_VIDEO_START(micro3d)
-	MCFG_VIDEO_RESET(micro3d)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

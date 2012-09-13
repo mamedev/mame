@@ -70,6 +70,7 @@ public:
 	void update_leds();
 	virtual void machine_reset();
 	DECLARE_DRIVER_INIT(supercon);
+	virtual void machine_start();
 };
 
 
@@ -541,15 +542,14 @@ static void board_postload(supercon_state *state)
 	state->set_pieces();
 }
 
-static MACHINE_START( supercon )
+void supercon_state::machine_start()
 {
-	supercon_state *state = machine.driver_data<supercon_state>();
-	state->m_timer_update_irq = machine.scheduler().timer_alloc(FUNC(update_irq));
-	state->m_timer_update_irq->adjust( attotime::zero, 0, attotime::from_hz(1000) );
-	state->m_timer_mouse_click =  machine.scheduler().timer_alloc(FUNC(mouse_click),NULL);
-	state->save_item(NAME(state->m_save_board));
-	machine.save().register_postload(save_prepost_delegate(FUNC(board_postload),state));
-	machine.save().register_presave(save_prepost_delegate(FUNC(board_presave),state));
+	m_timer_update_irq = machine().scheduler().timer_alloc(FUNC(update_irq));
+	m_timer_update_irq->adjust( attotime::zero, 0, attotime::from_hz(1000) );
+	m_timer_mouse_click =  machine().scheduler().timer_alloc(FUNC(mouse_click),NULL);
+	save_item(NAME(m_save_board));
+	machine().save().register_postload(save_prepost_delegate(FUNC(board_postload),this));
+	machine().save().register_presave(save_prepost_delegate(FUNC(board_presave),this));
 }
 
 void supercon_state::machine_reset()
@@ -732,7 +732,6 @@ static MACHINE_CONFIG_START( supercon, supercon_state )
 	MCFG_CPU_ADD("maincpu",M6502,MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(supercon_mem)
 
-	MCFG_MACHINE_START( supercon )
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_supercon)

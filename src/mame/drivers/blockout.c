@@ -278,21 +278,19 @@ static const ym2151_interface ym2151_config =
  *
  *************************************/
 
-static MACHINE_START( blockout )
+void blockout_state::machine_start()
 {
-	blockout_state *state = machine.driver_data<blockout_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_color));
+	save_item(NAME(m_color));
 }
 
-static MACHINE_RESET( blockout )
+void blockout_state::machine_reset()
 {
-	blockout_state *state = machine.driver_data<blockout_state>();
 
-	state->m_color = 0;
+	m_color = 0;
 }
 
 static TIMER_DEVICE_CALLBACK( blockout_scanline )
@@ -317,8 +315,6 @@ static MACHINE_CONFIG_START( blockout, blockout_state )
 	MCFG_CPU_ADD("audiocpu", Z80, AUDIO_CLOCK)	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 
-	MCFG_MACHINE_START(blockout)
-	MCFG_MACHINE_RESET(blockout)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -330,7 +326,6 @@ static MACHINE_CONFIG_START( blockout, blockout_state )
 
 	MCFG_PALETTE_LENGTH(513)
 
-	MCFG_VIDEO_START(blockout)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

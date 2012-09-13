@@ -229,7 +229,7 @@ static const int colortable_source[] =
 	0, 2, 3, 4, 5, 6, 7, 0
 };
 
-static PALETTE_INIT( spcforce )
+void spcforce_state::palette_init()
 {
 	int i;
 
@@ -238,7 +238,7 @@ static PALETTE_INIT( spcforce )
 		int data = colortable_source[i];
 		rgb_t color = MAKE_RGB(pal1bit(data >> 0), pal1bit(data >> 1), pal1bit(data >> 2));
 
-		palette_set_color(machine, i, color);
+		palette_set_color(machine(), i, color);
 	}
 }
 
@@ -284,7 +284,6 @@ static MACHINE_CONFIG_START( spcforce, spcforce_state )
 	MCFG_GFXDECODE(spcforce)
 	MCFG_PALETTE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
 
-	MCFG_PALETTE_INIT(spcforce)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

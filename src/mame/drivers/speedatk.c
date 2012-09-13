@@ -341,9 +341,7 @@ static MACHINE_CONFIG_START( speedatk, speedatk_state )
 
 	MCFG_GFXDECODE(speedatk)
 	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT(speedatk)
 
-	MCFG_VIDEO_START(speedatk)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

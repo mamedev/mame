@@ -218,100 +218,95 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_unkch_reel3_tile_info)
 
 
 
-VIDEO_START( goldstar )
+VIDEO_START_MEMBER(goldstar_state,goldstar)
 {
-	goldstar_state *state = machine.driver_data<goldstar_state>();
 
-	state->m_reel1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	state->m_reel2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel2_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	state->m_reel3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel3_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 
-	state->m_reel1_tilemap->set_scroll_cols(64);
-	state->m_reel2_tilemap->set_scroll_cols(64);
-	state->m_reel3_tilemap->set_scroll_cols(64);
+	m_reel1_tilemap->set_scroll_cols(64);
+	m_reel2_tilemap->set_scroll_cols(64);
+	m_reel3_tilemap->set_scroll_cols(64);
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8, 64, 32);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
 
 	// is there an enable reg for this game?
-	state->m_cm_enable_reg = 0x0b;
+	m_cm_enable_reg = 0x0b;
 }
 
-VIDEO_START( bingowng )
+VIDEO_START_MEMBER(goldstar_state,bingowng)
 {
-	goldstar_state *state = machine.driver_data<goldstar_state>();
 
-	state->m_reel1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 
-	state->m_reel1_tilemap->set_scroll_cols(64);
+	m_reel1_tilemap->set_scroll_cols(64);
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8, 64, 32);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
 
 	// is there an enable reg for this game?
-	state->m_cm_enable_reg = 0x0b;
+	m_cm_enable_reg = 0x0b;
 }
 
-VIDEO_START( magical )
+VIDEO_START_MEMBER(goldstar_state,magical)
 {
-	goldstar_state *state = machine.driver_data<goldstar_state>();
 
-	state->m_reel1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	state->m_reel2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel2_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	state->m_reel3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel3_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 
-	state->m_reel1_tilemap->set_scroll_cols(32);
-	state->m_reel2_tilemap->set_scroll_cols(32);
-	state->m_reel3_tilemap->set_scroll_cols(32);
+	m_reel1_tilemap->set_scroll_cols(32);
+	m_reel2_tilemap->set_scroll_cols(32);
+	m_reel3_tilemap->set_scroll_cols(32);
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_magical_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8, 64, 32);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_magical_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
 
 	// is there an enable reg for this game?
-	state->m_cm_enable_reg = 0x0b;
+	m_cm_enable_reg = 0x0b;
 }
 
-VIDEO_START( unkch )
+VIDEO_START_MEMBER(goldstar_state,unkch)
 {
-	goldstar_state *state = machine.driver_data<goldstar_state>();
 
-	state->m_reel1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_unkch_reel1_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	state->m_reel2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_unkch_reel2_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	state->m_reel3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_unkch_reel3_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_unkch_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_unkch_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_unkch_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 
-	state->m_reel1_tilemap->set_scroll_cols(32);
-	state->m_reel2_tilemap->set_scroll_cols(32);
-	state->m_reel3_tilemap->set_scroll_cols(32);
+	m_reel1_tilemap->set_scroll_cols(32);
+	m_reel2_tilemap->set_scroll_cols(32);
+	m_reel3_tilemap->set_scroll_cols(32);
 
-	state->m_cmaster_girl_num = 0;
-	state->m_cmaster_girl_pal = 0;
-	state->m_unkch_vidreg = 0x00;
+	m_cmaster_girl_num = 0;
+	m_cmaster_girl_pal = 0;
+	m_unkch_vidreg = 0x00;
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_cherrym_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8, 64, 32);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_cherrym_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_cm_enable_reg = 0x0b;
+	m_cm_enable_reg = 0x0b;
 }
 
-VIDEO_START( cherrym )
+VIDEO_START_MEMBER(goldstar_state,cherrym)
 {
-	goldstar_state *state = machine.driver_data<goldstar_state>();
 
-	state->m_reel1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	state->m_reel2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel2_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	state->m_reel3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel3_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 
-	state->m_reel1_tilemap->set_scroll_cols(64);
-	state->m_reel2_tilemap->set_scroll_cols(64);
-	state->m_reel3_tilemap->set_scroll_cols(64);
+	m_reel1_tilemap->set_scroll_cols(64);
+	m_reel2_tilemap->set_scroll_cols(64);
+	m_reel3_tilemap->set_scroll_cols(64);
 
-	state->m_cmaster_girl_num = 0;
-	state->m_cmaster_girl_pal = 0;
+	m_cmaster_girl_num = 0;
+	m_cmaster_girl_pal = 0;
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_cherrym_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8, 64, 32);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_cherrym_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_cm_enable_reg = 0x0b;
+	m_cm_enable_reg = 0x0b;
 }
 
 

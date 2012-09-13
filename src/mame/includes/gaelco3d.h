@@ -110,6 +110,11 @@ public:
 	DECLARE_WRITE16_MEMBER(eeprom_clock_w);
 	DECLARE_WRITE16_MEMBER(eeprom_cs_w);
 	DECLARE_DRIVER_INIT(gaelco3d);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	DECLARE_MACHINE_RESET(gaelco3d2);
+	DECLARE_MACHINE_RESET(common);
 };
 
 
@@ -118,5 +123,5 @@ public:
 void gaelco3d_render(screen_device &screen);
 
 
-VIDEO_START( gaelco3d );
+
 SCREEN_UPDATE_IND16( gaelco3d );

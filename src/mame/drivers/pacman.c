@@ -374,22 +374,21 @@ Boards:
  *
  *************************************/
 
-static MACHINE_RESET( mschamp )
+MACHINE_RESET_MEMBER(pacman_state,mschamp)
 {
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base() + 0x10000;
-	int whichbank = machine.root_device().ioport("GAME")->read() & 1;
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base() + 0x10000;
+	int whichbank = machine().root_device().ioport("GAME")->read() & 1;
 
-	machine.root_device().membank("bank1")->configure_entries(0, 2, &rom[0x0000], 0x8000);
-	machine.root_device().membank("bank2")->configure_entries(0, 2, &rom[0x4000], 0x8000);
+	machine().root_device().membank("bank1")->configure_entries(0, 2, &rom[0x0000], 0x8000);
+	machine().root_device().membank("bank2")->configure_entries(0, 2, &rom[0x4000], 0x8000);
 
-	machine.root_device().membank("bank1")->set_entry(whichbank);
-	machine.root_device().membank("bank2")->set_entry(whichbank);
+	machine().root_device().membank("bank1")->set_entry(whichbank);
+	machine().root_device().membank("bank2")->set_entry(whichbank);
 }
 
-static MACHINE_RESET( superabc )
+MACHINE_RESET_MEMBER(pacman_state,superabc)
 {
-	pacman_state *state = machine.driver_data<pacman_state>();
-	state->superabc_bank_w(*state->m_maincpu->space(AS_PROGRAM), 0, 0);
+	superabc_bank_w(*m_maincpu->space(AS_PROGRAM), 0, 0);
 }
 
 
@@ -3306,8 +3305,8 @@ static MACHINE_CONFIG_START( pacman, pacman_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(pacman)
 
-	MCFG_PALETTE_INIT(pacman)
-	MCFG_VIDEO_START(pacman)
+	MCFG_PALETTE_INIT_OVERRIDE(pacman_state,pacman)
+	MCFG_VIDEO_START_OVERRIDE(pacman_state,pacman)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3324,7 +3323,7 @@ static MACHINE_CONFIG_DERIVED( birdiy, pacman )
 	MCFG_CPU_PROGRAM_MAP(birdiy_map)
 	MCFG_CPU_IO_MAP(0)
 
-	MCFG_VIDEO_START(birdiy)
+	MCFG_VIDEO_START_OVERRIDE(pacman_state,birdiy)
 MACHINE_CONFIG_END
 
 
@@ -3391,8 +3390,8 @@ static MACHINE_CONFIG_DERIVED( theglobp, pacman )
 	MCFG_CPU_PROGRAM_MAP(epos_map)
 	MCFG_CPU_IO_MAP(theglobp_portmap)
 
-	MCFG_MACHINE_START(theglobp)
-	MCFG_MACHINE_RESET(theglobp)
+	MCFG_MACHINE_START_OVERRIDE(pacman_state,theglobp)
+	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,theglobp)
 MACHINE_CONFIG_END
 
 
@@ -3403,8 +3402,8 @@ static MACHINE_CONFIG_DERIVED( acitya, pacman )
 	MCFG_CPU_PROGRAM_MAP(epos_map)
 	MCFG_CPU_IO_MAP(acitya_portmap)
 
-	MCFG_MACHINE_START(acitya)
-	MCFG_MACHINE_RESET(acitya)
+	MCFG_MACHINE_START_OVERRIDE(pacman_state,acitya)
+	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,acitya)
 MACHINE_CONFIG_END
 
 
@@ -3459,7 +3458,7 @@ static MACHINE_CONFIG_DERIVED( s2650games, pacman )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_UPDATE_STATIC(s2650games)
 
-	MCFG_VIDEO_START(s2650games)
+	MCFG_VIDEO_START_OVERRIDE(pacman_state,s2650games)
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("namco", SN76496_NEW, MASTER_CLOCK/6)	/* 1H */
@@ -3512,7 +3511,7 @@ static MACHINE_CONFIG_DERIVED( mschamp, pacman )
 	MCFG_CPU_IO_MAP(mschamp_portmap)
 	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
-	MCFG_MACHINE_RESET(mschamp)
+	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,mschamp)
 MACHINE_CONFIG_END
 
 
@@ -3524,7 +3523,7 @@ static MACHINE_CONFIG_DERIVED( superabc, pacman )
 
 	MCFG_NVRAM_ADD_0FILL("28c16.u17")
 
-	MCFG_MACHINE_RESET(superabc)
+	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,superabc)
 
 	/* video hardware */
 	MCFG_GFXDECODE(superabc)

@@ -512,8 +512,6 @@ static MACHINE_CONFIG_START( sprint2, sprint2_state )
 	MCFG_GFXDECODE(sprint2)
 	MCFG_PALETTE_LENGTH(12)
 
-	MCFG_PALETTE_INIT(sprint2)
-	MCFG_VIDEO_START(sprint2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

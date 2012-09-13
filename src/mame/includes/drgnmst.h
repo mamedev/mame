@@ -63,11 +63,14 @@ public:
 	TILEMAP_MAPPER_MEMBER(drgnmst_fg_tilemap_scan_cols);
 	TILEMAP_MAPPER_MEMBER(drgnmst_md_tilemap_scan_cols);
 	TILEMAP_MAPPER_MEMBER(drgnmst_bg_tilemap_scan_cols);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/drgnmst.c -----------*/
 
 
-VIDEO_START(drgnmst);
+
 SCREEN_UPDATE_IND16(drgnmst);

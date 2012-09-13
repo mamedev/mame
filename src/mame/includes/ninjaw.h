@@ -40,12 +40,15 @@ public:
 	DECLARE_READ16_MEMBER(ninjaw_sound_r);
 	DECLARE_WRITE8_MEMBER(ninjaw_pancontrol);
 	DECLARE_WRITE16_MEMBER(tc0100scn_triple_screen_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/ninjaw.c -----------*/
 
-VIDEO_START( ninjaw );
+
 SCREEN_UPDATE_IND16( ninjaw_left );
 SCREEN_UPDATE_IND16( ninjaw_middle );
 SCREEN_UPDATE_IND16( ninjaw_right );

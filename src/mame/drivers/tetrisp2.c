@@ -1345,7 +1345,7 @@ static MACHINE_CONFIG_START( tetrisp2, tetrisp2_state )
 	MCFG_GFXDECODE(tetrisp2)
 	MCFG_PALETTE_LENGTH(0x8000)
 
-	MCFG_VIDEO_START(tetrisp2)
+	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,tetrisp2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1376,7 +1376,7 @@ static MACHINE_CONFIG_START( nndmseal, tetrisp2_state )
 	MCFG_GFXDECODE(tetrisp2)
 	MCFG_PALETTE_LENGTH(0x8000)
 
-	MCFG_VIDEO_START(nndmseal)	// bg layer offset
+	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,nndmseal)	// bg layer offset
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1406,7 +1406,7 @@ static MACHINE_CONFIG_START( rockn, tetrisp2_state )
 	MCFG_GFXDECODE(tetrisp2)
 	MCFG_PALETTE_LENGTH(0x8000)
 
-	MCFG_VIDEO_START(rockntread)
+	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rockntread)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1437,7 +1437,7 @@ static MACHINE_CONFIG_START( rockn2, tetrisp2_state )
 	MCFG_GFXDECODE(tetrisp2)
 	MCFG_PALETTE_LENGTH(0x8000)
 
-	MCFG_VIDEO_START(rockntread)
+	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rockntread)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1481,7 +1481,7 @@ static MACHINE_CONFIG_START( rocknms, tetrisp2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
 	MCFG_SCREEN_UPDATE_STATIC(rocknms_right)
 
-	MCFG_VIDEO_START(rocknms)
+	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rocknms)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1527,7 +1527,7 @@ static MACHINE_CONFIG_START( stepstag, stepstag_state )
 
 	MCFG_PALETTE_LENGTH(0x8000)	// 0x8000 * 3 needed I guess, but it hits an assert
 
-	MCFG_VIDEO_START( stepstag )
+	MCFG_VIDEO_START_OVERRIDE(stepstag_state, stepstag )
 	MCFG_GFXDECODE(stepstag)
 
 	MCFG_DEFAULT_LAYOUT(layout_stepstag)

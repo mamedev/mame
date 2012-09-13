@@ -1324,7 +1324,7 @@ static MACHINE_CONFIG_START( dec0_base, dec0_state )
 	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
 	deco_mxc06_device::set_gfx_region(*device, 3);
 
-	MCFG_VIDEO_START(dec0)
+	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dec0_base_sound, dec0_base )
@@ -1414,7 +1414,7 @@ static MACHINE_CONFIG_START( automat, dec0_automat_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
 	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(automat)
-	MCFG_VIDEO_START(dec0_nodma)
+	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0_nodma)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device, 0,0,0);
@@ -1467,7 +1467,7 @@ static MACHINE_CONFIG_START( secretab, dec0_automat_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
 	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(secretab)
-	MCFG_VIDEO_START(dec0_nodma)
+	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0_nodma)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device, 0,0,0);
@@ -1638,10 +1638,10 @@ static MACHINE_CONFIG_DERIVED( hippodrm, dec0_base_sound )
 	MCFG_SCREEN_UPDATE_STATIC(hippodrm)
 MACHINE_CONFIG_END
 
-static MACHINE_RESET( slyspy )
+MACHINE_RESET_MEMBER(dec0_state,slyspy)
 {
 	// set initial memory map
-	slyspy_set_protection_map(machine, 0);
+	slyspy_set_protection_map(machine(), 0);
 }
 
 static MACHINE_CONFIG_DERIVED( slyspy, dec0_base_sound_alt )
@@ -1663,9 +1663,9 @@ static MACHINE_CONFIG_DERIVED( slyspy, dec0_base_sound_alt )
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(slyspy)
 
-	MCFG_VIDEO_START(dec0_nodma)
+	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0_nodma)
 
-	MCFG_MACHINE_RESET(slyspy)
+	MCFG_MACHINE_RESET_OVERRIDE(dec0_state,slyspy)
 MACHINE_CONFIG_END
 
 
@@ -1691,7 +1691,7 @@ static MACHINE_CONFIG_DERIVED( midres, dec0_base_sound_alt )
 	MCFG_SCREEN_UPDATE_STATIC(midres)
 
 	MCFG_GFXDECODE(midres)
-	MCFG_VIDEO_START(dec0_nodma)
+	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0_nodma)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( midresb, midres )

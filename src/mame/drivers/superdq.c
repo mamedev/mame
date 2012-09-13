@@ -47,6 +47,10 @@ public:
 	DECLARE_READ8_MEMBER(superdq_ld_r);
 	DECLARE_WRITE8_MEMBER(superdq_ld_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 TILE_GET_INFO_MEMBER(superdq_state::get_tile_info)
@@ -56,11 +60,10 @@ TILE_GET_INFO_MEMBER(superdq_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0, tile, m_color_bank, 0);
 }
 
-static VIDEO_START( superdq )
+void superdq_state::video_start()
 {
-	superdq_state *state = machine.driver_data<superdq_state>();
 
-	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(superdq_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(superdq_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_RGB32( superdq )
@@ -80,9 +83,9 @@ static SCREEN_UPDATE_RGB32( superdq )
  *
  *************************************/
 
-static PALETTE_INIT( superdq )
+void superdq_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 	static const int resistances[3] = { 820, 390, 200 };
 	double rweights[3], gweights[3], bweights[2];
@@ -94,7 +97,7 @@ static PALETTE_INIT( superdq )
 			2,	&resistances[1], bweights, 220, 0);
 
 	/* initialize the palette with these colors */
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		int bit0, bit1, bit2;
 		int r, g, b;
@@ -116,17 +119,16 @@ static PALETTE_INIT( superdq )
 		bit1 = (color_prom[i] >> 0) & 0x01;
 		b = combine_2_weights(bweights, bit1, bit0);
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
-static MACHINE_RESET( superdq )
+void superdq_state::machine_reset()
 {
-	superdq_state *state = machine.driver_data<superdq_state>();
 
-	state->m_ld_in_latch = 0;
-	state->m_ld_out_latch = 0xff;
-	state->m_color_bank = 0;
+	m_ld_in_latch = 0;
+	m_ld_out_latch = 0xff;
+	m_color_bank = 0;
 }
 
 static INTERRUPT_GEN( superdq_vblank )
@@ -332,7 +334,7 @@ static const sn76496_config psg_intf =
  *
  *************************************/
 
-static MACHINE_START( superdq )
+void superdq_state::machine_start()
 {
 }
 
@@ -345,8 +347,6 @@ static MACHINE_CONFIG_START( superdq, superdq_state )
 	MCFG_CPU_IO_MAP(superdq_io)
 	MCFG_CPU_VBLANK_INT("screen", superdq_vblank)
 
-	MCFG_MACHINE_START(superdq)
-	MCFG_MACHINE_RESET(superdq)
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
 	MCFG_LASERDISC_OVERLAY_STATIC(256, 256, superdq)
@@ -357,8 +357,6 @@ static MACHINE_CONFIG_START( superdq, superdq_state )
 	MCFG_GFXDECODE(superdq)
 	MCFG_PALETTE_LENGTH(32)
 
-	MCFG_PALETTE_INIT(superdq)
-	MCFG_VIDEO_START(superdq)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

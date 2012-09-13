@@ -415,67 +415,64 @@ static TMS9928A_INTERFACE(einstein_tms9929a_interface)
 	DEVCB_NULL
 };
 
-static MACHINE_START( einstein )
+void einstein_state::machine_start()
 {
 }
 
-static MACHINE_RESET( einstein )
+void einstein_state::machine_reset()
 {
-	einstein_state *state = machine.driver_data<einstein_state>();
 	//device_t *floppy;
-	//UINT8 config = machine.root_device().ioport("config")->read();
+	//UINT8 config = machine().root_device().ioport("config")->read();
 
 	/* save pointers to our devices */
-	state->m_color_screen = machine.device("screen");
-	state->m_ctc = machine.device<z80ctc_device>(IC_I058);
+	m_color_screen = machine().device("screen");
+	m_ctc = machine().device<z80ctc_device>(IC_I058);
 
 	/* initialize memory mapping */
-	state->membank("bank2")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
-	state->membank("bank3")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x8000);
-	state->m_rom_enabled = 1;
-	einstein_page_rom(machine);
+	membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
+	membank("bank3")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x8000);
+	m_rom_enabled = 1;
+	einstein_page_rom(machine());
 
 	/* a reset causes the fire int, adc int, keyboard int mask
     to be set to 1, which causes all these to be DISABLED */
-	state->m_interrupt = 0;
-	state->m_interrupt_mask = 0;
+	m_interrupt = 0;
+	m_interrupt_mask = 0;
 
-	state->m_ctc_trigger = 0;
+	m_ctc_trigger = 0;
 
 	/* configure floppy drives */
 /*  floppy_type_t type_80 = FLOPPY_STANDARD_5_25_DSHD;
     floppy_type_t type_40 = FLOPPY_STANDARD_5_25_SSDD_40;
-    floppy = machine.device("floppy0");
+    floppy = machine().device("floppy0");
     floppy_drive_set_geometry(floppy, config & 0x01 ? type_80 : type_40);
-    floppy = machine.device("floppy1");
+    floppy = machine().device("floppy1");
     floppy_drive_set_geometry(floppy, config & 0x02 ? type_80 : type_40);
-    floppy = machine.device("floppy2");
+    floppy = machine().device("floppy2");
     floppy_drive_set_geometry(floppy, config & 0x04 ? type_80 : type_40);
-    floppy = machine.device("floppy3");
+    floppy = machine().device("floppy3");
     floppy_drive_set_geometry(floppy, config & 0x08 ? type_80 : type_40);*/
 }
 
-static MACHINE_RESET( einstein2 )
+MACHINE_RESET_MEMBER(einstein_state,einstein2)
 {
-	einstein_state *einstein = machine.driver_data<einstein_state>();
 
 	/* call standard initialization first */
-	MACHINE_RESET_CALL(einstein);
+	einstein_state::machine_reset();
 
 	/* get 80 column specific devices */
-	einstein->m_mc6845 = machine.device<mc6845_device>("crtc");
-	einstein->m_crtc_screen = machine.device<screen_device>("80column");
+	m_mc6845 = machine().device<mc6845_device>("crtc");
+	m_crtc_screen = machine().device<screen_device>("80column");
 
 	/* 80 column card palette */
-	palette_set_color(machine, TMS9928A_PALETTE_SIZE, RGB_BLACK);
-	palette_set_color(machine, TMS9928A_PALETTE_SIZE + 1, MAKE_RGB(0, 224, 0));
+	palette_set_color(machine(), TMS9928A_PALETTE_SIZE, RGB_BLACK);
+	palette_set_color(machine(), TMS9928A_PALETTE_SIZE + 1, MAKE_RGB(0, 224, 0));
 }
 
-static MACHINE_START( einstein2 )
+MACHINE_START_MEMBER(einstein_state,einstein2)
 {
-	einstein_state *einstein = machine.driver_data<einstein_state>();
-	einstein->m_crtc_ram = auto_alloc_array(machine, UINT8, 2048);
-	MACHINE_START_CALL(einstein);
+	m_crtc_ram = auto_alloc_array(machine(), UINT8, 2048);
+	einstein_state::machine_start();
 }
 
 
@@ -779,8 +776,6 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	MCFG_CPU_IO_MAP(einstein_io)
 	MCFG_CPU_CONFIG(einstein_daisy_chain)
 
-	MCFG_MACHINE_START(einstein)
-	MCFG_MACHINE_RESET(einstein)
 
 	/* this is actually clocked at the system clock 4 MHz, but this would be too fast for our
     driver. So we update at 50Hz and hope this is good enough. */
@@ -836,8 +831,8 @@ static MACHINE_CONFIG_DERIVED( einstei2, einstein )
 	MCFG_CPU_MODIFY(IC_I001)
 	MCFG_CPU_IO_MAP(einstein2_io)
 
-	MCFG_MACHINE_START(einstein2)
-	MCFG_MACHINE_RESET(einstein2)
+	MCFG_MACHINE_START_OVERRIDE(einstein_state,einstein2)
+	MCFG_MACHINE_RESET_OVERRIDE(einstein_state,einstein2)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)

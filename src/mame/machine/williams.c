@@ -364,38 +364,37 @@ static void tshoot_main_irq(device_t *device, int state)
  *
  *************************************/
 
-static MACHINE_START( williams_common )
+MACHINE_START_MEMBER(williams_state,williams_common)
 {
-	williams_state *state = machine.driver_data<williams_state>();
 	/* configure the memory bank */
-	state->membank("bank1")->configure_entry(0, state->m_videoram);
-	state->membank("bank1")->configure_entry(1, state->memregion("maincpu")->base() + 0x10000);
+	membank("bank1")->configure_entry(0, m_videoram);
+	membank("bank1")->configure_entry(1, memregion("maincpu")->base() + 0x10000);
 
-	state_save_register_global(machine, state->m_vram_bank);
+	state_save_register_global(machine(), m_vram_bank);
 }
 
 
-static MACHINE_RESET( williams_common )
+MACHINE_RESET_MEMBER(williams_state,williams_common)
 {
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
-	timer_device *scan_timer = machine.device<timer_device>("scan_timer");
-	scan_timer->adjust(machine.primary_screen->time_until_pos(0));
+	timer_device *scan_timer = machine().device<timer_device>("scan_timer");
+	scan_timer->adjust(machine().primary_screen->time_until_pos(0));
 
 	/* also set a timer to go off on scanline 240 */
-	timer_device *l240_timer = machine.device<timer_device>("240_timer");
-	l240_timer->adjust(machine.primary_screen->time_until_pos(240));
+	timer_device *l240_timer = machine().device<timer_device>("240_timer");
+	l240_timer->adjust(machine().primary_screen->time_until_pos(240));
 }
 
 
-MACHINE_START( williams )
+MACHINE_START_MEMBER(williams_state,williams)
 {
-	MACHINE_START_CALL(williams_common);
+	MACHINE_START_CALL_MEMBER(williams_common);
 }
 
 
-MACHINE_RESET( williams )
+MACHINE_RESET_MEMBER(williams_state,williams)
 {
-	MACHINE_RESET_CALL(williams_common);
+	MACHINE_RESET_CALL_MEMBER(williams_common);
 }
 
 
@@ -462,34 +461,32 @@ static void williams2_postload(running_machine &machine)
 }
 
 
-MACHINE_START( williams2 )
+MACHINE_START_MEMBER(williams_state,williams2)
 {
-	williams_state *state = machine.driver_data<williams_state>();
 	/* configure memory banks */
-	state->membank("bank1")->configure_entry(0, state->m_videoram);
-	state->membank("bank1")->configure_entries(1, 4, state->memregion("maincpu")->base() + 0x10000, 0x10000);
+	membank("bank1")->configure_entry(0, m_videoram);
+	membank("bank1")->configure_entries(1, 4, memregion("maincpu")->base() + 0x10000, 0x10000);
 
 	/* register for save states */
-	state_save_register_global(machine, state->m_vram_bank);
-	machine.save().register_postload(save_prepost_delegate(FUNC(williams2_postload), &machine));
+	state_save_register_global(machine(), m_vram_bank);
+	machine().save().register_postload(save_prepost_delegate(FUNC(williams2_postload), &machine()));
 }
 
 
-MACHINE_RESET( williams2 )
+MACHINE_RESET_MEMBER(williams_state,williams2)
 {
-	williams_state *state = machine.driver_data<williams_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* make sure our banking is reset */
-	state->williams2_bank_select_w(*space, 0, 0);
+	williams2_bank_select_w(*space, 0, 0);
 
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
-	timer_device *scan_timer = machine.device<timer_device>("scan_timer");
-	scan_timer->adjust(machine.primary_screen->time_until_pos(0));
+	timer_device *scan_timer = machine().device<timer_device>("scan_timer");
+	scan_timer->adjust(machine().primary_screen->time_until_pos(0));
 
 	/* also set a timer to go off on scanline 254 */
-	timer_device *l254_timer = machine.device<timer_device>("254_timer");
-	l254_timer->adjust(machine.primary_screen->time_until_pos(254));
+	timer_device *l254_timer = machine().device<timer_device>("254_timer");
+	l254_timer->adjust(machine().primary_screen->time_until_pos(254));
 }
 
 
@@ -767,25 +764,24 @@ static void defender_postload(running_machine &machine)
 }
 
 
-MACHINE_START( defender )
+MACHINE_START_MEMBER(williams_state,defender)
 {
-	MACHINE_START_CALL(williams_common);
+	MACHINE_START_CALL_MEMBER(williams_common);
 
 	/* configure the banking and make sure it is reset to 0 */
-	machine.root_device().membank("bank1")->configure_entries(0, 9, &machine.root_device().memregion("maincpu")->base()[0x10000], 0x1000);
+	machine().root_device().membank("bank1")->configure_entries(0, 9, &machine().root_device().memregion("maincpu")->base()[0x10000], 0x1000);
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(defender_postload), &machine));
+	machine().save().register_postload(save_prepost_delegate(FUNC(defender_postload), &machine()));
 }
 
 
-MACHINE_RESET( defender )
+MACHINE_RESET_MEMBER(williams_state,defender)
 {
-	williams_state *state = machine.driver_data<williams_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	MACHINE_RESET_CALL(williams_common);
+	MACHINE_RESET_CALL_MEMBER(williams_common);
 
-	state->defender_bank_select_w(*space, 0, 0);
+	defender_bank_select_w(*space, 0, 0);
 }
 
 
@@ -872,25 +868,24 @@ WRITE8_MEMBER(williams_state::sinistar_vram_select_w)
  *
  *************************************/
 
-MACHINE_START( blaster )
+MACHINE_START_MEMBER(williams_state,blaster)
 {
-	williams_state *state = machine.driver_data<williams_state>();
-	MACHINE_START_CALL(williams_common);
+	MACHINE_START_CALL_MEMBER(williams_common);
 
 	/* banking is different for blaster */
-	state->membank("bank1")->configure_entry(0, state->m_videoram);
-	state->membank("bank1")->configure_entries(1, 16, state->memregion("maincpu")->base() + 0x18000, 0x4000);
+	membank("bank1")->configure_entry(0, m_videoram);
+	membank("bank1")->configure_entries(1, 16, memregion("maincpu")->base() + 0x18000, 0x4000);
 
-	state->membank("bank2")->configure_entry(0, state->m_videoram + 0x4000);
-	state->membank("bank2")->configure_entries(1, 16, state->memregion("maincpu")->base() + 0x10000, 0x0000);
+	membank("bank2")->configure_entry(0, m_videoram + 0x4000);
+	membank("bank2")->configure_entries(1, 16, memregion("maincpu")->base() + 0x10000, 0x0000);
 
-	state_save_register_global(machine, state->m_blaster_bank);
+	state_save_register_global(machine(), m_blaster_bank);
 }
 
 
-MACHINE_RESET( blaster )
+MACHINE_RESET_MEMBER(williams_state,blaster)
 {
-	MACHINE_RESET_CALL(williams_common);
+	MACHINE_RESET_CALL_MEMBER(williams_common);
 }
 
 
@@ -983,17 +978,16 @@ static WRITE8_DEVICE_HANDLER( tshoot_lamp_w )
  *
  *************************************/
 
-MACHINE_START( joust2 )
+MACHINE_START_MEMBER(joust2_state,joust2)
 {
-	joust2_state *state = machine.driver_data<joust2_state>();
-	MACHINE_START_CALL(williams2);
-	state_save_register_global(machine, state->m_joust2_current_sound_data);
+	MACHINE_START_CALL_MEMBER(williams2);
+	state_save_register_global(machine(), m_joust2_current_sound_data);
 }
 
 
-MACHINE_RESET( joust2 )
+MACHINE_RESET_MEMBER(joust2_state,joust2)
 {
-	MACHINE_RESET_CALL(williams2);
+	MACHINE_RESET_CALL_MEMBER(williams2);
 }
 
 

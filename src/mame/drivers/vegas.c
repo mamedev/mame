@@ -499,6 +499,8 @@ public:
 	DECLARE_DRIVER_INIT(nbanfl);
 	DECLARE_DRIVER_INIT(sf2049);
 	DECLARE_DRIVER_INIT(sf2049se);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -534,69 +536,67 @@ static SCREEN_UPDATE_RGB32( vegas )
  *
  *************************************/
 
-static MACHINE_START( vegas )
+void vegas_state::machine_start()
 {
-	vegas_state *state = machine.driver_data<vegas_state>();
-	state->m_voodoo = machine.device("voodoo");
+	m_voodoo = machine().device("voodoo");
 
 	/* allocate timers for the NILE */
-	state->m_timer[0] = machine.scheduler().timer_alloc(FUNC_NULL);
-	state->m_timer[1] = machine.scheduler().timer_alloc(FUNC_NULL);
-	state->m_timer[2] = machine.scheduler().timer_alloc(FUNC(nile_timer_callback));
-	state->m_timer[3] = machine.scheduler().timer_alloc(FUNC(nile_timer_callback));
+	m_timer[0] = machine().scheduler().timer_alloc(FUNC_NULL);
+	m_timer[1] = machine().scheduler().timer_alloc(FUNC_NULL);
+	m_timer[2] = machine().scheduler().timer_alloc(FUNC(nile_timer_callback));
+	m_timer[3] = machine().scheduler().timer_alloc(FUNC(nile_timer_callback));
 
 	/* identify our sound board */
-	if (machine.device("dsio") != NULL)
-		state->m_dcs_idma_cs = 6;
-	else if (machine.device("denver") != NULL)
-		state->m_dcs_idma_cs = 7;
+	if (machine().device("dsio") != NULL)
+		m_dcs_idma_cs = 6;
+	else if (machine().device("denver") != NULL)
+		m_dcs_idma_cs = 7;
 	else
-		state->m_dcs_idma_cs = 0;
+		m_dcs_idma_cs = 0;
 
 	/* set the fastest DRC options, but strict verification */
-	mips3drc_set_options(machine.device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
+	mips3drc_set_options(machine().device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine.device("maincpu"), 0x00000000, state->m_rambase.bytes() - 1, FALSE, state->m_rambase);
-	mips3drc_add_fastram(machine.device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE, state->m_rombase);
+	mips3drc_add_fastram(machine().device("maincpu"), 0x00000000, m_rambase.bytes() - 1, FALSE, m_rambase);
+	mips3drc_add_fastram(machine().device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE, m_rombase);
 
 	/* register for save states */
-	state_save_register_global(machine, state->m_nile_irq_state);
-	state_save_register_global(machine, state->m_ide_irq_state);
-	state_save_register_global_array(machine, state->m_pci_bridge_regs);
-	state_save_register_global_array(machine, state->m_pci_ide_regs);
-	state_save_register_global_array(machine, state->m_pci_3dfx_regs);
-	state_save_register_global(machine, state->m_vblank_state);
-	state_save_register_global_array(machine, state->m_sio_data);
-	state_save_register_global(machine, state->m_sio_irq_clear);
-	state_save_register_global(machine, state->m_sio_irq_enable);
-	state_save_register_global(machine, state->m_sio_irq_state);
-	state_save_register_global(machine, state->m_sio_led_state);
-	state_save_register_global(machine, state->m_pending_analog_read);
-	state_save_register_global(machine, state->m_cmos_unlocked);
-	machine.save().register_postload(save_prepost_delegate(FUNC(remap_dynamic_addresses), &machine));
+	state_save_register_global(machine(), m_nile_irq_state);
+	state_save_register_global(machine(), m_ide_irq_state);
+	state_save_register_global_array(machine(), m_pci_bridge_regs);
+	state_save_register_global_array(machine(), m_pci_ide_regs);
+	state_save_register_global_array(machine(), m_pci_3dfx_regs);
+	state_save_register_global(machine(), m_vblank_state);
+	state_save_register_global_array(machine(), m_sio_data);
+	state_save_register_global(machine(), m_sio_irq_clear);
+	state_save_register_global(machine(), m_sio_irq_enable);
+	state_save_register_global(machine(), m_sio_irq_state);
+	state_save_register_global(machine(), m_sio_led_state);
+	state_save_register_global(machine(), m_pending_analog_read);
+	state_save_register_global(machine(), m_cmos_unlocked);
+	machine().save().register_postload(save_prepost_delegate(FUNC(remap_dynamic_addresses), &machine()));
 }
 
 
-static MACHINE_RESET( vegas )
+void vegas_state::machine_reset()
 {
-	vegas_state *state = machine.driver_data<vegas_state>();
 	/* reset dynamic addressing */
-	memset(state->m_nile_regs, 0, 0x1000);
-	memset(state->m_pci_ide_regs, 0, sizeof(state->m_pci_ide_regs));
-	memset(state->m_pci_3dfx_regs, 0, sizeof(state->m_pci_3dfx_regs));
+	memset(m_nile_regs, 0, 0x1000);
+	memset(m_pci_ide_regs, 0, sizeof(m_pci_ide_regs));
+	memset(m_pci_3dfx_regs, 0, sizeof(m_pci_3dfx_regs));
 
 	/* reset the DCS system if we have one */
-	if (machine.device("dcs2") != NULL || machine.device("dsio") != NULL || machine.device("denver") != NULL)
+	if (machine().device("dcs2") != NULL || machine().device("dsio") != NULL || machine().device("denver") != NULL)
 	{
-		dcs_reset_w(machine, 1);
-		dcs_reset_w(machine, 0);
+		dcs_reset_w(machine(), 1);
+		dcs_reset_w(machine(), 0);
 	}
 
 	/* initialize IRQ states */
-	state->m_ide_irq_state = 0;
-	state->m_nile_irq_state = 0;
-	state->m_sio_irq_state = 0;
+	m_ide_irq_state = 0;
+	m_nile_irq_state = 0;
+	m_sio_irq_state = 0;
 }
 
 
@@ -2252,8 +2252,6 @@ static MACHINE_CONFIG_START( vegascore, vegas_state )
 	MCFG_CPU_CONFIG(r5000_config)
 	MCFG_CPU_PROGRAM_MAP(vegas_map_8mb)
 
-	MCFG_MACHINE_START(vegas)
-	MCFG_MACHINE_RESET(vegas)
 	MCFG_M48T37_ADD("timekeeper")
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)

@@ -693,42 +693,40 @@ static void topspeed_postload(running_machine &machine)
 	reset_sound_region(machine);
 }
 
-static MACHINE_START( topspeed )
+void topspeed_state::machine_start()
 {
-	topspeed_state *state = machine.driver_data<topspeed_state>();
 
-	state->membank("bank10")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0xc000, 0x4000);
+	membank("bank10")->configure_entries(0, 4, memregion("audiocpu")->base() + 0xc000, 0x4000);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_subcpu = machine.device<cpu_device>("subcpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_tc0220ioc = machine.device("tc0220ioc");
-	state->m_pc080sn_1 = machine.device("pc080sn_1");
-	state->m_pc080sn_2 = machine.device("pc080sn_2");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_subcpu = machine().device<cpu_device>("subcpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_tc0220ioc = machine().device("tc0220ioc");
+	m_pc080sn_1 = machine().device("pc080sn_1");
+	m_pc080sn_2 = machine().device("pc080sn_2");
 
-	state->m_msm_chip[0] = machine.device("msm1");
-	state->m_msm_chip[1] = machine.device("msm2");
-	state->m_msm_rom[0] = state->memregion("adpcm")->base();
-	state->m_msm_rom[1] = state->memregion("adpcm")->base() + 0x10000;
+	m_msm_chip[0] = machine().device("msm1");
+	m_msm_chip[1] = machine().device("msm2");
+	m_msm_rom[0] = memregion("adpcm")->base();
+	m_msm_rom[1] = memregion("adpcm")->base() + 0x10000;
 
-	state->save_item(NAME(state->m_cpua_ctrl));
-	state->save_item(NAME(state->m_ioc220_port));
-	state->save_item(NAME(state->m_banknum));
-	machine.save().register_postload(save_prepost_delegate(FUNC(topspeed_postload), &machine));
+	save_item(NAME(m_cpua_ctrl));
+	save_item(NAME(m_ioc220_port));
+	save_item(NAME(m_banknum));
+	machine().save().register_postload(save_prepost_delegate(FUNC(topspeed_postload), &machine()));
 }
 
-static MACHINE_RESET( topspeed )
+void topspeed_state::machine_reset()
 {
-	topspeed_state *state = machine.driver_data<topspeed_state>();
 
-	state->m_cpua_ctrl = 0xff;
-	state->m_ioc220_port = 0;
-	state->m_banknum = -1;
+	m_cpua_ctrl = 0xff;
+	m_ioc220_port = 0;
+	m_banknum = -1;
 
-	msm5205_reset_w(state->m_msm_chip[0], 1);
-	msm5205_reset_w(state->m_msm_chip[1], 1);
-	state->m_msm_loop[0] = 0;
-	state->m_msm_loop[1] = 0;
+	msm5205_reset_w(m_msm_chip[0], 1);
+	msm5205_reset_w(m_msm_chip[1], 1);
+	m_msm_loop[0] = 0;
+	m_msm_loop[1] = 0;
 }
 
 static const pc080sn_interface topspeed_pc080sn_intf =
@@ -762,8 +760,6 @@ static MACHINE_CONFIG_START( topspeed, topspeed_state )
 	MCFG_CPU_PROGRAM_MAP(topspeed_cpub_map)
 	MCFG_CPU_VBLANK_INT("screen", topspeed_cpub_interrupt)
 
-	MCFG_MACHINE_START(topspeed)
-	MCFG_MACHINE_RESET(topspeed)
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", topspeed_io_intf)
 

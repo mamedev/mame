@@ -242,8 +242,8 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_CPU_VBLANK_INT("screen", kay_kbd_interrupt)	/* this doesn't actually exist, it is to run the keyboard */
 	MCFG_CPU_CONFIG(kayproii_daisy_chain)
 
-	MCFG_MACHINE_START( kayproii )
-	MCFG_MACHINE_RESET( kayproii )
+	MCFG_MACHINE_START_OVERRIDE(kaypro_state, kayproii )
+	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kayproii )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -251,7 +251,7 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(80*7, 24*10)
 	MCFG_SCREEN_VISIBLE_AREA(0,80*7-1,0,24*10-1)
-	MCFG_VIDEO_START( kaypro )
+	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
 	MCFG_SCREEN_UPDATE_STATIC( kayproii )
 	MCFG_GFXDECODE(kayproii)
 	MCFG_PALETTE_LENGTH(2)
@@ -287,7 +287,7 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_CPU_VBLANK_INT("screen", kay_kbd_interrupt)
 	MCFG_CPU_CONFIG(kaypro2x_daisy_chain)
 
-	MCFG_MACHINE_RESET( kaypro2x )
+	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kaypro2x )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -295,11 +295,11 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(80*8, 25*16)
 	MCFG_SCREEN_VISIBLE_AREA(0,80*8-1,0,25*16-1)
-	MCFG_VIDEO_START( kaypro )
+	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
 	MCFG_SCREEN_UPDATE_STATIC( kaypro2x )
 	MCFG_GFXDECODE(kaypro2x)
 	MCFG_PALETTE_LENGTH(3)
-	MCFG_PALETTE_INIT(kaypro)
+	MCFG_PALETTE_INIT_OVERRIDE(kaypro_state,kaypro)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

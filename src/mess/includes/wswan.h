@@ -152,14 +152,19 @@ public:
 	bitmap_ind16 m_bitmap;
 	UINT8 m_rotate;
 	void wswan_clear_irq_line(int irq);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void palette_init();
+	DECLARE_MACHINE_START(wscolor);
+	DECLARE_PALETTE_INIT(wscolor);
 };
 
 
 /*----------- defined in machine/wswan.c -----------*/
 
-MACHINE_START( wswan );
-MACHINE_START( wscolor );
-MACHINE_RESET( wswan );
+
+
+
 DEVICE_START(wswan_cart);
 DEVICE_IMAGE_LOAD(wswan_cart);
 

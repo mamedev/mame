@@ -914,19 +914,17 @@ WRITE8_MEMBER(namcona1_state::port8_w)
 }
 
 
-static MACHINE_START( namcona1 )
+void namcona1_state::machine_start()
 {
-	namcona1_state *state = machine.driver_data<namcona1_state>();
-	c140_set_base(machine.device("c140"), state->m_workram);
+	c140_set_base(machine().device("c140"), m_workram);
 }
 
 // for games with the MCU emulated, the MCU boots the 68000.  don't allow it before that.
-static MACHINE_RESET( namcona1_mcu )
+void namcona1_state::machine_reset()
 {
-	namcona1_state *state = machine.driver_data<namcona1_state>();
-	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	state->m_mcu_port5 = 1;
+	m_mcu_port5 = 1;
 }
 
 // "encrypt" player 3 inputs
@@ -1018,8 +1016,6 @@ static MACHINE_CONFIG_START( namcona1, namcona1_state )
 	MCFG_TIMER_ADD_SCANLINE("scan_mcu", mcu_interrupt, "screen", 0, 1)
 
 	MCFG_NVRAM_HANDLER(namcosna1)
-	MCFG_MACHINE_START(namcona1)
-	MCFG_MACHINE_RESET(namcona1_mcu)
 	MCFG_QUANTUM_TIME(attotime::from_hz(2400))
 
 	/* video hardware */
@@ -1034,7 +1030,6 @@ static MACHINE_CONFIG_START( namcona1, namcona1_state )
 
 	MCFG_PALETTE_LENGTH(0x2000)
 
-	MCFG_VIDEO_START(namcona1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

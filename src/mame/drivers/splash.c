@@ -291,12 +291,11 @@ static ADDRESS_MAP_START( funystrp_sound_io_map, AS_IO, 8, splash_state )
 	AM_RANGE(0x07, 0x07) AM_WRITE(msm2_interrupt_w)
 ADDRESS_MAP_END
 
-static MACHINE_RESET( funystrp )
+MACHINE_RESET_MEMBER(splash_state,funystrp)
 {
-	splash_state *state = machine.driver_data<splash_state>();
 
-	state->m_adpcm_data = 0;
-	state->m_ret = 0x100;
+	m_adpcm_data = 0;
+	m_ret = 0x100;
 }
 
 
@@ -485,12 +484,11 @@ static const msm5205_interface splash_msm5205_interface =
 	MSM5205_S48_4B		/* 8KHz */
 };
 
-static MACHINE_RESET( splash )
+MACHINE_RESET_MEMBER(splash_state,splash)
 {
-	splash_state *state = machine.driver_data<splash_state>();
 
-	state->m_adpcm_data = 0;
-	state->m_ret = 0x100;
+	m_adpcm_data = 0;
+	m_ret = 0x100;
 }
 
 static MACHINE_CONFIG_START( splash, splash_state )
@@ -515,9 +513,8 @@ static MACHINE_CONFIG_START( splash, splash_state )
 	MCFG_GFXDECODE(splash)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(splash)
 
-	MCFG_MACHINE_RESET( splash )
+	MCFG_MACHINE_RESET_OVERRIDE(splash_state, splash )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -573,9 +570,8 @@ static MACHINE_CONFIG_START( roldfrog, splash_state )
 	MCFG_GFXDECODE(splash)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(splash)
 
-	MCFG_MACHINE_RESET( splash )
+	MCFG_MACHINE_RESET_OVERRIDE(splash_state, splash )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -654,9 +650,8 @@ static MACHINE_CONFIG_START( funystrp, splash_state )
 	MCFG_GFXDECODE(splash)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(splash)
 
-	MCFG_MACHINE_RESET( funystrp )
+	MCFG_MACHINE_RESET_OVERRIDE(splash_state, funystrp )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

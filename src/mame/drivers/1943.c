@@ -243,14 +243,13 @@ GFXDECODE_END
 
 /* Machine Driver */
 
-static MACHINE_RESET( 1943 )
+void _1943_state::machine_reset()
 {
-	_1943_state *state = machine.driver_data<_1943_state>();
 
-	state->m_char_on = 0;
-	state->m_obj_on = 0;
-	state->m_bg1_on = 0;
-	state->m_bg2_on = 0;
+	m_char_on = 0;
+	m_obj_on = 0;
+	m_bg1_on = 0;
+	m_bg2_on = 0;
 }
 
 static MACHINE_CONFIG_START( 1943, _1943_state )
@@ -264,7 +263,6 @@ static MACHINE_CONFIG_START( 1943, _1943_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 4*60)
 
-	MCFG_MACHINE_RESET(1943)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -277,8 +275,6 @@ static MACHINE_CONFIG_START( 1943, _1943_state )
 	MCFG_GFXDECODE(1943)
 	MCFG_PALETTE_LENGTH(32*4+16*16+16*16+16*16)
 
-	MCFG_PALETTE_INIT(1943)
-	MCFG_VIDEO_START(1943)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

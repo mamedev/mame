@@ -27,11 +27,13 @@ public:
 	/* devices */
 	cpu_device *m_audiocpu;
 	DECLARE_WRITE16_MEMBER(soundcommand_w);
+	virtual void machine_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/galspnbl.c -----------*/
 
 
-PALETTE_INIT( galspnbl );
+
 SCREEN_UPDATE_IND16( galspnbl );

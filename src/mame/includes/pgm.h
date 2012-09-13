@@ -111,6 +111,9 @@ public:
 	DECLARE_DRIVER_INIT(pstar);
 	TILE_GET_INFO_MEMBER(get_pgm_tx_tilemap_tile_info);
 	TILE_GET_INFO_MEMBER(get_pgm_bg_tilemap_tile_info);
+	DECLARE_VIDEO_START(pgm);
+	DECLARE_MACHINE_START(pgm);
+	DECLARE_MACHINE_RESET(pgm);
 };
 
 
@@ -198,6 +201,7 @@ public:
 	DECLARE_DRIVER_INIT(kov);
 	DECLARE_DRIVER_INIT(kovboot);
 	DECLARE_DRIVER_INIT(oldsplus);
+	DECLARE_MACHINE_START(pgm_arm_type1);
 };
 
 /* for machine/pgmprot2.c type games */
@@ -225,6 +229,7 @@ public:
 	DECLARE_DRIVER_INIT(ddp2);
 	DECLARE_DRIVER_INIT(dw2001);
 	DECLARE_DRIVER_INIT(dwpc);
+	DECLARE_MACHINE_START(pgm_arm_type2);
 };
 
 
@@ -254,6 +259,7 @@ public:
 	DECLARE_DRIVER_INIT(killbldp);
 	DECLARE_DRIVER_INIT(dmnfrnt);
 	DECLARE_DRIVER_INIT(happy6);
+	DECLARE_MACHINE_START(pgm_arm_type3);
 };
 
 
@@ -275,6 +281,8 @@ public:
 
 	DECLARE_DRIVER_INIT(killbld);
 	DECLARE_DRIVER_INIT(drgw3);
+	DECLARE_MACHINE_RESET(killbld);
+	DECLARE_MACHINE_RESET(dw3);
 };
 
 /* for machine/pgmprot6.c type games */
@@ -295,6 +303,7 @@ public:
 	required_shared_ptr<UINT16> m_sharedprotram;
 
 	DECLARE_DRIVER_INIT(olds);
+	DECLARE_MACHINE_RESET(olds);
 };
 
 
@@ -321,8 +330,8 @@ ADDRESS_MAP_EXTERN( pgm_mem, 16 );
 ADDRESS_MAP_EXTERN( pgm_basic_mem, 16 );
 ADDRESS_MAP_EXTERN( pgm_base_mem, 16 );
 
-MACHINE_START( pgm );
-MACHINE_RESET( pgm );
+
+
 
 /*----------- defined in machine/pgmcrypt.c -----------*/
 
@@ -419,6 +428,6 @@ INPUT_PORTS_EXTERN( olds );
 /*----------- defined in video/pgm.c -----------*/
 
 
-VIDEO_START( pgm );
+
 SCREEN_VBLANK( pgm );
 SCREEN_UPDATE_IND16( pgm );

@@ -57,6 +57,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mjsister_input_sel1_w);
 	DECLARE_WRITE8_MEMBER(mjsister_input_sel2_w);
 	DECLARE_READ8_MEMBER(mjsister_keys_r);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -66,14 +69,13 @@ public:
  *
  *************************************/
 
-static VIDEO_START( mjsister )
+void mjsister_state::video_start()
 {
-	mjsister_state *state = machine.driver_data<mjsister_state>();
-	state->m_tmpbitmap0 = auto_bitmap_ind16_alloc(machine, 256, 256);
-	state->m_tmpbitmap1 = auto_bitmap_ind16_alloc(machine, 256, 256);
+	m_tmpbitmap0 = auto_bitmap_ind16_alloc(machine(), 256, 256);
+	m_tmpbitmap1 = auto_bitmap_ind16_alloc(machine(), 256, 256);
 
-	state->save_item(NAME(state->m_videoram0));
-	state->save_item(NAME(state->m_videoram1));
+	save_item(NAME(m_videoram0));
+	save_item(NAME(m_videoram1));
 }
 
 static void mjsister_plot0( running_machine &machine, int offset, UINT8 data )
@@ -446,50 +448,48 @@ static void mjsister_redraw(mjsister_state *state)
 	state->m_screen_redraw = 1;
 }
 
-static MACHINE_START( mjsister )
+void mjsister_state::machine_start()
 {
-	mjsister_state *state = machine.driver_data<mjsister_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x8000);
+	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x8000);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_dac = machine.device<dac_device>("dac");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_dac = machine().device<dac_device>("dac");
 
-	state->save_item(NAME(state->m_dac_busy));
-	state->save_item(NAME(state->m_flip_screen));
-	state->save_item(NAME(state->m_video_enable));
-	state->save_item(NAME(state->m_vrambank));
-	state->save_item(NAME(state->m_colorbank));
-	state->save_item(NAME(state->m_input_sel1));
-	state->save_item(NAME(state->m_input_sel2));
-	state->save_item(NAME(state->m_rombank0));
-	state->save_item(NAME(state->m_rombank1));
-	state->save_item(NAME(state->m_dac_adr));
-	state->save_item(NAME(state->m_dac_bank));
-	state->save_item(NAME(state->m_dac_adr_s));
-	state->save_item(NAME(state->m_dac_adr_e));
-	machine.save().register_postload(save_prepost_delegate(FUNC(mjsister_redraw), state));
+	save_item(NAME(m_dac_busy));
+	save_item(NAME(m_flip_screen));
+	save_item(NAME(m_video_enable));
+	save_item(NAME(m_vrambank));
+	save_item(NAME(m_colorbank));
+	save_item(NAME(m_input_sel1));
+	save_item(NAME(m_input_sel2));
+	save_item(NAME(m_rombank0));
+	save_item(NAME(m_rombank1));
+	save_item(NAME(m_dac_adr));
+	save_item(NAME(m_dac_bank));
+	save_item(NAME(m_dac_adr_s));
+	save_item(NAME(m_dac_adr_e));
+	machine().save().register_postload(save_prepost_delegate(FUNC(mjsister_redraw), this));
 }
 
-static MACHINE_RESET( mjsister )
+void mjsister_state::machine_reset()
 {
-	mjsister_state *state = machine.driver_data<mjsister_state>();
 
-	state->m_dac_busy = 0;
-	state->m_flip_screen = 0;
-	state->m_video_enable = 0;
-	state->m_screen_redraw = 0;
-	state->m_vrambank = 0;
-	state->m_colorbank = 0;
-	state->m_input_sel1 = 0;
-	state->m_input_sel2 = 0;
-	state->m_rombank0 = 0;
-	state->m_rombank1 = 0;
-	state->m_dac_adr = 0;
-	state->m_dac_bank = 0;
-	state->m_dac_adr_s = 0;
-	state->m_dac_adr_e = 0;
+	m_dac_busy = 0;
+	m_flip_screen = 0;
+	m_video_enable = 0;
+	m_screen_redraw = 0;
+	m_vrambank = 0;
+	m_colorbank = 0;
+	m_input_sel1 = 0;
+	m_input_sel2 = 0;
+	m_rombank0 = 0;
+	m_rombank1 = 0;
+	m_dac_adr = 0;
+	m_dac_bank = 0;
+	m_dac_adr_s = 0;
+	m_dac_adr_e = 0;
 }
 
 
@@ -501,8 +501,6 @@ static MACHINE_CONFIG_START( mjsister, mjsister_state )
 	MCFG_CPU_IO_MAP(mjsister_io_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
 
-	MCFG_MACHINE_START(mjsister)
-	MCFG_MACHINE_RESET(mjsister)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -515,7 +513,6 @@ static MACHINE_CONFIG_START( mjsister, mjsister_state )
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(mjsister)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

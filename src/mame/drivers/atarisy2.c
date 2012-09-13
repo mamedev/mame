@@ -220,37 +220,35 @@ DIRECT_UPDATE_MEMBER( atarisy2_state::atarisy2_direct_handler )
 }
 
 
-static MACHINE_START( atarisy2 )
+MACHINE_START_MEMBER(atarisy2_state,atarisy2)
 {
-	atarisy2_state *state = machine.driver_data<atarisy2_state>();
-	atarigen_init(machine);
+	atarigen_init(machine());
 
-	state->save_item(NAME(state->m_interrupt_enable));
-	state->save_item(NAME(state->m_which_adc));
-	state->save_item(NAME(state->m_p2portwr_state));
-	state->save_item(NAME(state->m_p2portrd_state));
-	machine.save().register_postload(save_prepost_delegate(FUNC(bankselect_postload), &machine));
-	state->save_item(NAME(state->m_sound_reset_state));
+	save_item(NAME(m_interrupt_enable));
+	save_item(NAME(m_which_adc));
+	save_item(NAME(m_p2portwr_state));
+	save_item(NAME(m_p2portrd_state));
+	machine().save().register_postload(save_prepost_delegate(FUNC(bankselect_postload), &machine()));
+	save_item(NAME(m_sound_reset_state));
 }
 
 
-static MACHINE_RESET( atarisy2 )
+MACHINE_RESET_MEMBER(atarisy2_state,atarisy2)
 {
-	atarisy2_state *state = machine.driver_data<atarisy2_state>();
 
-	atarigen_eeprom_reset(state);
+	atarigen_eeprom_reset(this);
 	slapstic_reset();
-	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_sound_io_reset(machine.device("soundcpu"));
-	atarigen_scanline_timer_reset(*machine.primary_screen, scanline_update, 64);
+	atarigen_interrupt_reset(this, update_interrupts);
+	atarigen_sound_io_reset(machine().device("soundcpu"));
+	atarigen_scanline_timer_reset(*machine().primary_screen, scanline_update, 64);
 
-	address_space *main = machine.device<t11_device>("maincpu")->space(AS_PROGRAM);
-	main->set_direct_update_handler(direct_update_delegate(FUNC(atarisy2_state::atarisy2_direct_handler), state));
+	address_space *main = machine().device<t11_device>("maincpu")->space(AS_PROGRAM);
+	main->set_direct_update_handler(direct_update_delegate(FUNC(atarisy2_state::atarisy2_direct_handler), this));
 
-	state->m_p2portwr_state = 0;
-	state->m_p2portrd_state = 0;
+	m_p2portwr_state = 0;
+	m_p2portrd_state = 0;
 
-	state->m_which_adc = 0;
+	m_which_adc = 0;
 }
 
 
@@ -1270,8 +1268,8 @@ static MACHINE_CONFIG_START( atarisy2, atarisy2_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)MASTER_CLOCK/2/16/16/16/10)
 
-	MCFG_MACHINE_START(atarisy2)
-	MCFG_MACHINE_RESET(atarisy2)
+	MCFG_MACHINE_START_OVERRIDE(atarisy2_state,atarisy2)
+	MCFG_MACHINE_RESET_OVERRIDE(atarisy2_state,atarisy2)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
@@ -1283,7 +1281,7 @@ static MACHINE_CONFIG_START( atarisy2, atarisy2_state )
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 640, 0, 512, 416, 0, 384)
 	MCFG_SCREEN_UPDATE_STATIC(atarisy2)
 
-	MCFG_VIDEO_START(atarisy2)
+	MCFG_VIDEO_START_OVERRIDE(atarisy2_state,atarisy2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

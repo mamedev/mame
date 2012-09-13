@@ -9,12 +9,12 @@
 #include "includes/tryout.h"
 
 
-PALETTE_INIT( tryout )
+void tryout_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -34,7 +34,7 @@ PALETTE_INIT( tryout )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -163,18 +163,17 @@ TILEMAP_MAPPER_MEMBER(tryout_state::get_bg_memory_offset)
 	return a;
 }
 
-VIDEO_START( tryout )
+void tryout_state::video_start()
 {
-	tryout_state *state = machine.driver_data<tryout_state>();
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tryout_state::get_fg_tile_info),state),tilemap_mapper_delegate(FUNC(tryout_state::get_fg_memory_offset),state),8,8,32,32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tryout_state::get_bg_tile_info),state),tilemap_mapper_delegate(FUNC(tryout_state::get_bg_memory_offset),state),16,16,64,16);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tryout_state::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(tryout_state::get_fg_memory_offset),this),8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tryout_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(tryout_state::get_bg_memory_offset),this),16,16,64,16);
 
-	state->m_vram=auto_alloc_array(machine, UINT8, 8 * 0x800);
-	state->m_vram_gfx=auto_alloc_array(machine, UINT8, 0x6000);
+	m_vram=auto_alloc_array(machine(), UINT8, 8 * 0x800);
+	m_vram_gfx=auto_alloc_array(machine(), UINT8, 0x6000);
 
-	machine.gfx[2]->set_source(state->m_vram_gfx);
+	machine().gfx[2]->set_source(m_vram_gfx);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)

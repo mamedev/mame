@@ -78,9 +78,8 @@ TILEMAP_MAPPER_MEMBER(polygonet_state::plygonet_scan_cols)
 	return col * num_rows + (row^1);
 }
 
-VIDEO_START( polygonet )
+void polygonet_state::video_start()
 {
-	polygonet_state *state = machine.driver_data<polygonet_state>();
 	static const gfx_layout charlayout =
 	{
 		8, 8,	/* 8x8 */
@@ -93,28 +92,28 @@ VIDEO_START( polygonet )
 	};
 
 	/* find first empty slot to decode gfx */
-	for (state->m_ttl_gfx_index = 0; state->m_ttl_gfx_index < MAX_GFX_ELEMENTS; state->m_ttl_gfx_index++)
-		if (machine.gfx[state->m_ttl_gfx_index] == 0)
+	for (m_ttl_gfx_index = 0; m_ttl_gfx_index < MAX_GFX_ELEMENTS; m_ttl_gfx_index++)
+		if (machine().gfx[m_ttl_gfx_index] == 0)
 			break;
 
-	assert(state->m_ttl_gfx_index != MAX_GFX_ELEMENTS);
+	assert(m_ttl_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* decode the ttl layer's gfx */
-	machine.gfx[state->m_ttl_gfx_index] = auto_alloc(machine, gfx_element(machine, charlayout, machine.root_device().memregion("gfx1")->base(), machine.total_colors() / 16, 0));
+	machine().gfx[m_ttl_gfx_index] = auto_alloc(machine(), gfx_element(machine(), charlayout, machine().root_device().memregion("gfx1")->base(), machine().total_colors() / 16, 0));
 
 	/* create the tilemap */
-	state->m_ttl_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(polygonet_state::ttl_get_tile_info),state), tilemap_mapper_delegate(FUNC(polygonet_state::plygonet_scan),state),  8, 8, 64, 32);
+	m_ttl_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(polygonet_state::ttl_get_tile_info),this), tilemap_mapper_delegate(FUNC(polygonet_state::plygonet_scan),this),  8, 8, 64, 32);
 
-	state->m_ttl_tilemap->set_transparent_pen(0);
+	m_ttl_tilemap->set_transparent_pen(0);
 
 	/* set up the roz t-map too */
-	state->m_roz_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(polygonet_state::roz_get_tile_info),state), tilemap_mapper_delegate(FUNC(polygonet_state::plygonet_scan_cols),state), 16, 16, 32, 64);
-	state->m_roz_tilemap->set_transparent_pen(0);
+	m_roz_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(polygonet_state::roz_get_tile_info),this), tilemap_mapper_delegate(FUNC(polygonet_state::plygonet_scan_cols),this), 16, 16, 32, 64);
+	m_roz_tilemap->set_transparent_pen(0);
 
 	/* save states */
-	state->save_item(NAME(state->m_ttl_gfx_index));
-	state->save_item(NAME(state->m_ttl_vram));
-	state->save_item(NAME(state->m_roz_vram));
+	save_item(NAME(m_ttl_gfx_index));
+	save_item(NAME(m_ttl_vram));
+	save_item(NAME(m_roz_vram));
 }
 
 SCREEN_UPDATE_IND16( polygonet )

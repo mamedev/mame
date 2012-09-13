@@ -82,9 +82,10 @@ public:
 	DECLARE_WRITE8_MEMBER(tlcs_sound_w);
 	DECLARE_WRITE8_MEMBER(taitopjc_tlcs900_to1);
 	DECLARE_WRITE8_MEMBER(taitopjc_tlcs900_to3);
+	virtual void video_start();
 };
 
-static VIDEO_START( taitopjc )
+void taitopjc_state::video_start()
 {
 
 }
@@ -433,7 +434,6 @@ static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 767)
 	MCFG_SCREEN_UPDATE_STATIC(taitopjc)
 
-	MCFG_VIDEO_START(taitopjc)
 MACHINE_CONFIG_END
 
 

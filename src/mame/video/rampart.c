@@ -18,7 +18,7 @@ static void rampart_bitmap_render(running_machine &machine, bitmap_ind16 &bitmap
  *
  *************************************/
 
-VIDEO_START( rampart )
+VIDEO_START_MEMBER(rampart_state,rampart)
 {
 	static const atarimo_desc modesc =
 	{
@@ -58,7 +58,7 @@ VIDEO_START( rampart )
 	};
 
 	/* initialize the motion objects */
-	atarimo_init(machine, 0, &modesc);
+	atarimo_init(machine(), 0, &modesc);
 
 	/* set the intial scroll offset */
 	atarimo_set_xscroll(0, -12);

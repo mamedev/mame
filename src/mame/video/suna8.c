@@ -205,9 +205,9 @@ static void suna8_vh_start_common(running_machine &machine, int dim)
 #endif
 }
 
-VIDEO_START( suna8_textdim0 )	{ suna8_vh_start_common(machine, 0);  }
-VIDEO_START( suna8_textdim8 )	{ suna8_vh_start_common(machine, 8);  }
-VIDEO_START( suna8_textdim12 )	{ suna8_vh_start_common(machine, 12); }
+VIDEO_START_MEMBER(suna8_state,suna8_textdim0){ suna8_vh_start_common(machine(), 0);  }
+VIDEO_START_MEMBER(suna8_state,suna8_textdim8){ suna8_vh_start_common(machine(), 8);  }
+VIDEO_START_MEMBER(suna8_state,suna8_textdim12){ suna8_vh_start_common(machine(), 12); }
 
 /***************************************************************************
 

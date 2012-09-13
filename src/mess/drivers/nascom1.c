@@ -281,7 +281,6 @@ static MACHINE_CONFIG_START( nascom1, nascom1_state )
 	MCFG_CPU_PROGRAM_MAP(nascom1_mem)
 	MCFG_CPU_IO_MAP(nascom1_io)
 
-	MCFG_MACHINE_RESET( nascom1 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

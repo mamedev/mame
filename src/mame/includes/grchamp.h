@@ -68,6 +68,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_right_tile_info);
 	TILE_GET_INFO_MEMBER(get_center_tile_info);
 	TILEMAP_MAPPER_MEMBER(get_memory_offset);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 /* Discrete Sound Input Nodes */
@@ -87,6 +90,6 @@ DISCRETE_SOUND_EXTERN( grchamp );
 
 /*----------- defined in video/grchamp.c -----------*/
 
-PALETTE_INIT( grchamp );
-VIDEO_START( grchamp );
+
+
 SCREEN_UPDATE_RGB32( grchamp );

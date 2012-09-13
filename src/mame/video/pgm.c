@@ -613,29 +613,28 @@ TILE_GET_INFO_MEMBER(pgm_state::get_pgm_bg_tilemap_tile_info)
 
 /*** Video - Start / Update ****************************************************/
 
-VIDEO_START( pgm )
+VIDEO_START_MEMBER(pgm_state,pgm)
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
 	int i;
 
-	state->m_bdata = state->memregion("sprmask")->base();
-	state->m_bdatasize = state->memregion("sprmask")->bytes() - 1;
-	state->m_aoffset = 0;
-	state->m_boffset = 0;
+	m_bdata = memregion("sprmask")->base();
+	m_bdatasize = memregion("sprmask")->bytes() - 1;
+	m_aoffset = 0;
+	m_boffset = 0;
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pgm_state::get_pgm_tx_tilemap_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_tx_tilemap->set_transparent_pen(15);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pgm_state::get_pgm_tx_tilemap_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tx_tilemap->set_transparent_pen(15);
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pgm_state::get_pgm_bg_tilemap_tile_info),state), TILEMAP_SCAN_ROWS, 32, 32, 64, 16);
-	state->m_bg_tilemap->set_transparent_pen(31);
-	state->m_bg_tilemap->set_scroll_rows(16 * 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pgm_state::get_pgm_bg_tilemap_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 64, 16);
+	m_bg_tilemap->set_transparent_pen(31);
+	m_bg_tilemap->set_scroll_rows(16 * 32);
 
 	for (i = 0; i < 0x1200 / 2; i++)
-		palette_set_color(machine, i, MAKE_RGB(0, 0, 0));
+		palette_set_color(machine(), i, MAKE_RGB(0, 0, 0));
 
-	state->m_spritebufferram = auto_alloc_array_clear(machine, UINT16, 0xa00/2);
+	m_spritebufferram = auto_alloc_array_clear(machine(), UINT16, 0xa00/2);
 
-	state->save_pointer(NAME(state->m_spritebufferram), 0xa00/2);
+	save_pointer(NAME(m_spritebufferram), 0xa00/2);
 }
 
 SCREEN_UPDATE_IND16( pgm )

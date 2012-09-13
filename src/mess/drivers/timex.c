@@ -561,14 +561,13 @@ static ADDRESS_MAP_START(ts2068_mem, AS_PROGRAM, 8, spectrum_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_RESET( ts2068 )
+MACHINE_RESET_MEMBER(spectrum_state,ts2068)
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
 
-	state->m_port_ff_data = 0;
-	state->m_port_f4_data = 0;
-	ts2068_update_memory(machine);
-	MACHINE_RESET_CALL(spectrum);
+	m_port_ff_data = 0;
+	m_port_f4_data = 0;
+	ts2068_update_memory(machine());
+	MACHINE_RESET_CALL_MEMBER(spectrum);
 
 }
 
@@ -598,16 +597,15 @@ static ADDRESS_MAP_START(tc2048_mem, AS_PROGRAM, 8, spectrum_state )
 	AM_RANGE( 0x4000, 0xffff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 ADDRESS_MAP_END
 
-static MACHINE_RESET( tc2048 )
+MACHINE_RESET_MEMBER(spectrum_state,tc2048)
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
-	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *messram = machine().device<ram_device>(RAM_TAG)->pointer();
 
-	state->membank("bank1")->set_base(messram);
-	state->membank("bank2")->set_base(messram);
-	state->m_port_ff_data = 0;
-	state->m_port_f4_data = -1;
-	MACHINE_RESET_CALL(spectrum);
+	membank("bank1")->set_base(messram);
+	membank("bank2")->set_base(messram);
+	m_port_ff_data = 0;
+	m_port_f4_data = -1;
+	MACHINE_RESET_CALL_MEMBER(spectrum);
 }
 
 
@@ -634,7 +632,7 @@ static MACHINE_CONFIG_DERIVED( ts2068, spectrum_128 )
 	MCFG_CPU_PROGRAM_MAP(ts2068_mem)
 	MCFG_CPU_IO_MAP(ts2068_io)
 
-	MCFG_MACHINE_RESET( ts2068 )
+	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, ts2068 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -645,7 +643,7 @@ static MACHINE_CONFIG_DERIVED( ts2068, spectrum_128 )
 
 	MCFG_GFXDECODE(ts2068)
 
-	MCFG_VIDEO_START( ts2068 )
+	MCFG_VIDEO_START_OVERRIDE(spectrum_state, ts2068 )
 
 	/* sound */
 	MCFG_SOUND_REPLACE("ay8912", AY8912, XTAL_14_112MHz/8)        /* From Schematic; 1.764 MHz */
@@ -676,7 +674,7 @@ static MACHINE_CONFIG_DERIVED( tc2048, spectrum )
 	MCFG_CPU_PROGRAM_MAP(tc2048_mem)
 	MCFG_CPU_IO_MAP(tc2048_io)
 
-	MCFG_MACHINE_RESET( tc2048 )
+	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, tc2048 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -685,7 +683,7 @@ static MACHINE_CONFIG_DERIVED( tc2048, spectrum )
 	MCFG_SCREEN_VISIBLE_AREA(0, TS2068_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_STATIC( tc2048 )
 
-	MCFG_VIDEO_START( spectrum_128 )
+	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum_128 )
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

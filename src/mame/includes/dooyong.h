@@ -69,6 +69,16 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg2_tile_info);
 	TILE_GET_INFO_MEMBER(flytiger_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	DECLARE_MACHINE_START(lastday);
+	DECLARE_MACHINE_RESET(sound_ym2203);
+	DECLARE_VIDEO_START(lastday);
+	DECLARE_VIDEO_START(gulfstrm);
+	DECLARE_VIDEO_START(pollux);
+	DECLARE_VIDEO_START(bluehawk);
+	DECLARE_VIDEO_START(flytiger);
+	DECLARE_VIDEO_START(primella);
+	DECLARE_VIDEO_START(rshark);
+	DECLARE_VIDEO_START(popbingo);
 };
 
 
@@ -87,11 +97,11 @@ SCREEN_UPDATE_IND16( primella );
 SCREEN_UPDATE_IND16( rshark );
 SCREEN_UPDATE_IND16( popbingo );
 
-VIDEO_START( lastday );
-VIDEO_START( gulfstrm );
-VIDEO_START( pollux );
-VIDEO_START( bluehawk );
-VIDEO_START( flytiger );
-VIDEO_START( primella );
-VIDEO_START( rshark );
-VIDEO_START( popbingo );
+
+
+
+
+
+
+
+

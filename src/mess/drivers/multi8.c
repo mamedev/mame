@@ -64,6 +64,10 @@ public:
 	UINT16 m_knj_addr;
 	DECLARE_READ8_MEMBER(ay8912_0_r);
 	DECLARE_READ8_MEMBER(ay8912_1_r);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 #define mc6845_h_char_total 	(state->m_crtc_vreg[0])
@@ -83,18 +87,17 @@ public:
 #define mc6845_light_pen_addr	(((state->m_crtc_vreg[0x10]<<8) & 0x3f00) | (state->m_crtc_vreg[0x11] & 0xff))
 #define mc6845_update_addr  	(((state->m_crtc_vreg[0x12]<<8) & 0x3f00) | (state->m_crtc_vreg[0x13] & 0xff))
 
-static VIDEO_START( multi8 )
+void multi8_state::video_start()
 {
-	multi8_state *state = machine.driver_data<multi8_state>();
 
-	state->m_keyb_press = state->m_keyb_press_flag = state->m_shift_press_flag = state->m_display_reg = 0;
+	m_keyb_press = m_keyb_press_flag = m_shift_press_flag = m_display_reg = 0;
 
-	for (state->m_bw_mode = 0; state->m_bw_mode < 8; state->m_bw_mode++)
-		state->m_pen_clut[state->m_bw_mode]=0;
+	for (m_bw_mode = 0; m_bw_mode < 8; m_bw_mode++)
+		m_pen_clut[m_bw_mode]=0;
 
-	state->m_vram_bank = 8;
-	state->m_bw_mode = 0;
-	state->m_p_chargen = state->memregion("chargen")->base();
+	m_vram_bank = 8;
+	m_bw_mode = 0;
+	m_p_chargen = memregion("chargen")->base();
 }
 
 static void multi8_draw_pixel(running_machine &machine, bitmap_ind16 &bitmap,int y,int x,UINT8 pen,UINT8 width)
@@ -568,12 +571,12 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
-static PALETTE_INIT( multi8 )
+void multi8_state::palette_init()
 {
 	UINT8 i;
 
 	for(i=0; i<8; i++)
-		palette_set_color_rgb(machine, i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
+		palette_set_color_rgb(machine(), i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
 }
 
 READ8_MEMBER( multi8_state::porta_r )
@@ -641,20 +644,18 @@ static const ym2203_interface ym2203_config =
 };
 
 
-static MACHINE_START(multi8)
+void multi8_state::machine_start()
 {
-	multi8_state *state = machine.driver_data<multi8_state>();
-	state->m_p_vram = machine.root_device().memregion("vram")->base();
-	state->m_p_wram = machine.root_device().memregion("wram")->base();
-	state->m_p_kanji = state->memregion("kanji")->base();
+	m_p_vram = machine().root_device().memregion("vram")->base();
+	m_p_wram = machine().root_device().memregion("wram")->base();
+	m_p_kanji = memregion("kanji")->base();
 }
 
-static MACHINE_RESET(multi8)
+void multi8_state::machine_reset()
 {
-	multi8_state *state = machine.driver_data<multi8_state>();
-	beep_set_frequency(machine.device(BEEPER_TAG),1200); //guesswork
-	beep_set_state(machine.device(BEEPER_TAG),0);
-	state->m_mcu_init = 0;
+	beep_set_frequency(machine().device(BEEPER_TAG),1200); //guesswork
+	beep_set_state(machine().device(BEEPER_TAG),0);
+	m_mcu_init = 0;
 }
 
 static MACHINE_CONFIG_START( multi8, multi8_state )
@@ -663,8 +664,6 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 	MCFG_CPU_PROGRAM_MAP(multi8_mem)
 	MCFG_CPU_IO_MAP(multi8_io)
 
-	MCFG_MACHINE_START(multi8)
-	MCFG_MACHINE_RESET(multi8)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -672,10 +671,8 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_VIDEO_START(multi8)
 	MCFG_SCREEN_UPDATE_STATIC(multi8)
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(multi8)
 	MCFG_GFXDECODE(multi8)
 
 	/* Audio */

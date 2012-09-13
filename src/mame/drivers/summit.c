@@ -30,10 +30,12 @@ public:
 	required_shared_ptr<UINT8> m_attr;
 	required_shared_ptr<UINT8> m_vram;
 	DECLARE_WRITE8_MEMBER(out_w);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
-static VIDEO_START(summit)
+void summit_state::video_start()
 {
 }
 
@@ -289,7 +291,7 @@ static GFXDECODE_START( summit )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
-PALETTE_INIT( summit )
+void summit_state::palette_init()
 {
 
 }
@@ -311,9 +313,7 @@ static MACHINE_CONFIG_START( summit, summit_state )
 	MCFG_GFXDECODE(summit)
 
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(summit)
 
-	MCFG_VIDEO_START(summit)
 MACHINE_CONFIG_END
 
 

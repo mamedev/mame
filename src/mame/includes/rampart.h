@@ -17,10 +17,13 @@ public:
 	UINT8			m_has_mo;
 	DECLARE_WRITE16_MEMBER(latch_w);
 	DECLARE_DRIVER_INIT(rampart);
+	DECLARE_MACHINE_START(rampart);
+	DECLARE_MACHINE_RESET(rampart);
+	DECLARE_VIDEO_START(rampart);
 };
 
 
 /*----------- defined in video/rampart.c -----------*/
 
-VIDEO_START( rampart );
+
 SCREEN_UPDATE_IND16( rampart );

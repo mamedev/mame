@@ -2,12 +2,12 @@
 #include "includes/pcktgal.h"
 #include "video/decbac06.h"
 
-PALETTE_INIT( pcktgal )
+void pcktgal_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -21,13 +21,13 @@ PALETTE_INIT( pcktgal )
 		bit2 = (color_prom[i] >> 6) & 0x01;
 		bit3 = (color_prom[i] >> 7) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[i + machine.total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[i + machine.total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[i + machine.total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[i + machine.total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[i + machine().total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[i + machine().total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[i + machine().total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[i + machine().total_colors()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 	}
 }
 

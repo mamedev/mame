@@ -34,9 +34,9 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( exerion )
+void exerion_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -49,7 +49,7 @@ PALETTE_INIT( exerion )
 			2, &resistances_b[0],  bweights, 0, 0);
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x20);
+	machine().colortable = colortable_alloc(machine(), 0x20);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -74,7 +74,7 @@ PALETTE_INIT( exerion )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -84,7 +84,7 @@ PALETTE_INIT( exerion )
 	for (i = 0; i < 0x200; i++)
 	{
 		UINT8 ctabentry = 0x10 | (color_prom[(i & 0x1c0) | ((i & 3) << 4) | ((i >> 2) & 0x0f)] & 0x0f);
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	/* bg chars (this is not the full story... there are four layers mixed */
@@ -92,7 +92,7 @@ PALETTE_INIT( exerion )
 	for (i = 0x200; i < 0x300; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 
@@ -104,22 +104,21 @@ PALETTE_INIT( exerion )
  *
  *************************************/
 
-VIDEO_START( exerion )
+void exerion_state::video_start()
 {
-	exerion_state *state = machine.driver_data<exerion_state>();
 	int i;
 	UINT8 *gfx;
 
 	/* get pointers to the mixing and lookup PROMs */
-	state->m_background_mixer = state->memregion("proms")->base() + 0x320;
+	m_background_mixer = memregion("proms")->base() + 0x320;
 
 	/* allocate memory for the decoded background graphics */
-	state->m_background_gfx[0] = auto_alloc_array(machine, UINT16, 256 * 256 * 4);
-	state->m_background_gfx[1] = state->m_background_gfx[0] + 256 * 256;
-	state->m_background_gfx[2] = state->m_background_gfx[1] + 256 * 256;
-	state->m_background_gfx[3] = state->m_background_gfx[2] + 256 * 256;
+	m_background_gfx[0] = auto_alloc_array(machine(), UINT16, 256 * 256 * 4);
+	m_background_gfx[1] = m_background_gfx[0] + 256 * 256;
+	m_background_gfx[2] = m_background_gfx[1] + 256 * 256;
+	m_background_gfx[3] = m_background_gfx[2] + 256 * 256;
 
-	state->save_pointer(NAME(state->m_background_gfx[0]), 256 * 256 * 4);
+	save_pointer(NAME(m_background_gfx[0]), 256 * 256 * 4);
 
 	/*---------------------------------
      * Decode the background graphics
@@ -136,13 +135,13 @@ VIDEO_START( exerion )
      * Where AA,BB,CC,DD are the 2bpp data for the pixel,and a,b,c,d are the OR
      * of these two bits together.
      */
-	gfx = state->memregion("gfx3")->base();
+	gfx = memregion("gfx3")->base();
 	for (i = 0; i < 4; i++)
 	{
 		int y;
 
 		UINT8 *src = gfx + i * 0x2000;
-		UINT16 *dst = state->m_background_gfx[i];
+		UINT16 *dst = m_background_gfx[i];
 
 		for (y = 0; y < 0x100; y++)
 		{

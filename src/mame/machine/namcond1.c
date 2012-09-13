@@ -17,17 +17,15 @@
 /* Perform basic machine initialisation */
 
 
-MACHINE_START( namcond1 )
+void namcond1_state::machine_start()
 {
-	namcond1_state *state = machine.driver_data<namcond1_state>();
-	state_save_register_global(machine, state->m_h8_irq5_enabled);
+	state_save_register_global(machine(), m_h8_irq5_enabled);
 }
 
-MACHINE_RESET( namcond1 )
+void namcond1_state::machine_reset()
 {
-	namcond1_state *state = machine.driver_data<namcond1_state>();
 #ifdef MAME_DEBUG
-    /*UINT8   *ROM = state->memregion(REGION_CPU1)->base();*/
+    /*UINT8   *ROM = memregion(REGION_CPU1)->base();*/
     /*UINT32 debug_trigger_addr;*/
     /*int             i;*/
 
@@ -45,10 +43,10 @@ MACHINE_RESET( namcond1 )
 #endif
 
     // initialise MCU states
-    state->m_h8_irq5_enabled = 0;
+    m_h8_irq5_enabled = 0;
 
     // halt the MCU
-    machine.device("mcu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+    machine().device("mcu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 // instance of the shared ram pointer

@@ -22,13 +22,17 @@ public:
 	DECLARE_WRITE8_MEMBER(blockade_env_on_w);
 	DECLARE_WRITE8_MEMBER(blockade_env_off_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/blockade.c -----------*/
 
 
-VIDEO_START( blockade );
+
 SCREEN_UPDATE_IND16( blockade );
 
 /*----------- defined in audio/blockade.c -----------*/

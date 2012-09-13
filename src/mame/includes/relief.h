@@ -23,10 +23,13 @@ public:
 	DECLARE_DRIVER_INIT(relief);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);
+	DECLARE_MACHINE_START(relief);
+	DECLARE_MACHINE_RESET(relief);
+	DECLARE_VIDEO_START(relief);
 };
 
 
 /*----------- defined in video/relief.c -----------*/
 
-VIDEO_START( relief );
+
 SCREEN_UPDATE_IND16( relief );

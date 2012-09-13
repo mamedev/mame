@@ -38,6 +38,10 @@ public:
 	DECLARE_WRITE8_MEMBER(jackal_voram_w);
 	DECLARE_WRITE8_MEMBER(jackal_spriteram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -45,6 +49,6 @@ public:
 
 void jackal_mark_tile_dirty(running_machine &machine, int offset);
 
-PALETTE_INIT( jackal );
-VIDEO_START( jackal );
+
+
 SCREEN_UPDATE_IND16( jackal );

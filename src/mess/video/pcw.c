@@ -19,13 +19,12 @@ INLINE void pcw_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
   Start the video hardware emulation.
 ***************************************************************************/
 
-VIDEO_START( pcw )
+void pcw_state::video_start()
 {
-	pcw_state *state = machine.driver_data<pcw_state>();
 	rectangle rect(0, PCW_PRINTER_WIDTH - 1, 0, PCW_PRINTER_HEIGHT - 1);
 
-	state->m_prn_output = auto_bitmap_ind16_alloc(machine,PCW_PRINTER_WIDTH,PCW_PRINTER_HEIGHT);
-	state->m_prn_output->fill(1, rect);
+	m_prn_output = auto_bitmap_ind16_alloc(machine(),PCW_PRINTER_WIDTH,PCW_PRINTER_HEIGHT);
+	m_prn_output->fill(1, rect);
 }
 
 /* two colours */
@@ -43,9 +42,9 @@ static const rgb_t pcw_palette[PCW_NUM_COLOURS] =
 
 
 /* Initialise the palette */
-PALETTE_INIT( pcw )
+void pcw_state::palette_init()
 {
-	palette_set_colors(machine, 0, pcw_palette, ARRAY_LENGTH(pcw_palette));
+	palette_set_colors(machine(), 0, pcw_palette, ARRAY_LENGTH(pcw_palette));
 }
 
 /***************************************************************************

@@ -90,6 +90,9 @@ public:
 	DECLARE_READ8_MEMBER(n7751_command_r);
 	DECLARE_READ8_MEMBER(n7751_t1_r);
 	DECLARE_WRITE8_MEMBER(n7751_p2_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 
@@ -116,22 +119,22 @@ static MC6845_UPDATE_ROW( update_row )
 	}
 }
 
-static PALETTE_INIT( othello )
+void othello_state::palette_init()
 {
 	int i;
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
-		palette_set_color(machine, i, MAKE_RGB(0xff, 0x00, 0xff));
+		palette_set_color(machine(), i, MAKE_RGB(0xff, 0x00, 0xff));
 	}
 
 	/* only colors  2,3,7,9,c,d,f are used */
-	palette_set_color(machine, 0x02, MAKE_RGB(0x00, 0xff, 0x00));
-	palette_set_color(machine, 0x03, MAKE_RGB(0xff, 0x7f, 0x00));
-	palette_set_color(machine, 0x07, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, 0x09, MAKE_RGB(0xff, 0x00, 0x00));
-	palette_set_color(machine, 0x0c, MAKE_RGB(0x00, 0x00, 0xff));
-	palette_set_color(machine, 0x0d, MAKE_RGB(0x7f, 0x7f, 0x00));
-	palette_set_color(machine, 0x0f, MAKE_RGB(0xff, 0xff, 0xff));
+	palette_set_color(machine(), 0x02, MAKE_RGB(0x00, 0xff, 0x00));
+	palette_set_color(machine(), 0x03, MAKE_RGB(0xff, 0x7f, 0x00));
+	palette_set_color(machine(), 0x07, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine(), 0x09, MAKE_RGB(0xff, 0x00, 0x00));
+	palette_set_color(machine(), 0x0c, MAKE_RGB(0x00, 0x00, 0xff));
+	palette_set_color(machine(), 0x0d, MAKE_RGB(0x7f, 0x7f, 0x00));
+	palette_set_color(machine(), 0x0f, MAKE_RGB(0xff, 0xff, 0xff));
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, othello_state )
@@ -380,34 +383,32 @@ static const mc6845_interface h46505_intf =
 };
 
 
-static MACHINE_START( othello )
+void othello_state::machine_start()
 {
-	othello_state *state = machine.driver_data<othello_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_mc6845 = machine.device<mc6845_device>("crtc");
-	state->m_n7751 = machine.device("n7751");
-	state->m_ay1 = machine.device("ay1");
-	state->m_ay2 = machine.device("ay2");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_mc6845 = machine().device<mc6845_device>("crtc");
+	m_n7751 = machine().device("n7751");
+	m_ay1 = machine().device("ay1");
+	m_ay2 = machine().device("ay2");
 
-	state->save_item(NAME(state->m_tile_bank));
-	state->save_item(NAME(state->m_ay_select));
-	state->save_item(NAME(state->m_ack_data));
-	state->save_item(NAME(state->m_n7751_command));
-	state->save_item(NAME(state->m_sound_addr));
-	state->save_item(NAME(state->m_n7751_busy));
+	save_item(NAME(m_tile_bank));
+	save_item(NAME(m_ay_select));
+	save_item(NAME(m_ack_data));
+	save_item(NAME(m_n7751_command));
+	save_item(NAME(m_sound_addr));
+	save_item(NAME(m_n7751_busy));
 }
 
-static MACHINE_RESET( othello )
+void othello_state::machine_reset()
 {
-	othello_state *state = machine.driver_data<othello_state>();
 
-	state->m_tile_bank = 0;
-	state->m_ay_select = 0;
-	state->m_ack_data = 0;
-	state->m_n7751_command = 0;
-	state->m_sound_addr = 0;
-	state->m_n7751_busy = 0;
+	m_tile_bank = 0;
+	m_ay_select = 0;
+	m_ack_data = 0;
+	m_n7751_command = 0;
+	m_sound_addr = 0;
+	m_n7751_busy = 0;
 }
 
 static MACHINE_CONFIG_START( othello, othello_state )
@@ -427,8 +428,6 @@ static MACHINE_CONFIG_START( othello, othello_state )
 
 	MCFG_I8243_ADD("n7751_8243", NULL, n7751_rom_control_w)
 
-	MCFG_MACHINE_START(othello)
-	MCFG_MACHINE_RESET(othello)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -439,7 +438,6 @@ static MACHINE_CONFIG_START( othello, othello_state )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(0x10)
-	MCFG_PALETTE_INIT(othello)
 
 	MCFG_MC6845_ADD("crtc", H46505, 1000000 /* ? MHz */, h46505_intf)	/* H46505 @ CPU clock */
 

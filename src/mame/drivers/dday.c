@@ -234,25 +234,23 @@ GFXDECODE_END
 
 
 
-static MACHINE_START( dday )
+void dday_state::machine_start()
 {
-	dday_state *state = machine.driver_data<dday_state>();
 
-	state->m_ay1 = machine.device("ay1");
+	m_ay1 = machine().device("ay1");
 
-	state->save_item(NAME(state->m_control));
-	state->save_item(NAME(state->m_sl_enable));
-	state->save_item(NAME(state->m_sl_image));
-	state->save_item(NAME(state->m_timer_value));
+	save_item(NAME(m_control));
+	save_item(NAME(m_sl_enable));
+	save_item(NAME(m_sl_image));
+	save_item(NAME(m_timer_value));
 }
 
-static MACHINE_RESET( dday )
+void dday_state::machine_reset()
 {
-	dday_state *state = machine.driver_data<dday_state>();
 
-	state->m_control = 0;
-	state->m_sl_enable = 0;
-	state->m_sl_image = 0;
+	m_control = 0;
+	m_sl_enable = 0;
+	m_sl_image = 0;
 }
 
 
@@ -262,8 +260,6 @@ static MACHINE_CONFIG_START( dday, dday_state )
 	MCFG_CPU_ADD("maincpu", Z80, 2000000)     /* 2 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(dday_map)
 
-	MCFG_MACHINE_START(dday)
-	MCFG_MACHINE_RESET(dday)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -275,10 +271,8 @@ static MACHINE_CONFIG_START( dday, dday_state )
 
 	MCFG_GFXDECODE(dday)
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(dday)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-	MCFG_VIDEO_START(dday)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

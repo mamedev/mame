@@ -123,6 +123,9 @@ public:
 	DECLARE_READ8_MEMBER(mermaid_p3_r);
 	DECLARE_WRITE8_MEMBER(mermaid_p3_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -132,26 +135,24 @@ public:
  *
  *************************************/
 
-static MACHINE_START( hvyunit )
+void hvyunit_state::machine_start()
 {
-	hvyunit_state *state = machine.driver_data<hvyunit_state>();
 
-	state->m_master_cpu = machine.device("master");
-	state->m_slave_cpu = machine.device("slave");
-	state->m_sound_cpu = machine.device("soundcpu");
-	state->m_mermaid = machine.device("mermaid");
-	state->m_pandora = machine.device("pandora");
+	m_master_cpu = machine().device("master");
+	m_slave_cpu = machine().device("slave");
+	m_sound_cpu = machine().device("soundcpu");
+	m_mermaid = machine().device("mermaid");
+	m_pandora = machine().device("pandora");
 
 	// TODO: Save state
 }
 
-static MACHINE_RESET( hvyunit )
+void hvyunit_state::machine_reset()
 {
-	hvyunit_state *state = machine.driver_data<hvyunit_state>();
 
-	state->m_mermaid_int0_l = 1;
-	state->m_mermaid_to_z80_full = 0;
-	state->m_z80_to_mermaid_full = 0;
+	m_mermaid_int0_l = 1;
+	m_mermaid_to_z80_full = 0;
+	m_z80_to_mermaid_full = 0;
 }
 
 
@@ -171,10 +172,9 @@ TILE_GET_INFO_MEMBER(hvyunit_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
-static VIDEO_START( hvyunit )
+void hvyunit_state::video_start()
 {
-	hvyunit_state *state = machine.driver_data<hvyunit_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hvyunit_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(hvyunit_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16( hvyunit )
@@ -673,8 +673,6 @@ static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(hvyunit)
-	MCFG_MACHINE_RESET(hvyunit)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -689,7 +687,6 @@ static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", hvyunit_pandora_config)
 
-	MCFG_VIDEO_START(hvyunit)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -162,13 +162,13 @@ static const unsigned char gmaster_palette[2][3] =
 #endif
 };
 
-static PALETTE_INIT( gmaster )
+void gmaster_state::palette_init()
 {
 	int i;
 
 	for (i = 0; i < 2; i++)
 	{
-		palette_set_color_rgb(machine, i, gmaster_palette[i][0], gmaster_palette[i][1], gmaster_palette[i][2]);
+		palette_set_color_rgb(machine(), i, gmaster_palette[i][0], gmaster_palette[i][1], gmaster_palette[i][2]);
 	}
 }
 
@@ -231,7 +231,6 @@ static MACHINE_CONFIG_START( gmaster, gmaster_state )
 	MCFG_SCREEN_UPDATE_STATIC(gmaster)
 
 	MCFG_PALETTE_LENGTH(sizeof(gmaster_palette)/sizeof(gmaster_palette[0]))
-	MCFG_PALETTE_INIT(gmaster)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

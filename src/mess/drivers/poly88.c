@@ -171,7 +171,6 @@ static MACHINE_CONFIG_START( poly88, poly88_state )
 	MCFG_CPU_IO_MAP(poly88_io)
 	MCFG_CPU_VBLANK_INT("screen", poly88_interrupt)
 
-	MCFG_MACHINE_RESET(poly88)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -185,7 +184,6 @@ static MACHINE_CONFIG_START( poly88, poly88_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START(poly88)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

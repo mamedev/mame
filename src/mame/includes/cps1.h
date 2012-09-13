@@ -198,6 +198,17 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile0_info);
 	TILE_GET_INFO_MEMBER(get_tile1_info);
 	TILE_GET_INFO_MEMBER(get_tile2_info);
+	DECLARE_MACHINE_START(cps1);
+	DECLARE_VIDEO_START(cps1);
+	DECLARE_MACHINE_START(common);
+	DECLARE_MACHINE_START(cps2);
+	DECLARE_VIDEO_START(cps2);
+	DECLARE_MACHINE_START(fcrash);
+	DECLARE_MACHINE_RESET(fcrash);
+	DECLARE_MACHINE_START(kodb);
+	DECLARE_MACHINE_START(qsound);
+	DECLARE_MACHINE_RESET(cps);
+	DECLARE_VIDEO_START(cps);
 };
 
 /*----------- defined in drivers/cps1.c -----------*/
@@ -214,8 +225,8 @@ GFXDECODE_EXTERN( cps1 );
 
 
 
-VIDEO_START( cps1 );
-VIDEO_START( cps2 );
+
+
 SCREEN_UPDATE_IND16( cps1 );
 SCREEN_VBLANK( cps1 );
 

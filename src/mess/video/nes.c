@@ -17,19 +17,17 @@ static void nes_vh_reset( running_machine &machine )
 	state->m_ppu->set_vidaccess_callback(nes_ppu_vidaccess);
 }
 
-VIDEO_START( nes )
+void nes_state::video_start()
 {
-	nes_state *state = machine.driver_data<nes_state>();
 
-	state->m_last_frame_flip =  0;
+	m_last_frame_flip =  0;
 
-	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(nes_vh_reset),&machine));
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(nes_vh_reset),&machine()));
 }
 
-PALETTE_INIT( nes )
+void nes_state::palette_init()
 {
-	nes_state *state = machine.driver_data<nes_state>();
-	state->m_ppu->init_palette(machine, 0);
+	m_ppu->init_palette(machine(), 0);
 }
 
 

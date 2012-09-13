@@ -182,68 +182,64 @@ static const gaelco_serial_interface serial_interface =
  *
  *************************************/
 
-static MACHINE_START( gaelco3d )
+void gaelco3d_state::machine_start()
 {
-	gaelco3d_state *state = machine.driver_data<gaelco3d_state>();
 	/* Save state support */
-	state_save_register_global(machine, state->m_sound_data);
-	state_save_register_global(machine, state->m_sound_status);
-	state_save_register_global_array(machine, state->m_analog_ports);
-	state_save_register_global(machine, state->m_framenum);
-	state_save_register_global(machine, state->m_adsp_ireg);
-	state_save_register_global(machine, state->m_adsp_ireg_base);
-	state_save_register_global(machine, state->m_adsp_incs);
-	state_save_register_global(machine, state->m_adsp_size);
+	state_save_register_global(machine(), m_sound_data);
+	state_save_register_global(machine(), m_sound_status);
+	state_save_register_global_array(machine(), m_analog_ports);
+	state_save_register_global(machine(), m_framenum);
+	state_save_register_global(machine(), m_adsp_ireg);
+	state_save_register_global(machine(), m_adsp_ireg_base);
+	state_save_register_global(machine(), m_adsp_incs);
+	state_save_register_global(machine(), m_adsp_size);
 }
 
 
-static MACHINE_RESET( common )
+MACHINE_RESET_MEMBER(gaelco3d_state,common)
 {
-	gaelco3d_state *state = machine.driver_data<gaelco3d_state>();
 	UINT16 *src;
 	int i;
 
-	state->m_framenum = 0;
+	m_framenum = 0;
 
 	/* boot the ADSP chip */
-	src = (UINT16 *)state->memregion("user1")->base();
+	src = (UINT16 *)memregion("user1")->base();
 	for (i = 0; i < (src[3] & 0xff) * 8; i++)
 	{
 		UINT32 opcode = ((src[i*4+0] & 0xff) << 16) | ((src[i*4+1] & 0xff) << 8) | (src[i*4+2] & 0xff);
-		state->m_adsp_ram_base[i] = opcode;
+		m_adsp_ram_base[i] = opcode;
 	}
 
 	/* allocate a timer for feeding the autobuffer */
-	state->m_adsp_autobuffer_timer = machine.device<timer_device>("adsp_timer");
+	m_adsp_autobuffer_timer = machine().device<timer_device>("adsp_timer");
 
-	state->membank("bank1")->configure_entries(0, 256, machine.root_device().memregion("user1")->base(), 0x4000);
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->configure_entries(0, 256, machine().root_device().memregion("user1")->base(), 0x4000);
+	membank("bank1")->set_entry(0);
 
 	/* keep the TMS32031 halted until the code is ready to go */
-	machine.device("tms")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("tms")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	for (i = 0; i < SOUND_CHANNELS; i++)
 	{
 		char buffer[10];
 		sprintf(buffer, "dac%d", i + 1);
-		state->m_dmadac[i] = machine.device<dmadac_sound_device>(buffer);
+		m_dmadac[i] = machine().device<dmadac_sound_device>(buffer);
 	}
 }
 
 
-static MACHINE_RESET( gaelco3d )
+void gaelco3d_state::machine_reset()
 {
-	gaelco3d_state *state = machine.driver_data<gaelco3d_state>();
-	MACHINE_RESET_CALL( common );
-	state->m_tms_offset_xor = 0;
+	MACHINE_RESET_CALL_MEMBER( common );
+	m_tms_offset_xor = 0;
 }
 
 
-static MACHINE_RESET( gaelco3d2 )
+MACHINE_RESET_MEMBER(gaelco3d_state,gaelco3d2)
 {
-	gaelco3d_state *state = machine.driver_data<gaelco3d_state>();
-	MACHINE_RESET_CALL( common );
-	state->m_tms_offset_xor = BYTE_XOR_BE(0);
+	MACHINE_RESET_CALL_MEMBER( common );
+	m_tms_offset_xor = BYTE_XOR_BE(0);
 }
 
 
@@ -1009,8 +1005,6 @@ static MACHINE_CONFIG_START( gaelco3d, gaelco3d_state )
 	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
 	MCFG_CPU_DATA_MAP(adsp_data_map)
 
-	MCFG_MACHINE_START(gaelco3d)
-	MCFG_MACHINE_RESET(gaelco3d)
 
 	MCFG_EEPROM_93C66B_ADD("eeprom")
 
@@ -1030,7 +1024,6 @@ static MACHINE_CONFIG_START( gaelco3d, gaelco3d_state )
 	MCFG_PALETTE_LENGTH(32768)
 
 	MCFG_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
-	MCFG_VIDEO_START(gaelco3d)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1059,7 +1052,7 @@ static MACHINE_CONFIG_DERIVED( gaelco3d2, gaelco3d )
 	MCFG_CPU_MODIFY("tms")
 	MCFG_CPU_CLOCK(50000000)
 
-	MCFG_MACHINE_RESET(gaelco3d2)
+	MCFG_MACHINE_RESET_OVERRIDE(gaelco3d_state,gaelco3d2)
 MACHINE_CONFIG_END
 
 

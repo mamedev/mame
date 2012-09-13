@@ -134,8 +134,6 @@ static MACHINE_CONFIG_START( gomoku, gomoku_state )
 	MCFG_GFXDECODE(gomoku)
 	MCFG_PALETTE_LENGTH(64)
 
-	MCFG_PALETTE_INIT(gomoku)
-	MCFG_VIDEO_START(gomoku)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

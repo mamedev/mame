@@ -53,18 +53,18 @@ public:
 	DECLARE_WRITE32_MEMBER(hvysmsh_oki_0_bank_w);
 	DECLARE_DRIVER_INIT(hvysmsh);
 	DECLARE_DRIVER_INIT(wcvol95);
+	virtual void video_start();
 };
 
 
-static VIDEO_START( wcvol95 )
+void deco156_state::video_start()
 {
-	deco156_state *state = machine.driver_data<deco156_state>();
-	state->m_spriteram = auto_alloc_array(machine, UINT16, 0x2000/2);
+	m_spriteram = auto_alloc_array(machine(), UINT16, 0x2000/2);
 
 	/* and register the allocated ram so that save states still work */
-	state->save_item(NAME(state->m_pf1_rowscroll));
-	state->save_item(NAME(state->m_pf2_rowscroll));
-	state->save_pointer(NAME(state->m_spriteram), 0x2000/2);
+	save_item(NAME(m_pf1_rowscroll));
+	save_item(NAME(m_pf2_rowscroll));
+	save_pointer(NAME(m_spriteram), 0x2000/2);
 }
 
 
@@ -368,7 +368,6 @@ static MACHINE_CONFIG_START( hvysmsh, deco156_state )
 	MCFG_GFXDECODE(hvysmsh)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(wcvol95)
 
 	MCFG_DECO16IC_ADD("tilegen1", deco156_deco16ic_tilegen1_intf)
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
@@ -406,7 +405,6 @@ static MACHINE_CONFIG_START( wcvol95, deco156_state )
 	MCFG_GFXDECODE(hvysmsh)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(wcvol95)
 
 	MCFG_DECO16IC_ADD("tilegen1", deco156_deco16ic_tilegen1_intf)
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)

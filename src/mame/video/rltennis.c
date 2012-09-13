@@ -220,13 +220,12 @@ WRITE16_MEMBER(rltennis_state::rlt_blitter_w)
 	}
 }
 
-VIDEO_START( rltennis )
+void rltennis_state::video_start()
 {
-	rltennis_state *state = machine.driver_data<rltennis_state>();
-	state->m_tmp_bitmap[BITMAP_BG] = auto_bitmap_ind16_alloc(machine, 512, 256);
-	state->m_tmp_bitmap[BITMAP_FG_1] = auto_bitmap_ind16_alloc(machine, 512, 256);
-	state->m_tmp_bitmap[BITMAP_FG_2] = auto_bitmap_ind16_alloc(machine, 512, 256);
-	state->m_tmp_bitmap[BITMAP_FG_DISPLAY] = auto_bitmap_ind16_alloc(machine, 512, 256);
+	m_tmp_bitmap[BITMAP_BG] = auto_bitmap_ind16_alloc(machine(), 512, 256);
+	m_tmp_bitmap[BITMAP_FG_1] = auto_bitmap_ind16_alloc(machine(), 512, 256);
+	m_tmp_bitmap[BITMAP_FG_2] = auto_bitmap_ind16_alloc(machine(), 512, 256);
+	m_tmp_bitmap[BITMAP_FG_DISPLAY] = auto_bitmap_ind16_alloc(machine(), 512, 256);
 }
 
 SCREEN_UPDATE_IND16( rltennis )

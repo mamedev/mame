@@ -73,6 +73,7 @@ public:
 	DECLARE_WRITE32_MEMBER(cpld_w);
 	DECLARE_READ32_MEMBER(prot_cheater_r);
 	DECLARE_DRIVER_INIT(39in1);
+	virtual void machine_start();
 };
 
 
@@ -1567,9 +1568,9 @@ static void pxa255_start(running_machine& machine)
 	//pxa255_register_state_save(device);
 }
 
-static MACHINE_START(39in1)
+void _39in1_state::machine_start()
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x80000; i += 2)
@@ -1583,7 +1584,7 @@ static MACHINE_START(39in1)
 //          }
 	}
 
-	pxa255_start(machine);
+	pxa255_start(machine());
 }
 
 static MACHINE_CONFIG_START( 39in1, _39in1_state )
@@ -1603,7 +1604,6 @@ static MACHINE_CONFIG_START( 39in1, _39in1_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_MACHINE_START(39in1)
 	MCFG_EEPROM_93C66B_ADD("eeprom")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

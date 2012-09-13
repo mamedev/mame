@@ -29,10 +29,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(multi16_set_int_line);
 	required_shared_ptr<UINT16> m_p_vram;
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
-static VIDEO_START( multi16 )
+void multi16_state::video_start()
 {
 }
 
@@ -131,13 +134,13 @@ static const struct pic8259_interface multi16_pic8259_config =
 	DEVCB_NULL
 };
 
-static MACHINE_START(multi16)
+void multi16_state::machine_start()
 {
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(multi16_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(multi16_irq_callback);
 }
 
 
-static MACHINE_RESET(multi16)
+void multi16_state::machine_reset()
 {
 }
 
@@ -161,8 +164,6 @@ static MACHINE_CONFIG_START( multi16, multi16_state )
 	MCFG_CPU_PROGRAM_MAP(multi16_map)
 	MCFG_CPU_IO_MAP(multi16_io)
 
-	MCFG_MACHINE_START(multi16)
-	MCFG_MACHINE_RESET(multi16)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -170,7 +171,6 @@ static MACHINE_CONFIG_START( multi16, multi16_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_VIDEO_START(multi16)
 	MCFG_SCREEN_UPDATE_STATIC(multi16)
 	MCFG_PALETTE_LENGTH(8)
 

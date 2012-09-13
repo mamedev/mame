@@ -203,10 +203,10 @@ static GFXDECODE_START( comquest )
 GFXDECODE_END
 
 
-static MACHINE_RESET( comquest )
+void comquest_state::machine_reset()
 {
-//  UINT8 *mem=machine.root_device().memregion("user1")->base();
-//  state->membank(1)->set_base(mem+0x00000);
+//  UINT8 *mem=machine().root_device().memregion("user1")->base();
+//  membank(1)->set_base(mem+0x00000);
 }
 
 static const UINT32 amask= 0xffff;
@@ -245,7 +245,6 @@ static MACHINE_CONFIG_START( comquest, comquest_state )
 	MCFG_CPU_PROGRAM_MAP(comquest_mem)
 	MCFG_CPU_CONFIG( amask )
 
-	MCFG_MACHINE_RESET( comquest )
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -259,7 +258,6 @@ static MACHINE_CONFIG_START( comquest, comquest_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START( comquest )
 
 	/* sound hardware */
 	/* unknown ? */

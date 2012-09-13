@@ -19,9 +19,9 @@
  *
  *************************************/
 
-PALETTE_INIT( yard )
+void m58_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	const UINT8 *char_lopal = color_prom + 0x000;
 	const UINT8 *char_hipal = color_prom + 0x100;
 	const UINT8 *sprite_pal = color_prom + 0x200;
@@ -33,7 +33,7 @@ PALETTE_INIT( yard )
 	double weights_r[3], weights_g[3], weights_b[3], scale;
 	int i;
 
-	machine.colortable = colortable_alloc(machine, 256+256+16);
+	machine().colortable = colortable_alloc(machine(), 256+256+16);
 
 	/* compute palette information for characters/radar */
 	scale = compute_resistor_weights(0,	255, -1.0,
@@ -49,7 +49,7 @@ PALETTE_INIT( yard )
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r,g,b));
 	}
 
 	/* radar palette */
@@ -60,7 +60,7 @@ PALETTE_INIT( yard )
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		colortable_palette_set_color(machine.colortable, 256+i, MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable, 256+i, MAKE_RGB(r,g,b));
 	}
 
 	/* compute palette information for sprites */
@@ -77,22 +77,22 @@ PALETTE_INIT( yard )
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		colortable_palette_set_color(machine.colortable, 256+256+i, MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable, 256+256+i, MAKE_RGB(r,g,b));
 	}
 
 	/* character lookup table */
 	for (i = 0; i < 256; i++)
-		colortable_entry_set_value(machine.colortable, i, i);
+		colortable_entry_set_value(machine().colortable, i, i);
 
 	/* radar lookup table */
 	for (i = 0; i < 256; i++)
-		colortable_entry_set_value(machine.colortable, 256+i, 256+i);
+		colortable_entry_set_value(machine().colortable, 256+i, 256+i);
 
 	/* sprite lookup table */
 	for (i = 0; i < 256; i++)
 	{
 		UINT8 promval = sprite_table[i] & 0x0f;
-		colortable_entry_set_value(machine.colortable, 256+256+i, 256+256+promval);
+		colortable_entry_set_value(machine().colortable, 256+256+i, 256+256+promval);
 	}
 }
 
@@ -174,19 +174,18 @@ TILEMAP_MAPPER_MEMBER(m58_state::yard_tilemap_scan_rows)
  *
  *************************************/
 
-VIDEO_START( yard )
+void m58_state::video_start()
 {
-	m58_state *state = machine.driver_data<m58_state>();
 
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
+	const rectangle &visarea = machine().primary_screen->visible_area();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(m58_state::yard_get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(m58_state::yard_tilemap_scan_rows),state),  8, 8, 64, 32);
-	state->m_bg_tilemap->set_scrolldx(visarea.min_x, width - (visarea.max_x + 1));
-	state->m_bg_tilemap->set_scrolldy(visarea.min_y - 8, height + 16 - (visarea.max_y + 1));
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m58_state::yard_get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(m58_state::yard_tilemap_scan_rows),this),  8, 8, 64, 32);
+	m_bg_tilemap->set_scrolldx(visarea.min_x, width - (visarea.max_x + 1));
+	m_bg_tilemap->set_scrolldy(visarea.min_y - 8, height + 16 - (visarea.max_y + 1));
 
-	state->m_scroll_panel_bitmap = auto_bitmap_ind16_alloc(machine, SCROLL_PANEL_WIDTH, height);
+	m_scroll_panel_bitmap = auto_bitmap_ind16_alloc(machine(), SCROLL_PANEL_WIDTH, height);
 }
 
 

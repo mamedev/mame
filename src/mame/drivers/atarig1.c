@@ -40,22 +40,20 @@ static void update_interrupts(running_machine &machine)
 }
 
 
-static MACHINE_START( atarig1 )
+MACHINE_START_MEMBER(atarig1_state,atarig1)
 {
-	atarig1_state *state = machine.driver_data<atarig1_state>();
-	atarigen_init(machine);
-	state->save_item(NAME(state->m_which_input));
+	atarigen_init(machine());
+	save_item(NAME(m_which_input));
 }
 
 
-static MACHINE_RESET( atarig1 )
+MACHINE_RESET_MEMBER(atarig1_state,atarig1)
 {
-	atarig1_state *state = machine.driver_data<atarig1_state>();
 
-	atarigen_eeprom_reset(state);
-	atarigen_slapstic_reset(state);
-	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine.primary_screen, atarig1_scanline_update, 8);
+	atarigen_eeprom_reset(this);
+	atarigen_slapstic_reset(this);
+	atarigen_interrupt_reset(this, update_interrupts);
+	atarigen_scanline_timer_reset(*machine().primary_screen, atarig1_scanline_update, 8);
 	atarijsa_reset();
 }
 
@@ -453,8 +451,8 @@ static MACHINE_CONFIG_START( atarig1, atarig1_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
-	MCFG_MACHINE_START(atarig1)
-	MCFG_MACHINE_RESET(atarig1)
+	MCFG_MACHINE_START_OVERRIDE(atarig1_state,atarig1)
+	MCFG_MACHINE_RESET_OVERRIDE(atarig1_state,atarig1)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
@@ -468,7 +466,7 @@ static MACHINE_CONFIG_START( atarig1, atarig1_state )
 	MCFG_SCREEN_UPDATE_STATIC(atarig1)
 	MCFG_SCREEN_VBLANK_STATIC(atarig1)
 
-	MCFG_VIDEO_START(atarig1)
+	MCFG_VIDEO_START_OVERRIDE(atarig1_state,atarig1)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(jsa_ii_mono)

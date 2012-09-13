@@ -61,12 +61,16 @@ public:
 	DECLARE_WRITE8_MEMBER(a7800_MARIA_w);
 	DECLARE_DRIVER_INIT(a7800_pal);
 	DECLARE_DRIVER_INIT(a7800_ntsc);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_PALETTE_INIT(a7800p);
 };
 
 
 /*----------- defined in video/a7800.c -----------*/
 
-VIDEO_START( a7800 );
+
 SCREEN_UPDATE_IND16( a7800 );
 TIMER_DEVICE_CALLBACK( a7800_interrupt );
 
@@ -76,7 +80,7 @@ TIMER_DEVICE_CALLBACK( a7800_interrupt );
 extern const riot6532_interface a7800_r6532_interface;
 
 
-MACHINE_RESET( a7800 );
+
 
 void a7800_partialhash(hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
 

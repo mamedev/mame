@@ -68,6 +68,13 @@ public:
 	UINT8 m_screens[ HP48_NB_SCREENS ][ 64 ][ 144 ];
 	int m_cur_screen;
 	DECLARE_DRIVER_INIT(hp48);
+	virtual void machine_reset();
+	virtual void palette_init();
+	DECLARE_MACHINE_START(hp48gx);
+	DECLARE_MACHINE_START(hp48g);
+	DECLARE_MACHINE_START(hp48gp);
+	DECLARE_MACHINE_START(hp48sx);
+	DECLARE_MACHINE_START(hp48s);
 };
 
 

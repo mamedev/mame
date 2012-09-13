@@ -147,30 +147,33 @@ public:
 	                                           UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right);
 	UINT8 display_world(int num, bitmap_ind16 &bitmap, bool right, int &cur_spt);
 	void m_set_brightness(void);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
-static VIDEO_START( vboy )
+void vboy_state::video_start()
 {
-	vboy_state *state = machine.driver_data<vboy_state>();
 	//int i;
 
 	// Allocate memory for temporary screens
-	state->m_bg_map = auto_alloc_array_clear(machine, int, 0x1000*0x1000);
-	state->m_ovr_map = auto_alloc_array_clear(machine, int, 8*8);
+	m_bg_map = auto_alloc_array_clear(machine(), int, 0x1000*0x1000);
+	m_ovr_map = auto_alloc_array_clear(machine(), int, 8*8);
 
 	// Allocate memory for framebuffers
-	state->m_l_frame_0 = auto_alloc_array_clear(machine, UINT8, 0x6000);
-	state->m_l_frame_1 = auto_alloc_array_clear(machine, UINT8, 0x6000);
-	state->m_r_frame_0 = auto_alloc_array_clear(machine, UINT8, 0x6000);
-	state->m_r_frame_1 = auto_alloc_array_clear(machine, UINT8, 0x6000);
+	m_l_frame_0 = auto_alloc_array_clear(machine(), UINT8, 0x6000);
+	m_l_frame_1 = auto_alloc_array_clear(machine(), UINT8, 0x6000);
+	m_r_frame_0 = auto_alloc_array_clear(machine(), UINT8, 0x6000);
+	m_r_frame_1 = auto_alloc_array_clear(machine(), UINT8, 0x6000);
 
-	state->m_font  = auto_alloc_array_clear(machine, UINT16, 2048 * 8);
-	state->m_bgmap = auto_alloc_array(machine, UINT16, 0x20000 >> 1);
-	state->m_objects = state->m_bgmap + (0x1e000 >> 1);
-	state->m_columntab1 = state->m_bgmap + (0x1dc00 >> 1);
-	state->m_columntab2 = state->m_bgmap + (0x1de00 >> 1);
-	state->m_world = state->m_bgmap + (0x1d800 >> 1);
+	m_font  = auto_alloc_array_clear(machine(), UINT16, 2048 * 8);
+	m_bgmap = auto_alloc_array(machine(), UINT16, 0x20000 >> 1);
+	m_objects = m_bgmap + (0x1e000 >> 1);
+	m_columntab1 = m_bgmap + (0x1dc00 >> 1);
+	m_columntab2 = m_bgmap + (0x1de00 >> 1);
+	m_world = m_bgmap + (0x1d800 >> 1);
 }
 
 void vboy_state::put_obj(bitmap_ind16 &bitmap, int x, int y, UINT16 code, bool flipx, bool flipy, UINT8 pal)
@@ -1151,38 +1154,36 @@ static void vboy_machine_stop(running_machine &machine)
 	}
 }
 
-static MACHINE_START( vboy )
+void vboy_state::machine_start()
 {
-//	vboy_state *state = machine.driver_data<vboy_state>();
 
 	/* add a hook for battery save */
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(vboy_machine_stop),&machine));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(vboy_machine_stop),&machine()));
 
-//	state->m_vboy_sram = auto_alloc_array(machine, UINT32, 0x10000/4);
+//	m_vboy_sram = auto_alloc_array(machine(), UINT32, 0x10000/4);
 }
 
-static MACHINE_RESET(vboy)
+void vboy_state::machine_reset()
 {
-	vboy_state *state = machine.driver_data<vboy_state>();
 
 	/* Initial values taken from Reality Boy, to be verified when emulation improves */
-	state->m_vboy_regs.lpc = 0x6d;
-	state->m_vboy_regs.lpc2 = 0xff;
-	state->m_vboy_regs.lpt = 0x00;
-	state->m_vboy_regs.lpr = 0x00;
-	state->m_vboy_regs.klb = 0x00;
-	state->m_vboy_regs.khb = 0x00;
-	state->m_vboy_regs.tlb = 0xff;
-	state->m_vboy_regs.thb = 0xff;
-	state->m_vboy_regs.tcr = 0xe4;
-	state->m_vboy_regs.wcr = 0xfc;
-	state->m_vboy_regs.kcr = 0x4c;
-	state->m_vip_regs.DPCTRL = 2; // ssquash relies on this at boot otherwise no frame_start irq is fired
-	state->m_displayfb = 0;
-	state->m_drawfb = 0;
+	m_vboy_regs.lpc = 0x6d;
+	m_vboy_regs.lpc2 = 0xff;
+	m_vboy_regs.lpt = 0x00;
+	m_vboy_regs.lpr = 0x00;
+	m_vboy_regs.klb = 0x00;
+	m_vboy_regs.khb = 0x00;
+	m_vboy_regs.tlb = 0xff;
+	m_vboy_regs.thb = 0xff;
+	m_vboy_regs.tcr = 0xe4;
+	m_vboy_regs.wcr = 0xfc;
+	m_vboy_regs.kcr = 0x4c;
+	m_vip_regs.DPCTRL = 2; // ssquash relies on this at boot otherwise no frame_start irq is fired
+	m_displayfb = 0;
+	m_drawfb = 0;
 
-    state->m_vboy_timer.count = 0;
-    state->m_maintimer->adjust(attotime::never);
+    m_vboy_timer.count = 0;
+    m_maintimer->adjust(attotime::never);
 }
 
 
@@ -1230,12 +1231,12 @@ static TIMER_DEVICE_CALLBACK( timer_pad_tick )
 		state->m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-static PALETTE_INIT( vboy )
+void vboy_state::palette_init()
 {
-	palette_set_color(machine, 0, RGB_BLACK);
-	palette_set_color(machine, 1, RGB_BLACK);
-	palette_set_color(machine, 2, RGB_BLACK);
-	palette_set_color(machine, 3, RGB_BLACK);
+	palette_set_color(machine(), 0, RGB_BLACK);
+	palette_set_color(machine(), 1, RGB_BLACK);
+	palette_set_color(machine(), 2, RGB_BLACK);
+	palette_set_color(machine(), 3, RGB_BLACK);
 }
 
 void vboy_state::m_set_irq(UINT16 irq_vector)
@@ -1431,8 +1432,6 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_TIMER_ADD_SCANLINE("scantimer_l", vboy_scanlineL, "3dleft", 0, 1)
 	//MCFG_TIMER_ADD_SCANLINE("scantimer_r", vboy_scanlineR, "3dright", 0, 1)
 
-	MCFG_MACHINE_START(vboy)
-	MCFG_MACHINE_RESET(vboy)
 
     // programmable timer
 	MCFG_TIMER_ADD("timer_main", timer_main_tick)
@@ -1442,9 +1441,7 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_vboy)
-	MCFG_VIDEO_START(vboy)
 	MCFG_PALETTE_LENGTH(4)
-	MCFG_PALETTE_INIT(vboy)
 
 	/* Left screen */
 	MCFG_SCREEN_ADD("3dleft", RASTER)

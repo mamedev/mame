@@ -469,77 +469,72 @@ static I8085_CONFIG( n8080_cpu_config )
 	DEVCB_NULL								/* SOD changed callback (8085A only) */
 };
 
-static MACHINE_START( n8080 )
+MACHINE_START_MEMBER(n8080_state,n8080)
 {
-	n8080_state *state = machine.driver_data<n8080_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
 
-	state->save_item(NAME(state->m_shift_data));
-	state->save_item(NAME(state->m_shift_bits));
-	state->save_item(NAME(state->m_inte));
+	save_item(NAME(m_shift_data));
+	save_item(NAME(m_shift_bits));
+	save_item(NAME(m_inte));
 }
 
-static MACHINE_START( spacefev )
+MACHINE_START_MEMBER(n8080_state,spacefev)
 {
-	MACHINE_START_CALL(n8080);
-	MACHINE_START_CALL(spacefev_sound);
+	MACHINE_START_CALL_MEMBER(n8080);
+	MACHINE_START_CALL_MEMBER(spacefev_sound);
 }
 
-static MACHINE_START( sheriff )
+MACHINE_START_MEMBER(n8080_state,sheriff)
 {
-	MACHINE_START_CALL(n8080);
-	MACHINE_START_CALL(sheriff_sound);
+	MACHINE_START_CALL_MEMBER(n8080);
+	MACHINE_START_CALL_MEMBER(sheriff_sound);
 }
 
-static MACHINE_START( helifire )
+MACHINE_START_MEMBER(n8080_state,helifire)
 {
-	MACHINE_START_CALL(n8080);
-	MACHINE_START_CALL(helifire_sound);
+	MACHINE_START_CALL_MEMBER(n8080);
+	MACHINE_START_CALL_MEMBER(helifire_sound);
 }
 
 
-static MACHINE_RESET( n8080 )
+MACHINE_RESET_MEMBER(n8080_state,n8080)
 {
-	n8080_state *state = machine.driver_data<n8080_state>();
 
-	state->m_shift_data = 0;
-	state->m_shift_bits = 0;
-	state->m_inte = 0;
+	m_shift_data = 0;
+	m_shift_bits = 0;
+	m_inte = 0;
 }
 
-static MACHINE_RESET( spacefev )
+MACHINE_RESET_MEMBER(n8080_state,spacefev)
 {
-	n8080_state *state = machine.driver_data<n8080_state>();
 
-	MACHINE_RESET_CALL(n8080);
-	MACHINE_RESET_CALL(spacefev_sound);
+	MACHINE_RESET_CALL_MEMBER(n8080);
+	MACHINE_RESET_CALL_MEMBER(spacefev_sound);
 
-	state->m_spacefev_red_screen = 0;
-	state->m_spacefev_red_cannon = 0;
+	m_spacefev_red_screen = 0;
+	m_spacefev_red_cannon = 0;
 }
 
-static MACHINE_RESET( sheriff )
+MACHINE_RESET_MEMBER(n8080_state,sheriff)
 {
-	n8080_state *state = machine.driver_data<n8080_state>();
 
-	MACHINE_RESET_CALL(n8080);
-	MACHINE_RESET_CALL(sheriff_sound);
+	MACHINE_RESET_CALL_MEMBER(n8080);
+	MACHINE_RESET_CALL_MEMBER(sheriff_sound);
 
-	state->m_sheriff_color_mode = 0;
-	state->m_sheriff_color_data = 0;
+	m_sheriff_color_mode = 0;
+	m_sheriff_color_data = 0;
 }
 
-static MACHINE_RESET( helifire )
+MACHINE_RESET_MEMBER(n8080_state,helifire)
 {
-	n8080_state *state = machine.driver_data<n8080_state>();
 
-	MACHINE_RESET_CALL(n8080);
-	MACHINE_RESET_CALL(helifire_sound);
+	MACHINE_RESET_CALL_MEMBER(n8080);
+	MACHINE_RESET_CALL_MEMBER(helifire_sound);
 
-	state->m_helifire_mv = 0;
-	state->m_helifire_sc = 0;
-	state->m_helifire_flash = 0;
+	m_helifire_mv = 0;
+	m_helifire_sc = 0;
+	m_helifire_flash = 0;
 }
 
 
@@ -551,8 +546,8 @@ static MACHINE_CONFIG_START( spacefev, n8080_state )
 	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 
-	MCFG_MACHINE_START(spacefev)
-	MCFG_MACHINE_RESET(spacefev)
+	MCFG_MACHINE_START_OVERRIDE(n8080_state,spacefev)
+	MCFG_MACHINE_RESET_OVERRIDE(n8080_state,spacefev)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -562,8 +557,8 @@ static MACHINE_CONFIG_START( spacefev, n8080_state )
 	MCFG_SCREEN_UPDATE_STATIC(spacefev)
 
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(n8080)
-	MCFG_VIDEO_START(spacefev)
+	MCFG_PALETTE_INIT_OVERRIDE(n8080_state,n8080)
+	MCFG_VIDEO_START_OVERRIDE(n8080_state,spacefev)
 
 	MCFG_TIMER_ADD_SCANLINE("rst1", rst1_tick, "screen", 128, 256)
 	MCFG_TIMER_ADD_SCANLINE("rst2", rst2_tick, "screen", 240, 256)
@@ -581,8 +576,8 @@ static MACHINE_CONFIG_START( sheriff, n8080_state )
 	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 
-	MCFG_MACHINE_START(sheriff)
-	MCFG_MACHINE_RESET(sheriff)
+	MCFG_MACHINE_START_OVERRIDE(n8080_state,sheriff)
+	MCFG_MACHINE_RESET_OVERRIDE(n8080_state,sheriff)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -592,8 +587,8 @@ static MACHINE_CONFIG_START( sheriff, n8080_state )
 	MCFG_SCREEN_UPDATE_STATIC(sheriff)
 
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(n8080)
-	MCFG_VIDEO_START(sheriff)
+	MCFG_PALETTE_INIT_OVERRIDE(n8080_state,n8080)
+	MCFG_VIDEO_START_OVERRIDE(n8080_state,sheriff)
 
 	MCFG_TIMER_ADD_SCANLINE("rst1", rst1_tick, "screen", 128, 256)
 	MCFG_TIMER_ADD_SCANLINE("rst2", rst2_tick, "screen", 240, 256)
@@ -622,8 +617,8 @@ static MACHINE_CONFIG_START( helifire, n8080_state )
 	MCFG_CPU_PROGRAM_MAP(helifire_main_cpu_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 
-	MCFG_MACHINE_START(helifire)
-	MCFG_MACHINE_RESET(helifire)
+	MCFG_MACHINE_START_OVERRIDE(n8080_state,helifire)
+	MCFG_MACHINE_RESET_OVERRIDE(n8080_state,helifire)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -634,8 +629,8 @@ static MACHINE_CONFIG_START( helifire, n8080_state )
 	MCFG_SCREEN_VBLANK_STATIC(helifire)
 
 	MCFG_PALETTE_LENGTH(8 + 0x400)
-	MCFG_PALETTE_INIT(helifire)
-	MCFG_VIDEO_START(helifire)
+	MCFG_PALETTE_INIT_OVERRIDE(n8080_state,helifire)
+	MCFG_VIDEO_START_OVERRIDE(n8080_state,helifire)
 
 	MCFG_TIMER_ADD_SCANLINE("rst1", rst1_tick, "screen", 128, 256)
 	MCFG_TIMER_ADD_SCANLINE("rst2", rst2_tick, "screen", 240, 256)

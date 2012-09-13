@@ -49,10 +49,11 @@ public:
 	DECLARE_WRITE8_MEMBER(starcrus_proj_parm_1_w);
 	DECLARE_WRITE8_MEMBER(starcrus_proj_parm_2_w);
 	DECLARE_READ8_MEMBER(starcrus_coll_det_r);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/starcrus.c -----------*/
 
-VIDEO_START( starcrus );
+
 SCREEN_UPDATE_IND16( starcrus );

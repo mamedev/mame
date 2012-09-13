@@ -90,14 +90,13 @@ WRITE8_MEMBER(thief_state::thief_videoram_w){
 
 /***************************************************************************/
 
-VIDEO_START( thief ){
-	thief_state *state = machine.driver_data<thief_state>();
-	memset( &state->m_coprocessor, 0x00, sizeof(state->m_coprocessor) );
+void thief_state::video_start(){
+	memset( &m_coprocessor, 0x00, sizeof(m_coprocessor) );
 
-	state->m_videoram = auto_alloc_array_clear(machine, UINT8, 0x2000*4*2 );
+	m_videoram = auto_alloc_array_clear(machine(), UINT8, 0x2000*4*2 );
 
-	state->m_coprocessor.image_ram = auto_alloc_array(machine, UINT8, 0x2000 );
-	state->m_coprocessor.context_ram = auto_alloc_array(machine, UINT8, 0x400 );
+	m_coprocessor.image_ram = auto_alloc_array(machine(), UINT8, 0x2000 );
+	m_coprocessor.context_ram = auto_alloc_array(machine(), UINT8, 0x400 );
 }
 
 SCREEN_UPDATE_IND16( thief ){

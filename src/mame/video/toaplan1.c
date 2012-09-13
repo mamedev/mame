@@ -329,54 +329,52 @@ static void register_common(running_machine &machine)
 }
 
 
-VIDEO_START( rallybik )
+VIDEO_START_MEMBER(toaplan1_state,rallybik)
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	toaplan1_create_tilemaps(machine);
-	toaplan1_paletteram_alloc(machine);
-	toaplan1_vram_alloc(machine);
+	toaplan1_create_tilemaps(machine());
+	toaplan1_paletteram_alloc(machine());
+	toaplan1_vram_alloc(machine());
 
-	state->m_buffered_spriteram = auto_alloc_array_clear(machine, UINT16, state->m_spriteram.bytes()/2);
-	state->save_pointer(NAME(state->m_buffered_spriteram), state->m_spriteram.bytes()/2);
+	m_buffered_spriteram = auto_alloc_array_clear(machine(), UINT16, m_spriteram.bytes()/2);
+	save_pointer(NAME(m_buffered_spriteram), m_spriteram.bytes()/2);
 
-	state->m_scrollx_offs1 = 0x00d + 6;
-	state->m_scrollx_offs2 = 0x00d + 4;
-	state->m_scrollx_offs3 = 0x00d + 2;
-	state->m_scrollx_offs4 = 0x00d + 0;
-	state->m_scrolly_offs  = 0x111;
+	m_scrollx_offs1 = 0x00d + 6;
+	m_scrollx_offs2 = 0x00d + 4;
+	m_scrollx_offs3 = 0x00d + 2;
+	m_scrollx_offs4 = 0x00d + 0;
+	m_scrolly_offs  = 0x111;
 
-	state->m_bcu_flipscreen = -1;
-	state->m_fcu_flipscreen = 0;
-	state->m_reset = 0;
+	m_bcu_flipscreen = -1;
+	m_fcu_flipscreen = 0;
+	m_reset = 0;
 
-	register_common(machine);
+	register_common(machine());
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(rallybik_flipscreen), &machine));
+	machine().save().register_postload(save_prepost_delegate(FUNC(rallybik_flipscreen), &machine()));
 }
 
-VIDEO_START( toaplan1 )
+VIDEO_START_MEMBER(toaplan1_state,toaplan1)
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	toaplan1_create_tilemaps(machine);
-	toaplan1_paletteram_alloc(machine);
-	toaplan1_vram_alloc(machine);
-	toaplan1_spritevram_alloc(machine);
+	toaplan1_create_tilemaps(machine());
+	toaplan1_paletteram_alloc(machine());
+	toaplan1_vram_alloc(machine());
+	toaplan1_spritevram_alloc(machine());
 
-	state->m_scrollx_offs1 = 0x1ef + 6;
-	state->m_scrollx_offs2 = 0x1ef + 4;
-	state->m_scrollx_offs3 = 0x1ef + 2;
-	state->m_scrollx_offs4 = 0x1ef + 0;
-	state->m_scrolly_offs  = 0x101;
+	m_scrollx_offs1 = 0x1ef + 6;
+	m_scrollx_offs2 = 0x1ef + 4;
+	m_scrollx_offs3 = 0x1ef + 2;
+	m_scrollx_offs4 = 0x1ef + 0;
+	m_scrolly_offs  = 0x101;
 
-	state->m_bcu_flipscreen = -1;
-	state->m_fcu_flipscreen = 0;
-	state->m_reset = 1;
+	m_bcu_flipscreen = -1;
+	m_fcu_flipscreen = 0;
+	m_reset = 1;
 
-	register_common(machine);
+	register_common(machine());
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(toaplan1_flipscreen), &machine));
+	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan1_flipscreen), &machine()));
 }
 
 

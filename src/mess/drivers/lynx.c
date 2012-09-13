@@ -41,13 +41,13 @@ static INPUT_PORTS_START( lynx )
 	// power on and power off buttons
 INPUT_PORTS_END
 
-static PALETTE_INIT( lynx )
+void lynx_state::palette_init()
 {
     int i;
 
     for (i=0; i< 0x1000; i++)
 	{
-		palette_set_color_rgb(machine, i,
+		palette_set_color_rgb(machine(), i,
 			((i >> 0) & 0x0f) * 0x11,
 			((i >> 4) & 0x0f) * 0x11,
 			((i >> 8) & 0x0f) * 0x11);
@@ -71,8 +71,6 @@ static MACHINE_CONFIG_START( lynx, lynx_state )
 	MCFG_CPU_PROGRAM_MAP(lynx_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START( lynx )
-	MCFG_MACHINE_RESET( lynx )
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -84,7 +82,6 @@ static MACHINE_CONFIG_START( lynx, lynx_state )
 	MCFG_DEFAULT_LAYOUT(layout_lynx)
 
 	MCFG_PALETTE_LENGTH(0x1000)
-	MCFG_PALETTE_INIT( lynx )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

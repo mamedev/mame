@@ -407,8 +407,6 @@ static MACHINE_CONFIG_START( sidepckt, sidepckt_state )
 	MCFG_GFXDECODE(sidepckt)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(sidepckt)
-	MCFG_VIDEO_START(sidepckt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -235,13 +235,22 @@ public:
     write8_delegate wd_inh_d000;
     read8_delegate rd_inh_e000;
     write8_delegate wd_inh_e000;
+	DECLARE_MACHINE_START(apple2);
+	DECLARE_VIDEO_START(apple2);
+	DECLARE_PALETTE_INIT(apple2);
+	DECLARE_MACHINE_START(apple2orig);
+	DECLARE_VIDEO_START(apple2p);
+	DECLARE_VIDEO_START(apple2e);
+	DECLARE_MACHINE_START(tk2000);
+	DECLARE_MACHINE_START(laser128);
+	DECLARE_MACHINE_START(space84);
 };
 
 
 /*----------- defined in drivers/apple2.c -----------*/
 
 INPUT_PORTS_EXTERN( apple2ep );
-PALETTE_INIT( apple2 );
+
 
 
 /*----------- defined in machine/apple2.c -----------*/
@@ -252,11 +261,11 @@ void apple2_iwm_setdiskreg(running_machine &machine, UINT8 data);
 UINT8 apple2_iwm_getdiskreg(running_machine &machine);
 
 void apple2_init_common(running_machine &machine);
-MACHINE_START( apple2 );
-MACHINE_START( apple2orig );
-MACHINE_START( tk2000 );
-MACHINE_START( laser128 );
-MACHINE_START( space84 );
+
+
+
+
+
 UINT8 apple2_getfloatingbusvalue(running_machine &machine);
 READ8_HANDLER( apple2_c0xx_r );
 WRITE8_HANDLER( apple2_c0xx_w );
@@ -279,9 +288,9 @@ void apple2_update_memory(running_machine &machine);
 /*----------- defined in video/apple2.c -----------*/
 
 void apple2_video_start(running_machine &machine, const UINT8 *vram, size_t vram_size, UINT32 ignored_softswitches, int hires_modulo);
-VIDEO_START( apple2 );
-VIDEO_START( apple2p );
-VIDEO_START( apple2e );
+
+
+
 SCREEN_UPDATE_IND16( apple2 );
 
 #endif /* APPLE2_H_ */

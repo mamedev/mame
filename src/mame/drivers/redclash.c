@@ -324,32 +324,30 @@ GFXDECODE_END
 
 
 
-static MACHINE_START( redclash )
+MACHINE_START_MEMBER(ladybug_state,redclash)
 {
-	ladybug_state *state = machine.driver_data<ladybug_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
 
-	state->save_item(NAME(state->m_star_speed));
-	state->save_item(NAME(state->m_gfxbank));
-	state->save_item(NAME(state->m_stars_enable));
-	state->save_item(NAME(state->m_stars_speed));
-	state->save_item(NAME(state->m_stars_state));
-	state->save_item(NAME(state->m_stars_offset));
-	state->save_item(NAME(state->m_stars_count));
+	save_item(NAME(m_star_speed));
+	save_item(NAME(m_gfxbank));
+	save_item(NAME(m_stars_enable));
+	save_item(NAME(m_stars_speed));
+	save_item(NAME(m_stars_state));
+	save_item(NAME(m_stars_offset));
+	save_item(NAME(m_stars_count));
 }
 
-static MACHINE_RESET( redclash )
+MACHINE_RESET_MEMBER(ladybug_state,redclash)
 {
-	ladybug_state *state = machine.driver_data<ladybug_state>();
 
-	state->m_star_speed = 0;
-	state->m_gfxbank = 0;
-	state->m_stars_enable = 0;
-	state->m_stars_speed = 0;
-	state->m_stars_state = 0;
-	state->m_stars_offset = 0;
-	state->m_stars_count = 0;
+	m_star_speed = 0;
+	m_gfxbank = 0;
+	m_stars_enable = 0;
+	m_stars_speed = 0;
+	m_stars_state = 0;
+	m_stars_offset = 0;
+	m_stars_count = 0;
 }
 
 static MACHINE_CONFIG_START( zerohour, ladybug_state )
@@ -358,8 +356,8 @@ static MACHINE_CONFIG_START( zerohour, ladybug_state )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(zerohour_map)
 
-	MCFG_MACHINE_START(redclash)
-	MCFG_MACHINE_RESET(redclash)
+	MCFG_MACHINE_START_OVERRIDE(ladybug_state,redclash)
+	MCFG_MACHINE_RESET_OVERRIDE(ladybug_state,redclash)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -373,8 +371,8 @@ static MACHINE_CONFIG_START( zerohour, ladybug_state )
 	MCFG_GFXDECODE(redclash)
 	MCFG_PALETTE_LENGTH(4*8+4*16+32)
 
-	MCFG_PALETTE_INIT(redclash)
-	MCFG_VIDEO_START(redclash)
+	MCFG_PALETTE_INIT_OVERRIDE(ladybug_state,redclash)
+	MCFG_VIDEO_START_OVERRIDE(ladybug_state,redclash)
 
 	/* sound hardware */
 MACHINE_CONFIG_END
@@ -386,8 +384,8 @@ static MACHINE_CONFIG_START( redclash, ladybug_state )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(redclash_map)
 
-	MCFG_MACHINE_START(redclash)
-	MCFG_MACHINE_RESET(redclash)
+	MCFG_MACHINE_START_OVERRIDE(ladybug_state,redclash)
+	MCFG_MACHINE_RESET_OVERRIDE(ladybug_state,redclash)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -401,8 +399,8 @@ static MACHINE_CONFIG_START( redclash, ladybug_state )
 	MCFG_GFXDECODE(redclash)
 	MCFG_PALETTE_LENGTH(4*8+4*16+32)
 
-	MCFG_PALETTE_INIT(redclash)
-	MCFG_VIDEO_START(redclash)
+	MCFG_PALETTE_INIT_OVERRIDE(ladybug_state,redclash)
+	MCFG_VIDEO_START_OVERRIDE(ladybug_state,redclash)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

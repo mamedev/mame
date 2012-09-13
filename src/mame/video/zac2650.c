@@ -119,17 +119,16 @@ TILE_GET_INFO_MEMBER(zac2650_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
-VIDEO_START( tinvader )
+void zac2650_state::video_start()
 {
-	zac2650_state *state = machine.driver_data<zac2650_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(zac2650_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(zac2650_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 		 24, 24, 32, 32);
 
-	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
-	machine.primary_screen->register_screen_bitmap(state->m_spritebitmap);
+	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_spritebitmap);
 
-	machine.gfx[1]->set_source(state->m_s2636_0_ram);
-	machine.gfx[2]->set_source(state->m_s2636_0_ram);
+	machine().gfx[1]->set_source(m_s2636_0_ram);
+	machine().gfx[2]->set_source(m_s2636_0_ram);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)

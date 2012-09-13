@@ -158,29 +158,27 @@ WRITE16_MEMBER(sslam_state::powerbls_bg_tileram_w)
 	m_bg_tilemap->mark_tile_dirty(offset>>1);
 }
 
-VIDEO_START(sslam)
+VIDEO_START_MEMBER(sslam_state,sslam)
 {
-	sslam_state *state = machine.driver_data<sslam_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sslam_state::get_sslam_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_md_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sslam_state::get_sslam_md_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sslam_state::get_sslam_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sslam_state::get_sslam_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_md_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sslam_state::get_sslam_md_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sslam_state::get_sslam_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
-	state->m_md_tilemap->set_transparent_pen(0);
-	state->m_tx_tilemap->set_transparent_pen(0);
+	m_md_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
 
-	state->m_sprites_x_offset = 0;
-	state->save_item(NAME(state->m_sprites_x_offset));
+	m_sprites_x_offset = 0;
+	save_item(NAME(m_sprites_x_offset));
 }
 
-VIDEO_START(powerbls)
+VIDEO_START_MEMBER(sslam_state,powerbls)
 {
-	sslam_state *state = machine.driver_data<sslam_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sslam_state::get_powerbls_bg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sslam_state::get_powerbls_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 
-	state->m_sprites_x_offset = -21;
-	state->save_item(NAME(state->m_sprites_x_offset));
+	m_sprites_x_offset = -21;
+	save_item(NAME(m_sprites_x_offset));
 }
 
 SCREEN_UPDATE_IND16(sslam)

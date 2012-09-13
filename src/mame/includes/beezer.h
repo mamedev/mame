@@ -16,6 +16,7 @@ public:
 	DECLARE_WRITE8_MEMBER(beezer_map_w);
 	DECLARE_READ8_MEMBER(beezer_line_r);
 	DECLARE_DRIVER_INIT(beezer);
+	virtual void machine_start();
 };
 
 

@@ -31,19 +31,18 @@ void xexex_tile_callback(running_machine &machine, int layer, int *code, int *co
 	*color = state->m_layer_colorbase[layer] | (*color >> 2 & 0x0f);
 }
 
-VIDEO_START( xexex )
+void xexex_state::video_start()
 {
-	xexex_state *state = machine.driver_data<xexex_state>();
 
-	assert(machine.primary_screen->format() == BITMAP_FORMAT_RGB32);
+	assert(machine().primary_screen->format() == BITMAP_FORMAT_RGB32);
 
-	state->m_cur_alpha = 0;
+	m_cur_alpha = 0;
 
 	// Xexex has relative plane offsets of -2,2,4,6 vs. -2,0,2,3 in MW and GX.
-	k056832_set_layer_offs(state->m_k056832, 0, -2, 16);
-	k056832_set_layer_offs(state->m_k056832, 1,  2, 16);
-	k056832_set_layer_offs(state->m_k056832, 2,  4, 16);
-	k056832_set_layer_offs(state->m_k056832, 3,  6, 16);
+	k056832_set_layer_offs(m_k056832, 0, -2, 16);
+	k056832_set_layer_offs(m_k056832, 1,  2, 16);
+	k056832_set_layer_offs(m_k056832, 2,  4, 16);
+	k056832_set_layer_offs(m_k056832, 3,  6, 16);
 }
 
 SCREEN_UPDATE_RGB32( xexex )

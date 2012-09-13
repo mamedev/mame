@@ -20,6 +20,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sol_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
 	DECLARE_DRIVER_INIT(peyper);
+	virtual void machine_reset();
 };
 
 
@@ -526,10 +527,9 @@ static INPUT_PORTS_START( odisea )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET( peyper )
+void peyper_state::machine_reset()
 {
-    peyper_state *state = machine.driver_data<peyper_state>();
-    state->irq_state = 0;
+    irq_state = 0;
 }
 
 static MACHINE_CONFIG_START( peyper, peyper_state )
@@ -539,7 +539,6 @@ static MACHINE_CONFIG_START( peyper, peyper_state )
 	MCFG_CPU_IO_MAP(peyper_io)
     MCFG_CPU_PERIODIC_INT(irq0_line_hold, 1250 * 2)
 
-	MCFG_MACHINE_RESET( peyper )
 
     /* video hardware */
     MCFG_DEFAULT_LAYOUT(layout_peyper)

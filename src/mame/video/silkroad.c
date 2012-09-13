@@ -123,16 +123,15 @@ WRITE32_MEMBER(silkroad_state::silkroad_fgram3_w)
 	m_fg3_tilemap->mark_tile_dirty(offset);
 }
 
-VIDEO_START(silkroad)
+void silkroad_state::video_start()
 {
-	silkroad_state *state = machine.driver_data<silkroad_state>();
-	state->m_fg_tilemap  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(silkroad_state::get_fg_tile_info),state),  TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_fg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(silkroad_state::get_fg2_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_fg3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(silkroad_state::get_fg3_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_fg_tilemap  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(silkroad_state::get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_fg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(silkroad_state::get_fg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_fg3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(silkroad_state::get_fg3_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
-	state->m_fg2_tilemap->set_transparent_pen(0);
-	state->m_fg3_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
+	m_fg2_tilemap->set_transparent_pen(0);
+	m_fg3_tilemap->set_transparent_pen(0);
 }
 
 SCREEN_UPDATE_IND16(silkroad)

@@ -634,17 +634,16 @@ static Z80CTC_INTERFACE( ctc_intf_audio )
 	DEVCB_NULL					/* ZC/TO2 callback */
 };
 
-static MACHINE_RESET( sailorws )
+void nbmj9195_state::machine_reset()
 {
-	nbmj9195_state *state = machine.driver_data<nbmj9195_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	// initialize TMPZ84C011 PIO
 	for (i = 0; i < (5 * 2); i++)
 	{
-		state->m_pio_dir[i] = state->m_pio_latch[i] = 0;
-		state->tmpz84c011_pio_w(*space, i, 0);
+		m_pio_dir[i] = m_pio_latch[i] = 0;
+		tmpz84c011_pio_w(*space, i, 0);
 	}
 }
 
@@ -3176,7 +3175,6 @@ static MACHINE_CONFIG_START( NBMJDRV1, nbmj9195_state )
 	MCFG_Z80CTC_ADD("main_ctc", 12000000/2 /* same as "maincpu" */, ctc_intf_main)
 	MCFG_Z80CTC_ADD("audio_ctc", 8000000 /* same as "audiocpu" */, ctc_intf_audio)
 
-	MCFG_MACHINE_RESET(sailorws)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -3189,7 +3187,6 @@ static MACHINE_CONFIG_START( NBMJDRV1, nbmj9195_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(nbmj9195_2layer)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3210,7 +3207,7 @@ static MACHINE_CONFIG_DERIVED( NBMJDRV2, NBMJDRV1 )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_VIDEO_START(nbmj9195_1layer)
+	MCFG_VIDEO_START_OVERRIDE(nbmj9195_state,nbmj9195_1layer)
 MACHINE_CONFIG_END
 
 
@@ -3221,7 +3218,7 @@ static MACHINE_CONFIG_DERIVED( NBMJDRV3, NBMJDRV1 )
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(nbmj9195_nb22090)
+	MCFG_VIDEO_START_OVERRIDE(nbmj9195_state,nbmj9195_nb22090)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(nbmj9195)
 MACHINE_CONFIG_END

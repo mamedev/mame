@@ -52,6 +52,10 @@ public:
 	DECLARE_WRITE16_MEMBER(write_rotram);
 	DECLARE_READ16_MEMBER(read_sndram);
 	DECLARE_WRITE16_MEMBER(write_sndram);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -73,20 +77,18 @@ public:
  *
  *************************************/
 
-static VIDEO_START( cubeqst )
+void cubeqst_state::video_start()
 {
-	cubeqst_state *state = machine.driver_data<cubeqst_state>();
-	state->m_video_field = 0;
-	state->m_depth_buffer = auto_alloc_array(machine, UINT8, 512);
+	m_video_field = 0;
+	m_depth_buffer = auto_alloc_array(machine(), UINT8, 512);
 }
 
 /* TODO: Use resistor values */
-static PALETTE_INIT( cubeqst )
+void cubeqst_state::palette_init()
 {
-	cubeqst_state *state = machine.driver_data<cubeqst_state>();
 	int i;
 
-	state->m_colormap = auto_alloc_array(machine, rgb_t, 65536);
+	m_colormap = auto_alloc_array(machine(), rgb_t, 65536);
 	for (i = 0; i < 65536; ++i)
 	{
 		UINT8 a, r, g, b, y;
@@ -97,7 +99,7 @@ static PALETTE_INIT( cubeqst )
 		r = (i >> 8) & 7;
 		y = ((i >> 12) & 0xf) * 2;
 
-		state->m_colormap[i] = MAKE_ARGB(a ? 0 : 255, y*r, y*g, y*b);
+		m_colormap[i] = MAKE_ARGB(a ? 0 : 255, y*r, y*g, y*b);
 	}
 }
 
@@ -441,19 +443,18 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static MACHINE_START( cubeqst )
+void cubeqst_state::machine_start()
 {
 }
 
-static MACHINE_RESET( cubeqst )
+void cubeqst_state::machine_reset()
 {
-	cubeqst_state *state = machine.driver_data<cubeqst_state>();
-	state->m_reset_latch = 0;
+	m_reset_latch = 0;
 
 	/* Auxillary CPUs are held in reset */
-	machine.device("sound_cpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine.device("rotate_cpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine.device("line_cpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("sound_cpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("rotate_cpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("line_cpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
@@ -528,8 +529,6 @@ static MACHINE_CONFIG_START( cubeqst, cubeqst_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(48000))
 
-	MCFG_MACHINE_START(cubeqst)
-	MCFG_MACHINE_RESET(cubeqst)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_LASERDISC_SIMUTREK_ADD("laserdisc")
@@ -540,8 +539,6 @@ static MACHINE_CONFIG_START( cubeqst, cubeqst_state )
 
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_VIDEO_START(cubeqst)
-	MCFG_PALETTE_INIT(cubeqst)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

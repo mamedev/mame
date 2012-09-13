@@ -635,30 +635,28 @@ static const k053252_interface qdrmfgp2_k053252_intf =
 	40, 16
 };
 
-static MACHINE_START( qdrmfgp )
+MACHINE_START_MEMBER(qdrmfgp_state,qdrmfgp)
 {
-	qdrmfgp_state *state = machine.driver_data<qdrmfgp_state>();
-	state_save_register_global(machine, state->m_control);
-	state_save_register_global(machine, state->m_pal);
-	state_save_register_global(machine, state->m_gp2_irq_control);
+	state_save_register_global(machine(), m_control);
+	state_save_register_global(machine(), m_pal);
+	state_save_register_global(machine(), m_gp2_irq_control);
 }
 
-static MACHINE_START( qdrmfgp2 )
+MACHINE_START_MEMBER(qdrmfgp_state,qdrmfgp2)
 {
 	/* sound irq (CCU? 240Hz) */
-	machine.scheduler().timer_pulse(attotime::from_hz(18432000/76800), FUNC(gp2_timer_callback));
+	machine().scheduler().timer_pulse(attotime::from_hz(18432000/76800), FUNC(gp2_timer_callback));
 
-	MACHINE_START_CALL( qdrmfgp );
+	MACHINE_START_CALL_MEMBER( qdrmfgp );
 }
 
-static MACHINE_RESET( qdrmfgp )
+void qdrmfgp_state::machine_reset()
 {
-	qdrmfgp_state *state = machine.driver_data<qdrmfgp_state>();
-	state->m_sndram = state->memregion("konami")->base() + 0x100000;
+	m_sndram = memregion("konami")->base() + 0x100000;
 
 	/* reset the IDE controller */
-	state->m_gp2_irq_control = 0;
-	machine.device("ide")->reset();
+	m_gp2_irq_control = 0;
+	machine().device("ide")->reset();
 }
 
 
@@ -681,8 +679,7 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	MCFG_CPU_PROGRAM_MAP(qdrmfgp_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", qdrmfgp_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_START(qdrmfgp)
-	MCFG_MACHINE_RESET(qdrmfgp)
+	MCFG_MACHINE_START_OVERRIDE(qdrmfgp_state,qdrmfgp)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
@@ -697,7 +694,7 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(qdrmfgp)
+	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp)
 
 	MCFG_K056832_ADD("k056832", qdrmfgp_k056832_intf)
 	MCFG_K053252_ADD("k053252", 32000000/4, qdrmfgp_k053252_intf)
@@ -723,8 +720,7 @@ static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 	MCFG_CPU_PROGRAM_MAP(qdrmfgp2_map)
 	MCFG_CPU_VBLANK_INT("screen", qdrmfgp2_interrupt)
 
-	MCFG_MACHINE_START(qdrmfgp2)
-	MCFG_MACHINE_RESET(qdrmfgp)
+	MCFG_MACHINE_START_OVERRIDE(qdrmfgp_state,qdrmfgp2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_IDE_CONTROLLER_ADD("ide", qdrmfgp2_ide_intf, ide_devices, "hdd", NULL, true)
@@ -739,7 +735,7 @@ static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(qdrmfgp2)
+	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp2)
 
 	MCFG_K056832_ADD("k056832", qdrmfgp2_k056832_intf)
 	MCFG_K053252_ADD("k053252", 32000000/4, qdrmfgp2_k053252_intf)

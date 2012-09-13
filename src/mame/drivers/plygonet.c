@@ -600,7 +600,7 @@ static GFXDECODE_START( plygonet )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout, 0x0000, 64 )
 GFXDECODE_END
 
-static MACHINE_START(polygonet)
+void polygonet_state::machine_start()
 {
 	logerror("Polygonet machine start\n");
 
@@ -608,9 +608,9 @@ static MACHINE_START(polygonet)
 	/* It's presumed the hardware has hard-wired operating mode 1 (MODA = 1, MODB = 0) */
 	/* TODO: This should work, but the MAME core appears to do something funny.
              Not a big deal - it's hacked in dsp_w_lines. */
-	//machine.device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	//machine.device("dsp")->execute().set_input_line(DSP56K_IRQ_MODA, ASSERT_LINE);
-	//machine.device("dsp")->execute().set_input_line(DSP56K_IRQ_MODB, CLEAR_LINE);
+	//machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	//machine().device("dsp")->execute().set_input_line(DSP56K_IRQ_MODA, ASSERT_LINE);
+	//machine().device("dsp")->execute().set_input_line(DSP56K_IRQ_MODB, CLEAR_LINE);
 }
 
 static const k053936_interface polygonet_k053936_intf =
@@ -632,7 +632,6 @@ static MACHINE_CONFIG_START( plygonet, polygonet_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT(audio_interrupt, 480)
 
-	MCFG_MACHINE_START(polygonet)
 
 	MCFG_GFXDECODE(plygonet)
 
@@ -651,7 +650,6 @@ static MACHINE_CONFIG_START( plygonet, polygonet_state )
 
 	MCFG_PALETTE_LENGTH(32768)
 
-	MCFG_VIDEO_START(polygonet)
 
 	MCFG_K053936_ADD("k053936", polygonet_k053936_intf)
 

@@ -138,14 +138,13 @@ TILE_GET_INFO_MEMBER(suprslam_state::get_suprslam_bg_tile_info)
 }
 
 
-VIDEO_START( suprslam )
+void suprslam_state::video_start()
 {
-	suprslam_state *state = machine.driver_data<suprslam_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(suprslam_state::get_suprslam_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_screen_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(suprslam_state::get_suprslam_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(suprslam_state::get_suprslam_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_screen_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(suprslam_state::get_suprslam_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	state->m_screen_tilemap->set_transparent_pen(15);
+	m_screen_tilemap->set_transparent_pen(15);
 }
 
 SCREEN_UPDATE_IND16( suprslam )

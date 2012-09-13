@@ -285,89 +285,88 @@ static void reset_lx390_banking(running_machine &machine)
      */
 }
 
-static MACHINE_RESET(z80ne_base)
+MACHINE_RESET_MEMBER(z80ne_state,z80ne_base)
 {
-	z80ne_state *state = machine.driver_data<z80ne_state>();
 	int i;
-	address_space *space = machine.device("z80ne")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("z80ne")->memory().space(AS_PROGRAM);
 
 	LOG(("In MACHINE_RESET z80ne_base\n"));
 
 	for ( i=0; i<LX383_KEYS; i++)
-    	state->m_lx383_key[i] = 0xf0 | i;
-    state->m_lx383_scan_counter = 0x0f;
-    state->m_lx383_downsampler = LX383_DOWNSAMPLING;
+    	m_lx383_key[i] = 0xf0 | i;
+    m_lx383_scan_counter = 0x0f;
+    m_lx383_downsampler = LX383_DOWNSAMPLING;
 
 	/* Initialize cassette interface */
-	switch(machine.root_device().ioport("LX.385")->read() & 0x07)
+	switch(machine().root_device().ioport("LX.385")->read() & 0x07)
 	{
 	case 0x01:
-		state->m_cass_data.speed = TAPE_300BPS;
-		state->m_cass_data.wave_filter = LX385_TAPE_SAMPLE_FREQ / 1600;
-		state->m_cass_data.wave_short = LX385_TAPE_SAMPLE_FREQ / (2400 * 2);
-		state->m_cass_data.wave_long = LX385_TAPE_SAMPLE_FREQ / (1200 * 2);
+		m_cass_data.speed = TAPE_300BPS;
+		m_cass_data.wave_filter = LX385_TAPE_SAMPLE_FREQ / 1600;
+		m_cass_data.wave_short = LX385_TAPE_SAMPLE_FREQ / (2400 * 2);
+		m_cass_data.wave_long = LX385_TAPE_SAMPLE_FREQ / (1200 * 2);
 		break;
 	case 0x02:
-		state->m_cass_data.speed = TAPE_600BPS;
-		state->m_cass_data.wave_filter = LX385_TAPE_SAMPLE_FREQ / 3200;
-		state->m_cass_data.wave_short = LX385_TAPE_SAMPLE_FREQ / (4800 * 2);
-		state->m_cass_data.wave_long = LX385_TAPE_SAMPLE_FREQ / (2400 * 2);
+		m_cass_data.speed = TAPE_600BPS;
+		m_cass_data.wave_filter = LX385_TAPE_SAMPLE_FREQ / 3200;
+		m_cass_data.wave_short = LX385_TAPE_SAMPLE_FREQ / (4800 * 2);
+		m_cass_data.wave_long = LX385_TAPE_SAMPLE_FREQ / (2400 * 2);
 		break;
 	case 0x04:
-		state->m_cass_data.speed = TAPE_1200BPS;
-		state->m_cass_data.wave_filter = LX385_TAPE_SAMPLE_FREQ / 6400;
-		state->m_cass_data.wave_short = LX385_TAPE_SAMPLE_FREQ / (9600 * 2);
-		state->m_cass_data.wave_long = LX385_TAPE_SAMPLE_FREQ / (4800 * 2);
+		m_cass_data.speed = TAPE_1200BPS;
+		m_cass_data.wave_filter = LX385_TAPE_SAMPLE_FREQ / 6400;
+		m_cass_data.wave_short = LX385_TAPE_SAMPLE_FREQ / (9600 * 2);
+		m_cass_data.wave_long = LX385_TAPE_SAMPLE_FREQ / (4800 * 2);
 	}
-	state->m_cass_data.wave_length = state->m_cass_data.wave_short;
-	state->m_cass_data.output.length = state->m_cass_data.wave_length;
-	state->m_cass_data.output.level = 1;
-	state->m_cass_data.input.length = 0;
-	state->m_cass_data.input.bit = 1;
+	m_cass_data.wave_length = m_cass_data.wave_short;
+	m_cass_data.output.length = m_cass_data.wave_length;
+	m_cass_data.output.level = 1;
+	m_cass_data.input.length = 0;
+	m_cass_data.input.bit = 1;
 
-	state->m_ay31015 = machine.device("ay_3_1015");
-	ay31015_set_input_pin( state->m_ay31015, AY31015_CS, 0 );
-	ay31015_set_input_pin( state->m_ay31015, AY31015_NB1, 1 );
-	ay31015_set_input_pin( state->m_ay31015, AY31015_NB2, 1 );
-	ay31015_set_input_pin( state->m_ay31015, AY31015_TSB, 1 );
-	ay31015_set_input_pin( state->m_ay31015, AY31015_EPS, 1 );
-	ay31015_set_input_pin( state->m_ay31015, AY31015_NP, machine.root_device().ioport("LX.385")->read() & 0x80 ? 1 : 0 );
-	ay31015_set_input_pin( state->m_ay31015, AY31015_CS, 1 );
-	ay31015_set_receiver_clock( state->m_ay31015, state->m_cass_data.speed * 16.0);
-	ay31015_set_transmitter_clock( state->m_ay31015, state->m_cass_data.speed * 16.0);
+	m_ay31015 = machine().device("ay_3_1015");
+	ay31015_set_input_pin( m_ay31015, AY31015_CS, 0 );
+	ay31015_set_input_pin( m_ay31015, AY31015_NB1, 1 );
+	ay31015_set_input_pin( m_ay31015, AY31015_NB2, 1 );
+	ay31015_set_input_pin( m_ay31015, AY31015_TSB, 1 );
+	ay31015_set_input_pin( m_ay31015, AY31015_EPS, 1 );
+	ay31015_set_input_pin( m_ay31015, AY31015_NP, machine().root_device().ioport("LX.385")->read() & 0x80 ? 1 : 0 );
+	ay31015_set_input_pin( m_ay31015, AY31015_CS, 1 );
+	ay31015_set_receiver_clock( m_ay31015, m_cass_data.speed * 16.0);
+	ay31015_set_transmitter_clock( m_ay31015, m_cass_data.speed * 16.0);
 
-	state->m_nmi_delay_counter = 0;
-	state->lx385_ctrl_w(*space, 0, 0);
+	m_nmi_delay_counter = 0;
+	lx385_ctrl_w(*space, 0, 0);
 
 }
 
-MACHINE_RESET(z80ne)
+MACHINE_RESET_MEMBER(z80ne_state,z80ne)
 {
 	LOG(("In MACHINE_RESET z80ne\n"));
-	reset_lx382_banking(machine);
-	MACHINE_RESET_CALL( z80ne_base );
+	reset_lx382_banking(machine());
+	MACHINE_RESET_CALL_MEMBER( z80ne_base );
 }
 
-MACHINE_RESET(z80net)
+MACHINE_RESET_MEMBER(z80ne_state,z80net)
 {
 	LOG(("In MACHINE_RESET z80net\n"));
-	MACHINE_RESET_CALL( z80ne );
-	reset_lx388(machine);
+	MACHINE_RESET_CALL_MEMBER( z80ne );
+	reset_lx388(machine());
 }
 
-MACHINE_RESET(z80netb)
+MACHINE_RESET_MEMBER(z80ne_state,z80netb)
 {
 	LOG(("In MACHINE_RESET z80netb\n"));
-	MACHINE_RESET_CALL( z80ne_base );
-	reset_lx388(machine);
+	MACHINE_RESET_CALL_MEMBER( z80ne_base );
+	reset_lx388(machine());
 }
 
-MACHINE_RESET(z80netf)
+MACHINE_RESET_MEMBER(z80ne_state,z80netf)
 {
 	LOG(("In MACHINE_RESET z80netf\n"));
-	reset_lx390_banking(machine);
-	MACHINE_RESET_CALL( z80ne_base );
-	reset_lx388(machine);
+	reset_lx390_banking(machine());
+	MACHINE_RESET_CALL_MEMBER( z80ne_base );
+	reset_lx388(machine());
 }
 
 INPUT_CHANGED( z80ne_reset )
@@ -393,34 +392,33 @@ INPUT_CHANGED( z80ne_nmi )
 	}
 }
 
-MACHINE_START( z80ne )
+MACHINE_START_MEMBER(z80ne_state,z80ne)
 {
-	z80ne_state *state = machine.driver_data<z80ne_state>();
 	LOG(("In MACHINE_START z80ne\n"));
-	state->m_lx385_ctrl = 0x1f;
-	state_save_register_item( machine, "z80ne", NULL, 0, state->m_lx383_scan_counter );
-	state_save_register_item( machine, "z80ne", NULL, 0, state->m_lx383_downsampler );
-	state_save_register_item_array( machine, "z80ne", NULL, 0, state->m_lx383_key );
-	state_save_register_item( machine, "z80ne", NULL, 0, state->m_nmi_delay_counter );
-	state->m_cassette_timer = machine.scheduler().timer_alloc(FUNC(z80ne_cassette_tc));
-	machine.scheduler().timer_pulse( attotime::from_hz(1000), FUNC(z80ne_kbd_scan));
+	m_lx385_ctrl = 0x1f;
+	state_save_register_item( machine(), "z80ne", NULL, 0, m_lx383_scan_counter );
+	state_save_register_item( machine(), "z80ne", NULL, 0, m_lx383_downsampler );
+	state_save_register_item_array( machine(), "z80ne", NULL, 0, m_lx383_key );
+	state_save_register_item( machine(), "z80ne", NULL, 0, m_nmi_delay_counter );
+	m_cassette_timer = machine().scheduler().timer_alloc(FUNC(z80ne_cassette_tc));
+	machine().scheduler().timer_pulse( attotime::from_hz(1000), FUNC(z80ne_kbd_scan));
 }
 
-MACHINE_START( z80net )
+MACHINE_START_MEMBER(z80ne_state,z80net)
 {
-	MACHINE_START_CALL( z80ne );
+	MACHINE_START_CALL_MEMBER( z80ne );
 	LOG(("In MACHINE_START z80net\n"));
 }
 
-MACHINE_START( z80netb )
+MACHINE_START_MEMBER(z80ne_state,z80netb)
 {
-	MACHINE_START_CALL( z80net );
+	MACHINE_START_CALL_MEMBER( z80net );
 	LOG(("In MACHINE_START z80netb\n"));
 }
 
-MACHINE_START( z80netf )
+MACHINE_START_MEMBER(z80ne_state,z80netf)
 {
-	MACHINE_START_CALL( z80net );
+	MACHINE_START_CALL_MEMBER( z80net );
 	LOG(("In MACHINE_START z80netf\n"));
 }
 

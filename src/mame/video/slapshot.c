@@ -4,30 +4,29 @@
 
 /**********************************************************/
 
-VIDEO_START( slapshot )
+void slapshot_state::video_start()
 {
-	slapshot_state *state = machine.driver_data<slapshot_state>();
 	int i;
 
-	state->m_spriteram_delayed = auto_alloc_array(machine, UINT16, state->m_spriteram.bytes() / 2);
-	state->m_spriteram_buffered = auto_alloc_array(machine, UINT16, state->m_spriteram.bytes() / 2);
-	state->m_spritelist = auto_alloc_array(machine, struct slapshot_tempsprite, 0x400);
+	m_spriteram_delayed = auto_alloc_array(machine(), UINT16, m_spriteram.bytes() / 2);
+	m_spriteram_buffered = auto_alloc_array(machine(), UINT16, m_spriteram.bytes() / 2);
+	m_spritelist = auto_alloc_array(machine(), struct slapshot_tempsprite, 0x400);
 
 	for (i = 0; i < 8; i ++)
-		state->m_spritebank[i] = 0x400 * i;
+		m_spritebank[i] = 0x400 * i;
 
-	state->m_sprites_disabled = 1;
-	state->m_sprites_active_area = 0;
+	m_sprites_disabled = 1;
+	m_sprites_active_area = 0;
 
-	state->save_item(NAME(state->m_spritebank));
-	state->save_item(NAME(state->m_sprites_disabled));
-	state->save_item(NAME(state->m_sprites_active_area));
-	state->save_item(NAME(state->m_sprites_master_scrollx));
-	state->save_item(NAME(state->m_sprites_master_scrolly));
-	state->save_item(NAME(state->m_sprites_flipscreen));
-	state->save_item(NAME(state->m_prepare_sprites));
-	state->save_pointer(NAME(state->m_spriteram_delayed), state->m_spriteram.bytes() / 2);
-	state->save_pointer(NAME(state->m_spriteram_buffered), state->m_spriteram.bytes() / 2);
+	save_item(NAME(m_spritebank));
+	save_item(NAME(m_sprites_disabled));
+	save_item(NAME(m_sprites_active_area));
+	save_item(NAME(m_sprites_master_scrollx));
+	save_item(NAME(m_sprites_master_scrolly));
+	save_item(NAME(m_sprites_flipscreen));
+	save_item(NAME(m_prepare_sprites));
+	save_pointer(NAME(m_spriteram_delayed), m_spriteram.bytes() / 2);
+	save_pointer(NAME(m_spriteram_buffered), m_spriteram.bytes() / 2);
 }
 
 /************************************************************

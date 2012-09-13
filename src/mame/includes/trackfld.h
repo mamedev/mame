@@ -60,14 +60,19 @@ public:
 	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };
 	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(space, offset, m_SN76496_latch); };
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	DECLARE_MACHINE_START(trackfld);
+	DECLARE_MACHINE_RESET(trackfld);
+	DECLARE_VIDEO_START(trackfld);
+	DECLARE_PALETTE_INIT(trackfld);
+	DECLARE_VIDEO_START(atlantol);
 };
 
 
 /*----------- defined in video/trackfld.c -----------*/
 
 
-PALETTE_INIT( trackfld );
-VIDEO_START( trackfld );
+
+
 SCREEN_UPDATE_IND16( trackfld );
-VIDEO_START( atlantol );
+
 

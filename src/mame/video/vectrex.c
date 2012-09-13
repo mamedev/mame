@@ -277,31 +277,30 @@ static TIMER_CALLBACK(update_signal)
 
 *********************************************************************/
 
-VIDEO_START(vectrex)
+void vectrex_state::video_start()
 {
-	vectrex_state *state = machine.driver_data<vectrex_state>();
-	screen_device *screen = machine.first_screen();
+	screen_device *screen = machine().first_screen();
 	const rectangle &visarea = screen->visible_area();
 
-	state->m_x_center=(visarea.width() / 2) << 16;
-	state->m_y_center=(visarea.height() / 2) << 16;
-	state->m_x_max = visarea.max_x << 16;
-	state->m_y_max = visarea.max_y << 16;
+	m_x_center=(visarea.width() / 2) << 16;
+	m_y_center=(visarea.height() / 2) << 16;
+	m_x_max = visarea.max_x << 16;
+	m_y_max = visarea.max_y << 16;
 
-	state->m_imager_freq = 1;
+	m_imager_freq = 1;
 
-	state->vector_add_point_function = vectrex_add_point;
-	state->m_imager_timer = machine.scheduler().timer_alloc(FUNC(vectrex_imager_eye));
-	state->m_imager_timer->adjust(
-						  attotime::from_hz(state->m_imager_freq),
+	vector_add_point_function = vectrex_add_point;
+	m_imager_timer = machine().scheduler().timer_alloc(FUNC(vectrex_imager_eye));
+	m_imager_timer->adjust(
+						  attotime::from_hz(m_imager_freq),
 						  2,
-						  attotime::from_hz(state->m_imager_freq));
+						  attotime::from_hz(m_imager_freq));
 
-	state->m_lp_t = machine.scheduler().timer_alloc(FUNC(lightpen_trigger));
+	m_lp_t = machine().scheduler().timer_alloc(FUNC(lightpen_trigger));
 
-	state->m_refresh = machine.scheduler().timer_alloc(FUNC(vectrex_refresh));
+	m_refresh = machine().scheduler().timer_alloc(FUNC(vectrex_refresh));
 
-	VIDEO_START_CALL(vector);
+	VIDEO_START_CALL_LEGACY(vector);
 }
 
 
@@ -485,19 +484,18 @@ WRITE8_MEMBER(vectrex_state::raaspec_led_w)
 }
 
 
-VIDEO_START(raaspec)
+VIDEO_START_MEMBER(vectrex_state,raaspec)
 {
-	vectrex_state *state = machine.driver_data<vectrex_state>();
-	screen_device *screen = machine.first_screen();
+	screen_device *screen = machine().first_screen();
 	const rectangle &visarea = screen->visible_area();
 
-	state->m_x_center=(visarea.width() / 2) << 16;
-	state->m_y_center=(visarea.height() / 2) << 16;
-	state->m_x_max = visarea.max_x << 16;
-	state->m_y_max = visarea.max_y << 16;
+	m_x_center=(visarea.width() / 2) << 16;
+	m_y_center=(visarea.height() / 2) << 16;
+	m_x_max = visarea.max_x << 16;
+	m_y_max = visarea.max_y << 16;
 
-	state->vector_add_point_function = vectrex_add_point;
-	state->m_refresh = machine.scheduler().timer_alloc(FUNC(vectrex_refresh));
+	vector_add_point_function = vectrex_add_point;
+	m_refresh = machine().scheduler().timer_alloc(FUNC(vectrex_refresh));
 
-	VIDEO_START_CALL(vector);
+	VIDEO_START_CALL_LEGACY(vector);
 }

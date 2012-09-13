@@ -92,13 +92,14 @@ public:
 	DECLARE_READ8_MEMBER(gunpey_inputs_r);
 	DECLARE_WRITE8_MEMBER(gunpey_blitter_w);
 	DECLARE_DRIVER_INIT(gunpey);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
-static VIDEO_START( gunpey )
+void gunpey_state::video_start()
 {
-	gunpey_state *state = machine.driver_data<gunpey_state>();
-	state->m_blit_buffer = auto_alloc_array(machine, UINT16, 512*512);
+	m_blit_buffer = auto_alloc_array(machine(), UINT16, 512*512);
 }
 
 static SCREEN_UPDATE_RGB32( gunpey )
@@ -333,10 +334,10 @@ INPUT_PORTS_END
 /***************************************************************************************/
 
 /* test hack */
-static PALETTE_INIT( gunpey )
+void gunpey_state::palette_init()
 {
 	int i,r,g,b,val;
-	UINT8 *blit_rom = machine.root_device().memregion("blit_data")->base();
+	UINT8 *blit_rom = machine().root_device().memregion("blit_data")->base();
 
 	for (i = 0; i < 512; i+=2)
 	{
@@ -349,7 +350,7 @@ static PALETTE_INIT( gunpey )
 		r = (val & 0x7c00) >> 10;
 		r<<=3;
 
-		palette_set_color(machine, i/2, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i/2, MAKE_RGB(r, g, b));
 	}
 
 }
@@ -377,9 +378,7 @@ static MACHINE_CONFIG_START( gunpey, gunpey_state )
 	MCFG_SCREEN_UPDATE_STATIC(gunpey)
 
 	MCFG_PALETTE_LENGTH(0x800)
-	MCFG_PALETTE_INIT(gunpey)
 
-	MCFG_VIDEO_START(gunpey)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 

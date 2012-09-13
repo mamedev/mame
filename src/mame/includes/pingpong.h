@@ -24,12 +24,14 @@ public:
 	DECLARE_DRIVER_INIT(cashquiz);
 	DECLARE_DRIVER_INIT(merlinmm);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/pingpong.c -----------*/
 
 
-PALETTE_INIT( pingpong );
-VIDEO_START( pingpong );
+
+
 SCREEN_UPDATE_IND16( pingpong );

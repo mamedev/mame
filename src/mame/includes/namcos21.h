@@ -152,6 +152,8 @@ public:
 	DECLARE_DRIVER_INIT(solvalou);
 	DECLARE_DRIVER_INIT(cybsled);
 	DECLARE_DRIVER_INIT(aircomb);
+	DECLARE_MACHINE_START(namcos21);
+	DECLARE_VIDEO_START(namcos21);
 };
 
 

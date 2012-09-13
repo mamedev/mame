@@ -18,7 +18,7 @@
 // Colors are 1bpp, but how they are generated is a mystery
 // there's no color prom on the pcb, nor palette ram
 
-PALETTE_INIT( galaxia )
+PALETTE_INIT_MEMBER(galaxia_state,galaxia)
 {
 	// estimated with video/photo references
 	const int lut_clr[0x18] = {
@@ -33,14 +33,14 @@ PALETTE_INIT( galaxia )
 	};
 
 	for (int i = 0; i < 0x18; i++)
-		palette_set_color_rgb(machine, i, pal1bit(lut_clr[i] >> 0), pal1bit(lut_clr[i] >> 1), pal1bit(lut_clr[i] >> 2));
+		palette_set_color_rgb(machine(), i, pal1bit(lut_clr[i] >> 0), pal1bit(lut_clr[i] >> 1), pal1bit(lut_clr[i] >> 2));
 
 	// stars/bullets
-	palette_set_color_rgb(machine, STAR_PEN, pal1bit(1), pal1bit(1), pal1bit(1));
-	palette_set_color_rgb(machine, BULLET_PEN, pal1bit(1), pal1bit(1), pal1bit(0));
+	palette_set_color_rgb(machine(), STAR_PEN, pal1bit(1), pal1bit(1), pal1bit(1));
+	palette_set_color_rgb(machine(), BULLET_PEN, pal1bit(1), pal1bit(1), pal1bit(0));
 }
 
-PALETTE_INIT( astrowar )
+PALETTE_INIT_MEMBER(galaxia_state,astrowar)
 {
 	// no reference material available(?), except for Data East astrof
 	const int lut_clr[8] = { 7, 3, 5, 1, 4, 2, 6, 7 };
@@ -48,16 +48,16 @@ PALETTE_INIT( astrowar )
 	for (int i = 0; i < 8; i++)
 	{
 		// background
-		palette_set_color_rgb(machine, i*2, 0, 0, 0);
-		palette_set_color_rgb(machine, i*2 + 1, pal1bit(lut_clr[i] >> 0), pal1bit(lut_clr[i] >> 1), pal1bit(lut_clr[i] >> 2));
+		palette_set_color_rgb(machine(), i*2, 0, 0, 0);
+		palette_set_color_rgb(machine(), i*2 + 1, pal1bit(lut_clr[i] >> 0), pal1bit(lut_clr[i] >> 1), pal1bit(lut_clr[i] >> 2));
 
 		// sprites
-		palette_set_color_rgb(machine, i | SPRITE_PEN_BASE, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		palette_set_color_rgb(machine(), i | SPRITE_PEN_BASE, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 	}
 
 	// stars/bullets
-	palette_set_color_rgb(machine, STAR_PEN, pal1bit(1), pal1bit(1), pal1bit(1));
-	palette_set_color_rgb(machine, BULLET_PEN, pal1bit(1), pal1bit(1), pal1bit(0));
+	palette_set_color_rgb(machine(), STAR_PEN, pal1bit(1), pal1bit(1), pal1bit(1));
+	palette_set_color_rgb(machine(), BULLET_PEN, pal1bit(1), pal1bit(1), pal1bit(0));
 }
 
 TILE_GET_INFO_MEMBER(galaxia_state::get_galaxia_bg_tile_info)
@@ -82,28 +82,26 @@ static void init_common( running_machine &machine )
 	cvs_init_stars(machine);
 }
 
-VIDEO_START( galaxia )
+VIDEO_START_MEMBER(galaxia_state,galaxia)
 {
-	galaxia_state *state = machine.driver_data<galaxia_state>();
-	init_common(machine);
+	init_common(machine());
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxia_state::get_galaxia_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg_tilemap->set_transparent_pen(0);
-	state->m_bg_tilemap->set_scroll_cols(8);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxia_state::get_galaxia_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scroll_cols(8);
 
 }
 
-VIDEO_START( astrowar )
+VIDEO_START_MEMBER(galaxia_state,astrowar)
 {
-	galaxia_state *state = machine.driver_data<galaxia_state>();
-	init_common(machine);
+	init_common(machine());
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxia_state::get_astrowar_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg_tilemap->set_transparent_pen(0);
-	state->m_bg_tilemap->set_scroll_cols(8);
-	state->m_bg_tilemap->set_scrolldx(8, 8);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxia_state::get_astrowar_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scroll_cols(8);
+	m_bg_tilemap->set_scrolldx(8, 8);
 
-	machine.primary_screen->register_screen_bitmap(state->m_temp_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_temp_bitmap);
 }
 
 

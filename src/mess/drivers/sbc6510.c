@@ -72,6 +72,7 @@ public:
 	UINT8 m_key_row;
 	UINT8 m_2;
 	required_device<generic_terminal_device> m_terminal;
+	virtual void machine_reset();
 };
 
 
@@ -193,7 +194,7 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 };
 
 
-static MACHINE_RESET(sbc6510)
+void sbc6510_state::machine_reset()
 {
 }
 
@@ -265,7 +266,6 @@ static MACHINE_CONFIG_START( sbc6510, sbc6510_state )
 	MCFG_CPU_CONFIG( sbc6510_m6510_interface )
 	MCFG_CPU_PROGRAM_MAP(sbc6510_mem)
 
-	MCFG_MACHINE_RESET(sbc6510)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)

@@ -15,24 +15,23 @@ static void set_videoram_bank( running_machine &machine, int first, int count, i
  *
  *************************************/
 
-MACHINE_RESET( pc10 )
+void playch10_state::machine_reset()
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
-	device_t *rp5h01 = machine.device("rp5h01");
+	device_t *rp5h01 = machine().device("rp5h01");
 
 	/* initialize latches and flip-flops */
-	state->m_pc10_nmi_enable = state->m_pc10_dog_di = state->m_pc10_dispmask = state->m_pc10_sdcs = state->m_pc10_int_detect = 0;
+	m_pc10_nmi_enable = m_pc10_dog_di = m_pc10_dispmask = m_pc10_sdcs = m_pc10_int_detect = 0;
 
-	state->m_pc10_game_mode = state->m_pc10_dispmask_old = 0;
+	m_pc10_game_mode = m_pc10_dispmask_old = 0;
 
-	state->m_cart_sel = 0;
-	state->m_cntrl_mask = 1;
+	m_cart_sel = 0;
+	m_cntrl_mask = 1;
 
-	state->m_input_latch[0] = state->m_input_latch[1] = 0;
+	m_input_latch[0] = m_input_latch[1] = 0;
 
 	/* variables used only in MMC2 game (mapper 9)  */
-	state->m_MMC2_bank[0] = state->m_MMC2_bank[1] = state->m_MMC2_bank[2] = state->m_MMC2_bank[3] = 0;
-	state->m_MMC2_bank_latch[0] = state->m_MMC2_bank_latch[1] = 0xfe;
+	m_MMC2_bank[0] = m_MMC2_bank[1] = m_MMC2_bank[2] = m_MMC2_bank[3] = 0;
+	m_MMC2_bank_latch[0] = m_MMC2_bank_latch[1] = 0xfe;
 
 	/* reset the security chip */
 	rp5h01_enable_w(rp5h01, 0, 0);
@@ -40,44 +39,42 @@ MACHINE_RESET( pc10 )
 	rp5h01_reset_w(rp5h01, 0, 1);
 	rp5h01_enable_w(rp5h01, 0, 1);
 
-	state->pc10_set_mirroring(state->m_mirroring);
+	pc10_set_mirroring(m_mirroring);
 }
 
-MACHINE_START( pc10 )
+void playch10_state::machine_start()
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
-	state->m_vrom = state->memregion("gfx2")->base();
+	m_vrom = memregion("gfx2")->base();
 
 	/* allocate 4K of nametable ram here */
 	/* move to individual boards as documentation of actual boards allows */
-	state->m_nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
+	m_nt_ram = auto_alloc_array(machine(), UINT8, 0x1000);
 
-	machine.device("ppu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(playch10_state::pc10_chr_r),state), write8_delegate(FUNC(playch10_state::pc10_chr_w),state));
-	machine.device("ppu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(playch10_state::pc10_nt_r),state),write8_delegate(FUNC(playch10_state::pc10_nt_w),state));
+	machine().device("ppu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(playch10_state::pc10_chr_r),this), write8_delegate(FUNC(playch10_state::pc10_chr_w),this));
+	machine().device("ppu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(playch10_state::pc10_nt_r),this),write8_delegate(FUNC(playch10_state::pc10_nt_w),this));
 
-	if (NULL != state->m_vram)
-		set_videoram_bank(machine, 0, 8, 0, 8);
-	else pc10_set_videorom_bank(machine, 0, 8, 0, 8);
+	if (NULL != m_vram)
+		set_videoram_bank(machine(), 0, 8, 0, 8);
+	else pc10_set_videorom_bank(machine(), 0, 8, 0, 8);
 
-	nvram_device *nvram = machine.device<nvram_device>("nvram");
+	nvram_device *nvram = machine().device<nvram_device>("nvram");
 	if (nvram != NULL)
-		nvram->set_base(state->memregion("cart" )->base() + 0x6000, 0x1000);
+		nvram->set_base(memregion("cart" )->base() + 0x6000, 0x1000);
 }
 
-MACHINE_START( playch10_hboard )
+MACHINE_START_MEMBER(playch10_state,playch10_hboard)
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
-	state->m_vrom = state->memregion("gfx2")->base();
+	m_vrom = memregion("gfx2")->base();
 
 	/* allocate 4K of nametable ram here */
 	/* move to individual boards as documentation of actual boards allows */
-	state->m_nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
+	m_nt_ram = auto_alloc_array(machine(), UINT8, 0x1000);
 	/* allocate vram */
 
-	state->m_vram = auto_alloc_array(machine, UINT8, 0x2000);
+	m_vram = auto_alloc_array(machine(), UINT8, 0x2000);
 
-	machine.device("ppu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(playch10_state::pc10_chr_r),state), write8_delegate(FUNC(playch10_state::pc10_chr_w),state));
-	machine.device("ppu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(playch10_state::pc10_nt_r),state), write8_delegate(FUNC(playch10_state::pc10_nt_w),state));
+	machine().device("ppu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(playch10_state::pc10_chr_r),this), write8_delegate(FUNC(playch10_state::pc10_chr_w),this));
+	machine().device("ppu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(playch10_state::pc10_nt_r),this), write8_delegate(FUNC(playch10_state::pc10_nt_w),this));
 }
 
 /*************************************

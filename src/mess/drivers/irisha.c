@@ -152,8 +152,6 @@ static MACHINE_CONFIG_START( irisha, irisha_state )
 	MCFG_CPU_PROGRAM_MAP(irisha_mem)
 	MCFG_CPU_IO_MAP(irisha_io)
 
-	MCFG_MACHINE_START( irisha )
-	MCFG_MACHINE_RESET( irisha )
 
 	MCFG_I8255_ADD( "ppi8255", irisha_ppi8255_interface )
 
@@ -173,7 +171,6 @@ static MACHINE_CONFIG_START( irisha, irisha_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START(irisha)
 
 	/* uart */
 	MCFG_I8251_ADD("uart", default_i8251_interface)

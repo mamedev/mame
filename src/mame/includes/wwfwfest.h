@@ -41,11 +41,13 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
+	virtual void video_start();
+	DECLARE_VIDEO_START(wwfwfstb);
 };
 
 
 /*----------- defined in video/wwfwfest.c -----------*/
 
-VIDEO_START( wwfwfest );
-VIDEO_START( wwfwfstb );
+
+
 SCREEN_UPDATE_IND16( wwfwfest );

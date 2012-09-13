@@ -60,6 +60,7 @@ public:
 	DECLARE_WRITE8_MEMBER(swtpc_terminal_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
+	virtual void machine_reset();
 };
 
 // bit 0 - ready to receive a character; bit 1 - ready to send a character to the terminal
@@ -95,7 +96,7 @@ static INPUT_PORTS_START( swtpc )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(swtpc)
+void swtpc_state::machine_reset()
 {
 }
 
@@ -114,7 +115,6 @@ static MACHINE_CONFIG_START( swtpc, swtpc_state )
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(swtpc_mem)
 
-	MCFG_MACHINE_RESET(swtpc)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)

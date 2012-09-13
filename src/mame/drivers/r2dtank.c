@@ -75,6 +75,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
 	DECLARE_WRITE8_MEMBER(pia_comp_w);
+	virtual void machine_start();
 };
 
 
@@ -296,13 +297,12 @@ static const pia6821_interface pia_audio_intf =
 };
 
 
-static MACHINE_START( r2dtank )
+void r2dtank_state::machine_start()
 {
-	r2dtank_state *state = machine.driver_data<r2dtank_state>();
 	/* setup for save states */
-	state_save_register_global(machine, state->m_flipscreen);
-	state_save_register_global(machine, state->m_ttl74123_output);
-	state_save_register_global(machine, state->m_AY8910_selected);
+	state_save_register_global(machine(), m_flipscreen);
+	state_save_register_global(machine(), m_ttl74123_output);
+	state_save_register_global(machine(), m_AY8910_selected);
 }
 
 
@@ -539,7 +539,6 @@ static MACHINE_CONFIG_START( r2dtank, r2dtank_state )
 	MCFG_CPU_ADD("audiocpu", M6802,3000000)			/* ?? */
 	MCFG_CPU_PROGRAM_MAP(r2dtank_audio_map)
 
-	MCFG_MACHINE_START(r2dtank)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */

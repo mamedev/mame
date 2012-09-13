@@ -557,10 +557,9 @@
 *     Video Hardware     *
 *************************/
 
-static VIDEO_START( norautp )
+void norautp_state::video_start()
 {
-	norautp_state *state = machine.driver_data<norautp_state>();
-	state->m_np_vram = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
+	m_np_vram = auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
 }
 
 
@@ -606,17 +605,17 @@ static SCREEN_UPDATE_IND16( norautp )
 }
 
 
-static PALETTE_INIT( norautp )
+void norautp_state::palette_init()
 {
 	/* 1st gfx bank */
-	palette_set_color(machine, 0, MAKE_RGB(0x00, 0x00, 0xff));	/* blue */
-	palette_set_color(machine, 1, MAKE_RGB(0xff, 0xff, 0x00));	/* yellow */
-	palette_set_color(machine, 2, MAKE_RGB(0x00, 0x00, 0xff));	/* blue */
-	palette_set_color(machine, 3, MAKE_RGB(0xff, 0xff, 0xff));	/* white */
-	palette_set_color(machine, 4, MAKE_RGB(0xff, 0xff, 0xff));	/* white */
-	palette_set_color(machine, 5, MAKE_RGB(0xff, 0x00, 0x00));	/* red */
-	palette_set_color(machine, 6, MAKE_RGB(0xff, 0xff, 0xff));	/* white */
-	palette_set_color(machine, 7, MAKE_RGB(0x00, 0x00, 0x00));	/* black */
+	palette_set_color(machine(), 0, MAKE_RGB(0x00, 0x00, 0xff));	/* blue */
+	palette_set_color(machine(), 1, MAKE_RGB(0xff, 0xff, 0x00));	/* yellow */
+	palette_set_color(machine(), 2, MAKE_RGB(0x00, 0x00, 0xff));	/* blue */
+	palette_set_color(machine(), 3, MAKE_RGB(0xff, 0xff, 0xff));	/* white */
+	palette_set_color(machine(), 4, MAKE_RGB(0xff, 0xff, 0xff));	/* white */
+	palette_set_color(machine(), 5, MAKE_RGB(0xff, 0x00, 0x00));	/* red */
+	palette_set_color(machine(), 6, MAKE_RGB(0xff, 0xff, 0xff));	/* white */
+	palette_set_color(machine(), 7, MAKE_RGB(0x00, 0x00, 0x00));	/* black */
 }
 
 
@@ -1270,9 +1269,7 @@ static MACHINE_CONFIG_START( noraut_base, norautp_state )
 
 	MCFG_GFXDECODE(norautp)
 
-	MCFG_PALETTE_INIT(norautp)
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_VIDEO_START(norautp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

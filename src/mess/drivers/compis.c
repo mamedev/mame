@@ -64,22 +64,22 @@ static const unsigned char COMPIS_palette[16*3] =
 	255, 255, 255
 };
 
-static PALETTE_INIT( compis_gdc )
+PALETTE_INIT_MEMBER(compis_state,compis_gdc)
 {
 	int i;
 
 	for ( i = 0; i < 16; i++ ) {
-		palette_set_color_rgb(machine, i, COMPIS_palette[i*3], COMPIS_palette[i*3+1], COMPIS_palette[i*3+2]);
+		palette_set_color_rgb(machine(), i, COMPIS_palette[i*3], COMPIS_palette[i*3+1], COMPIS_palette[i*3+2]);
 	}
 }
 #endif
 
 
-static PALETTE_INIT( compis )
+void compis_state::palette_init()
 {
-	palette_set_color(machine, 0, RGB_BLACK); // black
-	palette_set_color(machine, 1, MAKE_RGB(0x00, 0xc0, 0x00)); // green
-	palette_set_color(machine, 2, MAKE_RGB(0x00, 0xff, 0x00)); // highlight
+	palette_set_color(machine(), 0, RGB_BLACK); // black
+	palette_set_color(machine(), 1, MAKE_RGB(0x00, 0xc0, 0x00)); // green
+	palette_set_color(machine(), 2, MAKE_RGB(0x00, 0xff, 0x00)); // highlight
 }
 
 static SCREEN_UPDATE_IND16( compis2 ) // temporary
@@ -363,8 +363,6 @@ static MACHINE_CONFIG_START( compis, compis_state )
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START(compis)
-	MCFG_MACHINE_RESET(compis)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -376,10 +374,9 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 #if 0
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT(compis_gdc)
+	MCFG_PALETTE_INIT_OVERRIDE(compis_state,compis_gdc)
 #endif
 	MCFG_PALETTE_LENGTH(3)
-	MCFG_PALETTE_INIT(compis)
 
 	/* Devices */
 	MCFG_PIT8253_ADD( "pit8253", compis_pit8253_config )
@@ -409,8 +406,6 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START(compis)
-	MCFG_MACHINE_RESET(compis)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -421,7 +416,6 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_STATIC(compis2)
 	MCFG_PALETTE_LENGTH(3)
-	MCFG_PALETTE_INIT(compis)
 
 	/* Devices */
 	MCFG_PIT8253_ADD( "pit8253", compis_pit8253_config )

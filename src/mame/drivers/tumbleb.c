@@ -1863,33 +1863,31 @@ GFXDECODE_END
 /******************************************************************************/
 
 
-static MACHINE_START( tumbleb )
+MACHINE_START_MEMBER(tumbleb_state,tumbleb)
 {
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_oki = machine.device("oki");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_oki = machine().device("oki");
 
-	state->save_item(NAME(state->m_music_command));
-	state->save_item(NAME(state->m_music_bank));
-	state->save_item(NAME(state->m_music_is_playing));
+	save_item(NAME(m_music_command));
+	save_item(NAME(m_music_bank));
+	save_item(NAME(m_music_is_playing));
 
-	state->save_item(NAME(state->m_control_0));
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_tilebank));
+	save_item(NAME(m_control_0));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_tilebank));
 }
 
-static MACHINE_RESET( tumbleb )
+MACHINE_RESET_MEMBER(tumbleb_state,tumbleb)
 {
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 
-	state->m_music_command = 0;
-	state->m_music_bank = 0;
-	state->m_music_is_playing = 0;
-	state->m_flipscreen = 0;
-	state->m_tilebank = 0;
-	memset(state->m_control_0, 0, sizeof(state->m_control_0));
+	m_music_command = 0;
+	m_music_bank = 0;
+	m_music_is_playing = 0;
+	m_flipscreen = 0;
+	m_tilebank = 0;
+	memset(m_control_0, 0, sizeof(m_control_0));
 }
 
 static MACHINE_CONFIG_START( tumblepb, tumbleb_state )
@@ -1899,8 +1897,8 @@ static MACHINE_CONFIG_START( tumblepb, tumbleb_state )
 	MCFG_CPU_PROGRAM_MAP(tumblepopb_main_map)
 	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MCFG_MACHINE_START(tumbleb)
-	MCFG_MACHINE_RESET(tumbleb)
+	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
+	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1917,7 +1915,7 @@ static MACHINE_CONFIG_START( tumblepb, tumbleb_state )
 	MCFG_GFXDECODE(tumbleb)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(tumblepb)
+	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1934,8 +1932,8 @@ static MACHINE_CONFIG_START( tumbleb2, tumbleb_state )
 	MCFG_CPU_PROGRAM_MAP(tumblepopb_main_map)
 	MCFG_CPU_VBLANK_INT("screen", tumbleb2_interrupt)
 
-	MCFG_MACHINE_START(tumbleb)
-	MCFG_MACHINE_RESET(tumbleb)
+	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
+	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1952,7 +1950,7 @@ static MACHINE_CONFIG_START( tumbleb2, tumbleb_state )
 	MCFG_GFXDECODE(tumbleb)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(tumblepb)
+	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1972,8 +1970,8 @@ static MACHINE_CONFIG_START( jumpkids, tumbleb_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000/2)
 	MCFG_CPU_PROGRAM_MAP(jumpkids_sound_map)
 
-	MCFG_MACHINE_START(tumbleb)
-	MCFG_MACHINE_RESET(tumbleb)
+	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
+	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1990,7 +1988,7 @@ static MACHINE_CONFIG_START( jumpkids, tumbleb_state )
 	MCFG_GFXDECODE(tumbleb)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(tumblepb)
+	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2006,8 +2004,8 @@ static MACHINE_CONFIG_START( fncywld, tumbleb_state )
 	MCFG_CPU_PROGRAM_MAP(fncywld_main_map)
 	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MCFG_MACHINE_START(tumbleb)
-	MCFG_MACHINE_RESET(tumbleb)
+	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
+	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2025,7 +2023,7 @@ static MACHINE_CONFIG_START( fncywld, tumbleb_state )
 	MCFG_GFXDECODE(fncywld)
 	MCFG_PALETTE_LENGTH(0x800)
 
-	MCFG_VIDEO_START(fncywld)
+	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,fncywld)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2053,18 +2051,17 @@ static const ym2151_interface semicom_ym2151_interface =
 	DEVCB_LINE(semicom_irqhandler)
 };
 
-static MACHINE_RESET (htchctch)
+MACHINE_RESET_MEMBER(tumbleb_state,htchctch)
 {
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 
 	/* copy protection data every reset */
-	UINT16 *PROTDATA = (UINT16*)state->memregion("user1")->base();
-	int i, len = state->memregion("user1")->bytes();
+	UINT16 *PROTDATA = (UINT16*)memregion("user1")->base();
+	int i, len = memregion("user1")->bytes();
 
 	for (i = 0; i < len / 2; i++)
-		state->m_mainram[0x000/2 + i] = PROTDATA[i];
+		m_mainram[0x000/2 + i] = PROTDATA[i];
 
-	MACHINE_RESET_CALL(tumbleb);
+	MACHINE_RESET_CALL_MEMBER(tumbleb);
 }
 
 static MACHINE_CONFIG_START( htchctch, tumbleb_state )
@@ -2077,8 +2074,8 @@ static MACHINE_CONFIG_START( htchctch, tumbleb_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 15000000/4) /* verified on dquizgo */
 	MCFG_CPU_PROGRAM_MAP(semicom_sound_map)
 
-	MCFG_MACHINE_START(tumbleb)
-	MCFG_MACHINE_RESET(htchctch)
+	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
+	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,htchctch)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2095,7 +2092,7 @@ static MACHINE_CONFIG_START( htchctch, tumbleb_state )
 	MCFG_GFXDECODE(tumbleb)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(tumblepb)
+	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
 
 	/* sound hardware - same as hyperpac */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2143,7 +2140,7 @@ static MACHINE_CONFIG_DERIVED( semibase, bcstory )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sdfight, bcstory )
-	MCFG_VIDEO_START(sdfight)
+	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,sdfight)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(sdfight)
 MACHINE_CONFIG_END
@@ -2186,8 +2183,8 @@ static MACHINE_CONFIG_START( suprtrio, tumbleb_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
 	MCFG_CPU_PROGRAM_MAP(suprtrio_sound_map)
 
-	MCFG_MACHINE_START(tumbleb)
-	MCFG_MACHINE_RESET(tumbleb)
+	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
+	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2204,7 +2201,7 @@ static MACHINE_CONFIG_START( suprtrio, tumbleb_state )
 	MCFG_GFXDECODE(suprtrio)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(suprtrio)
+	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,suprtrio)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2221,8 +2218,8 @@ static MACHINE_CONFIG_START( pangpang, tumbleb_state )
 	MCFG_CPU_PROGRAM_MAP(pangpang_main_map)
 	MCFG_CPU_VBLANK_INT("screen", tumbleb2_interrupt)
 
-	MCFG_MACHINE_START(tumbleb)
-	MCFG_MACHINE_RESET(tumbleb)
+	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
+	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2239,7 +2236,7 @@ static MACHINE_CONFIG_START( pangpang, tumbleb_state )
 	MCFG_GFXDECODE(tumbleb)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(pangpang)
+	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,pangpang)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -100,6 +100,7 @@ public:
 	DECLARE_READ8_MEMBER( term_r );
 	DECLARE_WRITE8_MEMBER( term_w );
 	UINT8 m_term_data;
+	virtual void machine_reset();
 };
 
 READ8_MEMBER( d6809_state::term_r )
@@ -139,7 +140,7 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 	DEVCB_DRIVER_MEMBER(d6809_state, kbd_put)
 };
 
-static MACHINE_RESET(d6809)
+void d6809_state::machine_reset()
 {
 }
 
@@ -149,7 +150,6 @@ static MACHINE_CONFIG_START( d6809, d6809_state )
 	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(d6809_mem)
 
-	MCFG_MACHINE_RESET(d6809)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)

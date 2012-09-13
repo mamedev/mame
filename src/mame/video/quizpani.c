@@ -66,12 +66,11 @@ WRITE16_MEMBER(quizpani_state::quizpani_tilesbank_w)
 	}
 }
 
-VIDEO_START( quizpani )
+void quizpani_state::video_start()
 {
-	quizpani_state *state = machine.driver_data<quizpani_state>();
-	state->m_bg_tilemap  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(quizpani_state::bg_tile_info),state), tilemap_mapper_delegate(FUNC(quizpani_state::bg_scan),state),16,16,256,32);
-	state->m_txt_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(quizpani_state::txt_tile_info),state),tilemap_mapper_delegate(FUNC(quizpani_state::bg_scan),state),16,16,256,32);
-	state->m_txt_tilemap->set_transparent_pen(15);
+	m_bg_tilemap  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(quizpani_state::bg_tile_info),this), tilemap_mapper_delegate(FUNC(quizpani_state::bg_scan),this),16,16,256,32);
+	m_txt_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(quizpani_state::txt_tile_info),this),tilemap_mapper_delegate(FUNC(quizpani_state::bg_scan),this),16,16,256,32);
+	m_txt_tilemap->set_transparent_pen(15);
 }
 
 SCREEN_UPDATE_IND16( quizpani )

@@ -140,21 +140,20 @@ static void state_register( running_machine &machine )
 	state->save_item(NAME(state->m_flipscreen));
 }
 
-static MACHINE_START( taito_l )
+MACHINE_START_MEMBER(taitol_state,taito_l)
 {
-	taitol_state *state = machine.driver_data<taitol_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_rambanks));
-	state->save_item(NAME(state->m_palette_ram));
-	state->save_item(NAME(state->m_empty_ram));
+	save_item(NAME(m_rambanks));
+	save_item(NAME(m_palette_ram));
+	save_item(NAME(m_empty_ram));
 
-	state_register(machine);
+	state_register(machine());
 }
 
-static void machine_reset(running_machine &machine)
+static void taito_machine_reset(running_machine &machine)
 {
 	taitol_state *state = machine.driver_data<taitol_state>();
 	int i;
@@ -200,105 +199,95 @@ static void machine_reset(running_machine &machine)
 }
 
 
-static MACHINE_RESET( fhawk )
+MACHINE_RESET_MEMBER(taitol_state,fhawk)
 {
-	taitol_state *state = machine.driver_data<taitol_state>();
-	machine_reset(machine);
-	state->m_porte0_tag = NULL;
-	state->m_porte1_tag = NULL;
-	state->m_portf0_tag = NULL;
-	state->m_portf1_tag = NULL;
+	taito_machine_reset(machine());
+	m_porte0_tag = NULL;
+	m_porte1_tag = NULL;
+	m_portf0_tag = NULL;
+	m_portf1_tag = NULL;
 }
 
-static MACHINE_RESET( raimais )
+MACHINE_RESET_MEMBER(taitol_state,raimais)
 {
-	taitol_state *state = machine.driver_data<taitol_state>();
-	machine_reset(machine);
-	state->m_porte0_tag = NULL;
-	state->m_porte1_tag = NULL;
-	state->m_portf0_tag = NULL;
-	state->m_portf1_tag = NULL;
+	taito_machine_reset(machine());
+	m_porte0_tag = NULL;
+	m_porte1_tag = NULL;
+	m_portf0_tag = NULL;
+	m_portf1_tag = NULL;
 }
 
-static MACHINE_RESET( champwr )
+MACHINE_RESET_MEMBER(taitol_state,champwr)
 {
-	taitol_state *state = machine.driver_data<taitol_state>();
-	machine_reset(machine);
-	state->m_porte0_tag = NULL;
-	state->m_porte1_tag = NULL;
-	state->m_portf0_tag = NULL;
-	state->m_portf1_tag = NULL;
+	taito_machine_reset(machine());
+	m_porte0_tag = NULL;
+	m_porte1_tag = NULL;
+	m_portf0_tag = NULL;
+	m_portf1_tag = NULL;
 }
 
 
-static MACHINE_RESET( kurikint )
+MACHINE_RESET_MEMBER(taitol_state,kurikint)
 {
-	taitol_state *state = machine.driver_data<taitol_state>();
-	machine_reset(machine);
-	state->m_porte0_tag = NULL;
-	state->m_porte1_tag = NULL;
-	state->m_portf0_tag = NULL;
-	state->m_portf1_tag = NULL;
+	taito_machine_reset(machine());
+	m_porte0_tag = NULL;
+	m_porte1_tag = NULL;
+	m_portf0_tag = NULL;
+	m_portf1_tag = NULL;
 }
 
-static MACHINE_RESET( evilston )
+MACHINE_RESET_MEMBER(taitol_state,evilston)
 {
-	taitol_state *state = machine.driver_data<taitol_state>();
-	machine_reset(machine);
-	state->m_porte0_tag = NULL;
-	state->m_porte1_tag = NULL;
-	state->m_portf0_tag = NULL;
-	state->m_portf1_tag = NULL;
+	taito_machine_reset(machine());
+	m_porte0_tag = NULL;
+	m_porte1_tag = NULL;
+	m_portf0_tag = NULL;
+	m_portf1_tag = NULL;
 }
 
-static MACHINE_RESET( puzznic )
+MACHINE_RESET_MEMBER(taitol_state,puzznic)
 {
-	taitol_state *state = machine.driver_data<taitol_state>();
-	machine_reset(machine);
-	state->m_porte0_tag = "DSWA";
-	state->m_porte1_tag = "DSWB";
-	state->m_portf0_tag = "IN0";
-	state->m_portf1_tag = "IN1";
+	taito_machine_reset(machine());
+	m_porte0_tag = "DSWA";
+	m_porte1_tag = "DSWB";
+	m_portf0_tag = "IN0";
+	m_portf1_tag = "IN1";
 }
 
-static MACHINE_RESET( plotting )
+MACHINE_RESET_MEMBER(taitol_state,plotting)
 {
-	taitol_state *state = machine.driver_data<taitol_state>();
-	machine_reset(machine);
-	state->m_porte0_tag = "DSWA";
-	state->m_porte1_tag = "DSWB";
-	state->m_portf0_tag = "IN0";
-	state->m_portf1_tag = "IN1";
+	taito_machine_reset(machine());
+	m_porte0_tag = "DSWA";
+	m_porte1_tag = "DSWB";
+	m_portf0_tag = "IN0";
+	m_portf1_tag = "IN1";
 }
 
-static MACHINE_RESET( palamed )
+MACHINE_RESET_MEMBER(taitol_state,palamed)
 {
-	taitol_state *state = machine.driver_data<taitol_state>();
-	machine_reset(machine);
-	state->m_porte0_tag = "DSWA";
-	state->m_porte1_tag = NULL;
-	state->m_portf0_tag = "DSWB";
-	state->m_portf1_tag = NULL;
+	taito_machine_reset(machine());
+	m_porte0_tag = "DSWA";
+	m_porte1_tag = NULL;
+	m_portf0_tag = "DSWB";
+	m_portf1_tag = NULL;
 }
 
-static MACHINE_RESET( cachat )
+MACHINE_RESET_MEMBER(taitol_state,cachat)
 {
-	taitol_state *state = machine.driver_data<taitol_state>();
-	machine_reset(machine);
-	state->m_porte0_tag = "DSWA";
-	state->m_porte1_tag = NULL;
-	state->m_portf0_tag = "DSWB";
-	state->m_portf1_tag = NULL;
+	taito_machine_reset(machine());
+	m_porte0_tag = "DSWA";
+	m_porte1_tag = NULL;
+	m_portf0_tag = "DSWB";
+	m_portf1_tag = NULL;
 }
 
-static MACHINE_RESET( horshoes )
+MACHINE_RESET_MEMBER(taitol_state,horshoes)
 {
-	taitol_state *state = machine.driver_data<taitol_state>();
-	machine_reset(machine);
-	state->m_porte0_tag = "DSWA";
-	state->m_porte1_tag = "DSWB";
-	state->m_portf0_tag = "IN0";
-	state->m_portf1_tag = "IN1";
+	taito_machine_reset(machine());
+	m_porte0_tag = "DSWA";
+	m_porte1_tag = "DSWB";
+	m_portf0_tag = "IN0";
+	m_portf1_tag = "IN1";
 }
 
 
@@ -1866,8 +1855,8 @@ static MACHINE_CONFIG_START( fhawk, taitol_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(taito_l)
-	MCFG_MACHINE_RESET(fhawk)
+	MCFG_MACHINE_START_OVERRIDE(taitol_state,taito_l)
+	MCFG_MACHINE_RESET_OVERRIDE(taitol_state,fhawk)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1881,7 +1870,7 @@ static MACHINE_CONFIG_START( fhawk, taitol_state )
 	MCFG_GFXDECODE(2)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(taitol)
+	MCFG_VIDEO_START_OVERRIDE(taitol_state,taitol)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1909,7 +1898,7 @@ static MACHINE_CONFIG_DERIVED( champwr, fhawk )
 	MCFG_CPU_MODIFY("slave")
 	MCFG_CPU_PROGRAM_MAP(champwr_2_map)
 
-	MCFG_MACHINE_RESET(champwr)
+	MCFG_MACHINE_RESET_OVERRIDE(taitol_state,champwr)
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("ymsnd")
@@ -1934,7 +1923,7 @@ static MACHINE_CONFIG_DERIVED( raimais, fhawk )
 	MCFG_CPU_MODIFY("slave")
 	MCFG_CPU_PROGRAM_MAP(raimais_2_map)
 
-	MCFG_MACHINE_RESET(raimais)
+	MCFG_MACHINE_RESET_OVERRIDE(taitol_state,raimais)
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL_8MHz)		/* verified on pcb (8Mhz OSC is also for the 2nd z80) */
@@ -1958,8 +1947,8 @@ static MACHINE_CONFIG_START( kurikint, taitol_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(taito_l)
-	MCFG_MACHINE_RESET(kurikint)
+	MCFG_MACHINE_START_OVERRIDE(taitol_state,taito_l)
+	MCFG_MACHINE_RESET_OVERRIDE(taitol_state,kurikint)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1973,7 +1962,7 @@ static MACHINE_CONFIG_START( kurikint, taitol_state )
 	MCFG_GFXDECODE(2)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(taitol)
+	MCFG_VIDEO_START_OVERRIDE(taitol_state,taitol)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2004,8 +1993,8 @@ static MACHINE_CONFIG_START( plotting, taitol_state )
 	MCFG_CPU_PROGRAM_MAP(plotting_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", vbl_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_START(taito_l)
-	MCFG_MACHINE_RESET(plotting)
+	MCFG_MACHINE_START_OVERRIDE(taitol_state,taito_l)
+	MCFG_MACHINE_RESET_OVERRIDE(taitol_state,plotting)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2019,7 +2008,7 @@ static MACHINE_CONFIG_START( plotting, taitol_state )
 	MCFG_GFXDECODE(1)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(taitol)
+	MCFG_VIDEO_START_OVERRIDE(taitol_state,taitol)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2041,7 +2030,7 @@ static MACHINE_CONFIG_DERIVED( puzznic, plotting )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(puzznic_map)
 
-	MCFG_MACHINE_RESET(puzznic)
+	MCFG_MACHINE_RESET_OVERRIDE(taitol_state,puzznic)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( puzznici, plotting )
@@ -2050,7 +2039,7 @@ static MACHINE_CONFIG_DERIVED( puzznici, plotting )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(puzznici_map)
 
-	MCFG_MACHINE_RESET(puzznic)
+	MCFG_MACHINE_RESET_OVERRIDE(taitol_state,puzznic)
 MACHINE_CONFIG_END
 
 
@@ -2060,7 +2049,7 @@ static MACHINE_CONFIG_DERIVED( horshoes, plotting )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(horshoes_map)
 
-	MCFG_MACHINE_RESET(horshoes)
+	MCFG_MACHINE_RESET_OVERRIDE(taitol_state,horshoes)
 MACHINE_CONFIG_END
 
 
@@ -2070,7 +2059,7 @@ static MACHINE_CONFIG_DERIVED( palamed, plotting )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(palamed_map)
 
-	MCFG_MACHINE_RESET(palamed)
+	MCFG_MACHINE_RESET_OVERRIDE(taitol_state,palamed)
 MACHINE_CONFIG_END
 
 
@@ -2080,7 +2069,7 @@ static MACHINE_CONFIG_DERIVED( cachat, plotting )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(cachat_map)
 
-	MCFG_MACHINE_RESET(cachat)
+	MCFG_MACHINE_RESET_OVERRIDE(taitol_state,cachat)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( evilston, taitol_state )
@@ -2097,8 +2086,8 @@ static MACHINE_CONFIG_START( evilston, taitol_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(taito_l)
-	MCFG_MACHINE_RESET(evilston)
+	MCFG_MACHINE_START_OVERRIDE(taitol_state,taito_l)
+	MCFG_MACHINE_RESET_OVERRIDE(taitol_state,evilston)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2112,7 +2101,7 @@ static MACHINE_CONFIG_START( evilston, taitol_state )
 	MCFG_GFXDECODE(2)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(taitol)
+	MCFG_VIDEO_START_OVERRIDE(taitol_state,taitol)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2137,7 +2126,7 @@ static MACHINE_CONFIG_DERIVED( lagirl, plotting )
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("ymsnd", YM2203, XTAL_27_2109MHz/8)
 
-	MCFG_MACHINE_RESET(cachat)
+	MCFG_MACHINE_RESET_OVERRIDE(taitol_state,cachat)
 MACHINE_CONFIG_END
 #endif
 

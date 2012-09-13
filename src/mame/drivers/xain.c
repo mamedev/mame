@@ -566,12 +566,12 @@ static const ym2203_interface ym2203_config =
 	DEVCB_LINE(irqhandler)
 };
 
-static MACHINE_START( xsleena )
+void xain_state::machine_start()
 {
-	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base() + 0x4000, 0xc000);
-	machine.root_device().membank("bank2")->configure_entries(0, 2, machine.root_device().memregion("sub")->base()  + 0x4000, 0xc000);
-	machine.root_device().membank("bank1")->set_entry(0);
-	machine.root_device().membank("bank2")->set_entry(0);
+	machine().root_device().membank("bank1")->configure_entries(0, 2, machine().root_device().memregion("maincpu")->base() + 0x4000, 0xc000);
+	machine().root_device().membank("bank2")->configure_entries(0, 2, machine().root_device().memregion("sub")->base()  + 0x4000, 0xc000);
+	machine().root_device().membank("bank1")->set_entry(0);
+	machine().root_device().membank("bank2")->set_entry(0);
 }
 
 static MACHINE_CONFIG_START( xsleena, xain_state )
@@ -590,7 +590,6 @@ static MACHINE_CONFIG_START( xsleena, xain_state )
 	MCFG_CPU_ADD("mcu", M68705, MCU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
-	MCFG_MACHINE_START(xsleena)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -602,7 +601,6 @@ static MACHINE_CONFIG_START( xsleena, xain_state )
 	MCFG_GFXDECODE(xain)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(xain)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

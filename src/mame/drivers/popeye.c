@@ -441,8 +441,6 @@ static MACHINE_CONFIG_START( skyskipr, popeye_state )
 	MCFG_GFXDECODE(popeye)
 	MCFG_PALETTE_LENGTH(16+16*2+64*4)
 
-	MCFG_PALETTE_INIT(popeye)
-	MCFG_VIDEO_START(skyskipr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -457,7 +455,7 @@ static MACHINE_CONFIG_DERIVED( popeye, skyskipr )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(popeye_map)
 
-	MCFG_VIDEO_START(popeye)
+	MCFG_VIDEO_START_OVERRIDE(popeye_state,popeye)
 MACHINE_CONFIG_END
 
 
@@ -465,8 +463,8 @@ static MACHINE_CONFIG_DERIVED( popeyebl, skyskipr )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(popeyebl_map)
 
-	MCFG_PALETTE_INIT(popeyebl)
-	MCFG_VIDEO_START(popeye)
+	MCFG_PALETTE_INIT_OVERRIDE(popeye_state,popeyebl)
+	MCFG_VIDEO_START_OVERRIDE(popeye_state,popeye)
 MACHINE_CONFIG_END
 
 

@@ -95,17 +95,16 @@ WRITE16_MEMBER(fitfight_state::fof_txt_tileram_w)
 
 /* video start / update */
 
-VIDEO_START(fitfight)
+void fitfight_state::video_start()
 {
-	fitfight_state *state = machine.driver_data<fitfight_state>();
-	state->m_fof_bak_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fitfight_state::get_fof_bak_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 128, 32);
+	m_fof_bak_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fitfight_state::get_fof_bak_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 128, 32);
 	/* opaque */
 
-	state->m_fof_mid_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fitfight_state::get_fof_mid_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 128, 32);
-	state->m_fof_mid_tilemap->set_transparent_pen(0);
+	m_fof_mid_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fitfight_state::get_fof_mid_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 128, 32);
+	m_fof_mid_tilemap->set_transparent_pen(0);
 
-	state->m_fof_txt_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fitfight_state::get_fof_txt_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 128, 32);
-	state->m_fof_txt_tilemap->set_transparent_pen(0);
+	m_fof_txt_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fitfight_state::get_fof_txt_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 128, 32);
+	m_fof_txt_tilemap->set_transparent_pen(0);
 }
 
 SCREEN_UPDATE_IND16(fitfight)

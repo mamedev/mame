@@ -57,6 +57,7 @@ public:
 	DECLARE_WRITE8_MEMBER(astron_FIX_write);
 	DECLARE_WRITE8_MEMBER(astron_io_bankswitch_w);
 	DECLARE_DRIVER_INIT(astron);
+	virtual void machine_start();
 };
 
 /* VIDEO GOODS */
@@ -359,7 +360,7 @@ static GFXDECODE_START( segald )
 GFXDECODE_END
 
 
-static MACHINE_START( astron )
+void segald_state::machine_start()
 {
 }
 
@@ -373,7 +374,6 @@ static MACHINE_CONFIG_START( astron, segald_state )
 	MCFG_CPU_IO_MAP(mainport)
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 1000.0/59.94)
 
-	MCFG_MACHINE_START(astron)
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
 	MCFG_LASERDISC_OVERLAY_STATIC(256, 256, astron)

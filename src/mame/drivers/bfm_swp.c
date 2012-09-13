@@ -139,6 +139,7 @@ protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
 
+	virtual void machine_start();
 };
 
 
@@ -199,11 +200,10 @@ static INPUT_PORTS_START( bfm_swp )
 INPUT_PORTS_END
 
 
-static MACHINE_START( bfm_swp )
+void bfm_swp_state::machine_start()
 {
-	bfm_swp_state *state = machine.driver_data<bfm_swp_state>();
-	state->m_cpuregion = (UINT32*)state->memregion( "maincpu" )->base();
-	state->m_mainram = (UINT32*)auto_alloc_array_clear(machine, UINT32, 0x10000);
+	m_cpuregion = (UINT32*)memregion( "maincpu" )->base();
+	m_mainram = (UINT32*)auto_alloc_array_clear(machine(), UINT32, 0x10000);
 
 }
 
@@ -214,7 +214,6 @@ static MACHINE_CONFIG_START( bfm_swp, bfm_swp_state )
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)
 	MCFG_CPU_PROGRAM_MAP(bfm_swp_map)
 
-	MCFG_MACHINE_START( bfm_swp )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

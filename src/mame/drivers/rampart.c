@@ -61,20 +61,19 @@ static void scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-static MACHINE_START( rampart )
+MACHINE_START_MEMBER(rampart_state,rampart)
 {
-	atarigen_init(machine);
+	atarigen_init(machine());
 }
 
 
-static MACHINE_RESET( rampart )
+MACHINE_RESET_MEMBER(rampart_state,rampart)
 {
-	rampart_state *state = machine.driver_data<rampart_state>();
 
-	atarigen_eeprom_reset(state);
-	atarigen_slapstic_reset(state);
-	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine.primary_screen, scanline_update, 32);
+	atarigen_eeprom_reset(this);
+	atarigen_slapstic_reset(this);
+	atarigen_interrupt_reset(this, update_interrupts);
+	atarigen_scanline_timer_reset(*machine().primary_screen, scanline_update, 32);
 }
 
 
@@ -349,8 +348,8 @@ static MACHINE_CONFIG_START( rampart, rampart_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
-	MCFG_MACHINE_START(rampart)
-	MCFG_MACHINE_RESET(rampart)
+	MCFG_MACHINE_START_OVERRIDE(rampart_state,rampart)
+	MCFG_MACHINE_RESET_OVERRIDE(rampart_state,rampart)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
@@ -365,7 +364,7 @@ static MACHINE_CONFIG_START( rampart, rampart_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 456, 0+12, 336+12, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(rampart)
 
-	MCFG_VIDEO_START(rampart)
+	MCFG_VIDEO_START_OVERRIDE(rampart_state,rampart)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

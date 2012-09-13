@@ -1010,7 +1010,7 @@ static MACHINE_CONFIG_START( zunit, midyunit_state )
 	MCFG_CPU_CONFIG(zunit_tms_config)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_RESET(midyunit)
+	MCFG_MACHINE_RESET_OVERRIDE(midyunit_state,midyunit)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -1021,7 +1021,7 @@ static MACHINE_CONFIG_START( zunit, midyunit_state )
 	MCFG_SCREEN_RAW_PARAMS(MEDRES_PIXEL_CLOCK*2, 673, 0, 511, 433, 0, 399)
 	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
 
-	MCFG_VIDEO_START(midzunit)
+	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midzunit)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1045,7 +1045,7 @@ static MACHINE_CONFIG_START( yunit_core, midyunit_state )
 	MCFG_CPU_CONFIG(yunit_tms_config)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_RESET(midyunit)
+	MCFG_MACHINE_RESET_OVERRIDE(midyunit_state,midyunit)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -1069,7 +1069,7 @@ static MACHINE_CONFIG_DERIVED( yunit_cvsd_4bit_slow, yunit_core )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_VIDEO_START(midyunit_4bit)
+	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_4bit)
 MACHINE_CONFIG_END
 
 
@@ -1084,7 +1084,7 @@ static MACHINE_CONFIG_DERIVED( yunit_cvsd_4bit_fast, yunit_core )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_VIDEO_START(midyunit_4bit)
+	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_4bit)
 MACHINE_CONFIG_END
 
 
@@ -1096,7 +1096,7 @@ static MACHINE_CONFIG_DERIVED( yunit_cvsd_6bit_slow, yunit_core )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(4096)
-	MCFG_VIDEO_START(midyunit_6bit)
+	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_6bit)
 MACHINE_CONFIG_END
 
 
@@ -1111,7 +1111,7 @@ static MACHINE_CONFIG_DERIVED( yunit_adpcm_6bit_fast, yunit_core )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(4096)
-	MCFG_VIDEO_START(midyunit_6bit)
+	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_6bit)
 MACHINE_CONFIG_END
 
 
@@ -1126,7 +1126,7 @@ static MACHINE_CONFIG_DERIVED( yunit_adpcm_6bit_faster, yunit_core )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(4096)
-	MCFG_VIDEO_START(midyunit_6bit)
+	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_6bit)
 MACHINE_CONFIG_END
 
 
@@ -1139,7 +1139,7 @@ static MACHINE_CONFIG_DERIVED( mkyawdim, yunit_core )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(4096)
-	MCFG_VIDEO_START(mkyawdim)
+	MCFG_VIDEO_START_OVERRIDE(midyunit_state,mkyawdim)
 
 	/* sound hardware */
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified

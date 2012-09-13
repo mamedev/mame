@@ -30,6 +30,9 @@ public:
 	DECLARE_WRITE8_MEMBER(tiamc1_palette_w);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -66,7 +69,7 @@ WRITE8_DEVICE_HANDLER( tiamc1_timer1_gate_w );
 
 /*----------- defined in video/tiamc1.c -----------*/
 
-PALETTE_INIT( tiamc1 );
-VIDEO_START( tiamc1 );
+
+
 SCREEN_UPDATE_IND16( tiamc1 );
 

@@ -62,17 +62,24 @@ public:
 	DECLARE_DRIVER_INIT(nomnlnd);
 	DECLARE_DRIVER_INIT(cosmica);
 	DECLARE_DRIVER_INIT(panic);
+	DECLARE_MACHINE_START(cosmic);
+	DECLARE_MACHINE_RESET(cosmic);
+	DECLARE_PALETTE_INIT(cosmicg);
+	DECLARE_PALETTE_INIT(panic);
+	DECLARE_PALETTE_INIT(cosmica);
+	DECLARE_PALETTE_INIT(magspot);
+	DECLARE_PALETTE_INIT(nomnlnd);
 };
 
 
 /*----------- defined in video/cosmic.c -----------*/
 
 
-PALETTE_INIT( panic );
-PALETTE_INIT( cosmica );
-PALETTE_INIT( cosmicg );
-PALETTE_INIT( magspot );
-PALETTE_INIT( nomnlnd );
+
+
+
+
+
 
 SCREEN_UPDATE_IND16( panic );
 SCREEN_UPDATE_IND16( magspot );

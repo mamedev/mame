@@ -328,27 +328,25 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( bionicc )
+void bionicc_state::machine_start()
 {
-	bionicc_state *state = machine.driver_data<bionicc_state>();
 
-	state->save_item(NAME(state->m_soundcommand));
-	state->save_item(NAME(state->m_inp));
-	state->save_item(NAME(state->m_scroll));
+	save_item(NAME(m_soundcommand));
+	save_item(NAME(m_inp));
+	save_item(NAME(m_scroll));
 }
 
-static MACHINE_RESET( bionicc )
+void bionicc_state::machine_reset()
 {
-	bionicc_state *state = machine.driver_data<bionicc_state>();
 
-	state->m_inp[0] = 0;
-	state->m_inp[1] = 0;
-	state->m_inp[2] = 0;
-	state->m_scroll[0] = 0;
-	state->m_scroll[1] = 0;
-	state->m_scroll[2] = 0;
-	state->m_scroll[3] = 0;
-	state->m_soundcommand = 0;
+	m_inp[0] = 0;
+	m_inp[1] = 0;
+	m_inp[2] = 0;
+	m_scroll[0] = 0;
+	m_scroll[1] = 0;
+	m_scroll[2] = 0;
+	m_scroll[3] = 0;
+	m_soundcommand = 0;
 }
 
 static MACHINE_CONFIG_START( bionicc, bionicc_state )
@@ -366,8 +364,6 @@ static MACHINE_CONFIG_START( bionicc, bionicc_state )
      */
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,4*60)
 
-	MCFG_MACHINE_START(bionicc)
-	MCFG_MACHINE_RESET(bionicc)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -381,7 +377,6 @@ static MACHINE_CONFIG_START( bionicc, bionicc_state )
 	MCFG_GFXDECODE(bionicc)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(bionicc)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 

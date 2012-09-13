@@ -564,55 +564,53 @@ static const ym2203_interface ym2203_config =
 };
 
 
-static MACHINE_START( lsasquad )
+MACHINE_START_MEMBER(lsasquad_state,lsasquad)
 {
-	lsasquad_state *state = machine.driver_data<lsasquad_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
+	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_mcu = machine.device("mcu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_mcu = machine().device("mcu");
 
-	state->save_item(NAME(state->m_port_a_in));
-	state->save_item(NAME(state->m_port_a_out));
-	state->save_item(NAME(state->m_ddr_a));
-	state->save_item(NAME(state->m_port_b_in));
-	state->save_item(NAME(state->m_port_b_out));
-	state->save_item(NAME(state->m_ddr_b));
-	state->save_item(NAME(state->m_mcu_sent));
-	state->save_item(NAME(state->m_main_sent));
-	state->save_item(NAME(state->m_from_main));
-	state->save_item(NAME(state->m_from_mcu));
+	save_item(NAME(m_port_a_in));
+	save_item(NAME(m_port_a_out));
+	save_item(NAME(m_ddr_a));
+	save_item(NAME(m_port_b_in));
+	save_item(NAME(m_port_b_out));
+	save_item(NAME(m_ddr_b));
+	save_item(NAME(m_mcu_sent));
+	save_item(NAME(m_main_sent));
+	save_item(NAME(m_from_main));
+	save_item(NAME(m_from_mcu));
 
-	state->save_item(NAME(state->m_sound_pending));
-	state->save_item(NAME(state->m_sound_nmi_enable));
-	state->save_item(NAME(state->m_pending_nmi));
-	state->save_item(NAME(state->m_sound_cmd));
-	state->save_item(NAME(state->m_sound_result));
+	save_item(NAME(m_sound_pending));
+	save_item(NAME(m_sound_nmi_enable));
+	save_item(NAME(m_pending_nmi));
+	save_item(NAME(m_sound_cmd));
+	save_item(NAME(m_sound_result));
 }
 
-static MACHINE_RESET( lsasquad )
+MACHINE_RESET_MEMBER(lsasquad_state,lsasquad)
 {
-	lsasquad_state *state = machine.driver_data<lsasquad_state>();
 
-	state->m_sound_pending = 0;
-	state->m_sound_nmi_enable = 0;
-	state->m_pending_nmi = 0;
-	state->m_sound_cmd = 0;
-	state->m_sound_result = 0;
+	m_sound_pending = 0;
+	m_sound_nmi_enable = 0;
+	m_pending_nmi = 0;
+	m_sound_cmd = 0;
+	m_sound_result = 0;
 
-	state->m_port_a_in = 0;
-	state->m_port_a_out = 0;
-	state->m_ddr_a = 0;
-	state->m_port_b_in = 0;
-	state->m_port_b_out = 0;
-	state->m_ddr_b = 0;
-	state->m_mcu_sent = 0;
-	state->m_main_sent = 0;
-	state->m_from_main = 0;
-	state->m_from_mcu = 0;
+	m_port_a_in = 0;
+	m_port_a_out = 0;
+	m_ddr_a = 0;
+	m_port_b_in = 0;
+	m_port_b_out = 0;
+	m_ddr_b = 0;
+	m_mcu_sent = 0;
+	m_main_sent = 0;
+	m_from_main = 0;
+	m_from_mcu = 0;
 }
 
 /* Note: lsasquad clock values are not verified */
@@ -633,8 +631,8 @@ static MACHINE_CONFIG_START( lsasquad, lsasquad_state )
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
-	MCFG_MACHINE_START(lsasquad)
-	MCFG_MACHINE_RESET(lsasquad)
+	MCFG_MACHINE_START_OVERRIDE(lsasquad_state,lsasquad)
+	MCFG_MACHINE_RESET_OVERRIDE(lsasquad_state,lsasquad)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -689,8 +687,8 @@ static MACHINE_CONFIG_START( daikaiju, lsasquad_state )
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
-	MCFG_MACHINE_START(lsasquad)
-	MCFG_MACHINE_RESET(lsasquad)
+	MCFG_MACHINE_START_OVERRIDE(lsasquad_state,lsasquad)
+	MCFG_MACHINE_RESET_OVERRIDE(lsasquad_state,lsasquad)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

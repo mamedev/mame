@@ -12,7 +12,7 @@
 #include "includes/orion.h"
 #include "machine/ram.h"
 
-VIDEO_START( orion128 )
+VIDEO_START_MEMBER(orion_state,orion128)
 {
 }
 
@@ -108,9 +108,9 @@ static const rgb_t orion128_palette[18] = {
 	MAKE_RGB(0x32, 0xfa, 0xfa)	// 11
 };
 
-PALETTE_INIT( orion128 )
+PALETTE_INIT_MEMBER(orion_state,orion128 )
 {
-	palette_set_colors(machine, 0, orion128_palette, ARRAY_LENGTH(orion128_palette));
+	palette_set_colors(machine(), 0, orion128_palette, ARRAY_LENGTH(orion128_palette));
 }
 
 

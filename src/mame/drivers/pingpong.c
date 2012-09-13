@@ -477,8 +477,6 @@ static MACHINE_CONFIG_START( pingpong, pingpong_state )
 	MCFG_GFXDECODE(pingpong)
 	MCFG_PALETTE_LENGTH(64*4+64*4)
 
-	MCFG_PALETTE_INIT(pingpong)
-	MCFG_VIDEO_START(pingpong)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

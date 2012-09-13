@@ -206,7 +206,6 @@ static MACHINE_CONFIG_START( stlforce, stlforce_state )
 	MCFG_GFXDECODE(stlforce)
 	MCFG_PALETTE_LENGTH(0x800)
 
-	MCFG_VIDEO_START(stlforce)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -35,14 +35,17 @@ public:
 	DECLARE_WRITE8_MEMBER(sprint4_bang_w);
 	DECLARE_WRITE8_MEMBER(sprint4_attract_w);
 	TILE_GET_INFO_MEMBER(sprint4_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/sprint4.c -----------*/
 
-PALETTE_INIT( sprint4 );
+
 
 SCREEN_VBLANK( sprint4 );
-VIDEO_START( sprint4 );
+
 SCREEN_UPDATE_IND16( sprint4 );
 

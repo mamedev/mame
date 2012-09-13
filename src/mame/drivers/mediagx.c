@@ -183,6 +183,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mediagx_pic8259_1_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_DRIVER_INIT(a51site4);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 // Display controller registers
@@ -227,12 +230,12 @@ static const rgb_t cga_palette[16] =
 	MAKE_RGB( 0xff, 0x55, 0x55 ), MAKE_RGB( 0xff, 0x55, 0xff ), MAKE_RGB( 0xff, 0xff, 0x55 ), MAKE_RGB( 0xff, 0xff, 0xff ),
 };
 
-static VIDEO_START(mediagx)
+void mediagx_state::video_start()
 {
 	int i;
 	for (i=0; i < 16; i++)
 	{
-		palette_set_color(machine, i, cga_palette[i]);
+		palette_set_color(machine(), i, cga_palette[i]);
 	}
 }
 
@@ -1050,37 +1053,35 @@ static IRQ_CALLBACK(irq_callback)
 	return pic8259_acknowledge( state->m_pic8259_1);
 }
 
-static MACHINE_START(mediagx)
+void mediagx_state::machine_start()
 {
-	mediagx_state *state = machine.driver_data<mediagx_state>();
 
-	state->m_pit8254 = machine.device<pit8254_device>( "pit8254" );
-	state->m_pic8259_1 = machine.device<pic8259_device>( "pic8259_master" );
-	state->m_pic8259_2 = machine.device<pic8259_device>( "pic8259_slave" );
-	state->m_dma8237_1 = machine.device<i8237_device>( "dma8237_1" );
-	state->m_dma8237_2 = machine.device<i8237_device>( "dma8237_2" );
+	m_pit8254 = machine().device<pit8254_device>( "pit8254" );
+	m_pic8259_1 = machine().device<pic8259_device>( "pic8259_master" );
+	m_pic8259_2 = machine().device<pic8259_device>( "pic8259_slave" );
+	m_dma8237_1 = machine().device<i8237_device>( "dma8237_1" );
+	m_dma8237_2 = machine().device<i8237_device>( "dma8237_2" );
 
-	state->m_dacl = auto_alloc_array(machine, INT16, 65536);
-	state->m_dacr = auto_alloc_array(machine, INT16, 65536);
+	m_dacl = auto_alloc_array(machine(), INT16, 65536);
+	m_dacr = auto_alloc_array(machine(), INT16, 65536);
 }
 
-static MACHINE_RESET(mediagx)
+void mediagx_state::machine_reset()
 {
-	mediagx_state *state = machine.driver_data<mediagx_state>();
-	UINT8 *rom = state->memregion("bios")->base();
+	UINT8 *rom = memregion("bios")->base();
 
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 
-	memcpy(state->m_bios_ram, rom, 0x40000);
-	machine.device("maincpu")->reset();
+	memcpy(m_bios_ram, rom, 0x40000);
+	machine().device("maincpu")->reset();
 
-	timer_device *sound_timer = machine.device<timer_device>("sound_timer");
+	timer_device *sound_timer = machine().device<timer_device>("sound_timer");
 	sound_timer->adjust(attotime::from_msec(10));
 
-	state->m_dmadac[0] = machine.device<dmadac_sound_device>("dac1");
-	state->m_dmadac[1] = machine.device<dmadac_sound_device>("dac2");
-	dmadac_enable(&state->m_dmadac[0], 2, 1);
-	machine.device("ide")->reset();
+	m_dmadac[0] = machine().device<dmadac_sound_device>("dac1");
+	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
+	dmadac_enable(&m_dmadac[0], 2, 1);
+	machine().device("ide")->reset();
 }
 
 /*************************************************************
@@ -1165,8 +1166,6 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 	MCFG_CPU_PROGRAM_MAP(mediagx_map)
 	MCFG_CPU_IO_MAP(mediagx_io)
 
-	MCFG_MACHINE_START(mediagx)
-	MCFG_MACHINE_RESET(mediagx)
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(18, NULL, cx5510_pci_r, cx5510_pci_w)
@@ -1199,7 +1198,6 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 	MCFG_GFXDECODE(CGA)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(mediagx)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -20,11 +20,13 @@ public:
 	DECLARE_READ8_MEMBER(suprloco_control_r);
 	DECLARE_DRIVER_INIT(suprloco);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/suprloco.c -----------*/
 
-PALETTE_INIT( suprloco );
-VIDEO_START( suprloco );
+
+
 SCREEN_UPDATE_IND16( suprloco );

@@ -46,6 +46,9 @@ public:
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
+	virtual void video_start();
+	DECLARE_VIDEO_START(ginkun);
+	DECLARE_VIDEO_START(riot);
 };
 
 
@@ -53,7 +56,7 @@ public:
 
 
 
-VIDEO_START( fstarfrc );
-VIDEO_START( ginkun );
-VIDEO_START( riot );
+
+
+
 SCREEN_UPDATE_RGB32( tecmo16 );

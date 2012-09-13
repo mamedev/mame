@@ -37,10 +37,11 @@ public:
 	DECLARE_READ32_MEMBER(main_cycle_r);
 	DECLARE_READ16_MEMBER(sub_cycle_r);
 	DECLARE_DRIVER_INIT(superchs);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/superchs.c -----------*/
 
-VIDEO_START( superchs );
+
 SCREEN_UPDATE_IND16( superchs );

@@ -103,6 +103,11 @@ public:
 	DECLARE_WRITE8_MEMBER(payen_a_w);
 	DECLARE_WRITE8_MEMBER(display_c_w);
 	DECLARE_DRIVER_INIT(j6fbcrz);
+	DECLARE_MACHINE_START(jpmimpct);
+	DECLARE_MACHINE_RESET(jpmimpct);
+	DECLARE_VIDEO_START(jpmimpct);
+	DECLARE_MACHINE_START(impctawp);
+	DECLARE_MACHINE_RESET(impctawp);
 };
 
 
@@ -113,4 +118,4 @@ void jpmimpct_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg
 void jpmimpct_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg);
 void jpmimpct_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params);
 
-VIDEO_START( jpmimpct );
+

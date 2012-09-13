@@ -50,19 +50,18 @@ static void update_interrupts(running_machine &machine)
 }
 
 
-static MACHINE_START( eprom )
+MACHINE_START_MEMBER(eprom_state,eprom)
 {
-	atarigen_init(machine);
+	atarigen_init(machine());
 }
 
 
-static MACHINE_RESET( eprom )
+MACHINE_RESET_MEMBER(eprom_state,eprom)
 {
-	eprom_state *state = machine.driver_data<eprom_state>();
 
-	atarigen_eeprom_reset(state);
-	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine.primary_screen, eprom_scanline_update, 8);
+	atarigen_eeprom_reset(this);
+	atarigen_interrupt_reset(this, update_interrupts);
+	atarigen_scanline_timer_reset(*machine().primary_screen, eprom_scanline_update, 8);
 	atarijsa_reset();
 }
 
@@ -414,8 +413,8 @@ static MACHINE_CONFIG_START( eprom, eprom_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(eprom)
-	MCFG_MACHINE_RESET(eprom)
+	MCFG_MACHINE_START_OVERRIDE(eprom_state,eprom)
+	MCFG_MACHINE_RESET_OVERRIDE(eprom_state,eprom)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
@@ -429,7 +428,7 @@ static MACHINE_CONFIG_START( eprom, eprom_state )
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(eprom)
 
-	MCFG_VIDEO_START(eprom)
+	MCFG_VIDEO_START_OVERRIDE(eprom_state,eprom)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(jsa_i_mono_speech)
@@ -445,8 +444,8 @@ static MACHINE_CONFIG_START( klaxp, eprom_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(eprom)
-	MCFG_MACHINE_RESET(eprom)
+	MCFG_MACHINE_START_OVERRIDE(eprom_state,eprom)
+	MCFG_MACHINE_RESET_OVERRIDE(eprom_state,eprom)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
@@ -460,7 +459,7 @@ static MACHINE_CONFIG_START( klaxp, eprom_state )
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(eprom)
 
-	MCFG_VIDEO_START(eprom)
+	MCFG_VIDEO_START_OVERRIDE(eprom_state,eprom)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(jsa_ii_mono)
@@ -476,8 +475,8 @@ static MACHINE_CONFIG_START( guts, eprom_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(eprom)
-	MCFG_MACHINE_RESET(eprom)
+	MCFG_MACHINE_START_OVERRIDE(eprom_state,eprom)
+	MCFG_MACHINE_RESET_OVERRIDE(eprom_state,eprom)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
@@ -491,7 +490,7 @@ static MACHINE_CONFIG_START( guts, eprom_state )
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(guts)
 
-	MCFG_VIDEO_START(guts)
+	MCFG_VIDEO_START_OVERRIDE(eprom_state,guts)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(jsa_ii_mono)

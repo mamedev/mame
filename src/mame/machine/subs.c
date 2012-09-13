@@ -11,13 +11,12 @@
 /***************************************************************************
 subs_init_machine
 ***************************************************************************/
-MACHINE_RESET( subs )
+void subs_state::machine_reset()
 {
-	subs_state *state = machine.driver_data<subs_state>();
-	state->m_steering_buf1 = 0;
-	state->m_steering_buf2 = 0;
-	state->m_steering_val1 = 0x00;
-	state->m_steering_val2 = 0x00;
+	m_steering_buf1 = 0;
+	m_steering_buf2 = 0;
+	m_steering_val1 = 0x00;
+	m_steering_val2 = 0x00;
 }
 
 /***************************************************************************

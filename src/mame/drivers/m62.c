@@ -928,29 +928,27 @@ static GFXDECODE_START( youjyudn )
 GFXDECODE_END
 
 
-static MACHINE_START( m62 )
+void m62_state::machine_start()
 {
-	m62_state *state = machine.driver_data<m62_state>();
 
-	state->save_item(NAME(state->m_ldrun2_bankswap));
-	state->save_item(NAME(state->m_bankcontrol));
+	save_item(NAME(m_ldrun2_bankswap));
+	save_item(NAME(m_bankcontrol));
 }
 
-static MACHINE_RESET( m62 )
+void m62_state::machine_reset()
 {
-	m62_state *state = machine.driver_data<m62_state>();
 
-	state->m_flipscreen = 0;
-	state->m_m62_background_hscroll = 0;
-	state->m_m62_background_vscroll = 0;
-	state->m_kidniki_background_bank = 0;
-	state->m_kidniki_text_vscroll = 0;
-	state->m_ldrun3_topbottom_mask = 0;
-	state->m_spelunkr_palbank = 0;
+	m_flipscreen = 0;
+	m_m62_background_hscroll = 0;
+	m_m62_background_vscroll = 0;
+	m_kidniki_background_bank = 0;
+	m_kidniki_text_vscroll = 0;
+	m_ldrun3_topbottom_mask = 0;
+	m_spelunkr_palbank = 0;
 
-	state->m_ldrun2_bankswap = 0;
-	state->m_bankcontrol[0] = 0;
-	state->m_bankcontrol[1] = 0;
+	m_ldrun2_bankswap = 0;
+	m_bankcontrol[0] = 0;
+	m_bankcontrol[1] = 0;
 }
 
 static MACHINE_CONFIG_START( ldrun, m62_state )
@@ -961,8 +959,6 @@ static MACHINE_CONFIG_START( ldrun, m62_state )
 	MCFG_CPU_IO_MAP(kungfum_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(m62)
-	MCFG_MACHINE_RESET(m62)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -975,8 +971,6 @@ static MACHINE_CONFIG_START( ldrun, m62_state )
 	MCFG_GFXDECODE(ldrun)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_PALETTE_INIT(m62)
-	MCFG_VIDEO_START(ldrun)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(m62_audio)
@@ -996,7 +990,7 @@ static MACHINE_CONFIG_DERIVED( kungfum, ldrun )
 	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(kungfum)
 
-	MCFG_VIDEO_START(kungfum)
+	MCFG_VIDEO_START_OVERRIDE(m62_state,kungfum)
 MACHINE_CONFIG_END
 
 
@@ -1015,8 +1009,8 @@ static MACHINE_CONFIG_DERIVED( battroad, ldrun )
 	MCFG_GFXDECODE(battroad)
 	MCFG_PALETTE_LENGTH(544)
 
-	MCFG_PALETTE_INIT(battroad)
-	MCFG_VIDEO_START(battroad)
+	MCFG_PALETTE_INIT_OVERRIDE(m62_state,battroad)
+	MCFG_VIDEO_START_OVERRIDE(m62_state,battroad)
 MACHINE_CONFIG_END
 
 
@@ -1027,7 +1021,7 @@ static MACHINE_CONFIG_DERIVED( ldrun2, ldrun )
 	MCFG_CPU_PROGRAM_MAP(ldrun2_map)
 	MCFG_CPU_IO_MAP(ldrun2_io_map)
 
-	MCFG_VIDEO_START(ldrun2)
+	MCFG_VIDEO_START_OVERRIDE(m62_state,ldrun2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(ldrun)
 MACHINE_CONFIG_END
@@ -1042,7 +1036,7 @@ static MACHINE_CONFIG_DERIVED( ldrun3, ldrun )
 
 	/* video hardware */
 	MCFG_GFXDECODE(ldrun3)
-	MCFG_VIDEO_START(ldrun2)
+	MCFG_VIDEO_START_OVERRIDE(m62_state,ldrun2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(ldrun3)
 MACHINE_CONFIG_END
@@ -1057,7 +1051,7 @@ static MACHINE_CONFIG_DERIVED( ldrun4, ldrun )
 
 	/* video hardware */
 	MCFG_GFXDECODE(ldrun3)
-	MCFG_VIDEO_START(ldrun4)
+	MCFG_VIDEO_START_OVERRIDE(m62_state,ldrun4)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(ldrun4)
 MACHINE_CONFIG_END
@@ -1073,8 +1067,8 @@ static MACHINE_CONFIG_DERIVED( lotlot, ldrun )
 	MCFG_GFXDECODE(lotlot)
 	MCFG_PALETTE_LENGTH(768)
 
-	MCFG_PALETTE_INIT(lotlot)
-	MCFG_VIDEO_START(lotlot)
+	MCFG_PALETTE_INIT_OVERRIDE(m62_state,lotlot)
+	MCFG_VIDEO_START_OVERRIDE(m62_state,lotlot)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(lotlot)
 MACHINE_CONFIG_END
@@ -1090,7 +1084,7 @@ static MACHINE_CONFIG_DERIVED( kidniki, ldrun )
 	/* video hardware */
 	MCFG_GFXDECODE(kidniki)
 
-	MCFG_VIDEO_START(kidniki)
+	MCFG_VIDEO_START_OVERRIDE(m62_state,kidniki)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(kidniki)
 MACHINE_CONFIG_END
@@ -1105,7 +1099,7 @@ static MACHINE_CONFIG_DERIVED( spelunkr, ldrun )
 	/* video hardware */
 	MCFG_GFXDECODE(spelunkr)
 
-	MCFG_VIDEO_START(spelunkr)
+	MCFG_VIDEO_START_OVERRIDE(m62_state,spelunkr)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(spelunkr)
 MACHINE_CONFIG_END
@@ -1121,8 +1115,8 @@ static MACHINE_CONFIG_DERIVED( spelunk2, ldrun )
 	MCFG_GFXDECODE(spelunk2)
 	MCFG_PALETTE_LENGTH(768)
 
-	MCFG_PALETTE_INIT(spelunk2)
-	MCFG_VIDEO_START(spelunk2)
+	MCFG_PALETTE_INIT_OVERRIDE(m62_state,spelunk2)
+	MCFG_VIDEO_START_OVERRIDE(m62_state,spelunk2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(spelunk2)
 MACHINE_CONFIG_END
@@ -1142,7 +1136,7 @@ static MACHINE_CONFIG_DERIVED( youjyudn, ldrun )
 	MCFG_SCREEN_UPDATE_STATIC(youjyudn)
 	MCFG_GFXDECODE(youjyudn)
 
-	MCFG_VIDEO_START(youjyudn)
+	MCFG_VIDEO_START_OVERRIDE(m62_state,youjyudn)
 MACHINE_CONFIG_END
 
 
@@ -1157,7 +1151,7 @@ static MACHINE_CONFIG_DERIVED( horizon, ldrun )
 	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(horizon)
 
-	MCFG_VIDEO_START(horizon)
+	MCFG_VIDEO_START_OVERRIDE(m62_state,horizon)
 MACHINE_CONFIG_END
 
 

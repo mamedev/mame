@@ -39,6 +39,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(by133_cb2);
 	DECLARE_READ8_MEMBER(by133_portb_r);
 	DECLARE_WRITE8_MEMBER(by133_portb_w);
+	virtual void machine_reset();
 };
 
 
@@ -154,10 +155,9 @@ static const pia6821_interface videopia_intf =
 };
 
 
-static MACHINE_RESET( by133 )
+void by133_state::machine_reset()
 {
-	by133_state *state = machine.driver_data<by133_state>();
-	state->m_sound_port2 = 2; // forced to 010 on /reset
+	m_sound_port2 = 2; // forced to 010 on /reset
 }
 
 static MACHINE_CONFIG_START( by133, by133_state )
@@ -175,7 +175,6 @@ static MACHINE_CONFIG_START( by133, by133_state )
 
 	MCFG_PIA6821_ADD("videopia", videopia_intf)
 
-	MCFG_MACHINE_RESET(by133)
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, byvid_tms9928a_interface )

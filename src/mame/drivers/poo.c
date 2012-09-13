@@ -66,10 +66,12 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);
 	DECLARE_WRITE8_MEMBER(poo_vregs_w);
 	DECLARE_READ8_MEMBER(timer_r);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
-static VIDEO_START(unclepoo)
+void poo_state::video_start()
 {
 }
 
@@ -289,9 +291,9 @@ static GFXDECODE_START( unclepoo )
 	GFXDECODE_ENTRY( "gfx", 0, tiles8x8_layout, 0, 0x20 )
 GFXDECODE_END
 
-static PALETTE_INIT( unclepoo )
+void poo_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 
@@ -312,7 +314,7 @@ static PALETTE_INIT( unclepoo )
 		bit2 = (val >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -355,9 +357,7 @@ static MACHINE_CONFIG_START( unclepoo, poo_state )
 
 	MCFG_GFXDECODE(unclepoo)
 	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT(unclepoo)
 
-	MCFG_VIDEO_START(unclepoo)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay", AY8910, 18000000/12) /* ? Mhz */

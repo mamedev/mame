@@ -20,7 +20,7 @@
  *
  *************************************/
 
-PALETTE_INIT( arabian )
+void arabian_state::palette_init()
 {
 	int i;
 
@@ -139,7 +139,7 @@ PALETTE_INIT( arabian )
 
 		b = (bhi * 192) + (bbase * 63);
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -151,19 +151,18 @@ PALETTE_INIT( arabian )
  *
  *************************************/
 
-VIDEO_START( arabian )
+void arabian_state::video_start()
 {
-	arabian_state *state = machine.driver_data<arabian_state>();
-	UINT8 *gfxbase = state->memregion("gfx1")->base();
+	UINT8 *gfxbase = memregion("gfx1")->base();
 	int offs;
 
 	/* allocate a common bitmap to use for both planes */
 	/* plane A (top plane with motion objects) is in the upper 4 bits */
 	/* plane B (bottom plane with playfield) is in the lower 4 bits */
-	state->m_main_bitmap = auto_alloc_array(machine, UINT8, BITMAP_WIDTH * BITMAP_HEIGHT);
+	m_main_bitmap = auto_alloc_array(machine(), UINT8, BITMAP_WIDTH * BITMAP_HEIGHT);
 
 	/* allocate memory for the converted graphics data */
-	state->m_converted_gfx = auto_alloc_array(machine, UINT8, 0x8000 * 2);
+	m_converted_gfx = auto_alloc_array(machine(), UINT8, 0x8000 * 2);
 
 	/*--------------------------------------------------
         transform graphics data into more usable format
@@ -200,16 +199,16 @@ VIDEO_START( arabian )
 		v2 >>= 1;
 		p4 = (v1 & 0x01) | ((v1 & 0x10) >> 3) | ((v2 & 0x01) << 2) | ((v2 & 0x10) >> 1);
 
-		state->m_converted_gfx[offs * 4 + 3] = p1;
-		state->m_converted_gfx[offs * 4 + 2] = p2;
-		state->m_converted_gfx[offs * 4 + 1] = p3;
-		state->m_converted_gfx[offs * 4 + 0] = p4;
+		m_converted_gfx[offs * 4 + 3] = p1;
+		m_converted_gfx[offs * 4 + 2] = p2;
+		m_converted_gfx[offs * 4 + 1] = p3;
+		m_converted_gfx[offs * 4 + 0] = p4;
 	}
 
-    state->save_pointer(NAME(state->m_main_bitmap), BITMAP_WIDTH * BITMAP_HEIGHT);
-    state->save_pointer(NAME(state->m_converted_gfx), 0x8000 * 2);
-    state->save_item(NAME(state->m_video_control));
-    state->save_item(NAME(state->m_flip_screen));
+    save_pointer(NAME(m_main_bitmap), BITMAP_WIDTH * BITMAP_HEIGHT);
+    save_pointer(NAME(m_converted_gfx), 0x8000 * 2);
+    save_item(NAME(m_video_control));
+    save_item(NAME(m_flip_screen));
 }
 
 

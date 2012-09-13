@@ -251,9 +251,7 @@ static MACHINE_CONFIG_START( astrocde, astrocde_state )
 	MCFG_SCREEN_UPDATE_STATIC(astrocde)
 
 	MCFG_PALETTE_LENGTH(512)
-	MCFG_PALETTE_INIT(astrocde)
 
-	MCFG_VIDEO_START(astrocde)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

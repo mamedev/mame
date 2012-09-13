@@ -69,6 +69,10 @@ public:
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(unknown_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -87,13 +91,13 @@ TILE_GET_INFO_MEMBER(koikoi_state::get_tile_info)
 	SET_TILE_INFO_MEMBER( 0, code, color, flip);
 }
 
-static PALETTE_INIT( koikoi )
+void koikoi_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x10);
+	machine().colortable = colortable_alloc(machine(), 0x10);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x10; i++)
@@ -119,7 +123,7 @@ static PALETTE_INIT( koikoi )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -129,14 +133,13 @@ static PALETTE_INIT( koikoi )
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 
-static VIDEO_START(koikoi)
+void koikoi_state::video_start()
 {
-	koikoi_state *state = machine.driver_data<koikoi_state>();
-	state->m_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(koikoi_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(koikoi_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16(koikoi)
@@ -335,27 +338,25 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
-static MACHINE_START( koikoi )
+void koikoi_state::machine_start()
 {
-	koikoi_state *state = machine.driver_data<koikoi_state>();
 
-	state->save_item(NAME(state->m_inputcnt));
-	state->save_item(NAME(state->m_inputval));
-	state->save_item(NAME(state->m_inputlen));
-	state->save_item(NAME(state->m_ioram));
+	save_item(NAME(m_inputcnt));
+	save_item(NAME(m_inputval));
+	save_item(NAME(m_inputlen));
+	save_item(NAME(m_ioram));
 }
 
-static MACHINE_RESET( koikoi )
+void koikoi_state::machine_reset()
 {
-	koikoi_state *state = machine.driver_data<koikoi_state>();
 	int i;
 
-	state->m_inputcnt = -1;
-	state->m_inputval = 0;
-	state->m_inputlen = 0;
+	m_inputcnt = -1;
+	m_inputval = 0;
+	m_inputlen = 0;
 
 	for (i = 0; i < 8; i++)
-		state->m_ioram[i] = 0;
+		m_ioram[i] = 0;
 }
 
 static MACHINE_CONFIG_START( koikoi, koikoi_state )
@@ -366,8 +367,6 @@ static MACHINE_CONFIG_START( koikoi, koikoi_state )
 	MCFG_CPU_IO_MAP(koikoi_io_map)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MCFG_MACHINE_START(koikoi)
-	MCFG_MACHINE_RESET(koikoi)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -379,9 +378,7 @@ static MACHINE_CONFIG_START( koikoi, koikoi_state )
 
 	MCFG_GFXDECODE(koikoi)
 	MCFG_PALETTE_LENGTH(8*32)
-	MCFG_PALETTE_INIT(koikoi)
 
-	MCFG_VIDEO_START(koikoi)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

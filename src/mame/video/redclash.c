@@ -18,13 +18,13 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( redclash )
+PALETTE_INIT_MEMBER(ladybug_state,redclash)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x40);
+	machine().colortable = colortable_alloc(machine(), 0x40);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -47,7 +47,7 @@ PALETTE_INIT( redclash )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = 0x47 * bit0 + 0x97 * bit1;
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* star colors */
@@ -70,7 +70,7 @@ PALETTE_INIT( redclash )
 		bit0 = ((i - 0x20) >> 0) & 0x01;
 		r = 0x47 * bit0;
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -80,7 +80,7 @@ PALETTE_INIT( redclash )
 	for (i = 0; i < 0x20; i++)
 	{
 		UINT8 ctabentry = ((i << 3) & 0x18) | ((i >> 2) & 0x07);
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	/* sprites */
@@ -89,15 +89,15 @@ PALETTE_INIT( redclash )
 		UINT8 ctabentry = color_prom[(i - 0x20) >> 1];
 
 		ctabentry = BITSWAP8((color_prom[i - 0x20] >> 0) & 0x0f, 7,6,5,4,0,1,2,3);
-		colortable_entry_set_value(machine.colortable, i + 0x00, ctabentry);
+		colortable_entry_set_value(machine().colortable, i + 0x00, ctabentry);
 
 		ctabentry = BITSWAP8((color_prom[i - 0x20] >> 4) & 0x0f, 7,6,5,4,0,1,2,3);
-		colortable_entry_set_value(machine.colortable, i + 0x20, ctabentry);
+		colortable_entry_set_value(machine().colortable, i + 0x20, ctabentry);
 	}
 
 	/* stars */
 	for (i = 0x60; i < 0x80; i++)
-		colortable_entry_set_value(machine.colortable, i, (i - 0x60) + 0x20);
+		colortable_entry_set_value(machine().colortable, i, (i - 0x60) + 0x20);
 }
 
 WRITE8_HANDLER( redclash_videoram_w )
@@ -176,12 +176,11 @@ TILE_GET_INFO_MEMBER(ladybug_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-VIDEO_START( redclash )
+VIDEO_START_MEMBER(ladybug_state,redclash)
 {
-	ladybug_state *state = machine.driver_data<ladybug_state>();
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ladybug_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ladybug_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

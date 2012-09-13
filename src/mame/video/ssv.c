@@ -192,20 +192,19 @@ static void ssv_drawgfx(	bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_el
 }
 
 
-VIDEO_START( ssv )
+void ssv_state::video_start()
 {
-	machine.gfx[0]->set_granularity(64); /* 256 colour sprites with palette selectable on 64 colour boundaries */
+	machine().gfx[0]->set_granularity(64); /* 256 colour sprites with palette selectable on 64 colour boundaries */
 }
 
-VIDEO_START( eaglshot )
+VIDEO_START_MEMBER(ssv_state,eaglshot)
 {
-	ssv_state *state = machine.driver_data<ssv_state>();
-	VIDEO_START_CALL(ssv);
+	ssv_state::video_start();
 
-	state->m_eaglshot_gfxram		=	auto_alloc_array(machine, UINT16, 16 * 0x40000 / 2);
+	m_eaglshot_gfxram		=	auto_alloc_array(machine(), UINT16, 16 * 0x40000 / 2);
 
-	machine.gfx[0]->set_source((UINT8 *)state->m_eaglshot_gfxram);
-	machine.gfx[1]->set_source((UINT8 *)state->m_eaglshot_gfxram);
+	machine().gfx[0]->set_source((UINT8 *)m_eaglshot_gfxram);
+	machine().gfx[1]->set_source((UINT8 *)m_eaglshot_gfxram);
 }
 
 TILE_GET_INFO_MEMBER(ssv_state::get_tile_info_0)
@@ -222,16 +221,15 @@ WRITE16_MEMBER(ssv_state::gdfs_tmapram_w)
 	m_gdfs_tmap->mark_tile_dirty(offset);
 }
 
-VIDEO_START( gdfs )
+VIDEO_START_MEMBER(ssv_state,gdfs)
 {
-	ssv_state *state = machine.driver_data<ssv_state>();
 
-	VIDEO_START_CALL(ssv);
+	ssv_state::video_start();
 
 
-	state->m_gdfs_tmap	= &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ssv_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS, 16,16, 0x100,0x100);
+	m_gdfs_tmap	= &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ssv_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 16,16, 0x100,0x100);
 
-	state->m_gdfs_tmap->set_transparent_pen(0);
+	m_gdfs_tmap->set_transparent_pen(0);
 }
 
 /***************************************************************************

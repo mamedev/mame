@@ -28,10 +28,13 @@ public:
 	DECLARE_WRITE8_MEMBER(atetris_videoram_w);
 	DECLARE_DRIVER_INIT(atetris);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 /*----------- defined in video/atetris.c -----------*/
 
-VIDEO_START( atetris );
+
 SCREEN_UPDATE_IND16( atetris );
 

@@ -300,26 +300,24 @@ GFXDECODE_END
 
 
 
-static MACHINE_START( gng )
+void gng_state::machine_start()
 {
-	gng_state *state = machine.driver_data<gng_state>();
 
-	UINT8 *rombase = state->memregion("maincpu")->base();
-	state->membank("bank1")->configure_entries(0, 4, &rombase[0x10000], 0x2000);
-	state->membank("bank1")->configure_entry(4, &rombase[0x4000]);
+	UINT8 *rombase = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 4, &rombase[0x10000], 0x2000);
+	membank("bank1")->configure_entry(4, &rombase[0x4000]);
 
-	state->save_item(NAME(state->m_scrollx));
-	state->save_item(NAME(state->m_scrolly));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
 }
 
-static MACHINE_RESET( gng )
+void gng_state::machine_reset()
 {
-	gng_state *state = machine.driver_data<gng_state>();
 
-	state->m_scrollx[0] = 0;
-	state->m_scrollx[1] = 0;
-	state->m_scrolly[0] = 0;
-	state->m_scrolly[1] = 0;
+	m_scrollx[0] = 0;
+	m_scrollx[1] = 0;
+	m_scrolly[0] = 0;
+	m_scrolly[1] = 0;
 
 	{
 		int i;
@@ -328,14 +326,14 @@ static MACHINE_RESET( gng )
                  For now let's fill everything with white colors until we have better info about it */
 		for(i=0;i<0x100;i+=4)
 		{
-			state->m_generic_paletteram_8[i] = state->m_generic_paletteram2_8[i] = 0x00;
-			state->m_generic_paletteram_8[i+1] = state->m_generic_paletteram2_8[i+1] = 0x55;
-			state->m_generic_paletteram_8[i+2] = state->m_generic_paletteram2_8[i+2] = 0xaa;
-			state->m_generic_paletteram_8[i+3] = state->m_generic_paletteram2_8[i+3] = 0xff;
-			palette_set_color_rgb(machine,i+0,0x00,0x00,0x00);
-			palette_set_color_rgb(machine,i+1,0x55,0x55,0x55);
-			palette_set_color_rgb(machine,i+2,0xaa,0xaa,0xaa);
-			palette_set_color_rgb(machine,i+3,0xff,0xff,0xff);
+			m_generic_paletteram_8[i] = m_generic_paletteram2_8[i] = 0x00;
+			m_generic_paletteram_8[i+1] = m_generic_paletteram2_8[i+1] = 0x55;
+			m_generic_paletteram_8[i+2] = m_generic_paletteram2_8[i+2] = 0xaa;
+			m_generic_paletteram_8[i+3] = m_generic_paletteram2_8[i+3] = 0xff;
+			palette_set_color_rgb(machine(),i+0,0x00,0x00,0x00);
+			palette_set_color_rgb(machine(),i+1,0x55,0x55,0x55);
+			palette_set_color_rgb(machine(),i+2,0xaa,0xaa,0xaa);
+			palette_set_color_rgb(machine(),i+3,0xff,0xff,0xff);
 		}
 	}
 }
@@ -351,8 +349,6 @@ static MACHINE_CONFIG_START( gng, gng_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)
 
-	MCFG_MACHINE_START(gng)
-	MCFG_MACHINE_RESET(gng)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -368,7 +364,6 @@ static MACHINE_CONFIG_START( gng, gng_state )
 	MCFG_GFXDECODE(gng)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(gng)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

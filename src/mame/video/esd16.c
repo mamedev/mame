@@ -133,26 +133,25 @@ WRITE16_MEMBER(esd16_state::esd16_tilemap0_color_jumppop_w)
 ***************************************************************************/
 
 
-VIDEO_START( esd16 )
+void esd16_state::video_start()
 {
-	esd16_state *state = machine.driver_data<esd16_state>();
 
-	state->m_tilemap_0 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
-	state->m_tilemap_1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_1),state), TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
+	m_tilemap_0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
+	m_tilemap_1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
 
 	/* swatpolc changes tilemap 0 to 16x16 at various times */
-	state->m_tilemap_0_16x16 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_0_16x16),state), TILEMAP_SCAN_ROWS, 16,16, 0x40, 0x40);
+	m_tilemap_0_16x16 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_0_16x16),this), TILEMAP_SCAN_ROWS, 16,16, 0x40, 0x40);
 
 	/* hedpanic changes tilemap 1 to 16x16 at various times */
-	state->m_tilemap_1_16x16 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_1_16x16),state), TILEMAP_SCAN_ROWS, 16,16, 0x40, 0x40);
+	m_tilemap_1_16x16 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_1_16x16),this), TILEMAP_SCAN_ROWS, 16,16, 0x40, 0x40);
 
-	state->m_tilemap_0->set_scrolldx(-0x60 + 2, -0x60);
-	state->m_tilemap_1->set_scrolldx(-0x60, -0x60 + 2);
-	state->m_tilemap_0_16x16->set_scrolldx(-0x60 + 2, -0x60);
-	state->m_tilemap_1_16x16->set_scrolldx(-0x60, -0x60 + 2);
+	m_tilemap_0->set_scrolldx(-0x60 + 2, -0x60);
+	m_tilemap_1->set_scrolldx(-0x60, -0x60 + 2);
+	m_tilemap_0_16x16->set_scrolldx(-0x60 + 2, -0x60);
+	m_tilemap_1_16x16->set_scrolldx(-0x60, -0x60 + 2);
 
-	state->m_tilemap_1->set_transparent_pen(0x00);
-	state->m_tilemap_1_16x16->set_transparent_pen(0x00);
+	m_tilemap_1->set_transparent_pen(0x00);
+	m_tilemap_1_16x16->set_transparent_pen(0x00);
 }
 
 

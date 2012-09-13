@@ -246,6 +246,8 @@ public:
 
 	required_shared_ptr<UINT16> m_videoram;
 	DECLARE_READ16_MEMBER(unk_r);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -253,7 +255,7 @@ public:
 *     Video Hardware     *
 *************************/
 
-static VIDEO_START( goldngam )
+void goldngam_state::video_start()
 {
 
 }
@@ -281,7 +283,7 @@ static SCREEN_UPDATE_IND16( goldngam )
 }
 
 
-static PALETTE_INIT( goldngam )
+void goldngam_state::palette_init()
 {
 
 }
@@ -570,10 +572,8 @@ static MACHINE_CONFIG_START( swisspkr, goldngam_state )
 
 	MCFG_GFXDECODE(goldngam)
 
-	MCFG_PALETTE_INIT(goldngam)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(goldngam)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

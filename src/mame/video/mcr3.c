@@ -67,13 +67,13 @@ TILE_GET_INFO_MEMBER(mcr3_state::spyhunt_get_alpha_tile_info)
  *
  *************************************/
 
-PALETTE_INIT( spyhunt )
+PALETTE_INIT_MEMBER(mcr3_state,spyhunt)
 {
 	/* alpha colors are hard-coded */
-	palette_set_color(machine,4*16+0,MAKE_RGB(0x00,0x00,0x00));
-	palette_set_color(machine,4*16+1,MAKE_RGB(0x00,0xff,0x00));
-	palette_set_color(machine,4*16+2,MAKE_RGB(0x00,0x00,0xff));
-	palette_set_color(machine,4*16+3,MAKE_RGB(0xff,0xff,0xff));
+	palette_set_color(machine(),4*16+0,MAKE_RGB(0x00,0x00,0x00));
+	palette_set_color(machine(),4*16+1,MAKE_RGB(0x00,0xff,0x00));
+	palette_set_color(machine(),4*16+2,MAKE_RGB(0x00,0x00,0xff));
+	palette_set_color(machine(),4*16+3,MAKE_RGB(0xff,0xff,0xff));
 }
 
 
@@ -85,38 +85,35 @@ PALETTE_INIT( spyhunt )
  *************************************/
 
 #ifdef UNUSED_FUNCTION
-VIDEO_START( mcr3 )
+VIDEO_START_MEMBER(mcr3_state,mcr3)
 {
-	mcr3_state *state = machine.driver_data<mcr3_state>();
 	/* initialize the background tilemap */
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mcr3_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  16,16, 32,30);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mcr3_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
 }
 #endif
 
 
-VIDEO_START( mcrmono )
+VIDEO_START_MEMBER(mcr3_state,mcrmono)
 {
-	mcr3_state *state = machine.driver_data<mcr3_state>();
 	/* initialize the background tilemap */
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mcr3_state::mcrmono_get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  16,16, 32,30);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mcr3_state::mcrmono_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
 }
 
 
-VIDEO_START( spyhunt )
+VIDEO_START_MEMBER(mcr3_state,spyhunt)
 {
-	mcr3_state *state = machine.driver_data<mcr3_state>();
 	/* initialize the background tilemap */
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mcr3_state::spyhunt_get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(mcr3_state::spyhunt_bg_scan),state),  64,32, 64,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mcr3_state::spyhunt_get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(mcr3_state::spyhunt_bg_scan),this),  64,32, 64,32);
 
 	/* initialize the text tilemap */
-	state->m_alpha_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mcr3_state::spyhunt_get_alpha_tile_info),state), TILEMAP_SCAN_COLS,  16,16, 32,32);
-	state->m_alpha_tilemap->set_transparent_pen(0);
-	state->m_alpha_tilemap->set_scrollx(0, 16);
+	m_alpha_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mcr3_state::spyhunt_get_alpha_tile_info),this), TILEMAP_SCAN_COLS,  16,16, 32,32);
+	m_alpha_tilemap->set_transparent_pen(0);
+	m_alpha_tilemap->set_scrollx(0, 16);
 
-	state_save_register_global(machine, state->m_spyhunt_sprite_color_mask);
-	state_save_register_global(machine, state->m_spyhunt_scrollx);
-	state_save_register_global(machine, state->m_spyhunt_scrolly);
-	state_save_register_global(machine, state->m_spyhunt_scroll_offset);
+	state_save_register_global(machine(), m_spyhunt_sprite_color_mask);
+	state_save_register_global(machine(), m_spyhunt_scrollx);
+	state_save_register_global(machine(), m_spyhunt_scrolly);
+	state_save_register_global(machine(), m_spyhunt_scroll_offset);
 }
 
 

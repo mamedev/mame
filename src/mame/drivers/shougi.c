@@ -110,6 +110,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nmi_disable_and_clear_line_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_READ8_MEMBER(dummy_r);
+	virtual void palette_init();
 };
 
 
@@ -131,9 +132,9 @@ public:
 ***************************************************************************/
 
 
-static PALETTE_INIT( shougi )
+void shougi_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 	static const int resistances_b[2]  = { 470, 220 };
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -145,7 +146,7 @@ static PALETTE_INIT( shougi )
 			3,	resistances_rg,	weights_g,	1000, 0,
 			2,	resistances_b,	weights_b,	1000, 0);
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -166,7 +167,7 @@ static PALETTE_INIT( shougi )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -428,7 +429,6 @@ static MACHINE_CONFIG_START( shougi, shougi_state )
 
 	MCFG_PALETTE_LENGTH(32)
 
-	MCFG_PALETTE_INIT(shougi)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

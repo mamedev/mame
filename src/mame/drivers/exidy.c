@@ -791,10 +791,9 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( teetert )
+MACHINE_START_MEMBER(exidy_state,teetert)
 {
-	exidy_state *state = machine.driver_data<exidy_state>();
-	state_save_register_global(machine, state->m_last_dial);
+	state_save_register_global(machine(), m_last_dial);
 }
 
 /*************************************
@@ -811,7 +810,6 @@ static MACHINE_CONFIG_START( base, exidy_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_VIDEO_START(exidy)
 	MCFG_GFXDECODE(exidy)
 	MCFG_PALETTE_LENGTH(8)
 
@@ -882,7 +880,7 @@ static MACHINE_CONFIG_DERIVED( teetert, venture )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,10*60)
 
-	MCFG_MACHINE_START( teetert )
+	MCFG_MACHINE_START_OVERRIDE(exidy_state, teetert )
 
 MACHINE_CONFIG_END
 

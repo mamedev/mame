@@ -9,32 +9,32 @@ Functions to emulate the video hardware of the machine.
 #include "includes/srmp2.h"
 #include "video/seta001.h"
 
-PALETTE_INIT( srmp2 )
+PALETTE_INIT_MEMBER(srmp2_state,srmp2)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		int col;
 
-		col = (color_prom[i] << 8) + color_prom[i + machine.total_colors()];
-		palette_set_color_rgb(machine,i ^ 0x0f,pal5bit(col >> 10),pal5bit(col >> 5),pal5bit(col >> 0));
+		col = (color_prom[i] << 8) + color_prom[i + machine().total_colors()];
+		palette_set_color_rgb(machine(),i ^ 0x0f,pal5bit(col >> 10),pal5bit(col >> 5),pal5bit(col >> 0));
 	}
 }
 
 
-PALETTE_INIT( srmp3 )
+PALETTE_INIT_MEMBER(srmp2_state,srmp3)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		int col;
 
-		col = (color_prom[i] << 8) + color_prom[i + machine.total_colors()];
-		palette_set_color_rgb(machine,i,pal5bit(col >> 10),pal5bit(col >> 5),pal5bit(col >> 0));
+		col = (color_prom[i] << 8) + color_prom[i + machine().total_colors()];
+		palette_set_color_rgb(machine(),i,pal5bit(col >> 10),pal5bit(col >> 5),pal5bit(col >> 0));
 	}
 }
 

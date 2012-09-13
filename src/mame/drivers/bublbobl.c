@@ -720,47 +720,43 @@ static const ym2203_interface ym2203_config =
  *
  *************************************/
 
-static MACHINE_START( common )
+MACHINE_START_MEMBER(bublbobl_state,common)
 {
-	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_mcu = machine.device("mcu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_slave = machine.device("slave");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_mcu = machine().device("mcu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_slave = machine().device("slave");
 
-	state->save_item(NAME(state->m_sound_nmi_enable));
-	state->save_item(NAME(state->m_pending_nmi));
-	state->save_item(NAME(state->m_sound_status));
-	state->save_item(NAME(state->m_video_enable));
+	save_item(NAME(m_sound_nmi_enable));
+	save_item(NAME(m_pending_nmi));
+	save_item(NAME(m_sound_status));
+	save_item(NAME(m_video_enable));
 }
 
-static MACHINE_RESET( common )
+MACHINE_RESET_MEMBER(bublbobl_state,common)
 {
-	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
-	state->m_sound_nmi_enable = 0;
-	state->m_pending_nmi = 0;
-	state->m_sound_status = 0;
+	m_sound_nmi_enable = 0;
+	m_pending_nmi = 0;
+	m_sound_status = 0;
 }
 
 
-static MACHINE_START( tokio )
+MACHINE_START_MEMBER(bublbobl_state,tokio)
 {
-	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
-	MACHINE_START_CALL(common);
+	MACHINE_START_CALL_MEMBER(common);
 
-	state->save_item(NAME(state->m_tokio_prot_count));
+	save_item(NAME(m_tokio_prot_count));
 }
 
-static MACHINE_RESET( tokio )
+MACHINE_RESET_MEMBER(bublbobl_state,tokio)
 {
-	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
-	MACHINE_RESET_CALL(common);
+	MACHINE_RESET_CALL_MEMBER(common);
 
-	state->m_tokio_prot_count = 0;
+	m_tokio_prot_count = 0;
 }
 
 static MACHINE_CONFIG_START( tokio, bublbobl_state )
@@ -779,8 +775,8 @@ static MACHINE_CONFIG_START( tokio, bublbobl_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
-	MCFG_MACHINE_START(tokio)
-	MCFG_MACHINE_RESET(tokio)
+	MCFG_MACHINE_START_OVERRIDE(bublbobl_state,tokio)
+	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state,tokio)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -802,44 +798,42 @@ static MACHINE_CONFIG_START( tokio, bublbobl_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_START( bublbobl )
+MACHINE_START_MEMBER(bublbobl_state,bublbobl)
 {
-	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
-	MACHINE_START_CALL(common);
+	MACHINE_START_CALL_MEMBER(common);
 
-	state->save_item(NAME(state->m_ddr1));
-	state->save_item(NAME(state->m_ddr2));
-	state->save_item(NAME(state->m_ddr3));
-	state->save_item(NAME(state->m_ddr4));
-	state->save_item(NAME(state->m_port1_in));
-	state->save_item(NAME(state->m_port2_in));
-	state->save_item(NAME(state->m_port3_in));
-	state->save_item(NAME(state->m_port4_in));
-	state->save_item(NAME(state->m_port1_out));
-	state->save_item(NAME(state->m_port2_out));
-	state->save_item(NAME(state->m_port3_out));
-	state->save_item(NAME(state->m_port4_out));
+	save_item(NAME(m_ddr1));
+	save_item(NAME(m_ddr2));
+	save_item(NAME(m_ddr3));
+	save_item(NAME(m_ddr4));
+	save_item(NAME(m_port1_in));
+	save_item(NAME(m_port2_in));
+	save_item(NAME(m_port3_in));
+	save_item(NAME(m_port4_in));
+	save_item(NAME(m_port1_out));
+	save_item(NAME(m_port2_out));
+	save_item(NAME(m_port3_out));
+	save_item(NAME(m_port4_out));
 }
 
-static MACHINE_RESET( bublbobl )
+MACHINE_RESET_MEMBER(bublbobl_state,bublbobl)
 {
-	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
-	MACHINE_RESET_CALL(common);
+	MACHINE_RESET_CALL_MEMBER(common);
 
-	state->m_ddr1 = 0;
-	state->m_ddr2 = 0;
-	state->m_ddr3 = 0;
-	state->m_ddr4 = 0;
-	state->m_port1_in = 0;
-	state->m_port2_in = 0;
-	state->m_port3_in = 0;
-	state->m_port4_in = 0;
-	state->m_port1_out = 0;
-	state->m_port2_out = 0;
-	state->m_port3_out = 0;
-	state->m_port4_out = 0;
+	m_ddr1 = 0;
+	m_ddr2 = 0;
+	m_ddr3 = 0;
+	m_ddr4 = 0;
+	m_port1_in = 0;
+	m_port2_in = 0;
+	m_port3_in = 0;
+	m_port4_in = 0;
+	m_port1_out = 0;
+	m_port2_out = 0;
+	m_port3_out = 0;
+	m_port4_out = 0;
 }
 
 static MACHINE_CONFIG_START( bublbobl, bublbobl_state )
@@ -862,8 +856,8 @@ static MACHINE_CONFIG_START( bublbobl, bublbobl_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
-	MCFG_MACHINE_START(bublbobl)
-	MCFG_MACHINE_RESET(bublbobl)
+	MCFG_MACHINE_START_OVERRIDE(bublbobl_state,bublbobl)
+	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state,bublbobl)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -885,24 +879,22 @@ static MACHINE_CONFIG_START( bublbobl, bublbobl_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_START( boblbobl )
+MACHINE_START_MEMBER(bublbobl_state,boblbobl)
 {
-	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
-	MACHINE_START_CALL(common);
+	MACHINE_START_CALL_MEMBER(common);
 
-	state->save_item(NAME(state->m_ic43_a));
-	state->save_item(NAME(state->m_ic43_b));
+	save_item(NAME(m_ic43_a));
+	save_item(NAME(m_ic43_b));
 }
 
-static MACHINE_RESET( boblbobl )
+MACHINE_RESET_MEMBER(bublbobl_state,boblbobl)
 {
-	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
-	MACHINE_RESET_CALL(common);
+	MACHINE_RESET_CALL_MEMBER(common);
 
-	state->m_ic43_a = 0;
-	state->m_ic43_b = 0;
+	m_ic43_a = 0;
+	m_ic43_b = 0;
 }
 
 static MACHINE_CONFIG_DERIVED( boblbobl, bublbobl )
@@ -911,43 +903,41 @@ static MACHINE_CONFIG_DERIVED( boblbobl, bublbobl )
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	// interrupt mode 1, unlike Bubble Bobble
 
-	MCFG_MACHINE_START(boblbobl)
-	MCFG_MACHINE_RESET(boblbobl)
+	MCFG_MACHINE_START_OVERRIDE(bublbobl_state,boblbobl)
+	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state,boblbobl)
 
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
 
-static MACHINE_START( bub68705 )
+MACHINE_START_MEMBER(bublbobl_state,bub68705)
 {
-	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
-	MACHINE_START_CALL(common);
+	MACHINE_START_CALL_MEMBER(common);
 
-	state->save_item(NAME(state->m_port_a_in));
-	state->save_item(NAME(state->m_port_a_out));
-	state->save_item(NAME(state->m_ddr_a));
-	state->save_item(NAME(state->m_port_b_in));
-	state->save_item(NAME(state->m_port_b_out));
-	state->save_item(NAME(state->m_ddr_b));
-	state->save_item(NAME(state->m_address));
-	state->save_item(NAME(state->m_latch));
+	save_item(NAME(m_port_a_in));
+	save_item(NAME(m_port_a_out));
+	save_item(NAME(m_ddr_a));
+	save_item(NAME(m_port_b_in));
+	save_item(NAME(m_port_b_out));
+	save_item(NAME(m_ddr_b));
+	save_item(NAME(m_address));
+	save_item(NAME(m_latch));
 }
 
-static MACHINE_RESET( bub68705 )
+MACHINE_RESET_MEMBER(bublbobl_state,bub68705)
 {
-	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
-	MACHINE_RESET_CALL(common);
+	MACHINE_RESET_CALL_MEMBER(common);
 
-	state->m_port_a_in = 0;
-	state->m_port_a_out = 0;
-	state->m_ddr_a = 0;
-	state->m_port_b_in = 0;
-	state->m_port_b_out = 0;
-	state->m_ddr_b = 0;
-	state->m_address = 0;
-	state->m_latch = 0;
+	m_port_a_in = 0;
+	m_port_a_out = 0;
+	m_ddr_a = 0;
+	m_port_b_in = 0;
+	m_port_b_out = 0;
+	m_ddr_b = 0;
+	m_address = 0;
+	m_latch = 0;
 }
 
 static MACHINE_CONFIG_DERIVED( bub68705, bublbobl )
@@ -957,8 +947,8 @@ static MACHINE_CONFIG_DERIVED( bub68705, bublbobl )
 	MCFG_CPU_PROGRAM_MAP(bootlegmcu_map)
 	MCFG_CPU_VBLANK_INT("screen",bublbobl_m68705_interrupt) // ??? should come from the same clock which latches the INT pin on the second Z80
 
-	MCFG_MACHINE_START(bub68705)
-	MCFG_MACHINE_RESET(bub68705)
+	MCFG_MACHINE_START_OVERRIDE(bublbobl_state,bub68705)
+	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state,bub68705)
 MACHINE_CONFIG_END
 
 

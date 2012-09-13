@@ -345,6 +345,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dwarfd_sod_callback);
 	DECLARE_DRIVER_INIT(qc);
 	DECLARE_DRIVER_INIT(dwarfd);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -778,7 +782,7 @@ static INPUT_PORTS_START( quarterh )
 INPUT_PORTS_END
 
 
-static VIDEO_START(dwarfd)
+void dwarfd_state::video_start()
 {
 }
 
@@ -985,23 +989,23 @@ static GFXDECODE_START( dwarfd )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout3, 0, 16 )
 GFXDECODE_END
 
-static PALETTE_INIT(dwarfd)
+void dwarfd_state::palette_init()
 {
 	int i;
 
 	for (i = 0; i < 256; i++)
 	{
-		int r = machine.rand()|0x80;
-		int g = machine.rand()|0x80;
-		int b = machine.rand()|0x80;
+		int r = machine().rand()|0x80;
+		int g = machine().rand()|0x80;
+		int b = machine().rand()|0x80;
 		if (i == 0) r = g = b = 0;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 	}
-	palette_set_color(machine, 8, MAKE_RGB(255, 255, 0));
-	palette_set_color(machine, 12, MAKE_RGB(127, 127, 255));
-	palette_set_color(machine, 4, MAKE_RGB(0, 255, 0));
-	palette_set_color(machine, 6, MAKE_RGB(255, 0, 0));
+	palette_set_color(machine(), 8, MAKE_RGB(255, 255, 0));
+	palette_set_color(machine(), 12, MAKE_RGB(127, 127, 255));
+	palette_set_color(machine(), 4, MAKE_RGB(0, 255, 0));
+	palette_set_color(machine(), 6, MAKE_RGB(255, 0, 0));
 }
 
 static const ay8910_interface ay8910_config =
@@ -1015,50 +1019,48 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_START( dwarfd )
+void dwarfd_state::machine_start()
 {
-	dwarfd_state *state = machine.driver_data<dwarfd_state>();
 
-	state->save_item(NAME(state->m_bank));
-	state->save_item(NAME(state->m_line));
-	state->save_item(NAME(state->m_idx));
-	state->save_item(NAME(state->m_crt_access));
+	save_item(NAME(m_bank));
+	save_item(NAME(m_line));
+	save_item(NAME(m_idx));
+	save_item(NAME(m_crt_access));
 
 	/* i8275 */
-	state->save_item(NAME(state->m_i8275Command));
-	state->save_item(NAME(state->m_i8275HorizontalCharactersRow));
-	state->save_item(NAME(state->m_i8275CommandSeqCnt));
-	state->save_item(NAME(state->m_i8275SpacedRows));
-	state->save_item(NAME(state->m_i8275VerticalRows));
-	state->save_item(NAME(state->m_i8275VerticalRetraceRows));
-	state->save_item(NAME(state->m_i8275Underline));
-	state->save_item(NAME(state->m_i8275Lines));
-	state->save_item(NAME(state->m_i8275LineCounterMode));
-	state->save_item(NAME(state->m_i8275FieldAttributeMode));
-	state->save_item(NAME(state->m_i8275CursorFormat));
-	state->save_item(NAME(state->m_i8275HorizontalRetrace));
+	save_item(NAME(m_i8275Command));
+	save_item(NAME(m_i8275HorizontalCharactersRow));
+	save_item(NAME(m_i8275CommandSeqCnt));
+	save_item(NAME(m_i8275SpacedRows));
+	save_item(NAME(m_i8275VerticalRows));
+	save_item(NAME(m_i8275VerticalRetraceRows));
+	save_item(NAME(m_i8275Underline));
+	save_item(NAME(m_i8275Lines));
+	save_item(NAME(m_i8275LineCounterMode));
+	save_item(NAME(m_i8275FieldAttributeMode));
+	save_item(NAME(m_i8275CursorFormat));
+	save_item(NAME(m_i8275HorizontalRetrace));
 }
 
-static MACHINE_RESET( dwarfd )
+void dwarfd_state::machine_reset()
 {
-	dwarfd_state *state = machine.driver_data<dwarfd_state>();
 
-	state->m_bank = 0;
-	state->m_line = 0;
-	state->m_idx = 0;
-	state->m_crt_access = 0;
-	state->m_i8275Command = 0;
-	state->m_i8275HorizontalCharactersRow = 0;
-	state->m_i8275CommandSeqCnt = 0;
-	state->m_i8275SpacedRows = 0;
-	state->m_i8275VerticalRows = 0;
-	state->m_i8275VerticalRetraceRows = 0;
-	state->m_i8275Underline = 0;
-	state->m_i8275Lines = 0;
-	state->m_i8275LineCounterMode = 0;
-	state->m_i8275FieldAttributeMode = 0;
-	state->m_i8275CursorFormat = 0;
-	state->m_i8275HorizontalRetrace = 0;
+	m_bank = 0;
+	m_line = 0;
+	m_idx = 0;
+	m_crt_access = 0;
+	m_i8275Command = 0;
+	m_i8275HorizontalCharactersRow = 0;
+	m_i8275CommandSeqCnt = 0;
+	m_i8275SpacedRows = 0;
+	m_i8275VerticalRows = 0;
+	m_i8275VerticalRetraceRows = 0;
+	m_i8275Underline = 0;
+	m_i8275Lines = 0;
+	m_i8275LineCounterMode = 0;
+	m_i8275FieldAttributeMode = 0;
+	m_i8275CursorFormat = 0;
+	m_i8275HorizontalRetrace = 0;
 }
 
 static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
@@ -1071,8 +1073,6 @@ static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", dwarfd_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_START(dwarfd)
-	MCFG_MACHINE_RESET(dwarfd)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1084,9 +1084,7 @@ static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
 
 	MCFG_GFXDECODE(dwarfd)
 	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT(dwarfd)
 
-	MCFG_VIDEO_START(dwarfd)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)

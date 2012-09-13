@@ -124,6 +124,9 @@ public:
 	DECLARE_WRITE8_MEMBER(socrates_scroll_w);
 	DECLARE_WRITE8_MEMBER(socrates_sound_w);
 	DECLARE_DRIVER_INIT(socrates);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -204,28 +207,27 @@ static void socrates_check_kb_latch( running_machine &machine ) // if kb[1] is f
 	}
 }
 
-static MACHINE_RESET( socrates )
+void socrates_state::machine_reset()
 {
-	socrates_state *state = machine.driver_data<socrates_state>();
- state->m_rom_bank = 0xF3; // actually set semi-randomly on real console but we need to initialize it somewhere...
- socrates_set_rom_bank( machine );
- state->m_ram_bank = 0;  // the actual console sets it semi randomly on power up, and the bios cleans it up.
- socrates_set_ram_bank( machine );
- state->m_kb_latch_low[0] = 0xFF;
- state->m_kb_latch_high[0] = 0x8F;
- state->m_kb_latch_low[1] = 0x00;
- state->m_kb_latch_high[1] = 0x01;
- state->m_kb_latch_mouse = 0;
- state->m_kbmcu_rscount = 0;
- state->m_io40_latch = 0;
- state->m_hblankstate = 0;
- state->m_vblankstate = 0;
- state->m_speech_running = 0;
- state->m_speech_address = 0;
- state->m_speech_settings = 0;
- state->m_speech_dummy_read = 0;
- state->m_speech_load_address_count = 0;
- state->m_speech_load_settings_count = 0;
+ m_rom_bank = 0xF3; // actually set semi-randomly on real console but we need to initialize it somewhere...
+ socrates_set_rom_bank( machine() );
+ m_ram_bank = 0;  // the actual console sets it semi randomly on power up, and the bios cleans it up.
+ socrates_set_ram_bank( machine() );
+ m_kb_latch_low[0] = 0xFF;
+ m_kb_latch_high[0] = 0x8F;
+ m_kb_latch_low[1] = 0x00;
+ m_kb_latch_high[1] = 0x01;
+ m_kb_latch_mouse = 0;
+ m_kbmcu_rscount = 0;
+ m_io40_latch = 0;
+ m_hblankstate = 0;
+ m_vblankstate = 0;
+ m_speech_running = 0;
+ m_speech_address = 0;
+ m_speech_settings = 0;
+ m_speech_dummy_read = 0;
+ m_speech_load_address_count = 0;
+ m_speech_load_settings_count = 0;
 }
 
 DRIVER_INIT_MEMBER(socrates_state,socrates)
@@ -590,22 +592,20 @@ return composedcolor;
 }
 
 
-static PALETTE_INIT( socrates )
+void socrates_state::palette_init()
 {
-	socrates_state *state = machine.driver_data<socrates_state>();
 	int i; // iterator
 	for (i = 0; i < 256; i++)
 	{
-	 state->m_palette[i] = socrates_create_color(i);
+	 m_palette[i] = socrates_create_color(i);
 	}
-	palette_set_colors(machine, 0, state->m_palette, ARRAY_LENGTH(state->m_palette));
+	palette_set_colors(machine(), 0, m_palette, ARRAY_LENGTH(m_palette));
 }
 
-static VIDEO_START( socrates )
+void socrates_state::video_start()
 {
-	socrates_state *state = machine.driver_data<socrates_state>();
-	state->m_videoram = state->memregion("vram")->base();
-	state->m_scroll_offset = 0;
+	m_videoram = memregion("vram")->base();
+	m_scroll_offset = 0;
 }
 
 static SCREEN_UPDATE_IND16( socrates )
@@ -926,8 +926,7 @@ static MACHINE_CONFIG_START( socrates, socrates_state )
     MCFG_CPU_IO_MAP(z80_io)
     MCFG_QUANTUM_TIME(attotime::from_hz(60))
     MCFG_CPU_VBLANK_INT("screen", assert_irq)
-    //MCFG_MACHINE_START(socrates)
-    MCFG_MACHINE_RESET(socrates)
+    //MCFG_MACHINE_START_OVERRIDE(socrates_state,socrates)
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -938,9 +937,7 @@ static MACHINE_CONFIG_START( socrates, socrates_state )
 	MCFG_SCREEN_UPDATE_STATIC(socrates)
 
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(socrates)
 
-	MCFG_VIDEO_START(socrates)
 
     /* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -9,28 +9,28 @@ Atari Ultra Tank video emulation
 #include "audio/sprint4.h"
 
 
-PALETTE_INIT( ultratnk )
+void ultratnk_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 4);
+	machine().colortable = colortable_alloc(machine(), 4);
 
-	colortable_palette_set_color(machine.colortable, 0, MAKE_RGB(0x00, 0x00, 0x00));
-	colortable_palette_set_color(machine.colortable, 1, MAKE_RGB(0xa4, 0xa4, 0xa4));
-	colortable_palette_set_color(machine.colortable, 2, MAKE_RGB(0x5b, 0x5b, 0x5b));
-	colortable_palette_set_color(machine.colortable, 3, MAKE_RGB(0xff, 0xff, 0xff));
+	colortable_palette_set_color(machine().colortable, 0, MAKE_RGB(0x00, 0x00, 0x00));
+	colortable_palette_set_color(machine().colortable, 1, MAKE_RGB(0xa4, 0xa4, 0xa4));
+	colortable_palette_set_color(machine().colortable, 2, MAKE_RGB(0x5b, 0x5b, 0x5b));
+	colortable_palette_set_color(machine().colortable, 3, MAKE_RGB(0xff, 0xff, 0xff));
 
-	colortable_entry_set_value(machine.colortable, 0, color_prom[0x00] & 3);
-	colortable_entry_set_value(machine.colortable, 2, color_prom[0x00] & 3);
-	colortable_entry_set_value(machine.colortable, 4, color_prom[0x00] & 3);
-	colortable_entry_set_value(machine.colortable, 6, color_prom[0x00] & 3);
-	colortable_entry_set_value(machine.colortable, 8, color_prom[0x00] & 3);
+	colortable_entry_set_value(machine().colortable, 0, color_prom[0x00] & 3);
+	colortable_entry_set_value(machine().colortable, 2, color_prom[0x00] & 3);
+	colortable_entry_set_value(machine().colortable, 4, color_prom[0x00] & 3);
+	colortable_entry_set_value(machine().colortable, 6, color_prom[0x00] & 3);
+	colortable_entry_set_value(machine().colortable, 8, color_prom[0x00] & 3);
 
-	colortable_entry_set_value(machine.colortable, 1, color_prom[0x01] & 3);
-	colortable_entry_set_value(machine.colortable, 3, color_prom[0x02] & 3);
-	colortable_entry_set_value(machine.colortable, 5, color_prom[0x04] & 3);
-	colortable_entry_set_value(machine.colortable, 7, color_prom[0x08] & 3);
-	colortable_entry_set_value(machine.colortable, 9, color_prom[0x10] & 3);
+	colortable_entry_set_value(machine().colortable, 1, color_prom[0x01] & 3);
+	colortable_entry_set_value(machine().colortable, 3, color_prom[0x02] & 3);
+	colortable_entry_set_value(machine().colortable, 5, color_prom[0x04] & 3);
+	colortable_entry_set_value(machine().colortable, 7, color_prom[0x08] & 3);
+	colortable_entry_set_value(machine().colortable, 9, color_prom[0x10] & 3);
 }
 
 
@@ -46,12 +46,11 @@ TILE_GET_INFO_MEMBER(ultratnk_state::ultratnk_tile_info)
 }
 
 
-VIDEO_START( ultratnk )
+void ultratnk_state::video_start()
 {
-	ultratnk_state *state = machine.driver_data<ultratnk_state>();
-	machine.primary_screen->register_screen_bitmap(state->m_helper);
+	machine().primary_screen->register_screen_bitmap(m_helper);
 
-	state->m_playfield = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ultratnk_state::ultratnk_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_playfield = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ultratnk_state::ultratnk_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

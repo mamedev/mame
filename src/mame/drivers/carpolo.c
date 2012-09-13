@@ -247,8 +247,6 @@ static MACHINE_CONFIG_START( carpolo, carpolo_state )
 	MCFG_CPU_VBLANK_INT("screen", carpolo_timer_interrupt)	/* this not strictly VBLANK,
                                                        but it's supposed to happen 60
                                                        times a sec, so it's a good place */
-	MCFG_MACHINE_START(carpolo)
-	MCFG_MACHINE_RESET(carpolo)
 
 	MCFG_PIA6821_ADD("pia0", carpolo_pia0_intf)
 	MCFG_PIA6821_ADD("pia1", carpolo_pia1_intf)
@@ -281,8 +279,6 @@ static MACHINE_CONFIG_START( carpolo, carpolo_state )
 	MCFG_GFXDECODE(carpolo)
 	MCFG_PALETTE_LENGTH(12*2+2*16+4*2)
 
-	MCFG_PALETTE_INIT(carpolo)
-	MCFG_VIDEO_START(carpolo)
 MACHINE_CONFIG_END
 
 

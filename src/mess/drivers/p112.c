@@ -41,6 +41,8 @@ public:
 	p112_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -60,11 +62,11 @@ static INPUT_PORTS_START( p112 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(p112)
+void p112_state::machine_reset()
 {
 }
 
-static VIDEO_START( p112 )
+void p112_state::video_start()
 {
 }
 
@@ -79,7 +81,6 @@ static MACHINE_CONFIG_START( p112, p112_state )
 	MCFG_CPU_PROGRAM_MAP(p112_mem)
 	MCFG_CPU_IO_MAP(p112_io)
 
-	MCFG_MACHINE_RESET(p112)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -92,7 +93,6 @@ static MACHINE_CONFIG_START( p112, p112_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START(p112)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -46,12 +46,15 @@ public:
 	DECLARE_DRIVER_INIT(cheesech);
 	DECLARE_DRIVER_INIT(ultennis);
 	DECLARE_DRIVER_INIT(stonebal);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/artmagic.c -----------*/
 
-VIDEO_START( artmagic );
+
 
 void artmagic_to_shiftreg(address_space *space, offs_t address, UINT16 *data);
 void artmagic_from_shiftreg(address_space *space, offs_t address, UINT16 *data);

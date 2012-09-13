@@ -98,6 +98,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(a2_tx_w);
 	DECLARE_READ_LINE_MEMBER(a2_dcd_r);
 	void sys5_draw_lamps();
+	DECLARE_MACHINE_START(jpmsys5v);
+	DECLARE_MACHINE_RESET(jpmsys5v);
+	DECLARE_VIDEO_START(jpmsys5v);
+	DECLARE_MACHINE_START(jpmsys5);
+	DECLARE_MACHINE_RESET(jpmsys5);
 };
 
 
@@ -213,9 +218,9 @@ WRITE16_MEMBER(jpmsys5_state::ramdac_w)
 	}
 }
 
-static VIDEO_START( jpmsys5v )
+VIDEO_START_MEMBER(jpmsys5_state,jpmsys5v)
 {
-	tms34061_start(machine, &tms34061intf);
+	tms34061_start(machine(), &tms34061intf);
 }
 
 static SCREEN_UPDATE_RGB32( jpmsys5v )
@@ -678,21 +683,19 @@ static ACIA6850_INTERFACE( acia2_if )
  *
  *************************************/
 
-static MACHINE_START( jpmsys5v )
+MACHINE_START_MEMBER(jpmsys5_state,jpmsys5v)
 {
-	jpmsys5_state *state = machine.driver_data<jpmsys5_state>();
-	state->membank("bank1")->set_base(state->memregion("maincpu")->base()+0x20000);
-	state->m_touch_timer = machine.scheduler().timer_alloc(FUNC(touch_cb));
+	membank("bank1")->set_base(memregion("maincpu")->base()+0x20000);
+	m_touch_timer = machine().scheduler().timer_alloc(FUNC(touch_cb));
 }
 
-static MACHINE_RESET( jpmsys5v )
+MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5v)
 {
-	jpmsys5_state *state = machine.driver_data<jpmsys5_state>();
-	state->m_touch_timer->reset();
-	state->m_touch_state = IDLE;
-	state->m_a2_data_in = 1;
-	state->m_a2_acia_dcd = 0;
-	state->m_vfd->reset();
+	m_touch_timer->reset();
+	m_touch_state = IDLE;
+	m_a2_data_in = 1;
+	m_a2_acia_dcd = 0;
+	m_vfd->reset();
 
 }
 
@@ -715,14 +718,14 @@ static MACHINE_CONFIG_START( jpmsys5v, jpmsys5_state )
 
 	MCFG_ROC10937_ADD("vfd",0,RIGHT_TO_LEFT)//for debug ports
 
-	MCFG_MACHINE_START(jpmsys5v)
-	MCFG_MACHINE_RESET(jpmsys5v)
+	MCFG_MACHINE_START_OVERRIDE(jpmsys5_state,jpmsys5v)
+	MCFG_MACHINE_RESET_OVERRIDE(jpmsys5_state,jpmsys5v)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz / 4, 676, 20*4, 147*4, 256, 0, 254)
 	MCFG_SCREEN_UPDATE_STATIC(jpmsys5v)
 
-	MCFG_VIDEO_START(jpmsys5v)
+	MCFG_VIDEO_START_OVERRIDE(jpmsys5_state,jpmsys5v)
 
 	MCFG_PALETTE_LENGTH(16)
 
@@ -834,17 +837,16 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_START( jpmsys5 )
+MACHINE_START_MEMBER(jpmsys5_state,jpmsys5)
 {
-	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base()+0x20000);
+	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base()+0x20000);
 }
 
-static MACHINE_RESET( jpmsys5 )
+MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5)
 {
-	jpmsys5_state *state = machine.driver_data<jpmsys5_state>();
-	state->m_a2_data_in = 1;
-	state->m_a2_acia_dcd = 0;
-	state->m_vfd->reset();
+	m_a2_data_in = 1;
+	m_a2_acia_dcd = 0;
+	m_vfd->reset();
 }
 
 /*************************************
@@ -864,8 +866,8 @@ static MACHINE_CONFIG_START( jpmsys5, jpmsys5_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_ROC10937_ADD("vfd",0,RIGHT_TO_LEFT)
 
-	MCFG_MACHINE_START(jpmsys5)
-	MCFG_MACHINE_RESET(jpmsys5)
+	MCFG_MACHINE_START_OVERRIDE(jpmsys5_state,jpmsys5)
+	MCFG_MACHINE_RESET_OVERRIDE(jpmsys5_state,jpmsys5)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("upd7759", UPD7759, UPD7759_STANDARD_CLOCK)

@@ -193,8 +193,6 @@ static MACHINE_CONFIG_START( xorworld, xorworld_state )
 	MCFG_GFXDECODE(xorworld)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(xorworld)
-	MCFG_VIDEO_START(xorworld)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

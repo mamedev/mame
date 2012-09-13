@@ -16,22 +16,21 @@
  *
  *************************************/
 
-VIDEO_START( balsente )
+void balsente_state::video_start()
 {
-	balsente_state *state = machine.driver_data<balsente_state>();
 
 	/* reset the system */
-	state->m_palettebank_vis = 0;
-	state->m_sprite_bank[0] = state->memregion("gfx1")->base();
-	state->m_sprite_bank[1] = state->memregion("gfx1")->base() + 0x10000;
+	m_palettebank_vis = 0;
+	m_sprite_bank[0] = memregion("gfx1")->base();
+	m_sprite_bank[1] = memregion("gfx1")->base() + 0x10000;
 
 	/* determine sprite size */
-	state->m_sprite_data = state->memregion("gfx1")->base();
-	state->m_sprite_mask = state->memregion("gfx1")->bytes() - 1;
+	m_sprite_data = memregion("gfx1")->base();
+	m_sprite_mask = memregion("gfx1")->bytes() - 1;
 
 	/* register for saving */
-	state->save_item(NAME(state->m_expanded_videoram));
-	state->save_item(NAME(state->m_palettebank_vis));
+	save_item(NAME(m_expanded_videoram));
+	save_item(NAME(m_palettebank_vis));
 }
 
 

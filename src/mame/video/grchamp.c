@@ -12,12 +12,11 @@
 #define RGB_MAX		191
 
 
-PALETTE_INIT( grchamp )
+void grchamp_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	static const int resistances[3] = { 100, 270, 470 };
 	double rweights[3], gweights[3], bweights[2];
-	grchamp_state *state = machine.driver_data<grchamp_state>();
 	int i;
 
 	/* compute the color output resistor weights */
@@ -48,7 +47,7 @@ PALETTE_INIT( grchamp )
 		bit1 = (color_prom[i] >> 7) & 1;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		state->m_bgcolor[i] = MAKE_RGB(r, g, b);
+		m_bgcolor[i] = MAKE_RGB(r, g, b);
 	}
 }
 
@@ -97,17 +96,16 @@ TILEMAP_MAPPER_MEMBER(grchamp_state::get_memory_offset)
 }
 
 
-VIDEO_START( grchamp )
+void grchamp_state::video_start()
 {
-	grchamp_state *state = machine.driver_data<grchamp_state>();
 
-	state->m_work_bitmap.allocate(32,32);
+	m_work_bitmap.allocate(32,32);
 
 	/* allocate tilemaps for each of the three sections */
-	state->m_text_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(grchamp_state::get_text_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 32,32);
-	state->m_left_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(grchamp_state::get_left_tile_info),state), tilemap_mapper_delegate(FUNC(grchamp_state::get_memory_offset),state),  8,8, 64,32);
-	state->m_right_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(grchamp_state::get_right_tile_info),state), tilemap_mapper_delegate(FUNC(grchamp_state::get_memory_offset),state),  8,8, 64,32);
-	state->m_center_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(grchamp_state::get_center_tile_info),state), tilemap_mapper_delegate(FUNC(grchamp_state::get_memory_offset),state),  8,8, 64,32);
+	m_text_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(grchamp_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	m_left_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(grchamp_state::get_left_tile_info),this), tilemap_mapper_delegate(FUNC(grchamp_state::get_memory_offset),this),  8,8, 64,32);
+	m_right_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(grchamp_state::get_right_tile_info),this), tilemap_mapper_delegate(FUNC(grchamp_state::get_memory_offset),this),  8,8, 64,32);
+	m_center_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(grchamp_state::get_center_tile_info),this), tilemap_mapper_delegate(FUNC(grchamp_state::get_memory_offset),this),  8,8, 64,32);
 }
 
 #if 0

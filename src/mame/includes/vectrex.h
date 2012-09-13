@@ -67,6 +67,8 @@ public:
 	DECLARE_WRITE8_MEMBER(vectrex_via_w);
 	DECLARE_WRITE8_MEMBER(raaspec_led_w);
 	DECLARE_DRIVER_INIT(vectrex);
+	virtual void video_start();
+	DECLARE_VIDEO_START(raaspec);
 };
 
 
@@ -91,10 +93,10 @@ READ8_DEVICE_HANDLER( vectrex_s1_via_pb_r );
 extern const via6522_interface vectrex_via6522_interface;
 extern const via6522_interface spectrum1_via6522_interface;
 
-VIDEO_START( vectrex );
+
 SCREEN_UPDATE_RGB32( vectrex );
 
-VIDEO_START( raaspec );
+
 
 
 

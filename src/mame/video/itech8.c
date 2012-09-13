@@ -162,21 +162,20 @@ static const struct tms34061_interface tms34061intf =
  *
  *************************************/
 
-VIDEO_START( itech8 )
+void itech8_state::video_start()
 {
-	itech8_state *state = machine.driver_data<itech8_state>();
 	/* initialize TMS34061 emulation */
-	tms34061_start(machine, &tms34061intf);
+	tms34061_start(machine(), &tms34061intf);
 
 	/* get the TMS34061 display state */
-	tms34061_get_display_state(&state->m_tms_state);
+	tms34061_get_display_state(&m_tms_state);
 
 	/* reset statics */
-	state->m_page_select = 0xc0;
+	m_page_select = 0xc0;
 
 	/* fetch the GROM base */
-	state->m_grom_base = state->memregion("grom")->base();
-	state->m_grom_size = state->memregion("grom")->bytes();
+	m_grom_base = memregion("grom")->base();
+	m_grom_size = memregion("grom")->bytes();
 }
 
 

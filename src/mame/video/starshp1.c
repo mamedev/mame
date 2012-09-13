@@ -21,7 +21,7 @@ static void set_pens(starshp1_state *state, colortable_t *colortable)
 }
 
 
-PALETTE_INIT( starshp1 )
+void starshp1_state::palette_init()
 {
 	int i;
 
@@ -38,10 +38,10 @@ PALETTE_INIT( starshp1 )
 	};
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 8);
+	machine().colortable = colortable_alloc(machine(), 8);
 
 	for (i = 0; i < sizeof(colortable_source) / sizeof(colortable_source[0]); i++)
-		colortable_entry_set_value(machine.colortable, i, colortable_source[i]);
+		colortable_entry_set_value(machine().colortable, i, colortable_source[i]);
 }
 
 
@@ -53,20 +53,19 @@ TILE_GET_INFO_MEMBER(starshp1_state::get_tile_info)
 }
 
 
-VIDEO_START( starshp1 )
+void starshp1_state::video_start()
 {
-	starshp1_state *state = machine.driver_data<starshp1_state>();
 	UINT16 val = 0;
 
 	int i;
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(starshp1_state::get_tile_info),state), TILEMAP_SCAN_ROWS,  16, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(starshp1_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  16, 8, 32, 32);
 
-	state->m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap->set_scrollx(0, -8);
+	m_bg_tilemap->set_scrollx(0, -8);
 
-	state->m_LSFR = auto_alloc_array(machine, UINT16, 0x10000);
+	m_LSFR = auto_alloc_array(machine(), UINT16, 0x10000);
 
 	for (i = 0; i < 0x10000; i++)
 	{
@@ -75,12 +74,12 @@ VIDEO_START( starshp1 )
 				  (val >> 0x7) ^
 				  (val >> 0x1) ^ 1;
 
-		state->m_LSFR[i] = val;
+		m_LSFR[i] = val;
 
 		val = (val << 1) | (bit & 1);
 	}
 
-	machine.primary_screen->register_screen_bitmap(state->m_helper);
+	machine().primary_screen->register_screen_bitmap(m_helper);
 }
 
 

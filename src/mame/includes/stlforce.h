@@ -42,10 +42,11 @@ public:
 	TILE_GET_INFO_MEMBER(get_stlforce_mlow_tile_info);
 	TILE_GET_INFO_MEMBER(get_stlforce_mhigh_tile_info);
 	TILE_GET_INFO_MEMBER(get_stlforce_tx_tile_info);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/stlforce.c -----------*/
 
-VIDEO_START( stlforce );
+
 SCREEN_UPDATE_IND16( stlforce );

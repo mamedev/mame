@@ -111,6 +111,9 @@ public:
 	DECLARE_WRITE8_MEMBER(odyssey2_lum_w);
 	DECLARE_READ8_MEMBER(odyssey2_t1_r);
 	DECLARE_DRIVER_INIT(odyssey2);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -118,9 +121,9 @@ public:
 
 extern const UINT8 odyssey2_colors[];
 
-VIDEO_START( odyssey2 );
+
 SCREEN_UPDATE_IND16( odyssey2 );
-PALETTE_INIT( odyssey2 );
+
 
 STREAM_UPDATE( odyssey2_sh_update );
 
@@ -148,7 +151,7 @@ extern const device_type ODYSSEY2;
 
 /*----------- defined in machine/odyssey2.c -----------*/
 
-MACHINE_RESET( odyssey2 );
+
 
 /* i/o ports */
 

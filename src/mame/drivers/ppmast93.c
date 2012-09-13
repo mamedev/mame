@@ -154,6 +154,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ppmast_sound_w);
 	TILE_GET_INFO_MEMBER(get_ppmast93_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_ppmast93_fg_tile_info);
+	virtual void video_start();
 };
 
 
@@ -344,13 +345,12 @@ TILE_GET_INFO_MEMBER(ppmast93_state::get_ppmast93_fg_tile_info)
 			0);
 }
 
-static VIDEO_START( ppmast93 )
+void ppmast93_state::video_start()
 {
-	ppmast93_state *state = machine.driver_data<ppmast93_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ppmast93_state::get_ppmast93_bg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ppmast93_state::get_ppmast93_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ppmast93_state::get_ppmast93_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ppmast93_state::get_ppmast93_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 static SCREEN_UPDATE_IND16( ppmast93 )
@@ -386,7 +386,6 @@ static MACHINE_CONFIG_START( ppmast93, ppmast93_state )
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(ppmast93)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -32,10 +32,9 @@ Namco System 86 Video Hardware
 
 ***************************************************************************/
 
-PALETTE_INIT( namcos86 )
+void namcos86_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	namcos86_state *state = machine.driver_data<namcos86_state>();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 	rgb_t palette[512];
 
@@ -68,15 +67,15 @@ PALETTE_INIT( namcos86 )
 
 	/* tiles lookup table */
 	for (i = 0;i < 2048;i++)
-		palette_set_color(machine, i, palette[*color_prom++]);
+		palette_set_color(machine(), i, palette[*color_prom++]);
 
 	/* sprites lookup table */
 	for (i = 0;i < 2048;i++)
-		palette_set_color(machine, 2048 + i, palette[256 + *color_prom++]);
+		palette_set_color(machine(), 2048 + i, palette[256 + *color_prom++]);
 
 	/* color_prom now points to the beginning of the tile address decode PROM */
 
-	state->m_tile_address_prom = color_prom;	/* we'll need this at run time */
+	m_tile_address_prom = color_prom;	/* we'll need this at run time */
 }
 
 
@@ -132,20 +131,19 @@ TILE_GET_INFO_MEMBER(namcos86_state::get_tile_info3)
 
 ***************************************************************************/
 
-VIDEO_START( namcos86 )
+void namcos86_state::video_start()
 {
-	namcos86_state *state = machine.driver_data<namcos86_state>();
-	state->m_bg_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info0),state),TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_bg_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info1),state),TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_bg_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info2),state),TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_bg_tilemap[3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info3),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info0),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info1),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap[3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info3),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
-	state->m_bg_tilemap[0]->set_transparent_pen(7);
-	state->m_bg_tilemap[1]->set_transparent_pen(7);
-	state->m_bg_tilemap[2]->set_transparent_pen(7);
-	state->m_bg_tilemap[3]->set_transparent_pen(7);
+	m_bg_tilemap[0]->set_transparent_pen(7);
+	m_bg_tilemap[1]->set_transparent_pen(7);
+	m_bg_tilemap[2]->set_transparent_pen(7);
+	m_bg_tilemap[3]->set_transparent_pen(7);
 
-	state->m_spriteram = state->m_rthunder_spriteram + 0x1800;
+	m_spriteram = m_rthunder_spriteram + 0x1800;
 }
 
 

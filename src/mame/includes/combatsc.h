@@ -72,6 +72,13 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info0_bootleg);
 	TILE_GET_INFO_MEMBER(get_tile_info1_bootleg);
 	TILE_GET_INFO_MEMBER(get_text_info_bootleg);
+	virtual void machine_reset();
+	DECLARE_MACHINE_START(combatsc);
+	DECLARE_VIDEO_START(combatsc);
+	DECLARE_PALETTE_INIT(combatsc);
+	DECLARE_MACHINE_START(combatscb);
+	DECLARE_VIDEO_START(combatscb);
+	DECLARE_PALETTE_INIT(combatscb);
 };
 
 
@@ -79,9 +86,9 @@ public:
 
 
 
-PALETTE_INIT( combatsc );
-PALETTE_INIT( combatscb );
-VIDEO_START( combatsc );
-VIDEO_START( combatscb );
+
+
+
+
 SCREEN_UPDATE_IND16( combatscb );
 SCREEN_UPDATE_IND16( combatsc );

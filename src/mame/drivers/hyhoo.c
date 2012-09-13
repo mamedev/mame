@@ -257,7 +257,6 @@ static MACHINE_CONFIG_START( hyhoo, hyhoo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_STATIC(hyhoo)
 
-	MCFG_VIDEO_START(hyhoo)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -33,6 +33,9 @@ public:
 	DECLARE_WRITE8_MEMBER(crbaloon_colorram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(pc3092_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -50,8 +53,8 @@ MACHINE_CONFIG_EXTERN( crbaloon_audio );
 
 /*----------- defined in video/crbaloon.c -----------*/
 
-PALETTE_INIT( crbaloon );
-VIDEO_START( crbaloon );
+
+
 SCREEN_UPDATE_IND16( crbaloon );
 
 

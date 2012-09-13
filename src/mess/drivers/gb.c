@@ -566,8 +566,8 @@ static MACHINE_CONFIG_START( gb_common, gb_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START( gb )
-	MCFG_MACHINE_RESET( gb )
+	MCFG_MACHINE_START_OVERRIDE(gb_state, gb )
+	MCFG_MACHINE_RESET_OVERRIDE(gb_state, gb )
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(DMG_FRAMES_PER_SECOND)
@@ -580,7 +580,7 @@ static MACHINE_CONFIG_START( gb_common, gb_state )
 
 	MCFG_GFXDECODE(gb)
 	MCFG_PALETTE_LENGTH(4)
-	MCFG_PALETTE_INIT(gb)
+	MCFG_PALETTE_INIT_OVERRIDE(gb_state,gb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -608,8 +608,8 @@ static MACHINE_CONFIG_DERIVED( supergb, gameboy )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_LR35902_CONFIG(sgb_cpu_reset)
 
-	MCFG_MACHINE_START( sgb )
-	MCFG_MACHINE_RESET( sgb )
+	MCFG_MACHINE_START_OVERRIDE(gb_state, sgb )
+	MCFG_MACHINE_RESET_OVERRIDE(gb_state, sgb )
 
 	MCFG_DEFAULT_LAYOUT(layout_horizont)	/* runs on a TV, not an LCD */
 
@@ -617,14 +617,14 @@ static MACHINE_CONFIG_DERIVED( supergb, gameboy )
 	MCFG_SCREEN_SIZE(32*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_PALETTE_LENGTH(32768)
-	MCFG_PALETTE_INIT(sgb)
+	MCFG_PALETTE_INIT_OVERRIDE(gb_state,sgb)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gbpocket, gameboy )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_LR35902_CONFIG(mgb_cpu_reset)
-	MCFG_MACHINE_RESET( gbpocket )
-	MCFG_PALETTE_INIT(gbp)
+	MCFG_MACHINE_RESET_OVERRIDE(gb_state, gbpocket )
+	MCFG_PALETTE_INIT_OVERRIDE(gb_state,gbp)
 
 	MCFG_CARTSLOT_MODIFY("cart")
 	MCFG_CARTSLOT_MANDATORY
@@ -635,11 +635,11 @@ static MACHINE_CONFIG_DERIVED( gbcolor, gb_common )
 	MCFG_CPU_PROGRAM_MAP( gbc_map)
 	MCFG_LR35902_CONFIG(cgb_cpu_reset)
 
-	MCFG_MACHINE_START(gbc)
-	MCFG_MACHINE_RESET(gbc)
+	MCFG_MACHINE_START_OVERRIDE(gb_state,gbc)
+	MCFG_MACHINE_RESET_OVERRIDE(gb_state,gbc)
 
 	MCFG_PALETTE_LENGTH(32768)
-	MCFG_PALETTE_INIT(gbc)
+	MCFG_PALETTE_INIT_OVERRIDE(gb_state,gbc)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -667,8 +667,8 @@ static MACHINE_CONFIG_START( megaduck, gb_state )
 	MCFG_SCREEN_VBLANK_TIME(0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START( megaduck )
-	MCFG_MACHINE_RESET( megaduck )
+	MCFG_MACHINE_START_OVERRIDE(gb_state, megaduck )
+	MCFG_MACHINE_RESET_OVERRIDE(gb_state, megaduck )
 
 	MCFG_SCREEN_UPDATE_DRIVER(gb_state, screen_update)
 	MCFG_SCREEN_SIZE(20*8, 18*8)
@@ -677,7 +677,7 @@ static MACHINE_CONFIG_START( megaduck, gb_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_GFXDECODE(gb)
 	MCFG_PALETTE_LENGTH(4)
-	MCFG_PALETTE_INIT(megaduck)
+	MCFG_PALETTE_INIT_OVERRIDE(gb_state,megaduck)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("custom", GAMEBOY, 0)

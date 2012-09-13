@@ -843,47 +843,46 @@ static void namcos1_build_banks(running_machine &machine,read8_space_func key_r,
 	}
 }
 
-MACHINE_RESET( namcos1 )
+void namcos1_state::machine_reset()
 {
-	namcos1_state *state = machine.driver_data<namcos1_state>();
 	static const bankhandler unknown_handler = { unknown_r, unknown_w, 0, NULL };
 	int bank;
 
 	/* Point all of our bankhandlers to the error handlers */
 	for (bank = 0; bank < 2*8 ; bank++)
-		set_bank(machine, bank, &unknown_handler);
+		set_bank(machine(), bank, &unknown_handler);
 
-	memset(state->m_chip, 0, sizeof(state->m_chip));
+	memset(m_chip, 0, sizeof(m_chip));
 
 	/* Default MMU setup for Cpu 0 */
-	namcos1_bankswitch(machine, 0, 0x0000, 0x01 ); /* bank0 = 0x180(RAM) - evidence: wldcourt */
-	namcos1_bankswitch(machine, 0, 0x0001, 0x80 );
-	namcos1_bankswitch(machine, 0, 0x0200, 0x01 ); /* bank1 = 0x180(RAM) - evidence: berabohm */
-	namcos1_bankswitch(machine, 0, 0x0201, 0x80 );
+	namcos1_bankswitch(machine(), 0, 0x0000, 0x01 ); /* bank0 = 0x180(RAM) - evidence: wldcourt */
+	namcos1_bankswitch(machine(), 0, 0x0001, 0x80 );
+	namcos1_bankswitch(machine(), 0, 0x0200, 0x01 ); /* bank1 = 0x180(RAM) - evidence: berabohm */
+	namcos1_bankswitch(machine(), 0, 0x0201, 0x80 );
 
-	namcos1_bankswitch(machine, 0, 0x0e00, 0x03 ); /* bank7 = 0x3ff(PRG7) */
-	namcos1_bankswitch(machine, 0, 0x0e01, 0xff );
+	namcos1_bankswitch(machine(), 0, 0x0e00, 0x03 ); /* bank7 = 0x3ff(PRG7) */
+	namcos1_bankswitch(machine(), 0, 0x0e01, 0xff );
 
 	/* Default MMU setup for Cpu 1 */
-	namcos1_bankswitch(machine, 1, 0x0000, 0x01 ); /* bank0 = 0x180(RAM) - evidence: wldcourt */
-	namcos1_bankswitch(machine, 1, 0x0001, 0x80 );
+	namcos1_bankswitch(machine(), 1, 0x0000, 0x01 ); /* bank0 = 0x180(RAM) - evidence: wldcourt */
+	namcos1_bankswitch(machine(), 1, 0x0001, 0x80 );
 
-	namcos1_bankswitch(machine, 1, 0x0e00, 0x03); /* bank7 = 0x3ff(PRG7) */
-	namcos1_bankswitch(machine, 1, 0x0e01, 0xff);
+	namcos1_bankswitch(machine(), 1, 0x0e00, 0x03); /* bank7 = 0x3ff(PRG7) */
+	namcos1_bankswitch(machine(), 1, 0x0e01, 0xff);
 
 	/* reset Cpu 0 and stop all other CPUs */
-	machine.device("maincpu")->reset();
-	machine.device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine.device("mcu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("maincpu")->reset();
+	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("mcu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* mcu patch data clear */
-	state->m_mcu_patch_data = 0;
-	state->m_reset = 0;
+	m_mcu_patch_data = 0;
+	m_reset = 0;
 
-	namcos1_init_DACs(machine);
-	memset(state->m_key, 0, sizeof(state->m_key));
-	state->m_wdog = 0;
+	namcos1_init_DACs(machine());
+	memset(m_key, 0, sizeof(m_key));
+	m_wdog = 0;
 }
 
 

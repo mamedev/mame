@@ -63,21 +63,21 @@ public:
 	DECLARE_WRITE16_MEMBER(skilldrp_sound_bank_w);
 	DECLARE_DRIVER_INIT(showhanc);
 	DECLARE_DRIVER_INIT(showhand);
+	DECLARE_VIDEO_START(astrocorp);
 };
 
 /***************************************************************************
                                 Video
 ***************************************************************************/
 
-static VIDEO_START( astrocorp )
+VIDEO_START_MEMBER(astrocorp_state,astrocorp)
 {
-	astrocorp_state *state = machine.driver_data<astrocorp_state>();
 
-	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_bitmap);
 
-	state->save_item(NAME(state->m_bitmap));
-	state->save_item       (NAME(state->m_screen_enable));
-	state->save_item       (NAME(state->m_draw_sprites));
+	save_item(NAME(m_bitmap));
+	save_item       (NAME(m_screen_enable));
+	save_item       (NAME(m_draw_sprites));
 }
 
 /***************************************************************************
@@ -492,7 +492,7 @@ static MACHINE_CONFIG_START( showhand, astrocorp_state )
 	MCFG_GFXDECODE(astrocorp)
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(astrocorp)
+	MCFG_VIDEO_START_OVERRIDE(astrocorp_state,astrocorp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -543,7 +543,7 @@ static MACHINE_CONFIG_START( skilldrp, astrocorp_state )
 	MCFG_GFXDECODE(astrocorp)
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(astrocorp)
+	MCFG_VIDEO_START_OVERRIDE(astrocorp_state,astrocorp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

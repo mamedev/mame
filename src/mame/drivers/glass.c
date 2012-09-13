@@ -170,27 +170,25 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_START( glass )
+void glass_state::machine_start()
 {
-	glass_state *state = machine.driver_data<glass_state>();
 
-	state->save_item(NAME(state->m_cause_interrupt));
-	state->save_item(NAME(state->m_current_bit));
-	state->save_item(NAME(state->m_current_command));
-	state->save_item(NAME(state->m_blitter_serial_buffer));
+	save_item(NAME(m_cause_interrupt));
+	save_item(NAME(m_current_bit));
+	save_item(NAME(m_current_command));
+	save_item(NAME(m_blitter_serial_buffer));
 }
 
-static MACHINE_RESET( glass )
+void glass_state::machine_reset()
 {
-	glass_state *state = machine.driver_data<glass_state>();
 	int i;
 
-	state->m_cause_interrupt = 1;
-	state->m_current_bit = 0;
-	state->m_current_command = 0;
+	m_cause_interrupt = 1;
+	m_current_bit = 0;
+	m_current_command = 0;
 
 	for (i = 0; i < 5; i++)
-		state->m_blitter_serial_buffer[i] = 0;
+		m_blitter_serial_buffer[i] = 0;
 }
 
 static MACHINE_CONFIG_START( glass, glass_state )
@@ -200,8 +198,6 @@ static MACHINE_CONFIG_START( glass, glass_state )
 	MCFG_CPU_PROGRAM_MAP(glass_map)
 	MCFG_CPU_VBLANK_INT("screen", glass_interrupt)
 
-	MCFG_MACHINE_START(glass)
-	MCFG_MACHINE_RESET(glass)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -214,7 +210,6 @@ static MACHINE_CONFIG_START( glass, glass_state )
 	MCFG_GFXDECODE(glass)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(glass)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

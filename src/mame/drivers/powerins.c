@@ -312,10 +312,9 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static MACHINE_RESET( powerins )
+void powerins_state::machine_reset()
 {
-	powerins_state *state = machine.driver_data<powerins_state>();
-	state->m_oki_bank = -1;	// samples bank "unitialised"
+	m_oki_bank = -1;	// samples bank "unitialised"
 }
 
 static void irqhandler(device_t *device, int irq)
@@ -350,7 +349,6 @@ static MACHINE_CONFIG_START( powerins, powerins_state )
 	MCFG_CPU_PROGRAM_MAP(powerins_sound_map)
 	MCFG_CPU_IO_MAP(powerins_sound_io_map)
 
-	MCFG_MACHINE_RESET(powerins)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -363,7 +361,6 @@ static MACHINE_CONFIG_START( powerins, powerins_state )
 	MCFG_GFXDECODE(powerins)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(powerins)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -1465,39 +1465,38 @@ DRIVER_INIT_MEMBER(apollo_state,apollo)
 	//MLOG1(("driver_init_apollo"));
 }
 
-MACHINE_START( apollo )
+MACHINE_START_MEMBER(apollo_state,apollo)
 {
-	MLOG1(("machine_start_apollo"));
+	//MLOG1(("machine_start_apollo"));
 
-	device_start_apollo_fdc (machine.device(APOLLO_FDC_TAG));
-	device_start_apollo_ptm (machine.device(APOLLO_PTM_TAG) );
-	device_start_apollo_sio(machine.device(APOLLO_SIO_TAG));
-	device_start_apollo_sio2(machine.device(APOLLO_SIO2_TAG));
+	device_start_apollo_fdc (machine().device(APOLLO_FDC_TAG));
+	device_start_apollo_ptm (machine().device(APOLLO_PTM_TAG) );
+	device_start_apollo_sio(machine().device(APOLLO_SIO_TAG));
+	device_start_apollo_sio2(machine().device(APOLLO_SIO2_TAG));
 
 	if (apollo_is_dn3000())
 	{
-		MLOG1(("faking mc146818 interrupts (DN3000 only)"));
+		//MLOG1(("faking mc146818 interrupts (DN3000 only)"));
 		// fake mc146818 interrupts (DN3000 only)
-		machine.scheduler().timer_pulse(attotime::from_hz(2), FUNC(apollo_rtc_timer));
+		machine().scheduler().timer_pulse(attotime::from_hz(2), FUNC(apollo_rtc_timer));
 	}
 }
 
-MACHINE_RESET( apollo )
+MACHINE_RESET_MEMBER(apollo_state,apollo)
 {
-	apollo_state *st = machine.driver_data<apollo_state>();
-	MLOG1(("machine_reset_apollo"));
+	//MLOG1(("machine_reset_apollo"));
 
-	st->dma8237_1 = machine.device(APOLLO_DMA1_TAG);
-	st->dma8237_2 = machine.device(APOLLO_DMA2_TAG);
-	st->pic8259_master = machine.device(APOLLO_PIC1_TAG);
-	st->pic8259_slave = machine.device(APOLLO_PIC2_TAG);
+	dma8237_1 = machine().device(APOLLO_DMA1_TAG);
+	dma8237_2 = machine().device(APOLLO_DMA2_TAG);
+	pic8259_master = machine().device(APOLLO_PIC1_TAG);
+	pic8259_slave = machine().device(APOLLO_PIC2_TAG);
 
 	// set configuration
 	apollo_csr_set_servicemode(apollo_config(APOLLO_CONF_SERVICE_MODE));
 
-	device_reset_apollo_ptm(machine.device(APOLLO_PTM_TAG));
-	device_reset_apollo_rtc(machine.device(APOLLO_RTC_TAG));
-	device_reset_apollo_sio(machine.device(APOLLO_SIO_TAG));
-	device_reset_apollo_sio2(machine.device(APOLLO_SIO2_TAG));
+	device_reset_apollo_ptm(machine().device(APOLLO_PTM_TAG));
+	device_reset_apollo_rtc(machine().device(APOLLO_RTC_TAG));
+	device_reset_apollo_sio(machine().device(APOLLO_SIO_TAG));
+	device_reset_apollo_sio2(machine().device(APOLLO_SIO2_TAG));
 	device_reset_apollo_fdc(apollo_fdc_device);
 }

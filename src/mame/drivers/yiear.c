@@ -263,18 +263,16 @@ GFXDECODE_END
 
 
 
-static MACHINE_START( yiear )
+void yiear_state::machine_start()
 {
-	yiear_state *state = machine.driver_data<yiear_state>();
 
-	state->save_item(NAME(state->m_yiear_nmi_enable));
+	save_item(NAME(m_yiear_nmi_enable));
 }
 
-static MACHINE_RESET( yiear )
+void yiear_state::machine_reset()
 {
-	yiear_state *state = machine.driver_data<yiear_state>();
 
-	state->m_yiear_nmi_enable = 0;
+	m_yiear_nmi_enable = 0;
 }
 
 //-------------------------------------------------
@@ -294,8 +292,6 @@ static MACHINE_CONFIG_START( yiear, yiear_state )
 	MCFG_CPU_VBLANK_INT("screen", yiear_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT(yiear_nmi_interrupt,480)	/* music tempo (correct frequency unknown) */
 
-	MCFG_MACHINE_START(yiear)
-	MCFG_MACHINE_RESET(yiear)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -308,8 +304,6 @@ static MACHINE_CONFIG_START( yiear, yiear_state )
 	MCFG_GFXDECODE(yiear)
 	MCFG_PALETTE_LENGTH(32)
 
-	MCFG_PALETTE_INIT(yiear)
-	MCFG_VIDEO_START(yiear)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

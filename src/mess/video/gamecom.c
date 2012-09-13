@@ -63,10 +63,9 @@ static TIMER_CALLBACK( gamecom_scanline )
 	state->m_scanline = ( state->m_scanline + 1 ) % Y_PIXELS;
 }
 
-VIDEO_START( gamecom )
+void gamecom_state::video_start()
 {
-	gamecom_state *state = machine.driver_data<gamecom_state>();
-	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(gamecom_scanline));
-	state->m_scanline_timer->adjust( machine.primary_screen->time_until_pos(0 ), 0, machine.primary_screen->scan_period() );
-	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
+	m_scanline_timer = machine().scheduler().timer_alloc(FUNC(gamecom_scanline));
+	m_scanline_timer->adjust( machine().primary_screen->time_until_pos(0 ), 0, machine().primary_screen->scan_period() );
+	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }

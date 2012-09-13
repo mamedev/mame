@@ -20,10 +20,11 @@ public:
 	DECLARE_READ8_MEMBER(ioboard_unk_r);
 	DECLARE_WRITE8_MEMBER(ioboard_data_w);
 	DECLARE_WRITE8_MEMBER(ioboard_reg_w);
+	virtual void video_start();
 };
 
 
-VIDEO_START( hotstuff )
+void hotstuff_state::video_start()
 {
 }
 
@@ -136,7 +137,6 @@ static MACHINE_CONFIG_START( hotstuff, hotstuff_state )
 
 	MCFG_PALETTE_LENGTH(0x200)
 
-	MCFG_VIDEO_START(hotstuff)
 MACHINE_CONFIG_END
 
 

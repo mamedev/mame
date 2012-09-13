@@ -1812,7 +1812,7 @@ static const UINT8 printer_font[]= {
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 
-VIDEO_START( busicom )
+void busicom_state::video_start()
 {
 }
 
@@ -1846,14 +1846,14 @@ static const UINT8 color[] = { 0xFF,0xDB,0xB7,0x92,0x6E,0x49,0x25,0x00 };
 
 static const UINT8 color_red[] = { 0xb0,0xb5,0xc0,0xc5,0xd0,0xd5,0xdf };
 
-PALETTE_INIT( busicom )
+void busicom_state::palette_init()
 {
 	int i;
 	for(i=0;i<8;i++) {
-		palette_set_color( machine, i, MAKE_RGB(color[i],color[i],color[i]) );
+		palette_set_color( machine(), i, MAKE_RGB(color[i],color[i],color[i]) );
 	}
-	palette_set_color( machine, 8, MAKE_RGB(0xff,0xff,0xff) );
+	palette_set_color( machine(), 8, MAKE_RGB(0xff,0xff,0xff) );
 	for(i=0;i<7;i++) {
-		palette_set_color( machine, i+9, MAKE_RGB(color_red[i],0x00,0x00) );
+		palette_set_color( machine(), i+9, MAKE_RGB(color_red[i],0x00,0x00) );
 	}
 }

@@ -53,18 +53,26 @@ public:
 	TILE_GET_INFO_MEMBER(rallyx_fg_get_tile_info);
 	TILE_GET_INFO_MEMBER(locomotn_bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(locomotn_fg_get_tile_info);
+	DECLARE_MACHINE_START(rallyx);
+	DECLARE_MACHINE_RESET(rallyx);
+	DECLARE_VIDEO_START(rallyx);
+	DECLARE_PALETTE_INIT(rallyx);
+	DECLARE_VIDEO_START(jungler);
+	DECLARE_PALETTE_INIT(jungler);
+	DECLARE_VIDEO_START(locomotn);
+	DECLARE_VIDEO_START(commsega);
 };
 
 
 /*----------- defined in video/rallyx.c -----------*/
 
 
-PALETTE_INIT( rallyx );
-PALETTE_INIT( jungler );
-VIDEO_START( rallyx );
-VIDEO_START( jungler );
-VIDEO_START( locomotn );
-VIDEO_START( commsega );
+
+
+
+
+
+
 SCREEN_UPDATE_IND16( rallyx );
 SCREEN_UPDATE_IND16( jungler );
 SCREEN_UPDATE_IND16( locomotn );

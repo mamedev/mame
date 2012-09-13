@@ -205,21 +205,20 @@ static ADDRESS_MAP_START( cavepgm_mem, AS_PROGRAM, 16, pgm_arm_type1_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_START( pgm_arm_type1 )
+MACHINE_START_MEMBER(pgm_arm_type1_state,pgm_arm_type1)
 {
-	MACHINE_START_CALL(pgm);
+	MACHINE_START_CALL_MEMBER(pgm);
 
 
-	pgm_arm_type1_state *state = machine.driver_data<pgm_arm_type1_state>();
 
-	state->m_prot = machine.device<cpu_device>("prot");
+	m_prot = machine().device<cpu_device>("prot");
 
-	state->save_item(NAME(state->m_value0));
-	state->save_item(NAME(state->m_value1));
-	state->save_item(NAME(state->m_valuekey));
-	state->save_item(NAME(state->m_valueresponse));
-	state->save_item(NAME(state->m_curslots));
-	state->save_item(NAME(state->m_slots));
+	save_item(NAME(m_value0));
+	save_item(NAME(m_value1));
+	save_item(NAME(m_valuekey));
+	save_item(NAME(m_valueresponse));
+	save_item(NAME(m_curslots));
+	save_item(NAME(m_slots));
 }
 
 MACHINE_CONFIG_START( pgm_arm_type1_cave, pgm_arm_type1_state )
@@ -228,7 +227,7 @@ MACHINE_CONFIG_START( pgm_arm_type1_cave, pgm_arm_type1_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(cavepgm_mem)
 
-	MCFG_MACHINE_START( pgm_arm_type1 )
+	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type1_state, pgm_arm_type1 )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(59.17) // verified on pcb

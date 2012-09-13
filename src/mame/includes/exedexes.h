@@ -44,6 +44,10 @@ public:
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILEMAP_MAPPER_MEMBER(exedexes_bg_tilemap_scan);
 	TILEMAP_MAPPER_MEMBER(exedexes_fg_tilemap_scan);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 

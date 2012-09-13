@@ -91,6 +91,19 @@ public:
 	DECLARE_DRIVER_INIT(robotron);
 	DECLARE_DRIVER_INIT(bubbles);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	DECLARE_MACHINE_START(defender);
+	DECLARE_MACHINE_RESET(defender);
+	DECLARE_VIDEO_START(williams);
+	DECLARE_MACHINE_START(williams2);
+	DECLARE_MACHINE_RESET(williams2);
+	DECLARE_VIDEO_START(williams2);
+	DECLARE_MACHINE_START(williams);
+	DECLARE_MACHINE_RESET(williams);
+	DECLARE_MACHINE_START(blaster);
+	DECLARE_MACHINE_RESET(blaster);
+	DECLARE_VIDEO_START(blaster);
+	DECLARE_MACHINE_START(williams_common);
+	DECLARE_MACHINE_RESET(williams_common);
 };
 
 
@@ -103,6 +116,9 @@ public:
 
 	required_device<williams_cvsd_sound_device> m_cvsd_sound;
 	DECLARE_DRIVER_INIT(joust2);
+	DECLARE_MACHINE_START(joust2);
+	DECLARE_MACHINE_RESET(joust2);
+
 };
 
 /*----------- defined in drivers/williams.c -----------*/
@@ -148,16 +164,16 @@ TIMER_DEVICE_CALLBACK( williams2_va11_callback );
 TIMER_DEVICE_CALLBACK( williams2_endscreen_callback );
 
 /* initialization */
-MACHINE_START( defender );
-MACHINE_RESET( defender );
-MACHINE_START( williams );
-MACHINE_RESET( williams );
-MACHINE_START( blaster );
-MACHINE_RESET( blaster );
-MACHINE_START( williams2 );
-MACHINE_RESET( williams2 );
-MACHINE_START( joust2 );
-MACHINE_RESET( joust2 );
+
+
+
+
+
+
+
+
+
+
 
 /* banking */
 
@@ -175,9 +191,9 @@ MACHINE_RESET( joust2 );
 #define WILLIAMS_TILEMAP_JOUST2		2		/* IC79 is a 74LS157 selector jumpered to be disabled */
 
 
-VIDEO_START( williams );
-VIDEO_START( blaster );
-VIDEO_START( williams2 );
+
+
+
 
 SCREEN_UPDATE_RGB32( williams );
 SCREEN_UPDATE_RGB32( blaster );

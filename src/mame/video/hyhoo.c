@@ -222,10 +222,9 @@ static void hyhoo_gfxdraw(running_machine &machine)
 }
 
 
-VIDEO_START( hyhoo )
+void hyhoo_state::video_start()
 {
-	hyhoo_state *state = machine.driver_data<hyhoo_state>();
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap);
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmap);
 }
 
 

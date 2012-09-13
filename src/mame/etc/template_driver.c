@@ -31,6 +31,7 @@ protected:
 	virtual void machine_reset();
 
 	virtual void video_start();
+	virtual void palette_init();
 };
 
 void xxx_state::video_start()
@@ -132,7 +133,7 @@ void xxx_state::machine_reset()
 }
 
 
-static PALETTE_INIT( xxx )
+void xxx_state::palette_init()
 {
 }
 
@@ -153,7 +154,6 @@ static MACHINE_CONFIG_START( xxx, xxx_state )
 
 	MCFG_GFXDECODE(xxx)
 
-	MCFG_PALETTE_INIT(xxx)
 	MCFG_PALETTE_LENGTH(8)
 
 	/* sound hardware */

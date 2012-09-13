@@ -314,10 +314,10 @@ static NVRAM_HANDLER( micronic )
 	}
 }
 
-static PALETTE_INIT( micronic )
+void micronic_state::palette_init()
 {
-	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
+	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
+	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
 }
 
 static HD61830_INTERFACE( lcdc_intf )
@@ -372,7 +372,6 @@ static MACHINE_CONFIG_START( micronic, micronic_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(micronic)
 
 	MCFG_HD61830_ADD(HD61830_TAG, XTAL_4_9152MHz/2/2, lcdc_intf)
 

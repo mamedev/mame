@@ -35,31 +35,30 @@ void moo_tile_callback( running_machine &machine, int layer, int *code, int *col
 	*color = state->m_layer_colorbase[layer] | (*color >> 2 & 0x0f);
 }
 
-VIDEO_START(moo)
+VIDEO_START_MEMBER(moo_state,moo)
 {
-	moo_state *state = machine.driver_data<moo_state>();
 
-	assert(machine.primary_screen->format() == BITMAP_FORMAT_RGB32);
+	assert(machine().primary_screen->format() == BITMAP_FORMAT_RGB32);
 
-	state->m_alpha_enabled = 0;
+	m_alpha_enabled = 0;
 
-	if (!strcmp(machine.system().name, "bucky") || !strcmp(machine.system().name, "buckyua") || !strcmp(machine.system().name, "buckyaa"))
+	if (!strcmp(machine().system().name, "bucky") || !strcmp(machine().system().name, "buckyua") || !strcmp(machine().system().name, "buckyaa"))
 	{
 		// Bucky doesn't chain tilemaps
-		k056832_set_layer_association(state->m_k056832, 0);
+		k056832_set_layer_association(m_k056832, 0);
 
-		k056832_set_layer_offs(state->m_k056832, 0, -2, 0);
-		k056832_set_layer_offs(state->m_k056832, 1,  2, 0);
-		k056832_set_layer_offs(state->m_k056832, 2,  4, 0);
-		k056832_set_layer_offs(state->m_k056832, 3,  6, 0);
+		k056832_set_layer_offs(m_k056832, 0, -2, 0);
+		k056832_set_layer_offs(m_k056832, 1,  2, 0);
+		k056832_set_layer_offs(m_k056832, 2,  4, 0);
+		k056832_set_layer_offs(m_k056832, 3,  6, 0);
 	}
 	else
 	{
 		// other than the intro showing one blank line alignment is good through the game
-		k056832_set_layer_offs(state->m_k056832, 0, -2 + 1, 0);
-		k056832_set_layer_offs(state->m_k056832, 1,  2 + 1, 0);
-		k056832_set_layer_offs(state->m_k056832, 2,  4 + 1, 0);
-		k056832_set_layer_offs(state->m_k056832, 3,  6 + 1, 0);
+		k056832_set_layer_offs(m_k056832, 0, -2 + 1, 0);
+		k056832_set_layer_offs(m_k056832, 1,  2 + 1, 0);
+		k056832_set_layer_offs(m_k056832, 2,  4 + 1, 0);
+		k056832_set_layer_offs(m_k056832, 3,  6 + 1, 0);
 	}
 }
 

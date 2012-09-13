@@ -61,6 +61,7 @@ public:
 	UINT8 m_comm_latch;
 	required_shared_ptr<UINT8> m_vram;
 
+	virtual void video_start();
 };
 
 
@@ -145,7 +146,7 @@ static const mc6845_interface mbc200_crtc = {
 	NULL
 };
 
-static VIDEO_START( mbc200 )
+void mbc200_state::video_start()
 {
 }
 
@@ -267,7 +268,6 @@ static MACHINE_CONFIG_START( mbc200, mbc200_state )
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
-    MCFG_VIDEO_START(mbc200)
 
 	MCFG_MC6845_ADD("crtc", H46505, XTAL_8MHz / 4, mbc200_crtc) // HD46505SP
 	MCFG_I8255_ADD("ppi8255_1", mbc200_ppi8255_interface_1) // i8255AC-5

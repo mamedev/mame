@@ -28,6 +28,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	const UINT8 *m_p_chargen;
 	const UINT8 *m_p_videoram;
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 static ADDRESS_MAP_START(vta2000_mem, AS_PROGRAM, 8, vta2000_state)
@@ -46,15 +49,14 @@ static INPUT_PORTS_START( vta2000 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(vta2000)
+void vta2000_state::machine_reset()
 {
 }
 
-static VIDEO_START( vta2000 )
+void vta2000_state::video_start()
 {
-	vta2000_state *state = machine.driver_data<vta2000_state>();
-	state->m_p_chargen = machine.root_device().memregion("chargen")->base();
-	state->m_p_videoram = state->memregion("maincpu")->base()+0x8000;
+	m_p_chargen = machine().root_device().memregion("chargen")->base();
+	m_p_videoram = memregion("maincpu")->base()+0x8000;
 }
 
 static SCREEN_UPDATE_IND16( vta2000 )
@@ -141,11 +143,11 @@ static GFXDECODE_START( vta2000 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, vta2000_charlayout, 0, 1 )
 GFXDECODE_END
 
-static PALETTE_INIT( vta2000 )
+void vta2000_state::palette_init()
 {
-	palette_set_color(machine, 0, RGB_BLACK); // black
-	palette_set_color_rgb(machine, 1, 0x00, 0xc0, 0x00); // green
-	palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00); // highlight
+	palette_set_color(machine(), 0, RGB_BLACK); // black
+	palette_set_color_rgb(machine(), 1, 0x00, 0xc0, 0x00); // green
+	palette_set_color_rgb(machine(), 2, 0x00, 0xff, 0x00); // highlight
 }
 
 static MACHINE_CONFIG_START( vta2000, vta2000_state )
@@ -154,7 +156,6 @@ static MACHINE_CONFIG_START( vta2000, vta2000_state )
 	MCFG_CPU_PROGRAM_MAP(vta2000_mem)
 	MCFG_CPU_IO_MAP(vta2000_io)
 
-	MCFG_MACHINE_RESET(vta2000)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -162,10 +163,8 @@ static MACHINE_CONFIG_START( vta2000, vta2000_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(80*8, 25*12)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*12-1)
-	MCFG_VIDEO_START(vta2000)
 	MCFG_SCREEN_UPDATE_STATIC(vta2000)
 	MCFG_PALETTE_LENGTH(3)
-	MCFG_PALETTE_INIT(vta2000)
 	MCFG_GFXDECODE(vta2000)
 MACHINE_CONFIG_END
 

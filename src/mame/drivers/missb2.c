@@ -36,6 +36,8 @@ public:
 	DECLARE_WRITE8_MEMBER(missb2_bg_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_DRIVER_INIT(missb2);
+	DECLARE_MACHINE_START(missb2);
+	DECLARE_MACHINE_RESET(missb2);
 };
 
 
@@ -433,28 +435,26 @@ static INTERRUPT_GEN( missb2_interrupt )
 
 /* Machine Driver */
 
-static MACHINE_START( missb2 )
+MACHINE_START_MEMBER(missb2_state,missb2)
 {
-	missb2_state *state = machine.driver_data<missb2_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_slave = machine.device("slave");
-	state->m_mcu = NULL;
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_slave = machine().device("slave");
+	m_mcu = NULL;
 
-	state->save_item(NAME(state->m_sound_nmi_enable));
-	state->save_item(NAME(state->m_pending_nmi));
-	state->save_item(NAME(state->m_sound_status));
-	state->save_item(NAME(state->m_video_enable));
+	save_item(NAME(m_sound_nmi_enable));
+	save_item(NAME(m_pending_nmi));
+	save_item(NAME(m_sound_status));
+	save_item(NAME(m_video_enable));
 }
 
-static MACHINE_RESET( missb2 )
+MACHINE_RESET_MEMBER(missb2_state,missb2)
 {
-	missb2_state *state = machine.driver_data<missb2_state>();
 
-	state->m_sound_nmi_enable = 0;
-	state->m_pending_nmi = 0;
-	state->m_sound_status = 0;
+	m_sound_nmi_enable = 0;
+	m_pending_nmi = 0;
+	m_sound_status = 0;
 }
 
 static MACHINE_CONFIG_START( missb2, missb2_state )
@@ -475,8 +475,8 @@ static MACHINE_CONFIG_START( missb2, missb2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
-	MCFG_MACHINE_START(missb2)
-	MCFG_MACHINE_RESET(missb2)
+	MCFG_MACHINE_START_OVERRIDE(missb2_state,missb2)
+	MCFG_MACHINE_RESET_OVERRIDE(missb2_state,missb2)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

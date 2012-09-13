@@ -217,23 +217,21 @@ GFXDECODE_END
 
 
 
-static MACHINE_START( goindol )
+void goindol_state::machine_start()
 {
-	goindol_state *state = machine.driver_data<goindol_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
-	state->save_item(NAME(state->m_char_bank));
-	state->save_item(NAME(state->m_prot_toggle));
+	save_item(NAME(m_char_bank));
+	save_item(NAME(m_prot_toggle));
 }
 
-static MACHINE_RESET( goindol )
+void goindol_state::machine_reset()
 {
-	goindol_state *state = machine.driver_data<goindol_state>();
 
-	state->m_char_bank = 0;
-	state->m_prot_toggle = 0;
+	m_char_bank = 0;
+	m_prot_toggle = 0;
 }
 
 static MACHINE_CONFIG_START( goindol, goindol_state )
@@ -247,8 +245,6 @@ static MACHINE_CONFIG_START( goindol, goindol_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)
 
-	MCFG_MACHINE_START(goindol)
-	MCFG_MACHINE_RESET(goindol)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -262,7 +258,6 @@ static MACHINE_CONFIG_START( goindol, goindol_state )
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MCFG_VIDEO_START(goindol)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

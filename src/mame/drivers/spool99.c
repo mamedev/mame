@@ -116,6 +116,7 @@ public:
 	DECLARE_WRITE8_MEMBER(eeprom_dataline_w);
 	DECLARE_DRIVER_INIT(spool99);
 	TILE_GET_INFO_MEMBER(get_spool99_tile_info);
+	virtual void video_start();
 };
 
 TILE_GET_INFO_MEMBER(spool99_state::get_spool99_tile_info)
@@ -130,11 +131,10 @@ TILE_GET_INFO_MEMBER(spool99_state::get_spool99_tile_info)
 			0);
 }
 
-static VIDEO_START(spool99)
+void spool99_state::video_start()
 {
-	spool99_state *state = machine.driver_data<spool99_state>();
 
-	state->m_sc0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(spool99_state::get_spool99_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_sc0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spool99_state::get_spool99_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 static SCREEN_UPDATE_IND16(spool99)
@@ -367,7 +367,6 @@ static MACHINE_CONFIG_START( spool99, spool99_state )
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_VIDEO_START(spool99)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

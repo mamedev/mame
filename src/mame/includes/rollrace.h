@@ -33,12 +33,13 @@ public:
 	DECLARE_WRITE8_MEMBER(rollrace_backgroundcolor_w);
 	DECLARE_WRITE8_MEMBER(rollrace_flipy_w);
 	DECLARE_WRITE8_MEMBER(rollrace_flipx_w);
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/rollrace.c -----------*/
 
-PALETTE_INIT( rollrace );
+
 SCREEN_UPDATE_IND16( rollrace );
 
 

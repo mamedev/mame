@@ -217,14 +217,14 @@ static INPUT_PORTS_START( mbc55x )
 INPUT_PORTS_END
 
 
-static PALETTE_INIT( mbc55x )
+void mbc55x_state::palette_init()
 {
 	int colourno;
 
 	logerror("initializing palette\n");
 
 	for ( colourno = 0; colourno < SCREEN_NO_COLOURS; colourno++ )
-		palette_set_color_rgb(machine, colourno, mbc55x_palette[colourno][RED], mbc55x_palette[colourno][GREEN], mbc55x_palette[colourno][BLUE]);
+		palette_set_color_rgb(machine(), colourno, mbc55x_palette[colourno][RED], mbc55x_palette[colourno][GREEN], mbc55x_palette[colourno][BLUE]);
 }
 
 
@@ -234,8 +234,6 @@ static MACHINE_CONFIG_START( mbc55x, mbc55x_state )
 	MCFG_CPU_PROGRAM_MAP(mbc55x_mem)
 	MCFG_CPU_IO_MAP(mbc55x_io)
 
-	MCFG_MACHINE_START( mbc55x )
-	MCFG_MACHINE_RESET(mbc55x)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -244,13 +242,10 @@ static MACHINE_CONFIG_START( mbc55x, mbc55x_state )
 	MCFG_SCREEN_VBLANK_STATIC(mbc55x)
 
 	MCFG_PALETTE_LENGTH(SCREEN_NO_COLOURS * 3)
-	MCFG_PALETTE_INIT( mbc55x )
 
 //  MCFG_SCREEN_SIZE(650, 260)
 //  MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 
-	MCFG_VIDEO_START(mbc55x)
-	MCFG_VIDEO_RESET(mbc55x)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")

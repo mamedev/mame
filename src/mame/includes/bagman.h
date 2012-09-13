@@ -44,6 +44,9 @@ public:
 	DECLARE_READ8_MEMBER(dial_input_p2_r);
 	DECLARE_DRIVER_INIT(bagman);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	DECLARE_MACHINE_RESET(bagman);
+	DECLARE_VIDEO_START(bagman);
+	DECLARE_PALETTE_INIT(bagman);
 };
 
 
@@ -69,12 +72,12 @@ public:
 
 /*----------- defined in machine/bagman.c -----------*/
 
-MACHINE_RESET( bagman );
+
 
 
 /*----------- defined in video/bagman.c -----------*/
 
 
-PALETTE_INIT( bagman );
-VIDEO_START( bagman );
+
+
 SCREEN_UPDATE_IND16( bagman );

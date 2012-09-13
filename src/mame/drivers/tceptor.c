@@ -340,23 +340,21 @@ static const namco_interface namco_config =
 
 /*******************************************************************/
 
-static MACHINE_START( tceptor )
+void tceptor_state::machine_start()
 {
-	tceptor_state *state = machine.driver_data<tceptor_state>();
-	state_save_register_global(machine, state->m_m6809_irq_enable);
-	state_save_register_global(machine, state->m_m68k_irq_enable);
-	state_save_register_global(machine, state->m_mcu_irq_enable);
+	state_save_register_global(machine(), m_m6809_irq_enable);
+	state_save_register_global(machine(), m_m68k_irq_enable);
+	state_save_register_global(machine(), m_mcu_irq_enable);
 }
 
 
 /*******************************************************************/
 
-static MACHINE_RESET( tceptor )
+void tceptor_state::machine_reset()
 {
-	tceptor_state *state = machine.driver_data<tceptor_state>();
-	state->m_m6809_irq_enable = 0;
-	state->m_m68k_irq_enable = 0;
-	state->m_mcu_irq_enable = 0;
+	m_m6809_irq_enable = 0;
+	m_m68k_irq_enable = 0;
+	m_mcu_irq_enable = 0;
 }
 
 /*******************************************************************/
@@ -387,8 +385,6 @@ static MACHINE_CONFIG_START( tceptor, tceptor_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_MACHINE_START(tceptor)
-	MCFG_MACHINE_RESET(tceptor)
 
 	/* video hardware */
 	MCFG_GFXDECODE(tceptor)
@@ -419,9 +415,7 @@ static MACHINE_CONFIG_START( tceptor, tceptor_state )
 	MCFG_SCREEN_UPDATE_STATIC(tceptor_3d_right)
 	MCFG_SCREEN_VBLANK_STATIC(tceptor)
 
-	MCFG_PALETTE_INIT(tceptor)
 
-	MCFG_VIDEO_START(tceptor)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

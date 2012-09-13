@@ -68,10 +68,12 @@ public:
 	cpu_device *m_audiocpu;
 	DECLARE_WRITE16_MEMBER(soundcmd_w);
 	DECLARE_WRITE8_MEMBER(okibank_w);
+	virtual void machine_start();
+	virtual void video_start();
 };
 
 
-static VIDEO_START(diverboy)
+void diverboy_state::video_start()
 {
 }
 
@@ -244,11 +246,10 @@ static GFXDECODE_START( diverboy )
 GFXDECODE_END
 
 
-static MACHINE_START( diverboy )
+void diverboy_state::machine_start()
 {
-	diverboy_state *state = machine.driver_data<diverboy_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 }
 
 static MACHINE_CONFIG_START( diverboy, diverboy_state )
@@ -260,7 +261,6 @@ static MACHINE_CONFIG_START( diverboy, diverboy_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(snd_map)
 
-	MCFG_MACHINE_START(diverboy)
 
 	MCFG_GFXDECODE(diverboy)
 
@@ -273,7 +273,6 @@ static MACHINE_CONFIG_START( diverboy, diverboy_state )
 
 	MCFG_PALETTE_LENGTH(0x400)
 
-	MCFG_VIDEO_START(diverboy)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -39,6 +39,9 @@ public:
 	UINT16 m_t1latch;
 	UINT8 m_beep_en;
 	DECLARE_WRITE8_MEMBER(jr100_via_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -156,17 +159,17 @@ INPUT_PORTS_START( jr100 )
 	PORT_BIT(0xE0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-static MACHINE_START(jr100)
+void jr100_state::machine_start()
 {
-	beep_set_frequency(machine.device(BEEPER_TAG),0);
-	beep_set_state(machine.device(BEEPER_TAG),0);
+	beep_set_frequency(machine().device(BEEPER_TAG),0);
+	beep_set_state(machine().device(BEEPER_TAG),0);
 }
 
-static MACHINE_RESET(jr100)
+void jr100_state::machine_reset()
 {
 }
 
-static VIDEO_START( jr100 )
+void jr100_state::video_start()
 {
 }
 
@@ -355,8 +358,6 @@ static MACHINE_CONFIG_START( jr100, jr100_state )
     MCFG_CPU_ADD("maincpu",M6802, XTAL_14_31818MHz / 4) // clock devided internaly by 4
     MCFG_CPU_PROGRAM_MAP(jr100_mem)
 
-    MCFG_MACHINE_START(jr100)
-    MCFG_MACHINE_RESET(jr100)
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -370,7 +371,6 @@ static MACHINE_CONFIG_START( jr100, jr100_state )
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
-    MCFG_VIDEO_START(jr100)
 
 	MCFG_VIA6522_ADD("via", XTAL_14_31818MHz / 16, jr100_via_intf)
 

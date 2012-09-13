@@ -59,16 +59,18 @@ public:
 	DECLARE_WRITE8_MEMBER(ckon_ckof_callback);
 	DECLARE_WRITE8_MEMBER(lrex_callback);
 	DECLARE_DRIVER_INIT(ti990_4);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
-static MACHINE_RESET(ti990_4)
+void ti990_4_state::machine_reset()
 {
-	ti990_hold_load(machine);
+	ti990_hold_load(machine());
 
 	ti990_reset_int();
 
-	fd800_machine_init(machine, ti990_set_int7);
+	fd800_machine_init(machine(), ti990_set_int7);
 }
 
 
@@ -127,11 +129,10 @@ static const vdt911_init_params_t vdt911_intf =
 	ti990_set_int3
 };
 
-static VIDEO_START( ti990_4 )
+void ti990_4_state::video_start()
 {
-	ti990_4_state *state = machine.driver_data<ti990_4_state>();
 
-	state->m_terminal = machine.device("vdt911");
+	m_terminal = machine().device("vdt911");
 }
 
 static SCREEN_UPDATE_IND16( ti990_4 )
@@ -148,11 +149,10 @@ static const asr733_init_params_t asr733_intf =
 	ti990_set_int6
 };
 
-static VIDEO_START( ti990_4 )
+void ti990_4_state::video_start()
 {
-	ti990_4_state *state = machine.driver_data<ti990_4_state>();
 
-	state->m_terminal = machine.device("asr733");
+	m_terminal = machine().device("asr733");
 }
 
 static SCREEN_UPDATE_IND16( ti990_4 )
@@ -248,7 +248,6 @@ static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
 	MCFG_CPU_IO_MAP(ti990_4_cru_map)
 	MCFG_CPU_PERIODIC_INT(ti990_4_line_interrupt, 120/*or TIME_IN_HZ(100) in Europe*/)
 
-	MCFG_MACHINE_RESET( ti990_4 )
 
 	/* video hardware - we emulate a single 911 vdt display */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -278,7 +277,6 @@ static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
 	MCFG_PALETTE_INIT(asr733)
 	MCFG_ASR733_VIDEO_ADD("asr733", asr733_intf)
 #endif
-	MCFG_VIDEO_START(ti990_4)
 
 #if VIDEO_911
 	/* 911 VDT has a beep tone generator */

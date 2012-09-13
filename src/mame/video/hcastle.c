@@ -9,13 +9,13 @@
 #include "includes/hcastle.h"
 
 
-PALETTE_INIT( hcastle )
+void hcastle_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int chip;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x80);
+	machine().colortable = colortable_alloc(machine(), 0x80);
 
 	for (chip = 0; chip < 2; chip++)
 	{
@@ -35,7 +35,7 @@ PALETTE_INIT( hcastle )
 				else
 					ctabentry = (pal << 4) | (color_prom[(clut << 8) | i] & 0x0f);
 
-				colortable_entry_set_value(machine.colortable, (chip << 11) | (pal << 8) | i, ctabentry);
+				colortable_entry_set_value(machine().colortable, (chip << 11) | (pal << 8) | i, ctabentry);
 			}
 		}
 	}
@@ -127,14 +127,13 @@ TILE_GET_INFO_MEMBER(hcastle_state::get_bg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( hcastle )
+void hcastle_state::video_start()
 {
-	hcastle_state *state = machine.driver_data<hcastle_state>();
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hcastle_state::get_fg_tile_info),state), tilemap_mapper_delegate(FUNC(hcastle_state::tilemap_scan),state), 8, 8, 64, 32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hcastle_state::get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(hcastle_state::tilemap_scan),state), 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(hcastle_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(hcastle_state::tilemap_scan),this), 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(hcastle_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(hcastle_state::tilemap_scan),this), 8, 8, 64, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 

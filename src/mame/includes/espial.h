@@ -46,11 +46,16 @@ public:
 	DECLARE_WRITE8_MEMBER(espial_scrollram_w);
 	DECLARE_WRITE8_MEMBER(espial_flipscreen_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_VIDEO_START(netwars);
 };
 
 /*----------- defined in video/espial.c -----------*/
 
-PALETTE_INIT( espial );
-VIDEO_START( espial );
-VIDEO_START( netwars );
+
+
+
 SCREEN_UPDATE_IND16( espial );

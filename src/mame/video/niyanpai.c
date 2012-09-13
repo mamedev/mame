@@ -357,26 +357,25 @@ WRITE16_MEMBER(niyanpai_state::niyanpai_clutsel_2_w){ niyanpai_clutsel_w(machine
 
 
 ******************************************************************************/
-VIDEO_START( niyanpai )
+void niyanpai_state::video_start()
 {
-	niyanpai_state *state = machine.driver_data<niyanpai_state>();
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
 
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap[0]);
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap[1]);
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap[2]);
-	state->m_videoram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
-	state->m_videoram[1] = auto_alloc_array_clear(machine, UINT16, width * height);
-	state->m_videoram[2] = auto_alloc_array_clear(machine, UINT16, width * height);
-	state->m_videoworkram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
-	state->m_videoworkram[1] = auto_alloc_array_clear(machine, UINT16, width * height);
-	state->m_videoworkram[2] = auto_alloc_array_clear(machine, UINT16, width * height);
-	state->m_palette = auto_alloc_array(machine, UINT16, 0x480);
-	state->m_clut[0] = auto_alloc_array(machine, UINT8, 0x1000);
-	state->m_clut[1] = auto_alloc_array(machine, UINT8, 0x1000);
-	state->m_clut[2] = auto_alloc_array(machine, UINT8, 0x1000);
-	state->m_nb19010_busyflag = 1;
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmap[0]);
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmap[1]);
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmap[2]);
+	m_videoram[0] = auto_alloc_array_clear(machine(), UINT16, width * height);
+	m_videoram[1] = auto_alloc_array_clear(machine(), UINT16, width * height);
+	m_videoram[2] = auto_alloc_array_clear(machine(), UINT16, width * height);
+	m_videoworkram[0] = auto_alloc_array_clear(machine(), UINT16, width * height);
+	m_videoworkram[1] = auto_alloc_array_clear(machine(), UINT16, width * height);
+	m_videoworkram[2] = auto_alloc_array_clear(machine(), UINT16, width * height);
+	m_palette = auto_alloc_array(machine(), UINT16, 0x480);
+	m_clut[0] = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_clut[1] = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_clut[2] = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_nb19010_busyflag = 1;
 }
 
 /******************************************************************************

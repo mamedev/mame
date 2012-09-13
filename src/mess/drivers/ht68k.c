@@ -55,6 +55,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_WRITE_LINE_MEMBER(ht68k_fdc_intrq_w);
 	required_shared_ptr<UINT16> m_p_ram;
+	virtual void machine_reset();
 };
 
 
@@ -79,14 +80,13 @@ static INPUT_PORTS_START( ht68k )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(ht68k)
+void ht68k_state::machine_reset()
 {
-	ht68k_state *state = machine.driver_data<ht68k_state>();
-	UINT8* user1 = state->memregion("user1")->base();
+	UINT8* user1 = memregion("user1")->base();
 
-	memcpy((UINT8*)state->m_p_ram.target(),user1,0x8000);
+	memcpy((UINT8*)m_p_ram.target(),user1,0x8000);
 
-	machine.device("maincpu")->reset();
+	machine().device("maincpu")->reset();
 }
 
 static void duart_irq_handler(device_t *device, int state, UINT8 vector)
@@ -151,7 +151,6 @@ static MACHINE_CONFIG_START( ht68k, ht68k_state )
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(ht68k_mem)
 
-	MCFG_MACHINE_RESET(ht68k)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)

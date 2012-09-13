@@ -33,6 +33,8 @@ public:
 	DECLARE_WRITE8_MEMBER(dorachan_ctrl_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(dorachan_protection_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(dorachan_v128_r);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -221,20 +223,18 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_START( dorachan )
+void dorachan_state::machine_start()
 {
-	dorachan_state *state = machine.driver_data<dorachan_state>();
 
-	state->m_main_cpu = machine.device("maincpu");
+	m_main_cpu = machine().device("maincpu");
 
-	state->save_item(NAME(state->m_flip_screen));
+	save_item(NAME(m_flip_screen));
 }
 
-static MACHINE_RESET( dorachan )
+void dorachan_state::machine_reset()
 {
-	dorachan_state *state = machine.driver_data<dorachan_state>();
 
-	state->m_flip_screen = 0;
+	m_flip_screen = 0;
 }
 
 static MACHINE_CONFIG_START( dorachan, dorachan_state )
@@ -245,8 +245,6 @@ static MACHINE_CONFIG_START( dorachan, dorachan_state )
 	MCFG_CPU_IO_MAP(dorachan_io_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
 
-	MCFG_MACHINE_START(dorachan)
-	MCFG_MACHINE_RESET(dorachan)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

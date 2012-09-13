@@ -145,6 +145,7 @@ public:
 	int 				m_cassette_in;
 
 	kcexp_slot_device *	m_expansions[3];
+	DECLARE_PALETTE_INIT(kc85);
 };
 
 

@@ -983,25 +983,24 @@ static TIMER_CALLBACK( bebox_get_devices ) {
  *
  *************************************/
 
-MACHINE_RESET( bebox )
+void bebox_state::machine_reset()
 {
-	bebox_state *state = machine.driver_data<bebox_state>();
-	state->m_devices.pic8259_master = NULL;
-	state->m_devices.pic8259_slave = NULL;
-	state->m_devices.dma8237_1 = NULL;
-	state->m_devices.dma8237_2 = NULL;
+	m_devices.pic8259_master = NULL;
+	m_devices.pic8259_slave = NULL;
+	m_devices.dma8237_1 = NULL;
+	m_devices.dma8237_2 = NULL;
 
-	machine.scheduler().timer_set(attotime::zero, FUNC(bebox_get_devices));
+	machine().scheduler().timer_set(attotime::zero, FUNC(bebox_get_devices));
 
-	machine.device("ppc1")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-	machine.device("ppc2")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("ppc1")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	machine().device("ppc2")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	memcpy(machine.device<fujitsu_29f016a_device>("flash")->space()->get_read_ptr(0),state->memregion("user1")->base(),0x200000);
+	memcpy(machine().device<fujitsu_29f016a_device>("flash")->space()->get_read_ptr(0),memregion("user1")->base(),0x200000);
 }
 
-MACHINE_START( bebox )
+void bebox_state::machine_start()
 {
-	pc_fdc_init(machine, &bebox_fdc_interface);
+	pc_fdc_init(machine(), &bebox_fdc_interface);
 }
 
 DRIVER_INIT_MEMBER(bebox_state,bebox)

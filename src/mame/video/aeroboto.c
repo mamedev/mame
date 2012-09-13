@@ -39,33 +39,32 @@ TILE_GET_INFO_MEMBER(aeroboto_state::get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( aeroboto )
+void aeroboto_state::video_start()
 {
-	aeroboto_state *state = machine.driver_data<aeroboto_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aeroboto_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 64);
-	state->m_bg_tilemap->set_transparent_pen(0);
-	state->m_bg_tilemap->set_scroll_rows(64);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(aeroboto_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 64);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scroll_rows(64);
 
-	state->save_item(NAME(state->m_charbank));
-	state->save_item(NAME(state->m_starsoff));
-	state->save_item(NAME(state->m_sx));
-	state->save_item(NAME(state->m_sy));
-	state->save_item(NAME(state->m_ox));
-	state->save_item(NAME(state->m_oy));
+	save_item(NAME(m_charbank));
+	save_item(NAME(m_starsoff));
+	save_item(NAME(m_sx));
+	save_item(NAME(m_sy));
+	save_item(NAME(m_ox));
+	save_item(NAME(m_oy));
 
 	#if STARS_LAYOUT
 	{
 		UINT8 *temp;
 		int i;
 
-		temp = auto_alloc_array(machine, UINT8, state->m_stars_length);
-		memcpy(temp, state->m_stars_rom, state->m_stars_length);
+		temp = auto_alloc_array(machine(), UINT8, m_stars_length);
+		memcpy(temp, m_stars_rom, m_stars_length);
 
-		for (i = 0; i < state->m_stars_length; i++)
-			state->m_stars_rom[(i & ~0xff) + (i << 5 & 0xe0) + (i >> 3 & 0x1f)] = temp[i];
+		for (i = 0; i < m_stars_length; i++)
+			m_stars_rom[(i & ~0xff) + (i << 5 & 0xe0) + (i >> 3 & 0x1f)] = temp[i];
 
-		auto_free(machine, temp);
+		auto_free(machine(), temp);
 	}
 	#endif
 }

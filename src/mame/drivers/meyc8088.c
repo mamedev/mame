@@ -62,6 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER(meyc8088_common_w);
 
 	DECLARE_WRITE_LINE_MEMBER(meyc8088_sound_out);
+	virtual void palette_init();
 };
 
 
@@ -111,14 +112,14 @@ static const res_net_info meyc8088_net_info =
 	}
 };
 
-PALETTE_INIT( meyc8088 )
+void meyc8088_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	rgb_t *rgb;
 
-	rgb = compute_res_net_all(machine, color_prom, &meyc8088_decode_info, &meyc8088_net_info);
-	palette_set_colors(machine, 0, rgb, 32);
-	auto_free(machine, rgb);
+	rgb = compute_res_net_all(machine(), color_prom, &meyc8088_decode_info, &meyc8088_net_info);
+	palette_set_colors(machine(), 0, rgb, 32);
+	auto_free(machine(), rgb);
 }
 
 static SCREEN_UPDATE_IND16( meyc8088 )
@@ -389,7 +390,6 @@ static MACHINE_CONFIG_START( meyc8088, meyc8088_state )
 	MCFG_SCREEN_VBLANK_STATIC(meyc8088)
 
 	MCFG_PALETTE_LENGTH(32)
-	MCFG_PALETTE_INIT(meyc8088)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

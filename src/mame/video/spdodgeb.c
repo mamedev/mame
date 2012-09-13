@@ -3,13 +3,13 @@
 #include "includes/spdodgeb.h"
 
 
-PALETTE_INIT( spdodgeb )
+void spdodgeb_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -27,13 +27,13 @@ PALETTE_INIT( spdodgeb )
 		bit3 = (color_prom[0] >> 7) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 		/* blue component */
-		bit0 = (color_prom[machine.total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[machine.total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[machine.total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[machine.total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[machine().total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[machine().total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[machine().total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[machine().total_colors()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -69,10 +69,9 @@ TILE_GET_INFO_MEMBER(spdodgeb_state::get_bg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( spdodgeb )
+void spdodgeb_state::video_start()
 {
-	spdodgeb_state *state = machine.driver_data<spdodgeb_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(spdodgeb_state::get_bg_tile_info),state),tilemap_mapper_delegate(FUNC(spdodgeb_state::background_scan),state),8,8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spdodgeb_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(spdodgeb_state::background_scan),this),8,8,64,32);
 }
 
 

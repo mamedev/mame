@@ -519,54 +519,52 @@ static const kaneko_pandora_interface djboy_pandora_config =
 };
 
 
-static MACHINE_START( djboy )
+void djboy_state::machine_start()
 {
-	djboy_state *state = machine.driver_data<djboy_state>();
-	UINT8 *MAIN = state->memregion("maincpu")->base();
-	UINT8 *CPU1 = state->memregion("cpu1")->base();
-	UINT8 *CPU2 = state->memregion("cpu2")->base();
+	UINT8 *MAIN = memregion("maincpu")->base();
+	UINT8 *CPU1 = memregion("cpu1")->base();
+	UINT8 *CPU2 = memregion("cpu2")->base();
 
-	state->membank("bank1")->configure_entries(0, 4,  &MAIN[0x00000], 0x2000);
-	state->membank("bank1")->configure_entries(4, 28, &MAIN[0x10000], 0x2000);
-	state->membank("bank2")->configure_entries(0, 2,  &CPU1[0x00000], 0x4000);
-	state->membank("bank2")->configure_entries(2, 10, &CPU1[0x10000], 0x4000);
-	state->membank("bank3")->configure_entries(0, 3,  &CPU2[0x00000], 0x4000);
-	state->membank("bank3")->configure_entries(3, 5,  &CPU2[0x10000], 0x4000);
-	state->membank("bank4")->configure_entry(0, &MAIN[0x10000]); /* unsure if/how this area is banked */
+	membank("bank1")->configure_entries(0, 4,  &MAIN[0x00000], 0x2000);
+	membank("bank1")->configure_entries(4, 28, &MAIN[0x10000], 0x2000);
+	membank("bank2")->configure_entries(0, 2,  &CPU1[0x00000], 0x4000);
+	membank("bank2")->configure_entries(2, 10, &CPU1[0x10000], 0x4000);
+	membank("bank3")->configure_entries(0, 3,  &CPU2[0x00000], 0x4000);
+	membank("bank3")->configure_entries(3, 5,  &CPU2[0x10000], 0x4000);
+	membank("bank4")->configure_entry(0, &MAIN[0x10000]); /* unsure if/how this area is banked */
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_cpu1 = machine.device("cpu1");
-	state->m_cpu2 = machine.device("cpu2");
-	state->m_beast = machine.device("beast");
-	state->m_pandora = machine.device("pandora");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_cpu1 = machine().device("cpu1");
+	m_cpu2 = machine().device("cpu2");
+	m_beast = machine().device("beast");
+	m_pandora = machine().device("pandora");
 
-	state->save_item(NAME(state->m_videoreg));
-	state->save_item(NAME(state->m_scrollx));
-	state->save_item(NAME(state->m_scrolly));
+	save_item(NAME(m_videoreg));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
 
 	/* Kaneko BEAST */
-	state->save_item(NAME(state->m_data_to_beast));
-	state->save_item(NAME(state->m_data_to_z80));
-	state->save_item(NAME(state->m_beast_to_z80_full));
-	state->save_item(NAME(state->m_z80_to_beast_full));
-	state->save_item(NAME(state->m_beast_int0_l));
-	state->save_item(NAME(state->m_beast_p0));
-	state->save_item(NAME(state->m_beast_p1));
-	state->save_item(NAME(state->m_beast_p2));
-	state->save_item(NAME(state->m_beast_p3));
+	save_item(NAME(m_data_to_beast));
+	save_item(NAME(m_data_to_z80));
+	save_item(NAME(m_beast_to_z80_full));
+	save_item(NAME(m_z80_to_beast_full));
+	save_item(NAME(m_beast_int0_l));
+	save_item(NAME(m_beast_p0));
+	save_item(NAME(m_beast_p1));
+	save_item(NAME(m_beast_p2));
+	save_item(NAME(m_beast_p3));
 }
 
-static MACHINE_RESET( djboy )
+void djboy_state::machine_reset()
 {
-	djboy_state *state = machine.driver_data<djboy_state>();
 
-	state->m_videoreg = 0;
-	state->m_scrollx = 0;
-	state->m_scrolly = 0;
+	m_videoreg = 0;
+	m_scrollx = 0;
+	m_scrolly = 0;
 
-	state->m_beast_int0_l = 1;
-	state->m_beast_to_z80_full = 0;
-	state->m_z80_to_beast_full = 0;
+	m_beast_int0_l = 1;
+	m_beast_to_z80_full = 0;
+	m_z80_to_beast_full = 0;
 }
 
 static MACHINE_CONFIG_START( djboy, djboy_state )
@@ -591,8 +589,6 @@ static MACHINE_CONFIG_START( djboy, djboy_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(djboy)
-	MCFG_MACHINE_RESET(djboy)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57.5)
@@ -607,7 +603,6 @@ static MACHINE_CONFIG_START( djboy, djboy_state )
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", djboy_pandora_config)
 
-	MCFG_VIDEO_START(djboy)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

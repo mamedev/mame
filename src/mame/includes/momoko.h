@@ -43,6 +43,8 @@ public:
 	DECLARE_WRITE8_MEMBER(momoko_bg_select_w);
 	DECLARE_WRITE8_MEMBER(momoko_bg_priority_w);
 	DECLARE_WRITE8_MEMBER(momoko_flipscreen_w);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 

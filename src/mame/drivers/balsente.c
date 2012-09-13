@@ -1210,8 +1210,6 @@ static MACHINE_CONFIG_START( balsente, balsente_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(balsente)
-	MCFG_MACHINE_RESET(balsente)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_TIMER_ADD("scan_timer", balsente_interrupt_timer)
@@ -1228,7 +1226,6 @@ static MACHINE_CONFIG_START( balsente, balsente_state )
 
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(balsente)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

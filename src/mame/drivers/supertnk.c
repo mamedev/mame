@@ -123,6 +123,8 @@ public:
 	DECLARE_WRITE8_MEMBER(supertnk_bitplane_select_0_w);
 	DECLARE_WRITE8_MEMBER(supertnk_bitplane_select_1_w);
 	DECLARE_DRIVER_INIT(supertnk);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -184,22 +186,21 @@ WRITE8_MEMBER(supertnk_state::supertnk_interrupt_ack_w)
  *
  *************************************/
 
-static VIDEO_START( supertnk )
+void supertnk_state::video_start()
 {
-	supertnk_state *state = machine.driver_data<supertnk_state>();
 	offs_t i;
-	const UINT8 *prom = state->memregion("proms")->base();
+	const UINT8 *prom = memregion("proms")->base();
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
 		UINT8 data = prom[i];
 
-		state->m_pens[i] = MAKE_RGB(pal1bit(data >> 2), pal1bit(data >> 5), pal1bit(data >> 6));
+		m_pens[i] = MAKE_RGB(pal1bit(data >> 2), pal1bit(data >> 5), pal1bit(data >> 6));
 	}
 
-	state->m_videoram[0] = auto_alloc_array(machine, UINT8, 0x2000);
-	state->m_videoram[1] = auto_alloc_array(machine, UINT8, 0x2000);
-	state->m_videoram[2] = auto_alloc_array(machine, UINT8, 0x2000);
+	m_videoram[0] = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_videoram[1] = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_videoram[2] = auto_alloc_array(machine(), UINT8, 0x2000);
 }
 
 
@@ -284,15 +285,14 @@ static SCREEN_UPDATE_RGB32( supertnk )
  *
  *************************************/
 
-static MACHINE_RESET( supertnk )
+void supertnk_state::machine_reset()
 {
-	supertnk_state *state = machine.driver_data<supertnk_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	state->supertnk_bankswitch_0_w(*space, 0, 0);
-	state->supertnk_bankswitch_1_w(*space, 0, 0);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	supertnk_bankswitch_0_w(*space, 0, 0);
+	supertnk_bankswitch_1_w(*space, 0, 0);
 
-	state->supertnk_bitplane_select_0_w(*space, 0, 0);
-	state->supertnk_bitplane_select_1_w(*space, 0, 0);
+	supertnk_bitplane_select_0_w(*space, 0, 0);
+	supertnk_bitplane_select_1_w(*space, 0, 0);
 }
 
 
@@ -431,10 +431,8 @@ static MACHINE_CONFIG_START( supertnk, supertnk_state )
 	MCFG_CPU_IO_MAP(supertnk_io_map)
 	MCFG_CPU_VBLANK_INT("screen", supertnk_interrupt)
 
-	MCFG_MACHINE_RESET(supertnk)
 
 	/* video hardware */
-	MCFG_VIDEO_START(supertnk)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(32*8, 32*8)

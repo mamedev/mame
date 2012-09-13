@@ -335,20 +335,18 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static MACHINE_START( blmbycar )
+MACHINE_START_MEMBER(blmbycar_state,blmbycar)
 {
-	blmbycar_state *state = machine.driver_data<blmbycar_state>();
 
-	state->save_item(NAME(state->m_pot_wheel));
-	state->save_item(NAME(state->m_old_val));
+	save_item(NAME(m_pot_wheel));
+	save_item(NAME(m_old_val));
 }
 
-static MACHINE_RESET( blmbycar )
+MACHINE_RESET_MEMBER(blmbycar_state,blmbycar)
 {
-	blmbycar_state *state = machine.driver_data<blmbycar_state>();
 
-	state->m_pot_wheel = 0;
-	state->m_old_val = 0;
+	m_pot_wheel = 0;
+	m_old_val = 0;
 }
 
 
@@ -359,8 +357,8 @@ static MACHINE_CONFIG_START( blmbycar, blmbycar_state )
 	MCFG_CPU_PROGRAM_MAP(blmbycar_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MCFG_MACHINE_START(blmbycar)
-	MCFG_MACHINE_RESET(blmbycar)
+	MCFG_MACHINE_START_OVERRIDE(blmbycar_state,blmbycar)
+	MCFG_MACHINE_RESET_OVERRIDE(blmbycar_state,blmbycar)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -373,7 +371,6 @@ static MACHINE_CONFIG_START( blmbycar, blmbycar_state )
 	MCFG_GFXDECODE(blmbycar)
 	MCFG_PALETTE_LENGTH(0x300)
 
-	MCFG_VIDEO_START(blmbycar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -384,18 +381,16 @@ static MACHINE_CONFIG_START( blmbycar, blmbycar_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_START( watrball )
+MACHINE_START_MEMBER(blmbycar_state,watrball)
 {
-	blmbycar_state *state = machine.driver_data<blmbycar_state>();
 
-	state->save_item(NAME(state->m_retvalue));
+	save_item(NAME(m_retvalue));
 }
 
-static MACHINE_RESET( watrball )
+MACHINE_RESET_MEMBER(blmbycar_state,watrball)
 {
-	blmbycar_state *state = machine.driver_data<blmbycar_state>();
 
-	state->m_retvalue = 0;
+	m_retvalue = 0;
 }
 
 static MACHINE_CONFIG_START( watrball, blmbycar_state )
@@ -405,8 +400,8 @@ static MACHINE_CONFIG_START( watrball, blmbycar_state )
 	MCFG_CPU_PROGRAM_MAP(watrball_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MCFG_MACHINE_START(watrball)
-	MCFG_MACHINE_RESET(watrball)
+	MCFG_MACHINE_START_OVERRIDE(blmbycar_state,watrball)
+	MCFG_MACHINE_RESET_OVERRIDE(blmbycar_state,watrball)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -419,7 +414,6 @@ static MACHINE_CONFIG_START( watrball, blmbycar_state )
 	MCFG_GFXDECODE(blmbycar)
 	MCFG_PALETTE_LENGTH(0x300)
 
-	MCFG_VIDEO_START(blmbycar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

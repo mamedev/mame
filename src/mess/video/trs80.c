@@ -42,12 +42,11 @@ WRITE8_MEMBER( trs80_state::trs80m4_88_w )
 }
 
 
-VIDEO_START( trs80 )
+void trs80_state::video_start()
 {
-	trs80_state *state = machine.driver_data<trs80_state>();
-	state->m_p_chargen = state->memregion("chargen")->base();
-	state->m_size_store = 0xff;
-	state->m_mode &= 2;
+	m_p_chargen = memregion("chargen")->base();
+	m_size_store = 0xff;
+	m_mode &= 2;
 }
 
 
@@ -587,7 +586,7 @@ static const rgb_t lnw80_palette[] =
 	MAKE_RGB(0, 0, 0), // black
 };
 
-PALETTE_INIT( lnw80 )
+PALETTE_INIT_MEMBER(trs80_state,lnw80)
 {
-	palette_set_colors(machine, 0, lnw80_palette, ARRAY_LENGTH(lnw80_palette));
+	palette_set_colors(machine(), 0, lnw80_palette, ARRAY_LENGTH(lnw80_palette));
 }

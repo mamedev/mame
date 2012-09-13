@@ -54,15 +54,14 @@ void bottom9_zoom_callback( running_machine &machine, int *code, int *color, int
 
 ***************************************************************************/
 
-VIDEO_START( bottom9 )
+void bottom9_state::video_start()
 {
-	bottom9_state *state = machine.driver_data<bottom9_state>();
 
-	state->m_layer_colorbase[0] = 0;	/* not used */
-	state->m_layer_colorbase[1] = 0;
-	state->m_layer_colorbase[2] = 16;
-	state->m_sprite_colorbase = 32;
-	state->m_zoom_colorbase = 48;
+	m_layer_colorbase[0] = 0;	/* not used */
+	m_layer_colorbase[1] = 0;
+	m_layer_colorbase[2] = 16;
+	m_sprite_colorbase = 32;
+	m_zoom_colorbase = 48;
 }
 
 

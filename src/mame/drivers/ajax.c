@@ -220,8 +220,6 @@ static MACHINE_CONFIG_START( ajax, ajax_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_RESET(ajax)
-	MCFG_MACHINE_START(ajax)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -235,7 +233,6 @@ static MACHINE_CONFIG_START( ajax, ajax_state )
 
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(ajax)
 
 	MCFG_K052109_ADD("k052109", ajax_k052109_intf)
 	MCFG_K051960_ADD("k051960", ajax_k051960_intf)

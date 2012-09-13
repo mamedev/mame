@@ -50,11 +50,10 @@ TILE_GET_INFO_MEMBER(shisen_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-VIDEO_START( sichuan2 )
+void shisen_state::video_start()
 {
-	shisen_state *state = machine.driver_data<shisen_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(shisen_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(shisen_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 		 8, 8, 64, 32);
 }
 

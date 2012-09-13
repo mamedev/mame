@@ -20,6 +20,8 @@ public:
 	DECLARE_WRITE8_MEMBER(funybubl_soundcommand_w);
 	DECLARE_WRITE8_MEMBER(funybubl_paldatawrite);
 	DECLARE_WRITE8_MEMBER(funybubl_oki_bank_sw);
+	virtual void machine_start();
+	virtual void video_start();
 };
 
 
@@ -27,5 +29,5 @@ public:
 /*----------- defined in video/funybubl.c -----------*/
 
 
-VIDEO_START(funybubl);
+
 SCREEN_UPDATE_IND16(funybubl);

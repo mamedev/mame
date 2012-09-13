@@ -41,9 +41,9 @@
   bit 0 -- 2.2kohm resistor  -- BLUE
 
 ***************************************************************************/
-PALETTE_INIT( matmania )
+void matmania_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 64; i++)
@@ -66,7 +66,7 @@ PALETTE_INIT( matmania )
 		bit3 = BIT(color_prom[64], 3);
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -113,15 +113,14 @@ WRITE8_MEMBER(matmania_state::matmania_paletteram_w)
 
 ***************************************************************************/
 
-VIDEO_START( matmania )
+void matmania_state::video_start()
 {
-	matmania_state *state = machine.driver_data<matmania_state>();
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
 
 	/* Mat Mania has a virtual screen twice as large as the visible screen */
-	state->m_tmpbitmap  = auto_bitmap_ind16_alloc(machine, width, 2 * height);
-	state->m_tmpbitmap2 = auto_bitmap_ind16_alloc(machine, width, 2 * height);
+	m_tmpbitmap  = auto_bitmap_ind16_alloc(machine(), width, 2 * height);
+	m_tmpbitmap2 = auto_bitmap_ind16_alloc(machine(), width, 2 * height);
 }
 
 

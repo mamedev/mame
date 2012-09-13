@@ -17,10 +17,11 @@ public:
 	DECLARE_WRITE8_MEMBER(speedbal_background_videoram_w);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/speedbal.c -----------*/
 
-VIDEO_START( speedbal );
+
 SCREEN_UPDATE_IND16( speedbal );

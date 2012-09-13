@@ -31,12 +31,16 @@ public:
 	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };
 	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(space, offset, m_SN76496_latch); };
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/yiear.c -----------*/
 
 
-PALETTE_INIT( yiear );
-VIDEO_START( yiear );
+
+
 SCREEN_UPDATE_IND16( yiear );

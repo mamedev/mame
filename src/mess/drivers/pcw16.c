@@ -1423,20 +1423,19 @@ static void pcw16_reset(running_machine &machine)
 }
 
 
-static MACHINE_START( pcw16 )
+void pcw16_state::machine_start()
 {
-	pcw16_state *state = machine.driver_data<pcw16_state>();
-	device_t *speaker = machine.device(BEEPER_TAG);
-	state->m_system_status = 0;
-	state->m_interrupt_counter = 0;
+	device_t *speaker = machine().device(BEEPER_TAG);
+	m_system_status = 0;
+	m_interrupt_counter = 0;
 
-	pc_fdc_init(machine, &pcw16_fdc_interface);
+	pc_fdc_init(machine(), &pcw16_fdc_interface);
 
 	/* initialise keyboard */
-	at_keyboard_init(machine, AT_KEYBOARD_TYPE_AT);
+	at_keyboard_init(machine(), AT_KEYBOARD_TYPE_AT);
 	at_keyboard_set_scan_code_set(3);
 
-	pcw16_reset(machine);
+	pcw16_reset(machine());
 
 	beep_set_state(speaker,0);
 	beep_set_frequency(speaker,3750);
@@ -1480,7 +1479,6 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	MCFG_CPU_IO_MAP(pcw16_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START( pcw16 )
 
 	MCFG_NS16550_ADD( "ns16550_1", pcw16_com_interface[0], XTAL_1_8432MHz )		/* TODO: Verify uart model */
 
@@ -1495,9 +1493,7 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	MCFG_SCREEN_UPDATE_STATIC( pcw16 )
 
 	MCFG_PALETTE_LENGTH(PCW16_NUM_COLOURS)
-	MCFG_PALETTE_INIT( pcw16 )
 
-	MCFG_VIDEO_START( pcw16 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

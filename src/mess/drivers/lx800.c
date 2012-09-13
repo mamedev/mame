@@ -44,6 +44,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(lx800_centronics_pe_w);
 	DECLARE_WRITE_LINE_MEMBER(lx800_paperempty_led_w);
 	DECLARE_WRITE_LINE_MEMBER(lx800_reset_w);
+	virtual void machine_start();
 };
 
 
@@ -143,12 +144,10 @@ WRITE_LINE_MEMBER( lx800_state::lx800_reset_w )
     MACHINE EMULATION
 ***************************************************************************/
 
-static MACHINE_START( lx800 )
+void lx800_state::machine_start()
 {
-	lx800_state *lx800 = machine.driver_data<lx800_state>();
-
-	beep_set_state(lx800->m_beep, 0);
-	beep_set_frequency(lx800->m_beep, 4000); /* ? */
+	beep_set_state(m_beep, 0);
+	beep_set_frequency(m_beep, 4000); /* ? */
 }
 
 
@@ -264,7 +263,6 @@ static MACHINE_CONFIG_START( lx800, lx800_state )
 	MCFG_CPU_PROGRAM_MAP(lx800_mem)
 	MCFG_CPU_IO_MAP(lx800_io)
 
-	MCFG_MACHINE_START(lx800)
 
 	MCFG_DEFAULT_LAYOUT(layout_lx800)
 

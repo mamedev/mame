@@ -104,132 +104,126 @@ TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_bg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( bigtwin )
+VIDEO_START_MEMBER(playmark_state,bigtwin)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	state->m_tx_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
 
-	state->m_xoffset = 0;
-	state->m_yoffset = 0;
-	state->m_txt_tile_offset = 0;
+	m_xoffset = 0;
+	m_yoffset = 0;
+	m_txt_tile_offset = 0;
 
-	state->m_pri_masks[0] = 0;
-	state->m_pri_masks[1] = 0;
-	state->m_pri_masks[2] = 0;
+	m_pri_masks[0] = 0;
+	m_pri_masks[1] = 0;
+	m_pri_masks[2] = 0;
 }
 
 
-VIDEO_START( bigtwinb )
+VIDEO_START_MEMBER(playmark_state,bigtwinb)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::bigtwinb_get_tx_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_bg_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::bigtwinb_get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_bg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	state->m_tx_tilemap->set_transparent_pen(0);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap->set_scrolldx(-4, -4);
+	m_bg_tilemap->set_scrolldx(-4, -4);
 
-	state->m_xoffset = 1;
-	state->m_yoffset = 0;
-	state->m_txt_tile_offset = 0x8000;
+	m_xoffset = 1;
+	m_yoffset = 0;
+	m_txt_tile_offset = 0x8000;
 
-	state->m_pri_masks[0] = 0;
-	state->m_pri_masks[1] = 0;
-	state->m_pri_masks[2] = 0;
+	m_pri_masks[0] = 0;
+	m_pri_masks[1] = 0;
+	m_pri_masks[2] = 0;
 }
 
 
-VIDEO_START( wbeachvl )
+VIDEO_START_MEMBER(playmark_state,wbeachvl)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::wbeachvl_get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::wbeachvl_get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::wbeachvl_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::wbeachvl_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::wbeachvl_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::wbeachvl_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 
-	state->m_tx_tilemap->set_transparent_pen(0);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_xoffset = 0;
-	state->m_yoffset = 0;
-	state->m_txt_tile_offset = 0;
+	m_xoffset = 0;
+	m_yoffset = 0;
+	m_txt_tile_offset = 0;
 
-	state->m_pri_masks[0] = 0xfff0;
-	state->m_pri_masks[1] = 0xfffc;
-	state->m_pri_masks[2] = 0;
+	m_pri_masks[0] = 0xfff0;
+	m_pri_masks[1] = 0xfffc;
+	m_pri_masks[2] = 0;
 }
 
-VIDEO_START( excelsr )
+VIDEO_START_MEMBER(playmark_state,excelsr)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	state->m_tx_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
 
-	state->m_xoffset = 0;
-	state->m_yoffset = 0;
-	state->m_txt_tile_offset = 0;
+	m_xoffset = 0;
+	m_yoffset = 0;
+	m_txt_tile_offset = 0;
 
-	state->m_pri_masks[0] = 0;
-	state->m_pri_masks[1] = 0xfffc;
-	state->m_pri_masks[2] = 0xfff0;
+	m_pri_masks[0] = 0;
+	m_pri_masks[1] = 0xfffc;
+	m_pri_masks[2] = 0xfff0;
 }
 
-VIDEO_START( hotmind )
+VIDEO_START_MEMBER(playmark_state,hotmind)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	state->m_tx_tilemap->set_transparent_pen(0);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_tx_tilemap->set_scrolldx(-14, -14);
-	state->m_fg_tilemap->set_scrolldx(-14, -14);
-	state->m_bg_tilemap->set_scrolldx(-14, -14);
+	m_tx_tilemap->set_scrolldx(-14, -14);
+	m_fg_tilemap->set_scrolldx(-14, -14);
+	m_bg_tilemap->set_scrolldx(-14, -14);
 
-	state->m_xoffset = -9;
-	state->m_yoffset = -8;
-	state->m_txt_tile_offset = 0x9000;
+	m_xoffset = -9;
+	m_yoffset = -8;
+	m_txt_tile_offset = 0x9000;
 
-	state->m_pri_masks[0] = 0xfff0;
-	state->m_pri_masks[1] = 0xfffc;
-	state->m_pri_masks[2] = 0;
+	m_pri_masks[0] = 0xfff0;
+	m_pri_masks[1] = 0xfffc;
+	m_pri_masks[2] = 0;
 }
 
-VIDEO_START( hrdtimes )
+VIDEO_START_MEMBER(playmark_state,hrdtimes)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_tx_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_bg_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_bg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	state->m_tx_tilemap->set_transparent_pen(0);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_tx_tilemap->set_scrolldx(-14, -14);
-	state->m_fg_tilemap->set_scrolldx(-10, -10);
-	state->m_bg_tilemap->set_scrolldx(-12, -12);
+	m_tx_tilemap->set_scrolldx(-14, -14);
+	m_fg_tilemap->set_scrolldx(-10, -10);
+	m_bg_tilemap->set_scrolldx(-12, -12);
 
-	state->m_xoffset = -8;
-	state->m_yoffset = -8;
-	state->m_txt_tile_offset = 0xfc00;
+	m_xoffset = -8;
+	m_yoffset = -8;
+	m_txt_tile_offset = 0xfc00;
 
-	state->m_pri_masks[0] = 0xfff0;
-	state->m_pri_masks[1] = 0xfffc;
-	state->m_pri_masks[2] = 0;
+	m_pri_masks[0] = 0xfff0;
+	m_pri_masks[1] = 0xfffc;
+	m_pri_masks[2] = 0;
 }
 
 /***************************************************************************

@@ -139,6 +139,9 @@ public:
 	DECLARE_WRITE8_MEMBER(speech_enable_w);
 	DECLARE_DRIVER_INIT(looping);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_start();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -149,9 +152,9 @@ public:
  *
  *************************************/
 
-static PALETTE_INIT( looping )
+void looping_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
 	int i;
@@ -184,7 +187,7 @@ static PALETTE_INIT( looping )
 		bit1 = (color_prom[i] >> 7) & 1;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -204,13 +207,12 @@ TILE_GET_INFO_MEMBER(looping_state::get_tile_info)
 }
 
 
-static VIDEO_START( looping )
+void looping_state::video_start()
 {
-	looping_state *state = machine.driver_data<looping_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(looping_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(looping_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
-	state->m_bg_tilemap->set_scroll_cols(0x20);
+	m_bg_tilemap->set_scroll_cols(0x20);
 }
 
 
@@ -318,10 +320,9 @@ static SCREEN_UPDATE_IND16( looping )
  *
  *************************************/
 
-static MACHINE_START( looping )
+void looping_state::machine_start()
 {
-	looping_state *state = machine.driver_data<looping_state>();
-	state->save_item(NAME(state->m_sound));
+	save_item(NAME(m_sound));
 }
 
 
@@ -653,7 +654,6 @@ static MACHINE_CONFIG_START( looping, looping_state )
 	MCFG_CPU_IO_MAP(looping_cop_io_map)
 	MCFG_CPU_CONFIG(looping_cop_intf)
 
-	MCFG_MACHINE_START(looping)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -663,8 +663,6 @@ static MACHINE_CONFIG_START( looping, looping_state )
 	MCFG_GFXDECODE(looping)
 	MCFG_PALETTE_LENGTH(32)
 
-	MCFG_PALETTE_INIT(looping)
-	MCFG_VIDEO_START(looping)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

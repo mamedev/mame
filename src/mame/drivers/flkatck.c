@@ -192,31 +192,29 @@ static const k007232_interface k007232_config =
 };
 
 
-static MACHINE_START( flkatck )
+void flkatck_state::machine_start()
 {
-	flkatck_state *state = machine.driver_data<flkatck_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 3, &ROM[0x10000], 0x2000);
+	membank("bank1")->configure_entries(0, 3, &ROM[0x10000], 0x2000);
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_k007121 = machine.device("k007121");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_k007121 = machine().device("k007121");
 
-	state->save_item(NAME(state->m_irq_enabled));
-	state->save_item(NAME(state->m_multiply_reg));
-	state->save_item(NAME(state->m_flipscreen));
+	save_item(NAME(m_irq_enabled));
+	save_item(NAME(m_multiply_reg));
+	save_item(NAME(m_flipscreen));
 }
 
-static MACHINE_RESET( flkatck )
+void flkatck_state::machine_reset()
 {
-	flkatck_state *state = machine.driver_data<flkatck_state>();
 
-	k007232_set_bank(machine.device("konami"), 0, 1);
+	k007232_set_bank(machine().device("konami"), 0, 1);
 
-	state->m_irq_enabled = 0;
-	state->m_multiply_reg[0] = 0;
-	state->m_multiply_reg[1] = 0;
-	state->m_flipscreen = 0;
+	m_irq_enabled = 0;
+	m_multiply_reg[0] = 0;
+	m_multiply_reg[1] = 0;
+	m_flipscreen = 0;
 }
 
 static MACHINE_CONFIG_START( flkatck, flkatck_state )
@@ -231,8 +229,6 @@ static MACHINE_CONFIG_START( flkatck, flkatck_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(flkatck)
-	MCFG_MACHINE_RESET(flkatck)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -245,7 +241,6 @@ static MACHINE_CONFIG_START( flkatck, flkatck_state )
 	MCFG_GFXDECODE(flkatck)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(flkatck)
 
 	MCFG_K007121_ADD("k007121")
 

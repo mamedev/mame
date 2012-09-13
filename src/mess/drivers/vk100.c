@@ -190,6 +190,8 @@ public:
 	DECLARE_READ8_MEMBER(SYSTAT_A);
 	DECLARE_READ8_MEMBER(SYSTAT_B);
 	DECLARE_DRIVER_INIT(vk100);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 // vram access functions:
@@ -840,10 +842,9 @@ static INPUT_PORTS_START( vk100 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET( vk100 )
+void vk100_state::machine_reset()
 {
-	vk100_state *state = machine.driver_data<vk100_state>();
-	beep_set_frequency( state->m_speaker, 116 ); //116 hz (page 172 of TM), but duty cycle is wrong here!
+	beep_set_frequency( m_speaker, 116 ); //116 hz (page 172 of TM), but duty cycle is wrong here!
 	output_set_value("online_led",1);
 	output_set_value("local_led", 0);
 	output_set_value("noscroll_led",1);
@@ -851,25 +852,25 @@ static MACHINE_RESET( vk100 )
 	output_set_value("hardcopy_led", 1);
 	output_set_value("l1_led", 1);
 	output_set_value("l2_led", 1);
-	state->m_vsync = 0;
-	state->m_vgX = 0;
-	state->m_vgY = 0;
-	state->m_vgERR = 0;
-	state->m_vgSOPS = 0;
-	state->m_vgPAT = 0;
-	state->m_vgPAT_Mask = 0x80;
-	state->m_vgPMUL = 0;
-	state->m_vgPMUL_Count = 0;
-	state->m_vgDownCount = 0;
-	state->VG_DU = 0;
-	state->VG_DVM = 0;
-	state->VG_DIR = 0;
-	state->VG_WOPS = 0;
-	state->m_VG_MODE = 0;
-	state->m_vgGO = 0;
-	state->m_ACTS = 1;
-	state->m_RXDivisor = 6336;
-	state->m_TXDivisor = 6336;
+	m_vsync = 0;
+	m_vgX = 0;
+	m_vgY = 0;
+	m_vgERR = 0;
+	m_vgSOPS = 0;
+	m_vgPAT = 0;
+	m_vgPAT_Mask = 0x80;
+	m_vgPMUL = 0;
+	m_vgPMUL_Count = 0;
+	m_vgDownCount = 0;
+	VG_DU = 0;
+	VG_DVM = 0;
+	VG_DIR = 0;
+	VG_WOPS = 0;
+	m_VG_MODE = 0;
+	m_vgGO = 0;
+	m_ACTS = 1;
+	m_RXDivisor = 6336;
+	m_TXDivisor = 6336;
 }
 
 static WRITE_LINE_DEVICE_HANDLER(crtc_vsync)
@@ -908,13 +909,12 @@ DRIVER_INIT_MEMBER(vk100_state,vk100)
 	//machine().scheduler().timer_set(attotime::from_hz(10000), FUNC(i8251_rx_clk));
 }
 
-static VIDEO_START( vk100 )
+void vk100_state::video_start()
 {
-	vk100_state *state = machine.driver_data<vk100_state>();
-	state->m_vram = state->memregion("vram")->base();
-	state->m_trans = state->memregion("trans")->base();
-	state->m_pattern = state->memregion("pattern")->base();
-	state->m_dir = state->memregion("dir")->base();
+	m_vram = memregion("vram")->base();
+	m_trans = memregion("trans")->base();
+	m_pattern = memregion("pattern")->base();
+	m_dir = memregion("dir")->base();
 }
 
 static MC6845_UPDATE_ROW( vk100_update_row )
@@ -982,14 +982,12 @@ static MACHINE_CONFIG_START( vk100, vk100_state )
 	MCFG_CPU_PROGRAM_MAP(vk100_mem)
 	MCFG_CPU_IO_MAP(vk100_io)
 
-	MCFG_MACHINE_RESET(vk100)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_45_6192Mhz/3, 882, 0, 720, 370, 0, 350 ) // fake screen timings for startup until 6845 sets real ones
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 	MCFG_MC6845_ADD( "crtc", H46505, XTAL_45_6192Mhz/3/12, mc6845_intf)
-	MCFG_VIDEO_START(vk100) // to set m_vram pointer properly (is there a less roundabout way to do this?)
 
 	/* i8251 uart */
 	MCFG_I8251_ADD("i8251", i8251_intf)

@@ -590,40 +590,38 @@ static GFXDECODE_START( lazercmd )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 2 )
 GFXDECODE_END
 
-static PALETTE_INIT( lazercmd )
+void lazercmd_state::palette_init()
 {
-	palette_set_color(machine, 0, MAKE_RGB(0xb0, 0xb0, 0xb0));	/* white */
-	palette_set_color(machine, 1, MAKE_RGB(0x00, 0x00, 0x00));	/* black */
+	palette_set_color(machine(), 0, MAKE_RGB(0xb0, 0xb0, 0xb0));	/* white */
+	palette_set_color(machine(), 1, MAKE_RGB(0x00, 0x00, 0x00));	/* black */
 
-	palette_set_color(machine, 2, MAKE_RGB(0x00, 0x00, 0x00));	/* black */
-	palette_set_color(machine, 3, MAKE_RGB(0xb0, 0xb0, 0xb0));	/* white */
+	palette_set_color(machine(), 2, MAKE_RGB(0x00, 0x00, 0x00));	/* black */
+	palette_set_color(machine(), 3, MAKE_RGB(0xb0, 0xb0, 0xb0));	/* white */
 
-	palette_set_color(machine, 4, MAKE_RGB(0xff, 0xff, 0xff));	/* bright white */
+	palette_set_color(machine(), 4, MAKE_RGB(0xff, 0xff, 0xff));	/* bright white */
 }
 
 
-static MACHINE_START( lazercmd )
+void lazercmd_state::machine_start()
 {
-	lazercmd_state *state = machine.driver_data<lazercmd_state>();
 
-	state->m_dac = machine.device<dac_device>("dac");
+	m_dac = machine().device<dac_device>("dac");
 
-	state->save_item(NAME(state->m_marker_x));
-	state->save_item(NAME(state->m_marker_y));
-	state->save_item(NAME(state->m_timer_count));
-	state->save_item(NAME(state->m_sense_state));
-	state->save_item(NAME(state->m_dac_data));
+	save_item(NAME(m_marker_x));
+	save_item(NAME(m_marker_y));
+	save_item(NAME(m_timer_count));
+	save_item(NAME(m_sense_state));
+	save_item(NAME(m_dac_data));
 }
 
-static MACHINE_RESET( lazercmd )
+void lazercmd_state::machine_reset()
 {
-	lazercmd_state *state = machine.driver_data<lazercmd_state>();
 
-	state->m_marker_x = 0;
-	state->m_marker_y = 0;
-	state->m_timer_count = 0;
-	state->m_sense_state = 0;
-	state->m_dac_data = 0;
+	m_marker_x = 0;
+	m_marker_y = 0;
+	m_timer_count = 0;
+	m_sense_state = 0;
+	m_dac_data = 0;
 }
 
 
@@ -639,8 +637,6 @@ static MACHINE_CONFIG_START( lazercmd, lazercmd_state )
 	MCFG_CPU_IO_MAP(lazercmd_portmap)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", lazercmd_timer, "screen", 0, 1) /* 7680 Hz */
 
-	MCFG_MACHINE_START(lazercmd)
-	MCFG_MACHINE_RESET(lazercmd)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -654,7 +650,6 @@ static MACHINE_CONFIG_START( lazercmd, lazercmd_state )
 	MCFG_GFXDECODE(lazercmd)
 	MCFG_PALETTE_LENGTH(5)
 
-	MCFG_PALETTE_INIT(lazercmd)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -676,8 +671,6 @@ static MACHINE_CONFIG_START( medlanes, lazercmd_state )
 	MCFG_CPU_IO_MAP(lazercmd_portmap)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", lazercmd_timer, "screen", 0, 1) /* 7680 Hz */
 
-	MCFG_MACHINE_START(lazercmd)
-	MCFG_MACHINE_RESET(lazercmd)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -691,7 +684,6 @@ static MACHINE_CONFIG_START( medlanes, lazercmd_state )
 	MCFG_GFXDECODE(lazercmd)
 	MCFG_PALETTE_LENGTH(5)
 
-	MCFG_PALETTE_INIT(lazercmd)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -713,8 +705,6 @@ static MACHINE_CONFIG_START( bbonk, lazercmd_state )
 	MCFG_CPU_IO_MAP(lazercmd_portmap)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", bbonk_timer, "screen", 0, 1) /* 7680 Hz */
 
-	MCFG_MACHINE_START(lazercmd)
-	MCFG_MACHINE_RESET(lazercmd)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -728,7 +718,6 @@ static MACHINE_CONFIG_START( bbonk, lazercmd_state )
 	MCFG_GFXDECODE(lazercmd)
 	MCFG_PALETTE_LENGTH(5)
 
-	MCFG_PALETTE_INIT(lazercmd)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

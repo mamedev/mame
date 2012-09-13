@@ -174,22 +174,20 @@ static const samples_interface gotya_samples_interface =
 };
 
 
-static MACHINE_START( gotya )
+void gotya_state::machine_start()
 {
-	gotya_state *state = machine.driver_data<gotya_state>();
 
-	state->m_samples = machine.device<samples_device>("samples");
+	m_samples = machine().device<samples_device>("samples");
 
-	state->save_item(NAME(state->m_scroll_bit_8));
-	state->save_item(NAME(state->m_theme_playing));
+	save_item(NAME(m_scroll_bit_8));
+	save_item(NAME(m_theme_playing));
 }
 
-static MACHINE_RESET( gotya )
+void gotya_state::machine_reset()
 {
-	gotya_state *state = machine.driver_data<gotya_state>();
 
-	state->m_scroll_bit_8 = 0;
-	state->m_theme_playing = 0;
+	m_scroll_bit_8 = 0;
+	m_theme_playing = 0;
 }
 
 static MACHINE_CONFIG_START( gotya, gotya_state )
@@ -199,8 +197,6 @@ static MACHINE_CONFIG_START( gotya, gotya_state )
 	MCFG_CPU_PROGRAM_MAP(gotya_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(gotya)
-	MCFG_MACHINE_RESET(gotya)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -213,8 +209,6 @@ static MACHINE_CONFIG_START( gotya, gotya_state )
 	MCFG_GFXDECODE(gotya)
 	MCFG_PALETTE_LENGTH(16*4)
 
-	MCFG_PALETTE_INIT(gotya)
-	MCFG_VIDEO_START(gotya)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

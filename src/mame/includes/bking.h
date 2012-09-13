@@ -80,6 +80,13 @@ public:
 	DECLARE_WRITE8_MEMBER(unk_w);
 	DECLARE_WRITE8_MEMBER(port_b_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_MACHINE_START(bking3);
+	DECLARE_MACHINE_RESET(bking3);
+	DECLARE_MACHINE_RESET(common);
 };
 
 
@@ -87,7 +94,7 @@ public:
 
 
 
-PALETTE_INIT( bking );
-VIDEO_START( bking );
+
+
 SCREEN_UPDATE_IND16( bking );
 SCREEN_VBLANK( bking );

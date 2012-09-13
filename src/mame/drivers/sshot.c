@@ -172,6 +172,8 @@ public:
 	DECLARE_WRITE8_MEMBER(supershot_output0_w);
 	DECLARE_WRITE8_MEMBER(supershot_output1_w);
 	TILE_GET_INFO_MEMBER(get_supershot_text_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 /*************************************
@@ -187,10 +189,9 @@ TILE_GET_INFO_MEMBER(supershot_state::get_supershot_text_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
-static VIDEO_START( supershot )
+void supershot_state::video_start()
 {
-	supershot_state *state = machine.driver_data<supershot_state>();
-	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(supershot_state::get_supershot_text_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(supershot_state::get_supershot_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16( supershot )
@@ -320,10 +321,10 @@ static GFXDECODE_START( supershot )
 	GFXDECODE_ENTRY( "gfx", 0, supershot_charlayout,   0, 1  )
 GFXDECODE_END
 
-static PALETTE_INIT( supershot )
+void supershot_state::palette_init()
 {
-	palette_set_color(machine,0,RGB_BLACK); /* black */
-	palette_set_color(machine,1,RGB_WHITE); /* white */
+	palette_set_color(machine(),0,RGB_BLACK); /* black */
+	palette_set_color(machine(),1,RGB_WHITE); /* white */
 }
 
 static MACHINE_CONFIG_START( supershot, supershot_state )
@@ -339,12 +340,10 @@ static MACHINE_CONFIG_START( supershot, supershot_state )
 	MCFG_SCREEN_SIZE((32)*8, (32)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MCFG_VIDEO_START(supershot)
 	MCFG_SCREEN_UPDATE_STATIC(supershot)
 
 	MCFG_GFXDECODE(supershot)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(supershot)
 
 MACHINE_CONFIG_END
 

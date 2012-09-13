@@ -227,7 +227,6 @@ static MACHINE_CONFIG_START( prehisle, prehisle_state )
 	MCFG_GFXDECODE(prehisle)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(prehisle)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

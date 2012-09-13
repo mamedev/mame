@@ -91,9 +91,9 @@ WRITE8_MEMBER(dooyong_state::lastday_bankswitch_w)
 	if (data & 0xf8) popmessage("bankswitch %02x",data);
 }
 
-static MACHINE_START( lastday )
+MACHINE_START_MEMBER(dooyong_state,lastday)
 {
-	machine.root_device().membank("bank1")->configure_entries(0, 8, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	machine().root_device().membank("bank1")->configure_entries(0, 8, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 WRITE8_MEMBER(dooyong_state::flip_screen_w)
@@ -101,12 +101,11 @@ WRITE8_MEMBER(dooyong_state::flip_screen_w)
 	flip_screen_set(data);
 }
 
-static MACHINE_RESET( sound_ym2203 )
+MACHINE_RESET_MEMBER(dooyong_state,sound_ym2203)
 {
-	dooyong_state *state = machine.driver_data<dooyong_state>();
 
-	state->m_interrupt_line_1=0;
-	state->m_interrupt_line_2=0;
+	m_interrupt_line_1=0;
+	m_interrupt_line_2=0;
 }
 
 /***************************************************************************
@@ -871,8 +870,8 @@ static MACHINE_CONFIG_START( lastday, dooyong_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(lastday_sound_map)
 
-	MCFG_MACHINE_START(lastday)
-	MCFG_MACHINE_RESET(sound_ym2203)
+	MCFG_MACHINE_START_OVERRIDE(dooyong_state,lastday)
+	MCFG_MACHINE_RESET_OVERRIDE(dooyong_state,sound_ym2203)
 
 
 	/* video hardware */
@@ -889,7 +888,7 @@ static MACHINE_CONFIG_START( lastday, dooyong_state )
 	MCFG_GFXDECODE(lastday)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(lastday)
+	MCFG_VIDEO_START_OVERRIDE(dooyong_state,lastday)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -914,8 +913,8 @@ static MACHINE_CONFIG_START( gulfstrm, dooyong_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(lastday_sound_map)
 
-	MCFG_MACHINE_START(lastday)
-	MCFG_MACHINE_RESET(sound_ym2203)
+	MCFG_MACHINE_START_OVERRIDE(dooyong_state,lastday)
+	MCFG_MACHINE_RESET_OVERRIDE(dooyong_state,sound_ym2203)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -931,7 +930,7 @@ static MACHINE_CONFIG_START( gulfstrm, dooyong_state )
 	MCFG_GFXDECODE(lastday)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(gulfstrm)
+	MCFG_VIDEO_START_OVERRIDE(dooyong_state,gulfstrm)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD( sound_2203 )
@@ -947,8 +946,8 @@ static MACHINE_CONFIG_START( pollux, dooyong_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(pollux_sound_map)
 
-	MCFG_MACHINE_START(lastday)
-	MCFG_MACHINE_RESET(sound_ym2203)
+	MCFG_MACHINE_START_OVERRIDE(dooyong_state,lastday)
+	MCFG_MACHINE_RESET_OVERRIDE(dooyong_state,sound_ym2203)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -964,7 +963,7 @@ static MACHINE_CONFIG_START( pollux, dooyong_state )
 	MCFG_GFXDECODE(lastday)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(pollux)
+	MCFG_VIDEO_START_OVERRIDE(dooyong_state,pollux)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD( sound_2203 )
@@ -980,7 +979,7 @@ static MACHINE_CONFIG_START( bluehawk, dooyong_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
 
-	MCFG_MACHINE_START(lastday)
+	MCFG_MACHINE_START_OVERRIDE(dooyong_state,lastday)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -996,7 +995,7 @@ static MACHINE_CONFIG_START( bluehawk, dooyong_state )
 	MCFG_GFXDECODE(bluehawk)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(bluehawk)
+	MCFG_VIDEO_START_OVERRIDE(dooyong_state,bluehawk)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD( sound_2151 )
@@ -1012,7 +1011,7 @@ static MACHINE_CONFIG_START( flytiger, dooyong_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
 
-	MCFG_MACHINE_START(lastday)
+	MCFG_MACHINE_START_OVERRIDE(dooyong_state,lastday)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -1028,7 +1027,7 @@ static MACHINE_CONFIG_START( flytiger, dooyong_state )
 	MCFG_GFXDECODE(flytiger)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(flytiger)
+	MCFG_VIDEO_START_OVERRIDE(dooyong_state,flytiger)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD( sound_2151 )
@@ -1044,7 +1043,7 @@ static MACHINE_CONFIG_START( primella, dooyong_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
 
-	MCFG_MACHINE_START(lastday)
+	MCFG_MACHINE_START_OVERRIDE(dooyong_state,lastday)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1057,7 +1056,7 @@ static MACHINE_CONFIG_START( primella, dooyong_state )
 	MCFG_GFXDECODE(primella)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(primella)
+	MCFG_VIDEO_START_OVERRIDE(dooyong_state,primella)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD( sound_2151 )
@@ -1099,7 +1098,7 @@ static MACHINE_CONFIG_START( rshark, dooyong_state )
 	MCFG_GFXDECODE(rshark)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(rshark)
+	MCFG_VIDEO_START_OVERRIDE(dooyong_state,rshark)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD( sound_2151_m68k )
@@ -1129,7 +1128,7 @@ static MACHINE_CONFIG_START( superx, dooyong_state ) // dif mem map
 	MCFG_GFXDECODE(rshark)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(rshark)
+	MCFG_VIDEO_START_OVERRIDE(dooyong_state,rshark)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD( sound_2151_m68k )
@@ -1159,7 +1158,7 @@ static MACHINE_CONFIG_START( popbingo, dooyong_state )
 	MCFG_GFXDECODE(popbingo)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(popbingo)
+	MCFG_VIDEO_START_OVERRIDE(dooyong_state,popbingo)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD( sound_2151_m68k )

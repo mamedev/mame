@@ -57,10 +57,9 @@ I8255A_INTERFACE( orion128_ppi8255_interface_1)
 };
 
 
-MACHINE_START( orion128 )
+MACHINE_START_MEMBER(orion_state,orion128)
 {
-	orion_state *state = machine.driver_data<orion_state>();
-	state->m_video_mode_mask = 7;
+	m_video_mode_mask = 7;
 }
 
 READ8_MEMBER(orion_state::orion128_system_r)
@@ -155,17 +154,16 @@ WRITE8_MEMBER(orion_state::orion128_memory_page_w)
 	}
 }
 
-MACHINE_RESET ( orion128 )
+MACHINE_RESET_MEMBER(orion_state,orion128)
 {
-	orion_state *state = machine.driver_data<orion_state>();
-	state->m_orion128_video_page = 0;
-	state->m_orion128_video_mode = 0;
-	state->m_orion128_memory_page = -1;
-	state->membank("bank1")->set_base(state->memregion("maincpu")->base() + 0xf800);
-	state->membank("bank2")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0xf000);
-	state->m_orion128_video_width = SCREEN_WIDTH_384;
-	orion_set_video_mode(machine,384);
-	radio86_init_keyboard(machine);
+	m_orion128_video_page = 0;
+	m_orion128_video_mode = 0;
+	m_orion128_memory_page = -1;
+	membank("bank1")->set_base(memregion("maincpu")->base() + 0xf800);
+	membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0xf000);
+	m_orion128_video_width = SCREEN_WIDTH_384;
+	orion_set_video_mode(machine(),384);
+	radio86_init_keyboard(machine());
 }
 
 WRITE8_MEMBER(orion_state::orion_disk_control_w)
@@ -238,10 +236,9 @@ WRITE8_MEMBER(orion_state::orionz80_floppy_rtc_w)
 }
 
 
-MACHINE_START( orionz80 )
+MACHINE_START_MEMBER(orion_state,orionz80)
 {
-	orion_state *state = machine.driver_data<orion_state>();
-	state->m_video_mode_mask = 7;
+	m_video_mode_mask = 7;
 }
 
 WRITE8_MEMBER(orion_state::orionz80_sound_w)
@@ -329,44 +326,43 @@ WRITE8_MEMBER(orion_state::orionz80_dispatcher_w)
 	orionz80_switch_bank(machine());
 }
 
-MACHINE_RESET ( orionz80 )
+MACHINE_RESET_MEMBER(orion_state,orionz80)
 {
-	orion_state *state = machine.driver_data<orion_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	space->unmap_write(0x0000, 0x3fff);
 	space->install_write_bank(0x4000, 0xefff, "bank2");
 	space->install_write_bank(0xf000, 0xf3ff, "bank3");
 
-	space->install_write_handler(0xf400, 0xf4ff, write8_delegate(FUNC(orion_state::orion128_system_w),state));
-	space->install_write_handler(0xf500, 0xf5ff, write8_delegate(FUNC(orion_state::orion128_romdisk_w),state));
-	space->install_write_handler(0xf700, 0xf7ff, write8_delegate(FUNC(orion_state::orionz80_floppy_rtc_w),state));
-	space->install_read_handler(0xf400, 0xf4ff, read8_delegate(FUNC(orion_state::orion128_system_r),state));
-	space->install_read_handler(0xf500, 0xf5ff, read8_delegate(FUNC(orion_state::orion128_romdisk_r),state));
-	space->install_read_handler(0xf700, 0xf7ff, read8_delegate(FUNC(orion_state::orionz80_floppy_rtc_r),state));
+	space->install_write_handler(0xf400, 0xf4ff, write8_delegate(FUNC(orion_state::orion128_system_w),this));
+	space->install_write_handler(0xf500, 0xf5ff, write8_delegate(FUNC(orion_state::orion128_romdisk_w),this));
+	space->install_write_handler(0xf700, 0xf7ff, write8_delegate(FUNC(orion_state::orionz80_floppy_rtc_w),this));
+	space->install_read_handler(0xf400, 0xf4ff, read8_delegate(FUNC(orion_state::orion128_system_r),this));
+	space->install_read_handler(0xf500, 0xf5ff, read8_delegate(FUNC(orion_state::orion128_romdisk_r),this));
+	space->install_read_handler(0xf700, 0xf7ff, read8_delegate(FUNC(orion_state::orionz80_floppy_rtc_r),this));
 
-	space->install_write_handler(0xf800, 0xf8ff, write8_delegate(FUNC(orion_state::orion128_video_mode_w),state));
-	space->install_write_handler(0xf900, 0xf9ff, write8_delegate(FUNC(orion_state::orionz80_memory_page_w),state));
-	space->install_write_handler(0xfa00, 0xfaff, write8_delegate(FUNC(orion_state::orion128_video_page_w),state));
-	space->install_write_handler(0xfb00, 0xfbff, write8_delegate(FUNC(orion_state::orionz80_dispatcher_w),state));
+	space->install_write_handler(0xf800, 0xf8ff, write8_delegate(FUNC(orion_state::orion128_video_mode_w),this));
+	space->install_write_handler(0xf900, 0xf9ff, write8_delegate(FUNC(orion_state::orionz80_memory_page_w),this));
+	space->install_write_handler(0xfa00, 0xfaff, write8_delegate(FUNC(orion_state::orion128_video_page_w),this));
+	space->install_write_handler(0xfb00, 0xfbff, write8_delegate(FUNC(orion_state::orionz80_dispatcher_w),this));
 	space->unmap_write(0xfc00, 0xfeff);
-	space->install_write_handler(0xff00, 0xffff, write8_delegate(FUNC(orion_state::orionz80_sound_w),state));
+	space->install_write_handler(0xff00, 0xffff, write8_delegate(FUNC(orion_state::orionz80_sound_w),this));
 
 
-	state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0xf800);
-	state->membank("bank2")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x4000);
-	state->membank("bank3")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0xf000);
-	state->membank("bank5")->set_base(state->memregion("maincpu")->base() + 0xf800);
+	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0xf800);
+	membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x4000);
+	membank("bank3")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0xf000);
+	membank("bank5")->set_base(memregion("maincpu")->base() + 0xf800);
 
 
-	state->m_orion128_video_page = 0;
-	state->m_orion128_video_mode = 0;
-	state->m_orionz80_memory_page = 0;
-	state->m_orionz80_dispatcher = 0;
-	state->m_speaker = 0;
-	state->m_orion128_video_width = SCREEN_WIDTH_384;
-	orion_set_video_mode(machine,384);
-	radio86_init_keyboard(machine);
+	m_orion128_video_page = 0;
+	m_orion128_video_mode = 0;
+	m_orionz80_memory_page = 0;
+	m_orionz80_dispatcher = 0;
+	m_speaker = 0;
+	m_orion128_video_width = SCREEN_WIDTH_384;
+	orion_set_video_mode(machine(),384);
+	radio86_init_keyboard(machine());
 }
 
 INTERRUPT_GEN( orionz80_interrupt )
@@ -522,30 +518,29 @@ WRITE8_MEMBER(orion_state::orionpro_memory_page_w)
 	orionpro_bank_switch(machine());
 }
 
-MACHINE_RESET ( orionpro )
+MACHINE_RESET_MEMBER(orion_state,orionpro)
 {
-	orion_state *state = machine.driver_data<orion_state>();
-	radio86_init_keyboard(machine);
+	radio86_init_keyboard(machine());
 
-	state->m_orion128_video_page = 0;
-	state->m_orion128_video_mode = 0;
-	state->m_orionpro_ram0_segment = 0;
-	state->m_orionpro_ram1_segment = 0;
-	state->m_orionpro_ram2_segment = 0;
+	m_orion128_video_page = 0;
+	m_orion128_video_mode = 0;
+	m_orionpro_ram0_segment = 0;
+	m_orionpro_ram1_segment = 0;
+	m_orionpro_ram2_segment = 0;
 
-	state->m_orionpro_page = 0;
-	state->m_orionpro_128_page = 0;
-	state->m_orionpro_rom2_segment = 0;
+	m_orionpro_page = 0;
+	m_orionpro_128_page = 0;
+	m_orionpro_rom2_segment = 0;
 
-	state->m_orionpro_dispatcher = 0x50;
-	orionpro_bank_switch(machine);
+	m_orionpro_dispatcher = 0x50;
+	orionpro_bank_switch(machine());
 
-	state->m_speaker = 0;
-	state->m_orion128_video_width = SCREEN_WIDTH_384;
-	orion_set_video_mode(machine,384);
+	m_speaker = 0;
+	m_orion128_video_width = SCREEN_WIDTH_384;
+	orion_set_video_mode(machine(),384);
 
-	state->m_video_mode_mask = 31;
-	state->m_orionpro_pseudo_color = 0;
+	m_video_mode_mask = 31;
+	m_orionpro_pseudo_color = 0;
 }
 
 READ8_MEMBER(orion_state::orionpro_io_r)

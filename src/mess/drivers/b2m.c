@@ -206,8 +206,6 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
     MCFG_CPU_IO_MAP(b2m_io)
     MCFG_CPU_VBLANK_INT("screen", b2m_vblank_interrupt)
 
-    MCFG_MACHINE_START( b2m )
-    MCFG_MACHINE_RESET( b2m )
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -218,7 +216,6 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
     MCFG_SCREEN_UPDATE_STATIC(b2m)
 
 	MCFG_PALETTE_LENGTH(4)
-	MCFG_PALETTE_INIT(b2m)
 
 	MCFG_PIT8253_ADD( "pit8253", b2m_pit8253_intf )
 
@@ -230,7 +227,6 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 
 	MCFG_PIC8259_ADD( "pic8259", b2m_pic8259_config )
 
-	MCFG_VIDEO_START(b2m)
 
 	/* sound */
     MCFG_SPEAKER_STANDARD_MONO("mono")

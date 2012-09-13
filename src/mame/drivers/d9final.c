@@ -43,6 +43,8 @@ public:
 	DECLARE_WRITE8_MEMBER(d9final_bank_w);
 	DECLARE_READ8_MEMBER(prot_latch_r);
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -59,10 +61,9 @@ TILE_GET_INFO_MEMBER(d9final_state::get_sc0_tile_info)
 			0);
 }
 
-static VIDEO_START(d9final)
+void d9final_state::video_start()
 {
-	d9final_state *state = machine.driver_data<d9final_state>();
-	state->m_sc0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(d9final_state::get_sc0_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_sc0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(d9final_state::get_sc0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 }
 
 static SCREEN_UPDATE_IND16(d9final)
@@ -271,11 +272,11 @@ static GFXDECODE_START( d9final )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x8_layout, 0, 16*4 )
 GFXDECODE_END
 
-static MACHINE_RESET( d9final )
+void d9final_state::machine_reset()
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
-	machine.root_device().membank("bank1")->set_base(&ROM[0x10000]);
+	machine().root_device().membank("bank1")->set_base(&ROM[0x10000]);
 }
 
 static MACHINE_CONFIG_START( d9final, d9final_state )
@@ -285,7 +286,6 @@ static MACHINE_CONFIG_START( d9final, d9final_state )
 	MCFG_CPU_IO_MAP(d9final_io)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_RESET( d9final )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -299,7 +299,6 @@ static MACHINE_CONFIG_START( d9final, d9final_state )
 	MCFG_PALETTE_LENGTH(0x400)
 	MCFG_PALETTE_INIT(all_black)
 
-	MCFG_VIDEO_START(d9final)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

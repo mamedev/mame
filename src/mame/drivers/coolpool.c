@@ -132,21 +132,19 @@ static void coolpool_from_shiftreg(address_space *space, UINT32 address, UINT16 
  *
  *************************************/
 
-static MACHINE_RESET( amerdart )
+MACHINE_RESET_MEMBER(coolpool_state,amerdart)
 {
-	coolpool_state *state = machine.driver_data<coolpool_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_dsp = machine.device("dsp");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_dsp = machine().device("dsp");
 
-	state->m_nvram_write_enable = 0;
+	m_nvram_write_enable = 0;
 }
 
 
-static MACHINE_RESET( coolpool )
+MACHINE_RESET_MEMBER(coolpool_state,coolpool)
 {
-	coolpool_state *state = machine.driver_data<coolpool_state>();
-	state->m_nvram_write_enable = 0;
+	m_nvram_write_enable = 0;
 }
 
 
@@ -863,7 +861,7 @@ static MACHINE_CONFIG_START( amerdart, coolpool_state )
 	MCFG_CPU_IO_MAP(amerdart_dsp_io_map)
 	MCFG_TIMER_ADD_SCANLINE("audioint", amerdart_audio_int_gen, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET(amerdart)
+	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,amerdart)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_TIMER_ADD("nvram_timer", nvram_write_timeout)
@@ -892,7 +890,7 @@ static MACHINE_CONFIG_START( coolpool, coolpool_state )
 	MCFG_CPU_PROGRAM_MAP(coolpool_dsp_pgm_map)
 	MCFG_CPU_IO_MAP(coolpool_dsp_io_map)
 
-	MCFG_MACHINE_RESET(coolpool)
+	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,coolpool)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_TIMER_ADD("nvram_timer", nvram_write_timeout)

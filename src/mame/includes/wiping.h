@@ -20,11 +20,12 @@ public:
 	DECLARE_WRITE8_MEMBER(main_irq_mask_w);
 	DECLARE_WRITE8_MEMBER(sound_irq_mask_w);
 	DECLARE_WRITE8_MEMBER(wiping_flipscreen_w);
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/wiping.c -----------*/
 
-PALETTE_INIT( wiping );
+
 SCREEN_UPDATE_IND16( wiping );
 

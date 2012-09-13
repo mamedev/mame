@@ -289,44 +289,42 @@ static GFXDECODE_START( dragrace )
 GFXDECODE_END
 
 
-static PALETTE_INIT( dragrace )
+void dragrace_state::palette_init()
 {
-	palette_set_color(machine, 0, MAKE_RGB(0xFF, 0xFF, 0xFF));   /* 2 color tiles */
-	palette_set_color(machine, 1, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, 2, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, 3, MAKE_RGB(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine, 4, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, 5, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, 6, MAKE_RGB(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine, 7, MAKE_RGB(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine, 8, MAKE_RGB(0xFF, 0xFF, 0xFF));   /* 4 color tiles */
-	palette_set_color(machine, 9, MAKE_RGB(0xB0, 0xB0, 0xB0));
-	palette_set_color(machine, 10,MAKE_RGB(0x5F, 0x5F, 0x5F));
-	palette_set_color(machine, 11,MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, 12,MAKE_RGB(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine, 13,MAKE_RGB(0x5F, 0x5F, 0x5F));
-	palette_set_color(machine, 14,MAKE_RGB(0xB0, 0xB0, 0xB0));
-	palette_set_color(machine, 15,MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine(), 0, MAKE_RGB(0xFF, 0xFF, 0xFF));   /* 2 color tiles */
+	palette_set_color(machine(), 1, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine(), 2, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine(), 3, MAKE_RGB(0xFF, 0xFF, 0xFF));
+	palette_set_color(machine(), 4, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine(), 5, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine(), 6, MAKE_RGB(0xFF, 0xFF, 0xFF));
+	palette_set_color(machine(), 7, MAKE_RGB(0xFF, 0xFF, 0xFF));
+	palette_set_color(machine(), 8, MAKE_RGB(0xFF, 0xFF, 0xFF));   /* 4 color tiles */
+	palette_set_color(machine(), 9, MAKE_RGB(0xB0, 0xB0, 0xB0));
+	palette_set_color(machine(), 10,MAKE_RGB(0x5F, 0x5F, 0x5F));
+	palette_set_color(machine(), 11,MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine(), 12,MAKE_RGB(0xFF, 0xFF, 0xFF));
+	palette_set_color(machine(), 13,MAKE_RGB(0x5F, 0x5F, 0x5F));
+	palette_set_color(machine(), 14,MAKE_RGB(0xB0, 0xB0, 0xB0));
+	palette_set_color(machine(), 15,MAKE_RGB(0x00, 0x00, 0x00));
 }
 
 
-static MACHINE_START( dragrace )
+void dragrace_state::machine_start()
 {
-	dragrace_state *state = machine.driver_data<dragrace_state>();
 
-	state->m_discrete = machine.device("discrete");
+	m_discrete = machine().device("discrete");
 
-	state->save_item(NAME(state->m_misc_flags));
-	state->save_item(NAME(state->m_gear));
+	save_item(NAME(m_misc_flags));
+	save_item(NAME(m_gear));
 }
 
-static MACHINE_RESET( dragrace )
+void dragrace_state::machine_reset()
 {
-	dragrace_state *state = machine.driver_data<dragrace_state>();
 
-	state->m_misc_flags = 0;
-	state->m_gear[0] = 0;
-	state->m_gear[1] = 0;
+	m_misc_flags = 0;
+	m_gear[0] = 0;
+	m_gear[1] = 0;
 }
 
 static MACHINE_CONFIG_START( dragrace, dragrace_state )
@@ -337,8 +335,6 @@ static MACHINE_CONFIG_START( dragrace, dragrace_state )
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 4*60)
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
-	MCFG_MACHINE_START(dragrace)
-	MCFG_MACHINE_RESET(dragrace)
 
 	MCFG_TIMER_ADD_PERIODIC("frame_timer", dragrace_frame_callback, attotime::from_hz(60))
 
@@ -351,8 +347,6 @@ static MACHINE_CONFIG_START( dragrace, dragrace_state )
 
 	MCFG_GFXDECODE(dragrace)
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT(dragrace)
-	MCFG_VIDEO_START(dragrace)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

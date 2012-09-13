@@ -481,8 +481,6 @@ static MACHINE_CONFIG_START( mhavoc, mhavoc_state )
 	MCFG_CPU_ADD("gamma", M6502, MHAVOC_CLOCK_1_25M)	/* 1.25 MHz */
 	MCFG_CPU_PROGRAM_MAP(gamma_map)
 
-	MCFG_MACHINE_START(mhavoc)
-	MCFG_MACHINE_RESET(mhavoc)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_ADD_PERIODIC("5k_timer", mhavoc_cpu_irq_clock, attotime::from_hz(MHAVOC_CLOCK_5K))

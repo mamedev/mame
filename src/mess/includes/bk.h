@@ -33,6 +33,9 @@ public:
 	DECLARE_WRITE16_MEMBER(bk_floppy_cmd_w);
 	DECLARE_READ16_MEMBER(bk_floppy_data_r);
 	DECLARE_WRITE16_MEMBER(bk_floppy_data_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 

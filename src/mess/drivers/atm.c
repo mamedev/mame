@@ -29,6 +29,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(atm_port_7ffd_w);
 	DIRECT_UPDATE_MEMBER(atm_direct);
+	DECLARE_MACHINE_RESET(atm);
 };
 
 
@@ -116,12 +117,11 @@ static ADDRESS_MAP_START (atm_io, AS_IO, 8, atm_state )
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE_LEGACY("ay8912", ay8910_r, ay8910_address_w) AM_MIRROR(0x3ffd)
 ADDRESS_MAP_END
 
-static MACHINE_RESET( atm )
+MACHINE_RESET_MEMBER(atm_state,atm)
 {
-	atm_state *state = machine.driver_data<atm_state>();
-	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	device_t *beta = machine.device(BETA_DISK_TAG);
+	UINT8 *messram = machine().device<ram_device>(RAM_TAG)->pointer();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	device_t *beta = machine().device(BETA_DISK_TAG);
 
 	space->install_read_bank(0x0000, 0x3fff, "bank1");
 	space->unmap_write(0x0000, 0x3fff);
@@ -130,20 +130,20 @@ static MACHINE_RESET( atm )
 		betadisk_enable(beta);
 		betadisk_clear_status(beta);
 	}
-	space->set_direct_update_handler(direct_update_delegate(FUNC(atm_state::atm_direct), state));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(atm_state::atm_direct), this));
 
 	memset(messram,0,128*1024);
 
 	/* Bank 5 is always in 0x4000 - 0x7fff */
-	state->membank("bank2")->set_base(messram + (5<<14));
+	membank("bank2")->set_base(messram + (5<<14));
 
 	/* Bank 2 is always in 0x8000 - 0xbfff */
-	state->membank("bank3")->set_base(messram + (2<<14));
+	membank("bank3")->set_base(messram + (2<<14));
 
-	state->m_port_7ffd_data = 0;
-	state->m_port_1ffd_data = -1;
+	m_port_7ffd_data = 0;
+	m_port_1ffd_data = -1;
 
-	atm_update_memory(machine);
+	atm_update_memory(machine());
 }
 
 /* F4 Character Displayer */
@@ -172,7 +172,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_DERIVED_CLASS( atm, spectrum_128, atm_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(atm_io)
-	MCFG_MACHINE_RESET( atm )
+	MCFG_MACHINE_RESET_OVERRIDE(atm_state, atm )
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 	MCFG_GFXDECODE(atm)

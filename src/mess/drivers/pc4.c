@@ -156,10 +156,10 @@ static INPUT_PORTS_START( pc4 )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_UNUSED
 INPUT_PORTS_END
 
-static PALETTE_INIT( pc4 )
+void pc4_state::palette_init()
 {
-	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
+	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
+	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
 }
 
 static const gfx_layout pc4_charlayout =
@@ -220,7 +220,6 @@ static MACHINE_CONFIG_START( pc4, pc4_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 36-1)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(pc4)
 	MCFG_GFXDECODE(pc4)
 
 	/* sound hardware */

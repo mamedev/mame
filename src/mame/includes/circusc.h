@@ -53,12 +53,16 @@ public:
 	DECLARE_WRITE8_MEMBER(circusc_flipscreen_w);
 	DECLARE_DRIVER_INIT(circusc);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/circusc.c -----------*/
 
 
-VIDEO_START( circusc );
-PALETTE_INIT( circusc );
+
+
 SCREEN_UPDATE_IND16( circusc );

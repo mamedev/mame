@@ -42,6 +42,11 @@ public:
 	DECLARE_READ8_MEMBER(idsoccer_adpcm_status_r);
 	DECLARE_WRITE8_MEMBER(idsoccer_adpcm_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_VIDEO_START(dorunrun);
 };
 
 
@@ -51,8 +56,8 @@ public:
 /*----------- defined in video/docastle.c -----------*/
 
 
-PALETTE_INIT( docastle );
-VIDEO_START( docastle );
-VIDEO_START( dorunrun );
+
+
+
 SCREEN_UPDATE_IND16( docastle );
 

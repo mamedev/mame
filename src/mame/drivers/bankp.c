@@ -282,12 +282,11 @@ static const sn76496_config psg_intf =
  *
  *************************************/
 
-static MACHINE_RESET( bankp )
+void bankp_state::machine_reset()
 {
-	bankp_state *state = machine.driver_data<bankp_state>();
 
-	state->m_scroll_x = 0;
-	state->m_priority = 0;
+	m_scroll_x = 0;
+	m_priority = 0;
 }
 
 static INTERRUPT_GEN( vblank_irq )
@@ -306,7 +305,6 @@ static MACHINE_CONFIG_START( bankp, bankp_state )
 	MCFG_CPU_IO_MAP(bankp_io_map)
 	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
-	MCFG_MACHINE_RESET(bankp)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -316,8 +314,6 @@ static MACHINE_CONFIG_START( bankp, bankp_state )
 	MCFG_GFXDECODE(bankp)
 	MCFG_PALETTE_LENGTH(32*4+16*8)
 
-	MCFG_PALETTE_INIT(bankp)
-	MCFG_VIDEO_START(bankp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

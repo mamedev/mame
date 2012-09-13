@@ -393,9 +393,10 @@ public:
 	hikaru_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 	{ }
+	virtual void video_start();
 };
 
-static VIDEO_START(hikaru)
+void hikaru_state::video_start()
 {
 
 }
@@ -488,8 +489,8 @@ static MACHINE_CONFIG_START( hikaru, hikaru_state )
 	MCFG_CPU_ADD("slave", SH4LE, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(hikaru_map_slave)
 
-//  MCFG_MACHINE_START( hikaru )
-//  MCFG_MACHINE_RESET( hikaru )
+//  MCFG_MACHINE_START_OVERRIDE(hikaru_state, hikaru )
+//  MCFG_MACHINE_RESET_OVERRIDE(hikaru_state, hikaru )
 
 //  MCFG_NVRAM_HANDLER(hikaru_eeproms)
 
@@ -503,7 +504,6 @@ static MACHINE_CONFIG_START( hikaru, hikaru_state )
 
 	MCFG_PALETTE_LENGTH(0x1000)
 
-	MCFG_VIDEO_START(hikaru)
 
 //  MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 //  MCFG_SOUND_ADD("aica", AICA, 0)

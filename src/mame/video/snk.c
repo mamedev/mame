@@ -25,9 +25,9 @@
 
 /**************************************************************************************/
 
-PALETTE_INIT( tnk3 )
+PALETTE_INIT_MEMBER(snk_state,tnk3)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 	int num_colors = 0x400;
 
@@ -53,7 +53,7 @@ PALETTE_INIT( tnk3 )
 		bit3 = (color_prom[i + num_colors] >> 1) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -181,209 +181,198 @@ TILE_GET_INFO_MEMBER(snk_state::gwar_get_bg_tile_info)
 
 /**************************************************************************************/
 
-static VIDEO_START( snk_3bpp_shadow )
+VIDEO_START_MEMBER(snk_state,snk_3bpp_shadow)
 {
-	snk_state *state = machine.driver_data<snk_state>();
 	int i;
 
-	if(!(machine.config().m_video_attributes & VIDEO_HAS_SHADOWS))
+	if(!(machine().config().m_video_attributes & VIDEO_HAS_SHADOWS))
 		fatalerror("driver should use VIDEO_HAS_SHADOWS\n");
 
 	/* prepare shadow draw table */
-	for(i = 0; i <= 5; i++) state->m_drawmode_table[i] = DRAWMODE_SOURCE;
-	state->m_drawmode_table[6] = (machine.config().m_video_attributes & VIDEO_HAS_SHADOWS) ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
-	state->m_drawmode_table[7] = DRAWMODE_NONE;
+	for(i = 0; i <= 5; i++) m_drawmode_table[i] = DRAWMODE_SOURCE;
+	m_drawmode_table[6] = (machine().config().m_video_attributes & VIDEO_HAS_SHADOWS) ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+	m_drawmode_table[7] = DRAWMODE_NONE;
 
 	for (i = 0x000;i < 0x400;i++)
-		machine.shadow_table[i] = i | 0x200;
+		machine().shadow_table[i] = i | 0x200;
 }
 
-static VIDEO_START( snk_4bpp_shadow )
+VIDEO_START_MEMBER(snk_state,snk_4bpp_shadow)
 {
-	snk_state *state = machine.driver_data<snk_state>();
 	int i;
 
-	if(!(machine.config().m_video_attributes & VIDEO_HAS_SHADOWS))
+	if(!(machine().config().m_video_attributes & VIDEO_HAS_SHADOWS))
 		fatalerror("driver should use VIDEO_HAS_SHADOWS\n");
 
 	/* prepare shadow draw table */
-	for(i = 0; i <= 13; i++) state->m_drawmode_table[i] = DRAWMODE_SOURCE;
-	state->m_drawmode_table[14] = DRAWMODE_SHADOW;
-	state->m_drawmode_table[15] = DRAWMODE_NONE;
+	for(i = 0; i <= 13; i++) m_drawmode_table[i] = DRAWMODE_SOURCE;
+	m_drawmode_table[14] = DRAWMODE_SHADOW;
+	m_drawmode_table[15] = DRAWMODE_NONE;
 
 	/* all palette entries are not affected by shadow sprites... */
 	for (i = 0x000;i < 0x400;i++)
-		machine.shadow_table[i] = i;
+		machine().shadow_table[i] = i;
 	/* ... except for tilemap colors */
 	for (i = 0x200;i < 0x300;i++)
-		machine.shadow_table[i] = i + 0x100;
+		machine().shadow_table[i] = i + 0x100;
 }
 
 
-VIDEO_START( marvins )
+VIDEO_START_MEMBER(snk_state,marvins)
 {
-	snk_state *state = machine.driver_data<snk_state>();
 
-	VIDEO_START_CALL(snk_3bpp_shadow);
+	VIDEO_START_CALL_MEMBER(snk_3bpp_shadow);
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::marvins_get_tx_tile_info),state), tilemap_mapper_delegate(FUNC(snk_state::marvins_tx_scan_cols),state), 8, 8, 36, 28);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::marvins_get_fg_tile_info),state), TILEMAP_SCAN_COLS,    8, 8, 64, 32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::marvins_get_bg_tile_info),state), TILEMAP_SCAN_COLS,    8, 8, 64, 32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::marvins_get_tx_tile_info),this), tilemap_mapper_delegate(FUNC(snk_state::marvins_tx_scan_cols),this), 8, 8, 36, 28);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::marvins_get_fg_tile_info),this), TILEMAP_SCAN_COLS,    8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::marvins_get_bg_tile_info),this), TILEMAP_SCAN_COLS,    8, 8, 64, 32);
 
-	state->m_tx_tilemap->set_transparent_pen(15);
-	state->m_tx_tilemap->set_scrolldy(8, 8);
+	m_tx_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_scrolldy(8, 8);
 
-	state->m_fg_tilemap->set_transparent_pen(15);
-	state->m_fg_tilemap->set_scrolldx(15,  31);
-	state->m_fg_tilemap->set_scrolldy(8, -32);
+	m_fg_tilemap->set_transparent_pen(15);
+	m_fg_tilemap->set_scrolldx(15,  31);
+	m_fg_tilemap->set_scrolldy(8, -32);
 
-	state->m_bg_tilemap->set_scrolldx(15,  31);
-	state->m_bg_tilemap->set_scrolldy(8, -32);
+	m_bg_tilemap->set_scrolldx(15,  31);
+	m_bg_tilemap->set_scrolldy(8, -32);
 
-	state->m_tx_tile_offset = 0;
+	m_tx_tile_offset = 0;
 }
 
-VIDEO_START( jcross )
+VIDEO_START_MEMBER(snk_state,jcross)
 {
-	snk_state *state = machine.driver_data<snk_state>();
 
-	VIDEO_START_CALL(snk_3bpp_shadow);
+	VIDEO_START_CALL_MEMBER(snk_3bpp_shadow);
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::marvins_get_tx_tile_info),state), tilemap_mapper_delegate(FUNC(snk_state::marvins_tx_scan_cols),state), 8, 8, 36, 28);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::aso_get_bg_tile_info),state),     TILEMAP_SCAN_COLS,    8, 8, 64, 64);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::marvins_get_tx_tile_info),this), tilemap_mapper_delegate(FUNC(snk_state::marvins_tx_scan_cols),this), 8, 8, 36, 28);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::aso_get_bg_tile_info),this),     TILEMAP_SCAN_COLS,    8, 8, 64, 64);
 
-	state->m_tx_tilemap->set_transparent_pen(15);
-	state->m_tx_tilemap->set_scrolldy(8, 8);
+	m_tx_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_scrolldy(8, 8);
 
-	state->m_bg_tilemap->set_scrolldx(15, 24);
-	state->m_bg_tilemap->set_scrolldy(8, -32);
+	m_bg_tilemap->set_scrolldx(15, 24);
+	m_bg_tilemap->set_scrolldy(8, -32);
 
-	state->m_num_sprites = 25;
-	state->m_yscroll_mask = 0x1ff;
-	state->m_bg_tile_offset = 0;
-	state->m_tx_tile_offset = 0;
+	m_num_sprites = 25;
+	m_yscroll_mask = 0x1ff;
+	m_bg_tile_offset = 0;
+	m_tx_tile_offset = 0;
 }
 
-VIDEO_START( sgladiat )
+VIDEO_START_MEMBER(snk_state,sgladiat)
 {
-	snk_state *state = machine.driver_data<snk_state>();
 
-	VIDEO_START_CALL(snk_3bpp_shadow);
+	VIDEO_START_CALL_MEMBER(snk_3bpp_shadow);
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::marvins_get_tx_tile_info),state), tilemap_mapper_delegate(FUNC(snk_state::marvins_tx_scan_cols),state), 8, 8, 36, 28);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::aso_get_bg_tile_info),state),     TILEMAP_SCAN_COLS,    8, 8, 64, 32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::marvins_get_tx_tile_info),this), tilemap_mapper_delegate(FUNC(snk_state::marvins_tx_scan_cols),this), 8, 8, 36, 28);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::aso_get_bg_tile_info),this),     TILEMAP_SCAN_COLS,    8, 8, 64, 32);
 
-	state->m_tx_tilemap->set_transparent_pen(15);
-	state->m_tx_tilemap->set_scrolldy(8, 8);
+	m_tx_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_scrolldy(8, 8);
 
-	state->m_bg_tilemap->set_scrolldx(15, 24);
-	state->m_bg_tilemap->set_scrolldy(8, -32);
+	m_bg_tilemap->set_scrolldx(15, 24);
+	m_bg_tilemap->set_scrolldy(8, -32);
 
-	state->m_num_sprites = 25;
-	state->m_yscroll_mask = 0x0ff;
-	state->m_bg_tile_offset = 0;
-	state->m_tx_tile_offset = 0;
+	m_num_sprites = 25;
+	m_yscroll_mask = 0x0ff;
+	m_bg_tile_offset = 0;
+	m_tx_tile_offset = 0;
 }
 
-VIDEO_START( hal21 )
+VIDEO_START_MEMBER(snk_state,hal21)
 {
-	snk_state *state = machine.driver_data<snk_state>();
 
-	VIDEO_START_CALL(jcross);
+	VIDEO_START_CALL_MEMBER(jcross);
 
-	state->m_bg_tilemap->set_scrolldy(8, -32+256);
+	m_bg_tilemap->set_scrolldy(8, -32+256);
 
-	state->m_num_sprites = 50;
-	state->m_yscroll_mask = 0x1ff;
+	m_num_sprites = 50;
+	m_yscroll_mask = 0x1ff;
 }
 
-VIDEO_START( aso )
+VIDEO_START_MEMBER(snk_state,aso)
 {
-	snk_state *state = machine.driver_data<snk_state>();
 
-	VIDEO_START_CALL(jcross);
+	VIDEO_START_CALL_MEMBER(jcross);
 
-	state->m_bg_tilemap->set_scrolldx(15+256, 24+256);
+	m_bg_tilemap->set_scrolldx(15+256, 24+256);
 
-	state->m_num_sprites = 50;
-	state->m_yscroll_mask = 0x1ff;
+	m_num_sprites = 50;
+	m_yscroll_mask = 0x1ff;
 }
 
 
-VIDEO_START( tnk3 )
+VIDEO_START_MEMBER(snk_state,tnk3)
 {
-	snk_state *state = machine.driver_data<snk_state>();
 
-	VIDEO_START_CALL(snk_3bpp_shadow);
+	VIDEO_START_CALL_MEMBER(snk_3bpp_shadow);
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::marvins_get_tx_tile_info),state), tilemap_mapper_delegate(FUNC(snk_state::marvins_tx_scan_cols),state), 8, 8, 36, 28);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::tnk3_get_bg_tile_info),state),    TILEMAP_SCAN_COLS,    8, 8, 64, 64);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::marvins_get_tx_tile_info),this), tilemap_mapper_delegate(FUNC(snk_state::marvins_tx_scan_cols),this), 8, 8, 36, 28);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::tnk3_get_bg_tile_info),this),    TILEMAP_SCAN_COLS,    8, 8, 64, 64);
 
-	state->m_tx_tilemap->set_transparent_pen(15);
-	state->m_tx_tilemap->set_scrolldy(8, 8);
+	m_tx_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_scrolldy(8, 8);
 
-	state->m_bg_tilemap->set_scrolldx(15, 24);
-	state->m_bg_tilemap->set_scrolldy(8, -32);
+	m_bg_tilemap->set_scrolldx(15, 24);
+	m_bg_tilemap->set_scrolldy(8, -32);
 
-	state->m_num_sprites = 50;
-	state->m_yscroll_mask = 0x1ff;
-	state->m_tx_tile_offset = 0;
+	m_num_sprites = 50;
+	m_yscroll_mask = 0x1ff;
+	m_tx_tile_offset = 0;
 }
 
-VIDEO_START( ikari )
+VIDEO_START_MEMBER(snk_state,ikari)
 {
-	snk_state *state = machine.driver_data<snk_state>();
 
-	VIDEO_START_CALL(snk_3bpp_shadow);
+	VIDEO_START_CALL_MEMBER(snk_3bpp_shadow);
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::ikari_get_tx_tile_info),state), tilemap_mapper_delegate(FUNC(snk_state::marvins_tx_scan_cols),state),  8,  8, 36, 28);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::ikari_get_bg_tile_info),state), TILEMAP_SCAN_COLS,    16, 16, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::ikari_get_tx_tile_info),this), tilemap_mapper_delegate(FUNC(snk_state::marvins_tx_scan_cols),this),  8,  8, 36, 28);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::ikari_get_bg_tile_info),this), TILEMAP_SCAN_COLS,    16, 16, 32, 32);
 
-	state->m_tx_tilemap->set_transparent_pen(15);
-	state->m_tx_tilemap->set_scrolldy(8, 8);
+	m_tx_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_scrolldy(8, 8);
 
-	state->m_bg_tilemap->set_scrolldx(15, 24);
-	state->m_bg_tilemap->set_scrolldy(8, -32);
+	m_bg_tilemap->set_scrolldx(15, 24);
+	m_bg_tilemap->set_scrolldy(8, -32);
 
-	state->m_tx_tile_offset = 0;
+	m_tx_tile_offset = 0;
 }
 
-VIDEO_START( gwar )
+VIDEO_START_MEMBER(snk_state,gwar)
 {
-	snk_state *state = machine.driver_data<snk_state>();
 	int i;
 
 	/* prepare drawmode table */
-	for(i = 0; i <= 14; i++) state->m_drawmode_table[i] = DRAWMODE_SOURCE;
-	state->m_drawmode_table[15] = DRAWMODE_NONE;
+	for(i = 0; i <= 14; i++) m_drawmode_table[i] = DRAWMODE_SOURCE;
+	m_drawmode_table[15] = DRAWMODE_NONE;
 
-	memset(state->m_empty_tile, 0xf, sizeof(state->m_empty_tile));
+	memset(m_empty_tile, 0xf, sizeof(m_empty_tile));
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::gwar_get_tx_tile_info),state), TILEMAP_SCAN_COLS,  8,  8, 50, 32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::gwar_get_bg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::gwar_get_tx_tile_info),this), TILEMAP_SCAN_COLS,  8,  8, 50, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk_state::gwar_get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 
-	state->m_tx_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(15);
 
-	state->m_bg_tilemap->set_scrolldx(16, 143);
-	state->m_bg_tilemap->set_scrolldy(0, -32);
+	m_bg_tilemap->set_scrolldx(16, 143);
+	m_bg_tilemap->set_scrolldy(0, -32);
 
-	state->m_tx_tile_offset = 0;
+	m_tx_tile_offset = 0;
 
-	state->m_is_psychos = 0;
+	m_is_psychos = 0;
 }
 
-VIDEO_START( psychos )
+VIDEO_START_MEMBER(snk_state,psychos)
 {
-	snk_state *state = machine.driver_data<snk_state>();
 
-	VIDEO_START_CALL(gwar);
-	state->m_is_psychos = 1;
+	VIDEO_START_CALL_MEMBER(gwar);
+	m_is_psychos = 1;
 }
 
-VIDEO_START( tdfever )
+VIDEO_START_MEMBER(snk_state,tdfever)
 {
-	VIDEO_START_CALL(gwar);
-	VIDEO_START_CALL(snk_4bpp_shadow);
+	VIDEO_START_CALL_MEMBER(gwar);
+	VIDEO_START_CALL_MEMBER(snk_4bpp_shadow);
 }
 
 /**************************************************************************************/

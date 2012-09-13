@@ -282,13 +282,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_START( stactics )
+void stactics_state::machine_start()
 {
-	stactics_state *state = machine.driver_data<stactics_state>();
 
-	state->m_vert_pos = 0;
-	state->m_horiz_pos = 0;
-	*state->m_motor_on = 0;
+	m_vert_pos = 0;
+	m_horiz_pos = 0;
+	*m_motor_on = 0;
 }
 
 
@@ -306,7 +305,6 @@ static MACHINE_CONFIG_START( stactics, stactics_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", stactics_interrupt)
 
-	MCFG_MACHINE_START(stactics)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(stactics_video)

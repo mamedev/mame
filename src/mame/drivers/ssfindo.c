@@ -245,6 +245,7 @@ public:
 	DECLARE_DRIVER_INIT(ssfindo);
 	DECLARE_DRIVER_INIT(ppcar);
 	DECLARE_DRIVER_INIT(tetfight);
+	virtual void machine_reset();
 };
 
 
@@ -610,9 +611,9 @@ static ADDRESS_MAP_START( tetfight_map, AS_PROGRAM, 32, ssfindo_state )
 	AM_RANGE(0x10000000, 0x14ffffff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
-static MACHINE_RESET( ssfindo )
+void ssfindo_state::machine_reset()
 {
-	PS7500_reset(machine);
+	PS7500_reset(machine());
 }
 
 static INPUT_PORTS_START( ssfindo )
@@ -757,7 +758,6 @@ static MACHINE_CONFIG_START( ssfindo, ssfindo_state )
 	MCFG_CPU_PROGRAM_MAP(ssfindo_map)
 
 	MCFG_CPU_VBLANK_INT("screen", ssfindo_interrupt)
-	MCFG_MACHINE_RESET(ssfindo)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)

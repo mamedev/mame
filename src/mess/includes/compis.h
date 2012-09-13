@@ -183,6 +183,9 @@ public:
 
 	required_shared_ptr<UINT8> m_video_ram;
 	DECLARE_DRIVER_INIT(compis);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 
@@ -196,8 +199,8 @@ extern const struct pic8259_interface compis_pic8259_slave_config;
 extern const i8251_interface compis_usart_interface;
 extern const upd765_interface compis_fdc_interface;
 
-MACHINE_START(compis);
-MACHINE_RESET(compis);
+
+
 INTERRUPT_GEN(compis_vblank_int);
 
 #endif /* COMPIS_H_ */

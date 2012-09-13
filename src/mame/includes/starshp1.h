@@ -76,6 +76,8 @@ public:
 	DECLARE_WRITE8_MEMBER(starshp1_audio_w);
 	DECLARE_WRITE8_MEMBER(starshp1_analog_out_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -83,10 +85,10 @@ public:
 
 
 
-PALETTE_INIT( starshp1 );
+
 SCREEN_UPDATE_IND16( starshp1 );
 SCREEN_VBLANK( starshp1 );
-VIDEO_START( starshp1 );
+
 
 
 /*----------- defined in audio/starshp1.c -----------*/

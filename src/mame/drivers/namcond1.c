@@ -302,8 +302,6 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(namcond1)
-	MCFG_MACHINE_RESET(namcond1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -96,6 +96,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_mlow_tile_info);
 	TILE_GET_INFO_MEMBER(get_mhigh_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -387,24 +390,23 @@ TILE_GET_INFO_MEMBER(mwarr_state::get_tx_tile_info)
 	SET_TILE_INFO_MEMBER(1, tileno, colour, 0);
 }
 
-static VIDEO_START( mwarr )
+void mwarr_state::video_start()
 {
-	mwarr_state *state = machine.driver_data<mwarr_state>();
 
-	state->m_bg_tilemap    = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mwarr_state::get_bg_tile_info),state),    TILEMAP_SCAN_COLS, 16, 16, 64, 16);
-	state->m_mlow_tilemap  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mwarr_state::get_mlow_tile_info),state),  TILEMAP_SCAN_COLS, 16, 16, 64, 16);
-	state->m_mhigh_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mwarr_state::get_mhigh_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 64, 16);
-	state->m_tx_tilemap    = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mwarr_state::get_tx_tile_info),state),    TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
+	m_bg_tilemap    = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mwarr_state::get_bg_tile_info),this),    TILEMAP_SCAN_COLS, 16, 16, 64, 16);
+	m_mlow_tilemap  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mwarr_state::get_mlow_tile_info),this),  TILEMAP_SCAN_COLS, 16, 16, 64, 16);
+	m_mhigh_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mwarr_state::get_mhigh_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 16);
+	m_tx_tilemap    = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mwarr_state::get_tx_tile_info),this),    TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
 
-	state->m_mlow_tilemap->set_transparent_pen(0);
-	state->m_mhigh_tilemap->set_transparent_pen(0);
-	state->m_tx_tilemap->set_transparent_pen(0);
+	m_mlow_tilemap->set_transparent_pen(0);
+	m_mhigh_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap->set_scroll_rows(256);
-	state->m_mlow_tilemap->set_scroll_rows(256);
-	state->m_mhigh_tilemap->set_scroll_rows(256);
+	m_bg_tilemap->set_scroll_rows(256);
+	m_mlow_tilemap->set_scroll_rows(256);
+	m_mhigh_tilemap->set_scroll_rows(256);
 
-	state->save_item(NAME(state->m_sprites_buffer));
+	save_item(NAME(m_sprites_buffer));
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -539,18 +541,16 @@ static SCREEN_UPDATE_IND16( mwarr )
  *
  *************************************/
 
-static MACHINE_START( mwarr )
+void mwarr_state::machine_start()
 {
-	mwarr_state *state = machine.driver_data<mwarr_state>();
 
-	state->save_item(NAME(state->m_which));
+	save_item(NAME(m_which));
 }
 
-static MACHINE_RESET( mwarr )
+void mwarr_state::machine_reset()
 {
-	mwarr_state *state = machine.driver_data<mwarr_state>();
 
-	state->m_which = 0;
+	m_which = 0;
 }
 
 static MACHINE_CONFIG_START( mwarr, mwarr_state )
@@ -560,8 +560,6 @@ static MACHINE_CONFIG_START( mwarr, mwarr_state )
 	MCFG_CPU_PROGRAM_MAP(mwarr_map)
 	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MCFG_MACHINE_START(mwarr)
-	MCFG_MACHINE_RESET(mwarr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -574,7 +572,6 @@ static MACHINE_CONFIG_START( mwarr, mwarr_state )
 	MCFG_GFXDECODE(mwarr)
 	MCFG_PALETTE_LENGTH(0x800)
 
-	MCFG_VIDEO_START(mwarr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

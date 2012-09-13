@@ -429,49 +429,48 @@ void mpu4_stepper_reset(mpu4_state *state)
 }
 
 
-static MACHINE_RESET( mpu4 )
+MACHINE_RESET_MEMBER(mpu4_state,mpu4)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_vfd->reset();
+	m_vfd->reset();
 
-	mpu4_stepper_reset(state);
+	mpu4_stepper_reset(this);
 
-	state->m_lamp_strobe    = 0;
-	state->m_lamp_strobe2   = 0;
-	state->m_led_strobe     = 0;
-	state->m_mmtr_data      = 0;
-	state->m_remote_meter   = 0;
+	m_lamp_strobe    = 0;
+	m_lamp_strobe2   = 0;
+	m_led_strobe     = 0;
+	m_mmtr_data      = 0;
+	m_remote_meter   = 0;
 
-	state->m_IC23GC    = 0;
-	state->m_IC23GB    = 0;
-	state->m_IC23GA    = 0;
-	state->m_IC23G1    = 1;
-	state->m_IC23G2A   = 0;
-	state->m_IC23G2B   = 0;
+	m_IC23GC    = 0;
+	m_IC23GB    = 0;
+	m_IC23GA    = 0;
+	m_IC23G1    = 1;
+	m_IC23G2A   = 0;
+	m_IC23G2B   = 0;
 
-	state->m_prot_col  = 0;
-	state->m_chr_counter    = 0;
-	state->m_chr_value		= 0;
+	m_prot_col  = 0;
+	m_chr_counter    = 0;
+	m_chr_value		= 0;
 
 
 	{
-		UINT8 *rom = state->memregion("maincpu")->base();
-		size_t romsize = state->memregion("maincpu")->bytes();
+		UINT8 *rom = memregion("maincpu")->base();
+		size_t romsize = memregion("maincpu")->bytes();
 
 		if (romsize < 0x10000)
 			fatalerror("maincpu ROM region is < 0x10000 bytes, check ROM\n");
 
 		int numbanks = romsize / 0x10000;
 
-		state->membank("bank1")->configure_entries(0, 8, &rom[0x01000], 0x10000);
+		membank("bank1")->configure_entries(0, 8, &rom[0x01000], 0x10000);
 
 		// some Bwb games must default to the last bank, does anything not like this
 		// behavior?
 		// some Bwb games don't work anyway tho, they seem to dislike something else
 		// about the way the regular banking behaves, not related to the CB2 stuff
-		state->membank("bank1")->set_entry(numbanks-1);
+		membank("bank1")->set_entry(numbanks-1);
 
-		machine.device("maincpu")->reset();
+		machine().device("maincpu")->reset();
 	}
 }
 
@@ -2350,55 +2349,50 @@ static void mpu4_config_common_reels(running_machine &machine,int reels)
 	}
 }
 
-MACHINE_START( mod2     )
+MACHINE_START_MEMBER(mpu4_state,mod2)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	mpu4_config_common(machine);
+	mpu4_config_common(machine());
 
-	state->m_link7a_connected=0;
-	state->m_mod_number=2;
+	m_link7a_connected=0;
+	m_mod_number=2;
 }
 
-static MACHINE_START( mpu4yam )
+MACHINE_START_MEMBER(mpu4_state,mpu4yam)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	mpu4_config_common(machine);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	mpu4_config_common(machine());
 
-	state->m_link7a_connected=0;
-	state->m_mod_number=4;
+	m_link7a_connected=0;
+	m_mod_number=4;
 	mpu4_install_mod4yam_space(space);
 }
 
-static MACHINE_START( mpu4oki )
+MACHINE_START_MEMBER(mpu4_state,mpu4oki)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	mpu4_config_common(machine);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	mpu4_config_common(machine());
 
-	state->m_link7a_connected=0;
-	state->m_mod_number=4;
+	m_link7a_connected=0;
+	m_mod_number=4;
 	mpu4_install_mod4oki_space(space);
 }
 
-static MACHINE_START( mpu4bwb )
+MACHINE_START_MEMBER(mpu4_state,mpu4bwb)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	mpu4_config_common(machine);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	mpu4_config_common(machine());
 
-	state->m_link7a_connected=0;
-	state->m_mod_number=4;
+	m_link7a_connected=0;
+	m_mod_number=4;
 	mpu4_install_mod4bwb_space(space);
 }
 
-static MACHINE_START( mpu4cry )
+MACHINE_START_MEMBER(mpu4_state,mpu4cry)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	mpu4_config_common(machine);
+	mpu4_config_common(machine());
 
-	state->m_link7a_connected=0;
-	state->m_mod_number=4;
+	m_link7a_connected=0;
+	m_mod_number=4;
 }
 
 /* CHR Tables */
@@ -2727,8 +2721,8 @@ MACHINE_CONFIG_END
 /* machine driver for MOD 2 board */
 MACHINE_CONFIG_START( mpu4base, mpu4_state )
 
-	MCFG_MACHINE_START(mod2    )
-	MCFG_MACHINE_RESET(mpu4)
+	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mod2    )
+	MCFG_MACHINE_RESET_OVERRIDE(mpu4_state,mpu4)
 	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(mpu4_memmap)
 
@@ -2756,7 +2750,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_DERIVED( mod4yam, mpu4base )
-	MCFG_MACHINE_START(mpu4yam)
+	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4yam)
 
 	MCFG_SOUND_ADD("ym2413", YM2413, MPU4_MASTER_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -2764,7 +2758,7 @@ MACHINE_CONFIG_DERIVED( mod4yam, mpu4base )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( mod4oki, mpu4base )
-	MCFG_MACHINE_START(mpu4oki)
+	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
 
 	MCFG_FRAGMENT_ADD(mpu4_common2)
 
@@ -2774,11 +2768,11 @@ MACHINE_CONFIG_DERIVED( mod4oki, mpu4base )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( bwboki, mod4oki )
-	MCFG_MACHINE_START(mpu4bwb)
+	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4bwb)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(mpu4crys, mod2     )
-	MCFG_MACHINE_START(mpu4cry)
+	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4cry)
 
 	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)

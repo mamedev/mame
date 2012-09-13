@@ -29,11 +29,12 @@ public:
 	DECLARE_WRITE16_MEMBER(darkseal_palette_24bit_rg_w);
 	DECLARE_WRITE16_MEMBER(darkseal_palette_24bit_b_w);
 	DECLARE_DRIVER_INIT(darkseal);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/darkseal.c -----------*/
 
-VIDEO_START( darkseal );
+
 SCREEN_UPDATE_IND16( darkseal );
 

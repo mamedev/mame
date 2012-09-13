@@ -469,32 +469,30 @@ static TIMER_DEVICE_CALLBACK( madgear_timer_cb )
 	state->m_maincpu->set_input_line(6, HOLD_LINE); /* Controls */
 }
 
-static MACHINE_START( lastduel )
+MACHINE_START_MEMBER(lastduel_state,lastduel)
 {
-	lastduel_state *state = machine.driver_data<lastduel_state>();
 
-	state->save_item(NAME(state->m_tilemap_priority));
-	state->save_item(NAME(state->m_scroll));
+	save_item(NAME(m_tilemap_priority));
+	save_item(NAME(m_scroll));
 }
 
-static MACHINE_START( madgear )
+MACHINE_START_MEMBER(lastduel_state,madgear)
 {
-	UINT8 *ROM = machine.root_device().memregion("audiocpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("audiocpu")->base();
 
-	machine.root_device().membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
+	machine().root_device().membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
-	MACHINE_START_CALL(lastduel);
+	MACHINE_START_CALL_MEMBER(lastduel);
 }
 
-static MACHINE_RESET( lastduel )
+void lastduel_state::machine_reset()
 {
-	lastduel_state *state = machine.driver_data<lastduel_state>();
 	int i;
 
-	state->m_tilemap_priority = 0;
+	m_tilemap_priority = 0;
 
 	for (i = 0; i < 8; i++)
-		state->m_scroll[i] = 0;
+		m_scroll[i] = 0;
 }
 
 static MACHINE_CONFIG_START( lastduel, lastduel_state )
@@ -508,8 +506,7 @@ static MACHINE_CONFIG_START( lastduel, lastduel_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545) /* Accurate */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(lastduel)
-	MCFG_MACHINE_RESET(lastduel)
+	MCFG_MACHINE_START_OVERRIDE(lastduel_state,lastduel)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -527,7 +524,7 @@ static MACHINE_CONFIG_START( lastduel, lastduel_state )
 	MCFG_GFXDECODE(lastduel)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(lastduel)
+	MCFG_VIDEO_START_OVERRIDE(lastduel_state,lastduel)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -552,8 +549,7 @@ static MACHINE_CONFIG_START( madgear, lastduel_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(madgear_sound_map)
 
-	MCFG_MACHINE_START(madgear)
-	MCFG_MACHINE_RESET(lastduel)
+	MCFG_MACHINE_START_OVERRIDE(lastduel_state,madgear)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -571,7 +567,7 @@ static MACHINE_CONFIG_START( madgear, lastduel_state )
 	MCFG_GFXDECODE(madgear)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(madgear)
+	MCFG_VIDEO_START_OVERRIDE(lastduel_state,madgear)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

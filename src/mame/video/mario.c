@@ -62,20 +62,20 @@ static const res_net_info mario_net_info_std =
   bit 0 -- 470 ohm resistor -- inverter  -- BLUE
 
 ***************************************************************************/
-PALETTE_INIT( mario )
+void mario_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	rgb_t	*rgb;
 
-	rgb = compute_res_net_all(machine, color_prom, &mario_decode_info, &mario_net_info);
-	palette_set_colors(machine, 0, rgb, 256);
-	auto_free(machine, rgb);
-	rgb = compute_res_net_all(machine, color_prom+256, &mario_decode_info, &mario_net_info_std);
-	palette_set_colors(machine, 256, rgb, 256);
-	auto_free(machine, rgb);
+	rgb = compute_res_net_all(machine(), color_prom, &mario_decode_info, &mario_net_info);
+	palette_set_colors(machine(), 0, rgb, 256);
+	auto_free(machine(), rgb);
+	rgb = compute_res_net_all(machine(), color_prom+256, &mario_decode_info, &mario_net_info_std);
+	palette_set_colors(machine(), 256, rgb, 256);
+	auto_free(machine(), rgb);
 
-	palette_normalize_range(machine.palette, 0, 255, 0, 255);
-	palette_normalize_range(machine.palette, 256, 511, 0, 255);
+	palette_normalize_range(machine().palette, 0, 255, 0, 255);
+	palette_normalize_range(machine().palette, 256, 511, 0, 255);
 }
 
 WRITE8_MEMBER(mario_state::mario_videoram_w)
@@ -135,20 +135,19 @@ TILE_GET_INFO_MEMBER(mario_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-VIDEO_START( mario )
+void mario_state::video_start()
 {
-	mario_state	*state = machine.driver_data<mario_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mario_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mario_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 
-	state->m_gfx_bank = 0;
-	state->m_palette_bank = 0;
-	state->m_gfx_scroll = 0;
-	state->save_item(NAME(state->m_gfx_bank));
-	state->save_item(NAME(state->m_palette_bank));
-	state->save_item(NAME(state->m_gfx_scroll));
-	state->save_item(NAME(state->m_flip));
+	m_gfx_bank = 0;
+	m_palette_bank = 0;
+	m_gfx_scroll = 0;
+	save_item(NAME(m_gfx_bank));
+	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_gfx_scroll));
+	save_item(NAME(m_flip));
 }
 
 /*

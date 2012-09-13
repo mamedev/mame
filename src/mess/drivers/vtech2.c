@@ -379,23 +379,23 @@ static const rgb_t vt_colors[] =
 
 
 /* Initialise the palette */
-static PALETTE_INIT( vtech2 )
+void vtech2_state::palette_init()
 {
 	int i;
 
-	machine.colortable = colortable_alloc(machine, 16);
+	machine().colortable = colortable_alloc(machine(), 16);
 
 	for ( i = 0; i < 16; i++ )
-		colortable_palette_set_color(machine.colortable, i, vt_colors[i]);
+		colortable_palette_set_color(machine().colortable, i, vt_colors[i]);
 
 	for (i = 0; i < 256; i++)
 	{
-		colortable_entry_set_value(machine.colortable, 2*i, i&15);
-		colortable_entry_set_value(machine.colortable, 2*i+1, i>>4);
+		colortable_entry_set_value(machine().colortable, 2*i, i&15);
+		colortable_entry_set_value(machine().colortable, 2*i+1, i>>4);
 	}
 
 	for (i = 0; i < 16; i++)
-		colortable_entry_set_value(machine.colortable, 512+i, i);
+		colortable_entry_set_value(machine().colortable, 512+i, i);
 }
 
 static INTERRUPT_GEN( vtech2_interrupt )
@@ -433,7 +433,6 @@ static MACHINE_CONFIG_START( laser350, vtech2_state )
 	MCFG_CPU_VBLANK_INT("screen", vtech2_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_RESET( laser350 )
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -445,9 +444,7 @@ static MACHINE_CONFIG_START( laser350, vtech2_state )
 
 	MCFG_GFXDECODE( vtech2 )
 	MCFG_PALETTE_LENGTH(528)
-	MCFG_PALETTE_INIT(vtech2)
 
-	MCFG_VIDEO_START(laser)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -471,12 +468,12 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( laser500, laser350 )
-	MCFG_MACHINE_RESET( laser500 )
+	MCFG_MACHINE_RESET_OVERRIDE(vtech2_state, laser500 )
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( laser700, laser350 )
-	MCFG_MACHINE_RESET( laser700 )
+	MCFG_MACHINE_RESET_OVERRIDE(vtech2_state, laser700 )
 
 	/* Second 5.25" floppy drive */
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD( FLOPPY_1, vtech2_floppy_interface )

@@ -16,6 +16,8 @@ public:
 	unistar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -35,11 +37,11 @@ static INPUT_PORTS_START( unistar )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET( unistar )
+void unistar_state::machine_reset()
 {
 }
 
-static VIDEO_START( unistar )
+void unistar_state::video_start()
 {
 }
 
@@ -72,7 +74,6 @@ static MACHINE_CONFIG_START( unistar, unistar_state )
 	MCFG_CPU_PROGRAM_MAP(unistar_mem)
 	MCFG_CPU_IO_MAP(unistar_io)
 
-	MCFG_MACHINE_RESET(unistar)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -80,7 +81,6 @@ static MACHINE_CONFIG_START( unistar, unistar_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_VIDEO_START(unistar)
 	MCFG_SCREEN_UPDATE_STATIC(unistar)
 	MCFG_GFXDECODE(unistar)
 	MCFG_PALETTE_LENGTH(2)

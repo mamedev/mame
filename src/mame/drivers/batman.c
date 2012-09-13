@@ -39,24 +39,22 @@ static void update_interrupts(running_machine &machine)
 }
 
 
-static MACHINE_START( batman )
+MACHINE_START_MEMBER(batman_state,batman)
 {
-	batman_state *state = machine.driver_data<batman_state>();
-	atarigen_init(machine);
+	atarigen_init(machine());
 
-	state->save_item(NAME(state->m_latch_data));
-	state->save_item(NAME(state->m_alpha_tile_bank));
+	save_item(NAME(m_latch_data));
+	save_item(NAME(m_alpha_tile_bank));
 }
 
 
-static MACHINE_RESET( batman )
+MACHINE_RESET_MEMBER(batman_state,batman)
 {
-	batman_state *state = machine.driver_data<batman_state>();
 
-	atarigen_eeprom_reset(state);
-	atarigen_interrupt_reset(state, update_interrupts);
-	atarivc_reset(*machine.primary_screen, state->m_atarivc_eof_data, 2);
-	atarigen_scanline_timer_reset(*machine.primary_screen, batman_scanline_update, 8);
+	atarigen_eeprom_reset(this);
+	atarigen_interrupt_reset(this, update_interrupts);
+	atarivc_reset(*machine().primary_screen, m_atarivc_eof_data, 2);
+	atarigen_scanline_timer_reset(*machine().primary_screen, batman_scanline_update, 8);
 	atarijsa_reset();
 }
 
@@ -237,8 +235,8 @@ static MACHINE_CONFIG_START( batman, batman_state )
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_START(batman)
-	MCFG_MACHINE_RESET(batman)
+	MCFG_MACHINE_START_OVERRIDE(batman_state,batman)
+	MCFG_MACHINE_RESET_OVERRIDE(batman_state,batman)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
@@ -252,7 +250,7 @@ static MACHINE_CONFIG_START( batman, batman_state )
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(batman)
 
-	MCFG_VIDEO_START(batman)
+	MCFG_VIDEO_START_OVERRIDE(batman_state,batman)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(jsa_iii_mono)

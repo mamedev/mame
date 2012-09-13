@@ -673,63 +673,60 @@ static const ym2203_interface ym2203_bootleg_config =
 	DEVCB_NULL
 };
 
-static MACHINE_START( combatsc )
+MACHINE_START_MEMBER(combatsc_state,combatsc)
 {
-	combatsc_state *state = machine.driver_data<combatsc_state>();
-	UINT8 *MEM = state->memregion("maincpu")->base() + 0x38000;
+	UINT8 *MEM = memregion("maincpu")->base() + 0x38000;
 
-	state->m_io_ram  = MEM + 0x0000;
-	state->m_page[0] = MEM + 0x4000;
-	state->m_page[1] = MEM + 0x6000;
+	m_io_ram  = MEM + 0x0000;
+	m_page[0] = MEM + 0x4000;
+	m_page[1] = MEM + 0x6000;
 
-	state->m_interleave_timer = machine.scheduler().timer_alloc(FUNC_NULL);
+	m_interleave_timer = machine().scheduler().timer_alloc(FUNC_NULL);
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_k007121_1 = machine.device("k007121_1");
-	state->m_k007121_2 = machine.device("k007121_2");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_k007121_1 = machine().device("k007121_1");
+	m_k007121_2 = machine().device("k007121_2");
 
-	state->membank("bank1")->configure_entries(0, 10, state->memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 10, memregion("maincpu")->base() + 0x10000, 0x4000);
 
-	state->save_item(NAME(state->m_priority));
-	state->save_item(NAME(state->m_vreg));
-	state->save_item(NAME(state->m_bank_select));
-	state->save_item(NAME(state->m_video_circuit));
-	state->save_item(NAME(state->m_boost));
-	state->save_item(NAME(state->m_prot));
-	state->save_item(NAME(state->m_pos));
-	state->save_item(NAME(state->m_sign));
+	save_item(NAME(m_priority));
+	save_item(NAME(m_vreg));
+	save_item(NAME(m_bank_select));
+	save_item(NAME(m_video_circuit));
+	save_item(NAME(m_boost));
+	save_item(NAME(m_prot));
+	save_item(NAME(m_pos));
+	save_item(NAME(m_sign));
 }
 
-static MACHINE_START( combatscb )
+MACHINE_START_MEMBER(combatsc_state,combatscb)
 {
-	combatsc_state *state = machine.driver_data<combatsc_state>();
-	MACHINE_START_CALL( combatsc );
-	state->membank("bl_abank")->configure_entries(0, 2, state->memregion("audiocpu")->base() + 0x8000, 0x4000);
+	MACHINE_START_CALL_MEMBER( combatsc );
+	membank("bl_abank")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
 }
 
-static MACHINE_RESET( combatsc )
+void combatsc_state::machine_reset()
 {
-	combatsc_state *state = machine.driver_data<combatsc_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
-	memset(state->m_io_ram,  0x00, 0x4000);
-	memset(state->m_page[0], 0x00, 0x2000);
-	memset(state->m_page[1], 0x00, 0x2000);
+	memset(m_io_ram,  0x00, 0x4000);
+	memset(m_page[0], 0x00, 0x2000);
+	memset(m_page[1], 0x00, 0x2000);
 
-	state->m_vreg = -1;
-	state->m_boost = 1;
-	state->m_bank_select = -1;
-	state->m_prot[0] = 0;
-	state->m_prot[1] = 0;
+	m_vreg = -1;
+	m_boost = 1;
+	m_bank_select = -1;
+	m_prot[0] = 0;
+	m_prot[1] = 0;
 
 	for (i = 0; i < 4; i++)
 	{
-		state->m_pos[i] = 0;
-		state->m_sign[i] = 0;
+		m_pos[i] = 0;
+		m_sign[i] = 0;
 	}
 
-	state->combatsc_bankselect_w(*space, 0, 0);
+	combatsc_bankselect_w(*space, 0, 0);
 }
 
 /* combat school (original) */
@@ -745,8 +742,7 @@ static MACHINE_CONFIG_START( combatsc, combatsc_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
-	MCFG_MACHINE_START(combatsc)
-	MCFG_MACHINE_RESET(combatsc)
+	MCFG_MACHINE_START_OVERRIDE(combatsc_state,combatsc)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -759,8 +755,8 @@ static MACHINE_CONFIG_START( combatsc, combatsc_state )
 	MCFG_GFXDECODE(combatsc)
 	MCFG_PALETTE_LENGTH(8*16*16)
 
-	MCFG_PALETTE_INIT(combatsc)
-	MCFG_VIDEO_START(combatsc)
+	MCFG_PALETTE_INIT_OVERRIDE(combatsc_state,combatsc)
+	MCFG_VIDEO_START_OVERRIDE(combatsc_state,combatsc)
 
 	MCFG_K007121_ADD("k007121_1")
 	MCFG_K007121_ADD("k007121_2")
@@ -797,8 +793,7 @@ static MACHINE_CONFIG_START( combatscb, combatsc_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
-	MCFG_MACHINE_START(combatscb)
-	MCFG_MACHINE_RESET(combatsc)
+	MCFG_MACHINE_START_OVERRIDE(combatsc_state,combatscb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -811,8 +806,8 @@ static MACHINE_CONFIG_START( combatscb, combatsc_state )
 	MCFG_GFXDECODE(combatscb)
 	MCFG_PALETTE_LENGTH(8*16*16)
 
-	MCFG_PALETTE_INIT(combatscb)
-	MCFG_VIDEO_START(combatscb)
+	MCFG_PALETTE_INIT_OVERRIDE(combatsc_state,combatscb)
+	MCFG_VIDEO_START_OVERRIDE(combatsc_state,combatscb)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

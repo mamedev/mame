@@ -53,16 +53,15 @@ void aliens_sprite_callback( running_machine &machine, int *code, int *color, in
 
 ***************************************************************************/
 
-VIDEO_START( aliens )
+void aliens_state::video_start()
 {
-	aliens_state *state = machine.driver_data<aliens_state>();
 
-	state->m_generic_paletteram_8.allocate(0x400);
+	m_generic_paletteram_8.allocate(0x400);
 
-	state->m_layer_colorbase[0] = 0;
-	state->m_layer_colorbase[1] = 4;
-	state->m_layer_colorbase[2] = 8;
-	state->m_sprite_colorbase = 16;
+	m_layer_colorbase[0] = 0;
+	m_layer_colorbase[1] = 4;
+	m_layer_colorbase[2] = 8;
+	m_sprite_colorbase = 16;
 }
 
 

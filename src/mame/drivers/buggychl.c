@@ -356,38 +356,36 @@ static const msm5232_interface msm5232_config =
 };
 
 
-static MACHINE_START( buggychl )
+void buggychl_state::machine_start()
 {
-	buggychl_state *state = machine.driver_data<buggychl_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x2000);
+	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x2000);
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_sound_nmi_enable));
-	state->save_item(NAME(state->m_pending_nmi));
-	state->save_item(NAME(state->m_sprite_lookup));
-	state->save_item(NAME(state->m_sl_bank));
-	state->save_item(NAME(state->m_bg_on));
-	state->save_item(NAME(state->m_sky_on));
-	state->save_item(NAME(state->m_sprite_color_base));
-	state->save_item(NAME(state->m_bg_scrollx));
+	save_item(NAME(m_sound_nmi_enable));
+	save_item(NAME(m_pending_nmi));
+	save_item(NAME(m_sprite_lookup));
+	save_item(NAME(m_sl_bank));
+	save_item(NAME(m_bg_on));
+	save_item(NAME(m_sky_on));
+	save_item(NAME(m_sprite_color_base));
+	save_item(NAME(m_bg_scrollx));
 }
 
-static MACHINE_RESET( buggychl )
+void buggychl_state::machine_reset()
 {
-	buggychl_state *state = machine.driver_data<buggychl_state>();
 
-	machine.device("mcu")->execute().set_input_line(0, CLEAR_LINE);
+	machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 
-	state->m_sound_nmi_enable = 0;
-	state->m_pending_nmi = 0;
-	state->m_sl_bank = 0;
-	state->m_bg_on = 0;
-	state->m_sky_on = 0;
-	state->m_sprite_color_base = 0;
-	state->m_bg_scrollx = 0;
+	m_sound_nmi_enable = 0;
+	m_pending_nmi = 0;
+	m_sl_bank = 0;
+	m_bg_on = 0;
+	m_sky_on = 0;
+	m_sprite_color_base = 0;
+	m_bg_scrollx = 0;
 }
 
 static MACHINE_CONFIG_START( buggychl, buggychl_state )
@@ -406,8 +404,6 @@ static MACHINE_CONFIG_START( buggychl, buggychl_state )
 	MCFG_CPU_PROGRAM_MAP(buggychl_mcu_map)
 	MCFG_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
 
-	MCFG_MACHINE_START(buggychl)
-	MCFG_MACHINE_RESET(buggychl)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -420,8 +416,6 @@ static MACHINE_CONFIG_START( buggychl, buggychl_state )
 	MCFG_GFXDECODE(buggychl)
 	MCFG_PALETTE_LENGTH(128+128)
 
-	MCFG_PALETTE_INIT(buggychl)
-	MCFG_VIDEO_START(buggychl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

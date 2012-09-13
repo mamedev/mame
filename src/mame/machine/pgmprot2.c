@@ -133,12 +133,11 @@ static ADDRESS_MAP_START( 55857F_arm7_map, AS_PROGRAM, 32, pgm_arm_type2_state )
 	AM_RANGE(0x50000000, 0x500003ff) AM_RAM
 ADDRESS_MAP_END
 
-MACHINE_START( pgm_arm_type2 )
+MACHINE_START_MEMBER(pgm_arm_type2_state,pgm_arm_type2)
 {
-	MACHINE_START_CALL(pgm);
-	pgm_arm_type2_state *state = machine.driver_data<pgm_arm_type2_state>();
+	MACHINE_START_CALL_MEMBER(pgm);
 
-	state->m_prot = machine.device<cpu_device>("prot");
+	m_prot = machine().device<cpu_device>("prot");
 
 	/* register type specific Save State stuff here */
 
@@ -149,7 +148,7 @@ MACHINE_START( pgm_arm_type2 )
 MACHINE_CONFIG_START( pgm_arm_type2, pgm_arm_type2_state )
 	MCFG_FRAGMENT_ADD(pgmbase)
 
-	MCFG_MACHINE_START( pgm_arm_type2 )
+	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type2_state, pgm_arm_type2 )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(kov2_mem)

@@ -231,6 +231,13 @@ public:
 	void fm77av_encoder_setup_command();
 	void fm77av_encoder_handle_command();
 	DECLARE_DRIVER_INIT(fm7);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_MACHINE_START(fm7);
+	DECLARE_MACHINE_START(fm77av);
+	DECLARE_MACHINE_START(fm11);
+	DECLARE_MACHINE_START(fm16);
 };
 
 
@@ -248,8 +255,8 @@ TIMER_CALLBACK( fm77av_vsync );
 
 
 
-VIDEO_START( fm7 );
+
 SCREEN_UPDATE_IND16( fm7 );
-PALETTE_INIT( fm7 );
+
 
 #endif /*FM7_H_*/

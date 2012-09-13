@@ -12,30 +12,30 @@
 #include "includes/jackal.h"
 
 
-PALETTE_INIT( jackal )
+void jackal_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x200);
+	machine().colortable = colortable_alloc(machine(), 0x200);
 
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT16 ctabentry = i | 0x100;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	for (i = 0x100; i < 0x200; i++)
 	{
 		UINT16 ctabentry = color_prom[i - 0x100] & 0x0f;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	for (i = 0x200; i < 0x300; i++)
 	{
 		UINT16 ctabentry = (color_prom[i - 0x100] & 0x0f) | 0x10;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 
@@ -74,10 +74,9 @@ TILE_GET_INFO_MEMBER(jackal_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
-VIDEO_START( jackal )
+void jackal_state::video_start()
 {
-	jackal_state *state = machine.driver_data<jackal_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(jackal_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(jackal_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

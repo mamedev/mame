@@ -670,27 +670,25 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static MACHINE_START( paradise )
+void paradise_state::machine_start()
 {
-	paradise_state *state = machine.driver_data<paradise_state>();
-	int bank_n = state->memregion("maincpu")->bytes() / 0x4000 - 1;
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	int bank_n = memregion("maincpu")->bytes() / 0x4000 - 1;
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 3, &ROM[0x00000], 0x4000);
-	state->membank("bank1")->configure_entries(3, bank_n - 3, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 3, &ROM[0x00000], 0x4000);
+	membank("bank1")->configure_entries(3, bank_n - 3, &ROM[0x10000], 0x4000);
 
-	state->save_item(NAME(state->m_palbank));
-	state->save_item(NAME(state->m_priority));
+	save_item(NAME(m_palbank));
+	save_item(NAME(m_priority));
 }
 
-static MACHINE_RESET( paradise )
+void paradise_state::machine_reset()
 {
-	paradise_state *state = machine.driver_data<paradise_state>();
 
-	state->m_palbank = 0;
-	state->m_priority = 0;
+	m_palbank = 0;
+	m_priority = 0;
 
-	state->irq_count = 0;
+	irq_count = 0;
 
 }
 
@@ -712,8 +710,6 @@ static MACHINE_CONFIG_START( paradise, paradise_state )
 	MCFG_CPU_IO_MAP(paradise_io_map)
 	MCFG_CPU_PERIODIC_INT(paradise_irq,4*54)	/* No nmi routine, timing is confirmed (i.e. three timing irqs for each vblank irq */
 
-	MCFG_MACHINE_START(paradise)
-	MCFG_MACHINE_RESET(paradise)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -726,7 +722,6 @@ static MACHINE_CONFIG_START( paradise, paradise_state )
 	MCFG_GFXDECODE(paradise)
 	MCFG_PALETTE_LENGTH(0x800 + 16)
 
-	MCFG_VIDEO_START(paradise)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

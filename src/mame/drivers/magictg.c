@@ -211,6 +211,7 @@ public:
 protected:
 	virtual void machine_start();
 	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -253,7 +254,7 @@ void magictg_state::machine_reset()
  *
  *************************************/
 
-static VIDEO_START( magictg )
+void magictg_state::video_start()
 {
 
 }
@@ -963,7 +964,6 @@ static MACHINE_CONFIG_START( magictg, magictg_state )
 	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 447)
 
-	MCFG_VIDEO_START(magictg)
 	MCFG_SCREEN_UPDATE_STATIC(magictg)
 MACHINE_CONFIG_END
 

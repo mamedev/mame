@@ -93,6 +93,8 @@ public:
 	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(handset_ack);
 	DECLARE_WRITE_LINE_MEMBER(alphaW);
+	virtual void machine_start();
+	DECLARE_MACHINE_RESET(ti99_4p);
 
 	void set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state);
 
@@ -807,33 +809,32 @@ static TMS99xx_CONFIG( sgcpu_cpuconf )
 	DEVCB_NULL		// Hold acknowledge
 };
 
-MACHINE_START( ti99_4p )
+void ti99_4p::machine_start()
 {
-	ti99_4p *driver = machine.driver_data<ti99_4p>();
 
-	driver->m_cpu = static_cast<tms9900_device*>(machine.device("maincpu"));
-	driver->m_peribox = static_cast<peribox_device*>(machine.device(PERIBOX_TAG));
-	driver->m_sound = static_cast<ti_sound_system_device*>(machine.device(TISOUND_TAG));
-	driver->m_video = static_cast<ti_exp_video_device*>(machine.device(VIDEO_SYSTEM_TAG));
-	driver->m_cassette = static_cast<cassette_image_device*>(machine.device(CASSETTE_TAG));
-	driver->m_tms9901 = static_cast<tms9901_device*>(machine.device(TMS9901_TAG));
-	driver->m_joyport = static_cast<joyport_device*>(machine.device(JOYPORT_TAG));
+	m_cpu = static_cast<tms9900_device*>(machine().device("maincpu"));
+	m_peribox = static_cast<peribox_device*>(machine().device(PERIBOX_TAG));
+	m_sound = static_cast<ti_sound_system_device*>(machine().device(TISOUND_TAG));
+	m_video = static_cast<ti_exp_video_device*>(machine().device(VIDEO_SYSTEM_TAG));
+	m_cassette = static_cast<cassette_image_device*>(machine().device(CASSETTE_TAG));
+	m_tms9901 = static_cast<tms9901_device*>(machine().device(TMS9901_TAG));
+	m_joyport = static_cast<joyport_device*>(machine().device(JOYPORT_TAG));
 
-	driver->m_ram = (UINT16*)(*machine.root_device().memregion(SAMSMEM_TAG));
-	driver->m_scratchpad = (UINT16*)(*machine.root_device().memregion(PADMEM_TAG));
+	m_ram = (UINT16*)(*machine().root_device().memregion(SAMSMEM_TAG));
+	m_scratchpad = (UINT16*)(*machine().root_device().memregion(PADMEM_TAG));
 
-	driver->m_peribox->senila(CLEAR_LINE);
-	driver->m_peribox->senilb(CLEAR_LINE);
+	m_peribox->senila(CLEAR_LINE);
+	m_peribox->senilb(CLEAR_LINE);
 
-	driver->m_firstjoy = 6;
+	m_firstjoy = 6;
 
-	driver->m_ready_line = driver->m_ready_line_dmux = ASSERT_LINE;
+	m_ready_line = m_ready_line_dmux = ASSERT_LINE;
 
-	UINT16 *rom = (UINT16*)(*machine.root_device().memregion("maincpu"));
-	driver->m_rom0  = rom + 0x2000;
-	driver->m_dsr   = rom + 0x6000;
-	driver->m_rom6a = rom + 0x3000;
-	driver->m_rom6b = rom + 0x7000;
+	UINT16 *rom = (UINT16*)(*machine().root_device().memregion("maincpu"));
+	m_rom0  = rom + 0x2000;
+	m_dsr   = rom + 0x6000;
+	m_rom6a = rom + 0x3000;
+	m_rom6b = rom + 0x7000;
 }
 
 /*
@@ -858,13 +859,12 @@ static JOYPORT_CONFIG( joyport4a_60 )
 /*
     Reset the machine.
 */
-MACHINE_RESET( ti99_4p )
+MACHINE_RESET_MEMBER(ti99_4p,ti99_4p)
 {
-	ti99_4p *driver = machine.driver_data<ti99_4p>();
-	driver->m_tms9901->set_single_int(12, 0);
+	m_tms9901->set_single_int(12, 0);
 
-	driver->m_cpu->set_ready(ASSERT_LINE);
-	driver->m_cpu->set_hold(CLEAR_LINE);
+	m_cpu->set_ready(ASSERT_LINE);
+	m_cpu->set_hold(CLEAR_LINE);
 }
 
 TIMER_DEVICE_CALLBACK( sgcpu_hblank_interrupt )
@@ -879,7 +879,6 @@ static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, sgcpu_cpuconf)
-	MCFG_MACHINE_START( ti99_4p )
 
 	/* video hardware */
 	// Although we should have a 60 Hz screen rate, we have to set it to 30 here.

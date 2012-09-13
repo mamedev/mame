@@ -23,11 +23,10 @@ TILE_GET_INFO_MEMBER(canyon_state::get_bg_tile_info)
 }
 
 
-VIDEO_START( canyon )
+void canyon_state::video_start()
 {
-	canyon_state *state = machine.driver_data<canyon_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(canyon_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(canyon_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

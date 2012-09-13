@@ -28,6 +28,11 @@ public:
 	DECLARE_READ8_MEMBER(triothep_control_r);
 	DECLARE_WRITE8_MEMBER(actfancr_sound_w);
 	DECLARE_WRITE8_MEMBER(actfancr_buffer_spriteram_w);
+	virtual void video_start();
+	DECLARE_MACHINE_START(actfancr);
+	DECLARE_MACHINE_RESET(actfancr);
+	DECLARE_MACHINE_START(triothep);
+	DECLARE_MACHINE_RESET(triothep);
 };
 
 
@@ -40,6 +45,6 @@ WRITE8_HANDLER( actfancr_pf2_data_w );
 READ8_HANDLER( actfancr_pf2_data_r );
 WRITE8_HANDLER( actfancr_pf2_control_w );
 
-VIDEO_START( actfancr );
+
 SCREEN_UPDATE_IND16( actfancr );
 

@@ -482,7 +482,7 @@ static MACHINE_CONFIG_DERIVED( frogs, vicdual_root )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(frogs_map)
 	MCFG_CPU_IO_MAP(frogs_io_map)
-	MCFG_MACHINE_START(frogs_audio)
+	MCFG_MACHINE_START_OVERRIDE(vicdual_state,frogs_audio)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

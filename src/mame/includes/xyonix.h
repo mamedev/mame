@@ -17,11 +17,13 @@ public:
 	DECLARE_WRITE8_MEMBER(xyonix_io_w);
 	DECLARE_WRITE8_MEMBER(xyonix_vidram_w);
 	TILE_GET_INFO_MEMBER(get_xyonix_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/xyonix.c -----------*/
 
-PALETTE_INIT( xyonix );
-VIDEO_START(xyonix);
+
+
 SCREEN_UPDATE_IND16(xyonix);

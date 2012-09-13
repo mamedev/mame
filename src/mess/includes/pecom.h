@@ -36,13 +36,12 @@ public:
 	DECLARE_WRITE8_MEMBER(pecom_bank_w);
 	DECLARE_READ8_MEMBER(pecom_keyboard_r);
 	DECLARE_WRITE8_MEMBER(pecom_cdp1869_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	DECLARE_VIDEO_START(pecom);
 };
 
 /*----------- defined in machine/pecom.c -----------*/
-
-extern MACHINE_START( pecom );
-extern MACHINE_RESET( pecom );
-
 extern const cosmac_interface pecom64_cdp1802_config;
 
 /* ---------- defined in video/pecom.c ---------- */

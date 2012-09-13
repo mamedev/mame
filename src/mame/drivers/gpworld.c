@@ -70,6 +70,7 @@ public:
 	DECLARE_WRITE8_MEMBER(brake_gas_write);
 	DECLARE_WRITE8_MEMBER(palette_write);
 	DECLARE_DRIVER_INIT(gpworld);
+	virtual void machine_start();
 };
 
 
@@ -233,7 +234,7 @@ static SCREEN_UPDATE_RGB32( gpworld )
 }
 
 
-static MACHINE_START( gpworld )
+void gpworld_state::machine_start()
 {
 }
 
@@ -467,7 +468,6 @@ static MACHINE_CONFIG_START( gpworld, gpworld_state )
 	MCFG_CPU_IO_MAP(mainport)
 	MCFG_CPU_VBLANK_INT("screen", vblank_callback_gpworld)
 
-	MCFG_MACHINE_START(gpworld)
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
 	MCFG_LASERDISC_OVERLAY_STATIC(512, 256, gpworld)

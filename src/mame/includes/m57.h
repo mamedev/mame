@@ -18,11 +18,13 @@ public:
 	DECLARE_WRITE8_MEMBER(m57_videoram_w);
 	DECLARE_WRITE8_MEMBER(m57_flipscreen_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 /*----------- defined in video/m57.c -----------*/
 
 
-PALETTE_INIT( m57 );
-VIDEO_START( m57 );
+
+
 SCREEN_UPDATE_IND16( m57 );

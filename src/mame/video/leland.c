@@ -55,27 +55,25 @@ static TIMER_CALLBACK( scanline_callback )
  *
  *************************************/
 
-static VIDEO_START( leland )
+VIDEO_START_MEMBER(leland_state,leland)
 {
-	leland_state *state = machine.driver_data<leland_state>();
 	/* allocate memory */
-	state->m_video_ram = auto_alloc_array_clear(machine, UINT8, VRAM_SIZE);
+	m_video_ram = auto_alloc_array_clear(machine(), UINT8, VRAM_SIZE);
 
 	/* scanline timer */
-	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(scanline_callback));
-	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(0));
+	m_scanline_timer = machine().scheduler().timer_alloc(FUNC(scanline_callback));
+	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(0));
 
 }
 
 
-static VIDEO_START( ataxx )
+VIDEO_START_MEMBER(leland_state,ataxx)
 {
-	leland_state *state = machine.driver_data<leland_state>();
 	/* first do the standard stuff */
-	VIDEO_START_CALL(leland);
+	VIDEO_START_CALL_MEMBER(leland);
 
 	/* allocate memory */
-	state->m_ataxx_qram = auto_alloc_array_clear(machine, UINT8, QRAM_SIZE);
+	m_ataxx_qram = auto_alloc_array_clear(machine(), UINT8, QRAM_SIZE);
 }
 
 
@@ -525,7 +523,7 @@ static SCREEN_UPDATE_IND16( ataxx )
 MACHINE_CONFIG_FRAGMENT( leland_video )
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_VIDEO_START(leland)
+	MCFG_VIDEO_START_OVERRIDE(leland_state,leland)
 
 	MCFG_PALETTE_LENGTH(1024)
 
@@ -538,7 +536,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_DERIVED( ataxx_video, leland_video )
-	MCFG_VIDEO_START(ataxx)
+	MCFG_VIDEO_START_OVERRIDE(leland_state,ataxx)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(ataxx)
 MACHINE_CONFIG_END

@@ -75,12 +75,12 @@ sprites.
 
 ***************************************************************************/
 
-PALETTE_INIT( ghostb )
+PALETTE_INIT_MEMBER(dec8_state,ghostb)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b;
 
@@ -94,13 +94,13 @@ PALETTE_INIT( ghostb )
 		bit2 = (color_prom[i] >> 6) & 0x01;
 		bit3 = (color_prom[i] >> 7) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[i + machine.total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[i + machine.total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[i + machine.total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[i + machine.total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[i + machine().total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[i + machine().total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[i + machine().total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[i + machine().total_colors()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -293,16 +293,15 @@ TILE_GET_INFO_MEMBER(dec8_state::get_cobracom_fix_tile_info)
 			0);
 }
 
-VIDEO_START( cobracom )
+VIDEO_START_MEMBER(dec8_state,cobracom)
 {
-	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_cobracom_fix_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_cobracom_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_fix_tilemap->set_transparent_pen(0);
+	m_fix_tilemap->set_transparent_pen(0);
 
-	state->m_game_uses_priority = 0;
-	machine.device<deco_bac06_device>("tilegen1")->set_colmask(0x3);
-	machine.device<deco_bac06_device>("tilegen2")->set_colmask(0x3);
+	m_game_uses_priority = 0;
+	machine().device<deco_bac06_device>("tilegen1")->set_colmask(0x3);
+	machine().device<deco_bac06_device>("tilegen2")->set_colmask(0x3);
 
 }
 
@@ -330,14 +329,13 @@ TILE_GET_INFO_MEMBER(dec8_state::get_ghostb_fix_tile_info)
 			0);
 }
 
-VIDEO_START( ghostb )
+VIDEO_START_MEMBER(dec8_state,ghostb)
 {
-	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_ghostb_fix_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fix_tilemap->set_transparent_pen(0);
+	m_fix_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_ghostb_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fix_tilemap->set_transparent_pen(0);
 
-	state->m_game_uses_priority = 0;
-	machine.device<deco_bac06_device>("tilegen1")->set_colmask(0xf);
+	m_game_uses_priority = 0;
+	machine().device<deco_bac06_device>("tilegen1")->set_colmask(0xf);
 }
 
 /******************************************************************************/
@@ -368,15 +366,14 @@ TILE_GET_INFO_MEMBER(dec8_state::get_oscar_fix_tile_info)
 			0);
 }
 
-VIDEO_START( oscar )
+VIDEO_START_MEMBER(dec8_state,oscar)
 {
-	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_oscar_fix_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_oscar_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_fix_tilemap->set_transparent_pen(0);
+	m_fix_tilemap->set_transparent_pen(0);
 
-	state->m_game_uses_priority = 1;
-	machine.device<deco_bac06_device>("tilegen1")->set_colmask(0x7);
+	m_game_uses_priority = 1;
+	machine().device<deco_bac06_device>("tilegen1")->set_colmask(0x7);
 
 }
 
@@ -446,25 +443,23 @@ TILE_GET_INFO_MEMBER(dec8_state::get_lastmisn_fix_tile_info)
 			0);
 }
 
-VIDEO_START( lastmisn )
+VIDEO_START_MEMBER(dec8_state,lastmisn)
 {
-	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_tile_info),state), tilemap_mapper_delegate(FUNC(dec8_state::lastmisn_scan_rows),state), 16, 16, 32, 32);
-	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_fix_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_tile_info),this), tilemap_mapper_delegate(FUNC(dec8_state::lastmisn_scan_rows),this), 16, 16, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_fix_tilemap->set_transparent_pen(0);
-	state->m_game_uses_priority = 0;
+	m_fix_tilemap->set_transparent_pen(0);
+	m_game_uses_priority = 0;
 }
 
-VIDEO_START( shackled )
+VIDEO_START_MEMBER(dec8_state,shackled)
 {
-	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_tile_info),state), tilemap_mapper_delegate(FUNC(dec8_state::lastmisn_scan_rows),state), 16, 16, 32, 32);
-	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_fix_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_tile_info),this), tilemap_mapper_delegate(FUNC(dec8_state::lastmisn_scan_rows),this), 16, 16, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_fix_tilemap->set_transparent_pen(0);
-	state->m_bg_tilemap->set_transmask(0, 0x000f, 0xfff0); /* Bottom 12 pens */
-	state->m_game_uses_priority = 1;
+	m_fix_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_transmask(0, 0x000f, 0xfff0); /* Bottom 12 pens */
+	m_game_uses_priority = 1;
 }
 
 /******************************************************************************/
@@ -517,17 +512,16 @@ TILE_GET_INFO_MEMBER(dec8_state::get_srdarwin_tile_info)
 	tileinfo.group = color;
 }
 
-VIDEO_START( srdarwin )
+VIDEO_START_MEMBER(dec8_state,srdarwin)
 {
-	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_srdarwin_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
-	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_srdarwin_fix_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_srdarwin_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
+	m_fix_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_srdarwin_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_fix_tilemap->set_transparent_pen(0);
-	state->m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); //* draw as background only
-	state->m_bg_tilemap->set_transmask(1, 0x00ff, 0xff00); /* Bottom 8 pens */
-	state->m_bg_tilemap->set_transmask(2, 0x00ff, 0xff00); /* Bottom 8 pens */
-	state->m_bg_tilemap->set_transmask(3, 0x0000, 0xffff); //* draw as foreground only
+	m_fix_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); //* draw as background only
+	m_bg_tilemap->set_transmask(1, 0x00ff, 0xff00); /* Bottom 8 pens */
+	m_bg_tilemap->set_transmask(2, 0x00ff, 0xff00); /* Bottom 8 pens */
+	m_bg_tilemap->set_transmask(3, 0x0000, 0xffff); //* draw as foreground only
 }
 
 /******************************************************************************/
@@ -590,25 +584,23 @@ TILE_GET_INFO_MEMBER(dec8_state::get_gondo_tile_info)
 			0);
 }
 
-VIDEO_START( gondo )
+VIDEO_START_MEMBER(dec8_state,gondo)
 {
-	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_fix_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	state->m_fix_tilemap->set_transparent_pen(0);
-	state->m_bg_tilemap->set_transmask(0, 0x00ff, 0xff00); /* Bottom 8 pens */
-	state->m_game_uses_priority = 0;
+	m_fix_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_transmask(0, 0x00ff, 0xff00); /* Bottom 8 pens */
+	m_game_uses_priority = 0;
 }
 
-VIDEO_START( garyoret )
+VIDEO_START_MEMBER(dec8_state,garyoret)
 {
-	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_fix_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	state->m_fix_tilemap->set_transparent_pen(0);
-	state->m_game_uses_priority = 1;
+	m_fix_tilemap->set_transparent_pen(0);
+	m_game_uses_priority = 1;
 }
 
 /******************************************************************************/

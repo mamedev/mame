@@ -263,37 +263,37 @@ static TIMER_CALLBACK( int_timer_callback )
 }
 
 
-VIDEO_START( midzeus2 )
+VIDEO_START_MEMBER(midzeus_state,midzeus2)
 {
 	/* allocate memory for "wave" RAM */
-	waveram[0] = auto_alloc_array(machine, UINT32, WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8/4);
-	waveram[1] = auto_alloc_array(machine, UINT32, WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 12/4);
+	waveram[0] = auto_alloc_array(machine(), UINT32, WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8/4);
+	waveram[1] = auto_alloc_array(machine(), UINT32, WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 12/4);
 
 	/* initialize polygon engine */
-	poly = poly_alloc(machine, 10000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
+	poly = poly_alloc(machine(), 10000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 
 	/* we need to cleanup on exit */
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(exit_handler), &machine));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(exit_handler), &machine()));
 
 	zbase = 2.0f;
 	yoffs = 0;
 	texel_width = 256;
 	zeus_renderbase = waveram[1];
 
-	int_timer = machine.scheduler().timer_alloc(FUNC(int_timer_callback));
+	int_timer = machine().scheduler().timer_alloc(FUNC(int_timer_callback));
 
 	/* save states */
-	state_save_register_global_pointer(machine, waveram[0], WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 / sizeof(waveram[0][0]));
-	state_save_register_global_pointer(machine, waveram[1], WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 12 / sizeof(waveram[1][0]));
-	state_save_register_global_array(machine, zeus_fifo);
-	state_save_register_global(machine, zeus_fifo_words);
-	state_save_register_global(machine, zeus_cliprect.min_x);
-	state_save_register_global(machine, zeus_cliprect.max_x);
-	state_save_register_global(machine, zeus_cliprect.min_y);
-	state_save_register_global(machine, zeus_cliprect.max_y);
-	state_save_register_global_2d_array(machine, zeus_matrix);
-	state_save_register_global_array(machine, zeus_point);
-	state_save_register_global(machine, zeus_texbase);
+	state_save_register_global_pointer(machine(), waveram[0], WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 / sizeof(waveram[0][0]));
+	state_save_register_global_pointer(machine(), waveram[1], WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 12 / sizeof(waveram[1][0]));
+	state_save_register_global_array(machine(), zeus_fifo);
+	state_save_register_global(machine(), zeus_fifo_words);
+	state_save_register_global(machine(), zeus_cliprect.min_x);
+	state_save_register_global(machine(), zeus_cliprect.max_x);
+	state_save_register_global(machine(), zeus_cliprect.min_y);
+	state_save_register_global(machine(), zeus_cliprect.max_y);
+	state_save_register_global_2d_array(machine(), zeus_matrix);
+	state_save_register_global_array(machine(), zeus_point);
+	state_save_register_global(machine(), zeus_texbase);
 }
 
 

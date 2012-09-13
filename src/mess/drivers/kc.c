@@ -143,7 +143,7 @@ static MACHINE_CONFIG_START( kc85_3, kc_state )
 	MCFG_TIMER_ADD_SCANLINE("scantimer", kc_scanline, "screen", 0, 1)
 
 	MCFG_PALETTE_LENGTH(KC85_PALETTE_SIZE)
-	MCFG_PALETTE_INIT( kc85 )
+	MCFG_PALETTE_INIT_OVERRIDE(kc85_4_state, kc85 )
 
 	MCFG_KC_KEYBOARD_ADD("keyboard", XTAL_4MHz, kc85_keyboard_interface)
 
@@ -195,7 +195,7 @@ static MACHINE_CONFIG_START( kc85_4, kc85_4_state )
 	MCFG_TIMER_ADD_SCANLINE("scantimer", kc_scanline, "screen", 0, 1)
 
 	MCFG_PALETTE_LENGTH(KC85_PALETTE_SIZE)
-	MCFG_PALETTE_INIT( kc85 )
+	MCFG_PALETTE_INIT_OVERRIDE(kc85_4_state, kc85 )
 
 	MCFG_KC_KEYBOARD_ADD("keyboard", XTAL_4MHz, kc85_keyboard_interface)
 

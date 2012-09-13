@@ -13,23 +13,22 @@
 #include "includes/scramble.h"
 
 
-MACHINE_RESET( scramble )
+MACHINE_RESET_MEMBER(scramble_state,scramble)
 {
-	scramble_state *state = machine.driver_data<scramble_state>();
-	MACHINE_RESET_CALL(galaxold);
+	MACHINE_RESET_CALL_MEMBER(galaxold);
 
-	if (machine.device("audiocpu") != NULL)
-		scramble_sh_init(machine);
+	if (machine().device("audiocpu") != NULL)
+		scramble_sh_init(machine());
 
-	state->m_security_2B_counter = 0;
+	m_security_2B_counter = 0;
 }
 
-MACHINE_RESET( explorer )
+MACHINE_RESET_MEMBER(scramble_state,explorer)
 {
-	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
 	RAM[0x47ff] = 0; /* If not set, it doesn't reset after the 1st time */
 
-	MACHINE_RESET_CALL(galaxold);
+	MACHINE_RESET_CALL_MEMBER(galaxold);
 }
 
 

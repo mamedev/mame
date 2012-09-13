@@ -719,7 +719,6 @@ static MACHINE_CONFIG_START( esripsys, esripsys_state )
 	MCFG_SCREEN_UPDATE_STATIC(esripsys)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_VIDEO_START(esripsys)
 
 	/* Sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

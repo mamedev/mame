@@ -81,6 +81,8 @@ public:
 	DECLARE_WRITE8_MEMBER(kungfur_control_w);
 	DECLARE_WRITE8_MEMBER(kungfur_adpcm1_w);
 	DECLARE_WRITE8_MEMBER(kungfur_adpcm2_w);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -294,22 +296,20 @@ static const msm5205_interface msm5205_config_2 =
 	MSM5205_S48_4B
 };
 
-static MACHINE_START( kungfur )
+void kungfur_state::machine_start()
 {
-	kungfur_state *state = machine.driver_data<kungfur_state>();
 
-	state->save_item(NAME(state->m_control));
-	state->save_item(NAME(state->m_latch));
+	save_item(NAME(m_control));
+	save_item(NAME(m_latch));
 
-	state->save_item(NAME(state->m_adpcm_pos));
-	state->save_item(NAME(state->m_adpcm_data));
-	state->save_item(NAME(state->m_adpcm_sel));
+	save_item(NAME(m_adpcm_pos));
+	save_item(NAME(m_adpcm_data));
+	save_item(NAME(m_adpcm_sel));
 }
 
-static MACHINE_RESET( kungfur )
+void kungfur_state::machine_reset()
 {
-	kungfur_state *state = machine.driver_data<kungfur_state>();
-	state->m_control = 0;
+	m_control = 0;
 }
 
 static MACHINE_CONFIG_START( kungfur, kungfur_state )
@@ -322,8 +322,6 @@ static MACHINE_CONFIG_START( kungfur, kungfur_state )
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
 
-	MCFG_MACHINE_START(kungfur)
-	MCFG_MACHINE_RESET(kungfur)
 
 	/* no video! */
 

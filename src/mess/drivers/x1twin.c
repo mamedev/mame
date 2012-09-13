@@ -530,8 +530,8 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf )
 
-	MCFG_MACHINE_START(x1)
-	MCFG_MACHINE_RESET(x1)
+	MCFG_MACHINE_START_OVERRIDE(x1twin_state,x1)
+	MCFG_MACHINE_RESET_OVERRIDE(x1twin_state,x1)
 
 	#if 0
 	MCFG_CPU_ADD("pce_cpu", H6280, PCE_MAIN_CLOCK/3)
@@ -557,11 +557,11 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 
 	MCFG_MC6845_ADD("crtc", H46505, (VDP_CLOCK/48), mc6845_intf) //unknown divider
 	MCFG_PALETTE_LENGTH(0x10+0x1000)
-	MCFG_PALETTE_INIT(x1)
+	MCFG_PALETTE_INIT_OVERRIDE(x1twin_state,x1)
 
 	MCFG_GFXDECODE(x1)
 
-	MCFG_VIDEO_START(x1)
+	MCFG_VIDEO_START_OVERRIDE(x1twin_state,x1)
 
 	MCFG_MB8877_ADD("fdc",x1_mb8877a_interface)
 

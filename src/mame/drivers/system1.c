@@ -353,40 +353,37 @@ static const UINT8 cc_ex[0x100] = {
 };
 
 
-static MACHINE_START( system1 )
+void system1_state::machine_start()
 {
-	system1_state *state = machine.driver_data<system1_state>();
-	UINT32 numbanks = (state->memregion("maincpu")->bytes() - 0x10000) / 0x4000;
+	UINT32 numbanks = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
 
 	if (numbanks > 0)
-		state->membank("bank1")->configure_entries(0, numbanks, state->memregion("maincpu")->base() + 0x10000, 0x4000);
+		membank("bank1")->configure_entries(0, numbanks, memregion("maincpu")->base() + 0x10000, 0x4000);
 	else
-		state->membank("bank1")->configure_entry(0, state->memregion("maincpu")->base() + 0x8000);
-	state->membank("bank1")->set_entry(0);
+		membank("bank1")->configure_entry(0, memregion("maincpu")->base() + 0x8000);
+	membank("bank1")->set_entry(0);
 
-	z80_set_cycle_tables(machine.device("maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex);
+	z80_set_cycle_tables(machine().device("maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex);
 
-	state->m_mute_xor = 0x00;
+	m_mute_xor = 0x00;
 
-	state_save_register_global(machine, state->m_dakkochn_mux_data);
-	state_save_register_global(machine, state->m_videomode_prev);
-	state_save_register_global(machine, state->m_mcu_control);
-	state_save_register_global(machine, state->m_nob_maincpu_latch);
+	state_save_register_global(machine(), m_dakkochn_mux_data);
+	state_save_register_global(machine(), m_videomode_prev);
+	state_save_register_global(machine(), m_mcu_control);
+	state_save_register_global(machine(), m_nob_maincpu_latch);
 }
 
 
-static MACHINE_START( system2 )
+MACHINE_START_MEMBER(system1_state,system2)
 {
-	system1_state *state = machine.driver_data<system1_state>();
-	MACHINE_START_CALL(system1);
-	state->m_mute_xor = 0x01;
+	system1_state::machine_start();
+	m_mute_xor = 0x01;
 }
 
 
-static MACHINE_RESET( system1 )
+void system1_state::machine_reset()
 {
-	system1_state *state = machine.driver_data<system1_state>();
-	state->m_dakkochn_mux_data = 0;
+	m_dakkochn_mux_data = 0;
 }
 
 
@@ -2158,8 +2155,6 @@ static MACHINE_CONFIG_START( sys1ppi, system1_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(system1)
-	MCFG_MACHINE_RESET(system1)
 
 	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
 
@@ -2173,7 +2168,6 @@ static MACHINE_CONFIG_START( sys1ppi, system1_state )
 	MCFG_GFXDECODE(system1)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(system1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2253,10 +2247,10 @@ MACHINE_CONFIG_END
 /* system2 video */
 static MACHINE_CONFIG_DERIVED( sys2, sys1ppi )
 
-	MCFG_MACHINE_START(system2)
+	MCFG_MACHINE_START_OVERRIDE(system1_state,system2)
 
 	/* video hardware */
-	MCFG_VIDEO_START(system2)
+	MCFG_VIDEO_START_OVERRIDE(system1_state,system2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(system2)
 MACHINE_CONFIG_END

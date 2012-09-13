@@ -84,12 +84,12 @@ WRITE8_MEMBER(thedeep_state::thedeep_vram_1_w)
 
 ***************************************************************************/
 
-PALETTE_INIT( thedeep )
+void thedeep_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 	for (i = 0;i < 512;i++)
-		palette_set_color_rgb(machine,i,pal4bit(color_prom[0x400 + i] >> 0),pal4bit(color_prom[0x400 + i] >> 4),pal4bit(color_prom[0x200 + i] >> 0));
+		palette_set_color_rgb(machine(),i,pal4bit(color_prom[0x400 + i] >> 0),pal4bit(color_prom[0x400 + i] >> 4),pal4bit(color_prom[0x200 + i] >> 0));
 }
 
 /***************************************************************************
@@ -98,16 +98,15 @@ PALETTE_INIT( thedeep )
 
 ***************************************************************************/
 
-VIDEO_START( thedeep )
+void thedeep_state::video_start()
 {
-	thedeep_state *state = machine.driver_data<thedeep_state>();
-	state->m_tilemap_0  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(thedeep_state::get_tile_info_0),state),tilemap_mapper_delegate(FUNC(thedeep_state::tilemap_scan_rows_back),state),16,16,0x20,0x20);
-	state->m_tilemap_1  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(thedeep_state::get_tile_info_1),state),TILEMAP_SCAN_ROWS,8,8,0x20,0x20);
+	m_tilemap_0  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(thedeep_state::get_tile_info_0),this),tilemap_mapper_delegate(FUNC(thedeep_state::tilemap_scan_rows_back),this),16,16,0x20,0x20);
+	m_tilemap_1  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(thedeep_state::get_tile_info_1),this),TILEMAP_SCAN_ROWS,8,8,0x20,0x20);
 
-	state->m_tilemap_0->set_transparent_pen(0 );
-	state->m_tilemap_1->set_transparent_pen(0 );
+	m_tilemap_0->set_transparent_pen(0 );
+	m_tilemap_1->set_transparent_pen(0 );
 
-	state->m_tilemap_0->set_scroll_cols(0x20);	// column scroll for the background
+	m_tilemap_0->set_scroll_cols(0x20);	// column scroll for the background
 }
 
 /***************************************************************************

@@ -307,8 +307,8 @@ static MACHINE_CONFIG_START( jrpacman, jrpacman_state )
 	MCFG_GFXDECODE(jrpacman)
 	MCFG_PALETTE_LENGTH(128*4)
 
-	MCFG_PALETTE_INIT(pacman)
-	MCFG_VIDEO_START(jrpacman)
+	MCFG_PALETTE_INIT_OVERRIDE(jrpacman_state,pacman)
+	MCFG_VIDEO_START_OVERRIDE(jrpacman_state,jrpacman)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

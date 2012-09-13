@@ -41,6 +41,9 @@ public:
 	DECLARE_READ8_MEMBER(k7658_data_r);
 	DECLARE_WRITE8_MEMBER(k7658_data_w);
 	DECLARE_WRITE8_MEMBER(rt1715_rom_disable);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 
@@ -107,18 +110,16 @@ WRITE8_MEMBER(rt1715_state::k7658_data_w)
     MEMORY HANDLING
 ***************************************************************************/
 
-static MACHINE_START( rt1715 )
+void rt1715_state::machine_start()
 {
-	rt1715_state *state = machine.driver_data<rt1715_state>();
-	state->membank("bank2")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x0800);
-	state->membank("bank3")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
+	membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x0800);
+	membank("bank3")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 }
 
-static MACHINE_RESET( rt1715 )
+void rt1715_state::machine_reset()
 {
-	rt1715_state *state = machine.driver_data<rt1715_state>();
 	/* on reset, enable ROM */
-	state->membank("bank1")->set_base(state->memregion("ipl")->base());
+	membank("bank1")->set_base(memregion("ipl")->base());
 }
 
 WRITE8_MEMBER(rt1715_state::rt1715_rom_disable)
@@ -172,11 +173,11 @@ static const i8275_interface rt1715_i8275_intf =
     PALETTE
 ***************************************************************************/
 
-static PALETTE_INIT( rt1715 )
+void rt1715_state::palette_init()
 {
-	palette_set_color(machine, 0, MAKE_RGB(0x00, 0x00, 0x00)); /* black */
-	palette_set_color(machine, 1, MAKE_RGB(0x00, 0x7f, 0x00)); /* low intensity */
-	palette_set_color(machine, 2, MAKE_RGB(0x00, 0xff, 0x00)); /* high intensitiy */
+	palette_set_color(machine(), 0, MAKE_RGB(0x00, 0x00, 0x00)); /* black */
+	palette_set_color(machine(), 1, MAKE_RGB(0x00, 0x7f, 0x00)); /* low intensity */
+	palette_set_color(machine(), 2, MAKE_RGB(0x00, 0xff, 0x00)); /* high intensitiy */
 }
 
 
@@ -320,8 +321,6 @@ static MACHINE_CONFIG_START( rt1715, rt1715_state )
 	MCFG_CPU_IO_MAP(rt1715_io)
 	MCFG_CPU_CONFIG(rt1715_daisy_chain)
 
-	MCFG_MACHINE_START(rt1715)
-	MCFG_MACHINE_RESET(rt1715)
 
 	/* keyboard */
 	MCFG_CPU_ADD("keyboard", Z80, 683000)
@@ -338,7 +337,6 @@ static MACHINE_CONFIG_START( rt1715, rt1715_state )
 
 	MCFG_GFXDECODE(rt1715)
 	MCFG_PALETTE_LENGTH(3)
-	MCFG_PALETTE_INIT(rt1715)
 
 	MCFG_I8275_ADD("a26", rt1715_i8275_intf)
 	MCFG_Z80CTC_ADD("a30", XTAL_10MHz/4 /* ? */, rt1715_ctc_intf)

@@ -297,14 +297,18 @@ public:
 	DECLARE_DRIVER_INIT(stooges);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_screwloo_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	DECLARE_VIDEO_START(screwloo);
 };
 
 
 /*----------- defined in video/gottlieb.c -----------*/
 
 
-VIDEO_START( gottlieb );
-VIDEO_START( screwloo );
+
+
 SCREEN_UPDATE_RGB32( gottlieb );
 
 #if USE_FAKE_VOTRAX

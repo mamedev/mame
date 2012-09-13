@@ -76,15 +76,23 @@ public:
 	TILE_GET_INFO_MEMBER(get_fromance_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_nekkyoku_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_nekkyoku_fg_tile_info);
+	DECLARE_MACHINE_START(fromance);
+	DECLARE_MACHINE_RESET(fromance);
+	DECLARE_VIDEO_START(nekkyoku);
+	DECLARE_VIDEO_START(fromance);
+	DECLARE_MACHINE_START(pipedrm);
+	DECLARE_MACHINE_RESET(pipedrm);
+	DECLARE_VIDEO_START(pipedrm);
+	DECLARE_VIDEO_START(hatris);
 };
 
 
 /*----------- defined in video/fromance.c -----------*/
 
-VIDEO_START( fromance );
-VIDEO_START( nekkyoku );
-VIDEO_START( pipedrm );
-VIDEO_START( hatris );
+
+
+
+
 SCREEN_UPDATE_IND16( fromance );
 SCREEN_UPDATE_IND16( pipedrm );
 

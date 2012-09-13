@@ -46,11 +46,14 @@ public:
 	DECLARE_WRITE8_MEMBER(flip);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/toypop.c -----------*/
 
-VIDEO_START( toypop );
+
 SCREEN_UPDATE_IND16( toypop );
-PALETTE_INIT( toypop );
+

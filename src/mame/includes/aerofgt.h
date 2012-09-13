@@ -74,6 +74,15 @@ public:
 	TILE_GET_INFO_MEMBER(spinlbrk_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	DECLARE_MACHINE_START(aerofgt);
+	DECLARE_MACHINE_RESET(aerofgt);
+	DECLARE_VIDEO_START(pspikes);
+	DECLARE_MACHINE_START(common);
+	DECLARE_MACHINE_RESET(common);
+	DECLARE_VIDEO_START(karatblz);
+	DECLARE_VIDEO_START(spinlbrk);
+	DECLARE_VIDEO_START(turbofrc);
+	DECLARE_VIDEO_START(wbbc97);
 };
 
 
@@ -81,11 +90,11 @@ public:
 
 
 
-VIDEO_START( pspikes );
-VIDEO_START( karatblz );
-VIDEO_START( spinlbrk );
-VIDEO_START( turbofrc );
-VIDEO_START( wbbc97 );
+
+
+
+
+
 SCREEN_UPDATE_IND16( pspikes );
 SCREEN_UPDATE_IND16( pspikesb );
 SCREEN_UPDATE_IND16( spikes91 );

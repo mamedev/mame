@@ -248,10 +248,11 @@ public:
 	DECLARE_READ64_MEMBER(device2_r);
 	DECLARE_READ64_MEMBER(cpu_r);
 	DECLARE_DRIVER_INIT(m2);
+	virtual void video_start();
 };
 
 
-static VIDEO_START( m2 )
+void konamim2_state::video_start()
 {
 }
 
@@ -1188,7 +1189,6 @@ static MACHINE_CONFIG_START( m2, konamim2_state )
 	MCFG_PALETTE_LENGTH(32768)
 	MCFG_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
 
-	MCFG_VIDEO_START(m2)
 
 MACHINE_CONFIG_END
 

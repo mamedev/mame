@@ -70,10 +70,9 @@ Note:
 
 ***************************************************************************/
 
-static MACHINE_START( srmp2 )
+MACHINE_START_MEMBER(srmp2_state,srmp2)
 {
-	srmp2_state *state = machine.driver_data<srmp2_state>();
-	iox_t &iox = state->m_iox;
+	iox_t &iox = m_iox;
 
 	iox.reset = 0x1f;
 	iox.ff_event = -1;
@@ -85,10 +84,9 @@ static MACHINE_START( srmp2 )
 	iox.protcheck[3] = -1;   iox.protlatch[3] = -1;
 }
 
-static MACHINE_START( srmp3 )
+MACHINE_START_MEMBER(srmp2_state,srmp3)
 {
-	srmp2_state *state = machine.driver_data<srmp2_state>();
-	iox_t &iox = state->m_iox;
+	iox_t &iox = m_iox;
 
 	iox.reset = 0xc8;
 	iox.ff_event = 0xef;
@@ -99,10 +97,9 @@ static MACHINE_START( srmp3 )
 	iox.protcheck[3] = 0x45; iox.protlatch[3] = 0x00;
 }
 
-static MACHINE_START( rmgoldyh )
+MACHINE_START_MEMBER(srmp2_state,rmgoldyh)
 {
-	srmp2_state *state = machine.driver_data<srmp2_state>();
-	iox_t &iox = state->m_iox;
+	iox_t &iox = m_iox;
 
 	iox.reset = 0xc8;
 	iox.ff_event = 0xff;
@@ -1171,7 +1168,7 @@ static MACHINE_CONFIG_START( srmp2, srmp2_state )
 	MCFG_CPU_VBLANK_INT("screen",irq4_line_assert)
 	MCFG_CPU_PERIODIC_INT(irq2_line_assert,15*60)		/* Interrupt times is not understood */
 
-	MCFG_MACHINE_START(srmp2)
+	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp2)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -1187,7 +1184,7 @@ static MACHINE_CONFIG_START( srmp2, srmp2_state )
 	MCFG_GFXDECODE(srmp2)
 	MCFG_PALETTE_LENGTH(1024)	/* sprites only */
 
-	MCFG_PALETTE_INIT(srmp2)
+	MCFG_PALETTE_INIT_OVERRIDE(srmp2_state,srmp2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1212,7 +1209,7 @@ static MACHINE_CONFIG_START( srmp3, srmp2_state )
 	MCFG_CPU_IO_MAP(srmp3_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MCFG_MACHINE_START(srmp3)
+	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp3)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -1228,7 +1225,7 @@ static MACHINE_CONFIG_START( srmp3, srmp2_state )
 	MCFG_GFXDECODE(srmp3)
 	MCFG_PALETTE_LENGTH(512)	/* sprites only */
 
-	MCFG_PALETTE_INIT(srmp3)
+	MCFG_PALETTE_INIT_OVERRIDE(srmp2_state,srmp3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1248,7 +1245,7 @@ static MACHINE_CONFIG_DERIVED( rmgoldyh, srmp3 )
 	MCFG_CPU_PROGRAM_MAP(rmgoldyh_map)
 	MCFG_CPU_IO_MAP(rmgoldyh_io_map)
 
-	MCFG_MACHINE_START(rmgoldyh)
+	MCFG_MACHINE_START_OVERRIDE(srmp2_state,rmgoldyh)
 
 	MCFG_GFXDECODE(rmgoldyh)
 MACHINE_CONFIG_END
@@ -1261,7 +1258,7 @@ static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
 	MCFG_CPU_VBLANK_INT("screen",irq4_line_assert)
 	MCFG_CPU_PERIODIC_INT(irq2_line_assert,15*60)		/* Interrupt times is not understood */
 
-	MCFG_MACHINE_START(srmp2)
+	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp2)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

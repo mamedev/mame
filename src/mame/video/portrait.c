@@ -62,25 +62,24 @@ TILE_GET_INFO_MEMBER(portrait_state::get_fg_tile_info)
 	get_tile_info( machine(), tileinfo, tile_index, m_fgvideoram );
 }
 
-VIDEO_START( portrait )
+void portrait_state::video_start()
 {
-	portrait_state *state = machine.driver_data<portrait_state>();
-	state->m_background = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(portrait_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32 );
-	state->m_foreground = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(portrait_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32 );
+	m_background = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(portrait_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32 );
+	m_foreground = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(portrait_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32 );
 
-	state->m_foreground->set_transparent_pen(7 );
+	m_foreground->set_transparent_pen(7 );
 }
 
 
 
-PALETTE_INIT( portrait )
+void portrait_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
-	UINT8* lookup = machine.root_device().memregion("tileattr")->base();
+	UINT8* lookup = machine().root_device().memregion("tileattr")->base();
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x40);
+	machine().colortable = colortable_alloc(machine(), 0x40);
 
 /*
     for (i = 0;i < 0x40;i++)
@@ -93,7 +92,7 @@ PALETTE_INIT( portrait )
         g = (data >> 3) & 0x3;
         b = (data >> 5) & 0x7;
 
-        colortable_palette_set_color(machine.colortable, i, MAKE_RGB(pal3bit(r), pal2bit(g), pal3bit(b)));
+        colortable_palette_set_color(machine().colortable, i, MAKE_RGB(pal3bit(r), pal2bit(g), pal3bit(b)));
 
         color_prom++;
     }
@@ -108,10 +107,10 @@ PALETTE_INIT( portrait )
 		g = (data >> 5) & 0x1f;
 		b = (data >> 10) & 0x1f;
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b)));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b)));
 
 		// ?? the lookup seems to reference 0x3f colours, unless 1 bit is priority or similar?
-		colortable_palette_set_color(machine.colortable, i+0x20, MAKE_RGB(pal5bit(r>>1), pal5bit(g>>1), pal5bit(b>>1)));
+		colortable_palette_set_color(machine().colortable, i+0x20, MAKE_RGB(pal5bit(r>>1), pal5bit(g>>1), pal5bit(b>>1)));
 
 		color_prom++;
 	}
@@ -121,7 +120,7 @@ PALETTE_INIT( portrait )
 	for (i = 0;i < 0x800;i++)
 	{
 		UINT8 ctabentry = lookup[i]&0x3f;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 

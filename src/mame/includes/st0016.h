@@ -36,6 +36,7 @@ public:
 	DECLARE_DRIVER_INIT(mayjinsn);
 	DECLARE_DRIVER_INIT(mayjisn2);
 	DECLARE_DRIVER_INIT(renju);
+	DECLARE_VIDEO_START(st0016);
 };
 
 #define ISMACS  (st0016_game&0x80)
@@ -69,5 +70,5 @@ extern UINT8 *st0016_charram;
 
 
 void st0016_draw_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-VIDEO_START(st0016);
+
 SCREEN_UPDATE_IND16(st0016);

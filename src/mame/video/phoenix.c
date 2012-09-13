@@ -76,58 +76,58 @@ static const res_net_info survival_net_info =
 	}
 };
 
-PALETTE_INIT( phoenix )
+PALETTE_INIT_MEMBER(phoenix_state,phoenix)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 	rgb_t	*rgb;
 
-	rgb = compute_res_net_all(machine, color_prom, &phoenix_decode_info, &phoenix_net_info);
+	rgb = compute_res_net_all(machine(), color_prom, &phoenix_decode_info, &phoenix_net_info);
 	/* native order */
 	for (i=0;i<256;i++)
 	{
 		int col;
 		col = ((i << 3 ) & 0x18) | ((i>>2) & 0x07) | (i & 0x60);
-		palette_set_color(machine,i,rgb[col]);
+		palette_set_color(machine(),i,rgb[col]);
 	}
-	palette_normalize_range(machine.palette, 0, 255, 0, 255);
-	auto_free(machine, rgb);
+	palette_normalize_range(machine().palette, 0, 255, 0, 255);
+	auto_free(machine(), rgb);
 }
 
-PALETTE_INIT( survival )
+PALETTE_INIT_MEMBER(phoenix_state,survival)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 	rgb_t	*rgb;
 
-	rgb = compute_res_net_all(machine, color_prom, &phoenix_decode_info, &survival_net_info);
+	rgb = compute_res_net_all(machine(), color_prom, &phoenix_decode_info, &survival_net_info);
 	/* native order */
 	for (i=0;i<256;i++)
 	{
 		int col;
 		col = ((i << 3 ) & 0x18) | ((i>>2) & 0x07) | (i & 0x60);
-		palette_set_color(machine,i,rgb[col]);
+		palette_set_color(machine(),i,rgb[col]);
 	}
-	palette_normalize_range(machine.palette, 0, 255, 0, 255);
-	auto_free(machine, rgb);
+	palette_normalize_range(machine().palette, 0, 255, 0, 255);
+	auto_free(machine(), rgb);
 }
 
-PALETTE_INIT( pleiads )
+PALETTE_INIT_MEMBER(phoenix_state,pleiads)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 	rgb_t	*rgb;
 
-	rgb = compute_res_net_all(machine, color_prom, &phoenix_decode_info, &pleiades_net_info);
+	rgb = compute_res_net_all(machine(), color_prom, &phoenix_decode_info, &pleiades_net_info);
 	/* native order */
 	for (i=0;i<256;i++)
 	{
 		int col;
 		col = ((i << 3 ) & 0x18) | ((i>>2) & 0x07) | (i & 0xE0);
-		palette_set_color(machine,i,rgb[col]);
+		palette_set_color(machine(),i,rgb[col]);
 	}
-	palette_normalize_range(machine.palette, 0, 255, 0, 255);
-	auto_free(machine, rgb);
+	palette_normalize_range(machine().palette, 0, 255, 0, 255);
+	auto_free(machine(), rgb);
 }
 
 /***************************************************************************
@@ -170,49 +170,48 @@ TILE_GET_INFO_MEMBER(phoenix_state::get_bg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( phoenix )
+VIDEO_START_MEMBER(phoenix_state,phoenix)
 {
-	phoenix_state *state = machine.driver_data<phoenix_state>();
-	state->m_videoram_pg[0] = auto_alloc_array(machine, UINT8, 0x1000);
-	state->m_videoram_pg[1] = auto_alloc_array(machine, UINT8, 0x1000);
+	m_videoram_pg[0] = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_videoram_pg[1] = auto_alloc_array(machine(), UINT8, 0x1000);
 
-	state->membank("bank1")->configure_entry(0, state->m_videoram_pg[0]);
-	state->membank("bank1")->configure_entry(1, state->m_videoram_pg[1]);
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->configure_entry(0, m_videoram_pg[0]);
+	membank("bank1")->configure_entry(1, m_videoram_pg[1]);
+	membank("bank1")->set_entry(0);
 
-	state->m_videoram_pg_index = 0;
-	state->m_palette_bank = 0;
-	state->m_cocktail_mode = 0;
+	m_videoram_pg_index = 0;
+	m_palette_bank = 0;
+	m_cocktail_mode = 0;
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(phoenix_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(phoenix_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(phoenix_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(phoenix_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_fg_tilemap->set_scrolldx(0, (HTOTAL - HBSTART));
-	state->m_bg_tilemap->set_scrolldx(0, (HTOTAL - HBSTART));
-	state->m_fg_tilemap->set_scrolldy(0, (VTOTAL - VBSTART));
-	state->m_bg_tilemap->set_scrolldy(0, (VTOTAL - VBSTART));
+	m_fg_tilemap->set_scrolldx(0, (HTOTAL - HBSTART));
+	m_bg_tilemap->set_scrolldx(0, (HTOTAL - HBSTART));
+	m_fg_tilemap->set_scrolldy(0, (VTOTAL - VBSTART));
+	m_bg_tilemap->set_scrolldy(0, (VTOTAL - VBSTART));
 
-	state_save_register_global_pointer(machine, state->m_videoram_pg[0], 0x1000);
-	state_save_register_global_pointer(machine, state->m_videoram_pg[1], 0x1000);
-	state_save_register_global(machine, state->m_videoram_pg_index);
-	state_save_register_global(machine, state->m_palette_bank);
-	state_save_register_global(machine, state->m_cocktail_mode);
+	state_save_register_global_pointer(machine(), m_videoram_pg[0], 0x1000);
+	state_save_register_global_pointer(machine(), m_videoram_pg[1], 0x1000);
+	state_save_register_global(machine(), m_videoram_pg_index);
+	state_save_register_global(machine(), m_palette_bank);
+	state_save_register_global(machine(), m_cocktail_mode);
 
 	/* some more candidates */
-	state->m_pleiads_protection_question = 0;
-	state->m_survival_protection_value = 0;
-	state->m_survival_sid_value = 0;
-	state->m_survival_input_readc = 0;
-	state->m_survival_input_latches[0] = 0;
-	state->m_survival_input_latches[1] = 0;
+	m_pleiads_protection_question = 0;
+	m_survival_protection_value = 0;
+	m_survival_sid_value = 0;
+	m_survival_input_readc = 0;
+	m_survival_input_latches[0] = 0;
+	m_survival_input_latches[1] = 0;
 
-	state_save_register_global(machine, state->m_pleiads_protection_question);
-	state_save_register_global(machine, state->m_survival_protection_value);
-	state_save_register_global(machine, state->m_survival_sid_value);
-	state_save_register_global(machine, state->m_survival_input_readc);
-	state_save_register_global_array(machine, state->m_survival_input_latches);
+	state_save_register_global(machine(), m_pleiads_protection_question);
+	state_save_register_global(machine(), m_survival_protection_value);
+	state_save_register_global(machine(), m_survival_sid_value);
+	state_save_register_global(machine(), m_survival_input_readc);
+	state_save_register_global_array(machine(), m_survival_input_latches);
 
 }
 

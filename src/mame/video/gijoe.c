@@ -50,29 +50,28 @@ void gijoe_tile_callback( running_machine &machine, int layer, int *code, int *c
 	*color = (*color >> 2 & 0x0f) | state->m_layer_colorbase[layer];
 }
 
-VIDEO_START( gijoe )
+void gijoe_state::video_start()
 {
-	gijoe_state *state = machine.driver_data<gijoe_state>();
 	int i;
 
-	k056832_linemap_enable(state->m_k056832, 1);
+	k056832_linemap_enable(m_k056832, 1);
 
 	for (i = 0; i < 4; i++)
 	{
-		state->m_avac_occupancy[i] = 0;
-		state->m_avac_bits[i] = 0;
-		state->m_layer_colorbase[i] = 0;
-		state->m_layer_pri[i] = 0;
+		m_avac_occupancy[i] = 0;
+		m_avac_bits[i] = 0;
+		m_layer_colorbase[i] = 0;
+		m_layer_pri[i] = 0;
 	}
 
-	state->m_avac_vrc = 0xffff;
+	m_avac_vrc = 0xffff;
 
-	state->save_item(NAME(state->m_avac_vrc));
-	state->save_item(NAME(state->m_sprite_colorbase));
-	state->save_item(NAME(state->m_avac_occupancy));
-	state->save_item(NAME(state->m_avac_bits));	// these could possibly be re-created at postload k056832 elements
-	state->save_item(NAME(state->m_layer_colorbase));
-	state->save_item(NAME(state->m_layer_pri));
+	save_item(NAME(m_avac_vrc));
+	save_item(NAME(m_sprite_colorbase));
+	save_item(NAME(m_avac_occupancy));
+	save_item(NAME(m_avac_bits));	// these could possibly be re-created at postload k056832 elements
+	save_item(NAME(m_layer_colorbase));
+	save_item(NAME(m_layer_pri));
 }
 
 SCREEN_UPDATE_IND16( gijoe )

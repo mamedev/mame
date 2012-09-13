@@ -77,6 +77,9 @@ public:
 	TILEMAP_MAPPER_MEMBER(cischeat_scan_16x16);
 	TILE_GET_INFO_MEMBER(cischeat_get_scroll_tile_info_8x8);
 	TILE_GET_INFO_MEMBER(cischeat_get_scroll_tile_info_16x16);
+	DECLARE_VIDEO_START(bigrun);
+	DECLARE_VIDEO_START(f1gpstar);
+	DECLARE_VIDEO_START(cischeat);
 };
 
 
@@ -85,9 +88,9 @@ public:
 
 
 
-VIDEO_START( bigrun );
-VIDEO_START( cischeat );
-VIDEO_START( f1gpstar );
+
+
+
 
 SCREEN_UPDATE_IND16( bigrun );
 SCREEN_UPDATE_IND16( cischeat );

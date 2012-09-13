@@ -42,31 +42,30 @@ TILE_GET_INFO_MEMBER(atarig1_state::get_playfield_tile_info)
  *
  *************************************/
 
-VIDEO_START( atarig1 )
+VIDEO_START_MEMBER(atarig1_state,atarig1)
 {
-	atarig1_state *state = machine.driver_data<atarig1_state>();
 
 	/* blend the playfields and free the temporary one */
-	atarigen_blend_gfx(machine, 0, 2, 0x0f, 0x10);
+	atarigen_blend_gfx(machine(), 0, 2, 0x0f, 0x10);
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(atarig1_state::get_playfield_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 64,64);
+	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atarig1_state::get_playfield_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,64);
 
 	/* initialize the motion objects */
-	state->m_rle = machine.device("rle");
+	m_rle = machine().device("rle");
 
 	/* initialize the alphanumerics */
-	state->m_alpha_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(atarig1_state::get_alpha_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 64,32);
-	state->m_alpha_tilemap->set_transparent_pen(0);
+	m_alpha_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atarig1_state::get_alpha_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,32);
+	m_alpha_tilemap->set_transparent_pen(0);
 
 	/* reset statics */
-	state->m_pfscroll_xoffset = state->m_is_pitfight ? 2 : 0;
+	m_pfscroll_xoffset = m_is_pitfight ? 2 : 0;
 
 	/* state saving */
-	state->save_item(NAME(state->m_current_control));
-	state->save_item(NAME(state->m_playfield_tile_bank));
-	state->save_item(NAME(state->m_playfield_xscroll));
-	state->save_item(NAME(state->m_playfield_yscroll));
+	save_item(NAME(m_current_control));
+	save_item(NAME(m_playfield_tile_bank));
+	save_item(NAME(m_playfield_xscroll));
+	save_item(NAME(m_playfield_yscroll));
 }
 
 

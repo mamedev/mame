@@ -113,49 +113,47 @@ TILE_GET_INFO_MEMBER(armedf_state::get_bg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( terraf )
+VIDEO_START_MEMBER(armedf_state,terraf)
 {
-	armedf_state *state = machine.driver_data<armedf_state>();
 
-	state->m_sprite_offy = (state->m_scroll_type & 2 ) ? 0 : 128;  /* legion, legiono, crazy climber 2 */
+	m_sprite_offy = (m_scroll_type & 2 ) ? 0 : 128;  /* legion, legiono, crazy climber 2 */
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(armedf_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(armedf_state::get_fg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(armedf_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(armedf_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(armedf_state::get_nb1414m4_tx_tile_info),state), 
-		(state->m_scroll_type == 2) ? tilemap_mapper_delegate(FUNC(armedf_state::armedf_scan_type3),state) : tilemap_mapper_delegate(FUNC(armedf_state::armedf_scan_type2),state), 8, 8, 64, 32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(armedf_state::get_nb1414m4_tx_tile_info),this), 
+		(m_scroll_type == 2) ? tilemap_mapper_delegate(FUNC(armedf_state::armedf_scan_type3),this) : tilemap_mapper_delegate(FUNC(armedf_state::armedf_scan_type2),this), 8, 8, 64, 32);
 
-	state->m_bg_tilemap->set_transparent_pen(0xf);
-	state->m_fg_tilemap->set_transparent_pen(0xf);
-	state->m_tx_tilemap->set_transparent_pen(0xf);
+	m_bg_tilemap->set_transparent_pen(0xf);
+	m_fg_tilemap->set_transparent_pen(0xf);
+	m_tx_tilemap->set_transparent_pen(0xf);
 
-	if (state->m_scroll_type != 1)
-		state->m_tx_tilemap->set_scrollx(0, -128);
+	if (m_scroll_type != 1)
+		m_tx_tilemap->set_scrollx(0, -128);
 
-	state->m_text_videoram = auto_alloc_array(machine, UINT8, 0x1000);
-	memset(state->m_text_videoram, 0x00, 0x1000);
+	m_text_videoram = auto_alloc_array(machine(), UINT8, 0x1000);
+	memset(m_text_videoram, 0x00, 0x1000);
 }
 
-VIDEO_START( armedf )
+VIDEO_START_MEMBER(armedf_state,armedf)
 {
-	armedf_state *state = machine.driver_data<armedf_state>();
 
-	state->m_sprite_offy = (state->m_scroll_type & 2 ) ? 0 : 128;  /* legion, legiono, crazy climber 2 */
+	m_sprite_offy = (m_scroll_type & 2 ) ? 0 : 128;  /* legion, legiono, crazy climber 2 */
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(armedf_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(armedf_state::get_fg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(armedf_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(armedf_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(armedf_state::get_armedf_tx_tile_info),state), tilemap_mapper_delegate(FUNC(armedf_state::armedf_scan_type1),state), 8, 8, 64, 32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(armedf_state::get_armedf_tx_tile_info),this), tilemap_mapper_delegate(FUNC(armedf_state::armedf_scan_type1),this), 8, 8, 64, 32);
 
-	state->m_bg_tilemap->set_transparent_pen(0xf);
-	state->m_fg_tilemap->set_transparent_pen(0xf);
-	state->m_tx_tilemap->set_transparent_pen(0xf);
+	m_bg_tilemap->set_transparent_pen(0xf);
+	m_fg_tilemap->set_transparent_pen(0xf);
+	m_tx_tilemap->set_transparent_pen(0xf);
 
-	if (state->m_scroll_type != 1)
-		state->m_tx_tilemap->set_scrollx(0, -128);
+	if (m_scroll_type != 1)
+		m_tx_tilemap->set_scrollx(0, -128);
 
-	state->m_text_videoram = auto_alloc_array(machine, UINT8, 0x1000);
-	memset(state->m_text_videoram, 0x00, 0x1000);
+	m_text_videoram = auto_alloc_array(machine(), UINT8, 0x1000);
+	memset(m_text_videoram, 0x00, 0x1000);
 }
 
 /***************************************************************************

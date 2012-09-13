@@ -576,43 +576,41 @@ static const k054539_interface k054539_config =
 	sound_nmi
 };
 
-static MACHINE_START( lethalen )
+void lethal_state::machine_start()
 {
-	lethal_state *state = machine.driver_data<lethal_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 0x20, &ROM[0x10000], 0x2000);
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->configure_entries(0, 0x20, &ROM[0x10000], 0x2000);
+	membank("bank1")->set_entry(0);
 
-	state->m_generic_paletteram_8.allocate(0x3800 + 0x02);
+	m_generic_paletteram_8.allocate(0x3800 + 0x02);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("soundcpu");
-	state->m_k054539 = machine.device("k054539");
-	state->m_k053244 = machine.device("k053244");
-	state->m_k056832 = machine.device("k056832");
-	state->m_k054000 = machine.device("k054000");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("soundcpu");
+	m_k054539 = machine().device("k054539");
+	m_k053244 = machine().device("k053244");
+	m_k056832 = machine().device("k056832");
+	m_k054000 = machine().device("k054000");
 
-	state->save_item(NAME(state->m_cur_control2));
-	state->save_item(NAME(state->m_sprite_colorbase));
-	state->save_item(NAME(state->m_layer_colorbase));
+	save_item(NAME(m_cur_control2));
+	save_item(NAME(m_sprite_colorbase));
+	save_item(NAME(m_layer_colorbase));
 }
 
-static MACHINE_RESET( lethalen )
+void lethal_state::machine_reset()
 {
-	lethal_state *state = machine.driver_data<lethal_state>();
-	UINT8 *prgrom = (UINT8 *)state->memregion("maincpu")->base();
+	UINT8 *prgrom = (UINT8 *)memregion("maincpu")->base();
 	int i;
 
-	state->membank("bank2")->set_base(&prgrom[0x48000]);
+	membank("bank2")->set_base(&prgrom[0x48000]);
 	/* force reset again to read proper reset vector */
-	machine.device("maincpu")->reset();
+	machine().device("maincpu")->reset();
 
 	for (i = 0; i < 4; i++)
-		state->m_layer_colorbase[i] = 0;
+		m_layer_colorbase[i] = 0;
 
-	state->m_sprite_colorbase = 0;
-	state->m_cur_control2 = 0;
+	m_sprite_colorbase = 0;
+	m_cur_control2 = 0;
 }
 
 static const k056832_interface lethalen_k056832_intf =
@@ -652,8 +650,6 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 	MCFG_CPU_ADD("soundcpu", Z80, MAIN_CLOCK/4)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(le_sound)
 
-	MCFG_MACHINE_START(lethalen)
-	MCFG_MACHINE_RESET(lethalen)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
@@ -671,7 +667,6 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 
 	MCFG_PALETTE_LENGTH(7168+1)
 
-	MCFG_VIDEO_START(lethalen)
 
 	MCFG_K056832_ADD("k056832", lethalen_k056832_intf)
 	MCFG_K053244_ADD("k053244", lethalen_k05324x_intf)

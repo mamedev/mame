@@ -260,9 +260,7 @@ static MACHINE_CONFIG_START( portrait, portrait_state )
 
 	MCFG_GFXDECODE(portrait)
 	MCFG_PALETTE_LENGTH(0x800)
-	MCFG_PALETTE_INIT(portrait)
 
-	MCFG_VIDEO_START(portrait)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

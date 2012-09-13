@@ -74,12 +74,12 @@ static const gfx_layout p2000m_charlayout =
 	8 * 10
 };
 
-static PALETTE_INIT( p2000m )
+PALETTE_INIT_MEMBER(p2000t_state,p2000m)
 {
-	palette_set_color(machine,0,RGB_WHITE); /* white */
-	palette_set_color(machine,1,RGB_BLACK); /* black */
-	palette_set_color(machine,2,RGB_BLACK); /* black */
-	palette_set_color(machine,3,RGB_WHITE); /* white */
+	palette_set_color(machine(),0,RGB_WHITE); /* white */
+	palette_set_color(machine(),1,RGB_BLACK); /* black */
+	palette_set_color(machine(),2,RGB_BLACK); /* black */
+	palette_set_color(machine(),3,RGB_WHITE); /* white */
 }
 
 static GFXDECODE_START( p2000m )
@@ -269,11 +269,11 @@ static MACHINE_CONFIG_START( p2000m, p2000t_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(80 * 12, 24 * 20)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80 * 12 - 1, 0, 24 * 20 - 1)
-	MCFG_VIDEO_START(p2000m)
+	MCFG_VIDEO_START_OVERRIDE(p2000t_state,p2000m)
 	MCFG_SCREEN_UPDATE_STATIC(p2000m)
 	MCFG_GFXDECODE( p2000m )
 	MCFG_PALETTE_LENGTH(4)
-	MCFG_PALETTE_INIT(p2000m)
+	MCFG_PALETTE_INIT_OVERRIDE(p2000t_state,p2000m)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

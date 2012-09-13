@@ -57,6 +57,8 @@ public:
 	DECLARE_READ32_MEMBER(juicebox_nand_r);
 	DECLARE_WRITE32_MEMBER(juicebox_nand_w);
 	DECLARE_DRIVER_INIT(juicebox);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 /***************************************************************************
@@ -245,18 +247,17 @@ static INPUT_CHANGED( port_changed )
 
 // ...
 
-static MACHINE_START( juicebox )
+void juicebox_state::machine_start()
 {
-	juicebox_state *juicebox = machine.driver_data<juicebox_state>();
-	juicebox->s3c44b0 = machine.device( "s3c44b0");
-	smc_init( machine);
-	juicebox->dac = machine.device<dac_device>( "dac");
+	s3c44b0 = machine().device( "s3c44b0");
+	smc_init( machine());
+	dac = machine().device<dac_device>( "dac");
 }
 
-static MACHINE_RESET( juicebox )
+void juicebox_state::machine_reset()
 {
-	machine.device("maincpu")->reset();
-	smc_reset( machine);
+	machine().device("maincpu")->reset();
+	smc_reset( machine());
 }
 
 /***************************************************************************
@@ -310,8 +311,6 @@ static MACHINE_CONFIG_START( juicebox, juicebox_state )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_MACHINE_START(juicebox)
-	MCFG_MACHINE_RESET(juicebox)
 
 	MCFG_S3C44B0_ADD("s3c44b0", 10000000, juicebox_s3c44b0_intf)
 

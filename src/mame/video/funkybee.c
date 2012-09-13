@@ -9,9 +9,9 @@
 #include "emu.h"
 #include "includes/funkybee.h"
 
-PALETTE_INIT( funkybee )
+void funkybee_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* first, the character/sprite palette */
@@ -35,7 +35,7 @@ PALETTE_INIT( funkybee )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i, MAKE_RGB(r,g,b));
+		palette_set_color(machine(), i, MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -85,10 +85,9 @@ TILEMAP_MAPPER_MEMBER(funkybee_state::funkybee_tilemap_scan)
 	return 256 * row + col;
 }
 
-VIDEO_START( funkybee )
+void funkybee_state::video_start()
 {
-	funkybee_state *state = machine.driver_data<funkybee_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(funkybee_state::get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(funkybee_state::funkybee_tilemap_scan),state), 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(funkybee_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(funkybee_state::funkybee_tilemap_scan),this), 8, 8, 32, 32);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

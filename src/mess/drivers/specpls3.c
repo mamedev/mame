@@ -352,18 +352,17 @@ static ADDRESS_MAP_START (spectrum_plus3_io, AS_IO, 8, spectrum_state )
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE_LEGACY(spectrum_plus3_port_3ffd_r,spectrum_plus3_port_3ffd_w) AM_MIRROR(0x0ffd)
 ADDRESS_MAP_END
 
-static MACHINE_RESET( spectrum_plus3 )
+MACHINE_RESET_MEMBER(spectrum_state,spectrum_plus3)
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
-	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *messram = machine().device<ram_device>(RAM_TAG)->pointer();
 	memset(messram,0,128*1024);
 
-	MACHINE_RESET_CALL(spectrum);
+	MACHINE_RESET_CALL_MEMBER(spectrum);
 
 	/* Initial configuration */
-	state->m_port_7ffd_data = 0;
-	state->m_port_1ffd_data = 0;
-	spectrum_plus3_update_memory(machine);
+	m_port_7ffd_data = 0;
+	m_port_1ffd_data = 0;
+	spectrum_plus3_update_memory(machine());
 }
 
 DRIVER_INIT_MEMBER(spectrum_state,plus3)
@@ -414,7 +413,7 @@ static MACHINE_CONFIG_DERIVED( spectrum_plus3, spectrum_128 )
 	MCFG_SCREEN_REFRESH_RATE(50.01)
 	MCFG_GFXDECODE(specpls3)
 
-	MCFG_MACHINE_RESET( spectrum_plus3 )
+	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_plus3 )
 
 	MCFG_UPD765A_ADD("upd765", spectrum_plus3_upd765_interface)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(specpls3_floppy_interface)

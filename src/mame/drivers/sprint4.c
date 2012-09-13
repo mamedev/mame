@@ -108,20 +108,19 @@ static TIMER_CALLBACK( nmi_callback	)
 }
 
 
-static MACHINE_RESET( sprint4 )
+void sprint4_state::machine_reset()
 {
-	sprint4_state *state = machine.driver_data<sprint4_state>();
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(32), FUNC(nmi_callback), 32);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(32), FUNC(nmi_callback), 32);
 
-	memset(state->m_steer_FF1, 0, sizeof state->m_steer_FF1);
-	memset(state->m_steer_FF2, 0, sizeof state->m_steer_FF2);
+	memset(m_steer_FF1, 0, sizeof m_steer_FF1);
+	memset(m_steer_FF2, 0, sizeof m_steer_FF2);
 
-	state->m_gear[0] = 1;
-	state->m_gear[1] = 1;
-	state->m_gear[2] = 1;
-	state->m_gear[3] = 1;
+	m_gear[0] = 1;
+	m_gear[1] = 1;
+	m_gear[2] = 1;
+	m_gear[3] = 1;
 
-	state->m_da_latch = 0;
+	m_da_latch = 0;
 }
 
 
@@ -401,7 +400,6 @@ static MACHINE_CONFIG_START( sprint4, sprint4_state )
 	MCFG_CPU_PROGRAM_MAP(sprint4_cpu_map)
 
 	MCFG_WATCHDOG_VBLANK_INIT(8)
-	MCFG_MACHINE_RESET(sprint4)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -412,8 +410,6 @@ static MACHINE_CONFIG_START( sprint4, sprint4_state )
 	MCFG_GFXDECODE(sprint4)
 	MCFG_PALETTE_LENGTH(10)
 
-	MCFG_PALETTE_INIT(sprint4)
-	MCFG_VIDEO_START(sprint4)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

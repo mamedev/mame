@@ -74,47 +74,46 @@ TILEMAP_MAPPER_MEMBER(atarigt_state::atarigt_playfield_scan)
  *
  *************************************/
 
-VIDEO_START( atarigt )
+VIDEO_START_MEMBER(atarigt_state,atarigt)
 {
-	atarigt_state *state = machine.driver_data<atarigt_state>();
 	pen_t *substitute_pens;
 	int i, width, height;
 
 	/* blend the playfields and free the temporary one */
-	atarigen_blend_gfx(machine, 0, 2, 0x0f, 0x30);
+	atarigen_blend_gfx(machine(), 0, 2, 0x0f, 0x30);
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(atarigt_state::get_playfield_tile_info),state), tilemap_mapper_delegate(FUNC(atarigt_state::atarigt_playfield_scan),state),  8,8, 128,64);
+	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atarigt_state::get_playfield_tile_info),this), tilemap_mapper_delegate(FUNC(atarigt_state::atarigt_playfield_scan),this),  8,8, 128,64);
 
 	/* initialize the motion objects */
-	state->m_rle = machine.device("rle");
+	m_rle = machine().device("rle");
 
 	/* initialize the alphanumerics */
-	state->m_alpha_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(atarigt_state::get_alpha_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 64,32);
+	m_alpha_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atarigt_state::get_alpha_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,32);
 
 	/* allocate temp bitmaps */
-	width = machine.primary_screen->width();
-	height = machine.primary_screen->height();
+	width = machine().primary_screen->width();
+	height = machine().primary_screen->height();
 
-	state->m_pf_bitmap = auto_bitmap_ind16_alloc(machine, width, height);
-	state->m_an_bitmap = auto_bitmap_ind16_alloc(machine, width, height);
+	m_pf_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
+	m_an_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
 
 	/* map pens 1:1 */
-	substitute_pens = auto_alloc_array(machine, pen_t, 65536);
-	for (i = 0; i < machine.total_colors(); i++)
+	substitute_pens = auto_alloc_array(machine(), pen_t, 65536);
+	for (i = 0; i < machine().total_colors(); i++)
 		substitute_pens[i] = i;
-	machine.pens = substitute_pens;
+	machine().pens = substitute_pens;
 
 	/* reset statics */
-	memset(state->m_colorram, 0, 0x80000);
+	memset(m_colorram, 0, 0x80000);
 
 	/* save states */
-	state->save_item(NAME(state->m_playfield_tile_bank));
-	state->save_item(NAME(state->m_playfield_color_bank));
-	state->save_item(NAME(state->m_playfield_xscroll));
-	state->save_item(NAME(state->m_playfield_yscroll));
-	state->save_item(NAME(state->m_tram_checksum));
-	state->save_item(NAME(state->m_expanded_mram));
+	save_item(NAME(m_playfield_tile_bank));
+	save_item(NAME(m_playfield_color_bank));
+	save_item(NAME(m_playfield_xscroll));
+	save_item(NAME(m_playfield_yscroll));
+	save_item(NAME(m_tram_checksum));
+	save_item(NAME(m_expanded_mram));
 }
 
 

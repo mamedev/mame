@@ -60,12 +60,13 @@ public:
 	DECLARE_WRITE8_MEMBER(victory_paletteram_w);
 	DECLARE_READ8_MEMBER(victory_video_control_r);
 	DECLARE_WRITE8_MEMBER(victory_video_control_w);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/victory.c -----------*/
 
-VIDEO_START( victory );
+
 SCREEN_UPDATE_IND16( victory );
 INTERRUPT_GEN( victory_vblank_interrupt );
 

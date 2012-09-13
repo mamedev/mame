@@ -109,7 +109,7 @@ READ16_MEMBER(sshangha_state::deco_71_r)
 
 /******************************************************************************/
 
-static MACHINE_RESET( sshangha )
+void sshangha_state::machine_reset()
 {
 }
 
@@ -402,7 +402,6 @@ static MACHINE_CONFIG_START( sshangha, sshangha_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_RESET(sshangha)	/* init machine */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -423,7 +422,6 @@ static MACHINE_CONFIG_START( sshangha, sshangha_state )
 	decospr_device::set_gfx_region(*device, 2);
 
 
-	MCFG_VIDEO_START(sshangha)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") /* sure it's stereo? */

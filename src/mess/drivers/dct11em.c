@@ -14,6 +14,8 @@ class dct11em_state : public driver_device
 public:
 	dct11em_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 static ADDRESS_MAP_START( dct11em_mem, AS_PROGRAM, 16, dct11em_state )
@@ -28,11 +30,11 @@ static INPUT_PORTS_START( dct11em )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(dct11em)
+void dct11em_state::machine_reset()
 {
 }
 
-static VIDEO_START( dct11em )
+void dct11em_state::video_start()
 {
 }
 
@@ -52,7 +54,6 @@ static MACHINE_CONFIG_START( dct11em, dct11em_state )
 	MCFG_CPU_CONFIG(t11_data)
 	MCFG_CPU_PROGRAM_MAP(dct11em_mem)
 
-	MCFG_MACHINE_RESET(dct11em)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -60,7 +61,6 @@ static MACHINE_CONFIG_START( dct11em, dct11em_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_VIDEO_START(dct11em)
 	MCFG_SCREEN_UPDATE_STATIC(dct11em)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

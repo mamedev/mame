@@ -14,10 +14,9 @@ TILE_GET_INFO_MEMBER(freekick_state::get_freek_tile_info)
 }
 
 
-VIDEO_START( freekick )
+void freekick_state::video_start()
 {
-	freekick_state *state = machine.driver_data<freekick_state>();
-	state->m_freek_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(freekick_state::get_freek_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_freek_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(freekick_state::get_freek_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

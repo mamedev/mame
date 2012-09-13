@@ -104,19 +104,18 @@ static void scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-static MACHINE_START( arcadecl )
+MACHINE_START_MEMBER(arcadecl_state,arcadecl)
 {
-	atarigen_init(machine);
+	atarigen_init(machine());
 }
 
 
-static MACHINE_RESET( arcadecl )
+MACHINE_RESET_MEMBER(arcadecl_state,arcadecl)
 {
-	arcadecl_state *state = machine.driver_data<arcadecl_state>();
 
-	atarigen_eeprom_reset(state);
-	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine.primary_screen, scanline_update, 32);
+	atarigen_eeprom_reset(this);
+	atarigen_interrupt_reset(this, update_interrupts);
+	atarigen_scanline_timer_reset(*machine().primary_screen, scanline_update, 32);
 }
 
 
@@ -331,8 +330,8 @@ static MACHINE_CONFIG_START( arcadecl, arcadecl_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
-	MCFG_MACHINE_START(arcadecl)
-	MCFG_MACHINE_RESET(arcadecl)
+	MCFG_MACHINE_START_OVERRIDE(arcadecl_state,arcadecl)
+	MCFG_MACHINE_RESET_OVERRIDE(arcadecl_state,arcadecl)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
@@ -346,7 +345,7 @@ static MACHINE_CONFIG_START( arcadecl, arcadecl_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 456, 0+12, 336+12, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(arcadecl)
 
-	MCFG_VIDEO_START(arcadecl)
+	MCFG_VIDEO_START_OVERRIDE(arcadecl_state,arcadecl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

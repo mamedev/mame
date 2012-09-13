@@ -121,6 +121,8 @@ public:
 	UINT8 m_311_output;
 	UINT32 m_cassette_high_count;
 	UINT8 m_led_time[6];
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -296,25 +298,23 @@ static TIMER_DEVICE_CALLBACK( kim1_update_leds )
 }
 
 
-static MACHINE_START( kim1 )
+void kim1_state::machine_start()
 {
-	kim1_state *state = machine.driver_data<kim1_state>();
-	state_save_register_item(machine, "kim1", NULL, 0, state->m_u2_port_b );
-	state_save_register_item(machine, "kim1", NULL, 0, state->m_311_output );
-	state_save_register_item(machine, "kim1", NULL, 0, state->m_cassette_high_count );
+	state_save_register_item(machine(), "kim1", NULL, 0, m_u2_port_b );
+	state_save_register_item(machine(), "kim1", NULL, 0, m_311_output );
+	state_save_register_item(machine(), "kim1", NULL, 0, m_cassette_high_count );
 }
 
 
-static MACHINE_RESET( kim1 )
+void kim1_state::machine_reset()
 {
-	kim1_state *state = machine.driver_data<kim1_state>();
 	UINT8 i;
 
 	for ( i = 0; i < 6; i++ )
-		state->m_led_time[i] = 0;
+		m_led_time[i] = 0;
 
-	state->m_311_output = 0;
-	state->m_cassette_high_count = 0;
+	m_311_output = 0;
+	m_cassette_high_count = 0;
 }
 
 
@@ -334,8 +334,6 @@ static MACHINE_CONFIG_START( kim1, kim1_state )
 	MCFG_CPU_PROGRAM_MAP(kim1_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START( kim1 )
-	MCFG_MACHINE_RESET( kim1 )
 
 	/* video */
 	MCFG_DEFAULT_LAYOUT( layout_kim1 )

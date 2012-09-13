@@ -13,16 +13,15 @@ static TIMER_CALLBACK(gamecom_clock_timer_callback)
 	machine.device("maincpu")->execute().set_input_line(CK_INT, ASSERT_LINE );
 }
 
-MACHINE_RESET( gamecom )
+void gamecom_state::machine_reset()
 {
-	gamecom_state *state = machine.driver_data<gamecom_state>();
-	UINT8 *rom = state->memregion("kernel")->base();
-	state->membank( "bank1" )->set_base( rom );
-	state->membank( "bank2" )->set_base( rom );
-	state->membank( "bank3" )->set_base( rom );
-	state->membank( "bank4" )->set_base( rom );
+	UINT8 *rom = memregion("kernel")->base();
+	membank( "bank1" )->set_base( rom );
+	membank( "bank2" )->set_base( rom );
+	membank( "bank3" )->set_base( rom );
+	membank( "bank4" )->set_base( rom );
 
-	state->m_cartridge = NULL;
+	m_cartridge = NULL;
 }
 
 void gamecom_state::gamecom_set_mmu(UINT8 mmu, UINT8 data )

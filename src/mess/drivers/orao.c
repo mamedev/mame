@@ -176,7 +176,6 @@ static MACHINE_CONFIG_START( orao, orao_state )
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu", M6502, 1000000)
     MCFG_CPU_PROGRAM_MAP(orao_mem)
-    MCFG_MACHINE_RESET( orao )
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -189,7 +188,6 @@ static MACHINE_CONFIG_START( orao, orao_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-    MCFG_VIDEO_START(orao)
 
     /* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

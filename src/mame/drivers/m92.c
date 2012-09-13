@@ -212,17 +212,15 @@ psoldier dip locations still need verification.
 
 /*****************************************************************************/
 
-static MACHINE_START( m92 )
+MACHINE_START_MEMBER(m92_state,m92)
 {
-	m92_state *state = machine.driver_data<m92_state>();
-	state->save_item(NAME(state->m_sound_status));
+	save_item(NAME(m_sound_status));
 }
 
-static MACHINE_RESET( m92 )
+MACHINE_RESET_MEMBER(m92_state,m92)
 {
-	m92_state *state = machine.driver_data<m92_state>();
 
-	state->m_sprite_buffer_busy = 1;
+	m_sprite_buffer_busy = 1;
 }
 
 /*****************************************************************************/
@@ -943,8 +941,8 @@ static MACHINE_CONFIG_START( m92, m92_state )
 	MCFG_CPU_ADD("soundcpu" ,V35, XTAL_14_31818MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(m92)
-	MCFG_MACHINE_RESET(m92)
+	MCFG_MACHINE_START_OVERRIDE(m92_state,m92)
+	MCFG_MACHINE_RESET_OVERRIDE(m92_state,m92)
 
 	MCFG_TIMER_ADD_SCANLINE("scantimer", m92_scanline_interrupt, "screen", 0, 1)
 
@@ -961,7 +959,7 @@ static MACHINE_CONFIG_START( m92, m92_state )
 	MCFG_GFXDECODE(m92)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(m92)
+	MCFG_VIDEO_START_OVERRIDE(m92_state,m92)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1029,8 +1027,8 @@ static MACHINE_CONFIG_START( ppan, m92_state )
 
 	/* no Sound CPU */
 
-	MCFG_MACHINE_START(m92)
-	MCFG_MACHINE_RESET(m92)
+	MCFG_MACHINE_START_OVERRIDE(m92_state,m92)
+	MCFG_MACHINE_RESET_OVERRIDE(m92_state,m92)
 
 	MCFG_TIMER_ADD_SCANLINE("scantimer", m92_scanline_interrupt, "screen", 0, 1)
 
@@ -1047,7 +1045,7 @@ static MACHINE_CONFIG_START( ppan, m92_state )
 	MCFG_GFXDECODE(m92)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(ppan)
+	MCFG_VIDEO_START_OVERRIDE(m92_state,ppan)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

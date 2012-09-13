@@ -111,9 +111,9 @@ void hector_80c(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *page, int
 }
 
 
-VIDEO_START( hec2hrp )
+VIDEO_START_MEMBER(hec2hrp_state,hec2hrp)
 {
-	Init_Hector_Palette(machine);
+	Init_Hector_Palette(machine());
 }
 
 SCREEN_UPDATE_IND16( hec2hrp )

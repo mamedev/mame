@@ -25,6 +25,8 @@ public:
 	DECLARE_DRIVER_INIT(ssa);
 	DECLARE_DRIVER_INIT(enc);
 	DECLARE_DRIVER_INIT(deb);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 

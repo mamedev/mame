@@ -37,6 +37,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_coinage_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_payout_r);
 	DECLARE_DRIVER_INIT(sidewndr);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -75,10 +77,9 @@ static TIMER_CALLBACK( acefruit_refresh )
 	state->m_refresh_timer->adjust( machine.primary_screen->time_until_pos(vpos) );
 }
 
-static VIDEO_START( acefruit )
+void acefruit_state::video_start()
 {
-	acefruit_state *state = machine.driver_data<acefruit_state>();
-	state->m_refresh_timer = machine.scheduler().timer_alloc(FUNC(acefruit_refresh));
+	m_refresh_timer = machine().scheduler().timer_alloc(FUNC(acefruit_refresh));
 }
 
 static INTERRUPT_GEN( acefruit_vblank )
@@ -262,27 +263,27 @@ WRITE8_MEMBER(acefruit_state::acefruit_solenoid_w)
 	}
 }
 
-static PALETTE_INIT( acefruit )
+void acefruit_state::palette_init()
 {
 	/* sprites */
-	palette_set_color( machine, 0, MAKE_RGB(0x00, 0x00, 0x00) );
-	palette_set_color( machine, 1, MAKE_RGB(0x00, 0x00, 0xff) );
-	palette_set_color( machine, 2, MAKE_RGB(0x00, 0xff, 0x00) );
-	palette_set_color( machine, 3, MAKE_RGB(0xff, 0x7f, 0x00) );
-	palette_set_color( machine, 4, MAKE_RGB(0xff, 0x00, 0x00) );
-	palette_set_color( machine, 5, MAKE_RGB(0xff, 0xff, 0x00) );
-	palette_set_color( machine, 6, MAKE_RGB(0xff, 0xff, 0xff) );
-	palette_set_color( machine, 7, MAKE_RGB(0x7f, 0x3f, 0x1f) );
+	palette_set_color( machine(), 0, MAKE_RGB(0x00, 0x00, 0x00) );
+	palette_set_color( machine(), 1, MAKE_RGB(0x00, 0x00, 0xff) );
+	palette_set_color( machine(), 2, MAKE_RGB(0x00, 0xff, 0x00) );
+	palette_set_color( machine(), 3, MAKE_RGB(0xff, 0x7f, 0x00) );
+	palette_set_color( machine(), 4, MAKE_RGB(0xff, 0x00, 0x00) );
+	palette_set_color( machine(), 5, MAKE_RGB(0xff, 0xff, 0x00) );
+	palette_set_color( machine(), 6, MAKE_RGB(0xff, 0xff, 0xff) );
+	palette_set_color( machine(), 7, MAKE_RGB(0x7f, 0x3f, 0x1f) );
 
 	/* tiles */
-	palette_set_color( machine, 8, MAKE_RGB(0x00, 0x00, 0x00) );
-	palette_set_color( machine, 9, MAKE_RGB(0xff, 0xff, 0xff) );
-	palette_set_color( machine, 10, MAKE_RGB(0x00, 0x00, 0x00) );
-	palette_set_color( machine, 11, MAKE_RGB(0x00, 0x00, 0xff) );
-	palette_set_color( machine, 12, MAKE_RGB(0x00, 0x00, 0x00) );
-	palette_set_color( machine, 13, MAKE_RGB(0x00, 0xff, 0x00) );
-	palette_set_color( machine, 14, MAKE_RGB(0x00, 0x00, 0x00) );
-	palette_set_color( machine, 15, MAKE_RGB(0xff, 0x00, 0x00) );
+	palette_set_color( machine(), 8, MAKE_RGB(0x00, 0x00, 0x00) );
+	palette_set_color( machine(), 9, MAKE_RGB(0xff, 0xff, 0xff) );
+	palette_set_color( machine(), 10, MAKE_RGB(0x00, 0x00, 0x00) );
+	palette_set_color( machine(), 11, MAKE_RGB(0x00, 0x00, 0xff) );
+	palette_set_color( machine(), 12, MAKE_RGB(0x00, 0x00, 0x00) );
+	palette_set_color( machine(), 13, MAKE_RGB(0x00, 0xff, 0x00) );
+	palette_set_color( machine(), 14, MAKE_RGB(0x00, 0x00, 0x00) );
+	palette_set_color( machine(), 15, MAKE_RGB(0xff, 0x00, 0x00) );
 }
 
 static ADDRESS_MAP_START( acefruit_map, AS_PROGRAM, 8, acefruit_state )
@@ -597,8 +598,6 @@ static MACHINE_CONFIG_START( acefruit, acefruit_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PALETTE_INIT(acefruit)
-	MCFG_VIDEO_START(acefruit)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

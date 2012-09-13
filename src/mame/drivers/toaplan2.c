@@ -367,18 +367,17 @@ To Do / Unknowns:
 ***************************************************************************/
 
 
-static MACHINE_START( toaplan2 )
+MACHINE_START_MEMBER(toaplan2_state,toaplan2)
 {
-	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
-	state->m_main_cpu = machine.device("maincpu");
-	state->m_sub_cpu = machine.device("audiocpu");
+	m_main_cpu = machine().device("maincpu");
+	m_sub_cpu = machine().device("audiocpu");
 
-	state->save_item(NAME(state->m_mcu_data));
-	state->save_item(NAME(state->m_video_status));
-	state->save_item(NAME(state->m_old_p1_paddle_h));
-	state->save_item(NAME(state->m_old_p2_paddle_h));
-	state->save_item(NAME(state->m_z80_busreq));
+	save_item(NAME(m_mcu_data));
+	save_item(NAME(m_video_status));
+	save_item(NAME(m_old_p1_paddle_h));
+	save_item(NAME(m_old_p2_paddle_h));
+	save_item(NAME(m_z80_busreq));
 }
 
 
@@ -391,26 +390,24 @@ static void toaplan2_reset(device_t *device)
 }
 
 
-static MACHINE_RESET( toaplan2 )
+MACHINE_RESET_MEMBER(toaplan2_state,toaplan2)
 {
-	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
-	state->m_mcu_data = 0x00;
+	m_mcu_data = 0x00;
 
 	// All games execute a RESET instruction on init, presumably to reset the sound CPU.
 	// This is important for games with common RAM; the RAM test will fail
 	// when leaving service mode if the sound CPU is not reset.
-	m68k_set_reset_callback(state->m_main_cpu, toaplan2_reset);
+	m68k_set_reset_callback(m_main_cpu, toaplan2_reset);
 }
 
 
-static MACHINE_RESET( ghox )
+MACHINE_RESET_MEMBER(toaplan2_state,ghox)
 {
-	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
-	MACHINE_RESET_CALL(toaplan2);
-	state->m_old_p1_paddle_h = 0;
-	state->m_old_p2_paddle_h = 0;
+	MACHINE_RESET_CALL_MEMBER(toaplan2);
+	m_old_p1_paddle_h = 0;
+	m_old_p2_paddle_h = 0;
 }
 
 
@@ -3038,8 +3035,8 @@ static MACHINE_CONFIG_START( tekipaki, toaplan2_state )
 	MCFG_CPU_PROGRAM_MAP(hd647180_mem)
 #endif
 
-	MCFG_MACHINE_START(toaplan2)
-	MCFG_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3056,7 +3053,7 @@ static MACHINE_CONFIG_START( tekipaki, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 
-	MCFG_VIDEO_START(toaplan2)
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3079,8 +3076,8 @@ static MACHINE_CONFIG_START( ghox, toaplan2_state )
 	MCFG_CPU_PROGRAM_MAP(hd647180_mem)
 #endif
 
-	MCFG_MACHINE_START(toaplan2)
-	MCFG_MACHINE_RESET(ghox)
+	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,ghox)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3097,7 +3094,7 @@ static MACHINE_CONFIG_START( ghox, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 
-	MCFG_VIDEO_START(toaplan2)
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3170,7 +3167,7 @@ static MACHINE_CONFIG_START( dogyuun, toaplan2_state )
 	MCFG_CPU_IO_MAP(dogyuun_v25_port)
 	MCFG_CPU_CONFIG(nitro_config)
 
-	MCFG_MACHINE_START(toaplan2)
+	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3188,7 +3185,7 @@ static MACHINE_CONFIG_START( dogyuun, toaplan2_state )
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_DEVICE_ADD_VDP1
 
-	MCFG_VIDEO_START(toaplan2)
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3214,7 +3211,7 @@ static MACHINE_CONFIG_START( kbash, toaplan2_state )
 	MCFG_CPU_IO_MAP(v25_port)
 	MCFG_CPU_CONFIG(nitro_config)
 
-	MCFG_MACHINE_START(toaplan2)
+	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3231,7 +3228,7 @@ static MACHINE_CONFIG_START( kbash, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 
-	MCFG_VIDEO_START(toaplan2)
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3251,7 +3248,7 @@ static MACHINE_CONFIG_START( kbash2, toaplan2_state )
 	MCFG_CPU_PROGRAM_MAP(kbash2_68k_mem)
 	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MCFG_MACHINE_START(toaplan2)
+	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3268,7 +3265,7 @@ static MACHINE_CONFIG_START( kbash2, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 
-	MCFG_VIDEO_START(toaplan2)
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3288,7 +3285,7 @@ static MACHINE_CONFIG_START( truxton2, toaplan2_state )
 	MCFG_CPU_PROGRAM_MAP(truxton2_68k_mem)
 	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq2)
 
-	MCFG_MACHINE_START(toaplan2)
+	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3305,7 +3302,7 @@ static MACHINE_CONFIG_START( truxton2, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 
-	MCFG_VIDEO_START(truxton2)
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,truxton2)
 
 	/* sound hardware */
 #ifdef TRUXTON2_STEREO	// music data is stereo...
@@ -3342,8 +3339,8 @@ static MACHINE_CONFIG_START( pipibibs, toaplan2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(toaplan2)
-	MCFG_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3360,7 +3357,7 @@ static MACHINE_CONFIG_START( pipibibs, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 
-	MCFG_VIDEO_START(toaplan2)
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3383,8 +3380,8 @@ static MACHINE_CONFIG_START( pipibibsbl, toaplan2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(toaplan2)
-	MCFG_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3401,7 +3398,7 @@ static MACHINE_CONFIG_START( pipibibsbl, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 
-	MCFG_VIDEO_START(toaplan2)
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3463,7 +3460,7 @@ static MACHINE_CONFIG_START( fixeight, toaplan2_state )
 	MCFG_CPU_IO_MAP(fixeight_v25_port)
 	MCFG_CPU_CONFIG(ts001turbo_config)
 
-	MCFG_MACHINE_START(toaplan2)
+	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -3482,7 +3479,7 @@ static MACHINE_CONFIG_START( fixeight, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 
-	MCFG_VIDEO_START(truxton2)
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,truxton2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3502,7 +3499,7 @@ static MACHINE_CONFIG_START( fixeightbl, toaplan2_state )
 	MCFG_CPU_PROGRAM_MAP(fixeightbl_68k_mem)
 	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq2)
 
-	MCFG_MACHINE_START(toaplan2)
+	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3519,7 +3516,7 @@ static MACHINE_CONFIG_START( fixeightbl, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 
-	MCFG_VIDEO_START(fixeightbl)
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,fixeightbl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3542,7 +3539,7 @@ static MACHINE_CONFIG_START( vfive, toaplan2_state )
 	MCFG_CPU_IO_MAP(v25_port)
 	MCFG_CPU_CONFIG(nitro_config)
 
-	MCFG_MACHINE_START(toaplan2)
+	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3559,7 +3556,7 @@ static MACHINE_CONFIG_START( vfive, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 
-	MCFG_VIDEO_START(toaplan2)
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3580,7 +3577,7 @@ static MACHINE_CONFIG_START( batsugun, toaplan2_state )
 	MCFG_CPU_PROGRAM_MAP(v25_mem)
 	MCFG_CPU_IO_MAP(v25_port)
 
-	MCFG_MACHINE_START(toaplan2)
+	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3598,7 +3595,7 @@ static MACHINE_CONFIG_START( batsugun, toaplan2_state )
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_DEVICE_ADD_VDP1
 
-	MCFG_VIDEO_START(toaplan2)
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3618,7 +3615,7 @@ static MACHINE_CONFIG_START( snowbro2, toaplan2_state )
 	MCFG_CPU_PROGRAM_MAP(snowbro2_68k_mem)
 	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MCFG_MACHINE_START(toaplan2)
+	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3635,7 +3632,7 @@ static MACHINE_CONFIG_START( snowbro2, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 
-	MCFG_VIDEO_START(toaplan2)
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3660,8 +3657,8 @@ static MACHINE_CONFIG_START( mahoudai, toaplan2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(toaplan2)
-	MCFG_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3678,7 +3675,7 @@ static MACHINE_CONFIG_START( mahoudai, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 
-	MCFG_VIDEO_START(bgaregga)
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,bgaregga)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3703,8 +3700,8 @@ static MACHINE_CONFIG_START( shippumd, toaplan2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(toaplan2)
-	MCFG_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3721,7 +3718,7 @@ static MACHINE_CONFIG_START( shippumd, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 
-	MCFG_VIDEO_START(bgaregga)
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,bgaregga)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3757,8 +3754,8 @@ static MACHINE_CONFIG_START( bgaregga, toaplan2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(toaplan2)
-	MCFG_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3775,7 +3772,7 @@ static MACHINE_CONFIG_START( bgaregga, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 
-	MCFG_VIDEO_START(bgaregga)
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,bgaregga)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3791,7 +3788,7 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( bgareggabl, bgaregga )
-	MCFG_VIDEO_START(bgareggabl)
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,bgareggabl)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( batrider, toaplan2_state )
@@ -3807,8 +3804,8 @@ static MACHINE_CONFIG_START( batrider, toaplan2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(toaplan2)
-	MCFG_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3824,7 +3821,7 @@ static MACHINE_CONFIG_START( batrider, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 
-	MCFG_VIDEO_START(batrider)
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,batrider)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3856,8 +3853,8 @@ static MACHINE_CONFIG_START( bbakraid, toaplan2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(toaplan2)
-	MCFG_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	MCFG_EEPROM_ADD("eeprom", bbakraid_93C66_intf)
 
@@ -3875,7 +3872,7 @@ static MACHINE_CONFIG_START( bbakraid, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 
-	MCFG_VIDEO_START(batrider)
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,batrider)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

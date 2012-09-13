@@ -64,6 +64,8 @@ public:
 	DECLARE_WRITE8_MEMBER(hc11_mux_w);
 	DECLARE_READ8_MEMBER(hc11_okibank_r);
 	DECLARE_WRITE8_MEMBER(hc11_okibank_w);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -218,15 +220,14 @@ static INPUT_PORTS_START( 30test )
 INPUT_PORTS_END
 
 
-static MACHINE_START( 30test )
+void namco_30test_state::machine_start()
 {
-	namco_30test_state *state = machine.driver_data<namco_30test_state>();
 
-	state->save_item(NAME(state->m_mux_data));
-	state->save_item(NAME(state->m_oki_bank));
+	save_item(NAME(m_mux_data));
+	save_item(NAME(m_oki_bank));
 }
 
-static MACHINE_RESET( 30test )
+void namco_30test_state::machine_reset()
 {
 
 }
@@ -247,8 +248,6 @@ static MACHINE_CONFIG_START( 30test, namco_30test_state )
 	MCFG_CPU_IO_MAP(namco_30test_io)
 	MCFG_CPU_CONFIG(namco_30test_config)
 
-	MCFG_MACHINE_START(30test)
-	MCFG_MACHINE_RESET(30test)
 
 	/* no video! */
 

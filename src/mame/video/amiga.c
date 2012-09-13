@@ -94,12 +94,12 @@ const UINT16 delay[256] =
  *
  *************************************/
 
-PALETTE_INIT( amiga )
+PALETTE_INIT_MEMBER(amiga_state,amiga)
 {
 	int i;
 
 	for (i = 0; i < 0x1000; i++)
-		palette_set_color_rgb(machine, i, pal4bit(i >> 8), pal4bit(i >> 4), pal4bit(i));
+		palette_set_color_rgb(machine(), i, pal4bit(i >> 8), pal4bit(i >> 4), pal4bit(i));
 }
 
 
@@ -110,9 +110,8 @@ PALETTE_INIT( amiga )
  *
  *************************************/
 
-VIDEO_START( amiga )
+VIDEO_START_MEMBER(amiga_state,amiga)
 {
-	amiga_state *state = machine.driver_data<amiga_state>();
 	int j;
 
 	/* generate tables that produce the correct playfield color for dual playfield mode */
@@ -121,18 +120,18 @@ VIDEO_START( amiga )
 		int pf1pix = ((j >> 0) & 1) | ((j >> 1) & 2) | ((j >> 2) & 4);
 		int pf2pix = ((j >> 1) & 1) | ((j >> 2) & 2) | ((j >> 3) & 4);
 
-		state->m_separate_bitplanes[0][j] = (pf1pix || !pf2pix) ? pf1pix : (pf2pix + 8);
-		state->m_separate_bitplanes[1][j] = pf2pix ? (pf2pix + 8) : pf1pix;
+		m_separate_bitplanes[0][j] = (pf1pix || !pf2pix) ? pf1pix : (pf2pix + 8);
+		m_separate_bitplanes[1][j] = pf2pix ? (pf2pix + 8) : pf1pix;
 	}
 
 #if GUESS_COPPER_OFFSET
-	state->m_wait_offset = 3;
+	m_wait_offset = 3;
 #endif
 
 	/* reset the genlock color */
-	state->m_genlock_color = 0xffff;
+	m_genlock_color = 0xffff;
 
-	state->m_sprite_ctl_written = 0;
+	m_sprite_ctl_written = 0;
 }
 
 

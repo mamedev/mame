@@ -8,11 +8,10 @@ Atari Sky Raider video emulation
 #include "includes/skyraid.h"
 
 
-VIDEO_START( skyraid )
+void skyraid_state::video_start()
 {
-	skyraid_state *state = machine.driver_data<skyraid_state>();
 
-	state->m_helper.allocate(128, 240);
+	m_helper.allocate(128, 240);
 }
 
 

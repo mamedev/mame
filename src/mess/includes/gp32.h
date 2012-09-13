@@ -161,6 +161,8 @@ public:
 	DECLARE_WRITE32_MEMBER(s3c240x_spi_w);
 	DECLARE_READ32_MEMBER(s3c240x_mmc_r);
 	DECLARE_WRITE32_MEMBER(s3c240x_mmc_w);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 

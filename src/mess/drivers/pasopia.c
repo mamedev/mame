@@ -70,9 +70,12 @@ public:
 	bool m_ram_bank;
 	UINT8 *m_p_vram;
 	DECLARE_DRIVER_INIT(pasopia);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
-static VIDEO_START( pasopia )
+void pasopia_state::video_start()
 {
 }
 
@@ -140,16 +143,15 @@ static INPUT_PORTS_START( pasopia )
 	PASOPIA_KEYBOARD
 INPUT_PORTS_END
 
-static MACHINE_START(pasopia)
+void pasopia_state::machine_start()
 {
-	pasopia_state *state = machine.driver_data<pasopia_state>();
-	state->m_p_vram = state->memregion("vram")->base();
-	state->m_hblank = 0;
-	state->membank("bank1")->set_entry(0);
-	state->membank("bank2")->set_entry(0);
+	m_p_vram = memregion("vram")->base();
+	m_hblank = 0;
+	membank("bank1")->set_entry(0);
+	membank("bank2")->set_entry(0);
 }
 
-static MACHINE_RESET(pasopia)
+void pasopia_state::machine_reset()
 {
 }
 
@@ -351,8 +353,6 @@ static MACHINE_CONFIG_START( pasopia, pasopia_state )
 	MCFG_CPU_IO_MAP(pasopia_io)
 	MCFG_CPU_CONFIG(pasopia_daisy)
 
-	MCFG_MACHINE_START(pasopia)
-	MCFG_MACHINE_RESET(pasopia)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -360,7 +360,6 @@ static MACHINE_CONFIG_START( pasopia, pasopia_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_VIDEO_START(pasopia)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 	MCFG_GFXDECODE(pasopia)
 	MCFG_PALETTE_LENGTH(8)

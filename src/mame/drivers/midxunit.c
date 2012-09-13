@@ -265,7 +265,7 @@ static MACHINE_CONFIG_START( midxunit, midxunit_state )
 	MCFG_CPU_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_RESET(midxunit)
+	MCFG_MACHINE_RESET_OVERRIDE(midxunit_state,midxunit)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -274,7 +274,7 @@ static MACHINE_CONFIG_START( midxunit, midxunit_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 505, 0, 399, 289, 0, 253)
 	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
-	MCFG_VIDEO_START(midxunit)
+	MCFG_VIDEO_START_OVERRIDE(midxunit_state,midxunit)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(dcs_audio_2k_uart)

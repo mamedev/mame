@@ -24,6 +24,8 @@ public:
 	mk90_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -46,11 +48,11 @@ static INPUT_PORTS_START( mk90 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(mk90)
+void mk90_state::machine_reset()
 {
 }
 
-static VIDEO_START( mk90 )
+void mk90_state::video_start()
 {
 }
 
@@ -70,7 +72,6 @@ static MACHINE_CONFIG_START( mk90, mk90_state )
 	MCFG_CPU_CONFIG(t11_data)
 	MCFG_CPU_PROGRAM_MAP(mk90_mem)
 
-	MCFG_MACHINE_RESET(mk90)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -78,7 +79,6 @@ static MACHINE_CONFIG_START( mk90, mk90_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_VIDEO_START(mk90)
 	MCFG_SCREEN_UPDATE_STATIC(mk90)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

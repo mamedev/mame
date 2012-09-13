@@ -266,38 +266,36 @@ static const k051960_interface gbusters_k051960_intf =
 	gbusters_sprite_callback
 };
 
-static MACHINE_START( gbusters )
+void gbusters_state::machine_start()
 {
-	gbusters_state *state = machine.driver_data<gbusters_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x2000);
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x2000);
+	membank("bank1")->set_entry(0);
 
-	state->m_generic_paletteram_8.allocate(0x800);
+	m_generic_paletteram_8.allocate(0x800);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_k052109 = machine.device("k052109");
-	state->m_k051960 = machine.device("k051960");
-	state->m_k007232 = machine.device("k007232");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_k052109 = machine().device("k052109");
+	m_k051960 = machine().device("k051960");
+	m_k007232 = machine().device("k007232");
 
-	state->save_item(NAME(state->m_palette_selected));
-	state->save_item(NAME(state->m_priority));
+	save_item(NAME(m_palette_selected));
+	save_item(NAME(m_priority));
 }
 
-static MACHINE_RESET( gbusters )
+void gbusters_state::machine_reset()
 {
-	gbusters_state *state = machine.driver_data<gbusters_state>();
-	UINT8 *RAM = state->memregion("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 
-	konami_configure_set_lines(machine.device("maincpu"), gbusters_banking);
+	konami_configure_set_lines(machine().device("maincpu"), gbusters_banking);
 
 	/* mirror address for banked ROM */
 	memcpy(&RAM[0x18000], &RAM[0x10000], 0x08000);
 
-	state->m_palette_selected = 0;
-	state->m_priority = 0;
+	m_palette_selected = 0;
+	m_priority = 0;
 }
 
 static MACHINE_CONFIG_START( gbusters, gbusters_state )
@@ -310,8 +308,6 @@ static MACHINE_CONFIG_START( gbusters, gbusters_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)		/* ? */
 	MCFG_CPU_PROGRAM_MAP(gbusters_sound_map)
 
-	MCFG_MACHINE_START(gbusters)
-	MCFG_MACHINE_RESET(gbusters)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -325,7 +321,6 @@ static MACHINE_CONFIG_START( gbusters, gbusters_state )
 
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(gbusters)
 
 	MCFG_K052109_ADD("k052109", gbusters_k052109_intf)
 	MCFG_K051960_ADD("k051960", gbusters_k051960_intf)

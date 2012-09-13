@@ -197,93 +197,89 @@ static void m62_amplify_contrast(palette_t *palette, UINT32 numcolors)
 	palette_set_contrast(palette, 255000.0/ymax);
 }
 
-PALETTE_INIT( m62 )
+void m62_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	m62_state *state = machine.driver_data<m62_state>();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	rgb_t *rgb;
 
-	rgb = compute_res_net_all(machine, color_prom, &m62_tile_decode_info, &m62_tile_net_info);
-	palette_set_colors(machine, 0x000, rgb, 0x100);
-	auto_free(machine, rgb);
+	rgb = compute_res_net_all(machine(), color_prom, &m62_tile_decode_info, &m62_tile_net_info);
+	palette_set_colors(machine(), 0x000, rgb, 0x100);
+	auto_free(machine(), rgb);
 
-	rgb = compute_res_net_all(machine, color_prom, &m62_sprite_decode_info, &m62_sprite_net_info);
-	palette_set_colors(machine, 0x100, rgb, 0x100);
-	auto_free(machine, rgb);
+	rgb = compute_res_net_all(machine(), color_prom, &m62_sprite_decode_info, &m62_sprite_net_info);
+	palette_set_colors(machine(), 0x100, rgb, 0x100);
+	auto_free(machine(), rgb);
 
-	m62_amplify_contrast(machine.palette,0);
+	m62_amplify_contrast(machine().palette,0);
 
 	/* we'll need this at run time */
-	state->m_sprite_height_prom = color_prom + 0x600;
+	m_sprite_height_prom = color_prom + 0x600;
 }
 
 
-PALETTE_INIT( lotlot )
+PALETTE_INIT_MEMBER(m62_state,lotlot)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	m62_state *state = machine.driver_data<m62_state>();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	rgb_t *rgb;
 
-	rgb = compute_res_net_all(machine, color_prom, &lotlot_tile_decode_info, &m62_tile_net_info);
-	palette_set_colors(machine, 0x000, rgb, 0x180);
-	auto_free(machine, rgb);
+	rgb = compute_res_net_all(machine(), color_prom, &lotlot_tile_decode_info, &m62_tile_net_info);
+	palette_set_colors(machine(), 0x000, rgb, 0x180);
+	auto_free(machine(), rgb);
 
-	rgb = compute_res_net_all(machine, color_prom, &lotlot_sprite_decode_info, &m62_sprite_net_info);
-	palette_set_colors(machine, 0x180, rgb, 0x180);
-	auto_free(machine, rgb);
+	rgb = compute_res_net_all(machine(), color_prom, &lotlot_sprite_decode_info, &m62_sprite_net_info);
+	palette_set_colors(machine(), 0x180, rgb, 0x180);
+	auto_free(machine(), rgb);
 
-	m62_amplify_contrast(machine.palette,0);
+	m62_amplify_contrast(machine().palette,0);
 
 	/* we'll need this at run time */
-	state->m_sprite_height_prom = color_prom + 0x900;
+	m_sprite_height_prom = color_prom + 0x900;
 }
 
 
-PALETTE_INIT( battroad )
+PALETTE_INIT_MEMBER(m62_state,battroad)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	m62_state *state = machine.driver_data<m62_state>();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	rgb_t *rgb;
 
 	// m62 palette
-	rgb = compute_res_net_all(machine, color_prom, &m62_tile_decode_info, &m62_tile_net_info);
-	palette_set_colors(machine, 0x000, rgb, 0x100);
-	auto_free(machine, rgb);
+	rgb = compute_res_net_all(machine(), color_prom, &m62_tile_decode_info, &m62_tile_net_info);
+	palette_set_colors(machine(), 0x000, rgb, 0x100);
+	auto_free(machine(), rgb);
 
-	rgb = compute_res_net_all(machine, color_prom, &m62_sprite_decode_info, &m62_sprite_net_info);
-	palette_set_colors(machine, 0x100, rgb, 0x100);
-	auto_free(machine, rgb);
+	rgb = compute_res_net_all(machine(), color_prom, &m62_sprite_decode_info, &m62_sprite_net_info);
+	palette_set_colors(machine(), 0x100, rgb, 0x100);
+	auto_free(machine(), rgb);
 
-	m62_amplify_contrast(machine.palette,0x200);
+	m62_amplify_contrast(machine().palette,0x200);
 
 	// custom palette for foreground
-	rgb = compute_res_net_all(machine, color_prom, &battroad_char_decode_info, &battroad_char_net_info);
-	palette_set_colors(machine, 0x200, rgb, 0x020);
-	auto_free(machine, rgb);
+	rgb = compute_res_net_all(machine(), color_prom, &battroad_char_decode_info, &battroad_char_net_info);
+	palette_set_colors(machine(), 0x200, rgb, 0x020);
+	auto_free(machine(), rgb);
 
 	/* we'll need this at run time */
-	state->m_sprite_height_prom = color_prom + 0x620;
+	m_sprite_height_prom = color_prom + 0x620;
 }
 
 
-PALETTE_INIT( spelunk2 )
+PALETTE_INIT_MEMBER(m62_state,spelunk2)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	m62_state *state = machine.driver_data<m62_state>();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	rgb_t *rgb;
 
-	rgb = compute_res_net_all(machine, color_prom, &spelunk2_tile_decode_info, &m62_tile_net_info);
-	palette_set_colors(machine, 0x000, rgb, 0x200);
-	auto_free(machine, rgb);
+	rgb = compute_res_net_all(machine(), color_prom, &spelunk2_tile_decode_info, &m62_tile_net_info);
+	palette_set_colors(machine(), 0x000, rgb, 0x200);
+	auto_free(machine(), rgb);
 
-	rgb = compute_res_net_all(machine, color_prom, &spelunk2_sprite_decode_info, &m62_sprite_net_info);
-	palette_set_colors(machine, 0x200, rgb, 0x100);
-	auto_free(machine, rgb);
+	rgb = compute_res_net_all(machine(), color_prom, &spelunk2_sprite_decode_info, &m62_sprite_net_info);
+	palette_set_colors(machine(), 0x200, rgb, 0x100);
+	auto_free(machine(), rgb);
 
-	m62_amplify_contrast(machine.palette,0);
+	m62_amplify_contrast(machine().palette,0);
 
 	/* we'll need this at run time */
-	state->m_sprite_height_prom = color_prom + 0x700;
+	m_sprite_height_prom = color_prom + 0x700;
 }
 
 
@@ -462,10 +458,9 @@ TILE_GET_INFO_MEMBER(m62_state::get_kungfum_bg_tile_info)
 		tileinfo.category = 0;
 }
 
-VIDEO_START( kungfum )
+VIDEO_START_MEMBER(m62_state,kungfum)
 {
-	m62_state *state = machine.driver_data<m62_state>();
-	m62_start(machine, tilemap_get_info_delegate(FUNC(m62_state::get_kungfum_bg_tile_info),state), 32, 0, 8, 8, 64, 32);
+	m62_start(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_kungfum_bg_tile_info),this), 32, 0, 8, 8, 64, 32);
 }
 
 SCREEN_UPDATE_IND16( kungfum )
@@ -507,13 +502,12 @@ TILE_GET_INFO_MEMBER(m62_state::get_ldrun_bg_tile_info)
 		tileinfo.group = 0;
 }
 
-VIDEO_START( ldrun )
+void m62_state::video_start()
 {
-	m62_state *state = machine.driver_data<m62_state>();
 
-	m62_start(machine, tilemap_get_info_delegate(FUNC(m62_state::get_ldrun_bg_tile_info),state), 1, 1, 8, 8, 64, 32);
-	state->m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
-	state->m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
+	m62_start(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_ldrun_bg_tile_info),this), 1, 1, 8, 8, 64, 32);
+	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
+	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
 }
 
 SCREEN_UPDATE_IND16( ldrun )
@@ -548,12 +542,11 @@ TILE_GET_INFO_MEMBER(m62_state::get_ldrun2_bg_tile_info)
 		tileinfo.group = 0;
 }
 
-VIDEO_START( ldrun2 )
+VIDEO_START_MEMBER(m62_state,ldrun2)
 {
-	m62_state *state = machine.driver_data<m62_state>();
-	m62_start(machine, tilemap_get_info_delegate(FUNC(m62_state::get_ldrun2_bg_tile_info),state), 1, 1, 8, 8, 64, 32);
-	state->m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
-	state->m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
+	m62_start(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_ldrun2_bg_tile_info),this), 1, 1, 8, 8, 64, 32);
+	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
+	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
 }
 
 
@@ -612,13 +605,12 @@ TILE_GET_INFO_MEMBER(m62_state::get_battroad_fg_tile_info)
 	SET_TILE_INFO_MEMBER(2, code | ((color & 0x40) << 3) | ((color & 0x10) << 4), color & 0x0f, 0);
 }
 
-VIDEO_START( battroad )
+VIDEO_START_MEMBER(m62_state,battroad)
 {
-	m62_state *state = machine.driver_data<m62_state>();
-	m62_start(machine, tilemap_get_info_delegate(FUNC(m62_state::get_battroad_bg_tile_info),state), 1, 1, 8, 8, 64, 32);
-	m62_textlayer(machine, tilemap_get_info_delegate(FUNC(m62_state::get_battroad_fg_tile_info),state), 1, 1, 8, 8, 32, 32);
-	state->m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
-	state->m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
+	m62_start(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_battroad_bg_tile_info),this), 1, 1, 8, 8, 64, 32);
+	m62_textlayer(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_battroad_fg_tile_info),this), 1, 1, 8, 8, 32, 32);
+	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
+	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
 }
 
 SCREEN_UPDATE_IND16( battroad )
@@ -650,10 +642,9 @@ TILE_GET_INFO_MEMBER(m62_state::get_ldrun4_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code | ((color & 0xc0) << 2) | ((color & 0x20) << 5), color & 0x1f, 0);
 }
 
-VIDEO_START( ldrun4 )
+VIDEO_START_MEMBER(m62_state,ldrun4)
 {
-	m62_state *state = machine.driver_data<m62_state>();
-	m62_start(machine, tilemap_get_info_delegate(FUNC(m62_state::get_ldrun4_bg_tile_info),state), 1, 0, 8, 8, 64, 32);
+	m62_start(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_ldrun4_bg_tile_info),this), 1, 0, 8, 8, 64, 32);
 }
 
 SCREEN_UPDATE_IND16( ldrun4 )
@@ -691,11 +682,10 @@ TILE_GET_INFO_MEMBER(m62_state::get_lotlot_fg_tile_info)
 	SET_TILE_INFO_MEMBER(2, code | ((color & 0xc0) << 2), color & 0x1f, 0);
 }
 
-VIDEO_START( lotlot )
+VIDEO_START_MEMBER(m62_state,lotlot)
 {
-	m62_state *state = machine.driver_data<m62_state>();
-	m62_start(machine, tilemap_get_info_delegate(FUNC(m62_state::get_lotlot_bg_tile_info),state), 1, 1, 12, 10, 32, 64);
-	m62_textlayer(machine, tilemap_get_info_delegate(FUNC(m62_state::get_lotlot_fg_tile_info),state), 1, 1, 12, 10, 32, 64);
+	m62_start(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_lotlot_bg_tile_info),this), 1, 1, 12, 10, 32, 64);
+	m62_textlayer(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_lotlot_fg_tile_info),this), 1, 1, 12, 10, 32, 64);
 }
 
 SCREEN_UPDATE_IND16( lotlot )
@@ -752,17 +742,16 @@ TILE_GET_INFO_MEMBER(m62_state::get_kidniki_fg_tile_info)
 	SET_TILE_INFO_MEMBER(2, code | ( ( color & 0xc0 ) << 2 ), color & 0x1f, 0);
 }
 
-VIDEO_START( kidniki )
+VIDEO_START_MEMBER(m62_state,kidniki)
 {
-	m62_state *state = machine.driver_data<m62_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(m62_state::get_kidniki_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	state->m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
-	state->m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m62_state::get_kidniki_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
+	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
 
-	register_savestate(machine);
+	register_savestate(machine());
 
-	m62_textlayer(machine, tilemap_get_info_delegate(FUNC(m62_state::get_kidniki_fg_tile_info),state), 1, 1, 12, 8, 32, 64);
+	m62_textlayer(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_kidniki_fg_tile_info),this), 1, 1, 12, 8, 32, 64);
 }
 
 SCREEN_UPDATE_IND16( kidniki )
@@ -810,11 +799,10 @@ TILE_GET_INFO_MEMBER(m62_state::get_spelunkr_fg_tile_info)
 	SET_TILE_INFO_MEMBER(2, code | ((color & 0x10) << 4), (color & 0x0f) | (m_spelunkr_palbank << 4), 0);
 }
 
-VIDEO_START( spelunkr )
+VIDEO_START_MEMBER(m62_state,spelunkr)
 {
-	m62_state *state = machine.driver_data<m62_state>();
-	m62_start(machine, tilemap_get_info_delegate(FUNC(m62_state::get_spelunkr_bg_tile_info),state), 1, 1, 8, 8, 64, 64);
-	m62_textlayer(machine, tilemap_get_info_delegate(FUNC(m62_state::get_spelunkr_fg_tile_info),state), 1, 1, 12, 8, 32, 32);
+	m62_start(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_spelunkr_bg_tile_info),this), 1, 1, 8, 8, 64, 64);
+	m62_textlayer(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_spelunkr_fg_tile_info),this), 1, 1, 12, 8, 32, 32);
 }
 
 SCREEN_UPDATE_IND16( spelunkr )
@@ -854,11 +842,10 @@ TILE_GET_INFO_MEMBER(m62_state::get_spelunk2_bg_tile_info)
 	SET_TILE_INFO_MEMBER( 0, code | ((color & 0xf0) << 4), (color & 0x0f) | (m_spelunkr_palbank << 4), 0 );
 }
 
-VIDEO_START( spelunk2 )
+VIDEO_START_MEMBER(m62_state,spelunk2)
 {
-	m62_state *state = machine.driver_data<m62_state>();
-	m62_start(machine, tilemap_get_info_delegate(FUNC(m62_state::get_spelunk2_bg_tile_info),state), 1, 1, 8, 8, 64, 64);
-	m62_textlayer(machine, tilemap_get_info_delegate(FUNC(m62_state::get_spelunkr_fg_tile_info),state), 1, 1, 12, 8, 32, 32);
+	m62_start(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_spelunk2_bg_tile_info),this), 1, 1, 8, 8, 64, 64);
+	m62_textlayer(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_spelunkr_fg_tile_info),this), 1, 1, 12, 8, 32, 32);
 }
 
 SCREEN_UPDATE_IND16( spelunk2 )
@@ -899,13 +886,12 @@ TILE_GET_INFO_MEMBER(m62_state::get_youjyudn_fg_tile_info)
 	SET_TILE_INFO_MEMBER(2, code | ((color & 0xc0) << 2), (color & 0x0f), 0);
 }
 
-VIDEO_START( youjyudn )
+VIDEO_START_MEMBER(m62_state,youjyudn)
 {
-	m62_state *state = machine.driver_data<m62_state>();
-	m62_start(machine, tilemap_get_info_delegate(FUNC(m62_state::get_youjyudn_bg_tile_info),state), 1, 0, 8, 16, 64, 16);
-	m62_textlayer(machine, tilemap_get_info_delegate(FUNC(m62_state::get_youjyudn_fg_tile_info),state), 1, 1, 12, 8, 32, 32);
-	state->m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
-	state->m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
+	m62_start(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_youjyudn_bg_tile_info),this), 1, 0, 8, 16, 64, 16);
+	m62_textlayer(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_youjyudn_fg_tile_info),this), 1, 1, 12, 8, 32, 32);
+	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
+	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
 }
 
 SCREEN_UPDATE_IND16( youjyudn )
@@ -943,12 +929,11 @@ TILE_GET_INFO_MEMBER(m62_state::get_horizon_bg_tile_info)
 		tileinfo.group = 0;
 }
 
-VIDEO_START( horizon )
+VIDEO_START_MEMBER(m62_state,horizon)
 {
-	m62_state *state = machine.driver_data<m62_state>();
-	m62_start(machine, tilemap_get_info_delegate(FUNC(m62_state::get_horizon_bg_tile_info),state), 32, 0, 8, 8, 64, 32);
-	state->m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
-	state->m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
+	m62_start(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_horizon_bg_tile_info),this), 32, 0, 8, 8, 64, 32);
+	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
+	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
 }
 
 SCREEN_UPDATE_IND16( horizon )

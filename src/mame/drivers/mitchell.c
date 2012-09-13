@@ -1070,32 +1070,30 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( mitchell )
+MACHINE_START_MEMBER(mitchell_state,mitchell)
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
 
-	state->save_item(NAME(state->m_sample_buffer));
-	state->save_item(NAME(state->m_sample_select));
-	state->save_item(NAME(state->m_dial_selected));
-	state->save_item(NAME(state->m_keymatrix));
-	state->save_item(NAME(state->m_dir));
-	state->save_item(NAME(state->m_dial));
-	state->save_item(NAME(state->m_irq_source));
-//  state_save_register_global(machine, init_eeprom_count);
+	save_item(NAME(m_sample_buffer));
+	save_item(NAME(m_sample_select));
+	save_item(NAME(m_dial_selected));
+	save_item(NAME(m_keymatrix));
+	save_item(NAME(m_dir));
+	save_item(NAME(m_dial));
+	save_item(NAME(m_irq_source));
+//  state_save_register_global(machine(), init_eeprom_count);
 }
 
-static MACHINE_RESET( mitchell )
+MACHINE_RESET_MEMBER(mitchell_state,mitchell)
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
 
-	state->m_sample_buffer = 0;
-	state->m_sample_select = 0;
-	state->m_dial_selected = 0;
-	state->m_dial[0] = 0;
-	state->m_dial[1] = 0;
-	state->m_dir[0] = 0;
-	state->m_dir[1] = 0;
-	state->m_keymatrix = 0;
+	m_sample_buffer = 0;
+	m_sample_select = 0;
+	m_dial_selected = 0;
+	m_dial[0] = 0;
+	m_dial[1] = 0;
+	m_dir[0] = 0;
+	m_dir[1] = 0;
+	m_keymatrix = 0;
 }
 
 static TIMER_DEVICE_CALLBACK( mitchell_irq )
@@ -1119,8 +1117,8 @@ static MACHINE_CONFIG_START( mgakuen, mitchell_state )
 	MCFG_CPU_IO_MAP(mitchell_io_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", mitchell_irq, "screen", 0, 1)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
-	MCFG_MACHINE_START(mitchell)
-	MCFG_MACHINE_RESET(mitchell)
+	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
+	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
@@ -1135,7 +1133,7 @@ static MACHINE_CONFIG_START( mgakuen, mitchell_state )
 	MCFG_GFXDECODE(mgakuen)
 	MCFG_PALETTE_LENGTH(1024)	/* less colors than the others */
 
-	MCFG_VIDEO_START(pang)
+	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1156,8 +1154,8 @@ static MACHINE_CONFIG_START( pang, mitchell_state )
 	MCFG_CPU_IO_MAP(mitchell_io_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", mitchell_irq, "screen", 0, 1)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
-	MCFG_MACHINE_START(mitchell)
-	MCFG_MACHINE_RESET(mitchell)
+	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
+	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
 
 	MCFG_NVRAM_HANDLER(mitchell)
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
@@ -1172,7 +1170,7 @@ static MACHINE_CONFIG_START( pang, mitchell_state )
 	MCFG_GFXDECODE(mitchell)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(pang)
+	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 	MCFG_SCREEN_UPDATE_STATIC(pang)
 
 	/* sound hardware */
@@ -1259,8 +1257,8 @@ static MACHINE_CONFIG_START( mstworld, mitchell_state )
 	MCFG_CPU_ADD("audiocpu", Z80,6000000)		 /* 6 MHz? */
 	MCFG_CPU_PROGRAM_MAP(mstworld_sound_map)
 
-	MCFG_MACHINE_START(mitchell)
-	MCFG_MACHINE_RESET(mitchell)
+	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
+	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1272,7 +1270,7 @@ static MACHINE_CONFIG_START( mstworld, mitchell_state )
 	MCFG_GFXDECODE(mstworld)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(pang)
+	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 	MCFG_SCREEN_UPDATE_STATIC(pang)
 
 	/* sound hardware */
@@ -1304,7 +1302,7 @@ static MACHINE_CONFIG_START( marukin, mitchell_state )
 	MCFG_GFXDECODE(marukin)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(pang)
+	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 	MCFG_SCREEN_UPDATE_STATIC(pang)
 
 	/* sound hardware */
@@ -1356,7 +1354,7 @@ static MACHINE_CONFIG_START( pkladiesbl, mitchell_state )
 	MCFG_GFXDECODE(pkladiesbl)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(pang)
+	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 	MCFG_SCREEN_UPDATE_STATIC(pang)
 
 	/* sound hardware */

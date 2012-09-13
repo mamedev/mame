@@ -160,22 +160,20 @@ static void get_panther_pens(running_machine &machine, pen_t *pens)
  *
  *************************************/
 
-static VIDEO_START( redalert )
+VIDEO_START_MEMBER(redalert_state,redalert)
 {
-	redalert_state *state = machine.driver_data<redalert_state>();
-	state->m_bitmap_colorram = auto_alloc_array(machine, UINT8, 0x0400);
+	m_bitmap_colorram = auto_alloc_array(machine(), UINT8, 0x0400);
 
-	state->save_pointer(NAME(state->m_bitmap_colorram), 0x0400);
+	save_pointer(NAME(m_bitmap_colorram), 0x0400);
 
-	state->m_control_xor = 0x00;
+	m_control_xor = 0x00;
 }
 
-static VIDEO_START( ww3 )
+VIDEO_START_MEMBER(redalert_state,ww3)
 {
-	redalert_state *state = machine.driver_data<redalert_state>();
-	VIDEO_START_CALL( redalert );
+	VIDEO_START_CALL_MEMBER( redalert );
 
-	state->m_control_xor = 0x04;
+	m_control_xor = 0x04;
 }
 
 
@@ -416,14 +414,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( redalert_video )
 
-	MCFG_VIDEO_START(redalert)
+	MCFG_VIDEO_START_OVERRIDE(redalert_state,redalert)
 	MCFG_FRAGMENT_ADD( redalert_video_common )
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( ww3_video )
 
-	MCFG_VIDEO_START( ww3 )
+	MCFG_VIDEO_START_OVERRIDE(redalert_state, ww3 )
 	MCFG_FRAGMENT_ADD( redalert_video_common )
 
 MACHINE_CONFIG_END
@@ -436,7 +434,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 MACHINE_CONFIG_FRAGMENT( demoneye_video )
-	MCFG_VIDEO_START(redalert)
+	MCFG_VIDEO_START_OVERRIDE(redalert_state,redalert)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -449,7 +447,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( panther_video )
 
-	MCFG_VIDEO_START(ww3)
+	MCFG_VIDEO_START_OVERRIDE(redalert_state,ww3)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

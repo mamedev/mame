@@ -52,6 +52,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(pia1_cb1_in);
 	UINT8 m_term_data;
 	bool m_term_key;
+	virtual void machine_reset();
 };
 
 
@@ -82,7 +83,7 @@ static INPUT_PORTS_START( poly )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET( poly )
+void poly_state::machine_reset()
 {
 }
 
@@ -180,7 +181,6 @@ static MACHINE_CONFIG_START( poly, poly_state )
 	MCFG_CPU_ADD("maincpu", M6809E, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(poly_mem)
 
-	MCFG_MACHINE_RESET(poly)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -34,6 +34,8 @@ public:
 	DECLARE_WRITE8_MEMBER(bssoccer_DAC4_w);
 	DECLARE_WRITE8_MEMBER(bestbest_ay8910_port_a_w);
 	DECLARE_DRIVER_INIT(uballoon);
+	virtual void video_start();
+	DECLARE_MACHINE_RESET(uballoon);
 };
 
 
@@ -41,6 +43,6 @@ public:
 
 
 
-VIDEO_START( suna16 );
+
 SCREEN_UPDATE_IND16( suna16 );
 SCREEN_UPDATE_IND16( bestbest );

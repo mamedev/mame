@@ -72,26 +72,24 @@ TILE_GET_INFO_MEMBER(wc90_state::track_get_fg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( wc90 )
+void wc90_state::video_start()
 {
-	wc90_state *state = machine.driver_data<wc90_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wc90_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,     16,16,64,32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wc90_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,16,16,64,32);
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wc90_state::get_tx_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wc90_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,     16,16,64,32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wc90_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wc90_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
-	state->m_tx_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
 }
 
-VIDEO_START( wc90t )
+VIDEO_START_MEMBER(wc90_state,wc90t)
 {
-	wc90_state *state = machine.driver_data<wc90_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wc90_state::track_get_bg_tile_info),state),TILEMAP_SCAN_ROWS,     16,16,64,32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wc90_state::track_get_fg_tile_info),state),TILEMAP_SCAN_ROWS,16,16,64,32);
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wc90_state::get_tx_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wc90_state::track_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,     16,16,64,32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wc90_state::track_get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wc90_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
-	state->m_tx_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
 }
 
 

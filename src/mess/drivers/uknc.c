@@ -16,6 +16,8 @@ public:
 	uknc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -36,11 +38,11 @@ static INPUT_PORTS_START( uknc )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(uknc)
+void uknc_state::machine_reset()
 {
 }
 
-static VIDEO_START( uknc )
+void uknc_state::video_start()
 {
 }
 
@@ -65,7 +67,6 @@ static MACHINE_CONFIG_START( uknc, uknc_state )
 	MCFG_CPU_CONFIG(t11_data)
 	MCFG_CPU_PROGRAM_MAP(uknc_sub_mem)
 
-	MCFG_MACHINE_RESET(uknc)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -73,7 +74,6 @@ static MACHINE_CONFIG_START( uknc, uknc_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_VIDEO_START(uknc)
 	MCFG_SCREEN_UPDATE_STATIC(uknc)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

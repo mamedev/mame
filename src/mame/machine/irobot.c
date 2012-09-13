@@ -167,31 +167,30 @@ static TIMER_CALLBACK( scanline_callback )
     machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(scanline_callback), scanline);
 }
 
-MACHINE_RESET( irobot )
+void irobot_state::machine_reset()
 {
-	irobot_state *state = machine.driver_data<irobot_state>();
-	UINT8 *MB = state->memregion("mathbox")->base();
+	UINT8 *MB = memregion("mathbox")->base();
 
 	/* initialize the memory regions */
-	state->m_mbROM		= MB + 0x00000;
-	state->m_mbRAM		= MB + 0x0c000;
-	state->m_comRAM[0]	= MB + 0x0e000;
-	state->m_comRAM[1]	= MB + 0x0f000;
+	m_mbROM		= MB + 0x00000;
+	m_mbRAM		= MB + 0x0c000;
+	m_comRAM[0]	= MB + 0x0e000;
+	m_comRAM[1]	= MB + 0x0f000;
 
-	state->m_irvg_vblank=0;
-	state->m_irvg_running = 0;
-	state->m_irvg_timer = machine.device<timer_device>("irvg_timer");
-	state->m_irmb_running = 0;
-	state->m_irmb_timer = machine.device<timer_device>("irmb_timer");
+	m_irvg_vblank=0;
+	m_irvg_running = 0;
+	m_irvg_timer = machine().device<timer_device>("irvg_timer");
+	m_irmb_running = 0;
+	m_irmb_timer = machine().device<timer_device>("irmb_timer");
 
 	/* set an initial timer to go off on scanline 0 */
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0), FUNC(scanline_callback));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), FUNC(scanline_callback));
 
-	state->irobot_rom_banksel_w(*machine.device("maincpu")->memory().space(AS_PROGRAM),0,0);
-	state->irobot_out0_w(*machine.device("maincpu")->memory().space(AS_PROGRAM),0,0);
-	state->m_combase = state->m_comRAM[0];
-	state->m_combase_mb = state->m_comRAM[1];
-	state->m_outx = 0;
+	irobot_rom_banksel_w(*machine().device("maincpu")->memory().space(AS_PROGRAM),0,0);
+	irobot_out0_w(*machine().device("maincpu")->memory().space(AS_PROGRAM),0,0);
+	m_combase = m_comRAM[0];
+	m_combase_mb = m_comRAM[1];
+	m_outx = 0;
 }
 
 WRITE8_MEMBER(irobot_state::irobot_control_w)

@@ -56,6 +56,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass1;
 	required_device<cassette_image_device> m_cass2;
+	virtual void machine_start();
 };
 
 
@@ -68,6 +69,6 @@ void aim65_update_ds4(device_t *device, int digit, int data);
 void aim65_update_ds5(device_t *device, int digit, int data);
 
 
-MACHINE_START( aim65 );
+
 
 #endif /* AIM65_H_ */

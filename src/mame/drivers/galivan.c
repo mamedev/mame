@@ -375,63 +375,59 @@ GFXDECODE_END
 
 
 
-static MACHINE_START( galivan )
+MACHINE_START_MEMBER(galivan_state,galivan)
 {
-	galivan_state *state = machine.driver_data<galivan_state>();
 
 	/* configure ROM banking */
-	UINT8 *rombase = state->memregion("maincpu")->base();
-	state->membank("bank1")->configure_entries(0, 2, &rombase[0x10000], 0x2000);
-	state->membank("bank1")->set_entry(0);
+	UINT8 *rombase = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 2, &rombase[0x10000], 0x2000);
+	membank("bank1")->set_entry(0);
 
 	/* register for saving */
-	state->save_item(NAME(state->m_scrollx));
-	state->save_item(NAME(state->m_scrolly));
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_write_layers));
-	state->save_item(NAME(state->m_layers));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_write_layers));
+	save_item(NAME(m_layers));
 }
 
-static MACHINE_START( ninjemak )
+MACHINE_START_MEMBER(galivan_state,ninjemak)
 {
-	galivan_state *state = machine.driver_data<galivan_state>();
 
 	/* configure ROM banking */
-	UINT8 *rombase = state->memregion("maincpu")->base();
-	state->membank("bank1")->configure_entries(0, 4, &rombase[0x10000], 0x2000);
-	state->membank("bank1")->set_entry(0);
+	UINT8 *rombase = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 4, &rombase[0x10000], 0x2000);
+	membank("bank1")->set_entry(0);
 
 	/* register for saving */
-	state->save_item(NAME(state->m_scrollx));
-	state->save_item(NAME(state->m_scrolly));
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_ninjemak_dispdisable));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_ninjemak_dispdisable));
 }
 
-static MACHINE_RESET( galivan )
+MACHINE_RESET_MEMBER(galivan_state,galivan)
 {
-	galivan_state *state = machine.driver_data<galivan_state>();
 
-	machine.device("maincpu")->reset();
+	machine().device("maincpu")->reset();
 
-//  state->m_layers = 0x60;
-	state->m_layers = 0;
-	state->m_write_layers = 0;
-	state->m_galivan_scrollx[0] = state->m_galivan_scrollx[1] = 0;
-	state->m_galivan_scrolly[0] = state->m_galivan_scrolly[1] = 0;
-	state->m_flipscreen = 0;
+//  m_layers = 0x60;
+	m_layers = 0;
+	m_write_layers = 0;
+	m_galivan_scrollx[0] = m_galivan_scrollx[1] = 0;
+	m_galivan_scrolly[0] = m_galivan_scrolly[1] = 0;
+	m_flipscreen = 0;
 }
 
-static MACHINE_RESET( ninjemak )
+MACHINE_RESET_MEMBER(galivan_state,ninjemak)
 {
-	galivan_state *state = machine.driver_data<galivan_state>();
 
-	machine.device("maincpu")->reset();
+	machine().device("maincpu")->reset();
 
-	state->m_scrollx = 0;
-	state->m_scrolly = 0;
-	state->m_flipscreen = 0;
-	state->m_ninjemak_dispdisable = 0;
+	m_scrollx = 0;
+	m_scrolly = 0;
+	m_flipscreen = 0;
+	m_ninjemak_dispdisable = 0;
 }
 
 static MACHINE_CONFIG_START( galivan, galivan_state )
@@ -447,8 +443,8 @@ static MACHINE_CONFIG_START( galivan, galivan_state )
 	MCFG_CPU_IO_MAP(sound_io_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
 
-	MCFG_MACHINE_START(galivan)
-	MCFG_MACHINE_RESET(galivan)
+	MCFG_MACHINE_START_OVERRIDE(galivan_state,galivan)
+	MCFG_MACHINE_RESET_OVERRIDE(galivan_state,galivan)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -461,8 +457,7 @@ static MACHINE_CONFIG_START( galivan, galivan_state )
 	MCFG_GFXDECODE(galivan)
 	MCFG_PALETTE_LENGTH(8*16+16*16+256*16)
 
-	MCFG_PALETTE_INIT(galivan)
-	MCFG_VIDEO_START(galivan)
+	MCFG_VIDEO_START_OVERRIDE(galivan_state,galivan)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -490,8 +485,8 @@ static MACHINE_CONFIG_START( ninjemak, galivan_state )
 	MCFG_CPU_IO_MAP(sound_io_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
 
-	MCFG_MACHINE_START(ninjemak)
-	MCFG_MACHINE_RESET(ninjemak)
+	MCFG_MACHINE_START_OVERRIDE(galivan_state,ninjemak)
+	MCFG_MACHINE_RESET_OVERRIDE(galivan_state,ninjemak)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -504,8 +499,7 @@ static MACHINE_CONFIG_START( ninjemak, galivan_state )
 	MCFG_GFXDECODE(ninjemak)
 	MCFG_PALETTE_LENGTH(8*16+16*16+256*16)
 
-	MCFG_PALETTE_INIT(galivan)
-	MCFG_VIDEO_START(ninjemak)
+	MCFG_VIDEO_START_OVERRIDE(galivan_state,ninjemak)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -143,6 +143,43 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_l_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_r_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_MACHINE_RESET(ctsttape);
+	DECLARE_MACHINE_RESET(cprogolfj);
+	DECLARE_MACHINE_RESET(cdsteljn);
+	DECLARE_MACHINE_RESET(cfishing);
+	DECLARE_MACHINE_RESET(chwy);
+	DECLARE_MACHINE_RESET(cterrani);
+	DECLARE_MACHINE_RESET(castfant);
+	DECLARE_MACHINE_RESET(csuperas);
+	DECLARE_MACHINE_RESET(clocknch);
+	DECLARE_MACHINE_RESET(cprogolf);
+	DECLARE_MACHINE_RESET(cluckypo);
+	DECLARE_MACHINE_RESET(ctisland);
+	DECLARE_MACHINE_RESET(cexplore);
+	DECLARE_MACHINE_RESET(cdiscon1);
+	DECLARE_MACHINE_RESET(ctornado);
+	DECLARE_MACHINE_RESET(cmissnx);
+	DECLARE_MACHINE_RESET(cptennis);
+	DECLARE_MACHINE_RESET(cbtime);
+	DECLARE_MACHINE_RESET(cburnrub);
+	DECLARE_MACHINE_RESET(cgraplop);
+	DECLARE_MACHINE_RESET(cgraplop2);
+	DECLARE_MACHINE_RESET(clapapa);
+	DECLARE_MACHINE_RESET(cskater);
+	DECLARE_MACHINE_RESET(cprobowl);
+	DECLARE_MACHINE_RESET(cnightst);
+	DECLARE_MACHINE_RESET(cpsoccer);
+	DECLARE_MACHINE_RESET(csdtenis);
+	DECLARE_MACHINE_RESET(czeroize);
+	DECLARE_MACHINE_RESET(cppicf);
+	DECLARE_MACHINE_RESET(cfghtice);
+	DECLARE_MACHINE_RESET(type4);
+	DECLARE_MACHINE_RESET(cbdash);
+	DECLARE_MACHINE_RESET(cflyball);
 };
 
 
@@ -170,41 +207,41 @@ WRITE8_HANDLER( decocass_e5xx_w );
 WRITE8_HANDLER( decocass_de0091_w );
 WRITE8_HANDLER( decocass_e900_w );
 
-MACHINE_START( decocass );
-MACHINE_RESET( decocass );
-MACHINE_RESET( ctsttape );
-MACHINE_RESET( chwy );
-MACHINE_RESET( cdsteljn );
-MACHINE_RESET( cfishing );
-MACHINE_RESET( cterrani );
-MACHINE_RESET( castfant );
-MACHINE_RESET( csuperas );
-MACHINE_RESET( clocknch );
-MACHINE_RESET( cprogolf );
-MACHINE_RESET( cprogolfj );
-MACHINE_RESET( cluckypo );
-MACHINE_RESET( ctisland );
-MACHINE_RESET( cexplore );
-MACHINE_RESET( cdiscon1 );
-MACHINE_RESET( ctornado );
-MACHINE_RESET( cmissnx );
-MACHINE_RESET( cptennis );
-MACHINE_RESET( cbtime );
-MACHINE_RESET( cburnrub );
-MACHINE_RESET( cgraplop );
-MACHINE_RESET( cgraplop2 );
-MACHINE_RESET( cskater );
-MACHINE_RESET( clapapa );
-MACHINE_RESET( cprobowl );
-MACHINE_RESET( cnightst );
-MACHINE_RESET( cpsoccer );
-MACHINE_RESET( csdtenis );
-MACHINE_RESET( czeroize );
-MACHINE_RESET( cppicf );
-MACHINE_RESET( cfghtice );
-MACHINE_RESET( type4 );
-MACHINE_RESET( cflyball );
-MACHINE_RESET( cbdash );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 WRITE8_HANDLER( i8041_p1_w );
 READ8_HANDLER( i8041_p1_r );
@@ -237,7 +274,7 @@ WRITE8_HANDLER( decocass_part_v_shift_w );
 WRITE8_HANDLER( decocass_center_h_shift_space_w );
 WRITE8_HANDLER( decocass_center_v_shift_w );
 
-VIDEO_START( decocass );
+
 SCREEN_UPDATE_IND16( decocass );
 
 void decocass_video_state_save_init(running_machine &machine);

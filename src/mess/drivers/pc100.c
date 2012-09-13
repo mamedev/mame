@@ -60,9 +60,12 @@ public:
 		UINT8 addr;
 		UINT8 reg[8];
 	}m_crtc;
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
-static VIDEO_START( pc100 )
+void pc100_state::video_start()
 {
 }
 
@@ -327,16 +330,15 @@ static const struct pic8259_interface pc100_pic8259_config =
 	DEVCB_NULL
 };
 
-static MACHINE_START(pc100)
+void pc100_state::machine_start()
 {
-	pc100_state *state = machine.driver_data<pc100_state>();
 
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(pc100_irq_callback);
-	state->m_kanji_rom = (UINT16 *)(*machine.root_device().memregion("kanji"));
-	state->m_vram = (UINT16 *)(*state->memregion("vram"));
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(pc100_irq_callback);
+	m_kanji_rom = (UINT16 *)(*machine().root_device().memregion("kanji"));
+	m_vram = (UINT16 *)(*memregion("vram"));
 }
 
-static MACHINE_RESET(pc100)
+void pc100_state::machine_reset()
 {
 }
 
@@ -386,8 +388,6 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_CPU_IO_MAP(pc100_io)
 	MCFG_CPU_VBLANK_INT("screen",pc100_vblank_irq)
 
-	MCFG_MACHINE_START(pc100)
-	MCFG_MACHINE_RESET(pc100)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -395,7 +395,6 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 512-1)
-	MCFG_VIDEO_START(pc100)
 	MCFG_SCREEN_UPDATE_STATIC(pc100)
 	MCFG_GFXDECODE(pc100)
 	MCFG_PALETTE_LENGTH(16)

@@ -67,11 +67,10 @@ TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_B)
 
 ***************************************************************************/
 
-VIDEO_START( flkatck )
+void flkatck_state::video_start()
 {
-	flkatck_state *state = machine.driver_data<flkatck_state>();
-	state->m_k007121_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(flkatck_state::get_tile_info_A),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_k007121_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(flkatck_state::get_tile_info_B),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_k007121_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(flkatck_state::get_tile_info_A),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_k007121_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(flkatck_state::get_tile_info_B),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

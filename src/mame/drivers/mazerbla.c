@@ -139,6 +139,10 @@ public:
 	DECLARE_READ8_MEMBER(soundcommand_r);
 	DECLARE_DRIVER_INIT(mazerbla);
 	DECLARE_DRIVER_INIT(greatgun);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -161,42 +165,40 @@ public:
 
 ***************************************************************************/
 
-static PALETTE_INIT( mazerbla )
+void mazerbla_state::palette_init()
 {
-	mazerbla_state *state = machine.driver_data<mazerbla_state>();
 	static const int resistances_r[2]  = { 4700, 2200 };
 	static const int resistances_gb[3] = { 10000, 4700, 2200 };
 
 	/* just to calculate coefficients for later use */
 	compute_resistor_weights(0,	255,	-1.0,
-			3,	resistances_gb,	state->m_weights_g,	3600,	0,
-			3,	resistances_gb,	state->m_weights_b,	3600,	0,
-			2,	resistances_r,	state->m_weights_r,	3600,	0);
+			3,	resistances_gb,	m_weights_g,	3600,	0,
+			3,	resistances_gb,	m_weights_b,	3600,	0,
+			2,	resistances_r,	m_weights_r,	3600,	0);
 
 }
 
-static VIDEO_START( mazerbla )
+void mazerbla_state::video_start()
 {
-	mazerbla_state *state = machine.driver_data<mazerbla_state>();
 
 #if 0
-	state->m_planes_enabled[0] = state->m_planes_enabled[1] = state->m_planes_enabled[2] = state->m_planes_enabled[3] = 1;
-	state->m_dbg_info = 1;
-	state->m_dbg_gfx_e = 1;
-	state->m_dbg_clr_e = 0;
-	state->m_dbg_vbank = 1;
-	state->m_dbg_lookup = 4;
+	m_planes_enabled[0] = m_planes_enabled[1] = m_planes_enabled[2] = m_planes_enabled[3] = 1;
+	m_dbg_info = 1;
+	m_dbg_gfx_e = 1;
+	m_dbg_clr_e = 0;
+	m_dbg_vbank = 1;
+	m_dbg_lookup = 4;
 #endif
 
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmaps[0]);
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmaps[1]);
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmaps[2]);
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmaps[3]);
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmaps[0]);
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmaps[1]);
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmaps[2]);
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmaps[3]);
 
-	state->save_item(NAME(state->m_tmpbitmaps[0]));
-	state->save_item(NAME(state->m_tmpbitmaps[1]));
-	state->save_item(NAME(state->m_tmpbitmaps[2]));
-	state->save_item(NAME(state->m_tmpbitmaps[3]));
+	save_item(NAME(m_tmpbitmaps[0]));
+	save_item(NAME(m_tmpbitmaps[1]));
+	save_item(NAME(m_tmpbitmaps[2]));
+	save_item(NAME(m_tmpbitmaps[3]));
 }
 
 #ifdef UNUSED_DEFINITION
@@ -1431,78 +1433,76 @@ static INTERRUPT_GEN( sound_interrupt )
  *
  *************************************/
 
-static MACHINE_START( mazerbla )
+void mazerbla_state::machine_start()
 {
-	mazerbla_state *state = machine.driver_data<mazerbla_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_subcpu = machine.device<cpu_device>("sub");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_subcpu = machine().device<cpu_device>("sub");
 
-	state->save_item(NAME(state->m_vcu_video_reg));
-	state->save_item(NAME(state->m_vcu_gfx_addr));
-	state->save_item(NAME(state->m_vcu_gfx_param_addr));
+	save_item(NAME(m_vcu_video_reg));
+	save_item(NAME(m_vcu_gfx_addr));
+	save_item(NAME(m_vcu_gfx_param_addr));
 
-	state->save_item(NAME(state->m_bknd_col));
-	state->save_item(NAME(state->m_port02_status));
-	state->save_item(NAME(state->m_vbank));
-	state->save_item(NAME(state->m_xpos));
-	state->save_item(NAME(state->m_ypos));
-	state->save_item(NAME(state->m_pix_xsize));
-	state->save_item(NAME(state->m_pix_ysize));
-	state->save_item(NAME(state->m_color1));
-	state->save_item(NAME(state->m_color2));
-	state->save_item(NAME(state->m_mode));
-	state->save_item(NAME(state->m_plane));
-	state->save_item(NAME(state->m_lookup_ram));
-	state->save_item(NAME(state->m_gfx_rom_bank));
+	save_item(NAME(m_bknd_col));
+	save_item(NAME(m_port02_status));
+	save_item(NAME(m_vbank));
+	save_item(NAME(m_xpos));
+	save_item(NAME(m_ypos));
+	save_item(NAME(m_pix_xsize));
+	save_item(NAME(m_pix_ysize));
+	save_item(NAME(m_color1));
+	save_item(NAME(m_color2));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_plane));
+	save_item(NAME(m_lookup_ram));
+	save_item(NAME(m_gfx_rom_bank));
 
-	state->save_item(NAME(state->m_ls670_0));
-	state->save_item(NAME(state->m_ls670_1));
+	save_item(NAME(m_ls670_0));
+	save_item(NAME(m_ls670_1));
 
-	state->save_item(NAME(state->m_zpu_int_vector));
+	save_item(NAME(m_zpu_int_vector));
 
-	state->save_item(NAME(state->m_bcd_7445));
+	save_item(NAME(m_bcd_7445));
 
-	state->save_item(NAME(state->m_vsb_ls273));
-	state->save_item(NAME(state->m_soundlatch));
+	save_item(NAME(m_vsb_ls273));
+	save_item(NAME(m_soundlatch));
 }
 
-static MACHINE_RESET( mazerbla )
+void mazerbla_state::machine_reset()
 {
-	mazerbla_state *state = machine.driver_data<mazerbla_state>();
 	int i;
 
-	state->m_zpu_int_vector = 0xff;
+	m_zpu_int_vector = 0xff;
 
-	state->m_bknd_col = 0xaa;
-	state->m_gfx_rom_bank = 0xff;
+	m_bknd_col = 0xaa;
+	m_gfx_rom_bank = 0xff;
 
-	state->m_vcu_gfx_addr = 0;
-	state->m_vcu_gfx_param_addr = 0;
-	state->m_port02_status = 0;
-	state->m_vbank = 0;
-	state->m_xpos = 0;
-	state->m_ypos = 0;
-	state->m_pix_xsize = 0;
-	state->m_pix_ysize = 0;
-	state->m_color1 = 0;
-	state->m_color2 = 0;
-	state->m_mode = 0;
-	state->m_plane = 0;
-	state->m_bcd_7445 = 0;
-	state->m_vsb_ls273 = 0;
-	state->m_soundlatch = 0;
+	m_vcu_gfx_addr = 0;
+	m_vcu_gfx_param_addr = 0;
+	m_port02_status = 0;
+	m_vbank = 0;
+	m_xpos = 0;
+	m_ypos = 0;
+	m_pix_xsize = 0;
+	m_pix_ysize = 0;
+	m_color1 = 0;
+	m_color2 = 0;
+	m_mode = 0;
+	m_plane = 0;
+	m_bcd_7445 = 0;
+	m_vsb_ls273 = 0;
+	m_soundlatch = 0;
 
 	for (i = 0; i < 4; i++)
 	{
-		state->m_vcu_video_reg[i] = 0;
-		state->m_ls670_0[i] = 0;
-		state->m_ls670_1[i] = 0;
+		m_vcu_video_reg[i] = 0;
+		m_ls670_0[i] = 0;
+		m_ls670_1[i] = 0;
 	}
 
-	memset(state->m_lookup_ram, 0, ARRAY_LENGTH(state->m_lookup_ram));
+	memset(m_lookup_ram, 0, ARRAY_LENGTH(m_lookup_ram));
 
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 }
 
 
@@ -1528,8 +1528,6 @@ static MACHINE_CONFIG_START( mazerbla, mazerbla_state )
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* synchronization forced on the fly */
-	MCFG_MACHINE_START(mazerbla)
-	MCFG_MACHINE_RESET(mazerbla)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1541,8 +1539,6 @@ static MACHINE_CONFIG_START( mazerbla, mazerbla_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(mazerbla)
-	MCFG_VIDEO_START(mazerbla)
 
 	/* sound hardware */
 MACHINE_CONFIG_END
@@ -1568,8 +1564,6 @@ static MACHINE_CONFIG_START( greatgun, mazerbla_state )
     */
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(mazerbla)
-	MCFG_MACHINE_RESET(mazerbla)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1581,8 +1575,6 @@ static MACHINE_CONFIG_START( greatgun, mazerbla_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(mazerbla)
-	MCFG_VIDEO_START(mazerbla)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

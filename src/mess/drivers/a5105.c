@@ -65,6 +65,7 @@ public:
 	UINT8 m_memsel[4];
 	virtual void machine_reset();
 	virtual void video_start();
+	virtual void palette_init();
 };
 
 /* TODO */
@@ -483,7 +484,7 @@ static GFXDECODE_START( a5105 )
 GFXDECODE_END
 
 
-static PALETTE_INIT( gdc )
+void a5105_state::palette_init()
 {
 	int i;
 	int r,g,b;
@@ -494,7 +495,7 @@ static PALETTE_INIT( gdc )
 		g = i & 2 ? ((i & 8) ? 0xaa : 0xff) : 0x00;
 		b = i & 1 ? ((i & 8) ? 0xaa : 0xff) : 0x00;
 
-		palette_set_color(machine, i, MAKE_RGB(r,g,b));
+		palette_set_color(machine(), i, MAKE_RGB(r,g,b));
 	}
 }
 
@@ -593,7 +594,6 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 25*8-1)
 	MCFG_GFXDECODE(a5105)
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT(gdc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

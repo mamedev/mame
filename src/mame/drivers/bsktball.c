@@ -35,33 +35,33 @@
  *
  *************************************/
 
-static PALETTE_INIT( bsktball )
+void bsktball_state::palette_init()
 {
 	int i;
 
-	machine.colortable = colortable_alloc(machine, 4);
+	machine().colortable = colortable_alloc(machine(), 4);
 
-	colortable_palette_set_color(machine.colortable,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-	colortable_palette_set_color(machine.colortable,1,MAKE_RGB(0x80,0x80,0x80)); /* LIGHT GREY */
-	colortable_palette_set_color(machine.colortable,2,MAKE_RGB(0x50,0x50,0x50)); /* DARK GREY */
-	colortable_palette_set_color(machine.colortable,3,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
+	colortable_palette_set_color(machine().colortable,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
+	colortable_palette_set_color(machine().colortable,1,MAKE_RGB(0x80,0x80,0x80)); /* LIGHT GREY */
+	colortable_palette_set_color(machine().colortable,2,MAKE_RGB(0x50,0x50,0x50)); /* DARK GREY */
+	colortable_palette_set_color(machine().colortable,3,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
 
 	/* playfield */
 	for (i = 0; i < 2; i++)
 	{
-		colortable_entry_set_value(machine.colortable, i*4 + 0, 1);
-		colortable_entry_set_value(machine.colortable, i*4 + 1, 3 * i);
-		colortable_entry_set_value(machine.colortable, i*4 + 2, 3 * i);
-		colortable_entry_set_value(machine.colortable, i*4 + 3, 3 * i);
+		colortable_entry_set_value(machine().colortable, i*4 + 0, 1);
+		colortable_entry_set_value(machine().colortable, i*4 + 1, 3 * i);
+		colortable_entry_set_value(machine().colortable, i*4 + 2, 3 * i);
+		colortable_entry_set_value(machine().colortable, i*4 + 3, 3 * i);
 	}
 
 	/* motion */
 	for (i = 0; i < 4*4*4; i++)
 	{
-		colortable_entry_set_value(machine.colortable, 2*4 + i*4 + 0, 1);
-		colortable_entry_set_value(machine.colortable, 2*4 + i*4 + 1, (i >> 2) & 3);
-		colortable_entry_set_value(machine.colortable, 2*4 + i*4 + 2, (i >> 0) & 3);
-		colortable_entry_set_value(machine.colortable, 2*4 + i*4 + 3, (i >> 4) & 3);
+		colortable_entry_set_value(machine().colortable, 2*4 + i*4 + 0, 1);
+		colortable_entry_set_value(machine().colortable, 2*4 + i*4 + 1, (i >> 2) & 3);
+		colortable_entry_set_value(machine().colortable, 2*4 + i*4 + 2, (i >> 0) & 3);
+		colortable_entry_set_value(machine().colortable, 2*4 + i*4 + 3, (i >> 4) & 3);
 	}
 }
 
@@ -209,40 +209,38 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( bsktball )
+void bsktball_state::machine_start()
 {
-	bsktball_state *state = machine.driver_data<bsktball_state>();
 
-	state->save_item(NAME(state->m_nmi_on));
-//  state->save_item(NAME(state->m_i256v));
-	state->save_item(NAME(state->m_ld1));
-	state->save_item(NAME(state->m_ld2));
-	state->save_item(NAME(state->m_dir0));
-	state->save_item(NAME(state->m_dir1));
-	state->save_item(NAME(state->m_dir2));
-	state->save_item(NAME(state->m_dir3));
-	state->save_item(NAME(state->m_last_p1_horiz));
-	state->save_item(NAME(state->m_last_p1_vert));
-	state->save_item(NAME(state->m_last_p2_horiz));
-	state->save_item(NAME(state->m_last_p2_vert));
+	save_item(NAME(m_nmi_on));
+//  save_item(NAME(m_i256v));
+	save_item(NAME(m_ld1));
+	save_item(NAME(m_ld2));
+	save_item(NAME(m_dir0));
+	save_item(NAME(m_dir1));
+	save_item(NAME(m_dir2));
+	save_item(NAME(m_dir3));
+	save_item(NAME(m_last_p1_horiz));
+	save_item(NAME(m_last_p1_vert));
+	save_item(NAME(m_last_p2_horiz));
+	save_item(NAME(m_last_p2_vert));
 }
 
-static MACHINE_RESET( bsktball )
+void bsktball_state::machine_reset()
 {
-	bsktball_state *state = machine.driver_data<bsktball_state>();
 
-	state->m_nmi_on = 0;
-//  state->m_i256v = 0;
-	state->m_ld1 = 0;
-	state->m_ld2 = 0;
-	state->m_dir0 = 0;
-	state->m_dir1 = 0;
-	state->m_dir2 = 0;
-	state->m_dir3 = 0;
-	state->m_last_p1_horiz = 0;
-	state->m_last_p1_vert = 0;
-	state->m_last_p2_horiz = 0;
-	state->m_last_p2_vert = 0;
+	m_nmi_on = 0;
+//  m_i256v = 0;
+	m_ld1 = 0;
+	m_ld2 = 0;
+	m_dir0 = 0;
+	m_dir1 = 0;
+	m_dir2 = 0;
+	m_dir3 = 0;
+	m_last_p1_horiz = 0;
+	m_last_p1_vert = 0;
+	m_last_p2_horiz = 0;
+	m_last_p2_vert = 0;
 }
 
 
@@ -253,8 +251,6 @@ static MACHINE_CONFIG_START( bsktball, bsktball_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", bsktball_scanline, "screen", 0, 1)
 
-	MCFG_MACHINE_START(bsktball)
-	MCFG_MACHINE_RESET(bsktball)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -267,8 +263,6 @@ static MACHINE_CONFIG_START( bsktball, bsktball_state )
 	MCFG_GFXDECODE(bsktball)
 	MCFG_PALETTE_LENGTH(2*4 + 4*4*4*4)
 
-	MCFG_PALETTE_INIT(bsktball)
-	MCFG_VIDEO_START(bsktball)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

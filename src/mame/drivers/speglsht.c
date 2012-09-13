@@ -131,6 +131,8 @@ public:
 	DECLARE_READ32_MEMBER(cop_r);
 	DECLARE_READ32_MEMBER(irq_ack_clear);
 	DECLARE_DRIVER_INIT(speglsht);
+	DECLARE_MACHINE_RESET(speglsht);
+	DECLARE_VIDEO_START(speglsht);
 };
 
 
@@ -330,17 +332,15 @@ static const r3000_cpu_core r3000_config =
 	2048	/* data cache size */
 };
 
-static MACHINE_RESET(speglsht)
+MACHINE_RESET_MEMBER(speglsht_state,speglsht)
 {
-	speglsht_state *state = machine.driver_data<speglsht_state>();
-	memset(state->m_shared,0,0x1000);
+	memset(m_shared,0,0x1000);
 }
 
-static VIDEO_START(speglsht)
+VIDEO_START_MEMBER(speglsht_state,speglsht)
 {
-	speglsht_state *state = machine.driver_data<speglsht_state>();
-	state->m_bitmap = auto_bitmap_ind16_alloc(machine, 512, 5122 );
-	VIDEO_START_CALL(st0016);
+	m_bitmap = auto_bitmap_ind16_alloc(machine(), 512, 5122 );
+	VIDEO_START_CALL_MEMBER(st0016);
 }
 
 #define PLOT_PIXEL_RGB(x,y,r,g,b)	if(y>=0 && x>=0 && x<512 && y<512) \
@@ -399,7 +399,7 @@ static MACHINE_CONFIG_START( speglsht, speglsht_state )
 	MCFG_CPU_VBLANK_INT("screen", irq4_line_assert)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-	MCFG_MACHINE_RESET(speglsht)
+	MCFG_MACHINE_RESET_OVERRIDE(speglsht_state,speglsht)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -412,7 +412,7 @@ static MACHINE_CONFIG_START( speglsht, speglsht_state )
 	MCFG_GFXDECODE(speglsht)
 	MCFG_PALETTE_LENGTH(16*16*4+1)
 
-	MCFG_VIDEO_START(speglsht)
+	MCFG_VIDEO_START_OVERRIDE(speglsht_state,speglsht)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

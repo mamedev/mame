@@ -325,8 +325,8 @@ static MACHINE_CONFIG_START( ataxx, leland_state )
 	MCFG_CPU_PROGRAM_MAP(leland_80186_map_program)
 	MCFG_CPU_IO_MAP(ataxx_80186_map_io)
 
-	MCFG_MACHINE_START(ataxx)
-	MCFG_MACHINE_RESET(ataxx)
+	MCFG_MACHINE_START_OVERRIDE(leland_state,ataxx)
+	MCFG_MACHINE_RESET_OVERRIDE(leland_state,ataxx)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 	MCFG_NVRAM_ADD_0FILL("battery")

@@ -249,6 +249,12 @@ public:
 	DECLARE_DRIVER_INIT(m_grtecpss);
 	DECLARE_DRIVER_INIT(connect4);
 	DECLARE_DRIVER_INIT(m4altreels);
+	DECLARE_MACHINE_START(mod2);
+	DECLARE_MACHINE_RESET(mpu4);
+	DECLARE_MACHINE_START(mpu4yam);
+	DECLARE_MACHINE_START(mpu4oki);
+	DECLARE_MACHINE_START(mpu4bwb);
+	DECLARE_MACHINE_START(mpu4cry);
 };
 
 /* mpu4.c, used by mpu4vid.c */

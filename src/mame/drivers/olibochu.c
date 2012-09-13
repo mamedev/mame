@@ -82,16 +82,20 @@ public:
 	DECLARE_WRITE8_MEMBER(olibochu_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 
-static PALETTE_INIT( olibochu )
+void olibochu_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		UINT8 pen;
 		int bit0, bit1, bit2, r, g, b;
@@ -120,7 +124,7 @@ static PALETTE_INIT( olibochu )
 		bit1 = BIT(color_prom[pen], 7);
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -157,10 +161,9 @@ TILE_GET_INFO_MEMBER(olibochu_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
-static VIDEO_START( olibochu )
+void olibochu_state::video_start()
 {
-	olibochu_state *state = machine.driver_data<olibochu_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(olibochu_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(olibochu_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -417,18 +420,16 @@ GFXDECODE_END
 
 
 
-static MACHINE_START( olibochu )
+void olibochu_state::machine_start()
 {
-	olibochu_state *state = machine.driver_data<olibochu_state>();
 
-	state->save_item(NAME(state->m_cmd));
+	save_item(NAME(m_cmd));
 }
 
-static MACHINE_RESET( olibochu )
+void olibochu_state::machine_reset()
 {
-	olibochu_state *state = machine.driver_data<olibochu_state>();
 
-	state->m_cmd = 0;
+	m_cmd = 0;
 }
 
 static TIMER_DEVICE_CALLBACK( olibochu_scanline )
@@ -455,8 +456,6 @@ static MACHINE_CONFIG_START( olibochu, olibochu_state )
 
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_MACHINE_START(olibochu)
-	MCFG_MACHINE_RESET(olibochu)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -469,8 +468,6 @@ static MACHINE_CONFIG_START( olibochu, olibochu_state )
 	MCFG_GFXDECODE(olibochu)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_PALETTE_INIT(olibochu)
-	MCFG_VIDEO_START(olibochu)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

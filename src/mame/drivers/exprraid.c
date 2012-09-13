@@ -468,24 +468,22 @@ static INTERRUPT_GEN( exprraid_interrupt )
 #endif
 
 
-static MACHINE_START( exprraid )
+void exprraid_state::machine_start()
 {
-	exprraid_state *state = machine.driver_data<exprraid_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_slave = machine.device("slave");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_slave = machine().device("slave");
 
-	state->save_item(NAME(state->m_bg_index));
+	save_item(NAME(m_bg_index));
 }
 
-static MACHINE_RESET( exprraid )
+void exprraid_state::machine_reset()
 {
-	exprraid_state *state = machine.driver_data<exprraid_state>();
 
-	state->m_bg_index[0] = 0;
-	state->m_bg_index[1] = 0;
-	state->m_bg_index[2] = 0;
-	state->m_bg_index[3] = 0;
+	m_bg_index[0] = 0;
+	m_bg_index[1] = 0;
+	m_bg_index[2] = 0;
+	m_bg_index[3] = 0;
 }
 
 static MACHINE_CONFIG_START( exprraid, exprraid_state )
@@ -498,8 +496,6 @@ static MACHINE_CONFIG_START( exprraid, exprraid_state )
 	MCFG_CPU_ADD("slave", M6809, 2000000)        /* 2 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 								/* IRQs are caused by the YM3526 */
-	MCFG_MACHINE_START(exprraid)
-	MCFG_MACHINE_RESET(exprraid)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -513,7 +509,6 @@ static MACHINE_CONFIG_START( exprraid, exprraid_state )
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MCFG_VIDEO_START(exprraid)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -314,6 +314,7 @@ public:
 	DECLARE_DRIVER_INIT(gamshara);
 	DECLARE_DRIVER_INIT(mrdrilrg);
 	DECLARE_DRIVER_INIT(chocovdr);
+	DECLARE_MACHINE_RESET(namcos10);
 };
 
 
@@ -593,7 +594,7 @@ DRIVER_INIT_MEMBER(namcos10_state,nflclsfb)
 }
 
 
-static MACHINE_RESET( namcos10 )
+MACHINE_RESET_MEMBER(namcos10_state,namcos10)
 {
 }
 
@@ -602,7 +603,7 @@ static MACHINE_CONFIG_START( namcos10_memm, namcos10_state )
 	MCFG_CPU_ADD( "maincpu", CXD8606BQ, XTAL_101_4912MHz )
 	MCFG_CPU_PROGRAM_MAP( namcos10_memm_map )
 
-	MCFG_MACHINE_RESET( namcos10 )
+	MCFG_MACHINE_RESET_OVERRIDE(namcos10_state, namcos10 )
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x200000, XTAL_53_693175MHz )
@@ -616,7 +617,7 @@ static MACHINE_CONFIG_START( namcos10_memn, namcos10_state )
 	MCFG_CPU_ADD( "maincpu", CXD8606BQ, XTAL_101_4912MHz )
 	MCFG_CPU_PROGRAM_MAP( namcos10_memn_map )
 
-	MCFG_MACHINE_RESET( namcos10 )
+	MCFG_MACHINE_RESET_OVERRIDE(namcos10_state, namcos10 )
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x200000, XTAL_53_693175MHz )

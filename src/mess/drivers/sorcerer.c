@@ -425,8 +425,6 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	MCFG_CPU_PROGRAM_MAP(sorcerer_mem)
 	MCFG_CPU_IO_MAP(sorcerer_io)
 
-	MCFG_MACHINE_START( sorcerer )
-	MCFG_MACHINE_RESET( sorcerer )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -478,7 +476,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( sorcererd, sorcerer )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sorcererd_mem)
-	MCFG_MACHINE_START( sorcererd )
+	MCFG_MACHINE_START_OVERRIDE(sorcerer_state, sorcererd )
 	MCFG_MICROPOLIS_ADD("fdc", default_micropolis_interface )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(sorcerer_floppy_interface)
 	//MCFG_SOFTWARE_LIST_ADD("flop_list","sorcerer_flop") not created yet

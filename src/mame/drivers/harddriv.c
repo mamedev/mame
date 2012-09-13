@@ -1334,8 +1334,8 @@ static MACHINE_CONFIG_START( driver_nomsp, harddriv_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 
-	MCFG_MACHINE_START(harddriv)
-	MCFG_MACHINE_RESET(harddriv)
+	MCFG_MACHINE_START_OVERRIDE(harddriv_state,harddriv)
+	MCFG_MACHINE_RESET_OVERRIDE(harddriv_state,harddriv)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	MCFG_DUART68681_ADD("duart68681", XTAL_3_6864MHz, duart_config)
@@ -1348,7 +1348,7 @@ static MACHINE_CONFIG_START( driver_nomsp, harddriv_state )
 	MCFG_SCREEN_RAW_PARAMS(HARDDRIV_GSP_CLOCK/12*4, 160*4, 0, 127*4, 417, 0, 384)
 	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
 
-	MCFG_VIDEO_START(harddriv)
+	MCFG_VIDEO_START_OVERRIDE(harddriv_state,harddriv)
 MACHINE_CONFIG_END
 
 

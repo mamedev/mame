@@ -32,6 +32,7 @@ public:
 	DECLARE_WRITE8_MEMBER(spcforce_soundtrigger_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_WRITE8_MEMBER(spcforce_flip_screen_w);
+	virtual void palette_init();
 };
 
 

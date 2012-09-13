@@ -64,6 +64,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_2);
 	TILE_GET_INFO_MEMBER(get_tile_info_3);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_0)
@@ -114,19 +117,18 @@ TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_3)
 			0);
 }
 
-static VIDEO_START( umipoker )
+void umipoker_state::video_start()
 {
-	umipoker_state *state = machine.driver_data<umipoker_state>();
 
-	state->m_tilemap_0 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_0),state),TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_tilemap_1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_1),state),TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_tilemap_2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_2),state),TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_tilemap_3 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_3),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tilemap_0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_0),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tilemap_1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_1),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tilemap_2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_2),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tilemap_3 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_3),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
-	state->m_tilemap_0->set_transparent_pen(0);
-	state->m_tilemap_1->set_transparent_pen(0);
-	state->m_tilemap_2->set_transparent_pen(0);
-	state->m_tilemap_3->set_transparent_pen(0);
+	m_tilemap_0->set_transparent_pen(0);
+	m_tilemap_1->set_transparent_pen(0);
+	m_tilemap_2->set_transparent_pen(0);
+	m_tilemap_3->set_transparent_pen(0);
 
 }
 
@@ -645,15 +647,13 @@ static GFXDECODE_START( umipoker )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,     0, 0x40)
 GFXDECODE_END
 
-static MACHINE_START( umipoker )
+void umipoker_state::machine_start()
 {
-	//umipoker_state *state = machine.driver_data<_umipoker_state>();
 
 }
 
-static MACHINE_RESET( umipoker )
+void umipoker_state::machine_reset()
 {
-	//umipoker_state *state = machine.driver_data<_umipoker_state>();
 }
 
 // TODO: clocks
@@ -671,8 +671,6 @@ static MACHINE_CONFIG_START( umipoker, umipoker_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_MACHINE_START(umipoker)
-	MCFG_MACHINE_RESET(umipoker)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -686,7 +684,6 @@ static MACHINE_CONFIG_START( umipoker, umipoker_state )
 
 	MCFG_PALETTE_LENGTH(0x400)
 
-	MCFG_VIDEO_START(umipoker)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

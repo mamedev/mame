@@ -27,10 +27,9 @@ WRITE8_MEMBER(sbugger_state::sbugger_videoram_attr_w)
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-VIDEO_START(sbugger)
+void sbugger_state::video_start()
 {
-	sbugger_state *state = machine.driver_data<sbugger_state>();
-	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sbugger_state::get_sbugger_tile_info),state), TILEMAP_SCAN_ROWS, 8, 16, 64, 16);
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sbugger_state::get_sbugger_tile_info),this), TILEMAP_SCAN_ROWS, 8, 16, 64, 16);
 }
 
 SCREEN_UPDATE_IND16(sbugger)
@@ -41,20 +40,20 @@ SCREEN_UPDATE_IND16(sbugger)
 }
 
 /* not right but so we can see things ok */
-PALETTE_INIT(sbugger)
+void sbugger_state::palette_init()
 {
 	/* just some random colours for now */
 	int i;
 
 	for (i = 0;i < 256;i++)
 	{
-		int r = machine.rand()|0x80;
-		int g = machine.rand()|0x80;
-		int b = machine.rand()|0x80;
+		int r = machine().rand()|0x80;
+		int g = machine().rand()|0x80;
+		int b = machine().rand()|0x80;
 		if (i == 0) r = g = b = 0;
 
-		palette_set_color(machine,i*2+1,MAKE_RGB(r,g,b));
-		palette_set_color(machine,i*2,MAKE_RGB(0,0,0));
+		palette_set_color(machine(),i*2+1,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i*2,MAKE_RGB(0,0,0));
 
 	}
 

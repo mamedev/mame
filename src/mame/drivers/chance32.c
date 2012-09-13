@@ -59,6 +59,9 @@ public:
 	UINT8 mux_data;
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -85,17 +88,16 @@ TILE_GET_INFO_MEMBER(chance32_state::get_bg_tile_info)
 }
 
 
-VIDEO_START( chance32 )
+void chance32_state::video_start()
 {
-	chance32_state *state = machine.driver_data<chance32_state>();
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(chance32_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(chance32_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(chance32_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(chance32_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
 
-	state->m_fg_tilemap->set_flip(TILE_FLIPX|TILE_FLIPY);
-	state->m_bg_tilemap->set_flip(TILE_FLIPX|TILE_FLIPY);
+	m_fg_tilemap->set_flip(TILE_FLIPX|TILE_FLIPY);
+	m_bg_tilemap->set_flip(TILE_FLIPX|TILE_FLIPY);
 }
 
 
@@ -437,12 +439,12 @@ static GFXDECODE_START( chance32 )
 GFXDECODE_END
 
 
-static MACHINE_START( chance32 )
+void chance32_state::machine_start()
 {
 
 }
 
-static MACHINE_RESET( chance32 )
+void chance32_state::machine_reset()
 {
 
 }
@@ -471,8 +473,6 @@ static MACHINE_CONFIG_START( chance32, chance32_state )
 	MCFG_CPU_IO_MAP(chance32_portmap)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(chance32)
-	MCFG_MACHINE_RESET(chance32)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -488,7 +488,6 @@ static MACHINE_CONFIG_START( chance32, chance32_state )
 	MCFG_GFXDECODE(chance32)
 	MCFG_PALETTE_LENGTH(0x800)
 
-	MCFG_VIDEO_START(chance32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

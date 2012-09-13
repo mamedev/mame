@@ -93,20 +93,19 @@ static INTERRUPT_GEN( dcheese_vblank )
  *
  *************************************/
 
-static MACHINE_START( dcheese )
+void dcheese_state::machine_start()
 {
-	dcheese_state *state = machine.driver_data<dcheese_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_bsmt = machine.device("bsmt");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_bsmt = machine().device("bsmt");
 
-	state->m_maincpu->set_irq_acknowledge_callback(irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(irq_callback);
 
-	state->save_item(NAME(state->m_irq_state));
-	state->save_item(NAME(state->m_soundlatch_full));
-	state->save_item(NAME(state->m_sound_control));
-	state->save_item(NAME(state->m_sound_msb_latch));
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_soundlatch_full));
+	save_item(NAME(m_sound_control));
+	save_item(NAME(m_sound_msb_latch));
 }
 
 
@@ -416,7 +415,6 @@ static MACHINE_CONFIG_START( dcheese, dcheese_state )
 	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
 	MCFG_CPU_PERIODIC_INT(irq1_line_hold, 480)	/* accurate for fredmem */
 
-	MCFG_MACHINE_START(dcheese)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
@@ -430,8 +428,6 @@ static MACHINE_CONFIG_START( dcheese, dcheese_state )
 
 	MCFG_PALETTE_LENGTH(65534)
 
-	MCFG_PALETTE_INIT(dcheese)
-	MCFG_VIDEO_START(dcheese)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

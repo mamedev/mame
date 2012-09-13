@@ -49,6 +49,8 @@ public:
 	DECLARE_WRITE8_MEMBER(output_0_w);
 	DECLARE_READ8_MEMBER(input_1_r);
 	DECLARE_WRITE8_MEMBER(output_1_w);
+	DECLARE_MACHINE_START(cchance);
+	DECLARE_MACHINE_RESET(cchance);
 };
 
 
@@ -196,24 +198,22 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static MACHINE_START( cchance )
+MACHINE_START_MEMBER(cchance_state,cchance)
 {
-	cchance_state *state = machine.driver_data<cchance_state>();
-	state->m_mcu = NULL;
+	m_mcu = NULL;
 
-	state->save_item(NAME(state->m_screenflip));
-	state->save_item(NAME(state->m_hop_io));
-	state->save_item(NAME(state->m_bell_io));
+	save_item(NAME(m_screenflip));
+	save_item(NAME(m_hop_io));
+	save_item(NAME(m_bell_io));
 }
 
-static MACHINE_RESET( cchance )
+MACHINE_RESET_MEMBER(cchance_state,cchance)
 {
-	cchance_state *state = machine.driver_data<cchance_state>();
 
-	state->m_screenflip = 0;
-	state->m_mcu_type = -1;
-	state->m_hop_io = 0;
-	state->m_bell_io = 0;
+	m_screenflip = 0;
+	m_mcu_type = -1;
+	m_hop_io = 0;
+	m_bell_io = 0;
 
 }
 
@@ -223,8 +223,8 @@ static MACHINE_CONFIG_START( cchance, cchance_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(cchance)
-	MCFG_MACHINE_RESET(cchance)
+	MCFG_MACHINE_START_OVERRIDE(cchance_state,cchance)
+	MCFG_MACHINE_RESET_OVERRIDE(cchance_state,cchance)
 
 	MCFG_GFXDECODE(cchance)
 
@@ -240,7 +240,7 @@ static MACHINE_CONFIG_START( cchance, cchance_state )
 	MCFG_SCREEN_VBLANK_STATIC(tnzs)
 
 	MCFG_PALETTE_LENGTH(512)
-	MCFG_PALETTE_INIT(arknoid2)
+	MCFG_PALETTE_INIT_OVERRIDE(cchance_state,arknoid2)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

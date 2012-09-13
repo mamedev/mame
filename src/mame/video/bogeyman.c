@@ -2,9 +2,9 @@
 #include "includes/bogeyman.h"
 
 
-PALETTE_INIT( bogeyman )
+void bogeyman_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* first 16 colors are RAM */
@@ -31,7 +31,7 @@ PALETTE_INIT( bogeyman )
 		bit2 = (color_prom[256] >> 3) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i + 16, MAKE_RGB(r,g,b));
+		palette_set_color(machine(), i + 16, MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -90,13 +90,12 @@ TILE_GET_INFO_MEMBER(bogeyman_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(gfxbank, code, m_colbank, 0);
 }
 
-VIDEO_START( bogeyman )
+void bogeyman_state::video_start()
 {
-	bogeyman_state *state = machine.driver_data<bogeyman_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bogeyman_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bogeyman_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bogeyman_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bogeyman_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

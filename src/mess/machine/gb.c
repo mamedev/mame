@@ -245,139 +245,132 @@ static void gb_init(running_machine &machine)
 	state->m_gb_io[0x07] = 0xF8;		/* Upper bits of TIMEFRQ register are set to 1 */
 }
 
-MACHINE_START( gb )
+MACHINE_START_MEMBER(gb_state,gb)
 {
-	gb_state *state = machine.driver_data<gb_state>();
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gb_machine_stop),&machine));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gb_machine_stop),&machine()));
 
 	/* Allocate the serial timer, and disable it */
-	state->m_gb_serial_timer = machine.scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
-	state->m_gb_serial_timer->enable( 0 );
+	m_gb_serial_timer = machine().scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
+	m_gb_serial_timer->enable( 0 );
 
-	MACHINE_START_CALL( gb_video );
+	MACHINE_START_CALL_MEMBER( gb_video );
 }
 
-MACHINE_START( gbc )
+MACHINE_START_MEMBER(gb_state,gbc)
 {
-	gb_state *state = machine.driver_data<gb_state>();
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gb_machine_stop),&machine));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gb_machine_stop),&machine()));
 
 	/* Allocate the serial timer, and disable it */
-	state->m_gb_serial_timer = machine.scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
-	state->m_gb_serial_timer->enable( 0 );
+	m_gb_serial_timer = machine().scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
+	m_gb_serial_timer->enable( 0 );
 
-	MACHINE_START_CALL( gbc_video );
+	MACHINE_START_CALL_MEMBER( gbc_video );
 }
 
-MACHINE_RESET( gb )
+MACHINE_RESET_MEMBER(gb_state,gb)
 {
-	gb_state *state = machine.driver_data<gb_state>();
-	gb_init(machine);
+	gb_init(machine());
 
-	gb_video_reset( machine, GB_VIDEO_DMG );
+	gb_video_reset( machine(), GB_VIDEO_DMG );
 
-	gb_rom16_0000( machine, state->m_ROMMap[state->m_ROMBank00] );
+	gb_rom16_0000( machine(), m_ROMMap[m_ROMBank00] );
 
 	/* Enable BIOS rom */
-	state->membank("bank5")->set_base(state->memregion("maincpu")->base() );
+	membank("bank5")->set_base(memregion("maincpu")->base() );
 
-	state->m_divcount = 0x0004;
+	m_divcount = 0x0004;
 }
 
 
-MACHINE_START( sgb )
+MACHINE_START_MEMBER(gb_state,sgb)
 {
-	gb_state *state = machine.driver_data<gb_state>();
 
-	state->m_sgb_packets = -1;
-	state->m_sgb_tile_data = auto_alloc_array_clear(machine, UINT8, 0x2000 );
+	m_sgb_packets = -1;
+	m_sgb_tile_data = auto_alloc_array_clear(machine(), UINT8, 0x2000 );
 
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gb_machine_stop),&machine));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gb_machine_stop),&machine()));
 
 	/* Allocate the serial timer, and disable it */
-	state->m_gb_serial_timer = machine.scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
-	state->m_gb_serial_timer->enable( 0 );
+	m_gb_serial_timer = machine().scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
+	m_gb_serial_timer->enable( 0 );
 
-	MACHINE_START_CALL( gb_video );
+	MACHINE_START_CALL_MEMBER( gb_video );
 }
 
-MACHINE_RESET( sgb )
+MACHINE_RESET_MEMBER(gb_state,sgb)
 {
-	gb_state *state = machine.driver_data<gb_state>();
-	gb_init(machine);
+	gb_init(machine());
 
-	gb_video_reset( machine, GB_VIDEO_SGB );
+	gb_video_reset( machine(), GB_VIDEO_SGB );
 
-	gb_init_regs(machine);
+	gb_init_regs(machine());
 
-	gb_rom16_0000( machine, state->m_ROMMap[state->m_ROMBank00] ? state->m_ROMMap[state->m_ROMBank00] : state->m_gb_dummy_rom_bank );
+	gb_rom16_0000( machine(), m_ROMMap[m_ROMBank00] ? m_ROMMap[m_ROMBank00] : m_gb_dummy_rom_bank );
 
 	/* Enable BIOS rom */
-	state->membank("bank5")->set_base(state->memregion("maincpu")->base() );
+	membank("bank5")->set_base(memregion("maincpu")->base() );
 
-	memset( state->m_sgb_tile_data, 0, 0x2000 );
+	memset( m_sgb_tile_data, 0, 0x2000 );
 
-	state->m_sgb_window_mask = 0;
-	memset( state->m_sgb_pal_map, 0, sizeof(state->m_sgb_pal_map) );
-	memset( state->m_sgb_atf_data, 0, sizeof(state->m_sgb_atf_data) );
+	m_sgb_window_mask = 0;
+	memset( m_sgb_pal_map, 0, sizeof(m_sgb_pal_map) );
+	memset( m_sgb_atf_data, 0, sizeof(m_sgb_atf_data) );
 
 	/* HACKS for Donkey Kong Land 2 + 3.
        For some reason that I haven't figured out, they store the tile
        data differently.  Hacks will go once I figure it out */
-	state->m_sgb_hack = 0;
+	m_sgb_hack = 0;
 
-	if (state->m_gb_cart)	// make sure cart is in
+	if (m_gb_cart)	// make sure cart is in
 	{
-		if( strncmp( (const char*)(state->m_gb_cart + 0x134), "DONKEYKONGLAND 2", 16 ) == 0 ||
-			strncmp( (const char*)(state->m_gb_cart + 0x134), "DONKEYKONGLAND 3", 16 ) == 0 )
-				state->m_sgb_hack = 1;
+		if( strncmp( (const char*)(m_gb_cart + 0x134), "DONKEYKONGLAND 2", 16 ) == 0 ||
+			strncmp( (const char*)(m_gb_cart + 0x134), "DONKEYKONGLAND 3", 16 ) == 0 )
+				m_sgb_hack = 1;
 	}
 
-	state->m_divcount = 0x0004;
+	m_divcount = 0x0004;
 }
 
-MACHINE_RESET( gbpocket )
+MACHINE_RESET_MEMBER(gb_state,gbpocket)
 {
-	gb_state *state = machine.driver_data<gb_state>();
-	gb_init(machine);
+	gb_init(machine());
 
-	gb_video_reset( machine, GB_VIDEO_MGB );
+	gb_video_reset( machine(), GB_VIDEO_MGB );
 
-	gb_init_regs(machine);
+	gb_init_regs(machine());
 
 	/* Initialize the Sound registers */
-	gb_sound_w(machine.device("custom"), 0x16,0x80);
-	gb_sound_w(machine.device("custom"), 0x15,0xF3);
-	gb_sound_w(machine.device("custom"), 0x14,0x77);
+	gb_sound_w(machine().device("custom"), 0x16,0x80);
+	gb_sound_w(machine().device("custom"), 0x15,0xF3);
+	gb_sound_w(machine().device("custom"), 0x14,0x77);
 
 	/* Enable BIOS rom if we have one */
-	gb_rom16_0000( machine, state->m_ROMMap[state->m_ROMBank00] ? state->m_ROMMap[state->m_ROMBank00] : state->m_gb_dummy_rom_bank );
+	gb_rom16_0000( machine(), m_ROMMap[m_ROMBank00] ? m_ROMMap[m_ROMBank00] : m_gb_dummy_rom_bank );
 
-	state->m_divcount = 0xABC8;
+	m_divcount = 0xABC8;
 }
 
-MACHINE_RESET( gbc )
+MACHINE_RESET_MEMBER(gb_state,gbc)
 {
-	gb_state *state = machine.driver_data<gb_state>();
 	int ii;
 
-	gb_init(machine);
+	gb_init(machine());
 
-	gb_video_reset( machine, GB_VIDEO_CGB );
+	gb_video_reset( machine(), GB_VIDEO_CGB );
 
-	gb_init_regs(machine);
+	gb_init_regs(machine());
 
-	gb_rom16_0000( machine, state->m_ROMMap[state->m_ROMBank00] ? state->m_ROMMap[state->m_ROMBank00] : state->m_gb_dummy_rom_bank );
+	gb_rom16_0000( machine(), m_ROMMap[m_ROMBank00] ? m_ROMMap[m_ROMBank00] : m_gb_dummy_rom_bank );
 
 	/* Enable BIOS rom */
-	state->membank("bank5")->set_base(machine.root_device().memregion("maincpu")->base() );
-	state->membank("bank6")->set_base(state->memregion("maincpu")->base() + 0x100 );
+	membank("bank5")->set_base(machine().root_device().memregion("maincpu")->base() );
+	membank("bank6")->set_base(memregion("maincpu")->base() + 0x100 );
 
 	/* Allocate memory for internal ram */
 	for( ii = 0; ii < 8; ii++ )
 	{
-		state->m_GBC_RAMMap[ii] = machine.device<ram_device>(RAM_TAG)->pointer() + CGB_START_RAM_BANKS + ii * 0x1000;
-		memset (state->m_GBC_RAMMap[ii], 0, 0x1000);
+		m_GBC_RAMMap[ii] = machine().device<ram_device>(RAM_TAG)->pointer() + CGB_START_RAM_BANKS + ii * 0x1000;
+		memset (m_GBC_RAMMap[ii], 0, 0x1000);
 	}
 }
 
@@ -2021,22 +2014,21 @@ READ8_MEMBER(gb_state::gbc_io2_r)
 
  ****************************************************************************/
 
-MACHINE_START( megaduck )
+MACHINE_START_MEMBER(gb_state,megaduck)
 {
-	gb_state *state = machine.driver_data<gb_state>();
 	/* Allocate the serial timer, and disable it */
-	state->m_gb_serial_timer = machine.scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
-	state->m_gb_serial_timer->enable( 0 );
+	m_gb_serial_timer = machine().scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
+	m_gb_serial_timer->enable( 0 );
 
-	MACHINE_START_CALL( gb_video );
+	MACHINE_START_CALL_MEMBER( gb_video );
 }
 
-MACHINE_RESET( megaduck )
+MACHINE_RESET_MEMBER(gb_state,megaduck)
 {
 	/* We may have to add some more stuff here, if not then it can be merged back into gb */
-	gb_init(machine);
+	gb_init(machine());
 
-	gb_video_reset( machine, GB_VIDEO_DMG );
+	gb_video_reset( machine(), GB_VIDEO_DMG );
 }
 
 /*

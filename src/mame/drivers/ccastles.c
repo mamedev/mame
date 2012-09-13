@@ -185,52 +185,50 @@ CUSTOM_INPUT_MEMBER(ccastles_state::get_vblank)
  *
  *************************************/
 
-static MACHINE_START( ccastles )
+void ccastles_state::machine_start()
 {
-	ccastles_state *state = machine.driver_data<ccastles_state>();
 	rectangle visarea;
 
 	/* initialize globals */
-	state->m_syncprom = state->memregion("proms")->base() + 0x000;
+	m_syncprom = memregion("proms")->base() + 0x000;
 
 	/* find the start of VBLANK in the SYNC PROM */
-	for (state->m_vblank_start = 0; state->m_vblank_start < 256; state->m_vblank_start++)
-		if ((state->m_syncprom[(state->m_vblank_start - 1) & 0xff] & 1) == 0 && (state->m_syncprom[state->m_vblank_start] & 1) != 0)
+	for (m_vblank_start = 0; m_vblank_start < 256; m_vblank_start++)
+		if ((m_syncprom[(m_vblank_start - 1) & 0xff] & 1) == 0 && (m_syncprom[m_vblank_start] & 1) != 0)
 			break;
-	if (state->m_vblank_start == 0)
-		state->m_vblank_start = 256;
+	if (m_vblank_start == 0)
+		m_vblank_start = 256;
 
 	/* find the end of VBLANK in the SYNC PROM */
-	for (state->m_vblank_end = 0; state->m_vblank_end < 256; state->m_vblank_end++)
-		if ((state->m_syncprom[(state->m_vblank_end - 1) & 0xff] & 1) != 0 && (state->m_syncprom[state->m_vblank_end] & 1) == 0)
+	for (m_vblank_end = 0; m_vblank_end < 256; m_vblank_end++)
+		if ((m_syncprom[(m_vblank_end - 1) & 0xff] & 1) != 0 && (m_syncprom[m_vblank_end] & 1) == 0)
 			break;
 
 	/* can't handle the wrapping case */
-	assert(state->m_vblank_end < state->m_vblank_start);
+	assert(m_vblank_end < m_vblank_start);
 
 	/* reconfigure the visible area to match */
-	visarea.set(0, 255, state->m_vblank_end, state->m_vblank_start - 1);
-	machine.primary_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
+	visarea.set(0, 255, m_vblank_end, m_vblank_start - 1);
+	machine().primary_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* configure the ROM banking */
-	state->membank("bank1")->configure_entries(0, 2, state->memregion("maincpu")->base() + 0xa000, 0x6000);
+	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0xa000, 0x6000);
 
 	/* create a timer for IRQs and set up the first callback */
-	state->m_irq_timer = machine.scheduler().timer_alloc(FUNC(clock_irq));
-	state->m_irq_state = 0;
-	schedule_next_irq(machine, 0);
+	m_irq_timer = machine().scheduler().timer_alloc(FUNC(clock_irq));
+	m_irq_state = 0;
+	schedule_next_irq(machine(), 0);
 
 	/* setup for save states */
-	state->save_item(NAME(state->m_irq_state));
-	state->save_item(NAME(state->m_nvram_store));
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_nvram_store));
 }
 
 
-static MACHINE_RESET( ccastles )
+void ccastles_state::machine_reset()
 {
-	ccastles_state *state = machine.driver_data<ccastles_state>();
-	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
-	state->m_irq_state = 0;
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_irq_state = 0;
 }
 
 
@@ -475,8 +473,6 @@ static MACHINE_CONFIG_START( ccastles, ccastles_state )
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_START(ccastles)
-	MCFG_MACHINE_RESET(ccastles)
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
 	MCFG_X2212_ADD_AUTOSAVE("nvram_4b")
@@ -490,7 +486,6 @@ static MACHINE_CONFIG_START( ccastles, ccastles_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, HTOTAL - 1, VTOTAL, 0, VTOTAL - 1)	/* will be adjusted later */
 	MCFG_SCREEN_UPDATE_STATIC(ccastles)
 
-	MCFG_VIDEO_START(ccastles)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

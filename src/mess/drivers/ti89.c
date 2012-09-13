@@ -502,10 +502,10 @@ UINT32 ti68k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-static PALETTE_INIT( ti68k )
+void ti68k_state::palette_init()
 {
-	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
+	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
+	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
 }
 
 static MACHINE_CONFIG_START( ti89, ti68k_state )
@@ -523,7 +523,6 @@ static MACHINE_CONFIG_START( ti89, ti68k_state )
     MCFG_SCREEN_SIZE(240, 128)
     MCFG_SCREEN_VISIBLE_AREA(0, 160-1, 0, 100-1)
     MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(ti68k)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_SHARP_UNK128MBIT_ADD("flash")	//should be LH28F320 for ti89t and v200 and LH28F160S3T for other models

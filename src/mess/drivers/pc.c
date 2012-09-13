@@ -958,8 +958,8 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START(pc)
-	MCFG_MACHINE_RESET(pc)
+	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
+	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
 	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
@@ -1040,8 +1040,8 @@ static MACHINE_CONFIG_START( europc, pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(europc, europc, I8088, 4772720*2, pc_frame_interrupt)
 
-	MCFG_MACHINE_START(pc)
-	MCFG_MACHINE_RESET(pc)
+	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
+	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
 	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
@@ -1090,8 +1090,8 @@ static MACHINE_CONFIG_START( t1000hx, pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(tandy1000, tandy1000, I8088, 8000000, pc_frame_interrupt)
 
-	MCFG_MACHINE_START(pc)
-	MCFG_MACHINE_RESET(pc)
+	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
+	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
 	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
@@ -1139,8 +1139,8 @@ static MACHINE_CONFIG_START( t1000_16, pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(tandy1000_16, tandy1000_16, I8086, XTAL_28_63636MHz / 3, pc_frame_interrupt)
 
-	MCFG_MACHINE_START(pc)
-	MCFG_MACHINE_RESET(tandy1000rl)
+	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
+	MCFG_MACHINE_RESET_OVERRIDE(pc_state,tandy1000rl)
 
 	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
@@ -1188,8 +1188,8 @@ static MACHINE_CONFIG_START( t1000_286, pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(tandy1000_286, tandy1000_286, I80286, XTAL_28_63636MHz / 2, pc_frame_interrupt)
 
-	MCFG_MACHINE_START(pc)
-	MCFG_MACHINE_RESET(pc)
+	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
+	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
 	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
@@ -1259,8 +1259,8 @@ static MACHINE_CONFIG_START( ibmpcjr, pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(ibmpcjr, ibmpcjr, I8088, 4900000, pcjr_frame_interrupt)	/* TODO: Get correct cpu frequency, probably XTAL_14_31818MHz/3 */
 
-	MCFG_MACHINE_START(pcjr)
-	MCFG_MACHINE_RESET(pcjr)
+	MCFG_MACHINE_START_OVERRIDE(pc_state,pcjr)
+	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pcjr)
 
 	MCFG_PIT8253_ADD( "pit8253", pcjr_pit8253_config )
 
@@ -1343,8 +1343,8 @@ static MACHINE_CONFIG_START( mc1502, pc_state )
 	MCFG_CPU_IO_MAP(mc1502_io)
 	MCFG_CPU_CONFIG(i86_address_mask)
 
-	MCFG_MACHINE_START(mc1502)
-	MCFG_MACHINE_RESET(pc)
+	MCFG_MACHINE_START_OVERRIDE(pc_state,mc1502)
+	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
 	MCFG_PIT8253_ADD( "pit8253", mc1502_pit8253_config )
 
@@ -1386,8 +1386,8 @@ static MACHINE_CONFIG_START( ec1841, pc_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START(pc)
-	MCFG_MACHINE_RESET(pc)
+	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
+	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
 	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
@@ -1434,8 +1434,8 @@ static MACHINE_CONFIG_START( iskr1031, pc_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START(pc)
-	MCFG_MACHINE_RESET(pc)
+	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
+	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
 	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
@@ -1488,8 +1488,8 @@ static MACHINE_CONFIG_START( iskr3104, pc_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START(pc)
-	MCFG_MACHINE_RESET(pc)
+	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
+	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
 	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
@@ -1541,8 +1541,8 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START(pc)
-	MCFG_MACHINE_RESET(pc)
+	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
+	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
 	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
@@ -1594,8 +1594,8 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START(pc)
-	MCFG_MACHINE_RESET(pc)
+	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
+	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
 	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
@@ -1647,8 +1647,8 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START(pc)
-	MCFG_MACHINE_RESET(pc)
+	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
+	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
 	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
@@ -1700,8 +1700,8 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START(pc)
-	MCFG_MACHINE_RESET(pc)
+	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
+	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
 	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 

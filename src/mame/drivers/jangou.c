@@ -81,6 +81,14 @@ public:
 	DECLARE_READ8_MEMBER(input_system_r);
 	DECLARE_DRIVER_INIT(jngolady);
 	DECLARE_DRIVER_INIT(luckygrl);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_MACHINE_START(jngolady);
+	DECLARE_MACHINE_RESET(jngolady);
+	DECLARE_MACHINE_START(common);
+	DECLARE_MACHINE_RESET(common);
 };
 
 
@@ -91,9 +99,9 @@ public:
  *************************************/
 
 /* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
-static PALETTE_INIT( jangou )
+void jangou_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double weights_rg[3], weights_b[2];
@@ -105,7 +113,7 @@ static PALETTE_INIT( jangou )
 			2, resistances_b,  weights_b,  0, 0,
 			0, 0, 0, 0, 0);
 
-	for (i = 0;i < machine.total_colors(); i++)
+	for (i = 0;i < machine().total_colors(); i++)
 	{
 		int bit0, bit1, bit2;
 		int r, g, b;
@@ -127,15 +135,14 @@ static PALETTE_INIT( jangou )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
-static VIDEO_START( jangou )
+void jangou_state::video_start()
 {
-	jangou_state *state = machine.driver_data<jangou_state>();
 
-	state->save_item(NAME(state->m_blit_buffer));
+	save_item(NAME(m_blit_buffer));
 }
 
 static SCREEN_UPDATE_IND16( jangou )
@@ -911,76 +918,70 @@ static SOUND_START( jangou )
  *
  *************************************/
 
-static MACHINE_START( common )
+MACHINE_START_MEMBER(jangou_state,common)
 {
-	jangou_state *state = machine.driver_data<jangou_state>();
 
-	state->m_cpu_0 = machine.device("cpu0");
-	state->m_cpu_1 = machine.device("cpu1");
-	state->m_cvsd = machine.device("cvsd");
-	state->m_nsc = machine.device("nsc");
+	m_cpu_0 = machine().device("cpu0");
+	m_cpu_1 = machine().device("cpu1");
+	m_cvsd = machine().device("cvsd");
+	m_nsc = machine().device("nsc");
 
-	state->save_item(NAME(state->m_pen_data));
-	state->save_item(NAME(state->m_blit_data));
-	state->save_item(NAME(state->m_mux_data));
+	save_item(NAME(m_pen_data));
+	save_item(NAME(m_blit_data));
+	save_item(NAME(m_mux_data));
 }
 
-static MACHINE_START( jangou )
+void jangou_state::machine_start()
 {
-	jangou_state *state = machine.driver_data<jangou_state>();
 
-	MACHINE_START_CALL(common);
+	MACHINE_START_CALL_MEMBER(common);
 
-	state->save_item(NAME(state->m_cvsd_shiftreg));
-	state->save_item(NAME(state->m_cvsd_shift_cnt));
+	save_item(NAME(m_cvsd_shiftreg));
+	save_item(NAME(m_cvsd_shift_cnt));
 }
 
-static MACHINE_START( jngolady )
+MACHINE_START_MEMBER(jangou_state,jngolady)
 {
-	jangou_state *state = machine.driver_data<jangou_state>();
 
-	MACHINE_START_CALL(common);
+	MACHINE_START_CALL_MEMBER(common);
 
-	state->save_item(NAME(state->m_adpcm_byte));
-	state->save_item(NAME(state->m_msm5205_vclk_toggle));
-	state->save_item(NAME(state->m_nsc_latch));
-	state->save_item(NAME(state->m_z80_latch));
+	save_item(NAME(m_adpcm_byte));
+	save_item(NAME(m_msm5205_vclk_toggle));
+	save_item(NAME(m_nsc_latch));
+	save_item(NAME(m_z80_latch));
 }
 
-static MACHINE_RESET( common )
+MACHINE_RESET_MEMBER(jangou_state,common)
 {
-	jangou_state *state = machine.driver_data<jangou_state>();
 	int i;
 
-	state->m_mux_data = 0;
+	m_mux_data = 0;
 
 	for (i = 0; i < 6; i++)
-		state->m_blit_data[i] = 0;
+		m_blit_data[i] = 0;
 
 	for (i = 0; i < 16; i++)
-		state->m_pen_data[i] = 0;
+		m_pen_data[i] = 0;
 }
 
-static MACHINE_RESET( jangou )
+void jangou_state::machine_reset()
 {
-	jangou_state *state = machine.driver_data<jangou_state>();
 
-	MACHINE_RESET_CALL(common);
+	MACHINE_RESET_CALL_MEMBER(common);
 
-	state->m_cvsd_shiftreg = 0;
-	state->m_cvsd_shift_cnt = 0;
+	m_cvsd_shiftreg = 0;
+	m_cvsd_shift_cnt = 0;
 }
 
-static MACHINE_RESET( jngolady )
+MACHINE_RESET_MEMBER(jangou_state,jngolady)
 {
-	jangou_state *state = machine.driver_data<jangou_state>();
 
-	MACHINE_RESET_CALL(common);
+	MACHINE_RESET_CALL_MEMBER(common);
 
-	state->m_adpcm_byte = 0;
-	state->m_msm5205_vclk_toggle = 0;
-	state->m_nsc_latch = 0;
-	state->m_z80_latch = 0;
+	m_adpcm_byte = 0;
+	m_msm5205_vclk_toggle = 0;
+	m_nsc_latch = 0;
+	m_z80_latch = 0;
 }
 
 /* Note: All frequencies and dividers are unverified */
@@ -996,11 +997,8 @@ static MACHINE_CONFIG_START( jangou, jangou_state )
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_IO_MAP(cpu1_io)
 
-	MCFG_MACHINE_START(jangou)
-	MCFG_MACHINE_RESET(jangou)
 
 	/* video hardware */
-	MCFG_PALETTE_INIT(jangou)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1011,7 +1009,6 @@ static MACHINE_CONFIG_START( jangou, jangou_state )
 
 	MCFG_PALETTE_LENGTH(32)
 
-	MCFG_VIDEO_START(jangou)
 
 	/* sound hardware */
 	MCFG_SOUND_START(jangou)
@@ -1040,8 +1037,8 @@ static MACHINE_CONFIG_DERIVED( jngolady, jangou )
 	MCFG_CPU_ADD("nsc", NSC8105, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(nsc_map)
 
-	MCFG_MACHINE_START(jngolady)
-	MCFG_MACHINE_RESET(jngolady)
+	MCFG_MACHINE_START_OVERRIDE(jangou_state,jngolady)
+	MCFG_MACHINE_RESET_OVERRIDE(jangou_state,jngolady)
 
 	/* sound hardware */
 	MCFG_SOUND_START(0)
@@ -1062,8 +1059,8 @@ static MACHINE_CONFIG_DERIVED( cntrygrl, jangou )
 
 	MCFG_DEVICE_REMOVE("cpu1")
 
-	MCFG_MACHINE_START(common)
-	MCFG_MACHINE_RESET(common)
+	MCFG_MACHINE_START_OVERRIDE(jangou_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(jangou_state,common)
 
 	/* sound hardware */
 	MCFG_SOUND_START(0)
@@ -1082,8 +1079,8 @@ static MACHINE_CONFIG_DERIVED( roylcrdn, jangou )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_MACHINE_START(common)
-	MCFG_MACHINE_RESET(common)
+	MCFG_MACHINE_START_OVERRIDE(jangou_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(jangou_state,common)
 
 	/* sound hardware */
 	MCFG_SOUND_START(0)

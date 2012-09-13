@@ -351,19 +351,18 @@ SNAPSHOT_LOAD(sorcerer)
 	return IMAGE_INIT_PASS;
 }
 
-MACHINE_START( sorcerer )
+void sorcerer_state::machine_start()
 {
-	sorcerer_state *state = machine.driver_data<sorcerer_state>();
-	state->m_cassette_timer = machine.scheduler().timer_alloc(FUNC(sorcerer_cassette_tc));
+	m_cassette_timer = machine().scheduler().timer_alloc(FUNC(sorcerer_cassette_tc));
 #if SORCERER_USING_RS232
-	state->m_serial_timer = machine.scheduler().timer_alloc(FUNC(sorcerer_serial_tc));
+	m_serial_timer = machine().scheduler().timer_alloc(FUNC(sorcerer_serial_tc));
 #endif
 
 	UINT16 endmem = 0xbfff;
 
-	address_space *space = state->m_maincpu->space(AS_PROGRAM);
+	address_space *space = m_maincpu->space(AS_PROGRAM);
 	/* configure RAM */
-	switch (state->m_ram->size())
+	switch (m_ram->size())
 	{
 	case 8*1024:
 		space->unmap_readwrite(0x2000, endmem);
@@ -379,19 +378,18 @@ MACHINE_START( sorcerer )
 	}
 }
 
-MACHINE_START( sorcererd )
+MACHINE_START_MEMBER(sorcerer_state,sorcererd)
 {
-	sorcerer_state *state = machine.driver_data<sorcerer_state>();
-	state->m_cassette_timer = machine.scheduler().timer_alloc(FUNC(sorcerer_cassette_tc));
+	m_cassette_timer = machine().scheduler().timer_alloc(FUNC(sorcerer_cassette_tc));
 #if SORCERER_USING_RS232
-	state->m_serial_timer = machine.scheduler().timer_alloc(FUNC(sorcerer_serial_tc));
+	m_serial_timer = machine().scheduler().timer_alloc(FUNC(sorcerer_serial_tc));
 #endif
 
 	UINT16 endmem = 0xbbff;
 
-	address_space *space = state->m_maincpu->space(AS_PROGRAM);
+	address_space *space = m_maincpu->space(AS_PROGRAM);
 	/* configure RAM */
-	switch (state->m_ram->size())
+	switch (m_ram->size())
 	{
 	case 8*1024:
 		space->unmap_readwrite(0x2000, endmem);
@@ -407,20 +405,19 @@ MACHINE_START( sorcererd )
 	}
 }
 
-MACHINE_RESET( sorcerer )
+void sorcerer_state::machine_reset()
 {
-	sorcerer_state *state = machine.driver_data<sorcerer_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Initialize cassette interface */
-	state->m_cass_data.output.length = 0;
-	state->m_cass_data.output.level = 1;
-	state->m_cass_data.input.length = 0;
-	state->m_cass_data.input.bit = 1;
+	m_cass_data.output.length = 0;
+	m_cass_data.output.level = 1;
+	m_cass_data.input.length = 0;
+	m_cass_data.input.bit = 1;
 
-	state->m_fe = 0xff;
-	state->sorcerer_fe_w(*space, 0, 0, 0xff);
+	m_fe = 0xff;
+	sorcerer_fe_w(*space, 0, 0, 0xff);
 
-	state->membank("boot")->set_entry(1);
-	machine.scheduler().timer_set(attotime::from_usec(10), FUNC(sorcerer_reset));
+	membank("boot")->set_entry(1);
+	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(sorcerer_reset));
 }

@@ -63,10 +63,12 @@ public:
 	DECLARE_DRIVER_INIT(dragnblz);
 	DECLARE_DRIVER_INIT(gunbird2);
 	DECLARE_DRIVER_INIT(s1945ii);
+	virtual void machine_start();
+	virtual void video_start();
 };
 
 /*----------- defined in video/psikyosh.c -----------*/
 
-VIDEO_START( psikyosh );
+
 SCREEN_UPDATE_RGB32( psikyosh );
 SCREEN_VBLANK( psikyosh );

@@ -257,34 +257,32 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( fcombat )
+void fcombat_state::machine_start()
 {
-	fcombat_state *state = machine.driver_data<fcombat_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
 
-	state->save_item(NAME(state->m_cocktail_flip));
-	state->save_item(NAME(state->m_char_palette));
-	state->save_item(NAME(state->m_sprite_palette));
-	state->save_item(NAME(state->m_char_bank));
-	state->save_item(NAME(state->m_fcombat_sh));
-	state->save_item(NAME(state->m_fcombat_sv));
-	state->save_item(NAME(state->m_tx));
-	state->save_item(NAME(state->m_ty));
+	save_item(NAME(m_cocktail_flip));
+	save_item(NAME(m_char_palette));
+	save_item(NAME(m_sprite_palette));
+	save_item(NAME(m_char_bank));
+	save_item(NAME(m_fcombat_sh));
+	save_item(NAME(m_fcombat_sv));
+	save_item(NAME(m_tx));
+	save_item(NAME(m_ty));
 }
 
-static MACHINE_RESET( fcombat )
+void fcombat_state::machine_reset()
 {
-	fcombat_state *state = machine.driver_data<fcombat_state>();
 
-	state->m_cocktail_flip = 0;
-	state->m_char_palette = 0;
-	state->m_sprite_palette = 0;
-	state->m_char_bank = 0;
-	state->m_fcombat_sh = 0;
-	state->m_fcombat_sv = 0;
-	state->m_tx = 0;
-	state->m_ty = 0;
+	m_cocktail_flip = 0;
+	m_char_palette = 0;
+	m_sprite_palette = 0;
+	m_char_bank = 0;
+	m_fcombat_sh = 0;
+	m_fcombat_sv = 0;
+	m_tx = 0;
+	m_ty = 0;
 }
 
 static MACHINE_CONFIG_START( fcombat, fcombat_state )
@@ -296,8 +294,6 @@ static MACHINE_CONFIG_START( fcombat, fcombat_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 10000000/3)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 
-	MCFG_MACHINE_START(fcombat)
-	MCFG_MACHINE_RESET(fcombat)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -307,8 +303,6 @@ static MACHINE_CONFIG_START( fcombat, fcombat_state )
 	MCFG_GFXDECODE(fcombat)
 	MCFG_PALETTE_LENGTH(256*3)
 
-	MCFG_PALETTE_INIT(fcombat)
-	MCFG_VIDEO_START(fcombat)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

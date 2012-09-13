@@ -116,15 +116,17 @@ public:
 	DECLARE_DRIVER_INIT(cpokerpk);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
+	DECLARE_VIDEO_START(cpokerpk);
 };
 
 
-static MACHINE_RESET( igs )
+void igspoker_state::machine_reset()
 {
-	igspoker_state *state = machine.driver_data<igspoker_state>();
-	state->m_nmi_enable	=	0;
-	state->m_hopper		=	0;
-	state->m_bg_enable	=	1;
+	m_nmi_enable	=	0;
+	m_hopper		=	0;
+	m_bg_enable	=	1;
 }
 
 
@@ -187,13 +189,12 @@ WRITE8_MEMBER(igspoker_state::fg_color_w)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-static VIDEO_START(igs_video)
+void igspoker_state::video_start()
 {
-	igspoker_state *state = machine.driver_data<igspoker_state>();
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,	8,  8,	64, 32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(igspoker_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,	8,  32,	64, 8);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,	8,  8,	64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igspoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,	8,  32,	64, 8);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 static SCREEN_UPDATE_IND16(igs_video)
@@ -209,10 +210,9 @@ static SCREEN_UPDATE_IND16(igs_video)
 	return 0;
 }
 
-static VIDEO_START(cpokerpk)
+VIDEO_START_MEMBER(igspoker_state,cpokerpk)
 {
-	igspoker_state *state = machine.driver_data<igspoker_state>();
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,	8,  8,	64, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,	8,  8,	64, 32);
 }
 
 static SCREEN_UPDATE_IND16(cpokerpk)
@@ -1773,7 +1773,6 @@ static MACHINE_CONFIG_START( igspoker, igspoker_state )
 	MCFG_CPU_IO_MAP(igspoker_io_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", igs_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET(igs)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1786,7 +1785,6 @@ static MACHINE_CONFIG_START( igspoker, igspoker_state )
 	MCFG_GFXDECODE(igspoker)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(igs_video)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1813,7 +1811,7 @@ static MACHINE_CONFIG_DERIVED( number10, igspoker )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(cpokerpk)
-	MCFG_VIDEO_START(cpokerpk)
+	MCFG_VIDEO_START_OVERRIDE(igspoker_state,cpokerpk)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_12MHz / 12, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

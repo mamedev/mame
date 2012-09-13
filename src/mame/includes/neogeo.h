@@ -203,6 +203,10 @@ public:
 	DECLARE_DRIVER_INIT(sbp);
 	DECLARE_DRIVER_INIT(mvs);
 	void mvs_install_protection(device_image_interface& image);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void video_reset();
 };
 
 
@@ -302,8 +306,8 @@ void matrimbl_decrypt(running_machine &machine);
 
 /*----------- defined in video/neogeo.c -----------*/
 
-VIDEO_START( neogeo );
-VIDEO_RESET( neogeo );
+
+
 SCREEN_UPDATE_RGB32( neogeo );
 
 

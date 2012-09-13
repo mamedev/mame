@@ -263,6 +263,9 @@ public:
 	DECLARE_DRIVER_INIT(peplussb);
 	DECLARE_DRIVER_INIT(peplussbw);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 static const UINT8  id_022[8] = { 0x00, 0x01, 0x04, 0x09, 0x13, 0x16, 0x18, 0x00 };
@@ -956,14 +959,13 @@ TILE_GET_INFO_MEMBER(peplus_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static VIDEO_START( peplus )
+void peplus_state::video_start()
 {
-	peplus_state *state = machine.driver_data<peplus_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(peplus_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
-	state->m_palette_ram = auto_alloc_array(machine, UINT8, 0x3000);
-	memset(state->m_palette_ram, 0, 0x3000);
-	state->m_palette_ram2 = auto_alloc_array(machine, UINT8, 0x3000);
-	memset(state->m_palette_ram2, 0, 0x3000);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(peplus_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
+	m_palette_ram = auto_alloc_array(machine(), UINT8, 0x3000);
+	memset(m_palette_ram, 0, 0x3000);
+	m_palette_ram2 = auto_alloc_array(machine(), UINT8, 0x3000);
+	memset(m_palette_ram2, 0, 0x3000);
 }
 
 static SCREEN_UPDATE_IND16( peplus )
@@ -974,9 +976,9 @@ static SCREEN_UPDATE_IND16( peplus )
 	return 0;
 }
 
-static PALETTE_INIT( peplus )
+void peplus_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 /*  prom bits
     7654 3210
     ---- -xxx   red component.
@@ -985,7 +987,7 @@ static PALETTE_INIT( peplus )
 */
 	int i;
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -1007,7 +1009,7 @@ static PALETTE_INIT( peplus )
 		bit2 = 0;
 		b = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -1307,29 +1309,28 @@ INPUT_PORTS_END
 *     Machine Reset      *
 *************************/
 
-static MACHINE_RESET( peplus )
+void peplus_state::machine_reset()
 {
 	/* AutoHold Feature Currently Disabled */
 #if 0
-	peplus_state *state = machine.driver_data<peplus_state>();
 
 	// pepp0158
-	state->m_program_ram[0xa19f] = 0x22; // RET - Disable Memory Test
-	state->m_program_ram[0xddea] = 0x22; // RET - Disable Program Checksum
-	state->m_autohold_addr = 0x5ffe; // AutoHold Address
+	m_program_ram[0xa19f] = 0x22; // RET - Disable Memory Test
+	m_program_ram[0xddea] = 0x22; // RET - Disable Program Checksum
+	m_autohold_addr = 0x5ffe; // AutoHold Address
 
 	// pepp0188
-	state->m_program_ram[0x9a8d] = 0x22; // RET - Disable Memory Test
-	state->m_program_ram[0xf429] = 0x22; // RET - Disable Program Checksum
-	state->m_autohold_addr = 0x742f; // AutoHold Address
+	m_program_ram[0x9a8d] = 0x22; // RET - Disable Memory Test
+	m_program_ram[0xf429] = 0x22; // RET - Disable Program Checksum
+	m_autohold_addr = 0x742f; // AutoHold Address
 
 	// pepp0516
-	state->m_program_ram[0x9a24] = 0x22; // RET - Disable Memory Test
-	state->m_program_ram[0xd61d] = 0x22; // RET - Disable Program Checksum
-	state->m_autohold_addr = 0x5e7e; // AutoHold Address
+	m_program_ram[0x9a24] = 0x22; // RET - Disable Memory Test
+	m_program_ram[0xd61d] = 0x22; // RET - Disable Program Checksum
+	m_autohold_addr = 0x5e7e; // AutoHold Address
 
-	if (state->m_autohold_addr)
-		state->m_program_ram[state->m_autohold_addr] = state->ioport("AUTOHOLD")->read_safe(0x00) & 0x01;
+	if (m_autohold_addr)
+		m_program_ram[m_autohold_addr] = ioport("AUTOHOLD")->read_safe(0x00) & 0x01;
 #endif
 }
 
@@ -1344,7 +1345,6 @@ static MACHINE_CONFIG_START( peplus, peplus_state )
 	MCFG_CPU_PROGRAM_MAP(peplus_map)
 	MCFG_CPU_IO_MAP(peplus_iomap)
 
-	MCFG_MACHINE_RESET(peplus)
 	MCFG_NVRAM_ADD_0FILL("cmos")
 
 	// video hardware
@@ -1360,8 +1360,6 @@ static MACHINE_CONFIG_START( peplus, peplus_state )
 	MCFG_MC6845_ADD("crtc", R6545_1, MC6845_CLOCK, mc6845_intf)
 	MCFG_I2CMEM_ADD("i2cmem", i2cmem_interface)
 
-	MCFG_PALETTE_INIT(peplus)
-	MCFG_VIDEO_START(peplus)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

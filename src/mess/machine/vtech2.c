@@ -116,22 +116,22 @@ static void laser_machine_init(running_machine &machine, int bank_mask, int vide
 		state->laser_bank_select_w(*machine.device("maincpu")->memory().space(AS_PROGRAM), i, 0);
 }
 
-MACHINE_RESET( laser350 )
+void vtech2_state::machine_reset()
 {
 	/* banks 0 to 3 only, optional ROM extension */
-	laser_machine_init(machine, 0xf00f, 3);
+	laser_machine_init(machine(), 0xf00f, 3);
 }
 
-MACHINE_RESET( laser500 )
+MACHINE_RESET_MEMBER(vtech2_state,laser500)
 {
 	/* banks 0 to 2, and 4-7 only , optional ROM extension */
-	laser_machine_init(machine, 0xf0f7, 7);
+	laser_machine_init(machine(), 0xf0f7, 7);
 }
 
-MACHINE_RESET( laser700 )
+MACHINE_RESET_MEMBER(vtech2_state,laser700)
 {
 	/* all banks except #3 */
-	laser_machine_init(machine, 0xfff7, 7);
+	laser_machine_init(machine(), 0xfff7, 7);
 }
 
 

@@ -87,13 +87,16 @@ public:
 	DECLARE_WRITE8_MEMBER(adpcm_data_w);
 	DECLARE_DRIVER_INIT(darius);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/darius.c -----------*/
 
 
-VIDEO_START( darius );
+
 SCREEN_UPDATE_IND16( darius_left );
 SCREEN_UPDATE_IND16( darius_middle );
 SCREEN_UPDATE_IND16( darius_right );

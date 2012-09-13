@@ -61,19 +61,18 @@ WRITE16_MEMBER(shadfrce_state::shadfrce_bg1videoram_w)
 
 
 
-VIDEO_START( shadfrce )
+void shadfrce_state::video_start()
 {
-	shadfrce_state *state = machine.driver_data<shadfrce_state>();
 
-	state->m_fgtilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(shadfrce_state::get_shadfrce_fgtile_info),state),TILEMAP_SCAN_ROWS,    8,  8,64,32);
-	state->m_fgtilemap->set_transparent_pen(0);
+	m_fgtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(shadfrce_state::get_shadfrce_fgtile_info),this),TILEMAP_SCAN_ROWS,    8,  8,64,32);
+	m_fgtilemap->set_transparent_pen(0);
 
-	state->m_bg0tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(shadfrce_state::get_shadfrce_bg0tile_info),state),TILEMAP_SCAN_ROWS, 16, 16,32,32);
-	state->m_bg0tilemap->set_transparent_pen(0);
+	m_bg0tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(shadfrce_state::get_shadfrce_bg0tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);
+	m_bg0tilemap->set_transparent_pen(0);
 
-	state->m_bg1tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(shadfrce_state::get_shadfrce_bg1tile_info),state),TILEMAP_SCAN_ROWS, 16, 16,32,32);
+	m_bg1tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(shadfrce_state::get_shadfrce_bg1tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);
 
-	state->m_spvideoram_old = auto_alloc_array(machine, UINT16, state->m_spvideoram.bytes()/2);
+	m_spvideoram_old = auto_alloc_array(machine(), UINT16, m_spvideoram.bytes()/2);
 }
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_bg0scrollx_w)

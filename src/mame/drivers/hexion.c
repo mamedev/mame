@@ -241,7 +241,6 @@ static MACHINE_CONFIG_START( hexion, hexion_state )
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MCFG_VIDEO_START(hexion)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -22,6 +22,7 @@ public:
 	ddz_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	virtual void video_start();
 };
 
 
@@ -29,7 +30,7 @@ static ADDRESS_MAP_START( ddz_mem, AS_PROGRAM, 32, ddz_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
-static VIDEO_START(ddz)
+void ddz_state::video_start()
 {
 }
 
@@ -65,7 +66,7 @@ static MACHINE_CONFIG_START( ddz, ddz_state )
 	MCFG_CPU_PROGRAM_MAP(ddz_mem)
 	MCFG_CPU_VBLANK_INT("screen", ddz_interrupt)
 
-	//MCFG_MACHINE_RESET(ddz)
+	//MCFG_MACHINE_RESET_OVERRIDE(ddz_state,ddz)
 
 	//MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -79,7 +80,6 @@ static MACHINE_CONFIG_START( ddz, ddz_state )
 
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(ddz)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

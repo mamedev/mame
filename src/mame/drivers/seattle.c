@@ -494,6 +494,8 @@ public:
 	DECLARE_DRIVER_INIT(wg3dh);
 	DECLARE_DRIVER_INIT(mace);
 	DECLARE_DRIVER_INIT(blitz99);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -534,83 +536,81 @@ static SCREEN_UPDATE_RGB32( seattle )
  *
  *************************************/
 
-static MACHINE_START( seattle )
+void seattle_state::machine_start()
 {
-	seattle_state *state = machine.driver_data<seattle_state>();
 	int index;
 
-	state->m_voodoo = machine.device("voodoo");
+	m_voodoo = machine().device("voodoo");
 
 	/* allocate timers for the galileo */
-	state->m_galileo.timer[0].timer = machine.scheduler().timer_alloc(FUNC(galileo_timer_callback));
-	state->m_galileo.timer[1].timer = machine.scheduler().timer_alloc(FUNC(galileo_timer_callback));
-	state->m_galileo.timer[2].timer = machine.scheduler().timer_alloc(FUNC(galileo_timer_callback));
-	state->m_galileo.timer[3].timer = machine.scheduler().timer_alloc(FUNC(galileo_timer_callback));
+	m_galileo.timer[0].timer = machine().scheduler().timer_alloc(FUNC(galileo_timer_callback));
+	m_galileo.timer[1].timer = machine().scheduler().timer_alloc(FUNC(galileo_timer_callback));
+	m_galileo.timer[2].timer = machine().scheduler().timer_alloc(FUNC(galileo_timer_callback));
+	m_galileo.timer[3].timer = machine().scheduler().timer_alloc(FUNC(galileo_timer_callback));
 
 	/* set the fastest DRC options, but strict verification */
-	mips3drc_set_options(machine.device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	mips3drc_set_options(machine().device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine.device("maincpu"), 0x00000000, 0x007fffff, FALSE, state->m_rambase);
-	mips3drc_add_fastram(machine.device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  state->m_rombase);
+	mips3drc_add_fastram(machine().device("maincpu"), 0x00000000, 0x007fffff, FALSE, m_rambase);
+	mips3drc_add_fastram(machine().device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
 
 	/* register for save states */
-	state_save_register_global_array(machine, state->m_galileo.reg);
-	state_save_register_global(machine, state->m_galileo.dma_active);
-	state_save_register_global_array(machine, state->m_galileo.dma_stalled_on_voodoo);
-	state_save_register_global_array(machine, state->m_galileo.pci_bridge_regs);
-	state_save_register_global_array(machine, state->m_galileo.pci_3dfx_regs);
-	state_save_register_global_array(machine, state->m_galileo.pci_ide_regs);
-	for (index = 0; index < ARRAY_LENGTH(state->m_galileo.timer); index++)
+	state_save_register_global_array(machine(), m_galileo.reg);
+	state_save_register_global(machine(), m_galileo.dma_active);
+	state_save_register_global_array(machine(), m_galileo.dma_stalled_on_voodoo);
+	state_save_register_global_array(machine(), m_galileo.pci_bridge_regs);
+	state_save_register_global_array(machine(), m_galileo.pci_3dfx_regs);
+	state_save_register_global_array(machine(), m_galileo.pci_ide_regs);
+	for (index = 0; index < ARRAY_LENGTH(m_galileo.timer); index++)
 	{
-		state_save_register_item(machine, "galileo", NULL, index, state->m_galileo.timer[index].count);
-		state_save_register_item(machine, "galileo", NULL, index, state->m_galileo.timer[index].active);
+		state_save_register_item(machine(), "galileo", NULL, index, m_galileo.timer[index].count);
+		state_save_register_item(machine(), "galileo", NULL, index, m_galileo.timer[index].active);
 	}
-	state_save_register_global(machine, state->m_widget.ethernet_addr);
-	state_save_register_global(machine, state->m_widget.irq_num);
-	state_save_register_global(machine, state->m_widget.irq_mask);
-	state_save_register_global(machine, state->m_voodoo_stalled);
-	state_save_register_global(machine, state->m_cpu_stalled_on_voodoo);
-	state_save_register_global(machine, state->m_cpu_stalled_offset);
-	state_save_register_global(machine, state->m_cpu_stalled_data);
-	state_save_register_global(machine, state->m_cpu_stalled_mem_mask);
-	state_save_register_global(machine, state->m_board_config);
-	state_save_register_global(machine, state->m_ethernet_irq_num);
-	state_save_register_global(machine, state->m_ethernet_irq_state);
-	state_save_register_global(machine, state->m_vblank_irq_num);
-	state_save_register_global(machine, state->m_vblank_latch);
-	state_save_register_global(machine, state->m_vblank_state);
-	state_save_register_global(machine, state->m_pending_analog_read);
-	state_save_register_global(machine, state->m_status_leds);
-	state_save_register_global(machine, state->m_cmos_write_enabled);
+	state_save_register_global(machine(), m_widget.ethernet_addr);
+	state_save_register_global(machine(), m_widget.irq_num);
+	state_save_register_global(machine(), m_widget.irq_mask);
+	state_save_register_global(machine(), m_voodoo_stalled);
+	state_save_register_global(machine(), m_cpu_stalled_on_voodoo);
+	state_save_register_global(machine(), m_cpu_stalled_offset);
+	state_save_register_global(machine(), m_cpu_stalled_data);
+	state_save_register_global(machine(), m_cpu_stalled_mem_mask);
+	state_save_register_global(machine(), m_board_config);
+	state_save_register_global(machine(), m_ethernet_irq_num);
+	state_save_register_global(machine(), m_ethernet_irq_state);
+	state_save_register_global(machine(), m_vblank_irq_num);
+	state_save_register_global(machine(), m_vblank_latch);
+	state_save_register_global(machine(), m_vblank_state);
+	state_save_register_global(machine(), m_pending_analog_read);
+	state_save_register_global(machine(), m_status_leds);
+	state_save_register_global(machine(), m_cmos_write_enabled);
 }
 
 
-static MACHINE_RESET( seattle )
+void seattle_state::machine_reset()
 {
-	seattle_state *state = machine.driver_data<seattle_state>();
-	state->m_galileo.dma_active = -1;
+	m_galileo.dma_active = -1;
 
-	state->m_vblank_irq_num = 0;
-	state->m_voodoo_stalled = FALSE;
-	state->m_cpu_stalled_on_voodoo = FALSE;
+	m_vblank_irq_num = 0;
+	m_voodoo_stalled = FALSE;
+	m_cpu_stalled_on_voodoo = FALSE;
 
 	/* reset either the DCS2 board or the CAGE board */
-	if (machine.device("dcs2") != NULL)
+	if (machine().device("dcs2") != NULL)
 	{
-		dcs_reset_w(machine, 1);
-		dcs_reset_w(machine, 0);
+		dcs_reset_w(machine(), 1);
+		dcs_reset_w(machine(), 0);
 	}
-	else if (machine.device("cage") != NULL)
+	else if (machine().device("cage") != NULL)
 	{
-		cage_control_w(machine, 0);
-		cage_control_w(machine, 3);
+		cage_control_w(machine(), 0);
+		cage_control_w(machine(), 3);
 	}
 
 	/* reset the other devices */
-	galileo_reset(machine);
-	if (state->m_board_config == SEATTLE_WIDGET_CONFIG)
-		widget_reset(machine);
+	galileo_reset(machine());
+	if (m_board_config == SEATTLE_WIDGET_CONFIG)
+		widget_reset(machine());
 }
 
 
@@ -2548,8 +2548,6 @@ static MACHINE_CONFIG_START( seattle_common, seattle_state )
 	MCFG_CPU_CONFIG(r5000_config)
 	MCFG_CPU_PROGRAM_MAP(seattle_map)
 
-	MCFG_MACHINE_START(seattle)
-	MCFG_MACHINE_RESET(seattle)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)

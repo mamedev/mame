@@ -61,6 +61,9 @@ public:
 	DECLARE_DRIVER_INIT(indytemp);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	DECLARE_MACHINE_START(atarisy1);
+	DECLARE_MACHINE_RESET(atarisy1);
+	DECLARE_VIDEO_START(atarisy1);
 };
 
 
@@ -78,5 +81,5 @@ WRITE16_HANDLER( atarisy1_xscroll_w );
 WRITE16_HANDLER( atarisy1_yscroll_w );
 WRITE16_HANDLER( atarisy1_priority_w );
 
-VIDEO_START( atarisy1 );
+
 SCREEN_UPDATE_IND16( atarisy1 );

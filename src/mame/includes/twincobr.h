@@ -101,6 +101,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	DECLARE_MACHINE_RESET(twincobr);
+	DECLARE_VIDEO_START(toaplan0);
+	DECLARE_MACHINE_RESET(wardner);
 };
 
 
@@ -109,8 +112,8 @@ public:
 INTERRUPT_GEN( twincobr_interrupt );
 INTERRUPT_GEN( wardner_interrupt );
 
-MACHINE_RESET( twincobr );
-MACHINE_RESET( wardner );
+
+
 
 extern void twincobr_driver_savestate(running_machine &machine);
 
@@ -122,5 +125,5 @@ extern const mc6845_interface twincobr_mc6845_intf;
 extern void twincobr_flipscreen(running_machine &machine, int flip);
 extern void twincobr_display(running_machine &machine, int enable);
 
-VIDEO_START( toaplan0 );
+
 SCREEN_UPDATE_IND16( toaplan0 );

@@ -104,6 +104,7 @@ public:
 	DECLARE_WRITE16_MEMBER(paletteram_w);
 	DECLARE_READ16_MEMBER(srmp6_irq_ack_r);
 	DECLARE_DRIVER_INIT(INIT);
+	virtual void video_start();
 };
 
 #define VERBOSE 0
@@ -153,19 +154,18 @@ static void update_palette(running_machine &machine)
 	}
 }
 
-static VIDEO_START(srmp6)
+void srmp6_state::video_start()
 {
-	srmp6_state *state = machine.driver_data<srmp6_state>();
 
-	state->m_tileram = auto_alloc_array_clear(machine, UINT16, 0x100000*16/2);
-	state->m_dmaram.allocate(0x100/2);
-	state->m_sprram_old = auto_alloc_array_clear(machine, UINT16, 0x80000/2);
+	m_tileram = auto_alloc_array_clear(machine(), UINT16, 0x100000*16/2);
+	m_dmaram.allocate(0x100/2);
+	m_sprram_old = auto_alloc_array_clear(machine(), UINT16, 0x80000/2);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[0] = auto_alloc(machine, gfx_element(machine, tiles8x8_layout, (UINT8*)state->m_tileram, machine.total_colors() / 256, 0));
-	machine.gfx[0]->set_granularity(256);
+	machine().gfx[0] = auto_alloc(machine(), gfx_element(machine(), tiles8x8_layout, (UINT8*)m_tileram, machine().total_colors() / 256, 0));
+	machine().gfx[0]->set_granularity(256);
 
-	state->m_brightness = 0x60;
+	m_brightness = 0x60;
 }
 
 #if 0
@@ -685,7 +685,6 @@ static MACHINE_CONFIG_START( srmp6, srmp6_state )
 
 	MCFG_PALETTE_LENGTH(0x800)
 
-	MCFG_VIDEO_START(srmp6)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -965,13 +965,12 @@ void _3do_clio_init( running_machine &machine, screen_device *screen )
 
 /* 9 -> 5 bits translation */
 
-VIDEO_START( _3do )
+VIDEO_START_MEMBER(_3do_state,_3do)
 {
-	_3do_state *state = machine.driver_data<_3do_state>();
 	/* We only keep the odd bits and get rid of the even bits */
 	for ( int i = 0; i < 512; i++ )
 	{
-		state->m_video_bits[i] = ( i & 1 ) | ( ( i & 4 ) >> 1 ) | ( ( i & 0x10 ) >> 2 ) | ( ( i & 0x40 ) >> 3 ) | ( ( i & 0x100 ) >> 4 );
+		m_video_bits[i] = ( i & 1 ) | ( ( i & 4 ) >> 1 ) | ( ( i & 0x10 ) >> 2 ) | ( ( i & 0x40 ) >> 3 ) | ( ( i & 0x100 ) >> 4 );
 	}
 }
 

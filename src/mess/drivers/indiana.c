@@ -21,6 +21,7 @@ public:
 	indiana_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 	DECLARE_DRIVER_INIT(indiana);
+	virtual void machine_reset();
 };
 
 
@@ -42,7 +43,7 @@ static INPUT_PORTS_START( indiana )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(indiana)
+void indiana_state::machine_reset()
 {
 }
 
@@ -69,7 +70,6 @@ static MACHINE_CONFIG_START( indiana, indiana_state )
 	MCFG_CPU_ADD("maincpu",M68030, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(indiana_mem)
 
-	MCFG_MACHINE_RESET(indiana)
 
 	/* video hardware */
 	MCFG_GFXDECODE(indiana)

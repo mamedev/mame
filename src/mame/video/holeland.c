@@ -52,19 +52,17 @@ TILE_GET_INFO_MEMBER(holeland_state::crzrally_get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( holeland )
+VIDEO_START_MEMBER(holeland_state,holeland)
 {
-	holeland_state *state = machine.driver_data<holeland_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(holeland_state::holeland_get_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(holeland_state::holeland_get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	state->m_bg_tilemap->set_transmask(0, 0xff, 0x00); /* split type 0 is totally transparent in front half */
-	state->m_bg_tilemap->set_transmask(1, 0x01, 0xfe); /* split type 1 has pen 0? transparent in front half */
+	m_bg_tilemap->set_transmask(0, 0xff, 0x00); /* split type 0 is totally transparent in front half */
+	m_bg_tilemap->set_transmask(1, 0x01, 0xfe); /* split type 1 has pen 0? transparent in front half */
 }
 
-VIDEO_START( crzrally )
+VIDEO_START_MEMBER(holeland_state,crzrally)
 {
-	holeland_state *state = machine.driver_data<holeland_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(holeland_state::crzrally_get_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(holeland_state::crzrally_get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 }
 
 WRITE8_MEMBER(holeland_state::holeland_videoram_w)

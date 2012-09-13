@@ -260,25 +260,23 @@ static const ym3526_interface ym3526_config =
 };
 
 
-static MACHINE_START( metlclsh )
+void metlclsh_state::machine_start()
 {
-	metlclsh_state *state = machine.driver_data<metlclsh_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_subcpu = machine.device<cpu_device>("sub");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_subcpu = machine().device<cpu_device>("sub");
 
-	state->save_item(NAME(state->m_write_mask));
-	state->save_item(NAME(state->m_gfxbank));
+	save_item(NAME(m_write_mask));
+	save_item(NAME(m_gfxbank));
 }
 
-static MACHINE_RESET( metlclsh )
+void metlclsh_state::machine_reset()
 {
-	metlclsh_state *state = machine.driver_data<metlclsh_state>();
 
-	state->flip_screen_set(0);
+	flip_screen_set(0);
 
-	state->m_write_mask = 0;
-	state->m_gfxbank = 0;
+	m_write_mask = 0;
+	m_gfxbank = 0;
 }
 
 static MACHINE_CONFIG_START( metlclsh, metlclsh_state )
@@ -292,8 +290,6 @@ static MACHINE_CONFIG_START( metlclsh, metlclsh_state )
 	MCFG_CPU_PROGRAM_MAP(metlclsh_slave_map)
 	// IRQ by cpu #1, NMI by coins insertion
 
-	MCFG_MACHINE_START(metlclsh)
-	MCFG_MACHINE_RESET(metlclsh)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -306,7 +302,6 @@ static MACHINE_CONFIG_START( metlclsh, metlclsh_state )
 	MCFG_GFXDECODE(metlclsh)
 	MCFG_PALETTE_LENGTH(3 * 16)
 
-	MCFG_VIDEO_START(metlclsh)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

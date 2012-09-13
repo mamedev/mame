@@ -24,11 +24,13 @@ public:
 	DECLARE_WRITE8_MEMBER(speedatk_colorram_w);
 	DECLARE_WRITE8_MEMBER(speedatk_6845_w);
 	DECLARE_WRITE8_MEMBER(speedatk_output_w);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/speedatk.c -----------*/
 
-PALETTE_INIT( speedatk );
-VIDEO_START( speedatk );
+
+
 SCREEN_UPDATE_IND16( speedatk );

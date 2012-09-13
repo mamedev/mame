@@ -210,7 +210,6 @@ static MACHINE_CONFIG_START( quizpani, quizpani_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(quizpani)
 
-	MCFG_VIDEO_START(quizpani)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

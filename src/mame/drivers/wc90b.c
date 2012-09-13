@@ -386,7 +386,6 @@ static MACHINE_CONFIG_START( wc90b, wc90b_state )
 	MCFG_GFXDECODE(wc90b)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(wc90b)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

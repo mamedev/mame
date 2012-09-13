@@ -63,6 +63,12 @@ public:
 	UINT16 m_pr_cont;
 	UINT8 m_keyboard_line;
 	emu_timer *m_keyboard_timer;
+	DECLARE_MACHINE_START(cat);
+	DECLARE_MACHINE_RESET(cat);
+	DECLARE_VIDEO_START(cat);
+	DECLARE_MACHINE_START(swyft);
+	DECLARE_MACHINE_RESET(swyft);
+	DECLARE_VIDEO_START(swyft);
 };
 
 WRITE16_MEMBER( cat_state::cat_video_status_w )
@@ -300,23 +306,21 @@ static IRQ_CALLBACK(cat_int_ack)
 	return M68K_INT_ACK_AUTOVECTOR;
 }
 
-static MACHINE_START(cat)
+MACHINE_START_MEMBER(cat_state,cat)
 {
-	cat_state *state = machine.driver_data<cat_state>();
 
-	state->m_duart_inp = 0x0e;
-	state->m_keyboard_timer = machine.scheduler().timer_alloc(FUNC(keyboard_callback));
-	machine.device<nvram_device>("nvram")->set_base(state->m_p_sram, 0x4000);
+	m_duart_inp = 0x0e;
+	m_keyboard_timer = machine().scheduler().timer_alloc(FUNC(keyboard_callback));
+	machine().device<nvram_device>("nvram")->set_base(m_p_sram, 0x4000);
 }
 
-static MACHINE_RESET(cat)
+MACHINE_RESET_MEMBER(cat_state,cat)
 {
-	cat_state *state = machine.driver_data<cat_state>();
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(cat_int_ack);
-	state->m_keyboard_timer->adjust(attotime::zero, 0, attotime::from_hz(120));
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(cat_int_ack);
+	m_keyboard_timer->adjust(attotime::zero, 0, attotime::from_hz(120));
 }
 
-static VIDEO_START( cat )
+VIDEO_START_MEMBER(cat_state,cat)
 {
 }
 
@@ -353,16 +357,16 @@ static TIMER_CALLBACK( swyft_reset )
 	memset(machine.device("maincpu")->memory().space(AS_PROGRAM)->get_read_ptr(0xe2341), 0xff, 1);
 }
 
-static MACHINE_START(swyft)
+MACHINE_START_MEMBER(cat_state,swyft)
 {
 }
 
-static MACHINE_RESET(swyft)
+MACHINE_RESET_MEMBER(cat_state,swyft)
 {
-	machine.scheduler().timer_set(attotime::from_usec(10), FUNC(swyft_reset));
+	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(swyft_reset));
 }
 
-static VIDEO_START( swyft )
+VIDEO_START_MEMBER(cat_state,swyft)
 {
 }
 
@@ -427,8 +431,8 @@ static MACHINE_CONFIG_START( cat, cat_state )
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(cat_mem)
 
-	MCFG_MACHINE_START(cat)
-	MCFG_MACHINE_RESET(cat)
+	MCFG_MACHINE_START_OVERRIDE(cat_state,cat)
+	MCFG_MACHINE_RESET_OVERRIDE(cat_state,cat)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -441,7 +445,7 @@ static MACHINE_CONFIG_START( cat, cat_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START(cat)
+	MCFG_VIDEO_START_OVERRIDE(cat_state,cat)
 
 	MCFG_DUART68681_ADD( "duart68681", XTAL_5MHz, cat_duart68681_config )
 
@@ -454,8 +458,8 @@ static MACHINE_CONFIG_START( swyft, cat_state )
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(swyft_mem)
 
-	MCFG_MACHINE_START(swyft)
-	MCFG_MACHINE_RESET(swyft)
+	MCFG_MACHINE_START_OVERRIDE(cat_state,swyft)
+	MCFG_MACHINE_RESET_OVERRIDE(cat_state,swyft)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -468,7 +472,7 @@ static MACHINE_CONFIG_START( swyft, cat_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START(swyft)
+	MCFG_VIDEO_START_OVERRIDE(cat_state,swyft)
 MACHINE_CONFIG_END
 
 /* ROM definition */

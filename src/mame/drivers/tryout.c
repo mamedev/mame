@@ -204,9 +204,7 @@ static MACHINE_CONFIG_START( tryout, tryout_state )
 
 	MCFG_GFXDECODE(tryout)
 	MCFG_PALETTE_LENGTH(0x20)
-	MCFG_PALETTE_INIT(tryout)
 
-	MCFG_VIDEO_START(tryout)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

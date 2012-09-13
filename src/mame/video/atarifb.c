@@ -87,13 +87,12 @@ WRITE8_MEMBER(atarifb_state::atarifb_field_videoram_w)
  *
  *************************************/
 
-VIDEO_START( atarifb )
+void atarifb_state::video_start()
 {
-	atarifb_state *state = machine.driver_data<atarifb_state>();
 
-	state->m_alpha1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(atarifb_state::alpha1_get_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 3, 32);
-	state->m_alpha2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(atarifb_state::alpha2_get_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 3, 32);
-	state->m_field_tilemap  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(atarifb_state::field_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_alpha1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atarifb_state::alpha1_get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 3, 32);
+	m_alpha2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atarifb_state::alpha2_get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 3, 32);
+	m_field_tilemap  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atarifb_state::field_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

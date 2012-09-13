@@ -48,6 +48,7 @@ public:
 	DECLARE_WRITE8_MEMBER(leds_w);
 	UINT8 m_keyrow;
 	bool m_ledready;
+	virtual void machine_reset();
 };
 
 
@@ -141,7 +142,7 @@ static INPUT_PORTS_START( pmi80 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET( pmi80 )
+void pmi80_state::machine_reset()
 {
 }
 
@@ -152,7 +153,6 @@ static MACHINE_CONFIG_START( pmi80, pmi80_state )
 	MCFG_CPU_PROGRAM_MAP(pmi80_mem)
 	MCFG_CPU_IO_MAP(pmi80_io)
 
-	MCFG_MACHINE_RESET(pmi80)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pmi80)

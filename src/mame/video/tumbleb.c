@@ -233,75 +233,70 @@ static void tumbleb_tilemap_redraw(running_machine &machine)
 		state->m_pf2_alt_tilemap->mark_all_dirty();
 }
 
-VIDEO_START( pangpang )
+VIDEO_START_MEMBER(tumbleb_state,pangpang)
 {
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 
-	state->m_pf1_tilemap =     &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::pangpang_get_fg_tile_info),state),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
-	state->m_pf1_alt_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::pangpang_get_bg1_tile_info),state), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),state),     16, 16, 64, 32);
-	state->m_pf2_tilemap =     &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::pangpang_get_bg2_tile_info),state), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),state),     16, 16, 64, 32);
+	m_pf1_tilemap =     &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::pangpang_get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
+	m_pf1_alt_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::pangpang_get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
+	m_pf2_tilemap =     &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::pangpang_get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
 
-	state->m_pf1_tilemap->set_transparent_pen(0);
-	state->m_pf1_alt_tilemap->set_transparent_pen(0);
+	m_pf1_tilemap->set_transparent_pen(0);
+	m_pf1_alt_tilemap->set_transparent_pen(0);
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(tumbleb_tilemap_redraw), &machine));
+	machine().save().register_postload(save_prepost_delegate(FUNC(tumbleb_tilemap_redraw), &machine()));
 }
 
 
-VIDEO_START( tumblepb )
+VIDEO_START_MEMBER(tumbleb_state,tumblepb)
 {
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 
-	state->m_pf1_tilemap =     &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_fg_tile_info),state),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
-	state->m_pf1_alt_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg1_tile_info),state), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),state),     16, 16, 64, 32);
-	state->m_pf2_tilemap =     &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg2_tile_info),state), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),state),     16, 16, 64, 32);
+	m_pf1_tilemap =     &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
+	m_pf1_alt_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
+	m_pf2_tilemap =     &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
 
-	state->m_pf1_tilemap->set_transparent_pen(0);
-	state->m_pf1_alt_tilemap->set_transparent_pen(0);
+	m_pf1_tilemap->set_transparent_pen(0);
+	m_pf1_alt_tilemap->set_transparent_pen(0);
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(tumbleb_tilemap_redraw), &machine));
+	machine().save().register_postload(save_prepost_delegate(FUNC(tumbleb_tilemap_redraw), &machine()));
 }
 
-VIDEO_START( sdfight )
+VIDEO_START_MEMBER(tumbleb_state,sdfight)
 {
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 
-	state->m_pf1_tilemap =     &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_fg_tile_info),state),  TILEMAP_SCAN_ROWS, 8,  8, 64, 64); // 64*64 to prevent bad tilemap wrapping? - check real behavior
-	state->m_pf1_alt_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg1_tile_info),state), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),state),     16, 16, 64, 32);
-	state->m_pf2_tilemap =     &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg2_tile_info),state), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),state),     16, 16, 64, 32);
+	m_pf1_tilemap =     &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 8,  8, 64, 64); // 64*64 to prevent bad tilemap wrapping? - check real behavior
+	m_pf1_alt_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
+	m_pf2_tilemap =     &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
 
-	state->m_pf1_tilemap->set_transparent_pen(0);
-	state->m_pf1_alt_tilemap->set_transparent_pen(0);
+	m_pf1_tilemap->set_transparent_pen(0);
+	m_pf1_alt_tilemap->set_transparent_pen(0);
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(tumbleb_tilemap_redraw), &machine));
+	machine().save().register_postload(save_prepost_delegate(FUNC(tumbleb_tilemap_redraw), &machine()));
 }
 
-VIDEO_START( fncywld )
+VIDEO_START_MEMBER(tumbleb_state,fncywld)
 {
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 
-	state->m_pf1_tilemap =     &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_fncywld_fg_tile_info),state),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
-	state->m_pf1_alt_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_fncywld_bg1_tile_info),state), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),state),     16, 16, 64, 32);
-	state->m_pf2_tilemap =     &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_fncywld_bg2_tile_info),state), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),state),     16, 16, 64, 32);
+	m_pf1_tilemap =     &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_fncywld_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
+	m_pf1_alt_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_fncywld_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
+	m_pf2_tilemap =     &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_fncywld_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
 
-	state->m_pf1_tilemap->set_transparent_pen(15);
-	state->m_pf1_alt_tilemap->set_transparent_pen(15);
+	m_pf1_tilemap->set_transparent_pen(15);
+	m_pf1_alt_tilemap->set_transparent_pen(15);
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(tumbleb_tilemap_redraw), &machine));
+	machine().save().register_postload(save_prepost_delegate(FUNC(tumbleb_tilemap_redraw), &machine()));
 }
 
 
-VIDEO_START( suprtrio )
+VIDEO_START_MEMBER(tumbleb_state,suprtrio)
 {
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 
-	state->m_pf1_tilemap =     &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_fg_tile_info),state),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
-	state->m_pf1_alt_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg1_tile_info),state), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),state),     16, 16, 64, 32);
-	state->m_pf2_tilemap =     &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg2_tile_info),state), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),state),     16, 16, 64, 32);
+	m_pf1_tilemap =     &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
+	m_pf1_alt_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
+	m_pf2_tilemap =     &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
 
-	state->m_pf1_alt_tilemap->set_transparent_pen(0);
+	m_pf1_alt_tilemap->set_transparent_pen(0);
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(tumbleb_tilemap_redraw), &machine));
+	machine().save().register_postload(save_prepost_delegate(FUNC(tumbleb_tilemap_redraw), &machine()));
 }
 
 /******************************************************************************/

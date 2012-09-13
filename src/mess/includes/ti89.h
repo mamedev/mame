@@ -61,6 +61,7 @@ public:
 	DECLARE_WRITE16_MEMBER ( flash_w );
 	DECLARE_READ16_MEMBER ( flash_r );
 	UINT64 m_timer;
+	virtual void palette_init();
 };
 
 #endif // TI89_H_

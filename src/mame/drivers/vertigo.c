@@ -126,8 +126,6 @@ static MACHINE_CONFIG_START( vertigo, vertigo_state )
     MCFG_CPU_ADD("motor", M6805, 1000000)
     MCFG_CPU_PROGRAM_MAP(vertigo_motor)
     */
-	MCFG_MACHINE_START(vertigo)
-	MCFG_MACHINE_RESET(vertigo)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */

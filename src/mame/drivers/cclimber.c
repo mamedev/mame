@@ -251,14 +251,13 @@ WRITE8_MEMBER(cclimber_state::toprollr_rombank_w)
 		membank("bank1")->set_entry(m_toprollr_rombank);
 }
 
-static MACHINE_RESET( cclimber )
+MACHINE_RESET_MEMBER(cclimber_state,cclimber)
 {
-	cclimber_state *state = machine.driver_data<cclimber_state>();
 
 	/* Disable interrupts, River Patrol / Silver Land needs this otherwise returns bad RAM on POST */
-	state->m_nmi_mask = 0;
+	m_nmi_mask = 0;
 
-	state->m_toprollr_rombank = 0;
+	m_toprollr_rombank = 0;
 }
 
 
@@ -990,7 +989,7 @@ static MACHINE_CONFIG_START( root, cclimber_state )
 	MCFG_CPU_IO_MAP(cclimber_portmap)
 	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
-	MCFG_MACHINE_RESET(cclimber)
+	MCFG_MACHINE_RESET_OVERRIDE(cclimber_state,cclimber)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1003,8 +1002,8 @@ static MACHINE_CONFIG_START( root, cclimber_state )
 	MCFG_GFXDECODE(cclimber)
 	MCFG_PALETTE_LENGTH(16*4+8*4)
 
-	MCFG_PALETTE_INIT(cclimber)
-	MCFG_VIDEO_START(cclimber)
+	MCFG_PALETTE_INIT_OVERRIDE(cclimber_state,cclimber)
+	MCFG_VIDEO_START_OVERRIDE(cclimber_state,cclimber)
 MACHINE_CONFIG_END
 
 
@@ -1046,7 +1045,7 @@ static MACHINE_CONFIG_DERIVED( yamato, root )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(16*4+8*4+256)
-	MCFG_PALETTE_INIT(yamato)
+	MCFG_PALETTE_INIT_OVERRIDE(cclimber_state,yamato)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(yamato)
 
@@ -1070,9 +1069,9 @@ static MACHINE_CONFIG_DERIVED( toprollr, cclimber )
 	/* video hardware */
 	MCFG_GFXDECODE(toprollr)
 	MCFG_PALETTE_LENGTH(32*5)
-	MCFG_PALETTE_INIT(toprollr)
+	MCFG_PALETTE_INIT_OVERRIDE(cclimber_state,toprollr)
 
-	MCFG_VIDEO_START(toprollr)
+	MCFG_VIDEO_START_OVERRIDE(cclimber_state,toprollr)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(toprollr)
 MACHINE_CONFIG_END
@@ -1101,8 +1100,8 @@ static MACHINE_CONFIG_START( swimmer, cclimber_state )
 	MCFG_GFXDECODE(swimmer)
 	MCFG_PALETTE_LENGTH(32*8+4*8+1)
 
-	MCFG_PALETTE_INIT(swimmer)
-	MCFG_VIDEO_START(swimmer)
+	MCFG_PALETTE_INIT_OVERRIDE(cclimber_state,swimmer)
+	MCFG_VIDEO_START_OVERRIDE(cclimber_state,swimmer)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -42,12 +42,15 @@ public:
 	TILEMAP_MAPPER_MEMBER(bg_scan);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in machine/stfight.c -----------*/
 
-MACHINE_RESET( stfight );
+
 INTERRUPT_GEN( stfight_vb_interrupt );
 void stfight_adpcm_int(device_t *device);
 WRITE8_DEVICE_HANDLER( stfight_adpcm_control_w );
@@ -55,6 +58,6 @@ WRITE8_DEVICE_HANDLER( stfight_adpcm_control_w );
 
 /*----------- defined in video/stfight.c -----------*/
 
-PALETTE_INIT( stfight );
-VIDEO_START( stfight );
+
+
 SCREEN_UPDATE_IND16( stfight );

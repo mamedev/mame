@@ -64,6 +64,8 @@ public:
 	DECLARE_READ8_MEMBER(scregg_irqack_r);
 
 	DECLARE_DRIVER_INIT(rockduck);
+	DECLARE_MACHINE_START(scregg);
+	DECLARE_MACHINE_RESET(scregg);
 };
 
 
@@ -231,30 +233,28 @@ GFXDECODE_END
 
 
 
-static MACHINE_START( scregg )
+MACHINE_START_MEMBER(scregg_state,scregg)
 {
-	scregg_state *state = machine.driver_data<scregg_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = NULL;
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = NULL;
 
-	state->save_item(NAME(state->m_btime_palette));
-	state->save_item(NAME(state->m_bnj_scroll1));
-	state->save_item(NAME(state->m_bnj_scroll2));
-	state->save_item(NAME(state->m_btime_tilemap));
+	save_item(NAME(m_btime_palette));
+	save_item(NAME(m_bnj_scroll1));
+	save_item(NAME(m_bnj_scroll2));
+	save_item(NAME(m_btime_tilemap));
 }
 
-static MACHINE_RESET( scregg )
+MACHINE_RESET_MEMBER(scregg_state,scregg)
 {
-	scregg_state *state = machine.driver_data<scregg_state>();
 
-	state->m_btime_palette = 0;
-	state->m_bnj_scroll1 = 0;
-	state->m_bnj_scroll2 = 0;
-	state->m_btime_tilemap[0] = 0;
-	state->m_btime_tilemap[1] = 0;
-	state->m_btime_tilemap[2] = 0;
-	state->m_btime_tilemap[3] = 0;
+	m_btime_palette = 0;
+	m_bnj_scroll1 = 0;
+	m_bnj_scroll2 = 0;
+	m_btime_tilemap[0] = 0;
+	m_btime_tilemap[1] = 0;
+	m_btime_tilemap[2] = 0;
+	m_btime_tilemap[3] = 0;
 }
 
 static MACHINE_CONFIG_START( dommy, scregg_state )
@@ -264,8 +264,8 @@ static MACHINE_CONFIG_START( dommy, scregg_state )
 	MCFG_CPU_PROGRAM_MAP(dommy_map)
 	MCFG_TIMER_ADD_SCANLINE("irq", scregg_interrupt, "screen", 0, 8)
 
-	MCFG_MACHINE_START(scregg)
-	MCFG_MACHINE_RESET(scregg)
+	MCFG_MACHINE_START_OVERRIDE(scregg_state,scregg)
+	MCFG_MACHINE_RESET_OVERRIDE(scregg_state,scregg)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -275,8 +275,8 @@ static MACHINE_CONFIG_START( dommy, scregg_state )
 	MCFG_GFXDECODE(scregg)
 	MCFG_PALETTE_LENGTH(8)
 
-	MCFG_PALETTE_INIT(btime)
-	MCFG_VIDEO_START(btime)
+	MCFG_PALETTE_INIT_OVERRIDE(scregg_state,btime)
+	MCFG_VIDEO_START_OVERRIDE(scregg_state,btime)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -296,8 +296,8 @@ static MACHINE_CONFIG_START( scregg, scregg_state )
 	MCFG_CPU_PROGRAM_MAP(eggs_map)
 	MCFG_TIMER_ADD_SCANLINE("irq", scregg_interrupt, "screen", 0, 8)
 
-	MCFG_MACHINE_START(scregg)
-	MCFG_MACHINE_RESET(scregg)
+	MCFG_MACHINE_START_OVERRIDE(scregg_state,scregg)
+	MCFG_MACHINE_RESET_OVERRIDE(scregg_state,scregg)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -307,8 +307,8 @@ static MACHINE_CONFIG_START( scregg, scregg_state )
 	MCFG_GFXDECODE(scregg)
 	MCFG_PALETTE_LENGTH(8)
 
-	MCFG_PALETTE_INIT(btime)
-	MCFG_VIDEO_START(btime)
+	MCFG_PALETTE_INIT_OVERRIDE(scregg_state,btime)
+	MCFG_VIDEO_START_OVERRIDE(scregg_state,btime)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

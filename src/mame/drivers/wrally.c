@@ -268,7 +268,6 @@ static MACHINE_CONFIG_START( wrally, wrally_state )
 	MCFG_GFXDECODE(wrally)
 	MCFG_PALETTE_LENGTH(1024*8)
 
-	MCFG_VIDEO_START(wrally)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

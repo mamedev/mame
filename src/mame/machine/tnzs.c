@@ -639,35 +639,33 @@ INTERRUPT_GEN( arknoid2_interrupt )
 	device->execute().set_input_line(0, HOLD_LINE);
 }
 
-MACHINE_RESET( tnzs )
+MACHINE_RESET_MEMBER(tnzs_state,tnzs)
 {
-	tnzs_state *state = machine.driver_data<tnzs_state>();
 	/* initialize the mcu simulation */
-	switch (state->m_mcu_type)
+	switch (m_mcu_type)
 	{
 		case MCU_ARKANOID:
 		case MCU_EXTRMATN:
 		case MCU_DRTOPPEL:
 		case MCU_PLUMPOP:
-			mcu_reset(machine);
+			mcu_reset(machine());
 			break;
 		default:
 			break;
 	}
 
-	state->m_screenflip = 0;
-	state->m_kageki_csport_sel = 0;
-	state->m_input_select = 0;
-	state->m_mcu_readcredits = 0;	// this might belong to mcu_reset
-	state->m_insertcoin = 0;		// this might belong to mcu_reset
+	m_screenflip = 0;
+	m_kageki_csport_sel = 0;
+	m_input_select = 0;
+	m_mcu_readcredits = 0;	// this might belong to mcu_reset
+	m_insertcoin = 0;		// this might belong to mcu_reset
 }
 
-MACHINE_RESET( jpopnics )
+MACHINE_RESET_MEMBER(tnzs_state,jpopnics)
 {
-	tnzs_state *state = machine.driver_data<tnzs_state>();
 
-	state->m_screenflip = 0;
-	state->m_mcu_type = -1;
+	m_screenflip = 0;
+	m_mcu_type = -1;
 }
 
 static void tnzs_postload(running_machine &machine)
@@ -677,51 +675,49 @@ static void tnzs_postload(running_machine &machine)
 }
 
 
-MACHINE_START( jpopnics )
+MACHINE_START_MEMBER(tnzs_state,jpopnics)
 {
-	tnzs_state *state = machine.driver_data<tnzs_state>();
-	UINT8 *SUB = state->memregion("sub")->base();
-	state->m_ROM = machine.root_device().memregion("maincpu")->base();
-	state->m_bankedram = auto_alloc_array(machine, UINT8, 0x8000); // 2 banks of 0x4000
+	UINT8 *SUB = memregion("sub")->base();
+	m_ROM = machine().root_device().memregion("maincpu")->base();
+	m_bankedram = auto_alloc_array(machine(), UINT8, 0x8000); // 2 banks of 0x4000
 
-	state->membank("subbank")->configure_entries(0, 4, &SUB[0x08000], 0x2000);
-	state->membank("subbank")->set_entry(state->m_bank2);
+	membank("subbank")->configure_entries(0, 4, &SUB[0x08000], 0x2000);
+	membank("subbank")->set_entry(m_bank2);
 
-	state->m_subcpu = machine.device<cpu_device>("sub");
-	state->m_mcu = NULL;
+	m_subcpu = machine().device<cpu_device>("sub");
+	m_mcu = NULL;
 
-	state->m_bank1 = 2;
-	state->m_bank2 = 0;
+	m_bank1 = 2;
+	m_bank2 = 0;
 
-	state->save_pointer(NAME(state->m_bankedram), 0x8000);
-	state->save_item(NAME(state->m_screenflip));
-	state->save_item(NAME(state->m_bank1));
-	state->save_item(NAME(state->m_bank2));
+	save_pointer(NAME(m_bankedram), 0x8000);
+	save_item(NAME(m_screenflip));
+	save_item(NAME(m_bank1));
+	save_item(NAME(m_bank2));
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(tnzs_postload), &machine));
+	machine().save().register_postload(save_prepost_delegate(FUNC(tnzs_postload), &machine()));
 }
 
-MACHINE_START( tnzs )
+MACHINE_START_MEMBER(tnzs_state,tnzs)
 {
-	tnzs_state *state = machine.driver_data<tnzs_state>();
 
-	MACHINE_START_CALL( jpopnics );
+	MACHINE_START_CALL_MEMBER( jpopnics );
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_mcu = machine.device("mcu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_mcu = machine().device("mcu");
 
-	state->save_item(NAME(state->m_kageki_csport_sel));
-	state->save_item(NAME(state->m_input_select));
-	state->save_item(NAME(state->m_mcu_readcredits));
-	state->save_item(NAME(state->m_insertcoin));
-	state->save_item(NAME(state->m_mcu_initializing));
-	state->save_item(NAME(state->m_mcu_coinage_init));
-	state->save_item(NAME(state->m_mcu_coinage));
-	state->save_item(NAME(state->m_mcu_coins_a));
-	state->save_item(NAME(state->m_mcu_coins_b));
-	state->save_item(NAME(state->m_mcu_credits));
-	state->save_item(NAME(state->m_mcu_reportcoin));
-	state->save_item(NAME(state->m_mcu_command));
+	save_item(NAME(m_kageki_csport_sel));
+	save_item(NAME(m_input_select));
+	save_item(NAME(m_mcu_readcredits));
+	save_item(NAME(m_insertcoin));
+	save_item(NAME(m_mcu_initializing));
+	save_item(NAME(m_mcu_coinage_init));
+	save_item(NAME(m_mcu_coinage));
+	save_item(NAME(m_mcu_coins_a));
+	save_item(NAME(m_mcu_coins_b));
+	save_item(NAME(m_mcu_credits));
+	save_item(NAME(m_mcu_reportcoin));
+	save_item(NAME(m_mcu_command));
 
 }
 

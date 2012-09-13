@@ -38,16 +38,15 @@ INLINE UINT16 *address_to_vram(artmagic_state *state, offs_t *address)
  *
  *************************************/
 
-VIDEO_START( artmagic )
+void artmagic_state::video_start()
 {
-	artmagic_state *state = machine.driver_data<artmagic_state>();
-	state->m_blitter_base = (UINT16 *)state->memregion("gfx1")->base();
-	state->m_blitter_mask = state->memregion("gfx1")->bytes()/2 - 1;
+	m_blitter_base = (UINT16 *)memregion("gfx1")->base();
+	m_blitter_mask = memregion("gfx1")->bytes()/2 - 1;
 
-	state_save_register_global_array(machine, state->m_xor);
-	state_save_register_global(machine, state->m_is_stoneball);
-	state_save_register_global_array(machine, state->m_blitter_data);
-	state_save_register_global(machine, state->m_blitter_page);
+	state_save_register_global_array(machine(), m_xor);
+	state_save_register_global(machine(), m_is_stoneball);
+	state_save_register_global_array(machine(), m_blitter_data);
+	state_save_register_global(machine(), m_blitter_page);
 }
 
 

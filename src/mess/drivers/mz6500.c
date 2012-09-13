@@ -30,6 +30,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
 	required_shared_ptr<UINT8> m_video_ram;
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
@@ -51,7 +53,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 }
 
 
-static VIDEO_START( mz6500 )
+void mz6500_state::video_start()
 {
 }
 
@@ -115,7 +117,7 @@ static INPUT_PORTS_START( mz6500 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(mz6500)
+void mz6500_state::machine_reset()
 {
 }
 
@@ -173,14 +175,12 @@ static MACHINE_CONFIG_START( mz6500, mz6500_state )
 	MCFG_CPU_PROGRAM_MAP(mz6500_map)
 	MCFG_CPU_IO_MAP(mz6500_io)
 
-	MCFG_MACHINE_RESET(mz6500)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
-	MCFG_VIDEO_START(mz6500)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_PALETTE_LENGTH(8)

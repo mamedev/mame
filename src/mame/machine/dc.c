@@ -787,52 +787,50 @@ static void rtc_initial_setup(running_machine &machine)
 	state->dc_rtc_timer = machine.scheduler().timer_alloc(FUNC(dc_rtc_increment));
 }
 
-MACHINE_START( dc )
+void dc_state::machine_start()
 {
-	dc_state *state = machine.driver_data<dc_state>();
 
-	rtc_initial_setup(machine);
+	rtc_initial_setup(machine());
 
 	// save states
-	state_save_register_global_pointer(machine, state->dc_rtcregister, 4);
-	state_save_register_global_pointer(machine, state->dc_sysctrl_regs, 0x200/4);
-	state_save_register_global_pointer(machine, state->g2bus_regs, 0x100/4);
-	state_save_register_global(machine, state->m_wave_dma.aica_addr);
-	state_save_register_global(machine, state->m_wave_dma.root_addr);
-	state_save_register_global(machine, state->m_wave_dma.size);
-	state_save_register_global(machine, state->m_wave_dma.dir);
-	state_save_register_global(machine, state->m_wave_dma.flag);
-	state_save_register_global(machine, state->m_wave_dma.indirect);
-	state_save_register_global(machine, state->m_wave_dma.start);
-	state_save_register_global(machine, state->m_wave_dma.sel);
-	state_save_register_global(machine, state->m_pvr_dma.pvr_addr);
-	state_save_register_global(machine, state->m_pvr_dma.sys_addr);
-	state_save_register_global(machine, state->m_pvr_dma.size);
-	state_save_register_global(machine, state->m_pvr_dma.sel);
-	state_save_register_global(machine, state->m_pvr_dma.dir);
-	state_save_register_global(machine, state->m_pvr_dma.flag);
-	state_save_register_global(machine, state->m_pvr_dma.start);
-	state_save_register_global_pointer(machine,state->pvrta_regs,0x2000/4);
-	state_save_register_global_pointer(machine,state->pvrctrl_regs,0x100/4);
-	state_save_register_global(machine, state->debug_dip_status);
-	state_save_register_global_pointer(machine,state->tafifo_buff,32);
-	state_save_register_global(machine, state->scanline);
-	state_save_register_global(machine, state->next_y);
-	state_save_register_global_pointer(machine,state->dc_sound_ram.target(),state->dc_sound_ram.bytes());
+	state_save_register_global_pointer(machine(), dc_rtcregister, 4);
+	state_save_register_global_pointer(machine(), dc_sysctrl_regs, 0x200/4);
+	state_save_register_global_pointer(machine(), g2bus_regs, 0x100/4);
+	state_save_register_global(machine(), m_wave_dma.aica_addr);
+	state_save_register_global(machine(), m_wave_dma.root_addr);
+	state_save_register_global(machine(), m_wave_dma.size);
+	state_save_register_global(machine(), m_wave_dma.dir);
+	state_save_register_global(machine(), m_wave_dma.flag);
+	state_save_register_global(machine(), m_wave_dma.indirect);
+	state_save_register_global(machine(), m_wave_dma.start);
+	state_save_register_global(machine(), m_wave_dma.sel);
+	state_save_register_global(machine(), m_pvr_dma.pvr_addr);
+	state_save_register_global(machine(), m_pvr_dma.sys_addr);
+	state_save_register_global(machine(), m_pvr_dma.size);
+	state_save_register_global(machine(), m_pvr_dma.sel);
+	state_save_register_global(machine(), m_pvr_dma.dir);
+	state_save_register_global(machine(), m_pvr_dma.flag);
+	state_save_register_global(machine(), m_pvr_dma.start);
+	state_save_register_global_pointer(machine(),pvrta_regs,0x2000/4);
+	state_save_register_global_pointer(machine(),pvrctrl_regs,0x100/4);
+	state_save_register_global(machine(), debug_dip_status);
+	state_save_register_global_pointer(machine(),tafifo_buff,32);
+	state_save_register_global(machine(), scanline);
+	state_save_register_global(machine(), next_y);
+	state_save_register_global_pointer(machine(),dc_sound_ram.target(),dc_sound_ram.bytes());
 }
 
-MACHINE_RESET( dc )
+void dc_state::machine_reset()
 {
-	dc_state *state = machine.driver_data<dc_state>();
 
 	/* halt the ARM7 */
-	machine.device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	memset(state->dc_sysctrl_regs, 0, sizeof(state->dc_sysctrl_regs));
+	memset(dc_sysctrl_regs, 0, sizeof(dc_sysctrl_regs));
 
-	state->dc_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
+	dc_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 
-	state->dc_sysctrl_regs[SB_SBREV] = 0x0b;
+	dc_sysctrl_regs[SB_SBREV] = 0x0b;
 }
 
 READ64_DEVICE_HANDLER( dc_aica_reg_r )

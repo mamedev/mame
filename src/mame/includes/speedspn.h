@@ -20,12 +20,13 @@ public:
 	DECLARE_WRITE8_MEMBER(speedspn_global_display_w);
 	DECLARE_WRITE8_MEMBER(oki_banking_w);
 	TILE_GET_INFO_MEMBER(get_speedspn_tile_info);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/speedspn.c -----------*/
 
-VIDEO_START( speedspn );
+
 SCREEN_UPDATE_IND16( speedspn );
 
 

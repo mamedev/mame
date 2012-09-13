@@ -564,8 +564,8 @@ static MACHINE_CONFIG_START( argus, argus_state )
 	MCFG_GFXDECODE(argus)
 	MCFG_PALETTE_LENGTH(896)
 
-	MCFG_VIDEO_START(argus)
-	MCFG_VIDEO_RESET(argus)
+	MCFG_VIDEO_START_OVERRIDE(argus_state,argus)
+	MCFG_VIDEO_RESET_OVERRIDE(argus_state,argus)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -608,8 +608,8 @@ static MACHINE_CONFIG_START( valtric, argus_state )
 	MCFG_GFXDECODE(valtric)
 	MCFG_PALETTE_LENGTH(768)
 
-	MCFG_VIDEO_START(valtric)
-	MCFG_VIDEO_RESET(valtric)
+	MCFG_VIDEO_START_OVERRIDE(argus_state,valtric)
+	MCFG_VIDEO_RESET_OVERRIDE(argus_state,valtric)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -652,8 +652,8 @@ static MACHINE_CONFIG_START( butasan, argus_state )
 	MCFG_GFXDECODE(butasan)
 	MCFG_PALETTE_LENGTH(768)
 
-	MCFG_VIDEO_START(butasan)
-	MCFG_VIDEO_RESET(butasan)
+	MCFG_VIDEO_START_OVERRIDE(argus_state,butasan)
+	MCFG_VIDEO_RESET_OVERRIDE(argus_state,butasan)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

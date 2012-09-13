@@ -16,41 +16,39 @@
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
-MACHINE_START( taitosj )
+void taitosj_state::machine_start()
 {
-	taitosj_state *state = machine.driver_data<taitosj_state>();
-	state->membank("bank1")->configure_entry(0, state->memregion("maincpu")->base() + 0x6000);
-	state->membank("bank1")->configure_entry(1, state->memregion("maincpu")->base() + 0x10000);
+	membank("bank1")->configure_entry(0, memregion("maincpu")->base() + 0x6000);
+	membank("bank1")->configure_entry(1, memregion("maincpu")->base() + 0x10000);
 
-	state->save_item(NAME(state->m_fromz80));
-	state->save_item(NAME(state->m_toz80));
-	state->save_item(NAME(state->m_zaccept));
-	state->save_item(NAME(state->m_zready));
-	state->save_item(NAME(state->m_busreq));
+	save_item(NAME(m_fromz80));
+	save_item(NAME(m_toz80));
+	save_item(NAME(m_zaccept));
+	save_item(NAME(m_zready));
+	save_item(NAME(m_busreq));
 
-	state->save_item(NAME(state->m_portA_in));
-	state->save_item(NAME(state->m_portA_out));
-	state->save_item(NAME(state->m_address));
-	state->save_item(NAME(state->m_spacecr_prot_value));
-	state->save_item(NAME(state->m_protection_value));
+	save_item(NAME(m_portA_in));
+	save_item(NAME(m_portA_out));
+	save_item(NAME(m_address));
+	save_item(NAME(m_spacecr_prot_value));
+	save_item(NAME(m_protection_value));
 }
 
-MACHINE_RESET( taitosj )
+void taitosj_state::machine_reset()
 {
-	taitosj_state *state = machine.driver_data<taitosj_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/* set the default ROM bank (many games only have one bank and */
 	/* never write to the bank selector register) */
-	state->taitosj_bankswitch_w(*space, 0, 0);
+	taitosj_bankswitch_w(*space, 0, 0);
 
 
-	state->m_zaccept = 1;
-	state->m_zready = 0;
-	state->m_busreq = 0;
-	if (machine.device("mcu") != NULL)
-		machine.device("mcu")->execute().set_input_line(0, CLEAR_LINE);
+	m_zaccept = 1;
+	m_zready = 0;
+	m_busreq = 0;
+	if (machine().device("mcu") != NULL)
+		machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 
-	state->m_spacecr_prot_value = 0;
+	m_spacecr_prot_value = 0;
 }
 
 

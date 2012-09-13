@@ -813,26 +813,24 @@ static const msm5205_interface msm5205_config =
 	MSM5205_SEX_4B	/* 8KHz playback ?    */
 };
 
-static MACHINE_START( sf )
+void sf_state::machine_start()
 {
-	sf_state *state = machine.driver_data<sf_state>();
 
 	/* devices */
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_sf_active));
-	state->save_item(NAME(state->m_bgscroll));
-	state->save_item(NAME(state->m_fgscroll));
+	save_item(NAME(m_sf_active));
+	save_item(NAME(m_bgscroll));
+	save_item(NAME(m_fgscroll));
 }
 
-static MACHINE_RESET( sf )
+void sf_state::machine_reset()
 {
-	sf_state *state = machine.driver_data<sf_state>();
 
-	state->m_sf_active = 0;
-	state->m_bgscroll = 0;
-	state->m_fgscroll = 0;
+	m_sf_active = 0;
+	m_bgscroll = 0;
+	m_fgscroll = 0;
 }
 
 static MACHINE_CONFIG_START( sf, sf_state )
@@ -846,8 +844,6 @@ static MACHINE_CONFIG_START( sf, sf_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 								/* NMIs are caused by the main CPU */
 
-	MCFG_MACHINE_START(sf)
-	MCFG_MACHINE_RESET(sf)
 
 	MCFG_CPU_ADD("audio2", Z80, 3579545)	/* ? xtal is 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(sound2_map)
@@ -865,7 +861,6 @@ static MACHINE_CONFIG_START( sf, sf_state )
 	MCFG_GFXDECODE(sf)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(sf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

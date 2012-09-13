@@ -128,6 +128,18 @@ public:
 	DECLARE_DRIVER_INIT(mbeeic);
 	DECLARE_DRIVER_INIT(mbee128);
 	DECLARE_DRIVER_INIT(mbee64);
+	DECLARE_MACHINE_RESET(mbee);
+	DECLARE_VIDEO_START(mbee);
+	DECLARE_VIDEO_START(mbeeic);
+	DECLARE_PALETTE_INIT(mbeeic);
+	DECLARE_PALETTE_INIT(mbeepc85b);
+	DECLARE_VIDEO_START(mbeeppc);
+	DECLARE_PALETTE_INIT(mbeeppc);
+	DECLARE_MACHINE_RESET(mbee56);
+	DECLARE_MACHINE_RESET(mbee64);
+	DECLARE_MACHINE_RESET(mbee128);
+	DECLARE_MACHINE_RESET(mbee256);
+	DECLARE_MACHINE_RESET(mbeett);
 };
 
 
@@ -136,12 +148,12 @@ public:
 extern const wd17xx_interface mbee_wd17xx_interface;
 extern const z80pio_interface mbee_z80pio_intf;
 
-MACHINE_RESET( mbee );
-MACHINE_RESET( mbee56 );
-MACHINE_RESET( mbee64 );
-MACHINE_RESET( mbee128 );
-MACHINE_RESET( mbee256 );
-MACHINE_RESET( mbeett );
+
+
+
+
+
+
 INTERRUPT_GEN( mbee_interrupt );
 QUICKLOAD_LOAD( mbee );
 
@@ -154,14 +166,14 @@ MC6845_UPDATE_ROW( mbeeppc_update_row );
 MC6845_ON_UPDATE_ADDR_CHANGED( mbee_update_addr );
 MC6845_ON_UPDATE_ADDR_CHANGED( mbee256_update_addr );
 
-VIDEO_START( mbee );
+
 SCREEN_UPDATE_RGB32( mbee );
-VIDEO_START( mbeeic );
+
 SCREEN_UPDATE_RGB32( mbeeic );
-VIDEO_START( mbeeppc );
+
 SCREEN_UPDATE_RGB32( mbeeppc );
-PALETTE_INIT( mbeeic );
-PALETTE_INIT( mbeepc85b );
-PALETTE_INIT( mbeeppc );
+
+
+
 
 #endif /* MBEE_H_ */

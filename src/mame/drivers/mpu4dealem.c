@@ -28,6 +28,8 @@ public:
 	}
 
 	optional_shared_ptr<UINT8> m_dealem_videoram;
+	DECLARE_MACHINE_RESET(dealem_vid);
+	DECLARE_PALETTE_INIT(dealem);
 };
 
 
@@ -71,9 +73,9 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-static PALETTE_INIT( dealem )
+PALETTE_INIT_MEMBER(mpu4dealem_state,dealem)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i, len;
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
@@ -84,7 +86,7 @@ static PALETTE_INIT( dealem )
 			3,	resistances_rg,	weights_g,	1000,	0,
 			2,	resistances_b,	weights_b,	1000,	0);
 
-	len = machine.root_device().memregion("proms")->bytes();
+	len = machine().root_device().memregion("proms")->bytes();
 	for (i = 0; i < len; i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
@@ -104,7 +106,7 @@ static PALETTE_INIT( dealem )
 		bit1 = BIT(*color_prom,7);
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -178,34 +180,33 @@ static ADDRESS_MAP_START( dealem_memmap, AS_PROGRAM, 8, mpu4dealem_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM	AM_WRITENOP/* 64k  paged ROM (4 pages) */
 ADDRESS_MAP_END
 
-static MACHINE_RESET( dealem_vid )
+MACHINE_RESET_MEMBER(mpu4dealem_state,dealem_vid)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_vfd->reset(); //for debug ports only
+	m_vfd->reset(); //for debug ports only
 
-	mpu4_stepper_reset(state);
+	mpu4_stepper_reset(this);
 
-	state->m_lamp_strobe    = 0;
-	state->m_lamp_strobe2   = 0;
-	state->m_led_strobe     = 0;
+	m_lamp_strobe    = 0;
+	m_lamp_strobe2   = 0;
+	m_led_strobe     = 0;
 
-	state->m_IC23GC    = 0;
-	state->m_IC23GB    = 0;
-	state->m_IC23GA    = 0;
-	state->m_IC23G1    = 1;
-	state->m_IC23G2A   = 0;
-	state->m_IC23G2B   = 0;
+	m_IC23GC    = 0;
+	m_IC23GB    = 0;
+	m_IC23GA    = 0;
+	m_IC23G1    = 1;
+	m_IC23G2A   = 0;
+	m_IC23G2B   = 0;
 
-	state->m_prot_col  = 0;
-	state->m_chr_counter    = 0;
-	state->m_chr_value		= 0;
+	m_prot_col  = 0;
+	m_chr_counter    = 0;
+	m_chr_value		= 0;
 }
 
 
 /* machine driver for Zenitone Deal 'Em board */
 static MACHINE_CONFIG_START( dealem, mpu4dealem_state )
-	MCFG_MACHINE_START(mod2)							/* main mpu4 board initialisation */
-	MCFG_MACHINE_RESET(dealem_vid)
+	MCFG_MACHINE_START_OVERRIDE(mpu4dealem_state,mod2)							/* main mpu4 board initialisation */
+	MCFG_MACHINE_RESET_OVERRIDE(mpu4dealem_state,dealem_vid)
 
 	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(dealem_memmap)
@@ -229,7 +230,7 @@ static MACHINE_CONFIG_START( dealem, mpu4dealem_state )
 	MCFG_GFXDECODE(dealem)
 
 	MCFG_PALETTE_LENGTH(32)
-	MCFG_PALETTE_INIT(dealem)
+	MCFG_PALETTE_INIT_OVERRIDE(mpu4dealem_state,dealem)
 
 	MCFG_MC6845_ADD("crtc", HD6845, MPU4_MASTER_CLOCK / 4 / 8, hd6845_intf)	/* HD68B45 */
 MACHINE_CONFIG_END

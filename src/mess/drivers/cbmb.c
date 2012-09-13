@@ -275,12 +275,12 @@ static GFXDECODE_START( cbm700 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, cbm700_charlayout, 0, 1 )
 GFXDECODE_END
 
-static PALETTE_INIT( cbm700 )
+PALETTE_INIT_MEMBER(cbmb_state,cbm700)
 {
 	int i;
 
 	for ( i = 0; i < 2; i++ ) {
-		palette_set_color_rgb(machine, i, cbm700_palette[i*3], cbm700_palette[i*3+1], cbm700_palette[i*3+2]);
+		palette_set_color_rgb(machine(), i, cbm700_palette[i*3], cbm700_palette[i*3+1], cbm700_palette[i*3+2]);
 	}
 }
 
@@ -422,7 +422,7 @@ static MACHINE_CONFIG_START( cbm600, cbmb_state )
 	MCFG_CPU_ADD("maincpu", M6509, 7833600)        /* 7.8336 MHz */
 	MCFG_CPU_PROGRAM_MAP(cbmb_mem)
 
-	MCFG_MACHINE_RESET( cbmb )
+	MCFG_MACHINE_RESET_OVERRIDE(cbmb_state, cbmb )
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -434,11 +434,11 @@ static MACHINE_CONFIG_START( cbm600, cbmb_state )
 
 	MCFG_GFXDECODE( cbm600 )
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(cbm700_palette) / 3)
-	MCFG_PALETTE_INIT( cbm700 )
+	MCFG_PALETTE_INIT_OVERRIDE(cbmb_state, cbm700 )
 
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_18MHz / 8 /*?*/ /*  I do not know if this is correct, please verify */, cbm600_crtc)
 
-	MCFG_VIDEO_START( cbmb_crtc )
+	MCFG_VIDEO_START_OVERRIDE(cbmb_state, cbmb_crtc )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -478,7 +478,7 @@ static MACHINE_CONFIG_DERIVED( cbm700, cbm600 )
 	MCFG_DEVICE_REMOVE("crtc")
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_18MHz / 8 /*? I do not know if this is correct, please verify */, cbm700_crtc)
 
-	MCFG_VIDEO_START( cbm700 )
+	MCFG_VIDEO_START_OVERRIDE(cbmb_state, cbm700 )
 MACHINE_CONFIG_END
 
 
@@ -500,7 +500,7 @@ static MACHINE_CONFIG_START( p500, cbmb_state )
 	MCFG_CPU_PROGRAM_MAP(p500_mem)
 	//MCFG_CPU_PERIODIC_INT(vic2_raster_irq, VIC6567_HRETRACERATE)
 
-	MCFG_MACHINE_RESET( cbmb )
+	MCFG_MACHINE_RESET_OVERRIDE(cbmb_state, cbmb )
 
 	/* video hardware */
 	MCFG_MOS6567_ADD("vic6567", "screen", VIC6567_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)

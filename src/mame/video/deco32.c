@@ -510,55 +510,50 @@ static void dragngun_draw_sprites(running_machine& machine, bitmap_rgb32 &bitmap
 
 /******************************************************************************/
 
-VIDEO_START( captaven )
+VIDEO_START_MEMBER(deco32_state,captaven)
 {
-	deco32_state *state = machine.driver_data<deco32_state>();
-	state->m_has_ace_ram=0;
+	m_has_ace_ram=0;
 }
 
-VIDEO_START( fghthist )
+VIDEO_START_MEMBER(deco32_state,fghthist)
 {
-	deco32_state *state = machine.driver_data<deco32_state>();
-	state->m_dirty_palette = auto_alloc_array(machine, UINT8, 4096);
-	machine.device<decospr_device>("spritegen")->alloc_sprite_bitmap();
-	state->m_has_ace_ram=0;
+	m_dirty_palette = auto_alloc_array(machine(), UINT8, 4096);
+	machine().device<decospr_device>("spritegen")->alloc_sprite_bitmap();
+	m_has_ace_ram=0;
 }
 
-VIDEO_START( dragngun )
+VIDEO_START_MEMBER(dragngun_state,dragngun)
 {
-	dragngun_state *state = machine.driver_data<dragngun_state>();
-	state->m_dirty_palette = auto_alloc_array(machine, UINT8, 4096);
+	m_dirty_palette = auto_alloc_array(machine(), UINT8, 4096);
 
-	memset(state->m_dirty_palette,0,4096);
+	memset(m_dirty_palette,0,4096);
 
-	state_save_register_global(machine, state->m_dragngun_sprite_ctrl);
-	state->m_has_ace_ram=0;
+	state_save_register_global(machine(), m_dragngun_sprite_ctrl);
+	m_has_ace_ram=0;
 }
 
-VIDEO_START( lockload )
+VIDEO_START_MEMBER(dragngun_state,lockload)
 {
-	dragngun_state *state = machine.driver_data<dragngun_state>();
-	state->m_dirty_palette = auto_alloc_array(machine, UINT8, 4096);
+	m_dirty_palette = auto_alloc_array(machine(), UINT8, 4096);
 
-	memset(state->m_dirty_palette,0,4096);
+	memset(m_dirty_palette,0,4096);
 
-	state_save_register_global(machine, state->m_dragngun_sprite_ctrl);
-	state->m_has_ace_ram=0;
+	state_save_register_global(machine(), m_dragngun_sprite_ctrl);
+	m_has_ace_ram=0;
 }
 
-VIDEO_START( nslasher )
+VIDEO_START_MEMBER(deco32_state,nslasher)
 {
-	deco32_state *state = machine.driver_data<deco32_state>();
 	int width, height;
-	state->m_dirty_palette = auto_alloc_array(machine, UINT8, 4096);
-	width = machine.primary_screen->width();
-	height = machine.primary_screen->height();
-	state->m_tilemap_alpha_bitmap=auto_bitmap_ind16_alloc(machine, width, height );
-	machine.device<decospr_device>("spritegen1")->alloc_sprite_bitmap();
-	machine.device<decospr_device>("spritegen2")->alloc_sprite_bitmap();
-	memset(state->m_dirty_palette,0,4096);
-	state_save_register_global(machine, state->m_pri);
-	state->m_has_ace_ram=1;
+	m_dirty_palette = auto_alloc_array(machine(), UINT8, 4096);
+	width = machine().primary_screen->width();
+	height = machine().primary_screen->height();
+	m_tilemap_alpha_bitmap=auto_bitmap_ind16_alloc(machine(), width, height );
+	machine().device<decospr_device>("spritegen1")->alloc_sprite_bitmap();
+	machine().device<decospr_device>("spritegen2")->alloc_sprite_bitmap();
+	memset(m_dirty_palette,0,4096);
+	state_save_register_global(machine(), m_pri);
+	m_has_ace_ram=1;
 }
 
 /******************************************************************************/

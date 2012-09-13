@@ -730,32 +730,32 @@ static GFXDECODE_START( decocass )
 	GFXDECODE_ENTRY( NULL, 0xd800, objlayout,		48, 4 )  /* object */
 GFXDECODE_END
 
-static PALETTE_INIT( decocass )
+void decocass_state::palette_init()
 {
 	int i;
 
-	machine.colortable = colortable_alloc(machine, 32);
+	machine().colortable = colortable_alloc(machine(), 32);
 
 	/* set up 32 colors 1:1 pens */
 	for (i = 0; i < 32; i++)
-		colortable_entry_set_value(machine.colortable, i, i);
+		colortable_entry_set_value(machine().colortable, i, i);
 
 	/* setup straight/flipped colors for background tiles (D7 of color_center_bot ?) */
 	for (i = 0; i < 8; i++)
 	{
-		colortable_entry_set_value(machine.colortable, 32+i, 3*8+i);
-		colortable_entry_set_value(machine.colortable, 40+i, 3*8+((i << 1) & 0x04) + ((i >> 1) & 0x02) + (i & 0x01));
+		colortable_entry_set_value(machine().colortable, 32+i, 3*8+i);
+		colortable_entry_set_value(machine().colortable, 40+i, 3*8+((i << 1) & 0x04) + ((i >> 1) & 0x02) + (i & 0x01));
 	}
 
 	/* setup 4 colors for 1bpp object */
-	colortable_entry_set_value(machine.colortable, 48+0*2+0, 0);
-	colortable_entry_set_value(machine.colortable, 48+0*2+1, 25);	/* testtape red from 4th palette section? */
-	colortable_entry_set_value(machine.colortable, 48+1*2+0, 0);
-	colortable_entry_set_value(machine.colortable, 48+1*2+1, 28);	/* testtape blue from 4th palette section? */
-	colortable_entry_set_value(machine.colortable, 48+2*2+0, 0);
-	colortable_entry_set_value(machine.colortable, 48+2*2+1, 26);	/* testtape green from 4th palette section? */
-	colortable_entry_set_value(machine.colortable, 48+3*2+0, 0);
-	colortable_entry_set_value(machine.colortable, 48+3*2+1, 23);	/* ???? */
+	colortable_entry_set_value(machine().colortable, 48+0*2+0, 0);
+	colortable_entry_set_value(machine().colortable, 48+0*2+1, 25);	/* testtape red from 4th palette section? */
+	colortable_entry_set_value(machine().colortable, 48+1*2+0, 0);
+	colortable_entry_set_value(machine().colortable, 48+1*2+1, 28);	/* testtape blue from 4th palette section? */
+	colortable_entry_set_value(machine().colortable, 48+2*2+0, 0);
+	colortable_entry_set_value(machine().colortable, 48+2*2+1, 26);	/* testtape green from 4th palette section? */
+	colortable_entry_set_value(machine().colortable, 48+3*2+0, 0);
+	colortable_entry_set_value(machine().colortable, 48+3*2+1, 23);	/* ???? */
 }
 
 
@@ -774,8 +774,6 @@ static MACHINE_CONFIG_START( decocass, decocass_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(4200))				/* interleave CPUs */
 
-	MCFG_MACHINE_START(decocass)
-	MCFG_MACHINE_RESET(decocass)
 
 	MCFG_DECOCASS_TAPE_ADD("cassette")
 
@@ -787,8 +785,6 @@ static MACHINE_CONFIG_START( decocass, decocass_state )
 	MCFG_GFXDECODE(decocass)
 	MCFG_PALETTE_LENGTH(32+2*8+2*4)
 
-	MCFG_PALETTE_INIT(decocass)
-	MCFG_VIDEO_START(decocass)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -804,228 +800,228 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( ctsttape, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(ctsttape)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,ctsttape)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cprogolfj, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cprogolfj)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cprogolfj)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cdsteljn, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cdsteljn)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cdsteljn)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cfishing, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cfishing)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cfishing)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( chwy, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(chwy)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,chwy)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cterrani, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cterrani)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cterrani)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( castfant, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(castfant)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,castfant)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( csuperas, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(csuperas)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,csuperas)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( clocknch, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(clocknch)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,clocknch)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cprogolf, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cprogolf)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cprogolf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cluckypo, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cluckypo)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cluckypo)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ctisland, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(ctisland)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,ctisland)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cexplore, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cexplore)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cexplore)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cdiscon1, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cdiscon1)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cdiscon1)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ctornado, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(ctornado)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,ctornado)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cmissnx, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cmissnx)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cmissnx)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cptennis, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cptennis)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cptennis)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cbtime, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cbtime)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cbtime)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cburnrub, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cburnrub)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cburnrub)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cgraplop, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cgraplop)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cgraplop)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cgraplop2, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cgraplop2)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cgraplop2)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( clapapa, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(clapapa)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,clapapa)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cskater, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cskater)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cskater)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cprobowl, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cprobowl)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cprobowl)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cnightst, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cnightst)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cnightst)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cpsoccer, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cpsoccer)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cpsoccer)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( csdtenis, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(csdtenis)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,csdtenis)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( czeroize, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(czeroize)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,czeroize)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cppicf, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cppicf)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cppicf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cfghtice, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cfghtice)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cfghtice)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( type4, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(type4)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,type4)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cbdash, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cbdash)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cbdash)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cflyball, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cflyball)
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cflyball)
 MACHINE_CONFIG_END
 
 

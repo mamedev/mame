@@ -51,17 +51,16 @@ void xmen_sprite_callback( running_machine &machine, int *code, int *color, int 
 
 ***************************************************************************/
 
-VIDEO_START( xmen6p )
+VIDEO_START_MEMBER(xmen_state,xmen6p)
 {
-	xmen_state *state = machine.driver_data<xmen_state>();
 
-	k053247_get_ram(state->m_k053246, &state->m_k053247_ram);
+	k053247_get_ram(m_k053246, &m_k053247_ram);
 
-	state->m_screen_left  = auto_bitmap_ind16_alloc(machine, 64 * 8, 32 * 8);
-	state->m_screen_right = auto_bitmap_ind16_alloc(machine, 64 * 8, 32 * 8);
+	m_screen_left  = auto_bitmap_ind16_alloc(machine(), 64 * 8, 32 * 8);
+	m_screen_right = auto_bitmap_ind16_alloc(machine(), 64 * 8, 32 * 8);
 
-	state->save_item(NAME(*state->m_screen_left));
-	state->save_item(NAME(*state->m_screen_right));
+	save_item(NAME(*m_screen_left));
+	save_item(NAME(*m_screen_right));
 }
 
 

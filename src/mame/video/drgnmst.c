@@ -117,20 +117,19 @@ TILEMAP_MAPPER_MEMBER(drgnmst_state::drgnmst_bg_tilemap_scan_cols)
 	return (col * 8) + (row & 0x07) + ((row & 0xf8) >> 3) * 512;
 }
 
-VIDEO_START(drgnmst)
+void drgnmst_state::video_start()
 {
-	drgnmst_state *state = machine.driver_data<drgnmst_state>();
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(drgnmst_state::get_drgnmst_fg_tile_info),state), tilemap_mapper_delegate(FUNC(drgnmst_state::drgnmst_fg_tilemap_scan_cols),state), 8, 8, 64,64);
-	state->m_fg_tilemap->set_transparent_pen(15);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(drgnmst_state::get_drgnmst_fg_tile_info),this), tilemap_mapper_delegate(FUNC(drgnmst_state::drgnmst_fg_tilemap_scan_cols),this), 8, 8, 64,64);
+	m_fg_tilemap->set_transparent_pen(15);
 
-	state->m_md_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(drgnmst_state::get_drgnmst_md_tile_info),state), tilemap_mapper_delegate(FUNC(drgnmst_state::drgnmst_md_tilemap_scan_cols),state), 16, 16, 64,64);
-	state->m_md_tilemap->set_transparent_pen(15);
+	m_md_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(drgnmst_state::get_drgnmst_md_tile_info),this), tilemap_mapper_delegate(FUNC(drgnmst_state::drgnmst_md_tilemap_scan_cols),this), 16, 16, 64,64);
+	m_md_tilemap->set_transparent_pen(15);
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(drgnmst_state::get_drgnmst_bg_tile_info),state), tilemap_mapper_delegate(FUNC(drgnmst_state::drgnmst_bg_tilemap_scan_cols),state), 32, 32, 64,64);
-	state->m_bg_tilemap->set_transparent_pen(15);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(drgnmst_state::get_drgnmst_bg_tile_info),this), tilemap_mapper_delegate(FUNC(drgnmst_state::drgnmst_bg_tilemap_scan_cols),this), 32, 32, 64,64);
+	m_bg_tilemap->set_transparent_pen(15);
 
 	// do the other tilemaps have rowscroll too? probably not ..
-	state->m_md_tilemap->set_scroll_rows(1024);
+	m_md_tilemap->set_scroll_rows(1024);
 }
 
 SCREEN_UPDATE_IND16(drgnmst)

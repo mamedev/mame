@@ -8,22 +8,21 @@
 #include "video/decospr.h"
 
 
-VIDEO_START( simpl156 )
+void simpl156_state::video_start()
 {
-	simpl156_state *state = machine.driver_data<simpl156_state>();
 
 	/* allocate the ram as 16-bit (we do it here because the CPU is 32-bit) */
-	state->m_pf1_rowscroll = auto_alloc_array_clear(machine, UINT16, 0x800/2);
-	state->m_pf2_rowscroll = auto_alloc_array_clear(machine, UINT16, 0x800/2);
-	state->m_spriteram = auto_alloc_array_clear(machine, UINT16, 0x2000/2);
-	state->m_generic_paletteram_16.allocate(0x1000/2);
+	m_pf1_rowscroll = auto_alloc_array_clear(machine(), UINT16, 0x800/2);
+	m_pf2_rowscroll = auto_alloc_array_clear(machine(), UINT16, 0x800/2);
+	m_spriteram = auto_alloc_array_clear(machine(), UINT16, 0x2000/2);
+	m_generic_paletteram_16.allocate(0x1000/2);
 
-	memset(state->m_spriteram, 0xff, 0x2000);
+	memset(m_spriteram, 0xff, 0x2000);
 
 	/* and register the allocated ram so that save states still work */
-	state->save_pointer(NAME(state->m_pf1_rowscroll), 0x800/2);
-	state->save_pointer(NAME(state->m_pf2_rowscroll), 0x800/2);
-	state->save_pointer(NAME(state->m_spriteram), 0x2000/2);
+	save_pointer(NAME(m_pf1_rowscroll), 0x800/2);
+	save_pointer(NAME(m_pf2_rowscroll), 0x800/2);
+	save_pointer(NAME(m_spriteram), 0x2000/2);
 }
 
 SCREEN_UPDATE_IND16( simpl156 )

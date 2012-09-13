@@ -142,6 +142,8 @@ public:
 	int m_ColourRAM[4];
 	int m_Field;
 	int m_DrawInterlace;
+	virtual void machine_start();
+	virtual void palette_init();
 };
 
 
@@ -150,8 +152,8 @@ public:
 extern const wd17xx_interface dgnbeta_wd17xx_interface;
 extern const pia6821_interface dgnbeta_pia_intf[];
 
-MACHINE_START( dgnbeta );
-MACHINE_RESET( dgnbeta );
+
+
 
 // Page IO at FE00
 READ8_HANDLER( dgn_beta_page_r );

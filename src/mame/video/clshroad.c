@@ -40,23 +40,23 @@ WRITE8_MEMBER(clshroad_state::clshroad_flipscreen_w)
 }
 
 
-PALETTE_INIT( clshroad )
+PALETTE_INIT_MEMBER(clshroad_state,clshroad)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 	for (i = 0;i < 256;i++)
-		palette_set_color_rgb(machine,i,	pal4bit(color_prom[i + 256 * 0]),
+		palette_set_color_rgb(machine(),i,	pal4bit(color_prom[i + 256 * 0]),
 								        pal4bit(color_prom[i + 256 * 1]),
 								        pal4bit(color_prom[i + 256 * 2]));
 }
 
-PALETTE_INIT( firebatl )
+PALETTE_INIT_MEMBER(clshroad_state,firebatl)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x100);
+	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -65,20 +65,20 @@ PALETTE_INIT( firebatl )
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
 	color_prom += 0x300;
 
 	for (i = 0; i < 0x200; i++)
-		colortable_entry_set_value(machine.colortable, i, i & 0xff);
+		colortable_entry_set_value(machine().colortable, i, i & 0xff);
 
 	for (i = 0x200; i < 0x300; i++)
 	{
 		UINT8 ctabentry = ((color_prom[(i - 0x200) + 0x000] & 0x0f) << 4) |
 						   (color_prom[(i - 0x200) + 0x100] & 0x0f);
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 
@@ -204,52 +204,50 @@ WRITE8_MEMBER(clshroad_state::clshroad_vram_1_w)
 }
 
 
-VIDEO_START( firebatl )
+VIDEO_START_MEMBER(clshroad_state,firebatl)
 {
-	clshroad_state *state = machine.driver_data<clshroad_state>();
 	/* These 2 use the graphics and scroll value */
-	state->m_tilemap_0a = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0a),state),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
-	state->m_tilemap_0b = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0b),state),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
+	m_tilemap_0a = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0a),this),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
+	m_tilemap_0b = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0b),this),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
 	/* Text (No scrolling) */
-	state->m_tilemap_1  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_fb1),state),tilemap_mapper_delegate(FUNC(clshroad_state::tilemap_scan_rows_extra),state),8,8,0x24,0x20);
+	m_tilemap_1  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_fb1),this),tilemap_mapper_delegate(FUNC(clshroad_state::tilemap_scan_rows_extra),this),8,8,0x24,0x20);
 
-	state->m_tilemap_0a->set_scroll_rows(1);
-	state->m_tilemap_0b->set_scroll_rows(1);
-	state->m_tilemap_1->set_scroll_rows(1);
+	m_tilemap_0a->set_scroll_rows(1);
+	m_tilemap_0b->set_scroll_rows(1);
+	m_tilemap_1->set_scroll_rows(1);
 
-	state->m_tilemap_0a->set_scroll_cols(1);
-	state->m_tilemap_0b->set_scroll_cols(1);
-	state->m_tilemap_1->set_scroll_cols(1);
+	m_tilemap_0a->set_scroll_cols(1);
+	m_tilemap_0b->set_scroll_cols(1);
+	m_tilemap_1->set_scroll_cols(1);
 
-	state->m_tilemap_0a->set_scrolldx(-0x30, -0xb5);
-	state->m_tilemap_0b->set_scrolldx(-0x30, -0xb5);
+	m_tilemap_0a->set_scrolldx(-0x30, -0xb5);
+	m_tilemap_0b->set_scrolldx(-0x30, -0xb5);
 
-	state->m_tilemap_0b->set_transparent_pen(0 );
-	colortable_configure_tilemap_groups(machine.colortable, state->m_tilemap_1, machine.gfx[2], 0x0f);
+	m_tilemap_0b->set_transparent_pen(0 );
+	colortable_configure_tilemap_groups(machine().colortable, m_tilemap_1, machine().gfx[2], 0x0f);
 }
 
-VIDEO_START( clshroad )
+VIDEO_START_MEMBER(clshroad_state,clshroad)
 {
-	clshroad_state *state = machine.driver_data<clshroad_state>();
 	/* These 2 use the graphics and scroll value */
-	state->m_tilemap_0a = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0a),state),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
-	state->m_tilemap_0b = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0b),state),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
+	m_tilemap_0a = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0a),this),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
+	m_tilemap_0b = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0b),this),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
 	/* Text (No scrolling) */
-	state->m_tilemap_1  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_1),state),tilemap_mapper_delegate(FUNC(clshroad_state::tilemap_scan_rows_extra),state),8,8,0x24,0x20);
+	m_tilemap_1  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_1),this),tilemap_mapper_delegate(FUNC(clshroad_state::tilemap_scan_rows_extra),this),8,8,0x24,0x20);
 
-	state->m_tilemap_0a->set_scroll_rows(1);
-	state->m_tilemap_0b->set_scroll_rows(1);
-	state->m_tilemap_1->set_scroll_rows(1);
+	m_tilemap_0a->set_scroll_rows(1);
+	m_tilemap_0b->set_scroll_rows(1);
+	m_tilemap_1->set_scroll_rows(1);
 
-	state->m_tilemap_0a->set_scroll_cols(1);
-	state->m_tilemap_0b->set_scroll_cols(1);
-	state->m_tilemap_1->set_scroll_cols(1);
+	m_tilemap_0a->set_scroll_cols(1);
+	m_tilemap_0b->set_scroll_cols(1);
+	m_tilemap_1->set_scroll_cols(1);
 
-	state->m_tilemap_0a->set_scrolldx(-0x30, -0xb5);
-	state->m_tilemap_0b->set_scrolldx(-0x30, -0xb5);
+	m_tilemap_0a->set_scrolldx(-0x30, -0xb5);
+	m_tilemap_0b->set_scrolldx(-0x30, -0xb5);
 
-	state->m_tilemap_0b->set_transparent_pen(0x0f );
-	state->m_tilemap_1->set_transparent_pen(0x0f );
+	m_tilemap_0b->set_transparent_pen(0x0f );
+	m_tilemap_1->set_transparent_pen(0x0f );
 }
 
 

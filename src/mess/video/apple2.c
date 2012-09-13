@@ -442,35 +442,33 @@ void apple2_video_start(running_machine &machine, const UINT8 *vram, size_t vram
 
 
 
-VIDEO_START( apple2 )
+VIDEO_START_MEMBER(apple2_state,apple2)
 {
-	apple2_state *state = machine.driver_data<apple2_state>();
-	apple2_video_start(machine, machine.device<ram_device>(RAM_TAG)->pointer(), machine.device<ram_device>(RAM_TAG)->size(), VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 4);
+	apple2_video_start(machine(), machine().device<ram_device>(RAM_TAG)->pointer(), machine().device<ram_device>(RAM_TAG)->size(), VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 4);
 
 	/* hack to fix the colors on apple2/apple2p */
-	state->m_fgcolor = 0;
-	state->m_bgcolor = 15;
+	m_fgcolor = 0;
+	m_bgcolor = 15;
 
-	state->m_monochrome_dhr = false;
+	m_monochrome_dhr = false;
 }
 
 
-VIDEO_START( apple2p )
+VIDEO_START_MEMBER(apple2_state,apple2p)
 {
-	apple2_state *state = machine.driver_data<apple2_state>();
-	apple2_video_start(machine, machine.device<ram_device>(RAM_TAG)->pointer(), machine.device<ram_device>(RAM_TAG)->size(), VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 8);
+	apple2_video_start(machine(), machine().device<ram_device>(RAM_TAG)->pointer(), machine().device<ram_device>(RAM_TAG)->size(), VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 8);
 
 	/* hack to fix the colors on apple2/apple2p */
-	state->m_fgcolor = 0;
-	state->m_bgcolor = 15;
+	m_fgcolor = 0;
+	m_bgcolor = 15;
 
-	state->m_monochrome_dhr = false;
+	m_monochrome_dhr = false;
 }
 
 
-VIDEO_START( apple2e )
+VIDEO_START_MEMBER(apple2_state,apple2e)
 {
-	apple2_video_start(machine, machine.device<ram_device>(RAM_TAG)->pointer(), machine.device<ram_device>(RAM_TAG)->size(), 0, 8);
+	apple2_video_start(machine(), machine().device<ram_device>(RAM_TAG)->pointer(), machine().device<ram_device>(RAM_TAG)->size(), 0, 8);
 }
 
 

@@ -289,12 +289,11 @@ static GFXDECODE_START( shtrider )
 	GFXDECODE_ENTRY( "gfx2", 0, shtrider_spritelayout, 16*8, 16 )
 GFXDECODE_END
 
-static MACHINE_RESET( travrusa )
+void travrusa_state::machine_reset()
 {
-	travrusa_state *state = machine.driver_data<travrusa_state>();
 
-	state->m_scrollx[0] = 0;
-	state->m_scrollx[1] = 0;
+	m_scrollx[0] = 0;
+	m_scrollx[1] = 0;
 }
 
 static MACHINE_CONFIG_START( travrusa, travrusa_state )
@@ -304,7 +303,6 @@ static MACHINE_CONFIG_START( travrusa, travrusa_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_RESET(travrusa)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -320,8 +318,6 @@ static MACHINE_CONFIG_START( travrusa, travrusa_state )
 
 	MCFG_PALETTE_LENGTH(16*8+16*8)
 
-	MCFG_PALETTE_INIT(travrusa)
-	MCFG_VIDEO_START(travrusa)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(m52_sound_c_audio)
@@ -331,7 +327,7 @@ static MACHINE_CONFIG_DERIVED( shtrider, travrusa )
 
 	/* video hardware */
 	MCFG_GFXDECODE(shtrider)
-	MCFG_PALETTE_INIT(shtrider)
+	MCFG_PALETTE_INIT_OVERRIDE(travrusa_state,shtrider)
 MACHINE_CONFIG_END
 
 

@@ -93,6 +93,7 @@ public:
 	int m_rom_pagesize;
 	DECLARE_DRIVER_INIT(touryuu);
 	DECLARE_DRIVER_INIT(bballoon);
+	virtual void machine_reset();
 };
 
 
@@ -578,11 +579,10 @@ READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
 	return ret;
 }
 
-static MACHINE_RESET( bballoon )
+void ghosteo_state::machine_reset()
 {
-	ghosteo_state *state = machine.driver_data<ghosteo_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x4d000010, 0x4d000013,read32_delegate(FUNC(ghosteo_state::bballoon_speedup_r), state));
-	s3c2410 = machine.device("s3c2410");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x4d000010, 0x4d000013,read32_delegate(FUNC(ghosteo_state::bballoon_speedup_r), this));
+	s3c2410 = machine().device("s3c2410");
 }
 
 static MACHINE_CONFIG_START( ghosteo, ghosteo_state )
@@ -599,7 +599,6 @@ static MACHINE_CONFIG_START( ghosteo, ghosteo_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_MACHINE_RESET( bballoon )
 
 	MCFG_S3C2410_ADD("s3c2410", 12000000, bballoon_s3c2410_intf)
 

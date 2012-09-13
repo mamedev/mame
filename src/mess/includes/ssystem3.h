@@ -45,6 +45,8 @@ public:
 	playfield_t m_playfield;
 	lcd_t m_lcd;
 	DECLARE_DRIVER_INIT(ssystem3);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 

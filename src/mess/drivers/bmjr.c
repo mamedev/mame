@@ -48,14 +48,17 @@ public:
 	UINT8 m_xor_display;
 	UINT8 m_key_mux;
 	DECLARE_DRIVER_INIT(bmjr);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 
-static VIDEO_START( bmjr )
+void bmjr_state::video_start()
 {
-	bmjr_state *state = machine.driver_data<bmjr_state>();
-	state->m_p_chargen = state->memregion("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 static SCREEN_UPDATE_IND16( bmjr )
@@ -319,27 +322,25 @@ static GFXDECODE_START( bmjr )
 	GFXDECODE_ENTRY( "chargen", 0x0000, bmjr_charlayout, 0, 4 )
 GFXDECODE_END
 
-static PALETTE_INIT( bmjr )
+void bmjr_state::palette_init()
 {
 	int i;
 
 	for(i=0;i<8;i++)
-		palette_set_color_rgb(machine, i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
+		palette_set_color_rgb(machine(), i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
 }
 
 
-static MACHINE_START(bmjr)
+void bmjr_state::machine_start()
 {
-	bmjr_state *state = machine.driver_data<bmjr_state>();
-	beep_set_frequency(state->m_beep, 1200); //guesswork
-	beep_set_state(state->m_beep, 0);
+	beep_set_frequency(m_beep, 1200); //guesswork
+	beep_set_state(m_beep, 0);
 }
 
-static MACHINE_RESET(bmjr)
+void bmjr_state::machine_reset()
 {
-	bmjr_state *state = machine.driver_data<bmjr_state>();
-	state->m_tape_switch = 0;
-	state->m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+	m_tape_switch = 0;
+	m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
 static MACHINE_CONFIG_START( bmjr, bmjr_state )
@@ -348,8 +349,6 @@ static MACHINE_CONFIG_START( bmjr, bmjr_state )
 	MCFG_CPU_PROGRAM_MAP(bmjr_mem)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(bmjr)
-	MCFG_MACHINE_RESET(bmjr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -357,10 +356,8 @@ static MACHINE_CONFIG_START( bmjr, bmjr_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(256, 192)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
-	MCFG_VIDEO_START(bmjr)
 	MCFG_SCREEN_UPDATE_STATIC(bmjr)
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(bmjr)
 	MCFG_GFXDECODE(bmjr)
 
 	/* Audio */

@@ -36,11 +36,14 @@ public:
 	DECLARE_WRITE16_MEMBER(control2_w);
 	DECLARE_READ16_MEMBER(bishi_mirror_r);
 	DECLARE_READ16_MEMBER(bishi_K056832_rom_r);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 /*----------- defined in video/bishi.c -----------*/
 
 extern void bishi_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
 
-VIDEO_START(bishi);
+
 SCREEN_UPDATE_RGB32(bishi);

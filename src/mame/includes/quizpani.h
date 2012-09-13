@@ -20,11 +20,12 @@ public:
 	TILEMAP_MAPPER_MEMBER(bg_scan);
 	TILE_GET_INFO_MEMBER(bg_tile_info);
 	TILE_GET_INFO_MEMBER(txt_tile_info);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/quizpani.c -----------*/
 
 
-VIDEO_START( quizpani );
+
 SCREEN_UPDATE_IND16( quizpani );

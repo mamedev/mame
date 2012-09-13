@@ -11,7 +11,7 @@
 #include "includes/b2m.h"
 #include "machine/ram.h"
 
-VIDEO_START( b2m )
+void b2m_state::video_start()
 {
 }
 
@@ -53,7 +53,7 @@ static const rgb_t b2m_palette[4] = {
 	MAKE_RGB(0x00, 0x00, 0x00), // 3
 };
 
-PALETTE_INIT( b2m )
+void b2m_state::palette_init()
 {
-	palette_set_colors(machine, 0, b2m_palette, ARRAY_LENGTH(b2m_palette));
+	palette_set_colors(machine(), 0, b2m_palette, ARRAY_LENGTH(b2m_palette));
 }

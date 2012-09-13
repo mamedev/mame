@@ -364,22 +364,21 @@ static void nbmj8900_gfxdraw(running_machine &machine)
 
 
 ******************************************************************************/
-VIDEO_START( nbmj8900_2layer )
+void nbmj8900_state::video_start()
 {
-	nbmj8900_state *state = machine.driver_data<nbmj8900_state>();
-	state->m_screen_width = machine.primary_screen->width();
-	state->m_screen_height = machine.primary_screen->height();
+	m_screen_width = machine().primary_screen->width();
+	m_screen_height = machine().primary_screen->height();
 
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap0);
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap1);
-	state->m_videoram0 = auto_alloc_array(machine, UINT8, state->m_screen_width * state->m_screen_height);
-	state->m_videoram1 = auto_alloc_array(machine, UINT8, state->m_screen_width * state->m_screen_height);
-	state->m_palette = auto_alloc_array(machine, UINT8, 0x200);
-	state->m_clut = auto_alloc_array(machine, UINT8, 0x800);
-	memset(state->m_videoram0, 0xff, (state->m_screen_width * state->m_screen_height * sizeof(UINT8)));
-	memset(state->m_videoram1, 0xff, (state->m_screen_width * state->m_screen_height * sizeof(UINT8)));
-//  machine.pens[0x07f] = 0xff;    /* palette_transparent_pen */
-	state->m_gfxdraw_mode = 1;
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmap0);
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmap1);
+	m_videoram0 = auto_alloc_array(machine(), UINT8, m_screen_width * m_screen_height);
+	m_videoram1 = auto_alloc_array(machine(), UINT8, m_screen_width * m_screen_height);
+	m_palette = auto_alloc_array(machine(), UINT8, 0x200);
+	m_clut = auto_alloc_array(machine(), UINT8, 0x800);
+	memset(m_videoram0, 0xff, (m_screen_width * m_screen_height * sizeof(UINT8)));
+	memset(m_videoram1, 0xff, (m_screen_width * m_screen_height * sizeof(UINT8)));
+//  machine().pens[0x07f] = 0xff;    /* palette_transparent_pen */
+	m_gfxdraw_mode = 1;
 }
 
 /******************************************************************************

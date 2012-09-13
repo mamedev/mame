@@ -56,6 +56,9 @@ public:
 	DECLARE_DRIVER_INIT(palr1);
 	DECLARE_DRIVER_INIT(none);
 	DECLARE_DRIVER_INIT(palr6);
+	DECLARE_MACHINE_START(alg);
+	DECLARE_MACHINE_RESET(alg);
+	DECLARE_VIDEO_START(alg);
 };
 
 static TIMER_CALLBACK( response_timer );
@@ -91,14 +94,14 @@ static int get_lightgun_pos(screen_device &screen, int player, int *x, int *y)
  *
  *************************************/
 
-static VIDEO_START( alg )
+VIDEO_START_MEMBER(alg_state,alg)
 {
 	/* standard video start */
-	VIDEO_START_CALL(amiga);
+	VIDEO_START_CALL_MEMBER(amiga);
 
 	/* configure pen 4096 as transparent in the renderer and use it for the genlock color */
-	palette_set_color(machine, 4096, MAKE_ARGB(0,0,0,0));
-	amiga_set_genlock_color(machine, 4096);
+	palette_set_color(machine(), 4096, MAKE_ARGB(0,0,0,0));
+	amiga_set_genlock_color(machine(), 4096);
 }
 
 
@@ -109,18 +112,17 @@ static VIDEO_START( alg )
  *
  *************************************/
 
-static MACHINE_START( alg )
+MACHINE_START_MEMBER(alg_state,alg)
 {
-	alg_state *state = machine.driver_data<alg_state>();
 
-	state->m_serial_timer = machine.scheduler().timer_alloc(FUNC(response_timer));
-	state->m_serial_timer_active = FALSE;
+	m_serial_timer = machine().scheduler().timer_alloc(FUNC(response_timer));
+	m_serial_timer_active = FALSE;
 }
 
 
-static MACHINE_RESET( alg )
+MACHINE_RESET_MEMBER(alg_state,alg)
 {
-	MACHINE_RESET_CALL(amiga);
+	MACHINE_RESET_CALL_MEMBER(amiga);
 }
 
 
@@ -440,8 +442,8 @@ static MACHINE_CONFIG_START( alg_r1, alg_state )
 	MCFG_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map_r1)
 
-	MCFG_MACHINE_START(alg)
-	MCFG_MACHINE_RESET(alg)
+	MCFG_MACHINE_START_OVERRIDE(alg_state,alg)
+	MCFG_MACHINE_RESET_OVERRIDE(alg_state,alg)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_LASERDISC_LDP1450_ADD("laserdisc")
@@ -455,9 +457,9 @@ static MACHINE_CONFIG_START( alg_r1, alg_state )
 	MCFG_SCREEN_VISIBLE_AREA((129-8)*2, (449+8-1)*2, 44-8, 244+8-1)
 
 	MCFG_PALETTE_LENGTH(4097)
-	MCFG_PALETTE_INIT(amiga)
+	MCFG_PALETTE_INIT_OVERRIDE(alg_state,amiga)
 
-	MCFG_VIDEO_START(alg)
+	MCFG_VIDEO_START_OVERRIDE(alg_state,alg)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -231,20 +231,19 @@ static const ym2203_interface ym2203_config =
                 MACHINE DRIVERS
 ***********************************************************/
 
-static MACHINE_START( volfied )
+void volfied_state::machine_start()
 {
-	volfied_state *state = machine.driver_data<volfied_state>();
 
-	volfied_cchip_init(machine);
+	volfied_cchip_init(machine());
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_pc090oj = machine.device("pc090oj");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_pc090oj = machine().device("pc090oj");
 }
 
-static MACHINE_RESET( volfied )
+void volfied_state::machine_reset()
 {
-	volfied_cchip_reset(machine);
+	volfied_cchip_reset(machine());
 }
 
 static const pc090oj_interface volfied_pc090oj_intf =
@@ -269,8 +268,6 @@ static MACHINE_CONFIG_START( volfied, volfied_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
-	MCFG_MACHINE_START(volfied)
-	MCFG_MACHINE_RESET(volfied)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -283,7 +280,6 @@ static MACHINE_CONFIG_START( volfied, volfied_state )
 	MCFG_GFXDECODE(volfied)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(volfied)
 
 	MCFG_PC090OJ_ADD("pc090oj", volfied_pc090oj_intf)
 

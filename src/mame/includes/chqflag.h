@@ -40,6 +40,9 @@ public:
 	DECLARE_WRITE8_MEMBER(chqflag_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(k007232_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(k007232_extvolume_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 /*----------- defined in video/chqflag.c -----------*/
@@ -48,5 +51,5 @@ extern void chqflag_sprite_callback(running_machine &machine, int *code,int *col
 extern void chqflag_zoom_callback_0(running_machine &machine, int *code,int *color,int *flags);
 extern void chqflag_zoom_callback_1(running_machine &machine, int *code,int *color,int *flags);
 
-VIDEO_START( chqflag );
+
 SCREEN_UPDATE_IND16( chqflag );

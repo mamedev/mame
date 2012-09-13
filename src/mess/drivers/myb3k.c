@@ -38,9 +38,12 @@ public:
 	required_shared_ptr<UINT8> m_p_vram;
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
 	UINT8 m_vmode;
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
-static VIDEO_START( myb3k )
+void myb3k_state::video_start()
 {
 }
 
@@ -203,11 +206,11 @@ static INPUT_PORTS_START( myb3k )
 INPUT_PORTS_END
 
 
-static MACHINE_START(myb3k)
+void myb3k_state::machine_start()
 {
 }
 
-static MACHINE_RESET(myb3k)
+void myb3k_state::machine_reset()
 {
 }
 
@@ -270,8 +273,6 @@ static MACHINE_CONFIG_START( myb3k, myb3k_state )
 	MCFG_CPU_PROGRAM_MAP(myb3k_map)
 	MCFG_CPU_IO_MAP(myb3k_io)
 
-	MCFG_MACHINE_START(myb3k)
-	MCFG_MACHINE_RESET(myb3k)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -279,7 +280,6 @@ static MACHINE_CONFIG_START( myb3k, myb3k_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(320, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_VIDEO_START(myb3k)
 	MCFG_SCREEN_UPDATE_STATIC(myb3k)
 	MCFG_GFXDECODE(myb3k)
 	MCFG_PALETTE_LENGTH(2)

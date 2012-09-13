@@ -41,11 +41,12 @@ public:
 	DECLARE_READ8_MEMBER(test2_r);
 	DECLARE_READ8_MEMBER(in_r);
 	DECLARE_READ8_MEMBER(ld_r);
+	virtual void video_start();
 };
 
 
 
-static VIDEO_START( timetrv )
+void timetrv_state::video_start()
 {
 
 }
@@ -162,7 +163,6 @@ static MACHINE_CONFIG_START( timetrv, timetrv_state )
 
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(timetrv)
 	/* sound hardware */
 MACHINE_CONFIG_END
 

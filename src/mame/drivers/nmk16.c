@@ -191,14 +191,14 @@ WRITE16_MEMBER(nmk16_state::nmk16_mainram_strange_w)
 }
 
 
-static MACHINE_RESET( NMK004 )
+MACHINE_RESET_MEMBER(nmk16_state,NMK004)
 {
-	NMK004_init(machine);
+	NMK004_init(machine());
 }
 
-static MACHINE_RESET( mustang_sound )
+MACHINE_RESET_MEMBER(nmk16_state,mustang_sound)
 {
-	MACHINE_RESET_CALL(seibu_sound);
+	MACHINE_RESET_CALL_LEGACY(seibu_sound);
 }
 
 WRITE16_MEMBER(nmk16_state::ssmissin_sound_w)
@@ -3556,7 +3556,7 @@ static MACHINE_CONFIG_START( tharrier, nmk16_state )
 	MCFG_CPU_PROGRAM_MAP(tharrier_sound_map)
 	MCFG_CPU_IO_MAP(tharrier_sound_io_map)
 
-	MCFG_MACHINE_RESET(mustang_sound)
+	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,mustang_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3570,7 +3570,7 @@ static MACHINE_CONFIG_START( tharrier, nmk16_state )
 	MCFG_GFXDECODE(tharrier)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3613,7 +3613,7 @@ static MACHINE_CONFIG_START( manybloc, nmk16_state )
 	MCFG_GFXDECODE(tharrier)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3640,7 +3640,7 @@ static MACHINE_CONFIG_START( mustang, nmk16_state )
 	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET(NMK004)
+	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,NMK004)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3654,7 +3654,7 @@ static MACHINE_CONFIG_START( mustang, nmk16_state )
 	MCFG_GFXDECODE(macross)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3683,7 +3683,7 @@ static MACHINE_CONFIG_START( mustangb, nmk16_state )
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
-	MCFG_MACHINE_RESET(mustang_sound)
+	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,mustang_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3697,7 +3697,7 @@ static MACHINE_CONFIG_START( mustangb, nmk16_state )
 	MCFG_GFXDECODE(macross)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4, 1320000)
@@ -3715,7 +3715,7 @@ static MACHINE_CONFIG_START( bioship, nmk16_state )
 	MCFG_CPU_PERIODIC_INT(irq1_line_hold,100)/* 112 breaks the title screen */
 	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET(NMK004)
+	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,NMK004)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3729,7 +3729,7 @@ static MACHINE_CONFIG_START( bioship, nmk16_state )
 	MCFG_GFXDECODE(bioship)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(bioship)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,bioship)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3756,7 +3756,7 @@ static MACHINE_CONFIG_START( vandyke, nmk16_state )
 	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET(NMK004)
+	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,NMK004)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3770,7 +3770,7 @@ static MACHINE_CONFIG_START( vandyke, nmk16_state )
 	MCFG_GFXDECODE(macross)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3800,7 +3800,7 @@ static MACHINE_CONFIG_START( vandykeb, nmk16_state )
 	MCFG_CPU_ADD("mcu", PIC16C57, 12000000)	/* 3MHz */
 	MCFG_DEVICE_DISABLE()
 
-	//MCFG_MACHINE_RESET(NMK004) // no NMK004
+	//MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,NMK004) // no NMK004
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3814,7 +3814,7 @@ static MACHINE_CONFIG_START( vandykeb, nmk16_state )
 	MCFG_GFXDECODE(macross)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3831,7 +3831,7 @@ static MACHINE_CONFIG_START( acrobatm, nmk16_state )
 	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET(NMK004)
+	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,NMK004)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3845,7 +3845,7 @@ static MACHINE_CONFIG_START( acrobatm, nmk16_state )
 	MCFG_GFXDECODE(macross)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3876,7 +3876,7 @@ static MACHINE_CONFIG_START( tdragonb, nmk16_state )	/* bootleg using Raiden sou
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
-	MCFG_MACHINE_RESET(mustang_sound)
+	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,mustang_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3890,7 +3890,7 @@ static MACHINE_CONFIG_START( tdragonb, nmk16_state )	/* bootleg using Raiden sou
 	MCFG_GFXDECODE(macross)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4, 1320000)
@@ -3905,7 +3905,7 @@ static MACHINE_CONFIG_START( tdragon, nmk16_state )
 	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ?? drives music */
 	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET(NMK004)
+	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,NMK004)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3919,7 +3919,7 @@ static MACHINE_CONFIG_START( tdragon, nmk16_state )
 	MCFG_GFXDECODE(macross)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 	MCFG_TIMER_ADD_PERIODIC("coinsim", tdragon_mcu_sim, attotime::from_hz(10000)) // not real, but for simulating the MCU
 
 	/* sound hardware */
@@ -3962,7 +3962,7 @@ static MACHINE_CONFIG_START( ssmissin, nmk16_state )
 	MCFG_GFXDECODE(macross)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3980,7 +3980,7 @@ static MACHINE_CONFIG_START( strahl, nmk16_state )
 	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET(NMK004)
+	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,NMK004)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3994,7 +3994,7 @@ static MACHINE_CONFIG_START( strahl, nmk16_state )
 	MCFG_GFXDECODE(strahl)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(strahl)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,strahl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4021,7 +4021,7 @@ static MACHINE_CONFIG_START( hachamf, nmk16_state )
 	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
-	MCFG_MACHINE_RESET(NMK004)
+	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,NMK004)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4035,7 +4035,7 @@ static MACHINE_CONFIG_START( hachamf, nmk16_state )
 	MCFG_GFXDECODE(macross)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 	MCFG_TIMER_ADD_PERIODIC("coinsim", hachamf_mcu_sim, attotime::from_hz(10000)) // not real, but for simulating the MCU
 
 	/* sound hardware */
@@ -4063,7 +4063,7 @@ static MACHINE_CONFIG_START( macross, nmk16_state )
 	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
-	MCFG_MACHINE_RESET(NMK004)
+	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,NMK004)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4077,7 +4077,7 @@ static MACHINE_CONFIG_START( macross, nmk16_state )
 	MCFG_GFXDECODE(macross)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4104,7 +4104,7 @@ static MACHINE_CONFIG_START( blkheart, nmk16_state )
 	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
-	MCFG_MACHINE_RESET(NMK004)
+	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,NMK004)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4118,7 +4118,7 @@ static MACHINE_CONFIG_START( blkheart, nmk16_state )
 	MCFG_GFXDECODE(macross)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4145,7 +4145,7 @@ static MACHINE_CONFIG_START( gunnail, nmk16_state )
 	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)
 
-	MCFG_MACHINE_RESET(NMK004)
+	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,NMK004)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4159,7 +4159,7 @@ static MACHINE_CONFIG_START( gunnail, nmk16_state )
 	MCFG_GFXDECODE(macross)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(gunnail)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,gunnail)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4202,7 +4202,7 @@ static MACHINE_CONFIG_START( macross2, nmk16_state )
 	MCFG_GFXDECODE(macross2)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(macross2)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4244,7 +4244,7 @@ static MACHINE_CONFIG_START( tdragon2, nmk16_state )
 	MCFG_GFXDECODE(macross2)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(macross2)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4285,7 +4285,7 @@ static MACHINE_CONFIG_START( raphero, nmk16_state )
 	MCFG_GFXDECODE(macross2)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(raphero)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,raphero)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4323,7 +4323,7 @@ static MACHINE_CONFIG_START( bjtwin, nmk16_state )
 	MCFG_GFXDECODE(bjtwin)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(bjtwin)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,bjtwin)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4832,7 +4832,7 @@ static MACHINE_CONFIG_START( stagger1, nmk16_state )
 	MCFG_GFXDECODE(stagger1)
 	MCFG_PALETTE_LENGTH(768)
 
-	MCFG_VIDEO_START(afega)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,afega)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -4870,7 +4870,7 @@ static MACHINE_CONFIG_DERIVED( grdnstrm, stagger1 )
 
 	/* video hardware */
 	MCFG_GFXDECODE(grdnstrm)
-	MCFG_VIDEO_START(firehawk)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,firehawk)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(firehawk)
 MACHINE_CONFIG_END
@@ -4883,7 +4883,7 @@ static MACHINE_CONFIG_DERIVED( grdnstrmk, stagger1 ) /* Side by side with PCB, t
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(57) /* Side by side with PCB, MAME is too fast at 56 */
 	MCFG_GFXDECODE(grdnstrm)
-	MCFG_VIDEO_START(grdnstrm)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,grdnstrm)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( popspops, grdnstrm )
@@ -4917,7 +4917,7 @@ static MACHINE_CONFIG_START( firehawk, nmk16_state )
 	MCFG_GFXDECODE(grdnstrm)
 	MCFG_PALETTE_LENGTH(768)
 
-	MCFG_VIDEO_START(firehawk)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,firehawk)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4952,7 +4952,7 @@ static MACHINE_CONFIG_START( twinactn, nmk16_state )
 	MCFG_GFXDECODE(macross)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

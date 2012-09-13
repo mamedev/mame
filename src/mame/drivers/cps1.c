@@ -3030,24 +3030,23 @@ static const ym2151_interface ym2151_config =
 *
 ********************************************************************/
 
-static MACHINE_START( common )
+MACHINE_START_MEMBER(cps_state,common)
 {
-	cps_state *state = machine.driver_data<cps_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 }
 
-static MACHINE_START( cps1 )
+MACHINE_START_MEMBER(cps_state,cps1)
 {
-	MACHINE_START_CALL(common);
-	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("audiocpu")->base() + 0x10000, 0x4000);
+	MACHINE_START_CALL_MEMBER(common);
+	machine().root_device().membank("bank1")->configure_entries(0, 2, machine().root_device().memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
-static MACHINE_START( qsound )
+MACHINE_START_MEMBER(cps_state,qsound)
 {
-	MACHINE_START_CALL(common);
-	machine.root_device().membank("bank1")->configure_entries(0, 6, machine.root_device().memregion("audiocpu")->base() + 0x10000, 0x4000);
+	MACHINE_START_CALL_MEMBER(common);
+	machine().root_device().membank("bank1")->configure_entries(0, 6, machine().root_device().memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 static MACHINE_CONFIG_START( cps1_10MHz, cps_state )
@@ -3060,7 +3059,7 @@ static MACHINE_CONFIG_START( cps1_10MHz, cps_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MCFG_MACHINE_START(cps1)
+	MCFG_MACHINE_START_OVERRIDE(cps_state,cps1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3074,7 +3073,7 @@ static MACHINE_CONFIG_START( cps1_10MHz, cps_state )
 	MCFG_GFXDECODE(cps1)
 	MCFG_PALETTE_LENGTH(0xc00)
 
-	MCFG_VIDEO_START(cps1)
+	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3116,7 +3115,7 @@ static MACHINE_CONFIG_DERIVED( qsound, cps1_12MHz )
 	MCFG_CPU_PROGRAM_MAP(qsound_sub_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 250)	/* ?? */
 
-	MCFG_MACHINE_START(qsound)
+	MCFG_MACHINE_START_OVERRIDE(cps_state,qsound)
 
 	MCFG_EEPROM_ADD("eeprom", qsound_eeprom_interface)
 
@@ -3144,7 +3143,7 @@ static MACHINE_CONFIG_START( cpspicb, cps_state )
 	MCFG_CPU_ADD("audiocpu", PIC16C57, 12000000)
 	MCFG_DEVICE_DISABLE() /* no valid dumps .. */
 
-	MCFG_MACHINE_START(common)
+	MCFG_MACHINE_START_OVERRIDE(cps_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3158,7 +3157,7 @@ static MACHINE_CONFIG_START( cpspicb, cps_state )
 	MCFG_GFXDECODE(cps1)
 	MCFG_PALETTE_LENGTH(0xc00)
 
-	MCFG_VIDEO_START(cps1)
+	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3218,7 +3217,7 @@ static MACHINE_CONFIG_START( sf2mdt, cps_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(sf2mdt_z80map)
 
-	MCFG_MACHINE_START(common)
+	MCFG_MACHINE_START_OVERRIDE(cps_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3232,7 +3231,7 @@ static MACHINE_CONFIG_START( sf2mdt, cps_state )
 	MCFG_GFXDECODE(cps1)
 	MCFG_PALETTE_LENGTH(0xc00)
 
-	MCFG_VIDEO_START(cps1)
+	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3302,7 +3301,7 @@ static MACHINE_CONFIG_START( knightsb, cps_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 29821000 / 8)
 	MCFG_CPU_PROGRAM_MAP(sf2mdt_z80map)
 
-	MCFG_MACHINE_START(common)
+	MCFG_MACHINE_START_OVERRIDE(cps_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3316,7 +3315,7 @@ static MACHINE_CONFIG_START( knightsb, cps_state )
 	MCFG_GFXDECODE(cps1)
 	MCFG_PALETTE_LENGTH(0xc00)
 
-	MCFG_VIDEO_START(cps1)
+	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

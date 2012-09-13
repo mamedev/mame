@@ -64,6 +64,10 @@ public:
 	TILE_GET_INFO_MEMBER(get_piv0_tile_info);
 	TILE_GET_INFO_MEMBER(get_piv1_tile_info);
 	TILE_GET_INFO_MEMBER(get_piv2_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	DECLARE_VIDEO_START(wgp2);
 };
 
 
@@ -71,6 +75,6 @@ public:
 
 
 
-VIDEO_START( wgp );
-VIDEO_START( wgp2 );
+
+
 SCREEN_UPDATE_IND16( wgp );

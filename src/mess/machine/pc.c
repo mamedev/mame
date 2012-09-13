@@ -1432,53 +1432,49 @@ static IRQ_CALLBACK(pc_irq_callback)
 }
 
 
-MACHINE_START( pc )
+MACHINE_START_MEMBER(pc_state,pc)
 {
-	pc_state *st = machine.driver_data<pc_state>();
-
-	st->m_pic8259 = machine.device("pic8259");
-	st->m_dma8237 = machine.device("dma8237");
-	st->m_pit8253 = machine.device("pit8253");
-	pc_fdc_init( machine, &fdc_interface_nc );
+	m_pic8259 = machine().device("pic8259");
+	m_dma8237 = machine().device("dma8237");
+	m_pit8253 = machine().device("pit8253");
+	pc_fdc_init( machine(), &fdc_interface_nc );
 }
 
 
-MACHINE_RESET( pc )
+MACHINE_RESET_MEMBER(pc_state,pc)
 {
-	device_t *speaker = machine.device(SPEAKER_TAG);
-	pc_state *st = machine.driver_data<pc_state>();
-	st->m_maincpu = machine.device<cpu_device>("maincpu" );
-	st->m_maincpu->set_irq_acknowledge_callback(pc_irq_callback);
+	device_t *speaker = machine().device(SPEAKER_TAG);
+	m_maincpu = machine().device<cpu_device>("maincpu" );
+	m_maincpu->set_irq_acknowledge_callback(pc_irq_callback);
 
-	st->m_u73_q2 = 0;
-	st->m_out1 = 0;
-	st->m_pc_spkrdata = 0;
-	st->m_pc_input = 1;
-	st->m_dma_channel = 0;
-	memset(st->m_dma_offset,0,sizeof(st->m_dma_offset));
-	st->m_ppi_portc_switch_high = 0;
-	st->m_ppi_speaker = 0;
-	st->m_ppi_keyboard_clear = 0;
-	st->m_ppi_keyb_clock = 0;
-	st->m_ppi_portb = 0;
-	st->m_ppi_clock_signal = 0;
-	st->m_ppi_data_signal = 0;
-	st->m_ppi_shift_register = 0;
-	st->m_ppi_shift_enable = 0;
+	m_u73_q2 = 0;
+	m_out1 = 0;
+	m_pc_spkrdata = 0;
+	m_pc_input = 1;
+	m_dma_channel = 0;
+	memset(m_dma_offset,0,sizeof(m_dma_offset));
+	m_ppi_portc_switch_high = 0;
+	m_ppi_speaker = 0;
+	m_ppi_keyboard_clear = 0;
+	m_ppi_keyb_clock = 0;
+	m_ppi_portb = 0;
+	m_ppi_clock_signal = 0;
+	m_ppi_data_signal = 0;
+	m_ppi_shift_register = 0;
+	m_ppi_shift_enable = 0;
 
 	speaker_level_w( speaker, 0 );
 }
 
 
-MACHINE_START( mc1502 )
+MACHINE_START_MEMBER(pc_state,mc1502)
 {
-	pc_state *st = machine.driver_data<pc_state>();
-	st->m_maincpu = machine.device<cpu_device>("maincpu" );
-	st->m_maincpu->set_irq_acknowledge_callback(pc_irq_callback);
+	m_maincpu = machine().device<cpu_device>("maincpu" );
+	m_maincpu->set_irq_acknowledge_callback(pc_irq_callback);
 
-	st->m_pic8259 = machine.device("pic8259");
-	st->m_dma8237 = NULL;
-	st->m_pit8253 = machine.device("pit8253");
+	m_pic8259 = machine().device("pic8259");
+	m_dma8237 = NULL;
+	m_pit8253 = machine().device("pit8253");
 
 	/*
            Keyboard polling circuit holds IRQ1 high until a key is
@@ -1486,51 +1482,49 @@ MACHINE_START( mc1502 )
            40ms (check) for 20ms (check) until all keys are released.
            Last pulse causes BIOS to write a 'break' scancode into port 60h.
      */
-	pic8259_ir1_w(st->m_pic8259, 1);
+	pic8259_ir1_w(m_pic8259, 1);
 	memset(&mc1502_keyb, 0, sizeof(mc1502_keyb));
-	mc1502_keyb.keyb_signal_timer = machine.scheduler().timer_alloc(FUNC(mc1502_keyb_signal_callback));
+	mc1502_keyb.keyb_signal_timer = machine().scheduler().timer_alloc(FUNC(mc1502_keyb_signal_callback));
 	mc1502_keyb.keyb_signal_timer->adjust( attotime::from_msec(20), 0, attotime::from_msec(20) );
 }
 
 
-MACHINE_START( pcjr )
+MACHINE_START_MEMBER(pc_state,pcjr)
 {
-	pc_state *st = machine.driver_data<pc_state>();
-	pc_fdc_init( machine, &pcjr_fdc_interface_nc );
-	pcjr_keyb.keyb_signal_timer = machine.scheduler().timer_alloc(FUNC(pcjr_keyb_signal_callback));
-	pc_int_delay_timer = machine.scheduler().timer_alloc(FUNC(pcjr_delayed_pic8259_irq));
-	st->m_maincpu = machine.device<cpu_device>("maincpu" );
-	st->m_maincpu->set_irq_acknowledge_callback(pc_irq_callback);
+	pc_fdc_init( machine(), &pcjr_fdc_interface_nc );
+	pcjr_keyb.keyb_signal_timer = machine().scheduler().timer_alloc(FUNC(pcjr_keyb_signal_callback));
+	pc_int_delay_timer = machine().scheduler().timer_alloc(FUNC(pcjr_delayed_pic8259_irq));
+	m_maincpu = machine().device<cpu_device>("maincpu" );
+	m_maincpu->set_irq_acknowledge_callback(pc_irq_callback);
 
-	st->m_pic8259 = machine.device("pic8259");
-	st->m_dma8237 = NULL;
-	st->m_pit8253 = machine.device("pit8253");
+	m_pic8259 = machine().device("pic8259");
+	m_dma8237 = NULL;
+	m_pit8253 = machine().device("pit8253");
 }
 
 
-MACHINE_RESET( pcjr )
+MACHINE_RESET_MEMBER(pc_state,pcjr)
 {
-	device_t *speaker = machine.device(SPEAKER_TAG);
-	pc_state *st = machine.driver_data<pc_state>();
-	st->m_u73_q2 = 0;
-	st->m_out1 = 0;
-	st->m_pc_spkrdata = 0;
-	st->m_pc_input = 1;
-	st->m_dma_channel = 0;
-	memset(st->m_memboard,0xc,sizeof(st->m_memboard));	// check
-	memset(st->m_dma_offset,0,sizeof(st->m_dma_offset));
-	st->m_ppi_portc_switch_high = 0;
-	st->m_ppi_speaker = 0;
-	st->m_ppi_keyboard_clear = 0;
-	st->m_ppi_keyb_clock = 0;
-	st->m_ppi_portb = 0;
-	st->m_ppi_clock_signal = 0;
-	st->m_ppi_data_signal = 0;
-	st->m_ppi_shift_register = 0;
-	st->m_ppi_shift_enable = 0;
+	device_t *speaker = machine().device(SPEAKER_TAG);
+	m_u73_q2 = 0;
+	m_out1 = 0;
+	m_pc_spkrdata = 0;
+	m_pc_input = 1;
+	m_dma_channel = 0;
+	memset(m_memboard,0xc,sizeof(m_memboard));	// check
+	memset(m_dma_offset,0,sizeof(m_dma_offset));
+	m_ppi_portc_switch_high = 0;
+	m_ppi_speaker = 0;
+	m_ppi_keyboard_clear = 0;
+	m_ppi_keyb_clock = 0;
+	m_ppi_portb = 0;
+	m_ppi_clock_signal = 0;
+	m_ppi_data_signal = 0;
+	m_ppi_shift_register = 0;
+	m_ppi_shift_enable = 0;
 	speaker_level_w( speaker, 0 );
 
-	pcjr_keyb_init(machine);
+	pcjr_keyb_init(machine());
 }
 
 

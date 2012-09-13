@@ -1725,14 +1725,14 @@ static INPUT_PORTS_START( gp32 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("START") PORT_PLAYER(1)
 INPUT_PORTS_END
 
-static MACHINE_START( gp32 )
+void gp32_state::machine_start()
 {
-	s3c240x_machine_start(machine);
+	s3c240x_machine_start(machine());
 }
 
-static MACHINE_RESET( gp32 )
+void gp32_state::machine_reset()
 {
-	s3c240x_machine_reset(machine);
+	s3c240x_machine_reset(machine());
 }
 
 static MACHINE_CONFIG_START( gp32, gp32_state )
@@ -1751,8 +1751,6 @@ static MACHINE_CONFIG_START( gp32, gp32_state )
 	/* 320x240 is 4:3 but ROT270 causes an aspect ratio of 3:4 by default */
 	MCFG_DEFAULT_LAYOUT(layout_lcd_rot)
 
-	MCFG_MACHINE_START(gp32)
-	MCFG_MACHINE_RESET(gp32)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("dac1", DAC, 0)

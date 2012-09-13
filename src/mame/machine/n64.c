@@ -2402,29 +2402,28 @@ static void n64_machine_stop(running_machine &machine)
 	image->battery_save(data, 0x30800);
 }
 
-MACHINE_START( n64 )
+void n64_state::machine_start()
 {
-	n64_state *state = machine.driver_data<n64_state>();
-	rdram = reinterpret_cast<UINT32 *>(state->memshare("rdram")->ptr());
-	n64_sram = reinterpret_cast<UINT32 *>(state->memshare("sram")->ptr());
-	rsp_imem = reinterpret_cast<UINT32 *>(state->memshare("rsp_imem")->ptr());
-	rsp_dmem = reinterpret_cast<UINT32 *>(state->memshare("rsp_dmem")->ptr());
+	rdram = reinterpret_cast<UINT32 *>(memshare("rdram")->ptr());
+	n64_sram = reinterpret_cast<UINT32 *>(memshare("sram")->ptr());
+	rsp_imem = reinterpret_cast<UINT32 *>(memshare("rsp_imem")->ptr());
+	rsp_dmem = reinterpret_cast<UINT32 *>(memshare("rsp_dmem")->ptr());
 
-	mips3drc_set_options(machine.device("maincpu"), MIPS3DRC_COMPATIBLE_OPTIONS);
+	mips3drc_set_options(machine().device("maincpu"), MIPS3DRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine.device("maincpu"), 0x00000000, 0x007fffff, FALSE, rdram);
+	mips3drc_add_fastram(machine().device("maincpu"), 0x00000000, 0x007fffff, FALSE, rdram);
 
-	rspdrc_set_options(machine.device("rsp"), RSPDRC_STRICT_VERIFY);
-	rspdrc_flush_drc_cache(machine.device("rsp"));
-	rspdrc_add_dmem(machine.device("rsp"), rsp_dmem);
-	rspdrc_add_imem(machine.device("rsp"), rsp_imem);
+	rspdrc_set_options(machine().device("rsp"), RSPDRC_STRICT_VERIFY);
+	rspdrc_flush_drc_cache(machine().device("rsp"));
+	rspdrc_add_dmem(machine().device("rsp"), rsp_dmem);
+	rspdrc_add_imem(machine().device("rsp"), rsp_imem);
 
 	/* add a hook for battery save */
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(n64_machine_stop),&machine));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(n64_machine_stop),&machine()));
 }
 
-MACHINE_RESET( n64 )
+void n64_state::machine_reset()
 {
-	machine.device("rsp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	machine().device("rsp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }

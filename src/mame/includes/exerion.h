@@ -57,13 +57,17 @@ public:
 	DECLARE_WRITE8_MEMBER(exerion_portb_w);
 	DECLARE_DRIVER_INIT(exerion);
 	DECLARE_DRIVER_INIT(exerionb);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 
 /*----------- defined in video/exerion.c -----------*/
 
-PALETTE_INIT( exerion );
-VIDEO_START( exerion );
+
+
 SCREEN_UPDATE_IND16( exerion );
 

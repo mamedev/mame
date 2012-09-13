@@ -274,10 +274,8 @@ static MACHINE_CONFIG_START( flower, flower_state )
 
 	MCFG_GFXDECODE(flower)
 
-	MCFG_PALETTE_INIT(flower)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(flower)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

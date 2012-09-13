@@ -376,8 +376,8 @@ static MACHINE_CONFIG_START( sms_ntsc_base, sms_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START(sms)
-	MCFG_MACHINE_RESET(sms)
+	MCFG_MACHINE_START_OVERRIDE(sms_state,sms)
+	MCFG_MACHINE_RESET_OVERRIDE(sms_state,sms)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -432,7 +432,7 @@ static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 	MCFG_PALETTE_LENGTH(SEGA315_5124_PALETTE_SIZE)
 	MCFG_PALETTE_INIT(sega315_5124)
 
-	MCFG_VIDEO_START(sms1)
+	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 
 	MCFG_SEGA315_5124_ADD("sms_vdp", _315_5124_ntsc_intf)
 MACHINE_CONFIG_END
@@ -487,8 +487,8 @@ static MACHINE_CONFIG_START( sms_pal_base, sms_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
-	MCFG_MACHINE_START(sms)
-	MCFG_MACHINE_RESET(sms)
+	MCFG_MACHINE_START_OVERRIDE(sms_state,sms)
+	MCFG_MACHINE_RESET_OVERRIDE(sms_state,sms)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -544,7 +544,7 @@ static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
-	MCFG_VIDEO_START(sms1)
+	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 
 	MCFG_SEGA315_5124_ADD("sms_vdp", _315_5124_pal_intf)
 MACHINE_CONFIG_END
@@ -578,8 +578,8 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START(sms)
-	MCFG_MACHINE_RESET(sms)
+	MCFG_MACHINE_START_OVERRIDE(sms_state,sms)
+	MCFG_MACHINE_RESET_OVERRIDE(sms_state,sms)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -591,7 +591,7 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 	MCFG_PALETTE_LENGTH(SEGA315_5378_PALETTE_SIZE)
 	MCFG_PALETTE_INIT(sega315_5378)
 
-	MCFG_VIDEO_START(gamegear)
+	MCFG_VIDEO_START_OVERRIDE(sms_state,gamegear)
 
 	MCFG_SEGA315_5378_ADD("sms_vdp", _315_5124_ntsc_intf)
 

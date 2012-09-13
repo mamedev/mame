@@ -128,15 +128,16 @@ public:
 	DECLARE_WRITE8_MEMBER(ay1_sel);
 	DECLARE_WRITE8_MEMBER(ay2_sel);
 	DECLARE_DRIVER_INIT(mirax);
+	virtual void palette_init();
 };
 
 
-static PALETTE_INIT( mirax )
+void mirax_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -155,7 +156,7 @@ static PALETTE_INIT( mirax )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -467,7 +468,6 @@ static MACHINE_CONFIG_START( mirax, mirax_state )
 	MCFG_SCREEN_UPDATE_STATIC(mirax)
 
 	MCFG_PALETTE_LENGTH(0x40)
-	MCFG_PALETTE_INIT(mirax)
 	MCFG_GFXDECODE(mirax)
 
 	MCFG_SOUND_START(mirax)

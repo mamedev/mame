@@ -27,12 +27,14 @@ public:
 	DECLARE_WRITE8_MEMBER(tankbatt_videoram_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/tankbatt.c -----------*/
 
 
-PALETTE_INIT( tankbatt );
-VIDEO_START( tankbatt );
+
+
 SCREEN_UPDATE_IND16( tankbatt );

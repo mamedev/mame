@@ -177,29 +177,27 @@ READ8_HANDLER( acitya_decrypt_rom )
 }
 
 
-MACHINE_START( acitya )
+MACHINE_START_MEMBER(pacman_state,acitya)
 {
-	pacman_state *state = machine.driver_data<pacman_state>();
-	UINT8 *RAM = state->memregion("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 
 	/* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
         memory overhead and decrypt the ROMs using each method in advance. */
-	acitya_decrypt_rom_8(machine);
-	acitya_decrypt_rom_9(machine);
-	acitya_decrypt_rom_A(machine);
-	acitya_decrypt_rom_B(machine);
+	acitya_decrypt_rom_8(machine());
+	acitya_decrypt_rom_9(machine());
+	acitya_decrypt_rom_A(machine());
+	acitya_decrypt_rom_B(machine());
 
-	state->membank("bank1")->configure_entries(0, 4, &RAM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 4, &RAM[0x10000], 0x4000);
 
-	state_save_register_global(machine, state->m_counter);
+	state_save_register_global(machine(), m_counter);
 }
 
 
-MACHINE_RESET( acitya )
+MACHINE_RESET_MEMBER(pacman_state,acitya)
 {
-	pacman_state *state = machine.driver_data<pacman_state>();
 	/* The initial state of the counter is 0x0B */
-	state->m_counter = 0x0B;
-	state->membank("bank1")->set_entry(3);
+	m_counter = 0x0B;
+	membank("bank1")->set_entry(3);
 }

@@ -76,6 +76,7 @@ public:
 	DECLARE_READ8_MEMBER(tomcat_nvram_r);
 	DECLARE_WRITE8_MEMBER(tomcat_nvram_w);
 	DECLARE_WRITE8_MEMBER(soundlatches_w);
+	virtual void machine_start();
 };
 
 
@@ -355,22 +356,21 @@ static INPUT_PORTS_START( tomcat )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30)
 INPUT_PORTS_END
 
-static MACHINE_START(tomcat)
+void tomcat_state::machine_start()
 {
-	tomcat_state *state = machine.driver_data<tomcat_state>();
-	((UINT16*)state->m_shared_ram)[0x0000] = 0xf600;
-	((UINT16*)state->m_shared_ram)[0x0001] = 0x0000;
-	((UINT16*)state->m_shared_ram)[0x0002] = 0xf600;
-	((UINT16*)state->m_shared_ram)[0x0003] = 0x0000;
+	((UINT16*)m_shared_ram)[0x0000] = 0xf600;
+	((UINT16*)m_shared_ram)[0x0001] = 0x0000;
+	((UINT16*)m_shared_ram)[0x0002] = 0xf600;
+	((UINT16*)m_shared_ram)[0x0003] = 0x0000;
 
-	machine.device<nvram_device>("nvram")->set_base(state->m_nvram, 0x800);
+	machine().device<nvram_device>("nvram")->set_base(m_nvram, 0x800);
 
-	state->save_item(NAME(state->m_nvram));
-	state->save_item(NAME(state->m_control_num));
-	state->save_item(NAME(state->m_dsp_BIO));
-	state->save_item(NAME(state->m_dsp_idle));
+	save_item(NAME(m_nvram));
+	save_item(NAME(m_control_num));
+	save_item(NAME(m_dsp_BIO));
+	save_item(NAME(m_dsp_idle));
 
-	state->m_dsp_BIO = 0;
+	m_dsp_BIO = 0;
 }
 
 static const riot6532_interface tomcat_riot6532_intf =
@@ -412,7 +412,6 @@ static MACHINE_CONFIG_START( tomcat, tomcat_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(4000))
 
-	MCFG_MACHINE_START(tomcat)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

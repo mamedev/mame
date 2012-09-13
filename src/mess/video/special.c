@@ -10,7 +10,7 @@
 #include "includes/special.h"
 
 
-VIDEO_START( special )
+VIDEO_START_MEMBER(special_state,special)
 {
 }
 
@@ -31,7 +31,7 @@ SCREEN_UPDATE_IND16( special )
 	}
 	return 0;
 }
-VIDEO_START( specialp )
+VIDEO_START_MEMBER(special_state,specialp)
 {
 }
 
@@ -73,17 +73,16 @@ const rgb_t specimx_palette[16] = {
 	MAKE_RGB(0xff, 0xff, 0xff)  // F
 };
 
-PALETTE_INIT( specimx )
+PALETTE_INIT_MEMBER(special_state,specimx)
 {
-	palette_set_colors(machine, 0, specimx_palette, ARRAY_LENGTH(specimx_palette));
+	palette_set_colors(machine(), 0, specimx_palette, ARRAY_LENGTH(specimx_palette));
 }
 
 
-VIDEO_START( specimx )
+VIDEO_START_MEMBER(special_state,specimx)
 {
-	special_state *state = machine.driver_data<special_state>();
-	state->m_specimx_colorram = auto_alloc_array(machine, UINT8, 0x3000);
-	memset(state->m_specimx_colorram,0x70,0x3000);
+	m_specimx_colorram = auto_alloc_array(machine(), UINT8, 0x3000);
+	memset(m_specimx_colorram,0x70,0x3000);
 }
 
 SCREEN_UPDATE_IND16( specimx )
@@ -116,13 +115,13 @@ static const rgb_t erik_palette[8] = {
 	MAKE_RGB(0xff, 0xff, 0xff)  // 7
 };
 
-PALETTE_INIT( erik )
+PALETTE_INIT_MEMBER(special_state,erik)
 {
-	palette_set_colors(machine, 0, erik_palette, ARRAY_LENGTH(erik_palette));
+	palette_set_colors(machine(), 0, erik_palette, ARRAY_LENGTH(erik_palette));
 }
 
 
-VIDEO_START( erik )
+VIDEO_START_MEMBER(special_state,erik)
 {
 }
 

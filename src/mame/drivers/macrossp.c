@@ -597,27 +597,25 @@ static const es5506_interface es5506_config =
 };
 
 
-static MACHINE_START( macrossp )
+void macrossp_state::machine_start()
 {
-	macrossp_state *state = machine.driver_data<macrossp_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_sndpending));
-	state->save_item(NAME(state->m_snd_toggle));
-	state->save_item(NAME(state->m_fade_effect));
-	state->save_item(NAME(state->m_old_fade));
+	save_item(NAME(m_sndpending));
+	save_item(NAME(m_snd_toggle));
+	save_item(NAME(m_fade_effect));
+	save_item(NAME(m_old_fade));
 }
 
-static MACHINE_RESET( macrossp )
+void macrossp_state::machine_reset()
 {
-	macrossp_state *state = machine.driver_data<macrossp_state>();
 
-	state->m_sndpending = 0;
-	state->m_snd_toggle = 0;
-	state->m_fade_effect = 0;
-	state->m_old_fade = 0;
+	m_sndpending = 0;
+	m_snd_toggle = 0;
+	m_fade_effect = 0;
+	m_old_fade = 0;
 }
 
 static MACHINE_CONFIG_START( macrossp, macrossp_state )
@@ -630,8 +628,6 @@ static MACHINE_CONFIG_START( macrossp, macrossp_state )
 	MCFG_CPU_ADD("audiocpu", M68000, 32000000/2)	/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(macrossp_sound_map)
 
-	MCFG_MACHINE_START(macrossp)
-	MCFG_MACHINE_RESET(macrossp)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -645,7 +641,6 @@ static MACHINE_CONFIG_START( macrossp, macrossp_state )
 	MCFG_GFXDECODE(macrossp)
 	MCFG_PALETTE_LENGTH(0x1000)
 
-	MCFG_VIDEO_START(macrossp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

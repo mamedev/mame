@@ -62,6 +62,10 @@ public:
 	DECLARE_WRITE8_MEMBER(carpolo_car_border_interrupt_clear_w);
 	DECLARE_WRITE8_MEMBER(carpolo_timer_interrupt_clear_w);
 	DECLARE_DRIVER_INIT(carpolo);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -77,8 +81,8 @@ WRITE_LINE_DEVICE_HANDLER( carpolo_7474_2s_2_q_cb );
 WRITE_LINE_DEVICE_HANDLER( carpolo_7474_2u_1_q_cb );
 WRITE_LINE_DEVICE_HANDLER( carpolo_7474_2u_2_q_cb );
 
-MACHINE_START( carpolo );
-MACHINE_RESET( carpolo );
+
+
 
 
 
@@ -94,7 +98,7 @@ void carpolo_generate_car_border_interrupt(running_machine &machine, int car, in
 
 /*----------- defined in video/carpolo.c -----------*/
 
-PALETTE_INIT( carpolo );
-VIDEO_START( carpolo );
+
+
 SCREEN_UPDATE_IND16( carpolo );
 SCREEN_VBLANK( carpolo );

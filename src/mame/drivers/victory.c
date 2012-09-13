@@ -228,7 +228,6 @@ static MACHINE_CONFIG_START( victory, victory_state )
 
 	MCFG_PALETTE_LENGTH(64)
 
-	MCFG_VIDEO_START(victory)
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(victory_audio)

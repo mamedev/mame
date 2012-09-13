@@ -43,6 +43,7 @@ public:
 	UINT8 m_irq_state;
 	virtual void machine_reset();
 	virtual void video_start();
+	virtual void palette_init();
 };
 
 static ADDRESS_MAP_START(sm1800_mem, AS_PROGRAM, 8, sm1800_state)
@@ -156,11 +157,11 @@ I8255A_INTERFACE( sm1800_ppi8255_interface )
 	DEVCB_DRIVER_MEMBER(sm1800_state, sm1800_8255_portc_w)
 };
 
-static PALETTE_INIT( sm1800 )
+void sm1800_state::palette_init()
 {
-	palette_set_color(machine, 0, RGB_BLACK); // black
-	palette_set_color_rgb(machine, 1, 0xa0, 0xa0, 0xa0); // white
-	palette_set_color(machine, 2, RGB_WHITE); // highlight
+	palette_set_color(machine(), 0, RGB_BLACK); // black
+	palette_set_color_rgb(machine(), 1, 0xa0, 0xa0, 0xa0); // white
+	palette_set_color(machine(), 2, RGB_WHITE); // highlight
 }
 
 
@@ -199,7 +200,6 @@ static MACHINE_CONFIG_START( sm1800, sm1800_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_STATIC(sm1800)
 	MCFG_PALETTE_LENGTH(3)
-	MCFG_PALETTE_INIT(sm1800)
 
 	/* Devices */
 	MCFG_I8255_ADD ("i8255", sm1800_ppi8255_interface )

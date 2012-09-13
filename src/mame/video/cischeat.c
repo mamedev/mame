@@ -228,28 +228,27 @@ void cischeat_state::cischeat_set_vreg_flag(int which, int data)
 }
 
 /* 32 colour codes for the tiles */
-VIDEO_START( cischeat )
+VIDEO_START_MEMBER(cischeat_state,cischeat)
 {
-	cischeat_state *state = machine.driver_data<cischeat_state>();
 	int i;
 
-	state->m_spriteram = &state->m_ram[0x8000/2];
+	m_spriteram = &m_ram[0x8000/2];
 
-	create_tilemaps(machine);
-	state->m_tmap[0] = state->m_tilemap[0][0][0];
-	state->m_tmap[1] = state->m_tilemap[1][0][0];
-	state->m_tmap[2] = state->m_tilemap[2][0][0];
+	create_tilemaps(machine());
+	m_tmap[0] = m_tilemap[0][0][0];
+	m_tmap[1] = m_tilemap[1][0][0];
+	m_tmap[2] = m_tilemap[2][0][0];
 
-	state->m_active_layers = 0;
+	m_active_layers = 0;
 
 	for (i = 0; i < 3; i ++)
 	{
-		state->m_scroll_flag[i] = state->m_scrollx[i] = state->m_scrolly[i] = 0;
+		m_scroll_flag[i] = m_scrollx[i] = m_scrolly[i] = 0;
 	}
 
-	state->m_bits_per_color_code = 5;
+	m_bits_per_color_code = 5;
 
-	prepare_shadows(state);
+	prepare_shadows(this);
 }
 
 /**************************************************************************
@@ -257,18 +256,17 @@ VIDEO_START( cischeat )
 **************************************************************************/
 
 /* 16 colour codes for the tiles */
-VIDEO_START( f1gpstar )
+VIDEO_START_MEMBER(cischeat_state,f1gpstar)
 {
-	cischeat_state *state = machine.driver_data<cischeat_state>();
 
-	VIDEO_START_CALL(cischeat);
+	VIDEO_START_CALL_MEMBER(cischeat);
 
-	state->m_bits_per_color_code = 4;
+	m_bits_per_color_code = 4;
 }
 
-VIDEO_START( bigrun )
+VIDEO_START_MEMBER(cischeat_state,bigrun)
 {
-	VIDEO_START_CALL(f1gpstar);
+	VIDEO_START_CALL_MEMBER(f1gpstar);
 }
 
 

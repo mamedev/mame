@@ -91,6 +91,8 @@ public:
 	TILE_GET_INFO_MEMBER(bg_get_info3);
 	TILE_GET_INFO_MEMBER(fg_get_info4);
 	TILE_GET_INFO_MEMBER(fg_get_info5);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -104,7 +106,7 @@ void namcos1_init_DACs(running_machine &machine);
 
 
 
-MACHINE_RESET( namcos1 );
+
 
 
 /*----------- defined in video/namcos1.c -----------*/
@@ -115,6 +117,6 @@ WRITE8_HANDLER( namcos1_paletteram_w );
 READ8_HANDLER( namcos1_spriteram_r );
 WRITE8_HANDLER( namcos1_spriteram_w );
 
-VIDEO_START( namcos1 );
+
 SCREEN_UPDATE_IND16( namcos1 );
 SCREEN_VBLANK( namcos1 );

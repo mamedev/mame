@@ -18,13 +18,12 @@
   Start the video hardware emulation.
 
 ***************************************************************************/
-VIDEO_START( cgenie )
+void cgenie_state::video_start()
 {
-	cgenie_state *state = machine.driver_data<cgenie_state>();
-	screen_device *screen = machine.first_screen();
+	screen_device *screen = machine().first_screen();
 
-	screen->register_screen_bitmap(state->m_dlybitmap);
-	screen->register_screen_bitmap(state->m_bitmap);
+	screen->register_screen_bitmap(m_dlybitmap);
+	screen->register_screen_bitmap(m_bitmap);
 }
 
 /***************************************************************************

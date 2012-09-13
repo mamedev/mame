@@ -23,7 +23,7 @@ const gfx_layout kramermc_charlayout =
 	8*8					/* size of one char */
 };
 
-VIDEO_START( kramermc )
+void kramermc_state::video_start()
 {
 }
 

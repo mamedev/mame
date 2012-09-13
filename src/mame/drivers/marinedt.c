@@ -148,6 +148,10 @@ public:
 	DECLARE_WRITE8_MEMBER(marinedt_pd_w);
 	DECLARE_WRITE8_MEMBER(marinedt_pf_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -444,12 +448,12 @@ static GFXDECODE_START( marinedt )
 	GFXDECODE_ENTRY( "gfx3", 0, marinedt_objlayout,  32, 4 )
 GFXDECODE_END
 
-static PALETTE_INIT( marinedt )
+void marinedt_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i,r,b,g;
 
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		int bit0, bit1, bit2;
 
@@ -473,7 +477,7 @@ bit0 = 0;
 //      *(palette++) = 0x92 * bit0 + 0x46 * bit1 + 0x27 * bit2;
 		b = 0x27 * bit0 + 0x46 * bit1 + 0x92 * bit2;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -487,18 +491,17 @@ TILE_GET_INFO_MEMBER(marinedt_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
-static VIDEO_START( marinedt )
+void marinedt_state::video_start()
 {
-	marinedt_state *state = machine.driver_data<marinedt_state>();
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(marinedt_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(marinedt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_tx_tilemap->set_transparent_pen(0);
-	state->m_tx_tilemap->set_scrolldx(0, 4*8);
-	state->m_tx_tilemap->set_scrolldy(0, -4*8);
+	m_tx_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_scrolldx(0, 4*8);
+	m_tx_tilemap->set_scrolldy(0, -4*8);
 
-	state->m_tile = auto_bitmap_ind16_alloc(machine, 32 * 8, 32 * 8);
-	state->m_obj1 = auto_bitmap_ind16_alloc(machine, 32, 32);
-	state->m_obj2 = auto_bitmap_ind16_alloc(machine, 32, 32);
+	m_tile = auto_bitmap_ind16_alloc(machine(), 32 * 8, 32 * 8);
+	m_obj1 = auto_bitmap_ind16_alloc(machine(), 32, 32);
+	m_obj2 = auto_bitmap_ind16_alloc(machine(), 32, 32);
 }
 
 
@@ -618,52 +621,50 @@ static SCREEN_UPDATE_IND16( marinedt )
 	return 0;
 }
 
-static MACHINE_START( marinedt )
+void marinedt_state::machine_start()
 {
-	marinedt_state *state = machine.driver_data<marinedt_state>();
 
-	state->save_item(NAME(state->m_obj1_a));
-	state->save_item(NAME(state->m_obj1_x));
-	state->save_item(NAME(state->m_obj1_y));
-	state->save_item(NAME(state->m_obj2_a));
-	state->save_item(NAME(state->m_obj2_x));
-	state->save_item(NAME(state->m_obj2_y));
-	state->save_item(NAME(state->m_pd));
-	state->save_item(NAME(state->m_pf));
-	state->save_item(NAME(state->m_music));
-	state->save_item(NAME(state->m_sound));
-	state->save_item(NAME(state->m_coll));
-	state->save_item(NAME(state->m_cx));
-	state->save_item(NAME(state->m_cyr));
-	state->save_item(NAME(state->m_cyq));
-	state->save_item(NAME(state->m_collh));
-	state->save_item(NAME(state->m_cxh));
-	state->save_item(NAME(state->m_cyrh));
-	state->save_item(NAME(state->m_cyqh));
+	save_item(NAME(m_obj1_a));
+	save_item(NAME(m_obj1_x));
+	save_item(NAME(m_obj1_y));
+	save_item(NAME(m_obj2_a));
+	save_item(NAME(m_obj2_x));
+	save_item(NAME(m_obj2_y));
+	save_item(NAME(m_pd));
+	save_item(NAME(m_pf));
+	save_item(NAME(m_music));
+	save_item(NAME(m_sound));
+	save_item(NAME(m_coll));
+	save_item(NAME(m_cx));
+	save_item(NAME(m_cyr));
+	save_item(NAME(m_cyq));
+	save_item(NAME(m_collh));
+	save_item(NAME(m_cxh));
+	save_item(NAME(m_cyrh));
+	save_item(NAME(m_cyqh));
 }
 
-static MACHINE_RESET( marinedt )
+void marinedt_state::machine_reset()
 {
-	marinedt_state *state = machine.driver_data<marinedt_state>();
 
-	state->m_obj1_a = 0;
-	state->m_obj1_x = 0;
-	state->m_obj1_y = 0;
-	state->m_obj2_a = 0;
-	state->m_obj2_x = 0;
-	state->m_obj2_y = 0;
-	state->m_pd = 0;
-	state->m_pf = 0;
-	state->m_music = 0;
-	state->m_sound = 0;
-	state->m_coll = 0;
-	state->m_cx = 0;
-	state->m_cyr = 0;
-	state->m_cyq = 0;
-	state->m_collh = 0;
-	state->m_cxh = 0;
-	state->m_cyrh = 0;
-	state->m_cyqh = 0;
+	m_obj1_a = 0;
+	m_obj1_x = 0;
+	m_obj1_y = 0;
+	m_obj2_a = 0;
+	m_obj2_x = 0;
+	m_obj2_y = 0;
+	m_pd = 0;
+	m_pf = 0;
+	m_music = 0;
+	m_sound = 0;
+	m_coll = 0;
+	m_cx = 0;
+	m_cyr = 0;
+	m_cyq = 0;
+	m_collh = 0;
+	m_cxh = 0;
+	m_cyrh = 0;
+	m_cyqh = 0;
 }
 
 static MACHINE_CONFIG_START( marinedt, marinedt_state )
@@ -674,8 +675,6 @@ static MACHINE_CONFIG_START( marinedt, marinedt_state )
 	MCFG_CPU_IO_MAP(marinedt_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(marinedt)
-	MCFG_MACHINE_RESET(marinedt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -688,8 +687,6 @@ static MACHINE_CONFIG_START( marinedt, marinedt_state )
 	MCFG_GFXDECODE(marinedt)
 	MCFG_PALETTE_LENGTH(64)
 
-	MCFG_PALETTE_INIT(marinedt)
-	MCFG_VIDEO_START(marinedt)
 
 	/* sound hardware */
 	//discrete sound

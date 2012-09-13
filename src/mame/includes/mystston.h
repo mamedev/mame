@@ -44,6 +44,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	DECLARE_VIDEO_START(mystston);
+	DECLARE_VIDEO_RESET(mystston);
 };
 
 

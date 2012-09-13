@@ -24,6 +24,7 @@ public:
 	cpu_device *m_audiocpu;
 	device_t *m_deco_tilegen1;
 	DECLARE_DRIVER_INIT(dietgo);
+	virtual void machine_start();
 };
 
 

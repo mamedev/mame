@@ -603,57 +603,54 @@ static const k051960_interface thunderx_k051960_intf =
 	thunderx_sprite_callback
 };
 
-static MACHINE_START( scontra )
+MACHINE_START_MEMBER(thunderx_state,scontra)
 {
-	thunderx_state *state = machine.driver_data<thunderx_state>();
 
-	state->m_generic_paletteram_8.allocate(0x800);
+	m_generic_paletteram_8.allocate(0x800);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_k007232 = machine.device("k007232");
-	state->m_k052109 = machine.device("k052109");
-	state->m_k051960 = machine.device("k051960");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_k007232 = machine().device("k007232");
+	m_k052109 = machine().device("k052109");
+	m_k051960 = machine().device("k051960");
 
-	state->save_item(NAME(state->m_priority));
-	state->save_item(NAME(state->m_1f98_data));
-	state->save_item(NAME(state->m_palette_selected));
-	state->save_item(NAME(state->m_rambank));
-	state->save_item(NAME(state->m_pmcbank));
+	save_item(NAME(m_priority));
+	save_item(NAME(m_1f98_data));
+	save_item(NAME(m_palette_selected));
+	save_item(NAME(m_rambank));
+	save_item(NAME(m_pmcbank));
 }
 
-static MACHINE_START( thunderx )
+MACHINE_START_MEMBER(thunderx_state,thunderx)
 {
-	thunderx_state *state = machine.driver_data<thunderx_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x2000);
-	state->membank("bank1")->configure_entries(12, 4, &ROM[0x08000], 0x2000);
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x2000);
+	membank("bank1")->configure_entries(12, 4, &ROM[0x08000], 0x2000);
+	membank("bank1")->set_entry(0);
 
-	memset(state->m_pmcram, 0, sizeof(state->m_pmcram));
+	memset(m_pmcram, 0, sizeof(m_pmcram));
 
-	MACHINE_START_CALL(scontra);
+	MACHINE_START_CALL_MEMBER(scontra);
 
-	state->save_item(NAME(state->m_pmcram));
+	save_item(NAME(m_pmcram));
 }
 
-static MACHINE_RESET( scontra )
+MACHINE_RESET_MEMBER(thunderx_state,scontra)
 {
-	thunderx_state *state = machine.driver_data<thunderx_state>();
 
-	state->m_priority = 0;
-	state->m_1f98_data = 0;
-	state->m_palette_selected = 0;
-	state->m_rambank = 0;
-	state->m_pmcbank = 0;
+	m_priority = 0;
+	m_1f98_data = 0;
+	m_palette_selected = 0;
+	m_rambank = 0;
+	m_pmcbank = 0;
 }
 
-static MACHINE_RESET( thunderx )
+MACHINE_RESET_MEMBER(thunderx_state,thunderx)
 {
-	konami_configure_set_lines(machine.device("maincpu"), thunderx_banking);
+	konami_configure_set_lines(machine().device("maincpu"), thunderx_banking);
 
-	MACHINE_RESET_CALL(scontra);
+	MACHINE_RESET_CALL_MEMBER(scontra);
 }
 
 static MACHINE_CONFIG_START( scontra, thunderx_state )
@@ -666,8 +663,8 @@ static MACHINE_CONFIG_START( scontra, thunderx_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)		/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(scontra_sound_map)
 
-	MCFG_MACHINE_START(scontra)
-	MCFG_MACHINE_RESET(scontra)
+	MCFG_MACHINE_START_OVERRIDE(thunderx_state,scontra)
+	MCFG_MACHINE_RESET_OVERRIDE(thunderx_state,scontra)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -681,7 +678,6 @@ static MACHINE_CONFIG_START( scontra, thunderx_state )
 
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(scontra)
 
 	MCFG_K052109_ADD("k052109", thunderx_k052109_intf)
 	MCFG_K051960_ADD("k051960", thunderx_k051960_intf)
@@ -710,8 +706,8 @@ static MACHINE_CONFIG_START( thunderx, thunderx_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)		/* ? */
 	MCFG_CPU_PROGRAM_MAP(thunderx_sound_map)
 
-	MCFG_MACHINE_START(thunderx)
-	MCFG_MACHINE_RESET(thunderx)
+	MCFG_MACHINE_START_OVERRIDE(thunderx_state,thunderx)
+	MCFG_MACHINE_RESET_OVERRIDE(thunderx_state,thunderx)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -725,7 +721,6 @@ static MACHINE_CONFIG_START( thunderx, thunderx_state )
 
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(scontra)
 
 	MCFG_K052109_ADD("k052109", thunderx_k052109_intf)
 	MCFG_K051960_ADD("k051960", thunderx_k051960_intf)

@@ -232,18 +232,16 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_START( avalnche )
+void avalnche_state::machine_start()
 {
-	avalnche_state *state = machine.driver_data<avalnche_state>();
 
-	state->save_item(NAME(state->m_avalance_video_inverted));
+	save_item(NAME(m_avalance_video_inverted));
 }
 
-static MACHINE_RESET( avalnche )
+void avalnche_state::machine_reset()
 {
-	avalnche_state *state = machine.driver_data<avalnche_state>();
 
-	state->m_avalance_video_inverted = 0;
+	m_avalance_video_inverted = 0;
 }
 
 static MACHINE_CONFIG_START( avalnche, avalnche_state )
@@ -253,8 +251,6 @@ static MACHINE_CONFIG_START( avalnche, avalnche_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,8*60)
 
-	MCFG_MACHINE_START(avalnche)
-	MCFG_MACHINE_RESET(avalnche)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

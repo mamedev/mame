@@ -73,22 +73,20 @@ void dv_sprite_callback(running_machine &machine, int *code,int *color,int *prio
 
 /*****************************************************************************/
 
-VIDEO_START( mainevt )
+VIDEO_START_MEMBER(mainevt_state,mainevt)
 {
-	mainevt_state *state = machine.driver_data<mainevt_state>();
-	state->m_layer_colorbase[0] = 0;
-	state->m_layer_colorbase[1] = 8;
-	state->m_layer_colorbase[2] = 4;
-	state->m_sprite_colorbase = 12;
+	m_layer_colorbase[0] = 0;
+	m_layer_colorbase[1] = 8;
+	m_layer_colorbase[2] = 4;
+	m_sprite_colorbase = 12;
 }
 
-VIDEO_START( dv )
+VIDEO_START_MEMBER(mainevt_state,dv)
 {
-	mainevt_state *state = machine.driver_data<mainevt_state>();
-	state->m_layer_colorbase[0] = 0;
-	state->m_layer_colorbase[1] = 0;
-	state->m_layer_colorbase[2] = 4;
-	state->m_sprite_colorbase = 8;
+	m_layer_colorbase[0] = 0;
+	m_layer_colorbase[1] = 0;
+	m_layer_colorbase[2] = 4;
+	m_sprite_colorbase = 8;
 }
 
 /*****************************************************************************/

@@ -509,60 +509,54 @@ static void machine_reset_common_disk(running_machine &machine)
 //  wd17xx_set_complete_command_delay(state->m_fdc, 50);   /* default is 12 usec if not set */
 }
 
-MACHINE_RESET( mbee )
+MACHINE_RESET_MEMBER(mbee_state,mbee)
 {
-	mbee_state *state = machine.driver_data<mbee_state>();
-	state->membank("boot")->set_entry(1);
-	machine.scheduler().timer_set(attotime::from_usec(4), FUNC(mbee_reset));
+	membank("boot")->set_entry(1);
+	machine().scheduler().timer_set(attotime::from_usec(4), FUNC(mbee_reset));
 }
 
-MACHINE_RESET( mbee56 )
+MACHINE_RESET_MEMBER(mbee_state,mbee56)
 {
-	mbee_state *state = machine.driver_data<mbee_state>();
-	machine_reset_common_disk(machine);
-	state->membank("boot")->set_entry(1);
-	machine.scheduler().timer_set(attotime::from_usec(4), FUNC(mbee_reset));
+	machine_reset_common_disk(machine());
+	membank("boot")->set_entry(1);
+	machine().scheduler().timer_set(attotime::from_usec(4), FUNC(mbee_reset));
 }
 
-MACHINE_RESET( mbee64 )
+MACHINE_RESET_MEMBER(mbee_state,mbee64)
 {
-	mbee_state *state = machine.driver_data<mbee_state>();
-	machine_reset_common_disk(machine);
-	state->membank("boot")->set_entry(1);
-	state->membank("bankl")->set_entry(1);
-	state->membank("bankh")->set_entry(1);
+	machine_reset_common_disk(machine());
+	membank("boot")->set_entry(1);
+	membank("bankl")->set_entry(1);
+	membank("bankh")->set_entry(1);
 }
 
-MACHINE_RESET( mbee128 )
+MACHINE_RESET_MEMBER(mbee_state,mbee128)
 {
-	mbee_state *state = machine.driver_data<mbee_state>();
-	address_space *mem = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	machine_reset_common_disk(machine);
-	state->mbee128_50_w(*mem,0,0); // set banks to default
-	state->membank("boot")->set_entry(4); // boot time
+	address_space *mem = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	machine_reset_common_disk(machine());
+	mbee128_50_w(*mem,0,0); // set banks to default
+	membank("boot")->set_entry(4); // boot time
 }
 
-MACHINE_RESET( mbee256 )
+MACHINE_RESET_MEMBER(mbee_state,mbee256)
 {
-	mbee_state *state = machine.driver_data<mbee_state>();
 	UINT8 i;
-	address_space *mem = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	machine_reset_common_disk(machine);
-	for (i = 0; i < 15; i++) state->m_mbee256_was_pressed[i] = 0;
-	state->m_mbee256_q_pos = 0;
-	state->mbee256_50_w(*mem,0,0); // set banks to default
-	state->membank("boot")->set_entry(8); // boot time
-	machine.scheduler().timer_set(attotime::from_usec(4), FUNC(mbee_reset));
+	address_space *mem = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	machine_reset_common_disk(machine());
+	for (i = 0; i < 15; i++) m_mbee256_was_pressed[i] = 0;
+	m_mbee256_q_pos = 0;
+	mbee256_50_w(*mem,0,0); // set banks to default
+	membank("boot")->set_entry(8); // boot time
+	machine().scheduler().timer_set(attotime::from_usec(4), FUNC(mbee_reset));
 }
 
-MACHINE_RESET( mbeett )
+MACHINE_RESET_MEMBER(mbee_state,mbeett)
 {
-	mbee_state *state = machine.driver_data<mbee_state>();
 	UINT8 i;
-	for (i = 0; i < 15; i++) state->m_mbee256_was_pressed[i] = 0;
-	state->m_mbee256_q_pos = 0;
-	state->membank("boot")->set_entry(1);
-	machine.scheduler().timer_set(attotime::from_usec(4), FUNC(mbee_reset));
+	for (i = 0; i < 15; i++) m_mbee256_was_pressed[i] = 0;
+	m_mbee256_q_pos = 0;
+	membank("boot")->set_entry(1);
+	machine().scheduler().timer_set(attotime::from_usec(4), FUNC(mbee_reset));
 }
 
 INTERRUPT_GEN( mbee_interrupt )

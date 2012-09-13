@@ -115,6 +115,8 @@ public:
 	DECLARE_WRITE8_MEMBER(testb_w);
 	DECLARE_DRIVER_INIT(jokrwild);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -152,10 +154,9 @@ TILE_GET_INFO_MEMBER(jokrwild_state::get_bg_tile_info)
 }
 
 
-static VIDEO_START( jokrwild )
+void jokrwild_state::video_start()
 {
-	jokrwild_state *state = machine.driver_data<jokrwild_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(jokrwild_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 24, 26);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(jokrwild_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 24, 26);
 }
 
 
@@ -167,7 +168,7 @@ static SCREEN_UPDATE_IND16( jokrwild )
 }
 
 
-static PALETTE_INIT( jokrwild )
+void jokrwild_state::palette_init()
 {
 	//missing proms
 }
@@ -495,9 +496,7 @@ static MACHINE_CONFIG_START( jokrwild, jokrwild_state )
 	MCFG_SCREEN_UPDATE_STATIC(jokrwild)
 
 	MCFG_GFXDECODE(jokrwild)
-	MCFG_PALETTE_INIT(jokrwild)
 	MCFG_PALETTE_LENGTH(512)
-	MCFG_VIDEO_START(jokrwild)
 
 	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/16, mc6845_intf) /* guess */
 

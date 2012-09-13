@@ -234,6 +234,8 @@ public:
 	DECLARE_READ16_MEMBER(test_r);
 	DECLARE_DRIVER_INIT(colorama);
 	DECLARE_DRIVER_INIT(cmrltv75);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -242,7 +244,7 @@ public:
 *************************/
 
 
-static VIDEO_START( coinmvga )
+void coinmvga_state::video_start()
 {
 }
 
@@ -273,7 +275,7 @@ static SCREEN_UPDATE_IND16( coinmvga )
 }
 
 
-static PALETTE_INIT( coinmvga )
+void coinmvga_state::palette_init()
 {
 
 }
@@ -685,10 +687,8 @@ static MACHINE_CONFIG_START( coinmvga, coinmvga_state )
 
 	MCFG_GFXDECODE(coinmvga)
 
-	MCFG_PALETTE_INIT(coinmvga)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(coinmvga)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

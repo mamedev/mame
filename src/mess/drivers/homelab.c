@@ -66,6 +66,11 @@ public:
 	required_device<device_t> m_speaker;
 	required_device<cassette_image_device> m_cass;
 	DECLARE_DRIVER_INIT(brailab4);
+	DECLARE_VIDEO_START(homelab2);
+	DECLARE_MACHINE_RESET(homelab3);
+	DECLARE_VIDEO_START(homelab3);
+	DECLARE_MACHINE_RESET(brailab4);
+	DECLARE_VIDEO_START(brailab4);
 };
 
 static INTERRUPT_GEN( homelab_frame )
@@ -115,15 +120,14 @@ WRITE8_MEMBER( homelab_state::cass_w )
 		m_cass->output(BIT(data, 0) ? -1.0 : +1.0); // FIXME
 }
 
-MACHINE_RESET( homelab3 )
+MACHINE_RESET_MEMBER(homelab_state,homelab3)
 {
 
 }
 
-MACHINE_RESET( brailab4 )
+MACHINE_RESET_MEMBER(homelab_state,brailab4)
 {
-	homelab_state *state = machine.driver_data<homelab_state>();
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->set_entry(0);
 }
 
 WRITE8_MEMBER( homelab_state::port7f_w )
@@ -536,25 +540,22 @@ static INPUT_PORTS_START( brailab4 ) // F4 to F8 are foreign characters
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-static VIDEO_START( homelab2 )
+VIDEO_START_MEMBER(homelab_state,homelab2)
 {
-	homelab_state *state = machine.driver_data<homelab_state>();
-	state->m_p_chargen = state->memregion("chargen")->base();
-	state->m_p_videoram = state->memregion("maincpu")->base()+0xc000;
+	m_p_chargen = memregion("chargen")->base();
+	m_p_videoram = memregion("maincpu")->base()+0xc000;
 }
 
-static VIDEO_START( homelab3 )
+VIDEO_START_MEMBER(homelab_state,homelab3)
 {
-	homelab_state *state = machine.driver_data<homelab_state>();
-	state->m_p_chargen = state->memregion("chargen")->base();
-	state->m_p_videoram = state->memregion("maincpu")->base()+0xf800;
+	m_p_chargen = memregion("chargen")->base();
+	m_p_videoram = memregion("maincpu")->base()+0xf800;
 }
 
-static VIDEO_START( brailab4 )
+VIDEO_START_MEMBER(homelab_state,brailab4)
 {
-	homelab_state *state = machine.driver_data<homelab_state>();
-	state->m_p_chargen = state->memregion("chargen")->base();
-	state->m_p_videoram = state->memregion("maincpu")->base()+0x17800;
+	m_p_chargen = memregion("chargen")->base();
+	m_p_videoram = memregion("maincpu")->base()+0x17800;
 }
 
 static SCREEN_UPDATE_IND16( homelab2 )
@@ -748,7 +749,7 @@ static MACHINE_CONFIG_START( homelab, homelab_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(40*8, 25*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 25*8-1)
-	MCFG_VIDEO_START(homelab2)
+	MCFG_VIDEO_START_OVERRIDE(homelab_state,homelab2)
 	MCFG_SCREEN_UPDATE_STATIC(homelab2)
 	MCFG_GFXDECODE(homelab)
 	MCFG_PALETTE_LENGTH(2)
@@ -770,7 +771,7 @@ static MACHINE_CONFIG_START( homelab3, homelab_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(homelab3_mem)
 	MCFG_CPU_IO_MAP(homelab3_io)
-	MCFG_MACHINE_RESET(homelab3)
+	MCFG_MACHINE_RESET_OVERRIDE(homelab_state,homelab3)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -778,7 +779,7 @@ static MACHINE_CONFIG_START( homelab3, homelab_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	MCFG_VIDEO_START(homelab3)
+	MCFG_VIDEO_START_OVERRIDE(homelab_state,homelab3)
 	MCFG_SCREEN_UPDATE_STATIC(homelab3)
 	MCFG_GFXDECODE(homelab)
 	MCFG_PALETTE_LENGTH(2)
@@ -800,7 +801,7 @@ static MACHINE_CONFIG_START( brailab4, homelab_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(brailab4_mem)
 	MCFG_CPU_IO_MAP(brailab4_io)
-	MCFG_MACHINE_RESET(brailab4)
+	MCFG_MACHINE_RESET_OVERRIDE(homelab_state,brailab4)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -808,7 +809,7 @@ static MACHINE_CONFIG_START( brailab4, homelab_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	MCFG_VIDEO_START(brailab4)
+	MCFG_VIDEO_START_OVERRIDE(homelab_state,brailab4)
 	MCFG_SCREEN_UPDATE_STATIC(homelab3)
 	MCFG_GFXDECODE(homelab)
 	MCFG_PALETTE_LENGTH(2)

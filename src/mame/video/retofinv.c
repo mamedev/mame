@@ -10,13 +10,13 @@
 #include "includes/retofinv.h"
 
 
-PALETTE_INIT( retofinv )
+void retofinv_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x100);
+	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -25,7 +25,7 @@ PALETTE_INIT( retofinv )
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -42,14 +42,14 @@ PALETTE_INIT( retofinv )
 		else
 			ctabentry = 0;
 
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	/* sprites and bg tiles */
 	for (i = 0; i < 0x800; i++)
 	{
 		UINT8 ctabentry = BITSWAP8(color_prom[i],4,5,6,7,3,2,1,0);
-		colortable_entry_set_value(machine.colortable, i + 0x200, ctabentry);
+		colortable_entry_set_value(machine().colortable, i + 0x200, ctabentry);
 	}
 }
 
@@ -102,13 +102,12 @@ TILE_GET_INFO_MEMBER(retofinv_state::fg_get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( retofinv )
+void retofinv_state::video_start()
 {
-	retofinv_state *state = machine.driver_data<retofinv_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(retofinv_state::bg_get_tile_info),state),tilemap_mapper_delegate(FUNC(retofinv_state::tilemap_scan),state),8,8,36,28);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(retofinv_state::fg_get_tile_info),state),tilemap_mapper_delegate(FUNC(retofinv_state::tilemap_scan),state),8,8,36,28);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(retofinv_state::bg_get_tile_info),this),tilemap_mapper_delegate(FUNC(retofinv_state::tilemap_scan),this),8,8,36,28);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(retofinv_state::fg_get_tile_info),this),tilemap_mapper_delegate(FUNC(retofinv_state::tilemap_scan),this),8,8,36,28);
 
-	colortable_configure_tilemap_groups(machine.colortable, state->m_fg_tilemap, machine.gfx[0], 0);
+	colortable_configure_tilemap_groups(machine().colortable, m_fg_tilemap, machine().gfx[0], 0);
 }
 
 

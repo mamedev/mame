@@ -252,6 +252,8 @@ public:
 	DECLARE_READ32_MEMBER(dsp_dataram_r);
 	DECLARE_WRITE32_MEMBER(dsp_dataram_w);
 	DECLARE_DRIVER_INIT(nwktr);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -513,16 +515,15 @@ static TIMER_CALLBACK( irq_off )
 	machine.device("audiocpu")->execute().set_input_line(param, CLEAR_LINE);
 }
 
-static MACHINE_START( nwktr )
+void nwktr_state::machine_start()
 {
-	nwktr_state *state = machine.driver_data<nwktr_state>();
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine.device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(machine().device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x003fffff, FALSE, state->m_work_ram);
+	ppcdrc_add_fastram(machine().device("maincpu"), 0x00000000, 0x003fffff, FALSE, m_work_ram);
 
-	state->m_sound_irq_timer = machine.scheduler().timer_alloc(FUNC(irq_off));
+	m_sound_irq_timer = machine().scheduler().timer_alloc(FUNC(irq_off));
 }
 
 static ADDRESS_MAP_START( nwktr_map, AS_PROGRAM, 32, nwktr_state )
@@ -703,9 +704,9 @@ static const k001604_interface thrilld_k001604_intf =
 	0		/* slrasslt hack */
 };
 
-static MACHINE_RESET( nwktr )
+void nwktr_state::machine_reset()
 {
-	machine.device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static const voodoo_config voodoo_intf =
@@ -734,8 +735,6 @@ static MACHINE_CONFIG_START( nwktr, nwktr_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(9000))
 
-	MCFG_MACHINE_START(nwktr)
-	MCFG_MACHINE_RESET(nwktr)
 
 	MCFG_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, voodoo_intf)
 

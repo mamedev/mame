@@ -160,6 +160,9 @@ public:
 	UINT8 mz2500_cg_latch_compare();
 	UINT8 mz2500_ram_read(UINT16 offset, UINT8 bank_num);
 	void mz2500_ram_write(UINT16 offset, UINT8 data, UINT8 bank_num);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -177,7 +180,7 @@ static const UINT8 bank_reset_val[2][8] =
 
 /* video stuff*/
 
-static VIDEO_START( mz2500 )
+void mz2500_state::video_start()
 {
 }
 
@@ -1715,19 +1718,18 @@ static void mz2500_reset(mz2500_state *state, UINT8 type)
 		state->m_bank_val[i] = bank_reset_val[type][i];
 }
 
-static MACHINE_RESET(mz2500)
+void mz2500_state::machine_reset()
 {
-	mz2500_state *state = machine.driver_data<mz2500_state>();
-	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
-	UINT8 *IPL = state->memregion("ipl")->base();
+	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *IPL = memregion("ipl")->base();
 	UINT32 i;
 
-	mz2500_reset(state, IPL_RESET);
+	mz2500_reset(this, IPL_RESET);
 
-	//state->m_irq_vector[0] = 0xef; /* RST 28h - vblank */
+	//m_irq_vector[0] = 0xef; /* RST 28h - vblank */
 
-	state->m_text_col_size = 0;
-	state->m_text_font_reg = 0;
+	m_text_col_size = 0;
+	m_text_font_reg = 0;
 
 	/* copy IPL to its natural bank ROM/RAM position */
 	for(i=0;i<0x8000;i++)
@@ -1742,16 +1744,16 @@ static MACHINE_RESET(mz2500)
 
 	/* disable IRQ */
 	for(i=0;i<4;i++)
-		state->m_irq_mask[i] = 0;
+		m_irq_mask[i] = 0;
 
-	state->m_kanji_bank = 0;
+	m_kanji_bank = 0;
 
-	state->m_cg_clear_flag = 0;
+	m_cg_clear_flag = 0;
 
-	beep_set_frequency(machine.device(BEEPER_TAG),4096);
-	beep_set_state(machine.device(BEEPER_TAG),0);
+	beep_set_frequency(machine().device(BEEPER_TAG),4096);
+	beep_set_state(machine().device(BEEPER_TAG),0);
 
-//  state->m_monitor_type = machine.root_device().ioport("DSW1")->read() & 0x40 ? 1 : 0;
+//  m_monitor_type = machine().root_device().ioport("DSW1")->read() & 0x40 ? 1 : 0;
 }
 
 static const gfx_layout mz2500_cg_layout =
@@ -1997,16 +1999,16 @@ static const ym2203_interface ym2203_interface_1 =
 	DEVCB_NULL
 };
 
-static PALETTE_INIT( mz2500 )
+void mz2500_state::palette_init()
 {
 	int i;
 
 	for(i=0;i<0x200;i++)
-		palette_set_color_rgb(machine, i,pal1bit(0),pal1bit(0),pal1bit(0));
+		palette_set_color_rgb(machine(), i,pal1bit(0),pal1bit(0),pal1bit(0));
 
 	/* set up 8 colors (PCG) */
 	for(i=0;i<8;i++)
-		palette_set_color_rgb(machine, i+8,pal1bit((i & 2)>>1),pal1bit((i & 4)>>2),pal1bit((i & 1)>>0));
+		palette_set_color_rgb(machine(), i+8,pal1bit((i & 2)>>1),pal1bit((i & 4)>>2),pal1bit((i & 1)>>0));
 
 	/* set up 16 colors (PCG / CG) */
 
@@ -2031,7 +2033,7 @@ static PALETTE_INIT( mz2500 )
 			bit2 = i & 0x40 ? 4 : 0;
 			g = bit0|bit1|bit2;
 
-			palette_set_color_rgb(machine, i+0x100,pal3bit(r),pal3bit(g),pal3bit(b));
+			palette_set_color_rgb(machine(), i+0x100,pal3bit(r),pal3bit(g),pal3bit(b));
 		}
 	}
 }
@@ -2097,7 +2099,6 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
     MCFG_CPU_IO_MAP(mz2500_io)
 	MCFG_CPU_VBLANK_INT("screen", mz2500_vbl)
 
-    MCFG_MACHINE_RESET(mz2500)
 
 	MCFG_I8255_ADD( "i8255_0", ppi8255_intf )
 	MCFG_Z80PIO_ADD( "z80pio_1", 6000000, mz2500_pio1_intf )
@@ -2115,11 +2116,9 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
     MCFG_SCREEN_UPDATE_STATIC(mz2500)
 
 	MCFG_PALETTE_LENGTH(0x200)
-	MCFG_PALETTE_INIT(mz2500)
 
 	MCFG_GFXDECODE(mz2500)
 
-    MCFG_VIDEO_START(mz2500)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

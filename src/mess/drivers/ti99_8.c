@@ -252,6 +252,8 @@ public:
 	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
 
 	DECLARE_WRITE_LINE_MEMBER( clock_out );
+	virtual void machine_start();	
+	virtual void machine_reset();
 
 	// Some values to keep
 	tms9995_device		*m_cpu;
@@ -921,27 +923,25 @@ static JOYPORT_CONFIG( joyport8_50 )
 	50
 };
 
-MACHINE_START( ti99_8 )
+void ti99_8::machine_start()
 {
-	ti99_8 *driver = machine.driver_data<ti99_8>();
-	driver->m_cpu = static_cast<tms9995_device*>(machine.device("maincpu"));
-	driver->m_tms9901 = static_cast<tms9901_device*>(machine.device(TMS9901_TAG));
-	driver->m_gromport = static_cast<gromport_device*>(machine.device(GROMPORT_TAG));
-	driver->m_peribox = static_cast<peribox_device*>(machine.device(PERIBOX_TAG));
-	driver->m_mapper = static_cast<ti998_mapper_device*>(machine.device(MAPPER_TAG));
-	driver->m_joyport = static_cast<joyport_device*>(machine.device(JOYPORT_TAG));
-	driver->m_video = static_cast<ti_video_device*>(machine.device(VIDEO_SYSTEM_TAG));
+	m_cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
+	m_tms9901 = static_cast<tms9901_device*>(machine().device(TMS9901_TAG));
+	m_gromport = static_cast<gromport_device*>(machine().device(GROMPORT_TAG));
+	m_peribox = static_cast<peribox_device*>(machine().device(PERIBOX_TAG));
+	m_mapper = static_cast<ti998_mapper_device*>(machine().device(MAPPER_TAG));
+	m_joyport = static_cast<joyport_device*>(machine().device(JOYPORT_TAG));
+	m_video = static_cast<ti_video_device*>(machine().device(VIDEO_SYSTEM_TAG));
 
-	driver->m_peribox->senila(CLEAR_LINE);
-	driver->m_peribox->senilb(CLEAR_LINE);
-	driver->m_firstjoy = 14;
+	m_peribox->senila(CLEAR_LINE);
+	m_peribox->senilb(CLEAR_LINE);
+	m_firstjoy = 14;
 }
 
-MACHINE_RESET( ti99_8 )
+void ti99_8::machine_reset()
 {
-	ti99_8 *driver = machine.driver_data<ti99_8>();
 
-	driver->m_cpu->set_hold(CLEAR_LINE);
+	m_cpu->set_hold(CLEAR_LINE);
 
 	// Pulling down the line on RESET configures the CPU to insert one wait
 	// state on external memory accesses
@@ -951,10 +951,10 @@ MACHINE_RESET( ti99_8 )
 	// seems to keep READY low for one cycle when RESET* is
 	// asserted, but the timings are completely wrong this way
 
-	driver->m_cpu->set_ready(CLEAR_LINE);
+	m_cpu->set_ready(CLEAR_LINE);
 
 	// But we assert the line here so that the system starts running
-	driver->m_ready_line = driver->m_ready_line1 = ASSERT_LINE;
+	m_ready_line = m_ready_line1 = ASSERT_LINE;
 }
 
 static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8 )
@@ -962,8 +962,6 @@ static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8 )
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
 	MCFG_TMS9995_ADD("maincpu", TMS9995, 10738635, memmap, crumap, ti99_8_processor_config)
 
-	MCFG_MACHINE_START( ti99_8 )
-	MCFG_MACHINE_RESET( ti99_8 )
 
 	/* Video hardware */
 	MCFG_TI998_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9118, ti99_8_tms9118a_interface)
@@ -1007,8 +1005,6 @@ static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8 )
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
 	MCFG_TMS9995_ADD("maincpu", TMS9995, 10738635, memmap, crumap, ti99_8_processor_config)
-	MCFG_MACHINE_START( ti99_8 )
-	MCFG_MACHINE_RESET( ti99_8 )
 
 	/* Video hardware */
 	MCFG_TI998_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9129, ti99_8_tms9118a_interface)

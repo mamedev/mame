@@ -32,12 +32,14 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(get_fg_memory_offset);
 	TILEMAP_MAPPER_MEMBER(get_bg_memory_offset);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/tryout.c -----------*/
 
 
-PALETTE_INIT( tryout );
-VIDEO_START( tryout );
+
+
 SCREEN_UPDATE_IND16( tryout );

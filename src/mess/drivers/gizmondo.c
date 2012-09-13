@@ -61,6 +61,8 @@ public:
 	UINT32 m_port[9];
 	device_t *m_s3c2440;
 	DECLARE_DRIVER_INIT(gizmondo);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 /*******************************************************************************
@@ -134,18 +136,17 @@ static QUICKLOAD_LOAD( gizmondo )
     MACHINE HARDWARE
 *******************************************************************************/
 
-static MACHINE_START( gizmondo )
+void gizmondo_state::machine_start()
 {
-	gizmondo_state *gizmondo = machine.driver_data<gizmondo_state>();
-	gizmondo->m_s3c2440 = machine.device( "s3c2440");
-	gizmondo->m_port[S3C2440_GPIO_PORT_B] = 0x055E;
-	gizmondo->m_port[S3C2440_GPIO_PORT_C] = 0x5F20;
-	gizmondo->m_port[S3C2440_GPIO_PORT_D] = 0x4F60;
+	m_s3c2440 = machine().device( "s3c2440");
+	m_port[S3C2440_GPIO_PORT_B] = 0x055E;
+	m_port[S3C2440_GPIO_PORT_C] = 0x5F20;
+	m_port[S3C2440_GPIO_PORT_D] = 0x4F60;
 }
 
-static MACHINE_RESET( gizmondo )
+void gizmondo_state::machine_reset()
 {
-	machine.device("maincpu")->reset();
+	machine().device("maincpu")->reset();
 }
 
 /*******************************************************************************
@@ -205,8 +206,6 @@ static MACHINE_CONFIG_START( gizmondo, gizmondo_state )
 
 	MCFG_VIDEO_START(gf4500)
 
-	MCFG_MACHINE_START(gizmondo)
-	MCFG_MACHINE_RESET(gizmondo)
 
 	MCFG_S3C2440_ADD("s3c2440", 12000000, gizmondo_s3c2440_intf)
 

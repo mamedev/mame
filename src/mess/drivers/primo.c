@@ -264,7 +264,6 @@ static MACHINE_CONFIG_START( primoa32, primo_state )
 	MCFG_CPU_IO_MAP( primoa_port)
 	MCFG_CPU_VBLANK_INT("screen", primo_vblank_interrupt)
 
-	MCFG_MACHINE_RESET( primoa )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -316,28 +315,28 @@ static MACHINE_CONFIG_DERIVED( primob32, primoa32 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP( primob_port)
 
-	MCFG_MACHINE_RESET( primob )
+	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( primob48, primoa48 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP( primob_port)
 
-	MCFG_MACHINE_RESET( primob )
+	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( primob64, primoa64 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP( primob_port)
 
-	MCFG_MACHINE_RESET( primob )
+	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( primoc64, primoa64 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP( primob_port)
 
-	MCFG_MACHINE_RESET( primob )
+	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob )
 MACHINE_CONFIG_END
 
 ROM_START( primoa32 )

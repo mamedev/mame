@@ -43,7 +43,7 @@ TILE_GET_INFO_MEMBER(skullxbo_state::get_playfield_tile_info)
  *
  *************************************/
 
-VIDEO_START( skullxbo )
+VIDEO_START_MEMBER(skullxbo_state,skullxbo)
 {
 	static const atarimo_desc modesc =
 	{
@@ -81,17 +81,16 @@ VIDEO_START( skullxbo )
 		0,					/* resulting value to indicate "special" */
 		0,					/* callback routine for special entries */
 	};
-	skullxbo_state *state = machine.driver_data<skullxbo_state>();
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(skullxbo_state::get_playfield_tile_info),state), TILEMAP_SCAN_COLS,  16,8, 64,64);
+	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(skullxbo_state::get_playfield_tile_info),this), TILEMAP_SCAN_COLS,  16,8, 64,64);
 
 	/* initialize the motion objects */
-	atarimo_init(machine, 0, &modesc);
+	atarimo_init(machine(), 0, &modesc);
 
 	/* initialize the alphanumerics */
-	state->m_alpha_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(skullxbo_state::get_alpha_tile_info),state), TILEMAP_SCAN_ROWS,  16,8, 64,32);
-	state->m_alpha_tilemap->set_transparent_pen(0);
+	m_alpha_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(skullxbo_state::get_alpha_tile_info),this), TILEMAP_SCAN_ROWS,  16,8, 64,32);
+	m_alpha_tilemap->set_transparent_pen(0);
 }
 
 

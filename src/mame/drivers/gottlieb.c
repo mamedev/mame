@@ -234,52 +234,50 @@ static TIMER_CALLBACK( laserdisc_philips_callback );
  *
  *************************************/
 
-static MACHINE_START( gottlieb )
+void gottlieb_state::machine_start()
 {
-	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	/* register for save states */
-	state_save_register_global(machine, state->m_joystick_select);
-	state_save_register_global_array(machine, state->m_track);
+	state_save_register_global(machine(), m_joystick_select);
+	state_save_register_global_array(machine(), m_track);
 
 	/* see if we have a laserdisc */
-	if (state->m_laserdisc != NULL)
+	if (m_laserdisc != NULL)
 	{
 		/* attach to the I/O ports */
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x05805, 0x05807, 0, 0x07f8, read8_delegate(FUNC(gottlieb_state::laserdisc_status_r),state));
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x05805, 0x05805, 0, 0x07f8, write8_delegate(FUNC(gottlieb_state::laserdisc_command_w),state));	/* command for the player */
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x05806, 0x05806, 0, 0x07f8, write8_delegate(FUNC(gottlieb_state::laserdisc_select_w),state));
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x05805, 0x05807, 0, 0x07f8, read8_delegate(FUNC(gottlieb_state::laserdisc_status_r),this));
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x05805, 0x05805, 0, 0x07f8, write8_delegate(FUNC(gottlieb_state::laserdisc_command_w),this));	/* command for the player */
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x05806, 0x05806, 0, 0x07f8, write8_delegate(FUNC(gottlieb_state::laserdisc_select_w),this));
 
 		/* allocate a timer for serial transmission, and one for philips code processing */
-		state->m_laserdisc_bit_timer = machine.scheduler().timer_alloc(FUNC(laserdisc_bit_callback));
-		state->m_laserdisc_philips_timer = machine.scheduler().timer_alloc(FUNC(laserdisc_philips_callback));
+		m_laserdisc_bit_timer = machine().scheduler().timer_alloc(FUNC(laserdisc_bit_callback));
+		m_laserdisc_philips_timer = machine().scheduler().timer_alloc(FUNC(laserdisc_philips_callback));
 
 		/* create some audio RAM */
-		state->m_laserdisc_audio_buffer = auto_alloc_array(machine, UINT8, AUDIORAM_SIZE);
-		state->m_laserdisc_status = 0x38;
+		m_laserdisc_audio_buffer = auto_alloc_array(machine(), UINT8, AUDIORAM_SIZE);
+		m_laserdisc_status = 0x38;
 
 		/* more save state registration */
-		state_save_register_global(machine, state->m_laserdisc_select);
-		state_save_register_global(machine, state->m_laserdisc_status);
-		state_save_register_global(machine, state->m_laserdisc_philips_code);
+		state_save_register_global(machine(), m_laserdisc_select);
+		state_save_register_global(machine(), m_laserdisc_status);
+		state_save_register_global(machine(), m_laserdisc_philips_code);
 
-		state_save_register_global_pointer(machine, state->m_laserdisc_audio_buffer, AUDIORAM_SIZE);
-		state_save_register_global(machine, state->m_laserdisc_audio_address);
-		state_save_register_global_array(machine, state->m_laserdisc_last_samples);
-		state_save_register_global(machine, state->m_laserdisc_last_time);
-		state_save_register_global(machine, state->m_laserdisc_last_clock);
-		state_save_register_global(machine, state->m_laserdisc_zero_seen);
-		state_save_register_global(machine, state->m_laserdisc_audio_bits);
-		state_save_register_global(machine, state->m_laserdisc_audio_bit_count);
+		state_save_register_global_pointer(machine(), m_laserdisc_audio_buffer, AUDIORAM_SIZE);
+		state_save_register_global(machine(), m_laserdisc_audio_address);
+		state_save_register_global_array(machine(), m_laserdisc_last_samples);
+		state_save_register_global(machine(), m_laserdisc_last_time);
+		state_save_register_global(machine(), m_laserdisc_last_clock);
+		state_save_register_global(machine(), m_laserdisc_zero_seen);
+		state_save_register_global(machine(), m_laserdisc_audio_bits);
+		state_save_register_global(machine(), m_laserdisc_audio_bit_count);
 	}
 }
 
 
-static MACHINE_RESET( gottlieb )
+void gottlieb_state::machine_reset()
 {
-	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	/* if we have a laserdisc, reset our philips code callback for the next line 17 */
-	if (state->m_laserdisc != NULL)
-		state->m_laserdisc_philips_timer->adjust(machine.primary_screen->time_until_pos(17), 17);
+	if (m_laserdisc != NULL)
+		m_laserdisc_philips_timer->adjust(machine().primary_screen->time_until_pos(17), 17);
 }
 
 
@@ -1715,8 +1713,6 @@ static MACHINE_CONFIG_START( gottlieb_core, gottlieb_state )
 	MCFG_CPU_PROGRAM_MAP(gottlieb_map)
 	MCFG_CPU_VBLANK_INT("screen", gottlieb_interrupt)
 
-	MCFG_MACHINE_START(gottlieb)
-	MCFG_MACHINE_RESET(gottlieb)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 	MCFG_WATCHDOG_VBLANK_INIT(16)
 
@@ -1728,7 +1724,6 @@ static MACHINE_CONFIG_START( gottlieb_core, gottlieb_state )
 	MCFG_GFXDECODE(gfxdecode)
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_VIDEO_START(gottlieb)
 
 	// basic speaker configuration
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1825,7 +1820,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( screwloo, gottlieb2 )
 
-	MCFG_VIDEO_START(screwloo)
+	MCFG_VIDEO_START_OVERRIDE(gottlieb_state,screwloo)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cobram3, gottlieb_core )

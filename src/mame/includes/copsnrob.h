@@ -33,6 +33,9 @@ public:
 	DECLARE_READ8_MEMBER(copsnrob_misc_r);
 	DECLARE_WRITE8_MEMBER(copsnrob_misc2_w);
 	DECLARE_WRITE8_MEMBER(copsnrob_misc_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 

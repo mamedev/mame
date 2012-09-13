@@ -46,6 +46,9 @@ public:
 	DECLARE_WRITE16_MEMBER(xmen_18fa00_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(xmen_frame_r);
+	virtual void machine_start();
+	virtual void machine_reset();
+	DECLARE_VIDEO_START(xmen6p);
 };
 
 /*----------- defined in video/xmen.c -----------*/
@@ -53,7 +56,7 @@ public:
 void xmen_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
 void xmen_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);
 
-VIDEO_START( xmen6p );
+
 SCREEN_UPDATE_IND16( xmen );
 SCREEN_UPDATE_IND16( xmen6p_left );
 SCREEN_UPDATE_IND16( xmen6p_right );

@@ -12,11 +12,10 @@ TILE_GET_INFO_MEMBER(speedspn_state::get_speedspn_tile_info)
 	SET_TILE_INFO_MEMBER(0,code,attr & 0x3f,(attr & 0x80) ? TILE_FLIPX : 0);
 }
 
-VIDEO_START(speedspn)
+void speedspn_state::video_start()
 {
-	speedspn_state *state = machine.driver_data<speedspn_state>();
-	state->m_vidram = auto_alloc_array(machine, UINT8, 0x1000 * 2);
-	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(speedspn_state::get_speedspn_tile_info),state),TILEMAP_SCAN_COLS, 8, 8,64,32);
+	m_vidram = auto_alloc_array(machine(), UINT8, 0x1000 * 2);
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(speedspn_state::get_speedspn_tile_info),this),TILEMAP_SCAN_COLS, 8, 8,64,32);
 }
 
 WRITE8_MEMBER(speedspn_state::speedspn_vidram_w)

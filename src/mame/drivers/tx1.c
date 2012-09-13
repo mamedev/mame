@@ -703,13 +703,13 @@ static MACHINE_CONFIG_START( tx1, tx1_state )
 	MCFG_CPU_IO_MAP(tx1_sound_io)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, TX1_PIXEL_CLOCK / 4 / 2048 / 2)
 
-	MCFG_MACHINE_RESET(tx1)
+	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,tx1)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_I8255A_ADD("ppi8255", tx1_ppi8255_intf)
 
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(tx1)
+	MCFG_PALETTE_INIT_OVERRIDE(tx1_state,tx1)
 
 	MCFG_DEFAULT_LAYOUT(layout_triphsxs)
 
@@ -726,7 +726,7 @@ static MACHINE_CONFIG_START( tx1, tx1_state )
 	MCFG_SCREEN_UPDATE_STATIC(tx1_right)
 	MCFG_SCREEN_VBLANK_STATIC(tx1)
 
-	MCFG_VIDEO_START(tx1)
+	MCFG_VIDEO_START_OVERRIDE(tx1_state,tx1)
 
 	MCFG_SPEAKER_STANDARD_STEREO("frontleft", "frontright")
 //  MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright") /* Atari TX-1 TM262 manual shows 4 speakers (TX-1 Audio PCB Assembly A042016-01 A) */
@@ -756,7 +756,7 @@ static MACHINE_CONFIG_START( buggyboy, tx1_state )
 	MCFG_CPU_PERIODIC_INT(z80_irq, BUGGYBOY_ZCLK / 2 / 4 / 2048)
 	MCFG_CPU_IO_MAP(buggyboy_sound_io)
 
-	MCFG_MACHINE_RESET(buggyboy)
+	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,buggyboy)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_I8255A_ADD("ppi8255", buggyboy_ppi8255_intf)
@@ -777,8 +777,8 @@ static MACHINE_CONFIG_START( buggyboy, tx1_state )
 	MCFG_SCREEN_VBLANK_STATIC(buggyboy)
 
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(buggyboy)
-	MCFG_VIDEO_START(buggyboy)
+	MCFG_PALETTE_INIT_OVERRIDE(tx1_state,buggyboy)
+	MCFG_VIDEO_START_OVERRIDE(tx1_state,buggyboy)
 
 	MCFG_SPEAKER_STANDARD_STEREO("frontleft", "frontright")
 //  MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
@@ -810,7 +810,7 @@ static MACHINE_CONFIG_START( buggybjr, tx1_state )
 	MCFG_CPU_IO_MAP(buggyboy_sound_io)
 	MCFG_CPU_PERIODIC_INT(z80_irq, BUGGYBOY_ZCLK / 2 / 4 / 2048)
 
-	MCFG_MACHINE_RESET(buggyboy)
+	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,buggyboy)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -819,8 +819,8 @@ static MACHINE_CONFIG_START( buggybjr, tx1_state )
 	MCFG_SCREEN_VBLANK_STATIC(buggyboy)
 
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(buggyboy)
-	MCFG_VIDEO_START(buggybjr)
+	MCFG_PALETTE_INIT_OVERRIDE(tx1_state,buggyboy)
+	MCFG_VIDEO_START_OVERRIDE(tx1_state,buggybjr)
 
 	MCFG_SPEAKER_STANDARD_STEREO("frontleft", "frontright")
 //  MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")

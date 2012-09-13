@@ -91,12 +91,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
 	DECLARE_WRITE8_MEMBER(esripsys_dac_w);
 	DECLARE_DRIVER_INIT(esripsys);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/esripsys.c -----------*/
 
-VIDEO_START( esripsys );
+
 SCREEN_UPDATE_RGB32( esripsys );
 
 INTERRUPT_GEN( esripsys_vblank_irq );

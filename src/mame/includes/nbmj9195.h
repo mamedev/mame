@@ -106,15 +106,19 @@ public:
 	DECLARE_WRITE8_MEMBER(nbmj9195_clut_0_w);
 	DECLARE_WRITE8_MEMBER(nbmj9195_clut_1_w);
 	DECLARE_DRIVER_INIT(nbmj9195);
+	virtual void machine_reset();
+	virtual void video_start();
+	DECLARE_VIDEO_START(nbmj9195_1layer);
+	DECLARE_VIDEO_START(nbmj9195_nb22090);
 };
 
 
 /*----------- defined in video/nbmj9195.c -----------*/
 
 SCREEN_UPDATE_IND16( nbmj9195 );
-VIDEO_START( nbmj9195_1layer );
-VIDEO_START( nbmj9195_2layer );
-VIDEO_START( nbmj9195_nb22090 );
+
+
+
 
 
 

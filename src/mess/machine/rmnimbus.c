@@ -181,7 +181,7 @@ static TIMER_CALLBACK(keyscan_callback);
 
 static void pc8031_reset(running_machine &machine);
 static void iou_reset(running_machine &machine);
-static void sound_reset(running_machine &machine);
+static void rmni_sound_reset(running_machine &machine);
 
 static void mouse_js_reset(running_machine &machine);
 static TIMER_CALLBACK(mouse_callback);
@@ -1249,45 +1249,44 @@ WRITE16_MEMBER(rmnimbus_state::nimbus_i186_internal_port_w)
 	}
 }
 
-MACHINE_RESET(nimbus)
+void rmnimbus_state::machine_reset()
 {
 	/* CPU */
-	nimbus_cpu_reset(machine);
-	iou_reset(machine);
-	fdc_reset(machine);
-	hdc_reset(machine);
-	keyboard_reset(machine);
-	pc8031_reset(machine);
-	sound_reset(machine);
-	memory_reset(machine);
-	mouse_js_reset(machine);
+	nimbus_cpu_reset(machine());
+	iou_reset(machine());
+	fdc_reset(machine());
+	hdc_reset(machine());
+	keyboard_reset(machine());
+	pc8031_reset(machine());
+	rmni_sound_reset(machine());
+	memory_reset(machine());
+	mouse_js_reset(machine());
 }
 
 DRIVER_INIT_MEMBER(rmnimbus_state,nimbus)
 {
 }
 
-MACHINE_START( nimbus )
+void rmnimbus_state::machine_start()
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
 	/* init cpu */
-	nimbus_cpu_init(machine);
+	nimbus_cpu_init(machine());
 
-	state->m_keyboard.keyscan_timer=machine.scheduler().timer_alloc(FUNC(keyscan_callback));
-	state->m_nimbus_mouse.m_mouse_timer=machine.scheduler().timer_alloc(FUNC(mouse_callback));
+	m_keyboard.keyscan_timer=machine().scheduler().timer_alloc(FUNC(keyscan_callback));
+	m_nimbus_mouse.m_mouse_timer=machine().scheduler().timer_alloc(FUNC(mouse_callback));
 
 	/* setup debug commands */
-	if (machine.debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		debug_console_register_command(machine, "nimbus_irq", CMDFLAG_NONE, 0, 0, 2, execute_debug_irq);
-		debug_console_register_command(machine, "nimbus_intmasks", CMDFLAG_NONE, 0, 0, 0, execute_debug_intmasks);
-		debug_console_register_command(machine, "nimbus_debug", CMDFLAG_NONE, 0, 0, 1, nimbus_debug);
+		debug_console_register_command(machine(), "nimbus_irq", CMDFLAG_NONE, 0, 0, 2, execute_debug_irq);
+		debug_console_register_command(machine(), "nimbus_intmasks", CMDFLAG_NONE, 0, 0, 0, execute_debug_intmasks);
+		debug_console_register_command(machine(), "nimbus_debug", CMDFLAG_NONE, 0, 0, 1, nimbus_debug);
 
 		/* set up the instruction hook */
-		machine.device(MAINCPU_TAG)->debug()->set_instruction_hook(instruction_hook);
+		machine().device(MAINCPU_TAG)->debug()->set_instruction_hook(instruction_hook);
 	}
 
-	state->m_debug_machine=DEBUG_NONE;
+	m_debug_machine=DEBUG_NONE;
 }
 
 static void execute_debug_irq(running_machine &machine, int ref, int params, const char *param[])
@@ -2754,7 +2753,7 @@ static void iou_reset(running_machine &machine)
 
 */
 
-static void sound_reset(running_machine &machine)
+static void rmni_sound_reset(running_machine &machine)
 {
 	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
     //device_t *ay8910 = machine.device(AY8910_TAG);

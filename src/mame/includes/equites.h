@@ -98,6 +98,12 @@ public:
 	TILE_GET_INFO_MEMBER(splndrbt_fg_info);
 	TILE_GET_INFO_MEMBER(equites_bg_info);
 	TILE_GET_INFO_MEMBER(splndrbt_bg_info);
+	DECLARE_MACHINE_START(equites);
+	DECLARE_MACHINE_RESET(equites);
+	DECLARE_VIDEO_START(equites);
+	DECLARE_PALETTE_INIT(equites);
+	DECLARE_VIDEO_START(splndrbt);
+	DECLARE_PALETTE_INIT(splndrbt);
 };
 
 

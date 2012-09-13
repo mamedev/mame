@@ -110,117 +110,113 @@ static void update_ti86_memory (running_machine &machine)
   Machine Initialization
 ***************************************************************************/
 
-MACHINE_START( ti81 )
+void ti85_state::machine_start()
 {
-	ti85_state *state = machine.driver_data<ti85_state>();
-	address_space *space = state->m_maincpu->space(AS_PROGRAM);
-	state->m_bios = state->memregion("bios")->base();
+	address_space *space = m_maincpu->space(AS_PROGRAM);
+	m_bios = memregion("bios")->base();
 
-	state->m_timer_interrupt_mask = 0;
-	state->m_timer_interrupt_status = 0;
-	state->m_ON_interrupt_mask = 0;
-	state->m_ON_interrupt_status = 0;
-	state->m_ON_pressed = 0;
-	state->m_power_mode = 0;
-	state->m_keypad_mask = 0;
-	state->m_ti8x_memory_page_1 = 0;
-	state->m_LCD_memory_base = 0;
-	state->m_LCD_status = 0;
-	state->m_LCD_mask = 0;
-	state->m_video_buffer_width = 0;
-	state->m_interrupt_speed = 0;
-	state->m_port4_bit0 = 0;
-	state->m_ti81_port_7_data = 0;
+	m_timer_interrupt_mask = 0;
+	m_timer_interrupt_status = 0;
+	m_ON_interrupt_mask = 0;
+	m_ON_interrupt_status = 0;
+	m_ON_pressed = 0;
+	m_power_mode = 0;
+	m_keypad_mask = 0;
+	m_ti8x_memory_page_1 = 0;
+	m_LCD_memory_base = 0;
+	m_LCD_status = 0;
+	m_LCD_mask = 0;
+	m_video_buffer_width = 0;
+	m_interrupt_speed = 0;
+	m_port4_bit0 = 0;
+	m_ti81_port_7_data = 0;
 
-	machine.scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
+	machine().scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
 
 	space->unmap_write(0x0000, 0x3fff);
 	space->unmap_write(0x4000, 0x7fff);
-	state->membank("bank1")->set_base(state->m_bios);
-	state->membank("bank2")->set_base(state->m_bios + 0x04000);
+	membank("bank1")->set_base(m_bios);
+	membank("bank2")->set_base(m_bios + 0x04000);
 }
 
-MACHINE_RESET( ti85 )
+MACHINE_RESET_MEMBER(ti85_state,ti85)
 {
-	ti85_state *state = machine.driver_data<ti85_state>();
-	state->m_red_out = 0x00;
-	state->m_white_out = 0x00;
-	state->m_PCR = 0xc0;
+	m_red_out = 0x00;
+	m_white_out = 0x00;
+	m_PCR = 0xc0;
 }
 
 
-MACHINE_START( ti83p )
+MACHINE_START_MEMBER(ti85_state,ti83p)
 {
-	ti85_state *state = machine.driver_data<ti85_state>();
-	address_space *space = state->m_maincpu->space(AS_PROGRAM);
-	state->m_bios = state->memregion("bios")->base();
+	address_space *space = m_maincpu->space(AS_PROGRAM);
+	m_bios = memregion("bios")->base();
 
-	state->m_timer_interrupt_mask = 0;
-	state->m_timer_interrupt_status = 0;
-	state->m_ON_interrupt_mask = 0;
-	state->m_ON_interrupt_status = 0;
-	state->m_ON_pressed = 0;
-	state->m_ti8x_memory_page_1 = 0;
-	state->m_ti8x_memory_page_2 = 0;
-	state->m_LCD_memory_base = 0;
-	state->m_LCD_status = 0;
-	state->m_LCD_mask = 0;
-	state->m_power_mode = 0;
-	state->m_keypad_mask = 0;
-	state->m_video_buffer_width = 0;
-	state->m_interrupt_speed = 0;
-	state->m_port4_bit0 = 0;
+	m_timer_interrupt_mask = 0;
+	m_timer_interrupt_status = 0;
+	m_ON_interrupt_mask = 0;
+	m_ON_interrupt_status = 0;
+	m_ON_pressed = 0;
+	m_ti8x_memory_page_1 = 0;
+	m_ti8x_memory_page_2 = 0;
+	m_LCD_memory_base = 0;
+	m_LCD_status = 0;
+	m_LCD_mask = 0;
+	m_power_mode = 0;
+	m_keypad_mask = 0;
+	m_video_buffer_width = 0;
+	m_interrupt_speed = 0;
+	m_port4_bit0 = 0;
 
-	state->m_ti8x_ram = auto_alloc_array(machine, UINT8, 32*1024);
-	memset(state->m_ti8x_ram, 0, sizeof(UINT8)*32*1024);
+	m_ti8x_ram = auto_alloc_array(machine(), UINT8, 32*1024);
+	memset(m_ti8x_ram, 0, sizeof(UINT8)*32*1024);
 
 	space->unmap_write(0x0000, 0x3fff);
 	space->unmap_write(0x4000, 0x7fff);
 	space->unmap_write(0x8000, 0xbfff);
 
-	state->membank("bank1")->set_base(state->m_bios);
-	state->membank("bank2")->set_base(state->m_bios);
-	state->membank("bank3")->set_base(state->m_bios);
-	state->membank("bank4")->set_base(state->m_ti8x_ram);
+	membank("bank1")->set_base(m_bios);
+	membank("bank2")->set_base(m_bios);
+	membank("bank3")->set_base(m_bios);
+	membank("bank4")->set_base(m_ti8x_ram);
 
-	machine.scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
+	machine().scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
 
 }
 
 
-MACHINE_START( ti86 )
+MACHINE_START_MEMBER(ti85_state,ti86)
 {
-	ti85_state *state = machine.driver_data<ti85_state>();
-	address_space *space = state->m_maincpu->space(AS_PROGRAM);
-	state->m_bios = state->memregion("bios")->base();
+	address_space *space = m_maincpu->space(AS_PROGRAM);
+	m_bios = memregion("bios")->base();
 
-	state->m_timer_interrupt_mask = 0;
-	state->m_timer_interrupt_status = 0;
-	state->m_ON_interrupt_mask = 0;
-	state->m_ON_interrupt_status = 0;
-	state->m_ON_pressed = 0;
-	state->m_ti8x_memory_page_1 = 0;
-	state->m_ti8x_memory_page_2 = 0;
-	state->m_LCD_memory_base = 0;
-	state->m_LCD_status = 0;
-	state->m_LCD_mask = 0;
-	state->m_power_mode = 0;
-	state->m_keypad_mask = 0;
-	state->m_video_buffer_width = 0;
-	state->m_interrupt_speed = 0;
-	state->m_port4_bit0 = 0;
+	m_timer_interrupt_mask = 0;
+	m_timer_interrupt_status = 0;
+	m_ON_interrupt_mask = 0;
+	m_ON_interrupt_status = 0;
+	m_ON_pressed = 0;
+	m_ti8x_memory_page_1 = 0;
+	m_ti8x_memory_page_2 = 0;
+	m_LCD_memory_base = 0;
+	m_LCD_status = 0;
+	m_LCD_mask = 0;
+	m_power_mode = 0;
+	m_keypad_mask = 0;
+	m_video_buffer_width = 0;
+	m_interrupt_speed = 0;
+	m_port4_bit0 = 0;
 
-	state->m_ti8x_ram = auto_alloc_array(machine, UINT8, 128*1024);
-	memset(state->m_ti8x_ram, 0, sizeof(UINT8)*128*1024);
+	m_ti8x_ram = auto_alloc_array(machine(), UINT8, 128*1024);
+	memset(m_ti8x_ram, 0, sizeof(UINT8)*128*1024);
 
 	space->unmap_write(0x0000, 0x3fff);
 
-	state->membank("bank1")->set_base(state->m_bios);
-	state->membank("bank2")->set_base(state->m_bios + 0x04000);
+	membank("bank1")->set_base(m_bios);
+	membank("bank2")->set_base(m_bios + 0x04000);
 
-	state->membank("bank4")->set_base(state->m_ti8x_ram);
+	membank("bank4")->set_base(m_ti8x_ram);
 
-	machine.scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
+	machine().scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
 }
 
 

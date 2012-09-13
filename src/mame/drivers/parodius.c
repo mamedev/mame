@@ -246,45 +246,43 @@ static const k05324x_interface parodius_k05324x_intf =
 	parodius_sprite_callback
 };
 
-static MACHINE_START( parodius )
+void parodius_state::machine_start()
 {
-	parodius_state *state = machine.driver_data<parodius_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 14, &ROM[0x10000], 0x4000);
-	state->membank("bank1")->configure_entries(14, 2, &ROM[0x08000], 0x4000);
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->configure_entries(0, 14, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(14, 2, &ROM[0x08000], 0x4000);
+	membank("bank1")->set_entry(0);
 
-	state->m_generic_paletteram_8.allocate(0x1000);
+	m_generic_paletteram_8.allocate(0x1000);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_k053260 = machine.device("k053260");
-	state->m_k053245 = machine.device("k053245");
-	state->m_k053251 = machine.device("k053251");
-	state->m_k052109 = machine.device("k052109");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_k053260 = machine().device("k053260");
+	m_k053245 = machine().device("k053245");
+	m_k053251 = machine().device("k053251");
+	m_k052109 = machine().device("k052109");
 
-	state->save_item(NAME(state->m_videobank));
-	state->save_item(NAME(state->m_sprite_colorbase));
-	state->save_item(NAME(state->m_layer_colorbase));
-	state->save_item(NAME(state->m_layerpri));
+	save_item(NAME(m_videobank));
+	save_item(NAME(m_sprite_colorbase));
+	save_item(NAME(m_layer_colorbase));
+	save_item(NAME(m_layerpri));
 }
 
-static MACHINE_RESET( parodius )
+void parodius_state::machine_reset()
 {
-	parodius_state *state = machine.driver_data<parodius_state>();
 	int i;
 
-	konami_configure_set_lines(machine.device("maincpu"), parodius_banking);
+	konami_configure_set_lines(machine().device("maincpu"), parodius_banking);
 
 	for (i = 0; i < 3; i++)
 	{
-		state->m_layerpri[i] = 0;
-		state->m_layer_colorbase[i] = 0;
+		m_layerpri[i] = 0;
+		m_layer_colorbase[i] = 0;
 	}
 
-	state->m_sprite_colorbase = 0;
-	state->m_videobank = 0;
+	m_sprite_colorbase = 0;
+	m_videobank = 0;
 }
 
 static MACHINE_CONFIG_START( parodius, parodius_state )
@@ -297,8 +295,6 @@ static MACHINE_CONFIG_START( parodius, parodius_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(parodius_sound_map)
 								/* NMIs are triggered by the 053260 */
-	MCFG_MACHINE_START(parodius)
-	MCFG_MACHINE_RESET(parodius)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

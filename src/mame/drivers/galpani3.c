@@ -111,6 +111,7 @@ public:
 	DECLARE_DRIVER_INIT( galpani3 )
 	{
 	}
+	virtual void video_start();
 };
 
 
@@ -138,13 +139,12 @@ static TIMER_DEVICE_CALLBACK( galpani3_vblank ) // 2, 3, 5 ?
 }
 
 
-static VIDEO_START(galpani3)
+void galpani3_state::video_start()
 {
-	galpani3_state *state = machine.driver_data<galpani3_state>();
 	/* so we can use suprnova.c */
 
-	state->m_spritegen = machine.device<sknsspr_device>("spritegen");
-	state->m_spritegen->skns_sprite_kludge(0,0);
+	m_spritegen = machine().device<sknsspr_device>("spritegen");
+	m_spritegen->skns_sprite_kludge(0,0);
 }
 
 
@@ -526,7 +526,6 @@ static MACHINE_CONFIG_START( galpani3, galpani3_state )
 
 	MCFG_PALETTE_LENGTH(0x4303)
 
-	MCFG_VIDEO_START(galpani3)
 
 	MCFG_DEVICE_ADD("spritegen", SKNS_SPRITE, 0)
 

@@ -52,10 +52,9 @@ Dip locations verified with Fabtek manual for the trackball version
 #include "audio/seibu.h"
 #include "includes/cabal.h"
 
-static MACHINE_RESET( cabalbl )
+MACHINE_RESET_MEMBER(cabal_state,cabalbl)
 {
-	cabal_state *state = machine.driver_data<cabal_state>();
-	state->m_sound_command1 = state->m_sound_command2 = 0xff;
+	m_sound_command1 = m_sound_command2 = 0xff;
 }
 
 
@@ -511,7 +510,6 @@ static MACHINE_CONFIG_START( cabal, cabal_state )
 	MCFG_GFXDECODE(cabal)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(cabal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -554,7 +552,7 @@ static MACHINE_CONFIG_START( cabalbl, cabal_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_RESET(cabalbl)
+	MCFG_MACHINE_RESET_OVERRIDE(cabal_state,cabalbl)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -567,7 +565,6 @@ static MACHINE_CONFIG_START( cabalbl, cabal_state )
 	MCFG_GFXDECODE(cabal)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(cabal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

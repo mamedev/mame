@@ -249,11 +249,11 @@ static void tandy1000_set_bios_bank( running_machine &machine )
 }
 
 
-MACHINE_RESET( tandy1000rl )
+MACHINE_RESET_MEMBER(pc_state,tandy1000rl)
 {
-	MACHINE_RESET_CALL( pc );
+	MACHINE_RESET_CALL_MEMBER( pc );
 	tandy.bios_bank = 6;
-	tandy1000_set_bios_bank( machine );
+	tandy1000_set_bios_bank( machine() );
 }
 
 

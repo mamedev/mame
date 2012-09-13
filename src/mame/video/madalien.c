@@ -14,13 +14,13 @@
 #define PIXEL_CLOCK (MADALIEN_MAIN_CLOCK / 2)
 
 
-static PALETTE_INIT( madalien )
+PALETTE_INIT_MEMBER(madalien_state,madalien)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x20);
+	machine().colortable = colortable_alloc(machine(), 0x20);
 
 	for (i = 0; i < 0x20; i++)
 	{
@@ -41,11 +41,11 @@ static PALETTE_INIT( madalien )
 		if (BIT(color_prom[i], 5))
 			b += 0xc0;
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	for (i = 0; i < 0x10; i++)
-		colortable_entry_set_value(machine.colortable, i, i);
+		colortable_entry_set_value(machine().colortable, i, i);
 
 	for (i = 0x10; i < 0x20; i++)
 	{
@@ -57,11 +57,11 @@ static PALETTE_INIT( madalien )
 		if (BIT((i - 0x10), 2))
 			ctabentry = ctabentry ^ 0x06;
 
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	for (i = 0x20; i < 0x30; i++)
-		colortable_entry_set_value(machine.colortable, i, (i - 0x20) | 0x10);
+		colortable_entry_set_value(machine().colortable, i, (i - 0x20) | 0x10);
 }
 
 
@@ -117,17 +117,16 @@ WRITE8_MEMBER(madalien_state::madalien_videoram_w)
 }
 
 
-static VIDEO_START( madalien )
+VIDEO_START_MEMBER(madalien_state,madalien)
 {
-	madalien_state *state = machine.driver_data<madalien_state>();
 	int i;
 
 	static const tilemap_mapper_delegate scan_functions[4] =
 	{
-		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode0),state), 
-		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode1),state), 
-		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode2),state),
-		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode3),state)
+		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode0),this), 
+		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode1),this), 
+		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode2),this),
+		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode3),this)
 	};
 
 	static const int tilemap_cols[4] =
@@ -135,28 +134,28 @@ static VIDEO_START( madalien )
 		16, 16, 32, 32
 	};
 
-	state->m_tilemap_fg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_FG),state), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
-	state->m_tilemap_fg->set_transparent_pen(0);
-	state->m_tilemap_fg->set_scrolldx(0, 0x50);
-	state->m_tilemap_fg->set_scrolldy(0, 0x20);
+	m_tilemap_fg = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_FG),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
+	m_tilemap_fg->set_transparent_pen(0);
+	m_tilemap_fg->set_scrolldx(0, 0x50);
+	m_tilemap_fg->set_scrolldy(0, 0x20);
 
 	for (i = 0; i < 4; i++)
 	{
-		state->m_tilemap_edge1[i] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_1),state), scan_functions[i], 16, 16, tilemap_cols[i], 8);
-		state->m_tilemap_edge1[i]->set_scrolldx(0, 0x50);
-		state->m_tilemap_edge1[i]->set_scrolldy(0, 0x20);
+		m_tilemap_edge1[i] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_1),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
+		m_tilemap_edge1[i]->set_scrolldx(0, 0x50);
+		m_tilemap_edge1[i]->set_scrolldy(0, 0x20);
 
-		state->m_tilemap_edge2[i] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_2),state), scan_functions[i], 16, 16, tilemap_cols[i], 8);
-		state->m_tilemap_edge2[i]->set_scrolldx(0, 0x50);
-		state->m_tilemap_edge2[i]->set_scrolldy(0, machine.primary_screen->height() - 256);
+		m_tilemap_edge2[i] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_2),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
+		m_tilemap_edge2[i]->set_scrolldx(0, 0x50);
+		m_tilemap_edge2[i]->set_scrolldy(0, machine().primary_screen->height() - 256);
 	}
 
-	state->m_headlight_bitmap = auto_bitmap_ind16_alloc(machine, 128, 128);
+	m_headlight_bitmap = auto_bitmap_ind16_alloc(machine(), 128, 128);
 
-	machine.gfx[0]->set_source(state->m_charram);
+	machine().gfx[0]->set_source(m_charram);
 
-	drawgfx_opaque(*state->m_headlight_bitmap, state->m_headlight_bitmap->cliprect(), machine.gfx[2], 0, 0, 0, 0, 0x00, 0x00);
-	drawgfx_opaque(*state->m_headlight_bitmap, state->m_headlight_bitmap->cliprect(), machine.gfx[2], 0, 0, 0, 1, 0x00, 0x40);
+	drawgfx_opaque(*m_headlight_bitmap, m_headlight_bitmap->cliprect(), machine().gfx[2], 0, 0, 0, 0, 0x00, 0x00);
+	drawgfx_opaque(*m_headlight_bitmap, m_headlight_bitmap->cliprect(), machine().gfx[2], 0, 0, 0, 1, 0x00, 0x40);
 }
 
 
@@ -401,8 +400,8 @@ MACHINE_CONFIG_FRAGMENT( madalien_video )
 
 	MCFG_GFXDECODE(madalien)
 	MCFG_PALETTE_LENGTH(0x30)
-	MCFG_PALETTE_INIT(madalien)
-	MCFG_VIDEO_START(madalien)
+	MCFG_PALETTE_INIT_OVERRIDE(madalien_state,madalien)
+	MCFG_VIDEO_START_OVERRIDE(madalien_state,madalien)
 
 	MCFG_MC6845_ADD("crtc", MC6845, PIXEL_CLOCK / 8, mc6845_intf)
 MACHINE_CONFIG_END

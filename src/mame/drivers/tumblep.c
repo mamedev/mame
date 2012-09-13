@@ -294,13 +294,12 @@ static const deco16ic_interface tumblep_deco16ic_tilegen1_intf =
 	0,1
 };
 
-static MACHINE_START( tumblep )
+void tumblep_state::machine_start()
 {
-	tumblep_state *state = machine.driver_data<tumblep_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_deco_tilegen1 = machine.device("tilegen1");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_deco_tilegen1 = machine().device("tilegen1");
 }
 
 static MACHINE_CONFIG_START( tumblep, tumblep_state )
@@ -313,7 +312,6 @@ static MACHINE_CONFIG_START( tumblep, tumblep_state )
 	MCFG_CPU_ADD("audiocpu", H6280, 32220000/8)	/* Custom chip 45; Audio section crystal is 32.220 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(tumblep)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

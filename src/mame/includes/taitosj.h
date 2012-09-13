@@ -85,18 +85,21 @@ public:
 	DECLARE_DRIVER_INIT(taitosj);
 	DECLARE_DRIVER_INIT(junglhbr);
 	DECLARE_DRIVER_INIT(spacecr);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in machine/taitosj.c -----------*/
 
-MACHINE_START( taitosj );
-MACHINE_RESET( taitosj );
+
+
 
 
 
 /*----------- defined in video/taitosj.c -----------*/
 
-VIDEO_START( taitosj );
+
 SCREEN_UPDATE_IND16( taitosj );
 SCREEN_UPDATE_IND16( kikstart );

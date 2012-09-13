@@ -48,9 +48,12 @@ public:
 	DECLARE_READ16_MEMBER(unk_r);
 	DECLARE_READ16_MEMBER(ex_board_r);
 	DECLARE_READ16_MEMBER(pit_r);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
-static VIDEO_START( fp6000 )
+void fp6000_state::video_start()
 {
 }
 
@@ -273,15 +276,14 @@ static GFXDECODE_START( fp6000 )
 GFXDECODE_END
 
 
-static MACHINE_START(fp6000)
+void fp6000_state::machine_start()
 {
-	fp6000_state *state = machine.driver_data<fp6000_state>();
 
-	state->m_char_rom = state->memregion("pcg")->base();
-	state->m_mc6845 = machine.device<mc6845_device>("crtc");
+	m_char_rom = memregion("pcg")->base();
+	m_mc6845 = machine().device<mc6845_device>("crtc");
 }
 
-static MACHINE_RESET(fp6000)
+void fp6000_state::machine_reset()
 {
 }
 
@@ -305,8 +307,6 @@ static MACHINE_CONFIG_START( fp6000, fp6000_state )
 	MCFG_CPU_PROGRAM_MAP(fp6000_map)
 	MCFG_CPU_IO_MAP(fp6000_io)
 
-	MCFG_MACHINE_START(fp6000)
-	MCFG_MACHINE_RESET(fp6000)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -322,7 +322,6 @@ static MACHINE_CONFIG_START( fp6000, fp6000_state )
 //  MCFG_PALETTE_INIT(black_and_white)
 	MCFG_GFXDECODE(fp6000)
 
-	MCFG_VIDEO_START(fp6000)
 MACHINE_CONFIG_END
 
 /* ROM definition */

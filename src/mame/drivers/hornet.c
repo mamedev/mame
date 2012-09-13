@@ -366,6 +366,9 @@ public:
 	DECLARE_WRITE32_MEMBER(dsp_dataram1_w);
 	DECLARE_DRIVER_INIT(hornet);
 	DECLARE_DRIVER_INIT(hornet_2board);
+	virtual void machine_start();
+	virtual void machine_reset();
+	DECLARE_MACHINE_RESET(hornet_2board);
 };
 
 
@@ -879,40 +882,39 @@ static const sharc_config sharc_cfg =
 */
 static TIMER_CALLBACK( irq_off );
 
-static MACHINE_START( hornet )
+void hornet_state::machine_start()
 {
-	hornet_state *state = machine.driver_data<hornet_state>();
-	state->m_jvs_sdata_ptr = 0;
-	state->m_jvs_sdata = auto_alloc_array_clear(machine, UINT8, 1024);
+	m_jvs_sdata_ptr = 0;
+	m_jvs_sdata = auto_alloc_array_clear(machine(), UINT8, 1024);
 
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine.device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(machine().device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x003fffff, FALSE, state->m_workram);
+	ppcdrc_add_fastram(machine().device("maincpu"), 0x00000000, 0x003fffff, FALSE, m_workram);
 
-	state_save_register_global(machine, state->m_led_reg0);
-	state_save_register_global(machine, state->m_led_reg1);
-	state_save_register_global_pointer(machine, state->m_jvs_sdata, 1024);
-	state_save_register_global(machine, state->m_jvs_sdata_ptr);
+	state_save_register_global(machine(), m_led_reg0);
+	state_save_register_global(machine(), m_led_reg1);
+	state_save_register_global_pointer(machine(), m_jvs_sdata, 1024);
+	state_save_register_global(machine(), m_jvs_sdata_ptr);
 
-	state->m_sound_irq_timer = machine.scheduler().timer_alloc(FUNC(irq_off));
+	m_sound_irq_timer = machine().scheduler().timer_alloc(FUNC(irq_off));
 }
 
-static MACHINE_RESET( hornet )
+void hornet_state::machine_reset()
 {
-	UINT8 *usr3 = machine.root_device().memregion("user3")->base();
-	UINT8 *usr5 = machine.root_device().memregion("user5")->base();
+	UINT8 *usr3 = machine().root_device().memregion("user3")->base();
+	UINT8 *usr5 = machine().root_device().memregion("user5")->base();
 	if (usr3 != NULL)
 	{
-		machine.root_device().membank("bank1")->configure_entries(0, machine.root_device().memregion("user3")->bytes() / 0x10000, usr3, 0x10000);
-		machine.root_device().membank("bank1")->set_entry(0);
+		machine().root_device().membank("bank1")->configure_entries(0, machine().root_device().memregion("user3")->bytes() / 0x10000, usr3, 0x10000);
+		machine().root_device().membank("bank1")->set_entry(0);
 	}
 
-	machine.device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
-		machine.root_device().membank("bank5")->set_base(usr5);
+		machine().root_device().membank("bank5")->set_base(usr5);
 }
 
 static double adc12138_input_callback( device_t *device, UINT8 input )
@@ -1002,8 +1004,6 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START( hornet )
-	MCFG_MACHINE_RESET( hornet )
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -1036,23 +1036,23 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_RESET( hornet_2board )
+MACHINE_RESET_MEMBER(hornet_state,hornet_2board)
 {
-	UINT8 *usr3 = machine.root_device().memregion("user3")->base();
-	UINT8 *usr5 = machine.root_device().memregion("user5")->base();
+	UINT8 *usr3 = machine().root_device().memregion("user3")->base();
+	UINT8 *usr5 = machine().root_device().memregion("user5")->base();
 
 	if (usr3 != NULL)
 	{
-		machine.root_device().membank("bank1")->configure_entries(0, machine.root_device().memregion("user3")->bytes() / 0x10000, usr3, 0x10000);
-		machine.root_device().membank("bank1")->set_entry(0);
+		machine().root_device().membank("bank1")->configure_entries(0, machine().root_device().memregion("user3")->bytes() / 0x10000, usr3, 0x10000);
+		machine().root_device().membank("bank1")->set_entry(0);
 	}
-	machine.device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine.device("dsp2")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("dsp2")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
 	{
-		machine.root_device().membank("bank5")->set_base(usr5);
-		machine.root_device().membank("bank6")->set_base(usr5);
+		machine().root_device().membank("bank5")->set_base(usr5);
+		machine().root_device().membank("bank6")->set_base(usr5);
 	}
 }
 
@@ -1084,7 +1084,7 @@ static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
 	MCFG_CPU_CONFIG(sharc_cfg)
 	MCFG_CPU_DATA_MAP(sharc1_map)
 
-	MCFG_MACHINE_RESET(hornet_2board)
+	MCFG_MACHINE_RESET_OVERRIDE(hornet_state,hornet_2board)
 
 
 	MCFG_DEVICE_REMOVE("k037122_1")

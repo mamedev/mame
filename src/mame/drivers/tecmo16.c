@@ -396,7 +396,6 @@ static MACHINE_CONFIG_START( fstarfrc, tecmo16_state )
 	MCFG_GFXDECODE(tecmo16)
 	MCFG_PALETTE_LENGTH(4096)
 
-	MCFG_VIDEO_START(fstarfrc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -416,13 +415,13 @@ static MACHINE_CONFIG_DERIVED( ginkun, fstarfrc )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ginkun_map)
 
-	MCFG_VIDEO_START(ginkun)
+	MCFG_VIDEO_START_OVERRIDE(tecmo16_state,ginkun)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( riot, ginkun )
 
 	/* basic machine hardware */
-	MCFG_VIDEO_START(riot)
+	MCFG_VIDEO_START_OVERRIDE(tecmo16_state,riot)
 MACHINE_CONFIG_END
 
 /******************************************************************************/

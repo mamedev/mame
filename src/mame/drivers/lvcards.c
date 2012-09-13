@@ -80,20 +80,18 @@ TODO:
 #include "includes/lvcards.h"
 
 
-static MACHINE_START( lvpoker )
+MACHINE_START_MEMBER(lvcards_state,lvpoker)
 {
-	lvcards_state *state = machine.driver_data<lvcards_state>();
-	state_save_register_global(machine, state->m_payout);
-	state_save_register_global(machine, state->m_pulse);
-	state_save_register_global(machine, state->m_result);
+	state_save_register_global(machine(), m_payout);
+	state_save_register_global(machine(), m_pulse);
+	state_save_register_global(machine(), m_result);
 }
 
-static MACHINE_RESET( lvpoker )
+MACHINE_RESET_MEMBER(lvcards_state,lvpoker)
 {
-	lvcards_state *state = machine.driver_data<lvcards_state>();
-	state->m_payout = 0;
-	state->m_pulse = 0;
-	state->m_result = 0;
+	m_payout = 0;
+	m_pulse = 0;
+	m_result = 0;
 }
 
 WRITE8_MEMBER(lvcards_state::control_port_2_w)
@@ -481,8 +479,6 @@ static MACHINE_CONFIG_START( lvcards, lvcards_state )
 	MCFG_GFXDECODE(lvcards)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(lvcards)
-	MCFG_VIDEO_START(lvcards)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -498,8 +494,8 @@ static MACHINE_CONFIG_DERIVED( lvpoker, lvcards )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(lvpoker_map)
-	MCFG_MACHINE_START(lvpoker)
-	MCFG_MACHINE_RESET(lvpoker)
+	MCFG_MACHINE_START_OVERRIDE(lvcards_state,lvpoker)
+	MCFG_MACHINE_RESET_OVERRIDE(lvcards_state,lvpoker)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ponttehk, lvcards )
@@ -508,10 +504,10 @@ static MACHINE_CONFIG_DERIVED( ponttehk, lvcards )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ponttehk_map)
-	MCFG_MACHINE_RESET(lvpoker)
+	MCFG_MACHINE_RESET_OVERRIDE(lvcards_state,lvpoker)
 
 	// video hardware
-	MCFG_PALETTE_INIT(ponttehk)
+	MCFG_PALETTE_INIT_OVERRIDE(lvcards_state,ponttehk)
 MACHINE_CONFIG_END
 
 ROM_START( lvpoker )

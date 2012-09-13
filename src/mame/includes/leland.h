@@ -134,6 +134,12 @@ public:
 	DECLARE_DRIVER_INIT(indyheat);
 	DECLARE_DRIVER_INIT(brutforc);
 	DECLARE_DRIVER_INIT(asylum);
+	DECLARE_MACHINE_START(ataxx);
+	DECLARE_MACHINE_RESET(ataxx);
+	DECLARE_MACHINE_START(leland);
+	DECLARE_MACHINE_RESET(leland);
+	DECLARE_VIDEO_START(leland);
+	DECLARE_VIDEO_START(ataxx);
 };
 
 
@@ -152,10 +158,10 @@ public:
 
 
 
-MACHINE_START( leland );
-MACHINE_RESET( leland );
-MACHINE_START( ataxx );
-MACHINE_RESET( ataxx );
+
+
+
+
 
 INTERRUPT_GEN( leland_master_interrupt );
 

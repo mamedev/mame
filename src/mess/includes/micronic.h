@@ -60,6 +60,7 @@ public:
 	UINT8 m_lcd_contrast;
 	bool m_lcd_backlight;
 	UINT8 m_status_flag;
+	virtual void palette_init();
 };
 
 #endif

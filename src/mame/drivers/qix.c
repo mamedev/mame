@@ -560,7 +560,6 @@ static MACHINE_CONFIG_START( qix_base, qix_state )
 	/* Zookeeper settings and high score table seem especially sensitive to this */
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_MACHINE_RESET(qix)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_PIA6821_ADD("pia0", qix_pia_0_intf)
@@ -584,7 +583,7 @@ static MACHINE_CONFIG_DERIVED( mcu, qix )
 	MCFG_CPU_ADD("mcu", M68705, COIN_CLOCK_OSC)	/* 1.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
-	MCFG_MACHINE_START(qixmcu)
+	MCFG_MACHINE_START_OVERRIDE(qix_state,qixmcu)
 
 	MCFG_PIA6821_MODIFY("pia0", qixmcu_pia_0_intf)
 	MCFG_PIA6821_MODIFY("pia2", qixmcu_pia_2_intf)

@@ -37,10 +37,12 @@ public:
 	DECLARE_DRIVER_INIT(hidctch3);
 	DECLARE_DRIVER_INIT(hidctch2);
 	DECLARE_DRIVER_INIT(landbrka);
+	DECLARE_MACHINE_RESET(eolith);
+	DECLARE_VIDEO_START(eolith);
 };
 
 
 /*----------- defined in video/eolith.c -----------*/
 
-VIDEO_START( eolith );
+
 SCREEN_UPDATE_IND16( eolith );

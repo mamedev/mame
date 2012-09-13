@@ -34,11 +34,13 @@ public:
 	DECLARE_WRITE32_MEMBER(avengrs_eprom_w);
 	DECLARE_DRIVER_INIT(mlc);
 	DECLARE_DRIVER_INIT(avengrgs);
+	DECLARE_MACHINE_RESET(mlc);
+	DECLARE_VIDEO_START(mlc);
 };
 
 
 /*----------- defined in video/deco_mlc.c -----------*/
 
-VIDEO_START( mlc );
+
 SCREEN_UPDATE_RGB32( mlc );
 SCREEN_VBLANK( mlc );

@@ -351,7 +351,6 @@ static MACHINE_CONFIG_START( taotaido, taotaido_state )
 
 	MCFG_PALETTE_LENGTH(0x800)
 
-	MCFG_VIDEO_START(taotaido)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

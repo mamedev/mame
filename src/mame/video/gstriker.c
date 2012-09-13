@@ -556,77 +556,74 @@ SCREEN_UPDATE_IND16(gstriker)
 	return 0;
 }
 
-VIDEO_START(gstriker)
+VIDEO_START_MEMBER(gstriker_state,gstriker)
 {
-	gstriker_state *state = machine.driver_data<gstriker_state>();
 
 	// Palette bases are hardcoded, but should be probably extracted from the mixer registers
 
 	// Initalize the chip for the score plane
-	VS920A_init(machine, 1);
-	VS920A_set_gfx_region(state, 0, 0);
-	VS920A_set_pal_base(state, 0, 0x30);
-	VS920A_get_tilemap(state, 0)->set_transparent_pen(0xf);
+	VS920A_init(machine(), 1);
+	VS920A_set_gfx_region(this, 0, 0);
+	VS920A_set_pal_base(this, 0, 0x30);
+	VS920A_get_tilemap(this, 0)->set_transparent_pen(0xf);
 
 	// Initalize the chip for the screen plane
-	MB60553_init(machine, 1);
-	MB60553_set_gfx_region(state, 0, 1);
-	MB60553_set_pal_base(state, 0, 0);
-	MB60553_get_tilemap(state, 0)->set_transparent_pen(0xf);
+	MB60553_init(machine(), 1);
+	MB60553_set_gfx_region(this, 0, 1);
+	MB60553_set_pal_base(this, 0, 0);
+	MB60553_get_tilemap(this, 0)->set_transparent_pen(0xf);
 
 	// Initialize the sprite generator
 	CG10103_init(1);
-	CG10103_set_gfx_region(state, 0, 2);
-	CG10103_set_pal_base(state, 0, 0x10);
-	CG10103_set_transpen(state, 0, 0x0);
+	CG10103_set_gfx_region(this, 0, 2);
+	CG10103_set_pal_base(this, 0, 0x10);
+	CG10103_set_transpen(this, 0, 0x0);
 }
 
-VIDEO_START(twrldc94)
+VIDEO_START_MEMBER(gstriker_state,twrldc94)
 {
-	gstriker_state *state = machine.driver_data<gstriker_state>();
 
 	// Palette bases are hardcoded, but should be probably extracted from the mixer registers
 
 	// Initalize the chip for the score plane
-	VS920A_init(machine, 1);
-	VS920A_set_gfx_region(state, 0, 0);
-	VS920A_set_pal_base(state, 0, 0x40);
-	VS920A_get_tilemap(state, 0)->set_transparent_pen(0xf);
+	VS920A_init(machine(), 1);
+	VS920A_set_gfx_region(this, 0, 0);
+	VS920A_set_pal_base(this, 0, 0x40);
+	VS920A_get_tilemap(this, 0)->set_transparent_pen(0xf);
 
 	// Initalize the chip for the screen plane
-	MB60553_init(machine, 1);
-	MB60553_set_gfx_region(state, 0, 1);
-	MB60553_set_pal_base(state, 0, 0x50);
-	MB60553_get_tilemap(state, 0)->set_transparent_pen(0xf);
+	MB60553_init(machine(), 1);
+	MB60553_set_gfx_region(this, 0, 1);
+	MB60553_set_pal_base(this, 0, 0x50);
+	MB60553_get_tilemap(this, 0)->set_transparent_pen(0xf);
 
 	// Initialize the sprite generator
 	CG10103_init(1);
-	CG10103_set_gfx_region(state, 0, 2);
-	CG10103_set_pal_base(state, 0, 0x60);
-	CG10103_set_transpen(state, 0, 0x0);
+	CG10103_set_gfx_region(this, 0, 2);
+	CG10103_set_pal_base(this, 0, 0x60);
+	CG10103_set_transpen(this, 0, 0x0);
 }
 
-VIDEO_START(vgoalsoc)
+VIDEO_START_MEMBER(gstriker_state,vgoalsoc)
 {
-	gstriker_state *state = machine.driver_data<gstriker_state>();
 
 	// Palette bases are hardcoded, but should be probably extracted from the mixer registers
 
 	// Initalize the chip for the score plane
-	VS920A_init(machine, 1);
-	VS920A_set_gfx_region(state, 0, 0);
-	VS920A_set_pal_base(state, 0, 0x30);
-	VS920A_get_tilemap(state, 0)->set_transparent_pen(0xf);
+	VS920A_init(machine(), 1);
+	VS920A_set_gfx_region(this, 0, 0);
+	VS920A_set_pal_base(this, 0, 0x30);
+	VS920A_get_tilemap(this, 0)->set_transparent_pen(0xf);
 
 	// Initalize the chip for the screen plane
-	MB60553_init(machine, 1);
-	MB60553_set_gfx_region(state, 0, 1);
-	MB60553_set_pal_base(state, 0, 0x20);
-	MB60553_get_tilemap(state, 0)->set_transparent_pen(0xf);
+	MB60553_init(machine(), 1);
+	MB60553_set_gfx_region(this, 0, 1);
+	MB60553_set_pal_base(this, 0, 0x20);
+	MB60553_get_tilemap(this, 0)->set_transparent_pen(0xf);
 
 	// Initialize the sprite generator
 	CG10103_init(1);
-	CG10103_set_gfx_region(state, 0, 2);
-	CG10103_set_pal_base(state, 0, 0x00);
-	CG10103_set_transpen(state, 0, 0xf);
+	CG10103_set_gfx_region(this, 0, 2);
+	CG10103_set_pal_base(this, 0, 0x00);
+	CG10103_set_transpen(this, 0, 0xf);
 }

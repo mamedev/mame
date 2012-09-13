@@ -57,18 +57,27 @@ public:
 	TILE_GET_INFO_MEMBER(lasso_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wwjgtin_get_track_tile_info);
 	TILE_GET_INFO_MEMBER(pinbo_get_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_MACHINE_START(wwjgtin);
+	DECLARE_MACHINE_RESET(wwjgtin);
+	DECLARE_VIDEO_START(wwjgtin);
+	DECLARE_PALETTE_INIT(wwjgtin);
+	DECLARE_VIDEO_START(pinbo);
 };
 
 
 /*----------- defined in video/lasso.c -----------*/
 
 
-PALETTE_INIT( lasso );
-PALETTE_INIT( wwjgtin );
 
-VIDEO_START( lasso );
-VIDEO_START( wwjgtin );
-VIDEO_START( pinbo );
+
+
+
+
+
 
 SCREEN_UPDATE_IND16( lasso );
 SCREEN_UPDATE_IND16( chameleo );

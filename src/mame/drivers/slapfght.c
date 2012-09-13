@@ -757,7 +757,7 @@ static MACHINE_CONFIG_START( perfrman, slapfght_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))		/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_MACHINE_RESET(slapfight)
+	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state,slapfight)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -774,7 +774,7 @@ static MACHINE_CONFIG_START( perfrman, slapfght_state )
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MCFG_VIDEO_START(perfrman)
+	MCFG_VIDEO_START_OVERRIDE(slapfght_state,perfrman)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -803,7 +803,7 @@ static MACHINE_CONFIG_START( tigerhb, slapfght_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_MACHINE_RESET(slapfight)
+	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state,slapfight)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -820,7 +820,7 @@ static MACHINE_CONFIG_START( tigerhb, slapfght_state )
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MCFG_VIDEO_START(slapfight)
+	MCFG_VIDEO_START_OVERRIDE(slapfght_state,slapfight)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -851,7 +851,7 @@ static MACHINE_CONFIG_START( tigerh, slapfght_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_MACHINE_RESET(slapfight)
+	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state,slapfight)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -868,7 +868,7 @@ static MACHINE_CONFIG_START( tigerh, slapfght_state )
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MCFG_VIDEO_START(slapfight)
+	MCFG_VIDEO_START_OVERRIDE(slapfght_state,slapfight)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -900,7 +900,7 @@ static MACHINE_CONFIG_START( slapfigh, slapfght_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_MACHINE_RESET(slapfight)
+	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state,slapfight)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -917,7 +917,7 @@ static MACHINE_CONFIG_START( slapfigh, slapfght_state )
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MCFG_VIDEO_START(slapfight)
+	MCFG_VIDEO_START_OVERRIDE(slapfght_state,slapfight)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

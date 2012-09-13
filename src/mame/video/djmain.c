@@ -134,9 +134,9 @@ void djmain_tile_callback(running_machine& machine, int layer, int *code, int *c
 {
 }
 
-VIDEO_START( djmain )
+void djmain_state::video_start()
 {
-	device_t *k056832 = machine.device("k056832");
+	device_t *k056832 = machine().device("k056832");
 
 	k056832_set_layer_offs(k056832, 0, -92, -27);
 	// k056832_set_layer_offs(k056832, 1, -87, -27);

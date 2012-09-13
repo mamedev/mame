@@ -26,10 +26,11 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tigeroad_tilemap_scan);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/tigeroad.c -----------*/
 
-VIDEO_START( tigeroad );
+
 SCREEN_UPDATE_IND16( tigeroad );

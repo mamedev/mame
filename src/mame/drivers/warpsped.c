@@ -104,6 +104,8 @@ public:
 	DECLARE_DRIVER_INIT(warpspeed);
 	TILE_GET_INFO_MEMBER(get_warpspeed_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_warpspeed_starfield_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 WRITE8_MEMBER(warpspeed_state::warpspeed_hardware_w)
@@ -135,13 +137,12 @@ WRITE8_MEMBER(warpspeed_state::warpspeed_vidram_w)
 	m_text_tilemap->mark_tile_dirty(offset);
 }
 
-static VIDEO_START( warpspeed )
+void warpspeed_state::video_start()
 {
-	warpspeed_state *state = machine.driver_data<warpspeed_state>();
-	state->m_text_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(warpspeed_state::get_warpspeed_text_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_text_tilemap->set_transparent_pen(0);
-	state->m_starfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(warpspeed_state::get_warpspeed_starfield_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_starfield_tilemap->mark_all_dirty();
+	m_text_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(warpspeed_state::get_warpspeed_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_text_tilemap->set_transparent_pen(0);
+	m_starfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(warpspeed_state::get_warpspeed_starfield_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_starfield_tilemap->mark_all_dirty();
 }
 
 static void draw_circle_line(bitmap_ind16 &bitmap, int x, int y, int l, int color)
@@ -289,16 +290,16 @@ static GFXDECODE_START( warpspeed )
 	GFXDECODE_ENTRY( "gfx2", 0, warpspeed_charlayout,   0, 1  )
 GFXDECODE_END
 
-static PALETTE_INIT( warpspeed )
+void warpspeed_state::palette_init()
 {
 	// tilemaps
-	palette_set_color(machine,0,RGB_BLACK); /* black */
-	palette_set_color(machine,1,RGB_WHITE); /* white */
+	palette_set_color(machine(),0,RGB_BLACK); /* black */
+	palette_set_color(machine(),1,RGB_WHITE); /* white */
 
 	// circles
 	for ( int i = 0; i < 8; i++ )
 	{
-		palette_set_color_rgb(machine, 2 + i, 0xff*BIT(i,0), 0xff*BIT(i,1), 0xff*BIT(i,2));
+		palette_set_color_rgb(machine(), 2 + i, 0xff*BIT(i,0), 0xff*BIT(i,1), 0xff*BIT(i,2));
 	}
 }
 
@@ -317,12 +318,10 @@ static MACHINE_CONFIG_START( warpspeed, warpspeed_state )
 	MCFG_SCREEN_SIZE((32)*8, (32)*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 32*8-1, 8*8, 32*8-1)
 
-	MCFG_VIDEO_START(warpspeed)
 	MCFG_SCREEN_UPDATE_STATIC(warpspeed)
 
 	MCFG_GFXDECODE(warpspeed)
 	MCFG_PALETTE_LENGTH(2+8)
-	MCFG_PALETTE_INIT(warpspeed)
 
 MACHINE_CONFIG_END
 

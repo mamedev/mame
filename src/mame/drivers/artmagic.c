@@ -65,25 +65,23 @@ static void m68k_gen_int(device_t *device, int state)
  *
  *************************************/
 
-static MACHINE_START( artmagic )
+void artmagic_state::machine_start()
 {
-	artmagic_state *state = machine.driver_data<artmagic_state>();
-	state_save_register_global(machine, state->m_tms_irq);
-	state_save_register_global(machine, state->m_hack_irq);
-	state_save_register_global(machine, state->m_prot_input_index);
-	state_save_register_global(machine, state->m_prot_output_index);
-	state_save_register_global(machine, state->m_prot_output_bit);
-	state_save_register_global(machine, state->m_prot_bit_index);
-	state_save_register_global(machine, state->m_prot_save);
-	state_save_register_global_array(machine, state->m_prot_input);
-	state_save_register_global_array(machine, state->m_prot_output);
+	state_save_register_global(machine(), m_tms_irq);
+	state_save_register_global(machine(), m_hack_irq);
+	state_save_register_global(machine(), m_prot_input_index);
+	state_save_register_global(machine(), m_prot_output_index);
+	state_save_register_global(machine(), m_prot_output_bit);
+	state_save_register_global(machine(), m_prot_bit_index);
+	state_save_register_global(machine(), m_prot_save);
+	state_save_register_global_array(machine(), m_prot_input);
+	state_save_register_global_array(machine(), m_prot_output);
 }
 
-static MACHINE_RESET( artmagic )
+void artmagic_state::machine_reset()
 {
-	artmagic_state *state = machine.driver_data<artmagic_state>();
-	state->m_tms_irq = state->m_hack_irq = 0;
-	update_irq_state(machine);
+	m_tms_irq = m_hack_irq = 0;
+	update_irq_state(machine());
 }
 
 
@@ -843,15 +841,12 @@ static MACHINE_CONFIG_START( artmagic, artmagic_state )
 	MCFG_CPU_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(tms_map)
 
-	MCFG_MACHINE_START(artmagic)
-	MCFG_MACHINE_RESET(artmagic)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", tlc34076_6_bit_intf)
 
-	MCFG_VIDEO_START(artmagic)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_40MHz/6, 428, 0, 320, 313, 0, 256)

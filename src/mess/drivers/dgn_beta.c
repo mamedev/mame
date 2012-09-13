@@ -277,12 +277,12 @@ static INPUT_PORTS_START( dgnbeta )
 INPUT_PORTS_END
 
 
-static PALETTE_INIT( dgnbeta )
+void dgn_beta_state::palette_init()
 {
 	int i;
 
 	for ( i = 0; i < sizeof(dgnbeta_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, dgnbeta_palette[i*3], dgnbeta_palette[i*3+1], dgnbeta_palette[i*3+2]);
+		palette_set_color_rgb(machine(), i, dgnbeta_palette[i*3], dgnbeta_palette[i*3+1], dgnbeta_palette[i*3+2]);
 	}
 }
 
@@ -327,7 +327,6 @@ static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 	MCFG_CPU_ADD(DMACPU_TAG, M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(dgnbeta_map)
 
-	MCFG_MACHINE_START( dgnbeta )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -339,7 +338,6 @@ static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 
 	MCFG_GFXDECODE(dgnbeta)
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(dgnbeta_palette) / 3)
-	MCFG_PALETTE_INIT( dgnbeta )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
 	MCFG_PIA6821_ADD( PIA_0_TAG, dgnbeta_pia_intf[0] )

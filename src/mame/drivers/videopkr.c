@@ -357,6 +357,12 @@ public:
 	DECLARE_READ8_MEMBER(baby_sound_p3_r);
 	DECLARE_WRITE8_MEMBER(baby_sound_p3_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_start();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_VIDEO_START(vidadcba);
+	DECLARE_PALETTE_INIT(babypkr);
+	DECLARE_PALETTE_INIT(fortune1);
 };
 
 
@@ -402,12 +408,12 @@ static void count_7dig(unsigned long data, UINT8 index)
 	}
 }
 
-static PALETTE_INIT( videopkr )
+void videopkr_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int j;
 
-	for (j = 0; j < machine.total_colors(); j++)
+	for (j = 0; j < machine().total_colors(); j++)
 	{
 		int r, g, b, tr, tg, tb, i;
 
@@ -425,16 +431,16 @@ static PALETTE_INIT( videopkr )
 		tb = 0xf0 - (0xf0 * ((color_prom[j] >> 2) & 0x01));
 		b = tb - (i * (tb / 5));
 
-		palette_set_color(machine, j, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), j, MAKE_RGB(r, g, b));
 	}
 }
 
-static PALETTE_INIT( babypkr )
+PALETTE_INIT_MEMBER(videopkr_state,babypkr)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int j;
 
-	for (j = 0; j < machine.total_colors(); j++)
+	for (j = 0; j < machine().total_colors(); j++)
 	{
 		int r, g, b, tr, tg, tb, i, top;
 
@@ -456,16 +462,16 @@ static PALETTE_INIT( babypkr )
 		tb =  0xdf * ((color_prom[j] >> 2) & 0x01);
 		b = top - ((tb * top) / 0x100);
 
-		palette_set_color(machine, j, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), j, MAKE_RGB(r, g, b));
 	}
 }
 
-static PALETTE_INIT( fortune1 )
+PALETTE_INIT_MEMBER(videopkr_state,fortune1)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int j;
 
-	for (j = 0; j < machine.total_colors(); j++)
+	for (j = 0; j < machine().total_colors(); j++)
 	{
 		int r, g, b, tr, tg, tb, i, c;
 
@@ -489,7 +495,7 @@ static PALETTE_INIT( fortune1 )
 		if ((c % 4) == 1 || (c % 4) == 2)
 			c = ((int)(c / 4) * 4) + (3 - (c % 4));
 
-		palette_set_color(machine, c, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), c, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -503,16 +509,14 @@ TILE_GET_INFO_MEMBER(videopkr_state::get_bg_tile_info)
 }
 
 
-static VIDEO_START( videopkr )
+void videopkr_state::video_start()
 {
-	videopkr_state *state = machine.driver_data<videopkr_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(videopkr_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(videopkr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-static VIDEO_START( vidadcba )
+VIDEO_START_MEMBER(videopkr_state,vidadcba)
 {
-	videopkr_state *state = machine.driver_data<videopkr_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(videopkr_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(videopkr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 }
 
 
@@ -1199,17 +1203,16 @@ GFXDECODE_END
 *    Machine Start / Reset     *
 *******************************/
 
-static MACHINE_START(videopkr)
+void videopkr_state::machine_start()
 {
-	videopkr_state *state = machine.driver_data<videopkr_state>();
-	state->m_vp_sound_p2 = 0xff;	/* default P2 latch value */
-	state->m_sound_latch = 0xff;	/* default sound data latch value */
-	state->m_p24_data = 0xff;
-	state->m_p1 = 0xff;
-	state->m_ant_cio = 0;
-	state->m_count0 = 0;
+	m_vp_sound_p2 = 0xff;	/* default P2 latch value */
+	m_sound_latch = 0xff;	/* default sound data latch value */
+	m_p24_data = 0xff;
+	m_p1 = 0xff;
+	m_ant_cio = 0;
+	m_count0 = 0;
 
-	machine.device<nvram_device>("nvram")->set_base(state->m_data_ram, sizeof(state->m_data_ram));
+	machine().device<nvram_device>("nvram")->set_base(m_data_ram, sizeof(m_data_ram));
 }
 
 static const ay8910_interface ay8910_config =
@@ -1239,7 +1242,6 @@ static MACHINE_CONFIG_START( videopkr, videopkr_state )
 	MCFG_CPU_ADD("soundcpu", I8039, SOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(i8039_sound_mem)
 	MCFG_CPU_IO_MAP(i8039_sound_port)
-	MCFG_MACHINE_START(videopkr)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_TIMER_ADD_PERIODIC("t1_timer", sound_t1_callback, attotime::from_hz(50))
@@ -1255,9 +1257,7 @@ static MACHINE_CONFIG_START( videopkr, videopkr_state )
 	MCFG_SCREEN_UPDATE_STATIC(videopkr)
 
 	MCFG_GFXDECODE(videopkr)
-	MCFG_PALETTE_INIT(videopkr)
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_VIDEO_START(videopkr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1289,7 +1289,7 @@ static MACHINE_CONFIG_DERIVED( videodad, videopkr )
 	MCFG_SCREEN_VISIBLE_AREA(4*16, 31*16-1, 2*8, 30*8-1)
 
 	MCFG_GFXDECODE(videodad)
-	MCFG_VIDEO_START(vidadcba)
+	MCFG_VIDEO_START_OVERRIDE(videopkr_state,vidadcba)
 MACHINE_CONFIG_END
 
 
@@ -1308,9 +1308,9 @@ static MACHINE_CONFIG_DERIVED( babypkr, videopkr )
 	MCFG_SCREEN_SIZE(32*16, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(5*16, 31*16-1, 3*8, 29*8-1)
 
-	MCFG_PALETTE_INIT(babypkr)
+	MCFG_PALETTE_INIT_OVERRIDE(videopkr_state,babypkr)
 	MCFG_GFXDECODE(videodad)
-	MCFG_VIDEO_START(vidadcba)
+	MCFG_VIDEO_START_OVERRIDE(videopkr_state,vidadcba)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, CPU_CLOCK / 6)
 	MCFG_SOUND_CONFIG(ay8910_config)
@@ -1323,7 +1323,7 @@ static MACHINE_CONFIG_DERIVED( fortune1, videopkr )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(CPU_CLOCK_ALT)
 
-	MCFG_PALETTE_INIT(fortune1)
+	MCFG_PALETTE_INIT_OVERRIDE(videopkr_state,fortune1)
 MACHINE_CONFIG_END
 
 /*************************

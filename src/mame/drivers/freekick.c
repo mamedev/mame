@@ -583,53 +583,49 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( freekick )
+MACHINE_START_MEMBER(freekick_state,freekick)
 {
-	freekick_state *state = machine.driver_data<freekick_state>();
 
-	state->save_item(NAME(state->m_romaddr));
-	state->save_item(NAME(state->m_spinner));
-	state->save_item(NAME(state->m_nmi_en));
-	state->save_item(NAME(state->m_ff_data));
+	save_item(NAME(m_romaddr));
+	save_item(NAME(m_spinner));
+	save_item(NAME(m_nmi_en));
+	save_item(NAME(m_ff_data));
 }
 
-static MACHINE_RESET( freekick )
+MACHINE_RESET_MEMBER(freekick_state,freekick)
 {
-	freekick_state *state = machine.driver_data<freekick_state>();
 
-	state->m_romaddr = 0;
-	state->m_spinner = 0;
-	state->m_nmi_en = 0;
-	state->m_ff_data = 0;
+	m_romaddr = 0;
+	m_spinner = 0;
+	m_nmi_en = 0;
+	m_ff_data = 0;
 }
 
-static MACHINE_START( pbillrd )
+MACHINE_START_MEMBER(freekick_state,pbillrd)
 {
-	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	machine().root_device().membank("bank1")->configure_entries(0, 2, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 
-	MACHINE_START_CALL(freekick);
+	MACHINE_START_CALL_MEMBER(freekick);
 }
 
-static MACHINE_START( oigas )
+MACHINE_START_MEMBER(freekick_state,oigas)
 {
-	freekick_state *state = machine.driver_data<freekick_state>();
 
-	state->save_item(NAME(state->m_inval));
-	state->save_item(NAME(state->m_outval));
-	state->save_item(NAME(state->m_cnt));
+	save_item(NAME(m_inval));
+	save_item(NAME(m_outval));
+	save_item(NAME(m_cnt));
 
-	MACHINE_START_CALL(freekick);
+	MACHINE_START_CALL_MEMBER(freekick);
 }
 
-static MACHINE_RESET( oigas )
+MACHINE_RESET_MEMBER(freekick_state,oigas)
 {
-	freekick_state *state = machine.driver_data<freekick_state>();
 
-	MACHINE_RESET_CALL(freekick);
+	MACHINE_RESET_CALL_MEMBER(freekick);
 
-	state->m_inval = 0;
-	state->m_outval = 0;
-	state->m_cnt = 0;
+	m_inval = 0;
+	m_outval = 0;
+	m_cnt = 0;
 }
 
 static MACHINE_CONFIG_START( base, freekick_state )
@@ -651,7 +647,6 @@ static MACHINE_CONFIG_START( base, freekick_state )
 	MCFG_PALETTE_LENGTH(0x200)
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 
-	MCFG_VIDEO_START(freekick)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -675,8 +670,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pbillrd, base )
 
-	MCFG_MACHINE_START(pbillrd)
-	MCFG_MACHINE_RESET(freekick)
+	MCFG_MACHINE_START_OVERRIDE(freekick_state,pbillrd)
+	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( freekickb, base )
@@ -685,8 +680,8 @@ static MACHINE_CONFIG_DERIVED( freekickb, base )
 	MCFG_CPU_PROGRAM_MAP(freekickb_map)
 	MCFG_CPU_IO_MAP(freekickb_io_map)
 
-	MCFG_MACHINE_START(freekick)
-	MCFG_MACHINE_RESET(freekick)
+	MCFG_MACHINE_START_OVERRIDE(freekick_state,freekick)
+	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
@@ -701,8 +696,8 @@ static MACHINE_CONFIG_DERIVED( gigas, base )
 	MCFG_CPU_PROGRAM_MAP(gigas_map)
 	MCFG_CPU_IO_MAP(gigas_io_map)
 
-	MCFG_MACHINE_START(freekick)
-	MCFG_MACHINE_RESET(freekick)
+	MCFG_MACHINE_START_OVERRIDE(freekick_state,freekick)
+	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(gigas)
@@ -712,8 +707,8 @@ static MACHINE_CONFIG_DERIVED( oigas, gigas )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(oigas_io_map)
 
-	MCFG_MACHINE_START(oigas)
-	MCFG_MACHINE_RESET(oigas)
+	MCFG_MACHINE_START_OVERRIDE(freekick_state,oigas)
+	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,oigas)
 MACHINE_CONFIG_END
 
 

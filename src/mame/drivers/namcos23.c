@@ -1431,6 +1431,9 @@ public:
 	DECLARE_READ8_MEMBER(iob_r);
 	DECLARE_DRIVER_INIT(ss23);
 	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
+	DECLARE_MACHINE_START(s23);
+	DECLARE_VIDEO_START(ss23);
+	DECLARE_MACHINE_RESET(gmen);
 };
 
 
@@ -2395,25 +2398,24 @@ static void render_run(running_machine &machine, bitmap_rgb32 &bitmap)
 }
 
 
-static VIDEO_START( ss23 )
+VIDEO_START_MEMBER(namcos23_state,ss23)
 {
-	namcos23_state *state = machine.driver_data<namcos23_state>();
-	machine.gfx[0]->set_source(reinterpret_cast<UINT8 *>(state->m_charram.target()));
-	state->m_bgtilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos23_state::TextTilemapGetInfo),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_bgtilemap->set_transparent_pen(0xf);
+	machine().gfx[0]->set_source(reinterpret_cast<UINT8 *>(m_charram.target()));
+	m_bgtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos23_state::TextTilemapGetInfo),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_bgtilemap->set_transparent_pen(0xf);
 
 	// Gorgon's tilemap offset is 0, S23/SS23's is 860
-	if ((!strcmp(machine.system().name, "rapidrvr")) ||
-	    (!strcmp(machine.system().name, "rapidrvr2")) ||
-	    (!strcmp(machine.system().name, "finlflng")))
+	if ((!strcmp(machine().system().name, "rapidrvr")) ||
+	    (!strcmp(machine().system().name, "rapidrvr2")) ||
+	    (!strcmp(machine().system().name, "finlflng")))
 	{
-		state->m_bgtilemap->set_scrolldx(0, 0);
+		m_bgtilemap->set_scrolldx(0, 0);
 	}
 	else
 	{
-		state->m_bgtilemap->set_scrolldx(860, 860);
+		m_bgtilemap->set_scrolldx(860, 860);
 	}
-	state->m_render.polymgr = poly_alloc(machine, 10000, sizeof(namcos23_render_data), 0);
+	m_render.polymgr = poly_alloc(machine(), 10000, sizeof(namcos23_render_data), 0);
 }
 
 static SCREEN_UPDATE_RGB32( ss23 )
@@ -2444,11 +2446,10 @@ static INTERRUPT_GEN(s23_interrupt)
 	render.count[render.cur] = 0;
 }
 
-static MACHINE_START( s23 )
+MACHINE_START_MEMBER(namcos23_state,s23)
 {
-	namcos23_state *state = machine.driver_data<namcos23_state>();
-	c361_t &c361 = state->m_c361;
-	c361.timer = machine.scheduler().timer_alloc(FUNC(c361_timer_cb));
+	c361_t &c361 = m_c361;
+	c361.timer = machine().scheduler().timer_alloc(FUNC(c361_timer_cb));
 	c361.timer->adjust(attotime::never);
 }
 
@@ -2539,10 +2540,10 @@ static ADDRESS_MAP_START( gmen_sh2_map, AS_PROGRAM, 32, namcos23_state )
 	AM_RANGE( 0x04000000, 0x043fffff ) AM_RAM	// SH-2 main work RAM
 ADDRESS_MAP_END
 
-static MACHINE_RESET(gmen)
+MACHINE_RESET_MEMBER(namcos23_state,gmen)
 {
 	// halt the SH-2 until we need it
-	machine.device("gmen")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("gmen")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 WRITE16_MEMBER(namcos23_state::sharedram_sub_w)
@@ -3173,9 +3174,9 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 
 	MCFG_GFXDECODE(namcos23)
 
-	MCFG_VIDEO_START(ss23)
+	MCFG_VIDEO_START_OVERRIDE(namcos23_state,ss23)
 
-	MCFG_MACHINE_START(s23)
+	MCFG_MACHINE_START_OVERRIDE(namcos23_state,s23)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3218,9 +3219,9 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_VIDEO_START(ss23)
+	MCFG_VIDEO_START_OVERRIDE(namcos23_state,ss23)
 
-	MCFG_MACHINE_START(s23)
+	MCFG_MACHINE_START_OVERRIDE(namcos23_state,s23)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3259,9 +3260,9 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_VIDEO_START(ss23)
+	MCFG_VIDEO_START_OVERRIDE(namcos23_state,ss23)
 
-	MCFG_MACHINE_START(s23)
+	MCFG_MACHINE_START_OVERRIDE(namcos23_state,s23)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3311,7 +3312,7 @@ static MACHINE_CONFIG_DERIVED( gmen, s23 )
 	MCFG_CPU_ADD("gmen", SH2, 28700000)
 	MCFG_CPU_PROGRAM_MAP(gmen_sh2_map)
 
-	MCFG_MACHINE_RESET(gmen)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos23_state,gmen)
 MACHINE_CONFIG_END
 
 ROM_START( rapidrvr )

@@ -28,6 +28,7 @@ public:
 	DECLARE_WRITE8_MEMBER( relays_w );
 	UINT16 m_nixie[16];
 	UINT8 m_timer;
+	virtual void machine_start();
 };
 
 READ8_MEMBER(nixieclock_state::data_r)
@@ -130,14 +131,13 @@ static TIMER_DEVICE_CALLBACK(timer_callback)
 	state->m_timer^=1;
 }
 
-static MACHINE_START(4004clk)
+void nixieclock_state::machine_start()
 {
-	nixieclock_state *state = machine.driver_data<nixieclock_state>();
-	state->m_timer = 0;
+	m_timer = 0;
 
 	/* register for state saving */
-	state->save_item(NAME(state->m_timer));
-	state->save_pointer(NAME(state->m_nixie), 6);
+	save_item(NAME(m_timer));
+	save_pointer(NAME(m_nixie), 6);
 }
 
 static MACHINE_CONFIG_START( 4004clk, nixieclock_state )
@@ -148,7 +148,6 @@ static MACHINE_CONFIG_START( 4004clk, nixieclock_state )
 	MCFG_CPU_DATA_MAP(4004clk_mem)
 	MCFG_CPU_IO_MAP(4004clk_io)
 
-	MCFG_MACHINE_START(4004clk)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_4004clk)

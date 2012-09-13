@@ -41,17 +41,16 @@ static WRITE_LINE_DEVICE_HANDLER( display_enable_changed );
  *
  *************************************/
 
-static VIDEO_START( qix )
+VIDEO_START_MEMBER(qix_state,qix)
 {
-	qix_state *state = machine.driver_data<qix_state>();
 
 	/* allocate memory for the full video RAM */
-	state->m_videoram.allocate(256 * 256);
+	m_videoram.allocate(256 * 256);
 
 	/* set up save states */
-	state->save_item(NAME(state->m_flip));
-	state->save_item(NAME(state->m_palette_bank));
-	state->save_item(NAME(state->m_leds));
+	save_item(NAME(m_flip));
+	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_leds));
 }
 
 
@@ -422,7 +421,7 @@ MACHINE_CONFIG_FRAGMENT( qix_video )
 	MCFG_CPU_PROGRAM_MAP(qix_video_map)
 	MCFG_CPU_CONFIG(encryption_config)	// for kram3
 
-	MCFG_VIDEO_START(qix)
+	MCFG_VIDEO_START_OVERRIDE(qix_state,qix)
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, QIX_CHARACTER_CLOCK, mc6845_intf)
 

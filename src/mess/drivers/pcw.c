@@ -1042,47 +1042,45 @@ static TIMER_CALLBACK(setup_beep)
 }
 
 
-static MACHINE_START( pcw )
+void pcw_state::machine_start()
 {
-	pcw_state *state = machine.driver_data<pcw_state>();
-	state->m_fdc_interrupt_code = 2;
+	m_fdc_interrupt_code = 2;
 }
 
-static MACHINE_RESET( pcw )
+void pcw_state::machine_reset()
 {
-	pcw_state *state = machine.driver_data<pcw_state>();
-	UINT8* code = state->memregion("printer_mcu")->base();
+	UINT8* code = memregion("printer_mcu")->base();
 	int x;
 	/* ram paging is actually undefined at power-on */
 
-	state->m_bank_force = 0xf0;  // banks are locked for CPC-style paging - Batman expects this
+	m_bank_force = 0xf0;  // banks are locked for CPC-style paging - Batman expects this
 
-	state->m_banks[0] = 0x80;
-	state->m_banks[1] = 0x81;
-	state->m_banks[2] = 0x82;
-	state->m_banks[3] = 0x83;
+	m_banks[0] = 0x80;
+	m_banks[1] = 0x81;
+	m_banks[2] = 0x82;
+	m_banks[3] = 0x83;
 
-	pcw_update_mem(machine, 0, state->m_banks[0]);
-	pcw_update_mem(machine, 1, state->m_banks[1]);
-	pcw_update_mem(machine, 2, state->m_banks[2]);
-	pcw_update_mem(machine, 3, state->m_banks[3]);
+	pcw_update_mem(machine(), 0, m_banks[0]);
+	pcw_update_mem(machine(), 1, m_banks[1]);
+	pcw_update_mem(machine(), 2, m_banks[2]);
+	pcw_update_mem(machine(), 3, m_banks[3]);
 
-	state->m_boot = 0;   // System starts up in bootstrap mode, disabled until it's possible to emulate it.
+	m_boot = 0;   // System starts up in bootstrap mode, disabled until it's possible to emulate it.
 
 	/* copy boot code into RAM - yes, it's skipping a step */
-	memset(machine.device<ram_device>(RAM_TAG)->pointer(),0x00,machine.device<ram_device>(RAM_TAG)->size());
+	memset(machine().device<ram_device>(RAM_TAG)->pointer(),0x00,machine().device<ram_device>(RAM_TAG)->size());
 	for(x=0;x<256;x++)
-		machine.device<ram_device>(RAM_TAG)->pointer()[x+2] = code[x+0x300];
+		machine().device<ram_device>(RAM_TAG)->pointer()[x+2] = code[x+0x300];
 
 	/* and hack our way past the MCU side of the boot process */
 	code[0x01] = 0x40;
 
-	state->m_printer_status = 0xff;
-	state->m_printer_command = 0xff;
-	state->m_printer_data = 0x00;
-	state->m_printer_headpos = 0x00; // bring printer head to left margin
-	state->m_printer_shift = 0;
-	state->m_printer_shift_output = 0;
+	m_printer_status = 0xff;
+	m_printer_command = 0xff;
+	m_printer_data = 0x00;
+	m_printer_headpos = 0x00; // bring printer head to left margin
+	m_printer_shift = 0;
+	m_printer_shift_output = 0;
 }
 
 DRIVER_INIT_MEMBER(pcw_state,pcw)
@@ -1326,8 +1324,6 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 //  MCFG_QUANTUM_TIME(attotime::from_hz(50))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_MACHINE_START(pcw)
-	MCFG_MACHINE_RESET(pcw)
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1338,9 +1334,7 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 	MCFG_SCREEN_UPDATE_STATIC( pcw )
 
 	MCFG_PALETTE_LENGTH(PCW_NUM_COLOURS)
-	MCFG_PALETTE_INIT( pcw )
 
-	MCFG_VIDEO_START( pcw )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -16,13 +16,12 @@ static void blitter_execute(running_machine &machine);
  *
  *************************************/
 
-VIDEO_START( kangaroo )
+void kangaroo_state::video_start()
 {
-	kangaroo_state *state = machine.driver_data<kangaroo_state>();
 
 	/* video RAM is accessed 32 bits at a time (two planes, 4bpp each, 4 pixels) */
-	state->m_videoram = auto_alloc_array(machine, UINT32, 256 * 64);
-	state->save_pointer(NAME(state->m_videoram), 256 * 64);
+	m_videoram = auto_alloc_array(machine(), UINT32, 256 * 64);
+	save_pointer(NAME(m_videoram), 256 * 64);
 }
 
 

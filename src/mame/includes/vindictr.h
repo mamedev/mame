@@ -19,6 +19,9 @@ public:
 	DECLARE_DRIVER_INIT(vindictr);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	DECLARE_MACHINE_START(vindictr);
+	DECLARE_MACHINE_RESET(vindictr);
+	DECLARE_VIDEO_START(vindictr);
 };
 
 
@@ -26,7 +29,7 @@ public:
 
 WRITE16_HANDLER( vindictr_paletteram_w );
 
-VIDEO_START( vindictr );
+
 SCREEN_UPDATE_IND16( vindictr );
 
 void vindictr_scanline_update(screen_device &screen, int scanline);

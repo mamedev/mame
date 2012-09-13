@@ -350,6 +350,8 @@ public:
 	DECLARE_WRITE64_MEMBER(ata_w);
 	DECLARE_DRIVER_INIT(viper);
 	DECLARE_DRIVER_INIT(vipercf);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 UINT32 m_mpc8240_regs[256/4];
@@ -1937,27 +1939,27 @@ static void ide_interrupt(device_t *device, int state)
 {
 }
 
-static MACHINE_START(viper)
+void viper_state::machine_start()
 {
-	ds2430_timer = machine.scheduler().timer_alloc(FUNC(ds2430_timer_callback));
-	ds2430_bit_timer = machine.device<timer_device>("ds2430_timer2");
-	mpc8240_epic_init(machine);
+	ds2430_timer = machine().scheduler().timer_alloc(FUNC(ds2430_timer_callback));
+	ds2430_bit_timer = machine().device<timer_device>("ds2430_timer2");
+	mpc8240_epic_init(machine());
 
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine.device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(machine().device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x00ffffff, FALSE, workram);
+	ppcdrc_add_fastram(machine().device("maincpu"), 0x00000000, 0x00ffffff, FALSE, workram);
 
-	ds2430_rom = (UINT8*)machine.root_device().memregion("ds2430")->base();
+	ds2430_rom = (UINT8*)machine().root_device().memregion("ds2430")->base();
 }
 
-static MACHINE_RESET(viper)
+void viper_state::machine_reset()
 {
-	machine.device("ide")->reset();
+	machine().device("ide")->reset();
 	mpc8240_epic_reset();
 
-	UINT8 *ide_features = ide_get_features(machine.device("ide"), 0);
+	UINT8 *ide_features = ide_get_features(machine().device("ide"), 0);
 
 	// Viper expects these settings or the BIOS fails
 	ide_features[51*2+0] = 0;			/* 51: PIO data transfer cycle timing mode */
@@ -1992,8 +1994,6 @@ static MACHINE_CONFIG_START( viper, viper_state )
 	MCFG_CPU_PROGRAM_MAP(viper_map)
 	MCFG_CPU_VBLANK_INT("screen", viper_vblank)
 
-	MCFG_MACHINE_START(viper)
-	MCFG_MACHINE_RESET(viper)
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, "mpc8240", mpc8240_pci_r, mpc8240_pci_w)

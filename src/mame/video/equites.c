@@ -8,50 +8,50 @@
  *
  *************************************/
 
-PALETTE_INIT( equites )
+PALETTE_INIT_MEMBER(equites_state,equites)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	machine.colortable = colortable_alloc(machine, 256);
+	machine().colortable = colortable_alloc(machine(), 256);
 
 	for (i = 0; i < 256; i++)
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
 
 	// point to the CLUT
 	color_prom += 0x380;
 
 	for (i = 0; i < 256; i++)
-		colortable_entry_set_value(machine.colortable, i, i);
+		colortable_entry_set_value(machine().colortable, i, i);
 
 	for (i = 0; i < 0x80; i++)
-		colortable_entry_set_value(machine.colortable, i + 0x100, color_prom[i]);
+		colortable_entry_set_value(machine().colortable, i + 0x100, color_prom[i]);
 }
 
-PALETTE_INIT( splndrbt )
+PALETTE_INIT_MEMBER(equites_state,splndrbt)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	machine.colortable = colortable_alloc(machine, 256);
+	machine().colortable = colortable_alloc(machine(), 256);
 
 	for (i = 0; i < 0x100; i++)
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
 
 	for (i = 0; i < 0x100; i++)
-		colortable_entry_set_value(machine.colortable, i, i);
+		colortable_entry_set_value(machine().colortable, i, i);
 
 	// point to the bg CLUT
 	color_prom += 0x300;
 
 	for (i = 0; i < 0x80; i++)
-		colortable_entry_set_value(machine.colortable, i + 0x100, color_prom[i] + 0x10);
+		colortable_entry_set_value(machine().colortable, i + 0x100, color_prom[i] + 0x10);
 
 	// point to the sprite CLUT
 	color_prom += 0x100;
 
 	for (i = 0; i < 0x100; i++)
-		colortable_entry_set_value(machine.colortable, i + 0x180, color_prom[i]);
+		colortable_entry_set_value(machine().colortable, i + 0x180, color_prom[i]);
 }
 
 
@@ -111,34 +111,32 @@ TILE_GET_INFO_MEMBER(equites_state::splndrbt_bg_info)
  *
  *************************************/
 
-VIDEO_START( equites )
+VIDEO_START_MEMBER(equites_state,equites)
 {
-	equites_state *state = machine.driver_data<equites_state>();
-	state->m_fg_videoram = auto_alloc_array(machine, UINT8, 0x800);
-	state->save_pointer(NAME(state->m_fg_videoram), 0x800);
+	m_fg_videoram = auto_alloc_array(machine(), UINT8, 0x800);
+	save_pointer(NAME(m_fg_videoram), 0x800);
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(equites_state::equites_fg_info),state), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(equites_state::equites_fg_info),this), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(equites_state::equites_bg_info),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	state->m_bg_tilemap->set_transparent_pen(0);
-	state->m_bg_tilemap->set_scrolldx(0, -10);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(equites_state::equites_bg_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scrolldx(0, -10);
 }
 
-VIDEO_START( splndrbt )
+VIDEO_START_MEMBER(equites_state,splndrbt)
 {
-	equites_state *state = machine.driver_data<equites_state>();
-	assert(machine.primary_screen->format() == BITMAP_FORMAT_IND16);
+	assert(machine().primary_screen->format() == BITMAP_FORMAT_IND16);
 
-	state->m_fg_videoram = auto_alloc_array(machine, UINT8, 0x800);
-	state->save_pointer(NAME(state->m_fg_videoram), 0x800);
+	m_fg_videoram = auto_alloc_array(machine(), UINT8, 0x800);
+	save_pointer(NAME(m_fg_videoram), 0x800);
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(equites_state::splndrbt_fg_info),state), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
-	state->m_fg_tilemap->set_transparent_pen(0);
-	state->m_fg_tilemap->set_scrolldx(8, -8);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(equites_state::splndrbt_fg_info),this), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
+	m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_scrolldx(8, -8);
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(equites_state::splndrbt_bg_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	colortable_configure_tilemap_groups(machine.colortable, state->m_bg_tilemap, machine.gfx[1], 0x10);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(equites_state::splndrbt_bg_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, machine().gfx[1], 0x10);
 }
 
 

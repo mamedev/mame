@@ -53,6 +53,8 @@ public:
 	DECLARE_DRIVER_INIT(cabaret);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -101,13 +103,12 @@ WRITE8_MEMBER(cabaret_state::fg_color_w)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-static VIDEO_START(cabaret)
+void cabaret_state::video_start()
 {
-	cabaret_state *state = machine.driver_data<cabaret_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cabaret_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,	8,  32,	64, 8);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cabaret_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,	8,  8,	64, 32);
-	state->m_fg_tilemap->set_transparent_pen(0);
-	state->m_bg_tilemap->set_scroll_cols(64);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cabaret_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,	8,  32,	64, 8);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cabaret_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,	8,  8,	64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scroll_cols(64);
 }
 
 
@@ -318,10 +319,9 @@ GFXDECODE_END
                                 Machine Drivers
 ***************************************************************************/
 
-static MACHINE_RESET( cabaret )
+void cabaret_state::machine_reset()
 {
-	cabaret_state *state = machine.driver_data<cabaret_state>();
-	state->m_nmi_enable		=	0;
+	m_nmi_enable		=	0;
 }
 
 static INTERRUPT_GEN( cabaret_interrupt )
@@ -338,7 +338,6 @@ static MACHINE_CONFIG_START( cabaret, cabaret_state )
 	MCFG_CPU_IO_MAP(cabaret_portmap)
 	MCFG_CPU_VBLANK_INT("screen",cabaret_interrupt)
 
-	MCFG_MACHINE_RESET(cabaret)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -351,7 +350,6 @@ static MACHINE_CONFIG_START( cabaret, cabaret_state )
 	MCFG_GFXDECODE(cabaret)
 	MCFG_PALETTE_LENGTH(0x800)
 
-	MCFG_VIDEO_START(cabaret)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

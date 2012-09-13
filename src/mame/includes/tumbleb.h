@@ -83,17 +83,25 @@ public:
 	TILE_GET_INFO_MEMBER(pangpang_get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(pangpang_get_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(pangpang_get_fg_tile_info);
+	DECLARE_MACHINE_START(tumbleb);
+	DECLARE_MACHINE_RESET(tumbleb);
+	DECLARE_VIDEO_START(tumblepb);
+	DECLARE_VIDEO_START(fncywld);
+	DECLARE_MACHINE_RESET(htchctch);
+	DECLARE_VIDEO_START(suprtrio);
+	DECLARE_VIDEO_START(pangpang);
+	DECLARE_VIDEO_START(sdfight);
 };
 
 /*----------- defined in video/tumbleb.c -----------*/
 
 
 
-VIDEO_START( tumblepb );
-VIDEO_START( fncywld );
-VIDEO_START( sdfight );
-VIDEO_START( suprtrio );
-VIDEO_START( pangpang );
+
+
+
+
+
 
 SCREEN_UPDATE_IND16( tumblepb );
 SCREEN_UPDATE_IND16( jumpkids );

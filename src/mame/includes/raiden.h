@@ -37,11 +37,13 @@ public:
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	virtual void video_start();
+	DECLARE_VIDEO_START(raidena);
 };
 
 
 /*----------- defined in video/raiden.c -----------*/
 
-VIDEO_START( raiden );
-VIDEO_START( raidena );
+
+
 SCREEN_UPDATE_IND16( raiden );

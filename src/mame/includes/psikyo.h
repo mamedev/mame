@@ -85,6 +85,10 @@ public:
 	DECLARE_DRIVER_INIT(gunbird);
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
+	virtual void machine_start();
+	virtual void machine_reset();
+	DECLARE_VIDEO_START(sngkace);
+	DECLARE_VIDEO_START(psikyo);
 };
 
 
@@ -93,8 +97,8 @@ public:
 void psikyo_switch_banks(running_machine &machine, int tmap, int bank);
 
 
-VIDEO_START( sngkace );
-VIDEO_START( psikyo );
+
+
 SCREEN_UPDATE_IND16( psikyo );
 SCREEN_UPDATE_IND16( psikyo_bootleg );
 SCREEN_VBLANK( psikyo );

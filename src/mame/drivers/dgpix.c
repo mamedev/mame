@@ -75,6 +75,8 @@ public:
 	DECLARE_DRIVER_INIT(fmaniac3);
 	DECLARE_DRIVER_INIT(xfiles);
 	DECLARE_DRIVER_INIT(kdynastg);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -284,10 +286,9 @@ static INPUT_PORTS_START( dgpix )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static VIDEO_START( dgpix )
+void dgpix_state::video_start()
 {
-	dgpix_state *state = machine.driver_data<dgpix_state>();
-	state->m_vram = auto_alloc_array(machine, UINT32, 0x40000*2/4);
+	m_vram = auto_alloc_array(machine(), UINT32, 0x40000*2/4);
 }
 
 static SCREEN_UPDATE_IND16( dgpix )
@@ -314,13 +315,12 @@ static SCREEN_UPDATE_IND16( dgpix )
 	return 0;
 }
 
-static MACHINE_RESET( dgpix )
+void dgpix_state::machine_reset()
 {
-	dgpix_state *state = machine.driver_data<dgpix_state>();
-	state->m_vbuffer = 0;
-	state->m_flash_cmd = 0;
-	state->m_first_offset = -1;
-	state->m_old_vbuf = 3;
+	m_vbuffer = 0;
+	m_flash_cmd = 0;
+	m_first_offset = -1;
+	m_old_vbuf = 3;
 }
 
 
@@ -334,7 +334,6 @@ static MACHINE_CONFIG_START( dgpix, dgpix_state )
     running at 16.9MHz
 */
 
-	MCFG_MACHINE_RESET(dgpix)
 	MCFG_NVRAM_HANDLER(flashroms)
 
 	/* video hardware */
@@ -348,7 +347,6 @@ static MACHINE_CONFIG_START( dgpix, dgpix_state )
 	MCFG_PALETTE_INIT(BBBBB_GGGGG_RRRRR)
 	MCFG_PALETTE_LENGTH(32768)
 
-	MCFG_VIDEO_START(dgpix)
 
 	/* sound hardware */
 	// KS0164 sound chip

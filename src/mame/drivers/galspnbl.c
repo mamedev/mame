@@ -218,11 +218,10 @@ static const ym3812_interface ym3812_config =
 };
 
 
-static MACHINE_START( galspnbl )
+void galspnbl_state::machine_start()
 {
-	galspnbl_state *state = machine.driver_data<galspnbl_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 }
 
 static MACHINE_CONFIG_START( galspnbl, galspnbl_state )
@@ -236,7 +235,6 @@ static MACHINE_CONFIG_START( galspnbl, galspnbl_state )
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 								/* NMI is caused by the main CPU */
 
-	MCFG_MACHINE_START(galspnbl)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -249,7 +247,6 @@ static MACHINE_CONFIG_START( galspnbl, galspnbl_state )
 	MCFG_GFXDECODE(galspnbl)
 	MCFG_PALETTE_LENGTH(1024 + 32768)
 
-	MCFG_PALETTE_INIT(galspnbl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

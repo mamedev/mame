@@ -1628,8 +1628,8 @@ static MACHINE_CONFIG_START( arknoid2, tnzs_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_MACHINE_START(tnzs)
-	MCFG_MACHINE_RESET(tnzs)
+	MCFG_MACHINE_START_OVERRIDE(tnzs_state,tnzs)
+	MCFG_MACHINE_RESET_OVERRIDE(tnzs_state,tnzs)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
@@ -1645,7 +1645,7 @@ static MACHINE_CONFIG_START( arknoid2, tnzs_state )
 	MCFG_GFXDECODE(tnzs)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_PALETTE_INIT(arknoid2)
+	MCFG_PALETTE_INIT_OVERRIDE(tnzs_state,arknoid2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1669,8 +1669,8 @@ static MACHINE_CONFIG_START( drtoppel, tnzs_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_MACHINE_START(tnzs)
-	MCFG_MACHINE_RESET(tnzs)
+	MCFG_MACHINE_START_OVERRIDE(tnzs_state,tnzs)
+	MCFG_MACHINE_RESET_OVERRIDE(tnzs_state,tnzs)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
@@ -1686,7 +1686,7 @@ static MACHINE_CONFIG_START( drtoppel, tnzs_state )
 	MCFG_GFXDECODE(tnzs)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_PALETTE_INIT(arknoid2)
+	MCFG_PALETTE_INIT_OVERRIDE(tnzs_state,arknoid2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1713,8 +1713,8 @@ static MACHINE_CONFIG_START( tnzs, tnzs_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_MACHINE_START(tnzs)
-	MCFG_MACHINE_RESET(tnzs)
+	MCFG_MACHINE_START_OVERRIDE(tnzs_state,tnzs)
+	MCFG_MACHINE_RESET_OVERRIDE(tnzs_state,tnzs)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
@@ -1753,8 +1753,8 @@ static MACHINE_CONFIG_START( insectx, tnzs_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_MACHINE_START(tnzs)
-	MCFG_MACHINE_RESET(tnzs)
+	MCFG_MACHINE_START_OVERRIDE(tnzs_state,tnzs)
+	MCFG_MACHINE_RESET_OVERRIDE(tnzs_state,tnzs)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
@@ -1792,8 +1792,8 @@ static MACHINE_CONFIG_START( kageki, tnzs_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_MACHINE_START(tnzs)
-	MCFG_MACHINE_RESET(tnzs)
+	MCFG_MACHINE_START_OVERRIDE(tnzs_state,tnzs)
+	MCFG_MACHINE_RESET_OVERRIDE(tnzs_state,tnzs)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
@@ -1841,8 +1841,8 @@ static MACHINE_CONFIG_START( tnzsb, tnzs_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_MACHINE_START(tnzs)
-	MCFG_MACHINE_RESET(tnzs)
+	MCFG_MACHINE_START_OVERRIDE(tnzs_state,tnzs)
+	MCFG_MACHINE_RESET_OVERRIDE(tnzs_state,tnzs)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
@@ -1900,8 +1900,8 @@ static MACHINE_CONFIG_START( jpopnics, tnzs_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_MACHINE_START(jpopnics)
-	MCFG_MACHINE_RESET(jpopnics)
+	MCFG_MACHINE_START_OVERRIDE(tnzs_state,jpopnics)
+	MCFG_MACHINE_RESET_OVERRIDE(tnzs_state,jpopnics)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 

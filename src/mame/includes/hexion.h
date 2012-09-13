@@ -21,11 +21,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(hexion_nmi_ack_w);
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/hexion.c -----------*/
 
-VIDEO_START( hexion );
+
 SCREEN_UPDATE_IND16( hexion );
 

@@ -79,6 +79,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(taitowlf_pic8259_1_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_DRIVER_INIT(taitowlf);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 #if !ENABLE_VGA
@@ -527,21 +530,20 @@ static IRQ_CALLBACK(irq_callback)
 	return pic8259_acknowledge( state->m_pic8259_1);
 }
 
-static MACHINE_START(taitowlf)
+void taitowlf_state::machine_start()
 {
-	taitowlf_state *state = machine.driver_data<taitowlf_state>();
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 
-	state->m_pit8254 = machine.device( "pit8254" );
-	state->m_pic8259_1 = machine.device( "pic8259_1" );
-	state->m_pic8259_2 = machine.device( "pic8259_2" );
-	state->m_dma8237_1 = machine.device( "dma8237_1" );
-	state->m_dma8237_2 = machine.device( "dma8237_2" );
+	m_pit8254 = machine().device( "pit8254" );
+	m_pic8259_1 = machine().device( "pic8259_1" );
+	m_pic8259_2 = machine().device( "pic8259_2" );
+	m_dma8237_1 = machine().device( "dma8237_1" );
+	m_dma8237_2 = machine().device( "dma8237_2" );
 }
 
-static MACHINE_RESET(taitowlf)
+void taitowlf_state::machine_reset()
 {
-	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("user1")->base() + 0x30000);
+	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("user1")->base() + 0x30000);
 }
 
 
@@ -606,13 +608,13 @@ static const struct pit8253_config taitowlf_pit8254_config =
 
 #if !ENABLE_VGA
 /* debug purpose*/
-static PALETTE_INIT( taitowlf )
+void taitowlf_state::palette_init()
 {
-	palette_set_color(machine,0x70,MAKE_RGB(0xff,0xff,0xff));
-	palette_set_color(machine,0x71,MAKE_RGB(0xff,0xff,0xff));
-	palette_set_color(machine,0x01,MAKE_RGB(0x55,0x00,0x00));
-	palette_set_color(machine,0x10,MAKE_RGB(0xaa,0x00,0x00));
-	palette_set_color(machine,0x00,MAKE_RGB(0x00,0x00,0x00));
+	palette_set_color(machine(),0x70,MAKE_RGB(0xff,0xff,0xff));
+	palette_set_color(machine(),0x71,MAKE_RGB(0xff,0xff,0xff));
+	palette_set_color(machine(),0x01,MAKE_RGB(0x55,0x00,0x00));
+	palette_set_color(machine(),0x10,MAKE_RGB(0xaa,0x00,0x00));
+	palette_set_color(machine(),0x00,MAKE_RGB(0x00,0x00,0x00));
 }
 #endif
 
@@ -630,8 +632,6 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 	MCFG_CPU_PROGRAM_MAP(taitowlf_map)
 	MCFG_CPU_IO_MAP(taitowlf_io)
 
-	MCFG_MACHINE_START(taitowlf)
-	MCFG_MACHINE_RESET(taitowlf)
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
@@ -657,7 +657,6 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_SCREEN_UPDATE_STATIC(taitowlf)
-	MCFG_PALETTE_INIT(taitowlf)
 	#endif
 MACHINE_CONFIG_END
 

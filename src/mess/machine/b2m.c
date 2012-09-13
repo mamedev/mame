@@ -320,29 +320,28 @@ static void b2m_postload(b2m_state *state)
 	b2m_set_bank(state->machine(), state->m_b2m_8255_portc & 7);
 }
 
-MACHINE_START(b2m)
+void b2m_state::machine_start()
 {
-	b2m_state *state = machine.driver_data<b2m_state>();
-	state->m_pic = machine.device("pic8259");
-	state->m_fdc = machine.device("wd1793");
-	state->m_speaker = machine.device(SPEAKER_TAG);
+	m_pic = machine().device("pic8259");
+	m_fdc = machine().device("wd1793");
+	m_speaker = machine().device(SPEAKER_TAG);
 
-	wd17xx_set_pause_time(state->m_fdc,10);
+	wd17xx_set_pause_time(m_fdc,10);
 
 	/* register for state saving */
-	state->save_item(NAME(state->m_b2m_8255_porta));
-	state->save_item(NAME(state->m_b2m_video_scroll));
-	state->save_item(NAME(state->m_b2m_8255_portc));
-	state->save_item(NAME(state->m_b2m_video_page));
-	state->save_item(NAME(state->m_b2m_drive));
-	state->save_item(NAME(state->m_b2m_side));
-	state->save_item(NAME(state->m_b2m_romdisk_lsb));
-	state->save_item(NAME(state->m_b2m_romdisk_msb));
-	state->save_pointer(NAME(state->m_b2m_color), 4);
-	state->save_item(NAME(state->m_b2m_localmachine));
-	state->save_item(NAME(state->m_vblank_state));
+	save_item(NAME(m_b2m_8255_porta));
+	save_item(NAME(m_b2m_video_scroll));
+	save_item(NAME(m_b2m_8255_portc));
+	save_item(NAME(m_b2m_video_page));
+	save_item(NAME(m_b2m_drive));
+	save_item(NAME(m_b2m_side));
+	save_item(NAME(m_b2m_romdisk_lsb));
+	save_item(NAME(m_b2m_romdisk_msb));
+	save_pointer(NAME(m_b2m_color), 4);
+	save_item(NAME(m_b2m_localmachine));
+	save_item(NAME(m_vblank_state));
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(b2m_postload), state));
+	machine().save().register_postload(save_prepost_delegate(FUNC(b2m_postload), this));
 }
 
 static IRQ_CALLBACK(b2m_irq_callback)
@@ -366,12 +365,11 @@ INTERRUPT_GEN( b2m_vblank_interrupt )
 	pic8259_ir0_w(state->m_pic, state->m_vblank_state);
 }
 
-MACHINE_RESET(b2m)
+void b2m_state::machine_reset()
 {
-	b2m_state *state = machine.driver_data<b2m_state>();
-	state->m_b2m_side = 0;
-	state->m_b2m_drive = 0;
+	m_b2m_side = 0;
+	m_b2m_drive = 0;
 
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(b2m_irq_callback);
-	b2m_set_bank(machine, 7);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(b2m_irq_callback);
+	b2m_set_bank(machine(), 7);
 }

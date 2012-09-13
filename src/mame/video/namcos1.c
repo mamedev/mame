@@ -110,56 +110,55 @@ TILE_GET_INFO_MEMBER(namcos1_state::fg_get_info5)
 
 ***************************************************************************/
 
-VIDEO_START( namcos1 )
+void namcos1_state::video_start()
 {
-	namcos1_state *state = machine.driver_data<namcos1_state>();
 	int i;
 
-	state->m_tilemap_maskdata = (UINT8 *)state->memregion("gfx1")->base();
+	m_tilemap_maskdata = (UINT8 *)memregion("gfx1")->base();
 
 	/* allocate videoram */
-	state->m_videoram = auto_alloc_array(machine, UINT8, 0x8000);
-	state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000);
+	m_videoram = auto_alloc_array(machine(), UINT8, 0x8000);
+	m_spriteram = auto_alloc_array(machine(), UINT8, 0x1000);
 
 	/* initialize playfields */
-	state->m_bg_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info0),state),TILEMAP_SCAN_ROWS,8,8,64,64);
-	state->m_bg_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info1),state),TILEMAP_SCAN_ROWS,8,8,64,64);
-	state->m_bg_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info2),state),TILEMAP_SCAN_ROWS,8,8,64,64);
-	state->m_bg_tilemap[3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info3),state),TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_bg_tilemap[4] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::fg_get_info4),state),TILEMAP_SCAN_ROWS,8,8,36,28);
-	state->m_bg_tilemap[5] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::fg_get_info5),state),TILEMAP_SCAN_ROWS,8,8,36,28);
+	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info0),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info1),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_bg_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info2),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_bg_tilemap[3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info3),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap[4] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::fg_get_info4),this),TILEMAP_SCAN_ROWS,8,8,36,28);
+	m_bg_tilemap[5] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::fg_get_info5),this),TILEMAP_SCAN_ROWS,8,8,36,28);
 
-	state->m_bg_tilemap[4]->set_scrolldx(73,512-73);
-	state->m_bg_tilemap[5]->set_scrolldx(73,512-73);
-	state->m_bg_tilemap[4]->set_scrolldy(0x10,0x110);
-	state->m_bg_tilemap[5]->set_scrolldy(0x10,0x110);
+	m_bg_tilemap[4]->set_scrolldx(73,512-73);
+	m_bg_tilemap[5]->set_scrolldx(73,512-73);
+	m_bg_tilemap[4]->set_scrolldy(0x10,0x110);
+	m_bg_tilemap[5]->set_scrolldy(0x10,0x110);
 
 	/* register videoram to the save state system (post-allocation) */
-	state_save_register_global_pointer(machine, state->m_videoram, 0x8000);
-	state_save_register_global_array(machine, state->m_cus116);
-	state_save_register_global_pointer(machine, state->m_spriteram, 0x1000);
-	state_save_register_global_array(machine, state->m_playfield_control);
+	state_save_register_global_pointer(machine(), m_videoram, 0x8000);
+	state_save_register_global_array(machine(), m_cus116);
+	state_save_register_global_pointer(machine(), m_spriteram, 0x1000);
+	state_save_register_global_array(machine(), m_playfield_control);
 
 	/* set table for sprite color == 0x7f */
 	for (i = 0;i < 15;i++)
-		state->m_drawmode_table[i] = DRAWMODE_SHADOW;
-	state->m_drawmode_table[15] = DRAWMODE_NONE;
+		m_drawmode_table[i] = DRAWMODE_SHADOW;
+	m_drawmode_table[15] = DRAWMODE_NONE;
 
 	/* clear paletteram */
-	memset(state->m_paletteram, 0, 0x8000);
-	memset(state->m_cus116, 0, 0x10);
+	memset(m_paletteram, 0, 0x8000);
+	memset(m_cus116, 0, 0x10);
 	for (i = 0; i < 0x2000; i++)
-		palette_set_color(machine, i, MAKE_RGB(0, 0, 0));
+		palette_set_color(machine(), i, MAKE_RGB(0, 0, 0));
 
 	/* all palette entries are not affected by shadow sprites... */
 	for (i = 0;i < 0x2000;i++)
-		machine.shadow_table[i] = i;
+		machine().shadow_table[i] = i;
 	/* ... except for tilemap colors */
 	for (i = 0x0800;i < 0x1000;i++)
-		machine.shadow_table[i] = i + 0x0800;
+		machine().shadow_table[i] = i + 0x0800;
 
-	memset(state->m_playfield_control, 0, sizeof(state->m_playfield_control));
-	state->m_copy_sprites = 0;
+	memset(m_playfield_control, 0, sizeof(m_playfield_control));
+	m_copy_sprites = 0;
 }
 
 

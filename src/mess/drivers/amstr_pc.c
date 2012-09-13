@@ -266,8 +266,8 @@ static MACHINE_CONFIG_START( pc200, pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc200, pc200, I8086, 8000000, pc_frame_interrupt)
 
-	MCFG_MACHINE_START(pc)
-	MCFG_MACHINE_RESET(pc)
+	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
+	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
 	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
@@ -336,8 +336,8 @@ static MACHINE_CONFIG_START( ppc512, pc_state )
 	MCFG_CPU_IO_MAP(ppc512_io)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", pc_frame_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_START(pc)
-	MCFG_MACHINE_RESET(pc)
+	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
+	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
 	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 

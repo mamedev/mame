@@ -419,6 +419,8 @@ public:
 	DECLARE_WRITE64_MEMBER(gc_pi_w);
 	DECLARE_READ64_MEMBER(gc_exi_r);
 	DECLARE_WRITE64_MEMBER(gc_exi_w);
+	virtual void machine_start();
+	virtual void video_start();
 };
 
 READ64_MEMBER(triforce_state::gc_pi_r)
@@ -449,7 +451,7 @@ static ADDRESS_MAP_START( gc_map, AS_PROGRAM, 64, triforce_state )
 ADDRESS_MAP_END
 
 
-static VIDEO_START(triforce)
+void triforce_state::video_start()
 {
 
 }
@@ -516,12 +518,12 @@ static void descrambler(UINT8* data, UINT32 size)
 	}
 }
 
-static MACHINE_START( triforce )
+void triforce_state::machine_start()
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine.device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(machine().device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
-	UINT8 *rom = (UINT8*)machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = (UINT8*)machine().root_device().memregion("maincpu")->base();
 	descrambler(&rom[0x100], 0x1afe00);
 }
 
@@ -533,7 +535,6 @@ static MACHINE_CONFIG_START( triforce_base, triforce_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(triforce)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -544,7 +545,6 @@ static MACHINE_CONFIG_START( triforce_base, triforce_state )
 
 	MCFG_PALETTE_LENGTH(65536)
 
-	MCFG_VIDEO_START(triforce)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( triforcegd, triforce_base )

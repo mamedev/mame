@@ -48,6 +48,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -57,6 +60,6 @@ public:
 /*----------- defined in video/goal92.c -----------*/
 
 
-VIDEO_START( goal92 );
+
 SCREEN_UPDATE_IND16( goal92 );
 SCREEN_VBLANK( goal92 );

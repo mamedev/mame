@@ -71,6 +71,10 @@ public:
 	DECLARE_WRITE8_MEMBER(ym_port_w2);
 	DECLARE_WRITE8_MEMBER(chin_adpcm_w);
 	DECLARE_DRIVER_INIT(chinsan);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -80,16 +84,16 @@ public:
  *
  *************************************/
 
-static PALETTE_INIT( chinsan )
+void chinsan_state::palette_init()
 {
-	UINT8 *src = machine.root_device().memregion( "color_proms" )->base();
+	UINT8 *src = machine().root_device().memregion( "color_proms" )->base();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
-		palette_set_color_rgb(machine, i, pal4bit(src[i + 0x200]), pal4bit(src[i + 0x100]), pal4bit(src[i + 0x000]));
+		palette_set_color_rgb(machine(), i, pal4bit(src[i + 0x200]), pal4bit(src[i + 0x100]), pal4bit(src[i + 0x000]));
 }
 
-static VIDEO_START( chinsan )
+void chinsan_state::video_start()
 {
 }
 
@@ -572,28 +576,26 @@ static const msm5205_interface msm5205_config =
  *
  *************************************/
 
-static MACHINE_START( chinsan )
+void chinsan_state::machine_start()
 {
-	chinsan_state *state = machine.driver_data<chinsan_state>();
 
-	state->membank("bank1")->configure_entries(0, 4, state->memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
 
-	state->save_item(NAME(state->m_adpcm_idle));
-	state->save_item(NAME(state->m_port_select));
-	state->save_item(NAME(state->m_adpcm_pos));
-	state->save_item(NAME(state->m_adpcm_data));
-	state->save_item(NAME(state->m_trigger));
+	save_item(NAME(m_adpcm_idle));
+	save_item(NAME(m_port_select));
+	save_item(NAME(m_adpcm_pos));
+	save_item(NAME(m_adpcm_data));
+	save_item(NAME(m_trigger));
 }
 
-static MACHINE_RESET( chinsan )
+void chinsan_state::machine_reset()
 {
-	chinsan_state *state = machine.driver_data<chinsan_state>();
 
-	state->m_adpcm_idle = 1;
-	state->m_port_select = 0;
-	state->m_adpcm_pos = 0;
-	state->m_adpcm_data = 0;
-	state->m_trigger = 0;
+	m_adpcm_idle = 1;
+	m_port_select = 0;
+	m_adpcm_pos = 0;
+	m_adpcm_data = 0;
+	m_trigger = 0;
 }
 
 
@@ -605,8 +607,6 @@ static MACHINE_CONFIG_START( chinsan, chinsan_state )
 	MCFG_CPU_IO_MAP(chinsan_io)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START( chinsan )
-	MCFG_MACHINE_RESET( chinsan )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -618,9 +618,7 @@ static MACHINE_CONFIG_START( chinsan, chinsan_state )
 
 	MCFG_GFXDECODE(chinsan)
 	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT(chinsan)
 
-	MCFG_VIDEO_START(chinsan)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

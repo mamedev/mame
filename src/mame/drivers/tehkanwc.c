@@ -666,7 +666,6 @@ static MACHINE_CONFIG_START( tehkanwc, tehkanwc_state )
 	MCFG_GFXDECODE(tehkanwc)
 	MCFG_PALETTE_LENGTH(768)
 
-	MCFG_VIDEO_START(tehkanwc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

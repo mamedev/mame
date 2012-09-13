@@ -389,8 +389,8 @@ static MACHINE_CONFIG_START( dfruit, dfruit_state )
 	MCFG_CPU_PROGRAM_MAP(dfruit_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", dfruit_irq_scanline, "screen", 0, 1)
 
-	//MCFG_MACHINE_START(4enraya)
-	//MCFG_MACHINE_RESET(4enraya)
+	//MCFG_MACHINE_START_OVERRIDE(dfruit_state,4enraya)
+	//MCFG_MACHINE_RESET_OVERRIDE(dfruit_state,4enraya)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

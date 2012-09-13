@@ -618,31 +618,29 @@ GFXDECODE_END
 
 /* MACHINE drivers ***********************************************************/
 
-static MACHINE_START( kickgoal )
+void kickgoal_state::machine_start()
 {
-	kickgoal_state *state = machine.driver_data<kickgoal_state>();
 
-	state->save_item(NAME(state->m_snd_sam));
-	state->save_item(NAME(state->m_melody_loop));
-	state->save_item(NAME(state->m_snd_new));
-	state->save_item(NAME(state->m_m6295_comm));
-	state->save_item(NAME(state->m_m6295_bank));
-	state->save_item(NAME(state->m_m6295_key_delay));
+	save_item(NAME(m_snd_sam));
+	save_item(NAME(m_melody_loop));
+	save_item(NAME(m_snd_new));
+	save_item(NAME(m_m6295_comm));
+	save_item(NAME(m_m6295_bank));
+	save_item(NAME(m_m6295_key_delay));
 }
 
-static MACHINE_RESET( kickgoal )
+void kickgoal_state::machine_reset()
 {
-	kickgoal_state *state = machine.driver_data<kickgoal_state>();
 
-	state->m_melody_loop = 0;
-	state->m_snd_new = 0;
-	state->m_snd_sam[0] = 0;
-	state->m_snd_sam[1] = 0;
-	state->m_snd_sam[2] = 0;
-	state->m_snd_sam[3] = 0;
-	state->m_m6295_comm = 0;
-	state->m_m6295_bank = 0;
-	state->m_m6295_key_delay = 0;
+	m_melody_loop = 0;
+	m_snd_new = 0;
+	m_snd_sam[0] = 0;
+	m_snd_sam[1] = 0;
+	m_snd_sam[2] = 0;
+	m_snd_sam[3] = 0;
+	m_m6295_comm = 0;
+	m_m6295_bank = 0;
+	m_m6295_key_delay = 0;
 }
 
 static MACHINE_CONFIG_START( kickgoal, kickgoal_state )
@@ -658,8 +656,6 @@ static MACHINE_CONFIG_START( kickgoal, kickgoal_state )
 	/* Program and Data Maps are internal to the MCU */
 	MCFG_CPU_IO_MAP(kickgoal_sound_io_map)
 
-	MCFG_MACHINE_START(kickgoal)
-	MCFG_MACHINE_RESET(kickgoal)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 	MCFG_EEPROM_DATA(kickgoal_default_eeprom_type1, 128)
@@ -675,7 +671,7 @@ static MACHINE_CONFIG_START( kickgoal, kickgoal_state )
 	MCFG_GFXDECODE(kickgoal)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(kickgoal)
+	MCFG_VIDEO_START_OVERRIDE(kickgoal_state,kickgoal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -695,8 +691,6 @@ static MACHINE_CONFIG_START( actionhw, kickgoal_state )
 	/* Program and Data Maps are internal to the MCU */
 	MCFG_CPU_IO_MAP(actionhw_io_map)
 
-	MCFG_MACHINE_START(kickgoal)
-	MCFG_MACHINE_RESET(kickgoal)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 	MCFG_EEPROM_DATA(kickgoal_default_eeprom_type1, 128)
@@ -712,7 +706,7 @@ static MACHINE_CONFIG_START( actionhw, kickgoal_state )
 	MCFG_GFXDECODE(actionhw)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(actionhw)
+	MCFG_VIDEO_START_OVERRIDE(kickgoal_state,actionhw)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

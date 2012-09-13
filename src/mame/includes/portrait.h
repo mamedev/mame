@@ -20,11 +20,13 @@ public:
 	DECLARE_WRITE8_MEMBER(portrait_fgvideo_write);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/portrait.c -----------*/
 
-PALETTE_INIT( portrait );
-VIDEO_START( portrait );
+
+
 SCREEN_UPDATE_IND16( portrait );

@@ -67,7 +67,7 @@ static void gba_machine_stop(running_machine &machine)
 	}
 }
 
-static PALETTE_INIT( gba )
+void gba_state::palette_init()
 {
 	UINT8 r, g, b;
 	for( b = 0; b < 32; b++ )
@@ -76,7 +76,7 @@ static PALETTE_INIT( gba )
 		{
 			for( r = 0; r < 32; r++ )
 			{
-				palette_set_color_rgb( machine, ( b << 10 ) | ( g << 5 ) | r, pal5bit(r), pal5bit(g), pal5bit(b) );
+				palette_set_color_rgb( machine(), ( b << 10 ) | ( g << 5 ) | r, pal5bit(r), pal5bit(g), pal5bit(b) );
 			}
 		}
 	}
@@ -2113,45 +2113,44 @@ static TIMER_CALLBACK( perform_scan )
 	state->m_scan_timer->adjust(machine.primary_screen->time_until_pos(( scanline + 1 ) % 228, 0));
 }
 
-static MACHINE_RESET( gba )
+void gba_state::machine_reset()
 {
-	dac_device *gb_a_l = machine.device<dac_device>("direct_a_left");
-	dac_device *gb_a_r = machine.device<dac_device>("direct_a_right");
-	dac_device *gb_b_l = machine.device<dac_device>("direct_b_left");
-	dac_device *gb_b_r = machine.device<dac_device>("direct_b_right");
-	gba_state *state = machine.driver_data<gba_state>();
+	dac_device *gb_a_l = machine().device<dac_device>("direct_a_left");
+	dac_device *gb_a_r = machine().device<dac_device>("direct_a_right");
+	dac_device *gb_b_l = machine().device<dac_device>("direct_b_left");
+	dac_device *gb_b_r = machine().device<dac_device>("direct_b_right");
 
-	//memset(state, 0, sizeof(state));
-	state->m_SOUNDBIAS = 0x0200;
-	state->m_eeprom_state = EEP_IDLE;
-	state->m_SIOMULTI0 = 0xffff;
-	state->m_SIOMULTI1 = 0xffff;
-	state->m_SIOMULTI2 = 0xffff;
-	state->m_SIOMULTI3 = 0xffff;
-	state->m_KEYCNT = 0x03ff;
-	state->m_RCNT = 0x8000;
-	state->m_JOYSTAT = 0x0002;
-	state->m_gfxBG2Changed = 0;
-	state->m_gfxBG3Changed = 0;
-	state->m_gfxBG2X = 0;
-	state->m_gfxBG2Y = 0;
-	state->m_gfxBG3X = 0;
-	state->m_gfxBG3Y = 0;
+	//memset(this, 0, sizeof(this));
+	m_SOUNDBIAS = 0x0200;
+	m_eeprom_state = EEP_IDLE;
+	m_SIOMULTI0 = 0xffff;
+	m_SIOMULTI1 = 0xffff;
+	m_SIOMULTI2 = 0xffff;
+	m_SIOMULTI3 = 0xffff;
+	m_KEYCNT = 0x03ff;
+	m_RCNT = 0x8000;
+	m_JOYSTAT = 0x0002;
+	m_gfxBG2Changed = 0;
+	m_gfxBG3Changed = 0;
+	m_gfxBG2X = 0;
+	m_gfxBG2Y = 0;
+	m_gfxBG3X = 0;
+	m_gfxBG3Y = 0;
 
-	state->m_windowOn = 0;
-	state->m_fxOn = 0;
+	m_windowOn = 0;
+	m_fxOn = 0;
 
-	state->m_bios_protected = 0;
+	m_bios_protected = 0;
 
-	state->m_scan_timer->adjust(machine.primary_screen->time_until_pos(0, 0));
-	state->m_hbl_timer->adjust(attotime::never);
-	state->m_dma_timer[0]->adjust(attotime::never);
-	state->m_dma_timer[1]->adjust(attotime::never, 1);
-	state->m_dma_timer[2]->adjust(attotime::never, 2);
-	state->m_dma_timer[3]->adjust(attotime::never, 3);
+	m_scan_timer->adjust(machine().primary_screen->time_until_pos(0, 0));
+	m_hbl_timer->adjust(attotime::never);
+	m_dma_timer[0]->adjust(attotime::never);
+	m_dma_timer[1]->adjust(attotime::never, 1);
+	m_dma_timer[2]->adjust(attotime::never, 2);
+	m_dma_timer[3]->adjust(attotime::never, 3);
 
-	state->m_fifo_a_ptr = state->m_fifo_b_ptr = 17;	// indicate empty
-	state->m_fifo_a_in = state->m_fifo_b_in = 17;
+	m_fifo_a_ptr = m_fifo_b_ptr = 17;	// indicate empty
+	m_fifo_a_in = m_fifo_b_in = 17;
 
 	// and clear the DACs
 	gb_a_l->write_signed8(0x80);
@@ -2159,55 +2158,54 @@ static MACHINE_RESET( gba )
 	gb_b_l->write_signed8(0x80);
 	gb_b_r->write_signed8(0x80);
 
-	if (state->m_flash_battery_load != 0)
+	if (m_flash_battery_load != 0)
 	{
-		device_image_interface *image = dynamic_cast<device_image_interface *>(state->m_nvimage);
-		UINT8 *nvram = auto_alloc_array( machine, UINT8, state->m_flash_size);
-		image->battery_load( nvram, state->m_flash_size, 0xff);
-		for (int i = 0; i < state->m_flash_size; i++)
+		device_image_interface *image = dynamic_cast<device_image_interface *>(m_nvimage);
+		UINT8 *nvram = auto_alloc_array( machine(), UINT8, m_flash_size);
+		image->battery_load( nvram, m_flash_size, 0xff);
+		for (int i = 0; i < m_flash_size; i++)
 		{
-			state->m_mFlashDev->write_raw( i, nvram[i]);
+			m_mFlashDev->write_raw( i, nvram[i]);
 		}
-		auto_free( machine, nvram);
-		state->m_flash_battery_load = 0;
+		auto_free( machine(), nvram);
+		m_flash_battery_load = 0;
 	}
 }
 
-static MACHINE_START( gba )
+void gba_state::machine_start()
 {
-	gba_state *state = machine.driver_data<gba_state>();
 
 	/* add a hook for battery save */
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gba_machine_stop),&machine));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gba_machine_stop),&machine()));
 
 	/* create a timer to fire scanline functions */
-	state->m_scan_timer = machine.scheduler().timer_alloc(FUNC(perform_scan));
-	state->m_hbl_timer = machine.scheduler().timer_alloc(FUNC(perform_hbl));
-	state->m_scan_timer->adjust(machine.primary_screen->time_until_pos(0, 0));
+	m_scan_timer = machine().scheduler().timer_alloc(FUNC(perform_scan));
+	m_hbl_timer = machine().scheduler().timer_alloc(FUNC(perform_hbl));
+	m_scan_timer->adjust(machine().primary_screen->time_until_pos(0, 0));
 
 	/* and one for each DMA channel */
-	state->m_dma_timer[0] = machine.scheduler().timer_alloc(FUNC(dma_complete));
-	state->m_dma_timer[1] = machine.scheduler().timer_alloc(FUNC(dma_complete));
-	state->m_dma_timer[2] = machine.scheduler().timer_alloc(FUNC(dma_complete));
-	state->m_dma_timer[3] = machine.scheduler().timer_alloc(FUNC(dma_complete));
-	state->m_dma_timer[0]->adjust(attotime::never);
-	state->m_dma_timer[1]->adjust(attotime::never, 1);
-	state->m_dma_timer[2]->adjust(attotime::never, 2);
-	state->m_dma_timer[3]->adjust(attotime::never, 3);
+	m_dma_timer[0] = machine().scheduler().timer_alloc(FUNC(dma_complete));
+	m_dma_timer[1] = machine().scheduler().timer_alloc(FUNC(dma_complete));
+	m_dma_timer[2] = machine().scheduler().timer_alloc(FUNC(dma_complete));
+	m_dma_timer[3] = machine().scheduler().timer_alloc(FUNC(dma_complete));
+	m_dma_timer[0]->adjust(attotime::never);
+	m_dma_timer[1]->adjust(attotime::never, 1);
+	m_dma_timer[2]->adjust(attotime::never, 2);
+	m_dma_timer[3]->adjust(attotime::never, 3);
 
 	/* also one for each timer (heh) */
-	state->m_tmr_timer[0] = machine.scheduler().timer_alloc(FUNC(timer_expire));
-	state->m_tmr_timer[1] = machine.scheduler().timer_alloc(FUNC(timer_expire));
-	state->m_tmr_timer[2] = machine.scheduler().timer_alloc(FUNC(timer_expire));
-	state->m_tmr_timer[3] = machine.scheduler().timer_alloc(FUNC(timer_expire));
-	state->m_tmr_timer[0]->adjust(attotime::never);
-	state->m_tmr_timer[1]->adjust(attotime::never, 1);
-	state->m_tmr_timer[2]->adjust(attotime::never, 2);
-	state->m_tmr_timer[3]->adjust(attotime::never, 3);
+	m_tmr_timer[0] = machine().scheduler().timer_alloc(FUNC(timer_expire));
+	m_tmr_timer[1] = machine().scheduler().timer_alloc(FUNC(timer_expire));
+	m_tmr_timer[2] = machine().scheduler().timer_alloc(FUNC(timer_expire));
+	m_tmr_timer[3] = machine().scheduler().timer_alloc(FUNC(timer_expire));
+	m_tmr_timer[0]->adjust(attotime::never);
+	m_tmr_timer[1]->adjust(attotime::never, 1);
+	m_tmr_timer[2]->adjust(attotime::never, 2);
+	m_tmr_timer[3]->adjust(attotime::never, 3);
 
 	/* and an IRQ handling timer */
-	state->m_irq_timer = machine.scheduler().timer_alloc(FUNC(handle_irq));
-	state->m_irq_timer->adjust(attotime::never);
+	m_irq_timer = machine().scheduler().timer_alloc(FUNC(handle_irq));
+	m_irq_timer->adjust(attotime::never);
 }
 
 ROM_START( gba )
@@ -3158,8 +3156,6 @@ static MACHINE_CONFIG_START( gbadv, gba_state )
 	MCFG_CPU_ADD("maincpu", ARM7, 16777216)
 	MCFG_CPU_PROGRAM_MAP(gbadvance_map)
 
-	MCFG_MACHINE_START(gba)
-	MCFG_MACHINE_RESET(gba)
 
 	MCFG_SCREEN_ADD("gbalcd", RASTER)	// htot hst vwid vtot vst vis
 	MCFG_SCREEN_RAW_PARAMS(16777216/4, 308, 0,  240, 228, 0,  160)
@@ -3167,7 +3163,6 @@ static MACHINE_CONFIG_START( gbadv, gba_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_LENGTH(32768)
-	MCFG_PALETTE_INIT( gba )
 
 	MCFG_SPEAKER_STANDARD_STEREO("spkleft", "spkright")
 	MCFG_SOUND_ADD("custom", GAMEBOY, 0)

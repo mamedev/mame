@@ -166,15 +166,14 @@ INPUT_CHANGED_MEMBER(segag80v_state::service_switch)
 }
 
 
-static MACHINE_START( g80v )
+void segag80v_state::machine_start()
 {
-	segag80v_state *state = machine.driver_data<segag80v_state>();
 	/* register for save states */
-	state_save_register_global_array(machine, state->m_mult_data);
-	state_save_register_global(machine, state->m_mult_result);
-	state_save_register_global(machine, state->m_spinner_select);
-	state_save_register_global(machine, state->m_spinner_sign);
-	state_save_register_global(machine, state->m_spinner_count);
+	state_save_register_global_array(machine(), m_mult_data);
+	state_save_register_global(machine(), m_mult_result);
+	state_save_register_global(machine(), m_spinner_select);
+	state_save_register_global(machine(), m_spinner_sign);
+	state_save_register_global(machine(), m_spinner_count);
 }
 
 
@@ -901,7 +900,6 @@ static MACHINE_CONFIG_START( g80v_base, segag80v_state )
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(g80v)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", VECTOR)
@@ -910,7 +908,6 @@ static MACHINE_CONFIG_START( g80v_base, segag80v_state )
 	MCFG_SCREEN_VISIBLE_AREA(512, 1536, 640-32, 1408+32)
 	MCFG_SCREEN_UPDATE_STATIC(segag80v)
 
-	MCFG_VIDEO_START(segag80v)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

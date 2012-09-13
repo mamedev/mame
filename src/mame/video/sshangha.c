@@ -20,10 +20,10 @@ WRITE16_MEMBER(sshangha_state::sshangha_video_w)
 
 /******************************************************************************/
 
-VIDEO_START( sshangha )
+void sshangha_state::video_start()
 {
-	machine.device<decospr_device>("spritegen1")->alloc_sprite_bitmap();
-	machine.device<decospr_device>("spritegen2")->alloc_sprite_bitmap();
+	machine().device<decospr_device>("spritegen1")->alloc_sprite_bitmap();
+	machine().device<decospr_device>("spritegen2")->alloc_sprite_bitmap();
 }
 
 /******************************************************************************/

@@ -662,14 +662,13 @@ static const tc0140syt_interface rbisland_tc0140syt_intf =
 	"maincpu", "audiocpu"
 };
 
-static MACHINE_START( rbisland )
+void rbisland_state::machine_start()
 {
-	rbisland_state *state = machine.driver_data<rbisland_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_pc080sn = machine.device("pc080sn");
-	state->m_pc090oj = machine.device("pc090oj");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_pc080sn = machine().device("pc080sn");
+	m_pc090oj = machine().device("pc090oj");
 }
 
 static MACHINE_CONFIG_START( rbisland, rbisland_state )
@@ -684,7 +683,6 @@ static MACHINE_CONFIG_START( rbisland, rbisland_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_MACHINE_START(rbisland)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -725,7 +723,6 @@ static MACHINE_CONFIG_START( jumping, rbisland_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough ? */
 
-	MCFG_MACHINE_START(rbisland)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -738,7 +735,7 @@ static MACHINE_CONFIG_START( jumping, rbisland_state )
 	MCFG_GFXDECODE(jumping)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(jumping)
+	MCFG_VIDEO_START_OVERRIDE(rbisland_state,jumping)
 
 	MCFG_PC080SN_ADD("pc080sn", jumping_pc080sn_intf)
 

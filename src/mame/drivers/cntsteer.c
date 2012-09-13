@@ -83,14 +83,21 @@ public:
 	DECLARE_DRIVER_INIT(zerotrgt);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	DECLARE_MACHINE_START(cntsteer);
+	DECLARE_MACHINE_RESET(cntsteer);
+	DECLARE_VIDEO_START(cntsteer);
+	DECLARE_MACHINE_START(zerotrgt);
+	DECLARE_MACHINE_RESET(zerotrgt);
+	DECLARE_VIDEO_START(zerotrgt);
+	DECLARE_PALETTE_INIT(zerotrgt);
 };
 
 
-static PALETTE_INIT( zerotrgt )
+PALETTE_INIT_MEMBER(cntsteer_state,zerotrgt)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -110,7 +117,7 @@ static PALETTE_INIT( zerotrgt )
 		bit2 = (color_prom[i + 256] >> 2) & 0x01;
 		b = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
 
-		palette_set_color(machine, i, MAKE_RGB(r,g,b));
+		palette_set_color(machine(), i, MAKE_RGB(r,g,b));
 	}
 }
 
@@ -131,26 +138,24 @@ TILE_GET_INFO_MEMBER(cntsteer_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, 0x30 + ((attr & 0x78) >> 3), 0);
 }
 
-static VIDEO_START( cntsteer )
+VIDEO_START_MEMBER(cntsteer_state,cntsteer)
 {
-	cntsteer_state *state = machine.driver_data<cntsteer_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cntsteer_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 64, 64);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cntsteer_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS_FLIP_X, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cntsteer_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cntsteer_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS_FLIP_X, 8, 8, 32, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	//state->m_bg_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
+	//m_bg_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
 }
 
-static VIDEO_START( zerotrgt )
+VIDEO_START_MEMBER(cntsteer_state,zerotrgt)
 {
-	cntsteer_state *state = machine.driver_data<cntsteer_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cntsteer_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cntsteer_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS_FLIP_X, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cntsteer_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cntsteer_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS_FLIP_X, 8, 8, 32, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	//state->m_bg_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
+	//m_bg_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
 }
 
 /*
@@ -811,60 +816,56 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-static MACHINE_START( cntsteer )
+MACHINE_START_MEMBER(cntsteer_state,cntsteer)
 {
-	cntsteer_state *state = machine.driver_data<cntsteer_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_subcpu = machine.device<cpu_device>("subcpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_subcpu = machine().device<cpu_device>("subcpu");
 
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_bg_bank));
-	state->save_item(NAME(state->m_scrolly));
-	state->save_item(NAME(state->m_scrollx));
-	state->save_item(NAME(state->m_scrollx_hi));
-	state->save_item(NAME(state->m_scrolly_hi));
-	state->save_item(NAME(state->m_rotation_x));
-	state->save_item(NAME(state->m_rotation_sign));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_bg_bank));
+	save_item(NAME(m_scrolly));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrollx_hi));
+	save_item(NAME(m_scrolly_hi));
+	save_item(NAME(m_rotation_x));
+	save_item(NAME(m_rotation_sign));
 
-	state->save_item(NAME(state->m_bg_color_bank));
-	state->save_item(NAME(state->m_disable_roz));
+	save_item(NAME(m_bg_color_bank));
+	save_item(NAME(m_disable_roz));
 }
 
-static MACHINE_START( zerotrgt )
+MACHINE_START_MEMBER(cntsteer_state,zerotrgt)
 {
-	cntsteer_state *state = machine.driver_data<cntsteer_state>();
 
-	state->save_item(NAME(state->m_nmimask));
-	MACHINE_START_CALL(cntsteer);
-}
-
-
-static MACHINE_RESET( cntsteer )
-{
-	cntsteer_state *state = machine.driver_data<cntsteer_state>();
-
-	state->m_flipscreen = 0;
-	state->m_bg_bank = 0;
-	state->m_scrolly = 0;
-	state->m_scrollx = 0;
-	state->m_scrollx_hi = 0;
-	state->m_scrolly_hi = 0;
-	state->m_rotation_x = 0;
-	state->m_rotation_sign = 0;
-
-	state->m_bg_color_bank = 0;
-	state->m_disable_roz = 0;
+	save_item(NAME(m_nmimask));
+	MACHINE_START_CALL_MEMBER(cntsteer);
 }
 
 
-static MACHINE_RESET( zerotrgt )
+MACHINE_RESET_MEMBER(cntsteer_state,cntsteer)
 {
-	cntsteer_state *state = machine.driver_data<cntsteer_state>();
 
-	state->m_nmimask = 0;
-	MACHINE_RESET_CALL(cntsteer);
+	m_flipscreen = 0;
+	m_bg_bank = 0;
+	m_scrolly = 0;
+	m_scrollx = 0;
+	m_scrollx_hi = 0;
+	m_scrolly_hi = 0;
+	m_rotation_x = 0;
+	m_rotation_sign = 0;
+
+	m_bg_color_bank = 0;
+	m_disable_roz = 0;
+}
+
+
+MACHINE_RESET_MEMBER(cntsteer_state,zerotrgt)
+{
+
+	m_nmimask = 0;
+	MACHINE_RESET_CALL_MEMBER(cntsteer);
 }
 
 static const ay8910_interface ay8910_config =
@@ -892,8 +893,8 @@ static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT(sound_interrupt, 480)
 
-	MCFG_MACHINE_START(cntsteer)
-	MCFG_MACHINE_RESET(cntsteer)
+	MCFG_MACHINE_START_OVERRIDE(cntsteer_state,cntsteer)
+	MCFG_MACHINE_RESET_OVERRIDE(cntsteer_state,cntsteer)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -907,9 +908,9 @@ static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 
 	MCFG_GFXDECODE(cntsteer)
 	MCFG_PALETTE_LENGTH(256)
-//  MCFG_PALETTE_INIT(zerotrgt)
+//  MCFG_PALETTE_INIT_OVERRIDE(cntsteer_state,zerotrgt)
 
-	MCFG_VIDEO_START(cntsteer)
+	MCFG_VIDEO_START_OVERRIDE(cntsteer_state,cntsteer)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -941,8 +942,8 @@ static MACHINE_CONFIG_START( zerotrgt, cntsteer_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(zerotrgt)
-	MCFG_MACHINE_RESET(zerotrgt)
+	MCFG_MACHINE_START_OVERRIDE(cntsteer_state,zerotrgt)
+	MCFG_MACHINE_RESET_OVERRIDE(cntsteer_state,zerotrgt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -955,8 +956,8 @@ static MACHINE_CONFIG_START( zerotrgt, cntsteer_state )
 	MCFG_GFXDECODE(zerotrgt)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(zerotrgt)
-	MCFG_VIDEO_START(zerotrgt)
+	MCFG_PALETTE_INIT_OVERRIDE(cntsteer_state,zerotrgt)
+	MCFG_VIDEO_START_OVERRIDE(cntsteer_state,zerotrgt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

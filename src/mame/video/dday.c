@@ -48,15 +48,15 @@ static void start_countdown_timer(running_machine &machine)
 
 ***************************************************************************/
 
-PALETTE_INIT( dday )
+void dday_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	palette_set_shadow_factor(machine, 1.0 / 8);
+	palette_set_shadow_factor(machine(), 1.0 / 8);
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x100);
+	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -65,85 +65,85 @@ PALETTE_INIT( dday )
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	for (i = 0; i < 0x100; i++)
-		colortable_entry_set_value(machine.colortable, i, i);
+		colortable_entry_set_value(machine().colortable, i, i);
 
 	/* HACK!!! This table is handgenerated, but it matches the screenshot.
        I have no clue how it really works */
-	colortable_entry_set_value(machine.colortable, 0*8+0+0, 0x00);
-	colortable_entry_set_value(machine.colortable, 0*8+0+1, 0x01);
-	colortable_entry_set_value(machine.colortable, 0*8+0+2, 0x15);
-	colortable_entry_set_value(machine.colortable, 0*8+0+3, 0x02);
-	colortable_entry_set_value(machine.colortable, 0*8+4+0, 0x00);
-	colortable_entry_set_value(machine.colortable, 0*8+4+1, 0x01);
-	colortable_entry_set_value(machine.colortable, 0*8+4+2, 0x15);
-	colortable_entry_set_value(machine.colortable, 0*8+4+3, 0x02);
+	colortable_entry_set_value(machine().colortable, 0*8+0+0, 0x00);
+	colortable_entry_set_value(machine().colortable, 0*8+0+1, 0x01);
+	colortable_entry_set_value(machine().colortable, 0*8+0+2, 0x15);
+	colortable_entry_set_value(machine().colortable, 0*8+0+3, 0x02);
+	colortable_entry_set_value(machine().colortable, 0*8+4+0, 0x00);
+	colortable_entry_set_value(machine().colortable, 0*8+4+1, 0x01);
+	colortable_entry_set_value(machine().colortable, 0*8+4+2, 0x15);
+	colortable_entry_set_value(machine().colortable, 0*8+4+3, 0x02);
 
-	colortable_entry_set_value(machine.colortable, 1*8+0+0, 0x04);
-	colortable_entry_set_value(machine.colortable, 1*8+0+1, 0x05);
-	colortable_entry_set_value(machine.colortable, 1*8+0+2, 0x03);
-	colortable_entry_set_value(machine.colortable, 1*8+0+3, 0x07);
-	colortable_entry_set_value(machine.colortable, 1*8+4+0, 0x04);
-	colortable_entry_set_value(machine.colortable, 1*8+4+1, 0x05);
-	colortable_entry_set_value(machine.colortable, 1*8+4+2, 0x03);
-	colortable_entry_set_value(machine.colortable, 1*8+4+3, 0x07);
+	colortable_entry_set_value(machine().colortable, 1*8+0+0, 0x04);
+	colortable_entry_set_value(machine().colortable, 1*8+0+1, 0x05);
+	colortable_entry_set_value(machine().colortable, 1*8+0+2, 0x03);
+	colortable_entry_set_value(machine().colortable, 1*8+0+3, 0x07);
+	colortable_entry_set_value(machine().colortable, 1*8+4+0, 0x04);
+	colortable_entry_set_value(machine().colortable, 1*8+4+1, 0x05);
+	colortable_entry_set_value(machine().colortable, 1*8+4+2, 0x03);
+	colortable_entry_set_value(machine().colortable, 1*8+4+3, 0x07);
 
-	colortable_entry_set_value(machine.colortable, 2*8+0+0, 0x08);
-	colortable_entry_set_value(machine.colortable, 2*8+0+1, 0x15);
-	colortable_entry_set_value(machine.colortable, 2*8+0+2, 0x0a);
-	colortable_entry_set_value(machine.colortable, 2*8+0+3, 0x03);
-	colortable_entry_set_value(machine.colortable, 2*8+4+0, 0x08);
-	colortable_entry_set_value(machine.colortable, 2*8+4+1, 0x15);
-	colortable_entry_set_value(machine.colortable, 2*8+4+2, 0x0a);
-	colortable_entry_set_value(machine.colortable, 2*8+4+3, 0x03);
+	colortable_entry_set_value(machine().colortable, 2*8+0+0, 0x08);
+	colortable_entry_set_value(machine().colortable, 2*8+0+1, 0x15);
+	colortable_entry_set_value(machine().colortable, 2*8+0+2, 0x0a);
+	colortable_entry_set_value(machine().colortable, 2*8+0+3, 0x03);
+	colortable_entry_set_value(machine().colortable, 2*8+4+0, 0x08);
+	colortable_entry_set_value(machine().colortable, 2*8+4+1, 0x15);
+	colortable_entry_set_value(machine().colortable, 2*8+4+2, 0x0a);
+	colortable_entry_set_value(machine().colortable, 2*8+4+3, 0x03);
 
-	colortable_entry_set_value(machine.colortable, 3*8+0+0, 0x08);
-	colortable_entry_set_value(machine.colortable, 3*8+0+1, 0x15);
-	colortable_entry_set_value(machine.colortable, 3*8+0+2, 0x0a);
-	colortable_entry_set_value(machine.colortable, 3*8+0+3, 0x03);
-	colortable_entry_set_value(machine.colortable, 3*8+4+0, 0x08);
-	colortable_entry_set_value(machine.colortable, 3*8+4+1, 0x15);
-	colortable_entry_set_value(machine.colortable, 3*8+4+2, 0x0a);
-	colortable_entry_set_value(machine.colortable, 3*8+4+3, 0x03);
+	colortable_entry_set_value(machine().colortable, 3*8+0+0, 0x08);
+	colortable_entry_set_value(machine().colortable, 3*8+0+1, 0x15);
+	colortable_entry_set_value(machine().colortable, 3*8+0+2, 0x0a);
+	colortable_entry_set_value(machine().colortable, 3*8+0+3, 0x03);
+	colortable_entry_set_value(machine().colortable, 3*8+4+0, 0x08);
+	colortable_entry_set_value(machine().colortable, 3*8+4+1, 0x15);
+	colortable_entry_set_value(machine().colortable, 3*8+4+2, 0x0a);
+	colortable_entry_set_value(machine().colortable, 3*8+4+3, 0x03);
 
-	colortable_entry_set_value(machine.colortable, 4*8+0+0, 0x10);
-	colortable_entry_set_value(machine.colortable, 4*8+0+1, 0x11);
-	colortable_entry_set_value(machine.colortable, 4*8+0+2, 0x12);
-	colortable_entry_set_value(machine.colortable, 4*8+0+3, 0x07);
-	colortable_entry_set_value(machine.colortable, 4*8+4+0, 0x10);
-	colortable_entry_set_value(machine.colortable, 4*8+4+1, 0x11);
-	colortable_entry_set_value(machine.colortable, 4*8+4+2, 0x12);
-	colortable_entry_set_value(machine.colortable, 4*8+4+3, 0x07);
+	colortable_entry_set_value(machine().colortable, 4*8+0+0, 0x10);
+	colortable_entry_set_value(machine().colortable, 4*8+0+1, 0x11);
+	colortable_entry_set_value(machine().colortable, 4*8+0+2, 0x12);
+	colortable_entry_set_value(machine().colortable, 4*8+0+3, 0x07);
+	colortable_entry_set_value(machine().colortable, 4*8+4+0, 0x10);
+	colortable_entry_set_value(machine().colortable, 4*8+4+1, 0x11);
+	colortable_entry_set_value(machine().colortable, 4*8+4+2, 0x12);
+	colortable_entry_set_value(machine().colortable, 4*8+4+3, 0x07);
 
-	colortable_entry_set_value(machine.colortable, 5*8+0+0, 0x1d);
-	colortable_entry_set_value(machine.colortable, 5*8+0+1, 0x15);
-	colortable_entry_set_value(machine.colortable, 5*8+0+2, 0x16);
-	colortable_entry_set_value(machine.colortable, 5*8+0+3, 0x1b);
-	colortable_entry_set_value(machine.colortable, 5*8+4+0, 0x1d);
-	colortable_entry_set_value(machine.colortable, 5*8+4+1, 0x15);
-	colortable_entry_set_value(machine.colortable, 5*8+4+2, 0x16);
-	colortable_entry_set_value(machine.colortable, 5*8+4+3, 0x1b);
+	colortable_entry_set_value(machine().colortable, 5*8+0+0, 0x1d);
+	colortable_entry_set_value(machine().colortable, 5*8+0+1, 0x15);
+	colortable_entry_set_value(machine().colortable, 5*8+0+2, 0x16);
+	colortable_entry_set_value(machine().colortable, 5*8+0+3, 0x1b);
+	colortable_entry_set_value(machine().colortable, 5*8+4+0, 0x1d);
+	colortable_entry_set_value(machine().colortable, 5*8+4+1, 0x15);
+	colortable_entry_set_value(machine().colortable, 5*8+4+2, 0x16);
+	colortable_entry_set_value(machine().colortable, 5*8+4+3, 0x1b);
 
-	colortable_entry_set_value(machine.colortable, 6*8+0+0, 0x1d);
-	colortable_entry_set_value(machine.colortable, 6*8+0+1, 0x15);
-	colortable_entry_set_value(machine.colortable, 6*8+0+2, 0x1a);
-	colortable_entry_set_value(machine.colortable, 6*8+0+3, 0x1b);
-	colortable_entry_set_value(machine.colortable, 6*8+4+0, 0x1d);
-	colortable_entry_set_value(machine.colortable, 6*8+4+1, 0x15);
-	colortable_entry_set_value(machine.colortable, 6*8+4+2, 0x1a);
-	colortable_entry_set_value(machine.colortable, 6*8+4+3, 0x1b);
+	colortable_entry_set_value(machine().colortable, 6*8+0+0, 0x1d);
+	colortable_entry_set_value(machine().colortable, 6*8+0+1, 0x15);
+	colortable_entry_set_value(machine().colortable, 6*8+0+2, 0x1a);
+	colortable_entry_set_value(machine().colortable, 6*8+0+3, 0x1b);
+	colortable_entry_set_value(machine().colortable, 6*8+4+0, 0x1d);
+	colortable_entry_set_value(machine().colortable, 6*8+4+1, 0x15);
+	colortable_entry_set_value(machine().colortable, 6*8+4+2, 0x1a);
+	colortable_entry_set_value(machine().colortable, 6*8+4+3, 0x1b);
 
-	colortable_entry_set_value(machine.colortable, 7*8+0+0, 0x1d);
-	colortable_entry_set_value(machine.colortable, 7*8+0+1, 0x02);
-	colortable_entry_set_value(machine.colortable, 7*8+0+2, 0x04);
-	colortable_entry_set_value(machine.colortable, 7*8+0+3, 0x1b);
-	colortable_entry_set_value(machine.colortable, 7*8+4+0, 0x1d);
-	colortable_entry_set_value(machine.colortable, 7*8+4+1, 0x02);
-	colortable_entry_set_value(machine.colortable, 7*8+4+2, 0x04);
-	colortable_entry_set_value(machine.colortable, 7*8+4+3, 0x1b);
+	colortable_entry_set_value(machine().colortable, 7*8+0+0, 0x1d);
+	colortable_entry_set_value(machine().colortable, 7*8+0+1, 0x02);
+	colortable_entry_set_value(machine().colortable, 7*8+0+2, 0x04);
+	colortable_entry_set_value(machine().colortable, 7*8+0+3, 0x1b);
+	colortable_entry_set_value(machine().colortable, 7*8+4+0, 0x1d);
+	colortable_entry_set_value(machine().colortable, 7*8+4+1, 0x02);
+	colortable_entry_set_value(machine().colortable, 7*8+4+2, 0x04);
+	colortable_entry_set_value(machine().colortable, 7*8+4+3, 0x1b);
 }
 
 
@@ -207,21 +207,20 @@ TILE_GET_INFO_MEMBER(dday_state::get_sl_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( dday )
+void dday_state::video_start()
 {
-	dday_state *state = machine.driver_data<dday_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dday_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dday_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_text_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dday_state::get_text_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_sl_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dday_state::get_sl_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dday_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dday_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_text_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dday_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_sl_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dday_state::get_sl_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	machine.primary_screen->register_screen_bitmap(state->m_main_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_main_bitmap);
 
-	state->m_bg_tilemap->set_transmask(0, 0x00f0, 0xff0f); /* pens 0-3 have priority over the foreground layer */
-	state->m_fg_tilemap->set_transparent_pen(0);
-	state->m_text_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_transmask(0, 0x00f0, 0xff0f); /* pens 0-3 have priority over the foreground layer */
+	m_fg_tilemap->set_transparent_pen(0);
+	m_text_tilemap->set_transparent_pen(0);
 
-	start_countdown_timer(machine);
+	start_countdown_timer(machine());
 }
 
 WRITE8_MEMBER(dday_state::dday_bgvideoram_w)

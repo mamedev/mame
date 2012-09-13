@@ -290,7 +290,6 @@ static MACHINE_CONFIG_START( iqblock, iqblock_state )
 	MCFG_GFXDECODE(iqblock)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(iqblock)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

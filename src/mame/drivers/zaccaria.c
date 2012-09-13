@@ -611,8 +611,6 @@ static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
 	MCFG_GFXDECODE(zaccaria)
 	MCFG_PALETTE_LENGTH(32*8+32*8)
 
-	MCFG_PALETTE_INIT(zaccaria)
-	MCFG_VIDEO_START(zaccaria)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

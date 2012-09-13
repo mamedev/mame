@@ -47,11 +47,13 @@ public:
 	DECLARE_WRITE16_MEMBER(paletteram16_xbgr_word_be_tilehigh_w);
 	DECLARE_WRITE16_MEMBER(sshangha_video_w);
 	DECLARE_DRIVER_INIT(sshangha);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/sshangha.c -----------*/
 
-VIDEO_START( sshangha );
+
 SCREEN_UPDATE_RGB32( sshangha );
 

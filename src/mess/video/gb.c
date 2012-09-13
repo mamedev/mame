@@ -77,27 +77,26 @@ static const unsigned char palette_megaduck[] = {
 };
 
 /* Initialise the palettes */
-PALETTE_INIT( gb )
+PALETTE_INIT_MEMBER(gb_state,gb)
 {
 	int ii;
 	for( ii = 0; ii < 4; ii++)
 	{
-		palette_set_color_rgb(machine, ii, palette[ii*3+0], palette[ii*3+1], palette[ii*3+2]);
+		palette_set_color_rgb(machine(), ii, palette[ii*3+0], palette[ii*3+1], palette[ii*3+2]);
 	}
 }
 
-PALETTE_INIT( gbp )
+PALETTE_INIT_MEMBER(gb_state,gbp)
 {
 	int ii;
 	for( ii = 0; ii < 4; ii++)
 	{
-		palette_set_color_rgb(machine, ii, palette[(ii + 4)*3+0], palette[(ii + 4)*3+1], palette[(ii + 4)*3+2]);
+		palette_set_color_rgb(machine(), ii, palette[(ii + 4)*3+0], palette[(ii + 4)*3+1], palette[(ii + 4)*3+2]);
 	}
 }
 
-PALETTE_INIT( sgb )
+PALETTE_INIT_MEMBER(gb_state,sgb)
 {
-	gb_state *state = machine.driver_data<gb_state>();
 	int ii, r, g, b;
 
 	for( ii = 0; ii < 32768; ii++ )
@@ -105,22 +104,21 @@ PALETTE_INIT( sgb )
 		r = (ii & 0x1F) << 3;
 		g = ((ii >> 5) & 0x1F) << 3;
 		b = ((ii >> 10) & 0x1F) << 3;
-		palette_set_color_rgb(machine,  ii, r, g, b );
+		palette_set_color_rgb(machine(),  ii, r, g, b );
 	}
 
 	/* Some default colours for non-SGB games */
-	state->m_sgb_pal[0] = 32767;
-	state->m_sgb_pal[1] = 21140;
-	state->m_sgb_pal[2] = 10570;
-	state->m_sgb_pal[3] = 0;
+	m_sgb_pal[0] = 32767;
+	m_sgb_pal[1] = 21140;
+	m_sgb_pal[2] = 10570;
+	m_sgb_pal[3] = 0;
 	/* The rest of the colortable can be black */
 	for( ii = 4; ii < 8*16; ii++ )
-		state->m_sgb_pal[ii] = 0;
+		m_sgb_pal[ii] = 0;
 }
 
-PALETTE_INIT( gbc )
+PALETTE_INIT_MEMBER(gb_state,gbc)
 {
-	gb_state *state = machine.driver_data<gb_state>();
 	int ii, r, g, b;
 
 	for( ii = 0; ii < 32768; ii++ )
@@ -128,23 +126,23 @@ PALETTE_INIT( gbc )
 		r = (ii & 0x1F) << 3;
 		g = ((ii >> 5) & 0x1F) << 3;
 		b = ((ii >> 10) & 0x1F) << 3;
-		palette_set_color_rgb( machine, ii, r, g, b );
+		palette_set_color_rgb( machine(), ii, r, g, b );
 	}
 
 	/* Background is initialised as white */
 	for( ii = 0; ii < 32; ii++ )
-		state->m_lcd.cgb_bpal[ii] = 32767;
+		m_lcd.cgb_bpal[ii] = 32767;
 	/* Sprites are supposed to be uninitialized, but we'll make them black */
 	for( ii = 0; ii < 32; ii++ )
-		state->m_lcd.cgb_spal[ii] = 0;
+		m_lcd.cgb_spal[ii] = 0;
 }
 
-PALETTE_INIT( megaduck )
+PALETTE_INIT_MEMBER(gb_state,megaduck)
 {
 	int ii;
 	for( ii = 0; ii < 4; ii++)
 	{
-		palette_set_color_rgb(machine, ii, palette_megaduck[ii*3+0], palette_megaduck[ii*3+1], palette_megaduck[ii*3+2]);
+		palette_set_color_rgb(machine(), ii, palette_megaduck[ii*3+0], palette_megaduck[ii*3+1], palette_megaduck[ii*3+2]);
 	}
 }
 
@@ -1201,18 +1199,16 @@ static TIMER_CALLBACK( gb_video_init_vbl )
 	machine.device("maincpu")->execute().set_input_line(VBL_INT, ASSERT_LINE );
 }
 
-MACHINE_START( gb_video )
+MACHINE_START_MEMBER(gb_state,gb_video)
 {
-	gb_state *state = machine.driver_data<gb_state>();
-	state->m_lcd.lcd_timer = machine.scheduler().timer_alloc(FUNC(gb_lcd_timer_proc));
-	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
+	m_lcd.lcd_timer = machine().scheduler().timer_alloc(FUNC(gb_lcd_timer_proc));
+	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }
 
-MACHINE_START( gbc_video )
+MACHINE_START_MEMBER(gb_state,gbc_video)
 {
-	gb_state *state = machine.driver_data<gb_state>();
-	state->m_lcd.lcd_timer = machine.scheduler().timer_alloc(FUNC(gbc_lcd_timer_proc));
-	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
+	m_lcd.lcd_timer = machine().scheduler().timer_alloc(FUNC(gbc_lcd_timer_proc));
+	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }
 
 UINT32 gb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

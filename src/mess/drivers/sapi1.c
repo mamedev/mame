@@ -174,8 +174,8 @@ static MACHINE_CONFIG_START( sapi1, sapi1_state )
 	MCFG_CPU_PROGRAM_MAP(sapi1_mem)
 	MCFG_CPU_IO_MAP(sapi1_io)
 
-	MCFG_MACHINE_START( sapi1 )
-	MCFG_MACHINE_RESET( sapi1 )
+	MCFG_MACHINE_START_OVERRIDE(sapi1_state, sapi1 )
+	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapi1 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -188,7 +188,7 @@ static MACHINE_CONFIG_START( sapi1, sapi1_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START(sapi1)
+	MCFG_VIDEO_START_OVERRIDE(sapi1_state,sapi1)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -208,8 +208,8 @@ static MACHINE_CONFIG_START( sapi3, sapi1_state )
 	MCFG_CPU_PROGRAM_MAP(sapi3_mem)
 	MCFG_CPU_IO_MAP(sapi3_io)
 
-	MCFG_MACHINE_START( sapi1 )
-	MCFG_MACHINE_RESET( sapizps3 )
+	MCFG_MACHINE_START_OVERRIDE(sapi1_state, sapi1 )
+	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapizps3 )
 
 	/* video hardware */
 	//MCFG_SCREEN_ADD("screen", RASTER)
@@ -217,7 +217,7 @@ static MACHINE_CONFIG_START( sapi3, sapi1_state )
 	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	//MCFG_SCREEN_SIZE(80*6, 24*9)
 	//MCFG_SCREEN_VISIBLE_AREA(0, 80*6-1, 0, 24*9-1)
-	//MCFG_VIDEO_START(sapizps3)
+	//MCFG_VIDEO_START_OVERRIDE(sapi1_state,sapizps3)
 	//MCFG_SCREEN_UPDATE_STATIC(sapizps3)
 	//MCFG_PALETTE_LENGTH(2)
 	//MCFG_PALETTE_INIT(black_and_white)

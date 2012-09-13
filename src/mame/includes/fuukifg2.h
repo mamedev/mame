@@ -40,11 +40,14 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_2);
 	TILE_GET_INFO_MEMBER(get_tile_info_3);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/fuukifg2.c -----------*/
 
 
-VIDEO_START( fuuki16 );
+
 SCREEN_UPDATE_IND16( fuuki16 );

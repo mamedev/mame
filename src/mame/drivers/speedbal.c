@@ -243,7 +243,6 @@ static MACHINE_CONFIG_START( speedbal, speedbal_state )
 	MCFG_GFXDECODE(speedbal)
 	MCFG_PALETTE_LENGTH(768)
 
-	MCFG_VIDEO_START(speedbal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

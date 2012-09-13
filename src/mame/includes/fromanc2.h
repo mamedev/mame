@@ -97,6 +97,12 @@ public:
 	TILE_GET_INFO_MEMBER(fromancr_get_v1_l0_tile_info);
 	TILE_GET_INFO_MEMBER(fromancr_get_v1_l1_tile_info);
 	TILE_GET_INFO_MEMBER(fromancr_get_v1_l2_tile_info);
+	virtual void machine_reset();
+	DECLARE_MACHINE_START(fromanc2);
+	DECLARE_VIDEO_START(fromanc2);
+	DECLARE_VIDEO_START(fromancr);
+	DECLARE_MACHINE_START(fromanc4);
+	DECLARE_VIDEO_START(fromanc4);
 };
 
 
@@ -106,8 +112,8 @@ public:
 
 SCREEN_UPDATE_IND16( fromanc2_left );
 SCREEN_UPDATE_IND16( fromanc2_right );
-VIDEO_START( fromanc2 );
-VIDEO_START( fromancr );
-VIDEO_START( fromanc4 );
+
+
+
 
 void fromancr_gfxbank_w(running_machine &machine, int data);

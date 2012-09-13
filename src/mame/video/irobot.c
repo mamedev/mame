@@ -37,9 +37,9 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( irobot )
+void irobot_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* convert the color prom for the text palette */
@@ -53,7 +53,7 @@ PALETTE_INIT( irobot )
 
 		int swapped_i = BITSWAP8(i,7,6,5,4,3,0,1,2);
 
-		palette_set_color(machine, swapped_i + 64, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), swapped_i + 64, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -94,22 +94,21 @@ void irobot_poly_clear(running_machine &machine)
   Start the video hardware emulation.
 
 ***************************************************************************/
-VIDEO_START( irobot )
+void irobot_state::video_start()
 {
-	irobot_state *state = machine.driver_data<irobot_state>();
 	/* Setup 2 bitmaps for the polygon generator */
-	int height = machine.primary_screen->height();
-	state->m_polybitmap1 = auto_alloc_array(machine, UINT8, BITMAP_WIDTH * height);
-	state->m_polybitmap2 = auto_alloc_array(machine, UINT8, BITMAP_WIDTH * height);
+	int height = machine().primary_screen->height();
+	m_polybitmap1 = auto_alloc_array(machine(), UINT8, BITMAP_WIDTH * height);
+	m_polybitmap2 = auto_alloc_array(machine(), UINT8, BITMAP_WIDTH * height);
 
 	/* clear the bitmaps so we start with valid palette look-up values for drawing */
-	_irobot_poly_clear(machine, state->m_polybitmap1);
-	_irobot_poly_clear(machine, state->m_polybitmap2);
+	_irobot_poly_clear(machine(), m_polybitmap1);
+	_irobot_poly_clear(machine(), m_polybitmap2);
 
 	/* Set clipping */
-	state->m_ir_xmin = state->m_ir_ymin = 0;
-	state->m_ir_xmax = machine.primary_screen->width();
-	state->m_ir_ymax = machine.primary_screen->height();
+	m_ir_xmin = m_ir_ymin = 0;
+	m_ir_xmax = machine().primary_screen->width();
+	m_ir_ymax = machine().primary_screen->height();
 }
 
 

@@ -571,7 +571,6 @@ static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
 	MCFG_GFXDECODE(shadfrce)
 	MCFG_PALETTE_LENGTH(0x4000)
 
-	MCFG_VIDEO_START(shadfrce)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

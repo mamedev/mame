@@ -438,12 +438,11 @@ WRITE8_MEMBER(dynax_state::adpcm_reset_w)
 	msm5205_reset_w(device, ~data & 1);
 }
 
-static MACHINE_RESET( adpcm )
+MACHINE_RESET_MEMBER(dynax_state,adpcm)
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
 	/* start with the MSM5205 reset */
-	state->m_resetkludge = 0;
-	msm5205_reset_w(machine.device("msm"), 1);
+	m_resetkludge = 0;
+	msm5205_reset_w(machine().device("msm"), 1);
 }
 
 WRITE8_MEMBER(dynax_state::yarunara_layer_half_w)
@@ -4153,111 +4152,109 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_START( dynax )
+MACHINE_START_MEMBER(dynax_state,dynax)
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_soundcpu = machine.device<cpu_device>("soundcpu");
-	state->m_rtc = machine.device("rtc");
-	state->m_ymsnd = machine.device("ymsnd");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_soundcpu = machine().device<cpu_device>("soundcpu");
+	m_rtc = machine().device("rtc");
+	m_ymsnd = machine().device("ymsnd");
 
-	state->save_item(NAME(state->m_sound_irq));
-	state->save_item(NAME(state->m_vblank_irq));
-	state->save_item(NAME(state->m_blitter_irq));
-	state->save_item(NAME(state->m_blitter2_irq));
-	state->save_item(NAME(state->m_soundlatch_irq));
-	state->save_item(NAME(state->m_sound_vblank_irq));
+	save_item(NAME(m_sound_irq));
+	save_item(NAME(m_vblank_irq));
+	save_item(NAME(m_blitter_irq));
+	save_item(NAME(m_blitter2_irq));
+	save_item(NAME(m_soundlatch_irq));
+	save_item(NAME(m_sound_vblank_irq));
 
-	state->save_item(NAME(state->m_input_sel));
-	state->save_item(NAME(state->m_dsw_sel));
-	state->save_item(NAME(state->m_keyb));
-	state->save_item(NAME(state->m_coins));
-	state->save_item(NAME(state->m_hopper));
-	state->save_item(NAME(state->m_hnoridur_bank));
-	state->save_item(NAME(state->m_palbank));
-	state->save_item(NAME(state->m_msm5205next));
-	state->save_item(NAME(state->m_resetkludge));
-	state->save_item(NAME(state->m_toggle));
-	state->save_item(NAME(state->m_toggle_cpu1));
-	state->save_item(NAME(state->m_yarunara_clk_toggle));
-	state->save_item(NAME(state->m_soundlatch_ack));
-	state->save_item(NAME(state->m_soundlatch_full));
-	state->save_item(NAME(state->m_latch));
-	state->save_item(NAME(state->m_rombank));
-	state->save_item(NAME(state->m_tenkai_p5_val));
-	state->save_item(NAME(state->m_tenkai_6c));
-	state->save_item(NAME(state->m_tenkai_70));
-	state->save_item(NAME(state->m_gekisha_val));
-	state->save_item(NAME(state->m_palette_ram));
-	state->save_item(NAME(state->m_gekisha_rom_enable));
+	save_item(NAME(m_input_sel));
+	save_item(NAME(m_dsw_sel));
+	save_item(NAME(m_keyb));
+	save_item(NAME(m_coins));
+	save_item(NAME(m_hopper));
+	save_item(NAME(m_hnoridur_bank));
+	save_item(NAME(m_palbank));
+	save_item(NAME(m_msm5205next));
+	save_item(NAME(m_resetkludge));
+	save_item(NAME(m_toggle));
+	save_item(NAME(m_toggle_cpu1));
+	save_item(NAME(m_yarunara_clk_toggle));
+	save_item(NAME(m_soundlatch_ack));
+	save_item(NAME(m_soundlatch_full));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_rombank));
+	save_item(NAME(m_tenkai_p5_val));
+	save_item(NAME(m_tenkai_6c));
+	save_item(NAME(m_tenkai_70));
+	save_item(NAME(m_gekisha_val));
+	save_item(NAME(m_palette_ram));
+	save_item(NAME(m_gekisha_rom_enable));
 }
 
-static MACHINE_RESET( dynax )
+MACHINE_RESET_MEMBER(dynax_state,dynax)
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
 
-	if (machine.device("msm") != NULL)
-		MACHINE_RESET_CALL(adpcm);
+	if (machine().device("msm") != NULL)
+		MACHINE_RESET_CALL_MEMBER(adpcm);
 
-	state->m_sound_irq = 0;
-	state->m_vblank_irq = 0;
-	state->m_blitter_irq = 0;
-	state->m_blitter2_irq = 0;
-	state->m_soundlatch_irq = 0;
-	state->m_sound_vblank_irq = 0;
+	m_sound_irq = 0;
+	m_vblank_irq = 0;
+	m_blitter_irq = 0;
+	m_blitter2_irq = 0;
+	m_soundlatch_irq = 0;
+	m_sound_vblank_irq = 0;
 
-	state->m_input_sel = 0;
-	state->m_dsw_sel = 0;
-	state->m_keyb = 0;
-	state->m_coins = 0;
-	state->m_hopper = 0;
-	state->m_hnoridur_bank = 0;
-	state->m_palbank = 0;
-	state->m_msm5205next = 0;
-	state->m_resetkludge = 0;
-	state->m_toggle = 0;
-	state->m_toggle_cpu1 = 0;
-	state->m_yarunara_clk_toggle = 0;
-	state->m_soundlatch_ack = 0;
-	state->m_soundlatch_full = 0;
-	state->m_latch = 0;
-	state->m_rombank = 0;
-	state->m_tenkai_p5_val = 0;
-	state->m_tenkai_6c = 0;
-	state->m_tenkai_70 = 0;
-	state->m_gekisha_val[0] = 0;
-	state->m_gekisha_val[1] = 0;
-	state->m_gekisha_rom_enable = 0;
+	m_input_sel = 0;
+	m_dsw_sel = 0;
+	m_keyb = 0;
+	m_coins = 0;
+	m_hopper = 0;
+	m_hnoridur_bank = 0;
+	m_palbank = 0;
+	m_msm5205next = 0;
+	m_resetkludge = 0;
+	m_toggle = 0;
+	m_toggle_cpu1 = 0;
+	m_yarunara_clk_toggle = 0;
+	m_soundlatch_ack = 0;
+	m_soundlatch_full = 0;
+	m_latch = 0;
+	m_rombank = 0;
+	m_tenkai_p5_val = 0;
+	m_tenkai_6c = 0;
+	m_tenkai_70 = 0;
+	m_gekisha_val[0] = 0;
+	m_gekisha_val[1] = 0;
+	m_gekisha_rom_enable = 0;
 
-	memset(state->m_palette_ram, 0, ARRAY_LENGTH(state->m_palette_ram));
+	memset(m_palette_ram, 0, ARRAY_LENGTH(m_palette_ram));
 }
 
-static MACHINE_START( hanamai )
+MACHINE_START_MEMBER(dynax_state,hanamai)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	machine.root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x8000], 0x8000);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	machine().root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x8000], 0x8000);
 
-	MACHINE_START_CALL(dynax);
+	MACHINE_START_CALL_MEMBER(dynax);
 }
 
-static MACHINE_START( hnoridur )
+MACHINE_START_MEMBER(dynax_state,hnoridur)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	int bank_n = (machine.root_device().memregion("maincpu")->bytes() - 0x10000) / 0x8000;
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	int bank_n = (machine().root_device().memregion("maincpu")->bytes() - 0x10000) / 0x8000;
 
-	machine.root_device().membank("bank1")->configure_entries(0, bank_n, &ROM[0x10000], 0x8000);
+	machine().root_device().membank("bank1")->configure_entries(0, bank_n, &ROM[0x10000], 0x8000);
 
-	MACHINE_START_CALL(dynax);
+	MACHINE_START_CALL_MEMBER(dynax);
 }
 
-static MACHINE_START( htengoku )
+MACHINE_START_MEMBER(dynax_state,htengoku)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
-	machine.root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x8000);
+	machine().root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x8000);
 
-	MACHINE_START_CALL(dynax);
+	MACHINE_START_CALL_MEMBER(dynax);
 }
 
 /***************************************************************************
@@ -4293,8 +4290,8 @@ static MACHINE_CONFIG_START( hanamai, dynax_state )
 	MCFG_CPU_IO_MAP(hanamai_io_map)
 	MCFG_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
-	MCFG_MACHINE_START(hanamai)
-	MCFG_MACHINE_RESET(dynax)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -4308,8 +4305,8 @@ static MACHINE_CONFIG_START( hanamai, dynax_state )
 
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_PALETTE_INIT(sprtmtch)			// static palette
-	MCFG_VIDEO_START(hanamai)
+	MCFG_PALETTE_INIT_OVERRIDE(dynax_state,sprtmtch)			// static palette
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,hanamai)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4350,8 +4347,8 @@ static MACHINE_CONFIG_START( hnoridur, dynax_state )
 	MCFG_CPU_IO_MAP(hnoridur_io_map)
 	MCFG_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
-	MCFG_MACHINE_START(hnoridur)
-	MCFG_MACHINE_RESET(dynax)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,hnoridur)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -4365,7 +4362,7 @@ static MACHINE_CONFIG_START( hnoridur, dynax_state )
 
 	MCFG_PALETTE_LENGTH(16*256)
 
-	MCFG_VIDEO_START(hnoridur)
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,hnoridur)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4395,8 +4392,8 @@ static MACHINE_CONFIG_START( hjingi, dynax_state )
 	MCFG_CPU_IO_MAP(hjingi_io_map)
 	MCFG_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
-	MCFG_MACHINE_START(hnoridur)
-	MCFG_MACHINE_RESET(dynax)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,hnoridur)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -4410,7 +4407,7 @@ static MACHINE_CONFIG_START( hjingi, dynax_state )
 
 	MCFG_PALETTE_LENGTH(16*256)
 
-	MCFG_VIDEO_START(hnoridur)
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,hnoridur)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4453,8 +4450,8 @@ static MACHINE_CONFIG_START( sprtmtch, dynax_state )
 	MCFG_CPU_IO_MAP(sprtmtch_io_map)
 	MCFG_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
-	MCFG_MACHINE_START(hanamai)
-	MCFG_MACHINE_RESET(dynax)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -4468,8 +4465,8 @@ static MACHINE_CONFIG_START( sprtmtch, dynax_state )
 
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_PALETTE_INIT(sprtmtch)			// static palette
-	MCFG_VIDEO_START(sprtmtch)
+	MCFG_PALETTE_INIT_OVERRIDE(dynax_state,sprtmtch)			// static palette
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,sprtmtch)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4495,8 +4492,8 @@ static MACHINE_CONFIG_START( mjfriday, dynax_state )
 	MCFG_CPU_IO_MAP(mjfriday_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(hanamai)
-	MCFG_MACHINE_RESET(dynax)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -4510,8 +4507,8 @@ static MACHINE_CONFIG_START( mjfriday, dynax_state )
 
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_PALETTE_INIT(sprtmtch)			// static palette
-	MCFG_VIDEO_START(mjdialq2)
+	MCFG_PALETTE_INIT_OVERRIDE(dynax_state,sprtmtch)			// static palette
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjdialq2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4586,7 +4583,7 @@ static MACHINE_CONFIG_DERIVED( mcnpshnt, hnoridur )
 	MCFG_CPU_PROGRAM_MAP(mcnpshnt_mem_map)
 	MCFG_CPU_IO_MAP(mcnpshnt_io_map)
 
-	MCFG_VIDEO_START(mcnpshnt)	// different priorities
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,mcnpshnt)	// different priorities
 MACHINE_CONFIG_END
 
 
@@ -4623,19 +4620,18 @@ static const msm5205_interface jantouki_msm5205_interface =
 	MSM5205_S48_4B		/* 8 KHz, 4 Bits  */
 };
 
-static MACHINE_START( jantouki )
+MACHINE_START_MEMBER(dynax_state,jantouki)
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
-	UINT8 *MAIN = state->memregion("maincpu")->base();
-	UINT8 *SOUND = state->memregion("soundcpu")->base();
+	UINT8 *MAIN = memregion("maincpu")->base();
+	UINT8 *SOUND = memregion("soundcpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 0x10, &MAIN[0x8000],  0x8000);
-	state->membank("bank2")->configure_entries(0, 12,   &SOUND[0x8000], 0x8000);
+	membank("bank1")->configure_entries(0, 0x10, &MAIN[0x8000],  0x8000);
+	membank("bank2")->configure_entries(0, 12,   &SOUND[0x8000], 0x8000);
 
-	state->m_top_scr = machine.device("top");
-	state->m_bot_scr = machine.device("bottom");
+	m_top_scr = machine().device("top");
+	m_bot_scr = machine().device("bottom");
 
-	MACHINE_START_CALL(dynax);
+	MACHINE_START_CALL_MEMBER(dynax);
 }
 
 static MSM6242_INTERFACE( jantouki_rtc_intf )
@@ -4657,8 +4653,8 @@ static MACHINE_CONFIG_START( jantouki, dynax_state )
 	MCFG_CPU_IO_MAP(jantouki_sound_io_map)
 	MCFG_CPU_VBLANK_INT("top", jantouki_sound_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
-	MCFG_MACHINE_START(jantouki)
-	MCFG_MACHINE_RESET(dynax)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,jantouki)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -4680,8 +4676,8 @@ static MACHINE_CONFIG_START( jantouki, dynax_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_STATIC(jantouki_bottom)
 
-	MCFG_PALETTE_INIT(sprtmtch)			// static palette
-	MCFG_VIDEO_START(jantouki)
+	MCFG_PALETTE_INIT_OVERRIDE(dynax_state,sprtmtch)			// static palette
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,jantouki)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4735,7 +4731,7 @@ static MACHINE_CONFIG_DERIVED( mjelctrn, hnoridur )
 	MCFG_CPU_IO_MAP(mjelctrn_io_map)
 	MCFG_CPU_VBLANK_INT("screen", mjelctrn_vblank_interrupt)	/* IM 2 needs a vector on the data bus */
 
-	MCFG_VIDEO_START(mjelctrn)
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjelctrn)
 MACHINE_CONFIG_END
 
 
@@ -4773,7 +4769,7 @@ static MACHINE_CONFIG_DERIVED( neruton, mjelctrn )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_TIMER_ADD_SCANLINE("scantimer", neruton_irq_scanline, "screen", 0, 1)
 
-	MCFG_VIDEO_START(neruton)
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,neruton)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -4833,8 +4829,8 @@ static MACHINE_CONFIG_START( htengoku, dynax_state )
 	MCFG_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 	MCFG_CPU_PERIODIC_INT(yarunara_clock_interrupt, 60)	// RTC
 
-	MCFG_MACHINE_START(htengoku)
-	MCFG_MACHINE_RESET(dynax)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,htengoku)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -4849,7 +4845,7 @@ static MACHINE_CONFIG_START( htengoku, dynax_state )
 	MCFG_PALETTE_LENGTH(16*256)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_VIDEO_START(htengoku)
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,htengoku)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4891,11 +4887,11 @@ static const ay8910_interface tenkai_ay8910_interface =
 	DEVCB_NULL,						DEVCB_DRIVER_MEMBER(dynax_state,tenkai_dswsel_w)	// Write
 };
 
-static MACHINE_START( tenkai )
+MACHINE_START_MEMBER(dynax_state,tenkai)
 {
-	MACHINE_START_CALL(dynax);
+	MACHINE_START_CALL_MEMBER(dynax);
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(tenkai_update_rombank), &machine));
+	machine().save().register_postload(save_prepost_delegate(FUNC(tenkai_update_rombank), &machine()));
 }
 
 WRITE_LINE_MEMBER(dynax_state::tenkai_rtc_irq)
@@ -4916,8 +4912,8 @@ static MACHINE_CONFIG_START( tenkai, dynax_state )
 	MCFG_CPU_IO_MAP(tenkai_io_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", tenkai_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_START(tenkai)
-	MCFG_MACHINE_RESET(dynax)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,tenkai)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -4931,7 +4927,7 @@ static MACHINE_CONFIG_START( tenkai, dynax_state )
 
 	MCFG_PALETTE_LENGTH(16*256)
 
-	MCFG_VIDEO_START(mjelctrn)
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjelctrn)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4949,7 +4945,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( majrjhdx, tenkai )
 	MCFG_PALETTE_LENGTH(512)
-	MCFG_PALETTE_INIT(sprtmtch)			// static palette
+	MCFG_PALETTE_INIT_OVERRIDE(dynax_state,sprtmtch)			// static palette
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -4963,18 +4959,18 @@ static void gekisha_bank_postload(running_machine &machine)
 	gekisha_set_rombank(machine, state->m_rombank);
 }
 
-static MACHINE_START( gekisha )
+MACHINE_START_MEMBER(dynax_state,gekisha)
 {
-	MACHINE_START_CALL(dynax);
+	MACHINE_START_CALL_MEMBER(dynax);
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(gekisha_bank_postload), &machine));
+	machine().save().register_postload(save_prepost_delegate(FUNC(gekisha_bank_postload), &machine()));
 }
 
-static MACHINE_RESET( gekisha )
+MACHINE_RESET_MEMBER(dynax_state,gekisha)
 {
-	MACHINE_RESET_CALL(dynax);
+	MACHINE_RESET_CALL_MEMBER(dynax);
 
-	gekisha_set_rombank(machine, 0);
+	gekisha_set_rombank(machine(), 0);
 }
 
 static MACHINE_CONFIG_START( gekisha, dynax_state )
@@ -4985,8 +4981,8 @@ static MACHINE_CONFIG_START( gekisha, dynax_state )
 	MCFG_CPU_IO_MAP(gekisha_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(gekisha)
-	MCFG_MACHINE_RESET(gekisha)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,gekisha)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,gekisha)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -4999,8 +4995,8 @@ static MACHINE_CONFIG_START( gekisha, dynax_state )
 	MCFG_SCREEN_UPDATE_STATIC(mjdialq2)
 
 	MCFG_PALETTE_LENGTH(512)
-	MCFG_PALETTE_INIT(sprtmtch)			// static palette
-	MCFG_VIDEO_START(mjdialq2)
+	MCFG_PALETTE_INIT_OVERRIDE(dynax_state,sprtmtch)			// static palette
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjdialq2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

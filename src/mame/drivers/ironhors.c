@@ -356,25 +356,23 @@ static const ym2203_interface ym2203_config =
 };
 
 
-static MACHINE_START( ironhors )
+void ironhors_state::machine_start()
 {
-	ironhors_state *state = machine.driver_data<ironhors_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_soundcpu = machine.device<cpu_device>("soundcpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_soundcpu = machine().device<cpu_device>("soundcpu");
 
-	state->save_item(NAME(state->m_palettebank));
-	state->save_item(NAME(state->m_charbank));
-	state->save_item(NAME(state->m_spriterambank));
+	save_item(NAME(m_palettebank));
+	save_item(NAME(m_charbank));
+	save_item(NAME(m_spriterambank));
 }
 
-static MACHINE_RESET( ironhors )
+void ironhors_state::machine_reset()
 {
-	ironhors_state *state = machine.driver_data<ironhors_state>();
 
-	state->m_palettebank = 0;
-	state->m_charbank = 0;
-	state->m_spriterambank = 0;
+	m_palettebank = 0;
+	m_charbank = 0;
+	m_spriterambank = 0;
 }
 
 static MACHINE_CONFIG_START( ironhors, ironhors_state )
@@ -388,8 +386,6 @@ static MACHINE_CONFIG_START( ironhors, ironhors_state )
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	MCFG_CPU_IO_MAP(slave_io_map)
 
-	MCFG_MACHINE_START(ironhors)
-	MCFG_MACHINE_RESET(ironhors)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -402,8 +398,6 @@ static MACHINE_CONFIG_START( ironhors, ironhors_state )
 	MCFG_GFXDECODE(ironhors)
 	MCFG_PALETTE_LENGTH(16*8*16+16*8*16)
 
-	MCFG_PALETTE_INIT(ironhors)
-	MCFG_VIDEO_START(ironhors)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -472,7 +466,7 @@ static MACHINE_CONFIG_DERIVED( farwest, ironhors )
 	MCFG_CPU_IO_MAP(0)
 
 	MCFG_GFXDECODE(farwest)
-	MCFG_VIDEO_START(farwest)
+	MCFG_VIDEO_START_OVERRIDE(ironhors_state,farwest)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(farwest)
 

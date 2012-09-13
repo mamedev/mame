@@ -18,12 +18,15 @@ public:
 	DECLARE_READ16_MEMBER(inputs_r);
 	DECLARE_DRIVER_INIT(blstroid);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	DECLARE_MACHINE_START(blstroid);
+	DECLARE_MACHINE_RESET(blstroid);
+	DECLARE_VIDEO_START(blstroid);
 };
 
 
 /*----------- defined in video/blstroid.c -----------*/
 
-VIDEO_START( blstroid );
+
 SCREEN_UPDATE_IND16( blstroid );
 
 void blstroid_scanline_update(screen_device &screen, int scanline);

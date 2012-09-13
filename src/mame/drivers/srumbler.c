@@ -43,12 +43,11 @@ WRITE8_MEMBER(srumbler_state::srumbler_bankswitch_w)
 	}
 }
 
-static MACHINE_START( srumbler )
+void srumbler_state::machine_start()
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/* initialize banked ROM pointers */
-	srumbler_state *state = machine.driver_data<srumbler_state>();
-	state->srumbler_bankswitch_w(*space,0,0);
+	srumbler_bankswitch_w(*space,0,0);
 }
 
 static TIMER_DEVICE_CALLBACK( srumbler_interrupt )
@@ -246,7 +245,6 @@ static MACHINE_CONFIG_START( srumbler, srumbler_state )
 	MCFG_CPU_PROGRAM_MAP(srumbler_sound_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)
 
-	MCFG_MACHINE_START(srumbler)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -262,7 +260,6 @@ static MACHINE_CONFIG_START( srumbler, srumbler_state )
 	MCFG_GFXDECODE(srumbler)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(srumbler)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -39,18 +39,28 @@ public:
 	TILE_GET_INFO_MEMBER(superpac_get_tile_info);
 	TILE_GET_INFO_MEMBER(phozon_get_tile_info);
 	TILE_GET_INFO_MEMBER(mappy_get_tile_info);
+	DECLARE_MACHINE_START(mappy);
+	DECLARE_MACHINE_RESET(superpac);
+	DECLARE_VIDEO_START(superpac);
+	DECLARE_PALETTE_INIT(superpac);
+	DECLARE_MACHINE_RESET(phozon);
+	DECLARE_VIDEO_START(phozon);
+	DECLARE_PALETTE_INIT(phozon);
+	DECLARE_MACHINE_RESET(mappy);
+	DECLARE_VIDEO_START(mappy);
+	DECLARE_PALETTE_INIT(mappy);
 };
 
 
 /*----------- defined in video/mappy.c -----------*/
 
-VIDEO_START( phozon );
-PALETTE_INIT( phozon );
+
+
 SCREEN_UPDATE_IND16( phozon );
 
-PALETTE_INIT( superpac );
-PALETTE_INIT( mappy );
-VIDEO_START( superpac );
-VIDEO_START( mappy );
+
+
+
+
 SCREEN_UPDATE_IND16( superpac );
 SCREEN_UPDATE_IND16( mappy );

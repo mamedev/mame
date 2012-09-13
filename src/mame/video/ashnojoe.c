@@ -189,23 +189,22 @@ WRITE16_MEMBER(ashnojoe_state::joe_tilemaps_yscroll_w)
 	}
 }
 
-VIDEO_START( ashnojoe )
+void ashnojoe_state::video_start()
 {
-	ashnojoe_state *state = machine.driver_data<ashnojoe_state>();
 
-	state->m_joetilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info),state),  TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_joetilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_2),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_joetilemap3 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_3),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_joetilemap4 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_4),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_joetilemap5 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_5),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_joetilemap6 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_6),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_joetilemap7 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_7),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_joetilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info),this),  TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_joetilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_2),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_joetilemap3 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_3),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_joetilemap4 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_4),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_joetilemap5 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_5),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_joetilemap6 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_6),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_joetilemap7 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_7),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	state->m_joetilemap->set_transparent_pen(15);
-	state->m_joetilemap2->set_transparent_pen(15);
-	state->m_joetilemap3->set_transparent_pen(15);
-	state->m_joetilemap4->set_transparent_pen(15);
-	state->m_joetilemap5->set_transparent_pen(15);
+	m_joetilemap->set_transparent_pen(15);
+	m_joetilemap2->set_transparent_pen(15);
+	m_joetilemap3->set_transparent_pen(15);
+	m_joetilemap4->set_transparent_pen(15);
+	m_joetilemap5->set_transparent_pen(15);
 }
 
 SCREEN_UPDATE_IND16( ashnojoe )

@@ -52,13 +52,15 @@ public:
 	TILE_GET_INFO_MEMBER(get_bbusters_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
+	DECLARE_VIDEO_START(bbuster);
+	DECLARE_VIDEO_START(mechatt);
 };
 
 
 /*----------- defined in video/bbusters.c -----------*/
 
-VIDEO_START( bbuster );
-VIDEO_START( mechatt );
+
+
 SCREEN_UPDATE_IND16( bbuster );
 SCREEN_UPDATE_IND16( mechatt );
 

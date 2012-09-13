@@ -501,8 +501,6 @@ static MACHINE_CONFIG_START( vigilant, vigilant_state )
 	MCFG_GFXDECODE(vigilant)
 	MCFG_PALETTE_LENGTH(512+32)	/* 512 real palette, 32 virtual palette */
 
-	MCFG_VIDEO_START(vigilant)
-	MCFG_VIDEO_RESET(vigilant)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -543,8 +541,6 @@ static MACHINE_CONFIG_START( buccanrs, vigilant_state )
 	MCFG_GFXDECODE(buccanrs)
 	MCFG_PALETTE_LENGTH(512+32)	/* 512 real palette, 32 virtual palette */
 
-	MCFG_VIDEO_START(vigilant)
-	MCFG_VIDEO_RESET(vigilant)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -601,8 +597,6 @@ static MACHINE_CONFIG_START( kikcubic, vigilant_state )
 	MCFG_GFXDECODE(kikcubic)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(vigilant)
-	MCFG_VIDEO_RESET(vigilant)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -254,18 +254,16 @@ static const sn76496_config psg_intf =
 };
 
 
-static MACHINE_START( jailbrek )
+void jailbrek_state::machine_start()
 {
-	jailbrek_state *state = machine.driver_data<jailbrek_state>();
-	state->save_item(NAME(state->m_irq_enable));
-	state->save_item(NAME(state->m_nmi_enable));
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_nmi_enable));
 }
 
-static MACHINE_RESET( jailbrek )
+void jailbrek_state::machine_reset()
 {
-	jailbrek_state *state = machine.driver_data<jailbrek_state>();
-	state->m_irq_enable = 0;
-	state->m_nmi_enable = 0;
+	m_irq_enable = 0;
+	m_nmi_enable = 0;
 }
 
 static MACHINE_CONFIG_START( jailbrek, jailbrek_state )
@@ -276,8 +274,6 @@ static MACHINE_CONFIG_START( jailbrek, jailbrek_state )
 	MCFG_CPU_VBLANK_INT("screen", jb_interrupt)
 	MCFG_CPU_PERIODIC_INT(jb_interrupt_nmi, 500) /* ? */
 
-	MCFG_MACHINE_START(jailbrek)
-	MCFG_MACHINE_RESET(jailbrek)
 
 	/* video hardware */
 	MCFG_GFXDECODE(jailbrek)
@@ -287,8 +283,6 @@ static MACHINE_CONFIG_START( jailbrek, jailbrek_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 396, 8, 248, 256, 16, 240)
 	MCFG_SCREEN_UPDATE_STATIC(jailbrek)
 
-	MCFG_PALETTE_INIT(jailbrek)
-	MCFG_VIDEO_START(jailbrek)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -35,9 +35,9 @@ static IRQ_CALLBACK(aztarac_irq_callback)
 }
 
 
-static MACHINE_RESET( aztarac )
+void aztarac_state::machine_reset()
 {
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(aztarac_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(aztarac_irq_callback);
 }
 
 
@@ -155,7 +155,6 @@ static MACHINE_CONFIG_START( aztarac, aztarac_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT(aztarac_snd_timed_irq, 100)
 
-	MCFG_MACHINE_RESET(aztarac)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
@@ -165,7 +164,6 @@ static MACHINE_CONFIG_START( aztarac, aztarac_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
 	MCFG_SCREEN_UPDATE_STATIC(vector)
 
-	MCFG_VIDEO_START(aztarac)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

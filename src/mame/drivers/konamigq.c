@@ -84,6 +84,8 @@ public:
 	DECLARE_READ16_MEMBER(tms57002_status_word_r);
 	DECLARE_WRITE16_MEMBER(tms57002_control_word_w);
 	DECLARE_DRIVER_INIT(konamigq);
+	DECLARE_MACHINE_START(konamigq);
+	DECLARE_MACHINE_RESET(konamigq);
 };
 
 /* Sound */
@@ -319,17 +321,16 @@ DRIVER_INIT_MEMBER(konamigq_state,konamigq)
 	m_p_n_pcmram = memregion( "shared" )->base() + 0x80000;
 }
 
-static MACHINE_START( konamigq )
+MACHINE_START_MEMBER(konamigq_state,konamigq)
 {
-	konamigq_state *state = machine.driver_data<konamigq_state>();
 
-	state->save_pointer(NAME(state->m_p_n_pcmram), 0x380000);
-	state->save_item(NAME(state->m_sndto000));
-	state->save_item(NAME(state->m_sndtor3k));
-	state->save_item(NAME(state->m_sector_buffer));
+	save_pointer(NAME(m_p_n_pcmram), 0x380000);
+	save_item(NAME(m_sndto000));
+	save_item(NAME(m_sndtor3k));
+	save_item(NAME(m_sector_buffer));
 }
 
-static MACHINE_RESET( konamigq )
+MACHINE_RESET_MEMBER(konamigq_state,konamigq)
 {
 }
 
@@ -345,8 +346,8 @@ static MACHINE_CONFIG_START( konamigq, konamigq_state )
 	MCFG_CPU_PROGRAM_MAP( konamigq_sound_map)
 	MCFG_CPU_PERIODIC_INT( irq2_line_hold, 480 )
 
-	MCFG_MACHINE_START( konamigq )
-	MCFG_MACHINE_RESET( konamigq )
+	MCFG_MACHINE_START_OVERRIDE(konamigq_state, konamigq )
+	MCFG_MACHINE_RESET_OVERRIDE(konamigq_state, konamigq )
 	MCFG_EEPROM_93C46_ADD("eeprom")
 	MCFG_EEPROM_DATA(konamigq_def_eeprom, 128)
 

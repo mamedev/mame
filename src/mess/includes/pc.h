@@ -80,6 +80,12 @@ public:
 	DECLARE_DRIVER_INIT(pc1512);
 	DECLARE_DRIVER_INIT(pc1640);
 	DECLARE_DRIVER_INIT(pc_vga);
+	DECLARE_MACHINE_START(pc);
+	DECLARE_MACHINE_RESET(pc);
+	DECLARE_MACHINE_RESET(tandy1000rl);
+	DECLARE_MACHINE_START(pcjr);
+	DECLARE_MACHINE_RESET(pcjr);
+	DECLARE_MACHINE_START(mc1502);
 };
 
 /*----------- defined in machine/pc.c -----------*/
@@ -113,11 +119,11 @@ READ8_DEVICE_HANDLER( mc1502_wd17xx_motor_r );
 WRITE8_DEVICE_HANDLER( mc1502_wd17xx_aux_w );
 
 
-MACHINE_START( pc );
-MACHINE_RESET( pc );
-MACHINE_START( pcjr );
-MACHINE_RESET( pcjr );
-MACHINE_START( mc1502 );
+
+
+
+
+
 
 DEVICE_IMAGE_LOAD( pcjr_cartridge );
 

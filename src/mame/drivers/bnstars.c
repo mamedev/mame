@@ -153,6 +153,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_ms32_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_roz0_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_roz1_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -504,23 +506,22 @@ WRITE32_MEMBER(bnstars_state::ms32_spramx_w)
 }
 
 
-static VIDEO_START(bnstars)
+void bnstars_state::video_start()
 {
-	bnstars_state *state = machine.driver_data<bnstars_state>();
-	state->m_ms32_tx_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_tx0_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,64);
-	state->m_ms32_tx_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_tx1_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,64);
-	state->m_ms32_tx_tilemap[0]->set_transparent_pen(0);
-	state->m_ms32_tx_tilemap[1]->set_transparent_pen(0);
+	m_ms32_tx_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_tx0_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,64);
+	m_ms32_tx_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_tx1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,64);
+	m_ms32_tx_tilemap[0]->set_transparent_pen(0);
+	m_ms32_tx_tilemap[1]->set_transparent_pen(0);
 
-	state->m_ms32_bg_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_bg0_tile_info),state),TILEMAP_SCAN_ROWS,16,16,64,64);
-	state->m_ms32_bg_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_bg1_tile_info),state),TILEMAP_SCAN_ROWS,16,16,64,64);
-	state->m_ms32_bg_tilemap[0]->set_transparent_pen(0);
-	state->m_ms32_bg_tilemap[1]->set_transparent_pen(0);
+	m_ms32_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_bg0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,64);
+	m_ms32_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_bg1_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,64);
+	m_ms32_bg_tilemap[0]->set_transparent_pen(0);
+	m_ms32_bg_tilemap[1]->set_transparent_pen(0);
 
-	state->m_ms32_roz_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_roz0_tile_info),state),TILEMAP_SCAN_ROWS,16,16,128,128);
-	state->m_ms32_roz_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_roz1_tile_info),state),TILEMAP_SCAN_ROWS,16,16,128,128);
-	state->m_ms32_roz_tilemap[0]->set_transparent_pen(0);
-	state->m_ms32_roz_tilemap[1]->set_transparent_pen(0);
+	m_ms32_roz_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_roz0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,128,128);
+	m_ms32_roz_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_roz1_tile_info),this),TILEMAP_SCAN_ROWS,16,16,128,128);
+	m_ms32_roz_tilemap[0]->set_transparent_pen(0);
+	m_ms32_roz_tilemap[1]->set_transparent_pen(0);
 
 
 }
@@ -1366,9 +1367,9 @@ static TIMER_DEVICE_CALLBACK(ms32_interrupt)
 	if( (scanline % 8) == 0 && scanline <= 224 ) irq_raise(timer.machine(), 0);
 }
 
-static MACHINE_RESET( ms32 )
+void bnstars_state::machine_reset()
 {
-	irq_init(machine);
+	irq_init(machine());
 }
 
 
@@ -1384,7 +1385,6 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
-	MCFG_MACHINE_RESET(ms32)
 
 	MCFG_GFXDECODE(bnstars)
 	MCFG_PALETTE_LENGTH(0x8000*2)
@@ -1405,7 +1405,6 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(bnstars_right)
 
-	MCFG_VIDEO_START(bnstars)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

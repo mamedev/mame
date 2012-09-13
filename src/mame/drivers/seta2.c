@@ -2042,7 +2042,7 @@ static MACHINE_CONFIG_START( seta2, seta2_state )
 	MCFG_GFXDECODE(seta2)
 	MCFG_PALETTE_LENGTH(0x8000+0xf0)	// extra 0xf0 because we might draw 256-color object with 16-color granularity
 
-	MCFG_VIDEO_START(seta2)
+	MCFG_VIDEO_START_OVERRIDE(seta2_state,seta2)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2094,7 +2094,7 @@ static MACHINE_CONFIG_DERIVED( myangel, seta2 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
 
-	MCFG_VIDEO_START(seta2_yoffset)
+	MCFG_VIDEO_START_OVERRIDE(seta2_state,seta2_yoffset)
 MACHINE_CONFIG_END
 
 
@@ -2106,7 +2106,7 @@ static MACHINE_CONFIG_DERIVED( myangel2, seta2 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
 
-	MCFG_VIDEO_START(seta2_yoffset)
+	MCFG_VIDEO_START_OVERRIDE(seta2_state,seta2_yoffset)
 MACHINE_CONFIG_END
 
 
@@ -2141,7 +2141,7 @@ static MACHINE_CONFIG_DERIVED( reelquak, seta2 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x80, 0x170-1)
 
-	MCFG_VIDEO_START(seta2_xoffset)
+	MCFG_VIDEO_START_OVERRIDE(seta2_state,seta2_xoffset)
 MACHINE_CONFIG_END
 
 
@@ -2202,13 +2202,12 @@ static INTERRUPT_GEN( funcube_sub_timer_irq )
 	device->execute().set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
 }
 
-static MACHINE_RESET( funcube )
+MACHINE_RESET_MEMBER(seta2_state,funcube)
 {
-	seta2_state *state = machine.driver_data<seta2_state>();
-	state->m_funcube_coin_start_cycles = 0;
-	state->m_funcube_serial_count = 0;
-	state->m_funcube_press = 0;
-	state->m_funcube_hopper_motor = 0;
+	m_funcube_coin_start_cycles = 0;
+	m_funcube_serial_count = 0;
+	m_funcube_press = 0;
+	m_funcube_hopper_motor = 0;
 }
 
 static MACHINE_CONFIG_START( funcube, seta2_state )
@@ -2224,7 +2223,7 @@ static MACHINE_CONFIG_START( funcube, seta2_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_MACHINE_RESET( funcube )
+	MCFG_MACHINE_RESET_OVERRIDE(seta2_state, funcube )
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2238,7 +2237,7 @@ static MACHINE_CONFIG_START( funcube, seta2_state )
 	MCFG_GFXDECODE(funcube)
 	MCFG_PALETTE_LENGTH(0x8000+0xf0)	// extra 0xf0 because we might draw 256-color object with 16-color granularity
 
-	MCFG_VIDEO_START(seta2)
+	MCFG_VIDEO_START_OVERRIDE(seta2_state,seta2)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2289,7 +2288,7 @@ static MACHINE_CONFIG_START( namcostr, seta2_state )
 	MCFG_GFXDECODE(funcube)
 	MCFG_PALETTE_LENGTH(0x8000+0xf0)	// extra 0xf0 because we might draw 256-color object with 16-color granularity
 
-	MCFG_VIDEO_START(seta2)
+	MCFG_VIDEO_START_OVERRIDE(seta2_state,seta2)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

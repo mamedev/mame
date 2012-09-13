@@ -110,16 +110,15 @@ WRITE16_MEMBER(bigstrkb_state::bsb_videoram3_w)
 
 /* Video Start / Update */
 
-VIDEO_START(bigstrkb)
+void bigstrkb_state::video_start()
 {
-	bigstrkb_state *state = machine.driver_data<bigstrkb_state>();
-	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bigstrkb_state::get_bsb_tile_info),state),TILEMAP_SCAN_COLS, 8, 8,64,32);
-	state->m_tilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bigstrkb_state::get_bsb_tile2_info),state),tilemap_mapper_delegate(FUNC(bigstrkb_state::bsb_bg_scan),state), 16, 16,128,64);
-	state->m_tilemap3 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bigstrkb_state::get_bsb_tile3_info),state),tilemap_mapper_delegate(FUNC(bigstrkb_state::bsb_bg_scan),state), 16, 16,128,64);
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bigstrkb_state::get_bsb_tile_info),this),TILEMAP_SCAN_COLS, 8, 8,64,32);
+	m_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bigstrkb_state::get_bsb_tile2_info),this),tilemap_mapper_delegate(FUNC(bigstrkb_state::bsb_bg_scan),this), 16, 16,128,64);
+	m_tilemap3 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bigstrkb_state::get_bsb_tile3_info),this),tilemap_mapper_delegate(FUNC(bigstrkb_state::bsb_bg_scan),this), 16, 16,128,64);
 
-	state->m_tilemap->set_transparent_pen(15);
-	//state->m_tilemap2->set_transparent_pen(15);
-	state->m_tilemap3->set_transparent_pen(15);
+	m_tilemap->set_transparent_pen(15);
+	//m_tilemap2->set_transparent_pen(15);
+	m_tilemap3->set_transparent_pen(15);
 }
 
 SCREEN_UPDATE_IND16(bigstrkb)

@@ -1045,9 +1045,9 @@ static TIMER_DEVICE_CALLBACK( hotchase_scanline )
 }
 
 
-static MACHINE_RESET( wecleman )
+MACHINE_RESET_MEMBER(wecleman_state,wecleman)
 {
-	k007232_set_bank( machine.device("konami"), 0, 1 );
+	k007232_set_bank( machine().device("konami"), 0, 1 );
 }
 
 static MACHINE_CONFIG_START( wecleman, wecleman_state )
@@ -1066,7 +1066,7 @@ static MACHINE_CONFIG_START( wecleman, wecleman_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_RESET(wecleman)
+	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state,wecleman)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1080,7 +1080,7 @@ static MACHINE_CONFIG_START( wecleman, wecleman_state )
 
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(wecleman)
+	MCFG_VIDEO_START_OVERRIDE(wecleman_state,wecleman)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1120,17 +1120,16 @@ static const k051316_interface hotchase_k051316_intf_1 =
 	hotchase_zoom_callback_1
 };
 
-static MACHINE_RESET( hotchase )
+MACHINE_RESET_MEMBER(wecleman_state,hotchase)
 {
-	wecleman_state *state = machine.driver_data<wecleman_state>();
 	int i;
 
 	/* TODO: PCB reference clearly shows that the POST has random/filled data on the paletteram.
              For now let's fill everything with white colors until we have better info about it */
 	for(i=0;i<0x2000/2;i++)
 	{
-		state->m_generic_paletteram_16[i] = 0xffff;
-		palette_set_color_rgb(machine,i,0xff,0xff,0xff);
+		m_generic_paletteram_16[i] = 0xffff;
+		palette_set_color_rgb(machine(),i,0xff,0xff,0xff);
 	}
 }
 
@@ -1151,7 +1150,7 @@ static MACHINE_CONFIG_START( hotchase, wecleman_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_RESET(hotchase)
+	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state,hotchase)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1164,7 +1163,7 @@ static MACHINE_CONFIG_START( hotchase, wecleman_state )
 	MCFG_GFXDECODE(hotchase)
 	MCFG_PALETTE_LENGTH(2048*2)
 
-	MCFG_VIDEO_START(hotchase)
+	MCFG_VIDEO_START_OVERRIDE(wecleman_state,hotchase)
 
 	MCFG_K051316_ADD("k051316_1", hotchase_k051316_intf_0)
 	MCFG_K051316_ADD("k051316_2", hotchase_k051316_intf_1)

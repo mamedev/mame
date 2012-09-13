@@ -131,9 +131,8 @@ WRITE8_MEMBER(asteroid_state::astdelux_led_w)
 }
 
 
-MACHINE_RESET( asteroid )
+void asteroid_state::machine_reset()
 {
-	asteroid_state *state = machine.driver_data<asteroid_state>();
-	state->asteroid_bank_switch_w(*machine.device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
-	avgdvg_reset_w(machine.device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
+	asteroid_bank_switch_w(*machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
+	avgdvg_reset_w(machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
 }

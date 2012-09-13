@@ -18,12 +18,14 @@ public:
 
 	cassette_image_device *m_cassette;
 	DECLARE_DRIVER_INIT(ac1);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in machine/ac1.c -----------*/
 
-MACHINE_RESET( ac1 );
+
 
 extern const z80pio_interface ac1_z80pio_intf;
 
@@ -31,7 +33,7 @@ extern const z80pio_interface ac1_z80pio_intf;
 
 extern const gfx_layout ac1_charlayout;
 
-VIDEO_START( ac1 );
+
 SCREEN_UPDATE_IND16( ac1 );
 SCREEN_UPDATE_IND16( ac1_32 );
 

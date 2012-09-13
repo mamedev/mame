@@ -162,6 +162,8 @@ public:
 	DECLARE_READ8_MEMBER(io20_r);
 	DECLARE_WRITE8_MEMBER(io20_w);
 	DECLARE_WRITE_LINE_MEMBER(funkball_pic8259_1_set_int_line);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 void funkball_state::video_start()
@@ -1103,35 +1105,33 @@ static void ide_interrupt(device_t *device, int state)
 	pic8259_ir6_w(drvstate->m_pic8259_2, state);
 }
 
-static MACHINE_START( funkball )
+void funkball_state::machine_start()
 {
-	funkball_state *state = machine.driver_data<funkball_state>();
 
-	state->m_bios_ram = auto_alloc_array(machine, UINT8, 0x20000);
+	m_bios_ram = auto_alloc_array(machine(), UINT8, 0x20000);
 
-	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, funkball_set_keyb_int);
+	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, funkball_set_keyb_int);
 
-	state->m_maincpu->set_irq_acknowledge_callback(irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(irq_callback);
 
-	kbdc8042_init(machine, &at8042);
+	kbdc8042_init(machine(), &at8042);
 
 	/* defaults, otherwise it won't boot */
-	state->m_unk_ram[0x010/4] = 0x2f8d85ff;
-	state->m_unk_ram[0x018/4] = 0x000018c5;
+	m_unk_ram[0x010/4] = 0x2f8d85ff;
+	m_unk_ram[0x018/4] = 0x000018c5;
 }
 
-static MACHINE_RESET( funkball )
+void funkball_state::machine_reset()
 {
-	funkball_state *state = machine.driver_data<funkball_state>();
-	state->membank("bios_ext1")->set_base(state->memregion("bios")->base() + 0x00000);
-	state->membank("bios_ext2")->set_base(state->memregion("bios")->base() + 0x04000);
-	state->membank("bios_ext3")->set_base(state->memregion("bios")->base() + 0x08000);
-	state->membank("bios_ext4")->set_base(state->memregion("bios")->base() + 0x0c000);
-	state->membank("bios_bank1")->set_base(state->memregion("bios")->base() + 0x10000);
-	state->membank("bios_bank2")->set_base(state->memregion("bios")->base() + 0x14000);
-	state->membank("bios_bank3")->set_base(state->memregion("bios")->base() + 0x18000);
-	state->membank("bios_bank4")->set_base(state->memregion("bios")->base() + 0x1c000);
-	state->m_voodoo_pci_regs.base_addr = 0xff000000;
+	membank("bios_ext1")->set_base(memregion("bios")->base() + 0x00000);
+	membank("bios_ext2")->set_base(memregion("bios")->base() + 0x04000);
+	membank("bios_ext3")->set_base(memregion("bios")->base() + 0x08000);
+	membank("bios_ext4")->set_base(memregion("bios")->base() + 0x0c000);
+	membank("bios_bank1")->set_base(memregion("bios")->base() + 0x10000);
+	membank("bios_bank2")->set_base(memregion("bios")->base() + 0x14000);
+	membank("bios_bank3")->set_base(memregion("bios")->base() + 0x18000);
+	membank("bios_bank4")->set_base(memregion("bios")->base() + 0x1c000);
+	m_voodoo_pci_regs.base_addr = 0xff000000;
 }
 
 SCREEN_UPDATE_RGB32( funkball )
@@ -1163,8 +1163,6 @@ static MACHINE_CONFIG_START( funkball, funkball_state )
 	MCFG_CPU_PROGRAM_MAP(funkball_map)
 	MCFG_CPU_IO_MAP(funkball_io)
 
-	MCFG_MACHINE_START(funkball)
-	MCFG_MACHINE_RESET(funkball)
 
 	MCFG_PIT8254_ADD( "pit8254", funkball_pit8254_config )
 	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )

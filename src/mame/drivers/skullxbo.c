@@ -71,19 +71,18 @@ WRITE16_MEMBER(skullxbo_state::skullxbo_halt_until_hblank_0_w)
 }
 
 
-static MACHINE_START( skullxbo )
+MACHINE_START_MEMBER(skullxbo_state,skullxbo)
 {
-	atarigen_init(machine);
+	atarigen_init(machine());
 }
 
 
-static MACHINE_RESET( skullxbo )
+MACHINE_RESET_MEMBER(skullxbo_state,skullxbo)
 {
-	skullxbo_state *state = machine.driver_data<skullxbo_state>();
 
-	atarigen_eeprom_reset(state);
-	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine.primary_screen, alpha_row_update, 8);
+	atarigen_eeprom_reset(this);
+	atarigen_interrupt_reset(this, update_interrupts);
+	atarigen_scanline_timer_reset(*machine().primary_screen, alpha_row_update, 8);
 	atarijsa_reset();
 }
 
@@ -260,8 +259,8 @@ static MACHINE_CONFIG_START( skullxbo, skullxbo_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
-	MCFG_MACHINE_START(skullxbo)
-	MCFG_MACHINE_RESET(skullxbo)
+	MCFG_MACHINE_START_OVERRIDE(skullxbo_state,skullxbo)
+	MCFG_MACHINE_RESET_OVERRIDE(skullxbo_state,skullxbo)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
@@ -275,7 +274,7 @@ static MACHINE_CONFIG_START( skullxbo, skullxbo_state )
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(skullxbo)
 
-	MCFG_VIDEO_START(skullxbo)
+	MCFG_VIDEO_START_OVERRIDE(skullxbo_state,skullxbo)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(jsa_ii_mono)

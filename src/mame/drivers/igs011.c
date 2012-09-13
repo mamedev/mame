@@ -195,6 +195,7 @@ public:
 	DECLARE_DRIVER_INIT(vbowl);
 	DECLARE_DRIVER_INIT(vbowlj);
 	DECLARE_DRIVER_INIT(ryukobou);
+	virtual void video_start();
 };
 
 
@@ -230,17 +231,16 @@ WRITE16_MEMBER(igs011_state::igs011_priority_w)
 }
 
 
-static VIDEO_START( igs011 )
+void igs011_state::video_start()
 {
-	igs011_state *state = machine.driver_data<igs011_state>();
 	int i;
 
 	for (i = 0; i < 8; i++)
 	{
-		state->m_layer[i] = auto_alloc_array(machine, UINT8, 512 * 256);
+		m_layer[i] = auto_alloc_array(machine(), UINT8, 512 * 256);
 	}
 
-	state->m_lhb2_pen_hi = 0;
+	m_lhb2_pen_hi = 0;
 }
 
 static SCREEN_UPDATE_IND16( igs011 )
@@ -3814,7 +3814,6 @@ static MACHINE_CONFIG_START( igs011_base, igs011_state )
 	MCFG_PALETTE_LENGTH(0x800)
 //  MCFG_GFXDECODE(igs011)
 
-	MCFG_VIDEO_START( igs011 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

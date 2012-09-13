@@ -4,13 +4,13 @@
 #include "includes/flower.h"
 
 
-PALETTE_INIT( flower )
+void flower_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x100);
+	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -19,11 +19,11 @@ PALETTE_INIT( flower )
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	for (i = 0; i < 0x100; i++)
-		colortable_entry_set_value(machine.colortable, i, i);
+		colortable_entry_set_value(machine().colortable, i, i);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -145,20 +145,19 @@ TILE_GET_INFO_MEMBER(flower_state::get_text_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color>>2, 0);
 }
 
-VIDEO_START(flower)
+void flower_state::video_start()
 {
-	flower_state *state = machine.driver_data<flower_state>();
-	state->m_bg0_tilemap        = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(flower_state::get_bg0_tile_info),state), TILEMAP_SCAN_ROWS,16,16,16,16);
-	state->m_bg1_tilemap        = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(flower_state::get_bg1_tile_info),state), TILEMAP_SCAN_ROWS,16,16,16,16);
-	state->m_text_tilemap       = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(flower_state::get_text_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,32,32);
-	state->m_text_right_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(flower_state::get_text_tile_info),state),TILEMAP_SCAN_COLS, 8, 8, 2,32);
+	m_bg0_tilemap        = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(flower_state::get_bg0_tile_info),this), TILEMAP_SCAN_ROWS,16,16,16,16);
+	m_bg1_tilemap        = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(flower_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,16,16,16,16);
+	m_text_tilemap       = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(flower_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_text_right_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(flower_state::get_text_tile_info),this),TILEMAP_SCAN_COLS, 8, 8, 2,32);
 
-	state->m_bg1_tilemap->set_transparent_pen(15);
-	state->m_text_tilemap->set_transparent_pen(3);
-	state->m_text_right_tilemap->set_transparent_pen(3);
+	m_bg1_tilemap->set_transparent_pen(15);
+	m_text_tilemap->set_transparent_pen(3);
+	m_text_right_tilemap->set_transparent_pen(3);
 
-	state->m_text_tilemap->set_scrolly(0, 16);
-	state->m_text_right_tilemap->set_scrolly(0, 16);
+	m_text_tilemap->set_scrolly(0, 16);
+	m_text_right_tilemap->set_scrolly(0, 16);
 }
 
 SCREEN_UPDATE_IND16( flower )

@@ -245,7 +245,6 @@ static MACHINE_CONFIG_START( ambush, ambush_state )
 	MCFG_GFXDECODE(ambush)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(ambush)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

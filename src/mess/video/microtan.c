@@ -38,15 +38,14 @@ TILE_GET_INFO_MEMBER(microtan_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(gfxn, code, 0, 0);
 }
 
-VIDEO_START( microtan )
+void microtan_state::video_start()
 {
-	microtan_state *state = machine.driver_data<microtan_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(microtan_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(microtan_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 		8, 16, 32, 16);
 
-	state->m_chunky_buffer = auto_alloc_array(machine, UINT8, 0x200);
-	memset(state->m_chunky_buffer, 0, 0x200);
-	state->m_chunky_graphics = 0;
+	m_chunky_buffer = auto_alloc_array(machine(), UINT8, 0x200);
+	memset(m_chunky_buffer, 0, 0x200);
+	m_chunky_graphics = 0;
 }
 
 SCREEN_UPDATE_IND16( microtan )

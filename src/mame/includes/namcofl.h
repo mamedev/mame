@@ -54,11 +54,14 @@ public:
 	DECLARE_WRITE32_MEMBER(namcofl_spritebank_w);
 	DECLARE_DRIVER_INIT(speedrcr);
 	DECLARE_DRIVER_INIT(finalapr);
+	DECLARE_MACHINE_START(namcofl);
+	DECLARE_MACHINE_RESET(namcofl);
+	DECLARE_VIDEO_START(namcofl);
 };
 
 
 /*----------- defined in video/namcofl.c -----------*/
 
-VIDEO_START( namcofl );
+
 SCREEN_UPDATE_IND16( namcofl );
 

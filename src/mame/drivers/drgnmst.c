@@ -369,30 +369,28 @@ static GFXDECODE_START( drgnmst )
 GFXDECODE_END
 
 
-static MACHINE_START( drgnmst )
+void drgnmst_state::machine_start()
 {
-	drgnmst_state *state = machine.driver_data<drgnmst_state>();
 
-	state->save_item(NAME(state->m_snd_flag));
-	state->save_item(NAME(state->m_snd_command));
-	state->save_item(NAME(state->m_oki_control));
-	state->save_item(NAME(state->m_oki_command));
-	state->save_item(NAME(state->m_pic16c5x_port0));
-	state->save_item(NAME(state->m_oki1_bank));
-	state->save_item(NAME(state->m_oki0_bank));
+	save_item(NAME(m_snd_flag));
+	save_item(NAME(m_snd_command));
+	save_item(NAME(m_oki_control));
+	save_item(NAME(m_oki_command));
+	save_item(NAME(m_pic16c5x_port0));
+	save_item(NAME(m_oki1_bank));
+	save_item(NAME(m_oki0_bank));
 }
 
-static MACHINE_RESET( drgnmst )
+void drgnmst_state::machine_reset()
 {
-	drgnmst_state *state = machine.driver_data<drgnmst_state>();
 
-	state->m_snd_flag = 0;
-	state->m_snd_command = 0;
-	state->m_oki_control = 0;
-	state->m_oki_command = 0;
-	state->m_pic16c5x_port0 = 0;
-	state->m_oki1_bank = 0;
-	state->m_oki0_bank = 0;
+	m_snd_flag = 0;
+	m_snd_command = 0;
+	m_oki_control = 0;
+	m_oki_command = 0;
+	m_pic16c5x_port0 = 0;
+	m_oki1_bank = 0;
+	m_oki0_bank = 0;
 }
 
 static MACHINE_CONFIG_START( drgnmst, drgnmst_state )
@@ -405,8 +403,6 @@ static MACHINE_CONFIG_START( drgnmst, drgnmst_state )
 	/* Program and Data Maps are internal to the MCU */
 	MCFG_CPU_IO_MAP(drgnmst_sound_io_map)
 
-	MCFG_MACHINE_START(drgnmst)
-	MCFG_MACHINE_RESET(drgnmst)
 
 	MCFG_GFXDECODE(drgnmst)
 
@@ -419,7 +415,6 @@ static MACHINE_CONFIG_START( drgnmst, drgnmst_state )
 
 	MCFG_PALETTE_LENGTH(0x2000)
 
-	MCFG_VIDEO_START(drgnmst)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

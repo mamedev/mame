@@ -20,11 +20,11 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( blueprnt )
+void blueprnt_state::palette_init()
 {
 	int i;
 
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		UINT8 pen;
 		int r, g, b;
@@ -42,7 +42,7 @@ PALETTE_INIT( blueprnt )
 		g = ((pen >> 2) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
 		b = ((pen >> 1) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -83,15 +83,14 @@ TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-VIDEO_START( blueprnt )
+void blueprnt_state::video_start()
 {
-	blueprnt_state *state = machine.driver_data<blueprnt_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blueprnt_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
-	state->m_bg_tilemap->set_transparent_pen(0);
-	state->m_bg_tilemap->set_scroll_cols(32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blueprnt_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scroll_cols(32);
 
-	state->save_item(NAME(state->m_gfx_bank));
+	save_item(NAME(m_gfx_bank));
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

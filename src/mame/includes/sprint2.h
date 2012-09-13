@@ -62,6 +62,8 @@ public:
 	DECLARE_DRIVER_INIT(sprint2);
 	DECLARE_DRIVER_INIT(dominos);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -76,8 +78,8 @@ DISCRETE_SOUND_EXTERN( dominos );
 
 
 
-PALETTE_INIT( sprint2 );
+
 SCREEN_UPDATE_IND16( sprint2 );
-VIDEO_START( sprint2 );
+
 SCREEN_VBLANK( sprint2 );
 

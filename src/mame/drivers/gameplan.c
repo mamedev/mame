@@ -973,31 +973,29 @@ static const ay8910_interface ay8910_config =
 
 
 
-static MACHINE_START( gameplan )
+MACHINE_START_MEMBER(gameplan_state,gameplan)
 {
-	gameplan_state *state = machine.driver_data<gameplan_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_riot = machine.device("riot");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_riot = machine().device("riot");
 
 	/* register for save states */
-	state->save_item(NAME(state->m_current_port));
-	state->save_item(NAME(state->m_video_x));
-	state->save_item(NAME(state->m_video_y));
-	state->save_item(NAME(state->m_video_command));
-	state->save_item(NAME(state->m_video_data));
+	save_item(NAME(m_current_port));
+	save_item(NAME(m_video_x));
+	save_item(NAME(m_video_y));
+	save_item(NAME(m_video_command));
+	save_item(NAME(m_video_data));
 }
 
 
-static MACHINE_RESET( gameplan )
+MACHINE_RESET_MEMBER(gameplan_state,gameplan)
 {
-	gameplan_state *state = machine.driver_data<gameplan_state>();
-	state->m_current_port = 0;
-	state->m_video_x = 0;
-	state->m_video_y = 0;
-	state->m_video_command = 0;
-	state->m_video_data = 0;
+	m_current_port = 0;
+	m_video_x = 0;
+	m_video_y = 0;
+	m_video_command = 0;
+	m_video_data = 0;
 }
 
 static MACHINE_CONFIG_START( gameplan, gameplan_state )
@@ -1011,8 +1009,8 @@ static MACHINE_CONFIG_START( gameplan, gameplan_state )
 
 	MCFG_RIOT6532_ADD("riot", GAMEPLAN_AUDIO_CPU_CLOCK, r6532_interface)
 
-	MCFG_MACHINE_START(gameplan)
-	MCFG_MACHINE_RESET(gameplan)
+	MCFG_MACHINE_START_OVERRIDE(gameplan_state,gameplan)
+	MCFG_MACHINE_RESET_OVERRIDE(gameplan_state,gameplan)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(gameplan_video)

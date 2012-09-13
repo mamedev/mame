@@ -72,22 +72,20 @@ static void sprite_draw_donpachi_zbuf(running_machine &machine, int priority);
 
 ***************************************************************************/
 
-PALETTE_INIT( cave )
+PALETTE_INIT_MEMBER(cave_state,cave)
 {
-	cave_state *state = machine.driver_data<cave_state>();
-	int maxpen = state->m_paletteram.bytes() / 2;
+	int maxpen = m_paletteram.bytes() / 2;
 	int pen;
 
 	/* create a 1:1 palette map covering everything */
-	state->m_palette_map = auto_alloc_array(machine, UINT16, machine.total_colors());
+	m_palette_map = auto_alloc_array(machine(), UINT16, machine().total_colors());
 
-	for (pen = 0; pen < machine.total_colors(); pen++)
-		state->m_palette_map[pen] = pen % maxpen;
+	for (pen = 0; pen < machine().total_colors(); pen++)
+		m_palette_map[pen] = pen % maxpen;
 }
 
-PALETTE_INIT( dfeveron )
+PALETTE_INIT_MEMBER(cave_state,dfeveron)
 {
-	cave_state *state = machine.driver_data<cave_state>();
 	int color, pen;
 
 	/* Fill the 0-3fff range, used by sprites ($40 color codes * $100 pens)
@@ -95,16 +93,15 @@ PALETTE_INIT( dfeveron )
        multiplies the color code by $100 (for consistency).
        That's why we need this function.    */
 
-	PALETTE_INIT_CALL(cave);
+	PALETTE_INIT_CALL_MEMBER(cave);
 
 	for (color = 0; color < 0x40; color++)
 		for (pen = 0; pen < 0x10; pen++)
-			state->m_palette_map[(color << 8) | pen] = (color << 4) | pen;
+			m_palette_map[(color << 8) | pen] = (color << 4) | pen;
 }
 
-PALETTE_INIT( ddonpach )
+PALETTE_INIT_MEMBER(cave_state,ddonpach)
 {
-	cave_state *state = machine.driver_data<cave_state>();
 	int color, pen;
 
 	/* Fill the 8000-83ff range ($40 color codes * $10 pens) for
@@ -112,76 +109,72 @@ PALETTE_INIT( ddonpach )
        like layer 2, but use the first 16 color of every 256 for
        any given color code. */
 
-	PALETTE_INIT_CALL(cave);
+	PALETTE_INIT_CALL_MEMBER(cave);
 
 	for (color = 0; color < 0x40; color++)
 		for (pen = 0; pen < 0x10; pen++)
-			state->m_palette_map[0x8000 | (color << 4) | pen] = 0x4000 | (color << 8) | pen;
+			m_palette_map[0x8000 | (color << 4) | pen] = 0x4000 | (color << 8) | pen;
 }
 
-PALETTE_INIT( mazinger )
+PALETTE_INIT_MEMBER(cave_state,mazinger)
 {
-	cave_state *state = machine.driver_data<cave_state>();
 	int color, pen;
 
-	PALETTE_INIT_CALL(cave);
+	PALETTE_INIT_CALL_MEMBER(cave);
 
 	/* sprites (encrypted) are 4 bit deep */
 	for (color = 0; color < 0x40; color++)
 		for (pen = 0; pen < 0x100; pen++)
-			state->m_palette_map[(color << 8) | pen] = (color << 4) + pen;	/* yes, PLUS, not OR */
+			m_palette_map[(color << 8) | pen] = (color << 4) + pen;	/* yes, PLUS, not OR */
 
 	/* layer 0 is 6 bit deep, there are 64 color codes but only $400
        colors are actually addressable */
 	for (color = 0; color < 0x40; color++)
 		for (pen = 0; pen < 0x40; pen++)
-			state->m_palette_map[0x4400 + ((color << 6) | pen)] = 0x400 | ((color & 0x0f) << 6) | pen;
+			m_palette_map[0x4400 + ((color << 6) | pen)] = 0x400 | ((color & 0x0f) << 6) | pen;
 }
 
-PALETTE_INIT( sailormn )
+PALETTE_INIT_MEMBER(cave_state,sailormn)
 {
-	cave_state *state = machine.driver_data<cave_state>();
 	int color, pen;
 
-	PALETTE_INIT_CALL(cave);
+	PALETTE_INIT_CALL_MEMBER(cave);
 
 	/* sprites (encrypted) are 4 bit deep */
 	for (color = 0; color < 0x40; color++)
 		for (pen = 0; pen < 0x100; pen++)
-			state->m_palette_map[(color << 8) | pen] = (color << 4) + pen;	/* yes, PLUS, not OR */
+			m_palette_map[(color << 8) | pen] = (color << 4) + pen;	/* yes, PLUS, not OR */
 
 	/* layer 2 is 6 bit deep, there are 64 color codes but only $400
        colors are actually addressable */
 	for (color = 0; color < 0x40; color++)
 		for (pen = 0; pen < 0x40; pen++)
-			state->m_palette_map[0x4c00 | (color << 6) | pen] = 0xc00 | ((color & 0x0f) << 6) | pen;
+			m_palette_map[0x4c00 | (color << 6) | pen] = 0xc00 | ((color & 0x0f) << 6) | pen;
 }
 
-PALETTE_INIT( pwrinst2 )
+PALETTE_INIT_MEMBER(cave_state,pwrinst2)
 {
-	cave_state *state = machine.driver_data<cave_state>();
 	int color, pen;
 
-	PALETTE_INIT_CALL(cave);
+	PALETTE_INIT_CALL_MEMBER(cave);
 
 	for (color = 0; color < 0x80; color++)
 		for (pen = 0; pen < 0x10; pen++)
-			state->m_palette_map[(color << 8) | pen] = (color << 4) | pen;
+			m_palette_map[(color << 8) | pen] = (color << 4) | pen;
 
 	for (pen = 0x8000; pen < 0xa800; pen++)
-			state->m_palette_map[pen] = pen - 0x8000;
+			m_palette_map[pen] = pen - 0x8000;
 }
 
-PALETTE_INIT( korokoro )
+PALETTE_INIT_MEMBER(cave_state,korokoro)
 {
-	cave_state *state = machine.driver_data<cave_state>();
 	int color, pen;
 
-	PALETTE_INIT_CALL(cave);
+	PALETTE_INIT_CALL_MEMBER(cave);
 
 	for (color = 0; color < 0x40; color++)
 		for (pen = 0; pen < 0x10; pen++)
-			state->m_palette_map[(color << 8) | pen] = 0x3c00 | (color << 4) | pen;
+			m_palette_map[(color << 8) | pen] = 0x3c00 | (color << 4) | pen;
 }
 
 
@@ -459,23 +452,22 @@ static void cave_vh_start( running_machine &machine, int num )
 	}
 }
 
-VIDEO_START( cave_1_layer  )	{	cave_vh_start(machine, 1);	}
-VIDEO_START( cave_2_layers )	{	cave_vh_start(machine, 2);	}
-VIDEO_START( cave_3_layers )	{	cave_vh_start(machine, 3);	}
-VIDEO_START( cave_4_layers )	{	cave_vh_start(machine, 4);	}
+VIDEO_START_MEMBER(cave_state,cave_1_layer){	cave_vh_start(machine(), 1);	}
+VIDEO_START_MEMBER(cave_state,cave_2_layers){	cave_vh_start(machine(), 2);	}
+VIDEO_START_MEMBER(cave_state,cave_3_layers){	cave_vh_start(machine(), 3);	}
+VIDEO_START_MEMBER(cave_state,cave_4_layers){	cave_vh_start(machine(), 4);	}
 
 
-VIDEO_START( sailormn_3_layers )
+VIDEO_START_MEMBER(cave_state,sailormn_3_layers)
 {
-	cave_state *state = machine.driver_data<cave_state>();
-	cave_vh_start(machine, 2);
+	cave_vh_start(machine(), 2);
 
 	/* Layer 2 (8x8) needs to be handled differently */
-	state->m_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cave_state::sailormn_get_tile_info_2),state), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8 );
+	m_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cave_state::sailormn_get_tile_info_2),this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8 );
 
-	state->m_tilemap[2]->set_transparent_pen(0);
-	state->m_tilemap[2]->set_scroll_rows(1);
-	state->m_tilemap[2]->set_scroll_cols(1);
+	m_tilemap[2]->set_transparent_pen(0);
+	m_tilemap[2]->set_scroll_rows(1);
+	m_tilemap[2]->set_scroll_cols(1);
 }
 
 /***************************************************************************

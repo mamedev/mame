@@ -17,10 +17,9 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_display_enable)
 	COMBINE_DATA(&m_disp_enable);
 }
 
-VIDEO_START( kaneko16 )
+VIDEO_START_MEMBER(kaneko16_state,kaneko16)
 {
-	kaneko16_state *state = machine.driver_data<kaneko16_state>();
-	state->m_disp_enable = 1;	// default enabled for games not using it
+	m_disp_enable = 1;	// default enabled for games not using it
 }
 
 
@@ -88,7 +87,7 @@ SCREEN_UPDATE_IND16( kaneko16 )
 
 /* Berlwall and Gals Panic have an additional hi-color layers */
 
-PALETTE_INIT( berlwall )
+PALETTE_INIT_MEMBER(kaneko16_berlwall_state,berlwall)
 {
 	int i;
 
@@ -96,18 +95,17 @@ PALETTE_INIT( berlwall )
 
 	/* initialize 555 RGB lookup */
 	for (i = 0; i < 32768; i++)
-		palette_set_color_rgb(machine,2048 + i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
+		palette_set_color_rgb(machine(),2048 + i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
 }
 
-VIDEO_START( berlwall )
+VIDEO_START_MEMBER(kaneko16_berlwall_state,berlwall)
 {
-	kaneko16_berlwall_state *state = machine.driver_data<kaneko16_berlwall_state>();
 	int sx, x,y;
-	UINT8 *RAM	=	state->memregion("gfx3")->base();
+	UINT8 *RAM	=	memregion("gfx3")->base();
 
 	/* Render the hi-color static backgrounds held in the ROMs */
 
-	state->m_bg15_bitmap.allocate(256 * 32, 256 * 1);
+	m_bg15_bitmap.allocate(256 * 32, 256 * 1);
 
 /*
     8aba is used as background color
@@ -140,10 +138,10 @@ VIDEO_START( berlwall )
 			if ((r & 0x10) && (b & 0x10))
 				g = (g - 1) & 0x1f;		/* decrease with wraparound */
 
-			state->m_bg15_bitmap.pix16(y, sx * 256 + x) = 2048 + ((g << 10) | (r << 5) | b);
+			m_bg15_bitmap.pix16(y, sx * 256 + x) = 2048 + ((g << 10) | (r << 5) | b);
 	  }
 
-	VIDEO_START_CALL(kaneko16);
+	VIDEO_START_CALL_MEMBER(kaneko16);
 }
 
 

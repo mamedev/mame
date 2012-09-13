@@ -20,6 +20,7 @@ public:
 
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(display_w);
+	virtual void machine_reset();
 };
 
 /*
@@ -127,7 +128,7 @@ static INPUT_PORTS_START( mk14 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(mk14)
+void mk14_state::machine_reset()
 {
 }
 
@@ -146,7 +147,6 @@ static MACHINE_CONFIG_START( mk14, mk14_state )
 	MCFG_CPU_ADD("maincpu", INS8060, XTAL_4_433619MHz)
 	MCFG_CPU_PROGRAM_MAP(mk14_mem)
 
-	MCFG_MACHINE_RESET(mk14)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mk14)

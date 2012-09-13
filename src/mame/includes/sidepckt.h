@@ -26,12 +26,14 @@ public:
 	DECLARE_DRIVER_INIT(sidepckt);
 	DECLARE_DRIVER_INIT(sidepctj);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/sidepckt.c -----------*/
 
-PALETTE_INIT( sidepckt );
-VIDEO_START( sidepckt );
+
+
 SCREEN_UPDATE_IND16( sidepckt );
 

@@ -191,7 +191,7 @@ static MACHINE_CONFIG_START( galaxy, galaxy_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 
-	MCFG_MACHINE_RESET( galaxy )
+	MCFG_MACHINE_RESET_OVERRIDE(galaxy_state, galaxy )
 
 	/* video hardware */
 	MCFG_SCREEN_SIZE(384, 212)
@@ -202,7 +202,6 @@ static MACHINE_CONFIG_START( galaxy, galaxy_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT( black_and_white )
 
-	MCFG_VIDEO_START( galaxy )
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", galaxy, "gal", 0)
@@ -228,7 +227,7 @@ static MACHINE_CONFIG_START( galaxyp, galaxy_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 
-	MCFG_MACHINE_RESET( galaxyp )
+	MCFG_MACHINE_RESET_OVERRIDE(galaxy_state, galaxyp )
 
 	/* video hardware */
 	MCFG_SCREEN_SIZE(384, 208)
@@ -238,7 +237,6 @@ static MACHINE_CONFIG_START( galaxyp, galaxy_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT( black_and_white )
 
-	MCFG_VIDEO_START( galaxy )
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", galaxy, "gal", 0)

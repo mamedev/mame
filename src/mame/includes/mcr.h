@@ -96,6 +96,10 @@ public:
 	TILE_GET_INFO_MEMBER(mcr_90009_get_tile_info);
 	TILE_GET_INFO_MEMBER(mcr_90010_get_tile_info);
 	TILE_GET_INFO_MEMBER(mcr_91490_get_tile_info);
+	DECLARE_MACHINE_START(mcr);
+	DECLARE_MACHINE_RESET(mcr);
+	DECLARE_VIDEO_START(mcr);
+	DECLARE_MACHINE_START(nflfoot);
 };
 
 
@@ -120,9 +124,9 @@ extern const gfx_layout mcr_sprite_layout;
 extern UINT32 mcr_cpu_board;
 extern UINT32 mcr_sprite_board;
 
-MACHINE_START( mcr );
-MACHINE_RESET( mcr );
-MACHINE_START( nflfoot );
+
+
+
 
 TIMER_DEVICE_CALLBACK( mcr_interrupt );
 TIMER_DEVICE_CALLBACK( mcr_ipu_interrupt );
@@ -135,7 +139,7 @@ TIMER_DEVICE_CALLBACK( mcr_ipu_interrupt );
 extern INT8 mcr12_sprite_xoffs;
 extern INT8 mcr12_sprite_xoffs_flip;
 
-VIDEO_START( mcr );
+
 
 
 

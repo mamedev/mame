@@ -196,8 +196,6 @@ static MACHINE_CONFIG_START( mrdo, mrdo_state )
 	MCFG_GFXDECODE(mrdo)
 	MCFG_PALETTE_LENGTH(64*4+16*4)
 
-	MCFG_PALETTE_INIT(mrdo)
-	MCFG_VIDEO_START(mrdo)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

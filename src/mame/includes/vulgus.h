@@ -23,12 +23,14 @@ public:
 	DECLARE_WRITE8_MEMBER(vulgus_palette_bank_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/vulgus.c -----------*/
 
 
-VIDEO_START( vulgus );
-PALETTE_INIT( vulgus );
+
+
 SCREEN_UPDATE_IND16( vulgus );

@@ -293,16 +293,16 @@ static GFXDECODE_START( triplhnt )
 GFXDECODE_END
 
 
-static PALETTE_INIT( triplhnt )
+void triplhnt_state::palette_init()
 {
-	palette_set_color(machine, 0, MAKE_RGB(0xAF, 0xAF, 0xAF));  /* sprites */
-	palette_set_color(machine, 1, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, 2, MAKE_RGB(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine, 3, MAKE_RGB(0x50, 0x50, 0x50));
-	palette_set_color(machine, 4, MAKE_RGB(0x00, 0x00, 0x00));  /* tiles */
-	palette_set_color(machine, 5, MAKE_RGB(0x3F, 0x3F, 0x3F));
-	palette_set_color(machine, 6, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, 7, MAKE_RGB(0x3F, 0x3F, 0x3F));
+	palette_set_color(machine(), 0, MAKE_RGB(0xAF, 0xAF, 0xAF));  /* sprites */
+	palette_set_color(machine(), 1, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine(), 2, MAKE_RGB(0xFF, 0xFF, 0xFF));
+	palette_set_color(machine(), 3, MAKE_RGB(0x50, 0x50, 0x50));
+	palette_set_color(machine(), 4, MAKE_RGB(0x00, 0x00, 0x00));  /* tiles */
+	palette_set_color(machine(), 5, MAKE_RGB(0x3F, 0x3F, 0x3F));
+	palette_set_color(machine(), 6, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine(), 7, MAKE_RGB(0x3F, 0x3F, 0x3F));
 }
 
 
@@ -324,8 +324,6 @@ static MACHINE_CONFIG_START( triplhnt, triplhnt_state )
 
 	MCFG_GFXDECODE(triplhnt)
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(triplhnt)
-	MCFG_VIDEO_START(triplhnt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

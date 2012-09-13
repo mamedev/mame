@@ -239,10 +239,9 @@ static void draw_driver(running_machine &machine, bitmap_ind16 &bitmap, const re
 }
 
 
-VIDEO_START( sspeedr )
+void sspeedr_state::video_start()
 {
-	sspeedr_state *state = machine.driver_data<sspeedr_state>();
-	state->m_toggle = 0;
+	m_toggle = 0;
 }
 
 

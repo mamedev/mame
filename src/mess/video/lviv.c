@@ -24,12 +24,12 @@ const unsigned char lviv_palette[8*3] =
 };
 
 
-PALETTE_INIT( lviv )
+void lviv_state::palette_init()
 {
 	int i;
 
 	for ( i = 0; i < sizeof(lviv_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, lviv_palette[i*3], lviv_palette[i*3+1], lviv_palette[i*3+2]);
+		palette_set_color_rgb(machine(), i, lviv_palette[i*3], lviv_palette[i*3+1], lviv_palette[i*3+2]);
 	}
 }
 
@@ -59,7 +59,7 @@ void lviv_update_palette(running_machine &machine, UINT8 pal)
 	state->m_colortable[0][3] |= ((pal>>6)&0x01) ? 0x01 : 0x00;
 }
 
-VIDEO_START( lviv )
+void lviv_state::video_start()
 {
 }
 

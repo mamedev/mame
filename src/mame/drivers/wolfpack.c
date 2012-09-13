@@ -24,9 +24,9 @@ static TIMER_CALLBACK( periodic_callback )
 }
 
 
-static MACHINE_RESET( wolfpack )
+void wolfpack_state::machine_reset()
 {
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0), FUNC(periodic_callback));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), FUNC(periodic_callback));
 }
 
 
@@ -294,7 +294,6 @@ static MACHINE_CONFIG_START( wolfpack, wolfpack_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	/* video hardware */
-	MCFG_MACHINE_RESET(wolfpack)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -306,8 +305,6 @@ static MACHINE_CONFIG_START( wolfpack, wolfpack_state )
 
 	MCFG_GFXDECODE(wolfpack)
 	MCFG_PALETTE_LENGTH(12)
-	MCFG_PALETTE_INIT(wolfpack)
-	MCFG_VIDEO_START(wolfpack)
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("speech", S14001A, 20000) /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */

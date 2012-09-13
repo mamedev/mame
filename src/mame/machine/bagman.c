@@ -208,19 +208,18 @@ UINT8 line;
 	m_columnvalue[line + 1] = 1 - (data & 1);
 }
 
-MACHINE_RESET( bagman )
+MACHINE_RESET_MEMBER(bagman_state,bagman)
 {
-	bagman_state *state = machine.driver_data<bagman_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	state->bagman_pal16r6_w(*space, 0, 1);	/*pin 2*/
-	state->bagman_pal16r6_w(*space, 1, 1);	/*pin 3*/
-	state->bagman_pal16r6_w(*space, 2, 1);	/*pin 4*/
-	state->bagman_pal16r6_w(*space, 3, 1);	/*pin 5*/
-	state->bagman_pal16r6_w(*space, 4, 1);	/*pin 6*/
-	state->bagman_pal16r6_w(*space, 5, 1);	/*pin 7*/
-	state->bagman_pal16r6_w(*space, 6, 1);	/*pin 8*/
-	state->bagman_pal16r6_w(*space, 7, 1);	/*pin 9*/
-	state->update_pal();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	bagman_pal16r6_w(*space, 0, 1);	/*pin 2*/
+	bagman_pal16r6_w(*space, 1, 1);	/*pin 3*/
+	bagman_pal16r6_w(*space, 2, 1);	/*pin 4*/
+	bagman_pal16r6_w(*space, 3, 1);	/*pin 5*/
+	bagman_pal16r6_w(*space, 4, 1);	/*pin 6*/
+	bagman_pal16r6_w(*space, 5, 1);	/*pin 7*/
+	bagman_pal16r6_w(*space, 6, 1);	/*pin 8*/
+	bagman_pal16r6_w(*space, 7, 1);	/*pin 9*/
+	update_pal();
 }
 
 READ8_MEMBER(bagman_state::bagman_pal16r6_r)

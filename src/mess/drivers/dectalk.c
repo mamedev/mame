@@ -193,6 +193,7 @@ public:
 	DECLARE_WRITE16_MEMBER(spc_outfifo_data_w);
 	DECLARE_READ16_MEMBER(spc_semaphore_r);
 	DECLARE_DRIVER_INIT(dectalk);
+	virtual void machine_reset();
 };
 
 
@@ -344,10 +345,10 @@ static void dectalk_reset(device_t *device)
 	state->m_duart_outport = 0;
 }
 
-static MACHINE_RESET( dectalk )
+void dectalk_state::machine_reset()
 {
 	/* hook the RESET line, which resets a slew of other components */
-	m68k_set_reset_callback(machine.device("maincpu"), dectalk_reset);
+	m68k_set_reset_callback(machine().device("maincpu"), dectalk_reset);
 }
 
 /* Begin 68k i/o handlers */
@@ -731,7 +732,6 @@ static MACHINE_CONFIG_START( dectalk, dectalk_state )
     MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* E74 20MHz OSC (/2) */
     MCFG_CPU_PROGRAM_MAP(m68k_mem)
     MCFG_CPU_IO_MAP(m68k_io)
-    MCFG_MACHINE_RESET(dectalk)
     MCFG_DUART68681_ADD( "duart68681", XTAL_3_6864MHz, dectalk_duart68681_config ) /* Y3 3.6864MHz Xtal */
 
 

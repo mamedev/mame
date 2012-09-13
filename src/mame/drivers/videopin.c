@@ -61,16 +61,15 @@ static TIMER_CALLBACK( interrupt_callback )
 }
 
 
-static MACHINE_RESET( videopin )
+void videopin_state::machine_reset()
 {
-	videopin_state *state = machine.driver_data<videopin_state>();
 
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(32), FUNC(interrupt_callback), 32);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(32), FUNC(interrupt_callback), 32);
 
 	/* both output latches are cleared on reset */
 
-	state->videopin_out1_w(*machine.memory().first_space(), 0, 0);
-	state->videopin_out2_w(*machine.memory().first_space(), 0, 0);
+	videopin_out1_w(*machine().memory().first_space(), 0, 0);
+	videopin_out2_w(*machine().memory().first_space(), 0, 0);
 }
 
 
@@ -328,7 +327,6 @@ static MACHINE_CONFIG_START( videopin, videopin_state )
 	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_RESET(videopin)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -341,7 +339,6 @@ static MACHINE_CONFIG_START( videopin, videopin_state )
 	MCFG_PALETTE_LENGTH(2)
 
 	MCFG_PALETTE_INIT(black_and_white)
-	MCFG_VIDEO_START(videopin)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

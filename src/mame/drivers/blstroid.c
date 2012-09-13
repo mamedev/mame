@@ -47,19 +47,18 @@ WRITE16_MEMBER(blstroid_state::blstroid_halt_until_hblank_0_w)
 }
 
 
-static MACHINE_START( blstroid )
+MACHINE_START_MEMBER(blstroid_state,blstroid)
 {
-	atarigen_init(machine);
+	atarigen_init(machine());
 }
 
 
-static MACHINE_RESET( blstroid )
+MACHINE_RESET_MEMBER(blstroid_state,blstroid)
 {
-	blstroid_state *state = machine.driver_data<blstroid_state>();
 
-	atarigen_eeprom_reset(state);
-	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine.primary_screen, blstroid_scanline_update, 8);
+	atarigen_eeprom_reset(this);
+	atarigen_interrupt_reset(this, update_interrupts);
+	atarigen_scanline_timer_reset(*machine().primary_screen, blstroid_scanline_update, 8);
 	atarijsa_reset();
 }
 
@@ -207,8 +206,8 @@ static MACHINE_CONFIG_START( blstroid, blstroid_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
-	MCFG_MACHINE_START(blstroid)
-	MCFG_MACHINE_RESET(blstroid)
+	MCFG_MACHINE_START_OVERRIDE(blstroid_state,blstroid)
+	MCFG_MACHINE_RESET_OVERRIDE(blstroid_state,blstroid)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
@@ -222,7 +221,7 @@ static MACHINE_CONFIG_START( blstroid, blstroid_state )
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 320*2, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(blstroid)
 
-	MCFG_VIDEO_START(blstroid)
+	MCFG_VIDEO_START_OVERRIDE(blstroid_state,blstroid)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(jsa_i_stereo)

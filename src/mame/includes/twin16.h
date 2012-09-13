@@ -58,6 +58,9 @@ public:
 	DECLARE_DRIVER_INIT(twin16);
 	DECLARE_DRIVER_INIT(cuebrickj);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	DECLARE_MACHINE_START(twin16);
+	DECLARE_MACHINE_RESET(twin16);
+	DECLARE_VIDEO_START(twin16);
 };
 
 
@@ -69,7 +72,7 @@ int twin16_spriteram_process_enable( running_machine &machine );
 /*----------- defined in video/twin16.c -----------*/
 
 
-VIDEO_START( twin16 );
+
 SCREEN_UPDATE_IND16( twin16 );
 SCREEN_VBLANK( twin16 );
 

@@ -29,11 +29,12 @@ public:
 	DECLARE_WRITE8_MEMBER(solomon_flipscreen_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/solomon.c -----------*/
 
 
-VIDEO_START( solomon );
+
 SCREEN_UPDATE_IND16( solomon );

@@ -20,10 +20,9 @@ void tank8_set_collision(running_machine &machine, int index)
 }
 
 
-static MACHINE_RESET( tank8 )
+void tank8_state::machine_reset()
 {
-	tank8_state *state = machine.driver_data<tank8_state>();
-	state->m_collision_index = 0;
+	m_collision_index = 0;
 }
 
 
@@ -337,7 +336,6 @@ static MACHINE_CONFIG_START( tank8, tank8_state )
 	MCFG_CPU_ADD("maincpu", M6800, 11055000 / 10) /* ? */
 	MCFG_CPU_PROGRAM_MAP(tank8_cpu_map)
 
-	MCFG_MACHINE_RESET(tank8)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -353,8 +351,6 @@ static MACHINE_CONFIG_START( tank8, tank8_state )
 	MCFG_GFXDECODE(tank8)
 	MCFG_PALETTE_LENGTH(20)
 
-	MCFG_PALETTE_INIT(tank8)
-	MCFG_VIDEO_START(tank8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

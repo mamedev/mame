@@ -91,88 +91,83 @@ static void aerofgt_register_state_globals( running_machine &machine )
 	state->save_item(NAME(state->m_spritepalettebank));
 }
 
-VIDEO_START( pspikes )
+VIDEO_START_MEMBER(aerofgt_state,pspikes)
 {
-	aerofgt_state *state = machine.driver_data<aerofgt_state>();
-	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::get_pspikes_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::get_pspikes_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 	/* no bg2 in this game */
 
-	state->m_sprite_gfx = 1;
+	m_sprite_gfx = 1;
 
-	aerofgt_register_state_globals(machine);
-	state->save_item(NAME(state->m_spikes91_lookup));
+	aerofgt_register_state_globals(machine());
+	save_item(NAME(m_spikes91_lookup));
 }
 
 
-VIDEO_START( karatblz )
+VIDEO_START_MEMBER(aerofgt_state,karatblz)
 {
-	aerofgt_state *state = machine.driver_data<aerofgt_state>();
-	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::karatblz_bg1_tile_info),state),TILEMAP_SCAN_ROWS,     8,8,64,64);
-	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::karatblz_bg2_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::karatblz_bg1_tile_info),this),TILEMAP_SCAN_ROWS,     8,8,64,64);
+	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::karatblz_bg2_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 
-	state->m_bg2_tilemap->set_transparent_pen(15);
-	state->m_spritepalettebank = 0;
-	state->m_sprite_gfx = 2;
+	m_bg2_tilemap->set_transparent_pen(15);
+	m_spritepalettebank = 0;
+	m_sprite_gfx = 2;
 
-	aerofgt_register_state_globals(machine);
+	aerofgt_register_state_globals(machine());
 }
 
-VIDEO_START( spinlbrk )
+VIDEO_START_MEMBER(aerofgt_state,spinlbrk)
 {
-	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 	int i;
 
-	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::spinlbrk_bg1_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::karatblz_bg2_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::spinlbrk_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::karatblz_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
-	state->m_bg2_tilemap->set_transparent_pen(15);
+	m_bg2_tilemap->set_transparent_pen(15);
 
-	state->m_spritepalettebank = 0;
-	state->m_sprite_gfx = 2;
+	m_spritepalettebank = 0;
+	m_sprite_gfx = 2;
 
 	/* sprite maps are hardcoded in this game */
 
 	/* enemy sprites use ROM instead of RAM */
-	state->m_spriteram2.set_target(reinterpret_cast<UINT16 *>(state->memregion("gfx5")->base()), 0x20000);
+	m_spriteram2.set_target(reinterpret_cast<UINT16 *>(memregion("gfx5")->base()), 0x20000);
 
 	/* front sprites are direct maps */
-	state->m_spriteram1.set_target(state->m_spriteram2 + state->m_spriteram2.bytes() / 2, 0x4000);
+	m_spriteram1.set_target(m_spriteram2 + m_spriteram2.bytes() / 2, 0x4000);
 
-	for (i = 0; i < state->m_spriteram1.bytes() / 2; i++)
+	for (i = 0; i < m_spriteram1.bytes() / 2; i++)
 	{
-		state->m_spriteram1[i] = i;
+		m_spriteram1[i] = i;
 	}
 
-	aerofgt_register_state_globals(machine);
+	aerofgt_register_state_globals(machine());
 }
 
-VIDEO_START( turbofrc )
+VIDEO_START_MEMBER(aerofgt_state,turbofrc)
 {
-	aerofgt_state *state = machine.driver_data<aerofgt_state>();
-	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::get_bg1_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::get_bg2_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
-	state->m_bg2_tilemap->set_transparent_pen(15);
+	m_bg2_tilemap->set_transparent_pen(15);
 
-	state->m_spritepalettebank = 0;
-	state->m_sprite_gfx = 2;
+	m_spritepalettebank = 0;
+	m_sprite_gfx = 2;
 
-	aerofgt_register_state_globals(machine);
+	aerofgt_register_state_globals(machine());
 }
 
-VIDEO_START( wbbc97 )
+VIDEO_START_MEMBER(aerofgt_state,wbbc97)
 {
-	aerofgt_state *state = machine.driver_data<aerofgt_state>();
-	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::get_pspikes_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::get_pspikes_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	/* no bg2 in this game */
 
-	state->m_bg1_tilemap->set_transparent_pen(15);
+	m_bg1_tilemap->set_transparent_pen(15);
 
-	state->m_sprite_gfx = 1;
+	m_sprite_gfx = 1;
 
-	aerofgt_register_state_globals(machine);
+	aerofgt_register_state_globals(machine());
 
-	state->save_item(NAME(state->m_wbbc97_bitmap_enable));
+	save_item(NAME(m_wbbc97_bitmap_enable));
 }
 
 /***************************************************************************

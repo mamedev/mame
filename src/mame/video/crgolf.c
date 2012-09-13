@@ -88,17 +88,16 @@ static void get_pens( running_machine &machine, pen_t *pens )
  *
  *************************************/
 
-static VIDEO_START( crgolf )
+VIDEO_START_MEMBER(crgolf_state,crgolf)
 {
-	crgolf_state *state = machine.driver_data<crgolf_state>();
 
 	/* allocate memory for the two bitmaps */
-	state->m_videoram_a = auto_alloc_array(machine, UINT8, VIDEORAM_SIZE);
-	state->m_videoram_b = auto_alloc_array(machine, UINT8, VIDEORAM_SIZE);
+	m_videoram_a = auto_alloc_array(machine(), UINT8, VIDEORAM_SIZE);
+	m_videoram_b = auto_alloc_array(machine(), UINT8, VIDEORAM_SIZE);
 
 	/* register for save states */
-	state->save_pointer(NAME(state->m_videoram_a), VIDEORAM_SIZE);
-	state->save_pointer(NAME(state->m_videoram_b), VIDEORAM_SIZE);
+	save_pointer(NAME(m_videoram_a), VIDEORAM_SIZE);
+	save_pointer(NAME(m_videoram_b), VIDEORAM_SIZE);
 }
 
 
@@ -192,7 +191,7 @@ static SCREEN_UPDATE_RGB32( crgolf )
 
 MACHINE_CONFIG_FRAGMENT( crgolf_video )
 
-	MCFG_VIDEO_START(crgolf)
+	MCFG_VIDEO_START_OVERRIDE(crgolf_state,crgolf)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 247)

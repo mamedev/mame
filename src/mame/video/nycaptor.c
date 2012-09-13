@@ -71,23 +71,22 @@ TILE_GET_INFO_MEMBER(nycaptor_state::get_tile_info)
 }
 
 
-VIDEO_START( nycaptor )
+void nycaptor_state::video_start()
 {
-	nycaptor_state *state = machine.driver_data<nycaptor_state>();
 
-	state->m_spriteram = auto_alloc_array(machine, UINT8, 160);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(nycaptor_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32 );
+	m_spriteram = auto_alloc_array(machine(), UINT8, 160);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(nycaptor_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32 );
 
-	state->m_bg_tilemap->set_transmask(0, 0xf800, 0x7ff); //split 0
-	state->m_bg_tilemap->set_transmask(1, 0xfe00, 0x01ff);//split 1
-	state->m_bg_tilemap->set_transmask(2, 0xfffc, 0x0003);//split 2
-	state->m_bg_tilemap->set_transmask(3, 0xfff0, 0x000f);//split 3
+	m_bg_tilemap->set_transmask(0, 0xf800, 0x7ff); //split 0
+	m_bg_tilemap->set_transmask(1, 0xfe00, 0x01ff);//split 1
+	m_bg_tilemap->set_transmask(2, 0xfffc, 0x0003);//split 2
+	m_bg_tilemap->set_transmask(3, 0xfff0, 0x000f);//split 3
 
-	state->m_generic_paletteram_8.allocate(0x200);
-	state->m_generic_paletteram2_8.allocate(0x200);
-	state->m_bg_tilemap->set_scroll_cols(32);
+	m_generic_paletteram_8.allocate(0x200);
+	m_generic_paletteram2_8.allocate(0x200);
+	m_bg_tilemap->set_scroll_cols(32);
 
-	state->save_pointer(NAME(state->m_spriteram), 160);
+	save_pointer(NAME(m_spriteram), 160);
 }
 
 WRITE8_MEMBER(nycaptor_state::nycaptor_videoram_w)

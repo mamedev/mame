@@ -403,7 +403,7 @@ static MACHINE_CONFIG_START( special, special_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(specialist_mem)
-	MCFG_MACHINE_RESET( special )
+	MCFG_MACHINE_RESET_OVERRIDE(special_state, special )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -411,7 +411,7 @@ static MACHINE_CONFIG_START( special, special_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(384, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-	MCFG_VIDEO_START(special)
+	MCFG_VIDEO_START_OVERRIDE(special_state,special)
 	MCFG_SCREEN_UPDATE_STATIC(special)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
@@ -438,22 +438,22 @@ static MACHINE_CONFIG_DERIVED( specialp, special )
 	MCFG_SCREEN_UPDATE_STATIC(specialp)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_VIDEO_START(specialp)
+	MCFG_VIDEO_START_OVERRIDE(special_state,specialp)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( specimx, special )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(specimx_mem)
 
-	MCFG_MACHINE_START ( specimx )
-	MCFG_MACHINE_RESET ( specimx )
+	MCFG_MACHINE_START_OVERRIDE (special_state, specimx )
+	MCFG_MACHINE_RESET_OVERRIDE (special_state, specimx )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(specimx)
-	MCFG_VIDEO_START(specimx)
+	MCFG_VIDEO_START_OVERRIDE(special_state,specimx)
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT( specimx )
+	MCFG_PALETTE_INIT_OVERRIDE(special_state, specimx )
 
 	/* audio hardware */
 	MCFG_SOUND_ADD("custom", SPECIMX, 0)
@@ -474,7 +474,7 @@ static MACHINE_CONFIG_START( erik, special_state )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(erik_mem)
 	MCFG_CPU_IO_MAP(erik_io_map)
-	MCFG_MACHINE_RESET( erik )
+	MCFG_MACHINE_RESET_OVERRIDE(special_state, erik )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -482,10 +482,10 @@ static MACHINE_CONFIG_START( erik, special_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(384, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-	MCFG_VIDEO_START(erik)
+	MCFG_VIDEO_START_OVERRIDE(special_state,erik)
 	MCFG_SCREEN_UPDATE_STATIC(erik)
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(erik)
+	MCFG_PALETTE_INIT_OVERRIDE(special_state,erik)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

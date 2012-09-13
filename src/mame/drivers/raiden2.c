@@ -911,17 +911,16 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 /* VIDEO START (move to video file) */
 
 
-static VIDEO_START( raiden2 )
+VIDEO_START_MEMBER(raiden2_state,raiden2)
 {
-	raiden2_state *state = machine.driver_data<raiden2_state>();
-	state->text_layer       = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(raiden2_state::get_text_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 64,32 );
-	state->background_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(raiden2_state::get_back_tile_info),state), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
-	state->midground_layer  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(raiden2_state::get_mid_tile_info),state),  TILEMAP_SCAN_ROWS, 16,16, 32,32 );
-	state->foreground_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(raiden2_state::get_fore_tile_info),state), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
+	text_layer       = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(raiden2_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64,32 );
+	background_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(raiden2_state::get_back_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
+	midground_layer  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(raiden2_state::get_mid_tile_info),this),  TILEMAP_SCAN_ROWS, 16,16, 32,32 );
+	foreground_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(raiden2_state::get_fore_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
 
-	state->midground_layer->set_transparent_pen(15);
-	state->foreground_layer->set_transparent_pen(15);
-	state->text_layer->set_transparent_pen(15);
+	midground_layer->set_transparent_pen(15);
+	foreground_layer->set_transparent_pen(15);
+	text_layer->set_transparent_pen(15);
 }
 
 /* SCREEN_UPDATE_IND16 (move to video file) */
@@ -1095,58 +1094,54 @@ void raiden2_state::common_reset()
 	cop_itoa_digit_count = 4; //TODO: Raiden 2 never inits the BCD register, value here is a guess (8 digits, as WR is 10.000.000 + a)
 }
 
-static MACHINE_RESET(raiden2)
+MACHINE_RESET_MEMBER(raiden2_state,raiden2)
 {
-	raiden2_state *state = machine.driver_data<raiden2_state>();
-	state->common_reset();
+	common_reset();
 	sprcpt_init();
-	MACHINE_RESET_CALL(seibu_sound);
+	MACHINE_RESET_CALL_LEGACY(seibu_sound);
 
-	state->membank("mainbank")->set_entry(1);
+	membank("mainbank")->set_entry(1);
 
-	state->prg_bank = 0;
+	prg_bank = 0;
 	//cop_init();
 }
 
-static MACHINE_RESET(raidendx)
+MACHINE_RESET_MEMBER(raiden2_state,raidendx)
 {
-	raiden2_state *state = machine.driver_data<raiden2_state>();
-	state->common_reset();
+	common_reset();
 	sprcpt_init();
-	MACHINE_RESET_CALL(seibu_sound);
+	MACHINE_RESET_CALL_LEGACY(seibu_sound);
 
-	state->membank("mainbank")->set_entry(8);
+	membank("mainbank")->set_entry(8);
 
-	state->prg_bank = 0x08;
+	prg_bank = 0x08;
 
 	//cop_init();
 }
 
-static MACHINE_RESET(zeroteam)
+MACHINE_RESET_MEMBER(raiden2_state,zeroteam)
 {
-	raiden2_state *state = machine.driver_data<raiden2_state>();
-	state->bg_bank = 0;
-	state->fg_bank = 2;
-	state->mid_bank = 1;
+	bg_bank = 0;
+	fg_bank = 2;
+	mid_bank = 1;
 	sprcpt_init();
-	MACHINE_RESET_CALL(seibu_sound);
+	MACHINE_RESET_CALL_LEGACY(seibu_sound);
 
-	state->membank("mainbank")->set_entry(1);
+	membank("mainbank")->set_entry(1);
 
-	state->prg_bank = 0;
+	prg_bank = 0;
 	//cop_init();
 }
 
-static MACHINE_RESET(xsedae)
+MACHINE_RESET_MEMBER(raiden2_state,xsedae)
 {
-	raiden2_state *state = machine.driver_data<raiden2_state>();
-	state->bg_bank = 0;
-	state->fg_bank = 2;
-	state->mid_bank = 1;
+	bg_bank = 0;
+	fg_bank = 2;
+	mid_bank = 1;
 	sprcpt_init();
-	MACHINE_RESET_CALL(seibu_sound);
+	MACHINE_RESET_CALL_LEGACY(seibu_sound);
 
-	//state->membank("mainbank")->set_entry(1);
+	//membank("mainbank")->set_entry(1);
 
 	//cop_init();
 }
@@ -1798,7 +1793,7 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 	MCFG_CPU_PROGRAM_MAP(raiden2_mem)
 	MCFG_CPU_VBLANK_INT("screen", raiden2_interrupt)
 
-	MCFG_MACHINE_RESET(raiden2)
+	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,raiden2)
 
 	SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(XTAL_28_63636MHz/8)
 
@@ -1814,7 +1809,7 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 	MCFG_GFXDECODE(raiden2)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(raiden2)
+	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM2151_RAIDEN2_INTERFACE(XTAL_28_63636MHz/8,XTAL_28_63636MHz/28,1,2)
@@ -1830,7 +1825,7 @@ static MACHINE_CONFIG_DERIVED( xsedae, raiden2 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(xsedae_mem)
 
-	MCFG_MACHINE_RESET(xsedae)
+	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,xsedae)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
@@ -1843,7 +1838,7 @@ static MACHINE_CONFIG_DERIVED( raidendx, raiden2 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(raidendx_mem)
 
-	MCFG_MACHINE_RESET(raidendx)
+	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,raidendx)
 MACHINE_CONFIG_END
 
 
@@ -1854,7 +1849,7 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 	MCFG_CPU_PROGRAM_MAP(zeroteam_mem)
 	MCFG_CPU_VBLANK_INT("screen", raiden2_interrupt)
 
-	MCFG_MACHINE_RESET(zeroteam)
+	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,zeroteam)
 
 	SEIBU_NEWZEROTEAM_SOUND_SYSTEM_CPU(XTAL_28_63636MHz/8)
 
@@ -1870,7 +1865,7 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 	MCFG_GFXDECODE(raiden2)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(raiden2)
+	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(XTAL_28_63636MHz/8, 1320000/* ? */)

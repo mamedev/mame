@@ -17,30 +17,30 @@ WRITE8_MEMBER(n8080_state::n8080_video_control_w)
 }
 
 
-PALETTE_INIT( n8080 )
+PALETTE_INIT_MEMBER(n8080_state,n8080)
 {
 	int i;
 
 	for (i = 0; i < 8; i++)
-		palette_set_color_rgb(machine, i, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		palette_set_color_rgb(machine(), i, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 }
 
 
-PALETTE_INIT( helifire )
+PALETTE_INIT_MEMBER(n8080_state,helifire)
 {
 	int i;
 
-	PALETTE_INIT_CALL(n8080);
+	PALETTE_INIT_CALL_MEMBER(n8080);
 
 	for (i = 0; i < 0x100; i++)
 	{
 		int level = 0xff * exp(-3 * i / 255.); /* capacitor discharge */
 
-		palette_set_color(machine, 0x000 + 8 + i, MAKE_RGB(0x00, 0x00, level));   /* shades of blue */
-		palette_set_color(machine, 0x100 + 8 + i, MAKE_RGB(0x00, 0xC0, level));   /* shades of blue w/ green star */
+		palette_set_color(machine(), 0x000 + 8 + i, MAKE_RGB(0x00, 0x00, level));   /* shades of blue */
+		palette_set_color(machine(), 0x100 + 8 + i, MAKE_RGB(0x00, 0xC0, level));   /* shades of blue w/ green star */
 
-		palette_set_color(machine, 0x200 + 8 + i, MAKE_RGB(level, 0x00, 0x00));   /* shades of red */
-		palette_set_color(machine, 0x300 + 8 + i, MAKE_RGB(level, 0xC0, 0x00));   /* shades of red w/ green star */
+		palette_set_color(machine(), 0x200 + 8 + i, MAKE_RGB(level, 0x00, 0x00));   /* shades of red */
+		palette_set_color(machine(), 0x300 + 8 + i, MAKE_RGB(level, 0xC0, 0x00));   /* shades of red w/ green star */
 	}
 }
 
@@ -88,40 +88,37 @@ static void helifire_next_line( running_machine &machine )
 }
 
 
-VIDEO_START( spacefev )
+VIDEO_START_MEMBER(n8080_state,spacefev)
 {
-	n8080_state *state = machine.driver_data<n8080_state>();
 
-	state->m_cannon_timer = machine.scheduler().timer_alloc(FUNC(spacefev_stop_red_cannon));
+	m_cannon_timer = machine().scheduler().timer_alloc(FUNC(spacefev_stop_red_cannon));
 
-	state->flip_screen_set_no_update(0);
+	flip_screen_set_no_update(0);
 
-	state->save_item(NAME(state->m_spacefev_red_screen));
-	state->save_item(NAME(state->m_spacefev_red_cannon));
+	save_item(NAME(m_spacefev_red_screen));
+	save_item(NAME(m_spacefev_red_cannon));
 }
 
 
-VIDEO_START( sheriff )
+VIDEO_START_MEMBER(n8080_state,sheriff)
 {
-	n8080_state *state = machine.driver_data<n8080_state>();
 
-	state->flip_screen_set_no_update(0);
+	flip_screen_set_no_update(0);
 
-	state->save_item(NAME(state->m_sheriff_color_mode));
-	state->save_item(NAME(state->m_sheriff_color_data));
+	save_item(NAME(m_sheriff_color_mode));
+	save_item(NAME(m_sheriff_color_data));
 }
 
 
-VIDEO_START( helifire )
+VIDEO_START_MEMBER(n8080_state,helifire)
 {
-	n8080_state *state = machine.driver_data<n8080_state>();
 	UINT8 data = 0;
 	int i;
 
-	state->save_item(NAME(state->m_helifire_mv));
-	state->save_item(NAME(state->m_helifire_sc));
-	state->save_item(NAME(state->m_helifire_flash));
-	state->save_item(NAME(state->m_helifire_LSFR));
+	save_item(NAME(m_helifire_mv));
+	save_item(NAME(m_helifire_sc));
+	save_item(NAME(m_helifire_flash));
+	save_item(NAME(m_helifire_LSFR));
 
 	for (i = 0; i < 63; i++)
 	{
@@ -131,10 +128,10 @@ VIDEO_START( helifire )
 
 		data = (data << 1) | (bit & 1);
 
-		state->m_helifire_LSFR[i] = data;
+		m_helifire_LSFR[i] = data;
 	}
 
-	state->flip_screen_set_no_update(0);
+	flip_screen_set_no_update(0);
 }
 
 

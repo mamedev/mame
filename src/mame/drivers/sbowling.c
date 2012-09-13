@@ -71,6 +71,8 @@ public:
 	DECLARE_WRITE8_MEMBER(graph_control_w);
 	DECLARE_READ8_MEMBER(controls_r);
 	TILE_GET_INFO_MEMBER(get_sb_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 TILE_GET_INFO_MEMBER(sbowling_state::get_sb_tile_info)
@@ -124,12 +126,11 @@ static SCREEN_UPDATE_IND16(sbowling)
 	return 0;
 }
 
-static VIDEO_START(sbowling)
+void sbowling_state::video_start()
 {
-	sbowling_state *state = machine.driver_data<sbowling_state>();
 
-	state->m_tmpbitmap = auto_bitmap_ind16_alloc(machine,32*8,32*8);
-	state->m_sb_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sbowling_state::get_sb_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tmpbitmap = auto_bitmap_ind16_alloc(machine(),32*8,32*8);
+	m_sb_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sbowling_state::get_sb_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 WRITE8_MEMBER(sbowling_state::pix_shift_w)
@@ -340,9 +341,9 @@ static GFXDECODE_START( sbowling )
 GFXDECODE_END
 
 
-static PALETTE_INIT( sbowling )
+void sbowling_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	static const int resistances_rg[3] = { 470, 270, 100 };
@@ -355,7 +356,7 @@ static PALETTE_INIT( sbowling )
 		3,	resistances_rg, outputs_g,	0,	100,
 		2,	resistances_b,  outputs_b,	0,	100);
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -376,7 +377,7 @@ static PALETTE_INIT( sbowling )
 		bit2 = (color_prom[i+0x400] >> 3) & 0x01;
 		r = (int)(outputs_r[ (bit0<<0) | (bit1<<1) | (bit2<<2) ] + 0.5);
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -396,8 +397,6 @@ static MACHINE_CONFIG_START( sbowling, sbowling_state )
 	MCFG_GFXDECODE(sbowling)
 
 	MCFG_PALETTE_LENGTH(0x400)
-	MCFG_PALETTE_INIT(sbowling)
-	MCFG_VIDEO_START(sbowling)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

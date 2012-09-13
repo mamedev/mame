@@ -41,16 +41,15 @@ void blockhl_sprite_callback( running_machine &machine, int *code, int *color, i
 
 ***************************************************************************/
 
-VIDEO_START( blockhl )
+void blockhl_state::video_start()
 {
-	blockhl_state *state = machine.driver_data<blockhl_state>();
 
-	state->m_generic_paletteram_8.allocate(0x800);
+	m_generic_paletteram_8.allocate(0x800);
 
-	state->m_layer_colorbase[0] = 0;
-	state->m_layer_colorbase[1] = 16;
-	state->m_layer_colorbase[2] = 32;
-	state->m_sprite_colorbase = 48;
+	m_layer_colorbase[0] = 0;
+	m_layer_colorbase[1] = 16;
+	m_layer_colorbase[2] = 32;
+	m_sprite_colorbase = 48;
 }
 
 SCREEN_UPDATE_IND16( blockhl )

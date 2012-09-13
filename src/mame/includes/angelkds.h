@@ -56,6 +56,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bgtop_tile_info);
 	TILE_GET_INFO_MEMBER(get_bgbot_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -64,5 +67,5 @@ public:
 
 
 
-VIDEO_START( angelkds );
+
 SCREEN_UPDATE_IND16( angelkds );

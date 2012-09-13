@@ -38,10 +38,11 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
 	DECLARE_DRIVER_INIT(gunbustrj);
 	DECLARE_DRIVER_INIT(gunbustr);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/gunbustr.c -----------*/
 
-VIDEO_START( gunbustr );
+
 SCREEN_UPDATE_IND16( gunbustr );

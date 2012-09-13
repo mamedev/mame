@@ -238,6 +238,9 @@ public:
 	DECLARE_READ8_MEMBER(b_read);
 	DECLARE_WRITE8_MEMBER(b_writ);
 	DECLARE_DRIVER_INIT(screenpl);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -284,7 +287,7 @@ READ16_MEMBER(maygayv1_state::i82716_r)
 	return 0;
 }
 
-static VIDEO_START( maygayv1 )
+void maygayv1_state::video_start()
 {
 
 }
@@ -998,27 +1001,25 @@ static const pia6821_interface pia_intf =
 };
 
 
-static MACHINE_START( maygayv1 )
+void maygayv1_state::machine_start()
 {
-	maygayv1_state *state = machine.driver_data<maygayv1_state>();
-	i82716_t &i82716 = state->m_i82716;
-	i82716.dram = auto_alloc_array(machine, UINT16, 0x80000/2);   // ???
-	i82716.line_buf = auto_alloc_array(machine, UINT8, 512);
+	i82716_t &i82716 = m_i82716;
+	i82716.dram = auto_alloc_array(machine(), UINT16, 0x80000/2);   // ???
+	i82716.line_buf = auto_alloc_array(machine(), UINT8, 512);
 
-	state_save_register_global_pointer(machine, i82716.dram, 0x40000);
+	state_save_register_global_pointer(machine(), i82716.dram, 0x40000);
 
 //  duart_68681_init(DUART_CLOCK, duart_irq_handler, duart_tx);
 
-	i8051_set_serial_tx_callback(machine.device("soundcpu"), data_from_i8031);
-	i8051_set_serial_rx_callback(machine.device("soundcpu"), data_to_i8031);
+	i8051_set_serial_tx_callback(machine().device("soundcpu"), data_from_i8031);
+	i8051_set_serial_rx_callback(machine().device("soundcpu"), data_to_i8031);
 }
 
-static MACHINE_RESET( maygayv1 )
+void maygayv1_state::machine_reset()
 {
-	maygayv1_state *state = machine.driver_data<maygayv1_state>();
-	i82716_t &i82716 = state->m_i82716;
+	i82716_t &i82716 = m_i82716;
 	// ?
-	state->m_duart68681 = machine.device( "duart68681" );
+	m_duart68681 = machine().device( "duart68681" );
 	memset(i82716.dram, 0, 0x40000);
 	i82716.r[RWBA] = 0x0200;
 }
@@ -1044,8 +1045,6 @@ static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 
 	MCFG_PIA6821_ADD("pia", pia_intf)
 
-	MCFG_MACHINE_START(maygayv1)
-	MCFG_MACHINE_RESET(maygayv1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1062,7 +1061,6 @@ static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 
 	MCFG_DUART68681_ADD("duart68681", DUART_CLOCK, maygayv1_duart68681_config)
 
-	MCFG_VIDEO_START(maygayv1)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

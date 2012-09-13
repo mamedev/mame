@@ -221,6 +221,11 @@ public:
 	DECLARE_READ16_MEMBER(nimbus_video_io_r);
 	DECLARE_WRITE16_MEMBER(nimbus_video_io_w);
 	DECLARE_DRIVER_INIT(nimbus);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void video_reset();
+	virtual void palette_init();
 };
 
 
@@ -231,8 +236,8 @@ extern const unsigned char nimbus_palette[SCREEN_NO_COLOURS][3];
 
 /*----------- defined in machine/rmnimbus.c -----------*/
 
-MACHINE_RESET(nimbus);
-MACHINE_START(nimbus);
+
+
 
 /* 80186 Internal */
 
@@ -430,10 +435,10 @@ WRITE_LINE_DEVICE_HANDLER(nimbus_ack_w);
 /*----------- defined in video/rmnimbus.c -----------*/
 
 
-VIDEO_START( nimbus );
+
 SCREEN_VBLANK( nimbus );
 SCREEN_UPDATE_IND16( nimbus );
-VIDEO_RESET( nimbus );
+
 
 #define RED                     0
 #define GREEN                   1

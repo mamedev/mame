@@ -61,12 +61,16 @@ public:
 	DECLARE_DRIVER_INIT(stoneage);
 	DECLARE_DRIVER_INIT(mutantf);
 	DECLARE_DRIVER_INIT(cninja);
+	virtual void machine_start();
+	virtual void machine_reset();
+	DECLARE_VIDEO_START(stoneage);
+	DECLARE_VIDEO_START(mutantf);
 };
 
 /*----------- defined in video/cninja.c -----------*/
 
-VIDEO_START( stoneage );
-VIDEO_START( mutantf );
+
+
 
 SCREEN_UPDATE_IND16( cninja );
 SCREEN_UPDATE_IND16( cninjabl );

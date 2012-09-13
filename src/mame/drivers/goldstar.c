@@ -5871,7 +5871,7 @@ static MACHINE_CONFIG_START( goldstar, goldstar_state )
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START(goldstar)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -5905,7 +5905,7 @@ static MACHINE_CONFIG_START( goldstbl, goldstar_state )
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START(goldstar)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -5938,7 +5938,7 @@ static MACHINE_CONFIG_START( moonlght, goldstar_state )
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START(goldstar)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -5951,7 +5951,7 @@ static MACHINE_CONFIG_START( moonlght, goldstar_state )
 MACHINE_CONFIG_END
 
 
-static PALETTE_INIT(cm)
+PALETTE_INIT_MEMBER(goldstar_state,cm)
 {
 	/* BBGGGRRR */
 
@@ -5960,32 +5960,32 @@ static PALETTE_INIT(cm)
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT8 data;
-		UINT8*proms = machine.root_device().memregion("proms")->base();
+		UINT8*proms = machine().root_device().memregion("proms")->base();
 
 		data = proms[0x000 + i] | (proms[0x100 + i] << 4);
 
-		palette_set_color_rgb(machine, i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
+		palette_set_color_rgb(machine(), i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
 }
 
-static PALETTE_INIT(cmast91)
+PALETTE_INIT_MEMBER(goldstar_state,cmast91)
 {
 	int i;
 	for (i = 0; i < 0x100; i++)
 	{
 		int r,g,b;
 
-		UINT8*proms = machine.root_device().memregion("proms")->base();
+		UINT8*proms = machine().root_device().memregion("proms")->base();
 
 		b = proms[0x000 + i] << 4;
 		g = proms[0x100 + i] << 4;
 		r = proms[0x200 + i] << 4;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
-static PALETTE_INIT(lucky8)
+PALETTE_INIT_MEMBER(goldstar_state,lucky8)
 {
 	/* BBGGGRRR */
 
@@ -5993,21 +5993,21 @@ static PALETTE_INIT(lucky8)
 	UINT8 data;
 	UINT8 *proms;
 
-	proms = machine.root_device().memregion("proms")->base();
+	proms = machine().root_device().memregion("proms")->base();
 	for (i = 0; i < 0x100; i++)
 	{
 
 		data = proms[0x000 + i] | (proms[0x100 + i] << 4);
 
-		palette_set_color_rgb(machine, i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
+		palette_set_color_rgb(machine(), i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
 
-	proms = machine.root_device().memregion("proms2")->base();
+	proms = machine().root_device().memregion("proms2")->base();
 	for (i=0; i < 0x20; i++)
 	{
 		data = proms[i];
 
-		palette_set_color_rgb(machine, i + 0x80, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
+		palette_set_color_rgb(machine(), i + 0x80, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
 }
 
@@ -6035,10 +6035,10 @@ static MACHINE_CONFIG_START( chrygld, goldstar_state )
 
 	MCFG_GFXDECODE(chry10)
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(cm)
+	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START(goldstar)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6077,10 +6077,10 @@ static MACHINE_CONFIG_START( cb3c, goldstar_state )
 
 	MCFG_GFXDECODE(cb3c)
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(cm)
+	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START(goldstar)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6118,11 +6118,11 @@ static MACHINE_CONFIG_START( ncb3, goldstar_state )
 
 	MCFG_GFXDECODE(ncb3)
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(cm)
+	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START(goldstar)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6159,10 +6159,10 @@ static MACHINE_CONFIG_START( cm, goldstar_state )
 
 	MCFG_GFXDECODE(cmbitmap)
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(cm)
+	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START(cherrym)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6199,10 +6199,10 @@ static MACHINE_CONFIG_START( cmnobmp, goldstar_state )
 
 	MCFG_GFXDECODE(cm)
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(cm)
+	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START(cherrym)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6234,10 +6234,10 @@ static MACHINE_CONFIG_START( cmast91, goldstar_state )
 
 	MCFG_GFXDECODE(cmast91)
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(cmast91)
+	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cmast91)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START(cherrym)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6273,14 +6273,14 @@ static MACHINE_CONFIG_START( lucky8, goldstar_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_PALETTE_INIT(lucky8)
+	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
 	MCFG_SCREEN_UPDATE_STATIC(goldstar)
 
 	MCFG_GFXDECODE(ncb3)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START(goldstar)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6313,14 +6313,14 @@ static MACHINE_CONFIG_START( bingowng, goldstar_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_PALETTE_INIT(lucky8)
+	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
 	MCFG_SCREEN_UPDATE_STATIC(bingowng)
 
 	MCFG_GFXDECODE(ncb3)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START(bingowng)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,bingowng)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6353,14 +6353,14 @@ static MACHINE_CONFIG_START( bingownga, goldstar_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_PALETTE_INIT(lucky8)
+	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
 	MCFG_SCREEN_UPDATE_STATIC(bingowng)
 
 	MCFG_GFXDECODE(bingownga)		/* GFX Decode is the only difference with the parent machine */
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START(bingowng)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,bingowng)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6374,20 +6374,20 @@ static MACHINE_CONFIG_START( bingownga, goldstar_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static PALETTE_INIT(magodds)
+PALETTE_INIT_MEMBER(goldstar_state,magodds)
 {
 	int i;
 	for (i = 0; i < 0x100; i++)
 	{
 		int r,g,b;
 
-		UINT8*proms = machine.root_device().memregion("proms")->base();
+		UINT8*proms = machine().root_device().memregion("proms")->base();
 
 		b = proms[0x000 + i] << 4;
 		g = proms[0x100 + i] << 4;
 		r = proms[0x200 + i] << 4;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -6411,13 +6411,13 @@ static MACHINE_CONFIG_START( magodds, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(magical)
-	MCFG_PALETTE_INIT(magodds)
+	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,magodds)
 
 	MCFG_GFXDECODE(magodds)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START(magical)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,magical)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6453,12 +6453,12 @@ static MACHINE_CONFIG_START( kkotnoli, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(goldstar)
-	MCFG_PALETTE_INIT(lucky8)
+	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
 
 	MCFG_GFXDECODE(ncb3)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(goldstar)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6489,13 +6489,13 @@ static MACHINE_CONFIG_START( ladylinr, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(goldstar)
-	MCFG_PALETTE_INIT(lucky8)
+	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
 
 	MCFG_GFXDECODE(ncb3)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START(goldstar)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")//set up a standard mono speaker called 'mono'
@@ -6530,13 +6530,13 @@ static MACHINE_CONFIG_START( wcat3, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(goldstar)
-	MCFG_PALETTE_INIT(lucky8)
+	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
 
 	MCFG_GFXDECODE(ncb3)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START(goldstar)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6575,10 +6575,10 @@ static MACHINE_CONFIG_START( amcoe1, goldstar_state )
 
 	MCFG_GFXDECODE(cm)
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(cm)
+	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START(cherrym)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6614,10 +6614,10 @@ static MACHINE_CONFIG_START( amcoe1a, goldstar_state )
 
 	MCFG_GFXDECODE(cm)
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(cm)
+	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START(cherrym)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6653,10 +6653,10 @@ static MACHINE_CONFIG_START( amcoe2, goldstar_state )
 
 	MCFG_GFXDECODE(cm)
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(cm)
+	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START(cherrym)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6687,10 +6687,10 @@ static MACHINE_CONFIG_START( nfm, goldstar_state )
 
 	MCFG_GFXDECODE(nfm)
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(cm)
+	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START(cherrym)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6721,7 +6721,7 @@ static MACHINE_CONFIG_START( unkch, goldstar_state )
 
 	//MCFG_NVRAM_HANDLER(goldstar)
 
-	MCFG_VIDEO_START(unkch)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,unkch)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6766,10 +6766,10 @@ static MACHINE_CONFIG_START( pkrmast, goldstar_state )
 
 	MCFG_GFXDECODE(pkrmast)
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(cm)
+	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START(cherrym)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

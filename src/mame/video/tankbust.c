@@ -74,17 +74,16 @@ TILE_GET_INFO_MEMBER(tankbust_state::get_txt_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( tankbust )
+void tankbust_state::video_start()
 {
-	tankbust_state *state = machine.driver_data<tankbust_state>();
 	/* not scrollable */
-	state->m_txt_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tankbust_state::get_txt_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_txt_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tankbust_state::get_txt_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 	/* scrollable */
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tankbust_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tankbust_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 
-	state->m_txt_tilemap->set_transparent_pen(0);
+	m_txt_tilemap->set_transparent_pen(0);
 }
 
 

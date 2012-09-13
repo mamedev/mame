@@ -54,12 +54,12 @@ INLINE void pcw16_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
 }
 
 /* Initialise the palette */
-PALETTE_INIT( pcw16 )
+void pcw16_state::palette_init()
 {
-	palette_set_colors(machine, 0, pcw16_palette, ARRAY_LENGTH(pcw16_palette));
+	palette_set_colors(machine(), 0, pcw16_palette, ARRAY_LENGTH(pcw16_palette));
 }
 
-VIDEO_START( pcw16 )
+void pcw16_state::video_start()
 {
 }
 

@@ -62,33 +62,32 @@ TILE_GET_INFO_MEMBER(blktiger_state::get_tx_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( blktiger )
+void blktiger_state::video_start()
 {
-	blktiger_state *state = machine.driver_data<blktiger_state>();
 
-	state->m_chon = 1;
-	state->m_bgon = 1;
-	state->m_objon = 1;
-	state->m_screen_layout = 0;
+	m_chon = 1;
+	m_bgon = 1;
+	m_objon = 1;
+	m_screen_layout = 0;
 
-	state->m_scroll_ram = auto_alloc_array(machine, UINT8, BGRAM_BANK_SIZE * BGRAM_BANKS);
+	m_scroll_ram = auto_alloc_array(machine(), UINT8, BGRAM_BANK_SIZE * BGRAM_BANKS);
 
-	state->m_tx_tilemap =    &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blktiger_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg_tilemap8x4 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blktiger_state::get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(blktiger_state::bg8x4_scan),state), 16, 16, 128, 64);
-	state->m_bg_tilemap4x8 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blktiger_state::get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(blktiger_state::bg4x8_scan),state), 16, 16, 64, 128);
+	m_tx_tilemap =    &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blktiger_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap8x4 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blktiger_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(blktiger_state::bg8x4_scan),this), 16, 16, 128, 64);
+	m_bg_tilemap4x8 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blktiger_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(blktiger_state::bg4x8_scan),this), 16, 16, 64, 128);
 
-	state->m_tx_tilemap->set_transparent_pen(3);
+	m_tx_tilemap->set_transparent_pen(3);
 
-	state->m_bg_tilemap8x4->set_transmask(0, 0xffff, 0x8000);	/* split type 0 is totally transparent in front half */
-	state->m_bg_tilemap8x4->set_transmask(1, 0xfff0, 0x800f);	/* split type 1 has pens 4-15 transparent in front half */
-	state->m_bg_tilemap8x4->set_transmask(2, 0xff00, 0x80ff);	/* split type 1 has pens 8-15 transparent in front half */
-	state->m_bg_tilemap8x4->set_transmask(3, 0xf000, 0x8fff);	/* split type 1 has pens 12-15 transparent in front half */
-	state->m_bg_tilemap4x8->set_transmask(0, 0xffff, 0x8000);
-	state->m_bg_tilemap4x8->set_transmask(1, 0xfff0, 0x800f);
-	state->m_bg_tilemap4x8->set_transmask(2, 0xff00, 0x80ff);
-	state->m_bg_tilemap4x8->set_transmask(3, 0xf000, 0x8fff);
+	m_bg_tilemap8x4->set_transmask(0, 0xffff, 0x8000);	/* split type 0 is totally transparent in front half */
+	m_bg_tilemap8x4->set_transmask(1, 0xfff0, 0x800f);	/* split type 1 has pens 4-15 transparent in front half */
+	m_bg_tilemap8x4->set_transmask(2, 0xff00, 0x80ff);	/* split type 1 has pens 8-15 transparent in front half */
+	m_bg_tilemap8x4->set_transmask(3, 0xf000, 0x8fff);	/* split type 1 has pens 12-15 transparent in front half */
+	m_bg_tilemap4x8->set_transmask(0, 0xffff, 0x8000);
+	m_bg_tilemap4x8->set_transmask(1, 0xfff0, 0x800f);
+	m_bg_tilemap4x8->set_transmask(2, 0xff00, 0x80ff);
+	m_bg_tilemap4x8->set_transmask(3, 0xf000, 0x8fff);
 
-	state->save_pointer(NAME(state->m_scroll_ram), BGRAM_BANK_SIZE * BGRAM_BANKS);
+	save_pointer(NAME(m_scroll_ram), BGRAM_BANK_SIZE * BGRAM_BANKS);
 }
 
 

@@ -106,6 +106,17 @@ public:
 	DECLARE_DRIVER_INIT(coh1000a);
 	DECLARE_DRIVER_INIT(coh1000c);
 	DECLARE_DRIVER_INIT(coh1000w);
+	DECLARE_MACHINE_RESET(coh1000c);
+	DECLARE_MACHINE_RESET(coh3002c);
+	DECLARE_MACHINE_RESET(coh1000ta);
+	DECLARE_MACHINE_RESET(coh1000tb);
+	DECLARE_MACHINE_RESET(coh1000w);
+	DECLARE_MACHINE_RESET(coh1002e);
+	DECLARE_MACHINE_RESET(bam2);
+	DECLARE_MACHINE_RESET(coh1000a);
+	DECLARE_MACHINE_RESET(coh1001l);
+	DECLARE_MACHINE_RESET(coh1002v);
+	DECLARE_MACHINE_RESET(coh1002m);
 };
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
@@ -741,12 +752,12 @@ DRIVER_INIT_MEMBER(zn_state,coh1000c)
 	}
 }
 
-static MACHINE_RESET( coh1000c )
+MACHINE_RESET_MEMBER(zn_state,coh1000c)
 {
-	machine.root_device().membank( "bank1" )->set_base( machine.root_device().memregion( "user2" )->base() ); /* fixed game rom */
-	machine.root_device().membank( "bank2" )->set_base( machine.root_device().memregion( "user2" )->base() + 0x400000 ); /* banked game rom */
-	machine.root_device().membank( "bank3" )->set_base( machine.root_device().memregion( "user3" )->base() ); /* country rom */
-	zn_machine_init(machine);
+	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* fixed game rom */
+	machine().root_device().membank( "bank2" )->set_base( machine().root_device().memregion( "user2" )->base() + 0x400000 ); /* banked game rom */
+	machine().root_device().membank( "bank3" )->set_base( machine().root_device().memregion( "user3" )->base() ); /* country rom */
+	zn_machine_init(machine());
 }
 
 static ADDRESS_MAP_START( qsound_map, AS_PROGRAM, 8, zn_state )
@@ -770,7 +781,7 @@ static MACHINE_CONFIG_DERIVED( coh1000c, zn1_1mb_vram )
 	MCFG_CPU_IO_MAP( qsound_portmap)
 	MCFG_CPU_PERIODIC_INT( qsound_interrupt, 60*4 ) /* 4 interrupts per frame ?? */
 
-	MCFG_MACHINE_RESET( coh1000c )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c )
 
 	MCFG_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -784,7 +795,7 @@ static MACHINE_CONFIG_DERIVED( coh1002c, zn1_2mb_vram )
 	MCFG_CPU_IO_MAP( qsound_portmap)
 	MCFG_CPU_PERIODIC_INT( qsound_interrupt, 60*4 ) /* 4 interrupts per frame ?? */
 
-	MCFG_MACHINE_RESET( coh1000c )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c )
 
 	MCFG_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -949,12 +960,12 @@ DRIVER_INIT_MEMBER(zn_state,coh3002c)
 	zn_driver_init(machine());
 }
 
-static MACHINE_RESET( coh3002c )
+MACHINE_RESET_MEMBER(zn_state,coh3002c)
 {
-	machine.root_device().membank( "bank1" )->set_base( machine.root_device().memregion( "user2" )->base() ); /* fixed game rom */
-	machine.root_device().membank( "bank2" )->set_base( machine.root_device().memregion( "user2" )->base() + 0x400000 ); /* banked game rom */
-	machine.root_device().membank( "bank3" )->set_base( machine.root_device().memregion( "user3" )->base() ); /* country rom */
-	zn_machine_init(machine);
+	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* fixed game rom */
+	machine().root_device().membank( "bank2" )->set_base( machine().root_device().memregion( "user2" )->base() + 0x400000 ); /* banked game rom */
+	machine().root_device().membank( "bank3" )->set_base( machine().root_device().memregion( "user3" )->base() ); /* country rom */
+	zn_machine_init(machine());
 }
 
 static MACHINE_CONFIG_DERIVED( coh3002c, zn2 )
@@ -964,7 +975,7 @@ static MACHINE_CONFIG_DERIVED( coh3002c, zn2 )
 	MCFG_CPU_IO_MAP( qsound_portmap)
 	MCFG_CPU_PERIODIC_INT( qsound_interrupt, 60*4 ) /* 4 interrupts per frame ?? */
 
-	MCFG_MACHINE_RESET( coh3002c )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh3002c )
 
 	MCFG_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1235,12 +1246,11 @@ DRIVER_INIT_MEMBER(zn_state,coh1000ta)
 	zn_driver_init(machine());
 }
 
-static MACHINE_RESET( coh1000ta )
+MACHINE_RESET_MEMBER(zn_state,coh1000ta)
 {
-	zn_state *state = machine.driver_data<zn_state>();
-	state->membank( "bank1" )->set_base( state->memregion( "user2" )->base() ); /* banked game rom */
-	state->membank( "bank2" )->set_base( state->m_taitofx1_eeprom1 );
-	zn_machine_init(machine);
+	membank( "bank1" )->set_base( memregion( "user2" )->base() ); /* banked game rom */
+	membank( "bank2" )->set_base( m_taitofx1_eeprom1 );
+	zn_machine_init(machine());
 }
 
 static ADDRESS_MAP_START( fx1a_sound_map, AS_PROGRAM, 8, zn_state )
@@ -1276,7 +1286,7 @@ static MACHINE_CONFIG_DERIVED( coh1000ta, zn1_1mb_vram )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 16000000 / 4 )	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP( fx1a_sound_map)
-	MCFG_MACHINE_RESET( coh1000ta )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta )
 	MCFG_NVRAM_ADD_0FILL("eeprom1")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
@@ -1328,19 +1338,18 @@ DRIVER_INIT_MEMBER(zn_state,coh1000tb)
 	zn_driver_init(machine());
 }
 
-static MACHINE_RESET( coh1000tb )
+MACHINE_RESET_MEMBER(zn_state,coh1000tb)
 {
-	zn_state *state = machine.driver_data<zn_state>();
 
-	state->membank( "bank1" )->set_base( state->memregion( "user2" )->base() ); /* banked game rom */
-	state->membank( "bank2" )->set_base( state->m_taitofx1_eeprom1 );
-	state->membank( "bank3" )->set_base( state->m_taitofx1_eeprom2 );
-	zn_machine_init(machine);
+	membank( "bank1" )->set_base( memregion( "user2" )->base() ); /* banked game rom */
+	membank( "bank2" )->set_base( m_taitofx1_eeprom1 );
+	membank( "bank3" )->set_base( m_taitofx1_eeprom2 );
+	zn_machine_init(machine());
 }
 
 static MACHINE_CONFIG_DERIVED( coh1000tb, zn1_2mb_vram )
 
-	MCFG_MACHINE_RESET( coh1000tb )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000tb )
 	MCFG_NVRAM_ADD_0FILL("eeprom1")
 	MCFG_NVRAM_ADD_0FILL("eeprom2")
 
@@ -1515,12 +1524,12 @@ DRIVER_INIT_MEMBER(zn_state,coh1000w)
 	zn_driver_init(machine());
 }
 
-static MACHINE_RESET( coh1000w )
+MACHINE_RESET_MEMBER(zn_state,coh1000w)
 {
-	machine.root_device().membank( "bank1" )->set_base( machine.root_device().memregion( "user2" )->base() ); /* fixed game rom */
-	zn_machine_init(machine);
+	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* fixed game rom */
+	zn_machine_init(machine());
 
-	machine.device("ide")->reset();
+	machine().device("ide")->reset();
 }
 
 static const ide_config ide_intf = 
@@ -1531,7 +1540,7 @@ static const ide_config ide_intf =
 };
 
 static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )
-	MCFG_MACHINE_RESET( coh1000w )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000w )
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( atpsx_dma_read ), (zn_state *) owner ) )
@@ -1709,10 +1718,10 @@ DRIVER_INIT_MEMBER(zn_state,coh1002e)
 	zn_driver_init(machine());
 }
 
-static MACHINE_RESET( coh1002e )
+MACHINE_RESET_MEMBER(zn_state,coh1002e)
 {
-	machine.root_device().membank( "bank1" )->set_base( machine.root_device().memregion( "user2" )->base() ); /* banked game rom */
-	zn_machine_init(machine);
+	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* banked game rom */
+	zn_machine_init(machine());
 }
 
 static ADDRESS_MAP_START( psarc_snd_map, AS_PROGRAM, 16, zn_state )
@@ -1729,7 +1738,7 @@ static MACHINE_CONFIG_DERIVED( coh1002e, zn1_2mb_vram )
 	MCFG_CPU_ADD("audiocpu", M68000, 12000000 )
 	MCFG_CPU_PROGRAM_MAP( psarc_snd_map)
 
-	MCFG_MACHINE_RESET( coh1002e )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002e )
 
 	MCFG_SOUND_ADD( "ymf", YMF271, 16934400 )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1852,17 +1861,17 @@ DRIVER_INIT_MEMBER(zn_state,bam2)
 	zn_driver_init(machine());
 }
 
-static MACHINE_RESET( bam2 )
+MACHINE_RESET_MEMBER(zn_state,bam2)
 {
-	machine.root_device().membank( "bank1" )->set_base( machine.root_device().memregion( "user2" )->base() ); /* fixed game rom */
-	machine.root_device().membank( "bank2" )->set_base( machine.root_device().memregion( "user2" )->base() + 0x400000 ); /* banked game rom */
+	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* fixed game rom */
+	machine().root_device().membank( "bank2" )->set_base( machine().root_device().memregion( "user2" )->base() + 0x400000 ); /* banked game rom */
 
-	zn_machine_init(machine);
+	zn_machine_init(machine());
 }
 
 static MACHINE_CONFIG_DERIVED( bam2, zn1_2mb_vram )
 
-	MCFG_MACHINE_RESET( bam2 )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, bam2 )
 MACHINE_CONFIG_END
 
 /*
@@ -2188,20 +2197,20 @@ DRIVER_INIT_MEMBER(zn_state,coh1000a)
 	zn_driver_init(machine());
 }
 
-static MACHINE_RESET( coh1000a )
+MACHINE_RESET_MEMBER(zn_state,coh1000a)
 {
-	machine.root_device().membank( "bank1" )->set_base( machine.root_device().memregion( "user2" )->base() ); /* fixed game rom */
-	zn_machine_init(machine);
-	if( ( !strcmp( machine.system().name, "jdredd" ) ) ||
-		( !strcmp( machine.system().name, "jdreddb" ) ) )
+	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* fixed game rom */
+	zn_machine_init(machine());
+	if( ( !strcmp( machine().system().name, "jdredd" ) ) ||
+		( !strcmp( machine().system().name, "jdreddb" ) ) )
 	{
-		machine.device("ide")->reset();
+		machine().device("ide")->reset();
 	}
 }
 
 static MACHINE_CONFIG_DERIVED( coh1000a, zn1_2mb_vram )
 
-	MCFG_MACHINE_RESET( coh1000a )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000a )
 MACHINE_CONFIG_END
 
 static const ide_config jdredd_ide_intf = 
@@ -2216,7 +2225,7 @@ static MACHINE_CONFIG_DERIVED( coh1000a_ide, zn1_2mb_vram )
 	MCFG_DEVICE_MODIFY( "gpu" )
 	MCFG_PSXGPU_VBLANK_CALLBACK( vblank_state_delegate( FUNC( jdredd_vblank ), (zn_state *) owner ) )
 
-	MCFG_MACHINE_RESET( coh1000a )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000a )
 
 	MCFG_IDE_CONTROLLER_ADD("ide", jdredd_ide_intf, ide_devices, "hdd", NULL, true)
 MACHINE_CONFIG_END
@@ -2350,10 +2359,10 @@ DRIVER_INIT_MEMBER(zn_state,coh1001l)
 	zn_driver_init(machine());
 }
 
-static MACHINE_RESET( coh1001l )
+MACHINE_RESET_MEMBER(zn_state,coh1001l)
 {
-	machine.root_device().membank( "bank1" )->set_base( machine.root_device().memregion( "user2" )->base() ); /* banked rom */
-	zn_machine_init(machine);
+	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* banked rom */
+	zn_machine_init(machine());
 }
 
 static MACHINE_CONFIG_DERIVED( coh1001l, zn1_2mb_vram )
@@ -2361,7 +2370,7 @@ static MACHINE_CONFIG_DERIVED( coh1001l, zn1_2mb_vram )
 //  MCFG_CPU_ADD("audiocpu", M68000, 10000000 )
 //  MCFG_CPU_PROGRAM_MAP( atlus_snd_map)
 
-	MCFG_MACHINE_RESET( coh1001l )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1001l )
 
 //  MCFG_SOUND_ADD( "ymz", wYMZ280B, ymz280b_intf )
 MACHINE_CONFIG_END
@@ -2393,16 +2402,16 @@ DRIVER_INIT_MEMBER(zn_state,coh1002v)
 	zn_driver_init(machine());
 }
 
-static MACHINE_RESET( coh1002v )
+MACHINE_RESET_MEMBER(zn_state,coh1002v)
 {
-	machine.root_device().membank( "bank1" )->set_base( machine.root_device().memregion( "user2" )->base() ); /* fixed game rom */
-	machine.root_device().membank( "bank2" )->set_base( machine.root_device().memregion( "user3" )->base() ); /* banked rom */
-	zn_machine_init(machine);
+	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* fixed game rom */
+	machine().root_device().membank( "bank2" )->set_base( machine().root_device().memregion( "user3" )->base() ); /* banked rom */
+	zn_machine_init(machine());
 }
 
 static MACHINE_CONFIG_DERIVED( coh1002v, zn1_2mb_vram )
 
-	MCFG_MACHINE_RESET( coh1002v )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002v )
 MACHINE_CONFIG_END
 
 /*
@@ -2596,10 +2605,10 @@ DRIVER_INIT_MEMBER(zn_state,coh1002m)
 	zn_driver_init(machine());
 }
 
-static MACHINE_RESET( coh1002m )
+MACHINE_RESET_MEMBER(zn_state,coh1002m)
 {
-	machine.root_device().membank( "bank1" )->set_base( machine.root_device().memregion( "user2" )->base() );
-	zn_machine_init(machine);
+	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() );
+	zn_machine_init(machine());
 }
 
 READ8_MEMBER(zn_state::cbaj_z80_latch_r)
@@ -2638,7 +2647,7 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( coh1002m, zn1_2mb_vram )
 
-	MCFG_MACHINE_RESET( coh1002m )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002m )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coh1002msnd, zn1_2mb_vram )
@@ -2647,7 +2656,7 @@ static MACHINE_CONFIG_DERIVED( coh1002msnd, zn1_2mb_vram )
 	MCFG_CPU_PROGRAM_MAP( cbaj_z80_map)
 	MCFG_CPU_IO_MAP( cbaj_z80_port_map)
 
-	MCFG_MACHINE_RESET( coh1002m )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002m )
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -2659,7 +2668,7 @@ static MACHINE_CONFIG_DERIVED( coh1002ml, zn1_2mb_vram )
 	MCFG_CPU_ADD("link", Z80, 8000000 )
 	MCFG_CPU_PROGRAM_MAP( link_map)
 
-	MCFG_MACHINE_RESET( coh1002m )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002m )
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( zn )

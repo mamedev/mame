@@ -24,7 +24,7 @@ DRIVER_INIT_MEMBER(orao_state,orao103)
 	memset(m_memory,0xff,0x6000);
 }
 
-MACHINE_RESET( orao )
+void orao_state::machine_reset()
 {
 }
 

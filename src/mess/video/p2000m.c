@@ -11,10 +11,9 @@
 
 
 
-VIDEO_START( p2000m )
+VIDEO_START_MEMBER(p2000t_state,p2000m)
 {
-	p2000t_state *state = machine.driver_data<p2000t_state>();
-	state->m_frame_count = 0;
+	m_frame_count = 0;
 }
 
 

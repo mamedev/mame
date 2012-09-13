@@ -349,7 +349,6 @@ static MACHINE_CONFIG_START( superchs, superchs_state )
 	MCFG_GFXDECODE(superchs)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(superchs)
 
 	MCFG_TC0480SCP_ADD("tc0480scp", superchs_tc0480scp_intf)
 

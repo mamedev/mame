@@ -32,11 +32,12 @@ public:
 	DECLARE_WRITE8_MEMBER(thief_coprocessor_w);
 	DECLARE_WRITE8_MEMBER(tape_control_w);
 	DECLARE_DRIVER_INIT(thief);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/thief.c -----------*/
 
 
-VIDEO_START( thief );
+
 SCREEN_UPDATE_IND16( thief );

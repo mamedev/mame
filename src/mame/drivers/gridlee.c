@@ -139,30 +139,28 @@ static TIMER_CALLBACK( firq_timer_tick )
 	state->m_firq_off->adjust(machine.primary_screen->time_until_pos(FIRQ_SCANLINE, GRIDLEE_HBSTART));
 }
 
-static MACHINE_START( gridlee )
+void gridlee_state::machine_start()
 {
-	gridlee_state *state = machine.driver_data<gridlee_state>();
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	/* create the polynomial tables */
-	poly17_init(machine);
+	poly17_init(machine());
 
-	state_save_register_global_array(machine, state->m_last_analog_input);
-	state_save_register_global_array(machine, state->m_last_analog_output);
+	state_save_register_global_array(machine(), m_last_analog_input);
+	state_save_register_global_array(machine(), m_last_analog_output);
 
-	state->m_irq_off = machine.scheduler().timer_alloc(FUNC(irq_off_tick));
-	state->m_irq_timer = machine.scheduler().timer_alloc(FUNC(irq_timer_tick));
-	state->m_firq_off = machine.scheduler().timer_alloc(FUNC(firq_off_tick));
-	state->m_firq_timer = machine.scheduler().timer_alloc(FUNC(firq_timer_tick));
+	m_irq_off = machine().scheduler().timer_alloc(FUNC(irq_off_tick));
+	m_irq_timer = machine().scheduler().timer_alloc(FUNC(irq_timer_tick));
+	m_firq_off = machine().scheduler().timer_alloc(FUNC(firq_off_tick));
+	m_firq_timer = machine().scheduler().timer_alloc(FUNC(firq_timer_tick));
 }
 
 
-static MACHINE_RESET( gridlee )
+void gridlee_state::machine_reset()
 {
-	gridlee_state *state = machine.driver_data<gridlee_state>();
 	/* start timers to generate interrupts */
-	state->m_irq_timer->adjust(machine.primary_screen->time_until_pos(0));
-	state->m_firq_timer->adjust(machine.primary_screen->time_until_pos(FIRQ_SCANLINE));
+	m_irq_timer->adjust(machine().primary_screen->time_until_pos(0));
+	m_firq_timer->adjust(machine().primary_screen->time_until_pos(FIRQ_SCANLINE));
 }
 
 
@@ -429,8 +427,6 @@ static MACHINE_CONFIG_START( gridlee, gridlee_state )
 	MCFG_CPU_ADD("maincpu", M6809, GRIDLEE_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 
-	MCFG_MACHINE_START(gridlee)
-	MCFG_MACHINE_RESET(gridlee)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -440,8 +436,6 @@ static MACHINE_CONFIG_START( gridlee, gridlee_state )
 
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_PALETTE_INIT(gridlee)
-	MCFG_VIDEO_START(gridlee)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

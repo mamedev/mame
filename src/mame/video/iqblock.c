@@ -36,14 +36,13 @@ TILE_GET_INFO_MEMBER(iqblock_state::get_fg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( iqblock )
+void iqblock_state::video_start()
 {
-	iqblock_state *state = machine.driver_data<iqblock_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(iqblock_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,     8, 8,64,32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(iqblock_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,32,64, 8);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(iqblock_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,     8, 8,64,32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(iqblock_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,32,64, 8);
 
-	state->m_bg_tilemap->set_transparent_pen(0);
-	state->m_fg_tilemap->set_scroll_cols(64);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_scroll_cols(64);
 }
 
 

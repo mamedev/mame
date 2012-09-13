@@ -44,6 +44,8 @@ public:
 	required_shared_ptr<UINT32> m_steppingstone;
 	lcd_spi_t m_lcd_spi;
 	DECLARE_DRIVER_INIT(hp49gp);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 /***************************************************************************
@@ -237,16 +239,14 @@ static INPUT_CHANGED( port_changed )
 
 // ...
 
-static MACHINE_START( hp49gp )
+void hp49gp_state::machine_start()
 {
-	hp49gp_state *hp49gp = machine.driver_data<hp49gp_state>();
-	hp49gp->m_s3c2410 = machine.device( "s3c2410");
+	m_s3c2410 = machine().device( "s3c2410");
 }
 
-static MACHINE_RESET( hp49gp )
+void hp49gp_state::machine_reset()
 {
-//  hp49gp_state *hp49gp = machine.driver_data<hp49gp_state>();
-	machine.device("maincpu")->reset();
+	machine().device("maincpu")->reset();
 }
 
 /***************************************************************************
@@ -305,8 +305,6 @@ static MACHINE_CONFIG_START( hp49gp, hp49gp_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_MACHINE_START(hp49gp)
-	MCFG_MACHINE_RESET(hp49gp)
 
 	MCFG_S3C2410_ADD("s3c2410", 12000000, hp49gp_s3c2410_intf)
 MACHINE_CONFIG_END

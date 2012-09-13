@@ -83,18 +83,17 @@ WRITE8_MEMBER(sauro_state::sauro_scroll_fg_w)
 	m_fg_tilemap->set_scrollx(0, scroll);
 }
 
-VIDEO_START( sauro )
+VIDEO_START_MEMBER(sauro_state,sauro)
 {
-	sauro_state *state = machine.driver_data<sauro_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_bg),state), TILEMAP_SCAN_COLS,
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_bg),this), TILEMAP_SCAN_COLS,
 		 8, 8, 32, 32);
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_fg),state), TILEMAP_SCAN_COLS,
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_fg),this), TILEMAP_SCAN_COLS,
 		 8, 8, 32, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
-	state->m_palette_bank = 0;
+	m_fg_tilemap->set_transparent_pen(0);
+	m_palette_bank = 0;
 }
 
 static void sauro_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -157,11 +156,10 @@ SCREEN_UPDATE_IND16( sauro )
 
 /* Tricky Doc */
 
-VIDEO_START( trckydoc )
+VIDEO_START_MEMBER(sauro_state,trckydoc)
 {
-	sauro_state *state = machine.driver_data<sauro_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_bg),state), TILEMAP_SCAN_COLS,
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_bg),this), TILEMAP_SCAN_COLS,
 		 8, 8, 32, 32);
 }
 

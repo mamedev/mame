@@ -576,36 +576,33 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( champbas )
+MACHINE_START_MEMBER(champbas_state,champbas)
 {
-	champbas_state *state = machine.driver_data<champbas_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_mcu = machine.device(CPUTAG_MCU);
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_mcu = machine().device(CPUTAG_MCU);
 
-	state->save_item(NAME(state->m_watchdog_count));
-	state->save_item(NAME(state->m_palette_bank));
-	state->save_item(NAME(state->m_gfx_bank));
+	save_item(NAME(m_watchdog_count));
+	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_gfx_bank));
 }
 
-static MACHINE_START( exctsccr )
+MACHINE_START_MEMBER(champbas_state,exctsccr)
 {
-	champbas_state *state = machine.driver_data<champbas_state>();
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	// FIXME
-	machine.scheduler().timer_pulse(attotime::from_hz(75), FUNC(exctsccr_fm_callback)); /* updates fm */
+	machine().scheduler().timer_pulse(attotime::from_hz(75), FUNC(exctsccr_fm_callback)); /* updates fm */
 
-	MACHINE_START_CALL(champbas);
+	MACHINE_START_CALL_MEMBER(champbas);
 }
 
 
-static MACHINE_RESET( champbas )
+MACHINE_RESET_MEMBER(champbas_state,champbas)
 {
-	champbas_state *state = machine.driver_data<champbas_state>();
 
-	state->m_palette_bank = 0;
-	state->m_gfx_bank = 0;	// talbot has only 1 bank
+	m_palette_bank = 0;
+	m_gfx_bank = 0;	// talbot has only 1 bank
 }
 
 static INTERRUPT_GEN( vblank_irq )
@@ -628,8 +625,8 @@ static MACHINE_CONFIG_START( talbot, champbas_state )
 	MCFG_CPU_ADD(CPUTAG_MCU, ALPHA8201, XTAL_18_432MHz/6/8)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
-	MCFG_MACHINE_START(champbas)
-	MCFG_MACHINE_RESET(champbas)
+	MCFG_MACHINE_START_OVERRIDE(champbas_state,champbas)
+	MCFG_MACHINE_RESET_OVERRIDE(champbas_state,champbas)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -642,8 +639,8 @@ static MACHINE_CONFIG_START( talbot, champbas_state )
 	MCFG_GFXDECODE(talbot)
 	MCFG_PALETTE_LENGTH(0x200)
 
-	MCFG_PALETTE_INIT(champbas)
-	MCFG_VIDEO_START(champbas)
+	MCFG_PALETTE_INIT_OVERRIDE(champbas_state,champbas)
+	MCFG_VIDEO_START_OVERRIDE(champbas_state,champbas)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -663,8 +660,8 @@ static MACHINE_CONFIG_START( champbas, champbas_state )
 	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(champbas_sub_map)
 
-	MCFG_MACHINE_START(champbas)
-	MCFG_MACHINE_RESET(champbas)
+	MCFG_MACHINE_START_OVERRIDE(champbas_state,champbas)
+	MCFG_MACHINE_RESET_OVERRIDE(champbas_state,champbas)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -677,8 +674,8 @@ static MACHINE_CONFIG_START( champbas, champbas_state )
 	MCFG_GFXDECODE(champbas)
 	MCFG_PALETTE_LENGTH(0x200)
 
-	MCFG_PALETTE_INIT(champbas)
-	MCFG_VIDEO_START(champbas)
+	MCFG_PALETTE_INIT_OVERRIDE(champbas_state,champbas)
+	MCFG_VIDEO_START_OVERRIDE(champbas_state,champbas)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -720,8 +717,8 @@ static MACHINE_CONFIG_START( exctsccr, champbas_state )
 	MCFG_CPU_ADD(CPUTAG_MCU, ALPHA8301, XTAL_18_432MHz/6/8)		/* Actually 8302 */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
-	MCFG_MACHINE_START(exctsccr)
-	MCFG_MACHINE_RESET(champbas)
+	MCFG_MACHINE_START_OVERRIDE(champbas_state,exctsccr)
+	MCFG_MACHINE_RESET_OVERRIDE(champbas_state,champbas)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -734,8 +731,8 @@ static MACHINE_CONFIG_START( exctsccr, champbas_state )
 	MCFG_GFXDECODE(exctsccr)
 	MCFG_PALETTE_LENGTH(0x200)
 
-	MCFG_PALETTE_INIT(exctsccr)
-	MCFG_VIDEO_START(exctsccr)
+	MCFG_PALETTE_INIT_OVERRIDE(champbas_state,exctsccr)
+	MCFG_VIDEO_START_OVERRIDE(champbas_state,exctsccr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -771,8 +768,8 @@ static MACHINE_CONFIG_START( exctsccrb, champbas_state )
 	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(champbas_sub_map)
 
-	MCFG_MACHINE_START(champbas)
-	MCFG_MACHINE_RESET(champbas)
+	MCFG_MACHINE_START_OVERRIDE(champbas_state,champbas)
+	MCFG_MACHINE_RESET_OVERRIDE(champbas_state,champbas)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -785,8 +782,8 @@ static MACHINE_CONFIG_START( exctsccrb, champbas_state )
 	MCFG_GFXDECODE(exctsccr)
 	MCFG_PALETTE_LENGTH(0x200)
 
-	MCFG_PALETTE_INIT(exctsccr)
-	MCFG_VIDEO_START(exctsccr)
+	MCFG_PALETTE_INIT_OVERRIDE(champbas_state,exctsccr)
+	MCFG_VIDEO_START_OVERRIDE(champbas_state,exctsccr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

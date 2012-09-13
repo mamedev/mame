@@ -132,6 +132,12 @@ public:
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf3_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf4_tile_info);
+	DECLARE_MACHINE_RESET(toaplan1);
+	DECLARE_VIDEO_START(rallybik);
+	DECLARE_VIDEO_START(toaplan1);
+	DECLARE_MACHINE_RESET(zerowing);
+	DECLARE_MACHINE_RESET(demonwld);
+	DECLARE_MACHINE_RESET(vimana);
 };
 
 
@@ -140,10 +146,9 @@ public:
 INTERRUPT_GEN( toaplan1_interrupt );
 
 
-MACHINE_RESET( toaplan1 );
-MACHINE_RESET( demonwld );
-MACHINE_RESET( vimana );
-MACHINE_RESET( zerowing );	/* hack for ZeroWing/OutZone. See video */
+
+
+
 
 void toaplan1_driver_savestate(running_machine &machine);
 void demonwld_driver_savestate(running_machine &machine);
@@ -158,7 +163,7 @@ void vimana_driver_savestate(running_machine &machine);
 SCREEN_VBLANK( rallybik );
 SCREEN_VBLANK( toaplan1 );
 SCREEN_VBLANK( samesame );
-VIDEO_START( rallybik );
-VIDEO_START( toaplan1 );
+
+
 SCREEN_UPDATE_IND16( rallybik );
 SCREEN_UPDATE_IND16( toaplan1 );

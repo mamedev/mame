@@ -18,6 +18,8 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	DECLARE_READ8_MEMBER(vt520_some_r);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -48,16 +50,15 @@ static INPUT_PORTS_START( vt520 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(vt520)
+void vt520_state::machine_reset()
 {
-	vt520_state *state = machine.driver_data<vt520_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = state->memregion("maincpu")->base();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = memregion("maincpu")->base();
 	space->unmap_write(0x0000, 0xffff);
-	state->membank("bank1")->set_base(rom + 0x70000);
+	membank("bank1")->set_base(rom + 0x70000);
 }
 
-static VIDEO_START( vt520 )
+void vt520_state::video_start()
 {
 }
 
@@ -72,7 +73,6 @@ static MACHINE_CONFIG_START( vt520, vt520_state )
 	MCFG_CPU_PROGRAM_MAP(vt520_mem)
 	MCFG_CPU_IO_MAP(vt520_io)
 
-	MCFG_MACHINE_RESET(vt520)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -80,7 +80,6 @@ static MACHINE_CONFIG_START( vt520, vt520_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(802, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 802-1, 0, 480-1)
-	MCFG_VIDEO_START(vt520)
 	MCFG_SCREEN_UPDATE_STATIC(vt520)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

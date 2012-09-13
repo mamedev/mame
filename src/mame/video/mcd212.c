@@ -1648,17 +1648,16 @@ void mcd212_ab_init(mcd212_ab_t *mcd212_ab)
     }
 }
 
-VIDEO_START( cdimono1 )
+void cdi_state::video_start()
 {
-    cdi_state *state = machine.driver_data<cdi_state>();
 
-    mcd212_ab_init(&state->m_mcd212_ab);
-    mcd212_init(machine, &state->m_mcd212_regs);
-    state->m_mcd212_regs.scan_timer = machine.scheduler().timer_alloc(FUNC(mcd212_perform_scan));
-    state->m_mcd212_regs.scan_timer->adjust(machine.primary_screen->time_until_pos(0, 0));
+    mcd212_ab_init(&m_mcd212_ab);
+    mcd212_init(machine(), &m_mcd212_regs);
+    m_mcd212_regs.scan_timer = machine().scheduler().timer_alloc(FUNC(mcd212_perform_scan));
+    m_mcd212_regs.scan_timer->adjust(machine().primary_screen->time_until_pos(0, 0));
 
-	screen_device *screen = downcast<screen_device *>(machine.device("lcd"));
-    screen->register_screen_bitmap(state->m_lcdbitmap);
+	screen_device *screen = downcast<screen_device *>(machine().device("lcd"));
+    screen->register_screen_bitmap(m_lcdbitmap);
 }
 
 SCREEN_UPDATE_RGB32( cdimono1 )

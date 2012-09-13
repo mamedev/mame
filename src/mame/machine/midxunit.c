@@ -309,18 +309,17 @@ DRIVER_INIT_MEMBER(midxunit_state,revx)
  *
  *************************************/
 
-MACHINE_RESET( midxunit )
+MACHINE_RESET_MEMBER(midxunit_state,midxunit)
 {
-	midxunit_state *state = machine.driver_data<midxunit_state>();
 	int i;
 
 	/* reset sound */
-	dcs_reset_w(machine, 1);
-	dcs_reset_w(machine, 0);
+	dcs_reset_w(machine(), 1);
+	dcs_reset_w(machine(), 0);
 
 	/* reset I/O shuffling */
 	for (i = 0; i < 16; i++)
-		state->m_ioshuffle[i] = i % 8;
+		m_ioshuffle[i] = i % 8;
 
 	dcs_set_io_callbacks(midxunit_dcs_output_full, NULL);
 }

@@ -423,45 +423,43 @@ static INPUT_PORTS_START( bucky )
 INPUT_PORTS_END
 
 
-static MACHINE_START( moo )
+MACHINE_START_MEMBER(moo_state,moo)
 {
-	moo_state *state = machine.driver_data<moo_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("soundcpu");
-	state->m_k054539 = machine.device("k054539");
-	state->m_k053246 = machine.device("k053246");
-	state->m_k053251 = machine.device("k053251");
-	state->m_k056832 = machine.device("k056832");
-	state->m_k054338 = machine.device("k054338");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("soundcpu");
+	m_k054539 = machine().device("k054539");
+	m_k053246 = machine().device("k053246");
+	m_k053251 = machine().device("k053251");
+	m_k056832 = machine().device("k056832");
+	m_k054338 = machine().device("k054338");
 
-	state->save_item(NAME(state->m_cur_control2));
-	state->save_item(NAME(state->m_alpha_enabled));
-	state->save_item(NAME(state->m_sprite_colorbase));
-	state->save_item(NAME(state->m_layer_colorbase));
-	state->save_item(NAME(state->m_layerpri));
-	state->save_item(NAME(state->m_protram));
+	save_item(NAME(m_cur_control2));
+	save_item(NAME(m_alpha_enabled));
+	save_item(NAME(m_sprite_colorbase));
+	save_item(NAME(m_layer_colorbase));
+	save_item(NAME(m_layerpri));
+	save_item(NAME(m_protram));
 
-    state->m_dmaend_timer = machine.scheduler().timer_alloc(FUNC(dmaend_callback));
+    m_dmaend_timer = machine().scheduler().timer_alloc(FUNC(dmaend_callback));
 }
 
-static MACHINE_RESET( moo )
+MACHINE_RESET_MEMBER(moo_state,moo)
 {
-	moo_state *state = machine.driver_data<moo_state>();
 	int i;
 
 	for (i = 0; i < 16; i++)
-		state->m_protram[i] = 0;
+		m_protram[i] = 0;
 
 	for (i = 0; i < 4; i++)
-		state->m_layer_colorbase[i] = 0;
+		m_layer_colorbase[i] = 0;
 
 	for (i = 0; i < 3; i++)
-		state->m_layerpri[i] = 0;
+		m_layerpri[i] = 0;
 
-	state->m_cur_control2 = 0;
-	state->m_alpha_enabled = 0;
-	state->m_sprite_colorbase = 0;
+	m_cur_control2 = 0;
+	m_alpha_enabled = 0;
+	m_sprite_colorbase = 0;
 }
 
 static const k056832_interface moo_k056832_intf =
@@ -522,8 +520,8 @@ static MACHINE_CONFIG_START( moo, moo_state )
 	MCFG_CPU_ADD("soundcpu", Z80, 8000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(moo)
-	MCFG_MACHINE_RESET(moo)
+	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
+	MCFG_MACHINE_RESET_OVERRIDE(moo_state,moo)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
@@ -541,7 +539,7 @@ static MACHINE_CONFIG_START( moo, moo_state )
 
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(moo)
+	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
 	MCFG_K053247_ADD("k053246", moo_k053247_intf)
 	MCFG_K056832_ADD("k056832", moo_k056832_intf)
@@ -567,8 +565,8 @@ static MACHINE_CONFIG_START( moobl, moo_state )
 	MCFG_CPU_PROGRAM_MAP(moobl_map)
 	MCFG_CPU_VBLANK_INT("screen", moobl_interrupt)
 
-	MCFG_MACHINE_START(moo)
-	MCFG_MACHINE_RESET(moo)
+	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
+	MCFG_MACHINE_RESET_OVERRIDE(moo_state,moo)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
@@ -584,7 +582,7 @@ static MACHINE_CONFIG_START( moobl, moo_state )
 
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(moo)
+	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
 	MCFG_K053247_ADD("k053246", moo_k053247_intf)
 	MCFG_K056832_ADD("k056832", moo_k056832_intf)

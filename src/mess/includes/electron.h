@@ -71,19 +71,22 @@ public:
 	DECLARE_WRITE8_MEMBER(electron_ula_w);
 	void electron_tape_start();
 	void electron_tape_stop();
+	virtual void machine_start();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in machine/electron.c -----------*/
 
-MACHINE_START( electron );
+
 
 void electron_interrupt_handler(running_machine &machine, int mode, int interrupt);
 
 
 /*----------- defined in video/electron.c -----------*/
 
-VIDEO_START( electron );
+
 SCREEN_UPDATE_IND16( electron );
 
 

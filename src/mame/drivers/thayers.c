@@ -80,6 +80,8 @@ public:
 	DECLARE_READ8_MEMBER(ssi263_register_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_enter_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_ready_r);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -737,35 +739,33 @@ INPUT_PORTS_END
 
 /* Machine Initialization */
 
-static MACHINE_START( thayers )
+void thayers_state::machine_start()
 {
-	thayers_state *state = machine.driver_data<thayers_state>();
-	memset(&state->m_ssi263, 0, sizeof(state->m_ssi263));
+	memset(&m_ssi263, 0, sizeof(m_ssi263));
 }
 
-static MACHINE_RESET( thayers )
+void thayers_state::machine_reset()
 {
-	thayers_state *state = machine.driver_data<thayers_state>();
 
-	state->m_laserdisc_data = 0;
+	m_laserdisc_data = 0;
 
-	state->m_rx_bit = 0;
-	state->m_keylatch = 0;
+	m_rx_bit = 0;
+	m_keylatch = 0;
 
-	state->m_cop_data_latch = 0;
-	state->m_cop_data_latch_enable = 0;
-	state->m_cop_l = 0;
-	state->m_cop_cmd_latch = 0;
+	m_cop_data_latch = 0;
+	m_cop_data_latch_enable = 0;
+	m_cop_l = 0;
+	m_cop_cmd_latch = 0;
 
-	state->m_timer_int = 1;
-	state->m_data_rdy_int = 1;
-	state->m_ssi_data_request = 1;
+	m_timer_int = 1;
+	m_data_rdy_int = 1;
+	m_ssi_data_request = 1;
 
-	state->m_cart_present = 0;
-	state->m_pr7820_enter = 0;
+	m_cart_present = 0;
+	m_pr7820_enter = 0;
 
-//  newtype = (state->ioport("DSWB")->read() & 0x18) ? LASERDISC_TYPE_PIONEER_LDV1000 : LASERDISC_TYPE_PIONEER_PR7820;
-//  laserdisc_set_type(state->m_laserdisc, newtype);
+//  newtype = (ioport("DSWB")->read() & 0x18) ? LASERDISC_TYPE_PIONEER_LDV1000 : LASERDISC_TYPE_PIONEER_PR7820;
+//  laserdisc_set_type(m_laserdisc, newtype);
 }
 
 /* COP400 Interface */
@@ -789,8 +789,6 @@ static MACHINE_CONFIG_START( thayers, thayers_state )
 	MCFG_CPU_IO_MAP(thayers_cop_io_map)
 	MCFG_CPU_CONFIG(thayers_cop_intf)
 
-	MCFG_MACHINE_START(thayers)
-	MCFG_MACHINE_RESET(thayers)
 
 	MCFG_LASERDISC_PR7820_ADD("laserdisc")
 

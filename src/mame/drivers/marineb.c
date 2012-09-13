@@ -41,34 +41,31 @@ write
 #include "includes/marineb.h"
 
 
-static MACHINE_RESET( marineb )
+void marineb_state::machine_reset()
 {
-	marineb_state *state = machine.driver_data<marineb_state>();
 
-	state->m_palette_bank = 0;
-	state->m_column_scroll = 0;
-	state->m_flipscreen_x = 0;
-	state->m_flipscreen_y = 0;
-	state->m_marineb_active_low_flipscreen = 0;
+	m_palette_bank = 0;
+	m_column_scroll = 0;
+	m_flipscreen_x = 0;
+	m_flipscreen_y = 0;
+	m_marineb_active_low_flipscreen = 0;
 }
 
-static MACHINE_RESET( springer )
+MACHINE_RESET_MEMBER(marineb_state,springer)
 {
-	marineb_state *state = machine.driver_data<marineb_state>();
 
-	MACHINE_RESET_CALL( marineb );
+	marineb_state::machine_reset();
 
-	state->m_marineb_active_low_flipscreen = 1;
+	m_marineb_active_low_flipscreen = 1;
 }
 
-static MACHINE_START( marineb )
+void marineb_state::machine_start()
 {
-	marineb_state *state = machine.driver_data<marineb_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = NULL;
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = NULL;
 
-	state->save_item(NAME(state->m_marineb_active_low_flipscreen));
+	save_item(NAME(m_marineb_active_low_flipscreen));
 }
 
 WRITE8_MEMBER(marineb_state::irq_mask_w)
@@ -551,8 +548,6 @@ static MACHINE_CONFIG_START( marineb, marineb_state )
 	MCFG_CPU_IO_MAP(marineb_io_map)
 	MCFG_CPU_VBLANK_INT("screen", marineb_vblank_irq)
 
-	MCFG_MACHINE_START(marineb)
-	MCFG_MACHINE_RESET(marineb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -565,8 +560,6 @@ static MACHINE_CONFIG_START( marineb, marineb_state )
 	MCFG_GFXDECODE(marineb)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(marineb)
-	MCFG_VIDEO_START(marineb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -589,7 +582,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( springer, marineb )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(springer)
+	MCFG_MACHINE_RESET_OVERRIDE(marineb_state,springer)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -643,7 +636,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( bcruzm12, wanted )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(springer)
+	MCFG_MACHINE_RESET_OVERRIDE(marineb_state,springer)
 MACHINE_CONFIG_END
 
 /***************************************************************************

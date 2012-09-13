@@ -71,30 +71,29 @@ static TIMER_CALLBACK( invasn_gun_callback );
  *
  *************************************/
 
-static MACHINE_START( midzeus )
+MACHINE_START_MEMBER(midzeus_state,midzeus)
 {
-	timer[0] = machine.scheduler().timer_alloc(FUNC_NULL);
-	timer[1] = machine.scheduler().timer_alloc(FUNC_NULL);
+	timer[0] = machine().scheduler().timer_alloc(FUNC_NULL);
+	timer[1] = machine().scheduler().timer_alloc(FUNC_NULL);
 
-	gun_timer[0] = machine.scheduler().timer_alloc(FUNC(invasn_gun_callback));
-	gun_timer[1] = machine.scheduler().timer_alloc(FUNC(invasn_gun_callback));
+	gun_timer[0] = machine().scheduler().timer_alloc(FUNC(invasn_gun_callback));
+	gun_timer[1] = machine().scheduler().timer_alloc(FUNC(invasn_gun_callback));
 
-	state_save_register_global(machine, gun_control);
-	state_save_register_global(machine, gun_irq_state);
-	state_save_register_global_array(machine, gun_x);
-	state_save_register_global_array(machine, gun_y);
-	state_save_register_global(machine, crusnexo_leds_select);
-	state_save_register_global(machine, keypad_select);
+	state_save_register_global(machine(), gun_control);
+	state_save_register_global(machine(), gun_irq_state);
+	state_save_register_global_array(machine(), gun_x);
+	state_save_register_global_array(machine(), gun_y);
+	state_save_register_global(machine(), crusnexo_leds_select);
+	state_save_register_global(machine(), keypad_select);
 }
 
 
-static MACHINE_RESET( midzeus )
+MACHINE_RESET_MEMBER(midzeus_state,midzeus)
 {
-	midzeus_state *state = machine.driver_data<midzeus_state>();
 
-	memcpy(state->m_ram_base, machine.root_device().memregion("user1")->base(), 0x40000*4);
-	*state->m_ram_base <<= 1;
-	machine.device("maincpu")->reset();
+	memcpy(m_ram_base, machine().root_device().memregion("user1")->base(), 0x40000*4);
+	*m_ram_base <<= 1;
+	machine().device("maincpu")->reset();
 
 	cmos_protected = TRUE;
 }
@@ -1094,8 +1093,8 @@ static MACHINE_CONFIG_START( midzeus, midzeus_state )
 	MCFG_CPU_PROGRAM_MAP(zeus_map)
 	MCFG_CPU_VBLANK_INT("screen", display_irq)
 
-	MCFG_MACHINE_START(midzeus)
-	MCFG_MACHINE_RESET(midzeus)
+	MCFG_MACHINE_START_OVERRIDE(midzeus_state,midzeus)
+	MCFG_MACHINE_RESET_OVERRIDE(midzeus_state,midzeus)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
@@ -1105,7 +1104,7 @@ static MACHINE_CONFIG_START( midzeus, midzeus_state )
 	MCFG_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK/8, 529, 0, 400, 278, 0, 256)
 	MCFG_SCREEN_UPDATE_STATIC(midzeus)
 
-	MCFG_VIDEO_START(midzeus)
+	MCFG_VIDEO_START_OVERRIDE(midzeus_state,midzeus)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(dcs2_audio_2104)
@@ -1134,8 +1133,8 @@ static MACHINE_CONFIG_START( midzeus2, midzeus_state )
 	MCFG_CPU_PROGRAM_MAP(zeus2_map)
 	MCFG_CPU_VBLANK_INT("screen", display_irq)
 
-	MCFG_MACHINE_START(midzeus)
-	MCFG_MACHINE_RESET(midzeus)
+	MCFG_MACHINE_START_OVERRIDE(midzeus_state,midzeus)
+	MCFG_MACHINE_RESET_OVERRIDE(midzeus_state,midzeus)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
@@ -1143,7 +1142,7 @@ static MACHINE_CONFIG_START( midzeus2, midzeus_state )
 	MCFG_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK/4, 666, 0, 512, 438, 0, 400)
 	MCFG_SCREEN_UPDATE_STATIC(midzeus2)
 
-	MCFG_VIDEO_START(midzeus2)
+	MCFG_VIDEO_START_OVERRIDE(midzeus_state,midzeus2)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(dcs2_audio_2104)

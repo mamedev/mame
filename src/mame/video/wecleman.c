@@ -878,9 +878,8 @@ WRITE16_MEMBER(wecleman_state::wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w)
                             Initializations
 ***************************************************************************/
 
-VIDEO_START( wecleman )
+VIDEO_START_MEMBER(wecleman_state,wecleman)
 {
-	wecleman_state *state = machine.driver_data<wecleman_state>();
 	/*
         Sprite banking - each bank is 0x20000 bytes (we support 0x40 bank codes)
         This game has ROMs for 16 banks
@@ -896,75 +895,75 @@ VIDEO_START( wecleman )
 	UINT8 *buffer;
 	int i, j;
 
-	assert(machine.primary_screen->format() == BITMAP_FORMAT_RGB32);
-	buffer = auto_alloc_array(machine, UINT8, 0x12c00);	// working buffer for sprite operations
+	assert(machine().primary_screen->format() == BITMAP_FORMAT_RGB32);
+	buffer = auto_alloc_array(machine(), UINT8, 0x12c00);	// working buffer for sprite operations
 
-	state->m_gameid = 0;
-	state->m_gfx_bank = bank;
-	state->m_spr_offsx = -0xbc + BMP_PAD;
-	state->m_spr_offsy = 1 + BMP_PAD;
-	state->m_cloud_blend = BLEND_MAX;
-	state->m_cloud_ds = 0;
-	state->m_cloud_visible = 0;
-	state->m_black_pen = get_black_pen(machine);
+	m_gameid = 0;
+	m_gfx_bank = bank;
+	m_spr_offsx = -0xbc + BMP_PAD;
+	m_spr_offsy = 1 + BMP_PAD;
+	m_cloud_blend = BLEND_MAX;
+	m_cloud_ds = 0;
+	m_cloud_visible = 0;
+	m_black_pen = get_black_pen(machine());
 
-	state->m_rgb_half     =          (UINT16*)(buffer + 0x00000);
-	state->m_t32x32pm     =             (int*)(buffer + 0x10020);
-	state->m_spr_ptr_list = (struct sprite **)(buffer + 0x12000);
-	state->m_spr_idx_list =            (int *)(buffer + 0x12400);
-	state->m_spr_pri_list =            (int *)(buffer + 0x12800);
+	m_rgb_half     =          (UINT16*)(buffer + 0x00000);
+	m_t32x32pm     =             (int*)(buffer + 0x10020);
+	m_spr_ptr_list = (struct sprite **)(buffer + 0x12000);
+	m_spr_idx_list =            (int *)(buffer + 0x12400);
+	m_spr_pri_list =            (int *)(buffer + 0x12800);
 
 	for (i=0; i<0x8000; i++)
 	{
 		j = i>>1;
-		state->m_rgb_half[i] = (j&0xf) | (j&0x1e0) | (j&0x3c00);
+		m_rgb_half[i] = (j&0xf) | (j&0x1e0) | (j&0x3c00);
 	}
 
 	for (j=0; j<0x20; j++)
 	{
 		for (i=-0x1f; i<0x20; i++)
 		{
-			*(state->m_t32x32pm + (j<<6) + i) = i * j;
+			*(m_t32x32pm + (j<<6) + i) = i * j;
 		}
 	}
 
-	state->m_sprite_list = auto_alloc_array_clear(machine, struct sprite, NUM_SPRITES);
+	m_sprite_list = auto_alloc_array_clear(machine(), struct sprite, NUM_SPRITES);
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wecleman_state::wecleman_get_bg_tile_info),state),
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wecleman_state::wecleman_get_bg_tile_info),this),
 								TILEMAP_SCAN_ROWS,
 									/* We draw part of the road below */
 								8,8,
 								PAGE_NX * 2, PAGE_NY * 2 );
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wecleman_state::wecleman_get_fg_tile_info),state),
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wecleman_state::wecleman_get_fg_tile_info),this),
 								TILEMAP_SCAN_ROWS,
 
 								8,8,
 								PAGE_NX * 2, PAGE_NY * 2);
 
-	state->m_txt_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wecleman_state::wecleman_get_txt_tile_info),state),
+	m_txt_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wecleman_state::wecleman_get_txt_tile_info),this),
 								 TILEMAP_SCAN_ROWS,
 
 								 8,8,
 								 PAGE_NX * 1, PAGE_NY * 1);
 
-	state->m_bg_tilemap->set_scroll_rows(TILEMAP_DIMY);	/* Screen-wise scrolling */
-	state->m_bg_tilemap->set_scroll_cols(1);
-	state->m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scroll_rows(TILEMAP_DIMY);	/* Screen-wise scrolling */
+	m_bg_tilemap->set_scroll_cols(1);
+	m_bg_tilemap->set_transparent_pen(0);
 
-	state->m_fg_tilemap->set_scroll_rows(TILEMAP_DIMY);	/* Screen-wise scrolling */
-	state->m_fg_tilemap->set_scroll_cols(1);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_scroll_rows(TILEMAP_DIMY);	/* Screen-wise scrolling */
+	m_fg_tilemap->set_scroll_cols(1);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_txt_tilemap->set_scroll_rows(1);
-	state->m_txt_tilemap->set_scroll_cols(1);
-	state->m_txt_tilemap->set_transparent_pen(0);
+	m_txt_tilemap->set_scroll_rows(1);
+	m_txt_tilemap->set_scroll_cols(1);
+	m_txt_tilemap->set_transparent_pen(0);
 
-	state->m_txt_tilemap->set_scrollx(0, 512-320-16 -BMP_PAD);
-	state->m_txt_tilemap->set_scrolly(0, -BMP_PAD );
+	m_txt_tilemap->set_scrollx(0, 512-320-16 -BMP_PAD);
+	m_txt_tilemap->set_scrolly(0, -BMP_PAD );
 
 	// patches out a mysterious pixel floating in the sky (tile decoding bug?)
-	*const_cast<UINT8 *>(machine.gfx[0]->get_data(0xaca)+7) = 0;
+	*const_cast<UINT8 *>(machine().gfx[0]->get_data(0xaca)+7) = 0;
 }
 
 //  Callbacks for the K051316
@@ -981,9 +980,8 @@ void hotchase_zoom_callback_1(running_machine &machine, int *code,int *color,int
 	*color = ((*color & 0x3f) << 1) | ((*code & 0x80) >> 7);
 }
 
-VIDEO_START( hotchase )
+VIDEO_START_MEMBER(wecleman_state,hotchase)
 {
-	wecleman_state *state = machine.driver_data<wecleman_state>();
 	/*
         Sprite banking - each bank is 0x20000 bytes (we support 0x40 bank codes)
         This game has ROMs for 0x30 banks
@@ -998,17 +996,17 @@ VIDEO_START( hotchase )
 
 	UINT8 *buffer;
 
-	buffer = auto_alloc_array(machine, UINT8, 0x400);	// reserve 1k for sprite list
+	buffer = auto_alloc_array(machine(), UINT8, 0x400);	// reserve 1k for sprite list
 
-	state->m_gameid = 1;
-	state->m_gfx_bank = bank;
-	state->m_spr_offsx = -0xc0;
-	state->m_spr_offsy = 0;
-	state->m_black_pen = get_black_pen(machine);
+	m_gameid = 1;
+	m_gfx_bank = bank;
+	m_spr_offsx = -0xc0;
+	m_spr_offsy = 0;
+	m_black_pen = get_black_pen(machine());
 
-	state->m_spr_ptr_list = (struct sprite **)buffer;
+	m_spr_ptr_list = (struct sprite **)buffer;
 
-	state->m_sprite_list = auto_alloc_array_clear(machine, struct sprite, NUM_SPRITES);
+	m_sprite_list = auto_alloc_array_clear(machine(), struct sprite, NUM_SPRITES);
 }
 
 

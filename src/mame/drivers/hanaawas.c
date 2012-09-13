@@ -182,18 +182,16 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_START( hanaawas )
+void hanaawas_state::machine_start()
 {
-	hanaawas_state *state = machine.driver_data<hanaawas_state>();
 
-	state->save_item(NAME(state->m_mux));
+	save_item(NAME(m_mux));
 }
 
-static MACHINE_RESET( hanaawas )
+void hanaawas_state::machine_reset()
 {
-	hanaawas_state *state = machine.driver_data<hanaawas_state>();
 
-	state->m_mux = 0;
+	m_mux = 0;
 }
 
 static MACHINE_CONFIG_START( hanaawas, hanaawas_state )
@@ -204,8 +202,6 @@ static MACHINE_CONFIG_START( hanaawas, hanaawas_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(hanaawas)
-	MCFG_MACHINE_RESET(hanaawas)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -218,8 +214,6 @@ static MACHINE_CONFIG_START( hanaawas, hanaawas_state )
 	MCFG_GFXDECODE(hanaawas)
 	MCFG_PALETTE_LENGTH(32*8)
 
-	MCFG_PALETTE_INIT(hanaawas)
-	MCFG_VIDEO_START(hanaawas)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

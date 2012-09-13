@@ -20,13 +20,17 @@ public:
 	DECLARE_READ8_MEMBER(runaway_pot_r);
 	TILE_GET_INFO_MEMBER(runaway_get_tile_info);
 	TILE_GET_INFO_MEMBER(qwak_get_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	DECLARE_VIDEO_START(qwak);
 };
 
 
 /*----------- defined in video/runaway.c -----------*/
 
-VIDEO_START( runaway );
-VIDEO_START( qwak );
+
+
 SCREEN_UPDATE_IND16( runaway );
 SCREEN_UPDATE_IND16( qwak );
 

@@ -105,15 +105,18 @@ public:
 	UINT8 m_mux_data;
 	DECLARE_DRIVER_INIT(p7_lcd);
 	DECLARE_DRIVER_INIT(p7_raster);
+	virtual void machine_reset();
+	DECLARE_VIDEO_START(pasopia7);
+	DECLARE_PALETTE_INIT(p7_raster);
+	DECLARE_PALETTE_INIT(p7_lcd);
 };
 
 #define VDP_CLOCK XTAL_3_579545MHz/4
 #define LCD_CLOCK VDP_CLOCK/10
 
-static VIDEO_START( pasopia7 )
+VIDEO_START_MEMBER(pasopia7_state,pasopia7)
 {
-	pasopia7_state *state = machine.driver_data<pasopia7_state>();
-	state->m_p7_pal = auto_alloc_array(machine, UINT8, 0x10);
+	m_p7_pal = auto_alloc_array(machine(), UINT8, 0x10);
 }
 
 #define keyb_press(_val_,_charset_) \
@@ -934,36 +937,35 @@ static I8255_INTERFACE( ppi8255_intf_2 )
 	DEVCB_DRIVER_MEMBER(pasopia7_state, nmi_reg_w)		/* Port C write */
 };
 
-static MACHINE_RESET( pasopia7 )
+void pasopia7_state::machine_reset()
 {
-	pasopia7_state *state = machine.driver_data<pasopia7_state>();
-	UINT8 *bios = state->memregion("maincpu")->base();
+	UINT8 *bios = memregion("maincpu")->base();
 
-	state->membank("bank1")->set_base(bios + 0x10000);
-	state->membank("bank2")->set_base(bios + 0x10000);
-//  state->membank("bank3")->set_base(bios + 0x10000);
-//  state->membank("bank4")->set_base(bios + 0x10000);
+	membank("bank1")->set_base(bios + 0x10000);
+	membank("bank2")->set_base(bios + 0x10000);
+//  membank("bank3")->set_base(bios + 0x10000);
+//  membank("bank4")->set_base(bios + 0x10000);
 
-	state->m_nmi_reset |= 4;
+	m_nmi_reset |= 4;
 }
 
-static PALETTE_INIT( p7_raster )
+PALETTE_INIT_MEMBER(pasopia7_state,p7_raster)
 {
 	int i;
 
 	for( i = 0; i < 8; i++)
-		palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+		palette_set_color_rgb(machine(), i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
 /* TODO: palette values are mostly likely to be wrong in there */
-static PALETTE_INIT( p7_lcd )
+PALETTE_INIT_MEMBER(pasopia7_state,p7_lcd)
 {
 	int i;
 
-	palette_set_color_rgb(machine, 0, 0xa0, 0xa8, 0xa0);
+	palette_set_color_rgb(machine(), 0, 0xa0, 0xa8, 0xa0);
 
 	for( i = 1; i < 8; i++)
-		palette_set_color_rgb(machine, i, 0x30, 0x38, 0x10);
+		palette_set_color_rgb(machine(), i, 0x30, 0x38, 0x10);
 }
 
 static const struct upd765_interface pasopia7_upd765_interface =
@@ -1013,7 +1015,6 @@ static MACHINE_CONFIG_START( p7_base, pasopia7_state )
 	MCFG_CPU_IO_MAP(pasopia7_io)
 	MCFG_CPU_CONFIG(p7_daisy)
 
-	MCFG_MACHINE_RESET(pasopia7)
 
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1040,10 +1041,10 @@ static MACHINE_CONFIG_DERIVED( p7_raster, p7_base )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 32-1)
-	MCFG_VIDEO_START(pasopia7)
+	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
 	MCFG_SCREEN_UPDATE_STATIC(pasopia7)
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(p7_raster)
+	MCFG_PALETTE_INIT_OVERRIDE(pasopia7_state,p7_raster)
 	MCFG_GFXDECODE( pasopia7 )
 
 	MCFG_MC6845_ADD("crtc", H46505, VDP_CLOCK, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
@@ -1056,10 +1057,10 @@ static MACHINE_CONFIG_DERIVED( p7_lcd, p7_base )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_VIDEO_START(pasopia7)
+	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
 	MCFG_SCREEN_UPDATE_STATIC(pasopia7)
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(p7_lcd)
+	MCFG_PALETTE_INIT_OVERRIDE(pasopia7_state,p7_lcd)
 	MCFG_GFXDECODE( pasopia7 )
 
 	MCFG_MC6845_ADD("crtc", H46505, LCD_CLOCK, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */

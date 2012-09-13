@@ -58,11 +58,12 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_DRIVER_INIT(thndzone);
 	DECLARE_DRIVER_INIT(dassault);
+	virtual void video_start();
 };
 
 
 
 /*----------- defined in video/dassault.c -----------*/
 
-VIDEO_START(dassault);
+
 SCREEN_UPDATE_RGB32( dassault );

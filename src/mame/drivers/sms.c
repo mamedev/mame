@@ -240,6 +240,11 @@ public:
 	DECLARE_READ8_MEMBER(ppi0_c_r);
 	DECLARE_WRITE8_MEMBER(ppi0_a_w);
 	DECLARE_WRITE8_MEMBER(ppi0_b_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_MACHINE_START(sureshot);
 };
 
 
@@ -467,13 +472,12 @@ WRITE8_MEMBER(smsmfg_state::video_w)
 	}
 }
 
-static VIDEO_START( sms )
+void smsmfg_state::video_start()
 {
-	smsmfg_state *state = machine.driver_data<smsmfg_state>();
-	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_bitmap);
 
-	state_save_register_global_array(machine, state->m_vid_regs);
-	state_save_register_global_bitmap(machine, &state->m_bitmap);
+	state_save_register_global_array(machine(), m_vid_regs);
+	state_save_register_global_bitmap(machine(), &m_bitmap);
 }
 
 static SCREEN_UPDATE_IND16( sms )
@@ -483,13 +487,13 @@ static SCREEN_UPDATE_IND16( sms )
 	return 0;
 }
 
-static PALETTE_INIT( sms )
+void smsmfg_state::palette_init()
 {
 	int i;
 
 	for (i = 0; i < 8; i++ )
 	{
-		palette_set_color(machine, i, MAKE_RGB(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i)));
+		palette_set_color(machine(), i, MAKE_RGB(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i)));
 	}
 }
 
@@ -534,26 +538,23 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static MACHINE_START( sms )
+void smsmfg_state::machine_start()
 {
-	smsmfg_state *state = machine.driver_data<smsmfg_state>();
-	state->membank("bank1")->configure_entries(0, 16, state->memregion("questions")->base(), 0x4000);
+	membank("bank1")->configure_entries(0, 16, memregion("questions")->base(), 0x4000);
 
-	state_save_register_global(machine, state->m_communication_port_status);
-	state_save_register_global_array(machine, state->m_communication_port);
+	state_save_register_global(machine(), m_communication_port_status);
+	state_save_register_global_array(machine(), m_communication_port);
 }
 
-static MACHINE_START( sureshot )
+MACHINE_START_MEMBER(smsmfg_state,sureshot)
 {
-	smsmfg_state *state = machine.driver_data<smsmfg_state>();
-	state_save_register_global(machine, state->m_communication_port_status);
-	state_save_register_global_array(machine, state->m_communication_port);
+	state_save_register_global(machine(), m_communication_port_status);
+	state_save_register_global_array(machine(), m_communication_port);
 }
 
-static MACHINE_RESET( sms )
+void smsmfg_state::machine_reset()
 {
-	smsmfg_state *state = machine.driver_data<smsmfg_state>();
-	state->m_communication_port_status = 0;
+	m_communication_port_status = 0;
 }
 
 static MACHINE_CONFIG_START( sms, smsmfg_state )
@@ -565,8 +566,6 @@ static MACHINE_CONFIG_START( sms, smsmfg_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(sms)
-	MCFG_MACHINE_RESET(sms)
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
@@ -583,8 +582,6 @@ static MACHINE_CONFIG_START( sms, smsmfg_state )
 
 	MCFG_PALETTE_LENGTH(8)
 
-	MCFG_PALETTE_INIT(sms)
-	MCFG_VIDEO_START(sms)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -598,7 +595,7 @@ static MACHINE_CONFIG_DERIVED( sureshot, sms )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sureshot_map)
 
-	MCFG_MACHINE_START(sureshot)
+	MCFG_MACHINE_START_OVERRIDE(smsmfg_state,sureshot)
 MACHINE_CONFIG_END
 
 /*************************************

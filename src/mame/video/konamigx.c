@@ -2054,62 +2054,62 @@ static void _gxcommoninit(running_machine &machine)
 }
 
 
-VIDEO_START(konamigx_5bpp)
+VIDEO_START_MEMBER(konamigx_state,konamigx_5bpp)
 {
-	if (!strcmp(machine.system().name,"sexyparo") || !strcmp(machine.system().name,"sexyparoa"))
+	if (!strcmp(machine().system().name,"sexyparo") || !strcmp(machine().system().name,"sexyparoa"))
 		game_tile_callback = konamigx_alpha_tile_callback;
 	else
 		game_tile_callback = konamigx_type2_tile_callback;
 
-	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, game_tile_callback, 0);
+	K056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game_tile_callback, 0);
 
-	_gxcommoninit(machine);
+	_gxcommoninit(machine());
 
 	/* here are some hand tuned per game scroll offsets to go with the per game visible areas,
        i see no better way of doing this for now... */
 
-	if (!strcmp(machine.system().name,"tbyahhoo"))
+	if (!strcmp(machine().system().name,"tbyahhoo"))
 	{
 		K056832_set_UpdateMode(1);
 		gx_tilemode = 1;
 	} else
 
-	if (!strcmp(machine.system().name,"puzldama"))
+	if (!strcmp(machine().system().name,"puzldama"))
 	{
 		K053247GP_set_SpriteOffset(-46, -23);
 		konamigx_mixer_primode(5);
 	} else
 
-	if (!strcmp(machine.system().name,"daiskiss"))
+	if (!strcmp(machine().system().name,"daiskiss"))
 	{
 		konamigx_mixer_primode(4);
 	} else
 
-	if (!strcmp(machine.system().name,"gokuparo") || !strcmp(machine.system().name,"fantjour") || !strcmp(machine.system().name,"fantjoura"))
+	if (!strcmp(machine().system().name,"gokuparo") || !strcmp(machine().system().name,"fantjour") || !strcmp(machine().system().name,"fantjoura"))
 	{
 		K053247GP_set_SpriteOffset(-46, -23);
 	} else
 
-	if (!strcmp(machine.system().name,"sexyparo") || !strcmp(machine.system().name,"sexyparoa"))
+	if (!strcmp(machine().system().name,"sexyparo") || !strcmp(machine().system().name,"sexyparoa"))
 	{
 		K053247GP_set_SpriteOffset(-42, -23);
 	}
 }
 
-VIDEO_START(winspike)
+VIDEO_START_MEMBER(konamigx_state,winspike)
 {
-	K056832_vh_start(machine, "gfx1", K056832_BPP_8, 0, NULL, konamigx_alpha_tile_callback, 2);
-	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_LE2, -53, -23, konamigx_type2_sprite_callback);
+	K056832_vh_start(machine(), "gfx1", K056832_BPP_8, 0, NULL, konamigx_alpha_tile_callback, 2);
+	K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_LE2, -53, -23, konamigx_type2_sprite_callback);
 
-	_gxcommoninitnosprites(machine);
+	_gxcommoninitnosprites(machine());
 }
 
-VIDEO_START(dragoonj)
+VIDEO_START_MEMBER(konamigx_state,dragoonj)
 {
-	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 1, NULL, konamigx_type2_tile_callback, 0);
-	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_RNG, -53, -23, konamigx_dragoonj_sprite_callback);
+	K056832_vh_start(machine(), "gfx1", K056832_BPP_5, 1, NULL, konamigx_type2_tile_callback, 0);
+	K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_RNG, -53, -23, konamigx_dragoonj_sprite_callback);
 
-	_gxcommoninitnosprites(machine);
+	_gxcommoninitnosprites(machine());
 
 	K056832_set_LayerOffset(0, -2+1, 0);
 	K056832_set_LayerOffset(1,  0+1, 0);
@@ -2117,12 +2117,12 @@ VIDEO_START(dragoonj)
 	K056832_set_LayerOffset(3,  3+1, 0);
 }
 
-VIDEO_START(le2)
+VIDEO_START_MEMBER(konamigx_state,le2)
 {
-	K056832_vh_start(machine, "gfx1", K056832_BPP_8, 1, NULL, konamigx_type2_tile_callback, 0);
-	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_LE2, -46, -23, konamigx_le2_sprite_callback);
+	K056832_vh_start(machine(), "gfx1", K056832_BPP_8, 1, NULL, konamigx_type2_tile_callback, 0);
+	K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_LE2, -46, -23, konamigx_le2_sprite_callback);
 
-	_gxcommoninitnosprites(machine);
+	_gxcommoninitnosprites(machine());
 
 	konamigx_mixer_primode(-1); // swapped layer B and C priorities?
 
@@ -2130,42 +2130,41 @@ VIDEO_START(le2)
 	K055555_write_reg(K55_INPUT_ENABLES, 1); // it doesn't turn on the video output at first for the test screens, maybe it should default to ON?
 }
 
-VIDEO_START(konamigx_6bpp)
+VIDEO_START_MEMBER(konamigx_state,konamigx_6bpp)
 {
-	K056832_vh_start(machine, "gfx1", K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
+	K056832_vh_start(machine(), "gfx1", K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
 
-	_gxcommoninit(machine);
+	_gxcommoninit(machine());
 
-	if (!strcmp(machine.system().name,"tokkae") || !strcmp(machine.system().name,"tkmmpzdm"))
+	if (!strcmp(machine().system().name,"tokkae") || !strcmp(machine().system().name,"tkmmpzdm"))
 	{
 		K053247GP_set_SpriteOffset(-46, -23);
 		konamigx_mixer_primode(5);
 	}
 }
 
-VIDEO_START(konamigx_type3)
+VIDEO_START_MEMBER(konamigx_state,konamigx_type3)
 {
-	konamigx_state *state = machine.driver_data<konamigx_state>();
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
 
-	K056832_vh_start(machine, "gfx1", K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 1);
-	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -132, -23, konamigx_type2_sprite_callback);
+	K056832_vh_start(machine(), "gfx1", K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 1);
+	K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -132, -23, konamigx_type2_sprite_callback);
 
-	dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine, width, height);
-	dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine, width, height);
+	dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
+	dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
 
-	_gxcommoninitnosprites(machine);
+	_gxcommoninitnosprites(machine());
 
-	gx_psac_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac3_tile_info),state), TILEMAP_SCAN_COLS,  16, 16, 256, 256);
-	gx_psac_tilemap_alt = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac3_alt_tile_info),state), TILEMAP_SCAN_COLS,  16, 16, 256, 256);
+	gx_psac_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac3_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 256, 256);
+	gx_psac_tilemap_alt = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac3_alt_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 256, 256);
 
 	gx_rozenable = 0;
 	gx_specialrozenable = 2;
 
 
 	/* set up tile layers */
-	type3_roz_temp_bitmap = auto_bitmap_ind16_alloc(machine, width, height);
+	type3_roz_temp_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
 
 
 	//gx_psac_tilemap->set_flip(TILEMAP_FLIPX| TILEMAP_FLIPY);
@@ -2183,21 +2182,20 @@ VIDEO_START(konamigx_type3)
 	konamigx_palformat = 1;
 }
 
-VIDEO_START(konamigx_type4)
+VIDEO_START_MEMBER(konamigx_state,konamigx_type4)
 {
-	konamigx_state *state = machine.driver_data<konamigx_state>();
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
 
-	K056832_vh_start(machine, "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
-	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -79, -24, konamigx_type2_sprite_callback); // -23 looks better in intro
+	K056832_vh_start(machine(), "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
+	K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -79, -24, konamigx_type2_sprite_callback); // -23 looks better in intro
 
-	dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine, width, height);
-	dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine, width, height);
+	dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
+	dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
 
-	_gxcommoninitnosprites(machine);
+	_gxcommoninitnosprites(machine());
 
-	gx_psac_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac_tile_info),state), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	gx_psac_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
 	gx_rozenable = 0;
 	gx_specialrozenable = 3;
 
@@ -2215,21 +2213,20 @@ VIDEO_START(konamigx_type4)
 
 }
 
-VIDEO_START(konamigx_type4_vsn)
+VIDEO_START_MEMBER(konamigx_state,konamigx_type4_vsn)
 {
-	konamigx_state *state = machine.driver_data<konamigx_state>();
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
 
-	K056832_vh_start(machine, "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 2);   // set djmain_hack to 2 to kill layer association or half the tilemaps vanish on screen 0
-	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -132, -23, konamigx_type2_sprite_callback);
+	K056832_vh_start(machine(), "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 2);   // set djmain_hack to 2 to kill layer association or half the tilemaps vanish on screen 0
+	K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -132, -23, konamigx_type2_sprite_callback);
 
-	dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine, width, height);
-	dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine, width, height);
+	dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
+	dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
 
-	_gxcommoninitnosprites(machine);
+	_gxcommoninitnosprites(machine());
 
-	gx_psac_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac_tile_info),state), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	gx_psac_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
 	gx_rozenable = 0;
 	gx_specialrozenable = 3;
 
@@ -2246,21 +2243,20 @@ VIDEO_START(konamigx_type4_vsn)
 	konamigx_palformat = 0;
 }
 
-VIDEO_START(konamigx_type4_sd2)
+VIDEO_START_MEMBER(konamigx_state,konamigx_type4_sd2)
 {
-	konamigx_state *state = machine.driver_data<konamigx_state>();
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
 
-	K056832_vh_start(machine, "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
-	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -81, -23, konamigx_type2_sprite_callback);
+	K056832_vh_start(machine(), "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
+	K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -81, -23, konamigx_type2_sprite_callback);
 
-	dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine, width, height);
-	dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine, width, height);
+	dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
+	dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
 
-	_gxcommoninitnosprites(machine);
+	_gxcommoninitnosprites(machine());
 
-	gx_psac_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac_tile_info),state), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	gx_psac_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
 	gx_rozenable = 0;
 	gx_specialrozenable = 3;
 
@@ -2281,37 +2277,36 @@ VIDEO_START(konamigx_type4_sd2)
 }
 
 
-VIDEO_START(konamigx_6bpp_2)
+VIDEO_START_MEMBER(konamigx_state,konamigx_6bpp_2)
 {
-	K056832_vh_start(machine, "gfx1", K056832_BPP_6, 1, NULL, konamigx_type2_tile_callback, 0);
+	K056832_vh_start(machine(), "gfx1", K056832_BPP_6, 1, NULL, konamigx_type2_tile_callback, 0);
 
-	if (!strcmp(machine.system().name,"salmndr2") || !strcmp(machine.system().name,"salmndr2a"))
+	if (!strcmp(machine().system().name,"salmndr2") || !strcmp(machine().system().name,"salmndr2a"))
 	{
-		K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -48, -23, konamigx_salmndr2_sprite_callback);
+		K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -48, -23, konamigx_salmndr2_sprite_callback);
 
-		_gxcommoninitnosprites(machine);
+		_gxcommoninitnosprites(machine());
 	}
 	else
 	{
-		_gxcommoninit(machine);
+		_gxcommoninit(machine());
 	}
 }
 
-VIDEO_START(opengolf)
+VIDEO_START_MEMBER(konamigx_state,opengolf)
 {
-	konamigx_state *state = machine.driver_data<konamigx_state>();
-	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, konamigx_type2_tile_callback, 0);
-	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -53, -23, konamigx_type2_sprite_callback);
+	K056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, konamigx_type2_tile_callback, 0);
+	K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -53, -23, konamigx_type2_sprite_callback);
 
-	_gxcommoninitnosprites(machine);
+	_gxcommoninitnosprites(machine());
 
 	K056832_set_LayerOffset(0, -2+1, 0);
 	K056832_set_LayerOffset(1,  0+1, 0);
 	K056832_set_LayerOffset(2,  2+1, 0);
 	K056832_set_LayerOffset(3,  3+1, 0);
 
-	gx_psac_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac1a_tile_info),state), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
-	gx_psac_tilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac1b_tile_info),state), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	gx_psac_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac1a_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	gx_psac_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac1b_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
 
 	// transparency will be handled manually in post-processing
 	//gx_psac_tilemap->set_transparent_pen(0);
@@ -2320,8 +2315,8 @@ VIDEO_START(opengolf)
 	gx_rozenable = 0;
 	gx_specialrozenable = 1;
 
-	gxtype1_roz_dstbitmap =  auto_bitmap_ind16_alloc(machine,512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
-	gxtype1_roz_dstbitmap2 = auto_bitmap_ind16_alloc(machine,512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
+	gxtype1_roz_dstbitmap =  auto_bitmap_ind16_alloc(machine(),512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
+	gxtype1_roz_dstbitmap2 = auto_bitmap_ind16_alloc(machine(),512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
 
 
 	gxtype1_roz_dstbitmapclip.set(0, 512-1, 0, 512-1);
@@ -2332,25 +2327,24 @@ VIDEO_START(opengolf)
 
 	// urgh.. the priority bitmap is global, and because our temp bitmaps are bigger than the screen, this causes issues.. so just allocate something huge
 	// until there is a better solution, or priority bitmap can be specified manually.
-	machine.priority_bitmap.allocate(2048,2048);
+	machine().priority_bitmap.allocate(2048,2048);
 
 }
 
-VIDEO_START(racinfrc)
+VIDEO_START_MEMBER(konamigx_state,racinfrc)
 {
-	konamigx_state *state = machine.driver_data<konamigx_state>();
-	K056832_vh_start(machine, "gfx1", K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
-	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX, -53, -23, konamigx_type2_sprite_callback);
+	K056832_vh_start(machine(), "gfx1", K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
+	K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX, -53, -23, konamigx_type2_sprite_callback);
 
-	_gxcommoninitnosprites(machine);
+	_gxcommoninitnosprites(machine());
 
 	K056832_set_LayerOffset(0, -2+1, 0);
 	K056832_set_LayerOffset(1,  0+1, 0);
 	K056832_set_LayerOffset(2,  2+1, 0);
 	K056832_set_LayerOffset(3,  3+1, 0);
 
-	gx_psac_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac1a_tile_info),state), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
-	gx_psac_tilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac1b_tile_info),state), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	gx_psac_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac1a_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	gx_psac_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac1b_tile_info),this), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
 
 	// transparency will be handled manually in post-processing
 	//gx_psac_tilemap->set_transparent_pen(0);
@@ -2359,8 +2353,8 @@ VIDEO_START(racinfrc)
 	gx_rozenable = 0;
 	gx_specialrozenable = 1;
 
-	gxtype1_roz_dstbitmap =  auto_bitmap_ind16_alloc(machine,512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
-	gxtype1_roz_dstbitmap2 = auto_bitmap_ind16_alloc(machine,512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
+	gxtype1_roz_dstbitmap =  auto_bitmap_ind16_alloc(machine(),512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
+	gxtype1_roz_dstbitmap2 = auto_bitmap_ind16_alloc(machine(),512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
 
 
 	gxtype1_roz_dstbitmapclip.set(0, 512-1, 0, 512-1);
@@ -2371,7 +2365,7 @@ VIDEO_START(racinfrc)
 
 	// urgh.. the priority bitmap is global, and because our temp bitmaps are bigger than the screen, this causes issues.. so just allocate something huge
 	// until there is a better solution, or priority bitmap can be specified manually.
-	machine.priority_bitmap.allocate(2048,2048);
+	machine().priority_bitmap.allocate(2048,2048);
 
 
 }

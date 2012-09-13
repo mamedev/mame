@@ -530,29 +530,27 @@ static const msm5205_interface msm5205_config =
 
 
 
-static MACHINE_START( hnayayoi )
+void hnayayoi_state::machine_start()
 {
-	hnayayoi_state *state = machine.driver_data<hnayayoi_state>();
 
-	state->save_item(NAME(state->m_palbank));
-	state->save_item(NAME(state->m_blit_layer));
-	state->save_item(NAME(state->m_blit_dest));
-	state->save_item(NAME(state->m_blit_src));
-	state->save_item(NAME(state->m_keyb));
+	save_item(NAME(m_palbank));
+	save_item(NAME(m_blit_layer));
+	save_item(NAME(m_blit_dest));
+	save_item(NAME(m_blit_src));
+	save_item(NAME(m_keyb));
 }
 
-static MACHINE_RESET( hnayayoi )
+void hnayayoi_state::machine_reset()
 {
-	hnayayoi_state *state = machine.driver_data<hnayayoi_state>();
 
 	/* start with the MSM5205 reset */
-	msm5205_reset_w(machine.device("msm"), 1);
+	msm5205_reset_w(machine().device("msm"), 1);
 
-	state->m_palbank = 0;
-	state->m_blit_layer = 0;
-	state->m_blit_dest = 0;
-	state->m_blit_src = 0;
-	state->m_keyb = 0;
+	m_palbank = 0;
+	m_blit_layer = 0;
+	m_blit_dest = 0;
+	m_blit_src = 0;
+	m_keyb = 0;
 }
 
 
@@ -565,8 +563,6 @@ static MACHINE_CONFIG_START( hnayayoi, hnayayoi_state )
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 8000)
 
-	MCFG_MACHINE_START(hnayayoi)
-	MCFG_MACHINE_RESET(hnayayoi)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -581,7 +577,6 @@ static MACHINE_CONFIG_START( hnayayoi, hnayayoi_state )
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MCFG_VIDEO_START(hnayayoi)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -608,7 +603,7 @@ static MACHINE_CONFIG_DERIVED( untoucha, hnayayoi )
 	MCFG_CPU_PROGRAM_MAP(untoucha_map)
 	MCFG_CPU_IO_MAP(untoucha_io_map)
 
-	MCFG_VIDEO_START(untoucha)
+	MCFG_VIDEO_START_OVERRIDE(hnayayoi_state,untoucha)
 MACHINE_CONFIG_END
 
 

@@ -48,6 +48,10 @@ public:
 	DECLARE_WRITE8_MEMBER(unknown_port_1_w);
 	DECLARE_WRITE8_MEMBER(unknown_port_2_w);
 	TILE_GET_INFO_MEMBER(chaknpop_get_tx_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -58,7 +62,7 @@ public:
 
 /*----------- defined in video/chaknpop.c -----------*/
 
-PALETTE_INIT( chaknpop );
-VIDEO_START( chaknpop );
+
+
 SCREEN_UPDATE_IND16( chaknpop );
 

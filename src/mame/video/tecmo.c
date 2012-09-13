@@ -79,27 +79,26 @@ TILE_GET_INFO_MEMBER(tecmo_state::get_tx_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( tecmo )
+VIDEO_START_MEMBER(tecmo_state,tecmo)
 {
-	tecmo_state *state = machine.driver_data<tecmo_state>();
-	if (state->m_video_type == 2)	/* gemini */
+	if (m_video_type == 2)	/* gemini */
 	{
-		state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmo_state::gemini_get_bg_tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,16);
-		state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmo_state::gemini_get_fg_tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,16);
+		m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tecmo_state::gemini_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
+		m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tecmo_state::gemini_get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
 	}
 	else	/* rygar, silkworm */
 	{
-		state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmo_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,16);
-		state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmo_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,16);
+		m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tecmo_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
+		m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tecmo_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
 	}
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmo_state::get_tx_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tecmo_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
 
-	state->m_bg_tilemap->set_transparent_pen(0);
-	state->m_fg_tilemap->set_transparent_pen(0);
-	state->m_tx_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap->set_scrolldx(-48,256+48);
-	state->m_fg_tilemap->set_scrolldx(-48,256+48);
+	m_bg_tilemap->set_scrolldx(-48,256+48);
+	m_fg_tilemap->set_scrolldx(-48,256+48);
 }
 
 

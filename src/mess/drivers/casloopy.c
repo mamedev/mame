@@ -153,11 +153,13 @@ public:
 
 	required_shared_ptr<UINT32> m_bios_rom;
 	DECLARE_DRIVER_INIT(casloopy);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 
-static VIDEO_START( casloopy )
+void casloopy_state::video_start()
 {
 
 }
@@ -183,9 +185,9 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( casloopy )
 INPUT_PORTS_END
 
-static MACHINE_RESET( casloopy )
+void casloopy_state::machine_reset()
 {
-	//machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE); //halt the CPU until we find enough data to proceed
+	//machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE); //halt the CPU until we find enough data to proceed
 
 }
 
@@ -198,7 +200,6 @@ static MACHINE_CONFIG_START( casloopy, casloopy_state )
 //  MCFG_CPU_ADD("subcpu",V60,8000000)
 //  MCFG_CPU_PROGRAM_MAP(casloopy_sub_map)
 
-	MCFG_MACHINE_RESET(casloopy)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -210,7 +211,6 @@ static MACHINE_CONFIG_START( casloopy, casloopy_state )
 
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(casloopy)
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("ic1,bin")

@@ -30,12 +30,11 @@ TILE_GET_INFO_MEMBER(gumbo_state::get_gumbo_fg_tile_info)
 }
 
 
-VIDEO_START( gumbo )
+void gumbo_state::video_start()
 {
-	gumbo_state *state = machine.driver_data<gumbo_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gumbo_state::get_gumbo_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gumbo_state::get_gumbo_fg_tile_info),state), TILEMAP_SCAN_ROWS, 4, 4, 128, 64);
-	state->m_fg_tilemap->set_transparent_pen(0xff);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gumbo_state::get_gumbo_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gumbo_state::get_gumbo_fg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 4, 128, 64);
+	m_fg_tilemap->set_transparent_pen(0xff);
 }
 
 SCREEN_UPDATE_IND16( gumbo )

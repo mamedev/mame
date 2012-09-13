@@ -83,15 +83,15 @@ public:
 
 
 
+	virtual void video_start();
 };
 
 
 
-static VIDEO_START(ttchamp)
+void ttchamp_state::video_start()
 {
-	ttchamp_state *state = machine.driver_data<ttchamp_state>();
-	state->m_peno_vram = (UINT16*)auto_alloc_array_clear(machine, UINT16, 0x10000/2);
-	state->m_peno_mainram = (UINT16*)auto_alloc_array_clear(machine, UINT16, 0x10000/2);
+	m_peno_vram = (UINT16*)auto_alloc_array_clear(machine(), UINT16, 0x10000/2);
+	m_peno_mainram = (UINT16*)auto_alloc_array_clear(machine(), UINT16, 0x10000/2);
 
 	
 
@@ -291,7 +291,6 @@ static MACHINE_CONFIG_START( ttchamp, ttchamp_state )
 
 	MCFG_PALETTE_LENGTH(0x8000)
 
-	MCFG_VIDEO_START(ttchamp)
 MACHINE_CONFIG_END
 
 ROM_START( ttchamp )

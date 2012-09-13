@@ -65,6 +65,8 @@ public:
 	DECLARE_READ8_MEMBER(pzlestar_mem_bank_r);
 	DECLARE_WRITE8_MEMBER(sexyboom_bank_w);
 	DECLARE_DRIVER_INIT(sangho);
+	DECLARE_MACHINE_RESET(pzlestar);
+	DECLARE_MACHINE_RESET(sexyboom);
 };
 
 
@@ -376,28 +378,26 @@ static INPUT_PORTS_START( pzlestar )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(pzlestar)
+MACHINE_RESET_MEMBER(sangho_state,pzlestar)
 {
-	sangho_state *state = machine.driver_data<sangho_state>();
-	state->m_pzlestar_mem_bank = 2;
-	pzlestar_map_banks(machine);
+	m_pzlestar_mem_bank = 2;
+	pzlestar_map_banks(machine());
 }
 
-static MACHINE_RESET(sexyboom)
+MACHINE_RESET_MEMBER(sangho_state,sexyboom)
 {
-	sangho_state *state = machine.driver_data<sangho_state>();
-	state->m_sexyboom_bank[0] = 0x00;
-	state->m_sexyboom_bank[1] = 0x00;
-	state->m_sexyboom_bank[2] = 0x01;
-	state->m_sexyboom_bank[3] = 0x00;
-	state->m_sexyboom_bank[4] = 0x80;
-	state->m_sexyboom_bank[5] = 0x00;
-	state->m_sexyboom_bank[6] = 0x80;
-	state->m_sexyboom_bank[7] = 0x01;
-	sexyboom_map_bank(machine, 0);
-	sexyboom_map_bank(machine, 1);
-	sexyboom_map_bank(machine, 2);
-	sexyboom_map_bank(machine, 3);
+	m_sexyboom_bank[0] = 0x00;
+	m_sexyboom_bank[1] = 0x00;
+	m_sexyboom_bank[2] = 0x01;
+	m_sexyboom_bank[3] = 0x00;
+	m_sexyboom_bank[4] = 0x80;
+	m_sexyboom_bank[5] = 0x00;
+	m_sexyboom_bank[6] = 0x80;
+	m_sexyboom_bank[7] = 0x01;
+	sexyboom_map_bank(machine(), 0);
+	sexyboom_map_bank(machine(), 1);
+	sexyboom_map_bank(machine(), 2);
+	sexyboom_map_bank(machine(), 3);
 }
 
 static void msx_vdp_interrupt(device_t *, v99x8_device &device, int i)
@@ -440,7 +440,7 @@ static MACHINE_CONFIG_START( pzlestar, sangho_state )
 
 	MCFG_PALETTE_LENGTH(19268)
 
-	MCFG_MACHINE_RESET(pzlestar)
+	MCFG_MACHINE_RESET_OVERRIDE(sangho_state,pzlestar)
 
 	MCFG_PALETTE_INIT( v9958 )
 
@@ -472,9 +472,8 @@ static MACHINE_CONFIG_START( sexyboom, sangho_state )
 
 	MCFG_PALETTE_LENGTH(19268)
 
-	MCFG_MACHINE_RESET(sexyboom)
+	MCFG_MACHINE_RESET_OVERRIDE(sangho_state,sexyboom)
 
-	MCFG_PALETTE_INIT( v9958 )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ymsnd", YM2413, 3580000)

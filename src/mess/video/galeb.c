@@ -23,7 +23,7 @@ const gfx_layout galeb_charlayout =
 	8*8					/* size of one char */
 };
 
-VIDEO_START( galeb )
+void galeb_state::video_start()
 {
 }
 

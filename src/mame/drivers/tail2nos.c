@@ -205,34 +205,32 @@ static const k051316_interface tail2nos_k051316_intf =
 	tail2nos_zoom_callback
 };
 
-static MACHINE_START( tail2nos )
+void tail2nos_state::machine_start()
 {
-	tail2nos_state *state = machine.driver_data<tail2nos_state>();
-	UINT8 *ROM = state->memregion("audiocpu")->base();
+	UINT8 *ROM = memregion("audiocpu")->base();
 
-	state->membank("bank3")->configure_entries(0, 2, &ROM[0x10000], 0x8000);
-	state->membank("bank3")->set_entry(0);
+	membank("bank3")->configure_entries(0, 2, &ROM[0x10000], 0x8000);
+	membank("bank3")->set_entry(0);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_k051316 = machine.device("k051316");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_k051316 = machine().device("k051316");
 
-	state->save_item(NAME(state->m_charbank));
-	state->save_item(NAME(state->m_charpalette));
-	state->save_item(NAME(state->m_video_enable));
+	save_item(NAME(m_charbank));
+	save_item(NAME(m_charpalette));
+	save_item(NAME(m_video_enable));
 }
 
-static MACHINE_RESET( tail2nos )
+void tail2nos_state::machine_reset()
 {
-	tail2nos_state *state = machine.driver_data<tail2nos_state>();
 
 	/* point to the extra ROMs */
-	state->membank("bank1")->set_base(state->memregion("user1")->base());
-	state->membank("bank2")->set_base(state->memregion("user2")->base());
+	membank("bank1")->set_base(memregion("user1")->base());
+	membank("bank2")->set_base(memregion("user2")->base());
 
-	state->m_charbank = 0;
-	state->m_charpalette = 0;
-	state->m_video_enable = 0;
+	m_charbank = 0;
+	m_charpalette = 0;
+	m_video_enable = 0;
 }
 
 static MACHINE_CONFIG_START( tail2nos, tail2nos_state )
@@ -246,8 +244,6 @@ static MACHINE_CONFIG_START( tail2nos, tail2nos_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_port_map)
 								/* IRQs are triggered by the YM2608 */
-	MCFG_MACHINE_START(tail2nos)
-	MCFG_MACHINE_RESET(tail2nos)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -260,7 +256,6 @@ static MACHINE_CONFIG_START( tail2nos, tail2nos_state )
 	MCFG_GFXDECODE(tail2nos)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(tail2nos)
 
 	MCFG_K051316_ADD("k051316", tail2nos_k051316_intf)
 

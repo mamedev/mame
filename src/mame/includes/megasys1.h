@@ -106,16 +106,20 @@ public:
 	TILEMAP_MAPPER_MEMBER(megasys1_scan_16x16);
 	TILE_GET_INFO_MEMBER(megasys1_get_scroll_tile_info_8x8);
 	TILE_GET_INFO_MEMBER(megasys1_get_scroll_tile_info_16x16);
+	DECLARE_MACHINE_RESET(megasys1);
+	DECLARE_VIDEO_START(megasys1);
+	DECLARE_PALETTE_INIT(megasys1);
+	DECLARE_MACHINE_RESET(megasys1_hachoo);
 };
 
 
 /*----------- defined in video/megasys1.c -----------*/
 
-VIDEO_START( megasys1 );
+
 SCREEN_UPDATE_IND16( megasys1 );
 SCREEN_VBLANK( megasys1 );
 
-PALETTE_INIT( megasys1 );
+
 
 
 

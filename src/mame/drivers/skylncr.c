@@ -107,6 +107,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_reel_2_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_3_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_4_tile_info);
+	virtual void video_start();
 };
 
 
@@ -158,27 +159,26 @@ TILE_GET_INFO_MEMBER(skylncr_state::get_reel_4_tile_info)
 }
 
 
-static VIDEO_START( skylncr )
+void skylncr_state::video_start()
 {
-	skylncr_state *state = machine.driver_data<skylncr_state>();
 
-	state->m_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(skylncr_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20	);
+	m_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(skylncr_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20	);
 
-	state->m_reel_1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_1_tile_info),state), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
-	state->m_reel_2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_2_tile_info),state), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
-	state->m_reel_3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_3_tile_info),state), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
-	state->m_reel_4_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_4_tile_info),state), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
+	m_reel_1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
+	m_reel_2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
+	m_reel_3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_3_tile_info),this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
+	m_reel_4_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_4_tile_info),this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
 
-	state->m_reel_2_tilemap->set_scroll_cols(0x40);
-	state->m_reel_3_tilemap->set_scroll_cols(0x40);
-	state->m_reel_4_tilemap->set_scroll_cols(0x40);
+	m_reel_2_tilemap->set_scroll_cols(0x40);
+	m_reel_3_tilemap->set_scroll_cols(0x40);
+	m_reel_4_tilemap->set_scroll_cols(0x40);
 
-	state->m_reel_2_tilemap->set_transparent_pen(0);
-	state->m_reel_3_tilemap->set_transparent_pen(0);
-	state->m_reel_4_tilemap->set_transparent_pen(0);
+	m_reel_2_tilemap->set_transparent_pen(0);
+	m_reel_3_tilemap->set_transparent_pen(0);
+	m_reel_4_tilemap->set_transparent_pen(0);
 
 
-	state->m_tmap->set_transparent_pen(0);
+	m_tmap->set_transparent_pen(0);
 }
 
 
@@ -731,7 +731,6 @@ static MACHINE_CONFIG_START( skylncr, skylncr_state )
 	MCFG_GFXDECODE(skylncr)
 	MCFG_PALETTE_LENGTH(0x200)
 
-	MCFG_VIDEO_START(skylncr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

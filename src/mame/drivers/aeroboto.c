@@ -223,30 +223,28 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static MACHINE_START( formatz )
+void aeroboto_state::machine_start()
 {
-	aeroboto_state *state = machine.driver_data<aeroboto_state>();
 
-	state->m_stars_rom = state->memregion("gfx2")->base();
-	state->m_stars_length = state->memregion("gfx2")->bytes();
+	m_stars_rom = memregion("gfx2")->base();
+	m_stars_length = memregion("gfx2")->bytes();
 
-	state->save_item(NAME(state->m_disable_irq));
-	state->save_item(NAME(state->m_count));
+	save_item(NAME(m_disable_irq));
+	save_item(NAME(m_count));
 }
 
-static MACHINE_RESET( formatz )
+void aeroboto_state::machine_reset()
 {
-	aeroboto_state *state = machine.driver_data<aeroboto_state>();
 
-	state->m_disable_irq = 0;
-	state->m_count = 0;
+	m_disable_irq = 0;
+	m_count = 0;
 
-	state->m_charbank = 0;
-	state->m_starsoff = 0;
-	state->m_ox = 0;
-	state->m_oy = 0;
-	state->m_sx = 0;
-	state->m_sy = 0;
+	m_charbank = 0;
+	m_starsoff = 0;
+	m_ox = 0;
+	m_oy = 0;
+	m_sx = 0;
+	m_sy = 0;
 }
 
 static MACHINE_CONFIG_START( formatz, aeroboto_state )
@@ -260,8 +258,6 @@ static MACHINE_CONFIG_START( formatz, aeroboto_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(formatz)
-	MCFG_MACHINE_RESET(formatz)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -276,7 +272,6 @@ static MACHINE_CONFIG_START( formatz, aeroboto_state )
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MCFG_VIDEO_START(aeroboto)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

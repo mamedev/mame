@@ -99,6 +99,7 @@ public:
 	DECLARE_WRITE8_MEMBER(magtouch_io_w);
 	DECLARE_WRITE_LINE_MEMBER(at_com_interrupt_1);
 	DECLARE_DRIVER_INIT(magtouch);
+	virtual void machine_start();
 };
 
 
@@ -197,16 +198,16 @@ static void magtouch_set_keyb_int(running_machine &machine, int state)
 
 static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
 
-static MACHINE_START( magtouch )
+void magtouch_state::machine_start()
 {
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(pcat_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(pcat_irq_callback);
 
-	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, magtouch_set_keyb_int);
+	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, magtouch_set_keyb_int);
 
-	machine.root_device().membank("rombank")->configure_entries(0, 0x80, machine.root_device().memregion("game_prg")->base(), 0x8000 );
-	machine.root_device().membank("rombank")->set_entry(0);
+	machine().root_device().membank("rombank")->configure_entries(0, 0x80, machine().root_device().memregion("game_prg")->base(), 0x8000 );
+	machine().root_device().membank("rombank")->set_entry(0);
 
-//  microtouch_init(machine, magtouch_microtouch_tx_callback, NULL);
+//  microtouch_init(machine(), magtouch_microtouch_tx_callback, NULL);
 }
 
 static MACHINE_CONFIG_START( magtouch, magtouch_state )
@@ -222,7 +223,6 @@ static MACHINE_CONFIG_START( magtouch, magtouch_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
-	MCFG_MACHINE_START(magtouch)
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 //  MCFG_FRAGMENT_ADD( at_kbdc8042 )

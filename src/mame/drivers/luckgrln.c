@@ -149,6 +149,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_luckgrln_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_luckgrln_reel3_tile_info);
 	TILE_GET_INFO_MEMBER(get_luckgrln_reel4_tile_info);
+	virtual void video_start();
 };
 
 
@@ -268,23 +269,22 @@ TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel4_tile_info)
 			0);
 }
 
-static VIDEO_START(luckgrln)
+void luckgrln_state::video_start()
 {
-	luckgrln_state *state = machine.driver_data<luckgrln_state>();
-	state->m_reel1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel1_tile_info),state),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	state->m_reel2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel2_tile_info),state),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	state->m_reel3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel3_tile_info),state),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	state->m_reel4_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel4_tile_info),state),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel3_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel4_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel4_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
-	state->m_reel1_tilemap->set_scroll_cols(64);
-	state->m_reel2_tilemap->set_scroll_cols(64);
-	state->m_reel3_tilemap->set_scroll_cols(64);
-	state->m_reel4_tilemap->set_scroll_cols(64);
+	m_reel1_tilemap->set_scroll_cols(64);
+	m_reel2_tilemap->set_scroll_cols(64);
+	m_reel3_tilemap->set_scroll_cols(64);
+	m_reel4_tilemap->set_scroll_cols(64);
 
-	state->m_reel1_tilemap->set_transparent_pen(0 );
-	state->m_reel2_tilemap->set_transparent_pen(0 );
-	state->m_reel3_tilemap->set_transparent_pen(0 );
-	state->m_reel4_tilemap->set_transparent_pen(0 );
+	m_reel1_tilemap->set_transparent_pen(0 );
+	m_reel2_tilemap->set_transparent_pen(0 );
+	m_reel3_tilemap->set_transparent_pen(0 );
+	m_reel4_tilemap->set_transparent_pen(0 );
 }
 
 static SCREEN_UPDATE_IND16(luckgrln)
@@ -1011,7 +1011,6 @@ static MACHINE_CONFIG_START( luckgrln, luckgrln_state )
 	MCFG_GFXDECODE(luckgrln)
 	MCFG_PALETTE_LENGTH(0x8000)
 
-	MCFG_VIDEO_START(luckgrln)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -1402,14 +1402,12 @@ READ16_MEMBER(tx1_state::buggyboy_spcs_ram_r)
  *
  *************************************/
 
-MACHINE_RESET( buggyboy )
+MACHINE_RESET_MEMBER(tx1_state,buggyboy)
 {
-	tx1_state *state = machine.driver_data<tx1_state>();
-	memset(&state->m_math, 0, sizeof(state->m_math));
+	memset(&m_math, 0, sizeof(m_math));
 }
 
-MACHINE_RESET( tx1 )
+MACHINE_RESET_MEMBER(tx1_state,tx1)
 {
-	tx1_state *state = machine.driver_data<tx1_state>();
-	memset(&state->m_math, 0, sizeof(state->m_math));
+	memset(&m_math, 0, sizeof(m_math));
 }

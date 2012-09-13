@@ -69,6 +69,7 @@ public:
 	tilemap_t *m_md_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_tx_tilemap;
+	virtual void video_start();
 };
 
 
@@ -199,18 +200,17 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	}
 }
 
-static VIDEO_START( rdx_v33 )
+void r2dx_v33_state::video_start()
 {
-	r2dx_v33_state *state = machine.driver_data<r2dx_v33_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_md_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_md_tile_info),state), TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS,8, 8, 64,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_md_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_md_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS,8, 8, 64,32);
 
-	state->m_bg_tilemap->set_transparent_pen(15);
-	state->m_md_tilemap->set_transparent_pen(15);
-	state->m_fg_tilemap->set_transparent_pen(15);
-	state->m_tx_tilemap->set_transparent_pen(15);
+	m_bg_tilemap->set_transparent_pen(15);
+	m_md_tilemap->set_transparent_pen(15);
+	m_fg_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(15);
 }
 
 static SCREEN_UPDATE_IND16( rdx_v33 )
@@ -694,7 +694,7 @@ static MACHINE_CONFIG_START( rdx_v33, r2dx_v33_state )
 	MCFG_CPU_PROGRAM_MAP(rdx_v33_map)
 	MCFG_CPU_VBLANK_INT("screen", rdx_v33_interrupt)
 
-	//MCFG_MACHINE_RESET(rdx_v33)
+	//MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,rdx_v33)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -709,7 +709,6 @@ static MACHINE_CONFIG_START( rdx_v33, r2dx_v33_state )
 	MCFG_GFXDECODE(rdx_v33)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(rdx_v33)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -742,7 +741,6 @@ static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
 	MCFG_GFXDECODE(rdx_v33)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(rdx_v33)
 
 	/* sound hardware */
 //  SEIBU_SOUND_SYSTEM_YM2151_RAIDEN2_INTERFACE(28636360/8,28636360/28,1,2)

@@ -57,6 +57,7 @@ public:
 	required_device<device_t> m_speaker;
 	required_device<cassette_image_device> m_cass;
 	required_shared_ptr<UINT8> m_videoram;
+	virtual void palette_init();
 };
 
 
@@ -206,13 +207,13 @@ void phunsy_state::machine_reset()
 }
 
 
-static PALETTE_INIT( phunsy )
+void phunsy_state::palette_init()
 {
 	for ( int i = 0; i < 8; i++ )
 	{
 		int j = ( i << 5 ) | ( i << 2 ) | ( i >> 1 );
 
-		palette_set_color_rgb( machine, i, j, j, j );
+		palette_set_color_rgb( machine(), i, j, j, j );
 	}
 }
 
@@ -306,7 +307,6 @@ static MACHINE_CONFIG_START( phunsy, phunsy_state )
 	MCFG_SCREEN_UPDATE_DRIVER(phunsy_state, screen_update)
 	MCFG_GFXDECODE(phunsy)
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(phunsy)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

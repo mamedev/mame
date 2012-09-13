@@ -50,6 +50,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(bsb_bg_scan);
+	virtual void video_start();
 };
 
 
@@ -100,15 +101,14 @@ TILEMAP_MAPPER_MEMBER(bestleag_state::bsb_bg_scan)
 	return offset;
 }
 
-static VIDEO_START(bestleag)
+void bestleag_state::video_start()
 {
-	bestleag_state *state = machine.driver_data<bestleag_state>();
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bestleag_state::get_tx_tile_info),state),TILEMAP_SCAN_COLS,8,8,256, 32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bestleag_state::get_bg_tile_info),state),tilemap_mapper_delegate(FUNC(bestleag_state::bsb_bg_scan),state),16,16,128, 64);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bestleag_state::get_fg_tile_info),state),tilemap_mapper_delegate(FUNC(bestleag_state::bsb_bg_scan),state),16,16,128, 64);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bestleag_state::get_tx_tile_info),this),TILEMAP_SCAN_COLS,8,8,256, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bestleag_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(bestleag_state::bsb_bg_scan),this),16,16,128, 64);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bestleag_state::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(bestleag_state::bsb_bg_scan),this),16,16,128, 64);
 
-	state->m_tx_tilemap->set_transparent_pen(15);
-	state->m_fg_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(15);
+	m_fg_tilemap->set_transparent_pen(15);
 }
 
 /*
@@ -377,7 +377,6 @@ static MACHINE_CONFIG_START( bestleag, bestleag_state )
 	MCFG_GFXDECODE(bestleag)
 	MCFG_PALETTE_LENGTH(0x800)
 
-	MCFG_VIDEO_START(bestleag)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

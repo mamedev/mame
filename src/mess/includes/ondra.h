@@ -20,6 +20,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ondra_port_03_w);
 	DECLARE_WRITE8_MEMBER(ondra_port_09_w);
 	DECLARE_WRITE8_MEMBER(ondra_port_0a_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 

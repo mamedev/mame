@@ -328,28 +328,27 @@ SCREEN_UPDATE_RGB32(tecmosys)
 	return 0;
 }
 
-VIDEO_START(tecmosys)
+void tecmosys_state::video_start()
 {
-	tecmosys_state *state = machine.driver_data<tecmosys_state>();
-	state->m_sprite_bitmap.allocate(320,240);
-	state->m_sprite_bitmap.fill(0x4000);
+	m_sprite_bitmap.allocate(320,240);
+	m_sprite_bitmap.fill(0x4000);
 
-	state->m_tmp_tilemap_composebitmap.allocate(320,240);
-	state->m_tmp_tilemap_renderbitmap.allocate(320,240);
+	m_tmp_tilemap_composebitmap.allocate(320,240);
+	m_tmp_tilemap_renderbitmap.allocate(320,240);
 
-	state->m_tmp_tilemap_composebitmap.fill(0x0000);
-	state->m_tmp_tilemap_renderbitmap.fill(0x0000);
+	m_tmp_tilemap_composebitmap.fill(0x0000);
+	m_tmp_tilemap_renderbitmap.fill(0x0000);
 
 
-	state->m_txt_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmosys_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32*2,32*2);
-	state->m_txt_tilemap->set_transparent_pen(0);
+	m_txt_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tecmosys_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32*2,32*2);
+	m_txt_tilemap->set_transparent_pen(0);
 
-	state->m_bg0tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg0tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_bg0tilemap->set_transparent_pen(0);
+	m_bg0tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg0tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_bg0tilemap->set_transparent_pen(0);
 
-	state->m_bg1tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg1tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_bg1tilemap->set_transparent_pen(0);
+	m_bg1tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg1tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_bg1tilemap->set_transparent_pen(0);
 
-	state->m_bg2tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg2tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_bg2tilemap->set_transparent_pen(0);
+	m_bg2tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg2tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_bg2tilemap->set_transparent_pen(0);
 }

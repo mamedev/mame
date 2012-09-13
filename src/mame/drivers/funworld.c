@@ -2371,8 +2371,8 @@ static MACHINE_CONFIG_START( fw1stpal, funworld_state )
 	MCFG_GFXDECODE(fw1stpal)
 
 	MCFG_PALETTE_LENGTH(0x200)
-	MCFG_PALETTE_INIT(funworld)
-	MCFG_VIDEO_START(funworld)
+	MCFG_PALETTE_INIT_OVERRIDE(funworld_state,funworld)
+	MCFG_VIDEO_START_OVERRIDE(funworld_state,funworld)
 
 	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/8, mc6845_intf)	/* 2MHz, veryfied on jollycrd & royalcrd */
 
@@ -2414,7 +2414,7 @@ static MACHINE_CONFIG_DERIVED( magicrd2, fw1stpal )
 	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MCFG_VIDEO_START(magicrd2)
+	MCFG_VIDEO_START_OVERRIDE(funworld_state,magicrd2)
 
 	MCFG_SOUND_REPLACE("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
 	MCFG_SOUND_CONFIG(ay8910_intf)

@@ -151,6 +151,22 @@ public:
 	DECLARE_READ8_MEMBER(amstrad_psg_porta_read);
 	void amstrad_plus_seqcheck(int data);
 	DECLARE_DRIVER_INIT(aleste);
+	DECLARE_MACHINE_START(amstrad);
+	DECLARE_MACHINE_RESET(amstrad);
+	DECLARE_VIDEO_START(amstrad);
+	DECLARE_PALETTE_INIT(amstrad_cpc);
+	DECLARE_PALETTE_INIT(amstrad_cpc_green);
+	DECLARE_MACHINE_START(plus);
+	DECLARE_MACHINE_RESET(plus);
+	DECLARE_PALETTE_INIT(amstrad_plus);
+	DECLARE_MACHINE_START(gx4000);
+	DECLARE_MACHINE_RESET(gx4000);
+	DECLARE_MACHINE_START(kccomp);
+	DECLARE_MACHINE_RESET(kccomp);
+	DECLARE_PALETTE_INIT(kccomp);
+	DECLARE_MACHINE_START(aleste);
+	DECLARE_MACHINE_RESET(aleste);
+	DECLARE_PALETTE_INIT(aleste);
 };
 
 
@@ -170,16 +186,16 @@ WRITE_LINE_DEVICE_HANDLER( cpc_nmi_w );
 WRITE_LINE_DEVICE_HANDLER( cpc_romdis );
 WRITE_LINE_DEVICE_HANDLER( cpc_romen );
 
-MACHINE_START( amstrad );
-MACHINE_RESET( amstrad );
-MACHINE_START( kccomp );
-MACHINE_RESET( kccomp );
-MACHINE_START( plus );
-MACHINE_RESET( plus );
-MACHINE_START( gx4000 );
-MACHINE_RESET( gx4000 );
-MACHINE_START( aleste );
-MACHINE_RESET( aleste );
+
+
+
+
+
+
+
+
+
+
 
 SNAPSHOT_LOAD( amstrad );
 
@@ -188,15 +204,10 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge);
 extern const mc6845_interface amstrad_mc6845_intf;
 extern const mc6845_interface amstrad_plus_mc6845_intf;
 
-VIDEO_START( amstrad );
+
 SCREEN_UPDATE_IND16( amstrad );
 SCREEN_VBLANK( amstrad );
 
-PALETTE_INIT( amstrad_cpc );			/* For CPC464, CPC664, and CPC6128 */
-PALETTE_INIT( amstrad_cpc_green );		/* For CPC464, CPC664, and CPC6128 */
-PALETTE_INIT( kccomp );					/* For KC Compact */
-PALETTE_INIT( amstrad_plus );			/* For CPC464+ and CPC6128+ */
-PALETTE_INIT( aleste );					/* For aleste */
 
 SLOT_INTERFACE_START(cpc_exp_cards)
 	SLOT_INTERFACE("ssa1", CPC_SSA1)

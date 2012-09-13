@@ -258,8 +258,6 @@ static MACHINE_CONFIG_START( sbugger, sbugger_state )
 
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_PALETTE_INIT(sbugger)
-	MCFG_VIDEO_START(sbugger)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

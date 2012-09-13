@@ -1300,8 +1300,6 @@ static MACHINE_CONFIG_START( astrocade_base, astrocde_state )
 	MCFG_SCREEN_DEFAULT_POSITION(1.1, 0.0, 1.18, -0.018)	/* clip out borders */
 	MCFG_SCREEN_UPDATE_STATIC(astrocde)
 
-	MCFG_PALETTE_INIT(astrocde)
-	MCFG_VIDEO_START(astrocde)
 MACHINE_CONFIG_END
 
 
@@ -1313,8 +1311,8 @@ static MACHINE_CONFIG_DERIVED( astrocade_16color_base, astrocade_base )
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(4096)
 
-	MCFG_PALETTE_INIT(profpac)
-	MCFG_VIDEO_START(profpac)
+	MCFG_PALETTE_INIT_OVERRIDE(astrocde_state,profpac)
+	MCFG_VIDEO_START_OVERRIDE(astrocde_state,profpac)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(profpac)

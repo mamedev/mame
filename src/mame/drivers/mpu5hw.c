@@ -59,6 +59,7 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	virtual void machine_start();
 };
 
 
@@ -113,11 +114,10 @@ INPUT_PORTS_START(  mpu5 )
 INPUT_PORTS_END
 
 
-static MACHINE_START( mpu5 )
+void mpu5_state::machine_start()
 {
-	mpu5_state *state = machine.driver_data<mpu5_state>();
-	state->m_cpuregion = (UINT32*)state->memregion( "maincpu" )->base();
-	state->m_mainram = (UINT32*)auto_alloc_array_clear(machine, UINT32, 0x10000);
+	m_cpuregion = (UINT32*)memregion( "maincpu" )->base();
+	m_mainram = (UINT32*)auto_alloc_array_clear(machine(), UINT32, 0x10000);
 
 }
 
@@ -126,7 +126,6 @@ MACHINE_CONFIG_START( mpu5, mpu5_state )
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)	 // ?
 	MCFG_CPU_PROGRAM_MAP(mpu5_map)
 
-	MCFG_MACHINE_START( mpu5 )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	/* unknown sound */

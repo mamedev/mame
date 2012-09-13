@@ -386,22 +386,21 @@ WRITE8_MEMBER(svi318_state::svi806_ram_enable_w)
 	svi318_set_banks(machine());
 }
 
-VIDEO_START( svi328_806 )
+VIDEO_START_MEMBER(svi318_state,svi328_806)
 {
 }
 
-MACHINE_RESET( svi328_806 )
+MACHINE_RESET_MEMBER(svi318_state,svi328_806)
 {
-	svi318_state *state = machine.driver_data<svi318_state>();
-	MACHINE_RESET_CALL(svi318);
+	MACHINE_RESET_CALL_MEMBER(svi318);
 
-	svi318_80col_init(machine);
-	state->m_svi.svi806_present = 1;
-	svi318_set_banks(machine);
+	svi318_80col_init(machine());
+	m_svi.svi806_present = 1;
+	svi318_set_banks(machine());
 
 	/* Set SVI-806 80 column card palette */
-	palette_set_color_rgb( machine, TMS9928A_PALETTE_SIZE, 0, 0, 0 );		/* Monochrome black */
-	palette_set_color_rgb( machine, TMS9928A_PALETTE_SIZE+1, 0, 224, 0 );	/* Monochrome green */
+	palette_set_color_rgb( machine(), TMS9928A_PALETTE_SIZE, 0, 0, 0 );		/* Monochrome black */
+	palette_set_color_rgb( machine(), TMS9928A_PALETTE_SIZE+1, 0, 224, 0 );	/* Monochrome green */
 }
 
 /* Init functions */
@@ -547,11 +546,11 @@ DRIVER_INIT_MEMBER(svi318_state,svi318)
 	memset (m_svi.empty_bank, 0xff, 0x8000);
 }
 
-MACHINE_START( svi318_ntsc )
+MACHINE_START_MEMBER(svi318_state,svi318_ntsc)
 {
 }
 
-MACHINE_START( svi318_pal )
+MACHINE_START_MEMBER(svi318_state,svi318_pal)
 {
 }
 
@@ -576,17 +575,16 @@ static void svi318_load_proc(device_image_interface &image)
 	}
 }
 
-MACHINE_RESET( svi318 )
+MACHINE_RESET_MEMBER(svi318_state,svi318)
 {
-	svi318_state *state = machine.driver_data<svi318_state>();
 	int drive;
 
-	state->m_svi.bank_switch = 0xff;
-	svi318_set_banks(machine);
+	m_svi.bank_switch = 0xff;
+	svi318_set_banks(machine());
 
 	for(drive=0;drive<2;drive++)
 	{
-		floppy_install_load_proc(floppy_get_device(machine, drive), svi318_load_proc);
+		floppy_install_load_proc(floppy_get_device(machine(), drive), svi318_load_proc);
 	}
 }
 

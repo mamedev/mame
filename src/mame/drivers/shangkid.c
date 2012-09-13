@@ -135,17 +135,17 @@ DRIVER_INIT_MEMBER(shangkid_state,shangkid)
 
 /***************************************************************************************/
 
-static MACHINE_RESET( chinhero )
+MACHINE_RESET_MEMBER(shangkid_state,chinhero)
 {
-	machine.device("bbx")->execute().set_input_line(INPUT_LINE_HALT, 1 );
+	machine().device("bbx")->execute().set_input_line(INPUT_LINE_HALT, 1 );
 }
 
-static MACHINE_RESET( shangkid )
+MACHINE_RESET_MEMBER(shangkid_state,shangkid)
 {
-	machine.device("bbx")->execute().set_input_line(INPUT_LINE_HALT, 1 );
+	machine().device("bbx")->execute().set_input_line(INPUT_LINE_HALT, 1 );
 
-	machine.root_device().membank("bank1")->set_entry(0);
-	machine.root_device().membank("bank2")->set_entry(0);
+	machine().root_device().membank("bank1")->set_entry(0);
+	machine().root_device().membank("bank2")->set_entry(0);
 }
 
 /***************************************************************************************/
@@ -374,7 +374,7 @@ static MACHINE_CONFIG_START( chinhero, shangkid_state )
 	MCFG_CPU_PROGRAM_MAP(chinhero_sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 
-	MCFG_MACHINE_RESET(chinhero)
+	MCFG_MACHINE_RESET_OVERRIDE(shangkid_state,chinhero)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -390,7 +390,7 @@ static MACHINE_CONFIG_START( chinhero, shangkid_state )
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MCFG_VIDEO_START(shangkid)
+	MCFG_VIDEO_START_OVERRIDE(shangkid_state,shangkid)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -417,7 +417,7 @@ static MACHINE_CONFIG_DERIVED( shangkid, chinhero )
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(shangkid_sound_map)
 
-	MCFG_MACHINE_RESET(shangkid)
+	MCFG_MACHINE_RESET_OVERRIDE(shangkid_state,shangkid)
 
 	/* video hardware */
 	MCFG_GFXDECODE(shangkid)
@@ -468,7 +468,7 @@ static MACHINE_CONFIG_START( dynamski, shangkid_state )
 	MCFG_GFXDECODE(dynamski)
 	MCFG_PALETTE_LENGTH(16*4+16*4)
 
-	MCFG_PALETTE_INIT(dynamski)
+	MCFG_PALETTE_INIT_OVERRIDE(shangkid_state,dynamski)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

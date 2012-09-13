@@ -72,25 +72,24 @@ TILE_GET_INFO_MEMBER(dbz_state::get_dbz_bg1_tile_info)
 	SET_TILE_INFO_MEMBER(1, tileno, colour + (m_layer_colorbase[4] << 1), flag);
 }
 
-VIDEO_START( dbz )
+void dbz_state::video_start()
 {
-	dbz_state *state = machine.driver_data<dbz_state>();
 
-	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dbz_state::get_dbz_bg1_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dbz_state::get_dbz_bg2_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dbz_state::get_dbz_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dbz_state::get_dbz_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 
-	state->m_bg1_tilemap->set_transparent_pen(0);
-	state->m_bg2_tilemap->set_transparent_pen(0);
+	m_bg1_tilemap->set_transparent_pen(0);
+	m_bg2_tilemap->set_transparent_pen(0);
 
-	if (!strcmp(machine.system().name, "dbz"))
-		k056832_set_layer_offs(state->m_k056832, 0, -34, -16);
+	if (!strcmp(machine().system().name, "dbz"))
+		k056832_set_layer_offs(m_k056832, 0, -34, -16);
 	else
-		k056832_set_layer_offs(state->m_k056832, 0, -35, -16);
+		k056832_set_layer_offs(m_k056832, 0, -35, -16);
 
-	k056832_set_layer_offs(state->m_k056832, 1, -31, -16);
-	k056832_set_layer_offs(state->m_k056832, 3, -31, -16); //?
+	k056832_set_layer_offs(m_k056832, 1, -31, -16);
+	k056832_set_layer_offs(m_k056832, 3, -31, -16); //?
 
-	k053247_set_sprite_offs(state->m_k053246, -87, 32);
+	k053247_set_sprite_offs(m_k053246, -87, 32);
 }
 
 SCREEN_UPDATE_IND16( dbz )

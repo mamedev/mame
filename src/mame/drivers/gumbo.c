@@ -244,7 +244,6 @@ static MACHINE_CONFIG_START( gumbo, gumbo_state )
 
 	MCFG_PALETTE_LENGTH(0x200)
 
-	MCFG_VIDEO_START(gumbo)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

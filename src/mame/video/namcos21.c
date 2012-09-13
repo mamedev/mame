@@ -113,15 +113,14 @@ CopyVisiblePolyFrameBuffer( running_machine &machine, bitmap_ind16 &bitmap, cons
 	}
 } /* CopyVisiblePolyFrameBuffer */
 
-VIDEO_START( namcos21 )
+VIDEO_START_MEMBER(namcos21_state,namcos21)
 {
-	namcos21_state *state = machine.driver_data<namcos21_state>();
-	if( state->m_gametype == NAMCOS21_WINRUN91 )
+	if( m_gametype == NAMCOS21_WINRUN91 )
 	{
-		state->m_videoram = auto_alloc_array(machine, UINT8, 0x80000);
+		m_videoram = auto_alloc_array(machine(), UINT8, 0x80000);
 	}
-	AllocatePolyFrameBuffer(machine);
-	state->c355_obj_init(
+	AllocatePolyFrameBuffer(machine());
+	c355_obj_init(
 		0,		/* gfx bank */
 		0xf,	/* reverse palette mapping */
 		namcos2_shared_state::c355_obj_code2tile_delegate() );

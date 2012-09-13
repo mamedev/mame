@@ -29,15 +29,14 @@ static const UINT16 colormap[] = {
 };
 
 /* Initialise the palette */
-PALETTE_INIT( channelf )
+void channelf_state::palette_init()
 {
-	palette_set_colors(machine, 0, channelf_palette, ARRAY_LENGTH(channelf_palette));
+	palette_set_colors(machine(), 0, channelf_palette, ARRAY_LENGTH(channelf_palette));
 }
 
-VIDEO_START( channelf )
+void channelf_state::video_start()
 {
-	channelf_state *state = machine.driver_data<channelf_state>();
-	state->m_p_videoram = state->memregion("vram")->base();
+	m_p_videoram = memregion("vram")->base();
 }
 
 static int recalc_palette_offset(int reg1, int reg2)

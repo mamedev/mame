@@ -170,6 +170,7 @@ protected:
 	required_device<ay8910_device> m_ay;
 public:
 	DECLARE_DRIVER_INIT(proconn);
+	virtual void machine_reset();
 };
 
 static ADDRESS_MAP_START( proconn_map, AS_PROGRAM, 8, proconn_state )
@@ -355,10 +356,9 @@ static const z80_daisy_config z80_daisy_chain[] =
 	{ NULL }
 };
 
-static MACHINE_RESET( proconn )
+void proconn_state::machine_reset()
 {
-	proconn_state *state = machine.driver_data<proconn_state>();
-	state->m_vfd->reset();	// reset display1
+	m_vfd->reset();	// reset display1
 }
 
 static MACHINE_CONFIG_START( proconn, proconn_state )
@@ -378,7 +378,6 @@ static MACHINE_CONFIG_START( proconn, proconn_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_MACHINE_RESET( proconn )
 
 	MCFG_DEFAULT_LAYOUT(layout_awpvid16)
 

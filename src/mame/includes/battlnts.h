@@ -26,6 +26,8 @@ public:
 	DECLARE_WRITE8_MEMBER(battlnts_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(battlnts_spritebank_w);
 	DECLARE_DRIVER_INIT(rackemup);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 /*----------- defined in video/battlnts.c -----------*/

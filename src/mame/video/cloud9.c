@@ -15,33 +15,32 @@
  *
  *************************************/
 
-VIDEO_START( cloud9 )
+void cloud9_state::video_start()
 {
-	cloud9_state *state = machine.driver_data<cloud9_state>();
 	static const int resistances[3] = { 22000, 10000, 4700 };
 
 	/* allocate second bank of videoram */
-	state->m_videoram = auto_alloc_array(machine, UINT8, 0x8000);
-	state->membank("bank1")->set_base(state->m_videoram);
+	m_videoram = auto_alloc_array(machine(), UINT8, 0x8000);
+	membank("bank1")->set_base(m_videoram);
 
 	/* get pointers to our PROMs */
-	state->m_syncprom = machine.root_device().memregion("proms")->base() + 0x000;
-	state->m_wpprom = machine.root_device().memregion("proms")->base() + 0x200;
-	state->m_priprom = machine.root_device().memregion("proms")->base() + 0x300;
+	m_syncprom = machine().root_device().memregion("proms")->base() + 0x000;
+	m_wpprom = machine().root_device().memregion("proms")->base() + 0x200;
+	m_priprom = machine().root_device().memregion("proms")->base() + 0x300;
 
 	/* compute the color output resistor weights at startup */
 	compute_resistor_weights(0,	255, -1.0,
-			3,	resistances, state->m_rweights, 1000, 0,
-			3,	resistances, state->m_gweights, 1000, 0,
-			3,	resistances, state->m_bweights, 1000, 0);
+			3,	resistances, m_rweights, 1000, 0,
+			3,	resistances, m_gweights, 1000, 0,
+			3,	resistances, m_bweights, 1000, 0);
 
 	/* allocate a bitmap for drawing sprites */
-	machine.primary_screen->register_screen_bitmap(state->m_spritebitmap);
+	machine().primary_screen->register_screen_bitmap(m_spritebitmap);
 
 	/* register for savestates */
-	state->save_pointer(NAME(state->m_videoram), 0x8000);
-	state->save_item(NAME(state->m_video_control));
-	state->save_item(NAME(state->m_bitmode_addr));
+	save_pointer(NAME(m_videoram), 0x8000);
+	save_item(NAME(m_video_control));
+	save_item(NAME(m_bitmode_addr));
 }
 
 

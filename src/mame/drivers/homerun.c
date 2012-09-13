@@ -356,34 +356,32 @@ static const ym2203_interface ym2203_config =
 
 /**************************************************************************/
 
-static MACHINE_START( homerun )
+void homerun_state::machine_start()
 {
-	homerun_state *state = machine.driver_data<homerun_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entry(0, &ROM[0x00000]);
-	state->membank("bank1")->configure_entries(1, 7, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entry(0, &ROM[0x00000]);
+	membank("bank1")->configure_entries(1, 7, &ROM[0x10000], 0x4000);
 
-	state->save_item(NAME(state->m_control));
-	state->save_item(NAME(state->m_sample));
-	state->save_item(NAME(state->m_gfx_ctrl));
-	state->save_item(NAME(state->m_gc_up));
-	state->save_item(NAME(state->m_gc_down));
-	state->save_item(NAME(state->m_scrolly));
-	state->save_item(NAME(state->m_scrollx));
+	save_item(NAME(m_control));
+	save_item(NAME(m_sample));
+	save_item(NAME(m_gfx_ctrl));
+	save_item(NAME(m_gc_up));
+	save_item(NAME(m_gc_down));
+	save_item(NAME(m_scrolly));
+	save_item(NAME(m_scrollx));
 }
 
-static MACHINE_RESET( homerun )
+void homerun_state::machine_reset()
 {
-	homerun_state *state = machine.driver_data<homerun_state>();
 
-	state->m_control = 0;
-	state->m_sample = 0;
-	state->m_gfx_ctrl = 0;
-	state->m_gc_up = 0;
-	state->m_gc_down = 0;
-	state->m_scrolly = 0;
-	state->m_scrollx = 0;
+	m_control = 0;
+	m_sample = 0;
+	m_gfx_ctrl = 0;
+	m_gc_up = 0;
+	m_gc_down = 0;
+	m_scrolly = 0;
+	m_scrollx = 0;
 }
 
 /**************************************************************************/
@@ -396,8 +394,6 @@ static MACHINE_CONFIG_START( dynashot, homerun_state )
 	MCFG_CPU_IO_MAP(homerun_iomap)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(homerun)
-	MCFG_MACHINE_RESET(homerun)
 
 	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
 
@@ -412,7 +408,6 @@ static MACHINE_CONFIG_START( dynashot, homerun_state )
 	MCFG_GFXDECODE(homerun)
 	MCFG_PALETTE_LENGTH(16*4)
 
-	MCFG_VIDEO_START(homerun)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -25,10 +25,9 @@ TILE_GET_INFO_MEMBER(videopin_state::get_tile_info)
 }
 
 
-VIDEO_START( videopin )
+void videopin_state::video_start()
 {
-	videopin_state *state = machine.driver_data<videopin_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(videopin_state::get_tile_info),state), tilemap_mapper_delegate(FUNC(videopin_state::get_memory_offset),state),  8, 8, 48, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(videopin_state::get_tile_info),this), tilemap_mapper_delegate(FUNC(videopin_state::get_memory_offset),this),  8, 8, 48, 32);
 }
 
 

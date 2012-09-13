@@ -171,28 +171,27 @@ static void compute_draw_order(running_machine &machine)
 }
 
 
-VIDEO_START( taitosj )
+void taitosj_state::video_start()
 {
-	taitosj_state *state = machine.driver_data<taitosj_state>();
 	int i;
 
-	state->m_sprite_layer_collbitmap1.allocate(16,16);
+	m_sprite_layer_collbitmap1.allocate(16,16);
 
 	for (i = 0; i < 3; i++)
 	{
-		machine.primary_screen->register_screen_bitmap(state->m_layer_bitmap[i]);
-		machine.primary_screen->register_screen_bitmap(state->m_sprite_layer_collbitmap2[i]);
+		machine().primary_screen->register_screen_bitmap(m_layer_bitmap[i]);
+		machine().primary_screen->register_screen_bitmap(m_sprite_layer_collbitmap2[i]);
 	}
 
-	state->m_sprite_sprite_collbitmap1.allocate(32,32);
-	state->m_sprite_sprite_collbitmap2.allocate(32,32);
+	m_sprite_sprite_collbitmap1.allocate(32,32);
+	m_sprite_sprite_collbitmap2.allocate(32,32);
 
-	machine.gfx[0]->set_source(state->m_characterram);
-	machine.gfx[1]->set_source(state->m_characterram);
-	machine.gfx[2]->set_source(state->m_characterram + 0x1800);
-	machine.gfx[3]->set_source(state->m_characterram + 0x1800);
+	machine().gfx[0]->set_source(m_characterram);
+	machine().gfx[1]->set_source(m_characterram);
+	machine().gfx[2]->set_source(m_characterram + 0x1800);
+	machine().gfx[3]->set_source(m_characterram + 0x1800);
 
-	compute_draw_order(machine);
+	compute_draw_order(machine());
 }
 
 

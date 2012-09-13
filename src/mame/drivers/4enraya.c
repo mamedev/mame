@@ -292,29 +292,27 @@ static GFXDECODE_START( 4enraya )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
-static MACHINE_START( 4enraya )
+void _4enraya_state::machine_start()
 {
-	_4enraya_state *state = machine.driver_data<_4enraya_state>();
 
-	state->save_item(NAME(state->m_soundlatch));
-	state->save_item(NAME(state->m_last_snd_ctrl));
+	save_item(NAME(m_soundlatch));
+	save_item(NAME(m_last_snd_ctrl));
 }
 
-static MACHINE_RESET( 4enraya )
+void _4enraya_state::machine_reset()
 {
-	_4enraya_state *state = machine.driver_data<_4enraya_state>();
 
-	state->m_soundlatch = 0;
-	state->m_last_snd_ctrl = 0;
+	m_soundlatch = 0;
+	m_last_snd_ctrl = 0;
 }
 
-static PALETTE_INIT( 4enraya )
+void _4enraya_state::palette_init()
 {
 	int i;
 
 	/* RGB format */
 	for(i=0;i<8;i++)
-		palette_set_color(machine, i, MAKE_RGB(pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2)));
+		palette_set_color(machine(), i, MAKE_RGB(pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2)));
 }
 
 static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
@@ -325,8 +323,6 @@ static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60) // unknown timing
 
-	MCFG_MACHINE_START(4enraya)
-	MCFG_MACHINE_RESET(4enraya)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -338,10 +334,8 @@ static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
 
 	MCFG_GFXDECODE(4enraya)
 
-	MCFG_PALETTE_INIT(4enraya)
 	MCFG_PALETTE_LENGTH(8)
 
-	MCFG_VIDEO_START(4enraya)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

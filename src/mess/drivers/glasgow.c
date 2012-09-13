@@ -82,6 +82,9 @@ public:
 	UINT16 m_beeper;
 	DECLARE_READ16_MEMBER(read_test);
 	DECLARE_READ16_MEMBER(read_board_amsterd);
+	virtual void machine_start();
+	virtual void machine_reset();
+	DECLARE_MACHINE_START(dallas32);
 };
 
 
@@ -280,34 +283,31 @@ static TIMER_DEVICE_CALLBACK( update_nmi32 )
 	timer.machine().device("maincpu")->execute().set_input_line(6, HOLD_LINE);
 }
 
-static MACHINE_START( glasgow )
+void glasgow_state::machine_start()
 {
-	glasgow_state *state = machine.driver_data<glasgow_state>();
 
 	mboard_key_selector = 0;
-	state->m_irq_flag = 0;
-	state->m_lcd_shift_counter = 3;
-	beep_set_frequency(state->m_beep, 44);
+	m_irq_flag = 0;
+	m_lcd_shift_counter = 3;
+	beep_set_frequency(m_beep, 44);
 
-	mboard_savestate_register(machine);
+	mboard_savestate_register(machine());
 }
 
 
-static MACHINE_START( dallas32 )
+MACHINE_START_MEMBER(glasgow_state,dallas32)
 {
-	glasgow_state *state = machine.driver_data<glasgow_state>();
 
-	state->m_lcd_shift_counter = 3;
-	beep_set_frequency(state->m_beep, 44);
+	m_lcd_shift_counter = 3;
+	beep_set_frequency(m_beep, 44);
 
-	mboard_savestate_register(machine);
+	mboard_savestate_register(machine());
 }
 
 
-static MACHINE_RESET( glasgow )
+void glasgow_state::machine_reset()
 {
-	glasgow_state *state = machine.driver_data<glasgow_state>();
-	state->m_lcd_shift_counter = 3;
+	m_lcd_shift_counter = 3;
 
 	mboard_set_border_pieces();
 	mboard_set_board();
@@ -510,8 +510,6 @@ static MACHINE_CONFIG_START( glasgow, glasgow_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(glasgow_mem)
-	MCFG_MACHINE_START(glasgow)
-	MCFG_MACHINE_RESET(glasgow)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -530,7 +528,7 @@ static MACHINE_CONFIG_DERIVED( dallas32, glasgow )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68020, 14000000)
 	MCFG_CPU_PROGRAM_MAP(dallas32_mem)
-	MCFG_MACHINE_START( dallas32 )
+	MCFG_MACHINE_START_OVERRIDE(glasgow_state, dallas32 )
 
 	MCFG_DEVICE_REMOVE("nmi_timer")
 	MCFG_TIMER_ADD_PERIODIC("nmi_timer", update_nmi32, attotime::from_hz(50))

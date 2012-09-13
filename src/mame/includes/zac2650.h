@@ -19,12 +19,14 @@ public:
 	DECLARE_WRITE8_MEMBER(zac_s2636_w);
 	DECLARE_READ8_MEMBER(tinvader_port_0_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/zac2650.c -----------*/
 
 
-VIDEO_START( tinvader );
+
 SCREEN_UPDATE_IND16( tinvader );
 

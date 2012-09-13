@@ -22,9 +22,9 @@
   palette decode
 ***************************************************************************/
 
-PALETTE_INIT( chaknpop )
+void chaknpop_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 1024; i++)
@@ -52,7 +52,7 @@ PALETTE_INIT( chaknpop )
 		bit2 = (col >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -150,28 +150,27 @@ TILE_GET_INFO_MEMBER(chaknpop_state::chaknpop_get_tx_tile_info)
   Initialize video hardware emulation
 ***************************************************************************/
 
-VIDEO_START( chaknpop )
+void chaknpop_state::video_start()
 {
-	chaknpop_state *state = machine.driver_data<chaknpop_state>();
-	UINT8 *RAM = state->memregion("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 
 	/*                          info                       offset             type             w   h  col row */
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(chaknpop_state::chaknpop_get_tx_tile_info),state), TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(chaknpop_state::chaknpop_get_tx_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
 
-	state->m_vram1 = &RAM[0x10000];
-	state->m_vram2 = &RAM[0x12000];
-	state->m_vram3 = &RAM[0x14000];
-	state->m_vram4 = &RAM[0x16000];
+	m_vram1 = &RAM[0x10000];
+	m_vram2 = &RAM[0x12000];
+	m_vram3 = &RAM[0x14000];
+	m_vram4 = &RAM[0x16000];
 
-	state->save_pointer(NAME(state->m_vram1), 0x2000);
-	state->save_pointer(NAME(state->m_vram2), 0x2000);
-	state->save_pointer(NAME(state->m_vram3), 0x2000);
-	state->save_pointer(NAME(state->m_vram4), 0x2000);
+	save_pointer(NAME(m_vram1), 0x2000);
+	save_pointer(NAME(m_vram2), 0x2000);
+	save_pointer(NAME(m_vram3), 0x2000);
+	save_pointer(NAME(m_vram4), 0x2000);
 
-	state->membank("bank1")->set_entry(0);
-	tx_tilemap_mark_all_dirty(machine);
+	membank("bank1")->set_entry(0);
+	tx_tilemap_mark_all_dirty(machine());
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(tx_tilemap_mark_all_dirty), &machine));
+	machine().save().register_postload(save_prepost_delegate(FUNC(tx_tilemap_mark_all_dirty), &machine()));
 }
 
 

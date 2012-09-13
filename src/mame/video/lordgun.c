@@ -94,45 +94,44 @@ WRITE16_MEMBER(lordgun_state::lordgun_vram_3_w){ lordgun_vram_w(&space, offset, 
 ***************************************************************************/
 
 
-VIDEO_START( lordgun )
+void lordgun_state::video_start()
 {
-	lordgun_state *state = machine.driver_data<lordgun_state>();
 	int i;
-	int w = machine.primary_screen->width();
-	int h = machine.primary_screen->height();
+	int w = machine().primary_screen->width();
+	int h = machine().primary_screen->height();
 
 	// 0x800 x 200
-	state->m_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS,8,8, 0x100, 0x40 );
+	m_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,8,8, 0x100, 0x40 );
 
 	// 0x800 x 200
-	state->m_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info_1),state), TILEMAP_SCAN_ROWS,16,16, 0x80,0x20 );
+	m_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,16,16, 0x80,0x20 );
 
 	// 0x800 x 200
-	state->m_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info_2),state), TILEMAP_SCAN_ROWS,32,32, 0x40,0x10 );
+	m_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS,32,32, 0x40,0x10 );
 
 	// 0x200 x 100
-	state->m_tilemap[3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info_3),state), TILEMAP_SCAN_ROWS,8,8, 0x40,0x20 );
+	m_tilemap[3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info_3),this), TILEMAP_SCAN_ROWS,8,8, 0x40,0x20 );
 
-	state->m_tilemap[0]->set_scroll_rows(1);
-	state->m_tilemap[0]->set_scroll_cols(1);
-	state->m_tilemap[0]->set_transparent_pen(0x3f);
+	m_tilemap[0]->set_scroll_rows(1);
+	m_tilemap[0]->set_scroll_cols(1);
+	m_tilemap[0]->set_transparent_pen(0x3f);
 
 	// Has line scroll
-	state->m_tilemap[1]->set_scroll_rows(0x200);
-	state->m_tilemap[1]->set_scroll_cols(1);
-	state->m_tilemap[1]->set_transparent_pen(0x3f);
+	m_tilemap[1]->set_scroll_rows(0x200);
+	m_tilemap[1]->set_scroll_cols(1);
+	m_tilemap[1]->set_transparent_pen(0x3f);
 
-	state->m_tilemap[2]->set_scroll_rows(1);
-	state->m_tilemap[2]->set_scroll_cols(1);
-	state->m_tilemap[2]->set_transparent_pen(0x3f);
+	m_tilemap[2]->set_scroll_rows(1);
+	m_tilemap[2]->set_scroll_cols(1);
+	m_tilemap[2]->set_transparent_pen(0x3f);
 
-	state->m_tilemap[3]->set_scroll_rows(1);
-	state->m_tilemap[3]->set_scroll_cols(1);
-	state->m_tilemap[3]->set_transparent_pen(0x3f);
+	m_tilemap[3]->set_scroll_rows(1);
+	m_tilemap[3]->set_scroll_cols(1);
+	m_tilemap[3]->set_transparent_pen(0x3f);
 
 	// Buffer bitmaps for 4 tilemaps (0-3) + sprites (4)
 	for (i = 0; i < 5; i++)
-		state->m_bitmaps[i] = auto_bitmap_ind16_alloc(machine, w, h);
+		m_bitmaps[i] = auto_bitmap_ind16_alloc(machine(), w, h);
 }
 
 /***************************************************************************

@@ -136,14 +136,13 @@ READ8_MEMBER(vsnes_state::vsnes_in1_1_r)
  *
  *************************************/
 
-MACHINE_RESET( vsnes )
+MACHINE_RESET_MEMBER(vsnes_state,vsnes)
 {
-	vsnes_state *state = machine.driver_data<vsnes_state>();
 
-	state->m_last_bank = 0xff;
-	state->m_sound_fix = 0;
-	state->m_input_latch[0] = state->m_input_latch[1] = 0;
-	state->m_input_latch[2] = state->m_input_latch[3] = 0;
+	m_last_bank = 0xff;
+	m_sound_fix = 0;
+	m_input_latch[0] = m_input_latch[1] = 0;
+	m_input_latch[2] = m_input_latch[3] = 0;
 
 }
 
@@ -153,12 +152,11 @@ MACHINE_RESET( vsnes )
  *
  *************************************/
 
-MACHINE_RESET( vsdual )
+MACHINE_RESET_MEMBER(vsnes_state,vsdual)
 {
-	vsnes_state *state = machine.driver_data<vsnes_state>();
 
-	state->m_input_latch[0] = state->m_input_latch[1] = 0;
-	state->m_input_latch[2] = state->m_input_latch[3] = 0;
+	m_input_latch[0] = m_input_latch[1] = 0;
+	m_input_latch[2] = m_input_latch[3] = 0;
 
 }
 
@@ -186,75 +184,73 @@ static void v_set_videorom_bank( running_machine& machine, int start, int count,
 	}
 }
 
-MACHINE_START( vsnes )
+MACHINE_START_MEMBER(vsnes_state,vsnes)
 {
-	vsnes_state *state = machine.driver_data<vsnes_state>();
-	address_space *ppu1_space = machine.device("ppu1")->memory().space(AS_PROGRAM);
+	address_space *ppu1_space = machine().device("ppu1")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* establish nametable ram */
-	state->m_nt_ram[0] = auto_alloc_array(machine, UINT8, 0x1000);
+	m_nt_ram[0] = auto_alloc_array(machine(), UINT8, 0x1000);
 	/* set mirroring */
-	state->m_nt_page[0][0] = state->m_nt_ram[0];
-	state->m_nt_page[0][1] = state->m_nt_ram[0] + 0x400;
-	state->m_nt_page[0][2] = state->m_nt_ram[0] + 0x800;
-	state->m_nt_page[0][3] = state->m_nt_ram[0] + 0xc00;
+	m_nt_page[0][0] = m_nt_ram[0];
+	m_nt_page[0][1] = m_nt_ram[0] + 0x400;
+	m_nt_page[0][2] = m_nt_ram[0] + 0x800;
+	m_nt_page[0][3] = m_nt_ram[0] + 0xc00;
 
-	ppu1_space->install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(vsnes_state::vsnes_nt0_r),state), write8_delegate(FUNC(vsnes_state::vsnes_nt0_w),state));
+	ppu1_space->install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(vsnes_state::vsnes_nt0_r),this), write8_delegate(FUNC(vsnes_state::vsnes_nt0_w),this));
 
-	state->m_vrom[0] = state->memregion("gfx1")->base();
-	state->m_vrom_size[0] = state->memregion("gfx1")->bytes();
-	state->m_vrom_banks = state->m_vrom_size[0] / 0x400;
+	m_vrom[0] = memregion("gfx1")->base();
+	m_vrom_size[0] = memregion("gfx1")->bytes();
+	m_vrom_banks = m_vrom_size[0] / 0x400;
 
 	/* establish chr banks */
 	/* bank 1 is used already! */
 	/* DRIVER_INIT is called first - means we can handle this different for VRAM games! */
-	if (NULL != state->m_vrom[0])
+	if (NULL != m_vrom[0])
 	{
 		for (i = 0; i < 8; i++)
 		{
 			ppu1_space->install_read_bank(0x0400 * i, 0x0400 * i + 0x03ff, chr_banknames[i]);
-			state->membank(chr_banknames[i])->configure_entries(0, state->m_vrom_banks, state->m_vrom[0], 0x400);
+			membank(chr_banknames[i])->configure_entries(0, m_vrom_banks, m_vrom[0], 0x400);
 		}
-		v_set_videorom_bank(machine, 0, 8, 0);
+		v_set_videorom_bank(machine(), 0, 8, 0);
 	}
 	else
 	{
-		ppu1_space->install_ram(0x0000, 0x1fff, state->m_vram);
+		ppu1_space->install_ram(0x0000, 0x1fff, m_vram);
 	}
 }
 
-MACHINE_START( vsdual )
+MACHINE_START_MEMBER(vsnes_state,vsdual)
 {
-	vsnes_state *state = machine.driver_data<vsnes_state>();
-	state->m_vrom[0] = state->memregion("gfx1")->base();
-	state->m_vrom[1] = state->memregion("gfx2")->base();
-	state->m_vrom_size[0] = state->memregion("gfx1")->bytes();
-	state->m_vrom_size[1] = state->memregion("gfx2")->bytes();
+	m_vrom[0] = memregion("gfx1")->base();
+	m_vrom[1] = memregion("gfx2")->base();
+	m_vrom_size[0] = memregion("gfx1")->bytes();
+	m_vrom_size[1] = memregion("gfx2")->bytes();
 
 	/* establish nametable ram */
-	state->m_nt_ram[0] = auto_alloc_array(machine, UINT8, 0x1000);
-	state->m_nt_ram[1] = auto_alloc_array(machine, UINT8, 0x1000);
+	m_nt_ram[0] = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_nt_ram[1] = auto_alloc_array(machine(), UINT8, 0x1000);
 	/* set mirroring */
-	state->m_nt_page[0][0] = state->m_nt_ram[0];
-	state->m_nt_page[0][1] = state->m_nt_ram[0] + 0x400;
-	state->m_nt_page[0][2] = state->m_nt_ram[0] + 0x800;
-	state->m_nt_page[0][3] = state->m_nt_ram[0] + 0xc00;
-	state->m_nt_page[1][0] = state->m_nt_ram[1];
-	state->m_nt_page[1][1] = state->m_nt_ram[1] + 0x400;
-	state->m_nt_page[1][2] = state->m_nt_ram[1] + 0x800;
-	state->m_nt_page[1][3] = state->m_nt_ram[1] + 0xc00;
+	m_nt_page[0][0] = m_nt_ram[0];
+	m_nt_page[0][1] = m_nt_ram[0] + 0x400;
+	m_nt_page[0][2] = m_nt_ram[0] + 0x800;
+	m_nt_page[0][3] = m_nt_ram[0] + 0xc00;
+	m_nt_page[1][0] = m_nt_ram[1];
+	m_nt_page[1][1] = m_nt_ram[1] + 0x400;
+	m_nt_page[1][2] = m_nt_ram[1] + 0x800;
+	m_nt_page[1][3] = m_nt_ram[1] + 0xc00;
 
-	machine.device("ppu1")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(vsnes_state::vsnes_nt0_r),state), write8_delegate(FUNC(vsnes_state::vsnes_nt0_w),state));
-	machine.device("ppu2")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(vsnes_state::vsnes_nt1_r),state), write8_delegate(FUNC(vsnes_state::vsnes_nt1_w),state));
+	machine().device("ppu1")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(vsnes_state::vsnes_nt0_r),this), write8_delegate(FUNC(vsnes_state::vsnes_nt0_w),this));
+	machine().device("ppu2")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(vsnes_state::vsnes_nt1_r),this), write8_delegate(FUNC(vsnes_state::vsnes_nt1_w),this));
 	// read only!
-	machine.device("ppu1")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank2");
+	machine().device("ppu1")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank2");
 	// read only!
-	machine.device("ppu2")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank3");
-	state->membank("bank2")->configure_entries(0, state->m_vrom_size[0] / 0x2000, state->m_vrom[0], 0x2000);
-	state->membank("bank3")->configure_entries(0, state->m_vrom_size[1] / 0x2000, state->m_vrom[1], 0x2000);
-	state->membank("bank2")->set_entry(0);
-	state->membank("bank3")->set_entry(0);
+	machine().device("ppu2")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank3");
+	membank("bank2")->configure_entries(0, m_vrom_size[0] / 0x2000, m_vrom[0], 0x2000);
+	membank("bank3")->configure_entries(0, m_vrom_size[1] / 0x2000, m_vrom[1], 0x2000);
+	membank("bank2")->set_entry(0);
+	membank("bank3")->set_entry(0);
 }
 
 /*************************************

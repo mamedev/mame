@@ -173,7 +173,6 @@ static MACHINE_CONFIG_START( cchasm, cchasm_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
 	MCFG_SCREEN_UPDATE_STATIC(vector)
 
-	MCFG_VIDEO_START(cchasm)
 
 	/* sound hardware */
 	MCFG_SOUND_START(cchasm)

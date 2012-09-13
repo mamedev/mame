@@ -38,6 +38,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -76,5 +78,5 @@ extern const device_type FLOWER;
 
 
 SCREEN_UPDATE_IND16( flower );
-VIDEO_START( flower );
-PALETTE_INIT( flower );
+
+

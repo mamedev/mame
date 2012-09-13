@@ -64,10 +64,12 @@ public:
 	DECLARE_READ8_MEMBER(cmmb_input_r);
 	DECLARE_WRITE8_MEMBER(cmmb_output_w);
 	DECLARE_READ8_MEMBER(kludge_r);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
-static VIDEO_START( cmmb )
+void cmmb_state::video_start()
 {
 
 }
@@ -306,7 +308,7 @@ static INTERRUPT_GEN( cmmb_irq )
 //      device->execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_RESET( cmmb )
+void cmmb_state::machine_reset()
 {
 }
 
@@ -328,9 +330,7 @@ static MACHINE_CONFIG_START( cmmb, cmmb_state )
 	MCFG_GFXDECODE(cmmb)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(cmmb)
 
-	MCFG_MACHINE_RESET(cmmb)
 
 	/* sound hardware */
 //  MCFG_SPEAKER_STANDARD_MONO("mono")

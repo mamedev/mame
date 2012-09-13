@@ -18,13 +18,18 @@ public:
 	DECLARE_WRITE8_MEMBER(lvcards_videoram_w);
 	DECLARE_WRITE8_MEMBER(lvcards_colorram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_MACHINE_START(lvpoker);
+	DECLARE_MACHINE_RESET(lvpoker);
+	DECLARE_PALETTE_INIT(ponttehk);
 };
 
 
 /*----------- defined in video/lvcards.c -----------*/
 
 
-PALETTE_INIT( lvcards );
-PALETTE_INIT( ponttehk );
-VIDEO_START( lvcards );
+
+
+
 SCREEN_UPDATE_IND16( lvcards );

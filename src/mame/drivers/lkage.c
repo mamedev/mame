@@ -492,64 +492,62 @@ static const ym2203_interface ym2203_config =
 	DEVCB_LINE(irqhandler)
 };
 
-static MACHINE_START( lkage )
+void lkage_state::machine_start()
 {
-	lkage_state *state = machine.driver_data<lkage_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_mcu = machine.device("mcu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_mcu = machine().device("mcu");
 
-	state->save_item(NAME(state->m_bg_tile_bank));
-	state->save_item(NAME(state->m_fg_tile_bank));
-	state->save_item(NAME(state->m_tx_tile_bank));
+	save_item(NAME(m_bg_tile_bank));
+	save_item(NAME(m_fg_tile_bank));
+	save_item(NAME(m_tx_tile_bank));
 
-	state->save_item(NAME(state->m_sprite_dx));
+	save_item(NAME(m_sprite_dx));
 
-	state->save_item(NAME(state->m_mcu_ready));
-	state->save_item(NAME(state->m_mcu_val));
-	state->save_item(NAME(state->m_sound_nmi_enable));
-	state->save_item(NAME(state->m_pending_nmi));
+	save_item(NAME(m_mcu_ready));
+	save_item(NAME(m_mcu_val));
+	save_item(NAME(m_sound_nmi_enable));
+	save_item(NAME(m_pending_nmi));
 
-	state->save_item(NAME(state->m_port_a_in));
-	state->save_item(NAME(state->m_port_a_out));
-	state->save_item(NAME(state->m_ddr_a));
-	state->save_item(NAME(state->m_port_b_in));
-	state->save_item(NAME(state->m_port_b_out));
-	state->save_item(NAME(state->m_ddr_b));
-	state->save_item(NAME(state->m_port_c_in));
-	state->save_item(NAME(state->m_port_c_out));
-	state->save_item(NAME(state->m_ddr_c));
-	state->save_item(NAME(state->m_mcu_sent));
-	state->save_item(NAME(state->m_main_sent));
-	state->save_item(NAME(state->m_from_main));
-	state->save_item(NAME(state->m_from_mcu));
+	save_item(NAME(m_port_a_in));
+	save_item(NAME(m_port_a_out));
+	save_item(NAME(m_ddr_a));
+	save_item(NAME(m_port_b_in));
+	save_item(NAME(m_port_b_out));
+	save_item(NAME(m_ddr_b));
+	save_item(NAME(m_port_c_in));
+	save_item(NAME(m_port_c_out));
+	save_item(NAME(m_ddr_c));
+	save_item(NAME(m_mcu_sent));
+	save_item(NAME(m_main_sent));
+	save_item(NAME(m_from_main));
+	save_item(NAME(m_from_mcu));
 }
 
-static MACHINE_RESET( lkage )
+void lkage_state::machine_reset()
 {
-	lkage_state *state = machine.driver_data<lkage_state>();
 
-	state->m_bg_tile_bank = state->m_fg_tile_bank = state->m_tx_tile_bank =0;
+	m_bg_tile_bank = m_fg_tile_bank = m_tx_tile_bank =0;
 
-	state->m_mcu_ready = 3;
-	state->m_mcu_val = 0;
-	state->m_sound_nmi_enable = 0;
-	state->m_pending_nmi = 0;
+	m_mcu_ready = 3;
+	m_mcu_val = 0;
+	m_sound_nmi_enable = 0;
+	m_pending_nmi = 0;
 
-	state->m_port_a_in = 0;
-	state->m_port_a_out = 0;
-	state->m_ddr_a = 0;
-	state->m_port_b_in = 0;
-	state->m_port_b_out = 0;
-	state->m_ddr_b = 0;
-	state->m_port_c_in = 0;
-	state->m_port_c_out = 0;
-	state->m_ddr_c = 0;
-	state->m_mcu_sent = 0;
-	state->m_main_sent = 0;
-	state->m_from_main = 0;
-	state->m_from_mcu = 0;
+	m_port_a_in = 0;
+	m_port_a_out = 0;
+	m_ddr_a = 0;
+	m_port_b_in = 0;
+	m_port_b_out = 0;
+	m_ddr_b = 0;
+	m_port_c_in = 0;
+	m_port_c_out = 0;
+	m_ddr_c = 0;
+	m_mcu_sent = 0;
+	m_main_sent = 0;
+	m_from_main = 0;
+	m_from_mcu = 0;
 }
 
 static MACHINE_CONFIG_START( lkage, lkage_state )
@@ -567,8 +565,6 @@ static MACHINE_CONFIG_START( lkage, lkage_state )
 	MCFG_CPU_ADD("mcu", M68705,MCU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(lkage_m68705_map)
 
-	MCFG_MACHINE_START(lkage)
-	MCFG_MACHINE_RESET(lkage)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -581,7 +577,6 @@ static MACHINE_CONFIG_START( lkage, lkage_state )
 	MCFG_GFXDECODE(lkage)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(lkage)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -613,8 +608,6 @@ static MACHINE_CONFIG_START( lkageb, lkage_state )
 	MCFG_CPU_PROGRAM_MAP(lkage_sound_map)
 								/* IRQs are triggered by the YM2203 */
 
-	MCFG_MACHINE_START(lkage)
-	MCFG_MACHINE_RESET(lkage)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -627,7 +620,6 @@ static MACHINE_CONFIG_START( lkageb, lkage_state )
 	MCFG_GFXDECODE(lkage)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(lkage)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

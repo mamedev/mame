@@ -57,6 +57,7 @@ public:
 	DECLARE_READ8_MEMBER( key_r );
 	DECLARE_WRITE8_MEMBER( speaker_w );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
+	virtual void palette_init();
 };
 
 WRITE8_MEMBER( lcmate2_state::speaker_w )
@@ -191,10 +192,10 @@ static INPUT_PORTS_START( lcmate2 )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_UNUSED
 INPUT_PORTS_END
 
-static PALETTE_INIT( lcmate2 )
+void lcmate2_state::palette_init()
 {
-	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
+	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
+	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
 }
 
 void lcmate2_state::machine_start()
@@ -245,7 +246,6 @@ static MACHINE_CONFIG_START( lcmate2, lcmate2_state )
 	MCFG_SCREEN_SIZE(120, 18)
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 18-1)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(lcmate2)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_GFXDECODE(lcmate2)
 

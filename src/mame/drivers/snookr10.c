@@ -706,8 +706,6 @@ static MACHINE_CONFIG_START( snookr10, snookr10_state )
 	MCFG_GFXDECODE(snookr10)
 
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(snookr10)
-	MCFG_VIDEO_START(snookr10)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -722,8 +720,8 @@ static MACHINE_CONFIG_DERIVED( apple10, snookr10 )
 	MCFG_CPU_MODIFY("maincpu")
 
     /* video hardware */
-	MCFG_PALETTE_INIT(apple10)
-	MCFG_VIDEO_START(apple10)
+	MCFG_PALETTE_INIT_OVERRIDE(snookr10_state,apple10)
+	MCFG_VIDEO_START_OVERRIDE(snookr10_state,apple10)
 
 MACHINE_CONFIG_END
 

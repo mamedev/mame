@@ -337,18 +337,17 @@ DRIVER_INIT_MEMBER(midwunit_state,rmpgwt)
  *
  *************************************/
 
-MACHINE_RESET( midwunit )
+MACHINE_RESET_MEMBER(midwunit_state,midwunit)
 {
-	midwunit_state *state = machine.driver_data<midwunit_state>();
 	int i;
 
 	/* reset sound */
-	dcs_reset_w(machine, 1);
-	dcs_reset_w(machine, 0);
+	dcs_reset_w(machine(), 1);
+	dcs_reset_w(machine(), 0);
 
 	/* reset I/O shuffling */
 	for (i = 0; i < 16; i++)
-		state->m_ioshuffle[i] = i % 8;
+		m_ioshuffle[i] = i % 8;
 }
 
 

@@ -32,6 +32,19 @@ public:
     mcd212_regs_t m_mcd212_regs;
     mcd212_ab_t m_mcd212_ab;
 	DECLARE_INPUT_CHANGED_MEMBER(mcu_input);
+	virtual void machine_start();
+	virtual void video_start();
+	DECLARE_MACHINE_RESET(cdi);
+	DECLARE_MACHINE_RESET(quizrd12);
+	DECLARE_MACHINE_RESET(quizrd17);
+	DECLARE_MACHINE_RESET(quizrd18);
+	DECLARE_MACHINE_RESET(quizrd22);
+	DECLARE_MACHINE_RESET(quizrd23);
+	DECLARE_MACHINE_RESET(quizrd32);
+	DECLARE_MACHINE_RESET(quizrd34);
+	DECLARE_MACHINE_RESET(quizrr40);
+	DECLARE_MACHINE_RESET(quizrr41);
+	DECLARE_MACHINE_RESET(quizrr42);
 };
 
 /*----------- debug defines -----------*/

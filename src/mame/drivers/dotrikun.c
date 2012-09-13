@@ -37,6 +37,8 @@ public:
 	/* video-related */
 	UINT8          m_color;
 	DECLARE_WRITE8_MEMBER(dotrikun_color_w);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -134,17 +136,15 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_START( dotrikun )
+void dotrikun_state::machine_start()
 {
-	dotrikun_state *state = machine.driver_data<dotrikun_state>();
-	state->save_item(NAME(state->m_color));
+	save_item(NAME(m_color));
 }
 
-static MACHINE_RESET( dotrikun )
+void dotrikun_state::machine_reset()
 {
-	dotrikun_state *state = machine.driver_data<dotrikun_state>();
 
-	state->m_color = 0;
+	m_color = 0;
 }
 
 #define MASTER_CLOCK XTAL_4MHz
@@ -157,8 +157,6 @@ static MACHINE_CONFIG_START( dotrikun, dotrikun_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(dotrikun)
-	MCFG_MACHINE_RESET(dotrikun)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

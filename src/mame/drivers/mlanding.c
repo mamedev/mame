@@ -75,11 +75,13 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(ml_msm_start_lsb_w);
 	DECLARE_DRIVER_INIT(mlanding);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 
-static VIDEO_START(mlanding)
+void mlanding_state::video_start()
 {
 }
 
@@ -750,16 +752,15 @@ static const tc0140syt_interface mlanding_tc0140syt_intf =
 	"maincpu", "audiocpu"
 };
 
-static MACHINE_RESET( mlanding )
+void mlanding_state::machine_reset()
 {
-	mlanding_state *state = machine.driver_data<mlanding_state>();
-	machine.device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine.device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	state->m_adpcm_pos = 0;
-	state->m_adpcm_data = -1;
-	state->m_adpcm_idle = 1;
-	state->m_dsp_HOLD_signal = 0;
+	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_adpcm_pos = 0;
+	m_adpcm_data = -1;
+	m_adpcm_idle = 1;
+	m_dsp_HOLD_signal = 0;
 }
 
 static MACHINE_CONFIG_START( mlanding, mlanding_state )
@@ -797,9 +798,7 @@ static MACHINE_CONFIG_START( mlanding, mlanding_state )
 
 	MCFG_PALETTE_LENGTH(512*16)
 
-	MCFG_VIDEO_START(mlanding)
 
-	MCFG_MACHINE_RESET(mlanding)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

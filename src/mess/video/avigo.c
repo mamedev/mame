@@ -76,10 +76,10 @@ void avigo_state::video_start()
 }
 
 /* Initialise the palette */
-PALETTE_INIT( avigo )
+void avigo_state::palette_init()
 {
-	palette_set_color(machine,0,MAKE_RGB(0xff,0xff,0xff)); /* white  */
-	palette_set_color(machine,1,MAKE_RGB(0x00,0x00,0x00)); /* black  */
+	palette_set_color(machine(),0,MAKE_RGB(0xff,0xff,0xff)); /* white  */
+	palette_set_color(machine(),1,MAKE_RGB(0x00,0x00,0x00)); /* black  */
 }
 
 UINT32 avigo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

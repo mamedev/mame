@@ -143,7 +143,6 @@ static MACHINE_CONFIG_START( galeb, galeb_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-    MCFG_VIDEO_START(galeb)
 
     /* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

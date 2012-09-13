@@ -46,14 +46,18 @@ public:
 	DECLARE_READ8_MEMBER(pandoras_portA_r);
 	DECLARE_READ8_MEMBER(pandoras_portB_r);
 	TILE_GET_INFO_MEMBER(get_tile_info0);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/pandoras.c -----------*/
 
-PALETTE_INIT( pandoras );
 
 
-VIDEO_START( pandoras );
+
+
 SCREEN_UPDATE_IND16( pandoras );
 

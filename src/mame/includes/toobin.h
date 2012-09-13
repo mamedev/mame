@@ -22,6 +22,9 @@ public:
 	DECLARE_DRIVER_INIT(toobin);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	DECLARE_MACHINE_START(toobin);
+	DECLARE_MACHINE_RESET(toobin);
+	DECLARE_VIDEO_START(toobin);
 };
 
 
@@ -33,5 +36,5 @@ WRITE16_HANDLER( toobin_xscroll_w );
 WRITE16_HANDLER( toobin_yscroll_w );
 WRITE16_HANDLER( toobin_slip_w );
 
-VIDEO_START( toobin );
+
 SCREEN_UPDATE_RGB32( toobin );

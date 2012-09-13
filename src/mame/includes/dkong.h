@@ -239,18 +239,32 @@ public:
 	DECLARE_DRIVER_INIT(dkongx);
 	TILE_GET_INFO_MEMBER(dkong_bg_tile_info);
 	TILE_GET_INFO_MEMBER(radarscp1_bg_tile_info);
+	DECLARE_MACHINE_START(dkong2b);
+	DECLARE_MACHINE_RESET(dkong);
+	DECLARE_VIDEO_START(dkong);
+	DECLARE_VIDEO_START(dkong_base);
+	DECLARE_PALETTE_INIT(dkong2b);
+	DECLARE_MACHINE_START(dkong3);
+	DECLARE_PALETTE_INIT(dkong3);
+	DECLARE_MACHINE_START(radarscp);
+	DECLARE_PALETTE_INIT(radarscp);
+	DECLARE_MACHINE_START(radarscp1);
+	DECLARE_PALETTE_INIT(radarscp1);
+	DECLARE_MACHINE_START(s2650);
+	DECLARE_MACHINE_RESET(strtheat);
+	DECLARE_MACHINE_RESET(drakton);
 };
 
 /*----------- defined in video/dkong.c -----------*/
 
 
 
-PALETTE_INIT( dkong2b );
-PALETTE_INIT( radarscp );
-PALETTE_INIT( radarscp1 );
-PALETTE_INIT( dkong3 );
 
-VIDEO_START( dkong );
+
+
+
+
+
 SCREEN_UPDATE_IND16( dkong );
 SCREEN_UPDATE_IND16( pestplce );
 SCREEN_UPDATE_IND16( spclforc );

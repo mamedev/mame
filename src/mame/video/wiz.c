@@ -10,14 +10,13 @@
 #include "includes/wiz.h"
 
 
-VIDEO_START( wiz )
+void wiz_state::video_start()
 {
-	wiz_state *state = machine.driver_data<wiz_state>();
-	state_save_register_global_array(machine, state->m_char_bank);
-	state_save_register_global_array(machine, state->m_palbank);
-	state_save_register_global(machine, state->m_flipx);
-	state_save_register_global(machine, state->m_flipy);
-	state_save_register_global(machine, state->m_bgpen);
+	state_save_register_global_array(machine(), m_char_bank);
+	state_save_register_global_array(machine(), m_palbank);
+	state_save_register_global(machine(), m_flipx);
+	state_save_register_global(machine(), m_flipy);
+	state_save_register_global(machine(), m_bgpen);
 }
 
 /***************************************************************************
@@ -33,13 +32,13 @@ VIDEO_START( wiz )
   bit 0 -- 1  kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
-PALETTE_INIT( wiz )
+void wiz_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -49,18 +48,18 @@ PALETTE_INIT( wiz )
 		bit2 = (color_prom[0] >> 2) & 0x01;
 		bit3 = (color_prom[0] >> 3) & 0x01;
 		r = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
-		bit0 = (color_prom[machine.total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[machine.total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[machine.total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[machine.total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[machine().total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[machine().total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[machine().total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[machine().total_colors()] >> 3) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
-		bit0 = (color_prom[2*machine.total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[2*machine.total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[2*machine.total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[2*machine.total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[2*machine().total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[2*machine().total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[2*machine().total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[2*machine().total_colors()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}

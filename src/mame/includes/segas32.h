@@ -171,6 +171,9 @@ public:
 	DECLARE_DRIVER_INIT(f1lap);
 	DECLARE_DRIVER_INIT(orunners);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	DECLARE_MACHINE_RESET(system32);
+	DECLARE_VIDEO_START(system32);
+	DECLARE_VIDEO_START(multi32);
 };
 
 
@@ -190,8 +193,8 @@ void decrypt_ga2_protrom(running_machine &machine);
 
 /*----------- defined in video/segas32.c -----------*/
 
-VIDEO_START(system32);
-VIDEO_START(multi32);
+
+
 SCREEN_UPDATE_RGB32(system32);
 SCREEN_UPDATE_RGB32(multi32_left);
 SCREEN_UPDATE_RGB32(multi32_right);

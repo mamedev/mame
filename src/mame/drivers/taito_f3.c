@@ -419,10 +419,9 @@ static const UINT16 recalh_eeprom[64] =	{
 	0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff
 };
 
-static MACHINE_START(f3)
+MACHINE_START_MEMBER(taito_f3_state,f3)
 {
-	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	state_save_register_global_array(machine, state->m_coin_word);
+	state_save_register_global_array(machine(), m_coin_word);
 }
 
 static MACHINE_CONFIG_START( f3, taito_f3_state )
@@ -432,7 +431,7 @@ static MACHINE_CONFIG_START( f3, taito_f3_state )
 	MCFG_CPU_PROGRAM_MAP(f3_map)
 	MCFG_CPU_VBLANK_INT("screen", f3_interrupt2)
 
-	MCFG_MACHINE_START(f3)
+	MCFG_MACHINE_START_OVERRIDE(taito_f3_state,f3)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -448,7 +447,7 @@ static MACHINE_CONFIG_START( f3, taito_f3_state )
 	MCFG_GFXDECODE(taito_f3)
 	MCFG_PALETTE_LENGTH(0x2000)
 
-	MCFG_VIDEO_START(f3)
+	MCFG_VIDEO_START_OVERRIDE(taito_f3_state,f3)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(taito_en_sound)
@@ -526,7 +525,7 @@ static MACHINE_CONFIG_START( bubsympb, taito_f3_state )
 	MCFG_CPU_PROGRAM_MAP(f3_map)
 	MCFG_CPU_VBLANK_INT("screen", f3_interrupt2)
 
-	MCFG_MACHINE_START(f3)
+	MCFG_MACHINE_START_OVERRIDE(taito_f3_state,f3)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -542,7 +541,7 @@ static MACHINE_CONFIG_START( bubsympb, taito_f3_state )
 	MCFG_GFXDECODE(bubsympb)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(f3)
+	MCFG_VIDEO_START_OVERRIDE(taito_f3_state,f3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

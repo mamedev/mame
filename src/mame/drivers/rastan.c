@@ -357,34 +357,32 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S48_4B		/* 8 kHz */
 };
 
-static MACHINE_START( rastan )
+void rastan_state::machine_start()
 {
-	rastan_state *state = machine.driver_data<rastan_state>();
-	UINT8 *ROM = state->memregion("audiocpu")->base();
+	UINT8 *ROM = memregion("audiocpu")->base();
 
-	state->membank("bank1")->configure_entry(0, &ROM[0x00000]);
-	state->membank("bank1")->configure_entries(1, 3, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entry(0, &ROM[0x00000]);
+	membank("bank1")->configure_entries(1, 3, &ROM[0x10000], 0x4000);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_pc080sn = machine.device("pc080sn");
-	state->m_pc090oj = machine.device("pc090oj");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_pc080sn = machine().device("pc080sn");
+	m_pc090oj = machine().device("pc090oj");
 
-	state->save_item(NAME(state->m_sprite_ctrl));
-	state->save_item(NAME(state->m_sprites_flipscreen));
+	save_item(NAME(m_sprite_ctrl));
+	save_item(NAME(m_sprites_flipscreen));
 
-	state->save_item(NAME(state->m_adpcm_pos));
-	state->save_item(NAME(state->m_adpcm_data));
+	save_item(NAME(m_adpcm_pos));
+	save_item(NAME(m_adpcm_data));
 }
 
-static MACHINE_RESET( rastan )
+void rastan_state::machine_reset()
 {
-	rastan_state *state = machine.driver_data<rastan_state>();
 
-	state->m_sprite_ctrl = 0;
-	state->m_sprites_flipscreen = 0;
-	state->m_adpcm_pos = 0;
-	state->m_adpcm_data = -1;
+	m_sprite_ctrl = 0;
+	m_sprites_flipscreen = 0;
+	m_adpcm_pos = 0;
+	m_adpcm_data = -1;
 }
 
 
@@ -416,8 +414,6 @@ static MACHINE_CONFIG_START( rastan, rastan_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_MACHINE_START(rastan)
-	MCFG_MACHINE_RESET(rastan)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

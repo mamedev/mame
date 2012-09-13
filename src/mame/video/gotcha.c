@@ -40,16 +40,15 @@ TILE_GET_INFO_MEMBER(gotcha_state::bg_get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( gotcha )
+void gotcha_state::video_start()
 {
-	gotcha_state *state = machine.driver_data<gotcha_state>();
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gotcha_state::fg_get_tile_info),state), tilemap_mapper_delegate(FUNC(gotcha_state::gotcha_tilemap_scan),state), 16, 16, 64, 32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gotcha_state::bg_get_tile_info),state), tilemap_mapper_delegate(FUNC(gotcha_state::gotcha_tilemap_scan),state), 16, 16, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gotcha_state::fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(gotcha_state::gotcha_tilemap_scan),this), 16, 16, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gotcha_state::bg_get_tile_info),this), tilemap_mapper_delegate(FUNC(gotcha_state::gotcha_tilemap_scan),this), 16, 16, 64, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_fg_tilemap->set_scrolldx(-1, 0);
-	state->m_bg_tilemap->set_scrolldx(-5, 0);
+	m_fg_tilemap->set_scrolldx(-1, 0);
+	m_bg_tilemap->set_scrolldx(-5, 0);
 }
 
 

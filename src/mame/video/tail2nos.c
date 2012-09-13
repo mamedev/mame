@@ -53,18 +53,17 @@ static void tail2nos_postload(running_machine &machine)
 	}
 }
 
-VIDEO_START( tail2nos )
+void tail2nos_state::video_start()
 {
-	tail2nos_state *state = machine.driver_data<tail2nos_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tail2nos_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tail2nos_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	state->m_bg_tilemap->set_transparent_pen(15);
+	m_bg_tilemap->set_transparent_pen(15);
 
-	state->m_zoomdata = (UINT16 *)state->memregion("gfx3")->base();
+	m_zoomdata = (UINT16 *)memregion("gfx3")->base();
 
-	state->save_pointer(NAME(state->m_zoomdata), 0x20000 / 2);
-	machine.save().register_postload(save_prepost_delegate(FUNC(tail2nos_postload), &machine));
+	save_pointer(NAME(m_zoomdata), 0x20000 / 2);
+	machine().save().register_postload(save_prepost_delegate(FUNC(tail2nos_postload), &machine()));
 }
 
 

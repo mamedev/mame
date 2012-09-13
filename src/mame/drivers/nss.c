@@ -327,6 +327,8 @@ public:
 	DECLARE_DRIVER_INIT(nss);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(game_over_flag_r);
+	DECLARE_MACHINE_START(nss);
+	DECLARE_MACHINE_RESET(nss);
 };
 
 
@@ -617,14 +619,13 @@ static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, nss_state )
 	AM_RANGE(0x07, 0x07) AM_WRITE(port_07_w)
 ADDRESS_MAP_END
 
-static MACHINE_START( nss )
+MACHINE_START_MEMBER(nss_state,nss)
 {
-	nss_state *state = machine.driver_data<nss_state>();
 
-	MACHINE_START_CALL(snes);
+	MACHINE_START_CALL_LEGACY(snes);
 
-	state->m_is_nss = 1;
-	state->m_wram = auto_alloc_array_clear(machine, UINT8, 0x1000);
+	m_is_nss = 1;
+	m_wram = auto_alloc_array_clear(machine(), UINT8, 0x1000);
 }
 
 
@@ -824,18 +825,17 @@ static INTERRUPT_GEN ( nss_vblank_irq )
 		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_RESET( nss )
+MACHINE_RESET_MEMBER(nss_state,nss)
 {
-	nss_state *state = machine.driver_data<nss_state>();
 
-	MACHINE_RESET_CALL( snes );
+	MACHINE_RESET_CALL_LEGACY( snes );
 
 	/* start with both CPUs disabled */
-	state->m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	state->m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	state->m_game_over_flag = 1;
-	state->m_joy_flag = 1;
+	m_game_over_flag = 1;
+	m_joy_flag = 1;
 }
 
 static M50458_INTERFACE( m50458_intf )
@@ -855,8 +855,8 @@ static MACHINE_CONFIG_DERIVED( nss, snes )
 	MCFG_RP5H01_ADD("rp5h01")
 	MCFG_M6M80011AP_ADD("m6m80011ap")
 
-	MCFG_MACHINE_START( nss )
-	MCFG_MACHINE_RESET( nss )
+	MCFG_MACHINE_START_OVERRIDE(nss_state, nss )
+	MCFG_MACHINE_RESET_OVERRIDE(nss_state, nss )
 
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)

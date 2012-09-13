@@ -402,22 +402,20 @@ static const sn76496_config psg_intf =
  *
  *************************************/
 
-static MACHINE_START( gberet )
+MACHINE_START_MEMBER(gberet_state,gberet)
 {
-	gberet_state *state = machine.driver_data<gberet_state>();
 
-	state->save_item(NAME(state->m_interrupt_mask));
-	state->save_item(NAME(state->m_interrupt_ticks));
-	state->save_item(NAME(state->m_spritebank));
+	save_item(NAME(m_interrupt_mask));
+	save_item(NAME(m_interrupt_ticks));
+	save_item(NAME(m_spritebank));
 }
 
-static MACHINE_RESET( gberet )
+MACHINE_RESET_MEMBER(gberet_state,gberet)
 {
-	gberet_state *state = machine.driver_data<gberet_state>();
 
-	state->m_interrupt_mask = 0;
-	state->m_interrupt_ticks = 0;
-	state->m_spritebank = 0;
+	m_interrupt_mask = 0;
+	m_interrupt_ticks = 0;
+	m_spritebank = 0;
 }
 
 static MACHINE_CONFIG_START( gberet, gberet_state )
@@ -427,8 +425,8 @@ static MACHINE_CONFIG_START( gberet, gberet_state )
 	MCFG_CPU_PROGRAM_MAP(gberet_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", gberet_interrupt_tick, "screen", 0, 16) // ?
 
-	MCFG_MACHINE_START(gberet)
-	MCFG_MACHINE_RESET(gberet)
+	MCFG_MACHINE_START_OVERRIDE(gberet_state,gberet)
+	MCFG_MACHINE_RESET_OVERRIDE(gberet_state,gberet)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -441,8 +439,8 @@ static MACHINE_CONFIG_START( gberet, gberet_state )
 	MCFG_GFXDECODE(gberet)
 	MCFG_PALETTE_LENGTH(2*16*16)
 
-	MCFG_PALETTE_INIT(gberet)
-	MCFG_VIDEO_START(gberet)
+	MCFG_PALETTE_INIT_OVERRIDE(gberet_state,gberet)
+	MCFG_VIDEO_START_OVERRIDE(gberet_state,gberet)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -467,8 +465,8 @@ static MACHINE_CONFIG_START( gberetb, gberet_state )
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 	MCFG_CPU_PERIODIC_INT(nmi_line_assert, XTAL_20MHz/0x8000) // divider guessed
 
-	MCFG_MACHINE_START(gberet)
-	MCFG_MACHINE_RESET(gberet)
+	MCFG_MACHINE_START_OVERRIDE(gberet_state,gberet)
+	MCFG_MACHINE_RESET_OVERRIDE(gberet_state,gberet)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -481,8 +479,8 @@ static MACHINE_CONFIG_START( gberetb, gberet_state )
 	MCFG_GFXDECODE(gberetb)
 	MCFG_PALETTE_LENGTH(2*16*16)
 
-	MCFG_PALETTE_INIT(gberet)
-	MCFG_VIDEO_START(gberet)
+	MCFG_PALETTE_INIT_OVERRIDE(gberet_state,gberet)
+	MCFG_VIDEO_START_OVERRIDE(gberet_state,gberet)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

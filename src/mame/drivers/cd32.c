@@ -770,7 +770,7 @@ static MACHINE_CONFIG_START( cd32base, cd32_state )
 	MCFG_CPU_PROGRAM_MAP(cd32_map)
 	MCFG_DEVICE_ADD("akiko", AKIKO, 0)
 
-	MCFG_MACHINE_RESET(amiga)
+	MCFG_MACHINE_RESET_OVERRIDE(amiga_state,amiga)
 
 	MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)
 
@@ -784,7 +784,7 @@ static MACHINE_CONFIG_START( cd32base, cd32_state )
 	MCFG_SCREEN_VISIBLE_AREA((129-8-8)*2, (449+8-1+8)*2, 44-8, 300+8-1)
 	MCFG_SCREEN_UPDATE_STATIC(amiga_aga)
 
-	MCFG_VIDEO_START(amiga_aga)
+	MCFG_VIDEO_START_OVERRIDE(cd32_state,amiga_aga)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

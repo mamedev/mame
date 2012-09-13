@@ -31,6 +31,7 @@ public:
 	DECLARE_WRITE8_MEMBER( kb_w );
 
 	UINT8 m_keydata;
+	virtual void machine_reset();
 };
 
 
@@ -54,7 +55,7 @@ static INPUT_PORTS_START( a6809 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(a6809)
+void a6809_state::machine_reset()
 {
 }
 
@@ -135,7 +136,6 @@ static MACHINE_CONFIG_START( a6809, a6809_state )
 	MCFG_CPU_PROGRAM_MAP(a6809_mem)
 	MCFG_CPU_IO_MAP(a6809_io)
 
-	MCFG_MACHINE_RESET(a6809)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

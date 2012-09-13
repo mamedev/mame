@@ -82,6 +82,9 @@ public:
 	DECLARE_WRITE64_MEMBER(area4_w);
 	DECLARE_READ64_MEMBER(ioport_r);
 	DECLARE_WRITE64_MEMBER(ioport_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 static void logbinary(UINT32 data,int high=31,int low=0)
@@ -311,7 +314,7 @@ WRITE64_MEMBER(atvtrack_state::ioport_w)
 #endif
 }
 
-VIDEO_START(atvtrack)
+void atvtrack_state::video_start()
 {
 }
 
@@ -320,21 +323,21 @@ SCREEN_UPDATE_RGB32(atvtrack)
 	return 0;
 }
 
-static MACHINE_START(atvtrack)
+void atvtrack_state::machine_start()
 {
 	UINT8 *src, *dst;
 	address_space *as;
 
 	nandaddressstep = 0;
-	nandregion = machine.root_device().memregion("maincpu");
-	as = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	nandregion = machine().root_device().memregion("maincpu");
+	as = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	dst = (UINT8 *)(as->get_write_ptr(0x0c7f0000));
 	src = nandregion->base()+0x10;
 	// copy 0x10000 bytes from region "maincpu" offset 0x10 to 0x0c7f0000
 	memcpy(dst, src, 0x10000);
 }
 
-static MACHINE_RESET(atvtrack)
+void atvtrack_state::machine_reset()
 {
 	address_space *as;
 
@@ -342,12 +345,12 @@ static MACHINE_RESET(atvtrack)
 	// The routine initializes the cpu, copies the boot program from the flash memories into the cpu sdram
 	// and finally executes it.
 	// Here there is the setup of the cpu, the boot program is copied in machine_start
-	as = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	as = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	// set cpu PC register to 0x0c7f0000
-	machine.device("maincpu")->state().set_pc(0x0c7f0000);
+	machine().device("maincpu")->state().set_pc(0x0c7f0000);
 	// set BCR2 to 1
 	sh4_internal_w(as, 0x3001, 1, 0xffffffff);
-	device_execute_interface *exec = dynamic_cast<device_execute_interface *>(machine.device("subcpu"));
+	device_execute_interface *exec = dynamic_cast<device_execute_interface *>(machine().device("subcpu"));
 	exec->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
@@ -404,9 +407,6 @@ static MACHINE_CONFIG_START( atvtrack, atvtrack_state )
 
 	MCFG_PALETTE_LENGTH(0x1000)
 
-	MCFG_MACHINE_RESET(atvtrack)
-	MCFG_MACHINE_START(atvtrack)
-	MCFG_VIDEO_START(atvtrack)
 MACHINE_CONFIG_END
 
 ROM_START( atvtrack )

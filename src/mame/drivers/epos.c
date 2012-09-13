@@ -365,33 +365,31 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_START( epos )
+MACHINE_START_MEMBER(epos_state,epos)
 {
-	epos_state *state = machine.driver_data<epos_state>();
 
-	state->save_item(NAME(state->m_palette));
-	state->save_item(NAME(state->m_counter));
+	save_item(NAME(m_palette));
+	save_item(NAME(m_counter));
 }
 
-static MACHINE_RESET( epos )
+void epos_state::machine_reset()
 {
-	epos_state *state = machine.driver_data<epos_state>();
 
-	state->m_palette = 0;
-	state->m_counter = 0;
+	m_palette = 0;
+	m_counter = 0;
 }
 
 
-static MACHINE_START( dealer )
+MACHINE_START_MEMBER(epos_state,dealer)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	machine.root_device().membank("bank1")->configure_entries(0, 4, &ROM[0x0000], 0x10000);
-	machine.root_device().membank("bank2")->configure_entries(0, 2, &ROM[0x6000], 0x1000);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	machine().root_device().membank("bank1")->configure_entries(0, 4, &ROM[0x0000], 0x10000);
+	machine().root_device().membank("bank2")->configure_entries(0, 2, &ROM[0x6000], 0x1000);
 
-	machine.root_device().membank("bank1")->set_entry(0);
-	machine.root_device().membank("bank2")->set_entry(0);
+	machine().root_device().membank("bank1")->set_entry(0);
+	machine().root_device().membank("bank2")->set_entry(0);
 
-	MACHINE_START_CALL(epos);
+	MACHINE_START_CALL_MEMBER(epos);
 }
 
 static MACHINE_CONFIG_START( epos, epos_state )
@@ -402,8 +400,6 @@ static MACHINE_CONFIG_START( epos, epos_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_RESET(epos)
-	MCFG_MACHINE_RESET(epos)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -430,8 +426,7 @@ static MACHINE_CONFIG_START( dealer, epos_state )
 
 	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
 
-	MCFG_MACHINE_START(dealer)
-	MCFG_MACHINE_RESET(epos)
+	MCFG_MACHINE_START_OVERRIDE(epos_state,dealer)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

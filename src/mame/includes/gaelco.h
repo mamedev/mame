@@ -36,6 +36,9 @@ public:
 	DECLARE_WRITE16_MEMBER(gaelco_vram_w);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco_screen0);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco_screen1);
+	virtual void machine_start();
+	DECLARE_VIDEO_START(bigkarnk);
+	DECLARE_VIDEO_START(maniacsq);
 };
 
 
@@ -43,8 +46,8 @@ public:
 /*----------- defined in video/gaelco.c -----------*/
 
 
-VIDEO_START( bigkarnk );
-VIDEO_START( maniacsq );
+
+
 
 SCREEN_UPDATE_IND16( bigkarnk );
 SCREEN_UPDATE_IND16( maniacsq );

@@ -44,6 +44,8 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	DECLARE_DRIVER_INIT(sys2900);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -72,11 +74,10 @@ static TIMER_CALLBACK( sys2900_boot )
 	state->membank("boot")->set_entry(0);
 }
 
-static MACHINE_RESET(sys2900)
+void sys2900_state::machine_reset()
 {
-	sys2900_state *state = machine.driver_data<sys2900_state>();
-	state->membank("boot")->set_entry(1);
-	machine.scheduler().timer_set(attotime::from_usec(5), FUNC(sys2900_boot));
+	membank("boot")->set_entry(1);
+	machine().scheduler().timer_set(attotime::from_usec(5), FUNC(sys2900_boot));
 }
 
 DRIVER_INIT_MEMBER(sys2900_state,sys2900)
@@ -85,7 +86,7 @@ DRIVER_INIT_MEMBER(sys2900_state,sys2900)
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf000);
 }
 
-static VIDEO_START( sys2900 )
+void sys2900_state::video_start()
 {
 }
 
@@ -100,7 +101,6 @@ static MACHINE_CONFIG_START( sys2900, sys2900_state )
 	MCFG_CPU_PROGRAM_MAP(sys2900_mem)
 	MCFG_CPU_IO_MAP(sys2900_io)
 
-	MCFG_MACHINE_RESET(sys2900)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -113,7 +113,6 @@ static MACHINE_CONFIG_START( sys2900, sys2900_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START(sys2900)
 MACHINE_CONFIG_END
 
 /* ROM definition */

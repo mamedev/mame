@@ -23,12 +23,14 @@ public:
 	DECLARE_WRITE8_MEMBER(shaolins_scroll_w);
 	DECLARE_WRITE8_MEMBER(shaolins_nmi_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/sauro.c -----------*/
 
 
-PALETTE_INIT( shaolins );
-VIDEO_START( shaolins );
+
+
 SCREEN_UPDATE_IND16( shaolins );

@@ -36,9 +36,9 @@ Changes by Martin M. (pfloyd@gmx.net) 14.10.2001:
 
 ***************************************************************************/
 
-PALETTE_INIT( megazone )
+void megazone_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -51,7 +51,7 @@ PALETTE_INIT( megazone )
 			2, &resistances_b[0],  bweights, 1000, 0);
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x20);
+	machine().colortable = colortable_alloc(machine(), 0x20);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -76,7 +76,7 @@ PALETTE_INIT( megazone )
 		bit1 = BIT(color_prom[i], 7);
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -86,14 +86,14 @@ PALETTE_INIT( megazone )
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	/* characters */
 	for (i = 0x100; i < 0x200; i++)
 	{
 		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0x10;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 
@@ -102,12 +102,11 @@ WRITE8_MEMBER(megazone_state::megazone_flipscreen_w)
 	m_flipscreen = data & 1;
 }
 
-VIDEO_START( megazone )
+void megazone_state::video_start()
 {
-	megazone_state *state = machine.driver_data<megazone_state>();
-	state->m_tmpbitmap = auto_bitmap_ind16_alloc(machine, 256, 256);
+	m_tmpbitmap = auto_bitmap_ind16_alloc(machine(), 256, 256);
 
-	state->save_item(NAME(*state->m_tmpbitmap));
+	save_item(NAME(*m_tmpbitmap));
 }
 
 

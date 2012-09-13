@@ -169,20 +169,18 @@ static GFXDECODE_START( kopunch )
 GFXDECODE_END
 
 
-static MACHINE_START( kopunch )
+void kopunch_state::machine_start()
 {
-	kopunch_state *state = machine.driver_data<kopunch_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
 
-	state->save_item(NAME(state->m_gfxbank));
+	save_item(NAME(m_gfxbank));
 }
 
-static MACHINE_RESET( kopunch )
+void kopunch_state::machine_reset()
 {
-	kopunch_state *state = machine.driver_data<kopunch_state>();
 
-	state->m_gfxbank = 0;
+	m_gfxbank = 0;
 }
 
 static MACHINE_CONFIG_START( kopunch, kopunch_state )
@@ -193,8 +191,6 @@ static MACHINE_CONFIG_START( kopunch, kopunch_state )
 	MCFG_CPU_IO_MAP(kopunch_io_map)
 	MCFG_CPU_VBLANK_INT("screen",kopunch_interrupt)
 
-	MCFG_MACHINE_START(kopunch)
-	MCFG_MACHINE_RESET(kopunch)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -207,8 +203,6 @@ static MACHINE_CONFIG_START( kopunch, kopunch_state )
 	MCFG_GFXDECODE(kopunch)
 	MCFG_PALETTE_LENGTH(8)
 
-	MCFG_PALETTE_INIT(kopunch)
-	MCFG_VIDEO_START(kopunch)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

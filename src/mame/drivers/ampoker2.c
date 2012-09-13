@@ -1187,8 +1187,6 @@ static MACHINE_CONFIG_START( ampoker2, ampoker2_state )
 	MCFG_GFXDECODE(ampoker2)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_PALETTE_INIT(ampoker2)
-	MCFG_VIDEO_START(ampoker2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1203,7 +1201,7 @@ static MACHINE_CONFIG_DERIVED( sigma2k, ampoker2 )
 
 	/* video hardware */
 	MCFG_GFXDECODE(sigma2k)
-	MCFG_VIDEO_START(sigma2k)
+	MCFG_VIDEO_START_OVERRIDE(ampoker2_state,sigma2k)
 MACHINE_CONFIG_END
 
 

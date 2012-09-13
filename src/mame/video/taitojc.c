@@ -298,36 +298,35 @@ static void taitojc_exit(running_machine &machine)
 {
 }
 
-VIDEO_START( taitojc )
+void taitojc_state::video_start()
 {
-	taitojc_state *state = machine.driver_data<taitojc_state>();
 
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitojc_exit), &machine));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitojc_exit), &machine()));
 
 	/* find first empty slot to decode gfx */
-	for (state->m_gfx_index = 0; state->m_gfx_index < MAX_GFX_ELEMENTS; state->m_gfx_index++)
-		if (machine.gfx[state->m_gfx_index] == 0)
+	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
+		if (machine().gfx[m_gfx_index] == 0)
 			break;
 
-	assert(state->m_gfx_index != MAX_GFX_ELEMENTS);
+	assert(m_gfx_index != MAX_GFX_ELEMENTS);
 
-	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taitojc_state::taitojc_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(taitojc_state::taitojc_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
-	state->m_tilemap->set_transparent_pen(0);
+	m_tilemap->set_transparent_pen(0);
 
-	state->m_char_ram = auto_alloc_array_clear(machine, UINT32, 0x4000/4);
-	state->m_tile_ram = auto_alloc_array_clear(machine, UINT32, 0x4000/4);
+	m_char_ram = auto_alloc_array_clear(machine(), UINT32, 0x4000/4);
+	m_tile_ram = auto_alloc_array_clear(machine(), UINT32, 0x4000/4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[state->m_gfx_index] = auto_alloc(machine, gfx_element(machine, taitojc_char_layout, (UINT8 *)state->m_char_ram, machine.total_colors() / 16, 0));
+	machine().gfx[m_gfx_index] = auto_alloc(machine(), gfx_element(machine(), taitojc_char_layout, (UINT8 *)m_char_ram, machine().total_colors() / 16, 0));
 
-	state->m_texture = auto_alloc_array(machine, UINT8, 0x400000);
+	m_texture = auto_alloc_array(machine(), UINT8, 0x400000);
 
-	machine.primary_screen->register_screen_bitmap(state->m_framebuffer);
-	machine.primary_screen->register_screen_bitmap(state->m_zbuffer);
+	machine().primary_screen->register_screen_bitmap(m_framebuffer);
+	machine().primary_screen->register_screen_bitmap(m_zbuffer);
 
 	/* create renderer */
-	state->m_renderer = auto_alloc(machine, taitojc_renderer(machine, &state->m_framebuffer, &state->m_zbuffer, state->m_texture));
+	m_renderer = auto_alloc(machine(), taitojc_renderer(machine(), &m_framebuffer, &m_zbuffer, m_texture));
 }
 
 SCREEN_UPDATE_IND16( taitojc )

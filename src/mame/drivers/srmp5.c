@@ -579,7 +579,7 @@ static MACHINE_CONFIG_START( srmp5, srmp5_state )
 #ifdef DEBUG_CHAR
 	MCFG_GFXDECODE( srmp5 )
 #endif
-	MCFG_VIDEO_START(st0016)
+	MCFG_VIDEO_START_OVERRIDE(st0016_state,st0016)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

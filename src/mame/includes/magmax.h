@@ -29,11 +29,15 @@ public:
 	DECLARE_WRITE16_MEMBER(magmax_vreg_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portB_0_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portA_0_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/magmax.c -----------*/
 
-PALETTE_INIT( magmax );
+
 SCREEN_UPDATE_IND16( magmax );
-VIDEO_START( magmax );
+

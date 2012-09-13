@@ -54,6 +54,9 @@ public:
 	DECLARE_DRIVER_INIT(nitrobal);
 	DECLARE_DRIVER_INIT(schmeisr);
 	DECLARE_DRIVER_INIT(rohga);
+	DECLARE_VIDEO_START(rohga);
+	DECLARE_VIDEO_START(wizdfire);
+	DECLARE_VIDEO_START(schmeisr);
 };
 
 
@@ -61,9 +64,9 @@ public:
 /*----------- defined in video/rohga.c -----------*/
 
 
-VIDEO_START( rohga );
-VIDEO_START( schmeisr );
-VIDEO_START( wizdfire );
+
+
+
 
 
 SCREEN_UPDATE_IND16( rohga );

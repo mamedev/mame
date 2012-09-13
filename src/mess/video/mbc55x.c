@@ -173,24 +173,22 @@ const mc6845_interface mb55x_mc6845_intf =
 	NULL
 };
 
-VIDEO_START( mbc55x )
+void mbc55x_state::video_start()
 {
-	mbc55x_state *mstate = machine.driver_data<mbc55x_state>();
-	mstate->m_debug_video=0;
+	m_debug_video=0;
 
 	logerror("VIDEO_START\n");
 
-	if (machine.debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		debug_console_register_command(machine, "mbc55x_vid_debug", CMDFLAG_NONE, 0, 0, 1, video_debug);
+		debug_console_register_command(machine(), "mbc55x_vid_debug", CMDFLAG_NONE, 0, 0, 1, video_debug);
 	}
 }
 
-VIDEO_RESET( mbc55x )
+void mbc55x_state::video_reset()
 {
-	mbc55x_state *mstate = machine.driver_data<mbc55x_state>();
 	// When we reset clear the video registers and video memory.
-	memset(&mstate->m_video_mem,0,sizeof(mstate->m_video_mem));
+	memset(&m_video_mem,0,sizeof(m_video_mem));
 
 	logerror("Video reset\n");
 }

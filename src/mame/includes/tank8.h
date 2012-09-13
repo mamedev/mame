@@ -56,6 +56,9 @@ public:
 	DECLARE_WRITE8_MEMBER(tank8_motor_w);
 	DECLARE_DRIVER_INIT(decode);
 	TILE_GET_INFO_MEMBER(tank8_get_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -71,9 +74,9 @@ void tank8_set_collision(running_machine &machine, int index);
 
 /*----------- defined in video/tank8.c -----------*/
 
-PALETTE_INIT( tank8 );
+
 SCREEN_VBLANK( tank8 );
-VIDEO_START( tank8 );
+
 SCREEN_UPDATE_IND16( tank8 );
 
 

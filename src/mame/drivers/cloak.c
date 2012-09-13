@@ -354,7 +354,6 @@ static MACHINE_CONFIG_START( cloak, cloak_state )
 	MCFG_GFXDECODE(cloak)
 	MCFG_PALETTE_LENGTH(64)
 
-	MCFG_VIDEO_START(cloak)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

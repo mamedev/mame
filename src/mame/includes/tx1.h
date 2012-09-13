@@ -161,14 +161,21 @@ public:
 	DECLARE_WRITE8_MEMBER(bb_coin_cnt_w);
 	DECLARE_READ8_MEMBER(tx1_ppi_porta_r);
 	DECLARE_READ8_MEMBER(tx1_ppi_portb_r);
+	DECLARE_MACHINE_RESET(tx1);
+	DECLARE_VIDEO_START(tx1);
+	DECLARE_PALETTE_INIT(tx1);
+	DECLARE_MACHINE_RESET(buggyboy);
+	DECLARE_VIDEO_START(buggyboy);
+	DECLARE_PALETTE_INIT(buggyboy);
+	DECLARE_VIDEO_START(buggybjr);
 };
 
 
 /*----------- defined in machine/tx1.c -----------*/
-MACHINE_RESET( tx1 );
 
 
-MACHINE_RESET( buggyboy );
+
+
 
 /*----------- defined in audio/tx1.c -----------*/
 READ8_DEVICE_HANDLER( tx1_pit8253_r );
@@ -228,19 +235,19 @@ extern const device_type BUGGYBOY;
 
 /*----------- defined in video/tx1.c -----------*/
 
-PALETTE_INIT( tx1 );
-VIDEO_START( tx1 );
+
+
 SCREEN_UPDATE_IND16( tx1_left );
 SCREEN_UPDATE_IND16( tx1_middle );
 SCREEN_UPDATE_IND16( tx1_right );
 SCREEN_VBLANK( tx1 );
 
-PALETTE_INIT( buggyboy );
-VIDEO_START( buggyboy );
+
+
 SCREEN_UPDATE_IND16( buggyboy_left );
 SCREEN_UPDATE_IND16( buggyboy_middle );
 SCREEN_UPDATE_IND16( buggyboy_right );
 SCREEN_VBLANK( buggyboy );
 
-VIDEO_START( buggybjr );
+
 SCREEN_UPDATE_IND16( buggybjr );

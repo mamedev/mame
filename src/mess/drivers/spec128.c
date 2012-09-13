@@ -252,26 +252,25 @@ static ADDRESS_MAP_START (spectrum_128_mem, AS_PROGRAM, 8, spectrum_state )
 	AM_RANGE( 0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static MACHINE_RESET( spectrum_128 )
+MACHINE_RESET_MEMBER(spectrum_state,spectrum_128)
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
-	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *messram = machine().device<ram_device>(RAM_TAG)->pointer();
 
 	memset(messram,0,128*1024);
 	/* 0x0000-0x3fff always holds ROM */
 
 	/* Bank 5 is always in 0x4000 - 0x7fff */
-	state->membank("bank2")->set_base(messram + (5<<14));
+	membank("bank2")->set_base(messram + (5<<14));
 
 	/* Bank 2 is always in 0x8000 - 0xbfff */
-	state->membank("bank3")->set_base(messram + (2<<14));
+	membank("bank3")->set_base(messram + (2<<14));
 
-	MACHINE_RESET_CALL(spectrum);
+	MACHINE_RESET_CALL_MEMBER(spectrum);
 
 	/* set initial ram config */
-	state->m_port_7ffd_data = 0;
-	state->m_port_1ffd_data = -1;
-	spectrum_128_update_memory(machine);
+	m_port_7ffd_data = 0;
+	m_port_1ffd_data = -1;
+	spectrum_128_update_memory(machine());
 }
 
 /* F4 Character Displayer */
@@ -299,14 +298,14 @@ MACHINE_CONFIG_DERIVED( spectrum_128, spectrum )
 	MCFG_CPU_PROGRAM_MAP(spectrum_128_mem)
 	MCFG_CPU_IO_MAP(spectrum_128_io)
 
-	MCFG_MACHINE_RESET( spectrum_128 )
+	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_128 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT( spectrum )
+	MCFG_PALETTE_INIT_OVERRIDE(spectrum_state, spectrum )
 	MCFG_SCREEN_REFRESH_RATE(50.021)
-	MCFG_VIDEO_START( spectrum_128 )
+	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum_128 )
 	MCFG_GFXDECODE(spec128)
 
 	/* sound hardware */

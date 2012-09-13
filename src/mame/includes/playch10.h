@@ -108,14 +108,20 @@ public:
 	DECLARE_DRIVER_INIT(pciboard);
 	DECLARE_DRIVER_INIT(pcaboard);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_MACHINE_START(playch10_hboard);
+	DECLARE_VIDEO_START(playch10_hboard);
 };
 
 
 /*----------- defined in machine/playch10.c -----------*/
 
-MACHINE_RESET( pc10 );
-MACHINE_START( pc10 );
-MACHINE_START( playch10_hboard );
+
+
+
 
 
 
@@ -124,8 +130,8 @@ MACHINE_START( playch10_hboard );
 extern const ppu2c0x_interface playch10_ppu_interface;
 extern const ppu2c0x_interface playch10_ppu_interface_hboard;
 
-PALETTE_INIT( playch10 );
-VIDEO_START( playch10 );
-VIDEO_START( playch10_hboard );
+
+
+
 SCREEN_UPDATE_IND16( playch10_top );
 SCREEN_UPDATE_IND16( playch10_bottom );

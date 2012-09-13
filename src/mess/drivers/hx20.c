@@ -16,6 +16,8 @@ public:
 	hx20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -29,11 +31,11 @@ static INPUT_PORTS_START( ehx20 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(ehx20)
+void hx20_state::machine_reset()
 {
 }
 
-static VIDEO_START( ehx20 )
+void hx20_state::video_start()
 {
 }
 
@@ -93,7 +95,6 @@ static MACHINE_CONFIG_START( ehx20, hx20_state )
 	MCFG_CPU_ADD("maincpu",HD63701, 614000) // HD6301
 	MCFG_CPU_PROGRAM_MAP(ehx20_mem)
 
-	MCFG_MACHINE_RESET(ehx20)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -107,7 +108,6 @@ static MACHINE_CONFIG_START( ehx20, hx20_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START(ehx20)
 MACHINE_CONFIG_END
 
 /* ROM definition */

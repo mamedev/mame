@@ -488,12 +488,11 @@ static DISCRETE_SOUND_START( gyruss_sound )
 DISCRETE_SOUND_END
 
 
-static MACHINE_START( gyruss )
+void gyruss_state::machine_start()
 {
-	gyruss_state *state = machine.driver_data<gyruss_state>();
 
-	state->save_item(NAME(state->m_master_nmi_mask));
-	state->save_item(NAME(state->m_slave_irq_mask));
+	save_item(NAME(m_master_nmi_mask));
+	save_item(NAME(m_slave_irq_mask));
 }
 
 static INTERRUPT_GEN( master_vblank_irq )
@@ -533,7 +532,6 @@ static MACHINE_CONFIG_START( gyruss, gyruss_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(gyruss)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -543,8 +541,6 @@ static MACHINE_CONFIG_START( gyruss, gyruss_state )
 	MCFG_GFXDECODE(gyruss)
 	MCFG_PALETTE_LENGTH(16*4+16*16)
 
-	MCFG_PALETTE_INIT(gyruss)
-	MCFG_VIDEO_START(gyruss)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -68,91 +68,87 @@ TILE_GET_INFO_MEMBER(gaiden_state::get_tx_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( gaiden )
+VIDEO_START_MEMBER(gaiden_state,gaiden)
 {
-	gaiden_state *state = machine.driver_data<gaiden_state>();
 
 	/* set up tile layers */
-	machine.primary_screen->register_screen_bitmap(state->m_tile_bitmap_bg);
-	machine.primary_screen->register_screen_bitmap(state->m_tile_bitmap_fg);
+	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_bg);
+	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_fg);
 
-	state->m_background = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	state->m_foreground = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_fg_tile_info_raiga),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	state->m_text_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_background = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_foreground = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_fg_tile_info_raiga),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_text_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_background->set_transparent_pen(0);
-	state->m_foreground->set_transparent_pen(0);
-	state->m_text_layer->set_transparent_pen(0);
+	m_background->set_transparent_pen(0);
+	m_foreground->set_transparent_pen(0);
+	m_text_layer->set_transparent_pen(0);
 
-	state->m_background->set_scrolldy(0, 33);
-	state->m_foreground->set_scrolldy(0, 33);
-	state->m_text_layer->set_scrolldy(0, 31);
+	m_background->set_scrolldy(0, 33);
+	m_foreground->set_scrolldy(0, 33);
+	m_text_layer->set_scrolldy(0, 31);
 
-	state->m_background->set_scrolldx(0, -1);
-	state->m_foreground->set_scrolldx(0, -1);
-	state->m_text_layer->set_scrolldx(0, -1);
+	m_background->set_scrolldx(0, -1);
+	m_foreground->set_scrolldx(0, -1);
+	m_text_layer->set_scrolldx(0, -1);
 
 	/* set up sprites */
-	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_sprite_bitmap);
 }
 
-VIDEO_START( mastninj )
+VIDEO_START_MEMBER(gaiden_state,mastninj)
 {
 
-	gaiden_state *state = machine.driver_data<gaiden_state>();
 
 	/* set up tile layers */
-	machine.primary_screen->register_screen_bitmap(state->m_tile_bitmap_bg);
-	machine.primary_screen->register_screen_bitmap(state->m_tile_bitmap_fg);
+	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_bg);
+	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_fg);
 
-	state->m_background = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	state->m_foreground = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_fg_tile_info_raiga),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	state->m_text_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_background = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_foreground = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_fg_tile_info_raiga),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_text_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-//  state->m_background->set_transparent_pen(15);
-	state->m_foreground->set_transparent_pen(15);
-	state->m_text_layer->set_transparent_pen(15);
+//  m_background->set_transparent_pen(15);
+	m_foreground->set_transparent_pen(15);
+	m_text_layer->set_transparent_pen(15);
 
 	/* set up sprites */
-	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_sprite_bitmap);
 
-	state->m_background->set_scrolldx(-248, 248);
-	state->m_foreground->set_scrolldx(-252, 252);
+	m_background->set_scrolldx(-248, 248);
+	m_foreground->set_scrolldx(-252, 252);
 }
 
-VIDEO_START( raiga )
+VIDEO_START_MEMBER(gaiden_state,raiga)
 {
-	gaiden_state *state = machine.driver_data<gaiden_state>();
 
 	/* set up tile layers */
-	machine.primary_screen->register_screen_bitmap(state->m_tile_bitmap_bg);
-	machine.primary_screen->register_screen_bitmap(state->m_tile_bitmap_fg);
+	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_bg);
+	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_fg);
 
-	state->m_background = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	state->m_foreground = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_fg_tile_info_raiga),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	state->m_text_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_background = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_foreground = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_fg_tile_info_raiga),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_text_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_background->set_transparent_pen(0);
-	state->m_foreground->set_transparent_pen(0);
-	state->m_text_layer->set_transparent_pen(0);
+	m_background->set_transparent_pen(0);
+	m_foreground->set_transparent_pen(0);
+	m_text_layer->set_transparent_pen(0);
 
 	/* set up sprites */
-	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_sprite_bitmap);
 }
 
-VIDEO_START( drgnbowl )
+VIDEO_START_MEMBER(gaiden_state,drgnbowl)
 {
-	gaiden_state *state = machine.driver_data<gaiden_state>();
 	/* set up tile layers */
-	state->m_background = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	state->m_foreground = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	state->m_text_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_background = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_foreground = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_text_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gaiden_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_foreground->set_transparent_pen(15);
-	state->m_text_layer->set_transparent_pen(15);
+	m_foreground->set_transparent_pen(15);
+	m_text_layer->set_transparent_pen(15);
 
-	state->m_background->set_scrolldx(-248, 248);
-	state->m_foreground->set_scrolldx(-252, 252);
+	m_background->set_scrolldx(-248, 248);
+	m_foreground->set_scrolldx(-252, 252);
 }
 
 

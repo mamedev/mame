@@ -60,6 +60,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(alpha_xmtd_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
 	DECLARE_DRIVER_INIT(mhavocrv);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -68,7 +70,7 @@ public:
 TIMER_DEVICE_CALLBACK( mhavoc_cpu_irq_clock );
 
 
-MACHINE_START( mhavoc );
-MACHINE_RESET( mhavoc );
+
+
 
 

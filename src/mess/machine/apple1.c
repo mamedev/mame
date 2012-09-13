@@ -166,10 +166,10 @@ DRIVER_INIT_MEMBER(apple1_state,apple1)
 **  MACHINE_RESET:  actions to perform on each cold boot.
 *****************************************************************************/
 
-MACHINE_RESET( apple1 )
+void apple1_state::machine_reset()
 {
 	/* Reset the display hardware. */
-	apple1_vh_dsp_clr(machine);
+	apple1_vh_dsp_clr(machine());
 }
 
 

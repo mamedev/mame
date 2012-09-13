@@ -218,25 +218,23 @@ GFXDECODE_END
 
 
 
-static MACHINE_START( othldrby )
+void othldrby_state::machine_start()
 {
-	othldrby_state *state = machine.driver_data<othldrby_state>();
 
-	state->save_item(NAME(state->m_toggle));
-	state->save_item(NAME(state->m_vram_addr));
-	state->save_item(NAME(state->m_vreg_addr));
-	state->save_item(NAME(state->m_vreg));
+	save_item(NAME(m_toggle));
+	save_item(NAME(m_vram_addr));
+	save_item(NAME(m_vreg_addr));
+	save_item(NAME(m_vreg));
 }
 
-static MACHINE_RESET( othldrby )
+void othldrby_state::machine_reset()
 {
-	othldrby_state *state = machine.driver_data<othldrby_state>();
 
-	state->m_toggle = 0xff;
-	state->m_vram_addr = 0;
-	state->m_vreg_addr = 0;
+	m_toggle = 0xff;
+	m_vram_addr = 0;
+	m_vreg_addr = 0;
 
-	memset(state->m_vreg, 0, sizeof(state->m_vreg));
+	memset(m_vreg, 0, sizeof(m_vreg));
 }
 
 static MACHINE_CONFIG_START( othldrby, othldrby_state )
@@ -246,8 +244,6 @@ static MACHINE_CONFIG_START( othldrby, othldrby_state )
 	MCFG_CPU_PROGRAM_MAP(othldrby_map)
 	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MCFG_MACHINE_START(othldrby)
-	MCFG_MACHINE_RESET(othldrby)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -261,7 +257,6 @@ static MACHINE_CONFIG_START( othldrby, othldrby_state )
 	MCFG_GFXDECODE(othldrby)
 	MCFG_PALETTE_LENGTH(0x800)
 
-	MCFG_VIDEO_START(othldrby)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

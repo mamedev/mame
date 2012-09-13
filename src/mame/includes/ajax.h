@@ -33,18 +33,21 @@ public:
 	DECLARE_WRITE8_MEMBER(ajax_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(ajax_lamps_w);
 	DECLARE_WRITE8_MEMBER(k007232_extvol_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in machine/ajax.c -----------*/
 
-MACHINE_START( ajax );
-MACHINE_RESET( ajax );
+
+
 INTERRUPT_GEN( ajax_interrupt );
 
 /*----------- defined in video/ajax.c -----------*/
 
-VIDEO_START( ajax );
+
 SCREEN_UPDATE_IND16( ajax );
 
 extern void ajax_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);

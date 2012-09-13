@@ -42,12 +42,16 @@ public:
 	DECLARE_WRITE8_MEMBER(mnchmobl_flipscreen_w);
 	DECLARE_READ8_MEMBER(munchmo_ay1reset_r);
 	DECLARE_READ8_MEMBER(munchmo_ay2reset_r);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/munchmo.c -----------*/
 
 
-PALETTE_INIT( mnchmobl );
-VIDEO_START( mnchmobl );
+
+
 SCREEN_UPDATE_IND16( mnchmobl );

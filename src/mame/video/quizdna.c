@@ -44,21 +44,20 @@ TILE_GET_INFO_MEMBER(quizdna_state::get_fg_tile_info)
 }
 
 
-VIDEO_START( quizdna )
+void quizdna_state::video_start()
 {
-	quizdna_state *state = machine.driver_data<quizdna_state>();
-	state->m_flipscreen = -1;
-	state->m_video_enable = 0;
-	state->m_bg_xscroll[0] = 0;
-	state->m_bg_xscroll[1] = 0;
+	m_flipscreen = -1;
+	m_video_enable = 0;
+	m_bg_xscroll[0] = 0;
+	m_bg_xscroll[1] = 0;
 
-	state->m_bg_ram = auto_alloc_array(machine, UINT8, 0x2000);
-	state->m_fg_ram = auto_alloc_array(machine, UINT8, 0x1000);
+	m_bg_ram = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_fg_ram = auto_alloc_array(machine(), UINT8, 0x1000);
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(quizdna_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32 );
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(quizdna_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,16,8,32,32 );
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(quizdna_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(quizdna_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,8,32,32 );
 
-	state->m_fg_tilemap->set_transparent_pen(0 );
+	m_fg_tilemap->set_transparent_pen(0 );
 }
 
 WRITE8_MEMBER(quizdna_state::quizdna_bg_ram_w)

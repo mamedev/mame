@@ -105,6 +105,21 @@ public:
 	TILE_GET_INFO_MEMBER(mirderby_get_info1_0);
 	TILE_GET_INFO_MEMBER(mirderby_get_info0_1);
 	TILE_GET_INFO_MEMBER(mirderby_get_info1_1);
+	DECLARE_MACHINE_START(homedata);
+	DECLARE_MACHINE_RESET(homedata);
+	DECLARE_VIDEO_START(mrokumei);
+	DECLARE_PALETTE_INIT(mrokumei);
+	DECLARE_MACHINE_START(reikaids);
+	DECLARE_MACHINE_RESET(reikaids);
+	DECLARE_VIDEO_START(reikaids);
+	DECLARE_PALETTE_INIT(reikaids);
+	DECLARE_MACHINE_START(pteacher);
+	DECLARE_MACHINE_RESET(pteacher);
+	DECLARE_VIDEO_START(pteacher);
+	DECLARE_PALETTE_INIT(pteacher);
+	DECLARE_VIDEO_START(mirderby);
+	DECLARE_PALETTE_INIT(mirderby);
+	DECLARE_VIDEO_START(lemnangl);
 };
 
 
@@ -112,16 +127,16 @@ public:
 /*----------- defined in video/homedata.c -----------*/
 
 
-PALETTE_INIT( mrokumei );
-PALETTE_INIT( reikaids );
-PALETTE_INIT( pteacher );
-PALETTE_INIT( mirderby );
 
-VIDEO_START( mrokumei );
-VIDEO_START( reikaids );
-VIDEO_START( pteacher );
-VIDEO_START( lemnangl );
-VIDEO_START( mirderby );
+
+
+
+
+
+
+
+
+
 SCREEN_UPDATE_IND16( mrokumei );
 SCREEN_UPDATE_IND16( reikaids );
 SCREEN_UPDATE_IND16( pteacher );

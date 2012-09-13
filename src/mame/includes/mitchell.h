@@ -97,6 +97,9 @@ public:
 	DECLARE_DRIVER_INIT(blockbl);
 	DECLARE_DRIVER_INIT(dokaben);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	DECLARE_MACHINE_START(mitchell);
+	DECLARE_MACHINE_RESET(mitchell);
+	DECLARE_VIDEO_START(pang);
 };
 
 
@@ -105,5 +108,5 @@ public:
 
 
 
-VIDEO_START( pang );
+
 SCREEN_UPDATE_IND16( pang );

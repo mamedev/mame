@@ -119,6 +119,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_vmetal_texttilemap_tile_info);
 	TILE_GET_INFO_MEMBER(get_vmetal_mid1tilemap_tile_info);
 	TILE_GET_INFO_MEMBER(get_vmetal_mid2tilemap_tile_info);
+	DECLARE_VIDEO_START(varia);
 };
 
 
@@ -441,19 +442,18 @@ static void expand_gfx1(running_machine &machine)
 	}
 }
 
-static VIDEO_START(varia)
+VIDEO_START_MEMBER(vmetal_state,varia)
 {
-	vmetal_state *state = machine.driver_data<vmetal_state>();
 
-	state->m_texttilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(vmetal_state::get_vmetal_texttilemap_tile_info),state), TILEMAP_SCAN_ROWS,  8,  8, 256, 256);
-	state->m_mid1tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(vmetal_state::get_vmetal_mid1tilemap_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 256, 256);
-	state->m_mid2tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(vmetal_state::get_vmetal_mid2tilemap_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 256, 256);
+	m_texttilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(vmetal_state::get_vmetal_texttilemap_tile_info),this), TILEMAP_SCAN_ROWS,  8,  8, 256, 256);
+	m_mid1tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(vmetal_state::get_vmetal_mid1tilemap_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 256, 256);
+	m_mid2tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(vmetal_state::get_vmetal_mid2tilemap_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 256, 256);
 
-	state->m_texttilemap->set_transparent_pen(15);
-	state->m_mid1tilemap->set_transparent_pen(15);
-	state->m_mid2tilemap->set_transparent_pen(15);
+	m_texttilemap->set_transparent_pen(15);
+	m_mid1tilemap->set_transparent_pen(15);
+	m_mid2tilemap->set_transparent_pen(15);
 
-	expand_gfx1(machine);
+	expand_gfx1(machine());
 }
 
 static SCREEN_UPDATE_IND16(varia)
@@ -497,7 +497,7 @@ static MACHINE_CONFIG_START( varia, vmetal_state )
 	MCFG_GFXDECODE(vmetal)
 	MCFG_PALETTE_LENGTH(0x4000)
 
-	MCFG_VIDEO_START(varia)
+	MCFG_VIDEO_START_OVERRIDE(vmetal_state,varia)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

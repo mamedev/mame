@@ -68,18 +68,26 @@ public:
 	DECLARE_WRITE8_MEMBER(ay8910_portB_1_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portA_2_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portB_2_w);
+	DECLARE_MACHINE_START(tubep);
+	DECLARE_MACHINE_RESET(tubep);
+	DECLARE_VIDEO_START(tubep);
+	DECLARE_VIDEO_RESET(tubep);
+	DECLARE_PALETTE_INIT(tubep);
+	DECLARE_MACHINE_START(rjammer);
+	DECLARE_MACHINE_RESET(rjammer);
+	DECLARE_PALETTE_INIT(rjammer);
 };
 
 
 /*----------- defined in video/tubep.c -----------*/
 
 void tubep_vblank_end(running_machine &machine);
-PALETTE_INIT( tubep );
+
 SCREEN_UPDATE_IND16( tubep );
-PALETTE_INIT( rjammer );
+
 SCREEN_UPDATE_IND16( rjammer );
-VIDEO_START( tubep );
-VIDEO_RESET( tubep );
+
+
 
 
 

@@ -53,13 +53,12 @@ void ultraman_zoom_callback_2(running_machine &machine, int *code, int *color, i
 
 ***************************************************************************/
 
-VIDEO_START( ultraman )
+void ultraman_state::video_start()
 {
-	ultraman_state *state = machine.driver_data<ultraman_state>();
-	state->m_sprite_colorbase = 192;
-	state->m_zoom_colorbase[0] = 0;
-	state->m_zoom_colorbase[1] = 64;
-	state->m_zoom_colorbase[2] = 128;
+	m_sprite_colorbase = 192;
+	m_zoom_colorbase[0] = 0;
+	m_zoom_colorbase[1] = 64;
+	m_zoom_colorbase[2] = 128;
 }
 
 

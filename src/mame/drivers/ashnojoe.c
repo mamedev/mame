@@ -327,24 +327,22 @@ static const msm5205_interface msm5205_config =
 };
 
 
-static MACHINE_START( ashnojoe )
+void ashnojoe_state::machine_start()
 {
-	ashnojoe_state *state = machine.driver_data<ashnojoe_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_adpcm_byte));
-	state->save_item(NAME(state->m_soundlatch_status));
-	state->save_item(NAME(state->m_msm5205_vclk_toggle));
+	save_item(NAME(m_adpcm_byte));
+	save_item(NAME(m_soundlatch_status));
+	save_item(NAME(m_msm5205_vclk_toggle));
 }
 
-static MACHINE_RESET( ashnojoe )
+void ashnojoe_state::machine_reset()
 {
-	ashnojoe_state *state = machine.driver_data<ashnojoe_state>();
 
-	state->m_adpcm_byte = 0;
-	state->m_soundlatch_status = 0;
-	state->m_msm5205_vclk_toggle = 0;
+	m_adpcm_byte = 0;
+	m_soundlatch_status = 0;
+	m_msm5205_vclk_toggle = 0;
 }
 
 
@@ -359,8 +357,6 @@ static MACHINE_CONFIG_START( ashnojoe, ashnojoe_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 
-	MCFG_MACHINE_START(ashnojoe)
-	MCFG_MACHINE_RESET(ashnojoe)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -373,7 +369,6 @@ static MACHINE_CONFIG_START( ashnojoe, ashnojoe_state )
 	MCFG_GFXDECODE(ashnojoe)
 	MCFG_PALETTE_LENGTH(0x1000/2)
 
-	MCFG_VIDEO_START(ashnojoe)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

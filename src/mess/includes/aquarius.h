@@ -34,14 +34,16 @@ public:
 	DECLARE_WRITE8_MEMBER(floppy_w);
 	DECLARE_DRIVER_INIT(aquarius);
 	TILE_GET_INFO_MEMBER(aquarius_gettileinfo);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/aquarius.c -----------*/
 
 
-PALETTE_INIT( aquarius );
-VIDEO_START( aquarius );
+
+
 SCREEN_UPDATE_IND16( aquarius );
 
 #endif /* AQUARIUS_H_ */

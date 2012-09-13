@@ -16,12 +16,13 @@ public:
 	DECLARE_DRIVER_INIT(pcktgal);
 	DECLARE_DRIVER_INIT(deco222);
 	DECLARE_DRIVER_INIT(graphics);
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/pcktgal.c -----------*/
 
 
-PALETTE_INIT( pcktgal );
+
 SCREEN_UPDATE_IND16( pcktgal );
 SCREEN_UPDATE_IND16( pcktgalb );

@@ -847,28 +847,25 @@ READ8_MEMBER( trs80_state::trs80_keyboard_r )
  *  Machine              *
  *************************************/
 
-MACHINE_START( trs80 )
+void trs80_state::machine_start()
 {
-	trs80_state *state = machine.driver_data<trs80_state>();
-	state->m_tape_unit=1;
-	state->m_reg_load=1;
-	state->m_nmi_data=0xff;
+	m_tape_unit=1;
+	m_reg_load=1;
+	m_nmi_data=0xff;
 
-	state->m_cassette_data_timer = machine.scheduler().timer_alloc(FUNC(cassette_data_callback));
-	state->m_cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
+	m_cassette_data_timer = machine().scheduler().timer_alloc(FUNC(cassette_data_callback));
+	m_cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
 }
 
-MACHINE_RESET( trs80 )
+void trs80_state::machine_reset()
 {
-	trs80_state *state = machine.driver_data<trs80_state>();
-	state->m_cassette_data = 0;
+	m_cassette_data = 0;
 }
 
-MACHINE_RESET( trs80m4 )
+MACHINE_RESET_MEMBER(trs80_state,trs80m4)
 {
-	trs80_state *state = machine.driver_data<trs80_state>();
-	address_space *mem = state->m_maincpu->space(AS_PROGRAM);
-	state->m_cassette_data = 0;
+	address_space *mem = m_maincpu->space(AS_PROGRAM);
+	m_cassette_data = 0;
 
 	mem->install_read_bank (0x0000, 0x0fff, "bank1");
 	mem->install_read_bank (0x1000, 0x37e7, "bank2");
@@ -889,16 +886,15 @@ MACHINE_RESET( trs80m4 )
 	mem->install_write_bank (0x4000, 0xf3ff, "bank17");
 	mem->install_write_bank (0xf400, 0xf7ff, "bank18");
 	mem->install_write_bank (0xf800, 0xffff, "bank19");
-	state->trs80m4p_9c_w(*mem, 0, 1);	/* Enable the ROM */
-	state->trs80m4_84_w(*mem, 0, 0);	/* switch in devices at power-on */
+	trs80m4p_9c_w(*mem, 0, 1);	/* Enable the ROM */
+	trs80m4_84_w(*mem, 0, 0);	/* switch in devices at power-on */
 }
 
-MACHINE_RESET( lnw80 )
+MACHINE_RESET_MEMBER(trs80_state,lnw80)
 {
-	trs80_state *state = machine.driver_data<trs80_state>();
-	address_space *space = state->m_maincpu->space(AS_PROGRAM);
-	state->m_cassette_data = 0;
-	state->m_reg_load = 1;
-	state->lnw80_fe_w(*space, 0, 0);
+	address_space *space = m_maincpu->space(AS_PROGRAM);
+	m_cassette_data = 0;
+	m_reg_load = 1;
+	lnw80_fe_w(*space, 0, 0);
 }
 

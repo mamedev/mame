@@ -43,10 +43,9 @@ TILE_GET_INFO_MEMBER(gatron_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
-VIDEO_START( gat )
+void gatron_state::video_start()
 {
-	gatron_state *state = machine.driver_data<gatron_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gatron_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS, 8, 16, 48, 16);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gatron_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 8, 16, 48, 16);
 }
 
 SCREEN_UPDATE_IND16( gat )
@@ -56,7 +55,7 @@ SCREEN_UPDATE_IND16( gat )
 	return 0;
 }
 
-PALETTE_INIT( gat )
+void gatron_state::palette_init()
 {
 }
 

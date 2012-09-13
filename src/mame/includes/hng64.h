@@ -183,6 +183,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_hng64_tile2_16x16_info);
 	TILE_GET_INFO_MEMBER(get_hng64_tile3_8x8_info);
 	TILE_GET_INFO_MEMBER(get_hng64_tile3_16x16_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -190,6 +193,6 @@ public:
 
 void hng64_command3d(running_machine& machine, const UINT16* packet);
 
-VIDEO_START( hng64 );
+
 SCREEN_UPDATE_RGB32( hng64 );
 SCREEN_VBLANK( hng64 );

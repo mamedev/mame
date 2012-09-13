@@ -32,10 +32,9 @@ TILE_GET_INFO_MEMBER(nitedrvr_state::get_bg_tile_info)
 
 
 
-VIDEO_START( nitedrvr )
+void nitedrvr_state::video_start()
 {
-	nitedrvr_state *state = machine.driver_data<nitedrvr_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(nitedrvr_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(nitedrvr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static void draw_box( bitmap_ind16 &bitmap, int bx, int by, int ex, int ey )

@@ -85,6 +85,10 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(snd_ack_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 TILE_GET_INFO_MEMBER(dacholer_state::get_bg_tile_info)
@@ -97,13 +101,12 @@ TILE_GET_INFO_MEMBER(dacholer_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, m_fgvideoram[tile_index], 0, 0);
 }
 
-static VIDEO_START( dacholer )
+void dacholer_state::video_start()
 {
-	dacholer_state *state = machine.driver_data<dacholer_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dacholer_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dacholer_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dacholer_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dacholer_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 WRITE8_MEMBER(dacholer_state::bg_scroll_x_w)
@@ -578,35 +581,33 @@ static const msm5205_interface msm_interface =
 
 
 
-static MACHINE_START( dacholer )
+void dacholer_state::machine_start()
 {
-	dacholer_state *state = machine.driver_data<dacholer_state>();
 
-	state->save_item(NAME(state->m_bg_bank));
-	state->save_item(NAME(state->m_msm_data));
-	state->save_item(NAME(state->m_msm_toggle));
-	state->save_item(NAME(state->m_snd_interrupt_enable));
-	state->save_item(NAME(state->m_music_interrupt_enable));
-	state->save_item(NAME(state->m_snd_ack));
+	save_item(NAME(m_bg_bank));
+	save_item(NAME(m_msm_data));
+	save_item(NAME(m_msm_toggle));
+	save_item(NAME(m_snd_interrupt_enable));
+	save_item(NAME(m_music_interrupt_enable));
+	save_item(NAME(m_snd_ack));
 }
 
-static MACHINE_RESET( dacholer )
+void dacholer_state::machine_reset()
 {
-	dacholer_state *state = machine.driver_data<dacholer_state>();
 
-	state->m_msm_data = 0;
-	state->m_msm_toggle = 0;
+	m_msm_data = 0;
+	m_msm_toggle = 0;
 
-	state->m_bg_bank = 0;
-	state->m_snd_interrupt_enable = 0;
-	state->m_music_interrupt_enable = 0;
-	state->m_snd_ack = 0;
+	m_bg_bank = 0;
+	m_snd_interrupt_enable = 0;
+	m_music_interrupt_enable = 0;
+	m_snd_ack = 0;
 }
 
 /* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
-static PALETTE_INIT( dacholer )
+void dacholer_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double weights_rg[3], weights_b[2];
@@ -618,7 +619,7 @@ static PALETTE_INIT( dacholer )
 			2, resistances_b,  weights_b,  0, 0,
 			0, 0, 0, 0, 0);
 
-	for (i = 0;i < machine.total_colors(); i++)
+	for (i = 0;i < machine().total_colors(); i++)
 	{
 		int bit0, bit1, bit2;
 		int r, g, b;
@@ -640,7 +641,7 @@ static PALETTE_INIT( dacholer )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -658,8 +659,6 @@ static MACHINE_CONFIG_START( dacholer, dacholer_state )
 	MCFG_CPU_IO_MAP(snd_io_map)
 	MCFG_CPU_VBLANK_INT("screen",sound_irq)
 
-	MCFG_MACHINE_START(dacholer)
-	MCFG_MACHINE_RESET(dacholer)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -670,10 +669,8 @@ static MACHINE_CONFIG_START( dacholer, dacholer_state )
 	MCFG_SCREEN_UPDATE_STATIC(dacholer)
 
 	MCFG_PALETTE_LENGTH(32)
-	MCFG_PALETTE_INIT(dacholer)
 	MCFG_GFXDECODE(dacholer)
 
-	MCFG_VIDEO_START(dacholer)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

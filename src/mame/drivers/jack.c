@@ -785,29 +785,27 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
-static MACHINE_START( jack )
+void jack_state::machine_start()
 {
-	jack_state *state = machine.driver_data<jack_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_joinem_snd_bit));
-	state->save_item(NAME(state->m_question_address));
-	state->save_item(NAME(state->m_question_rom));
-	state->save_item(NAME(state->m_remap_address));
+	save_item(NAME(m_joinem_snd_bit));
+	save_item(NAME(m_question_address));
+	save_item(NAME(m_question_rom));
+	save_item(NAME(m_remap_address));
 }
 
-static MACHINE_RESET( jack )
+void jack_state::machine_reset()
 {
-	jack_state *state = machine.driver_data<jack_state>();
 	int i;
 
-	state->m_joinem_snd_bit = 0;
-	state->m_question_address = 0;
-	state->m_question_rom = 0;
+	m_joinem_snd_bit = 0;
+	m_question_address = 0;
+	m_question_rom = 0;
 
 	for (i = 0; i < 16; i++)
-		state->m_remap_address[i] = 0;
+		m_remap_address[i] = 0;
 }
 
 static MACHINE_CONFIG_START( jack, jack_state )
@@ -821,8 +819,6 @@ static MACHINE_CONFIG_START( jack, jack_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
-	MCFG_MACHINE_START(jack)
-	MCFG_MACHINE_RESET(jack)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -835,7 +831,6 @@ static MACHINE_CONFIG_START( jack, jack_state )
 	MCFG_GFXDECODE(jack)
 	MCFG_PALETTE_LENGTH(32)
 
-	MCFG_VIDEO_START(jack)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -874,8 +869,8 @@ static MACHINE_CONFIG_DERIVED( joinem, jack )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(joinem)
 
-	MCFG_PALETTE_INIT(joinem)
-	MCFG_VIDEO_START(joinem)
+	MCFG_PALETTE_INIT_OVERRIDE(jack_state,joinem)
+	MCFG_VIDEO_START_OVERRIDE(jack_state,joinem)
 MACHINE_CONFIG_END
 
 
@@ -893,8 +888,8 @@ static MACHINE_CONFIG_DERIVED( loverboy, jack )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(joinem)
 
-	MCFG_PALETTE_INIT(joinem)
-	MCFG_VIDEO_START(joinem)
+	MCFG_PALETTE_INIT_OVERRIDE(jack_state,joinem)
+	MCFG_VIDEO_START_OVERRIDE(jack_state,joinem)
 MACHINE_CONFIG_END
 
 /*************************************

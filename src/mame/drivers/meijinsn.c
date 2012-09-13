@@ -92,6 +92,10 @@ public:
 
 	DECLARE_WRITE16_MEMBER(sound_w);
 	DECLARE_READ16_MEMBER(alpha_mcu_r);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -242,13 +246,13 @@ static INPUT_PORTS_START( meijinsn )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
-static VIDEO_START(meijinsn)
+void meijinsn_state::video_start()
 {
 }
 
-static PALETTE_INIT( meijinsn )
+void meijinsn_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 	static const int resistances_b[2]  = { 470, 220 };
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -260,7 +264,7 @@ static PALETTE_INIT( meijinsn )
 			3,	resistances_rg,	weights_g,	0,	1000+1000,
 			2,	resistances_b,	weights_b,	0,	1000+1000);
 
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -281,7 +285,7 @@ static PALETTE_INIT( meijinsn )
 		bit1 = BIT(color_prom[i], 7);
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -331,22 +335,20 @@ static const ay8910_interface ay8910_config =
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r)
 };
 
-static MACHINE_START( meijinsn )
+void meijinsn_state::machine_start()
 {
-	meijinsn_state *state = machine.driver_data<meijinsn_state>();
 
-	state->save_item(NAME(state->m_deposits1));
-	state->save_item(NAME(state->m_deposits2));
-	state->save_item(NAME(state->m_credits));
+	save_item(NAME(m_deposits1));
+	save_item(NAME(m_deposits2));
+	save_item(NAME(m_credits));
 }
 
-static MACHINE_RESET( meijinsn )
+void meijinsn_state::machine_reset()
 {
-	meijinsn_state *state = machine.driver_data<meijinsn_state>();
 
-	state->m_deposits1 = 0;
-	state->m_deposits2 = 0;
-	state->m_credits   = 0;
+	m_deposits1 = 0;
+	m_deposits2 = 0;
+	m_credits   = 0;
 }
 
 
@@ -362,8 +364,6 @@ static MACHINE_CONFIG_START( meijinsn, meijinsn_state )
 	MCFG_CPU_IO_MAP(meijinsn_sound_io_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 160*60)
 
-	MCFG_MACHINE_START(meijinsn)
-	MCFG_MACHINE_RESET(meijinsn)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -374,9 +374,7 @@ static MACHINE_CONFIG_START( meijinsn, meijinsn_state )
 	MCFG_SCREEN_UPDATE_STATIC(meijinsn)
 
 	MCFG_PALETTE_LENGTH(32)
-	MCFG_PALETTE_INIT(meijinsn)
 
-	MCFG_VIDEO_START(meijinsn)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

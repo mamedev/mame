@@ -226,30 +226,28 @@ static const k051960_interface aliens_k051960_intf =
 	aliens_sprite_callback
 };
 
-static MACHINE_START( aliens )
+void aliens_state::machine_start()
 {
-	aliens_state *state = machine.driver_data<aliens_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 20, &ROM[0x10000], 0x2000);
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->configure_entries(0, 20, &ROM[0x10000], 0x2000);
+	membank("bank1")->set_entry(0);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_k007232 = machine.device("k007232");
-	state->m_k052109 = machine.device("k052109");
-	state->m_k051960 = machine.device("k051960");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_k007232 = machine().device("k007232");
+	m_k052109 = machine().device("k052109");
+	m_k051960 = machine().device("k051960");
 
-	state->save_item(NAME(state->m_palette_selected));
+	save_item(NAME(m_palette_selected));
 }
 
-static MACHINE_RESET( aliens )
+void aliens_state::machine_reset()
 {
-	aliens_state *state = machine.driver_data<aliens_state>();
 
-	konami_configure_set_lines(machine.device("maincpu"), aliens_banking);
+	konami_configure_set_lines(machine().device("maincpu"), aliens_banking);
 
-	state->m_palette_selected = 0;
+	m_palette_selected = 0;
 }
 
 static MACHINE_CONFIG_START( aliens, aliens_state )
@@ -263,8 +261,6 @@ static MACHINE_CONFIG_START( aliens, aliens_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) 	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(aliens_sound_map)
 
-	MCFG_MACHINE_START(aliens)
-	MCFG_MACHINE_RESET(aliens)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -278,7 +274,6 @@ static MACHINE_CONFIG_START( aliens, aliens_state )
 
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(aliens)
 
 	MCFG_K052109_ADD("k052109", aliens_k052109_intf)
 	MCFG_K051960_ADD("k051960", aliens_k051960_intf)

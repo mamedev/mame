@@ -77,6 +77,7 @@ public:
 
 	/* keyboard state */
 	int m_ksc;				/* keyboard scan column */
+	virtual void palette_init();
 };
 
 #endif

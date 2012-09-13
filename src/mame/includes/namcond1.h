@@ -25,12 +25,14 @@ public:
 	DECLARE_READ16_MEMBER(namcond1_cuskey_r);
 	DECLARE_WRITE16_MEMBER(namcond1_shared_ram_w);
 	DECLARE_WRITE16_MEMBER(namcond1_cuskey_w);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
 /*----------- defined in machine/namcond1.c -----------*/
 
 
-MACHINE_START( namcond1 );
-MACHINE_RESET( namcond1 );
+
+
 

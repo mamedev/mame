@@ -72,13 +72,12 @@ DRIVER_INIT_MEMBER(odyssey2_state,odyssey2)
 	m_cart_size = size;
 }
 
-MACHINE_RESET( odyssey2 )
+void odyssey2_state::machine_reset()
 {
-	odyssey2_state *state = machine.driver_data<odyssey2_state>();
 	/* jump to "last" bank, will work for all sizes due to being mirrored */
-	state->m_p1 = 0xFF;
-	state->m_p2 = 0xFF;
-	odyssey2_switch_banks(machine);
+	m_p1 = 0xFF;
+	m_p2 = 0xFF;
+	odyssey2_switch_banks(machine());
 }
 
 /****** External RAM ******************************/

@@ -34,10 +34,9 @@ TILE_GET_INFO_MEMBER(circus_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
-VIDEO_START( circus )
+void circus_state::video_start()
 {
-	circus_state *state = machine.driver_data<circus_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(circus_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(circus_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static void draw_line( bitmap_ind16 &bitmap, const rectangle &cliprect, int x1, int y1, int x2, int y2, int dotted )

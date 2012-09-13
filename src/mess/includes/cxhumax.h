@@ -148,6 +148,9 @@ public:
 	UINT32 m_hdmi_regs[0x400/4];
 
 	UINT32 m_gxa_cmd_regs[0x130/4];
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 #define INTDEST			0	// Interrupt destination (1=IRQ, 0=FIQ)

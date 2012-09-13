@@ -71,35 +71,33 @@ WRITE8_MEMBER(crgolf_state::rom_bank_select_w)
 }
 
 
-static MACHINE_START( crgolf )
+void crgolf_state::machine_start()
 {
-	crgolf_state *state = machine.driver_data<crgolf_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	/* configure the banking */
-	state->membank("bank1")->configure_entries(0, 16, state->memregion("maincpu")->base() + 0x10000, 0x2000);
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x2000);
+	membank("bank1")->set_entry(0);
 
 	/* register for save states */
-	state->save_item(NAME(state->m_port_select));
-	state->save_item(NAME(state->m_main_to_sound_data));
-	state->save_item(NAME(state->m_sound_to_main_data));
-	state->save_item(NAME(state->m_sample_offset));
-	state->save_item(NAME(state->m_sample_count));
+	save_item(NAME(m_port_select));
+	save_item(NAME(m_main_to_sound_data));
+	save_item(NAME(m_sound_to_main_data));
+	save_item(NAME(m_sample_offset));
+	save_item(NAME(m_sample_count));
 }
 
 
-static MACHINE_RESET( crgolf )
+void crgolf_state::machine_reset()
 {
-	crgolf_state *state = machine.driver_data<crgolf_state>();
 
-	state->m_port_select = 0;
-	state->m_main_to_sound_data = 0;
-	state->m_sound_to_main_data = 0;
-	state->m_sample_offset = 0;
-	state->m_sample_count = 0;
+	m_port_select = 0;
+	m_main_to_sound_data = 0;
+	m_sound_to_main_data = 0;
+	m_sample_offset = 0;
+	m_sample_count = 0;
 }
 
 
@@ -412,8 +410,6 @@ static MACHINE_CONFIG_START( crgolf, crgolf_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(crgolf)
-	MCFG_MACHINE_RESET(crgolf)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */

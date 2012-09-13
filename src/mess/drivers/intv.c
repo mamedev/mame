@@ -85,28 +85,28 @@ static const unsigned char intv_colors[] =
 	0xB5, 0x1A, 0x58  /* PURPLE */
 };
 
-static PALETTE_INIT( intv )
+void intv_state::palette_init()
 {
 	int k = 0;
 
 	UINT8 i, j, r, g, b;
 	/* Two copies of everything (why?) */
 
-	machine.colortable = colortable_alloc(machine, 32);
+	machine().colortable = colortable_alloc(machine(), 32);
 
 	for ( i = 0; i < 16; i++ )
 	{
 		r = intv_colors[i*3]; g = intv_colors[i*3+1]; b = intv_colors[i*3+2];
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
-		colortable_palette_set_color(machine.colortable, i + 16, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i + 16, MAKE_RGB(r, g, b));
 	}
 
 	for(i=0;i<16;i++)
 	{
 		for(j=0;j<16;j++)
 		{
-		colortable_entry_set_value(machine.colortable, k++, i);
-		colortable_entry_set_value(machine.colortable, k++, j);
+		colortable_entry_set_value(machine().colortable, k++, i);
+		colortable_entry_set_value(machine().colortable, k++, j);
 		}
 	}
 
@@ -114,8 +114,8 @@ static PALETTE_INIT( intv )
 	{
 		for(j=16;j<32;j++)
 		{
-			colortable_entry_set_value(machine.colortable, k++, i);
-			colortable_entry_set_value(machine.colortable, k++, j);
+			colortable_entry_set_value(machine().colortable, k++, i);
+			colortable_entry_set_value(machine().colortable, k++, j);
 		}
 	}
 }
@@ -814,7 +814,6 @@ static MACHINE_CONFIG_START( intv, intv_state )
 	MCFG_CPU_VBLANK_INT("screen", intv_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_RESET( intv )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -826,9 +825,7 @@ static MACHINE_CONFIG_START( intv, intv_state )
 
 	MCFG_GFXDECODE( intv )
 	MCFG_PALETTE_LENGTH(0x400)
-	MCFG_PALETTE_INIT( intv )
 
-	MCFG_VIDEO_START( intv )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -864,7 +861,7 @@ static MACHINE_CONFIG_DERIVED( intvecs, intv )
 	MCFG_SOUND_CONFIG(intv_ay8914_ecs_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MCFG_MACHINE_RESET( intvecs )
+	MCFG_MACHINE_RESET_OVERRIDE(intv_state, intvecs )
 
 	/* cassette */
 	//MCFG_CASSETTE_ADD( CASSETTE_TAG, ecs_cassette_interface )

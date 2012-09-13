@@ -42,6 +42,8 @@ public:
 
 	UINT32 m_port[9];
 	DECLARE_DRIVER_INIT(mini2440);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 /***************************************************************************
@@ -164,21 +166,19 @@ static INPUT_CHANGED( mini2440_input_changed )
 
 // ...
 
-static MACHINE_START( mini2440 )
+void mini2440_state::machine_start()
 {
-	mini2440_state *state = machine.driver_data<mini2440_state>();
-	state->m_s3c2440 = machine.device("s3c2440");
-	state->m_nand = machine.device<nand_device>("nand");
-	state->m_dac[0] = machine.device<dac_device>("dac1");
-	state->m_dac[1] = machine.device<dac_device>("dac2");
-	state->m_nand->set_data_ptr(state->memregion("nand")->base());
+	m_s3c2440 = machine().device("s3c2440");
+	m_nand = machine().device<nand_device>("nand");
+	m_dac[0] = machine().device<dac_device>("dac1");
+	m_dac[1] = machine().device<dac_device>("dac2");
+	m_nand->set_data_ptr(memregion("nand")->base());
 }
 
-static MACHINE_RESET( mini2440 )
+void mini2440_state::machine_reset()
 {
-	mini2440_state *state = machine.driver_data<mini2440_state>();
-	machine.device("maincpu")->reset();
-	memset( state->m_port, 0, sizeof( state->m_port));
+	machine().device("maincpu")->reset();
+	memset( m_port, 0, sizeof( m_port));
 }
 
 /***************************************************************************
@@ -236,8 +236,6 @@ static MACHINE_CONFIG_START( mini2440, mini2440_state )
 
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2440", s3c2440_device, screen_update)
 
-	MCFG_MACHINE_START(mini2440)
-	MCFG_MACHINE_RESET(mini2440)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("dac1", DAC, 0)

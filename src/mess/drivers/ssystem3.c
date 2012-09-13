@@ -317,9 +317,7 @@ static MACHINE_CONFIG_START( ssystem3, ssystem3_state )
 	MCFG_SCREEN_UPDATE_STATIC( ssystem3 )
 
 	MCFG_PALETTE_LENGTH(242 + 32768)
-	MCFG_PALETTE_INIT( ssystem3 )
 
-	MCFG_VIDEO_START( ssystem3 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

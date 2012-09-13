@@ -50,12 +50,15 @@ public:
 	DECLARE_DRIVER_INIT(bmcompm2);
 	DECLARE_DRIVER_INIT(bmcorerm);
 	DECLARE_DRIVER_INIT(bmclubmx);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/djmain.c -----------*/
 
 SCREEN_UPDATE_RGB32( djmain );
-VIDEO_START( djmain );
+
 
 void djmain_tile_callback(running_machine& machine, int layer, int *code, int *color, int *flags);

@@ -154,17 +154,24 @@ public:
 	TILE_GET_INFO_MEMBER(metro_k053936_get_tile_info);
 	TILE_GET_INFO_MEMBER(metro_k053936_gstrik2_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_gstrik2);
+	DECLARE_MACHINE_START(metro);
+	DECLARE_MACHINE_RESET(metro);
+	DECLARE_VIDEO_START(metro_i4220);
+	DECLARE_VIDEO_START(metro_i4100);
+	DECLARE_VIDEO_START(metro_i4300);
+	DECLARE_VIDEO_START(blzntrnd);
+	DECLARE_VIDEO_START(gstrik2);
 };
 
 
 /*----------- defined in video/metro.c -----------*/
 
 
-VIDEO_START( metro_i4100 );
-VIDEO_START( metro_i4220 );
-VIDEO_START( metro_i4300 );
-VIDEO_START( blzntrnd );
-VIDEO_START( gstrik2 );
+
+
+
+
+
 
 SCREEN_UPDATE_IND16( metro );
 

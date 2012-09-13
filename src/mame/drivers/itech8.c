@@ -643,29 +643,28 @@ static void generate_sound_irq(device_t *device, int state)
 static TIMER_CALLBACK( behind_the_beam_update );
 
 
-static MACHINE_START( sstrike )
+MACHINE_START_MEMBER(itech8_state,sstrike)
 {
 	/* we need to update behind the beam as well */
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0), FUNC(behind_the_beam_update), 32);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), FUNC(behind_the_beam_update), 32);
 }
 
-static MACHINE_RESET( itech8 )
+void itech8_state::machine_reset()
 {
-	itech8_state *state = machine.driver_data<itech8_state>();
-	device_type main_cpu_type = machine.device("maincpu")->type();
+	device_type main_cpu_type = machine().device("maincpu")->type();
 
 	/* make sure bank 0 is selected */
 	if (main_cpu_type == M6809 || main_cpu_type == HD6309)
 	{
-		state->membank("bank1")->set_base(&state->memregion("maincpu")->base()[0x4000]);
-		machine.device("maincpu")->reset();
+		membank("bank1")->set_base(&memregion("maincpu")->base()[0x4000]);
+		machine().device("maincpu")->reset();
 	}
 
 	/* set the visible area */
-	if (state->m_visarea.width() > 1)
+	if (m_visarea.width() > 1)
 	{
-		machine.primary_screen->set_visible_area(state->m_visarea.min_x, state->m_visarea.max_x, state->m_visarea.min_y, state->m_visarea.max_y);
-		state->m_visarea.set(0, 0, 0, 0);
+		machine().primary_screen->set_visible_area(m_visarea.min_x, m_visarea.max_x, m_visarea.min_y, m_visarea.max_y);
+		m_visarea.set(0, 0, 0, 0);
 	}
 }
 
@@ -1688,7 +1687,6 @@ static MACHINE_CONFIG_START( itech8_core_lo, itech8_state )
 	MCFG_CPU_PROGRAM_MAP(tmslo_map)
 	MCFG_CPU_VBLANK_INT("screen", generate_nmi)
 
-	MCFG_MACHINE_RESET(itech8)
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
@@ -1697,7 +1695,6 @@ static MACHINE_CONFIG_START( itech8_core_lo, itech8_state )
 	MCFG_TLC34076_ADD("tlc34076", tlc34076_6_bit_intf)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_VIDEO_START(itech8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1851,7 +1848,7 @@ static MACHINE_CONFIG_DERIVED( slikshot_hi, itech8_core_hi )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_STATIC(slikshot)
-	MCFG_VIDEO_START(slikshot)
+	MCFG_VIDEO_START_OVERRIDE(itech8_state,slikshot)
 MACHINE_CONFIG_END
 
 
@@ -1868,7 +1865,7 @@ static MACHINE_CONFIG_DERIVED( slikshot_lo, itech8_core_lo )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_STATIC(slikshot)
-	MCFG_VIDEO_START(slikshot)
+	MCFG_VIDEO_START_OVERRIDE(itech8_state,slikshot)
 MACHINE_CONFIG_END
 
 
@@ -1887,7 +1884,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( sstrike, slikshot_lo )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_START(sstrike)
+	MCFG_MACHINE_START_OVERRIDE(itech8_state,sstrike)
 
 MACHINE_CONFIG_END
 

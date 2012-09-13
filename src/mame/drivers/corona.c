@@ -346,6 +346,8 @@ public:
 	void blitter_execute(int x, int y, int color, int width, int flag);
 	DECLARE_WRITE8_MEMBER(ay_port_a_out);
 	DECLARE_WRITE8_MEMBER(ay_port_b_out);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -353,9 +355,9 @@ public:
 *               Video Hardware               *
 *********************************************/
 
-static PALETTE_INIT( winner )
+void corona_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int bit6, bit7, bit0, bit1, r, g, b;
 	int i;
 
@@ -376,7 +378,7 @@ static PALETTE_INIT( winner )
 		bit1 = (color_prom[0] >> 5) & 0x01;
 		r = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 }
@@ -452,10 +454,9 @@ WRITE8_MEMBER(corona_state::blitter_trig_wdht_w)
 	blitter_execute(m_blitter_x_reg, 0x100 - m_blitter_y_reg, m_blitter_aux_reg & 0xf, data, m_blitter_aux_reg & 0xf0);
 }
 
-static VIDEO_START(winner)
+void corona_state::video_start()
 {
-	corona_state *state = machine.driver_data<corona_state>();
-	state->m_videobuf = auto_alloc_array_clear(machine, UINT8, VIDEOBUF_SIZE);
+	m_videobuf = auto_alloc_array_clear(machine(), UINT8, VIDEOBUF_SIZE);
 }
 
 static SCREEN_UPDATE_IND16(winner)
@@ -1366,7 +1367,6 @@ static MACHINE_CONFIG_START( winner81, corona_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PALETTE_INIT(winner)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1378,7 +1378,6 @@ static MACHINE_CONFIG_START( winner81, corona_state )
 
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(winner)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK1)	/* measured */
@@ -1399,7 +1398,6 @@ static MACHINE_CONFIG_START( winner82, corona_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PALETTE_INIT(winner)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1411,7 +1409,6 @@ static MACHINE_CONFIG_START( winner82, corona_state )
 
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(winner)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLK2)	/* measured */
@@ -1432,7 +1429,6 @@ static MACHINE_CONFIG_START( re800, corona_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PALETTE_INIT(winner)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1444,7 +1440,6 @@ static MACHINE_CONFIG_START( re800, corona_state )
 
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(winner)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK2)
@@ -1464,7 +1459,6 @@ static MACHINE_CONFIG_START( rcirulet, corona_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PALETTE_INIT(winner)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1476,7 +1470,6 @@ static MACHINE_CONFIG_START( rcirulet, corona_state )
 
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(winner)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK2)
@@ -1497,7 +1490,6 @@ static MACHINE_CONFIG_START( luckyrlt, corona_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PALETTE_INIT(winner)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1509,7 +1501,6 @@ static MACHINE_CONFIG_START( luckyrlt, corona_state )
 
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(winner)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK1)

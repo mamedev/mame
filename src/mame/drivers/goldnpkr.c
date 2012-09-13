@@ -999,6 +999,11 @@ public:
 	DECLARE_DRIVER_INIT(vkdlswwv);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wcrdxtnd_get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_PALETTE_INIT(witchcrd);
+	DECLARE_VIDEO_START(wcrdxtnd);
+	DECLARE_PALETTE_INIT(wcrdxtnd);
 };
 
 
@@ -1055,16 +1060,14 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::wcrdxtnd_get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
-static VIDEO_START( goldnpkr )
+void goldnpkr_state::video_start()
 {
-	goldnpkr_state *state = machine.driver_data<goldnpkr_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldnpkr_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldnpkr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-static VIDEO_START( wcrdxtnd )
+VIDEO_START_MEMBER(goldnpkr_state,wcrdxtnd)
 {
-	goldnpkr_state *state = machine.driver_data<goldnpkr_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldnpkr_state::wcrdxtnd_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldnpkr_state::wcrdxtnd_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16( goldnpkr )
@@ -1074,9 +1077,9 @@ static SCREEN_UPDATE_IND16( goldnpkr )
 	return 0;
 }
 
-static PALETTE_INIT( goldnpkr )
+void goldnpkr_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 /*  prom bits
     7654 3210
     ---- ---x   red component.
@@ -1090,7 +1093,7 @@ static PALETTE_INIT( goldnpkr )
 	/* 0000IBGR */
 	if (color_prom == 0) return;
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0, bit1, bit2, r, g, b, inten, intenmin, intenmax;
 
@@ -1114,13 +1117,13 @@ static PALETTE_INIT( goldnpkr )
 		b = (bit2 * intenmin) + (inten * (bit2 * (intenmax - intenmin)));
 
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
-static PALETTE_INIT( witchcrd )
+PALETTE_INIT_MEMBER(goldnpkr_state,witchcrd)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 /*
     This hardware has a feature called BLUE KILLER.
     Using the original intensity line, the PCB has a bridge
@@ -1142,7 +1145,7 @@ static PALETTE_INIT( witchcrd )
 
 	if (color_prom == 0) return;
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b, bk;
 
@@ -1162,13 +1165,13 @@ static PALETTE_INIT( witchcrd )
 		bit2 = (color_prom[i] >> 2) & 0x01;
 		b = bk * (bit2 * 0xff);
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
-static PALETTE_INIT( wcrdxtnd )
+PALETTE_INIT_MEMBER(goldnpkr_state,wcrdxtnd)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 /*
     Using the original intensity line, the PCB has a bridge
     that allow (as default) turn the background dark blue.
@@ -1186,7 +1189,7 @@ static PALETTE_INIT( wcrdxtnd )
 
 	if (color_prom == 0) return;
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b, bk;
 
@@ -1208,7 +1211,7 @@ static PALETTE_INIT( wcrdxtnd )
 		//if ((b == 0) & (bk = 1))   --> needs better implementation
 		//  b = 0x3f;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -3589,9 +3592,7 @@ static MACHINE_CONFIG_START( goldnpkr_base, goldnpkr_state )
 	MCFG_MC6845_ADD("crtc", MC6845, CPU_CLOCK, mc6845_intf)	/* 68B45 or 6845s @ CPU clock */
 
 	MCFG_GFXDECODE(goldnpkr)
-	MCFG_PALETTE_INIT(goldnpkr)
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_VIDEO_START(goldnpkr)
 MACHINE_CONFIG_END
 
 
@@ -3630,7 +3631,7 @@ static MACHINE_CONFIG_DERIVED( witchcrd, goldnpkr_base )
 	MCFG_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
 
 	/* video hardware */
-	MCFG_PALETTE_INIT(witchcrd)
+	MCFG_PALETTE_INIT_OVERRIDE(goldnpkr_state,witchcrd)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3650,7 +3651,7 @@ static MACHINE_CONFIG_DERIVED( wcfalcon, goldnpkr_base )
 	MCFG_PIA6821_MODIFY("pia1", wcfalcon_pia1_intf)
 
 	/* video hardware */
-	MCFG_PALETTE_INIT(witchcrd)
+	MCFG_PALETTE_INIT_OVERRIDE(goldnpkr_state,witchcrd)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3670,8 +3671,8 @@ static MACHINE_CONFIG_DERIVED( wildcard, goldnpkr_base )
 
 	/* video hardware */
 //  MCFG_GFXDECODE(wildcard)
-	MCFG_PALETTE_INIT(witchcrd)
-//  MCFG_VIDEO_START(wildcard)
+	MCFG_PALETTE_INIT_OVERRIDE(goldnpkr_state,witchcrd)
+//  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3691,8 +3692,8 @@ static MACHINE_CONFIG_DERIVED( wcrdxtnd, goldnpkr_base )
 
 	/* video hardware */
 	MCFG_GFXDECODE(wcrdxtnd)
-	MCFG_PALETTE_INIT(wcrdxtnd)
-	MCFG_VIDEO_START(wcrdxtnd)
+	MCFG_PALETTE_INIT_OVERRIDE(goldnpkr_state,wcrdxtnd)
+	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wcrdxtnd)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3717,8 +3718,8 @@ static MACHINE_CONFIG_DERIVED( wildcrdb, goldnpkr_base )
 
 	/* video hardware */
 //  MCFG_GFXDECODE(wildcard)
-	MCFG_PALETTE_INIT(witchcrd)
-//  MCFG_VIDEO_START(wildcard)
+	MCFG_PALETTE_INIT_OVERRIDE(goldnpkr_state,witchcrd)
+//  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3737,7 +3738,7 @@ static MACHINE_CONFIG_DERIVED( genie, goldnpkr_base )
 	MCFG_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
 
 	/* video hardware */
-	MCFG_PALETTE_INIT(witchcrd)
+	MCFG_PALETTE_INIT_OVERRIDE(goldnpkr_state,witchcrd)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

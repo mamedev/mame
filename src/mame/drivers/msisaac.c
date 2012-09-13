@@ -210,9 +210,8 @@ static ADDRESS_MAP_START( msisaac_map, AS_PROGRAM, 8, msisaac_state )
 //  AM_RANGE(0xfc03, 0xfc04) AM_WRITE(msisaac_coin_counter_w)
 ADDRESS_MAP_END
 
-static MACHINE_RESET( ta7630 )
+MACHINE_RESET_MEMBER(msisaac_state,ta7630)
 {
-	msisaac_state *state = machine.driver_data<msisaac_state>();
 	int i;
 
 	double db			= 0.0;
@@ -221,8 +220,8 @@ static MACHINE_RESET( ta7630 )
 	for (i=0; i<16; i++)
 	{
 		double max = 100.0 / pow(10.0, db/20.0 );
-		state->m_vol_ctrl[15 - i] = max;
-		/*logerror("vol_ctrl[%x] = %i (%f dB)\n",15 - i, state->m_vol_ctrl[15 - i], db);*/
+		m_vol_ctrl[15 - i] = max;
+		/*logerror("vol_ctrl[%x] = %i (%f dB)\n",15 - i, m_vol_ctrl[15 - i], db);*/
 		db += db_step;
 		db_step += db_step_inc;
 	}
@@ -431,47 +430,45 @@ static const msm5232_interface msm5232_config =
 
 /*******************************************************************************/
 
-static MACHINE_START( msisaac )
+void msisaac_state::machine_start()
 {
-	msisaac_state *state = machine.driver_data<msisaac_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	/* video */
-	state->save_item(NAME(state->m_bg2_textbank));
+	save_item(NAME(m_bg2_textbank));
 	/* sound */
-	state->save_item(NAME(state->m_sound_nmi_enable));
-	state->save_item(NAME(state->m_pending_nmi));
-	state->save_item(NAME(state->m_vol_ctrl));
-	state->save_item(NAME(state->m_snd_ctrl0));
-	state->save_item(NAME(state->m_snd_ctrl1));
+	save_item(NAME(m_sound_nmi_enable));
+	save_item(NAME(m_pending_nmi));
+	save_item(NAME(m_vol_ctrl));
+	save_item(NAME(m_snd_ctrl0));
+	save_item(NAME(m_snd_ctrl1));
 
 #ifdef USE_MCU
 #else
-	state->save_item(NAME(state->m_mcu_val));
-	state->save_item(NAME(state->m_direction));
+	save_item(NAME(m_mcu_val));
+	save_item(NAME(m_direction));
 #endif
 }
 
-static MACHINE_RESET( msisaac )
+void msisaac_state::machine_reset()
 {
-	msisaac_state *state = machine.driver_data<msisaac_state>();
 
-	MACHINE_RESET_CALL(ta7630);
+	MACHINE_RESET_CALL_MEMBER(ta7630);
 
 	/* video */
-	state->m_bg2_textbank = 0;
+	m_bg2_textbank = 0;
 	/* sound */
-	state->m_sound_nmi_enable = 0;
-	state->m_pending_nmi = 0;
-	state->m_snd_ctrl0 = 0;
-	state->m_snd_ctrl1 = 0;
+	m_sound_nmi_enable = 0;
+	m_pending_nmi = 0;
+	m_snd_ctrl0 = 0;
+	m_snd_ctrl1 = 0;
 
 #ifdef USE_MCU
-	machine.device("mcu")->execute().set_input_line(0, CLEAR_LINE);
+	machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 #else
-	state->m_mcu_val = 0;
-	state->m_direction = 0;
+	m_mcu_val = 0;
+	m_direction = 0;
 #endif
 }
 
@@ -492,8 +489,6 @@ static MACHINE_CONFIG_START( msisaac, msisaac_state )
 	MCFG_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
 #endif
 
-	MCFG_MACHINE_START(msisaac)
-	MCFG_MACHINE_RESET(msisaac)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -506,7 +501,6 @@ static MACHINE_CONFIG_START( msisaac, msisaac_state )
 	MCFG_GFXDECODE(msisaac)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(msisaac)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

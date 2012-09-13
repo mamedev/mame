@@ -42,31 +42,29 @@ TILE_GET_INFO_MEMBER(gladiatr_state::fg_get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( ppking )
+VIDEO_START_MEMBER(gladiatr_state,ppking)
 {
-	gladiatr_state *state = machine.driver_data<gladiatr_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gladiatr_state::bg_get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,64);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gladiatr_state::fg_get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,64);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gladiatr_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,64);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gladiatr_state::fg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,64);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap->set_scroll_cols(0x10);
+	m_bg_tilemap->set_scroll_cols(0x10);
 
-	state->m_sprite_bank = 1;
+	m_sprite_bank = 1;
 }
 
-VIDEO_START( gladiatr )
+VIDEO_START_MEMBER(gladiatr_state,gladiatr)
 {
-	gladiatr_state *state = machine.driver_data<gladiatr_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gladiatr_state::bg_get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gladiatr_state::fg_get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gladiatr_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gladiatr_state::fg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap->set_scrolldx(-0x30, 0x12f);
-	state->m_fg_tilemap->set_scrolldx(-0x30, 0x12f);
+	m_bg_tilemap->set_scrolldx(-0x30, 0x12f);
+	m_fg_tilemap->set_scrolldx(-0x30, 0x12f);
 
-	state->m_sprite_bank = 2;
+	m_sprite_bank = 2;
 }
 
 

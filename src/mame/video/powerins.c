@@ -186,18 +186,17 @@ WRITE16_MEMBER(powerins_state::powerins_vram_1_w)
 
 ***************************************************************************/
 
-VIDEO_START( powerins )
+void powerins_state::video_start()
 {
-	powerins_state *state = machine.driver_data<powerins_state>();
-	state->m_tilemap_0 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(powerins_state::get_tile_info_0),state),tilemap_mapper_delegate(FUNC(powerins_state::powerins_get_memory_offset_0),state),16,16,DIM_NX_0, DIM_NY_0 );
-	state->m_tilemap_1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(powerins_state::get_tile_info_1),state),TILEMAP_SCAN_COLS,8,8,DIM_NX_1, DIM_NY_1 );
+	m_tilemap_0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(powerins_state::get_tile_info_0),this),tilemap_mapper_delegate(FUNC(powerins_state::powerins_get_memory_offset_0),this),16,16,DIM_NX_0, DIM_NY_0 );
+	m_tilemap_1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(powerins_state::get_tile_info_1),this),TILEMAP_SCAN_COLS,8,8,DIM_NX_1, DIM_NY_1 );
 
-	state->m_tilemap_0->set_scroll_rows(1);
-	state->m_tilemap_0->set_scroll_cols(1);
+	m_tilemap_0->set_scroll_rows(1);
+	m_tilemap_0->set_scroll_cols(1);
 
-	state->m_tilemap_1->set_scroll_rows(1);
-	state->m_tilemap_1->set_scroll_cols(1);
-	state->m_tilemap_1->set_transparent_pen(15);
+	m_tilemap_1->set_scroll_rows(1);
+	m_tilemap_1->set_scroll_cols(1);
+	m_tilemap_1->set_transparent_pen(15);
 }
 
 

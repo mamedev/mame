@@ -353,8 +353,8 @@ static MACHINE_CONFIG_START( mtx512, mtx_state )
 	MCFG_CPU_IO_MAP(mtx_io)
 	MCFG_CPU_CONFIG(mtx_daisy_chain)
 
-	MCFG_MACHINE_START(mtx512)
-	MCFG_MACHINE_RESET(mtx512)
+	MCFG_MACHINE_START_OVERRIDE(mtx_state,mtx512)
+	MCFG_MACHINE_RESET_OVERRIDE(mtx_state,mtx512)
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9929a", TMS9929A, mtx_tms9928a_interface )

@@ -240,6 +240,9 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(gamecom);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -255,7 +258,7 @@ extern void gamecom_update_timers( device_t *device, int cycles );
 
 /*----------- defined in video/gamecom.c -----------*/
 
-VIDEO_START( gamecom );
+
 
 
 #endif /* GAMECOM_H_ */

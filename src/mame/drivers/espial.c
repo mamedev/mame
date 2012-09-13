@@ -44,25 +44,23 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 
 
-static MACHINE_RESET( espial )
+void espial_state::machine_reset()
 {
-	espial_state *state = machine.driver_data<espial_state>();
 
-	state->m_flipscreen = 0;
+	m_flipscreen = 0;
 
-	state->m_main_nmi_enabled = FALSE;
-	state->m_sound_nmi_enabled = FALSE;
+	m_main_nmi_enabled = FALSE;
+	m_sound_nmi_enabled = FALSE;
 }
 
-static MACHINE_START( espial )
+void espial_state::machine_start()
 {
-	espial_state *state = machine.driver_data<espial_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	//state_save_register_global_array(machine, mcu_out[1]);
-	state->save_item(NAME(state->m_sound_nmi_enabled));
+	//state_save_register_global_array(machine(), mcu_out[1]);
+	save_item(NAME(m_sound_nmi_enabled));
 }
 
 
@@ -332,8 +330,6 @@ static MACHINE_CONFIG_START( espial, espial_state )
 	MCFG_CPU_IO_MAP(espial_sound_io_map)
 	MCFG_CPU_PERIODIC_INT(espial_sound_nmi_gen,4*60)
 
-	MCFG_MACHINE_RESET(espial)
-	MCFG_MACHINE_START(espial)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -346,8 +342,6 @@ static MACHINE_CONFIG_START( espial, espial_state )
 	MCFG_GFXDECODE(espial)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(espial)
-	MCFG_VIDEO_START(espial)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -366,7 +360,7 @@ static MACHINE_CONFIG_DERIVED( netwars, espial )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(32*8, 64*8)
 
-	MCFG_VIDEO_START(netwars)
+	MCFG_VIDEO_START_OVERRIDE(espial_state,netwars)
 MACHINE_CONFIG_END
 
 

@@ -31,13 +31,16 @@ public:
 	DECLARE_WRITE8_MEMBER(bladestl_port_B_w);
 	DECLARE_READ8_MEMBER(bladestl_speech_busy_r);
 	DECLARE_WRITE8_MEMBER(bladestl_speech_ctrl_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 
 
 /*----------- defined in video/bladestl.c -----------*/
 
-PALETTE_INIT( bladestl );
+
 
 SCREEN_UPDATE_IND16( bladestl );
 

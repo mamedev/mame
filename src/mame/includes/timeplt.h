@@ -45,13 +45,18 @@ public:
 	DECLARE_WRITE8_MEMBER(chkun_sound_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_chkun_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_VIDEO_START(chkun);
 };
 
 
 /*----------- defined in video/timeplt.c -----------*/
 
 
-PALETTE_INIT( timeplt );
-VIDEO_START( timeplt );
-VIDEO_START( chkun );
+
+
+
 SCREEN_UPDATE_IND16( timeplt );

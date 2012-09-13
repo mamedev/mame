@@ -57,6 +57,13 @@ public:
 	DECLARE_DRIVER_INIT(tailg);
 	DECLARE_DRIVER_INIT(sundance);
 	DECLARE_DRIVER_INIT(qb3);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	DECLARE_VIDEO_START(cinemat_16level);
+	DECLARE_VIDEO_START(cinemat_64level);
+	DECLARE_VIDEO_START(cinemat_color);
+	DECLARE_VIDEO_START(cinemat_qb3color);
 };
 
 
@@ -85,11 +92,11 @@ MACHINE_CONFIG_EXTERN( qb3_sound );
 
 void cinemat_vector_callback(device_t *device, INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift);
 
-VIDEO_START( cinemat_bilevel );
-VIDEO_START( cinemat_16level );
-VIDEO_START( cinemat_64level );
-VIDEO_START( cinemat_color );
-VIDEO_START( cinemat_qb3color );
+
+
+
+
+
 SCREEN_UPDATE_RGB32( cinemat );
 
 SCREEN_UPDATE_RGB32( spacewar );

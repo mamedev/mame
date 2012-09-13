@@ -400,30 +400,28 @@ static const ym2203_interface ym2203_config =
 };
 
 
-static MACHINE_START( pushman )
+void pushman_state::machine_start()
 {
-	pushman_state *state = machine.driver_data<pushman_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_mcu = machine.device("mcu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_mcu = machine().device("mcu");
 
-	state->save_item(NAME(state->m_control));
-	state->save_item(NAME(state->m_shared_ram));
-	state->save_item(NAME(state->m_latch));
-	state->save_item(NAME(state->m_new_latch));
+	save_item(NAME(m_control));
+	save_item(NAME(m_shared_ram));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_new_latch));
 }
 
-static MACHINE_RESET( pushman )
+MACHINE_RESET_MEMBER(pushman_state,pushman)
 {
-	pushman_state *state = machine.driver_data<pushman_state>();
 
-	state->m_latch = 0;
-	state->m_new_latch = 0;
-	state->m_control[0] = 0;
-	state->m_control[1] = 0;
+	m_latch = 0;
+	m_new_latch = 0;
+	m_control[0] = 0;
+	m_control[1] = 0;
 
-	memset(state->m_shared_ram, 0, ARRAY_LENGTH(state->m_shared_ram));
+	memset(m_shared_ram, 0, ARRAY_LENGTH(m_shared_ram));
 }
 
 static MACHINE_CONFIG_START( pushman, pushman_state )
@@ -443,8 +441,7 @@ static MACHINE_CONFIG_START( pushman, pushman_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(3600))
 
-	MCFG_MACHINE_START(pushman)
-	MCFG_MACHINE_RESET(pushman)
+	MCFG_MACHINE_RESET_OVERRIDE(pushman_state,pushman)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -457,7 +454,6 @@ static MACHINE_CONFIG_START( pushman, pushman_state )
 	MCFG_GFXDECODE(pushman)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(pushman)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -470,13 +466,12 @@ static MACHINE_CONFIG_START( pushman, pushman_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_RESET( bballs )
+MACHINE_RESET_MEMBER(pushman_state,bballs)
 {
-	pushman_state *state = machine.driver_data<pushman_state>();
 
-	MACHINE_RESET_CALL(pushman);
+	MACHINE_RESET_CALL_MEMBER(pushman);
 
-	state->m_latch = 0x400;
+	m_latch = 0x400;
 }
 
 static MACHINE_CONFIG_START( bballs, pushman_state )
@@ -492,8 +487,7 @@ static MACHINE_CONFIG_START( bballs, pushman_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(3600))
 
-	MCFG_MACHINE_START(pushman)
-	MCFG_MACHINE_RESET(bballs)
+	MCFG_MACHINE_RESET_OVERRIDE(pushman_state,bballs)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -506,7 +500,6 @@ static MACHINE_CONFIG_START( bballs, pushman_state )
 	MCFG_GFXDECODE(pushman)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(pushman)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -77,6 +77,8 @@ public:
 	DECLARE_READ32_MEMBER(a310_psy_wram_r);
 	DECLARE_WRITE32_MEMBER(a310_psy_wram_w);
 	DECLARE_DRIVER_INIT(a310);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -116,17 +118,17 @@ DRIVER_INIT_MEMBER(a310_state,a310)
 	archimedes_driver_init(machine());
 }
 
-static MACHINE_START( a310 )
+void a310_state::machine_start()
 {
-	archimedes_init(machine);
+	archimedes_init(machine());
 
 	// reset the DAC to centerline
-	//machine.device<dac_device>("dac")->write_signed8(0x80);
+	//machine().device<dac_device>("dac")->write_signed8(0x80);
 }
 
-static MACHINE_RESET( a310 )
+void a310_state::machine_reset()
 {
-	archimedes_reset(machine);
+	archimedes_reset(machine());
 }
 
 static ADDRESS_MAP_START( a310_mem, AS_PROGRAM, 32, a310_state )
@@ -268,8 +270,6 @@ static MACHINE_CONFIG_START( a310, a310_state )
 	MCFG_CPU_ADD("maincpu", ARM, 8000000)        /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(a310_mem)
 
-	MCFG_MACHINE_START( a310 )
-	MCFG_MACHINE_RESET( a310 )
 
 	MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)
 

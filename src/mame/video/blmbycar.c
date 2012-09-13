@@ -118,19 +118,18 @@ WRITE16_MEMBER(blmbycar_state::blmbycar_vram_1_w)
 
 ***************************************************************************/
 
-VIDEO_START( blmbycar )
+void blmbycar_state::video_start()
 {
-	blmbycar_state *state = machine.driver_data<blmbycar_state>();
 
-	state->m_tilemap_0 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blmbycar_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
-	state->m_tilemap_1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blmbycar_state::get_tile_info_1),state), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
+	m_tilemap_0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blmbycar_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
+	m_tilemap_1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blmbycar_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
 
-	state->m_tilemap_0->set_scroll_rows(1);
-	state->m_tilemap_0->set_scroll_cols(1);
+	m_tilemap_0->set_scroll_rows(1);
+	m_tilemap_0->set_scroll_cols(1);
 
-	state->m_tilemap_1->set_scroll_rows(1);
-	state->m_tilemap_1->set_scroll_cols(1);
-	state->m_tilemap_1->set_transparent_pen(0);
+	m_tilemap_1->set_scroll_rows(1);
+	m_tilemap_1->set_scroll_cols(1);
+	m_tilemap_1->set_transparent_pen(0);
 }
 
 

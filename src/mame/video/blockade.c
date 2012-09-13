@@ -20,10 +20,9 @@ TILE_GET_INFO_MEMBER(blockade_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
-VIDEO_START( blockade )
+void blockade_state::video_start()
 {
-	blockade_state *state = machine.driver_data<blockade_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blockade_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blockade_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 SCREEN_UPDATE_IND16( blockade )

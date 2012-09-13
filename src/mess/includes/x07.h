@@ -259,4 +259,5 @@ public:
 	UINT8 m_prn_char_code;
 	UINT8 m_prn_buffer[0x100];
 	UINT8 m_prn_size;
+	virtual void palette_init();
 };

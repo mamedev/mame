@@ -343,33 +343,31 @@ static GFXDECODE_START( chaknpop )
 GFXDECODE_END
 
 
-static MACHINE_START( chaknpop )
+void chaknpop_state::machine_start()
 {
-	chaknpop_state *state = machine.driver_data<chaknpop_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
-	state->save_item(NAME(state->m_gfxmode));
-	state->save_item(NAME(state->m_flip_x));
-	state->save_item(NAME(state->m_flip_y));
+	save_item(NAME(m_gfxmode));
+	save_item(NAME(m_flip_x));
+	save_item(NAME(m_flip_y));
 
-	state->save_item(NAME(state->m_mcu_seed));
-	state->save_item(NAME(state->m_mcu_result));
-	state->save_item(NAME(state->m_mcu_select));
+	save_item(NAME(m_mcu_seed));
+	save_item(NAME(m_mcu_result));
+	save_item(NAME(m_mcu_select));
 }
 
-static MACHINE_RESET( chaknpop )
+void chaknpop_state::machine_reset()
 {
-	chaknpop_state *state = machine.driver_data<chaknpop_state>();
 
-	state->m_gfxmode = 0;
-	state->m_flip_x = 0;
-	state->m_flip_y = 0;
+	m_gfxmode = 0;
+	m_flip_x = 0;
+	m_flip_y = 0;
 
-	state->m_mcu_seed = MCU_INITIAL_SEED;
-	state->m_mcu_result = 0;
-	state->m_mcu_select = 0;
+	m_mcu_seed = MCU_INITIAL_SEED;
+	m_mcu_result = 0;
+	m_mcu_select = 0;
 }
 
 static MACHINE_CONFIG_START( chaknpop, chaknpop_state )
@@ -379,8 +377,6 @@ static MACHINE_CONFIG_START( chaknpop, chaknpop_state )
 	MCFG_CPU_PROGRAM_MAP(chaknpop_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(chaknpop)
-	MCFG_MACHINE_RESET(chaknpop)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -393,8 +389,6 @@ static MACHINE_CONFIG_START( chaknpop, chaknpop_state )
 	MCFG_GFXDECODE(chaknpop)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_PALETTE_INIT(chaknpop)
-	MCFG_VIDEO_START(chaknpop)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

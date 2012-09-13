@@ -129,6 +129,8 @@ public:
 	DECLARE_READ32_MEMBER(hpc3_unkpbus0_r);
 	DECLARE_WRITE32_MEMBER(hpc3_unkpbus0_w);
 	DECLARE_DRIVER_INIT(ip225015);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -1218,23 +1220,23 @@ static TIMER_CALLBACK(ip22_timer)
 	machine.scheduler().timer_set(attotime::from_msec(1), FUNC(ip22_timer));
 }
 
-static MACHINE_RESET( ip225015 )
+void ip22_state::machine_reset()
 {
-	ip22_state *state = machine.driver_data<ip22_state>();
-	state->m_HPC3.nenetr_nbdp = 0x80000000;
-	state->m_HPC3.nenetr_cbp = 0x80000000;
-	state->m_nIntCounter = 0;
+	ip22_state *state = machine().driver_data<ip22_state>();
+	m_HPC3.nenetr_nbdp = 0x80000000;
+	m_HPC3.nenetr_cbp = 0x80000000;
+	m_nIntCounter = 0;
 	RTC_REGISTERB = 0x08;
 	RTC_REGISTERD = 0x80;
 
-	machine.scheduler().timer_set(attotime::from_msec(1), FUNC(ip22_timer));
+	machine().scheduler().timer_set(attotime::from_msec(1), FUNC(ip22_timer));
 
 	// set up low RAM mirror
-	state->membank("bank1")->set_base(state->m_mainram);
+	membank("bank1")->set_base(m_mainram);
 
-	state->m_PBUS_DMA.nActive = 0;
+	m_PBUS_DMA.nActive = 0;
 
-	mips3drc_set_options(machine.device("maincpu"), MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
+	mips3drc_set_options(machine().device("maincpu"), MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
 }
 
 static void dump_chain(address_space *space, UINT32 ch_base)
@@ -1509,16 +1511,15 @@ static int ip22_get_out2(running_machine &machine) {
 	return pit8253_get_output(machine.device("pit8254"), 2 );
 }
 
-static MACHINE_START( ip225015 )
+void ip22_state::machine_start()
 {
-	ip22_state *state = machine.driver_data<ip22_state>();
-	sgi_mc_init(machine);
+	sgi_mc_init(machine());
 
 	// SCSI init
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ip225015_exit),&machine));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ip225015_exit),&machine()));
 
-	machine.device<nvram_device>("nvram_user")->set_base(state->m_RTC.nUserRAM, 0x200);
-	machine.device<nvram_device>("nvram")->set_base(state->m_RTC.nRAM, 0x200);
+	machine().device<nvram_device>("nvram_user")->set_base(m_RTC.nUserRAM, 0x200);
+	machine().device<nvram_device>("nvram")->set_base(m_RTC.nRAM, 0x200);
 }
 
 DRIVER_INIT_MEMBER(ip22_state,ip225015)
@@ -1636,8 +1637,6 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_CPU_PROGRAM_MAP( ip225015_map)
 	MCFG_CPU_VBLANK_INT("screen", ip22_vbl)
 
-	MCFG_MACHINE_START( ip225015 )
-	MCFG_MACHINE_RESET( ip225015 )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_NVRAM_ADD_0FILL("nvram_user")

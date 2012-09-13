@@ -384,33 +384,32 @@ DRIVER_INIT_MEMBER(mbc55x_state,mbc55x)
 {
 }
 
-MACHINE_RESET( mbc55x )
+void mbc55x_state::machine_reset()
 {
-	set_ram_size(machine);
-	keyboard_reset(machine);
-	machine.device(MAINCPU_TAG)->execute().set_irq_acknowledge_callback(mbc55x_irq_callback);
+	set_ram_size(machine());
+	keyboard_reset(machine());
+	machine().device(MAINCPU_TAG)->execute().set_irq_acknowledge_callback(mbc55x_irq_callback);
 }
 
-MACHINE_START( mbc55x )
+void mbc55x_state::machine_start()
 {
-	mbc55x_state *state = machine.driver_data<mbc55x_state>();
 	/* init cpu */
-//  mbc55x_cpu_init(machine);
+//  mbc55x_cpu_init(machine());
 
 
 	/* setup debug commands */
-	if (machine.debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		debug_console_register_command(machine, "mbc55x_debug", CMDFLAG_NONE, 0, 0, 1, mbc55x_debug);
+		debug_console_register_command(machine(), "mbc55x_debug", CMDFLAG_NONE, 0, 0, 1, mbc55x_debug);
 
 		/* set up the instruction hook */
-		machine.device(MAINCPU_TAG)->debug()->set_instruction_hook(instruction_hook);
+		machine().device(MAINCPU_TAG)->debug()->set_instruction_hook(instruction_hook);
 	}
 
-	state->m_debug_machine=DEBUG_NONE;
+	m_debug_machine=DEBUG_NONE;
 
 	// Allocate keyscan timer
-	state->m_keyboard.keyscan_timer=machine.scheduler().timer_alloc(FUNC(keyscan_callback));
+	m_keyboard.keyscan_timer=machine().scheduler().timer_alloc(FUNC(keyscan_callback));
 }
 
 

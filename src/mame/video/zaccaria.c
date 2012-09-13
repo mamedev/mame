@@ -33,9 +33,9 @@ Here's the hookup from the proms (82s131) to the r-g-b-outputs
 
 
 ***************************************************************************/
-PALETTE_INIT( zaccaria )
+void zaccaria_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i, j, k;
 	static const int resistances_rg[] = { 1200, 1000, 820 };
 	static const int resistances_b[]  = { 1000, 820 };
@@ -48,7 +48,7 @@ PALETTE_INIT( zaccaria )
 							 0, 0, 0, 0, 0);
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x200);
+	machine().colortable = colortable_alloc(machine(), 0x200);
 
 	for (i = 0; i < 0x200; i++)
 	{
@@ -61,7 +61,7 @@ PALETTE_INIT( zaccaria )
           black anyway.
          */
 		if (((i % 64) / 8) == 0)
-			colortable_palette_set_color(machine.colortable, i, RGB_BLACK);
+			colortable_palette_set_color(machine().colortable, i, RGB_BLACK);
 		else
 		{
 			int bit0, bit1, bit2;
@@ -84,7 +84,7 @@ PALETTE_INIT( zaccaria )
 			bit1 = (color_prom[i + 0x200] >> 0) & 0x01;
 			b = combine_2_weights(weights_b, bit0, bit1);
 
-			colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+			colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 		}
 	}
 
@@ -96,13 +96,13 @@ PALETTE_INIT( zaccaria )
 		for (j = 0;j < 4;j++)
 			for (k = 0;k < 8;k++)
 				/* swap j and k to make the colors sequential */
-				colortable_entry_set_value(machine.colortable, 0 + 32 * i + 8 * j + k, 64 * i + 8 * k + 2*j);
+				colortable_entry_set_value(machine().colortable, 0 + 32 * i + 8 * j + k, 64 * i + 8 * k + 2*j);
 
 	for (i = 0;i < 8;i++)
 		for (j = 0;j < 4;j++)
 			for (k = 0;k < 8;k++)
 				/* swap j and k to make the colors sequential */
-				colortable_entry_set_value(machine.colortable, 256 + 32 * i + 8 * j + k, 64 * i + 8 * k + 2*j+1);
+				colortable_entry_set_value(machine().colortable, 256 + 32 * i + 8 * j + k, 64 * i + 8 * k + 2*j+1);
 }
 
 
@@ -131,12 +131,11 @@ TILE_GET_INFO_MEMBER(zaccaria_state::get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( zaccaria )
+void zaccaria_state::video_start()
 {
-	zaccaria_state *state = machine.driver_data<zaccaria_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(zaccaria_state::get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(zaccaria_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	state->m_bg_tilemap->set_scroll_cols(32);
+	m_bg_tilemap->set_scroll_cols(32);
 }
 
 

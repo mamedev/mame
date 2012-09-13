@@ -296,13 +296,12 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( matmania )
+MACHINE_START_MEMBER(matmania_state,matmania)
 {
-	matmania_state *state = machine.driver_data<matmania_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_mcu = machine.device("mcu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_mcu = machine().device("mcu");
 }
 
 static MACHINE_CONFIG_START( matmania, matmania_state )
@@ -318,7 +317,7 @@ static MACHINE_CONFIG_START( matmania, matmania_state )
 								/* IRQs are caused by the main CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(matmania)
+	MCFG_MACHINE_START_OVERRIDE(matmania_state,matmania)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -331,8 +330,6 @@ static MACHINE_CONFIG_START( matmania, matmania_state )
 	MCFG_GFXDECODE(matmania)
 	MCFG_PALETTE_LENGTH(64+16)
 
-	MCFG_PALETTE_INIT(matmania)
-	MCFG_VIDEO_START(matmania)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -354,44 +351,42 @@ static const ym3526_interface ym3526_config =
 };
 
 
-static MACHINE_START( maniach )
+MACHINE_START_MEMBER(matmania_state,maniach)
 {
-	matmania_state *state = machine.driver_data<matmania_state>();
 
-	MACHINE_START_CALL(matmania);
+	MACHINE_START_CALL_MEMBER(matmania);
 
-	state->save_item(NAME(state->m_port_a_in));
-	state->save_item(NAME(state->m_port_a_out));
-	state->save_item(NAME(state->m_ddr_a));
-	state->save_item(NAME(state->m_port_b_in));
-	state->save_item(NAME(state->m_port_b_out));
-	state->save_item(NAME(state->m_ddr_b));
-	state->save_item(NAME(state->m_port_c_in));
-	state->save_item(NAME(state->m_port_c_out));
-	state->save_item(NAME(state->m_ddr_c));
-	state->save_item(NAME(state->m_mcu_sent));
-	state->save_item(NAME(state->m_main_sent));
-	state->save_item(NAME(state->m_from_main));
-	state->save_item(NAME(state->m_from_mcu));
+	save_item(NAME(m_port_a_in));
+	save_item(NAME(m_port_a_out));
+	save_item(NAME(m_ddr_a));
+	save_item(NAME(m_port_b_in));
+	save_item(NAME(m_port_b_out));
+	save_item(NAME(m_ddr_b));
+	save_item(NAME(m_port_c_in));
+	save_item(NAME(m_port_c_out));
+	save_item(NAME(m_ddr_c));
+	save_item(NAME(m_mcu_sent));
+	save_item(NAME(m_main_sent));
+	save_item(NAME(m_from_main));
+	save_item(NAME(m_from_mcu));
 }
 
-static MACHINE_RESET( maniach )
+MACHINE_RESET_MEMBER(matmania_state,maniach)
 {
-	matmania_state *state = machine.driver_data<matmania_state>();
 
-	state->m_port_a_in = 0;
-	state->m_port_a_out = 0;
-	state->m_ddr_a = 0;
-	state->m_port_b_in = 0;
-	state->m_port_b_out = 0;
-	state->m_ddr_b = 0;
-	state->m_port_c_in = 0;
-	state->m_port_c_out = 0;
-	state->m_ddr_c = 0;
-	state->m_mcu_sent = 0;
-	state->m_main_sent = 0;
-	state->m_from_main = 0;
-	state->m_from_mcu = 0;
+	m_port_a_in = 0;
+	m_port_a_out = 0;
+	m_ddr_a = 0;
+	m_port_b_in = 0;
+	m_port_b_out = 0;
+	m_ddr_b = 0;
+	m_port_c_in = 0;
+	m_port_c_out = 0;
+	m_ddr_c = 0;
+	m_mcu_sent = 0;
+	m_main_sent = 0;
+	m_from_main = 0;
+	m_from_mcu = 0;
 }
 
 static MACHINE_CONFIG_START( maniach, matmania_state )
@@ -410,8 +405,8 @@ static MACHINE_CONFIG_START( maniach, matmania_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slice per frame - high interleaving to sync main and mcu */
 
-	MCFG_MACHINE_START(maniach)
-	MCFG_MACHINE_RESET(maniach)
+	MCFG_MACHINE_START_OVERRIDE(matmania_state,maniach)
+	MCFG_MACHINE_RESET_OVERRIDE(matmania_state,maniach)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -424,8 +419,6 @@ static MACHINE_CONFIG_START( maniach, matmania_state )
 	MCFG_GFXDECODE(maniach)
 	MCFG_PALETTE_LENGTH(64+16)
 
-	MCFG_PALETTE_INIT(matmania)
-	MCFG_VIDEO_START(matmania)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

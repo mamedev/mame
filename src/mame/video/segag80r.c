@@ -179,26 +179,25 @@ TILE_GET_INFO_MEMBER(segag80r_state::bg_get_tile_info)
  *
  *************************************/
 
-VIDEO_START( segag80r )
+void segag80r_state::video_start()
 {
-	segag80r_state *state = machine.driver_data<segag80r_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	static const int rg_resistances[3] = { 4700, 2400, 1200 };
 	static const int b_resistances[2] = { 2000, 1000 };
 
 	/* compute the color output resistor weights at startup */
 	compute_resistor_weights(0,	255, -1.0,
-			3,	rg_resistances, state->m_rweights, 220, 0,
-			3,	rg_resistances, state->m_gweights, 220, 0,
-			2,	b_resistances,  state->m_bweights, 220, 0);
+			3,	rg_resistances, m_rweights, 220, 0,
+			3,	rg_resistances, m_gweights, 220, 0,
+			2,	b_resistances,  m_bweights, 220, 0);
 
-	machine.gfx[0]->set_source(&videoram[0x800]);
+	machine().gfx[0]->set_source(&videoram[0x800]);
 
 	/* allocate paletteram */
-	state->m_generic_paletteram_8.allocate(0x80);
+	m_generic_paletteram_8.allocate(0x80);
 
 	/* initialize the particulars for each type of background PCB */
-	switch (state->m_background_pcb)
+	switch (m_background_pcb)
 	{
 		/* nothing to do here */
 		case G80_BACKGROUND_NONE:
@@ -207,40 +206,40 @@ VIDEO_START( segag80r )
 		/* create a fixed background palette and two tilemaps, one horizontally scrolling */
 		/* and one vertically scrolling */
 		case G80_BACKGROUND_SPACEOD:
-			spaceod_bg_init_palette(machine);
-			state->m_spaceod_bg_htilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(segag80r_state::spaceod_get_tile_info),state), tilemap_mapper_delegate(FUNC(segag80r_state::spaceod_scan_rows),state),  8,8, 128,32);
-			state->m_spaceod_bg_vtilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(segag80r_state::spaceod_get_tile_info),state), tilemap_mapper_delegate(FUNC(segag80r_state::spaceod_scan_rows),state),  8,8, 32,128);
+			spaceod_bg_init_palette(machine());
+			m_spaceod_bg_htilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segag80r_state::spaceod_get_tile_info),this), tilemap_mapper_delegate(FUNC(segag80r_state::spaceod_scan_rows),this),  8,8, 128,32);
+			m_spaceod_bg_vtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segag80r_state::spaceod_get_tile_info),this), tilemap_mapper_delegate(FUNC(segag80r_state::spaceod_scan_rows),this),  8,8, 32,128);
 			break;
 
 		/* background tilemap is effectively 1 screen x n screens */
 		case G80_BACKGROUND_MONSTERB:
-			state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(segag80r_state::bg_get_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 32,machine.root_device().memregion("gfx2")->bytes() / 32);
+			m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segag80r_state::bg_get_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,machine().root_device().memregion("gfx2")->bytes() / 32);
 			break;
 
 		/* background tilemap is effectively 4 screens x n screens */
 		case G80_BACKGROUND_PIGNEWT:
 		case G80_BACKGROUND_SINDBADM:
-			state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(segag80r_state::bg_get_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 128,machine.root_device().memregion("gfx2")->bytes() / 128);
+			m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segag80r_state::bg_get_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 128,machine().root_device().memregion("gfx2")->bytes() / 128);
 			break;
 	}
 
 	/* register for save states */
-	state_save_register_global(machine, state->m_video_control);
-	state_save_register_global(machine, state->m_video_flip);
-	state_save_register_global(machine, state->m_vblank_latch);
+	state_save_register_global(machine(), m_video_control);
+	state_save_register_global(machine(), m_video_flip);
+	state_save_register_global(machine(), m_vblank_latch);
 
-	state_save_register_global(machine, state->m_spaceod_hcounter);
-	state_save_register_global(machine, state->m_spaceod_vcounter);
-	state_save_register_global(machine, state->m_spaceod_fixed_color);
-	state_save_register_global(machine, state->m_spaceod_bg_control);
-	state_save_register_global(machine, state->m_spaceod_bg_detect);
+	state_save_register_global(machine(), m_spaceod_hcounter);
+	state_save_register_global(machine(), m_spaceod_vcounter);
+	state_save_register_global(machine(), m_spaceod_fixed_color);
+	state_save_register_global(machine(), m_spaceod_bg_control);
+	state_save_register_global(machine(), m_spaceod_bg_detect);
 
-	state_save_register_global(machine, state->m_bg_enable);
-	state_save_register_global(machine, state->m_bg_char_bank);
-	state_save_register_global(machine, state->m_bg_scrollx);
-	state_save_register_global(machine, state->m_bg_scrolly);
+	state_save_register_global(machine(), m_bg_enable);
+	state_save_register_global(machine(), m_bg_char_bank);
+	state_save_register_global(machine(), m_bg_scrollx);
+	state_save_register_global(machine(), m_bg_scrolly);
 
-	state_save_register_global(machine, state->m_pignewt_bg_color_offset);
+	state_save_register_global(machine(), m_pignewt_bg_color_offset);
 }
 
 

@@ -127,36 +127,33 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-static VIDEO_START( ladyfrog_common )
+VIDEO_START_MEMBER(ladyfrog_state,ladyfrog_common)
 {
-	ladyfrog_state *state = machine.driver_data<ladyfrog_state>();
 
-	state->m_spriteram = auto_alloc_array(machine, UINT8, 160);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ladyfrog_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_spriteram = auto_alloc_array(machine(), UINT8, 160);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ladyfrog_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_generic_paletteram_8.allocate(0x200);
-	state->m_generic_paletteram2_8.allocate(0x200);
-	state->m_bg_tilemap->set_scroll_cols(32);
-	state->m_bg_tilemap->set_scrolldy(15, 15);
+	m_generic_paletteram_8.allocate(0x200);
+	m_generic_paletteram2_8.allocate(0x200);
+	m_bg_tilemap->set_scroll_cols(32);
+	m_bg_tilemap->set_scrolldy(15, 15);
 
-	state->save_pointer(NAME(state->m_spriteram), 160);
+	save_pointer(NAME(m_spriteram), 160);
 }
 
-VIDEO_START( ladyfrog )
+void ladyfrog_state::video_start()
 {
-	ladyfrog_state *state = machine.driver_data<ladyfrog_state>();
 
 	// weird, there are sprite tiles at 0x000 and 0x400, but they don't contain all the sprites!
-	state->m_spritetilebase = 0x800;
-	VIDEO_START_CALL(ladyfrog_common);
+	m_spritetilebase = 0x800;
+	VIDEO_START_CALL_MEMBER(ladyfrog_common);
 }
 
-VIDEO_START( toucheme )
+VIDEO_START_MEMBER(ladyfrog_state,toucheme)
 {
-	ladyfrog_state *state = machine.driver_data<ladyfrog_state>();
 
-	state->m_spritetilebase = 0x000;
-	VIDEO_START_CALL(ladyfrog_common);
+	m_spritetilebase = 0x000;
+	VIDEO_START_CALL_MEMBER(ladyfrog_common);
 }
 
 

@@ -31,11 +31,12 @@ public:
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/deadang.c -----------*/
 
 
-VIDEO_START( deadang );
+
 SCREEN_UPDATE_IND16( deadang );

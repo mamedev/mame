@@ -103,6 +103,8 @@ public:
 	DECLARE_DRIVER_INIT(jojo);
 	DECLARE_DRIVER_INIT(jojoba);
 	DECLARE_DRIVER_INIT(sfiii2);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 

@@ -78,37 +78,34 @@ TILE_GET_INFO_MEMBER(lwings_state::get_bg2_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( lwings )
+void lwings_state::video_start()
 {
-	lwings_state *state = machine.driver_data<lwings_state>();
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::lwings_get_bg1_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::lwings_get_bg1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(3);
+	m_fg_tilemap->set_transparent_pen(3);
 }
 
-VIDEO_START( trojan )
+VIDEO_START_MEMBER(lwings_state,trojan)
 {
-	lwings_state *state = machine.driver_data<lwings_state>();
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::trojan_get_bg1_tile_info),state),TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::get_bg2_tile_info),state), tilemap_mapper_delegate(FUNC(lwings_state::get_bg2_memory_offset),state), 16, 16, 32, 16);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::trojan_get_bg1_tile_info),this),TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(lwings_state::get_bg2_memory_offset),this), 16, 16, 32, 16);
 
-	state->m_fg_tilemap->set_transparent_pen(3);
-	state->m_bg1_tilemap->set_transmask(0, 0xffff, 0x0001); /* split type 0 is totally transparent in front half */
-	state->m_bg1_tilemap->set_transmask(1, 0xf07f, 0x0f81); /* split type 1 has pens 7-11 opaque in front half */
+	m_fg_tilemap->set_transparent_pen(3);
+	m_bg1_tilemap->set_transmask(0, 0xffff, 0x0001); /* split type 0 is totally transparent in front half */
+	m_bg1_tilemap->set_transmask(1, 0xf07f, 0x0f81); /* split type 1 has pens 7-11 opaque in front half */
 
-	state->m_bg2_avenger_hw = 0;
+	m_bg2_avenger_hw = 0;
 }
 
-VIDEO_START( avengers )
+VIDEO_START_MEMBER(lwings_state,avengers)
 {
-	lwings_state *state = machine.driver_data<lwings_state>();
 
-	VIDEO_START_CALL(trojan);
-	state->m_bg2_avenger_hw = 1;
+	VIDEO_START_CALL_MEMBER(trojan);
+	m_bg2_avenger_hw = 1;
 }
 
 /***************************************************************************

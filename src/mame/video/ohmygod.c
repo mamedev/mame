@@ -26,10 +26,9 @@ TILE_GET_INFO_MEMBER(ohmygod_state::get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( ohmygod )
+void ohmygod_state::video_start()
 {
-	ohmygod_state *state = machine.driver_data<ohmygod_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ohmygod_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ohmygod_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 }
 
 

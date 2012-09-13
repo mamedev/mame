@@ -45,6 +45,7 @@ public:
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	UINT8 *m_ram;
 	UINT8 m_term_data;
+	virtual void machine_reset();
 };
 
 READ16_MEMBER( dms86_state::dms86_82_r )
@@ -93,7 +94,7 @@ static INPUT_PORTS_START( dms86 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(dms86)
+void dms86_state::machine_reset()
 {
 }
 
@@ -114,7 +115,6 @@ static MACHINE_CONFIG_START( dms86, dms86_state )
 	MCFG_CPU_PROGRAM_MAP(dms86_mem)
 	MCFG_CPU_IO_MAP(dms86_io)
 
-	MCFG_MACHINE_RESET(dms86)
 
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END

@@ -55,6 +55,9 @@ class shtzone_state : public driver_device
 public:
 	shtzone_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 static ADDRESS_MAP_START( shtzone_map, AS_PROGRAM, 8, shtzone_state )
@@ -67,17 +70,17 @@ static INPUT_PORTS_START( shtzone )
 INPUT_PORTS_END
 
 
-static MACHINE_START( shtzone )
+void shtzone_state::machine_start()
 {
 
 }
 
-static MACHINE_RESET( shtzone )
+void shtzone_state::machine_reset()
 {
 
 }
 
-VIDEO_START( shtzone )
+void shtzone_state::video_start()
 {
 
 }
@@ -98,8 +101,6 @@ static MACHINE_CONFIG_START( shtzone, shtzone_state )
 
 	/* + SMS CPU */
 
-	MCFG_MACHINE_START(shtzone)
-	MCFG_MACHINE_RESET(shtzone)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -111,7 +112,6 @@ static MACHINE_CONFIG_START( shtzone, shtzone_state )
 
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(shtzone)
 MACHINE_CONFIG_END
 
 

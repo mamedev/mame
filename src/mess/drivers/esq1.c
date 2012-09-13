@@ -91,6 +91,7 @@ public:
     int m_seq_bank;
     UINT8 m_seqram[0x10000];
     UINT8 m_dosram[0x2000];
+	virtual void machine_reset();
 };
 
 
@@ -103,14 +104,13 @@ static UINT8 esq1_adc_read(device_t *device)
 	return 0x80;
 }
 
-static MACHINE_RESET( esq1 )
+void esq1_state::machine_reset()
 {
 	// set default OSROM banking
-	esq1_state *state = machine.driver_data<esq1_state>();
-	state->membank("osbank")->set_base(machine.root_device().memregion("osrom")->base() );
+	membank("osbank")->set_base(machine().root_device().memregion("osrom")->base() );
 
-    state->m_mapper_state = 0;
-    state->m_seq_bank = 0;
+    m_mapper_state = 0;
+    m_seq_bank = 0;
 }
 
 READ8_MEMBER(esq1_state::wd1772_r)
@@ -267,7 +267,6 @@ static MACHINE_CONFIG_START( esq1, esq1_state )
 	MCFG_CPU_ADD("maincpu", M6809E, 4000000)	// how fast is it?
 	MCFG_CPU_PROGRAM_MAP(esq1_map)
 
-	MCFG_MACHINE_RESET( esq1 )
 
 	MCFG_DUART68681_ADD("duart", 4000000, duart_config)
 

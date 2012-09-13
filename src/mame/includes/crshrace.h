@@ -47,11 +47,14 @@ public:
 	DECLARE_DRIVER_INIT(crshrace);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 /*----------- defined in video/crshrace.c -----------*/
 
 
-VIDEO_START( crshrace );
+
 SCREEN_VBLANK( crshrace );
 SCREEN_UPDATE_IND16( crshrace );

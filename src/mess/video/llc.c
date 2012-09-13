@@ -10,10 +10,9 @@
 #include "includes/llc.h"
 
 
-VIDEO_START( llc )
+void llc_state::video_start()
 {
-	llc_state *state = machine.driver_data<llc_state>();
-	state->m_p_chargen = state->memregion("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 SCREEN_UPDATE_IND16( llc1 )

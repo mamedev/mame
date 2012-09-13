@@ -486,7 +486,6 @@ static MACHINE_CONFIG_START( shangha3, shangha3_state )
 	MCFG_GFXDECODE(shangha3)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(shangha3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -524,7 +523,6 @@ static MACHINE_CONFIG_START( heberpop, shangha3_state )
 	MCFG_GFXDECODE(shangha3)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(shangha3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -563,7 +561,6 @@ static MACHINE_CONFIG_START( blocken, shangha3_state )
 	MCFG_GFXDECODE(shangha3)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(shangha3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

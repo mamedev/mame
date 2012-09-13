@@ -15,9 +15,9 @@
  *
  *************************************/
 
-PALETTE_INIT( dribling )
+void dribling_state::palette_init()
 {
-	const UINT8 *prom = machine.root_device().memregion("proms")->base() + 0x400;
+	const UINT8 *prom = machine().root_device().memregion("proms")->base() + 0x400;
 	int i;
 
 	for (i = 0; i < 256; i++)
@@ -30,7 +30,7 @@ PALETTE_INIT( dribling )
 		g *= 0x55;
 		b *= 0xff;
 
-		palette_set_color(machine, i, MAKE_RGB(r,g,b));
+		palette_set_color(machine(), i, MAKE_RGB(r,g,b));
 	}
 }
 

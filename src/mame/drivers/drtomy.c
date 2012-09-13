@@ -37,6 +37,9 @@ public:
 	DECLARE_WRITE16_MEMBER(drtomy_okibank_w);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -119,14 +122,13 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-static VIDEO_START( drtomy )
+void drtomy_state::video_start()
 {
-	drtomy_state *state = machine.driver_data<drtomy_state>();
 
-	state->m_tilemap_bg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(drtomy_state::get_tile_info_bg),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_tilemap_fg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(drtomy_state::get_tile_info_fg),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap_bg = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(drtomy_state::get_tile_info_bg),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap_fg = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(drtomy_state::get_tile_info_fg),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	state->m_tilemap_fg->set_transparent_pen(0);
+	m_tilemap_fg->set_transparent_pen(0);
 }
 
 static SCREEN_UPDATE_IND16( drtomy )
@@ -281,18 +283,16 @@ static INPUT_PORTS_START( drtomy )
 INPUT_PORTS_END
 
 
-static MACHINE_START( drtomy )
+void drtomy_state::machine_start()
 {
-	drtomy_state *state = machine.driver_data<drtomy_state>();
 
-	state->save_item(NAME(state->m_oki_bank));
+	save_item(NAME(m_oki_bank));
 }
 
-static MACHINE_RESET( drtomy )
+void drtomy_state::machine_reset()
 {
-	drtomy_state *state = machine.driver_data<drtomy_state>();
 
-	state->m_oki_bank = 0;
+	m_oki_bank = 0;
 }
 
 static MACHINE_CONFIG_START( drtomy, drtomy_state )
@@ -302,8 +302,6 @@ static MACHINE_CONFIG_START( drtomy, drtomy_state )
 	MCFG_CPU_PROGRAM_MAP(drtomy_map)
 	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MCFG_MACHINE_START(drtomy)
-	MCFG_MACHINE_RESET(drtomy)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -316,7 +314,6 @@ static MACHINE_CONFIG_START( drtomy, drtomy_state )
 	MCFG_GFXDECODE(drtomy)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(drtomy)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

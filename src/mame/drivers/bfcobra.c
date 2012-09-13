@@ -297,6 +297,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(data_acia_rx_r);
 	DECLARE_WRITE_LINE_MEMBER(data_acia_tx_w);
 	DECLARE_DRIVER_INIT(bfcobra);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -343,25 +345,24 @@ static const UINT8 col3bit_default[16]=
 static const UINT8 col76index[] = {0, 2, 4, 7};
 
 
-static VIDEO_START( bfcobra )
+void bfcobra_state::video_start()
 {
-	bfcobra_state *state = machine.driver_data<bfcobra_state>();
 	int i;
 
-	memcpy(state->m_col4bit, col4bit_default, sizeof(state->m_col4bit));
-	memcpy(state->m_col3bit, col3bit_default, sizeof(state->m_col3bit));
+	memcpy(m_col4bit, col4bit_default, sizeof(m_col4bit));
+	memcpy(m_col3bit, col3bit_default, sizeof(m_col3bit));
 	for (i = 0; i < 256; ++i)
 	{
 		UINT8 col;
 
-		state->m_col8bit[i] = i;
+		m_col8bit[i] = i;
 		col = i & 0x7f;
 		col = (col & 0x1f) | (col76index[ ( (col & 0x60) >> 5 ) & 3] << 5);
-		state->m_col7bit[i] = col;
+		m_col7bit[i] = col;
 
 		col = (col & 3) | (col76index[( (col & 0x0c) >> 2) & 3] << 2 ) |
 			  (col76index[( (col & 0x30) >> 4) & 3] << 5 );
-		state->m_col6bit[i] = col;
+		m_col6bit[i] = col;
 	}
 }
 
@@ -1320,21 +1321,20 @@ WRITE8_MEMBER(bfcobra_state::fd_ctrl_w)
 }
 #endif
 
-static MACHINE_RESET( bfcobra )
+void bfcobra_state::machine_reset()
 {
-	bfcobra_state *state = machine.driver_data<bfcobra_state>();
 	unsigned int pal;
 
 	for (pal = 0; pal < 256; ++pal)
 	{
-		palette_set_color_rgb(machine, pal, pal3bit((pal>>5)&7), pal3bit((pal>>2)&7), pal2bit(pal&3));
+		palette_set_color_rgb(machine(), pal, pal3bit((pal>>5)&7), pal3bit((pal>>2)&7), pal2bit(pal&3));
 	}
 
-	state->m_bank_data[0] = 1;
-	memset(&state->m_ramdac, 0, sizeof(state->m_ramdac));
-	reset_fdc(machine);
+	m_bank_data[0] = 1;
+	memset(&m_ramdac, 0, sizeof(m_ramdac));
+	reset_fdc(machine());
 
-	state->m_irq_state = state->m_blitter_irq = state->m_vblank_irq = state->m_acia_irq = 0;
+	m_irq_state = m_blitter_irq = m_vblank_irq = m_acia_irq = 0;
 }
 
 /***************************************************************************
@@ -1787,7 +1787,6 @@ static MACHINE_CONFIG_START( bfcobra, bfcobra_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_MACHINE_RESET(bfcobra)
 
 	/* TODO */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1807,7 +1806,6 @@ static MACHINE_CONFIG_START( bfcobra, bfcobra_state )
 	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_VIDEO_START(bfcobra)
 
 	/* ACIAs */
 	MCFG_ACIA6850_ADD("acia6850_0", z80_acia_if)

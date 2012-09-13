@@ -51,6 +51,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mexico86_68705_ddr_b_w);
 	DECLARE_WRITE8_MEMBER(mexico86_bankswitch_w);
 	DECLARE_READ8_MEMBER(kiki_ym2203_r);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 

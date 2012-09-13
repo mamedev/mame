@@ -194,16 +194,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mjtensin_rtc_irq);
 	DECLARE_DRIVER_INIT(janptr96);
 	DECLARE_DRIVER_INIT(ippatsu);
+	virtual void palette_init();
+	DECLARE_PALETTE_INIT(mjderngr);
 };
 
 
 
 
-static PALETTE_INIT( royalmah )
+void royalmah_state::palette_init()
 {
 	offs_t i;
-	const UINT8 *prom = machine.root_device().memregion("proms")->base();
-	int len = machine.root_device().memregion("proms")->bytes();
+	const UINT8 *prom = machine().root_device().memregion("proms")->base();
+	int len = machine().root_device().memregion("proms")->bytes();
 
 	for (i = 0; i < len; i++)
 	{
@@ -229,16 +231,16 @@ static PALETTE_INIT( royalmah )
 		bit2 = (data >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color_rgb(machine,i, r,g,b);
+		palette_set_color_rgb(machine(),i, r,g,b);
 	}
 }
 
 
-static PALETTE_INIT( mjderngr )
+PALETTE_INIT_MEMBER(royalmah_state,mjderngr)
 {
 	offs_t i;
-	const UINT8 *prom = machine.root_device().memregion("proms")->base();
-	int len = machine.root_device().memregion("proms")->bytes();
+	const UINT8 *prom = machine().root_device().memregion("proms")->base();
+	int len = machine().root_device().memregion("proms")->bytes();
 
 	for (i = 0; i < len / 2; i++)
 	{
@@ -249,7 +251,7 @@ static PALETTE_INIT( mjderngr )
 		UINT8 g = BITSWAP8((data >>  5) & 0x1f,7,6,5,0,1,2,3,4 );
 		UINT8 b = BITSWAP8((data >> 10) & 0x1f,7,6,5,0,1,2,3,4 );
 
-		palette_set_color_rgb(machine,i, pal5bit(r), pal5bit(g), pal5bit(b));
+		palette_set_color_rgb(machine(),i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -3173,7 +3175,6 @@ static MACHINE_CONFIG_START( royalmah, royalmah_state )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(16*2)
-	MCFG_PALETTE_INIT(royalmah)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(256, 256)
@@ -3285,7 +3286,7 @@ static MACHINE_CONFIG_DERIVED( mjderngr, dondenmj )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(16*32)
-	MCFG_PALETTE_INIT(mjderngr)
+	MCFG_PALETTE_INIT_OVERRIDE(royalmah_state,mjderngr)
 MACHINE_CONFIG_END
 
 /* It runs in IM 2, thus needs a vector on the data bus */

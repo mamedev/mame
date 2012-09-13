@@ -10,13 +10,13 @@
 #include "includes/cop01.h"
 
 
-PALETTE_INIT( cop01 )
+void cop01_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x100);
+	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -25,7 +25,7 @@ PALETTE_INIT( cop01 )
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -33,7 +33,7 @@ PALETTE_INIT( cop01 )
 
 	/* characters use colors 0x00-0x0f (or 0x00-0x7f, but the eight rows are identical) */
 	for (i = 0; i < 0x10; i++)
-		colortable_entry_set_value(machine.colortable, i, i);
+		colortable_entry_set_value(machine().colortable, i, i);
 
 	/* background tiles use colors 0xc0-0xff */
 	/* I don't know how much of the lookup table PROM is hooked up, */
@@ -42,14 +42,14 @@ PALETTE_INIT( cop01 )
 	{
 		UINT8 ctabentry = 0xc0 | ((i - 0x10) & 0x30) |
 						  (color_prom[(((i - 0x10) & 0x40) >> 2) | ((i - 0x10) & 0x0f)] & 0x0f);
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	/* sprites use colors 0x80-0x8f (or 0x80-0xbf, but the four rows are identical) */
 	for (i = 0x90; i < 0x190; i++)
 	{
 		UINT8 ctabentry = 0x80 | (color_prom[i - 0x90 + 0x100] & 0x0f);
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 
@@ -98,17 +98,16 @@ TILE_GET_INFO_MEMBER(cop01_state::get_fg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( cop01 )
+void cop01_state::video_start()
 {
-	cop01_state *state = machine.driver_data<cop01_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cop01_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cop01_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cop01_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cop01_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(15);
+	m_fg_tilemap->set_transparent_pen(15);
 
 	/* priority doesn't exactly work this way, see above */
-	state->m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); /* split type 0 is totally transparent in front half */
-	state->m_bg_tilemap->set_transmask(1, 0x0fff, 0xf000); /* split type 1 has pens 0-11 transparent in front half */
+	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); /* split type 0 is totally transparent in front half */
+	m_bg_tilemap->set_transmask(1, 0x0fff, 0xf000); /* split type 1 has pens 0-11 transparent in front half */
 }
 
 

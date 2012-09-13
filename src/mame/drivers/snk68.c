@@ -610,7 +610,6 @@ static MACHINE_CONFIG_START( pow, snk68_state )
 	MCFG_GFXDECODE(pow)
 	MCFG_PALETTE_LENGTH(0x800)
 
-	MCFG_VIDEO_START(pow)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -629,7 +628,7 @@ static MACHINE_CONFIG_DERIVED( searchar, pow )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(searchar_map)
 
-	MCFG_VIDEO_START(searchar)
+	MCFG_VIDEO_START_OVERRIDE(snk68_state,searchar)
 MACHINE_CONFIG_END
 
 

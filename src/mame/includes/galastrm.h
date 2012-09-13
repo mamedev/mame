@@ -46,10 +46,11 @@ public:
 	DECLARE_WRITE32_MEMBER(galastrm_adstick_ctrl_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/galastrm.c -----------*/
 
-VIDEO_START( galastrm );
+
 SCREEN_UPDATE_IND16( galastrm );

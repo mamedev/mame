@@ -113,18 +113,16 @@ GFXDECODE_END
 
 
 
-static MACHINE_START( news )
+void news_state::machine_start()
 {
-	news_state *state = machine.driver_data<news_state>();
 
-	state->save_item(NAME(state->m_bgpic));
+	save_item(NAME(m_bgpic));
 }
 
-static MACHINE_RESET( news )
+void news_state::machine_reset()
 {
-	news_state *state = machine.driver_data<news_state>();
 
-	state->m_bgpic = 0;
+	m_bgpic = 0;
 }
 
 static MACHINE_CONFIG_START( news, news_state )
@@ -134,8 +132,6 @@ static MACHINE_CONFIG_START( news, news_state )
 	MCFG_CPU_PROGRAM_MAP(news_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(news)
-	MCFG_MACHINE_RESET(news)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -148,7 +144,6 @@ static MACHINE_CONFIG_START( news, news_state )
 	MCFG_GFXDECODE(news)
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(news)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

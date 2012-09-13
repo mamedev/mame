@@ -291,7 +291,7 @@ static MACHINE_CONFIG_START( a1200n, ami1200_state )
 
 //  MCFG_CPU_ADD("keyboard_mpu", MC68HC05)
 
-	MCFG_MACHINE_RESET(amiga)
+	MCFG_MACHINE_RESET_OVERRIDE(ami1200_state,amiga)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -303,7 +303,7 @@ static MACHINE_CONFIG_START( a1200n, ami1200_state )
 	MCFG_SCREEN_VISIBLE_AREA((129-8-8)*2, (449+8-1+8)*2, 44-8, 300+8-1)
 	MCFG_SCREEN_UPDATE_STATIC(amiga_aga)
 
-	MCFG_VIDEO_START(amiga_aga)
+	MCFG_VIDEO_START_OVERRIDE(ami1200_state,amiga_aga)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

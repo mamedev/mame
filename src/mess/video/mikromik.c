@@ -6,11 +6,11 @@
 //  PALETTE_INIT( mm1 )
 //-------------------------------------------------
 
-static PALETTE_INIT( mm1 )
+PALETTE_INIT_MEMBER(mm1_state,mm1)
 {
-	palette_set_color(machine, 0, RGB_BLACK); /* black */
-	palette_set_color_rgb(machine, 1, 0x00, 0xc0, 0x00); /* green */
-	palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00); /* bright green */
+	palette_set_color(machine(), 0, RGB_BLACK); /* black */
+	palette_set_color_rgb(machine(), 1, 0x00, 0xc0, 0x00); /* green */
+	palette_set_color_rgb(machine(), 2, 0x00, 0xff, 0x00); /* bright green */
 }
 
 
@@ -162,7 +162,7 @@ MACHINE_CONFIG_FRAGMENT( mm1m6_video )
 
 	MCFG_GFXDECODE(mm1)
 	MCFG_PALETTE_LENGTH(3)
-	MCFG_PALETTE_INIT(mm1)
+	MCFG_PALETTE_INIT_OVERRIDE(mm1_state,mm1)
 
 	MCFG_I8275_ADD(I8275_TAG, crtc_intf)
 	MCFG_UPD7220_ADD(UPD7220_TAG, XTAL_18_720MHz/8, hgdc_intf, mm1_upd7220_map)

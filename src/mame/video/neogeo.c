@@ -845,54 +845,53 @@ WRITE16_MEMBER(neogeo_state::neogeo_video_register_w)
  *
  *************************************/
 
-VIDEO_START( neogeo )
+void neogeo_state::video_start()
 {
-	neogeo_state *state = machine.driver_data<neogeo_state>();
 
 	/* allocate memory not directly mapped */
-	state->m_palettes[0] = auto_alloc_array(machine, UINT16, NUM_PENS);
-	state->m_palettes[1] = auto_alloc_array(machine, UINT16, NUM_PENS);
-	state->m_pens = auto_alloc_array(machine, pen_t, NUM_PENS);
-	state->m_videoram = auto_alloc_array(machine, UINT16, 0x20000/2);
+	m_palettes[0] = auto_alloc_array(machine(), UINT16, NUM_PENS);
+	m_palettes[1] = auto_alloc_array(machine(), UINT16, NUM_PENS);
+	m_pens = auto_alloc_array(machine(), pen_t, NUM_PENS);
+	m_videoram = auto_alloc_array(machine(), UINT16, 0x20000/2);
 
 	/* clear allocated memory */
-	memset(state->m_palettes[0], 0x00, NUM_PENS * sizeof(UINT16));
-	memset(state->m_palettes[1], 0x00, NUM_PENS * sizeof(UINT16));
-	memset(state->m_pens, 0x00, NUM_PENS * sizeof(pen_t));
-	memset(state->m_videoram, 0x00, 0x20000);
+	memset(m_palettes[0], 0x00, NUM_PENS * sizeof(UINT16));
+	memset(m_palettes[1], 0x00, NUM_PENS * sizeof(UINT16));
+	memset(m_pens, 0x00, NUM_PENS * sizeof(pen_t));
+	memset(m_videoram, 0x00, 0x20000);
 
-	compute_rgb_weights(machine);
-	create_sprite_line_timer(machine);
-	create_auto_animation_timer(machine);
-	optimize_sprite_data(machine);
+	compute_rgb_weights(machine());
+	create_sprite_line_timer(machine());
+	create_auto_animation_timer(machine());
+	optimize_sprite_data(machine());
 
 	/* initialize values that are not modified on a reset */
-	state->m_videoram_read_buffer = 0;
-	state->m_videoram_offset = 0;
-	state->m_videoram_modulo = 0;
-	state->m_auto_animation_speed = 0;
-	state->m_auto_animation_disabled = 0;
-	state->m_auto_animation_counter = 0;
-	state->m_auto_animation_frame_counter = 0;
+	m_videoram_read_buffer = 0;
+	m_videoram_offset = 0;
+	m_videoram_modulo = 0;
+	m_auto_animation_speed = 0;
+	m_auto_animation_disabled = 0;
+	m_auto_animation_counter = 0;
+	m_auto_animation_frame_counter = 0;
 
 	/* register for state saving */
-	state->save_pointer(NAME(state->m_palettes[0]), NUM_PENS);
-	state->save_pointer(NAME(state->m_palettes[1]), NUM_PENS);
-	state->save_pointer(NAME(state->m_videoram), 0x20000/2);
-	state->save_item(NAME(state->m_videoram_read_buffer));
-	state->save_item(NAME(state->m_videoram_modulo));
-	state->save_item(NAME(state->m_videoram_offset));
-	state->save_item(NAME(state->m_fixed_layer_source));
-	state->save_item(NAME(state->m_screen_dark));
-	state->save_item(NAME(state->m_palette_bank));
-	state->save_item(NAME(state->m_auto_animation_speed));
-	state->save_item(NAME(state->m_auto_animation_disabled));
-	state->save_item(NAME(state->m_auto_animation_counter));
-	state->save_item(NAME(state->m_auto_animation_frame_counter));
+	save_pointer(NAME(m_palettes[0]), NUM_PENS);
+	save_pointer(NAME(m_palettes[1]), NUM_PENS);
+	save_pointer(NAME(m_videoram), 0x20000/2);
+	save_item(NAME(m_videoram_read_buffer));
+	save_item(NAME(m_videoram_modulo));
+	save_item(NAME(m_videoram_offset));
+	save_item(NAME(m_fixed_layer_source));
+	save_item(NAME(m_screen_dark));
+	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_auto_animation_speed));
+	save_item(NAME(m_auto_animation_disabled));
+	save_item(NAME(m_auto_animation_counter));
+	save_item(NAME(m_auto_animation_frame_counter));
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(regenerate_pens), &machine));
+	machine().save().register_postload(save_prepost_delegate(FUNC(regenerate_pens), &machine()));
 
-	state->m_region_zoomy = state->memregion("zoomy")->base();
+	m_region_zoomy = memregion("zoomy")->base();
 }
 
 
@@ -903,11 +902,11 @@ VIDEO_START( neogeo )
  *
  *************************************/
 
-VIDEO_RESET( neogeo )
+void neogeo_state::video_reset()
 {
-	start_sprite_line_timer(machine);
-	start_auto_animation_timer(machine);
-	optimize_sprite_data(machine);
+	start_sprite_line_timer(machine());
+	start_auto_animation_timer(machine());
+	optimize_sprite_data(machine());
 }
 
 

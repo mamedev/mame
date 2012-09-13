@@ -17,23 +17,21 @@
 static const rectangle bottomvisiblearea(16*8, 48*8-1, 6*8, 32*8-1);
 
 
-VIDEO_START( vigilant )
+void vigilant_state::video_start()
 {
-	vigilant_state *state = machine.driver_data<vigilant_state>();
-	state->m_bg_bitmap = auto_bitmap_ind16_alloc(machine,512*4,256);
+	m_bg_bitmap = auto_bitmap_ind16_alloc(machine(),512*4,256);
 }
 
 
-VIDEO_RESET( vigilant )
+void vigilant_state::video_reset()
 {
-	vigilant_state *state = machine.driver_data<vigilant_state>();
-	state->m_horiz_scroll_low = 0;
-	state->m_horiz_scroll_high = 0;
-	state->m_rear_horiz_scroll_low = 0;
-	state->m_rear_horiz_scroll_high = 0;
-	state->m_rear_color = 0;
-	state->m_rear_disable = 1;
-	state->m_rear_refresh = 1;
+	m_horiz_scroll_low = 0;
+	m_horiz_scroll_high = 0;
+	m_rear_horiz_scroll_low = 0;
+	m_rear_horiz_scroll_high = 0;
+	m_rear_color = 0;
+	m_rear_disable = 1;
+	m_rear_refresh = 1;
 }
 
 

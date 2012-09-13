@@ -30,12 +30,12 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( m57 )
+void m57_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	machine.colortable = colortable_alloc(machine, 32 * 8 + 16);
+	machine().colortable = colortable_alloc(machine(), 32 * 8 + 16);
 
 	/* character palette */
 	for (i = 0; i < 256; i++)
@@ -58,8 +58,8 @@ PALETTE_INIT( m57 )
 		bit2 = (color_prom[0] >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r,g,b));
-		colortable_entry_set_value(machine.colortable, i, i);
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r,g,b));
+		colortable_entry_set_value(machine().colortable, i, i);
 		color_prom++;
 	}
 
@@ -87,7 +87,7 @@ PALETTE_INIT( m57 )
 		bit2 = (*color_prom >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine.colortable, i + 256, MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable, i + 256, MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -98,7 +98,7 @@ PALETTE_INIT( m57 )
 	/* sprite lookup table */
 	for (i = 0; i < 32 * 8; i++)
 	{
-		colortable_entry_set_value(machine.colortable, i + 32 * 8, 256 + (~*color_prom & 0x0f));
+		colortable_entry_set_value(machine().colortable, i + 32 * 8, 256 + (~*color_prom & 0x0f));
 		color_prom++;
 	}
 }
@@ -140,14 +140,13 @@ WRITE8_MEMBER(m57_state::m57_videoram_w)
  *
  *************************************/
 
-VIDEO_START( m57 )
+void m57_state::video_start()
 {
-	m57_state *state = machine.driver_data<m57_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(m57_state::get_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
-	state->m_bg_tilemap->set_scroll_rows(256);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m57_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_bg_tilemap->set_scroll_rows(256);
 
-	state->save_item(NAME(state->m_flipscreen));
+	save_item(NAME(m_flipscreen));
 }
 
 

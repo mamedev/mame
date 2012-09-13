@@ -578,9 +578,9 @@ static const rgb_t apple2_palette[] =
 };
 
 /* Initialize the palette */
-PALETTE_INIT( apple2 )
+PALETTE_INIT_MEMBER(apple2_state,apple2)
 {
-	palette_set_colors(machine, 0, apple2_palette, ARRAY_LENGTH(apple2_palette));
+	palette_set_colors(machine(), 0, apple2_palette, ARRAY_LENGTH(apple2_palette));
 }
 
 static const cassette_interface apple2_cassette_interface =
@@ -645,7 +645,7 @@ static MACHINE_CONFIG_START( apple2_common, apple2_state )
 	MCFG_TIMER_ADD_SCANLINE("scantimer", apple2_interrupt, "screen", 0, 1)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START( apple2 )
+	MCFG_MACHINE_START_OVERRIDE(apple2_state, apple2 )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -655,9 +655,9 @@ static MACHINE_CONFIG_START( apple2_common, apple2_state )
 	MCFG_SCREEN_UPDATE_STATIC(apple2)
 
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(apple2_palette))
-	MCFG_PALETTE_INIT(apple2)
+	MCFG_PALETTE_INIT_OVERRIDE(apple2_state,apple2)
 
-	MCFG_VIDEO_START(apple2)
+	MCFG_VIDEO_START_OVERRIDE(apple2_state,apple2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -679,7 +679,7 @@ static MACHINE_CONFIG_START( apple2_common, apple2_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2, apple2_common )
-	MCFG_MACHINE_START(apple2orig)
+	MCFG_MACHINE_START_OVERRIDE(apple2_state,apple2orig)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -693,8 +693,8 @@ static MACHINE_CONFIG_DERIVED( apple2, apple2_common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
-	MCFG_MACHINE_START(apple2orig)
-	MCFG_VIDEO_START(apple2p)
+	MCFG_MACHINE_START_OVERRIDE(apple2_state,apple2orig)
+	MCFG_VIDEO_START_OVERRIDE(apple2_state,apple2p)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -708,7 +708,7 @@ static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
-    MCFG_VIDEO_START(apple2e)
+    MCFG_VIDEO_START_OVERRIDE(apple2_state,apple2e)
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
@@ -726,8 +726,8 @@ static MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tk2000, apple2_common )
-	MCFG_MACHINE_START(tk2000)
-    MCFG_VIDEO_START(apple2e)
+	MCFG_MACHINE_START_OVERRIDE(apple2_state,tk2000)
+    MCFG_VIDEO_START_OVERRIDE(apple2_state,apple2e)
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
@@ -784,7 +784,7 @@ static MACHINE_CONFIG_DERIVED( apple2c_iwm, apple2c )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( laser128, apple2c )
-	MCFG_MACHINE_START(laser128)
+	MCFG_MACHINE_START_OVERRIDE(apple2_state,laser128)
 
     MCFG_A2BUS_SLOT_REMOVE("sl6")
 
@@ -798,7 +798,7 @@ static MACHINE_CONFIG_DERIVED( laser128, apple2c )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( space84, apple2p )
-	MCFG_MACHINE_START(space84)
+	MCFG_MACHINE_START_OVERRIDE(apple2_state,space84)
 MACHINE_CONFIG_END
 
 /***************************************************************************

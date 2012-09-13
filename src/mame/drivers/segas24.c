@@ -1258,37 +1258,35 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static MACHINE_START( system24 )
+void segas24_state::machine_start()
 {
-	segas24_state *state = machine.driver_data<segas24_state>();
-	if (state->track_size)
-		machine.device<nvram_device>("floppy_nvram")->set_base(state->memregion("floppy")->base(), 2*state->track_size);
+	if (track_size)
+		machine().device<nvram_device>("floppy_nvram")->set_base(memregion("floppy")->base(), 2*track_size);
 
-	UINT8 *usr1 = state->memregion("romboard")->base();
+	UINT8 *usr1 = memregion("romboard")->base();
 	if (usr1)
 	{
-		state->membank("bank1")->configure_entries(0, 16, usr1, 0x40000);
-		state->membank("bank2")->configure_entries(0, 16, usr1, 0x40000);
+		membank("bank1")->configure_entries(0, 16, usr1, 0x40000);
+		membank("bank2")->configure_entries(0, 16, usr1, 0x40000);
 	}
 
-	state->vtile = machine.device<segas24_tile>("tile");
-	state->vsprite = machine.device<segas24_sprite>("sprite");
-	state->vmixer = machine.device<segas24_mixer>("mixer");
+	vtile = machine().device<segas24_tile>("tile");
+	vsprite = machine().device<segas24_sprite>("sprite");
+	vmixer = machine().device<segas24_mixer>("mixer");
 }
 
-static MACHINE_RESET( system24 )
+void segas24_state::machine_reset()
 {
-	segas24_state *state = machine.driver_data<segas24_state>();
-	machine.device("subcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	state->prev_resetcontrol = state->resetcontrol = 0x06;
-	state->fdc_init();
-	state->curbank = 0;
-	state->reset_bank();
-	state->irq_init();
-	state->mlatch = 0x00;
-	state->frc_mode = 0;
-	state->frc_cnt_timer = machine.device<timer_device>("frc_timer");
-	state->frc_cnt_timer->reset();
+	machine().device("subcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	prev_resetcontrol = resetcontrol = 0x06;
+	fdc_init();
+	curbank = 0;
+	reset_bank();
+	irq_init();
+	mlatch = 0x00;
+	frc_mode = 0;
+	frc_cnt_timer = machine().device<timer_device>("frc_timer");
+	frc_cnt_timer->reset();
 }
 
 /*************************************
@@ -1955,8 +1953,6 @@ static MACHINE_CONFIG_START( system24, segas24_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(system24)
-	MCFG_MACHINE_RESET(system24)
 
 	MCFG_TIMER_ADD("irq_timer", irq_timer_cb)
 	MCFG_TIMER_ADD("irq_timer_clear", irq_timer_clear_cb)

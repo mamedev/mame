@@ -551,16 +551,15 @@ READ16_MEMBER(taitoair_state::dsp_y_return_r)
 	return res;
 }
 
-VIDEO_START( taitoair )
+void taitoair_state::video_start()
 {
-	taitoair_state *state = machine.driver_data<taitoair_state>();
 	int width, height;
 
-	width = machine.primary_screen->width();
-	height = machine.primary_screen->height();
-	state->m_framebuffer[0] = auto_bitmap_ind16_alloc(machine, width, height);
-	state->m_framebuffer[1] = auto_bitmap_ind16_alloc(machine, width, height);
-	//state->m_buffer3d = auto_bitmap_ind16_alloc(machine, width, height);
+	width = machine().primary_screen->width();
+	height = machine().primary_screen->height();
+	m_framebuffer[0] = auto_bitmap_ind16_alloc(machine(), width, height);
+	m_framebuffer[1] = auto_bitmap_ind16_alloc(machine(), width, height);
+	//m_buffer3d = auto_bitmap_ind16_alloc(machine(), width, height);
 }
 
 SCREEN_UPDATE_IND16( taitoair )

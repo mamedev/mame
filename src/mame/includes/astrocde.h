@@ -116,16 +116,20 @@ public:
 	DECLARE_DRIVER_INIT(ebases);
 	DECLARE_DRIVER_INIT(gorf);
 	DECLARE_DRIVER_INIT(astrocde);
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_VIDEO_START(profpac);
+	DECLARE_PALETTE_INIT(profpac);
 };
 
 
 /*----------- defined in video/astrocde.c -----------*/
 
-PALETTE_INIT( astrocde );
-PALETTE_INIT( profpac );
 
-VIDEO_START( astrocde );
-VIDEO_START( profpac );
+
+
+
+
 
 SCREEN_UPDATE_IND16( astrocde );
 SCREEN_UPDATE_IND16( profpac );

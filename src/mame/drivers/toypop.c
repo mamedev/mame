@@ -148,17 +148,16 @@ WRITE8_MEMBER(toypop_state::toypop_m68000_assert_w)
 	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static MACHINE_RESET( toypop )
+void toypop_state::machine_reset()
 {
-	toypop_state *state = machine.driver_data<toypop_state>();
 
-	state->m_main_irq_mask = 0;
-	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_main_irq_mask = 0;
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 
-	state->m_sound_irq_mask = 0;
-	machine.device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_sound_irq_mask = 0;
+	machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
 
-	state->m_interrupt_enable_68k = 0;
+	m_interrupt_enable_68k = 0;
 }
 
 static INTERRUPT_GEN( toypop_m68000_interrupt )
@@ -562,7 +561,6 @@ static MACHINE_CONFIG_START( liblrabl, toypop_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MCFG_MACHINE_RESET(toypop)
 
 	MCFG_NAMCO58XX_ADD("58xx", intf0)
 	MCFG_NAMCO56XX_ADD("56xx_1", intf1)
@@ -579,8 +577,6 @@ static MACHINE_CONFIG_START( liblrabl, toypop_state )
 	MCFG_GFXDECODE(toypop)
 	MCFG_PALETTE_LENGTH(128*4+64*4+16*2)
 
-	MCFG_PALETTE_INIT(toypop)
-	MCFG_VIDEO_START(toypop)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

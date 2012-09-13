@@ -51,6 +51,8 @@ public:
 	DECLARE_WRITE8_MEMBER(z80_2_latch1_write);
 	DECLARE_WRITE8_MEMBER(z80_2_ldp_write);
 	DECLARE_DRIVER_INIT(istellar);
+	virtual void machine_start();
+	virtual void palette_init();
 };
 
 
@@ -86,7 +88,7 @@ static SCREEN_UPDATE_RGB32( istellar )
 }
 
 
-static MACHINE_START( istellar )
+void istellar_state::machine_start()
 {
 }
 
@@ -262,12 +264,12 @@ static INPUT_PORTS_START( istellar )
 	/* SERVICE might be hanging out back here */
 INPUT_PORTS_END
 
-static PALETTE_INIT( istellar )
+void istellar_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		int r,g,b;
 		int bit0,bit1,bit2,bit3;
@@ -295,7 +297,7 @@ static PALETTE_INIT( istellar )
 		bit3 = (color_prom[i+0x200] >> 3) & 0x01;
 		b = (0x8f * bit3) + (0x43 * bit2) + (0x1f * bit1) + (0x0e * bit0);
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -342,7 +344,6 @@ static MACHINE_CONFIG_START( istellar, istellar_state )
 	MCFG_CPU_PROGRAM_MAP(z80_2_mem)
 	MCFG_CPU_IO_MAP(z80_2_io)
 
-	MCFG_MACHINE_START(istellar)
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
 	MCFG_LASERDISC_OVERLAY_STATIC(256, 256, istellar)
@@ -351,7 +352,6 @@ static MACHINE_CONFIG_START( istellar, istellar_state )
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(istellar)
 
 	MCFG_GFXDECODE(istellar)
 

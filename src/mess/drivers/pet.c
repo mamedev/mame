@@ -623,16 +623,16 @@ static const mc6845_interface crtc_pet80 = {
 	NULL
 };
 
-static PALETTE_INIT( pet )
+void pet_state::palette_init()
 {
 	int i;
 
 	for ( i = 0; i < sizeof(pet_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, pet_palette[i*3], pet_palette[i*3+1], pet_palette[i*3+2]);
+		palette_set_color_rgb(machine(), i, pet_palette[i*3], pet_palette[i*3+1], pet_palette[i*3+2]);
 	}
 }
 
-static VIDEO_START( pet_crtc )
+VIDEO_START_MEMBER(pet_state,pet_crtc)
 {
 }
 
@@ -661,7 +661,6 @@ static MACHINE_CONFIG_START( pet_general, pet_state )
 	MCFG_CPU_PROGRAM_MAP(pet_mem)
 	MCFG_CPU_VBLANK_INT("screen", pet_frame_interrupt)
 
-	MCFG_MACHINE_RESET( pet )
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -673,7 +672,6 @@ static MACHINE_CONFIG_START( pet_general, pet_state )
 
 	MCFG_GFXDECODE( pet )
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(pet_palette) / 3)
-	MCFG_PALETTE_INIT( pet )
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, cbm_cassette_interface )
@@ -726,7 +724,7 @@ static MACHINE_CONFIG_DERIVED( pet40, pet )
 
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_17_73447MHz/3	/* This is a wild guess and mostly likely incorrect */, crtc_pet40)
 
-	MCFG_VIDEO_START( pet_crtc )
+	MCFG_VIDEO_START_OVERRIDE(pet_state, pet_crtc )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
@@ -757,7 +755,7 @@ static MACHINE_CONFIG_DERIVED( pet80, pet_general )
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12MHz / 2	/* This is a wild guess and mostly likely incorrect */, crtc_pet80)
 
 	MCFG_GFXDECODE( pet80 )
-	MCFG_VIDEO_START( pet_crtc )
+	MCFG_VIDEO_START_OVERRIDE(pet_state, pet_crtc )
 
 	MCFG_PIA6821_MODIFY( "pia_0", petb_pia0 )
 

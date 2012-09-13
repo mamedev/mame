@@ -6,17 +6,16 @@
           INITIALISATION AND CLEAN-UP
 ******************************************************/
 
-VIDEO_START( volfied )
+void volfied_state::video_start()
 {
-	volfied_state *state = machine.driver_data<volfied_state>();
-	state->m_video_ram = auto_alloc_array(machine, UINT16, 0x40000);
+	m_video_ram = auto_alloc_array(machine(), UINT16, 0x40000);
 
-	state->m_video_ctrl = 0;
-	state->m_video_mask = 0;
+	m_video_ctrl = 0;
+	m_video_mask = 0;
 
-	state->save_pointer(NAME(state->m_video_ram), 0x40000);
-	state->save_item(NAME(state->m_video_ctrl));
-	state->save_item(NAME(state->m_video_mask));
+	save_pointer(NAME(m_video_ram), 0x40000);
+	save_item(NAME(m_video_ctrl));
+	save_item(NAME(m_video_mask));
 }
 
 

@@ -85,21 +85,24 @@ public:
 
 	device_t *m_terminal;
 	DECLARE_DRIVER_INIT(ti990_10);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
-static MACHINE_START( ti990_10 )
+void ti990_10_state::machine_start()
 {
-	MACHINE_START_CALL( ti990_hdc );
+	MACHINE_START_CALL_LEGACY( ti990_hdc );
 }
 
-static MACHINE_RESET( ti990_10 )
+void ti990_10_state::machine_reset()
 {
-	ti990_hold_load(machine);
+	ti990_hold_load(machine());
 
 	ti990_reset_int();
 
-	ti990_hdc_init(machine, ti990_set_int13);
+	ti990_hdc_init(machine(), ti990_set_int13);
 }
 
 static INTERRUPT_GEN( ti990_10_line_interrupt )
@@ -145,10 +148,9 @@ static const vdt911_init_params_t vdt911_intf =
 	ti990_set_int10
 };
 
-static VIDEO_START( ti990_10 )
+void ti990_10_state::video_start()
 {
-	ti990_10_state *state = machine.driver_data<ti990_10_state>();
-	state->m_terminal = machine.device("vdt911");
+	m_terminal = machine().device("vdt911");
 }
 
 static SCREEN_UPDATE_IND16( ti990_10 )
@@ -215,8 +217,6 @@ static MACHINE_CONFIG_START( ti990_10, ti990_10_state )
 	MCFG_CPU_IO_MAP(ti990_10_io)
 	MCFG_CPU_PERIODIC_INT(ti990_10_line_interrupt, 120/*or 100 in Europe*/)
 
-	MCFG_MACHINE_START( ti990_10 )
-	MCFG_MACHINE_RESET( ti990_10 )
 
 	/* video hardware - we emulate a single 911 vdt display */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -232,7 +232,6 @@ static MACHINE_CONFIG_START( ti990_10, ti990_10_state )
 
 	MCFG_PALETTE_INIT(vdt911)
 	MCFG_VDT911_VIDEO_ADD("vdt911", vdt911_intf)
-	MCFG_VIDEO_START(ti990_10)
 
 	/* 911 VDT has a beep tone generator */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

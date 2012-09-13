@@ -479,7 +479,7 @@ static MACHINE_CONFIG_START( bagman, bagman_state )
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
-	MCFG_MACHINE_RESET(bagman)
+	MCFG_MACHINE_RESET_OVERRIDE(bagman_state,bagman)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -489,8 +489,8 @@ static MACHINE_CONFIG_START( bagman, bagman_state )
 	MCFG_GFXDECODE(bagman)
 	MCFG_PALETTE_LENGTH(64)
 
-	MCFG_PALETTE_INIT(bagman)
-	MCFG_VIDEO_START(bagman)
+	MCFG_PALETTE_INIT_OVERRIDE(bagman_state,bagman)
+	MCFG_VIDEO_START_OVERRIDE(bagman_state,bagman)
 
 	MCFG_DEVICE_ADD("tmsprom", TMSPROM, 640000 / 2)  /* rom clock */
 	MCFG_DEVICE_CONFIG(prom_intf)
@@ -515,7 +515,7 @@ static MACHINE_CONFIG_START( pickin, bagman_state )
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
-	MCFG_MACHINE_RESET(bagman)
+	MCFG_MACHINE_RESET_OVERRIDE(bagman_state,bagman)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -525,8 +525,8 @@ static MACHINE_CONFIG_START( pickin, bagman_state )
 	MCFG_GFXDECODE(pickin)
 	MCFG_PALETTE_LENGTH(64)
 
-	MCFG_PALETTE_INIT(bagman)
-	MCFG_VIDEO_START(bagman)
+	MCFG_PALETTE_INIT_OVERRIDE(bagman_state,bagman)
+	MCFG_VIDEO_START_OVERRIDE(bagman_state,bagman)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -567,7 +567,7 @@ static MACHINE_CONFIG_START( botanic, bagman_state )
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
-	MCFG_MACHINE_RESET(bagman)
+	MCFG_MACHINE_RESET_OVERRIDE(bagman_state,bagman)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -577,8 +577,8 @@ static MACHINE_CONFIG_START( botanic, bagman_state )
 	MCFG_GFXDECODE(bagman)
 	MCFG_PALETTE_LENGTH(64)
 
-	MCFG_PALETTE_INIT(bagman)
-	MCFG_VIDEO_START(bagman)
+	MCFG_PALETTE_INIT_OVERRIDE(bagman_state,bagman)
+	MCFG_VIDEO_START_OVERRIDE(bagman_state,bagman)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

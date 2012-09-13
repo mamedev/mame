@@ -216,17 +216,16 @@ static const UINT8 fakecols[4*4][8][3]=
 
 };
 
-VIDEO_START( ssrj )
+void ssrj_state::video_start()
 {
-	ssrj_state *state = machine.driver_data<ssrj_state>();
 
-	state->m_tilemap1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ssrj_state::get_tile_info1),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
-	state->m_tilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ssrj_state::get_tile_info2),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
-	state->m_tilemap4 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ssrj_state::get_tile_info4),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
-	state->m_tilemap2->set_transparent_pen(0);
-	state->m_tilemap4->set_transparent_pen(0);
+	m_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ssrj_state::get_tile_info1),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ssrj_state::get_tile_info2),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_tilemap4 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ssrj_state::get_tile_info4),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_tilemap2->set_transparent_pen(0);
+	m_tilemap4->set_transparent_pen(0);
 
-	state->m_buffer_spriteram = auto_alloc_array(machine, UINT8, 0x0800);
+	m_buffer_spriteram = auto_alloc_array(machine(), UINT8, 0x0800);
 }
 
 
@@ -266,12 +265,12 @@ static void draw_objects(running_machine &machine, bitmap_ind16 &bitmap, const r
 }
 
 
-PALETTE_INIT( ssrj )
+void ssrj_state::palette_init()
 {
 	int i, j;
 	for(i=0; i<4*4; i++)
 		for(j=0; j<8; j++)
-			palette_set_color_rgb(machine, i*8+j, fakecols[i][j][0], fakecols[i][j][1], fakecols[i][j][2]);
+			palette_set_color_rgb(machine(), i*8+j, fakecols[i][j][0], fakecols[i][j][1], fakecols[i][j][2]);
 }
 
 SCREEN_UPDATE_IND16( ssrj )

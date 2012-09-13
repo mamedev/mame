@@ -51,18 +51,24 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(pc8300_setdirect);
 	DECLARE_DIRECT_UPDATE_MEMBER(pow3000_setdirect);
 	DECLARE_DRIVER_INIT(zx);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_PALETTE_INIT(ts1000);
+	DECLARE_MACHINE_RESET(pc8300);
+	DECLARE_MACHINE_RESET(pow3000);
 };
 
 
 /*----------- defined in machine/zx.c -----------*/
 
-MACHINE_RESET( zx80 );
-MACHINE_RESET( pow3000 );
-MACHINE_RESET( pc8300 );
+
+
+
 
 /*----------- defined in video/zx.c -----------*/
 
-VIDEO_START( zx );
+
 SCREEN_VBLANK( zx );
 
 void zx_ula_bkgnd(running_machine &machine, int color);

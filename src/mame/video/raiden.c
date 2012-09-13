@@ -65,28 +65,26 @@ TILE_GET_INFO_MEMBER(raiden_state::get_text_tile_info)
 			0);
 }
 
-VIDEO_START( raiden )
+void raiden_state::video_start()
 {
-	raiden_state *state = machine.driver_data<raiden_state>();
-	state->m_bg_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(raiden_state::get_back_tile_info),state),TILEMAP_SCAN_COLS,     16,16,32,32);
-	state->m_fg_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(raiden_state::get_fore_tile_info),state),TILEMAP_SCAN_COLS,16,16,32,32);
-	state->m_tx_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(raiden_state::get_text_tile_info),state),TILEMAP_SCAN_COLS,8,8,32,32);
-	state->m_alternate=0;
+	m_bg_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(raiden_state::get_back_tile_info),this),TILEMAP_SCAN_COLS,     16,16,32,32);
+	m_fg_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(raiden_state::get_fore_tile_info),this),TILEMAP_SCAN_COLS,16,16,32,32);
+	m_tx_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(raiden_state::get_text_tile_info),this),TILEMAP_SCAN_COLS,8,8,32,32);
+	m_alternate=0;
 
-	state->m_fg_layer->set_transparent_pen(15);
-	state->m_tx_layer->set_transparent_pen(15);
+	m_fg_layer->set_transparent_pen(15);
+	m_tx_layer->set_transparent_pen(15);
 }
 
-VIDEO_START( raidena )
+VIDEO_START_MEMBER(raiden_state,raidena)
 {
-	raiden_state *state = machine.driver_data<raiden_state>();
-	state->m_bg_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(raiden_state::get_back_tile_info),state),TILEMAP_SCAN_COLS,     16,16,32,32);
-	state->m_fg_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(raiden_state::get_fore_tile_info),state),TILEMAP_SCAN_COLS,16,16,32,32);
-	state->m_tx_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(raiden_state::get_text_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
-	state->m_alternate=1;
+	m_bg_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(raiden_state::get_back_tile_info),this),TILEMAP_SCAN_COLS,     16,16,32,32);
+	m_fg_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(raiden_state::get_fore_tile_info),this),TILEMAP_SCAN_COLS,16,16,32,32);
+	m_tx_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(raiden_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_alternate=1;
 
-	state->m_fg_layer->set_transparent_pen(15);
-	state->m_tx_layer->set_transparent_pen(15);
+	m_fg_layer->set_transparent_pen(15);
+	m_tx_layer->set_transparent_pen(15);
 }
 
 WRITE16_MEMBER(raiden_state::raiden_control_w)

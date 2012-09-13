@@ -431,7 +431,6 @@ static MACHINE_CONFIG_START( policetr, policetr_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(policetr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

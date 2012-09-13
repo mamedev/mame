@@ -94,9 +94,10 @@ public:
 	required_shared_ptr<UINT16> m_vregs;
 	DECLARE_READ8_MEMBER(popo_620000_r);
 	DECLARE_WRITE8_MEMBER(popobear_irq_ack_w);
+	virtual void video_start();
 };
 
-VIDEO_START(popobear)
+void popobear_state::video_start()
 {
 
 }
@@ -472,7 +473,6 @@ static MACHINE_CONFIG_START( popobear, popobear_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_PALETTE_LENGTH(256*2)
 
-	MCFG_VIDEO_START(popobear)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

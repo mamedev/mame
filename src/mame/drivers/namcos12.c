@@ -1096,6 +1096,7 @@ public:
 	DECLARE_DRIVER_INIT(namcos12);
 	DECLARE_DRIVER_INIT(ghlpanic);
 	DECLARE_DRIVER_INIT(ptblank2);
+	DECLARE_MACHINE_RESET(namcos12);
 };
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
@@ -1384,55 +1385,54 @@ READ32_MEMBER(namcos12_state::tektagt_protection_3_r)
 	return 0;
 }
 
-static MACHINE_RESET( namcos12 )
+MACHINE_RESET_MEMBER(namcos12_state,namcos12)
 {
-	namcos12_state *state = machine.driver_data<namcos12_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	state->bankoffset_w(*space,0,0,0xffffffff);
-	state->m_has_tektagt_dma = 0;
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	bankoffset_w(*space,0,0,0xffffffff);
+	m_has_tektagt_dma = 0;
 
-	if( strcmp( machine.system().name, "tektagt" ) == 0 ||
-		strcmp( machine.system().name, "tektagtac" ) == 0 ||
-		strcmp( machine.system().name, "tektagtac1" ) == 0 ||
-		strcmp( machine.system().name, "tektagtub" ) == 0 ||
-		strcmp( machine.system().name, "tektagtjb" ) == 0 ||
-		strcmp( machine.system().name, "tektagtja" ) == 0 )
+	if( strcmp( machine().system().name, "tektagt" ) == 0 ||
+		strcmp( machine().system().name, "tektagtac" ) == 0 ||
+		strcmp( machine().system().name, "tektagtac1" ) == 0 ||
+		strcmp( machine().system().name, "tektagtub" ) == 0 ||
+		strcmp( machine().system().name, "tektagtjb" ) == 0 ||
+		strcmp( machine().system().name, "tektagtja" ) == 0 )
 	{
-		state->m_has_tektagt_dma = 1;
-		space->install_readwrite_handler(0x1fb00000, 0x1fb00003, read32_delegate(FUNC(namcos12_state::tektagt_protection_1_r),state), write32_delegate(FUNC(namcos12_state::tektagt_protection_1_w),state));
-		space->install_readwrite_handler(0x1fb80000, 0x1fb80003, read32_delegate(FUNC(namcos12_state::tektagt_protection_2_r),state), write32_delegate(FUNC(namcos12_state::tektagt_protection_2_w),state));
-		space->install_read_handler(0x1f700000, 0x1f700003, read32_delegate(FUNC(namcos12_state::tektagt_protection_3_r),state));
+		m_has_tektagt_dma = 1;
+		space->install_readwrite_handler(0x1fb00000, 0x1fb00003, read32_delegate(FUNC(namcos12_state::tektagt_protection_1_r),this), write32_delegate(FUNC(namcos12_state::tektagt_protection_1_w),this));
+		space->install_readwrite_handler(0x1fb80000, 0x1fb80003, read32_delegate(FUNC(namcos12_state::tektagt_protection_2_r),this), write32_delegate(FUNC(namcos12_state::tektagt_protection_2_w),this));
+		space->install_read_handler(0x1f700000, 0x1f700003, read32_delegate(FUNC(namcos12_state::tektagt_protection_3_r),this));
 	}
 
-	if( strcmp( machine.system().name, "tektagt" ) == 0 ||
-		strcmp( machine.system().name, "tektagtac" ) == 0 ||
-		strcmp( machine.system().name, "tektagtac1" ) == 0 ||
-		strcmp( machine.system().name, "tektagtub" ) == 0 ||
-		strcmp( machine.system().name, "tektagtjb" ) == 0 ||
-		strcmp( machine.system().name, "tektagtja" ) == 0 ||
-		strcmp( machine.system().name, "fgtlayer" ) == 0 ||
-		strcmp( machine.system().name, "golgo13" ) == 0 ||
-		strcmp( machine.system().name, "g13knd" ) == 0 ||
-		strcmp( machine.system().name, "mrdrillr" ) == 0 ||
-		strcmp( machine.system().name, "pacapp" ) == 0 ||
-		strcmp( machine.system().name, "pacappsp" ) == 0 ||
-		strcmp( machine.system().name, "pacapp2" ) == 0 ||
-		strcmp( machine.system().name, "tenkomor" ) == 0 ||
-		strcmp( machine.system().name, "tenkomorja" ) == 0 ||
-		strcmp( machine.system().name, "ptblank2" ) == 0 ||
-		strcmp( machine.system().name, "gunbarl" ) == 0 ||
-		strcmp( machine.system().name, "sws2000" ) == 0 ||
-		strcmp( machine.system().name, "sws2001" ) == 0 ||
-		strcmp( machine.system().name, "truckk" ) == 0 ||
-		strcmp( machine.system().name, "ghlpanic" ) == 0 )
+	if( strcmp( machine().system().name, "tektagt" ) == 0 ||
+		strcmp( machine().system().name, "tektagtac" ) == 0 ||
+		strcmp( machine().system().name, "tektagtac1" ) == 0 ||
+		strcmp( machine().system().name, "tektagtub" ) == 0 ||
+		strcmp( machine().system().name, "tektagtjb" ) == 0 ||
+		strcmp( machine().system().name, "tektagtja" ) == 0 ||
+		strcmp( machine().system().name, "fgtlayer" ) == 0 ||
+		strcmp( machine().system().name, "golgo13" ) == 0 ||
+		strcmp( machine().system().name, "g13knd" ) == 0 ||
+		strcmp( machine().system().name, "mrdrillr" ) == 0 ||
+		strcmp( machine().system().name, "pacapp" ) == 0 ||
+		strcmp( machine().system().name, "pacappsp" ) == 0 ||
+		strcmp( machine().system().name, "pacapp2" ) == 0 ||
+		strcmp( machine().system().name, "tenkomor" ) == 0 ||
+		strcmp( machine().system().name, "tenkomorja" ) == 0 ||
+		strcmp( machine().system().name, "ptblank2" ) == 0 ||
+		strcmp( machine().system().name, "gunbarl" ) == 0 ||
+		strcmp( machine().system().name, "sws2000" ) == 0 ||
+		strcmp( machine().system().name, "sws2001" ) == 0 ||
+		strcmp( machine().system().name, "truckk" ) == 0 ||
+		strcmp( machine().system().name, "ghlpanic" ) == 0 )
 	{
 		/* this is based on guesswork, it might not even be keycus. */
 		space->install_read_bank (0x1fc20280, 0x1fc2028b, "bank2" );
-		space->install_write_handler(0x1f008000, 0x1f008003, write32_delegate(FUNC(namcos12_state::kcon_w),state));
-		space->install_write_handler(0x1f018000, 0x1f018003, write32_delegate(FUNC(namcos12_state::kcoff_w),state));
+		space->install_write_handler(0x1f008000, 0x1f008003, write32_delegate(FUNC(namcos12_state::kcon_w),this));
+		space->install_write_handler(0x1f018000, 0x1f018003, write32_delegate(FUNC(namcos12_state::kcoff_w),this));
 
-		memset( state->m_kcram, 0, sizeof( state->m_kcram ) );
-		state->membank( "bank2" )->set_base( state->m_kcram );
+		memset( m_kcram, 0, sizeof( m_kcram ) );
+		membank( "bank2" )->set_base( m_kcram );
 	}
 }
 
@@ -1677,7 +1677,7 @@ static MACHINE_CONFIG_START( coh700, namcos12_state )
 	MCFG_CPU_PROGRAM_MAP( s12h8rwmap)
 	MCFG_CPU_IO_MAP( s12h8iomap)
 
-	MCFG_MACHINE_RESET( namcos12 )
+	MCFG_MACHINE_RESET_OVERRIDE(namcos12_state, namcos12 )
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )

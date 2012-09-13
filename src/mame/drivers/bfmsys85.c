@@ -110,6 +110,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(sys85_data_r);
 	DECLARE_WRITE_LINE_MEMBER(sys85_data_w);
 	DECLARE_DRIVER_INIT(decode);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -147,20 +149,19 @@ static ACIA6850_INTERFACE( m6809_acia_if )
 // called if board is reset ///////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-static MACHINE_RESET( bfm_sys85 )
+void bfmsys85_state::machine_reset()
 {
-	bfmsys85_state *state = machine.driver_data<bfmsys85_state>();
-	state->m_alpha_clock       = 0;
-	state->m_mmtr_latch        = 0;
-	state->m_triac_latch       = 0;
-	state->m_irq_status        = 0;
-	state->m_is_timer_enabled  = 1;
-	state->m_coin_inhibits     = 0;
-	state->m_mux_output_strobe = 0;
-	state->m_mux_input_strobe  = 0;
-	state->m_mux_input         = 0;
+	m_alpha_clock       = 0;
+	m_mmtr_latch        = 0;
+	m_triac_latch       = 0;
+	m_irq_status        = 0;
+	m_is_timer_enabled  = 1;
+	m_coin_inhibits     = 0;
+	m_mux_output_strobe = 0;
+	m_mux_input_strobe  = 0;
+	m_mux_input         = 0;
 
-	state->m_vfd->reset();	// reset display1
+	m_vfd->reset();	// reset display1
 
 // reset stepper motors ///////////////////////////////////////////////////
 	{
@@ -171,9 +172,9 @@ static MACHINE_RESET( bfm_sys85 )
 			stepper_reset_position(i);
 			if ( stepper_optic_state(i) ) pattern |= 1<<i;
 		}
-	state->m_optic_pattern = pattern;
+	m_optic_pattern = pattern;
 	}
-	state->m_locked		  = 0x00; // hardware is open
+	m_locked		  = 0x00; // hardware is open
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -368,12 +369,12 @@ READ8_MEMBER(bfmsys85_state::triac_r)
 
 // machine start (called only once) ////////////////////////////////////////
 
-static MACHINE_START( bfm_sys85 )
+void bfmsys85_state::machine_start()
 {
 	int i;
 	for ( i = 0; i < 4; i++ )
 	{
-		stepper_config(machine, i, &starpoint_interface_48step);
+		stepper_config(machine(), i, &starpoint_interface_48step);
 	}
 
 }
@@ -415,8 +416,6 @@ ADDRESS_MAP_END
 // machine driver for system85 board //////////////////////////////////////
 
 static MACHINE_CONFIG_START( bfmsys85, bfmsys85_state )
-	MCFG_MACHINE_START(bfm_sys85)						// main system85 board initialisation
-	MCFG_MACHINE_RESET(bfm_sys85)
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)			// 6809 CPU at 1 Mhz
 	MCFG_CPU_PROGRAM_MAP(memmap)						// setup read and write memorymap
 	MCFG_CPU_PERIODIC_INT(timer_irq, 1000 )				// generate 1000 IRQ's per second

@@ -47,6 +47,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen1);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen0_dual);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen1_dual);
+	DECLARE_VIDEO_START(gaelco2);
+	DECLARE_VIDEO_START(gaelco2_dual);
 };
 
 
@@ -60,7 +62,7 @@ WRITE16_DEVICE_HANDLER( gaelco2_eeprom_data_w );
 /*----------- defined in video/gaelco2.c -----------*/
 
 SCREEN_UPDATE_IND16( gaelco2 );
-VIDEO_START( gaelco2 );
+
 SCREEN_UPDATE_IND16( gaelco2_left );
 SCREEN_UPDATE_IND16( gaelco2_right );
-VIDEO_START( gaelco2_dual );
+

@@ -79,6 +79,8 @@ public:
 	TILE_GET_INFO_MEMBER(starforc_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -92,5 +94,5 @@ extern const z80ctc_interface senjyo_ctc_intf;
 /*----------- defined in video/senjyo.c -----------*/
 
 
-VIDEO_START( senjyo );
+
 SCREEN_UPDATE_IND16( senjyo );

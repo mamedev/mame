@@ -35,6 +35,8 @@ public:
 	tilemap_t *m_tmap;
 	DECLARE_DRIVER_INIT(tattack);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -64,10 +66,9 @@ static SCREEN_UPDATE_IND16( tattack )
 	return 0;
 }
 
-static VIDEO_START( tattack )
+void tattack_state::video_start()
 {
-	tattack_state *state = machine.driver_data<tattack_state>();
-	state->m_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tattack_state::get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32 );
+	m_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tattack_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
 }
 
 static ADDRESS_MAP_START( mem, AS_PROGRAM, 8, tattack_state )
@@ -175,7 +176,7 @@ static GFXDECODE_START( tattack )
 	GFXDECODE_ENTRY( "gfx1", 0     , charlayout,  0, 1 )
 GFXDECODE_END
 
-static PALETTE_INIT( tattack  )
+void tattack_state::palette_init()
 {
 	int i,r,g,b;
 	for(i=0;i<8;i++)
@@ -189,8 +190,8 @@ static PALETTE_INIT( tattack  )
 		else
 			r=g=b=128;
 
-		palette_set_color(machine,2*i,MAKE_RGB(0x00,0x00,0x00));
-		palette_set_color(machine,2*i+1,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),2*i,MAKE_RGB(0x00,0x00,0x00));
+		palette_set_color(machine(),2*i+1,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -212,9 +213,7 @@ static MACHINE_CONFIG_START( tattack, tattack_state )
 
 	MCFG_GFXDECODE(tattack)
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT(tattack )
 
-	MCFG_VIDEO_START(tattack)
 
 	/* sound hardware */
 	/* Discrete ???? */

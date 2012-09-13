@@ -44,7 +44,7 @@ TILE_GET_INFO_MEMBER(toobin_state::get_playfield_tile_info)
  *
  *************************************/
 
-VIDEO_START( toobin )
+VIDEO_START_MEMBER(toobin_state,toobin)
 {
 	static const atarimo_desc modesc =
 	{
@@ -82,22 +82,21 @@ VIDEO_START( toobin )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
-	toobin_state *state = machine.driver_data<toobin_state>();
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(toobin_state::get_playfield_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 128,64);
+	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(toobin_state::get_playfield_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 128,64);
 
 	/* initialize the motion objects */
-	atarimo_init(machine, 0, &modesc);
+	atarimo_init(machine(), 0, &modesc);
 
 	/* initialize the alphanumerics */
-	state->m_alpha_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(toobin_state::get_alpha_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 64,48);
-	state->m_alpha_tilemap->set_transparent_pen(0);
+	m_alpha_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(toobin_state::get_alpha_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,48);
+	m_alpha_tilemap->set_transparent_pen(0);
 
 	/* allocate a playfield bitmap for rendering */
-	machine.primary_screen->register_screen_bitmap(state->m_pfbitmap);
+	machine().primary_screen->register_screen_bitmap(m_pfbitmap);
 
-	state->save_item(NAME(state->m_brightness));
+	save_item(NAME(m_brightness));
 }
 
 

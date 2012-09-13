@@ -77,6 +77,7 @@ public:
 	DECLARE_WRITE8_MEMBER(rbmk_mcu_io_w);
 	DECLARE_WRITE8_MEMBER(mcu_io_mux_w);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
+	virtual void video_start();
 };
 
 
@@ -492,7 +493,7 @@ static GFXDECODE_START( rbmk )
 	GFXDECODE_ENTRY( "gfx2", 0, rbmk8_layout,   0x100, 16  )
 GFXDECODE_END
 
-static VIDEO_START(rbmk)
+void rbmk_state::video_start()
 {
 }
 
@@ -553,7 +554,6 @@ static MACHINE_CONFIG_START( rbmk, rbmk_state )
 
 	MCFG_PALETTE_LENGTH(0x800)
 
-	MCFG_VIDEO_START(rbmk)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 

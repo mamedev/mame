@@ -460,7 +460,6 @@ static MACHINE_CONFIG_START( quizdna, quizdna_state )
 	MCFG_GFXDECODE(quizdna)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(quizdna)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

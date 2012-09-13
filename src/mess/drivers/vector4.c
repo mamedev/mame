@@ -27,6 +27,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vector4_02_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
+	virtual void machine_reset();
 };
 
 
@@ -70,11 +71,10 @@ static INPUT_PORTS_START( vector4 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(vector4)
+void vector4_state::machine_reset()
 {
-	vector4_state *state = machine.driver_data<vector4_state>();
-	state->m_term_data = 0;
-	machine.device("maincpu")->state().set_state_int(Z80_PC, 0xe000);
+	m_term_data = 0;
+	machine().device("maincpu")->state().set_state_int(Z80_PC, 0xe000);
 }
 
 WRITE8_MEMBER( vector4_state::kbd_put )
@@ -94,7 +94,6 @@ static MACHINE_CONFIG_START( vector4, vector4_state )
 	MCFG_CPU_PROGRAM_MAP(vector4_mem)
 	MCFG_CPU_IO_MAP(vector4_io)
 
-	MCFG_MACHINE_RESET(vector4)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)

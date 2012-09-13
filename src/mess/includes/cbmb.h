@@ -61,6 +61,10 @@ public:
 	DECLARE_DRIVER_INIT(cbm600hu);
 	DECLARE_DRIVER_INIT(cbm600pal);
 	DECLARE_DRIVER_INIT(cbm700);
+	DECLARE_MACHINE_RESET(cbmb);
+	DECLARE_VIDEO_START(cbmb_crtc);
+	DECLARE_PALETTE_INIT(cbm700);
+	DECLARE_VIDEO_START(cbm700);
 };
 
 /*----------- defined in machine/cbmb.c -----------*/
@@ -86,21 +90,21 @@ int cbmb_dma_read_color(running_machine &machine, int offset);
 
 WRITE_LINE_DEVICE_HANDLER( cbmb_change_font );
 
-MACHINE_RESET( cbmb );
+
 
 MACHINE_CONFIG_EXTERN( cbmb_cartslot );
 
 
 /*----------- defined in video/cbmb.c -----------*/
 
-VIDEO_START( cbmb_crtc );
+
 MC6845_UPDATE_ROW( cbm600_update_row );
 MC6845_UPDATE_ROW( cbm700_update_row );
 WRITE_LINE_DEVICE_HANDLER( cbmb_display_enable_changed );
 
 void cbm600_vh_init(running_machine &machine);
 void cbm700_vh_init(running_machine &machine);
-VIDEO_START( cbm700 );
+
 
 void cbmb_vh_set_font(running_machine &machine, int font);
 

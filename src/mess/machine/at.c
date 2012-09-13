@@ -352,17 +352,16 @@ static IRQ_CALLBACK(at_irq_callback)
 	return pic8259_acknowledge(st->m_pic8259_master);
 }
 
-MACHINE_START( at )
+MACHINE_START_MEMBER(at_state,at)
 {
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(at_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(at_irq_callback);
 }
 
-MACHINE_RESET( at )
+MACHINE_RESET_MEMBER(at_state,at)
 {
-	at_state *st = machine.driver_data<at_state>();
-	st->m_poll_delay = 4;
-	st->m_at_spkrdata = 0;
-	st->m_at_speaker_input = 0;
-	st->m_dma_channel = -1;
-	st->m_cur_eop = false;
+	m_poll_delay = 4;
+	m_at_spkrdata = 0;
+	m_at_speaker_input = 0;
+	m_dma_channel = -1;
+	m_cur_eop = false;
 }

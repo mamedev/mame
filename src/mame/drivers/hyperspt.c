@@ -312,8 +312,6 @@ static MACHINE_CONFIG_START( hyperspt, hyperspt_state )
 	MCFG_GFXDECODE(hyperspt)
 	MCFG_PALETTE_LENGTH(16*16+16*16)
 
-	MCFG_PALETTE_INIT(hyperspt)
-	MCFG_VIDEO_START(hyperspt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -347,7 +345,7 @@ static MACHINE_CONFIG_DERIVED( roadf, hyperspt )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(roadf_map)
 	MCFG_GFXDECODE(roadf)
-	MCFG_VIDEO_START(roadf)
+	MCFG_VIDEO_START_OVERRIDE(hyperspt_state,roadf)
 MACHINE_CONFIG_END
 
 

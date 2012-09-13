@@ -202,8 +202,6 @@ static MACHINE_CONFIG_START( scotrsht, scotrsht_state )
 	MCFG_GFXDECODE(scotrsht)
 	MCFG_PALETTE_LENGTH(16*8*16+16*8*16)
 
-	MCFG_PALETTE_INIT(scotrsht)
-	MCFG_VIDEO_START(scotrsht)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

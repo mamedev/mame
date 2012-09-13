@@ -96,10 +96,9 @@ TILE_GET_INFO_MEMBER(homerun_state::get_homerun_tile_info)
 }
 
 
-VIDEO_START( homerun )
+void homerun_state::video_start()
 {
-	homerun_state *state = machine.driver_data<homerun_state>();
-	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(homerun_state::get_homerun_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(homerun_state::get_homerun_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 }
 
 

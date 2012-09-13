@@ -32,6 +32,8 @@ public:
 	DECLARE_DRIVER_INIT(cabalbl2);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	virtual void video_start();
+	DECLARE_MACHINE_RESET(cabalbl);
 };
 
 

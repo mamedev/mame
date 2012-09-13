@@ -17,12 +17,14 @@ public:
 	DECLARE_WRITE16_MEMBER(eeprom_data_w);
 	DECLARE_DRIVER_INIT(xorworld);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/xorworld.c -----------*/
 
 
-PALETTE_INIT( xorworld );
-VIDEO_START( xorworld );
+
+
 SCREEN_UPDATE_IND16( xorworld );

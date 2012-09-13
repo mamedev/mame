@@ -326,7 +326,7 @@ DRIVER_INIT_MEMBER(cbmb_state,p500)
 	m_cbm_ntsc = 1;
 }
 
-MACHINE_RESET( cbmb )
+MACHINE_RESET_MEMBER(cbmb_state,cbmb)
 {
 //removed   cbm_drive_0_config (IEEE8ON ? IEEE : 0, 8);
 //removed   cbm_drive_1_config (IEEE9ON ? IEEE : 0, 9);

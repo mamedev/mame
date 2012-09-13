@@ -23,12 +23,13 @@ public:
 	DECLARE_WRITE8_MEMBER(paletteram_xBGR_RRRR_GGGG_BBBB_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/quizdna.c -----------*/
 
-VIDEO_START( quizdna );
+
 SCREEN_UPDATE_IND16( quizdna );
 
 

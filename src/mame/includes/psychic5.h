@@ -40,6 +40,11 @@ public:
 	DECLARE_WRITE8_MEMBER(bombsa_unknown_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void machine_reset();
+	DECLARE_VIDEO_START(psychic5);
+	DECLARE_VIDEO_RESET(psychic5);
+	DECLARE_VIDEO_START(bombsa);
+	DECLARE_VIDEO_RESET(bombsa);
 };
 
 
@@ -47,11 +52,11 @@ public:
 
 
 
-VIDEO_START( psychic5 );
-VIDEO_RESET( psychic5 );
+
+
 SCREEN_UPDATE_RGB32( psychic5 );
 
 
-VIDEO_START( bombsa );
-VIDEO_RESET( bombsa );
+
+
 SCREEN_UPDATE_RGB32( bombsa );

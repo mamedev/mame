@@ -1832,8 +1832,8 @@ static MACHINE_CONFIG_START( mcr_90009, mcr_state )
 	MCFG_Z80CTC_ADD("ctc", MAIN_OSC_MCR_I/8 /* same as "maincpu" */, mcr_ctc_intf)
 
 	MCFG_WATCHDOG_VBLANK_INIT(16)
-	MCFG_MACHINE_START(mcr)
-	MCFG_MACHINE_RESET(mcr)
+	MCFG_MACHINE_START_OVERRIDE(mcr_state,mcr)
+	MCFG_MACHINE_RESET_OVERRIDE(mcr_state,mcr)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
@@ -1849,7 +1849,7 @@ static MACHINE_CONFIG_START( mcr_90009, mcr_state )
 	MCFG_GFXDECODE(mcr)
 	MCFG_PALETTE_LENGTH(32)
 
-	MCFG_VIDEO_START(mcr)
+	MCFG_VIDEO_START_OVERRIDE(mcr_state,mcr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1932,7 +1932,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcr_91490_ipu, mcr_91490_snt )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_START(nflfoot)
+	MCFG_MACHINE_START_OVERRIDE(mcr_state,nflfoot)
 
 	MCFG_CPU_ADD("ipu", Z80, 7372800/2)
 	MCFG_CPU_CONFIG(mcr_ipu_daisy_chain)

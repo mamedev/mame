@@ -43,6 +43,8 @@ public:
 	DECLARE_DRIVER_INIT(minferno);
 	DECLARE_DRIVER_INIT(gypsyjug);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -55,6 +57,6 @@ void meadows_sh_update(running_machine &machine);
 
 /*----------- defined in video/meadows.c -----------*/
 
-VIDEO_START( meadows );
+
 SCREEN_UPDATE_IND16( meadows );
 

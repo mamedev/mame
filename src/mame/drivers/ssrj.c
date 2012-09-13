@@ -34,13 +34,12 @@ HW info :
 #include "sound/ay8910.h"
 #include "includes/ssrj.h"
 
-static MACHINE_RESET(ssrj)
+void ssrj_state::machine_reset()
 {
-	ssrj_state *state = machine.driver_data<ssrj_state>();
-	UINT8 *rom = state->memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	memset(&rom[0xc000], 0 ,0x3fff); /* req for some control types */
-	state->m_oldport = 0x80;
+	m_oldport = 0x80;
 }
 
 READ8_MEMBER(ssrj_state::ssrj_wheel_r)
@@ -158,11 +157,8 @@ static MACHINE_CONFIG_START( ssrj, ssrj_state )
 
 	MCFG_GFXDECODE(ssrj)
 	MCFG_PALETTE_LENGTH(128)
-	MCFG_PALETTE_INIT(ssrj)
 
-	MCFG_VIDEO_START(ssrj)
 
-	MCFG_MACHINE_RESET(ssrj)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

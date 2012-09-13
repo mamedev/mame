@@ -73,6 +73,8 @@ public:
 	DECLARE_WRITE8_MEMBER(palette1_w);
 	DECLARE_WRITE8_MEMBER(palette2_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void machine_start();
+	virtual void video_start();
 };
 
 
@@ -93,10 +95,9 @@ TILE_GET_INFO_MEMBER(onetwo_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static VIDEO_START( onetwo )
+void onetwo_state::video_start()
 {
-	onetwo_state *state = machine.driver_data<onetwo_state>();
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(onetwo_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(onetwo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 static SCREEN_UPDATE_IND16( onetwo )
@@ -345,15 +346,14 @@ static const ym3812_interface ym3812_config =
  *
  *************************************/
 
-static MACHINE_START( onetwo )
+void onetwo_state::machine_start()
 {
-	onetwo_state *state = machine.driver_data<onetwo_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 }
 
 static MACHINE_CONFIG_START( onetwo, onetwo_state )
@@ -368,7 +368,6 @@ static MACHINE_CONFIG_START( onetwo, onetwo_state )
 	MCFG_CPU_PROGRAM_MAP(sound_cpu)
 	MCFG_CPU_IO_MAP(sound_cpu_io)
 
-	MCFG_MACHINE_START(onetwo)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -381,7 +380,6 @@ static MACHINE_CONFIG_START( onetwo, onetwo_state )
 	MCFG_GFXDECODE(onetwo)
 	MCFG_PALETTE_LENGTH(0x80)
 
-	MCFG_VIDEO_START(onetwo)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

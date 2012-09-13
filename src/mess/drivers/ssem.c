@@ -20,6 +20,7 @@ public:
 
 	required_shared_ptr<UINT8> m_store;
 	UINT8 m_store_line;
+	virtual void machine_reset();
 };
 
 
@@ -624,10 +625,9 @@ static DEVICE_IMAGE_LOAD(ssem_store)
 * Machine definition                                 *
 \****************************************************/
 
-static MACHINE_RESET( ssem )
+void ssem_state::machine_reset()
 {
-	ssem_state *state = machine.driver_data<ssem_state>();
-	state->m_store_line = 0;
+	m_store_line = 0;
 }
 
 static MACHINE_CONFIG_START( ssem, ssem_state )
@@ -635,7 +635,6 @@ static MACHINE_CONFIG_START( ssem, ssem_state )
 	MCFG_CPU_ADD("maincpu", SSEM, 700)
 	MCFG_CPU_PROGRAM_MAP(ssem_map)
 
-	MCFG_MACHINE_RESET(ssem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

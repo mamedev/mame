@@ -65,22 +65,21 @@ gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
  *
  *************************************/
 
-VIDEO_START( gaelco3d )
+void gaelco3d_state::video_start()
 {
-	gaelco3d_state *state = machine.driver_data<gaelco3d_state>();
 
-	state->m_poly = auto_alloc(machine, gaelco3d_renderer(*state));
+	m_poly = auto_alloc(machine(), gaelco3d_renderer(*this));
 
-	state->m_palette = auto_alloc_array(machine, rgb_t, 32768);
-	state->m_polydata_buffer = auto_alloc_array(machine, UINT32, MAX_POLYDATA);
+	m_palette = auto_alloc_array(machine(), rgb_t, 32768);
+	m_polydata_buffer = auto_alloc_array(machine(), UINT32, MAX_POLYDATA);
 
 	/* save states */
 
-	state_save_register_global_pointer(machine, state->m_palette, 32768);
-	state_save_register_global_pointer(machine, state->m_polydata_buffer, MAX_POLYDATA);
-	state_save_register_global(machine, state->m_polydata_count);
+	state_save_register_global_pointer(machine(), m_palette, 32768);
+	state_save_register_global_pointer(machine(), m_polydata_buffer, MAX_POLYDATA);
+	state_save_register_global(machine(), m_polydata_count);
 
-	state_save_register_global(machine, state->m_lastscan);
+	state_save_register_global(machine(), m_lastscan);
 }
 
 

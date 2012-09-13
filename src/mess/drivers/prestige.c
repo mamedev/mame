@@ -110,6 +110,7 @@ public:
 	DECLARE_WRITE8_MEMBER( kb_w );
 	DECLARE_READ8_MEMBER( mouse_r );
 	DECLARE_WRITE8_MEMBER( mouse_w );
+	virtual void palette_init();
 };
 
 
@@ -438,10 +439,10 @@ void prestige_state::machine_start()
 	m_vram = ram;
 }
 
-static PALETTE_INIT( prestige )
+void prestige_state::palette_init()
 {
-	palette_set_color(machine, 0, MAKE_RGB(39, 108, 51));
-	palette_set_color(machine, 1, MAKE_RGB(16, 37, 84));
+	palette_set_color(machine(), 0, MAKE_RGB(39, 108, 51));
+	palette_set_color(machine(), 1, MAKE_RGB(16, 37, 84));
 }
 
 UINT32 prestige_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -492,7 +493,6 @@ static MACHINE_CONFIG_START( prestige, prestige_state )
 	MCFG_DEFAULT_LAYOUT( layout_lcd )
 
     MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(prestige)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

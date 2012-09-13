@@ -25,10 +25,9 @@ TILE_GET_INFO_MEMBER(mjkjidai_state::get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( mjkjidai )
+void mjkjidai_state::video_start()
 {
-	mjkjidai_state *state = machine.driver_data<mjkjidai_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mjkjidai_state::get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mjkjidai_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 }
 
 

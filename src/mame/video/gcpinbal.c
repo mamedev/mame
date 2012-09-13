@@ -63,9 +63,9 @@ static void gcpinbal_core_vh_start( running_machine &machine )
 	state->m_tilemap[2]->set_scrolldy(-yoffs, 0);
 }
 
-VIDEO_START( gcpinbal )
+void gcpinbal_state::video_start()
 {
-	gcpinbal_core_vh_start(machine);
+	gcpinbal_core_vh_start(machine());
 }
 
 

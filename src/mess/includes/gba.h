@@ -237,6 +237,9 @@ public:
 	DECLARE_READ32_MEMBER(eeprom_r);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_DRIVER_INIT(gbadv);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 /*----------- defined in video/gba.c -----------*/

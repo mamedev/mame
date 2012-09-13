@@ -101,6 +101,12 @@ public:
 	DECLARE_DRIVER_INIT(hiimpact);
 	DECLARE_DRIVER_INIT(mkyturbo);
 	DECLARE_DRIVER_INIT(term2la2);
+	DECLARE_MACHINE_RESET(midyunit);
+	DECLARE_VIDEO_START(midzunit);
+	DECLARE_VIDEO_START(midyunit_4bit);
+	DECLARE_VIDEO_START(midyunit_6bit);
+	DECLARE_VIDEO_START(mkyawdim);
+	DECLARE_VIDEO_START(common);
 };
 
 
@@ -110,16 +116,16 @@ public:
 
 
 
-MACHINE_RESET( midyunit );
+
 
 
 
 /*----------- defined in video/midyunit.c -----------*/
 
-VIDEO_START( midyunit_4bit );
-VIDEO_START( midyunit_6bit );
-VIDEO_START( mkyawdim );
-VIDEO_START( midzunit );
+
+
+
+
 
 
 

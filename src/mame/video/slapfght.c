@@ -64,21 +64,19 @@ TILE_GET_INFO_MEMBER(slapfght_state::get_fix_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( perfrman )
+VIDEO_START_MEMBER(slapfght_state,perfrman)
 {
-	slapfght_state *state = machine.driver_data<slapfght_state>();
-	state->m_pf1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(slapfght_state::get_pf_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_pf1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(slapfght_state::get_pf_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
-	state->m_pf1_tilemap->set_transparent_pen(0);
+	m_pf1_tilemap->set_transparent_pen(0);
 }
 
-VIDEO_START( slapfight )
+VIDEO_START_MEMBER(slapfght_state,slapfight)
 {
-	slapfght_state *state = machine.driver_data<slapfght_state>();
-	state->m_pf1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(slapfght_state::get_pf1_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(slapfght_state::get_fix_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_pf1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(slapfght_state::get_pf1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_fix_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(slapfght_state::get_fix_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
-	state->m_fix_tilemap->set_transparent_pen(0);
+	m_fix_tilemap->set_transparent_pen(0);
 }
 
 

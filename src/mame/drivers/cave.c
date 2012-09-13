@@ -1793,33 +1793,31 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static MACHINE_START( cave )
+MACHINE_START_MEMBER(cave_state,cave)
 {
-	cave_state *state = machine.driver_data<cave_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_soundbuf_len));
-	state->save_item(NAME(state->m_soundbuf_data));
+	save_item(NAME(m_soundbuf_len));
+	save_item(NAME(m_soundbuf_data));
 
-	state->save_item(NAME(state->m_vblank_irq));
-	state->save_item(NAME(state->m_sound_irq));
-	state->save_item(NAME(state->m_unknown_irq));
-	state->save_item(NAME(state->m_agallet_vblank_irq));
+	save_item(NAME(m_vblank_irq));
+	save_item(NAME(m_sound_irq));
+	save_item(NAME(m_unknown_irq));
+	save_item(NAME(m_agallet_vblank_irq));
 }
 
-static MACHINE_RESET( cave )
+MACHINE_RESET_MEMBER(cave_state,cave)
 {
-	cave_state *state = machine.driver_data<cave_state>();
 
-	memset(state->m_soundbuf_data, 0, 32);
-	state->m_soundbuf_len = 0;
+	memset(m_soundbuf_data, 0, 32);
+	m_soundbuf_len = 0;
 
-	state->m_vblank_irq = 0;
-	state->m_sound_irq = 0;
-	state->m_unknown_irq = 0;
-	state->m_agallet_vblank_irq = 0;
+	m_vblank_irq = 0;
+	m_sound_irq = 0;
+	m_unknown_irq = 0;
+	m_agallet_vblank_irq = 0;
 }
 
 static const ymz280b_interface ymz280b_intf =
@@ -1858,8 +1856,8 @@ static MACHINE_CONFIG_START( dfeveron, cave_state )
 	MCFG_CPU_PROGRAM_MAP(dfeveron_map)
 	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MCFG_MACHINE_START(cave)
-	MCFG_MACHINE_RESET(cave)
+	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
@@ -1874,9 +1872,9 @@ static MACHINE_CONFIG_START( dfeveron, cave_state )
 
 	MCFG_GFXDECODE(dfeveron)
 	MCFG_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
-	MCFG_PALETTE_INIT(dfeveron)
+	MCFG_PALETTE_INIT_OVERRIDE(cave_state,dfeveron)
 
-	MCFG_VIDEO_START(cave_2_layers)
+	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_2_layers)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1900,8 +1898,8 @@ static MACHINE_CONFIG_START( ddonpach, cave_state )
 	MCFG_CPU_PROGRAM_MAP(ddonpach_map)
 	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MCFG_MACHINE_START(cave)
-	MCFG_MACHINE_RESET(cave)
+	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
@@ -1916,9 +1914,9 @@ static MACHINE_CONFIG_START( ddonpach, cave_state )
 
 	MCFG_GFXDECODE(ddonpach)
 	MCFG_PALETTE_LENGTH(0x8000 + 0x40*16)	// $400 extra entries for layers 1&2
-	MCFG_PALETTE_INIT(ddonpach)
+	MCFG_PALETTE_INIT_OVERRIDE(cave_state,ddonpach)
 
-	MCFG_VIDEO_START(cave_3_layers)
+	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1946,8 +1944,8 @@ static MACHINE_CONFIG_START( donpachi, cave_state )
 	MCFG_CPU_PROGRAM_MAP(donpachi_map)
 	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MCFG_MACHINE_START(cave)
-	MCFG_MACHINE_RESET(cave)
+	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
@@ -1962,9 +1960,9 @@ static MACHINE_CONFIG_START( donpachi, cave_state )
 
 	MCFG_GFXDECODE(donpachi)
 	MCFG_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
-	MCFG_PALETTE_INIT(dfeveron)
+	MCFG_PALETTE_INIT_OVERRIDE(cave_state,dfeveron)
 
-	MCFG_VIDEO_START(cave_3_layers)
+	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1992,8 +1990,8 @@ static MACHINE_CONFIG_START( esprade, cave_state )
 	MCFG_CPU_PROGRAM_MAP(esprade_map)
 	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MCFG_MACHINE_START(cave)
-	MCFG_MACHINE_RESET(cave)
+	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
@@ -2008,9 +2006,9 @@ static MACHINE_CONFIG_START( esprade, cave_state )
 
 	MCFG_GFXDECODE(esprade)
 	MCFG_PALETTE_LENGTH(0x8000)
-	MCFG_PALETTE_INIT(cave)
+	MCFG_PALETTE_INIT_OVERRIDE(cave_state,cave)
 
-	MCFG_VIDEO_START(cave_3_layers)
+	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2033,8 +2031,8 @@ static MACHINE_CONFIG_START( gaia, cave_state )
 	MCFG_CPU_PROGRAM_MAP(gaia_map)
 	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MCFG_MACHINE_START(cave)
-	MCFG_MACHINE_RESET(cave)
+	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 
 	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
 
@@ -2048,9 +2046,9 @@ static MACHINE_CONFIG_START( gaia, cave_state )
 
 	MCFG_GFXDECODE(esprade)
 	MCFG_PALETTE_LENGTH(0x8000)
-	MCFG_PALETTE_INIT(cave)
+	MCFG_PALETTE_INIT_OVERRIDE(cave_state,cave)
 
-	MCFG_VIDEO_START(cave_3_layers)
+	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2073,8 +2071,8 @@ static MACHINE_CONFIG_START( guwange, cave_state )
 	MCFG_CPU_PROGRAM_MAP(guwange_map)
 	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MCFG_MACHINE_START(cave)
-	MCFG_MACHINE_RESET(cave)
+	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
@@ -2089,9 +2087,9 @@ static MACHINE_CONFIG_START( guwange, cave_state )
 
 	MCFG_GFXDECODE(esprade)
 	MCFG_PALETTE_LENGTH(0x8000)
-	MCFG_PALETTE_INIT(cave)
+	MCFG_PALETTE_INIT_OVERRIDE(cave_state,cave)
 
-	MCFG_VIDEO_START(cave_3_layers)
+	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2117,8 +2115,8 @@ static MACHINE_CONFIG_START( hotdogst, cave_state )
 	MCFG_CPU_PROGRAM_MAP(hotdogst_sound_map)
 	MCFG_CPU_IO_MAP(hotdogst_sound_portmap)
 
-	MCFG_MACHINE_START(cave)
-	MCFG_MACHINE_RESET(cave)
+	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
@@ -2133,9 +2131,9 @@ static MACHINE_CONFIG_START( hotdogst, cave_state )
 
 	MCFG_GFXDECODE(hotdogst)
 	MCFG_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
-	MCFG_PALETTE_INIT(dfeveron)
+	MCFG_PALETTE_INIT_OVERRIDE(cave_state,dfeveron)
 
-	MCFG_VIDEO_START(cave_3_layers)
+	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2169,8 +2167,8 @@ static MACHINE_CONFIG_START( korokoro, cave_state )
 	MCFG_CPU_PROGRAM_MAP(korokoro_map)
 	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MCFG_MACHINE_START(cave)
-	MCFG_MACHINE_RESET(cave)
+	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_8BIT_ADD("eeprom")
 
 	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
@@ -2185,9 +2183,9 @@ static MACHINE_CONFIG_START( korokoro, cave_state )
 
 	MCFG_GFXDECODE(korokoro)
 	MCFG_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
-	MCFG_PALETTE_INIT(korokoro)
+	MCFG_PALETTE_INIT_OVERRIDE(cave_state,korokoro)
 
-	MCFG_VIDEO_START(cave_1_layer)
+	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2223,8 +2221,8 @@ static MACHINE_CONFIG_START( mazinger, cave_state )
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START(cave)
-	MCFG_MACHINE_RESET(cave)
+	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
@@ -2239,9 +2237,9 @@ static MACHINE_CONFIG_START( mazinger, cave_state )
 
 	MCFG_GFXDECODE(mazinger)
 	MCFG_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
-	MCFG_PALETTE_INIT(mazinger)
+	MCFG_PALETTE_INIT_OVERRIDE(cave_state,mazinger)
 
-	MCFG_VIDEO_START(cave_2_layers)
+	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_2_layers)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2281,8 +2279,8 @@ static MACHINE_CONFIG_START( metmqstr, cave_state )
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START(cave)
-	MCFG_MACHINE_RESET(cave)	/* start with the watchdog armed */
+	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)	/* start with the watchdog armed */
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
@@ -2297,9 +2295,9 @@ static MACHINE_CONFIG_START( metmqstr, cave_state )
 
 	MCFG_GFXDECODE(donpachi)
 	MCFG_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
-	MCFG_PALETTE_INIT(dfeveron)
+	MCFG_PALETTE_INIT_OVERRIDE(cave_state,dfeveron)
 
-	MCFG_VIDEO_START(cave_3_layers)
+	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2336,8 +2334,8 @@ static MACHINE_CONFIG_START( pacslot, cave_state )
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START(cave)
-	MCFG_MACHINE_RESET(cave)
+	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_pacslot)
 
 	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
@@ -2352,9 +2350,9 @@ static MACHINE_CONFIG_START( pacslot, cave_state )
 
 	MCFG_GFXDECODE(tjumpman)
 	MCFG_PALETTE_LENGTH(0x8000)
-	MCFG_PALETTE_INIT(cave)
+	MCFG_PALETTE_INIT_OVERRIDE(cave_state,cave)
 
-	MCFG_VIDEO_START(cave_1_layer)
+	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2392,8 +2390,8 @@ static MACHINE_CONFIG_START( pwrinst2, cave_state )
 	MCFG_CPU_PROGRAM_MAP(pwrinst2_sound_map)
 	MCFG_CPU_IO_MAP(pwrinst2_sound_portmap)
 
-	MCFG_MACHINE_START(cave)
-	MCFG_MACHINE_RESET(cave)
+	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
@@ -2408,9 +2406,9 @@ static MACHINE_CONFIG_START( pwrinst2, cave_state )
 
 	MCFG_GFXDECODE(pwrinst2)
 	MCFG_PALETTE_LENGTH(0x8000+0x2800)
-	MCFG_PALETTE_INIT(pwrinst2)
+	MCFG_PALETTE_INIT_OVERRIDE(cave_state,pwrinst2)
 
-	MCFG_VIDEO_START(cave_4_layers)
+	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_4_layers)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2455,8 +2453,8 @@ static MACHINE_CONFIG_START( sailormn, cave_state )
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(cave)
-	MCFG_MACHINE_RESET(cave)
+	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
@@ -2471,9 +2469,9 @@ static MACHINE_CONFIG_START( sailormn, cave_state )
 
 	MCFG_GFXDECODE(sailormn)
 	MCFG_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
-	MCFG_PALETTE_INIT(sailormn)	// 4 bit sprites, 6 bit tiles
+	MCFG_PALETTE_INIT_OVERRIDE(cave_state,sailormn)	// 4 bit sprites, 6 bit tiles
 
-	MCFG_VIDEO_START(sailormn_3_layers)	/* Layer 2 has 1 banked ROM */
+	MCFG_VIDEO_START_OVERRIDE(cave_state,sailormn_3_layers)	/* Layer 2 has 1 banked ROM */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2509,8 +2507,8 @@ static MACHINE_CONFIG_START( tjumpman, cave_state )
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START(cave)
-	MCFG_MACHINE_RESET(cave)
+	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
@@ -2525,9 +2523,9 @@ static MACHINE_CONFIG_START( tjumpman, cave_state )
 
 	MCFG_GFXDECODE(tjumpman)
 	MCFG_PALETTE_LENGTH(0x8000)
-	MCFG_PALETTE_INIT(cave)
+	MCFG_PALETTE_INIT_OVERRIDE(cave_state,cave)
 
-	MCFG_VIDEO_START(cave_1_layer)
+	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2551,7 +2549,7 @@ static MACHINE_CONFIG_START( uopoko, cave_state )
 	MCFG_CPU_PROGRAM_MAP(uopoko_map)
 	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MCFG_MACHINE_START(cave)
+	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
@@ -2567,8 +2565,8 @@ static MACHINE_CONFIG_START( uopoko, cave_state )
 	MCFG_GFXDECODE(uopoko)
 	MCFG_PALETTE_LENGTH(0x8000)
 
-	MCFG_PALETTE_INIT(cave)
-	MCFG_VIDEO_START(cave_1_layer)
+	MCFG_PALETTE_INIT_OVERRIDE(cave_state,cave)
+	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

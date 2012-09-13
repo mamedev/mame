@@ -238,24 +238,22 @@ static const sn76496_config psg_intf =
  *
  *************************************/
 
-static MACHINE_START( drmicro )
+void drmicro_state::machine_start()
 {
-	drmicro_state *state = machine.driver_data<drmicro_state>();
 
-	state->m_msm = machine.device("msm");
+	m_msm = machine().device("msm");
 
-	state->save_item(NAME(state->m_nmi_enable));
-	state->save_item(NAME(state->m_pcm_adr));
-	state->save_item(NAME(state->m_flipscreen));
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_pcm_adr));
+	save_item(NAME(m_flipscreen));
 }
 
-static MACHINE_RESET( drmicro )
+void drmicro_state::machine_reset()
 {
-	drmicro_state *state = machine.driver_data<drmicro_state>();
 
-	state->m_nmi_enable = 0;
-	state->m_pcm_adr = 0;
-	state->m_flipscreen = 0;
+	m_nmi_enable = 0;
+	m_pcm_adr = 0;
+	m_flipscreen = 0;
 }
 
 
@@ -269,8 +267,6 @@ static MACHINE_CONFIG_START( drmicro, drmicro_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START(drmicro)
-	MCFG_MACHINE_RESET(drmicro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -283,8 +279,6 @@ static MACHINE_CONFIG_START( drmicro, drmicro_state )
 	MCFG_GFXDECODE(drmicro)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_PALETTE_INIT(drmicro)
-	MCFG_VIDEO_START(drmicro)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

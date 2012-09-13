@@ -75,55 +75,53 @@ static void simpsons_postload(running_machine &machine)
 	simpsons_video_banking(machine, state->m_video_bank);
 }
 
-MACHINE_START( simpsons )
+void simpsons_state::machine_start()
 {
-	simpsons_state *state = machine.driver_data<simpsons_state>();
 
-	state->m_generic_paletteram_8.allocate(0x1000);
-	state->m_xtraram = auto_alloc_array_clear(machine, UINT8, 0x1000);
-	state->m_spriteram = auto_alloc_array_clear(machine, UINT16, 0x1000 / 2);
+	m_generic_paletteram_8.allocate(0x1000);
+	m_xtraram = auto_alloc_array_clear(machine(), UINT8, 0x1000);
+	m_spriteram = auto_alloc_array_clear(machine(), UINT16, 0x1000 / 2);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_k053260 = machine.device("k053260");
-	state->m_k052109 = machine.device("k052109");
-	state->m_k053246 = machine.device("k053246");
-	state->m_k053251 = machine.device("k053251");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_k053260 = machine().device("k053260");
+	m_k052109 = machine().device("k052109");
+	m_k053246 = machine().device("k053246");
+	m_k053251 = machine().device("k053251");
 
-	state->save_item(NAME(state->m_firq_enabled));
-	state->save_item(NAME(state->m_video_bank));
-	state->save_item(NAME(state->m_sprite_colorbase));
-	state->save_item(NAME(state->m_layer_colorbase));
-	state->save_item(NAME(state->m_layerpri));
-	state->save_pointer(NAME(state->m_xtraram), 0x1000);
-	state->save_pointer(NAME(state->m_spriteram), 0x1000 / 2);
-	machine.save().register_postload(save_prepost_delegate(FUNC(simpsons_postload), &machine));
+	save_item(NAME(m_firq_enabled));
+	save_item(NAME(m_video_bank));
+	save_item(NAME(m_sprite_colorbase));
+	save_item(NAME(m_layer_colorbase));
+	save_item(NAME(m_layerpri));
+	save_pointer(NAME(m_xtraram), 0x1000);
+	save_pointer(NAME(m_spriteram), 0x1000 / 2);
+	machine().save().register_postload(save_prepost_delegate(FUNC(simpsons_postload), &machine()));
 }
 
-MACHINE_RESET( simpsons )
+void simpsons_state::machine_reset()
 {
-	simpsons_state *state = machine.driver_data<simpsons_state>();
 	int i;
 
-	konami_configure_set_lines(machine.device("maincpu"), simpsons_banking);
+	konami_configure_set_lines(machine().device("maincpu"), simpsons_banking);
 
 	for (i = 0; i < 3; i++)
 	{
-		state->m_layerpri[i] = 0;
-		state->m_layer_colorbase[i] = 0;
+		m_layerpri[i] = 0;
+		m_layer_colorbase[i] = 0;
 	}
 
-	state->m_sprite_colorbase = 0;
-	state->m_firq_enabled = 0;
-	state->m_video_bank = 0;
+	m_sprite_colorbase = 0;
+	m_firq_enabled = 0;
+	m_video_bank = 0;
 
 	/* init the default banks */
-	state->membank("bank1")->configure_entries(0, 64, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x2000);
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->configure_entries(0, 64, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x2000);
+	membank("bank1")->set_entry(0);
 
-	state->membank("bank2")->configure_entries(0, 2, machine.root_device().memregion("audiocpu")->base() + 0x10000, 0);
-	state->membank("bank2")->configure_entries(2, 6, machine.root_device().memregion("audiocpu")->base() + 0x10000, 0x4000);
-	state->membank("bank2")->set_entry(0);
+	membank("bank2")->configure_entries(0, 2, machine().root_device().memregion("audiocpu")->base() + 0x10000, 0);
+	membank("bank2")->configure_entries(2, 6, machine().root_device().memregion("audiocpu")->base() + 0x10000, 0x4000);
+	membank("bank2")->set_entry(0);
 
-	simpsons_video_banking(machine, 0);
+	simpsons_video_banking(machine(), 0);
 }

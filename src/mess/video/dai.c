@@ -40,18 +40,18 @@ const unsigned char dai_palette[16*3] =
 };
 
 
-PALETTE_INIT( dai )
+void dai_state::palette_init()
 {
 	int i;
 
 	for ( i = 0; i < sizeof(dai_palette) / 3; i++ )
 	{
-		palette_set_color_rgb(machine, i, dai_palette[i * 3], dai_palette[i * 3 + 1], dai_palette[i * 3 + 2]);
+		palette_set_color_rgb(machine(), i, dai_palette[i * 3], dai_palette[i * 3 + 1], dai_palette[i * 3 + 2]);
 	}
 }
 
 
-VIDEO_START( dai )
+void dai_state::video_start()
 {
 }
 

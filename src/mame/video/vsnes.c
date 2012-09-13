@@ -3,18 +3,18 @@
 #include "includes/vsnes.h"
 
 
-PALETTE_INIT( vsnes )
+PALETTE_INIT_MEMBER(vsnes_state,vsnes)
 {
-	ppu2c0x_device *ppu = machine.device<ppu2c0x_device>("ppu1");
-	ppu->init_palette_rgb(machine, 0 );
+	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu1");
+	ppu->init_palette_rgb(machine(), 0 );
 }
 
-PALETTE_INIT( vsdual )
+PALETTE_INIT_MEMBER(vsnes_state,vsdual)
 {
-	ppu2c0x_device *ppu1 = machine.device<ppu2c0x_device>("ppu1");
-	ppu2c0x_device *ppu2 = machine.device<ppu2c0x_device>("ppu2");
-	ppu1->init_palette_rgb(machine, 0 );
-	ppu2->init_palette_rgb(machine, 8*4*16 );
+	ppu2c0x_device *ppu1 = machine().device<ppu2c0x_device>("ppu1");
+	ppu2c0x_device *ppu2 = machine().device<ppu2c0x_device>("ppu2");
+	ppu1->init_palette_rgb(machine(), 0 );
+	ppu2->init_palette_rgb(machine(), 8*4*16 );
 }
 
 static void ppu_irq_1( device_t *device, int *ppu_regs )
@@ -49,11 +49,11 @@ const ppu2c0x_interface vsnes_ppu_interface_2 =
 	ppu_irq_2			/* irq */
 };
 
-VIDEO_START( vsnes )
+VIDEO_START_MEMBER(vsnes_state,vsnes )
 {
 }
 
-VIDEO_START( vsdual )
+VIDEO_START_MEMBER(vsnes_state,vsdual )
 {
 }
 

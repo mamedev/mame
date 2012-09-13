@@ -137,30 +137,29 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_text_tile_info)
 
 /*** VIDEO START / UPDATE ***/
 
-VIDEO_START( macrossp )
+void macrossp_state::video_start()
 {
-	macrossp_state *state = machine.driver_data<macrossp_state>();
 
-	state->m_spriteram_old = auto_alloc_array_clear(machine, UINT32, state->m_spriteram.bytes() / 4);
-	state->m_spriteram_old2 = auto_alloc_array_clear(machine, UINT32, state->m_spriteram.bytes() / 4);
+	m_spriteram_old = auto_alloc_array_clear(machine(), UINT32, m_spriteram.bytes() / 4);
+	m_spriteram_old2 = auto_alloc_array_clear(machine(), UINT32, m_spriteram.bytes() / 4);
 
-	state->m_text_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(macrossp_state::get_macrossp_text_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_scra_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(macrossp_state::get_macrossp_scra_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_scrb_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(macrossp_state::get_macrossp_scrb_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_scrc_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(macrossp_state::get_macrossp_scrc_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_text_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(macrossp_state::get_macrossp_text_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_scra_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(macrossp_state::get_macrossp_scra_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_scrb_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(macrossp_state::get_macrossp_scrb_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_scrc_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(macrossp_state::get_macrossp_scrc_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
-	state->m_text_tilemap->set_transparent_pen(0);
-	state->m_scra_tilemap->set_transparent_pen(0);
-	state->m_scrb_tilemap->set_transparent_pen(0);
-	state->m_scrc_tilemap->set_transparent_pen(0);
+	m_text_tilemap->set_transparent_pen(0);
+	m_scra_tilemap->set_transparent_pen(0);
+	m_scrb_tilemap->set_transparent_pen(0);
+	m_scrc_tilemap->set_transparent_pen(0);
 
-	machine.gfx[0]->set_granularity(64);
-	machine.gfx[1]->set_granularity(64);
-	machine.gfx[2]->set_granularity(64);
-	machine.gfx[3]->set_granularity(64);
+	machine().gfx[0]->set_granularity(64);
+	machine().gfx[1]->set_granularity(64);
+	machine().gfx[2]->set_granularity(64);
+	machine().gfx[3]->set_granularity(64);
 
-	state->save_pointer(NAME(state->m_spriteram_old), state->m_spriteram.bytes() / 4);
-	state->save_pointer(NAME(state->m_spriteram_old2), state->m_spriteram.bytes() / 4);
+	save_pointer(NAME(m_spriteram_old), m_spriteram.bytes() / 4);
+	save_pointer(NAME(m_spriteram_old2), m_spriteram.bytes() / 4);
 }
 
 

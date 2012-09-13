@@ -26,6 +26,10 @@ public:
 	DECLARE_WRITE8_MEMBER(printer_w);
 	DECLARE_WRITE8_MEMBER(status_w);
 	DECLARE_WRITE8_MEMBER(printer_ctrl_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 

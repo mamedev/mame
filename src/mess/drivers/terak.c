@@ -22,6 +22,8 @@ public:
 	UINT8 m_unit;
 	UINT8 m_cmd;
 	UINT16 m_data;
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 READ16_MEMBER( terak_state::terak_fdc_status_r )
@@ -67,11 +69,11 @@ static INPUT_PORTS_START( terak )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(terak)
+void terak_state::machine_reset()
 {
 }
 
-static VIDEO_START( terak )
+void terak_state::video_start()
 {
 }
 
@@ -91,7 +93,6 @@ static MACHINE_CONFIG_START( terak, terak_state )
 	MCFG_CPU_CONFIG(t11_data)
 	MCFG_CPU_PROGRAM_MAP(terak_mem)
 
-	MCFG_MACHINE_RESET(terak)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -104,7 +105,6 @@ static MACHINE_CONFIG_START( terak, terak_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START(terak)
 MACHINE_CONFIG_END
 
 /* ROM definition */

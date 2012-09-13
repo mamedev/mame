@@ -290,7 +290,7 @@ static GFXDECODE_START( pdp1 )
 GFXDECODE_END
 
 /* Initialise the palette */
-static PALETTE_INIT( pdp1 )
+void pdp1_state::palette_init()
 {
 	/* rgb components for the two color emissions */
 	const double r1 = .1, g1 = .1, b1 = .924, r2 = .7, g2 = .7, b2 = .076;
@@ -302,7 +302,7 @@ static PALETTE_INIT( pdp1 )
 	double cur_level_1, cur_level_2;
 	UINT8 i, r, g, b;
 
-	machine.colortable = colortable_alloc(machine, total_colors_needed);
+	machine().colortable = colortable_alloc(machine(), total_colors_needed);
 
 	/* initialize CRT palette */
 
@@ -319,28 +319,28 @@ static PALETTE_INIT( pdp1 )
 		g = (int) ((g1*cur_level_1 + g2*cur_level_2) + .5);
 		b = (int) ((b1*cur_level_1 + b2*cur_level_2) + .5);
 		/* write color in palette */
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 		/* apply decay for next iteration */
 		cur_level_1 *= decay_1;
 		cur_level_2 *= decay_2;
 	}
 
-	colortable_palette_set_color(machine.colortable, 0, MAKE_RGB(0, 0, 0));
+	colortable_palette_set_color(machine().colortable, 0, MAKE_RGB(0, 0, 0));
 
 	/* load static palette */
 	for ( i = 0; i < 6; i++ )
 	{
 		r = pdp1_colors[i*3]; g = pdp1_colors[i*3+1]; b = pdp1_colors[i*3+2];
-		colortable_palette_set_color(machine.colortable, pen_crt_num_levels + i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, pen_crt_num_levels + i, MAKE_RGB(r, g, b));
 	}
 
 	/* copy colortable to palette */
 	for( i = 0; i < total_colors_needed; i++ )
-		colortable_entry_set_value(machine.colortable, i, i);
+		colortable_entry_set_value(machine().colortable, i, i);
 
 	/* set up palette for text */
 	for( i = 0; i < 6; i++ )
-		colortable_entry_set_value(machine.colortable, total_colors_needed + i, pdp1_palette[i]);
+		colortable_entry_set_value(machine().colortable, total_colors_needed + i, pdp1_palette[i]);
 }
 
 
@@ -490,23 +490,22 @@ static pdp1_reset_param_t pdp1_reset_param =
 	0	/* type 20 sequence break system support defined in input ports and pdp1_init_machine */
 };
 
-static MACHINE_RESET( pdp1 )
+void pdp1_state::machine_reset()
 {
-	pdp1_state *state = machine.driver_data<pdp1_state>();
 	int cfg;
 
-	cfg = machine.root_device().ioport("CFG")->read();
+	cfg = machine().root_device().ioport("CFG")->read();
 	pdp1_reset_param.extend_support = (cfg >> pdp1_config_extend_bit) & pdp1_config_extend_mask;
 	pdp1_reset_param.hw_mul_div = (cfg >> pdp1_config_hw_mul_div_bit) & pdp1_config_hw_mul_div_mask;
 	pdp1_reset_param.type_20_sbs = (cfg >> pdp1_config_type_20_sbs_bit) & pdp1_config_type_20_sbs_mask;
 
 	/* reset device state */
-	state->m_tape_reader.rcl = state->m_tape_reader.rc = 0;
-	state->m_io_status = io_st_tyo | io_st_ptp;
-	state->m_lightpen.active = state->m_lightpen.down = 0;
-	state->m_lightpen.x = state->m_lightpen.y = 0;
-	state->m_lightpen.radius = 10;	/* ??? */
-	pdp1_update_lightpen_state(machine, &state->m_lightpen);
+	m_tape_reader.rcl = m_tape_reader.rc = 0;
+	m_io_status = io_st_tyo | io_st_ptp;
+	m_lightpen.active = m_lightpen.down = 0;
+	m_lightpen.x = m_lightpen.y = 0;
+	m_lightpen.radius = 10;	/* ??? */
+	pdp1_update_lightpen_state(machine(), &m_lightpen);
 }
 
 
@@ -524,9 +523,8 @@ static void pdp1_machine_stop(running_machine &machine)
 
     Set up the pdp1_memory pointer, and generate font data.
 */
-static MACHINE_START( pdp1 )
+void pdp1_state::machine_start()
 {
-	pdp1_state *state = machine.driver_data<pdp1_state>();
 	UINT8 *dst;
 
 	static const unsigned char fontdata6x8[pdp1_fontdata_size] =
@@ -655,17 +653,17 @@ static MACHINE_START( pdp1 )
 	};
 
 	/* set up our font */
-	dst = machine.root_device().memregion("gfx1")->base();
+	dst = machine().root_device().memregion("gfx1")->base();
 	memcpy(dst, fontdata6x8, pdp1_fontdata_size);
 
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(pdp1_machine_stop),&machine));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(pdp1_machine_stop),&machine()));
 
-	state->m_tape_reader.timer = machine.scheduler().timer_alloc(FUNC(reader_callback));
-	state->m_tape_puncher.timer = machine.scheduler().timer_alloc(FUNC(puncher_callback));
-	state->m_typewriter.tyo_timer = machine.scheduler().timer_alloc(FUNC(tyo_callback));
-	state->m_dpy_timer = machine.scheduler().timer_alloc(FUNC(dpy_callback));
-	state->m_tape_reader.timer->adjust(attotime::zero, 0, attotime::from_hz(2500));
-	state->m_tape_reader.timer->enable(0);
+	m_tape_reader.timer = machine().scheduler().timer_alloc(FUNC(reader_callback));
+	m_tape_puncher.timer = machine().scheduler().timer_alloc(FUNC(puncher_callback));
+	m_typewriter.tyo_timer = machine().scheduler().timer_alloc(FUNC(tyo_callback));
+	m_dpy_timer = machine().scheduler().timer_alloc(FUNC(dpy_callback));
+	m_tape_reader.timer->adjust(attotime::zero, 0, attotime::from_hz(2500));
+	m_tape_reader.timer->enable(0);
 }
 
 
@@ -1958,8 +1956,6 @@ static MACHINE_CONFIG_START( pdp1, pdp1_state )
 	MCFG_CPU_PROGRAM_MAP(pdp1_map)
 	MCFG_CPU_VBLANK_INT("screen", pdp1_interrupt)	/* dummy interrupt: handles input */
 
-	MCFG_MACHINE_START( pdp1 )
-	MCFG_MACHINE_RESET( pdp1 )
 
 	/* video hardware (includes the control panel and typewriter output) */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1979,8 +1975,6 @@ static MACHINE_CONFIG_START( pdp1, pdp1_state )
 	MCFG_GFXDECODE(pdp1)
 	MCFG_PALETTE_LENGTH(pen_crt_num_levels + sizeof(pdp1_colors) / 3 + sizeof(pdp1_palette))
 
-	MCFG_PALETTE_INIT(pdp1)
-	MCFG_VIDEO_START(pdp1)
 MACHINE_CONFIG_END
 
 /*

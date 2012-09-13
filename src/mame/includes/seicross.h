@@ -26,12 +26,15 @@ public:
 	DECLARE_READ8_MEMBER(friskyt_portB_r);
 	DECLARE_WRITE8_MEMBER(friskyt_portB_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/seicross.c -----------*/
 
 
-PALETTE_INIT( seicross );
-VIDEO_START( seicross );
+
+
 SCREEN_UPDATE_IND16( seicross );

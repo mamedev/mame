@@ -51,6 +51,15 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(satansat_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(satansat_get_fg_tile_info);
+	DECLARE_MACHINE_RESET(sasuke);
+	DECLARE_VIDEO_START(satansat);
+	DECLARE_PALETTE_INIT(satansat);
+	DECLARE_MACHINE_RESET(vanguard);
+	DECLARE_VIDEO_START(snk6502);
+	DECLARE_PALETTE_INIT(snk6502);
+	DECLARE_MACHINE_RESET(satansat);
+	DECLARE_MACHINE_RESET(pballoon);
+	DECLARE_VIDEO_START(pballoon);
 };
 
 
@@ -108,12 +117,12 @@ DISCRETE_SOUND_EXTERN( fantasy );
 /*----------- defined in video/snk6502.c -----------*/
 
 
-PALETTE_INIT( snk6502 );
-VIDEO_START( snk6502 );
+
+
 SCREEN_UPDATE_IND16( snk6502 );
-VIDEO_START( pballoon );
 
 
-PALETTE_INIT( satansat );
-VIDEO_START( satansat );
+
+
+
 

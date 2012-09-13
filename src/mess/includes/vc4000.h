@@ -94,6 +94,8 @@ public:
 	UINT8 m_irq_pause;
 	bitmap_ind16 *m_bitmap;
 	optional_device<cassette_image_device> m_cass;
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 

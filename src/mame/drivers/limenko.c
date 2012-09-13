@@ -86,6 +86,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void video_start();
 };
 
 
@@ -500,18 +501,17 @@ static void copy_sprites(running_machine &machine, bitmap_ind16 &bitmap, bitmap_
 	}
 }
 
-static VIDEO_START( limenko )
+void limenko_state::video_start()
 {
-	limenko_state *state = machine.driver_data<limenko_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(limenko_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,128,64);
-	state->m_md_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(limenko_state::get_md_tile_info),state),TILEMAP_SCAN_ROWS,8,8,128,64);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(limenko_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,128,64);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(limenko_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
+	m_md_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(limenko_state::get_md_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(limenko_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
 
-	state->m_md_tilemap->set_transparent_pen(0);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_md_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_sprites_bitmap.allocate(384,240);
-	state->m_sprites_bitmap_pri.allocate(384,240);
+	m_sprites_bitmap.allocate(384,240);
+	m_sprites_bitmap_pri.allocate(384,240);
 }
 
 static SCREEN_UPDATE_IND16( limenko )
@@ -767,7 +767,6 @@ static MACHINE_CONFIG_START( limenko, limenko_state )
 	MCFG_GFXDECODE(limenko)
 	MCFG_PALETTE_LENGTH(0x1000)
 
-	MCFG_VIDEO_START(limenko)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -799,7 +798,6 @@ static MACHINE_CONFIG_START( spotty, limenko_state )
 	MCFG_GFXDECODE(limenko)
 	MCFG_PALETTE_LENGTH(0x1000)
 
-	MCFG_VIDEO_START(limenko)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

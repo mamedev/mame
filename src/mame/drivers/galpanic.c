@@ -581,8 +581,8 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 
 
 
-	MCFG_PALETTE_INIT(galpanic)
-	MCFG_VIDEO_START(galpanic)
+	MCFG_PALETTE_INIT_OVERRIDE(galpanic_state,galpanic)
+	MCFG_VIDEO_START_OVERRIDE(galpanic_state,galpanic)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

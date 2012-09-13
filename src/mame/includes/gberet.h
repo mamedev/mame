@@ -51,13 +51,17 @@ public:
 	DECLARE_WRITE8_MEMBER(gberetb_scroll_w);
 	DECLARE_DRIVER_INIT(mrgoemon);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	DECLARE_MACHINE_START(gberet);
+	DECLARE_MACHINE_RESET(gberet);
+	DECLARE_VIDEO_START(gberet);
+	DECLARE_PALETTE_INIT(gberet);
 };
 
 
 /*----------- defined in video/gberet.c -----------*/
 
 
-PALETTE_INIT( gberet );
-VIDEO_START( gberet );
+
+
 SCREEN_UPDATE_IND16( gberet );
 SCREEN_UPDATE_IND16( gberetb );

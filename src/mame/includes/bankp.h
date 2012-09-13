@@ -35,14 +35,17 @@ public:
 	DECLARE_WRITE8_MEMBER(bankp_out_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/bankp.c -----------*/
 
 
-PALETTE_INIT( bankp );
-VIDEO_START( bankp );
+
+
 SCREEN_UPDATE_IND16( bankp );
 
 

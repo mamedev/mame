@@ -110,16 +110,25 @@ public:
 	DECLARE_DRIVER_INIT(vfive);
 	DECLARE_DRIVER_INIT(batrider);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	DECLARE_MACHINE_START(toaplan2);
+	DECLARE_MACHINE_RESET(toaplan2);
+	DECLARE_VIDEO_START(toaplan2);
+	DECLARE_MACHINE_RESET(ghox);
+	DECLARE_VIDEO_START(truxton2);
+	DECLARE_VIDEO_START(fixeightbl);
+	DECLARE_VIDEO_START(bgaregga);
+	DECLARE_VIDEO_START(batrider);
+	DECLARE_VIDEO_START(bgareggabl);
 };
 
 /*----------- defined in video/toaplan2.c -----------*/
 
-VIDEO_START( toaplan2 );
-VIDEO_START( truxton2 );
-VIDEO_START( fixeightbl );
-VIDEO_START( bgaregga );
-VIDEO_START( batrider );
-VIDEO_START( bgareggabl );
+
+
+
+
+
+
 
 SCREEN_UPDATE_IND16( toaplan2 );
 SCREEN_UPDATE_IND16( truxton2 );

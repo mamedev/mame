@@ -86,6 +86,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel3_opto_r);
 	DECLARE_DRIVER_INIT(ecoinfr);
 	DECLARE_DRIVER_INIT(ecoinfrmab);
+	virtual void machine_reset();
 };
 
 
@@ -614,36 +615,35 @@ static INPUT_PORTS_START( ecoinfr_barx )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_RESET( ecoinfr )
+void ecoinfr_state::machine_reset()
 {
-	ecoinfr_state *state = machine.driver_data<ecoinfr_state>();
 
-//  state->port00_value = 0x00;
-//  state->port01_value = 0x00;
-//  state->port02_value = 0x00;
-//  state->port03_value = 0x00;
-//  state->port04_value = 0x00;
-//  state->port05_value = 0x00;
-//  state->port06_value = 0x00;
-//  state->port07_value = 0x00;
-//  state->port08_value = 0x00;
-	state->port09_value = 0x00;
-//  state->port0a_value = 0x00;
-//  state->port0b_value = 0x00;
-//  state->port0c_value = 0x00;
-//  state->port0d_value = 0x00;
-//  state->port0e_value = 0x00;
-//  state->port0f_value = 0x00;
-	state->port10_value = 0x00;
-	state->port11_value = 0x00;
-	state->port12_value = 0x00;
-	state->port13_value = 0x00;
-	state->port14_value = 0x00;
-	state->port15_value = 0x00;
-	state->port16_value = 0x00;
-	state->port17_value = 0x00;
+//  port00_value = 0x00;
+//  port01_value = 0x00;
+//  port02_value = 0x00;
+//  port03_value = 0x00;
+//  port04_value = 0x00;
+//  port05_value = 0x00;
+//  port06_value = 0x00;
+//  port07_value = 0x00;
+//  port08_value = 0x00;
+	port09_value = 0x00;
+//  port0a_value = 0x00;
+//  port0b_value = 0x00;
+//  port0c_value = 0x00;
+//  port0d_value = 0x00;
+//  port0e_value = 0x00;
+//  port0f_value = 0x00;
+	port10_value = 0x00;
+	port11_value = 0x00;
+	port12_value = 0x00;
+	port13_value = 0x00;
+	port14_value = 0x00;
+	port15_value = 0x00;
+	port16_value = 0x00;
+	port17_value = 0x00;
 
-	state->irq_toggle = 0;
+	irq_toggle = 0;
 }
 
 static MACHINE_CONFIG_START( ecoinfr, ecoinfr_state )
@@ -652,7 +652,6 @@ static MACHINE_CONFIG_START( ecoinfr, ecoinfr_state )
 	MCFG_CPU_PROGRAM_MAP(memmap)
 	MCFG_CPU_IO_MAP(portmap)
 	MCFG_TIMER_ADD_PERIODIC("ectimer",ecoinfr_irq_timer, attotime::from_hz(250))
-	MCFG_MACHINE_RESET(ecoinfr)
 
 	MCFG_I8251_ADD(UPD8251_TAG, default_i8251_interface)
 MACHINE_CONFIG_END

@@ -36,81 +36,76 @@ enum
  *
  *************************************/
 
-static VIDEO_START( common )
+VIDEO_START_MEMBER(midyunit_state,common)
 {
-	midyunit_state *state = machine.driver_data<midyunit_state>();
 	/* allocate memory */
-	state->m_cmos_ram = auto_alloc_array(machine, UINT16, (0x2000 * 4)/2);
-	state->m_local_videoram = auto_alloc_array_clear(machine, UINT16, 0x80000/2);
-	state->m_pen_map = auto_alloc_array(machine, pen_t, 65536);
+	m_cmos_ram = auto_alloc_array(machine(), UINT16, (0x2000 * 4)/2);
+	m_local_videoram = auto_alloc_array_clear(machine(), UINT16, 0x80000/2);
+	m_pen_map = auto_alloc_array(machine(), pen_t, 65536);
 
-	machine.device<nvram_device>("nvram")->set_base(state->m_cmos_ram, 0x2000 * 4);
+	machine().device<nvram_device>("nvram")->set_base(m_cmos_ram, 0x2000 * 4);
 
 	/* reset all the globals */
-	state->m_cmos_page = 0;
-	state->m_autoerase_enable = 0;
-	state->m_yawdim_dma = 0;
+	m_cmos_page = 0;
+	m_autoerase_enable = 0;
+	m_yawdim_dma = 0;
 
 	/* reset DMA state */
-	memset(state->m_dma_register, 0, sizeof(state->m_dma_register));
-	memset(&state->m_dma_state, 0, sizeof(state->m_dma_state));
+	memset(m_dma_register, 0, sizeof(m_dma_register));
+	memset(&m_dma_state, 0, sizeof(m_dma_state));
 
 	/* register for state saving */
-	state_save_register_global(machine, state->m_autoerase_enable);
-	state_save_register_global_pointer(machine, state->m_local_videoram, 0x80000/2);
-	state_save_register_global_pointer(machine, state->m_cmos_ram, (0x2000 * 4)/2);
-	state_save_register_global(machine, state->m_videobank_select);
-	state_save_register_global_array(machine, state->m_dma_register);
+	state_save_register_global(machine(), m_autoerase_enable);
+	state_save_register_global_pointer(machine(), m_local_videoram, 0x80000/2);
+	state_save_register_global_pointer(machine(), m_cmos_ram, (0x2000 * 4)/2);
+	state_save_register_global(machine(), m_videobank_select);
+	state_save_register_global_array(machine(), m_dma_register);
 }
 
 
-VIDEO_START( midyunit_4bit )
+VIDEO_START_MEMBER(midyunit_state,midyunit_4bit)
 {
-	midyunit_state *state = machine.driver_data<midyunit_state>();
 	int i;
 
-	VIDEO_START_CALL(common);
+	VIDEO_START_CALL_MEMBER(common);
 
 	/* init for 4-bit */
 	for (i = 0; i < 65536; i++)
-		state->m_pen_map[i] = ((i & 0xf000) >> 8) | (i & 0x000f);
-	state->m_palette_mask = 0x00ff;
+		m_pen_map[i] = ((i & 0xf000) >> 8) | (i & 0x000f);
+	m_palette_mask = 0x00ff;
 }
 
 
-VIDEO_START( midyunit_6bit )
+VIDEO_START_MEMBER(midyunit_state,midyunit_6bit)
 {
-	midyunit_state *state = machine.driver_data<midyunit_state>();
 	int i;
 
-	VIDEO_START_CALL(common);
+	VIDEO_START_CALL_MEMBER(common);
 
 	/* init for 6-bit */
 	for (i = 0; i < 65536; i++)
-		state->m_pen_map[i] = ((i & 0xc000) >> 8) | (i & 0x0f3f);
-	state->m_palette_mask = 0x0fff;
+		m_pen_map[i] = ((i & 0xc000) >> 8) | (i & 0x0f3f);
+	m_palette_mask = 0x0fff;
 }
 
 
-VIDEO_START( mkyawdim )
+VIDEO_START_MEMBER(midyunit_state,mkyawdim)
 {
-	midyunit_state *state = machine.driver_data<midyunit_state>();
-	VIDEO_START_CALL(midyunit_6bit);
-	state->m_yawdim_dma = 1;
+	VIDEO_START_CALL_MEMBER(midyunit_6bit);
+	m_yawdim_dma = 1;
 }
 
 
-VIDEO_START( midzunit )
+VIDEO_START_MEMBER(midyunit_state,midzunit)
 {
-	midyunit_state *state = machine.driver_data<midyunit_state>();
 	int i;
 
-	VIDEO_START_CALL(common);
+	VIDEO_START_CALL_MEMBER(common);
 
 	/* init for 8-bit */
 	for (i = 0; i < 65536; i++)
-		state->m_pen_map[i] = i & 0x1fff;
-	state->m_palette_mask = 0x1fff;
+		m_pen_map[i] = i & 0x1fff;
+	m_palette_mask = 0x1fff;
 }
 
 

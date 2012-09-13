@@ -249,8 +249,6 @@ static MACHINE_CONFIG_START( usg32, usgames_state )
 	MCFG_GFXDECODE(usgames)
 	MCFG_PALETTE_LENGTH(2*256)
 
-	MCFG_PALETTE_INIT(usgames)
-	MCFG_VIDEO_START(usgames)
 
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_18MHz / 16, mc6845_intf)
 

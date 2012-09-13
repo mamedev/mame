@@ -516,25 +516,23 @@ static GFXDECODE_START( dleague )
 GFXDECODE_END
 
 
-static MACHINE_RESET( taitoh )
+void taitoh_state::machine_reset()
 {
-	taitoh_state *state = machine.driver_data<taitoh_state>();
-	state->m_banknum = 0;
+	m_banknum = 0;
 }
 
-static MACHINE_START( taitoh )
+void taitoh_state::machine_start()
 {
-	taitoh_state *state = machine.driver_data<taitoh_state>();
-	UINT8 *ROM = state->memregion("audiocpu")->base();
+	UINT8 *ROM = memregion("audiocpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
+	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_tc0220ioc = machine.device("tc0220ioc");
-	state->m_tc0080vco = machine.device("tc0080vco");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_tc0220ioc = machine().device("tc0220ioc");
+	m_tc0080vco = machine().device("tc0080vco");
 
-	state->save_item(NAME(state->m_banknum));
-	machine.save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine));
+	save_item(NAME(m_banknum));
+	machine().save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine()));
 }
 
 
@@ -573,8 +571,6 @@ static MACHINE_CONFIG_START( syvalion, taitoh_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)		/* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(taitoh)
-	MCFG_MACHINE_RESET(taitoh)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -616,8 +612,6 @@ static MACHINE_CONFIG_START( recordbr, taitoh_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)		/* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(taitoh)
-	MCFG_MACHINE_RESET(taitoh)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -659,8 +653,6 @@ static MACHINE_CONFIG_START( dleague, taitoh_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)		/* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(taitoh)
-	MCFG_MACHINE_RESET(taitoh)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 

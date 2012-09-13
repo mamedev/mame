@@ -189,121 +189,119 @@ static INPUT_PORTS_START( quizard )
 INPUT_PORTS_END
 
 
-static MACHINE_START( cdi )
+void cdi_state::machine_start()
 {
-    cdi_state *state = machine.driver_data<cdi_state>();
 
-    scc68070_register_globals(machine, &state->m_scc68070_regs);
+    scc68070_register_globals(machine(), &m_scc68070_regs);
 }
 
-static MACHINE_RESET( cdi )
+MACHINE_RESET_MEMBER(cdi_state,cdi)
 {
-    cdi_state *state = machine.driver_data<cdi_state>();
-    UINT16 *src   = (UINT16*)state->memregion("maincpu")->base();
-    UINT16 *dst   = state->m_planea;
-    //device_t *cdrom_dev = machine.device("cdrom");
+    UINT16 *src   = (UINT16*)memregion("maincpu")->base();
+    UINT16 *dst   = m_planea;
+    //device_t *cdrom_dev = machine().device("cdrom");
     memcpy(dst, src, 0x8);
 
-    scc68070_init(machine, &state->m_scc68070_regs);
+    scc68070_init(machine(), &m_scc68070_regs);
 
-    machine.device("maincpu")->reset();
+    machine().device("maincpu")->reset();
 
-    state->m_dmadac[0] = machine.device<dmadac_sound_device>("dac1");
-    state->m_dmadac[1] = machine.device<dmadac_sound_device>("dac2");
+    m_dmadac[0] = machine().device<dmadac_sound_device>("dac1");
+    m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
 }
 
-static MACHINE_RESET( quizrd12 )
+MACHINE_RESET_MEMBER(cdi_state,quizrd12)
 {
-	MACHINE_RESET_CALL( cdi );
+	MACHINE_RESET_CALL_MEMBER( cdi );
 
-    scc68070_set_quizard_mcu_value(machine, 0x021f);
-    scc68070_set_quizard_mcu_ack(machine, 0x5a);
+    scc68070_set_quizard_mcu_value(machine(), 0x021f);
+    scc68070_set_quizard_mcu_ack(machine(), 0x5a);
 }
 
-static MACHINE_RESET( quizrd17 )
+MACHINE_RESET_MEMBER(cdi_state,quizrd17)
 {
-	MACHINE_RESET_CALL( cdi );
+	MACHINE_RESET_CALL_MEMBER( cdi );
 
-    scc68070_set_quizard_mcu_value(machine, 0x021f);
-    scc68070_set_quizard_mcu_ack(machine, 0x5a);
+    scc68070_set_quizard_mcu_value(machine(), 0x021f);
+    scc68070_set_quizard_mcu_ack(machine(), 0x5a);
 }
 
 /* Untested - copied from quizrd17 */
-static MACHINE_RESET( quizrd18 )
+MACHINE_RESET_MEMBER(cdi_state,quizrd18)
 {
-	MACHINE_RESET_CALL( cdi );
+	MACHINE_RESET_CALL_MEMBER( cdi );
 
-    scc68070_set_quizard_mcu_value(machine, 0x021f);
-    scc68070_set_quizard_mcu_ack(machine, 0x5a);
+    scc68070_set_quizard_mcu_value(machine(), 0x021f);
+    scc68070_set_quizard_mcu_ack(machine(), 0x5a);
 }
 
-static MACHINE_RESET( quizrd22 )
+MACHINE_RESET_MEMBER(cdi_state,quizrd22)
 {
-	MACHINE_RESET_CALL( cdi );
+	MACHINE_RESET_CALL_MEMBER( cdi );
 
 	// 0x2b1: Italian
 	// 0x001: French
 	// 0x188: German
 
-	scc68070_set_quizard_mcu_value(machine, 0x188);
-    scc68070_set_quizard_mcu_ack(machine, 0x59);
+	scc68070_set_quizard_mcu_value(machine(), 0x188);
+    scc68070_set_quizard_mcu_ack(machine(), 0x59);
 }
 
 /* Untested - copied from quizrd22 */
-static MACHINE_RESET( quizrd23 )
+MACHINE_RESET_MEMBER(cdi_state,quizrd23)
 {
-	MACHINE_RESET_CALL( cdi );
+	MACHINE_RESET_CALL_MEMBER( cdi );
 
 	// 0x2b1: Italian
 	// 0x001: French
 	// 0x188: German
 
-	scc68070_set_quizard_mcu_value(machine, 0x188);
-    scc68070_set_quizard_mcu_ack(machine, 0x59);
+	scc68070_set_quizard_mcu_value(machine(), 0x188);
+    scc68070_set_quizard_mcu_ack(machine(), 0x59);
 }
 
-static MACHINE_RESET( quizrd32 )
+MACHINE_RESET_MEMBER(cdi_state,quizrd32)
 {
-	MACHINE_RESET_CALL( cdi );
+	MACHINE_RESET_CALL_MEMBER( cdi );
 
-	scc68070_set_quizard_mcu_value(machine, 0x00ae);
-    scc68070_set_quizard_mcu_ack(machine, 0x58);
+	scc68070_set_quizard_mcu_value(machine(), 0x00ae);
+    scc68070_set_quizard_mcu_ack(machine(), 0x58);
 }
 
 /* Untested - copied from quizrd32 */
-static MACHINE_RESET( quizrd34 )
+MACHINE_RESET_MEMBER(cdi_state,quizrd34)
 {
-	MACHINE_RESET_CALL( cdi );
+	MACHINE_RESET_CALL_MEMBER( cdi );
 
-	scc68070_set_quizard_mcu_value(machine, 0x00ae);
-    scc68070_set_quizard_mcu_ack(machine, 0x58);
+	scc68070_set_quizard_mcu_value(machine(), 0x00ae);
+    scc68070_set_quizard_mcu_ack(machine(), 0x58);
 }
 
 /* Untested - copied from quizrr41 */
-static MACHINE_RESET( quizrr40 )
+MACHINE_RESET_MEMBER(cdi_state,quizrr40)
 {
-	MACHINE_RESET_CALL( cdi );
+	MACHINE_RESET_CALL_MEMBER( cdi );
 
-	//scc68070_set_quizard_mcu_value(machine, 0x0139);
-	scc68070_set_quizard_mcu_value(machine, 0x011f);
-	scc68070_set_quizard_mcu_ack(machine, 0x57);
+	//scc68070_set_quizard_mcu_value(machine(), 0x0139);
+	scc68070_set_quizard_mcu_value(machine(), 0x011f);
+	scc68070_set_quizard_mcu_ack(machine(), 0x57);
 }
 
-static MACHINE_RESET( quizrr41 )
+MACHINE_RESET_MEMBER(cdi_state,quizrr41)
 {
-	MACHINE_RESET_CALL( cdi );
+	MACHINE_RESET_CALL_MEMBER( cdi );
 
-	//scc68070_set_quizard_mcu_value(machine, 0x0139);
-	scc68070_set_quizard_mcu_value(machine, 0x011f);
-	scc68070_set_quizard_mcu_ack(machine, 0x57);
+	//scc68070_set_quizard_mcu_value(machine(), 0x0139);
+	scc68070_set_quizard_mcu_value(machine(), 0x011f);
+	scc68070_set_quizard_mcu_ack(machine(), 0x57);
 }
 
-static MACHINE_RESET( quizrr42 )
+MACHINE_RESET_MEMBER(cdi_state,quizrr42)
 {
-	MACHINE_RESET_CALL( cdi );
+	MACHINE_RESET_CALL_MEMBER( cdi );
 
-	scc68070_set_quizard_mcu_value(machine, 0x01ae);
-	scc68070_set_quizard_mcu_ack(machine, 0x57);
+	scc68070_set_quizard_mcu_value(machine(), 0x01ae);
+	scc68070_set_quizard_mcu_ack(machine(), 0x57);
 }
 
 static DEVICE_IMAGE_DISPLAY_INFO(cdi_cdinfo)
@@ -346,9 +344,7 @@ static MACHINE_CONFIG_START( cdi, cdi_state )
 
     MCFG_DEFAULT_LAYOUT(layout_cdi)
 
-    MCFG_VIDEO_START(cdimono1)
 
-    MCFG_MACHINE_START(cdi)
 
     MCFG_CDICDIC_ADD( "cdic" )
     MCFG_CDISLAVE_ADD( "slave" )
@@ -377,7 +373,7 @@ struct cdrom_interface cdi_cdrom =
 
 // Standard CD-i system, with CD-ROM image device (MESS) and Software List (MESS)
 static MACHINE_CONFIG_DERIVED( cdimono1, cdi )
-	MCFG_MACHINE_RESET( cdi )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, cdi )
 
 	MCFG_CDROM_ADD( "cdrom", cdi_cdrom )
 
@@ -392,43 +388,43 @@ static MACHINE_CONFIG_DERIVED( quizard, cdi )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quizrd12, quizard )
-	MCFG_MACHINE_RESET( quizrd12 )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizrd12 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quizrd17, quizard )
-	MCFG_MACHINE_RESET( quizrd17 )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizrd17 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quizrd18, quizard )
-	MCFG_MACHINE_RESET( quizrd18 )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizrd18 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quizrd22, quizard )
-	MCFG_MACHINE_RESET( quizrd22 )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizrd22 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quizrd23, quizard )
-	MCFG_MACHINE_RESET( quizrd23 )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizrd23 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quizrd32, quizard )
-	MCFG_MACHINE_RESET( quizrd32 )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizrd32 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quizrd34, quizard )
-	MCFG_MACHINE_RESET( quizrd34 )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizrd34 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quizrr40, quizard )
-	MCFG_MACHINE_RESET( quizrr40 )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizrr40 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quizrr41, quizard )
-	MCFG_MACHINE_RESET( quizrr41 )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizrr41 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quizrr42, quizard )
-	MCFG_MACHINE_RESET( quizrr42 )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizrr42 )
 MACHINE_CONFIG_END
 
 

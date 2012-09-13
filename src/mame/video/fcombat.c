@@ -37,13 +37,13 @@ TILE_GET_INFO_MEMBER(fcombat_state::get_bg_tile_info)
 
 ***************************************************************************/
 
-PALETTE_INIT( fcombat )
+void fcombat_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x20);
+	machine().colortable = colortable_alloc(machine(), 0x20);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -69,7 +69,7 @@ PALETTE_INIT( fcombat )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -79,7 +79,7 @@ PALETTE_INIT( fcombat )
 	for (i = 0; i < 0x200; i++)
 	{
 		UINT8 ctabentry = (color_prom[(i & 0x1c0) | ((i & 3) << 4) | ((i >> 2) & 0x0f)] & 0x0f) | 0x10;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	/* bg chars (this is not the full story... there are four layers mixed */
@@ -87,7 +87,7 @@ PALETTE_INIT( fcombat )
 	for (i = 0x200; i < 0x300; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 
@@ -99,10 +99,9 @@ PALETTE_INIT( fcombat )
  *
  *************************************/
 
-VIDEO_START( fcombat )
+void fcombat_state::video_start()
 {
-	fcombat_state *state = machine.driver_data<fcombat_state>();
-	state->m_bgmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fcombat_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32 * 8 * 2, 32);
+	m_bgmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fcombat_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32 * 8 * 2, 32);
 }
 
 

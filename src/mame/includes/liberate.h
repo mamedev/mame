@@ -56,19 +56,26 @@ public:
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);
 	TILE_GET_INFO_MEMBER(prosport_get_back_tile_info);
+	DECLARE_MACHINE_START(liberate);
+	DECLARE_MACHINE_RESET(liberate);
+	DECLARE_VIDEO_START(liberate);
+	DECLARE_PALETTE_INIT(liberate);
+	DECLARE_VIDEO_START(prosport);
+	DECLARE_VIDEO_START(boomrang);
+	DECLARE_VIDEO_START(prosoccr);
 };
 
 
 /*----------- defined in video/liberate.c -----------*/
 
-PALETTE_INIT( liberate );
+
 SCREEN_UPDATE_IND16( prosoccr );
 SCREEN_UPDATE_IND16( prosport );
 SCREEN_UPDATE_IND16( liberate );
 SCREEN_UPDATE_IND16( boomrang );
-VIDEO_START( prosoccr );
-VIDEO_START( prosport );
-VIDEO_START( boomrang );
-VIDEO_START( liberate );
+
+
+
+
 
 

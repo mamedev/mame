@@ -2105,7 +2105,7 @@ static struct stv_vdp2_debugging
 	UINT8 win;	 /*Enters into Window effect debug menu*/
 	UINT32 error; /*bits for VDP2 error logging*/
 	UINT8 roz;   /*Debug roz on screen*/
-} debug;
+} vdpdebug;
 
 /* Not sure if to use this for the rotating tilemaps as well or just use different draw functions, might add too much bloat */
 static struct stv_vdp2_tilemap_capabilities
@@ -2272,15 +2272,15 @@ static void stv_vdp2_fill_rotation_parameter_table( running_machine &machine, UI
 	if(LOG_ROZ == 2)
 	{
 		if(machine.input().code_pressed_once(JOYCODE_Y_UP_SWITCH))
-			debug.roz++;
+			vdpdebug.roz++;
 
 		if(machine.input().code_pressed_once(JOYCODE_Y_DOWN_SWITCH))
-			debug.roz--;
+			vdpdebug.roz--;
 
-		if(debug.roz > 10)
-			debug.roz = 10;
+		if(vdpdebug.roz > 10)
+			vdpdebug.roz = 10;
 
-		switch(debug.roz)
+		switch(vdpdebug.roz)
 		{
 	    	case 0: popmessage( "Rotation parameter Table (%d)", rot_parameter ); break;
 	        case 1: popmessage( "xst = %x, yst = %x, zst = %x", RP.xst, RP.yst, RP.zst ); break;
@@ -5815,23 +5815,22 @@ static int stv_vdp2_start (running_machine &machine)
 }
 
 /* maybe we should move this to video/stv.c */
-VIDEO_START( stv_vdp2 )
+VIDEO_START_MEMBER(saturn_state,stv_vdp2)
 {
-	saturn_state *state = machine.driver_data<saturn_state>();
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap);
-	stv_vdp2_start(machine);
-	stv_vdp1_start(machine);
-	debug.l_en = 0xff;
-	debug.error = 0xffffffff;
-	debug.roz = 0;
-	machine.gfx[0]->set_source(state->m_vdp2.gfx_decode);
-	machine.gfx[1]->set_source(state->m_vdp2.gfx_decode);
-	machine.gfx[2]->set_source(state->m_vdp2.gfx_decode);
-	machine.gfx[3]->set_source(state->m_vdp2.gfx_decode);
-	machine.gfx[4]->set_source(state->m_vdp1.gfx_decode);
-	machine.gfx[5]->set_source(state->m_vdp1.gfx_decode);
-	machine.gfx[6]->set_source(state->m_vdp1.gfx_decode);
-	machine.gfx[7]->set_source(state->m_vdp1.gfx_decode);
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmap);
+	stv_vdp2_start(machine());
+	stv_vdp1_start(machine());
+	vdpdebug.l_en = 0xff;
+	vdpdebug.error = 0xffffffff;
+	vdpdebug.roz = 0;
+	machine().gfx[0]->set_source(m_vdp2.gfx_decode);
+	machine().gfx[1]->set_source(m_vdp2.gfx_decode);
+	machine().gfx[2]->set_source(m_vdp2.gfx_decode);
+	machine().gfx[3]->set_source(m_vdp2.gfx_decode);
+	machine().gfx[4]->set_source(m_vdp1.gfx_decode);
+	machine().gfx[5]->set_source(m_vdp1.gfx_decode);
+	machine().gfx[6]->set_source(m_vdp1.gfx_decode);
+	machine().gfx[7]->set_source(m_vdp1.gfx_decode);
 }
 
 void stv_vdp2_dynamic_res_change(running_machine &machine)
@@ -6648,33 +6647,33 @@ SCREEN_UPDATE_RGB32( stv_vdp2 )
 	#if DEBUG_MODE
 	if(screen.machine().input().code_pressed_once(KEYCODE_T))
 	{
-		debug.l_en^=1;
-		popmessage("NBG3 %sabled",debug.l_en & 1 ? "en" : "dis");
+		vdpdebug.l_en^=1;
+		popmessage("NBG3 %sabled",vdpdebug.l_en & 1 ? "en" : "dis");
 	}
 	if(screen.machine().input().code_pressed_once(KEYCODE_Y))
 	{
-		debug.l_en^=2;
-		popmessage("NBG2 %sabled",debug.l_en & 2 ? "en" : "dis");
+		vdpdebug.l_en^=2;
+		popmessage("NBG2 %sabled",vdpdebug.l_en & 2 ? "en" : "dis");
 	}
 	if(screen.machine().input().code_pressed_once(KEYCODE_U))
 	{
-		debug.l_en^=4;
-		popmessage("NBG1 %sabled",debug.l_en & 4 ? "en" : "dis");
+		vdpdebug.l_en^=4;
+		popmessage("NBG1 %sabled",vdpdebug.l_en & 4 ? "en" : "dis");
 	}
 	if(screen.machine().input().code_pressed_once(KEYCODE_I))
 	{
-		debug.l_en^=8;
-		popmessage("NBG0 %sabled",debug.l_en & 8 ? "en" : "dis");
+		vdpdebug.l_en^=8;
+		popmessage("NBG0 %sabled",vdpdebug.l_en & 8 ? "en" : "dis");
 	}
 	if(screen.machine().input().code_pressed_once(KEYCODE_K))
 	{
-		debug.l_en^=0x10;
-		popmessage("RBG0 %sabled",debug.l_en & 0x10 ? "en" : "dis");
+		vdpdebug.l_en^=0x10;
+		popmessage("RBG0 %sabled",vdpdebug.l_en & 0x10 ? "en" : "dis");
 	}
 	if(screen.machine().input().code_pressed_once(KEYCODE_O))
 	{
-		debug.l_en^=0x20;
-		popmessage("SPRITE %sabled",debug.l_en & 0x20 ? "en" : "dis");
+		vdpdebug.l_en^=0x20;
+		popmessage("SPRITE %sabled",vdpdebug.l_en & 0x20 ? "en" : "dis");
 	}
 	#endif
 
@@ -6689,12 +6688,12 @@ SCREEN_UPDATE_RGB32( stv_vdp2 )
 		/*If a plane has a priority value of zero it isn't shown at all.*/
 		for(pri=1;pri<8;pri++)
 		{
-			if (debug.l_en & 1)    { if(pri==STV_VDP2_N3PRIN) stv_vdp2_draw_NBG3(screen.machine(), state->m_tmpbitmap,cliprect); }
-			if (debug.l_en & 2)    { if(pri==STV_VDP2_N2PRIN) stv_vdp2_draw_NBG2(screen.machine(), state->m_tmpbitmap,cliprect); }
-			if (debug.l_en & 4)    { if(pri==STV_VDP2_N1PRIN) stv_vdp2_draw_NBG1(screen.machine(), state->m_tmpbitmap,cliprect); }
-			if (debug.l_en & 8)    { if(pri==STV_VDP2_N0PRIN) stv_vdp2_draw_NBG0(screen.machine(), state->m_tmpbitmap,cliprect); }
-			if (debug.l_en & 0x10) { if(pri==STV_VDP2_R0PRIN) stv_vdp2_draw_RBG0(screen.machine(), state->m_tmpbitmap,cliprect); }
-			if (debug.l_en & 0x20) { draw_sprites(screen.machine(),state->m_tmpbitmap,cliprect,pri); }
+			if (vdpdebug.l_en & 1)    { if(pri==STV_VDP2_N3PRIN) stv_vdp2_draw_NBG3(screen.machine(), state->m_tmpbitmap,cliprect); }
+			if (vdpdebug.l_en & 2)    { if(pri==STV_VDP2_N2PRIN) stv_vdp2_draw_NBG2(screen.machine(), state->m_tmpbitmap,cliprect); }
+			if (vdpdebug.l_en & 4)    { if(pri==STV_VDP2_N1PRIN) stv_vdp2_draw_NBG1(screen.machine(), state->m_tmpbitmap,cliprect); }
+			if (vdpdebug.l_en & 8)    { if(pri==STV_VDP2_N0PRIN) stv_vdp2_draw_NBG0(screen.machine(), state->m_tmpbitmap,cliprect); }
+			if (vdpdebug.l_en & 0x10) { if(pri==STV_VDP2_R0PRIN) stv_vdp2_draw_RBG0(screen.machine(), state->m_tmpbitmap,cliprect); }
+			if (vdpdebug.l_en & 0x20) { draw_sprites(screen.machine(),state->m_tmpbitmap,cliprect,pri); }
 		}
 	}
 

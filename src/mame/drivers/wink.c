@@ -40,6 +40,8 @@ public:
 	DECLARE_READ8_MEMBER(sound_r);
 	DECLARE_DRIVER_INIT(wink);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -58,10 +60,9 @@ TILE_GET_INFO_MEMBER(wink_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
-static VIDEO_START( wink )
+void wink_state::video_start()
 {
-	wink_state *state = machine.driver_data<wink_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wink_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wink_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16( wink )
@@ -334,10 +335,9 @@ static INTERRUPT_GEN( wink_sound )
 	state->m_sound_flag ^= 0x80;
 }
 
-static MACHINE_RESET( wink )
+void wink_state::machine_reset()
 {
-	wink_state *state = machine.driver_data<wink_state>();
-	state->m_sound_flag = 0;
+	m_sound_flag = 0;
 }
 
 static MACHINE_CONFIG_START( wink, wink_state )
@@ -353,7 +353,6 @@ static MACHINE_CONFIG_START( wink, wink_state )
 	MCFG_CPU_PERIODIC_INT(wink_sound, 15625)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
-	MCFG_MACHINE_RESET(wink)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -366,7 +365,6 @@ static MACHINE_CONFIG_START( wink, wink_state )
 	MCFG_GFXDECODE(wink)
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_VIDEO_START(wink)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

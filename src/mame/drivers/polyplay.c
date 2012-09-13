@@ -102,20 +102,19 @@ static const samples_interface polyplay_samples_interface =
 };
 
 
-static MACHINE_RESET( polyplay )
+void polyplay_state::machine_reset()
 {
-	polyplay_state *state = machine.driver_data<polyplay_state>();
-	state->m_channel1_active = 0;
-	state->m_channel1_const = 0;
-	state->m_channel2_active = 0;
-	state->m_channel2_const = 0;
+	m_channel1_active = 0;
+	m_channel1_const = 0;
+	m_channel2_active = 0;
+	m_channel2_const = 0;
 
-	polyplay_set_channel1(machine, 0);
-	polyplay_play_channel1(machine, 0);
-	polyplay_set_channel2(machine, 0);
-	polyplay_play_channel2(machine, 0);
+	polyplay_set_channel1(machine(), 0);
+	polyplay_play_channel1(machine(), 0);
+	polyplay_set_channel2(machine(), 0);
+	polyplay_play_channel2(machine(), 0);
 
-	state->m_timer = machine.device<timer_device>("timer");
+	m_timer = machine().device<timer_device>("timer");
 }
 
 
@@ -277,7 +276,6 @@ static MACHINE_CONFIG_START( polyplay, polyplay_state )
 	MCFG_CPU_PERIODIC_INT(periodic_interrupt,75)
 	MCFG_CPU_VBLANK_INT("screen", coin_interrupt)
 
-	MCFG_MACHINE_RESET(polyplay)
 
 	MCFG_TIMER_ADD("timer", polyplay_timer_callback)
 
@@ -292,8 +290,6 @@ static MACHINE_CONFIG_START( polyplay, polyplay_state )
 	MCFG_GFXDECODE(polyplay)
 	MCFG_PALETTE_LENGTH(10)
 
-	MCFG_PALETTE_INIT(polyplay)
-	MCFG_VIDEO_START(polyplay)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

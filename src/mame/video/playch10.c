@@ -14,10 +14,10 @@ WRITE8_MEMBER(playch10_state::playch10_videoram_w)
 	}
 }
 
-PALETTE_INIT( playch10 )
+void playch10_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	ppu2c0x_device *ppu = machine.device<ppu2c0x_device>("ppu");
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
 	int i;
 
 	for (i = 0; i < 256; i++)
@@ -50,12 +50,12 @@ PALETTE_INIT( playch10 )
 
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
 
-	ppu->init_palette_rgb(machine, 256);
+	ppu->init_palette_rgb(machine(), 256);
 }
 
 static void ppu_irq( device_t *device, int *ppu_regs )
@@ -89,23 +89,21 @@ TILE_GET_INFO_MEMBER(playch10_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-VIDEO_START( playch10 )
+void playch10_state::video_start()
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
-	const UINT8 *bios = state->memregion("maincpu")->base();
-	state->m_pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
+	const UINT8 *bios = memregion("maincpu")->base();
+	m_pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playch10_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playch10_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 }
 
-VIDEO_START( playch10_hboard )
+VIDEO_START_MEMBER(playch10_state,playch10_hboard)
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
-	const UINT8 *bios = state->memregion("maincpu")->base();
-	state->m_pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
+	const UINT8 *bios = memregion("maincpu")->base();
+	m_pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playch10_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playch10_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 }
 

@@ -32,15 +32,17 @@ public:
 	DECLARE_WRITE8_MEMBER(hanaroku_out_1_w);
 	DECLARE_WRITE8_MEMBER(hanaroku_out_2_w);
 	DECLARE_WRITE8_MEMBER(albazc_vregs_w);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 
 /* video */
 
-static PALETTE_INIT( hanaroku )
+void albazc_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 	int r, g, b;
 
@@ -50,12 +52,12 @@ static PALETTE_INIT( hanaroku )
 		g = ((color_prom[i * 2 + 1] & 0xe0) | ((color_prom[i * 2 + 0]& 0x03) <<8)) >> 5;
 		r = (color_prom[i * 2 + 0] & 0x7c) >> 2;
 
-		palette_set_color_rgb(machine, i, pal5bit(r), pal5bit(g), pal5bit(b));
+		palette_set_color_rgb(machine(), i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
 
-static VIDEO_START( hanaroku )
+void albazc_state::video_start()
 {
 }
 
@@ -281,8 +283,6 @@ static MACHINE_CONFIG_START( hanaroku, albazc_state )
 	MCFG_GFXDECODE(hanaroku)
 	MCFG_PALETTE_LENGTH(0x200)
 
-	MCFG_PALETTE_INIT(hanaroku)
-	MCFG_VIDEO_START(hanaroku)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

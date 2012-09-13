@@ -283,14 +283,14 @@ INPUT_PORTS_END
 // PALETTE INIT   //
 ////////////////////
 
-PALETTE_INIT( hd66421 )
+void cybiko_state::palette_init()
 {
 	// init palette
 	for (int i = 0; i < 4; i++)
 	{
-		palette_set_color(machine, i, RGB_WHITE);
+		palette_set_color(machine(), i, RGB_WHITE);
 #ifndef HD66421_BRIGHTNESS_DOES_NOT_WORK
-		palette_set_pen_contrast(machine, i, 1.0 * i / (4 - 1));
+		palette_set_pen_contrast(machine(), i, 1.0 * i / (4 - 1));
 #endif
 	}
 }
@@ -326,15 +326,12 @@ static MACHINE_CONFIG_START( cybikov1, cybiko_state )
 	// video
 	MCFG_HD66421_ADD("hd66421")
 	MCFG_PALETTE_LENGTH(4)
-	MCFG_PALETTE_INIT(hd66421)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	// sound
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	// machine
-	MCFG_MACHINE_START(cybikov1)
-	MCFG_MACHINE_RESET(cybikov1)
 	/* rtc */
 	MCFG_PCF8593_ADD("rtc")
 	MCFG_AT45DB041_ADD("flash1")
@@ -356,8 +353,8 @@ static MACHINE_CONFIG_DERIVED( cybikov2, cybikov1)
 	MCFG_CPU_PROGRAM_MAP(cybikov2_mem )
 	MCFG_CPU_IO_MAP(cybikov2_io )
 	// machine
-	MCFG_MACHINE_START(cybikov2)
-	MCFG_MACHINE_RESET(cybikov2)
+	MCFG_MACHINE_START_OVERRIDE(cybiko_state,cybikov2)
+	MCFG_MACHINE_RESET_OVERRIDE(cybiko_state,cybikov2)
 	MCFG_SST39VF020_ADD("flash2", cybyko_sst39vfx_intf)
 
 	/* internal ram */
@@ -372,8 +369,8 @@ static MACHINE_CONFIG_DERIVED( cybikoxt, cybikov1)
 	MCFG_CPU_PROGRAM_MAP(cybikoxt_mem )
 	MCFG_CPU_IO_MAP(cybikoxt_io )
 	// machine
-	MCFG_MACHINE_START(cybikoxt)
-	MCFG_MACHINE_RESET(cybikoxt)
+	MCFG_MACHINE_START_OVERRIDE(cybiko_state,cybikoxt)
+	MCFG_MACHINE_RESET_OVERRIDE(cybiko_state,cybikoxt)
 	MCFG_DEVICE_REMOVE("flash1")
 	MCFG_SST39VF400A_ADD("flash2", cybyko_sst39vfx_intf)
 

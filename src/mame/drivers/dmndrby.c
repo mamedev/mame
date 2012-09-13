@@ -78,6 +78,8 @@ public:
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(output_w);
 	TILE_GET_INFO_MEMBER(get_dmndrby_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -335,12 +337,11 @@ TILE_GET_INFO_MEMBER(dmndrby_state::get_dmndrby_tile_info)
 }
 
 
-static VIDEO_START(dderby)
+void dmndrby_state::video_start()
 {
-	dmndrby_state *state = machine.driver_data<dmndrby_state>();
-	state->m_racetrack_tilemap_rom = state->memregion("user1")->base();
-	state->m_racetrack_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dmndrby_state::get_dmndrby_tile_info),state),TILEMAP_SCAN_ROWS,16,16, 16, 512);
-	state->m_racetrack_tilemap->mark_all_dirty();
+	m_racetrack_tilemap_rom = memregion("user1")->base();
+	m_racetrack_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dmndrby_state::get_dmndrby_tile_info),this),TILEMAP_SCAN_ROWS,16,16, 16, 512);
+	m_racetrack_tilemap->mark_all_dirty();
 
 }
 
@@ -442,9 +443,9 @@ wouldnt like to say its the most effective way though...
 }
 
 // copied from elsewhere. surely incorrect
-static PALETTE_INIT( dmnderby )
+void dmndrby_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -457,7 +458,7 @@ static PALETTE_INIT( dmnderby )
 			2, &resistances_b[0],  bweights, 470, 0);
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x20);
+	machine().colortable = colortable_alloc(machine(), 0x20);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -482,17 +483,17 @@ static PALETTE_INIT( dmnderby )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
-	color_prom = machine.root_device().memregion("proms2")->base();
+	color_prom = machine().root_device().memregion("proms2")->base();
 
 	/* normal tiles use colors 0-15 */
 	for (i = 0x000; i < 0x300; i++)
 	{
 		UINT8 ctabentry = color_prom[i];
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 
@@ -530,9 +531,7 @@ static MACHINE_CONFIG_START( dderby, dmndrby_state )
 
 	MCFG_GFXDECODE(dmndrby)
 	MCFG_PALETTE_LENGTH(0x300)
-	MCFG_PALETTE_INIT(dmnderby)
 
-	MCFG_VIDEO_START(dderby)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

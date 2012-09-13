@@ -278,18 +278,16 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_START( funkybee )
+void funkybee_state::machine_start()
 {
-	funkybee_state *state = machine.driver_data<funkybee_state>();
 
-	state->save_item(NAME(state->m_gfx_bank));
+	save_item(NAME(m_gfx_bank));
 }
 
-static MACHINE_RESET( funkybee )
+void funkybee_state::machine_reset()
 {
-	funkybee_state *state = machine.driver_data<funkybee_state>();
 
-	state->m_gfx_bank = 0;
+	m_gfx_bank = 0;
 }
 
 static MACHINE_CONFIG_START( funkybee, funkybee_state )
@@ -300,8 +298,6 @@ static MACHINE_CONFIG_START( funkybee, funkybee_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(funkybee)
-	MCFG_MACHINE_RESET(funkybee)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -314,8 +310,6 @@ static MACHINE_CONFIG_START( funkybee, funkybee_state )
 	MCFG_GFXDECODE(funkybee)
 	MCFG_PALETTE_LENGTH(32)
 
-	MCFG_PALETTE_INIT(funkybee)
-	MCFG_VIDEO_START(funkybee)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

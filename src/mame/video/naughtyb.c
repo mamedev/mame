@@ -56,9 +56,9 @@ static const res_net_info naughtyb_net_info =
 
 ***************************************************************************/
 
-PALETTE_INIT( naughtyb )
+void naughtyb_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	static const int resistances[2] = { 270, 130 };
 	double weights[2];
 	int i;
@@ -69,7 +69,7 @@ PALETTE_INIT( naughtyb )
 			2, resistances, weights, 0, 0,
 			0, 0, 0, 0, 0);
 
-	for (i = 0;i < machine.total_colors(); i++)
+	for (i = 0;i < machine().total_colors(); i++)
 	{
 		int bit0, bit1;
 		int r, g, b;
@@ -89,7 +89,7 @@ PALETTE_INIT( naughtyb )
 		bit1 = (color_prom[i+0x100] >> 1) & 0x01;
 		b = combine_2_weights(weights, bit0, bit1);
 
-		palette_set_color(machine, BITSWAP8(i,5,7,6,2,1,0,4,3), MAKE_RGB(r, g, b));
+		palette_set_color(machine(), BITSWAP8(i,5,7,6,2,1,0,4,3), MAKE_RGB(r, g, b));
 	}
 }
 
@@ -99,13 +99,12 @@ PALETTE_INIT( naughtyb )
   Start the video hardware emulation.
 
 ***************************************************************************/
-VIDEO_START( naughtyb )
+void naughtyb_state::video_start()
 {
-	naughtyb_state *state = machine.driver_data<naughtyb_state>();
-	state->m_palreg = state->m_bankreg = 0;
+	m_palreg = m_bankreg = 0;
 
 	/* Naughty Boy has a virtual screen twice as large as the visible screen */
-	state->m_tmpbitmap.allocate(68*8,28*8,machine.primary_screen->format());
+	m_tmpbitmap.allocate(68*8,28*8,machine().primary_screen->format());
 }
 
 

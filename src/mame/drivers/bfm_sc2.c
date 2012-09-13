@@ -298,6 +298,10 @@ public:
 	DECLARE_DRIVER_INIT(focus);
 	DECLARE_DRIVER_INIT(drwho);
 	DECLARE_DRIVER_INIT(drwho_common);
+	DECLARE_MACHINE_RESET(init);
+	DECLARE_MACHINE_RESET(awp_init);
+	DECLARE_MACHINE_START(sc2dmd);
+	DECLARE_MACHINE_RESET(dm01_init);
 };
 
 
@@ -1416,15 +1420,14 @@ static int read_e2ram(running_machine &machine)
 
 // machine init (called only once) ////////////////////////////////////////
 
-static MACHINE_RESET( init )
+MACHINE_RESET_MEMBER(bfm_sc2_state,init)
 {
-	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
 
 	// reset the board //////////////////////////////////////////////////////
 
-	on_scorpion2_reset(machine);
-	state->m_vfd0->reset();
-	state->m_vfd1->reset();
+	on_scorpion2_reset(machine());
+	m_vfd0->reset();
+	m_vfd1->reset();
 
 }
 
@@ -2150,7 +2153,7 @@ INPUT_PORTS_END
 ///////////////////////////////////////////////////////////////////////////
 
 static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
-	MCFG_MACHINE_RESET( init )							// main scorpion2 board initialisation
+	MCFG_MACHINE_RESET_OVERRIDE(bfm_sc2_state, init )							// main scorpion2 board initialisation
 	MCFG_QUANTUM_TIME(attotime::from_hz(960))									// needed for serial communication !!
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )	// 6809 CPU at 2 Mhz
 	MCFG_CPU_PROGRAM_MAP(memmap_vid)					// setup scorpion2 board memorymap
@@ -2598,19 +2601,18 @@ static const bfmdm01_interface dm01_interface =
 };
 
 /* machine init (called only once) */
-static MACHINE_RESET( awp_init )
+MACHINE_RESET_MEMBER(bfm_sc2_state,awp_init)
 {
-	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
 
-	on_scorpion2_reset(machine);
-	state->m_vfd0->reset();
-	state->m_vfd1->reset();
+	on_scorpion2_reset(machine());
+	m_vfd0->reset();
+	m_vfd1->reset();
 }
 
 
-static MACHINE_RESET( dm01_init )
+MACHINE_RESET_MEMBER(bfm_sc2_state,dm01_init)
 {
-	on_scorpion2_reset(machine);
+	on_scorpion2_reset(machine());
 }
 
 
@@ -3689,19 +3691,18 @@ WRITE8_MEMBER(bfm_sc2_state::dmd_reset_w)
 //TODO: Reset callback for DMD
 }
 
-static MACHINE_START( sc2dmd )
+MACHINE_START_MEMBER(bfm_sc2_state,sc2dmd)
 {
-	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
 
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->install_write_handler(0x2800, 0x2800, 0, 0, write8_delegate(FUNC(bfm_sc2_state::vfd1_dmd_w),state));
-	space->install_write_handler(0x2900, 0x2900, 0, 0, write8_delegate(FUNC(bfm_sc2_state::dmd_reset_w),state));
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	space->install_write_handler(0x2800, 0x2800, 0, 0, write8_delegate(FUNC(bfm_sc2_state::vfd1_dmd_w),this));
+	space->install_write_handler(0x2900, 0x2900, 0, 0, write8_delegate(FUNC(bfm_sc2_state::dmd_reset_w),this));
 }
 
 /* machine driver for scorpion2 board */
 
 static MACHINE_CONFIG_START( scorpion2, bfm_sc2_state )
-	MCFG_MACHINE_RESET(awp_init)
+	MCFG_MACHINE_RESET_OVERRIDE(bfm_sc2_state,awp_init)
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP(sc2_basemap)
 	MCFG_CPU_PERIODIC_INT(timer_irq, 1000 )
@@ -3734,7 +3735,7 @@ MACHINE_CONFIG_END
 
 /* machine driver for scorpion2 board + matrix board */
 static MACHINE_CONFIG_START( scorpion2_dm01, bfm_sc2_state )
-	MCFG_MACHINE_RESET(dm01_init)
+	MCFG_MACHINE_RESET_OVERRIDE(bfm_sc2_state,dm01_init)
 	MCFG_QUANTUM_TIME(attotime::from_hz(960))									// needed for serial communication !!
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP(sc2_basemap)
@@ -3745,7 +3746,7 @@ static MACHINE_CONFIG_START( scorpion2_dm01, bfm_sc2_state )
 	MCFG_SOUND_ADD("ymsnd",YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_MACHINE_START(sc2dmd)
+	MCFG_MACHINE_START_OVERRIDE(bfm_sc2_state,sc2dmd)
 	MCFG_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

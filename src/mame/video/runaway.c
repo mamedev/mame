@@ -66,21 +66,19 @@ TILE_GET_INFO_MEMBER(runaway_state::qwak_get_tile_info)
 
 
 
-VIDEO_START( runaway )
+void runaway_state::video_start()
 {
-	runaway_state *state = machine.driver_data<runaway_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(runaway_state::runaway_get_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 30);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(runaway_state::runaway_get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 30);
 
-	state->save_item(NAME(state->m_tile_bank));
+	save_item(NAME(m_tile_bank));
 }
 
 
-VIDEO_START( qwak )
+VIDEO_START_MEMBER(runaway_state,qwak)
 {
-	runaway_state *state = machine.driver_data<runaway_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(runaway_state::qwak_get_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 30);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(runaway_state::qwak_get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 30);
 
-	state->save_item(NAME(state->m_tile_bank));
+	save_item(NAME(m_tile_bank));
 }
 
 

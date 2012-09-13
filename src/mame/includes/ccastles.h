@@ -64,13 +64,16 @@ public:
 	DECLARE_WRITE8_MEMBER(ccastles_bitmode_w);
 	DECLARE_WRITE8_MEMBER(ccastles_bitmode_addr_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/ccastles.c -----------*/
 
 
-VIDEO_START( ccastles );
+
 SCREEN_UPDATE_IND16( ccastles );
 
 

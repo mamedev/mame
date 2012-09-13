@@ -161,6 +161,10 @@ public:
 	DECLARE_READ8_MEMBER(px4_ramdisk_control_r);
 	DECLARE_DRIVER_INIT(px4);
 	DECLARE_DRIVER_INIT(px4p);
+	virtual void machine_reset();
+	virtual void palette_init();
+	DECLARE_MACHINE_START(px4_ramdisk);
+	DECLARE_PALETTE_INIT(px4p);
 };
 
 
@@ -1112,17 +1116,14 @@ DRIVER_INIT_MEMBER(px4_state,px4p)
 	m_ramdisk = auto_alloc_array(machine(), UINT8, 0x20000);
 }
 
-static MACHINE_RESET( px4 )
+void px4_state::machine_reset()
 {
-	px4_state *px4 = machine.driver_data<px4_state>();
-
-	px4->m_artsr = ART_TXRDY | ART_TXEMPTY;
+	m_artsr = ART_TXRDY | ART_TXEMPTY;
 }
 
-static MACHINE_START( px4_ramdisk )
+MACHINE_START_MEMBER(px4_state,px4_ramdisk)
 {
-	px4_state *px4 = machine.driver_data<px4_state>();
-	machine.device<nvram_device>("nvram")->set_base(px4->m_ramdisk, 0x20000);
+	machine().device<nvram_device>("nvram")->set_base(m_ramdisk, 0x20000);
 }
 
 /***************************************************************************
@@ -1329,16 +1330,16 @@ INPUT_PORTS_END
     PALETTE
 ***************************************************************************/
 
-static PALETTE_INIT( px4 )
+void px4_state::palette_init()
 {
-	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
+	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
+	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
 }
 
-static PALETTE_INIT( px4p )
+PALETTE_INIT_MEMBER(px4_state,px4p)
 {
-	palette_set_color(machine, 0, MAKE_RGB(149, 157, 130));
-	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
+	palette_set_color(machine(), 0, MAKE_RGB(149, 157, 130));
+	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
 }
 
 
@@ -1362,7 +1363,6 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_CPU_PROGRAM_MAP(px4_mem)
 	MCFG_CPU_IO_MAP(px4_io)
 
-	MCFG_MACHINE_RESET(px4)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -1374,7 +1374,6 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_DEFAULT_LAYOUT(layout_px4)
 
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(px4)
 
 	MCFG_TIMER_ADD_PERIODIC("one_sec", upd7508_1sec_callback, attotime::from_seconds(1))
 	MCFG_TIMER_ADD_PERIODIC("frc", frc_tick, attotime::from_hz(XTAL_7_3728MHz / 2 / 6))
@@ -1404,10 +1403,10 @@ static MACHINE_CONFIG_DERIVED( px4p, px4 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(px4p_io)
 
-	MCFG_MACHINE_START(px4_ramdisk)
+	MCFG_MACHINE_START_OVERRIDE(px4_state,px4_ramdisk)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PALETTE_INIT(px4p)
+	MCFG_PALETTE_INIT_OVERRIDE(px4_state,px4p)
 
 	MCFG_CARTSLOT_ADD("ramdisk")
 	MCFG_CARTSLOT_NOT_MANDATORY

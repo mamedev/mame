@@ -359,9 +359,8 @@ static ADDRESS_MAP_START( rumba_map, AS_PROGRAM, 8, flstory_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_RESET( ta7630 )
+MACHINE_RESET_MEMBER(flstory_state,ta7630)
 {
-	flstory_state *state = machine.driver_data<flstory_state>();
 	int i;
 
 	double db			= 0.0;
@@ -370,8 +369,8 @@ static MACHINE_RESET( ta7630 )
 	for (i = 0; i < 16; i++)
 	{
 		double max = 100.0 / pow(10.0, db/20.0 );
-		state->m_vol_ctrl[15 - i] = max;
-		/*logerror("vol_ctrl[%x] = %i (%f dB)\n", 15 - i, state->m_vol_ctrl[15 - i], db);*/
+		m_vol_ctrl[15 - i] = max;
+		/*logerror("vol_ctrl[%x] = %i (%f dB)\n", 15 - i, m_vol_ctrl[15 - i], db);*/
 		db += db_step;
 		db_step += db_step_inc;
 	}
@@ -1002,81 +1001,79 @@ static const msm5232_interface msm5232_config =
 };
 
 
-static MACHINE_START( flstory )
+void flstory_state::machine_start()
 {
-	flstory_state *state = machine.driver_data<flstory_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_mcu = machine.device("mcu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_mcu = machine().device("mcu");
 
 	/* video */
-	state->save_item(NAME(state->m_char_bank));
-	state->save_item(NAME(state->m_palette_bank));
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_gfxctrl));
+	save_item(NAME(m_char_bank));
+	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_gfxctrl));
 	/* sound */
-	state->save_item(NAME(state->m_snd_data));
-	state->save_item(NAME(state->m_snd_flag));
-	state->save_item(NAME(state->m_sound_nmi_enable));
-	state->save_item(NAME(state->m_pending_nmi));
-	state->save_item(NAME(state->m_vol_ctrl));
-	state->save_item(NAME(state->m_snd_ctrl0));
-	state->save_item(NAME(state->m_snd_ctrl1));
-	state->save_item(NAME(state->m_snd_ctrl2));
-	state->save_item(NAME(state->m_snd_ctrl3));
+	save_item(NAME(m_snd_data));
+	save_item(NAME(m_snd_flag));
+	save_item(NAME(m_sound_nmi_enable));
+	save_item(NAME(m_pending_nmi));
+	save_item(NAME(m_vol_ctrl));
+	save_item(NAME(m_snd_ctrl0));
+	save_item(NAME(m_snd_ctrl1));
+	save_item(NAME(m_snd_ctrl2));
+	save_item(NAME(m_snd_ctrl3));
 	/* mcu */
-	state->save_item(NAME(state->m_from_main));
-	state->save_item(NAME(state->m_from_mcu));
-	state->save_item(NAME(state->m_mcu_sent));
-	state->save_item(NAME(state->m_main_sent));
-	state->save_item(NAME(state->m_port_a_in));
-	state->save_item(NAME(state->m_port_a_out));
-	state->save_item(NAME(state->m_ddr_a));
-	state->save_item(NAME(state->m_port_b_in));
-	state->save_item(NAME(state->m_port_b_out));
-	state->save_item(NAME(state->m_ddr_b));
-	state->save_item(NAME(state->m_port_c_in));
-	state->save_item(NAME(state->m_port_c_out));
-	state->save_item(NAME(state->m_ddr_c));
-	state->save_item(NAME(state->m_mcu_select));
+	save_item(NAME(m_from_main));
+	save_item(NAME(m_from_mcu));
+	save_item(NAME(m_mcu_sent));
+	save_item(NAME(m_main_sent));
+	save_item(NAME(m_port_a_in));
+	save_item(NAME(m_port_a_out));
+	save_item(NAME(m_ddr_a));
+	save_item(NAME(m_port_b_in));
+	save_item(NAME(m_port_b_out));
+	save_item(NAME(m_ddr_b));
+	save_item(NAME(m_port_c_in));
+	save_item(NAME(m_port_c_out));
+	save_item(NAME(m_ddr_c));
+	save_item(NAME(m_mcu_select));
 }
 
-static MACHINE_RESET( flstory )
+MACHINE_RESET_MEMBER(flstory_state,flstory)
 {
-	flstory_state *state = machine.driver_data<flstory_state>();
 
-	MACHINE_RESET_CALL(ta7630);
+	MACHINE_RESET_CALL_MEMBER(ta7630);
 
 	/* video */
-	state->m_char_bank = 0;
-	state->m_palette_bank = 0;
-	state->m_flipscreen = 0;
-	state->m_gfxctrl = 0;
+	m_char_bank = 0;
+	m_palette_bank = 0;
+	m_flipscreen = 0;
+	m_gfxctrl = 0;
 	/* sound */
-	state->m_snd_data = 0;
-	state->m_snd_flag = 0;
-	state->m_sound_nmi_enable = 0;
-	state->m_pending_nmi = 0;
-	state->m_snd_ctrl0 = 0;
-	state->m_snd_ctrl1 = 0;
-	state->m_snd_ctrl2 = 0;
-	state->m_snd_ctrl3 = 0;
+	m_snd_data = 0;
+	m_snd_flag = 0;
+	m_sound_nmi_enable = 0;
+	m_pending_nmi = 0;
+	m_snd_ctrl0 = 0;
+	m_snd_ctrl1 = 0;
+	m_snd_ctrl2 = 0;
+	m_snd_ctrl3 = 0;
 	/* mcu */
-	state->m_from_main = 0;
-	state->m_from_mcu = 0;
-	state->m_mcu_sent = 0;
-	state->m_main_sent = 0;
-	state->m_port_a_in = 0;
-	state->m_port_a_out = 0;
-	state->m_ddr_a = 0;
-	state->m_port_b_in = 0;
-	state->m_port_b_out = 0;
-	state->m_ddr_b = 0;
-	state->m_port_c_in = 0;
-	state->m_port_c_out = 0;
-	state->m_ddr_c = 0;
-	state->m_mcu_select = 0;
+	m_from_main = 0;
+	m_from_mcu = 0;
+	m_mcu_sent = 0;
+	m_main_sent = 0;
+	m_port_a_in = 0;
+	m_port_a_out = 0;
+	m_ddr_a = 0;
+	m_port_b_in = 0;
+	m_port_b_out = 0;
+	m_ddr_b = 0;
+	m_port_c_in = 0;
+	m_port_c_out = 0;
+	m_ddr_c = 0;
+	m_mcu_select = 0;
 }
 
 static MACHINE_CONFIG_START( flstory, flstory_state )
@@ -1096,8 +1093,7 @@ static MACHINE_CONFIG_START( flstory, flstory_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MCFG_MACHINE_START(flstory)
-	MCFG_MACHINE_RESET(flstory)
+	MCFG_MACHINE_RESET_OVERRIDE(flstory_state,flstory)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1110,7 +1106,7 @@ static MACHINE_CONFIG_START( flstory, flstory_state )
 	MCFG_GFXDECODE(flstory)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(flstory)
+	MCFG_VIDEO_START_OVERRIDE(flstory_state,flstory)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1154,8 +1150,7 @@ static MACHINE_CONFIG_START( onna34ro, flstory_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MCFG_MACHINE_START(flstory)
-	MCFG_MACHINE_RESET(flstory)
+	MCFG_MACHINE_RESET_OVERRIDE(flstory_state,flstory)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1168,7 +1163,7 @@ static MACHINE_CONFIG_START( onna34ro, flstory_state )
 	MCFG_GFXDECODE(flstory)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(flstory)
+	MCFG_VIDEO_START_OVERRIDE(flstory_state,flstory)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1212,8 +1207,7 @@ static MACHINE_CONFIG_START( victnine, flstory_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MCFG_MACHINE_START(flstory)
-	MCFG_MACHINE_RESET(flstory)
+	MCFG_MACHINE_RESET_OVERRIDE(flstory_state,flstory)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1226,7 +1220,7 @@ static MACHINE_CONFIG_START( victnine, flstory_state )
 	MCFG_GFXDECODE(flstory)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(victnine)
+	MCFG_VIDEO_START_OVERRIDE(flstory_state,victnine)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1253,11 +1247,10 @@ static MACHINE_CONFIG_START( victnine, flstory_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_RESET( rumba )
+MACHINE_RESET_MEMBER(flstory_state,rumba)
 {
-	flstory_state *state = machine.driver_data<flstory_state>();
-	MACHINE_RESET_CALL(flstory);
-	state->m_mcu_cmd = 0;
+	MACHINE_RESET_CALL_MEMBER(flstory);
+	m_mcu_cmd = 0;
 }
 
 static MACHINE_CONFIG_START( rumba, flstory_state )
@@ -1277,8 +1270,7 @@ static MACHINE_CONFIG_START( rumba, flstory_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MCFG_MACHINE_START(flstory)
-	MCFG_MACHINE_RESET(rumba)
+	MCFG_MACHINE_RESET_OVERRIDE(flstory_state,rumba)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1291,7 +1283,7 @@ static MACHINE_CONFIG_START( rumba, flstory_state )
 	MCFG_GFXDECODE(flstory)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(rumba)
+	MCFG_VIDEO_START_OVERRIDE(flstory_state,rumba)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

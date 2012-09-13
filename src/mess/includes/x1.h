@@ -194,23 +194,28 @@ public:
 	required_device<mc6845_device> m_crtc;
 	required_device<z80ctc_device> m_ctc;
 	DECLARE_DRIVER_INIT(x1_kanji);
+	DECLARE_MACHINE_START(x1);
+	DECLARE_MACHINE_RESET(x1);
+	DECLARE_VIDEO_START(x1);
+	DECLARE_PALETTE_INIT(x1);
+	DECLARE_MACHINE_RESET(x1turbo);
 };
 
 
 
 /*----------- shared with x1twin.c -----------*/
 
-VIDEO_START( x1 );
+
 SCREEN_UPDATE_RGB32( x1 );
 
 TIMER_DEVICE_CALLBACK(x1_keyboard_callback);
 TIMER_CALLBACK(x1_rtc_increment);
 TIMER_DEVICE_CALLBACK( x1_cmt_wind_timer );
 
-MACHINE_RESET( x1 );
-MACHINE_RESET( x1turbo );
-MACHINE_START( x1 );
-PALETTE_INIT(x1);
+
+
+
+
 
 
 

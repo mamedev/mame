@@ -41,6 +41,9 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
 	DECLARE_READ8_MEMBER(k052109_051960_r);
 	DECLARE_WRITE8_MEMBER(k052109_051960_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -49,5 +52,5 @@ public:
 extern void spy_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
 extern void spy_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask,int *shadow);
 
-VIDEO_START( spy );
+
 SCREEN_UPDATE_IND16( spy );

@@ -41,6 +41,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
 	required_shared_ptr<UINT8> m_ram;
+	virtual void machine_reset();
 };
 
 
@@ -103,13 +104,12 @@ QUICKLOAD_LOAD(altair)
 }
 
 
-static MACHINE_RESET(altair)
+void altair_state::machine_reset()
 {
-	altair_state *state = machine.driver_data<altair_state>();
 	// Set startup addess done by turn-key
-	machine.device("maincpu")->state().set_state_int(I8085_PC, 0xFD00);
+	machine().device("maincpu")->state().set_state_int(I8085_PC, 0xFD00);
 
-	state->m_term_data = 0;
+	m_term_data = 0;
 }
 
 WRITE8_MEMBER( altair_state::kbd_put )
@@ -128,7 +128,6 @@ static MACHINE_CONFIG_START( altair, altair_state )
 	MCFG_CPU_PROGRAM_MAP(altair_mem)
 	MCFG_CPU_IO_MAP(altair_io)
 
-	MCFG_MACHINE_RESET(altair)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)

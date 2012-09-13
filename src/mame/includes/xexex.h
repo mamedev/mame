@@ -61,6 +61,9 @@ public:
 	DECLARE_READ16_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_DRIVER_INIT(xexex);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -69,5 +72,5 @@ public:
 extern void xexex_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);
 extern void xexex_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
 
-VIDEO_START( xexex );
+
 SCREEN_UPDATE_RGB32( xexex );

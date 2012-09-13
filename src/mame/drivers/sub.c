@@ -131,9 +131,11 @@ public:
 	UINT8 m_nmi_en;
 	DECLARE_WRITE8_MEMBER(subm_to_sound_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
-static VIDEO_START(sub)
+void sub_state::video_start()
 {
 }
 
@@ -384,14 +386,14 @@ static GFXDECODE_START( sub )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x32_layout, 0, 0x80 )
 GFXDECODE_END
 
-static PALETTE_INIT( sub )
+void sub_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
-	UINT8* lookup = machine.root_device().memregion("proms2")->base();
+	UINT8* lookup = machine().root_device().memregion("proms2")->base();
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x100);
+	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	for (i = 0;i < 0x100;i++)
 	{
@@ -400,8 +402,8 @@ static PALETTE_INIT( sub )
 		g = (color_prom[0x100] >> 0);
 		b = (color_prom[0x200] >> 0);
 
-		//colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b)));
+		//colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b)));
 
 		color_prom++;
 	}
@@ -410,7 +412,7 @@ static PALETTE_INIT( sub )
 	for (i = 0;i < 0x400;i++)
 	{
 		UINT8 ctabentry = lookup[i+0x400] | (lookup[i+0x000] << 4);
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 }
@@ -448,9 +450,7 @@ static MACHINE_CONFIG_START( sub, sub_state )
 
 	MCFG_GFXDECODE(sub)
 	MCFG_PALETTE_LENGTH(0x400)
-	MCFG_PALETTE_INIT(sub)
 
-	MCFG_VIDEO_START(sub)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

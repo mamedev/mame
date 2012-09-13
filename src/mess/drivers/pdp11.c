@@ -89,6 +89,9 @@ public:
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	UINT8 m_term_data;
 	UINT16 m_term_status;
+	virtual void machine_reset();
+	DECLARE_MACHINE_RESET(pdp11ub2);
+	DECLARE_MACHINE_RESET(pdp11qb);
 };
 
 WRITE16_MEMBER(pdp11_state::term_w)
@@ -219,11 +222,11 @@ static INPUT_PORTS_START( pdp11 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(pdp11)
+void pdp11_state::machine_reset()
 {
 	// Load M9301-YA
-	UINT8* user1 = machine.root_device().memregion("user1")->base();
-	UINT8* maincpu = machine.root_device().memregion("maincpu")->base();
+	UINT8* user1 = machine().root_device().memregion("user1")->base();
+	UINT8* maincpu = machine().root_device().memregion("maincpu")->base();
 	int i;
 
 	for(i=0;i<0x100;i++) {
@@ -263,40 +266,40 @@ static void load9312prom(UINT8 *desc, UINT8 *src, int size)
 	}
 }
 
-static MACHINE_RESET(pdp11ub2)
+MACHINE_RESET_MEMBER(pdp11_state,pdp11ub2)
 {
 	// Load M9312
-	UINT8* user1 = machine.root_device().memregion("consproms")->base() + machine.root_device().ioport("CONSPROM")->read() * 0x0400;
-	UINT8* maincpu = machine.root_device().memregion("maincpu")->base();
+	UINT8* user1 = machine().root_device().memregion("consproms")->base() + machine().root_device().ioport("CONSPROM")->read() * 0x0400;
+	UINT8* maincpu = machine().root_device().memregion("maincpu")->base();
 
 	//0165000
 	load9312prom(maincpu + 0165000,user1,0x100);
 
-	UINT8 s1 = machine.root_device().ioport("S1")->read();
+	UINT8 s1 = machine().root_device().ioport("S1")->read();
 
 	if (s1 & 0x02) { // if boot enabled
 		UINT16 addr = 0173000;
 		if (s1 & 1) {
 			addr = 0165000;
 		}
-		addr += machine.root_device().ioport("S1_2")->read() * 2;
-		machine.device("maincpu")->state().set_state_int(T11_PC, addr);
+		addr += machine().root_device().ioport("S1_2")->read() * 2;
+		machine().device("maincpu")->state().set_state_int(T11_PC, addr);
 	}
 
 	//0173000
-	load9312prom(maincpu + 0173000,machine.root_device().memregion("devproms")->base() + machine.root_device().ioport("DEVPROM1")->read() * 0x0200,0x080);
+	load9312prom(maincpu + 0173000,machine().root_device().memregion("devproms")->base() + machine().root_device().ioport("DEVPROM1")->read() * 0x0200,0x080);
 	//0173200
-	load9312prom(maincpu + 0173200,machine.root_device().memregion("devproms")->base() + machine.root_device().ioport("DEVPROM2")->read() * 0x0200,0x080);
+	load9312prom(maincpu + 0173200,machine().root_device().memregion("devproms")->base() + machine().root_device().ioport("DEVPROM2")->read() * 0x0200,0x080);
 	//0173400
-	load9312prom(maincpu + 0173400,machine.root_device().memregion("devproms")->base() + machine.root_device().ioport("DEVPROM3")->read() * 0x0200,0x080);
+	load9312prom(maincpu + 0173400,machine().root_device().memregion("devproms")->base() + machine().root_device().ioport("DEVPROM3")->read() * 0x0200,0x080);
 	//0173600
-	load9312prom(maincpu + 0173600,machine.root_device().memregion("devproms")->base() + machine.root_device().ioport("DEVPROM4")->read() * 0x0200,0x080);
+	load9312prom(maincpu + 0173600,machine().root_device().memregion("devproms")->base() + machine().root_device().ioport("DEVPROM4")->read() * 0x0200,0x080);
 
 }
 
-static MACHINE_RESET(pdp11qb)
+MACHINE_RESET_MEMBER(pdp11_state,pdp11qb)
 {
-	machine.device("maincpu")->state().set_state_int(T11_PC, 0xea00);
+	machine().device("maincpu")->state().set_state_int(T11_PC, 0xea00);
 }
 
 static const struct t11_setup pdp11_data =
@@ -326,7 +329,6 @@ static MACHINE_CONFIG_START( pdp11, pdp11_state )
 	MCFG_CPU_CONFIG(pdp11_data)
 	MCFG_CPU_PROGRAM_MAP(pdp11_mem)
 
-	MCFG_MACHINE_RESET(pdp11)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
@@ -335,11 +337,11 @@ static MACHINE_CONFIG_START( pdp11, pdp11_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pdp11ub2, pdp11 )
-	MCFG_MACHINE_RESET(pdp11ub2)
+	MCFG_MACHINE_RESET_OVERRIDE(pdp11_state,pdp11ub2)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pdp11qb, pdp11 )
-	MCFG_MACHINE_RESET(pdp11qb)
+	MCFG_MACHINE_RESET_OVERRIDE(pdp11_state,pdp11qb)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CONFIG(mxv11_data)

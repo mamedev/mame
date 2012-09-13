@@ -393,8 +393,8 @@ static MACHINE_CONFIG_START( pengo, pengo_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(pacman)
 
-	MCFG_PALETTE_INIT(pacman)
-	MCFG_VIDEO_START(pengo)
+	MCFG_PALETTE_INIT_OVERRIDE(pengo_state,pacman)
+	MCFG_VIDEO_START_OVERRIDE(pengo_state,pengo)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -413,7 +413,7 @@ static MACHINE_CONFIG_DERIVED( jrpacmbl, pengo )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jrpacmbl_map)
 
-	MCFG_VIDEO_START(jrpacman)
+	MCFG_VIDEO_START_OVERRIDE(pengo_state,jrpacman)
 MACHINE_CONFIG_END
 
 

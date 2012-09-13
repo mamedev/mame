@@ -486,35 +486,34 @@ static void draw_missiles(running_machine &machine,bitmap_ind16 &bitmap, const r
 }
 
 
-VIDEO_START( decocass )
+void decocass_state::video_start()
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	state->m_bg_tilemap_l = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(decocass_state::get_bg_l_tile_info),state), tilemap_mapper_delegate(FUNC(decocass_state::bgvideoram_scan_cols),state), 16, 16, 32, 32);
-	state->m_bg_tilemap_r = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(decocass_state::get_bg_r_tile_info),state), tilemap_mapper_delegate(FUNC(decocass_state::bgvideoram_scan_cols),state), 16, 16, 32, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(decocass_state::get_fg_tile_info),state), tilemap_mapper_delegate(FUNC(decocass_state::fgvideoram_scan_cols),state), 8, 8, 32, 32);
+	m_bg_tilemap_l = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(decocass_state::get_bg_l_tile_info),this), tilemap_mapper_delegate(FUNC(decocass_state::bgvideoram_scan_cols),this), 16, 16, 32, 32);
+	m_bg_tilemap_r = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(decocass_state::get_bg_r_tile_info),this), tilemap_mapper_delegate(FUNC(decocass_state::bgvideoram_scan_cols),this), 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(decocass_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(decocass_state::fgvideoram_scan_cols),this), 8, 8, 32, 32);
 
-	state->m_bg_tilemap_l->set_transparent_pen(0);
-	state->m_bg_tilemap_r->set_transparent_pen(0);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap_l->set_transparent_pen(0);
+	m_bg_tilemap_r->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap_l_clip = machine.primary_screen->visible_area();
-	state->m_bg_tilemap_l_clip.max_y = 256 / 2 - 1;
+	m_bg_tilemap_l_clip = machine().primary_screen->visible_area();
+	m_bg_tilemap_l_clip.max_y = 256 / 2 - 1;
 
-	state->m_bg_tilemap_r_clip = machine.primary_screen->visible_area();
-	state->m_bg_tilemap_r_clip.min_y = 256 / 2;
+	m_bg_tilemap_r_clip = machine().primary_screen->visible_area();
+	m_bg_tilemap_r_clip.min_y = 256 / 2;
 
 	/* background videroam bits D0-D3 are shared with the tileram */
-	state->m_bgvideoram = state->m_tileram;
-	state->m_bgvideoram_size = 0x0400;	/* d000-d3ff */
+	m_bgvideoram = m_tileram;
+	m_bgvideoram_size = 0x0400;	/* d000-d3ff */
 
-	machine.gfx[0]->set_source(state->m_charram);
-	machine.gfx[1]->set_source(state->m_charram);
-	machine.gfx[2]->set_source(state->m_tileram);
-	machine.gfx[3]->set_source(state->m_objectram);
+	machine().gfx[0]->set_source(m_charram);
+	machine().gfx[1]->set_source(m_charram);
+	machine().gfx[2]->set_source(m_tileram);
+	machine().gfx[3]->set_source(m_objectram);
 
 	/* This should ensure that the fake 17th tile is left blank
      * now that dirty-tile tracking is handled by the core */
-	machine.gfx[2]->decode(16);
+	machine().gfx[2]->decode(16);
 }
 
 SCREEN_UPDATE_IND16( decocass )

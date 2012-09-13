@@ -43,9 +43,9 @@ WRITE16_MEMBER(cbuster_state::twocrude_palette_24bit_b_w)
 
 /******************************************************************************/
 
-VIDEO_START( twocrude )
+void cbuster_state::video_start()
 {
-	machine.device<decospr_device>("spritegen")->alloc_sprite_bitmap();
+	machine().device<decospr_device>("spritegen")->alloc_sprite_bitmap();
 }
 
 SCREEN_UPDATE_RGB32( twocrude )

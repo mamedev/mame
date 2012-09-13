@@ -104,27 +104,26 @@ DRIVER_INIT_MEMBER(a7800_state,a7800_pal)
 }
 
 
-MACHINE_RESET( a7800 )
+void a7800_state::machine_reset()
 {
-	a7800_state *state = machine.driver_data<a7800_state>();
 	UINT8 *memory;
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space* space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	state->m_ctrl_lock = 0;
-	state->m_ctrl_reg = 0;
-	state->m_maria_flag = 0;
+	m_ctrl_lock = 0;
+	m_ctrl_reg = 0;
+	m_maria_flag = 0;
 
 	/* set banks to default states */
-	memory = state->memregion("maincpu")->base();
-	state->membank("bank1")->set_base(memory + 0x4000 );
-	state->membank("bank2")->set_base(memory + 0x8000 );
-	state->membank("bank3")->set_base(memory + 0xA000 );
-	state->membank("bank4")->set_base(memory + 0xC000 );
+	memory = memregion("maincpu")->base();
+	membank("bank1")->set_base(memory + 0x4000 );
+	membank("bank2")->set_base(memory + 0x8000 );
+	membank("bank3")->set_base(memory + 0xA000 );
+	membank("bank4")->set_base(memory + 0xC000 );
 
 	/* pokey cartridge */
-	if (state->m_cart_type & 0x01)
+	if (m_cart_type & 0x01)
 	{
-		pokey_device *pokey = machine.device<pokey_device>("pokey");
+		pokey_device *pokey = machine().device<pokey_device>("pokey");
 		space->install_readwrite_handler(0x4000, 0x7FFF, read8_delegate(FUNC(pokey_device::read),pokey), write8_delegate(FUNC(pokey_device::write),pokey));
 	}
 }

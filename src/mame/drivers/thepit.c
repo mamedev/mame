@@ -663,8 +663,6 @@ static MACHINE_CONFIG_START( thepit, thepit_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(thepit)
 
-	MCFG_PALETTE_INIT(thepit)
-	MCFG_VIDEO_START(thepit)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -694,7 +692,7 @@ static MACHINE_CONFIG_DERIVED( suprmous, intrepid )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_PALETTE_INIT(suprmous)
+	MCFG_PALETTE_INIT_OVERRIDE(thepit_state,suprmous)
 	MCFG_GFXDECODE(suprmous)
 MACHINE_CONFIG_END
 

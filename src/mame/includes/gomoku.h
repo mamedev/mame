@@ -23,6 +23,8 @@ public:
 	DECLARE_WRITE8_MEMBER(gomoku_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(gomoku_bg_dispsw_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -58,7 +60,7 @@ extern const device_type GOMOKU;
 
 /*----------- defined in video/gomoku.c -----------*/
 
-PALETTE_INIT( gomoku );
-VIDEO_START( gomoku );
+
+
 SCREEN_UPDATE_IND16( gomoku );
 

@@ -41,6 +41,8 @@ public:
 	//DECLARE_READ16_MEMBER(palm_spim_in);
 	UINT8 m_port_f_latch;
 	UINT16 m_spim_data;
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 static offs_t palm_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
@@ -116,30 +118,28 @@ static void palm_spim_exchange( device_t *device )
 	}
 }
 
-static MACHINE_START( palm )
+void palm_state::machine_start()
 {
-	palm_state *state = machine.driver_data<palm_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->install_read_bank (0x000000, machine.device<ram_device>(RAM_TAG)->size() - 1, machine.device<ram_device>(RAM_TAG)->size() - 1, 0, "bank1");
-	space->install_write_bank(0x000000, machine.device<ram_device>(RAM_TAG)->size() - 1, machine.device<ram_device>(RAM_TAG)->size() - 1, 0, "bank1");
-	state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	space->install_read_bank (0x000000, machine().device<ram_device>(RAM_TAG)->size() - 1, machine().device<ram_device>(RAM_TAG)->size() - 1, 0, "bank1");
+	space->install_write_bank(0x000000, machine().device<ram_device>(RAM_TAG)->size() - 1, machine().device<ram_device>(RAM_TAG)->size() - 1, 0, "bank1");
+	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 
-	state->save_item(NAME(state->m_port_f_latch));
-	state->save_item(NAME(state->m_spim_data));
+	save_item(NAME(m_port_f_latch));
+	save_item(NAME(m_spim_data));
 
-	if (state->m_maincpu->debug())
-		state->m_maincpu->debug()->set_dasm_override(palm_dasm_override);
+	if (m_maincpu->debug())
+		m_maincpu->debug()->set_dasm_override(palm_dasm_override);
 }
 
-static MACHINE_RESET( palm )
+void palm_state::machine_reset()
 {
     // Copy boot ROM
-	UINT8* bios = machine.root_device().memregion("bios")->base();
-	memset(machine.device<ram_device>(RAM_TAG)->pointer(), 0, machine.device<ram_device>(RAM_TAG)->size());
-	memcpy(machine.device<ram_device>(RAM_TAG)->pointer(), bios, 0x20000);
+	UINT8* bios = machine().root_device().memregion("bios")->base();
+	memset(machine().device<ram_device>(RAM_TAG)->pointer(), 0, machine().device<ram_device>(RAM_TAG)->size());
+	memcpy(machine().device<ram_device>(RAM_TAG)->pointer(), bios, 0x20000);
 
-	palm_state *state = machine.driver_data<palm_state>();
-	state->m_maincpu->reset();
+	m_maincpu->reset();
 }
 
 
@@ -210,8 +210,6 @@ static MACHINE_CONFIG_START( palm, palm_state )
 	MCFG_SCREEN_VBLANK_TIME( ATTOSECONDS_IN_USEC(1260) )
 	MCFG_QUANTUM_TIME( attotime::from_hz(60) )
 
-	MCFG_MACHINE_START( palm )
-	MCFG_MACHINE_RESET( palm )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES( VIDEO_UPDATE_BEFORE_VBLANK )

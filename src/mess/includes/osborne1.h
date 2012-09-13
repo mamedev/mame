@@ -80,6 +80,8 @@ public:
 	bool m_in_irq_handler;
 	bool m_beep_state;
 	DECLARE_DRIVER_INIT(osborne1);
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 
@@ -88,7 +90,7 @@ public:
 extern const pia6821_interface osborne1_ieee_pia_config;
 extern const pia6821_interface osborne1_video_pia_config;
 
-MACHINE_RESET( osborne1 );
+
 
 
 // ======================> osborne1_daisy_device

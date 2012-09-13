@@ -2672,7 +2672,7 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_CPU_IO_MAP(towns_io)
 	MCFG_CPU_VBLANK_INT("screen", towns_vsync_irq)
 
-	//    MCFG_MACHINE_RESET(towns)
+	//    MCFG_MACHINE_RESET_OVERRIDE(towns_state,towns)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2722,7 +2722,7 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	//MCFG_VIDEO_START(towns)
+	//MCFG_VIDEO_START_OVERRIDE(towns_state,towns)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

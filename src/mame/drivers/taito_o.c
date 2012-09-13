@@ -242,12 +242,11 @@ static const tc0080vco_interface parentj_intf =
 	0
 };
 
-static MACHINE_START( taitoo )
+void taitoo_state::machine_start()
 {
-	taitoo_state *state = machine.driver_data<taitoo_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_tc0080vco = machine.device("tc0080vco");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_tc0080vco = machine().device("tc0080vco");
 }
 
 static MACHINE_CONFIG_START( parentj, taitoo_state )
@@ -256,7 +255,6 @@ static MACHINE_CONFIG_START( parentj, taitoo_state )
 	MCFG_CPU_PROGRAM_MAP(parentj_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", parentj_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_START(taitoo)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

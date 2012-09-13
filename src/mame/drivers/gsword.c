@@ -228,22 +228,21 @@ static const struct TAITO8741interface gsword_8741interface=
 	{ "DSW2","DSW1",NULL,NULL }
 };
 
-static MACHINE_RESET( gsword )
+MACHINE_RESET_MEMBER(gsword_state,gsword)
 {
-	gsword_state *state = machine.driver_data<gsword_state>();
 	int i;
 
 	for(i=0;i<4;i++) TAITO8741_reset(i);
-	state->m_coins = 0;
+	m_coins = 0;
 
 	/* snd CPU mask NMI during reset phase */
-	state->m_nmi_enable   = 0;
-	state->m_protect_hack = 0;
+	m_nmi_enable   = 0;
+	m_protect_hack = 0;
 
 	TAITO8741_start(&gsword_8741interface);
 }
 
-static MACHINE_RESET( josvolly )
+MACHINE_RESET_MEMBER(gsword_state,josvolly)
 {
 	josvolly_8741_reset();
 }
@@ -674,7 +673,7 @@ static MACHINE_CONFIG_START( gsword, gsword_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000)) /* Allow time for 2nd cpu to interleave*/
 
-	MCFG_MACHINE_RESET(gsword)
+	MCFG_MACHINE_RESET_OVERRIDE(gsword_state,gsword)
 
 #if 1
 	/* to MCU timeout champbbj */
@@ -692,8 +691,7 @@ static MACHINE_CONFIG_START( gsword, gsword_state )
 	MCFG_GFXDECODE(gsword)
 	MCFG_PALETTE_LENGTH(64*4+64*4)
 
-	MCFG_PALETTE_INIT(gsword)
-	MCFG_VIDEO_START(gsword)
+	MCFG_PALETTE_INIT_OVERRIDE(gsword_state,gsword)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -723,7 +721,7 @@ static MACHINE_CONFIG_START( josvolly, gsword_state )
 	MCFG_CPU_IO_MAP(josvolly_cpu2_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_RESET(josvolly)
+	MCFG_MACHINE_RESET_OVERRIDE(gsword_state,josvolly)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -736,8 +734,7 @@ static MACHINE_CONFIG_START( josvolly, gsword_state )
 	MCFG_GFXDECODE(gsword)
 	MCFG_PALETTE_LENGTH(64*4+64*4)
 
-	MCFG_PALETTE_INIT(josvolly)
-	MCFG_VIDEO_START(gsword)
+	MCFG_PALETTE_INIT_OVERRIDE(gsword_state,josvolly)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

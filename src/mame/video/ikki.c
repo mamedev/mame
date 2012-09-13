@@ -11,14 +11,13 @@ Video hardware driver by Uki
 #include "emu.h"
 #include "includes/ikki.h"
 
-PALETTE_INIT( ikki )
+void ikki_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	ikki_state *state = machine.driver_data<ikki_state>();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable - extra pen for the punch through pen */
-	machine.colortable = colortable_alloc(machine, 0x101);
+	machine().colortable = colortable_alloc(machine(), 0x101);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -27,7 +26,7 @@ PALETTE_INIT( ikki )
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -41,18 +40,18 @@ PALETTE_INIT( ikki )
 		if (((i & 0x07) == 0x07) && (ctabentry == 0))
 		{
 			/* punch through */
-			state->m_punch_through_pen = i;
+			m_punch_through_pen = i;
 			ctabentry = 0x100;
 		}
 
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	/* bg lookup table */
 	for (i = 0x200; i < 0x400; i++)
 	{
 		UINT8 ctabentry = color_prom[i];
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 
@@ -116,11 +115,10 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 }
 
 
-VIDEO_START( ikki )
+void ikki_state::video_start()
 {
-	ikki_state *state = machine.driver_data<ikki_state>();
-	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
-	state->save_item(NAME(state->m_sprite_bitmap));
+	machine().primary_screen->register_screen_bitmap(m_sprite_bitmap);
+	save_item(NAME(m_sprite_bitmap));
 }
 
 

@@ -42,9 +42,9 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( mrdo )
+void mrdo_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	const int R1 = 150;
@@ -76,7 +76,7 @@ PALETTE_INIT( mrdo )
 	}
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x100);
+	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	for (i = 0; i < 0x100; i++)
 	{
@@ -102,7 +102,7 @@ PALETTE_INIT( mrdo )
 		bits2 = (color_prom[a2] >> 4) & 0x03;
 		b = weight[bits0 + (bits2 << 2)];
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -110,7 +110,7 @@ PALETTE_INIT( mrdo )
 
 	/* characters */
 	for (i = 0; i < 0x100; i++)
-		colortable_entry_set_value(machine.colortable, i, i);
+		colortable_entry_set_value(machine().colortable, i, i);
 
 	/* sprites */
 	for (i = 0x100; i < 0x140; i++)
@@ -122,7 +122,7 @@ PALETTE_INIT( mrdo )
 		else
 			ctabentry &= 0x0f;	/* low 4 bits are for sprite color n */
 
-		colortable_entry_set_value(machine.colortable, i, ctabentry + ((ctabentry & 0x0c) << 3));
+		colortable_entry_set_value(machine().colortable, i, ctabentry + ((ctabentry & 0x0c) << 3));
 	}
 }
 
@@ -162,24 +162,23 @@ TILE_GET_INFO_MEMBER(mrdo_state::get_fg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( mrdo )
+void mrdo_state::video_start()
 {
-	mrdo_state *state = machine.driver_data<mrdo_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mrdo_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mrdo_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mrdo_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mrdo_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	state->m_bg_tilemap->set_transparent_pen(0);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap->set_scrolldx(0, 56);
-	state->m_fg_tilemap->set_scrolldx(0, 56);
-	state->m_bg_tilemap->set_scrolldy(0, 6);
-	state->m_fg_tilemap->set_scrolldy(0, 6);
+	m_bg_tilemap->set_scrolldx(0, 56);
+	m_fg_tilemap->set_scrolldx(0, 56);
+	m_bg_tilemap->set_scrolldy(0, 6);
+	m_fg_tilemap->set_scrolldy(0, 6);
 
-	state->m_flipscreen = 0;
+	m_flipscreen = 0;
 
-	state->save_item(NAME(state->m_flipscreen));
+	save_item(NAME(m_flipscreen));
 }
 
 

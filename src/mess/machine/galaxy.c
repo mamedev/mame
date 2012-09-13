@@ -169,24 +169,23 @@ DRIVER_INIT_MEMBER(galaxy_state,galaxy)
   Machine Initialization
 ***************************************************************************/
 
-MACHINE_RESET( galaxy )
+MACHINE_RESET_MEMBER(galaxy_state,galaxy)
 {
-	galaxy_state *state = machine.driver_data<galaxy_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* ROM 2 enable/disable */
-	if (machine.root_device().ioport("ROM2")->read()) {
+	if (machine().root_device().ioport("ROM2")->read()) {
 		space->install_read_bank(0x1000, 0x1fff, "bank10");
 	} else {
 		space->nop_read(0x1000, 0x1fff);
 	}
 	space->nop_write(0x1000, 0x1fff);
 
-	if (machine.root_device().ioport("ROM2")->read())
-		state->membank("bank10")->set_base(machine.root_device().memregion("maincpu")->base() + 0x1000);
+	if (machine().root_device().ioport("ROM2")->read())
+		membank("bank10")->set_base(machine().root_device().memregion("maincpu")->base() + 0x1000);
 
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(galaxy_irq_callback);
-	state->m_interrupts_enabled = TRUE;
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(galaxy_irq_callback);
+	m_interrupts_enabled = TRUE;
 }
 
 DRIVER_INIT_MEMBER(galaxy_state,galaxyp)
@@ -194,13 +193,12 @@ DRIVER_INIT_MEMBER(galaxy_state,galaxyp)
 	DRIVER_INIT_CALL(galaxy);
 }
 
-MACHINE_RESET( galaxyp )
+MACHINE_RESET_MEMBER(galaxy_state,galaxyp)
 {
-	galaxy_state *state = machine.driver_data<galaxy_state>();
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(galaxy_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(galaxy_irq_callback);
 
 	ROM[0x0037] = 0x29;
 	ROM[0x03f9] = 0xcd;
@@ -209,6 +207,6 @@ MACHINE_RESET( galaxyp )
 
 	space->install_read_bank(0xe000, 0xefff, "bank11");
 	space->nop_write(0xe000, 0xefff);
-	state->membank("bank11")->set_base(state->memregion("maincpu")->base() + 0xe000);
-	state->m_interrupts_enabled = TRUE;
+	membank("bank11")->set_base(memregion("maincpu")->base() + 0xe000);
+	m_interrupts_enabled = TRUE;
 }

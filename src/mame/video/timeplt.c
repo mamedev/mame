@@ -37,9 +37,9 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( timeplt )
+void timeplt_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	rgb_t palette[32];
 	int i;
 
@@ -75,11 +75,11 @@ PALETTE_INIT( timeplt )
 
 	/* sprites */
 	for (i = 0; i < 64 * 4; i++)
-		palette_set_color(machine, 32 * 4 + i, palette[*color_prom++ & 0x0f]);
+		palette_set_color(machine(), 32 * 4 + i, palette[*color_prom++ & 0x0f]);
 
 	/* characters */
 	for (i = 0; i < 32 * 4; i++)
-		palette_set_color(machine, i, palette[(*color_prom++ & 0x0f) + 0x10]);
+		palette_set_color(machine(), i, palette[(*color_prom++ & 0x0f) + 0x10]);
 }
 
 
@@ -120,16 +120,14 @@ TILE_GET_INFO_MEMBER(timeplt_state::get_chkun_tile_info)
  *
  *************************************/
 
-VIDEO_START( timeplt )
+void timeplt_state::video_start()
 {
-	timeplt_state *state = machine.driver_data<timeplt_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(timeplt_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(timeplt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-VIDEO_START( chkun )
+VIDEO_START_MEMBER(timeplt_state,chkun)
 {
-	timeplt_state *state = machine.driver_data<timeplt_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(timeplt_state::get_chkun_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(timeplt_state::get_chkun_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

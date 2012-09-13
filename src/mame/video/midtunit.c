@@ -7,6 +7,7 @@
 #include "emu.h"
 #include "cpu/tms34010/tms34010.h"
 #include "includes/midtunit.h"
+#include "includes/midwunit.h"
 #include "includes/midxunit.h"
 
 
@@ -85,10 +86,10 @@ static struct
  *
  *************************************/
 
-VIDEO_START( midtunit )
+VIDEO_START_MEMBER(midtunit_state,midtunit)
 {
 	/* allocate memory */
-	local_videoram = auto_alloc_array(machine, UINT16, 0x100000/2);
+	local_videoram = auto_alloc_array(machine(), UINT16, 0x100000/2);
 
 	/* reset all the globals */
 	gfxbank_offset[0] = 0x000000;
@@ -96,27 +97,26 @@ VIDEO_START( midtunit )
 
 	memset(dma_register, 0, sizeof(dma_register));
 	memset(&dma_state, 0, sizeof(dma_state));
-	dma_state.gfxrom = machine.driver_data<midtunit_state>()->m_gfxrom->base();
 
 	/* register for state saving */
-	state_save_register_global(machine, midtunit_control);
-	state_save_register_global_array(machine, gfxbank_offset);
-	state_save_register_global_pointer(machine, local_videoram, 0x100000/sizeof(local_videoram[0]));
-	state_save_register_global(machine, videobank_select);
-	state_save_register_global_array(machine, dma_register);
+	state_save_register_global(machine(), midtunit_control);
+	state_save_register_global_array(machine(), gfxbank_offset);
+	state_save_register_global_pointer(machine(), local_videoram, 0x100000/sizeof(local_videoram[0]));
+	state_save_register_global(machine(), videobank_select);
+	state_save_register_global_array(machine(), dma_register);
 }
 
 
-VIDEO_START( midwunit )
+VIDEO_START_MEMBER(midwunit_state,midwunit)
 {
-	VIDEO_START_CALL(midtunit);
+	VIDEO_START_CALL_MEMBER(midtunit);
 	midtunit_gfx_rom_large = 1;
 }
 
 
-VIDEO_START( midxunit )
+VIDEO_START_MEMBER(midxunit_state,midxunit)
 {
-	VIDEO_START_CALL(midtunit);
+	VIDEO_START_CALL_MEMBER(midtunit);
 	midtunit_gfx_rom_large = 1;
 	videobank_select = 1;
 }

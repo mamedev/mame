@@ -1383,10 +1383,8 @@ static MACHINE_CONFIG_START( lucky74, lucky74_state )
 
 	MCFG_GFXDECODE(lucky74)
 
-	MCFG_PALETTE_INIT(lucky74)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(lucky74)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

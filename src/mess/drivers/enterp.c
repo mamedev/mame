@@ -170,9 +170,9 @@ static const dave_interface enterprise_dave_interface =
 };
 
 
-static MACHINE_RESET( enterprise )
+void ep_state::machine_reset()
 {
-	machine.device("maincpu")->execute().set_input_line_vector(0, 0xff);
+	machine().device("maincpu")->execute().set_input_line_vector(0, 0xff);
 }
 
 
@@ -450,7 +450,6 @@ static MACHINE_CONFIG_START( ep64, ep_state )
 	MCFG_CPU_PROGRAM_MAP(enterprise_mem)
 	MCFG_CPU_IO_MAP(enterprise_io)
 
-	MCFG_MACHINE_RESET(enterprise)
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -461,9 +460,7 @@ static MACHINE_CONFIG_START( ep64, ep_state )
 	MCFG_SCREEN_UPDATE_STATIC(epnick)
 
 	MCFG_PALETTE_LENGTH(NICK_PALETTE_SIZE)
-	MCFG_PALETTE_INIT(epnick)
 
-	MCFG_VIDEO_START(epnick)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

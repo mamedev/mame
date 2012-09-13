@@ -43,10 +43,13 @@ public:
 	DECLARE_WRITE16_MEMBER(rlt_snd1_w);
 	DECLARE_WRITE16_MEMBER(rlt_snd2_w);
 	DECLARE_WRITE16_MEMBER(rlt_blitter_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 
-VIDEO_START( rltennis );
+
 SCREEN_UPDATE_IND16( rltennis );
 

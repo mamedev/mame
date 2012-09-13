@@ -45,14 +45,17 @@ public:
 	DECLARE_DRIVER_INIT(wiz);
 	DECLARE_DRIVER_INIT(scion);
 	DECLARE_DRIVER_INIT(stinger);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/wiz.c -----------*/
 
 
-VIDEO_START( wiz );
-PALETTE_INIT( wiz );
+
+
 SCREEN_UPDATE_IND16( wiz );
 SCREEN_UPDATE_IND16( stinger );
 SCREEN_UPDATE_IND16( kungfut );

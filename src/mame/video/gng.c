@@ -45,15 +45,14 @@ TILE_GET_INFO_MEMBER(gng_state::get_bg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( gng )
+void gng_state::video_start()
 {
-	gng_state *state = machine.driver_data<gng_state>();
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gng_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gng_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gng_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gng_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(3);
-	state->m_bg_tilemap->set_transmask(0, 0xff, 0x00); /* split type 0 is totally transparent in front half */
-	state->m_bg_tilemap->set_transmask(1, 0x41, 0xbe); /* split type 1 has pens 0 and 6 transparent in front half */
+	m_fg_tilemap->set_transparent_pen(3);
+	m_bg_tilemap->set_transmask(0, 0xff, 0x00); /* split type 0 is totally transparent in front half */
+	m_bg_tilemap->set_transmask(1, 0x41, 0xbe); /* split type 1 has pens 0 and 6 transparent in front half */
 }
 
 

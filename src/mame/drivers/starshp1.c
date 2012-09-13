@@ -311,9 +311,7 @@ static MACHINE_CONFIG_START( starshp1, starshp1_state )
 
 	MCFG_GFXDECODE(starshp1)
 	MCFG_PALETTE_LENGTH(19)
-	MCFG_PALETTE_INIT(starshp1)
 
-	MCFG_VIDEO_START(starshp1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -198,6 +198,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 public:
 	DECLARE_DRIVER_INIT(hb);
+	virtual void machine_start();
 };
 
 READ32_MEMBER(pluto5_state::pluto5_mem_r)
@@ -240,11 +241,10 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START(  pluto5 )
 INPUT_PORTS_END
 
-static MACHINE_START( pluto5 )
+void pluto5_state::machine_start()
 {
-	pluto5_state *state = machine.driver_data<pluto5_state>();
-	state->m_cpuregion = (UINT32*)state->memregion( "maincpu" )->base();
-	state->m_mainram = (UINT32*)auto_alloc_array_clear(machine, UINT32, 0x10000);
+	m_cpuregion = (UINT32*)memregion( "maincpu" )->base();
+	m_mainram = (UINT32*)auto_alloc_array_clear(machine(), UINT32, 0x10000);
 
 }
 
@@ -252,7 +252,6 @@ static MACHINE_CONFIG_START( pluto5, pluto5_state )
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)
 	MCFG_CPU_PROGRAM_MAP(pluto5_map)
 
-	MCFG_MACHINE_START( pluto5 )
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

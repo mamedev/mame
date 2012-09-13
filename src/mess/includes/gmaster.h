@@ -30,6 +30,7 @@ public:
 	DECLARE_READ8_MEMBER(gmaster_port_r);
 	DECLARE_WRITE8_MEMBER(gmaster_port_w);
 	DECLARE_DRIVER_INIT(gmaster);
+	virtual void palette_init();
 };
 
 

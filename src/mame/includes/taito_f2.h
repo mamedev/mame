@@ -103,34 +103,60 @@ public:
 	DECLARE_DRIVER_INIT(cameltry);
 	DECLARE_DRIVER_INIT(mjnquest);
 	DECLARE_DRIVER_INIT(finalb);
+	DECLARE_MACHINE_START(f2);
+	DECLARE_VIDEO_START(taitof2_default);
+	DECLARE_MACHINE_START(common);
+	DECLARE_VIDEO_START(taitof2_dondokod);
+	DECLARE_VIDEO_START(taitof2_driftout);
+	DECLARE_VIDEO_START(taitof2_finalb);
+	DECLARE_VIDEO_START(taitof2_megab);
+	DECLARE_VIDEO_START(taitof2_thundfox);
+	DECLARE_VIDEO_START(taitof2_ssi);
+	DECLARE_VIDEO_START(taitof2_gunfront);
+	DECLARE_VIDEO_START(taitof2_growl);
+	DECLARE_VIDEO_START(taitof2_mjnquest);
+	DECLARE_VIDEO_START(taitof2_footchmp);
+	DECLARE_VIDEO_START(taitof2_hthero);
+	DECLARE_VIDEO_START(taitof2_koshien);
+	DECLARE_VIDEO_START(taitof2_yuyugogo);
+	DECLARE_VIDEO_START(taitof2_ninjak);
+	DECLARE_VIDEO_START(taitof2_solfigtr);
+	DECLARE_VIDEO_START(taitof2_pulirula);
+	DECLARE_VIDEO_START(taitof2_metalb);
+	DECLARE_VIDEO_START(taitof2_qzchikyu);
+	DECLARE_VIDEO_START(taitof2_yesnoj);
+	DECLARE_VIDEO_START(taitof2_deadconx);
+	DECLARE_VIDEO_START(taitof2_deadconxj);
+	DECLARE_VIDEO_START(taitof2_dinorex);
+	DECLARE_VIDEO_START(taitof2_quiz);
 };
 
 /*----------- defined in video/taito_f2.c -----------*/
 
-VIDEO_START( taitof2_default );
-VIDEO_START( taitof2_quiz );
-VIDEO_START( taitof2_finalb );
-VIDEO_START( taitof2_megab );
-VIDEO_START( taitof2_solfigtr );
-VIDEO_START( taitof2_koshien );
-VIDEO_START( taitof2_driftout );
-VIDEO_START( taitof2_dondokod );
-VIDEO_START( taitof2_thundfox );
-VIDEO_START( taitof2_growl );
-VIDEO_START( taitof2_yuyugogo );
-VIDEO_START( taitof2_mjnquest );
-VIDEO_START( taitof2_footchmp );
-VIDEO_START( taitof2_hthero );
-VIDEO_START( taitof2_ssi );
-VIDEO_START( taitof2_gunfront );
-VIDEO_START( taitof2_ninjak );
-VIDEO_START( taitof2_pulirula );
-VIDEO_START( taitof2_metalb );
-VIDEO_START( taitof2_qzchikyu );
-VIDEO_START( taitof2_yesnoj );
-VIDEO_START( taitof2_deadconx );
-VIDEO_START( taitof2_deadconxj );
-VIDEO_START( taitof2_dinorex );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 SCREEN_VBLANK( taitof2_no_buffer );
 SCREEN_VBLANK( taitof2_full_buffer_delayed );
 SCREEN_VBLANK( taitof2_partial_buffer_delayed );

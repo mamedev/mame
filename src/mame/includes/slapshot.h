@@ -62,11 +62,13 @@ public:
 	DECLARE_WRITE16_MEMBER(slapshot_msb_sound_w);
 	DECLARE_READ16_MEMBER(slapshot_msb_sound_r);
 	DECLARE_DRIVER_INIT(slapshot);
+	virtual void machine_start();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/slapshot.c -----------*/
 
-VIDEO_START( slapshot );
+
 SCREEN_UPDATE_IND16( slapshot );
 SCREEN_VBLANK( taito_no_buffer );

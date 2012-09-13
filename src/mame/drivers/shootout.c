@@ -281,8 +281,6 @@ static MACHINE_CONFIG_START( shootout, shootout_state )
 	MCFG_GFXDECODE(shootout)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(shootout)
-	MCFG_VIDEO_START(shootout)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -310,8 +308,6 @@ static MACHINE_CONFIG_START( shootouj, shootout_state )
 	MCFG_GFXDECODE(shootout)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(shootout)
-	MCFG_VIDEO_START(shootout)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

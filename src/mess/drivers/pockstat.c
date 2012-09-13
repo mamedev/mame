@@ -120,6 +120,8 @@ public:
 	DECLARE_READ32_MEMBER(ps_audio_r);
 	DECLARE_WRITE32_MEMBER(ps_audio_w);
 	DECLARE_WRITE32_MEMBER(ps_dac_w);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -866,63 +868,61 @@ static INPUT_PORTS_START( pockstat )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static MACHINE_START( pockstat )
+void pockstat_state::machine_start()
 {
-	pockstat_state *state = machine.driver_data<pockstat_state>();
 	int index = 0;
 	for(index = 0; index < 3; index++)
 	{
-		state->m_timer_regs.timer[index].timer = machine.scheduler().timer_alloc(FUNC(timer_tick));
-		state->m_timer_regs.timer[index].timer->adjust(attotime::never, index);
+		m_timer_regs.timer[index].timer = machine().scheduler().timer_alloc(FUNC(timer_tick));
+		m_timer_regs.timer[index].timer->adjust(attotime::never, index);
 	}
 
-	state->m_rtc_regs.time = 0x01000000;
-	state->m_rtc_regs.date = 0x19990101;
+	m_rtc_regs.time = 0x01000000;
+	m_rtc_regs.date = 0x19990101;
 
-	state->m_rtc_regs.timer = machine.scheduler().timer_alloc(FUNC(rtc_tick));
-	state->m_rtc_regs.timer->adjust(attotime::from_hz(1), index);
+	m_rtc_regs.timer = machine().scheduler().timer_alloc(FUNC(rtc_tick));
+	m_rtc_regs.timer->adjust(attotime::from_hz(1), index);
 
-	state->save_item(NAME(state->m_ftlb_regs.control));
-	state->save_item(NAME(state->m_ftlb_regs.stat));
-	state->save_item(NAME(state->m_ftlb_regs.valid));
-	state->save_item(NAME(state->m_ftlb_regs.wait1));
-	state->save_item(NAME(state->m_ftlb_regs.wait2));
-	state->save_item(NAME(state->m_ftlb_regs.entry));
+	save_item(NAME(m_ftlb_regs.control));
+	save_item(NAME(m_ftlb_regs.stat));
+	save_item(NAME(m_ftlb_regs.valid));
+	save_item(NAME(m_ftlb_regs.wait1));
+	save_item(NAME(m_ftlb_regs.wait2));
+	save_item(NAME(m_ftlb_regs.entry));
 
-	state->save_item(NAME(state->m_intc_regs.hold));
-	state->save_item(NAME(state->m_intc_regs.status));
-	state->save_item(NAME(state->m_intc_regs.enable));
-	state->save_item(NAME(state->m_intc_regs.mask));
+	save_item(NAME(m_intc_regs.hold));
+	save_item(NAME(m_intc_regs.status));
+	save_item(NAME(m_intc_regs.enable));
+	save_item(NAME(m_intc_regs.mask));
 
-	state->save_item(NAME(state->m_timer_regs.timer[0].period));
-	state->save_item(NAME(state->m_timer_regs.timer[0].count));
-	state->save_item(NAME(state->m_timer_regs.timer[0].control));
-	state->save_item(NAME(state->m_timer_regs.timer[1].period));
-	state->save_item(NAME(state->m_timer_regs.timer[1].count));
-	state->save_item(NAME(state->m_timer_regs.timer[1].control));
-	state->save_item(NAME(state->m_timer_regs.timer[2].period));
-	state->save_item(NAME(state->m_timer_regs.timer[2].count));
-	state->save_item(NAME(state->m_timer_regs.timer[2].control));
+	save_item(NAME(m_timer_regs.timer[0].period));
+	save_item(NAME(m_timer_regs.timer[0].count));
+	save_item(NAME(m_timer_regs.timer[0].control));
+	save_item(NAME(m_timer_regs.timer[1].period));
+	save_item(NAME(m_timer_regs.timer[1].count));
+	save_item(NAME(m_timer_regs.timer[1].control));
+	save_item(NAME(m_timer_regs.timer[2].period));
+	save_item(NAME(m_timer_regs.timer[2].count));
+	save_item(NAME(m_timer_regs.timer[2].control));
 
-	state->save_item(NAME(state->m_clock_regs.mode));
-	state->save_item(NAME(state->m_clock_regs.control));
+	save_item(NAME(m_clock_regs.mode));
+	save_item(NAME(m_clock_regs.control));
 
-	state->save_item(NAME(state->m_rtc_regs.mode));
-	state->save_item(NAME(state->m_rtc_regs.control));
-	state->save_item(NAME(state->m_rtc_regs.time));
-	state->save_item(NAME(state->m_rtc_regs.date));
+	save_item(NAME(m_rtc_regs.mode));
+	save_item(NAME(m_rtc_regs.control));
+	save_item(NAME(m_rtc_regs.time));
+	save_item(NAME(m_rtc_regs.date));
 
-	state->save_item(NAME(state->m_ps_flash_write_enable_count));
-	state->save_item(NAME(state->m_ps_flash_write_count));
+	save_item(NAME(m_ps_flash_write_enable_count));
+	save_item(NAME(m_ps_flash_write_count));
 }
 
-static MACHINE_RESET( pockstat )
+void pockstat_state::machine_reset()
 {
-	pockstat_state *state = machine.driver_data<pockstat_state>();
-	machine.device("maincpu")->state().set_pc(0x4000000);
+	machine().device("maincpu")->state().set_pc(0x4000000);
 
-	state->m_ps_flash_write_enable_count = 0;
-	state->m_ps_flash_write_count = 0;
+	m_ps_flash_write_enable_count = 0;
+	m_ps_flash_write_count = 0;
 }
 
 static SCREEN_UPDATE_RGB32( pockstat )
@@ -986,8 +986,6 @@ static MACHINE_CONFIG_START( pockstat, pockstat_state )
 	MCFG_CPU_ADD("maincpu", ARM7, DEFAULT_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(pockstat_mem)
 
-	MCFG_MACHINE_RESET(pockstat)
-	MCFG_MACHINE_START(pockstat)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

@@ -84,6 +84,7 @@ public:
 	void io_rw(address_space &space, UINT16 offset);
 	DECLARE_WRITE8_MEMBER( io_w );
 	DECLARE_READ8_MEMBER( io_r );
+	virtual void palette_init();
 };
 
 // device type definition

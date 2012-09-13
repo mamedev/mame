@@ -43,7 +43,7 @@ TILE_GET_INFO_MEMBER(gauntlet_state::get_playfield_tile_info)
  *
  *************************************/
 
-VIDEO_START( gauntlet )
+VIDEO_START_MEMBER(gauntlet_state,gauntlet)
 {
 	static const atarimo_desc modesc =
 	{
@@ -82,19 +82,18 @@ VIDEO_START( gauntlet )
 		0					/* callback routine for special entries */
 	};
 
-	gauntlet_state *state = machine.driver_data<gauntlet_state>();
 	UINT16 *codelookup;
 	int i, size;
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gauntlet_state::get_playfield_tile_info),state), TILEMAP_SCAN_COLS,  8,8, 64,64);
+	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gauntlet_state::get_playfield_tile_info),this), TILEMAP_SCAN_COLS,  8,8, 64,64);
 
 	/* initialize the motion objects */
-	atarimo_init(machine, 0, &modesc);
+	atarimo_init(machine(), 0, &modesc);
 
 	/* initialize the alphanumerics */
-	state->m_alpha_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gauntlet_state::get_alpha_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 64,32);
-	state->m_alpha_tilemap->set_transparent_pen(0);
+	m_alpha_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gauntlet_state::get_alpha_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,32);
+	m_alpha_tilemap->set_transparent_pen(0);
 
 	/* modify the motion object code lookup table to account for the code XOR */
 	codelookup = atarimo_get_code_lookup(0, &size);
@@ -102,11 +101,11 @@ VIDEO_START( gauntlet )
 		codelookup[i] ^= 0x800;
 
 	/* set up the base color for the playfield */
-	state->m_playfield_color_bank = state->m_vindctr2_screen_refresh ? 0 : 1;
+	m_playfield_color_bank = m_vindctr2_screen_refresh ? 0 : 1;
 
 	/* save states */
-	state->save_item(NAME(state->m_playfield_tile_bank));
-	state->save_item(NAME(state->m_playfield_color_bank));
+	save_item(NAME(m_playfield_tile_bank));
+	save_item(NAME(m_playfield_color_bank));
 }
 
 

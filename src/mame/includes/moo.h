@@ -50,6 +50,9 @@ public:
 	DECLARE_WRITE16_MEMBER(moo_prot_w);
 	DECLARE_WRITE16_MEMBER(moobl_oki_bank_w);
 	DECLARE_DRIVER_INIT(moo);
+	DECLARE_MACHINE_START(moo);
+	DECLARE_MACHINE_RESET(moo);
+	DECLARE_VIDEO_START(moo);
 };
 
 
@@ -59,5 +62,5 @@ public:
 extern void moo_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
 extern void moo_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);
 
-VIDEO_START(moo);
+
 SCREEN_UPDATE_RGB32(moo);

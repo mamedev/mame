@@ -310,8 +310,6 @@ static MACHINE_CONFIG_START( tunhunt, tunhunt_state )
 	MCFG_GFXDECODE(tunhunt)
 	MCFG_PALETTE_LENGTH(0x1a)
 
-	MCFG_PALETTE_INIT(tunhunt)
-	MCFG_VIDEO_START(tunhunt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

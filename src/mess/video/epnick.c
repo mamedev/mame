@@ -165,13 +165,13 @@ the NICK_GET_RED8, NICK_GET_GREEN8, NICK_GET_BLUE8 macros
 return a 8-bit colour value for the index specified.  */
 
 /* initial the palette */
-PALETTE_INIT( epnick )
+void ep_state::palette_init()
 {
 	int i;
 
 	for (i=0; i<256; i++)
 	{
-		palette_set_color_rgb( machine, i, NICK_GET_RED8(i), NICK_GET_GREEN8(i), NICK_GET_BLUE8(i) );
+		palette_set_color_rgb( machine(), i, NICK_GET_RED8(i), NICK_GET_GREEN8(i), NICK_GET_BLUE8(i) );
 	}
 }
 
@@ -1024,14 +1024,13 @@ static void Nick_DoScreen(NICK_STATE *nick, bitmap_ind16 &bm)
 }
 
 
-VIDEO_START( epnick )
+void ep_state::video_start()
 {
-	ep_state *state = machine.driver_data<ep_state>();
-	state->nick = auto_alloc_clear(machine, NICK_STATE);
+	nick = auto_alloc_clear(machine(), NICK_STATE);
 
-	state->nick->videoram = machine.device<ram_device>(RAM_TAG)->pointer();
-	Nick_Init(state->nick);
-	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
+	nick->videoram = machine().device<ram_device>(RAM_TAG)->pointer();
+	Nick_Init(nick);
+	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }
 
 

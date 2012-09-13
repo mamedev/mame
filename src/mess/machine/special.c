@@ -108,11 +108,10 @@ static TIMER_CALLBACK( special_reset )
 }
 
 
-MACHINE_RESET( special )
+MACHINE_RESET_MEMBER(special_state,special)
 {
-	special_state *state = machine.driver_data<special_state>();
-	machine.scheduler().timer_set(attotime::from_usec(10), FUNC(special_reset));
-	state->membank("bank1")->set_entry(1);
+	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(special_reset));
+	membank("bank1")->set_entry(1);
 }
 
 
@@ -220,10 +219,9 @@ const struct pit8253_config specimx_pit8253_intf =
 	}
 };
 
-MACHINE_START( specimx )
+MACHINE_START_MEMBER(special_state,specimx)
 {
-	special_state *state = machine.driver_data<special_state>();
-	state->m_specimx_audio = machine.device("custom");
+	m_specimx_audio = machine().device("custom");
 }
 
 static TIMER_CALLBACK( setup_pit8253_gates )
@@ -235,13 +233,12 @@ static TIMER_CALLBACK( setup_pit8253_gates )
 	pit8253_gate2_w(pit8253, 0);
 }
 
-MACHINE_RESET( specimx )
+MACHINE_RESET_MEMBER(special_state,specimx)
 {
-	special_state *state = machine.driver_data<special_state>();
-	state->specimx_set_bank(2, 0); // Initiali load ROM disk
-	state->m_specimx_color = 0x70;
-	machine.scheduler().timer_set(attotime::zero, FUNC(setup_pit8253_gates));
-	device_t *fdc = machine.device("wd1793");
+	specimx_set_bank(2, 0); // Initiali load ROM disk
+	m_specimx_color = 0x70;
+	machine().scheduler().timer_set(attotime::zero, FUNC(setup_pit8253_gates));
+	device_t *fdc = machine().device("wd1793");
 	wd17xx_set_pause_time(fdc,12);
 	wd17xx_dden_w(fdc, 0);
 }
@@ -347,12 +344,11 @@ DRIVER_INIT_MEMBER(special_state,erik)
 	m_erik_background = 0;
 }
 
-MACHINE_RESET( erik )
+MACHINE_RESET_MEMBER(special_state,erik)
 {
-	special_state *state = machine.driver_data<special_state>();
-	state->m_RR_register = 0x00;
-	state->m_RC_register = 0x00;
-	state->erik_set_bank();
+	m_RR_register = 0x00;
+	m_RC_register = 0x00;
+	erik_set_bank();
 }
 
 READ8_MEMBER( special_state::erik_rr_reg_r )

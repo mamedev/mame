@@ -24,13 +24,13 @@
   bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
-PALETTE_INIT( xevious )
+PALETTE_INIT_MEMBER(xevious_state,xevious)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine.gfx[gfxn]->colors() * machine.gfx[gfxn]->granularity())
+	#define TOTAL_COLORS(gfxn) (machine().gfx[gfxn]->colors() * machine().gfx[gfxn]->granularity())
 
-	machine.colortable = colortable_alloc(machine, 128+1);
+	machine().colortable = colortable_alloc(machine(), 128+1);
 
 	for (i = 0;i < 128;i++)
 	{
@@ -55,12 +55,12 @@ PALETTE_INIT( xevious )
 		bit3 = (color_prom[2*256] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		colortable_palette_set_color(machine.colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
 	/* color 0x80 is used by sprites to mark transparency */
-	colortable_palette_set_color(machine.colortable,0x80,MAKE_RGB(0,0,0));
+	colortable_palette_set_color(machine().colortable,0x80,MAKE_RGB(0,0,0));
 
 	color_prom += 128;  /* the bottom part of the PROM is unused */
 	color_prom += 2*256;
@@ -69,7 +69,7 @@ PALETTE_INIT( xevious )
 	/* background tiles */
 	for (i = 0;i < TOTAL_COLORS(1);i++)
 	{
-		colortable_entry_set_value(machine.colortable, machine.gfx[1]->colorbase() + i,
+		colortable_entry_set_value(machine().colortable, machine().gfx[1]->colorbase() + i,
 				(color_prom[0] & 0x0f) | ((color_prom[TOTAL_COLORS(1)] & 0x0f) << 4));
 
 		color_prom++;
@@ -81,7 +81,7 @@ PALETTE_INIT( xevious )
 	{
 		int c = (color_prom[0] & 0x0f) | ((color_prom[TOTAL_COLORS(2)] & 0x0f) << 4);
 
-		colortable_entry_set_value(machine.colortable, machine.gfx[2]->colorbase() + i,
+		colortable_entry_set_value(machine().colortable, machine().gfx[2]->colorbase() + i,
 				(c & 0x80) ? (c & 0x7f) : 0x80);
 
 		color_prom++;
@@ -91,19 +91,19 @@ PALETTE_INIT( xevious )
 	/* foreground characters */
 	for (i = 0;i < TOTAL_COLORS(0);i++)
 	{
-		colortable_entry_set_value(machine.colortable, machine.gfx[0]->colorbase() + i,
+		colortable_entry_set_value(machine().colortable, machine().gfx[0]->colorbase() + i,
 				(i % 2 != 0) ? (i / 2) : 0x80);
 	}
 }
 
 
 
-PALETTE_INIT( battles )
+PALETTE_INIT_MEMBER(xevious_state,battles)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	machine.colortable = colortable_alloc(machine, 128+1);
+	machine().colortable = colortable_alloc(machine(), 128+1);
 
 	for (i = 0;i < 128;i++)
 	{
@@ -128,12 +128,12 @@ PALETTE_INIT( battles )
 		bit3 = (color_prom[2*256] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		colortable_palette_set_color(machine.colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
 	/* color 0x80 is used by sprites to mark transparency */
-	colortable_palette_set_color(machine.colortable,0x80,MAKE_RGB(0,0,0));
+	colortable_palette_set_color(machine().colortable,0x80,MAKE_RGB(0,0,0));
 
 	color_prom += 128;  /* the bottom part of the PROM is unused */
 	color_prom += 2*256;
@@ -142,7 +142,7 @@ PALETTE_INIT( battles )
 	/* background tiles */
 	for (i = 0;i < TOTAL_COLORS(1);i++)
 	{
-		colortable_entry_set_value(machine.colortable, machine.gfx[1]->colorbase() + i,
+		colortable_entry_set_value(machine().colortable, machine().gfx[1]->colorbase() + i,
 				(color_prom[0] & 0x0f) | ((color_prom[0x400] & 0x0f) << 4));
 
 		color_prom++;
@@ -154,7 +154,7 @@ PALETTE_INIT( battles )
 	{
 		int c = (color_prom[0] & 0x0f) | ((color_prom[0x400] & 0x0f) << 4);
 
-		colortable_entry_set_value(machine.colortable, machine.gfx[2]->colorbase() + i,
+		colortable_entry_set_value(machine().colortable, machine().gfx[2]->colorbase() + i,
 				(c & 0x80) ? (c & 0x7f) : 0x80);
 
 		color_prom++;
@@ -163,7 +163,7 @@ PALETTE_INIT( battles )
 	/* foreground characters */
 	for (i = 0;i < TOTAL_COLORS(0);i++)
 	{
-		colortable_entry_set_value(machine.colortable, machine.gfx[0]->colorbase() + i,
+		colortable_entry_set_value(machine().colortable, machine().gfx[0]->colorbase() + i,
 				(i % 2 != 0) ? (i / 2) : 0x80);
 	}
 }
@@ -213,22 +213,21 @@ TILE_GET_INFO_MEMBER(xevious_state::get_bg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( xevious )
+VIDEO_START_MEMBER(xevious_state,xevious)
 {
-	xevious_state *state =  machine.driver_data<xevious_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(xevious_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(xevious_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(xevious_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(xevious_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
-	state->m_bg_tilemap->set_scrolldx(-20,288+27);
-	state->m_bg_tilemap->set_scrolldy(-16,-16);
-	state->m_fg_tilemap->set_scrolldx(-32,288+32);
-	state->m_fg_tilemap->set_scrolldy(-18,-10);
-	state->m_fg_tilemap->set_transparent_pen(0);
-	state->m_xevious_bs[0] = 0;
-	state->m_xevious_bs[1] = 0;
+	m_bg_tilemap->set_scrolldx(-20,288+27);
+	m_bg_tilemap->set_scrolldy(-16,-16);
+	m_fg_tilemap->set_scrolldx(-32,288+32);
+	m_fg_tilemap->set_scrolldy(-18,-10);
+	m_fg_tilemap->set_transparent_pen(0);
+	m_xevious_bs[0] = 0;
+	m_xevious_bs[1] = 0;
 
-	state->save_item(NAME(state->m_xevious_bs));
+	save_item(NAME(m_xevious_bs));
 }
 
 

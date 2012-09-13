@@ -11,7 +11,7 @@ Taito Super Speed Race driver
 
 
 
-static PALETTE_INIT( sspeedr )
+void sspeedr_state::palette_init()
 {
 	int i;
 
@@ -28,7 +28,7 @@ static PALETTE_INIT( sspeedr )
 			b += 0x4f;
 		}
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -204,8 +204,6 @@ static MACHINE_CONFIG_START( sspeedr, sspeedr_state )
 	MCFG_GFXDECODE(sspeedr)
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_PALETTE_INIT(sspeedr)
-	MCFG_VIDEO_START(sspeedr)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

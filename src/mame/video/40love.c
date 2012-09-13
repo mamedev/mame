@@ -10,12 +10,12 @@
 *   color prom decoding
 */
 
-PALETTE_INIT( fortyl )
+void fortyl_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b;
 
@@ -27,20 +27,20 @@ PALETTE_INIT( fortyl )
 		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		/* green component */
-		bit0 = (color_prom[machine.total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[machine.total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[machine.total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[machine.total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[machine().total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[machine().total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[machine().total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[machine().total_colors()] >> 3) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		/* blue component */
-		bit0 = (color_prom[2*machine.total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[2*machine.total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[2*machine.total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[2*machine.total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[2*machine().total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[2*machine().total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[2*machine().total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[2*machine().total_colors()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine, i, MAKE_RGB(r,g,b));
+		palette_set_color(machine(), i, MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -100,30 +100,29 @@ static void redraw_pixels(running_machine &machine)
 
 ***************************************************************************/
 
-VIDEO_START( fortyl )
+void fortyl_state::video_start()
 {
-	fortyl_state *state = machine.driver_data<fortyl_state>();
-	state->m_pixram1 = auto_alloc_array_clear(machine, UINT8, 0x4000);
-	state->m_pixram2 = auto_alloc_array_clear(machine, UINT8, 0x4000);
+	m_pixram1 = auto_alloc_array_clear(machine(), UINT8, 0x4000);
+	m_pixram2 = auto_alloc_array_clear(machine(), UINT8, 0x4000);
 
-	state->m_tmp_bitmap1 = auto_bitmap_ind16_alloc(machine, 256, 256);
-	state->m_tmp_bitmap2 = auto_bitmap_ind16_alloc(machine, 256, 256);
+	m_tmp_bitmap1 = auto_bitmap_ind16_alloc(machine(), 256, 256);
+	m_tmp_bitmap2 = auto_bitmap_ind16_alloc(machine(), 256, 256);
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fortyl_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fortyl_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	state->m_xoffset = 128;	// this never changes
+	m_xoffset = 128;	// this never changes
 
-	state->m_bg_tilemap->set_scroll_rows(32);
-	state->m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scroll_rows(32);
+	m_bg_tilemap->set_transparent_pen(0);
 
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_pix_color));
-	state->save_pointer(NAME(state->m_pixram1), 0x4000);
-	state->save_pointer(NAME(state->m_pixram2), 0x4000);
-	state->save_item(NAME(*state->m_tmp_bitmap1));
-	state->save_item(NAME(*state->m_tmp_bitmap2));
-	state->save_item(NAME(state->m_pixram_sel));
-	machine.save().register_postload(save_prepost_delegate(FUNC(redraw_pixels), &machine));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_pix_color));
+	save_pointer(NAME(m_pixram1), 0x4000);
+	save_pointer(NAME(m_pixram2), 0x4000);
+	save_item(NAME(*m_tmp_bitmap1));
+	save_item(NAME(*m_tmp_bitmap2));
+	save_item(NAME(m_pixram_sel));
+	machine().save().register_postload(save_prepost_delegate(FUNC(redraw_pixels), &machine()));
 }
 
 

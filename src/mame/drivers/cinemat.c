@@ -49,24 +49,22 @@
  *
  *************************************/
 
-static MACHINE_START( cinemat )
+void cinemat_state::machine_start()
 {
-	cinemat_state *state = machine.driver_data<cinemat_state>();
-	state_save_register_global(machine, state->m_coin_detected);
-	state_save_register_global(machine, state->m_coin_last_reset);
-	state_save_register_global(machine, state->m_mux_select);
+	state_save_register_global(machine(), m_coin_detected);
+	state_save_register_global(machine(), m_coin_last_reset);
+	state_save_register_global(machine(), m_mux_select);
 }
 
 
-static MACHINE_RESET( cinemat )
+void cinemat_state::machine_reset()
 {
-	cinemat_state *state = machine.driver_data<cinemat_state>();
 	/* reset the coin states */
-	state->m_coin_detected = 0;
-	state->m_coin_last_reset = 0;
+	m_coin_detected = 0;
+	m_coin_last_reset = 0;
 
 	/* reset mux select */
-	state->m_mux_select = 0;
+	m_mux_select = 0;
 }
 
 
@@ -993,8 +991,6 @@ static MACHINE_CONFIG_START( cinemat_nojmi_4k, cinemat_state )
 	MCFG_CPU_DATA_MAP(data_map)
 	MCFG_CPU_IO_MAP(io_map)
 
-	MCFG_MACHINE_START(cinemat)
-	MCFG_MACHINE_RESET(cinemat)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -1005,7 +1001,6 @@ static MACHINE_CONFIG_START( cinemat_nojmi_4k, cinemat_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 1023, 0, 767)
 	MCFG_SCREEN_UPDATE_STATIC(cinemat)
 
-	MCFG_VIDEO_START(cinemat_bilevel)
 MACHINE_CONFIG_END
 
 
@@ -1071,7 +1066,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sundance, cinemat_jmi_8k )
 	MCFG_FRAGMENT_ADD(sundance_sound)
-	MCFG_VIDEO_START(cinemat_16level)
+	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_16level)
 MACHINE_CONFIG_END
 
 
@@ -1102,7 +1097,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( solarq, cinemat_jmi_16k )
 	MCFG_FRAGMENT_ADD(solarq_sound)
-	MCFG_VIDEO_START(cinemat_64level)
+	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_64level)
 MACHINE_CONFIG_END
 
 
@@ -1110,7 +1105,7 @@ static MACHINE_CONFIG_DERIVED( boxingb, cinemat_jmi_32k )
 	MCFG_FRAGMENT_ADD(boxingb_sound)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024, 0, 788)
-	MCFG_VIDEO_START(cinemat_color)
+	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_color)
 MACHINE_CONFIG_END
 
 
@@ -1123,7 +1118,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( wotwc, cinemat_jmi_16k )
 	MCFG_FRAGMENT_ADD(wotw_sound)
-	MCFG_VIDEO_START(cinemat_color)
+	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_color)
 MACHINE_CONFIG_END
 
 
@@ -1140,7 +1135,7 @@ static MACHINE_CONFIG_DERIVED( qb3, cinemat_jmi_32k )
 	MCFG_CPU_DATA_MAP(data_map_qb3)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 1120, 0, 780)
-	MCFG_VIDEO_START(cinemat_qb3color)
+	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_qb3color)
 MACHINE_CONFIG_END
 
 

@@ -16,12 +16,11 @@ TILE_GET_INFO_MEMBER(triplhnt_state::get_tile_info)
 }
 
 
-VIDEO_START( triplhnt )
+void triplhnt_state::video_start()
 {
-	triplhnt_state *state = machine.driver_data<triplhnt_state>();
-	machine.primary_screen->register_screen_bitmap(state->m_helper);
+	machine().primary_screen->register_screen_bitmap(m_helper);
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(triplhnt_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(triplhnt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 }
 
 

@@ -726,55 +726,52 @@ static const sn76496_config psg_intf =
 };
 
 
-static MACHINE_START( ladybug )
+MACHINE_START_MEMBER(ladybug_state,ladybug)
 {
-	ladybug_state *state = machine.driver_data<ladybug_state>();
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
 }
 
-static MACHINE_START( sraider )
+MACHINE_START_MEMBER(ladybug_state,sraider)
 {
-	ladybug_state *state = machine.driver_data<ladybug_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
 
-	state->save_item(NAME(state->m_grid_color));
-	state->save_item(NAME(state->m_sound_low));
-	state->save_item(NAME(state->m_sound_high));
-	state->save_item(NAME(state->m_sraider_0x30));
-	state->save_item(NAME(state->m_sraider_0x38));
-	state->save_item(NAME(state->m_weird_value));
+	save_item(NAME(m_grid_color));
+	save_item(NAME(m_sound_low));
+	save_item(NAME(m_sound_high));
+	save_item(NAME(m_sraider_0x30));
+	save_item(NAME(m_sraider_0x38));
+	save_item(NAME(m_weird_value));
 
 	/* for stars */
-	state->save_item(NAME(state->m_star_speed));
-	state->save_item(NAME(state->m_stars_enable));
-	state->save_item(NAME(state->m_stars_speed));
-	state->save_item(NAME(state->m_stars_state));
-	state->save_item(NAME(state->m_stars_offset));
-	state->save_item(NAME(state->m_stars_count));
+	save_item(NAME(m_star_speed));
+	save_item(NAME(m_stars_enable));
+	save_item(NAME(m_stars_speed));
+	save_item(NAME(m_stars_state));
+	save_item(NAME(m_stars_offset));
+	save_item(NAME(m_stars_count));
 }
 
-static MACHINE_RESET( sraider )
+MACHINE_RESET_MEMBER(ladybug_state,sraider)
 {
-	ladybug_state *state = machine.driver_data<ladybug_state>();
 	int i;
 
-	state->m_grid_color = 0;
-	state->m_sound_low = 0;
-	state->m_sound_high = 0;
-	state->m_sraider_0x30 = 0;
-	state->m_sraider_0x38 = 0;
+	m_grid_color = 0;
+	m_sound_low = 0;
+	m_sound_high = 0;
+	m_sraider_0x30 = 0;
+	m_sraider_0x38 = 0;
 
 	/* for stars */
-	state->m_star_speed = 0;
-	state->m_stars_enable = 0;
-	state->m_stars_speed = 0;
-	state->m_stars_state = 0;
-	state->m_stars_offset = 0;
-	state->m_stars_count = 0;
+	m_star_speed = 0;
+	m_stars_enable = 0;
+	m_stars_speed = 0;
+	m_stars_state = 0;
+	m_stars_offset = 0;
+	m_stars_count = 0;
 
 	for (i = 0; i < 8; i++)
-		state->m_weird_value[i] = 0;
+		m_weird_value[i] = 0;
 }
 
 static MACHINE_CONFIG_START( ladybug, ladybug_state )
@@ -783,7 +780,7 @@ static MACHINE_CONFIG_START( ladybug, ladybug_state )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(ladybug_map)
 
-	MCFG_MACHINE_START(ladybug)
+	MCFG_MACHINE_START_OVERRIDE(ladybug_state,ladybug)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -796,8 +793,8 @@ static MACHINE_CONFIG_START( ladybug, ladybug_state )
 	MCFG_GFXDECODE(ladybug)
 	MCFG_PALETTE_LENGTH(4*8+4*16)
 
-	MCFG_PALETTE_INIT(ladybug)
-	MCFG_VIDEO_START(ladybug)
+	MCFG_PALETTE_INIT_OVERRIDE(ladybug_state,ladybug)
+	MCFG_VIDEO_START_OVERRIDE(ladybug_state,ladybug)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -824,8 +821,8 @@ static MACHINE_CONFIG_START( sraider, ladybug_state )
 	MCFG_CPU_IO_MAP(sraider_cpu2_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(sraider)
-	MCFG_MACHINE_RESET(sraider)
+	MCFG_MACHINE_START_OVERRIDE(ladybug_state,sraider)
+	MCFG_MACHINE_RESET_OVERRIDE(ladybug_state,sraider)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -839,8 +836,8 @@ static MACHINE_CONFIG_START( sraider, ladybug_state )
 	MCFG_GFXDECODE(sraider)
 	MCFG_PALETTE_LENGTH(4*8+4*16+32+2)
 
-	MCFG_PALETTE_INIT(sraider)
-	MCFG_VIDEO_START(sraider)
+	MCFG_PALETTE_INIT_OVERRIDE(ladybug_state,sraider)
+	MCFG_VIDEO_START_OVERRIDE(ladybug_state,sraider)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -136,14 +136,13 @@ WRITE16_MEMBER(mugsmash_state::mugsmash_reg_w)
 	}
 }
 
-VIDEO_START( mugsmash )
+void mugsmash_state::video_start()
 {
-	mugsmash_state *state = machine.driver_data<mugsmash_state>();
 
-	state->m_tilemap1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mugsmash_state::get_mugsmash_tile_info1),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_tilemap1->set_transparent_pen(0);
+	m_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mugsmash_state::get_mugsmash_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap1->set_transparent_pen(0);
 
-	state->m_tilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mugsmash_state::get_mugsmash_tile_info2),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mugsmash_state::get_mugsmash_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 }
 
 SCREEN_UPDATE_IND16( mugsmash )

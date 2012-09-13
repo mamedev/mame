@@ -372,29 +372,28 @@ SNAPSHOT_LOAD( mtx )
     MACHINE_START( mtx512 )
 -------------------------------------------------*/
 
-MACHINE_START( mtx512 )
+MACHINE_START_MEMBER(mtx_state,mtx512)
 {
-	mtx_state *state = machine.driver_data<mtx_state>();
-	ram_device *messram = machine.device<ram_device>(RAM_TAG);
+	ram_device *messram = machine().device<ram_device>(RAM_TAG);
 
 	/* find devices */
-	state->m_z80ctc = machine.device<z80ctc_device>(Z80CTC_TAG);
-	state->m_z80dart = machine.device(Z80DART_TAG);
-	state->m_cassette = machine.device<cassette_image_device>(CASSETTE_TAG);
+	m_z80ctc = machine().device<z80ctc_device>(Z80CTC_TAG);
+	m_z80dart = machine().device(Z80DART_TAG);
+	m_cassette = machine().device<cassette_image_device>(CASSETTE_TAG);
 
 	/* configure memory */
-	state->membank("bank1")->set_base(machine.root_device().memregion("user1")->base());
-	state->membank("bank2")->configure_entries(0, 8, state->memregion("user2")->base(), 0x2000);
-	state->membank("bank3")->configure_entries(0, messram->size()/0x4000/2, messram->pointer(), 0x4000);
-	state->membank("bank4")->configure_entries(0, messram->size()/0x4000/2, messram->pointer() + messram->size()/2, 0x4000);
+	membank("bank1")->set_base(machine().root_device().memregion("user1")->base());
+	membank("bank2")->configure_entries(0, 8, memregion("user2")->base(), 0x2000);
+	membank("bank3")->configure_entries(0, messram->size()/0x4000/2, messram->pointer(), 0x4000);
+	membank("bank4")->configure_entries(0, messram->size()/0x4000/2, messram->pointer() + messram->size()/2, 0x4000);
 }
 
 /*-------------------------------------------------
     MACHINE_RESET( mtx512 )
 -------------------------------------------------*/
 
-MACHINE_RESET( mtx512 )
+MACHINE_RESET_MEMBER(mtx_state,mtx512)
 {
 	/* bank switching */
-	bankswitch(machine, 0);
+	bankswitch(machine(), 0);
 }

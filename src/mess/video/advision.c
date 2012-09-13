@@ -31,14 +31,14 @@ void advision_state::video_start()
 
 ***************************************************************************/
 
-PALETTE_INIT( advision )
+void advision_state::palette_init()
 {
 	int i;
 
 	for( i = 0; i < 8; i++ )
 	{
 		/* 8 shades of RED */
-		palette_set_color_rgb(machine, i, i * 0x22, 0x00, 0x00);
+		palette_set_color_rgb(machine(), i, i * 0x22, 0x00, 0x00);
 	}
 }
 

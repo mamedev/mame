@@ -129,19 +129,18 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 }
 
 
-VIDEO_START( goal92 )
+void goal92_state::video_start()
 {
-	goal92_state *state = machine.driver_data<goal92_state>();
-	state->m_bg_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goal92_state::get_back_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_fg_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goal92_state::get_fore_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_tx_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goal92_state::get_text_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goal92_state::get_back_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goal92_state::get_fore_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tx_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goal92_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, 0x400 * 2);
-	state_save_register_global_pointer(machine, state->m_buffered_spriteram, 0x400 * 2);
+	m_buffered_spriteram = auto_alloc_array(machine(), UINT16, 0x400 * 2);
+	state_save_register_global_pointer(machine(), m_buffered_spriteram, 0x400 * 2);
 
-	state->m_bg_layer->set_transparent_pen(15);
-	state->m_fg_layer->set_transparent_pen(15);
-	state->m_tx_layer->set_transparent_pen(15);
+	m_bg_layer->set_transparent_pen(15);
+	m_fg_layer->set_transparent_pen(15);
+	m_tx_layer->set_transparent_pen(15);
 }
 
 SCREEN_UPDATE_IND16( goal92 )

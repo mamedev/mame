@@ -108,6 +108,8 @@ public:
 	DECLARE_READ8_MEMBER(osbexec_kbd_r);
 	DECLARE_READ8_MEMBER(osbexec_rtc_r);
 	DECLARE_DRIVER_INIT(osbexec);
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 
@@ -299,11 +301,11 @@ static INPUT_PORTS_START( osbexec )
 INPUT_PORTS_END
 
 
-static PALETTE_INIT( osbexec )
+void osbexec_state::palette_init()
 {
-	palette_set_color_rgb( machine, 0, 0, 0, 0 );	/* Black */
-	palette_set_color_rgb( machine, 1, 0, 255, 0 );	/* Full */
-	palette_set_color_rgb( machine, 2, 0, 128, 0 );	/* Dimmed */
+	palette_set_color_rgb( machine(), 0, 0, 0, 0 );	/* Black */
+	palette_set_color_rgb( machine(), 1, 0, 255, 0 );	/* Full */
+	palette_set_color_rgb( machine(), 2, 0, 128, 0 );	/* Dimmed */
 }
 
 void osbexec_state::video_start()
@@ -619,17 +621,16 @@ DRIVER_INIT_MEMBER(osbexec_state,osbexec)
 }
 
 
-static MACHINE_RESET( osbexec )
+void osbexec_state::machine_reset()
 {
-	osbexec_state *state = machine.driver_data<osbexec_state>();
 
-	state->m_pia0_porta = 0xC0;		/* Enable ROM and VRAM on reset */
+	m_pia0_porta = 0xC0;		/* Enable ROM and VRAM on reset */
 
-	state->set_banks( machine );
+	set_banks( machine() );
 
-	state->m_video_timer->adjust( machine.primary_screen->time_until_pos( 0, 0 ) );
+	m_video_timer->adjust( machine().primary_screen->time_until_pos( 0, 0 ) );
 
-	state->m_rtc = 0;
+	m_rtc = 0;
 }
 
 
@@ -646,14 +647,12 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_CPU_IO_MAP( osbexec_io)
 	MCFG_CPU_CONFIG( osbexec_daisy_config )
 
-	MCFG_MACHINE_RESET( osbexec )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(osbexec_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240 )	/* May not be correct */
 
 	MCFG_PALETTE_LENGTH( 3 )
-	MCFG_PALETTE_INIT( osbexec )
 
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)

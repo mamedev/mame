@@ -125,6 +125,9 @@ public:
 	DECLARE_READ8_MEMBER(imola_slave_port82r);
 	DECLARE_WRITE8_MEMBER(vreg_control_w);
 	DECLARE_WRITE8_MEMBER(vreg_data_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -195,14 +198,13 @@ static void initialize_colors( running_machine &machine )
 	}
 }
 
-static VIDEO_START( imolagp )
+void imolagp_state::video_start()
 {
-	imolagp_state *state = machine.driver_data<imolagp_state>();
 
-	memset(state->m_videoram, 0, sizeof(state->m_videoram));
-	state->save_item(NAME(state->m_videoram));
+	memset(m_videoram, 0, sizeof(m_videoram));
+	save_item(NAME(m_videoram));
 
-	initialize_colors(machine);
+	initialize_colors(machine());
 }
 
 
@@ -514,40 +516,38 @@ static I8255A_INTERFACE( ppi8255_intf )
 };
 
 
-static MACHINE_START( imolagp )
+void imolagp_state::machine_start()
 {
-	imolagp_state *state = machine.driver_data<imolagp_state>();
 
-	state->m_slavecpu = machine.device<cpu_device>("slave");
+	m_slavecpu = machine().device<cpu_device>("slave");
 
-	state->save_item(NAME(state->m_control));
-	state->save_item(NAME(state->m_scroll));
-	state->save_item(NAME(state->m_steerlatch));
-	state->save_item(NAME(state->m_draw_mode));
-	state->save_item(NAME(state->m_oldsteer));
+	save_item(NAME(m_control));
+	save_item(NAME(m_scroll));
+	save_item(NAME(m_steerlatch));
+	save_item(NAME(m_draw_mode));
+	save_item(NAME(m_oldsteer));
 #ifdef HLE_COM
-	state->save_item(NAME(state->m_mComData));
-	state->save_item(NAME(state->m_mComCount));
+	save_item(NAME(m_mComData));
+	save_item(NAME(m_mComCount));
 #else
-	state->save_item(NAME(state->m_mLatchedData));
+	save_item(NAME(m_mLatchedData));
 #endif
 }
 
-static MACHINE_RESET( imolagp )
+void imolagp_state::machine_reset()
 {
-	imolagp_state *state = machine.driver_data<imolagp_state>();
 
-	state->m_control = 0;
-	state->m_scroll = 0;
-	state->m_steerlatch = 0;
-	state->m_draw_mode = 0;
-	state->m_oldsteer = 0;
+	m_control = 0;
+	m_scroll = 0;
+	m_steerlatch = 0;
+	m_draw_mode = 0;
+	m_oldsteer = 0;
 #ifdef HLE_COM
-	state->m_mComCount = 0;
-	memset(state->m_mComData, 0, 0x100);
+	m_mComCount = 0;
+	memset(m_mComData, 0, 0x100);
 #else
-	state->m_mLatchedData[0] = 0;
-	state->m_mLatchedData[1] = 0;
+	m_mLatchedData[0] = 0;
+	m_mLatchedData[1] = 0;
 #endif
 }
 
@@ -566,8 +566,6 @@ static MACHINE_CONFIG_START( imolagp, imolagp_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(imolagp)
-	MCFG_MACHINE_RESET(imolagp)
 
 	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
 
@@ -579,7 +577,6 @@ static MACHINE_CONFIG_START( imolagp, imolagp_state )
 	MCFG_SCREEN_UPDATE_STATIC(imolagp)
 
 	MCFG_PALETTE_LENGTH(0x20)
-	MCFG_VIDEO_START(imolagp)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

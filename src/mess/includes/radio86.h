@@ -36,6 +36,8 @@ public:
 	DECLARE_WRITE8_MEMBER(radio86_pagesel);
 	DECLARE_DRIVER_INIT(radioram);
 	DECLARE_DRIVER_INIT(radio86);
+	DECLARE_MACHINE_RESET(radio86);
+	DECLARE_PALETTE_INIT(radio86);
 };
 
 

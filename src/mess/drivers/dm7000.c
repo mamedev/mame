@@ -248,19 +248,18 @@ static INPUT_PORTS_START( dm7000 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(dm7000)
+void dm7000_state::machine_reset()
 {
-	dm7000_state *state = machine.driver_data<dm7000_state>();
 
-	state->dcr[DCRSTB045_CICVCR] = 0x00000001;
-	state->dcr[DCRSTB045_SCCR] = 0x00420080 /* default for serial divs */ | 0x3f /* undocumented?? used to print clocks */;
-	state->dcr[DCRSTB045_VIDEO_CNTL] = 0x00009000;
-	state->dcr[DCRSTB045_DISP_MODE] = 0x00880000;
-	state->dcr[DCRSTB045_FRAME_BUFR_BASE] = 0x0f000000;
-	state->m_scc0_lsr = UART_LSR_THRE | UART_LSR_TEMT;
+	dcr[DCRSTB045_CICVCR] = 0x00000001;
+	dcr[DCRSTB045_SCCR] = 0x00420080 /* default for serial divs */ | 0x3f /* undocumented?? used to print clocks */;
+	dcr[DCRSTB045_VIDEO_CNTL] = 0x00009000;
+	dcr[DCRSTB045_DISP_MODE] = 0x00880000;
+	dcr[DCRSTB045_FRAME_BUFR_BASE] = 0x0f000000;
+	m_scc0_lsr = UART_LSR_THRE | UART_LSR_TEMT;
 }
 
-static VIDEO_START( dm7000 )
+void dm7000_state::video_start()
 {
 }
 
@@ -317,7 +316,6 @@ static MACHINE_CONFIG_START( dm7000, dm7000_state )
 	MCFG_CPU_CONFIG(ppc405_config)
 	MCFG_CPU_PROGRAM_MAP(dm7000_mem)
 
-	MCFG_MACHINE_RESET(dm7000)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -332,7 +330,6 @@ static MACHINE_CONFIG_START( dm7000, dm7000_state )
 
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
-	MCFG_VIDEO_START(dm7000)
 MACHINE_CONFIG_END
 
 /* ROM definition */

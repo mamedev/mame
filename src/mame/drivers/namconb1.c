@@ -597,12 +597,11 @@ static NVRAM_HANDLER( namconb1 )
 	}
 } /* namconb1 */
 
-static MACHINE_START(namconb)
+MACHINE_START_MEMBER(namconb1_state,namconb)
 {
-	namconb1_state *state = machine.driver_data<namconb1_state>();
-	state->m_vblank_irq_active = 0;
-	state->m_pos_irq_active = 0;
-	memset(state->m_namconb_cpureg, 0, sizeof(state->m_namconb_cpureg));
+	m_vblank_irq_active = 0;
+	m_pos_irq_active = 0;
+	memset(m_namconb_cpureg, 0, sizeof(m_namconb_cpureg));
 }
 
 DRIVER_INIT_MEMBER(namconb1_state,nebulray)
@@ -1018,7 +1017,7 @@ static MACHINE_CONFIG_START( namconb1, namconb1_state )
 	MCFG_TIMER_ADD_SCANLINE("mcu_st", mcu_interrupt, "screen", 0, 1)
 
 	MCFG_NVRAM_HANDLER(namconb1)
-	MCFG_MACHINE_START(namconb)
+	MCFG_MACHINE_START_OVERRIDE(namconb1_state,namconb)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1029,7 +1028,7 @@ static MACHINE_CONFIG_START( namconb1, namconb1_state )
 
 	MCFG_GFXDECODE(namconb1)
 	MCFG_PALETTE_LENGTH(0x2000)
-	MCFG_VIDEO_START(namconb1)
+	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb1)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_C352_ADD("c352", MASTER_CLOCK_HZ/2)
@@ -1050,7 +1049,7 @@ static MACHINE_CONFIG_START( namconb2, namconb1_state )
 	MCFG_TIMER_ADD_SCANLINE("mcu_st", mcu_interrupt, "screen", 0, 1)
 
 	MCFG_NVRAM_HANDLER(namconb1)
-	MCFG_MACHINE_START(namconb)
+	MCFG_MACHINE_START_OVERRIDE(namconb1_state,namconb)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1061,7 +1060,7 @@ static MACHINE_CONFIG_START( namconb2, namconb1_state )
 
 	MCFG_GFXDECODE(2)
 	MCFG_PALETTE_LENGTH(0x2000)
-	MCFG_VIDEO_START(namconb2)
+	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_C352_ADD("c352", MASTER_CLOCK_HZ/2)

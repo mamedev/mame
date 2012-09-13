@@ -93,6 +93,7 @@ private:
 	UINT8 m_port21;
 public:
 	DECLARE_DRIVER_INIT(m20);
+	virtual void video_start();
 };
 
 
@@ -100,7 +101,7 @@ public:
 #define PIXEL_CLOCK XTAL_4_433619MHz
 
 
-static VIDEO_START( m20 )
+void m20_state::video_start()
 {
 }
 
@@ -545,7 +546,6 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_VIDEO_START(m20)
 	MCFG_SCREEN_UPDATE_STATIC(m20)
 	MCFG_PALETTE_LENGTH(4)
 

@@ -746,37 +746,35 @@ static TIMER_DEVICE_CALLBACK( model1_interrupt )
 	}
 }
 
-static MACHINE_RESET(model1)
+MACHINE_RESET_MEMBER(model1_state,model1)
 {
-	model1_state *state = machine.driver_data<model1_state>();
-	state->membank("bank1")->set_base(state->memregion("maincpu")->base() + 0x1000000);
-	irq_init(machine);
-	model1_tgp_reset(machine, !strcmp(machine.system().name, "swa") || !strcmp(machine.system().name, "wingwar") || !strcmp(machine.system().name, "wingwaru") || !strcmp(machine.system().name, "wingwarj"));
-	if (!strcmp(machine.system().name, "swa"))
+	membank("bank1")->set_base(memregion("maincpu")->base() + 0x1000000);
+	irq_init(machine());
+	model1_tgp_reset(machine(), !strcmp(machine().system().name, "swa") || !strcmp(machine().system().name, "wingwar") || !strcmp(machine().system().name, "wingwaru") || !strcmp(machine().system().name, "wingwarj"));
+	if (!strcmp(machine().system().name, "swa"))
 	{
-		state->m_sound_irq = 0;
+		m_sound_irq = 0;
 	}
 	else
 	{
-		state->m_sound_irq = 3;
+		m_sound_irq = 3;
 	}
 
 	// init the sound FIFO
-	state->m_fifo_rptr = state->m_fifo_wptr = 0;
-	memset(state->m_to_68k, 0, sizeof(state->m_to_68k));
+	m_fifo_rptr = m_fifo_wptr = 0;
+	memset(m_to_68k, 0, sizeof(m_to_68k));
 }
 
-static MACHINE_RESET(model1_vr)
+MACHINE_RESET_MEMBER(model1_state,model1_vr)
 {
-	model1_state *state = machine.driver_data<model1_state>();
-	state->membank("bank1")->set_base(state->memregion("maincpu")->base() + 0x1000000);
-	irq_init(machine);
-	model1_vr_tgp_reset(machine);
-	state->m_sound_irq = 3;
+	membank("bank1")->set_base(memregion("maincpu")->base() + 0x1000000);
+	irq_init(machine());
+	model1_vr_tgp_reset(machine());
+	m_sound_irq = 3;
 
 	// init the sound FIFO
-	state->m_fifo_rptr = state->m_fifo_wptr = 0;
-	memset(state->m_to_68k, 0, sizeof(state->m_to_68k));
+	m_fifo_rptr = m_fifo_wptr = 0;
+	memset(m_to_68k, 0, sizeof(m_to_68k));
 }
 
 READ16_MEMBER(model1_state::network_ctl_r)
@@ -1527,8 +1525,8 @@ static MACHINE_CONFIG_START( model1, model1_state )
 	MCFG_CPU_ADD("audiocpu", M68000, 10000000)	// verified on real h/w
 	MCFG_CPU_PROGRAM_MAP(model1_snd)
 
-	MCFG_MACHINE_START(model1)
-	MCFG_MACHINE_RESET(model1)
+	MCFG_MACHINE_START_OVERRIDE(model1_state,model1)
+	MCFG_MACHINE_RESET_OVERRIDE(model1_state,model1)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
@@ -1542,7 +1540,7 @@ static MACHINE_CONFIG_START( model1, model1_state )
 
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(model1)
+	MCFG_VIDEO_START_OVERRIDE(model1_state,model1)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1576,8 +1574,8 @@ static MACHINE_CONFIG_START( model1_vr, model1_state )
 	MCFG_CPU_CONFIG(model1_vr_tgp_config)
 	MCFG_CPU_PROGRAM_MAP(model1_vr_tgp_map)
 
-	MCFG_MACHINE_START(model1)
-	MCFG_MACHINE_RESET(model1_vr)
+	MCFG_MACHINE_START_OVERRIDE(model1_state,model1)
+	MCFG_MACHINE_RESET_OVERRIDE(model1_state,model1_vr)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
@@ -1591,7 +1589,7 @@ static MACHINE_CONFIG_START( model1_vr, model1_state )
 
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(model1)
+	MCFG_VIDEO_START_OVERRIDE(model1_state,model1)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

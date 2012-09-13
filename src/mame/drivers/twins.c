@@ -69,6 +69,8 @@ public:
 	DECLARE_WRITE16_MEMBER(porte_paloff0_w);
 	DECLARE_WRITE16_MEMBER(twinsa_port4_w);
 	DECLARE_READ16_MEMBER(twinsa_unk_r);
+	DECLARE_VIDEO_START(twins);
+	DECLARE_VIDEO_START(twinsa);
 };
 
 
@@ -109,10 +111,9 @@ static ADDRESS_MAP_START( twins_io, AS_IO, 16, twins_state )
 	AM_RANGE(0x000e, 0x000f) AM_WRITE(porte_paloff0_w)
 ADDRESS_MAP_END
 
-static VIDEO_START(twins)
+VIDEO_START_MEMBER(twins_state,twins)
 {
-	twins_state *state = machine.driver_data<twins_state>();
-	state->m_pal = auto_alloc_array(machine, UINT16, 0x100);
+	m_pal = auto_alloc_array(machine(), UINT16, 0x100);
 }
 
 static SCREEN_UPDATE_IND16(twins)
@@ -203,7 +204,7 @@ static MACHINE_CONFIG_START( twins, twins_state )
 
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(twins)
+	MCFG_VIDEO_START_OVERRIDE(twins_state,twins)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -216,10 +217,9 @@ MACHINE_CONFIG_END
 /* The second set has different palette hardware and a different port map */
 
 
-static VIDEO_START(twinsa)
+VIDEO_START_MEMBER(twins_state,twinsa)
 {
-	twins_state *state = machine.driver_data<twins_state>();
-	state->m_pal = auto_alloc_array(machine, UINT16, 0x1000);
+	m_pal = auto_alloc_array(machine(), UINT16, 0x1000);
 }
 
 static SCREEN_UPDATE_IND16(twinsa)
@@ -293,7 +293,7 @@ static MACHINE_CONFIG_START( twinsa, twins_state )
 
 	MCFG_PALETTE_LENGTH(0x1000)
 
-	MCFG_VIDEO_START(twinsa)
+	MCFG_VIDEO_START_OVERRIDE(twins_state,twinsa)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

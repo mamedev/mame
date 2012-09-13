@@ -181,6 +181,8 @@ emu_timer *m_ic21_timer;
 	DECLARE_WRITE8_MEMBER(pia_ic6_porta_w);
 	DECLARE_WRITE8_MEMBER(pia_ic6_portb_w);
 	DECLARE_DRIVER_INIT(m3hprvpr);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 #define DISPLAY_PORT 0
@@ -214,22 +216,21 @@ static void mpu3_stepper_reset(running_machine &machine)
 	state->m_optic_pattern = pattern;
 }
 
-static MACHINE_RESET( mpu3 )
+void mpu3_state::machine_reset()
 {
-	mpu3_state *state = machine.driver_data<mpu3_state>();
-	state->m_vfd->reset();
+	m_vfd->reset();
 
-	mpu3_stepper_reset(machine);
+	mpu3_stepper_reset(machine());
 
-	state->m_lamp_strobe   = 0;
-	state->m_led_strobe    = 0;
+	m_lamp_strobe   = 0;
+	m_led_strobe    = 0;
 
-	state->m_IC11GC    = 0;
-	state->m_IC11GB    = 0;
-	state->m_IC11GA    = 0;
-	state->m_IC11G1    = 1;
-	state->m_IC11G2A   = 0;
-	state->m_IC11G2B   = 0;
+	m_IC11GC    = 0;
+	m_IC11GB    = 0;
+	m_IC11GA    = 0;
+	m_IC11G1    = 1;
+	m_IC11G2A   = 0;
+	m_IC11G2B   = 0;
 }
 
 /* 6808 IRQ handler */
@@ -785,18 +786,18 @@ static void mpu3_config_common(running_machine &machine)
 	state->m_ic21_timer = machine.scheduler().timer_alloc(FUNC(ic21_timeout));
 }
 
-static MACHINE_START( mpu3 )
+void mpu3_state::machine_start()
 {
-	mpu3_config_common(machine);
+	mpu3_config_common(machine());
 
 	/* setup 8 mechanical meters */
-	MechMtr_config(machine,8);
+	MechMtr_config(machine(),8);
 
 	/* setup 4 reels */
-	stepper_config(machine, 0, &mpu3_reel_interface);
-	stepper_config(machine, 1, &mpu3_reel_interface);
-	stepper_config(machine, 2, &mpu3_reel_interface);
-	stepper_config(machine, 3, &mpu3_reel_interface);
+	stepper_config(machine(), 0, &mpu3_reel_interface);
+	stepper_config(machine(), 1, &mpu3_reel_interface);
+	stepper_config(machine(), 2, &mpu3_reel_interface);
+	stepper_config(machine(), 3, &mpu3_reel_interface);
 
 }
 /*
@@ -897,8 +898,6 @@ static ADDRESS_MAP_START( mpu3_basemap, AS_PROGRAM, 8, mpu3_state )
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( mpu3base, mpu3_state )
-	MCFG_MACHINE_START(mpu3)
-	MCFG_MACHINE_RESET(mpu3)
 	MCFG_CPU_ADD("maincpu", M6808, MPU3_MASTER_CLOCK)///4)
 	MCFG_CPU_PROGRAM_MAP(mpu3_basemap)
 

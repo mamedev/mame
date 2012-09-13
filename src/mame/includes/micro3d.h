@@ -111,6 +111,9 @@ public:
 	DECLARE_READ8_MEMBER(micro3d_sound_io_r);
 	DECLARE_DRIVER_INIT(micro3d);
 	DECLARE_DRIVER_INIT(botss);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void video_reset();
 };
 
 typedef struct _micro3d_vtx_
@@ -126,7 +129,7 @@ UINT8 micro3d_duart_input_r(device_t *device);
 void micro3d_duart_output_w(device_t *device, UINT8 data);
 void micro3d_duart_tx(device_t *device, int channel, UINT8 data);
 
-MACHINE_RESET( micro3d );
+
 
 
 /*----------- defined in audio/micro3d.c -----------*/
@@ -163,8 +166,8 @@ extern const device_type MICRO3D;
 
 /*----------- defined in video/micro3d.c -----------*/
 
-VIDEO_START( micro3d );
-VIDEO_RESET( micro3d );
+
+
 
 void micro3d_tms_interrupt(device_t *device, int state);
 void micro3d_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);

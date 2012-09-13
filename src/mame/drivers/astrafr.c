@@ -120,6 +120,10 @@ public:
 	DECLARE_DRIVER_INIT(astradec);
 	DECLARE_DRIVER_INIT(astradec_dual);
 	DECLARE_DRIVER_INIT(astradec_sml_dual);
+	DECLARE_MACHINE_START(astra_common);
+	DECLARE_MACHINE_START(astra_2e);
+	DECLARE_MACHINE_START(astra_37);
+	DECLARE_MACHINE_START(astra_57);
 };
 
 
@@ -260,38 +264,35 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( astrafr )
 INPUT_PORTS_END
 
-static MACHINE_START( astra_common )
+MACHINE_START_MEMBER(astrafr_state,astra_common)
 {
-	astrafr_state *state = machine.driver_data<astrafr_state>();
 
-	state->m_cpuregion = (UINT32*)state->memregion( "maincpu" )->base();
-	state->m_cpuregion_size = state->memregion( "maincpu" )->bytes()/4;
-	state->m_mainram = (UINT32*)auto_alloc_array_clear(machine, UINT32, 0x10000);
+	m_cpuregion = (UINT32*)memregion( "maincpu" )->base();
+	m_cpuregion_size = memregion( "maincpu" )->bytes()/4;
+	m_mainram = (UINT32*)auto_alloc_array_clear(machine(), UINT32, 0x10000);
 
-	state->m_slavecpuregion = (UINT32*)state->memregion( "slavecpu" )->base();
-	state->m_slavecpuregion_size = state->memregion( "slavecpu" )->bytes()/4;
-	state->m_slaveram = (UINT32*)auto_alloc_array_clear(machine, UINT32, 0x10000);
+	m_slavecpuregion = (UINT32*)memregion( "slavecpu" )->base();
+	m_slavecpuregion_size = memregion( "slavecpu" )->bytes()/4;
+	m_slaveram = (UINT32*)auto_alloc_array_clear(machine(), UINT32, 0x10000);
 
 
 }
 
 /* the FPGA area read/write addresses move around ... */
-static MACHINE_START( astra_37 )
+MACHINE_START_MEMBER(astrafr_state,astra_37)
 {
-	astrafr_state *state = machine.driver_data<astrafr_state>();
-	state->fgpa_after_rom_write_addr = 0x30;
-	state->fgpa_first_read_addr = 0x33;
-	state->fgpa_rom_write_addr = 0x37;
-	MACHINE_START_CALL(astra_common);
+	fgpa_after_rom_write_addr = 0x30;
+	fgpa_first_read_addr = 0x33;
+	fgpa_rom_write_addr = 0x37;
+	MACHINE_START_CALL_MEMBER(astra_common);
 }
 
-static MACHINE_START( astra_2e )
+MACHINE_START_MEMBER(astrafr_state,astra_2e)
 {
-	astrafr_state *state = machine.driver_data<astrafr_state>();
-	state->fgpa_after_rom_write_addr = 0x20;
-	state->fgpa_first_read_addr = 0x23;
-	state->fgpa_rom_write_addr = 0x2e;
-	MACHINE_START_CALL(astra_common);
+	fgpa_after_rom_write_addr = 0x20;
+	fgpa_first_read_addr = 0x23;
+	fgpa_rom_write_addr = 0x2e;
+	MACHINE_START_CALL_MEMBER(astra_common);
 }
 
 
@@ -302,15 +303,15 @@ static MACHINE_CONFIG_START( astrafr_dual, astrafr_state )
 	MCFG_CPU_ADD("slavecpu", M68340, 16000000)
 	MCFG_CPU_PROGRAM_MAP(astrafr_slave_map)
 
-	MCFG_MACHINE_START( astra_common )
+	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( astrafr_dual_2e, astrafr_dual )
-	MCFG_MACHINE_START( astra_2e )
+	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_2e )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( astrafr_dual_37, astrafr_dual )
-	MCFG_MACHINE_START( astra_37 )
+	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_37 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( astrafr_dual_alt, astrafr_state )
@@ -322,7 +323,7 @@ static MACHINE_CONFIG_START( astrafr_dual_alt, astrafr_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( astrafr_dual_alt_37, astrafr_dual_alt )
-	MCFG_MACHINE_START( astra_37 )
+	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_37 )
 MACHINE_CONFIG_END
 
 
@@ -330,39 +331,38 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( astra_single, astrafr_state )
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)
 	MCFG_CPU_PROGRAM_MAP(astra_map)
-	MCFG_MACHINE_START( astra_common )
+	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( astra_single_37, astra_single )
-	MCFG_MACHINE_START( astra_37 )
+	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_37 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( astra_single_2e, astra_single )
-	MCFG_MACHINE_START( astra_2e )
+	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_2e )
 MACHINE_CONFIG_END
 
-static MACHINE_START( astra_57 )
+MACHINE_START_MEMBER(astrafr_state,astra_57)
 {
-	astrafr_state *state = machine.driver_data<astrafr_state>();
-//  state->fgpa_after_rom_write_addr = 0x20;
-//  state->fgpa_first_read_addr = 0x23;
-	state->fgpa_rom_write_addr = 0x57;
-	MACHINE_START_CALL(astra_common);
+//  fgpa_after_rom_write_addr = 0x20;
+//  fgpa_first_read_addr = 0x23;
+	fgpa_rom_write_addr = 0x57;
+	MACHINE_START_CALL_MEMBER(astra_common);
 }
 
 
 static MACHINE_CONFIG_START( astra_single_alt, astrafr_state )
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)
 	MCFG_CPU_PROGRAM_MAP(astra_map)
-	MCFG_MACHINE_START( astra_common )
+	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( astra_single_alt_57, astra_single_alt )
-	MCFG_MACHINE_START( astra_57 )
+	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_57 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( astra_single_alt_37, astra_single_alt )
-	MCFG_MACHINE_START( astra_37 )
+	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_37 )
 MACHINE_CONFIG_END
 
 /* are the ptM roms Master and ptS roms Slave?

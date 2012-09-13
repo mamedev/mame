@@ -286,31 +286,29 @@ static const k051960_interface gradius3_k051960_intf =
 	gradius3_sprite_callback
 };
 
-static MACHINE_START( gradius3 )
+void gradius3_state::machine_start()
 {
-	gradius3_state *state = machine.driver_data<gradius3_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_subcpu = machine.device<cpu_device>("sub");
-	state->m_k007232 = machine.device("k007232");
-	state->m_k052109 = machine.device("k052109");
-	state->m_k051960 = machine.device("k051960");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_subcpu = machine().device<cpu_device>("sub");
+	m_k007232 = machine().device("k007232");
+	m_k052109 = machine().device("k052109");
+	m_k051960 = machine().device("k051960");
 
-	state->save_item(NAME(state->m_irqAen));
-	state->save_item(NAME(state->m_irqBmask));
-	state->save_item(NAME(state->m_priority));
+	save_item(NAME(m_irqAen));
+	save_item(NAME(m_irqBmask));
+	save_item(NAME(m_priority));
 }
 
-static MACHINE_RESET( gradius3 )
+void gradius3_state::machine_reset()
 {
-	gradius3_state *state = machine.driver_data<gradius3_state>();
 
 	/* start with cpu B halted */
-	machine.device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	state->m_irqAen = 0;
-	state->m_irqBmask = 0;
-	state->m_priority = 0;
+	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_irqAen = 0;
+	m_irqBmask = 0;
+	m_priority = 0;
 
 }
 
@@ -332,8 +330,6 @@ static MACHINE_CONFIG_START( gradius3, gradius3_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(gradius3)
-	MCFG_MACHINE_RESET(gradius3)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -347,7 +343,6 @@ static MACHINE_CONFIG_START( gradius3, gradius3_state )
 
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(gradius3)
 
 	MCFG_K052109_ADD("k052109", gradius3_k052109_intf)
 	MCFG_K051960_ADD("k051960", gradius3_k051960_intf)

@@ -101,6 +101,10 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
 	DECLARE_DRIVER_INIT(ddayjlc);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -379,10 +383,9 @@ TILE_GET_INFO_MEMBER(ddayjlc_state::get_tile_info_bg)
 	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
-static VIDEO_START( ddayjlc )
+void ddayjlc_state::video_start()
 {
-	ddayjlc_state *state = machine.driver_data<ddayjlc_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ddayjlc_state::get_tile_info_bg),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ddayjlc_state::get_tile_info_bg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16( ddayjlc )
@@ -447,47 +450,45 @@ static INTERRUPT_GEN( ddayjlc_snd_interrupt )
 }
 
 
-static MACHINE_START( ddayjlc )
+void ddayjlc_state::machine_start()
 {
-	ddayjlc_state *state = machine.driver_data<ddayjlc_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_char_bank));
-	state->save_item(NAME(state->m_bgadr));
-	state->save_item(NAME(state->m_sound_nmi_enable));
-	state->save_item(NAME(state->m_main_nmi_enable));
-	state->save_item(NAME(state->m_prot_addr));
+	save_item(NAME(m_char_bank));
+	save_item(NAME(m_bgadr));
+	save_item(NAME(m_sound_nmi_enable));
+	save_item(NAME(m_main_nmi_enable));
+	save_item(NAME(m_prot_addr));
 
-	state->save_item(NAME(state->m_e00x_l));
-	state->save_item(NAME(state->m_e00x_d[0]));
-	state->save_item(NAME(state->m_e00x_d[1]));
-	state->save_item(NAME(state->m_e00x_d[2]));
-	state->save_item(NAME(state->m_e00x_d[3]));
+	save_item(NAME(m_e00x_l));
+	save_item(NAME(m_e00x_d[0]));
+	save_item(NAME(m_e00x_d[1]));
+	save_item(NAME(m_e00x_d[2]));
+	save_item(NAME(m_e00x_d[3]));
 }
 
-static MACHINE_RESET( ddayjlc )
+void ddayjlc_state::machine_reset()
 {
-	ddayjlc_state *state = machine.driver_data<ddayjlc_state>();
 	int i;
 
-	state->m_char_bank = 0;
-	state->m_bgadr = 0;
-	state->m_sound_nmi_enable = 0;
-	state->m_main_nmi_enable = 0;
-	state->m_prot_addr = 0;
+	m_char_bank = 0;
+	m_bgadr = 0;
+	m_sound_nmi_enable = 0;
+	m_main_nmi_enable = 0;
+	m_prot_addr = 0;
 
 	for (i = 0; i < 4; i++)
 	{
-		state->m_e00x_l[i] = 0;
-		state->m_e00x_d[i][0] = 0;
-		state->m_e00x_d[i][1] = 0;
+		m_e00x_l[i] = 0;
+		m_e00x_d[i][0] = 0;
+		m_e00x_d[i][1] = 0;
 	}
 }
 
-static PALETTE_INIT( ddayjlc )
+void ddayjlc_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 
@@ -508,7 +509,7 @@ static PALETTE_INIT( ddayjlc )
 		bit2 = (val >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -525,8 +526,6 @@ static MACHINE_CONFIG_START( ddayjlc, ddayjlc_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(ddayjlc)
-	MCFG_MACHINE_RESET(ddayjlc)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -538,9 +537,7 @@ static MACHINE_CONFIG_START( ddayjlc, ddayjlc_state )
 
 	MCFG_GFXDECODE(ddayjlc)
 	MCFG_PALETTE_LENGTH(0x200)
-	MCFG_PALETTE_INIT(ddayjlc)
 
-	MCFG_VIDEO_START(ddayjlc)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

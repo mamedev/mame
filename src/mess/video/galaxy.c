@@ -110,15 +110,14 @@ void galaxy_set_timer(running_machine &machine)
 	state->m_gal_video_timer->adjust(attotime::zero, 0, attotime::from_hz(6144000 / 8));
 }
 
-VIDEO_START( galaxy )
+void galaxy_state::video_start()
 {
-	galaxy_state *state = machine.driver_data<galaxy_state>();
-	state->m_gal_cnt = 0;
+	m_gal_cnt = 0;
 
-	state->m_gal_video_timer = machine.scheduler().timer_alloc(FUNC(gal_video));
-	state->m_gal_video_timer->adjust(attotime::zero, 0, attotime::never);
+	m_gal_video_timer = machine().scheduler().timer_alloc(FUNC(gal_video));
+	m_gal_video_timer->adjust(attotime::zero, 0, attotime::never);
 
-	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }
 
 SCREEN_UPDATE_IND16( galaxy )

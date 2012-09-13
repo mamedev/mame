@@ -48,13 +48,15 @@ public:
 	UINT8 m_row_reg;
 	UINT8 m_col_reg;
 	UINT8 port_read_with_latch(UINT8 ext, UINT8 latch_state);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/channelf.c -----------*/
 
-PALETTE_INIT( channelf );
-VIDEO_START( channelf );
+
+
 SCREEN_UPDATE_IND16( channelf );
 
 

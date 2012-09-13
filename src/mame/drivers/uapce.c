@@ -110,6 +110,7 @@ public:
 	DECLARE_READ8_MEMBER(jamma_if_control_latch_r);
 	DECLARE_READ8_MEMBER(jamma_if_read_dsw);
 	DECLARE_DRIVER_INIT(uapce);
+	virtual void machine_reset();
 };
 
 #define UAPCE_SOUND_EN	NODE_10
@@ -225,11 +226,10 @@ static UINT8 jamma_if_read_joystick( running_machine &machine )
 	}
 }
 
-static MACHINE_RESET( uapce )
+void uapce_state::machine_reset()
 {
-	uapce_state *state = machine.driver_data<uapce_state>();
 	pce_set_joystick_readinputport_callback( jamma_if_read_joystick );
-	state->m_jamma_if_control_latch = 0;
+	m_jamma_if_control_latch = 0;
 }
 
 static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, uapce_state )
@@ -315,7 +315,6 @@ static MACHINE_CONFIG_START( uapce, uapce_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_RESET( uapce )
 
     /* video hardware */
 

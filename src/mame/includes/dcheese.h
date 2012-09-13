@@ -43,6 +43,9 @@ public:
 	DECLARE_WRITE16_MEMBER(madmax_blitter_unknown_w);
 	DECLARE_READ16_MEMBER(madmax_blitter_vidparam_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(sound_latch_state_r);
+	virtual void machine_start();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -53,8 +56,8 @@ void dcheese_signal_irq(running_machine &machine, int which);
 
 /*----------- defined in video/dcheese.c -----------*/
 
-PALETTE_INIT( dcheese );
-VIDEO_START( dcheese );
+
+
 SCREEN_UPDATE_IND16( dcheese );
 
 

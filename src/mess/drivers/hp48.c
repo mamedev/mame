@@ -938,7 +938,6 @@ static const char layout_hp48s [] = "hp48s";
 
 
 static MACHINE_CONFIG_START( hp48_common, hp48_state )
-	MCFG_MACHINE_RESET ( hp48 )
 
 	/* cpu */
 	MCFG_CPU_ADD ( "maincpu", SATURN, 3937007 ) /* almost 4 MHz */
@@ -957,7 +956,6 @@ static MACHINE_CONFIG_START( hp48_common, hp48_state )
 	MCFG_SCREEN_UPDATE_STATIC( hp48 )
 
 	MCFG_PALETTE_LENGTH( 256 ) /* monochrome, but with varying contrast and grayscale */
-	MCFG_PALETTE_INIT( hp48 )
 
 	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
@@ -966,7 +964,7 @@ static MACHINE_CONFIG_START( hp48_common, hp48_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hp48gx, hp48_common )
-	MCFG_MACHINE_START  ( hp48gx )
+	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48gx )
 	MCFG_DEFAULT_LAYOUT ( layout_hp48gx )
 
 	/* expansion ports */
@@ -979,7 +977,7 @@ static MACHINE_CONFIG_DERIVED( hp48gx, hp48_common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hp48g, hp48_common )
-	MCFG_MACHINE_START  ( hp48g )
+	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48g )
 	MCFG_DEFAULT_LAYOUT ( layout_hp48g )
 
 	/* serial I/O */
@@ -989,7 +987,7 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( hp48gp, hp48_common )
-	MCFG_MACHINE_START  ( hp48gp )
+	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48gp )
 	MCFG_DEFAULT_LAYOUT ( layout_hp48gp )
 
 	/* serial I/O */
@@ -1001,7 +999,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( hp48sx, hp48_common )
 	MCFG_CPU_MODIFY     ( "maincpu" )
 	MCFG_CPU_CLOCK      ( 2000000 )
-	MCFG_MACHINE_START  ( hp48sx )
+	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48sx )
 	MCFG_DEFAULT_LAYOUT ( layout_hp48sx )
 
 	/* expansion ports */
@@ -1015,7 +1013,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( hp48s, hp48_common )
 	MCFG_CPU_MODIFY     ( "maincpu" )
 	MCFG_CPU_CLOCK      ( 2000000 )
-	MCFG_MACHINE_START  ( hp48s )
+	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48s )
 	MCFG_DEFAULT_LAYOUT ( layout_hp48s )
 
 	/* serial I/O */

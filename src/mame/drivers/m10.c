@@ -175,7 +175,7 @@ static const ttl74123_interface ic8j2_intf =
  *
  *************************************/
 
-static PALETTE_INIT( m10 )
+PALETTE_INIT_MEMBER(m10_state,m10)
 {
 	int i;
 
@@ -188,31 +188,29 @@ static PALETTE_INIT( m10 )
 		else
 			color = RGB_BLACK;
 
-		palette_set_color(machine, i, color);
+		palette_set_color(machine(), i, color);
 	}
 }
 
-static MACHINE_START( m10 )
+MACHINE_START_MEMBER(m10_state,m10)
 {
-	m10_state *state = machine.driver_data<m10_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_ic8j1 = machine.device("ic8j1");
-	state->m_ic8j2 = machine.device("ic8j2");
-	state->m_samples = machine.device<samples_device>("samples");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_ic8j1 = machine().device("ic8j1");
+	m_ic8j2 = machine().device("ic8j2");
+	m_samples = machine().device<samples_device>("samples");
 
-	state->save_item(NAME(state->m_bottomline));
-	state->save_item(NAME(state->m_flip));
-	state->save_item(NAME(state->m_last));
+	save_item(NAME(m_bottomline));
+	save_item(NAME(m_flip));
+	save_item(NAME(m_last));
 }
 
-static MACHINE_RESET( m10 )
+MACHINE_RESET_MEMBER(m10_state,m10)
 {
-	m10_state *state = machine.driver_data<m10_state>();
 
-	state->m_bottomline = 0;
-	state->m_flip = 0;
-	state->m_last = 0;
+	m_bottomline = 0;
+	m_flip = 0;
+	m_last = 0;
 }
 
 /*************************************
@@ -831,8 +829,8 @@ static MACHINE_CONFIG_START( m10, m10_state )
 	MCFG_CPU_ADD("maincpu", M6502,IREMM10_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(m10_main)
 
-	MCFG_MACHINE_START(m10)
-	MCFG_MACHINE_RESET(m10)
+	MCFG_MACHINE_START_OVERRIDE(m10_state,m10)
+	MCFG_MACHINE_RESET_OVERRIDE(m10_state,m10)
 
 	//MCFG_CPU_VBLANK_INT("screen", m10_interrupt)
 
@@ -844,8 +842,8 @@ static MACHINE_CONFIG_START( m10, m10_state )
 	MCFG_GFXDECODE(m10)
 	MCFG_PALETTE_LENGTH(2*8)
 
-	MCFG_PALETTE_INIT(m10)
-	MCFG_VIDEO_START(m10)
+	MCFG_PALETTE_INIT_OVERRIDE(m10_state,m10)
+	MCFG_VIDEO_START_OVERRIDE(m10_state,m10)
 
 	/* 74LS123 */
 
@@ -876,8 +874,8 @@ static MACHINE_CONFIG_START( m15, m10_state )
 	MCFG_CPU_ADD("maincpu", M6502,IREMM15_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(m15_main)
 
-	MCFG_MACHINE_START(m10)
-	MCFG_MACHINE_RESET(m10)
+	MCFG_MACHINE_START_OVERRIDE(m10_state,m10)
+	MCFG_MACHINE_RESET_OVERRIDE(m10_state,m10)
 
 	MCFG_CPU_VBLANK_INT("screen", m15_interrupt)
 
@@ -888,8 +886,8 @@ static MACHINE_CONFIG_START( m15, m10_state )
 
 	MCFG_PALETTE_LENGTH(2*8)
 
-	MCFG_PALETTE_INIT(m10)
-	MCFG_VIDEO_START( m15 )
+	MCFG_PALETTE_INIT_OVERRIDE(m10_state,m10)
+	MCFG_VIDEO_START_OVERRIDE(m10_state, m15 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

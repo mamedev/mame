@@ -41,11 +41,12 @@ public:
 	TILE_GET_INFO_MEMBER(get_shadfrce_fgtile_info);
 	TILE_GET_INFO_MEMBER(get_shadfrce_bg0tile_info);
 	TILE_GET_INFO_MEMBER(get_shadfrce_bg1tile_info);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/shadfrce.c -----------*/
 
-VIDEO_START( shadfrce );
+
 SCREEN_VBLANK(shadfrce);
 SCREEN_UPDATE_IND16( shadfrce );

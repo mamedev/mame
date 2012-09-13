@@ -403,7 +403,6 @@ static MACHINE_CONFIG_START( wwfwfest, wwfwfest_state )
 	MCFG_GFXDECODE(wwfwfest)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(wwfwfest)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -418,7 +417,7 @@ static MACHINE_CONFIG_START( wwfwfest, wwfwfest_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( wwfwfstb, wwfwfest )
-	MCFG_VIDEO_START(wwfwfstb)
+	MCFG_VIDEO_START_OVERRIDE(wwfwfest_state,wwfwfstb)
 MACHINE_CONFIG_END
 
 /*******************************************************************************

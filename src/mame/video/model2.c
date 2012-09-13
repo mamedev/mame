@@ -2700,23 +2700,22 @@ static void model2_exit(running_machine &machine)
 	poly_free(state->m_poly);
 }
 
-VIDEO_START(model2)
+VIDEO_START_MEMBER(model2_state,model2)
 {
-	model2_state *state = machine.driver_data<model2_state>();
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = machine().primary_screen->visible_area();
 	int	width = visarea.width();
 	int	height = visarea.height();
 
-	state->m_sys24_bitmap.allocate(width, height+4);
+	m_sys24_bitmap.allocate(width, height+4);
 
-	state->m_poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), 0);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model2_exit), &machine));
+	m_poly = poly_alloc(machine(), 4000, sizeof(poly_extra_data), 0);
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model2_exit), &machine()));
 
 	/* initialize the hardware rasterizer */
-	model2_3d_init( machine, (UINT16*)state->memregion("user3")->base() );
+	model2_3d_init( machine(), (UINT16*)memregion("user3")->base() );
 
 	/* initialize the geometry engine */
-	geo_init( machine, (UINT32*)state->memregion("user2")->base() );
+	geo_init( machine(), (UINT32*)memregion("user2")->base() );
 }
 
 SCREEN_UPDATE_RGB32(model2)

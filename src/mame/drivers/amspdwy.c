@@ -250,25 +250,23 @@ static const ym2151_interface amspdwy_ym2151_interface =
 	DEVCB_LINE(irq_handler)
 };
 
-static MACHINE_START( amspdwy )
+void amspdwy_state::machine_start()
 {
-	amspdwy_state *state = machine.driver_data<amspdwy_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_wheel_old));
-	state->save_item(NAME(state->m_wheel_return));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_wheel_old));
+	save_item(NAME(m_wheel_return));
 }
 
-static MACHINE_RESET( amspdwy )
+void amspdwy_state::machine_reset()
 {
-	amspdwy_state *state = machine.driver_data<amspdwy_state>();
-	state->m_flipscreen = 0;
-	state->m_wheel_old[0] = 0;
-	state->m_wheel_old[1] = 0;
-	state->m_wheel_return[0] = 0;
-	state->m_wheel_return[1] = 0;
+	m_flipscreen = 0;
+	m_wheel_old[0] = 0;
+	m_wheel_old[1] = 0;
+	m_wheel_return[0] = 0;
+	m_wheel_return[1] = 0;
 }
 
 static MACHINE_CONFIG_START( amspdwy, amspdwy_state )
@@ -283,8 +281,6 @@ static MACHINE_CONFIG_START( amspdwy, amspdwy_state )
 	MCFG_CPU_PROGRAM_MAP(amspdwy_sound_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-	MCFG_MACHINE_START(amspdwy)
-	MCFG_MACHINE_RESET(amspdwy)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -297,7 +293,6 @@ static MACHINE_CONFIG_START( amspdwy, amspdwy_state )
 	MCFG_GFXDECODE(amspdwy)
 	MCFG_PALETTE_LENGTH(32)
 
-	MCFG_VIDEO_START(amspdwy)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

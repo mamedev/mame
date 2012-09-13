@@ -15,13 +15,13 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( hanaawas )
+void hanaawas_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x10);
+	machine().colortable = colortable_alloc(machine(), 0x10);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x10; i++)
@@ -47,7 +47,7 @@ PALETTE_INIT( hanaawas )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -59,7 +59,7 @@ PALETTE_INIT( hanaawas )
 	{
 		int swapped_i = BITSWAP8(i,2,7,6,5,4,3,1,0);
 		UINT8 ctabentry = color_prom[swapped_i] & 0x0f;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 
@@ -101,10 +101,9 @@ TILE_GET_INFO_MEMBER(hanaawas_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(gfxbank, code, color, 0);
 }
 
-VIDEO_START( hanaawas )
+void hanaawas_state::video_start()
 {
-	hanaawas_state *state = machine.driver_data<hanaawas_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hanaawas_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(hanaawas_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 SCREEN_UPDATE_IND16( hanaawas )

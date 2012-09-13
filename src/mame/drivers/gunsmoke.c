@@ -271,27 +271,25 @@ GFXDECODE_END
 
 /* Machine Driver */
 
-static MACHINE_START( gunsmoke )
+void gunsmoke_state::machine_start()
 {
-	gunsmoke_state *state = machine.driver_data<gunsmoke_state>();
-	UINT8 *rombase = state->memregion("maincpu")->base();
+	UINT8 *rombase = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 4, &rombase[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 4, &rombase[0x10000], 0x4000);
 
-	state->save_item(NAME(state->m_chon));
-	state->save_item(NAME(state->m_objon));
-	state->save_item(NAME(state->m_bgon));
-	state->save_item(NAME(state->m_sprite3bank));
+	save_item(NAME(m_chon));
+	save_item(NAME(m_objon));
+	save_item(NAME(m_bgon));
+	save_item(NAME(m_sprite3bank));
 }
 
-static MACHINE_RESET( gunsmoke )
+void gunsmoke_state::machine_reset()
 {
-	gunsmoke_state *state = machine.driver_data<gunsmoke_state>();
 
-	state->m_chon = 0;
-	state->m_objon = 0;
-	state->m_bgon = 0;
-	state->m_sprite3bank = 0;
+	m_chon = 0;
+	m_objon = 0;
+	m_bgon = 0;
+	m_sprite3bank = 0;
 }
 
 static MACHINE_CONFIG_START( gunsmoke, gunsmoke_state )
@@ -305,8 +303,6 @@ static MACHINE_CONFIG_START( gunsmoke, gunsmoke_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 4*60)
 
-	MCFG_MACHINE_START(gunsmoke)
-	MCFG_MACHINE_RESET(gunsmoke)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -318,8 +314,6 @@ static MACHINE_CONFIG_START( gunsmoke, gunsmoke_state )
 	MCFG_GFXDECODE(gunsmoke)
 	MCFG_PALETTE_LENGTH(32*4+16*16+16*16)
 
-	MCFG_PALETTE_INIT(gunsmoke)
-	MCFG_VIDEO_START(gunsmoke)
 	MCFG_SCREEN_UPDATE_STATIC(gunsmoke)
 
 	/* sound hardware */

@@ -621,12 +621,11 @@ static const msm5205_interface msm5205_config =
 };
 
 
-static MACHINE_RESET( rygar )
+MACHINE_RESET_MEMBER(tecmo_state,rygar)
 {
-	tecmo_state *state = machine.driver_data<tecmo_state>();
-	state->m_adpcm_pos = 0;
-	state->m_adpcm_end = 0;
-	state->m_adpcm_data = -1;
+	m_adpcm_pos = 0;
+	m_adpcm_end = 0;
+	m_adpcm_data = -1;
 }
 
 static MACHINE_CONFIG_START( rygar, tecmo_state )
@@ -650,9 +649,9 @@ static MACHINE_CONFIG_START( rygar, tecmo_state )
 	MCFG_GFXDECODE(tecmo)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(tecmo)
+	MCFG_VIDEO_START_OVERRIDE(tecmo_state,tecmo)
 
-	MCFG_MACHINE_RESET( rygar )
+	MCFG_MACHINE_RESET_OVERRIDE(tecmo_state, rygar )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -709,9 +708,9 @@ static MACHINE_CONFIG_START( backfirt, tecmo_state )
 	MCFG_GFXDECODE(tecmo)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(tecmo)
+	MCFG_VIDEO_START_OVERRIDE(tecmo_state,tecmo)
 
-	MCFG_MACHINE_RESET( rygar )
+	MCFG_MACHINE_RESET_OVERRIDE(tecmo_state, rygar )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

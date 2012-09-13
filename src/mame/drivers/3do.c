@@ -129,24 +129,23 @@ static INPUT_PORTS_START( 3do )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET( 3do )
+void _3do_state::machine_reset()
 {
-	_3do_state *state = machine.driver_data<_3do_state>();
 
-	state->m_maincpu = downcast<legacy_cpu_device*>( machine.device<cpu_device>("maincpu") );
+	m_maincpu = downcast<legacy_cpu_device*>( machine().device<cpu_device>("maincpu") );
 
-	state->membank("bank2")->set_base(state->memregion("user1")->base());
+	membank("bank2")->set_base(memregion("user1")->base());
 
 	/* configure overlay */
-	state->membank("bank1")->configure_entry(0, state->m_dram);
-	state->membank("bank1")->configure_entry(1, state->memregion("user1")->base());
+	membank("bank1")->configure_entry(0, m_dram);
+	membank("bank1")->configure_entry(1, memregion("user1")->base());
 
 	/* start with overlay enabled */
-	state->membank("bank1")->set_entry(1);
+	membank("bank1")->set_entry(1);
 
-	_3do_slow2_init(machine);
-	_3do_madam_init(machine);
-	_3do_clio_init(machine, downcast<screen_device *>(machine.device("screen")));
+	_3do_slow2_init(machine());
+	_3do_madam_init(machine());
+	_3do_clio_init(machine(), downcast<screen_device *>(machine().device("screen")));
 }
 
 struct cdrom_interface _3do_cdrom =
@@ -161,9 +160,8 @@ static MACHINE_CONFIG_START( 3do, _3do_state )
 	MCFG_CPU_ADD( "maincpu", ARM7_BE, XTAL_50MHz/4 )
 	MCFG_CPU_PROGRAM_MAP( 3do_mem)
 
-	MCFG_MACHINE_RESET( 3do )
 
-	MCFG_VIDEO_START( _3do )
+	MCFG_VIDEO_START_OVERRIDE(_3do_state, _3do )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( X2_CLOCK_NTSC / 2, 1592, 254, 1534, 263, 22, 262 )
@@ -179,7 +177,6 @@ static MACHINE_CONFIG_START( 3do_pal, _3do_state )
 	MCFG_CPU_ADD("maincpu", ARM7_BE, XTAL_50MHz/4 )
 	MCFG_CPU_PROGRAM_MAP( 3do_mem)
 
-	MCFG_MACHINE_RESET( 3do )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_STATIC( _3do )

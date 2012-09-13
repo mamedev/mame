@@ -272,6 +272,9 @@ public:
 	DECLARE_DRIVER_INIT(prot_val_40);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -841,13 +844,12 @@ INPUT_PORTS_END
 TILE_GET_INFO_MEMBER(nmg5_state::fg_get_tile_info){ SET_TILE_INFO_MEMBER(0, m_fg_videoram[tile_index] | (m_gfx_bank << 16), 0, 0);}
 TILE_GET_INFO_MEMBER(nmg5_state::bg_get_tile_info){ SET_TILE_INFO_MEMBER(0, m_bg_videoram[tile_index] | (m_gfx_bank << 16), 1, 0);}
 
-static VIDEO_START( nmg5 )
+void nmg5_state::video_start()
 {
-	nmg5_state *state = machine.driver_data<nmg5_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(nmg5_state::bg_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(nmg5_state::fg_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(nmg5_state::bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(nmg5_state::fg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 
@@ -982,27 +984,25 @@ static const ym3812_interface ym3812_intf =
 	soundirq	/* IRQ Line */
 };
 
-static MACHINE_START( nmg5 )
+void nmg5_state::machine_start()
 {
-	nmg5_state *state = machine.driver_data<nmg5_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_soundcpu = machine.device<cpu_device>("soundcpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_soundcpu = machine().device<cpu_device>("soundcpu");
 
-	state->save_item(NAME(state->m_gfx_bank));
-	state->save_item(NAME(state->m_priority_reg));
-	state->save_item(NAME(state->m_input_data));
+	save_item(NAME(m_gfx_bank));
+	save_item(NAME(m_priority_reg));
+	save_item(NAME(m_input_data));
 }
 
-static MACHINE_RESET( nmg5 )
+void nmg5_state::machine_reset()
 {
-	nmg5_state *state = machine.driver_data<nmg5_state>();
 
 	/* some games don't set the priority register so it should be hard-coded to a normal layout */
-	state->m_priority_reg = 7;
+	m_priority_reg = 7;
 
-	state->m_gfx_bank = 0;
-	state->m_input_data = 0;
+	m_gfx_bank = 0;
+	m_input_data = 0;
 }
 
 static MACHINE_CONFIG_START( nmg5, nmg5_state )
@@ -1016,8 +1016,6 @@ static MACHINE_CONFIG_START( nmg5, nmg5_state )
 	MCFG_CPU_PROGRAM_MAP(nmg5_sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
-	MCFG_MACHINE_START(nmg5)
-	MCFG_MACHINE_RESET(nmg5)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1030,7 +1028,6 @@ static MACHINE_CONFIG_START( nmg5, nmg5_state )
 	MCFG_GFXDECODE(nmg5)
 	MCFG_PALETTE_LENGTH(0x400)
 
-	MCFG_VIDEO_START(nmg5)
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 1);

@@ -66,12 +66,16 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/firetrap.c -----------*/
 
 
-PALETTE_INIT( firetrap );
-VIDEO_START( firetrap );
+
+
 SCREEN_UPDATE_IND16( firetrap );

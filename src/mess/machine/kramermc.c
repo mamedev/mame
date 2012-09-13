@@ -47,8 +47,7 @@ DRIVER_INIT_MEMBER(kramermc_state,kramermc)
 {
 }
 
-MACHINE_RESET( kramermc )
+void kramermc_state::machine_reset()
 {
-	kramermc_state *state = machine.driver_data<kramermc_state>();
-	state->m_key_row = 0;
+	m_key_row = 0;
 }

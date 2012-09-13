@@ -35,26 +35,24 @@ enum
  *
  *************************************/
 
-VIDEO_START( micro3d )
+void micro3d_state::video_start()
 {
-	micro3d_state *state = machine.driver_data<micro3d_state>();
 
 	/* Allocate 512x12 x 2 3D frame buffers */
-	state->m_frame_buffers[0] = auto_alloc_array(machine, UINT16, 1024 * 512);
-	state->m_frame_buffers[1] = auto_alloc_array(machine, UINT16, 1024 * 512);
-	state->m_tmp_buffer = auto_alloc_array(machine, UINT16, 1024 * 512);
+	m_frame_buffers[0] = auto_alloc_array(machine(), UINT16, 1024 * 512);
+	m_frame_buffers[1] = auto_alloc_array(machine(), UINT16, 1024 * 512);
+	m_tmp_buffer = auto_alloc_array(machine(), UINT16, 1024 * 512);
 }
 
 
-VIDEO_RESET( micro3d )
+void micro3d_state::video_reset()
 {
-	micro3d_state *state = machine.driver_data<micro3d_state>();
 
-	state->m_pipeline_state  = 0;
-	state->m_creg = 0;
+	m_pipeline_state  = 0;
+	m_creg = 0;
 
-	state->m_drawing_buffer = 0;
-	state->m_display_buffer = 1;
+	m_drawing_buffer = 0;
+	m_display_buffer = 1;
 }
 
 

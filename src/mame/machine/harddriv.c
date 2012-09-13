@@ -51,48 +51,46 @@ static void hd68k_update_interrupts(running_machine &machine);
  *
  *************************************/
 
-MACHINE_START( harddriv )
+MACHINE_START_MEMBER(harddriv_state,harddriv)
 {
-	harddriv_state *state = machine.driver_data<harddriv_state>();
 
-	atarigen_init(machine);
+	atarigen_init(machine());
 
 	/* predetermine memory regions */
-	state->m_sim_memory = (UINT16 *)state->memregion("user1")->base();
-	state->m_sim_memory_size = state->memregion("user1")->bytes() / 2;
-	state->m_adsp_pgm_memory_word = (UINT16 *)(reinterpret_cast<UINT8 *>(state->m_adsp_pgm_memory.target()) + 1);
+	m_sim_memory = (UINT16 *)memregion("user1")->base();
+	m_sim_memory_size = memregion("user1")->bytes() / 2;
+	m_adsp_pgm_memory_word = (UINT16 *)(reinterpret_cast<UINT8 *>(m_adsp_pgm_memory.target()) + 1);
 }
 
 
-MACHINE_RESET( harddriv )
+MACHINE_RESET_MEMBER(harddriv_state,harddriv)
 {
-	harddriv_state *state = machine.driver_data<harddriv_state>();
 
 	/* generic reset */
-	atarigen_eeprom_reset(state);
+	atarigen_eeprom_reset(this);
 	slapstic_reset();
-	atarigen_interrupt_reset(state, hd68k_update_interrupts);
+	atarigen_interrupt_reset(this, hd68k_update_interrupts);
 
 	/* halt several of the DSPs to start */
-	if (state->m_adsp != NULL) state->m_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	if (state->m_dsp32 != NULL) state->m_dsp32->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	if (state->m_sounddsp != NULL) state->m_sounddsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	if (m_adsp != NULL) m_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	if (m_dsp32 != NULL) m_dsp32->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	if (m_sounddsp != NULL) m_sounddsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	/* if we found a 6502, reset the JSA board */
-	if (state->m_jsacpu != NULL)
+	if (m_jsacpu != NULL)
 		atarijsa_reset();
 
-	state->m_last_gsp_shiftreg = 0;
+	m_last_gsp_shiftreg = 0;
 
-	state->m_m68k_adsp_buffer_bank = 0;
+	m_m68k_adsp_buffer_bank = 0;
 
 	/* reset IRQ states */
-	state->m_irq_state = state->m_gsp_irq_state = state->m_msp_irq_state = state->m_adsp_irq_state = state->m_duart_irq_state = 0;
+	m_irq_state = m_gsp_irq_state = m_msp_irq_state = m_adsp_irq_state = m_duart_irq_state = 0;
 
 	/* reset the ADSP/DSIII/DSIV boards */
-	state->m_adsp_halt = 1;
-	state->m_adsp_br = 0;
-	state->m_adsp_xflag = 0;
+	m_adsp_halt = 1;
+	m_adsp_br = 0;
+	m_adsp_xflag = 0;
 }
 
 

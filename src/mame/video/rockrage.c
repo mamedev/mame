@@ -2,17 +2,17 @@
 #include "video/konicdev.h"
 #include "includes/rockrage.h"
 
-PALETTE_INIT( rockrage )
+void rockrage_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x40);
+	machine().colortable = colortable_alloc(machine(), 0x40);
 
 	/* sprites */
 	for (i = 0x20; i < 0x40; i++)
-		colortable_entry_set_value(machine.colortable, i, i);
+		colortable_entry_set_value(machine().colortable, i, i);
 
 	/* characters */
 	for (i = 0x40; i < 0x140; i++)
@@ -20,10 +20,10 @@ PALETTE_INIT( rockrage )
 		UINT8 ctabentry;
 
 		ctabentry = (color_prom[(i - 0x40) + 0x000] & 0x0f) | 0x00;
-		colortable_entry_set_value(machine.colortable, i + 0x000, ctabentry);
+		colortable_entry_set_value(machine().colortable, i + 0x000, ctabentry);
 
 		ctabentry = (color_prom[(i - 0x40) + 0x100] & 0x0f) | 0x10;
-		colortable_entry_set_value(machine.colortable, i + 0x100, ctabentry);
+		colortable_entry_set_value(machine().colortable, i + 0x100, ctabentry);
 	}
 }
 

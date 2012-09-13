@@ -433,24 +433,24 @@ static void st0016_save_init(running_machine &machine)
 }
 
 
-VIDEO_START( st0016 )
+VIDEO_START_MEMBER(st0016_state,st0016)
 {
 	int gfx_index=0;
 
 	macs_cart_slot = 0;
-	st0016_charram=auto_alloc_array(machine, UINT8, ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
-	st0016_spriteram=auto_alloc_array(machine, UINT8, ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
-	st0016_paletteram=auto_alloc_array(machine, UINT8, ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
+	st0016_charram=auto_alloc_array(machine(), UINT8, ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
+	st0016_spriteram=auto_alloc_array(machine(), UINT8, ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
+	st0016_paletteram=auto_alloc_array(machine(), UINT8, ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine.gfx[gfx_index] == 0)
+		if (machine().gfx[gfx_index] == 0)
 			break;
 
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[gfx_index] = auto_alloc(machine, gfx_element(machine, charlayout, (UINT8 *) st0016_charram, 0x40, 0));
+	machine().gfx[gfx_index] = auto_alloc(machine(), gfx_element(machine(), charlayout, (UINT8 *) st0016_charram, 0x40, 0));
 	st0016_ramgfx = gfx_index;
 
 	spr_dx=0;
@@ -459,32 +459,32 @@ VIDEO_START( st0016 )
 	switch(st0016_game&0x3f)
 	{
 		case 0: //renju kizoku
-			machine.primary_screen->set_visible_area(0, 40*8-1, 0, 30*8-1);
+			machine().primary_screen->set_visible_area(0, 40*8-1, 0, 30*8-1);
 			spr_dx=0;
 			spr_dy=0;
 		break;
 
 		case 1: //neratte chu!
-			machine.primary_screen->set_visible_area(8,41*8-1,0,30*8-1);
+			machine().primary_screen->set_visible_area(8,41*8-1,0,30*8-1);
 			spr_dx=0;
 			spr_dy=8;
 		break;
 
 		case 4: //mayjinsen 1&2
-			machine.primary_screen->set_visible_area(0,32*8-1,0,28*8-1);
+			machine().primary_screen->set_visible_area(0,32*8-1,0,28*8-1);
 		break;
 
 		case 10:
-			machine.primary_screen->set_visible_area(0,383,0,255);
+			machine().primary_screen->set_visible_area(0,383,0,255);
 		break;
 
 		case 11:
-			machine.primary_screen->set_visible_area(0,383,0,383);
+			machine().primary_screen->set_visible_area(0,383,0,383);
 		break;
 
 	}
 
-	st0016_save_init(machine);
+	st0016_save_init(machine());
 }
 
 

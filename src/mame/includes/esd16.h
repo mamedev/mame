@@ -60,11 +60,14 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_0_16x16);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_1_16x16);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/esd16.c -----------*/
 
 
-VIDEO_START( esd16 );
+
 SCREEN_UPDATE_IND16( hedpanic );

@@ -142,130 +142,126 @@ static const int ddenlovr_commands[8]	= { BLIT_NEXT, BLIT_LINE,		BLIT_COPY,			BL
 static const int hanakanz_commands[8]	= { BLIT_NEXT, BLIT_CHANGE_PEN,	BLIT_CHANGE_NUM,	BLIT_UNKNOWN,	BLIT_SKIP,		BLIT_COPY,			BLIT_LINE,			BLIT_STOP	};
 static const int mjflove_commands[8]	= { BLIT_STOP, BLIT_CHANGE_PEN,	BLIT_CHANGE_NUM,	BLIT_UNKNOWN,	BLIT_SKIP,		BLIT_COPY,			BLIT_LINE,			BLIT_NEXT	};
 
-VIDEO_START( ddenlovr )
+VIDEO_START_MEMBER(dynax_state,ddenlovr)
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
 	int i;
 
 	for (i = 0; i < 8; i++)
 	{
-		state->m_ddenlovr_pixmap[i] = auto_alloc_array(machine, UINT8, 512 * 512);
-		state->m_ddenlovr_scroll[i * 2 + 0] = state->m_ddenlovr_scroll[i * 2 + 1] = 0;
+		m_ddenlovr_pixmap[i] = auto_alloc_array(machine(), UINT8, 512 * 512);
+		m_ddenlovr_scroll[i * 2 + 0] = m_ddenlovr_scroll[i * 2 + 1] = 0;
 	}
 
-	state->m_extra_layers = 0;
+	m_extra_layers = 0;
 
-	state->m_ddenlovr_clip_ctrl = 0x0f;
-	state->m_ddenlovr_layer_enable = state->m_ddenlovr_layer_enable2 = 0x0f;
-	state->m_ddenlovr_blit_pen_mask = 0xff;
+	m_ddenlovr_clip_ctrl = 0x0f;
+	m_ddenlovr_layer_enable = m_ddenlovr_layer_enable2 = 0x0f;
+	m_ddenlovr_blit_pen_mask = 0xff;
 
 	// older games do not set these !?
-	state->m_ddenlovr_clip_width = 0x400;
-	state->m_ddenlovr_clip_height = 0x400;
+	m_ddenlovr_clip_width = 0x400;
+	m_ddenlovr_clip_height = 0x400;
 
-	state->m_ddenlovr_blit_rom_bits = 8;
-	state->m_ddenlovr_blit_commands = ddenlovr_commands;
+	m_ddenlovr_blit_rom_bits = 8;
+	m_ddenlovr_blit_commands = ddenlovr_commands;
 
 	/* init to 0 the remaining elements */
-	state->m_ddenlovr_dest_layer = 0;
-	state->m_ddenlovr_blit_flip = 0;
-	state->m_ddenlovr_blit_x = 0;
-	state->m_ddenlovr_blit_y = 0;
-	state->m_ddenlovr_blit_address = 0;
-	state->m_ddenlovr_blit_pen = 0;
-	state->m_ddenlovr_blit_pen_mode = 0;
-	state->m_ddenlovr_blitter_irq_flag = 0;
-	state->m_ddenlovr_blitter_irq_enable = 0;
-	state->m_ddenlovr_rect_width = 0;
-	state->m_ddenlovr_rect_height = 0;
-	state->m_ddenlovr_line_length = 0;
-	state->m_ddenlovr_clip_x = 0;
-	state->m_ddenlovr_clip_y = 0;
-	state->m_ddenlovr_priority = 0;
-	state->m_ddenlovr_priority2 = 0;
-	state->m_ddenlovr_bgcolor = 0;
-	state->m_ddenlovr_bgcolor2 = 0;
-	state->m_ddenlovr_blit_latch = 0;
-	state->m_ddenlovr_blit_regs[0] = 0;
-	state->m_ddenlovr_blit_regs[1] = 0;
+	m_ddenlovr_dest_layer = 0;
+	m_ddenlovr_blit_flip = 0;
+	m_ddenlovr_blit_x = 0;
+	m_ddenlovr_blit_y = 0;
+	m_ddenlovr_blit_address = 0;
+	m_ddenlovr_blit_pen = 0;
+	m_ddenlovr_blit_pen_mode = 0;
+	m_ddenlovr_blitter_irq_flag = 0;
+	m_ddenlovr_blitter_irq_enable = 0;
+	m_ddenlovr_rect_width = 0;
+	m_ddenlovr_rect_height = 0;
+	m_ddenlovr_line_length = 0;
+	m_ddenlovr_clip_x = 0;
+	m_ddenlovr_clip_y = 0;
+	m_ddenlovr_priority = 0;
+	m_ddenlovr_priority2 = 0;
+	m_ddenlovr_bgcolor = 0;
+	m_ddenlovr_bgcolor2 = 0;
+	m_ddenlovr_blit_latch = 0;
+	m_ddenlovr_blit_regs[0] = 0;
+	m_ddenlovr_blit_regs[1] = 0;
 
 	for (i = 0; i < 8; i++)
 	{
-		state->m_ddenlovr_palette_base[i] = 0;
-		state->m_ddenlovr_palette_mask[i] = 0;
-		state->m_ddenlovr_transparency_pen[i] = 0;
-		state->m_ddenlovr_transparency_mask[i] = 0;
+		m_ddenlovr_palette_base[i] = 0;
+		m_ddenlovr_palette_mask[i] = 0;
+		m_ddenlovr_transparency_pen[i] = 0;
+		m_ddenlovr_transparency_mask[i] = 0;
 	}
 
 	/* register save states */
-	state->save_item(NAME(state->m_ddenlovr_dest_layer));
-	state->save_item(NAME(state->m_ddenlovr_blit_flip));
-	state->save_item(NAME(state->m_ddenlovr_blit_x));
-	state->save_item(NAME(state->m_ddenlovr_blit_y));
-	state->save_item(NAME(state->m_ddenlovr_blit_address));
-	state->save_item(NAME(state->m_ddenlovr_blit_pen));
-	state->save_item(NAME(state->m_ddenlovr_blit_pen_mode));
-	state->save_item(NAME(state->m_ddenlovr_blitter_irq_flag));
-	state->save_item(NAME(state->m_ddenlovr_blitter_irq_enable));
-	state->save_item(NAME(state->m_ddenlovr_rect_width));
-	state->save_item(NAME(state->m_ddenlovr_rect_height));
-	state->save_item(NAME(state->m_ddenlovr_clip_width));
-	state->save_item(NAME(state->m_ddenlovr_clip_height));
-	state->save_item(NAME(state->m_ddenlovr_line_length));
-	state->save_item(NAME(state->m_ddenlovr_clip_ctrl));
-	state->save_item(NAME(state->m_ddenlovr_clip_x));
-	state->save_item(NAME(state->m_ddenlovr_clip_y));
-	state->save_item(NAME(state->m_ddenlovr_scroll));
-	state->save_item(NAME(state->m_ddenlovr_priority));
-	state->save_item(NAME(state->m_ddenlovr_priority2));
-	state->save_item(NAME(state->m_ddenlovr_bgcolor));
-	state->save_item(NAME(state->m_ddenlovr_bgcolor2));
-	state->save_item(NAME(state->m_ddenlovr_layer_enable));
-	state->save_item(NAME(state->m_ddenlovr_layer_enable2));
-	state->save_item(NAME(state->m_ddenlovr_palette_base));
-	state->save_item(NAME(state->m_ddenlovr_palette_mask));
-	state->save_item(NAME(state->m_ddenlovr_transparency_pen));
-	state->save_item(NAME(state->m_ddenlovr_transparency_mask));
-	state->save_item(NAME(state->m_ddenlovr_blit_latch));
-	state->save_item(NAME(state->m_ddenlovr_blit_pen_mask));
-	state->save_item(NAME(state->m_ddenlovr_blit_regs));
+	save_item(NAME(m_ddenlovr_dest_layer));
+	save_item(NAME(m_ddenlovr_blit_flip));
+	save_item(NAME(m_ddenlovr_blit_x));
+	save_item(NAME(m_ddenlovr_blit_y));
+	save_item(NAME(m_ddenlovr_blit_address));
+	save_item(NAME(m_ddenlovr_blit_pen));
+	save_item(NAME(m_ddenlovr_blit_pen_mode));
+	save_item(NAME(m_ddenlovr_blitter_irq_flag));
+	save_item(NAME(m_ddenlovr_blitter_irq_enable));
+	save_item(NAME(m_ddenlovr_rect_width));
+	save_item(NAME(m_ddenlovr_rect_height));
+	save_item(NAME(m_ddenlovr_clip_width));
+	save_item(NAME(m_ddenlovr_clip_height));
+	save_item(NAME(m_ddenlovr_line_length));
+	save_item(NAME(m_ddenlovr_clip_ctrl));
+	save_item(NAME(m_ddenlovr_clip_x));
+	save_item(NAME(m_ddenlovr_clip_y));
+	save_item(NAME(m_ddenlovr_scroll));
+	save_item(NAME(m_ddenlovr_priority));
+	save_item(NAME(m_ddenlovr_priority2));
+	save_item(NAME(m_ddenlovr_bgcolor));
+	save_item(NAME(m_ddenlovr_bgcolor2));
+	save_item(NAME(m_ddenlovr_layer_enable));
+	save_item(NAME(m_ddenlovr_layer_enable2));
+	save_item(NAME(m_ddenlovr_palette_base));
+	save_item(NAME(m_ddenlovr_palette_mask));
+	save_item(NAME(m_ddenlovr_transparency_pen));
+	save_item(NAME(m_ddenlovr_transparency_mask));
+	save_item(NAME(m_ddenlovr_blit_latch));
+	save_item(NAME(m_ddenlovr_blit_pen_mask));
+	save_item(NAME(m_ddenlovr_blit_regs));
 
-	state->save_pointer(NAME(state->m_ddenlovr_pixmap[0]), 512 * 512);
-	state->save_pointer(NAME(state->m_ddenlovr_pixmap[1]), 512 * 512);
-	state->save_pointer(NAME(state->m_ddenlovr_pixmap[2]), 512 * 512);
-	state->save_pointer(NAME(state->m_ddenlovr_pixmap[3]), 512 * 512);
-	state->save_pointer(NAME(state->m_ddenlovr_pixmap[4]), 512 * 512);
-	state->save_pointer(NAME(state->m_ddenlovr_pixmap[5]), 512 * 512);
-	state->save_pointer(NAME(state->m_ddenlovr_pixmap[6]), 512 * 512);
-	state->save_pointer(NAME(state->m_ddenlovr_pixmap[7]), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[0]), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[1]), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[2]), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[3]), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[4]), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[5]), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[6]), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[7]), 512 * 512);
 }
 
-static VIDEO_START( mmpanic )
+VIDEO_START_MEMBER(dynax_state,mmpanic)
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
 
-	VIDEO_START_CALL(ddenlovr);
+	VIDEO_START_CALL_MEMBER(ddenlovr);
 
-	state->m_extra_layers = 1;
+	m_extra_layers = 1;
 }
 
-static VIDEO_START( hanakanz )
+VIDEO_START_MEMBER(dynax_state,hanakanz)
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
 
-	VIDEO_START_CALL(ddenlovr);
+	VIDEO_START_CALL_MEMBER(ddenlovr);
 
-	state->m_ddenlovr_blit_rom_bits = 16;
-	state->m_ddenlovr_blit_commands = hanakanz_commands;
+	m_ddenlovr_blit_rom_bits = 16;
+	m_ddenlovr_blit_commands = hanakanz_commands;
 }
 
-static VIDEO_START( mjflove )
+VIDEO_START_MEMBER(dynax_state,mjflove)
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
 
-	VIDEO_START_CALL(ddenlovr);
+	VIDEO_START_CALL_MEMBER(ddenlovr);
 
-	state->m_ddenlovr_blit_commands = mjflove_commands;
+	m_ddenlovr_blit_commands = mjflove_commands;
 }
 
 static void ddenlovr_flipscreen_w( UINT8 data )
@@ -8356,138 +8352,136 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_START( ddenlovr )
+MACHINE_START_MEMBER(dynax_state,ddenlovr)
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_soundcpu = machine.device<cpu_device>("soundcpu");
-	state->m_oki = machine.device<okim6295_device>("oki");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_soundcpu = machine().device<cpu_device>("soundcpu");
+	m_oki = machine().device<okim6295_device>("oki");
 
-	state->save_item(NAME(state->m_input_sel));
-	state->save_item(NAME(state->m_dsw_sel));
-	state->save_item(NAME(state->m_keyb));
-	state->save_item(NAME(state->m_coins));
-	state->save_item(NAME(state->m_hopper));
+	save_item(NAME(m_input_sel));
+	save_item(NAME(m_dsw_sel));
+	save_item(NAME(m_keyb));
+	save_item(NAME(m_coins));
+	save_item(NAME(m_hopper));
 
-	state->save_item(NAME(state->m_okibank));
-	state->save_item(NAME(state->m_rongrong_blitter_busy_select));
+	save_item(NAME(m_okibank));
+	save_item(NAME(m_rongrong_blitter_busy_select));
 
-	state->save_item(NAME(state->m_prot_val));
-	state->save_item(NAME(state->m_prot_16));
-	state->save_item(NAME(state->m_quiz365_protection));
+	save_item(NAME(m_prot_val));
+	save_item(NAME(m_prot_16));
+	save_item(NAME(m_quiz365_protection));
 
-	state->save_item(NAME(state->m_mmpanic_leds));
-	state->save_item(NAME(state->m_funkyfig_lockout));
-	state->save_item(NAME(state->m_romdata));
-	state->save_item(NAME(state->m_palette_index));
-	state->save_item(NAME(state->m_hginga_rombank));
-	state->save_item(NAME(state->m_mjflove_irq_cause));
-	state->save_item(NAME(state->m_daimyojn_palette_sel));
-	state->save_item(NAME(state->m_palram));
+	save_item(NAME(m_mmpanic_leds));
+	save_item(NAME(m_funkyfig_lockout));
+	save_item(NAME(m_romdata));
+	save_item(NAME(m_palette_index));
+	save_item(NAME(m_hginga_rombank));
+	save_item(NAME(m_mjflove_irq_cause));
+	save_item(NAME(m_daimyojn_palette_sel));
+	save_item(NAME(m_palram));
 
-	state->save_item(NAME(state->m_irq_count));
+	save_item(NAME(m_irq_count));
 }
 
-static MACHINE_RESET( ddenlovr )
+MACHINE_RESET_MEMBER(dynax_state,ddenlovr)
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
 
-	state->m_input_sel = 0;
-	state->m_dsw_sel = 0;
-	state->m_keyb = 0;
-	state->m_coins = 0;
-	state->m_hopper = 0;
+	m_input_sel = 0;
+	m_dsw_sel = 0;
+	m_keyb = 0;
+	m_coins = 0;
+	m_hopper = 0;
 
-	state->m_okibank = 0;
-	state->m_rongrong_blitter_busy_select = 0;
-	state->m_prot_val = 0;
-	state->m_prot_16 = 0;
-	state->m_mmpanic_leds = 0;
-	state->m_funkyfig_lockout = 0;
-	state->m_palette_index = 0;
-	state->m_hginga_rombank = 0;
-	state->m_mjflove_irq_cause = 0;
-	state->m_daimyojn_palette_sel = 0;
-	state->m_irq_count = 0;
+	m_okibank = 0;
+	m_rongrong_blitter_busy_select = 0;
+	m_prot_val = 0;
+	m_prot_16 = 0;
+	m_mmpanic_leds = 0;
+	m_funkyfig_lockout = 0;
+	m_palette_index = 0;
+	m_hginga_rombank = 0;
+	m_mjflove_irq_cause = 0;
+	m_daimyojn_palette_sel = 0;
+	m_irq_count = 0;
 
-	state->m_quiz365_protection[0] = 0;
-	state->m_quiz365_protection[1] = 0;
-	state->m_romdata[0] = 0;
-	state->m_romdata[1] = 0;
+	m_quiz365_protection[0] = 0;
+	m_quiz365_protection[1] = 0;
+	m_romdata[0] = 0;
+	m_romdata[1] = 0;
 
-	memset(state->m_palram, 0, ARRAY_LENGTH(state->m_palram));
+	memset(m_palram, 0, ARRAY_LENGTH(m_palram));
 }
 
-static MACHINE_START( rongrong )
+MACHINE_START_MEMBER(dynax_state,rongrong)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	machine.root_device().membank("bank1")->configure_entries(0, 0x20, &ROM[0x010000], 0x8000);
-	machine.root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x110000], 0x1000);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	machine().root_device().membank("bank1")->configure_entries(0, 0x20, &ROM[0x010000], 0x8000);
+	machine().root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x110000], 0x1000);
 
-	MACHINE_START_CALL(ddenlovr);
+	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
-static MACHINE_START( mmpanic )
+MACHINE_START_MEMBER(dynax_state,mmpanic)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	machine.root_device().membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	machine().root_device().membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
 
-	MACHINE_START_CALL(ddenlovr);
+	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
-static MACHINE_START( funkyfig )
+MACHINE_START_MEMBER(dynax_state,funkyfig)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	machine.root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
-	machine.root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	machine().root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
+	machine().root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
 
-	MACHINE_START_CALL(ddenlovr);
+	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
-static MACHINE_START( hanakanz )
+MACHINE_START_MEMBER(dynax_state,hanakanz)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	machine.root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
-	machine.root_device().membank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	machine().root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
+	machine().root_device().membank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
 
-	MACHINE_START_CALL(ddenlovr);
+	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
-static MACHINE_START( mjmyster )
+MACHINE_START_MEMBER(dynax_state,mjmyster)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	machine.root_device().membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
-	machine.root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	machine().root_device().membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
+	machine().root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
 
-	MACHINE_START_CALL(ddenlovr);
+	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
-static MACHINE_START( hparadis )
+MACHINE_START_MEMBER(dynax_state,hparadis)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	machine.root_device().membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
-	machine.root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x50000], 0x1000);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	machine().root_device().membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
+	machine().root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x50000], 0x1000);
 
-	MACHINE_START_CALL(ddenlovr);
+	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
-static MACHINE_START( mjflove )
+MACHINE_START_MEMBER(dynax_state,mjflove)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	machine.root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
-	machine.root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	machine().root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
+	machine().root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
 
-	MACHINE_START_CALL(ddenlovr);
+	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
-static MACHINE_START( sryudens )
+MACHINE_START_MEMBER(dynax_state,sryudens)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	machine.root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
-	machine.root_device().membank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	machine().root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
+	machine().root_device().membank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
 
-	MACHINE_START_CALL(ddenlovr);
+	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
 /***************************************************************************
@@ -8507,8 +8501,8 @@ static MACHINE_CONFIG_START( ddenlovr, dynax_state )
 	MCFG_CPU_PROGRAM_MAP(ddenlovr_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MCFG_MACHINE_START(ddenlovr)
-	MCFG_MACHINE_RESET(ddenlovr)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,ddenlovr)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,ddenlovr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8521,7 +8515,7 @@ static MACHINE_CONFIG_START( ddenlovr, dynax_state )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_VIDEO_START(ddenlovr)
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,ddenlovr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -8631,8 +8625,8 @@ static MACHINE_CONFIG_START( quizchq, dynax_state )
 	MCFG_CPU_IO_MAP(quizchq_portmap)
 	MCFG_CPU_VBLANK_INT("screen",quizchq_irq)
 
-	MCFG_MACHINE_START(rongrong)
-	MCFG_MACHINE_RESET(ddenlovr)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,rongrong)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,ddenlovr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8645,7 +8639,7 @@ static MACHINE_CONFIG_START( quizchq, dynax_state )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_VIDEO_START(ddenlovr)
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,ddenlovr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -8722,8 +8716,8 @@ static MACHINE_CONFIG_START( mmpanic, dynax_state )
 	MCFG_CPU_IO_MAP(mmpanic_sound_portmap)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	// NMI by main cpu
 
-	MCFG_MACHINE_START(mmpanic)
-	MCFG_MACHINE_RESET(ddenlovr)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,mmpanic)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,ddenlovr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8736,7 +8730,7 @@ static MACHINE_CONFIG_START( mmpanic, dynax_state )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_VIDEO_START(mmpanic)	// extra layers
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,mmpanic)	// extra layers
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -8806,8 +8800,8 @@ static MACHINE_CONFIG_START( hanakanz, dynax_state )
 	MCFG_CPU_IO_MAP(hanakanz_portmap)
 	MCFG_CPU_VBLANK_INT("screen", hanakanz_irq)
 
-	MCFG_MACHINE_START(hanakanz)
-	MCFG_MACHINE_RESET(ddenlovr)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanakanz)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,ddenlovr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8820,7 +8814,7 @@ static MACHINE_CONFIG_START( hanakanz, dynax_state )
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_VIDEO_START(hanakanz)	// blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,hanakanz)	// blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -8912,7 +8906,7 @@ static MACHINE_CONFIG_DERIVED( funkyfig, mmpanic )
 	MCFG_CPU_IO_MAP(funkyfig_portmap)
 	MCFG_CPU_VBLANK_INT("screen",mjchuuka_irq)
 
-	MCFG_MACHINE_START(funkyfig)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,funkyfig)
 
 	MCFG_DEVICE_MODIFY("rtc")
 	MCFG_DEVICE_CONFIG(mjchuuka_rtc_intf)
@@ -8920,7 +8914,7 @@ static MACHINE_CONFIG_DERIVED( funkyfig, mmpanic )
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(funkyfig_sound_portmap)
 
-	MCFG_VIDEO_START(ddenlovr)	// no extra layers?
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,ddenlovr)	// no extra layers?
 MACHINE_CONFIG_END
 
 
@@ -9000,7 +8994,7 @@ static MACHINE_CONFIG_DERIVED( mjmyster, quizchq )
 	MCFG_DEVICE_MODIFY("rtc")
 	MCFG_DEVICE_CONFIG(mjmyster_rtc_intf)
 
-	MCFG_MACHINE_START(mjmyster)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,mjmyster)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 3579545)
 	MCFG_SOUND_CONFIG(mjmyster_ay8910_interface)
@@ -9070,7 +9064,7 @@ static MACHINE_CONFIG_DERIVED( hginga, quizchq )
 	MCFG_DEVICE_MODIFY("rtc")
 	MCFG_DEVICE_CONFIG(hginga_rtc_intf)
 
-	MCFG_MACHINE_START(mjmyster)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,mjmyster)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 3579545)
 	MCFG_SOUND_CONFIG(hginga_ay8910_interface)
@@ -9088,7 +9082,7 @@ static MACHINE_CONFIG_DERIVED( hgokou, quizchq )
 	MCFG_DEVICE_MODIFY("rtc")
 	MCFG_DEVICE_CONFIG(hginga_rtc_intf)
 
-	MCFG_MACHINE_START(mjmyster)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,mjmyster)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 3579545)
 	MCFG_SOUND_CONFIG(hginga_ay8910_interface)
@@ -9121,7 +9115,7 @@ static MACHINE_CONFIG_DERIVED( mjmyuniv, quizchq )
 	MCFG_CPU_IO_MAP(mjmyster_portmap)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", mjmyster_irq, "screen", 0, 1)
 
-	MCFG_MACHINE_START(mjmyster)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,mjmyster)
 
 	MCFG_DEVICE_MODIFY("rtc")
 	MCFG_DEVICE_CONFIG(mjmyster_rtc_intf)
@@ -9141,7 +9135,7 @@ static MACHINE_CONFIG_DERIVED( mjmyornt, quizchq )
 	MCFG_CPU_IO_MAP(mjmyster_portmap)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", mjmyster_irq, "screen", 0, 1)
 
-	MCFG_MACHINE_START(mjmyster)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,mjmyster)
 
 	MCFG_DEVICE_MODIFY("rtc")
 	MCFG_DEVICE_CONFIG(mjmyster_rtc_intf)
@@ -9183,12 +9177,12 @@ static MACHINE_CONFIG_DERIVED( mjflove, quizchq )
 	MCFG_CPU_IO_MAP(mjflove_portmap)
 	MCFG_CPU_VBLANK_INT("screen",mjflove_irq)
 
-	MCFG_MACHINE_START(mjflove)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,mjflove)
 
 	MCFG_DEVICE_MODIFY("rtc")
 	MCFG_DEVICE_CONFIG(mjflove_rtc_intf)
 
-	MCFG_VIDEO_START(mjflove)	// blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjflove)	// blitter commands in the roms are shuffled around
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 28636363/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -9209,7 +9203,7 @@ static MACHINE_CONFIG_DERIVED( hparadis, quizchq )
 	MCFG_CPU_IO_MAP(hparadis_portmap)
 	MCFG_CPU_VBLANK_INT("screen", hparadis_irq)
 
-	MCFG_MACHINE_START(hparadis)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,hparadis)
 MACHINE_CONFIG_END
 
 
@@ -9222,8 +9216,8 @@ static MACHINE_CONFIG_START( jongtei, dynax_state )
 	MCFG_CPU_IO_MAP(jongtei_portmap)
 	MCFG_CPU_VBLANK_INT("screen", hanakanz_irq)
 
-	MCFG_MACHINE_START(hanakanz)
-	MCFG_MACHINE_RESET(ddenlovr)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanakanz)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,ddenlovr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9236,7 +9230,7 @@ static MACHINE_CONFIG_START( jongtei, dynax_state )
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_VIDEO_START(hanakanz)	// blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,hanakanz)	// blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -9263,8 +9257,8 @@ static MACHINE_CONFIG_START( sryudens, dynax_state )
 	MCFG_CPU_IO_MAP(sryudens_portmap)
 	MCFG_CPU_VBLANK_INT("screen",mjchuuka_irq)
 
-	MCFG_MACHINE_START(sryudens)
-	MCFG_MACHINE_RESET(ddenlovr)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,sryudens)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,ddenlovr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9277,7 +9271,7 @@ static MACHINE_CONFIG_START( sryudens, dynax_state )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_VIDEO_START(mjflove)	// blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjflove)	// blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -9308,8 +9302,8 @@ static MACHINE_CONFIG_START( janshinp, dynax_state )
 	MCFG_CPU_IO_MAP(janshinp_portmap)
 	MCFG_CPU_VBLANK_INT("screen",mjchuuka_irq)
 
-	MCFG_MACHINE_START(hanakanz)
-	MCFG_MACHINE_RESET(ddenlovr)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanakanz)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,ddenlovr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9322,7 +9316,7 @@ static MACHINE_CONFIG_START( janshinp, dynax_state )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_VIDEO_START(ddenlovr)
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,ddenlovr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -9343,7 +9337,7 @@ MACHINE_CONFIG_END
 // Same PCB as janshinp
 static MACHINE_CONFIG_DERIVED( dtoyoken, janshinp )
 
-	MCFG_VIDEO_START(mjflove)	// blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjflove)	// blitter commands in the roms are shuffled around
 MACHINE_CONFIG_END
 
 
@@ -9360,18 +9354,18 @@ static const ay8910_interface seljan2_ay8910_interface =
 	DEVCB_NULL,						DEVCB_HANDLER(ddenlovr_select_w)		// W
 };
 
-static MACHINE_START( seljan2 )
+MACHINE_START_MEMBER(dynax_state,seljan2)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
-	machine.root_device().membank("bank1")->configure_entries(0x00, 0x10, &ROM[0x10000], 0x8000);
+	machine().root_device().membank("bank1")->configure_entries(0x00, 0x10, &ROM[0x10000], 0x8000);
 	// banks 10-1f -> palette RAM
 	for (int i = 0; i < 0x10; i++)
-		machine.root_device().membank("bank1")->configure_entries(0x10+i, 1, &ROM[0x90000], 0x8000);
+		machine().root_device().membank("bank1")->configure_entries(0x10+i, 1, &ROM[0x90000], 0x8000);
 
-	machine.root_device().membank("bank2")->configure_entries(0, 0x10, &ROM[0x98000], 0x1000);
+	machine().root_device().membank("bank2")->configure_entries(0, 0x10, &ROM[0x98000], 0x1000);
 
-	MACHINE_START_CALL(ddenlovr);
+	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
 static MACHINE_CONFIG_START( seljan2, dynax_state )
@@ -9382,8 +9376,8 @@ static MACHINE_CONFIG_START( seljan2, dynax_state )
 	MCFG_CPU_IO_MAP(seljan2_portmap)
 	MCFG_CPU_VBLANK_INT("screen",mjchuuka_irq)
 
-	MCFG_MACHINE_START(seljan2)
-	MCFG_MACHINE_RESET(ddenlovr)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,seljan2)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,ddenlovr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9396,7 +9390,7 @@ static MACHINE_CONFIG_START( seljan2, dynax_state )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_VIDEO_START(mjflove)	// blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjflove)	// blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -9429,8 +9423,8 @@ static MACHINE_CONFIG_START( daimyojn, dynax_state )
 	MCFG_CPU_IO_MAP(daimyojn_portmap)
 	MCFG_CPU_VBLANK_INT("screen", hanakanz_irq)
 
-	MCFG_MACHINE_START(mjflove)
-	MCFG_MACHINE_RESET(ddenlovr)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,mjflove)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,ddenlovr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9443,7 +9437,7 @@ static MACHINE_CONFIG_START( daimyojn, dynax_state )
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_VIDEO_START(hanakanz)	// blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,hanakanz)	// blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -54,6 +54,8 @@ public:
 	UINT8 m_key_code;
 	double m_send_baud_rate;
 	double m_recv_baud_rate;
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -335,17 +337,16 @@ static IRQ_CALLBACK(vt100_irq_callback)
 	return ret;
 }
 
-static MACHINE_START(vt100)
+void vt100_state::machine_start()
 {
 }
 
-static MACHINE_RESET(vt100)
+void vt100_state::machine_reset()
 {
-	vt100_state *state = machine.driver_data<vt100_state>();
-	state->m_keyboard_int = 0;
-	state->m_receiver_int = 0;
-	state->m_vertical_int = 0;
-	beep_set_frequency( state->m_speaker, 786 ); // 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
+	m_keyboard_int = 0;
+	m_receiver_int = 0;
+	m_vertical_int = 0;
+	beep_set_frequency( m_speaker, 786 ); // 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
 	output_set_value("online_led",1);
 	output_set_value("local_led", 0);
 	output_set_value("locked_led",1);
@@ -354,9 +355,9 @@ static MACHINE_RESET(vt100)
 	output_set_value("l3_led", 1);
 	output_set_value("l4_led", 1);
 
-	state->m_key_scan = 0;
+	m_key_scan = 0;
 
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(vt100_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(vt100_irq_callback);
 }
 
 READ8_MEMBER( vt100_state::vt100_read_video_ram_r )
@@ -412,8 +413,6 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_CPU_IO_MAP(vt100_io)
 	MCFG_CPU_VBLANK_INT("screen", vt100_vertical_interrupt)
 
-	MCFG_MACHINE_START(vt100)
-	MCFG_MACHINE_RESET(vt100)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

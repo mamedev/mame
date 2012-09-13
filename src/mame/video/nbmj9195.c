@@ -384,57 +384,54 @@ WRITE8_MEMBER(nbmj9195_state::nbmj9195_clut_1_w){ nbmj9195_clut_w(&space, offset
 
 
 ******************************************************************************/
-VIDEO_START( nbmj9195_1layer )
+VIDEO_START_MEMBER(nbmj9195_state,nbmj9195_1layer)
 {
-	nbmj9195_state *state = machine.driver_data<nbmj9195_state>();
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
 
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap[0]);
-	state->m_videoram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
-	state->m_palette = auto_alloc_array(machine, UINT8, 0x200);
-	state->m_clut[0] = auto_alloc_array(machine, UINT8, 0x1000);
-	state->m_scanline[0] = state->m_scanline[1] = SCANLINE_MIN;
-	state->m_nb19010_busyflag = 1;
-	state->m_gfxdraw_mode = 0;
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmap[0]);
+	m_videoram[0] = auto_alloc_array_clear(machine(), UINT16, width * height);
+	m_palette = auto_alloc_array(machine(), UINT8, 0x200);
+	m_clut[0] = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_scanline[0] = m_scanline[1] = SCANLINE_MIN;
+	m_nb19010_busyflag = 1;
+	m_gfxdraw_mode = 0;
 }
 
-VIDEO_START( nbmj9195_2layer )
+void nbmj9195_state::video_start()
 {
-	nbmj9195_state *state = machine.driver_data<nbmj9195_state>();
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
 
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap[0]);
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap[1]);
-	state->m_videoram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
-	state->m_videoram[1] = auto_alloc_array_clear(machine, UINT16, width * height);
-	state->m_palette = auto_alloc_array(machine, UINT8, 0x200);
-	state->m_clut[0] = auto_alloc_array(machine, UINT8, 0x1000);
-	state->m_clut[1] = auto_alloc_array(machine, UINT8, 0x1000);
-	state->m_scanline[0] = state->m_scanline[1] = SCANLINE_MIN;
-	state->m_nb19010_busyflag = 1;
-	state->m_gfxdraw_mode = 1;
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmap[0]);
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmap[1]);
+	m_videoram[0] = auto_alloc_array_clear(machine(), UINT16, width * height);
+	m_videoram[1] = auto_alloc_array_clear(machine(), UINT16, width * height);
+	m_palette = auto_alloc_array(machine(), UINT8, 0x200);
+	m_clut[0] = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_clut[1] = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_scanline[0] = m_scanline[1] = SCANLINE_MIN;
+	m_nb19010_busyflag = 1;
+	m_gfxdraw_mode = 1;
 }
 
-VIDEO_START( nbmj9195_nb22090 )
+VIDEO_START_MEMBER(nbmj9195_state,nbmj9195_nb22090)
 {
-	nbmj9195_state *state = machine.driver_data<nbmj9195_state>();
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
 
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap[0]);
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap[1]);
-	state->m_videoram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
-	state->m_videoram[1] = auto_alloc_array_clear(machine, UINT16, width * height);
-	state->m_videoworkram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
-	state->m_videoworkram[1] = auto_alloc_array_clear(machine, UINT16, width * height);
-	state->m_nb22090_palette = auto_alloc_array(machine, UINT8, 0xc00);
-	state->m_clut[0] = auto_alloc_array(machine, UINT8, 0x1000);
-	state->m_clut[1] = auto_alloc_array(machine, UINT8, 0x1000);
-	state->m_scanline[0] = state->m_scanline[1] = SCANLINE_MIN;
-	state->m_nb19010_busyflag = 1;
-	state->m_gfxdraw_mode = 2;
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmap[0]);
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmap[1]);
+	m_videoram[0] = auto_alloc_array_clear(machine(), UINT16, width * height);
+	m_videoram[1] = auto_alloc_array_clear(machine(), UINT16, width * height);
+	m_videoworkram[0] = auto_alloc_array_clear(machine(), UINT16, width * height);
+	m_videoworkram[1] = auto_alloc_array_clear(machine(), UINT16, width * height);
+	m_nb22090_palette = auto_alloc_array(machine(), UINT8, 0xc00);
+	m_clut[0] = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_clut[1] = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_scanline[0] = m_scanline[1] = SCANLINE_MIN;
+	m_nb19010_busyflag = 1;
+	m_gfxdraw_mode = 2;
 }
 
 /******************************************************************************

@@ -243,18 +243,17 @@ WRITE8_MEMBER(angelkds_state::angelkds_paletteram_w)
 
 */
 
-VIDEO_START( angelkds )
+void angelkds_state::video_start()
 {
-	angelkds_state *state = machine.driver_data<angelkds_state>();
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(angelkds_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_tx_tilemap->set_transparent_pen(0);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(angelkds_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tx_tilemap->set_transparent_pen(0);
 
-	state->m_bgbot_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(angelkds_state::get_bgbot_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bgbot_tilemap->set_transparent_pen(15);
+	m_bgbot_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(angelkds_state::get_bgbot_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bgbot_tilemap->set_transparent_pen(15);
 
-	state->m_bgtop_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(angelkds_state::get_bgtop_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bgtop_tilemap->set_transparent_pen(15);
+	m_bgtop_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(angelkds_state::get_bgtop_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bgtop_tilemap->set_transparent_pen(15);
 }
 
 /* enable bits are uncertain */

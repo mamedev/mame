@@ -16,13 +16,13 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( mrjong )
+void mrjong_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x10);
+	machine().colortable = colortable_alloc(machine(), 0x10);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x10; i++)
@@ -48,7 +48,7 @@ PALETTE_INIT( mrjong )
 		bit2 = BIT(color_prom[i], 7);
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -58,7 +58,7 @@ PALETTE_INIT( mrjong )
 	for (i = 0; i < 0x80; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 
@@ -99,10 +99,9 @@ TILE_GET_INFO_MEMBER(mrjong_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
-VIDEO_START( mrjong )
+void mrjong_state::video_start()
 {
-	mrjong_state *state = machine.driver_data<mrjong_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mrjong_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS_FLIP_XY, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mrjong_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS_FLIP_XY, 8, 8, 32, 32);
 }
 
 /*

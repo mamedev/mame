@@ -40,6 +40,9 @@ public:
 	DECLARE_READ16_MEMBER(volfied_video_ctrl_r);
 	DECLARE_WRITE16_MEMBER(volfied_video_mask_w);
 	DECLARE_WRITE16_MEMBER(volfied_sprite_ctrl_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -55,4 +58,4 @@ void volfied_cchip_reset(running_machine &machine);
 
 
 SCREEN_UPDATE_IND16( volfied );
-VIDEO_START( volfied );
+

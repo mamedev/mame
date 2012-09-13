@@ -70,11 +70,14 @@ public:
 	TILE_GET_INFO_MEMBER(get_joe_tile_info_5);
 	TILE_GET_INFO_MEMBER(get_joe_tile_info_6);
 	TILE_GET_INFO_MEMBER(get_joe_tile_info_7);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/ashnojoe.c -----------*/
 
 
-VIDEO_START( ashnojoe );
+
 SCREEN_UPDATE_IND16( ashnojoe );

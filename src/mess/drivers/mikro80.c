@@ -174,7 +174,6 @@ static MACHINE_CONFIG_START( mikro80, mikro80_state )
 	MCFG_CPU_ADD("maincpu",I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(mikro80_mem)
 	MCFG_CPU_IO_MAP(mikro80_io)
-	MCFG_MACHINE_RESET( mikro80 )
 
 	MCFG_I8255_ADD( "ppi8255", mikro80_ppi8255_interface )
 
@@ -190,7 +189,6 @@ static MACHINE_CONFIG_START( mikro80, mikro80_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START(mikro80)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)

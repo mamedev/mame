@@ -204,7 +204,6 @@ static MACHINE_CONFIG_START( thoop2, thoop2_state )
 	MCFG_GFXDECODE(thoop2)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(thoop2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

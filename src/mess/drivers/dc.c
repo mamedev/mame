@@ -210,7 +210,7 @@ static MACHINE_RESET( dc_console )
 	dc_state *state = machine.driver_data<dc_state>();
 
 	device_t *aica = machine.device("aica");
-	MACHINE_RESET_CALL(dc);
+	state->machine_reset();
 	aica_set_ram_base(aica, state->dc_sound_ram, 2*1024*1024);
 	dreamcast_atapi_reset(machine);
 }
@@ -239,7 +239,6 @@ static MACHINE_CONFIG_START( dc, dc_state )
 	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MCFG_CPU_PROGRAM_MAP(dc_audio_map)
 
-	MCFG_MACHINE_START( dc )
 	MCFG_MACHINE_RESET( dc_console )
 
 	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu", dc_maple_irq )
@@ -258,7 +257,6 @@ static MACHINE_CONFIG_START( dc, dc_state )
 
 	MCFG_PALETTE_LENGTH(0x1000)
 
-	MCFG_VIDEO_START(dc)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("aica", AICA, 0)

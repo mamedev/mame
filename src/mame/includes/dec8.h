@@ -110,12 +110,23 @@ public:
 	TILE_GET_INFO_MEMBER(get_srdarwin_tile_info);
 	TILE_GET_INFO_MEMBER(get_gondo_fix_tile_info);
 	TILE_GET_INFO_MEMBER(get_gondo_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	DECLARE_VIDEO_START(lastmisn);
+	DECLARE_VIDEO_START(shackled);
+	DECLARE_VIDEO_START(gondo);
+	DECLARE_VIDEO_START(garyoret);
+	DECLARE_VIDEO_START(ghostb);
+	DECLARE_PALETTE_INIT(ghostb);
+	DECLARE_VIDEO_START(oscar);
+	DECLARE_VIDEO_START(srdarwin);
+	DECLARE_VIDEO_START(cobracom);
 };
 
 /*----------- defined in video/dec8.c -----------*/
 
 
-PALETTE_INIT( ghostb );
+
 SCREEN_UPDATE_IND16( cobracom );
 SCREEN_UPDATE_IND16( ghostb );
 SCREEN_UPDATE_IND16( srdarwin );
@@ -124,14 +135,14 @@ SCREEN_UPDATE_IND16( garyoret );
 SCREEN_UPDATE_IND16( lastmisn );
 SCREEN_UPDATE_IND16( shackled );
 SCREEN_UPDATE_IND16( oscar );
-VIDEO_START( cobracom );
-VIDEO_START( oscar );
-VIDEO_START( ghostb );
-VIDEO_START( lastmisn );
-VIDEO_START( shackled );
-VIDEO_START( srdarwin );
-VIDEO_START( gondo );
-VIDEO_START( garyoret );
+
+
+
+
+
+
+
+
 
 WRITE8_HANDLER( dec8_bac06_0_w );
 WRITE8_HANDLER( dec8_bac06_1_w );

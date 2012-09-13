@@ -21,10 +21,12 @@ public:
 
 	required_shared_ptr<UINT8> m_vram;
 	DECLARE_READ8_MEMBER(test_r);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
-static VIDEO_START(buster)
+void buster_state::video_start()
 {
 }
 
@@ -318,13 +320,13 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
-static PALETTE_INIT( buster )
+void buster_state::palette_init()
 {
 	int i;
 
 	/* RGB format */
 	for(i=0;i<8;i++)
-		palette_set_color(machine, i, MAKE_RGB(pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2)));
+		palette_set_color(machine(), i, MAKE_RGB(pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2)));
 }
 
 static MACHINE_CONFIG_START( buster, buster_state )
@@ -344,9 +346,7 @@ static MACHINE_CONFIG_START( buster, buster_state )
 
 	MCFG_GFXDECODE(buster)
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(buster)
 
-	MCFG_VIDEO_START(buster)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

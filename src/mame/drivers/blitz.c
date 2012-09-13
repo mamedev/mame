@@ -311,6 +311,8 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_a_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -352,10 +354,9 @@ TILE_GET_INFO_MEMBER(blitz_state::get_bg_tile_info)
 }
 
 
-static VIDEO_START( megadpkr )
+void blitz_state::video_start()
 {
-	blitz_state *state = machine.driver_data<blitz_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blitz_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blitz_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16( megadpkr )
@@ -366,9 +367,9 @@ static SCREEN_UPDATE_IND16( megadpkr )
 }
 
 
-static PALETTE_INIT( megadpkr )
+void blitz_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 /*
     This hardware has a feature called BLUE KILLER.
     Using the original intensity line, the PCB has a bridge
@@ -387,7 +388,7 @@ static PALETTE_INIT( megadpkr )
 
 	if (color_prom == 0) return;
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b, bk;
 
@@ -407,7 +408,7 @@ static PALETTE_INIT( megadpkr )
 		bit2 = (color_prom[i] >> 2) & 0x01;
 		b = bk * (bit2 * 0xff);
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -814,9 +815,7 @@ static MACHINE_CONFIG_START( megadpkr, blitz_state )
 	MCFG_MC6845_ADD("crtc", MC6845, CPU_CLOCK, mc6845_intf)
 
 	MCFG_GFXDECODE(megadpkr)
-	MCFG_PALETTE_INIT(megadpkr)
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_VIDEO_START(megadpkr)
 
 MACHINE_CONFIG_END
 

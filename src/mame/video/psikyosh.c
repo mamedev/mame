@@ -1219,17 +1219,16 @@ static void psikyosh_postlineblend( running_machine &machine, bitmap_rgb32 &bitm
 }
 
 
-VIDEO_START( psikyosh )
+void psikyosh_state::video_start()
 {
-	psikyosh_state *state = machine.driver_data<psikyosh_state>();
-	UINT8 *alphatable = state->m_alphatable;
+	UINT8 *alphatable = m_alphatable;
 
-	machine.primary_screen->register_screen_bitmap(state->m_z_bitmap); /* z-buffer */
-	state->m_zoom_bitmap.allocate(16*16, 16*16); /* temp buffer for assembling sprites */
-	state->m_bg_bitmap.allocate(32*16, 32*16); /* temp buffer for assembling tilemaps */
-	state->m_bg_zoom = auto_alloc_array(machine, UINT16, 256);
+	machine().primary_screen->register_screen_bitmap(m_z_bitmap); /* z-buffer */
+	m_zoom_bitmap.allocate(16*16, 16*16); /* temp buffer for assembling sprites */
+	m_bg_bitmap.allocate(32*16, 32*16); /* temp buffer for assembling tilemaps */
+	m_bg_zoom = auto_alloc_array(machine(), UINT16, 256);
 
-	machine.gfx[1]->set_granularity(16); /* 256 colour sprites with palette selectable on 16 colour boundaries */
+	machine().gfx[1]->set_granularity(16); /* 256 colour sprites with palette selectable on 16 colour boundaries */
 
 	/* Pens 0xc0-0xff have a gradient of alpha values associated with them */
 	int i;
@@ -1245,13 +1244,13 @@ VIDEO_START( psikyosh )
 	/* precompute the background zoom table. verified against hardware.
        unsure of the precision, we use .10 fixed point like the sprites */
 	for(i = 0; i < 0x100; i++) {
-		state->m_bg_zoom[i] = (64 * 0x400) / (i + 64);
+		m_bg_zoom[i] = (64 * 0x400) / (i + 64);
 	}
 
-	state->save_item(NAME(state->m_z_bitmap));
-	state->save_item(NAME(state->m_zoom_bitmap));
-	state->save_item(NAME(state->m_bg_bitmap));
-	state->save_pointer(NAME(state->m_bg_zoom), 256);
+	save_item(NAME(m_z_bitmap));
+	save_item(NAME(m_zoom_bitmap));
+	save_item(NAME(m_bg_bitmap));
+	save_pointer(NAME(m_bg_zoom), 256);
 }
 
 

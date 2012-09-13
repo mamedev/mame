@@ -165,7 +165,7 @@ static MACHINE_CONFIG_START( apogee, apogee_state )
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
     MCFG_CPU_PROGRAM_MAP(apogee_mem)
-    MCFG_MACHINE_RESET( radio86 )
+    MCFG_MACHINE_RESET_OVERRIDE(apogee_state, radio86 )
 
 	MCFG_I8255_ADD( "ppi8255_1", radio86_ppi8255_interface_1 )
 
@@ -182,7 +182,7 @@ static MACHINE_CONFIG_START( apogee, apogee_state )
 
 	MCFG_GFXDECODE(apogee)
 	MCFG_PALETTE_LENGTH(3)
-	MCFG_PALETTE_INIT(radio86)
+	MCFG_PALETTE_INIT_OVERRIDE(apogee_state,radio86)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)

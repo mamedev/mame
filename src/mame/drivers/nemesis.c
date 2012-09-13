@@ -1516,42 +1516,40 @@ static const k007232_interface k007232_config =
 
 /******************************************************************************/
 
-static MACHINE_START( nemesis )
+void nemesis_state::machine_start()
 {
-	nemesis_state *state = machine.driver_data<nemesis_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_vlm = machine.device("vlm");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_vlm = machine().device("vlm");
 
-	state->save_item(NAME(state->m_irq_on));
-	state->save_item(NAME(state->m_irq1_on));
-	state->save_item(NAME(state->m_irq2_on));
-	state->save_item(NAME(state->m_irq4_on));
-	state->save_item(NAME(state->m_frame_counter));
-	state->save_item(NAME(state->m_gx400_irq1_cnt));
-	state->save_item(NAME(state->m_selected_ip));
+	save_item(NAME(m_irq_on));
+	save_item(NAME(m_irq1_on));
+	save_item(NAME(m_irq2_on));
+	save_item(NAME(m_irq4_on));
+	save_item(NAME(m_frame_counter));
+	save_item(NAME(m_gx400_irq1_cnt));
+	save_item(NAME(m_selected_ip));
 
-	state->save_item(NAME(state->m_tilemap_flip));
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_irq_port_last));
+	save_item(NAME(m_tilemap_flip));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_irq_port_last));
 }
 
-static MACHINE_RESET( nemesis )
+void nemesis_state::machine_reset()
 {
-	nemesis_state *state = machine.driver_data<nemesis_state>();
 
-	state->m_irq_on = 0;
-	state->m_irq1_on = 0;
-	state->m_irq2_on = 0;
-	state->m_irq4_on = 0;
-	state->m_gx400_irq1_cnt = 0;
-	state->m_frame_counter = 1;
-	state->m_selected_ip = 0;
+	m_irq_on = 0;
+	m_irq1_on = 0;
+	m_irq2_on = 0;
+	m_irq4_on = 0;
+	m_gx400_irq1_cnt = 0;
+	m_frame_counter = 1;
+	m_selected_ip = 0;
 
-	state->m_flipscreen = 0;
-	state->m_tilemap_flip = 0;
-	state->m_irq_port_last = 0;
+	m_flipscreen = 0;
+	m_tilemap_flip = 0;
+	m_irq_port_last = 0;
 }
 
 static MACHINE_CONFIG_START( nemesis, nemesis_state )
@@ -1565,8 +1563,6 @@ static MACHINE_CONFIG_START( nemesis, nemesis_state )
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4) /* From schematics, should be accurate */
 	MCFG_CPU_PROGRAM_MAP(sound_map)	/* fixed */
 
-	MCFG_MACHINE_START(nemesis)
-	MCFG_MACHINE_RESET(nemesis)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1579,7 +1575,6 @@ static MACHINE_CONFIG_START( nemesis, nemesis_state )
 	MCFG_GFXDECODE(nemesis)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(nemesis)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1611,8 +1606,6 @@ static MACHINE_CONFIG_START( gx400, nemesis_state )
 	MCFG_CPU_PROGRAM_MAP(gx400_sound_map)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)	/* interrupts are triggered by the main CPU */
 
-	MCFG_MACHINE_START(nemesis)
-	MCFG_MACHINE_RESET(nemesis)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1625,7 +1618,6 @@ static MACHINE_CONFIG_START( gx400, nemesis_state )
 	MCFG_GFXDECODE(nemesis)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(nemesis)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1656,8 +1648,6 @@ static MACHINE_CONFIG_START( konamigt, nemesis_state )
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(nemesis)
-	MCFG_MACHINE_RESET(nemesis)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1670,7 +1660,6 @@ static MACHINE_CONFIG_START( konamigt, nemesis_state )
 	MCFG_GFXDECODE(nemesis)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(nemesis)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1699,8 +1688,6 @@ static MACHINE_CONFIG_START( rf2_gx400, nemesis_state )
 	MCFG_CPU_PROGRAM_MAP(gx400_sound_map)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)	/* interrupts are triggered by the main CPU */
 
-	MCFG_MACHINE_START(nemesis)
-	MCFG_MACHINE_RESET(nemesis)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1713,7 +1700,6 @@ static MACHINE_CONFIG_START( rf2_gx400, nemesis_state )
 	MCFG_GFXDECODE(nemesis)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(nemesis)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1744,8 +1730,6 @@ static MACHINE_CONFIG_START( salamand, nemesis_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)         /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(sal_sound_map)
 
-	MCFG_MACHINE_START(nemesis)
-	MCFG_MACHINE_RESET(nemesis)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -1760,7 +1744,6 @@ static MACHINE_CONFIG_START( salamand, nemesis_state )
 	MCFG_GFXDECODE(nemesis)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(nemesis)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1793,8 +1776,6 @@ static MACHINE_CONFIG_START( blkpnthr, nemesis_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)        /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(blkpnthr_sound_map)
 
-	MCFG_MACHINE_START(nemesis)
-	MCFG_MACHINE_RESET(nemesis)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1809,7 +1790,6 @@ static MACHINE_CONFIG_START( blkpnthr, nemesis_state )
 	MCFG_GFXDECODE(nemesis)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(nemesis)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1838,8 +1818,6 @@ static MACHINE_CONFIG_START( citybomb, nemesis_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)        /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(city_sound_map)
 
-	MCFG_MACHINE_START(nemesis)
-	MCFG_MACHINE_RESET(nemesis)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1854,7 +1832,6 @@ static MACHINE_CONFIG_START( citybomb, nemesis_state )
 	MCFG_GFXDECODE(nemesis)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(nemesis)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1887,8 +1864,6 @@ static MACHINE_CONFIG_START( nyanpani, nemesis_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)        /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(city_sound_map)
 
-	MCFG_MACHINE_START(nemesis)
-	MCFG_MACHINE_RESET(nemesis)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1903,7 +1878,6 @@ static MACHINE_CONFIG_START( nyanpani, nemesis_state )
 	MCFG_GFXDECODE(nemesis)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(nemesis)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1936,8 +1910,6 @@ static MACHINE_CONFIG_START( hcrash, nemesis_state )
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)       /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(sal_sound_map)
 
-	MCFG_MACHINE_START(nemesis)
-	MCFG_MACHINE_RESET(nemesis)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1950,7 +1922,6 @@ static MACHINE_CONFIG_START( hcrash, nemesis_state )
 	MCFG_GFXDECODE(nemesis)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(nemesis)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2686,8 +2657,6 @@ static MACHINE_CONFIG_START( bubsys, nemesis_state )
 	MCFG_CPU_PROGRAM_MAP(gx400_sound_map)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)	/* interrupts are triggered by the main CPU */
 
-	MCFG_MACHINE_START(nemesis)
-	MCFG_MACHINE_RESET(nemesis)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2700,7 +2669,6 @@ static MACHINE_CONFIG_START( bubsys, nemesis_state )
 	MCFG_GFXDECODE(nemesis)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(nemesis)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

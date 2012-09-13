@@ -70,10 +70,12 @@ public:
 	TILE_GET_INFO_MEMBER(roz_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(plygonet_scan);
 	TILEMAP_MAPPER_MEMBER(plygonet_scan_cols);
+	virtual void machine_start();
+	virtual void video_start();
 };
 
 /*----------- defined in video/plygonet.c -----------*/
 
-VIDEO_START( polygonet );
+
 SCREEN_UPDATE_IND16( polygonet );
 

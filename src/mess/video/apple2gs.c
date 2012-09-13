@@ -13,14 +13,13 @@
 
 
 
-VIDEO_START( apple2gs )
+VIDEO_START_MEMBER(apple2gs_state,apple2gs)
 {
-	apple2gs_state *state = machine.driver_data<apple2gs_state>();
-	state->m_bordercolor = 0;
-	apple2_video_start(machine, state->m_slowmem, 0x20000, 0, 8);
-	state->m_legacy_gfx = auto_bitmap_ind16_alloc(machine, 560, 192);
+	m_bordercolor = 0;
+	apple2_video_start(machine(), m_slowmem, 0x20000, 0, 8);
+	m_legacy_gfx = auto_bitmap_ind16_alloc(machine(), 560, 192);
 
-	state_save_register_item(machine, "BORDERCLR", NULL, 0, state->m_bordercolor);
+	state_save_register_item(machine(), "BORDERCLR", NULL, 0, m_bordercolor);
 }
 
 

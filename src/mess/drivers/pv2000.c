@@ -60,6 +60,8 @@ public:
 	UINT8 m_key_pressed;
 	UINT8 m_keyb_column;
 	UINT8 m_cass_conf;
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -361,20 +363,19 @@ static const sn76496_config psg_intf =
 };
 
 
-static MACHINE_START( pv2000 )
+void pv2000_state::machine_start()
 {
 }
 
-static MACHINE_RESET( pv2000 )
+void pv2000_state::machine_reset()
 {
-	pv2000_state *state = machine.driver_data<pv2000_state>();
 
-	state->m_last_state = 0;
-	state->m_key_pressed = 0;
-	state->m_keyb_column = 0;
+	m_last_state = 0;
+	m_key_pressed = 0;
+	m_keyb_column = 0;
 
-	machine.device("maincpu")->execute().set_input_line_vector(INPUT_LINE_IRQ0, 0xff);
-	memset(&state->memregion("maincpu")->base()[0x7000], 0xff, 0x1000);	// initialize RAM
+	machine().device("maincpu")->execute().set_input_line_vector(INPUT_LINE_IRQ0, 0xff);
+	memset(&memregion("maincpu")->base()[0x7000], 0xff, 0x1000);	// initialize RAM
 }
 
 static DEVICE_IMAGE_LOAD( pv2000_cart )
@@ -425,8 +426,6 @@ static MACHINE_CONFIG_START( pv2000, pv2000_state )
 	MCFG_CPU_PROGRAM_MAP(pv2000_map)
 	MCFG_CPU_IO_MAP(pv2000_io_map)
 
-	MCFG_MACHINE_START(pv2000)
-	MCFG_MACHINE_RESET(pv2000)
 
 	// video hardware
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, pv2000_tms9928a_interface )

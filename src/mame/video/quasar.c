@@ -19,19 +19,19 @@
 #include "cpu/s2650/s2650.h"
 #include "includes/quasar.h"
 
-PALETTE_INIT( quasar )
+PALETTE_INIT_MEMBER(quasar_state,quasar)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x500);
+	machine().colortable = colortable_alloc(machine(), 0x500);
 
 	/* standard 1 bit per color palette (background and sprites) */
 	for (i = 0; i < 8; i++)
 	{
 		rgb_t color = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
-		colortable_palette_set_color(machine.colortable, i, color);
+		colortable_palette_set_color(machine().colortable, i, color);
 	}
 
 	/* effects color map */
@@ -59,49 +59,48 @@ PALETTE_INIT( quasar )
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
 		/* intensity 0 */
-	    colortable_palette_set_color(machine.colortable, 0x100 + i, RGB_BLACK);
+	    colortable_palette_set_color(machine().colortable, 0x100 + i, RGB_BLACK);
 
 		/* intensity 1 */
 		color = MAKE_RGB(r >> 2, g >> 2, b >> 2);
-	    colortable_palette_set_color(machine.colortable, 0x200 + i, color);
+	    colortable_palette_set_color(machine().colortable, 0x200 + i, color);
 
 		/* intensity 2 */
 		color = MAKE_RGB((r >> 2) + (r >> 3), (g >> 2) + (g >> 3), (b >> 2) + (b >> 2));
-	    colortable_palette_set_color(machine.colortable, 0x300 + i, color);
+	    colortable_palette_set_color(machine().colortable, 0x300 + i, color);
 
 		/* intensity 3 */
 		color = MAKE_RGB(r >> 1, g >> 1, b >> 1);
-	    colortable_palette_set_color(machine.colortable, 0x400 + i, color);
+	    colortable_palette_set_color(machine().colortable, 0x400 + i, color);
 	}
 
 	// Address 0-2 from graphic rom
 	//         3-5 from color ram
 	//         6-8 from sprite chips (Used for priority)
 	for (i = 0; i < 0x200; i++)
-		colortable_entry_set_value(machine.colortable, i, color_prom[i] & 0x07);
+		colortable_entry_set_value(machine().colortable, i, color_prom[i] & 0x07);
 
 	/* background for collision */
 	for (i = 1; i < 8; i++)
-		colortable_entry_set_value(machine.colortable, 0x200 + i, 7);
-	colortable_entry_set_value(machine.colortable, 0x200, 0);
+		colortable_entry_set_value(machine().colortable, 0x200 + i, 7);
+	colortable_entry_set_value(machine().colortable, 0x200, 0);
 
 	/* effects */
 	for (i = 0; i < 0x400; i++)
-		colortable_entry_set_value(machine.colortable, 0x208 + i, 0x100 + i);
+		colortable_entry_set_value(machine().colortable, 0x208 + i, 0x100 + i);
 }
 
 
-VIDEO_START( quasar )
+VIDEO_START_MEMBER(quasar_state,quasar)
 {
-	quasar_state *state = machine.driver_data<quasar_state>();
-	state->m_effectram = auto_alloc_array(machine, UINT8, 0x400);
+	m_effectram = auto_alloc_array(machine(), UINT8, 0x400);
 
 	/* create helper bitmap */
-	machine.primary_screen->register_screen_bitmap(state->m_collision_background);
+	machine().primary_screen->register_screen_bitmap(m_collision_background);
 
 	/* register save */
-	state->save_item(NAME(state->m_collision_background));
-	state->save_pointer(NAME(state->m_effectram), 0x400);
+	save_item(NAME(m_collision_background));
+	save_pointer(NAME(m_effectram), 0x400);
 }
 
 SCREEN_UPDATE_IND16( quasar )

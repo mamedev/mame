@@ -51,6 +51,8 @@ public:
 	cpu_device *m_soundcpu;
 	DECLARE_WRITE16_MEMBER(sound_cmd_w);
 	DECLARE_WRITE8_MEMBER(go2000_pcm_1_bankswitch_w);
+	virtual void machine_start();
+	virtual void video_start();
 };
 
 
@@ -168,7 +170,7 @@ static GFXDECODE_START( go2000 )
 	GFXDECODE_ENTRY( "gfx1", 0, go2000_layout,   0x0, 0x80  ) /* tiles */
 GFXDECODE_END
 
-static VIDEO_START(go2000)
+void go2000_state::video_start()
 {
 }
 
@@ -307,18 +309,17 @@ static SCREEN_UPDATE_IND16(go2000)
 }
 
 
-static MACHINE_START( go2000 )
+void go2000_state::machine_start()
 {
-	go2000_state *state = machine.driver_data<go2000_state>();
-	UINT8 *SOUND = state->memregion("soundcpu")->base();
+	UINT8 *SOUND = memregion("soundcpu")->base();
 	int i;
 
 	for (i = 0; i < 8; i++)
-		state->membank("bank1")->configure_entry(i, &SOUND[0x00400 + i * 0x10000]);
+		membank("bank1")->configure_entry(i, &SOUND[0x00400 + i * 0x10000]);
 
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->set_entry(0);
 
-	state->m_soundcpu = machine.device<cpu_device>("soundcpu");
+	m_soundcpu = machine().device<cpu_device>("soundcpu");
 }
 
 static MACHINE_CONFIG_START( go2000, go2000_state )
@@ -331,7 +332,6 @@ static MACHINE_CONFIG_START( go2000, go2000_state )
 	MCFG_CPU_PROGRAM_MAP(go2000_sound_map)
 	MCFG_CPU_IO_MAP(go2000_sound_io)
 
-	MCFG_MACHINE_START(go2000)
 
 	MCFG_GFXDECODE(go2000)
 
@@ -344,7 +344,6 @@ static MACHINE_CONFIG_START( go2000, go2000_state )
 
 	MCFG_PALETTE_LENGTH(0x800)
 
-	MCFG_VIDEO_START(go2000)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

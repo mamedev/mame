@@ -690,7 +690,7 @@ static MACHINE_CONFIG_START( bbusters, bbusters_state )
 	MCFG_GFXDECODE(bbusters)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(bbuster)
+	MCFG_VIDEO_START_OVERRIDE(bbusters_state,bbuster)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
@@ -728,7 +728,7 @@ static MACHINE_CONFIG_START( mechatt, bbusters_state )
 	MCFG_GFXDECODE(mechatt)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(mechatt)
+	MCFG_VIDEO_START_OVERRIDE(bbusters_state,mechatt)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 

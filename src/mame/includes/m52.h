@@ -31,11 +31,14 @@ public:
 	DECLARE_WRITE8_MEMBER(m52_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(alpha1v_flipscreen_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 /*----------- defined in video/m52.c -----------*/
 
 
-PALETTE_INIT( m52 );
-VIDEO_START( m52 );
+
+
 SCREEN_UPDATE_IND16( m52 );

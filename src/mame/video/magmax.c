@@ -24,13 +24,13 @@ Additional tweaking by Jarek Burczynski
   bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
-PALETTE_INIT( magmax )
+void magmax_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x100);
+	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -39,7 +39,7 @@ PALETTE_INIT( magmax )
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -47,39 +47,38 @@ PALETTE_INIT( magmax )
 
 	/* characters use colors 0-0x0f */
 	for (i = 0; i < 0x10; i++)
-		colortable_entry_set_value(machine.colortable, i, i);
+		colortable_entry_set_value(machine().colortable, i, i);
 
 	/*sprites use colors 0x10-0x1f, color 0x1f being transparent*/
 	for (i = 0x10; i < 0x110; i++)
 	{
 		UINT8 ctabentry = (color_prom[i - 0x10] & 0x0f) | 0x10;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	/* background uses all colors (no lookup table) */
 	for (i = 0x110; i < 0x210; i++)
-		colortable_entry_set_value(machine.colortable, i, i - 0x110);
+		colortable_entry_set_value(machine().colortable, i, i - 0x110);
 
 }
 
-VIDEO_START( magmax )
+void magmax_state::video_start()
 {
-	magmax_state *state = machine.driver_data<magmax_state>();
 	int i,v;
-	UINT8 * prom14D = state->memregion("user2")->base();
+	UINT8 * prom14D = memregion("user2")->base();
 
 	/* Set up save state */
-	state_save_register_global(machine, state->m_flipscreen);
+	state_save_register_global(machine(), m_flipscreen);
 
-	state->m_prom_tab = auto_alloc_array(machine, UINT32, 256);
+	m_prom_tab = auto_alloc_array(machine(), UINT32, 256);
 
-	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_bitmap);
 
 	/* Allocate temporary bitmap */
 	for (i=0; i<256; i++)
 	{
 		v = (prom14D[i] << 4) + prom14D[i + 0x100];
-		state->m_prom_tab[i] = ((v&0x1f)<<8) | ((v&0x10)<<10) | ((v&0xe0)>>1); /*convert data into more useful format*/
+		m_prom_tab[i] = ((v&0x1f)<<8) | ((v&0x10)<<10) | ((v&0xe0)>>1); /*convert data into more useful format*/
 	}
 }
 

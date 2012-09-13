@@ -16,17 +16,17 @@ WRITE16_MEMBER(rohga_state::rohga_buffer_spriteram16_w)
 	m_spriteram->copy();
 }
 
-VIDEO_START( rohga )
+VIDEO_START_MEMBER(rohga_state,rohga)
 {
-	machine.device<decospr_device>("spritegen1")->set_col_callback(rohga_col_callback);
-	machine.device<decospr_device>("spritegen1")->set_pri_callback(rohga_pri_callback);
+	machine().device<decospr_device>("spritegen1")->set_col_callback(rohga_col_callback);
+	machine().device<decospr_device>("spritegen1")->set_pri_callback(rohga_pri_callback);
 }
 
-VIDEO_START( schmeisr )
+VIDEO_START_MEMBER(rohga_state,schmeisr)
 {
-	VIDEO_START_CALL( rohga );
+	VIDEO_START_CALL_MEMBER( rohga );
 	// wire mods on pcb..
-	machine.device<decospr_device>("spritegen1")->set_col_callback(schmeisr_col_callback);
+	machine().device<decospr_device>("spritegen1")->set_col_callback(schmeisr_col_callback);
 }
 
 
@@ -112,10 +112,10 @@ SCREEN_UPDATE_IND16( rohga )
 
 
 
-VIDEO_START(wizdfire)
+VIDEO_START_MEMBER(rohga_state,wizdfire)
 {
-	machine.device<decospr_device>("spritegen1")->alloc_sprite_bitmap();
-	machine.device<decospr_device>("spritegen2")->alloc_sprite_bitmap();
+	machine().device<decospr_device>("spritegen1")->alloc_sprite_bitmap();
+	machine().device<decospr_device>("spritegen2")->alloc_sprite_bitmap();
 }
 
 // not amazingly efficient, called multiple times to pull a layer out of the sprite bitmaps, but keeps correct sprite<->sprite priorities

@@ -13,10 +13,9 @@
 
 
 
-VIDEO_START( ondra )
+void ondra_state::video_start()
 {
-	ondra_state *state = machine.driver_data<ondra_state>();
-	state->m_video_enable = 0;
+	m_video_enable = 0;
 }
 
 SCREEN_UPDATE_IND16( ondra )

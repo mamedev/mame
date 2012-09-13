@@ -24,12 +24,14 @@ public:
 	DECLARE_WRITE8_MEMBER(vigilant_horiz_scroll_w);
 	DECLARE_WRITE8_MEMBER(vigilant_rear_horiz_scroll_w);
 	DECLARE_WRITE8_MEMBER(vigilant_rear_color_w);
+	virtual void video_start();
+	virtual void video_reset();
 };
 
 
 /*----------- defined in video/vigilant.c -----------*/
 
-VIDEO_START( vigilant );
-VIDEO_RESET( vigilant );
+
+
 SCREEN_UPDATE_IND16( vigilant );
 SCREEN_UPDATE_IND16( kikcubic );

@@ -686,10 +686,10 @@ INPUT_PORTS_END
     PALETTE_INIT( px8 )
 -------------------------------------------------*/
 
-static PALETTE_INIT( px8 )
+void px8_state::palette_init()
 {
-    palette_set_color_rgb(machine, 0, 0xa5, 0xad, 0xa5);
-    palette_set_color_rgb(machine, 1, 0x31, 0x39, 0x10);
+    palette_set_color_rgb(machine(), 0, 0xa5, 0xad, 0xa5);
+    palette_set_color_rgb(machine(), 1, 0x31, 0x39, 0x10);
 }
 
 /*-------------------------------------------------
@@ -819,7 +819,6 @@ static MACHINE_CONFIG_START( px8, px8_state )
 
 	MCFG_GFXDECODE(px8)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(px8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

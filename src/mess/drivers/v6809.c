@@ -79,6 +79,8 @@ public:
 	UINT8 m_video_index;
 	UINT8 m_term_data;
 	UINT8 m_vidbyte;
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -167,11 +169,10 @@ MC6845_ON_UPDATE_ADDR_CHANGED( v6809_update_addr )
 	state->m_video_address = address & 0x7ff;
 }
 
-static VIDEO_START( v6809 )
+void v6809_state::video_start()
 {
-	v6809_state *state = machine.driver_data<v6809_state>();
-	state->m_p_chargen = machine.root_device().memregion("chargen")->base();
-	state->m_p_videoram = state->memregion("videoram")->base();
+	m_p_chargen = machine().root_device().memregion("chargen")->base();
+	m_p_videoram = memregion("videoram")->base();
 }
 
 static const mc6845_interface v6809_crtc = {
@@ -242,7 +243,7 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 
 // *** Machine ****
 
-static MACHINE_RESET(v6809)
+void v6809_state::machine_reset()
 {
 }
 
@@ -252,7 +253,6 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_CPU_PROGRAM_MAP(v6809_mem)
 	MCFG_CPU_IO_MAP(v6809_io)
 
-	MCFG_MACHINE_RESET(v6809)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -261,7 +261,6 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
-	MCFG_VIDEO_START(v6809)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 	MCFG_GFXDECODE(v6809)

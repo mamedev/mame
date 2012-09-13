@@ -89,24 +89,23 @@ TILE_GET_INFO_MEMBER(prehisle_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-VIDEO_START( prehisle )
+void prehisle_state::video_start()
 {
-	prehisle_state *state = machine.driver_data<prehisle_state>();
 
-	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(prehisle_state::get_bg2_tile_info),state), TILEMAP_SCAN_COLS,
+	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(prehisle_state::get_bg2_tile_info),this), TILEMAP_SCAN_COLS,
 		 16, 16, 1024, 32);
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(prehisle_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS,
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(prehisle_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
 		 16, 16, 256, 32);
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(prehisle_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(prehisle_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 
-	state->m_bg_tilemap->set_transparent_pen(15);
-	state->m_fg_tilemap->set_transparent_pen(15);
+	m_bg_tilemap->set_transparent_pen(15);
+	m_fg_tilemap->set_transparent_pen(15);
 
 	/* register for saving */
-	state->save_item(NAME(state->m_invert_controls));
+	save_item(NAME(m_invert_controls));
 }
 
 /* sprite layout

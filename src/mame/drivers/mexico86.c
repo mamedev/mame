@@ -419,56 +419,54 @@ static const ym2203_interface ym2203_config =
  *
  *************************************/
 
-static MACHINE_START( mexico86 )
+void mexico86_state::machine_start()
 {
-	mexico86_state *state = machine.driver_data<mexico86_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_subcpu = machine.device<cpu_device>("sub");
-	state->m_mcu = machine.device("mcu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_subcpu = machine().device<cpu_device>("sub");
+	m_mcu = machine().device("mcu");
 
-	state->save_item(NAME(state->m_port_a_in));
-	state->save_item(NAME(state->m_port_a_out));
-	state->save_item(NAME(state->m_ddr_a));
-	state->save_item(NAME(state->m_port_b_in));
-	state->save_item(NAME(state->m_port_b_out));
-	state->save_item(NAME(state->m_ddr_b));
-	state->save_item(NAME(state->m_address));
-	state->save_item(NAME(state->m_latch));
+	save_item(NAME(m_port_a_in));
+	save_item(NAME(m_port_a_out));
+	save_item(NAME(m_ddr_a));
+	save_item(NAME(m_port_b_in));
+	save_item(NAME(m_port_b_out));
+	save_item(NAME(m_ddr_b));
+	save_item(NAME(m_address));
+	save_item(NAME(m_latch));
 
-	state->save_item(NAME(state->m_mcu_running));
-	state->save_item(NAME(state->m_mcu_initialised));
-	state->save_item(NAME(state->m_coin_last));
+	save_item(NAME(m_mcu_running));
+	save_item(NAME(m_mcu_initialised));
+	save_item(NAME(m_coin_last));
 
-	state->save_item(NAME(state->m_charbank));
+	save_item(NAME(m_charbank));
 }
 
-static MACHINE_RESET( mexico86 )
+void mexico86_state::machine_reset()
 {
-	mexico86_state *state = machine.driver_data<mexico86_state>();
 
 	/*TODO: check the PCB and see how the halt / reset lines are connected. */
-	if (machine.device("sub") != NULL)
-		machine.device("sub")->execute().set_input_line(INPUT_LINE_RESET, (state->ioport("DSW1")->read() & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	if (machine().device("sub") != NULL)
+		machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, (ioport("DSW1")->read() & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 
-	state->m_port_a_in = 0;
-	state->m_port_a_out = 0;
-	state->m_ddr_a = 0;
-	state->m_port_b_in = 0;
-	state->m_port_b_out = 0;
-	state->m_ddr_b = 0;
-	state->m_address = 0;
-	state->m_latch = 0;
+	m_port_a_in = 0;
+	m_port_a_out = 0;
+	m_ddr_a = 0;
+	m_port_b_in = 0;
+	m_port_b_out = 0;
+	m_ddr_b = 0;
+	m_address = 0;
+	m_latch = 0;
 
-	state->m_mcu_running = 0;
-	state->m_mcu_initialised = 0;
-	state->m_coin_last = 0;
+	m_mcu_running = 0;
+	m_mcu_initialised = 0;
+	m_coin_last = 0;
 
-	state->m_charbank = 0;
+	m_charbank = 0;
 }
 
 static MACHINE_CONFIG_START( mexico86, mexico86_state )
@@ -491,8 +489,6 @@ static MACHINE_CONFIG_START( mexico86, mexico86_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs */
 
-	MCFG_MACHINE_START(mexico86)
-	MCFG_MACHINE_RESET(mexico86)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

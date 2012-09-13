@@ -19,10 +19,11 @@ public:
 	DECLARE_WRITE16_MEMBER(targeth_vram_w);
 	TILE_GET_INFO_MEMBER(get_tile_info_targeth_screen0);
 	TILE_GET_INFO_MEMBER(get_tile_info_targeth_screen1);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/targeth.c -----------*/
 
-VIDEO_START( targeth );
+
 SCREEN_UPDATE_IND16( targeth );

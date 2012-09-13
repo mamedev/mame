@@ -207,7 +207,6 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 	MCFG_CPU_IO_MAP(pk8020_io)
 	MCFG_CPU_VBLANK_INT("screen", pk8020_interrupt)
 
-	MCFG_MACHINE_RESET( pk8020 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -219,9 +218,7 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 
 	MCFG_GFXDECODE(pk8020)
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT(pk8020)
 
-	MCFG_VIDEO_START(pk8020)
 
 	MCFG_I8255_ADD( "ppi8255_1", pk8020_ppi8255_interface_1 )
 	MCFG_I8255_ADD( "ppi8255_2", pk8020_ppi8255_interface_2 )

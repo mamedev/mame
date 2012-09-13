@@ -10,13 +10,13 @@
 #include "video/konicdev.h"
 #include "includes/combatsc.h"
 
-PALETTE_INIT( combatsc )
+PALETTE_INIT_MEMBER(combatsc_state,combatsc)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int pal;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x80);
+	machine().colortable = colortable_alloc(machine(), 0x80);
 
 	for (pal = 0; pal < 8; pal++)
 	{
@@ -55,19 +55,19 @@ PALETTE_INIT( combatsc )
 			else
 				ctabentry = (pal << 4) | (color_prom[(clut << 8) | i] & 0x0f);
 
-			colortable_entry_set_value(machine.colortable, (pal << 8) | i, ctabentry);
+			colortable_entry_set_value(machine().colortable, (pal << 8) | i, ctabentry);
 		}
 	}
 }
 
 
-PALETTE_INIT( combatscb )
+PALETTE_INIT_MEMBER(combatsc_state,combatscb)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int pal;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x80);
+	machine().colortable = colortable_alloc(machine(), 0x80);
 
 	for (pal = 0; pal < 8; pal++)
 	{
@@ -84,7 +84,7 @@ PALETTE_INIT( combatscb )
 				/* chars - no lookup? */
 				ctabentry = (pal << 4) | (i & 0x0f);	/* no lookup? */
 
-			colortable_entry_set_value(machine.colortable, (pal << 8) | i, ctabentry);
+			colortable_entry_set_value(machine().colortable, (pal << 8) | i, ctabentry);
 		}
 	}
 }
@@ -278,47 +278,45 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_text_info_bootleg)
 
 ***************************************************************************/
 
-VIDEO_START( combatsc )
+VIDEO_START_MEMBER(combatsc_state,combatsc)
 {
-	combatsc_state *state = machine.driver_data<combatsc_state>();
 
-	state->m_bg_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info0),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_textlayer =  &machine.tilemap().create(tilemap_get_info_delegate(FUNC(combatsc_state::get_text_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_textlayer =  &machine().tilemap().create(tilemap_get_info_delegate(FUNC(combatsc_state::get_text_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_spriteram[0] = auto_alloc_array_clear(machine, UINT8, 0x800);
-	state->m_spriteram[1] = auto_alloc_array_clear(machine, UINT8, 0x800);
+	m_spriteram[0] = auto_alloc_array_clear(machine(), UINT8, 0x800);
+	m_spriteram[1] = auto_alloc_array_clear(machine(), UINT8, 0x800);
 
-	state->m_bg_tilemap[0]->set_transparent_pen(0);
-	state->m_bg_tilemap[1]->set_transparent_pen(0);
-	state->m_textlayer->set_transparent_pen(0);
+	m_bg_tilemap[0]->set_transparent_pen(0);
+	m_bg_tilemap[1]->set_transparent_pen(0);
+	m_textlayer->set_transparent_pen(0);
 
-	state->m_textlayer->set_scroll_rows(32);
+	m_textlayer->set_scroll_rows(32);
 
-	state->save_pointer(NAME(state->m_spriteram[0]), 0x800);
-	state->save_pointer(NAME(state->m_spriteram[1]), 0x800);
+	save_pointer(NAME(m_spriteram[0]), 0x800);
+	save_pointer(NAME(m_spriteram[1]), 0x800);
 }
 
-VIDEO_START( combatscb )
+VIDEO_START_MEMBER(combatsc_state,combatscb)
 {
-	combatsc_state *state = machine.driver_data<combatsc_state>();
 
-	state->m_bg_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info0_bootleg),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1_bootleg),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_textlayer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(combatsc_state::get_text_info_bootleg),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info0_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_textlayer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(combatsc_state::get_text_info_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_spriteram[0] = auto_alloc_array_clear(machine, UINT8, 0x800);
-	state->m_spriteram[1] = auto_alloc_array_clear(machine, UINT8, 0x800);
+	m_spriteram[0] = auto_alloc_array_clear(machine(), UINT8, 0x800);
+	m_spriteram[1] = auto_alloc_array_clear(machine(), UINT8, 0x800);
 
-	state->m_bg_tilemap[0]->set_transparent_pen(0);
-	state->m_bg_tilemap[1]->set_transparent_pen(0);
-	state->m_textlayer->set_transparent_pen(0);
+	m_bg_tilemap[0]->set_transparent_pen(0);
+	m_bg_tilemap[1]->set_transparent_pen(0);
+	m_textlayer->set_transparent_pen(0);
 
-	state->m_bg_tilemap[0]->set_scroll_rows(32);
-	state->m_bg_tilemap[1]->set_scroll_rows(32);
+	m_bg_tilemap[0]->set_scroll_rows(32);
+	m_bg_tilemap[1]->set_scroll_rows(32);
 
-	state->save_pointer(NAME(state->m_spriteram[0]), 0x800);
-	state->save_pointer(NAME(state->m_spriteram[1]), 0x800);
+	save_pointer(NAME(m_spriteram[0]), 0x800);
+	save_pointer(NAME(m_spriteram[1]), 0x800);
 }
 
 /***************************************************************************

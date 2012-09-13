@@ -447,10 +447,9 @@ static const ymf262_interface tecmosys_ymf262_interface =
 	sound_irq		/* irq */
 };
 
-static MACHINE_START( tecmosys )
+void tecmosys_state::machine_start()
 {
-	tecmosys_state *state = machine.driver_data<tecmosys_state>();
-	state->membank("bank1")->configure_entries(0, 16, state->memregion("audiocpu")->base(), 0x4000);
+	membank("bank1")->configure_entries(0, 16, memregion("audiocpu")->base(), 0x4000);
 }
 
 static MACHINE_CONFIG_START( deroon, tecmosys_state )
@@ -463,7 +462,6 @@ static MACHINE_CONFIG_START( deroon, tecmosys_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(io_map)
 
-	MCFG_MACHINE_START(tecmosys)
 
 	MCFG_GFXDECODE(tecmosys)
 
@@ -480,7 +478,6 @@ static MACHINE_CONFIG_START( deroon, tecmosys_state )
 
 	MCFG_PALETTE_LENGTH(0x4000+0x800)
 
-	MCFG_VIDEO_START(tecmosys)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

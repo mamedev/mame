@@ -7,9 +7,12 @@
 #include "emu.h"
 #include "includes/galaxold.h"
 
-#define STARS_COLOR_BASE		(machine.root_device().memregion("proms")->bytes())
+#define STARS_COLOR_BASE_LEGACY	(machine.root_device().memregion("proms")->bytes())
+#define STARS_COLOR_BASE		(machine().root_device().memregion("proms")->bytes())
 #define BULLETS_COLOR_BASE		(STARS_COLOR_BASE + 64)
+#define BULLETS_COLOR_BASE_LEGACY		(STARS_COLOR_BASE_LEGACY + 64)
 #define BACKGROUND_COLOR_BASE	(BULLETS_COLOR_BASE + 2)
+#define BACKGROUND_COLOR_BASE_LEGACY	(BULLETS_COLOR_BASE_LEGACY + 2)
 
 
 
@@ -92,14 +95,14 @@ static void dambustr_draw_background(running_machine &machine, bitmap_ind16 &bit
   The RGB outputs have a 470 ohm pull-down each.
 
 ***************************************************************************/
-PALETTE_INIT( galaxold )
+PALETTE_INIT_MEMBER(galaxold_state,galaxold)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i, len;
 
 
 	/* first, the character/sprite palette */
-	len = machine.root_device().memregion("proms")->bytes();
+	len = machine().root_device().memregion("proms")->bytes();
 	for (i = 0;i < len;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
@@ -119,36 +122,36 @@ PALETTE_INIT( galaxold )
 		bit1 = BIT(*color_prom,7);
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color_rgb(machine,i,r,g,b);
+		palette_set_color_rgb(machine(),i,r,g,b);
 		color_prom++;
 	}
 
 
-	galaxold_init_stars(machine, STARS_COLOR_BASE);
+	galaxold_init_stars(machine(), STARS_COLOR_BASE);
 
 
 	/* bullets - yellow and white */
-	palette_set_color(machine,BULLETS_COLOR_BASE+0,MAKE_RGB(0xef,0xef,0x00));
-	palette_set_color(machine,BULLETS_COLOR_BASE+1,MAKE_RGB(0xef,0xef,0xef));
+	palette_set_color(machine(),BULLETS_COLOR_BASE+0,MAKE_RGB(0xef,0xef,0x00));
+	palette_set_color(machine(),BULLETS_COLOR_BASE+1,MAKE_RGB(0xef,0xef,0xef));
 }
 
-PALETTE_INIT( scrambold )
+PALETTE_INIT_MEMBER(galaxold_state,scrambold)
 {
-	PALETTE_INIT_CALL(galaxold);
+	PALETTE_INIT_CALL_MEMBER(galaxold);
 
 
 	/* blue background - 390 ohm resistor */
-	palette_set_color(machine,BACKGROUND_COLOR_BASE,MAKE_RGB(0,0,0x56));
+	palette_set_color(machine(),BACKGROUND_COLOR_BASE,MAKE_RGB(0,0,0x56));
 }
 
 
-PALETTE_INIT( stratgyx )
+PALETTE_INIT_MEMBER(galaxold_state,stratgyx)
 {
 	int base = BACKGROUND_COLOR_BASE;
 	int i;
 
 
-	PALETTE_INIT_CALL(galaxold);
+	PALETTE_INIT_CALL_MEMBER(galaxold);
 
 
 	/*  The background color generator is connected this way:
@@ -163,18 +166,18 @@ PALETTE_INIT( stratgyx )
 		int g = BIT(i,1) * 0x3c;
 		int b = BIT(i,2) * 0x47;
 
-		palette_set_color_rgb(machine,base+i,r,g,b);
+		palette_set_color_rgb(machine(),base+i,r,g,b);
 	}
 }
 
-PALETTE_INIT( rockclim )
+PALETTE_INIT_MEMBER(galaxold_state,rockclim)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i, len;
 
 
 	/* first, the character/sprite palette */
-	len = machine.root_device().memregion("proms")->bytes();
+	len = machine().root_device().memregion("proms")->bytes();
 	for (i = 0;i < len;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
@@ -194,7 +197,7 @@ PALETTE_INIT( rockclim )
 		bit1 = BIT(*color_prom,7);
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color_rgb(machine,i,r,g,b);
+		palette_set_color_rgb(machine(),i,r,g,b);
 		color_prom++;
 	}
 }
@@ -216,9 +219,9 @@ PALETTE_INIT( rockclim )
   The RGB outputs have a 470 ohm pull-down each.
 
 ***************************************************************************/
-PALETTE_INIT( darkplnt )
+PALETTE_INIT_MEMBER(galaxold_state,darkplnt)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 
@@ -241,23 +244,23 @@ PALETTE_INIT( darkplnt )
 		bit2 = BIT(*color_prom,5);
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color_rgb(machine,i,r,g,b);
+		palette_set_color_rgb(machine(),i,r,g,b);
 		color_prom++;
 	}
 
 
 	/* bullets - red and blue */
-	palette_set_color(machine,BULLETS_COLOR_BASE+0,MAKE_RGB(0xef,0x00,0x00));
-	palette_set_color(machine,BULLETS_COLOR_BASE+1,MAKE_RGB(0x00,0x00,0xef));
+	palette_set_color(machine(),BULLETS_COLOR_BASE+0,MAKE_RGB(0xef,0x00,0x00));
+	palette_set_color(machine(),BULLETS_COLOR_BASE+1,MAKE_RGB(0x00,0x00,0xef));
 }
 
-PALETTE_INIT( minefld )
+PALETTE_INIT_MEMBER(galaxold_state,minefld)
 {
 	int base = BACKGROUND_COLOR_BASE;
 	int i;
 
 
-	PALETTE_INIT_CALL(galaxold);
+	PALETTE_INIT_CALL_MEMBER(galaxold);
 
 
 	/* set up background colors */
@@ -269,7 +272,7 @@ PALETTE_INIT( minefld )
 		int r = 0;
 		int g = i;
 		int b = i * 2;
-		palette_set_color_rgb(machine,base+i,r,g,b);
+		palette_set_color_rgb(machine(),base+i,r,g,b);
 	}
 
 	/* graduated brown */
@@ -279,17 +282,17 @@ PALETTE_INIT( minefld )
 		int r = i * 1.5;
 		int g = i * 0.75;
 		int b = i / 2;
-		palette_set_color_rgb(machine,base+128+i,r,g,b);
+		palette_set_color_rgb(machine(),base+128+i,r,g,b);
 	}
 }
 
-PALETTE_INIT( rescue )
+PALETTE_INIT_MEMBER(galaxold_state,rescue)
 {
 	int base = BACKGROUND_COLOR_BASE;
 	int i;
 
 
-	PALETTE_INIT_CALL(galaxold);
+	PALETTE_INIT_CALL_MEMBER(galaxold);
 
 
 	/* set up background colors */
@@ -301,17 +304,17 @@ PALETTE_INIT( rescue )
 		int r = 0;
 		int g = i;
 		int b = i * 2;
-		palette_set_color_rgb(machine,base+i,r,g,b);
+		palette_set_color_rgb(machine(),base+i,r,g,b);
 	}
 }
 
-PALETTE_INIT( mariner )
+PALETTE_INIT_MEMBER(galaxold_state,mariner)
 {
 	int base = BACKGROUND_COLOR_BASE;
 	int i;
 
 
-	PALETTE_INIT_CALL(galaxold);
+	PALETTE_INIT_CALL_MEMBER(galaxold);
 
 
 	/* set up background colors */
@@ -331,19 +334,19 @@ PALETTE_INIT( mariner )
 		g = 0;
 		b = 0x0e * BIT(i,0) + 0x1f * BIT(i,1) + 0x43 * BIT(i,2) + 0x8f * BIT(i,3);
 
-		palette_set_color_rgb(machine,base+i,r,g,b);
+		palette_set_color_rgb(machine(),base+i,r,g,b);
 	}
 }
 
 /* swapped r/g/b hook-up */
-PALETTE_INIT( dambustr )
+PALETTE_INIT_MEMBER(galaxold_state,dambustr)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int base = BACKGROUND_COLOR_BASE;
 	int i, len;
 
 	/* first, the character/sprite palette */
-	len = machine.root_device().memregion("proms")->bytes();
+	len = machine().root_device().memregion("proms")->bytes();
 
 	for (i = 0;i < len;i++)
 	{
@@ -364,17 +367,17 @@ PALETTE_INIT( dambustr )
 		bit1 = BIT(*color_prom,7);
 		g = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color_rgb(machine,i,r,g,b);
+		palette_set_color_rgb(machine(),i,r,g,b);
 		color_prom++;
 	}
 
 
-	galaxold_init_stars(machine, STARS_COLOR_BASE);
+	galaxold_init_stars(machine(), STARS_COLOR_BASE);
 
 
 	/* bullets - yellow and white */
-	palette_set_color(machine,BULLETS_COLOR_BASE+0,MAKE_RGB(0xef,0xef,0x00));
-	palette_set_color(machine,BULLETS_COLOR_BASE+1,MAKE_RGB(0xef,0xef,0xef));
+	palette_set_color(machine(),BULLETS_COLOR_BASE+0,MAKE_RGB(0xef,0xef,0x00));
+	palette_set_color(machine(),BULLETS_COLOR_BASE+1,MAKE_RGB(0xef,0xef,0xef));
 
 	/*
     Assumption (not clear from the schematics):
@@ -390,18 +393,18 @@ PALETTE_INIT( dambustr )
 		int r = BIT(i,0) * 0x47;
 		int g = BIT(i,1) * 0x47;
 		int b = BIT(i,2) * 0x4f;
-		palette_set_color_rgb(machine,base+i,r,g,b);
+		palette_set_color_rgb(machine(),base+i,r,g,b);
 	}
 }
 
 
-PALETTE_INIT( turtles )
+PALETTE_INIT_MEMBER(galaxold_state,turtles)
 {
 	int base = BACKGROUND_COLOR_BASE;
 	int i;
 
 
-	PALETTE_INIT_CALL(galaxold);
+	PALETTE_INIT_CALL_MEMBER(galaxold);
 
 
 	/*  The background color generator is connected this way:
@@ -416,7 +419,7 @@ PALETTE_INIT( turtles )
 		int g = BIT(i,1) * 0x47;
 		int b = BIT(i,2) * 0x55;
 
-		palette_set_color_rgb(machine,base+i,r,g,b);
+		palette_set_color_rgb(machine(),base+i,r,g,b);
 	}
 }
 
@@ -474,130 +477,118 @@ static void video_start_common(running_machine &machine)
 	state_save_register(machine);
 }
 
-VIDEO_START( galaxold_plain )
+VIDEO_START_MEMBER(galaxold_state,galaxold_plain)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	video_start_common(machine);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
-	state->m_bg_tilemap->set_transparent_pen(0);
+	video_start_common(machine());
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap->set_scroll_cols(32);
+	m_bg_tilemap->set_scroll_cols(32);
 
-	state->m_color_mask = (machine.gfx[0]->granularity() == 4) ? 7 : 3;
+	m_color_mask = (machine().gfx[0]->granularity() == 4) ? 7 : 3;
 }
 
-VIDEO_START( galaxold )
+VIDEO_START_MEMBER(galaxold_state,galaxold)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	VIDEO_START_CALL(galaxold_plain);
+	VIDEO_START_CALL_MEMBER(galaxold_plain);
 
-	state->m_draw_stars = galaxold_draw_stars;
+	m_draw_stars = galaxold_draw_stars;
 
-	state->m_draw_bullets = galaxold_draw_bullets;
+	m_draw_bullets = galaxold_draw_bullets;
 }
 
-VIDEO_START( scrambold )
+VIDEO_START_MEMBER(galaxold_state,scrambold)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	VIDEO_START_CALL(galaxold_plain);
+	VIDEO_START_CALL_MEMBER(galaxold_plain);
 
 	/* FIXME: This most probably needs to be adjusted
      * again when RAW video params are added to scramble
      */
-	state->m_bg_tilemap->set_scrolldx(0, 0);
+	m_bg_tilemap->set_scrolldx(0, 0);
 
-	state->m_draw_stars = scrambold_draw_stars;
+	m_draw_stars = scrambold_draw_stars;
 
-	state->m_draw_bullets = scrambold_draw_bullets;
+	m_draw_bullets = scrambold_draw_bullets;
 
-	state->m_draw_background = scrambold_draw_background;
+	m_draw_background = scrambold_draw_background;
 }
 
-VIDEO_START( darkplnt )
+VIDEO_START_MEMBER(galaxold_state,darkplnt)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	VIDEO_START_CALL(galaxold_plain);
+	VIDEO_START_CALL_MEMBER(galaxold_plain);
 
-	state->m_bg_tilemap->set_scrolldx(0, 0);
-	state->m_draw_bullets = darkplnt_draw_bullets;
+	m_bg_tilemap->set_scrolldx(0, 0);
+	m_draw_bullets = darkplnt_draw_bullets;
 }
 
-VIDEO_START( rescue )
+VIDEO_START_MEMBER(galaxold_state,rescue)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	VIDEO_START_CALL(scrambold);
+	VIDEO_START_CALL_MEMBER(scrambold);
 
-	state->m_draw_stars = rescue_draw_stars;
+	m_draw_stars = rescue_draw_stars;
 
-	state->m_draw_background = rescue_draw_background;
+	m_draw_background = rescue_draw_background;
 }
 
-VIDEO_START( minefld )
+VIDEO_START_MEMBER(galaxold_state,minefld)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	VIDEO_START_CALL(scrambold);
+	VIDEO_START_CALL_MEMBER(scrambold);
 
-	state->m_draw_stars = rescue_draw_stars;
+	m_draw_stars = rescue_draw_stars;
 
-	state->m_draw_background = minefld_draw_background;
+	m_draw_background = minefld_draw_background;
 }
 
-VIDEO_START( stratgyx )
+VIDEO_START_MEMBER(galaxold_state,stratgyx)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	VIDEO_START_CALL(galaxold_plain);
+	VIDEO_START_CALL_MEMBER(galaxold_plain);
 
-	state->m_draw_background = stratgyx_draw_background;
+	m_draw_background = stratgyx_draw_background;
 }
 
-VIDEO_START( ckongs )
+VIDEO_START_MEMBER(galaxold_state,ckongs)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	VIDEO_START_CALL(scrambold);
+	VIDEO_START_CALL_MEMBER(scrambold);
 
-	state->m_modify_spritecode = mshuttle_modify_spritecode;
+	m_modify_spritecode = mshuttle_modify_spritecode;
 }
 
-VIDEO_START( mariner )
+VIDEO_START_MEMBER(galaxold_state,mariner)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	VIDEO_START_CALL(galaxold_plain);
+	VIDEO_START_CALL_MEMBER(galaxold_plain);
 
-	state->m_draw_stars = mariner_draw_stars;
+	m_draw_stars = mariner_draw_stars;
 
-	state->m_draw_bullets = scrambold_draw_bullets;
+	m_draw_bullets = scrambold_draw_bullets;
 
-	state->m_draw_background = mariner_draw_background;
+	m_draw_background = mariner_draw_background;
 
-	state->m_modify_charcode = mariner_modify_charcode;
+	m_modify_charcode = mariner_modify_charcode;
 }
 
-VIDEO_START( mimonkey )
+VIDEO_START_MEMBER(galaxold_state,mimonkey)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	VIDEO_START_CALL(scrambold);
+	VIDEO_START_CALL_MEMBER(scrambold);
 
-	state->m_modify_charcode   = mimonkey_modify_charcode;
-	state->m_modify_spritecode = mimonkey_modify_spritecode;
+	m_modify_charcode   = mimonkey_modify_charcode;
+	m_modify_spritecode = mimonkey_modify_spritecode;
 }
 
-VIDEO_START( dkongjrm )
+VIDEO_START_MEMBER(galaxold_state,dkongjrm)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	VIDEO_START_CALL(galaxold_plain);
+	VIDEO_START_CALL_MEMBER(galaxold_plain);
 
-	state->m_modify_charcode   = pisces_modify_charcode;
-	state->m_modify_spritecode = dkongjrm_modify_spritecode;
+	m_modify_charcode   = pisces_modify_charcode;
+	m_modify_spritecode = dkongjrm_modify_spritecode;
 
-	state->m_spriteram2_present= 1;
+	m_spriteram2_present= 1;
 }
 
-VIDEO_START( scorpion )
+VIDEO_START_MEMBER(galaxold_state,scorpion)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	VIDEO_START_CALL(scrambold);
+	VIDEO_START_CALL_MEMBER(scrambold);
 
-	state->m_modify_spritecode = batman2_modify_spritecode;
+	m_modify_spritecode = batman2_modify_spritecode;
 }
 
 static void pisces_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
@@ -606,13 +597,12 @@ static void pisces_modify_spritecode(running_machine &machine, UINT8 *spriteram,
 	*code |= (state->m_gfxbank[0] << 6);
 }
 
-VIDEO_START( pisces )
+VIDEO_START_MEMBER(galaxold_state,pisces)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	VIDEO_START_CALL(galaxold);
+	VIDEO_START_CALL_MEMBER(galaxold);
 
-	state->m_modify_charcode   = pisces_modify_charcode;
-	state->m_modify_spritecode = pisces_modify_spritecode;
+	m_modify_charcode   = pisces_modify_charcode;
+	m_modify_spritecode = pisces_modify_spritecode;
 }
 
 #ifdef UNUSED_FUNCTION
@@ -631,12 +621,11 @@ static void theend_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, 
 	}
 }
 
-VIDEO_START( theend )
+VIDEO_START_MEMBER(galaxold_state,theend)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	VIDEO_START_CALL(galaxold);
+	VIDEO_START_CALL_MEMBER(galaxold);
 
-	state->m_draw_bullets = theend_draw_bullets;
+	m_draw_bullets = theend_draw_bullets;
 }
 #endif
 
@@ -649,13 +638,12 @@ static void mooncrst_modify_spritecode(running_machine &machine, UINT8 *spritera
 	}
 }
 
-VIDEO_START( mooncrst )
+VIDEO_START_MEMBER(galaxold_state,mooncrst)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	VIDEO_START_CALL(galaxold);
+	VIDEO_START_CALL_MEMBER(galaxold);
 
-	state->m_modify_charcode   = mooncrst_modify_charcode;
-	state->m_modify_spritecode = mooncrst_modify_spritecode;
+	m_modify_charcode   = mooncrst_modify_charcode;
+	m_modify_spritecode = mooncrst_modify_spritecode;
 }
 
 static void batman2_modify_charcode(running_machine &machine, UINT16 *code, UINT8 x)
@@ -667,13 +655,12 @@ static void batman2_modify_charcode(running_machine &machine, UINT16 *code, UINT
 	}
 }
 
-VIDEO_START( batman2 )
+VIDEO_START_MEMBER(galaxold_state,batman2)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	VIDEO_START_CALL(galaxold);
+	VIDEO_START_CALL_MEMBER(galaxold);
 
-	state->m_modify_charcode   = batman2_modify_charcode;
-	state->m_modify_spritecode = batman2_modify_spritecode;
+	m_modify_charcode   = batman2_modify_charcode;
+	m_modify_spritecode = batman2_modify_spritecode;
 }
 
 
@@ -690,19 +677,18 @@ static void rockclim_modify_spritecode(running_machine &machine, UINT8 *spritera
 	if (state->m_gfxbank[2])	*code|=0x40;
 }
 
-VIDEO_START( rockclim )
+VIDEO_START_MEMBER(galaxold_state,rockclim)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	VIDEO_START_CALL(galaxold);
-	state->m_rockclim_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::rockclim_get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	VIDEO_START_CALL_MEMBER(galaxold);
+	m_rockclim_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::rockclim_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
-	state->m_draw_background = rockclim_draw_background;
-	state->m_modify_charcode = mooncrst_modify_charcode;
-	state->m_modify_spritecode = rockclim_modify_spritecode;
+	m_draw_background = rockclim_draw_background;
+	m_modify_charcode = mooncrst_modify_charcode;
+	m_modify_spritecode = rockclim_modify_spritecode;
 
-	state->m_rockclim_v = state->m_rockclim_h = 0;
-	state_save_register_global(machine, state->m_rockclim_v);
-	state_save_register_global(machine, state->m_rockclim_h);
+	m_rockclim_v = m_rockclim_h = 0;
+	state_save_register_global(machine(), m_rockclim_v);
+	state_save_register_global(machine(), m_rockclim_h);
 }
 
 TILE_GET_INFO_MEMBER(galaxold_state::drivfrcg_get_tile_info)
@@ -718,37 +704,35 @@ TILE_GET_INFO_MEMBER(galaxold_state::drivfrcg_get_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-VIDEO_START( drivfrcg )
+VIDEO_START_MEMBER(galaxold_state,drivfrcg)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	video_start_common(machine);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::drivfrcg_get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
+	video_start_common(machine());
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::drivfrcg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	state->m_bg_tilemap->set_transparent_pen(0);
-	state->m_bg_tilemap->set_scroll_cols(32);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scroll_cols(32);
 
-	state->m_modify_spritecode = mshuttle_modify_spritecode;
-	state->m_modify_color = drivfrcg_modify_color;
+	m_modify_spritecode = mshuttle_modify_spritecode;
+	m_modify_color = drivfrcg_modify_color;
 
-	state->m_color_mask = 0xff;
+	m_color_mask = 0xff;
 }
 
-VIDEO_START( ad2083 )
+VIDEO_START_MEMBER(galaxold_state,ad2083)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	video_start_common(machine);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::drivfrcg_get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
+	video_start_common(machine());
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::drivfrcg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	state->m_bg_tilemap->set_transparent_pen(0);
-	state->m_bg_tilemap->set_scroll_cols(32);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scroll_cols(32);
 
-	state->m_modify_spritecode = ad2083_modify_spritecode;
+	m_modify_spritecode = ad2083_modify_spritecode;
 
-	state->m_draw_bullets = scrambold_draw_bullets;
+	m_draw_bullets = scrambold_draw_bullets;
 
-	state->m_draw_background = ad2083_draw_background;
+	m_draw_background = ad2083_draw_background;
 
-	state->m_color_mask = 7;
+	m_color_mask = 7;
 }
 
 
@@ -770,24 +754,22 @@ TILE_GET_INFO_MEMBER(galaxold_state::racknrol_get_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-VIDEO_START( racknrol )
+VIDEO_START_MEMBER(galaxold_state,racknrol)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	video_start_common(machine);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::racknrol_get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
+	video_start_common(machine());
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::racknrol_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	state->m_bg_tilemap->set_transparent_pen(0);
-	state->m_bg_tilemap->set_scroll_cols(32);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scroll_cols(32);
 
-	state->m_color_mask = 0xff;
+	m_color_mask = 0xff;
 }
 
-VIDEO_START( bongo )
+VIDEO_START_MEMBER(galaxold_state,bongo)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	VIDEO_START_CALL(galaxold_plain);
+	VIDEO_START_CALL_MEMBER(galaxold_plain);
 
-	state->m_modify_spritecode = batman2_modify_spritecode;
+	m_modify_spritecode = batman2_modify_spritecode;
 }
 
 TILE_GET_INFO_MEMBER(galaxold_state::dambustr_get_tile_info2)
@@ -810,32 +792,31 @@ TILE_GET_INFO_MEMBER(galaxold_state::dambustr_get_tile_info2)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-VIDEO_START( dambustr )
+VIDEO_START_MEMBER(galaxold_state,dambustr)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	VIDEO_START_CALL(galaxold);
+	VIDEO_START_CALL_MEMBER(galaxold);
 
-	state->m_dambustr_bg_split_line = 0;
-	state->m_dambustr_bg_color_1 = 0;
-	state->m_dambustr_bg_color_2 = 0;
-	state->m_dambustr_bg_priority = 0;
-	state->m_dambustr_char_bank = 0;
+	m_dambustr_bg_split_line = 0;
+	m_dambustr_bg_color_1 = 0;
+	m_dambustr_bg_color_2 = 0;
+	m_dambustr_bg_priority = 0;
+	m_dambustr_char_bank = 0;
 
-	state->m_draw_background = dambustr_draw_background;
+	m_draw_background = dambustr_draw_background;
 
-	state->m_modify_charcode   = dambustr_modify_charcode;
-	state->m_modify_spritecode = dambustr_modify_spritecode;
+	m_modify_charcode   = dambustr_modify_charcode;
+	m_modify_spritecode = dambustr_modify_spritecode;
 
-	state->m_draw_bullets = dambustr_draw_bullets;
+	m_draw_bullets = dambustr_draw_bullets;
 
 	/* allocate the temporary bitmap for the background priority */
-	state->m_dambustr_tmpbitmap = auto_bitmap_ind16_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height());
+	m_dambustr_tmpbitmap = auto_bitmap_ind16_alloc(machine(), machine().primary_screen->width(), machine().primary_screen->height());
 
 	/* make a copy of the tilemap to emulate background priority */
-	state->m_dambustr_videoram2 = auto_alloc_array(machine, UINT8, 0x0400);
-	state->m_dambustr_tilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::dambustr_get_tile_info2),state),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_dambustr_videoram2 = auto_alloc_array(machine(), UINT8, 0x0400);
+	m_dambustr_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::dambustr_get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	state->m_dambustr_tilemap2->set_transparent_pen(0);
+	m_dambustr_tilemap2->set_transparent_pen(0);
 }
 
 
@@ -1128,7 +1109,7 @@ static void galaxold_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap
 
 
 			/* yellow missile, white shells (this is the terminology on the schematics) */
-			color = ((offs == 7*4) ? BULLETS_COLOR_BASE : BULLETS_COLOR_BASE + 1);
+			color = ((offs == 7*4) ? BULLETS_COLOR_BASE_LEGACY : BULLETS_COLOR_BASE_LEGACY + 1);
 
 			bitmap.pix16(y, x) = color;
 		}
@@ -1144,7 +1125,7 @@ static void scrambold_draw_bullets(running_machine &machine, bitmap_ind16 &bitma
 
 	if (cliprect.contains(x, y))
 		/* yellow bullets */
-		bitmap.pix16(y, x) = BULLETS_COLOR_BASE;
+		bitmap.pix16(y, x) = BULLETS_COLOR_BASE_LEGACY;
 }
 
 static void darkplnt_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
@@ -1172,11 +1153,11 @@ static void dambustr_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap
 	{
 		if (offs < 4*4)
 		{
-			color = BULLETS_COLOR_BASE;
+			color = BULLETS_COLOR_BASE_LEGACY;
 			y--;
 		}
 		else {
-			color = BULLETS_COLOR_BASE + 1;
+			color = BULLETS_COLOR_BASE_LEGACY + 1;
 			x--;
 		}
 
@@ -1199,7 +1180,7 @@ static void scrambold_draw_background(running_machine &machine, bitmap_ind16 &bi
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	if (state->m_background_enable)
-		bitmap.fill(BACKGROUND_COLOR_BASE, cliprect);
+		bitmap.fill(BACKGROUND_COLOR_BASE_LEGACY, cliprect);
 	else
 		bitmap.fill(0, cliprect);
 }
@@ -1209,7 +1190,7 @@ static void ad2083_draw_background(running_machine &machine, bitmap_ind16 &bitma
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	int color = (state->m_background_blue << 2) | (state->m_background_green << 1) | state->m_background_red;
 
-	bitmap.fill(BACKGROUND_COLOR_BASE + color, cliprect);
+	bitmap.fill(BACKGROUND_COLOR_BASE_LEGACY + color, cliprect);
 }
 
 static void stratgyx_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -1217,7 +1198,7 @@ static void stratgyx_draw_background(running_machine &machine, bitmap_ind16 &bit
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	UINT8 x;
 	UINT8 *prom;
-	int base = BACKGROUND_COLOR_BASE;
+	int base = BACKGROUND_COLOR_BASE_LEGACY;
 
 
 	/* the background PROM is connected the following way:
@@ -1254,7 +1235,7 @@ static void minefld_draw_background(running_machine &machine, bitmap_ind16 &bitm
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	if (state->m_background_enable)
 	{
-		int base = BACKGROUND_COLOR_BASE;
+		int base = BACKGROUND_COLOR_BASE_LEGACY;
 		int x;
 
 
@@ -1275,7 +1256,7 @@ static void rescue_draw_background(running_machine &machine, bitmap_ind16 &bitma
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	if (state->m_background_enable)
 	{
-		int base = BACKGROUND_COLOR_BASE;
+		int base = BACKGROUND_COLOR_BASE_LEGACY;
 		int x;
 
 		for (x = 0; x < 128; x++)
@@ -1293,7 +1274,7 @@ static void rescue_draw_background(running_machine &machine, bitmap_ind16 &bitma
 static void mariner_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
-	int base = BACKGROUND_COLOR_BASE;
+	int base = BACKGROUND_COLOR_BASE_LEGACY;
 	UINT8 x;
 	UINT8 *prom;
 
@@ -1337,7 +1318,7 @@ static void mariner_draw_background(running_machine &machine, bitmap_ind16 &bitm
 static void dambustr_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
-	int base = BACKGROUND_COLOR_BASE;
+	int base = BACKGROUND_COLOR_BASE_LEGACY;
 	int col1 = base + state->m_dambustr_bg_color_1;
 	int col2 = base + state->m_dambustr_bg_color_2;
 

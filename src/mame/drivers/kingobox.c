@@ -450,24 +450,22 @@ static INTERRUPT_GEN( kingofb_interrupt )
 		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_START( kingofb )
+void kingofb_state::machine_start()
 {
-	kingofb_state *state = machine.driver_data<kingofb_state>();
 
-	state->m_video_cpu = machine.device("video");
-	state->m_sprite_cpu = machine.device("sprite");
-	state->m_audio_cpu = machine.device("audiocpu");
+	m_video_cpu = machine().device("video");
+	m_sprite_cpu = machine().device("sprite");
+	m_audio_cpu = machine().device("audiocpu");
 
-	state->save_item(NAME(state->m_nmi_enable));
-	state->save_item(NAME(state->m_palette_bank));
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_palette_bank));
 }
 
-static MACHINE_RESET( kingofb )
+void kingofb_state::machine_reset()
 {
-	kingofb_state *state = machine.driver_data<kingofb_state>();
 
-	state->m_nmi_enable = 0;
-	state->m_palette_bank = 0;
+	m_nmi_enable = 0;
+	m_palette_bank = 0;
 }
 
 static MACHINE_CONFIG_START( kingofb, kingofb_state )
@@ -492,8 +490,6 @@ static MACHINE_CONFIG_START( kingofb, kingofb_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* We really need heavy synching among the processors */
 
-	MCFG_MACHINE_START(kingofb)
-	MCFG_MACHINE_RESET(kingofb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -506,8 +502,8 @@ static MACHINE_CONFIG_START( kingofb, kingofb_state )
 	MCFG_GFXDECODE(kingobox)
 	MCFG_PALETTE_LENGTH(256+8*2)
 
-	MCFG_PALETTE_INIT(kingofb)
-	MCFG_VIDEO_START(kingofb)
+	MCFG_PALETTE_INIT_OVERRIDE(kingofb_state,kingofb)
+	MCFG_VIDEO_START_OVERRIDE(kingofb_state,kingofb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -544,8 +540,6 @@ static MACHINE_CONFIG_START( ringking, kingofb_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* We really need heavy synching among the processors */
 
-	MCFG_MACHINE_START(kingofb)
-	MCFG_MACHINE_RESET(kingofb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -558,8 +552,8 @@ static MACHINE_CONFIG_START( ringking, kingofb_state )
 	MCFG_GFXDECODE(rk)
 	MCFG_PALETTE_LENGTH(256+8*2)
 
-	MCFG_PALETTE_INIT(ringking)
-	MCFG_VIDEO_START(ringking)
+	MCFG_PALETTE_INIT_OVERRIDE(kingofb_state,ringking)
+	MCFG_VIDEO_START_OVERRIDE(kingofb_state,ringking)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -37,33 +37,31 @@ static void exidy440_update_firq(running_machine &machine);
  *
  *************************************/
 
-static VIDEO_START( exidy440 )
+VIDEO_START_MEMBER(exidy440_state,exidy440)
 {
-	exidy440_state *state = machine.driver_data<exidy440_state>();
 	/* reset the system */
-	state->m_firq_enable = 0;
-	state->m_firq_select = 0;
-	state->m_palettebank_io = 0;
-	state->m_palettebank_vis = 0;
-	state->m_firq_vblank = 0;
-	state->m_firq_beam = 0;
+	m_firq_enable = 0;
+	m_firq_select = 0;
+	m_palettebank_io = 0;
+	m_palettebank_vis = 0;
+	m_firq_vblank = 0;
+	m_firq_beam = 0;
 
 	/* allocate a buffer for VRAM */
-	state->m_local_videoram = auto_alloc_array(machine, UINT8, 256 * 256 * 2);
-	memset(state->m_local_videoram, 0, 256 * 256 * 2);
+	m_local_videoram = auto_alloc_array(machine(), UINT8, 256 * 256 * 2);
+	memset(m_local_videoram, 0, 256 * 256 * 2);
 
 	/* allocate a buffer for palette RAM */
-	state->m_local_paletteram = auto_alloc_array(machine, UINT8, 512 * 2);
-	memset(state->m_local_paletteram, 0, 512 * 2);
+	m_local_paletteram = auto_alloc_array(machine(), UINT8, 512 * 2);
+	memset(m_local_paletteram, 0, 512 * 2);
 }
 
 
-static VIDEO_START( topsecex )
+VIDEO_START_MEMBER(exidy440_state,topsecex)
 {
-	exidy440_state *state = machine.driver_data<exidy440_state>();
-	VIDEO_START_CALL(exidy440);
+	VIDEO_START_CALL_MEMBER(exidy440);
 
-	*state->m_topsecex_yscroll = 0;
+	*m_topsecex_yscroll = 0;
 }
 
 
@@ -476,7 +474,7 @@ static SCREEN_UPDATE_IND16( topsecex )
 
 MACHINE_CONFIG_FRAGMENT( exidy440_video )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_VIDEO_START(exidy440)
+	MCFG_VIDEO_START_OVERRIDE(exidy440_state,exidy440)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -487,7 +485,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( topsecex_video )
 	MCFG_VIDEO_ATTRIBUTES(0)
-	MCFG_VIDEO_START(topsecex)
+	MCFG_VIDEO_START_OVERRIDE(exidy440_state,topsecex)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, TOPSECEX_VBSTART)

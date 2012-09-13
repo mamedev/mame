@@ -49,6 +49,7 @@ public:
 	UINT8 m_out_req_last; // old value at 0xFFFE before the most recent write
 	UINT8 m_out_ack; // byte written to 0xFFFC
 	DECLARE_DRIVER_INIT(zexall);
+	virtual void machine_reset();
 };
 
 DRIVER_INIT_MEMBER(zexall_state,zexall)
@@ -59,12 +60,11 @@ DRIVER_INIT_MEMBER(zexall_state,zexall)
 	m_out_data = 0;
 }
 
-static MACHINE_RESET( zexall )
+void zexall_state::machine_reset()
 {
 // rom is self-modifying, so need to refresh it on each run
-	zexall_state *state = machine.driver_data<zexall_state>();
-	UINT8 *rom = state->memregion("romcode")->base();
-	UINT8 *ram = state->m_main_ram;
+	UINT8 *rom = memregion("romcode")->base();
+	UINT8 *ram = m_main_ram;
 	/* fill main ram with zexall code */
 	memcpy(ram, rom, 0x228a);
 }
@@ -147,7 +147,6 @@ static MACHINE_CONFIG_START( zexall, zexall_state )
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(z80_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_MACHINE_RESET(zexall)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, zexall_terminal_intf)

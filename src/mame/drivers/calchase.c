@@ -173,6 +173,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(calchase_pic8259_1_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_DRIVER_INIT(calchase);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -804,16 +806,15 @@ static IRQ_CALLBACK(irq_callback)
 
 static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
 
-static MACHINE_START(calchase)
+void calchase_state::machine_start()
 {
-	calchase_state *state = machine.driver_data<calchase_state>();
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 
-	state->m_pit8254 = machine.device( "pit8254" );
-	state->m_pic8259_1 = machine.device( "pic8259_1" );
-	state->m_pic8259_2 = machine.device( "pic8259_2" );
-	state->m_dma8237_1 = machine.device( "dma8237_1" );
-	state->m_dma8237_2 = machine.device( "dma8237_2" );
+	m_pit8254 = machine().device( "pit8254" );
+	m_pic8259_1 = machine().device( "pic8259_1" );
+	m_pic8259_2 = machine().device( "pic8259_2" );
+	m_dma8237_1 = machine().device( "dma8237_1" );
+	m_dma8237_2 = machine().device( "dma8237_2" );
 }
 
 /*************************************************************
@@ -877,10 +878,10 @@ static const struct pit8253_config calchase_pit8254_config =
 	}
 };
 
-static MACHINE_RESET(calchase)
+void calchase_state::machine_reset()
 {
-	//machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("bios")->base() + 0x10000);
-	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("bios")->base());
+	//machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("bios")->base() + 0x10000);
+	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("bios")->base());
 }
 
 static void set_gate_a20(running_machine &machine, int a20)
@@ -929,8 +930,6 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 	MCFG_CPU_PROGRAM_MAP(calchase_map)
 	MCFG_CPU_IO_MAP(calchase_io)
 
-	MCFG_MACHINE_START(calchase)
-	MCFG_MACHINE_RESET(calchase)
 
 	MCFG_PIT8254_ADD( "pit8254", calchase_pit8254_config )
 	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )

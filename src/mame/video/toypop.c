@@ -18,11 +18,11 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( toypop )
+void toypop_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 256);
+	machine().colortable = colortable_alloc(machine(), 256);
 
 	for (int i = 0;i < 256;i++)
 	{
@@ -47,7 +47,7 @@ PALETTE_INIT( toypop )
 		bit3 = (color_prom[i+0x200] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r,g,b));
 	}
 
 	for (int i = 0;i < 256;i++)
@@ -55,17 +55,17 @@ PALETTE_INIT( toypop )
 		UINT8 entry;
 
 		// characters
-		colortable_entry_set_value(machine.colortable, i + 0*256, (color_prom[i + 0x300] & 0x0f) | 0x70);
-		colortable_entry_set_value(machine.colortable, i + 1*256, (color_prom[i + 0x300] & 0x0f) | 0xf0);
+		colortable_entry_set_value(machine().colortable, i + 0*256, (color_prom[i + 0x300] & 0x0f) | 0x70);
+		colortable_entry_set_value(machine().colortable, i + 1*256, (color_prom[i + 0x300] & 0x0f) | 0xf0);
 		// sprites
 		entry = color_prom[i + 0x500];
-		colortable_entry_set_value(machine.colortable, i + 2*256, entry);
+		colortable_entry_set_value(machine().colortable, i + 2*256, entry);
 	}
 	for (int i = 0;i < 16;i++)
 	{
 		// background
-		colortable_entry_set_value(machine.colortable, i + 3*256 + 0*16, 0x60 + i);
-		colortable_entry_set_value(machine.colortable, i + 3*256 + 1*16, 0xe0 + i);
+		colortable_entry_set_value(machine().colortable, i + 3*256 + 0*16, 0x60 + i);
+		colortable_entry_set_value(machine().colortable, i + 3*256 + 1*16, 0xe0 + i);
 	}
 }
 
@@ -110,12 +110,11 @@ TILE_GET_INFO_MEMBER(toypop_state::get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( toypop )
+void toypop_state::video_start()
 {
-	toypop_state *state = machine.driver_data<toypop_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(toypop_state::get_tile_info),state), tilemap_mapper_delegate(FUNC(toypop_state::tilemap_scan),state),8,8,36,28);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(toypop_state::get_tile_info),this), tilemap_mapper_delegate(FUNC(toypop_state::tilemap_scan),this),8,8,36,28);
 
-	state->m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_transparent_pen(0);
 }
 
 

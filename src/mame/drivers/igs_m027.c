@@ -57,6 +57,7 @@ public:
 	DECLARE_DRIVER_INIT(klxyj);
 	TILE_GET_INFO_MEMBER(get_tx_tilemap_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tilemap_tile_info);
+	virtual void video_start();
 };
 
 
@@ -170,14 +171,13 @@ WRITE32_MEMBER(igs_m027_state::igs_palette32_w)
 
 
 
-static VIDEO_START(igs_majhong)
+void igs_m027_state::video_start()
 {
-	igs_m027_state *state = machine.driver_data<igs_m027_state>();
-	state->m_igs_tx_tilemap= &machine.tilemap().create(tilemap_get_info_delegate(FUNC(igs_m027_state::get_tx_tilemap_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,32);
-	state->m_igs_tx_tilemap->set_transparent_pen(15);
-	state->m_igs_bg_tilemap= &machine.tilemap().create(tilemap_get_info_delegate(FUNC(igs_m027_state::get_bg_tilemap_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,32);
-	//state->m_igs_bg_tilemap= &machine.tilemap().create(tilemap_get_info_delegate(FUNC(igs_m027_state::get_bg_tilemap_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,32);
-	//state->m_igs_bg_tilemap->set_transparent_pen(15);
+	m_igs_tx_tilemap= &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igs_m027_state::get_tx_tilemap_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	m_igs_tx_tilemap->set_transparent_pen(15);
+	m_igs_bg_tilemap= &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igs_m027_state::get_bg_tilemap_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	//m_igs_bg_tilemap= &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igs_m027_state::get_bg_tilemap_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	//m_igs_bg_tilemap->set_transparent_pen(15);
 	logerror("Video START OK!\n");
 }
 
@@ -383,7 +383,6 @@ static MACHINE_CONFIG_START( igs_majhong, igs_m027_state )
 
 	MCFG_PALETTE_LENGTH(0x200)
 
-	MCFG_VIDEO_START( igs_majhong )
 
 	/* sound hardware */
 

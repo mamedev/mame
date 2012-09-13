@@ -65,6 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(subcpu_status_w);
 	DECLARE_READ8_MEMBER(subcpu_status_r);
 	DECLARE_WRITE8_MEMBER(msm_cfg_w);
+	virtual void machine_reset();
 };
 
 
@@ -342,7 +343,7 @@ static const msm5205_interface msm_interface =
     MSM5205_S48_4B  /* changed on the fly */
 };
 
-static MACHINE_RESET(sothello)
+void sothello_state::machine_reset()
 {
 }
 
@@ -377,7 +378,6 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
 
     MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-    MCFG_MACHINE_RESET(sothello)
 
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM)
 	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(sothello_vdp_interrupt)

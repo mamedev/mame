@@ -250,15 +250,19 @@ public:
 	DECLARE_DRIVER_INIT(ridgeraj);
 	DECLARE_DRIVER_INIT(alpinesa);
 	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
+	virtual void machine_reset();
+	DECLARE_VIDEO_START(namcos22s);
+	DECLARE_VIDEO_START(namcos22);
+	DECLARE_VIDEO_START(common);
 };
 
 
 /*----------- defined in video/namcos22.c -----------*/
 
-VIDEO_START( namcos22 );
+
 SCREEN_UPDATE_RGB32( namcos22 );
 
-VIDEO_START( namcos22s );
+
 SCREEN_UPDATE_RGB32( namcos22s );
 
 void namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource );

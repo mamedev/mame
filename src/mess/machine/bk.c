@@ -66,9 +66,9 @@ static TIMER_CALLBACK(keyboard_callback)
 }
 
 
-MACHINE_START(bk0010)
+void bk_state::machine_start()
 {
-	machine.scheduler().timer_pulse(attotime::from_hz(2400), FUNC(keyboard_callback));
+	machine().scheduler().timer_pulse(attotime::from_hz(2400), FUNC(keyboard_callback));
 }
 
 static IRQ_CALLBACK(bk0010_irq_callback)
@@ -78,13 +78,12 @@ static IRQ_CALLBACK(bk0010_irq_callback)
 	return state->m_key_irq_vector;
 }
 
-MACHINE_RESET( bk0010 )
+void bk_state::machine_reset()
 {
-	bk_state *state = machine.driver_data<bk_state>();
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(bk0010_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(bk0010_irq_callback);
 
-	state->m_kbd_state = 0;
-	state->m_scrool = 01330;
+	m_kbd_state = 0;
+	m_scrool = 01330;
 }
 
 READ16_MEMBER(bk_state::bk_key_state_r)

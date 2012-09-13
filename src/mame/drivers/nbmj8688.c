@@ -2925,8 +2925,8 @@ static MACHINE_CONFIG_START( NBMJDRV_4096, nbmj8688_state )
 
 	MCFG_PALETTE_LENGTH(4096)
 
-	MCFG_PALETTE_INIT(mbmj8688_12bit)
-	MCFG_VIDEO_START(mbmj8688_pure_12bit)
+	MCFG_PALETTE_INIT_OVERRIDE(nbmj8688_state,mbmj8688_12bit)
+	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_pure_12bit)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2946,8 +2946,8 @@ static MACHINE_CONFIG_DERIVED( NBMJDRV_256, NBMJDRV_4096 )
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(mbmj8688_8bit)
-	MCFG_VIDEO_START(mbmj8688_8bit)
+	MCFG_PALETTE_INIT_OVERRIDE(nbmj8688_state,mbmj8688_8bit)
+	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_8bit)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( NBMJDRV_65536, NBMJDRV_4096 )
@@ -2958,8 +2958,8 @@ static MACHINE_CONFIG_DERIVED( NBMJDRV_65536, NBMJDRV_4096 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_PALETTE_LENGTH(65536)
 
-	MCFG_PALETTE_INIT(mbmj8688_16bit)
-	MCFG_VIDEO_START(mbmj8688_hybrid_16bit)
+	MCFG_PALETTE_INIT_OVERRIDE(nbmj8688_state,mbmj8688_16bit)
+	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_hybrid_16bit)
 MACHINE_CONFIG_END
 
 // --------------------------------------------------------------------------------
@@ -2988,7 +2988,7 @@ static MACHINE_CONFIG_DERIVED( mbmj_h12bit, NBMJDRV_4096 )
 	MCFG_CPU_IO_MAP(secolove_io_map)
 
 	/* video hardware */
-	MCFG_VIDEO_START(mbmj8688_hybrid_12bit)
+	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_hybrid_12bit)
 MACHINE_CONFIG_END
 
 /*Same as h12bit HW with different sound HW + NMI enable bit*/
@@ -3012,7 +3012,7 @@ static MACHINE_CONFIG_DERIVED( mbmj_p16bit, NBMJDRV_65536 )
 	MCFG_CPU_IO_MAP(secolove_io_map)
 
 	/* video hardware */
-	MCFG_VIDEO_START(mbmj8688_pure_16bit)
+	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_pure_16bit)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mbmj_p16bit_LCD, nbmj8688_state )
@@ -3029,7 +3029,7 @@ static MACHINE_CONFIG_START( mbmj_p16bit_LCD, nbmj8688_state )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(65536)
-	MCFG_PALETTE_INIT(mbmj8688_16bit)
+	MCFG_PALETTE_INIT_OVERRIDE(nbmj8688_state,mbmj8688_16bit)
 	MCFG_DEFAULT_LAYOUT(layout_nbmj8688)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3053,7 +3053,7 @@ static MACHINE_CONFIG_START( mbmj_p16bit_LCD, nbmj8688_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 64-1)
 	MCFG_SCREEN_UPDATE_STATIC(mbmj8688_lcd1)
 
-	MCFG_VIDEO_START(mbmj8688_pure_16bit_LCD)
+	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_pure_16bit_LCD)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

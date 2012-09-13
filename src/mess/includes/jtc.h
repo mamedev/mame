@@ -42,7 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER( p2_w );
 	DECLARE_READ8_MEMBER( p3_r );
 	DECLARE_WRITE8_MEMBER( p3_w );
-
+	DECLARE_PALETTE_INIT(jtc_es40);
 	optional_shared_ptr<UINT8> m_video_ram;
 };
 

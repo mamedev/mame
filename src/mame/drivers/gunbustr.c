@@ -320,7 +320,6 @@ static MACHINE_CONFIG_START( gunbustr, gunbustr_state )
 	MCFG_GFXDECODE(gunbustr)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(gunbustr)
 
 	MCFG_TC0480SCP_ADD("tc0480scp", gunbustr_tc0480scp_intf)
 

@@ -54,6 +54,7 @@ public:
 	DECLARE_READ8_MEMBER(ff_r);
 	DECLARE_DRIVER_INIT(coinmstr);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
 };
 
 
@@ -914,10 +915,9 @@ TILE_GET_INFO_MEMBER(coinmstr_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
-static VIDEO_START( coinmstr )
+void coinmstr_state::video_start()
 {
-	coinmstr_state *state = machine.driver_data<coinmstr_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(coinmstr_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 46, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(coinmstr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 46, 32);
 }
 
 static SCREEN_UPDATE_IND16( coinmstr )
@@ -1027,7 +1027,6 @@ static MACHINE_CONFIG_START( coinmstr, coinmstr_state )
 	MCFG_GFXDECODE(coinmstr)
 	MCFG_PALETTE_LENGTH(46*32*4)
 
-	MCFG_VIDEO_START(coinmstr)
 
 	MCFG_MC6845_ADD("crtc", H46505, 14000000 / 16, h46505_intf)
 

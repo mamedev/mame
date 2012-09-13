@@ -56,21 +56,19 @@ To enter service mode, keep 1&2 pressed on reset
 #include "includes/circusc.h"
 
 
-static MACHINE_START( circusc )
+void circusc_state::machine_start()
 {
-	circusc_state *state = machine.driver_data<circusc_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_dac = machine.device<dac_device>("dac");
-	state->m_discrete = machine.device("fltdisc");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_dac = machine().device<dac_device>("dac");
+	m_discrete = machine().device("fltdisc");
 
-	state->save_item(NAME(state->m_sn_latch));
+	save_item(NAME(m_sn_latch));
 }
 
-static MACHINE_RESET( circusc )
+void circusc_state::machine_reset()
 {
-	circusc_state *state = machine.driver_data<circusc_state>();
-	state->m_sn_latch = 0;
+	m_sn_latch = 0;
 }
 
 READ8_MEMBER(circusc_state::circusc_sh_timer_r)
@@ -366,8 +364,6 @@ static MACHINE_CONFIG_START( circusc, circusc_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(circusc)
-	MCFG_MACHINE_RESET(circusc)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -380,8 +376,6 @@ static MACHINE_CONFIG_START( circusc, circusc_state )
 	MCFG_GFXDECODE(circusc)
 	MCFG_PALETTE_LENGTH(16*16+16*16)
 
-	MCFG_PALETTE_INIT(circusc)
-	MCFG_VIDEO_START(circusc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

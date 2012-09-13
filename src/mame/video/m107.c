@@ -118,20 +118,19 @@ WRITE16_MEMBER(m107_state::m107_control_w)
 
 /*****************************************************************************/
 
-VIDEO_START( m107 )
+void m107_state::video_start()
 {
-	m107_state *state = machine.driver_data<m107_state>();
 	int laynum;
 
 	for (laynum = 0; laynum < 4; laynum++)
 	{
-		pf_layer_info *layer = &state->m_pf_layer[laynum];
+		pf_layer_info *layer = &m_pf_layer[laynum];
 
 		/* allocate a tilemaps per layer */
-		layer->tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(m107_state::get_pf_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 64,64);
+		layer->tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m107_state::get_pf_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,64);
 
 		/* set the user data to point to the layer */
-		layer->tmap->set_user_data(&state->m_pf_layer[laynum]);
+		layer->tmap->set_user_data(&m_pf_layer[laynum]);
 
 		/* set scroll offsets */
 		layer->tmap->set_scrolldx(-3 + 2 * laynum, -3 + 2 * laynum);
@@ -142,7 +141,7 @@ VIDEO_START( m107 )
 			layer->tmap->set_transparent_pen(0);
 	}
 
-	state->m_buffered_spriteram = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
+	m_buffered_spriteram = auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
 }
 
 /*****************************************************************************/

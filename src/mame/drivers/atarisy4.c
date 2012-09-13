@@ -54,6 +54,10 @@ public:
 	DECLARE_READ16_MEMBER(analog_r);
 	DECLARE_DRIVER_INIT(airrace);
 	DECLARE_DRIVER_INIT(laststar);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void video_reset();
+	DECLARE_MACHINE_RESET(airrace);
 };
 
 
@@ -132,8 +136,8 @@ struct _poly_extra_data
  *************************************/
 
 
-static MACHINE_RESET( atarisy4 );
-static MACHINE_RESET( airrace );
+
+
 
 
 /*************************************
@@ -142,13 +146,12 @@ static MACHINE_RESET( airrace );
  *
  *************************************/
 
-static VIDEO_START( atarisy4 )
+void atarisy4_state::video_start()
 {
-	atarisy4_state *state = machine.driver_data<atarisy4_state>();
-	state->m_poly = poly_alloc(machine, 1024, sizeof(poly_extra_data), POLYFLAG_NO_WORK_QUEUE);
+	m_poly = poly_alloc(machine(), 1024, sizeof(poly_extra_data), POLYFLAG_NO_WORK_QUEUE);
 }
 
-static VIDEO_RESET( atarisy4 )
+void atarisy4_state::video_reset()
 {
 	gpu.vblank_wait = 0;
 }
@@ -734,8 +737,6 @@ static MACHINE_CONFIG_START( atarisy4, atarisy4_state )
 	MCFG_CPU_PROGRAM_MAP(dsp0_map)
 	MCFG_CPU_IO_MAP(dsp0_io_map)
 
-	MCFG_VIDEO_RESET(atarisy4)
-	MCFG_MACHINE_RESET(atarisy4)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(32000000/2, 660, 0, 512, 404, 0, 384)
@@ -743,7 +744,6 @@ static MACHINE_CONFIG_START( atarisy4, atarisy4_state )
 	MCFG_SCREEN_UPDATE_STATIC(atarisy4)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(atarisy4)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( airrace, atarisy4 )
@@ -752,7 +752,7 @@ static MACHINE_CONFIG_DERIVED( airrace, atarisy4 )
 	MCFG_CPU_PROGRAM_MAP(dsp1_map)
 	MCFG_CPU_IO_MAP(dsp1_io_map)
 
-	MCFG_MACHINE_RESET(airrace)
+	MCFG_MACHINE_RESET_OVERRIDE(atarisy4_state,airrace)
 MACHINE_CONFIG_END
 
 
@@ -999,15 +999,15 @@ DRIVER_INIT_MEMBER(atarisy4_state,airrace)
 	load_ldafile(machine().device("dsp1")->memory().space(AS_PROGRAM), memregion("dsp")->base());
 }
 
-static MACHINE_RESET( atarisy4 )
+void atarisy4_state::machine_reset()
 {
-	machine.device("dsp0")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("dsp0")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static MACHINE_RESET( airrace )
+MACHINE_RESET_MEMBER(atarisy4_state,airrace)
 {
-	machine.device("dsp0")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine.device("dsp1")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("dsp0")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("dsp1")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 

@@ -773,7 +773,6 @@ static MACHINE_CONFIG_START( realbrk, realbrk_state )
 	MCFG_GFXDECODE(realbrk)
 	MCFG_PALETTE_LENGTH(0x8000)
 
-	MCFG_VIDEO_START(realbrk)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

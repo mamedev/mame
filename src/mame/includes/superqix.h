@@ -72,13 +72,17 @@ public:
 	DECLARE_DRIVER_INIT(sqixa);
 	TILE_GET_INFO_MEMBER(pb_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(sqix_get_bg_tile_info);
+	DECLARE_MACHINE_START(pbillian);
+	DECLARE_VIDEO_START(pbillian);
+	DECLARE_MACHINE_START(superqix);
+	DECLARE_VIDEO_START(superqix);
 };
 
 
 /*----------- defined in video/superqix.c -----------*/
 
 
-VIDEO_START( pbillian );
+
 SCREEN_UPDATE_IND16( pbillian );
-VIDEO_START( superqix );
+
 SCREEN_UPDATE_IND16( superqix );

@@ -1070,7 +1070,7 @@ static MACHINE_CONFIG_START( legionna, legionna_state )
 	MCFG_PALETTE_LENGTH(128*16)
 	MCFG_PALETTE_INIT(all_black)
 
-	MCFG_VIDEO_START(legionna)
+	MCFG_VIDEO_START_OVERRIDE(legionna_state,legionna)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)
@@ -1100,7 +1100,7 @@ static MACHINE_CONFIG_START( heatbrl, legionna_state )
 	MCFG_PALETTE_LENGTH(128*16)
 	MCFG_PALETTE_INIT(all_black)
 
-	MCFG_VIDEO_START(legionna)
+	MCFG_VIDEO_START_OVERRIDE(legionna_state,legionna)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)
@@ -1129,7 +1129,7 @@ static MACHINE_CONFIG_START( godzilla, legionna_state )
 	MCFG_PALETTE_LENGTH(128*16)
 	MCFG_PALETTE_INIT(all_black)
 
-	MCFG_VIDEO_START(godzilla)
+	MCFG_VIDEO_START_OVERRIDE(legionna_state,godzilla)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM2151_INTERFACE(14318180/4,1320000)
@@ -1158,7 +1158,7 @@ static MACHINE_CONFIG_START( denjinmk, legionna_state )
 	MCFG_PALETTE_LENGTH(128*16)
 	MCFG_PALETTE_INIT(all_black)
 
-	MCFG_VIDEO_START(denjinmk)
+	MCFG_VIDEO_START_OVERRIDE(legionna_state,denjinmk)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM2151_INTERFACE(14318180/4,1320000)
@@ -1187,7 +1187,7 @@ static MACHINE_CONFIG_START( grainbow, legionna_state )
 	MCFG_PALETTE_LENGTH(128*16)
 	MCFG_PALETTE_INIT(all_black)
 
-	MCFG_VIDEO_START(grainbow)
+	MCFG_VIDEO_START_OVERRIDE(legionna_state,grainbow)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM2151_INTERFACE(14318180/4,1320000)
@@ -1217,7 +1217,7 @@ static MACHINE_CONFIG_START( cupsoc, legionna_state )
 	MCFG_PALETTE_LENGTH(128*16)
 	MCFG_PALETTE_INIT(all_black)
 
-	MCFG_VIDEO_START(cupsoc)
+	MCFG_VIDEO_START_OVERRIDE(legionna_state,cupsoc)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)
@@ -1255,7 +1255,7 @@ static MACHINE_CONFIG_START( cupsocbl, legionna_state )
 	MCFG_PALETTE_LENGTH(128*16)
 	MCFG_PALETTE_INIT(all_black)
 
-	MCFG_VIDEO_START(cupsoc)
+	MCFG_VIDEO_START_OVERRIDE(legionna_state,cupsoc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

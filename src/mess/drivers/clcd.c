@@ -124,6 +124,7 @@ private:
 	int keyColumnSelect;
 	int keyClockState;
 	int keyReadState;
+	virtual void palette_init();
 };
 
 static ADDRESS_MAP_START( clcd_mem, AS_PROGRAM, 8, clcd_state )
@@ -231,10 +232,10 @@ static INPUT_PORTS_START( clcd )
 INPUT_PORTS_END
 
 
-static PALETTE_INIT( clcd )
+void clcd_state::palette_init()
 {
-	palette_set_color(machine, 0, MAKE_RGB(32,240,32));
-	palette_set_color(machine, 1, MAKE_RGB(32,32,32));
+	palette_set_color(machine(), 0, MAKE_RGB(32,240,32));
+	palette_set_color(machine(), 1, MAKE_RGB(32,32,32));
 }
 
 static const via6522_interface via0_intf =
@@ -308,7 +309,6 @@ static MACHINE_CONFIG_START( clcd, clcd_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(clcd)
 	MCFG_GFXDECODE(clcd)
 MACHINE_CONFIG_END
 

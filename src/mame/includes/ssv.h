@@ -121,15 +121,19 @@ public:
 	DECLARE_DRIVER_INIT(twineag2);
 	DECLARE_DRIVER_INIT(mslider);
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
+	virtual void machine_reset();
+	virtual void video_start();
+	DECLARE_VIDEO_START(gdfs);
+	DECLARE_VIDEO_START(eaglshot);
 };
 
 /*----------- defined in video/ssv.c -----------*/
 
 void ssv_enable_video(running_machine &machine, int enable);
 
-VIDEO_START( ssv );
-VIDEO_START( eaglshot );
-VIDEO_START( gdfs );
+
+
+
 
 SCREEN_UPDATE_IND16( ssv );
 SCREEN_UPDATE_IND16( eaglshot );

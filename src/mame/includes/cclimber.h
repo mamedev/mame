@@ -58,6 +58,14 @@ public:
 	TILE_GET_INFO_MEMBER(cclimber_get_bs_tile_info);
 	TILE_GET_INFO_MEMBER(toprollr_get_bs_tile_info);
 	TILE_GET_INFO_MEMBER(toproller_get_bg_tile_info);
+	DECLARE_MACHINE_RESET(cclimber);
+	DECLARE_VIDEO_START(cclimber);
+	DECLARE_PALETTE_INIT(cclimber);
+	DECLARE_VIDEO_START(swimmer);
+	DECLARE_PALETTE_INIT(swimmer);
+	DECLARE_PALETTE_INIT(yamato);
+	DECLARE_VIDEO_START(toprollr);
+	DECLARE_PALETTE_INIT(toprollr);
 };
 
 
@@ -67,17 +75,17 @@ public:
 /*----------- defined in video/cclimber.c -----------*/
 
 
-PALETTE_INIT( cclimber );
-VIDEO_START( cclimber );
+
+
 SCREEN_UPDATE_IND16( cclimber );
 
-PALETTE_INIT( swimmer );
-VIDEO_START( swimmer );
+
+
 SCREEN_UPDATE_IND16( swimmer );
 
-PALETTE_INIT( yamato );
+
 SCREEN_UPDATE_IND16( yamato );
 
-PALETTE_INIT( toprollr );
-VIDEO_START( toprollr );
+
+
 SCREEN_UPDATE_IND16( toprollr );

@@ -47,11 +47,10 @@ WRITE8_MEMBER(atetris_state::atetris_videoram_w)
  *
  *************************************/
 
-VIDEO_START( atetris )
+void atetris_state::video_start()
 {
-	atetris_state *state = machine.driver_data<atetris_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(atetris_state::get_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 64,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atetris_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,32);
 }
 
 

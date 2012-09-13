@@ -3826,21 +3826,20 @@ n64_rdp::n64_rdp(n64_state &state) : poly_manager<UINT32, rdp_poly_state, 8, 320
 	_Fill[1] = &n64_rdp::_Fill32Bit;
 }
 
-VIDEO_START(n64)
+void n64_state::video_start()
 {
-	n64_state *state = machine.driver_data<n64_state>();
 
-	state->m_rdp = auto_alloc(machine, n64_rdp(*state));
+	m_rdp = auto_alloc(machine(), n64_rdp(*this));
 
-	state->m_rdp->SetMachine(machine);
-	state->m_rdp->InitInternalState();
+	m_rdp->SetMachine(machine());
+	m_rdp->InitInternalState();
 
-	state->m_rdp->Blender.SetMachine(machine);
-	state->m_rdp->Blender.SetProcessor(state->m_rdp);
+	m_rdp->Blender.SetMachine(machine());
+	m_rdp->Blender.SetProcessor(m_rdp);
 
-	state->m_rdp->TexPipe.SetMachine(machine);
+	m_rdp->TexPipe.SetMachine(machine());
 
-	state->m_rdp->AuxBuf = auto_alloc_array_clear(machine, UINT8, EXTENT_AUX_COUNT);
+	m_rdp->AuxBuf = auto_alloc_array_clear(machine(), UINT8, EXTENT_AUX_COUNT);
 
 	if (LOG_RDP_EXECUTION)
 	{

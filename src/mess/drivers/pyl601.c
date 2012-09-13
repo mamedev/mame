@@ -80,6 +80,8 @@ public:
 	required_device<device_t> m_fdc;
 	required_device<ram_device> m_ram;
 	DECLARE_DRIVER_INIT(pyl601);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -377,22 +379,21 @@ static INPUT_PORTS_START( pyl601 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(PGUP))
 INPUT_PORTS_END
 
-static MACHINE_RESET(pyl601)
+void pyl601_state::machine_reset()
 {
-	pyl601_state *state = machine.driver_data<pyl601_state>();
-	UINT8 *ram = state->m_ram->pointer();
-	state->m_key_code = 0xff;
-	state->membank("bank1")->set_base(ram + 0x0000);
-	state->membank("bank2")->set_base(ram + 0xc000);
-	state->membank("bank3")->set_base(ram + 0xe000);
-	state->membank("bank4")->set_base(ram + 0xe700);
-	state->membank("bank5")->set_base(state->memregion("maincpu")->base() + 0xf000);
-	state->membank("bank6")->set_base(ram + 0xf000);
+	UINT8 *ram = m_ram->pointer();
+	m_key_code = 0xff;
+	membank("bank1")->set_base(ram + 0x0000);
+	membank("bank2")->set_base(ram + 0xc000);
+	membank("bank3")->set_base(ram + 0xe000);
+	membank("bank4")->set_base(ram + 0xe700);
+	membank("bank5")->set_base(memregion("maincpu")->base() + 0xf000);
+	membank("bank6")->set_base(ram + 0xf000);
 
-	machine.device("maincpu")->reset();
+	machine().device("maincpu")->reset();
 }
 
-static VIDEO_START( pyl601 )
+void pyl601_state::video_start()
 {
 }
 
@@ -584,7 +585,6 @@ static MACHINE_CONFIG_START( pyl601, pyl601_state )
 	MCFG_CPU_PROGRAM_MAP(pyl601_mem)
 	MCFG_CPU_VBLANK_INT("screen", pyl601_interrupt)
 
-	MCFG_MACHINE_RESET(pyl601)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -592,7 +592,6 @@ static MACHINE_CONFIG_START( pyl601, pyl601_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
-	MCFG_VIDEO_START( pyl601 )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_GFXDECODE(pyl601)
 	MCFG_PALETTE_LENGTH(2)

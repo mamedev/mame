@@ -84,6 +84,10 @@ public:
 	DECLARE_WRITE8_MEMBER(psg_4015_w);
 	DECLARE_WRITE8_MEMBER(psg_4017_w);
 	DECLARE_DRIVER_INIT(cham24);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -268,14 +272,14 @@ static const nes_interface cham24_interface_1 =
 	"maincpu"
 };
 
-static MACHINE_RESET( cham24 )
+void cham24_state::machine_reset()
 {
 }
 
-static PALETTE_INIT( cham24 )
+void cham24_state::palette_init()
 {
-	ppu2c0x_device *ppu = machine.device<ppu2c0x_device>("ppu");
-	ppu->init_palette(machine, 0);
+	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
+	ppu->init_palette(machine(), 0);
 }
 
 static void ppu_irq( device_t *device, int *ppu_regs )
@@ -294,7 +298,7 @@ static const ppu2c0x_interface ppu_interface =
 	ppu_irq				/* irq */
 };
 
-static VIDEO_START( cham24 )
+void cham24_state::video_start()
 {
 }
 
@@ -307,29 +311,28 @@ static SCREEN_UPDATE_IND16( cham24 )
 }
 
 
-static MACHINE_START( cham24 )
+void cham24_state::machine_start()
 {
-	cham24_state *state = machine.driver_data<cham24_state>();
 	/* switch PRG rom */
-	UINT8* dst = state->memregion("maincpu")->base();
-	UINT8* src = state->memregion("user1")->base();
+	UINT8* dst = memregion("maincpu")->base();
+	UINT8* src = memregion("user1")->base();
 
 	memcpy(&dst[0x8000], &src[0x0f8000], 0x4000);
 	memcpy(&dst[0xc000], &src[0x0f8000], 0x4000);
 
 	/* uses 8K swapping, all ROM!*/
-	machine.device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank1");
-	state->membank("bank1")->set_base(state->memregion("gfx1")->base());
+	machine().device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank1");
+	membank("bank1")->set_base(memregion("gfx1")->base());
 
 	/* need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4 */
-	state->m_nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
-	state->m_nt_page[0] = state->m_nt_ram;
-	state->m_nt_page[1] = state->m_nt_ram + 0x400;
-	state->m_nt_page[2] = state->m_nt_ram + 0x800;
-	state->m_nt_page[3] = state->m_nt_ram + 0xc00;
+	m_nt_ram = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_nt_page[0] = m_nt_ram;
+	m_nt_page[1] = m_nt_ram + 0x400;
+	m_nt_page[2] = m_nt_ram + 0x800;
+	m_nt_page[3] = m_nt_ram + 0xc00;
 
 	/* and read/write handlers */
-	machine.device("ppu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x2000, 0x3eff,read8_delegate(FUNC(cham24_state::nt_r), state), write8_delegate(FUNC(cham24_state::nt_w), state));
+	machine().device("ppu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x2000, 0x3eff,read8_delegate(FUNC(cham24_state::nt_r), this), write8_delegate(FUNC(cham24_state::nt_w), this));
 }
 
 DRIVER_INIT_MEMBER(cham24_state,cham24)
@@ -345,8 +348,6 @@ static MACHINE_CONFIG_START( cham24, cham24_state )
 	MCFG_CPU_ADD("maincpu", N2A03, N2A03_DEFAULTCLOCK)
 	MCFG_CPU_PROGRAM_MAP(cham24_map)
 
-	MCFG_MACHINE_RESET( cham24 )
-	MCFG_MACHINE_START( cham24 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -358,8 +359,6 @@ static MACHINE_CONFIG_START( cham24, cham24_state )
 	MCFG_GFXDECODE(cham24)
 	MCFG_PALETTE_LENGTH(8*4*16)
 
-	MCFG_PALETTE_INIT(cham24)
-	MCFG_VIDEO_START(cham24)
 
 	MCFG_PPU2C04_ADD("ppu", ppu_interface)
 

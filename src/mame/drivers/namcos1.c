@@ -1101,7 +1101,6 @@ static MACHINE_CONFIG_START( ns1, namcos1_state )
 	// heavy sync required to prevent CPUs from fighting for video RAM access and going into deadlocks
 	MCFG_QUANTUM_TIME(attotime::from_hz(38400))
 
-	MCFG_MACHINE_RESET(namcos1)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -1118,7 +1117,6 @@ static MACHINE_CONFIG_START( ns1, namcos1_state )
 	MCFG_GFXDECODE(namcos1)
 	MCFG_PALETTE_LENGTH(0x2000)
 
-	MCFG_VIDEO_START(namcos1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

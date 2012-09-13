@@ -9,11 +9,11 @@
 #include "emu.h"
 #include "includes/truco.h"
 
-PALETTE_INIT( truco )
+void truco_state::palette_init()
 {
 	int i;
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int	r = ( i & 0x8 ) ? 0xff : 0x00;
 		int g = ( i & 0x4 ) ? 0xff : 0x00;
@@ -27,7 +27,7 @@ PALETTE_INIT( truco )
 			b >>= 1;
 		}
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 	}
 }
 

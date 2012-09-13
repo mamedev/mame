@@ -258,7 +258,6 @@ static MACHINE_CONFIG_START( deadang, deadang_state )
 	MCFG_GFXDECODE(deadang)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(deadang)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM2203_INTERFACE(XTAL_14_31818MHz/4)

@@ -188,43 +188,41 @@ static const k05324x_interface surpratk_k05324x_intf =
 	surpratk_sprite_callback
 };
 
-static MACHINE_START( surpratk )
+void surpratk_state::machine_start()
 {
-	surpratk_state *state = machine.driver_data<surpratk_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 28, &ROM[0x10000], 0x2000);
-	state->membank("bank1")->configure_entries(28, 4, &ROM[0x08000], 0x2000);
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->configure_entries(0, 28, &ROM[0x10000], 0x2000);
+	membank("bank1")->configure_entries(28, 4, &ROM[0x08000], 0x2000);
+	membank("bank1")->set_entry(0);
 
-	state->m_generic_paletteram_8.allocate(0x1000);
+	m_generic_paletteram_8.allocate(0x1000);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_k053244 = machine.device("k053244");
-	state->m_k053251 = machine.device("k053251");
-	state->m_k052109 = machine.device("k052109");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_k053244 = machine().device("k053244");
+	m_k053251 = machine().device("k053251");
+	m_k052109 = machine().device("k052109");
 
-	state->save_item(NAME(state->m_videobank));
-	state->save_item(NAME(state->m_sprite_colorbase));
-	state->save_item(NAME(state->m_layer_colorbase));
-	state->save_item(NAME(state->m_layerpri));
+	save_item(NAME(m_videobank));
+	save_item(NAME(m_sprite_colorbase));
+	save_item(NAME(m_layer_colorbase));
+	save_item(NAME(m_layerpri));
 }
 
-static MACHINE_RESET( surpratk )
+void surpratk_state::machine_reset()
 {
-	surpratk_state *state = machine.driver_data<surpratk_state>();
 	int i;
 
-	konami_configure_set_lines(machine.device("maincpu"), surpratk_banking);
+	konami_configure_set_lines(machine().device("maincpu"), surpratk_banking);
 
 	for (i = 0; i < 3; i++)
 	{
-		state->m_layerpri[i] = 0;
-		state->m_layer_colorbase[i] = 0;
+		m_layerpri[i] = 0;
+		m_layer_colorbase[i] = 0;
 	}
 
-	state->m_sprite_colorbase = 0;
-	state->m_videobank = 0;
+	m_sprite_colorbase = 0;
+	m_videobank = 0;
 }
 
 static MACHINE_CONFIG_START( surpratk, surpratk_state )
@@ -234,8 +232,6 @@ static MACHINE_CONFIG_START( surpratk, surpratk_state )
 	MCFG_CPU_PROGRAM_MAP(surpratk_map)
 	MCFG_CPU_VBLANK_INT("screen", surpratk_interrupt)
 
-	MCFG_MACHINE_START(surpratk)
-	MCFG_MACHINE_RESET(surpratk)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

@@ -131,10 +131,9 @@
 ***************************************************************************/
 
 
-PALETTE_INIT( tubep )
+PALETTE_INIT_MEMBER(tubep_state,tubep)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	tubep_state *state = machine.driver_data<tubep_state>();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i,r,g,b;
 
 	/* background/sprites palette variables */
@@ -190,7 +189,7 @@ PALETTE_INIT( tubep )
 		bit1 = (*color_prom >> 7) & 0x01;
 		b = combine_2_weights(weights_txt_b, bit0, bit1);
 
-		palette_set_color(machine,i, MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i, MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -198,7 +197,7 @@ PALETTE_INIT( tubep )
 	/* sprites use the second PROM to control 8 x LS368. We copy content of this PROM over here */
 	for (i = 0; i < 32; i++)
 	{
-		state->m_prom2[i] = *color_prom;
+		m_prom2[i] = *color_prom;
 		color_prom++;
 	}
 
@@ -331,68 +330,66 @@ PALETTE_INIT( tubep )
 			/*logerror("Calculate [%x:%x] (active resistors:r=%i g=%i b=%i) = ", i, shade, active_r, active_g, active_b);*/
 			/*logerror("r:%3i g:%3i b:%3i\n",r,g,b );*/
 
-			palette_set_color(machine,32+i*0x40+sh, MAKE_RGB(r,g,b));
+			palette_set_color(machine(),32+i*0x40+sh, MAKE_RGB(r,g,b));
 		}
 	}
 }
 
 
-VIDEO_START( tubep )
+VIDEO_START_MEMBER(tubep_state,tubep)
 {
-	tubep_state *state = machine.driver_data<tubep_state>();
-	state->m_spritemap = auto_alloc_array(machine, UINT8, 256*256*2);
+	m_spritemap = auto_alloc_array(machine(), UINT8, 256*256*2);
 
 	/* Set up save state */
-	state_save_register_global(machine, state->m_romD_addr);
-	state_save_register_global(machine, state->m_romEF_addr);
-	state_save_register_global(machine, state->m_E16_add_b);
-	state_save_register_global(machine, state->m_HINV);
-	state_save_register_global(machine, state->m_VINV);
-	state_save_register_global(machine, state->m_XSize);
-	state_save_register_global(machine, state->m_YSize);
-	state_save_register_global(machine, state->m_mark_1);
-	state_save_register_global(machine, state->m_mark_2);
-	state_save_register_global(machine, state->m_colorram_addr_hi);
-	state_save_register_global(machine, state->m_ls273_g6);
-	state_save_register_global(machine, state->m_ls273_j6);
-	state_save_register_global(machine, state->m_romHI_addr_mid);
-	state_save_register_global(machine, state->m_romHI_addr_msb);
-	state_save_register_global(machine, state->m_DISP);
-	state_save_register_global(machine, state->m_background_romsel);
-	state_save_register_global(machine, state->m_color_A4);
-	state_save_register_global(machine, state->m_ls175_b7);
-	state_save_register_global(machine, state->m_ls175_e8);
-	state_save_register_global(machine, state->m_ls377_data);
-	state_save_register_global(machine, state->m_page);
+	state_save_register_global(machine(), m_romD_addr);
+	state_save_register_global(machine(), m_romEF_addr);
+	state_save_register_global(machine(), m_E16_add_b);
+	state_save_register_global(machine(), m_HINV);
+	state_save_register_global(machine(), m_VINV);
+	state_save_register_global(machine(), m_XSize);
+	state_save_register_global(machine(), m_YSize);
+	state_save_register_global(machine(), m_mark_1);
+	state_save_register_global(machine(), m_mark_2);
+	state_save_register_global(machine(), m_colorram_addr_hi);
+	state_save_register_global(machine(), m_ls273_g6);
+	state_save_register_global(machine(), m_ls273_j6);
+	state_save_register_global(machine(), m_romHI_addr_mid);
+	state_save_register_global(machine(), m_romHI_addr_msb);
+	state_save_register_global(machine(), m_DISP);
+	state_save_register_global(machine(), m_background_romsel);
+	state_save_register_global(machine(), m_color_A4);
+	state_save_register_global(machine(), m_ls175_b7);
+	state_save_register_global(machine(), m_ls175_e8);
+	state_save_register_global(machine(), m_ls377_data);
+	state_save_register_global(machine(), m_page);
 }
 
 
-VIDEO_RESET( tubep )
+VIDEO_RESET_MEMBER(tubep_state,tubep)
 {
-	tubep_state *state = machine.driver_data<tubep_state>();
-	memset(state->m_spritemap,0,256*256*2);
+	memset(m_spritemap,0,256*256*2);
 
-	state->m_romD_addr = 0;
-	state->m_romEF_addr = 0;
-	state->m_E16_add_b = 0;
-	state->m_HINV = 0;
-	state->m_VINV = 0;
-	state->m_XSize = 0;
-	state->m_YSize = 0;
-	state->m_mark_1 = 0;
-	state->m_mark_2 = 0;
-	state->m_colorram_addr_hi = 0;
-	state->m_ls273_g6 = 0;
-	state->m_ls273_j6 = 0;
-	state->m_romHI_addr_mid = 0;
-	state->m_romHI_addr_msb = 0;
-	state->m_DISP = 0;
-	state->m_background_romsel = 0;
-	state->m_color_A4 = 0;
-	state->m_ls175_b7 = 0x0f | 0xf0;
-	state->m_ls175_e8 = 0x0f;
-	state->m_ls377_data = 0;
-	state->m_page = 0;
+	m_romD_addr = 0;
+	m_romEF_addr = 0;
+	m_E16_add_b = 0;
+	m_HINV = 0;
+	m_VINV = 0;
+	m_XSize = 0;
+	m_YSize = 0;
+	m_mark_1 = 0;
+	m_mark_2 = 0;
+	m_colorram_addr_hi = 0;
+	m_ls273_g6 = 0;
+	m_ls273_j6 = 0;
+	m_romHI_addr_mid = 0;
+	m_romHI_addr_msb = 0;
+	m_DISP = 0;
+	m_background_romsel = 0;
+	m_color_A4 = 0;
+	m_ls175_b7 = 0x0f | 0xf0;
+	m_ls175_e8 = 0x0f;
+	m_ls377_data = 0;
+	m_page = 0;
 }
 
 
@@ -684,9 +681,9 @@ SCREEN_UPDATE_IND16( tubep )
 
 ***************************************************************************/
 
-PALETTE_INIT( rjammer )
+PALETTE_INIT_MEMBER(tubep_state,rjammer)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	static const int resistors_rg[3] = { 1000, 470, 220 };
@@ -699,7 +696,7 @@ PALETTE_INIT( rjammer )
 			2,	resistors_b,	weights_b,	470,	0,
 			0,	0,	0,	0,	0	);
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -718,7 +715,7 @@ PALETTE_INIT( rjammer )
 		bit1 = (*color_prom >> 7) & 0x01;
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine,i, MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i, MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}

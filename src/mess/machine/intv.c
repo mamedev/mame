@@ -616,36 +616,35 @@ DRIVER_INIT_MEMBER(intv_state,intv)
 #endif
 
 /* Set Reset and INTR/INTRM Vector */
-MACHINE_RESET( intv )
+void intv_state::machine_reset()
 {
-	machine.device("maincpu")->execute().set_input_line_vector(CP1610_RESET, 0x1000);
+	machine().device("maincpu")->execute().set_input_line_vector(CP1610_RESET, 0x1000);
 
 	/* These are actually the same vector, and INTR is unused */
-	machine.device("maincpu")->execute().set_input_line_vector(CP1610_INT_INTRM, 0x1004);
-	machine.device("maincpu")->execute().set_input_line_vector(CP1610_INT_INTR,  0x1004);
+	machine().device("maincpu")->execute().set_input_line_vector(CP1610_INT_INTRM, 0x1004);
+	machine().device("maincpu")->execute().set_input_line_vector(CP1610_INT_INTR,  0x1004);
 
 	/* Set initial PC */
-	machine.device("maincpu")->state().set_state_int(CP1610_R7, 0x1000);
+	machine().device("maincpu")->state().set_state_int(CP1610_R7, 0x1000);
 
 	return;
 }
 
-MACHINE_RESET( intvecs )
+MACHINE_RESET_MEMBER(intv_state,intvecs)
 {
-	intv_state *state = machine.driver_data<intv_state>();
-	state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + (0x2000 << 1));
-	state->membank("bank2")->set_base(machine.root_device().memregion("ecs_rom")->base() + (0x7000 << 1));
-	state->membank("bank3")->set_base(machine.root_device().memregion("maincpu")->base() + (0xE000 << 1));
-	state->membank("bank4")->set_base(machine.root_device().memregion("maincpu")->base() + (0xF000 << 1));
+	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + (0x2000 << 1));
+	membank("bank2")->set_base(machine().root_device().memregion("ecs_rom")->base() + (0x7000 << 1));
+	membank("bank3")->set_base(machine().root_device().memregion("maincpu")->base() + (0xE000 << 1));
+	membank("bank4")->set_base(machine().root_device().memregion("maincpu")->base() + (0xF000 << 1));
 
-	machine.device("maincpu")->execute().set_input_line_vector(CP1610_RESET, 0x1000);
+	machine().device("maincpu")->execute().set_input_line_vector(CP1610_RESET, 0x1000);
 
 	/* These are actually the same vector, and INTR is unused */
-	machine.device("maincpu")->execute().set_input_line_vector(CP1610_INT_INTRM, 0x1004);
-	machine.device("maincpu")->execute().set_input_line_vector(CP1610_INT_INTR,  0x1004);
+	machine().device("maincpu")->execute().set_input_line_vector(CP1610_INT_INTRM, 0x1004);
+	machine().device("maincpu")->execute().set_input_line_vector(CP1610_INT_INTR,  0x1004);
 
 	/* Set initial PC */
-	machine.device("maincpu")->state().set_state_int(CP1610_R7, 0x1000);
+	machine().device("maincpu")->state().set_state_int(CP1610_R7, 0x1000);
 
 	return;
 }

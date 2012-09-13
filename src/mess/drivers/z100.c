@@ -200,6 +200,10 @@ public:
 
 	mc6845_device *m_mc6845;
 	DECLARE_DRIVER_INIT(z100);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 #define mc6845_h_char_total 	(state->m_crtc_vreg[0])
@@ -220,11 +224,10 @@ public:
 #define mc6845_update_addr  	(((state->m_crtc_vreg[0x12]<<8) & 0xff00) | (state->m_crtc_vreg[0x13] & 0xff))
 
 
-static VIDEO_START( z100 )
+void z100_state::video_start()
 {
-	z100_state *state = machine.driver_data<z100_state>();
 
-	state->m_gvram = auto_alloc_array_clear(machine, UINT8, 0x30000);
+	m_gvram = auto_alloc_array_clear(machine(), UINT8, 0x30000);
 }
 
 static SCREEN_UPDATE_IND16( z100 )
@@ -741,33 +744,31 @@ static const floppy_interface z100_floppy_interface =
 	NULL
 };
 
-static PALETTE_INIT(z100)
+void z100_state::palette_init()
 {
 	// ...
 }
 
-static MACHINE_START(z100)
+void z100_state::machine_start()
 {
-	z100_state *state = machine.driver_data<z100_state>();
 
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(z100_irq_callback);
-	state->m_mc6845 = machine.device<mc6845_device>("crtc");
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(z100_irq_callback);
+	m_mc6845 = machine().device<mc6845_device>("crtc");
 }
 
-static MACHINE_RESET(z100)
+void z100_state::machine_reset()
 {
-	//z100_state *state = machine.driver_data<z100_state>();
 	int i;
 
-	if(machine.root_device().ioport("CONFIG")->read() & 1)
+	if(machine().root_device().ioport("CONFIG")->read() & 1)
 	{
 		for(i=0;i<8;i++)
-			palette_set_color_rgb(machine, i,pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
+			palette_set_color_rgb(machine(), i,pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
 	}
 	else
 	{
 		for(i=0;i<8;i++)
-			palette_set_color_rgb(machine, i,pal3bit(0),pal3bit(i),pal3bit(0));
+			palette_set_color_rgb(machine(), i,pal3bit(0),pal3bit(i),pal3bit(0));
 	}
 }
 
@@ -777,8 +778,6 @@ static MACHINE_CONFIG_START( z100, z100_state )
 	MCFG_CPU_PROGRAM_MAP(z100_mem)
 	MCFG_CPU_IO_MAP(z100_io)
 
-	MCFG_MACHINE_START(z100)
-	MCFG_MACHINE_RESET(z100)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -786,10 +785,8 @@ static MACHINE_CONFIG_START( z100, z100_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_VIDEO_START(z100)
 	MCFG_SCREEN_UPDATE_STATIC(z100)
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(z100)
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_14_31818MHz/8, mc6845_intf)	/* unknown clock, hand tuned to get ~50/~60 fps */

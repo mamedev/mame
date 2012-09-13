@@ -49,14 +49,19 @@ public:
 	DECLARE_WRITE8_MEMBER(laser_two_color_w);
 	DECLARE_READ8_MEMBER(laser_fdc_r);
 	DECLARE_DRIVER_INIT(laser);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_MACHINE_RESET(laser500);
+	DECLARE_MACHINE_RESET(laser700);
 };
 
 
 /*----------- defined in machine/vtech2.c -----------*/
 
-MACHINE_RESET( laser350 );
-MACHINE_RESET( laser500 );
-MACHINE_RESET( laser700 );
+
+
+
 
 DEVICE_IMAGE_LOAD( laser_cart );
 DEVICE_IMAGE_UNLOAD( laser_cart );

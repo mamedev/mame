@@ -426,41 +426,39 @@ ADDRESS_MAP_END
 //5 - different values
 //6 - different values
 
-static MACHINE_START( opwolf )
+void opwolf_state::machine_start()
 {
-	opwolf_state *state = machine.driver_data<opwolf_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_pc080sn = machine.device("pc080sn");
-	state->m_pc090oj = machine.device("pc090oj");
-	state->m_msm1 = machine.device("msm1");
-	state->m_msm2 = machine.device("msm2");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_pc080sn = machine().device("pc080sn");
+	m_pc090oj = machine().device("pc090oj");
+	m_msm1 = machine().device("msm1");
+	m_msm2 = machine().device("msm2");
 
-	state->save_item(NAME(state->m_sprite_ctrl));
-	state->save_item(NAME(state->m_sprites_flipscreen));
+	save_item(NAME(m_sprite_ctrl));
+	save_item(NAME(m_sprites_flipscreen));
 
-	state->save_item(NAME(state->m_adpcm_b));
-	state->save_item(NAME(state->m_adpcm_c));
-	state->save_item(NAME(state->m_adpcm_pos));
-	state->save_item(NAME(state->m_adpcm_end));
+	save_item(NAME(m_adpcm_b));
+	save_item(NAME(m_adpcm_c));
+	save_item(NAME(m_adpcm_pos));
+	save_item(NAME(m_adpcm_end));
 }
 
-static MACHINE_RESET( opwolf )
+MACHINE_RESET_MEMBER(opwolf_state,opwolf)
 {
-	opwolf_state *state = machine.driver_data<opwolf_state>();
 
-	state->m_adpcm_b[0] = state->m_adpcm_b[1] = 0;
-	state->m_adpcm_c[0] = state->m_adpcm_c[1] = 0;
-	state->m_adpcm_pos[0] = state->m_adpcm_pos[1] = 0;
-	state->m_adpcm_end[0] = state->m_adpcm_end[1] = 0;
-	state->m_adpcm_data[0] = state->m_adpcm_data[1] = -1;
+	m_adpcm_b[0] = m_adpcm_b[1] = 0;
+	m_adpcm_c[0] = m_adpcm_c[1] = 0;
+	m_adpcm_pos[0] = m_adpcm_pos[1] = 0;
+	m_adpcm_end[0] = m_adpcm_end[1] = 0;
+	m_adpcm_data[0] = m_adpcm_data[1] = -1;
 
-	state->m_sprite_ctrl = 0;
-	state->m_sprites_flipscreen = 0;
+	m_sprite_ctrl = 0;
+	m_sprites_flipscreen = 0;
 
-	msm5205_reset_w(machine.device("msm1"), 1);
-	msm5205_reset_w(machine.device("msm2"), 1);
+	msm5205_reset_w(machine().device("msm1"), 1);
+	msm5205_reset_w(machine().device("msm2"), 1);
 }
 
 static void opwolf_msm5205_vck( device_t *device )
@@ -744,8 +742,7 @@ static MACHINE_CONFIG_START( opwolf, opwolf_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_MACHINE_START(opwolf)
-	MCFG_MACHINE_RESET(opwolf)
+	MCFG_MACHINE_RESET_OVERRIDE(opwolf_state,opwolf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -799,7 +796,6 @@ static MACHINE_CONFIG_START( opwolfb, opwolf_state ) /* OSC clocks unknown for t
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_MACHINE_START(opwolf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

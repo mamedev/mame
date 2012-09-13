@@ -103,31 +103,29 @@ static void reset_bank(running_machine &machine)
 }
 
 
-static MACHINE_START( atetris )
+void atetris_state::machine_start()
 {
-	atetris_state *state = machine.driver_data<atetris_state>();
 
 	/* Allocate interrupt timer */
-	state->m_interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_gen));
+	m_interrupt_timer = machine().scheduler().timer_alloc(FUNC(interrupt_gen));
 
 	/* Set up save state */
-	state->save_item(NAME(state->m_current_bank));
-	state->save_item(NAME(state->m_nvram_write_enable));
-	machine.save().register_postload(save_prepost_delegate(FUNC(reset_bank), &machine));
+	save_item(NAME(m_current_bank));
+	save_item(NAME(m_nvram_write_enable));
+	machine().save().register_postload(save_prepost_delegate(FUNC(reset_bank), &machine()));
 }
 
 
-static MACHINE_RESET( atetris )
+void atetris_state::machine_reset()
 {
-	atetris_state *state = machine.driver_data<atetris_state>();
 
 	/* reset the slapstic */
 	slapstic_reset();
-	state->m_current_bank = slapstic_bank() & 1;
-	reset_bank(machine);
+	m_current_bank = slapstic_bank() & 1;
+	reset_bank(machine());
 
 	/* start interrupts going (32V clocked by 16V) */
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(48), 48);
+	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(48), 48);
 }
 
 
@@ -346,8 +344,6 @@ static MACHINE_CONFIG_START( atetris, atetris_state )
 	MCFG_CPU_ADD("maincpu", M6502,MASTER_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_START(atetris)
-	MCFG_MACHINE_RESET(atetris)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
@@ -360,7 +356,6 @@ static MACHINE_CONFIG_START( atetris, atetris_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(atetris)
 
-	MCFG_VIDEO_START(atetris)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -381,8 +376,6 @@ static MACHINE_CONFIG_START( atetrisb2, atetris_state )
 	MCFG_CPU_ADD("maincpu", M6502,BOOTLEG_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(atetrisb2_map)
 
-	MCFG_MACHINE_START(atetris)
-	MCFG_MACHINE_RESET(atetris)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
@@ -395,7 +388,6 @@ static MACHINE_CONFIG_START( atetrisb2, atetris_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(atetris)
 
-	MCFG_VIDEO_START(atetris)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

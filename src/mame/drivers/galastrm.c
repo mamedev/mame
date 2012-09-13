@@ -325,7 +325,6 @@ static MACHINE_CONFIG_START( galastrm, galastrm_state )
 	MCFG_GFXDECODE(galastrm)
 	MCFG_PALETTE_LENGTH(4096)
 
-	MCFG_VIDEO_START(galastrm)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", galastrm_tc0100scn_intf)
 	MCFG_TC0480SCP_ADD("tc0480scp", galastrm_tc0480scp_intf)

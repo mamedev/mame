@@ -110,6 +110,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_command_r);
 	DECLARE_DRIVER_INIT(fixed);
 	DECLARE_DRIVER_INIT(variable);
+	DECLARE_MACHINE_START(dlair);
+	DECLARE_MACHINE_RESET(dlair);
+	DECLARE_PALETTE_INIT(dleuro);
 };
 
 
@@ -204,14 +207,14 @@ static const z80_daisy_config dleuro_daisy_chain[] =
  *
  *************************************/
 
-static PALETTE_INIT( dleuro )
+PALETTE_INIT_MEMBER(dlair_state,dleuro)
 {
 	int i;
 
 	for (i = 0; i < 8; i++)
 	{
-		palette_set_color(machine, 2 * i + 0, MAKE_RGB(0, 0, 0));
-		palette_set_color_rgb(machine, 2 * i + 1, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		palette_set_color(machine(), 2 * i + 0, MAKE_RGB(0, 0, 0));
+		palette_set_color_rgb(machine(), 2 * i + 1, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 	}
 }
 
@@ -248,21 +251,20 @@ static SCREEN_UPDATE_IND16( dleuro )
  *
  *************************************/
 
-static MACHINE_START( dlair )
+MACHINE_START_MEMBER(dlair_state,dlair)
 {
 }
 
 
-static MACHINE_RESET( dlair )
+MACHINE_RESET_MEMBER(dlair_state,dlair)
 {
 #if 0
-	dlair_state *state = machine.driver_data<dlair_state>();
 
 	/* determine the laserdisc player from the DIP switches */
-	if (state->m_laserdisc_type == LASERDISC_TYPE_VARIABLE)
+	if (m_laserdisc_type == LASERDISC_TYPE_VARIABLE)
 	{
-		int newtype = (state->ioport("DSW2")->read() & 0x08) ? LASERDISC_TYPE_PIONEER_LDV1000 : LASERDISC_TYPE_PIONEER_PR7820;
-		laserdisc_set_type(state->m_laserdisc, newtype);
+		int newtype = (ioport("DSW2")->read() & 0x08) ? LASERDISC_TYPE_PIONEER_LDV1000 : LASERDISC_TYPE_PIONEER_PR7820;
+		laserdisc_set_type(m_laserdisc, newtype);
 	}
 #endif
 }
@@ -724,8 +726,8 @@ static MACHINE_CONFIG_START( dlair_base, dlair_state )
 	MCFG_CPU_VBLANK_INT("screen", vblank_callback)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, (double)MASTER_CLOCK_US/8/16/16/16/16)
 
-	MCFG_MACHINE_START(dlair)
-	MCFG_MACHINE_RESET(dlair)
+	MCFG_MACHINE_START_OVERRIDE(dlair_state,dlair)
+	MCFG_MACHINE_RESET_OVERRIDE(dlair_state,dlair)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -766,8 +768,8 @@ static MACHINE_CONFIG_START( dleuro, dlair_state )
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MASTER_CLOCK_EURO/(16*16*16*16*16*8)))
 
-	MCFG_MACHINE_START(dlair)
-	MCFG_MACHINE_RESET(dlair)
+	MCFG_MACHINE_START_OVERRIDE(dlair_state,dlair)
+	MCFG_MACHINE_RESET_OVERRIDE(dlair_state,dlair)
 
 	MCFG_LASERDISC_22VP932_ADD("ld_22vp932")
 	MCFG_LASERDISC_OVERLAY_STATIC(256, 256, dleuro)
@@ -778,7 +780,7 @@ static MACHINE_CONFIG_START( dleuro, dlair_state )
 	MCFG_GFXDECODE(dlair)
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_PALETTE_INIT(dleuro)
+	MCFG_PALETTE_INIT_OVERRIDE(dlair_state,dleuro)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

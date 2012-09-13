@@ -44,6 +44,10 @@ public:
 	DECLARE_WRITE8_MEMBER(b2m_localmachine_w);
 	DECLARE_READ8_MEMBER(b2m_localmachine_r);
 	DECLARE_DRIVER_INIT(b2m);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 /*----------- defined in machine/b2m.c -----------*/

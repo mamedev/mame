@@ -53,7 +53,7 @@ WRITE16_MEMBER(darkseal_state::darkseal_palette_24bit_b_w)
 
 /******************************************************************************/
 
-VIDEO_START( darkseal )
+void darkseal_state::video_start()
 {
 
 }

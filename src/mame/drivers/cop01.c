@@ -425,28 +425,26 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( cop01 )
+void cop01_state::machine_start()
 {
-	cop01_state *state = machine.driver_data<cop01_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_pulse));
-	state->save_item(NAME(state->m_timer));
-	state->save_item(NAME(state->m_vreg));
+	save_item(NAME(m_pulse));
+	save_item(NAME(m_timer));
+	save_item(NAME(m_vreg));
 }
 
-static MACHINE_RESET( cop01 )
+void cop01_state::machine_reset()
 {
-	cop01_state *state = machine.driver_data<cop01_state>();
 
-	state->m_pulse = 0;
-	state->m_timer = 0;
-	state->m_vreg[0] = 0;
-	state->m_vreg[1] = 0;
-	state->m_vreg[2] = 0;
-	state->m_vreg[3] = 0;
+	m_pulse = 0;
+	m_timer = 0;
+	m_vreg[0] = 0;
+	m_vreg[1] = 0;
+	m_vreg[2] = 0;
+	m_vreg[3] = 0;
 }
 
 
@@ -462,8 +460,6 @@ static MACHINE_CONFIG_START( cop01, cop01_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(audio_io_map)
 
-	MCFG_MACHINE_START(cop01)
-	MCFG_MACHINE_RESET(cop01)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -476,8 +472,6 @@ static MACHINE_CONFIG_START( cop01, cop01_state )
 	MCFG_GFXDECODE(cop01)
 	MCFG_PALETTE_LENGTH(16+8*16+16*16)
 
-	MCFG_PALETTE_INIT(cop01)
-	MCFG_VIDEO_START(cop01)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -504,8 +498,6 @@ static MACHINE_CONFIG_START( mightguy, cop01_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(mightguy_audio_io_map)
 
-	MCFG_MACHINE_START(cop01)
-	MCFG_MACHINE_RESET(cop01)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -518,8 +510,6 @@ static MACHINE_CONFIG_START( mightguy, cop01_state )
 	MCFG_GFXDECODE(cop01)
 	MCFG_PALETTE_LENGTH(16+8*16+16*16)
 
-	MCFG_PALETTE_INIT(cop01)
-	MCFG_VIDEO_START(cop01)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

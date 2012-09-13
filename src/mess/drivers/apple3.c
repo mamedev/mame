@@ -74,7 +74,7 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_CPU_PERIODIC_INT(apple3_interrupt, 192)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_RESET( apple3 )
+	MCFG_MACHINE_RESET_OVERRIDE(apple3_state, apple3 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -85,9 +85,9 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_SCREEN_UPDATE_STATIC( apple3 )
 
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT( apple2 )
+	MCFG_PALETTE_INIT_OVERRIDE(apple3_state, apple2 )
 
-	MCFG_VIDEO_START( apple3 )
+	MCFG_VIDEO_START_OVERRIDE(apple3_state, apple3 )
 
     /* slot bus */
     MCFG_A2BUS_BUS_ADD("a2bus", "maincpu", a2bus_intf)

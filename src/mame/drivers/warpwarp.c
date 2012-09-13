@@ -742,8 +742,8 @@ static MACHINE_CONFIG_START( geebee, warpwarp_state )
 	MCFG_GFXDECODE(1k)
 	MCFG_PALETTE_LENGTH(4*2)
 
-	MCFG_PALETTE_INIT(geebee)
-	MCFG_VIDEO_START(geebee)
+	MCFG_PALETTE_INIT_OVERRIDE(warpwarp_state,geebee)
+	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,geebee)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -758,8 +758,8 @@ static MACHINE_CONFIG_DERIVED( navarone, geebee )
 	MCFG_GFXDECODE(2k)
 	MCFG_PALETTE_LENGTH(2*2)
 
-	MCFG_PALETTE_INIT(navarone)
-	MCFG_VIDEO_START(navarone)
+	MCFG_PALETTE_INIT_OVERRIDE(warpwarp_state,navarone)
+	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,navarone)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( bombbee, warpwarp_state )
@@ -777,8 +777,8 @@ static MACHINE_CONFIG_START( bombbee, warpwarp_state )
 	MCFG_GFXDECODE(color)
 	MCFG_PALETTE_LENGTH(2*256+1)
 
-	MCFG_PALETTE_INIT(warpwarp)
-	MCFG_VIDEO_START(warpwarp)
+	MCFG_PALETTE_INIT_OVERRIDE(warpwarp_state,warpwarp)
+	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,warpwarp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

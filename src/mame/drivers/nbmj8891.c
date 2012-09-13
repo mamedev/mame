@@ -2616,7 +2616,6 @@ static MACHINE_CONFIG_START( gionbana, nbmj8891_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(nbmj8891_2layer)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2665,7 +2664,7 @@ static MACHINE_CONFIG_DERIVED( mjcamerb, gionbana )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	MCFG_VIDEO_START(nbmj8891_1layer)
+	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,nbmj8891_1layer)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mmcamera, gionbana )
@@ -2679,7 +2678,7 @@ static MACHINE_CONFIG_DERIVED( mmcamera, gionbana )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	MCFG_VIDEO_START(nbmj8891_1layer)
+	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,nbmj8891_1layer)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hanamomo, gionbana )
@@ -2692,7 +2691,7 @@ static MACHINE_CONFIG_DERIVED( hanamomo, gionbana )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	MCFG_VIDEO_START(nbmj8891_1layer)
+	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,nbmj8891_1layer)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( msjiken, hanamomo )
@@ -2707,7 +2706,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( telmahjn, gionbana )
 
 	/* video hardware */
-	MCFG_VIDEO_START(nbmj8891_1layer)
+	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,nbmj8891_1layer)
 MACHINE_CONFIG_END
 
 /* NBMJDRV4 */
@@ -2716,7 +2715,7 @@ static MACHINE_CONFIG_DERIVED( mjfocus, gionbana )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_VIDEO_START(nbmj8891_1layer)
+	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,nbmj8891_1layer)
 MACHINE_CONFIG_END
 
 /* NBMJDRV5 */
@@ -2810,7 +2809,7 @@ static MACHINE_CONFIG_DERIVED( mjfocusm, gionbana )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	MCFG_VIDEO_START(nbmj8891_1layer)
+	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,nbmj8891_1layer)
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("fmsnd", AY8910, 1250000)
@@ -2831,7 +2830,7 @@ static MACHINE_CONFIG_DERIVED( taiwanmb, gionbana )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	MCFG_VIDEO_START(nbmj8891_1layer)
+	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,nbmj8891_1layer)
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("fmsnd", AY8910, 1250000)

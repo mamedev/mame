@@ -1863,86 +1863,80 @@ static const ym3812_interface ym3812_config =
 /******************************************************************************/
 
 
-static MACHINE_START( common )
+MACHINE_START_MEMBER(alpha68k_state,common)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_trigstate));
-	state->save_item(NAME(state->m_deposits1));
-	state->save_item(NAME(state->m_deposits2));
-    	state->save_item(NAME(state->m_credits));
-	state->save_item(NAME(state->m_coinvalue));
-	state->save_item(NAME(state->m_microcontroller_data));
-	state->save_item(NAME(state->m_latch));
-	state->save_item(NAME(state->m_flipscreen));
+	save_item(NAME(m_trigstate));
+	save_item(NAME(m_deposits1));
+	save_item(NAME(m_deposits2));
+    	save_item(NAME(m_credits));
+	save_item(NAME(m_coinvalue));
+	save_item(NAME(m_microcontroller_data));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_flipscreen));
 }
 
-static MACHINE_RESET( common )
+MACHINE_RESET_MEMBER(alpha68k_state,common)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 
-	state->m_trigstate = 0;
-	state->m_deposits1 = 0;
-	state->m_deposits2 = 0;
-	state->m_credits = 0;
-	state->m_coinvalue = 0;
-	state->m_microcontroller_data = 0;
-	state->m_latch = 0;
-	state->m_flipscreen = 0;
+	m_trigstate = 0;
+	m_deposits1 = 0;
+	m_deposits2 = 0;
+	m_credits = 0;
+	m_coinvalue = 0;
+	m_microcontroller_data = 0;
+	m_latch = 0;
+	m_flipscreen = 0;
 }
 
-static MACHINE_START( alpha68k_V )
+MACHINE_START_MEMBER(alpha68k_state,alpha68k_V)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	UINT8 *ROM = state->memregion("audiocpu")->base();
+	UINT8 *ROM = memregion("audiocpu")->base();
 
-	state->membank("bank7")->configure_entries(0, 32, &ROM[0x10000], 0x4000);
+	membank("bank7")->configure_entries(0, 32, &ROM[0x10000], 0x4000);
 
-	MACHINE_START_CALL(common);
+	MACHINE_START_CALL_MEMBER(common);
 
-	state->save_item(NAME(state->m_bank_base));
-	state->save_item(NAME(state->m_last_bank));
+	save_item(NAME(m_bank_base));
+	save_item(NAME(m_last_bank));
 }
 
-static MACHINE_RESET( alpha68k_V )
+MACHINE_RESET_MEMBER(alpha68k_state,alpha68k_V)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 
-	MACHINE_RESET_CALL(common);
+	MACHINE_RESET_CALL_MEMBER(common);
 
-	state->m_bank_base = 0;
-	state->m_last_bank = 0;
+	m_bank_base = 0;
+	m_last_bank = 0;
 }
 
-static MACHINE_RESET( alpha68k_II )
+MACHINE_RESET_MEMBER(alpha68k_state,alpha68k_II)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 
-	MACHINE_RESET_CALL(common);
+	MACHINE_RESET_CALL_MEMBER(common);
 
-	state->m_bank_base = 0;
-	state->m_last_bank = 0;
-	state->m_buffer_28 = 0;
-	state->m_buffer_60 = 0;
-	state->m_buffer_68 = 0;
+	m_bank_base = 0;
+	m_last_bank = 0;
+	m_buffer_28 = 0;
+	m_buffer_60 = 0;
+	m_buffer_68 = 0;
 }
 
-static MACHINE_START( alpha68k_II )
+MACHINE_START_MEMBER(alpha68k_state,alpha68k_II)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	UINT8 *ROM = state->memregion("audiocpu")->base();
+	UINT8 *ROM = memregion("audiocpu")->base();
 
-	state->membank("bank7")->configure_entries(0, 28, &ROM[0x10000], 0x4000);
+	membank("bank7")->configure_entries(0, 28, &ROM[0x10000], 0x4000);
 
-	MACHINE_START_CALL(common);
+	MACHINE_START_CALL_MEMBER(common);
 
-	state->save_item(NAME(state->m_bank_base));
-	state->save_item(NAME(state->m_last_bank));
-	state->save_item(NAME(state->m_buffer_28));
-	state->save_item(NAME(state->m_buffer_60));
-	state->save_item(NAME(state->m_buffer_68));
+	save_item(NAME(m_bank_base));
+	save_item(NAME(m_last_bank));
+	save_item(NAME(m_buffer_28));
+	save_item(NAME(m_buffer_60));
+	save_item(NAME(m_buffer_68));
 
 }
 
@@ -1975,8 +1969,8 @@ static MACHINE_CONFIG_START( sstingry, alpha68k_state )
 	MCFG_CPU_IO_MAP(i8748_portmap)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_MACHINE_START(common)
-	MCFG_MACHINE_RESET(common)
+	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1988,7 +1982,7 @@ static MACHINE_CONFIG_START( sstingry, alpha68k_state )
 
 	MCFG_GFXDECODE(sstingry)
 	MCFG_PALETTE_LENGTH(256 + 1)
-	MCFG_PALETTE_INIT(kyros)
+	MCFG_PALETTE_INIT_OVERRIDE(alpha68k_state,kyros)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2020,8 +2014,8 @@ static MACHINE_CONFIG_START( kyros, alpha68k_state )
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 2*60)
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 4000)
 
-	MCFG_MACHINE_START(common)
-	MCFG_MACHINE_RESET(common)
+	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2034,7 +2028,7 @@ static MACHINE_CONFIG_START( kyros, alpha68k_state )
 	MCFG_GFXDECODE(kyros)
 	MCFG_PALETTE_LENGTH(256 + 1)
 
-	MCFG_PALETTE_INIT(kyros)
+	MCFG_PALETTE_INIT_OVERRIDE(alpha68k_state,kyros)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2065,8 +2059,8 @@ static MACHINE_CONFIG_START( jongbou, alpha68k_state )
 	MCFG_CPU_IO_MAP(jongbou_sound_portmap)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 160*60)
 
-	MCFG_MACHINE_START(common)
-	MCFG_MACHINE_RESET(common)
+	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2079,7 +2073,7 @@ static MACHINE_CONFIG_START( jongbou, alpha68k_state )
 	MCFG_GFXDECODE(jongbou)
 	MCFG_PALETTE_LENGTH(256 + 1)
 
-	MCFG_PALETTE_INIT(kyros)
+	MCFG_PALETTE_INIT_OVERRIDE(alpha68k_state,kyros)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2099,8 +2093,8 @@ static MACHINE_CONFIG_START( alpha68k_I, alpha68k_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // 4Mhz seems to yield the correct tone
 	MCFG_CPU_PROGRAM_MAP(alpha68k_I_s_map)
 
-	MCFG_MACHINE_START(common)
-	MCFG_MACHINE_RESET(common)
+	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2113,7 +2107,7 @@ static MACHINE_CONFIG_START( alpha68k_I, alpha68k_state )
 	MCFG_GFXDECODE(paddle)
 
 	MCFG_PALETTE_LENGTH(1024)
-	MCFG_PALETTE_INIT(paddlem)
+	MCFG_PALETTE_INIT_OVERRIDE(alpha68k_state,paddlem)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2143,8 +2137,8 @@ static MACHINE_CONFIG_START( alpha68k_II, alpha68k_state )
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT(alpha68k_sound_nmi, 7500)
 
-	MCFG_MACHINE_START(alpha68k_II)
-	MCFG_MACHINE_RESET(alpha68k_II)
+	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_II)
+	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_II)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2157,7 +2151,7 @@ static MACHINE_CONFIG_START( alpha68k_II, alpha68k_state )
 	MCFG_GFXDECODE(alpha68k_II)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(alpha68k)
+	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2192,8 +2186,8 @@ static MACHINE_CONFIG_START( alpha68k_II_gm, alpha68k_state )
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT(alpha68k_sound_nmi, 7500)
 
-	MCFG_MACHINE_START(alpha68k_II)
-	MCFG_MACHINE_RESET(alpha68k_II)
+	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_II)
+	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_II)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2206,7 +2200,7 @@ static MACHINE_CONFIG_START( alpha68k_II_gm, alpha68k_state )
 	MCFG_GFXDECODE(alpha68k_II)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(alpha68k)
+	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2235,8 +2229,8 @@ static MACHINE_CONFIG_START( alpha68k_V, alpha68k_state )
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT(alpha68k_sound_nmi, 8500)
 
-	MCFG_MACHINE_START(alpha68k_V)
-	MCFG_MACHINE_RESET(alpha68k_V)
+	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_V)
+	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_V)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2249,7 +2243,7 @@ static MACHINE_CONFIG_START( alpha68k_V, alpha68k_state )
 	MCFG_GFXDECODE(alpha68k_V)
 	MCFG_PALETTE_LENGTH(4096)
 
-	MCFG_VIDEO_START(alpha68k)
+	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2277,8 +2271,8 @@ static MACHINE_CONFIG_START( alpha68k_V_sb, alpha68k_state )
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT(alpha68k_sound_nmi, 8500)
 
-	MCFG_MACHINE_START(alpha68k_V)
-	MCFG_MACHINE_RESET(alpha68k_V)
+	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_V)
+	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_V)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2291,7 +2285,7 @@ static MACHINE_CONFIG_START( alpha68k_V_sb, alpha68k_state )
 	MCFG_GFXDECODE(alpha68k_V)
 	MCFG_PALETTE_LENGTH(4096)
 
-	MCFG_VIDEO_START(alpha68k)
+	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2318,8 +2312,8 @@ static MACHINE_CONFIG_START( tnextspc, alpha68k_state )
 	MCFG_CPU_PROGRAM_MAP(tnextspc_sound_map)
 	MCFG_CPU_IO_MAP(tnextspc_sound_portmap)
 
-	MCFG_MACHINE_START(common)
-	MCFG_MACHINE_RESET(common)
+	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2332,7 +2326,7 @@ static MACHINE_CONFIG_START( tnextspc, alpha68k_state )
 	MCFG_GFXDECODE(tnextspc)
 
 	MCFG_PALETTE_LENGTH(1024)
-	MCFG_PALETTE_INIT(paddlem)
+	MCFG_PALETTE_INIT_OVERRIDE(alpha68k_state,paddlem)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

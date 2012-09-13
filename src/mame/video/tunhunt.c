@@ -65,24 +65,23 @@ TILE_GET_INFO_MEMBER(tunhunt_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
-VIDEO_START( tunhunt )
+void tunhunt_state::video_start()
 {
 	/*
     Motion Object RAM contains 64 lines of run-length encoded data.
     We keep track of dirty lines and cache the expanded bitmap.
     With max RLE expansion, bitmap size is 256x64.
     */
-	tunhunt_state *state = machine.driver_data<tunhunt_state>();
 
-	state->m_tmpbitmap.allocate(256, 64, machine.primary_screen->format());
+	m_tmpbitmap.allocate(256, 64, machine().primary_screen->format());
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tunhunt_state::get_fg_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tunhunt_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
-	state->m_fg_tilemap->set_scrollx(0, 64);
+	m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_scrollx(0, 64);
 }
 
-PALETTE_INIT( tunhunt )
+void tunhunt_state::palette_init()
 {
 	int i;
 
@@ -92,11 +91,11 @@ PALETTE_INIT( tunhunt )
      */
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x10);
+	machine().colortable = colortable_alloc(machine(), 0x10);
 
 	/* motion objects/box */
 	for (i = 0; i < 0x10; i++)
-		colortable_entry_set_value(machine.colortable, i, i);
+		colortable_entry_set_value(machine().colortable, i, i);
 
 	/* AlphaNumerics (1bpp)
      *  2 bits of hilite select from 4 different background colors
@@ -105,26 +104,26 @@ PALETTE_INIT( tunhunt )
      */
 
 	/* alpha hilite#0 */
-	colortable_entry_set_value(machine.colortable, 0x10, 0x0); /* background color#0 (transparent) */
-	colortable_entry_set_value(machine.colortable, 0x11, 0x4); /* foreground color */
+	colortable_entry_set_value(machine().colortable, 0x10, 0x0); /* background color#0 (transparent) */
+	colortable_entry_set_value(machine().colortable, 0x11, 0x4); /* foreground color */
 
 	/* alpha hilite#1 */
-	colortable_entry_set_value(machine.colortable, 0x12, 0x5); /* background color#1 */
-	colortable_entry_set_value(machine.colortable, 0x13, 0x4); /* foreground color */
+	colortable_entry_set_value(machine().colortable, 0x12, 0x5); /* background color#1 */
+	colortable_entry_set_value(machine().colortable, 0x13, 0x4); /* foreground color */
 
 	/* alpha hilite#2 */
-	colortable_entry_set_value(machine.colortable, 0x14, 0x6); /* background color#2 */
-	colortable_entry_set_value(machine.colortable, 0x15, 0x4); /* foreground color */
+	colortable_entry_set_value(machine().colortable, 0x14, 0x6); /* background color#2 */
+	colortable_entry_set_value(machine().colortable, 0x15, 0x4); /* foreground color */
 
 	/* alpha hilite#3 */
-	colortable_entry_set_value(machine.colortable, 0x16, 0xf); /* background color#3 */
-	colortable_entry_set_value(machine.colortable, 0x17, 0x4); /* foreground color */
+	colortable_entry_set_value(machine().colortable, 0x16, 0xf); /* background color#3 */
+	colortable_entry_set_value(machine().colortable, 0x17, 0x4); /* foreground color */
 
 	/* shell graphics; these are either 1bpp (2 banks) or 2bpp.  It isn't clear which.
      * In any event, the following pens are associated with the shell graphics:
      */
-	colortable_entry_set_value(machine.colortable, 0x18, 0);
-	colortable_entry_set_value(machine.colortable, 0x19, 4);//1;
+	colortable_entry_set_value(machine().colortable, 0x18, 0);
+	colortable_entry_set_value(machine().colortable, 0x19, 4);//1;
 }
 
 /*

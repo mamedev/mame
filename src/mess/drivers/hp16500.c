@@ -28,6 +28,7 @@ public:
 	hp16500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	virtual void video_start();
 };
 
 
@@ -37,7 +38,7 @@ static ADDRESS_MAP_START(hp16500_map, AS_PROGRAM, 32, hp16500_state)
 	AM_RANGE(0x00800000, 0x009fffff) AM_RAM	    // 284e end of test - d0 = 0 for pass
 ADDRESS_MAP_END
 
-static VIDEO_START( hp16500 )
+void hp16500_state::video_start()
 {
 }
 
@@ -61,7 +62,6 @@ static MACHINE_CONFIG_START( hp16500, hp16500_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(hp16500)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END

@@ -275,42 +275,40 @@ static const ym2203_interface ym2203_config =
 	DEVCB_LINE(irqhandler)
 };
 
-static MACHINE_START( blktiger )
+void blktiger_state::machine_start()
 {
-	blktiger_state *state = machine.driver_data<blktiger_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_mcu = machine.device("mcu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_mcu = machine().device("mcu");
 
 	/* configure bankswitching */
-	state->membank("bank1")->configure_entries(0, 16, state->memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 
-	state->save_item(NAME(state->m_scroll_bank));
-	state->save_item(NAME(state->m_screen_layout));
-	state->save_item(NAME(state->m_chon));
-	state->save_item(NAME(state->m_objon));
-	state->save_item(NAME(state->m_bgon));
-	state->save_item(NAME(state->m_z80_latch));
-	state->save_item(NAME(state->m_i8751_latch));
-	state->save_item(NAME(state->m_scroll_x));
-	state->save_item(NAME(state->m_scroll_y));
+	save_item(NAME(m_scroll_bank));
+	save_item(NAME(m_screen_layout));
+	save_item(NAME(m_chon));
+	save_item(NAME(m_objon));
+	save_item(NAME(m_bgon));
+	save_item(NAME(m_z80_latch));
+	save_item(NAME(m_i8751_latch));
+	save_item(NAME(m_scroll_x));
+	save_item(NAME(m_scroll_y));
 }
 
-static MACHINE_RESET( blktiger )
+void blktiger_state::machine_reset()
 {
-	blktiger_state *state = machine.driver_data<blktiger_state>();
 
 	/* configure bankswitching */
-	state->membank("bank1")->configure_entries(0, 16, state->memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 
-	state->m_scroll_x[0] = 0;
-	state->m_scroll_x[1] = 0;
-	state->m_scroll_y[0] = 0;
-	state->m_scroll_y[1] = 0;
-	state->m_scroll_bank = 0;
-	state->m_screen_layout = 0;
-	state->m_z80_latch = 0;
-	state->m_i8751_latch = 0;
+	m_scroll_x[0] = 0;
+	m_scroll_x[1] = 0;
+	m_scroll_y[0] = 0;
+	m_scroll_y[1] = 0;
+	m_scroll_bank = 0;
+	m_screen_layout = 0;
+	m_z80_latch = 0;
+	m_i8751_latch = 0;
 }
 
 static MACHINE_CONFIG_START( blktiger, blktiger_state )
@@ -329,8 +327,6 @@ static MACHINE_CONFIG_START( blktiger, blktiger_state )
 	MCFG_CPU_IO_MAP(blktiger_mcu_io_map)
 	//MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(blktiger)
-	MCFG_MACHINE_RESET(blktiger)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -344,7 +340,6 @@ static MACHINE_CONFIG_START( blktiger, blktiger_state )
 	MCFG_GFXDECODE(blktiger)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(blktiger)
 
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 

@@ -47,6 +47,9 @@ public:
 	DECLARE_WRITE8_MEMBER(skydiver_sound_enable_w);
 	DECLARE_WRITE8_MEMBER(skydiver_whistle_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -57,6 +60,6 @@ DISCRETE_SOUND_EXTERN( skydiver );
 
 /*----------- defined in video/skydiver.c -----------*/
 
-MACHINE_RESET( skydiver );
-VIDEO_START( skydiver );
+
+
 SCREEN_UPDATE_IND16( skydiver );

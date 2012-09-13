@@ -110,6 +110,8 @@ public:
 	DECLARE_DRIVER_INIT(dcclubfd);
 	DECLARE_DRIVER_INIT(qsww);
 	DECLARE_DRIVER_INIT(sgmast);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 /*----------- defined in video/segas24.c -----------*/

@@ -53,19 +53,20 @@ public:
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_WRITE8_MEMBER(port2_w);
 	DECLARE_WRITE8_MEMBER(port3_w);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 
-static PALETTE_INIT(monzagp)
+void monzagp_state::palette_init()
 {
 }
 
-static VIDEO_START(monzagp)
+void monzagp_state::video_start()
 {
-	monzagp_state *state = machine.driver_data<monzagp_state>();
-	state->m_screenw = 80;
-	state->m_vram = auto_alloc_array(machine, UINT8, 0x10000);
+	m_screenw = 80;
+	m_vram = auto_alloc_array(machine(), UINT8, 0x10000);
 }
 
 static SCREEN_UPDATE_IND16(monzagp)
@@ -269,10 +270,8 @@ static MACHINE_CONFIG_START( monzagp, monzagp_state )
 	MCFG_SCREEN_UPDATE_STATIC(monzagp)
 
 	MCFG_PALETTE_LENGTH(0x200)
-	MCFG_PALETTE_INIT(monzagp)
 
 	MCFG_GFXDECODE(monzagp)
-	MCFG_VIDEO_START(monzagp)
 MACHINE_CONFIG_END
 
 ROM_START( monzagp )

@@ -520,22 +520,21 @@ static const tc0140syt_interface slapshot_tc0140syt_intf =
 	"maincpu", "audiocpu"
 };
 
-static MACHINE_START( slapshot )
+void slapshot_state::machine_start()
 {
-	slapshot_state *state = machine.driver_data<slapshot_state>();
 
-	state->membank("bank10")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0xc000, 0x4000);
+	membank("bank10")->configure_entries(0, 4, memregion("audiocpu")->base() + 0xc000, 0x4000);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_tc0140syt = machine.device("tc0140syt");
-	state->m_tc0480scp = machine.device("tc0480scp");
-	state->m_tc0360pri = machine.device("tc0360pri");
-	state->m_tc0640fio = machine.device("tc0640fio");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_tc0140syt = machine().device("tc0140syt");
+	m_tc0480scp = machine().device("tc0480scp");
+	m_tc0360pri = machine().device("tc0360pri");
+	m_tc0640fio = machine().device("tc0640fio");
 
-	state->m_banknum = 0;
-	state->save_item(NAME(state->m_banknum));
-	machine.save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine));
+	m_banknum = 0;
+	save_item(NAME(m_banknum));
+	machine().save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine()));
 }
 
 
@@ -551,7 +550,6 @@ static MACHINE_CONFIG_START( slapshot, slapshot_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(slapshot)
 
 	MCFG_TC0640FIO_ADD("tc0640fio", slapshot_io_intf)
 
@@ -567,7 +565,6 @@ static MACHINE_CONFIG_START( slapshot, slapshot_state )
 	MCFG_GFXDECODE(slapshot)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(slapshot)
 
 	MCFG_TC0480SCP_ADD("tc0480scp", slapshot_tc0480scp_intf)
 	MCFG_TC0360PRI_ADD("tc0360pri")
@@ -599,7 +596,6 @@ static MACHINE_CONFIG_START( opwolf3, slapshot_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(slapshot)
 
 	MCFG_TC0640FIO_ADD("tc0640fio", slapshot_io_intf)
 
@@ -615,7 +611,6 @@ static MACHINE_CONFIG_START( opwolf3, slapshot_state )
 	MCFG_GFXDECODE(slapshot)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(slapshot)
 
 	MCFG_TC0480SCP_ADD("tc0480scp", slapshot_tc0480scp_intf)
 	MCFG_TC0360PRI_ADD("tc0360pri")

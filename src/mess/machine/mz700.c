@@ -102,15 +102,14 @@ DRIVER_INIT_MEMBER(mz_state,mz800)
 	m_cgram = auto_alloc_array(machine(), UINT8, 0x1000);
 }
 
-MACHINE_START( mz700 )
+void mz_state::machine_start()
 {
-	mz_state *mz = machine.driver_data<mz_state>();
 
-	mz->m_pit = machine.device("pit8253");
-	mz->m_ppi = machine.device<i8255_device>("ppi8255");
+	m_pit = machine().device("pit8253");
+	m_ppi = machine().device<i8255_device>("ppi8255");
 
 	/* reset memory map to defaults */
-	mz->mz700_bank_4_w(*machine.device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
+	mz700_bank_4_w(*machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
 }
 
 

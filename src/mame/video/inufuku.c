@@ -208,15 +208,14 @@ WRITE16_MEMBER(inufuku_state::inufuku_tx_videoram_w)
 
 ******************************************************************************/
 
-VIDEO_START( inufuku )
+void inufuku_state::video_start()
 {
-	inufuku_state *state = machine.driver_data<inufuku_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(inufuku_state::get_inufuku_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(inufuku_state::get_inufuku_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(inufuku_state::get_inufuku_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(inufuku_state::get_inufuku_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
-	state->m_bg_tilemap->set_transparent_pen(255);
-	state->m_tx_tilemap->set_transparent_pen(255);
+	m_bg_tilemap->set_transparent_pen(255);
+	m_tx_tilemap->set_transparent_pen(255);
 }
 
 

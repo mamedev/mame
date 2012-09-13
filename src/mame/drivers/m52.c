@@ -380,15 +380,14 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_RESET( m52 )
+void m52_state::machine_reset()
 {
-	m52_state *state = machine.driver_data<m52_state>();
 
-	state->m_bg1xpos = 0;
-	state->m_bg1ypos = 0;
-	state->m_bg2xpos = 0;
-	state->m_bg2ypos = 0;
-	state->m_bgcontrol = 0;
+	m_bg1xpos = 0;
+	m_bg1ypos = 0;
+	m_bg2xpos = 0;
+	m_bg2ypos = 0;
+	m_bgcontrol = 0;
 }
 
 static MACHINE_CONFIG_START( m52, m52_state )
@@ -399,7 +398,6 @@ static MACHINE_CONFIG_START( m52, m52_state )
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_RESET(m52)
 
 	/* video hardware */
 	MCFG_GFXDECODE(m52)
@@ -409,8 +407,6 @@ static MACHINE_CONFIG_START( m52, m52_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 136, 376, 282, 22, 274)
 	MCFG_SCREEN_UPDATE_STATIC(m52)
 
-	MCFG_PALETTE_INIT(m52)
-	MCFG_VIDEO_START(m52)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(m52_sound_c_audio)

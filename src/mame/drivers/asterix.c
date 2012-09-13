@@ -243,48 +243,46 @@ static const k05324x_interface asterix_k05324x_intf =
 	asterix_sprite_callback
 };
 
-static MACHINE_START( asterix )
+void asterix_state::machine_start()
 {
-	asterix_state *state = machine.driver_data<asterix_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_k053260 = machine.device("k053260");
-	state->m_k056832 = machine.device("k056832");
-	state->m_k053244 = machine.device("k053244");
-	state->m_k053251 = machine.device("k053251");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_k053260 = machine().device("k053260");
+	m_k056832 = machine().device("k056832");
+	m_k053244 = machine().device("k053244");
+	m_k053251 = machine().device("k053251");
 
-	state->save_item(NAME(state->m_cur_control2));
-	state->save_item(NAME(state->m_prot));
+	save_item(NAME(m_cur_control2));
+	save_item(NAME(m_prot));
 
-	state->save_item(NAME(state->m_sprite_colorbase));
-	state->save_item(NAME(state->m_spritebank));
-	state->save_item(NAME(state->m_layerpri));
-	state->save_item(NAME(state->m_layer_colorbase));
-	state->save_item(NAME(state->m_tilebanks));
-	state->save_item(NAME(state->m_spritebanks));
+	save_item(NAME(m_sprite_colorbase));
+	save_item(NAME(m_spritebank));
+	save_item(NAME(m_layerpri));
+	save_item(NAME(m_layer_colorbase));
+	save_item(NAME(m_tilebanks));
+	save_item(NAME(m_spritebanks));
 }
 
-static MACHINE_RESET( asterix )
+void asterix_state::machine_reset()
 {
-	asterix_state *state = machine.driver_data<asterix_state>();
 	int i;
 
-	state->m_cur_control2 = 0;
-	state->m_prot[0] = 0;
-	state->m_prot[1] = 0;
+	m_cur_control2 = 0;
+	m_prot[0] = 0;
+	m_prot[1] = 0;
 
-	state->m_sprite_colorbase = 0;
-	state->m_spritebank = 0;
-	state->m_layerpri[0] = 0;
-	state->m_layerpri[1] = 0;
-	state->m_layerpri[2] = 0;
+	m_sprite_colorbase = 0;
+	m_spritebank = 0;
+	m_layerpri[0] = 0;
+	m_layerpri[1] = 0;
+	m_layerpri[2] = 0;
 
 	for (i = 0; i < 4; i++)
 	{
-		state->m_layer_colorbase[i] = 0;
-		state->m_tilebanks[i] = 0;
-		state->m_spritebanks[i] = 0;
+		m_layer_colorbase[i] = 0;
+		m_tilebanks[i] = 0;
+		m_spritebanks[i] = 0;
 	}
 }
 
@@ -298,8 +296,6 @@ static MACHINE_CONFIG_START( asterix, asterix_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(asterix)
-	MCFG_MACHINE_RESET(asterix)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 

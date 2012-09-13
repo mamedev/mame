@@ -33,6 +33,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sspeedr_track_horz_2_w);
 	DECLARE_WRITE8_MEMBER(sspeedr_track_vert_w);
 	DECLARE_WRITE8_MEMBER(sspeedr_track_ice_w);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -41,6 +43,6 @@ public:
 
 
 
-VIDEO_START( sspeedr );
+
 SCREEN_UPDATE_IND16( sspeedr );
 SCREEN_VBLANK( sspeedr );

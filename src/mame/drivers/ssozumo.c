@@ -210,8 +210,6 @@ static MACHINE_CONFIG_START( ssozumo, ssozumo_state )
 	MCFG_GFXDECODE(ssozumo)
 	MCFG_PALETTE_LENGTH(64 + 16)
 
-	MCFG_PALETTE_INIT(ssozumo)
-	MCFG_VIDEO_START(ssozumo)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

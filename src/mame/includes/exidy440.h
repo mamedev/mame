@@ -63,6 +63,10 @@ public:
 	DECLARE_DRIVER_INIT(yukon);
 	DECLARE_DRIVER_INIT(exidy440);
 	DECLARE_DRIVER_INIT(claypign);
+	virtual void machine_start();
+	virtual void machine_reset();
+	DECLARE_VIDEO_START(exidy440);
+	DECLARE_VIDEO_START(topsecex);
 };
 
 

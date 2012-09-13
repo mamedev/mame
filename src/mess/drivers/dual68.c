@@ -28,6 +28,7 @@ public:
 	DECLARE_WRITE16_MEMBER( dual68_terminal_w );
 	//UINT8 m_term_data;
 	required_shared_ptr<UINT16> m_p_ram;
+	virtual void machine_reset();
 };
 
 
@@ -60,14 +61,13 @@ static INPUT_PORTS_START( dual68 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(dual68)
+void dual68_state::machine_reset()
 {
-	dual68_state *state = machine.driver_data<dual68_state>();
-	UINT8* user1 = state->memregion("user1")->base();
+	UINT8* user1 = memregion("user1")->base();
 
-	memcpy((UINT8*)state->m_p_ram.target(),user1,0x2000);
+	memcpy((UINT8*)m_p_ram.target(),user1,0x2000);
 
-	machine.device("maincpu")->reset();
+	machine().device("maincpu")->reset();
 }
 
 WRITE8_MEMBER( dual68_state::kbd_put )
@@ -89,7 +89,6 @@ static MACHINE_CONFIG_START( dual68, dual68_state )
 	MCFG_CPU_PROGRAM_MAP(sio4_mem)
 	MCFG_CPU_IO_MAP(sio4_io)
 
-	MCFG_MACHINE_RESET(dual68)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,terminal_intf)

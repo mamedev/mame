@@ -22,19 +22,15 @@ public:
 	DECLARE_WRITE8_MEMBER(orao_io_w);
 	DECLARE_DRIVER_INIT(orao);
 	DECLARE_DRIVER_INIT(orao103);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in machine/orao.c -----------*/
 
-extern MACHINE_RESET( orao );
-
-
-
-
 /*----------- defined in video/orao.c -----------*/
 
-extern VIDEO_START( orao );
 extern SCREEN_UPDATE_IND16( orao );
 
 

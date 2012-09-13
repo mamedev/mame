@@ -28,16 +28,15 @@
  *
  *************************************/
 
-VIDEO_START( harddriv )
+VIDEO_START_MEMBER(harddriv_state,harddriv)
 {
-	harddriv_state *state = machine.driver_data<harddriv_state>();
 	UINT32 *destmask, mask;
 	int i;
 
 	/* fill in the mask table */
-	destmask = state->m_mask_table;
+	destmask = m_mask_table;
 	for (i = 0; i < 65536; i++)
-		if (state->m_gsp_multisync)
+		if (m_gsp_multisync)
 		{
 			mask = 0;
 			if (i & 0x0001) mask |= MASK(0);
@@ -85,7 +84,7 @@ VIDEO_START( harddriv )
 		}
 
 	/* init VRAM pointers */
-	state->m_vram_mask = state->m_gsp_vram.bytes() - 1;
+	m_vram_mask = m_gsp_vram.bytes() - 1;
 }
 
 

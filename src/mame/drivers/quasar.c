@@ -301,27 +301,25 @@ static const s2636_interface s2636_2_config =
 // Quasar S2650 Main CPU, I8035 sound board
 // ****************************************
 
-static MACHINE_START( quasar )
+MACHINE_START_MEMBER(quasar_state,quasar)
 {
-	quasar_state *state = machine.driver_data<quasar_state>();
 
-	MACHINE_START_CALL(cvs);
+	MACHINE_START_CALL_MEMBER(cvs);
 
 	/* register state save */
-	state->save_item(NAME(state->m_effectcontrol));
-	state->save_item(NAME(state->m_page));
-	state->save_item(NAME(state->m_io_page));
+	save_item(NAME(m_effectcontrol));
+	save_item(NAME(m_page));
+	save_item(NAME(m_io_page));
 }
 
-static MACHINE_RESET( quasar )
+MACHINE_RESET_MEMBER(quasar_state,quasar)
 {
-	quasar_state *state = machine.driver_data<quasar_state>();
 
-	MACHINE_RESET_CALL(cvs);
+	MACHINE_RESET_CALL_MEMBER(cvs);
 
-	state->m_effectcontrol = 0;
-	state->m_page = 0;
-	state->m_io_page = 8;
+	m_effectcontrol = 0;
+	m_page = 0;
+	m_io_page = 8;
 }
 
 static MACHINE_CONFIG_START( quasar, quasar_state )
@@ -336,8 +334,8 @@ static MACHINE_CONFIG_START( quasar, quasar_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 
-	MCFG_MACHINE_START(quasar)
-	MCFG_MACHINE_RESET(quasar)
+	MCFG_MACHINE_START_OVERRIDE(quasar_state,quasar)
+	MCFG_MACHINE_RESET_OVERRIDE(quasar_state,quasar)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -356,8 +354,8 @@ static MACHINE_CONFIG_START( quasar, quasar_state )
 	MCFG_S2636_ADD("s2636_1", s2636_1_config)
 	MCFG_S2636_ADD("s2636_2", s2636_2_config)
 
-	MCFG_PALETTE_INIT(quasar)
-	MCFG_VIDEO_START(quasar)
+	MCFG_PALETTE_INIT_OVERRIDE(quasar_state,quasar)
+	MCFG_VIDEO_START_OVERRIDE(quasar_state,quasar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

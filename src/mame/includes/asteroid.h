@@ -28,6 +28,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
 	DECLARE_DRIVER_INIT(asterock);
 	DECLARE_DRIVER_INIT(asteroidb);
+	virtual void machine_reset();
 };
 
 
@@ -39,7 +40,7 @@ INTERRUPT_GEN( llander_interrupt );
 
 
 
-MACHINE_RESET( asteroid );
+
 
 
 /*----------- defined in audio/asteroid.c -----------*/

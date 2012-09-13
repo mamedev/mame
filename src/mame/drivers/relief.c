@@ -65,24 +65,23 @@ WRITE16_MEMBER(relief_state::relief_atarivc_w)
  *
  *************************************/
 
-static MACHINE_START( relief )
+MACHINE_START_MEMBER(relief_state,relief)
 {
-	atarigen_init(machine);
+	atarigen_init(machine());
 }
 
 
-static MACHINE_RESET( relief )
+MACHINE_RESET_MEMBER(relief_state,relief)
 {
-	relief_state *state = machine.driver_data<relief_state>();
 
-	atarigen_eeprom_reset(state);
-	atarigen_interrupt_reset(state, update_interrupts);
-	atarivc_reset(*machine.primary_screen, state->m_atarivc_eof_data, 2);
+	atarigen_eeprom_reset(this);
+	atarigen_interrupt_reset(this, update_interrupts);
+	atarivc_reset(*machine().primary_screen, m_atarivc_eof_data, 2);
 
-	machine.device<okim6295_device>("oki")->set_bank_base(0);
-	state->m_ym2413_volume = 15;
-	state->m_overall_volume = 127;
-	state->m_adpcm_bank_base = 0;
+	machine().device<okim6295_device>("oki")->set_bank_base(0);
+	m_ym2413_volume = 15;
+	m_overall_volume = 127;
+	m_adpcm_bank_base = 0;
 }
 
 
@@ -297,8 +296,8 @@ static MACHINE_CONFIG_START( relief, relief_state )
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_START(relief)
-	MCFG_MACHINE_RESET(relief)
+	MCFG_MACHINE_START_OVERRIDE(relief_state,relief)
+	MCFG_MACHINE_RESET_OVERRIDE(relief_state,relief)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
@@ -312,7 +311,7 @@ static MACHINE_CONFIG_START( relief, relief_state )
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(relief)
 
-	MCFG_VIDEO_START(relief)
+	MCFG_VIDEO_START_OVERRIDE(relief_state,relief)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -132,13 +132,13 @@ static const UINT8 o2_shape[0x40][8]={
 
 
 
-PALETTE_INIT( odyssey2 )
+void odyssey2_state::palette_init()
 {
 	int i;
 
 	for ( i = 0; i < 24; i++ )
 	{
-		palette_set_color_rgb( machine, i, odyssey2_colors[i*3], odyssey2_colors[i*3+1], odyssey2_colors[i*3+2] );
+		palette_set_color_rgb( machine(), i, odyssey2_colors[i*3], odyssey2_colors[i*3+1], odyssey2_colors[i*3+2] );
 	}
 }
 
@@ -564,38 +564,37 @@ static TIMER_CALLBACK( i824x_hblank_callback )
 
 ***************************************************************************/
 
-VIDEO_START( odyssey2 )
+void odyssey2_state::video_start()
 {
-	odyssey2_state *state = machine.driver_data<odyssey2_state>();
-	screen_device *screen = machine.first_screen();
+	screen_device *screen = machine().first_screen();
 
-	memset(state->m_o2_vdc.reg, 0, 0x100);
+	memset(m_o2_vdc.reg, 0, 0x100);
 
-	state->m_o2_snd_shift[0] = state->m_o2_snd_shift[1] = 0;
-	state->m_x_beam_pos = 0;
-	state->m_y_beam_pos = 0;
-	state->m_control_status = 0;
-	state->m_collision_status = 0;
-	state->m_iff = 0;
-	state->m_start_vpos = 0;
-	state->m_start_vblank = 0;
-	state->m_lum = 0;
+	m_o2_snd_shift[0] = m_o2_snd_shift[1] = 0;
+	m_x_beam_pos = 0;
+	m_y_beam_pos = 0;
+	m_control_status = 0;
+	m_collision_status = 0;
+	m_iff = 0;
+	m_start_vpos = 0;
+	m_start_vblank = 0;
+	m_lum = 0;
 
-	state->m_o2_snd_shift[0] = machine.sample_rate() / 983;
-	state->m_o2_snd_shift[1] = machine.sample_rate() / 3933;
+	m_o2_snd_shift[0] = machine().sample_rate() / 983;
+	m_o2_snd_shift[1] = machine().sample_rate() / 3933;
 
-	state->m_start_vpos = I824X_START_Y;
-	state->m_start_vblank = I824X_START_Y + I824X_SCREEN_HEIGHT;
-	state->m_control_status = 0;
-	state->m_iff = 0;
+	m_start_vpos = I824X_START_Y;
+	m_start_vblank = I824X_START_Y + I824X_SCREEN_HEIGHT;
+	m_control_status = 0;
+	m_iff = 0;
 
-	screen->register_screen_bitmap(state->m_tmp_bitmap);
+	screen->register_screen_bitmap(m_tmp_bitmap);
 
-	state->m_i824x_line_timer = machine.scheduler().timer_alloc(FUNC(i824x_scanline_callback));
-	state->m_i824x_line_timer->adjust( machine.primary_screen->time_until_pos(1, I824X_START_ACTIVE_SCAN ), 0,  machine.primary_screen->scan_period() );
+	m_i824x_line_timer = machine().scheduler().timer_alloc(FUNC(i824x_scanline_callback));
+	m_i824x_line_timer->adjust( machine().primary_screen->time_until_pos(1, I824X_START_ACTIVE_SCAN ), 0,  machine().primary_screen->scan_period() );
 
-	state->m_i824x_hblank_timer = machine.scheduler().timer_alloc(FUNC(i824x_hblank_callback));
-	state->m_i824x_hblank_timer->adjust( machine.primary_screen->time_until_pos(1, I824X_END_ACTIVE_SCAN + 18 ), 0, machine.primary_screen->scan_period() );
+	m_i824x_hblank_timer = machine().scheduler().timer_alloc(FUNC(i824x_hblank_callback));
+	m_i824x_hblank_timer->adjust( machine().primary_screen->time_until_pos(1, I824X_END_ACTIVE_SCAN + 18 ), 0, machine().primary_screen->scan_period() );
 }
 
 /***************************************************************************

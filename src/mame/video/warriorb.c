@@ -4,12 +4,11 @@
 
 /**********************************************************/
 
-VIDEO_START( warriorb )
+void warriorb_state::video_start()
 {
-	warriorb_state *state = machine.driver_data<warriorb_state>();
 
 	/* Ensure palette from correct TC0110PCR used for each screen */
-	tc0100scn_set_colbanks(state->m_tc0100scn_1, 0x0, 0x100, 0x0);
+	tc0100scn_set_colbanks(m_tc0100scn_1, 0x0, 0x100, 0x0);
 }
 
 

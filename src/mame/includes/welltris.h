@@ -34,11 +34,12 @@ public:
 	DECLARE_DRIVER_INIT(quiz18k);
 	DECLARE_DRIVER_INIT(welltris);
 	TILE_GET_INFO_MEMBER(get_welltris_tile_info);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/welltris.c -----------*/
 
 
-VIDEO_START( welltris );
+
 SCREEN_UPDATE_IND16( welltris );

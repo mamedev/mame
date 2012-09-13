@@ -67,6 +67,8 @@ public:
 	DECLARE_DRIVER_INIT(wallc);
 	DECLARE_DRIVER_INIT(wallca);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -95,9 +97,9 @@ public:
 
 ***************************************************************************/
 
-static PALETTE_INIT( wallc )
+void wallc_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	static const int resistances_rg[2] = { 330, 220 };
@@ -109,7 +111,7 @@ static PALETTE_INIT( wallc )
 			2,	resistances_rg,	weights_g,	330,	0,
 			3,	resistances_b,	weights_b,	330,	655+220);
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0,bit1,bit7,r,g,b;
 
@@ -129,7 +131,7 @@ static PALETTE_INIT( wallc )
 		bit7 = (color_prom[i] >> 7) & 0x01;
 		b = combine_3_weights(weights_b, bit7, bit1, bit0);
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -146,10 +148,9 @@ TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, videoram[tile_index] + 0x100, 1, 0);
 }
 
-static VIDEO_START( wallc )
+void wallc_state::video_start()
 {
-	wallc_state *state = machine.driver_data<wallc_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS_FLIP_Y,	8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_Y,	8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16( wallc )
@@ -314,8 +315,6 @@ static MACHINE_CONFIG_START( wallc, wallc_state )
 	MCFG_GFXDECODE(wallc)
 	MCFG_PALETTE_LENGTH(32)
 
-	MCFG_PALETTE_INIT(wallc)
-	MCFG_VIDEO_START(wallc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

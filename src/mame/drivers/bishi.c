@@ -388,24 +388,22 @@ static const k054338_interface bishi_k054338_intf =
 	"none"
 };
 
-static MACHINE_START( bishi )
+void bishi_state::machine_start()
 {
-	bishi_state *state = machine.driver_data<bishi_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_k056832 = machine.device("k056832");
-	state->m_k054338 = machine.device("k054338");
-	state->m_k055555 = machine.device("k055555");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_k056832 = machine().device("k056832");
+	m_k054338 = machine().device("k054338");
+	m_k055555 = machine().device("k055555");
 
-	state->save_item(NAME(state->m_cur_control));
-	state->save_item(NAME(state->m_cur_control2));
+	save_item(NAME(m_cur_control));
+	save_item(NAME(m_cur_control2));
 }
 
-static MACHINE_RESET( bishi )
+void bishi_state::machine_reset()
 {
-	bishi_state *state = machine.driver_data<bishi_state>();
-	state->m_cur_control = 0;
-	state->m_cur_control2 = 0;
+	m_cur_control = 0;
+	m_cur_control2 = 0;
 }
 
 static MACHINE_CONFIG_START( bishi, bishi_state )
@@ -415,8 +413,6 @@ static MACHINE_CONFIG_START( bishi, bishi_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", bishi_scanline, "screen", 0, 1)
 
-	MCFG_MACHINE_START(bishi)
-	MCFG_MACHINE_RESET(bishi)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
@@ -430,7 +426,6 @@ static MACHINE_CONFIG_START( bishi, bishi_state )
 
 	MCFG_PALETTE_LENGTH(4096)
 
-	MCFG_VIDEO_START(bishi)
 
 	MCFG_K056832_ADD("k056832", bishi_k056832_intf)
 	MCFG_K054338_ADD("k054338", bishi_k054338_intf)

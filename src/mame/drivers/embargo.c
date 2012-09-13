@@ -27,6 +27,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port_1_w);
 	DECLARE_WRITE8_MEMBER(port_2_w);
 	DECLARE_WRITE8_MEMBER(input_select_w);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -226,24 +228,22 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_START( embargo )
+void embargo_state::machine_start()
 {
-	embargo_state *state = machine.driver_data<embargo_state>();
 
 	/* register for state saving */
-	state->save_item(NAME(state->m_dial_enable_1));
-	state->save_item(NAME(state->m_dial_enable_2));
-	state->save_item(NAME(state->m_input_select));
+	save_item(NAME(m_dial_enable_1));
+	save_item(NAME(m_dial_enable_2));
+	save_item(NAME(m_input_select));
 }
 
 
-static MACHINE_RESET( embargo )
+void embargo_state::machine_reset()
 {
-	embargo_state *state = machine.driver_data<embargo_state>();
 
-	state->m_dial_enable_1 = 0;
-	state->m_dial_enable_2 = 0;
-	state->m_input_select = 0;
+	m_dial_enable_1 = 0;
+	m_dial_enable_2 = 0;
+	m_input_select = 0;
 }
 
 /*************************************
@@ -259,8 +259,6 @@ static MACHINE_CONFIG_START( embargo, embargo_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 
-	MCFG_MACHINE_START(embargo)
-	MCFG_MACHINE_RESET(embargo)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

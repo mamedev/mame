@@ -157,60 +157,59 @@ void psikyo_switch_banks( running_machine &machine, int tmap, int bank )
 }
 
 
-VIDEO_START( psikyo )
+VIDEO_START_MEMBER(psikyo_state,psikyo)
 {
-	psikyo_state *state = machine.driver_data<psikyo_state>();
 
 	/* The Hardware is Capable of Changing the Dimensions of the Tilemaps, its safer to create
        the various sized tilemaps now as opposed to later */
 
-	state->m_tilemap_0_size0 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x80);
-	state->m_tilemap_0_size1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x40);
-	state->m_tilemap_0_size2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS, 16, 16, 0x80, 0x20);
-	state->m_tilemap_0_size3 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS, 16, 16, 0x100, 0x10);
+	m_tilemap_0_size0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x80);
+	m_tilemap_0_size1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x40);
+	m_tilemap_0_size2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 16, 16, 0x80, 0x20);
+	m_tilemap_0_size3 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 16, 16, 0x100, 0x10);
 
-	state->m_tilemap_1_size0 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_1),state), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x80);
-	state->m_tilemap_1_size1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_1),state), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x40);
-	state->m_tilemap_1_size2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_1),state), TILEMAP_SCAN_ROWS, 16, 16, 0x80, 0x20);
-	state->m_tilemap_1_size3 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_1),state), TILEMAP_SCAN_ROWS, 16, 16, 0x100, 0x10);
+	m_tilemap_1_size0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x80);
+	m_tilemap_1_size1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x40);
+	m_tilemap_1_size2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 16, 16, 0x80, 0x20);
+	m_tilemap_1_size3 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 16, 16, 0x100, 0x10);
 
-	state->m_spritebuf1 = auto_alloc_array(machine, UINT32, 0x2000 / 4);
-	state->m_spritebuf2 = auto_alloc_array(machine, UINT32, 0x2000 / 4);
+	m_spritebuf1 = auto_alloc_array(machine(), UINT32, 0x2000 / 4);
+	m_spritebuf2 = auto_alloc_array(machine(), UINT32, 0x2000 / 4);
 
-	state->m_tilemap_0_size0->set_scroll_rows(0x80 * 16);	// line scrolling
-	state->m_tilemap_0_size0->set_scroll_cols(1);
+	m_tilemap_0_size0->set_scroll_rows(0x80 * 16);	// line scrolling
+	m_tilemap_0_size0->set_scroll_cols(1);
 
-	state->m_tilemap_0_size1->set_scroll_rows(0x40 * 16);	// line scrolling
-	state->m_tilemap_0_size1->set_scroll_cols(1);
+	m_tilemap_0_size1->set_scroll_rows(0x40 * 16);	// line scrolling
+	m_tilemap_0_size1->set_scroll_cols(1);
 
-	state->m_tilemap_0_size2->set_scroll_rows(0x20 * 16);	// line scrolling
-	state->m_tilemap_0_size2->set_scroll_cols(1);
+	m_tilemap_0_size2->set_scroll_rows(0x20 * 16);	// line scrolling
+	m_tilemap_0_size2->set_scroll_cols(1);
 
-	state->m_tilemap_0_size3->set_scroll_rows(0x10 * 16);	// line scrolling
-	state->m_tilemap_0_size3->set_scroll_cols(1);
+	m_tilemap_0_size3->set_scroll_rows(0x10 * 16);	// line scrolling
+	m_tilemap_0_size3->set_scroll_cols(1);
 
-	state->m_tilemap_1_size0->set_scroll_rows(0x80 * 16);	// line scrolling
-	state->m_tilemap_1_size0->set_scroll_cols(1);
+	m_tilemap_1_size0->set_scroll_rows(0x80 * 16);	// line scrolling
+	m_tilemap_1_size0->set_scroll_cols(1);
 
-	state->m_tilemap_1_size1->set_scroll_rows(0x40 * 16);	// line scrolling
-	state->m_tilemap_1_size1->set_scroll_cols(1);
+	m_tilemap_1_size1->set_scroll_rows(0x40 * 16);	// line scrolling
+	m_tilemap_1_size1->set_scroll_cols(1);
 
-	state->m_tilemap_1_size2->set_scroll_rows(0x20 * 16);	// line scrolling
-	state->m_tilemap_1_size2->set_scroll_cols(1);
+	m_tilemap_1_size2->set_scroll_rows(0x20 * 16);	// line scrolling
+	m_tilemap_1_size2->set_scroll_cols(1);
 
-	state->m_tilemap_1_size3->set_scroll_rows(0x10 * 16);	// line scrolling
-	state->m_tilemap_1_size3->set_scroll_cols(1);
+	m_tilemap_1_size3->set_scroll_rows(0x10 * 16);	// line scrolling
+	m_tilemap_1_size3->set_scroll_cols(1);
 
-	state->save_pointer(NAME(state->m_spritebuf1), 0x2000 / 4);
-	state->save_pointer(NAME(state->m_spritebuf2), 0x2000 / 4);
+	save_pointer(NAME(m_spritebuf1), 0x2000 / 4);
+	save_pointer(NAME(m_spritebuf2), 0x2000 / 4);
 }
 
-VIDEO_START( sngkace )
+VIDEO_START_MEMBER(psikyo_state,sngkace)
 {
-	VIDEO_START_CALL( psikyo );
+	VIDEO_START_CALL_MEMBER( psikyo );
 
-	psikyo_switch_banks(machine, 0, 0); // sngkace / samuraia don't use banking
-	psikyo_switch_banks(machine, 1, 1); // They share "gfx2" to save memory on other boards
+	psikyo_switch_banks(machine(), 0, 0); // sngkace / samuraia don't use banking
+	psikyo_switch_banks(machine(), 1, 1); // They share "gfx2" to save memory on other boards
 }
 
 

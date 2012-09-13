@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(offtwall_state::get_playfield_tile_info)
  *
  *************************************/
 
-VIDEO_START( offtwall )
+VIDEO_START_MEMBER(offtwall_state,offtwall)
 {
 	static const atarimo_desc modesc =
 	{
@@ -71,13 +71,12 @@ VIDEO_START( offtwall )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
-	offtwall_state *state = machine.driver_data<offtwall_state>();
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(offtwall_state::get_playfield_tile_info),state), TILEMAP_SCAN_COLS,  8,8, 64,64);
+	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(offtwall_state::get_playfield_tile_info),this), TILEMAP_SCAN_COLS,  8,8, 64,64);
 
 	/* initialize the motion objects */
-	atarimo_init(machine, 0, &modesc);
+	atarimo_init(machine(), 0, &modesc);
 }
 
 

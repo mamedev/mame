@@ -22,11 +22,12 @@ public:
 	DECLARE_WRITE8_MEMBER(hyhoo_romsel_w);
 	DECLARE_DRIVER_INIT(hyhoo2);
 	DECLARE_DRIVER_INIT(hyhoo);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/hyhoo.c -----------*/
 
 SCREEN_UPDATE_RGB32( hyhoo );
-VIDEO_START( hyhoo );
+
 

@@ -14,13 +14,12 @@ DRIVER_INIT_MEMBER(sapi1_state,sapi1)
 {
 }
 
-MACHINE_RESET( sapi1 )
+MACHINE_RESET_MEMBER(sapi1_state,sapi1)
 {
-	sapi1_state *state = machine.driver_data<sapi1_state>();
-	state->m_keyboard_mask = 0;
+	m_keyboard_mask = 0;
 }
 
-MACHINE_START(sapi1)
+MACHINE_START_MEMBER(sapi1_state,sapi1)
 {
 }
 
@@ -41,11 +40,10 @@ WRITE8_MEMBER( sapi1_state::sapi1_keyboard_w )
 }
 
 
-MACHINE_RESET( sapizps3 )
+MACHINE_RESET_MEMBER(sapi1_state,sapizps3)
 {
-	sapi1_state *state = machine.driver_data<sapi1_state>();
-	state->m_keyboard_mask = 0;
-	state->membank("bank1")->set_entry(1);
+	m_keyboard_mask = 0;
+	membank("bank1")->set_entry(1);
 }
 
 DRIVER_INIT_MEMBER(sapi1_state,sapizps3)

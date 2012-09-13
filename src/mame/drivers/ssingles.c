@@ -172,6 +172,7 @@ public:
 	DECLARE_WRITE8_MEMBER(atamanot_prot_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(controls_r);
 	DECLARE_DRIVER_INIT(ssingles);
+	virtual void video_start();
 };
 
 //fake palette
@@ -307,15 +308,14 @@ WRITE8_MEMBER(ssingles_state::ssingles_colorram_w)
 }
 
 
-static VIDEO_START(ssingles)
+void ssingles_state::video_start()
 {
-	ssingles_state *state = machine.driver_data<ssingles_state>();
 
 	{
 		int i;
 		for(i=0;i<NUM_PENS;++i)
 		{
-			state->m_pens[i]=MAKE_RGB(ssingles_colors[3*i], ssingles_colors[3*i+1], ssingles_colors[3*i+2]);
+			m_pens[i]=MAKE_RGB(ssingles_colors[3*i], ssingles_colors[3*i+1], ssingles_colors[3*i+2]);
 		}
 	}
 }
@@ -578,7 +578,6 @@ static MACHINE_CONFIG_START( ssingles, ssingles_state )
 
 	MCFG_GFXDECODE(ssingles)
 
-	MCFG_VIDEO_START(ssingles)
 
 	MCFG_MC6845_ADD("crtc", MC6845, 1000000 /* ? MHz */, ssingles_mc6845_intf)
 

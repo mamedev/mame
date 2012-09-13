@@ -62,10 +62,11 @@ protected:
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
-
-	virtual void video_start();
+public:
+	virtual void video_start();	
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	DECLARE_PALETTE_INIT(zodiack);
 };
 
 class percuss_state : public zodiack_state
@@ -77,4 +78,4 @@ public:
 };
 
 // in video/zodiack.c
-PALETTE_INIT( zodiack );
+

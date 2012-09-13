@@ -63,6 +63,7 @@ public:
 	DECLARE_WRITE8_MEMBER(votrtnt_kbd_put);
 	UINT8 m_term_data;
 	UINT8 m_term_status;
+	virtual void machine_reset();
 };
 
 READ8_MEMBER( votrtnt_state::votrtnt_acia_status_r )
@@ -111,11 +112,10 @@ static INPUT_PORTS_START(votrtnt)
 	PORT_DIPSETTING(    0x80, "9600" )
 INPUT_PORTS_END
 
-static MACHINE_RESET(votrtnt)
+void votrtnt_state::machine_reset()
 {
-	votrtnt_state *state = machine.driver_data<votrtnt_state>();
-	state->m_term_data = 0;
-	state->m_term_status = 0xe2;
+	m_term_data = 0;
+	m_term_status = 0xe2;
 }
 
 WRITE8_MEMBER( votrtnt_state::votrtnt_kbd_put )
@@ -143,7 +143,6 @@ static MACHINE_CONFIG_START( votrtnt, votrtnt_state )
 	MCFG_CPU_ADD("maincpu", M6802, XTAL_2_4576MHz)  /* 2.4576MHz XTAL, verified; divided by 4 inside the m6802*/
 	MCFG_CPU_PROGRAM_MAP(6802_mem)
 
-	MCFG_MACHINE_RESET(votrtnt)
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT(layout_votrtnt)
 

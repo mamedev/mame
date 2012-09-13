@@ -302,7 +302,6 @@ static MACHINE_CONFIG_START( wiping, wiping_state )
 	MCFG_GFXDECODE(wiping)
 	MCFG_PALETTE_LENGTH(64*4+64*4)
 
-	MCFG_PALETTE_INIT(wiping)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

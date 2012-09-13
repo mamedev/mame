@@ -225,20 +225,18 @@ static const sn76496_config psg_intf =
  *
  *************************************/
 
-static MACHINE_START( ikki )
+void ikki_state::machine_start()
 {
-	ikki_state *state = machine.driver_data<ikki_state>();
 
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_punch_through_pen));
-	state->save_item(NAME(state->m_irq_source));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_punch_through_pen));
+	save_item(NAME(m_irq_source));
 }
 
-static MACHINE_RESET( ikki )
+void ikki_state::machine_reset()
 {
-	ikki_state *state = machine.driver_data<ikki_state>();
 
-	state->m_flipscreen = 0;
+	m_flipscreen = 0;
 }
 
 static TIMER_DEVICE_CALLBACK( ikki_irq )
@@ -270,8 +268,6 @@ static MACHINE_CONFIG_START( ikki, ikki_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_MACHINE_START(ikki)
-	MCFG_MACHINE_RESET(ikki)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -285,8 +281,6 @@ static MACHINE_CONFIG_START( ikki, ikki_state )
 	MCFG_GFXDECODE(ikki)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_PALETTE_INIT(ikki)
-	MCFG_VIDEO_START(ikki)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

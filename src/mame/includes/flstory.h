@@ -107,6 +107,13 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(victnine_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_rumba_tile_info);
+	virtual void machine_start();
+	DECLARE_MACHINE_RESET(flstory);
+	DECLARE_VIDEO_START(flstory);
+	DECLARE_VIDEO_START(victnine);
+	DECLARE_MACHINE_RESET(rumba);
+	DECLARE_VIDEO_START(rumba);
+	DECLARE_MACHINE_RESET(ta7630);
 };
 
 
@@ -116,10 +123,10 @@ public:
 
 /*----------- defined in video/flstory.c -----------*/
 
-VIDEO_START( flstory );
+
 SCREEN_UPDATE_IND16( flstory );
-VIDEO_START( victnine );
+
 SCREEN_UPDATE_IND16( victnine );
-VIDEO_START( rumba );
+
 SCREEN_UPDATE_IND16( rumba );
 

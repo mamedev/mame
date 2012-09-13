@@ -141,19 +141,18 @@ TILEMAP_MAPPER_MEMBER(tigeroad_state::tigeroad_tilemap_scan)
 	return 2 * (col % 8) + 16 * ((127 - row) % 8) + 128 * (col / 8) + 2048 * ((127 - row) / 8);
 }
 
-VIDEO_START( tigeroad )
+void tigeroad_state::video_start()
 {
-	tigeroad_state *state = machine.driver_data<tigeroad_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tigeroad_state::get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(tigeroad_state::tigeroad_tilemap_scan),state),
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tigeroad_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(tigeroad_state::tigeroad_tilemap_scan),this),
 		 32, 32, 128, 128);
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tigeroad_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tigeroad_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 
-	state->m_bg_tilemap->set_transmask(0, 0xffff, 0);
-	state->m_bg_tilemap->set_transmask(1, 0x1ff, 0xfe00);
+	m_bg_tilemap->set_transmask(0, 0xffff, 0);
+	m_bg_tilemap->set_transmask(1, 0x1ff, 0xfe00);
 
-	state->m_fg_tilemap->set_transparent_pen(3);
+	m_fg_tilemap->set_transparent_pen(3);
 }
 
 SCREEN_UPDATE_IND16( tigeroad )

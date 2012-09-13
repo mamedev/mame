@@ -48,12 +48,16 @@ public:
 	DECLARE_WRITE8_MEMBER(dogfgt_scroll_w);
 	DECLARE_WRITE8_MEMBER(dogfgt_1800_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/dogfgt.c -----------*/
 
 
-PALETTE_INIT( dogfgt );
-VIDEO_START( dogfgt );
+
+
 SCREEN_UPDATE_IND16( dogfgt );

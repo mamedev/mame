@@ -463,9 +463,7 @@ static MACHINE_CONFIG_START( gat, gatron_state )
 	MCFG_SCREEN_UPDATE_STATIC(gat)
 
 	MCFG_GFXDECODE(gat)
-	MCFG_PALETTE_INIT(gat)
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_VIDEO_START(gat)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

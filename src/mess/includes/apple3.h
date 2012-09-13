@@ -57,6 +57,8 @@ public:
 	void apple3_profile_w(offs_t offset, UINT8 data);
 	DECLARE_DIRECT_UPDATE_MEMBER(apple3_opbase);
 	DECLARE_DRIVER_INIT(apple3);
+	DECLARE_MACHINE_RESET(apple3);
+	DECLARE_VIDEO_START(apple3);
 };
 
 
@@ -66,7 +68,7 @@ extern const applefdc_interface apple3_fdc_interface;
 extern const via6522_interface apple3_via_0_intf;
 extern const via6522_interface apple3_via_1_intf;
 
-MACHINE_RESET( apple3 );
+
 INTERRUPT_GEN( apple3_interrupt );
 
 
@@ -74,7 +76,7 @@ INTERRUPT_GEN( apple3_interrupt );
 
 /*----------- defined in video/apple3.c -----------*/
 
-VIDEO_START( apple3 );
+
 SCREEN_UPDATE_IND16( apple3 );
 void apple3_write_charmem(running_machine &machine);
 

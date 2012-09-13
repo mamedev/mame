@@ -215,17 +215,16 @@ static void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_el
  *
  *************************************/
 
-static VIDEO_START( mystston )
+VIDEO_START_MEMBER(mystston_state,mystston)
 {
-	mystston_state *state = machine.driver_data<mystston_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mystston_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS_FLIP_X, 16, 16, 16, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mystston_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X, 16, 16, 16, 32);
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mystston_state::get_fg_tile_info),state), TILEMAP_SCAN_COLS_FLIP_X,  8,  8, 32, 32);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mystston_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X,  8,  8, 32, 32);
+	m_fg_tilemap->set_transparent_pen(0);
 
 	/* create the interrupt timer */
-	state->m_interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_callback));
+	m_interrupt_timer = machine().scheduler().timer_alloc(FUNC(interrupt_callback));
 }
 
 
@@ -236,11 +235,10 @@ static VIDEO_START( mystston )
  *
  *************************************/
 
-static VIDEO_RESET( mystston )
+VIDEO_RESET_MEMBER(mystston_state,mystston)
 {
-	mystston_state *state = machine.driver_data<mystston_state>();
 
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(FIRST_INT_VPOS - 1, INT_HPOS), FIRST_INT_VPOS);
+	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(FIRST_INT_VPOS - 1, INT_HPOS), FIRST_INT_VPOS);
 }
 
 
@@ -319,8 +317,8 @@ GFXDECODE_END
  *************************************/
 
 MACHINE_CONFIG_FRAGMENT( mystston_video )
-	MCFG_VIDEO_START(mystston)
-	MCFG_VIDEO_RESET(mystston)
+	MCFG_VIDEO_START_OVERRIDE(mystston_state,mystston)
+	MCFG_VIDEO_RESET_OVERRIDE(mystston_state,mystston)
 
 	MCFG_GFXDECODE(mystston)
 	MCFG_PALETTE_LENGTH(0x40)

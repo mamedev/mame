@@ -13,18 +13,17 @@
 #define NUM_PENS	(8)
 
 
-MACHINE_START( extra_8080bw_vh )
+MACHINE_START_MEMBER(_8080bw_state,extra_8080bw_vh)
 {
-	_8080bw_state *state = machine.driver_data<_8080bw_state>();
 
-	state->save_item(NAME(state->m_c8080bw_flip_screen));
-	state->save_item(NAME(state->m_color_map));
-	state->save_item(NAME(state->m_screen_red));
+	save_item(NAME(m_c8080bw_flip_screen));
+	save_item(NAME(m_color_map));
+	save_item(NAME(m_screen_red));
 
 	// These two only belong to schaser, but for simplicity's sake let's waste
 	// two bytes in other drivers' .sta files.
-	state->save_item(NAME(state->m_schaser_background_disable));
-	state->save_item(NAME(state->m_schaser_background_select));
+	save_item(NAME(m_schaser_background_disable));
+	save_item(NAME(m_schaser_background_select));
 }
 
 

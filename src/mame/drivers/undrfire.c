@@ -744,7 +744,6 @@ static MACHINE_CONFIG_START( undrfire, undrfire_state )
 	MCFG_GFXDECODE(undrfire)
 	MCFG_PALETTE_LENGTH(16384)
 
-	MCFG_VIDEO_START(undrfire)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", undrfire_tc0100scn_intf)
 	MCFG_TC0480SCP_ADD("tc0480scp", undrfire_tc0480scp_intf)
@@ -780,7 +779,6 @@ static MACHINE_CONFIG_START( cbombers, undrfire_state )
 	MCFG_GFXDECODE(cbombers)
 	MCFG_PALETTE_LENGTH(16384)
 
-	MCFG_VIDEO_START(undrfire)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", undrfire_tc0100scn_intf)
 	MCFG_TC0480SCP_ADD("tc0480scp", undrfire_tc0480scp_intf)

@@ -226,7 +226,7 @@ static GFXDECODE_START( tx0 )
 GFXDECODE_END
 
 /* Initialise the palette */
-static PALETTE_INIT( tx0 )
+void tx0_state::palette_init()
 {
 	/* rgb components for the two color emissions */
 	const double r1 = .1, g1 = .1, b1 = .924, r2 = .7, g2 = .7, b2 = .076;
@@ -244,7 +244,7 @@ static PALETTE_INIT( tx0 )
 #endif
 	UINT8 i, r, g, b;
 
-	machine.colortable = colortable_alloc(machine, total_colors_needed);
+	machine().colortable = colortable_alloc(machine(), total_colors_needed);
 
 	/* initialize CRT palette */
 
@@ -261,7 +261,7 @@ static PALETTE_INIT( tx0 )
 		g = (int) ((g1*cur_level_1 + g2*cur_level_2) + .5);
 		b = (int) ((b1*cur_level_1 + b2*cur_level_2) + .5);
 		/* write color in palette */
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 		/* apply decay for next iteration */
 		cur_level_1 *= decay_1;
 		cur_level_2 *= decay_2;
@@ -281,22 +281,22 @@ static PALETTE_INIT( tx0 )
         mame_printf_debug("File %s line %d: Please take higher value for pen_crt_num_levels or smaller value for decay\n", __FILE__, __LINE__);*/
 #endif
 #endif
-	colortable_palette_set_color(machine.colortable, 0, MAKE_RGB(0, 0, 0));
+	colortable_palette_set_color(machine().colortable, 0, MAKE_RGB(0, 0, 0));
 
 	/* load static palette */
 	for ( i = 0; i < 6; i++ )
 	{
 		r = tx0_colors[i*3]; g = tx0_colors[i*3+1]; b = tx0_colors[i*3+2];
-		colortable_palette_set_color(machine.colortable, pen_crt_num_levels + i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, pen_crt_num_levels + i, MAKE_RGB(r, g, b));
 	}
 
 	/* copy colortable to palette */
 	for( i = 0; i < total_colors_needed; i++ )
-		colortable_entry_set_value(machine.colortable, i, i);
+		colortable_entry_set_value(machine().colortable, i, i);
 
 	/* set up palette for text */
 	for( i = 0; i < 6; i++ )
-		colortable_entry_set_value(machine.colortable, total_colors_needed + i, tx0_palette[i]);
+		colortable_entry_set_value(machine().colortable, total_colors_needed + i, tx0_palette[i]);
 }
 
 static void tx0_io_cpy(device_t *device);
@@ -365,11 +365,10 @@ enum
 };
 
 
-static MACHINE_RESET( tx0 )
+void tx0_state::machine_reset()
 {
-	tx0_state *state = machine.driver_data<tx0_state>();
 	/* reset device state */
-	state->m_tape_reader.rcl = state->m_tape_reader.rc = 0;
+	m_tape_reader.rcl = m_tape_reader.rc = 0;
 }
 
 
@@ -382,15 +381,14 @@ static void tx0_machine_stop(running_machine &machine)
 }
 
 
-static MACHINE_START( tx0 )
+void tx0_state::machine_start()
 {
-	tx0_state *state = machine.driver_data<tx0_state>();
-	state->m_tape_reader.timer = machine.scheduler().timer_alloc(FUNC(reader_callback));
-	state->m_tape_puncher.timer = machine.scheduler().timer_alloc(FUNC(puncher_callback));
-	state->m_typewriter.prt_timer = machine.scheduler().timer_alloc(FUNC(prt_callback));
-	state->m_dis_timer = machine.scheduler().timer_alloc(FUNC(dis_callback));
+	m_tape_reader.timer = machine().scheduler().timer_alloc(FUNC(reader_callback));
+	m_tape_puncher.timer = machine().scheduler().timer_alloc(FUNC(puncher_callback));
+	m_typewriter.prt_timer = machine().scheduler().timer_alloc(FUNC(prt_callback));
+	m_dis_timer = machine().scheduler().timer_alloc(FUNC(dis_callback));
 
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(tx0_machine_stop),&machine));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(tx0_machine_stop),&machine()));
 }
 
 
@@ -1610,8 +1608,6 @@ static MACHINE_CONFIG_START( tx0_64kw, tx0_state )
 	/* dummy interrupt: handles input */
 	MCFG_CPU_VBLANK_INT("screen", tx0_interrupt)
 
-	MCFG_MACHINE_START( tx0 )
-	MCFG_MACHINE_RESET( tx0 )
 
 	/* video hardware (includes the control panel and typewriter output) */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1631,8 +1627,6 @@ static MACHINE_CONFIG_START( tx0_64kw, tx0_state )
 	MCFG_GFXDECODE(tx0)
 	MCFG_PALETTE_LENGTH(pen_crt_num_levels + sizeof(tx0_colors) / 3 + sizeof(tx0_palette))
 
-	MCFG_PALETTE_INIT(tx0)
-	MCFG_VIDEO_START(tx0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tx0_8kw, tx0_64kw )

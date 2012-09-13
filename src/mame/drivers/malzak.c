@@ -301,14 +301,14 @@ static GFXDECODE_START( malzak )
 GFXDECODE_END
 
 
-static PALETTE_INIT( malzak )
+void malzak_state::palette_init()
 {
 	int i;
 
 	for (i = 0; i < 8 * 8; i++)
 	{
-		palette_set_color_rgb(machine, i * 2 + 0, pal1bit(i >> 3), pal1bit(i >> 4), pal1bit(i >> 5));
-		palette_set_color_rgb(machine, i * 2 + 1, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		palette_set_color_rgb(machine(), i * 2 + 0, pal1bit(i >> 3), pal1bit(i >> 4), pal1bit(i >> 5));
+		palette_set_color_rgb(machine(), i * 2 + 1, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 	}
 }
 
@@ -366,29 +366,27 @@ static const saa5050_interface malzac_saa5050_intf =
 };
 
 
-static MACHINE_START( malzak )
+void malzak_state::machine_start()
 {
-	malzak_state *state = machine.driver_data<malzak_state>();
 
-	state->membank("bank1")->configure_entries(0, 2, state->memregion("user2")->base(), 0x400);
+	membank("bank1")->configure_entries(0, 2, memregion("user2")->base(), 0x400);
 
-	state->m_s2636_0 = machine.device("s2636_0");
-	state->m_s2636_1 = machine.device("s2636_1");
-	state->m_saa5050 = machine.device("saa5050");
+	m_s2636_0 = machine().device("s2636_0");
+	m_s2636_1 = machine().device("s2636_1");
+	m_saa5050 = machine().device("saa5050");
 
-	state->save_item(NAME(state->m_playfield_code));
-	state->save_item(NAME(state->m_malzak_x));
-	state->save_item(NAME(state->m_malzak_y));
+	save_item(NAME(m_playfield_code));
+	save_item(NAME(m_malzak_x));
+	save_item(NAME(m_malzak_y));
 }
 
-static MACHINE_RESET( malzak )
+void malzak_state::machine_reset()
 {
-	malzak_state *state = machine.driver_data<malzak_state>();
 
-	memset(state->m_playfield_code, 0, 256 * sizeof(int));
+	memset(m_playfield_code, 0, 256 * sizeof(int));
 
-	state->m_malzak_x = 0;
-	state->m_malzak_y = 0;
+	m_malzak_x = 0;
+	m_malzak_y = 0;
 }
 
 static MACHINE_CONFIG_START( malzak, malzak_state )
@@ -398,8 +396,6 @@ static MACHINE_CONFIG_START( malzak, malzak_state )
 	MCFG_CPU_PROGRAM_MAP(malzak_map)
 	MCFG_CPU_IO_MAP(malzak_io_map)
 
-	MCFG_MACHINE_START(malzak)
-	MCFG_MACHINE_RESET(malzak)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -411,7 +407,6 @@ static MACHINE_CONFIG_START( malzak, malzak_state )
 
 	MCFG_GFXDECODE(malzak)
 	MCFG_PALETTE_LENGTH(128)
-	MCFG_PALETTE_INIT(malzak)
 
 	MCFG_S2636_ADD("s2636_0", malzac_s2636_0_config)
 	MCFG_S2636_ADD("s2636_1", malzac_s2636_1_config)

@@ -93,6 +93,7 @@ public:
 
 	// video state
 	UINT8 *m_video_ram;
+	virtual void palette_init();
 };
 
 #endif

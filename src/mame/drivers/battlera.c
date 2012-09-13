@@ -250,7 +250,6 @@ static MACHINE_CONFIG_START( battlera, battlera_state )
 	MCFG_GFXDECODE(battlera)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(battlera)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

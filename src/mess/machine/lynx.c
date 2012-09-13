@@ -1962,36 +1962,34 @@ static void lynx_postload(lynx_state *state)
 	state->lynx_memory_config_w( *state->machine().device("maincpu")->memory().space(AS_PROGRAM), 0, state->m_memory_config);
 }
 
-MACHINE_START( lynx )
+void lynx_state::machine_start()
 {
-	lynx_state *state = machine.driver_data<lynx_state>();
-	state->m_bitmap_temp.allocate(160,102,0,0);
+	m_bitmap_temp.allocate(160,102,0,0);
 
 	int i;
-	state->save_item(NAME(state->m_memory_config));
-	state->save_pointer(NAME(state->m_mem_fe00.target()), state->m_mem_fe00.bytes());
-	machine.save().register_postload(save_prepost_delegate(FUNC(lynx_postload), state));
+	save_item(NAME(m_memory_config));
+	save_pointer(NAME(m_mem_fe00.target()), m_mem_fe00.bytes());
+	machine().save().register_postload(save_prepost_delegate(FUNC(lynx_postload), this));
 
-	state->membank("bank3")->configure_entry(0, machine.root_device().memregion("maincpu")->base() + 0x0000);
-	state->membank("bank3")->configure_entry(1, state->m_mem_fe00);
-	state->membank("bank4")->configure_entry(0, state->memregion("maincpu")->base() + 0x01fa);
-	state->membank("bank4")->configure_entry(1, state->m_mem_fffa);
+	membank("bank3")->configure_entry(0, machine().root_device().memregion("maincpu")->base() + 0x0000);
+	membank("bank3")->configure_entry(1, m_mem_fe00);
+	membank("bank4")->configure_entry(0, memregion("maincpu")->base() + 0x01fa);
+	membank("bank4")->configure_entry(1, m_mem_fffa);
 
-	state->m_audio = machine.device("custom");
+	m_audio = machine().device("custom");
 
-	memset(&state->m_suzy, 0, sizeof(state->m_suzy));
+	memset(&m_suzy, 0, sizeof(m_suzy));
 
-	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(lynx_reset),&machine));
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(lynx_reset),&machine()));
 
 	for (i = 0; i < NR_LYNX_TIMERS; i++)
-		lynx_timer_init(machine, i);
+		lynx_timer_init(machine(), i);
 }
 
-MACHINE_RESET( lynx )
+void lynx_state::machine_reset()
 {
-	lynx_state *state = machine.driver_data<lynx_state>();
-	render_target *target = machine.render().first_target();
-	target->set_view(state->m_rotate);
+	render_target *target = machine().render().first_target();
+	target->set_view(m_rotate);
 }
 
 /****************************************

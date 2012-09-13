@@ -162,11 +162,11 @@ WRITE8_MEMBER(firetrk_state::montecar_output_2_w)
 }
 
 
-static MACHINE_RESET( firetrk )
+void firetrk_state::machine_reset()
 {
-	set_service_mode(machine, 0);
+	set_service_mode(machine(), 0);
 
-	machine.scheduler().synchronize(FUNC(periodic_callback));
+	machine().scheduler().synchronize(FUNC(periodic_callback));
 }
 
 
@@ -879,7 +879,6 @@ static MACHINE_CONFIG_START( firetrk, firetrk_state )
 	MCFG_CPU_VBLANK_INT("screen", firetrk_interrupt)
 	MCFG_WATCHDOG_VBLANK_INIT(5)
 
-	MCFG_MACHINE_RESET(firetrk)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -890,8 +889,6 @@ static MACHINE_CONFIG_START( firetrk, firetrk_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_STATIC(firetrk)
 
-	MCFG_VIDEO_START(firetrk)
-	MCFG_PALETTE_INIT(firetrk)
 	MCFG_PALETTE_LENGTH(28)
 	MCFG_GFXDECODE(firetrk)
 
@@ -914,7 +911,7 @@ static MACHINE_CONFIG_DERIVED( superbug, firetrk )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(superbug)
 
-	MCFG_VIDEO_START(superbug)
+	MCFG_VIDEO_START_OVERRIDE(firetrk_state,superbug)
 	MCFG_GFXDECODE(superbug)
 	MCFG_PALETTE_LENGTH(28)
 
@@ -935,10 +932,10 @@ static MACHINE_CONFIG_DERIVED( montecar, firetrk )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(montecar)
 
-	MCFG_VIDEO_START(montecar)
+	MCFG_VIDEO_START_OVERRIDE(firetrk_state,montecar)
 	MCFG_GFXDECODE(montecar)
 
-	MCFG_PALETTE_INIT(montecar)
+	MCFG_PALETTE_INIT_OVERRIDE(firetrk_state,montecar)
 	MCFG_PALETTE_LENGTH(46)
 
 	/* sound hardware */

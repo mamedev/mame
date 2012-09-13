@@ -26,6 +26,10 @@ public:
 	DECLARE_WRITE8_MEMBER(kangaroo_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(kangaroo_videoram_w);
 	DECLARE_WRITE8_MEMBER(kangaroo_video_control_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	DECLARE_MACHINE_START(kangaroo_mcu);
 };
 
 
@@ -33,6 +37,6 @@ public:
 
 /*----------- defined in video/kangaroo.c -----------*/
 
-VIDEO_START( kangaroo );
+
 SCREEN_UPDATE_RGB32( kangaroo );
 

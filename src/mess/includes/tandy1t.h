@@ -18,7 +18,6 @@ extern  READ8_HANDLER(tandy1000_pio_r);
 
 extern NVRAM_HANDLER( tandy1000 );
 
-MACHINE_RESET( tandy1000rl );
 READ8_HANDLER( tandy1000_bank_r );
 WRITE8_HANDLER( tandy1000_bank_w );
 

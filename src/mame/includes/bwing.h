@@ -71,6 +71,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bgtileinfo);
 	TILE_GET_INFO_MEMBER(get_charinfo);
 	TILEMAP_MAPPER_MEMBER(bwing_scan_cols);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -79,5 +82,5 @@ public:
 extern const gfx_layout bwing_tilelayout;
 
 
-VIDEO_START( bwing );
+
 SCREEN_UPDATE_IND16( bwing );

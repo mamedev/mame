@@ -40,6 +40,9 @@ public:
 	DECLARE_WRITE8_MEMBER(orbit_misc_w);
 	DECLARE_WRITE8_MEMBER(orbit_playfield_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -54,6 +57,6 @@ DISCRETE_SOUND_EXTERN( orbit );
 
 /*----------- defined in video/orbit.c -----------*/
 
-VIDEO_START( orbit );
+
 SCREEN_UPDATE_IND16( orbit );
 

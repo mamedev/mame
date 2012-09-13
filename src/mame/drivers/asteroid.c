@@ -617,7 +617,6 @@ static MACHINE_CONFIG_START( asteroid, asteroid_state )
 	MCFG_CPU_PROGRAM_MAP(asteroid_map)
 	MCFG_CPU_PERIODIC_INT(asteroid_interrupt, (double)MASTER_CLOCK/4096/12)
 
-	MCFG_MACHINE_RESET(asteroid)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", VECTOR)

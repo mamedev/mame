@@ -56,6 +56,8 @@ public:
 	DECLARE_DRIVER_INIT(3super8);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 WRITE8_MEMBER(spoker_state::bg_tile_w)
@@ -91,13 +93,12 @@ WRITE8_MEMBER(spoker_state::fg_color_w)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-static VIDEO_START(spoker)
+void spoker_state::video_start()
 {
-	spoker_state *state = machine.driver_data<spoker_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(spoker_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,	8,  32,	128, 8);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(spoker_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,	8,  8,	128, 32);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,	8,  32,	128, 8);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,	8,  8,	128, 32);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 static SCREEN_UPDATE_IND16(spoker)
@@ -510,13 +511,12 @@ GFXDECODE_END
                                 Machine Drivers
 ***************************************************************************/
 
-static MACHINE_RESET( spoker )
+void spoker_state::machine_reset()
 {
-	spoker_state *state = machine.driver_data<spoker_state>();
 
-	state->m_nmi_ack		=	0;
-	state->m_hopper			=	0;
-	state->m_video_enable	=	1;
+	m_nmi_ack		=	0;
+	m_hopper			=	0;
+	m_video_enable	=	1;
 }
 
 static INTERRUPT_GEN( spoker_interrupt )
@@ -534,7 +534,6 @@ static MACHINE_CONFIG_START( spoker, spoker_state )
 	MCFG_CPU_IO_MAP(spoker_portmap)
 	MCFG_CPU_VBLANK_INT("screen",spoker_interrupt)
 
-	MCFG_MACHINE_RESET(spoker)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -549,7 +548,6 @@ static MACHINE_CONFIG_START( spoker, spoker_state )
 	MCFG_GFXDECODE(spoker)
 	MCFG_PALETTE_LENGTH(0x400)
 
-	MCFG_VIDEO_START(spoker)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -198,35 +198,33 @@ READ16_MEMBER(vertigo_state::vertigo_sio_r)
  *
  *************************************/
 
-MACHINE_START( vertigo )
+void vertigo_state::machine_start()
 {
-	vertigo_state *state = machine.driver_data<vertigo_state>();
 
-	state->m_custom = machine.device("custom");
-	state->m_ttl74148 = machine.device("74148");
+	m_custom = machine().device("custom");
+	m_ttl74148 = machine().device("74148");
 
-	state_save_register_global(machine, state->m_irq_state);
-	state_save_register_global(machine, state->m_adc_result);
-	state_save_register_global(machine, state->m_irq4_time);
+	state_save_register_global(machine(), m_irq_state);
+	state_save_register_global(machine(), m_adc_result);
+	state_save_register_global(machine(), m_irq4_time);
 
-	vertigo_vproc_init(machine);
+	vertigo_vproc_init(machine());
 }
 
-MACHINE_RESET( vertigo )
+void vertigo_state::machine_reset()
 {
-	vertigo_state *state = machine.driver_data<vertigo_state>();
 	int i;
 
-	ttl74148_enable_input_w(state->m_ttl74148, 0);
+	ttl74148_enable_input_w(m_ttl74148, 0);
 
 	for (i = 0; i < 8; i++)
-		ttl74148_input_line_w(state->m_ttl74148, i, 1);
+		ttl74148_input_line_w(m_ttl74148, i, 1);
 
-	ttl74148_update(state->m_ttl74148);
-	vertigo_vproc_reset(machine);
+	ttl74148_update(m_ttl74148);
+	vertigo_vproc_reset(machine());
 
-	state->m_irq4_time = machine.time();
-	state->m_irq_state = 7;
+	m_irq4_time = machine().time();
+	m_irq_state = 7;
 }
 
 

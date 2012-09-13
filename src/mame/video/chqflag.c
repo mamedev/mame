@@ -52,15 +52,14 @@ void chqflag_zoom_callback_1( running_machine &machine, int *code, int *color, i
 
 ***************************************************************************/
 
-VIDEO_START( chqflag )
+void chqflag_state::video_start()
 {
-	chqflag_state *state = machine.driver_data<chqflag_state>();
 
-	state->m_generic_paletteram_8.allocate(0x800);
+	m_generic_paletteram_8.allocate(0x800);
 
-	state->m_sprite_colorbase = 0;
-	state->m_zoom_colorbase[0] = 0x10;
-	state->m_zoom_colorbase[1] = 0x02;
+	m_sprite_colorbase = 0;
+	m_zoom_colorbase[0] = 0x10;
+	m_zoom_colorbase[1] = 0x02;
 }
 
 /***************************************************************************

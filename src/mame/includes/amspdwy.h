@@ -40,11 +40,14 @@ public:
 	DECLARE_READ8_MEMBER(amspdwy_sound_r);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_cols_back);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/amspdwy.c -----------*/
 
 
-VIDEO_START( amspdwy );
+
 SCREEN_UPDATE_IND16( amspdwy );

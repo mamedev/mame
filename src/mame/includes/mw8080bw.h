@@ -128,6 +128,17 @@ public:
 	DECLARE_WRITE8_MEMBER(bowler_audio_4_w);
 	DECLARE_WRITE8_MEMBER(bowler_audio_5_w);
 	DECLARE_WRITE8_MEMBER(bowler_audio_6_w);
+	DECLARE_MACHINE_START(mw8080bw);
+	DECLARE_MACHINE_RESET(mw8080bw);
+	DECLARE_MACHINE_START(maze);
+	DECLARE_MACHINE_START(boothill);
+	DECLARE_MACHINE_START(desertgu);
+	DECLARE_MACHINE_START(gmissile);
+	DECLARE_MACHINE_START(m4);
+	DECLARE_MACHINE_START(clowns);
+	DECLARE_MACHINE_START(spcenctr);
+	DECLARE_MACHINE_START(phantom2);
+	DECLARE_MACHINE_START(invaders);
 };
 
 
@@ -182,8 +193,8 @@ int invaders_is_cabinet_cocktail(running_machine &machine);
 
 /*----------- defined in machine/mw8080bw.c -----------*/
 
-MACHINE_START( mw8080bw );
-MACHINE_RESET( mw8080bw );
+
+
 
 
 /*----------- defined in audio/mw8080bw.c -----------*/

@@ -160,6 +160,8 @@ public:
 	DECLARE_WRITE32_MEMBER(kinst_ide_extra_w);
 	DECLARE_DRIVER_INIT(kinst);
 	DECLARE_DRIVER_INIT(kinst2);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -175,16 +177,15 @@ public:
  *
  *************************************/
 
-static MACHINE_START( kinst )
+void kinst_state::machine_start()
 {
-	kinst_state *state = machine.driver_data<kinst_state>();
 	/* set the fastest DRC options */
-	mips3drc_set_options(machine.device("maincpu"), MIPS3DRC_FASTEST_OPTIONS);
+	mips3drc_set_options(machine().device("maincpu"), MIPS3DRC_FASTEST_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine.device("maincpu"), 0x08000000, 0x087fffff, FALSE, state->m_rambase2);
-	mips3drc_add_fastram(machine.device("maincpu"), 0x00000000, 0x0007ffff, FALSE, state->m_rambase);
-	mips3drc_add_fastram(machine.device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  state->m_rombase);
+	mips3drc_add_fastram(machine().device("maincpu"), 0x08000000, 0x087fffff, FALSE, m_rambase2);
+	mips3drc_add_fastram(machine().device("maincpu"), 0x00000000, 0x0007ffff, FALSE, m_rambase);
+	mips3drc_add_fastram(machine().device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
 }
 
 
@@ -195,13 +196,12 @@ static MACHINE_START( kinst )
  *
  *************************************/
 
-static MACHINE_RESET( kinst )
+void kinst_state::machine_reset()
 {
-	kinst_state *state = machine.driver_data<kinst_state>();
-	device_t *ide = machine.device("ide");
+	device_t *ide = machine().device("ide");
 	UINT8 *features = ide_get_features(ide,0);
 
-	if (strncmp(machine.system().name, "kinst2", 6) != 0)
+	if (strncmp(machine().system().name, "kinst2", 6) != 0)
 	{
 		/* kinst: tweak the model number so we pass the check */
 		features[27*2+0] = 0x54;
@@ -231,7 +231,7 @@ static MACHINE_RESET( kinst )
 	}
 
 	/* set a safe base location for video */
-	state->m_video_base = &state->m_rambase[0x30000/4];
+	m_video_base = &m_rambase[0x30000/4];
 }
 
 
@@ -677,8 +677,6 @@ static MACHINE_CONFIG_START( kinst, kinst_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_start)
 
-	MCFG_MACHINE_START(kinst)
-	MCFG_MACHINE_RESET(kinst)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
 

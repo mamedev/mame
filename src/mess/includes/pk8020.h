@@ -41,11 +41,13 @@ public:
 	DECLARE_WRITE8_MEMBER(gzu_w);
 	DECLARE_READ8_MEMBER(devices_r);
 	DECLARE_WRITE8_MEMBER(devices_w);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in machine/pk8020.c -----------*/
-extern MACHINE_RESET( pk8020 );
 extern const i8255_interface pk8020_ppi8255_interface_1;
 extern const i8255_interface pk8020_ppi8255_interface_2;
 extern const i8255_interface pk8020_ppi8255_interface_3;
@@ -54,8 +56,6 @@ extern const struct pic8259_interface pk8020_pic8259_config;
 extern INTERRUPT_GEN( pk8020_interrupt );
 /*----------- defined in video/pk8020.c -----------*/
 
-extern PALETTE_INIT( pk8020 );
-extern VIDEO_START( pk8020 );
 extern SCREEN_UPDATE_IND16( pk8020 );
 
 #endif /* pk8020_H_ */

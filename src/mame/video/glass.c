@@ -123,17 +123,16 @@ WRITE16_MEMBER(glass_state::glass_vram_w)
 
 ***************************************************************************/
 
-VIDEO_START( glass )
+void glass_state::video_start()
 {
-	glass_state *state = machine.driver_data<glass_state>();
-	state->m_pant[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(glass_state::get_tile_info_glass_screen0),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_pant[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(glass_state::get_tile_info_glass_screen1),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_screen_bitmap = auto_bitmap_ind16_alloc (machine, 320, 200);
+	m_pant[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(glass_state::get_tile_info_glass_screen0),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_pant[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(glass_state::get_tile_info_glass_screen1),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_screen_bitmap = auto_bitmap_ind16_alloc (machine(), 320, 200);
 
-	state->save_item(NAME(*state->m_screen_bitmap));
+	save_item(NAME(*m_screen_bitmap));
 
-	state->m_pant[0]->set_transparent_pen(0);
-	state->m_pant[1]->set_transparent_pen(0);
+	m_pant[0]->set_transparent_pen(0);
+	m_pant[1]->set_transparent_pen(0);
 }
 
 

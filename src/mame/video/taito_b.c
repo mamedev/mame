@@ -38,81 +38,75 @@ WRITE16_MEMBER(taitob_state::realpunc_video_ctrl_w)
 	COMBINE_DATA(&m_realpunc_video_ctrl);
 }
 
-static VIDEO_START( taitob_core )
+VIDEO_START_MEMBER(taitob_state,taitob_core)
 {
-	taitob_state *state = machine.driver_data<taitob_state>();
 
-	state->m_framebuffer[0] = auto_bitmap_ind16_alloc(machine, 512, 256);
-	state->m_framebuffer[1] = auto_bitmap_ind16_alloc(machine, 512, 256);
-	state->m_pixel_bitmap = NULL;  /* only hitice needs this */
+	m_framebuffer[0] = auto_bitmap_ind16_alloc(machine(), 512, 256);
+	m_framebuffer[1] = auto_bitmap_ind16_alloc(machine(), 512, 256);
+	m_pixel_bitmap = NULL;  /* only hitice needs this */
 
-	state->save_item(NAME(state->m_pixel_scroll));
+	save_item(NAME(m_pixel_scroll));
 
-	state->save_item(NAME(*state->m_framebuffer[0]));
-	state->save_item(NAME(*state->m_framebuffer[1]));
+	save_item(NAME(*m_framebuffer[0]));
+	save_item(NAME(*m_framebuffer[1]));
 }
 
-VIDEO_START( taitob_color_order0 )
+VIDEO_START_MEMBER(taitob_state,taitob_color_order0)
 {
 	/*graphics are shared, only that they use different palette*/
 	/*this is the basic layout used in: Nastar, Ashura Blaster, Hit the Ice, Rambo3, Tetris*/
 
 	/*Note that in both this and color order 1 pixel_color_base/color_granularity is equal to sprites color base. Pure coincidence? */
 
-	taitob_state *state = machine.driver_data<taitob_state>();
-	state->m_b_sp_color_base = 0x40 * 16;	/*sprites   */
+	m_b_sp_color_base = 0x40 * 16;	/*sprites   */
 
 	/* bg, fg, tx color_base are set in the tc0180vcu interface */
 
-	VIDEO_START_CALL(taitob_core);
+	VIDEO_START_CALL_MEMBER(taitob_core);
 }
 
-VIDEO_START( taitob_color_order1 )
+VIDEO_START_MEMBER(taitob_state,taitob_color_order1)
 {
 	/* this is the reversed layout used in: Crime City, Puzzle Bobble */
-	taitob_state *state = machine.driver_data<taitob_state>();
-	state->m_b_sp_color_base = 0x80 * 16;
+	m_b_sp_color_base = 0x80 * 16;
 
-	VIDEO_START_CALL(taitob_core);
+	VIDEO_START_CALL_MEMBER(taitob_core);
 }
 
-VIDEO_START( taitob_color_order2 )
+VIDEO_START_MEMBER(taitob_state,taitob_color_order2)
 {
 	/*this is used in: rambo3a, masterw, silentd, selfeena, ryujin */
-	taitob_state *state = machine.driver_data<taitob_state>();
-	state->m_b_sp_color_base = 0x10 * 16;
+	m_b_sp_color_base = 0x10 * 16;
 
-	VIDEO_START_CALL(taitob_core);
+	VIDEO_START_CALL_MEMBER(taitob_core);
 }
 
 
-VIDEO_START( hitice )
+VIDEO_START_MEMBER(taitob_state,hitice)
 {
-	taitob_state *state = machine.driver_data<taitob_state>();
 
-	VIDEO_START_CALL(taitob_color_order0);
+	VIDEO_START_CALL_MEMBER(taitob_color_order0);
 
-	state->m_b_fg_color_base = 0x80;		/* hitice also uses this for the pixel_bitmap */
+	m_b_fg_color_base = 0x80;		/* hitice also uses this for the pixel_bitmap */
 
-	state->m_pixel_bitmap = auto_bitmap_ind16_alloc(machine, 1024, 512);
+	m_pixel_bitmap = auto_bitmap_ind16_alloc(machine(), 1024, 512);
 
-	state->save_item(NAME(*state->m_pixel_bitmap));
+	save_item(NAME(*m_pixel_bitmap));
 }
 
-VIDEO_RESET( hitice )
+VIDEO_RESET_MEMBER(taitob_state,hitice)
 {
 	/* kludge: clear the bitmap on startup */
-	hitice_clear_pixel_bitmap(machine);
+	hitice_clear_pixel_bitmap(machine());
 }
 
 
-VIDEO_START( realpunc )
+VIDEO_START_MEMBER(taitob_state,realpunc)
 {
-	taitob_state *state = machine.driver_data<taitob_state>();
 
-	state->m_realpunc_bitmap = auto_bitmap_ind16_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height());
+	m_realpunc_bitmap = auto_bitmap_ind16_alloc(machine(), machine().primary_screen->width(), machine().primary_screen->height());
 
-	VIDEO_START_CALL(taitob_color_order0);
+	VIDEO_START_CALL_MEMBER(taitob_color_order0);
 }
 
 

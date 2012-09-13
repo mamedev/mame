@@ -723,7 +723,7 @@ static MACHINE_CONFIG_START( sslam, sslam_state )
 	MCFG_GFXDECODE(sslam)
 	MCFG_PALETTE_LENGTH(0x800)
 
-	MCFG_VIDEO_START(sslam)
+	MCFG_VIDEO_START_OVERRIDE(sslam_state,sslam)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -753,7 +753,7 @@ static MACHINE_CONFIG_START( powerbls, sslam_state )
 	MCFG_GFXDECODE(powerbls)
 	MCFG_PALETTE_LENGTH(0x200)
 
-	MCFG_VIDEO_START(powerbls)
+	MCFG_VIDEO_START_OVERRIDE(sslam_state,powerbls)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

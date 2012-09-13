@@ -36,15 +36,17 @@ public:
 
 	DECLARE_WRITE16_MEMBER(shanghai_coin_w);
 	DECLARE_READ16_MEMBER(kothello_hd63484_status_r);
+	virtual void video_start();
+	DECLARE_PALETTE_INIT(shanghai);
 };
 
 
-static PALETTE_INIT( shanghai )
+PALETTE_INIT_MEMBER(shanghai_state,shanghai)
 {
 	int i;
 
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -65,11 +67,11 @@ static PALETTE_INIT( shanghai )
 		bit2 = (i >> 1) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 	}
 }
 
-static VIDEO_START( shanghai )
+void shanghai_state::video_start()
 {
 }
 
@@ -453,8 +455,7 @@ static MACHINE_CONFIG_START( shanghai, shanghai_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(shanghai)
-	MCFG_VIDEO_START(shanghai)
+	MCFG_PALETTE_INIT_OVERRIDE(shanghai_state,shanghai)
 
 	MCFG_HD63484_ADD("hd63484", shanghai_hd63484_intf)
 
@@ -487,7 +488,6 @@ static MACHINE_CONFIG_START( shangha2, shanghai_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(shanghai)
 
 	MCFG_HD63484_ADD("hd63484", shanghai_hd63484_intf)
 
@@ -525,7 +525,6 @@ static MACHINE_CONFIG_START( kothello, shanghai_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(shanghai)
 
 	MCFG_HD63484_ADD("hd63484", shanghai_hd63484_intf)
 

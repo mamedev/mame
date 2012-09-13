@@ -24,10 +24,11 @@ public:
 
 	DECLARE_WRITE8_MEMBER(ambush_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/ambush.c -----------*/
 
-PALETTE_INIT( ambush );
+
 SCREEN_UPDATE_IND16( ambush );

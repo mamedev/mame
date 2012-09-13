@@ -24,12 +24,16 @@ public:
 	DECLARE_WRITE8_MEMBER(funkybee_flipscreen_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(funkybee_tilemap_scan);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/funkybee.c -----------*/
 
 
-PALETTE_INIT( funkybee );
-VIDEO_START( funkybee );
+
+
 SCREEN_UPDATE_IND16( funkybee );

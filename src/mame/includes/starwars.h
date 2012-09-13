@@ -61,6 +61,7 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(esb_setdirect);
 	DECLARE_DRIVER_INIT(esb);
 	DECLARE_DRIVER_INIT(starwars);
+	virtual void machine_reset();
 };
 
 

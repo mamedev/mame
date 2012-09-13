@@ -178,10 +178,9 @@ static INTERRUPT_GEN( assert_irq )
        */
 }
 
-static MACHINE_START( mustache )
+void mustache_state::machine_start()
 {
-	mustache_state *state = machine.driver_data<mustache_state>();
-	state->m_clear_irq_timer = machine.scheduler().timer_alloc(FUNC(clear_irq_cb));
+	m_clear_irq_timer = machine().scheduler().timer_alloc(FUNC(clear_irq_cb));
 }
 
 static MACHINE_CONFIG_START( mustache, mustache_state )
@@ -195,7 +194,6 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 	MCFG_CPU_PROGRAM_MAP(t5182_map)
 	MCFG_CPU_IO_MAP(t5182_io)
 
-	MCFG_MACHINE_START(mustache)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -208,8 +206,6 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 	MCFG_GFXDECODE(mustache)
 	MCFG_PALETTE_LENGTH(8*16+16*8)
 
-	MCFG_PALETTE_INIT(mustache)
-	MCFG_VIDEO_START(mustache)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

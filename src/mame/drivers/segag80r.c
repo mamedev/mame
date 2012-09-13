@@ -153,7 +153,7 @@ INPUT_CHANGED_MEMBER(segag80r_state::service_switch)
 }
 
 
-static MACHINE_START( g80r )
+void segag80r_state::machine_start()
 {
 	/* register for save states */
 }
@@ -845,7 +845,6 @@ static MACHINE_CONFIG_START( g80r_base, segag80r_state )
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT("screen", segag80r_vblank_start)
 
-	MCFG_MACHINE_START(g80r)
 
 	/* video hardware */
 	MCFG_GFXDECODE(segag80r)
@@ -855,7 +854,6 @@ static MACHINE_CONFIG_START( g80r_base, segag80r_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(segag80r)
 
-	MCFG_VIDEO_START(segag80r)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

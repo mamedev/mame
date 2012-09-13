@@ -381,14 +381,13 @@ WRITE16_MEMBER(toaplan1_state::samesame_coin_w)
 }
 
 
-MACHINE_RESET( toaplan1 )
+MACHINE_RESET_MEMBER(toaplan1_state,toaplan1)
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	state->m_intenable = 0;
-	state->m_coin_count = 0;
-	state->m_unk_reset_port = 0;
-	coin_lockout_global_w(machine, 0);
+	m_intenable = 0;
+	m_coin_count = 0;
+	m_unk_reset_port = 0;
+	coin_lockout_global_w(machine(), 0);
 }
 
 void toaplan1_driver_savestate(running_machine &machine)
@@ -400,22 +399,20 @@ void toaplan1_driver_savestate(running_machine &machine)
 	state->save_item(NAME(state->m_unk_reset_port));
 }
 
-MACHINE_RESET( zerowing )	/* Hack for ZeroWing and OutZone. See the video driver */
+MACHINE_RESET_MEMBER(toaplan1_state,zerowing)/* Hack for ZeroWing and OutZone. See the video driver */
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	MACHINE_RESET_CALL(toaplan1);
-	state->m_unk_reset_port = 1;
+	MACHINE_RESET_CALL_MEMBER(toaplan1);
+	m_unk_reset_port = 1;
 }
 
-MACHINE_RESET( demonwld )
+MACHINE_RESET_MEMBER(toaplan1_state,demonwld)
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	MACHINE_RESET_CALL(toaplan1);
-	state->m_dsp_addr_w = 0;
-	state->m_main_ram_seg = 0;
-	state->m_dsp_execute = 0;
+	MACHINE_RESET_CALL_MEMBER(toaplan1);
+	m_dsp_addr_w = 0;
+	m_main_ram_seg = 0;
+	m_dsp_execute = 0;
 }
 
 void demonwld_driver_savestate(running_machine &machine)
@@ -430,14 +427,13 @@ void demonwld_driver_savestate(running_machine &machine)
 	machine.save().register_postload(save_prepost_delegate(FUNC(demonwld_restore_dsp), &machine));
 }
 
-MACHINE_RESET( vimana )
+MACHINE_RESET_MEMBER(toaplan1_state,vimana)
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	MACHINE_RESET_CALL(toaplan1);
-	state->m_vimana_coins[0] = state->m_vimana_coins[1] = 0;
-	state->m_vimana_credits = 0;
-	state->m_vimana_latch = 0;
+	MACHINE_RESET_CALL_MEMBER(toaplan1);
+	m_vimana_coins[0] = m_vimana_coins[1] = 0;
+	m_vimana_credits = 0;
+	m_vimana_latch = 0;
 }
 
 void vimana_driver_savestate(running_machine &machine)

@@ -155,23 +155,21 @@ static INTERRUPT_GEN(  rltennis_interrupt )
 	device->execute().set_input_line(1, HOLD_LINE); /* hack, to avoid dead loop */
 }
 
-static MACHINE_START( rltennis )
+void rltennis_state::machine_start()
 {
-	rltennis_state *state = machine.driver_data<rltennis_state>();
-	state->m_maincpu = machine.device<cpu_device>( "maincpu");
-	state->m_screen = machine.device(  "screen");
-	state->m_dac_1 = machine.device<dac_device>("dac1");
-	state->m_dac_2 = machine.device<dac_device>("dac2");
-	state->m_samples_1 = state->memregion("samples1")->base();
-	state->m_samples_2 = state->memregion("samples2")->base();
-	state->m_gfx =  state->memregion("gfx1")->base();
-	state->m_timer = machine.scheduler().timer_alloc(FUNC(sample_player));
+	m_maincpu = machine().device<cpu_device>( "maincpu");
+	m_screen = machine().device(  "screen");
+	m_dac_1 = machine().device<dac_device>("dac1");
+	m_dac_2 = machine().device<dac_device>("dac2");
+	m_samples_1 = memregion("samples1")->base();
+	m_samples_2 = memregion("samples2")->base();
+	m_gfx =  memregion("gfx1")->base();
+	m_timer = machine().scheduler().timer_alloc(FUNC(sample_player));
 }
 
-static MACHINE_RESET( rltennis )
+void rltennis_state::machine_reset()
 {
-	rltennis_state *state = machine.driver_data<rltennis_state>();
-	state->m_timer->adjust(attotime::from_hz(RLT_TIMER_FREQ));
+	m_timer->adjust(attotime::from_hz(RLT_TIMER_FREQ));
 }
 
 static ADDRESS_MAP_START( ramdac_map, AS_0, 8, rltennis_state )
@@ -197,11 +195,8 @@ static MACHINE_CONFIG_START( rltennis, rltennis_state )
 	MCFG_SCREEN_UPDATE_STATIC(rltennis)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_MACHINE_START( rltennis )
-	MCFG_MACHINE_RESET( rltennis )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_VIDEO_START( rltennis )
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

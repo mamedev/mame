@@ -205,15 +205,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 *******************************************************************************/
 
 
-VIDEO_START( wwfsstar )
+void wwfsstar_state::video_start()
 {
-	wwfsstar_state *state = machine.driver_data<wwfsstar_state>();
 
-	state->m_fg0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wwfsstar_state::get_fg0_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,32,32);
-	state->m_fg0_tilemap->set_transparent_pen(0);
+	m_fg0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wwfsstar_state::get_fg0_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_fg0_tilemap->set_transparent_pen(0);
 
-	state->m_bg0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wwfsstar_state::get_bg0_tile_info),state),tilemap_mapper_delegate(FUNC(wwfsstar_state::bg0_scan),state), 16, 16,32,32);
-	state->m_fg0_tilemap->set_transparent_pen(0);
+	m_bg0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wwfsstar_state::get_bg0_tile_info),this),tilemap_mapper_delegate(FUNC(wwfsstar_state::bg0_scan),this), 16, 16,32,32);
+	m_fg0_tilemap->set_transparent_pen(0);
 }
 
 SCREEN_UPDATE_IND16( wwfsstar )

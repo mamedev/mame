@@ -69,6 +69,8 @@ public:
 	struct _vg230_t m_vg230;
 	struct _ems_t m_ems;
 	DECLARE_DRIVER_INIT(pasogo);
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 
@@ -380,13 +382,13 @@ static const unsigned char pasogo_palette[][3] =
 	{ 255,255,255 }
 };
 
-static PALETTE_INIT( pasogo )
+void pasogo_state::palette_init()
 {
 	int i;
 
 	for ( i = 0; i < ARRAY_LENGTH(pasogo_palette); i++ )
 	{
-		palette_set_color_rgb(machine, i, pasogo_palette[i][0], pasogo_palette[i][1], pasogo_palette[i][2]);
+		palette_set_color_rgb(machine(), i, pasogo_palette[i][0], pasogo_palette[i][1], pasogo_palette[i][2]);
 	}
 }
 
@@ -458,9 +460,9 @@ static IRQ_CALLBACK(pasogo_irq_callback)
 	return pic8259_acknowledge( device->machine().device("pic8259"));
 }
 
-static MACHINE_RESET( pasogo )
+void pasogo_state::machine_reset()
 {
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(pasogo_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(pasogo_irq_callback);
 }
 
 //static const unsigned i86_address_mask = 0x000fffff;
@@ -505,7 +507,6 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_CPU_IO_MAP( pasogo_io)
 	MCFG_CPU_VBLANK_INT("screen", pasogo_interrupt)
 //  MCFG_CPU_CONFIG(i86_address_mask)
-	MCFG_MACHINE_RESET( pasogo )
 
 	MCFG_PIT8254_ADD( "pit8254", pc_pit8254_config )
 
@@ -518,7 +519,6 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_SCREEN_UPDATE_STATIC(pasogo)
 
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(pasogo_palette))
-	MCFG_PALETTE_INIT(pasogo)
 #if 0
 	MCFG_SPEAKER_STANDARD_MONO("gmaster")
 	MCFG_SOUND_ADD("custom", CUSTOM, 0)

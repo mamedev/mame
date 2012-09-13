@@ -151,24 +151,23 @@ public:
 	TILE_GET_INFO_MEMBER(tnk3_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(ikari_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(gwar_get_bg_tile_info);
+	DECLARE_VIDEO_START(marvins);
+	DECLARE_PALETTE_INIT(tnk3);
+	DECLARE_VIDEO_START(jcross);
+	DECLARE_VIDEO_START(tnk3);
+	DECLARE_VIDEO_START(ikari);
+	DECLARE_VIDEO_START(gwar);
+	DECLARE_VIDEO_START(tdfever);
+	DECLARE_VIDEO_START(sgladiat);
+	DECLARE_VIDEO_START(hal21);
+	DECLARE_VIDEO_START(aso);
+	DECLARE_VIDEO_START(psychos);
+	DECLARE_VIDEO_START(snk_3bpp_shadow);
+	DECLARE_VIDEO_START(snk_4bpp_shadow);
 };
 
 
 /*----------- defined in video/snk.c -----------*/
-
-extern PALETTE_INIT( tnk3 );
-
-extern VIDEO_START( marvins );
-extern VIDEO_START( jcross );
-extern VIDEO_START( sgladiat );
-extern VIDEO_START( hal21 );
-extern VIDEO_START( aso );
-extern VIDEO_START( tnk3 );
-extern VIDEO_START( ikari );
-extern VIDEO_START( gwar );
-extern VIDEO_START( psychos );
-extern VIDEO_START( tdfever );
-
 extern SCREEN_UPDATE_IND16( marvins );
 extern SCREEN_UPDATE_IND16( tnk3 );
 extern SCREEN_UPDATE_IND16( ikari );

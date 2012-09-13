@@ -428,6 +428,41 @@ public:
 	DECLARE_DRIVER_INIT(rongrong);
 	DECLARE_DRIVER_INIT(momotaro);
 
+	DECLARE_MACHINE_START(ddenlovr);
+	DECLARE_MACHINE_RESET(ddenlovr);
+	DECLARE_VIDEO_START(ddenlovr);
+	DECLARE_MACHINE_START(rongrong);
+	DECLARE_MACHINE_START(mmpanic);
+	DECLARE_VIDEO_START(mmpanic);
+	DECLARE_MACHINE_START(hanakanz);
+	DECLARE_VIDEO_START(hanakanz);
+	DECLARE_MACHINE_START(sryudens);
+	DECLARE_VIDEO_START(mjflove);
+	DECLARE_MACHINE_START(seljan2);
+	DECLARE_MACHINE_START(mjflove);
+	DECLARE_MACHINE_START(hanamai);
+	DECLARE_MACHINE_RESET(dynax);
+	DECLARE_VIDEO_START(hanamai);
+	DECLARE_PALETTE_INIT(sprtmtch);
+	DECLARE_MACHINE_START(hnoridur);
+	DECLARE_VIDEO_START(hnoridur);
+	DECLARE_VIDEO_START(sprtmtch);
+	DECLARE_VIDEO_START(mjdialq2);
+	DECLARE_MACHINE_START(jantouki);
+	DECLARE_VIDEO_START(jantouki);
+	DECLARE_MACHINE_START(htengoku);
+	DECLARE_VIDEO_START(htengoku);
+	DECLARE_MACHINE_START(tenkai);
+	DECLARE_VIDEO_START(mjelctrn);
+	DECLARE_MACHINE_START(gekisha);
+	DECLARE_MACHINE_RESET(gekisha);
+	DECLARE_MACHINE_START(funkyfig);
+	DECLARE_MACHINE_START(mjmyster);
+	DECLARE_MACHINE_START(hparadis);
+	DECLARE_VIDEO_START(mcnpshnt);
+	DECLARE_VIDEO_START(neruton);
+	DECLARE_MACHINE_START(dynax);
+	DECLARE_MACHINE_RESET(adpcm);
 };
 
 //----------- defined in drivers/dynax.c -----------
@@ -438,15 +473,15 @@ void mjelctrn_update_irq(running_machine &machine);
 void neruton_update_irq(running_machine &machine);
 
 //----------- defined in video/dynax.c -----------
-VIDEO_START( hanamai );
-VIDEO_START( hnoridur );
-VIDEO_START( mcnpshnt );
-VIDEO_START( sprtmtch );
-VIDEO_START( mjdialq2 );
-VIDEO_START( jantouki );
-VIDEO_START( mjelctrn );
-VIDEO_START( neruton );
-VIDEO_START( htengoku );
+
+
+
+
+
+
+
+
+
 
 SCREEN_UPDATE_IND16( hanamai );
 SCREEN_UPDATE_IND16( hnoridur );
@@ -456,10 +491,10 @@ SCREEN_UPDATE_IND16( jantouki_top );
 SCREEN_UPDATE_IND16( jantouki_bottom );
 SCREEN_UPDATE_IND16( htengoku );
 
-PALETTE_INIT( sprtmtch );
+
 
 
 //----------- defined in drivers/ddenlovr.c -----------
 
-VIDEO_START(ddenlovr);
+
 SCREEN_UPDATE_IND16(ddenlovr);

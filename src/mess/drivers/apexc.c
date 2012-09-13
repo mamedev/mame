@@ -28,6 +28,9 @@ public:
 	int m_letters;
 	int m_pos;
 	DECLARE_DRIVER_INIT(apexc);
+	virtual void machine_start();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -35,9 +38,9 @@ static void apexc_teletyper_init(running_machine &machine);
 static void apexc_teletyper_putchar(running_machine &machine, int character);
 
 
-static MACHINE_START(apexc)
+void apexc_state::machine_start()
 {
-	apexc_teletyper_init(machine);
+	apexc_teletyper_init(machine());
 }
 
 
@@ -543,20 +546,19 @@ static const rectangle teletyper_scroll_clear_window(
 );
 static const int var_teletyper_scroll_step = - teletyper_scroll_step;
 
-static PALETTE_INIT( apexc )
+void apexc_state::palette_init()
 {
-	palette_set_colors(machine, 0, apexc_palette, APEXC_PALETTE_SIZE);
+	palette_set_colors(machine(), 0, apexc_palette, APEXC_PALETTE_SIZE);
 }
 
-static VIDEO_START( apexc )
+void apexc_state::video_start()
 {
-	apexc_state *state = machine.driver_data<apexc_state>();
-	screen_device *screen = machine.first_screen();
+	screen_device *screen = machine().first_screen();
 	int width = screen->width();
 	int height = screen->height();
 
-	state->m_bitmap = auto_bitmap_ind16_alloc(machine, width, height);
-	state->m_bitmap->fill(0, /*machine.visible_area*/teletyper_window);
+	m_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
+	m_bitmap->fill(0, /*machine().visible_area*/teletyper_window);
 }
 
 /* draw a small 8*8 LED (well, there were no LEDs at the time, so let's call this a lamp ;-) ) */
@@ -870,7 +872,6 @@ static MACHINE_CONFIG_START( apexc, apexc_state )
 	MCFG_CPU_VBLANK_INT("screen", apexc_interrupt)
 	/*MCFG_CPU_PERIODIC_INT(func, rate)*/
 
-	MCFG_MACHINE_START( apexc )
 
 	/* video hardware does not exist, but we display a control panel and the typewriter output */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -883,8 +884,6 @@ static MACHINE_CONFIG_START( apexc, apexc_state )
 	MCFG_GFXDECODE(apexc)
 	MCFG_PALETTE_LENGTH(APEXC_PALETTE_SIZE)
 
-	MCFG_PALETTE_INIT(apexc)
-	MCFG_VIDEO_START(apexc)
 
 	MCFG_APEXC_CYLINDER_ADD("cylinder")
 	MCFG_APEXC_TAPE_PUNCHER_ADD("tape_puncher")

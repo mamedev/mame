@@ -186,20 +186,18 @@ static const ym2203_interface ym2203_config =
 
 
 
-static MACHINE_START( citycon )
+void citycon_state::machine_start()
 {
-	citycon_state *state = machine.driver_data<citycon_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
 
-	state->save_item(NAME(state->m_bg_image));
+	save_item(NAME(m_bg_image));
 }
 
-static MACHINE_RESET( citycon )
+void citycon_state::machine_reset()
 {
-	citycon_state *state = machine.driver_data<citycon_state>();
 
-	state->m_bg_image = 0;
+	m_bg_image = 0;
 }
 
 
@@ -214,8 +212,6 @@ static MACHINE_CONFIG_START( citycon, citycon_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 //  MCFG_CPU_VBLANK_INT("screen", irq0_line_hold) //actually unused, probably it was during development
 
-	MCFG_MACHINE_START(citycon)
-	MCFG_MACHINE_RESET(citycon)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -229,7 +225,6 @@ static MACHINE_CONFIG_START( citycon, citycon_state )
 	MCFG_PALETTE_LENGTH(640+1024)	/* 640 real palette + 1024 virtual palette */
 	MCFG_PALETTE_INIT(all_black) /* guess */
 
-	MCFG_VIDEO_START(citycon)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

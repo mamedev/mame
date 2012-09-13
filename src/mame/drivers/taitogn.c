@@ -387,6 +387,7 @@ public:
 	DECLARE_READ32_MEMBER(gnet_mahjong_panel_r);
 	DECLARE_DRIVER_INIT(coh3002t_mp);
 	DECLARE_DRIVER_INIT(coh3002t);
+	DECLARE_MACHINE_RESET(coh3002t);
 };
 
 
@@ -881,19 +882,18 @@ DRIVER_INIT_MEMBER(taitogn_state,coh3002t_mp)
 	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x1fa10100, 0x1fa10103, read32_delegate(FUNC(taitogn_state::gnet_mahjong_panel_r),this));
 }
 
-static MACHINE_RESET( coh3002t )
+MACHINE_RESET_MEMBER(taitogn_state,coh3002t)
 {
-	taitogn_state *state = machine.driver_data<taitogn_state>();
 
-	state->m_b_lastclock = 1;
-	state->m_locked = 0x1ff;
-	install_handlers(machine, 0);
-	state->m_control = 0;
-	machine.device(":card")->reset();
-	ide_set_gnet_readlock(machine.device(":card"), 1);
+	m_b_lastclock = 1;
+	m_locked = 0x1ff;
+	install_handlers(machine(), 0);
+	m_control = 0;
+	machine().device(":card")->reset();
+	ide_set_gnet_readlock(machine().device(":card"), 1);
 
 	// halt sound CPU since it has no valid program at start
-	machine.device("mn10200")->execute().set_input_line(INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
+	machine().device("mn10200")->execute().set_input_line(INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
 }
 
 static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
@@ -960,7 +960,7 @@ static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 
-	MCFG_MACHINE_RESET( coh3002t )
+	MCFG_MACHINE_RESET_OVERRIDE(taitogn_state, coh3002t )
 
 	MCFG_AT28C16_ADD( "at28c16", 0 )
 	MCFG_IDE_CONTROLLER_ADD( "card", ide_intf, ide_devices, "hdd", NULL, true)

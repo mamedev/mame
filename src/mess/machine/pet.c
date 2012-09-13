@@ -719,47 +719,46 @@ DRIVER_INIT_MEMBER(pet_state,superpet)
 	superpet_vh_init(machine());
 }
 
-MACHINE_RESET( pet )
+void pet_state::machine_reset()
 {
-	pet_state *state = machine.driver_data<pet_state>();
 
-	if (state->m_superpet)
+	if (m_superpet)
 	{
-		state->m_spet.rom = 0;
-		if (machine.root_device().ioport("CFG")->read() & 0x04)
+		m_spet.rom = 0;
+		if (machine().root_device().ioport("CFG")->read() & 0x04)
 		{
-			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, 1);
-			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, 0);
-			state->m_font = 2;
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, 1);
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, 0);
+			m_font = 2;
 		}
 		else
 		{
-			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, 0);
-			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, 1);
-			state->m_font = 0;
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, 0);
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, 1);
+			m_font = 0;
 		}
 	}
 
-	if (state->m_cbm8096)
+	if (m_cbm8096)
 	{
-		if (machine.root_device().ioport("CFG")->read() & 0x08)
+		if (machine().root_device().ioport("CFG")->read() & 0x08)
 		{
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfff0, 0xfff0, FUNC(cbm8096_w));
+			machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfff0, 0xfff0, FUNC(cbm8096_w));
 		}
 		else
 		{
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xfff0, 0xfff0);
+			machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xfff0, 0xfff0);
 		}
-		cbm8096_w(machine.device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
+		cbm8096_w(machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
 	}
 
-//removed   cbm_drive_0_config (machine.root_device().ioport("CFG")->read() & 2 ? IEEE : 0, 8);
-//removed   cbm_drive_1_config (machine.root_device().ioport("CFG")->read() & 1 ? IEEE : 0, 9);
-	machine.device("maincpu")->reset();
+//removed   cbm_drive_0_config (machine().root_device().ioport("CFG")->read() & 2 ? IEEE : 0, 8);
+//removed   cbm_drive_1_config (machine().root_device().ioport("CFG")->read() & 1 ? IEEE : 0, 9);
+	machine().device("maincpu")->reset();
 
-	state->m_ieee->ren_w(0);
-	state->m_ieee->ifc_w(0);
-	state->m_ieee->ifc_w(1);
+	m_ieee->ren_w(0);
+	m_ieee->ifc_w(0);
+	m_ieee->ifc_w(1);
 }
 
 

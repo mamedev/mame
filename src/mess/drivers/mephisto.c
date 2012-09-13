@@ -90,6 +90,9 @@ public:
 	UINT8 m_led7;
 	UINT8 m_allowNMI;
 	DECLARE_DRIVER_INIT(mephisto);
+	virtual void machine_start();
+	virtual void machine_reset();
+	DECLARE_MACHINE_START(mm2);
 };
 
 
@@ -354,47 +357,44 @@ static TIMER_DEVICE_CALLBACK( update_irq )		//only mm2
 	beep_set_state(state->m_beep, state->m_led_status&64?1:0);
 }
 
-static MACHINE_START( mephisto )
+void mephisto_state::machine_start()
 {
-	mephisto_state *state = machine.driver_data<mephisto_state>();
-	state->m_lcd_shift_counter = 3;
-	state->m_allowNMI = 1;
-	mboard_savestate_register(machine);
+	m_lcd_shift_counter = 3;
+	m_allowNMI = 1;
+	mboard_savestate_register(machine());
 }
 
-static MACHINE_START( mm2 )
+MACHINE_START_MEMBER(mephisto_state,mm2)
 {
-	mephisto_state *state = machine.driver_data<mephisto_state>();
-	state->m_lcd_shift_counter = 3;
-	state->m_led7=0xff;
+	m_lcd_shift_counter = 3;
+	m_led7=0xff;
 
-	mboard_savestate_register(machine);
+	mboard_savestate_register(machine());
 }
 
 
-static MACHINE_RESET( mephisto )
+void mephisto_state::machine_reset()
 {
-	mephisto_state *state = machine.driver_data<mephisto_state>();
-	state->m_lcd_shift_counter = 3;
-	state->m_allowNMI = 1;
+	m_lcd_shift_counter = 3;
+	m_allowNMI = 1;
 	mboard_set_border_pieces();
 	mboard_set_board();
 
 /* adjust artwork depending on current emulation*/
 
-	if (!strcmp(machine.system().name,"mm2") )
+	if (!strcmp(machine().system().name,"mm2") )
 		output_set_value("MM",1);
-	else if (!strcmp(machine.system().name,"mm4") )
+	else if (!strcmp(machine().system().name,"mm4") )
 		output_set_value("MM",2);
-	else if (!strcmp(machine.system().name,"mm4tk") )
+	else if (!strcmp(machine().system().name,"mm4tk") )
 		output_set_value("MM",5);
-	else if (!strcmp(machine.system().name,"mm5tk") )
+	else if (!strcmp(machine().system().name,"mm5tk") )
 		output_set_value("MM",5);
-	else if (!strcmp(machine.system().name,"mm5") )
+	else if (!strcmp(machine().system().name,"mm5") )
 		output_set_value("MM",3);
-	else if (!strcmp(machine.system().name,"mm50") )
+	else if (!strcmp(machine().system().name,"mm50") )
 		output_set_value("MM",3);
-	else if (!strcmp(machine.system().name,"rebel5") )
+	else if (!strcmp(machine().system().name,"rebel5") )
 		output_set_value("MM",4);
 }
 
@@ -404,8 +404,6 @@ static MACHINE_CONFIG_START( mephisto, mephisto_state )
 	MCFG_CPU_ADD("maincpu",M65C02,4915200)	/* 65C02 */
 	MCFG_CPU_PROGRAM_MAP(mephisto_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_MACHINE_START( mephisto )
-	MCFG_MACHINE_RESET( mephisto )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -428,7 +426,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mm2, mephisto )
 	MCFG_CPU_REPLACE("maincpu", M65C02, 3700000)
 	MCFG_CPU_PROGRAM_MAP(mm2_mem)
-	MCFG_MACHINE_START( mm2 )
+	MCFG_MACHINE_START_OVERRIDE(mephisto_state, mm2 )
 
 	MCFG_DEVICE_REMOVE("nmi_timer")
 	MCFG_TIMER_ADD_PERIODIC("irq_timer", update_irq, attotime::from_hz(450))

@@ -23,13 +23,12 @@ TILE_GET_INFO_MEMBER(darius_state::get_fg_tile_info)
 
 /***************************************************************************/
 
-VIDEO_START( darius )
+void darius_state::video_start()
 {
-	darius_state *state = machine.driver_data<darius_state>();
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(darius_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,128,64);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(darius_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 /***************************************************************************/

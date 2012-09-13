@@ -44,34 +44,32 @@ static void update_interrupts(running_machine &machine)
 }
 
 
-static MACHINE_START( cyberbal )
+MACHINE_START_MEMBER(cyberbal_state,cyberbal)
 {
-	cyberbal_state *state = machine.driver_data<cyberbal_state>();
-	atarigen_init(machine);
+	atarigen_init(machine());
 
-	state->save_item(NAME(state->m_fast_68k_int));
-	state->save_item(NAME(state->m_io_68k_int));
-	state->save_item(NAME(state->m_sound_data_from_68k));
-	state->save_item(NAME(state->m_sound_data_from_6502));
-	state->save_item(NAME(state->m_sound_data_from_68k_ready));
-	state->save_item(NAME(state->m_sound_data_from_6502_ready));
+	save_item(NAME(m_fast_68k_int));
+	save_item(NAME(m_io_68k_int));
+	save_item(NAME(m_sound_data_from_68k));
+	save_item(NAME(m_sound_data_from_6502));
+	save_item(NAME(m_sound_data_from_68k_ready));
+	save_item(NAME(m_sound_data_from_6502_ready));
 }
 
 
-static MACHINE_RESET( cyberbal )
+MACHINE_RESET_MEMBER(cyberbal_state,cyberbal)
 {
-	cyberbal_state *state = machine.driver_data<cyberbal_state>();
 
-	atarigen_eeprom_reset(state);
-	atarigen_slapstic_reset(state);
-	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine.primary_screen, cyberbal_scanline_update, 8);
-	atarigen_sound_io_reset(machine.device("audiocpu"));
+	atarigen_eeprom_reset(this);
+	atarigen_slapstic_reset(this);
+	atarigen_interrupt_reset(this, update_interrupts);
+	atarigen_scanline_timer_reset(*machine().primary_screen, cyberbal_scanline_update, 8);
+	atarigen_sound_io_reset(machine().device("audiocpu"));
 
-	cyberbal_sound_reset(machine);
+	cyberbal_sound_reset(machine());
 
 	/* Extra CPU (second M68k) doesn't run until reset */
-	machine.device("extra")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("extra")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
@@ -83,13 +81,12 @@ static void cyberbal2p_update_interrupts(running_machine &machine)
 }
 
 
-static MACHINE_RESET( cyberbal2p )
+MACHINE_RESET_MEMBER(cyberbal_state,cyberbal2p)
 {
-	cyberbal_state *state = machine.driver_data<cyberbal_state>();
 
-	atarigen_eeprom_reset(state);
-	atarigen_interrupt_reset(state, cyberbal2p_update_interrupts);
-	atarigen_scanline_timer_reset(*machine.primary_screen, cyberbal_scanline_update, 8);
+	atarigen_eeprom_reset(this);
+	atarigen_interrupt_reset(this, cyberbal2p_update_interrupts);
+	atarigen_scanline_timer_reset(*machine().primary_screen, cyberbal_scanline_update, 8);
 	atarijsa_reset();
 }
 
@@ -447,8 +444,8 @@ static MACHINE_CONFIG_START( cyberbal, cyberbal_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(cyberbal)
-	MCFG_MACHINE_RESET(cyberbal)
+	MCFG_MACHINE_START_OVERRIDE(cyberbal_state,cyberbal)
+	MCFG_MACHINE_RESET_OVERRIDE(cyberbal_state,cyberbal)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
@@ -468,7 +465,7 @@ static MACHINE_CONFIG_START( cyberbal, cyberbal_state )
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(cyberbal_right)
 
-	MCFG_VIDEO_START(cyberbal)
+	MCFG_VIDEO_START_OVERRIDE(cyberbal_state,cyberbal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -493,8 +490,8 @@ static MACHINE_CONFIG_START( cyberbal2p, cyberbal_state )
 	MCFG_CPU_PROGRAM_MAP(cyberbal2p_map)
 	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
-	MCFG_MACHINE_START(cyberbal)
-	MCFG_MACHINE_RESET(cyberbal2p)
+	MCFG_MACHINE_START_OVERRIDE(cyberbal_state,cyberbal)
+	MCFG_MACHINE_RESET_OVERRIDE(cyberbal_state,cyberbal2p)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
@@ -508,7 +505,7 @@ static MACHINE_CONFIG_START( cyberbal2p, cyberbal_state )
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(cyberbal2p)
 
-	MCFG_VIDEO_START(cyberbal2p)
+	MCFG_VIDEO_START_OVERRIDE(cyberbal_state,cyberbal2p)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(jsa_ii_mono)

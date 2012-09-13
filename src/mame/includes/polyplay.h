@@ -29,6 +29,9 @@ public:
 	DECLARE_WRITE8_MEMBER(polyplay_start_timer2);
 	DECLARE_READ8_MEMBER(polyplay_random_read);
 	DECLARE_WRITE8_MEMBER(polyplay_characterram_w);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -43,6 +46,6 @@ SAMPLES_START( polyplay_sh_start );
 
 /*----------- defined in video/polyplay.c -----------*/
 
-PALETTE_INIT( polyplay );
-VIDEO_START( polyplay );
+
+
 SCREEN_UPDATE_IND16( polyplay );

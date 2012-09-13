@@ -80,18 +80,17 @@ WRITE16_MEMBER(aztarac_state::aztarac_ubr_w)
 }
 
 
-VIDEO_START( aztarac )
+void aztarac_state::video_start()
 {
-	aztarac_state *state = machine.driver_data<aztarac_state>();
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = machine().primary_screen->visible_area();
 
 	int xmin = visarea.min_x;
 	int ymin = visarea.min_y;
 	int xmax = visarea.max_x;
 	int ymax = visarea.max_y;
 
-	state->m_xcenter=((xmax + xmin) / 2) << 16;
-	state->m_ycenter=((ymax + ymin) / 2) << 16;
+	m_xcenter=((xmax + xmin) / 2) << 16;
+	m_ycenter=((ymax + ymin) / 2) << 16;
 
-	VIDEO_START_CALL(vector);
+	VIDEO_START_CALL_LEGACY(vector);
 }

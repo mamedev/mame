@@ -2,13 +2,13 @@
 #include "includes/kopunch.h"
 
 
-PALETTE_INIT( kopunch )
+void kopunch_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	color_prom += 24;	/* first 24 colors are black */
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -28,7 +28,7 @@ PALETTE_INIT( kopunch )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 }
@@ -80,15 +80,14 @@ TILE_GET_INFO_MEMBER(kopunch_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, 0, 0);
 }
 
-VIDEO_START( kopunch )
+void kopunch_state::video_start()
 {
-	kopunch_state *state = machine.driver_data<kopunch_state>();
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(kopunch_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,  8,  8, 32, 32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(kopunch_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(kopunch_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8,  8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(kopunch_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap->set_scrolldx(16, 16);
+	m_bg_tilemap->set_scrolldx(16, 16);
 }
 
 SCREEN_UPDATE_IND16( kopunch )

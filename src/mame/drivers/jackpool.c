@@ -36,10 +36,11 @@ public:
 	DECLARE_READ16_MEMBER(jackpool_io_r);
 	DECLARE_WRITE16_MEMBER(jackpool_io_w);
 	DECLARE_DRIVER_INIT(jackpool);
+	virtual void video_start();
 };
 
 
-static VIDEO_START(jackpool)
+void jackpool_state::video_start()
 {
 }
 
@@ -271,7 +272,6 @@ static MACHINE_CONFIG_START( jackpool, jackpool_state )
 
 	MCFG_PALETTE_LENGTH(0x200)
 
-	MCFG_VIDEO_START(jackpool)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

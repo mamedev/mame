@@ -17,23 +17,22 @@ Todo: Priority between tree0 and tree1.
 
 static TIMER_CALLBACK( changela_scanline_callback );
 
-VIDEO_START( changela )
+void changela_state::video_start()
 {
-	changela_state *state = machine.driver_data<changela_state>();
 
-	state->m_memory_devices = auto_alloc_array(machine, UINT8, 4 * 0x800); /* 0 - not connected, 1,2,3 - RAMs*/
-	state->m_tree_ram = auto_alloc_array(machine, UINT8, 2 * 0x20);
+	m_memory_devices = auto_alloc_array(machine(), UINT8, 4 * 0x800); /* 0 - not connected, 1,2,3 - RAMs*/
+	m_tree_ram = auto_alloc_array(machine(), UINT8, 2 * 0x20);
 
-	machine.primary_screen->register_screen_bitmap(state->m_obj0_bitmap);
-	machine.primary_screen->register_screen_bitmap(state->m_river_bitmap);
-	machine.primary_screen->register_screen_bitmap(state->m_tree0_bitmap);
-	machine.primary_screen->register_screen_bitmap(state->m_tree1_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_obj0_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_river_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_tree0_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_tree1_bitmap);
 
-	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(changela_scanline_callback));
-	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(30), 30);
+	m_scanline_timer = machine().scheduler().timer_alloc(FUNC(changela_scanline_callback));
+	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(30), 30);
 
-	state->save_pointer(NAME(state->m_memory_devices), 4 * 0x800);
-	state->save_pointer(NAME(state->m_tree_ram), 2 * 0x20);
+	save_pointer(NAME(m_memory_devices), 4 * 0x800);
+	save_pointer(NAME(m_tree_ram), 2 * 0x20);
 }
 
 /**************************************************************************

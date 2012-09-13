@@ -1642,7 +1642,7 @@ static MACHINE_CONFIG_START( hardhead, suna8_state )
 	MCFG_GFXDECODE(suna8)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(suna8_textdim12)
+	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_textdim12)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1706,7 +1706,7 @@ static MACHINE_CONFIG_START( rranger, suna8_state )
 	MCFG_GFXDECODE(suna8)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(suna8_textdim8)
+	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_textdim8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1751,11 +1751,10 @@ static TIMER_DEVICE_CALLBACK( brickzn_interrupt )
 }
 
 
-static MACHINE_RESET( brickzn )
+MACHINE_RESET_MEMBER(suna8_state,brickzn)
 {
-	suna8_state *state = machine.driver_data<suna8_state>();
-	state->m_protection_val = state->m_prot2 = state->m_prot2_prev = 0xff;
-	state->membank("bank1")->set_entry(0);
+	m_protection_val = m_prot2 = m_prot2_prev = 0xff;
+	membank("bank1")->set_entry(0);
 }
 
 static MACHINE_CONFIG_START( brickzn, suna8_state )
@@ -1773,7 +1772,7 @@ static MACHINE_CONFIG_START( brickzn, suna8_state )
 	MCFG_CPU_PROGRAM_MAP(brickzn_pcm_map)
 	MCFG_CPU_IO_MAP(brickzn_pcm_io_map)
 
-	MCFG_MACHINE_RESET( brickzn )
+	MCFG_MACHINE_RESET_OVERRIDE(suna8_state, brickzn )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1786,7 +1785,7 @@ static MACHINE_CONFIG_START( brickzn, suna8_state )
 	MCFG_GFXDECODE(suna8)
 	MCFG_PALETTE_LENGTH(256 * 2)	// 2 x Palette RAM
 
-	MCFG_VIDEO_START(suna8_textdim0)
+	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_textdim0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1831,11 +1830,10 @@ static TIMER_DEVICE_CALLBACK( hardhea2_interrupt )
 		if (state->m_nmi_enable)	state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_RESET( hardhea2 )
+MACHINE_RESET_MEMBER(suna8_state,hardhea2)
 {
-	suna8_state *state = machine.driver_data<suna8_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	state->hardhea2_rambank_0_w(*space,0,0);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	hardhea2_rambank_0_w(*space,0,0);
 }
 
 static MACHINE_CONFIG_DERIVED( hardhea2, brickzn )
@@ -1845,7 +1843,7 @@ static MACHINE_CONFIG_DERIVED( hardhea2, brickzn )
 	MCFG_CPU_PROGRAM_MAP(hardhea2_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", hardhea2_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET(hardhea2)
+	MCFG_MACHINE_RESET_OVERRIDE(suna8_state,hardhea2)
 	MCFG_PALETTE_LENGTH(256)
 MACHINE_CONFIG_END
 
@@ -1888,7 +1886,7 @@ static MACHINE_CONFIG_START( starfigh, suna8_state )
 	MCFG_GFXDECODE(suna8)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(suna8_textdim0)
+	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_textdim0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1935,7 +1933,7 @@ static MACHINE_CONFIG_START( sparkman, suna8_state )
 	MCFG_GFXDECODE(suna8)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(suna8_textdim0)
+	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_textdim0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

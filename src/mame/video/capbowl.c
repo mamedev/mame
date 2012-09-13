@@ -38,10 +38,10 @@ static const struct tms34061_interface tms34061intf =
  *
  *************************************/
 
-VIDEO_START( capbowl )
+void capbowl_state::video_start()
 {
 	/* initialize TMS34061 emulation */
-    tms34061_start(machine, &tms34061intf);
+    tms34061_start(machine(), &tms34061intf);
 }
 
 

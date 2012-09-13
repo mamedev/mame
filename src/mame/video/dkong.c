@@ -199,15 +199,14 @@ static const res_net_info radarscp_grid_net_info =
 
 ***************************************************************************/
 
-PALETTE_INIT( dkong2b)
+PALETTE_INIT_MEMBER(dkong_state,dkong2b)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	dkong_state *state = machine.driver_data<dkong_state>();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	rgb_t	*rgb;
 	int i;
 
-	rgb = compute_res_net_all(machine, color_prom, &dkong_decode_info, &dkong_net_info);
-	palette_set_colors(machine, 0, rgb, 256);
+	rgb = compute_res_net_all(machine(), color_prom, &dkong_decode_info, &dkong_net_info);
+	palette_set_colors(machine(), 0, rgb, 256);
 
 	/* Now treat tri-state black background generation */
 
@@ -218,22 +217,21 @@ PALETTE_INIT( dkong2b)
 			r = compute_res_net( 1, 0, &dkong_net_bck_info );
 			g = compute_res_net( 1, 1, &dkong_net_bck_info );
 			b = compute_res_net( 1, 2, &dkong_net_bck_info );
-			palette_set_color_rgb(machine,i,r,g,b);
+			palette_set_color_rgb(machine(),i,r,g,b);
 		}
 
-	palette_normalize_range(machine.palette, 0, 255, 0, 255);
+	palette_normalize_range(machine().palette, 0, 255, 0, 255);
 
 	color_prom += 512;
 	/* color_prom now points to the beginning of the character color codes */
-	state->m_color_codes = color_prom;	/* we'll need it later */
-	auto_free(machine, rgb);
+	m_color_codes = color_prom;	/* we'll need it later */
+	auto_free(machine(), rgb);
 }
 
 #ifdef UNUSED_FUNCTION
-PALETTE_INIT( dkong4b )
+PALETTE_INIT_MEMBER(dkong_state,dkong4b)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	dkong_state *state = machine.driver_data<dkong_state>();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 	int r,g,b;
 
@@ -247,7 +245,7 @@ PALETTE_INIT( dkong4b )
 		/* blue component */
 		b = compute_res_net( (color_prom[0]>>0) & 0x03, 2, &radarscp_net_info );
 
-		palette_set_color_rgb(machine,i,r,g,b);
+		palette_set_color_rgb(machine(),i,r,g,b);
 		color_prom++;
 	}
 
@@ -259,21 +257,20 @@ PALETTE_INIT( dkong4b )
 			r = compute_res_net( 1, 0, &radarscp_net_bck_info );
 			g = compute_res_net( 1, 1, &radarscp_net_bck_info );
 			b = compute_res_net( 1, 2, &radarscp_net_bck_info );
-			palette_set_color_rgb(machine,i,r,g,b);
+			palette_set_color_rgb(machine(),i,r,g,b);
 		}
 
-	palette_normalize_range(machine.palette, 0, 255, 0, 255);
+	palette_normalize_range(machine().palette, 0, 255, 0, 255);
 
 	color_prom += 256;
 	/* color_prom now points to the beginning of the character color codes */
-	state->m_color_codes = color_prom;	/* we'll need it later */
+	m_color_codes = color_prom;	/* we'll need it later */
 }
 #endif
 
-PALETTE_INIT( radarscp )
+PALETTE_INIT_MEMBER(dkong_state,radarscp)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	dkong_state *state = machine.driver_data<dkong_state>();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 	int r,g,b;
 
@@ -287,7 +284,7 @@ PALETTE_INIT( radarscp )
 		/* blue component */
 		b = compute_res_net( (color_prom[0]>>0) & 0x03, 2, &radarscp_net_info );
 
-		palette_set_color_rgb(machine,i,r,g,b);
+		palette_set_color_rgb(machine(),i,r,g,b);
 		color_prom++;
 	}
 
@@ -299,14 +296,14 @@ PALETTE_INIT( radarscp )
 			r = compute_res_net( 1, 0, &radarscp_net_bck_info );
 			g = compute_res_net( 1, 1, &radarscp_net_bck_info );
 			b = compute_res_net( 1, 2, &radarscp_net_bck_info );
-			palette_set_color_rgb(machine,i,r,g,b);
+			palette_set_color_rgb(machine(),i,r,g,b);
 		}
 
 	/* Star color */
 	r = compute_res_net( 1, 0, &radarscp_stars_net_info );
 	g = compute_res_net( 0, 1, &radarscp_stars_net_info );
 	b = compute_res_net( 0, 2, &radarscp_stars_net_info );
-	palette_set_color_rgb(machine,RADARSCP_STAR_COL,r,g,b);
+	palette_set_color_rgb(machine(),RADARSCP_STAR_COL,r,g,b);
 
 	/* Oscillating background */
 	for (i = 0;i < 256;i++)
@@ -315,7 +312,7 @@ PALETTE_INIT( radarscp )
 		g = compute_res_net( 0, 1, &radarscp_blue_net_info );
 		b = compute_res_net( i, 2, &radarscp_blue_net_info );
 
-		palette_set_color_rgb(machine,RADARSCP_BCK_COL_OFFSET + i,r,g,b);
+		palette_set_color_rgb(machine(),RADARSCP_BCK_COL_OFFSET + i,r,g,b);
 	}
 
 	/* Grid */
@@ -325,20 +322,19 @@ PALETTE_INIT( radarscp )
 		g = compute_res_net( (i>>1) & 1, 1, &radarscp_grid_net_info );
 		b = compute_res_net( (i>>2) & 1, 2, &radarscp_grid_net_info );
 
-		palette_set_color_rgb(machine,RADARSCP_GRID_COL_OFFSET + i,r,g,b);
+		palette_set_color_rgb(machine(),RADARSCP_GRID_COL_OFFSET + i,r,g,b);
 	}
 
-	palette_normalize_range(machine.palette, 0, RADARSCP_GRID_COL_OFFSET+7, 0, 255);
+	palette_normalize_range(machine().palette, 0, RADARSCP_GRID_COL_OFFSET+7, 0, 255);
 
 	color_prom += 256;
 	/* color_prom now points to the beginning of the character color codes */
-	state->m_color_codes = color_prom;	/* we'll need it later */
+	m_color_codes = color_prom;	/* we'll need it later */
 }
 
-PALETTE_INIT( radarscp1 )
+PALETTE_INIT_MEMBER(dkong_state,radarscp1)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	dkong_state *state = machine.driver_data<dkong_state>();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 	int r,g,b;
 
@@ -352,7 +348,7 @@ PALETTE_INIT( radarscp1 )
 		/* blue component */
 		b = compute_res_net( color_prom[0], 2, &radarscp1_net_info );
 
-		palette_set_color_rgb(machine,i,r,g,b);
+		palette_set_color_rgb(machine(),i,r,g,b);
 		color_prom++;
 	}
 
@@ -364,14 +360,14 @@ PALETTE_INIT( radarscp1 )
 			r = compute_res_net( 0, 0, &radarscp1_net_info );
 			g = compute_res_net( 0, 1, &radarscp1_net_info );
 			b = compute_res_net( 0, 2, &radarscp1_net_info );
-			palette_set_color_rgb(machine,i,r,g,b);
+			palette_set_color_rgb(machine(),i,r,g,b);
 		}
 
 	/* Star color */
 	r = compute_res_net( 1, 0, &radarscp_stars_net_info );
 	g = compute_res_net( 0, 1, &radarscp_stars_net_info );
 	b = compute_res_net( 0, 2, &radarscp_stars_net_info );
-	palette_set_color_rgb(machine,RADARSCP_STAR_COL,r,g,b);
+	palette_set_color_rgb(machine(),RADARSCP_STAR_COL,r,g,b);
 
 	/* Oscillating background */
 	for (i = 0;i < 256;i++)
@@ -380,7 +376,7 @@ PALETTE_INIT( radarscp1 )
 		g = compute_res_net( 0, 1, &radarscp_blue_net_info );
 		b = compute_res_net( i, 2, &radarscp_blue_net_info );
 
-		palette_set_color_rgb(machine,RADARSCP_BCK_COL_OFFSET + i,r,g,b);
+		palette_set_color_rgb(machine(),RADARSCP_BCK_COL_OFFSET + i,r,g,b);
 	}
 
 	/* Grid */
@@ -390,13 +386,13 @@ PALETTE_INIT( radarscp1 )
 		g = compute_res_net( (i>>1) & 1, 1, &radarscp_grid_net_info );
 		b = compute_res_net( (i>>2) & 1, 2, &radarscp_grid_net_info );
 
-		palette_set_color_rgb(machine,RADARSCP_GRID_COL_OFFSET + i,r,g,b);
+		palette_set_color_rgb(machine(),RADARSCP_GRID_COL_OFFSET + i,r,g,b);
 	}
-	palette_normalize_range(machine.palette, 0, RADARSCP_GRID_COL_OFFSET+7, 0, 255);
+	palette_normalize_range(machine().palette, 0, RADARSCP_GRID_COL_OFFSET+7, 0, 255);
 
 	color_prom += 512;
 	/* color_prom now points to the beginning of the character color codes */
-	state->m_color_codes = color_prom;	/* we'll need it later */
+	m_color_codes = color_prom;	/* we'll need it later */
 }
 
 
@@ -436,20 +432,19 @@ PALETTE_INIT( radarscp1 )
 
 ***************************************************************************/
 
-PALETTE_INIT( dkong3 )
+PALETTE_INIT_MEMBER(dkong_state,dkong3)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	dkong_state *state = machine.driver_data<dkong_state>();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	rgb_t	*rgb;
 
-	rgb = compute_res_net_all(machine, color_prom, &dkong3_decode_info, &dkong3_net_info);
-	palette_set_colors(machine, 0, rgb, 256);
-	palette_normalize_range(machine.palette, 0, 255, 0, 255);
-	auto_free(machine, rgb);
+	rgb = compute_res_net_all(machine(), color_prom, &dkong3_decode_info, &dkong3_net_info);
+	palette_set_colors(machine(), 0, rgb, 256);
+	palette_normalize_range(machine().palette, 0, 255, 0, 255);
+	auto_free(machine(), rgb);
 
 	color_prom += 1024;
 	/* color_prom now points to the beginning of the character color codes */
-	state->m_color_codes = color_prom;	/* we'll need it later */
+	m_color_codes = color_prom;	/* we'll need it later */
 }
 
 TILE_GET_INFO_MEMBER(dkong_state::dkong_bg_tile_info)
@@ -891,66 +886,64 @@ static void check_palette(running_machine &machine)
 			switch (newset)
 			{
 				case 0x00:
-					PALETTE_INIT_CALL(radarscp);
+					state->PALETTE_INIT_CALL_MEMBER(radarscp);
 					break;
 				case 0x01:
-					PALETTE_INIT_CALL(dkong2b);
+					state->PALETTE_INIT_CALL_MEMBER(dkong2b);
 					break;
 			}
 		}
 	}
 }
 
-static VIDEO_START( dkong_base )
+VIDEO_START_MEMBER(dkong_state,dkong_base)
 {
-	dkong_state *state = machine.driver_data<dkong_state>();
 
-	state->m_cd4049_b = (log(0.0 - log(cd4049_al)) - log(0.0 - log((1.0-cd4049_al))) ) / log(cd4049_vh/cd4049_vl);
-	state->m_cd4049_a = log(0.0 - log(cd4049_al)) - state->m_cd4049_b * log(cd4049_vh);
+	m_cd4049_b = (log(0.0 - log(cd4049_al)) - log(0.0 - log((1.0-cd4049_al))) ) / log(cd4049_vh/cd4049_vl);
+	m_cd4049_a = log(0.0 - log(cd4049_al)) - m_cd4049_b * log(cd4049_vh);
 
-	state->m_gfx_bank = 0;
-	state->m_palette_bank = 0;
-	state->m_sprite_bank = 0;
-	state->m_vidhw = -1;
+	m_gfx_bank = 0;
+	m_palette_bank = 0;
+	m_sprite_bank = 0;
+	m_vidhw = -1;
 
-	state->save_item(NAME(state->m_gfx_bank));
-	state->save_item(NAME(state->m_palette_bank));
-	state->save_item(NAME(state->m_sprite_bank));
-	state->save_item(NAME(state->m_grid_on));
+	save_item(NAME(m_gfx_bank));
+	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_sprite_bank));
+	save_item(NAME(m_grid_on));
 
-	state->save_item(NAME(state->m_grid_col));
-	state->save_item(NAME(state->m_flip));
+	save_item(NAME(m_grid_col));
+	save_item(NAME(m_flip));
 }
 
-VIDEO_START( dkong )
+VIDEO_START_MEMBER(dkong_state,dkong)
 {
-	dkong_state *state = machine.driver_data<dkong_state>();
 
-	VIDEO_START_CALL(dkong_base);
+	VIDEO_START_CALL_MEMBER(dkong_base);
 
-	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(scanline_callback));
-	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(0));
+	m_scanline_timer = machine().scheduler().timer_alloc(FUNC(scanline_callback));
+	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(0));
 
-	switch (state->m_hardware_type)
+	switch (m_hardware_type)
 	{
 		case HARDWARE_TRS02:
-			machine.primary_screen->register_screen_bitmap(state->m_bg_bits);
-			state->m_gfx3 = state->memregion("gfx3")->base();
-			state->m_gfx3_len = state->memregion("gfx3")->bytes();
+			machine().primary_screen->register_screen_bitmap(m_bg_bits);
+			m_gfx3 = memregion("gfx3")->base();
+			m_gfx3_len = memregion("gfx3")->bytes();
 		    /* fall through */
 		case HARDWARE_TKG04:
 		case HARDWARE_TKG02:
-			state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dkong_state::dkong_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
-			state->m_bg_tilemap->set_scrolldx(0, 128);
+			m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dkong_state::dkong_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+			m_bg_tilemap->set_scrolldx(0, 128);
 			break;
 		case HARDWARE_TRS01:
-			state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dkong_state::radarscp1_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
-			state->m_bg_tilemap->set_scrolldx(0, 128);
+			m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dkong_state::radarscp1_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+			m_bg_tilemap->set_scrolldx(0, 128);
 
-			machine.primary_screen->register_screen_bitmap(state->m_bg_bits);
-			state->m_gfx4 = state->memregion("gfx4")->base();
-			state->m_gfx3 = state->memregion("gfx3")->base();
-			state->m_gfx3_len = state->memregion("gfx3")->bytes();
+			machine().primary_screen->register_screen_bitmap(m_bg_bits);
+			m_gfx4 = memregion("gfx4")->base();
+			m_gfx3 = memregion("gfx3")->base();
+			m_gfx3_len = memregion("gfx3")->bytes();
 
 			break;
 		default:

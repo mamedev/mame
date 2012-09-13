@@ -163,28 +163,27 @@ WRITE8_MEMBER( vector06_state::vector06_disc_w )
 	wd17xx_set_drive(m_fdc,BIT(data, 0));
 }
 
-MACHINE_START( vector06 )
+void vector06_state::machine_start()
 {
-	machine.scheduler().timer_pulse(attotime::from_hz(50), FUNC(reset_check_callback));
+	machine().scheduler().timer_pulse(attotime::from_hz(50), FUNC(reset_check_callback));
 }
 
-MACHINE_RESET( vector06 )
+void vector06_state::machine_reset()
 {
-	vector06_state *state = machine.driver_data<vector06_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(vector06_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(vector06_irq_callback);
 	space->install_read_bank (0x0000, 0x7fff, "bank1");
 	space->install_write_bank(0x0000, 0x7fff, "bank2");
 	space->install_read_bank (0x8000, 0xffff, "bank3");
 	space->install_write_bank(0x8000, 0xffff, "bank4");
 
-	state->membank("bank1")->set_base(state->memregion("maincpu")->base() + 0x10000);
-	state->membank("bank2")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x0000);
-	state->membank("bank3")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x8000);
-	state->membank("bank4")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x8000);
+	membank("bank1")->set_base(memregion("maincpu")->base() + 0x10000);
+	membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x0000);
+	membank("bank3")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x8000);
+	membank("bank4")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x8000);
 
-	state->m_keyboard_mask = 0;
-	state->m_color_index = 0;
-	state->m_video_mode = 0;
+	m_keyboard_mask = 0;
+	m_color_index = 0;
+	m_video_mode = 0;
 }

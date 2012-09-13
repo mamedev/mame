@@ -1379,12 +1379,12 @@ ADDRESS_MAP_END
 
 /********** MACHINE INIT **********/
 
-static MACHINE_RESET( ms32 )
+void ms32_state::machine_reset()
 {
-	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base());
-	machine.root_device().membank("bank4")->set_entry(0);
-	machine.root_device().membank("bank5")->set_entry(1);
-	irq_init(machine);
+	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
+	machine().root_device().membank("bank4")->set_entry(0);
+	machine().root_device().membank("bank5")->set_entry(1);
+	irq_init(machine());
 }
 
 /********** MACHINE DRIVER **********/
@@ -1401,7 +1401,6 @@ static MACHINE_CONFIG_START( ms32, ms32_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
-	MCFG_MACHINE_RESET(ms32)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1414,7 +1413,6 @@ static MACHINE_CONFIG_START( ms32, ms32_state )
 	MCFG_GFXDECODE(ms32)
 	MCFG_PALETTE_LENGTH(0x10000)
 
-	MCFG_VIDEO_START(ms32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1431,7 +1429,7 @@ static MACHINE_CONFIG_DERIVED( f1superb, ms32 )
 
 	MCFG_GFXDECODE(f1superb)
 
-	MCFG_VIDEO_START(f1superb)
+	MCFG_VIDEO_START_OVERRIDE(ms32_state,f1superb)
 MACHINE_CONFIG_END
 
 

@@ -183,27 +183,25 @@ static const via6522_interface via_2_interface =
 };
 
 
-static MACHINE_START( trvquest )
+MACHINE_START_MEMBER(gameplan_state,trvquest)
 {
-	gameplan_state *state = machine.driver_data<gameplan_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	/* register for save states */
-	state->save_item(NAME(state->m_video_x));
-	state->save_item(NAME(state->m_video_y));
-	state->save_item(NAME(state->m_video_command));
-	state->save_item(NAME(state->m_video_data));
+	save_item(NAME(m_video_x));
+	save_item(NAME(m_video_y));
+	save_item(NAME(m_video_command));
+	save_item(NAME(m_video_data));
 }
 
-static MACHINE_RESET( trvquest )
+MACHINE_RESET_MEMBER(gameplan_state,trvquest)
 {
-	gameplan_state *state = machine.driver_data<gameplan_state>();
 
-	state->m_video_x = 0;
-	state->m_video_y = 0;
-	state->m_video_command = 0;
-	state->m_video_data = 0;
+	m_video_x = 0;
+	m_video_y = 0;
+	m_video_command = 0;
+	m_video_data = 0;
 }
 
 static INTERRUPT_GEN( trvquest_interrupt )
@@ -220,8 +218,8 @@ static MACHINE_CONFIG_START( trvquest, gameplan_state )
 	MCFG_CPU_VBLANK_INT("screen", trvquest_interrupt)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
-	MCFG_MACHINE_START(trvquest)
-	MCFG_MACHINE_RESET(trvquest)
+	MCFG_MACHINE_START_OVERRIDE(gameplan_state,trvquest)
+	MCFG_MACHINE_RESET_OVERRIDE(gameplan_state,trvquest)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(trvquest_video)

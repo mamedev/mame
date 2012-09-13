@@ -672,9 +672,8 @@ static ADDRESS_MAP_START( undoukai_map, AS_PROGRAM, 8, fortyl_state )
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(fortyl_pixram_r, fortyl_pixram_w)
 ADDRESS_MAP_END
 
-static MACHINE_RESET( ta7630 )
+MACHINE_RESET_MEMBER(fortyl_state,ta7630)
 {
-	fortyl_state *state = machine.driver_data<fortyl_state>();
 	int i;
 
 	double db			= 0.0;
@@ -683,8 +682,8 @@ static MACHINE_RESET( ta7630 )
 	for (i = 0; i < 16; i++)
 	{
 		double max = 100.0 / pow(10.0, db/20.0);
-		state->m_vol_ctrl[15 - i] = max;
-		/*logerror("vol_ctrl[%x] = %i (%f dB)\n", 15 - i, state->m_vol_ctrl[15 - i], db);*/
+		m_vol_ctrl[15 - i] = max;
+		/*logerror("vol_ctrl[%x] = %i (%f dB)\n", 15 - i, m_vol_ctrl[15 - i], db);*/
 		db += db_step;
 		db_step += db_step_inc;
 	}
@@ -974,88 +973,84 @@ static const msm5232_interface msm5232_config =
 
 /*******************************************************************************/
 
-static MACHINE_START( 40love )
+MACHINE_START_MEMBER(fortyl_state,40love)
 {
-	fortyl_state *state = machine.driver_data<fortyl_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	/* video */
-	state->save_item(NAME(state->m_pix1));
-	state->save_item(NAME(state->m_pix2));
+	save_item(NAME(m_pix1));
+	save_item(NAME(m_pix2));
 	/* sound */
-	state->save_item(NAME(state->m_sound_nmi_enable));
-	state->save_item(NAME(state->m_pending_nmi));
-	state->save_item(NAME(state->m_snd_data));
-	state->save_item(NAME(state->m_snd_flag));
-	state->save_item(NAME(state->m_vol_ctrl));
-	state->save_item(NAME(state->m_snd_ctrl0));
-	state->save_item(NAME(state->m_snd_ctrl1));
-	state->save_item(NAME(state->m_snd_ctrl2));
-	state->save_item(NAME(state->m_snd_ctrl3));
+	save_item(NAME(m_sound_nmi_enable));
+	save_item(NAME(m_pending_nmi));
+	save_item(NAME(m_snd_data));
+	save_item(NAME(m_snd_flag));
+	save_item(NAME(m_vol_ctrl));
+	save_item(NAME(m_snd_ctrl0));
+	save_item(NAME(m_snd_ctrl1));
+	save_item(NAME(m_snd_ctrl2));
+	save_item(NAME(m_snd_ctrl3));
 }
 
-static MACHINE_START( undoukai )
+MACHINE_START_MEMBER(fortyl_state,undoukai)
 {
-	fortyl_state *state = machine.driver_data<fortyl_state>();
 
-	MACHINE_START_CALL(40love);
+	MACHINE_START_CALL_MEMBER(40love);
 
 	/* fake mcu */
-	state->save_item(NAME(state->m_from_mcu));
-	state->save_item(NAME(state->m_mcu_cmd));
-	state->save_item(NAME(state->m_mcu_in[0]));
-	state->save_item(NAME(state->m_mcu_in[1]));
-	state->save_item(NAME(state->m_mcu_out[0]));
-	state->save_item(NAME(state->m_mcu_out[1]));
+	save_item(NAME(m_from_mcu));
+	save_item(NAME(m_mcu_cmd));
+	save_item(NAME(m_mcu_in[0]));
+	save_item(NAME(m_mcu_in[1]));
+	save_item(NAME(m_mcu_out[0]));
+	save_item(NAME(m_mcu_out[1]));
 }
 
-static MACHINE_RESET( common )
+MACHINE_RESET_MEMBER(fortyl_state,common)
 {
-	fortyl_state *state = machine.driver_data<fortyl_state>();
 
-	MACHINE_RESET_CALL(ta7630);
+	MACHINE_RESET_CALL_MEMBER(ta7630);
 
 	/* video */
-	state->m_pix1 = 0;
-	state->m_pix2[0] = 0;
-	state->m_pix2[1] = 0;
+	m_pix1 = 0;
+	m_pix2[0] = 0;
+	m_pix2[1] = 0;
 
 	/* sound */
-	state->m_sound_nmi_enable = 0;
-	state->m_pending_nmi = 0;
-	state->m_snd_data = 0;
-	state->m_snd_flag = 0;
-	state->m_snd_ctrl0 = 0;
-	state->m_snd_ctrl1 = 0;
-	state->m_snd_ctrl2 = 0;
-	state->m_snd_ctrl3 = 0;
+	m_sound_nmi_enable = 0;
+	m_pending_nmi = 0;
+	m_snd_data = 0;
+	m_snd_flag = 0;
+	m_snd_ctrl0 = 0;
+	m_snd_ctrl1 = 0;
+	m_snd_ctrl2 = 0;
+	m_snd_ctrl3 = 0;
 }
 
-static MACHINE_RESET( 40love )
+MACHINE_RESET_MEMBER(fortyl_state,40love)
 {
-	machine.device("mcu")->execute().set_input_line(0, CLEAR_LINE);
+	machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 
-	MACHINE_RESET_CALL(common);
+	MACHINE_RESET_CALL_MEMBER(common);
 }
 
-static MACHINE_RESET( undoukai )
+MACHINE_RESET_MEMBER(fortyl_state,undoukai)
 {
-	fortyl_state *state = machine.driver_data<fortyl_state>();
 	int i;
 
-	MACHINE_RESET_CALL(common);
+	MACHINE_RESET_CALL_MEMBER(common);
 
 	/* fake mcu */
-	state->m_from_mcu = 0xff;
-	state->m_mcu_cmd = -1;
+	m_from_mcu = 0xff;
+	m_mcu_cmd = -1;
 
 	for (i = 0; i < 16; i++)
 	{
-		state->m_mcu_in[0][i] = 0;
-		state->m_mcu_in[1][i] = 0;
-		state->m_mcu_out[0][i] = 0;
-		state->m_mcu_out[1][i] = 0;
+		m_mcu_in[0][i] = 0;
+		m_mcu_in[1][i] = 0;
+		m_mcu_out[0][i] = 0;
+		m_mcu_out[1][i] = 0;
 	}
 }
 
@@ -1075,8 +1070,8 @@ static MACHINE_CONFIG_START( 40love, fortyl_state )
 	MCFG_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* high interleave to ensure proper synchronization of CPUs */
-	MCFG_MACHINE_START(40love)
-	MCFG_MACHINE_RESET(40love)
+	MCFG_MACHINE_START_OVERRIDE(fortyl_state,40love)
+	MCFG_MACHINE_RESET_OVERRIDE(fortyl_state,40love)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1089,8 +1084,6 @@ static MACHINE_CONFIG_START( 40love, fortyl_state )
 	MCFG_GFXDECODE(40love)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_PALETTE_INIT(fortyl)
-	MCFG_VIDEO_START(fortyl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1132,8 +1125,8 @@ static MACHINE_CONFIG_START( undoukai, fortyl_state )
 //  MCFG_CPU_PROGRAM_MAP(buggychl_mcu_map)
 //  MCFG_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
 
-	MCFG_MACHINE_START(undoukai)
-	MCFG_MACHINE_RESET(undoukai)	/* init machine */
+	MCFG_MACHINE_START_OVERRIDE(fortyl_state,undoukai)
+	MCFG_MACHINE_RESET_OVERRIDE(fortyl_state,undoukai)	/* init machine */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1146,8 +1139,6 @@ static MACHINE_CONFIG_START( undoukai, fortyl_state )
 	MCFG_GFXDECODE(40love)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_PALETTE_INIT(fortyl)
-	MCFG_VIDEO_START(fortyl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -363,108 +363,106 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys16_textram_w)
 
 /***************************************************************************/
 
-VIDEO_START( system16 )
+VIDEO_START_MEMBER(segas1x_bootleg_state,system16)
 {
-	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
 	/* Normal colors */
 	compute_resistor_weights(0, 255, -1.0,
-		6, resistances_normal, state->m_weights[0][0], 0, 0,
-		6, resistances_normal, state->m_weights[0][1], 0, 0,
-		6, resistances_normal, state->m_weights[0][2], 0, 0
+		6, resistances_normal, m_weights[0][0], 0, 0,
+		6, resistances_normal, m_weights[0][1], 0, 0,
+		6, resistances_normal, m_weights[0][2], 0, 0
 		);
 
 	/* Shadow/Highlight colors */
 	compute_resistor_weights(0, 255, -1.0,
-		6, resistances_sh, state->m_weights[1][0], 0, 0,
-		6, resistances_sh, state->m_weights[1][1], 0, 0,
-		6, resistances_sh, state->m_weights[1][2], 0, 0
+		6, resistances_sh, m_weights[1][0], 0, 0,
+		6, resistances_sh, m_weights[1][1], 0, 0,
+		6, resistances_sh, m_weights[1][2], 0, 0
 		);
 
-	if (!state->m_bg1_trans)
-		state->m_background = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),state),
+	if (!m_bg1_trans)
+		m_background = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),this),
 			8,8,
 			64*2,32*2 );
 	else
-		state->m_background = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),state),
+		m_background = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),this),
 			8,8,
 			64*2,32*2 );
 
-	state->m_foreground = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_fg_tile_info),state), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),state),
+	m_foreground = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),this),
 		8,8,
 		64*2,32*2 );
 
-	state->m_text_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_text_tile_info),state), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_text_map),state),
+	m_text_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_text_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_text_map),this),
 		8,8,
 		40,28 );
 
 	{
-		if (state->m_bg1_trans) state->m_background->set_transparent_pen(0);
-		state->m_foreground->set_transparent_pen(0);
-		state->m_text_layer->set_transparent_pen(0);
+		if (m_bg1_trans) m_background->set_transparent_pen(0);
+		m_foreground->set_transparent_pen(0);
+		m_text_layer->set_transparent_pen(0);
 
-		state->m_tile_bank0 = 0;
-		state->m_tile_bank1 = 1;
+		m_tile_bank0 = 0;
+		m_tile_bank1 = 1;
 
-		state->m_fg_scrollx = 0;
-		state->m_fg_scrolly = 0;
+		m_fg_scrollx = 0;
+		m_fg_scrolly = 0;
 
-		state->m_bg_scrollx = 0;
-		state->m_bg_scrolly = 0;
+		m_bg_scrollx = 0;
+		m_bg_scrolly = 0;
 
-		state->m_refreshenable = 1;
+		m_refreshenable = 1;
 
 		/* common defaults */
-		state->m_tilebank_switch = 0x1000;
+		m_tilebank_switch = 0x1000;
 
 		// Defaults for sys16 games
-		state->m_textlayer_lo_min = 0;
-		state->m_textlayer_lo_max = 0x7f;
-		state->m_textlayer_hi_min = 0x80;
-		state->m_textlayer_hi_max = 0xff;
+		m_textlayer_lo_min = 0;
+		m_textlayer_lo_max = 0x7f;
+		m_textlayer_hi_min = 0x80;
+		m_textlayer_hi_max = 0xff;
 
-		state->m_system18 = 0;
+		m_system18 = 0;
 	}
 
-	setup_system16_bootleg_spritebanking(machine);
+	setup_system16_bootleg_spritebanking(machine());
 }
 
-VIDEO_START( system18old )
+VIDEO_START_MEMBER(segas1x_bootleg_state,system18old)
 {
-	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
-	VIDEO_START_CALL(system16);
+	VIDEO_START_CALL_MEMBER(system16);
 
-	state->m_bg1_trans = 1;
+	m_bg1_trans = 1;
 
-	state->m_background2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_bg2_tile_info),state), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),state),
+	m_background2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),this),
 		8,8,
 		64*2,32*2 );
 
-	state->m_foreground2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_fg2_tile_info),state), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),state),
+	m_foreground2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_fg2_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),this),
 		8,8,
 		64*2,32*2 );
 
-	state->m_foreground2->set_transparent_pen(0);
+	m_foreground2->set_transparent_pen(0);
 
-	if (state->m_splittab_fg_x)
+	if (m_splittab_fg_x)
 	{
-		state->m_foreground ->set_scroll_rows(64);
-		state->m_foreground2 ->set_scroll_rows(64);
+		m_foreground ->set_scroll_rows(64);
+		m_foreground2 ->set_scroll_rows(64);
 	}
 
-	if (state->m_splittab_bg_x)
+	if (m_splittab_bg_x)
 	{
-		state->m_background ->set_scroll_rows(64);
-		state->m_background2 ->set_scroll_rows(64);
+		m_background ->set_scroll_rows(64);
+		m_background2 ->set_scroll_rows(64);
 	}
 
-	state->m_textlayer_lo_min = 0;
-	state->m_textlayer_lo_max = 0x1f;
-	state->m_textlayer_hi_min = 0x20;
-	state->m_textlayer_hi_max = 0xff;
+	m_textlayer_lo_min = 0;
+	m_textlayer_lo_max = 0x1f;
+	m_textlayer_hi_min = 0x20;
+	m_textlayer_hi_max = 0xff;
 
-	state->m_system18 = 1;
+	m_system18 = 1;
 }
 
 
@@ -557,53 +555,52 @@ WRITE16_MEMBER(segas1x_bootleg_state::s16a_bootleg_tilemapselect_w)
 }
 
 
-VIDEO_START( s16a_bootleg )
+VIDEO_START_MEMBER(segas1x_bootleg_state,s16a_bootleg)
 {
-	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
 	/* Normal colors */
 	compute_resistor_weights(0, 255, -1.0,
-		6, resistances_normal, state->m_weights[0][0], 0, 0,
-		6, resistances_normal, state->m_weights[0][1], 0, 0,
-		6, resistances_normal, state->m_weights[0][2], 0, 0
+		6, resistances_normal, m_weights[0][0], 0, 0,
+		6, resistances_normal, m_weights[0][1], 0, 0,
+		6, resistances_normal, m_weights[0][2], 0, 0
 		);
 
 	/* Shadow/Highlight colors */
 	compute_resistor_weights(0, 255, -1.0,
-		6, resistances_sh, state->m_weights[1][0], 0, 0,
-		6, resistances_sh, state->m_weights[1][1], 0, 0,
-		6, resistances_sh, state->m_weights[1][2], 0, 0
+		6, resistances_sh, m_weights[1][0], 0, 0,
+		6, resistances_sh, m_weights[1][1], 0, 0,
+		6, resistances_sh, m_weights[1][2], 0, 0
 		);
 
 
 
-	state->m_text_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_s16a_bootleg_tile_infotxt),state), TILEMAP_SCAN_ROWS, 8,8, 64,32 );
+	m_text_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_s16a_bootleg_tile_infotxt),this), TILEMAP_SCAN_ROWS, 8,8, 64,32 );
 
 	// the system16a bootlegs have simple tilemaps instead of the paged system
-	state->m_bg_tilemaps[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_s16a_bootleg_tile_info0),state), TILEMAP_SCAN_ROWS, 8,8, 64,32 );
-	state->m_bg_tilemaps[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_s16a_bootleg_tile_info1),state), TILEMAP_SCAN_ROWS, 8,8, 64,32 );
+	m_bg_tilemaps[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_s16a_bootleg_tile_info0),this), TILEMAP_SCAN_ROWS, 8,8, 64,32 );
+	m_bg_tilemaps[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_s16a_bootleg_tile_info1),this), TILEMAP_SCAN_ROWS, 8,8, 64,32 );
 
-	state->m_text_tilemap->set_transparent_pen(0);
-	state->m_bg_tilemaps[0]->set_transparent_pen(0);
-	state->m_bg_tilemaps[1]->set_transparent_pen(0);
+	m_text_tilemap->set_transparent_pen(0);
+	m_bg_tilemaps[0]->set_transparent_pen(0);
+	m_bg_tilemaps[1]->set_transparent_pen(0);
 }
 
-VIDEO_START( s16a_bootleg_wb3bl )
+VIDEO_START_MEMBER(segas1x_bootleg_state,s16a_bootleg_wb3bl)
 {
-	VIDEO_START_CALL(s16a_bootleg);
-	setup_system16_bootleg_spritebanking(machine);
+	VIDEO_START_CALL_MEMBER(s16a_bootleg);
+	setup_system16_bootleg_spritebanking(machine());
 }
 
-VIDEO_START( s16a_bootleg_shinobi )
+VIDEO_START_MEMBER(segas1x_bootleg_state,s16a_bootleg_shinobi)
 {
-	VIDEO_START_CALL(s16a_bootleg);
-	setup_system16_bootleg_spritebanking(machine);
+	VIDEO_START_CALL_MEMBER(s16a_bootleg);
+	setup_system16_bootleg_spritebanking(machine());
 }
 
-VIDEO_START( s16a_bootleg_passsht )
+VIDEO_START_MEMBER(segas1x_bootleg_state,s16a_bootleg_passsht)
 {
-	VIDEO_START_CALL(s16a_bootleg);
-	setup_system16_bootleg_spritebanking(machine);
+	VIDEO_START_CALL_MEMBER(s16a_bootleg);
+	setup_system16_bootleg_spritebanking(machine());
 }
 
 // Passing Shot (2 player), Shinobi (Datsu), Wonderboy 3

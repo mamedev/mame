@@ -666,43 +666,41 @@ static const tc0140syt_interface airsys_tc0140syt_intf =
 	"maincpu", "audiocpu"
 };
 
-static MACHINE_START( taitoair )
+void taitoair_state::machine_start()
 {
-	taitoair_state *state = machine.driver_data<taitoair_state>();
-	UINT8 *ROM = state->memregion("audiocpu")->base();
+	UINT8 *ROM = memregion("audiocpu")->base();
 	int i;
 
-	state->membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
+	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_dsp = machine.device("dsp");
-	state->m_tc0080vco = machine.device("tc0080vco");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_dsp = machine().device("dsp");
+	m_tc0080vco = machine().device("tc0080vco");
 
-	state->save_item(NAME(state->m_banknum));
-	state->save_item(NAME(state->m_q.col));
-	state->save_item(NAME(state->m_q.pcount));
+	save_item(NAME(m_banknum));
+	save_item(NAME(m_q.col));
+	save_item(NAME(m_q.pcount));
 
 	for (i = 0; i < TAITOAIR_POLY_MAX_PT; i++)
 	{
-		state_save_register_item(machine, "globals", NULL, i, state->m_q.p[i].x);
-		state_save_register_item(machine, "globals", NULL, i, state->m_q.p[i].y);
+		state_save_register_item(machine(), "globals", NULL, i, m_q.p[i].x);
+		state_save_register_item(machine(), "globals", NULL, i, m_q.p[i].y);
 	}
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine));
+	machine().save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine()));
 }
 
-static MACHINE_RESET( taitoair )
+void taitoair_state::machine_reset()
 {
-	taitoair_state *state = machine.driver_data<taitoair_state>();
 	int i;
 
-	state->m_dsp_hold_signal = ASSERT_LINE;
-	state->m_banknum = 0;
+	m_dsp_hold_signal = ASSERT_LINE;
+	m_banknum = 0;
 
 	for (i = 0; i < TAITOAIR_POLY_MAX_PT; i++)
 	{
-		state->m_q.p[i].x = 0;
-		state->m_q.p[i].y = 0;
+		m_q.p[i].x = 0;
+		m_q.p[i].y = 0;
 	}
 }
 
@@ -723,8 +721,6 @@ static MACHINE_CONFIG_START( airsys, taitoair_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_MACHINE_START(taitoair)
-	MCFG_MACHINE_RESET(taitoair)
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", airsys_io_intf)
 
@@ -735,7 +731,6 @@ static MACHINE_CONFIG_START( airsys, taitoair_state )
 	MCFG_SCREEN_SIZE(64*16, 64*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 3*16, 28*16-1)
 	MCFG_SCREEN_UPDATE_STATIC(taitoair)
-	MCFG_VIDEO_START(taitoair);
 
 	MCFG_GFXDECODE(airsys)
 	MCFG_PALETTE_LENGTH(512*16+512*16)

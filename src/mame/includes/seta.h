@@ -177,6 +177,21 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_2);
 	TILE_GET_INFO_MEMBER(get_tile_info_3);
+	DECLARE_VIDEO_START(seta_no_layers);
+	DECLARE_VIDEO_START(twineagl_1_layer);
+	DECLARE_VIDEO_START(seta_1_layer);
+	DECLARE_MACHINE_RESET(calibr50);
+	DECLARE_PALETTE_INIT(usclssic);
+	DECLARE_VIDEO_START(seta_2_layers);
+	DECLARE_PALETTE_INIT(blandia);
+	DECLARE_PALETTE_INIT(setaroul);
+	DECLARE_PALETTE_INIT(zingzip);
+	DECLARE_MACHINE_START(wrofaero);
+	DECLARE_PALETTE_INIT(gundhara);
+	DECLARE_PALETTE_INIT(jjsquawk);
+	DECLARE_MACHINE_START(keroppi);
+	DECLARE_VIDEO_START(oisipuzl_2_layers);
+	DECLARE_PALETTE_INIT(inttoote);
 };
 
 /*----------- defined in video/seta.c -----------*/
@@ -185,19 +200,19 @@ void seta_coin_lockout_w(running_machine &machine, int data);
 
 
 
-PALETTE_INIT( blandia );
-PALETTE_INIT( gundhara );
-PALETTE_INIT( inttoote );
-PALETTE_INIT( setaroul );
-PALETTE_INIT( jjsquawk );
-PALETTE_INIT( usclssic );
-PALETTE_INIT( zingzip );
 
-VIDEO_START( seta_no_layers);
-VIDEO_START( twineagl_1_layer);
-VIDEO_START( seta_1_layer);
-VIDEO_START( seta_2_layers);
-VIDEO_START( oisipuzl_2_layers );
+
+
+
+
+
+
+
+
+
+
+
+
 
 SCREEN_UPDATE_IND16( seta );
 SCREEN_UPDATE_IND16( seta_no_layers );

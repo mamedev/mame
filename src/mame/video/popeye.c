@@ -113,22 +113,20 @@ static void convert_color_prom(running_machine &machine,const UINT8 *color_prom)
 	}
 }
 
-PALETTE_INIT( popeye )
+void popeye_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	popeye_state *state = machine.driver_data<popeye_state>();
-	state->m_invertmask = 0xff;
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	m_invertmask = 0xff;
 
-	convert_color_prom(machine,color_prom);
+	convert_color_prom(machine(),color_prom);
 }
 
-PALETTE_INIT( popeyebl )
+PALETTE_INIT_MEMBER(popeye_state,popeyebl)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	popeye_state *state = machine.driver_data<popeye_state>();
-	state->m_invertmask = 0x00;
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	m_invertmask = 0x00;
 
-	convert_color_prom(machine,color_prom);
+	convert_color_prom(machine(),color_prom);
 }
 
 static void set_background_palette(running_machine &machine,int bank)
@@ -241,40 +239,38 @@ TILE_GET_INFO_MEMBER(popeye_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-VIDEO_START( skyskipr )
+void popeye_state::video_start()
 {
-	popeye_state *state = machine.driver_data<popeye_state>();
-	state->m_bitmapram = auto_alloc_array(machine, UINT8, popeye_bitmapram_size);
-	state->m_tmpbitmap2 = auto_bitmap_ind16_alloc(machine,1024,1024);	/* actually 1024x512 but not rolling over vertically? */
+	m_bitmapram = auto_alloc_array(machine(), UINT8, popeye_bitmapram_size);
+	m_tmpbitmap2 = auto_bitmap_ind16_alloc(machine(),1024,1024);	/* actually 1024x512 but not rolling over vertically? */
 
-	state->m_bitmap_type = TYPE_SKYSKIPR;
+	m_bitmap_type = TYPE_SKYSKIPR;
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(popeye_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popeye_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap->set_transparent_pen(0);
 
-    state->m_lastflip = 0;
+    m_lastflip = 0;
 
-    state_save_register_global(machine, state->m_lastflip);
-    state_save_register_global_bitmap(machine, state->m_tmpbitmap2);
-    state_save_register_global_pointer(machine, state->m_bitmapram, popeye_bitmapram_size);
+    state_save_register_global(machine(), m_lastflip);
+    state_save_register_global_bitmap(machine(), m_tmpbitmap2);
+    state_save_register_global_pointer(machine(), m_bitmapram, popeye_bitmapram_size);
 }
 
-VIDEO_START( popeye )
+VIDEO_START_MEMBER(popeye_state,popeye)
 {
-	popeye_state *state = machine.driver_data<popeye_state>();
-	state->m_bitmapram = auto_alloc_array(machine, UINT8, popeye_bitmapram_size);
-	state->m_tmpbitmap2 = auto_bitmap_ind16_alloc(machine,512,512);
+	m_bitmapram = auto_alloc_array(machine(), UINT8, popeye_bitmapram_size);
+	m_tmpbitmap2 = auto_bitmap_ind16_alloc(machine(),512,512);
 
-	state->m_bitmap_type = TYPE_POPEYE;
+	m_bitmap_type = TYPE_POPEYE;
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(popeye_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popeye_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap->set_transparent_pen(0);
 
-    state->m_lastflip = 0;
+    m_lastflip = 0;
 
-    state_save_register_global(machine, state->m_lastflip);
-    state_save_register_global_bitmap(machine, state->m_tmpbitmap2);
-    state_save_register_global_pointer(machine, state->m_bitmapram, popeye_bitmapram_size);
+    state_save_register_global(machine(), m_lastflip);
+    state_save_register_global_bitmap(machine(), m_tmpbitmap2);
+    state_save_register_global_pointer(machine(), m_bitmapram, popeye_bitmapram_size);
 }
 
 static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)

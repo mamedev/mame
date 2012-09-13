@@ -180,6 +180,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ramdac_io_w);
 	DECLARE_READ8_MEMBER(h63484_rom_r);
 	DECLARE_READ8_MEMBER(t2_r);
+	DECLARE_MACHINE_START(skattv);
+	DECLARE_MACHINE_RESET(skattv);
+	DECLARE_PALETTE_INIT(adp);
 };
 
 
@@ -297,16 +300,15 @@ static const microtouch_interface adb_microtouch_config =
 	NULL
 };
 
-static MACHINE_START( skattv )
+MACHINE_START_MEMBER(adp_state,skattv)
 {
-	adp_state *state = machine.driver_data<adp_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_duart = machine.device("duart68681");
-	//state->m_h63484 = machine.device("h63484");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_duart = machine().device("duart68681");
+	//m_h63484 = machine().device("h63484");
 
-	state->save_item(NAME(state->m_mux_data));
-	state->save_item(NAME(state->m_register_active));
+	save_item(NAME(m_mux_data));
+	save_item(NAME(m_register_active));
 
 	#if 0
 	/*
@@ -320,10 +322,10 @@ static MACHINE_START( skattv )
 
 	// hack to handle acrt rom
 	{
-		UINT16 *rom = (UINT16*)state->memregion("gfx1")->base();
+		UINT16 *rom = (UINT16*)memregion("gfx1")->base();
 		int i;
 
-		device_t *hd63484 = machine.device("hd63484");
+		device_t *hd63484 = machine().device("hd63484");
 
 		for(i = 0; i < 0x40000/2; ++i)
 		{
@@ -336,12 +338,11 @@ static MACHINE_START( skattv )
 	#endif
 }
 
-static MACHINE_RESET( skattv )
+MACHINE_RESET_MEMBER(adp_state,skattv)
 {
-	adp_state *state = machine.driver_data<adp_state>();
 
-	state->m_mux_data = 0;
-	state->m_register_active = 0;
+	m_mux_data = 0;
+	m_register_active = 0;
 }
 
 static const duart68681_config skattv_duart68681_config =
@@ -352,11 +353,11 @@ static const duart68681_config skattv_duart68681_config =
 	NULL
 };
 
-static PALETTE_INIT( adp )
+PALETTE_INIT_MEMBER(adp_state,adp)
 {
     int i;
 
-    for (i = 0; i < machine.total_colors(); i++)
+    for (i = 0; i < machine().total_colors(); i++)
     {
         int bit0, bit1, bit2, r, g, b;
 
@@ -377,7 +378,7 @@ static PALETTE_INIT( adp )
         bit2 = (i >> 2) & 0x01;
         b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-        palette_set_color(machine, i, MAKE_RGB(r,g,b));
+        palette_set_color(machine(), i, MAKE_RGB(r,g,b));
     }
 }
 
@@ -665,8 +666,8 @@ static MACHINE_CONFIG_START( quickjac, adp_state )
 	MCFG_CPU_PROGRAM_MAP(quickjac_mem)
 //  MCFG_CPU_VBLANK_INT("screen", adp_int)
 
-	MCFG_MACHINE_START(skattv)
-	MCFG_MACHINE_RESET(skattv)
+	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)
+	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)
 
 	MCFG_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
 	MCFG_MICROTOUCH_ADD( "microtouch", adb_microtouch_config )
@@ -680,7 +681,7 @@ static MACHINE_CONFIG_START( quickjac, adp_state )
 
 	MCFG_PALETTE_LENGTH(0x10)
 
-	MCFG_PALETTE_INIT(adp)
+	MCFG_PALETTE_INIT_OVERRIDE(adp_state,adp)
 
 	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, adp_h63484_map)
 
@@ -697,8 +698,8 @@ static MACHINE_CONFIG_START( skattv, adp_state )
 	MCFG_CPU_PROGRAM_MAP(skattv_mem)
 //  MCFG_CPU_VBLANK_INT("screen", adp_int)
 
-	MCFG_MACHINE_START(skattv)
-	MCFG_MACHINE_RESET(skattv)
+	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)
+	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)
 
 	MCFG_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
 	MCFG_MICROTOUCH_ADD( "microtouch", adb_microtouch_config )
@@ -712,7 +713,7 @@ static MACHINE_CONFIG_START( skattv, adp_state )
 
 	MCFG_PALETTE_LENGTH(0x10)
 
-	MCFG_PALETTE_INIT(adp)
+	MCFG_PALETTE_INIT_OVERRIDE(adp_state,adp)
 
 	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, adp_h63484_map)
 
@@ -731,8 +732,8 @@ static MACHINE_CONFIG_START( backgamn, adp_state )
 	MCFG_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
 	MCFG_MICROTOUCH_ADD( "microtouch", adb_microtouch_config )
 
-	MCFG_MACHINE_START(skattv)
-	MCFG_MACHINE_RESET(skattv)
+	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)
+	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -743,7 +744,7 @@ static MACHINE_CONFIG_START( backgamn, adp_state )
 
 	MCFG_PALETTE_LENGTH(0x10)
 
-//  MCFG_PALETTE_INIT(adp)
+//  MCFG_PALETTE_INIT_OVERRIDE(adp_state,adp)
 
 	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, adp_h63484_map)
 

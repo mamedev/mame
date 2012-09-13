@@ -33,6 +33,9 @@ public:
 
 	DECLARE_DRIVER_INIT(kov2nl);
 	DECLARE_DRIVER_INIT(orleg2);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
@@ -52,17 +55,17 @@ static SCREEN_VBLANK(pgm2)
 
 }
 
-static VIDEO_START(pgm2)
+void pgm2_state::video_start()
 {
 
 }
 
-static MACHINE_START( pgm2 )
+void pgm2_state::machine_start()
 {
 
 }
 
-static MACHINE_RESET( pgm2 )
+void pgm2_state::machine_reset()
 {
 
 }
@@ -127,8 +130,6 @@ static MACHINE_CONFIG_START( pgm2, pgm2_state )
 	MCFG_CPU_PROGRAM_MAP(pgm2_map)
 //  MCFG_DEVICE_DISABLE()
 
-	MCFG_MACHINE_START( pgm2 )
-	MCFG_MACHINE_RESET( pgm2 )
 
 	MCFG_GFXDECODE(pgm2)
 
@@ -143,7 +144,6 @@ static MACHINE_CONFIG_START( pgm2, pgm2_state )
 
 	MCFG_PALETTE_LENGTH(0x1000)
 
-	MCFG_VIDEO_START(pgm2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
     MCFG_YMZ770_ADD("ymz770", 16384000)  // Actually a YMZ774 on-board

@@ -98,44 +98,43 @@ static void twincobr_create_tilemaps(running_machine &machine)
 	state->m_tx_tilemap->set_transparent_pen(0);
 }
 
-VIDEO_START( toaplan0 )
+VIDEO_START_MEMBER(twincobr_state,toaplan0)
 {
-	twincobr_state *state = machine.driver_data<twincobr_state>();
 
 	/* the video RAM is accessed via ports, it's not memory mapped */
-	state->m_txvideoram_size = 0x0800;
-	state->m_bgvideoram_size = 0x2000;	/* banked two times 0x1000 */
-	state->m_fgvideoram_size = 0x1000;
+	m_txvideoram_size = 0x0800;
+	m_bgvideoram_size = 0x2000;	/* banked two times 0x1000 */
+	m_fgvideoram_size = 0x1000;
 
-	twincobr_create_tilemaps(machine);
+	twincobr_create_tilemaps(machine());
 
-	state->m_txvideoram16 = auto_alloc_array_clear(machine, UINT16, state->m_txvideoram_size);
-	state->m_fgvideoram16 = auto_alloc_array_clear(machine, UINT16, state->m_fgvideoram_size);
-	state->m_bgvideoram16 = auto_alloc_array_clear(machine, UINT16, state->m_bgvideoram_size);
+	m_txvideoram16 = auto_alloc_array_clear(machine(), UINT16, m_txvideoram_size);
+	m_fgvideoram16 = auto_alloc_array_clear(machine(), UINT16, m_fgvideoram_size);
+	m_bgvideoram16 = auto_alloc_array_clear(machine(), UINT16, m_bgvideoram_size);
 
-	state->m_display_on = 0;
-	twincobr_display(machine, state->m_display_on);
+	m_display_on = 0;
+	twincobr_display(machine(), m_display_on);
 
-	state_save_register_global_pointer(machine, state->m_txvideoram16, state->m_txvideoram_size);
-	state_save_register_global_pointer(machine, state->m_fgvideoram16, state->m_fgvideoram_size);
-	state_save_register_global_pointer(machine, state->m_bgvideoram16, state->m_bgvideoram_size);
-	state_save_register_global(machine, state->m_txoffs);
-	state_save_register_global(machine, state->m_fgoffs);
-	state_save_register_global(machine, state->m_bgoffs);
-	state_save_register_global(machine, state->m_scroll_x);
-	state_save_register_global(machine, state->m_scroll_y);
-	state_save_register_global(machine, state->m_txscrollx);
-	state_save_register_global(machine, state->m_fgscrollx);
-	state_save_register_global(machine, state->m_bgscrollx);
-	state_save_register_global(machine, state->m_txscrolly);
-	state_save_register_global(machine, state->m_fgscrolly);
-	state_save_register_global(machine, state->m_bgscrolly);
-	state_save_register_global(machine, state->m_display_on);
-	state_save_register_global(machine, state->m_fg_rom_bank);
-	state_save_register_global(machine, state->m_bg_ram_bank);
-	state_save_register_global(machine, state->m_flip_screen);
-	state_save_register_global(machine, state->m_wardner_sprite_hack);
-	machine.save().register_postload(save_prepost_delegate(FUNC(twincobr_restore_screen), &machine));
+	state_save_register_global_pointer(machine(), m_txvideoram16, m_txvideoram_size);
+	state_save_register_global_pointer(machine(), m_fgvideoram16, m_fgvideoram_size);
+	state_save_register_global_pointer(machine(), m_bgvideoram16, m_bgvideoram_size);
+	state_save_register_global(machine(), m_txoffs);
+	state_save_register_global(machine(), m_fgoffs);
+	state_save_register_global(machine(), m_bgoffs);
+	state_save_register_global(machine(), m_scroll_x);
+	state_save_register_global(machine(), m_scroll_y);
+	state_save_register_global(machine(), m_txscrollx);
+	state_save_register_global(machine(), m_fgscrollx);
+	state_save_register_global(machine(), m_bgscrollx);
+	state_save_register_global(machine(), m_txscrolly);
+	state_save_register_global(machine(), m_fgscrolly);
+	state_save_register_global(machine(), m_bgscrolly);
+	state_save_register_global(machine(), m_display_on);
+	state_save_register_global(machine(), m_fg_rom_bank);
+	state_save_register_global(machine(), m_bg_ram_bank);
+	state_save_register_global(machine(), m_flip_screen);
+	state_save_register_global(machine(), m_wardner_sprite_hack);
+	machine().save().register_postload(save_prepost_delegate(FUNC(twincobr_restore_screen), &machine()));
 }
 
 static void twincobr_restore_screen(running_machine &machine)

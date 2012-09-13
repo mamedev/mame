@@ -83,20 +83,19 @@ TILE_GET_INFO_MEMBER(lkage_state::get_tx_tile_info)
 	SET_TILE_INFO_MEMBER( 0/*gfx*/, code, 0/*color*/, 0/*flags*/);
 }
 
-VIDEO_START( lkage )
+void lkage_state::video_start()
 {
-	lkage_state *state = machine.driver_data<lkage_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lkage_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lkage_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lkage_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lkage_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lkage_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lkage_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
-	state->m_tx_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap->set_scrolldx(-5, -5 + 24);
-	state->m_fg_tilemap->set_scrolldx(-3, -3 + 24);
-	state->m_tx_tilemap->set_scrolldx(-1, -1 + 24);
+	m_bg_tilemap->set_scrolldx(-5, -5 + 24);
+	m_fg_tilemap->set_scrolldx(-3, -3 + 24);
+	m_tx_tilemap->set_scrolldx(-1, -1 + 24);
 }
 
 

@@ -64,9 +64,9 @@
  *
  **************************************************************************/
 
-PALETTE_INIT( carpolo )
+void carpolo_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* thanks to Jarek Burczynski for analyzing the circuit */
@@ -91,7 +91,7 @@ PALETTE_INIT( carpolo )
 	};
 
 
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		UINT8 pen, r, g, b;
 
@@ -130,7 +130,7 @@ PALETTE_INIT( carpolo )
 		/* blue component */
 		b = ((b_voltage[(color_prom[pen] >> 0) & 0x03] - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * 255.;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -141,23 +141,22 @@ PALETTE_INIT( carpolo )
  *
  *************************************/
 
-VIDEO_START( carpolo )
+void carpolo_state::video_start()
 {
-	carpolo_state *state = machine.driver_data<carpolo_state>();
 
-	state->m_sprite_sprite_collision_bitmap1 = auto_bitmap_ind16_alloc(machine, SPRITE_WIDTH*2, SPRITE_HEIGHT*2);
-	state->m_sprite_sprite_collision_bitmap2 = auto_bitmap_ind16_alloc(machine, SPRITE_WIDTH*2, SPRITE_HEIGHT*2);
+	m_sprite_sprite_collision_bitmap1 = auto_bitmap_ind16_alloc(machine(), SPRITE_WIDTH*2, SPRITE_HEIGHT*2);
+	m_sprite_sprite_collision_bitmap2 = auto_bitmap_ind16_alloc(machine(), SPRITE_WIDTH*2, SPRITE_HEIGHT*2);
 
-	state->m_sprite_goal_collision_bitmap1 = auto_bitmap_ind16_alloc(machine, SPRITE_WIDTH+GOAL_WIDTH, SPRITE_HEIGHT+GOAL_HEIGHT);
-	state->m_sprite_goal_collision_bitmap2 = auto_bitmap_ind16_alloc(machine, SPRITE_WIDTH+GOAL_WIDTH, SPRITE_HEIGHT+GOAL_HEIGHT);
+	m_sprite_goal_collision_bitmap1 = auto_bitmap_ind16_alloc(machine(), SPRITE_WIDTH+GOAL_WIDTH, SPRITE_HEIGHT+GOAL_HEIGHT);
+	m_sprite_goal_collision_bitmap2 = auto_bitmap_ind16_alloc(machine(), SPRITE_WIDTH+GOAL_WIDTH, SPRITE_HEIGHT+GOAL_HEIGHT);
 
-	state->m_sprite_border_collision_bitmap = auto_bitmap_ind16_alloc(machine, SPRITE_WIDTH, SPRITE_HEIGHT);
+	m_sprite_border_collision_bitmap = auto_bitmap_ind16_alloc(machine(), SPRITE_WIDTH, SPRITE_HEIGHT);
 
-    state_save_register_global_bitmap(machine, state->m_sprite_sprite_collision_bitmap1);
-    state_save_register_global_bitmap(machine, state->m_sprite_sprite_collision_bitmap2);
-    state_save_register_global_bitmap(machine, state->m_sprite_goal_collision_bitmap1);
-    state_save_register_global_bitmap(machine, state->m_sprite_goal_collision_bitmap2);
-    state_save_register_global_bitmap(machine, state->m_sprite_border_collision_bitmap);
+    state_save_register_global_bitmap(machine(), m_sprite_sprite_collision_bitmap1);
+    state_save_register_global_bitmap(machine(), m_sprite_sprite_collision_bitmap2);
+    state_save_register_global_bitmap(machine(), m_sprite_goal_collision_bitmap1);
+    state_save_register_global_bitmap(machine(), m_sprite_goal_collision_bitmap2);
+    state_save_register_global_bitmap(machine(), m_sprite_border_collision_bitmap);
 }
 
 

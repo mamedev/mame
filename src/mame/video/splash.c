@@ -165,17 +165,16 @@ static void draw_bitmap(running_machine &machine, bitmap_ind16 &bitmap, const re
 
 ***************************************************************************/
 
-VIDEO_START( splash )
+void splash_state::video_start()
 {
-	splash_state *state = machine.driver_data<splash_state>();
 
-	state->m_bg_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(splash_state::get_tile_info_splash_tilemap0),state), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
-	state->m_bg_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(splash_state::get_tile_info_splash_tilemap1),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(splash_state::get_tile_info_splash_tilemap0),this), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(splash_state::get_tile_info_splash_tilemap1),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	state->m_bg_tilemap[0]->set_transparent_pen(0);
-	state->m_bg_tilemap[1]->set_transparent_pen(0);
+	m_bg_tilemap[0]->set_transparent_pen(0);
+	m_bg_tilemap[1]->set_transparent_pen(0);
 
-	state->m_bg_tilemap[0]->set_scrollx(0, 4);
+	m_bg_tilemap[0]->set_scrollx(0, 4);
 }
 
 /***************************************************************************

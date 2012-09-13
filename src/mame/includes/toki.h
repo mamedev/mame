@@ -37,11 +37,12 @@ public:
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/toki.c -----------*/
 
-VIDEO_START( toki );
+
 SCREEN_UPDATE_IND16( toki );
 SCREEN_UPDATE_IND16( tokib );

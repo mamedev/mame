@@ -20,9 +20,9 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( champbas )
+PALETTE_INIT_MEMBER(champbas_state,champbas)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -35,7 +35,7 @@ PALETTE_INIT( champbas )
 			2, &resistances_b[0],  bweights, 0, 0);
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x20);
+	machine().colortable = colortable_alloc(machine(), 0x20);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -60,7 +60,7 @@ PALETTE_INIT( champbas )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	color_prom += 0x20;
@@ -68,18 +68,18 @@ PALETTE_INIT( champbas )
 	for (i = 0; i < 0x200; i++)
 	{
 		UINT8 ctabentry = (color_prom[i & 0xff] & 0x0f) | ((i & 0x100) >> 4);
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 
 
-PALETTE_INIT( exctsccr )
+PALETTE_INIT_MEMBER(champbas_state,exctsccr)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x20);
+	machine().colortable = colortable_alloc(machine(), 0x20);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -105,7 +105,7 @@ PALETTE_INIT( exctsccr )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -116,14 +116,14 @@ PALETTE_INIT( exctsccr )
 	{
 		int swapped_i = BITSWAP8(i, 2, 7, 6, 5, 4, 3, 1, 0);
 		UINT8 ctabentry = (color_prom[swapped_i] & 0x0f) | ((i & 0x80) >> 3);
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	/* sprites (4bpp) */
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT8 ctabentry = (color_prom[0x100 + i] & 0x0f) | 0x10;
-		colortable_entry_set_value(machine.colortable, i + 0x100, ctabentry);
+		colortable_entry_set_value(machine().colortable, i + 0x100, ctabentry);
 	}
 }
 
@@ -147,16 +147,14 @@ TILE_GET_INFO_MEMBER(champbas_state::exctsccr_get_bg_tile_info)
 
 
 
-VIDEO_START( champbas )
+VIDEO_START_MEMBER(champbas_state,champbas)
 {
-	champbas_state *state = machine.driver_data<champbas_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(champbas_state::champbas_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(champbas_state::champbas_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-VIDEO_START( exctsccr )
+VIDEO_START_MEMBER(champbas_state,exctsccr)
 {
-	champbas_state *state = machine.driver_data<champbas_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(champbas_state::exctsccr_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(champbas_state::exctsccr_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

@@ -211,7 +211,6 @@ static MACHINE_CONFIG_START( bigstrkb, bigstrkb_state )
 
 	MCFG_PALETTE_LENGTH(0x400)
 
-	MCFG_VIDEO_START(bigstrkb)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 //  MCFG_SOUND_ADD("ymsnd", YM2151, ym2151_config)

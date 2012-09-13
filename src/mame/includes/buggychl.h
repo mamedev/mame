@@ -51,12 +51,16 @@ public:
 	DECLARE_WRITE8_MEMBER(port_b_0_w);
 	DECLARE_WRITE8_MEMBER(port_a_1_w);
 	DECLARE_WRITE8_MEMBER(port_b_1_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/buggychl.c -----------*/
 
 
-PALETTE_INIT( buggychl );
-VIDEO_START( buggychl );
+
+
 SCREEN_UPDATE_IND16( buggychl );

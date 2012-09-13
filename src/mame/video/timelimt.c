@@ -20,11 +20,11 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( timelimt ) {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+void timelimt_state::palette_init(){
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -43,7 +43,7 @@ PALETTE_INIT( timelimt ) {
 		bit1 = (*color_prom >> 7) & 0x01;
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -65,16 +65,15 @@ TILE_GET_INFO_MEMBER(timelimt_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, videoram[tile_index], 0, 0);
 }
 
-VIDEO_START( timelimt )
+void timelimt_state::video_start()
 {
-	timelimt_state *state = machine.driver_data<timelimt_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(timelimt_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(timelimt_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 		 8, 8, 64, 32);
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(timelimt_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(timelimt_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 /***************************************************************************/

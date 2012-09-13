@@ -79,6 +79,9 @@ public:
 	DECLARE_READ8_MEMBER(samcoupe_keyboard_r);
 	DECLARE_WRITE8_MEMBER(samcoupe_border_w);
 	DECLARE_READ8_MEMBER(samcoupe_attributes_r);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 
@@ -92,8 +95,8 @@ void samcoupe_irq(device_t *device, UINT8 src);
 void samcoupe_update_memory(address_space *space);
 UINT8 samcoupe_mouse_r(running_machine &machine);
 
-MACHINE_START( samcoupe );
-MACHINE_RESET( samcoupe );
+
+
 
 
 /*----------- defined in video/samcoupe.c -----------*/

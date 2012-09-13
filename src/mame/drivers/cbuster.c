@@ -302,25 +302,23 @@ static const deco16ic_interface twocrude_deco16ic_tilegen2_intf =
 	0,2,
 };
 
-static MACHINE_START( cbuster )
+void cbuster_state::machine_start()
 {
-	cbuster_state *state = machine.driver_data<cbuster_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_deco_tilegen1 = machine.device("tilegen1");
-	state->m_deco_tilegen2 = machine.device("tilegen2");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_deco_tilegen1 = machine().device("tilegen1");
+	m_deco_tilegen2 = machine().device("tilegen2");
 
-	state->save_item(NAME(state->m_prot));
-	state->save_item(NAME(state->m_pri));
+	save_item(NAME(m_prot));
+	save_item(NAME(m_pri));
 }
 
-static MACHINE_RESET( cbuster )
+void cbuster_state::machine_reset()
 {
-	cbuster_state *state = machine.driver_data<cbuster_state>();
 
-	state->m_prot = 0;
-	state->m_pri = 0;
+	m_prot = 0;
+	m_pri = 0;
 }
 
 static MACHINE_CONFIG_START( twocrude, cbuster_state )
@@ -333,8 +331,6 @@ static MACHINE_CONFIG_START( twocrude, cbuster_state )
 	MCFG_CPU_ADD("audiocpu", H6280,32220000/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(cbuster)
-	MCFG_MACHINE_RESET(cbuster)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -343,7 +339,6 @@ static MACHINE_CONFIG_START( twocrude, cbuster_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(twocrude)
-	MCFG_VIDEO_START(twocrude)
 
 	MCFG_GFXDECODE(cbuster)
 	MCFG_PALETTE_LENGTH(2048)

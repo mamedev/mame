@@ -3,14 +3,13 @@
 #include "includes/galpanic.h"
 
 
-VIDEO_START( galpanic )
+VIDEO_START_MEMBER(galpanic_state,galpanic)
 {
-	galpanic_state *state = machine.driver_data<galpanic_state>();
-	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
-	machine.primary_screen->register_screen_bitmap(state->m_sprites_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_sprites_bitmap);
 }
 
-PALETTE_INIT( galpanic )
+PALETTE_INIT_MEMBER(galpanic_state,galpanic)
 {
 	int i;
 
@@ -18,7 +17,7 @@ PALETTE_INIT( galpanic )
 
 	/* initialize 555 RGB lookup */
 	for (i = 0;i < 32768;i++)
-		palette_set_color_rgb(machine,i+1024,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
+		palette_set_color_rgb(machine(),i+1024,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
 }
 
 

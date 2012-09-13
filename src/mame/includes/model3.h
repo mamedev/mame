@@ -188,6 +188,15 @@ public:
 	DECLARE_DRIVER_INIT(dayto2pe);
 	DECLARE_DRIVER_INIT(spikeout);
 	DECLARE_DRIVER_INIT(model3_15);
+	virtual void video_start();
+	DECLARE_MACHINE_START(model3_10);
+	DECLARE_MACHINE_RESET(model3_10);
+	DECLARE_MACHINE_START(model3_15);
+	DECLARE_MACHINE_RESET(model3_15);
+	DECLARE_MACHINE_START(model3_20);
+	DECLARE_MACHINE_RESET(model3_20);
+	DECLARE_MACHINE_START(model3_21);
+	DECLARE_MACHINE_RESET(model3_21);
 };
 
 
@@ -207,7 +216,7 @@ void model3_tap_reset(running_machine &machine);
 /*----------- defined in video/model3.c -----------*/
 
 
-VIDEO_START(model3);
+
 SCREEN_UPDATE_IND16(model3);
 
 void real3d_display_list_end(running_machine &machine);

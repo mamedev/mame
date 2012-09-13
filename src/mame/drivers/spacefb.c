@@ -165,9 +165,9 @@ static void start_interrupt_timer(running_machine &machine)
  *
  *************************************/
 
-static MACHINE_START( spacefb )
+void spacefb_state::machine_start()
 {
-	create_interrupt_timer(machine);
+	create_interrupt_timer(machine());
 }
 
 
@@ -178,16 +178,15 @@ static MACHINE_START( spacefb )
  *
  *************************************/
 
-static MACHINE_RESET( spacefb )
+void spacefb_state::machine_reset()
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_IO);
-	spacefb_state *state = machine.driver_data<spacefb_state>();
+	address_space *space = machine().device("maincpu")->memory().space(AS_IO);
 	/* the 3 output ports are cleared on reset */
-	state->spacefb_port_0_w(*space, 0, 0);
-	state->spacefb_port_1_w(*space, 0, 0);
-	state->spacefb_port_2_w(*space, 0, 0);
+	spacefb_port_0_w(*space, 0, 0);
+	spacefb_port_1_w(*space, 0, 0);
+	spacefb_port_2_w(*space, 0, 0);
 
-	start_interrupt_timer(machine);
+	start_interrupt_timer(machine());
 }
 
 
@@ -341,11 +340,8 @@ static MACHINE_CONFIG_START( spacefb, spacefb_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(180))
 
-	MCFG_MACHINE_START(spacefb)
-	MCFG_MACHINE_RESET(spacefb)
 
 	/* video hardware */
-	MCFG_VIDEO_START(spacefb)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(SPACEFB_PIXEL_CLOCK, SPACEFB_HTOTAL, SPACEFB_HBEND, SPACEFB_HBSTART, SPACEFB_VTOTAL, SPACEFB_VBEND, SPACEFB_VBSTART)

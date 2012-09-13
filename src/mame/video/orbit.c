@@ -28,10 +28,9 @@ TILE_GET_INFO_MEMBER(orbit_state::get_tile_info)
 }
 
 
-VIDEO_START( orbit )
+void orbit_state::video_start()
 {
-	orbit_state *state = machine.driver_data<orbit_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(orbit_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 30);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(orbit_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 30);
 }
 
 

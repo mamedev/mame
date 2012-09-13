@@ -110,9 +110,9 @@ enum
 
 ***************************************************************************/
 
-PALETTE_INIT( tx1 )
+PALETTE_INIT_MEMBER(tx1_state,tx1)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	static const res_net_info tx1_net_info =
@@ -133,7 +133,7 @@ PALETTE_INIT( tx1 )
 		g = compute_res_net(color_prom[i + 0x400] & 0xf, 1, &tx1_net_info);
 		b = compute_res_net(color_prom[i + 0x500] & 0xf, 2, &tx1_net_info);
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -1102,22 +1102,21 @@ static void tx1_draw_objects(running_machine &machine, UINT8 *bitmap)
  *
  *************************************/
 
-VIDEO_START( tx1 )
+VIDEO_START_MEMBER(tx1_state,tx1)
 {
-	tx1_state *state = machine.driver_data<tx1_state>();
 	/* Allocate a large bitmap that covers the three screens */
-	state->m_bitmap = auto_bitmap_ind16_alloc(machine, 768, 256);
+	m_bitmap = auto_bitmap_ind16_alloc(machine(), 768, 256);
 
 	/* Allocate some bitmaps */
-	state->m_chr_bmp = auto_alloc_array(machine, UINT8, 256 * 3 * 240);
-	state->m_obj_bmp = auto_alloc_array(machine, UINT8, 256 * 3 * 240);
-	state->m_rod_bmp = auto_alloc_array(machine, UINT8, 256 * 3 * 240);
+	m_chr_bmp = auto_alloc_array(machine(), UINT8, 256 * 3 * 240);
+	m_obj_bmp = auto_alloc_array(machine(), UINT8, 256 * 3 * 240);
+	m_rod_bmp = auto_alloc_array(machine(), UINT8, 256 * 3 * 240);
 
 	/* Set a timer to run the interrupts */
-	state->m_interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_callback));
+	m_interrupt_timer = machine().scheduler().timer_alloc(FUNC(interrupt_callback));
 
 	/* /CUDISP CRTC interrupt */
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
+	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
 SCREEN_VBLANK( tx1 )
@@ -1247,9 +1246,9 @@ SCREEN_UPDATE_IND16( tx1_right )
 
 ***************************************************************************/
 
-PALETTE_INIT( buggyboy )
+PALETTE_INIT_MEMBER(tx1_state,buggyboy)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
@@ -1278,7 +1277,7 @@ PALETTE_INIT( buggyboy )
 		bit4 = BIT(color_prom[i + 0x300], 0);
 		b = 0x06 * bit4 + 0x0d * bit0 + 0x1e * bit1 + 0x41 * bit2 + 0x8a * bit3;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -2996,34 +2995,32 @@ static void bb_combine_layers(running_machine &machine, bitmap_ind16 &bitmap, in
 	}
 }
 
-VIDEO_START( buggyboy )
+VIDEO_START_MEMBER(tx1_state,buggyboy)
 {
-	tx1_state *state = machine.driver_data<tx1_state>();
 	/* Allocate some bitmaps */
-	state->m_chr_bmp = auto_alloc_array(machine, UINT8, 3 * 256 * 240);
-	state->m_obj_bmp = auto_alloc_array(machine, UINT8, 3 * 256 * 240);
-	state->m_rod_bmp = auto_alloc_array(machine, UINT8, 3 * 256 * 240);
+	m_chr_bmp = auto_alloc_array(machine(), UINT8, 3 * 256 * 240);
+	m_obj_bmp = auto_alloc_array(machine(), UINT8, 3 * 256 * 240);
+	m_rod_bmp = auto_alloc_array(machine(), UINT8, 3 * 256 * 240);
 
 	/* Set a timer to run the interrupts */
-	state->m_interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_callback));
+	m_interrupt_timer = machine().scheduler().timer_alloc(FUNC(interrupt_callback));
 
 	/* /CUDISP CRTC interrupt */
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
+	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
-VIDEO_START( buggybjr )
+VIDEO_START_MEMBER(tx1_state,buggybjr)
 {
-	tx1_state *state = machine.driver_data<tx1_state>();
 	/* Allocate some bitmaps */
-	state->m_chr_bmp = auto_alloc_array(machine, UINT8, 256 * 240);
-	state->m_obj_bmp = auto_alloc_array(machine, UINT8, 256 * 240);
-	state->m_rod_bmp = auto_alloc_array(machine, UINT8, 256 * 240);
+	m_chr_bmp = auto_alloc_array(machine(), UINT8, 256 * 240);
+	m_obj_bmp = auto_alloc_array(machine(), UINT8, 256 * 240);
+	m_rod_bmp = auto_alloc_array(machine(), UINT8, 256 * 240);
 
 	/* Set a timer to run the interrupts */
-	state->m_interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_callback));
+	m_interrupt_timer = machine().scheduler().timer_alloc(FUNC(interrupt_callback));
 
 	/* /CUDISP CRTC interrupt */
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
+	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
 SCREEN_VBLANK( buggyboy )

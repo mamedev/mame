@@ -63,6 +63,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_2);
 	TILE_GET_INFO_MEMBER(get_tile_info_3);
+	virtual void video_start();
 };
 
 
@@ -72,5 +73,5 @@ public:
 float lordgun_crosshair_mapper(const ioport_field *field, float linear_value);
 void lordgun_update_gun(running_machine &machine, int i);
 
-VIDEO_START( lordgun );
+
 SCREEN_UPDATE_IND16( lordgun );

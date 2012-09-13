@@ -77,19 +77,18 @@ WRITE16_MEMBER(thoop2_state::thoop2_vram_w)
 
 ***************************************************************************/
 
-VIDEO_START( thoop2 )
+void thoop2_state::video_start()
 {
-	thoop2_state *state = machine.driver_data<thoop2_state>();
 	int i;
 
-	state->m_pant[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(thoop2_state::get_tile_info_thoop2_screen0),state),TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_pant[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(thoop2_state::get_tile_info_thoop2_screen1),state),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_pant[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(thoop2_state::get_tile_info_thoop2_screen0),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_pant[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(thoop2_state::get_tile_info_thoop2_screen1),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 
-	state->m_pant[0]->set_transmask(0,0xff01,0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
-	state->m_pant[1]->set_transmask(0,0xff01,0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
+	m_pant[0]->set_transmask(0,0xff01,0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
+	m_pant[1]->set_transmask(0,0xff01,0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
 
 	for (i = 0; i < 5; i++){
-		state->m_sprite_table[i] = auto_alloc_array(machine, int, 512);
+		m_sprite_table[i] = auto_alloc_array(machine(), int, 512);
 	}
 }
 

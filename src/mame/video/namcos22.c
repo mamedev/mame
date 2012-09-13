@@ -2724,63 +2724,60 @@ static void namcos22_exit(running_machine &machine)
 	poly_free(state->m_poly);
 }
 
-static VIDEO_START( common )
+VIDEO_START_MEMBER(namcos22_state,common)
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
 	int code;
 
-	state->m_mix_bitmap = auto_bitmap_ind16_alloc(machine,640,480);
-	state->m_bgtilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos22_state::TextTilemapGetInfo),state),TILEMAP_SCAN_ROWS,16,16,64,64 );
-	state->m_bgtilemap->set_transparent_pen(0xf);
+	m_mix_bitmap = auto_bitmap_ind16_alloc(machine(),640,480);
+	m_bgtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos22_state::TextTilemapGetInfo),this),TILEMAP_SCAN_ROWS,16,16,64,64 );
+	m_bgtilemap->set_transparent_pen(0xf);
 
-	state->m_mbDSPisActive = 0;
-	memset( state->m_polygonram, 0xcc, 0x20000 );
+	m_mbDSPisActive = 0;
+	memset( m_polygonram, 0xcc, 0x20000 );
 
-	for (code = 0; code < machine.gfx[GFX_TEXTURE_TILE]->elements(); code++)
-		machine.gfx[GFX_TEXTURE_TILE]->decode(code);
+	for (code = 0; code < machine().gfx[GFX_TEXTURE_TILE]->elements(); code++)
+		machine().gfx[GFX_TEXTURE_TILE]->decode(code);
 
-	Prepare3dTexture(machine, state->memregion("textilemap")->base(), machine.gfx[GFX_TEXTURE_TILE]->get_data(0) );
-	state->m_dirtypal = auto_alloc_array(machine, UINT8, NAMCOS22_PALETTE_SIZE/4);
-	state->m_mPtRomSize = state->memregion("pointrom")->bytes()/3;
-	state->m_mpPolyL = state->memregion("pointrom")->base();
-	state->m_mpPolyM = state->m_mpPolyL + state->m_mPtRomSize;
-	state->m_mpPolyH = state->m_mpPolyM + state->m_mPtRomSize;
+	Prepare3dTexture(machine(), memregion("textilemap")->base(), machine().gfx[GFX_TEXTURE_TILE]->get_data(0) );
+	m_dirtypal = auto_alloc_array(machine(), UINT8, NAMCOS22_PALETTE_SIZE/4);
+	m_mPtRomSize = memregion("pointrom")->bytes()/3;
+	m_mpPolyL = memregion("pointrom")->base();
+	m_mpPolyM = m_mpPolyL + m_mPtRomSize;
+	m_mpPolyH = m_mpPolyM + m_mPtRomSize;
 
-	state->m_poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), 0);
-	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(namcos22_reset), &machine));
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(namcos22_exit), &machine));
+	m_poly = poly_alloc(machine(), 4000, sizeof(poly_extra_data), 0);
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(namcos22_reset), &machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(namcos22_exit), &machine()));
 
-	machine.gfx[GFX_CHAR]->set_source((UINT8 *)state->m_cgram.target());
+	machine().gfx[GFX_CHAR]->set_source((UINT8 *)m_cgram.target());
 }
 
-VIDEO_START( namcos22 )
+VIDEO_START_MEMBER(namcos22_state,namcos22)
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	state->m_mbSuperSystem22 = 0;
-	VIDEO_START_CALL(common);
+	m_mbSuperSystem22 = 0;
+	VIDEO_START_CALL_MEMBER(common);
 }
 
-VIDEO_START( namcos22s )
+VIDEO_START_MEMBER(namcos22_state,namcos22s)
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	state->m_mbSuperSystem22 = 1;
+	m_mbSuperSystem22 = 1;
 
 	// init spotram
-	state->m_spotram = auto_alloc_array(machine, UINT16, SPOTRAM_SIZE);
-	memset(state->m_spotram, 0, SPOTRAM_SIZE*2);
+	m_spotram = auto_alloc_array(machine(), UINT16, SPOTRAM_SIZE);
+	memset(m_spotram, 0, SPOTRAM_SIZE*2);
 
 	// init czram tables
 	int table;
 	for (table=0; table<4; table++)
 	{
-		state->m_banked_czram[table] = auto_alloc_array(machine, UINT16, 0x100);
-		memset(state->m_banked_czram[table], 0, 0x100*2);
-		state->m_recalc_czram[table] = auto_alloc_array(machine, UINT8, 0x2000);
-		memset(state->m_recalc_czram[table], 0, 0x2000);
-		state->m_cz_was_written[table] = 0;
+		m_banked_czram[table] = auto_alloc_array(machine(), UINT16, 0x100);
+		memset(m_banked_czram[table], 0, 0x100*2);
+		m_recalc_czram[table] = auto_alloc_array(machine(), UINT8, 0x2000);
+		memset(m_recalc_czram[table], 0, 0x2000);
+		m_cz_was_written[table] = 0;
 	}
 
-	VIDEO_START_CALL(common);
+	VIDEO_START_CALL_MEMBER(common);
 }
 
 SCREEN_UPDATE_RGB32( namcos22s )

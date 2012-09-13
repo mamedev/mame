@@ -282,100 +282,95 @@ static void expand_gfx1(metro_state &state)
 	}
 }
 
-VIDEO_START( metro_i4100 )
+VIDEO_START_MEMBER(metro_state,metro_i4100)
 {
-	metro_state *state = machine.driver_data<metro_state>();
-	expand_gfx1(*state);
+	expand_gfx1(*this);
 
-	state->m_support_8bpp = 0;
-	state->m_support_16x16 = 0;
-	state->m_has_zoom = 0;
+	m_support_8bpp = 0;
+	m_support_16x16 = 0;
+	m_has_zoom = 0;
 
-	state->m_bg_tilemap_enable[0] = 1;
-	state->m_bg_tilemap_enable[1] = 1;
-	state->m_bg_tilemap_enable[2] = 1;
+	m_bg_tilemap_enable[0] = 1;
+	m_bg_tilemap_enable[1] = 1;
+	m_bg_tilemap_enable[2] = 1;
 
-	state->m_bg_tilemap_enable16[0] = 0;
-	state->m_bg_tilemap_enable16[1] = 0;
-	state->m_bg_tilemap_enable16[2] = 0;
+	m_bg_tilemap_enable16[0] = 0;
+	m_bg_tilemap_enable16[1] = 0;
+	m_bg_tilemap_enable16[2] = 0;
 
-	state->m_bg_tilemap_scrolldx[0] = 0;
-	state->m_bg_tilemap_scrolldx[1] = 0;
-	state->m_bg_tilemap_scrolldx[2] = 0;
+	m_bg_tilemap_scrolldx[0] = 0;
+	m_bg_tilemap_scrolldx[1] = 0;
+	m_bg_tilemap_scrolldx[2] = 0;
 }
 
-VIDEO_START( metro_i4220 )
+VIDEO_START_MEMBER(metro_state,metro_i4220)
 {
-	metro_state *state = machine.driver_data<metro_state>();
-	expand_gfx1(*state);
+	expand_gfx1(*this);
 
-	state->m_support_8bpp = 1;
-	state->m_support_16x16 = 0;
-	state->m_has_zoom = 0;
+	m_support_8bpp = 1;
+	m_support_16x16 = 0;
+	m_has_zoom = 0;
 
-	state->m_bg_tilemap_enable[0] = 1;
-	state->m_bg_tilemap_enable[1] = 1;
-	state->m_bg_tilemap_enable[2] = 1;
+	m_bg_tilemap_enable[0] = 1;
+	m_bg_tilemap_enable[1] = 1;
+	m_bg_tilemap_enable[2] = 1;
 
-	state->m_bg_tilemap_enable16[0] = 0;
-	state->m_bg_tilemap_enable16[1] = 0;
-	state->m_bg_tilemap_enable16[2] = 0;
+	m_bg_tilemap_enable16[0] = 0;
+	m_bg_tilemap_enable16[1] = 0;
+	m_bg_tilemap_enable16[2] = 0;
 
-	state->m_bg_tilemap_scrolldx[0] = -2;
-	state->m_bg_tilemap_scrolldx[1] = -2;
-	state->m_bg_tilemap_scrolldx[2] = -2;
+	m_bg_tilemap_scrolldx[0] = -2;
+	m_bg_tilemap_scrolldx[1] = -2;
+	m_bg_tilemap_scrolldx[2] = -2;
 }
 
-VIDEO_START( metro_i4300 )
+VIDEO_START_MEMBER(metro_state,metro_i4300)
 {
-	metro_state *state = machine.driver_data<metro_state>();
-	expand_gfx1(*state);
+	expand_gfx1(*this);
 
-	state->m_support_8bpp = 1;
-	state->m_support_16x16 = 1;
-	state->m_has_zoom = 0;
+	m_support_8bpp = 1;
+	m_support_16x16 = 1;
+	m_has_zoom = 0;
 
-	state->m_bg_tilemap_enable[0] = 1;
-	state->m_bg_tilemap_enable[1] = 1;
-	state->m_bg_tilemap_enable[2] = 1;
+	m_bg_tilemap_enable[0] = 1;
+	m_bg_tilemap_enable[1] = 1;
+	m_bg_tilemap_enable[2] = 1;
 
-	state->m_bg_tilemap_enable16[0] = 0;
-	state->m_bg_tilemap_enable16[1] = 0;
-	state->m_bg_tilemap_enable16[2] = 0;
+	m_bg_tilemap_enable16[0] = 0;
+	m_bg_tilemap_enable16[1] = 0;
+	m_bg_tilemap_enable16[2] = 0;
 
-	state->m_bg_tilemap_scrolldx[0] = 0;
-	state->m_bg_tilemap_scrolldx[1] = 0;
-	state->m_bg_tilemap_scrolldx[2] = 0;
+	m_bg_tilemap_scrolldx[0] = 0;
+	m_bg_tilemap_scrolldx[1] = 0;
+	m_bg_tilemap_scrolldx[2] = 0;
 }
 
-VIDEO_START( blzntrnd )
+VIDEO_START_MEMBER(metro_state,blzntrnd)
 {
-	metro_state *state = machine.driver_data<metro_state>();
 
-	VIDEO_START_CALL(metro_i4220);
+	VIDEO_START_CALL_MEMBER(metro_i4220);
 
-	state->m_has_zoom = 1;
+	m_has_zoom = 1;
 
-	state->m_k053936_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(metro_state::metro_k053936_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 256, 512);
+	m_k053936_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(metro_state::metro_k053936_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 512);
 
-	state->m_bg_tilemap_scrolldx[0] = 8;
-	state->m_bg_tilemap_scrolldx[1] = 8;
-	state->m_bg_tilemap_scrolldx[2] = 8;
+	m_bg_tilemap_scrolldx[0] = 8;
+	m_bg_tilemap_scrolldx[1] = 8;
+	m_bg_tilemap_scrolldx[2] = 8;
 }
 
-VIDEO_START( gstrik2 )
+VIDEO_START_MEMBER(metro_state,gstrik2)
 {
-	metro_state *state = machine.driver_data<metro_state>();
 
-	VIDEO_START_CALL(metro_i4220);
+	VIDEO_START_CALL_MEMBER(metro_i4220);
 
-	state->m_has_zoom = 1;
+	m_has_zoom = 1;
 
-	state->m_k053936_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(metro_state::metro_k053936_gstrik2_get_tile_info),state), tilemap_mapper_delegate(FUNC(metro_state::tilemap_scan_gstrik2),state), 16, 16, 128, 256);
+	m_k053936_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(metro_state::metro_k053936_gstrik2_get_tile_info),this), tilemap_mapper_delegate(FUNC(metro_state::tilemap_scan_gstrik2),this), 16, 16, 128, 256);
 
-	state->m_bg_tilemap_scrolldx[0] = 8;
-	state->m_bg_tilemap_scrolldx[1] = 0;
-	state->m_bg_tilemap_scrolldx[2] = 8;
+	m_bg_tilemap_scrolldx[0] = 8;
+	m_bg_tilemap_scrolldx[1] = 0;
+	m_bg_tilemap_scrolldx[2] = 8;
 }
 
 /***************************************************************************

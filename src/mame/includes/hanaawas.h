@@ -26,6 +26,10 @@ public:
 	DECLARE_WRITE8_MEMBER(hanaawas_videoram_w);
 	DECLARE_WRITE8_MEMBER(hanaawas_colorram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -33,6 +37,6 @@ public:
 
 WRITE8_DEVICE_HANDLER( hanaawas_portB_w );
 
-PALETTE_INIT( hanaawas );
-VIDEO_START( hanaawas );
+
+
 SCREEN_UPDATE_IND16( hanaawas );

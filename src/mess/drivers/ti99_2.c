@@ -99,6 +99,8 @@ public:
 	DECLARE_READ8_MEMBER(ti99_2_read_misc_cru);
 	DECLARE_DRIVER_INIT(ti99_2_24);
 	DECLARE_DRIVER_INIT(ti99_2_32);
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 
@@ -118,14 +120,13 @@ DRIVER_INIT_MEMBER(ti99_2_state,ti99_2_32)
 #define TI99_2_32_ROMPAGE0 (machine().root_device().memregion("maincpu")->base()+0x4000)
 #define TI99_2_32_ROMPAGE1 (machine().root_device().memregion("maincpu")->base()+0x10000)
 
-static MACHINE_RESET( ti99_2 )
+void ti99_2_state::machine_reset()
 {
-	ti99_2_state *state = machine.driver_data<ti99_2_state>();
-	state->m_irq_state = ASSERT_LINE;
-	if (! state->m_ROM_paged)
-		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base()+0x4000);
+	m_irq_state = ASSERT_LINE;
+	if (! m_ROM_paged)
+		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base()+0x4000);
 	else
-		state->membank("bank1")->set_base((state->memregion("maincpu")->base()+0x4000));
+		membank("bank1")->set_base((memregion("maincpu")->base()+0x4000));
 }
 
 static INTERRUPT_GEN( ti99_2_vblank_interrupt )
@@ -149,10 +150,10 @@ static INTERRUPT_GEN( ti99_2_vblank_interrupt )
 */
 
 
-static PALETTE_INIT(ti99_2)
+void ti99_2_state::palette_init()
 {
-	palette_set_color(machine,0,RGB_WHITE); /* white */
-	palette_set_color(machine,1,RGB_BLACK); /* black */
+	palette_set_color(machine(),0,RGB_WHITE); /* white */
+	palette_set_color(machine(),1,RGB_BLACK); /* black */
 }
 
 
@@ -381,7 +382,6 @@ static MACHINE_CONFIG_START( ti99_2, ti99_2_state )
 	MCFG_CPU_IO_MAP(ti99_2_io)
 	MCFG_CPU_VBLANK_INT("screen", ti99_2_vblank_interrupt)
 
-	MCFG_MACHINE_RESET( ti99_2 )
 
 	/* video hardware */
 	/*MCFG_TMS9928A( &tms9918_interface )*/
@@ -394,7 +394,6 @@ static MACHINE_CONFIG_START( ti99_2, ti99_2_state )
 
 	MCFG_GFXDECODE(ti99_2)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(ti99_2)
 MACHINE_CONFIG_END
 
 

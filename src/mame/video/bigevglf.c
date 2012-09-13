@@ -49,22 +49,21 @@ READ8_MEMBER(bigevglf_state::bigevglf_vidram_r)
 	return m_vidram[0x10000 * m_plane_selected + m_vidram_bank + offset];
 }
 
-VIDEO_START( bigevglf )
+void bigevglf_state::video_start()
 {
-	bigevglf_state *state = machine.driver_data<bigevglf_state>();
 
-	machine.primary_screen->register_screen_bitmap(state->m_tmp_bitmap[0]);
-	machine.primary_screen->register_screen_bitmap(state->m_tmp_bitmap[1]);
-	machine.primary_screen->register_screen_bitmap(state->m_tmp_bitmap[2]);
-	machine.primary_screen->register_screen_bitmap(state->m_tmp_bitmap[3]);
-	state->save_item(NAME(state->m_tmp_bitmap[0]));
-	state->save_item(NAME(state->m_tmp_bitmap[1]));
-	state->save_item(NAME(state->m_tmp_bitmap[2]));
-	state->save_item(NAME(state->m_tmp_bitmap[3]));
+	machine().primary_screen->register_screen_bitmap(m_tmp_bitmap[0]);
+	machine().primary_screen->register_screen_bitmap(m_tmp_bitmap[1]);
+	machine().primary_screen->register_screen_bitmap(m_tmp_bitmap[2]);
+	machine().primary_screen->register_screen_bitmap(m_tmp_bitmap[3]);
+	save_item(NAME(m_tmp_bitmap[0]));
+	save_item(NAME(m_tmp_bitmap[1]));
+	save_item(NAME(m_tmp_bitmap[2]));
+	save_item(NAME(m_tmp_bitmap[3]));
 
-	state->m_vidram = auto_alloc_array(machine, UINT8, 0x100 * 0x100 * 4);
+	m_vidram = auto_alloc_array(machine(), UINT8, 0x100 * 0x100 * 4);
 
-	state->save_pointer(NAME(state->m_vidram), 0x100 * 0x100 * 4);
+	save_pointer(NAME(m_vidram), 0x100 * 0x100 * 4);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

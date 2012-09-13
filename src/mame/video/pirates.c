@@ -33,17 +33,16 @@ TILE_GET_INFO_MEMBER(pirates_state::get_bg_tile_info)
 
 /* video start / update */
 
-VIDEO_START(pirates)
+void pirates_state::video_start()
 {
-	pirates_state *state = machine.driver_data<pirates_state>();
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pirates_state::get_tx_tile_info),state),TILEMAP_SCAN_COLS,8,8,36,32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pirates_state::get_tx_tile_info),this),TILEMAP_SCAN_COLS,8,8,36,32);
 
 	/* Not sure how big they can be, Pirates uses only 32 columns, Genix 44 */
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pirates_state::get_fg_tile_info),state),TILEMAP_SCAN_COLS,8,8,64,32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pirates_state::get_bg_tile_info),state),TILEMAP_SCAN_COLS,     8,8,64,32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pirates_state::get_fg_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pirates_state::get_bg_tile_info),this),TILEMAP_SCAN_COLS,     8,8,64,32);
 
-	state->m_tx_tilemap->set_transparent_pen(0);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 

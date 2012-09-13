@@ -59,6 +59,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_videoram;
+	virtual void video_start();
 };
 
 
@@ -220,7 +221,7 @@ SCREEN_UPDATE_IND16( bmcpokr )
 	return 0;
 }
 
-VIDEO_START(bmcpokr)
+void bmcpokr_state::video_start()
 {
 
 }
@@ -242,7 +243,6 @@ static MACHINE_CONFIG_START( bmcpokr, bmcpokr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(bmcpokr)
 MACHINE_CONFIG_END
 
 

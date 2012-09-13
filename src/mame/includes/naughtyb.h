@@ -29,12 +29,14 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_DRIVER_INIT(trvmstr);
 	DECLARE_DRIVER_INIT(popflame);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/naughtyb.c -----------*/
 
 
-VIDEO_START( naughtyb );
-PALETTE_INIT( naughtyb );
+
+
 SCREEN_UPDATE_IND16( naughtyb );

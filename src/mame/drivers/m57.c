@@ -243,8 +243,6 @@ static MACHINE_CONFIG_START( m57, m57_state )
 	MCFG_GFXDECODE(m57)
 	MCFG_PALETTE_LENGTH(32*8+32*8)
 
-	MCFG_PALETTE_INIT(m57)
-	MCFG_VIDEO_START(m57)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(m52_sound_c_audio)

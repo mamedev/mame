@@ -83,15 +83,14 @@ static TIMER_CALLBACK(nmi_check_callback)
 	}
 }
 
-MACHINE_RESET( ondra )
+void ondra_state::machine_reset()
 {
-	ondra_state *state = machine.driver_data<ondra_state>();
-	state->m_bank1_status = 0;
-	state->m_bank2_status = 0;
-	ondra_update_banks(machine);
+	m_bank1_status = 0;
+	m_bank2_status = 0;
+	ondra_update_banks(machine());
 }
 
-MACHINE_START(ondra)
+void ondra_state::machine_start()
 {
-	machine.scheduler().timer_pulse(attotime::from_hz(10), FUNC(nmi_check_callback));
+	machine().scheduler().timer_pulse(attotime::from_hz(10), FUNC(nmi_check_callback));
 }

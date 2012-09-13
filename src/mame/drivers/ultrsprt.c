@@ -34,6 +34,7 @@ public:
 	DECLARE_READ16_MEMBER(K056800_68k_r);
 	DECLARE_WRITE16_MEMBER(K056800_68k_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(analog_ctrl_r);
+	virtual void machine_start();
 };
 
 
@@ -100,15 +101,14 @@ WRITE32_MEMBER(ultrsprt_state::int_ack_w)
 	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 }
 
-static MACHINE_START( ultrsprt )
+void ultrsprt_state::machine_start()
 {
-	ultrsprt_state *state = machine.driver_data<ultrsprt_state>();
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine.device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(machine().device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine.device("maincpu"), 0x80000000, 0x8007ffff, FALSE, state->m_vram);
-	ppcdrc_add_fastram(machine.device("maincpu"), 0xff000000, 0xff01ffff, FALSE, state->m_workram);
+	ppcdrc_add_fastram(machine().device("maincpu"), 0x80000000, 0x8007ffff, FALSE, m_vram);
+	ppcdrc_add_fastram(machine().device("maincpu"), 0xff000000, 0xff01ffff, FALSE, m_workram);
 }
 
 
@@ -236,7 +236,6 @@ static MACHINE_CONFIG_START( ultrsprt, ultrsprt_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
-	MCFG_MACHINE_START(ultrsprt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

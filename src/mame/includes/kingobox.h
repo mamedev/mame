@@ -50,16 +50,22 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(ringking_get_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	DECLARE_VIDEO_START(kingofb);
+	DECLARE_PALETTE_INIT(kingofb);
+	DECLARE_VIDEO_START(ringking);
+	DECLARE_PALETTE_INIT(ringking);
 };
 
 
 /*----------- defined in video/kingobox.c -----------*/
 
 
-PALETTE_INIT( kingofb );
-VIDEO_START( kingofb );
+
+
 SCREEN_UPDATE_IND16( kingofb );
 
-PALETTE_INIT( ringking );
-VIDEO_START( ringking );
+
+
 SCREEN_UPDATE_IND16( ringking );

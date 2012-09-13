@@ -309,28 +309,26 @@ WRITE8_MEMBER(twincobr_state::wardner_coin_dsp_w)
 }
 
 
-MACHINE_RESET( twincobr )
+MACHINE_RESET_MEMBER(twincobr_state,twincobr)
 {
-	twincobr_state *state = machine.driver_data<twincobr_state>();
 
-	state->m_toaplan_main_cpu = 0;		/* 68000 */
-	twincobr_display(machine, 0);
-	state->m_intenable = 0;
-	state->m_dsp_addr_w = 0;
-	state->m_main_ram_seg = 0;
-	state->m_dsp_execute = 0;
-	state->m_dsp_BIO = CLEAR_LINE;
-	state->m_wardner_membank = 0;
-	state->m_fsharkbt_8741 = -1;
+	m_toaplan_main_cpu = 0;		/* 68000 */
+	twincobr_display(machine(), 0);
+	m_intenable = 0;
+	m_dsp_addr_w = 0;
+	m_main_ram_seg = 0;
+	m_dsp_execute = 0;
+	m_dsp_BIO = CLEAR_LINE;
+	m_wardner_membank = 0;
+	m_fsharkbt_8741 = -1;
 }
 
-MACHINE_RESET( wardner )
+MACHINE_RESET_MEMBER(twincobr_state,wardner)
 {
-	MACHINE_RESET_CALL(twincobr);
+	MACHINE_RESET_CALL_MEMBER(twincobr);
 
-	twincobr_state *state = machine.driver_data<twincobr_state>();
-	state->m_toaplan_main_cpu = 1;		/* Z80 */
-	twincobr_display(machine, 1);
+	m_toaplan_main_cpu = 1;		/* Z80 */
+	twincobr_display(machine(), 1);
 }
 
 void twincobr_driver_savestate(running_machine &machine)

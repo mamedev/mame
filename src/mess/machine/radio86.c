@@ -176,14 +176,13 @@ WRITE8_MEMBER(radio86_state::radio_io_w)
 	machine().device("maincpu")->memory().space(AS_PROGRAM)->write_byte((offset << 8) + offset,data);
 }
 
-MACHINE_RESET( radio86 )
+MACHINE_RESET_MEMBER(radio86_state,radio86)
 {
-	radio86_state *state = machine.driver_data<radio86_state>();
-	machine.scheduler().timer_set(attotime::from_usec(10), FUNC(radio86_reset));
-	state->membank("bank1")->set_entry(1);
+	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(radio86_reset));
+	membank("bank1")->set_entry(1);
 
-	state->m_keyboard_mask = 0;
-	state->m_disk_sel = 0;
+	m_keyboard_mask = 0;
+	m_disk_sel = 0;
 }
 
 

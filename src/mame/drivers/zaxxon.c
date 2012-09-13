@@ -321,14 +321,13 @@ WRITE8_MEMBER(zaxxon_state::int_enable_w)
  *
  *************************************/
 
-static MACHINE_START( zaxxon )
+void zaxxon_state::machine_start()
 {
-	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 
 	/* register for save states */
-	state->save_item(NAME(state->m_int_enabled));
-	state->save_item(NAME(state->m_coin_status));
-	state->save_item(NAME(state->m_coin_enable));
+	save_item(NAME(m_int_enabled));
+	save_item(NAME(m_coin_status));
+	save_item(NAME(m_coin_enable));
 }
 
 
@@ -965,7 +964,6 @@ static MACHINE_CONFIG_START( root, zaxxon_state )
 	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
 	MCFG_CPU_VBLANK_INT("screen", vblank_int)
 
-	MCFG_MACHINE_START(zaxxon)
 
 	MCFG_I8255A_ADD( "ppi8255", zaxxon_ppi_intf )
 
@@ -977,8 +975,6 @@ static MACHINE_CONFIG_START( root, zaxxon_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(zaxxon)
 
-	MCFG_PALETTE_INIT(zaxxon)
-	MCFG_VIDEO_START(zaxxon)
 MACHINE_CONFIG_END
 
 
@@ -1010,7 +1006,7 @@ static MACHINE_CONFIG_DERIVED( razmataz, root )
 	MCFG_DEVICE_REMOVE("ppi8255")
 
 	/* video hardware */
-	MCFG_VIDEO_START(razmataz)
+	MCFG_VIDEO_START_OVERRIDE(zaxxon_state,razmataz)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(razmataz)
 
@@ -1034,7 +1030,7 @@ static MACHINE_CONFIG_DERIVED( congo, root )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(512)
-	MCFG_VIDEO_START(congo)
+	MCFG_VIDEO_START_OVERRIDE(zaxxon_state,congo)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(congo)
 

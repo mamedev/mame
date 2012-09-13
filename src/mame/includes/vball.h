@@ -30,12 +30,13 @@ public:
 	DECLARE_WRITE8_MEMBER(vb_attrib_w);
 	TILEMAP_MAPPER_MEMBER(background_scan);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/vball.c -----------*/
 
-VIDEO_START( vb );
+
 SCREEN_UPDATE_IND16( vb );
 void vb_bgprombank_w(running_machine &machine, int bank);
 void vb_spprombank_w(running_machine &machine, int bank);

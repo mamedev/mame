@@ -274,35 +274,33 @@ TIMER_DEVICE_CALLBACK( nitedrvr_crash_toggle_callback )
 	}
 }
 
-MACHINE_START( nitedrvr )
+void nitedrvr_state::machine_start()
 {
-	nitedrvr_state *state = machine.driver_data<nitedrvr_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_discrete = machine.device("discrete");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_discrete = machine().device("discrete");
 
-	state->save_item(NAME(state->m_gear));
-	state->save_item(NAME(state->m_track));
-	state->save_item(NAME(state->m_steering_buf));
-	state->save_item(NAME(state->m_steering_val));
-	state->save_item(NAME(state->m_crash_en));
-	state->save_item(NAME(state->m_crash_data));
-	state->save_item(NAME(state->m_crash_data_en));
-	state->save_item(NAME(state->m_ac_line));
-	state->save_item(NAME(state->m_last_steering_val));
+	save_item(NAME(m_gear));
+	save_item(NAME(m_track));
+	save_item(NAME(m_steering_buf));
+	save_item(NAME(m_steering_val));
+	save_item(NAME(m_crash_en));
+	save_item(NAME(m_crash_data));
+	save_item(NAME(m_crash_data_en));
+	save_item(NAME(m_ac_line));
+	save_item(NAME(m_last_steering_val));
 }
 
-MACHINE_RESET( nitedrvr )
+void nitedrvr_state::machine_reset()
 {
-	nitedrvr_state *state = machine.driver_data<nitedrvr_state>();
 
-	state->m_gear = 1;
-	state->m_track = 0;
-	state->m_steering_buf = 0;
-	state->m_steering_val = 0;
-	state->m_crash_en = 0;
-	state->m_crash_data = 0x0f;
-	state->m_crash_data_en = 0;
-	state->m_ac_line = 0;
-	state->m_last_steering_val = 0;
+	m_gear = 1;
+	m_track = 0;
+	m_steering_buf = 0;
+	m_steering_val = 0;
+	m_crash_en = 0;
+	m_crash_data = 0x0f;
+	m_crash_data_en = 0;
+	m_ac_line = 0;
+	m_last_steering_val = 0;
 }

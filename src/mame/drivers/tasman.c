@@ -35,15 +35,16 @@ public:
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_WRITE8_MEMBER(kongambl_ff_w);
 	DECLARE_DRIVER_INIT(kingtut);
+	DECLARE_VIDEO_START(kongambl);
 };
 
 
-static VIDEO_START(kongambl)
+VIDEO_START_MEMBER(kongambl_state,kongambl)
 {
 	#if CUSTOM_DRAW
 
 	#else
-	device_t *k056832 = machine.device("k056832");
+	device_t *k056832 = machine().device("k056832");
 
 	k056832_set_layer_association(k056832, 0);
 	k056832_set_layer_offs(k056832, 0, -2, 0);
@@ -610,7 +611,7 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 
 	MCFG_PALETTE_LENGTH(0x8000)
 
-	MCFG_VIDEO_START(kongambl)
+	MCFG_VIDEO_START_OVERRIDE(kongambl_state,kongambl)
 
 	MCFG_K053247_ADD("k053246", k053247_intf)
 	#if CUSTOM_DRAW

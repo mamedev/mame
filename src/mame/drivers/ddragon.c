@@ -145,41 +145,39 @@ static TIMER_DEVICE_CALLBACK( ddragon_scanline )
  *
  *************************************/
 
-static MACHINE_START( ddragon )
+MACHINE_START_MEMBER(ddragon_state,ddragon)
 {
-	ddragon_state *state = machine.driver_data<ddragon_state>();
 
 	/* configure banks */
-	state->membank("bank1")->configure_entries(0, 8, state->memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_sub_cpu = machine.device("sub");
-	state->m_snd_cpu = machine.device("soundcpu");
-	state->m_adpcm_1 = machine.device("adpcm1");
-	state->m_adpcm_2 = machine.device("adpcm2");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_sub_cpu = machine().device("sub");
+	m_snd_cpu = machine().device("soundcpu");
+	m_adpcm_1 = machine().device("adpcm1");
+	m_adpcm_2 = machine().device("adpcm2");
 
 	/* register for save states */
-	state->save_item(NAME(state->m_dd_sub_cpu_busy));
-	state->save_item(NAME(state->m_scrollx_hi));
-	state->save_item(NAME(state->m_scrolly_hi));
-	state->save_item(NAME(state->m_adpcm_pos));
-	state->save_item(NAME(state->m_adpcm_end));
-	state->save_item(NAME(state->m_adpcm_idle));
-	state->save_item(NAME(state->m_adpcm_data));
+	save_item(NAME(m_dd_sub_cpu_busy));
+	save_item(NAME(m_scrollx_hi));
+	save_item(NAME(m_scrolly_hi));
+	save_item(NAME(m_adpcm_pos));
+	save_item(NAME(m_adpcm_end));
+	save_item(NAME(m_adpcm_idle));
+	save_item(NAME(m_adpcm_data));
 }
 
 
-static MACHINE_RESET( ddragon )
+MACHINE_RESET_MEMBER(ddragon_state,ddragon)
 {
-	ddragon_state *state = machine.driver_data<ddragon_state>();
 
-	state->m_dd_sub_cpu_busy = 1;
-	state->m_adpcm_pos[0] = state->m_adpcm_pos[1] = 0;
-	state->m_adpcm_end[0] = state->m_adpcm_end[1] = 0;
-	state->m_adpcm_idle[0] = state->m_adpcm_idle[1] = 1;
-	state->m_adpcm_data[0] = state->m_adpcm_data[1] = -1;
-	state->m_scrollx_hi = 0;
-	state->m_scrolly_hi = 0;
+	m_dd_sub_cpu_busy = 1;
+	m_adpcm_pos[0] = m_adpcm_pos[1] = 0;
+	m_adpcm_end[0] = m_adpcm_end[1] = 0;
+	m_adpcm_idle[0] = m_adpcm_idle[1] = 1;
+	m_adpcm_data[0] = m_adpcm_data[1] = -1;
+	m_scrollx_hi = 0;
+	m_scrolly_hi = 0;
 }
 
 
@@ -978,8 +976,8 @@ static MACHINE_CONFIG_START( ddragon, ddragon_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))	/* heavy interleaving to sync up sprite<->main cpu's */
 
-	MCFG_MACHINE_START(ddragon)
-	MCFG_MACHINE_RESET(ddragon)
+	MCFG_MACHINE_START_OVERRIDE(ddragon_state,ddragon)
+	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
 
 	/* video hardware */
 	MCFG_GFXDECODE(ddragon)
@@ -989,7 +987,7 @@ static MACHINE_CONFIG_START( ddragon, ddragon_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(ddragon)
 
-	MCFG_VIDEO_START(ddragon)
+	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1041,8 +1039,8 @@ static MACHINE_CONFIG_START( ddragon6809, ddragon_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
-	MCFG_MACHINE_START(ddragon)
-	MCFG_MACHINE_RESET(ddragon)
+	MCFG_MACHINE_START_OVERRIDE(ddragon_state,ddragon)
+	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
 
 	/* video hardware */
 	MCFG_GFXDECODE(ddragon)
@@ -1052,7 +1050,7 @@ static MACHINE_CONFIG_START( ddragon6809, ddragon_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(ddragon)
 
-	MCFG_VIDEO_START(ddragon)
+	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1087,8 +1085,8 @@ static MACHINE_CONFIG_START( ddragon2, ddragon_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
-	MCFG_MACHINE_START(ddragon)
-	MCFG_MACHINE_RESET(ddragon)
+	MCFG_MACHINE_START_OVERRIDE(ddragon_state,ddragon)
+	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
 
 	/* video hardware */
 	MCFG_GFXDECODE(ddragon)
@@ -1098,7 +1096,7 @@ static MACHINE_CONFIG_START( ddragon2, ddragon_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(ddragon)
 
-	MCFG_VIDEO_START(ddragon)
+	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

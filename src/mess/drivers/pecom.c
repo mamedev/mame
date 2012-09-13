@@ -182,8 +182,6 @@ static MACHINE_CONFIG_START( pecom64, pecom_state )
 	MCFG_CPU_IO_MAP(pecom64_io)
 	MCFG_CPU_CONFIG(pecom64_cdp1802_config)
 
-	MCFG_MACHINE_START( pecom )
-	MCFG_MACHINE_RESET( pecom )
 
 	// sound and video hardware
 

@@ -43,12 +43,15 @@ public:
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILEMAP_MAPPER_MEMBER(atarigx2_playfield_scan);
+	DECLARE_MACHINE_START(atarigx2);
+	DECLARE_MACHINE_RESET(atarigx2);
+	DECLARE_VIDEO_START(atarigx2);
 };
 
 
 /*----------- defined in video/atarigx2.c -----------*/
 
-VIDEO_START( atarigx2 );
+
 SCREEN_VBLANK( atarigx2 );
 SCREEN_UPDATE_IND16( atarigx2 );
 

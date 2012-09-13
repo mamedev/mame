@@ -53,10 +53,11 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	DECLARE_DRIVER_INIT(tcl);
+	virtual void video_start();
 };
 
 
-static VIDEO_START( tcl )
+void tcl_state::video_start()
 {
 }
 static SCREEN_UPDATE_IND16( tcl )
@@ -139,7 +140,6 @@ static MACHINE_CONFIG_START( tcl, tcl_state )
 	MCFG_GFXDECODE(tcl)
 	MCFG_PALETTE_LENGTH(16*16)
 
-	MCFG_VIDEO_START(tcl)
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )

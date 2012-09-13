@@ -444,7 +444,6 @@ static MACHINE_CONFIG_START( stfight, stfight_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_RESET(stfight)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -457,8 +456,6 @@ static MACHINE_CONFIG_START( stfight, stfight_state )
 	MCFG_GFXDECODE(stfight)
 	MCFG_PALETTE_LENGTH(16*4+16*16+16*16+16*16)
 
-	MCFG_PALETTE_INIT(stfight)
-	MCFG_VIDEO_START(stfight)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

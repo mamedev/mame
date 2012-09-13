@@ -87,12 +87,20 @@ public:
 	DECLARE_DRIVER_INIT(undoukai);
 	DECLARE_DRIVER_INIT(40love);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_MACHINE_START(40love);
+	DECLARE_MACHINE_RESET(40love);
+	DECLARE_MACHINE_START(undoukai);
+	DECLARE_MACHINE_RESET(undoukai);
+	DECLARE_MACHINE_RESET(common);
+	DECLARE_MACHINE_RESET(ta7630);
 };
 
 
 /*----------- defined in video/40love.c -----------*/
 
 
-VIDEO_START( fortyl );
+
 SCREEN_UPDATE_IND16( fortyl );
-PALETTE_INIT( fortyl );
+

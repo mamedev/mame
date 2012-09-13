@@ -280,39 +280,37 @@ static const k051316_interface overdriv_k051316_intf_2 =
 };
 
 
-static MACHINE_START( overdriv )
+void overdriv_state::machine_start()
 {
-	overdriv_state *state = machine.driver_data<overdriv_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_subcpu = machine.device<cpu_device>("sub");
-	state->m_k051316_1 = machine.device("k051316_1");
-	state->m_k051316_2 = machine.device("k051316_2");
-	state->m_k053260_1 = machine.device("k053260_1");
-	state->m_k053260_2 = machine.device("k053260_2");
-	state->m_k053246 = machine.device("k053246");
-	state->m_k053251 = machine.device("k053251");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_subcpu = machine().device<cpu_device>("sub");
+	m_k051316_1 = machine().device("k051316_1");
+	m_k051316_2 = machine().device("k051316_2");
+	m_k053260_1 = machine().device("k053260_1");
+	m_k053260_2 = machine().device("k053260_2");
+	m_k053246 = machine().device("k053246");
+	m_k053251 = machine().device("k053251");
 
-	state->save_item(NAME(state->m_cpuB_ctrl));
-	state->save_item(NAME(state->m_sprite_colorbase));
-	state->save_item(NAME(state->m_zoom_colorbase));
-	state->save_item(NAME(state->m_road_colorbase));
+	save_item(NAME(m_cpuB_ctrl));
+	save_item(NAME(m_sprite_colorbase));
+	save_item(NAME(m_zoom_colorbase));
+	save_item(NAME(m_road_colorbase));
 }
 
-static MACHINE_RESET( overdriv )
+void overdriv_state::machine_reset()
 {
-	overdriv_state *state = machine.driver_data<overdriv_state>();
 
-	state->m_cpuB_ctrl = 0;
-	state->m_sprite_colorbase = 0;
-	state->m_zoom_colorbase[0] = 0;
-	state->m_zoom_colorbase[1] = 0;
-	state->m_road_colorbase[0] = 0;
-	state->m_road_colorbase[1] = 0;
+	m_cpuB_ctrl = 0;
+	m_sprite_colorbase = 0;
+	m_zoom_colorbase[0] = 0;
+	m_zoom_colorbase[1] = 0;
+	m_road_colorbase[0] = 0;
+	m_road_colorbase[1] = 0;
 
 	/* start with cpu B halted */
-	machine.device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static const k053252_interface overdriv_k053252_intf =
@@ -345,8 +343,6 @@ static MACHINE_CONFIG_START( overdriv, overdriv_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
-	MCFG_MACHINE_START(overdriv)
-	MCFG_MACHINE_RESET(overdriv)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 	MCFG_EEPROM_DATA(overdriv_default_eeprom, 128)

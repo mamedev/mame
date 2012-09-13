@@ -86,6 +86,10 @@ public:
 	DECLARE_WRITE8_MEMBER(payout_w);
 	DECLARE_WRITE8_MEMBER(ay8910_outputa_w);
 	DECLARE_WRITE8_MEMBER(ay8910_outputb_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -93,7 +97,7 @@ public:
                            Video Hardware
 **********************************************************************/
 
-static VIDEO_START( supdrapo )
+void supdrapo_state::video_start()
 {
 }
 
@@ -126,9 +130,9 @@ static SCREEN_UPDATE_IND16( supdrapo )
 
 
 /*Maybe bit 2 & 3 of the second color prom are intensity bits? */
-static PALETTE_INIT( sdpoker )
+void supdrapo_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int	bit0, bit1, bit2 , r, g, b;
 	int	i;
 
@@ -149,7 +153,7 @@ static PALETTE_INIT( sdpoker )
 		bit2 = (color_prom[0x100] >> 1) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 }
@@ -237,15 +241,14 @@ WRITE8_MEMBER(supdrapo_state::payout_w)
                         Machine Start & Reset
 **********************************************************************/
 
-static MACHINE_START( supdrapo )
+void supdrapo_state::machine_start()
 {
 }
 
 
-static MACHINE_RESET( supdrapo )
+void supdrapo_state::machine_reset()
 {
-	supdrapo_state *state = machine.driver_data<supdrapo_state>();
-	state->m_wdog = 1;
+	m_wdog = 1;
 }
 
 
@@ -444,8 +447,6 @@ static MACHINE_CONFIG_START( supdrapo, supdrapo_state )
 	MCFG_CPU_PROGRAM_MAP(sdpoker_mem)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(supdrapo)
-	MCFG_MACHINE_RESET(supdrapo)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -459,9 +460,7 @@ static MACHINE_CONFIG_START( supdrapo, supdrapo_state )
 
 	MCFG_GFXDECODE(supdrapo)
 	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT(sdpoker)
 
-	MCFG_VIDEO_START(supdrapo)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

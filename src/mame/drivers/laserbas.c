@@ -56,15 +56,17 @@ public:
 	DECLARE_WRITE8_MEMBER(vrambank_w);
 	DECLARE_READ8_MEMBER(protram_r);
 	DECLARE_WRITE8_MEMBER(protram_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
-static VIDEO_START(laserbas)
+void laserbas_state::video_start()
 {
-	laserbas_state *state = machine.driver_data<laserbas_state>();
 
-	state->save_item(NAME(state->m_vram1));
-	state->save_item(NAME(state->m_vram2));
+	save_item(NAME(m_vram1));
+	save_item(NAME(m_vram2));
 }
 
 static SCREEN_UPDATE_IND16(laserbas)
@@ -229,20 +231,18 @@ static INPUT_PORTS_START( laserbas )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_START( laserbas )
+void laserbas_state::machine_start()
 {
-	laserbas_state *state = machine.driver_data<laserbas_state>();
 
-	state->save_item(NAME(state->m_vrambank));
-	state->save_item(NAME(state->m_count));
+	save_item(NAME(m_vrambank));
+	save_item(NAME(m_count));
 }
 
-static MACHINE_RESET( laserbas )
+void laserbas_state::machine_reset()
 {
-	laserbas_state *state = machine.driver_data<laserbas_state>();
 
-	state->m_vrambank = 0;
-	state->m_count = 0;
+	m_vrambank = 0;
+	m_count = 0;
 }
 
 static const mc6845_interface mc6845_intf =
@@ -313,8 +313,6 @@ static MACHINE_CONFIG_START( laserbas, laserbas_state )
 	MCFG_PIT8253_ADD("pit0", laserbas_pit8253_intf_0)
 	MCFG_PIT8253_ADD("pit1", laserbas_pit8253_intf_1)
 
-	MCFG_MACHINE_START(laserbas)
-	MCFG_MACHINE_RESET(laserbas)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -326,7 +324,6 @@ static MACHINE_CONFIG_START( laserbas, laserbas_state )
 	MCFG_MC6845_ADD("crtc", H46505, 3000000/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 
 	MCFG_PALETTE_LENGTH(32)
-	MCFG_VIDEO_START(laserbas)
 MACHINE_CONFIG_END
 
 /*

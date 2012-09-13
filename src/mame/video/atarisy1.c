@@ -120,7 +120,7 @@ TILE_GET_INFO_MEMBER(atarisy1_state::get_playfield_tile_info)
  *
  *************************************/
 
-VIDEO_START( atarisy1 )
+VIDEO_START_MEMBER(atarisy1_state,atarisy1)
 {
 	static const atarimo_desc modesc =
 	{
@@ -159,24 +159,23 @@ VIDEO_START( atarisy1 )
 		0					/* callback routine for special entries */
 	};
 
-	atarisy1_state *state = machine.driver_data<atarisy1_state>();
 	UINT16 motable[256];
 	UINT16 *codelookup;
 	UINT8 *colorlookup, *gfxlookup;
 	int i, size;
 
 	/* first decode the graphics */
-	decode_gfx(machine, state->m_playfield_lookup, motable);
+	decode_gfx(machine(), m_playfield_lookup, motable);
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(atarisy1_state::get_playfield_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 64,64);
+	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atarisy1_state::get_playfield_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,64);
 
 	/* initialize the motion objects */
-	atarimo_init(machine, 0, &modesc);
+	atarimo_init(machine(), 0, &modesc);
 
 	/* initialize the alphanumerics */
-	state->m_alpha_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(atarisy1_state::get_alpha_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 64,32);
-	state->m_alpha_tilemap->set_transparent_pen(0);
+	m_alpha_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atarisy1_state::get_alpha_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,32);
+	m_alpha_tilemap->set_transparent_pen(0);
 
 	/* modify the motion object code lookup */
 	codelookup = atarimo_get_code_lookup(0, &size);
@@ -194,12 +193,12 @@ VIDEO_START( atarisy1 )
 
 	/* reset the statics */
 	atarimo_set_yscroll(0, 256);
-	state->m_next_timer_scanline = -1;
+	m_next_timer_scanline = -1;
 
 	/* save state */
-	state->save_item(NAME(state->m_playfield_tile_bank));
-	state->save_item(NAME(state->m_playfield_priority_pens));
-	state->save_item(NAME(state->m_next_timer_scanline));
+	save_item(NAME(m_playfield_tile_bank));
+	save_item(NAME(m_playfield_priority_pens));
+	save_item(NAME(m_next_timer_scanline));
 }
 
 

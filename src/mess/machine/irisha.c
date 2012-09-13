@@ -25,15 +25,14 @@ static TIMER_CALLBACK( irisha_key )
 	state->m_keyboard_cnt = 0;
 }
 
-MACHINE_START( irisha )
+void irisha_state::machine_start()
 {
-	machine.scheduler().timer_pulse(attotime::from_msec(30), FUNC(irisha_key));
+	machine().scheduler().timer_pulse(attotime::from_msec(30), FUNC(irisha_key));
 }
 
-MACHINE_RESET( irisha )
+void irisha_state::machine_reset()
 {
-	irisha_state *state = machine.driver_data<irisha_state>();
-	state->m_keypressed = 0;
+	m_keypressed = 0;
 }
 
 void irisha_state::update_speaker()

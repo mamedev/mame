@@ -287,16 +287,15 @@ static void nbmj8991_gfxdraw(running_machine &machine)
 
 
 ******************************************************************************/
-VIDEO_START( nbmj8991 )
+VIDEO_START_MEMBER(nbmj8991_state,nbmj8991)
 {
-	nbmj8991_state *state = machine.driver_data<nbmj8991_state>();
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
 
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap);
-	state->m_videoram = auto_alloc_array(machine, UINT8, width * height);
-	state->m_clut = auto_alloc_array(machine, UINT8, 0x800);
-	memset(state->m_videoram, 0x00, (width * height * sizeof(UINT8)));
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmap);
+	m_videoram = auto_alloc_array(machine(), UINT8, width * height);
+	m_clut = auto_alloc_array(machine(), UINT8, 0x800);
+	memset(m_videoram, 0x00, (width * height * sizeof(UINT8)));
 }
 
 SCREEN_UPDATE_IND16( nbmj8991_type1 )

@@ -98,11 +98,14 @@ public:
 	DECLARE_READ8_MEMBER(backupram_dsw_r);
 	DECLARE_WRITE8_MEMBER(sys_port1_w);
 	DECLARE_WRITE8_MEMBER(fdc_irq_vector_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 
-static VIDEO_START( pc88va )
+void pc88va_state::video_start()
 {
 
 }
@@ -1525,40 +1528,38 @@ static const struct pic8259_interface pc88va_pic8259_slave_config =
 	DEVCB_NULL
 };
 
-static MACHINE_START( pc88va )
+void pc88va_state::machine_start()
 {
-	pc88va_state *state = machine.driver_data<pc88va_state>();
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(pc88va_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(pc88va_irq_callback);
 
-	state->m_t3_mouse_timer = machine.scheduler().timer_alloc(FUNC(t3_mouse_callback));
-	state->m_t3_mouse_timer->adjust(attotime::never);
+	m_t3_mouse_timer = machine().scheduler().timer_alloc(FUNC(t3_mouse_callback));
+	m_t3_mouse_timer->adjust(attotime::never);
 }
 
-static MACHINE_RESET( pc88va )
+void pc88va_state::machine_reset()
 {
-	pc88va_state *state = machine.driver_data<pc88va_state>();
-	UINT8 *ROM00 = machine.root_device().memregion("rom00")->base();
-	UINT8 *ROM10 = state->memregion("rom10")->base();
+	UINT8 *ROM00 = machine().root_device().memregion("rom00")->base();
+	UINT8 *ROM10 = memregion("rom10")->base();
 
-	state->membank("rom10_bank")->set_base(&ROM10[0x00000]);
-	state->membank("rom00_bank")->set_base(&ROM00[0x00000]);
+	membank("rom10_bank")->set_base(&ROM10[0x00000]);
+	membank("rom00_bank")->set_base(&ROM00[0x00000]);
 
-	state->m_bank_reg = 0x4100;
-	state->m_backupram_wp = 1;
+	m_bank_reg = 0x4100;
+	m_backupram_wp = 1;
 
 	/* default palette */
 	{
 		UINT8 i;
 		for(i=0;i<32;i++)
-			palette_set_color_rgb(machine,i,pal1bit((i & 2) >> 1),pal1bit((i & 4) >> 2),pal1bit(i & 1));
+			palette_set_color_rgb(machine(),i,pal1bit((i & 2) >> 1),pal1bit((i & 4) >> 2),pal1bit(i & 1));
 	}
 
-	state->m_tsp.tvram_vreg_offset = 0;
+	m_tsp.tvram_vreg_offset = 0;
 
-	state->m_fdc_mode = 0;
-	state->m_fdc_irq_opcode = 0x00; //0x7f ld a,a !
+	m_fdc_mode = 0;
+	m_fdc_irq_opcode = 0x00; //0x7f ld a,a !
 
-	machine.device("fdccpu")->execute().set_input_line_vector(0, 0);
+	machine().device("fdccpu")->execute().set_input_line_vector(0, 0);
 }
 
 static INTERRUPT_GEN( pc88va_vrtc_irq )
@@ -1671,13 +1672,10 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_SCREEN_UPDATE_STATIC( pc88va )
 
 	MCFG_PALETTE_LENGTH(32)
-//  MCFG_PALETTE_INIT( pc8801 )
+//  MCFG_PALETTE_INIT_OVERRIDE(pc88va_state, pc8801 )
 	MCFG_GFXDECODE( pc88va )
 
-	MCFG_VIDEO_START( pc88va )
 
-	MCFG_MACHINE_START( pc88va )
-	MCFG_MACHINE_RESET( pc88va )
 
 	MCFG_I8255_ADD( "d8255_2", master_fdd_intf )
 	MCFG_I8255_ADD( "d8255_3", r232c_ctrl_intf )

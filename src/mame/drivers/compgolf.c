@@ -223,26 +223,24 @@ static const ym2203_interface ym2203_config =
  *
  *************************************/
 
-static MACHINE_START( compgolf )
+void compgolf_state::machine_start()
 {
-	compgolf_state *state = machine.driver_data<compgolf_state>();
 
-	state->save_item(NAME(state->m_bank));
-	state->save_item(NAME(state->m_scrollx_lo));
-	state->save_item(NAME(state->m_scrollx_hi));
-	state->save_item(NAME(state->m_scrolly_lo));
-	state->save_item(NAME(state->m_scrolly_hi));
+	save_item(NAME(m_bank));
+	save_item(NAME(m_scrollx_lo));
+	save_item(NAME(m_scrollx_hi));
+	save_item(NAME(m_scrolly_lo));
+	save_item(NAME(m_scrolly_hi));
 }
 
-static MACHINE_RESET( compgolf )
+void compgolf_state::machine_reset()
 {
-	compgolf_state *state = machine.driver_data<compgolf_state>();
 
-	state->m_bank = -1;
-	state->m_scrollx_lo = 0;
-	state->m_scrollx_hi = 0;
-	state->m_scrolly_lo = 0;
-	state->m_scrolly_hi = 0;
+	m_bank = -1;
+	m_scrollx_lo = 0;
+	m_scrollx_hi = 0;
+	m_scrolly_lo = 0;
+	m_scrolly_hi = 0;
 }
 
 static MACHINE_CONFIG_START( compgolf, compgolf_state )
@@ -252,8 +250,6 @@ static MACHINE_CONFIG_START( compgolf, compgolf_state )
 	MCFG_CPU_PROGRAM_MAP(compgolf_map)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MCFG_MACHINE_START(compgolf)
-	MCFG_MACHINE_RESET(compgolf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -264,10 +260,8 @@ static MACHINE_CONFIG_START( compgolf, compgolf_state )
 	MCFG_SCREEN_UPDATE_STATIC(compgolf)
 
 	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT(compgolf)
 	MCFG_GFXDECODE(compgolf)
 
-	MCFG_VIDEO_START(compgolf)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

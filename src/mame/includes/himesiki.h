@@ -30,11 +30,14 @@ public:
 	DECLARE_WRITE8_MEMBER(himesiki_scrollx_w);
 	DECLARE_WRITE8_MEMBER(himesiki_flip_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/himesiki.c -----------*/
 
-VIDEO_START( himesiki );
+
 SCREEN_UPDATE_IND16( himesiki );
 

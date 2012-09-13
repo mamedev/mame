@@ -83,6 +83,12 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_0_8bit);
 	TILE_GET_INFO_MEMBER(get_tile_info_1_8bit);
 	TILE_GET_INFO_MEMBER(get_tile_info_2_8bit);
+	virtual void machine_reset();
+	DECLARE_MACHINE_START(hyprduel);
+	DECLARE_VIDEO_START(hyprduel_14220);
+	DECLARE_MACHINE_START(magerror);
+	DECLARE_VIDEO_START(magerror_14220);
+	DECLARE_VIDEO_START(common_14220);
 };
 
 
@@ -91,6 +97,6 @@ public:
 
 
 
-VIDEO_START( hyprduel_14220 );
-VIDEO_START( magerror_14220 );
+
+
 SCREEN_UPDATE_IND16( hyprduel );

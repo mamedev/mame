@@ -30,15 +30,14 @@ TILE_GET_INFO_MEMBER(crshrace_state::get_tile_info2)
 
 ***************************************************************************/
 
-VIDEO_START( crshrace )
+void crshrace_state::video_start()
 {
-	crshrace_state *state = machine.driver_data<crshrace_state>();
 
-	state->m_tilemap1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(crshrace_state::get_tile_info1),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_tilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(crshrace_state::get_tile_info2),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(crshrace_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(crshrace_state::get_tile_info2),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
-	state->m_tilemap1->set_transparent_pen(0x0f);
-	state->m_tilemap2->set_transparent_pen(0xff);
+	m_tilemap1->set_transparent_pen(0x0f);
+	m_tilemap2->set_transparent_pen(0xff);
 }
 
 

@@ -75,15 +75,14 @@ READ16_MEMBER(lethalj_state::lethalj_gun_r)
  *
  *************************************/
 
-VIDEO_START( lethalj )
+void lethalj_state::video_start()
 {
-	lethalj_state *state = machine.driver_data<lethalj_state>();
 	/* allocate video RAM for screen */
-	state->m_screenram = auto_alloc_array(machine, UINT16, BLITTER_DEST_WIDTH * BLITTER_DEST_HEIGHT);
+	m_screenram = auto_alloc_array(machine(), UINT16, BLITTER_DEST_WIDTH * BLITTER_DEST_HEIGHT);
 
 	/* predetermine blitter info */
-	state->m_blitter_base = (UINT16 *)state->memregion("gfx1")->base();
-	state->m_blitter_rows = state->memregion("gfx1")->bytes() / (2*BLITTER_SOURCE_WIDTH);
+	m_blitter_base = (UINT16 *)memregion("gfx1")->base();
+	m_blitter_rows = memregion("gfx1")->bytes() / (2*BLITTER_SOURCE_WIDTH);
 }
 
 

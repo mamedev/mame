@@ -50,6 +50,8 @@ public:
 	DECLARE_DRIVER_INIT(elim2);
 	DECLARE_DRIVER_INIT(tacscan);
 	DECLARE_DRIVER_INIT(spacfury);
+	virtual void machine_start();
+	virtual void video_start();
 };
 
 
@@ -59,5 +61,5 @@ public:
 
 /*----------- defined in video/segag80v.c -----------*/
 
-VIDEO_START( segag80v );
+
 SCREEN_UPDATE_RGB32( segag80v );

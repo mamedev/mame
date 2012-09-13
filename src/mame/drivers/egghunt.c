@@ -76,6 +76,9 @@ public:
 	DECLARE_READ8_MEMBER(egghunt_okibanking_r);
 	DECLARE_WRITE8_MEMBER(egghunt_okibanking_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -168,14 +171,13 @@ WRITE8_MEMBER(egghunt_state::egghunt_atram_w)
 }
 
 
-static VIDEO_START(egghunt)
+void egghunt_state::video_start()
 {
-	egghunt_state *state = machine.driver_data<egghunt_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(egghunt_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(egghunt_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	state->save_item(NAME(state->m_bgram));
-	state->save_item(NAME(state->m_spram));
+	save_item(NAME(m_bgram));
+	save_item(NAME(m_spram));
 }
 
 static SCREEN_UPDATE_IND16(egghunt)
@@ -387,23 +389,21 @@ static GFXDECODE_START( egghunt )
 GFXDECODE_END
 
 
-static MACHINE_START( egghunt )
+void egghunt_state::machine_start()
 {
-	egghunt_state *state = machine.driver_data<egghunt_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_gfx_banking));
-	state->save_item(NAME(state->m_okibanking));
-	state->save_item(NAME(state->m_vidram_bank));
+	save_item(NAME(m_gfx_banking));
+	save_item(NAME(m_okibanking));
+	save_item(NAME(m_vidram_bank));
 }
 
-static MACHINE_RESET( egghunt )
+void egghunt_state::machine_reset()
 {
-	egghunt_state *state = machine.driver_data<egghunt_state>();
-	state->m_gfx_banking = 0;
-	state->m_okibanking = 0;
-	state->m_vidram_bank = 0;
+	m_gfx_banking = 0;
+	m_okibanking = 0;
+	m_vidram_bank = 0;
 }
 
 static MACHINE_CONFIG_START( egghunt, egghunt_state )
@@ -417,8 +417,6 @@ static MACHINE_CONFIG_START( egghunt, egghunt_state )
 	MCFG_CPU_ADD("audiocpu", Z80,12000000/2)		 /* 6 MHz ?*/
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(egghunt)
-	MCFG_MACHINE_RESET(egghunt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -431,7 +429,6 @@ static MACHINE_CONFIG_START( egghunt, egghunt_state )
 	MCFG_GFXDECODE(egghunt)
 	MCFG_PALETTE_LENGTH(0x400)
 
-	MCFG_VIDEO_START(egghunt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

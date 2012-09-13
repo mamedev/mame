@@ -26,10 +26,11 @@ public:
 	DECLARE_WRITE16_MEMBER(shangha3_blitter_go_w);
 	DECLARE_DRIVER_INIT(shangha3);
 	DECLARE_DRIVER_INIT(heberpop);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/shangha3.c -----------*/
 
-VIDEO_START( shangha3 );
+
 SCREEN_UPDATE_IND16( shangha3 );

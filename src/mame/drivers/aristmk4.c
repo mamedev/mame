@@ -316,17 +316,22 @@ public:
 	DECLARE_READ8_MEMBER(pb1_r);
 	DECLARE_READ8_MEMBER(pc1_r);
 	DECLARE_DRIVER_INIT(aristmk4);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_PALETTE_INIT(lions);
 };
 
 /* Partial Cashcade protocol */
 static const UINT8 cashcade_p[] ={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xf0};
 
-static VIDEO_START(aristmk4)
+void aristmk4_state::video_start()
 {
 	int tile;
-	for (tile = 0; tile < machine.gfx[0]->elements(); tile++)
+	for (tile = 0; tile < machine().gfx[0]->elements(); tile++)
 	{
-		machine.gfx[0]->decode(tile);
+		machine().gfx[0]->decode(tile);
 	}
 }
 
@@ -1597,12 +1602,12 @@ static I8255A_INTERFACE( ppi8255_intf )
 
 
 /* same as Casino Winner HW */
-static PALETTE_INIT( aristmk4 )
+void aristmk4_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -1618,7 +1623,7 @@ static PALETTE_INIT( aristmk4 )
 		bit2 = (color_prom[0] >> 7) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 }
@@ -1630,24 +1635,23 @@ DRIVER_INIT_MEMBER(aristmk4_state,aristmk4)
 	m_nvram = auto_alloc_array(machine(), UINT8, 0x1000);
 }
 
-static MACHINE_START( aristmk4 )
+void aristmk4_state::machine_start()
 {
-	aristmk4_state *state = machine.driver_data<aristmk4_state>();
 
-	state->m_samples = machine.device<samples_device>("samples");
-	state_save_register_global_pointer(machine, state->m_nvram, 0x1000); // state->m_nvram
+	m_samples = machine().device<samples_device>("samples");
+	state_save_register_global_pointer(machine(), m_nvram, 0x1000); // m_nvram
 }
 
-static MACHINE_RESET( aristmk4 )
+void aristmk4_state::machine_reset()
 {
 	/* mark 4 has a link on the motherboard to switch between 1.5MHz and 3MHz clock speed */
-	switch(machine.root_device().ioport("LK13")->read())  // CPU speed control... 3mhz or 1.5MHz
+	switch(machine().root_device().ioport("LK13")->read())  // CPU speed control... 3mhz or 1.5MHz
 	{
 	case 0x00:
-		machine.device("maincpu")->set_unscaled_clock(MAIN_CLOCK/4);  // 3 MHz
+		machine().device("maincpu")->set_unscaled_clock(MAIN_CLOCK/4);  // 3 MHz
 		break;
 	case 0x10:
-		machine.device("maincpu")->set_unscaled_clock(MAIN_CLOCK/8);  // 1.5 MHz
+		machine().device("maincpu")->set_unscaled_clock(MAIN_CLOCK/8);  // 1.5 MHz
 		break;
 	}
 }
@@ -1682,8 +1686,6 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_CPU_PROGRAM_MAP(aristmk4_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(aristmk4)
-	MCFG_MACHINE_RESET(aristmk4 )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_TIMER_ADD_PERIODIC("power_fail", aristmk4_pf,attotime::from_hz(1)) // not real but required to simulate power failure to access robot test. How else can we do this ?
 
@@ -1696,9 +1698,7 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 
 	MCFG_GFXDECODE(aristmk4)
 	MCFG_PALETTE_LENGTH(512)
-	MCFG_PALETTE_INIT(aristmk4)
 
-	MCFG_VIDEO_START(aristmk4)
 	MCFG_SCREEN_UPDATE_STATIC(aristmk4)
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf )
@@ -1731,11 +1731,11 @@ static MACHINE_CONFIG_DERIVED( aristmk4_poker, aristmk4 )
 MACHINE_CONFIG_END
 
 /* same as Aristocrat Mark-IV HW color offset 7 */
-static PALETTE_INIT( lions )
+PALETTE_INIT_MEMBER(aristmk4_state,lions)
 {
 	int i;
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0,bit1,r,g,b;
 
@@ -1749,12 +1749,12 @@ static PALETTE_INIT( lions )
 		bit1 = (i >> 5) & 0x01;
 		r = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
 static MACHINE_CONFIG_DERIVED( 86lions, aristmk4 )
-	MCFG_PALETTE_INIT(lions)
+	MCFG_PALETTE_INIT_OVERRIDE(aristmk4_state,lions)
 MACHINE_CONFIG_END
 
 ROM_START( 3bagflvt )

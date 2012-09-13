@@ -143,6 +143,11 @@ public:
 	TILE_GET_INFO_MEMBER(get_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	DECLARE_MACHINE_RESET(raiden2);
+	DECLARE_VIDEO_START(raiden2);
+	DECLARE_MACHINE_RESET(zeroteam);
+	DECLARE_MACHINE_RESET(xsedae);
+	DECLARE_MACHINE_RESET(raidendx);
 };
 
 

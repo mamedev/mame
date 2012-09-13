@@ -77,15 +77,21 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info_raiga);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	DECLARE_MACHINE_START(raiga);
+	DECLARE_MACHINE_RESET(raiga);
+	DECLARE_VIDEO_START(gaiden);
+	DECLARE_VIDEO_START(drgnbowl);
+	DECLARE_VIDEO_START(mastninj);
+	DECLARE_VIDEO_START(raiga);
 };
 
 
 /*----------- defined in video/gaiden.c -----------*/
 
-VIDEO_START( gaiden );
-VIDEO_START( raiga );
-VIDEO_START( drgnbowl );
-VIDEO_START( mastninj );
+
+
+
+
 
 SCREEN_UPDATE_RGB32( gaiden );
 SCREEN_UPDATE_RGB32( raiga );

@@ -42,12 +42,18 @@ public:
 	DECLARE_DRIVER_INIT(gigasb);
 	DECLARE_DRIVER_INIT(pbillrds);
 	TILE_GET_INFO_MEMBER(get_freek_tile_info);
+	virtual void video_start();
+	DECLARE_MACHINE_START(pbillrd);
+	DECLARE_MACHINE_RESET(freekick);
+	DECLARE_MACHINE_START(freekick);
+	DECLARE_MACHINE_START(oigas);
+	DECLARE_MACHINE_RESET(oigas);
 };
 
 
 /*----------- defined in video/freekick.c -----------*/
 
-VIDEO_START(freekick);
+
 SCREEN_UPDATE_IND16(gigas);
 SCREEN_UPDATE_IND16(pbillrd);
 SCREEN_UPDATE_IND16(freekick);

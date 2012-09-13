@@ -4,13 +4,12 @@
 
 /******************************************************************/
 
-VIDEO_START( groundfx )
+void groundfx_state::video_start()
 {
-	groundfx_state *state = machine.driver_data<groundfx_state>();
-	state->m_spritelist = auto_alloc_array(machine, struct tempsprite, 0x4000);
+	m_spritelist = auto_alloc_array(machine(), struct tempsprite, 0x4000);
 
 	/* Hack */
-	state->m_hack_cliprect.set(69, 250, 24 + 5, 24 + 44);
+	m_hack_cliprect.set(69, 250, 24 + 5, 24 + 44);
 }
 
 /***************************************************************

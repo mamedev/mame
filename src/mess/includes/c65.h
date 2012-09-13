@@ -62,6 +62,8 @@ public:
 
 	DECLARE_READ8_MEMBER( sid_potx_r );
 	DECLARE_READ8_MEMBER( sid_poty_r );
+	DECLARE_MACHINE_START(c65);
+	DECLARE_PALETTE_INIT(c65);
 };
 
 
@@ -82,7 +84,7 @@ int c65_dma_read_color(running_machine &machine, int offset);
 void c65_vic_interrupt(running_machine &machine, int level);
 void c65_bankswitch_interface(running_machine &machine, int value);
 
-MACHINE_START( c65 );
+
 INTERRUPT_GEN( c65_frame_interrupt );
 
 extern const mos6526_interface c65_cia0;

@@ -142,25 +142,25 @@ void mac_scsi_irq(running_machine &machine, int state);
 void mac_asc_irq(device_t *device, int state);
 void mac_fdc_set_enable_lines(device_t *device, int enable_mask);
 
-MACHINE_START( macscsi );
-MACHINE_START( mac );
-MACHINE_RESET( mac );
+
+
+
 
 
 NVRAM_HANDLER( mac );
 
 /*----------- defined in video/mac.c -----------*/
 
-VIDEO_START( mac );
-VIDEO_START( macrbv );
-VIDEO_START( macv8 );
-VIDEO_START( macsonora );
-VIDEO_START( macdafb );
 
-VIDEO_RESET(macrbv);
-VIDEO_RESET(macdafb);
-VIDEO_RESET(maceagle);
-VIDEO_RESET(macsonora);
+
+
+
+
+
+
+
+
+
 
 SCREEN_UPDATE_IND16( mac );
 SCREEN_UPDATE_IND16( macse30 );
@@ -172,8 +172,8 @@ SCREEN_UPDATE_RGB32( macrbvvram );
 SCREEN_UPDATE_RGB32( macdafb );
 SCREEN_UPDATE_RGB32( macpbwd );
 
-PALETTE_INIT( mac );
-PALETTE_INIT( macgsc );
+
+
 
 /*----------- defined in audio/mac.c -----------*/
 
@@ -501,6 +501,18 @@ public:
 	DECLARE_DRIVER_INIT(macpm7100);
 	DECLARE_DRIVER_INIT(macpm8100);
 	DECLARE_DRIVER_INIT(macpb100);
+	DECLARE_VIDEO_START(mac);
+	DECLARE_PALETTE_INIT(mac);
+	DECLARE_VIDEO_START(macprtb);
+	DECLARE_PALETTE_INIT(macgsc);
+	DECLARE_VIDEO_START(macsonora);
+	DECLARE_VIDEO_RESET(macrbv);
+	DECLARE_VIDEO_START(macdafb);
+	DECLARE_VIDEO_RESET(macdafb);
+	DECLARE_VIDEO_START(macv8);
+	DECLARE_VIDEO_RESET(macsonora);
+	DECLARE_VIDEO_RESET(maceagle);
+	DECLARE_VIDEO_START(macrbv);
 };
 
 #endif /* MAC_H_ */

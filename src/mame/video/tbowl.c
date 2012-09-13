@@ -187,16 +187,15 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 /*** Video Start / Update ***/
 
-VIDEO_START( tbowl )
+void tbowl_state::video_start()
 {
-	tbowl_state *state = machine.driver_data<tbowl_state>();
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tbowl_state::get_tx_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tbowl_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16,128,32);
-	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tbowl_state::get_bg2_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16,128,32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tbowl_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tbowl_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,128,32);
+	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tbowl_state::get_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,128,32);
 
-	state->m_tx_tilemap->set_transparent_pen(0);
-	state->m_bg_tilemap->set_transparent_pen(0);
-	state->m_bg2_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_bg2_tilemap->set_transparent_pen(0);
 }
 
 

@@ -108,6 +108,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(deco16_scan_rows);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -137,13 +140,12 @@ TILEMAP_MAPPER_MEMBER(silvmil_state::deco16_scan_rows)
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5) + ((row & 0x20) << 6);
 }
 
-VIDEO_START( silvmil )
+void silvmil_state::video_start()
 {
-	silvmil_state *state = machine.driver_data<silvmil_state>();
-	state->m_bg_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(silvmil_state::get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(silvmil_state::deco16_scan_rows),state), 16, 16, 64, 32);
-	state->m_fg_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(silvmil_state::get_fg_tile_info),state), tilemap_mapper_delegate(FUNC(silvmil_state::deco16_scan_rows),state), 16, 16, 64, 32);
+	m_bg_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(silvmil_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(silvmil_state::deco16_scan_rows),this), 16, 16, 64, 32);
+	m_fg_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(silvmil_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(silvmil_state::deco16_scan_rows),this), 16, 16, 64, 32);
 
-	state->m_fg_layer->set_transparent_pen(0);
+	m_fg_layer->set_transparent_pen(0);
 }
 
 SCREEN_UPDATE_IND16( silvmil )
@@ -273,19 +275,18 @@ static GFXDECODE_START( silvmil )
 GFXDECODE_END
 
 
-static MACHINE_START( silvmil )
+void silvmil_state::machine_start()
 {
 
 }
 
-static MACHINE_RESET( silvmil )
+void silvmil_state::machine_reset()
 {
-	silvmil_state *state = machine.driver_data<silvmil_state>();
-	state->m_silvmil_tilebank[0] = 0;
-	state->m_silvmil_tilebank[1] = 0;
-	state->m_silvmil_tilebank[2] = 0;
-	state->m_silvmil_tilebank[3] = 0;
-	state->m_whichbank = 0;
+	m_silvmil_tilebank[0] = 0;
+	m_silvmil_tilebank[1] = 0;
+	m_silvmil_tilebank[2] = 0;
+	m_silvmil_tilebank[3] = 0;
+	m_whichbank = 0;
 }
 
 
@@ -322,8 +323,6 @@ static MACHINE_CONFIG_START( silvmil, silvmil_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4_096MHz) // 4.096MHz or 3.579545MHz - Need to verify
 	MCFG_CPU_PROGRAM_MAP(silvmil_sound_map)
 
-	MCFG_MACHINE_START(silvmil)
-	MCFG_MACHINE_RESET(silvmil)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -336,7 +335,6 @@ static MACHINE_CONFIG_START( silvmil, silvmil_state )
 	MCFG_PALETTE_LENGTH(0x300)
 	MCFG_GFXDECODE(silvmil)
 
-	MCFG_VIDEO_START(silvmil)
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 0);

@@ -45,12 +45,13 @@ public:
 	DECLARE_READ8_MEMBER(sound_test_r);
 	DECLARE_WRITE16_MEMBER(main_sound_latch_w);
 	DECLARE_WRITE8_MEMBER(bingoc_play_w);
+	virtual void video_start();
 };
 
 
 #define SOUND_TEST 0
 
-static VIDEO_START(bingoc)
+void bingoc_state::video_start()
 {
 
 }
@@ -163,7 +164,6 @@ static MACHINE_CONFIG_START( bingoc, bingoc_state )
 
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(bingoc)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") //might just be mono...
 

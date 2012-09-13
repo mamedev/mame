@@ -46,6 +46,9 @@ public:
 	DECLARE_READ8_MEMBER(spacefb_audio_t0_r);
 	DECLARE_READ8_MEMBER(spacefb_audio_t1_r);
 	DECLARE_WRITE8_MEMBER(spacefb_port_1_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -57,6 +60,6 @@ MACHINE_CONFIG_EXTERN( spacefb_audio );
 
 /*----------- defined in video/spacefb.c -----------*/
 
-VIDEO_START( spacefb );
+
 SCREEN_UPDATE_RGB32( spacefb );
 

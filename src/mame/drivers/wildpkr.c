@@ -173,6 +173,9 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	DECLARE_DRIVER_INIT(wildpkr);
+	virtual void machine_start();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -180,7 +183,7 @@ public:
 *     Video Hardware     *
 *************************/
 
-static VIDEO_START( wildpkr )
+void wildpkr_state::video_start()
 {
 }
 
@@ -190,7 +193,7 @@ static SCREEN_UPDATE_IND16( wildpkr )
 	return 0;
 }
 
-static PALETTE_INIT( wildpkr )
+void wildpkr_state::palette_init()
 {
 }
 
@@ -237,7 +240,7 @@ INPUT_PORTS_END
 *     Machine Start      *
 *************************/
 
-static MACHINE_START(wildpkr)
+void wildpkr_state::machine_start()
 {
 /*
   ACRTC memory:
@@ -275,7 +278,6 @@ static MACHINE_CONFIG_START( wildpkr, wildpkr_state )
 	MCFG_CPU_PROGRAM_MAP(wildpkr_map)
 //  MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)   //guess
 
-	MCFG_MACHINE_START(wildpkr)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -287,10 +289,8 @@ static MACHINE_CONFIG_START( wildpkr, wildpkr_state )
 //  MCFG_HD63484_ADD("hd63484", wildpkr_hd63484_intf)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
-	MCFG_PALETTE_INIT(wildpkr)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(wildpkr)
 
 MACHINE_CONFIG_END
 

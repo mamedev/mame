@@ -48,6 +48,10 @@ public:
 	DECLARE_WRITE8_MEMBER(jr200_border_col_w);
 	DECLARE_READ8_MEMBER(mn1271_io_r);
 	DECLARE_WRITE8_MEMBER(mn1271_io_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -109,7 +113,7 @@ static const UINT8 jr200_keycodes[4][9][8] =
 };
 
 
-static VIDEO_START( jr200 )
+void jr200_state::video_start()
 {
 }
 
@@ -452,12 +456,12 @@ static INPUT_PORTS_START( jr200 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RIGHT CTRL") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
 INPUT_PORTS_END
 
-static PALETTE_INIT( jr200 )
+void jr200_state::palette_init()
 {
 	int i;
 
 	for (i = 0; i < 8; i++)
-		palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+		palette_set_color_rgb(machine(), i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
 static const gfx_layout tiles8x8_layout =
@@ -476,27 +480,25 @@ static GFXDECODE_START( jr200 )
 	GFXDECODE_ENTRY( "pcg", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_START(jr200)
+void jr200_state::machine_start()
 {
-	jr200_state *state = machine.driver_data<jr200_state>();
-	beep_set_frequency(machine.device(BEEPER_TAG),0);
-	beep_set_state(machine.device(BEEPER_TAG),0);
-	state->m_timer_d = machine.scheduler().timer_alloc(FUNC(timer_d_callback));
+	beep_set_frequency(machine().device(BEEPER_TAG),0);
+	beep_set_state(machine().device(BEEPER_TAG),0);
+	m_timer_d = machine().scheduler().timer_alloc(FUNC(timer_d_callback));
 }
 
-static MACHINE_RESET(jr200)
+void jr200_state::machine_reset()
 {
-	jr200_state *state = machine.driver_data<jr200_state>();
-	UINT8 *gfx_rom = machine.root_device().memregion("gfx_rom")->base();
-	UINT8 *gfx_ram = state->memregion("gfx_ram")->base();
+	UINT8 *gfx_rom = machine().root_device().memregion("gfx_rom")->base();
+	UINT8 *gfx_ram = memregion("gfx_ram")->base();
 	int i;
-	memset(state->m_mn1271_ram,0,0x800);
+	memset(m_mn1271_ram,0,0x800);
 
 	for(i=0;i<0x800;i++)
 		gfx_ram[i] = gfx_rom[i];
 
 	for(i=0;i<0x800;i+=8)
-		machine.gfx[0]->mark_dirty(i >> 3);
+		machine().gfx[0]->mark_dirty(i >> 3);
 }
 
 
@@ -507,8 +509,6 @@ static MACHINE_CONFIG_START( jr200, jr200_state )
 
 //  MCFG_CPU_ADD("mn1544", MN1544, ?)
 
-	MCFG_MACHINE_START(jr200)
-	MCFG_MACHINE_RESET(jr200)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -520,9 +520,7 @@ static MACHINE_CONFIG_START( jr200, jr200_state )
 
 	MCFG_GFXDECODE(jr200)
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(jr200)
 
-	MCFG_VIDEO_START(jr200)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

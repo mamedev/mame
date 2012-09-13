@@ -293,27 +293,25 @@ GFXDECODE_END
 
 
 
-static MACHINE_START( ohmygod )
+void ohmygod_state::machine_start()
 {
-	ohmygod_state *state = machine.driver_data<ohmygod_state>();
 
-	state->save_item(NAME(state->m_spritebank));
-	state->save_item(NAME(state->m_scrollx));
-	state->save_item(NAME(state->m_scrolly));
-	state->save_item(NAME(state->m_sndbank));
+	save_item(NAME(m_spritebank));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
+	save_item(NAME(m_sndbank));
 }
 
-static MACHINE_RESET( ohmygod )
+void ohmygod_state::machine_reset()
 {
-	ohmygod_state *state = machine.driver_data<ohmygod_state>();
-	UINT8 *rom = state->memregion("oki")->base();
+	UINT8 *rom = memregion("oki")->base();
 
-	state->m_sndbank = 0;
-	memcpy(rom + 0x20000, rom + 0x40000 + 0x20000 * state->m_sndbank, 0x20000);
+	m_sndbank = 0;
+	memcpy(rom + 0x20000, rom + 0x40000 + 0x20000 * m_sndbank, 0x20000);
 
-	state->m_spritebank = 0;
-	state->m_scrollx = 0;
-	state->m_scrolly = 0;
+	m_spritebank = 0;
+	m_scrollx = 0;
+	m_scrolly = 0;
 }
 
 static MACHINE_CONFIG_START( ohmygod, ohmygod_state )
@@ -325,8 +323,6 @@ static MACHINE_CONFIG_START( ohmygod, ohmygod_state )
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START(ohmygod)
-	MCFG_MACHINE_RESET(ohmygod)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -339,7 +335,6 @@ static MACHINE_CONFIG_START( ohmygod, ohmygod_state )
 	MCFG_GFXDECODE(ohmygod)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(ohmygod)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

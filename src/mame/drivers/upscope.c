@@ -313,7 +313,7 @@ static MACHINE_CONFIG_START( upscope, upscope_state )
 	MCFG_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_RESET(amiga)
+	MCFG_MACHINE_RESET_OVERRIDE(upscope_state,amiga)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -327,9 +327,9 @@ static MACHINE_CONFIG_START( upscope, upscope_state )
 	MCFG_SCREEN_UPDATE_STATIC(amiga)
 
 	MCFG_PALETTE_LENGTH(4096)
-	MCFG_PALETTE_INIT(amiga)
+	MCFG_PALETTE_INIT_OVERRIDE(upscope_state,amiga)
 
-	MCFG_VIDEO_START(amiga)
+	MCFG_VIDEO_START_OVERRIDE(upscope_state,amiga)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

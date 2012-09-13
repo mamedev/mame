@@ -65,20 +65,19 @@ TILE_GET_INFO_MEMBER(vastar_state::get_bg2_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( vastar )
+void vastar_state::video_start()
 {
-	vastar_state *state = machine.driver_data<vastar_state>();
 
-	state->m_fg_tilemap  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(vastar_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,8,8,32,32);
-	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(vastar_state::get_bg1_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
-	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(vastar_state::get_bg2_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_fg_tilemap  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(vastar_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(vastar_state::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(vastar_state::get_bg2_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
-	state->m_bg1_tilemap->set_transparent_pen(0);
-	state->m_bg2_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
+	m_bg1_tilemap->set_transparent_pen(0);
+	m_bg2_tilemap->set_transparent_pen(0);
 
-	state->m_bg1_tilemap->set_scroll_cols(32);
-	state->m_bg2_tilemap->set_scroll_cols(32);
+	m_bg1_tilemap->set_scroll_cols(32);
+	m_bg2_tilemap->set_scroll_cols(32);
 }
 
 

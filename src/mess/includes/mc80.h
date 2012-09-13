@@ -38,6 +38,10 @@ public:
 	DECLARE_WRITE8_MEMBER(asp_port_a_w);
 	DECLARE_WRITE8_MEMBER(asp_port_b_w);
 	optional_shared_ptr<UINT8> m_p_videoram;
+	DECLARE_MACHINE_RESET(mc8020);
+	DECLARE_VIDEO_START(mc8020);
+	DECLARE_MACHINE_RESET(mc8030);
+	DECLARE_VIDEO_START(mc8030);
 };
 
 

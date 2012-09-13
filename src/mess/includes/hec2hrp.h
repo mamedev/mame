@@ -129,6 +129,13 @@ public:
 	DECLARE_WRITE8_MEMBER(hector_io_8255_w);
 	DECLARE_WRITE8_MEMBER(hector_mx40_io_port_w);
 	DECLARE_WRITE8_MEMBER(hector_mx80_io_port_w);
+	DECLARE_MACHINE_START(hec2hrp);
+	DECLARE_MACHINE_RESET(hec2hrp);
+	DECLARE_VIDEO_START(hec2hrp);
+	DECLARE_MACHINE_START(hec2hrx);
+	DECLARE_MACHINE_RESET(hec2hrx);
+	DECLARE_MACHINE_START(hec2mdhrx);
+	DECLARE_MACHINE_RESET(hec2mdhrx);
 };
 
 /*----------- defined in machine/hec2hrp.c -----------*/
@@ -146,7 +153,7 @@ READ8_HANDLER( hector_mx_io_port_r );
 
 void hector_80c(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram) ;
 void hector_hr(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram) ;
-VIDEO_START( hec2hrp );
+
 SCREEN_UPDATE_IND16( hec2hrp );
 
 /* Sound function*/

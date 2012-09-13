@@ -1026,44 +1026,42 @@ static GFXDECODE_START( bigtwinb )
 	GFXDECODE_ENTRY( "gfx1", 0, hrdtimes_charlayout, 0x200, 16 )	/* colors 0x200-0x2ff */
 GFXDECODE_END
 
-static MACHINE_START( playmark )
+MACHINE_START_MEMBER(playmark_state,playmark)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_oki = machine.device<okim6295_device>("oki");
-	state->m_eeprom = machine.device<eeprom_device>("eeprom");
+	m_oki = machine().device<okim6295_device>("oki");
+	m_eeprom = machine().device<eeprom_device>("eeprom");
 
-	state->save_item(NAME(state->m_bgscrollx));
-	state->save_item(NAME(state->m_bgscrolly));
-	state->save_item(NAME(state->m_bg_enable));
-	state->save_item(NAME(state->m_bg_full_size));
-	state->save_item(NAME(state->m_fgscrollx));
-	state->save_item(NAME(state->m_fg_rowscroll_enable));
-	state->save_item(NAME(state->m_scroll));
+	save_item(NAME(m_bgscrollx));
+	save_item(NAME(m_bgscrolly));
+	save_item(NAME(m_bg_enable));
+	save_item(NAME(m_bg_full_size));
+	save_item(NAME(m_fgscrollx));
+	save_item(NAME(m_fg_rowscroll_enable));
+	save_item(NAME(m_scroll));
 
-	state->save_item(NAME(state->m_snd_command));
-	state->save_item(NAME(state->m_snd_flag));
-	state->save_item(NAME(state->m_oki_control));
-	state->save_item(NAME(state->m_oki_command));
-	state->save_item(NAME(state->m_old_oki_bank));
+	save_item(NAME(m_snd_command));
+	save_item(NAME(m_snd_flag));
+	save_item(NAME(m_oki_control));
+	save_item(NAME(m_oki_command));
+	save_item(NAME(m_old_oki_bank));
 }
 
-static MACHINE_RESET( playmark )
+MACHINE_RESET_MEMBER(playmark_state,playmark)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_bgscrollx = 0;
-	state->m_bgscrolly = 0;
-	state->m_bg_enable = 0;
-	state->m_bg_full_size = 0;
-	state->m_fgscrollx = 0;
-	state->m_fg_rowscroll_enable = 0;
-	memset(state->m_scroll, 0, sizeof(state->m_scroll));
+	m_bgscrollx = 0;
+	m_bgscrolly = 0;
+	m_bg_enable = 0;
+	m_bg_full_size = 0;
+	m_fgscrollx = 0;
+	m_fg_rowscroll_enable = 0;
+	memset(m_scroll, 0, sizeof(m_scroll));
 
-	state->m_snd_command = 0;
-	state->m_oki_control = 0;
-	state->m_oki_command = 0;
-	state->m_old_oki_bank = 0;
+	m_snd_command = 0;
+	m_oki_control = 0;
+	m_oki_command = 0;
+	m_old_oki_bank = 0;
 }
 
 static MACHINE_CONFIG_START( bigtwin, playmark_state )
@@ -1077,8 +1075,8 @@ static MACHINE_CONFIG_START( bigtwin, playmark_state )
 	/* Program and Data Maps are internal to the MCU */
 	MCFG_CPU_IO_MAP(playmark_sound_io_map)
 
-	MCFG_MACHINE_START(playmark)
-	MCFG_MACHINE_RESET(playmark)
+	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
+	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1091,7 +1089,7 @@ static MACHINE_CONFIG_START( bigtwin, playmark_state )
 	MCFG_GFXDECODE(playmark)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(bigtwin)
+	MCFG_VIDEO_START_OVERRIDE(playmark_state,bigtwin)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1111,8 +1109,8 @@ static MACHINE_CONFIG_START( bigtwinb, playmark_state )
 	/* Program and Data Maps are internal to the MCU */
 	MCFG_CPU_IO_MAP(playmark_sound_io_map)
 
-	MCFG_MACHINE_START(playmark)
-	MCFG_MACHINE_RESET(playmark)
+	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
+	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1125,7 +1123,7 @@ static MACHINE_CONFIG_START( bigtwinb, playmark_state )
 	MCFG_GFXDECODE(bigtwinb)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(bigtwinb)
+	MCFG_VIDEO_START_OVERRIDE(playmark_state,bigtwinb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1148,8 +1146,8 @@ static MACHINE_CONFIG_START( wbeachvl, playmark_state )
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 	MCFG_EEPROM_DEFAULT_VALUE(0)
 
-	MCFG_MACHINE_START(playmark)
-	MCFG_MACHINE_RESET(playmark)
+	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
+	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1162,7 +1160,7 @@ static MACHINE_CONFIG_START( wbeachvl, playmark_state )
 	MCFG_GFXDECODE(wbeachvl)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(wbeachvl)
+	MCFG_VIDEO_START_OVERRIDE(playmark_state,wbeachvl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1182,8 +1180,8 @@ static MACHINE_CONFIG_START( excelsr, playmark_state )
 	/* Program and Data Maps are internal to the MCU */
 	MCFG_CPU_IO_MAP(playmark_sound_io_map)
 
-	MCFG_MACHINE_START(playmark)
-	MCFG_MACHINE_RESET(playmark)
+	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
+	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1196,7 +1194,7 @@ static MACHINE_CONFIG_START( excelsr, playmark_state )
 	MCFG_GFXDECODE(excelsr)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(excelsr)
+	MCFG_VIDEO_START_OVERRIDE(playmark_state,excelsr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1219,8 +1217,8 @@ static MACHINE_CONFIG_START( hotmind, playmark_state )
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 	MCFG_EEPROM_DEFAULT_VALUE(0)
 
-	MCFG_MACHINE_START(playmark)
-	MCFG_MACHINE_RESET(playmark)
+	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
+	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1233,7 +1231,7 @@ static MACHINE_CONFIG_START( hotmind, playmark_state )
 	MCFG_GFXDECODE(hrdtimes)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(hotmind)
+	MCFG_VIDEO_START_OVERRIDE(playmark_state,hotmind)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1253,8 +1251,8 @@ static MACHINE_CONFIG_START( hrdtimes, playmark_state )
 	/* Program and Data Maps are internal to the MCU */
 //  MCFG_CPU_IO_MAP(playmark_sound_io_map)
 
-	MCFG_MACHINE_START(playmark)
-	MCFG_MACHINE_RESET(playmark)
+	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
+	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1267,7 +1265,7 @@ static MACHINE_CONFIG_START( hrdtimes, playmark_state )
 	MCFG_GFXDECODE(hrdtimes)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(hrdtimes)
+	MCFG_VIDEO_START_OVERRIDE(playmark_state,hrdtimes)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

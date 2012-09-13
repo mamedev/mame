@@ -2,25 +2,24 @@
 #include "includes/buggychl.h"
 
 
-PALETTE_INIT( buggychl )
+void buggychl_state::palette_init()
 {
 	int i;
 
 	/* arbitrary blue shading for the sky, estimation */
 	for (i = 0; i < 128; i++)
-		palette_set_color(machine, i + 128, MAKE_RGB(0, 240-i, 255));
+		palette_set_color(machine(), i + 128, MAKE_RGB(0, 240-i, 255));
 }
 
-VIDEO_START( buggychl )
+void buggychl_state::video_start()
 {
-	buggychl_state *state = machine.driver_data<buggychl_state>();
-	machine.primary_screen->register_screen_bitmap(state->m_tmp_bitmap1);
-	machine.primary_screen->register_screen_bitmap(state->m_tmp_bitmap2);
+	machine().primary_screen->register_screen_bitmap(m_tmp_bitmap1);
+	machine().primary_screen->register_screen_bitmap(m_tmp_bitmap2);
 
-	state->save_item(NAME(state->m_tmp_bitmap1));
-	state->save_item(NAME(state->m_tmp_bitmap2));
+	save_item(NAME(m_tmp_bitmap1));
+	save_item(NAME(m_tmp_bitmap2));
 
-	machine.gfx[0]->set_source(state->m_charram);
+	machine().gfx[0]->set_source(m_charram);
 }
 
 

@@ -61,9 +61,9 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( pacman )
+PALETTE_INIT_MEMBER(pacman_state,pacman)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
 	int i;
@@ -75,7 +75,7 @@ PALETTE_INIT( pacman )
 			2, &resistances[1], bweights, 0, 0);
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 32);
+	machine().colortable = colortable_alloc(machine(), 32);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 32; i++)
@@ -100,7 +100,7 @@ PALETTE_INIT( pacman )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -112,10 +112,10 @@ PALETTE_INIT( pacman )
 		UINT8 ctabentry = color_prom[i] & 0x0f;
 
 		/* first palette bank */
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 
 		/* second palette bank */
-		colortable_entry_set_value(machine.colortable, i + 64*4, 0x10 + ctabentry);
+		colortable_entry_set_value(machine().colortable, i + 64*4, 0x10 + ctabentry);
 	}
 }
 
@@ -159,36 +159,34 @@ static void init_save_state(running_machine &machine)
 }
 
 
-VIDEO_START( pacman )
+VIDEO_START_MEMBER(pacman_state,pacman)
 {
-	pacman_state *state = machine.driver_data<pacman_state>();
-	init_save_state(machine);
+	init_save_state(machine());
 
-	state->m_charbank = 0;
-	state->m_spritebank = 0;
-	state->m_palettebank = 0;
-	state->m_colortablebank = 0;
-	state->m_flipscreen = 0;
-	state->m_bgpriority = 0;
-	state->m_inv_spr = 0;
+	m_charbank = 0;
+	m_spritebank = 0;
+	m_palettebank = 0;
+	m_colortablebank = 0;
+	m_flipscreen = 0;
+	m_bgpriority = 0;
+	m_inv_spr = 0;
 
 	/* In the Pac Man based games (NOT Pengo) the first two sprites must be offset */
 	/* one pixel to the left to get a more correct placement */
-	state->m_xoffsethack = 1;
+	m_xoffsethack = 1;
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pacman_state::pacman_get_tile_info),state), tilemap_mapper_delegate(FUNC(pacman_state::pacman_scan_rows),state),  8, 8, 36, 28 );
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pacman_state::pacman_get_tile_info),this), tilemap_mapper_delegate(FUNC(pacman_state::pacman_scan_rows),this),  8, 8, 36, 28 );
 
-	state->m_bg_tilemap->set_scrolldx(0, 384 - 288 );
-	state->m_bg_tilemap->set_scrolldy(0, 264 - 224 );
+	m_bg_tilemap->set_scrolldx(0, 384 - 288 );
+	m_bg_tilemap->set_scrolldy(0, 264 - 224 );
 }
 
-VIDEO_START( birdiy )
+VIDEO_START_MEMBER(pacman_state,birdiy)
 {
-	pacman_state *state = machine.driver_data<pacman_state>();
 
-	VIDEO_START_CALL( pacman );
-	state->m_xoffsethack = 0;
-	state->m_inv_spr = 1; // sprites are mirrored in X-axis compared to normal behaviour
+	VIDEO_START_CALL_MEMBER( pacman );
+	m_xoffsethack = 0;
+	m_inv_spr = 1; // sprites are mirrored in X-axis compared to normal behaviour
 }
 
 WRITE8_MEMBER(pacman_state::pacman_videoram_w)
@@ -318,24 +316,23 @@ SCREEN_UPDATE_IND16( pacman )
 
 **************************************************************************/
 
-VIDEO_START( pengo )
+VIDEO_START_MEMBER(pacman_state,pengo)
 {
-	pacman_state *state = machine.driver_data<pacman_state>();
-	init_save_state(machine);
+	init_save_state(machine());
 
-	state->m_charbank = 0;
-	state->m_spritebank = 0;
-	state->m_palettebank = 0;
-	state->m_colortablebank = 0;
-	state->m_flipscreen = 0;
-	state->m_bgpriority = 0;
-	state->m_inv_spr = 0;
-	state->m_xoffsethack = 0;
+	m_charbank = 0;
+	m_spritebank = 0;
+	m_palettebank = 0;
+	m_colortablebank = 0;
+	m_flipscreen = 0;
+	m_bgpriority = 0;
+	m_inv_spr = 0;
+	m_xoffsethack = 0;
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pacman_state::pacman_get_tile_info),state), tilemap_mapper_delegate(FUNC(pacman_state::pacman_scan_rows),state),  8, 8, 36, 28 );
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pacman_state::pacman_get_tile_info),this), tilemap_mapper_delegate(FUNC(pacman_state::pacman_scan_rows),this),  8, 8, 36, 28 );
 
-	state->m_bg_tilemap->set_scrolldx(0, 384 - 288 );
-	state->m_bg_tilemap->set_scrolldy(0, 264 - 224 );
+	m_bg_tilemap->set_scrolldx(0, 384 - 288 );
+	m_bg_tilemap->set_scrolldy(0, 264 - 224 );
 }
 
 WRITE8_MEMBER(pacman_state::pengo_palettebank_w)
@@ -385,23 +382,22 @@ TILE_GET_INFO_MEMBER(pacman_state::s2650_get_tile_info)
 	SET_TILE_INFO_MEMBER(0,code,attr & 0x1f,0);
 }
 
-VIDEO_START( s2650games )
+VIDEO_START_MEMBER(pacman_state,s2650games)
 {
-	pacman_state *state = machine.driver_data<pacman_state>();
-	init_save_state(machine);
+	init_save_state(machine());
 
-	state->m_charbank = 0;
-	state->m_spritebank = 0;
-	state->m_palettebank = 0;
-	state->m_colortablebank = 0;
-	state->m_flipscreen = 0;
-	state->m_bgpriority = 0;
-	state->m_inv_spr = 0;
-	state->m_xoffsethack = 1;
+	m_charbank = 0;
+	m_spritebank = 0;
+	m_palettebank = 0;
+	m_colortablebank = 0;
+	m_flipscreen = 0;
+	m_bgpriority = 0;
+	m_inv_spr = 0;
+	m_xoffsethack = 1;
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pacman_state::s2650_get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32 );
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pacman_state::s2650_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
 
-	state->m_bg_tilemap->set_scroll_cols(32);
+	m_bg_tilemap->set_scroll_cols(32);
 }
 
 SCREEN_UPDATE_IND16( s2650games )
@@ -556,24 +552,23 @@ static void jrpacman_mark_tile_dirty( running_machine &machine, int offset )
 	}
 }
 
-VIDEO_START( jrpacman )
+VIDEO_START_MEMBER(pacman_state,jrpacman)
 {
-	pacman_state *state = machine.driver_data<pacman_state>();
-	init_save_state(machine);
+	init_save_state(machine());
 
-	state->m_charbank = 0;
-	state->m_spritebank = 0;
-	state->m_palettebank = 0;
-	state->m_colortablebank = 0;
-	state->m_flipscreen = 0;
-	state->m_bgpriority = 0;
-	state->m_inv_spr = 0;
-	state->m_xoffsethack = 1;
+	m_charbank = 0;
+	m_spritebank = 0;
+	m_palettebank = 0;
+	m_colortablebank = 0;
+	m_flipscreen = 0;
+	m_bgpriority = 0;
+	m_inv_spr = 0;
+	m_xoffsethack = 1;
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pacman_state::jrpacman_get_tile_info),state),tilemap_mapper_delegate(FUNC(pacman_state::jrpacman_scan_rows),state),8,8,36,54 );
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pacman_state::jrpacman_get_tile_info),this),tilemap_mapper_delegate(FUNC(pacman_state::jrpacman_scan_rows),this),8,8,36,54 );
 
-	state->m_bg_tilemap->set_transparent_pen(0 );
-	state->m_bg_tilemap->set_scroll_cols(36 );
+	m_bg_tilemap->set_transparent_pen(0 );
+	m_bg_tilemap->set_scroll_cols(36 );
 }
 
 WRITE8_MEMBER(pacman_state::jrpacman_videoram_w)

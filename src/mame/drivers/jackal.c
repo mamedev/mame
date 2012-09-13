@@ -325,34 +325,32 @@ static INTERRUPT_GEN( jackal_interrupt )
  *
  *************************************/
 
-static MACHINE_START( jackal )
+void jackal_state::machine_start()
 {
-	jackal_state *state = machine.driver_data<jackal_state>();
-	UINT8 *ROM = state->memregion("master")->base();
+	UINT8 *ROM = memregion("master")->base();
 
-	state->membank("bank1")->configure_entry(0, &ROM[0x04000]);
-	state->membank("bank1")->configure_entry(1, &ROM[0x14000]);
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->configure_entry(0, &ROM[0x04000]);
+	membank("bank1")->configure_entry(1, &ROM[0x14000]);
+	membank("bank1")->set_entry(0);
 
-	state->m_mastercpu = machine.device<cpu_device>("master");
-	state->m_slavecpu = machine.device<cpu_device>("slave");
+	m_mastercpu = machine().device<cpu_device>("master");
+	m_slavecpu = machine().device<cpu_device>("slave");
 
-	state->save_item(NAME(state->m_irq_enable));
+	save_item(NAME(m_irq_enable));
 }
 
-static MACHINE_RESET( jackal )
+void jackal_state::machine_reset()
 {
-	jackal_state *state = machine.driver_data<jackal_state>();
-	UINT8 *rgn = state->memregion("master")->base();
+	UINT8 *rgn = memregion("master")->base();
 
 	// HACK: running at the nominal clock rate, music stops working
 	// at the beginning of the game. This fixes it.
-	machine.device("slave")->set_clock_scale(1.2f);
+	machine().device("slave")->set_clock_scale(1.2f);
 
-	state->m_rambank = rgn;
-	state->m_spritebank = rgn;
+	m_rambank = rgn;
+	m_spritebank = rgn;
 
-	state->m_irq_enable = 0;
+	m_irq_enable = 0;
 }
 
 static MACHINE_CONFIG_START( jackal, jackal_state )
@@ -367,8 +365,6 @@ static MACHINE_CONFIG_START( jackal, jackal_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(jackal)
-	MCFG_MACHINE_RESET(jackal)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -381,8 +377,6 @@ static MACHINE_CONFIG_START( jackal, jackal_state )
 	MCFG_GFXDECODE(jackal)
 	MCFG_PALETTE_LENGTH(0x300)
 
-	MCFG_PALETTE_INIT(jackal)
-	MCFG_VIDEO_START(jackal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

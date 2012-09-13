@@ -568,35 +568,33 @@ GFXDECODE_END
 
 */
 
-static MACHINE_START( angelkds )
+void angelkds_state::machine_start()
 {
-	angelkds_state *state = machine.driver_data<angelkds_state>();
 
-	state->m_subcpu = machine.device<cpu_device>("sub");
+	m_subcpu = machine().device<cpu_device>("sub");
 
-	state->save_item(NAME(state->m_layer_ctrl));
-	state->save_item(NAME(state->m_txbank));
-	state->save_item(NAME(state->m_bgbotbank));
-	state->save_item(NAME(state->m_bgtopbank));
-	state->save_item(NAME(state->m_sound));
-	state->save_item(NAME(state->m_sound2));
+	save_item(NAME(m_layer_ctrl));
+	save_item(NAME(m_txbank));
+	save_item(NAME(m_bgbotbank));
+	save_item(NAME(m_bgtopbank));
+	save_item(NAME(m_sound));
+	save_item(NAME(m_sound2));
 }
 
-static MACHINE_RESET( angelkds )
+void angelkds_state::machine_reset()
 {
-	angelkds_state *state = machine.driver_data<angelkds_state>();
 	int i;
 
 	for (i = 0; i < 4; i++)
 	{
-		state->m_sound[i] = 0;
-		state->m_sound2[i] = 0;
+		m_sound[i] = 0;
+		m_sound2[i] = 0;
 	}
 
-	state->m_layer_ctrl = 0;
-	state->m_txbank = 0;
-	state->m_bgbotbank = 0;
-	state->m_bgtopbank = 0;
+	m_layer_ctrl = 0;
+	m_txbank = 0;
+	m_bgbotbank = 0;
+	m_bgtopbank = 0;
 }
 
 static MACHINE_CONFIG_START( angelkds, angelkds_state )
@@ -610,8 +608,6 @@ static MACHINE_CONFIG_START( angelkds, angelkds_state )
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_IO_MAP(sub_portmap)
 
-	MCFG_MACHINE_START(angelkds)
-	MCFG_MACHINE_RESET(angelkds)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -626,7 +622,6 @@ static MACHINE_CONFIG_START( angelkds, angelkds_state )
 	MCFG_GFXDECODE(angelkds)
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(angelkds)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

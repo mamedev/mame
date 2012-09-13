@@ -23,12 +23,14 @@ public:
 	DECLARE_WRITE8_MEMBER(mrjong_colorram_w);
 	DECLARE_WRITE8_MEMBER(mrjong_flipscreen_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/mrjong.c -----------*/
 
 
-PALETTE_INIT( mrjong );
-VIDEO_START( mrjong );
+
+
 SCREEN_UPDATE_IND16( mrjong );

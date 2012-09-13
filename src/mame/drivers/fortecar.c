@@ -340,10 +340,13 @@ public:
 	DECLARE_WRITE8_MEMBER(ayporta_w);
 	DECLARE_WRITE8_MEMBER(ayportb_w);
 	DECLARE_DRIVER_INIT(fortecar);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
-static VIDEO_START(fortecar)
+void fortecar_state::video_start()
 {
 }
 
@@ -375,9 +378,9 @@ static SCREEN_UPDATE_IND16(fortecar)
 	return 0;
 }
 
-static PALETTE_INIT( fortecar )
+void fortecar_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 /* Video resistors...
 
 O1 (LS374) R1K  RED
@@ -422,7 +425,7 @@ R = 82 Ohms Pull Down.
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -672,14 +675,13 @@ GFXDECODE_END
 
 
 
-static MACHINE_RESET(fortecar)
+void fortecar_state::machine_reset()
 {
-	fortecar_state *state = machine.driver_data<fortecar_state>();
 	int i;
 
 	/* apparently there's a random fill in there (checked thru trojan TODO: extract proper algorythm) */
-	for(i=0;i<state->m_vram.bytes();i++)
-		state->m_vram[i] = machine.rand();
+	for(i=0;i<m_vram.bytes();i++)
+		m_vram[i] = machine().rand();
 }
 
 
@@ -701,7 +703,6 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 600-1, 0, 240-1)	/* driven by CRTC */
 	MCFG_SCREEN_UPDATE_STATIC(fortecar)
 
-	MCFG_MACHINE_RESET(fortecar)
 
 	MCFG_EEPROM_ADD("eeprom", forte_eeprom_intf)
 	MCFG_EEPROM_DEFAULT_VALUE(0)
@@ -711,9 +712,7 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 
 	MCFG_GFXDECODE(fortecar)
 	MCFG_PALETTE_LENGTH(0x200)
-	MCFG_PALETTE_INIT(fortecar)
 
-	MCFG_VIDEO_START(fortecar)
 
 	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)	/* 1.5 MHz, measured */
 

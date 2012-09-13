@@ -49,6 +49,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ganjaja_hopper_status_r);
 
 	TILE_GET_INFO_MEMBER(get_homerun_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -56,5 +59,5 @@ public:
 
 WRITE8_DEVICE_HANDLER( homerun_banking_w );
 
-VIDEO_START(homerun);
+
 SCREEN_UPDATE_IND16(homerun);

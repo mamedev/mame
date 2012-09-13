@@ -129,8 +129,8 @@ static MACHINE_CONFIG_START( orion128, orion_state )
     MCFG_CPU_PROGRAM_MAP(orion128_mem)
     MCFG_CPU_IO_MAP(orion128_io)
 
-    MCFG_MACHINE_START( orion128 )
-    MCFG_MACHINE_RESET( orion128 )
+    MCFG_MACHINE_START_OVERRIDE(orion_state, orion128 )
+    MCFG_MACHINE_RESET_OVERRIDE(orion_state, orion128 )
 
 	MCFG_I8255A_ADD( "ppi8255_1", orion128_ppi8255_interface_1 )
 
@@ -145,9 +145,9 @@ static MACHINE_CONFIG_START( orion128, orion_state )
     MCFG_SCREEN_UPDATE_STATIC(orion128)
 
 	MCFG_PALETTE_LENGTH(18)
-	MCFG_PALETTE_INIT( orion128 )
+	MCFG_PALETTE_INIT_OVERRIDE(orion_state, orion128 )
 
-	MCFG_VIDEO_START(orion128)
+	MCFG_VIDEO_START_OVERRIDE(orion_state,orion128)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
@@ -185,8 +185,8 @@ static MACHINE_CONFIG_START( orionz80, orion_state )
     MCFG_CPU_IO_MAP(orionz80_io)
     MCFG_CPU_VBLANK_INT("screen",orionz80_interrupt)
 
-    MCFG_MACHINE_START( orionz80 )
-    MCFG_MACHINE_RESET( orionz80 )
+    MCFG_MACHINE_START_OVERRIDE(orion_state, orionz80 )
+    MCFG_MACHINE_RESET_OVERRIDE(orion_state, orionz80 )
 
 	MCFG_I8255A_ADD( "ppi8255_1", orion128_ppi8255_interface_1 )
 
@@ -201,9 +201,9 @@ static MACHINE_CONFIG_START( orionz80, orion_state )
 	MCFG_SCREEN_UPDATE_STATIC(orion128)
 
 	MCFG_PALETTE_LENGTH(18)
-	MCFG_PALETTE_INIT( orion128 )
+	MCFG_PALETTE_INIT_OVERRIDE(orion_state, orion128 )
 
-	MCFG_VIDEO_START(orion128)
+	MCFG_VIDEO_START_OVERRIDE(orion_state,orion128)
 
 	MCFG_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
 
@@ -241,7 +241,7 @@ static MACHINE_CONFIG_START( orionpro, orion_state )
     MCFG_CPU_PROGRAM_MAP(orionpro_mem)
     MCFG_CPU_IO_MAP(orionpro_io)
 
-    MCFG_MACHINE_RESET( orionpro )
+    MCFG_MACHINE_RESET_OVERRIDE(orion_state, orionpro )
 
 	MCFG_I8255A_ADD( "ppi8255_1", orion128_ppi8255_interface_1 )
 
@@ -256,9 +256,9 @@ static MACHINE_CONFIG_START( orionpro, orion_state )
     MCFG_SCREEN_UPDATE_STATIC(orion128)
 
 	MCFG_PALETTE_LENGTH(18)
-	MCFG_PALETTE_INIT( orion128 )
+	MCFG_PALETTE_INIT_OVERRIDE(orion_state, orion128 )
 
-	MCFG_VIDEO_START(orion128)
+	MCFG_VIDEO_START_OVERRIDE(orion_state,orion128)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)

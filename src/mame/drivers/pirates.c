@@ -279,7 +279,6 @@ static MACHINE_CONFIG_START( pirates, pirates_state )
 
 	MCFG_PALETTE_LENGTH(0x2000)
 
-	MCFG_VIDEO_START(pirates)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -49,6 +49,7 @@ public:
 	DECLARE_WRITE8_MEMBER(elwro800jr_fdc_control_w);
 	DECLARE_READ8_MEMBER(elwro800jr_io_r);
 	DECLARE_WRITE8_MEMBER(elwro800jr_io_w);
+	DECLARE_MACHINE_RESET(elwro800);
 };
 
 
@@ -507,23 +508,22 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_RESET(elwro800)
+MACHINE_RESET_MEMBER(elwro800_state,elwro800)
 {
-	elwro800_state *state = machine.driver_data<elwro800_state>();
-	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *messram = machine().device<ram_device>(RAM_TAG)->pointer();
 
-	state->m_df_on_databus = 0xdf;
+	m_df_on_databus = 0xdf;
 	memset(messram, 0, 64*1024);
 
-	state->membank("bank3")->set_base(messram + 0x4000);
+	membank("bank3")->set_base(messram + 0x4000);
 
-	state->m_port_7ffd_data = 0;
-	state->m_port_1ffd_data = -1;
+	m_port_7ffd_data = 0;
+	m_port_1ffd_data = -1;
 
 	// this is a reset of ls175 in mmu
-	elwro800jr_mmu_w(machine, 0);
+	elwro800jr_mmu_w(machine(), 0);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(elwro800_state::elwro800_direct_handler), state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(elwro800_state::elwro800_direct_handler), this));
 }
 
 static const cassette_interface elwro800jr_cassette_interface =
@@ -580,7 +580,7 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 	MCFG_CPU_IO_MAP(elwro800_io)
 	MCFG_CPU_VBLANK_INT("screen", elwro800jr_interrupt)
 
-	MCFG_MACHINE_RESET(elwro800)
+	MCFG_MACHINE_RESET_OVERRIDE(elwro800_state,elwro800)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -592,10 +592,10 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 	MCFG_SCREEN_VBLANK_STATIC( spectrum )
 
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT( spectrum )
+	MCFG_PALETTE_INIT_OVERRIDE(elwro800_state, spectrum )
 	MCFG_GFXDECODE(elwro800)
 
-	MCFG_VIDEO_START( spectrum )
+	MCFG_VIDEO_START_OVERRIDE(elwro800_state, spectrum )
 
 	MCFG_UPD765A_ADD("upd765", elwro800jr_upd765_interface)
 	MCFG_I8255A_ADD( "ppi8255", elwro800jr_ppi8255_interface)

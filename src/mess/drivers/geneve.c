@@ -258,7 +258,9 @@ public:
 	WRITE_LINE_MEMBER( mapper_ready );
 
 	DECLARE_DRIVER_INIT(geneve);
-
+	virtual void machine_start();	
+	virtual void machine_reset();
+	
 	void	set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state);
 
 	line_state	m_inta;
@@ -716,38 +718,36 @@ DRIVER_INIT_MEMBER(geneve,geneve)
 {
 }
 
-static MACHINE_START( geneve )
+void geneve::machine_start()
 {
-	geneve *driver = machine.driver_data<geneve>();
-	driver->m_tms9901 = static_cast<tms9901_device*>(machine.device(TMS9901_TAG));
-	driver->m_mapper = static_cast<geneve_mapper_device*>(machine.device(GMAPPER_TAG));
-	driver->m_keyboard = static_cast<geneve_keyboard_device*>(machine.device(GKEYBOARD_TAG));
-	driver->m_peribox = static_cast<peribox_device*>(machine.device(PERIBOX_TAG));
-	driver->m_mouse =  static_cast<geneve_mouse_device*>(machine.device(GMOUSE_TAG));
-	driver->m_cpu = static_cast<tms9995_device*>(machine.device("maincpu"));
-	driver->m_joyport = static_cast<joyport_device*>(machine.device(JOYPORT_TAG));
+	m_tms9901 = static_cast<tms9901_device*>(machine().device(TMS9901_TAG));
+	m_mapper = static_cast<geneve_mapper_device*>(machine().device(GMAPPER_TAG));
+	m_keyboard = static_cast<geneve_keyboard_device*>(machine().device(GKEYBOARD_TAG));
+	m_peribox = static_cast<peribox_device*>(machine().device(PERIBOX_TAG));
+	m_mouse =  static_cast<geneve_mouse_device*>(machine().device(GMOUSE_TAG));
+	m_cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
+	m_joyport = static_cast<joyport_device*>(machine().device(JOYPORT_TAG));
 }
 
 /*
     Reset the machine.
 */
-static MACHINE_RESET( geneve )
+void geneve::machine_reset()
 {
-	geneve *driver = machine.driver_data<geneve>();
-	driver->m_inta = CLEAR_LINE;	// flag reflecting the INTA line
-	driver->m_intb = CLEAR_LINE;	// flag reflecting the INTB line
-	driver->m_int2 = CLEAR_LINE;	// flag reflecting the INT2 line
-	driver->m_keyint = CLEAR_LINE;
+	m_inta = CLEAR_LINE;	// flag reflecting the INTA line
+	m_intb = CLEAR_LINE;	// flag reflecting the INTB line
+	m_int2 = CLEAR_LINE;	// flag reflecting the INT2 line
+	m_keyint = CLEAR_LINE;
 
 	// No automatic wait state (auto wait state is enabled with READY=CLEAR at RESET)
-	driver->m_cpu->set_ready(ASSERT_LINE);
-	driver->m_cpu->set_hold(CLEAR_LINE);
+	m_cpu->set_ready(ASSERT_LINE);
+	m_cpu->set_hold(CLEAR_LINE);
 
-	driver->m_ready_line = driver->m_ready_line1 = ASSERT_LINE;
+	m_ready_line = m_ready_line1 = ASSERT_LINE;
 
-	driver->m_peribox->set_genmod(machine.root_device().ioport("MODE")->read()==GENMOD);
+	m_peribox->set_genmod(machine().root_device().ioport("MODE")->read()==GENMOD);
 
-	driver->m_joyport->write_port(0x01);	// select Joystick 1
+	m_joyport->write_port(0x01);	// select Joystick 1
 }
 
 static MACHINE_CONFIG_START( geneve_60hz, geneve )
@@ -755,8 +755,6 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve )
 	// TMS9995 CPU @ 12.0 MHz
 	MCFG_TMS9995_ADD("maincpu", TMS9995, 12000000, memmap, crumap, geneve_processor_config)
 
-	MCFG_MACHINE_START( geneve )
-	MCFG_MACHINE_RESET( geneve )
 
 	// video hardware
 	// Although we should have a 60 Hz screen rate, we have to set it to 30 here.

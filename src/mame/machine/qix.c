@@ -225,22 +225,20 @@ const pia6821_interface slither_pia_2_intf =
  *
  *************************************/
 
-MACHINE_RESET( qix )
+void qix_state::machine_reset()
 {
-	qix_state *state = machine.driver_data<qix_state>();
 
 	/* reset the coin counter register */
-	state->m_coinctrl = 0x00;
+	m_coinctrl = 0x00;
 }
 
 
-MACHINE_START( qixmcu )
+MACHINE_START_MEMBER(qix_state,qixmcu)
 {
-	qix_state *state = machine.driver_data<qix_state>();
 
 	/* set up save states */
-	state->save_item(NAME(state->m_68705_port_in));
-	state->save_item(NAME(state->m_coinctrl));
+	save_item(NAME(m_68705_port_in));
+	save_item(NAME(m_coinctrl));
 }
 
 

@@ -221,7 +221,6 @@ static MACHINE_CONFIG_START( microtan, microtan_state )
 	MCFG_CPU_PROGRAM_MAP(microtan_map)
 	MCFG_CPU_VBLANK_INT("screen", microtan_interrupt)
 
-	MCFG_MACHINE_RESET(microtan)
 
     /* video hardware - include overscan */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -235,7 +234,6 @@ static MACHINE_CONFIG_START( microtan, microtan_state )
 	MCFG_PALETTE_LENGTH(2)
 
 	MCFG_PALETTE_INIT(black_and_white)
-	MCFG_VIDEO_START(microtan)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

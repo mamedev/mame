@@ -438,26 +438,24 @@ static const k053936_interface crshrace_k053936_intf =
 };
 
 
-static MACHINE_START( crshrace )
+void crshrace_state::machine_start()
 {
-	crshrace_state *state = machine.driver_data<crshrace_state>();
 
-	state->membank("bank1")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0x10000, 0x8000);
+	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x8000);
 
-	state->save_item(NAME(state->m_roz_bank));
-	state->save_item(NAME(state->m_gfxctrl));
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_pending_command));
+	save_item(NAME(m_roz_bank));
+	save_item(NAME(m_gfxctrl));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_pending_command));
 }
 
-static MACHINE_RESET( crshrace )
+void crshrace_state::machine_reset()
 {
-	crshrace_state *state = machine.driver_data<crshrace_state>();
 
-	state->m_roz_bank = 0;
-	state->m_gfxctrl = 0;
-	state->m_flipscreen = 0;
-	state->m_pending_command = 0;
+	m_roz_bank = 0;
+	m_gfxctrl = 0;
+	m_flipscreen = 0;
+	m_pending_command = 0;
 }
 
 static MACHINE_CONFIG_START( crshrace, crshrace_state )
@@ -471,8 +469,6 @@ static MACHINE_CONFIG_START( crshrace, crshrace_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
-	MCFG_MACHINE_START(crshrace)
-	MCFG_MACHINE_RESET(crshrace)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -490,7 +486,6 @@ static MACHINE_CONFIG_START( crshrace, crshrace_state )
 
 	MCFG_K053936_ADD("k053936", crshrace_k053936_intf)
 
-	MCFG_VIDEO_START(crshrace)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

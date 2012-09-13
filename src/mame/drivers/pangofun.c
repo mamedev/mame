@@ -106,6 +106,7 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	DECLARE_DRIVER_INIT(pangofun);
+	virtual void machine_start();
 };
 
 
@@ -185,11 +186,11 @@ static const struct kbdc8042_interface at8042 =
 	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, NULL, pcat_dyn_get_out2
 };
 
-static MACHINE_START( pangofun )
+void pangofun_state::machine_start()
 {
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(pcat_irq_callback);
-	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, pangofun_set_keyb_int);
-	kbdc8042_init(machine, &at8042);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(pcat_irq_callback);
+	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, pangofun_set_keyb_int);
+	kbdc8042_init(machine(), &at8042);
 }
 
 
@@ -205,7 +206,6 @@ static MACHINE_CONFIG_START( pangofun, pangofun_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
-	MCFG_MACHINE_START(pangofun)
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 	MCFG_FRAGMENT_ADD( pcat_common )
 MACHINE_CONFIG_END

@@ -50,10 +50,11 @@ public:
 	TILE_GET_INFO_MEMBER(get_philko_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(sidearms_tilemap_scan);
+	virtual void video_start();
 };
 
 /*----------- defined in video/sidearms.c -----------*/
 
 
-VIDEO_START( sidearms );
+
 SCREEN_UPDATE_IND16( sidearms );

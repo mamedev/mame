@@ -58,18 +58,18 @@ protected:
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*Temporary,to show something on screen...*/
 
-static VIDEO_START( destiny )
+void destiny_state::video_start()
 {
-	destiny_state *state = machine.driver_data<destiny_state>();
 	UINT8 i;
 	for(i=0;i<20;i++)
-		state->m_led_array[i] = 0x20;
-	state->m_led_array[20] = 0;
+		m_led_array[i] = 0x20;
+	m_led_array[20] = 0;
 }
 
 static SCREEN_UPDATE_IND16( destiny )
@@ -271,7 +271,6 @@ static MACHINE_CONFIG_START( destiny, destiny_state )
 	MCFG_SCREEN_UPDATE_STATIC(destiny)
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_VIDEO_START(destiny)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

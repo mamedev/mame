@@ -85,10 +85,13 @@ public:
 	DECLARE_READ8_MEMBER(changela_mem_device_r);
 	DECLARE_WRITE8_MEMBER(changela_slope_rom_addr_hi_w);
 	DECLARE_WRITE8_MEMBER(changela_slope_rom_addr_lo_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 /*----------- defined in video/changela.c -----------*/
 
-VIDEO_START( changela );
+
 SCREEN_UPDATE_IND16( changela );
 

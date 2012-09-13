@@ -415,6 +415,7 @@ public:
 	} chihiro_devs;
 
 	nv2a_renderer *nvidia_nv2a;
+	virtual void machine_start();
 };
 
 /*
@@ -1800,22 +1801,21 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( chihiro )
 INPUT_PORTS_END
 
-static MACHINE_START( chihiro )
+void chihiro_state::machine_start()
 {
-	chihiro_state *chst=machine.driver_data<chihiro_state>();
-	chst->nvidia_nv2a=auto_alloc(machine, nv2a_renderer(machine));
+	nvidia_nv2a=auto_alloc(machine(), nv2a_renderer(machine()));
 	memset(pic16lc_buffer,0,sizeof(pic16lc_buffer));
 	pic16lc_buffer[0]='B';
 	pic16lc_buffer[4]=2; // A/V connector, 2=vga
-	chst->smbus_register_device(0x10,smbus_callback_pic16lc);
-	chst->smbus_register_device(0x45,smbus_callback_cx25871);
-	chst->smbus_register_device(0x54,smbus_callback_eeprom);
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
-	chst->chihiro_devs.pic8259_1 = machine.device( "pic8259_1" );
-	chst->chihiro_devs.pic8259_2 = machine.device( "pic8259_2" );
-	chst->chihiro_devs.ide = machine.device( "ide" );
-	if (machine.debug_flags & DEBUG_FLAG_ENABLED)
-		debug_console_register_command(machine,"chihiro",CMDFLAG_NONE,0,1,4,chihiro_debug_commands);
+	smbus_register_device(0x10,smbus_callback_pic16lc);
+	smbus_register_device(0x45,smbus_callback_cx25871);
+	smbus_register_device(0x54,smbus_callback_eeprom);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	chihiro_devs.pic8259_1 = machine().device( "pic8259_1" );
+	chihiro_devs.pic8259_2 = machine().device( "pic8259_2" );
+	chihiro_devs.ide = machine().device( "ide" );
+	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+		debug_console_register_command(machine(),"chihiro",CMDFLAG_NONE,0,1,4,chihiro_debug_commands);
 }
 
 static SLOT_INTERFACE_START(ide_baseboard)
@@ -1861,7 +1861,6 @@ static MACHINE_CONFIG_START( chihiro_base, chihiro_state )
 	MCFG_SCREEN_UPDATE_DRIVER(chihiro_state,screen_update_callback)
 	MCFG_SCREEN_VBLANK_DRIVER(chihiro_state,vblank_callback)
 
-	MCFG_MACHINE_START(chihiro)
 
 	MCFG_PALETTE_LENGTH(65536)
 MACHINE_CONFIG_END

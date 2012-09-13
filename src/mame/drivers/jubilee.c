@@ -102,6 +102,8 @@ public:
 	DECLARE_WRITE8_MEMBER(jubileep_videoram_w);
 	DECLARE_READ8_MEMBER(unk_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -126,10 +128,9 @@ TILE_GET_INFO_MEMBER(jubilee_state::get_bg_tile_info)
 
 
 
-static VIDEO_START( jubileep )
+void jubilee_state::video_start()
 {
-	jubilee_state *state = machine.driver_data<jubilee_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(jubilee_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(jubilee_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -141,7 +142,7 @@ static SCREEN_UPDATE_IND16( jubileep )
 }
 
 
-static PALETTE_INIT( jubileep )
+void jubilee_state::palette_init()
 {
 
 }
@@ -428,10 +429,8 @@ static MACHINE_CONFIG_START( jubileep, jubilee_state )
 
 	MCFG_GFXDECODE(jubileep)
 
-	MCFG_PALETTE_INIT(jubileep)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(jubileep)
 
 	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/4, mc6845_intf) /* guess */
 

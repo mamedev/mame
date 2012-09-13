@@ -183,6 +183,18 @@ public:
 	DECLARE_READ32_MEMBER(read_1800000);
 	DECLARE_WRITE32_MEMBER(write_1000000);
 	DECLARE_DRIVER_INIT(polgar);
+	DECLARE_MACHINE_START(polgar);
+	DECLARE_MACHINE_RESET(polgar);
+	DECLARE_MACHINE_START(sfortea);
+	DECLARE_MACHINE_RESET(sfortea);
+	DECLARE_MACHINE_START(van32);
+	DECLARE_MACHINE_RESET(van16);
+	DECLARE_MACHINE_RESET(monteciv);
+	DECLARE_MACHINE_START(diablo68);
+	DECLARE_MACHINE_START(van16);
+	DECLARE_MACHINE_START(risc);
+	DECLARE_MACHINE_RESET(academy);
+	DECLARE_PALETTE_INIT(chess_lcd);
 };
 
 static HD44780_INTERFACE( chess_display )
@@ -988,15 +1000,15 @@ static TIMER_DEVICE_CALLBACK( timer_update_irq_academy )
 }
 
 
-static MACHINE_START( van32 )
+MACHINE_START_MEMBER(polgar_state,van32)
 {
 // patch LCD delay loop on the 68030 machines until waitstates and/or opcode timings are fixed in MAME core
 // patches gen32 gen32_41 gen32_oc lond030
 
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 	if(rom[0x870] == 0x0c && rom[0x871] == 0x78) {
-		if (!strcmp(machine.system().name,"gen32_oc")) {
+		if (!strcmp(machine().system().name,"gen32_oc")) {
 			rom[0x870] = 0x6c;
 		} else {
 			rom[0x870] = 0x38;
@@ -1005,7 +1017,7 @@ static MACHINE_START( van32 )
 }
 
 
-static MACHINE_START( risc )
+MACHINE_START_MEMBER(polgar_state,risc)
 {
 
 }
@@ -1017,51 +1029,51 @@ static void common_chess_start(void)
 	mboard_set_board();
 }
 
-static MACHINE_START( polgar )
+MACHINE_START_MEMBER(polgar_state,polgar)
 {
 	common_chess_start();
-	mboard_savestate_register(machine);
+	mboard_savestate_register(machine());
 }
 
-static MACHINE_START( sfortea )
+MACHINE_START_MEMBER(polgar_state,sfortea)
 {
 	common_chess_start();
-	mboard_savestate_register(machine);
+	mboard_savestate_register(machine());
 }
 
-static MACHINE_START( diablo68 )
+MACHINE_START_MEMBER(polgar_state,diablo68)
 {
 
-	common_chess_start();
-
-}
-
-static MACHINE_START( van16 )
-{
-
-	mboard_savestate_register(machine);
-
-}
-
-static MACHINE_RESET( van16 )
-{
 	common_chess_start();
 
 }
 
-static MACHINE_RESET( polgar )
+MACHINE_START_MEMBER(polgar_state,van16)
+{
+
+	mboard_savestate_register(machine());
+
+}
+
+MACHINE_RESET_MEMBER(polgar_state,van16)
 {
 	common_chess_start();
 
 }
 
-static MACHINE_RESET( sfortea )
+MACHINE_RESET_MEMBER(polgar_state,polgar)
 {
 	common_chess_start();
 
 }
 
-static MACHINE_RESET( monteciv )
+MACHINE_RESET_MEMBER(polgar_state,sfortea)
+{
+	common_chess_start();
+
+}
+
+MACHINE_RESET_MEMBER(polgar_state,monteciv)
 {
 	montecivtop = 0;
 	montecivbot = 0;
@@ -1072,17 +1084,17 @@ static MACHINE_RESET( monteciv )
 }
 
 
-static MACHINE_RESET( academy )
+MACHINE_RESET_MEMBER(polgar_state,academy)
 {
 	academyallowNMI = 0;
 	common_chess_start();
 }
 
-static PALETTE_INIT( chess_lcd )
+PALETTE_INIT_MEMBER(polgar_state,chess_lcd)
 {
-	// palette_set_color(machine, 0, MAKE_RGB(138, 146, 148)); // some think this is closer, but slightly less readable
-	palette_set_color(machine, 0, MAKE_RGB(255, 255, 255));
-    palette_set_color(machine, 1, MAKE_RGB(0, 0, 0));
+	// palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148)); // some think this is closer, but slightly less readable
+	palette_set_color(machine(), 0, MAKE_RGB(255, 255, 255));
+    palette_set_color(machine(), 1, MAKE_RGB(0, 0, 0));
 }
 
 static const gfx_layout chess_charlayout =
@@ -1525,7 +1537,7 @@ static MACHINE_CONFIG_FRAGMENT ( chess_common )
 	MCFG_SCREEN_VISIBLE_AREA(0, 100-1, 0, 22-3)
     MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(chess_lcd)
+	MCFG_PALETTE_INIT_OVERRIDE(polgar_state,chess_lcd)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	MCFG_GFXDECODE(chess_lcd)
 
@@ -1544,8 +1556,8 @@ static MACHINE_CONFIG_START( polgar, polgar_state )
 	MCFG_CPU_ADD("maincpu",M65C02,4915200)
 	MCFG_CPU_PROGRAM_MAP(polgar_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_MACHINE_START( polgar )
-	MCFG_MACHINE_RESET( polgar )
+	MCFG_MACHINE_START_OVERRIDE(polgar_state, polgar )
+	MCFG_MACHINE_RESET_OVERRIDE(polgar_state, polgar )
 	MCFG_FRAGMENT_ADD( chess_common )
 
 	MCFG_TIMER_ADD_PERIODIC("irq_timer", cause_nmi, attotime::from_hz(600))
@@ -1558,8 +1570,8 @@ static MACHINE_CONFIG_START( sfortea, polgar_state )
 	MCFG_CPU_ADD("maincpu",M65C02,5000000)
 	MCFG_CPU_PROGRAM_MAP(sfortea_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_MACHINE_START( sfortea )
-	MCFG_MACHINE_RESET( sfortea )
+	MCFG_MACHINE_START_OVERRIDE(polgar_state, sfortea )
+	MCFG_MACHINE_RESET_OVERRIDE(polgar_state, sfortea )
 	MCFG_FRAGMENT_ADD( chess_common )
 
 	/* acia */
@@ -1573,8 +1585,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( alm32, polgar_state )
 	MCFG_CPU_ADD("maincpu", M68020, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(alm32_mem)
-	MCFG_MACHINE_START(van32)
-	MCFG_MACHINE_RESET(van16)
+	MCFG_MACHINE_START_OVERRIDE(polgar_state,van32)
+	MCFG_MACHINE_RESET_OVERRIDE(polgar_state,van16)
 	MCFG_TIMER_ADD_PERIODIC("int_timer", timer_update_irq6, attotime::from_hz(750))
 	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(120))
 
@@ -1586,7 +1598,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( academy, polgar )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(academy_mem)
-	MCFG_MACHINE_RESET( academy )
+	MCFG_MACHINE_RESET_OVERRIDE(polgar_state, academy )
 	//MCFG_DEVICE_REMOVE("int_timer")
 	MCFG_TIMER_ADD_PERIODIC("int_timer", timer_update_irq_academy, attotime::from_hz(600))
 
@@ -1602,8 +1614,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( monteciv, polgar_state )
 	MCFG_CPU_ADD("maincpu",M65C02,8000000)
 	MCFG_CPU_PROGRAM_MAP( monteciv_mem )
-	MCFG_MACHINE_START( polgar )
-	MCFG_MACHINE_RESET( monteciv )
+	MCFG_MACHINE_START_OVERRIDE(polgar_state, polgar )
+	MCFG_MACHINE_RESET_OVERRIDE(polgar_state, monteciv )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beep", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1622,7 +1634,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( diablo68, polgar_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(diablo68_mem)
-	MCFG_MACHINE_START(diablo68)
+	MCFG_MACHINE_START_OVERRIDE(polgar_state,diablo68)
 	MCFG_FRAGMENT_ADD( chess_common )
 
 	/* acia */
@@ -1638,8 +1650,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( van16, polgar_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(van16_mem)
-	MCFG_MACHINE_START(van16)
-	MCFG_MACHINE_RESET(van16)
+	MCFG_MACHINE_START_OVERRIDE(polgar_state,van16)
+	MCFG_MACHINE_RESET_OVERRIDE(polgar_state,van16)
 	MCFG_TIMER_ADD_PERIODIC("int_timer", timer_update_irq6, attotime::from_hz(600))  // chess clock right, diags wrong
 //  MCFG_TIMER_ADD_PERIODIC("int_timer", timer_update_irq6, attotime::from_hz(587))  // vv
 	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(120))
@@ -1656,8 +1668,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( van32, polgar_state )
 	MCFG_CPU_ADD("maincpu", M68020, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(van32_mem)
-	MCFG_MACHINE_START(van32)
-	MCFG_MACHINE_RESET(van16)
+	MCFG_MACHINE_START_OVERRIDE(polgar_state,van32)
+	MCFG_MACHINE_RESET_OVERRIDE(polgar_state,van16)
 	MCFG_TIMER_ADD_PERIODIC("int_timer", timer_update_irq6, attotime::from_hz(750))
 	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(120))
 
@@ -1669,8 +1681,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( risc, polgar_state )
 	MCFG_CPU_ADD("maincpu", ARM, 14000000)
 	MCFG_CPU_PROGRAM_MAP(risc_mem)
-	MCFG_MACHINE_START(risc)
-	MCFG_MACHINE_RESET(van16)
+	MCFG_MACHINE_START_OVERRIDE(polgar_state,risc)
+	MCFG_MACHINE_RESET_OVERRIDE(polgar_state,van16)
 	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(120))
 
 	MCFG_FRAGMENT_ADD( chess_common )
@@ -1681,8 +1693,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( gen32, polgar_state )
 	MCFG_CPU_ADD("maincpu", M68030, XTAL_33_333MHz)
 	MCFG_CPU_PROGRAM_MAP(gen32_mem)
-	MCFG_MACHINE_START(van32)
-	MCFG_MACHINE_RESET(van16)
+	MCFG_MACHINE_START_OVERRIDE(polgar_state,van32)
+	MCFG_MACHINE_RESET_OVERRIDE(polgar_state,van16)
 	MCFG_TIMER_ADD_PERIODIC("int_timer", timer_update_irq6, attotime::from_hz(375))
 //  MCFG_TIMER_ADD_PERIODIC("int_timer", timer_update_irq6, attotime::from_hz(368.64))
 	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(120))
@@ -1705,8 +1717,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( bpl32, polgar_state )
 	MCFG_CPU_ADD("maincpu", M68020, XTAL_24_576MHz)
 	MCFG_CPU_PROGRAM_MAP(bpl32_mem)
-	MCFG_MACHINE_START(van32)
-	MCFG_MACHINE_RESET(van16)
+	MCFG_MACHINE_START_OVERRIDE(polgar_state,van32)
+	MCFG_MACHINE_RESET_OVERRIDE(polgar_state,van16)
 	MCFG_TIMER_ADD_PERIODIC("int_timer", timer_update_irq6, attotime::from_hz(750))
 	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(100))
 

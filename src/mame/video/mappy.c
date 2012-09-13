@@ -30,9 +30,9 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( superpac )
+PALETTE_INIT_MEMBER(mappy_state,superpac)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
 	int i;
@@ -44,7 +44,7 @@ PALETTE_INIT( superpac )
 			2, &resistances[1], bweights, 0, 0);
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 32);
+	machine().colortable = colortable_alloc(machine(), 32);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 32; i++)
@@ -69,7 +69,7 @@ PALETTE_INIT( superpac )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -79,20 +79,20 @@ PALETTE_INIT( superpac )
 	for (i = 0; i < 64*4; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine.colortable, i, (ctabentry ^ 15) + 0x10);
+		colortable_entry_set_value(machine().colortable, i, (ctabentry ^ 15) + 0x10);
 	}
 
 	/* sprites map to the lower 16 palette entries */
 	for (i = 64*4; i < 128*4; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 
-PALETTE_INIT( mappy )
+PALETTE_INIT_MEMBER(mappy_state,mappy)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
 	int i;
@@ -104,7 +104,7 @@ PALETTE_INIT( mappy )
 			2, &resistances[1], bweights, 0, 0);
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 32);
+	machine().colortable = colortable_alloc(machine(), 32);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 32; i++)
@@ -129,7 +129,7 @@ PALETTE_INIT( mappy )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -139,14 +139,14 @@ PALETTE_INIT( mappy )
 	for (i = 0*4; i < 64*4; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine.colortable, i, ctabentry + 0x10);
+		colortable_entry_set_value(machine().colortable, i, ctabentry + 0x10);
 	}
 
 	/* sprites map to the lower 16 palette entries */
-	for (i = 64*4; i < machine.total_colors(); i++)
+	for (i = 64*4; i < machine().total_colors(); i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 
@@ -162,9 +162,9 @@ PALETTE_INIT( mappy )
 
 ***************************************************************************/
 
-PALETTE_INIT( phozon )
+PALETTE_INIT_MEMBER(mappy_state,phozon)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	static const int resistances[4] = { 2200, 1000, 470, 220 };
 	double rweights[4], gweights[4], bweights[4];
 	int i;
@@ -176,7 +176,7 @@ PALETTE_INIT( phozon )
 			4, &resistances[0], bweights, 0, 0);
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 32);
+	machine().colortable = colortable_alloc(machine(), 32);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 32; i++)
@@ -205,7 +205,7 @@ PALETTE_INIT( phozon )
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
 		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -215,14 +215,14 @@ PALETTE_INIT( phozon )
 	for (i = 0; i < 64*4; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	/* sprites map to the upper 16 palette entries */
 	for (i = 64*4; i < 128*4; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine.colortable, i, ctabentry + 0x10);
+		colortable_entry_set_value(machine().colortable, i, ctabentry + 0x10);
 	}
 }
 
@@ -318,35 +318,32 @@ TILE_GET_INFO_MEMBER(mappy_state::mappy_get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( superpac )
+VIDEO_START_MEMBER(mappy_state,superpac)
 {
-	mappy_state *state = machine.driver_data<mappy_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mappy_state::superpac_get_tile_info),state),tilemap_mapper_delegate(FUNC(mappy_state::superpac_tilemap_scan),state),8,8,36,28);
-	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mappy_state::superpac_get_tile_info),this),tilemap_mapper_delegate(FUNC(mappy_state::superpac_tilemap_scan),this),8,8,36,28);
+	machine().primary_screen->register_screen_bitmap(m_sprite_bitmap);
 
-	colortable_configure_tilemap_groups(machine.colortable, state->m_bg_tilemap, machine.gfx[0], 31);
+	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, machine().gfx[0], 31);
 }
 
-VIDEO_START( phozon )
+VIDEO_START_MEMBER(mappy_state,phozon)
 {
-	mappy_state *state = machine.driver_data<mappy_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mappy_state::phozon_get_tile_info),state),tilemap_mapper_delegate(FUNC(mappy_state::superpac_tilemap_scan),state),8,8,36,28);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mappy_state::phozon_get_tile_info),this),tilemap_mapper_delegate(FUNC(mappy_state::superpac_tilemap_scan),this),8,8,36,28);
 
-	colortable_configure_tilemap_groups(machine.colortable, state->m_bg_tilemap, machine.gfx[0], 15);
+	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, machine().gfx[0], 15);
 
-	state->save_item(NAME(state->m_scroll));
+	save_item(NAME(m_scroll));
 }
 
-VIDEO_START( mappy )
+VIDEO_START_MEMBER(mappy_state,mappy)
 {
-	mappy_state *state = machine.driver_data<mappy_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mappy_state::mappy_get_tile_info),state),tilemap_mapper_delegate(FUNC(mappy_state::mappy_tilemap_scan),state),8,8,36,60);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mappy_state::mappy_get_tile_info),this),tilemap_mapper_delegate(FUNC(mappy_state::mappy_tilemap_scan),this),8,8,36,60);
 
-	colortable_configure_tilemap_groups(machine.colortable, state->m_bg_tilemap, machine.gfx[0], 31);
-	state->m_bg_tilemap->set_scroll_cols(36);
+	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, machine().gfx[0], 31);
+	m_bg_tilemap->set_scroll_cols(36);
 }
 
 

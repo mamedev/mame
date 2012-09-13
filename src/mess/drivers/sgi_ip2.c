@@ -100,6 +100,8 @@ public:
 	DECLARE_READ16_MEMBER(sgi_ip2_stklmt_r);
 	DECLARE_WRITE16_MEMBER(sgi_ip2_stklmt_w);
 	DECLARE_DRIVER_INIT(sgi_ip2);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -369,11 +371,11 @@ static INTERRUPT_GEN( sgi_ip2_vbl )
 {
 }
 
-static MACHINE_START( sgi_ip2 )
+void sgi_ip2_state::machine_start()
 {
 }
 
-static MACHINE_RESET( sgi_ip2 )
+void sgi_ip2_state::machine_reset()
 {
 }
 
@@ -477,8 +479,6 @@ static MACHINE_CONFIG_START( sgi_ip2, sgi_ip2_state )
 	MCFG_CPU_PROGRAM_MAP(sgi_ip2_map)
 	MCFG_CPU_VBLANK_INT(TERMINAL_TAG ":" TERMINAL_SCREEN_TAG, sgi_ip2_vbl)
 
-	MCFG_MACHINE_START(sgi_ip2)
-	MCFG_MACHINE_RESET(sgi_ip2)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sgi_terminal_intf)

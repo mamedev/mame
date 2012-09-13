@@ -31,10 +31,9 @@ const gfx_layout mz80kj_charlayout =
 };
 
 /* Video hardware */
-VIDEO_START( mz80k )
+void mz80_state::video_start()
 {
-	mz80_state *state = machine.driver_data<mz80_state>();
-	state->m_p_chargen = state->memregion("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 SCREEN_UPDATE_IND16( mz80k )

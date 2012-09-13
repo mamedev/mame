@@ -40,13 +40,18 @@ public:
 	DECLARE_DRIVER_INIT(gsword);
 	DECLARE_DRIVER_INIT(gsword2);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
+	DECLARE_MACHINE_RESET(gsword);
+	DECLARE_PALETTE_INIT(gsword);
+	DECLARE_MACHINE_RESET(josvolly);
+	DECLARE_PALETTE_INIT(josvolly);
 };
 
 
 /*----------- defined in video/gsword.c -----------*/
 
 
-PALETTE_INIT( josvolly );
-PALETTE_INIT( gsword );
-VIDEO_START( gsword );
+
+
+
 SCREEN_UPDATE_IND16( gsword );

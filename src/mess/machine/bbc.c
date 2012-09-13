@@ -1999,76 +1999,73 @@ DRIVER_INIT_MEMBER(bbc_state,bbcm)
 	m_tape_timer = machine().scheduler().timer_alloc(FUNC(bbc_tape_timer_cb));
 }
 
-MACHINE_START( bbca )
+MACHINE_START_MEMBER(bbc_state,bbca)
 {
 }
 
-MACHINE_RESET( bbca )
+MACHINE_RESET_MEMBER(bbc_state,bbca)
 {
-	bbc_state *state = machine.driver_data<bbc_state>();
-	UINT8 *ram = machine.root_device().memregion("maincpu")->base();
-	state->m_RAMSize = 1;
-	state->membank("bank1")->set_base(ram);
-	state->membank("bank3")->set_base(ram);
+	UINT8 *ram = machine().root_device().memregion("maincpu")->base();
+	m_RAMSize = 1;
+	membank("bank1")->set_base(ram);
+	membank("bank3")->set_base(ram);
 
-	state->membank("bank4")->set_base(machine.root_device().memregion("user1")->base());          /* bank 4 is the paged ROMs     from 8000 to bfff */
-	state->membank("bank7")->set_base(state->memregion("user1")->base()+0x10000);  /* bank 7 points at the OS rom  from c000 to ffff */
+	membank("bank4")->set_base(machine().root_device().memregion("user1")->base());          /* bank 4 is the paged ROMs     from 8000 to bfff */
+	membank("bank7")->set_base(memregion("user1")->base()+0x10000);  /* bank 7 points at the OS rom  from c000 to ffff */
 
-	bbcb_IC32_initialise(state);
+	bbcb_IC32_initialise(this);
 }
 
-MACHINE_START( bbcb )
+MACHINE_START_MEMBER(bbc_state,bbcb)
 {
-	bbc_state *state = machine.driver_data<bbc_state>();
-	state->m_mc6850_clock = 0;
+	m_mc6850_clock = 0;
 	//removed from here because MACHINE_START can no longer read DIP swiches.
 	//put in MACHINE_RESET instead.
-	//state->m_DFSType=  (machine.root_device().ioport("BBCCONFIG")->read()>>0)&0x07;
-	//state->m_SWRAMtype=(machine.root_device().ioport("BBCCONFIG")->read()>>3)&0x03;
-	//state->m_RAMSize=  (machine.root_device().ioport("BBCCONFIG")->read()>>5)&0x01;
+	//m_DFSType=  (machine().root_device().ioport("BBCCONFIG")->read()>>0)&0x07;
+	//m_SWRAMtype=(machine().root_device().ioport("BBCCONFIG")->read()>>3)&0x03;
+	//m_RAMSize=  (machine().root_device().ioport("BBCCONFIG")->read()>>5)&0x01;
 
 	/*set up the required disc controller*/
-	//switch (state->m_DFSType) {
+	//switch (m_DFSType) {
 	//case 0:   case 1: case 2: case 3:
-		state->m_previous_i8271_int_state=0;
+		m_previous_i8271_int_state=0;
 	//  break;
 	//case 4: case 5: case 6:
-		state->m_previous_wd177x_int_state=1;
+		m_previous_wd177x_int_state=1;
 	//  break;
 	//}
 }
 
-MACHINE_RESET( bbcb )
+MACHINE_RESET_MEMBER(bbc_state,bbcb)
 {
-	bbc_state *state = machine.driver_data<bbc_state>();
-	UINT8 *ram = state->memregion("maincpu")->base();
-	state->m_DFSType=    (machine.root_device().ioport("BBCCONFIG")->read() >> 0) & 0x07;
-	state->m_SWRAMtype = (machine.root_device().ioport("BBCCONFIG")->read() >> 3) & 0x03;
-	state->m_RAMSize=    (machine.root_device().ioport("BBCCONFIG")->read() >> 5) & 0x01;
+	UINT8 *ram = memregion("maincpu")->base();
+	m_DFSType=    (machine().root_device().ioport("BBCCONFIG")->read() >> 0) & 0x07;
+	m_SWRAMtype = (machine().root_device().ioport("BBCCONFIG")->read() >> 3) & 0x03;
+	m_RAMSize=    (machine().root_device().ioport("BBCCONFIG")->read() >> 5) & 0x01;
 
-	state->membank("bank1")->set_base(ram);
-	if (state->m_RAMSize)
+	membank("bank1")->set_base(ram);
+	if (m_RAMSize)
 	{
 		/* 32K Model B */
-		state->membank("bank3")->set_base(ram + 0x4000);
-		state->m_memorySize=32;
+		membank("bank3")->set_base(ram + 0x4000);
+		m_memorySize=32;
 	}
 	else
 	{
 		/* 16K just repeat the lower 16K*/
-		state->membank("bank3")->set_base(ram);
-		state->m_memorySize=16;
+		membank("bank3")->set_base(ram);
+		m_memorySize=16;
 	}
 
-	state->membank("bank4")->set_base(machine.root_device().memregion("user1")->base());          /* bank 4 is the paged ROMs     from 8000 to bfff */
-	state->membank("bank7")->set_base(machine.root_device().memregion("user1")->base() + 0x40000);  /* bank 7 points at the OS rom  from c000 to ffff */
+	membank("bank4")->set_base(machine().root_device().memregion("user1")->base());          /* bank 4 is the paged ROMs     from 8000 to bfff */
+	membank("bank7")->set_base(machine().root_device().memregion("user1")->base() + 0x40000);  /* bank 7 points at the OS rom  from c000 to ffff */
 
-	bbcb_IC32_initialise(state);
+	bbcb_IC32_initialise(this);
 
 
-	state->m_opusbank = 0;
+	m_opusbank = 0;
 	/*set up the required disc controller*/
-	//switch (state->m_DFSType) {
+	//switch (m_DFSType) {
 	//case 0:   case 1: case 2: case 3:
 	//  break;
 	//case 4: case 5: case 6:
@@ -2077,60 +2074,56 @@ MACHINE_RESET( bbcb )
 }
 
 
-MACHINE_START( bbcbp )
+MACHINE_START_MEMBER(bbc_state,bbcbp)
 {
-	bbc_state *state = machine.driver_data<bbc_state>();
-	state->m_mc6850_clock = 0;
+	m_mc6850_clock = 0;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(bbc_state::bbcbp_direct_handler), state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(bbc_state::bbcbp_direct_handler), this));
 
 	/* bank 6 is the paged ROMs     from b000 to bfff */
-	state->membank("bank6")->configure_entries(0, 16, state->memregion("user1")->base() + 0x3000, 1<<14);
+	membank("bank6")->configure_entries(0, 16, memregion("user1")->base() + 0x3000, 1<<14);
 }
 
-MACHINE_RESET( bbcbp )
+MACHINE_RESET_MEMBER(bbc_state,bbcbp)
 {
-	bbc_state *state = machine.driver_data<bbc_state>();
-	state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base());
-	state->membank("bank2")->set_base(machine.root_device().memregion("maincpu")->base()+0x03000);  /* bank 2 screen/shadow ram     from 3000 to 7fff */
-	state->membank("bank4")->set_base(machine.root_device().memregion("user1")->base());         /* bank 4 is paged ROM or RAM   from 8000 to afff */
-	state->membank("bank6")->set_entry(0);
-	state->membank("bank7")->set_base(state->memregion("user1")->base()+0x40000); /* bank 7 points at the OS rom  from c000 to ffff */
+	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
+	membank("bank2")->set_base(machine().root_device().memregion("maincpu")->base()+0x03000);  /* bank 2 screen/shadow ram     from 3000 to 7fff */
+	membank("bank4")->set_base(machine().root_device().memregion("user1")->base());         /* bank 4 is paged ROM or RAM   from 8000 to afff */
+	membank("bank6")->set_entry(0);
+	membank("bank7")->set_base(memregion("user1")->base()+0x40000); /* bank 7 points at the OS rom  from c000 to ffff */
 
-	bbcb_IC32_initialise(state);
+	bbcb_IC32_initialise(this);
 
 
-	state->m_previous_wd177x_int_state=1;
+	m_previous_wd177x_int_state=1;
 }
 
 
 
-MACHINE_START( bbcm )
+MACHINE_START_MEMBER(bbc_state,bbcm)
 {
-	bbc_state *state = machine.driver_data<bbc_state>();
-	state->m_mc6850_clock = 0;
+	m_mc6850_clock = 0;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(bbc_state::bbcm_direct_handler), state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(bbc_state::bbcm_direct_handler), this));
 
 	/* bank 5 is the paged ROMs     from 9000 to bfff */
-	state->membank("bank5")->configure_entries(0, 16, machine.root_device().memregion("user1")->base()+0x01000, 1<<14);
+	membank("bank5")->configure_entries(0, 16, machine().root_device().memregion("user1")->base()+0x01000, 1<<14);
 
 	/* Set ROM/IO bank to point to rom */
-	state->membank( "bank8" )->set_base( state->memregion("user1")->base()+0x43c00);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xFC00, 0xFEFF, "bank8");
+	membank( "bank8" )->set_base( memregion("user1")->base()+0x43c00);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xFC00, 0xFEFF, "bank8");
 }
 
-MACHINE_RESET( bbcm )
+MACHINE_RESET_MEMBER(bbc_state,bbcm)
 {
-	bbc_state *state = machine.driver_data<bbc_state>();
-	state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base());			/* bank 1 regular lower ram     from 0000 to 2fff */
-	state->membank("bank2")->set_base(machine.root_device().memregion("maincpu")->base() + 0x3000);	/* bank 2 screen/shadow ram     from 3000 to 7fff */
-	state->membank("bank4")->set_base(machine.root_device().memregion("user1")->base());         /* bank 4 is paged ROM or RAM   from 8000 to 8fff */
-	state->membank("bank5")->set_entry(0);
-	state->membank("bank7")->set_base(state->memregion("user1")->base() + 0x40000); /* bank 6 OS rom of RAM          from c000 to dfff */
+	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());			/* bank 1 regular lower ram     from 0000 to 2fff */
+	membank("bank2")->set_base(machine().root_device().memregion("maincpu")->base() + 0x3000);	/* bank 2 screen/shadow ram     from 3000 to 7fff */
+	membank("bank4")->set_base(machine().root_device().memregion("user1")->base());         /* bank 4 is paged ROM or RAM   from 8000 to 8fff */
+	membank("bank5")->set_entry(0);
+	membank("bank7")->set_base(memregion("user1")->base() + 0x40000); /* bank 6 OS rom of RAM          from c000 to dfff */
 
-	bbcb_IC32_initialise(state);
+	bbcb_IC32_initialise(this);
 
 
-	state->m_previous_wd177x_int_state=1;
+	m_previous_wd177x_int_state=1;
 }

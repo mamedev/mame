@@ -292,33 +292,31 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static MACHINE_START( pandoras )
+void pandoras_state::machine_start()
 {
-	pandoras_state *state = machine.driver_data<pandoras_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_subcpu = machine.device<cpu_device>("sub");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_mcu = machine.device<cpu_device>("mcu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_subcpu = machine().device<cpu_device>("sub");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_mcu = machine().device<cpu_device>("mcu");
 
-	state->save_item(NAME(state->m_firq_old_data_a));
-	state->save_item(NAME(state->m_firq_old_data_b));
-	state->save_item(NAME(state->m_irq_enable_a));
-	state->save_item(NAME(state->m_irq_enable_b));
-	state->save_item(NAME(state->m_i8039_status));
+	save_item(NAME(m_firq_old_data_a));
+	save_item(NAME(m_firq_old_data_b));
+	save_item(NAME(m_irq_enable_a));
+	save_item(NAME(m_irq_enable_b));
+	save_item(NAME(m_i8039_status));
 }
 
-static MACHINE_RESET( pandoras )
+void pandoras_state::machine_reset()
 {
-	pandoras_state *state = machine.driver_data<pandoras_state>();
 
-	state->m_firq_old_data_a = 0;
-	state->m_firq_old_data_b = 0;
-	state->m_irq_enable_a = 0;
-	state->m_irq_enable_b = 0;
-	state->m_i8039_status = 0;
+	m_firq_old_data_a = 0;
+	m_firq_old_data_b = 0;
+	m_irq_enable_a = 0;
+	m_irq_enable_b = 0;
+	m_i8039_status = 0;
 
-	state->m_flipscreen = 0;
+	m_flipscreen = 0;
 }
 
 READ8_MEMBER(pandoras_state::pandoras_portA_r)
@@ -361,8 +359,6 @@ static MACHINE_CONFIG_START( pandoras, pandoras_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - needed for correct synchronization of the sound CPUs */
 
-	MCFG_MACHINE_START(pandoras)
-	MCFG_MACHINE_RESET(pandoras)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -375,8 +371,6 @@ static MACHINE_CONFIG_START( pandoras, pandoras_state )
 	MCFG_GFXDECODE(pandoras)
 	MCFG_PALETTE_LENGTH(16*16+16*16)
 
-	MCFG_PALETTE_INIT(pandoras)
-	MCFG_VIDEO_START(pandoras)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

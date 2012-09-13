@@ -100,17 +100,17 @@ static GFXDECODE_START( wswan )
 GFXDECODE_END
 
 /* WonderSwan can display 16 shades of grey */
-static PALETTE_INIT( wswan )
+void wswan_state::palette_init()
 {
 	int ii;
 	for (ii = 0; ii < 16; ii++)
 	{
 		UINT8 shade = ii * (256 / 16);
-		palette_set_color_rgb(machine,  15 - ii, shade, shade, shade);
+		palette_set_color_rgb(machine(),  15 - ii, shade, shade, shade);
 	}
 }
 
-static PALETTE_INIT( wscolor )
+PALETTE_INIT_MEMBER(wswan_state,wscolor)
 {
 	int i;
 	for (i = 0; i < 4096; i++)
@@ -118,7 +118,7 @@ static PALETTE_INIT( wscolor )
 		int r = (i & 0x0f00) >> 8;
 		int g = (i & 0x00f0) >> 4;
 		int b = i & 0x000f;
-		palette_set_color_rgb(machine,  i, r << 4, g << 4, b << 4);
+		palette_set_color_rgb(machine(),  i, r << 4, g << 4, b << 4);
 	}
 }
 
@@ -140,12 +140,9 @@ static MACHINE_CONFIG_START( wswan, wswan_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_MACHINE_START( wswan )
-	MCFG_MACHINE_RESET( wswan )
 
 	MCFG_GFXDECODE(wswan)
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT(wswan)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -169,9 +166,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( wscolor, wswan )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(wscolor_mem)
-	MCFG_MACHINE_START( wscolor )
+	MCFG_MACHINE_START_OVERRIDE(wswan_state, wscolor )
 	MCFG_PALETTE_LENGTH(4096)
-	MCFG_PALETTE_INIT( wscolor )
+	MCFG_PALETTE_INIT_OVERRIDE(wswan_state, wscolor )
 
 
 	/* software lists */

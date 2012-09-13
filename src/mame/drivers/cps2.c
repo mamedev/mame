@@ -1210,15 +1210,14 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( cps2 )
+MACHINE_START_MEMBER(cps_state,cps2)
 {
-	cps_state *state = machine.driver_data<cps_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	if (state->m_audiocpu != NULL)	// gigaman2 has no audiocpu
-		state->membank("bank1")->configure_entries(0, (QSOUND_SIZE - 0x10000) / 0x4000, state->memregion("audiocpu")->base() + 0x10000, 0x4000);
+	if (m_audiocpu != NULL)	// gigaman2 has no audiocpu
+		membank("bank1")->configure_entries(0, (QSOUND_SIZE - 0x10000) / 0x4000, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 
@@ -1233,7 +1232,7 @@ static MACHINE_CONFIG_START( cps2, cps_state )
 	MCFG_CPU_PROGRAM_MAP(qsound_sub_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 251)	/* 251 is good (see 'mercy mercy mercy'section of sgemf attract mode for accurate sound sync */
 
-	MCFG_MACHINE_START(cps2)
+	MCFG_MACHINE_START_OVERRIDE(cps_state,cps2)
 
 	MCFG_EEPROM_ADD("eeprom", cps2_eeprom_interface)
 
@@ -1258,7 +1257,7 @@ static MACHINE_CONFIG_START( cps2, cps_state )
 	MCFG_GFXDECODE(cps2)
 	MCFG_PALETTE_LENGTH(0xc00)
 
-	MCFG_VIDEO_START(cps2)
+	MCFG_VIDEO_START_OVERRIDE(cps_state,cps2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

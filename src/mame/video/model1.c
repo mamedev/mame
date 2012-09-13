@@ -1443,27 +1443,26 @@ static void tgp_scan(running_machine &machine)
 	state->m_render_done = 0;
 }
 
-VIDEO_START(model1)
+VIDEO_START_MEMBER(model1_state,model1)
 {
-	model1_state *state = machine.driver_data<model1_state>();
-	state->m_paletteram16 = state->m_generic_paletteram_16;
+	m_paletteram16 = m_generic_paletteram_16;
 
-	state->m_view = auto_alloc_clear(machine, struct view);
+	m_view = auto_alloc_clear(machine(), struct view);
 
-	state->m_poly_rom = (UINT32 *)state->memregion("user1")->base();
-	state->m_poly_ram = auto_alloc_array_clear(machine, UINT32, 0x400000);
-	state->m_tgp_ram = auto_alloc_array_clear(machine, UINT16, 0x100000-0x40000);
-	state->m_pointdb = auto_alloc_array_clear(machine, struct point, 1000000*2);
-	state->m_quaddb  = auto_alloc_array_clear(machine, struct quad_m1, 1000000);
-	state->m_quadind = auto_alloc_array_clear(machine, struct quad_m1 *, 1000000);
+	m_poly_rom = (UINT32 *)memregion("user1")->base();
+	m_poly_ram = auto_alloc_array_clear(machine(), UINT32, 0x400000);
+	m_tgp_ram = auto_alloc_array_clear(machine(), UINT16, 0x100000-0x40000);
+	m_pointdb = auto_alloc_array_clear(machine(), struct point, 1000000*2);
+	m_quaddb  = auto_alloc_array_clear(machine(), struct quad_m1, 1000000);
+	m_quadind = auto_alloc_array_clear(machine(), struct quad_m1 *, 1000000);
 
-	state->m_pointpt = state->m_pointdb;
-	state->m_quadpt = state->m_quaddb;
-	state->m_listctl[0] = state->m_listctl[1] = 0;
+	m_pointpt = m_pointdb;
+	m_quadpt = m_quaddb;
+	m_listctl[0] = m_listctl[1] = 0;
 
-	state_save_register_global_pointer(machine, state->m_tgp_ram, 0x100000-0x40000);
-	state_save_register_global_pointer(machine, state->m_poly_ram, 0x40000);
-	state_save_register_global_array(machine, state->m_listctl);
+	state_save_register_global_pointer(machine(), m_tgp_ram, 0x100000-0x40000);
+	state_save_register_global_pointer(machine(), m_poly_ram, 0x40000);
+	state_save_register_global_array(machine(), m_listctl);
 }
 
 SCREEN_UPDATE_RGB32(model1)

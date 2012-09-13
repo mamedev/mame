@@ -43,12 +43,15 @@ public:
 	DECLARE_WRITE8_MEMBER(spdodgeb_videoram_w);
 	TILEMAP_MAPPER_MEMBER(background_scan);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/spdodgeb.c -----------*/
 
-PALETTE_INIT( spdodgeb );
-VIDEO_START( spdodgeb );
+
+
 SCREEN_UPDATE_IND16( spdodgeb );
 TIMER_DEVICE_CALLBACK( spdodgeb_interrupt );

@@ -130,6 +130,10 @@ public:
 	DECLARE_WRITE16_MEMBER(model1_listctl_w);
 	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk1_w);
 	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk2_w);
+	DECLARE_MACHINE_START(model1);
+	DECLARE_MACHINE_RESET(model1);
+	DECLARE_VIDEO_START(model1);
+	DECLARE_MACHINE_RESET(model1_vr);
 };
 
 
@@ -141,7 +145,7 @@ extern const mb86233_cpu_core model1_vr_tgp_config;
 
 ADDRESS_MAP_EXTERN( model1_vr_tgp_map, 32 );
 
-MACHINE_START( model1 );
+
 
 void model1_vr_tgp_reset( running_machine &machine );
 void model1_tgp_reset(running_machine &machine, int swa);
@@ -149,7 +153,7 @@ void model1_tgp_reset(running_machine &machine, int swa);
 
 /*----------- defined in video/model1.c -----------*/
 
-VIDEO_START(model1);
+
 SCREEN_UPDATE_RGB32(model1);
 SCREEN_VBLANK(model1);
 

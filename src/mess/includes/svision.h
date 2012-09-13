@@ -49,6 +49,11 @@ public:
 	DECLARE_WRITE8_MEMBER(tvlink_w);
 	DECLARE_DRIVER_INIT(svisions);
 	DECLARE_DRIVER_INIT(svision);
+	virtual void machine_reset();
+	virtual void palette_init();
+	DECLARE_PALETTE_INIT(svisionp);
+	DECLARE_PALETTE_INIT(svisionn);
+	DECLARE_MACHINE_RESET(tvlink);
 };
 
 

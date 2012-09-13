@@ -26,19 +26,19 @@
 
 
 /* 0 B01234 G01234 R01234 */
-PALETTE_INIT( sprtmtch )
+PALETTE_INIT_MEMBER(dynax_state,sprtmtch)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		int x = (color_prom[i] << 8) + color_prom[0x200 + i];
 		/* The bits are in reverse order! */
 		int r = BITSWAP8((x >>  0) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
 		int g = BITSWAP8((x >>  5) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
 		int b = BITSWAP8((x >> 10) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
-		palette_set_color_rgb(machine, i, pal5bit(r), pal5bit(g), pal5bit(b));
+		palette_set_color_rgb(machine(), i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -800,166 +800,158 @@ static void dynax_common_reset( running_machine &machine )
 	state->save_item(NAME(state->m_hanamai_priority));
 }
 
-VIDEO_START( hanamai )
+VIDEO_START_MEMBER(dynax_state,hanamai)
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
 
-	state->m_pixmap[0][0] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[0][1] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[1][0] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[1][1] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[2][0] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[2][1] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[3][0] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[3][1] = auto_alloc_array(machine, UINT8, 256 * 256);
+	m_pixmap[0][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[0][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[1][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[1][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[2][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[2][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[3][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[3][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
 
-	dynax_common_reset(machine);
-	state->m_layer_layout = LAYOUT_HANAMAI;
+	dynax_common_reset(machine());
+	m_layer_layout = LAYOUT_HANAMAI;
 
-	state->save_pointer(NAME(state->m_pixmap[0][0]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[0][1]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[1][0]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[1][1]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[2][0]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[2][1]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[3][0]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[3][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][1]), 256 * 256);
 }
 
-VIDEO_START( hnoridur )
+VIDEO_START_MEMBER(dynax_state,hnoridur)
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
 
-	state->m_pixmap[0][0] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[0][1] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[1][0] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[1][1] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[2][0] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[2][1] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[3][0] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[3][1] = auto_alloc_array(machine, UINT8, 256 * 256);
+	m_pixmap[0][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[0][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[1][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[1][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[2][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[2][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[3][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[3][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
 
-	dynax_common_reset(machine);
-	state->m_layer_layout = LAYOUT_HNORIDUR;
+	dynax_common_reset(machine());
+	m_layer_layout = LAYOUT_HNORIDUR;
 
-	state->m_priority_table = priority_hnoridur;
+	m_priority_table = priority_hnoridur;
 
-	state->save_pointer(NAME(state->m_pixmap[0][0]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[0][1]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[1][0]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[1][1]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[2][0]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[2][1]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[3][0]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[3][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][1]), 256 * 256);
 }
 
-VIDEO_START( mcnpshnt )
+VIDEO_START_MEMBER(dynax_state,mcnpshnt)
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
 
-	VIDEO_START_CALL(hnoridur);
-	state->m_priority_table = priority_mcnpshnt;
+	VIDEO_START_CALL_MEMBER(hnoridur);
+	m_priority_table = priority_mcnpshnt;
 }
 
-VIDEO_START( sprtmtch )
+VIDEO_START_MEMBER(dynax_state,sprtmtch)
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
 
-	state->m_pixmap[0][0] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[0][1] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[1][0] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[1][1] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[2][0] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[2][1] = auto_alloc_array(machine, UINT8, 256 * 256);
+	m_pixmap[0][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[0][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[1][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[1][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[2][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[2][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
 
-	dynax_common_reset(machine);
-	state->m_layer_layout = LAYOUT_DRGPUNCH;
+	dynax_common_reset(machine());
+	m_layer_layout = LAYOUT_DRGPUNCH;
 
-	state->save_pointer(NAME(state->m_pixmap[0][0]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[0][1]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[1][0]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[1][1]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[2][0]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[2][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][1]), 256 * 256);
 }
 
-VIDEO_START( jantouki )
+VIDEO_START_MEMBER(dynax_state,jantouki)
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
 
-	state->m_pixmap[0][0] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[0][1] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[1][0] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[1][1] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[2][0] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[2][1] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[3][0] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[3][1] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[4][0] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[4][1] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[5][0] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[5][1] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[6][0] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[6][1] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[7][0] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[7][1] = auto_alloc_array(machine, UINT8, 256 * 256);
+	m_pixmap[0][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[0][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[1][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[1][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[2][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[2][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[3][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[3][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[4][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[4][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[5][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[5][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[6][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[6][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[7][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[7][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
 
-	dynax_common_reset(machine);
-	state->m_layer_layout = LAYOUT_JANTOUKI;
-	state->m_update_irq_func = jantouki_update_irq;
+	dynax_common_reset(machine());
+	m_layer_layout = LAYOUT_JANTOUKI;
+	m_update_irq_func = jantouki_update_irq;
 
-	state->save_pointer(NAME(state->m_pixmap[0][0]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[0][1]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[1][0]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[1][1]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[2][0]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[2][1]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[3][0]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[3][1]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[4][0]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[4][1]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[5][0]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[5][1]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[6][0]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[6][1]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[7][0]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[7][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[4][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[4][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[5][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[5][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[6][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[6][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[7][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[7][1]), 256 * 256);
 }
 
-VIDEO_START( mjdialq2 )
+VIDEO_START_MEMBER(dynax_state,mjdialq2)
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
 
-	state->m_pixmap[0][0] = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_pixmap[1][0] = auto_alloc_array(machine, UINT8, 256 * 256);
+	m_pixmap[0][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[1][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
 
-	dynax_common_reset(machine);
-	state->m_layer_layout = LAYOUT_MJDIALQ2;
-	state->m_update_irq_func = 0;
+	dynax_common_reset(machine());
+	m_layer_layout = LAYOUT_MJDIALQ2;
+	m_update_irq_func = 0;
 
-	state->save_pointer(NAME(state->m_pixmap[0][0]), 256 * 256);
-	state->save_pointer(NAME(state->m_pixmap[1][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
 }
 
-VIDEO_START( mjelctrn )
+VIDEO_START_MEMBER(dynax_state,mjelctrn)
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
 
-	VIDEO_START_CALL(hnoridur);
+	VIDEO_START_CALL_MEMBER(hnoridur);
 
-	state->m_priority_table = priority_mjelctrn;
-	state->m_update_irq_func = mjelctrn_update_irq;
+	m_priority_table = priority_mjelctrn;
+	m_update_irq_func = mjelctrn_update_irq;
 }
 
-VIDEO_START( neruton )
+VIDEO_START_MEMBER(dynax_state,neruton)
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
 
-	VIDEO_START_CALL(hnoridur);
+	VIDEO_START_CALL_MEMBER(hnoridur);
 
-//  state->m_priority_table = priority_mjelctrn;
-	state->m_update_irq_func = neruton_update_irq;
+//  m_priority_table = priority_mjelctrn;
+	m_update_irq_func = neruton_update_irq;
 }
 
 /***************************************************************************
@@ -1396,10 +1388,10 @@ SCREEN_UPDATE_IND16( mjdialq2 )
 
 // htengoku uses the mixer chip from ddenlovr
 
-VIDEO_START(htengoku)
+VIDEO_START_MEMBER(dynax_state,htengoku)
 {
-	VIDEO_START_CALL(ddenlovr);
-	VIDEO_START_CALL(hnoridur);
+	VIDEO_START_CALL_MEMBER(ddenlovr);
+	VIDEO_START_CALL_MEMBER(hnoridur);
 }
 
 SCREEN_UPDATE_IND16(htengoku)

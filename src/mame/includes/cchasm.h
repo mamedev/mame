@@ -31,6 +31,7 @@ public:
 	DECLARE_READ16_MEMBER(cchasm_io_r);
 	INPUT_CHANGED_MEMBER(cchasm_set_coin_flag);
 	DECLARE_WRITE_LINE_MEMBER(cchasm_6840_irq);
+	virtual void video_start();
 };
 
 
@@ -46,5 +47,5 @@ SOUND_START( cchasm );
 
 /*----------- defined in video/cchasm.c -----------*/
 
-VIDEO_START( cchasm );
+
 

@@ -142,22 +142,21 @@ WRITE16_MEMBER(realbrk_state::realbrk_vram_2_w)
 
 ***************************************************************************/
 
-VIDEO_START(realbrk)
+void realbrk_state::video_start()
 {
-	realbrk_state *state = machine.driver_data<realbrk_state>();
 	/* Backgrounds */
-	state->m_tilemap_0 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(realbrk_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x20);
-	state->m_tilemap_1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(realbrk_state::get_tile_info_1),state), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x20);
+	m_tilemap_0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(realbrk_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x20);
+	m_tilemap_1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(realbrk_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x20);
 
 	/* Text */
-	state->m_tilemap_2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(realbrk_state::get_tile_info_2),state), TILEMAP_SCAN_ROWS,  8,  8, 0x40, 0x20);
+	m_tilemap_2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(realbrk_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS,  8,  8, 0x40, 0x20);
 
-	state->m_tilemap_0->set_transparent_pen(0);
-	state->m_tilemap_1->set_transparent_pen(0);
-	state->m_tilemap_2->set_transparent_pen(0);
+	m_tilemap_0->set_transparent_pen(0);
+	m_tilemap_1->set_transparent_pen(0);
+	m_tilemap_2->set_transparent_pen(0);
 
-	state->m_tmpbitmap0 = auto_bitmap_ind16_alloc(machine,32,32);
-	state->m_tmpbitmap1 = auto_bitmap_ind16_alloc(machine,32,32);
+	m_tmpbitmap0 = auto_bitmap_ind16_alloc(machine(),32,32);
+	m_tmpbitmap1 = auto_bitmap_ind16_alloc(machine(),32,32);
 }
 
 /***************************************************************************

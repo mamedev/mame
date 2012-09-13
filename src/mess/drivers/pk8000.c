@@ -27,6 +27,8 @@ public:
 	UINT8 m_keyboard_line;
 	DECLARE_READ8_MEMBER(pk8000_joy_1_r);
 	DECLARE_READ8_MEMBER(pk8000_joy_2_r);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -316,13 +318,13 @@ static IRQ_CALLBACK(pk8000_irq_callback)
 }
 
 
-static MACHINE_RESET(pk8000)
+void pk8000_state::machine_reset()
 {
-	pk8000_set_bank(machine,0);
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(pk8000_irq_callback);
+	pk8000_set_bank(machine(),0);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(pk8000_irq_callback);
 }
 
-static VIDEO_START( pk8000 )
+void pk8000_state::video_start()
 {
 }
 
@@ -348,7 +350,6 @@ static MACHINE_CONFIG_START( pk8000, pk8000_state )
 	MCFG_CPU_IO_MAP(pk8000_io)
 	MCFG_CPU_VBLANK_INT("screen", pk8000_interrupt)
 
-	MCFG_MACHINE_RESET(pk8000)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -361,7 +362,6 @@ static MACHINE_CONFIG_START( pk8000, pk8000_state )
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(pk8000)
 
-	MCFG_VIDEO_START(pk8000)
 
 	MCFG_I8255_ADD( "ppi8255_1", pk8000_ppi8255_interface_1 )
 	MCFG_I8255_ADD( "ppi8255_2", pk8000_ppi8255_interface_2 )

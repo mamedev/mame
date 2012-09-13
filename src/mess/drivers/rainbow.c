@@ -129,6 +129,7 @@ private:
     UINT8 m_z80_mailbox, m_8088_mailbox;
 
     void update_kbd_irq();
+	virtual void machine_reset();
 };
 
 void rainbow_state::machine_start()
@@ -190,17 +191,16 @@ static INPUT_PORTS_START( rainbow )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET( rainbow )
+void rainbow_state::machine_reset()
 {
-    rainbow_state *state = machine.driver_data<rainbow_state>();
 
-    state->m_z80->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+    m_z80->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
-    state->m_zflip = true;
-    state->m_z80_halted = true;
-    state->m_kbd_tx_ready = state->m_kbd_rx_ready = false;
+    m_zflip = true;
+    m_z80_halted = true;
+    m_kbd_tx_ready = m_kbd_rx_ready = false;
 
-    state->m_kbd8251->input_callback(SERIAL_STATE_CTS); // raise clear to send
+    m_kbd8251->input_callback(SERIAL_STATE_CTS); // raise clear to send
 }
 
 static SCREEN_UPDATE_IND16( rainbow )
@@ -467,7 +467,6 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_CPU_PROGRAM_MAP(rainbowz80_mem)
 	MCFG_CPU_IO_MAP(rainbowz80_io)
 
-	MCFG_MACHINE_RESET(rainbow)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

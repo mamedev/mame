@@ -94,20 +94,21 @@ public:
 	DECLARE_DRIVER_INIT(key_0);
 	DECLARE_DRIVER_INIT(key_2);
 	DECLARE_DRIVER_INIT(dtrvwz5);
+	virtual void machine_start();
+	DECLARE_MACHINE_START(casino5);
 };
 
 
-static MACHINE_START(merit)
+void merit_state::machine_start()
 {
-	merit_state *state = machine.driver_data<merit_state>();
-	state->m_question_address = 0;
-	state->m_ram_palette = auto_alloc_array(machine, UINT8, RAM_PALETTE_SIZE);
+	m_question_address = 0;
+	m_ram_palette = auto_alloc_array(machine(), UINT8, RAM_PALETTE_SIZE);
 
-	state_save_register_global_pointer(machine, state->m_ram_palette, RAM_PALETTE_SIZE);
-	state_save_register_global(machine, state->m_lscnblk);
-	state_save_register_global(machine, state->m_extra_video_bank_bit);
-	state_save_register_global(machine, state->m_question_address);
-	state_save_register_global(machine, state->m_decryption_key);
+	state_save_register_global_pointer(machine(), m_ram_palette, RAM_PALETTE_SIZE);
+	state_save_register_global(machine(), m_lscnblk);
+	state_save_register_global(machine(), m_extra_video_bank_bit);
+	state_save_register_global(machine(), m_question_address);
+	state_save_register_global(machine(), m_decryption_key);
 }
 
 
@@ -1213,13 +1214,13 @@ void merit_state::dodge_nvram_init(nvram_device &nvram, void *base, size_t size)
 	reinterpret_cast<UINT8 *>(base)[0x1040] = 0xc9; /* ret */
 }
 
-static MACHINE_START(casino5)
+MACHINE_START_MEMBER(merit_state,casino5)
 {
-	MACHINE_START_CALL(merit);
-	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base() + 0x2000, 0x2000);
-	machine.root_device().membank("bank2")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base() + 0x6000, 0x2000);
-	machine.root_device().membank("bank1")->set_entry(0);
-	machine.root_device().membank("bank2")->set_entry(0);
+	merit_state::machine_start();
+	machine().root_device().membank("bank1")->configure_entries(0, 2, machine().root_device().memregion("maincpu")->base() + 0x2000, 0x2000);
+	machine().root_device().membank("bank2")->configure_entries(0, 2, machine().root_device().memregion("maincpu")->base() + 0x6000, 0x2000);
+	machine().root_device().membank("bank1")->set_entry(0);
+	machine().root_device().membank("bank2")->set_entry(0);
 }
 
 static MACHINE_CONFIG_START( pitboss, merit_state )
@@ -1230,7 +1231,6 @@ static MACHINE_CONFIG_START( pitboss, merit_state )
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
 
-	MCFG_MACHINE_START(merit)
 	/* video hardware */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1255,7 +1255,7 @@ static MACHINE_CONFIG_DERIVED( casino5, pitboss )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_MACHINE_START(casino5)
+	MCFG_MACHINE_START_OVERRIDE(merit_state,casino5)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bigappg, pitboss )

@@ -43,6 +43,7 @@ protected:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -81,7 +82,7 @@ void segajw_state::machine_reset()
 {
 }
 
-static PALETTE_INIT( segajw )
+void segajw_state::palette_init()
 {
 
 }
@@ -100,7 +101,6 @@ static MACHINE_CONFIG_START( segajw, segajw_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MCFG_PALETTE_INIT(segajw)
 	MCFG_PALETTE_LENGTH(16)
 
 	/* sound hardware */

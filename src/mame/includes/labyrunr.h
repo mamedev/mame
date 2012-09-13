@@ -38,6 +38,9 @@ public:
 	DECLARE_WRITE8_MEMBER(labyrunr_vram2_w);
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
+	virtual void machine_start();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -45,6 +48,6 @@ public:
 
 
 
-PALETTE_INIT( labyrunr );
-VIDEO_START( labyrunr );
+
+
 SCREEN_UPDATE_IND16( labyrunr );

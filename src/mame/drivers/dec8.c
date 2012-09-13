@@ -1978,56 +1978,54 @@ static INTERRUPT_GEN( oscar_interrupt )
 /******************************************************************************/
 
 
-static MACHINE_START( dec8 )
+void dec8_state::machine_start()
 {
-	dec8_state *state = machine.driver_data<dec8_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_subcpu = machine.device<cpu_device>("sub");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_mcu = machine.device("mcu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_subcpu = machine().device<cpu_device>("sub");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_mcu = machine().device("mcu");
 
-	state->save_item(NAME(state->m_latch));
-	state->save_item(NAME(state->m_nmi_enable));
-	state->save_item(NAME(state->m_i8751_port0));
-	state->save_item(NAME(state->m_i8751_port1));
-	state->save_item(NAME(state->m_i8751_return));
-	state->save_item(NAME(state->m_i8751_value));
-	state->save_item(NAME(state->m_coinage_id));
-	state->save_item(NAME(state->m_coin1));
-	state->save_item(NAME(state->m_coin2));
-	state->save_item(NAME(state->m_need1));
-	state->save_item(NAME(state->m_need2));
-	state->save_item(NAME(state->m_cred1));
-	state->save_item(NAME(state->m_cred2));
-	state->save_item(NAME(state->m_credits));
-	state->save_item(NAME(state->m_snd));
-	state->save_item(NAME(state->m_msm5205next));
-	state->save_item(NAME(state->m_toggle));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_i8751_port0));
+	save_item(NAME(m_i8751_port1));
+	save_item(NAME(m_i8751_return));
+	save_item(NAME(m_i8751_value));
+	save_item(NAME(m_coinage_id));
+	save_item(NAME(m_coin1));
+	save_item(NAME(m_coin2));
+	save_item(NAME(m_need1));
+	save_item(NAME(m_need2));
+	save_item(NAME(m_cred1));
+	save_item(NAME(m_cred2));
+	save_item(NAME(m_credits));
+	save_item(NAME(m_snd));
+	save_item(NAME(m_msm5205next));
+	save_item(NAME(m_toggle));
 
-	state->save_item(NAME(state->m_scroll2));
-	state->save_item(NAME(state->m_bg_control));
-	state->save_item(NAME(state->m_pf1_control));
+	save_item(NAME(m_scroll2));
+	save_item(NAME(m_bg_control));
+	save_item(NAME(m_pf1_control));
 }
 
-static MACHINE_RESET( dec8 )
+void dec8_state::machine_reset()
 {
-	dec8_state *state = machine.driver_data<dec8_state>();
 	int i;
 
-	state->m_nmi_enable = state->m_i8751_port0 = state->m_i8751_port1 = 0;
-	state->m_i8751_return = state->m_i8751_value = 0;
-	state->m_coinage_id = 0;
-	state->m_coin1 = state->m_coin2 = state->m_credits = state->m_snd = 0;
-	state->m_need1 = state->m_need2 = state->m_cred1 = state->m_cred2 = 1;
-	state->m_msm5205next = 0;
-	state->m_toggle = 0;
+	m_nmi_enable = m_i8751_port0 = m_i8751_port1 = 0;
+	m_i8751_return = m_i8751_value = 0;
+	m_coinage_id = 0;
+	m_coin1 = m_coin2 = m_credits = m_snd = 0;
+	m_need1 = m_need2 = m_cred1 = m_cred2 = 1;
+	m_msm5205next = 0;
+	m_toggle = 0;
 
-	state->m_scroll2[0] = state->m_scroll2[1] = state->m_scroll2[2] = state->m_scroll2[3] = 0;
+	m_scroll2[0] = m_scroll2[1] = m_scroll2[2] = m_scroll2[3] = 0;
 	for (i = 0; i < 0x20; i++)
 	{
-		state->m_bg_control[i] = 0;
-		state->m_pf1_control[i] = 0;
+		m_bg_control[i] = 0;
+		m_pf1_control[i] = 0;
 	}
 }
 
@@ -2046,8 +2044,6 @@ static MACHINE_CONFIG_START( lastmisn, dec8_state )
 								/* NMIs are caused by the main CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
-	MCFG_MACHINE_START(dec8)
-	MCFG_MACHINE_RESET(dec8)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -2065,7 +2061,7 @@ static MACHINE_CONFIG_START( lastmisn, dec8_state )
 	MCFG_GFXDECODE(shackled)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(lastmisn)
+	MCFG_VIDEO_START_OVERRIDE(dec8_state,lastmisn)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2095,8 +2091,6 @@ static MACHINE_CONFIG_START( shackled, dec8_state )
 								/* NMIs are caused by the main CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(4800))
 
-	MCFG_MACHINE_START(dec8)
-	MCFG_MACHINE_RESET(dec8)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -2114,7 +2108,7 @@ static MACHINE_CONFIG_START( shackled, dec8_state )
 	MCFG_GFXDECODE(shackled)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(shackled)
+	MCFG_VIDEO_START_OVERRIDE(dec8_state,shackled)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2144,8 +2138,6 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
 	MCFG_CPU_IO_MAP(dec8_mcu_io_map)
 
-	MCFG_MACHINE_START(dec8)
-	MCFG_MACHINE_RESET(dec8)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -2164,7 +2156,7 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 	MCFG_GFXDECODE(gondo)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(gondo)
+	MCFG_VIDEO_START_OVERRIDE(dec8_state,gondo)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2194,8 +2186,6 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
 	MCFG_CPU_IO_MAP(dec8_mcu_io_map)
 
-	MCFG_MACHINE_START(dec8)
-	MCFG_MACHINE_RESET(dec8)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -2214,7 +2204,7 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 	MCFG_GFXDECODE(gondo)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(garyoret)
+	MCFG_VIDEO_START_OVERRIDE(dec8_state,garyoret)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2244,8 +2234,6 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 	MCFG_CPU_ADD("mcu", I8751, 3000000*4)
 	MCFG_CPU_IO_MAP(dec8_mcu_io_map)
 
-	MCFG_MACHINE_START(dec8)
-	MCFG_MACHINE_RESET(dec8)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -2267,8 +2255,8 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 	MCFG_GFXDECODE(ghostb)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_PALETTE_INIT(ghostb)
-	MCFG_VIDEO_START(ghostb)
+	MCFG_PALETTE_INIT_OVERRIDE(dec8_state,ghostb)
+	MCFG_VIDEO_START_OVERRIDE(dec8_state,ghostb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2299,8 +2287,6 @@ static MACHINE_CONFIG_START( csilver, dec8_state )
 								/* NMIs are caused by the main CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(dec8)
-	MCFG_MACHINE_RESET(dec8)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -2318,7 +2304,7 @@ static MACHINE_CONFIG_START( csilver, dec8_state )
 	MCFG_GFXDECODE(shackled)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(lastmisn)
+	MCFG_VIDEO_START_OVERRIDE(dec8_state,lastmisn)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2353,8 +2339,6 @@ static MACHINE_CONFIG_START( oscar, dec8_state )
 								/* NMIs are caused by the main CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(2400)) /* 40 CPU slices per frame */
 
-	MCFG_MACHINE_START(dec8)
-	MCFG_MACHINE_RESET(dec8)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -2375,7 +2359,7 @@ static MACHINE_CONFIG_START( oscar, dec8_state )
 	MCFG_GFXDECODE(oscar)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(oscar)
+	MCFG_VIDEO_START_OVERRIDE(dec8_state,oscar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2402,8 +2386,6 @@ static MACHINE_CONFIG_START( srdarwin, dec8_state )
 	MCFG_CPU_PROGRAM_MAP(dec8_s_map)
 								/* NMIs are caused by the main CPU */
 
-	MCFG_MACHINE_START(dec8)
-	MCFG_MACHINE_RESET(dec8)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -2418,7 +2400,7 @@ static MACHINE_CONFIG_START( srdarwin, dec8_state )
 	MCFG_GFXDECODE(srdarwin)
 	MCFG_PALETTE_LENGTH(144)
 
-	MCFG_VIDEO_START(srdarwin)
+	MCFG_VIDEO_START_OVERRIDE(dec8_state,srdarwin)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2445,8 +2427,6 @@ static MACHINE_CONFIG_START( cobracom, dec8_state )
 	MCFG_CPU_PROGRAM_MAP(dec8_s_map)
 								/* NMIs are caused by the main CPU */
 
-	MCFG_MACHINE_START(dec8)
-	MCFG_MACHINE_RESET(dec8)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -2470,7 +2450,7 @@ static MACHINE_CONFIG_START( cobracom, dec8_state )
 	MCFG_GFXDECODE(cobracom)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(cobracom)
+	MCFG_VIDEO_START_OVERRIDE(dec8_state,cobracom)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

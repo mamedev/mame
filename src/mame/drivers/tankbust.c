@@ -111,9 +111,9 @@ READ8_MEMBER(tankbust_state::debug_output_area_r)
 
 
 
-static PALETTE_INIT( tankbust )
+void tankbust_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 128; i++)
@@ -156,7 +156,7 @@ static PALETTE_INIT( tankbust )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		r = 0x55 * bit0 + 0xaa * bit1;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -312,10 +312,9 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static MACHINE_RESET( tankbust )
+void tankbust_state::machine_reset()
 {
-	tankbust_state *state = machine.driver_data<tankbust_state>();
-	state->m_variable_data = 0x11;
+	m_variable_data = 0x11;
 }
 
 static INTERRUPT_GEN( vblank_irq )
@@ -340,7 +339,6 @@ static MACHINE_CONFIG_START( tankbust, tankbust_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_RESET( tankbust )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -354,9 +352,7 @@ static MACHINE_CONFIG_START( tankbust, tankbust_state )
 	MCFG_GFXDECODE( tankbust )
 
 	MCFG_PALETTE_LENGTH( 128 )
-	MCFG_PALETTE_INIT  ( tankbust )
 
-	MCFG_VIDEO_START   ( tankbust )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -108,12 +108,11 @@ static GFXDECODE_START( cheekyms )
 GFXDECODE_END
 
 
-static MACHINE_START( cheekyms )
+void cheekyms_state::machine_start()
 {
-	cheekyms_state *state = machine.driver_data<cheekyms_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_dac = machine.device<dac_device>("dac");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_dac = machine().device<dac_device>("dac");
 }
 
 static INTERRUPT_GEN( vblank_irq )
@@ -133,7 +132,6 @@ static MACHINE_CONFIG_START( cheekyms, cheekyms_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
-	MCFG_MACHINE_START(cheekyms)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -146,8 +144,6 @@ static MACHINE_CONFIG_START( cheekyms, cheekyms_state )
 	MCFG_GFXDECODE(cheekyms)
 	MCFG_PALETTE_LENGTH(0xc0)
 
-	MCFG_PALETTE_INIT(cheekyms)
-	MCFG_VIDEO_START(cheekyms)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

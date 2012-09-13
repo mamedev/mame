@@ -2937,9 +2937,9 @@ static TIMER_DEVICE_CALLBACK( mcu_irq )
 		state->m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }
 
-static MACHINE_RESET(namcos22)
+void namcos22_state::machine_reset()
 {
-	InitDSP(machine);
+	InitDSP(machine());
 }
 
 static MACHINE_CONFIG_START( namcos22s, namcos22_state )
@@ -2975,8 +2975,7 @@ static MACHINE_CONFIG_START( namcos22s, namcos22_state )
 
 	MCFG_PALETTE_LENGTH(NAMCOS22_PALETTE_SIZE)
 	MCFG_GFXDECODE(super)
-	MCFG_VIDEO_START(namcos22s)
-	MCFG_MACHINE_RESET(namcos22)
+	MCFG_VIDEO_START_OVERRIDE(namcos22_state,namcos22s)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3224,8 +3223,7 @@ static MACHINE_CONFIG_START( namcos22, namcos22_state )
 
 	MCFG_PALETTE_LENGTH(NAMCOS22_PALETTE_SIZE)
 	MCFG_GFXDECODE(namcos22)
-	MCFG_VIDEO_START(namcos22)
-	MCFG_MACHINE_RESET(namcos22)
+	MCFG_VIDEO_START_OVERRIDE(namcos22_state,namcos22)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -7,13 +7,13 @@
 #include "includes/shootout.h"
 
 
-PALETTE_INIT( shootout )
+void shootout_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -33,7 +33,7 @@ PALETTE_INIT( shootout )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -79,13 +79,12 @@ WRITE8_MEMBER(shootout_state::shootout_textram_w)
 	m_foreground->mark_tile_dirty(offset&0x3ff );
 }
 
-VIDEO_START( shootout )
+void shootout_state::video_start()
 {
-	shootout_state *state = machine.driver_data<shootout_state>();
 
-	state->m_background = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(shootout_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_foreground = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(shootout_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_foreground->set_transparent_pen(0 );
+	m_background = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(shootout_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_foreground = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(shootout_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_foreground->set_transparent_pen(0 );
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_bits )

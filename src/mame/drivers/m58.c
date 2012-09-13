@@ -203,8 +203,6 @@ static MACHINE_CONFIG_START( yard, m58_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 256, 282, 42, 266)
 	MCFG_SCREEN_UPDATE_STATIC(yard)
 
-	MCFG_PALETTE_INIT(yard)
-	MCFG_VIDEO_START(yard)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(m52_large_audio)

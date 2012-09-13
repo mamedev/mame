@@ -41,5 +41,7 @@ public:
 	DECLARE_DRIVER_INIT(4in1boot);
 	DECLARE_DRIVER_INIT(3in1semi);
 	DECLARE_DRIVER_INIT(cookbib2);
+	DECLARE_MACHINE_RESET(semiprot);
+	DECLARE_MACHINE_RESET(finalttr);
 };
 

@@ -74,12 +74,12 @@ static const unsigned char palette[] =
 	0x00, 0x00, 0x00,	/* Black */
 };
 
-static PALETTE_INIT( gamecom )
+void gamecom_state::palette_init()
 {
 	int index;
 	for ( index = 0; index < 5; index++ )
 	{
-		palette_set_color_rgb(machine,  4-index, palette[index*3+0], palette[index*3+1], palette[index*3+2] );
+		palette_set_color_rgb(machine(),  4-index, palette[index*3+0], palette[index*3+1], palette[index*3+2] );
 	}
 }
 
@@ -105,10 +105,8 @@ static MACHINE_CONFIG_START( gamecom, gamecom_state )
 
 	//MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_MACHINE_RESET( gamecom )
 
 	/* video hardware */
-	MCFG_VIDEO_START( gamecom )
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE( 59.732155 )
@@ -119,7 +117,6 @@ static MACHINE_CONFIG_START( gamecom, gamecom_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_LENGTH(5)
-	MCFG_PALETTE_INIT(gamecom)
 
 	/* sound hardware */
 #if 0

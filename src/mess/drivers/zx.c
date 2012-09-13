@@ -324,20 +324,20 @@ GFXDECODE_END
 /* Palette Initialization */
 
 
-static PALETTE_INIT( zx80 )
+void zx_state::palette_init()
 {
-	palette_set_color(machine,0,RGB_WHITE); /* white */
-	palette_set_color(machine,1,RGB_BLACK); /* black */
-	palette_set_color(machine,2,RGB_BLACK); /* black */
-	palette_set_color(machine,3,RGB_WHITE); /* white */
+	palette_set_color(machine(),0,RGB_WHITE); /* white */
+	palette_set_color(machine(),1,RGB_BLACK); /* black */
+	palette_set_color(machine(),2,RGB_BLACK); /* black */
+	palette_set_color(machine(),3,RGB_WHITE); /* white */
 }
 
-static PALETTE_INIT( ts1000 )
+PALETTE_INIT_MEMBER(zx_state,ts1000)
 {
-	palette_set_color(machine,0,MAKE_RGB(64, 244, 244)); /* cyan */
-	palette_set_color(machine,1,RGB_BLACK); /* black */
-	palette_set_color(machine,2,RGB_BLACK); /* black */
-	palette_set_color(machine,3,MAKE_RGB(64, 244, 244)); /* cyan */
+	palette_set_color(machine(),0,MAKE_RGB(64, 244, 244)); /* cyan */
+	palette_set_color(machine(),1,RGB_BLACK); /* black */
+	palette_set_color(machine(),2,RGB_BLACK); /* black */
+	palette_set_color(machine(),3,MAKE_RGB(64, 244, 244)); /* cyan */
 }
 
 
@@ -388,7 +388,6 @@ static MACHINE_CONFIG_START( zx80, zx_state )
 	MCFG_SCREEN_REFRESH_RATE(ZX81_PAL_FRAMES_PER_SECOND)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(ZX81_VBLANK_DURATION))
 
-	MCFG_MACHINE_RESET(zx80)
 
 	/* video hardware */
 	MCFG_SCREEN_UPDATE_DRIVER(zx_state, screen_update)
@@ -398,9 +397,7 @@ static MACHINE_CONFIG_START( zx80, zx_state )
 
 	MCFG_GFXDECODE(zx80)
 	MCFG_PALETTE_LENGTH(4)
-	MCFG_PALETTE_INIT(zx80)
 
-	MCFG_VIDEO_START(zx)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -429,7 +426,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ts1000, zx81 )
 
-	MCFG_PALETTE_INIT(ts1000)
+	MCFG_PALETTE_INIT_OVERRIDE(zx_state,ts1000)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ts1500, ts1000 )
@@ -444,7 +441,7 @@ static MACHINE_CONFIG_DERIVED( pc8300, zx81 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(pc8300_io_map)
 
-	MCFG_MACHINE_RESET(pc8300)
+	MCFG_MACHINE_RESET_OVERRIDE(zx_state,pc8300)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(ZX81_NTSC_FRAMES_PER_SECOND)
@@ -452,7 +449,6 @@ static MACHINE_CONFIG_DERIVED( pc8300, zx81 )
 	MCFG_SCREEN_VISIBLE_AREA(0, ZX81_PIXELS_PER_SCANLINE-1, 0, ZX81_NTSC_SCANLINES-1)
 
 	MCFG_GFXDECODE(pc8300)
-	MCFG_PALETTE_INIT(zx80)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -464,10 +460,9 @@ static MACHINE_CONFIG_DERIVED( pow3000, zx81 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(pow3000_io_map)
 
-	MCFG_MACHINE_RESET(pow3000)
+	MCFG_MACHINE_RESET_OVERRIDE(zx_state,pow3000)
 
 	MCFG_GFXDECODE(pc8300)
-	MCFG_PALETTE_INIT(zx80)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

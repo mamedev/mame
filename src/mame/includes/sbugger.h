@@ -14,11 +14,13 @@ public:
 	DECLARE_WRITE8_MEMBER(sbugger_videoram_attr_w);
 	DECLARE_WRITE_LINE_MEMBER(sbugger_interrupt);
 	TILE_GET_INFO_MEMBER(get_sbugger_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/sbugger.c -----------*/
 
-PALETTE_INIT(sbugger);
+
 SCREEN_UPDATE_IND16(sbugger);
-VIDEO_START(sbugger);
+

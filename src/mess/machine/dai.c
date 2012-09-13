@@ -111,21 +111,19 @@ static TIMER_CALLBACK( dai_timer )
 	state->m_tms5501->set_pio_bit_7((state->ioport("IN8")->read() & 0x04) ? 1:0);
 }
 
-MACHINE_START( dai )
+void dai_state::machine_start()
 {
-	dai_state *state = machine.driver_data<dai_state>();
 
-	state->membank("bank2")->configure_entries(0, 4, state->memregion("maincpu")->base() + 0x010000, 0x1000);
-	machine.scheduler().timer_set(attotime::zero, FUNC(dai_bootstrap_callback));
-	machine.scheduler().timer_pulse(attotime::from_hz(100), FUNC(dai_timer));	/* timer for tms5501 */
+	membank("bank2")->configure_entries(0, 4, memregion("maincpu")->base() + 0x010000, 0x1000);
+	machine().scheduler().timer_set(attotime::zero, FUNC(dai_bootstrap_callback));
+	machine().scheduler().timer_pulse(attotime::from_hz(100), FUNC(dai_timer));	/* timer for tms5501 */
 
-	memset(machine.device<ram_device>(RAM_TAG)->pointer(), 0, machine.device<ram_device>(RAM_TAG)->size());
+	memset(machine().device<ram_device>(RAM_TAG)->pointer(), 0, machine().device<ram_device>(RAM_TAG)->size());
 }
 
-MACHINE_RESET( dai )
+void dai_state::machine_reset()
 {
-	dai_state *state = machine.driver_data<dai_state>();
-	state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
+	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 }
 
 /***************************************************************************

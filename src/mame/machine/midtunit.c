@@ -551,21 +551,20 @@ DRIVER_INIT_MEMBER(midtunit_state,mk2)
  *
  *************************************/
 
-MACHINE_RESET( midtunit )
+MACHINE_RESET_MEMBER(midtunit_state,midtunit)
 {
-	midtunit_state *state = machine.driver_data<midtunit_state>();
 	/* reset sound */
 	switch (chip_type)
 	{
 		case SOUND_ADPCM:
 		case SOUND_ADPCM_LARGE:
-			state->m_adpcm_sound->reset_write(1);
-			state->m_adpcm_sound->reset_write(0);
+			m_adpcm_sound->reset_write(1);
+			m_adpcm_sound->reset_write(0);
 			break;
 
 		case SOUND_DCS:
-			dcs_reset_w(machine, 1);
-			dcs_reset_w(machine, 0);
+			dcs_reset_w(machine(), 1);
+			dcs_reset_w(machine(), 0);
 			break;
 	}
 }

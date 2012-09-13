@@ -229,6 +229,22 @@ public:
 	DECLARE_WRITE8_MEMBER(gb_video_w);
 	DECLARE_READ8_MEMBER(gbc_video_r);
 	DECLARE_WRITE8_MEMBER(gbc_video_w);
+	DECLARE_MACHINE_START(gb);
+	DECLARE_MACHINE_RESET(gb);
+	DECLARE_PALETTE_INIT(gb);
+	DECLARE_MACHINE_START(megaduck);
+	DECLARE_MACHINE_RESET(megaduck);
+	DECLARE_PALETTE_INIT(megaduck);
+	DECLARE_MACHINE_START(sgb);
+	DECLARE_MACHINE_RESET(sgb);
+	DECLARE_PALETTE_INIT(sgb);
+	DECLARE_MACHINE_RESET(gbpocket);
+	DECLARE_PALETTE_INIT(gbp);
+	DECLARE_MACHINE_START(gbc);
+	DECLARE_MACHINE_RESET(gbc);	
+	DECLARE_PALETTE_INIT(gbc);
+	DECLARE_MACHINE_START(gb_video);
+	DECLARE_MACHINE_START(gbc_video);
 };
 
 
@@ -238,9 +254,9 @@ DEVICE_START(gb_cart);
 DEVICE_IMAGE_LOAD(gb_cart);
 INTERRUPT_GEN( gb_scanline_interrupt );
 void gb_timer_callback(lr35902_cpu_device *device, int cycles);
-MACHINE_START( gb );
-MACHINE_RESET( gb );
-MACHINE_RESET( gbpocket );
+
+
+
 
 /* -- Super Game Boy specific -- */
 #define SGB_BORDER_PAL_OFFSET	64	/* Border colours stored from pal 4-7   */
@@ -248,17 +264,9 @@ MACHINE_RESET( gbpocket );
 #define SGB_YOFFSET				40	/* GB screen starts at row 40           */
 
 
-extern MACHINE_START( sgb );
-extern MACHINE_RESET( sgb );
-
-MACHINE_START( gbc );
-MACHINE_RESET( gbc );
-
-
 /* -- Megaduck specific -- */
 extern DEVICE_IMAGE_LOAD(megaduck_cart);
-extern MACHINE_START( megaduck );
-extern MACHINE_RESET( megaduck );
+
 
 
 /*----------- defined in video/gb.c -----------*/
@@ -273,14 +281,14 @@ enum
 	GB_VIDEO_CGB
 };
 
-PALETTE_INIT( gb );
-PALETTE_INIT( gbp );
-PALETTE_INIT( sgb );
-PALETTE_INIT( gbc );
-PALETTE_INIT( megaduck );
 
-MACHINE_START( gb_video );
-MACHINE_START( gbc_video );
+
+
+
+
+
+
+
 void gb_video_reset( running_machine &machine, int mode );
 UINT8 *gb_get_vram_ptr(running_machine &machine);
 

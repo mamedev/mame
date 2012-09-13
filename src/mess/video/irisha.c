@@ -11,7 +11,7 @@
 #include "includes/irisha.h"
 
 
-VIDEO_START( irisha )
+void irisha_state::video_start()
 {
 }
 

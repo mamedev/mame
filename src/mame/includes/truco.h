@@ -14,10 +14,12 @@ public:
 	DECLARE_WRITE8_MEMBER(portb_w);
 	DECLARE_WRITE8_MEMBER(pia_irqa_w);
 	DECLARE_WRITE8_MEMBER(pia_irqb_w);
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/truco.c -----------*/
 
 SCREEN_UPDATE_IND16( truco );
-PALETTE_INIT( truco );
+

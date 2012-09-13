@@ -283,21 +283,20 @@ static void amiga_m68k_reset(device_t *device)
 }
 
 
-MACHINE_RESET( amiga )
+MACHINE_RESET_MEMBER(amiga_state,amiga)
 {
-	amiga_state *state = machine.driver_data<amiga_state>();
 
 	/* set m68k reset  function */
-	m68k_set_reset_callback(machine.device("maincpu"), amiga_m68k_reset);
+	m68k_set_reset_callback(machine().device("maincpu"), amiga_m68k_reset);
 
-	amiga_m68k_reset(machine.device("maincpu"));
+	amiga_m68k_reset(machine().device("maincpu"));
 
 	/* call the system-specific callback */
-	if (state->m_intf->reset_callback)
-		(*state->m_intf->reset_callback)(machine);
+	if (m_intf->reset_callback)
+		(*m_intf->reset_callback)(machine());
 
 	/* start the scanline timer */
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0), FUNC(scanline_callback));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), FUNC(scanline_callback));
 }
 
 

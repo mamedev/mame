@@ -34,19 +34,18 @@ INLINE void intv_plot_box(intv_state *state, bitmap_ind16 &bm, int x, int y, int
 	bm.plot_box(x * state->m_x_scale, y * state->m_y_scale, w * state->m_x_scale, h * state->m_y_scale, SET_COLOR(color));
 }
 
-VIDEO_START( intv )
+void intv_state::video_start()
 {
-	intv_state *state = machine.driver_data<intv_state>();
 	//int i,j,k;
 
-	state->m_tms9927_num_rows = 25;
+	m_tms9927_num_rows = 25;
 
-	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_bitmap);
 
 #if 0
 	for (i = 0; i < STIC_MOBS; i++)
 	{
-		intv_sprite_type* s = &state->m_sprite[i];
+		intv_sprite_type* s = &m_sprite[i];
 		s->visible = 0;
 		s->xpos = 0;
 		s->ypos = 0;
@@ -67,28 +66,28 @@ VIDEO_START( intv )
 		{
 			for (k = 0; k < 128; k++)
 			{
-				state->m_sprite_buffers[i][j][k] = 0;
+				m_sprite_buffers[i][j][k] = 0;
 			}
 		}
 	}
 	for(i = 0; i < STIC_REGISTERS; i++)
 	{
-		state->m_stic_registers[i] = 0;
+		m_stic_registers[i] = 0;
 	}
-	state->m_color_stack_mode = 0;
-	state->m_color_stack_offset = 0;
-	state->m_stic_handshake = 0;
-	state->m_border_color = 0;
-	state->m_col_delay = 0;
-	state->m_row_delay = 0;
-	state->m_left_edge_inhibit = 0;
-	state->m_top_edge_inhibit = 0;
+	m_color_stack_mode = 0;
+	m_color_stack_offset = 0;
+	m_stic_handshake = 0;
+	m_border_color = 0;
+	m_col_delay = 0;
+	m_row_delay = 0;
+	m_left_edge_inhibit = 0;
+	m_top_edge_inhibit = 0;
 
-	state->m_gramdirty = 1;
+	m_gramdirty = 1;
 	for(i=0;i<64;i++)
 	{
-		state->m_gram[i] = 0;
-		state->m_gramdirtybytes[i] = 1;
+		m_gram[i] = 0;
+		m_gramdirtybytes[i] = 1;
 	}
 #endif
 }

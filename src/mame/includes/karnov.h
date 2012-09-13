@@ -52,6 +52,11 @@ public:
 	DECLARE_DRIVER_INIT(chelnovj);
 	DECLARE_DRIVER_INIT(chelnov);
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void palette_init();
+	DECLARE_VIDEO_START(karnov);
+	DECLARE_VIDEO_START(wndrplnt);
 };
 
 enum {
@@ -69,7 +74,7 @@ enum {
 
 void karnov_flipscreen_w(running_machine &machine, int data);
 
-PALETTE_INIT( karnov );
-VIDEO_START( karnov );
-VIDEO_START( wndrplnt );
+
+
+
 SCREEN_UPDATE_IND16( karnov );

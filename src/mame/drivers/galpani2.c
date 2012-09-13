@@ -70,9 +70,9 @@ WRITE16_MEMBER(galpani2_state::galpani2_eeprom_w)
 ***************************************************************************/
 
 
-static MACHINE_RESET( galpani2 )
+void galpani2_state::machine_reset()
 {
-	machine.scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); //initial mcu xchk
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); //initial mcu xchk
 }
 
 static void galpani2_write_kaneko(device_t *device)
@@ -589,7 +589,6 @@ static MACHINE_CONFIG_START( galpani2, galpani2_state )
 	MCFG_CPU_PROGRAM_MAP(galpani2_mem2)
 	MCFG_TIMER_ADD_SCANLINE("s_scantimer", galpani2_interrupt2, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET(galpani2)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
@@ -606,8 +605,6 @@ static MACHINE_CONFIG_START( galpani2, galpani2_state )
 	MCFG_DEVICE_ADD_KC002_SPRITES
 	kaneko16_sprite_device::set_offsets(*device, 0x10000 - 0x16c0 + 0xc00, 0);
 
-	MCFG_PALETTE_INIT(galpani2)
-	MCFG_VIDEO_START(galpani2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -66,6 +66,8 @@ public:
 	DECLARE_WRITE8_MEMBER(suprgolf_writeB);
 	DECLARE_DRIVER_INIT(suprgolf);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
@@ -80,17 +82,16 @@ TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
 		0);
 }
 
-static VIDEO_START( suprgolf )
+void suprgolf_state::video_start()
 {
-	suprgolf_state *state = machine.driver_data<suprgolf_state>();
 
-	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(suprgolf_state::get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32 );
-	state->m_paletteram = auto_alloc_array(machine, UINT8, 0x1000);
-	state->m_bg_vram = auto_alloc_array(machine, UINT8, 0x2000*0x20);
-	state->m_bg_fb = auto_alloc_array(machine, UINT16, 0x2000*0x20);
-	state->m_fg_fb = auto_alloc_array(machine, UINT16, 0x2000*0x20);
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(suprgolf_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
+	m_paletteram = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_bg_vram = auto_alloc_array(machine(), UINT8, 0x2000*0x20);
+	m_bg_fb = auto_alloc_array(machine(), UINT16, 0x2000*0x20);
+	m_fg_fb = auto_alloc_array(machine(), UINT16, 0x2000*0x20);
 
-	state->m_tilemap->set_transparent_pen(15);
+	m_tilemap->set_transparent_pen(15);
 }
 
 static SCREEN_UPDATE_IND16( suprgolf )
@@ -479,11 +480,10 @@ static GFXDECODE_START( suprgolf )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,   0, 0x80 )
 GFXDECODE_END
 
-static MACHINE_RESET( suprgolf )
+void suprgolf_state::machine_reset()
 {
-	suprgolf_state *state = machine.driver_data<suprgolf_state>();
 
-	state->m_msm_nmi_mask = 0;
+	m_msm_nmi_mask = 0;
 }
 
 static I8255A_INTERFACE( ppi8255_intf_0 )
@@ -517,9 +517,7 @@ static MACHINE_CONFIG_START( suprgolf, suprgolf_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_VIDEO_START(suprgolf)
 
-	MCFG_MACHINE_RESET(suprgolf)
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )

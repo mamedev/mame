@@ -289,45 +289,43 @@ static const int jumppoints_other[0x100] =
 	    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1
 };
 
-static MACHINE_RESET( raiga )
+MACHINE_RESET_MEMBER(gaiden_state,raiga)
 {
-	gaiden_state *state = machine.driver_data<gaiden_state>();
 
-	state->m_prot = 0;
-	state->m_jumpcode = 0;
+	m_prot = 0;
+	m_jumpcode = 0;
 
-	state->m_tx_scroll_x = 0;
-	state->m_tx_scroll_y = 0;
-	state->m_bg_scroll_x = 0;
-	state->m_bg_scroll_y = 0;
-	state->m_fg_scroll_x = 0;
-	state->m_fg_scroll_y = 0;
+	m_tx_scroll_x = 0;
+	m_tx_scroll_y = 0;
+	m_bg_scroll_x = 0;
+	m_bg_scroll_y = 0;
+	m_fg_scroll_x = 0;
+	m_fg_scroll_y = 0;
 
-	state->m_tx_offset_y = 0;
-	state->m_fg_offset_y = 0;
-	state->m_bg_offset_y = 0;
-	state->m_spr_offset_y = 0;
+	m_tx_offset_y = 0;
+	m_fg_offset_y = 0;
+	m_bg_offset_y = 0;
+	m_spr_offset_y = 0;
 }
 
-static MACHINE_START( raiga )
+MACHINE_START_MEMBER(gaiden_state,raiga)
 {
-	gaiden_state *state = machine.driver_data<gaiden_state>();
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_prot));
-	state->save_item(NAME(state->m_jumpcode));
+	save_item(NAME(m_prot));
+	save_item(NAME(m_jumpcode));
 
-	state->save_item(NAME(state->m_tx_scroll_x));
-	state->save_item(NAME(state->m_tx_scroll_y));
-	state->save_item(NAME(state->m_bg_scroll_x));
-	state->save_item(NAME(state->m_bg_scroll_y));
-	state->save_item(NAME(state->m_fg_scroll_x));
-	state->save_item(NAME(state->m_fg_scroll_y));
+	save_item(NAME(m_tx_scroll_x));
+	save_item(NAME(m_tx_scroll_y));
+	save_item(NAME(m_bg_scroll_x));
+	save_item(NAME(m_bg_scroll_y));
+	save_item(NAME(m_fg_scroll_x));
+	save_item(NAME(m_fg_scroll_y));
 
-	state->save_item(NAME(state->m_tx_offset_y));
-	state->save_item(NAME(state->m_fg_offset_y));
-	state->save_item(NAME(state->m_bg_offset_y));
-	state->save_item(NAME(state->m_spr_offset_y));
+	save_item(NAME(m_tx_offset_y));
+	save_item(NAME(m_fg_offset_y));
+	save_item(NAME(m_bg_offset_y));
+	save_item(NAME(m_spr_offset_y));
 }
 
 WRITE16_MEMBER(gaiden_state::raiga_protection_w)
@@ -772,8 +770,8 @@ static MACHINE_CONFIG_START( shadoww, gaiden_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 								/* IRQs are triggered by the YM2203 */
 
-	MCFG_MACHINE_START(raiga)
-	MCFG_MACHINE_RESET(raiga)
+	MCFG_MACHINE_START_OVERRIDE(gaiden_state,raiga)
+	MCFG_MACHINE_RESET_OVERRIDE(gaiden_state,raiga)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -786,7 +784,7 @@ static MACHINE_CONFIG_START( shadoww, gaiden_state )
 	MCFG_GFXDECODE(gaiden)
 	MCFG_PALETTE_LENGTH(4096)
 
-	MCFG_VIDEO_START(gaiden)
+	MCFG_VIDEO_START_OVERRIDE(gaiden_state,gaiden)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -813,7 +811,7 @@ static MACHINE_CONFIG_DERIVED( raiga, shadoww )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(raiga)
 
-	MCFG_VIDEO_START(raiga)
+	MCFG_VIDEO_START_OVERRIDE(gaiden_state,raiga)
 	MCFG_GFXDECODE(raiga)
 MACHINE_CONFIG_END
 
@@ -828,8 +826,8 @@ static MACHINE_CONFIG_START( drgnbowl, gaiden_state )
 	MCFG_CPU_PROGRAM_MAP(drgnbowl_sound_map)
 	MCFG_CPU_IO_MAP(drgnbowl_sound_port_map)
 
-	MCFG_MACHINE_START(raiga)
-	MCFG_MACHINE_RESET(raiga)
+	MCFG_MACHINE_START_OVERRIDE(gaiden_state,raiga)
+	MCFG_MACHINE_RESET_OVERRIDE(gaiden_state,raiga)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -842,7 +840,7 @@ static MACHINE_CONFIG_START( drgnbowl, gaiden_state )
 	MCFG_GFXDECODE(drgnbowl)
 	MCFG_PALETTE_LENGTH(4096)
 
-	MCFG_VIDEO_START(drgnbowl)
+	MCFG_VIDEO_START_OVERRIDE(gaiden_state,drgnbowl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -944,8 +942,8 @@ static MACHINE_CONFIG_START( mastninj, gaiden_state )
 	MCFG_CPU_PROGRAM_MAP(mastninj_sound_map)
 								/* IRQs are triggered by the YM2203 */
 
-	MCFG_MACHINE_START(raiga)
-	MCFG_MACHINE_RESET(raiga)
+	MCFG_MACHINE_START_OVERRIDE(gaiden_state,raiga)
+	MCFG_MACHINE_RESET_OVERRIDE(gaiden_state,raiga)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -958,7 +956,7 @@ static MACHINE_CONFIG_START( mastninj, gaiden_state )
 	MCFG_GFXDECODE(mastninj)
 	MCFG_PALETTE_LENGTH(4096)
 
-	MCFG_VIDEO_START(mastninj)
+	MCFG_VIDEO_START_OVERRIDE(gaiden_state,mastninj)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

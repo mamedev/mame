@@ -28,6 +28,8 @@ public:
 	required_device<device_t> m_terminal;
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	//UINT8 m_term_data;
+	virtual void machine_reset();
+	DECLARE_MACHINE_RESET(horizon_sd);
 };
 
 
@@ -60,14 +62,14 @@ static INPUT_PORTS_START( horizon )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(horizon)
+void horizon_state::machine_reset()
 {
-	machine.device("maincpu")->state().set_state_int(Z80_PC, 0xe800);
+	machine().device("maincpu")->state().set_state_int(Z80_PC, 0xe800);
 }
 
-static MACHINE_RESET(horizon_sd)
+MACHINE_RESET_MEMBER(horizon_state,horizon_sd)
 {
-	machine.device("maincpu")->state().set_state_int(Z80_PC, 0xe900);
+	machine().device("maincpu")->state().set_state_int(Z80_PC, 0xe900);
 }
 
 WRITE8_MEMBER( horizon_state::kbd_put )
@@ -85,7 +87,6 @@ static MACHINE_CONFIG_START( horizon, horizon_state )
 	MCFG_CPU_PROGRAM_MAP(horizon_mem)
 	MCFG_CPU_IO_MAP(horizon_io)
 
-	MCFG_MACHINE_RESET(horizon)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
@@ -96,7 +97,7 @@ static MACHINE_CONFIG_DERIVED( horizsd, horizon )
 	MCFG_CPU_PROGRAM_MAP( horizon_sd_mem)
 	MCFG_CPU_IO_MAP(horizon_sd_io)
 
-	MCFG_MACHINE_RESET(horizon_sd)
+	MCFG_MACHINE_RESET_OVERRIDE(horizon_state,horizon_sd)
 MACHINE_CONFIG_END
 
 /* ROM definition */

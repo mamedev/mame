@@ -439,7 +439,6 @@ static MACHINE_CONFIG_START( wwfsstar, wwfsstar_state )
 	MCFG_GFXDECODE(wwfsstar)
 	MCFG_PALETTE_LENGTH(384)
 
-	MCFG_VIDEO_START(wwfsstar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

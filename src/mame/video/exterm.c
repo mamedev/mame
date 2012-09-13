@@ -15,13 +15,13 @@
  *
  *************************************/
 
-PALETTE_INIT( exterm )
+void exterm_state::palette_init()
 {
 	int i;
 
 	/* initialize 555 RGB lookup */
 	for (i = 0; i < 32768; i++)
-		palette_set_color_rgb(machine, i + 0x800, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
+		palette_set_color_rgb(machine(), i + 0x800, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
 }
 
 

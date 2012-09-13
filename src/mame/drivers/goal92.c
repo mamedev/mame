@@ -289,27 +289,25 @@ static GFXDECODE_START( goal92 )
 GFXDECODE_END
 
 
-static MACHINE_START( goal92 )
+void goal92_state::machine_start()
 {
-	goal92_state *state = machine.driver_data<goal92_state>();
-	UINT8 *ROM = state->memregion("audiocpu")->base();
+	UINT8 *ROM = memregion("audiocpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_fg_bank));
-	state->save_item(NAME(state->m_msm5205next));
-	state->save_item(NAME(state->m_adpcm_toggle));
+	save_item(NAME(m_fg_bank));
+	save_item(NAME(m_msm5205next));
+	save_item(NAME(m_adpcm_toggle));
 }
 
-static MACHINE_RESET( goal92 )
+void goal92_state::machine_reset()
 {
-	goal92_state *state = machine.driver_data<goal92_state>();
 
-	state->m_fg_bank = 0;
-	state->m_msm5205next = 0;
-	state->m_adpcm_toggle = 0;
+	m_fg_bank = 0;
+	m_msm5205next = 0;
+	m_adpcm_toggle = 0;
 }
 
 static MACHINE_CONFIG_START( goal92, goal92_state )
@@ -323,8 +321,6 @@ static MACHINE_CONFIG_START( goal92, goal92_state )
 	MCFG_CPU_PROGRAM_MAP(sound_cpu)
 								/* IRQs are triggered by the main CPU */
 
-	MCFG_MACHINE_START(goal92)
-	MCFG_MACHINE_RESET(goal92)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -338,7 +334,6 @@ static MACHINE_CONFIG_START( goal92, goal92_state )
 	MCFG_GFXDECODE(goal92)
 	MCFG_PALETTE_LENGTH(128*16)
 
-	MCFG_VIDEO_START(goal92)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

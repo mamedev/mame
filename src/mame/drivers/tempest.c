@@ -297,6 +297,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
 	DECLARE_READ8_MEMBER(input_port_1_bit_r);
 	DECLARE_READ8_MEMBER(input_port_2_bit_r);
+	virtual void machine_start();
 };
 
 
@@ -310,10 +311,9 @@ public:
 
 
 
-static MACHINE_START( tempest )
+void tempest_state::machine_start()
 {
-	tempest_state *state = machine.driver_data<tempest_state>();
-	state->save_item(NAME(state->m_player_select));
+	save_item(NAME(m_player_select));
 }
 
 /*************************************
@@ -593,7 +593,6 @@ static MACHINE_CONFIG_START( tempest, tempest_state )
 
 	MCFG_ATARIVGEAROM_ADD("earom")
 
-	MCFG_MACHINE_START(tempest)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", VECTOR)

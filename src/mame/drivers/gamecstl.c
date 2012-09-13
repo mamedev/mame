@@ -116,6 +116,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(gamecstl_pic8259_1_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_DRIVER_INIT(gamecstl);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -130,11 +133,11 @@ static const rgb_t cga_palette[16] =
 	MAKE_RGB( 0xff, 0x55, 0x55 ), MAKE_RGB( 0xff, 0x55, 0xff ), MAKE_RGB( 0xff, 0xff, 0x55 ), MAKE_RGB( 0xff, 0xff, 0xff ),
 };
 
-static VIDEO_START(gamecstl)
+void gamecstl_state::video_start()
 {
 	int i;
 	for (i=0; i < 16; i++)
-		palette_set_color(machine, i, cga_palette[i]);
+		palette_set_color(machine(), i, cga_palette[i]);
 }
 
 static void draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y)
@@ -608,21 +611,20 @@ static IRQ_CALLBACK(irq_callback)
 	return pic8259_acknowledge(state->m_pic8259_1);
 }
 
-static MACHINE_START(gamecstl)
+void gamecstl_state::machine_start()
 {
-	gamecstl_state *state = machine.driver_data<gamecstl_state>();
-	state->m_pit8254 = machine.device( "pit8254" );
-	state->m_pic8259_1 = machine.device( "pic8259_1" );
-	state->m_pic8259_2 = machine.device( "pic8259_2" );
-	state->m_dma8237_1 = machine.device( "dma8237_1" );
-	state->m_dma8237_2 = machine.device( "dma8237_2" );
+	m_pit8254 = machine().device( "pit8254" );
+	m_pic8259_1 = machine().device( "pic8259_1" );
+	m_pic8259_2 = machine().device( "pic8259_2" );
+	m_dma8237_1 = machine().device( "dma8237_1" );
+	m_dma8237_2 = machine().device( "dma8237_2" );
 }
 
-static MACHINE_RESET(gamecstl)
+void gamecstl_state::machine_reset()
 {
-	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("bios")->base() + 0x30000);
+	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("bios")->base() + 0x30000);
 
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 }
 
 
@@ -699,8 +701,6 @@ static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
 	MCFG_CPU_PROGRAM_MAP(gamecstl_map)
 	MCFG_CPU_IO_MAP(gamecstl_io)
 
-	MCFG_MACHINE_START(gamecstl)
-	MCFG_MACHINE_RESET(gamecstl)
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
@@ -731,7 +731,6 @@ static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
 	MCFG_GFXDECODE(CGA)
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_VIDEO_START(gamecstl)
 
 MACHINE_CONFIG_END
 

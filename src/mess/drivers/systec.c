@@ -51,6 +51,7 @@ public:
 	DECLARE_READ8_MEMBER(systec_c6_r);
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	UINT8 m_term_data;
+	virtual void machine_reset();
 };
 
 READ8_MEMBER( systec_state::systec_c4_r )
@@ -91,10 +92,10 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( systec )
 INPUT_PORTS_END
 
-static MACHINE_RESET(systec)
+void systec_state::machine_reset()
 {
-	UINT8 *m_p_maincpu = machine.root_device().memregion("maincpu")->base();
-	UINT8 *m_p_roms = machine.root_device().memregion("roms")->base();
+	UINT8 *m_p_maincpu = machine().root_device().memregion("maincpu")->base();
+	UINT8 *m_p_roms = machine().root_device().memregion("roms")->base();
 	memcpy(m_p_maincpu, m_p_roms, 0x2000);
 }
 
@@ -104,7 +105,6 @@ static MACHINE_CONFIG_START( systec, systec_state )
 	MCFG_CPU_PROGRAM_MAP(systec_mem)
 	MCFG_CPU_IO_MAP(systec_io)
 
-	MCFG_MACHINE_RESET(systec)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)

@@ -186,12 +186,11 @@ WRITE16_MEMBER(terracre_state::amazon_protection_w)
 	}
 }
 
-static MACHINE_START( amazon )
+MACHINE_START_MEMBER(terracre_state,amazon)
 {
-	terracre_state *state = machine.driver_data<terracre_state>();
 	/* set up for save */
-	state_save_register_global(machine, state->m_mAmazonProtCmd);
-	state_save_register_global_array(machine, state->m_mAmazonProtReg);
+	state_save_register_global(machine(), m_mAmazonProtCmd);
+	state_save_register_global_array(machine(), m_mAmazonProtReg);
 }
 
 static ADDRESS_MAP_START( terracre_map, AS_PROGRAM, 16, terracre_state )
@@ -536,7 +535,7 @@ static MACHINE_CONFIG_START( amazon, terracre_state )
 	MCFG_CPU_IO_MAP(sound_3526_io_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_16MHz/4/512)	// ?
 
-	MCFG_MACHINE_START(amazon)
+	MCFG_MACHINE_START_OVERRIDE(terracre_state,amazon)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( 60 )
@@ -548,8 +547,6 @@ static MACHINE_CONFIG_START( amazon, terracre_state )
 	MCFG_GFXDECODE(terracre)
 	MCFG_PALETTE_LENGTH(1*16+16*16+16*256)
 
-	MCFG_PALETTE_INIT(amazon)
-	MCFG_VIDEO_START(amazon)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -583,8 +580,6 @@ static MACHINE_CONFIG_START( ym3526, terracre_state )
 	MCFG_GFXDECODE(terracre)
 	MCFG_PALETTE_LENGTH(1*16+16*16+16*256)
 
-	MCFG_PALETTE_INIT(amazon)
-	MCFG_VIDEO_START(amazon)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -618,8 +613,6 @@ static MACHINE_CONFIG_START( ym2203, terracre_state )
 	MCFG_GFXDECODE(terracre)
 	MCFG_PALETTE_LENGTH(1*16+16*16+16*256)
 
-	MCFG_PALETTE_INIT(amazon)
-	MCFG_VIDEO_START(amazon)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

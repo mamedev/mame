@@ -138,16 +138,15 @@ WRITE8_MEMBER( aim65_state::aim65_riot_a_w )
     DRIVER INIT
 ***************************************************************************/
 
-MACHINE_START( aim65 )
+void aim65_state::machine_start()
 {
-	aim65_state *state = machine.driver_data<aim65_state>();
-	ram_device *ram = machine.device<ram_device>(RAM_TAG);
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	ram_device *ram = machine().device<ram_device>(RAM_TAG);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Init RAM */
 	space->install_ram(0x0000, ram->size() - 1, ram->pointer());
 
-	state->m_pb_save = 0;
+	m_pb_save = 0;
 }
 
 
@@ -284,7 +283,7 @@ device - the output will be gibberish.
 
 
 /* Other items from H file
-VIDEO_START( aim65 );
+
 VIDEO_UPDATE( aim65 );
 */
 
@@ -296,7 +295,7 @@ DRIVER_MEMBER(aim65_state, aim65_printer_on), // out CB2
 
 
 /* From Machine Config
-    MCFG_VIDEO_START(aim65)
+    MCFG_VIDEO_START_OVERRIDE(aim65_state,aim65)
     MCFG_VIDEO_UPDATE(aim65)
 */
 
@@ -368,19 +367,18 @@ WRITE8_MEMBER( aim65_state::aim65_pa_w )
 	}
 }
 
-VIDEO_START( aim65 )
+VIDEO_START_MEMBER(aim65_state,aim65)
 {
-	aim65_state *state = machine.driver_data<aim65_state>();
-	state->m_print_timer = machine.scheduler().timer_alloc(FUNC(aim65_printer_timer));
-	state->m_printerRAM = auto_alloc_array(machine, UINT16, (600 * 10 * 2) / 2);
-	memset(state->m_printerRAM, 0, videoram_size);
-	VIDEO_START_CALL(generic);
-	state->m_printer_x = 0;
-	state->m_printer_y = 0;
-	state->m_printer_dir = 0;
-	state->m_flag_a = 0;
-	state->m_flag_b = 0;
-	state->m_printer_level = 0;
+	m_print_timer = machine().scheduler().timer_alloc(FUNC(aim65_printer_timer));
+	m_printerRAM = auto_alloc_array(machine(), UINT16, (600 * 10 * 2) / 2);
+	memset(m_printerRAM, 0, videoram_size);
+	VIDEO_START_CALL_MEMBER(generic);
+	m_printer_x = 0;
+	m_printer_y = 0;
+	m_printer_dir = 0;
+	m_flag_a = 0;
+	m_flag_b = 0;
+	m_printer_level = 0;
 }
 
 SCREEN_UPDATE( aim65 )

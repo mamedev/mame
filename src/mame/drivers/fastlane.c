@@ -203,15 +203,14 @@ static const k007232_interface k007232_interface_2 =
 	volume_callback1
 };
 
-static MACHINE_START( fastlane )
+void fastlane_state::machine_start()
 {
-	fastlane_state *state = machine.driver_data<fastlane_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
-	state->m_konami2 = machine.device("konami2");
-	state->m_k007121 = machine.device("k007121");
+	m_konami2 = machine().device("konami2");
+	m_k007121 = machine().device("k007121");
 }
 
 static MACHINE_CONFIG_START( fastlane, fastlane_state )
@@ -221,7 +220,6 @@ static MACHINE_CONFIG_START( fastlane, fastlane_state )
 	MCFG_CPU_PROGRAM_MAP(fastlane_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", fastlane_scanline, "screen", 0, 1)
 
-	MCFG_MACHINE_START(fastlane)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -234,8 +232,6 @@ static MACHINE_CONFIG_START( fastlane, fastlane_state )
 	MCFG_GFXDECODE(fastlane)
 	MCFG_PALETTE_LENGTH(1024*16)
 
-	MCFG_PALETTE_INIT(fastlane)
-	MCFG_VIDEO_START(fastlane)
 
 	MCFG_K007121_ADD("k007121")
 	MCFG_K051733_ADD("k051733")

@@ -306,25 +306,23 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( munchmo )
+void munchmo_state::machine_start()
 {
-	munchmo_state *state = machine.driver_data<munchmo_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_palette_bank));
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_nmi_enable));
+	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_nmi_enable));
 }
 
-static MACHINE_RESET( munchmo )
+void munchmo_state::machine_reset()
 {
-	munchmo_state *state = machine.driver_data<munchmo_state>();
 
-	state->m_palette_bank = 0;
-	state->m_flipscreen = 0;
-	state->m_nmi_enable = 0;
+	m_palette_bank = 0;
+	m_flipscreen = 0;
+	m_nmi_enable = 0;
 }
 
 static MACHINE_CONFIG_START( mnchmobl, munchmo_state )
@@ -338,8 +336,6 @@ static MACHINE_CONFIG_START( mnchmobl, munchmo_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_VBLANK_INT("screen", mnchmobl_sound_irq)
 
-	MCFG_MACHINE_START(munchmo)
-	MCFG_MACHINE_RESET(munchmo)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -352,8 +348,6 @@ static MACHINE_CONFIG_START( mnchmobl, munchmo_state )
 	MCFG_GFXDECODE(mnchmobl)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(mnchmobl)
-	MCFG_VIDEO_START(mnchmobl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

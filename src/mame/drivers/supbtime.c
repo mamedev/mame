@@ -330,13 +330,12 @@ static const deco16ic_interface supbtime_deco16ic_tilegen1_intf =
 	0,1
 };
 
-static MACHINE_START( supbtime )
+void supbtime_state::machine_start()
 {
-	supbtime_state *state = machine.driver_data<supbtime_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_deco_tilegen1 = machine.device("tilegen1");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_deco_tilegen1 = machine().device("tilegen1");
 }
 
 static MACHINE_CONFIG_START( supbtime, supbtime_state )
@@ -349,7 +348,6 @@ static MACHINE_CONFIG_START( supbtime, supbtime_state )
 	MCFG_CPU_ADD("audiocpu", H6280, 32220000/8)	/* Custom chip 45, audio section crystal is 32.220 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(supbtime)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -391,7 +389,6 @@ static MACHINE_CONFIG_START( chinatwn, supbtime_state )
 	MCFG_CPU_ADD("audiocpu", H6280, 32220000/8) /* Custom chip 45, audio section crystal is 32.220 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(supbtime)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

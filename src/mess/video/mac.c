@@ -56,22 +56,22 @@ Apple color FPD      01           11           10   (FPD = Full Page Display)
 #include "includes/mac.h"
 #include "machine/ram.h"
 
-PALETTE_INIT( mac )
+PALETTE_INIT_MEMBER(mac_state,mac)
 {
-	palette_set_color_rgb(machine, 0, 0xff, 0xff, 0xff);
-	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0x00);
+	palette_set_color_rgb(machine(), 0, 0xff, 0xff, 0xff);
+	palette_set_color_rgb(machine(), 1, 0x00, 0x00, 0x00);
 }
 
 // 4-level grayscale
-PALETTE_INIT( macgsc )
+PALETTE_INIT_MEMBER(mac_state,macgsc)
 {
-	palette_set_color_rgb(machine, 0, 0xff, 0xff, 0xff);
-	palette_set_color_rgb(machine, 1, 0x7f, 0x7f, 0x7f);
-	palette_set_color_rgb(machine, 2, 0x3f, 0x3f, 0x3f);
-	palette_set_color_rgb(machine, 3, 0x00, 0x00, 0x00);
+	palette_set_color_rgb(machine(), 0, 0xff, 0xff, 0xff);
+	palette_set_color_rgb(machine(), 1, 0x7f, 0x7f, 0x7f);
+	palette_set_color_rgb(machine(), 2, 0x3f, 0x3f, 0x3f);
+	palette_set_color_rgb(machine(), 3, 0x00, 0x00, 0x00);
 }
 
-VIDEO_START( mac )
+VIDEO_START_MEMBER(mac_state,mac)
 {
 }
 
@@ -216,43 +216,40 @@ SCREEN_UPDATE_IND16( macpb160 )
 
 // IIci/IIsi RAM-Based Video (RBV) and children: V8, Eagle, Spice, VASP, Sonora
 
-VIDEO_START( macrbv )
+VIDEO_START_MEMBER(mac_state,macrbv)
 {
 }
 
-VIDEO_RESET(maceagle)
+VIDEO_RESET_MEMBER(mac_state,maceagle)
 {
-	mac_state *mac = machine.driver_data<mac_state>();
-
-	mac->m_rbv_montype = 32;
-	mac->m_rbv_palette[0xfe] = 0xffffff;
-	mac->m_rbv_palette[0xff] = 0;
+	m_rbv_montype = 32;
+	m_rbv_palette[0xfe] = 0xffffff;
+	m_rbv_palette[0xff] = 0;
 }
 
-VIDEO_RESET(macrbv)
+VIDEO_RESET_MEMBER(mac_state,macrbv)
 {
-	mac_state *mac = machine.driver_data<mac_state>();
 	rectangle visarea;
 	int htotal, vtotal;
 	double framerate;
 	int view;
 
-	memset(mac->m_rbv_regs, 0, sizeof(mac->m_rbv_regs));
+	memset(m_rbv_regs, 0, sizeof(m_rbv_regs));
 
-	mac->m_rbv_count = 0;
-	mac->m_rbv_clutoffs = 0;
-	mac->m_rbv_immed10wr = 0;
+	m_rbv_count = 0;
+	m_rbv_clutoffs = 0;
+	m_rbv_immed10wr = 0;
 
-	mac->m_rbv_regs[2] = 0x7f;
-	mac->m_rbv_regs[3] = 0;
+	m_rbv_regs[2] = 0x7f;
+	m_rbv_regs[3] = 0;
 
-	mac->m_rbv_type = RBV_TYPE_RBV;
+	m_rbv_type = RBV_TYPE_RBV;
 
 	visarea.min_x = 0;
 	visarea.min_y = 0;
 	view = 0;
-	mac->m_rbv_montype = machine.root_device().ioport("MONTYPE")->read_safe(2);
-	switch (mac->m_rbv_montype)
+	m_rbv_montype = machine().root_device().ioport("MONTYPE")->read_safe(2);
+	switch (m_rbv_montype)
 	{
 		case 1:	// 15" portrait display
 			visarea.max_x = 640-1;
@@ -282,39 +279,38 @@ VIDEO_RESET(macrbv)
 	}
 
 //      printf("RBV reset: monitor is %dx%d @ %f Hz\n", visarea.max_x+1, visarea.max_y+1, framerate);
-	machine.primary_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(framerate));
-	render_target *target = machine.render().first_target();
+	machine().primary_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(framerate));
+	render_target *target = machine().render().first_target();
 	target->set_view(view);
 }
 
-VIDEO_RESET(macsonora)
+VIDEO_RESET_MEMBER(mac_state,macsonora)
 {
-	mac_state *mac = machine.driver_data<mac_state>();
 	rectangle visarea;
 	int htotal, vtotal;
 	double framerate;
 
-	memset(mac->m_rbv_regs, 0, sizeof(mac->m_rbv_regs));
+	memset(m_rbv_regs, 0, sizeof(m_rbv_regs));
 
-	mac->m_rbv_count = 0;
-	mac->m_rbv_clutoffs = 0;
-	mac->m_rbv_immed10wr = 0;
+	m_rbv_count = 0;
+	m_rbv_clutoffs = 0;
+	m_rbv_immed10wr = 0;
 
-	mac->m_rbv_regs[2] = 0x7f;
-	mac->m_rbv_regs[3] = 0;
+	m_rbv_regs[2] = 0x7f;
+	m_rbv_regs[3] = 0;
 
-	mac->m_rbv_type = RBV_TYPE_SONORA;
+	m_rbv_type = RBV_TYPE_SONORA;
 
 	visarea.min_x = 0;
 	visarea.min_y = 0;
 
-	mac->m_rbv_montype = machine.root_device().ioport("MONTYPE")->read_safe(2);
-	switch (mac->m_rbv_montype)
+	m_rbv_montype = machine().root_device().ioport("MONTYPE")->read_safe(2);
+	switch (m_rbv_montype)
 	{
 		case 1:	// 15" portrait display
 			visarea.max_x = 640-1;
 			visarea.max_y = 870-1;
-		    	htotal = 832;
+		    htotal = 832;
 			vtotal = 918;
 			framerate = 75.0;
 			break;
@@ -322,7 +318,7 @@ VIDEO_RESET(macsonora)
 		case 2: // 12" RGB
 			visarea.max_x = 512-1;
 			visarea.max_y = 384-1;
-		    	htotal = 640;
+		    htotal = 640;
 			vtotal = 407;
 			framerate = 60.15;
 			break;
@@ -331,53 +327,51 @@ VIDEO_RESET(macsonora)
 		default:
 			visarea.max_x = 640-1;
 			visarea.max_y = 480-1;
-		    	htotal = 800;
+		    htotal = 800;
 			vtotal = 525;
 			framerate = 59.94;
 			break;
 	}
 
 //      printf("RBV reset: monitor is %dx%d @ %f Hz\n", visarea.max_x+1, visarea.max_y+1, framerate);
-	machine.primary_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(framerate));
+	machine().primary_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(framerate));
 }
 
-VIDEO_START( macsonora )
+VIDEO_START_MEMBER(mac_state,macsonora)
 {
-	mac_state *mac = machine.driver_data<mac_state>();
 
-	memset(mac->m_rbv_regs, 0, sizeof(mac->m_rbv_regs));
+	memset(m_rbv_regs, 0, sizeof(m_rbv_regs));
 
-	mac->m_rbv_count = 0;
-	mac->m_rbv_clutoffs = 0;
-	mac->m_rbv_immed10wr = 0;
+	m_rbv_count = 0;
+	m_rbv_clutoffs = 0;
+	m_rbv_immed10wr = 0;
 
-	mac->m_rbv_regs[2] = 0x7f;
-	mac->m_rbv_regs[3] = 0;
-	mac->m_rbv_regs[4] = 0x6;
-	mac->m_rbv_regs[5] = 0x3;
+	m_rbv_regs[2] = 0x7f;
+	m_rbv_regs[3] = 0;
+	m_rbv_regs[4] = 0x6;
+	m_rbv_regs[5] = 0x3;
 
-	mac->m_sonora_vctl[0] = 0x9f;
-	mac->m_sonora_vctl[1] = 0;
-	mac->m_sonora_vctl[2] = 0;
+	m_sonora_vctl[0] = 0x9f;
+	m_sonora_vctl[1] = 0;
+	m_sonora_vctl[2] = 0;
 
-	mac->m_rbv_type = RBV_TYPE_SONORA;
+	m_rbv_type = RBV_TYPE_SONORA;
 }
 
-VIDEO_START( macv8 )
+VIDEO_START_MEMBER(mac_state,macv8)
 {
-	mac_state *mac = machine.driver_data<mac_state>();
 
-	memset(mac->m_rbv_regs, 0, sizeof(mac->m_rbv_regs));
+	memset(m_rbv_regs, 0, sizeof(m_rbv_regs));
 
-	mac->m_rbv_count = 0;
-	mac->m_rbv_clutoffs = 0;
-	mac->m_rbv_immed10wr = 0;
+	m_rbv_count = 0;
+	m_rbv_clutoffs = 0;
+	m_rbv_immed10wr = 0;
 
-	mac->m_rbv_regs[0] = 0x4f;
-	mac->m_rbv_regs[1] = 0x06;
-	mac->m_rbv_regs[2] = 0x7f;
+	m_rbv_regs[0] = 0x4f;
+	m_rbv_regs[1] = 0x06;
+	m_rbv_regs[2] = 0x7f;
 
-	mac->m_rbv_type = RBV_TYPE_V8;
+	m_rbv_type = RBV_TYPE_V8;
 }
 
 SCREEN_UPDATE_RGB32( macrbv )
@@ -684,32 +678,28 @@ static TIMER_CALLBACK(dafb_cursor_tick)
 	mac->m_cursor_timer->adjust(mac->m_screen->time_until_pos(mac->m_cursor_line, 0), 0);
 }
 
-VIDEO_START( macdafb )
+VIDEO_START_MEMBER(mac_state,macdafb)
 {
-	mac_state *mac = machine.driver_data<mac_state>();
+	m_vbl_timer = machine().scheduler().timer_alloc(FUNC(dafb_vbl_tick));
+	m_cursor_timer = machine().scheduler().timer_alloc(FUNC(dafb_cursor_tick));
 
-	mac->m_vbl_timer = machine.scheduler().timer_alloc(FUNC(dafb_vbl_tick));
-	mac->m_cursor_timer = machine.scheduler().timer_alloc(FUNC(dafb_cursor_tick));
-
-	mac->m_vbl_timer->adjust(attotime::never);
-	mac->m_cursor_timer->adjust(attotime::never);
+	m_vbl_timer->adjust(attotime::never);
+	m_cursor_timer->adjust(attotime::never);
 }
 
-VIDEO_RESET(macdafb)
+VIDEO_RESET_MEMBER(mac_state,macdafb)
 {
-	mac_state *mac = machine.driver_data<mac_state>();
+	m_rbv_count = 0;
+	m_rbv_clutoffs = 0;
+	m_rbv_montype = 6;
+	m_rbv_vbltime = 0;
+	m_dafb_int_status = 0;
+	m_rbv_type = RBV_TYPE_DAFB;
+	m_dafb_mode = 0;
+	m_dafb_base = 0x1000;
+	m_dafb_stride = 256*4;
 
-	mac->m_rbv_count = 0;
-	mac->m_rbv_clutoffs = 0;
-	mac->m_rbv_montype = 6;
-	mac->m_rbv_vbltime = 0;
-	mac->m_dafb_int_status = 0;
-	mac->m_rbv_type = RBV_TYPE_DAFB;
-	mac->m_dafb_mode = 0;
-	mac->m_dafb_base = 0x1000;
-	mac->m_dafb_stride = 256*4;
-
-	memset(mac->m_rbv_palette, 0, sizeof(mac->m_rbv_palette));
+	memset(m_rbv_palette, 0, sizeof(m_rbv_palette));
 }
 
 READ32_MEMBER(mac_state::dafb_r)

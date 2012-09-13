@@ -70,6 +70,8 @@ public:
 		  m_videoram(*this, "videoram") { }
 
 	required_shared_ptr<UINT8> m_videoram;
+	DECLARE_MACHINE_START(interact);
+	DECLARE_MACHINE_RESET(interact);
 };
 
 
@@ -117,14 +119,14 @@ static DISCRETE_SOUND_START( hec2hrp )
 	DISCRETE_OUTPUT(NODE_01, 5000)
 DISCRETE_SOUND_END
 
-static MACHINE_RESET(interact)
+MACHINE_RESET_MEMBER(interact_state,interact)
 {
-	hector_reset(machine, 0, 0);
+	hector_reset(machine(), 0, 0);
 }
 
-static MACHINE_START(interact)
+MACHINE_START_MEMBER(interact_state,interact)
 {
-	hector_init(machine);
+	hector_init(machine());
 }
 
 static SCREEN_UPDATE_IND16( interact )
@@ -143,8 +145,8 @@ static MACHINE_CONFIG_START( interact, interact_state )
 	MCFG_CPU_PROGRAM_MAP(interact_mem)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,50) /*  put on the I8080 irq in Hz*/
 
-	MCFG_MACHINE_RESET(interact)
-	MCFG_MACHINE_START(interact)
+	MCFG_MACHINE_RESET_OVERRIDE(interact_state,interact)
+	MCFG_MACHINE_START_OVERRIDE(interact_state,interact)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -156,7 +158,7 @@ static MACHINE_CONFIG_START( interact, interact_state )
 
 	MCFG_PALETTE_LENGTH(16)				/* 8 colours, but only 4 at a time*/
 
-	MCFG_VIDEO_START(hec2hrp)
+	MCFG_VIDEO_START_OVERRIDE(interact_state,hec2hrp)
 		/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
@@ -184,8 +186,8 @@ static MACHINE_CONFIG_START( hector1, interact_state )
 	MCFG_CPU_PROGRAM_MAP(interact_mem)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,50) /*  put on the I8080 irq in Hz*/
 
-	MCFG_MACHINE_RESET(interact)
-	MCFG_MACHINE_START(interact)
+	MCFG_MACHINE_RESET_OVERRIDE(interact_state,interact)
+	MCFG_MACHINE_START_OVERRIDE(interact_state,interact)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -197,7 +199,7 @@ static MACHINE_CONFIG_START( hector1, interact_state )
 
 	MCFG_PALETTE_LENGTH(16)				/* 8 colours, but only 4 at a time*/
 
-	MCFG_VIDEO_START(hec2hrp)
+	MCFG_VIDEO_START_OVERRIDE(interact_state,hec2hrp)
 		/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)

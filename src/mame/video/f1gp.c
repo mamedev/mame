@@ -40,49 +40,46 @@ TILE_GET_INFO_MEMBER(f1gp_state::get_fg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( f1gp )
+VIDEO_START_MEMBER(f1gp_state,f1gp)
 {
-	f1gp_state *state = machine.driver_data<f1gp_state>();
 
-	state->m_roz_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::f1gp_get_roz_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_roz_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::f1gp_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0xff);
+	m_fg_tilemap->set_transparent_pen(0xff);
 
-	state->m_zoomdata = (UINT16 *)state->memregion("gfx4")->base();
-	machine.gfx[3]->set_source((UINT8 *)state->m_zoomdata);
+	m_zoomdata = (UINT16 *)memregion("gfx4")->base();
+	machine().gfx[3]->set_source((UINT8 *)m_zoomdata);
 
-//  state->save_pointer(NAME(state->m_zoomdata), state->memregion("gfx4")->bytes());
+//  save_pointer(NAME(m_zoomdata), memregion("gfx4")->bytes());
 }
 
 
-VIDEO_START( f1gpb )
+VIDEO_START_MEMBER(f1gp_state,f1gpb)
 {
-	f1gp_state *state = machine.driver_data<f1gp_state>();
 
-	state->m_roz_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::f1gp_get_roz_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_roz_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::f1gp_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0xff);
+	m_fg_tilemap->set_transparent_pen(0xff);
 
-	state->m_zoomdata = (UINT16 *)state->memregion("gfx4")->base();
-	machine.gfx[3]->set_source((UINT8 *)state->m_zoomdata);
+	m_zoomdata = (UINT16 *)memregion("gfx4")->base();
+	machine().gfx[3]->set_source((UINT8 *)m_zoomdata);
 
-//  state->save_pointer(NAME(state->m_zoomdata), state->memregion("gfx4")->bytes());
+//  save_pointer(NAME(m_zoomdata), memregion("gfx4")->bytes());
 }
 
-VIDEO_START( f1gp2 )
+VIDEO_START_MEMBER(f1gp_state,f1gp2)
 {
-	f1gp_state *state = machine.driver_data<f1gp_state>();
 
-	state->m_roz_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::f1gp2_get_roz_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_roz_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::f1gp2_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0xff);
-	state->m_roz_tilemap->set_transparent_pen(0x0f);
+	m_fg_tilemap->set_transparent_pen(0xff);
+	m_roz_tilemap->set_transparent_pen(0x0f);
 
-	state->m_fg_tilemap->set_scrolldx(-80, 0);
-	state->m_fg_tilemap->set_scrolldy(-26, 0);
+	m_fg_tilemap->set_scrolldx(-80, 0);
+	m_fg_tilemap->set_scrolldy(-26, 0);
 }
 
 

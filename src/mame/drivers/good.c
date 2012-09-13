@@ -56,6 +56,7 @@ public:
 	DECLARE_WRITE16_MEMBER(bg_tilemapram_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
 };
 
 
@@ -87,12 +88,11 @@ TILE_GET_INFO_MEMBER(good_state::get_bg_tile_info)
 
 
 
-static VIDEO_START( good )
+void good_state::video_start()
 {
-	good_state *state = machine.driver_data<good_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(good_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(good_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_fg_tilemap->set_transparent_pen(0xf);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(good_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(good_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap->set_transparent_pen(0xf);
 }
 
 static SCREEN_UPDATE_IND16( good )
@@ -292,7 +292,6 @@ static MACHINE_CONFIG_START( good, good_state )
 
 	MCFG_PALETTE_LENGTH(0x400)
 
-	MCFG_VIDEO_START(good)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

@@ -28,11 +28,13 @@ public:
 	DECLARE_WRITE16_MEMBER(mugsmash_reg_w);
 	TILE_GET_INFO_MEMBER(get_mugsmash_tile_info1);
 	TILE_GET_INFO_MEMBER(get_mugsmash_tile_info2);
+	virtual void machine_start();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/mugsmash.c -----------*/
 
-VIDEO_START( mugsmash );
+
 SCREEN_UPDATE_IND16( mugsmash );
 

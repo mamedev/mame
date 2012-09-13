@@ -41,6 +41,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -230,15 +233,14 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 	}
 }
 
-static VIDEO_START( pkscramble )
+void pkscram_state::video_start()
 {
-	pkscram_state *state = machine.driver_data<pkscram_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pkscram_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8,32,32);
-	state->m_md_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pkscram_state::get_md_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8,32,32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pkscram_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pkscram_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_md_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pkscram_state::get_md_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pkscram_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8,32,32);
 
-	state->m_md_tilemap->set_transparent_pen(15);
-	state->m_fg_tilemap->set_transparent_pen(15);
+	m_md_tilemap->set_transparent_pen(15);
+	m_fg_tilemap->set_transparent_pen(15);
 }
 
 static SCREEN_UPDATE_IND16( pkscramble )
@@ -283,20 +285,18 @@ static const ym2203_interface ym2203_config =
 	DEVCB_LINE(irqhandler)
 };
 
-static MACHINE_START( pkscramble)
+void pkscram_state::machine_start()
 {
-	pkscram_state *state = machine.driver_data<pkscram_state>();
-	state_save_register_global(machine, state->m_out);
-	state_save_register_global(machine, state->m_interrupt_line_active);
+	state_save_register_global(machine(), m_out);
+	state_save_register_global(machine(), m_interrupt_line_active);
 }
 
-static MACHINE_RESET( pkscramble)
+void pkscram_state::machine_reset()
 {
-	pkscram_state *state = machine.driver_data<pkscram_state>();
-	state->m_out = 0;
-	state->m_interrupt_line_active=0;
-	timer_device *scanline_timer = machine.device<timer_device>("scan_timer");
-	scanline_timer->adjust(machine.primary_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
+	m_out = 0;
+	m_interrupt_line_active=0;
+	timer_device *scanline_timer = machine().device<timer_device>("scan_timer");
+	scanline_timer->adjust(machine().primary_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
 }
 
 static MACHINE_CONFIG_START( pkscramble, pkscram_state )
@@ -307,8 +307,6 @@ static MACHINE_CONFIG_START( pkscramble, pkscram_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_MACHINE_START(pkscramble)
-	MCFG_MACHINE_RESET(pkscramble)
 
 	MCFG_TIMER_ADD("scan_timer", scanline_callback)
 
@@ -323,7 +321,6 @@ static MACHINE_CONFIG_START( pkscramble, pkscram_state )
 	MCFG_PALETTE_LENGTH(0x800)
 	MCFG_GFXDECODE(pkscram)
 
-	MCFG_VIDEO_START(pkscramble)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

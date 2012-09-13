@@ -55,6 +55,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_vsgongf_tile_info);
+	DECLARE_VIDEO_START(tsamurai);
+	DECLARE_VIDEO_START(vsgongf);
 };
 
 
@@ -63,8 +65,8 @@ public:
 
 
 
-VIDEO_START( tsamurai );
+
 SCREEN_UPDATE_IND16( tsamurai );
 
-VIDEO_START( vsgongf );
+
 SCREEN_UPDATE_IND16( vsgongf );

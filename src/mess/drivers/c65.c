@@ -172,13 +172,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static PALETTE_INIT( c65 )
+PALETTE_INIT_MEMBER(c65_state,c65)
 {
 	int i;
 
 	for ( i = 0; i < 0x100; i++ )
 	{
-		palette_set_color_rgb(machine, i, 0, 0, 0);
+		palette_set_color_rgb(machine(), i, 0, 0, 0);
 	}
 }
 
@@ -309,7 +309,7 @@ static MACHINE_CONFIG_START( c65, c65_state )
 	MCFG_CPU_VBLANK_INT("screen", c65_frame_interrupt)
 	MCFG_CPU_PERIODIC_INT(vic3_raster_irq, VIC6567_HRETRACERATE)
 
-	MCFG_MACHINE_START( c65 )
+	MCFG_MACHINE_START_OVERRIDE(c65_state, c65 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -320,7 +320,7 @@ static MACHINE_CONFIG_START( c65, c65_state )
 	MCFG_SCREEN_UPDATE_STATIC( c65 )
 
 	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT( c65 )
+	MCFG_PALETTE_INIT_OVERRIDE(c65_state, c65 )
 
 	MCFG_VIC3_ADD("vic3", c65_vic3_ntsc_intf)
 

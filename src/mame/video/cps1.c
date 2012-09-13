@@ -1485,10 +1485,9 @@ CPS1 VIDEO RENDERER
 static void cps1_build_palette(running_machine &machine, const UINT16* const palette_base);
 
 
-static MACHINE_RESET( cps )
+MACHINE_RESET_MEMBER(cps_state,cps)
 {
-	cps_state *state = machine.driver_data<cps_state>();
-	const char *gamename = machine.system().name;
+	const char *gamename = machine().system().name;
 	const struct CPS1config *pCFG = &cps1_config_table[0];
 
 	while (pCFG->name)
@@ -1499,9 +1498,9 @@ static MACHINE_RESET( cps )
 		pCFG++;
 	}
 
-	state->m_game_config = pCFG;
+	m_game_config = pCFG;
 
-	if (!state->m_game_config->name)
+	if (!m_game_config->name)
 	{
 		gamename = "cps2";
 		pCFG = &cps1_config_table[0];
@@ -1514,20 +1513,20 @@ static MACHINE_RESET( cps )
 			pCFG++;
 		}
 
-		state->m_game_config = pCFG;
+		m_game_config = pCFG;
 	}
 
 	if (strcmp(gamename, "sf2rb") == 0)
 	{
 		/* Patch out protection check */
-		UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+		UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 		rom[0xe5464 / 2] = 0x6012;
 	}
 
 	if (strcmp(gamename, "sf2rb2") == 0)
 	{
 		/* Patch out protection check */
-		UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+		UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 		rom[0xe5332 / 2] = 0x6014;
 	}
 
@@ -1538,13 +1537,13 @@ static MACHINE_RESET( cps )
            by the cpu core as a 32-bit branch. This branch would make the
            game crash (address error, since it would branch to an odd address)
            if location 180ca6 (outside ROM space) isn't 0. Protection check? */
-		UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+		UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 		rom[0x11756 / 2] = 0x4e71;
 	}
 	else if (strcmp(gamename, "ghouls") == 0)
 	{
 		/* Patch out self-test... it takes forever */
-		UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+		UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 		rom[0x61964 / 2] = 0x4ef9;
 		rom[0x61966 / 2] = 0x0000;
 		rom[0x61968 / 2] = 0x0400;
@@ -2079,118 +2078,115 @@ static void cps1_update_transmasks( running_machine &machine )
 	}
 }
 
-static VIDEO_START( cps )
+VIDEO_START_MEMBER(cps_state,cps)
 {
-	cps_state *state = machine.driver_data<cps_state>();
 	int i;
 
-	MACHINE_RESET_CALL(cps);
+	MACHINE_RESET_CALL_MEMBER(cps);
 
 	/* Put in some const */
-	state->m_scroll_size    = 0x4000;	/* scroll1, scroll2, scroll3 */
-	state->m_obj_size       = 0x0800;
-	state->m_cps2_obj_size  = 0x2000;
-	state->m_other_size     = 0x0800;
-	state->m_palette_align  = 0x0400;	/* minimum alignment is a single palette page (512 colors). Verified on pcb. */
-	state->m_palette_size   = cps1_palette_entries * 32; /* Size of palette RAM */
-	state->m_stars_rom_size = 0x2000;	/* first 0x4000 of gfx ROM are used, but 0x0000-0x1fff is == 0x2000-0x3fff */
+	m_scroll_size    = 0x4000;	/* scroll1, scroll2, scroll3 */
+	m_obj_size       = 0x0800;
+	m_cps2_obj_size  = 0x2000;
+	m_other_size     = 0x0800;
+	m_palette_align  = 0x0400;	/* minimum alignment is a single palette page (512 colors). Verified on pcb. */
+	m_palette_size   = cps1_palette_entries * 32; /* Size of palette RAM */
+	m_stars_rom_size = 0x2000;	/* first 0x4000 of gfx ROM are used, but 0x0000-0x1fff is == 0x2000-0x3fff */
 
 	/* create tilemaps */
-	state->m_bg_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cps_state::get_tile0_info),state), tilemap_mapper_delegate(FUNC(cps_state::tilemap0_scan),state),  8,  8, 64, 64);
-	state->m_bg_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cps_state::get_tile1_info),state), tilemap_mapper_delegate(FUNC(cps_state::tilemap1_scan),state), 16, 16, 64, 64);
-	state->m_bg_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cps_state::get_tile2_info),state), tilemap_mapper_delegate(FUNC(cps_state::tilemap2_scan),state), 32, 32, 64, 64);
+	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cps_state::get_tile0_info),this), tilemap_mapper_delegate(FUNC(cps_state::tilemap0_scan),this),  8,  8, 64, 64);
+	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cps_state::get_tile1_info),this), tilemap_mapper_delegate(FUNC(cps_state::tilemap1_scan),this), 16, 16, 64, 64);
+	m_bg_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cps_state::get_tile2_info),this), tilemap_mapper_delegate(FUNC(cps_state::tilemap2_scan),this), 32, 32, 64, 64);
 
 	/* create empty tiles */
-	memset(state->m_empty_tile, 0x0f, sizeof(state->m_empty_tile));
+	memset(m_empty_tile, 0x0f, sizeof(m_empty_tile));
 
 	/* front masks will change at runtime to handle sprite occluding */
-	cps1_update_transmasks(machine);
+	cps1_update_transmasks(machine());
 
 	for (i = 0; i < cps1_palette_entries * 16; i++)
-		palette_set_color(machine, i, MAKE_RGB(0,0,0));
+		palette_set_color(machine(), i, MAKE_RGB(0,0,0));
 
-	state->m_buffered_obj = auto_alloc_array_clear(machine, UINT16, state->m_obj_size / 2);
+	m_buffered_obj = auto_alloc_array_clear(machine(), UINT16, m_obj_size / 2);
 
-	if (state->m_cps_version == 2)
-		state->m_cps2_buffered_obj = auto_alloc_array_clear(machine, UINT16, state->m_cps2_obj_size / 2);
+	if (m_cps_version == 2)
+		m_cps2_buffered_obj = auto_alloc_array_clear(machine(), UINT16, m_cps2_obj_size / 2);
 
 	/* clear RAM regions */
-	memset(state->m_gfxram, 0, state->m_gfxram.bytes());   /* Clear GFX RAM */
-	memset(state->m_cps_a_regs, 0, 0x40);   /* Clear CPS-A registers */
-	memset(state->m_cps_b_regs, 0, 0x40);   /* Clear CPS-B registers */
+	memset(m_gfxram, 0, m_gfxram.bytes());   /* Clear GFX RAM */
+	memset(m_cps_a_regs, 0, 0x40);   /* Clear CPS-A registers */
+	memset(m_cps_b_regs, 0, 0x40);   /* Clear CPS-B registers */
 
-	if (state->m_cps_version == 2)
+	if (m_cps_version == 2)
 	{
-		memset(state->m_objram1, 0, state->m_cps2_obj_size);
-		memset(state->m_objram2, 0, state->m_cps2_obj_size);
+		memset(m_objram1, 0, m_cps2_obj_size);
+		memset(m_objram2, 0, m_cps2_obj_size);
 	}
 
 	/* Put in some defaults */
-	state->m_cps_a_regs[CPS1_OBJ_BASE]     = 0x9200;
-	state->m_cps_a_regs[CPS1_SCROLL1_BASE] = 0x9000;
-	state->m_cps_a_regs[CPS1_SCROLL2_BASE] = 0x9040;
-	state->m_cps_a_regs[CPS1_SCROLL3_BASE] = 0x9080;
-	state->m_cps_a_regs[CPS1_OTHER_BASE]   = 0x9100;
+	m_cps_a_regs[CPS1_OBJ_BASE]     = 0x9200;
+	m_cps_a_regs[CPS1_SCROLL1_BASE] = 0x9000;
+	m_cps_a_regs[CPS1_SCROLL2_BASE] = 0x9040;
+	m_cps_a_regs[CPS1_SCROLL3_BASE] = 0x9080;
+	m_cps_a_regs[CPS1_OTHER_BASE]   = 0x9100;
 
 	/* This should never be hit, since game_config is set in MACHINE_RESET */
-	assert_always(state->m_game_config, "state_game_config hasn't been set up yet");
+	assert_always(m_game_config, "state_game_config hasn't been set up yet");
 
 
 	/* Set up old base */
-	state->m_scroll1 = NULL;
-	state->m_scroll2 = NULL;
-	state->m_scroll3 = NULL;
-	state->m_obj = NULL;
-	state->m_other = NULL;
-	cps1_get_video_base(machine);   /* Calculate base pointers */
-	cps1_get_video_base(machine);   /* Calculate old base pointers */
+	m_scroll1 = NULL;
+	m_scroll2 = NULL;
+	m_scroll3 = NULL;
+	m_obj = NULL;
+	m_other = NULL;
+	cps1_get_video_base(machine());   /* Calculate base pointers */
+	cps1_get_video_base(machine());   /* Calculate old base pointers */
 
 	/* state save register */
-	state->save_item(NAME(state->m_scanline1));
-	state->save_item(NAME(state->m_scanline2));
-	state->save_item(NAME(state->m_scancalls));
+	save_item(NAME(m_scanline1));
+	save_item(NAME(m_scanline2));
+	save_item(NAME(m_scancalls));
 #if 0
 	/* these do not need to be saved, because they are recovered from cps_a_regs in cps1_postload */
-	state->save_item(NAME(state->m_scroll1x));
-	state->save_item(NAME(state->m_scroll1y));
-	state->save_item(NAME(state->m_scroll2x));
-	state->save_item(NAME(state->m_scroll2y));
-	state->save_item(NAME(state->m_scroll3x));
-	state->save_item(NAME(state->m_scroll3y));
-	state->save_item(NAME(state->m_stars1x));
-	state->save_item(NAME(state->m_stars1y));
-	state->save_item(NAME(state->m_stars2x));
-	state->save_item(NAME(state->m_stars2y));
-	state->save_item(NAME(state->m_stars_enabled));
+	save_item(NAME(m_scroll1x));
+	save_item(NAME(m_scroll1y));
+	save_item(NAME(m_scroll2x));
+	save_item(NAME(m_scroll2y));
+	save_item(NAME(m_scroll3x));
+	save_item(NAME(m_scroll3y));
+	save_item(NAME(m_stars1x));
+	save_item(NAME(m_stars1y));
+	save_item(NAME(m_stars2x));
+	save_item(NAME(m_stars2y));
+	save_item(NAME(m_stars_enabled));
 #endif
-	state->save_item(NAME(state->m_last_sprite_offset));
-	state->save_item(NAME(state->m_pri_ctrl));
-	state->save_item(NAME(state->m_objram_bank));
+	save_item(NAME(m_last_sprite_offset));
+	save_item(NAME(m_pri_ctrl));
+	save_item(NAME(m_objram_bank));
 
-	state->save_pointer(NAME(state->m_buffered_obj), state->m_obj_size / 2);
-	if (state->m_cps_version == 2)
+	save_pointer(NAME(m_buffered_obj), m_obj_size / 2);
+	if (m_cps_version == 2)
 	{
-		state->save_item(NAME(state->m_cps2_last_sprite_offset));
-		state->save_pointer(NAME(state->m_cps2_buffered_obj), state->m_cps2_obj_size / 2);
+		save_item(NAME(m_cps2_last_sprite_offset));
+		save_pointer(NAME(m_cps2_buffered_obj), m_cps2_obj_size / 2);
 	}
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(cps1_get_video_base), &machine));
+	machine().save().register_postload(save_prepost_delegate(FUNC(cps1_get_video_base), &machine()));
 }
 
-VIDEO_START( cps1 )
+VIDEO_START_MEMBER(cps_state,cps1)
 {
-	cps_state *state = machine.driver_data<cps_state>();
 
-	state->m_cps_version = 1;
-	VIDEO_START_CALL(cps);
+	m_cps_version = 1;
+	VIDEO_START_CALL_MEMBER(cps);
 }
 
-VIDEO_START( cps2 )
+VIDEO_START_MEMBER(cps_state,cps2)
 {
-	cps_state *state = machine.driver_data<cps_state>();
 
-	state->m_cps_version = 2;
-	VIDEO_START_CALL(cps);
+	m_cps_version = 2;
+	VIDEO_START_CALL_MEMBER(cps);
 }
 
 /***************************************************************************

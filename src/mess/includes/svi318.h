@@ -70,6 +70,11 @@ public:
 	DECLARE_READ8_MEMBER(svi318_io_ext_r);
 	DECLARE_WRITE8_MEMBER(svi318_io_ext_w);
 	DECLARE_DRIVER_INIT(svi318);
+	DECLARE_MACHINE_START(svi318_pal);
+	DECLARE_MACHINE_RESET(svi318);
+	DECLARE_MACHINE_RESET(svi328_806);
+	DECLARE_VIDEO_START(svi328_806);
+	DECLARE_MACHINE_START(svi318_ntsc);
 };
 
 
@@ -79,9 +84,9 @@ extern const i8255_interface svi318_ppi8255_interface;
 extern const ins8250_interface svi318_ins8250_interface[2];
 extern const wd17xx_interface svi_wd17xx_interface;
 
-MACHINE_START( svi318_pal );
-MACHINE_START( svi318_ntsc );
-MACHINE_RESET( svi318 );
+
+
+
 
 DEVICE_START( svi318_cart );
 DEVICE_IMAGE_LOAD( svi318_cart );
@@ -93,7 +98,7 @@ DEVICE_IMAGE_UNLOAD( svi318_cart );
 int svi318_cassette_present(running_machine &machine, int id);
 
 MC6845_UPDATE_ROW( svi806_crtc6845_update_row );
-VIDEO_START( svi328_806 );
-MACHINE_RESET( svi328_806 );
+
+
 
 #endif /* SVI318_H_ */

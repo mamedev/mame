@@ -684,8 +684,6 @@ static MACHINE_CONFIG_START( playch10, playch10_state )
 	MCFG_CPU_ADD("cart", N2A03, N2A03_DEFAULTCLOCK)
 	MCFG_CPU_PROGRAM_MAP(cart_map)
 
-	MCFG_MACHINE_RESET(pc10)
-	MCFG_MACHINE_START(pc10)
 
 	// video hardware
 	MCFG_GFXDECODE(playch10)
@@ -704,8 +702,6 @@ static MACHINE_CONFIG_START( playch10, playch10_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(playch10_bottom)
 
-	MCFG_PALETTE_INIT(playch10)
-	MCFG_VIDEO_START(playch10)
 
 	MCFG_PPU2C03B_ADD("ppu", playch10_ppu_interface)
 
@@ -726,8 +722,8 @@ static MACHINE_CONFIG_DERIVED( playchnv, playch10 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( playch10_hboard, playch10 )
-	MCFG_VIDEO_START(playch10_hboard)
-	MCFG_MACHINE_START(playch10_hboard)
+	MCFG_VIDEO_START_OVERRIDE(playch10_state,playch10_hboard)
+	MCFG_MACHINE_START_OVERRIDE(playch10_state,playch10_hboard)
 MACHINE_CONFIG_END
 
 /***************************************************************************

@@ -61,16 +61,15 @@ TILE_GET_INFO_MEMBER(renegade_state::get_fg_tilemap_info)
 		0);
 }
 
-VIDEO_START( renegade )
+void renegade_state::video_start()
 {
-	renegade_state *state = machine.driver_data<renegade_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(renegade_state::get_bg_tilemap_info),state), TILEMAP_SCAN_ROWS,      16, 16, 64, 16);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(renegade_state::get_fg_tilemap_info),state), TILEMAP_SCAN_ROWS,   8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(renegade_state::get_bg_tilemap_info),this), TILEMAP_SCAN_ROWS,      16, 16, 64, 16);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(renegade_state::get_fg_tilemap_info),this), TILEMAP_SCAN_ROWS,   8, 8, 32, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
-	state->m_bg_tilemap->set_scrolldx(256, 0);
+	m_fg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scrolldx(256, 0);
 
-	state_save_register_global(machine, state->m_scrollx);
+	state_save_register_global(machine(), m_scrollx);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)

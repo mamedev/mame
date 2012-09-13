@@ -213,8 +213,6 @@ static MACHINE_CONFIG_START( rocnrope, rocnrope_state )
 	MCFG_GFXDECODE(rocnrope)
 	MCFG_PALETTE_LENGTH(16*16+16*16)
 
-	MCFG_PALETTE_INIT(rocnrope)
-	MCFG_VIDEO_START(rocnrope)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(timeplt_sound)

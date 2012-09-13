@@ -8,40 +8,40 @@ Atari Wolf Pack (prototype) video emulation
 #include "includes/wolfpack.h"
 
 
-PALETTE_INIT( wolfpack )
+void wolfpack_state::palette_init()
 {
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 8);
+	machine().colortable = colortable_alloc(machine(), 8);
 
-	colortable_palette_set_color(machine.colortable, 0, MAKE_RGB(0x00, 0x00, 0x00));
-	colortable_palette_set_color(machine.colortable, 1, MAKE_RGB(0xc1, 0xc1, 0xc1));
-	colortable_palette_set_color(machine.colortable, 2, MAKE_RGB(0x81, 0x81, 0x81));
-	colortable_palette_set_color(machine.colortable, 3, MAKE_RGB(0x48, 0x48, 0x48));
+	colortable_palette_set_color(machine().colortable, 0, MAKE_RGB(0x00, 0x00, 0x00));
+	colortable_palette_set_color(machine().colortable, 1, MAKE_RGB(0xc1, 0xc1, 0xc1));
+	colortable_palette_set_color(machine().colortable, 2, MAKE_RGB(0x81, 0x81, 0x81));
+	colortable_palette_set_color(machine().colortable, 3, MAKE_RGB(0x48, 0x48, 0x48));
 
 	for (i = 0; i < 4; i++)
 	{
-		rgb_t color = colortable_palette_get_color(machine.colortable, i);
+		rgb_t color = colortable_palette_get_color(machine().colortable, i);
 
-		colortable_palette_set_color(machine.colortable, 4 + i,
+		colortable_palette_set_color(machine().colortable, 4 + i,
 									 MAKE_RGB(RGB_RED(color)   < 0xb8 ? RGB_RED(color)   + 0x48 : 0xff,
 											  RGB_GREEN(color) < 0xb8 ? RGB_GREEN(color) + 0x48 : 0xff,
 											  RGB_BLUE(color)  < 0xb8 ? RGB_BLUE(color)  + 0x48 : 0xff));
 	}
 
-	colortable_entry_set_value(machine.colortable, 0x00, 0);
-	colortable_entry_set_value(machine.colortable, 0x01, 1);
-	colortable_entry_set_value(machine.colortable, 0x02, 1);
-	colortable_entry_set_value(machine.colortable, 0x03, 0);
-	colortable_entry_set_value(machine.colortable, 0x04, 0);
-	colortable_entry_set_value(machine.colortable, 0x05, 2);
-	colortable_entry_set_value(machine.colortable, 0x06, 0);
-	colortable_entry_set_value(machine.colortable, 0x07, 3);
-	colortable_entry_set_value(machine.colortable, 0x08, 4);
-	colortable_entry_set_value(machine.colortable, 0x09, 5);
-	colortable_entry_set_value(machine.colortable, 0x0a, 6);
-	colortable_entry_set_value(machine.colortable, 0x0b, 7);
+	colortable_entry_set_value(machine().colortable, 0x00, 0);
+	colortable_entry_set_value(machine().colortable, 0x01, 1);
+	colortable_entry_set_value(machine().colortable, 0x02, 1);
+	colortable_entry_set_value(machine().colortable, 0x03, 0);
+	colortable_entry_set_value(machine().colortable, 0x04, 0);
+	colortable_entry_set_value(machine().colortable, 0x05, 2);
+	colortable_entry_set_value(machine().colortable, 0x06, 0);
+	colortable_entry_set_value(machine().colortable, 0x07, 3);
+	colortable_entry_set_value(machine().colortable, 0x08, 4);
+	colortable_entry_set_value(machine().colortable, 0x09, 5);
+	colortable_entry_set_value(machine().colortable, 0x0a, 6);
+	colortable_entry_set_value(machine().colortable, 0x0b, 7);
 }
 
 
@@ -95,16 +95,15 @@ WRITE8_MEMBER(wolfpack_state::wolfpack_torpedo_v_w)
 }
 
 
-VIDEO_START( wolfpack )
+void wolfpack_state::video_start()
 {
-	wolfpack_state *state = machine.driver_data<wolfpack_state>();
 	UINT16 val = 0;
 
 	int i;
 
-	state->m_LFSR = auto_alloc_array(machine, UINT8, 0x8000);
+	m_LFSR = auto_alloc_array(machine(), UINT8, 0x8000);
 
-	machine.primary_screen->register_screen_bitmap(state->m_helper);
+	machine().primary_screen->register_screen_bitmap(m_helper);
 
 	for (i = 0; i < 0x8000; i++)
 	{
@@ -112,10 +111,10 @@ VIDEO_START( wolfpack )
 
 		val = (val << 1) | (bit & 1);
 
-		state->m_LFSR[i] = (val & 0xc00) == 0xc00;
+		m_LFSR[i] = (val & 0xc00) == 0xc00;
 	}
 
-	state->m_current_index = 0x80;
+	m_current_index = 0x80;
 }
 
 

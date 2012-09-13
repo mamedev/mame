@@ -480,84 +480,82 @@ const pia6821_interface carpolo_pia1_intf =
 	DEVCB_NULL		/* IRQB */
 };
 
-MACHINE_START( carpolo )
+void carpolo_state::machine_start()
 {
-	carpolo_state *state = machine.driver_data<carpolo_state>();
 	/* find flip-flops */
-	state->m_ttl7474_2s_1 = machine.device<ttl7474_device>("7474_2s_1");
-	state->m_ttl7474_2s_2 = machine.device<ttl7474_device>("7474_2s_2");
-	state->m_ttl7474_2u_1 = machine.device<ttl7474_device>("7474_2u_1");
-	state->m_ttl7474_2u_2 = machine.device<ttl7474_device>("7474_2u_2");
-	state->m_ttl7474_1f_1 = machine.device<ttl7474_device>("7474_1f_1");
-	state->m_ttl7474_1f_2 = machine.device<ttl7474_device>("7474_1f_2");
-	state->m_ttl7474_1d_1 = machine.device<ttl7474_device>("7474_1d_1");
-	state->m_ttl7474_1d_2 = machine.device<ttl7474_device>("7474_1d_2");
-	state->m_ttl7474_1c_1 = machine.device<ttl7474_device>("7474_1c_1");
-	state->m_ttl7474_1c_2 = machine.device<ttl7474_device>("7474_1c_2");
-	state->m_ttl7474_1a_1 = machine.device<ttl7474_device>("7474_1a_1");
-	state->m_ttl7474_1a_2 = machine.device<ttl7474_device>("7474_1a_2");
+	m_ttl7474_2s_1 = machine().device<ttl7474_device>("7474_2s_1");
+	m_ttl7474_2s_2 = machine().device<ttl7474_device>("7474_2s_2");
+	m_ttl7474_2u_1 = machine().device<ttl7474_device>("7474_2u_1");
+	m_ttl7474_2u_2 = machine().device<ttl7474_device>("7474_2u_2");
+	m_ttl7474_1f_1 = machine().device<ttl7474_device>("7474_1f_1");
+	m_ttl7474_1f_2 = machine().device<ttl7474_device>("7474_1f_2");
+	m_ttl7474_1d_1 = machine().device<ttl7474_device>("7474_1d_1");
+	m_ttl7474_1d_2 = machine().device<ttl7474_device>("7474_1d_2");
+	m_ttl7474_1c_1 = machine().device<ttl7474_device>("7474_1c_1");
+	m_ttl7474_1c_2 = machine().device<ttl7474_device>("7474_1c_2");
+	m_ttl7474_1a_1 = machine().device<ttl7474_device>("7474_1a_1");
+	m_ttl7474_1a_2 = machine().device<ttl7474_device>("7474_1a_2");
 
-	state->m_ttl74148_3s = machine.device("74148_3s");
-	state->m_ttl74153_1k = machine.device("74153_1k");
+	m_ttl74148_3s = machine().device("74148_3s");
+	m_ttl74153_1k = machine().device("74153_1k");
 
-    state_save_register_global(machine, state->m_ball_screen_collision_cause);
-    state_save_register_global(machine, state->m_car_ball_collision_x);
-    state_save_register_global(machine, state->m_car_ball_collision_y);
-    state_save_register_global(machine, state->m_car_car_collision_cause);
-    state_save_register_global(machine, state->m_car_goal_collision_cause);
-    state_save_register_global(machine, state->m_car_ball_collision_cause);
-    state_save_register_global(machine, state->m_car_border_collision_cause);
-    state_save_register_global(machine, state->m_priority_0_extension);
-    state_save_register_global_array(machine, state->m_last_wheel_value);
+    state_save_register_global(machine(), m_ball_screen_collision_cause);
+    state_save_register_global(machine(), m_car_ball_collision_x);
+    state_save_register_global(machine(), m_car_ball_collision_y);
+    state_save_register_global(machine(), m_car_car_collision_cause);
+    state_save_register_global(machine(), m_car_goal_collision_cause);
+    state_save_register_global(machine(), m_car_ball_collision_cause);
+    state_save_register_global(machine(), m_car_border_collision_cause);
+    state_save_register_global(machine(), m_priority_0_extension);
+    state_save_register_global_array(machine(), m_last_wheel_value);
 }
 
-MACHINE_RESET( carpolo )
+void carpolo_state::machine_reset()
 {
-	carpolo_state *state = machine.driver_data<carpolo_state>();
 	/* set up the priority encoder */
-	ttl74148_enable_input_w(state->m_ttl74148_3s, 0);	/* always enabled */
+	ttl74148_enable_input_w(m_ttl74148_3s, 0);	/* always enabled */
 
 	/* set up the coin handling flip-flops */
-	state->m_ttl7474_2s_1->d_w     (1);
-	state->m_ttl7474_2s_1->preset_w(1);
+	m_ttl7474_2s_1->d_w     (1);
+	m_ttl7474_2s_1->preset_w(1);
 
-	state->m_ttl7474_2s_2->d_w     (1);
-	state->m_ttl7474_2s_2->preset_w(1);
+	m_ttl7474_2s_2->d_w     (1);
+	m_ttl7474_2s_2->preset_w(1);
 
-	state->m_ttl7474_2u_1->d_w     (1);
-	state->m_ttl7474_2u_1->preset_w(1);
+	m_ttl7474_2u_1->d_w     (1);
+	m_ttl7474_2u_1->preset_w(1);
 
-	state->m_ttl7474_2u_2->d_w     (1);
-	state->m_ttl7474_2u_2->preset_w(1);
+	m_ttl7474_2u_2->d_w     (1);
+	m_ttl7474_2u_2->preset_w(1);
 
 
 	/* set up the steering handling flip-flops */
-	state->m_ttl7474_1f_1->d_w     (1);
-	state->m_ttl7474_1f_1->preset_w(1);
+	m_ttl7474_1f_1->d_w     (1);
+	m_ttl7474_1f_1->preset_w(1);
 
-	state->m_ttl7474_1f_2->clear_w (1);
-	state->m_ttl7474_1f_2->preset_w(1);
+	m_ttl7474_1f_2->clear_w (1);
+	m_ttl7474_1f_2->preset_w(1);
 
-	state->m_ttl7474_1d_1->d_w     (1);
-	state->m_ttl7474_1d_1->preset_w(1);
+	m_ttl7474_1d_1->d_w     (1);
+	m_ttl7474_1d_1->preset_w(1);
 
-	state->m_ttl7474_1d_2->clear_w (1);
-	state->m_ttl7474_1d_2->preset_w(1);
+	m_ttl7474_1d_2->clear_w (1);
+	m_ttl7474_1d_2->preset_w(1);
 
-	state->m_ttl7474_1c_1->d_w     (1);
-	state->m_ttl7474_1c_1->preset_w(1);
+	m_ttl7474_1c_1->d_w     (1);
+	m_ttl7474_1c_1->preset_w(1);
 
-	state->m_ttl7474_1c_2->clear_w (1);
-	state->m_ttl7474_1c_2->preset_w(1);
+	m_ttl7474_1c_2->clear_w (1);
+	m_ttl7474_1c_2->preset_w(1);
 
-	state->m_ttl7474_1a_1->d_w     (1);
-	state->m_ttl7474_1a_1->preset_w(1);
+	m_ttl7474_1a_1->d_w     (1);
+	m_ttl7474_1a_1->preset_w(1);
 
-	state->m_ttl7474_1a_2->clear_w (1);
-	state->m_ttl7474_1a_2->preset_w(1);
+	m_ttl7474_1a_2->clear_w (1);
+	m_ttl7474_1a_2->preset_w(1);
 
 
 	/* set up the pedal handling chips */
-	ttl74153_enable_w(state->m_ttl74153_1k, 0, 0);
-	ttl74153_enable_w(state->m_ttl74153_1k, 1, 0);
+	ttl74153_enable_w(m_ttl74153_1k, 0, 0);
+	ttl74153_enable_w(m_ttl74153_1k, 1, 0);
 }

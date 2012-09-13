@@ -43,10 +43,13 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(pb_w);
 	DECLARE_WRITE8_MEMBER(shr_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/dribling.c -----------*/
 
-PALETTE_INIT( dribling );
+
 SCREEN_UPDATE_IND16( dribling );

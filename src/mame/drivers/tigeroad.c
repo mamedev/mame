@@ -542,7 +542,6 @@ static MACHINE_CONFIG_START( tigeroad, tigeroad_state )
 	MCFG_GFXDECODE(tigeroad)
 	MCFG_PALETTE_LENGTH(576)
 
-	MCFG_VIDEO_START(tigeroad)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

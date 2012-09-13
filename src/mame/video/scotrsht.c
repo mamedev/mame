@@ -3,13 +3,13 @@
 
 
 /* Similar as Iron Horse */
-PALETTE_INIT( scotrsht )
+void scotrsht_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x100);
+	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -18,7 +18,7 @@ PALETTE_INIT( scotrsht )
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -32,7 +32,7 @@ PALETTE_INIT( scotrsht )
 		for (j = 0; j < 8; j++)
 		{
 			UINT8 ctabentry = ((~i & 0x100) >> 1) | (j << 4) | (color_prom[i] & 0x0f);
-			colortable_entry_set_value(machine.colortable, ((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
+			colortable_entry_set_value(machine().colortable, ((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
 		}
 	}
 }
@@ -125,13 +125,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-VIDEO_START( scotrsht )
+void scotrsht_state::video_start()
 {
-	scotrsht_state *state = machine.driver_data<scotrsht_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(scotrsht_state::scotrsht_get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(scotrsht_state::scotrsht_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
-	state->m_bg_tilemap->set_scroll_cols(64);
+	m_bg_tilemap->set_scroll_cols(64);
 }
 
 SCREEN_UPDATE_IND16( scotrsht )

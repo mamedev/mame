@@ -23,6 +23,9 @@ public:
 	DECLARE_READ8_MEMBER(lviv_io_r);
 	DECLARE_WRITE8_MEMBER(lviv_io_w);
 	DECLARE_DIRECT_UPDATE_MEMBER(lviv_directoverride);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -31,7 +34,7 @@ public:
 extern const i8255_interface lviv_ppi8255_interface_0;
 extern const i8255_interface lviv_ppi8255_interface_1;
 
-MACHINE_RESET( lviv );
+
 SNAPSHOT_LOAD( lviv );
 
 

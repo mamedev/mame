@@ -213,8 +213,6 @@ static MACHINE_CONFIG_START( markham, markham_state )
 	MCFG_GFXDECODE(markham)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_PALETTE_INIT(markham)
-	MCFG_VIDEO_START(markham)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

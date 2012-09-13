@@ -72,13 +72,16 @@ public:
 	DECLARE_DRIVER_INIT(gslgr94j);
 	DECLARE_DRIVER_INIT(outfxies);
 	DECLARE_DRIVER_INIT(gslgr94u);
+	DECLARE_MACHINE_START(namconb);
+	DECLARE_VIDEO_START(namconb1);
+	DECLARE_VIDEO_START(namconb2);
 };
 
 
 /*----------- defined in video/namconb1.c -----------*/
 
 SCREEN_UPDATE_IND16( namconb1 );
-VIDEO_START( namconb1 );
+
 
 SCREEN_UPDATE_IND16( namconb2 );
-VIDEO_START( namconb2 );
+

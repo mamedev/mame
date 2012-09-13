@@ -49,6 +49,13 @@ public:
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(ninjemak_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(ninjemak_get_tx_tile_info);
+	virtual void palette_init();
+	DECLARE_MACHINE_START(galivan);
+	DECLARE_MACHINE_RESET(galivan);
+	DECLARE_VIDEO_START(galivan);
+	DECLARE_MACHINE_START(ninjemak);
+	DECLARE_MACHINE_RESET(ninjemak);
+	DECLARE_VIDEO_START(ninjemak);
 };
 
 
@@ -58,9 +65,9 @@ public:
 WRITE8_HANDLER( ninjemak_scrollx_w );
 WRITE8_HANDLER( ninjemak_scrolly_w );
 
-PALETTE_INIT( galivan );
 
-VIDEO_START( galivan );
-VIDEO_START( ninjemak );
+
+
+
 SCREEN_UPDATE_IND16( galivan );
 SCREEN_UPDATE_IND16( ninjemak );

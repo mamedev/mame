@@ -425,19 +425,18 @@ static const ym2610_interface mcatadv_ym2610_interface =
 };
 
 
-static MACHINE_START( mcatadv )
+void mcatadv_state::machine_start()
 {
-	mcatadv_state *state = machine.driver_data<mcatadv_state>();
-	UINT8 *ROM = state->memregion("soundcpu")->base();
+	UINT8 *ROM = memregion("soundcpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
-	state->membank("bank1")->set_entry(1);
+	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	membank("bank1")->set_entry(1);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_soundcpu = machine.device<cpu_device>("soundcpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_soundcpu = machine().device<cpu_device>("soundcpu");
 
-	state->save_item(NAME(state->m_palette_bank1));
-	state->save_item(NAME(state->m_palette_bank2));
+	save_item(NAME(m_palette_bank1));
+	save_item(NAME(m_palette_bank2));
 }
 
 static MACHINE_CONFIG_START( mcatadv, mcatadv_state )
@@ -451,7 +450,6 @@ static MACHINE_CONFIG_START( mcatadv, mcatadv_state )
 	MCFG_CPU_PROGRAM_MAP(mcatadv_sound_map)
 	MCFG_CPU_IO_MAP(mcatadv_sound_io_map)
 
-	MCFG_MACHINE_START(mcatadv)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -467,7 +465,6 @@ static MACHINE_CONFIG_START( mcatadv, mcatadv_state )
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
 
-	MCFG_VIDEO_START(mcatadv)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

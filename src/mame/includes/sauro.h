@@ -34,14 +34,16 @@ public:
 	DECLARE_DRIVER_INIT(tecfri);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
+	DECLARE_VIDEO_START(trckydoc);
+	DECLARE_VIDEO_START(sauro);
 };
 
 
 /*----------- defined in video/sauro.c -----------*/
 
 
-VIDEO_START( sauro );
-VIDEO_START( trckydoc );
+
+
 
 SCREEN_UPDATE_IND16( sauro );
 SCREEN_UPDATE_IND16( trckydoc );

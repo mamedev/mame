@@ -240,7 +240,6 @@ static MACHINE_CONFIG_START( pcktgal, pcktgal_state )
 	MCFG_GFXDECODE(pcktgal)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_PALETTE_INIT(pcktgal)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device, 0,0,0);

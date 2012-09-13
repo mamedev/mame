@@ -43,11 +43,12 @@ public:
 	DECLARE_WRITE8_MEMBER(nbmj8900_romsel_w);
 	DECLARE_DRIVER_INIT(togenkyo);
 	DECLARE_DRIVER_INIT(ohpaipee);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/nbmj8900.c -----------*/
 
 SCREEN_UPDATE_IND16( nbmj8900 );
-VIDEO_START( nbmj8900_2layer );
+
 

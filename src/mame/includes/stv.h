@@ -193,6 +193,11 @@ public:
 	DECLARE_DRIVER_INIT(saturnus);
 	DECLARE_DRIVER_INIT(saturneu);
 	DECLARE_DRIVER_INIT(saturnjp);
+	DECLARE_MACHINE_START(saturn);
+	DECLARE_MACHINE_RESET(saturn);
+	DECLARE_VIDEO_START(stv_vdp2);
+	DECLARE_MACHINE_START(stv);
+	DECLARE_MACHINE_RESET(stv);
 };
 
 #define MASTER_CLOCK_352 57272720
@@ -256,7 +261,7 @@ WRITE32_HANDLER ( saturn_vdp2_vram_w );
 WRITE32_HANDLER ( saturn_vdp2_cram_w );
 WRITE16_HANDLER ( saturn_vdp2_regs_w );
 
-VIDEO_START ( stv_vdp2 );
+
 SCREEN_UPDATE_RGB32( stv_vdp2 );
 #if NEW_VIDEO_CODE
 SCREEN_UPDATE_RGB32( saturn );

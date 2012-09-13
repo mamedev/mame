@@ -34,17 +34,16 @@ TILE_GET_INFO_MEMBER(speedbal_state::get_tile_info_fg)
  *                                   *
  *************************************/
 
-VIDEO_START( speedbal )
+void speedbal_state::video_start()
 {
-	speedbal_state *state = machine.driver_data<speedbal_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(speedbal_state::get_tile_info_bg),state), TILEMAP_SCAN_COLS_FLIP_X,  16, 16, 16, 16);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(speedbal_state::get_tile_info_fg),state), TILEMAP_SCAN_COLS_FLIP_X,   8,  8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(speedbal_state::get_tile_info_bg),this), TILEMAP_SCAN_COLS_FLIP_X,  16, 16, 16, 16);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(speedbal_state::get_tile_info_fg),this), TILEMAP_SCAN_COLS_FLIP_X,   8,  8, 32, 32);
 
-	state->m_bg_tilemap->set_transmask(0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
-	state->m_bg_tilemap->set_transmask(1,0x00f7,0x0000); /* split type 1 has pen 0-2, 4-7 transparent in front half */
+	m_bg_tilemap->set_transmask(0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
+	m_bg_tilemap->set_transmask(1,0x00f7,0x0000); /* split type 1 has pen 0-2, 4-7 transparent in front half */
 
-	state->m_fg_tilemap->set_transmask(0,0xffff,0x0001); /* split type 0 is totally transparent in front half and has pen 0 transparent in back half */
-	state->m_fg_tilemap->set_transmask(1,0x0001,0x0001); /* split type 1 has pen 0 transparent in front and back half */
+	m_fg_tilemap->set_transmask(0,0xffff,0x0001); /* split type 0 is totally transparent in front half and has pen 0 transparent in back half */
+	m_fg_tilemap->set_transmask(1,0x0001,0x0001); /* split type 1 has pen 0 transparent in front and back half */
 }
 
 

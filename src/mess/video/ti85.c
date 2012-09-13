@@ -97,43 +97,42 @@ static const unsigned short ti85_palette[32][7] =
 	{ 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf }
 };
 
-PALETTE_INIT( ti85 )
+void ti85_state::palette_init()
 {
-	ti85_state *state = machine.driver_data<ti85_state>();
 	UINT8 i, j, r, g, b;
 
-	machine.colortable = colortable_alloc(machine, 224);
+	machine().colortable = colortable_alloc(machine(), 224);
 
 	for ( i = 0; i < 224; i++ )
 	{
 		r = ti85_colors[i][0]; g = ti85_colors[i][1]; b = ti85_colors[i][2];
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	for (i=0; i < 32; i++)
 		for (j=0; j < 7; j++)
-			colortable_entry_set_value(machine.colortable, i*7+j, ti85_palette[i][j]);
+			colortable_entry_set_value(machine().colortable, i*7+j, ti85_palette[i][j]);
 
-	if (!strncmp(machine.system().name, "ti81", 4))
+	if (!strncmp(machine().system().name, "ti81", 4))
 	{
-		state->m_ti_video_memory_size = TI81_VIDEO_MEMORY_SIZE;
-		state->m_ti_screen_x_size = TI81_SCREEN_X_SIZE;
-		state->m_ti_screen_y_size = TI81_SCREEN_Y_SIZE;
-		state->m_ti_number_of_frames = TI81_NUMBER_OF_FRAMES;
+		m_ti_video_memory_size = TI81_VIDEO_MEMORY_SIZE;
+		m_ti_screen_x_size = TI81_SCREEN_X_SIZE;
+		m_ti_screen_y_size = TI81_SCREEN_Y_SIZE;
+		m_ti_number_of_frames = TI81_NUMBER_OF_FRAMES;
 	}
-	else if (!strncmp(machine.system().name, "ti85", 4))
+	else if (!strncmp(machine().system().name, "ti85", 4))
 	{
-		state->m_ti_video_memory_size = TI85_VIDEO_MEMORY_SIZE;
-		state->m_ti_screen_x_size = TI85_SCREEN_X_SIZE;
-		state->m_ti_screen_y_size = TI85_SCREEN_Y_SIZE;
-		state->m_ti_number_of_frames = TI85_NUMBER_OF_FRAMES;
+		m_ti_video_memory_size = TI85_VIDEO_MEMORY_SIZE;
+		m_ti_screen_x_size = TI85_SCREEN_X_SIZE;
+		m_ti_screen_y_size = TI85_SCREEN_Y_SIZE;
+		m_ti_number_of_frames = TI85_NUMBER_OF_FRAMES;
 	}
-	else if (!strncmp(machine.system().name, "ti86", 4))
+	else if (!strncmp(machine().system().name, "ti86", 4))
 	{
-		state->m_ti_video_memory_size = TI86_VIDEO_MEMORY_SIZE;
-		state->m_ti_screen_x_size = TI86_SCREEN_X_SIZE;
-		state->m_ti_screen_y_size = TI86_SCREEN_Y_SIZE;
-		state->m_ti_number_of_frames = TI86_NUMBER_OF_FRAMES;
+		m_ti_video_memory_size = TI86_VIDEO_MEMORY_SIZE;
+		m_ti_screen_x_size = TI86_SCREEN_X_SIZE;
+		m_ti_screen_y_size = TI86_SCREEN_Y_SIZE;
+		m_ti_number_of_frames = TI86_NUMBER_OF_FRAMES;
 	}
 	else
 	{
@@ -141,10 +140,10 @@ PALETTE_INIT( ti85 )
 		return;
 	}
 
-	state->m_frames = auto_alloc_array_clear(machine, UINT8, state->m_ti_number_of_frames*state->m_ti_video_memory_size);
+	m_frames = auto_alloc_array_clear(machine(), UINT8, m_ti_number_of_frames*m_ti_video_memory_size);
 }
 
-VIDEO_START( ti85 )
+void ti85_state::video_start()
 {
 }
 
@@ -189,8 +188,8 @@ SCREEN_UPDATE_IND16( ti85 )
 	return 0;
 }
 
-PALETTE_INIT( ti82 )
+PALETTE_INIT_MEMBER(ti85_state,ti82)
 {
-	palette_set_color(machine, 0, MAKE_RGB(160, 190, 170));
-	palette_set_color(machine, 1, MAKE_RGB(83, 111, 138));
+	palette_set_color(machine(), 0, MAKE_RGB(160, 190, 170));
+	palette_set_color(machine(), 1, MAKE_RGB(83, 111, 138));
 }

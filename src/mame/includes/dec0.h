@@ -69,6 +69,9 @@ public:
 	DECLARE_DRIVER_INIT(birdtry);
 	DECLARE_DRIVER_INIT(baddudes);
 	DECLARE_DRIVER_INIT(midresb);
+	DECLARE_VIDEO_START(dec0);
+	DECLARE_MACHINE_RESET(slyspy);
+	DECLARE_VIDEO_START(dec0_nodma);
 };
 
 
@@ -91,17 +94,17 @@ public:
 		COMBINE_DATA(&m_automat_scroll_regs[offset]);
 	}
 	UINT16 m_automat_scroll_regs[4];
-
-
+	
+	DECLARE_VIDEO_START(automat);
 };
 
 
 /*----------- defined in video/dec0.c -----------*/
 
 /* Video emulation definitions */
-VIDEO_START( dec0 );
-VIDEO_START( dec0_nodma );
-VIDEO_START( automat );
+
+
+
 SCREEN_UPDATE_IND16( hbarrel );
 SCREEN_UPDATE_IND16( baddudes );
 SCREEN_UPDATE_IND16( birdtry );

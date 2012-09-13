@@ -99,13 +99,18 @@ public:
 	DECLARE_DRIVER_INIT(gardia);
 	DECLARE_DRIVER_INIT(spatter);
 	TILE_GET_INFO_MEMBER(tile_get_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	DECLARE_MACHINE_START(system2);
+	DECLARE_VIDEO_START(system2);
 };
 
 
 /*----------- defined in video/system1.c -----------*/
 
-VIDEO_START( system1 );
-VIDEO_START( system2 );
+
+
 
 
 WRITE8_DEVICE_HANDLER( system1_videoram_bank_w );

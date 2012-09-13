@@ -331,21 +331,19 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( bombjack )
+void bombjack_state::machine_start()
 {
-	bombjack_state *state = machine.driver_data<bombjack_state>();
 
-	state->save_item(NAME(state->m_latch));
-	state->save_item(NAME(state->m_background_image));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_background_image));
 }
 
 
-static MACHINE_RESET( bombjack )
+void bombjack_state::machine_reset()
 {
-	bombjack_state *state = machine.driver_data<bombjack_state>();
 
-	state->m_latch = 0;
-	state->m_background_image = 0;
+	m_latch = 0;
+	m_background_image = 0;
 }
 
 
@@ -369,8 +367,6 @@ static MACHINE_CONFIG_START( bombjack, bombjack_state )
 	MCFG_CPU_IO_MAP(audio_io_map)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MCFG_MACHINE_START(bombjack)
-	MCFG_MACHINE_RESET(bombjack)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -383,7 +379,6 @@ static MACHINE_CONFIG_START( bombjack, bombjack_state )
 	MCFG_GFXDECODE(bombjack)
 	MCFG_PALETTE_LENGTH(128)
 
-	MCFG_VIDEO_START(bombjack)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -179,6 +179,10 @@ public:
 	DECLARE_DRIVER_INIT(tm4k);
 	DECLARE_DRIVER_INIT(tm5kca);
 	DECLARE_DRIVER_INIT(tm5k);
+	DECLARE_MACHINE_RESET(tmaster);
+	DECLARE_VIDEO_START(tmaster);
+	DECLARE_MACHINE_RESET(galgames);
+	DECLARE_VIDEO_START(galgames);
 };
 
 
@@ -332,27 +336,25 @@ static int galgames_compute_addr(UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high
 	return reg_low | (reg_mid << 16);
 }
 
-static VIDEO_START( tmaster )
+VIDEO_START_MEMBER(tmaster_state,tmaster)
 {
-	tmaster_state *state = machine.driver_data<tmaster_state>();
 	int layer, buffer;
 	for (layer = 0; layer < 2; layer++)
 	{
 		for (buffer = 0; buffer < 2; buffer++)
 		{
-			machine.primary_screen->register_screen_bitmap(state->m_bitmap[layer][buffer]);
-			state->m_bitmap[layer][buffer].fill(0xff);
+			machine().primary_screen->register_screen_bitmap(m_bitmap[layer][buffer]);
+			m_bitmap[layer][buffer].fill(0xff);
 		}
 	}
 
-	state->m_compute_addr = tmaster_compute_addr;
+	m_compute_addr = tmaster_compute_addr;
 }
 
-static VIDEO_START( galgames )
+VIDEO_START_MEMBER(tmaster_state,galgames)
 {
-	tmaster_state *state = machine.driver_data<tmaster_state>();
-	VIDEO_START_CALL( tmaster );
-	state->m_compute_addr = galgames_compute_addr;
+	VIDEO_START_CALL_MEMBER( tmaster );
+	m_compute_addr = galgames_compute_addr;
 }
 
 static SCREEN_UPDATE_IND16( tmaster )
@@ -892,13 +894,12 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_RESET( tmaster )
+MACHINE_RESET_MEMBER(tmaster_state,tmaster)
 {
-	tmaster_state *state = machine.driver_data<tmaster_state>();
-	state->m_gfx_offs = 0;
-	state->m_gfx_size = state->memregion("blitter")->bytes();
+	m_gfx_offs = 0;
+	m_gfx_size = memregion("blitter")->bytes();
 
-	state->m_duart68681 = machine.device( "duart68681" );
+	m_duart68681 = machine().device( "duart68681" );
 }
 
 static TIMER_DEVICE_CALLBACK( tm3k_interrupt )
@@ -928,7 +929,7 @@ static MACHINE_CONFIG_START( tm3k, tmaster_state )
 	MCFG_CPU_PROGRAM_MAP(tmaster_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", tm3k_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET(tmaster)
+	MCFG_MACHINE_RESET_OVERRIDE(tmaster_state,tmaster)
 
 	MCFG_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2 /*??*/, tmaster_duart68681_config )
 	MCFG_MICROTOUCH_ADD( "microtouch", tmaster_microtouch_config )
@@ -944,7 +945,7 @@ static MACHINE_CONFIG_START( tm3k, tmaster_state )
 
 	MCFG_PALETTE_LENGTH(0x1000)
 
-	MCFG_VIDEO_START(tmaster)
+	MCFG_VIDEO_START_OVERRIDE(tmaster_state,tmaster)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -959,23 +960,22 @@ static MACHINE_CONFIG_DERIVED( tm, tm3k )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_RESET( galgames )
+MACHINE_RESET_MEMBER(tmaster_state,galgames)
 {
-	tmaster_state *state = machine.driver_data<tmaster_state>();
-	state->m_gfx_offs = 0;
-	state->m_gfx_size = 0x200000;
+	m_gfx_offs = 0;
+	m_gfx_size = 0x200000;
 
-	state->membank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_ROM0);	// rom
-	state->membank(GALGAMES_BANK_000000_W)->set_entry(GALGAMES_RAM);		// ram
+	membank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_ROM0);	// rom
+	membank(GALGAMES_BANK_000000_W)->set_entry(GALGAMES_RAM);		// ram
 
-	state->membank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_RAM);		// ram
-	state->membank(GALGAMES_BANK_200000_W)->set_entry(GALGAMES_RAM);		// ram
+	membank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_RAM);		// ram
+	membank(GALGAMES_BANK_200000_W)->set_entry(GALGAMES_RAM);		// ram
 
-	state->membank(GALGAMES_BANK_240000_R)->set_entry(GALGAMES_ROM0);	// rom
+	membank(GALGAMES_BANK_240000_R)->set_entry(GALGAMES_ROM0);	// rom
 
-	galgames_update_rombank(machine, 0);
+	galgames_update_rombank(machine(), 0);
 
-	machine.device("maincpu")->reset();
+	machine().device("maincpu")->reset();
 }
 
 static MACHINE_CONFIG_START( galgames, tmaster_state )
@@ -990,7 +990,7 @@ static MACHINE_CONFIG_START( galgames, tmaster_state )
 	MCFG_EEPROM_ADD(GALGAMES_EEPROM_CART3, galgames_eeprom_interface)
 	MCFG_EEPROM_ADD(GALGAMES_EEPROM_CART4, galgames_eeprom_interface)
 
-	MCFG_MACHINE_RESET( galgames )
+	MCFG_MACHINE_RESET_OVERRIDE(tmaster_state, galgames )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1002,7 +1002,7 @@ static MACHINE_CONFIG_START( galgames, tmaster_state )
 
 	MCFG_PALETTE_LENGTH(0x1000)	// only 0x100 used
 
-	MCFG_VIDEO_START(galgames)
+	MCFG_VIDEO_START_OVERRIDE(tmaster_state,galgames)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

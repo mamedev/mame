@@ -38,6 +38,15 @@ would commence ($C00000).
 #include "imagedev/chd_cd.h"
 #include "imagedev/cartslot.h"
 
+class cdtv_state : public amiga_state
+{
+public:
+	cdtv_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag) { }
+
+	DECLARE_MACHINE_START(cdtv);
+	DECLARE_MACHINE_RESET(cdtv);
+};
 
 static READ8_DEVICE_HANDLER( amiga_cia_0_portA_r );
 static READ8_DEVICE_HANDLER( amiga_cia_0_cdtv_portA_r );
@@ -267,18 +276,18 @@ INPUT_PORTS_END
   Machine drivers
 ***************************************************************************/
 
-static MACHINE_START( cdtv )
+MACHINE_START_MEMBER(cdtv_state,cdtv)
 {
-	MACHINE_START_CALL( amigacd );
+	MACHINE_START_CALL_LEGACY( amigacd );
 }
 
 
-static MACHINE_RESET( cdtv )
+MACHINE_RESET_MEMBER(cdtv_state,cdtv)
 {
-	MACHINE_RESET_CALL( amiga );
+	MACHINE_RESET_CALL_MEMBER( amiga );
 
 	/* initialize the cdrom controller */
-	MACHINE_RESET_CALL( amigacd );
+	MACHINE_RESET_CALL_LEGACY( amigacd );
 }
 
 static const mos6526_interface cia_0_ntsc_intf =
@@ -382,7 +391,7 @@ static MACHINE_CONFIG_START( ntsc, amiga_state )
 	MCFG_SCREEN_REFRESH_RATE(59.997)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 
-	MCFG_MACHINE_RESET( amiga )
+	MCFG_MACHINE_RESET_OVERRIDE(amiga_state, amiga )
 
     /* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -391,9 +400,9 @@ static MACHINE_CONFIG_START( ntsc, amiga_state )
 	MCFG_SCREEN_UPDATE_STATIC(amiga)
 
 	MCFG_PALETTE_LENGTH(4096)
-	MCFG_PALETTE_INIT( amiga )
+	MCFG_PALETTE_INIT_OVERRIDE(amiga_state, amiga )
 
-	MCFG_VIDEO_START(amiga)
+	MCFG_VIDEO_START_OVERRIDE(amiga_state,amiga)
 
 	/* devices */
 	MCFG_MSM6242_ADD("rtc",amiga_rtc_intf)
@@ -435,7 +444,7 @@ struct cdrom_interface cdtv_cdrom =
 	NULL
 };
 
-static MACHINE_CONFIG_DERIVED( cdtv, ntsc )
+static MACHINE_CONFIG_DERIVED_CLASS( cdtv, ntsc, cdtv_state)
 	MCFG_CPU_REPLACE("maincpu", M68000, CDTV_CLOCK_X1 / 4)
 	MCFG_CPU_PROGRAM_MAP(cdtv_mem)
 
@@ -448,8 +457,8 @@ static MACHINE_CONFIG_DERIVED( cdtv, ntsc )
 //  MCFG_CPU_ADD("lcd", LC6554, XTAL_4MHz) /* 4 MHz? */
 //  MCFG_CPU_PROGRAM_MAP(cdtv_lcd_mem)
 
-	MCFG_MACHINE_START( cdtv )
-	MCFG_MACHINE_RESET( cdtv )
+	MCFG_MACHINE_START_OVERRIDE(cdtv_state, cdtv )
+	MCFG_MACHINE_RESET_OVERRIDE(cdtv_state, cdtv )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

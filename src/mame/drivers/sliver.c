@@ -112,6 +112,7 @@ public:
 	DECLARE_WRITE16_MEMBER(io_data_w);
 	DECLARE_WRITE16_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(oki_setbank);
+	virtual void video_start();
 };
 
 static void plot_pixel_rgb(sliver_state *state, int x, int y, UINT32 r, UINT32 g, UINT32 b)
@@ -365,12 +366,11 @@ static ADDRESS_MAP_START( soundmem_io, AS_IO, 8, sliver_state )
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(oki_setbank )
 ADDRESS_MAP_END
 
-static VIDEO_START(sliver)
+void sliver_state::video_start()
 {
-	sliver_state *state = machine.driver_data<sliver_state>();
 
-	machine.primary_screen->register_screen_bitmap(state->m_bitmap_bg);
-	machine.primary_screen->register_screen_bitmap(state->m_bitmap_fg);
+	machine().primary_screen->register_screen_bitmap(m_bitmap_bg);
+	machine().primary_screen->register_screen_bitmap(m_bitmap_fg);
 }
 
 static SCREEN_UPDATE_RGB32(sliver)
@@ -490,7 +490,6 @@ static MACHINE_CONFIG_START( sliver, sliver_state )
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
-	MCFG_VIDEO_START(sliver)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

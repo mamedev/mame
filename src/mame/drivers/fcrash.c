@@ -690,40 +690,37 @@ static const msm5205_interface msm5205_interface2 =
 };
 
 
-static MACHINE_START( fcrash )
+MACHINE_START_MEMBER(cps_state,fcrash)
 {
-	cps_state *state = machine.driver_data<cps_state>();
-	UINT8 *ROM = state->memregion("soundcpu")->base();
+	UINT8 *ROM = memregion("soundcpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("soundcpu");
-	state->m_msm_1 = machine.device<msm5205_device>("msm1");
-	state->m_msm_2 = machine.device<msm5205_device>("msm2");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("soundcpu");
+	m_msm_1 = machine().device<msm5205_device>("msm1");
+	m_msm_2 = machine().device<msm5205_device>("msm2");
 
-	state->save_item(NAME(state->m_sample_buffer1));
-	state->save_item(NAME(state->m_sample_buffer2));
-	state->save_item(NAME(state->m_sample_select1));
-	state->save_item(NAME(state->m_sample_select2));
+	save_item(NAME(m_sample_buffer1));
+	save_item(NAME(m_sample_buffer2));
+	save_item(NAME(m_sample_select1));
+	save_item(NAME(m_sample_select2));
 }
 
-static MACHINE_START( kodb )
+MACHINE_START_MEMBER(cps_state,kodb)
 {
-	cps_state *state = machine.driver_data<cps_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("soundcpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("soundcpu");
 }
 
-static MACHINE_RESET( fcrash )
+MACHINE_RESET_MEMBER(cps_state,fcrash)
 {
-	cps_state *state = machine.driver_data<cps_state>();
 
-	state->m_sample_buffer1 = 0;
-	state->m_sample_buffer2 = 0;
-	state->m_sample_select1 = 0;
-	state->m_sample_select2 = 0;
+	m_sample_buffer1 = 0;
+	m_sample_buffer2 = 0;
+	m_sample_select1 = 0;
+	m_sample_select2 = 0;
 }
 
 static MACHINE_CONFIG_START( fcrash, cps_state )
@@ -736,8 +733,8 @@ static MACHINE_CONFIG_START( fcrash, cps_state )
 	MCFG_CPU_ADD("soundcpu", Z80, 24000000/6) /* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(fcrash)
-	MCFG_MACHINE_RESET(fcrash)
+	MCFG_MACHINE_START_OVERRIDE(cps_state,fcrash)
+	MCFG_MACHINE_RESET_OVERRIDE(cps_state,fcrash)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -751,7 +748,7 @@ static MACHINE_CONFIG_START( fcrash, cps_state )
 	MCFG_GFXDECODE(cps1)
 	MCFG_PALETTE_LENGTH(4096)
 
-	MCFG_VIDEO_START(cps1)
+	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -787,7 +784,7 @@ static MACHINE_CONFIG_START( kodb, cps_state )
 //  MCFG_CPU_ADD("soundcpu", Z80, 3579545)
 //  MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MCFG_MACHINE_START(kodb)
+	MCFG_MACHINE_START_OVERRIDE(cps_state,kodb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -801,7 +798,7 @@ static MACHINE_CONFIG_START( kodb, cps_state )
 	MCFG_GFXDECODE(cps1)
 	MCFG_PALETTE_LENGTH(0xc00)
 
-	MCFG_VIDEO_START(cps1)
+	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
 	/* sound hardware */
 //  MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -943,7 +940,7 @@ static MACHINE_CONFIG_START( sgyxz, cps_state )
 //  MCFG_CPU_ADD("soundcpu", Z80, 3579545)
 //  MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MCFG_MACHINE_START(kodb)
+	MCFG_MACHINE_START_OVERRIDE(cps_state,kodb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -957,7 +954,7 @@ static MACHINE_CONFIG_START( sgyxz, cps_state )
 	MCFG_GFXDECODE(cps1)
 	MCFG_PALETTE_LENGTH(0xc00)
 
-	MCFG_VIDEO_START(cps1)
+	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 MACHINE_CONFIG_END
 
 

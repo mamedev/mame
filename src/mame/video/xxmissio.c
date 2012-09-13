@@ -66,17 +66,16 @@ TILE_GET_INFO_MEMBER(xxmissio_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-VIDEO_START( xxmissio )
+void xxmissio_state::video_start()
 {
-	xxmissio_state *state = machine.driver_data<xxmissio_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(xxmissio_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(xxmissio_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(xxmissio_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(xxmissio_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 
-	state->m_bg_tilemap->set_scroll_cols(1);
-	state->m_bg_tilemap->set_scroll_rows(1);
-	state->m_bg_tilemap->set_scrolldx(2, 12);
+	m_bg_tilemap->set_scroll_cols(1);
+	m_bg_tilemap->set_scroll_rows(1);
+	m_bg_tilemap->set_scrolldx(2, 12);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 

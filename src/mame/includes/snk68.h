@@ -41,11 +41,13 @@ public:
 	DECLARE_DRIVER_INIT(searchar);
 	TILE_GET_INFO_MEMBER(get_pow_tile_info);
 	TILE_GET_INFO_MEMBER(get_searchar_tile_info);
+	virtual void video_start();
+	DECLARE_VIDEO_START(searchar);
 };
 
 
 /*----------- defined in video/snk68.c -----------*/
 
-VIDEO_START( pow );
-VIDEO_START( searchar );
+
+
 SCREEN_UPDATE_IND16( pow );

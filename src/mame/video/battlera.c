@@ -14,26 +14,25 @@
 
 /******************************************************************************/
 
-VIDEO_START( battlera )
+void battlera_state::video_start()
 {
-	battlera_state *state = machine.driver_data<battlera_state>();
-	state->m_HuC6270_vram=auto_alloc_array(machine, UINT8, 0x20000);
-	state->m_vram_dirty=auto_alloc_array(machine, UINT8, 0x1000);
+	m_HuC6270_vram=auto_alloc_array(machine(), UINT8, 0x20000);
+	m_vram_dirty=auto_alloc_array(machine(), UINT8, 0x1000);
 
-	memset(state->m_HuC6270_vram,0,0x20000);
-	memset(state->m_vram_dirty,1,0x1000);
+	memset(m_HuC6270_vram,0,0x20000);
+	memset(m_vram_dirty,1,0x1000);
 
-	state->m_tile_bitmap=auto_bitmap_ind16_alloc(machine,512,512);
-	state->m_front_bitmap=auto_bitmap_ind16_alloc(machine,512,512);
+	m_tile_bitmap=auto_bitmap_ind16_alloc(machine(),512,512);
+	m_front_bitmap=auto_bitmap_ind16_alloc(machine(),512,512);
 
-	state->m_vram_ptr=0;
-	state->m_inc_value=1;
-	state->m_current_scanline=0;
-	state->m_irq_enable=state->m_rcr_enable=state->m_sb_enable=state->m_bb_enable=0;
+	m_vram_ptr=0;
+	m_inc_value=1;
+	m_current_scanline=0;
+	m_irq_enable=m_rcr_enable=m_sb_enable=m_bb_enable=0;
 
-	machine.gfx[0]->set_source(state->m_HuC6270_vram);
-	machine.gfx[1]->set_source(state->m_HuC6270_vram);
-	machine.gfx[2]->set_source(state->m_blank_tile);
+	machine().gfx[0]->set_source(m_HuC6270_vram);
+	machine().gfx[1]->set_source(m_HuC6270_vram);
+	machine().gfx[2]->set_source(m_blank_tile);
 }
 
 /******************************************************************************/

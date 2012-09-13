@@ -160,21 +160,20 @@ TILE_GET_INFO_MEMBER(mystwarr_state::get_gai_936_tile_info)
 	SET_TILE_INFO_MEMBER(0, tileno, colour, 0);
 }
 
-VIDEO_START(gaiapols)
+VIDEO_START_MEMBER(mystwarr_state,gaiapols)
 {
-	mystwarr_state *state = machine.driver_data<mystwarr_state>();
-	K055555_vh_start(machine);
-	K054338_vh_start(machine);
+	K055555_vh_start(machine());
+	K054338_vh_start(machine());
 
-	state->m_gametype = 0;
+	m_gametype = 0;
 
-	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
+	K056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
 
-	mystwarr_decode_tiles(machine);
+	mystwarr_decode_tiles(machine());
 
-	K055673_vh_start(machine, "gfx2", 1, -61, -22, gaiapols_sprite_callback); // stage2 brick walls
+	K055673_vh_start(machine(), "gfx2", 1, -61, -22, gaiapols_sprite_callback); // stage2 brick walls
 
-	konamigx_mixer_init(machine, 0);
+	konamigx_mixer_init(machine(), 0);
 
 	K056832_set_LayerOffset(0, -2+2-1, 0-1);
 	K056832_set_LayerOffset(1,  0+2, 0);
@@ -184,8 +183,8 @@ VIDEO_START(gaiapols)
 	K053936_wraparound_enable(0, 1);
 	K053936GP_set_offset(0, -10,  0); // floor tiles in demo loop2 (Elaine vs. boss)
 
-	state->m_ult_936_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mystwarr_state::get_gai_936_tile_info),state), TILEMAP_SCAN_ROWS,  16, 16, 512, 512);
-	state->m_ult_936_tilemap->set_transparent_pen(0);
+	m_ult_936_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mystwarr_state::get_gai_936_tile_info),this), TILEMAP_SCAN_ROWS,  16, 16, 512, 512);
+	m_ult_936_tilemap->set_transparent_pen(0);
 }
 
 TILE_GET_INFO_MEMBER(mystwarr_state::get_ult_936_tile_info)
@@ -201,21 +200,20 @@ TILE_GET_INFO_MEMBER(mystwarr_state::get_ult_936_tile_info)
 	SET_TILE_INFO_MEMBER(0, tileno, colour, (dat1[tile_index]&0x40) ? TILE_FLIPX : 0);
 }
 
-VIDEO_START(dadandrn)
+VIDEO_START_MEMBER(mystwarr_state,dadandrn)
 {
-	mystwarr_state *state = machine.driver_data<mystwarr_state>();
-	K055555_vh_start(machine);
-	K054338_vh_start(machine);
+	K055555_vh_start(machine());
+	K054338_vh_start(machine());
 
-	state->m_gametype = 1;
+	m_gametype = 1;
 
-	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0);
+	K056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0);
 
-	mystwarr_decode_tiles(machine);
+	mystwarr_decode_tiles(machine());
 
-	K055673_vh_start(machine, "gfx2", 0, -42, -22, gaiapols_sprite_callback);
+	K055673_vh_start(machine(), "gfx2", 0, -42, -22, gaiapols_sprite_callback);
 
-	konamigx_mixer_init(machine, 0);
+	konamigx_mixer_init(machine(), 0);
 
 	konamigx_mixer_primode(1);
 
@@ -227,50 +225,48 @@ VIDEO_START(dadandrn)
 	K053936_wraparound_enable(0, 1);
 	K053936GP_set_offset(0, -8, 0); // Brainy's laser
 
-	state->m_ult_936_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mystwarr_state::get_ult_936_tile_info),state), TILEMAP_SCAN_ROWS,  16, 16, 512, 512);
-	state->m_ult_936_tilemap->set_transparent_pen(0);
+	m_ult_936_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mystwarr_state::get_ult_936_tile_info),this), TILEMAP_SCAN_ROWS,  16, 16, 512, 512);
+	m_ult_936_tilemap->set_transparent_pen(0);
 }
 
-VIDEO_START(mystwarr)
+VIDEO_START_MEMBER(mystwarr_state,mystwarr)
 {
-	mystwarr_state *state = machine.driver_data<mystwarr_state>();
-	K055555_vh_start(machine);
-	K054338_vh_start(machine);
+	K055555_vh_start(machine());
+	K054338_vh_start(machine());
 
-	state->m_gametype = 0;
+	m_gametype = 0;
 
-	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, mystwarr_tile_callback, 0);
+	K056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, mystwarr_tile_callback, 0);
 
-	mystwarr_decode_tiles(machine);
+	mystwarr_decode_tiles(machine());
 
-	K055673_vh_start(machine, "gfx2", 0, -48, -24, mystwarr_sprite_callback);
+	K055673_vh_start(machine(), "gfx2", 0, -48, -24, mystwarr_sprite_callback);
 
-	konamigx_mixer_init(machine, 0);
+	konamigx_mixer_init(machine(), 0);
 
 	K056832_set_LayerOffset(0, -2-3, 0);
 	K056832_set_LayerOffset(1,  0-3, 0);
 	K056832_set_LayerOffset(2,  2-3, 0);
 	K056832_set_LayerOffset(3,  3-3, 0);
 
-	state->m_cbparam = 0;
+	m_cbparam = 0;
 }
 
-VIDEO_START(metamrph)
+VIDEO_START_MEMBER(mystwarr_state,metamrph)
 {
-	mystwarr_state *state = machine.driver_data<mystwarr_state>();
 
-	state->m_gametype = 0;
+	m_gametype = 0;
 
-	K055555_vh_start(machine);
-	K054338_vh_start(machine);
+	K055555_vh_start(machine());
+	K054338_vh_start(machine());
 
-	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
+	K056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
 
-	mystwarr_decode_tiles(machine);
+	mystwarr_decode_tiles(machine());
 
-	K055673_vh_start(machine, "gfx2", 1, -51, -22, metamrph_sprite_callback);
+	K055673_vh_start(machine(), "gfx2", 1, -51, -22, metamrph_sprite_callback);
 
-	konamigx_mixer_init(machine, 0);
+	konamigx_mixer_init(machine(), 0);
 
 	// other reference, floor at first boss
 	K056832_set_LayerOffset(0, -2+4, 0); // text
@@ -279,21 +275,20 @@ VIDEO_START(metamrph)
 	K056832_set_LayerOffset(3,  3+4, 0); // attract sky background to sea
 }
 
-VIDEO_START(viostorm)
+VIDEO_START_MEMBER(mystwarr_state,viostorm)
 {
-	mystwarr_state *state = machine.driver_data<mystwarr_state>();
-	state->m_gametype = 0;
+	m_gametype = 0;
 
-	K055555_vh_start(machine);
-	K054338_vh_start(machine);
+	K055555_vh_start(machine());
+	K054338_vh_start(machine());
 
-	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
+	K056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
 
-	mystwarr_decode_tiles(machine);
+	mystwarr_decode_tiles(machine());
 
-	K055673_vh_start(machine, "gfx2", 1, -62, -23, metamrph_sprite_callback);
+	K055673_vh_start(machine(), "gfx2", 1, -62, -23, metamrph_sprite_callback);
 
-	konamigx_mixer_init(machine, 0);
+	konamigx_mixer_init(machine(), 0);
 
 	K056832_set_LayerOffset(0, -2+1, 0);
 	K056832_set_LayerOffset(1,  0+1, 0);
@@ -301,21 +296,20 @@ VIDEO_START(viostorm)
 	K056832_set_LayerOffset(3,  3+1, 0);
 }
 
-VIDEO_START(martchmp)
+VIDEO_START_MEMBER(mystwarr_state,martchmp)
 {
-	mystwarr_state *state = machine.driver_data<mystwarr_state>();
-	state->m_gametype = 0;
+	m_gametype = 0;
 
-	K055555_vh_start(machine);
-	K054338_vh_start(machine);
+	K055555_vh_start(machine());
+	K054338_vh_start(machine());
 
-	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0);
+	K056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0);
 
-	mystwarr_decode_tiles(machine);
+	mystwarr_decode_tiles(machine());
 
-	K055673_vh_start(machine, "gfx2", 0, -58, -23, martchmp_sprite_callback);
+	K055673_vh_start(machine(), "gfx2", 0, -58, -23, martchmp_sprite_callback);
 
-	konamigx_mixer_init(machine, 0);
+	konamigx_mixer_init(machine(), 0);
 
 	K056832_set_LayerOffset(0, -2-4, 0);
 	K056832_set_LayerOffset(1,  0-4, 0);

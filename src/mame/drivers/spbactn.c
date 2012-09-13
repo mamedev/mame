@@ -365,7 +365,6 @@ static MACHINE_CONFIG_START( spbactn, spbactn_state )
 	MCFG_GFXDECODE(spbactn)
 	MCFG_PALETTE_LENGTH(0x2800/2)
 
-	MCFG_VIDEO_START(spbactn)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

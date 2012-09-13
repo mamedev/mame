@@ -322,11 +322,11 @@ WRITE8_MEMBER(namcos86_state::cus115_w)
 }
 
 
-static MACHINE_RESET( namco86 )
+void namcos86_state::machine_reset()
 {
-	UINT8 *base = machine.root_device().memregion("cpu1")->base() + 0x10000;
+	UINT8 *base = machine().root_device().memregion("cpu1")->base() + 0x10000;
 
-	machine.root_device().membank("bank1")->set_base(base);
+	machine().root_device().membank("bank1")->set_base(base);
 }
 
 
@@ -1005,7 +1005,6 @@ static MACHINE_CONFIG_START( hopmappy, namcos86_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(48000))	/* heavy interleaving needed to avoid hangs in rthunder */
 
-	MCFG_MACHINE_RESET(namco86)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1019,8 +1018,6 @@ static MACHINE_CONFIG_START( hopmappy, namcos86_state )
 	MCFG_GFXDECODE(namcos86)
 	MCFG_PALETTE_LENGTH(4096)
 
-	MCFG_PALETTE_INIT(namcos86)
-	MCFG_VIDEO_START(namcos86)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -158,15 +158,15 @@ public:
 	DECLARE_WRITE32_MEMBER(namcos21_video_enable_w);
 	DECLARE_READ32_MEMBER(rso_r);
 	DECLARE_WRITE32_MEMBER(rso_w);
+	DECLARE_VIDEO_START(gal3);
 };
 
 
-static VIDEO_START(gal3)
+VIDEO_START_MEMBER(gal3_state,gal3)
 {
-	gal3_state *state = machine.driver_data<gal3_state>();
-	state->m_generic_paletteram_16.allocate(0x10000);
+	m_generic_paletteram_16.allocate(0x10000);
 
-	state->c355_obj_init(
+	c355_obj_init(
 		0,		/* gfx bank */
 		0xf,	/* reverse palette mapping */
 		namcos2_shared_state::c355_obj_code2tile_delegate() );
@@ -670,7 +670,7 @@ static MACHINE_CONFIG_START( gal3, gal3_state )
 	MCFG_GFXDECODE(namcos21)
 	MCFG_PALETTE_LENGTH(NAMCOS21_NUM_COLORS)
 
-	MCFG_VIDEO_START(gal3)
+	MCFG_VIDEO_START_OVERRIDE(gal3_state,gal3)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

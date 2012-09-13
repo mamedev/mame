@@ -127,6 +127,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
 	DECLARE_WRITE8_MEMBER(nyny_ay8910_37_port_a_w);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -673,33 +675,31 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_START( nyny )
+void nyny_state::machine_start()
 {
-	nyny_state *state = machine.driver_data<nyny_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_audiocpu2 = machine.device("audio2");
-	state->m_ic48_1 = machine.device("ic48_1");
-	state->m_mc6845 = machine.device<mc6845_device>("crtc");
-	state->m_pia1 = machine.device<pia6821_device>("pia1");
-	state->m_pia2 = machine.device<pia6821_device>("pia2");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_audiocpu2 = machine().device("audio2");
+	m_ic48_1 = machine().device("ic48_1");
+	m_mc6845 = machine().device<mc6845_device>("crtc");
+	m_pia1 = machine().device<pia6821_device>("pia1");
+	m_pia2 = machine().device<pia6821_device>("pia2");
 
 	/* setup for save states */
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_star_enable));
-	state->save_item(NAME(state->m_star_delay_counter));
-	state->save_item(NAME(state->m_star_shift_reg));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_star_enable));
+	save_item(NAME(m_star_delay_counter));
+	save_item(NAME(m_star_shift_reg));
 }
 
-static MACHINE_RESET( nyny )
+void nyny_state::machine_reset()
 {
-	nyny_state *state = machine.driver_data<nyny_state>();
 
-	state->m_flipscreen = 0;
-	state->m_star_enable = 0;
-	state->m_star_delay_counter = 0;
-	state->m_star_shift_reg = 0;
+	m_flipscreen = 0;
+	m_star_enable = 0;
+	m_star_delay_counter = 0;
+	m_star_shift_reg = 0;
 }
 
 /*************************************
@@ -721,8 +721,6 @@ static MACHINE_CONFIG_START( nyny, nyny_state )
 	MCFG_CPU_ADD("audio2", M6802, AUDIO_CPU_2_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(nyny_audio_2_map)
 
-	MCFG_MACHINE_START(nyny)
-	MCFG_MACHINE_RESET(nyny)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */

@@ -89,17 +89,16 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 }
 
 
-VIDEO_START( sderby )
+void sderby_state::video_start()
 {
-	sderby_state *state = machine.driver_data<sderby_state>();
 
-	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sderby_state::get_sderby_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16,32,32);
-	state->m_md_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sderby_state::get_sderby_md_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16,32,32);
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sderby_state::get_sderby_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);
+	m_md_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sderby_state::get_sderby_md_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);
 
-	state->m_md_tilemap->set_transparent_pen(0);
+	m_md_tilemap->set_transparent_pen(0);
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sderby_state::get_sderby_fg_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,32);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sderby_state::get_sderby_fg_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 SCREEN_UPDATE_IND16( sderby )

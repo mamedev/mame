@@ -87,6 +87,9 @@ public:
 
 	DECLARE_READ32_MEMBER(psattack_unk_r);
 	DECLARE_DRIVER_INIT(psattack);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -105,17 +108,17 @@ static ADDRESS_MAP_START( psattack_mem, AS_PROGRAM, 32, psattack_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_START(psattack)
+void psattack_state::machine_start()
 {
 
 }
 
-static MACHINE_RESET(psattack)
+void psattack_state::machine_reset()
 {
 
 }
 
-static VIDEO_START(psattack)
+void psattack_state::video_start()
 {
 
 }
@@ -175,8 +178,6 @@ static MACHINE_CONFIG_START( psattack, psattack_state )
 	MCFG_CPU_PROGRAM_MAP(psattack_mem)
 	MCFG_CPU_VBLANK_INT("screen", psattack_interrupt)
 
-	MCFG_MACHINE_START(psattack)
-	MCFG_MACHINE_RESET(psattack)
 
 	//MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -188,7 +189,6 @@ static MACHINE_CONFIG_START( psattack, psattack_state )
 	MCFG_SCREEN_UPDATE_STATIC(psattack)
 	MCFG_SCREEN_VBLANK_STATIC(psattack)
 
-	MCFG_VIDEO_START(psattack)
 
 	MCFG_PALETTE_INIT(RRRRR_GGGGGG_BBBBB)
 	MCFG_PALETTE_LENGTH(65536)

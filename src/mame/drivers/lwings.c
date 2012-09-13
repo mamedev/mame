@@ -746,38 +746,36 @@ static const msm5205_interface msm5205_config =
  *
  *************************************/
 
-static MACHINE_START( lwings )
+void lwings_state::machine_start()
 {
-	lwings_state *state = machine.driver_data<lwings_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
-	state->save_item(NAME(state->m_bg2_image));
-	state->save_item(NAME(state->m_scroll_x));
-	state->save_item(NAME(state->m_scroll_y));
-	state->save_item(NAME(state->m_param));
-	state->save_item(NAME(state->m_palette_pen));
-	state->save_item(NAME(state->m_soundstate));
-	state->save_item(NAME(state->m_adpcm));
+	save_item(NAME(m_bg2_image));
+	save_item(NAME(m_scroll_x));
+	save_item(NAME(m_scroll_y));
+	save_item(NAME(m_param));
+	save_item(NAME(m_palette_pen));
+	save_item(NAME(m_soundstate));
+	save_item(NAME(m_adpcm));
 }
 
-static MACHINE_RESET( lwings )
+void lwings_state::machine_reset()
 {
-	lwings_state *state = machine.driver_data<lwings_state>();
 
-	state->m_bg2_image = 0;
-	state->m_scroll_x[0] = 0;
-	state->m_scroll_x[1] = 0;
-	state->m_scroll_y[0] = 0;
-	state->m_scroll_y[1] = 0;
-	state->m_param[0] = 0;
-	state->m_param[1] = 0;
-	state->m_param[2] = 0;
-	state->m_param[3] = 0;
-	state->m_palette_pen = 0;
-	state->m_soundstate = 0;
-	state->m_adpcm = 0;
+	m_bg2_image = 0;
+	m_scroll_x[0] = 0;
+	m_scroll_x[1] = 0;
+	m_scroll_y[0] = 0;
+	m_scroll_y[1] = 0;
+	m_param[0] = 0;
+	m_param[1] = 0;
+	m_param[2] = 0;
+	m_param[3] = 0;
+	m_palette_pen = 0;
+	m_soundstate = 0;
+	m_adpcm = 0;
 }
 
 static MACHINE_CONFIG_START( lwings, lwings_state )
@@ -791,8 +789,6 @@ static MACHINE_CONFIG_START( lwings, lwings_state )
 	MCFG_CPU_PROGRAM_MAP(lwings_sound_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)	/* ??? */
 
-	MCFG_MACHINE_START(lwings)
-	MCFG_MACHINE_RESET(lwings)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -808,7 +804,6 @@ static MACHINE_CONFIG_START( lwings, lwings_state )
 	MCFG_GFXDECODE(lwings)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(lwings)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -844,7 +839,7 @@ static MACHINE_CONFIG_DERIVED( trojan, lwings )
 	/* video hardware */
 	MCFG_GFXDECODE(trojan)
 
-	MCFG_VIDEO_START(trojan)
+	MCFG_VIDEO_START_OVERRIDE(lwings_state,trojan)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(trojan)
 
@@ -864,7 +859,7 @@ static MACHINE_CONFIG_DERIVED( avengers, trojan )
 	MCFG_CPU_IO_MAP(avengers_adpcm_io_map)
 
 	/* video hardware */
-	MCFG_VIDEO_START(avengers)
+	MCFG_VIDEO_START_OVERRIDE(lwings_state,avengers)
 MACHINE_CONFIG_END
 
 /*************************************

@@ -127,8 +127,6 @@ static MACHINE_CONFIG_START( ondra, ondra_state )
 	MCFG_CPU_IO_MAP(ondra_io)
 	MCFG_CPU_VBLANK_INT("screen", ondra_interrupt)
 
-	MCFG_MACHINE_START( ondra )
-	MCFG_MACHINE_RESET( ondra )
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -141,7 +139,6 @@ static MACHINE_CONFIG_START( ondra, ondra_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START(ondra)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

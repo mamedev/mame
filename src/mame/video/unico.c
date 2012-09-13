@@ -131,68 +131,66 @@ WRITE32_MEMBER(unico_state::unico_vram32_w)
 ***************************************************************************/
 
 
-VIDEO_START( unico )
+VIDEO_START_MEMBER(unico_state,unico)
 {
-	unico_state *state = machine.driver_data<unico_state>();
-	state->m_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),state),TILEMAP_SCAN_ROWS,
+	m_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),this),TILEMAP_SCAN_ROWS,
 									16,16,	0x40, 0x40);
 
-	state->m_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),state),TILEMAP_SCAN_ROWS,
+	m_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),this),TILEMAP_SCAN_ROWS,
 									16,16,	0x40, 0x40);
 
-	state->m_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),state),TILEMAP_SCAN_ROWS,
+	m_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),this),TILEMAP_SCAN_ROWS,
 									16,16,	0x40, 0x40);
 
-	state->m_tilemap[0]->set_user_data(&state->m_vram[0x8000/2]);
-	state->m_tilemap[1]->set_user_data(&state->m_vram[0x0000/2]);
-	state->m_tilemap[2]->set_user_data(&state->m_vram[0x4000/2]);
+	m_tilemap[0]->set_user_data(&m_vram[0x8000/2]);
+	m_tilemap[1]->set_user_data(&m_vram[0x0000/2]);
+	m_tilemap[2]->set_user_data(&m_vram[0x4000/2]);
 
-	state->m_sprites_scrolldx = -0x3f;
-	state->m_sprites_scrolldy = -0x0e;
+	m_sprites_scrolldx = -0x3f;
+	m_sprites_scrolldy = -0x0e;
 
-	state->m_tilemap[0]->set_scrolldx(-0x32,0);
-	state->m_tilemap[1]->set_scrolldx(-0x30,0);
-	state->m_tilemap[2]->set_scrolldx(-0x2e,0);
+	m_tilemap[0]->set_scrolldx(-0x32,0);
+	m_tilemap[1]->set_scrolldx(-0x30,0);
+	m_tilemap[2]->set_scrolldx(-0x2e,0);
 
-	state->m_tilemap[0]->set_scrolldy(-0x0f,0);
-	state->m_tilemap[1]->set_scrolldy(-0x0f,0);
-	state->m_tilemap[2]->set_scrolldy(-0x0f,0);
+	m_tilemap[0]->set_scrolldy(-0x0f,0);
+	m_tilemap[1]->set_scrolldy(-0x0f,0);
+	m_tilemap[2]->set_scrolldy(-0x0f,0);
 
-	state->m_tilemap[0]->set_transparent_pen(0x00);
-	state->m_tilemap[1]->set_transparent_pen(0x00);
-	state->m_tilemap[2]->set_transparent_pen(0x00);
+	m_tilemap[0]->set_transparent_pen(0x00);
+	m_tilemap[1]->set_transparent_pen(0x00);
+	m_tilemap[2]->set_transparent_pen(0x00);
 }
 
-VIDEO_START( zeropnt2 )
+VIDEO_START_MEMBER(unico_state,zeropnt2)
 {
-	unico_state *state = machine.driver_data<unico_state>();
-	state->m_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info32),state),TILEMAP_SCAN_ROWS,
+	m_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info32),this),TILEMAP_SCAN_ROWS,
 									16,16,	0x40, 0x40);
 
-	state->m_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info32),state),TILEMAP_SCAN_ROWS,
+	m_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info32),this),TILEMAP_SCAN_ROWS,
 									16,16,	0x40, 0x40);
 
-	state->m_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info32),state),TILEMAP_SCAN_ROWS,
+	m_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info32),this),TILEMAP_SCAN_ROWS,
 									16,16,	0x40, 0x40);
 
-	state->m_tilemap[0]->set_user_data(&state->m_vram32[0x8000/4]);
-	state->m_tilemap[1]->set_user_data(&state->m_vram32[0x0000/4]);
-	state->m_tilemap[2]->set_user_data(&state->m_vram32[0x4000/4]);
+	m_tilemap[0]->set_user_data(&m_vram32[0x8000/4]);
+	m_tilemap[1]->set_user_data(&m_vram32[0x0000/4]);
+	m_tilemap[2]->set_user_data(&m_vram32[0x4000/4]);
 
-	state->m_sprites_scrolldx = -0x3f;
-	state->m_sprites_scrolldy = -0x0e;
+	m_sprites_scrolldx = -0x3f;
+	m_sprites_scrolldy = -0x0e;
 
-	state->m_tilemap[0]->set_scrolldx(-0x32,0);
-	state->m_tilemap[1]->set_scrolldx(-0x30,0);
-	state->m_tilemap[2]->set_scrolldx(-0x2e,0);
+	m_tilemap[0]->set_scrolldx(-0x32,0);
+	m_tilemap[1]->set_scrolldx(-0x30,0);
+	m_tilemap[2]->set_scrolldx(-0x2e,0);
 
-	state->m_tilemap[0]->set_scrolldy(-0x0f,0);
-	state->m_tilemap[1]->set_scrolldy(-0x0f,0);
-	state->m_tilemap[2]->set_scrolldy(-0x0f,0);
+	m_tilemap[0]->set_scrolldy(-0x0f,0);
+	m_tilemap[1]->set_scrolldy(-0x0f,0);
+	m_tilemap[2]->set_scrolldy(-0x0f,0);
 
-	state->m_tilemap[0]->set_transparent_pen(0x00);
-	state->m_tilemap[1]->set_transparent_pen(0x00);
-	state->m_tilemap[2]->set_transparent_pen(0x00);
+	m_tilemap[0]->set_transparent_pen(0x00);
+	m_tilemap[1]->set_transparent_pen(0x00);
+	m_tilemap[2]->set_transparent_pen(0x00);
 }
 
 

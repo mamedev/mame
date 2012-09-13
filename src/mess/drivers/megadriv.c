@@ -2,6 +2,17 @@
 #include "emu.h"
 #include "includes/megadriv.h"
 
+class pico_state : public md_cons_state
+{
+public:
+	pico_state(const machine_config &mconfig, device_type type, const char *tag)
+	: md_cons_state(mconfig, type, tag) { }
+
+	UINT8 m_page_register;
+	DECLARE_MACHINE_START(ms_megadriv);
+	DECLARE_MACHINE_RESET(ms_megadriv);
+};
+
 /*************************************
  *
  *  Input handlers
@@ -306,23 +317,23 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_START( ms_megadriv )
+MACHINE_START_MEMBER(pico_state,ms_megadriv)
 {
-	mess_init_6buttons_pad(machine);
-	MACHINE_START_CALL( md_sram );
+	mess_init_6buttons_pad(machine());
+	MACHINE_START_CALL_LEGACY( md_sram );
 }
 
-static MACHINE_RESET( ms_megadriv )
+MACHINE_RESET_MEMBER(pico_state,ms_megadriv)
 {
-	MACHINE_RESET_CALL( megadriv );
+	MACHINE_RESET_CALL_LEGACY( megadriv );
 }
 
 static MACHINE_CONFIG_START( ms_megadriv, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 	MCFG_NVRAM_HANDLER_CLEAR()
 
-	MCFG_MACHINE_START( ms_megadriv )
-	MCFG_MACHINE_RESET( ms_megadriv )
+	MCFG_MACHINE_START_OVERRIDE(pico_state, ms_megadriv )
+	MCFG_MACHINE_RESET_OVERRIDE(pico_state, ms_megadriv )
 
 	MCFG_FRAGMENT_ADD( genesis_cartslot )
 MACHINE_CONFIG_END
@@ -331,8 +342,8 @@ static MACHINE_CONFIG_START( ms_megadpal, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_pal )
 	MCFG_NVRAM_HANDLER_CLEAR()
 
-	MCFG_MACHINE_START( ms_megadriv )
-	MCFG_MACHINE_RESET( ms_megadriv )
+	MCFG_MACHINE_START_OVERRIDE(pico_state, ms_megadriv )
+	MCFG_MACHINE_RESET_OVERRIDE(pico_state, ms_megadriv )
 
 	MCFG_FRAGMENT_ADD( genesis_cartslot )
 MACHINE_CONFIG_END
@@ -342,8 +353,8 @@ static MACHINE_CONFIG_START( ms_megdsvp, mdsvp_state )
 	MCFG_FRAGMENT_ADD( md_svp )
 	MCFG_NVRAM_HANDLER_CLEAR()
 
-	MCFG_MACHINE_START( ms_megadriv )
-	MCFG_MACHINE_RESET( ms_megadriv )
+	MCFG_MACHINE_START_OVERRIDE(pico_state, ms_megadriv )
+	MCFG_MACHINE_RESET_OVERRIDE(pico_state, ms_megadriv )
 
 	MCFG_FRAGMENT_ADD( genesis_cartslot )
 MACHINE_CONFIG_END
@@ -353,8 +364,8 @@ static MACHINE_CONFIG_START( ms_megdsvppal, mdsvp_state )
 	MCFG_FRAGMENT_ADD( md_svp )
 	MCFG_NVRAM_HANDLER_CLEAR()
 
-	MCFG_MACHINE_START( ms_megadriv )
-	MCFG_MACHINE_RESET( ms_megadriv )
+	MCFG_MACHINE_START_OVERRIDE(pico_state, ms_megadriv )
+	MCFG_MACHINE_RESET_OVERRIDE(pico_state, ms_megadriv )
 
 	MCFG_FRAGMENT_ADD( genesis_cartslot )
 MACHINE_CONFIG_END
@@ -815,7 +826,7 @@ static MACHINE_CONFIG_START( pico, pico_state )
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 
-	MCFG_MACHINE_RESET( ms_megadriv )
+	MCFG_MACHINE_RESET_OVERRIDE(pico_state, ms_megadriv )
 
 	MCFG_FRAGMENT_ADD( pico_cartslot )
 MACHINE_CONFIG_END
@@ -829,7 +840,7 @@ static MACHINE_CONFIG_START( picopal, pico_state )
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 
-	MCFG_MACHINE_RESET( ms_megadriv )
+	MCFG_MACHINE_RESET_OVERRIDE(pico_state, ms_megadriv )
 
 	MCFG_FRAGMENT_ADD( pico_cartslot )
 MACHINE_CONFIG_END

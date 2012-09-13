@@ -123,6 +123,7 @@ public:
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_DRIVER_INIT(tetriskr);
 	DECLARE_DRIVER_INIT(filetto);
+	virtual void machine_reset();
 };
 
 static SCREEN_UPDATE_RGB32( tetriskr )
@@ -713,17 +714,16 @@ static GFXDECODE_START( pcxt )
 GFXDECODE_END
 
 
-static MACHINE_RESET( filetto )
+void pcxt_state::machine_reset()
 {
-	pcxt_state *state = machine.driver_data<pcxt_state>();
-	device_t *speaker = machine.device("speaker");
-	state->m_bank = -1;
-	state->m_lastvalue = -1;
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	device_t *speaker = machine().device("speaker");
+	m_bank = -1;
+	m_lastvalue = -1;
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 
-	state->m_pc_spkrdata = 0;
-	state->m_pc_input = 0;
-	state->m_wss2_data = 0;
+	m_pc_spkrdata = 0;
+	m_pc_input = 0;
+	m_wss2_data = 0;
 	speaker_level_w( speaker, 0 );
 }
 
@@ -732,7 +732,6 @@ static MACHINE_CONFIG_START( filetto, pcxt_state )
 	MCFG_CPU_PROGRAM_MAP(filetto_map)
 	MCFG_CPU_IO_MAP(filetto_io)
 
-	MCFG_MACHINE_RESET( filetto )
 
 	MCFG_PIT8253_ADD( "pit8253", pc_pit8253_config )
 

@@ -35,6 +35,8 @@ public:
 	UINT8 m_digit_data;
 	UINT8 m_beep_state;
 	void sc2_update_display();
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 READ8_MEMBER( sc2_state::sc2_beep )
@@ -90,26 +92,24 @@ static INPUT_PORTS_START( sc2 )
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("P") PORT_CODE(KEYCODE_O)
 INPUT_PORTS_END
 
-static MACHINE_START(sc2)
+void sc2_state::machine_start()
 {
-	sc2_state *state = machine.driver_data<sc2_state>();
 
-	state->save_item(NAME(state->m_led_7seg_data));
-	state->save_item(NAME(state->m_kp_matrix));
-	state->save_item(NAME(state->m_led_selected));
-	state->save_item(NAME(state->m_digit_data));
-	state->save_item(NAME(state->m_beep_state));
+	save_item(NAME(m_led_7seg_data));
+	save_item(NAME(m_kp_matrix));
+	save_item(NAME(m_led_selected));
+	save_item(NAME(m_digit_data));
+	save_item(NAME(m_beep_state));
 }
 
-static MACHINE_RESET(sc2)
+void sc2_state::machine_reset()
 {
-	sc2_state *state = machine.driver_data<sc2_state>();
 
-	state->m_kp_matrix = 0;
-	state->m_led_selected = 0;
-	state->m_digit_data = 0;
-	state->m_beep_state = 0;
-	memset(state->m_led_7seg_data, 0, ARRAY_LENGTH(state->m_led_7seg_data));
+	m_kp_matrix = 0;
+	m_led_selected = 0;
+	m_digit_data = 0;
+	m_beep_state = 0;
+	memset(m_led_7seg_data, 0, ARRAY_LENGTH(m_led_7seg_data));
 }
 
 void sc2_state::sc2_update_display()
@@ -210,8 +210,6 @@ static MACHINE_CONFIG_START( sc2, sc2_state )
 	MCFG_CPU_PROGRAM_MAP(sc2_mem)
 	MCFG_CPU_IO_MAP(sc2_io)
 
-	MCFG_MACHINE_START(sc2)
-	MCFG_MACHINE_RESET(sc2)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_sc2)

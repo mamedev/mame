@@ -649,7 +649,7 @@ static MACHINE_CONFIG_START( super80, super80_state )
 
 	MCFG_GFXDECODE(super80)
 	MCFG_DEFAULT_LAYOUT( layout_super80 )
-	MCFG_VIDEO_START(super80)
+	MCFG_VIDEO_START_OVERRIDE(super80_state,super80)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -688,7 +688,7 @@ static MACHINE_CONFIG_DERIVED( super80m, super80 )
 
 	MCFG_GFXDECODE(super80m)
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT(super80m)
+	MCFG_PALETTE_INIT_OVERRIDE(super80_state,super80m)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(super80m)
@@ -712,13 +712,13 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_SCREEN_VBLANK_STATIC(super80m)
 
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT(super80m)
+	MCFG_PALETTE_INIT_OVERRIDE(super80_state,super80m)
 
 	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / SUPER80V_DOTS, super80v_crtc)
 
 	MCFG_GFXDECODE(super80v)
 	MCFG_DEFAULT_LAYOUT( layout_super80 )
-	MCFG_VIDEO_START(super80v)
+	MCFG_VIDEO_START_OVERRIDE(super80_state,super80v)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

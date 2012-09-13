@@ -56,12 +56,14 @@ public:
 	DECLARE_WRITE8_MEMBER(hrx_data_w);
 	DECLARE_READ8_MEMBER(hrx_attr_r);
 	DECLARE_WRITE8_MEMBER(hrx_attr_w);
+	DECLARE_MACHINE_START(mtx512);
+	DECLARE_MACHINE_RESET(mtx512);
 };
 
 /*----------- defined in machine/mtx.c -----------*/
 
-MACHINE_START( mtx512 );
-MACHINE_RESET( mtx512 );
+
+
 SNAPSHOT_LOAD( mtx );
 
 

@@ -68,27 +68,26 @@ static void gradius3_postload(running_machine &machine)
 	}
 }
 
-VIDEO_START( gradius3 )
+void gradius3_state::video_start()
 {
-	gradius3_state *state = machine.driver_data<gradius3_state>();
 	int i;
 
-	state->m_layer_colorbase[0] = 0;
-	state->m_layer_colorbase[1] = 32;
-	state->m_layer_colorbase[2] = 48;
-	state->m_sprite_colorbase = 16;
+	m_layer_colorbase[0] = 0;
+	m_layer_colorbase[1] = 32;
+	m_layer_colorbase[2] = 48;
+	m_sprite_colorbase = 16;
 
-	k052109_set_layer_offsets(state->m_k052109, 2, -2, 0);
-	k051960_set_sprite_offsets(state->m_k051960, 2, 0);
+	k052109_set_layer_offsets(m_k052109, 2, -2, 0);
+	k051960_set_sprite_offsets(m_k051960, 2, 0);
 
 	/* re-decode the sprites because the ROMs are connected to the custom IC differently
        from how they are connected to the CPU. */
 	for (i = 0; i < TOTAL_SPRITES; i++)
-		machine.gfx[1]->mark_dirty(i);
+		machine().gfx[1]->mark_dirty(i);
 
-	machine.gfx[0]->set_source((UINT8 *)state->m_gfxram.target());
+	machine().gfx[0]->set_source((UINT8 *)m_gfxram.target());
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(gradius3_postload), &machine));
+	machine().save().register_postload(save_prepost_delegate(FUNC(gradius3_postload), &machine()));
 }
 
 

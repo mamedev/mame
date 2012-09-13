@@ -148,6 +148,8 @@ public:
 	DECLARE_WRITE8_MEMBER( port_83_w );
 	DECLARE_WRITE8_MEMBER( snes_map_0_w );
 	DECLARE_WRITE8_MEMBER( snes_map_1_w );
+	DECLARE_MACHINE_START(sfcbox);
+	DECLARE_MACHINE_RESET(sfcbox);
 };
 
 UINT32 sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
@@ -462,24 +464,22 @@ static MACHINE_CONFIG_START( snes, sfcbox_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_START( sfcbox )
+MACHINE_START_MEMBER(sfcbox_state,sfcbox)
 {
-	sfcbox_state *state = machine.driver_data<sfcbox_state>();
 
-	MACHINE_START_CALL(snes);
+	MACHINE_START_CALL_LEGACY(snes);
 
-	state->m_is_sfcbox = 1;
+	m_is_sfcbox = 1;
 }
 
-static MACHINE_RESET( sfcbox )
+MACHINE_RESET_MEMBER(sfcbox_state,sfcbox)
 {
-	sfcbox_state *state = machine.driver_data<sfcbox_state>();
 
-	MACHINE_RESET_CALL( snes );
+	MACHINE_RESET_CALL_LEGACY( snes );
 
 	/* start with both CPUs disabled */
-	state->m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	state->m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_DERIVED( sfcbox, snes )
@@ -491,8 +491,8 @@ static MACHINE_CONFIG_DERIVED( sfcbox, snes )
 	MCFG_MB90082_ADD("mb90082",XTAL_12MHz / 2) /* TODO: correct clock */
 	MCFG_S3520CF_ADD("s3520cf") /* RTC */
 
-	MCFG_MACHINE_START( sfcbox )
-	MCFG_MACHINE_RESET( sfcbox )
+	MCFG_MACHINE_START_OVERRIDE(sfcbox_state, sfcbox )
+	MCFG_MACHINE_RESET_OVERRIDE(sfcbox_state, sfcbox )
 
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)

@@ -44,12 +44,16 @@ public:
 	TILEMAP_MAPPER_MEMBER(background_scan_rows);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	virtual void machine_start();
+	virtual void video_start();
+	DECLARE_MACHINE_RESET(pushman);
+	DECLARE_MACHINE_RESET(bballs);
 };
 
 
 /*----------- defined in video/pushman.c -----------*/
 
 
-VIDEO_START( pushman );
+
 
 SCREEN_UPDATE_IND16( pushman );

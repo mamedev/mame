@@ -172,25 +172,22 @@
  *
  *************************************/
 
-static MACHINE_START( kangaroo )
+void kangaroo_state::machine_start()
 {
-	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("gfx1")->base(), 0x2000);
+	machine().root_device().membank("bank1")->configure_entries(0, 2, machine().root_device().memregion("gfx1")->base(), 0x2000);
 }
 
 
-static MACHINE_START( kangaroo_mcu )
+MACHINE_START_MEMBER(kangaroo_state,kangaroo_mcu)
 {
-	kangaroo_state *state = machine.driver_data<kangaroo_state>();
-
-	MACHINE_START_CALL(kangaroo);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xef00, 0xefff, read8_delegate(FUNC(kangaroo_state::mcu_sim_r),state), write8_delegate(FUNC(kangaroo_state::mcu_sim_w),state));
-	state->save_item(NAME(state->m_clock));
+	kangaroo_state::machine_start();
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xef00, 0xefff, read8_delegate(FUNC(kangaroo_state::mcu_sim_r),this), write8_delegate(FUNC(kangaroo_state::mcu_sim_w),this));
+	save_item(NAME(m_clock));
 }
 
 
-static MACHINE_RESET( kangaroo )
+void kangaroo_state::machine_reset()
 {
-	kangaroo_state *state = machine.driver_data<kangaroo_state>();
 
 	/* I think there is a bug in the startup checks of the game. At the very */
 	/* beginning, during the RAM check, it goes one byte too far, and ends up */
@@ -203,9 +200,9 @@ static MACHINE_RESET( kangaroo )
 	/* the copy protection. */
 	/* Anyway, what I do here is just immediately generate the NMI, so the game */
 	/* properly starts. */
-	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
-	state->m_clock = 0;
+	m_clock = 0;
 }
 
 
@@ -438,8 +435,6 @@ static MACHINE_CONFIG_START( nomcu, kangaroo_state )
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(kangaroo)
-	MCFG_MACHINE_RESET(kangaroo)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
@@ -448,7 +443,6 @@ static MACHINE_CONFIG_START( nomcu, kangaroo_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 320*2, 0*2, 256*2, 260, 8, 248)
 	MCFG_SCREEN_UPDATE_STATIC(kangaroo)
 
-	MCFG_VIDEO_START(kangaroo)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -459,7 +453,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mcu, nomcu )
 
-	MCFG_MACHINE_START(kangaroo_mcu)
+	MCFG_MACHINE_START_OVERRIDE(kangaroo_state,kangaroo_mcu)
 
 	MCFG_CPU_ADD("mcu", MB8841, MASTER_CLOCK/4/2)
 	MCFG_DEVICE_DISABLE()

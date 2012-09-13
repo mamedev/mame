@@ -48,6 +48,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -55,7 +57,7 @@ public:
 
 
 
-VIDEO_START( tbowl );
+
 SCREEN_UPDATE_IND16( tbowl_left );
 SCREEN_UPDATE_IND16( tbowl_right );
 

@@ -105,6 +105,8 @@ public:
 	UINT8 m_adpcm_data;
 	DECLARE_WRITE8_MEMBER(controls_w);
 	DECLARE_READ8_MEMBER(controls_r);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 WRITE8_MEMBER(pachifev_state::controls_w)
@@ -300,18 +302,17 @@ static const msm5205_interface msm5205_config =
 
 #endif
 
-static MACHINE_RESET( pachifev )
+void pachifev_state::machine_reset()
 {
-    pachifev_state *state = machine.driver_data<pachifev_state>();
 
-    state->m_power=0;
-    state->m_max_power=0;
-    state->m_input_power=0;
-    state->m_previous_power=0;
-    state->m_cnt=0;
+    m_power=0;
+    m_max_power=0;
+    m_input_power=0;
+    m_previous_power=0;
+    m_cnt=0;
 
 #if USE_MSM
-    state->m_adpcm_pos = 0;
+    m_adpcm_pos = 0;
 #endif
 }
 
@@ -355,15 +356,14 @@ static TMS9928A_INTERFACE(pachifev_tms9928a_interface)
     DEVCB_NULL
 };
 
-static MACHINE_START( pachifev)
+void pachifev_state::machine_start()
 {
-	pachifev_state *state = machine.driver_data<pachifev_state>();
 
-	state->save_item(NAME(state->m_power));
-	state->save_item(NAME(state->m_max_power));
-	state->save_item(NAME(state->m_input_power));
-	state->save_item(NAME(state->m_previous_power));
-	state->save_item(NAME(state->m_cnt));
+	save_item(NAME(m_power));
+	save_item(NAME(m_max_power));
+	save_item(NAME(m_input_power));
+	save_item(NAME(m_previous_power));
+	save_item(NAME(m_cnt));
 }
 
 static const struct tms9995reset_param pachifev_processor_config =
@@ -380,8 +380,6 @@ static MACHINE_CONFIG_START( pachifev, pachifev_state )
     MCFG_CPU_IO_MAP(pachifev_cru)
     MCFG_CPU_VBLANK_INT("screen",pachifev_vblank_irq)
 
-    MCFG_MACHINE_START(pachifev)
-    MCFG_MACHINE_RESET(pachifev)
 
     /* video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, pachifev_tms9928a_interface )

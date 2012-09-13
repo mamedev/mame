@@ -425,8 +425,6 @@ static MACHINE_CONFIG_START( pastelg, pastelg_state )
 
 	MCFG_PALETTE_LENGTH(32)
 
-	MCFG_PALETTE_INIT(pastelg)
-	MCFG_VIDEO_START(pastelg)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -483,8 +481,6 @@ static MACHINE_CONFIG_START( threeds, pastelg_state )
 
 	MCFG_PALETTE_LENGTH(32)
 
-	MCFG_PALETTE_INIT(pastelg)
-	MCFG_VIDEO_START(pastelg)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

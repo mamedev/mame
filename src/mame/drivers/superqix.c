@@ -541,20 +541,20 @@ static void machine_init_common(running_machine &machine)
 	state->save_item(NAME(state->m_portC));
 }
 
-static MACHINE_START( superqix )
+MACHINE_START_MEMBER(superqix_state,superqix)
 {
 	/* configure the banks */
-	machine.root_device().membank("bank1")->configure_entries(0, 4, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	machine().root_device().membank("bank1")->configure_entries(0, 4, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 
-	machine_init_common(machine);
+	machine_init_common(machine());
 }
 
-static MACHINE_START( pbillian )
+MACHINE_START_MEMBER(superqix_state,pbillian)
 {
 	/* configure the banks */
-	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	machine().root_device().membank("bank1")->configure_entries(0, 2, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 
-	machine_init_common(machine);
+	machine_init_common(machine());
 }
 
 
@@ -1006,7 +1006,7 @@ static MACHINE_CONFIG_START( pbillian, superqix_state )
 	MCFG_CPU_IO_MAP(pbillian_port_map)
 	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
-	MCFG_MACHINE_START(pbillian)
+	MCFG_MACHINE_START_OVERRIDE(superqix_state,pbillian)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1019,7 +1019,7 @@ static MACHINE_CONFIG_START( pbillian, superqix_state )
 	MCFG_GFXDECODE(pbillian)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(pbillian)
+	MCFG_VIDEO_START_OVERRIDE(superqix_state,pbillian)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -1040,7 +1040,7 @@ static MACHINE_CONFIG_START( hotsmash, superqix_state )
 	MCFG_CPU_ADD("mcu", M68705, 4000000) /* ???? */
 	MCFG_CPU_PROGRAM_MAP(m68705_map)
 
-	MCFG_MACHINE_START(pbillian)
+	MCFG_MACHINE_START_OVERRIDE(superqix_state,pbillian)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1053,7 +1053,7 @@ static MACHINE_CONFIG_START( hotsmash, superqix_state )
 	MCFG_GFXDECODE(pbillian)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(pbillian)
+	MCFG_VIDEO_START_OVERRIDE(superqix_state,pbillian)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -1078,7 +1078,7 @@ static MACHINE_CONFIG_START( sqix, superqix_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_MACHINE_START(superqix)
+	MCFG_MACHINE_START_OVERRIDE(superqix_state,superqix)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1091,7 +1091,7 @@ static MACHINE_CONFIG_START( sqix, superqix_state )
 	MCFG_GFXDECODE(sqix)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(superqix)
+	MCFG_VIDEO_START_OVERRIDE(superqix_state,superqix)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1121,7 +1121,7 @@ static MACHINE_CONFIG_START( sqixbl, superqix_state )
 	MCFG_CPU_IO_MAP(sqix_port_map)
 	MCFG_CPU_PERIODIC_INT(sqix_timer_irq, 4*60) /* ??? */
 
-	MCFG_MACHINE_START(superqix)
+	MCFG_MACHINE_START_OVERRIDE(superqix_state,superqix)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1134,7 +1134,7 @@ static MACHINE_CONFIG_START( sqixbl, superqix_state )
 	MCFG_GFXDECODE(sqix)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(superqix)
+	MCFG_VIDEO_START_OVERRIDE(superqix_state,superqix)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

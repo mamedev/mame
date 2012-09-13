@@ -588,50 +588,48 @@ static const ym2610_interface ym2610_config =
  *
  *************************************/
 
-static MACHINE_START( pipedrm )
+MACHINE_START_MEMBER(fromance_state,pipedrm)
 {
-	fromance_state *state = machine.driver_data<fromance_state>();
 
-	state->m_subcpu = machine.device<cpu_device>("sub");
+	m_subcpu = machine().device<cpu_device>("sub");
 
 	/* initialize main Z80 bank */
-	state->membank("bank1")->configure_entries(0, 8, state->memregion("maincpu")->base() + 0x10000, 0x2000);
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x2000);
+	membank("bank1")->set_entry(0);
 
 	/* initialize sound bank */
-	state->membank("bank2")->configure_entries(0, 2, state->memregion("sub")->base() + 0x10000, 0x8000);
-	state->membank("bank2")->set_entry(0);
+	membank("bank2")->configure_entries(0, 2, memregion("sub")->base() + 0x10000, 0x8000);
+	membank("bank2")->set_entry(0);
 
 	/* state save */
-	state->save_item(NAME(state->m_pending_command));
-	state->save_item(NAME(state->m_sound_command));
+	save_item(NAME(m_pending_command));
+	save_item(NAME(m_sound_command));
 
 	/* video-related elements are saved in VIDEO_START */
 }
 
-static MACHINE_RESET( pipedrm )
+MACHINE_RESET_MEMBER(fromance_state,pipedrm)
 {
-	fromance_state *state = machine.driver_data<fromance_state>();
 	int i;
 
-	state->m_pending_command = 0;
-	state->m_sound_command = 0;
+	m_pending_command = 0;
+	m_sound_command = 0;
 
-	state->m_flipscreen_old = -1;
-	state->m_scrollx_ofs = 0x159;
-	state->m_scrolly_ofs = 0x10;
+	m_flipscreen_old = -1;
+	m_scrollx_ofs = 0x159;
+	m_scrolly_ofs = 0x10;
 
-	state->m_selected_videoram = state->m_selected_paletteram = 0;
-	state->m_scrollx[0] = 0;
-	state->m_scrollx[1] = 0;
-	state->m_scrolly[0] = 0;
-	state->m_scrolly[1] = 0;
-	state->m_gfxreg = 0;
-	state->m_flipscreen = 0;
-	state->m_crtc_register = 0;
+	m_selected_videoram = m_selected_paletteram = 0;
+	m_scrollx[0] = 0;
+	m_scrollx[1] = 0;
+	m_scrolly[0] = 0;
+	m_scrolly[1] = 0;
+	m_gfxreg = 0;
+	m_flipscreen = 0;
+	m_crtc_register = 0;
 
 	for (i = 0; i < 0x10; i++)
-		state->m_crtc_data[i] = 0;
+		m_crtc_data[i] = 0;
 }
 
 static MACHINE_CONFIG_START( pipedrm, fromance_state )
@@ -646,8 +644,8 @@ static MACHINE_CONFIG_START( pipedrm, fromance_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 
-	MCFG_MACHINE_START(pipedrm)
-	MCFG_MACHINE_RESET(pipedrm)
+	MCFG_MACHINE_START_OVERRIDE(fromance_state,pipedrm)
+	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,pipedrm)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -660,7 +658,7 @@ static MACHINE_CONFIG_START( pipedrm, fromance_state )
 	MCFG_GFXDECODE(pipedrm)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(pipedrm)
+	MCFG_VIDEO_START_OVERRIDE(fromance_state,pipedrm)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -685,8 +683,8 @@ static MACHINE_CONFIG_START( hatris, fromance_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(hatris_sound_portmap)
 
-	MCFG_MACHINE_START(pipedrm)
-	MCFG_MACHINE_RESET(pipedrm)
+	MCFG_MACHINE_START_OVERRIDE(fromance_state,pipedrm)
+	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,pipedrm)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -699,7 +697,7 @@ static MACHINE_CONFIG_START( hatris, fromance_state )
 	MCFG_GFXDECODE(hatris)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(hatris)
+	MCFG_VIDEO_START_OVERRIDE(fromance_state,hatris)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -435,24 +435,23 @@ WRITE16_MEMBER(itech32_state::int1_ack_w)
  *
  *************************************/
 
-static MACHINE_RESET( itech32 )
+void itech32_state::machine_reset()
 {
-	itech32_state *state = machine.driver_data<itech32_state>();
-	state->m_vint_state = state->m_xint_state = state->m_qint_state = 0;
-	state->m_sound_data = 0;
-	state->m_sound_return = 0;
-	state->m_sound_int_state = 0;
+	m_vint_state = m_xint_state = m_qint_state = 0;
+	m_sound_data = 0;
+	m_sound_return = 0;
+	m_sound_int_state = 0;
 }
 
 
-static MACHINE_RESET( drivedge )
+MACHINE_RESET_MEMBER(itech32_state,drivedge)
 {
-	MACHINE_RESET_CALL(itech32);
+	itech32_state::machine_reset();
 
-	machine.device("dsp1")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine.device("dsp2")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	STOP_TMS_SPINNING(machine, 0);
-	STOP_TMS_SPINNING(machine, 1);
+	machine().device("dsp1")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("dsp2")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	STOP_TMS_SPINNING(machine(), 0);
+	STOP_TMS_SPINNING(machine(), 1);
 }
 
 
@@ -1677,7 +1676,6 @@ static MACHINE_CONFIG_START( timekill, itech32_state )
 	MCFG_CPU_ADD("soundcpu", M6809, SOUND_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_RESET(itech32)
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", itech32_state, nvram_init)
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
@@ -1690,7 +1688,6 @@ static MACHINE_CONFIG_START( timekill, itech32_state )
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 508, 0, 384, 262, 0, 256)
 	MCFG_SCREEN_UPDATE_STATIC(itech32)
 
-	MCFG_VIDEO_START(itech32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1731,7 +1728,7 @@ static MACHINE_CONFIG_DERIVED( drivedge, bloodstm )
 
 //  MCFG_CPU_ADD("comm", M6803, 8000000/4) -- network CPU
 
-	MCFG_MACHINE_RESET(drivedge)
+	MCFG_MACHINE_RESET_OVERRIDE(itech32_state,drivedge)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 MACHINE_CONFIG_END
 

@@ -56,19 +56,18 @@ static void update_interrupts(running_machine &machine)
 }
 
 
-static MACHINE_START( atarigt )
+MACHINE_START_MEMBER(atarigt_state,atarigt)
 {
-	atarigen_init(machine);
+	atarigen_init(machine());
 }
 
 
-static MACHINE_RESET( atarigt )
+MACHINE_RESET_MEMBER(atarigt_state,atarigt)
 {
-	atarigt_state *state = machine.driver_data<atarigt_state>();
 
-	atarigen_eeprom_reset(state);
-	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine.primary_screen, atarigt_scanline_update, 8);
+	atarigen_eeprom_reset(this);
+	atarigen_interrupt_reset(this, update_interrupts);
+	atarigen_scanline_timer_reset(*machine().primary_screen, atarigt_scanline_update, 8);
 }
 
 
@@ -814,8 +813,8 @@ static MACHINE_CONFIG_START( atarigt, atarigt_state )
 	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 	MCFG_CPU_PERIODIC_INT(atarigen_scanline_int_gen, 250)
 
-	MCFG_MACHINE_START(atarigt)
-	MCFG_MACHINE_RESET(atarigt)
+	MCFG_MACHINE_START_OVERRIDE(atarigt_state,atarigt)
+	MCFG_MACHINE_RESET_OVERRIDE(atarigt_state,atarigt)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
@@ -830,7 +829,7 @@ static MACHINE_CONFIG_START( atarigt, atarigt_state )
 	MCFG_SCREEN_UPDATE_STATIC(atarigt)
 	MCFG_SCREEN_VBLANK_STATIC(atarigt)
 
-	MCFG_VIDEO_START(atarigt)
+	MCFG_VIDEO_START_OVERRIDE(atarigt_state,atarigt)
 
 	MCFG_ATARIRLE_ADD("rle", modesc)
 

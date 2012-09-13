@@ -47,6 +47,10 @@ private:
 public:
 	DECLARE_DRIVER_INIT(llc2);
 	DECLARE_DRIVER_INIT(llc1);
+	virtual void video_start();
+	DECLARE_MACHINE_START(llc1);
+	DECLARE_MACHINE_RESET(llc1);
+	DECLARE_MACHINE_RESET(llc2);
 };
 
 

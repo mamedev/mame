@@ -186,30 +186,28 @@ static const k051960_interface blockhl_k051960_intf =
 	blockhl_sprite_callback
 };
 
-static MACHINE_START( blockhl )
+void blockhl_state::machine_start()
 {
-	blockhl_state *state = machine.driver_data<blockhl_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
+	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_k052109 = machine.device("k052109");
-	state->m_k051960 = machine.device("k051960");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_k052109 = machine().device("k052109");
+	m_k051960 = machine().device("k051960");
 
-	state->save_item(NAME(state->m_palette_selected));
-	state->save_item(NAME(state->m_rombank));
+	save_item(NAME(m_palette_selected));
+	save_item(NAME(m_rombank));
 }
 
-static MACHINE_RESET( blockhl )
+void blockhl_state::machine_reset()
 {
-	blockhl_state *state = machine.driver_data<blockhl_state>();
 
-	konami_configure_set_lines(machine.device("maincpu"), blockhl_banking);
+	konami_configure_set_lines(machine().device("maincpu"), blockhl_banking);
 
-	state->m_palette_selected = 0;
-	state->m_rombank = 0;
+	m_palette_selected = 0;
+	m_rombank = 0;
 }
 
 static MACHINE_CONFIG_START( blockhl, blockhl_state )
@@ -222,8 +220,6 @@ static MACHINE_CONFIG_START( blockhl, blockhl_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 
-	MCFG_MACHINE_START(blockhl)
-	MCFG_MACHINE_RESET(blockhl)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -237,7 +233,6 @@ static MACHINE_CONFIG_START( blockhl, blockhl_state )
 
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(blockhl)
 
 	MCFG_K052109_ADD("k052109", blockhl_k052109_intf)
 	MCFG_K051960_ADD("k051960", blockhl_k051960_intf)

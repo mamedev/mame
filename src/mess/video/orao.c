@@ -10,8 +10,7 @@
 #include "emu.h"
 #include "includes/orao.h"
 
-
-VIDEO_START( orao )
+void orao_state::video_start()
 {
 }
 

@@ -165,43 +165,38 @@ WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
  *
  *************************************/
 
-VIDEO_START( cinemat_bilevel )
+void cinemat_state::video_start()
 {
-	cinemat_state *state = machine.driver_data<cinemat_state>();
-	state->m_color_mode = COLOR_BILEVEL;
-	VIDEO_START_CALL(vector);
+	m_color_mode = COLOR_BILEVEL;
+	VIDEO_START_CALL_LEGACY(vector);
 }
 
 
-VIDEO_START( cinemat_16level )
+VIDEO_START_MEMBER(cinemat_state,cinemat_16level)
 {
-	cinemat_state *state = machine.driver_data<cinemat_state>();
-	state->m_color_mode = COLOR_16LEVEL;
-	VIDEO_START_CALL(vector);
+	m_color_mode = COLOR_16LEVEL;
+	VIDEO_START_CALL_LEGACY(vector);
 }
 
 
-VIDEO_START( cinemat_64level )
+VIDEO_START_MEMBER(cinemat_state,cinemat_64level)
 {
-	cinemat_state *state = machine.driver_data<cinemat_state>();
-	state->m_color_mode = COLOR_64LEVEL;
-	VIDEO_START_CALL(vector);
+	m_color_mode = COLOR_64LEVEL;
+	VIDEO_START_CALL_LEGACY(vector);
 }
 
 
-VIDEO_START( cinemat_color )
+VIDEO_START_MEMBER(cinemat_state,cinemat_color)
 {
-	cinemat_state *state = machine.driver_data<cinemat_state>();
-	state->m_color_mode = COLOR_RGB;
-	VIDEO_START_CALL(vector);
+	m_color_mode = COLOR_RGB;
+	VIDEO_START_CALL_LEGACY(vector);
 }
 
 
-VIDEO_START( cinemat_qb3color )
+VIDEO_START_MEMBER(cinemat_state,cinemat_qb3color)
 {
-	cinemat_state *state = machine.driver_data<cinemat_state>();
-	state->m_color_mode = COLOR_QB3;
-	VIDEO_START_CALL(vector);
+	m_color_mode = COLOR_QB3;
+	VIDEO_START_CALL_LEGACY(vector);
 }
 
 

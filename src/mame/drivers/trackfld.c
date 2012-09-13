@@ -864,25 +864,23 @@ GFXDECODE_END
 
 
 
-static MACHINE_START( trackfld )
+MACHINE_START_MEMBER(trackfld_state,trackfld)
 {
-	trackfld_state *state = machine.driver_data<trackfld_state>();
 
 	/* video */
-	state->save_item(NAME(state->m_bg_bank));
-	state->save_item(NAME(state->m_sprite_bank1));
-	state->save_item(NAME(state->m_sprite_bank2));
-	state->save_item(NAME(state->m_old_gfx_bank));
+	save_item(NAME(m_bg_bank));
+	save_item(NAME(m_sprite_bank1));
+	save_item(NAME(m_sprite_bank2));
+	save_item(NAME(m_old_gfx_bank));
 }
 
-static MACHINE_RESET( trackfld )
+MACHINE_RESET_MEMBER(trackfld_state,trackfld)
 {
-	trackfld_state *state = machine.driver_data<trackfld_state>();
 
-	state->m_bg_bank = 0;
-	state->m_sprite_bank1 = 0;
-	state->m_sprite_bank2 = 0;
-	state->m_old_gfx_bank = 0;
+	m_bg_bank = 0;
+	m_sprite_bank1 = 0;
+	m_sprite_bank2 = 0;
+	m_old_gfx_bank = 0;
 }
 
 static INTERRUPT_GEN( vblank_irq )
@@ -920,8 +918,8 @@ static MACHINE_CONFIG_START( trackfld, trackfld_state )
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(trackfld)
-	MCFG_MACHINE_RESET(trackfld)
+	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
+	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -935,8 +933,8 @@ static MACHINE_CONFIG_START( trackfld, trackfld_state )
 	MCFG_GFXDECODE(trackfld)
 	MCFG_PALETTE_LENGTH(16*16+16*16)
 
-	MCFG_PALETTE_INIT(trackfld)
-	MCFG_VIDEO_START(trackfld)
+	MCFG_PALETTE_INIT_OVERRIDE(trackfld_state,trackfld)
+	MCFG_VIDEO_START_OVERRIDE(trackfld_state,trackfld)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -975,8 +973,8 @@ static MACHINE_CONFIG_START( yieartf, trackfld_state )
 //  MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)
 //  MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(trackfld)
-	MCFG_MACHINE_RESET(trackfld)
+	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
+	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -990,8 +988,8 @@ static MACHINE_CONFIG_START( yieartf, trackfld_state )
 	MCFG_GFXDECODE(trackfld)
 	MCFG_PALETTE_LENGTH(16*16+16*16)
 
-	MCFG_PALETTE_INIT(trackfld)
-	MCFG_VIDEO_START(trackfld)
+	MCFG_PALETTE_INIT_OVERRIDE(trackfld_state,trackfld)
+	MCFG_VIDEO_START_OVERRIDE(trackfld_state,trackfld)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1016,8 +1014,8 @@ static MACHINE_CONFIG_DERIVED( hyprolyb, trackfld )
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(hyprolyb_sound_map)
 
-	MCFG_MACHINE_START(trackfld)
-	MCFG_MACHINE_RESET(trackfld)
+	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
+	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("vlm")
@@ -1026,7 +1024,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( atlantol, hyprolyb )
 
-	MCFG_VIDEO_START(atlantol)
+	MCFG_VIDEO_START_OVERRIDE(trackfld_state,atlantol)
 MACHINE_CONFIG_END
 
 

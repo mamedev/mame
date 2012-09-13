@@ -38,29 +38,28 @@ static int command7(running_machine &machine);
  *
  *************************************/
 
-VIDEO_START( victory )
+void victory_state::video_start()
 {
-	victory_state *state = machine.driver_data<victory_state>();
 	/* allocate bitmapram */
-	state->m_rram = auto_alloc_array(machine, UINT8, 0x4000);
-	state->m_gram = auto_alloc_array(machine, UINT8, 0x4000);
-	state->m_bram = auto_alloc_array(machine, UINT8, 0x4000);
+	m_rram = auto_alloc_array(machine(), UINT8, 0x4000);
+	m_gram = auto_alloc_array(machine(), UINT8, 0x4000);
+	m_bram = auto_alloc_array(machine(), UINT8, 0x4000);
 
 	/* allocate bitmaps */
-	state->m_bgbitmap = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->m_fgbitmap = auto_alloc_array(machine, UINT8, 256 * 256);
+	m_bgbitmap = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_fgbitmap = auto_alloc_array(machine(), UINT8, 256 * 256);
 
 	/* reset globals */
-	state->m_vblank_irq = 0;
-	state->m_fgcoll = state->m_fgcollx = state->m_fgcolly = 0;
-	state->m_bgcoll = state->m_bgcollx = state->m_bgcolly = 0;
-	state->m_scrollx = state->m_scrolly = 0;
-	state->m_video_control = 0;
-	memset(&state->m_micro, 0, sizeof(state->m_micro));
-	state->m_micro.timer = machine.scheduler().timer_alloc(FUNC_NULL);
+	m_vblank_irq = 0;
+	m_fgcoll = m_fgcollx = m_fgcolly = 0;
+	m_bgcoll = m_bgcollx = m_bgcolly = 0;
+	m_scrollx = m_scrolly = 0;
+	m_video_control = 0;
+	memset(&m_micro, 0, sizeof(m_micro));
+	m_micro.timer = machine().scheduler().timer_alloc(FUNC_NULL);
 
 	/* register for state saving */
-	state_save_register_global_array(machine, state->m_paletteram);
+	state_save_register_global_array(machine(), m_paletteram);
 }
 
 

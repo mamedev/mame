@@ -40,6 +40,8 @@ public:
 	DECLARE_WRITE16_MEMBER(asterix_spritebank_w);
 	DECLARE_READ8_MEMBER(asterix_sound_r);
 	DECLARE_DRIVER_INIT(asterix);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 

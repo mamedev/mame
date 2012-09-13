@@ -42,12 +42,16 @@ public:
 	DECLARE_WRITE8_MEMBER(fgoal_ypos_w);
 	DECLARE_WRITE8_MEMBER(fgoal_xpos_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(fgoal_80_r);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/fgoal.c -----------*/
 
-VIDEO_START( fgoal );
+
 SCREEN_UPDATE_IND16( fgoal );
 
 

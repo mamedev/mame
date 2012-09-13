@@ -223,24 +223,22 @@ static INTERRUPT_GEN( commando_interrupt )
 
 /* Machine Driver */
 
-static MACHINE_START( commando )
+void commando_state::machine_start()
 {
-	commando_state *state = machine.driver_data<commando_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_scroll_x));
-	state->save_item(NAME(state->m_scroll_y));
+	save_item(NAME(m_scroll_x));
+	save_item(NAME(m_scroll_y));
 }
 
-static MACHINE_RESET( commando )
+void commando_state::machine_reset()
 {
-	commando_state *state = machine.driver_data<commando_state>();
 
-	state->m_scroll_x[0] = 0;
-	state->m_scroll_x[1] = 0;
-	state->m_scroll_y[0] = 0;
-	state->m_scroll_y[1] = 0;
+	m_scroll_x[0] = 0;
+	m_scroll_x[1] = 0;
+	m_scroll_y[0] = 0;
+	m_scroll_y[1] = 0;
 }
 
 
@@ -255,8 +253,6 @@ static MACHINE_CONFIG_START( commando, commando_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 4*60)
 
-	MCFG_MACHINE_START(commando)
-	MCFG_MACHINE_RESET(commando)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -271,7 +267,6 @@ static MACHINE_CONFIG_START( commando, commando_state )
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MCFG_VIDEO_START(commando)
 
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 

@@ -47,17 +47,16 @@ WRITE16_MEMBER(oneshot_state::oneshot_fg_videoram_w)
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-VIDEO_START( oneshot )
+void oneshot_state::video_start()
 {
-	oneshot_state *state = machine.driver_data<oneshot_state>();
 
-	state->m_bg_tilemap =  &machine.tilemap().create(tilemap_get_info_delegate(FUNC(oneshot_state::get_oneshot_bg_tile_info),state),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_mid_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(oneshot_state::get_oneshot_mid_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_fg_tilemap =  &machine.tilemap().create(tilemap_get_info_delegate(FUNC(oneshot_state::get_oneshot_fg_tile_info),state),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap =  &machine().tilemap().create(tilemap_get_info_delegate(FUNC(oneshot_state::get_oneshot_bg_tile_info),this),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_mid_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(oneshot_state::get_oneshot_mid_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap =  &machine().tilemap().create(tilemap_get_info_delegate(FUNC(oneshot_state::get_oneshot_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	state->m_bg_tilemap->set_transparent_pen(0);
-	state->m_mid_tilemap->set_transparent_pen(0);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_mid_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 static void draw_crosshairs( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

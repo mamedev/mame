@@ -146,12 +146,16 @@ public:
 	int m_case_shift;
 	device_t *m_crt;
 	DECLARE_DRIVER_INIT(tx0);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/tx0.c -----------*/
 
-VIDEO_START( tx0 );
+
 SCREEN_VBLANK( tx0 );
 SCREEN_UPDATE_IND16( tx0 );
 

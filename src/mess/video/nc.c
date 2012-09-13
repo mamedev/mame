@@ -14,7 +14,7 @@
   Start the video hardware emulation.
 ***************************************************************************/
 
-VIDEO_START( nc )
+void nc_state::video_start()
 {
 }
 
@@ -35,9 +35,9 @@ static const rgb_t nc_palette[NC_NUM_COLOURS] =
 
 
 /* Initialise the palette */
-PALETTE_INIT( nc )
+void nc_state::palette_init()
 {
-	palette_set_colors(machine, 0, nc_palette, ARRAY_LENGTH(nc_palette));
+	palette_set_colors(machine(), 0, nc_palette, ARRAY_LENGTH(nc_palette));
 }
 
 

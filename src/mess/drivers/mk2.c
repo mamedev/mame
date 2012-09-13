@@ -72,6 +72,7 @@ public:
 	DECLARE_READ8_MEMBER(mk2_read_b);
 	DECLARE_WRITE8_MEMBER(mk2_write_b);
 	UINT8 m_led[5];
+	virtual void machine_start();
 };
 
 
@@ -127,7 +128,7 @@ static TIMER_DEVICE_CALLBACK( update_leds )
 	state->m_led[0]= state->m_led[1]= state->m_led[2]= state->m_led[3]= state->m_led[4]= 0;
 }
 
-static MACHINE_START( mk2 )
+void mk2_state::machine_start()
 {
 }
 
@@ -195,7 +196,6 @@ static MACHINE_CONFIG_START( mk2, mk2_state )
 	MCFG_CPU_PROGRAM_MAP(mk2_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START( mk2 )
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mk2)

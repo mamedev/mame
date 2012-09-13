@@ -113,7 +113,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(handset_ack);
 	DECLARE_WRITE_LINE_MEMBER(cs2_motor);
 	DECLARE_WRITE_LINE_MEMBER(alphaW);
-
+	DECLARE_MACHINE_START(ti99_4);
+	DECLARE_MACHINE_START(ti99_4a);
+	DECLARE_MACHINE_RESET(ti99_4);
+	DECLARE_MACHINE_RESET(ti99_4a);
 private:
 	void	set_keyboard_column(int number, int data);
 	int		m_keyboard_column;
@@ -841,34 +844,32 @@ static JOYPORT_CONFIG( joyport4a_50 )
     Machine definitions
 ******************************************************************************/
 
-MACHINE_START( ti99_4 )
+MACHINE_START_MEMBER(ti99_4x,ti99_4)
 {
-	ti99_4x *driver = machine.driver_data<ti99_4x>();
 
-	driver->m_cpu = static_cast<tms9900_device*>(machine.device("maincpu"));
-	driver->m_tms9901 = static_cast<tms9901_device*>(machine.device(TMS9901_TAG));
+	m_cpu = static_cast<tms9900_device*>(machine().device("maincpu"));
+	m_tms9901 = static_cast<tms9901_device*>(machine().device(TMS9901_TAG));
 
-	driver->m_gromport = static_cast<gromport_device*>(machine.device(GROMPORT_TAG));
+	m_gromport = static_cast<gromport_device*>(machine().device(GROMPORT_TAG));
 
-	driver->m_peribox = static_cast<peribox_device*>(machine.device(PERIBOX_TAG));
-	driver->m_datamux = static_cast<ti99_datamux_device*>(machine.device(DATAMUX_TAG));
+	m_peribox = static_cast<peribox_device*>(machine().device(PERIBOX_TAG));
+	m_datamux = static_cast<ti99_datamux_device*>(machine().device(DATAMUX_TAG));
 
-	driver->m_joyport = static_cast<joyport_device*>(machine.device(JOYPORT_TAG));
+	m_joyport = static_cast<joyport_device*>(machine().device(JOYPORT_TAG));
 
-	driver->m_video = static_cast<ti_video_device*>(machine.device(VIDEO_SYSTEM_TAG));
+	m_video = static_cast<ti_video_device*>(machine().device(VIDEO_SYSTEM_TAG));
 
-	driver->m_peribox->senila(CLEAR_LINE);
-	driver->m_peribox->senilb(CLEAR_LINE);
-	driver->m_firstjoy = 5;
+	m_peribox->senila(CLEAR_LINE);
+	m_peribox->senilb(CLEAR_LINE);
+	m_firstjoy = 5;
 
-	driver->m_ready_line = driver->m_ready_line_dmux = ASSERT_LINE;
+	m_ready_line = m_ready_line_dmux = ASSERT_LINE;
 }
 
-MACHINE_RESET( ti99_4 )
+MACHINE_RESET_MEMBER(ti99_4x,ti99_4)
 {
-	ti99_4x *driver = machine.driver_data<ti99_4x>();
-	driver->m_cpu->set_ready(ASSERT_LINE);
-	driver->m_cpu->set_hold(CLEAR_LINE);
+	m_cpu->set_ready(ASSERT_LINE);
+	m_cpu->set_hold(CLEAR_LINE);
 }
 
 /*
@@ -878,8 +879,8 @@ static MACHINE_CONFIG_START( ti99_4_60hz, ti99_4x )
 	/* CPU */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
 
-	MCFG_MACHINE_START( ti99_4 )
-	MCFG_MACHINE_RESET( ti99_4 )
+	MCFG_MACHINE_START_OVERRIDE(ti99_4x, ti99_4 )
+	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x, ti99_4 )
 
 	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918, ti99_4_tms9928a_interface)
 
@@ -919,8 +920,8 @@ static MACHINE_CONFIG_START( ti99_4_50hz, ti99_4x )
 	/* CPU */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
 
-	MCFG_MACHINE_START( ti99_4 )
-	MCFG_MACHINE_RESET( ti99_4 )
+	MCFG_MACHINE_START_OVERRIDE(ti99_4x, ti99_4 )
+	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x, ti99_4 )
 
 	/* video hardware */
 	MCFG_TI_TMS991x_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9929, ti99_4_tms9928a_interface)
@@ -961,39 +962,37 @@ MACHINE_CONFIG_END
     TI-99/4A - replaced the 99/4
 */
 
-MACHINE_START( ti99_4a )
+MACHINE_START_MEMBER(ti99_4x,ti99_4a)
 {
-	ti99_4x *driver = machine.driver_data<ti99_4x>();
 
-	driver->m_cpu = static_cast<tms9900_device*>(machine.device("maincpu"));
-	driver->m_tms9901 = static_cast<tms9901_device*>(machine.device(TMS9901_TAG));
-
-	driver->m_gromport = static_cast<gromport_device*>(machine.device(GROMPORT_TAG));
-	driver->m_peribox = static_cast<peribox_device*>(machine.device(PERIBOX_TAG));
-
-	driver->m_datamux = static_cast<ti99_datamux_device*>(machine.device(DATAMUX_TAG));
-	driver->m_joyport = static_cast<joyport_device*>(machine.device(JOYPORT_TAG));
-	driver->m_video = static_cast<ti_video_device*>(machine.device(VIDEO_SYSTEM_TAG));
-	driver->m_firstjoy = 6;
-
-	driver->m_peribox->senila(CLEAR_LINE);
-	driver->m_peribox->senilb(CLEAR_LINE);
-	driver->m_ready_line = driver->m_ready_line_dmux = ASSERT_LINE;
+	m_cpu = static_cast<tms9900_device*>(machine().device("maincpu"));
+	m_tms9901 = static_cast<tms9901_device*>(machine().device(TMS9901_TAG));
+    
+	m_gromport = static_cast<gromport_device*>(machine().device(GROMPORT_TAG));
+	m_peribox = static_cast<peribox_device*>(machine().device(PERIBOX_TAG));
+    
+	m_datamux = static_cast<ti99_datamux_device*>(machine().device(DATAMUX_TAG));
+	m_joyport = static_cast<joyport_device*>(machine().device(JOYPORT_TAG));
+	m_video = static_cast<ti_video_device*>(machine().device(VIDEO_SYSTEM_TAG));
+	m_firstjoy = 6;
+    
+	m_peribox->senila(CLEAR_LINE);
+	m_peribox->senilb(CLEAR_LINE);
+	m_ready_line = m_ready_line_dmux = ASSERT_LINE;
 }
 
-MACHINE_RESET( ti99_4a )
+MACHINE_RESET_MEMBER(ti99_4x,ti99_4a)
 {
-	ti99_4x *driver = machine.driver_data<ti99_4x>();
-	driver->m_cpu->set_ready(ASSERT_LINE);
-	driver->m_cpu->set_hold(CLEAR_LINE);
+	m_cpu->set_ready(ASSERT_LINE);
+	m_cpu->set_hold(CLEAR_LINE);
 }
 
 static MACHINE_CONFIG_START( ti99_4a_60hz, ti99_4x )
 	/* CPU */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
 
-	MCFG_MACHINE_START( ti99_4a )
-	MCFG_MACHINE_RESET( ti99_4a )
+	MCFG_MACHINE_START_OVERRIDE(ti99_4x, ti99_4a )
+	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x, ti99_4a )
 
 	/* Video hardware */
 	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918A, ti99_4_tms9928a_interface)
@@ -1034,8 +1033,8 @@ static MACHINE_CONFIG_START( ti99_4a_50hz, ti99_4x )
 	/* CPU */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
 
-	MCFG_MACHINE_START( ti99_4a )
-	MCFG_MACHINE_RESET( ti99_4a )
+	MCFG_MACHINE_START_OVERRIDE(ti99_4x, ti99_4a )
+	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x, ti99_4a )
 
 	/* Video hardware */
 	MCFG_TI_TMS991x_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9929A, ti99_4_tms9928a_interface)
@@ -1086,7 +1085,7 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x )
 	/* CPU */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
 
-	MCFG_MACHINE_START( ti99_4a )
+	MCFG_MACHINE_START_OVERRIDE(ti99_4x, ti99_4a )
 
 	/* video hardware */
 	// Although we should have a 60 Hz screen rate, we have to set it to 30 here.

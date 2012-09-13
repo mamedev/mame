@@ -174,6 +174,7 @@ public:
 	DECLARE_DRIVER_INIT(clatt);
 	DECLARE_DRIVER_INIT(rou029);
 	DECLARE_DRIVER_INIT(nocrypt);
+	virtual void machine_reset();
 };
 
 #define VFD_RESET  0x20
@@ -637,25 +638,24 @@ READ8_MEMBER(bfm_sc1_state::vid_uart_ctrl_r)
 
 // machine start (called only once) /////////////////////////////////////////////////
 
-static MACHINE_RESET( bfm_sc1 )
+void bfm_sc1_state::machine_reset()
 {
-	bfm_sc1_state *state = machine.driver_data<bfm_sc1_state>();
-	state->m_vfd_latch         = 0;
-	state->m_mmtr_latch        = 0;
-	state->m_triac_latch       = 0;
-	state->m_irq_status        = 0;
-	state->m_is_timer_enabled  = 1;
-	state->m_coin_inhibits     = 0;
-	state->m_mux1_outputlatch  = 0x08;	// clock HIGH
-	state->m_mux1_datalo       = 0;
-	state->m_mux1_datahi		  = 0;
-	state->m_mux1_input        = 0;
-	state->m_mux2_outputlatch  = 0x08;	// clock HIGH
-	state->m_mux2_datalo       = 0;
-	state->m_mux2_datahi		  = 0;
-	state->m_mux2_input        = 0;
+	m_vfd_latch         = 0;
+	m_mmtr_latch        = 0;
+	m_triac_latch       = 0;
+	m_irq_status        = 0;
+	m_is_timer_enabled  = 1;
+	m_coin_inhibits     = 0;
+	m_mux1_outputlatch  = 0x08;	// clock HIGH
+	m_mux1_datalo       = 0;
+	m_mux1_datahi		  = 0;
+	m_mux1_input        = 0;
+	m_mux2_outputlatch  = 0x08;	// clock HIGH
+	m_mux2_datalo       = 0;
+	m_mux2_datahi		  = 0;
+	m_mux2_input        = 0;
 
-	state->m_vfd0->reset();
+	m_vfd0->reset();
 
 // reset stepper motors /////////////////////////////////////////////////////////////
 	{
@@ -667,19 +667,19 @@ static MACHINE_RESET( bfm_sc1 )
 			if ( stepper_optic_state(i) ) pattern |= 1<<i;
 		}
 
-		state->m_optic_pattern = pattern;
+		m_optic_pattern = pattern;
 
 	}
 
-	state->m_acia_status   = 0x02; // MC6850 transmit buffer empty !!!
-	state->m_locked		  = 0x07; // hardware is locked
+	m_acia_status   = 0x02; // MC6850 transmit buffer empty !!!
+	m_locked		  = 0x07; // hardware is locked
 
 // init rom bank ////////////////////////////////////////////////////////////////////
 	{
-		UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+		UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
-		state->membank("bank1")->configure_entries(0, 4, &rom[0x0000], 0x02000);
-		state->membank("bank1")->set_entry(state->m_defaultbank);
+		membank("bank1")->configure_entries(0, 4, &rom[0x0000], 0x02000);
+		membank("bank1")->set_entry(m_defaultbank);
 	}
 }
 
@@ -1093,7 +1093,6 @@ INPUT_PORTS_END
 /////////////////////////////////////////////////////////////////////////////////////
 
 static MACHINE_CONFIG_START( scorpion1, bfm_sc1_state )
-	MCFG_MACHINE_RESET(bfm_sc1)							// main scorpion1 board initialisation
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)			// 6809 CPU at 1 Mhz
 	MCFG_CPU_PROGRAM_MAP(sc1_base)						// setup read and write memorymap
 	MCFG_CPU_PERIODIC_INT(timer_irq, 1000 )				// generate 1000 IRQ's per second

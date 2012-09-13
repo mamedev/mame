@@ -47,6 +47,8 @@ public:
 	DECLARE_WRITE8_MEMBER(switch_w);
 	DECLARE_READ8_MEMBER(dedicated_switch_r);
 	DECLARE_DRIVER_INIT(whitestar);
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 static INPUT_PORTS_START( whitestar )
@@ -169,10 +171,10 @@ static ADDRESS_MAP_START( whitestar_dmd_map, AS_PROGRAM, 8, whitestar_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("dmdcpu", 0x78000)
 ADDRESS_MAP_END
 
-static MACHINE_RESET( whitestar )
+void whitestar_state::machine_reset()
 {
-	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("user1")->base());
-	machine.root_device().membank("dmd_bank1")->set_base(machine.root_device().memregion("dmdcpu")->base());
+	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("user1")->base());
+	machine().root_device().membank("dmd_bank1")->set_base(machine().root_device().memregion("dmdcpu")->base());
 }
 
 DRIVER_INIT_MEMBER(whitestar_state,whitestar)
@@ -255,14 +257,14 @@ static const mc6845_interface whitestar_crtc6845_interface =
 	NULL
 };
 
-static PALETTE_INIT( whitestar )
+void whitestar_state::palette_init()
 {
-	palette_set_color(machine, 0, MAKE_RGB(0, 0, 0));
+	palette_set_color(machine(), 0, MAKE_RGB(0, 0, 0));
 
-	palette_set_color(machine, 1, MAKE_RGB(20, 20, 20));
-	palette_set_color(machine, 2, MAKE_RGB(84, 73, 10));
-	palette_set_color(machine, 3, MAKE_RGB(168, 147, 21));
-	palette_set_color(machine, 4, MAKE_RGB(255, 224, 32));
+	palette_set_color(machine(), 1, MAKE_RGB(20, 20, 20));
+	palette_set_color(machine(), 2, MAKE_RGB(84, 73, 10));
+	palette_set_color(machine(), 3, MAKE_RGB(168, 147, 21));
+	palette_set_color(machine(), 4, MAKE_RGB(255, 224, 32));
 }
 
 static MACHINE_CONFIG_START( whitestar, whitestar_state )
@@ -275,7 +277,6 @@ static MACHINE_CONFIG_START( whitestar, whitestar_state )
 	MCFG_CPU_PROGRAM_MAP(whitestar_dmd_map)
 	MCFG_CPU_PERIODIC_INT(whitestar_firq_interrupt, 80) // value taken from PinMAME
 
-	MCFG_MACHINE_RESET( whitestar )
 
 	/* sound hardware */
 	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
@@ -286,7 +287,6 @@ static MACHINE_CONFIG_START( whitestar, whitestar_state )
     MCFG_DMD_ADD("screen", 128, 32)
 
     MCFG_PALETTE_LENGTH(5)
-    MCFG_PALETTE_INIT(whitestar)
 MACHINE_CONFIG_END
 
 // 8Mbit ROMs are mapped oddly: the first 4Mbit of each of the ROMs goes in order u17, u21, u36, u37

@@ -60,6 +60,8 @@ public:
 	DECLARE_READ32_MEMBER(int_r);
 	DECLARE_WRITE32_MEMBER(int_w);
 	DECLARE_DRIVER_INIT(ip204415);
+	virtual void machine_start();
+	virtual void video_start();
 };
 
 
@@ -78,7 +80,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, c
 	}
 }
 
-static VIDEO_START( ip204415 )
+void ip20_state::video_start()
 {
 }
 
@@ -551,22 +553,21 @@ static TIMER_CALLBACK(ip20_timer)
 	machine.scheduler().timer_set(attotime::from_msec(1), FUNC(ip20_timer));
 }
 
-static MACHINE_START( ip204415 )
+void ip20_state::machine_start()
 {
-	ip20_state *state = machine.driver_data<ip20_state>();
 
-	sgi_mc_init(machine);
+	sgi_mc_init(machine());
 
-	state->m_HPC.nMiscStatus = 0;
-	state->m_HPC.nParBufPtr = 0;
-	state->m_HPC.nLocalIOReg0Mask = 0;
-	state->m_HPC.nLocalIOReg1Mask = 0;
-	state->m_HPC.nVMEIntMask0 = 0;
-	state->m_HPC.nVMEIntMask1 = 0;
+	m_HPC.nMiscStatus = 0;
+	m_HPC.nParBufPtr = 0;
+	m_HPC.nLocalIOReg0Mask = 0;
+	m_HPC.nLocalIOReg1Mask = 0;
+	m_HPC.nVMEIntMask0 = 0;
+	m_HPC.nVMEIntMask1 = 0;
 
-	state->m_RTC.nTemp = 0;
+	m_RTC.nTemp = 0;
 
-	machine.scheduler().timer_set(attotime::from_msec(1), FUNC(ip20_timer));
+	machine().scheduler().timer_set(attotime::from_msec(1), FUNC(ip20_timer));
 }
 
 static INPUT_PORTS_START( ip204415 )
@@ -585,7 +586,6 @@ static MACHINE_CONFIG_START( ip204415, ip20_state )
 	MCFG_CPU_CONFIG( config )
 	MCFG_CPU_PROGRAM_MAP( ip204415_map)
 
-	MCFG_MACHINE_START( ip204415 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -597,7 +597,6 @@ static MACHINE_CONFIG_START( ip204415, ip20_state )
 
 	MCFG_PALETTE_LENGTH(65536)
 
-	MCFG_VIDEO_START( ip204415 )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

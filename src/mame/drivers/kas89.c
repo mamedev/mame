@@ -226,6 +226,8 @@ public:
 	DECLARE_WRITE8_MEMBER(led_mux_data_w);
 	DECLARE_WRITE8_MEMBER(led_mux_select_w);
 	DECLARE_DRIVER_INIT(kas89);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 #define VDP_MEM             0x40000
@@ -254,20 +256,18 @@ static TIMER_DEVICE_CALLBACK( kas89_interrupt )
 *       Machine Start & Reset        *
 *************************************/
 
-static MACHINE_START( kas89 )
+void kas89_state::machine_start()
 {
-	kas89_state *state = machine.driver_data<kas89_state>();
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	output_set_lamp_value(37, 0);	/* turning off the operator led */
 }
 
-static MACHINE_RESET(kas89)
+void kas89_state::machine_reset()
 {
-	kas89_state *state = machine.driver_data<kas89_state>();
 
-	state->m_main_nmi_enable = 0;
+	m_main_nmi_enable = 0;
 }
 
 
@@ -787,8 +787,6 @@ static MACHINE_CONFIG_START( kas89, kas89_state )
 	MCFG_CPU_IO_MAP(audio_io)
 	MCFG_TIMER_ADD_PERIODIC("kas89_snmi", kas89_sound_nmi_cb, attotime::from_hz(138)) /* Connected to a 138Hz osc.*/
 
-	MCFG_MACHINE_START(kas89)
-	MCFG_MACHINE_RESET(kas89)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

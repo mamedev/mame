@@ -359,31 +359,28 @@ WRITE8_MEMBER ( mbee_state::m6545_data_w )
 
 ************************************************************/
 
-VIDEO_START( mbee )
+VIDEO_START_MEMBER(mbee_state,mbee)
 {
-	mbee_state *state = machine.driver_data<mbee_state>();
-	state->m_p_videoram = machine.root_device().memregion("videoram")->base();
-	state->m_p_gfxram = state->memregion("gfx")->base()+0x1000;
-	state->m_is_premium = 0;
+	m_p_videoram = machine().root_device().memregion("videoram")->base();
+	m_p_gfxram = memregion("gfx")->base()+0x1000;
+	m_is_premium = 0;
 }
 
-VIDEO_START( mbeeic )
+VIDEO_START_MEMBER(mbee_state,mbeeic)
 {
-	mbee_state *state = machine.driver_data<mbee_state>();
-	state->m_p_videoram = machine.root_device().memregion("videoram")->base();
-	state->m_p_colorram = machine.root_device().memregion("colorram")->base();
-	state->m_p_gfxram = state->memregion("gfx")->base()+0x1000;
-	state->m_is_premium = 0;
+	m_p_videoram = machine().root_device().memregion("videoram")->base();
+	m_p_colorram = machine().root_device().memregion("colorram")->base();
+	m_p_gfxram = memregion("gfx")->base()+0x1000;
+	m_is_premium = 0;
 }
 
-VIDEO_START( mbeeppc )
+VIDEO_START_MEMBER(mbee_state,mbeeppc)
 {
-	mbee_state *state = machine.driver_data<mbee_state>();
-	state->m_p_videoram = machine.root_device().memregion("videoram")->base();
-	state->m_p_colorram = machine.root_device().memregion("colorram")->base();
-	state->m_p_gfxram = machine.root_device().memregion("gfx")->base()+0x1000;
-	state->m_p_attribram = state->memregion("attrib")->base();
-	state->m_is_premium = 1;
+	m_p_videoram = machine().root_device().memregion("videoram")->base();
+	m_p_colorram = machine().root_device().memregion("colorram")->base();
+	m_p_gfxram = machine().root_device().memregion("gfx")->base()+0x1000;
+	m_p_attribram = memregion("attrib")->base();
+	m_is_premium = 1;
 }
 
 SCREEN_UPDATE_RGB32( mbee )
@@ -554,9 +551,9 @@ MC6845_UPDATE_ROW( mbeeppc_update_row )
 
 ************************************************************/
 
-PALETTE_INIT( mbeeic )
+PALETTE_INIT_MEMBER(mbee_state,mbeeic)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	UINT16 i;
 	UINT8 r, b, g, k;
 	UINT8 level[] = { 0, 0x80, 0xff, 0xff };	/* off, half, full intensity */
@@ -567,7 +564,7 @@ PALETTE_INIT( mbeeic )
 		r = level[((i>>0)&1)|((i>>2)&2)];
 		g = level[((i>>1)&1)|((i>>3)&2)];
 		b = level[((i>>2)&1)|((i>>4)&2)];
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 
 	/* set up foreground palette (64-95) by reading the prom */
@@ -577,14 +574,14 @@ PALETTE_INIT( mbeeic )
 		r = level[((k>>2)&1)|((k>>4)&2)];
 		g = level[((k>>1)&1)|((k>>3)&2)];
 		b = level[((k>>0)&1)|((k>>2)&2)];
-		palette_set_color(machine, i|64, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i|64, MAKE_RGB(r, g, b));
 	}
 }
 
 
-PALETTE_INIT( mbeepc85b )
+PALETTE_INIT_MEMBER(mbee_state,mbeepc85b)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	UINT16 i;
 	UINT8 r, b, g, k;
 	UINT8 level[] = { 0, 0x80, 0x80, 0xff };	/* off, half, full intensity */
@@ -595,7 +592,7 @@ PALETTE_INIT( mbeepc85b )
 		r = level[((i>>0)&1)|((i>>2)&2)];
 		g = level[((i>>1)&1)|((i>>3)&2)];
 		b = level[((i>>2)&1)|((i>>4)&2)];
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 
 	level[2] = 0xff;
@@ -607,12 +604,12 @@ PALETTE_INIT( mbeepc85b )
 		r = level[((k>>2)&1)|((k>>4)&2)];
 		g = level[((k>>1)&1)|((k>>3)&2)];
 		b = level[((k>>0)&1)|((k>>2)&2)];
-		palette_set_color(machine, i|64, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i|64, MAKE_RGB(r, g, b));
 	}
 }
 
 
-PALETTE_INIT( mbeeppc )
+PALETTE_INIT_MEMBER(mbee_state,mbeeppc)
 {
 	UINT16 i;
 	UINT8 r, b, g;
@@ -623,7 +620,7 @@ PALETTE_INIT( mbeeppc )
 		r = (i & 1) ? 0xc0 : 0;
 		g = (i & 2) ? 0xc0 : 0;
 		b = (i & 4) ? 0xc0 : 0;
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 
 	/* set up 8 high intensity colours */
@@ -632,7 +629,7 @@ PALETTE_INIT( mbeeppc )
 		r = (i & 1) ? 0xff : 0;
 		g = (i & 2) ? 0xff : 0;
 		b = (i & 4) ? 0xff : 0;
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 

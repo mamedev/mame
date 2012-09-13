@@ -45,6 +45,7 @@ public:
 	DECLARE_DRIVER_INIT(policetr);
 	DECLARE_DRIVER_INIT(sshooter);
 	DECLARE_DRIVER_INIT(plctr13b);
+	virtual void video_start();
 };
 
 
@@ -52,5 +53,5 @@ public:
 
 
 
-VIDEO_START( policetr );
+
 SCREEN_UPDATE_IND16( policetr );

@@ -194,37 +194,35 @@ WRITE8_MEMBER(ajax_state::ajax_bankswitch_2_w)
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
-MACHINE_START( ajax )
+void ajax_state::machine_start()
 {
-	ajax_state *state = machine.driver_data<ajax_state>();
-	UINT8 *MAIN = state->memregion("maincpu")->base();
-	UINT8 *SUB  = state->memregion("sub")->base();
+	UINT8 *MAIN = memregion("maincpu")->base();
+	UINT8 *SUB  = memregion("sub")->base();
 
-	state->membank("bank1")->configure_entries(0,  9,  &SUB[0x10000], 0x2000);
-	state->membank("bank2")->configure_entries(0, 12, &MAIN[0x10000], 0x2000);
+	membank("bank1")->configure_entries(0,  9,  &SUB[0x10000], 0x2000);
+	membank("bank2")->configure_entries(0, 12, &MAIN[0x10000], 0x2000);
 
-	state->membank("bank1")->set_entry(0);
-	state->membank("bank2")->set_entry(0);
+	membank("bank1")->set_entry(0);
+	membank("bank2")->set_entry(0);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_subcpu = machine.device<cpu_device>("sub");
-	state->m_k007232_1 = machine.device("k007232_1");
-	state->m_k007232_2 = machine.device("k007232_2");
-	state->m_k052109 = machine.device("k052109");
-	state->m_k051960 = machine.device("k051960");
-	state->m_k051316 = machine.device("k051316");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_subcpu = machine().device<cpu_device>("sub");
+	m_k007232_1 = machine().device("k007232_1");
+	m_k007232_2 = machine().device("k007232_2");
+	m_k052109 = machine().device("k052109");
+	m_k051960 = machine().device("k051960");
+	m_k051316 = machine().device("k051316");
 
-	state->save_item(NAME(state->m_priority));
-	state->save_item(NAME(state->m_firq_enable));
+	save_item(NAME(m_priority));
+	save_item(NAME(m_firq_enable));
 }
 
-MACHINE_RESET( ajax )
+void ajax_state::machine_reset()
 {
-	ajax_state *state = machine.driver_data<ajax_state>();
 
-	state->m_priority = 0;
-	state->m_firq_enable = 0;
+	m_priority = 0;
+	m_firq_enable = 0;
 }
 
 INTERRUPT_GEN( ajax_interrupt )

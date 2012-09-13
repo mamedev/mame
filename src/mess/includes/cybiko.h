@@ -79,6 +79,13 @@ public:
 	DECLARE_DRIVER_INIT(cybikoxt);
 	DECLARE_DRIVER_INIT(cybikov1);
 	DECLARE_DRIVER_INIT(cybikov2);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void palette_init();
+	DECLARE_MACHINE_START(cybikov2);
+	DECLARE_MACHINE_RESET(cybikov2);
+	DECLARE_MACHINE_START(cybikoxt);
+	DECLARE_MACHINE_RESET(cybikoxt);
 };
 
 
@@ -87,14 +94,14 @@ public:
 // driver init
 
 // machine start
-MACHINE_START( cybikov1 );
-MACHINE_START( cybikov2 );
-MACHINE_START( cybikoxt );
+
+
+
 
 // machine reset
-MACHINE_RESET( cybikov1 );
-MACHINE_RESET( cybikov2 );
-MACHINE_RESET( cybikoxt );
+
+
+
 
 
 #endif /* CYBIKO_H_ */

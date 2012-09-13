@@ -874,17 +874,16 @@ static TIMER_CALLBACK( cpu3_interrupt_callback )
 }
 
 
-static MACHINE_START( galaga )
+MACHINE_START_MEMBER(galaga_state,galaga)
 {
-	galaga_state *state = machine.driver_data<galaga_state>();
 
 	/* create the interrupt timer */
-	state->m_cpu3_interrupt_timer = machine.scheduler().timer_alloc(FUNC(cpu3_interrupt_callback));
-	state->m_custom_mod = 0;
-	state_save_register_global(machine, state->m_custom_mod);
-	state->save_item(NAME(state->m_main_irq_mask));
-	state->save_item(NAME(state->m_sub_irq_mask));
-	state->save_item(NAME(state->m_sub2_nmi_mask));
+	m_cpu3_interrupt_timer = machine().scheduler().timer_alloc(FUNC(cpu3_interrupt_callback));
+	m_custom_mod = 0;
+	state_save_register_global(machine(), m_custom_mod);
+	save_item(NAME(m_main_irq_mask));
+	save_item(NAME(m_sub_irq_mask));
+	save_item(NAME(m_sub2_nmi_mask));
 }
 
 static void bosco_latch_reset(running_machine &machine)
@@ -898,20 +897,19 @@ static void bosco_latch_reset(running_machine &machine)
 		state->bosco_latch_w(*space,i,0);
 }
 
-static MACHINE_RESET( galaga )
+MACHINE_RESET_MEMBER(galaga_state,galaga)
 {
-	galaga_state *state = machine.driver_data<galaga_state>();
 
 	/* Reset all latches */
-	bosco_latch_reset(machine);
+	bosco_latch_reset(machine());
 
-	state->m_cpu3_interrupt_timer->adjust(machine.primary_screen->time_until_pos(64), 64);
+	m_cpu3_interrupt_timer->adjust(machine().primary_screen->time_until_pos(64), 64);
 }
 
-static MACHINE_RESET( battles )
+MACHINE_RESET_MEMBER(xevious_state,battles)
 {
-	MACHINE_RESET_CALL(galaga);
-	battles_customio_init(machine);
+	MACHINE_RESET_CALL_MEMBER(galaga);
+	battles_customio_init(machine());
 }
 
 
@@ -1696,8 +1694,8 @@ static MACHINE_CONFIG_START( bosco, bosco_state )
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MCFG_MACHINE_START(galaga)
-	MCFG_MACHINE_RESET(galaga)
+	MCFG_MACHINE_START_OVERRIDE(bosco_state,galaga)
+	MCFG_MACHINE_RESET_OVERRIDE(bosco_state,galaga)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1708,8 +1706,8 @@ static MACHINE_CONFIG_START( bosco, bosco_state )
 	MCFG_GFXDECODE(bosco)
 	MCFG_PALETTE_LENGTH(64*4+64*4+4+64)
 
-	MCFG_PALETTE_INIT(bosco)
-	MCFG_VIDEO_START(bosco)
+	MCFG_PALETTE_INIT_OVERRIDE(bosco_state,bosco)
+	MCFG_VIDEO_START_OVERRIDE(bosco_state,bosco)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1752,8 +1750,8 @@ static MACHINE_CONFIG_START( galaga, galaga_state )
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MCFG_MACHINE_START(galaga)
-	MCFG_MACHINE_RESET(galaga)
+	MCFG_MACHINE_START_OVERRIDE(bosco_state,galaga)
+	MCFG_MACHINE_RESET_OVERRIDE(bosco_state,galaga)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1764,8 +1762,8 @@ static MACHINE_CONFIG_START( galaga, galaga_state )
 	MCFG_GFXDECODE(galaga)
 	MCFG_PALETTE_LENGTH(64*4+64*4+64)
 
-	MCFG_PALETTE_INIT(galaga)
-	MCFG_VIDEO_START(galaga)
+	MCFG_PALETTE_INIT_OVERRIDE(bosco_state,galaga)
+	MCFG_VIDEO_START_OVERRIDE(bosco_state,galaga)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1830,8 +1828,8 @@ static MACHINE_CONFIG_START( xevious, xevious_state )
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))	/* 1000 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MCFG_MACHINE_START(galaga)
-	MCFG_MACHINE_RESET(galaga)
+	MCFG_MACHINE_START_OVERRIDE(galaga_state,galaga)
+	MCFG_MACHINE_RESET_OVERRIDE(galaga_state,galaga)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1841,8 +1839,8 @@ static MACHINE_CONFIG_START( xevious, xevious_state )
 	MCFG_GFXDECODE(xevious)
 	MCFG_PALETTE_LENGTH(128*4+64*8+64*2)
 
-	MCFG_PALETTE_INIT(xevious)
-	MCFG_VIDEO_START(xevious)
+	MCFG_PALETTE_INIT_OVERRIDE(xevious_state,xevious)
+	MCFG_VIDEO_START_OVERRIDE(xevious_state,xevious)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1879,10 +1877,10 @@ static MACHINE_CONFIG_DERIVED( battles, xevious )
 
 	MCFG_TIMER_ADD("battles_nmi", battles_nmi_generate)
 
-	MCFG_MACHINE_RESET(battles)
+	MCFG_MACHINE_RESET_OVERRIDE(xevious_state,battles)
 
 	/* video hardware */
-	MCFG_PALETTE_INIT(battles)
+	MCFG_PALETTE_INIT_OVERRIDE(xevious_state,battles)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("discrete")
@@ -1917,8 +1915,8 @@ static MACHINE_CONFIG_START( digdug, digdug_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MCFG_MACHINE_START(galaga)
-	MCFG_MACHINE_RESET(galaga)
+	MCFG_MACHINE_START_OVERRIDE(galaga_state,galaga)
+	MCFG_MACHINE_RESET_OVERRIDE(galaga_state,galaga)
 
 	MCFG_ATARIVGEAROM_ADD("earom")
 
@@ -1930,8 +1928,8 @@ static MACHINE_CONFIG_START( digdug, digdug_state )
 	MCFG_GFXDECODE(digdug)
 	MCFG_PALETTE_LENGTH(16*2+64*4+64*4)
 
-	MCFG_PALETTE_INIT(digdug)
-	MCFG_VIDEO_START(digdug)
+	MCFG_PALETTE_INIT_OVERRIDE(digdug_state,digdug)
+	MCFG_VIDEO_START_OVERRIDE(digdug_state,digdug)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

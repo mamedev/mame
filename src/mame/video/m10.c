@@ -98,30 +98,28 @@ INLINE void plot_pixel_m10( running_machine &machine, bitmap_ind16 &bm, int x, i
 				(IREMM10_HBSTART - 1) - (x - IREMM10_HBEND)) = col; // only when flip_screen(?)
 }
 
-VIDEO_START( m10 )
+VIDEO_START_MEMBER(m10_state,m10)
 {
-	m10_state *state = machine.driver_data<m10_state>();
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),state), tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),state), 8, 8, 32, 32);
-	state->m_tx_tilemap->set_transparent_pen(0);
-	state->m_tx_tilemap->set_scrolldx(0, 62);
-	state->m_tx_tilemap->set_scrolldy(0, 0);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),this), tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),this), 8, 8, 32, 32);
+	m_tx_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_scrolldx(0, 62);
+	m_tx_tilemap->set_scrolldy(0, 0);
 
-	state->m_back_gfx = auto_alloc(machine, gfx_element(machine, backlayout, state->m_chargen, 8, 0));
+	m_back_gfx = auto_alloc(machine(), gfx_element(machine(), backlayout, m_chargen, 8, 0));
 
-	machine.gfx[1] = state->m_back_gfx;
+	machine().gfx[1] = m_back_gfx;
 	return ;
 }
 
-VIDEO_START( m15 )
+VIDEO_START_MEMBER(m10_state,m15)
 {
-	m10_state *state = machine.driver_data<m10_state>();
 
-	machine.gfx[0] = auto_alloc(machine, gfx_element(machine, charlayout, state->m_chargen, 8, 0));
+	machine().gfx[0] = auto_alloc(machine(), gfx_element(machine(), charlayout, m_chargen, 8, 0));
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),state),tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),state), 8, 8, 32, 32);
-	state->m_tx_tilemap->set_scrolldx(0, 116);
-	state->m_tx_tilemap->set_scrolldy(0, 0);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),this),tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),this), 8, 8, 32, 32);
+	m_tx_tilemap->set_scrolldx(0, 116);
+	m_tx_tilemap->set_scrolldy(0, 0);
 
 	return ;
 }

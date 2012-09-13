@@ -670,40 +670,38 @@ static const tc0140syt_interface othunder_tc0140syt_intf =
 	"maincpu", "audiocpu"
 };
 
-static MACHINE_START( othunder )
+void othunder_state::machine_start()
 {
-	othunder_state *state = machine.driver_data<othunder_state>();
 
-	state->membank("bank10")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0xc000, 0x4000);
+	membank("bank10")->configure_entries(0, 4, memregion("audiocpu")->base() + 0xc000, 0x4000);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_eeprom = machine.device<eeprom_device>("eeprom");
-	state->m_tc0220ioc = machine.device("tc0220ioc");
-	state->m_tc0100scn = machine.device("tc0100scn");
-	state->m_tc0110pcr = machine.device("tc0110pcr");
-	state->m_tc0140syt = machine.device("tc0140syt");
-	state->m_2610_0l = machine.device("2610.0l");
-	state->m_2610_0r = machine.device("2610.0r");
-	state->m_2610_1l = machine.device("2610.1l");
-	state->m_2610_1r = machine.device("2610.1r");
-	state->m_2610_2l = machine.device("2610.2l");
-	state->m_2610_2r = machine.device("2610.2r");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_eeprom = machine().device<eeprom_device>("eeprom");
+	m_tc0220ioc = machine().device("tc0220ioc");
+	m_tc0100scn = machine().device("tc0100scn");
+	m_tc0110pcr = machine().device("tc0110pcr");
+	m_tc0140syt = machine().device("tc0140syt");
+	m_2610_0l = machine().device("2610.0l");
+	m_2610_0r = machine().device("2610.0r");
+	m_2610_1l = machine().device("2610.1l");
+	m_2610_1r = machine().device("2610.1r");
+	m_2610_2l = machine().device("2610.2l");
+	m_2610_2r = machine().device("2610.2r");
 
-	state->save_item(NAME(state->m_vblank_irq));
-	state->save_item(NAME(state->m_ad_irq));
-	state->save_item(NAME(state->m_banknum));
-	state->save_item(NAME(state->m_pan));
-	machine.save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine));
+	save_item(NAME(m_vblank_irq));
+	save_item(NAME(m_ad_irq));
+	save_item(NAME(m_banknum));
+	save_item(NAME(m_pan));
+	machine().save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine()));
 }
 
-static MACHINE_RESET( othunder )
+void othunder_state::machine_reset()
 {
-	othunder_state *state = machine.driver_data<othunder_state>();
 
-	state->m_vblank_irq = 0;
-	state->m_ad_irq = 0;
-	state->m_banknum = 0;
+	m_vblank_irq = 0;
+	m_ad_irq = 0;
+	m_banknum = 0;
 }
 
 static MACHINE_CONFIG_START( othunder, othunder_state )
@@ -719,8 +717,6 @@ static MACHINE_CONFIG_START( othunder, othunder_state )
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
-	MCFG_MACHINE_START(othunder)
-	MCFG_MACHINE_RESET(othunder)
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", othunder_io_intf)
 
@@ -735,7 +731,6 @@ static MACHINE_CONFIG_START( othunder, othunder_state )
 	MCFG_GFXDECODE(othunder)
 	MCFG_PALETTE_LENGTH(4096)
 
-	MCFG_VIDEO_START(othunder)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", othunder_tc0100scn_intf)
 	MCFG_TC0110PCR_ADD("tc0110pcr", othunder_tc0110pcr_intf)

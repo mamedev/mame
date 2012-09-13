@@ -416,76 +416,74 @@ static const msm5232_interface msm5232_config =
 	{ 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6 }	/* 0.65 (???) uF capacitors */
 };
 
-static MACHINE_START( bigevglf )
+void bigevglf_state::machine_start()
 {
-	bigevglf_state *state = machine.driver_data<bigevglf_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_mcu = machine.device("mcu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_mcu = machine().device("mcu");
 
-	state->save_item(NAME(state->m_vidram_bank));
-	state->save_item(NAME(state->m_plane_selected));
-	state->save_item(NAME(state->m_plane_visible));
+	save_item(NAME(m_vidram_bank));
+	save_item(NAME(m_plane_selected));
+	save_item(NAME(m_plane_visible));
 
-	state->save_item(NAME(state->m_beg13_ls74));
-	state->save_item(NAME(state->m_beg_bank));
-	state->save_item(NAME(state->m_port_select));
+	save_item(NAME(m_beg13_ls74));
+	save_item(NAME(m_beg_bank));
+	save_item(NAME(m_port_select));
 
-	state->save_item(NAME(state->m_sound_nmi_enable));
-	state->save_item(NAME(state->m_pending_nmi));
-	state->save_item(NAME(state->m_for_sound));
-	state->save_item(NAME(state->m_from_sound));
-	state->save_item(NAME(state->m_sound_state));
+	save_item(NAME(m_sound_nmi_enable));
+	save_item(NAME(m_pending_nmi));
+	save_item(NAME(m_for_sound));
+	save_item(NAME(m_from_sound));
+	save_item(NAME(m_sound_state));
 
-	state->save_item(NAME(state->m_main_sent));
-	state->save_item(NAME(state->m_mcu_sent));
-	state->save_item(NAME(state->m_mcu_coin_bit5));
+	save_item(NAME(m_main_sent));
+	save_item(NAME(m_mcu_sent));
+	save_item(NAME(m_mcu_coin_bit5));
 
-	state->save_item(NAME(state->m_port_a_in));
-	state->save_item(NAME(state->m_port_a_out));
-	state->save_item(NAME(state->m_ddr_a));
-	state->save_item(NAME(state->m_port_b_in));
-	state->save_item(NAME(state->m_port_b_out));
-	state->save_item(NAME(state->m_ddr_b));
-	state->save_item(NAME(state->m_port_c_in));
-	state->save_item(NAME(state->m_port_c_out));
-	state->save_item(NAME(state->m_ddr_c));
-	state->save_item(NAME(state->m_from_mcu));
+	save_item(NAME(m_port_a_in));
+	save_item(NAME(m_port_a_out));
+	save_item(NAME(m_ddr_a));
+	save_item(NAME(m_port_b_in));
+	save_item(NAME(m_port_b_out));
+	save_item(NAME(m_ddr_b));
+	save_item(NAME(m_port_c_in));
+	save_item(NAME(m_port_c_out));
+	save_item(NAME(m_ddr_c));
+	save_item(NAME(m_from_mcu));
 }
 
-static MACHINE_RESET( bigevglf )
+void bigevglf_state::machine_reset()
 {
-	bigevglf_state *state = machine.driver_data<bigevglf_state>();
 
-	state->m_vidram_bank = 0;
-	state->m_plane_selected = 0;
-	state->m_plane_visible = 0;
+	m_vidram_bank = 0;
+	m_plane_selected = 0;
+	m_plane_visible = 0;
 
-	state->m_beg13_ls74[0] = 0;
-	state->m_beg13_ls74[1] = 0;
-	state->m_beg_bank = 0;
-	state->m_port_select = 0;
+	m_beg13_ls74[0] = 0;
+	m_beg13_ls74[1] = 0;
+	m_beg_bank = 0;
+	m_port_select = 0;
 
-	state->m_sound_nmi_enable = 0;
-	state->m_pending_nmi = 0;
-	state->m_for_sound = 0;
-	state->m_from_sound = 0;
-	state->m_sound_state = 0;
+	m_sound_nmi_enable = 0;
+	m_pending_nmi = 0;
+	m_for_sound = 0;
+	m_from_sound = 0;
+	m_sound_state = 0;
 
-	state->m_main_sent = 0;
-	state->m_mcu_sent = 0;
-	state->m_mcu_coin_bit5 = 0;
+	m_main_sent = 0;
+	m_mcu_sent = 0;
+	m_mcu_coin_bit5 = 0;
 
-	state->m_port_a_in = 0;
-	state->m_port_a_out = 0;
-	state->m_ddr_a = 0;
-	state->m_port_b_in = 0;
-	state->m_port_b_out = 0;
-	state->m_ddr_b = 0;
-	state->m_port_c_in = 0;
-	state->m_port_c_out = 0;
-	state->m_ddr_c = 0;
-	state->m_from_mcu = 0;
+	m_port_a_in = 0;
+	m_port_a_out = 0;
+	m_ddr_a = 0;
+	m_port_b_in = 0;
+	m_port_b_out = 0;
+	m_ddr_b = 0;
+	m_port_c_in = 0;
+	m_port_c_out = 0;
+	m_ddr_c = 0;
+	m_from_mcu = 0;
 }
 
 
@@ -513,8 +511,6 @@ static MACHINE_CONFIG_START( bigevglf, bigevglf_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - interleaving is forced on the fly */
 
-	MCFG_MACHINE_START(bigevglf)
-	MCFG_MACHINE_RESET(bigevglf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -526,7 +522,6 @@ static MACHINE_CONFIG_START( bigevglf, bigevglf_state )
 
 	MCFG_GFXDECODE(bigevglf)
 	MCFG_PALETTE_LENGTH(0x800)
-	MCFG_VIDEO_START(bigevglf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

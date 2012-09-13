@@ -19,32 +19,30 @@
 /***************************************************************************
   Start the video hardware emulation.
 ***************************************************************************/
-VIDEO_START( spectrum )
+VIDEO_START_MEMBER(spectrum_state,spectrum)
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
-	state->m_LastDisplayedBorderColor = -1;
-	state->m_frame_invert_count = 25;
-	state->m_frame_number = 0;
-	state->m_flash_invert = 0;
+	m_LastDisplayedBorderColor = -1;
+	m_frame_invert_count = 25;
+	m_frame_number = 0;
+	m_flash_invert = 0;
 
-	spectrum_EventList_Initialise(machine, 30000);
+	spectrum_EventList_Initialise(machine(), 30000);
 
-	state->m_retrace_cycles = SPEC_RETRACE_CYCLES;
+	m_retrace_cycles = SPEC_RETRACE_CYCLES;
 
-	state->m_screen_location = state->m_video_ram;
+	m_screen_location = m_video_ram;
 }
 
-VIDEO_START( spectrum_128 )
+VIDEO_START_MEMBER(spectrum_state,spectrum_128)
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
-	state->m_LastDisplayedBorderColor = -1;
-	state->m_frame_invert_count = 25;
-	state->m_frame_number = 0;
-	state->m_flash_invert = 0;
+	m_LastDisplayedBorderColor = -1;
+	m_frame_invert_count = 25;
+	m_frame_number = 0;
+	m_flash_invert = 0;
 
-	spectrum_EventList_Initialise(machine, 30000);
+	spectrum_EventList_Initialise(machine(), 30000);
 
-	state->m_retrace_cycles = SPEC128_RETRACE_CYCLES;
+	m_retrace_cycles = SPEC128_RETRACE_CYCLES;
 }
 
 
@@ -191,9 +189,9 @@ static const rgb_t spectrum_palette[16] = {
 	MAKE_RGB(0xff, 0xff, 0xff)
 };
 /* Initialise the palette */
-PALETTE_INIT( spectrum )
+PALETTE_INIT_MEMBER(spectrum_state,spectrum)
 {
-	palette_set_colors(machine, 0, spectrum_palette, ARRAY_LENGTH(spectrum_palette));
+	palette_set_colors(machine(), 0, spectrum_palette, ARRAY_LENGTH(spectrum_palette));
 }
 
 /***************************************************************************

@@ -54,17 +54,30 @@ public:
 	DECLARE_READ16_MEMBER(ddd_053936_tilerom_2_r);
 	TILE_GET_INFO_MEMBER(get_gai_936_tile_info);
 	TILE_GET_INFO_MEMBER(get_ult_936_tile_info);
+	DECLARE_MACHINE_START(mystwarr);
+	DECLARE_MACHINE_RESET(mystwarr);
+	DECLARE_VIDEO_START(mystwarr);
+	DECLARE_MACHINE_RESET(viostorm);
+	DECLARE_VIDEO_START(viostorm);
+	DECLARE_MACHINE_RESET(metamrph);
+	DECLARE_VIDEO_START(metamrph);
+	DECLARE_MACHINE_RESET(dadandrn);
+	DECLARE_VIDEO_START(dadandrn);
+	DECLARE_MACHINE_RESET(gaiapols);
+	DECLARE_VIDEO_START(gaiapols);
+	DECLARE_MACHINE_RESET(martchmp);
+	DECLARE_VIDEO_START(martchmp);
 };
 
 
 /*----------- defined in video/mystwarr.c -----------*/
 
-VIDEO_START( gaiapols );
-VIDEO_START( dadandrn );
-VIDEO_START( viostorm );
-VIDEO_START( metamrph );
-VIDEO_START( martchmp );
-VIDEO_START( mystwarr );
+
+
+
+
+
+
 SCREEN_UPDATE_RGB32( dadandrn );
 SCREEN_UPDATE_RGB32( mystwarr );
 SCREEN_UPDATE_RGB32( metamrph );

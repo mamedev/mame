@@ -1514,24 +1514,22 @@ static const ym2151_interface ym2151_config =
 };
 
 
-static MACHINE_RESET (semiprot)
+MACHINE_RESET_MEMBER(snowbros_state,semiprot)
 {
-	snowbros_state *state = machine.driver_data<snowbros_state>();
-	UINT16 *PROTDATA = (UINT16*)state->memregion("user1")->base();
+	UINT16 *PROTDATA = (UINT16*)memregion("user1")->base();
 	int i;
 
 	for (i = 0;i < 0x200/2;i++)
-		state->m_hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
+		m_hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
 }
 
-static MACHINE_RESET (finalttr)
+MACHINE_RESET_MEMBER(snowbros_state,finalttr)
 {
-	snowbros_state *state = machine.driver_data<snowbros_state>();
-	UINT16 *PROTDATA = (UINT16*)state->memregion("user1")->base();
+	UINT16 *PROTDATA = (UINT16*)memregion("user1")->base();
 	int i;
 
 	for (i = 0;i < 0x200/2;i++)
-		state->m_hyperpac_ram[0x2000/2 + i] = PROTDATA[i];
+		m_hyperpac_ram[0x2000/2 + i] = PROTDATA[i];
 }
 
 static const kaneko_pandora_interface snowbros_pandora_config =
@@ -1628,7 +1626,7 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( semiprot, semicom )
-	MCFG_MACHINE_RESET ( semiprot )
+	MCFG_MACHINE_RESET_OVERRIDE (snowbros_state, semiprot )
 MACHINE_CONFIG_END
 
 /*
@@ -1746,7 +1744,7 @@ static MACHINE_CONFIG_DERIVED( finalttr, semicom )
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_CLOCK(3578545)
 
-	MCFG_MACHINE_RESET ( finalttr )
+	MCFG_MACHINE_RESET_OVERRIDE (snowbros_state, finalttr )
 
 	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_CONFIG(ym2151_config)

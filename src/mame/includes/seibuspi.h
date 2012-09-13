@@ -106,6 +106,13 @@ public:
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
+	DECLARE_MACHINE_START(spi);
+	DECLARE_MACHINE_RESET(spi);
+	DECLARE_VIDEO_START(spi);
+	DECLARE_MACHINE_RESET(seibu386);
+	DECLARE_VIDEO_START(sys386f2);
+	DECLARE_MACHINE_START(sxx2f);
+	DECLARE_MACHINE_RESET(sxx2f);
 };
 
 
@@ -116,10 +123,10 @@ void seibuspi_sprite_decrypt(UINT8 *src, int romsize);
 
 /*----------- defined in video/seibuspi.c -----------*/
 
-VIDEO_START( spi );
+
 SCREEN_UPDATE_RGB32( spi );
 
-VIDEO_START( sys386f2 );
+
 SCREEN_UPDATE_RGB32( sys386f2 );
 
 

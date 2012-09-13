@@ -188,8 +188,6 @@ static MACHINE_CONFIG_START( suprloco, suprloco_state )
 	MCFG_GFXDECODE(suprloco)
 	MCFG_PALETTE_LENGTH(512+256)
 
-	MCFG_PALETTE_INIT(suprloco)
-	MCFG_VIDEO_START(suprloco)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -215,6 +215,8 @@ public:
 	DECLARE_READ16_MEMBER(scc68070_mmu_r);
 	DECLARE_WRITE16_MEMBER(scc68070_mmu_w);
 	DECLARE_DRIVER_INIT(magicard);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -405,7 +407,7 @@ TODO: check this register,doesn't seem to be 100% correct.
 */
 
 
-static VIDEO_START(magicard)
+void magicard_state::video_start()
 {
 
 }
@@ -691,13 +693,12 @@ static INPUT_PORTS_START( magicard )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET( magicard )
+void magicard_state::machine_reset()
 {
-	magicard_state *state = machine.driver_data<magicard_state>();
-	UINT16 *src    = (UINT16*)state->memregion("maincpu" )->base();
-	UINT16 *dst    = state->m_magicram;
+	UINT16 *src    = (UINT16*)memregion("maincpu" )->base();
+	UINT16 *dst    = m_magicram;
 	memcpy (dst, src, 0x80000);
-	machine.device("maincpu")->reset();
+	machine().device("maincpu")->reset();
 }
 
 
@@ -728,9 +729,7 @@ static MACHINE_CONFIG_START( magicard, magicard_state )
 
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(magicard)
 
-	MCFG_MACHINE_RESET(magicard)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ymsnd", YM2413, CLOCK_A/12)

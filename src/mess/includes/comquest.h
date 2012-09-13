@@ -22,12 +22,14 @@ public:
 	int m_count;
 	DECLARE_READ8_MEMBER(comquest_read);
 	DECLARE_WRITE8_MEMBER(comquest_write);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/comquest.c -----------*/
 
-VIDEO_START( comquest );
+
 SCREEN_UPDATE_IND16( comquest );
 
 

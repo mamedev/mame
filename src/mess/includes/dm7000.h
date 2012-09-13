@@ -40,6 +40,8 @@ public:
 	UINT16			m_enet_regs[32];
 
 	UINT32			dcr[1024];
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 /* */

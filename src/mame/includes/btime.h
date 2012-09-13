@@ -98,6 +98,15 @@ public:
 	DECLARE_DRIVER_INIT(protennb);
 	DECLARE_DRIVER_INIT(disco);
 	DECLARE_DRIVER_INIT(lnc);
+	DECLARE_MACHINE_START(btime);
+	DECLARE_MACHINE_RESET(btime);
+	DECLARE_VIDEO_START(btime);
+	DECLARE_PALETTE_INIT(btime);
+	DECLARE_MACHINE_RESET(lnc);
+	DECLARE_PALETTE_INIT(lnc);
+	DECLARE_MACHINE_START(mmonkey);
+	DECLARE_MACHINE_RESET(mmonkey);
+	DECLARE_VIDEO_START(bnj);
 };
 
 
@@ -107,11 +116,11 @@ public:
 
 /*----------- defined in video/btime.c -----------*/
 
-PALETTE_INIT( btime );
-PALETTE_INIT( lnc );
 
-VIDEO_START( btime );
-VIDEO_START( bnj );
+
+
+
+
 
 SCREEN_UPDATE_IND16( btime );
 SCREEN_UPDATE_IND16( cookrace );

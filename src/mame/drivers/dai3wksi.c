@@ -65,6 +65,8 @@ public:
 	DECLARE_WRITE8_MEMBER(dai3wksi_audio_1_w);
 	DECLARE_WRITE8_MEMBER(dai3wksi_audio_2_w);
 	DECLARE_WRITE8_MEMBER(dai3wksi_audio_3_w);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -561,28 +563,26 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_START( dai3wksi )
+void dai3wksi_state::machine_start()
 {
-	dai3wksi_state *state = machine.driver_data<dai3wksi_state>();
 
 	/* Set up save state */
-	state->save_item(NAME(state->m_dai3wksi_flipscreen));
-	state->save_item(NAME(state->m_dai3wksi_redscreen));
-	state->save_item(NAME(state->m_dai3wksi_redterop));
-	state->save_item(NAME(state->m_port_last1));
-	state->save_item(NAME(state->m_port_last2));
-	state->save_item(NAME(state->m_enabled_sound));
-	state->save_item(NAME(state->m_sound3_counter));
+	save_item(NAME(m_dai3wksi_flipscreen));
+	save_item(NAME(m_dai3wksi_redscreen));
+	save_item(NAME(m_dai3wksi_redterop));
+	save_item(NAME(m_port_last1));
+	save_item(NAME(m_port_last2));
+	save_item(NAME(m_enabled_sound));
+	save_item(NAME(m_sound3_counter));
 }
 
-static MACHINE_RESET( dai3wksi )
+void dai3wksi_state::machine_reset()
 {
-	dai3wksi_state *state = machine.driver_data<dai3wksi_state>();
 
-	state->m_port_last1 = 0;
-	state->m_port_last2 = 0;
-	state->m_enabled_sound = 0;
-	state->m_sound3_counter = 0;
+	m_port_last1 = 0;
+	m_port_last2 = 0;
+	m_enabled_sound = 0;
+	m_sound3_counter = 0;
 }
 
 
@@ -593,8 +593,6 @@ static MACHINE_CONFIG_START( dai3wksi, dai3wksi_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(dai3wksi)
-	MCFG_MACHINE_RESET(dai3wksi)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

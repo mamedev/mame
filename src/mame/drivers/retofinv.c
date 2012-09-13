@@ -393,8 +393,6 @@ static MACHINE_CONFIG_START( retofinv, retofinv_state )
 	MCFG_GFXDECODE(retofinv)
 	MCFG_PALETTE_LENGTH(256*2+64*16+64*16)
 
-	MCFG_PALETTE_INIT(retofinv)
-	MCFG_VIDEO_START(retofinv)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

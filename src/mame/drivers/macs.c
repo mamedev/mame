@@ -80,10 +80,11 @@ public:
 	DECLARE_DRIVER_INIT(kisekaeh);
 	DECLARE_DRIVER_INIT(kisekaem);
 	DECLARE_DRIVER_INIT(macs2);
+	DECLARE_MACHINE_RESET(macs);
 };
 
 
-static MACHINE_RESET(macs);
+
 
 
 static ADDRESS_MAP_START( macs_mem, AS_PROGRAM, 8, macs_state )
@@ -482,7 +483,7 @@ static MACHINE_CONFIG_START( macs, macs_state )
 
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_RESET(macs)
+	MCFG_MACHINE_RESET_OVERRIDE(macs_state,macs)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -495,7 +496,7 @@ static MACHINE_CONFIG_START( macs, macs_state )
 	MCFG_GFXDECODE(macs)
 	MCFG_PALETTE_LENGTH(16*16*4+1)
 
-	MCFG_VIDEO_START(st0016)
+	MCFG_VIDEO_START_OVERRIDE(st0016_state,st0016)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -638,12 +639,11 @@ static const UINT8 ramdata[160]=
 	0xF0, 0xED, 0xB0, 0x3A, 0x0A, 0xE8, 0xE6, 0xF3, 0x32, 0x0A, 0xE8, 0xD3, 0xC0, 0xC9, 0x00, 0xF3
 };
 
-static MACHINE_RESET(macs)
+MACHINE_RESET_MEMBER(macs_state,macs)
 {
-	macs_state *state = machine.driver_data<macs_state>();
-	UINT8 *macs_ram1 = state->m_ram1;
+	UINT8 *macs_ram1 = m_ram1;
 	#if 0
-	UINT8 *macs_ram2 = state->m_ram2;
+	UINT8 *macs_ram2 = m_ram2;
 /*
         BIOS ram init:
 
@@ -672,11 +672,11 @@ static MACHINE_RESET(macs)
         730E: ED B0         ldir
         ...
 */
-		memcpy(macs_ram1 + 0x0e9f, state->memregion("user1")->base()+0x7327, 0xc7);
-		memcpy(macs_ram1 + 0x1e9f, state->memregion("user1")->base()+0x7327, 0xc7);
+		memcpy(macs_ram1 + 0x0e9f, memregion("user1")->base()+0x7327, 0xc7);
+		memcpy(macs_ram1 + 0x1e9f, memregion("user1")->base()+0x7327, 0xc7);
 
-		memcpy(macs_ram1 + 0x0800, state->memregion("user1")->base()+0x73fa, 0x507);
-		memcpy(macs_ram1 + 0x1800, state->memregion("user1")->base()+0x73fa, 0x507);
+		memcpy(macs_ram1 + 0x0800, memregion("user1")->base()+0x73fa, 0x507);
+		memcpy(macs_ram1 + 0x1800, memregion("user1")->base()+0x73fa, 0x507);
 
 #define MAKEJMP(n,m)	macs_ram2[(n) - 0xe800 + 0]=0xc3;\
 						macs_ram2[(n) - 0xe800 + 1]=(m)&0xff;\
@@ -712,10 +712,10 @@ static MACHINE_RESET(macs)
 		macs_ram1[0x1ff9]=0x07;
 		#endif
 
-		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() );
-		state->membank("bank2")->set_base(macs_ram1+0x800);
-		state->membank("bank3")->set_base(macs_ram1+0x10000);
-		state->membank("bank4")->set_base(machine.root_device().memregion("maincpu")->base() );
+		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() );
+		membank("bank2")->set_base(macs_ram1+0x800);
+		membank("bank3")->set_base(macs_ram1+0x10000);
+		membank("bank4")->set_base(machine().root_device().memregion("maincpu")->base() );
 }
 
 DRIVER_INIT_MEMBER(macs_state,macs)

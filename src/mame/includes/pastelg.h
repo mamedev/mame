@@ -32,14 +32,16 @@ public:
 	DECLARE_WRITE8_MEMBER(pastelg_romsel_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_hackbusyflag_r);
 	DECLARE_DRIVER_INIT(pastelg);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/pastelg.c -----------*/
 
-PALETTE_INIT( pastelg );
+
 SCREEN_UPDATE_IND16( pastelg );
-VIDEO_START( pastelg );
+
 
 
 int pastelg_blitter_src_addr_r(address_space *space);

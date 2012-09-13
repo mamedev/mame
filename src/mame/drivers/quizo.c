@@ -41,6 +41,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port70_w);
 	DECLARE_WRITE8_MEMBER(port60_w);
 	DECLARE_DRIVER_INIT(quizo);
+	virtual void palette_init();
 };
 
 
@@ -50,9 +51,9 @@ public:
 
 static const UINT8 rombankLookup[]={ 2, 3, 4, 4, 4, 4, 4, 5, 0, 1};
 
-static PALETTE_INIT(quizo)
+void quizo_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 	for (i = 0;i < 16;i++)
 	{
@@ -73,7 +74,7 @@ static PALETTE_INIT(quizo)
 		bit2 = (*color_prom >> 7) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -218,7 +219,6 @@ static MACHINE_CONFIG_START( quizo, quizo_state )
 	MCFG_SCREEN_UPDATE_STATIC(quizo)
 
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT(quizo)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

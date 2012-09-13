@@ -323,10 +323,10 @@ static INTERRUPT_GEN( audio_interrupt )
  *
  *************************************/
 
-static PALETTE_INIT( meadows )
+void meadows_state::palette_init()
 {
-	palette_set_color(machine, 0, RGB_BLACK);
-	palette_set_color(machine, 1, RGB_WHITE);
+	palette_set_color(machine(), 0, RGB_BLACK);
+	palette_set_color(machine(), 1, RGB_WHITE);
 }
 
 
@@ -663,8 +663,6 @@ static MACHINE_CONFIG_START( meadows, meadows_state )
 	MCFG_GFXDECODE(meadows)
 	MCFG_PALETTE_LENGTH(2)
 
-	MCFG_PALETTE_INIT(meadows)
-	MCFG_VIDEO_START(meadows)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -695,8 +693,6 @@ static MACHINE_CONFIG_START( minferno, meadows_state )
 	MCFG_GFXDECODE(minferno)
 	MCFG_PALETTE_LENGTH(2)
 
-	MCFG_PALETTE_INIT(meadows)
-	MCFG_VIDEO_START(meadows)
 
 	/* audio hardware */
 MACHINE_CONFIG_END
@@ -724,8 +720,6 @@ static MACHINE_CONFIG_START( bowl3d, meadows_state )
 	MCFG_GFXDECODE(meadows)
 	MCFG_PALETTE_LENGTH(2)
 
-	MCFG_PALETTE_INIT(meadows)
-	MCFG_VIDEO_START(meadows)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

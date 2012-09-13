@@ -107,6 +107,9 @@ public:
 	TILE_GET_INFO_MEMBER(tilemap_get_info2);
 	TILE_GET_INFO_MEMBER(tilemap_get_info3);
 	TILE_GET_INFO_MEMBER(roz_get_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 

@@ -815,40 +815,39 @@ static void cps3_set_mame_colours(running_machine &machine, int colournum, UINT1
 }
 
 
-static VIDEO_START(cps3)
+void cps3_state::video_start()
 {
-	cps3_state *state = machine.driver_data<cps3_state>();
-	state->m_ss_ram       = auto_alloc_array(machine, UINT32, 0x10000/4);
-	memset(state->m_ss_ram, 0x00, 0x10000);
-	state_save_register_global_pointer(machine, state->m_ss_ram, 0x10000/4);
+	m_ss_ram       = auto_alloc_array(machine(), UINT32, 0x10000/4);
+	memset(m_ss_ram, 0x00, 0x10000);
+	state_save_register_global_pointer(machine(), m_ss_ram, 0x10000/4);
 
-	state->m_char_ram = auto_alloc_array(machine, UINT32, 0x800000/4);
-	memset(state->m_char_ram, 0x00, 0x800000);
-	state_save_register_global_pointer(machine, state->m_char_ram, 0x800000 /4);
+	m_char_ram = auto_alloc_array(machine(), UINT32, 0x800000/4);
+	memset(m_char_ram, 0x00, 0x800000);
+	state_save_register_global_pointer(machine(), m_char_ram, 0x800000 /4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[0] = auto_alloc(machine, gfx_element(machine, cps3_tiles8x8_layout, (UINT8 *)state->m_ss_ram, machine.total_colors() / 16, 0));
+	machine().gfx[0] = auto_alloc(machine(), gfx_element(machine(), cps3_tiles8x8_layout, (UINT8 *)m_ss_ram, machine().total_colors() / 16, 0));
 
 	//decode_ssram();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[1] = auto_alloc(machine, gfx_element(machine, cps3_tiles16x16_layout, (UINT8 *)state->m_char_ram, machine.total_colors() / 64, 0));
-	machine.gfx[1]->set_granularity(64);
+	machine().gfx[1] = auto_alloc(machine(), gfx_element(machine(), cps3_tiles16x16_layout, (UINT8 *)m_char_ram, machine().total_colors() / 64, 0));
+	machine().gfx[1]->set_granularity(64);
 
 	//decode_charram();
 
-	state->m_mame_colours = auto_alloc_array(machine, UINT32, 0x80000/4);
-	memset(state->m_mame_colours, 0x00, 0x80000);
+	m_mame_colours = auto_alloc_array(machine(), UINT32, 0x80000/4);
+	memset(m_mame_colours, 0x00, 0x80000);
 
-	state->m_screenwidth = 384;
+	m_screenwidth = 384;
 
 	// the renderbuffer can be twice the size of the screen, this allows us to handle framebuffer zoom values
 	// between 0x00 and 0x80 (0x40 is normal, 0x80 would be 'view twice as much', 0x20 is 'view half as much')
-	state->m_renderbuffer_bitmap.allocate(512*2,224*2);
+	m_renderbuffer_bitmap.allocate(512*2,224*2);
 
-	state->m_renderbuffer_clip.set(0, state->m_screenwidth-1, 0, 224-1);
+	m_renderbuffer_clip.set(0, m_screenwidth-1, 0, 224-1);
 
-	state->m_renderbuffer_bitmap.fill(0x3f, state->m_renderbuffer_clip);
+	m_renderbuffer_bitmap.fill(0x3f, m_renderbuffer_clip);
 
 }
 
@@ -2267,13 +2266,12 @@ static const struct WD33C93interface wd33c93_intf =
 	NULL			/* command completion IRQ */
 };
 
-static MACHINE_RESET( cps3 )
+void cps3_state::machine_reset()
 {
-	cps3_state *state = machine.driver_data<cps3_state>();
-	state->m_current_table_address = -1;
+	m_current_table_address = -1;
 
 	// copy data from flashroms back into user regions + decrypt into regions we execute/draw from.
-	copy_from_nvram(machine);
+	copy_from_nvram(machine());
 }
 
 
@@ -2520,11 +2518,9 @@ static MACHINE_CONFIG_START( cps3, cps3_state )
          42.9545MHz / 15.4445kHz = 2781.217 / 6 = 463.536 -> unlikely
 */
 
-	MCFG_MACHINE_RESET(cps3)
 	MCFG_NVRAM_ADD_0FILL("eeprom")
 	MCFG_PALETTE_LENGTH(0x10000) // actually 0x20000 ...
 
-	MCFG_VIDEO_START(cps3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

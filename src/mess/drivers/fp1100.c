@@ -112,9 +112,12 @@ public:
 		UINT8 portb;
 		UINT8 portc;
 	}m_upd7801;
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
-static VIDEO_START( fp1100 )
+void fp1100_state::video_start()
 {
 }
 
@@ -341,23 +344,21 @@ static INPUT_PORTS_START( fp1100 )
 INPUT_PORTS_END
 
 
-static MACHINE_START(fp1100)
+void fp1100_state::machine_start()
 {
-	fp1100_state *state = machine.driver_data<fp1100_state>();
-	state->m_wram = state->memregion("wram")->base();
+	m_wram = memregion("wram")->base();
 }
 
-static MACHINE_RESET(fp1100)
+void fp1100_state::machine_reset()
 {
-	fp1100_state *state = machine.driver_data<fp1100_state>();
 	int i;
 	UINT8 slot_type;
 	const UINT8 id_type[4] = { 0xff, 0x00, 0x01, 0x04};
 
 	for(i=0;i<8;i++)
 	{
-		slot_type = (machine.root_device().ioport("SLOTS")->read() >> i*2) & 3;
-		state->m_slot[i].id = id_type[slot_type];
+		slot_type = (machine().root_device().ioport("SLOTS")->read() >> i*2) & 3;
+		m_slot[i].id = id_type[slot_type];
 	}
 }
 
@@ -413,8 +414,6 @@ static MACHINE_CONFIG_START( fp1100, fp1100_state )
 	MCFG_CPU_IO_MAP( fp1100_slave_io )
 	MCFG_CPU_CONFIG( fp1100_slave_cpu_config )
 
-	MCFG_MACHINE_START(fp1100)
-	MCFG_MACHINE_RESET(fp1100)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -422,7 +421,6 @@ static MACHINE_CONFIG_START( fp1100, fp1100_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_VIDEO_START(fp1100)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_GFXDECODE(fp1100)

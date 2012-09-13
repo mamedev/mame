@@ -444,6 +444,13 @@ public:
 protected:
 
 	virtual void video_start();
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void palette_init();
+public:
+	DECLARE_MACHINE_RESET(pc8801_clock_speed);
+	DECLARE_MACHINE_RESET(pc8801_dic);
+	DECLARE_MACHINE_RESET(pc8801_cdrom);	
 };
 
 
@@ -2416,143 +2423,138 @@ static INTERRUPT_GEN( pc8801_vrtc_irq )
 }
 #endif
 
-static MACHINE_START( pc8801 )
+void pc8801_state::machine_start()
 {
-	pc8801_state *state = machine.driver_data<pc8801_state>();
 
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(pc8801_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(pc8801_irq_callback);
 
-	state->m_rtc->cs_w(1);
-	state->m_rtc->oe_w(1);
+	m_rtc->cs_w(1);
+	m_rtc->oe_w(1);
 }
 
-static MACHINE_RESET( pc8801 )
+void pc8801_state::machine_reset()
 {
-	pc8801_state *state = machine.driver_data<pc8801_state>();
 	#define kB 1024
 	#define MB 1024*1024
 	const UINT32 extram_type[] = { 0*kB, 32*kB,64*kB,128*kB,128*kB,256*kB,512*kB,1*MB,2*MB,4*MB,8*MB,1*MB+128*kB,2*MB+128*kB,4*MB+128*kB, 0*kB, 0*kB };
 	#undef kB
 	#undef MB
 
-	state->m_ext_rom_bank = 0xff;
-	state->m_gfx_ctrl = 0x31;
-	state->m_window_offset_bank = 0x80;
-	state->m_misc_ctrl = 0x80;
-	state->m_layer_mask = 0x00;
-	state->m_vram_sel = 3;
+	m_ext_rom_bank = 0xff;
+	m_gfx_ctrl = 0x31;
+	m_window_offset_bank = 0x80;
+	m_misc_ctrl = 0x80;
+	m_layer_mask = 0x00;
+	m_vram_sel = 3;
 
-//  pc8801_dynamic_res_change(machine);
+//  pc8801_dynamic_res_change(machine());
 
-	state->m_fdc_irq_opcode = 0; //TODO: copied from PC-88VA, could be wrong here ... should be 0x7f ld a,a in the latter case
-	state->m_mouse.phase = 0;
+	m_fdc_irq_opcode = 0; //TODO: copied from PC-88VA, could be wrong here ... should be 0x7f ld a,a in the latter case
+	m_mouse.phase = 0;
 
-	machine.device("fdccpu")->execute().set_input_line_vector(0, 0);
+	machine().device("fdccpu")->execute().set_input_line_vector(0, 0);
 
 	{
-		state->m_txt_color = 2;
+		m_txt_color = 2;
 	}
 
 	{
 		int i;
 
 		for(i=0;i<3;i++)
-			state->m_alu_reg[i] = 0x00;
+			m_alu_reg[i] = 0x00;
 	}
 
 	{
-		state->m_crtc.param_count = 0;
-		state->m_crtc.cmd = 0;
-		state->m_crtc.status = 0;
+		m_crtc.param_count = 0;
+		m_crtc.cmd = 0;
+		m_crtc.status = 0;
 	}
 
-	beep_set_frequency(machine.device(BEEPER_TAG),2400);
-	beep_set_state(machine.device(BEEPER_TAG),0);
+	beep_set_frequency(machine().device(BEEPER_TAG),2400);
+	beep_set_state(machine().device(BEEPER_TAG),0);
 
 	#ifdef USE_PROPER_I8214
 	{
 		/* initialize I8214 */
-		state->m_pic->etlg_w(1);
-		state->m_pic->inte_w(1);
+		m_pic->etlg_w(1);
+		m_pic->inte_w(1);
 	}
 	#else
 	{
-		state->m_vrtc_irq_mask = 0;
-		state->m_vrtc_irq_latch = 0;
-		state->m_timer_irq_mask = 0;
-		state->m_timer_irq_latch = 0;
-		state->m_sound_irq_mask = 0;
-		state->m_sound_irq_latch = 0;
-		state->m_i8214_irq_level = 0;
-		state->m_sound_irq_pending = 0;
+		m_vrtc_irq_mask = 0;
+		m_vrtc_irq_latch = 0;
+		m_timer_irq_mask = 0;
+		m_timer_irq_latch = 0;
+		m_sound_irq_mask = 0;
+		m_sound_irq_latch = 0;
+		m_i8214_irq_level = 0;
+		m_sound_irq_pending = 0;
 	}
 	#endif
 
 	{
-		state->m_dma_address[2] = 0xf300;
+		m_dma_address[2] = 0xf300;
 	}
 
 	{
-		state->m_extram_bank = 0;
-		state->m_extram_mode = 0;
+		m_extram_bank = 0;
+		m_extram_mode = 0;
 	}
 
 	{
 		int i;
 
 		for(i=0;i<0x10;i++) //text + bitmap
-			palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+			palette_set_color_rgb(machine(), i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 	}
 
-	state->m_has_clock_speed = 0;
-	state->m_has_dictionary = 0;
-	state->m_has_cdrom = 0;
+	m_has_clock_speed = 0;
+	m_has_dictionary = 0;
+	m_has_cdrom = 0;
 
-	state->m_extram_size = extram_type[machine.root_device().ioport("MEM")->read() & 0x0f];
-	state->m_has_opna = machine.root_device().ioport("BOARD_CONFIG")->read() & 1;
+	m_extram_size = extram_type[machine().root_device().ioport("MEM")->read() & 0x0f];
+	m_has_opna = machine().root_device().ioport("BOARD_CONFIG")->read() & 1;
 }
 
-static MACHINE_RESET( pc8801_clock_speed )
+MACHINE_RESET_MEMBER(pc8801_state,pc8801_clock_speed)
 {
-	pc8801_state *state = machine.driver_data<pc8801_state>();
-	MACHINE_RESET_CALL( pc8801 );
-	state->m_has_clock_speed = 1;
-	state->m_clock_setting = machine.root_device().ioport("CFG")->read() & 0x80;
+	pc8801_state::machine_reset();
+	m_has_clock_speed = 1;
+	m_clock_setting = machine().root_device().ioport("CFG")->read() & 0x80;
 
-	machine.device("maincpu")->set_unscaled_clock(state->m_clock_setting ?  XTAL_4MHz : XTAL_8MHz);
-	machine.device("fdccpu")->set_unscaled_clock(state->m_clock_setting ?  XTAL_4MHz : XTAL_8MHz); // correct?
-	state->m_baudrate_val = 0;
+	machine().device("maincpu")->set_unscaled_clock(m_clock_setting ?  XTAL_4MHz : XTAL_8MHz);
+	machine().device("fdccpu")->set_unscaled_clock(m_clock_setting ?  XTAL_4MHz : XTAL_8MHz); // correct?
+	m_baudrate_val = 0;
 }
 
-static MACHINE_RESET( pc8801_dic )
+MACHINE_RESET_MEMBER(pc8801_state,pc8801_dic)
 {
-	pc8801_state *state = machine.driver_data<pc8801_state>();
-	MACHINE_RESET_CALL( pc8801_clock_speed );
-	state->m_has_dictionary = 1;
-	state->m_dic_bank = 0;
-	state->m_dic_ctrl = 0;
+	MACHINE_RESET_CALL_MEMBER( pc8801_clock_speed );
+	m_has_dictionary = 1;
+	m_dic_bank = 0;
+	m_dic_ctrl = 0;
 }
 
-static MACHINE_RESET( pc8801_cdrom )
+MACHINE_RESET_MEMBER(pc8801_state,pc8801_cdrom)
 {
-	pc8801_state *state = machine.driver_data<pc8801_state>();
-	MACHINE_RESET_CALL( pc8801_dic );
-	state->m_has_cdrom = 1;
+	MACHINE_RESET_CALL_MEMBER( pc8801_dic );
+	m_has_cdrom = 1;
 
 	{
 		int i;
 
 		for(i=0;i<0x10;i++)
-			state->m_cdrom_reg[i] = 0;
+			m_cdrom_reg[i] = 0;
 	}
 }
 
-static PALETTE_INIT( pc8801 )
+void pc8801_state::palette_init()
 {
 	int i;
 
 	for(i=0;i<0x10;i++) //text + bitmap
-		palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+		palette_set_color_rgb(machine(), i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
 static const struct upd765_interface pc8801_upd765_interface =
@@ -2671,8 +2673,6 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	//MCFG_QUANTUM_TIME(attotime::from_hz(300000))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_MACHINE_START( pc8801 )
-	MCFG_MACHINE_RESET( pc8801 )
 
 	MCFG_I8255_ADD( "d8255_master", master_fdd_intf )
 	MCFG_I8255_ADD( "d8255_slave", slave_fdd_intf )
@@ -2698,9 +2698,8 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 
 	MCFG_GFXDECODE( pc8801 )
 	MCFG_PALETTE_LENGTH(0x10)
-	MCFG_PALETTE_INIT( pc8801 )
 
-//  MCFG_VIDEO_START(pc8801)
+//  MCFG_VIDEO_START_OVERRIDE(pc8801_state,pc8801)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2719,15 +2718,15 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc8801fh, pc8801 )
-	MCFG_MACHINE_RESET( pc8801_clock_speed )
+	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_clock_speed )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc8801ma, pc8801 )
-	MCFG_MACHINE_RESET( pc8801_dic )
+	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_dic )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc8801mc, pc8801 )
-	MCFG_MACHINE_RESET( pc8801_cdrom )
+	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_cdrom )
 MACHINE_CONFIG_END
 
 

@@ -633,13 +633,12 @@ DRIVER_INIT_MEMBER(micro3d_state,botss)
 	DRIVER_INIT_CALL(micro3d);
 }
 
-MACHINE_RESET( micro3d )
+void micro3d_state::machine_reset()
 {
-	micro3d_state *state = machine.driver_data<micro3d_state>();
 
-	state->m_ti_uart[STATUS] = 1;
+	m_ti_uart[STATUS] = 1;
 
-	machine.device("vgb")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine.device("drmath")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("vgb")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("drmath")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }

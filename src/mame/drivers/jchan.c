@@ -223,6 +223,7 @@ public:
 	DECLARE_WRITE16_MEMBER(jchan_suprnova_sprite32regs_2_w);
 
 	DECLARE_DRIVER_INIT(jchan);
+	virtual void video_start();
 };
 
 
@@ -268,25 +269,24 @@ static TIMER_DEVICE_CALLBACK( jchan_vblank )
 
 
 
-static VIDEO_START(jchan)
+void jchan_state::video_start()
 {
-	jchan_state *state = machine.driver_data<jchan_state>();
 	/* so we can use suprnova.c */
-	state->m_sprite_ram32_1 = auto_alloc_array(machine, UINT32, 0x4000/4);
-	state->m_sprite_ram32_2 = auto_alloc_array(machine, UINT32, 0x4000/4);
+	m_sprite_ram32_1 = auto_alloc_array(machine(), UINT32, 0x4000/4);
+	m_sprite_ram32_2 = auto_alloc_array(machine(), UINT32, 0x4000/4);
 
-	state->m_sprite_regs32_1 = auto_alloc_array(machine, UINT32, 0x40/4);
-	state->m_sprite_regs32_2 = auto_alloc_array(machine, UINT32, 0x40/4);
+	m_sprite_regs32_1 = auto_alloc_array(machine(), UINT32, 0x40/4);
+	m_sprite_regs32_2 = auto_alloc_array(machine(), UINT32, 0x40/4);
 
-	state->m_sprite_bitmap_1 = auto_bitmap_ind16_alloc(machine,1024,1024);
-	state->m_sprite_bitmap_2 = auto_bitmap_ind16_alloc(machine,1024,1024);
+	m_sprite_bitmap_1 = auto_bitmap_ind16_alloc(machine(),1024,1024);
+	m_sprite_bitmap_2 = auto_bitmap_ind16_alloc(machine(),1024,1024);
 
-	state->m_spritegen1 = machine.device<sknsspr_device>("spritegen1");
-	state->m_spritegen2 = machine.device<sknsspr_device>("spritegen2");
+	m_spritegen1 = machine().device<sknsspr_device>("spritegen1");
+	m_spritegen2 = machine().device<sknsspr_device>("spritegen2");
 
 
-	state->m_spritegen1->skns_sprite_kludge(0,0);
-	state->m_spritegen2->skns_sprite_kludge(0,0);
+	m_spritegen1->skns_sprite_kludge(0,0);
+	m_spritegen2->skns_sprite_kludge(0,0);
 }
 
 
@@ -621,7 +621,6 @@ static MACHINE_CONFIG_START( jchan, jchan_state )
 	kaneko_view2_tilemap_device::set_offset(*device, 25, 11, 320, 240);
 
 
-	MCFG_VIDEO_START(jchan)
 
 	MCFG_DEVICE_ADD("spritegen1", SKNS_SPRITE, 0)
 	MCFG_DEVICE_ADD("spritegen2", SKNS_SPRITE, 0)

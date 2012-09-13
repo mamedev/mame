@@ -76,6 +76,8 @@ public:
 private:
 	UINT8 m_kbd_s;
 	UINT8 m_portb;
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -296,11 +298,11 @@ static const pia6821_interface d6800_mc6821_intf =
 
 /* Machine Initialization */
 
-static MACHINE_START( d6800 )
+void d6800_state::machine_start()
 {
 }
 
-static MACHINE_RESET( d6800 )
+void d6800_state::machine_reset()
 {
 }
 
@@ -359,8 +361,6 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 	MCFG_CPU_ADD("maincpu",M6800, XTAL_4MHz/4)
 	MCFG_CPU_PROGRAM_MAP(d6800_map)
 
-	MCFG_MACHINE_START(d6800)
-	MCFG_MACHINE_RESET(d6800)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

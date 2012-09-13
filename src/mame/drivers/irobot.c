@@ -294,7 +294,6 @@ static MACHINE_CONFIG_START( irobot, irobot_state )
 	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(irobot_map)
 
-	MCFG_MACHINE_RESET(irobot)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -308,8 +307,6 @@ static MACHINE_CONFIG_START( irobot, irobot_state )
 	MCFG_GFXDECODE(irobot)
 	MCFG_PALETTE_LENGTH(64 + 32)	/* 64 for polygons, 32 for text */
 
-	MCFG_PALETTE_INIT(irobot)
-	MCFG_VIDEO_START(irobot)
 
 	MCFG_TIMER_ADD("irvg_timer", irobot_irvg_done_callback)
 	MCFG_TIMER_ADD("irmb_timer", irobot_irmb_done_callback)

@@ -32,14 +32,14 @@ static const res_net_decode_info tagteam_decode_info =
 	{  0x07, 0x07, 0x03 }  /* masks */
 };
 
-PALETTE_INIT( tagteam )
+void tagteam_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	rgb_t *rgb;
 
-	rgb = compute_res_net_all(machine, color_prom, &tagteam_decode_info, &tagteam_net_info);
-	palette_set_colors(machine, 0x00, rgb, 0x20);
-	auto_free(machine, rgb);
+	rgb = compute_res_net_all(machine(), color_prom, &tagteam_decode_info, &tagteam_net_info);
+	palette_set_colors(machine(), 0x00, rgb, 0x20);
+	auto_free(machine(), rgb);
 }
 
 
@@ -135,10 +135,9 @@ TILE_GET_INFO_MEMBER(tagteam_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-VIDEO_START( tagteam )
+void tagteam_state::video_start()
 {
-	tagteam_state *state = machine.driver_data<tagteam_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tagteam_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS_FLIP_X,
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tagteam_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS_FLIP_X,
 		 8, 8, 32, 32);
 }
 

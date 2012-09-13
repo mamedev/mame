@@ -228,19 +228,18 @@ static int apple1_getcursorcode(int original_code)
 
 /**************************************************************************/
 
-VIDEO_START( apple1 )
+void apple1_state::video_start()
 {
-	apple1_state *state = machine.driver_data<apple1_state>();
-	state->m_blink_on = 1;		/* cursor is visible initially */
-	state->m_terminal = terminal_create(
-		machine,
+	m_blink_on = 1;		/* cursor is visible initially */
+	m_terminal = terminal_create(
+		machine(),
 		0,			/* graphics font 0 (the only one we have) */
 		32,			/* Blank character is symbol 32 in the ROM */
 		8,			/* use 8 bits for the character code */
 		apple1_getcursorcode,
 		40, 24);	/* 40 columns, 24 rows */
 
-	terminal_setcursor(state->m_terminal, 0, 0);
+	terminal_setcursor(m_terminal, 0, 0);
 }
 
 /* This function handles all writes to the video display. */

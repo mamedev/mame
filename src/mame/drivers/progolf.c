@@ -84,19 +84,20 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_DRIVER_INIT(progolfa);
 	DECLARE_DRIVER_INIT(progolf);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 
 
-static VIDEO_START( progolf )
+void progolf_state::video_start()
 {
-	progolf_state *state = machine.driver_data<progolf_state>();
-	state->m_scrollx_hi = 0;
-	state->m_scrollx_lo = 0;
+	m_scrollx_hi = 0;
+	m_scrollx_lo = 0;
 
-	state->m_fg_fb = auto_alloc_array(machine, UINT8, 0x2000*8);
-	state->m_videoram = auto_alloc_array(machine, UINT8, 0x1000);
+	m_fg_fb = auto_alloc_array(machine(), UINT8, 0x2000*8);
+	m_videoram = auto_alloc_array(machine(), UINT8, 0x1000);
 }
 
 
@@ -389,12 +390,12 @@ static const mc6845_interface mc6845_intf =
 
 };
 
-static PALETTE_INIT( progolf )
+void progolf_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -414,7 +415,7 @@ static PALETTE_INIT( progolf )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -439,10 +440,8 @@ static MACHINE_CONFIG_START( progolf, progolf_state )
 
 	MCFG_GFXDECODE(progolf)
 	MCFG_PALETTE_LENGTH(32*3)
-	MCFG_PALETTE_INIT(progolf)
 
 	MCFG_MC6845_ADD("crtc", MC6845, 3000000/4, mc6845_intf)	/* hand tuned to get ~57 fps */
-	MCFG_VIDEO_START(progolf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

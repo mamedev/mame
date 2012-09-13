@@ -607,7 +607,7 @@ static MACHINE_CONFIG_START( tunit_core, midtunit_state )
 	MCFG_CPU_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_RESET(midtunit)
+	MCFG_MACHINE_RESET_OVERRIDE(midtunit_state,midtunit)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -617,7 +617,7 @@ static MACHINE_CONFIG_START( tunit_core, midtunit_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK * 2, 505, 0, 399, 289, 0, 253)
 	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
 
-	MCFG_VIDEO_START(midtunit)
+	MCFG_VIDEO_START_OVERRIDE(midtunit_state,midtunit)
 MACHINE_CONFIG_END
 
 

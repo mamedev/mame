@@ -84,6 +84,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( drq2_w );
 	DECLARE_WRITE_LINE_MEMBER( drq1_w );
 	DECLARE_READ_LINE_MEMBER( dsra_r );
+	DECLARE_PALETTE_INIT(mm1);
 
 	void scan_keyboard();
 

@@ -290,7 +290,6 @@ static MACHINE_CONFIG_START( darkseal, darkseal_state )
 
 
 
-	MCFG_VIDEO_START(darkseal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

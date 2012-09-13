@@ -186,10 +186,9 @@
  *
  *************************************/
 
-static MACHINE_RESET( buckrog )
+MACHINE_RESET_MEMBER(turbo_state,buckrog)
 {
-	turbo_state *state = machine.driver_data<turbo_state>();
-	state->m_buckrog_command = 0x00;
+	m_buckrog_command = 0x00;
 }
 
 
@@ -949,8 +948,8 @@ static MACHINE_CONFIG_START( turbo, turbo_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(turbo)
 
-	MCFG_PALETTE_INIT(turbo)
-	MCFG_VIDEO_START(turbo)
+	MCFG_PALETTE_INIT_OVERRIDE(turbo_state,turbo)
+	MCFG_VIDEO_START_OVERRIDE(turbo_state,turbo)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(turbo_samples)
@@ -978,8 +977,8 @@ static MACHINE_CONFIG_START( subroc3d, turbo_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(subroc3d)
 
-	MCFG_PALETTE_INIT(subroc3d)
-	MCFG_VIDEO_START(turbo)
+	MCFG_PALETTE_INIT_OVERRIDE(turbo_state,subroc3d)
+	MCFG_VIDEO_START_OVERRIDE(turbo_state,turbo)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(subroc3d_samples)
@@ -998,7 +997,7 @@ static MACHINE_CONFIG_START( buckrog, turbo_state )
 	MCFG_CPU_IO_MAP(buckrog_cpu2_portmap)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-	MCFG_MACHINE_RESET(buckrog)
+	MCFG_MACHINE_RESET_OVERRIDE(turbo_state,buckrog)
 
 	MCFG_I8255_ADD( "i8255_0", buckrog_8255_intf_0 )
 	MCFG_I8255_ADD( "i8255_1", buckrog_8255_intf_1 )
@@ -1014,8 +1013,8 @@ static MACHINE_CONFIG_START( buckrog, turbo_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(buckrog)
 
-	MCFG_PALETTE_INIT(buckrog)
-	MCFG_VIDEO_START(buckrog)
+	MCFG_PALETTE_INIT_OVERRIDE(turbo_state,buckrog)
+	MCFG_VIDEO_START_OVERRIDE(turbo_state,buckrog)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(buckrog_samples)

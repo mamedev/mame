@@ -106,7 +106,7 @@
 #include "includes/eolithsp.h"
 
 
-static MACHINE_RESET( eolith );
+
 
 
 /*************************************
@@ -578,7 +578,7 @@ static MACHINE_CONFIG_START( eolith45, eolith_state )
 	MCFG_CPU_PROGRAM_MAP(sound_prg_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
-	MCFG_MACHINE_RESET(eolith)
+	MCFG_MACHINE_RESET_OVERRIDE(eolith_state,eolith)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C66)
 
@@ -597,7 +597,7 @@ static MACHINE_CONFIG_START( eolith45, eolith_state )
 	MCFG_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
 	MCFG_PALETTE_LENGTH(32768)
 
-	MCFG_VIDEO_START(eolith)
+	MCFG_VIDEO_START_OVERRIDE(eolith_state,eolith)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1433,9 +1433,9 @@ ROM_START( hidctch3 )
 ROM_END
 
 
-static MACHINE_RESET( eolith )
+MACHINE_RESET_MEMBER(eolith_state,eolith)
 {
-	machine.device("soundcpu")->execute().set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
+	machine().device("soundcpu")->execute().set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 }
 
 DRIVER_INIT_MEMBER(eolith_state,eolith)

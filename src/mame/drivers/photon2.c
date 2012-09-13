@@ -32,6 +32,9 @@ public:
 	DECLARE_READ8_MEMBER(photon2_fe_r);
 	DECLARE_WRITE8_MEMBER(photon2_fe_w);
 	DECLARE_WRITE8_MEMBER(photon2_misc_w);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -81,16 +84,15 @@ static const rgb_t spectrum_palette[16] = {
 };
 
 /* Initialise the palette */
-static PALETTE_INIT( spectrum )
+void photon2_state::palette_init()
 {
-	palette_set_colors(machine, 0, spectrum_palette, ARRAY_LENGTH(spectrum_palette));
+	palette_set_colors(machine(), 0, spectrum_palette, ARRAY_LENGTH(spectrum_palette));
 }
 
-static VIDEO_START( spectrum )
+void photon2_state::video_start()
 {
-	photon2_state *state = machine.driver_data<photon2_state>();
-	state->m_spectrum_frame_number = 0;
-	state->m_spectrum_flash_invert = 0;
+	m_spectrum_frame_number = 0;
+	m_spectrum_flash_invert = 0;
 }
 
 /* return the color to be used inverting FLASHing colors if necessary */
@@ -310,9 +312,9 @@ static TIMER_DEVICE_CALLBACK( spec_interrupt_hack )
 	}
 }
 
-static MACHINE_RESET( photon2 )
+void photon2_state::machine_reset()
 {
-	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base());
+	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
 }
 
 static MACHINE_CONFIG_START( photon2, photon2_state )
@@ -322,7 +324,6 @@ static MACHINE_CONFIG_START( photon2, photon2_state )
 	MCFG_CPU_IO_MAP(spectrum_io)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", spec_interrupt_hack, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET( photon2 )
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -334,9 +335,7 @@ static MACHINE_CONFIG_START( photon2, photon2_state )
 	MCFG_SCREEN_VBLANK_STATIC( spectrum )
 
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT( spectrum )
 
-	MCFG_VIDEO_START( spectrum )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

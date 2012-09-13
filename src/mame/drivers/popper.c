@@ -310,24 +310,22 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( popper )
+void popper_state::machine_start()
 {
-	popper_state *state = machine.driver_data<popper_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_e002));
-	state->save_item(NAME(state->m_gfx_bank));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_e002));
+	save_item(NAME(m_gfx_bank));
 }
 
-static MACHINE_RESET( popper )
+void popper_state::machine_reset()
 {
-	popper_state *state = machine.driver_data<popper_state>();
 
-	state->m_flipscreen = 0;
-	state->m_e002 = 0;
-	state->m_gfx_bank = 0;
+	m_flipscreen = 0;
+	m_e002 = 0;
+	m_gfx_bank = 0;
 }
 
 static INTERRUPT_GEN( vblank_irq )
@@ -352,8 +350,6 @@ static MACHINE_CONFIG_START( popper, popper_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1800))
 
-	MCFG_MACHINE_START(popper)
-	MCFG_MACHINE_RESET(popper)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -366,8 +362,6 @@ static MACHINE_CONFIG_START( popper, popper_state )
 	MCFG_GFXDECODE(popper)
 	MCFG_PALETTE_LENGTH(64)
 
-	MCFG_PALETTE_INIT(popper)
-	MCFG_VIDEO_START(popper)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

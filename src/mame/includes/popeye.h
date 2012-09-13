@@ -36,14 +36,18 @@ public:
 	DECLARE_DRIVER_INIT(skyskipr);
 	DECLARE_DRIVER_INIT(popeye);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_VIDEO_START(popeye);
+	DECLARE_PALETTE_INIT(popeyebl);
 };
 
 
 /*----------- defined in video/popeye.c -----------*/
 
 
-PALETTE_INIT( popeye );
-PALETTE_INIT( popeyebl );
-VIDEO_START( skyskipr );
-VIDEO_START( popeye );
+
+
+
+
 SCREEN_UPDATE_IND16( popeye );

@@ -124,12 +124,13 @@ public:
 	DECLARE_WRITE16_MEMBER(tv_ncf_oki6376_st_w);
 	DECLARE_DRIVER_INIT(fashion);
 	DECLARE_DRIVER_INIT(ciclone);
+	DECLARE_VIDEO_START(tourvisn);
 };
 
 
 
 
-static VIDEO_START(tourvisn)
+VIDEO_START_MEMBER(highvdeo_state,tourvisn)
 {
 
 }
@@ -941,7 +942,7 @@ static MACHINE_CONFIG_START( tv_vcf, highvdeo_state )
 
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(tourvisn)
+	MCFG_VIDEO_START_OVERRIDE(highvdeo_state,tourvisn)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1007,7 +1008,7 @@ static MACHINE_CONFIG_START( brasil, highvdeo_state )
 
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(tourvisn)
+	MCFG_VIDEO_START_OVERRIDE(highvdeo_state,tourvisn)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

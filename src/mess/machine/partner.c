@@ -40,9 +40,9 @@ const wd17xx_interface partner_wd17xx_interface =
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
-MACHINE_START( partner )
+MACHINE_START_MEMBER(partner_state,partner)
 {
-	device_t *fdc = machine.device("wd1793");
+	device_t *fdc = machine().device("wd1793");
 	wd17xx_set_pause_time(fdc, 10);
 }
 
@@ -381,10 +381,9 @@ I8257_INTERFACE( partner_dma )
 };
 
 
-MACHINE_RESET( partner )
+MACHINE_RESET_MEMBER(partner_state,partner)
 {
-	partner_state *state = machine.driver_data<partner_state>();
-	state->m_mem_page = 0;
-	state->m_win_mem_page = 0;
-	partner_bank_switch(machine);
+	m_mem_page = 0;
+	m_win_mem_page = 0;
+	partner_bank_switch(machine());
 }

@@ -315,23 +315,21 @@ const wd17xx_interface kaypro_wd1793_interface =
     Machine
 
 ************************************************************/
-MACHINE_START( kayproii )
+MACHINE_START_MEMBER(kaypro_state,kayproii)
 {
-	kaypro_state *state = machine.driver_data<kaypro_state>();
-	state->m_pio_s->strobe_a(0);
+	m_pio_s->strobe_a(0);
 }
 
-MACHINE_RESET( kayproii )
+MACHINE_RESET_MEMBER(kaypro_state,kayproii)
 {
-	MACHINE_RESET_CALL(kay_kbd);
+	MACHINE_RESET_CALL_MEMBER(kay_kbd);
 }
 
-MACHINE_RESET( kaypro2x )
+MACHINE_RESET_MEMBER(kaypro_state,kaypro2x)
 {
-	kaypro_state *state = machine.driver_data<kaypro_state>();
-	address_space *space = state->m_maincpu->space(AS_PROGRAM);
-	state->kaypro2x_system_port_w(*space, 0, 0x80);
-	MACHINE_RESET_CALL(kay_kbd);
+	address_space *space = m_maincpu->space(AS_PROGRAM);
+	kaypro2x_system_port_w(*space, 0, 0x80);
+	MACHINE_RESET_CALL_MEMBER(kay_kbd);
 }
 
 /***********************************************************

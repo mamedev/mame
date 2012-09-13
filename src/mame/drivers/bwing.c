@@ -333,35 +333,33 @@ GFXDECODE_END
 //****************************************************************************
 // Hardware Definitions
 
-static MACHINE_START( bwing )
+void bwing_state::machine_start()
 {
-	bwing_state *state = machine.driver_data<bwing_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_subcpu = machine.device<cpu_device>("sub");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_subcpu = machine().device<cpu_device>("sub");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_palatch));
-	state->save_item(NAME(state->m_srbank));
-	state->save_item(NAME(state->m_mapmask));
-	state->save_item(NAME(state->m_mapflip));
-	state->save_item(NAME(state->m_bwp3_nmimask));
-	state->save_item(NAME(state->m_bwp3_u8F_d));
+	save_item(NAME(m_palatch));
+	save_item(NAME(m_srbank));
+	save_item(NAME(m_mapmask));
+	save_item(NAME(m_mapflip));
+	save_item(NAME(m_bwp3_nmimask));
+	save_item(NAME(m_bwp3_u8F_d));
 
-	state->save_item(NAME(state->m_sreg));
+	save_item(NAME(m_sreg));
 }
 
-static MACHINE_RESET( bwing )
+void bwing_state::machine_reset()
 {
-	bwing_state *state = machine.driver_data<bwing_state>();
 
-	state->m_palatch = 0;
-	state->m_srbank = 0;
-	state->m_mapmask = 0;
-	state->m_mapflip = 0;
+	m_palatch = 0;
+	m_srbank = 0;
+	m_mapmask = 0;
+	m_mapflip = 0;
 
-	state->m_bwp3_nmimask = 0;
-	state->m_bwp3_u8F_d = 0;
+	m_bwp3_nmimask = 0;
+	m_bwp3_u8F_d = 0;
 }
 
 static MACHINE_CONFIG_START( bwing, bwing_state )
@@ -380,8 +378,6 @@ static MACHINE_CONFIG_START( bwing, bwing_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(18000))		// high enough?
 
-	MCFG_MACHINE_START(bwing)
-	MCFG_MACHINE_RESET(bwing)
 
 	// video hardware
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -396,7 +392,6 @@ static MACHINE_CONFIG_START( bwing, bwing_state )
 	MCFG_GFXDECODE(bwing)
 	MCFG_PALETTE_LENGTH(64)
 
-	MCFG_VIDEO_START(bwing)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

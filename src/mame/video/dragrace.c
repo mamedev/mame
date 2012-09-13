@@ -39,10 +39,9 @@ TILE_GET_INFO_MEMBER(dragrace_state::get_tile_info)
 }
 
 
-VIDEO_START( dragrace )
+void dragrace_state::video_start()
 {
-	dragrace_state *state = machine.driver_data<dragrace_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dragrace_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dragrace_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 }
 
 

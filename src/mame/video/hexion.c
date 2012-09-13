@@ -38,19 +38,18 @@ TILE_GET_INFO_MEMBER(hexion_state::get_tile_info1)
 
 ***************************************************************************/
 
-VIDEO_START( hexion )
+void hexion_state::video_start()
 {
-	hexion_state *state = machine.driver_data<hexion_state>();
-	state->m_bg_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hexion_state::get_tile_info0),state),TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_bg_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hexion_state::get_tile_info1),state),TILEMAP_SCAN_ROWS,     8,8,64,32);
+	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(hexion_state::get_tile_info0),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(hexion_state::get_tile_info1),this),TILEMAP_SCAN_ROWS,     8,8,64,32);
 
-	state->m_bg_tilemap[0]->set_transparent_pen(0);
-	state->m_bg_tilemap[1]->set_scrollx(0,-4);
-	state->m_bg_tilemap[1]->set_scrolly(0,4);
+	m_bg_tilemap[0]->set_transparent_pen(0);
+	m_bg_tilemap[1]->set_scrollx(0,-4);
+	m_bg_tilemap[1]->set_scrolly(0,4);
 
-	state->m_vram[0] = state->memregion("maincpu")->base() + 0x30000;
-	state->m_vram[1] = state->m_vram[0] + 0x2000;
-	state->m_unkram = state->m_vram[1] + 0x2000;
+	m_vram[0] = memregion("maincpu")->base() + 0x30000;
+	m_vram[1] = m_vram[0] + 0x2000;
+	m_unkram = m_vram[1] + 0x2000;
 }
 
 

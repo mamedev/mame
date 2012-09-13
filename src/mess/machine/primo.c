@@ -246,14 +246,14 @@ static void primo_common_machine_init (running_machine &machine)
 	machine.device("maincpu")->set_clock_scale(machine.root_device().ioport("CPU_CLOCK")->read() ? 1.5 : 1.0);
 }
 
-MACHINE_RESET( primoa )
+void primo_state::machine_reset()
 {
-	primo_common_machine_init(machine);
+	primo_common_machine_init(machine());
 }
 
-MACHINE_RESET( primob )
+MACHINE_RESET_MEMBER(primo_state,primob)
 {
-	primo_common_machine_init(machine);
+	primo_common_machine_init(machine());
 
 //removed   cbm_drive_0_config(SERIAL, 8);
 //removed   cbm_drive_1_config(SERIAL, 9);

@@ -837,24 +837,23 @@ static GFXDECODE_START( dadandrn )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x0000, 8 )
 GFXDECODE_END
 
-static MACHINE_START( mystwarr )
+MACHINE_START_MEMBER(mystwarr_state,mystwarr)
 {
-	mystwarr_state *state = machine.driver_data<mystwarr_state>();
 	/* set default bankswitch */
-	state->m_cur_sound_region = 2;
-	reset_sound_region(machine);
+	m_cur_sound_region = 2;
+	reset_sound_region(machine());
 
-	state->m_mw_irq_control = 0;
+	m_mw_irq_control = 0;
 
-	state_save_register_global(machine, state->m_mw_irq_control);
-	state_save_register_global(machine, state->m_cur_sound_region);
-	machine.save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine));
+	state_save_register_global(machine(), m_mw_irq_control);
+	state_save_register_global(machine(), m_cur_sound_region);
+	machine().save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine()));
 }
 
-static MACHINE_RESET(mystwarr)
+MACHINE_RESET_MEMBER(mystwarr_state,mystwarr)
 {
-	k054539_device *k054539_1 = machine.device<k054539_device>("konami1");
-	k054539_device *k054539_2 = machine.device<k054539_device>("konami2");
+	k054539_device *k054539_1 = machine().device<k054539_device>("konami1");
+	k054539_device *k054539_2 = machine().device<k054539_device>("konami2");
 	int i;
 
 	// soften chorus(chip 0 channel 0-3), boost voice(chip 0 channel 4-7)
@@ -868,28 +867,28 @@ static MACHINE_RESET(mystwarr)
 	for (i=0; i<=7; i++) k054539_2->set_gain(i, 0.5);
 }
 
-static MACHINE_RESET(dadandrn)
+MACHINE_RESET_MEMBER(mystwarr_state,dadandrn)
 {
-	k054539_device *k054539_1 = machine.device<k054539_device>("konami1");
+	k054539_device *k054539_1 = machine().device<k054539_device>("konami1");
 	int i;
 
 	// boost voice(chip 0 channel 4-7)
 	for (i=4; i<=7; i++) k054539_1->set_gain(i, 2.0);
 }
 
-static MACHINE_RESET(viostorm)
+MACHINE_RESET_MEMBER(mystwarr_state,viostorm)
 {
-	k054539_device *k054539_1 = machine.device<k054539_device>("konami1");
+	k054539_device *k054539_1 = machine().device<k054539_device>("konami1");
 	int i;
 
 	// boost voice(chip 0 channel 4-7)
 	for (i=4; i<=7; i++) k054539_1->set_gain(i, 2.0);
 }
 
-static MACHINE_RESET(metamrph)
+MACHINE_RESET_MEMBER(mystwarr_state,metamrph)
 {
-	k054539_device *k054539_1 = machine.device<k054539_device>("konami1");
-	k054539_device *k054539_2 = machine.device<k054539_device>("konami2");
+	k054539_device *k054539_1 = machine().device<k054539_device>("konami1");
+	k054539_device *k054539_2 = machine().device<k054539_device>("konami2");
 	int i;
 
 	// boost voice(chip 0 channel 4-7) and soften other channels
@@ -902,9 +901,9 @@ static MACHINE_RESET(metamrph)
 	}
 }
 
-static MACHINE_RESET(martchmp)
+MACHINE_RESET_MEMBER(mystwarr_state,martchmp)
 {
-	k054539_device *k054539_1 = machine.device<k054539_device>("konami1");
+	k054539_device *k054539_1 = machine().device<k054539_device>("konami1");
 	int i;
 
 	k054539_1->init_flags(k054539_device::REVERSE_STEREO);
@@ -913,9 +912,9 @@ static MACHINE_RESET(martchmp)
 	for (i=4; i<=7; i++) k054539_1->set_gain(i, 1.4);
 }
 
-static MACHINE_RESET(gaiapols)
+MACHINE_RESET_MEMBER(mystwarr_state,gaiapols)
 {
-	k054539_device *k054539_1 = machine.device<k054539_device>("konami1");
+	k054539_device *k054539_1 = machine().device<k054539_device>("konami1");
 	int i;
 
 	// boost voice(chip 0 channel 5-7)
@@ -998,8 +997,8 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 	MCFG_K053252_ADD("k053252", 6000000, mystwarr_k053252_intf) // 6 MHz?
 
-	MCFG_MACHINE_START(mystwarr)
-	MCFG_MACHINE_RESET(mystwarr)
+	MCFG_MACHINE_START_OVERRIDE(mystwarr_state,mystwarr)
+	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,mystwarr)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
@@ -1014,7 +1013,7 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(mystwarr)
+	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,mystwarr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1030,7 +1029,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( viostorm, mystwarr )
 
-	MCFG_MACHINE_RESET(viostorm)
+	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,viostorm)
 
 	MCFG_DEVICE_REMOVE("k053252")
 	MCFG_K053252_ADD("k053252", 16000000/2, viostorm_k053252_intf)
@@ -1042,7 +1041,7 @@ static MACHINE_CONFIG_DERIVED( viostorm, mystwarr )
 	MCFG_TIMER_CALLBACK(metamrph_interrupt)
 
 	/* video hardware */
-	MCFG_VIDEO_START(viostorm)
+	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,viostorm)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(metamrph)
 
@@ -1054,7 +1053,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( metamrph, mystwarr )
 
-	MCFG_MACHINE_RESET(metamrph)
+	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,metamrph)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1067,7 +1066,7 @@ static MACHINE_CONFIG_DERIVED( metamrph, mystwarr )
 	MCFG_K053250_ADD("k053250_1", "screen", -7, 0)
 
 	/* video hardware */
-	MCFG_VIDEO_START(metamrph)
+	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,metamrph)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(metamrph)
 
@@ -1079,7 +1078,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dadandrn, mystwarr )
 
-	MCFG_MACHINE_RESET(dadandrn)
+	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,dadandrn)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1093,7 +1092,7 @@ static MACHINE_CONFIG_DERIVED( dadandrn, mystwarr )
 	MCFG_GFXDECODE(dadandrn)
 
 	/* video hardware */
-	MCFG_VIDEO_START(dadandrn)
+	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,dadandrn)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(dadandrn)
 
@@ -1105,7 +1104,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
 
-	MCFG_MACHINE_RESET(gaiapols)
+	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,gaiapols)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1122,7 +1121,7 @@ static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
 	MCFG_EEPROM_ADD("eeprom", gaia_eeprom_intf)
 
 	/* video hardware */
-	MCFG_VIDEO_START(gaiapols)
+	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,gaiapols)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(dadandrn)
 
@@ -1135,7 +1134,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( martchmp, mystwarr )
 
-	MCFG_MACHINE_RESET(martchmp)
+	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,martchmp)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1148,7 +1147,7 @@ static MACHINE_CONFIG_DERIVED( martchmp, mystwarr )
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MCFG_VIDEO_START(martchmp)
+	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,martchmp)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(martchmp)

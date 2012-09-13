@@ -142,48 +142,82 @@ public:
 	TILE_GET_INFO_MEMBER(dambustr_get_tile_info2);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(rockclim_get_tile_info);
+	DECLARE_MACHINE_RESET(galaxold);
+	DECLARE_VIDEO_START(galaxold);
+	DECLARE_PALETTE_INIT(galaxold);
+	DECLARE_VIDEO_START(drivfrcg);
+	DECLARE_PALETTE_INIT(rockclim);
+	DECLARE_VIDEO_START(racknrol);
+	DECLARE_VIDEO_START(batman2);
+	DECLARE_VIDEO_START(mooncrst);
+	DECLARE_VIDEO_START(scrambold);
+	DECLARE_PALETTE_INIT(scrambold);
+	DECLARE_VIDEO_START(pisces);
+	DECLARE_MACHINE_RESET(devilfsg);
+	DECLARE_VIDEO_START(dkongjrm);
+	DECLARE_VIDEO_START(rockclim);
+	DECLARE_VIDEO_START(galaxold_plain);
+	DECLARE_VIDEO_START(bongo);
+	DECLARE_MACHINE_RESET(hunchbkg);
+	DECLARE_VIDEO_START(ckongs);
+	DECLARE_PALETTE_INIT(stratgyx);
+	DECLARE_PALETTE_INIT(darkplnt);
+	DECLARE_PALETTE_INIT(minefld);
+	DECLARE_PALETTE_INIT(rescue);
+	DECLARE_PALETTE_INIT(mariner);
+	DECLARE_PALETTE_INIT(dambustr);
+	DECLARE_PALETTE_INIT(turtles);
+	DECLARE_VIDEO_START(darkplnt);
+	DECLARE_VIDEO_START(rescue);
+	DECLARE_VIDEO_START(minefld);
+	DECLARE_VIDEO_START(stratgyx);
+	DECLARE_VIDEO_START(mariner);
+	DECLARE_VIDEO_START(mimonkey);
+	DECLARE_VIDEO_START(scorpion);
+	DECLARE_VIDEO_START(ad2083);
+	DECLARE_VIDEO_START(dambustr);
 };
 
 
 /*----------- defined in video/galaxold.c -----------*/
 
-PALETTE_INIT( galaxold );
-PALETTE_INIT( scrambold );
-PALETTE_INIT( darkplnt );
-PALETTE_INIT( rescue );
-PALETTE_INIT( minefld );
-PALETTE_INIT( stratgyx );
-PALETTE_INIT( mariner );
-PALETTE_INIT( rockclim );
-PALETTE_INIT( dambustr );
-PALETTE_INIT( turtles );
-
-VIDEO_START( dambustr );
 
 
 
 
 
-VIDEO_START( galaxold_plain );
-VIDEO_START( galaxold );
-VIDEO_START( mooncrst );
-VIDEO_START( pisces );
-VIDEO_START( batman2 );
-VIDEO_START( dkongjrm );
-VIDEO_START( scrambold );
-VIDEO_START( darkplnt );
-VIDEO_START( rescue );
-VIDEO_START( minefld );
-VIDEO_START( stratgyx );
-VIDEO_START( mimonkey );
-VIDEO_START( mariner );
-VIDEO_START( ckongs );
-VIDEO_START( rockclim );
-VIDEO_START( drivfrcg );
-VIDEO_START( bongo );
-VIDEO_START( scorpion );
-VIDEO_START( racknrol );
-VIDEO_START( ad2083 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void galaxold_init_stars(running_machine &machine, int colors_offset);
 void galaxold_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -201,9 +235,9 @@ WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_2_q_callback );
 WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_1_callback );
 
 
-MACHINE_RESET( galaxold );
-MACHINE_RESET( devilfsg );
-MACHINE_RESET( hunchbkg );
+
+
+
 
 #define galaxold_coin_counter_0_w galaxold_coin_counter_w
 

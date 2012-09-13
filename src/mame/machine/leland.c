@@ -316,99 +316,95 @@ WRITE8_MEMBER(leland_state::indyheat_analog_w)
  *
  *************************************/
 
-MACHINE_START( leland )
+MACHINE_START_MEMBER(leland_state,leland)
 {
-	leland_state *state = machine.driver_data<leland_state>();
 	/* allocate extra stuff */
-	state->m_battery_ram = reinterpret_cast<UINT8 *>(state->memshare("battery")->ptr());
+	m_battery_ram = reinterpret_cast<UINT8 *>(memshare("battery")->ptr());
 
 	/* start scanline interrupts going */
-	state->m_master_int_timer = machine.scheduler().timer_alloc(FUNC(leland_interrupt_callback));
+	m_master_int_timer = machine().scheduler().timer_alloc(FUNC(leland_interrupt_callback));
 }
 
 
-MACHINE_RESET( leland )
+MACHINE_RESET_MEMBER(leland_state,leland)
 {
-	leland_state *state = machine.driver_data<leland_state>();
-	state->m_master_int_timer->adjust(machine.primary_screen->time_until_pos(8), 8);
+	m_master_int_timer->adjust(machine().primary_screen->time_until_pos(8), 8);
 
 	/* reset globals */
-	state->m_gfx_control = 0x00;
-	leland_sound_port_w(machine.device("ay8910.1"), 0, 0xff);
-	state->m_wcol_enable = 0;
+	m_gfx_control = 0x00;
+	leland_sound_port_w(machine().device("ay8910.1"), 0, 0xff);
+	m_wcol_enable = 0;
 
-	state->m_dangerz_x = 512;
-	state->m_dangerz_y = 512;
-	state->m_analog_result = 0xff;
-	memset(state->m_dial_last_input, 0, sizeof(state->m_dial_last_input));
-	memset(state->m_dial_last_result, 0, sizeof(state->m_dial_last_result));
+	m_dangerz_x = 512;
+	m_dangerz_y = 512;
+	m_analog_result = 0xff;
+	memset(m_dial_last_input, 0, sizeof(m_dial_last_input));
+	memset(m_dial_last_result, 0, sizeof(m_dial_last_result));
 
-	state->m_keycard_shift = 0;
-	state->m_keycard_bit = 0;
-	state->m_keycard_state = 0;
-	state->m_keycard_clock = 0;
-	memset(state->m_keycard_command, 0, sizeof(state->m_keycard_command));
+	m_keycard_shift = 0;
+	m_keycard_bit = 0;
+	m_keycard_state = 0;
+	m_keycard_clock = 0;
+	memset(m_keycard_command, 0, sizeof(m_keycard_command));
 
-	state->m_top_board_bank = 0;
-	state->m_sound_port_bank = 0;
-	state->m_alternate_bank = 0;
+	m_top_board_bank = 0;
+	m_sound_port_bank = 0;
+	m_alternate_bank = 0;
 
 	/* initialize the master banks */
-	state->m_master_length = state->memregion("master")->bytes();
-	state->m_master_base = state->memregion("master")->base();
-	(*state->m_update_master_bank)(machine);
+	m_master_length = memregion("master")->bytes();
+	m_master_base = memregion("master")->base();
+	(*m_update_master_bank)(machine());
 
 	/* initialize the slave banks */
-	state->m_slave_length = state->memregion("slave")->bytes();
-	state->m_slave_base = state->memregion("slave")->base();
-	if (state->m_slave_length > 0x10000)
-		state->membank("bank3")->set_base(&state->m_slave_base[0x10000]);
+	m_slave_length = memregion("slave")->bytes();
+	m_slave_base = memregion("slave")->base();
+	if (m_slave_length > 0x10000)
+		membank("bank3")->set_base(&m_slave_base[0x10000]);
 }
 
 
-MACHINE_START( ataxx )
+MACHINE_START_MEMBER(leland_state,ataxx)
 {
-	leland_state *state = machine.driver_data<leland_state>();
 	/* set the odd data banks */
-	state->m_battery_ram = reinterpret_cast<UINT8 *>(state->memshare("battery")->ptr());
-	state->m_extra_tram = auto_alloc_array(machine, UINT8, ATAXX_EXTRA_TRAM_SIZE);
+	m_battery_ram = reinterpret_cast<UINT8 *>(memshare("battery")->ptr());
+	m_extra_tram = auto_alloc_array(machine(), UINT8, ATAXX_EXTRA_TRAM_SIZE);
 
 	/* start scanline interrupts going */
-	state->m_master_int_timer = machine.scheduler().timer_alloc(FUNC(ataxx_interrupt_callback));
+	m_master_int_timer = machine().scheduler().timer_alloc(FUNC(ataxx_interrupt_callback));
 }
 
 
-MACHINE_RESET( ataxx )
+MACHINE_RESET_MEMBER(leland_state,ataxx)
 {
-	leland_state *state = machine.driver_data<leland_state>();
-	memset(state->m_extra_tram, 0, ATAXX_EXTRA_TRAM_SIZE);
-	state->m_master_int_timer->adjust(machine.primary_screen->time_until_pos(8), 8);
+	memset(m_extra_tram, 0, ATAXX_EXTRA_TRAM_SIZE);
+	m_master_int_timer->adjust(machine().primary_screen->time_until_pos(8), 8);
 
 	/* initialize the XROM */
-	state->m_xrom_length = state->memregion("user1")->bytes();
-	state->m_xrom_base = state->memregion("user1")->base();
-	state->m_xrom1_addr = 0;
-	state->m_xrom2_addr = 0;
+	m_xrom_length = memregion("user1")->bytes();
+	m_xrom_base = memregion("user1")->base();
+	m_xrom1_addr = 0;
+	m_xrom2_addr = 0;
 
 	/* reset globals */
-	state->m_wcol_enable = 0;
+	m_wcol_enable = 0;
 
-	state->m_analog_result = 0xff;
-	memset(state->m_dial_last_input, 0, sizeof(state->m_dial_last_input));
-	memset(state->m_dial_last_result, 0, sizeof(state->m_dial_last_result));
+	m_analog_result = 0xff;
+	memset(m_dial_last_input, 0, sizeof(m_dial_last_input));
+	memset(m_dial_last_result, 0, sizeof(m_dial_last_result));
 
-	state->m_master_bank = 0;
+	m_master_bank = 0;
 
 	/* initialize the master banks */
-	state->m_master_length = state->memregion("master")->bytes();
-	state->m_master_base = state->memregion("master")->base();
-	ataxx_bankswitch(machine);
+	m_master_length = memregion("master")->bytes();
+	m_master_base = memregion("master")->base();
+	ataxx_bankswitch(machine());
 
 	/* initialize the slave banks */
-	state->m_slave_length = state->memregion("slave")->bytes();
-	state->m_slave_base = state->memregion("slave")->base();
-	if (state->m_slave_length > 0x10000)
-		state->membank("bank3")->set_base(&state->m_slave_base[0x10000]);
+	m_slave_length = memregion("slave")->bytes();
+	m_slave_base = memregion("slave")->base();
+	if (m_slave_length > 0x10000)
+		membank("bank3")->set_base(&m_slave_base[0x10000]);
 }
 
 

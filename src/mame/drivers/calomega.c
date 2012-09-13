@@ -2754,8 +2754,6 @@ static MACHINE_CONFIG_START( sys903, calomega_state )
 	MCFG_GFXDECODE(calomega)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_PALETTE_INIT(calomega)
-	MCFG_VIDEO_START(calomega)
 
 	MCFG_MC6845_ADD("crtc", MC6845, CPU_CLOCK, mc6845_intf)	/* 6845 @ CPU clock */
 

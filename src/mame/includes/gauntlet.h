@@ -27,6 +27,9 @@ public:
 	DECLARE_DRIVER_INIT(vindctr2);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	DECLARE_MACHINE_START(gauntlet);
+	DECLARE_MACHINE_RESET(gauntlet);
+	DECLARE_VIDEO_START(gauntlet);
 };
 
 
@@ -35,5 +38,5 @@ public:
 WRITE16_HANDLER( gauntlet_xscroll_w );
 WRITE16_HANDLER( gauntlet_yscroll_w );
 
-VIDEO_START( gauntlet );
+
 SCREEN_UPDATE_IND16( gauntlet );

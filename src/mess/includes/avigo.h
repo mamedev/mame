@@ -104,6 +104,7 @@ public:
 	UINT8				m_screen_column;
 	UINT8				m_warm_start;
 	UINT8 * 			m_ram_base;
+	virtual void palette_init();
 };
 
 

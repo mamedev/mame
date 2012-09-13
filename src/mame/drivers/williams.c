@@ -1439,8 +1439,8 @@ static MACHINE_CONFIG_START( defender, williams_state )
 	MCFG_CPU_ADD("soundcpu", M6808, SOUND_CLOCK) // internal clock divider of 4, effective frequency is 894.886kHz
 	MCFG_CPU_PROGRAM_MAP(defender_sound_map)
 
-	MCFG_MACHINE_START(defender)
-	MCFG_MACHINE_RESET(defender)
+	MCFG_MACHINE_START_OVERRIDE(williams_state,defender)
+	MCFG_MACHINE_RESET_OVERRIDE(williams_state,defender)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_TIMER_ADD("scan_timer", williams_va11_callback)
@@ -1453,7 +1453,7 @@ static MACHINE_CONFIG_START( defender, williams_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 10, 304, 260, 7, 245)
 	MCFG_SCREEN_UPDATE_STATIC(williams)
 
-	MCFG_VIDEO_START(williams)
+	MCFG_VIDEO_START_OVERRIDE(williams_state,williams)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1485,8 +1485,8 @@ static MACHINE_CONFIG_DERIVED( williams, defender )
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(williams)
-	MCFG_MACHINE_RESET(williams)
+	MCFG_MACHINE_START_OVERRIDE(williams_state,williams)
+	MCFG_MACHINE_RESET_OVERRIDE(williams_state,williams)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(6, 298-1, 7, 247-1)
 MACHINE_CONFIG_END
@@ -1536,8 +1536,8 @@ static MACHINE_CONFIG_DERIVED( alienar, defender )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(williams_map)
 
-	MCFG_MACHINE_START(williams)
-	MCFG_MACHINE_RESET(williams)
+	MCFG_MACHINE_START_OVERRIDE(williams_state,williams)
+	MCFG_MACHINE_RESET_OVERRIDE(williams_state,williams)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(6, 298-1, 7, 247-1)
 
@@ -1584,11 +1584,11 @@ static MACHINE_CONFIG_DERIVED( blastkit, williams )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(blaster_map)
 
-	MCFG_MACHINE_START(blaster)
-	MCFG_MACHINE_RESET(blaster)
+	MCFG_MACHINE_START_OVERRIDE(williams_state,blaster)
+	MCFG_MACHINE_RESET_OVERRIDE(williams_state,blaster)
 
 	/* video hardware */
-	MCFG_VIDEO_START(blaster)
+	MCFG_VIDEO_START_OVERRIDE(williams_state,blaster)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(blaster)
 
@@ -1629,8 +1629,8 @@ static MACHINE_CONFIG_START( williams2, williams_state )
 	MCFG_CPU_ADD("soundcpu", M6808, MASTER_CLOCK/3)	/* yes, this is different from the older games */
 	MCFG_CPU_PROGRAM_MAP(williams2_sound_map)
 
-	MCFG_MACHINE_START(williams2)
-	MCFG_MACHINE_RESET(williams2)
+	MCFG_MACHINE_START_OVERRIDE(williams_state,williams2)
+	MCFG_MACHINE_RESET_OVERRIDE(williams_state,williams2)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_TIMER_ADD("scan_timer", williams2_va11_callback)
@@ -1645,7 +1645,7 @@ static MACHINE_CONFIG_START( williams2, williams_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 8, 284, 260, 8, 248)
 	MCFG_SCREEN_UPDATE_STATIC(williams2)
 
-	MCFG_VIDEO_START(williams2)
+	MCFG_VIDEO_START_OVERRIDE(williams_state,williams2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1696,8 +1696,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( joust2, williams2, joust2_state )
 	MCFG_WILLIAMS_CVSD_SOUND_ADD("cvsd")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_MACHINE_START(joust2)
-	MCFG_MACHINE_RESET(joust2)
+	MCFG_MACHINE_START_OVERRIDE(joust2_state,joust2)
+	MCFG_MACHINE_RESET_OVERRIDE(joust2_state,joust2)
 
 	/* pia */
 	MCFG_PIA6821_MODIFY("pia_1", joust2_pia_1_intf)

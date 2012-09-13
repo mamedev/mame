@@ -122,23 +122,35 @@ public:
 	TILE_GET_INFO_MEMBER(s2650_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(jrpacman_scan_rows);
 	TILE_GET_INFO_MEMBER(jrpacman_get_tile_info);
+	DECLARE_VIDEO_START(pacman);
+	DECLARE_PALETTE_INIT(pacman);
+	DECLARE_VIDEO_START(birdiy);
+	DECLARE_MACHINE_START(theglobp);
+	DECLARE_MACHINE_RESET(theglobp);
+	DECLARE_MACHINE_START(acitya);
+	DECLARE_MACHINE_RESET(acitya);
+	DECLARE_VIDEO_START(s2650games);
+	DECLARE_MACHINE_RESET(mschamp);
+	DECLARE_MACHINE_RESET(superabc);
+	DECLARE_VIDEO_START(pengo);
+	DECLARE_VIDEO_START(jrpacman);
 };
 
 
 /*----------- defined in video/pacman.c -----------*/
 
-PALETTE_INIT( pacman );
-VIDEO_START( pacman );
+
+
 SCREEN_UPDATE_IND16( pacman );
 
-VIDEO_START( pengo );
 
-VIDEO_START( s2650games );
+
+
 SCREEN_UPDATE_IND16( s2650games );
 
-VIDEO_START( jrpacman );
 
-VIDEO_START( birdiy );
+
+
 
 
 /*----------- defined in machine/pacplus.c -----------*/
@@ -153,13 +165,13 @@ void jumpshot_decode(running_machine &machine);
 
 /*----------- defined in machine/theglobp.c -----------*/
 
-MACHINE_START( theglobp );
-MACHINE_RESET( theglobp );
+
+
 READ8_HANDLER( theglobp_decrypt_rom );
 
 
 /*----------- defined in machine/acitya.c -------------*/
 
-MACHINE_START( acitya );
-MACHINE_RESET( acitya );
+
+
 READ8_HANDLER( acitya_decrypt_rom );

@@ -871,23 +871,21 @@ static const samples_interface rallyx_samples_interface =
  *
  *************************************/
 
-static MACHINE_START( rallyx )
+MACHINE_START_MEMBER(rallyx_state,rallyx)
 {
-	rallyx_state *state = machine.driver_data<rallyx_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_samples = machine.device<samples_device>("samples");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_samples = machine().device<samples_device>("samples");
 
-	state->save_item(NAME(state->m_last_bang));
-	state->save_item(NAME(state->m_stars_enable));
+	save_item(NAME(m_last_bang));
+	save_item(NAME(m_stars_enable));
 }
 
-static MACHINE_RESET( rallyx )
+MACHINE_RESET_MEMBER(rallyx_state,rallyx)
 {
-	rallyx_state *state = machine.driver_data<rallyx_state>();
 
-	state->m_last_bang = 0;
-	state->m_stars_enable = 0;
+	m_last_bang = 0;
+	m_stars_enable = 0;
 }
 
 static INTERRUPT_GEN( rallyx_vblank_irq )
@@ -914,8 +912,8 @@ static MACHINE_CONFIG_START( rallyx, rallyx_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT("screen", rallyx_vblank_irq)
 
-	MCFG_MACHINE_START(rallyx)
-	MCFG_MACHINE_RESET(rallyx)
+	MCFG_MACHINE_START_OVERRIDE(rallyx_state,rallyx)
+	MCFG_MACHINE_RESET_OVERRIDE(rallyx_state,rallyx)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -930,8 +928,8 @@ static MACHINE_CONFIG_START( rallyx, rallyx_state )
 	MCFG_GFXDECODE(rallyx)
 	MCFG_PALETTE_LENGTH(64*4+4)
 
-	MCFG_PALETTE_INIT(rallyx)
-	MCFG_VIDEO_START(rallyx)
+	MCFG_PALETTE_INIT_OVERRIDE(rallyx_state,rallyx)
+	MCFG_VIDEO_START_OVERRIDE(rallyx_state,rallyx)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -952,8 +950,8 @@ static MACHINE_CONFIG_START( jungler, rallyx_state )
 	MCFG_CPU_PROGRAM_MAP(jungler_map)
 	MCFG_CPU_VBLANK_INT("screen", jungler_vblank_irq)
 
-	MCFG_MACHINE_START(rallyx)
-	MCFG_MACHINE_RESET(rallyx)
+	MCFG_MACHINE_START_OVERRIDE(rallyx_state,rallyx)
+	MCFG_MACHINE_RESET_OVERRIDE(rallyx_state,rallyx)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -968,8 +966,8 @@ static MACHINE_CONFIG_START( jungler, rallyx_state )
 	MCFG_GFXDECODE(jungler)
 	MCFG_PALETTE_LENGTH(64*4+4+64)
 
-	MCFG_PALETTE_INIT(jungler)
-	MCFG_VIDEO_START(jungler)
+	MCFG_PALETTE_INIT_OVERRIDE(rallyx_state,jungler)
+	MCFG_VIDEO_START_OVERRIDE(rallyx_state,jungler)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(locomotn_sound)
@@ -981,7 +979,7 @@ static MACHINE_CONFIG_DERIVED( tactcian, jungler )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_VIDEO_START(locomotn)
+	MCFG_VIDEO_START_OVERRIDE(rallyx_state,locomotn)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(locomotn)
 MACHINE_CONFIG_END
@@ -995,7 +993,7 @@ static MACHINE_CONFIG_DERIVED( locomotn, jungler )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(locomotn)
-	MCFG_VIDEO_START(locomotn)
+	MCFG_VIDEO_START_OVERRIDE(rallyx_state,locomotn)
 MACHINE_CONFIG_END
 
 
@@ -1007,7 +1005,7 @@ static MACHINE_CONFIG_DERIVED( commsega, jungler )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(locomotn)
-	MCFG_VIDEO_START(commsega)
+	MCFG_VIDEO_START_OVERRIDE(rallyx_state,commsega)
 MACHINE_CONFIG_END
 
 

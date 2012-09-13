@@ -33,6 +33,8 @@ public:
 	DECLARE_WRITE32_MEMBER(debug1_w);
 	DECLARE_WRITE32_MEMBER(debug2_w);
 	required_shared_ptr<UINT32> m_p_ram;
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -112,16 +114,15 @@ static INPUT_PORTS_START( pv9234 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(pv9234)
+void pv9234_state::machine_reset()
 {
-	pv9234_state *state = machine.driver_data<pv9234_state>();
 	int i;
 
 	for(i=0;i<0x1000/4;i++)
-		state->m_p_ram[i] = 0;
+		m_p_ram[i] = 0;
 }
 
-static VIDEO_START( pv9234 )
+void pv9234_state::video_start()
 {
 }
 
@@ -135,7 +136,6 @@ static MACHINE_CONFIG_START( pv9234, pv9234_state )
 	MCFG_CPU_ADD("maincpu", ARM7, 4915000) //probably a more powerful clone.
 	MCFG_CPU_PROGRAM_MAP(pv9234_map)
 
-	MCFG_MACHINE_RESET(pv9234)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -148,7 +148,6 @@ static MACHINE_CONFIG_START( pv9234, pv9234_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START(pv9234)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -68,13 +68,13 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_txttile_info)
         0);
 }
 
-PALETTE_INIT(darkmist)
+void darkmist_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x101);
+	machine().colortable = colortable_alloc(machine(), 0x101);
 
 	for (i = 0; i < 0x400; i++)
 	{
@@ -95,7 +95,7 @@ PALETTE_INIT(darkmist)
 			}
 		}
 
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 
@@ -118,14 +118,13 @@ static void set_pens(running_machine &machine)
 }
 
 
-VIDEO_START(darkmist)
+void darkmist_state::video_start()
 {
-	darkmist_state *state = machine.driver_data<darkmist_state>();
-	state->m_bgtilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(darkmist_state::get_bgtile_info),state),TILEMAP_SCAN_ROWS,16,16,512,64 );
-	state->m_fgtilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(darkmist_state::get_fgtile_info),state),TILEMAP_SCAN_ROWS,16,16,64,256 );
-	state->m_txtilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(darkmist_state::get_txttile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32 );
-	state->m_fgtilemap->set_transparent_pen(0);
-	state->m_txtilemap->set_transparent_pen(0);
+	m_bgtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(darkmist_state::get_bgtile_info),this),TILEMAP_SCAN_ROWS,16,16,512,64 );
+	m_fgtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(darkmist_state::get_fgtile_info),this),TILEMAP_SCAN_ROWS,16,16,64,256 );
+	m_txtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(darkmist_state::get_txttile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
+	m_fgtilemap->set_transparent_pen(0);
+	m_txtilemap->set_transparent_pen(0);
 }
 
 SCREEN_UPDATE_IND16( darkmist)

@@ -1140,111 +1140,105 @@ static const sn76496_config psg_intf =
 };
 
 
-static MACHINE_START( homedata )
+MACHINE_START_MEMBER(homedata_state,homedata)
 {
-	homedata_state *state = machine.driver_data<homedata_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_ym = machine.device("ymsnd");
-	state->m_sn = machine.device<sn76489a_new_device>("snsnd");
-	state->m_dac = machine.device<dac_device>("dac");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_ym = machine().device("ymsnd");
+	m_sn = machine().device<sn76489a_new_device>("snsnd");
+	m_dac = machine().device<dac_device>("dac");
 
-	state->save_item(NAME(state->m_visible_page));
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_blitter_bank));
-	state->save_item(NAME(state->m_blitter_param_count));
-	state->save_item(NAME(state->m_blitter_param));
-	state->save_item(NAME(state->m_vblank));
-	state->save_item(NAME(state->m_sndbank));
-	state->save_item(NAME(state->m_keyb));
-	state->save_item(NAME(state->m_snd_command));
+	save_item(NAME(m_visible_page));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_blitter_bank));
+	save_item(NAME(m_blitter_param_count));
+	save_item(NAME(m_blitter_param));
+	save_item(NAME(m_vblank));
+	save_item(NAME(m_sndbank));
+	save_item(NAME(m_keyb));
+	save_item(NAME(m_snd_command));
 }
 
-static MACHINE_START( reikaids )
+MACHINE_START_MEMBER(homedata_state,reikaids)
 {
-	homedata_state *state = machine.driver_data<homedata_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 8, &ROM[0xc000], 0x4000);
-	state->membank("bank2")->configure_entries(0, 4, state->memregion("audiocpu")->base(), 0x10000);
+	membank("bank1")->configure_entries(0, 8, &ROM[0xc000], 0x4000);
+	membank("bank2")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x10000);
 
-	MACHINE_START_CALL(homedata);
+	MACHINE_START_CALL_MEMBER(homedata);
 
-	state->save_item(NAME(state->m_upd7807_porta));
-	state->save_item(NAME(state->m_upd7807_portc));
+	save_item(NAME(m_upd7807_porta));
+	save_item(NAME(m_upd7807_portc));
 
-	state->save_item(NAME(state->m_reikaids_which));
-	state->save_item(NAME(state->m_gfx_bank));
+	save_item(NAME(m_reikaids_which));
+	save_item(NAME(m_gfx_bank));
 }
 
-static MACHINE_START( pteacher )
+MACHINE_START_MEMBER(homedata_state,pteacher)
 {
-	homedata_state *state = machine.driver_data<homedata_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
-	state->membank("bank2")->configure_entries(0, 4, state->memregion("audiocpu")->base(), 0x10000);
+	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
+	membank("bank2")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x10000);
 
-	MACHINE_START_CALL(homedata);
+	MACHINE_START_CALL_MEMBER(homedata);
 
-	state->save_item(NAME(state->m_upd7807_porta));
-	state->save_item(NAME(state->m_upd7807_portc));
+	save_item(NAME(m_upd7807_porta));
+	save_item(NAME(m_upd7807_portc));
 
-	state->save_item(NAME(state->m_gfx_bank));
-	state->save_item(NAME(state->m_to_cpu));
-	state->save_item(NAME(state->m_from_cpu));
+	save_item(NAME(m_gfx_bank));
+	save_item(NAME(m_to_cpu));
+	save_item(NAME(m_from_cpu));
 }
 
-static MACHINE_RESET( homedata )
+MACHINE_RESET_MEMBER(homedata_state,homedata)
 {
-	homedata_state *state = machine.driver_data<homedata_state>();
 
-	state->m_visible_page = 0;
-	state->m_flipscreen = 0;
-	state->m_blitter_bank = 0;
-	state->m_blitter_param_count = 0;
-	state->m_blitter_param[0] = 0;
-	state->m_blitter_param[1] = 0;
-	state->m_blitter_param[2] = 0;
-	state->m_blitter_param[3] = 0;
-	state->m_vblank = 0;
-	state->m_sndbank = 0;
-	state->m_keyb = 0;
-	state->m_snd_command = 0;
+	m_visible_page = 0;
+	m_flipscreen = 0;
+	m_blitter_bank = 0;
+	m_blitter_param_count = 0;
+	m_blitter_param[0] = 0;
+	m_blitter_param[1] = 0;
+	m_blitter_param[2] = 0;
+	m_blitter_param[3] = 0;
+	m_vblank = 0;
+	m_sndbank = 0;
+	m_keyb = 0;
+	m_snd_command = 0;
 }
 
-static MACHINE_RESET( pteacher )
+MACHINE_RESET_MEMBER(homedata_state,pteacher)
 {
-	homedata_state *state = machine.driver_data<homedata_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
-	state->pteacher_upd7807_portc_w(*space, 0, 0xff);
+	pteacher_upd7807_portc_w(*space, 0, 0xff);
 
-	MACHINE_RESET_CALL(homedata);
+	MACHINE_RESET_CALL_MEMBER(homedata);
 
-	state->m_upd7807_porta = 0;
-	state->m_gfx_bank[0] = 0;
-	state->m_gfx_bank[1] = 0;
-	state->m_to_cpu = 0;
-	state->m_from_cpu = 0;
+	m_upd7807_porta = 0;
+	m_gfx_bank[0] = 0;
+	m_gfx_bank[1] = 0;
+	m_to_cpu = 0;
+	m_from_cpu = 0;
 }
 
-static MACHINE_RESET( reikaids )
+MACHINE_RESET_MEMBER(homedata_state,reikaids)
 {
-	homedata_state *state = machine.driver_data<homedata_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
-	state->reikaids_upd7807_portc_w(*space, 0, 0xff);
+	reikaids_upd7807_portc_w(*space, 0, 0xff);
 
-	MACHINE_RESET_CALL(homedata);
+	MACHINE_RESET_CALL_MEMBER(homedata);
 
-	state->m_reikaids_which = state->m_priority;	// state->m_priority is set in DRIVER_INIT
-	state->m_upd7807_porta = 0;
-	state->m_gfx_bank[0] = 0;
-	state->m_gfx_bank[1] = 0;	// this is not used by reikaids
+	m_reikaids_which = m_priority;	// m_priority is set in DRIVER_INIT
+	m_upd7807_porta = 0;
+	m_gfx_bank[0] = 0;
+	m_gfx_bank[1] = 0;	// this is not used by reikaids
 }
 
 static MACHINE_CONFIG_START( mrokumei, homedata_state )
@@ -1258,8 +1252,8 @@ static MACHINE_CONFIG_START( mrokumei, homedata_state )
 	MCFG_CPU_PROGRAM_MAP(mrokumei_sound_map)
 	MCFG_CPU_IO_MAP(mrokumei_sound_io_map)
 
-	MCFG_MACHINE_START(homedata)
-	MCFG_MACHINE_RESET(homedata)
+	MCFG_MACHINE_START_OVERRIDE(homedata_state,homedata)
+	MCFG_MACHINE_RESET_OVERRIDE(homedata_state,homedata)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1274,8 +1268,8 @@ static MACHINE_CONFIG_START( mrokumei, homedata_state )
 	MCFG_GFXDECODE(mrokumei)
 	MCFG_PALETTE_LENGTH(0x8000)
 
-	MCFG_PALETTE_INIT(mrokumei)
-	MCFG_VIDEO_START(mrokumei)
+	MCFG_PALETTE_INIT_OVERRIDE(homedata_state,mrokumei)
+	MCFG_VIDEO_START_OVERRIDE(homedata_state,mrokumei)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1328,8 +1322,8 @@ static MACHINE_CONFIG_START( reikaids, homedata_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))	// very high interleave required to sync for startup tests
 
-	MCFG_MACHINE_START(reikaids)
-	MCFG_MACHINE_RESET(reikaids)
+	MCFG_MACHINE_START_OVERRIDE(homedata_state,reikaids)
+	MCFG_MACHINE_RESET_OVERRIDE(homedata_state,reikaids)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1343,8 +1337,8 @@ static MACHINE_CONFIG_START( reikaids, homedata_state )
 	MCFG_GFXDECODE(reikaids)
 	MCFG_PALETTE_LENGTH(0x8000)
 
-	MCFG_PALETTE_INIT(reikaids)
-	MCFG_VIDEO_START(reikaids)
+	MCFG_PALETTE_INIT_OVERRIDE(homedata_state,reikaids)
+	MCFG_VIDEO_START_OVERRIDE(homedata_state,reikaids)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1378,8 +1372,8 @@ static MACHINE_CONFIG_START( pteacher, homedata_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	// should be enough
 
-	MCFG_MACHINE_START(pteacher)
-	MCFG_MACHINE_RESET(pteacher)
+	MCFG_MACHINE_START_OVERRIDE(homedata_state,pteacher)
+	MCFG_MACHINE_RESET_OVERRIDE(homedata_state,pteacher)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1394,8 +1388,8 @@ static MACHINE_CONFIG_START( pteacher, homedata_state )
 	MCFG_GFXDECODE(pteacher)
 	MCFG_PALETTE_LENGTH(0x8000)
 
-	MCFG_PALETTE_INIT(pteacher)
-	MCFG_VIDEO_START(pteacher)
+	MCFG_PALETTE_INIT_OVERRIDE(homedata_state,pteacher)
+	MCFG_VIDEO_START_OVERRIDE(homedata_state,pteacher)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1419,7 +1413,7 @@ static MACHINE_CONFIG_DERIVED( lemnangl, pteacher )
 	/* video hardware */
 	MCFG_GFXDECODE(lemnangl)
 
-	MCFG_VIDEO_START(lemnangl)
+	MCFG_VIDEO_START_OVERRIDE(homedata_state,lemnangl)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( mirderby )
@@ -1557,8 +1551,8 @@ static MACHINE_CONFIG_START( mirderby, homedata_state )
 	MCFG_GFXDECODE(mirderby)
 	MCFG_PALETTE_LENGTH(0x8000)
 
-	MCFG_PALETTE_INIT(mirderby)
-	MCFG_VIDEO_START(mirderby)
+	MCFG_PALETTE_INIT_OVERRIDE(homedata_state,mirderby)
+	MCFG_VIDEO_START_OVERRIDE(homedata_state,mirderby)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

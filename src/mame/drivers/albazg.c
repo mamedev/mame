@@ -73,6 +73,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(yumefuda_output_w);
 	TILE_GET_INFO_MEMBER(y_get_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 TILE_GET_INFO_MEMBER(albazg_state::y_get_bg_tile_info)
@@ -88,10 +91,9 @@ TILE_GET_INFO_MEMBER(albazg_state::y_get_bg_tile_info)
 }
 
 
-static VIDEO_START( yumefuda )
+void albazg_state::video_start()
 {
-	albazg_state *state = machine.driver_data<albazg_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(albazg_state::y_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(albazg_state::y_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16( yumefuda )
@@ -354,24 +356,22 @@ INPUT_PORTS_END
 
 /***************************************************************************************/
 
-static MACHINE_START( yumefuda )
+void albazg_state::machine_start()
 {
-	albazg_state *state = machine.driver_data<albazg_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
+	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
 
-	state->save_item(NAME(state->m_mux_data));
-	state->save_item(NAME(state->m_bank));
-	state->save_item(NAME(state->m_prot_lock));
+	save_item(NAME(m_mux_data));
+	save_item(NAME(m_bank));
+	save_item(NAME(m_prot_lock));
 }
 
-static MACHINE_RESET( yumefuda )
+void albazg_state::machine_reset()
 {
-	albazg_state *state = machine.driver_data<albazg_state>();
-	state->m_mux_data = 0;
-	state->m_bank = -1;
-	state->m_prot_lock = 0;
+	m_mux_data = 0;
+	m_bank = -1;
+	m_prot_lock = 0;
 }
 
 static MACHINE_CONFIG_START( yumefuda, albazg_state )
@@ -382,8 +382,6 @@ static MACHINE_CONFIG_START( yumefuda, albazg_state )
 	MCFG_CPU_IO_MAP(port_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(yumefuda)
-	MCFG_MACHINE_RESET(yumefuda)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -404,7 +402,6 @@ static MACHINE_CONFIG_START( yumefuda, albazg_state )
 	MCFG_GFXDECODE( yumefuda )
 	MCFG_PALETTE_LENGTH(0x80)
 
-	MCFG_VIDEO_START( yumefuda )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

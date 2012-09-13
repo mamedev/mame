@@ -18,9 +18,12 @@ public:
 	UINT8			m_has_mo;
 	DECLARE_WRITE16_MEMBER(latch_w);
 	DECLARE_DRIVER_INIT(sparkz);
+	DECLARE_MACHINE_START(arcadecl);
+	DECLARE_MACHINE_RESET(arcadecl);
+	DECLARE_VIDEO_START(arcadecl);
 };
 
 /*----------- defined in video/arcadecl.c -----------*/
 
-VIDEO_START( arcadecl );
+
 SCREEN_UPDATE_IND16( arcadecl );

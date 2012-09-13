@@ -24,13 +24,12 @@ public:
 	DECLARE_WRITE8_MEMBER(partner_win_memory_page_w);
 	DECLARE_WRITE8_MEMBER(partner_mem_page_w);
 	DECLARE_DRIVER_INIT(partner);
+	DECLARE_MACHINE_START(partner);
+	DECLARE_MACHINE_RESET(partner);
 };
 
 
 /*----------- defined in machine/partner.c -----------*/
-
-extern MACHINE_RESET( partner );
-extern MACHINE_START( partner );
 
 extern const i8257_interface partner_dma;
 extern const wd17xx_interface partner_wd17xx_interface;

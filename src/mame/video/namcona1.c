@@ -275,32 +275,31 @@ static void UpdateGfx(running_machine &machine)
 {
 } /* UpdateGfx */
 
-VIDEO_START( namcona1 )
+void namcona1_state::video_start()
 {
-	namcona1_state *state = machine.driver_data<namcona1_state>();
 	static const tilemap_get_info_delegate get_info[4] = { 
-		tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info0),state), 
-		tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info1),state), 
-		tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info2),state), 
-		tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info3),state) 
+		tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info0),this), 
+		tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info1),this), 
+		tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info2),this), 
+		tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info3),this) 
 	};
 	int i;
 
-	state->m_roz_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcona1_state::roz_get_info),state), TILEMAP_SCAN_ROWS, 8,8,64,64 );
-	state->m_roz_palette = -1;
+	m_roz_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcona1_state::roz_get_info),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
+	m_roz_palette = -1;
 
 	for( i=0; i<NAMCONA1_NUM_TILEMAPS; i++ )
 	{
-		state->m_bg_tilemap[i] = &machine.tilemap().create(get_info[i], TILEMAP_SCAN_ROWS, 8,8,64,64 );
-		state->m_tilemap_palette_bank[i] = -1;
+		m_bg_tilemap[i] = &machine().tilemap().create(get_info[i], TILEMAP_SCAN_ROWS, 8,8,64,64 );
+		m_tilemap_palette_bank[i] = -1;
 	}
 
-	state->m_shaperam		     = auto_alloc_array(machine, UINT16, 0x2000*4/2 );
-	state->m_cgram			     = auto_alloc_array(machine, UINT16, 0x1000*0x40/2 );
+	m_shaperam		     = auto_alloc_array(machine(), UINT16, 0x2000*4/2 );
+	m_cgram			     = auto_alloc_array(machine(), UINT16, 0x1000*0x40/2 );
 
-	machine.gfx[0] = auto_alloc( machine, gfx_element( machine, cg_layout_8bpp, (UINT8 *)state->m_cgram, machine.total_colors()/256, 0 ));
-	machine.gfx[1] = auto_alloc( machine, gfx_element( machine, cg_layout_4bpp, (UINT8 *)state->m_cgram, machine.total_colors()/16, 0 ));
-	machine.gfx[2] = auto_alloc( machine, gfx_element( machine, shape_layout, (UINT8 *)state->m_shaperam, machine.total_colors()/2, 0 ));
+	machine().gfx[0] = auto_alloc( machine(), gfx_element( machine(), cg_layout_8bpp, (UINT8 *)m_cgram, machine().total_colors()/256, 0 ));
+	machine().gfx[1] = auto_alloc( machine(), gfx_element( machine(), cg_layout_4bpp, (UINT8 *)m_cgram, machine().total_colors()/16, 0 ));
+	machine().gfx[2] = auto_alloc( machine(), gfx_element( machine(), shape_layout, (UINT8 *)m_shaperam, machine().total_colors()/2, 0 ));
 
 } /* namcona1_vh_start */
 

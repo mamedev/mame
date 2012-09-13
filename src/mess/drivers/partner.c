@@ -193,8 +193,8 @@ static MACHINE_CONFIG_START( partner, partner_state )
     MCFG_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
     MCFG_CPU_PROGRAM_MAP(partner_mem)
 
-    MCFG_MACHINE_START( partner )
-    MCFG_MACHINE_RESET( partner )
+    MCFG_MACHINE_START_OVERRIDE(partner_state, partner )
+    MCFG_MACHINE_RESET_OVERRIDE(partner_state, partner )
 
 	MCFG_I8255_ADD( "ppi8255_1", radio86_ppi8255_interface_1 )
 
@@ -209,7 +209,7 @@ static MACHINE_CONFIG_START( partner, partner_state )
 
 	MCFG_GFXDECODE(partner)
 	MCFG_PALETTE_LENGTH(3)
-	MCFG_PALETTE_INIT(radio86)
+	MCFG_PALETTE_INIT_OVERRIDE(partner_state,radio86)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)

@@ -130,6 +130,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg5_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg6_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg7_tile_info);
+	virtual void video_start();
 };
 
 #define GET_INFO( ram ) \
@@ -159,27 +160,26 @@ WRITE16_MEMBER(blackt96_state::bg_videoram5_w) { COMBINE_DATA(&m_spriteram5[offs
 WRITE16_MEMBER(blackt96_state::bg_videoram6_w) { COMBINE_DATA(&m_spriteram6[offset]); m_bg_tilemap[6]->mark_tile_dirty(offset/2); }
 WRITE16_MEMBER(blackt96_state::bg_videoram7_w) { COMBINE_DATA(&m_spriteram7[offset]); m_bg_tilemap[7]->mark_tile_dirty(offset/2); }
 
-static VIDEO_START( blackt96 )
+void blackt96_state::video_start()
 {
-	blackt96_state *state = machine.driver_data<blackt96_state>();
 
-	state->m_bg_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg0_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_bg_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg1_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_bg_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg2_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_bg_tilemap[3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg3_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_bg_tilemap[4] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg4_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_bg_tilemap[5] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg5_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_bg_tilemap[6] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg6_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_bg_tilemap[7] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg7_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg0_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_bg_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg2_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_bg_tilemap[3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg3_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_bg_tilemap[4] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg4_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_bg_tilemap[5] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg5_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_bg_tilemap[6] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg6_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_bg_tilemap[7] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg7_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 
-	state->m_spriteram[0] = state->m_spriteram0;
-	state->m_spriteram[1] = state->m_spriteram1;
-	state->m_spriteram[2] =	state->m_spriteram2;
-	state->m_spriteram[3] = state->m_spriteram3;
-	state->m_spriteram[4] = state->m_spriteram4;
-	state->m_spriteram[5] = state->m_spriteram5;
-	state->m_spriteram[6] =	state->m_spriteram6;
-	state->m_spriteram[7] = state->m_spriteram7;
+	m_spriteram[0] = m_spriteram0;
+	m_spriteram[1] = m_spriteram1;
+	m_spriteram[2] =	m_spriteram2;
+	m_spriteram[3] = m_spriteram3;
+	m_spriteram[4] = m_spriteram4;
+	m_spriteram[5] = m_spriteram5;
+	m_spriteram[6] =	m_spriteram6;
+	m_spriteram[7] = m_spriteram7;
 }
 
 static void draw_strip(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int column, int bg)
@@ -625,7 +625,6 @@ static MACHINE_CONFIG_START( blackt96, blackt96_state )
 
 	MCFG_PALETTE_LENGTH(0x800)
 
-	MCFG_VIDEO_START(blackt96)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

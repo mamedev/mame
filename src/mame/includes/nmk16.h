@@ -115,6 +115,18 @@ public:
 	TILE_GET_INFO_MEMBER(macross_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(bjtwin_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info_0_8bit);
+	DECLARE_MACHINE_RESET(mustang_sound);
+	DECLARE_VIDEO_START(macross);
+	DECLARE_MACHINE_RESET(NMK004);
+	DECLARE_VIDEO_START(bioship);
+	DECLARE_VIDEO_START(strahl);
+	DECLARE_VIDEO_START(gunnail);
+	DECLARE_VIDEO_START(macross2);
+	DECLARE_VIDEO_START(raphero);
+	DECLARE_VIDEO_START(bjtwin);
+	DECLARE_VIDEO_START(afega);
+	DECLARE_VIDEO_START(firehawk);
+	DECLARE_VIDEO_START(grdnstrm);
 };
 
 
@@ -122,13 +134,13 @@ public:
 
 
 
-VIDEO_START( macross );
-VIDEO_START( gunnail );
-VIDEO_START( macross2 );
-VIDEO_START( raphero );
-VIDEO_START( bjtwin );
-VIDEO_START( bioship );
-VIDEO_START( strahl );
+
+
+
+
+
+
+
 SCREEN_UPDATE_IND16( macross );
 SCREEN_UPDATE_IND16( manybloc );
 SCREEN_UPDATE_IND16( tharrier );
@@ -140,9 +152,9 @@ SCREEN_UPDATE_IND16( bjtwin );
 SCREEN_VBLANK( nmk );
 SCREEN_VBLANK( strahl );
 
-VIDEO_START( afega );
-VIDEO_START( grdnstrm );
-VIDEO_START( firehawk );
+
+
+
 SCREEN_UPDATE_IND16( afega );
 SCREEN_UPDATE_IND16( redhawkb );
 SCREEN_UPDATE_IND16(redhawki );

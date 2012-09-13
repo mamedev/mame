@@ -217,31 +217,29 @@ static void update_interrupts(running_machine &machine)
 }
 
 
-static MACHINE_START( atarisy1 )
+MACHINE_START_MEMBER(atarisy1_state,atarisy1)
 {
-	atarisy1_state *state = machine.driver_data<atarisy1_state>();
-	atarigen_init(machine);
+	atarigen_init(machine());
 
-	state->save_item(NAME(state->m_joystick_int));
-	state->save_item(NAME(state->m_joystick_int_enable));
-	state->save_item(NAME(state->m_joystick_value));
+	save_item(NAME(m_joystick_int));
+	save_item(NAME(m_joystick_int_enable));
+	save_item(NAME(m_joystick_value));
 }
 
 
-static MACHINE_RESET( atarisy1 )
+MACHINE_RESET_MEMBER(atarisy1_state,atarisy1)
 {
-	atarisy1_state *state = machine.driver_data<atarisy1_state>();
 
 	/* initialize the system */
-	atarigen_eeprom_reset(state);
-	atarigen_slapstic_reset(state);
-	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_sound_io_reset(machine.device("audiocpu"));
+	atarigen_eeprom_reset(this);
+	atarigen_slapstic_reset(this);
+	atarigen_interrupt_reset(this, update_interrupts);
+	atarigen_sound_io_reset(machine().device("audiocpu"));
 
 	/* reset the joystick parameters */
-	state->m_joystick_value = 0;
-	state->m_joystick_int = 0;
-	state->m_joystick_int_enable = 0;
+	m_joystick_value = 0;
+	m_joystick_int = 0;
+	m_joystick_int_enable = 0;
 }
 
 
@@ -769,8 +767,8 @@ static MACHINE_CONFIG_START( atarisy1, atarisy1_state )
 	MCFG_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(atarisy1)
-	MCFG_MACHINE_RESET(atarisy1)
+	MCFG_MACHINE_START_OVERRIDE(atarisy1_state,atarisy1)
+	MCFG_MACHINE_RESET_OVERRIDE(atarisy1_state,atarisy1)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	MCFG_TIMER_ADD("joystick_timer", delayed_joystick_int)
@@ -789,7 +787,7 @@ static MACHINE_CONFIG_START( atarisy1, atarisy1_state )
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(atarisy1)
 
-	MCFG_VIDEO_START(atarisy1)
+	MCFG_VIDEO_START_OVERRIDE(atarisy1_state,atarisy1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

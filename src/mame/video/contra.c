@@ -20,13 +20,13 @@
 **
 ***************************************************************************/
 
-PALETTE_INIT( contra )
+void contra_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int chip;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x80);
+	machine().colortable = colortable_alloc(machine(), 0x80);
 
 	for (chip = 0; chip < 2; chip++)
 	{
@@ -46,7 +46,7 @@ PALETTE_INIT( contra )
 				else
 					ctabentry = (pal << 4) | (color_prom[(clut << 8) | i] & 0x0f);
 
-				colortable_entry_set_value(machine.colortable, (chip << 11) | (pal << 8) | i, ctabentry);
+				colortable_entry_set_value(machine().colortable, (chip << 11) | (pal << 8) | i, ctabentry);
 			}
 		}
 	}
@@ -162,30 +162,29 @@ TILE_GET_INFO_MEMBER(contra_state::get_tx_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( contra )
+void contra_state::video_start()
 {
-	contra_state *state = machine.driver_data<contra_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(contra_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(contra_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(contra_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(contra_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(contra_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(contra_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_buffered_spriteram = auto_alloc_array(machine, UINT8, 0x800);
-	state->m_buffered_spriteram_2 = auto_alloc_array(machine, UINT8, 0x800);
+	m_buffered_spriteram = auto_alloc_array(machine(), UINT8, 0x800);
+	m_buffered_spriteram_2 = auto_alloc_array(machine(), UINT8, 0x800);
 
-	state->m_bg_clip = machine.primary_screen->visible_area();
-	state->m_bg_clip.min_x += 40;
+	m_bg_clip = machine().primary_screen->visible_area();
+	m_bg_clip.min_x += 40;
 
-	state->m_fg_clip = state->m_bg_clip;
+	m_fg_clip = m_bg_clip;
 
-	state->m_tx_clip = machine.primary_screen->visible_area();
-	state->m_tx_clip.max_x = 39;
-	state->m_tx_clip.min_x = 0;
+	m_tx_clip = machine().primary_screen->visible_area();
+	m_tx_clip.max_x = 39;
+	m_tx_clip.min_x = 0;
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->save_pointer(NAME(state->m_buffered_spriteram), 0x800);
-	state->save_pointer(NAME(state->m_buffered_spriteram_2), 0x800);
+	save_pointer(NAME(m_buffered_spriteram), 0x800);
+	save_pointer(NAME(m_buffered_spriteram_2), 0x800);
 }
 
 

@@ -447,6 +447,11 @@ public:
 	DECLARE_DRIVER_INIT(ama8000_2_i);
 	DECLARE_DRIVER_INIT(ama8000_2_v);
 	DECLARE_DRIVER_INIT(ama8000_1_x);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_PALETTE_INIT(amaticmg2);
 };
 
 
@@ -454,7 +459,7 @@ public:
 *          Video Hardware           *
 ************************************/
 
-static VIDEO_START( amaticmg )
+void amaticmg_state::video_start()
 {
 }
 
@@ -509,9 +514,9 @@ static SCREEN_UPDATE_IND16( amaticmg2 )
 	return 0;
 }
 
-static PALETTE_INIT( amaticmg )
+void amaticmg_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int	bit0, bit1, bit2 , r, g, b;
 	int	i;
 
@@ -530,25 +535,25 @@ static PALETTE_INIT( amaticmg )
 		bit2 = (color_prom[0] >> 5) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 }
 
 
-static PALETTE_INIT( amaticmg2 )
+PALETTE_INIT_MEMBER(amaticmg_state,amaticmg2)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int	r, g, b;
 	int	i;
 
-	for (i = 0; i < machine.root_device().memregion("proms")->bytes(); i+=2)
+	for (i = 0; i < machine().root_device().memregion("proms")->bytes(); i+=2)
 	{
 		b = ((color_prom[1] & 0xf8) >> 3);
 		g = ((color_prom[0] & 0xc0) >> 6) | ((color_prom[1] & 0x7) << 2);
 		r = ((color_prom[0] & 0x3e) >> 1);
 
-		palette_set_color_rgb(machine, i >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
+		palette_set_color_rgb(machine(), i >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 		color_prom+=2;
 	}
 }
@@ -837,19 +842,18 @@ static I8255A_INTERFACE( ppi8255_intf_1 )
 *       Machine Start & Reset       *
 ************************************/
 
-static MACHINE_START( amaticmg )
+void amaticmg_state::machine_start()
 {
-	UINT8 *rombank = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rombank = machine().root_device().memregion("maincpu")->base();
 
-	machine.root_device().membank("bank1")->configure_entries(0, 0x10, &rombank[0x8000], 0x4000);
+	machine().root_device().membank("bank1")->configure_entries(0, 0x10, &rombank[0x8000], 0x4000);
 }
 
-static MACHINE_RESET( amaticmg )
+void amaticmg_state::machine_reset()
 {
-	amaticmg_state *state = machine.driver_data<amaticmg_state>();
 
-	state->membank("bank1")->set_entry(0);
-	state->m_nmi_mask = 0;
+	membank("bank1")->set_entry(0);
+	m_nmi_mask = 0;
 }
 
 
@@ -883,12 +887,8 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 
 	MCFG_GFXDECODE(amaticmg)
 
-	MCFG_PALETTE_INIT(amaticmg)
 	MCFG_PALETTE_LENGTH(0x200)
-	MCFG_VIDEO_START(amaticmg)
 
-	MCFG_MACHINE_START(amaticmg)
-	MCFG_MACHINE_RESET(amaticmg)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -922,7 +922,7 @@ static MACHINE_CONFIG_DERIVED( amaticmg2, amaticmg )
 	MCFG_SCREEN_UPDATE_STATIC(amaticmg2)
 
 	MCFG_GFXDECODE(amaticmg2)
-	MCFG_PALETTE_INIT(amaticmg2)
+	MCFG_PALETTE_INIT_OVERRIDE(amaticmg_state,amaticmg2)
 	MCFG_PALETTE_LENGTH(0x10000)
 MACHINE_CONFIG_END
 

@@ -409,9 +409,7 @@ static MACHINE_CONFIG_START( aquarius, aquarius_state )
 
 	MCFG_GFXDECODE( aquarius )
 	MCFG_PALETTE_LENGTH(512)
-	MCFG_PALETTE_INIT( aquarius )
 
-	MCFG_VIDEO_START( aquarius )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -63,55 +63,53 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_gamma_irq_ack_w)
  *
  *************************************/
 
-MACHINE_START( mhavoc )
+void mhavoc_state::machine_start()
 {
-	mhavoc_state *state = machine.driver_data<mhavoc_state>();
-	state_save_register_item(machine, "misc", NULL, 0, state->m_alpha_data);
-	state_save_register_item(machine, "misc", NULL, 0, state->m_alpha_rcvd);
-	state_save_register_item(machine, "misc", NULL, 0, state->m_alpha_xmtd);
-	state_save_register_item(machine, "misc", NULL, 0, state->m_gamma_data);
-	state_save_register_item(machine, "misc", NULL, 0, state->m_gamma_rcvd);
-	state_save_register_item(machine, "misc", NULL, 0, state->m_gamma_xmtd);
-	state_save_register_item(machine, "misc", NULL, 0, state->m_player_1);
-	state_save_register_item(machine, "misc", NULL, 0, state->m_alpha_irq_clock);
-	state_save_register_item(machine, "misc", NULL, 0, state->m_alpha_irq_clock_enable);
-	state_save_register_item(machine, "misc", NULL, 0, state->m_gamma_irq_clock);
+	state_save_register_item(machine(), "misc", NULL, 0, m_alpha_data);
+	state_save_register_item(machine(), "misc", NULL, 0, m_alpha_rcvd);
+	state_save_register_item(machine(), "misc", NULL, 0, m_alpha_xmtd);
+	state_save_register_item(machine(), "misc", NULL, 0, m_gamma_data);
+	state_save_register_item(machine(), "misc", NULL, 0, m_gamma_rcvd);
+	state_save_register_item(machine(), "misc", NULL, 0, m_gamma_xmtd);
+	state_save_register_item(machine(), "misc", NULL, 0, m_player_1);
+	state_save_register_item(machine(), "misc", NULL, 0, m_alpha_irq_clock);
+	state_save_register_item(machine(), "misc", NULL, 0, m_alpha_irq_clock_enable);
+	state_save_register_item(machine(), "misc", NULL, 0, m_gamma_irq_clock);
 
-	state_save_register_item(machine, "misc", NULL, 0, state->m_speech_write_buffer);
+	state_save_register_item(machine(), "misc", NULL, 0, m_speech_write_buffer);
 }
 
 
-MACHINE_RESET( mhavoc )
+void mhavoc_state::machine_reset()
 {
-	mhavoc_state *state = machine.driver_data<mhavoc_state>();
-	address_space *space = machine.device("alpha")->memory().space(AS_PROGRAM);
-	state->m_has_gamma_cpu = (machine.device("gamma") != NULL);
+	address_space *space = machine().device("alpha")->memory().space(AS_PROGRAM);
+	m_has_gamma_cpu = (machine().device("gamma") != NULL);
 
-	state->membank("bank1")->configure_entry(0, state->m_zram0);
-	state->membank("bank1")->configure_entry(1, state->m_zram1);
-	state->membank("bank2")->configure_entries(0, 4, state->memregion("alpha")->base() + 0x10000, 0x2000);
+	membank("bank1")->configure_entry(0, m_zram0);
+	membank("bank1")->configure_entry(1, m_zram1);
+	membank("bank2")->configure_entries(0, 4, memregion("alpha")->base() + 0x10000, 0x2000);
 
 	/* reset RAM/ROM banks to 0 */
-	state->mhavoc_ram_banksel_w(*space, 0, 0);
-	state->mhavoc_rom_banksel_w(*space, 0, 0);
+	mhavoc_ram_banksel_w(*space, 0, 0);
+	mhavoc_rom_banksel_w(*space, 0, 0);
 
 	/* reset alpha comm status */
-	state->m_alpha_data = 0;
-	state->m_alpha_rcvd = 0;
-	state->m_alpha_xmtd = 0;
+	m_alpha_data = 0;
+	m_alpha_rcvd = 0;
+	m_alpha_xmtd = 0;
 
 	/* reset gamma comm status */
-	state->m_gamma_data = 0;
-	state->m_gamma_rcvd = 0;
-	state->m_gamma_xmtd = 0;
+	m_gamma_data = 0;
+	m_gamma_rcvd = 0;
+	m_gamma_xmtd = 0;
 
 	/* reset player 1 flag */
-	state->m_player_1 = 0;
+	m_player_1 = 0;
 
 	/* reset IRQ clock states */
-	state->m_alpha_irq_clock = 0;
-	state->m_alpha_irq_clock_enable = 1;
-	state->m_gamma_irq_clock = 0;
+	m_alpha_irq_clock = 0;
+	m_alpha_irq_clock_enable = 1;
+	m_gamma_irq_clock = 0;
 }
 
 

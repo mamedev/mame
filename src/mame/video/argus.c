@@ -267,85 +267,79 @@ static void reset_common(running_machine &machine)
 	state->m_palette_intensity = 0;
 }
 
-VIDEO_START( argus )
+VIDEO_START_MEMBER(argus_state,argus)
 {
-	argus_state *state = machine.driver_data<argus_state>();
 	/*                           info                     offset             w   h  col  row */
-	state->m_bg0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg0_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg1_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_tx_tilemap  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::argus_get_tx_tile_info),state),  TILEMAP_SCAN_COLS,  8,  8, 32, 32);
+	m_bg0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg0_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_tx_tilemap  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::argus_get_tx_tile_info),this),  TILEMAP_SCAN_COLS,  8,  8, 32, 32);
 
-	state->m_bg1_tilemap->set_transparent_pen(15);
-	state->m_tx_tilemap->set_transparent_pen(15);
+	m_bg1_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(15);
 
 	/* dummy RAM for back ground */
-	state->m_dummy_bg0ram = auto_alloc_array(machine, UINT8, 0x800);
+	m_dummy_bg0ram = auto_alloc_array(machine(), UINT8, 0x800);
 
-	jal_blend_init(machine, 1);
+	jal_blend_init(machine(), 1);
 }
 
-VIDEO_RESET( argus )
+VIDEO_RESET_MEMBER(argus_state,argus)
 {
-	argus_state *state = machine.driver_data<argus_state>();
-	state->m_lowbitscroll = 0;
-	state->m_prvscrollx = 0;
-	state->m_bg0_scrollx[0] = 0;
-	state->m_bg0_scrollx[1] = 0;
-	memset(state->m_dummy_bg0ram, 0, 0x800);
-	reset_common(machine);
+	m_lowbitscroll = 0;
+	m_prvscrollx = 0;
+	m_bg0_scrollx[0] = 0;
+	m_bg0_scrollx[1] = 0;
+	memset(m_dummy_bg0ram, 0, 0x800);
+	reset_common(machine());
 }
 
-VIDEO_START( valtric )
+VIDEO_START_MEMBER(argus_state,valtric)
 {
-	argus_state *state = machine.driver_data<argus_state>();
 	/*                           info                      offset             w   h  col  row */
-	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::valtric_get_bg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_tx_tilemap  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::valtric_get_tx_tile_info),state), TILEMAP_SCAN_COLS,  8,  8, 32, 32);
+	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::valtric_get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_tx_tilemap  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::valtric_get_tx_tile_info),this), TILEMAP_SCAN_COLS,  8,  8, 32, 32);
 
-	state->m_tx_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(15);
 
-	machine.primary_screen->register_screen_bitmap(state->m_mosaicbitmap);
+	machine().primary_screen->register_screen_bitmap(m_mosaicbitmap);
 
-	jal_blend_init(machine, 1);
+	jal_blend_init(machine(), 1);
 }
 
-VIDEO_RESET( valtric )
+VIDEO_RESET_MEMBER(argus_state,valtric)
 {
-	argus_state *state = machine.driver_data<argus_state>();
-	state->m_valtric_mosaic = 0x0f;
-	reset_common(machine);
+	m_valtric_mosaic = 0x0f;
+	reset_common(machine());
 }
 
-VIDEO_START( butasan )
+VIDEO_START_MEMBER(argus_state,butasan)
 {
-	argus_state *state = machine.driver_data<argus_state>();
 	/*                           info                       offset             w   h  col  row */
-	state->m_bg0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::butasan_get_bg0_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::butasan_get_bg1_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_tx_tilemap  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::butasan_get_tx_tile_info),state),  TILEMAP_SCAN_ROWS,  8,  8, 32, 32);
+	m_bg0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::butasan_get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::butasan_get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tx_tilemap  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::butasan_get_tx_tile_info),this),  TILEMAP_SCAN_ROWS,  8,  8, 32, 32);
 
-	state->m_bg1_tilemap->set_transparent_pen(15);
-	state->m_tx_tilemap->set_transparent_pen(15);
+	m_bg1_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(15);
 
-	state->m_butasan_pagedram[0] = auto_alloc_array(machine, UINT8, 0x1000);
-	state->m_butasan_pagedram[1] = auto_alloc_array(machine, UINT8, 0x1000);
+	m_butasan_pagedram[0] = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_butasan_pagedram[1] = auto_alloc_array(machine(), UINT8, 0x1000);
 
-	state->m_butasan_bg0ram     = &state->m_butasan_pagedram[0][0x000];
-	state->m_butasan_bg0backram = &state->m_butasan_pagedram[0][0x800];
-	state->m_butasan_txram      = &state->m_butasan_pagedram[1][0x000];
-	state->m_butasan_txbackram  = &state->m_butasan_pagedram[1][0x800];
+	m_butasan_bg0ram     = &m_butasan_pagedram[0][0x000];
+	m_butasan_bg0backram = &m_butasan_pagedram[0][0x800];
+	m_butasan_txram      = &m_butasan_pagedram[1][0x000];
+	m_butasan_txbackram  = &m_butasan_pagedram[1][0x800];
 
-	jal_blend_init(machine, 1);
+	jal_blend_init(machine(), 1);
 }
 
-VIDEO_RESET( butasan )
+VIDEO_RESET_MEMBER(argus_state,butasan)
 {
-	argus_state *state = machine.driver_data<argus_state>();
-	state->m_butasan_page_latch = 0;
-	state->m_butasan_bg1_status = 0x01;
-	memset(state->m_butasan_pagedram[0], 0, 0x1000);
-	memset(state->m_butasan_pagedram[1], 0, 0x1000);
-	reset_common(machine);
+	m_butasan_page_latch = 0;
+	m_butasan_bg1_status = 0x01;
+	memset(m_butasan_pagedram[0], 0, 0x1000);
+	memset(m_butasan_pagedram[1], 0, 0x1000);
+	reset_common(machine());
 }
 
 

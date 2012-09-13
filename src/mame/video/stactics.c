@@ -57,9 +57,9 @@ tilt the mirror up and down, and the monitor left and right.
  *
  *************************************/
 
-static PALETTE_INIT( stactics )
+PALETTE_INIT_MEMBER(stactics_state,stactics)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x400; i++)
@@ -78,7 +78,7 @@ static PALETTE_INIT( stactics )
 		/* blue component */
 		int b = 0xff * bit2;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -359,19 +359,18 @@ static void update_artwork(running_machine &machine, stactics_state *state)
  *
  *************************************/
 
-static VIDEO_START( stactics )
+VIDEO_START_MEMBER(stactics_state,stactics)
 {
-	stactics_state *state = machine.driver_data<stactics_state>();
 
-	state->m_y_scroll_d = 0;
-	state->m_y_scroll_e = 0;
-	state->m_y_scroll_f = 0;
+	m_y_scroll_d = 0;
+	m_y_scroll_e = 0;
+	m_y_scroll_f = 0;
 
-	state->m_frame_count = 0;
-	state->m_shot_standby = 1;
-	state->m_shot_arrive = 0;
-	state->m_beam_state = 0;
-	state->m_old_beam_state = 0;
+	m_frame_count = 0;
+	m_shot_standby = 1;
+	m_shot_arrive = 0;
+	m_beam_state = 0;
+	m_old_beam_state = 0;
 }
 
 
@@ -416,6 +415,6 @@ MACHINE_CONFIG_FRAGMENT( stactics_video )
 
 	MCFG_PALETTE_LENGTH(0x400)
 
-	MCFG_PALETTE_INIT(stactics)
-	MCFG_VIDEO_START(stactics)
+	MCFG_PALETTE_INIT_OVERRIDE(stactics_state,stactics)
+	MCFG_VIDEO_START_OVERRIDE(stactics_state,stactics)
 MACHINE_CONFIG_END

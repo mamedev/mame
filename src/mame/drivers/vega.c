@@ -145,6 +145,9 @@ public:
 	DECLARE_DRIVER_INIT(vega);
 
 
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 WRITE8_MEMBER(vega_state::extern_w)
@@ -474,13 +477,13 @@ INPUT_PORTS_END
 
 
 
-static PALETTE_INIT( vega )
+void vega_state::palette_init()
 {
 	int i;
 	for(i=0;i<8;++i)
 	{
-		palette_set_color( machine,2*i, MAKE_RGB(0x00, 0x00, 0x00) );
-		palette_set_color( machine,2*i+1, MAKE_RGB( (i&1)?0xff:0x00, (i&2)?0xff:0x00, (i&4)?0xff:0x00) );
+		palette_set_color( machine(),2*i, MAKE_RGB(0x00, 0x00, 0x00) );
+		palette_set_color( machine(),2*i+1, MAKE_RGB( (i&1)?0xff:0x00, (i&2)?0xff:0x00, (i&4)?0xff:0x00) );
 	}
 }
 
@@ -709,10 +712,9 @@ static GFXDECODE_START( test_decode )
 	GFXDECODE_ENTRY( "gfx2", 0,  tile_layoutzoom, 16, 1 )
 GFXDECODE_END
 
-static MACHINE_RESET(vega)
+void vega_state::machine_reset()
 {
-	vega_state *state = machine.driver_data<vega_state>();
-	state->membank("bank1")->set_entry(1);
+	membank("bank1")->set_entry(1);
 }
 
 WRITE8_MEMBER(vega_state::txtram_w)
@@ -828,7 +830,7 @@ static const ay8910_interface ay8910_inf =
 	DEVCB_DRIVER_MEMBER(vega_state, ay8910_pb_w)
 };
 
-static MACHINE_START( vega )
+void vega_state::machine_start()
 {
 
 }
@@ -843,8 +845,6 @@ static MACHINE_CONFIG_START( vega, vega_state )
 	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
 
 
-	MCFG_MACHINE_START(vega)
-	MCFG_MACHINE_RESET(vega)
 
 	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
 	MCFG_INS8154_ADD( "ins8154", ins8154_intf)
@@ -860,7 +860,6 @@ static MACHINE_CONFIG_START( vega, vega_state )
 
 	MCFG_GFXDECODE(test_decode)
 
-	MCFG_PALETTE_INIT(vega)
 	MCFG_SCREEN_UPDATE_STATIC(vega)
 
 	/* sound hardware */

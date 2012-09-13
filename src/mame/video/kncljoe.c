@@ -14,13 +14,13 @@ Knuckle Joe - (c) 1985 Taito Corporation
 
 ***************************************************************************/
 
-PALETTE_INIT( kncljoe )
+void kncljoe_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x90);
+	machine().colortable = colortable_alloc(machine(), 0x90);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x80; i++)
@@ -29,7 +29,7 @@ PALETTE_INIT( kncljoe )
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	for (i = 0x80; i < 0x90; i++)
@@ -55,7 +55,7 @@ PALETTE_INIT( kncljoe )
 		bit2 = (color_prom[(i - 0x80) + 0x300] >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -63,13 +63,13 @@ PALETTE_INIT( kncljoe )
 
 	/* chars */
 	for (i = 0; i < 0x80; i++)
-		colortable_entry_set_value(machine.colortable, i, i);
+		colortable_entry_set_value(machine().colortable, i, i);
 
 	/* sprite lookup table */
 	for (i = 0x80; i < 0x100; i++)
 	{
 		UINT8 ctabentry = (color_prom[i - 0x80] & 0x0f) | 0x80;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 
@@ -101,12 +101,11 @@ TILE_GET_INFO_MEMBER(kncljoe_state::get_bg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( kncljoe )
+void kncljoe_state::video_start()
 {
-	kncljoe_state *state = machine.driver_data<kncljoe_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(kncljoe_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(kncljoe_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	state->m_bg_tilemap->set_scroll_rows(4);
+	m_bg_tilemap->set_scroll_rows(4);
 }
 
 

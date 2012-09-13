@@ -447,12 +447,11 @@ The game is displayed on 2 monitors
 
 ***/
 
-static MACHINE_RESET( tbowl )
+void tbowl_state::machine_reset()
 {
-	tbowl_state *state = machine.driver_data<tbowl_state>();
-	state->m_adpcm_pos[0] = state->m_adpcm_pos[1] = 0;
-	state->m_adpcm_end[0] = state->m_adpcm_end[1] = 0;
-	state->m_adpcm_data[0] = state->m_adpcm_data[1] = -1;
+	m_adpcm_pos[0] = m_adpcm_pos[1] = 0;
+	m_adpcm_end[0] = m_adpcm_end[1] = 0;
+	m_adpcm_data[0] = m_adpcm_data[1] = -1;
 }
 
 static MACHINE_CONFIG_START( tbowl, tbowl_state )
@@ -492,9 +491,7 @@ static MACHINE_CONFIG_START( tbowl, tbowl_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(tbowl_right)
 
-	MCFG_VIDEO_START(tbowl)
 
-	MCFG_MACHINE_RESET( tbowl )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

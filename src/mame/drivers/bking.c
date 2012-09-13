@@ -388,82 +388,78 @@ static const ay8910_interface ay8910_config =
 	DEVCB_DRIVER_MEMBER(bking_state,port_b_w)
 };
 
-static MACHINE_START( bking )
+void bking_state::machine_start()
 {
-	bking_state *state = machine.driver_data<bking_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	/* video */
-	state->save_item(NAME(state->m_pc3259_output));
-	state->save_item(NAME(state->m_pc3259_mask));
-	state->save_item(NAME(state->m_xld1));
-	state->save_item(NAME(state->m_xld2));
-	state->save_item(NAME(state->m_xld3));
-	state->save_item(NAME(state->m_yld1));
-	state->save_item(NAME(state->m_yld2));
-	state->save_item(NAME(state->m_yld3));
-	state->save_item(NAME(state->m_ball1_pic));
-	state->save_item(NAME(state->m_ball2_pic));
-	state->save_item(NAME(state->m_crow_pic));
-	state->save_item(NAME(state->m_crow_flip));
-	state->save_item(NAME(state->m_palette_bank));
-	state->save_item(NAME(state->m_controller));
-	state->save_item(NAME(state->m_hit));
+	save_item(NAME(m_pc3259_output));
+	save_item(NAME(m_pc3259_mask));
+	save_item(NAME(m_xld1));
+	save_item(NAME(m_xld2));
+	save_item(NAME(m_xld3));
+	save_item(NAME(m_yld1));
+	save_item(NAME(m_yld2));
+	save_item(NAME(m_yld3));
+	save_item(NAME(m_ball1_pic));
+	save_item(NAME(m_ball2_pic));
+	save_item(NAME(m_crow_pic));
+	save_item(NAME(m_crow_flip));
+	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_controller));
+	save_item(NAME(m_hit));
 	/* sound */
-	state->save_item(NAME(state->m_sound_nmi_enable));
+	save_item(NAME(m_sound_nmi_enable));
 }
 
-static MACHINE_START( bking3 )
+MACHINE_START_MEMBER(bking_state,bking3)
 {
-	bking_state *state = machine.driver_data<bking_state>();
 
-	MACHINE_START_CALL(bking);
+	bking_state::machine_start();
 
 	/* misc */
-	state->save_item(NAME(state->m_addr_h));
-	state->save_item(NAME(state->m_addr_l));
+	save_item(NAME(m_addr_h));
+	save_item(NAME(m_addr_l));
 
 }
 
-static MACHINE_RESET( bking )
+void bking_state::machine_reset()
 {
-	bking_state *state = machine.driver_data<bking_state>();
 
 	/* video */
-	state->m_pc3259_output[0] = 0;
-	state->m_pc3259_output[1] = 0;
-	state->m_pc3259_output[2] = 0;
-	state->m_pc3259_output[3] = 0;
-	state->m_pc3259_mask = 0;
-	state->m_xld1 = 0;
-	state->m_xld2 = 0;
-	state->m_xld3 = 0;
-	state->m_yld1 = 0;
-	state->m_yld2 = 0;
-	state->m_yld3 = 0;
-	state->m_ball1_pic = 0;
-	state->m_ball2_pic = 0;
-	state->m_crow_pic = 0;
-	state->m_crow_flip = 0;
-	state->m_palette_bank = 0;
-	state->m_controller = 0;
-	state->m_hit = 0;
+	m_pc3259_output[0] = 0;
+	m_pc3259_output[1] = 0;
+	m_pc3259_output[2] = 0;
+	m_pc3259_output[3] = 0;
+	m_pc3259_mask = 0;
+	m_xld1 = 0;
+	m_xld2 = 0;
+	m_xld3 = 0;
+	m_yld1 = 0;
+	m_yld2 = 0;
+	m_yld3 = 0;
+	m_ball1_pic = 0;
+	m_ball2_pic = 0;
+	m_crow_pic = 0;
+	m_crow_flip = 0;
+	m_palette_bank = 0;
+	m_controller = 0;
+	m_hit = 0;
 	/* sound */
-	state->m_sound_nmi_enable = 1;
+	m_sound_nmi_enable = 1;
 }
 
-static MACHINE_RESET( bking3 )
+MACHINE_RESET_MEMBER(bking_state,bking3)
 {
-	bking_state *state = machine.driver_data<bking_state>();
 
-	machine.device("mcu")->execute().set_input_line(0, CLEAR_LINE);
+	machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 
-	MACHINE_RESET_CALL(bking);
+	bking_state::machine_reset();
 
 	/* misc */
-	state->m_addr_h = 0;
-	state->m_addr_l = 0;
+	m_addr_h = 0;
+	m_addr_l = 0;
 }
 
 static MACHINE_CONFIG_START( bking, bking_state )
@@ -482,8 +478,6 @@ static MACHINE_CONFIG_START( bking, bking_state )
 	/* - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz, */
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, (double)6000000/(4*16*16*10*16))
 
-	MCFG_MACHINE_START(bking)
-	MCFG_MACHINE_RESET(bking)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -497,8 +491,6 @@ static MACHINE_CONFIG_START( bking, bking_state )
 	MCFG_GFXDECODE(bking)
 	MCFG_PALETTE_LENGTH(4*8+4*4+4*2+4*2)
 
-	MCFG_PALETTE_INIT(bking)
-	MCFG_VIDEO_START(bking)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -523,8 +515,8 @@ static MACHINE_CONFIG_DERIVED( bking3, bking )
 	MCFG_CPU_PROGRAM_MAP(buggychl_mcu_map)
 	MCFG_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
 
-	MCFG_MACHINE_START(bking3)
-	MCFG_MACHINE_RESET(bking3)
+	MCFG_MACHINE_START_OVERRIDE(bking_state,bking3)
+	MCFG_MACHINE_RESET_OVERRIDE(bking_state,bking3)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 MACHINE_CONFIG_END

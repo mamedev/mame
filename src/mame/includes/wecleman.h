@@ -72,15 +72,19 @@ public:
 	TILE_GET_INFO_MEMBER(wecleman_get_txt_tile_info);
 	TILE_GET_INFO_MEMBER(wecleman_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wecleman_get_fg_tile_info);
+	DECLARE_MACHINE_RESET(wecleman);
+	DECLARE_VIDEO_START(wecleman);
+	DECLARE_MACHINE_RESET(hotchase);
+	DECLARE_VIDEO_START(hotchase);
 };
 
 
 /*----------- defined in video/wecleman.c -----------*/
 
 SCREEN_UPDATE_RGB32( wecleman );
-VIDEO_START( wecleman );
+
 SCREEN_UPDATE_IND16( hotchase );
-VIDEO_START( hotchase );
+
 
 void hotchase_zoom_callback_0(running_machine &machine, int *code,int *color,int *flags);
 void hotchase_zoom_callback_1(running_machine &machine, int *code,int *color,int *flags);

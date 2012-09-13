@@ -168,13 +168,12 @@ CUSTOM_INPUT_MEMBER(astrof_state::tomahawk_controls_r)
 #define TOMAHAWK_NUM_PENS	(0x20)
 
 
-static VIDEO_START( astrof )
+void astrof_state::video_start()
 {
-	astrof_state *state = machine.driver_data<astrof_state>();
 
 	/* allocate the color RAM -- half the size of the video RAM as A0 is not connected */
-	state->m_colorram = auto_alloc_array(machine, UINT8, state->m_videoram.bytes() / 2);
-	state->save_pointer(NAME(state->m_colorram), state->m_videoram.bytes() / 2);
+	m_colorram = auto_alloc_array(machine(), UINT8, m_videoram.bytes() / 2);
+	save_pointer(NAME(m_colorram), m_videoram.bytes() / 2);
 }
 
 
@@ -483,73 +482,69 @@ READ8_MEMBER(astrof_state::tomahawk_protection_r)
  *
  *************************************/
 
-static MACHINE_START( astrof )
+MACHINE_START_MEMBER(astrof_state,astrof)
 {
-	astrof_state *state = machine.driver_data<astrof_state>();
 
 	/* the 74175 outputs all HI's if not otherwise set */
-	astrof_set_video_control_2(machine, 0xff);
+	astrof_set_video_control_2(machine(), 0xff);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_samples = machine.device<samples_device>("samples");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_samples = machine().device<samples_device>("samples");
 
 	/* register for state saving */
-	state->save_item(NAME(state->m_red_on));
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_screen_off));
-	state->save_item(NAME(state->m_astrof_palette_bank));
-	state->save_item(NAME(state->m_port_1_last));
-	state->save_item(NAME(state->m_port_2_last));
-	state->save_item(NAME(state->m_astrof_start_explosion));
-	state->save_item(NAME(state->m_astrof_death_playing));
-	state->save_item(NAME(state->m_astrof_bosskill_playing));
+	save_item(NAME(m_red_on));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_screen_off));
+	save_item(NAME(m_astrof_palette_bank));
+	save_item(NAME(m_port_1_last));
+	save_item(NAME(m_port_2_last));
+	save_item(NAME(m_astrof_start_explosion));
+	save_item(NAME(m_astrof_death_playing));
+	save_item(NAME(m_astrof_bosskill_playing));
 }
 
 
-static MACHINE_START( abattle )
+MACHINE_START_MEMBER(astrof_state,abattle)
 {
-	astrof_state *state = machine.driver_data<astrof_state>();
 
 	/* register for state saving */
-	state->save_item(NAME(state->m_abattle_count));
+	save_item(NAME(m_abattle_count));
 
-	MACHINE_START_CALL(astrof);
+	MACHINE_START_CALL_MEMBER(astrof);
 }
 
 
-static MACHINE_START( spfghmk2 )
+MACHINE_START_MEMBER(astrof_state,spfghmk2)
 {
-	astrof_state *state = machine.driver_data<astrof_state>();
 
 	/* the 74175 outputs all HI's if not otherwise set */
-	spfghmk2_set_video_control_2(machine, 0xff);
+	spfghmk2_set_video_control_2(machine(), 0xff);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	/* the red background circuit is disabled */
-	state->m_red_on = FALSE;
+	m_red_on = FALSE;
 
 	/* register for state saving */
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_screen_off));
-	state->save_item(NAME(state->m_astrof_palette_bank));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_screen_off));
+	save_item(NAME(m_astrof_palette_bank));
 }
 
 
-static MACHINE_START( tomahawk )
+MACHINE_START_MEMBER(astrof_state,tomahawk)
 {
-	astrof_state *state = machine.driver_data<astrof_state>();
 
 	/* the 74175 outputs all HI's if not otherwise set */
-	tomahawk_set_video_control_2(machine, 0xff);
+	tomahawk_set_video_control_2(machine(), 0xff);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_sn = machine.device("snsnd");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_sn = machine().device("snsnd");
 
 	/* register for state saving */
-	state->save_item(NAME(state->m_red_on));
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_screen_off));
+	save_item(NAME(m_red_on));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_screen_off));
 }
 
 
@@ -560,10 +555,9 @@ static MACHINE_START( tomahawk )
  *
  *************************************/
 
-static MACHINE_RESET( abattle )
+MACHINE_RESET_MEMBER(astrof_state,abattle)
 {
-	astrof_state *state = machine.driver_data<astrof_state>();
-	state->m_abattle_count = 0;
+	m_abattle_count = 0;
 }
 
 
@@ -952,7 +946,6 @@ static MACHINE_CONFIG_START( base, astrof_state )
 	MCFG_TIMER_ADD_SCANLINE("vblank", irq_callback, "screen", VBSTART, 0)
 
 	/* video hardware */
-	MCFG_VIDEO_START(astrof)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
@@ -965,7 +958,7 @@ static MACHINE_CONFIG_DERIVED( astrof, base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(astrof_map)
 
-	MCFG_MACHINE_START(astrof)
+	MCFG_MACHINE_START_OVERRIDE(astrof_state,astrof)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -980,8 +973,8 @@ static MACHINE_CONFIG_DERIVED( abattle, astrof )
 
 	/* basic machine hardware */
 
-	MCFG_MACHINE_START(abattle)
-	MCFG_MACHINE_RESET(abattle)
+	MCFG_MACHINE_START_OVERRIDE(astrof_state,abattle)
+	MCFG_MACHINE_RESET_OVERRIDE(astrof_state,abattle)
 MACHINE_CONFIG_END
 
 
@@ -991,7 +984,7 @@ static MACHINE_CONFIG_DERIVED( spfghmk2, base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spfghmk2_map)
 
-	MCFG_MACHINE_START(spfghmk2)
+	MCFG_MACHINE_START_OVERRIDE(astrof_state,spfghmk2)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1008,7 +1001,7 @@ static MACHINE_CONFIG_DERIVED( tomahawk, base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tomahawk_map)
 
-	MCFG_MACHINE_START(tomahawk)
+	MCFG_MACHINE_START_OVERRIDE(astrof_state,tomahawk)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

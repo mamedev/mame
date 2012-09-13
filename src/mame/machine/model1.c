@@ -1984,27 +1984,26 @@ WRITE16_MEMBER(model1_state::model1_tgp_copro_ram_w)
 	}
 }
 
-MACHINE_START( model1 )
+MACHINE_START_MEMBER(model1_state,model1)
 {
-	model1_state *state = machine.driver_data<model1_state>();
-	state->m_ram_data = auto_alloc_array(machine, UINT32, 0x10000);
+	m_ram_data = auto_alloc_array(machine(), UINT32, 0x10000);
 
-	state_save_register_global_pointer(machine, state->m_ram_data, 0x10000);
-	state_save_register_global(machine, state->m_ram_adr);
-	state_save_register_global(machine, state->m_ram_scanadr);
-	state_save_register_global_array(machine, state->m_ram_latch);
-	state_save_register_global(machine, state->m_fifoout_rpos);
-	state_save_register_global(machine, state->m_fifoout_wpos);
-	state_save_register_global_array(machine, state->m_fifoout_data);
-	state_save_register_global(machine, state->m_fifoin_rpos);
-	state_save_register_global(machine, state->m_fifoin_wpos);
-	state_save_register_global_array(machine, state->m_fifoin_data);
-	state_save_register_global_array(machine, state->m_cmat);
-	state_save_register_global_2d_array(machine, state->m_mat_stack);
-	state_save_register_global_2d_array(machine, state->m_mat_vector);
-	state_save_register_global(machine, state->m_mat_stack_pos);
-	state_save_register_global(machine, state->m_acc);
-	state_save_register_global(machine, state->m_list_length);
+	state_save_register_global_pointer(machine(), m_ram_data, 0x10000);
+	state_save_register_global(machine(), m_ram_adr);
+	state_save_register_global(machine(), m_ram_scanadr);
+	state_save_register_global_array(machine(), m_ram_latch);
+	state_save_register_global(machine(), m_fifoout_rpos);
+	state_save_register_global(machine(), m_fifoout_wpos);
+	state_save_register_global_array(machine(), m_fifoout_data);
+	state_save_register_global(machine(), m_fifoin_rpos);
+	state_save_register_global(machine(), m_fifoin_wpos);
+	state_save_register_global_array(machine(), m_fifoin_data);
+	state_save_register_global_array(machine(), m_cmat);
+	state_save_register_global_2d_array(machine(), m_mat_stack);
+	state_save_register_global_2d_array(machine(), m_mat_vector);
+	state_save_register_global(machine(), m_mat_stack_pos);
+	state_save_register_global(machine(), m_acc);
+	state_save_register_global(machine(), m_list_length);
 }
 
 void model1_tgp_reset(running_machine &machine, int swa)

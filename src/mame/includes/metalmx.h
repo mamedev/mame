@@ -46,4 +46,6 @@ public:
 	DECLARE_WRITE32_MEMBER(host_vram_w);
 	DECLARE_WRITE32_MEMBER(timer_w);
 	DECLARE_DRIVER_INIT(metalmx);
+	virtual void machine_reset();
+	virtual void video_start();
 };

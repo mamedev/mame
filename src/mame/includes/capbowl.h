@@ -37,11 +37,14 @@ public:
 	DECLARE_WRITE8_MEMBER(bowlrama_blitter_w);
 	DECLARE_READ8_MEMBER(bowlrama_blitter_r);
 	DECLARE_DRIVER_INIT(capbowl);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 /*----------- defined in video/capbowl.c -----------*/
 
-VIDEO_START( capbowl );
+
 SCREEN_UPDATE_RGB32( capbowl );
 
 

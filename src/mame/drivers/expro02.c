@@ -179,10 +179,13 @@ public:
 	DECLARE_WRITE16_MEMBER(galsnew_vram_0_bank_w);
 	DECLARE_WRITE16_MEMBER(galsnew_vram_1_bank_w);
 	DECLARE_DRIVER_INIT(galsnew);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
-PALETTE_INIT( galsnew )
+void expro02_state::palette_init()
 {
 	int i;
 
@@ -190,7 +193,7 @@ PALETTE_INIT( galsnew )
 
 	/* initialize 555 RGB lookup */
 	for (i = 0; i < 32768; i++)
-		palette_set_color_rgb(machine,2048 + i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
+		palette_set_color_rgb(machine(),2048 + i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
 }
 
 SCREEN_UPDATE_IND16( galsnew )
@@ -248,7 +251,7 @@ SCREEN_UPDATE_IND16( galsnew )
 	return 0;
 }
 
-VIDEO_START( galsnew )
+void expro02_state::video_start()
 {
 
 }
@@ -506,9 +509,8 @@ static TIMER_DEVICE_CALLBACK( expro02_scanline )
 		timer.machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 }
 
-static MACHINE_RESET( galsnew )
+void expro02_state::machine_reset()
 {
-//  expro02_state *state = machine.driver_data<expro02_state>();
 }
 
 /*************************************
@@ -559,7 +561,6 @@ static MACHINE_CONFIG_START( galsnew, expro02_state )
 
 	MCFG_GFXDECODE(1x4bit_1x4bit)
 	MCFG_PALETTE_LENGTH(2048 + 32768)
-	MCFG_MACHINE_RESET( galsnew )
 
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
@@ -573,8 +574,6 @@ static MACHINE_CONFIG_START( galsnew, expro02_state )
 	kaneko_hit_device::set_type(*device, 0);
 
 
-	MCFG_VIDEO_START(galsnew)
-	MCFG_PALETTE_INIT(galsnew)
 
 	/* arm watchdog */
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */

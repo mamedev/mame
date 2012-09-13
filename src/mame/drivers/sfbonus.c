@@ -451,6 +451,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_sfbonus_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_sfbonus_reel3_tile_info);
 	TILE_GET_INFO_MEMBER(get_sfbonus_reel4_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -895,29 +897,28 @@ WRITE8_MEMBER(sfbonus_state::sfbonus_videoram_w)
 
 
 
-static VIDEO_START(sfbonus)
+void sfbonus_state::video_start()
 {
-	sfbonus_state *state = machine.driver_data<sfbonus_state>();
-	state->m_temp_reel_bitmap = auto_bitmap_ind16_alloc(machine,1024,512);
+	m_temp_reel_bitmap = auto_bitmap_ind16_alloc(machine(),1024,512);
 
-	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_tile_info),state),TILEMAP_SCAN_ROWS,8,8, 128, 64);
-	state->m_reel_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 16);
-	state->m_reel2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel2_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 16);
-	state->m_reel3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel3_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 16);
-	state->m_reel4_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel4_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 16);
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 128, 64);
+	m_reel_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 16);
+	m_reel2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 16);
+	m_reel3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 16);
+	m_reel4_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel4_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 16);
 
-	state->m_tilemap->set_transparent_pen(0);
-	state->m_reel_tilemap->set_transparent_pen(255);
-	state->m_reel2_tilemap->set_transparent_pen(255);
-	state->m_reel3_tilemap->set_transparent_pen(255);
-	state->m_reel4_tilemap->set_transparent_pen(255);
+	m_tilemap->set_transparent_pen(0);
+	m_reel_tilemap->set_transparent_pen(255);
+	m_reel2_tilemap->set_transparent_pen(255);
+	m_reel3_tilemap->set_transparent_pen(255);
+	m_reel4_tilemap->set_transparent_pen(255);
 
-	state->m_tilemap->set_scroll_rows(64);
+	m_tilemap->set_scroll_rows(64);
 
-	state->m_reel_tilemap->set_scroll_cols(64);
-	state->m_reel2_tilemap->set_scroll_cols(64);
-	state->m_reel3_tilemap->set_scroll_cols(64);
-	state->m_reel4_tilemap->set_scroll_cols(64);
+	m_reel_tilemap->set_scroll_cols(64);
+	m_reel2_tilemap->set_scroll_cols(64);
+	m_reel3_tilemap->set_scroll_cols(64);
+	m_reel4_tilemap->set_scroll_cols(64);
 
 
 }
@@ -1336,11 +1337,11 @@ static GFXDECODE_START( sfbonus )
 GFXDECODE_END
 
 
-static MACHINE_RESET( sfbonus )
+void sfbonus_state::machine_reset()
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
-	machine.root_device().membank("bank1")->set_base(&ROM[0]);
+	machine().root_device().membank("bank1")->set_base(&ROM[0]);
 }
 
 
@@ -1361,7 +1362,6 @@ static MACHINE_CONFIG_START( sfbonus, sfbonus_state )
 	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
 	//MCFG_CPU_PERIODIC_INT(nmi_line_pulse,100)
 
-	MCFG_MACHINE_RESET( sfbonus )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1378,7 +1378,6 @@ static MACHINE_CONFIG_START( sfbonus, sfbonus_state )
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
-	MCFG_VIDEO_START(sfbonus)
 
 	/* Parrot 3 seems fine at 1 Mhz, but Double Challenge isn't? */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

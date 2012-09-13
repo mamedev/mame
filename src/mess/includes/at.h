@@ -178,7 +178,8 @@ public:
 
 	DECLARE_DRIVER_INIT(atcga);
 	DECLARE_DRIVER_INIT(atvga);
-
+	DECLARE_MACHINE_START(at);
+	DECLARE_MACHINE_RESET(at);
 	void pc_set_dma_channel(int channel, int state);
 };
 
@@ -193,8 +194,8 @@ extern const am9517a_interface at_dma8237_2_config;
 
 
 
-MACHINE_START( at );
-MACHINE_RESET( at );
+
+
 
 
 #endif /* AT_H_ */

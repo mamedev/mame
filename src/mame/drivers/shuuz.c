@@ -64,19 +64,18 @@ WRITE16_MEMBER(shuuz_state::shuuz_atarivc_w)
  *
  *************************************/
 
-static MACHINE_START( shuuz )
+MACHINE_START_MEMBER(shuuz_state,shuuz)
 {
-	atarigen_init(machine);
+	atarigen_init(machine());
 }
 
 
-static MACHINE_RESET( shuuz )
+MACHINE_RESET_MEMBER(shuuz_state,shuuz)
 {
-	shuuz_state *state = machine.driver_data<shuuz_state>();
 
-	atarigen_eeprom_reset(state);
-	atarigen_interrupt_reset(state, update_interrupts);
-	atarivc_reset(*machine.primary_screen, state->m_atarivc_eof_data, 1);
+	atarigen_eeprom_reset(this);
+	atarigen_interrupt_reset(this, update_interrupts);
+	atarivc_reset(*machine().primary_screen, m_atarivc_eof_data, 1);
 }
 
 
@@ -264,8 +263,8 @@ static MACHINE_CONFIG_START( shuuz, shuuz_state )
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_START(shuuz)
-	MCFG_MACHINE_RESET(shuuz)
+	MCFG_MACHINE_START_OVERRIDE(shuuz_state,shuuz)
+	MCFG_MACHINE_RESET_OVERRIDE(shuuz_state,shuuz)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
@@ -279,7 +278,7 @@ static MACHINE_CONFIG_START( shuuz, shuuz_state )
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(shuuz)
 
-	MCFG_VIDEO_START(shuuz)
+	MCFG_VIDEO_START_OVERRIDE(shuuz_state,shuuz)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

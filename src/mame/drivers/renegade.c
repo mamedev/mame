@@ -289,16 +289,15 @@ static void setbank(running_machine &machine)
 	state->membank("bank1")->set_base(&RAM[state->m_bank ? 0x10000 : 0x4000]);
 }
 
-static MACHINE_START( renegade )
+void renegade_state::machine_start()
 {
-	renegade_state *state = machine.driver_data<renegade_state>();
-	state_save_register_global_array(machine, state->m_mcu_buffer);
-	state_save_register_global(machine, state->m_mcu_input_size);
-	state_save_register_global(machine, state->m_mcu_output_byte);
-	state_save_register_global(machine, state->m_mcu_key);
+	state_save_register_global_array(machine(), m_mcu_buffer);
+	state_save_register_global(machine(), m_mcu_input_size);
+	state_save_register_global(machine(), m_mcu_output_byte);
+	state_save_register_global(machine(), m_mcu_key);
 
-	state_save_register_global(machine, state->m_bank);
-	machine.save().register_postload(save_prepost_delegate(FUNC(setbank), &machine));
+	state_save_register_global(machine(), m_bank);
+	machine().save().register_postload(save_prepost_delegate(FUNC(setbank), &machine()));
 }
 
 DRIVER_INIT_MEMBER(renegade_state,renegade)
@@ -925,11 +924,10 @@ static const ym3526_interface ym3526_config =
 };
 
 
-static MACHINE_RESET( renegade )
+void renegade_state::machine_reset()
 {
-	renegade_state *state = machine.driver_data<renegade_state>();
-	state->m_bank = 0;
-	setbank(machine);
+	m_bank = 0;
+	setbank(machine());
 }
 
 
@@ -946,8 +944,6 @@ static MACHINE_CONFIG_START( renegade, renegade_state )
 	MCFG_CPU_ADD("mcu", M68705, 12000000/4) // ?
 	MCFG_CPU_PROGRAM_MAP(renegade_mcu_map)
 
-	MCFG_MACHINE_START(renegade)
-	MCFG_MACHINE_RESET(renegade)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -960,7 +956,6 @@ static MACHINE_CONFIG_START( renegade, renegade_state )
     MCFG_GFXDECODE(renegade)
     MCFG_PALETTE_LENGTH(256)
 
-    MCFG_VIDEO_START(renegade)
 
     /* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

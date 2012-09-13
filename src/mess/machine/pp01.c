@@ -130,14 +130,13 @@ static void pp01_set_memory(running_machine &machine,UINT8 block, UINT8 data)
 	}
 }
 
-MACHINE_RESET( pp01 )
+void pp01_state::machine_reset()
 {
-	pp01_state *state = machine.driver_data<pp01_state>();
 	int i;
-	memset(state->m_memory_block,0xff,16);
+	memset(m_memory_block,0xff,16);
 	for(i=0;i<16;i++) {
-		state->m_memory_block[i] = 0xff;
-		pp01_set_memory(machine, i, 0xff);
+		m_memory_block[i] = 0xff;
+		pp01_set_memory(machine(), i, 0xff);
 	}
 }
 
@@ -152,7 +151,7 @@ READ8_MEMBER(pp01_state::pp01_mem_block_r)
 	return	m_memory_block[offset];
 }
 
-MACHINE_START(pp01)
+void pp01_state::machine_start()
 {
 }
 

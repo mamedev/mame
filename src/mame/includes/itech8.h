@@ -85,6 +85,10 @@ public:
 	DECLARE_DRIVER_INIT(arligntn);
 	DECLARE_DRIVER_INIT(hstennis);
 	DECLARE_DRIVER_INIT(sstrike);
+	virtual void machine_reset();
+	virtual void video_start();
+	DECLARE_VIDEO_START(slikshot);
+	DECLARE_MACHINE_START(sstrike);
 };
 
 
@@ -102,13 +106,13 @@ READ8_HANDLER( slikshot_z80_r );
 READ8_HANDLER( slikshot_z80_control_r );
 WRITE8_HANDLER( slikshot_z80_control_w );
 
-VIDEO_START( slikshot );
+
 SCREEN_UPDATE_RGB32( slikshot );
 
 
 /*----------- defined in video/itech8.c -----------*/
 
-VIDEO_START( itech8 );
+
 
 
 

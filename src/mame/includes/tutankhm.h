@@ -29,6 +29,8 @@ public:
 	DECLARE_WRITE8_MEMBER(tutankhm_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(tutankhm_flip_screen_x_w);
 	DECLARE_WRITE8_MEMBER(tutankhm_flip_screen_y_w);
+	DECLARE_MACHINE_START(tutankhm);
+	DECLARE_MACHINE_RESET(tutankhm);
 };
 
 

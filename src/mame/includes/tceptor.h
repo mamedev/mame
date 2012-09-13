@@ -56,13 +56,17 @@ public:
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/tceptor.c -----------*/
 
-PALETTE_INIT( tceptor );
-VIDEO_START( tceptor );
+
+
 SCREEN_UPDATE_IND16( tceptor_2d );
 SCREEN_UPDATE_IND16( tceptor_3d_left );
 SCREEN_UPDATE_IND16( tceptor_3d_right );

@@ -565,7 +565,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static MACHINE_RESET( unico )
+MACHINE_RESET_MEMBER(unico_state,unico)
 {
 }
 
@@ -595,7 +595,7 @@ static MACHINE_CONFIG_START( burglarx, unico_state )
 	MCFG_CPU_PROGRAM_MAP(burglarx_map)
 	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MCFG_MACHINE_RESET(unico)
+	MCFG_MACHINE_RESET_OVERRIDE(unico_state,unico)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -608,7 +608,7 @@ static MACHINE_CONFIG_START( burglarx, unico_state )
 	MCFG_GFXDECODE(unico)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(unico)
+	MCFG_VIDEO_START_OVERRIDE(unico_state,unico)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -628,9 +628,9 @@ MACHINE_CONFIG_END
                                 Zero Point
 ***************************************************************************/
 
-static MACHINE_RESET( zeropt )
+MACHINE_RESET_MEMBER(unico_state,zeropt)
 {
-	MACHINE_RESET_CALL(unico);
+	MACHINE_RESET_CALL_MEMBER(unico);
 }
 
 static MACHINE_CONFIG_START( zeropnt, unico_state )
@@ -640,7 +640,7 @@ static MACHINE_CONFIG_START( zeropnt, unico_state )
 	MCFG_CPU_PROGRAM_MAP(zeropnt_map)
 	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MCFG_MACHINE_RESET(zeropt)
+	MCFG_MACHINE_RESET_OVERRIDE(unico_state,zeropt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -653,7 +653,7 @@ static MACHINE_CONFIG_START( zeropnt, unico_state )
 	MCFG_GFXDECODE(unico)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(unico)
+	MCFG_VIDEO_START_OVERRIDE(unico_state,unico)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -680,7 +680,7 @@ static MACHINE_CONFIG_START( zeropnt2, unico_state )
 	MCFG_CPU_PROGRAM_MAP(zeropnt2_map)
 	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MCFG_MACHINE_RESET(zeropt)
+	MCFG_MACHINE_RESET_OVERRIDE(unico_state,zeropt)
 
 	MCFG_EEPROM_ADD("eeprom", zeropnt2_eeprom_interface)
 
@@ -695,7 +695,7 @@ static MACHINE_CONFIG_START( zeropnt2, unico_state )
 	MCFG_GFXDECODE(unico)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(zeropnt2)
+	MCFG_VIDEO_START_OVERRIDE(unico_state,zeropnt2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

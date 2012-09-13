@@ -63,12 +63,23 @@ public:
 	DECLARE_WRITE8_MEMBER(invmulti_bank_w);
 	DECLARE_DRIVER_INIT(invmulti);
 	DECLARE_DRIVER_INIT(vortex);
+	DECLARE_MACHINE_START(extra_8080bw);
+	DECLARE_MACHINE_START(schaser);
+	DECLARE_MACHINE_RESET(schaser);
+	DECLARE_MACHINE_START(polaris);
+	DECLARE_MACHINE_START(darthvdr);
+	DECLARE_MACHINE_RESET(darthvdr);
+	DECLARE_MACHINE_RESET(invmulti);
+	DECLARE_MACHINE_START(extra_8080bw_sh);
+	DECLARE_MACHINE_START(extra_8080bw_vh);
+	DECLARE_MACHINE_START(schaser_sh);
+	DECLARE_MACHINE_RESET(schaser_sh);
 };
 
 
 /*----------- defined in audio/8080bw.c -----------*/
 
-MACHINE_START( extra_8080bw_sh );
+
 
 extern const samples_interface lrescue_samples_interface;
 
@@ -80,15 +91,15 @@ WRITE8_DEVICE_HANDLER( polaris_sh_port_2_w );
 WRITE8_DEVICE_HANDLER( polaris_sh_port_3_w );
 DISCRETE_SOUND_EXTERN( polaris );
 
-MACHINE_RESET( schaser_sh );
-MACHINE_START( schaser_sh );
+
+
 extern const sn76477_interface schaser_sn76477_interface;
 DISCRETE_SOUND_EXTERN( schaser );
 
 
 /*----------- defined in video/8080bw.c -----------*/
 
-MACHINE_START( extra_8080bw_vh );
+
 
 SCREEN_UPDATE_RGB32( invadpt2 );
 SCREEN_UPDATE_RGB32( ballbomb );

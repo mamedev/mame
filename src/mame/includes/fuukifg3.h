@@ -58,12 +58,15 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_2);
 	TILE_GET_INFO_MEMBER(get_tile_info_3);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/fuuki32.c -----------*/
 
 
-VIDEO_START( fuuki32 );
+
 SCREEN_UPDATE_IND16( fuuki32 );
 SCREEN_VBLANK( fuuki32 );

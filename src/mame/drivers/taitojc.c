@@ -1191,31 +1191,30 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_RESET( taitojc )
+void taitojc_state::machine_reset()
 {
-	taitojc_state *state = machine.driver_data<taitojc_state>();
 
-	state->m_first_dsp_reset = 1;
+	m_first_dsp_reset = 1;
 
-	state->m_mcu_comm_main = 0;
-	state->m_mcu_comm_hc11 = 0;
-	state->m_mcu_data_main = 0;
-	state->m_mcu_data_hc11 = 0;
+	m_mcu_comm_main = 0;
+	m_mcu_comm_hc11 = 0;
+	m_mcu_data_main = 0;
+	m_mcu_data_hc11 = 0;
 
-	state->m_texture_x = 0;
-	state->m_texture_y = 0;
+	m_texture_x = 0;
+	m_texture_y = 0;
 
-	state->m_dsp_rom_pos = 0;
-	state->m_dsp_tex_address = 0;
-	state->m_dsp_tex_offset = 0;
-	state->m_polygon_fifo_ptr = 0;
+	m_dsp_rom_pos = 0;
+	m_dsp_tex_address = 0;
+	m_dsp_tex_offset = 0;
+	m_polygon_fifo_ptr = 0;
 
-	memset(state->m_viewport_data, 0, sizeof(state->m_viewport_data));
-	memset(state->m_projection_data, 0, sizeof(state->m_projection_data));
-	memset(state->m_intersection_data, 0, sizeof(state->m_intersection_data));
+	memset(m_viewport_data, 0, sizeof(m_viewport_data));
+	memset(m_projection_data, 0, sizeof(m_projection_data));
+	memset(m_intersection_data, 0, sizeof(m_intersection_data));
 
 	// hold the TMS in reset until we have code
-	state->m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( taitojc_vblank )
@@ -1253,7 +1252,6 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_RESET(taitojc)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -1269,7 +1267,6 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 
 	MCFG_PALETTE_LENGTH(32768)
 
-	MCFG_VIDEO_START(taitojc)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(taito_en_sound)

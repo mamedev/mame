@@ -225,39 +225,37 @@ static const ym2203_interface ym2203_config =
 	DEVCB_NULL
 };
 
-static MACHINE_START( momoko )
+void momoko_state::machine_start()
 {
-	momoko_state *state = machine.driver_data<momoko_state>();
-	UINT8 *BG_MAP = state->memregion("user1")->base();
+	UINT8 *BG_MAP = memregion("user1")->base();
 
-	state->membank("bank1")->configure_entries(0, 32, &BG_MAP[0x0000], 0x1000);
+	membank("bank1")->configure_entries(0, 32, &BG_MAP[0x0000], 0x1000);
 
-	state->save_item(NAME(state->m_fg_scrollx));
-	state->save_item(NAME(state->m_fg_scrolly));
-	state->save_item(NAME(state->m_fg_select));
-	state->save_item(NAME(state->m_text_scrolly));
-	state->save_item(NAME(state->m_text_mode));
-	state->save_item(NAME(state->m_bg_select));
-	state->save_item(NAME(state->m_bg_priority));
-	state->save_item(NAME(state->m_bg_mask));
-	state->save_item(NAME(state->m_fg_mask));
-	state->save_item(NAME(state->m_flipscreen));
+	save_item(NAME(m_fg_scrollx));
+	save_item(NAME(m_fg_scrolly));
+	save_item(NAME(m_fg_select));
+	save_item(NAME(m_text_scrolly));
+	save_item(NAME(m_text_mode));
+	save_item(NAME(m_bg_select));
+	save_item(NAME(m_bg_priority));
+	save_item(NAME(m_bg_mask));
+	save_item(NAME(m_fg_mask));
+	save_item(NAME(m_flipscreen));
 }
 
-static MACHINE_RESET( momoko )
+void momoko_state::machine_reset()
 {
-	momoko_state *state = machine.driver_data<momoko_state>();
 
-	state->m_fg_scrollx = 0;
-	state->m_fg_scrolly = 0;
-	state->m_fg_select = 0;
-	state->m_text_scrolly = 0;
-	state->m_text_mode = 0;
-	state->m_bg_select = 0;
-	state->m_bg_priority = 0;
-	state->m_bg_mask = 0;
-	state->m_fg_mask = 0;
-	state->m_flipscreen = 0;
+	m_fg_scrollx = 0;
+	m_fg_scrolly = 0;
+	m_fg_select = 0;
+	m_text_scrolly = 0;
+	m_text_mode = 0;
+	m_bg_select = 0;
+	m_bg_priority = 0;
+	m_bg_mask = 0;
+	m_fg_mask = 0;
+	m_flipscreen = 0;
 }
 
 static MACHINE_CONFIG_START( momoko, momoko_state )
@@ -270,8 +268,6 @@ static MACHINE_CONFIG_START( momoko, momoko_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 2500000)	/* 2.5MHz */
 	MCFG_CPU_PROGRAM_MAP(momoko_sound_map)
 
-	MCFG_MACHINE_START(momoko)
-	MCFG_MACHINE_RESET(momoko)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

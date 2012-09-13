@@ -28,11 +28,10 @@ TILE_GET_INFO_MEMBER(_4enraya_state::get_tile_info)
 		0);
 }
 
-VIDEO_START( 4enraya )
+void _4enraya_state::video_start()
 {
-	_4enraya_state *state = machine.driver_data<_4enraya_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(_4enraya_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(_4enraya_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 SCREEN_UPDATE_IND16( 4enraya )

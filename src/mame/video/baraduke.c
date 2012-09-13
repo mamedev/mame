@@ -15,9 +15,9 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( baraduke )
+void baraduke_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 	int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -44,7 +44,7 @@ PALETTE_INIT( baraduke )
 		bit3 = (color_prom[0] >> 7) & 0x01;
 		b = 0x0e*bit0 + 0x1f*bit1 + 0x43*bit2 + 0x8f*bit3;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -113,19 +113,18 @@ TILE_GET_INFO_MEMBER(baraduke_state::get_tile_info1)
 
 ***************************************************************************/
 
-VIDEO_START( baraduke )
+void baraduke_state::video_start()
 {
-	baraduke_state *state = machine.driver_data<baraduke_state>();
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(baraduke_state::tx_get_tile_info),state),tilemap_mapper_delegate(FUNC(baraduke_state::tx_tilemap_scan),state),8,8,36,28);
-	state->m_bg_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(baraduke_state::get_tile_info0),state),TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_bg_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(baraduke_state::get_tile_info1),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(baraduke_state::tx_get_tile_info),this),tilemap_mapper_delegate(FUNC(baraduke_state::tx_tilemap_scan),this),8,8,36,28);
+	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(baraduke_state::get_tile_info0),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(baraduke_state::get_tile_info1),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
-	state->m_tx_tilemap->set_transparent_pen(3);
-	state->m_bg_tilemap[0]->set_transparent_pen(7);
-	state->m_bg_tilemap[1]->set_transparent_pen(7);
+	m_tx_tilemap->set_transparent_pen(3);
+	m_bg_tilemap[0]->set_transparent_pen(7);
+	m_bg_tilemap[1]->set_transparent_pen(7);
 
-	state->m_tx_tilemap->set_scrolldx(0,512-288);
-	state->m_tx_tilemap->set_scrolldy(16,16);
+	m_tx_tilemap->set_scrolldx(0,512-288);
+	m_tx_tilemap->set_scrolldy(16,16);
 }
 
 

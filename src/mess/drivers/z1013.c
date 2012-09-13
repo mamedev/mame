@@ -74,6 +74,8 @@ public:
 	const UINT8 *m_p_chargen;
 	UINT8 m_keyboard_line;
 	bool m_keyboard_part;
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -213,10 +215,9 @@ static INPUT_PORTS_START( z1013 )
 INPUT_PORTS_END
 
 
-VIDEO_START( z1013 )
+void z1013_state::video_start()
 {
-	z1013_state *state = machine.driver_data<z1013_state>();
-	state->m_p_chargen = state->memregion("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 SCREEN_UPDATE_IND16( z1013 )
@@ -254,12 +255,11 @@ SCREEN_UPDATE_IND16( z1013 )
 	return 0;
 }
 
-MACHINE_RESET( z1013 )
+void z1013_state::machine_reset()
 {
-	z1013_state *state = machine.driver_data<z1013_state>();
-	machine.device("maincpu")->state().set_state_int(Z80_PC, 0xF000);
-	state->m_keyboard_part = 0;
-	state->m_keyboard_line = 0;
+	machine().device("maincpu")->state().set_state_int(Z80_PC, 0xF000);
+	m_keyboard_part = 0;
+	m_keyboard_line = 0;
 }
 
 WRITE8_MEMBER( z1013_state::z1013_keyboard_w )
@@ -397,7 +397,6 @@ static MACHINE_CONFIG_START( z1013, z1013_state )
 	MCFG_CPU_PROGRAM_MAP(z1013_mem)
 	MCFG_CPU_IO_MAP(z1013_io)
 
-	MCFG_MACHINE_RESET( z1013 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -405,7 +404,6 @@ static MACHINE_CONFIG_START( z1013, z1013_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
-	MCFG_VIDEO_START(z1013)
 	MCFG_SCREEN_UPDATE_STATIC(z1013)
 	MCFG_GFXDECODE(z1013)
 	MCFG_PALETTE_LENGTH(2)

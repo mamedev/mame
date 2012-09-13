@@ -381,7 +381,6 @@ static MACHINE_CONFIG_START( groundfx, groundfx_state )
 	MCFG_GFXDECODE(groundfx)
 	MCFG_PALETTE_LENGTH(16384)
 
-	MCFG_VIDEO_START(groundfx)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", groundfx_tc0100scn_intf)
 	MCFG_TC0480SCP_ADD("tc0480scp", groundfx_tc0480scp_intf)

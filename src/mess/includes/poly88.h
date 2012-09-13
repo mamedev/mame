@@ -31,12 +31,14 @@ public:
 	DECLARE_READ8_MEMBER(poly88_keyboard_r);
 	DECLARE_WRITE8_MEMBER(poly88_intr_w);
 	DECLARE_DRIVER_INIT(poly88);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in machine/poly88.c -----------*/
 
-MACHINE_RESET(poly88);
+
 INTERRUPT_GEN( poly88_interrupt );
 
 extern const i8251_interface poly88_usart_interface;

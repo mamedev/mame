@@ -64,10 +64,11 @@ public:
 	int m_sound_cmd;
 	int m_sound_d;
 	int m_sound_g;
+	virtual void palette_init();
 };
 
 /*----------- defined in video/advision.c -----------*/
 
-PALETTE_INIT( advision );
+
 
 #endif

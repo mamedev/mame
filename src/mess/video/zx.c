@@ -190,12 +190,11 @@ void zx_ula_r(running_machine &machine, int offs, const char *region, const UINT
 	}
 }
 
-VIDEO_START( zx )
+void zx_state::video_start()
 {
-	zx_state *state = machine.driver_data<zx_state>();
-	state->m_ula_nmi = machine.scheduler().timer_alloc(FUNC(zx_ula_nmi));
-	state->m_ula_irq_active = 0;
-	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
+	m_ula_nmi = machine().scheduler().timer_alloc(FUNC(zx_ula_nmi));
+	m_ula_irq_active = 0;
+	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }
 
 SCREEN_VBLANK( zx )

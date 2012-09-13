@@ -127,6 +127,7 @@ public:
 	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 m_apf_ints;
 	void apf_update_ints(UINT8 intnum);
+	virtual void machine_start();
 };
 
 
@@ -355,14 +356,13 @@ static const pia6821_interface apf_imagination_pia_interface=
 };
 
 
-static MACHINE_START( apf_imagination )
+void apf_state::machine_start()
 {
-	apf_state *state = machine.driver_data<apf_state>();
 
-	state->m_apf_ints = 0;
+	m_apf_ints = 0;
 
-	if (state->m_cass) // apfimag only
-		state->m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	if (m_cass) // apfimag only
+		m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
 WRITE8_MEMBER( apf_state::apf_dischw_w)
@@ -697,7 +697,6 @@ static MACHINE_CONFIG_START( apf_imagination, apf_state )
 	MCFG_CPU_ADD("maincpu", M6800, 1000000 )        /* backgammon uses timing from vertical interrupt to switch between video modes during frame */
 	MCFG_CPU_PROGRAM_MAP(apf_imagination_map)
 
-	MCFG_MACHINE_START( apf_imagination )
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")

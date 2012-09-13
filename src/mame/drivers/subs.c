@@ -29,12 +29,12 @@
  *
  *************************************/
 
-static PALETTE_INIT( subs )
+void subs_state::palette_init()
 {
-	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK - modified on video invert */
-	palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0xff)); /* WHITE - modified on video invert */
-	palette_set_color(machine,2,MAKE_RGB(0x00,0x00,0x00)); /* BLACK - modified on video invert */
-	palette_set_color(machine,3,MAKE_RGB(0xff,0xff,0xff)); /* WHITE - modified on video invert*/
+	palette_set_color(machine(),0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK - modified on video invert */
+	palette_set_color(machine(),1,MAKE_RGB(0xff,0xff,0xff)); /* WHITE - modified on video invert */
+	palette_set_color(machine(),2,MAKE_RGB(0x00,0x00,0x00)); /* BLACK - modified on video invert */
+	palette_set_color(machine(),3,MAKE_RGB(0xff,0xff,0xff)); /* WHITE - modified on video invert*/
 }
 
 
@@ -181,7 +181,6 @@ static MACHINE_CONFIG_START( subs, subs_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_PERIODIC_INT(subs_interrupt,4*57)
 
-	MCFG_MACHINE_RESET(subs)
 
 	/* video hardware */
 	MCFG_GFXDECODE(subs)
@@ -202,7 +201,6 @@ static MACHINE_CONFIG_START( subs, subs_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(subs_right)
 
-	MCFG_PALETTE_INIT(subs)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

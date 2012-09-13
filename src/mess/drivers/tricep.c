@@ -27,6 +27,7 @@ public:
 	DECLARE_WRITE16_MEMBER(tricep_terminal_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	required_shared_ptr<UINT16> m_p_ram;
+	virtual void machine_reset();
 };
 
 
@@ -53,14 +54,13 @@ static INPUT_PORTS_START( tricep )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(tricep)
+void tricep_state::machine_reset()
 {
-	tricep_state *state = machine.driver_data<tricep_state>();
-	UINT8* user1 = state->memregion("user1")->base();
+	UINT8* user1 = memregion("user1")->base();
 
-	memcpy((UINT8*)state->m_p_ram.target(),user1,0x2000);
+	memcpy((UINT8*)m_p_ram.target(),user1,0x2000);
 
-	machine.device("maincpu")->reset();
+	machine().device("maincpu")->reset();
 }
 
 WRITE8_MEMBER( tricep_state::kbd_put )
@@ -77,7 +77,6 @@ static MACHINE_CONFIG_START( tricep, tricep_state )
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(tricep_mem)
 
-	MCFG_MACHINE_RESET(tricep)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)

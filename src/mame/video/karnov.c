@@ -36,12 +36,12 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( karnov )
+void karnov_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b;
 
@@ -55,13 +55,13 @@ PALETTE_INIT( karnov )
 		bit2 = (color_prom[0] >> 6) & 0x01;
 		bit3 = (color_prom[0] >> 7) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[machine.total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[machine.total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[machine.total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[machine.total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[machine().total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[machine().total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[machine().total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[machine().total_colors()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 }
@@ -159,30 +159,28 @@ WRITE16_MEMBER(karnov_state::karnov_playfield_swap_w)
 
 /******************************************************************************/
 
-VIDEO_START( karnov )
+VIDEO_START_MEMBER(karnov_state,karnov)
 {
-	karnov_state *state = machine.driver_data<karnov_state>();
 
 	/* Allocate bitmap & tilemap */
-	state->m_bitmap_f = auto_bitmap_ind16_alloc(machine, 512, 512);
-	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(karnov_state::get_fix_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bitmap_f = auto_bitmap_ind16_alloc(machine(), 512, 512);
+	m_fix_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(karnov_state::get_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->save_item(NAME(*state->m_bitmap_f));
+	save_item(NAME(*m_bitmap_f));
 
-	state->m_fix_tilemap->set_transparent_pen(0);
+	m_fix_tilemap->set_transparent_pen(0);
 }
 
-VIDEO_START( wndrplnt )
+VIDEO_START_MEMBER(karnov_state,wndrplnt)
 {
-	karnov_state *state = machine.driver_data<karnov_state>();
 
 	/* Allocate bitmap & tilemap */
-	state->m_bitmap_f = auto_bitmap_ind16_alloc(machine, 512, 512);
-	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(karnov_state::get_fix_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_bitmap_f = auto_bitmap_ind16_alloc(machine(), 512, 512);
+	m_fix_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(karnov_state::get_fix_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
-	state->save_item(NAME(*state->m_bitmap_f));
+	save_item(NAME(*m_bitmap_f));
 
-	state->m_fix_tilemap->set_transparent_pen(0);
+	m_fix_tilemap->set_transparent_pen(0);
 }
 
 /******************************************************************************/

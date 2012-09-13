@@ -347,37 +347,35 @@ static const k053252_interface dbz_k053252_intf =
 	0, 0
 };
 
-static MACHINE_START( dbz )
+void dbz_state::machine_start()
 {
-	dbz_state *state = machine.driver_data<dbz_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_k053936_1 = machine.device("k053936_1");
-	state->m_k053936_2 = machine.device("k053936_2");
-	state->m_k056832 = machine.device("k056832");
-	state->m_k053246 = machine.device("k053246");
-	state->m_k053251 = machine.device("k053251");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_k053936_1 = machine().device("k053936_1");
+	m_k053936_2 = machine().device("k053936_2");
+	m_k056832 = machine().device("k056832");
+	m_k053246 = machine().device("k053246");
+	m_k053251 = machine().device("k053251");
 
-	state->save_item(NAME(state->m_control));
-	state->save_item(NAME(state->m_sprite_colorbase));
-	state->save_item(NAME(state->m_layerpri));
-	state->save_item(NAME(state->m_layer_colorbase));
+	save_item(NAME(m_control));
+	save_item(NAME(m_sprite_colorbase));
+	save_item(NAME(m_layerpri));
+	save_item(NAME(m_layer_colorbase));
 }
 
-static MACHINE_RESET( dbz )
+void dbz_state::machine_reset()
 {
-	dbz_state *state = machine.driver_data<dbz_state>();
 	int i;
 
 	for (i = 0; i < 5; i++)
-		state->m_layerpri[i] = 0;
+		m_layerpri[i] = 0;
 
 	for (i = 0; i < 6; i++)
-		state->m_layer_colorbase[i] = 0;
+		m_layer_colorbase[i] = 0;
 
-	state->m_sprite_colorbase = 0;
-	state->m_control = 0;
+	m_sprite_colorbase = 0;
+	m_control = 0;
 }
 
 static MACHINE_CONFIG_START( dbz, dbz_state )
@@ -391,8 +389,6 @@ static MACHINE_CONFIG_START( dbz, dbz_state )
 	MCFG_CPU_PROGRAM_MAP(dbz_sound_map)
 	MCFG_CPU_IO_MAP(dbz_sound_io_map)
 
-	MCFG_MACHINE_START(dbz)
-	MCFG_MACHINE_RESET(dbz)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -406,7 +402,6 @@ static MACHINE_CONFIG_START( dbz, dbz_state )
 
 	MCFG_GFXDECODE(dbz)
 
-	MCFG_VIDEO_START(dbz)
 	MCFG_PALETTE_LENGTH(0x4000/2)
 
 	MCFG_K056832_ADD("k056832", dbz_k056832_intf)

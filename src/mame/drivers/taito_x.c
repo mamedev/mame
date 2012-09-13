@@ -336,6 +336,7 @@ public:
 	DECLARE_WRITE16_MEMBER(kyustrkr_input_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_DRIVER_INIT(kyustrkr);
+	DECLARE_MACHINE_START(taitox);
 };
 
 READ16_MEMBER(taitox_state::superman_dsw_input_r)
@@ -807,13 +808,12 @@ static const ym2151_interface ym2151_config =
 	DEVCB_LINE(irqhandler)
 };
 
-static MACHINE_START( taitox )
+MACHINE_START_MEMBER(taitox_state,taitox)
 {
-	taitox_state *state = machine.driver_data<taitox_state>();
 
-	state->m_banknum = -1;
-	state->save_item(NAME(state->m_banknum));
-	machine.save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine));
+	m_banknum = -1;
+	save_item(NAME(m_banknum));
+	machine().save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine()));
 }
 
 static const tc0140syt_interface taitox_tc0140syt_intf =
@@ -836,7 +836,7 @@ static MACHINE_CONFIG_START( superman, taitox_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_MACHINE_START(taitox)
+	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 	MCFG_MACHINE_RESET(cchip1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -852,7 +852,7 @@ static MACHINE_CONFIG_START( superman, taitox_state )
 	MCFG_GFXDECODE(superman)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(seta_no_layers)
+	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -879,7 +879,7 @@ static MACHINE_CONFIG_START( daisenpu, taitox_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_MACHINE_START(taitox)
+	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
@@ -894,7 +894,7 @@ static MACHINE_CONFIG_START( daisenpu, taitox_state )
 	MCFG_GFXDECODE(superman)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(seta_no_layers)
+	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -919,7 +919,7 @@ static MACHINE_CONFIG_START( gigandes, taitox_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_MACHINE_START(taitox)
+	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
@@ -934,7 +934,7 @@ static MACHINE_CONFIG_START( gigandes, taitox_state )
 	MCFG_GFXDECODE(superman)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(seta_no_layers)
+	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -961,7 +961,7 @@ static MACHINE_CONFIG_START( ballbros, taitox_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_MACHINE_START(taitox)
+	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
@@ -976,7 +976,7 @@ static MACHINE_CONFIG_START( ballbros, taitox_state )
 	MCFG_GFXDECODE(ballbros)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(seta_no_layers)
+	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

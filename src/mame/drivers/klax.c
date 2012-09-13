@@ -60,19 +60,18 @@ WRITE16_MEMBER(klax_state::interrupt_ack_w)
  *
  *************************************/
 
-static MACHINE_START( klax )
+MACHINE_START_MEMBER(klax_state,klax)
 {
-	atarigen_init(machine);
+	atarigen_init(machine());
 }
 
 
-static MACHINE_RESET( klax )
+MACHINE_RESET_MEMBER(klax_state,klax)
 {
-	klax_state *state = machine.driver_data<klax_state>();
 
-	atarigen_eeprom_reset(state);
-	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine.primary_screen, scanline_update, 32);
+	atarigen_eeprom_reset(this);
+	atarigen_interrupt_reset(this, update_interrupts);
+	atarigen_scanline_timer_reset(*machine().primary_screen, scanline_update, 32);
 }
 
 
@@ -172,8 +171,8 @@ static MACHINE_CONFIG_START( klax, klax_state )
 	MCFG_CPU_PROGRAM_MAP(klax_map)
 	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
-	MCFG_MACHINE_START(klax)
-	MCFG_MACHINE_RESET(klax)
+	MCFG_MACHINE_START_OVERRIDE(klax_state,klax)
+	MCFG_MACHINE_RESET_OVERRIDE(klax_state,klax)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
@@ -187,7 +186,7 @@ static MACHINE_CONFIG_START( klax, klax_state )
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(klax)
 
-	MCFG_VIDEO_START(klax)
+	MCFG_VIDEO_START_OVERRIDE(klax_state,klax)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

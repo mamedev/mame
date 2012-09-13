@@ -11,7 +11,7 @@
 #include "includes/bk.h"
 
 
-VIDEO_START( bk0010 )
+void bk_state::video_start()
 {
 }
 

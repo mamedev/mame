@@ -275,21 +275,19 @@ static const ay8910_interface ay8910_interface_2 =
  *
  *************************************/
 
-static MACHINE_START( blueprnt )
+void blueprnt_state::machine_start()
 {
-	blueprnt_state *state = machine.driver_data<blueprnt_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_dipsw));
+	save_item(NAME(m_dipsw));
 }
 
-static MACHINE_RESET( blueprnt )
+void blueprnt_state::machine_reset()
 {
-	blueprnt_state *state = machine.driver_data<blueprnt_state>();
 
-	state->m_gfx_bank = 0;
-	state->m_dipsw = 0;
+	m_gfx_bank = 0;
+	m_dipsw = 0;
 }
 
 
@@ -305,8 +303,6 @@ static MACHINE_CONFIG_START( blueprnt, blueprnt_state )
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 4*60)	// IRQs connected to 32V
 									// NMIs are caused by the main CPU
 
-	MCFG_MACHINE_START(blueprnt)
-	MCFG_MACHINE_RESET(blueprnt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -319,8 +315,6 @@ static MACHINE_CONFIG_START( blueprnt, blueprnt_state )
 	MCFG_GFXDECODE(blueprnt)
 	MCFG_PALETTE_LENGTH(128*4+8)
 
-	MCFG_PALETTE_INIT(blueprnt)
-	MCFG_VIDEO_START(blueprnt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

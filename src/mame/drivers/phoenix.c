@@ -444,9 +444,9 @@ static const ay8910_interface survival_ay8910_interface =
 
 
 
-static MACHINE_RESET( phoenix )
+MACHINE_RESET_MEMBER(phoenix_state,phoenix)
 {
-	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x4000);
+	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x4000);
 }
 
 
@@ -456,7 +456,7 @@ static MACHINE_CONFIG_START( phoenix, phoenix_state )
 	MCFG_CPU_ADD("maincpu", I8085A, CPU_CLOCK)	/* 2.75 MHz */
 	MCFG_CPU_PROGRAM_MAP(phoenix_memory_map)
 
-	MCFG_MACHINE_RESET(phoenix)
+	MCFG_MACHINE_RESET_OVERRIDE(phoenix_state,phoenix)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -466,8 +466,8 @@ static MACHINE_CONFIG_START( phoenix, phoenix_state )
 	MCFG_GFXDECODE(phoenix)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(phoenix)
-	MCFG_VIDEO_START(phoenix)
+	MCFG_PALETTE_INIT_OVERRIDE(phoenix_state,phoenix)
+	MCFG_VIDEO_START_OVERRIDE(phoenix_state,phoenix)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -494,7 +494,7 @@ static MACHINE_CONFIG_DERIVED( pleiads, phoenix )
 	/* video hardware */
 	MCFG_GFXDECODE(pleiads)
 
-	MCFG_PALETTE_INIT(pleiads)
+	MCFG_PALETTE_INIT_OVERRIDE(phoenix_state,pleiads)
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("tms", TMS36XX, 247)
@@ -525,7 +525,7 @@ static MACHINE_CONFIG_START( survival, phoenix_state )
 	MCFG_CPU_CONFIG(survival_i8085_config)
 	MCFG_CPU_PROGRAM_MAP(survival_memory_map)
 
-	MCFG_MACHINE_RESET(phoenix)
+	MCFG_MACHINE_RESET_OVERRIDE(phoenix_state,phoenix)
 
 	/* video hardware */
 
@@ -539,8 +539,8 @@ static MACHINE_CONFIG_START( survival, phoenix_state )
 	MCFG_GFXDECODE(phoenix)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(survival)
-	MCFG_VIDEO_START(phoenix)
+	MCFG_PALETTE_INIT_OVERRIDE(phoenix_state,survival)
+	MCFG_VIDEO_START_OVERRIDE(phoenix_state,phoenix)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -442,6 +442,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER(debug_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 #define mc6845_h_char_total 	(state->m_crtc_vreg[0])
@@ -496,10 +498,9 @@ TILE_GET_INFO_MEMBER(avt_state::get_bg_tile_info)
 }
 
 
-static VIDEO_START( avt )
+void avt_state::video_start()
 {
-	avt_state *state = machine.driver_data<avt_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(avt_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 28, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(avt_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 28, 32);
 }
 
 
@@ -529,9 +530,9 @@ static SCREEN_UPDATE_IND16( avt )
 }
 
 
-static PALETTE_INIT( avt )
+void avt_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 /*  prom bits
     7654 3210
     ---- ---x   Intensity?.
@@ -545,7 +546,7 @@ static PALETTE_INIT( avt )
 	/* 0000BGRI */
 	if (color_prom == 0) return;
 
-	for (j = 0; j < machine.total_colors(); j++)
+	for (j = 0; j < machine().total_colors(); j++)
 	{
 		int bit1, bit2, bit3, r, g, b, inten, intenmin, intenmax, i;
 
@@ -574,9 +575,9 @@ static PALETTE_INIT( avt )
 
 		/* hack to switch cyan->magenta for highlighted background */
 		if (j == 0x40)
-			palette_set_color(machine, j, MAKE_RGB(g, r, b));	// Why this one has R-G swapped?...
+			palette_set_color(machine(), j, MAKE_RGB(g, r, b));	// Why this one has R-G swapped?...
 		else
-			palette_set_color(machine, j, MAKE_RGB(r, g, b));
+			palette_set_color(machine(), j, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -905,10 +906,8 @@ static MACHINE_CONFIG_START( avt, avt_state )
 
 	MCFG_GFXDECODE(avt)
 
-	MCFG_PALETTE_INIT(avt)
 	MCFG_PALETTE_LENGTH(8*16)
 
-	MCFG_VIDEO_START(avt)
 
 	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)	/* guess */
 

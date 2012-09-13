@@ -81,6 +81,10 @@ public:
 	UINT8 m_keyb_press_flag;
 	UINT8 m_shift_press_flag;
 	UINT8 m_ppi_portc;
+	DECLARE_MACHINE_RESET(tk80);
+	DECLARE_MACHINE_START(tk80bs);
+	DECLARE_MACHINE_RESET(tk80bs);
+	DECLARE_VIDEO_START(tk80bs);
 };
 
 /************************************************* TK80 ******************************************/
@@ -162,7 +166,7 @@ INPUT_PORTS_START( mikrolab )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_O)
 INPUT_PORTS_END
 
-static MACHINE_RESET(tk80)
+MACHINE_RESET_MEMBER(tk80bs_state,tk80)
 {
 }
 
@@ -232,7 +236,7 @@ static MACHINE_CONFIG_START( tk80, tk80bs_state )
 	MCFG_CPU_PROGRAM_MAP(tk80_mem)
 	MCFG_CPU_IO_MAP(tk80_io)
 
-	MCFG_MACHINE_RESET(tk80)
+	MCFG_MACHINE_RESET_OVERRIDE(tk80bs_state,tk80)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_tk80)
@@ -251,7 +255,7 @@ MACHINE_CONFIG_END
 
 /************************************************* TK80BS ****************************************/
 
-static VIDEO_START( tk80bs )
+VIDEO_START_MEMBER(tk80bs_state,tk80bs)
 {
 }
 
@@ -322,11 +326,11 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( tk80bs )
 INPUT_PORTS_END
 
-static MACHINE_START(tk80bs)
+MACHINE_START_MEMBER(tk80bs_state,tk80bs)
 {
 }
 
-static MACHINE_RESET(tk80bs)
+MACHINE_RESET_MEMBER(tk80bs_state,tk80bs)
 {
 }
 
@@ -394,8 +398,8 @@ static MACHINE_CONFIG_START( tk80bs, tk80bs_state )
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_1MHz) //unknown clock
 	MCFG_CPU_PROGRAM_MAP(tk80bs_mem)
 
-	MCFG_MACHINE_START(tk80bs)
-	MCFG_MACHINE_RESET(tk80bs)
+	MCFG_MACHINE_START_OVERRIDE(tk80bs_state,tk80bs)
+	MCFG_MACHINE_RESET_OVERRIDE(tk80bs_state,tk80bs)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -403,7 +407,7 @@ static MACHINE_CONFIG_START( tk80bs, tk80bs_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(256, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 128-1)
-	MCFG_VIDEO_START(tk80bs)
+	MCFG_VIDEO_START_OVERRIDE(tk80bs_state,tk80bs)
 	MCFG_SCREEN_UPDATE_STATIC(tk80bs)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

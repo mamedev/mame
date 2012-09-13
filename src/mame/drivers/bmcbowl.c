@@ -135,6 +135,8 @@ public:
 	DECLARE_READ8_MEMBER(dips1_r);
 	DECLARE_WRITE8_MEMBER(input_mux_w);
 	DECLARE_DRIVER_INIT(bmcbowl);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -142,7 +144,7 @@ public:
 
 #define NVRAM_HACK
 
-static VIDEO_START( bmcbowl )
+void bmcbowl_state::video_start()
 {
 }
 
@@ -494,7 +496,7 @@ static const via6522_interface via_interface =
 	/*irq                  */ DEVCB_DRIVER_MEMBER(bmcbowl_state,via_irq)
 };
 
-static MACHINE_RESET( bmcbowl )
+void bmcbowl_state::machine_reset()
 {
 }
 
@@ -512,10 +514,8 @@ static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(bmcbowl)
 
 	MCFG_NVRAM_HANDLER(bmcbowl)
-	MCFG_MACHINE_RESET(bmcbowl)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

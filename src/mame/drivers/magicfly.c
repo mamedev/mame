@@ -435,6 +435,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mux_port_w);
 	TILE_GET_INFO_MEMBER(get_magicfly_tile_info);
 	TILE_GET_INFO_MEMBER(get_7mezzo_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_VIDEO_START(7mezzo);
 };
 
 
@@ -480,10 +483,9 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_magicfly_tile_info)
 	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
-static VIDEO_START(magicfly)
+void magicfly_state::video_start()
 {
-	magicfly_state *state = machine.driver_data<magicfly_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(magicfly_state::get_magicfly_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(magicfly_state::get_magicfly_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
 }
 
 TILE_GET_INFO_MEMBER(magicfly_state::get_7mezzo_tile_info)
@@ -511,10 +513,9 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_7mezzo_tile_info)
 	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
-static VIDEO_START( 7mezzo )
+VIDEO_START_MEMBER(magicfly_state,7mezzo)
 {
-	magicfly_state *state = machine.driver_data<magicfly_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(magicfly_state::get_7mezzo_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(magicfly_state::get_7mezzo_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
 }
 
 static SCREEN_UPDATE_IND16( magicfly )
@@ -524,30 +525,30 @@ static SCREEN_UPDATE_IND16( magicfly )
 	return 0;
 }
 
-static PALETTE_INIT( magicfly )
+void magicfly_state::palette_init()
 {
 	int i;
 
 	for (i = 0x00; i < 0x10; i += 0x10)
 	{
 		/* 1st gfx bank */
-		palette_set_color(machine, i + 0, MAKE_RGB(0x00, 0x00, 0x00));
-		palette_set_color(machine, i + 2, MAKE_RGB(0x00, 0x00, 0x00));
-		palette_set_color(machine, i + 4, MAKE_RGB(0x00, 0x00, 0x00));
-		palette_set_color(machine, i + 6, MAKE_RGB(0x00, 0x00, 0x00));
-		palette_set_color(machine, i + 8, MAKE_RGB(0x00, 0x00, 0x00));
-		palette_set_color(machine, i + 10, MAKE_RGB(0x00, 0x00, 0x00));
-		palette_set_color(machine, i + 12, MAKE_RGB(0x00, 0x00, 0x00));
-		palette_set_color(machine, i + 14, MAKE_RGB(0x00, 0x00, 0x00));
+		palette_set_color(machine(), i + 0, MAKE_RGB(0x00, 0x00, 0x00));
+		palette_set_color(machine(), i + 2, MAKE_RGB(0x00, 0x00, 0x00));
+		palette_set_color(machine(), i + 4, MAKE_RGB(0x00, 0x00, 0x00));
+		palette_set_color(machine(), i + 6, MAKE_RGB(0x00, 0x00, 0x00));
+		palette_set_color(machine(), i + 8, MAKE_RGB(0x00, 0x00, 0x00));
+		palette_set_color(machine(), i + 10, MAKE_RGB(0x00, 0x00, 0x00));
+		palette_set_color(machine(), i + 12, MAKE_RGB(0x00, 0x00, 0x00));
+		palette_set_color(machine(), i + 14, MAKE_RGB(0x00, 0x00, 0x00));
 
-		palette_set_color(machine, i + 1, MAKE_RGB(0x00, 0x00, 0x00));
-		palette_set_color(machine, i + 3, MAKE_RGB(0xff, 0x00, 0x00));
-		palette_set_color(machine, i + 5, MAKE_RGB(0x00, 0xff, 0x00));
-		palette_set_color(machine, i + 7, MAKE_RGB(0xff, 0xff, 0x00));
-		palette_set_color(machine, i + 9, MAKE_RGB(0x00, 0x00, 0xff));
-		palette_set_color(machine, i + 11, MAKE_RGB(0xff, 0x00, 0xff));
-		palette_set_color(machine, i + 13, MAKE_RGB(0x00, 0xff, 0xff));
-		palette_set_color(machine, i + 15, MAKE_RGB(0xff, 0xff, 0xff));
+		palette_set_color(machine(), i + 1, MAKE_RGB(0x00, 0x00, 0x00));
+		palette_set_color(machine(), i + 3, MAKE_RGB(0xff, 0x00, 0x00));
+		palette_set_color(machine(), i + 5, MAKE_RGB(0x00, 0xff, 0x00));
+		palette_set_color(machine(), i + 7, MAKE_RGB(0xff, 0xff, 0x00));
+		palette_set_color(machine(), i + 9, MAKE_RGB(0x00, 0x00, 0xff));
+		palette_set_color(machine(), i + 11, MAKE_RGB(0xff, 0x00, 0xff));
+		palette_set_color(machine(), i + 13, MAKE_RGB(0x00, 0xff, 0xff));
+		palette_set_color(machine(), i + 15, MAKE_RGB(0xff, 0xff, 0xff));
 	}
 }
 
@@ -817,9 +818,7 @@ static MACHINE_CONFIG_START( magicfly, magicfly_state )
 
 	MCFG_GFXDECODE(magicfly)
 	MCFG_PALETTE_LENGTH(32)
-	MCFG_PALETTE_INIT(magicfly)
 
-	MCFG_VIDEO_START(magicfly)
 
 	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/16, mc6845_intf) /* guess */
 
@@ -834,7 +833,7 @@ static MACHINE_CONFIG_DERIVED( 7mezzo, magicfly )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_VIDEO_START(7mezzo)
+	MCFG_VIDEO_START_OVERRIDE(magicfly_state,7mezzo)
 
 MACHINE_CONFIG_END
 

@@ -24,12 +24,14 @@ public:
 	DECLARE_WRITE8_MEMBER(higemaru_colorram_w);
 	DECLARE_WRITE8_MEMBER(higemaru_c800_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/higemaru.c -----------*/
 
 
-PALETTE_INIT( higemaru );
-VIDEO_START( higemaru );
+
+
 SCREEN_UPDATE_IND16( higemaru );

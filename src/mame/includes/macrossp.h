@@ -68,11 +68,14 @@ public:
 	TILE_GET_INFO_MEMBER(get_macrossp_scrb_tile_info);
 	TILE_GET_INFO_MEMBER(get_macrossp_scrc_tile_info);
 	TILE_GET_INFO_MEMBER(get_macrossp_text_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 /*----------- defined in video/macrossp.c -----------*/
 
 
-VIDEO_START(macrossp);
+
 SCREEN_UPDATE_RGB32(macrossp);
 SCREEN_VBLANK(macrossp);

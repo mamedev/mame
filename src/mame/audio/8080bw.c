@@ -14,15 +14,14 @@
 /*                                                     */
 /*******************************************************/
 
-MACHINE_START( extra_8080bw_sh )
+MACHINE_START_MEMBER(_8080bw_state,extra_8080bw_sh)
 {
-	_8080bw_state *state = machine.driver_data<_8080bw_state>();
 
-	state->m_speaker = machine.device("speaker");
+	m_speaker = machine().device("speaker");
 
-	state->save_item(NAME(state->m_port_1_last_extra));
-	state->save_item(NAME(state->m_port_2_last_extra));
-	state->save_item(NAME(state->m_port_3_last_extra));
+	save_item(NAME(m_port_1_last_extra));
+	save_item(NAME(m_port_2_last_extra));
+	save_item(NAME(m_port_3_last_extra));
 }
 
 /*******************************************************/
@@ -904,31 +903,29 @@ static void schaser_reinit_555_time_remain(_8080bw_state *state)
 }
 
 
-MACHINE_START( schaser_sh )
+MACHINE_START_MEMBER(_8080bw_state,schaser_sh)
 {
-	_8080bw_state *state = machine.driver_data<_8080bw_state>();
 
-	state->m_schaser_effect_555_timer = machine.scheduler().timer_alloc(FUNC(schaser_effect_555_cb));
+	m_schaser_effect_555_timer = machine().scheduler().timer_alloc(FUNC(schaser_effect_555_cb));
 
-	state->save_item(NAME(state->m_schaser_explosion));
-	state->save_item(NAME(state->m_schaser_effect_555_is_low));
-	state->save_item(NAME(state->m_schaser_effect_555_time_remain_savable));
-	state->save_item(NAME(state->m_port_2_last_extra));
-	machine.save().register_postload(save_prepost_delegate(FUNC(schaser_reinit_555_time_remain), state));
+	save_item(NAME(m_schaser_explosion));
+	save_item(NAME(m_schaser_effect_555_is_low));
+	save_item(NAME(m_schaser_effect_555_time_remain_savable));
+	save_item(NAME(m_port_2_last_extra));
+	machine().save().register_postload(save_prepost_delegate(FUNC(schaser_reinit_555_time_remain), this));
 }
 
 
-MACHINE_RESET( schaser_sh )
+MACHINE_RESET_MEMBER(_8080bw_state,schaser_sh)
 {
-	_8080bw_state *state = machine.driver_data<_8080bw_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	state->m_schaser_effect_555_is_low = 0;
-	state->m_schaser_effect_555_timer->adjust(attotime::never);
-	state->schaser_sh_port_1_w(*space, 0, 0);
-	state->schaser_sh_port_2_w(*space, 0, 0);
-	state->m_schaser_effect_555_time_remain = attotime::zero;
-	state->m_schaser_effect_555_time_remain_savable = state->m_schaser_effect_555_time_remain.as_double();
+	m_schaser_effect_555_is_low = 0;
+	m_schaser_effect_555_timer->adjust(attotime::never);
+	schaser_sh_port_1_w(*space, 0, 0);
+	schaser_sh_port_2_w(*space, 0, 0);
+	m_schaser_effect_555_time_remain = attotime::zero;
+	m_schaser_effect_555_time_remain_savable = m_schaser_effect_555_time_remain.as_double();
 }
 
 

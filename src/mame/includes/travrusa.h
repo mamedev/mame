@@ -20,12 +20,16 @@ public:
 	DECLARE_DRIVER_INIT(shtridra);
 	DECLARE_DRIVER_INIT(motorace);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_PALETTE_INIT(shtrider);
 };
 
 /*----------- defined in video/travrusa.c -----------*/
 
 
-PALETTE_INIT( travrusa );
-PALETTE_INIT( shtrider );
-VIDEO_START( travrusa );
+
+
+
 SCREEN_UPDATE_IND16( travrusa );

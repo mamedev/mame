@@ -74,11 +74,14 @@ public:
 	DECLARE_WRITE16_MEMBER(okim1_rombank_w);
 	DECLARE_WRITE16_MEMBER(okim0_rombank_w);
 	DECLARE_DRIVER_INIT(mirage);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
-static VIDEO_START( mirage )
+void miragemi_state::video_start()
 {
-	machine.device<decospr_device>("spritegen")->alloc_sprite_bitmap();
+	machine().device<decospr_device>("spritegen")->alloc_sprite_bitmap();
 }
 
 static SCREEN_UPDATE_RGB32( mirage )
@@ -299,18 +302,16 @@ static const deco16ic_interface mirage_deco16ic_tilegen1_intf =
 };
 
 
-static MACHINE_START( mirage )
+void miragemi_state::machine_start()
 {
-	miragemi_state *state = machine.driver_data<miragemi_state>();
 
-	state->save_item(NAME(state->m_mux_data));
+	save_item(NAME(m_mux_data));
 }
 
-static MACHINE_RESET( mirage )
+void miragemi_state::machine_reset()
 {
-	miragemi_state *state = machine.driver_data<miragemi_state>();
 
-	state->m_mux_data = 0;
+	m_mux_data = 0;
 }
 
 static MACHINE_CONFIG_START( mirage, miragemi_state )
@@ -320,8 +321,6 @@ static MACHINE_CONFIG_START( mirage, miragemi_state )
 	MCFG_CPU_PROGRAM_MAP(mirage_map)
 	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MCFG_MACHINE_START(mirage)
-	MCFG_MACHINE_RESET(mirage)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -334,7 +333,6 @@ static MACHINE_CONFIG_START( mirage, miragemi_state )
 	MCFG_SCREEN_UPDATE_STATIC(mirage)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
-	MCFG_VIDEO_START(mirage)
 
 	MCFG_GFXDECODE(mirage)
 	MCFG_PALETTE_LENGTH(1024)

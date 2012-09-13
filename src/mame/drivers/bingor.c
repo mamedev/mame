@@ -453,10 +453,11 @@ public:
 	required_shared_ptr<UINT16> m_blit_ram;
 	DECLARE_READ16_MEMBER(test_r);
 	DECLARE_READ8_MEMBER(test8_r);
+	virtual void video_start();
 };
 
 
-static VIDEO_START(bingor)
+void bingor_state::video_start()
 {
 }
 
@@ -638,7 +639,6 @@ static MACHINE_CONFIG_START( bingor, bingor_state )
 
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(bingor)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("saa", SAA1099, 6000000 )

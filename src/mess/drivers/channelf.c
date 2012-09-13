@@ -273,9 +273,7 @@ static MACHINE_CONFIG_START( channelf, channelf_state )
 	MCFG_SCREEN_UPDATE_STATIC( channelf )
 
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT( channelf )
 
-	MCFG_VIDEO_START( channelf )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -301,9 +299,7 @@ static MACHINE_CONFIG_START( sabavdpl, channelf_state )
 	MCFG_SCREEN_UPDATE_STATIC( channelf )
 
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT( channelf )
 
-	MCFG_VIDEO_START( channelf )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -330,9 +326,7 @@ static MACHINE_CONFIG_START( channlf2, channelf_state )
 	MCFG_SCREEN_UPDATE_STATIC( channelf )
 
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT( channelf )
 
-	MCFG_VIDEO_START( channelf )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -359,9 +353,7 @@ static MACHINE_CONFIG_START( sabavpl2, channelf_state )
 	MCFG_SCREEN_UPDATE_STATIC( channelf )
 
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT( channelf )
 
-	MCFG_VIDEO_START( channelf )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

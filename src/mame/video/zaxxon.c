@@ -15,10 +15,9 @@
  *
  *************************************/
 
-PALETTE_INIT( zaxxon )
+void zaxxon_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	zaxxon_state *state = machine.driver_data<zaxxon_state>();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
 	int i;
@@ -30,7 +29,7 @@ PALETTE_INIT( zaxxon )
 			2,	&resistances[1], bweights, 470, 0);
 
 	/* initialize the palette with these colors */
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		int bit0, bit1, bit2;
 		int r, g, b;
@@ -52,11 +51,11 @@ PALETTE_INIT( zaxxon )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the character color codes */
-	state->m_color_codes = &color_prom[256];
+	m_color_codes = &color_prom[256];
 }
 
 
@@ -145,33 +144,30 @@ static void video_start_common(running_machine &machine, tilemap_get_info_delega
 }
 
 
-VIDEO_START( zaxxon )
+void zaxxon_state::video_start()
 {
-	zaxxon_state *state = machine.driver_data<zaxxon_state>();
-	video_start_common(machine, tilemap_get_info_delegate(FUNC(zaxxon_state::zaxxon_get_fg_tile_info),state));
+	video_start_common(machine(), tilemap_get_info_delegate(FUNC(zaxxon_state::zaxxon_get_fg_tile_info),this));
 }
 
 
-VIDEO_START( razmataz )
+VIDEO_START_MEMBER(zaxxon_state,razmataz)
 {
-	zaxxon_state *state = machine.driver_data<zaxxon_state>();
-	video_start_common(machine, tilemap_get_info_delegate(FUNC(zaxxon_state::razmataz_get_fg_tile_info),state));
+	video_start_common(machine(), tilemap_get_info_delegate(FUNC(zaxxon_state::razmataz_get_fg_tile_info),this));
 }
 
 
-VIDEO_START( congo )
+VIDEO_START_MEMBER(zaxxon_state,congo)
 {
-	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 
 	/* allocate our own spriteram since it is not accessible by the main CPU */
-	state->m_spriteram.allocate(0x100);
+	m_spriteram.allocate(0x100);
 
 	/* register for save states */
-	state->save_item(NAME(state->m_congo_fg_bank));
-	state->save_item(NAME(state->m_congo_color_bank));
-	state->save_item(NAME(state->m_congo_custom));
+	save_item(NAME(m_congo_fg_bank));
+	save_item(NAME(m_congo_color_bank));
+	save_item(NAME(m_congo_custom));
 
-	video_start_common(machine, tilemap_get_info_delegate(FUNC(zaxxon_state::congo_get_fg_tile_info),state));
+	video_start_common(machine(), tilemap_get_info_delegate(FUNC(zaxxon_state::congo_get_fg_tile_info),this));
 }
 
 

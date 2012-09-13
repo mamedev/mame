@@ -64,6 +64,7 @@ public:
 	DECLARE_DRIVER_INIT(koftball);
 	TILE_GET_INFO_MEMBER(get_t1_tile_info);
 	TILE_GET_INFO_MEMBER(get_t2_tile_info);
+	virtual void video_start();
 };
 
 
@@ -87,13 +88,12 @@ TILE_GET_INFO_MEMBER(koftball_state::get_t2_tile_info)
 			0);
 }
 
-static VIDEO_START( koftball )
+void koftball_state::video_start()
 {
-	koftball_state *state = machine.driver_data<koftball_state>();
-	state->m_tilemap_1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(koftball_state::get_t1_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_tilemap_2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(koftball_state::get_t2_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tilemap_1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(koftball_state::get_t1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tilemap_2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(koftball_state::get_t2_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
-	state->m_tilemap_1->set_transparent_pen(0);
+	m_tilemap_1->set_transparent_pen(0);
 }
 
 static SCREEN_UPDATE_IND16( koftball )
@@ -256,7 +256,6 @@ static MACHINE_CONFIG_START( koftball, koftball_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 30*8-1)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(koftball)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

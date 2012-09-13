@@ -560,7 +560,7 @@ static MACHINE_CONFIG_START( gstriker, gstriker_state )
 	MCFG_GFXDECODE(gstriker)
 	MCFG_PALETTE_LENGTH(0x800)
 
-	MCFG_VIDEO_START(gstriker)
+	MCFG_VIDEO_START_OVERRIDE(gstriker_state,gstriker)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -573,7 +573,7 @@ static MACHINE_CONFIG_START( gstriker, gstriker_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( twrldc94, gstriker )
-	MCFG_VIDEO_START( twrldc94 )
+	MCFG_VIDEO_START_OVERRIDE(gstriker_state, twrldc94 )
 MACHINE_CONFIG_END
 
 
@@ -598,7 +598,7 @@ static MACHINE_CONFIG_START( vgoal, gstriker_state )
 	MCFG_GFXDECODE(gstriker)
 	MCFG_PALETTE_LENGTH(0x2000)
 
-	MCFG_VIDEO_START(vgoalsoc)
+	MCFG_VIDEO_START_OVERRIDE(gstriker_state,vgoalsoc)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

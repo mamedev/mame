@@ -337,14 +337,13 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_RESET( crballoon )
+void crbaloon_state::machine_reset()
 {
-	crbaloon_state *state = machine.driver_data<crbaloon_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_IO);
-	device_t *discrete = machine.device("discrete");
+	address_space *space = machine().device("maincpu")->memory().space(AS_IO);
+	device_t *discrete = machine().device("discrete");
 
 	pc3092_reset();
-	state->port_sound_w(*space, 0, 0);
+	port_sound_w(*space, 0, 0);
 	crbaloon_audio_set_music_freq(discrete, 0, 0);
 }
 
@@ -373,15 +372,12 @@ static MACHINE_CONFIG_START( crbaloon, crbaloon_state )
 	MCFG_CPU_IO_MAP(main_io_map)
 	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
-	MCFG_MACHINE_RESET(crballoon)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_VIDEO_START(crbaloon)
 
 	MCFG_GFXDECODE(crbaloon)
 	MCFG_PALETTE_LENGTH(32)
-	MCFG_PALETTE_INIT(crbaloon)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

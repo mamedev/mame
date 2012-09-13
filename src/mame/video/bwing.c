@@ -193,42 +193,41 @@ TILEMAP_MAPPER_MEMBER(bwing_state::bwing_scan_cols)
 }
 
 
-VIDEO_START( bwing )
+void bwing_state::video_start()
 {
-	bwing_state *state = machine.driver_data<bwing_state>();
 //	UINT32 *dwptr;
 	int i;
 
-	state->m_charmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bwing_state::get_charinfo),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
-	state->m_fgmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bwing_state::get_fgtileinfo),state), tilemap_mapper_delegate(FUNC(bwing_state::bwing_scan_cols),state), 16, 16, 64, 64);
-	state->m_bgmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bwing_state::get_bgtileinfo),state), tilemap_mapper_delegate(FUNC(bwing_state::bwing_scan_cols),state), 16, 16, 64, 64);
+	m_charmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bwing_state::get_charinfo),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_fgmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bwing_state::get_fgtileinfo),this), tilemap_mapper_delegate(FUNC(bwing_state::bwing_scan_cols),this), 16, 16, 64, 64);
+	m_bgmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bwing_state::get_bgtileinfo),this), tilemap_mapper_delegate(FUNC(bwing_state::bwing_scan_cols),this), 16, 16, 64, 64);
 
-	state->m_charmap->set_transparent_pen(0);
-	state->m_fgmap->set_transparent_pen(0);
+	m_charmap->set_transparent_pen(0);
+	m_fgmap->set_transparent_pen(0);
 
-	state->m_srxlat = auto_alloc_array(machine, int, 0x2000);
-	state->save_pointer(NAME(state->m_srxlat), 0x2000);
+	m_srxlat = auto_alloc_array(machine(), int, 0x2000);
+	save_pointer(NAME(m_srxlat), 0x2000);
 
-	fill_srxlat(state->m_srxlat);
+	fill_srxlat(m_srxlat);
 
-	state->m_fgdata = state->memregion("gpu")->base();
-	state->m_bgdata = state->m_fgdata + 0x1000;
+	m_fgdata = memregion("gpu")->base();
+	m_bgdata = m_fgdata + 0x1000;
 
 	for (i = 0; i < 4; i++)
-		state->m_srbase[i] = state->m_fgdata + i * 0x2000;
+		m_srbase[i] = m_fgdata + i * 0x2000;
 
 	for (i = 0; i < 8; i++)
-		state->m_sreg[i] = 0;
+		m_sreg[i] = 0;
 
-//  state->m_fgfx = machine.gfx[2];
-	machine.gfx[2]->set_source(state->m_srbase[1]);
+//  m_fgfx = machine().gfx[2];
+	machine().gfx[2]->set_source(m_srbase[1]);
 
-//  state->m_bgfx = machine.gfx[3];
-	machine.gfx[3]->set_source(state->m_srbase[1] + 0x1000);
+//  m_bgfx = machine().gfx[3];
+	machine().gfx[3]->set_source(m_srbase[1] + 0x1000);
 /*
 	WTF??
 	
-	dwptr = machine.gfx[2]->pen_usage();
+	dwptr = machine().gfx[2]->pen_usage();
 	if (dwptr)
 	{
 		dwptr[0] = 0;

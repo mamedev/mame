@@ -39,11 +39,13 @@ public:
 	DECLARE_WRITE16_MEMBER(mcatadv_videoram2_w);
 	TILE_GET_INFO_MEMBER(get_mcatadv_tile_info1);
 	TILE_GET_INFO_MEMBER(get_mcatadv_tile_info2);
+	virtual void machine_start();
+	virtual void video_start();
 };
 
 /*----------- defined in video/mcatadv.c -----------*/
 
 SCREEN_UPDATE_IND16( mcatadv );
-VIDEO_START( mcatadv );
+
 SCREEN_VBLANK( mcatadv );
 

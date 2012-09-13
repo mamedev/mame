@@ -80,32 +80,31 @@ WRITE16_MEMBER(fuuki16_state::fuuki16_vram_3_w){ fuuki16_vram_w(&space, offset, 
 
 /* Not used atm, seems to be fine without clearing pens? */
 #if 0
-PALETTE_INIT( fuuki16 )
+PALETTE_INIT_MEMBER(fuuki16_state,fuuki16)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int pen;
 
 	/* The game does not initialise the palette at startup. It should
        be totally black */
-	for (pen = 0; pen < machine.total_colors(); pen++)
-		palette_set_color(machine,pen,MAKE_RGB(0,0,0));
+	for (pen = 0; pen < machine().total_colors(); pen++)
+		palette_set_color(machine(),pen,MAKE_RGB(0,0,0));
 }
 #endif
 
-VIDEO_START( fuuki16 )
+void fuuki16_state::video_start()
 {
-	fuuki16_state *state = machine.driver_data<fuuki16_state>();
-	state->m_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	state->m_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info_1),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	state->m_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info_2),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_tilemap[3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info_3),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info_3),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	state->m_tilemap[0]->set_transparent_pen(0x0f);	// 4 bits
-	state->m_tilemap[1]->set_transparent_pen(0xff);	// 8 bits
-	state->m_tilemap[2]->set_transparent_pen(0x0f);	// 4 bits
-	state->m_tilemap[3]->set_transparent_pen(0x0f);	// 4 bits
+	m_tilemap[0]->set_transparent_pen(0x0f);	// 4 bits
+	m_tilemap[1]->set_transparent_pen(0xff);	// 8 bits
+	m_tilemap[2]->set_transparent_pen(0x0f);	// 4 bits
+	m_tilemap[3]->set_transparent_pen(0x0f);	// 4 bits
 
-	machine.gfx[2]->set_granularity(16); /* 256 colour tiles with palette selectable on 16 colour boundaries */
+	machine().gfx[2]->set_granularity(16); /* 256 colour tiles with palette selectable on 16 colour boundaries */
 }
 
 

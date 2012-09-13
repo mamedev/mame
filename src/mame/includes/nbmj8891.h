@@ -71,12 +71,14 @@ public:
 	DECLARE_DRIVER_INIT(lovehous);
 	DECLARE_DRIVER_INIT(club90s);
 	DECLARE_DRIVER_INIT(maiko);
+	virtual void video_start();
+	DECLARE_VIDEO_START(nbmj8891_1layer);
 };
 
 
 /*----------- defined in video/nbmj8891.c -----------*/
 
 SCREEN_UPDATE_IND16( nbmj8891 );
-VIDEO_START( nbmj8891_1layer );
-VIDEO_START( nbmj8891_2layer );
+
+
 

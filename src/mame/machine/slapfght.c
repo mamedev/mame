@@ -12,22 +12,21 @@
 
 
 /* Perform basic machine initialisation */
-MACHINE_RESET( slapfight )
+MACHINE_RESET_MEMBER(slapfght_state,slapfight)
 {
-	slapfght_state *state = machine.driver_data<slapfght_state>();
 	/* MAIN CPU */
 
-	state->m_slapfight_status_state=0;
-	state->m_slapfight_status = 0xc7;
+	m_slapfight_status_state=0;
+	m_slapfight_status = 0xc7;
 
-	state->m_getstar_sequence_index = 0;
-	state->m_getstar_sh_intenabled = 0;	/* disable sound cpu interrupts */
+	m_getstar_sequence_index = 0;
+	m_getstar_sh_intenabled = 0;	/* disable sound cpu interrupts */
 
 	/* SOUND CPU */
-	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* MCU */
-	state->m_mcu_val = 0;
+	m_mcu_val = 0;
 }
 
 /* Slapfight CPU input/output ports

@@ -922,11 +922,10 @@ static const nes_interface nes_config =
 	"audiocpu"
 };
 
-static MACHINE_RESET( punchout )
+void punchout_state::machine_reset()
 {
-	punchout_state *state = machine.driver_data<punchout_state>();
-	state->m_rp5c01_mode_sel = 0;
-	memset(state->m_rp5c01_mem, 0, sizeof(state->m_rp5c01_mem));
+	m_rp5c01_mode_sel = 0;
+	memset(m_rp5c01_mem, 0, sizeof(m_rp5c01_mem));
 }
 
 static INTERRUPT_GEN( vblank_irq )
@@ -951,7 +950,6 @@ static MACHINE_CONFIG_START( punchout, punchout_state )
 	MCFG_CPU_PROGRAM_MAP(punchout_sound_map)
 	MCFG_CPU_VBLANK_INT("top", nmi_line_pulse)
 
-	MCFG_MACHINE_RESET(punchout)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -973,7 +971,6 @@ static MACHINE_CONFIG_START( punchout, punchout_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(punchout_bottom)
 
-	MCFG_VIDEO_START(punchout)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -997,7 +994,7 @@ static MACHINE_CONFIG_DERIVED( armwrest, punchout )
 	/* video hardware */
 	MCFG_GFXDECODE(armwrest)
 
-	MCFG_VIDEO_START(armwrest)
+	MCFG_VIDEO_START_OVERRIDE(punchout_state,armwrest)
 	MCFG_SCREEN_MODIFY("top")
 	MCFG_SCREEN_UPDATE_STATIC(armwrest_top)
 	MCFG_SCREEN_MODIFY("bottom")

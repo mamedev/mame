@@ -121,16 +121,16 @@ static void ringking_get_rgb_data( const UINT8 *color_prom, int i, int *r_data, 
 }
 
 
-PALETTE_INIT( kingofb )
+PALETTE_INIT_MEMBER(kingofb_state,kingofb)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	palette_init_common(machine, color_prom, kingofb_get_rgb_data);
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	palette_init_common(machine(), color_prom, kingofb_get_rgb_data);
 }
 
-PALETTE_INIT( ringking )
+PALETTE_INIT_MEMBER(kingofb_state,ringking)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	palette_init_common(machine, color_prom, ringking_get_rgb_data);
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	palette_init_common(machine(), color_prom, ringking_get_rgb_data);
 }
 
 WRITE8_MEMBER(kingofb_state::kingofb_videoram_w)
@@ -194,13 +194,12 @@ TILE_GET_INFO_MEMBER(kingofb_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
-VIDEO_START( kingofb )
+VIDEO_START_MEMBER(kingofb_state,kingofb)
 {
-	kingofb_state *state = machine.driver_data<kingofb_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(kingofb_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS_FLIP_Y, 16, 16, 16, 16);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(kingofb_state::get_fg_tile_info),state), TILEMAP_SCAN_COLS_FLIP_Y,  8,  8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(kingofb_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_Y, 16, 16, 16, 16);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(kingofb_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_Y,  8,  8, 32, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 static void kingofb_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -262,13 +261,12 @@ TILE_GET_INFO_MEMBER(kingofb_state::ringking_get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(4, code, color, 0);
 }
 
-VIDEO_START( ringking )
+VIDEO_START_MEMBER(kingofb_state,ringking)
 {
-	kingofb_state *state = machine.driver_data<kingofb_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(kingofb_state::ringking_get_bg_tile_info),state), TILEMAP_SCAN_COLS_FLIP_Y, 16, 16, 16, 16);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(kingofb_state::get_fg_tile_info),state), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(kingofb_state::ringking_get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_Y, 16, 16, 16, 16);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(kingofb_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 static void ringking_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

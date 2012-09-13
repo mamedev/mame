@@ -58,6 +58,8 @@ public:
 	DECLARE_WRITE8_MEMBER(b800_w);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -213,9 +215,9 @@ TILE_GET_INFO_MEMBER(ettrivia_state::get_tile_info_fg)
 	get_tile_info(machine(), tileinfo, tile_index, m_fg_videoram, 1);
 }
 
-static PALETTE_INIT( ettrivia )
+void ettrivia_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	static const int resistances[2] = { 270, 130 };
 	double weights[2];
 	int i;
@@ -226,7 +228,7 @@ static PALETTE_INIT( ettrivia )
 			2, resistances, weights, 0, 0,
 			0, 0, 0, 0, 0);
 
-	for (i = 0;i < machine.total_colors(); i++)
+	for (i = 0;i < machine().total_colors(); i++)
 	{
 		int bit0, bit1;
 		int r, g, b;
@@ -246,17 +248,16 @@ static PALETTE_INIT( ettrivia )
 		bit1 = (color_prom[i+0x100] >> 1) & 0x01;
 		b = combine_2_weights(weights, bit0, bit1);
 
-		palette_set_color(machine, BITSWAP8(i,5,7,6,2,1,0,4,3), MAKE_RGB(r, g, b));
+		palette_set_color(machine(), BITSWAP8(i,5,7,6,2,1,0,4,3), MAKE_RGB(r, g, b));
 	}
 }
 
-static VIDEO_START( ettrivia )
+void ettrivia_state::video_start()
 {
-	ettrivia_state *state = machine.driver_data<ettrivia_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ettrivia_state::get_tile_info_bg),state),TILEMAP_SCAN_ROWS,8,8,64,32 );
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ettrivia_state::get_tile_info_fg),state),TILEMAP_SCAN_ROWS,8,8,64,32 );
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ettrivia_state::get_tile_info_bg),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ettrivia_state::get_tile_info_fg),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 static SCREEN_UPDATE_IND16( ettrivia )
@@ -315,8 +316,6 @@ static MACHINE_CONFIG_START( ettrivia, ettrivia_state )
 	MCFG_GFXDECODE(ettrivia)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(ettrivia)
-	MCFG_VIDEO_START(ettrivia)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

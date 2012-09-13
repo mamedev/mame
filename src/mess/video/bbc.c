@@ -367,24 +367,24 @@ static void common_init(running_machine &machine, int memorySize)
 
 }
 
-VIDEO_START( bbca )
+VIDEO_START_MEMBER(bbc_state,bbca)
 {
-	common_init(machine,16);
+	common_init(machine(),16);
 }
 
-VIDEO_START( bbcb )
+VIDEO_START_MEMBER(bbc_state,bbcb)
 {
-	common_init(machine,32);
+	common_init(machine(),32);
 }
 
-VIDEO_START( bbcbp )
+VIDEO_START_MEMBER(bbc_state,bbcbp)
 {
-	common_init(machine,32);
+	common_init(machine(),32);
 }
 
-VIDEO_START( bbcm )
+VIDEO_START_MEMBER(bbc_state,bbcm)
 {
-	common_init(machine,32);
+	common_init(machine(),32);
 }
 
 

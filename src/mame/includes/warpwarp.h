@@ -40,17 +40,23 @@ public:
 	TILE_GET_INFO_MEMBER(geebee_get_tile_info);
 	TILE_GET_INFO_MEMBER(navarone_get_tile_info);
 	TILE_GET_INFO_MEMBER(warpwarp_get_tile_info);
+	DECLARE_VIDEO_START(geebee);
+	DECLARE_PALETTE_INIT(geebee);
+	DECLARE_VIDEO_START(warpwarp);
+	DECLARE_PALETTE_INIT(warpwarp);
+	DECLARE_VIDEO_START(navarone);
+	DECLARE_PALETTE_INIT(navarone);
 };
 
 
 /*----------- defined in video/warpwarp.c -----------*/
 
-PALETTE_INIT( geebee );
-PALETTE_INIT( navarone );
-PALETTE_INIT( warpwarp );
-VIDEO_START( geebee );
-VIDEO_START( navarone );
-VIDEO_START( warpwarp );
+
+
+
+
+
+
 SCREEN_UPDATE_IND16( geebee );
 
 

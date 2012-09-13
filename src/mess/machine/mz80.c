@@ -14,13 +14,12 @@ DRIVER_INIT_MEMBER(mz80_state,mz80k)
 {
 }
 
-MACHINE_RESET( mz80k )
+void mz80_state::machine_reset()
 {
-	mz80_state *state = machine.driver_data<mz80_state>();
-	state->m_mz80k_tempo_strobe = 0;
-	state->m_mz80k_vertical = 0;
-	state->m_mz80k_cursor_cnt = 0;
-	state->m_mz80k_keyboard_line = 0;
+	m_mz80k_tempo_strobe = 0;
+	m_mz80k_vertical = 0;
+	m_mz80k_cursor_cnt = 0;
+	m_mz80k_keyboard_line = 0;
 }
 
 

@@ -114,45 +114,44 @@ static void model3_exit(running_machine &machine)
 	poly_free(state->m_poly);
 }
 
-VIDEO_START( model3 )
+void model3_state::video_start()
 {
-	model3_state *state = machine.driver_data<model3_state>();
 
-	state->m_poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), 0);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model3_exit), &machine));
+	m_poly = poly_alloc(machine(), 4000, sizeof(poly_extra_data), 0);
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model3_exit), &machine()));
 
-	machine.primary_screen->register_screen_bitmap(state->m_bitmap3d);
-	machine.primary_screen->register_screen_bitmap(state->m_zbuffer);
+	machine().primary_screen->register_screen_bitmap(m_bitmap3d);
+	machine().primary_screen->register_screen_bitmap(m_zbuffer);
 
-	state->m_m3_char_ram = auto_alloc_array_clear(machine, UINT64, 0x100000/8);
-	state->m_m3_tile_ram = auto_alloc_array_clear(machine, UINT64, 0x8000/8);
+	m_m3_char_ram = auto_alloc_array_clear(machine(), UINT64, 0x100000/8);
+	m_m3_tile_ram = auto_alloc_array_clear(machine(), UINT64, 0x8000/8);
 
-	state->m_pal_lookup = auto_alloc_array_clear(machine, UINT16, 65536);
+	m_pal_lookup = auto_alloc_array_clear(machine(), UINT16, 65536);
 
-	state->m_texture_fifo = auto_alloc_array_clear(machine, UINT32, 0x100000/4);
+	m_texture_fifo = auto_alloc_array_clear(machine(), UINT32, 0x100000/4);
 
 	/* 2x 4MB texture sheets */
-	state->m_texture_ram[0] = auto_alloc_array(machine, UINT16, 0x400000/2);
-	state->m_texture_ram[1] = auto_alloc_array(machine, UINT16, 0x400000/2);
+	m_texture_ram[0] = auto_alloc_array(machine(), UINT16, 0x400000/2);
+	m_texture_ram[1] = auto_alloc_array(machine(), UINT16, 0x400000/2);
 
 	/* 1MB Display List RAM */
-	state->m_display_list_ram = auto_alloc_array_clear(machine, UINT32, 0x100000/4);
+	m_display_list_ram = auto_alloc_array_clear(machine(), UINT32, 0x100000/4);
 	/* 4MB for nodes (< Step 2.0 have only 2MB) */
-	state->m_culling_ram = auto_alloc_array_clear(machine, UINT32, 0x400000/4);
+	m_culling_ram = auto_alloc_array_clear(machine(), UINT32, 0x400000/4);
 	/* 4MB Polygon RAM */
-	state->m_polygon_ram = auto_alloc_array_clear(machine, UINT32, 0x400000/4);
+	m_polygon_ram = auto_alloc_array_clear(machine(), UINT32, 0x400000/4);
 
-	state->m_tick = 0;
-	state->m_debug_layer_disable = 0;
-	state->m_vid_reg0 = 0;
+	m_tick = 0;
+	m_debug_layer_disable = 0;
+	m_vid_reg0 = 0;
 
-	state->m_viewport_focal_length = 300.;
-	state->m_viewport_region_x = 0;
-	state->m_viewport_region_y = 0;
-	state->m_viewport_region_width = 496;
-	state->m_viewport_region_height = 384;
+	m_viewport_focal_length = 300.;
+	m_viewport_region_x = 0;
+	m_viewport_region_y = 0;
+	m_viewport_region_width = 496;
+	m_viewport_region_height = 384;
 
-	init_matrix_stack(machine);
+	init_matrix_stack(machine());
 }
 
 static void draw_tile_4bit(running_machine &machine, bitmap_ind16 &bitmap, int tx, int ty, int tilenum)

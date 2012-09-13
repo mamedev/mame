@@ -245,9 +245,7 @@ static MACHINE_CONFIG_START( darkmist, darkmist_state )
 	MCFG_SCREEN_UPDATE_STATIC(darkmist)
 
 	MCFG_GFXDECODE(darkmist)
-	MCFG_PALETTE_INIT(darkmist)
 	MCFG_PALETTE_LENGTH(0x100*4)
-	MCFG_VIDEO_START(darkmist)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -23,6 +23,8 @@ public:
 	DECLARE_WRITE8_MEMBER(avalance_credit_1_lamp_w);
 	DECLARE_WRITE8_MEMBER(avalance_credit_2_lamp_w);
 	DECLARE_WRITE8_MEMBER(avalance_start_lamp_w);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 /*----------- defined in audio/avalnche.c -----------*/

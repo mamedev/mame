@@ -276,28 +276,26 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_START( dribling )
+void dribling_state::machine_start()
 {
-	dribling_state *state = machine.driver_data<dribling_state>();
 
-	state->save_item(NAME(state->m_abca));
-	state->save_item(NAME(state->m_di));
-	state->save_item(NAME(state->m_dr));
-	state->save_item(NAME(state->m_ds));
-	state->save_item(NAME(state->m_sh));
-	state->save_item(NAME(state->m_input_mux));
+	save_item(NAME(m_abca));
+	save_item(NAME(m_di));
+	save_item(NAME(m_dr));
+	save_item(NAME(m_ds));
+	save_item(NAME(m_sh));
+	save_item(NAME(m_input_mux));
 }
 
-static MACHINE_RESET( dribling )
+void dribling_state::machine_reset()
 {
-	dribling_state *state = machine.driver_data<dribling_state>();
 
-	state->m_abca = 0;
-	state->m_di = 0;
-	state->m_dr = 0;
-	state->m_ds = 0;
-	state->m_sh = 0;
-	state->m_input_mux = 0;
+	m_abca = 0;
+	m_di = 0;
+	m_dr = 0;
+	m_ds = 0;
+	m_sh = 0;
+	m_input_mux = 0;
 }
 
 
@@ -312,8 +310,6 @@ static MACHINE_CONFIG_START( dribling, dribling_state )
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
 
-	MCFG_MACHINE_START(dribling)
-	MCFG_MACHINE_RESET(dribling)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -327,7 +323,6 @@ static MACHINE_CONFIG_START( dribling, dribling_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(dribling)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

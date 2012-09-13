@@ -12,14 +12,13 @@
 
 /******************************************************************************/
 
-VIDEO_START( stoneage )
+VIDEO_START_MEMBER(cninja_state,stoneage)
 {
-	cninja_state *state = machine.driver_data<cninja_state>();
 
 	/* The bootleg has broken scroll registers */
-	deco16ic_set_scrolldx(state->m_deco_tilegen1, 3, 0, -10, -10);	/* pf4 16x16 tilemap */
-	deco16ic_set_scrolldx(state->m_deco_tilegen1, 1, 0, -10, -10);	/* pf2 16x16 tilemap */
-	deco16ic_set_scrolldx(state->m_deco_tilegen1, 0, 1, 2, 2);	/* pf1 8x8 tilemap */
+	deco16ic_set_scrolldx(m_deco_tilegen1, 3, 0, -10, -10);	/* pf4 16x16 tilemap */
+	deco16ic_set_scrolldx(m_deco_tilegen1, 1, 0, -10, -10);	/* pf2 16x16 tilemap */
+	deco16ic_set_scrolldx(m_deco_tilegen1, 0, 1, 2, 2);	/* pf1 8x8 tilemap */
 }
 
 /******************************************************************************/
@@ -241,10 +240,10 @@ SCREEN_UPDATE_IND16( robocop2 )
 	return 0;
 }
 
-VIDEO_START( mutantf )
+VIDEO_START_MEMBER(cninja_state,mutantf)
 {
-	machine.device<decospr_device>("spritegen1")->alloc_sprite_bitmap();
-	machine.device<decospr_device>("spritegen2")->alloc_sprite_bitmap();
+	machine().device<decospr_device>("spritegen1")->alloc_sprite_bitmap();
+	machine().device<decospr_device>("spritegen2")->alloc_sprite_bitmap();
 }
 
 SCREEN_UPDATE_RGB32( mutantf )

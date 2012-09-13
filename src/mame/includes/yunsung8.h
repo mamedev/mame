@@ -36,11 +36,14 @@ public:
 	DECLARE_WRITE8_MEMBER(yunsung8_sound_bankswitch_w);
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/yunsung8.c -----------*/
 
 
-VIDEO_START( yunsung8 );
+
 SCREEN_UPDATE_IND16( yunsung8 );

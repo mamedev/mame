@@ -551,7 +551,6 @@ static MACHINE_CONFIG_START( pmd85, pmd85_state )
 	MCFG_CPU_IO_MAP(pmd85_io_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_RESET( pmd85 )
 
 	MCFG_PIT8253_ADD( "pit8253", pmd85_pit8253_interface )
 
@@ -564,9 +563,7 @@ static MACHINE_CONFIG_START( pmd85, pmd85_state )
 	MCFG_SCREEN_UPDATE_STATIC( pmd85 )
 
 	MCFG_PALETTE_LENGTH(sizeof (pmd85_palette) / 3)
-	MCFG_PALETTE_INIT( pmd85 )
 
-	MCFG_VIDEO_START( pmd85 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

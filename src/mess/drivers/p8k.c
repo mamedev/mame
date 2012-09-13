@@ -80,6 +80,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	DECLARE_DRIVER_INIT(p8k);
+	DECLARE_MACHINE_RESET(p8k);
+	DECLARE_MACHINE_RESET(p8k_16);
 };
 
 /***************************************************************************
@@ -386,25 +388,24 @@ static INPUT_PORTS_START( p8k )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET( p8k )
+MACHINE_RESET_MEMBER(p8k_state,p8k)
 {
-	p8k_state *state = machine.driver_data<p8k_state>();
-	state->membank("bank0")->set_entry(0);
-	state->membank("bank1")->set_entry(0);
-	state->membank("bank2")->set_entry(0);
-	state->membank("bank3")->set_entry(0);
-	state->membank("bank4")->set_entry(0);
-	state->membank("bank5")->set_entry(0);
-	state->membank("bank6")->set_entry(0);
-	state->membank("bank7")->set_entry(0);
-	state->membank("bank8")->set_entry(0);
-	state->membank("bank9")->set_entry(0);
-	state->membank("bank10")->set_entry(0);
-	state->membank("bank11")->set_entry(0);
-	state->membank("bank12")->set_entry(0);
-	state->membank("bank13")->set_entry(0);
-	state->membank("bank14")->set_entry(0);
-	state->membank("bank15")->set_entry(0);
+	membank("bank0")->set_entry(0);
+	membank("bank1")->set_entry(0);
+	membank("bank2")->set_entry(0);
+	membank("bank3")->set_entry(0);
+	membank("bank4")->set_entry(0);
+	membank("bank5")->set_entry(0);
+	membank("bank6")->set_entry(0);
+	membank("bank7")->set_entry(0);
+	membank("bank8")->set_entry(0);
+	membank("bank9")->set_entry(0);
+	membank("bank10")->set_entry(0);
+	membank("bank11")->set_entry(0);
+	membank("bank12")->set_entry(0);
+	membank("bank13")->set_entry(0);
+	membank("bank14")->set_entry(0);
+	membank("bank15")->set_entry(0);
 }
 
 DRIVER_INIT_MEMBER(p8k_state,p8k)
@@ -454,7 +455,7 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf_16 )
 
 
 
-static MACHINE_RESET( p8k_16 )
+MACHINE_RESET_MEMBER(p8k_state,p8k_16)
 {
 }
 
@@ -712,7 +713,7 @@ static MACHINE_CONFIG_START( p8k, p8k_state )
 	MCFG_CPU_CONFIG(p8k_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(p8k_memmap)
 	MCFG_CPU_IO_MAP(p8k_iomap)
-	MCFG_MACHINE_RESET(p8k)
+	MCFG_MACHINE_RESET_OVERRIDE(p8k_state,p8k)
 
 	/* peripheral hardware */
 	MCFG_Z80DMA_ADD("z80dma", XTAL_4MHz, p8k_dma_intf)
@@ -742,7 +743,7 @@ static MACHINE_CONFIG_START( p8k_16, p8k_state )
 	MCFG_CPU_CONFIG(p8k_16_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(p8k_16_memmap)
 	MCFG_CPU_IO_MAP(p8k_16_iomap)
-	MCFG_MACHINE_RESET(p8k_16)
+	MCFG_MACHINE_RESET_OVERRIDE(p8k_state,p8k_16)
 
 	/* peripheral hardware */
 	MCFG_Z80CTC_ADD("z80ctc_0", XTAL_4MHz, p8k_16_ctc_0_intf)

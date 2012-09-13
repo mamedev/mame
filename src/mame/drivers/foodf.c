@@ -135,20 +135,18 @@ static TIMER_DEVICE_CALLBACK( scanline_update )
 }
 
 
-static MACHINE_START( foodf )
+MACHINE_START_MEMBER(foodf_state,foodf)
 {
-	foodf_state *state = machine.driver_data<foodf_state>();
-	atarigen_init(machine);
-	state->save_item(NAME(state->m_whichport));
+	atarigen_init(machine());
+	save_item(NAME(m_whichport));
 }
 
 
-static MACHINE_RESET( foodf )
+MACHINE_RESET_MEMBER(foodf_state,foodf)
 {
-	foodf_state *state = machine.driver_data<foodf_state>();
-	atarigen_interrupt_reset(state, update_interrupts);
-	timer_device *scan_timer = machine.device<timer_device>("scan_timer");
-	scan_timer->adjust(machine.primary_screen->time_until_pos(0));
+	atarigen_interrupt_reset(this, update_interrupts);
+	timer_device *scan_timer = machine().device<timer_device>("scan_timer");
+	scan_timer->adjust(machine().primary_screen->time_until_pos(0));
 }
 
 
@@ -358,8 +356,8 @@ static MACHINE_CONFIG_START( foodf, foodf_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
-	MCFG_MACHINE_START(foodf)
-	MCFG_MACHINE_RESET(foodf)
+	MCFG_MACHINE_START_OVERRIDE(foodf_state,foodf)
+	MCFG_MACHINE_RESET_OVERRIDE(foodf_state,foodf)
 
 	MCFG_X2212_ADD_AUTOSAVE("nvram")
 
@@ -375,7 +373,7 @@ static MACHINE_CONFIG_START( foodf, foodf_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 0, 256, 259, 0, 224)
 	MCFG_SCREEN_UPDATE_STATIC(foodf)
 
-	MCFG_VIDEO_START(foodf)
+	MCFG_VIDEO_START_OVERRIDE(foodf_state,foodf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

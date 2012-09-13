@@ -578,7 +578,7 @@ static MACHINE_CONFIG_START( zodiack, zodiack_state )
 	MCFG_GFXDECODE(zodiack)
 	MCFG_PALETTE_LENGTH(4*8+2*8+2*1)
 
-	MCFG_PALETTE_INIT(zodiack)
+	MCFG_PALETTE_INIT_OVERRIDE(zodiack_state,zodiack)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -145,6 +145,7 @@ public:
 	DECLARE_WRITE8_MEMBER(decold_palette_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(begas_vblank_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	virtual void machine_start();
 };
 
 static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 *spriteram, UINT16 tile_bank )
@@ -449,7 +450,7 @@ static GFXDECODE_START( rblaster )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 8 )
 GFXDECODE_END
 
-static MACHINE_START( rblaster )
+void deco_ld_state::machine_start()
 {
 }
 
@@ -474,7 +475,6 @@ static MACHINE_CONFIG_START( rblaster, deco_ld_state )
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 	MCFG_GFXDECODE(rblaster)
 	MCFG_PALETTE_LENGTH(512)
-	MCFG_MACHINE_START(rblaster)
 
 	/* sound hardware */
 	/* TODO: mixing */

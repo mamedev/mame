@@ -59,13 +59,12 @@ WRITE16_MEMBER(blockout_state::blockout_frontcolor_w)
   Start the video hardware emulation.
 
 ***************************************************************************/
-VIDEO_START( blockout )
+void blockout_state::video_start()
 {
-	blockout_state *state = machine.driver_data<blockout_state>();
 
 	/* Allocate temporary bitmaps */
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap);
-	state->save_item(NAME(state->m_tmpbitmap));
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmap);
+	save_item(NAME(m_tmpbitmap));
 }
 
 static void update_pixels( running_machine &machine, int x, int y )

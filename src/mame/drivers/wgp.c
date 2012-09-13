@@ -922,42 +922,40 @@ static void wgp_postload(running_machine &machine)
 	reset_sound_region(machine);
 }
 
-static MACHINE_RESET( wgp )
+void wgp_state::machine_reset()
 {
-	wgp_state *state = machine.driver_data<wgp_state>();
 	int i;
 
-	state->m_banknum = 0;
-	state->m_cpua_ctrl = 0xff;
-	state->m_port_sel = 0;
-	state->m_piv_ctrl_reg = 0;
+	m_banknum = 0;
+	m_cpua_ctrl = 0xff;
+	m_port_sel = 0;
+	m_piv_ctrl_reg = 0;
 
 	for (i = 0; i < 3; i++)
 	{
-		state->m_piv_zoom[i] = 0;
-		state->m_piv_scrollx[i] = 0;
-		state->m_piv_scrolly[i] = 0;
+		m_piv_zoom[i] = 0;
+		m_piv_scrollx[i] = 0;
+		m_piv_scrolly[i] = 0;
 	}
 
-	memset(state->m_rotate_ctrl, 0, 8 * sizeof(UINT16));
+	memset(m_rotate_ctrl, 0, 8 * sizeof(UINT16));
 }
 
-static MACHINE_START( wgp )
+void wgp_state::machine_start()
 {
-	wgp_state *state = machine.driver_data<wgp_state>();
 
-	state->membank("bank10")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0xc000, 0x4000);
+	membank("bank10")->configure_entries(0, 4, memregion("audiocpu")->base() + 0xc000, 0x4000);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_subcpu = machine.device<cpu_device>("sub");
-	state->m_tc0140syt = machine.device("tc0140syt");
-	state->m_tc0100scn = machine.device("tc0100scn");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_subcpu = machine().device<cpu_device>("sub");
+	m_tc0140syt = machine().device("tc0140syt");
+	m_tc0100scn = machine().device("tc0100scn");
 
-	state->save_item(NAME(state->m_cpua_ctrl));
-	state->save_item(NAME(state->m_banknum));
-	state->save_item(NAME(state->m_port_sel));
-	machine.save().register_postload(save_prepost_delegate(FUNC(wgp_postload), &machine));
+	save_item(NAME(m_cpua_ctrl));
+	save_item(NAME(m_banknum));
+	save_item(NAME(m_port_sel));
+	machine().save().register_postload(save_prepost_delegate(FUNC(wgp_postload), &machine()));
 }
 
 static const tc0100scn_interface wgp_tc0100scn_intf =
@@ -1005,8 +1003,6 @@ static MACHINE_CONFIG_START( wgp, wgp_state )
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_VBLANK_INT("screen", wgp_cpub_interrupt)
 
-	MCFG_MACHINE_START(wgp)
-	MCFG_MACHINE_RESET(wgp)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 
@@ -1023,7 +1019,6 @@ static MACHINE_CONFIG_START( wgp, wgp_state )
 	MCFG_GFXDECODE(wgp)
 	MCFG_PALETTE_LENGTH(4096)
 
-	MCFG_VIDEO_START(wgp)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", wgp_tc0100scn_intf)
 
@@ -1045,7 +1040,7 @@ static MACHINE_CONFIG_DERIVED( wgp2, wgp )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 	/* video hardware */
-	MCFG_VIDEO_START(wgp2)
+	MCFG_VIDEO_START_OVERRIDE(wgp_state,wgp2)
 
 	MCFG_DEVICE_REMOVE("tc0100scn")
 	MCFG_TC0100SCN_ADD("tc0100scn", wgp2_tc0100scn_intf)

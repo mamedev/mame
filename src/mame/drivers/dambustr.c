@@ -249,7 +249,7 @@ static MACHINE_CONFIG_START( dambustr, dambustr_state )
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(dambustr_map)
 
-	MCFG_MACHINE_RESET(galaxold)
+	MCFG_MACHINE_RESET_OVERRIDE(dambustr_state,galaxold)
 
 	MCFG_7474_ADD("7474_9m_1", "7474_9m_1", galaxold_7474_9m_1_callback, NULL)
 	MCFG_7474_ADD("7474_9m_2", "7474_9m_1", NULL, galaxold_7474_9m_2_q_callback)
@@ -266,8 +266,8 @@ static MACHINE_CONFIG_START( dambustr, dambustr_state )
 	MCFG_GFXDECODE(dambustr)
 	MCFG_PALETTE_LENGTH(32+2+64+8)		/* 32 for the characters, 2 for the bullets, 64 for the stars, 8 for the background */
 
-	MCFG_PALETTE_INIT(dambustr)
-	MCFG_VIDEO_START(dambustr)
+	MCFG_PALETTE_INIT_OVERRIDE(dambustr_state,dambustr)
+	MCFG_VIDEO_START_OVERRIDE(dambustr_state,dambustr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

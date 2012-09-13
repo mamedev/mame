@@ -220,8 +220,6 @@ static MACHINE_CONFIG_START( shaolins, shaolins_state )
 	MCFG_GFXDECODE(shaolins)
 	MCFG_PALETTE_LENGTH(16*8*16+16*8*16)
 
-	MCFG_PALETTE_INIT(shaolins)
-	MCFG_VIDEO_START(shaolins)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

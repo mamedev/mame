@@ -45,6 +45,11 @@ public:
 	DECLARE_DRIVER_INIT(robowresb);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	DECLARE_VIDEO_START(appoooh);
+	DECLARE_PALETTE_INIT(appoooh);
+	DECLARE_PALETTE_INIT(robowres);
 };
 
 #define CHR1_OFST   0x00  /* palette page of char set #1 */
@@ -53,8 +58,8 @@ public:
 
 /* ----------- defined in video/appoooh.c -----------*/
 
-PALETTE_INIT( appoooh );
-PALETTE_INIT( robowres );
-VIDEO_START( appoooh );
+
+
+
 SCREEN_UPDATE_IND16( appoooh );
 SCREEN_UPDATE_IND16( robowres );

@@ -280,15 +280,14 @@ static const UINT8 keyboard[8][10][8] = {
 	},
 };
 
-MACHINE_RESET( kay_kbd )
+MACHINE_RESET_MEMBER(kaypro_state,kay_kbd)
 {
-	kaypro_state *state = machine.driver_data<kaypro_state>();
-	kay_kbd_t *kbd = state->m_kbd = auto_alloc_clear(machine, kay_kbd_t);
+	kay_kbd_t *kbd = m_kbd = auto_alloc_clear(machine(), kay_kbd_t);
 
 	/* disable CapsLock LED initially */
-	set_led_status(machine, 1, 1);
-	set_led_status(machine, 1, 0);
-	kbd->beeper = machine.device(BEEPER_TAG);
+	set_led_status(machine(), 1, 1);
+	set_led_status(machine(), 1, 0);
+	kbd->beeper = machine().device(BEEPER_TAG);
 	kbd->beep_on = 1;
 	kbd->control_status = 0x14;
 	beep_set_state(kbd->beeper, 0);

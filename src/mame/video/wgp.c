@@ -67,14 +67,14 @@ static void wgp_core_vh_start( running_machine &machine, int piv_xoffs, int piv_
 	state->save_item(NAME(state->m_piv_scrolly));
 }
 
-VIDEO_START( wgp )
+void wgp_state::video_start()
 {
-	wgp_core_vh_start(machine, 32, 16);
+	wgp_core_vh_start(machine(), 32, 16);
 }
 
-VIDEO_START( wgp2 )
+VIDEO_START_MEMBER(wgp_state,wgp2)
 {
-	wgp_core_vh_start(machine, 32, 16);
+	wgp_core_vh_start(machine(), 32, 16);
 }
 
 

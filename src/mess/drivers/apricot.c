@@ -63,6 +63,7 @@ public:
 	bool m_display_enabled;
 	required_shared_ptr<UINT16> m_screen_buffer;
 	DECLARE_DRIVER_INIT(apricot);
+	virtual void palette_init();
 };
 
 
@@ -309,11 +310,11 @@ INPUT_PORTS_END
     PALETTE
 ***************************************************************************/
 
-static PALETTE_INIT( apricot )
+void apricot_state::palette_init()
 {
-	palette_set_color(machine, 0, MAKE_RGB(0x00, 0x00, 0x00)); /* black */
-	palette_set_color(machine, 1, MAKE_RGB(0x00, 0x7f, 0x00)); /* low intensity */
-	palette_set_color(machine, 2, MAKE_RGB(0x00, 0xff, 0x00)); /* high intensitiy */
+	palette_set_color(machine(), 0, MAKE_RGB(0x00, 0x00, 0x00)); /* black */
+	palette_set_color(machine(), 1, MAKE_RGB(0x00, 0x7f, 0x00)); /* low intensity */
+	palette_set_color(machine(), 2, MAKE_RGB(0x00, 0xff, 0x00)); /* high intensitiy */
 }
 
 
@@ -377,7 +378,6 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_SCREEN_REFRESH_RATE(72)
 	MCFG_SCREEN_UPDATE_STATIC(apricot)
 	MCFG_PALETTE_LENGTH(3)
-	MCFG_PALETTE_INIT(apricot)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

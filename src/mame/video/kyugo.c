@@ -41,19 +41,18 @@ TILE_GET_INFO_MEMBER(kyugo_state::get_bg_tile_info)
  *
  *************************************/
 
-VIDEO_START( kyugo )
+void kyugo_state::video_start()
 {
-	kyugo_state *state = machine.driver_data<kyugo_state>();
 
-	state->m_color_codes = state->memregion("proms")->base() + 0x300;
+	m_color_codes = memregion("proms")->base() + 0x300;
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(kyugo_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(kyugo_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(kyugo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(kyugo_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_fg_tilemap->set_scrolldx(0, 224);
-	state->m_bg_tilemap->set_scrolldx(-32, 32);
+	m_fg_tilemap->set_scrolldx(0, 224);
+	m_bg_tilemap->set_scrolldx(-32, 32);
 }
 
 

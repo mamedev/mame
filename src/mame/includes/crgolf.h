@@ -50,6 +50,9 @@ public:
 	DECLARE_READ8_MEMBER(crgolf_videoram_r);
 	DECLARE_WRITE8_MEMBER(crgolfhi_sample_w);
 	DECLARE_DRIVER_INIT(crgolfhi);
+	virtual void machine_start();
+	virtual void machine_reset();
+	DECLARE_VIDEO_START(crgolf);
 };
 
 /*----------- defined in video/crgolf.c -----------*/

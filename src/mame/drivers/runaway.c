@@ -33,16 +33,14 @@ static TIMER_CALLBACK( interrupt_callback )
 	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
 }
 
-static MACHINE_START( runaway )
+void runaway_state::machine_start()
 {
-	runaway_state *state = machine.driver_data<runaway_state>();
-	state->m_interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_callback));
+	m_interrupt_timer = machine().scheduler().timer_alloc(FUNC(interrupt_callback));
 }
 
-static MACHINE_RESET( runaway )
+void runaway_state::machine_reset()
 {
-	runaway_state *state = machine.driver_data<runaway_state>();
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(16), 16);
+	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(16), 16);
 }
 
 
@@ -353,8 +351,6 @@ static MACHINE_CONFIG_START( runaway, runaway_state )
 	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 8) /* ? */
 	MCFG_CPU_PROGRAM_MAP(runaway_map)
 
-	MCFG_MACHINE_START(runaway)
-	MCFG_MACHINE_RESET(runaway)
 
 	MCFG_ATARIVGEAROM_ADD("earom")
 
@@ -368,7 +364,6 @@ static MACHINE_CONFIG_START( runaway, runaway_state )
 	MCFG_GFXDECODE(runaway)
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_VIDEO_START(runaway)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -390,7 +385,7 @@ static MACHINE_CONFIG_DERIVED( qwak, runaway )
 	/* video hardware */
 	MCFG_GFXDECODE(qwak)
 
-	MCFG_VIDEO_START(qwak)
+	MCFG_VIDEO_START_OVERRIDE(runaway_state,qwak)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(qwak)
 

@@ -70,6 +70,10 @@ public:
 	DECLARE_WRITE8_MEMBER(mole_flipscreen_w);
 	DECLARE_READ8_MEMBER(mole_protection_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -79,12 +83,12 @@ public:
  *
  *************************************/
 
-static PALETTE_INIT( mole )
+void mole_state::palette_init()
 {
 	int i;
 
 	for (i = 0; i < 8; i++)
-		palette_set_color_rgb(machine, i, pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
+		palette_set_color_rgb(machine(), i, pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
 }
 
 TILE_GET_INFO_MEMBER(mole_state::get_bg_tile_info)
@@ -94,13 +98,12 @@ TILE_GET_INFO_MEMBER(mole_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER((code & 0x200) ? 1 : 0, code & 0x1ff, 0, 0);
 }
 
-static VIDEO_START( mole )
+void mole_state::video_start()
 {
-	mole_state *state = machine.driver_data<mole_state>();
-	memset(state->m_tileram, 0, sizeof(state->m_tileram));
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mole_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
+	memset(m_tileram, 0, sizeof(m_tileram));
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mole_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
 
-	state->save_item(NAME(state->m_tileram));
+	save_item(NAME(m_tileram));
 }
 
 WRITE8_MEMBER(mole_state::mole_videoram_w)
@@ -301,18 +304,16 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( mole )
+void mole_state::machine_start()
 {
-	mole_state *state = machine.driver_data<mole_state>();
 
-	state->save_item(NAME(state->m_tile_bank));
+	save_item(NAME(m_tile_bank));
 }
 
-static MACHINE_RESET( mole )
+void mole_state::machine_reset()
 {
-	mole_state *state = machine.driver_data<mole_state>();
 
-	state->m_tile_bank = 0;
+	m_tile_bank = 0;
 }
 
 static MACHINE_CONFIG_START( mole, mole_state )
@@ -322,8 +323,6 @@ static MACHINE_CONFIG_START( mole, mole_state )
 	MCFG_CPU_PROGRAM_MAP(mole_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(mole)
-	MCFG_MACHINE_RESET(mole)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -336,8 +335,6 @@ static MACHINE_CONFIG_START( mole, mole_state )
 	MCFG_GFXDECODE(mole)
 	MCFG_PALETTE_LENGTH(8)
 
-	MCFG_PALETTE_INIT(mole)
-	MCFG_VIDEO_START(mole)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -297,15 +297,14 @@ static const deco16ic_interface funkyjet_deco16ic_tilegen1_intf =
 	0,1,
 };
 
-static MACHINE_START( funkyjet )
+void funkyjet_state::machine_start()
 {
-	funkyjet_state *state = machine.driver_data<funkyjet_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_deco_tilegen1 = machine.device("tilegen1");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_deco_tilegen1 = machine().device("tilegen1");
 
-	decoprot_reset(machine);
+	decoprot_reset(machine());
 }
 
 static MACHINE_CONFIG_START( funkyjet, funkyjet_state )
@@ -318,7 +317,6 @@ static MACHINE_CONFIG_START( funkyjet, funkyjet_state )
 	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(funkyjet)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

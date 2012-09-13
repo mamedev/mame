@@ -47,6 +47,10 @@ public:
 	DECLARE_READ8_MEMBER(megazone_port_a_r);
 	DECLARE_WRITE8_MEMBER(megazone_port_b_w);
 	DECLARE_DRIVER_INIT(megazone);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -54,6 +58,6 @@ public:
 /*----------- defined in video/megazone.c -----------*/
 
 
-PALETTE_INIT( megazone );
-VIDEO_START( megazone );
+
+
 SCREEN_UPDATE_IND16( megazone );

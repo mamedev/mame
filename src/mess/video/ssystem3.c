@@ -36,21 +36,20 @@ static const unsigned char ssystem3_palette[] =
 };
 
 
-PALETTE_INIT( ssystem3 )
+void ssystem3_state::palette_init()
 {
 	int i;
 
 	for ( i = 0; i < sizeof(ssystem3_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, ssystem3_palette[i*3], ssystem3_palette[i*3+1], ssystem3_palette[i*3+2]);
+		palette_set_color_rgb(machine(), i, ssystem3_palette[i*3], ssystem3_palette[i*3+1], ssystem3_palette[i*3+2]);
 	}
 }
 
 
-VIDEO_START( ssystem3 )
+void ssystem3_state::video_start()
 {
-	ssystem3_state *state = machine.driver_data<ssystem3_state>();
 	// artwork seams to need this
-	state->m_videoram = auto_alloc_array(machine, UINT8, 6 * 2 + 24);
+	m_videoram = auto_alloc_array(machine(), UINT8, 6 * 2 + 24);
 }
 
 

@@ -1924,125 +1924,123 @@ static void setup_banks( running_machine &machine )
 	}
 }
 
-MACHINE_START( sms )
+MACHINE_START_MEMBER(sms_state,sms)
 {
-	sms_state *state = machine.driver_data<sms_state>();
 
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sms_machine_stop),&machine));
-	state->m_rapid_fire_timer = machine.scheduler().timer_alloc(FUNC(rapid_fire_callback));
-	state->m_rapid_fire_timer->adjust(attotime::from_hz(10), 0, attotime::from_hz(10));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sms_machine_stop),&machine()));
+	m_rapid_fire_timer = machine().scheduler().timer_alloc(FUNC(rapid_fire_callback));
+	m_rapid_fire_timer->adjust(attotime::from_hz(10), 0, attotime::from_hz(10));
 
-	state->m_lphaser_1_timer = machine.scheduler().timer_alloc(FUNC(lphaser_1_callback));
-	state->m_lphaser_2_timer = machine.scheduler().timer_alloc(FUNC(lphaser_2_callback));
+	m_lphaser_1_timer = machine().scheduler().timer_alloc(FUNC(lphaser_1_callback));
+	m_lphaser_2_timer = machine().scheduler().timer_alloc(FUNC(lphaser_2_callback));
 
-	state->m_main_cpu = machine.device("maincpu");
-	state->m_control_cpu = machine.device("control");
-	state->m_vdp = machine.device<sega315_5124_device>("sms_vdp");
-	state->m_eeprom = machine.device<eeprom_device>("eeprom");
-	state->m_ym = machine.device("ym2413");
-	state->m_main_scr = machine.device("screen");
-	state->m_left_lcd = machine.device("left_lcd");
-	state->m_right_lcd = machine.device("right_lcd");
-	state->m_space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	m_main_cpu = machine().device("maincpu");
+	m_control_cpu = machine().device("control");
+	m_vdp = machine().device<sega315_5124_device>("sms_vdp");
+	m_eeprom = machine().device<eeprom_device>("eeprom");
+	m_ym = machine().device("ym2413");
+	m_main_scr = machine().device("screen");
+	m_left_lcd = machine().device("left_lcd");
+	m_right_lcd = machine().device("right_lcd");
+	m_space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	machine.scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
+	machine().scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
 }
 
-MACHINE_RESET( sms )
+MACHINE_RESET_MEMBER(sms_state,sms)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	sms_state *state = machine.driver_data<sms_state>();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	state->m_ctrl_reg = 0xff;
-	if (state->m_has_fm)
-		state->m_fm_detect = 0x01;
+	m_ctrl_reg = 0xff;
+	if (m_has_fm)
+		m_fm_detect = 0x01;
 
-	state->m_mapper_ram = (UINT8*)space->get_write_ptr(0xdffc);
+	m_mapper_ram = (UINT8*)space->get_write_ptr(0xdffc);
 
-	state->m_bios_port = 0;
+	m_bios_port = 0;
 
-	if ( state->m_cartridge[state->m_current_cartridge].features & CF_CODEMASTERS_MAPPER )
+	if ( m_cartridge[m_current_cartridge].features & CF_CODEMASTERS_MAPPER )
 	{
 		/* Install special memory handlers */
-		space->install_write_handler(0x0000, 0x0000, write8_delegate(FUNC(sms_state::sms_codemasters_page0_w),state));
-		space->install_write_handler(0x4000, 0x4000, write8_delegate(FUNC(sms_state::sms_codemasters_page1_w),state));
+		space->install_write_handler(0x0000, 0x0000, write8_delegate(FUNC(sms_state::sms_codemasters_page0_w),this));
+		space->install_write_handler(0x4000, 0x4000, write8_delegate(FUNC(sms_state::sms_codemasters_page1_w),this));
 	}
 
-	if ( state->m_cartridge[state->m_current_cartridge].features & CF_KOREAN_ZEMINA_MAPPER )
+	if ( m_cartridge[m_current_cartridge].features & CF_KOREAN_ZEMINA_MAPPER )
 	{
-		space->install_write_handler(0x0000, 0x0003, write8_delegate(FUNC(sms_state::sms_korean_zemina_banksw_w),state));
+		space->install_write_handler(0x0000, 0x0003, write8_delegate(FUNC(sms_state::sms_korean_zemina_banksw_w),this));
 	}
 
-	if ( state->m_cartridge[state->m_current_cartridge].features & CF_JANGGUN_MAPPER )
+	if ( m_cartridge[m_current_cartridge].features & CF_JANGGUN_MAPPER )
 	{
-		space->install_write_handler(0x4000, 0x4000, write8_delegate(FUNC(sms_state::sms_janggun_bank0_w),state));
-		space->install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(sms_state::sms_janggun_bank1_w),state));
-		space->install_write_handler(0x8000, 0x8000, write8_delegate(FUNC(sms_state::sms_janggun_bank2_w),state));
-		space->install_write_handler(0xA000, 0xA000,write8_delegate(FUNC(sms_state::sms_janggun_bank3_w),state));
+		space->install_write_handler(0x4000, 0x4000, write8_delegate(FUNC(sms_state::sms_janggun_bank0_w),this));
+		space->install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(sms_state::sms_janggun_bank1_w),this));
+		space->install_write_handler(0x8000, 0x8000, write8_delegate(FUNC(sms_state::sms_janggun_bank2_w),this));
+		space->install_write_handler(0xA000, 0xA000,write8_delegate(FUNC(sms_state::sms_janggun_bank3_w),this));
 	}
 
-	if ( state->m_cartridge[state->m_current_cartridge].features & CF_4PAK_MAPPER )
+	if ( m_cartridge[m_current_cartridge].features & CF_4PAK_MAPPER )
 	{
-		space->install_write_handler(0x3ffe, 0x3ffe, write8_delegate(FUNC(sms_state::sms_4pak_page0_w),state));
-		space->install_write_handler(0x7fff, 0x7fff, write8_delegate(FUNC(sms_state::sms_4pak_page1_w),state));
-		space->install_write_handler(0xbfff, 0xbfff, write8_delegate(FUNC(sms_state::sms_4pak_page2_w),state));
+		space->install_write_handler(0x3ffe, 0x3ffe, write8_delegate(FUNC(sms_state::sms_4pak_page0_w),this));
+		space->install_write_handler(0x7fff, 0x7fff, write8_delegate(FUNC(sms_state::sms_4pak_page1_w),this));
+		space->install_write_handler(0xbfff, 0xbfff, write8_delegate(FUNC(sms_state::sms_4pak_page2_w),this));
 	}
 
-	if ( state->m_cartridge[state->m_current_cartridge].features & CF_TVDRAW )
+	if ( m_cartridge[m_current_cartridge].features & CF_TVDRAW )
 	{
-		space->install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(sms_state::sms_tvdraw_axis_w),state));
-		space->install_read_handler(0x8000, 0x8000, read8_delegate(FUNC(sms_state::sms_tvdraw_status_r),state));
-		space->install_read_handler(0xa000, 0xa000, read8_delegate(FUNC(sms_state::sms_tvdraw_data_r),state));
+		space->install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(sms_state::sms_tvdraw_axis_w),this));
+		space->install_read_handler(0x8000, 0x8000, read8_delegate(FUNC(sms_state::sms_tvdraw_status_r),this));
+		space->install_read_handler(0xa000, 0xa000, read8_delegate(FUNC(sms_state::sms_tvdraw_data_r),this));
 		space->nop_write(0xa000, 0xa000);
-		state->m_cartridge[state->m_current_cartridge].m_tvdraw_data = 0;
+		m_cartridge[m_current_cartridge].m_tvdraw_data = 0;
 	}
 
-	if ( state->m_cartridge[state->m_current_cartridge].features & CF_93C46_EEPROM )
+	if ( m_cartridge[m_current_cartridge].features & CF_93C46_EEPROM )
 	{
-		space->install_write_handler(0x8000,0x8000, write8_delegate(FUNC(sms_state::sms_93c46_w),state));
-		space->install_read_handler(0x8000,0x8000, read8_delegate(FUNC(sms_state::sms_93c46_r),state));
+		space->install_write_handler(0x8000,0x8000, write8_delegate(FUNC(sms_state::sms_93c46_w),this));
+		space->install_read_handler(0x8000,0x8000, read8_delegate(FUNC(sms_state::sms_93c46_r),this));
 	}
 
-	if (state->m_cartridge[state->m_current_cartridge].features & CF_GG_SMS_MODE)
+	if (m_cartridge[m_current_cartridge].features & CF_GG_SMS_MODE)
 	{
-		state->m_vdp->set_sega315_5124_compatibility_mode(true);
+		m_vdp->set_sega315_5124_compatibility_mode(true);
 	}
 
 	/* Initialize SIO stuff for GG */
-	state->m_gg_sio[0] = 0x7f;
-	state->m_gg_sio[1] = 0xff;
-	state->m_gg_sio[2] = 0x00;
-	state->m_gg_sio[3] = 0xff;
-	state->m_gg_sio[4] = 0x00;
+	m_gg_sio[0] = 0x7f;
+	m_gg_sio[1] = 0xff;
+	m_gg_sio[2] = 0x00;
+	m_gg_sio[3] = 0xff;
+	m_gg_sio[4] = 0x00;
 
-	state->m_store_control = 0;
+	m_store_control = 0;
 
-	setup_banks(machine);
+	setup_banks(machine());
 
 	setup_rom(space);
 
-	state->m_rapid_fire_state_1 = 0;
-	state->m_rapid_fire_state_2 = 0;
+	m_rapid_fire_state_1 = 0;
+	m_rapid_fire_state_2 = 0;
 
-	state->m_last_paddle_read_time = 0;
-	state->m_paddle_read_state = 0;
+	m_last_paddle_read_time = 0;
+	m_paddle_read_state = 0;
 
-	state->m_last_sports_pad_time_1 = 0;
-	state->m_last_sports_pad_time_2 = 0;
-	state->m_sports_pad_state_1 = 0;
-	state->m_sports_pad_state_2 = 0;
-	state->m_sports_pad_last_data_1 = 0;
-	state->m_sports_pad_last_data_2 = 0;
-	state->m_sports_pad_1_x = 0;
-	state->m_sports_pad_1_y = 0;
-	state->m_sports_pad_2_x = 0;
-	state->m_sports_pad_2_y = 0;
+	m_last_sports_pad_time_1 = 0;
+	m_last_sports_pad_time_2 = 0;
+	m_sports_pad_state_1 = 0;
+	m_sports_pad_state_2 = 0;
+	m_sports_pad_last_data_1 = 0;
+	m_sports_pad_last_data_2 = 0;
+	m_sports_pad_1_x = 0;
+	m_sports_pad_1_y = 0;
+	m_sports_pad_2_x = 0;
+	m_sports_pad_2_y = 0;
 
-	state->m_lphaser_1_latch = 0;
-	state->m_lphaser_2_latch = 0;
+	m_lphaser_1_latch = 0;
+	m_lphaser_2_latch = 0;
 
-	state->m_sscope_state = 0;
+	m_sscope_state = 0;
 }
 
 READ8_MEMBER(sms_state::sms_store_cart_select_r)
@@ -2176,15 +2174,14 @@ DRIVER_INIT_MEMBER(sms_state,gamegeaj)
 }
 
 
-VIDEO_START( sms1 )
+VIDEO_START_MEMBER(sms_state,sms1)
 {
-	sms_state *state = machine.driver_data<sms_state>();
-	screen_device *screen = machine.first_screen();
+	screen_device *screen = machine().first_screen();
 
-	screen->register_screen_bitmap(state->m_prevleft_bitmap);
-	screen->register_screen_bitmap(state->m_prevright_bitmap);
-	state->save_item(NAME(state->m_prevleft_bitmap));
-	state->save_item(NAME(state->m_prevright_bitmap));
+	screen->register_screen_bitmap(m_prevleft_bitmap);
+	screen->register_screen_bitmap(m_prevright_bitmap);
+	save_item(NAME(m_prevleft_bitmap));
+	save_item(NAME(m_prevright_bitmap));
 }
 
 SCREEN_UPDATE_RGB32( sms1 )
@@ -2275,13 +2272,12 @@ SCREEN_UPDATE_RGB32( sms )
 	return 0;
 }
 
-VIDEO_START( gamegear )
+VIDEO_START_MEMBER(sms_state,gamegear)
 {
-	sms_state *state = machine.driver_data<sms_state>();
-	screen_device *screen = machine.first_screen();
+	screen_device *screen = machine().first_screen();
 
-	screen->register_screen_bitmap(state->m_prev_bitmap);
-	state->save_item(NAME(state->m_prev_bitmap));
+	screen->register_screen_bitmap(m_prev_bitmap);
+	save_item(NAME(m_prev_bitmap));
 }
 
 SCREEN_UPDATE_RGB32( gamegear )

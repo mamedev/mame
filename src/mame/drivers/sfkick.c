@@ -78,6 +78,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi_port_a_w);
 	DECLARE_WRITE8_MEMBER(ppi_port_c_w);
 	DECLARE_DRIVER_INIT(sfkick);
+	virtual void machine_reset();
 };
 
 
@@ -434,19 +435,18 @@ static void sfkick_vdp_interrupt(device_t *, v99x8_device &device, int i)
 	device.machine().device("maincpu")->execute().set_input_line(0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
-static MACHINE_RESET(sfkick)
+void sfkick_state::machine_reset()
 {
-	sfkick_state *state = machine.driver_data<sfkick_state>();
-	state->m_bank_cfg=0;
-	state->m_bank[0]=0;
-	state->m_bank[1]=0;
-	state->m_bank[2]=0;
-	state->m_bank[3]=0;
-	state->m_bank[4]=0;
-	state->m_bank[5]=0;
-	state->m_bank[6]=0;
-	state->m_bank[7]=0;
-	sfkick_remap_banks(machine);
+	m_bank_cfg=0;
+	m_bank[0]=0;
+	m_bank[1]=0;
+	m_bank[2]=0;
+	m_bank[3]=0;
+	m_bank[4]=0;
+	m_bank[5]=0;
+	m_bank[6]=0;
+	m_bank[7]=0;
+	sfkick_remap_banks(machine());
 }
 
 static TIMER_DEVICE_CALLBACK( sfkick_interrupt )
@@ -497,7 +497,6 @@ static MACHINE_CONFIG_START( sfkick, sfkick_state )
 
 	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
 
-	MCFG_MACHINE_RESET(sfkick)
 
 	MCFG_PALETTE_INIT( v9938 )
 

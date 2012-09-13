@@ -1054,7 +1054,7 @@ static void x68k_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, in
 	}
 }
 
-PALETTE_INIT( x68000 )
+PALETTE_INIT_MEMBER(x68k_state,x68000)
 {
 	int pal;
 	int r,g,b;
@@ -1064,7 +1064,7 @@ PALETTE_INIT( x68000 )
 		g = (pal & 0x7c00) >> 7;
 		r = (pal & 0x03e0) >> 2;
 		b = (pal & 0x001f) << 3;
-		palette_set_color_rgb(machine,pal+512,r,g,b);
+		palette_set_color_rgb(machine(),pal+512,r,g,b);
 	}
 }
 
@@ -1130,35 +1130,34 @@ TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg1_tile_16)
 	SET_TILE_INFO_MEMBER(1,code,colour+16,flags);
 }
 
-VIDEO_START( x68000 )
+VIDEO_START_MEMBER(x68k_state,x68000)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
 	int gfx_index;
 
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine.gfx[gfx_index] == 0)
+		if (machine().gfx[gfx_index] == 0)
 			break;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[gfx_index] = auto_alloc(machine, gfx_element(machine, x68k_pcg_8, machine.root_device().memregion("user1")->base(), 32, 0));
+	machine().gfx[gfx_index] = auto_alloc(machine(), gfx_element(machine(), x68k_pcg_8, machine().root_device().memregion("user1")->base(), 32, 0));
 
 	gfx_index++;
 
-	machine.gfx[gfx_index] = auto_alloc(machine, gfx_element(machine, x68k_pcg_16, state->memregion("user1")->base(), 32, 0));
-	machine.gfx[gfx_index]->set_colors(32);
+	machine().gfx[gfx_index] = auto_alloc(machine(), gfx_element(machine(), x68k_pcg_16, memregion("user1")->base(), 32, 0));
+	machine().gfx[gfx_index]->set_colors(32);
 
 	/* Tilemaps */
-	state->m_bg0_8 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(x68k_state::x68k_get_bg0_tile),state),TILEMAP_SCAN_ROWS,8,8,64,64);
-	state->m_bg1_8 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(x68k_state::x68k_get_bg1_tile),state),TILEMAP_SCAN_ROWS,8,8,64,64);
-	state->m_bg0_16 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(x68k_state::x68k_get_bg0_tile_16),state),TILEMAP_SCAN_ROWS,16,16,64,64);
-	state->m_bg1_16 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(x68k_state::x68k_get_bg1_tile_16),state),TILEMAP_SCAN_ROWS,16,16,64,64);
+	m_bg0_8 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(x68k_state::x68k_get_bg0_tile),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_bg1_8 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(x68k_state::x68k_get_bg1_tile),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_bg0_16 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(x68k_state::x68k_get_bg0_tile_16),this),TILEMAP_SCAN_ROWS,16,16,64,64);
+	m_bg1_16 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(x68k_state::x68k_get_bg1_tile_16),this),TILEMAP_SCAN_ROWS,16,16,64,64);
 
-	state->m_bg0_8->set_transparent_pen(0);
-	state->m_bg1_8->set_transparent_pen(0);
-	state->m_bg0_16->set_transparent_pen(0);
-	state->m_bg1_16->set_transparent_pen(0);
+	m_bg0_8->set_transparent_pen(0);
+	m_bg1_8->set_transparent_pen(0);
+	m_bg0_16->set_transparent_pen(0);
+	m_bg1_16->set_transparent_pen(0);
 
-//  state->m_scanline_timer->adjust(attotime::zero, 0, attotime::from_hz(55.45)/568);
+//  m_scanline_timer->adjust(attotime::zero, 0, attotime::from_hz(55.45)/568);
 }
 
 SCREEN_UPDATE_IND16( x68000 )

@@ -951,54 +951,52 @@ static const msm5205_interface msm5205_config =
  *
  *************************************/
 
-static MACHINE_START( fromance )
+MACHINE_START_MEMBER(fromance_state,fromance)
 {
-	fromance_state *state = machine.driver_data<fromance_state>();
-	UINT8 *ROM = state->memregion("sub")->base();
+	UINT8 *ROM = memregion("sub")->base();
 
-	state->membank("bank1")->configure_entries(0, 0x100, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 0x100, &ROM[0x10000], 0x4000);
 
-	state->m_subcpu = machine.device<cpu_device>("sub");
+	m_subcpu = machine().device<cpu_device>("sub");
 
-	state->save_item(NAME(state->m_directionflag));
-	state->save_item(NAME(state->m_commanddata));
-	state->save_item(NAME(state->m_portselect));
+	save_item(NAME(m_directionflag));
+	save_item(NAME(m_commanddata));
+	save_item(NAME(m_portselect));
 
-	state->save_item(NAME(state->m_adpcm_reset));
-	state->save_item(NAME(state->m_adpcm_data));
-	state->save_item(NAME(state->m_vclk_left));
+	save_item(NAME(m_adpcm_reset));
+	save_item(NAME(m_adpcm_data));
+	save_item(NAME(m_vclk_left));
 
 	/* video-related elements are saved in VIDEO_START */
 }
 
-static MACHINE_RESET( fromance )
+MACHINE_RESET_MEMBER(fromance_state,fromance)
 {
-	fromance_state *state = machine.driver_data<fromance_state>();
 	int i;
 
-	state->m_directionflag = 0;
-	state->m_commanddata = 0;
-	state->m_portselect = 0;
+	m_directionflag = 0;
+	m_commanddata = 0;
+	m_portselect = 0;
 
-	state->m_adpcm_reset = 0;
-	state->m_adpcm_data = 0;
-	state->m_vclk_left = 0;
+	m_adpcm_reset = 0;
+	m_adpcm_data = 0;
+	m_vclk_left = 0;
 
-	state->m_flipscreen_old = -1;
-	state->m_scrollx_ofs = 0x159;
-	state->m_scrolly_ofs = 0x10;
+	m_flipscreen_old = -1;
+	m_scrollx_ofs = 0x159;
+	m_scrolly_ofs = 0x10;
 
-	state->m_selected_videoram = state->m_selected_paletteram = 0;
-	state->m_scrollx[0] = 0;
-	state->m_scrollx[1] = 0;
-	state->m_scrolly[0] = 0;
-	state->m_scrolly[1] = 0;
-	state->m_gfxreg = 0;
-	state->m_flipscreen = 0;
-	state->m_crtc_register = 0;
+	m_selected_videoram = m_selected_paletteram = 0;
+	m_scrollx[0] = 0;
+	m_scrollx[1] = 0;
+	m_scrolly[0] = 0;
+	m_scrolly[1] = 0;
+	m_gfxreg = 0;
+	m_flipscreen = 0;
+	m_crtc_register = 0;
 
 	for (i = 0; i < 0x10; i++)
-		state->m_crtc_data[i] = 0;
+		m_crtc_data[i] = 0;
 }
 
 static MACHINE_CONFIG_START( nekkyoku, fromance_state )
@@ -1012,8 +1010,8 @@ static MACHINE_CONFIG_START( nekkyoku, fromance_state )
 	MCFG_CPU_PROGRAM_MAP(nekkyoku_sub_map)
 	MCFG_CPU_IO_MAP(nekkyoku_sub_io_map)
 
-	MCFG_MACHINE_START(fromance)
-	MCFG_MACHINE_RESET(fromance)
+	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
+	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1025,7 +1023,7 @@ static MACHINE_CONFIG_START( nekkyoku, fromance_state )
 	MCFG_GFXDECODE(fromance)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(nekkyoku)
+	MCFG_VIDEO_START_OVERRIDE(fromance_state,nekkyoku)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1050,8 +1048,8 @@ static MACHINE_CONFIG_START( idolmj, fromance_state )
 	MCFG_CPU_PROGRAM_MAP(fromance_sub_map)
 	MCFG_CPU_IO_MAP(idolmj_sub_io_map)
 
-	MCFG_MACHINE_START(fromance)
-	MCFG_MACHINE_RESET(fromance)
+	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
+	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1063,7 +1061,7 @@ static MACHINE_CONFIG_START( idolmj, fromance_state )
 	MCFG_GFXDECODE(fromance)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(fromance)
+	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1088,8 +1086,8 @@ static MACHINE_CONFIG_START( fromance, fromance_state )
 	MCFG_CPU_PROGRAM_MAP(fromance_sub_map)
 	MCFG_CPU_IO_MAP(fromance_sub_io_map)
 
-	MCFG_MACHINE_START(fromance)
-	MCFG_MACHINE_RESET(fromance)
+	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
+	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1101,7 +1099,7 @@ static MACHINE_CONFIG_START( fromance, fromance_state )
 	MCFG_GFXDECODE(fromance)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(fromance)
+	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

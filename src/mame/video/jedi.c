@@ -28,13 +28,12 @@
  *
  *************************************/
 
-static VIDEO_START( jedi )
+VIDEO_START_MEMBER(jedi_state,jedi)
 {
-	jedi_state *state = machine.driver_data<jedi_state>();
 
 	/* register for saving */
-	state->save_item(NAME(state->m_vscroll));
-	state->save_item(NAME(state->m_hscroll));
+	save_item(NAME(m_vscroll));
+	save_item(NAME(m_hscroll));
 }
 
 
@@ -359,5 +358,5 @@ MACHINE_CONFIG_FRAGMENT( jedi_video )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(jedi)
 
-	MCFG_VIDEO_START(jedi)
+	MCFG_VIDEO_START_OVERRIDE(jedi_state,jedi)
 MACHINE_CONFIG_END

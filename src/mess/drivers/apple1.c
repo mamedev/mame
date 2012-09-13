@@ -283,7 +283,6 @@ static MACHINE_CONFIG_START( apple1, apple1_state )
 	MCFG_CPU_ADD("maincpu", M6502, 960000)        /* 1.023 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple1_map)
 
-	MCFG_MACHINE_RESET( apple1 )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -305,7 +304,6 @@ static MACHINE_CONFIG_START( apple1, apple1_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START(apple1)
 
 	MCFG_PIA6821_ADD( "pia", apple1_pia0 )
 

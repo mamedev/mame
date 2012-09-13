@@ -128,6 +128,7 @@ public:
 	UINT8		m_vram_bank;
 	UINT8		m_cassette_ff;
 	UINT8		m_centronics_ff;
+	virtual void palette_init();
 };
 
 

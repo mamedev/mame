@@ -715,37 +715,34 @@ WRITE8_MEMBER(mappy_state::mappy_latch_w)
 }
 
 
-static MACHINE_RESET( superpac )
+MACHINE_RESET_MEMBER(mappy_state,superpac)
 {
-	mappy_state *state = machine.driver_data<mappy_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
 	for (i = 0; i < 0x10; i += 2)
-		state->superpac_latch_w(*space,i,0);
+		superpac_latch_w(*space,i,0);
 }
 
-static MACHINE_RESET( phozon )
+MACHINE_RESET_MEMBER(mappy_state,phozon)
 {
-	mappy_state *state = machine.driver_data<mappy_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
 	for (i = 0; i < 0x10; i += 2)
-		state->phozon_latch_w(*space, i, 0);
+		phozon_latch_w(*space, i, 0);
 }
 
-static MACHINE_RESET( mappy )
+MACHINE_RESET_MEMBER(mappy_state,mappy)
 {
-	mappy_state *state = machine.driver_data<mappy_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
 	for (i = 0; i < 0x10; i += 2)
-		state->mappy_latch_w(*space, i, 0);
+		mappy_latch_w(*space, i, 0);
 }
 
 /* different games need different interrupt generators & timers because they use different Namco I/O devices */
@@ -1620,13 +1617,12 @@ static const namcoio_interface intf1_interleave =
 	NULL
 };
 
-static MACHINE_START( mappy )
+MACHINE_START_MEMBER(mappy_state,mappy)
 {
-	mappy_state *state = machine.driver_data<mappy_state>();
 
-	state->save_item(NAME(state->m_main_irq_mask));
-	state->save_item(NAME(state->m_sub_irq_mask));
-	state->save_item(NAME(state->m_sub2_irq_mask));
+	save_item(NAME(m_main_irq_mask));
+	save_item(NAME(m_sub_irq_mask));
+	save_item(NAME(m_sub2_irq_mask));
 }
 
 
@@ -1644,8 +1640,8 @@ static MACHINE_CONFIG_START( superpac, mappy_state )
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MCFG_MACHINE_START(mappy)
-	MCFG_MACHINE_RESET(superpac)
+	MCFG_MACHINE_START_OVERRIDE(mappy_state,mappy)
+	MCFG_MACHINE_RESET_OVERRIDE(mappy_state,superpac)
 
 	MCFG_NAMCO56XX_ADD("namcoio_1", intf0)
 	MCFG_NAMCO56XX_ADD("namcoio_2", intf1)
@@ -1658,8 +1654,8 @@ static MACHINE_CONFIG_START( superpac, mappy_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(superpac)
 
-	MCFG_PALETTE_INIT(superpac)
-	MCFG_VIDEO_START(superpac)
+	MCFG_PALETTE_INIT_OVERRIDE(mappy_state,superpac)
+	MCFG_VIDEO_START_OVERRIDE(mappy_state,superpac)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1717,8 +1713,8 @@ static MACHINE_CONFIG_START( phozon, mappy_state )
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MCFG_MACHINE_START(mappy)
-	MCFG_MACHINE_RESET(phozon)
+	MCFG_MACHINE_START_OVERRIDE(mappy_state,mappy)
+	MCFG_MACHINE_RESET_OVERRIDE(mappy_state,phozon)
 
 	MCFG_NAMCO58XX_ADD("namcoio_1", intf0)
 	MCFG_NAMCO56XX_ADD("namcoio_2", intf1_interleave)
@@ -1731,8 +1727,8 @@ static MACHINE_CONFIG_START( phozon, mappy_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(phozon)
 
-	MCFG_PALETTE_INIT(phozon)
-	MCFG_VIDEO_START(phozon)
+	MCFG_PALETTE_INIT_OVERRIDE(mappy_state,phozon)
+	MCFG_VIDEO_START_OVERRIDE(mappy_state,phozon)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1757,8 +1753,8 @@ static MACHINE_CONFIG_START( mappy, mappy_state )
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MCFG_MACHINE_START(mappy)
-	MCFG_MACHINE_RESET(mappy)
+	MCFG_MACHINE_START_OVERRIDE(mappy_state,mappy)
+	MCFG_MACHINE_RESET_OVERRIDE(mappy_state,mappy)
 
 	MCFG_NAMCO58XX_ADD("namcoio_1", intf0)
 	MCFG_NAMCO58XX_ADD("namcoio_2", intf1)
@@ -1771,8 +1767,8 @@ static MACHINE_CONFIG_START( mappy, mappy_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(mappy)
 
-	MCFG_PALETTE_INIT(mappy)
-	MCFG_VIDEO_START(mappy)
+	MCFG_PALETTE_INIT_OVERRIDE(mappy_state,mappy)
+	MCFG_VIDEO_START_OVERRIDE(mappy_state,mappy)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

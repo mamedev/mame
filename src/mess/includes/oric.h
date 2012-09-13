@@ -102,6 +102,11 @@ public:
 	DECLARE_WRITE8_MEMBER(oric_microdisc_w);
 	DECLARE_READ8_MEMBER(oric_IO_r);
 	DECLARE_WRITE8_MEMBER(oric_IO_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_MACHINE_START(telestrat);
 };
 
 
@@ -111,17 +116,17 @@ extern const via6522_interface oric_6522_interface;
 extern const via6522_interface telestrat_via2_interface;
 extern const wd17xx_interface oric_wd17xx_interface;
 
-MACHINE_START( oric );
-MACHINE_RESET( oric );
+
+
 
 
 /* Telestrat specific */
-MACHINE_START( telestrat );
+
 
 
 /*----------- defined in video/oric.c -----------*/
 
-VIDEO_START( oric );
+
 SCREEN_UPDATE_IND16( oric );
 
 

@@ -359,35 +359,34 @@ INPUT_PORTS_END
 *       Machine Reset & Interrupts         *
 *******************************************/
 
-static MACHINE_RESET( truco )
+void truco_state::machine_reset()
 {
-	truco_state *state = machine.driver_data<truco_state>();
 	int a;
 
 	/* Setup the data on the battery backed RAM */
 
 	/* IRQ check */
-	state->m_battery_ram[0x002] = 0x51;
-	state->m_battery_ram[0x024] = 0x49;
-	state->m_battery_ram[0x089] = 0x04;
-	state->m_battery_ram[0x170] = 0x12;
-	state->m_battery_ram[0x1a8] = 0xd5;
+	m_battery_ram[0x002] = 0x51;
+	m_battery_ram[0x024] = 0x49;
+	m_battery_ram[0x089] = 0x04;
+	m_battery_ram[0x170] = 0x12;
+	m_battery_ram[0x1a8] = 0xd5;
 
 	/* Mainloop check */
-	state->m_battery_ram[0x005] = 0x04;
-	state->m_battery_ram[0x22B] = 0x46;
-	state->m_battery_ram[0x236] = 0xfb;
-	state->m_battery_ram[0x2fe] = 0x1D;
-	state->m_battery_ram[0x359] = 0x5A;
+	m_battery_ram[0x005] = 0x04;
+	m_battery_ram[0x22B] = 0x46;
+	m_battery_ram[0x236] = 0xfb;
+	m_battery_ram[0x2fe] = 0x1D;
+	m_battery_ram[0x359] = 0x5A;
 
 	/* Boot check */
-	a = ( state->m_battery_ram[0x000] << 8 ) | state->m_battery_ram[0x001];
+	a = ( m_battery_ram[0x000] << 8 ) | m_battery_ram[0x001];
 
 	a += 0x4d2;
 
-	state->m_battery_ram[0x01d] = ( a >> 8 ) & 0xff;
-	state->m_battery_ram[0x01e] = a & 0xff;
-	state->m_battery_ram[0x020] = state->m_battery_ram[0x011];
+	m_battery_ram[0x01d] = ( a >> 8 ) & 0xff;
+	m_battery_ram[0x01e] = a & 0xff;
+	m_battery_ram[0x020] = m_battery_ram[0x011];
 }
 
 static INTERRUPT_GEN( truco_interrupt )
@@ -463,7 +462,6 @@ static MACHINE_CONFIG_START( truco, truco_state )
 
 	MCFG_PIA6821_ADD("pia0", pia0_intf)
 
-	MCFG_MACHINE_RESET(truco)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -474,7 +472,6 @@ static MACHINE_CONFIG_START( truco, truco_state )
 	MCFG_SCREEN_UPDATE_STATIC(truco)
 
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT(truco)
 
 	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)	/* Identified as UM6845 */
 

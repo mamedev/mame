@@ -51,16 +51,15 @@ TILE_GET_INFO_MEMBER(sf_state::get_tx_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( sf )
+void sf_state::video_start()
 {
-	sf_state *state = machine.driver_data<sf_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sf_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 2048, 16);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sf_state::get_fg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 2048, 16);
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sf_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sf_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 2048, 16);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sf_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 2048, 16);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sf_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(15);
-	state->m_tx_tilemap->set_transparent_pen(3);
+	m_fg_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(3);
 }
 
 

@@ -43,6 +43,10 @@ public:
 	DECLARE_READ8_MEMBER(borntofi_inputs_r);
 	DECLARE_WRITE8_MEMBER(borntofi_msm5205_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(wheelrun_wheel_r);
+	DECLARE_MACHINE_START(fantland);
+	DECLARE_MACHINE_RESET(fantland);
+	DECLARE_MACHINE_START(borntofi);
+	DECLARE_MACHINE_RESET(borntofi);
 };
 
 

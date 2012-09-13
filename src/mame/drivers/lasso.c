@@ -475,39 +475,35 @@ static const sn76496_config psg_intf =
 };
 
 
-static MACHINE_START( lasso )
+void lasso_state::machine_start()
 {
-	lasso_state *state = machine.driver_data<lasso_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	
-	state->save_item(NAME(state->m_gfxbank));
+	save_item(NAME(m_gfxbank));
 }
 
-static MACHINE_START( wwjgtin )
+MACHINE_START_MEMBER(lasso_state,wwjgtin)
 {
-	lasso_state *state = machine.driver_data<lasso_state>();
 
-	MACHINE_START_CALL(lasso);
+	lasso_state::machine_start();
 
-	state->save_item(NAME(state->m_track_enable));
+	save_item(NAME(m_track_enable));
 }
 
-static MACHINE_RESET( lasso )
+void lasso_state::machine_reset()
 {
-	lasso_state *state = machine.driver_data<lasso_state>();
 
-	state->m_gfxbank = 0;
+	m_gfxbank = 0;
 }
 
-static MACHINE_RESET( wwjgtin )
+MACHINE_RESET_MEMBER(lasso_state,wwjgtin)
 {
-	lasso_state *state = machine.driver_data<lasso_state>();
 
-	MACHINE_RESET_CALL(lasso);
+	lasso_state::machine_reset();
 
-	state->m_track_enable = 0;
+	m_track_enable = 0;
 }
 
 static MACHINE_CONFIG_START( base, lasso_state )
@@ -522,8 +518,6 @@ static MACHINE_CONFIG_START( base, lasso_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(lasso)
-	MCFG_MACHINE_RESET(lasso)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -536,8 +530,6 @@ static MACHINE_CONFIG_START( base, lasso_state )
 	MCFG_GFXDECODE(lasso)
 	MCFG_PALETTE_LENGTH(0x40)
 
-	MCFG_PALETTE_INIT(lasso)
-	MCFG_VIDEO_START(lasso)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -582,8 +574,8 @@ static MACHINE_CONFIG_DERIVED( wwjgtin, base )
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(wwjgtin_audio_map)
 
-	MCFG_MACHINE_START(wwjgtin)
-	MCFG_MACHINE_RESET(wwjgtin)
+	MCFG_MACHINE_START_OVERRIDE(lasso_state,wwjgtin)
+	MCFG_MACHINE_RESET_OVERRIDE(lasso_state,wwjgtin)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -592,8 +584,8 @@ static MACHINE_CONFIG_DERIVED( wwjgtin, base )
 	MCFG_GFXDECODE(wwjgtin)	// Has 1 additional layer
 	MCFG_PALETTE_LENGTH(0x40 + 16*16)
 
-	MCFG_PALETTE_INIT(wwjgtin)
-	MCFG_VIDEO_START(wwjgtin)
+	MCFG_PALETTE_INIT_OVERRIDE(lasso_state,wwjgtin)
+	MCFG_VIDEO_START_OVERRIDE(lasso_state,wwjgtin)
 
 	/* sound hardware */
 	MCFG_DAC_ADD("dac")
@@ -615,7 +607,7 @@ static MACHINE_CONFIG_DERIVED( pinbo, base )
 	MCFG_GFXDECODE(pinbo)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MCFG_VIDEO_START(pinbo)
+	MCFG_VIDEO_START_OVERRIDE(lasso_state,pinbo)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(chameleo)
 

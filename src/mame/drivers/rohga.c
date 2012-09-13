@@ -818,7 +818,7 @@ static MACHINE_CONFIG_START( rohga, rohga_state )
 	MCFG_GFXDECODE(rohga)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(rohga)
+	MCFG_VIDEO_START_OVERRIDE(rohga_state,rohga)
 
 	MCFG_DECOCOMN_ADD("deco_common", rohga_decocomn_intf)
 
@@ -880,7 +880,7 @@ static MACHINE_CONFIG_START( wizdfire, rohga_state )
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 4);
 
-	MCFG_VIDEO_START(wizdfire)
+	MCFG_VIDEO_START_OVERRIDE(rohga_state,wizdfire)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -934,7 +934,7 @@ static MACHINE_CONFIG_START( nitrobal, rohga_state )
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 4);
 
-	MCFG_VIDEO_START(wizdfire)
+	MCFG_VIDEO_START_OVERRIDE(rohga_state,wizdfire)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -976,7 +976,7 @@ static MACHINE_CONFIG_START( schmeisr, rohga_state )
 	MCFG_GFXDECODE(schmeisr)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(schmeisr)
+	MCFG_VIDEO_START_OVERRIDE(rohga_state,schmeisr)
 
 	MCFG_DECOCOMN_ADD("deco_common", rohga_decocomn_intf)
 

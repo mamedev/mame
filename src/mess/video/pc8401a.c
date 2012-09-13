@@ -3,10 +3,10 @@
 
 /* PC-8401A */
 
-static PALETTE_INIT( pc8401a )
+PALETTE_INIT_MEMBER(pc8401a_state,pc8401a)
 {
-	palette_set_color(machine, 0, MAKE_RGB(39, 108, 51));
-	palette_set_color(machine, 1, MAKE_RGB(16, 37, 84));
+	palette_set_color(machine(), 0, MAKE_RGB(39, 108, 51));
+	palette_set_color(machine(), 1, MAKE_RGB(16, 37, 84));
 }
 
 void pc8401a_state::video_start()
@@ -75,7 +75,7 @@ MACHINE_CONFIG_FRAGMENT( pc8401a_video )
 //  MCFG_DEFAULT_LAYOUT(layout_pc8401a)
 
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(pc8401a)
+	MCFG_PALETTE_INIT_OVERRIDE(pc8401a_state,pc8401a)
 
 	/* LCD */
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
@@ -91,7 +91,7 @@ MACHINE_CONFIG_FRAGMENT( pc8500_video )
 	MCFG_DEFAULT_LAYOUT(layout_pc8500)
 
 	MCFG_PALETTE_LENGTH(2+8)
-	MCFG_PALETTE_INIT(pc8401a)
+	MCFG_PALETTE_INIT_OVERRIDE(pc8401a_state,pc8401a)
 
 	/* LCD */
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)

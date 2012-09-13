@@ -61,6 +61,9 @@ public:
 	DECLARE_READ16_MEMBER(drill_irq_r);
 	DECLARE_WRITE16_MEMBER(drill_irq_w);
 	DECLARE_DRIVER_INIT(drill);
+	DECLARE_MACHINE_START(drill);
+	DECLARE_MACHINE_RESET(drill);
+
 };
 
 
@@ -422,23 +425,21 @@ static const ym2610_interface ym2610_config =
 };
 
 
-static MACHINE_START( drill )
+MACHINE_START_MEMBER(_2mindril_state,drill)
 {
-	_2mindril_state *state = machine.driver_data<_2mindril_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
 
-	state->save_item(NAME(state->m_defender_sensor));
-	state->save_item(NAME(state->m_shutter_sensor));
+	save_item(NAME(m_defender_sensor));
+	save_item(NAME(m_shutter_sensor));
 }
 
-static MACHINE_RESET( drill )
+MACHINE_RESET_MEMBER(_2mindril_state,drill)
 {
-	_2mindril_state *state = machine.driver_data<_2mindril_state>();
 
-	state->m_defender_sensor = 0;
-	state->m_shutter_sensor = 0;
-	state->irq_reg = 0;
+	m_defender_sensor = 0;
+	m_shutter_sensor = 0;
+	irq_reg = 0;
 }
 
 static MACHINE_CONFIG_START( drill, _2mindril_state )
@@ -449,8 +450,8 @@ static MACHINE_CONFIG_START( drill, _2mindril_state )
 	//MCFG_CPU_PERIODIC_INT(drill_device_irq,60)
 	MCFG_GFXDECODE(2mindril)
 
-	MCFG_MACHINE_START(drill)
-	MCFG_MACHINE_RESET(drill)
+	MCFG_MACHINE_START_OVERRIDE(_2mindril_state,drill)
+	MCFG_MACHINE_RESET_OVERRIDE(_2mindril_state,drill)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -462,7 +463,7 @@ static MACHINE_CONFIG_START( drill, _2mindril_state )
 
 	MCFG_PALETTE_LENGTH(0x2000)
 
-	MCFG_VIDEO_START(f3)
+	MCFG_VIDEO_START_OVERRIDE(_2mindril_state,f3)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

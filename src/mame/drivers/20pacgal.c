@@ -341,25 +341,23 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_START( 20pacgal )
+void _20pacgal_state::machine_start()
 {
-	_20pacgal_state *state = machine.driver_data<_20pacgal_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_eeprom = machine.device("eeprom");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_eeprom = machine().device("eeprom");
 
-	state->save_item(NAME(state->m_game_selected));
-	state->save_item(NAME(state->m_ram_48000));
-	state->save_item(NAME(state->m_irq_mask));
+	save_item(NAME(m_game_selected));
+	save_item(NAME(m_ram_48000));
+	save_item(NAME(m_irq_mask));
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(set_bankptr), &machine));
+	machine().save().register_postload(save_prepost_delegate(FUNC(set_bankptr), &machine()));
 }
 
-static MACHINE_RESET( 20pacgal )
+void _20pacgal_state::machine_reset()
 {
-	_20pacgal_state *state = machine.driver_data<_20pacgal_state>();
 
-	state->m_game_selected = 0;
+	m_game_selected = 0;
 }
 
 static INTERRUPT_GEN( vblank_irq )
@@ -378,8 +376,6 @@ static MACHINE_CONFIG_START( 20pacgal, _20pacgal_state )
 	MCFG_CPU_IO_MAP(20pacgal_io_map)
 	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
-	MCFG_MACHINE_START(20pacgal)
-	MCFG_MACHINE_RESET(20pacgal)
 
 	MCFG_EEPROM_ADD("eeprom", _20pacgal_eeprom_intf)
 

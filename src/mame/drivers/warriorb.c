@@ -155,8 +155,8 @@ Colscroll effects?
 #include "includes/warriorb.h"
 #include "includes/taitoipt.h"
 
-static MACHINE_START( warriorb );
-static MACHINE_RESET( taito_dualscreen );
+
+
 
 
 
@@ -508,39 +508,37 @@ static const tc0140syt_interface warriorb_tc0140syt_intf =
 };
 
 
-static MACHINE_START( warriorb )
+void warriorb_state::machine_start()
 {
-	warriorb_state *state = machine.driver_data<warriorb_state>();
 
-	state->membank("bank10")->configure_entries(0, 8, state->memregion("audiocpu")->base() + 0xc000, 0x4000);
+	membank("bank10")->configure_entries(0, 8, memregion("audiocpu")->base() + 0xc000, 0x4000);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_tc0140syt = machine.device("tc0140syt");
-	state->m_tc0100scn_1 = machine.device("tc0100scn_1");
-	state->m_tc0100scn_2 = machine.device("tc0100scn_2");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_tc0140syt = machine().device("tc0140syt");
+	m_tc0100scn_1 = machine().device("tc0100scn_1");
+	m_tc0100scn_2 = machine().device("tc0100scn_2");
 
-	state->m_lscreen = machine.device("lscreen");
-	state->m_rscreen = machine.device("rscreen");
+	m_lscreen = machine().device("lscreen");
+	m_rscreen = machine().device("rscreen");
 
-	state->m_2610_1l = machine.device("2610.1.l");
-	state->m_2610_1r = machine.device("2610.1.r");
-	state->m_2610_2l = machine.device("2610.2.l");
-	state->m_2610_2r = machine.device("2610.2.r");
+	m_2610_1l = machine().device("2610.1.l");
+	m_2610_1r = machine().device("2610.1.r");
+	m_2610_2l = machine().device("2610.2.l");
+	m_2610_2r = machine().device("2610.2.r");
 
-	state->save_item(NAME(state->m_banknum));
-	state->save_item(NAME(state->m_pandata));
-	machine.save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine));
+	save_item(NAME(m_banknum));
+	save_item(NAME(m_pandata));
+	machine().save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine()));
 }
 
-static MACHINE_RESET( taito_dualscreen )
+void warriorb_state::machine_reset()
 {
-	warriorb_state *state = machine.driver_data<warriorb_state>();
 
-	state->m_banknum = 0;
+	m_banknum = 0;
 
 	/**** mixer control enable ****/
-	machine.sound().system_enable(true);	/* mixer enabled */
+	machine().sound().system_enable(true);	/* mixer enabled */
 }
 
 static MACHINE_CONFIG_START( darius2d, warriorb_state )
@@ -553,8 +551,6 @@ static MACHINE_CONFIG_START( darius2d, warriorb_state )
 	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_MACHINE_START( warriorb )
-	MCFG_MACHINE_RESET( taito_dualscreen )
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", darius2d_io_intf)
 
@@ -577,7 +573,6 @@ static MACHINE_CONFIG_START( darius2d, warriorb_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 3*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(warriorb_right)
 
-	MCFG_VIDEO_START(warriorb)
 
 	MCFG_TC0100SCN_ADD("tc0100scn_1", darius2d_tc0100scn_intf_l)
 	MCFG_TC0100SCN_ADD("tc0100scn_2", darius2d_tc0100scn_intf_r)
@@ -619,8 +614,6 @@ static MACHINE_CONFIG_START( warriorb, warriorb_state )
 	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_MACHINE_START( warriorb )
-	MCFG_MACHINE_RESET( taito_dualscreen )
 
 	MCFG_TC0510NIO_ADD("tc0510nio", warriorb_io_intf)
 
@@ -643,7 +636,6 @@ static MACHINE_CONFIG_START( warriorb, warriorb_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(warriorb_right)
 
-	MCFG_VIDEO_START(warriorb)
 
 	MCFG_TC0100SCN_ADD("tc0100scn_1", warriorb_tc0100scn_intf_l)
 	MCFG_TC0100SCN_ADD("tc0100scn_2", warriorb_tc0100scn_intf_r)

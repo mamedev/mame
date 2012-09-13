@@ -32,12 +32,16 @@ public:
 	DECLARE_WRITE8_MEMBER(adpcm_reset_w);
 	DECLARE_WRITE8_MEMBER(adpcm_reset_inv_w);
 	DECLARE_DRIVER_INIT(hnfubuki);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	DECLARE_VIDEO_START(untoucha);
 };
 
 
 /*----------- defined in video/hnayayoi.c -----------*/
 
-VIDEO_START( hnayayoi );
-VIDEO_START( untoucha );
+
+
 SCREEN_UPDATE_IND16( hnayayoi );
 

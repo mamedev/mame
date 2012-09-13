@@ -45,6 +45,8 @@ public:
 	UINT8 m_port_a;
 	UINT8 m_port_b;
 	UINT8 m_led_time[6];
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -204,21 +206,19 @@ static TIMER_DEVICE_CALLBACK( junior_update_leds )
 }
 
 
-static MACHINE_START( junior )
+void junior_state::machine_start()
 {
-	junior_state *state = machine.driver_data<junior_state>();
-	state_save_register_item(machine, "junior", NULL, 0, state->m_port_a );
-	state_save_register_item(machine, "junior", NULL, 0, state->m_port_b );
+	state_save_register_item(machine(), "junior", NULL, 0, m_port_a );
+	state_save_register_item(machine(), "junior", NULL, 0, m_port_b );
 }
 
 
-static MACHINE_RESET(junior)
+void junior_state::machine_reset()
 {
-	junior_state *state = machine.driver_data<junior_state>();
 	int i;
 
 	for ( i = 0; i < 6; i++ )
-		state->m_led_time[i] = 0;
+		m_led_time[i] = 0;
 }
 
 
@@ -228,8 +228,6 @@ static MACHINE_CONFIG_START( junior, junior_state )
 	MCFG_CPU_PROGRAM_MAP(junior_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
-	MCFG_MACHINE_START( junior )
-	MCFG_MACHINE_RESET(junior)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_junior )

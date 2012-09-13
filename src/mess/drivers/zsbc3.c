@@ -52,6 +52,7 @@ public:
 	DECLARE_READ8_MEMBER(zsbc3_2a_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
+	virtual void machine_reset();
 };
 
 
@@ -85,7 +86,7 @@ static INPUT_PORTS_START( zsbc3 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(zsbc3)
+void zsbc3_state::machine_reset()
 {
 }
 
@@ -106,7 +107,6 @@ static MACHINE_CONFIG_START( zsbc3, zsbc3_state )
 	MCFG_CPU_PROGRAM_MAP(zsbc3_mem)
 	MCFG_CPU_IO_MAP(zsbc3_io)
 
-	MCFG_MACHINE_RESET(zsbc3)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)

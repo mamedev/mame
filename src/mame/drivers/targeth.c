@@ -189,7 +189,6 @@ static MACHINE_CONFIG_START( targeth, targeth_state )
 	MCFG_GFXDECODE(0x080000)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(targeth)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

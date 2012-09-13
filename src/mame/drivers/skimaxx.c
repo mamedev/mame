@@ -71,6 +71,8 @@ public:
 	DECLARE_WRITE32_MEMBER(skimaxx_unk1_w);
 	DECLARE_WRITE32_MEMBER(skimaxx_sub_ctrl_w);
 	DECLARE_READ32_MEMBER(skimaxx_analog_r);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -135,17 +137,16 @@ READ32_MEMBER(skimaxx_state::skimaxx_blitter_r)
 }
 
 
-static VIDEO_START( skimaxx )
+void skimaxx_state::video_start()
 {
-	skimaxx_state *state = machine.driver_data<skimaxx_state>();
-	state->m_blitter_gfx = (UINT16 *) state->memregion( "blitter" )->base();
-	state->m_blitter_gfx_len = state->memregion( "blitter" )->bytes() / 2;
+	m_blitter_gfx = (UINT16 *) memregion( "blitter" )->base();
+	m_blitter_gfx_len = memregion( "blitter" )->bytes() / 2;
 
-	state->m_bg_buffer = auto_alloc_array(machine, UINT32, 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 2);	// 2 buffers
-	state->m_bg_buffer_back  = state->m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 0;
-	state->m_bg_buffer_front = state->m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 1;
-	state->membank("bank1")->configure_entry(0, state->m_bg_buffer_back);
-	state->membank("bank1")->configure_entry(1, state->m_bg_buffer_front);
+	m_bg_buffer = auto_alloc_array(machine(), UINT32, 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 2);	// 2 buffers
+	m_bg_buffer_back  = m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 0;
+	m_bg_buffer_front = m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 1;
+	membank("bank1")->configure_entry(0, m_bg_buffer_back);
+	membank("bank1")->configure_entry(1, m_bg_buffer_front);
 }
 
 static SCREEN_UPDATE_IND16( skimaxx )
@@ -509,7 +510,7 @@ static const tms34010_config tms_config =
  *
  *************************************/
 
-static MACHINE_RESET( skimaxx )
+void skimaxx_state::machine_reset()
 {
 
 }
@@ -528,7 +529,6 @@ static MACHINE_CONFIG_START( skimaxx, skimaxx_state )
 	MCFG_CPU_ADD("subcpu", M68EC030, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(68030_2_map)
 
-	MCFG_MACHINE_RESET(skimaxx)
 
 	/* video hardware */
 	MCFG_CPU_ADD("tms", TMS34010, XTAL_50MHz)
@@ -544,7 +544,6 @@ static MACHINE_CONFIG_START( skimaxx, skimaxx_state )
 //  MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
 	MCFG_SCREEN_UPDATE_STATIC(skimaxx)
 
-	MCFG_VIDEO_START(skimaxx)
 
 //  MCFG_GFXDECODE( skimaxx )
 

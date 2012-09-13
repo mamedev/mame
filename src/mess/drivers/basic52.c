@@ -49,6 +49,7 @@ public:
 	UINT8 m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
+	virtual void machine_reset();
 };
 
 
@@ -94,11 +95,10 @@ READ8_MEMBER( basic52_state::unk_r)
 	return m_term_data; // won't boot without this
 }
 
-static MACHINE_RESET( basic52 )
+void basic52_state::machine_reset()
 {
-	basic52_state *state = machine.driver_data<basic52_state>();
-	i8051_set_serial_tx_callback(state->m_maincpu, to_term);
-	i8051_set_serial_rx_callback(state->m_maincpu, from_term);
+	i8051_set_serial_tx_callback(m_maincpu, to_term);
+	i8051_set_serial_rx_callback(m_maincpu, from_term);
 }
 
 WRITE8_MEMBER( basic52_state::kbd_put )
@@ -129,7 +129,6 @@ static MACHINE_CONFIG_START( basic31, basic52_state )
 	MCFG_CPU_PROGRAM_MAP(basic52_mem)
 	MCFG_CPU_IO_MAP(basic52_io)
 
-	MCFG_MACHINE_RESET(basic52)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)

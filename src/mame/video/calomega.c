@@ -54,10 +54,9 @@ TILE_GET_INFO_MEMBER(calomega_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
-VIDEO_START( calomega )
+void calomega_state::video_start()
 {
-	calomega_state *state = machine.driver_data<calomega_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(calomega_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 31);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(calomega_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 31);
 }
 
 SCREEN_UPDATE_IND16( calomega )
@@ -67,9 +66,9 @@ SCREEN_UPDATE_IND16( calomega )
 	return 0;
 }
 
-PALETTE_INIT( calomega )
+void calomega_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 /*  prom bits
     7654 3210
     ---- ---x   red component.
@@ -82,7 +81,7 @@ PALETTE_INIT( calomega )
 	/* 00000BGR */
 	if (color_prom == 0) return;
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -99,6 +98,6 @@ PALETTE_INIT( calomega )
 		b = bit2 * 0xff;
 
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }

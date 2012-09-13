@@ -233,7 +233,8 @@ static DEVICE_IMAGE_LOAD(n64_cart)
 
 MACHINE_START( n64dd )
 {
-	MACHINE_START_CALL( n64 );
+	n64_state *state = machine.driver_data<n64_state>();
+	state->machine_start();
 
 	UINT8 *ipl = machine.root_device().memregion("ddipl")->base();
 
@@ -268,8 +269,6 @@ static MACHINE_CONFIG_START( n64, n64_state )
 	MCFG_CPU_CONFIG(n64_rsp_config)
 	MCFG_CPU_PROGRAM_MAP(rsp_map)
 
-	MCFG_MACHINE_START( n64 )
-	MCFG_MACHINE_RESET( n64 )
 	//MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
@@ -283,7 +282,6 @@ static MACHINE_CONFIG_START( n64, n64_state )
 
 	MCFG_PALETTE_LENGTH(0x1000)
 
-	MCFG_VIDEO_START(n64)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

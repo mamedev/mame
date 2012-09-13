@@ -1396,39 +1396,37 @@ static const k054539_interface k054539_config =
  *
  *************************************/
 
-static MACHINE_START( djmain )
+void djmain_state::machine_start()
 {
-	djmain_state *state = machine.driver_data<djmain_state>();
-	device_t *ide = machine.device("ide");
+	device_t *ide = machine().device("ide");
 
-	if (ide != NULL && state->m_ide_master_password != NULL)
-		ide_set_master_password(ide, state->m_ide_master_password);
-	if (ide != NULL && state->m_ide_user_password != NULL)
-		ide_set_user_password(ide, state->m_ide_user_password);
+	if (ide != NULL && m_ide_master_password != NULL)
+		ide_set_master_password(ide, m_ide_master_password);
+	if (ide != NULL && m_ide_user_password != NULL)
+		ide_set_user_password(ide, m_ide_user_password);
 
-	state_save_register_global(machine, state->m_sndram_bank);
-	state_save_register_global(machine, state->m_pending_vb_int);
-	state_save_register_global(machine, state->m_v_ctrl);
-	state_save_register_global_array(machine, state->m_obj_regs);
+	state_save_register_global(machine(), m_sndram_bank);
+	state_save_register_global(machine(), m_pending_vb_int);
+	state_save_register_global(machine(), m_v_ctrl);
+	state_save_register_global_array(machine(), m_obj_regs);
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(sndram_set_bank), &machine));
+	machine().save().register_postload(save_prepost_delegate(FUNC(sndram_set_bank), &machine()));
 }
 
 
-static MACHINE_RESET( djmain )
+void djmain_state::machine_reset()
 {
-	djmain_state *state = machine.driver_data<djmain_state>();
 	/* reset sound ram bank */
-	state->m_sndram_bank = 0;
-	sndram_set_bank(machine);
+	m_sndram_bank = 0;
+	sndram_set_bank(machine());
 
 	/* reset the IDE controller */
-	machine.device("ide")->reset();
+	machine().device("ide")->reset();
 
 	/* reset LEDs */
-	set_led_status(machine, 0, 1);
-	set_led_status(machine, 1, 1);
-	set_led_status(machine, 2, 1);
+	set_led_status(machine(), 0, 1);
+	set_led_status(machine(), 1, 1);
+	set_led_status(machine(), 2, 1);
 }
 
 
@@ -1464,8 +1462,6 @@ static MACHINE_CONFIG_START( djmain, djmain_state )
 	MCFG_CPU_PROGRAM_MAP(memory_map)
 	MCFG_CPU_VBLANK_INT("screen", vb_interrupt)
 
-	MCFG_MACHINE_START(djmain)
-	MCFG_MACHINE_RESET(djmain)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
 
@@ -1479,7 +1475,6 @@ static MACHINE_CONFIG_START( djmain, djmain_state )
 
 	MCFG_PALETTE_LENGTH(0x4440/4)
 	MCFG_GFXDECODE(djmain)
-	MCFG_VIDEO_START(djmain)
 
 	MCFG_K056832_ADD("k056832", djmain_k056832_intf)
 	MCFG_K055555_ADD("k055555")

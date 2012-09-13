@@ -55,12 +55,15 @@ public:
 	DECLARE_WRITE8_MEMBER(cloud9_bitmode_w);
 	DECLARE_WRITE8_MEMBER(cloud9_bitmode_addr_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/cloud9.c -----------*/
 
-VIDEO_START( cloud9 );
+
 SCREEN_UPDATE_IND16( cloud9 );
 
 

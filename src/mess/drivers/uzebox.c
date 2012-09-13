@@ -17,6 +17,7 @@ public:
 	{
 	}
 	DECLARE_DRIVER_INIT(uzebox);
+	virtual void machine_reset();
 };
 /****************************************************\
 * Address maps                                       *
@@ -55,7 +56,7 @@ DRIVER_INIT_MEMBER(uzebox_state,uzebox)
 {
 }
 
-static MACHINE_RESET( uzebox )
+void uzebox_state::machine_reset()
 {
 }
 
@@ -66,7 +67,6 @@ static MACHINE_CONFIG_START( uzebox, uzebox_state )
 	MCFG_CPU_PROGRAM_MAP(uzebox_prg_map)
 	MCFG_CPU_IO_MAP(uzebox_io_map)
 
-	MCFG_MACHINE_RESET(uzebox)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

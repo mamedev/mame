@@ -51,24 +51,23 @@ TILE_GET_INFO_MEMBER(othldrby_state::get_tile_info2)
 
 ***************************************************************************/
 
-VIDEO_START( othldrby )
+void othldrby_state::video_start()
 {
-	othldrby_state *state = machine.driver_data<othldrby_state>();
 
-	state->m_bg_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(othldrby_state::get_tile_info0),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_bg_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(othldrby_state::get_tile_info1),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_bg_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(othldrby_state::get_tile_info2),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(othldrby_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(othldrby_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(othldrby_state::get_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	state->m_vram = auto_alloc_array(machine, UINT16, VIDEORAM_SIZE);
-	state->m_buf_spriteram = auto_alloc_array(machine, UINT16, 2 * SPRITERAM_SIZE);
-	state->m_buf_spriteram2 = state->m_buf_spriteram + SPRITERAM_SIZE;
+	m_vram = auto_alloc_array(machine(), UINT16, VIDEORAM_SIZE);
+	m_buf_spriteram = auto_alloc_array(machine(), UINT16, 2 * SPRITERAM_SIZE);
+	m_buf_spriteram2 = m_buf_spriteram + SPRITERAM_SIZE;
 
-	state->m_bg_tilemap[0]->set_transparent_pen(0);
-	state->m_bg_tilemap[1]->set_transparent_pen(0);
-	state->m_bg_tilemap[2]->set_transparent_pen(0);
+	m_bg_tilemap[0]->set_transparent_pen(0);
+	m_bg_tilemap[1]->set_transparent_pen(0);
+	m_bg_tilemap[2]->set_transparent_pen(0);
 
-	state->save_pointer(NAME(state->m_vram), VIDEORAM_SIZE);
-	state->save_pointer(NAME(state->m_buf_spriteram), 2 * SPRITERAM_SIZE);
+	save_pointer(NAME(m_vram), VIDEORAM_SIZE);
+	save_pointer(NAME(m_buf_spriteram), 2 * SPRITERAM_SIZE);
 }
 
 

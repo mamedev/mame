@@ -30,15 +30,15 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( arknoid2 )
+PALETTE_INIT_MEMBER(tnzs_state,arknoid2)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i, col;
 
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		col = (color_prom[i] << 8) + color_prom[i + 512];
-		palette_set_color_rgb(machine, i, pal5bit(col >> 10), pal5bit(col >> 5), pal5bit(col >> 0));
+		palette_set_color_rgb(machine(), i, pal5bit(col >> 10), pal5bit(col >> 5), pal5bit(col >> 0));
 	}
 }
 

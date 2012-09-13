@@ -6,15 +6,14 @@
 
 /******************************************************************/
 
-VIDEO_START( undrfire )
+void undrfire_state::video_start()
 {
-	undrfire_state *state = machine.driver_data<undrfire_state>();
 	int i;
 
-	state->m_spritelist = auto_alloc_array(machine, struct tempsprite, 0x4000);
+	m_spritelist = auto_alloc_array(machine(), struct tempsprite, 0x4000);
 
 	for (i = 0; i < 16384; i++) /* Fix later - some weird colours in places */
-		palette_set_color(machine, i, MAKE_RGB(0,0,0));
+		palette_set_color(machine(), i, MAKE_RGB(0,0,0));
 }
 
 /***************************************************************

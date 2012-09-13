@@ -53,16 +53,23 @@ public:
 	DECLARE_DRIVER_INIT(champbas);
 	TILE_GET_INFO_MEMBER(champbas_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(exctsccr_get_bg_tile_info);
+	DECLARE_MACHINE_START(champbas);
+	DECLARE_MACHINE_RESET(champbas);
+	DECLARE_VIDEO_START(champbas);
+	DECLARE_PALETTE_INIT(champbas);
+	DECLARE_MACHINE_START(exctsccr);
+	DECLARE_VIDEO_START(exctsccr);
+	DECLARE_PALETTE_INIT(exctsccr);
 };
 
 
 /*----------- defined in video/champbas.c -----------*/
 
 
-PALETTE_INIT( champbas );
-PALETTE_INIT( exctsccr );
-VIDEO_START( champbas );
-VIDEO_START( exctsccr );
+
+
+
+
 SCREEN_UPDATE_IND16( champbas );
 SCREEN_UPDATE_IND16( exctsccr );
 

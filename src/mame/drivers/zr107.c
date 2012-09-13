@@ -201,16 +201,20 @@ public:
 	DECLARE_DRIVER_INIT(common);
 	DECLARE_DRIVER_INIT(zr107);
 	DECLARE_DRIVER_INIT(jetwave);
+	virtual void machine_start();
+	virtual void machine_reset();
+	DECLARE_VIDEO_START(zr107);
+	DECLARE_VIDEO_START(jetwave);
 };
 
 
 
 
 
-static VIDEO_START( jetwave )
+VIDEO_START_MEMBER(zr107_state,jetwave)
 {
-	K001005_init(machine);
-	K001006_init(machine);
+	K001005_init(machine());
+	K001006_init(machine());
 }
 
 
@@ -250,9 +254,9 @@ static void game_tile_callback(running_machine &machine, int layer, int *code, i
 	*color += layer * 0x40;
 }
 
-static VIDEO_START( zr107 )
+VIDEO_START_MEMBER(zr107_state,zr107)
 {
-	device_t *k056832 = machine.device("k056832");
+	device_t *k056832 = machine().device("k056832");
 
 	k056832_set_layer_offs(k056832, 0, -29, -27);
 	k056832_set_layer_offs(k056832, 1, -29, -27);
@@ -263,8 +267,8 @@ static VIDEO_START( zr107 )
 	k056832_set_layer_offs(k056832, 6, -29, -27);
 	k056832_set_layer_offs(k056832, 7, -29, -27);
 
-	K001006_init(machine);
-	K001005_init(machine);
+	K001006_init(machine());
+	K001005_init(machine());
 }
 
 static SCREEN_UPDATE_RGB32( zr107 )
@@ -401,14 +405,13 @@ WRITE32_MEMBER(zr107_state::ccu_w)
 
 /******************************************************************/
 
-static MACHINE_START( zr107 )
+void zr107_state::machine_start()
 {
-	zr107_state *state = machine.driver_data<zr107_state>();
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine.device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(machine().device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x000fffff, FALSE, state->m_workram);
+	ppcdrc_add_fastram(machine().device("maincpu"), 0x00000000, 0x000fffff, FALSE, m_workram);
 }
 
 static ADDRESS_MAP_START( zr107_map, AS_PROGRAM, 32, zr107_state )
@@ -718,9 +721,9 @@ static INTERRUPT_GEN( zr107_vblank )
 	device->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-static MACHINE_RESET( zr107 )
+void zr107_state::machine_reset()
 {
-	machine.device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( zr107, zr107_state )
@@ -740,8 +743,6 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
-	MCFG_MACHINE_START(zr107)
-	MCFG_MACHINE_RESET(zr107)
 
 	MCFG_K056230_ADD("k056230", zr107_k056230_intf)
 
@@ -754,7 +755,7 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 
 	MCFG_PALETTE_LENGTH(65536)
 
-	MCFG_VIDEO_START(zr107)
+	MCFG_VIDEO_START_OVERRIDE(zr107_state,zr107)
 
 	MCFG_K056832_ADD("k056832", zr107_k056832_intf)
 
@@ -798,8 +799,6 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
-	MCFG_MACHINE_START(zr107)
-	MCFG_MACHINE_RESET(zr107)
 
 	MCFG_K056230_ADD("k056230", zr107_k056230_intf)
 
@@ -812,7 +811,7 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 
 	MCFG_PALETTE_LENGTH(65536)
 
-	MCFG_VIDEO_START(jetwave)
+	MCFG_VIDEO_START_OVERRIDE(zr107_state,jetwave)
 
 	MCFG_K001604_ADD("k001604", jetwave_k001604_intf)
 

@@ -220,89 +220,82 @@ void prmrsocr_sprite_callback( running_machine &machine, int *code, int *color, 
 
 ***************************************************************************/
 
-VIDEO_START( cuebrick )
+VIDEO_START_MEMBER(tmnt_state,cuebrick)
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
-	state->m_layer_colorbase[0] = 0;
-	state->m_layer_colorbase[1] = 32;
-	state->m_layer_colorbase[2] = 40;
-	state->m_sprite_colorbase = 16;
+	m_layer_colorbase[0] = 0;
+	m_layer_colorbase[1] = 32;
+	m_layer_colorbase[2] = 40;
+	m_sprite_colorbase = 16;
 }
 
-VIDEO_START( mia )
+VIDEO_START_MEMBER(tmnt_state,mia)
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
-	state->m_layer_colorbase[0] = 0;
-	state->m_layer_colorbase[1] = 32;
-	state->m_layer_colorbase[2] = 40;
-	state->m_sprite_colorbase = 16;
+	m_layer_colorbase[0] = 0;
+	m_layer_colorbase[1] = 32;
+	m_layer_colorbase[2] = 40;
+	m_sprite_colorbase = 16;
 
-	state->m_tmnt_priorityflag = 0;
-	state->save_item(NAME(state->m_tmnt_priorityflag));
+	m_tmnt_priorityflag = 0;
+	save_item(NAME(m_tmnt_priorityflag));
 }
 
-VIDEO_START( tmnt )
+VIDEO_START_MEMBER(tmnt_state,tmnt)
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
-	state->m_layer_colorbase[0] = 0;
-	state->m_layer_colorbase[1] = 32;
-	state->m_layer_colorbase[2] = 40;
-	state->m_sprite_colorbase = 16;
+	m_layer_colorbase[0] = 0;
+	m_layer_colorbase[1] = 32;
+	m_layer_colorbase[2] = 40;
+	m_sprite_colorbase = 16;
 
-	state->m_tmnt_priorityflag = 0;
-	state->save_item(NAME(state->m_tmnt_priorityflag));
+	m_tmnt_priorityflag = 0;
+	save_item(NAME(m_tmnt_priorityflag));
 
-	palette_set_shadow_factor(machine,0.75);
+	palette_set_shadow_factor(machine(),0.75);
 }
 
-VIDEO_START( lgtnfght )	/* also tmnt2, ssriders */
+VIDEO_START_MEMBER(tmnt_state,lgtnfght)/* also tmnt2, ssriders */
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
 
-	k05324x_set_z_rejection(state->m_k053245, 0);
+	k05324x_set_z_rejection(m_k053245, 0);
 
-	state->m_dim_c = state->m_dim_v = state->m_lastdim = state->m_lasten = 0;
+	m_dim_c = m_dim_v = m_lastdim = m_lasten = 0;
 
-	state->save_item(NAME(state->m_dim_c));
-	state->save_item(NAME(state->m_dim_v));
-	state->save_item(NAME(state->m_lastdim));
-	state->save_item(NAME(state->m_lasten));
+	save_item(NAME(m_dim_c));
+	save_item(NAME(m_dim_v));
+	save_item(NAME(m_lastdim));
+	save_item(NAME(m_lasten));
 }
 
-VIDEO_START( glfgreat )
+VIDEO_START_MEMBER(tmnt_state,glfgreat)
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
 
-	state->m_roz_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tmnt_state::glfgreat_get_roz_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 512, 512);
-	state->m_roz_tilemap->set_transparent_pen(0);
+	m_roz_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tmnt_state::glfgreat_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 512, 512);
+	m_roz_tilemap->set_transparent_pen(0);
 
-	state->m_glfgreat_roz_rom_bank = 0;
-	state->m_glfgreat_roz_char_bank = 0;
-	state->m_glfgreat_roz_rom_mode = 0;
-	state->save_item(NAME(state->m_glfgreat_roz_rom_bank));
-	state->save_item(NAME(state->m_glfgreat_roz_char_bank));
-	state->save_item(NAME(state->m_glfgreat_roz_rom_mode));
+	m_glfgreat_roz_rom_bank = 0;
+	m_glfgreat_roz_char_bank = 0;
+	m_glfgreat_roz_rom_mode = 0;
+	save_item(NAME(m_glfgreat_roz_rom_bank));
+	save_item(NAME(m_glfgreat_roz_char_bank));
+	save_item(NAME(m_glfgreat_roz_rom_mode));
 }
 
-VIDEO_START( prmrsocr )
+VIDEO_START_MEMBER(tmnt_state,prmrsocr)
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
 
-	state->m_roz_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tmnt_state::prmrsocr_get_roz_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 512, 256);
-	state->m_roz_tilemap->set_transparent_pen(0);
+	m_roz_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tmnt_state::prmrsocr_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 512, 256);
+	m_roz_tilemap->set_transparent_pen(0);
 
-	state->m_prmrsocr_sprite_bank = 0;
-	state->m_glfgreat_roz_char_bank = 0;
-	state->save_item(NAME(state->m_prmrsocr_sprite_bank));
-	state->save_item(NAME(state->m_glfgreat_roz_char_bank));
+	m_prmrsocr_sprite_bank = 0;
+	m_glfgreat_roz_char_bank = 0;
+	save_item(NAME(m_prmrsocr_sprite_bank));
+	save_item(NAME(m_glfgreat_roz_char_bank));
 }
 
-VIDEO_START( blswhstl )
+VIDEO_START_MEMBER(tmnt_state,blswhstl)
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
 
-	state->m_blswhstl_rombank = -1;
-	state->save_item(NAME(state->m_blswhstl_rombank));
+	m_blswhstl_rombank = -1;
+	save_item(NAME(m_blswhstl_rombank));
 }
 
 

@@ -52,6 +52,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(topspeed_msm5205_command_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(topspeed_pedal_r);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 

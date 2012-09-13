@@ -1691,8 +1691,8 @@ static MACHINE_CONFIG_START( vsnes, vsnes_state )
 	MCFG_CPU_ADD("maincpu", N2A03,N2A03_DEFAULTCLOCK)
 	MCFG_CPU_PROGRAM_MAP(vsnes_cpu1_map)
 								/* some carts also trigger IRQs */
-	MCFG_MACHINE_RESET(vsnes)
-	MCFG_MACHINE_START(vsnes)
+	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
+	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsnes)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen1", RASTER)
@@ -1703,8 +1703,8 @@ static MACHINE_CONFIG_START( vsnes, vsnes_state )
 
 	MCFG_PALETTE_LENGTH(8*4*16)
 
-	MCFG_PALETTE_INIT(vsnes)
-	MCFG_VIDEO_START(vsnes)
+	MCFG_PALETTE_INIT_OVERRIDE(vsnes_state,vsnes)
+	MCFG_VIDEO_START_OVERRIDE(vsnes_state,vsnes)
 
 	MCFG_PPU2C04_ADD("ppu1", vsnes_ppu_interface_1)
 
@@ -1752,8 +1752,8 @@ static MACHINE_CONFIG_START( vsdual, vsnes_state )
 	MCFG_CPU_ADD("sub", N2A03,N2A03_DEFAULTCLOCK)
 	MCFG_CPU_PROGRAM_MAP(vsnes_cpu2_map)
 								/* some carts also trigger IRQs */
-	MCFG_MACHINE_RESET(vsdual)
-	MCFG_MACHINE_START(vsdual)
+	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsdual)
+	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsdual)
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(2*8*4*16)
@@ -1771,8 +1771,8 @@ static MACHINE_CONFIG_START( vsdual, vsnes_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(vsnes_bottom)
 
-	MCFG_PALETTE_INIT(vsdual)
-	MCFG_VIDEO_START(vsdual)
+	MCFG_PALETTE_INIT_OVERRIDE(vsnes_state,vsdual)
+	MCFG_VIDEO_START_OVERRIDE(vsnes_state,vsdual)
 
 	MCFG_PPU2C04_ADD("ppu1", vsnes_ppu_interface_1)
 	MCFG_PPU2C04_ADD("ppu2", vsnes_ppu_interface_2)

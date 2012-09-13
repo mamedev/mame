@@ -188,22 +188,21 @@ static TIMER_DEVICE_CALLBACK(timer_callback)
 
 }
 
-static MACHINE_START(busicom)
+void busicom_state::machine_start()
 {
 }
 
-static MACHINE_RESET(busicom)
+void busicom_state::machine_reset()
 {
-	busicom_state *state = machine.driver_data<busicom_state>();
 	int i,j;
-	state->m_drum_index =0;
-	state->m_keyboard_shifter = 0;
-	state->m_printer_shifter = 0;
+	m_drum_index =0;
+	m_keyboard_shifter = 0;
+	m_printer_shifter = 0;
 
 	for(i=0;i<17;i++) {
 		for(j=0;j<11;j++) {
-			state->m_printer_line[j][i] = 0;
-			state->m_printer_line_color[j] = 0;
+			m_printer_line[j][i] = 0;
+			m_printer_line_color[j] = 0;
 		}
 	}
 
@@ -218,8 +217,6 @@ static MACHINE_CONFIG_START( busicom, busicom_state )
     MCFG_CPU_DATA_MAP(busicom_mem)
     MCFG_CPU_IO_MAP(busicom_io)
 
-    MCFG_MACHINE_RESET(busicom)
-	MCFG_MACHINE_START(busicom)
 
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)
@@ -230,9 +227,7 @@ static MACHINE_CONFIG_START( busicom, busicom_state )
 	MCFG_SCREEN_UPDATE_STATIC(busicom)
 
     MCFG_PALETTE_LENGTH(16)
-    MCFG_PALETTE_INIT(busicom)
 
-	MCFG_VIDEO_START(busicom)
 
 	MCFG_TIMER_ADD_PERIODIC("busicom_timer", timer_callback, attotime::from_msec(28*2))
 MACHINE_CONFIG_END

@@ -35,11 +35,14 @@ public:
 	DECLARE_READ16_MEMBER(warriorb_sound_r);
 	DECLARE_WRITE8_MEMBER(warriorb_pancontrol);
 	DECLARE_WRITE16_MEMBER(tc0100scn_dual_screen_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/warriorb.c -----------*/
 
-VIDEO_START( warriorb );
+
 SCREEN_UPDATE_IND16( warriorb_left );
 SCREEN_UPDATE_IND16( warriorb_right );

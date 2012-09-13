@@ -84,6 +84,8 @@ public:
 	DECLARE_WRITE8_MEMBER(w3);
 	DECLARE_WRITE8_MEMBER(trvmadns_tileram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -280,14 +282,13 @@ TILE_GET_INFO_MEMBER(trvmadns_state::get_bg_tile_info)
 	tileinfo.category = (attr & 0x20)>>5;
 }
 
-static VIDEO_START( trvmadns )
+void trvmadns_state::video_start()
 {
-	trvmadns_state *state = machine.driver_data<trvmadns_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(trvmadns_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(trvmadns_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 //  fg_tilemap->set_transparent_pen(1);
 
-	machine.gfx[0]->set_source(state->m_gfxram);
+	machine().gfx[0]->set_source(m_gfxram);
 }
 
 static SCREEN_UPDATE_IND16( trvmadns )
@@ -337,10 +338,9 @@ static SCREEN_UPDATE_IND16( trvmadns )
 	return 0;
 }
 
-static MACHINE_RESET( trvmadns )
+void trvmadns_state::machine_reset()
 {
-	trvmadns_state *state = machine.driver_data<trvmadns_state>();
-	state->m_old_data = -1;
+	m_old_data = -1;
 }
 
 static MACHINE_CONFIG_START( trvmadns, trvmadns_state )
@@ -349,7 +349,6 @@ static MACHINE_CONFIG_START( trvmadns, trvmadns_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MCFG_MACHINE_RESET(trvmadns)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -362,7 +361,6 @@ static MACHINE_CONFIG_START( trvmadns, trvmadns_state )
 	MCFG_GFXDECODE(trvmadns)
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_VIDEO_START(trvmadns)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

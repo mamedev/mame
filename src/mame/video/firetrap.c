@@ -34,13 +34,13 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( firetrap )
+void firetrap_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b;
 
@@ -55,13 +55,13 @@ PALETTE_INIT( firetrap )
 		bit2 = (color_prom[i] >> 6) & 0x01;
 		bit3 = (color_prom[i] >> 7) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[i + machine.total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[i + machine.total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[i + machine.total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[i + machine.total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[i + machine().total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[i + machine().total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[i + machine().total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[i + machine().total_colors()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine, i, MAKE_RGB(r,g,b));
+		palette_set_color(machine(), i, MAKE_RGB(r,g,b));
 	}
 }
 
@@ -123,15 +123,14 @@ TILE_GET_INFO_MEMBER(firetrap_state::get_bg2_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( firetrap )
+void firetrap_state::video_start()
 {
-	firetrap_state *state = machine.driver_data<firetrap_state>();
-	state->m_fg_tilemap  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(firetrap_state::get_fg_tile_info),state), tilemap_mapper_delegate(FUNC(firetrap_state::get_fg_memory_offset),state), 8, 8, 32, 32);
-	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(firetrap_state::get_bg1_tile_info),state), tilemap_mapper_delegate(FUNC(firetrap_state::get_bg_memory_offset),state), 16, 16, 32, 32);
-	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(firetrap_state::get_bg2_tile_info),state), tilemap_mapper_delegate(FUNC(firetrap_state::get_bg_memory_offset),state), 16, 16, 32, 32);
+	m_fg_tilemap  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(firetrap_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(firetrap_state::get_fg_memory_offset),this), 8, 8, 32, 32);
+	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(firetrap_state::get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(firetrap_state::get_bg_memory_offset),this), 16, 16, 32, 32);
+	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(firetrap_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(firetrap_state::get_bg_memory_offset),this), 16, 16, 32, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
-	state->m_bg1_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
+	m_bg1_tilemap->set_transparent_pen(0);
 }
 
 

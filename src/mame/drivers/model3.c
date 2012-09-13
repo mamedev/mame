@@ -1231,33 +1231,29 @@ static TIMER_CALLBACK(model3_sound_timer_tick)
 	}
 }
 
-static MACHINE_START(model3_10)
+MACHINE_START_MEMBER(model3_state,model3_10)
 {
-	configure_fast_ram(machine);
+	configure_fast_ram(machine());
 
-	model3_state *state = machine.driver_data<model3_state>();
-	state->m_sound_timer = machine.scheduler().timer_alloc(FUNC(model3_sound_timer_tick));
+	m_sound_timer = machine().scheduler().timer_alloc(FUNC(model3_sound_timer_tick));
 }
-static MACHINE_START(model3_15)
+MACHINE_START_MEMBER(model3_state,model3_15)
 {
-	configure_fast_ram(machine);
+	configure_fast_ram(machine());
 
-	model3_state *state = machine.driver_data<model3_state>();
-	state->m_sound_timer = machine.scheduler().timer_alloc(FUNC(model3_sound_timer_tick));
+	m_sound_timer = machine().scheduler().timer_alloc(FUNC(model3_sound_timer_tick));
 }
-static MACHINE_START(model3_20)
+MACHINE_START_MEMBER(model3_state,model3_20)
 {
-	configure_fast_ram(machine);
+	configure_fast_ram(machine());
 
-	model3_state *state = machine.driver_data<model3_state>();
-	state->m_sound_timer = machine.scheduler().timer_alloc(FUNC(model3_sound_timer_tick));
+	m_sound_timer = machine().scheduler().timer_alloc(FUNC(model3_sound_timer_tick));
 }
-static MACHINE_START(model3_21)
+MACHINE_START_MEMBER(model3_state,model3_21)
 {
-	configure_fast_ram(machine);
+	configure_fast_ram(machine());
 
-	model3_state *state = machine.driver_data<model3_state>();
-	state->m_sound_timer = machine.scheduler().timer_alloc(FUNC(model3_sound_timer_tick));
+	m_sound_timer = machine().scheduler().timer_alloc(FUNC(model3_sound_timer_tick));
 }
 
 static void model3_init(running_machine &machine, int step)
@@ -1309,10 +1305,10 @@ static void model3_init(running_machine &machine, int step)
 	}
 }
 
-static MACHINE_RESET(model3_10) { model3_init(machine, 0x10); }
-static MACHINE_RESET(model3_15) { model3_init(machine, 0x15); }
-static MACHINE_RESET(model3_20) { model3_init(machine, 0x20); }
-static MACHINE_RESET(model3_21) { model3_init(machine, 0x21); }
+MACHINE_RESET_MEMBER(model3_state,model3_10){ model3_init(machine(), 0x10); }
+MACHINE_RESET_MEMBER(model3_state,model3_15){ model3_init(machine(), 0x15); }
+MACHINE_RESET_MEMBER(model3_state,model3_20){ model3_init(machine(), 0x20); }
+MACHINE_RESET_MEMBER(model3_state,model3_21){ model3_init(machine(), 0x21); }
 
 
 READ64_MEMBER(model3_state::model3_ctrl_r)
@@ -5302,8 +5298,8 @@ static MACHINE_CONFIG_START( model3_10, model3_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(model3_10)
-	MCFG_MACHINE_RESET(model3_10)
+	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_10)
+	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_10)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 	MCFG_NVRAM_ADD_1FILL("backup")
@@ -5316,9 +5312,7 @@ static MACHINE_CONFIG_START( model3_10, model3_state )
 	MCFG_SCREEN_UPDATE_STATIC(model3)
 
 	MCFG_PALETTE_LENGTH(32768)
-	MCFG_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
 
-	MCFG_VIDEO_START(model3)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("scsp1", SCSP, 0)
@@ -5344,8 +5338,8 @@ static MACHINE_CONFIG_START( model3_15, model3_state )
 	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(model3_snd)
 
-	MCFG_MACHINE_START(model3_15)
-	MCFG_MACHINE_RESET(model3_15)
+	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_15)
+	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_15)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 	MCFG_NVRAM_ADD_1FILL("backup")
@@ -5358,9 +5352,7 @@ static MACHINE_CONFIG_START( model3_15, model3_state )
 	MCFG_SCREEN_UPDATE_STATIC(model3)
 
 	MCFG_PALETTE_LENGTH(32768)
-	MCFG_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
 
-	MCFG_VIDEO_START(model3)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("scsp1", SCSP, 0)
@@ -5386,8 +5378,8 @@ static MACHINE_CONFIG_START( model3_20, model3_state )
 	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(model3_snd)
 
-	MCFG_MACHINE_START(model3_20)
-	MCFG_MACHINE_RESET(model3_20)
+	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_20)
+	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_20)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 	MCFG_NVRAM_ADD_1FILL("backup")
@@ -5402,7 +5394,6 @@ static MACHINE_CONFIG_START( model3_20, model3_state )
 	MCFG_PALETTE_LENGTH(32768)
 	MCFG_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
 
-	MCFG_VIDEO_START(model3)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("scsp1", SCSP, 0)
@@ -5425,8 +5416,8 @@ static MACHINE_CONFIG_START( model3_21, model3_state )
 	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(model3_snd)
 
-	MCFG_MACHINE_START(model3_21)
-	MCFG_MACHINE_RESET(model3_21)
+	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_21)
+	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_21)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 	MCFG_NVRAM_ADD_1FILL("backup")
@@ -5442,7 +5433,6 @@ static MACHINE_CONFIG_START( model3_21, model3_state )
 	MCFG_PALETTE_LENGTH(32768)
 	MCFG_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
 
-	MCFG_VIDEO_START(model3)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("scsp1", SCSP, 0)

@@ -37,6 +37,8 @@ public:
 	DECLARE_WRITE8_MEMBER(forte2_ay8910_set_input_mask);
 	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
 	DECLARE_DRIVER_INIT(pesadelo);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -107,18 +109,16 @@ static TMS9928A_INTERFACE(forte2_tms9928a_interface)
 	DEVCB_DRIVER_LINE_MEMBER(forte2_state,vdp_interrupt)
 };
 
-static MACHINE_RESET( forte2 )
+void forte2_state::machine_reset()
 {
-	forte2_state *state = machine.driver_data<forte2_state>();
-	state->m_input_mask = 0xff;
+	m_input_mask = 0xff;
 }
 
-static MACHINE_START( forte2 )
+void forte2_state::machine_start()
 {
-	forte2_state *state = machine.driver_data<forte2_state>();
 
 	/* register for save states */
-	state_save_register_global(machine, state->m_input_mask);
+	state_save_register_global(machine(), m_input_mask);
 }
 
 
@@ -128,8 +128,6 @@ static MACHINE_CONFIG_START( pesadelo, forte2_state )
 	MCFG_CPU_PROGRAM_MAP(program_mem)
 	MCFG_CPU_IO_MAP(io_mem)
 
-	MCFG_MACHINE_START( forte2 )
-	MCFG_MACHINE_RESET( forte2 )
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, forte2_tms9928a_interface )

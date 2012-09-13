@@ -38,12 +38,16 @@ public:
 	DECLARE_WRITE8_MEMBER(arabian_videoram_w);
 	DECLARE_WRITE8_MEMBER(ay8910_porta_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/arabian.c -----------*/
 
 
-PALETTE_INIT( arabian );
-VIDEO_START( arabian );
+
+
 SCREEN_UPDATE_IND16( arabian );

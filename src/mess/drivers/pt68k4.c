@@ -22,6 +22,8 @@ public:
 		m_p_ram(*this, "p_ram"){ }
 
 	required_shared_ptr<UINT16> m_p_ram;
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 static ADDRESS_MAP_START(pt68k4_mem, AS_PROGRAM, 16, pt68k4_state)
@@ -36,17 +38,16 @@ static INPUT_PORTS_START( pt68k4 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(pt68k4)
+void pt68k4_state::machine_reset()
 {
-	pt68k4_state *state = machine.driver_data<pt68k4_state>();
-	UINT8* user1 = state->memregion("user1")->base();
+	UINT8* user1 = memregion("user1")->base();
 
-	memcpy((UINT8*)state->m_p_ram.target(), user1, 8);
+	memcpy((UINT8*)m_p_ram.target(), user1, 8);
 
-	machine.device("maincpu")->reset();
+	machine().device("maincpu")->reset();
 }
 
-static VIDEO_START( pt68k4 )
+void pt68k4_state::video_start()
 {
 }
 
@@ -60,7 +61,6 @@ static MACHINE_CONFIG_START( pt68k4, pt68k4_state )
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(pt68k4_mem)
 
-	MCFG_MACHINE_RESET(pt68k4)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -68,7 +68,6 @@ static MACHINE_CONFIG_START( pt68k4, pt68k4_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_VIDEO_START(pt68k4)
 	MCFG_SCREEN_UPDATE_STATIC(pt68k4)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

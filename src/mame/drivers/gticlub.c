@@ -260,6 +260,9 @@ public:
 	DECLARE_WRITE32_MEMBER(dsp_dataram1_w);
 	DECLARE_DRIVER_INIT(hangplt);
 	DECLARE_DRIVER_INIT(gticlub);
+	DECLARE_MACHINE_START(gticlub);
+	DECLARE_MACHINE_RESET(gticlub);
+	DECLARE_MACHINE_RESET(hangplt);
 };
 
 
@@ -405,15 +408,14 @@ WRITE8_MEMBER(gticlub_state::sysreg_w)
 
 /******************************************************************/
 
-static MACHINE_START( gticlub )
+MACHINE_START_MEMBER(gticlub_state,gticlub)
 {
-	gticlub_state *state = machine.driver_data<gticlub_state>();
 
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine.device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(machine().device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x000fffff, FALSE, state->m_work_ram);
+	ppcdrc_add_fastram(machine().device("maincpu"), 0x00000000, 0x000fffff, FALSE, m_work_ram);
 }
 
 static ADDRESS_MAP_START( gticlub_map, AS_PROGRAM, 32, gticlub_state )
@@ -795,9 +797,9 @@ static const k001604_interface hangplt_k001604_intf_r =
 };
 
 
-static MACHINE_RESET( gticlub )
+MACHINE_RESET_MEMBER(gticlub_state,gticlub)
 {
-	machine.device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( gticlub, gticlub_state )
@@ -818,8 +820,8 @@ static MACHINE_CONFIG_START( gticlub, gticlub_state )
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
-	MCFG_MACHINE_START(gticlub)
-	MCFG_MACHINE_RESET(gticlub)
+	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
+	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,gticlub)
 
 	MCFG_ADC1038_ADD("adc1038", gticlub_adc1038_intf)
 
@@ -876,10 +878,10 @@ static const k033906_interface hangplt_k033906_intf_1 =
 	"voodoo1"
 };
 
-static MACHINE_RESET( hangplt )
+MACHINE_RESET_MEMBER(gticlub_state,hangplt)
 {
-	machine.device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine.device("dsp2")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("dsp2")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static const voodoo_config voodoo_l_intf =
@@ -925,8 +927,8 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
-	MCFG_MACHINE_START(gticlub)
-	MCFG_MACHINE_RESET(hangplt)
+	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
+	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,hangplt)
 
 	MCFG_ADC1038_ADD("adc1038", thunderh_adc1038_intf)
 	MCFG_K056230_ADD("k056230", gticlub_k056230_intf)

@@ -61,6 +61,10 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_control_w);
 	DECLARE_DRIVER_INIT(dynadice);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -199,14 +203,13 @@ TILE_GET_INFO_MEMBER(dynadice_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, 0, 0);
 }
 
-static VIDEO_START( dynadice )
+void dynadice_state::video_start()
 {
-	dynadice_state *state = machine.driver_data<dynadice_state>();
 
 	/* pacman - style videoram layout */
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dynadice_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_top_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dynadice_state::get_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 2, 32);
-	state->m_bg_tilemap->set_scrollx(0, -16);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dynadice_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_top_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dynadice_state::get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 2, 32);
+	m_bg_tilemap->set_scrollx(0, -16);
 }
 
 static SCREEN_UPDATE_IND16( dynadice )
@@ -219,23 +222,21 @@ static SCREEN_UPDATE_IND16( dynadice )
 	return 0;
 }
 
-static PALETTE_INIT( dynadice )
+void dynadice_state::palette_init()
 {
 	int i;
 	for(i = 0; i < 8; i++)
-		palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+		palette_set_color_rgb(machine(), i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
-static MACHINE_START( dynadice )
+void dynadice_state::machine_start()
 {
-	dynadice_state *state = machine.driver_data<dynadice_state>();
-	state->save_item(NAME(state->m_ay_data));
+	save_item(NAME(m_ay_data));
 }
 
-static MACHINE_RESET( dynadice )
+void dynadice_state::machine_reset()
 {
-	dynadice_state *state = machine.driver_data<dynadice_state>();
-	state->m_ay_data = 0;
+	m_ay_data = 0;
 }
 
 static MACHINE_CONFIG_START( dynadice, dynadice_state )
@@ -249,8 +250,6 @@ static MACHINE_CONFIG_START( dynadice, dynadice_state )
 	MCFG_CPU_PROGRAM_MAP(dynadice_sound_map)
 	MCFG_CPU_IO_MAP(dynadice_sound_io_map)
 
-	MCFG_MACHINE_START(dynadice)
-	MCFG_MACHINE_RESET(dynadice)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -264,9 +263,7 @@ static MACHINE_CONFIG_START( dynadice, dynadice_state )
 
 	MCFG_GFXDECODE(dynadice)
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(dynadice)
 
-	MCFG_VIDEO_START(dynadice)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

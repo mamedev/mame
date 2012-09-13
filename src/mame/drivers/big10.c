@@ -74,6 +74,7 @@ public:
 	UINT8 m_mux_data;
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
+	virtual void machine_reset();
 };
 
 
@@ -100,7 +101,7 @@ static TIMER_DEVICE_CALLBACK( big10_interrupt )
 *           Machine Reset            *
 *************************************/
 
-static MACHINE_RESET(big10)
+void big10_state::machine_reset()
 {
 }
 
@@ -248,7 +249,6 @@ static MACHINE_CONFIG_START( big10, big10_state )
 	MCFG_CPU_IO_MAP(main_io)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", big10_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET(big10)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

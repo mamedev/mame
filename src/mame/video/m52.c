@@ -17,9 +17,9 @@
  *
  *************************************/
 
-PALETTE_INIT( m52 )
+void m52_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	const UINT8 *char_pal = color_prom + 0x000;
 	const UINT8 *back_pal = color_prom + 0x200;
 	const UINT8 *sprite_pal = color_prom + 0x220;
@@ -29,7 +29,7 @@ PALETTE_INIT( m52 )
 	double weights_r[3], weights_g[3], weights_b[3], scale;
 	int i;
 
-	machine.colortable = colortable_alloc(machine, 512 + 32 + 32);
+	machine().colortable = colortable_alloc(machine(), 512 + 32 + 32);
 
 	/* compute palette information for characters/backgrounds */
 	scale = compute_resistor_weights(0,	255, -1.0,
@@ -45,7 +45,7 @@ PALETTE_INIT( m52 )
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_2_weights(weights_b, BIT(promval,6), BIT(promval,7));
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r,g,b));
 	}
 
 	/* background palette */
@@ -56,7 +56,7 @@ PALETTE_INIT( m52 )
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_2_weights(weights_b, BIT(promval,6), BIT(promval,7));
 
-		colortable_palette_set_color(machine.colortable, 512+i, MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable, 512+i, MAKE_RGB(r,g,b));
 	}
 
 	/* compute palette information for sprites */
@@ -73,18 +73,18 @@ PALETTE_INIT( m52 )
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		colortable_palette_set_color(machine.colortable, 512 + 32 + i, MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable, 512 + 32 + i, MAKE_RGB(r,g,b));
 	}
 
 	/* character lookup table */
 	for (i = 0; i < 512; i++)
-		colortable_entry_set_value(machine.colortable, i, i);
+		colortable_entry_set_value(machine().colortable, i, i);
 
 	/* sprite lookup table */
 	for (i = 0; i < 16 * 4; i++)
 	{
 		UINT8 promval = sprite_table[(i & 3) | ((i & ~3) << 1)];
-		colortable_entry_set_value(machine.colortable, 512 + i, 512 + 32 + promval);
+		colortable_entry_set_value(machine().colortable, 512 + i, 512 + 32 + promval);
 	}
 
 	/* background */
@@ -93,18 +93,18 @@ PALETTE_INIT( m52 )
 	/* xbb00: mountains */
 	/* 0xxbb: hills */
 	/* 1xxbb: city */
-	colortable_entry_set_value(machine.colortable, 512+16*4+0*4+0, 512);
-	colortable_entry_set_value(machine.colortable, 512+16*4+0*4+1, 512+4);
-	colortable_entry_set_value(machine.colortable, 512+16*4+0*4+2, 512+8);
-	colortable_entry_set_value(machine.colortable, 512+16*4+0*4+3, 512+12);
-	colortable_entry_set_value(machine.colortable, 512+16*4+1*4+0, 512);
-	colortable_entry_set_value(machine.colortable, 512+16*4+1*4+1, 512+1);
-	colortable_entry_set_value(machine.colortable, 512+16*4+1*4+2, 512+2);
-	colortable_entry_set_value(machine.colortable, 512+16*4+1*4+3, 512+3);
-	colortable_entry_set_value(machine.colortable, 512+16*4+2*4+0, 512);
-	colortable_entry_set_value(machine.colortable, 512+16*4+2*4+1, 512+16+1);
-	colortable_entry_set_value(machine.colortable, 512+16*4+2*4+2, 512+16+2);
-	colortable_entry_set_value(machine.colortable, 512+16*4+2*4+3, 512+16+3);
+	colortable_entry_set_value(machine().colortable, 512+16*4+0*4+0, 512);
+	colortable_entry_set_value(machine().colortable, 512+16*4+0*4+1, 512+4);
+	colortable_entry_set_value(machine().colortable, 512+16*4+0*4+2, 512+8);
+	colortable_entry_set_value(machine().colortable, 512+16*4+0*4+3, 512+12);
+	colortable_entry_set_value(machine().colortable, 512+16*4+1*4+0, 512);
+	colortable_entry_set_value(machine().colortable, 512+16*4+1*4+1, 512+1);
+	colortable_entry_set_value(machine().colortable, 512+16*4+1*4+2, 512+2);
+	colortable_entry_set_value(machine().colortable, 512+16*4+1*4+3, 512+3);
+	colortable_entry_set_value(machine().colortable, 512+16*4+2*4+0, 512);
+	colortable_entry_set_value(machine().colortable, 512+16*4+2*4+1, 512+16+1);
+	colortable_entry_set_value(machine().colortable, 512+16*4+2*4+2, 512+16+2);
+	colortable_entry_set_value(machine().colortable, 512+16*4+2*4+3, 512+16+3);
 }
 
 
@@ -146,22 +146,21 @@ TILE_GET_INFO_MEMBER(m52_state::get_tile_info)
  *
  *************************************/
 
-VIDEO_START( m52 )
+void m52_state::video_start()
 {
-	m52_state *state = machine.driver_data<m52_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(m52_state::get_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m52_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 
-	state->m_bg_tilemap->set_transparent_pen(0);
-	state->m_bg_tilemap->set_scrolldx(128 - 1, -1);
-	state->m_bg_tilemap->set_scrolldy(16, 16);
-	state->m_bg_tilemap->set_scroll_rows(4); /* only lines 192-256 scroll */
+	m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scrolldx(128 - 1, -1);
+	m_bg_tilemap->set_scrolldy(16, 16);
+	m_bg_tilemap->set_scroll_rows(4); /* only lines 192-256 scroll */
 
-	state->save_item(NAME(state->m_bg1xpos));
-	state->save_item(NAME(state->m_bg1ypos));
-	state->save_item(NAME(state->m_bg2xpos));
-	state->save_item(NAME(state->m_bg2ypos));
-	state->save_item(NAME(state->m_bgcontrol));
+	save_item(NAME(m_bg1xpos));
+	save_item(NAME(m_bg1ypos));
+	save_item(NAME(m_bg2xpos));
+	save_item(NAME(m_bg2ypos));
+	save_item(NAME(m_bgcontrol));
 }
 
 

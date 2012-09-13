@@ -15,11 +15,13 @@ public:
 	DECLARE_WRITE8_MEMBER(usgames_videoram_w);
 	DECLARE_WRITE8_MEMBER(usgames_charram_w);
 	TILE_GET_INFO_MEMBER(get_usgames_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/usgames.c -----------*/
 
-VIDEO_START( usgames );
-PALETTE_INIT( usgames );
+
+
 SCREEN_UPDATE_IND16( usgames );

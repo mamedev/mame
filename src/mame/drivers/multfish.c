@@ -235,6 +235,10 @@ public:
 	DECLARE_DRIVER_INIT(fcockt2ent);
 	TILE_GET_INFO_MEMBER(get_multfish_tile_info);
 	TILE_GET_INFO_MEMBER(get_multfish_reel_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	DECLARE_MACHINE_RESET(island2a);
 };
 
 TILE_GET_INFO_MEMBER(multfish_state::get_multfish_tile_info)
@@ -262,19 +266,18 @@ TILE_GET_INFO_MEMBER(multfish_state::get_multfish_reel_tile_info)
 			0);
 }
 
-static VIDEO_START(multfish)
+void multfish_state::video_start()
 {
-	multfish_state *state = machine.driver_data<multfish_state>();
 
-	memset(state->m_vid,0x00,sizeof(state->m_vid));
-	state->save_item(NAME(state->m_vid));
+	memset(m_vid,0x00,sizeof(m_vid));
+	save_item(NAME(m_vid));
 
-	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(multfish_state::get_multfish_tile_info),state),TILEMAP_SCAN_ROWS,16,16, 64, 32);
-	state->m_tilemap->set_transparent_pen(255);
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(multfish_state::get_multfish_tile_info),this),TILEMAP_SCAN_ROWS,16,16, 64, 32);
+	m_tilemap->set_transparent_pen(255);
 
-	state->m_reel_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(multfish_state::get_multfish_reel_tile_info),state),TILEMAP_SCAN_ROWS,16,16, 64, 64);
-	state->m_reel_tilemap->set_transparent_pen(255);
-	state->m_reel_tilemap->set_scroll_cols(64);
+	m_reel_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(multfish_state::get_multfish_reel_tile_info),this),TILEMAP_SCAN_ROWS,16,16, 64, 64);
+	m_reel_tilemap->set_transparent_pen(255);
+	m_reel_tilemap->set_scroll_cols(64);
 }
 
 static SCREEN_UPDATE_IND16(multfish)
@@ -1059,27 +1062,25 @@ static GFXDECODE_START( multfish )
 	GFXDECODE_ENTRY( "gfx", 0, tiles16x16_layout, 0, 16 )
 GFXDECODE_END
 
-static MACHINE_START( multfish )
+void multfish_state::machine_start()
 {
-	multfish_state *state = machine.driver_data<multfish_state>();
 
-	state->save_item(NAME(state->m_disp_enable));
-	state->save_item(NAME(state->m_rambk));
-	state->save_item(NAME(state->m_hopper_motor));
-	state->save_item(NAME(state->m_hopper));
+	save_item(NAME(m_disp_enable));
+	save_item(NAME(m_rambk));
+	save_item(NAME(m_hopper_motor));
+	save_item(NAME(m_hopper));
 }
 
-static MACHINE_RESET( multfish )
+void multfish_state::machine_reset()
 {
-	multfish_state *state = machine.driver_data<multfish_state>();
 
-	state->membank("bank1")->configure_entries(0, 16, state->memregion("maincpu")->base(), 0x4000);
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base(), 0x4000);
+	membank("bank1")->set_entry(0);
 
-	state->m_disp_enable = 0;
-	state->m_rambk = 0;
-	state->m_hopper_motor = 0;
-	state->m_hopper = 0;
+	m_disp_enable = 0;
+	m_rambk = 0;
+	m_hopper_motor = 0;
+	m_hopper = 0;
 }
 
 static const ay8910_interface ay8910_config =
@@ -1100,8 +1101,6 @@ static MACHINE_CONFIG_START( multfish, multfish_state )
 	MCFG_CPU_IO_MAP(multfish_portmap)
 	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
 
-	MCFG_MACHINE_START( multfish )
-	MCFG_MACHINE_RESET( multfish )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1113,7 +1112,6 @@ static MACHINE_CONFIG_START( multfish, multfish_state )
 	MCFG_GFXDECODE(multfish)
 	MCFG_PALETTE_LENGTH(0x1000)
 
-	MCFG_VIDEO_START(multfish)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 6000000/4)
@@ -1128,18 +1126,18 @@ static MACHINE_CONFIG_DERIVED( rollfr, multfish )
 	MCFG_CPU_IO_MAP(rollfr_portmap)
 MACHINE_CONFIG_END
 
-static MACHINE_RESET( island2a )
+MACHINE_RESET_MEMBER(multfish_state,island2a)
 {
-	MACHINE_RESET_CALL(multfish);
+	multfish_state::machine_reset();
 
 	// this set needs preprogrammed data in timekeeper
-	timekeeper_w(machine.device("m48t35"), 0x2003 , 0x01);
-	timekeeper_w(machine.device("m48t35"), 0x4003 , 0x02);
+	timekeeper_w(machine().device("m48t35"), 0x2003 , 0x01);
+	timekeeper_w(machine().device("m48t35"), 0x4003 , 0x02);
 }
 static MACHINE_CONFIG_DERIVED( island2a, multfish )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET( island2a )
+	MCFG_MACHINE_RESET_OVERRIDE(multfish_state, island2a )
 MACHINE_CONFIG_END
 
 

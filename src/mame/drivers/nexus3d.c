@@ -48,6 +48,8 @@ public:
 	DECLARE_WRITE8_MEMBER(n3d_flash_cmd_w);
 	DECLARE_WRITE8_MEMBER(n3d_flash_addr_w);
 	DECLARE_DRIVER_INIT(nexus3d);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -176,7 +178,7 @@ static INPUT_PORTS_START( nexus3d )
 INPUT_PORTS_END
 
 
-VIDEO_START( nexus3d )
+void nexus3d_state::video_start()
 {
 
 }
@@ -186,9 +188,9 @@ SCREEN_UPDATE_RGB32(nexus3d)
 	return 0;
 }
 
-static MACHINE_RESET (nexus3d)
+void nexus3d_state::machine_reset()
 {
-	nexus3d_flash_reset(machine);
+	nexus3d_flash_reset(machine());
 }
 
 static MACHINE_CONFIG_START( nexus3d, nexus3d_state )
@@ -206,9 +208,7 @@ static MACHINE_CONFIG_START( nexus3d, nexus3d_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_MACHINE_RESET( nexus3d )
 
-	MCFG_VIDEO_START(nexus3d)
 MACHINE_CONFIG_END
 
 

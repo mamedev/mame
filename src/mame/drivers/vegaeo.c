@@ -40,6 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 	DECLARE_DRIVER_INIT(vegaeo);
+	DECLARE_VIDEO_START(vega);
 };
 
 READ8_MEMBER( vegaeo_state::qs1000_p1_r )
@@ -188,10 +189,9 @@ static INPUT_PORTS_START( crazywar )
 INPUT_PORTS_END
 
 
-static VIDEO_START( vega )
+VIDEO_START_MEMBER(vegaeo_state,vega)
 {
-	vegaeo_state *state = machine.driver_data<vegaeo_state>();
-	state->m_vega_vram = auto_alloc_array(machine, UINT32, 0x14000*2/4);
+	m_vega_vram = auto_alloc_array(machine(), UINT32, 0x14000*2/4);
 }
 
 static SCREEN_UPDATE_IND16( vega )
@@ -265,7 +265,7 @@ static MACHINE_CONFIG_START( vega, vegaeo_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(vega)
+	MCFG_VIDEO_START_OVERRIDE(vegaeo_state,vega)
 
 	/* sound hardware */
 	/* sound hardware */

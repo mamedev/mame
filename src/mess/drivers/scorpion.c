@@ -165,6 +165,8 @@ public:
 	DECLARE_WRITE8_MEMBER(scorpion_0000_w);
 	DECLARE_WRITE8_MEMBER(scorpion_port_7ffd_w);
 	DECLARE_WRITE8_MEMBER(scorpion_port_1ffd_w);
+	DECLARE_MACHINE_START(scorpion);
+	DECLARE_MACHINE_RESET(scorpion);
 };
 
 /****************************************************************************************************/
@@ -320,34 +322,33 @@ static ADDRESS_MAP_START (scorpion_io, AS_IO, 8, scorpion_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_RESET( scorpion )
+MACHINE_RESET_MEMBER(scorpion_state,scorpion)
 {
-	scorpion_state *state = machine.driver_data<scorpion_state>();
-	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
-	device_t *beta = machine.device(BETA_DISK_TAG);
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *messram = machine().device<ram_device>(RAM_TAG)->pointer();
+	device_t *beta = machine().device(BETA_DISK_TAG);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	state->m_ram_0000 = NULL;
+	m_ram_0000 = NULL;
 	space->install_read_bank(0x0000, 0x3fff, "bank1");
-	space->install_write_handler(0x0000, 0x3fff, write8_delegate(FUNC(scorpion_state::scorpion_0000_w),state));
+	space->install_write_handler(0x0000, 0x3fff, write8_delegate(FUNC(scorpion_state::scorpion_0000_w),this));
 
 	betadisk_disable(beta);
 	betadisk_clear_status(beta);
-	space->set_direct_update_handler(direct_update_delegate(FUNC(scorpion_state::scorpion_direct), state));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(scorpion_state::scorpion_direct), this));
 
 	memset(messram,0,256*1024);
 
 	/* Bank 5 is always in 0x4000 - 0x7fff */
-	state->membank("bank2")->set_base(messram + (5<<14));
+	membank("bank2")->set_base(messram + (5<<14));
 
 	/* Bank 2 is always in 0x8000 - 0xbfff */
-	state->membank("bank3")->set_base(messram + (2<<14));
+	membank("bank3")->set_base(messram + (2<<14));
 
-	state->m_port_7ffd_data = 0;
-	state->m_port_1ffd_data = 0;
-	scorpion_update_memory(machine);
+	m_port_7ffd_data = 0;
+	m_port_1ffd_data = 0;
+	scorpion_update_memory(machine());
 }
-static MACHINE_START( scorpion )
+MACHINE_START_MEMBER(scorpion_state,scorpion)
 {
 }
 
@@ -410,8 +411,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( scorpion, spectrum_128, scorpion_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(scorpion_io)
 
-	MCFG_MACHINE_START( scorpion )
-	MCFG_MACHINE_RESET( scorpion )
+	MCFG_MACHINE_START_OVERRIDE(scorpion_state, scorpion )
+	MCFG_MACHINE_RESET_OVERRIDE(scorpion_state, scorpion )
 	MCFG_GFXDECODE(scorpion)
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)

@@ -109,6 +109,9 @@ public:
 	DECLARE_DRIVER_INIT(calorieb);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -138,14 +141,13 @@ TILE_GET_INFO_MEMBER(calorie_state::get_fg_tile_info)
 }
 
 
-static VIDEO_START( calorie )
+void calorie_state::video_start()
 {
-	calorie_state *state = machine.driver_data<calorie_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(calorie_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(calorie_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(calorie_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(calorie_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 static SCREEN_UPDATE_IND16( calorie )
@@ -422,18 +424,16 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( calorie )
+void calorie_state::machine_start()
 {
-	calorie_state *state = machine.driver_data<calorie_state>();
 
-	state->save_item(NAME(state->m_bg_bank));
+	save_item(NAME(m_bg_bank));
 }
 
-static MACHINE_RESET( calorie )
+void calorie_state::machine_reset()
 {
-	calorie_state *state = machine.driver_data<calorie_state>();
 
-	state->m_bg_bank = 0;
+	m_bg_bank = 0;
 }
 
 
@@ -449,8 +449,6 @@ static MACHINE_CONFIG_START( calorie, calorie_state )
 	MCFG_CPU_IO_MAP(calorie_sound_io_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 64)
 
-	MCFG_MACHINE_START(calorie)
-	MCFG_MACHINE_RESET(calorie)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -463,7 +461,6 @@ static MACHINE_CONFIG_START( calorie, calorie_state )
 	MCFG_GFXDECODE(calorie)
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(calorie)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

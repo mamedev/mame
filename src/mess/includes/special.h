@@ -80,6 +80,16 @@ public:
 	optional_shared_ptr<UINT8> m_p_videoram;
 	DECLARE_DRIVER_INIT(erik);
 	DECLARE_DRIVER_INIT(special);
+	DECLARE_MACHINE_RESET(special);
+	DECLARE_VIDEO_START(special);
+	DECLARE_MACHINE_RESET(erik);
+	DECLARE_VIDEO_START(erik);
+	DECLARE_PALETTE_INIT(erik);
+	DECLARE_VIDEO_START(specialp);
+	DECLARE_MACHINE_START(specimx);
+	DECLARE_MACHINE_RESET(specimx);
+	DECLARE_VIDEO_START(specimx);
+	DECLARE_PALETTE_INIT(specimx);
 };
 
 
@@ -88,29 +98,29 @@ public:
 extern const struct pit8253_config specimx_pit8253_intf;
 extern const i8255_interface specialist_ppi8255_interface;
 
-MACHINE_RESET( special );
 
-MACHINE_RESET( specimx );
-MACHINE_START ( specimx );
 
-MACHINE_RESET( erik );
+
+
+
+
 
 /*----------- defined in video/special.c -----------*/
 
-VIDEO_START( special );
+
 SCREEN_UPDATE_IND16( special );
 
-VIDEO_START( specialp );
+
 SCREEN_UPDATE_IND16( specialp );
 
-VIDEO_START( specimx );
+
 SCREEN_UPDATE_IND16( specimx );
 
-VIDEO_START( erik );
-SCREEN_UPDATE_IND16( erik );
-PALETTE_INIT( erik );
 
-PALETTE_INIT( specimx );
+SCREEN_UPDATE_IND16( erik );
+
+
+
 extern const rgb_t specimx_palette[16];
 
 /*----------- defined in audio/special.c -----------*/

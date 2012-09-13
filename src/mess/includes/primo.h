@@ -31,6 +31,8 @@ public:
 	DECLARE_DRIVER_INIT(primo48);
 	DECLARE_DRIVER_INIT(primo64);
 	DECLARE_DRIVER_INIT(primo32);
+	virtual void machine_reset();
+	DECLARE_MACHINE_RESET(primob);
 };
 
 

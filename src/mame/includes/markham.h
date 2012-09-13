@@ -24,12 +24,14 @@ public:
 	DECLARE_WRITE8_MEMBER(markham_videoram_w);
 	DECLARE_WRITE8_MEMBER(markham_flipscreen_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/markham.c -----------*/
 
 
-PALETTE_INIT( markham );
-VIDEO_START( markham );
+
+
 SCREEN_UPDATE_IND16( markham );

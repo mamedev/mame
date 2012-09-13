@@ -28,9 +28,9 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( bking )
+void bking_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 220, 390, 820 };
 	static const int resistances_b [2] = { 220, 390 };
 	double rweights[3], gweights[3], bweights[2];
@@ -42,7 +42,7 @@ PALETTE_INIT( bking )
 			3, &resistances_rg[0], gweights, 0, 0,
 			2, &resistances_b[0],  bweights, 0, 0);
 
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		UINT16 pen;
 		int bit0, bit1, bit2, r, g, b;
@@ -78,7 +78,7 @@ PALETTE_INIT( bking )
 		bit1 = (color_prom[pen] >> 7) & 0x01;
 		b = combine_2_weights(gweights, bit0, bit1);
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -222,15 +222,14 @@ TILE_GET_INFO_MEMBER(bking_state::get_tile_info)
 }
 
 
-VIDEO_START( bking )
+void bking_state::video_start()
 {
-	bking_state *state = machine.driver_data<bking_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bking_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	machine.primary_screen->register_screen_bitmap(state->m_tmp_bitmap1);
-	machine.primary_screen->register_screen_bitmap(state->m_tmp_bitmap2);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bking_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	machine().primary_screen->register_screen_bitmap(m_tmp_bitmap1);
+	machine().primary_screen->register_screen_bitmap(m_tmp_bitmap2);
 
-	state->save_item(NAME(state->m_tmp_bitmap1));
-	state->save_item(NAME(state->m_tmp_bitmap2));
+	save_item(NAME(m_tmp_bitmap1));
+	save_item(NAME(m_tmp_bitmap2));
 }
 
 

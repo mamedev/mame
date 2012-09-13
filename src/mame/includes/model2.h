@@ -154,12 +154,20 @@ public:
 	DECLARE_DRIVER_INIT(doa);
 	DECLARE_DRIVER_INIT(zerogun);
 	DECLARE_DRIVER_INIT(sgt24h);
+	DECLARE_MACHINE_START(model2);
+	DECLARE_MACHINE_RESET(model2o);
+	DECLARE_VIDEO_START(model2);
+	DECLARE_MACHINE_RESET(model2);
+	DECLARE_MACHINE_RESET(model2b);
+	DECLARE_MACHINE_RESET(model2c);
+	DECLARE_MACHINE_RESET(model2_common);
+	DECLARE_MACHINE_RESET(model2_scsp);
 };
 
 
 /*----------- defined in video/model2.c -----------*/
 
-VIDEO_START(model2);
+
 SCREEN_UPDATE_RGB32(model2);
 
 void model2_3d_set_zclip( running_machine &machine, UINT8 clip );

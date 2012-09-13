@@ -22,13 +22,12 @@
   Zarzon has a different PROM layout from the others.
 
 ***************************************************************************/
-PALETTE_INIT( snk6502 )
+PALETTE_INIT_MEMBER(snk6502_state,snk6502)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	snk6502_state *state = machine.driver_data<snk6502_state>();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -56,22 +55,22 @@ PALETTE_INIT( snk6502 )
 
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		state->m_palette[i] = MAKE_RGB(r, g, b);
+		m_palette[i] = MAKE_RGB(r, g, b);
 
 		color_prom++;
 	}
 
-	state->m_backcolor = 0;	/* background color can be changed by the game */
+	m_backcolor = 0;	/* background color can be changed by the game */
 
-	for (i = 0; i < TOTAL_COLORS(machine,0); i++)
-		palette_set_color(machine, COLOR(machine, 0, i), state->m_palette[i]);
+	for (i = 0; i < TOTAL_COLORS(machine(),0); i++)
+		palette_set_color(machine(), COLOR(machine(), 0, i), m_palette[i]);
 
-	for (i = 0; i < TOTAL_COLORS(machine,1); i++)
+	for (i = 0; i < TOTAL_COLORS(machine(),1); i++)
 	{
 		if (i % 4 == 0)
-			palette_set_color(machine, COLOR(machine, 1, i), state->m_palette[4 * state->m_backcolor + 0x20]);
+			palette_set_color(machine(), COLOR(machine(), 1, i), m_palette[4 * m_backcolor + 0x20]);
 		else
-			palette_set_color(machine, COLOR(machine, 1, i), state->m_palette[i + 0x20]);
+			palette_set_color(machine(), COLOR(machine(), 1, i), m_palette[i + 0x20]);
 	}
 }
 
@@ -172,26 +171,24 @@ TILE_GET_INFO_MEMBER(snk6502_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-VIDEO_START( snk6502 )
+VIDEO_START_MEMBER(snk6502_state,snk6502)
 {
-	snk6502_state *state = machine.driver_data<snk6502_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snk6502_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snk6502_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk6502_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk6502_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	machine.gfx[0]->set_source(state->m_charram);
+	machine().gfx[0]->set_source(m_charram);
 }
 
-VIDEO_START( pballoon )
+VIDEO_START_MEMBER(snk6502_state,pballoon)
 {
-	snk6502_state *state = machine.driver_data<snk6502_state>();
 
-	VIDEO_START_CALL( snk6502 );
+	VIDEO_START_CALL_MEMBER( snk6502 );
 
-	state->m_bg_tilemap->set_scrolldy(-16, -16);
-	state->m_fg_tilemap->set_scrolldy(-16, -16);
+	m_bg_tilemap->set_scrolldy(-16, -16);
+	m_fg_tilemap->set_scrolldy(-16, -16);
 }
 
 
@@ -206,13 +203,12 @@ SCREEN_UPDATE_IND16( snk6502 )
 
 /* Satan of Saturn */
 
-PALETTE_INIT( satansat )
+PALETTE_INIT_MEMBER(snk6502_state,satansat)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	snk6502_state *state = machine.driver_data<snk6502_state>();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine.total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -240,22 +236,22 @@ PALETTE_INIT( satansat )
 
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		state->m_palette[i] = MAKE_RGB(r, g, b);
+		m_palette[i] = MAKE_RGB(r, g, b);
 
 		color_prom++;
 	}
 
-	state->m_backcolor = 0;	/* background color can be changed by the game */
+	m_backcolor = 0;	/* background color can be changed by the game */
 
-	for (i = 0; i < TOTAL_COLORS(machine,0); i++)
-		palette_set_color(machine, COLOR(machine, 0, i), state->m_palette[4 * (i % 4) + (i / 4)]);
+	for (i = 0; i < TOTAL_COLORS(machine(),0); i++)
+		palette_set_color(machine(), COLOR(machine(), 0, i), m_palette[4 * (i % 4) + (i / 4)]);
 
-	for (i = 0; i < TOTAL_COLORS(machine,1); i++)
+	for (i = 0; i < TOTAL_COLORS(machine(),1); i++)
 	{
 		if (i % 4 == 0)
-			palette_set_color(machine, COLOR(machine, 1, i), state->m_palette[state->m_backcolor + 0x10]);
+			palette_set_color(machine(), COLOR(machine(), 1, i), m_palette[m_backcolor + 0x10]);
 		else
-			palette_set_color(machine, COLOR(machine, 1, i), state->m_palette[4 * (i % 4) + (i / 4) + 0x10]);
+			palette_set_color(machine(), COLOR(machine(), 1, i), m_palette[4 * (i % 4) + (i / 4) + 0x10]);
 	}
 }
 
@@ -307,14 +303,13 @@ TILE_GET_INFO_MEMBER(snk6502_state::satansat_get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-VIDEO_START( satansat )
+VIDEO_START_MEMBER(snk6502_state,satansat)
 {
-	snk6502_state *state = machine.driver_data<snk6502_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snk6502_state::satansat_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snk6502_state::satansat_get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk6502_state::satansat_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk6502_state::satansat_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	machine.gfx[0]->set_source(state->m_charram);
+	machine().gfx[0]->set_source(m_charram);
 }

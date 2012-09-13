@@ -123,13 +123,14 @@ public:
 	DECLARE_READ8_MEMBER(blitter_r);
 	DECLARE_WRITE8_MEMBER(blitter_w);
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
-static VIDEO_START( vpoker )
+void vpoker_state::video_start()
 {
-	vpoker_state *state = machine.driver_data<vpoker_state>();
-	state->m_videoram = auto_alloc_array(machine, UINT8, 0x200);
+	m_videoram = auto_alloc_array(machine(), UINT8, 0x200);
 }
 
 static SCREEN_UPDATE_IND16( vpoker )
@@ -623,7 +624,7 @@ static GFXDECODE_START( vpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
-static PALETTE_INIT( vpoker )
+void vpoker_state::palette_init()
 {
 	int i;
 
@@ -633,7 +634,7 @@ static PALETTE_INIT( vpoker )
 
 		color = MAKE_RGB(pal1bit((i & 4) >> 2),pal1bit(i & 1),pal1bit((i & 2) >> 1));
 
-		palette_set_color(machine, i, color);
+		palette_set_color(machine(), i, color);
 	}
 }
 
@@ -668,9 +669,7 @@ static MACHINE_CONFIG_START( vpoker, vpoker_state )
 
 	MCFG_GFXDECODE(vpoker)
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(vpoker)
 
-	MCFG_VIDEO_START(vpoker)
 
 	/* 6840 PTM */
 	MCFG_PTM6840_ADD("6840ptm", ptm_intf)

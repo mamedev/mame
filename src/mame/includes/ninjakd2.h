@@ -64,6 +64,14 @@ public:
 	TILE_GET_INFO_MEMBER(robokid_get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(robokid_get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(robokid_get_bg2_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
+	DECLARE_VIDEO_START(mnight);
+	DECLARE_VIDEO_START(arkarea);
+	DECLARE_MACHINE_RESET(robokid);
+	DECLARE_VIDEO_START(robokid);
+	DECLARE_MACHINE_RESET(omegaf);
+	DECLARE_VIDEO_START(omegaf);
 };
 
 

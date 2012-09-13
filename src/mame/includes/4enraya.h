@@ -30,11 +30,15 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_control_w);
 	DECLARE_DRIVER_INIT(unkpacg);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/4enraya.c -----------*/
 
 
-VIDEO_START( 4enraya );
+
 SCREEN_UPDATE_IND16( 4enraya );

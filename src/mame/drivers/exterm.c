@@ -467,7 +467,6 @@ static MACHINE_CONFIG_START( exterm, exterm_state )
 	MCFG_SCREEN_RAW_PARAMS(40000000/8, 318, 0, 256, 264, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
 
-	MCFG_PALETTE_INIT(exterm)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

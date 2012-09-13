@@ -225,74 +225,70 @@ TILE_GET_INFO_MEMBER(psychic5_state::get_fg_tile_info)
   Initialize and destroy video hardware emulation
 ***************************************************************************/
 
-VIDEO_START( psychic5 )
+VIDEO_START_MEMBER(psychic5_state,psychic5)
 {
-	psychic5_state *state = machine.driver_data<psychic5_state>();
 	/*                          info              offset             w   h  col  row */
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psychic5_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psychic5_state::get_fg_tile_info),state), TILEMAP_SCAN_COLS,  8,  8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(psychic5_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(psychic5_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,  8,  8, 32, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(15);
+	m_fg_tilemap->set_transparent_pen(15);
 
-	state->m_ps5_pagedram[0] = auto_alloc_array(machine, UINT8, 0x2000);
-	state->m_ps5_pagedram[1] = auto_alloc_array(machine, UINT8, 0x2000);
+	m_ps5_pagedram[0] = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_ps5_pagedram[1] = auto_alloc_array(machine(), UINT8, 0x2000);
 
-	state->m_bg_videoram  = &state->m_ps5_pagedram[0][0x0000];
-	state->m_ps5_dummy_bg_ram      = &state->m_ps5_pagedram[0][0x1000];
-	state->m_ps5_io_ram            = &state->m_ps5_pagedram[1][0x0000];
-	state->m_ps5_palette_ram       = &state->m_ps5_pagedram[1][0x0400];
-	state->m_fg_videoram  = &state->m_ps5_pagedram[1][0x1000];
+	m_bg_videoram  = &m_ps5_pagedram[0][0x0000];
+	m_ps5_dummy_bg_ram      = &m_ps5_pagedram[0][0x1000];
+	m_ps5_io_ram            = &m_ps5_pagedram[1][0x0000];
+	m_ps5_palette_ram       = &m_ps5_pagedram[1][0x0400];
+	m_fg_videoram  = &m_ps5_pagedram[1][0x1000];
 
-	jal_blend_init(machine, 1);
+	jal_blend_init(machine(), 1);
 
-	state->m_bg_palette_ram_base = 0x400;
-	state->m_bg_palette_base = 0x100;
+	m_bg_palette_ram_base = 0x400;
+	m_bg_palette_base = 0x100;
 }
 
-VIDEO_START( bombsa )
+VIDEO_START_MEMBER(psychic5_state,bombsa)
 {
-	psychic5_state *state = machine.driver_data<psychic5_state>();
 	/*                          info              offset             w   h   col  row */
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psychic5_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psychic5_state::get_fg_tile_info),state), TILEMAP_SCAN_COLS,  8,  8,  32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(psychic5_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(psychic5_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,  8,  8,  32, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(15);
+	m_fg_tilemap->set_transparent_pen(15);
 
-	state->m_ps5_pagedram[0] = auto_alloc_array(machine, UINT8, 0x2000);
-	state->m_ps5_pagedram[1] = auto_alloc_array(machine, UINT8, 0x2000);
+	m_ps5_pagedram[0] = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_ps5_pagedram[1] = auto_alloc_array(machine(), UINT8, 0x2000);
 
-	state->m_bg_videoram  = &state->m_ps5_pagedram[0][0x0000];
-	state->m_ps5_dummy_bg_ram      = &state->m_ps5_pagedram[0][0x1000];
-	state->m_ps5_io_ram            = &state->m_ps5_pagedram[1][0x0000];
-	state->m_fg_videoram  = &state->m_ps5_pagedram[1][0x0800];
-	state->m_ps5_palette_ram       = &state->m_ps5_pagedram[1][0x1000];
+	m_bg_videoram  = &m_ps5_pagedram[0][0x0000];
+	m_ps5_dummy_bg_ram      = &m_ps5_pagedram[0][0x1000];
+	m_ps5_io_ram            = &m_ps5_pagedram[1][0x0000];
+	m_fg_videoram  = &m_ps5_pagedram[1][0x0800];
+	m_ps5_palette_ram       = &m_ps5_pagedram[1][0x1000];
 
-	jal_blend_init(machine, 0);
+	jal_blend_init(machine(), 0);
 
-	state->m_bg_palette_ram_base = 0x000;
-	state->m_bg_palette_base = 0x000;
+	m_bg_palette_ram_base = 0x000;
+	m_bg_palette_base = 0x000;
 }
 
-VIDEO_RESET( psychic5 )
+VIDEO_RESET_MEMBER(psychic5_state,psychic5)
 {
-	psychic5_state *state = machine.driver_data<psychic5_state>();
-	state->m_bg_clip_mode = 0;
-	state->m_ps5_vram_page = 0;
-	state->m_bg_status = 0;
-	memset(state->m_ps5_pagedram[0],0,0x2000);
-	memset(state->m_ps5_pagedram[1],0,0x2000);
-	state->m_palette_intensity = 0;
+	m_bg_clip_mode = 0;
+	m_ps5_vram_page = 0;
+	m_bg_status = 0;
+	memset(m_ps5_pagedram[0],0,0x2000);
+	memset(m_ps5_pagedram[1],0,0x2000);
+	m_palette_intensity = 0;
 }
 
-VIDEO_RESET( bombsa )
+VIDEO_RESET_MEMBER(psychic5_state,bombsa)
 {
-	psychic5_state *state = machine.driver_data<psychic5_state>();
-	state->m_ps5_vram_page = 0;
-	state->m_bg_status = 0;
-	state->m_title_screen = 0;
-	memset(state->m_ps5_pagedram[0],0,0x2000);
-	memset(state->m_ps5_pagedram[1],0,0x2000);
-	state->m_palette_intensity = 0;
+	m_ps5_vram_page = 0;
+	m_bg_status = 0;
+	m_title_screen = 0;
+	memset(m_ps5_pagedram[0],0,0x2000);
+	memset(m_ps5_pagedram[1],0,0x2000);
+	m_palette_intensity = 0;
 }
 
 

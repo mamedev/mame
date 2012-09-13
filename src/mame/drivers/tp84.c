@@ -74,10 +74,9 @@ C004      76489 #4 trigger
 
 
 
-static MACHINE_START( tp84 )
+void tp84_state::machine_start()
 {
-	tp84_state *state = machine.driver_data<tp84_state>();
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 }
 
 
@@ -322,7 +321,6 @@ static MACHINE_CONFIG_START( tp84, tp84_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
-	MCFG_MACHINE_START(tp84)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -335,8 +333,6 @@ static MACHINE_CONFIG_START( tp84, tp84_state )
 	MCFG_GFXDECODE(tp84)
 	MCFG_PALETTE_LENGTH(4096)
 
-	MCFG_PALETTE_INIT(tp84)
-	MCFG_VIDEO_START(tp84)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -40,6 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER(video_w);
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(lamps_w);
+	virtual void palette_init();
 };
 
 
@@ -184,12 +185,12 @@ static GFXDECODE_START( cardline )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 2 )
 GFXDECODE_END
 
-static PALETTE_INIT(cardline)
+void cardline_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i,r,g,b,data;
 	int bit0,bit1,bit2;
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		data=color_prom[i];
 
@@ -207,7 +208,7 @@ static PALETTE_INIT(cardline)
 		bit0 = (data >> 0) & 0x01;
 		bit1 = (data >> 1) & 0x01;
 		b = 0x55 * bit0 + 0xaa * bit1;
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -229,7 +230,6 @@ static MACHINE_CONFIG_START( cardline, cardline_state )
 
 	MCFG_GFXDECODE(cardline)
 	MCFG_PALETTE_LENGTH(512)
-	MCFG_PALETTE_INIT(cardline)
 
 	MCFG_DEFAULT_LAYOUT(layout_cardline)
 

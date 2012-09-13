@@ -43,14 +43,19 @@ public:
 	DECLARE_READ8_MEMBER(farwest_soundlatch_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(farwest_get_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_VIDEO_START(farwest);
 };
 
 
 /*----------- defined in video/ironhors.c -----------*/
 
 
-PALETTE_INIT( ironhors );
-VIDEO_START( ironhors );
+
+
 SCREEN_UPDATE_IND16( ironhors );
-VIDEO_START( farwest );
+
 SCREEN_UPDATE_IND16( farwest );

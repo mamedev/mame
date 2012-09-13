@@ -409,8 +409,6 @@ static MACHINE_CONFIG_START( mainsnk, mainsnk_state )
 	MCFG_GFXDECODE(mainsnk)
 	MCFG_PALETTE_LENGTH(0x400)
 
-	MCFG_PALETTE_INIT(mainsnk)
-	MCFG_VIDEO_START(mainsnk)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

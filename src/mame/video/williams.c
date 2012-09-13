@@ -130,37 +130,34 @@ static void state_save_register(running_machine &machine)
 }
 
 
-VIDEO_START( williams )
+VIDEO_START_MEMBER(williams_state,williams)
 {
-	williams_state *state = machine.driver_data<williams_state>();
-	blitter_init(machine, state->m_blitter_config, NULL);
-	create_palette_lookup(machine);
-	state_save_register(machine);
+	blitter_init(machine(), m_blitter_config, NULL);
+	create_palette_lookup(machine());
+	state_save_register(machine());
 }
 
 
-VIDEO_START( blaster )
+VIDEO_START_MEMBER(williams_state,blaster)
 {
-	williams_state *state = machine.driver_data<williams_state>();
-	blitter_init(machine, state->m_blitter_config, state->memregion("proms")->base());
-	create_palette_lookup(machine);
-	state_save_register(machine);
+	blitter_init(machine(), m_blitter_config, memregion("proms")->base());
+	create_palette_lookup(machine());
+	state_save_register(machine());
 }
 
 
-VIDEO_START( williams2 )
+VIDEO_START_MEMBER(williams_state,williams2)
 {
-	williams_state *state = machine.driver_data<williams_state>();
-	blitter_init(machine, state->m_blitter_config, NULL);
+	blitter_init(machine(), m_blitter_config, NULL);
 
 	/* allocate paletteram */
-	state->m_generic_paletteram_8.allocate(0x400 * 2);
+	m_generic_paletteram_8.allocate(0x400 * 2);
 
 	/* create the tilemap */
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(williams_state::get_tile_info),state), TILEMAP_SCAN_COLS,  24,16, 128,16);
-	state->m_bg_tilemap->set_scrolldx(2, 0);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(williams_state::get_tile_info),this), TILEMAP_SCAN_COLS,  24,16, 128,16);
+	m_bg_tilemap->set_scrolldx(2, 0);
 
-	state_save_register(machine);
+	state_save_register(machine());
 }
 
 

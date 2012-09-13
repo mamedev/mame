@@ -183,14 +183,16 @@ public:
 	TILE_GET_INFO_MEMBER(get_s16a_bootleg_tile_infotxt);
 	TILE_GET_INFO_MEMBER(get_s16a_bootleg_tile_info0);
 	TILE_GET_INFO_MEMBER(get_s16a_bootleg_tile_info1);
+	DECLARE_VIDEO_START(system16);
+	DECLARE_VIDEO_START(system18old);
+	DECLARE_VIDEO_START(s16a_bootleg_shinobi);
+	DECLARE_VIDEO_START(s16a_bootleg_passsht);
+	DECLARE_VIDEO_START(s16a_bootleg_wb3bl);
+	DECLARE_VIDEO_START(s16a_bootleg);
 };
 
 /*----------- defined in video/system16.c -----------*/
 
-extern VIDEO_START( s16a_bootleg );
-extern VIDEO_START( s16a_bootleg_wb3bl );
-extern VIDEO_START( s16a_bootleg_shinobi );
-extern VIDEO_START( s16a_bootleg_passsht );
 extern SCREEN_UPDATE_IND16( s16a_bootleg );
 extern SCREEN_UPDATE_IND16( s16a_bootleg_passht4b );
 

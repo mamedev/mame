@@ -10,22 +10,22 @@
 #include "includes/ddribble.h"
 
 
-PALETTE_INIT( ddribble )
+void ddribble_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x40);
+	machine().colortable = colortable_alloc(machine(), 0x40);
 
 	for (i = 0x10; i < 0x40; i++)
-		colortable_entry_set_value(machine.colortable, i, i);
+		colortable_entry_set_value(machine().colortable, i, i);
 
 	/* sprite #2 uses pens 0x00-0x0f */
 	for (i = 0x40; i < 0x140; i++)
 	{
 		UINT8 ctabentry = color_prom[i - 0x40] & 0x0f;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 
@@ -121,14 +121,13 @@ TILE_GET_INFO_MEMBER(ddribble_state::get_bg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( ddribble )
+void ddribble_state::video_start()
 {
-	ddribble_state *state = machine.driver_data<ddribble_state>();
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ddribble_state::get_fg_tile_info),state), tilemap_mapper_delegate(FUNC(ddribble_state::tilemap_scan),state), 8, 8, 64, 32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ddribble_state::get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(ddribble_state::tilemap_scan),state), 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ddribble_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(ddribble_state::tilemap_scan),this), 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ddribble_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(ddribble_state::tilemap_scan),this), 8, 8, 64, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 /***************************************************************************

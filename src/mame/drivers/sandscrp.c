@@ -108,6 +108,7 @@ public:
 	DECLARE_READ8_MEMBER(sandscrp_latchstatus_r);
 	DECLARE_READ8_MEMBER(sandscrp_soundlatch_r);
 	DECLARE_WRITE8_MEMBER(sandscrp_soundlatch_w);
+	virtual void machine_reset();
 };
 
 
@@ -137,9 +138,8 @@ SCREEN_UPDATE_IND16( sandscrp )
 
 
 
-static MACHINE_RESET( sandscrp )
+void sandscrp_state::machine_reset()
 {
-//  sandscrp_state *state = machine.driver_data<sandscrp_state>();
 }
 
 /* Sand Scorpion */
@@ -508,7 +508,6 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
 
-	MCFG_MACHINE_RESET(sandscrp)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

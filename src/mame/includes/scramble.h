@@ -51,6 +51,8 @@ public:
 	DECLARE_DRIVER_INIT(hustler);
 	DECLARE_DRIVER_INIT(hustlerd);
 	DECLARE_DRIVER_INIT(billiard);
+	DECLARE_MACHINE_RESET(scramble);
+	DECLARE_MACHINE_RESET(explorer);
 };
 
 
@@ -61,8 +63,8 @@ extern const i8255_interface(scramble_ppi_1_intf);
 extern const i8255_interface(stratgyx_ppi_1_intf);
 
 
-MACHINE_RESET( scramble );
-MACHINE_RESET( explorer );
+
+
 
 READ8_HANDLER( triplep_pip_r );
 READ8_HANDLER( triplep_pap_r );

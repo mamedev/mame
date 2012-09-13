@@ -59,11 +59,14 @@ public:
 	DECLARE_DRIVER_INIT(rebus);
 	TILE_GET_INFO_MEMBER(get_tile_info_splash_tilemap0);
 	TILE_GET_INFO_MEMBER(get_tile_info_splash_tilemap1);
+	virtual void video_start();
+	DECLARE_MACHINE_RESET(splash);
+	DECLARE_MACHINE_RESET(funystrp);
 };
 
 
 /*----------- defined in video/splash.c -----------*/
 
-VIDEO_START( splash );
+
 SCREEN_UPDATE_IND16( splash );
 SCREEN_UPDATE_IND16( funystrp );

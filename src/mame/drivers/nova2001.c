@@ -157,11 +157,10 @@ WRITE8_MEMBER(nova2001_state::ninjakun_cpu2_io_A002_w)
  *
  *************************************/
 
-static MACHINE_START( ninjakun )
+MACHINE_START_MEMBER(nova2001_state,ninjakun)
 {
-	nova2001_state *state = machine.driver_data<nova2001_state>();
 	/* Save State Stuff */
-	state_save_register_global(machine, state->m_ninjakun_io_a002_ctrl);
+	state_save_register_global(machine(), m_ninjakun_io_a002_ctrl);
 }
 
 
@@ -696,8 +695,8 @@ static MACHINE_CONFIG_START( nova2001, nova2001_state )
 	MCFG_GFXDECODE(nova2001)
 	MCFG_PALETTE_LENGTH(0x200)
 
-	MCFG_PALETTE_INIT(nova2001)
-	MCFG_VIDEO_START(nova2001)
+	MCFG_PALETTE_INIT_OVERRIDE(nova2001_state,nova2001)
+	MCFG_VIDEO_START_OVERRIDE(nova2001_state,nova2001)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -724,7 +723,7 @@ static MACHINE_CONFIG_START( ninjakun, nova2001_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame */
 
-	MCFG_MACHINE_START(ninjakun)
+	MCFG_MACHINE_START_OVERRIDE(nova2001_state,ninjakun)
 
     /* video hardware */
 
@@ -737,7 +736,7 @@ static MACHINE_CONFIG_START( ninjakun, nova2001_state )
 	MCFG_GFXDECODE(ninjakun)
 	MCFG_PALETTE_LENGTH(0x300)
 
-	MCFG_VIDEO_START(ninjakun)
+	MCFG_VIDEO_START_OVERRIDE(nova2001_state,ninjakun)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -769,8 +768,8 @@ static MACHINE_CONFIG_START( pkunwar, nova2001_state )
 	MCFG_GFXDECODE(pkunwar)
 	MCFG_PALETTE_LENGTH(0x200)
 
-	MCFG_PALETTE_INIT(nova2001)
-	MCFG_VIDEO_START(pkunwar)
+	MCFG_PALETTE_INIT_OVERRIDE(nova2001_state,nova2001)
+	MCFG_VIDEO_START_OVERRIDE(nova2001_state,pkunwar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -808,7 +807,7 @@ static MACHINE_CONFIG_START( raiders5, nova2001_state )
 	MCFG_GFXDECODE(raiders5)
 	MCFG_PALETTE_LENGTH(0x300)
 
-	MCFG_VIDEO_START(raiders5)
+	MCFG_VIDEO_START_OVERRIDE(nova2001_state,raiders5)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

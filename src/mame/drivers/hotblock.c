@@ -66,6 +66,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hotblock_port4_w);
 	DECLARE_WRITE8_MEMBER(hotblock_port0_w);
 	DECLARE_WRITE8_MEMBER(hotblock_video_write);
+	virtual void video_start();
 };
 
 
@@ -136,10 +137,9 @@ ADDRESS_MAP_END
 
 
 
-static VIDEO_START(hotblock)
+void hotblock_state::video_start()
 {
-	hotblock_state *state = machine.driver_data<hotblock_state>();
-	state->save_item(NAME(state->m_pal));
+	save_item(NAME(m_pal));
 }
 
 static SCREEN_UPDATE_IND16(hotblock)
@@ -229,7 +229,6 @@ static MACHINE_CONFIG_START( hotblock, hotblock_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(hotblock)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

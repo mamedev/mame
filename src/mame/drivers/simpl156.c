@@ -439,7 +439,6 @@ static MACHINE_CONFIG_START( chainrec, simpl156_state )
 
 	MCFG_PALETTE_LENGTH(4096)
 	MCFG_GFXDECODE(simpl156)
-	MCFG_VIDEO_START(simpl156)
 
 	MCFG_DECO16IC_ADD("tilegen1", simpl156_deco16ic_tilegen1_intf)
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)

@@ -369,11 +369,10 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static MACHINE_RESET( mlc )
+MACHINE_RESET_MEMBER(deco_mlc_state,mlc)
 {
-	deco_mlc_state *state = machine.driver_data<deco_mlc_state>();
-	state->m_vbl_i = 0xffffffff;
-	state->m_raster_irq_timer = machine.device<timer_device>("int_timer");
+	m_vbl_i = 0xffffffff;
+	m_raster_irq_timer = machine().device<timer_device>("int_timer");
 }
 
 static MACHINE_CONFIG_START( avengrgs, deco_mlc_state )
@@ -382,7 +381,7 @@ static MACHINE_CONFIG_START( avengrgs, deco_mlc_state )
 	MCFG_CPU_ADD("maincpu", SH2,42000000/2) /* 21 MHz clock confirmed on real board */
 	MCFG_CPU_PROGRAM_MAP(decomlc_map)
 
-	MCFG_MACHINE_RESET(mlc)
+	MCFG_MACHINE_RESET_OVERRIDE(deco_mlc_state,mlc)
 	MCFG_EEPROM_93C46_ADD("eeprom") /* Actually 93c45 */
 
 	MCFG_TIMER_ADD("int_timer", interrupt_gen)
@@ -398,7 +397,7 @@ static MACHINE_CONFIG_START( avengrgs, deco_mlc_state )
 	MCFG_GFXDECODE(deco_mlc)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(mlc)
+	MCFG_VIDEO_START_OVERRIDE(deco_mlc_state,mlc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -414,7 +413,7 @@ static MACHINE_CONFIG_START( mlc, deco_mlc_state )
 	MCFG_CPU_ADD("maincpu", ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
 	MCFG_CPU_PROGRAM_MAP(decomlc_map)
 
-	MCFG_MACHINE_RESET(mlc)
+	MCFG_MACHINE_RESET_OVERRIDE(deco_mlc_state,mlc)
 	MCFG_EEPROM_93C46_ADD("eeprom") /* Actually 93c45 */
 
 	MCFG_TIMER_ADD("int_timer", interrupt_gen)
@@ -430,7 +429,7 @@ static MACHINE_CONFIG_START( mlc, deco_mlc_state )
 	MCFG_GFXDECODE(deco_mlc)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(mlc)
+	MCFG_VIDEO_START_OVERRIDE(deco_mlc_state,mlc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

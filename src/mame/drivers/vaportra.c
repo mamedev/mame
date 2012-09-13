@@ -241,24 +241,22 @@ static const deco16ic_interface vaportra_deco16ic_tilegen2_intf =
 	2,3
 };
 
-static MACHINE_START( vaportra )
+void vaportra_state::machine_start()
 {
-	vaportra_state *state = machine.driver_data<vaportra_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_deco_tilegen1 = machine.device("tilegen1");
-	state->m_deco_tilegen2 = machine.device("tilegen2");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_deco_tilegen1 = machine().device("tilegen1");
+	m_deco_tilegen2 = machine().device("tilegen2");
 
-	state->save_item(NAME(state->m_priority));
+	save_item(NAME(m_priority));
 }
 
-static MACHINE_RESET( vaportra )
+void vaportra_state::machine_reset()
 {
-	vaportra_state *state = machine.driver_data<vaportra_state>();
 
-	state->m_priority[0] = 0;
-	state->m_priority[1] = 0;
+	m_priority[0] = 0;
+	m_priority[1] = 0;
 }
 
 static MACHINE_CONFIG_START( vaportra, vaportra_state )
@@ -271,8 +269,6 @@ static MACHINE_CONFIG_START( vaportra, vaportra_state )
 	MCFG_CPU_ADD("audiocpu", H6280, 32220000/4) /* Custom chip 45; Audio section crystal is 32.220 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(vaportra)
-	MCFG_MACHINE_RESET(vaportra)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")

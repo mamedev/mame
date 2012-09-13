@@ -53,17 +53,15 @@ WRITE8_MEMBER(hitme_state::hitme_vidram_w)
  *
  *************************************/
 
-static VIDEO_START( hitme )
+void hitme_state::video_start()
 {
-	hitme_state *state = machine.driver_data<hitme_state>();
-	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hitme_state::get_hitme_tile_info),state), TILEMAP_SCAN_ROWS, 8, 10, 40, 19);
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(hitme_state::get_hitme_tile_info),this), TILEMAP_SCAN_ROWS, 8, 10, 40, 19);
 }
 
 
-static VIDEO_START( barricad )
+VIDEO_START_MEMBER(hitme_state,barricad)
 {
-	hitme_state *state = machine.driver_data<hitme_state>();
-	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hitme_state::get_hitme_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 24);
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(hitme_state::get_hitme_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 24);
 }
 
 
@@ -304,15 +302,14 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( hitme )
+void hitme_state::machine_start()
 {
 }
 
-static MACHINE_RESET( hitme )
+void hitme_state::machine_reset()
 {
-	hitme_state *state = machine.driver_data<hitme_state>();
 
-	state->m_timeout_time = attotime::zero;
+	m_timeout_time = attotime::zero;
 }
 
 static MACHINE_CONFIG_START( hitme, hitme_state )
@@ -322,8 +319,6 @@ static MACHINE_CONFIG_START( hitme, hitme_state )
 	MCFG_CPU_PROGRAM_MAP(hitme_map)
 	MCFG_CPU_IO_MAP(hitme_portmap)
 
-	MCFG_MACHINE_START(hitme)
-	MCFG_MACHINE_RESET(hitme)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -337,7 +332,6 @@ static MACHINE_CONFIG_START( hitme, hitme_state )
 	MCFG_PALETTE_LENGTH(2)
 
 	MCFG_PALETTE_INIT(black_and_white)
-	MCFG_VIDEO_START(hitme)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -365,7 +359,7 @@ static MACHINE_CONFIG_DERIVED( barricad, hitme )
 
 	MCFG_GFXDECODE(barricad)
 
-	MCFG_VIDEO_START(barricad)
+	MCFG_VIDEO_START_OVERRIDE(hitme_state,barricad)
 MACHINE_CONFIG_END
 
 

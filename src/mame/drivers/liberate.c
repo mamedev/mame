@@ -790,33 +790,31 @@ static INTERRUPT_GEN( prosport_interrupt )
  *
  *************************************/
 
-static MACHINE_START( liberate )
+MACHINE_START_MEMBER(liberate_state,liberate)
 {
-	liberate_state *state = machine.driver_data<liberate_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_background_disable));
-	state->save_item(NAME(state->m_background_color));
-	state->save_item(NAME(state->m_gfx_rom_readback));
-	state->save_item(NAME(state->m_latch));
-	state->save_item(NAME(state->m_bank));
+	save_item(NAME(m_background_disable));
+	save_item(NAME(m_background_color));
+	save_item(NAME(m_gfx_rom_readback));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_bank));
 
-	state->save_item(NAME(state->m_io_ram));
+	save_item(NAME(m_io_ram));
 }
 
-static MACHINE_RESET( liberate )
+MACHINE_RESET_MEMBER(liberate_state,liberate)
 {
-	liberate_state *state = machine.driver_data<liberate_state>();
 
-	memset(state->m_io_ram, 0, ARRAY_LENGTH(state->m_io_ram));
+	memset(m_io_ram, 0, ARRAY_LENGTH(m_io_ram));
 
-	state->m_background_disable = 0;
-	state->m_background_color = 0;
-	state->m_gfx_rom_readback = 0;
-	state->m_latch = 0;
-	state->m_bank = 0;
+	m_background_disable = 0;
+	m_background_color = 0;
+	m_gfx_rom_readback = 0;
+	m_latch = 0;
+	m_bank = 0;
 }
 
 static MACHINE_CONFIG_START( liberate, liberate_state )
@@ -833,8 +831,8 @@ static MACHINE_CONFIG_START( liberate, liberate_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
-	MCFG_MACHINE_START(liberate)
-	MCFG_MACHINE_RESET(liberate)
+	MCFG_MACHINE_START_OVERRIDE(liberate_state,liberate)
+	MCFG_MACHINE_RESET_OVERRIDE(liberate_state,liberate)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -846,9 +844,9 @@ static MACHINE_CONFIG_START( liberate, liberate_state )
 
 	MCFG_GFXDECODE(liberate)
 	MCFG_PALETTE_LENGTH(33)
-	MCFG_PALETTE_INIT(liberate)
+	MCFG_PALETTE_INIT_OVERRIDE(liberate_state,liberate)
 
-	MCFG_VIDEO_START(liberate)
+	MCFG_VIDEO_START_OVERRIDE(liberate_state,liberate)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -870,7 +868,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( boomrang, liberate )
 
-	MCFG_VIDEO_START(boomrang)
+	MCFG_VIDEO_START_OVERRIDE(liberate_state,boomrang)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(boomrang)
 MACHINE_CONFIG_END
@@ -895,7 +893,7 @@ static MACHINE_CONFIG_DERIVED( prosoccr, liberate )
 
 	MCFG_GFXDECODE(prosoccr)
 
-	MCFG_VIDEO_START(prosoccr)
+	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosoccr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( prosport, liberate_state )
@@ -912,8 +910,8 @@ static MACHINE_CONFIG_START( prosport, liberate_state )
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
-	MCFG_MACHINE_START(liberate)
-	MCFG_MACHINE_RESET(liberate)
+	MCFG_MACHINE_START_OVERRIDE(liberate_state,liberate)
+	MCFG_MACHINE_RESET_OVERRIDE(liberate_state,liberate)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -926,7 +924,7 @@ static MACHINE_CONFIG_START( prosport, liberate_state )
 	MCFG_GFXDECODE(prosport)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(prosport)
+	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosport)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

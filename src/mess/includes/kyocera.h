@@ -113,6 +113,8 @@ public:
 	/* sound state */
 	int m_buzzer;				/* buzzer select */
 	int m_bell;				/* bell output */
+	
+	DECLARE_PALETTE_INIT(kc85);
 };
 
 class trsm100_state : public kc85_state

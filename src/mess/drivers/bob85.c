@@ -30,6 +30,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(sid_r);
 	UINT8 m_prev_key;
 	UINT8 m_count_key;
+	virtual void machine_reset();
 };
 
 
@@ -162,7 +163,7 @@ static INPUT_PORTS_START( bob85 )
 	PORT_BIT(0xC0, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static MACHINE_RESET(bob85)
+void bob85_state::machine_reset()
 {
 }
 
@@ -200,7 +201,6 @@ static MACHINE_CONFIG_START( bob85, bob85_state )
 	MCFG_CPU_IO_MAP(bob85_io)
 	MCFG_CPU_CONFIG(cpu_config)
 
-	MCFG_MACHINE_RESET(bob85)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_bob85)

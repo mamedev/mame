@@ -65,29 +65,28 @@ TILEMAP_MAPPER_MEMBER(atarigx2_state::atarigx2_playfield_scan)
  *
  *************************************/
 
-VIDEO_START( atarigx2 )
+VIDEO_START_MEMBER(atarigx2_state,atarigx2)
 {
-	atarigx2_state *state = machine.driver_data<atarigx2_state>();
 
 	/* blend the playfields and free the temporary one */
-	atarigen_blend_gfx(machine, 0, 2, 0x0f, 0x30);
+	atarigen_blend_gfx(machine(), 0, 2, 0x0f, 0x30);
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(atarigx2_state::get_playfield_tile_info),state), tilemap_mapper_delegate(FUNC(atarigx2_state::atarigx2_playfield_scan),state),  8,8, 128,64);
+	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atarigx2_state::get_playfield_tile_info),this), tilemap_mapper_delegate(FUNC(atarigx2_state::atarigx2_playfield_scan),this),  8,8, 128,64);
 
 	/* initialize the motion objects */
-	state->m_rle = machine.device("rle");
+	m_rle = machine().device("rle");
 
 	/* initialize the alphanumerics */
-	state->m_alpha_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(atarigx2_state::get_alpha_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 64,32);
-	state->m_alpha_tilemap->set_transparent_pen(0);
+	m_alpha_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atarigx2_state::get_alpha_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,32);
+	m_alpha_tilemap->set_transparent_pen(0);
 
 	/* save states */
-	state->save_item(NAME(state->m_current_control));
-	state->save_item(NAME(state->m_playfield_tile_bank));
-	state->save_item(NAME(state->m_playfield_color_bank));
-	state->save_item(NAME(state->m_playfield_xscroll));
-	state->save_item(NAME(state->m_playfield_yscroll));
+	save_item(NAME(m_current_control));
+	save_item(NAME(m_playfield_tile_bank));
+	save_item(NAME(m_playfield_color_bank));
+	save_item(NAME(m_playfield_xscroll));
+	save_item(NAME(m_playfield_yscroll));
 }
 
 

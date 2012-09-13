@@ -54,40 +54,37 @@ TILE_GET_INFO_MEMBER(flstory_state::get_rumba_tile_info)
 			0);
 }
 
-VIDEO_START( flstory )
+VIDEO_START_MEMBER(flstory_state,flstory)
 {
-	flstory_state *state = machine.driver_data<flstory_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(flstory_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-//  state->m_bg_tilemap->set_transparent_pen(15);
-	state->m_bg_tilemap->set_transmask(0, 0x3fff, 0xc000); /* split type 0 has pens 0-13 transparent in front half */
-	state->m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
-	state->m_bg_tilemap->set_scroll_cols(32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(flstory_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+//  m_bg_tilemap->set_transparent_pen(15);
+	m_bg_tilemap->set_transmask(0, 0x3fff, 0xc000); /* split type 0 has pens 0-13 transparent in front half */
+	m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
+	m_bg_tilemap->set_scroll_cols(32);
 
-	state->m_generic_paletteram_8.allocate(0x200);
-	state->m_generic_paletteram2_8.allocate(0x200);
+	m_generic_paletteram_8.allocate(0x200);
+	m_generic_paletteram2_8.allocate(0x200);
 }
 
-VIDEO_START( rumba )
+VIDEO_START_MEMBER(flstory_state,rumba)
 {
-	flstory_state *state = machine.driver_data<flstory_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(flstory_state::get_rumba_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-//  state->m_bg_tilemap->set_transparent_pen(15);
-	state->m_bg_tilemap->set_transmask(0, 0x3fff, 0xc000); /* split type 0 has pens 0-13 transparent in front half */
-	state->m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
-	state->m_bg_tilemap->set_scroll_cols(32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(flstory_state::get_rumba_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+//  m_bg_tilemap->set_transparent_pen(15);
+	m_bg_tilemap->set_transmask(0, 0x3fff, 0xc000); /* split type 0 has pens 0-13 transparent in front half */
+	m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
+	m_bg_tilemap->set_scroll_cols(32);
 
-	state->m_generic_paletteram_8.allocate(0x200);
-	state->m_generic_paletteram2_8.allocate(0x200);
+	m_generic_paletteram_8.allocate(0x200);
+	m_generic_paletteram2_8.allocate(0x200);
 }
 
-VIDEO_START( victnine )
+VIDEO_START_MEMBER(flstory_state,victnine)
 {
-	flstory_state *state = machine.driver_data<flstory_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(flstory_state::victnine_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg_tilemap->set_scroll_cols(32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(flstory_state::victnine_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap->set_scroll_cols(32);
 
-	state->m_generic_paletteram_8.allocate(0x200);
-	state->m_generic_paletteram2_8.allocate(0x200);
+	m_generic_paletteram_8.allocate(0x200);
+	m_generic_paletteram2_8.allocate(0x200);
 }
 
 WRITE8_MEMBER(flstory_state::flstory_videoram_w)

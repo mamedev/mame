@@ -101,6 +101,9 @@ public:
 	TILE_GET_INFO_MEMBER(VS920A_get_tile_info);
 	TILE_GET_INFO_MEMBER(MB60553_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(twc94_scan);
+	DECLARE_VIDEO_START(gstriker);
+	DECLARE_VIDEO_START(vgoalsoc);
+	DECLARE_VIDEO_START(twrldc94);
 };
 
 
@@ -108,7 +111,7 @@ public:
 
 
 SCREEN_UPDATE_IND16( gstriker );
-VIDEO_START( gstriker );
-VIDEO_START( twrldc94 );
-VIDEO_START( vgoalsoc );
+
+
+
 #endif

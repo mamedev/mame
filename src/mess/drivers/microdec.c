@@ -27,6 +27,7 @@ public:
 	UINT8 m_term_data;
 
 	required_device<generic_terminal_device> m_terminal;
+	virtual void machine_reset();
 };
 
 
@@ -62,10 +63,9 @@ static INPUT_PORTS_START( microdec )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(microdec)
+void microdec_state::machine_reset()
 {
-	microdec_state *state = machine.driver_data<microdec_state>();
-	state->m_term_data = 0;
+	m_term_data = 0;
 }
 
 WRITE8_MEMBER( microdec_state::kbd_put )
@@ -110,7 +110,6 @@ static MACHINE_CONFIG_START( microdec, microdec_state )
 	MCFG_CPU_PROGRAM_MAP(microdec_mem)
 	MCFG_CPU_IO_MAP(microdec_io)
 
-	MCFG_MACHINE_RESET(microdec)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)

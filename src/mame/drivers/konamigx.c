@@ -107,8 +107,8 @@
 
 #define GX_DEBUG     0
 
-static MACHINE_START(konamigx);
-static MACHINE_RESET(konamigx);
+
+
 
 static int konamigx_cfgport;
 
@@ -1773,8 +1773,8 @@ static MACHINE_CONFIG_START( konamigx, konamigx_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
-	MCFG_MACHINE_START(konamigx)
-	MCFG_MACHINE_RESET(konamigx)
+	MCFG_MACHINE_START_OVERRIDE(konamigx_state,konamigx)
+	MCFG_MACHINE_RESET_OVERRIDE(konamigx_state,konamigx)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -1793,7 +1793,7 @@ static MACHINE_CONFIG_START( konamigx, konamigx_state )
 
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(konamigx_5bpp)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state,konamigx_5bpp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1812,19 +1812,19 @@ static MACHINE_CONFIG_DERIVED( dragoonj, konamigx )
 	MCFG_CPU_CLOCK(26400000) // needs higher clock to stop sprite flickerings
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
-	MCFG_VIDEO_START(dragoonj)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state,dragoonj)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( le2, konamigx )
-	MCFG_VIDEO_START(le2)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state,le2)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( konamigx_6bpp, konamigx )
-	MCFG_VIDEO_START(konamigx_6bpp)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state,konamigx_6bpp)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( konamigx_6bpp_2, konamigx )
-	MCFG_VIDEO_START(konamigx_6bpp_2)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state,konamigx_6bpp_2)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( opengolf, konamigx )
@@ -1832,7 +1832,7 @@ static MACHINE_CONFIG_DERIVED( opengolf, konamigx )
 	MCFG_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
 	MCFG_GFXDECODE(opengolf)
-	MCFG_VIDEO_START(opengolf)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state,opengolf)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gx_type1_map)
@@ -1845,7 +1845,7 @@ static MACHINE_CONFIG_DERIVED( racinfrc, konamigx )
 	MCFG_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
 	MCFG_SCREEN_VISIBLE_AREA(32, 32+384-1, 16, 16+224-1)
 	MCFG_GFXDECODE(racinfrc)
-	MCFG_VIDEO_START(racinfrc)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state,racinfrc)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gx_type1_map)
@@ -1864,7 +1864,7 @@ static MACHINE_CONFIG_DERIVED( gxtype3, konamigx )
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)
 
-	MCFG_VIDEO_START(konamigx_type3)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state,konamigx_type3)
 	MCFG_PALETTE_LENGTH(16384)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(576, 264)
@@ -1904,7 +1904,7 @@ static MACHINE_CONFIG_DERIVED( gxtype4, konamigx )
 
 	MCFG_PALETTE_LENGTH(8192)
 	MCFG_GFXDECODE(type4)
-	MCFG_VIDEO_START(konamigx_type4)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state,konamigx_type4)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gxtype4_vsn, gxtype4 )
@@ -1919,12 +1919,12 @@ static MACHINE_CONFIG_DERIVED( gxtype4_vsn, gxtype4 )
 	MCFG_SCREEN_SIZE(128*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
 
-	MCFG_VIDEO_START(konamigx_type4_vsn)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state,konamigx_type4_vsn)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gxtype4sd2, gxtype4 )
 
-	MCFG_VIDEO_START(konamigx_type4_sd2)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state,konamigx_type4_sd2)
 MACHINE_CONFIG_END
 
 
@@ -1933,7 +1933,7 @@ static MACHINE_CONFIG_DERIVED( winspike, konamigx )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(38, 38+384-1, 16, 16+224-1)
-	MCFG_VIDEO_START(winspike)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state,winspike)
 MACHINE_CONFIG_END
 
 
@@ -3613,16 +3613,16 @@ ROM_END
 /**********************************************************************************/
 /* initializers */
 
-static MACHINE_START( konamigx )
+MACHINE_START_MEMBER(konamigx_state,konamigx)
 {
-	state_save_register_global(machine, konamigx_wrport1_1);
-	state_save_register_global_array(machine, sndto020);
-	state_save_register_global_array(machine, sndto000);
+	state_save_register_global(machine(), konamigx_wrport1_1);
+	state_save_register_global_array(machine(), sndto020);
+	state_save_register_global_array(machine(), sndto000);
 }
 
-static MACHINE_RESET(konamigx)
+MACHINE_RESET_MEMBER(konamigx_state,konamigx)
 {
-	k054539_device *k054539_2 = machine.device<k054539_device>("konami2");
+	k054539_device *k054539_2 = machine().device<k054539_device>("konami2");
 	int i;
 
 	konamigx_wrport1_0 = konamigx_wrport1_1 = 0;
@@ -3641,15 +3641,15 @@ static MACHINE_RESET(konamigx)
 	memset(sndto020, 0, 16);
 
 	// sound CPU initially disabled?
-	machine.device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	machine.device("dasp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	machine().device("dasp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	if (!strcmp(machine.system().name, "tkmmpzdm"))
+	if (!strcmp(machine().system().name, "tkmmpzdm"))
 	{
 		// boost voice(chip 1 channel 3-7)
 		for (i=3; i<=7; i++) k054539_2->set_gain(i, 2.0);
 	}
-	else if ((!strcmp(machine.system().name, "dragoonj")) || (!strcmp(machine.system().name, "dragoona")))
+	else if ((!strcmp(machine().system().name, "dragoonj")) || (!strcmp(machine().system().name, "dragoona")))
 	{
 		// soften percussions(chip 1 channel 0-3), boost voice(chip 1 channel 4-7)
 		for (i=0; i<=3; i++)

@@ -82,6 +82,10 @@ public:
 	DECLARE_WRITE8_MEMBER(smc777_irq_mask_w);
 	DECLARE_READ8_MEMBER(smc777_io_r);
 	DECLARE_WRITE8_MEMBER(smc777_io_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -89,7 +93,7 @@ public:
 #define CRTC_MIN_X 10
 #define CRTC_MIN_Y 10
 
-static VIDEO_START( smc777 )
+void smc777_state::video_start()
 {
 }
 
@@ -951,22 +955,20 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 	}
 }
 
-static MACHINE_START(smc777)
+void smc777_state::machine_start()
 {
-	//smc777_state *state = machine.driver_data<smc777_state>();
 
 
-	beep_set_frequency(machine.device(BEEPER_TAG),300); //guesswork
-	beep_set_state(machine.device(BEEPER_TAG),0);
+	beep_set_frequency(machine().device(BEEPER_TAG),300); //guesswork
+	beep_set_state(machine().device(BEEPER_TAG),0);
 }
 
-static MACHINE_RESET(smc777)
+void smc777_state::machine_reset()
 {
-	smc777_state *state = machine.driver_data<smc777_state>();
 
-	state->m_raminh = 1;
-	state->m_raminh_pending_change = 1;
-	state->m_raminh_prefetch = 0xff;
+	m_raminh = 1;
+	m_raminh_pending_change = 1;
+	m_raminh_prefetch = 0xff;
 }
 
 static const gfx_layout smc777_charlayout =
@@ -998,7 +1000,7 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
-static PALETTE_INIT( smc777 )
+void smc777_state::palette_init()
 {
 	int i;
 
@@ -1010,7 +1012,7 @@ static PALETTE_INIT( smc777 )
 		g = (i & 2) >> 1;
 		b = (i & 1) >> 0;
 
-		palette_set_color_rgb(machine, i, pal1bit(r),pal1bit(g),pal1bit(b));
+		palette_set_color_rgb(machine(), i, pal1bit(r),pal1bit(g),pal1bit(b));
 	}
 }
 
@@ -1079,8 +1081,6 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
     MCFG_CPU_IO_MAP(smc777_io)
 	MCFG_CPU_VBLANK_INT("screen",smc777_vblank_irq)
 
-    MCFG_MACHINE_START(smc777)
-    MCFG_MACHINE_RESET(smc777)
 
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)
@@ -1091,12 +1091,10 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
     MCFG_SCREEN_UPDATE_STATIC(smc777)
 
     MCFG_PALETTE_LENGTH(0x10+8) //16 palette entries + 8 special colors
-    MCFG_PALETTE_INIT(smc777)
 	MCFG_GFXDECODE(smc777)
 
 	MCFG_MC6845_ADD("crtc", H46505, MASTER_CLOCK/2, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 
-    MCFG_VIDEO_START(smc777)
 
 	MCFG_MB8876_ADD("fdc",smc777_mb8876_interface)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(smc777_floppy_interface)

@@ -11,7 +11,7 @@
 #include "includes/mikro80.h"
 
 
-VIDEO_START( mikro80 )
+void mikro80_state::video_start()
 {
 }
 

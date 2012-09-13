@@ -437,8 +437,6 @@ static MACHINE_CONFIG_START( pacland, pacland_state )
 	MCFG_GFXDECODE(pacland)
 	MCFG_PALETTE_LENGTH(256*4+256*4+64*16)
 
-	MCFG_PALETTE_INIT(pacland)
-	MCFG_VIDEO_START(pacland)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -4,10 +4,10 @@
 #include "video/decocomn.h"
 #include "video/decospr.h"
 
-VIDEO_START( boogwing )
+void boogwing_state::video_start()
 {
-	machine.device<decospr_device>("spritegen1")->alloc_sprite_bitmap();
-	machine.device<decospr_device>("spritegen2")->alloc_sprite_bitmap();
+	machine().device<decospr_device>("spritegen1")->alloc_sprite_bitmap();
+	machine().device<decospr_device>("spritegen2")->alloc_sprite_bitmap();
 }
 
 

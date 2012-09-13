@@ -39,6 +39,9 @@ public:
 	DECLARE_WRITE16_MEMBER(twocrude_palette_24bit_rg_w);
 	DECLARE_WRITE16_MEMBER(twocrude_palette_24bit_b_w);
 	DECLARE_DRIVER_INIT(twocrude);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -46,5 +49,5 @@ public:
 /*----------- defined in video/cbuster.c -----------*/
 
 
-VIDEO_START( twocrude );
+
 SCREEN_UPDATE_RGB32( twocrude );

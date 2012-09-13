@@ -272,6 +272,7 @@ public:
 	DECLARE_READ16_MEMBER(twinkle_ide_r);
 	DECLARE_WRITE16_MEMBER(twinkle_ide_w);
 	DECLARE_DRIVER_INIT(twinkle);
+	DECLARE_MACHINE_RESET(twinkle);
 };
 
 /* RTC */
@@ -870,13 +871,13 @@ DRIVER_INIT_MEMBER(twinkle_state,twinkle)
 	i2cmem_wc_write( i2cmem, 0 );
 }
 
-static MACHINE_RESET( twinkle )
+MACHINE_RESET_MEMBER(twinkle_state,twinkle)
 {
 	/* also hook up CDDA audio to the CD-ROM drive */
 	void *cdrom;
-	scsidev_device *scsidev = machine.device<scsidev_device>("scsi:cdrom");
+	scsidev_device *scsidev = machine().device<scsidev_device>("scsi:cdrom");
 	scsidev->GetDevice( &cdrom );
-	cdda_set_cdrom(machine.device("cdda"), cdrom);
+	cdda_set_cdrom(machine().device("cdda"), cdrom);
 }
 
 static void spu_irq(device_t *device, UINT32 data)
@@ -917,7 +918,7 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200)) /* check TD pin on LTC1232 */
 
-	MCFG_MACHINE_RESET( twinkle )
+	MCFG_MACHINE_RESET_OVERRIDE(twinkle_state, twinkle )
 	MCFG_I2CMEM_ADD("security",i2cmem_interface)
 
 	MCFG_SCSIBUS_ADD("scsi")

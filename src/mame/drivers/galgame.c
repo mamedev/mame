@@ -45,6 +45,8 @@ public:
 	DECLARE_WRITE16_MEMBER(y_w);
 	DECLARE_WRITE16_MEMBER(clk_w);
 	DECLARE_DRIVER_INIT(galaxygame);
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 /*************************************
@@ -287,10 +289,10 @@ static ADDRESS_MAP_START( galaxygame_map, AS_PROGRAM, 16, galaxygame_state )
 ADDRESS_MAP_END
 
 
-static PALETTE_INIT( galaxygame )
+void galaxygame_state::palette_init()
 {
-	palette_set_color(machine,0,RGB_BLACK); /* black */
-	palette_set_color(machine,1,RGB_WHITE); /* white */
+	palette_set_color(machine(),0,RGB_BLACK); /* black */
+	palette_set_color(machine(),1,RGB_WHITE); /* white */
 }
 
 static IRQ_CALLBACK(galaxygame_irq_callback)
@@ -309,15 +311,14 @@ static INTERRUPT_GEN(galaxygame_irq)
 	}
 }
 
-static MACHINE_RESET( galaxygame )
+void galaxygame_state::machine_reset()
 {
-	galaxygame_state *state = machine.driver_data<galaxygame_state>();
-	state->m_clk = 0x00;
-	state->m_point_work_list_index = 0;
-	state->m_point_display_list_index = 0;
-	state->m_interrupt = 0;
+	m_clk = 0x00;
+	m_point_work_list_index = 0;
+	m_point_display_list_index = 0;
+	m_interrupt = 0;
 
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(galaxygame_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(galaxygame_irq_callback);
 }
 
 static const struct t11_setup t11_data =
@@ -341,9 +342,7 @@ static MACHINE_CONFIG_START( galaxygame, galaxygame_state )
 	MCFG_SCREEN_UPDATE_STATIC(galaxygame)
 
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(galaxygame)
 
-	MCFG_MACHINE_RESET(galaxygame)
 MACHINE_CONFIG_END
 
 ROM_START(galgame)

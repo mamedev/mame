@@ -44,6 +44,8 @@ public:
 	DECLARE_WRITE8_MEMBER(speech_msg_w);
 	DECLARE_READ8_MEMBER(k052109_051960_r);
 	DECLARE_WRITE8_MEMBER(k052109_051960_w);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 

@@ -41,6 +41,8 @@ public:
 	UINT8 m_keyboard_input;
 	optional_device<via6522_device> m_via_0;
 	required_shared_ptr<UINT8> m_p_videoram;
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 static ADDRESS_MAP_START(ec65_mem, AS_PROGRAM, 8, ec65_state)
@@ -171,14 +173,13 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 	DEVCB_DRIVER_MEMBER(ec65_state, kbd_put)
 };
 
-static MACHINE_RESET(ec65)
+void ec65_state::machine_reset()
 {
 }
 
-static VIDEO_START( ec65 )
+void ec65_state::video_start()
 {
-	ec65_state *state = machine.driver_data<ec65_state>();
-	state->m_p_chargen = state->memregion("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 static MC6845_UPDATE_ROW( ec65_update_row )
@@ -249,7 +250,6 @@ static MACHINE_CONFIG_START( ec65, ec65_state )
 	MCFG_CPU_ADD("maincpu",M6502, XTAL_4MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(ec65_mem)
 
-	MCFG_MACHINE_RESET(ec65)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -265,7 +265,6 @@ static MACHINE_CONFIG_START( ec65, ec65_state )
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz / 8, ec65_crtc6845_interface)
 
-	MCFG_VIDEO_START(ec65)
 
 	/* devices */
 	MCFG_PIA6821_ADD( PIA6821_TAG, ec65_pia_interface )
@@ -282,7 +281,6 @@ static MACHINE_CONFIG_START( ec65k, ec65_state )
 	MCFG_CPU_ADD("maincpu",G65816, XTAL_4MHz) // can use 4,2 or 1 MHz
 	MCFG_CPU_PROGRAM_MAP(ec65k_mem)
 
-	MCFG_MACHINE_RESET(ec65)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -298,7 +296,6 @@ static MACHINE_CONFIG_START( ec65k, ec65_state )
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz / 8, ec65_crtc6845_interface)
 
-	MCFG_VIDEO_START(ec65)
 MACHINE_CONFIG_END
 
 /* ROM definition */

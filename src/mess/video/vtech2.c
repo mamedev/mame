@@ -40,7 +40,7 @@
  *      1 1 1 1 GR1 bank 3 0E000-0FFFF
  */
 
-VIDEO_START( laser )
+void vtech2_state::video_start()
 {
 }
 

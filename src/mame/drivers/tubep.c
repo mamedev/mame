@@ -335,20 +335,18 @@ static void tubep_setup_save_state(running_machine &machine)
 
 
 
-static MACHINE_START( tubep )
+MACHINE_START_MEMBER(tubep_state,tubep)
 {
-	tubep_state *state = machine.driver_data<tubep_state>();
 	/* Create interrupt timer */
-	state->m_interrupt_timer = machine.scheduler().timer_alloc(FUNC(tubep_scanline_callback));
+	m_interrupt_timer = machine().scheduler().timer_alloc(FUNC(tubep_scanline_callback));
 
-	tubep_setup_save_state(machine);
+	tubep_setup_save_state(machine());
 }
 
 
-static MACHINE_RESET( tubep )
+MACHINE_RESET_MEMBER(tubep_state,tubep)
 {
-	tubep_state *state = machine.driver_data<tubep_state>();
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(0));
+	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(0));
 }
 
 
@@ -501,19 +499,17 @@ static TIMER_CALLBACK( rjammer_scanline_callback )
 }
 
 
-static MACHINE_START( rjammer )
+MACHINE_START_MEMBER(tubep_state,rjammer)
 {
-	tubep_state *state = machine.driver_data<tubep_state>();
 	/* Create interrupt timer */
-	state->m_interrupt_timer = machine.scheduler().timer_alloc(FUNC(rjammer_scanline_callback));
+	m_interrupt_timer = machine().scheduler().timer_alloc(FUNC(rjammer_scanline_callback));
 
-	tubep_setup_save_state(machine);
+	tubep_setup_save_state(machine());
 }
 
-static MACHINE_RESET( rjammer )
+MACHINE_RESET_MEMBER(tubep_state,rjammer)
 {
-	tubep_state *state = machine.driver_data<tubep_state>();
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(0));
+	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(0));
 }
 
 
@@ -909,8 +905,8 @@ static MACHINE_CONFIG_START( tubep, tubep_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(tubep)
-	MCFG_MACHINE_RESET(tubep)
+	MCFG_MACHINE_START_OVERRIDE(tubep_state,tubep)
+	MCFG_MACHINE_RESET_OVERRIDE(tubep_state,tubep)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -921,9 +917,9 @@ static MACHINE_CONFIG_START( tubep, tubep_state )
 
 	MCFG_PALETTE_LENGTH(32 + 256*64)
 
-	MCFG_PALETTE_INIT(tubep)
-	MCFG_VIDEO_START(tubep)
-	MCFG_VIDEO_RESET(tubep)
+	MCFG_PALETTE_INIT_OVERRIDE(tubep_state,tubep)
+	MCFG_VIDEO_START_OVERRIDE(tubep_state,tubep)
+	MCFG_VIDEO_RESET_OVERRIDE(tubep_state,tubep)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -968,8 +964,8 @@ static MACHINE_CONFIG_START( rjammer, tubep_state )
 	MCFG_CPU_ADD("mcu",NSC8105,6000000)	/* 6 MHz Xtal - divided internally ??? */
 	MCFG_CPU_PROGRAM_MAP(nsc_map)
 
-	MCFG_MACHINE_START(rjammer)
-	MCFG_MACHINE_RESET(rjammer)
+	MCFG_MACHINE_START_OVERRIDE(tubep_state,rjammer)
+	MCFG_MACHINE_RESET_OVERRIDE(tubep_state,rjammer)
 
 
 	/* video hardware */
@@ -981,9 +977,9 @@ static MACHINE_CONFIG_START( rjammer, tubep_state )
 
 	MCFG_PALETTE_LENGTH(64)
 
-	MCFG_PALETTE_INIT(rjammer)
-	MCFG_VIDEO_START(tubep)
-	MCFG_VIDEO_RESET(tubep)
+	MCFG_PALETTE_INIT_OVERRIDE(tubep_state,rjammer)
+	MCFG_VIDEO_START_OVERRIDE(tubep_state,tubep)
+	MCFG_VIDEO_RESET_OVERRIDE(tubep_state,tubep)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

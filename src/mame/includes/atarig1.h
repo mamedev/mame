@@ -46,13 +46,16 @@ public:
 	DECLARE_DRIVER_INIT(pitfightb);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	DECLARE_MACHINE_START(atarig1);
+	DECLARE_MACHINE_RESET(atarig1);
+	DECLARE_VIDEO_START(atarig1);
 };
 
 
 /*----------- defined in video/atarig1.c -----------*/
 
 
-VIDEO_START( atarig1 );
+
 SCREEN_VBLANK( atarig1 );
 SCREEN_UPDATE_IND16( atarig1 );
 

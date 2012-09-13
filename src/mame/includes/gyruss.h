@@ -50,11 +50,14 @@ public:
 	DECLARE_WRITE8_MEMBER(gyruss_filter1_w);
 	DECLARE_DRIVER_INIT(gyruss);
 	TILE_GET_INFO_MEMBER(gyruss_get_tile_info);
+	virtual void machine_start();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/gyruss.c -----------*/
 
-PALETTE_INIT( gyruss );
-VIDEO_START( gyruss );
+
+
 SCREEN_UPDATE_IND16( gyruss );

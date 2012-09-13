@@ -3,13 +3,13 @@
 #include "includes/fastlane.h"
 
 
-PALETTE_INIT( fastlane )
+void fastlane_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int pal;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x400);
+	machine().colortable = colortable_alloc(machine(), 0x400);
 
 	for (pal = 0; pal < 0x10; pal++)
 	{
@@ -18,7 +18,7 @@ PALETTE_INIT( fastlane )
 		for (i = 0; i < 0x400; i++)
 		{
 			UINT8 ctabentry = (i & 0x3f0) | color_prom[(pal << 4) | (i & 0x0f)];
-			colortable_entry_set_value(machine.colortable, (pal << 10) | i, ctabentry);
+			colortable_entry_set_value(machine().colortable, (pal << 10) | i, ctabentry);
 		}
 	}
 }
@@ -109,21 +109,20 @@ TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info1)
 
 ***************************************************************************/
 
-VIDEO_START( fastlane )
+void fastlane_state::video_start()
 {
-	fastlane_state *state = machine.driver_data<fastlane_state>();
 
-	state->m_layer0 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fastlane_state::get_tile_info0),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_layer1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fastlane_state::get_tile_info1),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_layer0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fastlane_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_layer1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fastlane_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_layer0->set_scroll_rows(32);
+	m_layer0->set_scroll_rows(32);
 
-	state->m_clip0 = machine.primary_screen->visible_area();
-	state->m_clip0.min_x += 40;
+	m_clip0 = machine().primary_screen->visible_area();
+	m_clip0.min_x += 40;
 
-	state->m_clip1 = machine.primary_screen->visible_area();
-	state->m_clip1.max_x = 39;
-	state->m_clip1.min_x = 0;
+	m_clip1 = machine().primary_screen->visible_area();
+	m_clip1.max_x = 39;
+	m_clip1.min_x = 0;
 }
 
 /***************************************************************************

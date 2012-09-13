@@ -63,6 +63,11 @@ public:
 	TILE_GET_INFO_MEMBER(zaxxon_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(razmataz_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(congo_get_fg_tile_info);
+	virtual void machine_start();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_VIDEO_START(razmataz);
+	DECLARE_VIDEO_START(congo);
 };
 
 
@@ -84,11 +89,11 @@ MACHINE_CONFIG_EXTERN( congo_samples );
 
 
 
-PALETTE_INIT( zaxxon );
 
-VIDEO_START( zaxxon );
-VIDEO_START( razmataz );
-VIDEO_START( congo );
+
+
+
+
 
 SCREEN_UPDATE_IND16( zaxxon );
 SCREEN_UPDATE_IND16( razmataz );

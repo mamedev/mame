@@ -453,18 +453,16 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( timeplt )
+void timeplt_state::machine_start()
 {
-	timeplt_state *state = machine.driver_data<timeplt_state>();
 
-	state->save_item(NAME(state->m_nmi_enable));
+	save_item(NAME(m_nmi_enable));
 }
 
-static MACHINE_RESET( timeplt )
+void timeplt_state::machine_reset()
 {
-	timeplt_state *state = machine.driver_data<timeplt_state>();
 
-	state->m_nmi_enable = 0;
+	m_nmi_enable = 0;
 }
 
 static MACHINE_CONFIG_START( timeplt, timeplt_state )
@@ -474,8 +472,6 @@ static MACHINE_CONFIG_START( timeplt, timeplt_state )
 	MCFG_CPU_PROGRAM_MAP(timeplt_main_map)
 	MCFG_CPU_VBLANK_INT("screen", timeplt_interrupt)
 
-	MCFG_MACHINE_START(timeplt)
-	MCFG_MACHINE_RESET(timeplt)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
@@ -489,8 +485,6 @@ static MACHINE_CONFIG_START( timeplt, timeplt_state )
 	MCFG_GFXDECODE(timeplt)
 	MCFG_PALETTE_LENGTH(32*4+64*4)
 
-	MCFG_PALETTE_INIT(timeplt)
-	MCFG_VIDEO_START(timeplt)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(timeplt_sound)
@@ -513,7 +507,7 @@ static MACHINE_CONFIG_DERIVED( bikkuric, timeplt )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(chkun_main_map)
 
-	MCFG_VIDEO_START(chkun)
+	MCFG_VIDEO_START_OVERRIDE(timeplt_state,chkun)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( chkun, bikkuric )

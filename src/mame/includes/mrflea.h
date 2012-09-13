@@ -42,6 +42,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mrflea_gfx_bank_w);
 	DECLARE_WRITE8_MEMBER(mrflea_videoram_w);
 	DECLARE_WRITE8_MEMBER(mrflea_spriteram_w);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 

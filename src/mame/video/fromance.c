@@ -89,43 +89,39 @@ static void init_common( running_machine &machine )
 	state->save_pointer(NAME(state->m_local_paletteram), 0x800 * 2);
 }
 
-VIDEO_START( fromance )
+VIDEO_START_MEMBER(fromance_state,fromance)
 {
-	fromance_state *state = machine.driver_data<fromance_state>();
 
 	/* allocate tilemaps */
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_fromance_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_fromance_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_fromance_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_fromance_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
 
-	init_common(machine);
+	init_common(machine());
 }
 
-VIDEO_START( nekkyoku )
+VIDEO_START_MEMBER(fromance_state,nekkyoku)
 {
-	fromance_state *state = machine.driver_data<fromance_state>();
 
 	/* allocate tilemaps */
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_nekkyoku_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_nekkyoku_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_nekkyoku_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_nekkyoku_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
 
-	init_common(machine);
+	init_common(machine());
 }
 
-VIDEO_START( pipedrm )
+VIDEO_START_MEMBER(fromance_state,pipedrm)
 {
-	fromance_state *state = machine.driver_data<fromance_state>();
 
-	VIDEO_START_CALL(fromance);
-	state->m_scrolly_ofs = 0x00;
+	VIDEO_START_CALL_MEMBER(fromance);
+	m_scrolly_ofs = 0x00;
 }
 
-VIDEO_START( hatris )
+VIDEO_START_MEMBER(fromance_state,hatris)
 {
-	fromance_state *state = machine.driver_data<fromance_state>();
 
-	VIDEO_START_CALL(fromance);
-	state->m_scrollx_ofs = 0xB9;
-	state->m_scrolly_ofs = 0x00;
+	VIDEO_START_CALL_MEMBER(fromance);
+	m_scrollx_ofs = 0xB9;
+	m_scrolly_ofs = 0x00;
 }
 
 /*************************************

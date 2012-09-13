@@ -122,7 +122,6 @@ static MACHINE_CONFIG_START( concept, concept_state )
 	MCFG_CPU_VBLANK_INT("screen", concept_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_MACHINE_START(concept)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -136,7 +135,6 @@ static MACHINE_CONFIG_START( concept, concept_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START(concept)
 
 	/* no sound? */
 

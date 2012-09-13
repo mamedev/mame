@@ -67,6 +67,9 @@ public:
 	DECLARE_READ8_MEMBER(drw80pkr_io_r);
 	DECLARE_DRIVER_INIT(drw80pkr);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_start();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -74,10 +77,9 @@ public:
 #define DATA_NVRAM_SIZE     0x100
 
 
-static MACHINE_START( drw80pkr )
+void drw80pkr_state::machine_start()
 {
-	drw80pkr_state *state = machine.driver_data<drw80pkr_state>();
-	machine.device<nvram_device>("nvram")->set_base(state->m_pkr_io_ram, sizeof(state->m_pkr_io_ram));
+	machine().device<nvram_device>("nvram")->set_base(m_pkr_io_ram, sizeof(m_pkr_io_ram));
 }
 
 /*****************
@@ -332,10 +334,9 @@ TILE_GET_INFO_MEMBER(drw80pkr_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static VIDEO_START( drw80pkr )
+void drw80pkr_state::video_start()
 {
-	drw80pkr_state *state = machine.driver_data<drw80pkr_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(drw80pkr_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 24, 27);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(drw80pkr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 24, 27);
 }
 
 static SCREEN_UPDATE_IND16( drw80pkr )
@@ -346,12 +347,12 @@ static SCREEN_UPDATE_IND16( drw80pkr )
 	return 0;
 }
 
-static PALETTE_INIT( drw80pkr )
+void drw80pkr_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int j;
 
-	for (j = 0; j < machine.total_colors(); j++)
+	for (j = 0; j < machine().total_colors(); j++)
 	{
 		int r, g, b, tr, tg, tb, i;
 
@@ -370,7 +371,7 @@ static PALETTE_INIT( drw80pkr )
 		tb = 0xf0 - (0xf0 * ((color_prom[j] >> 2) & 0x01));
 		b = tb - (i * (tb / 5));
 
-		palette_set_color(machine, j, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), j, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -468,7 +469,6 @@ static MACHINE_CONFIG_START( drw80pkr, drw80pkr_state )
     MCFG_CPU_IO_MAP(drw80pkr_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(drw80pkr)
 
 	// video hardware
 
@@ -482,8 +482,6 @@ static MACHINE_CONFIG_START( drw80pkr, drw80pkr_state )
 	MCFG_GFXDECODE(drw80pkr)
 	MCFG_PALETTE_LENGTH(16*16)
 
-	MCFG_PALETTE_INIT(drw80pkr)
-	MCFG_VIDEO_START(drw80pkr)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

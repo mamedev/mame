@@ -71,13 +71,12 @@ void amiga_aga_palette_write(running_machine &machine, int color_reg, UINT16 dat
  *
  *************************************/
 
-VIDEO_START( amiga_aga )
+VIDEO_START_MEMBER(amiga_state,amiga_aga)
 {
-	amiga_state *state = machine.driver_data<amiga_state>();
 
-	VIDEO_START_CALL( amiga );
+	VIDEO_START_CALL_MEMBER( amiga );
 
-	state->m_aga_diwhigh_written = 0;
+	m_aga_diwhigh_written = 0;
 }
 
 

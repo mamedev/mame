@@ -144,6 +144,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 	DECLARE_DRIVER_INIT(aces1);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -174,16 +176,15 @@ static void aces1_create_timers(running_machine &machine)
 	state->m_aces1_nmi_timer = machine.scheduler().timer_alloc(FUNC(m_aces1_nmi_timer_callback), 0);
 }
 
-static MACHINE_START( aces1 )
+void aces1_state::machine_start()
 {
-	aces1_create_timers(machine);
+	aces1_create_timers(machine());
 }
 
-static MACHINE_RESET( aces1 )
+void aces1_state::machine_reset()
 {
-	aces1_state *state = machine.driver_data<aces1_state>();
-	state->aces1_reset_nmi_timer();
-	state->aces1_reset_irq_timer();
+	aces1_reset_nmi_timer();
+	aces1_reset_irq_timer();
 }
 
 static ADDRESS_MAP_START( aces1_map, AS_PROGRAM, 8, aces1_state )
@@ -315,8 +316,6 @@ static MACHINE_CONFIG_START( aces1, aces1_state )
 	MCFG_I8255A_ADD( "ppi8255_ic25", ppi8255_ic25_intf )
 	MCFG_I8255A_ADD( "ppi8255_ic37", ppi8255_ic37_intf )
 
-	MCFG_MACHINE_START( aces1 )
-	MCFG_MACHINE_RESET( aces1 )
 	MCFG_DEFAULT_LAYOUT(layout_aces1)
 
 	/* sound hardware */

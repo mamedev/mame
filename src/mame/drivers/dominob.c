@@ -84,11 +84,12 @@ public:
 	//UINT8 m_paddle_value;
 	DECLARE_WRITE8_MEMBER(dominob_d008_w);
 	DECLARE_READ8_MEMBER(dominob_unk_port02_r);
+	virtual void video_start();
 };
 
-static VIDEO_START( dominob )
+void dominob_state::video_start()
 {
-	machine.gfx[0]->set_granularity(8);
+	machine().gfx[0]->set_granularity(8);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -311,7 +312,6 @@ static MACHINE_CONFIG_START( dominob, dominob_state )
 	MCFG_GFXDECODE(dominob)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(dominob)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

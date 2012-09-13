@@ -182,71 +182,71 @@ static void cybiko_ramdisk_save(running_machine &machine, emu_file *file)
 #endif
 }
 
-MACHINE_START( cybikov1 )
+void cybiko_state::machine_start()
 {
 	_logerror( 0, ("machine_start_cybikov1\n"));
 	// real-time clock
-	nvram_system_load( machine, "rtc", cybiko_pcf8593_load, 0);
+	nvram_system_load( machine(), "rtc", cybiko_pcf8593_load, 0);
 	// serial dataflash
-	nvram_system_load( machine, "flash1", cybiko_at45dbxx_load, 1);
+	nvram_system_load( machine(), "flash1", cybiko_at45dbxx_load, 1);
 	// serial port
-	cybiko_rs232_init(machine);
+	cybiko_rs232_init(machine());
 	// other
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(machine_stop_cybikov1),&machine));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(machine_stop_cybikov1),&machine()));
 }
 
-MACHINE_START( cybikov2 )
+MACHINE_START_MEMBER(cybiko_state,cybikov2)
 {
-	device_t *flash2 = machine.device("flash2");
+	device_t *flash2 = machine().device("flash2");
 
 	_logerror( 0, ("machine_start_cybikov2\n"));
 	// real-time clock
-	nvram_system_load( machine, "rtc", cybiko_pcf8593_load, 0);
+	nvram_system_load( machine(), "rtc", cybiko_pcf8593_load, 0);
 	// serial dataflash
-	nvram_system_load( machine, "flash1", cybiko_at45dbxx_load, 1);
+	nvram_system_load( machine(), "flash1", cybiko_at45dbxx_load, 1);
 	// multi-purpose flash
-	nvram_system_load( machine, "flash2", cybiko_sst39vfx_load, 1);
-	machine.root_device().membank( "bank2" )->set_base( sst39vfx_get_base(flash2));
+	nvram_system_load( machine(), "flash2", cybiko_sst39vfx_load, 1);
+	machine().root_device().membank( "bank2" )->set_base( sst39vfx_get_base(flash2));
 	// serial port
-	cybiko_rs232_init(machine);
+	cybiko_rs232_init(machine());
 	// other
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(machine_stop_cybikov2),&machine));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(machine_stop_cybikov2),&machine()));
 }
 
-MACHINE_START( cybikoxt )
+MACHINE_START_MEMBER(cybiko_state,cybikoxt)
 {
-	device_t *flash2 = machine.device("flash2");
+	device_t *flash2 = machine().device("flash2");
 	_logerror( 0, ("machine_start_cybikoxt\n"));
 	// real-time clock
-	nvram_system_load( machine, "rtc", cybiko_pcf8593_load, 0);
+	nvram_system_load( machine(), "rtc", cybiko_pcf8593_load, 0);
 	// multi-purpose flash
-	nvram_system_load( machine, "flash2", cybiko_sst39vfx_load, 1);
-	machine.root_device().membank( "bank2" )->set_base( sst39vfx_get_base(flash2));
+	nvram_system_load( machine(), "flash2", cybiko_sst39vfx_load, 1);
+	machine().root_device().membank( "bank2" )->set_base( sst39vfx_get_base(flash2));
 	// ramdisk
-	nvram_system_load( machine, "ramdisk", cybiko_ramdisk_load, 0);
+	nvram_system_load( machine(), "ramdisk", cybiko_ramdisk_load, 0);
 	// serial port
-	cybiko_rs232_init(machine);
+	cybiko_rs232_init(machine());
 	// other
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(machine_stop_cybikoxt),&machine));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(machine_stop_cybikoxt),&machine()));
 }
 
 ///////////////////
 // MACHINE RESET //
 ///////////////////
 
-MACHINE_RESET( cybikov1 )
+void cybiko_state::machine_reset()
 {
 	_logerror( 0, ("machine_reset_cybikov1\n"));
 	cybiko_rs232_reset();
 }
 
-MACHINE_RESET( cybikov2 )
+MACHINE_RESET_MEMBER(cybiko_state,cybikov2)
 {
 	_logerror( 0, ("machine_reset_cybikov2\n"));
 	cybiko_rs232_reset();
 }
 
-MACHINE_RESET( cybikoxt )
+MACHINE_RESET_MEMBER(cybiko_state,cybikoxt)
 {
 	_logerror( 0, ("machine_reset_cybikoxt\n"));
 	cybiko_rs232_reset();

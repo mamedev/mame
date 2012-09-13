@@ -581,8 +581,6 @@ static MACHINE_CONFIG_START( trs80, trs80_state )		// the original model I, leve
 	MCFG_CPU_PROGRAM_MAP(trs80_map)
 	MCFG_CPU_IO_MAP(trs80_io)
 
-	MCFG_MACHINE_START( trs80 )
-	MCFG_MACHINE_RESET( trs80 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -596,7 +594,6 @@ static MACHINE_CONFIG_START( trs80, trs80_state )		// the original model I, leve
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START( trs80 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -630,7 +627,7 @@ static MACHINE_CONFIG_DERIVED( model3, model1 )
 	MCFG_CPU_IO_MAP( model3_io)
 	MCFG_CPU_PERIODIC_INT(trs80_rtc_interrupt, 30)
 
-	MCFG_MACHINE_RESET( trs80m4 )
+	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, trs80m4 )
 
 	MCFG_GFXDECODE(trs80m4)
 	MCFG_SCREEN_MODIFY("screen")
@@ -664,11 +661,11 @@ static MACHINE_CONFIG_DERIVED( lnw80, model1 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( lnw80_map)
 	MCFG_CPU_IO_MAP( lnw80_io)
-	MCFG_MACHINE_RESET( lnw80 )
+	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, lnw80 )
 
 	MCFG_GFXDECODE(lnw80)
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(lnw80)
+	MCFG_PALETTE_INIT_OVERRIDE(trs80_state,lnw80)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(80*6, 16*12)
 	MCFG_SCREEN_VISIBLE_AREA(0,80*6-1,0,16*12-1)

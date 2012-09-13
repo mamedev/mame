@@ -201,6 +201,7 @@ public:
 		littlerb_printf("littlerb_1800003c_w %04x\n", data);
 		// edfc / fffc alternating (display double buffering?)
 	}
+	virtual void video_start();
 };
 
 
@@ -591,17 +592,16 @@ static TIMER_DEVICE_CALLBACK( littlerb_scanline )
 	}
 }
 
-VIDEO_START( littlerb )
+void littlerb_state::video_start()
 {
-	littlerb_state *state = machine.driver_data<littlerb_state>();
-//	machine.primary_screen->register_screen_bitmap(state->m_temp_bitmap_sprites_back);
-//	machine.primary_screen->register_screen_bitmap(state->m_temp_bitmap_sprites);
+//	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites_back);
+//	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites);
 
-	state->m_temp_bitmap_sprites_back = auto_bitmap_ind16_alloc(machine,512,512);
-	state->m_temp_bitmap_sprites = auto_bitmap_ind16_alloc(machine,512,512);
+	m_temp_bitmap_sprites_back = auto_bitmap_ind16_alloc(machine(),512,512);
+	m_temp_bitmap_sprites = auto_bitmap_ind16_alloc(machine(),512,512);
 
 
-	state->m_spritelist = (UINT16*)auto_alloc_array_clear(machine, UINT16, 0x20000);
+	m_spritelist = (UINT16*)auto_alloc_array_clear(machine(), UINT16, 0x20000);
 
 }
 
@@ -836,14 +836,13 @@ static MACHINE_CONFIG_START( littlerb, littlerb_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 336-1, 0*8, 288-1)
 	MCFG_SCREEN_UPDATE_STATIC(littlerb)
 
-	MCFG_VIDEO_START(littlerb)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_DEVICE_ADD("littlerbvdp", LITTLERBVDP, 0)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
-//  MCFG_PALETTE_INIT(littlerb)
+//  MCFG_PALETTE_INIT_OVERRIDE(littlerb_state,littlerb)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 
 	MCFG_DAC_ADD("dacl")

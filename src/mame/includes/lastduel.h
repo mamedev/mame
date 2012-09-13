@@ -53,12 +53,17 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fix_info);
+	virtual void machine_reset();
+	DECLARE_MACHINE_START(lastduel);
+	DECLARE_VIDEO_START(lastduel);
+	DECLARE_MACHINE_START(madgear);
+	DECLARE_VIDEO_START(madgear);
 };
 
 /*----------- defined in video/lastduel.c -----------*/
 
 
-VIDEO_START( lastduel );
-VIDEO_START( madgear );
+
+
 SCREEN_UPDATE_IND16( lastduel );
 SCREEN_UPDATE_IND16( madgear );

@@ -305,42 +305,40 @@ static KONAMI_SETLINES_CALLBACK( k88games_banking )
 	state->m_k88games_priority = lines & 0x80;
 }
 
-static MACHINE_START( 88games )
+void _88games_state::machine_start()
 {
-	_88games_state *state = machine.driver_data<_88games_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_k052109 = machine.device("k052109");
-	state->m_k051960 = machine.device("k051960");
-	state->m_k051316 = machine.device("k051316");
-	state->m_upd_1 = machine.device("upd1");
-	state->m_upd_2 = machine.device("upd2");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_k052109 = machine().device("k052109");
+	m_k051960 = machine().device("k051960");
+	m_k051316 = machine().device("k051316");
+	m_upd_1 = machine().device("upd1");
+	m_upd_2 = machine().device("upd2");
 
-	state->save_item(NAME(state->m_videobank));
-	state->save_item(NAME(state->m_zoomreadroms));
-	state->save_item(NAME(state->m_speech_chip));
-	state->save_item(NAME(state->m_layer_colorbase));
-	state->save_item(NAME(state->m_k88games_priority));
-	state->save_item(NAME(state->m_sprite_colorbase));
-	state->save_item(NAME(state->m_zoom_colorbase));
+	save_item(NAME(m_videobank));
+	save_item(NAME(m_zoomreadroms));
+	save_item(NAME(m_speech_chip));
+	save_item(NAME(m_layer_colorbase));
+	save_item(NAME(m_k88games_priority));
+	save_item(NAME(m_sprite_colorbase));
+	save_item(NAME(m_zoom_colorbase));
 }
 
-static MACHINE_RESET( 88games )
+void _88games_state::machine_reset()
 {
-	_88games_state *state = machine.driver_data<_88games_state>();
 
-	konami_configure_set_lines(machine.device("maincpu"), k88games_banking);
-	state->m_generic_paletteram_8.set_target(&state->memregion("maincpu")->base()[0x20000], 0x1000);
+	konami_configure_set_lines(machine().device("maincpu"), k88games_banking);
+	m_generic_paletteram_8.set_target(&memregion("maincpu")->base()[0x20000], 0x1000);
 
-	state->m_videobank = 0;
-	state->m_zoomreadroms = 0;
-	state->m_speech_chip = 0;
-	state->m_k88games_priority = 0;
-	state->m_layer_colorbase[0] = 64;
-	state->m_layer_colorbase[1] = 0;
-	state->m_layer_colorbase[2] = 16;
-	state->m_sprite_colorbase = 32;
-	state->m_zoom_colorbase = 48;
+	m_videobank = 0;
+	m_zoomreadroms = 0;
+	m_speech_chip = 0;
+	m_k88games_priority = 0;
+	m_layer_colorbase[0] = 64;
+	m_layer_colorbase[1] = 0;
+	m_layer_colorbase[2] = 16;
+	m_sprite_colorbase = 32;
+	m_zoom_colorbase = 48;
 }
 
 static const k052109_interface _88games_k052109_intf =
@@ -377,8 +375,6 @@ static MACHINE_CONFIG_START( 88games, _88games_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(88games)
-	MCFG_MACHINE_RESET(88games)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

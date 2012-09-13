@@ -416,15 +416,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-static VIDEO_START( powerbal )
+VIDEO_START_MEMBER(playmark_state,powerbal)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::powerbal_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::powerbal_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	state->m_xoffset = -20;
+	m_xoffset = -20;
 
-	state->m_bg_tilemap->set_scrolly(0, state->m_bg_yoffset);
+	m_bg_tilemap->set_scrolly(0, m_bg_yoffset);
 }
 
 static SCREEN_UPDATE_IND16( powerbal )
@@ -469,18 +468,16 @@ GFXDECODE_END
 
 
 
-static MACHINE_START( powerbal )
+MACHINE_START_MEMBER(playmark_state,powerbal)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->save_item(NAME(state->m_tilebank));
+	save_item(NAME(m_tilebank));
 }
 
-static MACHINE_RESET( powerbal )
+MACHINE_RESET_MEMBER(playmark_state,powerbal)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_tilebank = 0;
+	m_tilebank = 0;
 }
 
 static MACHINE_CONFIG_START( powerbal, playmark_state )
@@ -490,8 +487,8 @@ static MACHINE_CONFIG_START( powerbal, playmark_state )
 	MCFG_CPU_PROGRAM_MAP(powerbal_main_map)
 	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MCFG_MACHINE_START(powerbal)
-	MCFG_MACHINE_RESET(powerbal)
+	MCFG_MACHINE_START_OVERRIDE(playmark_state,powerbal)
+	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,powerbal)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -504,7 +501,7 @@ static MACHINE_CONFIG_START( powerbal, playmark_state )
 	MCFG_GFXDECODE(powerbal)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(powerbal)
+	MCFG_VIDEO_START_OVERRIDE(playmark_state,powerbal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -523,8 +520,8 @@ static MACHINE_CONFIG_START( magicstk, playmark_state )
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 	MCFG_EEPROM_DEFAULT_VALUE(0)
 
-	MCFG_MACHINE_START(powerbal)
-	MCFG_MACHINE_RESET(powerbal)
+	MCFG_MACHINE_START_OVERRIDE(playmark_state,powerbal)
+	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,powerbal)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -537,7 +534,7 @@ static MACHINE_CONFIG_START( magicstk, playmark_state )
 	MCFG_GFXDECODE(powerbal)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(powerbal)
+	MCFG_VIDEO_START_OVERRIDE(playmark_state,powerbal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

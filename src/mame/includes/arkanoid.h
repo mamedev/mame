@@ -74,6 +74,9 @@ public:
 	DECLARE_DRIVER_INIT(arkbloc2);
 	DECLARE_DRIVER_INIT(arkangc);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	DECLARE_MACHINE_START(arkanoid);
+	DECLARE_MACHINE_RESET(arkanoid);
+	DECLARE_VIDEO_START(arkanoid);
 };
 
 

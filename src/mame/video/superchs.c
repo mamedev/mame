@@ -2,10 +2,9 @@
 #include "video/taitoic.h"
 #include "includes/superchs.h"
 
-VIDEO_START( superchs )
+void superchs_state::video_start()
 {
-	superchs_state *state = machine.driver_data<superchs_state>();
-	state->m_spritelist = auto_alloc_array(machine, struct tempsprite, 0x4000);
+	m_spritelist = auto_alloc_array(machine(), struct tempsprite, 0x4000);
 }
 
 /************************************************************

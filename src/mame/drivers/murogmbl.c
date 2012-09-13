@@ -46,12 +46,14 @@ public:
 		m_video(*this, "video"){ }
 
 	required_shared_ptr<UINT8> m_video;
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
-static PALETTE_INIT( murogmbl )
+void murogmbl_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int	bit0, bit1, bit2 , r, g, b;
 	int	i;
 
@@ -70,7 +72,7 @@ static PALETTE_INIT( murogmbl )
 		bit2 = (color_prom[0] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 }
@@ -87,7 +89,7 @@ static ADDRESS_MAP_START( murogmbl_map, AS_PROGRAM, 8, murogmbl_state )
 	AM_RANGE(0x7800, 0x7800) AM_READNOP AM_DEVWRITE("dac1", dac_device, write_unsigned8) /* read is always discarded */
 ADDRESS_MAP_END
 
-static VIDEO_START(murogmbl)
+void murogmbl_state::video_start()
 {
 
 }
@@ -185,7 +187,6 @@ static MACHINE_CONFIG_START( murogmbl, murogmbl_state )
 
 	MCFG_GFXDECODE(murogmbl)
 
-	MCFG_PALETTE_INIT(murogmbl)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -197,7 +198,6 @@ static MACHINE_CONFIG_START( murogmbl, murogmbl_state )
 
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(murogmbl)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_DAC_ADD("dac1")

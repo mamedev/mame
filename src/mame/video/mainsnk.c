@@ -2,9 +2,9 @@
 #include "includes/mainsnk.h"
 
 
-PALETTE_INIT( mainsnk )
+void mainsnk_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 	int num_colors = 0x400;
 
@@ -30,7 +30,7 @@ PALETTE_INIT( mainsnk )
 		bit3 = (color_prom[i + num_colors] >> 1) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -67,18 +67,17 @@ TILE_GET_INFO_MEMBER(mainsnk_state::get_bg_tile_info)
 }
 
 
-VIDEO_START(mainsnk)
+void mainsnk_state::video_start()
 {
-	mainsnk_state *state = machine.driver_data<mainsnk_state>();
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mainsnk_state::get_tx_tile_info),state), tilemap_mapper_delegate(FUNC(mainsnk_state::marvins_tx_scan_cols),state), 8, 8, 36, 28);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mainsnk_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS,    8, 8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mainsnk_state::get_tx_tile_info),this), tilemap_mapper_delegate(FUNC(mainsnk_state::marvins_tx_scan_cols),this), 8, 8, 36, 28);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mainsnk_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,    8, 8, 32, 32);
 
-	state->m_tx_tilemap->set_transparent_pen(15);
-	state->m_tx_tilemap->set_scrolldy(8, 8);
+	m_tx_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_scrolldy(8, 8);
 
-	state->m_bg_tilemap->set_scrolldx(16, 16);
-	state->m_bg_tilemap->set_scrolldy(8,  8);
+	m_bg_tilemap->set_scrolldx(16, 16);
+	m_bg_tilemap->set_scrolldy(8,  8);
 }
 
 

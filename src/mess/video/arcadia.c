@@ -283,30 +283,29 @@ static const UINT8 chars[0x40][8]={
 	// 8x user defined
 };
 
-VIDEO_START( arcadia )
+void arcadia_state::video_start()
 {
-	arcadia_state *state = machine.driver_data<arcadia_state>();
 	int i;
-	memcpy(&state->m_chars, chars, sizeof(chars));
+	memcpy(&m_chars, chars, sizeof(chars));
 	for (i=0; i<0x40; i++)
 	{
-		state->m_rectangle[i][0]=0;
-		state->m_rectangle[i][4]=0;
-		if (i&1) state->m_rectangle[i][0]|=3;
-		if (i&2) state->m_rectangle[i][0]|=0x1c;
-		if (i&4) state->m_rectangle[i][0]|=0xe0;
-		if (i&8) state->m_rectangle[i][4]|=3;
-		if (i&0x10) state->m_rectangle[i][4]|=0x1c;
-		if (i&0x20) state->m_rectangle[i][4]|=0xe0;
-		state->m_rectangle[i][1]=state->m_rectangle[i][2]=state->m_rectangle[i][3]=state->m_rectangle[i][0];
-		state->m_rectangle[i][5]=state->m_rectangle[i][6]=state->m_rectangle[i][7]=state->m_rectangle[i][4];
+		m_rectangle[i][0]=0;
+		m_rectangle[i][4]=0;
+		if (i&1) m_rectangle[i][0]|=3;
+		if (i&2) m_rectangle[i][0]|=0x1c;
+		if (i&4) m_rectangle[i][0]|=0xe0;
+		if (i&8) m_rectangle[i][4]|=3;
+		if (i&0x10) m_rectangle[i][4]|=0x1c;
+		if (i&0x20) m_rectangle[i][4]|=0xe0;
+		m_rectangle[i][1]=m_rectangle[i][2]=m_rectangle[i][3]=m_rectangle[i][0];
+		m_rectangle[i][5]=m_rectangle[i][6]=m_rectangle[i][7]=m_rectangle[i][4];
 	}
 
 	{
-		screen_device *screen = machine.first_screen();
+		screen_device *screen = machine().first_screen();
 		int width = screen->width();
 		int height = screen->height();
-		state->m_bitmap = auto_bitmap_ind16_alloc(machine, width, height);
+		m_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
 	}
 }
 

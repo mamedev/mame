@@ -349,20 +349,19 @@ static READ16_HANDLER( killbld_igs025_prot_r )
 
 
 
-static MACHINE_RESET( killbld )
+MACHINE_RESET_MEMBER(pgm_022_025_state,killbld)
 {
-	pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
 
-	MACHINE_RESET_CALL(pgm);
+	MACHINE_RESET_CALL_MEMBER(pgm);
 	/* fill the protection ram with a5 + auto dma */
-	IGS022_reset(machine);
+	IGS022_reset(machine());
 
 	// Reset IGS025 stuff
-	state->m_kb_cmd = 0;
-	state->m_kb_reg = 0;
-	state->m_kb_ptr = 0;
-	state->m_kb_region_sequence_position = 0;
-	memset(state->m_kb_regs, 0, 0x10 * sizeof(UINT32));
+	m_kb_cmd = 0;
+	m_kb_reg = 0;
+	m_kb_ptr = 0;
+	m_kb_region_sequence_position = 0;
+	memset(m_kb_regs, 0, 0x10 * sizeof(UINT32));
 
 }
 
@@ -389,58 +388,57 @@ DRIVER_INIT_MEMBER(pgm_022_025_state,killbld)
 	save_item(NAME(m_kb_regs));
 }
 
-static MACHINE_RESET( dw3 )
+MACHINE_RESET_MEMBER(pgm_022_025_state,dw3)
 {
-	pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
 
 
-	MACHINE_RESET_CALL(pgm);
+	MACHINE_RESET_CALL_MEMBER(pgm);
 	/* fill the protection ram with a5 + auto dma */
-	IGS022_reset(machine);
+	IGS022_reset(machine());
 
 	/* game won't boot unless various values are in protection RAM
      - these should almost certainly end up there as the result of executing the protection
        commands are startup, but which, and how? */
 
-//  state->m_sharedprotram[0x200/2] = 0x006d;
-	state->m_sharedprotram[0x202/2] = 0x007c; // it cares about this, operation status flag?
+//  m_sharedprotram[0x200/2] = 0x006d;
+	m_sharedprotram[0x202/2] = 0x007c; // it cares about this, operation status flag?
 
-//  state->m_sharedprotram[0x20c/2] = 0x0000;
-//  state->m_sharedprotram[0x20e/2] = 0x0007;
-//  state->m_sharedprotram[0x210/2] = 0x0000;
-//  state->m_sharedprotram[0x212/2] = 0x0004;
-//  state->m_sharedprotram[0x214/2] = 0x0000;
-//  state->m_sharedprotram[0x216/2] = 0x0007;
-//  state->m_sharedprotram[0x218/2] = 0x0000;
-//  state->m_sharedprotram[0x21a/2] = 0x0004;
+//  m_sharedprotram[0x20c/2] = 0x0000;
+//  m_sharedprotram[0x20e/2] = 0x0007;
+//  m_sharedprotram[0x210/2] = 0x0000;
+//  m_sharedprotram[0x212/2] = 0x0004;
+//  m_sharedprotram[0x214/2] = 0x0000;
+//  m_sharedprotram[0x216/2] = 0x0007;
+//  m_sharedprotram[0x218/2] = 0x0000;
+//  m_sharedprotram[0x21a/2] = 0x0004;
 
-//  state->m_sharedprotram[0x288/2] = 0x0000;
-//  state->m_sharedprotram[0x28a/2] = 0x00c2;
-//  state->m_sharedprotram[0x28c/2] = 0x0000;
-//  state->m_sharedprotram[0x28e/2] = 0x00c2;
-//  state->m_sharedprotram[0x290/2] = 0x0500;
-//  state->m_sharedprotram[0x292/2] = 0x1000;
-//  state->m_sharedprotram[0x294/2] = 0x00c3;
-//  state->m_sharedprotram[0x296/2] = 0x7104;
-//  state->m_sharedprotram[0x298/2] = 0x0000;
-//  state->m_sharedprotram[0x29a/2] = 0x0003;
-//  state->m_sharedprotram[0x29c/2] = 0x0108;
-//  state->m_sharedprotram[0x29e/2] = 0x0009;
+//  m_sharedprotram[0x288/2] = 0x0000;
+//  m_sharedprotram[0x28a/2] = 0x00c2;
+//  m_sharedprotram[0x28c/2] = 0x0000;
+//  m_sharedprotram[0x28e/2] = 0x00c2;
+//  m_sharedprotram[0x290/2] = 0x0500;
+//  m_sharedprotram[0x292/2] = 0x1000;
+//  m_sharedprotram[0x294/2] = 0x00c3;
+//  m_sharedprotram[0x296/2] = 0x7104;
+//  m_sharedprotram[0x298/2] = 0x0000;
+//  m_sharedprotram[0x29a/2] = 0x0003;
+//  m_sharedprotram[0x29c/2] = 0x0108;
+//  m_sharedprotram[0x29e/2] = 0x0009;
 
-//  state->m_sharedprotram[0x2a2/2] = 0x84f6; // it cares about this, it's the version number of the data rom, copied automatically!
+//  m_sharedprotram[0x2a2/2] = 0x84f6; // it cares about this, it's the version number of the data rom, copied automatically!
 
-//  state->m_sharedprotram[0x2ac/2] = 0x006d;
-//  state->m_sharedprotram[0x2ae/2] = 0x0000;
+//  m_sharedprotram[0x2ac/2] = 0x006d;
+//  m_sharedprotram[0x2ae/2] = 0x0000;
 
-//  state->m_sharedprotram[0x2b0/2] = 0xaf56;
+//  m_sharedprotram[0x2b0/2] = 0xaf56;
 
 
 	// Reset IGS025 stuff
-	state->m_kb_cmd = 0;
-	state->m_kb_reg = 0;
-	state->m_kb_ptr = 0;
-	state->m_kb_region_sequence_position = 0;
-	memset(state->m_kb_regs, 0, 0x10 * sizeof(UINT32));
+	m_kb_cmd = 0;
+	m_kb_reg = 0;
+	m_kb_ptr = 0;
+	m_kb_region_sequence_position = 0;
+	memset(m_kb_regs, 0, 0x10 * sizeof(UINT32));
 
 }
 
@@ -558,7 +556,7 @@ MACHINE_CONFIG_START( pgm_022_025_kb, pgm_022_025_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(killbld_mem)
 
-	MCFG_MACHINE_RESET(killbld)
+	MCFG_MACHINE_RESET_OVERRIDE(pgm_022_025_state,killbld)
 MACHINE_CONFIG_END
 
 
@@ -568,7 +566,7 @@ MACHINE_CONFIG_START( pgm_022_025_dw, pgm_022_025_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(killbld_mem)
 
-	MCFG_MACHINE_RESET(dw3)
+	MCFG_MACHINE_RESET_OVERRIDE(pgm_022_025_state,dw3)
 MACHINE_CONFIG_END
 
 

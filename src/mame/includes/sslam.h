@@ -48,12 +48,14 @@ public:
 	TILE_GET_INFO_MEMBER(get_sslam_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_sslam_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_powerbls_bg_tile_info);
+	DECLARE_VIDEO_START(sslam);
+	DECLARE_VIDEO_START(powerbls);
 };
 
 
 /*----------- defined in video/sslam.c -----------*/
 
-VIDEO_START(sslam);
-VIDEO_START(powerbls);
+
+
 SCREEN_UPDATE_IND16(sslam);
 SCREEN_UPDATE_IND16(powerbls);

@@ -255,6 +255,10 @@ public:
 	DECLARE_WRITE8_MEMBER(nes_fds_w);
 	DECLARE_WRITE8_MEMBER(nes_vh_sprite_dma_w);
 	DECLARE_DRIVER_INIT(famicom);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -268,8 +272,8 @@ DEVICE_START(nes_disk);
 DEVICE_IMAGE_LOAD(nes_disk);
 DEVICE_IMAGE_UNLOAD(nes_disk);
 
-MACHINE_START( nes );
-MACHINE_RESET( nes );
+
+
 
 
 
@@ -279,8 +283,8 @@ void nes_partialhash(hash_collection &dest, const unsigned char *data, unsigned 
 
 /*----------- defined in video/nes.c -----------*/
 
-PALETTE_INIT( nes );
-VIDEO_START( nes );
+
+
 SCREEN_UPDATE_IND16( nes );
 
 

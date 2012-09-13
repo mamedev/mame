@@ -124,10 +124,9 @@ READ8_MEMBER(fastfred_state::boggy84_custom_io_r)
 */
 
 
-static MACHINE_START( imago )
+MACHINE_START_MEMBER(fastfred_state,imago)
 {
-	fastfred_state *state = machine.driver_data<fastfred_state>();
-	machine.gfx[1]->set_source(state->m_imago_sprites);
+	machine().gfx[1]->set_source(m_imago_sprites);
 }
 
 WRITE8_MEMBER(fastfred_state::imago_dma_irq_w)
@@ -665,8 +664,8 @@ static MACHINE_CONFIG_START( fastfred, fastfred_state )
 	MCFG_GFXDECODE(fastfred)
 	MCFG_PALETTE_LENGTH(32*8)
 
-	MCFG_PALETTE_INIT(fastfred)
-	MCFG_VIDEO_START(fastfred)
+	MCFG_PALETTE_INIT_OVERRIDE(fastfred_state,fastfred)
+	MCFG_VIDEO_START_OVERRIDE(fastfred_state,fastfred)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -699,13 +698,13 @@ static MACHINE_CONFIG_DERIVED( imago, fastfred )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(imago_map)
 
-	MCFG_MACHINE_START(imago)
+	MCFG_MACHINE_START_OVERRIDE(fastfred_state,imago)
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(256+64+2) /* 256 for characters, 64 for the stars and 2 for the web */
 	MCFG_GFXDECODE(imago)
 
-	MCFG_VIDEO_START(imago)
+	MCFG_VIDEO_START_OVERRIDE(fastfred_state,imago)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(imago)
 MACHINE_CONFIG_END

@@ -26,6 +26,8 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -159,11 +161,11 @@ static DEVICE_IMAGE_LOAD( bbcbc_cart )
 
 }
 
-static MACHINE_START( bbcbc )
+void bbcbc_state::machine_start()
 {
 }
 
-static MACHINE_RESET( bbcbc )
+void bbcbc_state::machine_reset()
 {
 }
 
@@ -174,8 +176,6 @@ static MACHINE_CONFIG_START( bbcbc, bbcbc_state )
 	MCFG_CPU_IO_MAP( bbcbc_io)
 	MCFG_CPU_CONFIG(bbcbc_daisy_chain)
 
-	MCFG_MACHINE_START( bbcbc )
-	MCFG_MACHINE_RESET( bbcbc )
 
 	MCFG_Z80PIO_ADD( "z80pio", MAIN_CLOCK / 8, bbcbc_z80pio_intf )
 

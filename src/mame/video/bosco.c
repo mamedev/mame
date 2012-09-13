@@ -14,12 +14,12 @@
 #define STARS_COLOR_BASE (64*4+64*4+4)
 #define VIDEO_RAM_SIZE 0x400
 
-PALETTE_INIT( bosco )
+PALETTE_INIT_MEMBER(bosco_state,bosco)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	machine.colortable = colortable_alloc(machine, 32+64);
+	machine().colortable = colortable_alloc(machine(), 32+64);
 
 	/* core palette */
 	for (i = 0;i < 32;i++)
@@ -40,7 +40,7 @@ PALETTE_INIT( bosco )
 		bit2 = ((*color_prom) >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine.colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -57,24 +57,24 @@ PALETTE_INIT( bosco )
 		bits = (i >> 4) & 0x03;
 		b = map[bits];
 
-		colortable_palette_set_color(machine.colortable,32 + i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable,32 + i,MAKE_RGB(r,g,b));
 	}
 
 	/* characters / sprites */
 	for (i = 0;i < 64*4;i++)
 	{
-		colortable_entry_set_value(machine.colortable, i, (color_prom[i] & 0x0f) + 0x10);	/* chars */
-		colortable_entry_set_value(machine.colortable, i+64*4, color_prom[i] & 0x0f);	/* sprites */
+		colortable_entry_set_value(machine().colortable, i, (color_prom[i] & 0x0f) + 0x10);	/* chars */
+		colortable_entry_set_value(machine().colortable, i+64*4, color_prom[i] & 0x0f);	/* sprites */
 	}
 
 	/* bullets lookup table */
 	/* they use colors 28-31, I think - PAL 5A controls it */
 	for (i = 0;i < 4;i++)
-		colortable_entry_set_value(machine.colortable, 64*4+64*4+i, 31-i);
+		colortable_entry_set_value(machine().colortable, 64*4+64*4+i, 31-i);
 
 	/* now the stars */
 	for (i = 0;i < 64;i++)
-		colortable_entry_set_value(machine.colortable, 64*4+64*4+4+i, 32 + i);
+		colortable_entry_set_value(machine().colortable, 64*4+64*4+4+i, 32 + i);
 }
 
 
@@ -124,26 +124,25 @@ TILE_GET_INFO_MEMBER(bosco_state::fg_get_tile_info )
 
 ***************************************************************************/
 
-VIDEO_START( bosco )
+VIDEO_START_MEMBER(bosco_state,bosco)
 {
-	bosco_state *state =  machine.driver_data<bosco_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bosco_state::bg_get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bosco_state::fg_get_tile_info),state),tilemap_mapper_delegate(FUNC(bosco_state::fg_tilemap_scan),state),  8,8, 8,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bosco_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bosco_state::fg_get_tile_info),this),tilemap_mapper_delegate(FUNC(bosco_state::fg_tilemap_scan),this),  8,8, 8,32);
 
-	colortable_configure_tilemap_groups(machine.colortable, state->m_bg_tilemap, machine.gfx[0], 0x1f);
-	colortable_configure_tilemap_groups(machine.colortable, state->m_fg_tilemap, machine.gfx[0], 0x1f);
+	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, machine().gfx[0], 0x1f);
+	colortable_configure_tilemap_groups(machine().colortable, m_fg_tilemap, machine().gfx[0], 0x1f);
 
-	state->m_bg_tilemap->set_scrolldx(3,3);
+	m_bg_tilemap->set_scrolldx(3,3);
 
-	state->m_spriteram = state->m_videoram + 0x03d4;
-	state->m_spriteram_size = 0x0c;
-	state->m_spriteram2 = state->m_spriteram + 0x0800;
-	state->m_bosco_radarx = state->m_videoram + 0x03f0;
-	state->m_bosco_radary = state->m_bosco_radarx + 0x0800;
+	m_spriteram = m_videoram + 0x03d4;
+	m_spriteram_size = 0x0c;
+	m_spriteram2 = m_spriteram + 0x0800;
+	m_bosco_radarx = m_videoram + 0x03f0;
+	m_bosco_radary = m_bosco_radarx + 0x0800;
 
-	state->save_item(NAME(state->m_stars_scrollx));
-	state->save_item(NAME(state->m_stars_scrolly));
+	save_item(NAME(m_stars_scrollx));
+	save_item(NAME(m_stars_scrolly));
 }
 
 

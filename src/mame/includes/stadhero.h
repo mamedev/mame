@@ -14,11 +14,12 @@ public:
 	DECLARE_WRITE16_MEMBER(stadhero_control_w);
 	DECLARE_WRITE16_MEMBER(stadhero_pf1_data_w);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/stadhero.c -----------*/
 
-VIDEO_START( stadhero );
+
 SCREEN_UPDATE_IND16( stadhero );
 

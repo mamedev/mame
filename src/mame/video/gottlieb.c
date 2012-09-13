@@ -142,58 +142,56 @@ TILE_GET_INFO_MEMBER(gottlieb_state::get_screwloo_bg_tile_info)
 }
 
 
-VIDEO_START( gottlieb )
+void gottlieb_state::video_start()
 {
-	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	static const int resistances[4] = { 2000, 1000, 470, 240 };
 
 	/* compute palette information */
 	/* note that there really are pullup/pulldown resistors, but this situation is complicated */
 	/* by the use of transistors, so we ignore that and just use the realtive resistor weights */
 	compute_resistor_weights(0,	255, -1.0,
-			4, resistances, state->m_weights, 180, 0,
-			4, resistances, state->m_weights, 180, 0,
-			4, resistances, state->m_weights, 180, 0);
-	state->m_transparent0 = FALSE;
+			4, resistances, m_weights, 180, 0,
+			4, resistances, m_weights, 180, 0,
+			4, resistances, m_weights, 180, 0);
+	m_transparent0 = FALSE;
 
 	/* configure the background tilemap */
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gottlieb_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg_tilemap->set_transparent_pen(0);
-	state->m_bg_tilemap->set_scrolldx(0, 318 - 256);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gottlieb_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scrolldx(0, 318 - 256);
 
-	machine.gfx[0]->set_source(state->m_charram);
+	machine().gfx[0]->set_source(m_charram);
 
 	/* save some state */
-	state_save_register_global(machine, state->m_background_priority);
-	state_save_register_global(machine, state->m_spritebank);
-	state_save_register_global(machine, state->m_transparent0);
+	state_save_register_global(machine(), m_background_priority);
+	state_save_register_global(machine(), m_spritebank);
+	state_save_register_global(machine(), m_transparent0);
 }
 
-VIDEO_START( screwloo )
+VIDEO_START_MEMBER(gottlieb_state,screwloo)
 {
-	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	static const int resistances[4] = { 2000, 1000, 470, 240 };
 
 	/* compute palette information */
 	/* note that there really are pullup/pulldown resistors, but this situation is complicated */
 	/* by the use of transistors, so we ignore that and just use the realtive resistor weights */
 	compute_resistor_weights(0,	255, -1.0,
-			4, resistances, state->m_weights, 180, 0,
-			4, resistances, state->m_weights, 180, 0,
-			4, resistances, state->m_weights, 180, 0);
-	state->m_transparent0 = FALSE;
+			4, resistances, m_weights, 180, 0,
+			4, resistances, m_weights, 180, 0,
+			4, resistances, m_weights, 180, 0);
+	m_transparent0 = FALSE;
 
 	/* configure the background tilemap */
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gottlieb_state::get_screwloo_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg_tilemap->set_transparent_pen(0);
-	state->m_bg_tilemap->set_scrolldx(0, 318 - 256);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gottlieb_state::get_screwloo_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scrolldx(0, 318 - 256);
 
-	machine.gfx[0]->set_source(state->m_charram);
+	machine().gfx[0]->set_source(m_charram);
 
 	/* save some state */
-	state_save_register_global(machine, state->m_background_priority);
-	state_save_register_global(machine, state->m_spritebank);
-	state_save_register_global(machine, state->m_transparent0);
+	state_save_register_global(machine(), m_background_priority);
+	state_save_register_global(machine(), m_spritebank);
+	state_save_register_global(machine(), m_transparent0);
 }
 
 

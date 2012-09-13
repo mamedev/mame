@@ -214,14 +214,17 @@ public:
 	DECLARE_DRIVER_INIT(harddriv);
 	DECLARE_DRIVER_INIT(steeltalp);
 	DECLARE_DRIVER_INIT(stunrun);
+	DECLARE_MACHINE_START(harddriv);
+	DECLARE_MACHINE_RESET(harddriv);
+	DECLARE_VIDEO_START(harddriv);
 };
 
 
 /*----------- defined in machine/harddriv.c -----------*/
 
 /* Driver/Multisync board */
-MACHINE_START( harddriv );
-MACHINE_RESET( harddriv );
+
+
 
 INTERRUPT_GEN( hd68k_irq_gen );
 WRITE16_HANDLER( hd68k_irq_ack_w );
@@ -352,7 +355,7 @@ WRITE16_DEVICE_HANDLER( hdsnddsp_dac_w );
 
 /*----------- defined in video/harddriv.c -----------*/
 
-VIDEO_START( harddriv );
+
 void hdgsp_write_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg);
 void hdgsp_read_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg);
 

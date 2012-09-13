@@ -582,6 +582,7 @@ public:
 	DECLARE_DRIVER_INIT(ddrsolo);
 	DECLARE_DRIVER_INIT(ddrdigital);
 	DECLARE_DRIVER_INIT(konami573);
+	DECLARE_MACHINE_RESET(konami573);
 };
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
@@ -1402,19 +1403,18 @@ DRIVER_INIT_MEMBER(ksys573_state,konami573)
 	flash_init(machine());
 }
 
-static MACHINE_RESET( konami573 )
+MACHINE_RESET_MEMBER(ksys573_state,konami573)
 {
-	ksys573_state *state = machine.driver_data<ksys573_state>();
 
-	if( state->machine().device<device_secure_serial_flash>("install_eeprom") )
+	if( machine().device<device_secure_serial_flash>("install_eeprom") )
 	{
 		/* security cart */
-		psx_sio_input( machine, 1, PSX_SIO_IN_DSR, PSX_SIO_IN_DSR );
+		psx_sio_input( machine(), 1, PSX_SIO_IN_DSR, PSX_SIO_IN_DSR );
 	}
 
-	state->m_flash_bank = -1;
+	m_flash_bank = -1;
 
-	update_mode(machine);
+	update_mode(machine());
 }
 
 static void spu_irq(device_t *device, UINT32 data)
@@ -3049,7 +3049,7 @@ static MACHINE_CONFIG_START( konami573, ksys573_state )
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( cdrom_dma_read ), (ksys573_state *) owner ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( cdrom_dma_write ), (ksys573_state *) owner ) )
 
-	MCFG_MACHINE_RESET( konami573 )
+	MCFG_MACHINE_RESET_OVERRIDE(ksys573_state, konami573 )
 
 	// multiple cd's are handled by switching drives instead of discs.
 	MCFG_DEVICE_ADD("cdrom0", CR589, 0)

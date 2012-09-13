@@ -2,7 +2,7 @@
 
 #include "includes/comquest.h"
 
-VIDEO_START( comquest )
+void comquest_state::video_start()
 {
 }
 

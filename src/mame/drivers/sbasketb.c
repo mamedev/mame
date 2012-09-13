@@ -215,8 +215,6 @@ static MACHINE_CONFIG_START( sbasketb, sbasketb_state )
 	MCFG_GFXDECODE(sbasketb)
 	MCFG_PALETTE_LENGTH(16*16+16*16*16)
 
-	MCFG_PALETTE_INIT(sbasketb)
-	MCFG_VIDEO_START(sbasketb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -109,7 +109,6 @@ static MACHINE_CONFIG_START( kramermc, kramermc_state )
 	MCFG_CPU_ADD("maincpu", Z80, 1500000)
 	MCFG_CPU_PROGRAM_MAP(kramermc_mem)
 	MCFG_CPU_IO_MAP(kramermc_io)
-	MCFG_MACHINE_RESET( kramermc )
 
 	MCFG_Z80PIO_ADD( "z80pio", 1500000, kramermc_z80pio_intf )
 
@@ -126,7 +125,6 @@ static MACHINE_CONFIG_START( kramermc, kramermc_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START(kramermc)
 MACHINE_CONFIG_END
 
 /* ROM definition */

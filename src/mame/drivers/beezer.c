@@ -77,11 +77,10 @@ static INPUT_PORTS_START( beezer )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
-static MACHINE_START(beezer)
+void beezer_state::machine_start()
 {
-	beezer_state *state = machine.driver_data<beezer_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
 }
 
 static MACHINE_CONFIG_START( beezer, beezer_state )
@@ -104,7 +103,6 @@ static MACHINE_CONFIG_START( beezer, beezer_state )
 
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_MACHINE_START(beezer)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

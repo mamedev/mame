@@ -58,23 +58,21 @@ static void common_video_start(running_machine &machine)
 	state->m_fg_tilemap->set_scrolldy(0, machine.primary_screen->height() - 256);
 }
 
-VIDEO_START( pow )
+void snk68_state::video_start()
 {
-	snk68_state *state = machine.driver_data<snk68_state>();
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snk68_state::get_pow_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
-	state->m_fg_tile_offset = 0;
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk68_state::get_pow_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_fg_tile_offset = 0;
 
-	common_video_start(machine);
+	common_video_start(machine());
 }
 
-VIDEO_START( searchar )
+VIDEO_START_MEMBER(snk68_state,searchar)
 {
-	snk68_state *state = machine.driver_data<snk68_state>();
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snk68_state::get_searchar_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk68_state::get_searchar_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
-	common_video_start(machine);
+	common_video_start(machine());
 }
 
 /***************************************************************************

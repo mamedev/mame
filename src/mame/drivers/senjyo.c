@@ -78,15 +78,14 @@ I/O read/write
 #include "machine/segacrpt.h"
 #include "includes/senjyo.h"
 
-static MACHINE_RESET( senjyo )
+void senjyo_state::machine_reset()
 {
-	senjyo_state *state = machine.driver_data<senjyo_state>();
 
 	/* we must avoid generating interrupts for the first few frames otherwise */
 	/* Senjyo locks up. There must be an interrupt enable port somewhere, */
 	/* or maybe interrupts are genenrated by the CTC. */
 	/* Maybe a write to port d002 clears the IRQ line, but I'm not sure. */
-	state->m_int_delay_kludge = 10;
+	m_int_delay_kludge = 10;
 }
 
 static INTERRUPT_GEN( senjyo_interrupt )
@@ -580,7 +579,6 @@ static MACHINE_CONFIG_START( senjyo, senjyo_state )
 	MCFG_CPU_PROGRAM_MAP(senjyo_sound_map)
 	MCFG_CPU_IO_MAP(senjyo_sound_io_map)
 
-	MCFG_MACHINE_RESET(senjyo)
 
 	MCFG_Z80PIO_ADD( "z80pio", 2000000, senjyo_pio_intf )
 	MCFG_Z80CTC_ADD( "z80ctc", 2000000 /* same as "sub" */, senjyo_ctc_intf )
@@ -596,7 +594,6 @@ static MACHINE_CONFIG_START( senjyo, senjyo_state )
 	MCFG_GFXDECODE(senjyo)
 	MCFG_PALETTE_LENGTH(512+2)	/* 512 real palette + 2 for the radar */
 
-	MCFG_VIDEO_START(senjyo)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

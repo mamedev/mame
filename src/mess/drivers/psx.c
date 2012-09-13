@@ -54,6 +54,7 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(psx_default);
 	DECLARE_DIRECT_UPDATE_MEMBER(psx_setopbase);
 	DECLARE_DRIVER_INIT(psx);
+	DECLARE_MACHINE_RESET(psx);
 };
 
 
@@ -701,9 +702,9 @@ static ADDRESS_MAP_START( psx_map, AS_PROGRAM, 32, psx1_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_RESET( psx )
+MACHINE_RESET_MEMBER(psx1_state,psx)
 {
-	psx_sio_install_handler( machine, 0, psx_sio0 );
+	psx_sio_install_handler( machine(), 0, psx_sio0 );
 }
 
 DRIVER_INIT_MEMBER(psx1_state,psx)
@@ -772,7 +773,7 @@ static MACHINE_CONFIG_START( psxntsc, psx1_state )
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( psx_map )
 
-	MCFG_MACHINE_RESET( psx )
+	MCFG_MACHINE_RESET_OVERRIDE(psx1_state, psx )
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL_53_693175MHz )
@@ -802,7 +803,7 @@ static MACHINE_CONFIG_START( psxpal, psx1_state )
 	MCFG_CPU_ADD( "maincpu", CXD8530AQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( psx_map)
 
-	MCFG_MACHINE_RESET( psx )
+	MCFG_MACHINE_RESET_OVERRIDE(psx1_state, psx )
 
 	/* video hardware */
 	/* TODO: visible area and refresh rate */

@@ -184,8 +184,6 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
-	MCFG_MACHINE_START( bebox )
-	MCFG_MACHINE_RESET( bebox )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ym3812", YM3812, 3579545)

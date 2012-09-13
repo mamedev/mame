@@ -56,35 +56,33 @@ TILE_GET_INFO_MEMBER(mcr68_state::zwackery_get_fg_tile_info)
  *
  *************************************/
 
-VIDEO_START( mcr68 )
+VIDEO_START_MEMBER(mcr68_state,mcr68)
 {
-	mcr68_state *state = machine.driver_data<mcr68_state>();
 	/* initialize the background tilemap */
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mcr68_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  16,16, 32,32);
-	state->m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mcr68_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,32);
+	m_bg_tilemap->set_transparent_pen(0);
 }
 
 
-VIDEO_START( zwackery )
+VIDEO_START_MEMBER(mcr68_state,zwackery)
 {
-	mcr68_state *state = machine.driver_data<mcr68_state>();
-	const UINT8 *colordatabase = (const UINT8 *)state->memregion("gfx3")->base();
-	gfx_element *gfx0 = machine.gfx[0];
-	gfx_element *gfx2 = machine.gfx[2];
+	const UINT8 *colordatabase = (const UINT8 *)memregion("gfx3")->base();
+	gfx_element *gfx0 = machine().gfx[0];
+	gfx_element *gfx2 = machine().gfx[2];
 	UINT8 *srcdata0, *dest0;
 	UINT8 *srcdata2, *dest2;
 	int code, y, x;
 
 	/* initialize the background tilemap */
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mcr68_state::zwackery_get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  16,16, 32,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mcr68_state::zwackery_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,32);
 
 	/* initialize the foreground tilemap */
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mcr68_state::zwackery_get_fg_tile_info),state), TILEMAP_SCAN_ROWS,  16,16, 32,32);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mcr68_state::zwackery_get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,32);
+	m_fg_tilemap->set_transparent_pen(0);
 
 	/* allocate memory for the assembled gfx data */
-	srcdata0 = auto_alloc_array(machine, UINT8, gfx0->elements() * gfx0->width() * gfx0->height());
-	srcdata2 = auto_alloc_array(machine, UINT8, gfx2->elements() * gfx2->width() * gfx2->height());
+	srcdata0 = auto_alloc_array(machine(), UINT8, gfx0->elements() * gfx0->width() * gfx0->height());
+	srcdata2 = auto_alloc_array(machine(), UINT8, gfx2->elements() * gfx2->width() * gfx2->height());
 
 	/* "colorize" each code */
 	dest0 = srcdata0;

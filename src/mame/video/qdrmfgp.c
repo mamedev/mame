@@ -27,9 +27,9 @@ void qdrmfgp2_tile_callback(running_machine &machine, int layer, int *code, int 
 
 ***************************************************************************/
 
-VIDEO_START( qdrmfgp )
+VIDEO_START_MEMBER(qdrmfgp_state,qdrmfgp)
 {
-	device_t *k056832 = machine.device("k056832");
+	device_t *k056832 = machine().device("k056832");
 
 	k056832_set_layer_association(k056832, 0);
 
@@ -39,9 +39,9 @@ VIDEO_START( qdrmfgp )
 	k056832_set_layer_offs(k056832, 3, 8, 0);
 }
 
-VIDEO_START( qdrmfgp2 )
+VIDEO_START_MEMBER(qdrmfgp_state,qdrmfgp2)
 {
-	device_t *k056832 = machine.device("k056832");
+	device_t *k056832 = machine().device("k056832");
 
 	k056832_set_layer_association(k056832, 0);
 

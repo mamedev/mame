@@ -20,10 +20,9 @@ TILE_GET_INFO_MEMBER(himesiki_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, col, 0);
 }
 
-VIDEO_START( himesiki )
+void himesiki_state::video_start()
 {
-	himesiki_state *state = machine.driver_data<himesiki_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(himesiki_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(himesiki_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 WRITE8_MEMBER(himesiki_state::himesiki_bg_ram_w)

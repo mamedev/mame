@@ -108,6 +108,8 @@ public:
 	DECLARE_WRITE16_MEMBER(vertigo_motor_w);
 	DECLARE_READ16_MEMBER(vertigo_pit8254_lsb_r);
 	DECLARE_WRITE16_MEMBER(vertigo_pit8254_lsb_w);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -119,8 +121,8 @@ extern const struct pit8253_config vertigo_pit8254_config;
 
 
 INTERRUPT_GEN( vertigo_interrupt );
-MACHINE_START( vertigo );
-MACHINE_RESET( vertigo );
+
+
 
 /*----------- defined in video/vertigo.c -----------*/
 

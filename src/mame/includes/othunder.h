@@ -59,10 +59,13 @@ public:
 	DECLARE_WRITE16_MEMBER(othunder_sound_w);
 	DECLARE_READ16_MEMBER(othunder_sound_r);
 	DECLARE_WRITE8_MEMBER(othunder_TC0310FAM_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/othunder.c -----------*/
 
-VIDEO_START( othunder );
+
 SCREEN_UPDATE_IND16( othunder );

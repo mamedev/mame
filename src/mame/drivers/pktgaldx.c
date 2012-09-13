@@ -314,14 +314,13 @@ static const deco16ic_interface pktgaldx_deco16ic_tilegen1_intf =
 
 
 
-static MACHINE_START( pktgaldx )
+void pktgaldx_state::machine_start()
 {
-	pktgaldx_state *state = machine.driver_data<pktgaldx_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_deco_tilegen1 = machine.device("tilegen1");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_deco_tilegen1 = machine().device("tilegen1");
 
-	decoprot_reset(machine);
+	decoprot_reset(machine());
 }
 
 static MACHINE_CONFIG_START( pktgaldx, pktgaldx_state )
@@ -331,7 +330,6 @@ static MACHINE_CONFIG_START( pktgaldx, pktgaldx_state )
 	MCFG_CPU_PROGRAM_MAP(pktgaldx_map)
 	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MCFG_MACHINE_START(pktgaldx)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -371,7 +369,6 @@ static MACHINE_CONFIG_START( pktgaldb, pktgaldx_state )
 	MCFG_CPU_PROGRAM_MAP(pktgaldb_map)
 	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MCFG_MACHINE_START(pktgaldx)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

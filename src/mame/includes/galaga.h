@@ -52,6 +52,10 @@ public:
 	DECLARE_DRIVER_INIT(gatsbee);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	DECLARE_MACHINE_START(galaga);
+	DECLARE_MACHINE_RESET(galaga);
+	DECLARE_VIDEO_START(galaga);
+	DECLARE_PALETTE_INIT(galaga);
 };
 
 class xevious_state : public galaga_state
@@ -81,6 +85,11 @@ public:
 	DECLARE_DRIVER_INIT(battles);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	DECLARE_VIDEO_START(xevious);
+	DECLARE_PALETTE_INIT(xevious);
+	DECLARE_MACHINE_RESET(xevios);
+	DECLARE_PALETTE_INIT(battles);
+	DECLARE_MACHINE_RESET(battles);		
 };
 
 
@@ -108,6 +117,8 @@ public:
 	TILEMAP_MAPPER_MEMBER(fg_tilemap_scan);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
+	DECLARE_VIDEO_START(bosco);
+	DECLARE_PALETTE_INIT(bosco);	
 };
 
 class digdug_state : public galaga_state
@@ -131,6 +142,8 @@ public:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
+	DECLARE_VIDEO_START(digdug);
+	DECLARE_PALETTE_INIT(digdug);		
 };
 
 
@@ -141,9 +154,9 @@ WRITE8_HANDLER( bosco_videoram_w );
 WRITE8_HANDLER( bosco_scrollx_w );
 WRITE8_HANDLER( bosco_scrolly_w );
 WRITE8_HANDLER( bosco_starclr_w );
-VIDEO_START( bosco );
+
 SCREEN_UPDATE_IND16( bosco );
-PALETTE_INIT( bosco );
+
 SCREEN_VBLANK( bosco );	/* update starfield */
 
 /*----------- defined in audio/galaga.c -----------*/
@@ -162,8 +175,8 @@ struct star
 
 extern const struct star star_seed_tab[];
 
-PALETTE_INIT( galaga );
-VIDEO_START( galaga );
+
+
 SCREEN_UPDATE_IND16( galaga );
 SCREEN_VBLANK( galaga );	/* update starfield */
 
@@ -176,11 +189,11 @@ WRITE8_HANDLER( xevious_bg_colorram_w );
 WRITE8_HANDLER( xevious_vh_latch_w );
 WRITE8_HANDLER( xevious_bs_w );
 READ8_HANDLER( xevious_bb_r );
-VIDEO_START( xevious );
-PALETTE_INIT( xevious );
+
+
 SCREEN_UPDATE_IND16( xevious );
 
-PALETTE_INIT( battles );
+
 
 /*----------- defined in machine/xevious.c -----------*/
 
@@ -206,6 +219,6 @@ INTERRUPT_GEN( battles_interrupt_4 );
 
 WRITE8_HANDLER( digdug_videoram_w );
 WRITE8_HANDLER( digdug_PORT_w );
-VIDEO_START( digdug );
+
 SCREEN_UPDATE_IND16( digdug );
-PALETTE_INIT( digdug );
+

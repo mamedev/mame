@@ -67,17 +67,25 @@ public:
 	TILE_GET_INFO_MEMBER(warlords_get_tile_info);
 	TILE_GET_INFO_MEMBER(milliped_get_tile_info);
 	TILE_GET_INFO_MEMBER(bullsdrt_get_tile_info);
+	DECLARE_MACHINE_START(centiped);
+	DECLARE_MACHINE_RESET(centiped);
+	DECLARE_VIDEO_START(centiped);
+	DECLARE_VIDEO_START(bullsdrt);
+	DECLARE_MACHINE_RESET(magworm);
+	DECLARE_VIDEO_START(milliped);
+	DECLARE_VIDEO_START(warlords);
+	DECLARE_PALETTE_INIT(warlords);
 };
 
 
 /*----------- defined in video/centiped.c -----------*/
 
-PALETTE_INIT( warlords );
 
-VIDEO_START( centiped );
-VIDEO_START( milliped );
-VIDEO_START( warlords );
-VIDEO_START( bullsdrt );
+
+
+
+
+
 
 SCREEN_UPDATE_IND16( centiped );
 SCREEN_UPDATE_IND16( milliped );

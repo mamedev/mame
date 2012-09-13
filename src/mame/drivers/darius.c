@@ -836,81 +836,79 @@ static void darius_postload(running_machine &machine)
 	reset_sound_region(machine);
 }
 
-static MACHINE_START( darius )
+void darius_state::machine_start()
 {
-	darius_state *state = machine.driver_data<darius_state>();
 
-	state->membank("bank1")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0x10000, 0x8000);
-	state->membank("bank1")->configure_entry(4, state->memregion("audiocpu")->base());
-	state->membank("bank1")->set_entry(4);
+	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x8000);
+	membank("bank1")->configure_entry(4, memregion("audiocpu")->base());
+	membank("bank1")->set_entry(4);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_cpub = machine.device("cpub");
-	state->m_adpcm = machine.device("adpcm");
-	state->m_pc080sn = machine.device("pc080sn");
-	state->m_tc0140syt = machine.device("tc0140syt");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_cpub = machine().device("cpub");
+	m_adpcm = machine().device("adpcm");
+	m_pc080sn = machine().device("pc080sn");
+	m_tc0140syt = machine().device("tc0140syt");
 
-	state->m_lscreen = machine.device("lscreen");
-	state->m_mscreen = machine.device("mscreen");
-	state->m_rscreen = machine.device("rscreen");
+	m_lscreen = machine().device("lscreen");
+	m_mscreen = machine().device("mscreen");
+	m_rscreen = machine().device("rscreen");
 
-	state->m_filter0_0l = machine.device("filter0.0l");
-	state->m_filter0_0r = machine.device("filter0.0r");
-	state->m_filter0_1l = machine.device("filter0.1l");
-	state->m_filter0_1r = machine.device("filter0.1r");
-	state->m_filter0_2l = machine.device("filter0.2l");
-	state->m_filter0_2r = machine.device("filter0.2r");
-	state->m_filter0_3l = machine.device("filter0.3l");
-	state->m_filter0_3r = machine.device("filter0.3r");
+	m_filter0_0l = machine().device("filter0.0l");
+	m_filter0_0r = machine().device("filter0.0r");
+	m_filter0_1l = machine().device("filter0.1l");
+	m_filter0_1r = machine().device("filter0.1r");
+	m_filter0_2l = machine().device("filter0.2l");
+	m_filter0_2r = machine().device("filter0.2r");
+	m_filter0_3l = machine().device("filter0.3l");
+	m_filter0_3r = machine().device("filter0.3r");
 
-	state->m_filter1_0l = machine.device("filter1.0l");
-	state->m_filter1_0r = machine.device("filter1.0r");
-	state->m_filter1_1l = machine.device("filter1.1l");
-	state->m_filter1_1r = machine.device("filter1.1r");
-	state->m_filter1_2l = machine.device("filter1.2l");
-	state->m_filter1_2r = machine.device("filter1.2r");
-	state->m_filter1_3l = machine.device("filter1.3l");
-	state->m_filter1_3r = machine.device("filter1.3r");
+	m_filter1_0l = machine().device("filter1.0l");
+	m_filter1_0r = machine().device("filter1.0r");
+	m_filter1_1l = machine().device("filter1.1l");
+	m_filter1_1r = machine().device("filter1.1r");
+	m_filter1_2l = machine().device("filter1.2l");
+	m_filter1_2r = machine().device("filter1.2r");
+	m_filter1_3l = machine().device("filter1.3l");
+	m_filter1_3r = machine().device("filter1.3r");
 
-	state->m_msm5205_l = machine.device("msm5205.l");
-	state->m_msm5205_r = machine.device("msm5205.r");
+	m_msm5205_l = machine().device("msm5205.l");
+	m_msm5205_r = machine().device("msm5205.r");
 
-	state->save_item(NAME(state->m_cpua_ctrl));
-	state->save_item(NAME(state->m_coin_word));
+	save_item(NAME(m_cpua_ctrl));
+	save_item(NAME(m_coin_word));
 
-	state->save_item(NAME(state->m_banknum));
-	state->save_item(NAME(state->m_adpcm_command));
-	state->save_item(NAME(state->m_nmi_enable));
-	state->save_item(NAME(state->m_vol));
-	state->save_item(NAME(state->m_pan));
-	machine.save().register_postload(save_prepost_delegate(FUNC(darius_postload), &machine));
+	save_item(NAME(m_banknum));
+	save_item(NAME(m_adpcm_command));
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_vol));
+	save_item(NAME(m_pan));
+	machine().save().register_postload(save_prepost_delegate(FUNC(darius_postload), &machine()));
 }
 
 
-static MACHINE_RESET( darius )
+void darius_state::machine_reset()
 {
-	darius_state *state = machine.driver_data<darius_state>();
 	int  i;
 
-	state->m_cpua_ctrl = 0xff;
-	state->m_banknum = 0;
-	state->m_coin_word = 0;
-	state->m_adpcm_command = 0;
-	state->m_nmi_enable = 0;
+	m_cpua_ctrl = 0xff;
+	m_banknum = 0;
+	m_coin_word = 0;
+	m_adpcm_command = 0;
+	m_nmi_enable = 0;
 
-	machine.sound().system_enable(true);	/* mixer enabled */
+	machine().sound().system_enable(true);	/* mixer enabled */
 
 	for (i = 0; i < DARIUS_VOL_MAX; i++)
-		state->m_vol[i] = 0x00;	/* min volume */
+		m_vol[i] = 0x00;	/* min volume */
 
 	for (i = 0; i < DARIUS_PAN_MAX; i++)
-		state->m_pan[i] = 0x80;	/* center */
+		m_pan[i] = 0x80;	/* center */
 
 	for (i = 0; i < 0x10; i++)
 	{
 		//logerror( "calc %d = %d\n", i, (int)(100.0f / (float)pow(10.0f, (32.0f - (i * (32.0f / (float)(0xf)))) / 20.0f)) );
-		state->m_def_vol[i] = (int)(100.0f / (float)pow(10.0f, (32.0f - (i * (32.0f / (float)(0xf)))) / 20.0f));
+		m_def_vol[i] = (int)(100.0f / (float)pow(10.0f, (32.0f - (i * (32.0f / (float)(0xf)))) / 20.0f));
 	}
 }
 
@@ -935,8 +933,6 @@ static MACHINE_CONFIG_START( darius, darius_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame ? */
 
-	MCFG_MACHINE_START(darius)
-	MCFG_MACHINE_RESET(darius)
 
 	/* video hardware */
 	MCFG_GFXDECODE(darius)
@@ -964,7 +960,6 @@ static MACHINE_CONFIG_START( darius, darius_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 29*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(darius_right)
 
-	MCFG_VIDEO_START(darius)
 
 	MCFG_PC080SN_ADD("pc080sn", darius_pc080sn_intf)
 

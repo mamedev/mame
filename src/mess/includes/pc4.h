@@ -62,6 +62,7 @@ public:
 	INT8 m_disp_shift;
 	INT8 m_direction;
 	UINT8 m_blink;
+	virtual void palette_init();
 };
 
 #endif	// _PC4_H_

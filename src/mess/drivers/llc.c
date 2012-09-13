@@ -202,8 +202,8 @@ static MACHINE_CONFIG_START( llc1, llc_state )
 	MCFG_CPU_PROGRAM_MAP(llc1_mem)
 	MCFG_CPU_IO_MAP(llc1_io)
 
-	MCFG_MACHINE_START( llc1 )
-	MCFG_MACHINE_RESET( llc1 )
+	MCFG_MACHINE_START_OVERRIDE(llc_state, llc1 )
+	MCFG_MACHINE_RESET_OVERRIDE(llc_state, llc1 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -215,7 +215,6 @@ static MACHINE_CONFIG_START( llc1, llc_state )
 	MCFG_GFXDECODE(llc1)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-	MCFG_VIDEO_START(llc)
 	MCFG_DEFAULT_LAYOUT(layout_llc1)
 
 	MCFG_Z80PIO_ADD( "z80pio1", XTAL_3MHz, llc1_z80pio1_intf )
@@ -231,7 +230,7 @@ static MACHINE_CONFIG_START( llc2, llc_state )
 	MCFG_CPU_PROGRAM_MAP(llc2_mem)
 	MCFG_CPU_IO_MAP(llc2_io)
 
-	MCFG_MACHINE_RESET( llc2 )
+	MCFG_MACHINE_RESET_OVERRIDE(llc_state, llc2 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -243,7 +242,6 @@ static MACHINE_CONFIG_START( llc2, llc_state )
 	MCFG_GFXDECODE(llc2)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-	MCFG_VIDEO_START(llc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

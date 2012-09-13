@@ -76,6 +76,10 @@ public:
 	DECLARE_WRITE8_MEMBER(dai_pit_w);
 	DECLARE_READ8_MEMBER(dai_keyboard_r);
 	DECLARE_WRITE8_MEMBER(dai_keyboard_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -85,17 +89,17 @@ extern const struct pit8253_config dai_pit8253_intf;
 extern const i8255_interface dai_ppi82555_intf;
 extern const tms5501_interface dai_tms5501_interface;
 
-MACHINE_START( dai );
-MACHINE_RESET( dai );
+
+
 
 
 /*----------- defined in video/dai.c -----------*/
 
 extern const unsigned char dai_palette[16*3];
 
-VIDEO_START( dai );
+
 SCREEN_UPDATE_IND16( dai );
-PALETTE_INIT( dai );
+
 
 
 /*----------- defined in audio/dai.c -----------*/

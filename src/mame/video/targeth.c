@@ -69,13 +69,12 @@ WRITE16_MEMBER(targeth_state::targeth_vram_w)
 
 ***************************************************************************/
 
-VIDEO_START( targeth )
+void targeth_state::video_start()
 {
-	targeth_state *state = machine.driver_data<targeth_state>();
-	state->m_pant[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(targeth_state::get_tile_info_targeth_screen0),state),TILEMAP_SCAN_ROWS,16,16,64,32);
-	state->m_pant[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(targeth_state::get_tile_info_targeth_screen1),state),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(targeth_state::get_tile_info_targeth_screen0),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(targeth_state::get_tile_info_targeth_screen1),this),TILEMAP_SCAN_ROWS,16,16,64,32);
 
-	state->m_pant[0]->set_transparent_pen(0);
+	m_pant[0]->set_transparent_pen(0);
 }
 
 

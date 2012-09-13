@@ -495,11 +495,10 @@ GFXDECODEINFO(0x100000,64)
  *
  *************************************/
 
-static MACHINE_START( gaelco )
+void gaelco_state::machine_start()
 {
-	gaelco_state *state = machine.driver_data<gaelco_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 }
 
 static MACHINE_CONFIG_START( bigkarnk, gaelco_state )
@@ -514,7 +513,6 @@ static MACHINE_CONFIG_START( bigkarnk, gaelco_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(gaelco)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -527,7 +525,7 @@ static MACHINE_CONFIG_START( bigkarnk, gaelco_state )
 	MCFG_GFXDECODE(0x100000)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(bigkarnk)
+	MCFG_VIDEO_START_OVERRIDE(gaelco_state,bigkarnk)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -546,7 +544,6 @@ static MACHINE_CONFIG_START( maniacsq, gaelco_state )
 	MCFG_CPU_PROGRAM_MAP(maniacsq_map)
 	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MCFG_MACHINE_START(gaelco)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -559,7 +556,7 @@ static MACHINE_CONFIG_START( maniacsq, gaelco_state )
 	MCFG_GFXDECODE(0x100000)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(maniacsq)
+	MCFG_VIDEO_START_OVERRIDE(gaelco_state,maniacsq)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -577,7 +574,6 @@ static MACHINE_CONFIG_START( squash, gaelco_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(gaelco)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -590,7 +586,7 @@ static MACHINE_CONFIG_START( squash, gaelco_state )
 	MCFG_GFXDECODE(0x100000)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(maniacsq)
+	MCFG_VIDEO_START_OVERRIDE(gaelco_state,maniacsq)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -608,7 +604,6 @@ static MACHINE_CONFIG_START( thoop, gaelco_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(gaelco)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -621,7 +616,7 @@ static MACHINE_CONFIG_START( thoop, gaelco_state )
 	MCFG_GFXDECODE(0x100000)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(maniacsq)
+	MCFG_VIDEO_START_OVERRIDE(gaelco_state,maniacsq)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

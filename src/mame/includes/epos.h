@@ -23,6 +23,9 @@ public:
 	DECLARE_WRITE8_MEMBER(epos_port_1_w);
 	DECLARE_WRITE8_MEMBER(write_prtc);
 	DECLARE_DRIVER_INIT(dealer);
+	virtual void machine_reset();
+	DECLARE_MACHINE_START(epos);
+	DECLARE_MACHINE_START(dealer);
 };
 
 

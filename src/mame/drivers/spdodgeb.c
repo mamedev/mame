@@ -394,19 +394,18 @@ static const msm5205_interface msm5205_config =
 };
 
 
-static MACHINE_RESET( spdodgeb )
+void spdodgeb_state::machine_reset()
 {
-	spdodgeb_state *state = machine.driver_data<spdodgeb_state>();
-	state->m_toggle = 0;
-	state->m_adpcm_pos[0] = state->m_adpcm_pos[1] = 0;
-	state->m_adpcm_end[0] = state->m_adpcm_end[1] = 0;
-	state->m_adpcm_idle[0] = state->m_adpcm_data[1] = 0;
-	state->m_adpcm_data[0] = state->m_adpcm_data[1] = -1;
-	state->m_mcu63701_command = 0;
-	memset(state->m_inputs, 0, sizeof(state->m_inputs));
-	memset(state->m_tapc, 0, sizeof(state->m_tapc));
-	state->m_last_port[0] = state->m_last_port[1] = 0;
-	state->m_last_dash[0] = state->m_last_dash[1] = 0;
+	m_toggle = 0;
+	m_adpcm_pos[0] = m_adpcm_pos[1] = 0;
+	m_adpcm_end[0] = m_adpcm_end[1] = 0;
+	m_adpcm_idle[0] = m_adpcm_data[1] = 0;
+	m_adpcm_data[0] = m_adpcm_data[1] = -1;
+	m_mcu63701_command = 0;
+	memset(m_inputs, 0, sizeof(m_inputs));
+	memset(m_tapc, 0, sizeof(m_tapc));
+	m_last_port[0] = m_last_port[1] = 0;
+	m_last_dash[0] = m_last_dash[1] = 0;
 }
 
 static MACHINE_CONFIG_START( spdodgeb, spdodgeb_state )
@@ -427,10 +426,7 @@ static MACHINE_CONFIG_START( spdodgeb, spdodgeb_state )
 	MCFG_GFXDECODE(spdodgeb)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_PALETTE_INIT(spdodgeb)
-	MCFG_VIDEO_START(spdodgeb)
 
-	MCFG_MACHINE_RESET( spdodgeb )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

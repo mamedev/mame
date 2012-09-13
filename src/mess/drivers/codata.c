@@ -18,6 +18,8 @@ public:
 		m_p_base(*this, "p_base"){ }
 
 	required_shared_ptr<UINT16> m_p_base;
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -36,15 +38,14 @@ static INPUT_PORTS_START( codata )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(codata)
+void codata_state::machine_reset()
 {
-	codata_state *state = machine.driver_data<codata_state>();
-	UINT8* RAM = state->memregion("user1")->base();
-	memcpy(state->m_p_base, RAM, 16);
-	machine.device("maincpu")->reset();
+	UINT8* RAM = memregion("user1")->base();
+	memcpy(m_p_base, RAM, 16);
+	machine().device("maincpu")->reset();
 }
 
-static VIDEO_START( codata )
+void codata_state::video_start()
 {
 }
 
@@ -58,7 +59,6 @@ static MACHINE_CONFIG_START( codata, codata_state )
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(codata_mem)
 
-	MCFG_MACHINE_RESET(codata)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -71,7 +71,6 @@ static MACHINE_CONFIG_START( codata, codata_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START(codata)
 MACHINE_CONFIG_END
 
 /* ROM definition */

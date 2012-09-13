@@ -120,6 +120,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_layer0_tile_info);
 	TILE_GET_INFO_MEMBER(get_layer1_tile_info);
 	TILE_GET_INFO_MEMBER(get_layer2_tile_info);
+	virtual void video_start();
 };
 
 
@@ -186,15 +187,14 @@ TILE_GET_INFO_MEMBER(magic10_state::get_layer2_tile_info)
 }
 
 
-static VIDEO_START( magic10 )
+void magic10_state::video_start()
 {
-	magic10_state *state = machine.driver_data<magic10_state>();
-	state->m_layer0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(magic10_state::get_layer0_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_layer1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(magic10_state::get_layer1_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_layer2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(magic10_state::get_layer2_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_layer0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(magic10_state::get_layer0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_layer1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(magic10_state::get_layer1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_layer2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(magic10_state::get_layer2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
-	state->m_layer1_tilemap->set_transparent_pen(0);
-	state->m_layer2_tilemap->set_transparent_pen(0);
+	m_layer1_tilemap->set_transparent_pen(0);
+	m_layer2_tilemap->set_transparent_pen(0);
 }
 
 static SCREEN_UPDATE_IND16( magic10 )
@@ -744,7 +744,6 @@ static MACHINE_CONFIG_START( magic10, magic10_state )
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_GFXDECODE(magic10)
 
-	MCFG_VIDEO_START(magic10)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

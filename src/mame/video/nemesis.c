@@ -291,34 +291,33 @@ static void nemesis_postload(running_machine &machine)
 
 
 /* claim a palette dirty array */
-VIDEO_START( nemesis )
+void nemesis_state::video_start()
 {
-	nemesis_state *state = machine.driver_data<nemesis_state>();
 
-	state->m_spriteram_words = state->m_spriteram.bytes() / 2;
+	m_spriteram_words = m_spriteram.bytes() / 2;
 
-	state->m_background = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(nemesis_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	state->m_foreground = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(nemesis_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_background = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(nemesis_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_foreground = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(nemesis_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
-	state->m_background->set_transparent_pen(0);
-	state->m_foreground->set_transparent_pen(0);
-	state->m_background->set_scroll_rows(256);
-	state->m_foreground->set_scroll_rows(256);
+	m_background->set_transparent_pen(0);
+	m_foreground->set_transparent_pen(0);
+	m_background->set_scroll_rows(256);
+	m_foreground->set_scroll_rows(256);
 
-	memset(state->m_charram, 0, state->m_charram.bytes());
-	memset(state->m_blank_tile, 0, ARRAY_LENGTH(state->m_blank_tile));
+	memset(m_charram, 0, m_charram.bytes());
+	memset(m_blank_tile, 0, ARRAY_LENGTH(m_blank_tile));
 
-	machine.gfx[0]->set_source((UINT8 *)state->m_charram.target());
-	machine.gfx[1]->set_source((UINT8 *)state->m_charram.target());
-	machine.gfx[2]->set_source((UINT8 *)state->m_charram.target());
-	machine.gfx[3]->set_source((UINT8 *)state->m_charram.target());
-	machine.gfx[4]->set_source((UINT8 *)state->m_charram.target());
-	machine.gfx[5]->set_source((UINT8 *)state->m_charram.target());
-	machine.gfx[6]->set_source((UINT8 *)state->m_charram.target());
-	machine.gfx[7]->set_source((UINT8 *)state->m_charram.target());
+	machine().gfx[0]->set_source((UINT8 *)m_charram.target());
+	machine().gfx[1]->set_source((UINT8 *)m_charram.target());
+	machine().gfx[2]->set_source((UINT8 *)m_charram.target());
+	machine().gfx[3]->set_source((UINT8 *)m_charram.target());
+	machine().gfx[4]->set_source((UINT8 *)m_charram.target());
+	machine().gfx[5]->set_source((UINT8 *)m_charram.target());
+	machine().gfx[6]->set_source((UINT8 *)m_charram.target());
+	machine().gfx[7]->set_source((UINT8 *)m_charram.target());
 
 	/* Set up save state */
-	machine.save().register_postload(save_prepost_delegate(FUNC(nemesis_postload), &machine));
+	machine().save().register_postload(save_prepost_delegate(FUNC(nemesis_postload), &machine()));
 }
 
 

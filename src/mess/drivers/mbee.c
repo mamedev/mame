@@ -673,7 +673,7 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MCFG_CPU_IO_MAP(mbee_io)
 	MCFG_CPU_CONFIG(mbee_daisy_chain)
 
-	MCFG_MACHINE_RESET( mbee )
+	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee )
 
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_12MHz / 6, mbee_z80pio_intf )
 
@@ -688,7 +688,7 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_amber) // usually sold with amber or green monitor
 
-	MCFG_VIDEO_START(mbee)
+	MCFG_VIDEO_START_OVERRIDE(mbee_state,mbee)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -714,7 +714,7 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MCFG_CPU_CONFIG(mbee_daisy_chain)
 	//MCFG_CPU_VBLANK_INT("screen", mbee_interrupt)
 
-	MCFG_MACHINE_RESET( mbee )
+	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee )
 
 	MCFG_Z80PIO_ADD( "z80pio", 3375000, mbee_z80pio_intf )
 
@@ -727,9 +727,9 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 
 	MCFG_GFXDECODE(mbeeic)
 	MCFG_PALETTE_LENGTH(96)
-	MCFG_PALETTE_INIT(mbeeic)
+	MCFG_PALETTE_INIT_OVERRIDE(mbee_state,mbeeic)
 
-	MCFG_VIDEO_START(mbeeic)
+	MCFG_VIDEO_START_OVERRIDE(mbee_state,mbeeic)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -759,17 +759,17 @@ static MACHINE_CONFIG_DERIVED( mbeepc85, mbeeic )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbeepc85b, mbeepc85 )
-	MCFG_PALETTE_INIT(mbeepc85b)
+	MCFG_PALETTE_INIT_OVERRIDE(mbee_state,mbeepc85b)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbeeppc, mbeeic )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbeeppc_mem)
 	MCFG_CPU_IO_MAP(mbeeppc_io)
-	MCFG_VIDEO_START(mbeeppc)
+	MCFG_VIDEO_START_OVERRIDE(mbee_state,mbeeppc)
 	MCFG_GFXDECODE(mbeeppc)
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT(mbeeppc)
+	MCFG_PALETTE_INIT_OVERRIDE(mbee_state,mbeeppc)
 	MCFG_DEVICE_REMOVE("crtc")
 	MCFG_MC6845_ADD("crtc", SY6545_1, XTAL_13_5MHz / 8, mbeeppc_crtc)
 MACHINE_CONFIG_END
@@ -778,7 +778,7 @@ static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbee56_mem)
 	MCFG_CPU_IO_MAP(mbee56_io)
-	MCFG_MACHINE_RESET( mbee56 )
+	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee56 )
 	MCFG_WD2793_ADD("fdc", mbee_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mbee_floppy_interface)
 MACHINE_CONFIG_END
@@ -787,14 +787,14 @@ static MACHINE_CONFIG_DERIVED( mbee64, mbee56 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbee64_mem)
 	MCFG_CPU_IO_MAP(mbee64_io)
-	MCFG_MACHINE_RESET( mbee64 )
+	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee64 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee128, mbeeppc )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbee128_mem)
 	MCFG_CPU_IO_MAP(mbee128_io)
-	MCFG_MACHINE_RESET( mbee128 )
+	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128 )
 	MCFG_WD2793_ADD("fdc", mbee_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mbee_floppy_interface)
 MACHINE_CONFIG_END
@@ -802,7 +802,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mbee256, mbee128 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP(mbee256_io)
-	MCFG_MACHINE_RESET( mbee256 )
+	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee256 )
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 	MCFG_DEVICE_REMOVE("crtc")
 	MCFG_MC6845_ADD("crtc", SY6545_1, XTAL_13_5MHz / 8, mbee256_crtc)
@@ -812,7 +812,7 @@ static MACHINE_CONFIG_DERIVED( mbeett, mbeeppc )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbeett_mem)
 	MCFG_CPU_IO_MAP(mbeett_io)
-	MCFG_MACHINE_RESET( mbeett )
+	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbeett )
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 	MCFG_DEVICE_REMOVE("crtc")
 	MCFG_MC6845_ADD("crtc", SY6545_1, XTAL_13_5MHz / 8, mbee256_crtc)

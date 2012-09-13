@@ -81,6 +81,8 @@ public:
 	DECLARE_WRITE16_MEMBER(dblewing_prot_w);
 	DECLARE_READ8_MEMBER(irq_latch_r);
 	DECLARE_DRIVER_INIT(dblewing);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 UINT16 dblwings_pri_callback(UINT16 x)
@@ -561,78 +563,76 @@ static const deco16ic_interface dblewing_deco16ic_tilegen1_intf =
 	0,1,
 };
 
-static MACHINE_START( dblewing )
+void dblewing_state::machine_start()
 {
-	dblewing_state *state = machine.driver_data<dblewing_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_deco_tilegen1 = machine.device("tilegen1");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_deco_tilegen1 = machine().device("tilegen1");
 
-	state->save_item(NAME(state->m_008_data));
-	state->save_item(NAME(state->m_104_data));
-	state->save_item(NAME(state->m_406_data));
-	state->save_item(NAME(state->m_608_data));
-	state->save_item(NAME(state->m_70c_data));
-	state->save_item(NAME(state->m_78a_data));
-	state->save_item(NAME(state->m_088_data));
-	state->save_item(NAME(state->m_58c_data));
-	state->save_item(NAME(state->m_408_data));
-	state->save_item(NAME(state->m_40e_data));
-	state->save_item(NAME(state->m_080_data));
-	state->save_item(NAME(state->m_788_data));
-	state->save_item(NAME(state->m_38e_data));
-	state->save_item(NAME(state->m_580_data));
-	state->save_item(NAME(state->m_60a_data));
-	state->save_item(NAME(state->m_200_data));
-	state->save_item(NAME(state->m_28c_data));
-	state->save_item(NAME(state->m_18a_data));
-	state->save_item(NAME(state->m_280_data));
-	state->save_item(NAME(state->m_384_data));
+	save_item(NAME(m_008_data));
+	save_item(NAME(m_104_data));
+	save_item(NAME(m_406_data));
+	save_item(NAME(m_608_data));
+	save_item(NAME(m_70c_data));
+	save_item(NAME(m_78a_data));
+	save_item(NAME(m_088_data));
+	save_item(NAME(m_58c_data));
+	save_item(NAME(m_408_data));
+	save_item(NAME(m_40e_data));
+	save_item(NAME(m_080_data));
+	save_item(NAME(m_788_data));
+	save_item(NAME(m_38e_data));
+	save_item(NAME(m_580_data));
+	save_item(NAME(m_60a_data));
+	save_item(NAME(m_200_data));
+	save_item(NAME(m_28c_data));
+	save_item(NAME(m_18a_data));
+	save_item(NAME(m_280_data));
+	save_item(NAME(m_384_data));
 
-	state->save_item(NAME(state->m_boss_move));
-	state->save_item(NAME(state->m_boss_shoot_type));
-	state->save_item(NAME(state->m_boss_3_data));
-	state->save_item(NAME(state->m_boss_4_data));
-	state->save_item(NAME(state->m_boss_5_data));
-	state->save_item(NAME(state->m_boss_5sx_data));
-	state->save_item(NAME(state->m_boss_6_data));
-	state->save_item(NAME(state->m_sound_irq));
+	save_item(NAME(m_boss_move));
+	save_item(NAME(m_boss_shoot_type));
+	save_item(NAME(m_boss_3_data));
+	save_item(NAME(m_boss_4_data));
+	save_item(NAME(m_boss_5_data));
+	save_item(NAME(m_boss_5sx_data));
+	save_item(NAME(m_boss_6_data));
+	save_item(NAME(m_sound_irq));
 }
 
-static MACHINE_RESET( dblewing )
+void dblewing_state::machine_reset()
 {
-	dblewing_state *state = machine.driver_data<dblewing_state>();
 
-	state->m_008_data = 0;
-	state->m_104_data = 0;
-	state->m_406_data = 0;
-	state->m_608_data = 0;
-	state->m_70c_data = 0;
-	state->m_78a_data = 0;
-	state->m_088_data = 0;
-	state->m_58c_data = 0;
-	state->m_408_data = 0;
-	state->m_40e_data = 0;
-	state->m_080_data = 0;
-	state->m_788_data = 0;
-	state->m_38e_data = 0;
-	state->m_580_data = 0;
-	state->m_60a_data = 0;
-	state->m_200_data = 0;
-	state->m_28c_data = 0;
-	state->m_18a_data = 0;
-	state->m_280_data = 0;
-	state->m_384_data = 0;
+	m_008_data = 0;
+	m_104_data = 0;
+	m_406_data = 0;
+	m_608_data = 0;
+	m_70c_data = 0;
+	m_78a_data = 0;
+	m_088_data = 0;
+	m_58c_data = 0;
+	m_408_data = 0;
+	m_40e_data = 0;
+	m_080_data = 0;
+	m_788_data = 0;
+	m_38e_data = 0;
+	m_580_data = 0;
+	m_60a_data = 0;
+	m_200_data = 0;
+	m_28c_data = 0;
+	m_18a_data = 0;
+	m_280_data = 0;
+	m_384_data = 0;
 
-	state->m_boss_move = 0;
-	state->m_boss_shoot_type = 0;
-	state->m_boss_3_data = 0;
-	state->m_boss_4_data = 0;
-	state->m_boss_5_data = 0;
-	state->m_boss_5sx_data = 0;
-	state->m_boss_6_data = 0;
-	state->m_sound_irq = 0;
+	m_boss_move = 0;
+	m_boss_shoot_type = 0;
+	m_boss_3_data = 0;
+	m_boss_4_data = 0;
+	m_boss_5_data = 0;
+	m_boss_5sx_data = 0;
+	m_boss_6_data = 0;
+	m_sound_irq = 0;
 }
 
 static MACHINE_CONFIG_START( dblewing, dblewing_state )
@@ -648,8 +648,6 @@ static MACHINE_CONFIG_START( dblewing, dblewing_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(dblewing)
-	MCFG_MACHINE_RESET(dblewing)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

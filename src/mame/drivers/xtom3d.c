@@ -113,6 +113,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
 	DECLARE_WRITE_LINE_MEMBER(xtom3d_pic8259_1_set_int_line);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 // Intel 82439TX System Controller (MXTC)
@@ -644,37 +646,36 @@ static void ide_interrupt(device_t *device, int state)
 
 static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
 
-static MACHINE_START( xtom3d )
+void xtom3d_state::machine_start()
 {
-	xtom3d_state *state = machine.driver_data<xtom3d_state>();
 
-	state->m_bios_ram = auto_alloc_array(machine, UINT32, 0x10000/4);
-	state->m_bios_ext1_ram = auto_alloc_array(machine, UINT32, 0x4000/4);
-	state->m_bios_ext2_ram = auto_alloc_array(machine, UINT32, 0x4000/4);
-	state->m_bios_ext3_ram = auto_alloc_array(machine, UINT32, 0x4000/4);
-	state->m_bios_ext4_ram = auto_alloc_array(machine, UINT32, 0x4000/4);
-	state->m_isa_ram1 = auto_alloc_array(machine, UINT32, 0x4000/4);
-	state->m_isa_ram2 = auto_alloc_array(machine, UINT32, 0x4000/4);
+	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x10000/4);
+	m_bios_ext1_ram = auto_alloc_array(machine(), UINT32, 0x4000/4);
+	m_bios_ext2_ram = auto_alloc_array(machine(), UINT32, 0x4000/4);
+	m_bios_ext3_ram = auto_alloc_array(machine(), UINT32, 0x4000/4);
+	m_bios_ext4_ram = auto_alloc_array(machine(), UINT32, 0x4000/4);
+	m_isa_ram1 = auto_alloc_array(machine(), UINT32, 0x4000/4);
+	m_isa_ram2 = auto_alloc_array(machine(), UINT32, 0x4000/4);
 
-	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, xtom3d_set_keyb_int);
+	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, xtom3d_set_keyb_int);
 
-	state->m_maincpu->set_irq_acknowledge_callback(irq_callback);
-	intel82439tx_init(machine);
+	m_maincpu->set_irq_acknowledge_callback(irq_callback);
+	intel82439tx_init(machine());
 
-	kbdc8042_init(machine, &at8042);
-	pc_vga_init(machine, vga_setting, NULL);
-	pc_vga_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine.device("maincpu")->memory().space(AS_IO), 0x0000);
+	kbdc8042_init(machine(), &at8042);
+	pc_vga_init(machine(), vga_setting, NULL);
+	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
-static MACHINE_RESET( xtom3d )
+void xtom3d_state::machine_reset()
 {
-	machine.root_device().membank("bios_bank")->set_base(machine.root_device().memregion("bios")->base() + 0x10000);
-	machine.root_device().membank("bios_ext1")->set_base(machine.root_device().memregion("bios")->base() + 0);
-	machine.root_device().membank("bios_ext2")->set_base(machine.root_device().memregion("bios")->base() + 0x4000);
-	machine.root_device().membank("bios_ext3")->set_base(machine.root_device().memregion("bios")->base() + 0x8000);
-	machine.root_device().membank("bios_ext4")->set_base(machine.root_device().memregion("bios")->base() + 0xc000);
-	machine.root_device().membank("video_bank1")->set_base(machine.root_device().memregion("video_bios")->base() + 0);
-	machine.root_device().membank("video_bank2")->set_base(machine.root_device().memregion("video_bios")->base() + 0x4000);
+	machine().root_device().membank("bios_bank")->set_base(machine().root_device().memregion("bios")->base() + 0x10000);
+	machine().root_device().membank("bios_ext1")->set_base(machine().root_device().memregion("bios")->base() + 0);
+	machine().root_device().membank("bios_ext2")->set_base(machine().root_device().memregion("bios")->base() + 0x4000);
+	machine().root_device().membank("bios_ext3")->set_base(machine().root_device().memregion("bios")->base() + 0x8000);
+	machine().root_device().membank("bios_ext4")->set_base(machine().root_device().memregion("bios")->base() + 0xc000);
+	machine().root_device().membank("video_bank1")->set_base(machine().root_device().memregion("video_bios")->base() + 0);
+	machine().root_device().membank("video_bank2")->set_base(machine().root_device().memregion("video_bios")->base() + 0x4000);
 }
 
 static const ide_config ide_intf = 
@@ -689,8 +690,6 @@ static MACHINE_CONFIG_START( xtom3d, xtom3d_state )
 	MCFG_CPU_PROGRAM_MAP(xtom3d_map)
 	MCFG_CPU_IO_MAP(xtom3d_io)
 
-	MCFG_MACHINE_START(xtom3d)
-	MCFG_MACHINE_RESET(xtom3d)
 
 	MCFG_PIT8254_ADD( "pit8254", xtom3d_pit8254_config )
 	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )

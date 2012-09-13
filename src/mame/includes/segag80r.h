@@ -96,6 +96,8 @@ public:
 	TILE_GET_INFO_MEMBER(spaceod_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(spaceod_scan_rows);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
+	virtual void machine_start();
+	virtual void video_start();
 };
 
 
@@ -122,7 +124,7 @@ INTERRUPT_GEN( segag80r_vblank_start );
 
 
 
-VIDEO_START( segag80r );
+
 SCREEN_UPDATE_IND16( segag80r );
 
 

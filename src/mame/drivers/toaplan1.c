@@ -1540,7 +1540,7 @@ static MACHINE_CONFIG_START( rallybik, toaplan1_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_RESET(toaplan1)
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1553,7 +1553,7 @@ static MACHINE_CONFIG_START( rallybik, toaplan1_state )
 	MCFG_GFXDECODE(rallybik)
 	MCFG_PALETTE_LENGTH((64*16)+(64*16))
 
-	MCFG_VIDEO_START(rallybik)
+	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,rallybik)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1577,7 +1577,7 @@ static MACHINE_CONFIG_START( truxton, toaplan1_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_RESET(toaplan1)
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1590,7 +1590,7 @@ static MACHINE_CONFIG_START( truxton, toaplan1_state )
 	MCFG_GFXDECODE(toaplan1)
 	MCFG_PALETTE_LENGTH((64*16)+(64*16))
 
-	MCFG_VIDEO_START(toaplan1)
+	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1614,7 +1614,7 @@ static MACHINE_CONFIG_START( hellfire, toaplan1_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_RESET(toaplan1)
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1627,7 +1627,7 @@ static MACHINE_CONFIG_START( hellfire, toaplan1_state )
 	MCFG_GFXDECODE(toaplan1)
 	MCFG_PALETTE_LENGTH((64*16)+(64*16))
 
-	MCFG_VIDEO_START(toaplan1)
+	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1651,7 +1651,7 @@ static MACHINE_CONFIG_START( zerowing, toaplan1_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_RESET(zerowing)
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,zerowing)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1664,7 +1664,7 @@ static MACHINE_CONFIG_START( zerowing, toaplan1_state )
 	MCFG_GFXDECODE(toaplan1)
 	MCFG_PALETTE_LENGTH((64*16)+(64*16))
 
-	MCFG_VIDEO_START(toaplan1)
+	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1692,7 +1692,7 @@ static MACHINE_CONFIG_START( demonwld, toaplan1_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_RESET(demonwld)
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,demonwld)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1705,7 +1705,7 @@ static MACHINE_CONFIG_START( demonwld, toaplan1_state )
 	MCFG_GFXDECODE(toaplan1)
 	MCFG_PALETTE_LENGTH((64*16)+(64*16))
 
-	MCFG_VIDEO_START(toaplan1)
+	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1727,7 +1727,7 @@ static MACHINE_CONFIG_START( samesame, toaplan1_state )
 	MCFG_CPU_PROGRAM_MAP(hd647180_mem_map)
 	MCFG_DEVICE_DISABLE()		/* Internal code is not dumped */
 
-	MCFG_MACHINE_RESET(toaplan1)
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1740,7 +1740,7 @@ static MACHINE_CONFIG_START( samesame, toaplan1_state )
 	MCFG_GFXDECODE(toaplan1)
 	MCFG_PALETTE_LENGTH((64*16)+(64*16))
 
-	MCFG_VIDEO_START(toaplan1)
+	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1764,7 +1764,7 @@ static MACHINE_CONFIG_START( outzone, toaplan1_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_RESET(zerowing)
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,zerowing)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1777,7 +1777,7 @@ static MACHINE_CONFIG_START( outzone, toaplan1_state )
 	MCFG_GFXDECODE(outzone)
 	MCFG_PALETTE_LENGTH((64*16)+(64*16))
 
-	MCFG_VIDEO_START(toaplan1)
+	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1799,7 +1799,7 @@ static MACHINE_CONFIG_START( vimana, toaplan1_state )
 	MCFG_CPU_PROGRAM_MAP(hd647180_mem_map)
 	MCFG_DEVICE_DISABLE()		/* Internal code is not dumped */
 
-	MCFG_MACHINE_RESET(vimana)
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,vimana)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1812,7 +1812,7 @@ static MACHINE_CONFIG_START( vimana, toaplan1_state )
 	MCFG_GFXDECODE(vm)
 	MCFG_PALETTE_LENGTH((64*16)+(64*16))
 
-	MCFG_VIDEO_START(toaplan1)
+	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

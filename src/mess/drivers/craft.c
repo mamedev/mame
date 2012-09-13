@@ -72,6 +72,7 @@ public:
 	DECLARE_READ8_MEMBER(avr8_read);
 	DECLARE_WRITE8_MEMBER(avr8_write);
 	DECLARE_DRIVER_INIT(craft);
+	virtual void machine_reset();
 };
 
 void craft_state::machine_start()
@@ -963,9 +964,9 @@ DRIVER_INIT_MEMBER(craft_state,craft)
 {
 }
 
-static MACHINE_RESET( craft )
+void craft_state::machine_reset()
 {
-    craft_state *state = machine.driver_data<craft_state>();
+    craft_state *state = machine().driver_data<craft_state>();
 
     AVR8_TIMSK1 = 0;
     AVR8_OCR1AH = 0;
@@ -977,7 +978,7 @@ static MACHINE_RESET( craft )
     AVR8_TCNT1H = 0;
     AVR8_TCNT1L = 0;
 
-    machine.device<dac_device>("dac")->write_unsigned8(0x00);
+    machine().device<dac_device>("dac")->write_unsigned8(0x00);
 }
 
 static MACHINE_CONFIG_START( craft, craft_state )
@@ -987,7 +988,6 @@ static MACHINE_CONFIG_START( craft, craft_state )
     MCFG_CPU_PROGRAM_MAP(craft_prg_map)
     MCFG_CPU_IO_MAP(craft_io_map)
 
-    MCFG_MACHINE_RESET(craft)
 
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)

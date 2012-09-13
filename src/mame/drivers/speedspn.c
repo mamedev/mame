@@ -289,7 +289,6 @@ static MACHINE_CONFIG_START( speedspn, speedspn_state )
 	MCFG_GFXDECODE(speedspn)
 	MCFG_PALETTE_LENGTH(0x400)
 
-	MCFG_VIDEO_START(speedspn)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

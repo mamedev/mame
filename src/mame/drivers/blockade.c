@@ -439,10 +439,10 @@ static GFXDECODE_START( blasto )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, blasto_layout,   0, 1 )
 GFXDECODE_END
 
-static PALETTE_INIT( blockade )
+void blockade_state::palette_init()
 {
-	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-	palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
+	palette_set_color(machine(),0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
+	palette_set_color(machine(),1,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
 }
 
 
@@ -452,20 +452,18 @@ static PALETTE_INIT( blockade )
  *
  *************************************/
 
-static MACHINE_START( blockade )
+void blockade_state::machine_start()
 {
-	blockade_state *state = machine.driver_data<blockade_state>();
 
-	state->save_item(NAME(state->m_coin_latch));
-	state->save_item(NAME(state->m_just_been_reset));
+	save_item(NAME(m_coin_latch));
+	save_item(NAME(m_just_been_reset));
 }
 
-static MACHINE_RESET( blockade )
+void blockade_state::machine_reset()
 {
-	blockade_state *state = machine.driver_data<blockade_state>();
 
-	state->m_coin_latch = 1;
-	state->m_just_been_reset = 0;
+	m_coin_latch = 1;
+	m_just_been_reset = 0;
 }
 
 static MACHINE_CONFIG_START( blockade, blockade_state )
@@ -476,8 +474,6 @@ static MACHINE_CONFIG_START( blockade, blockade_state )
 	MCFG_CPU_IO_MAP(main_io_map)
 	MCFG_CPU_VBLANK_INT("screen", blockade_interrupt)
 
-	MCFG_MACHINE_START(blockade)
-	MCFG_MACHINE_RESET(blockade)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -490,8 +486,6 @@ static MACHINE_CONFIG_START( blockade, blockade_state )
 	MCFG_GFXDECODE(blockade)
 	MCFG_PALETTE_LENGTH(2)
 
-	MCFG_PALETTE_INIT(blockade)
-	MCFG_VIDEO_START(blockade)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

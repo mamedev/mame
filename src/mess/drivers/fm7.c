@@ -1842,138 +1842,133 @@ DRIVER_INIT_MEMBER(fm7_state,fm7)
 	machine().device("sub")->execute().set_irq_acknowledge_callback(fm7_sub_irq_ack);
 }
 
-static MACHINE_START(fm7)
+MACHINE_START_MEMBER(fm7_state,fm7)
 {
-	fm7_state *state = machine.driver_data<fm7_state>();
 	// The FM-7 has no initialisation ROM, and no other obvious
 	// way to set the reset vector, so for now this will have to do.
-	UINT8* RAM = state->memregion("maincpu")->base();
+	UINT8* RAM = memregion("maincpu")->base();
 
 	RAM[0xfffe] = 0xfe;
 	RAM[0xffff] = 0x00;
 
-	memset(state->m_shared_ram,0xff,0x80);
-	state->m_type = SYS_FM7;
+	memset(m_shared_ram,0xff,0x80);
+	m_type = SYS_FM7;
 
-	beep_set_frequency(machine.device(BEEPER_TAG),1200);
-	beep_set_state(machine.device(BEEPER_TAG),0);
+	beep_set_frequency(machine().device(BEEPER_TAG),1200);
+	beep_set_state(machine().device(BEEPER_TAG),0);
 }
 
-static MACHINE_START(fm77av)
+MACHINE_START_MEMBER(fm7_state,fm77av)
 {
-	fm7_state *state = machine.driver_data<fm7_state>();
-	UINT8* RAM = machine.root_device().memregion("maincpu")->base();
-	UINT8* ROM = machine.root_device().memregion("init")->base();
+	UINT8* RAM = machine().root_device().memregion("maincpu")->base();
+	UINT8* ROM = machine().root_device().memregion("init")->base();
 
-	memset(state->m_shared_ram,0xff,0x80);
+	memset(m_shared_ram,0xff,0x80);
 
 	// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)
 	memcpy(RAM+0x3fff0,ROM+0x1ff0,16);
 
-	state->m_video.subrom = 0;  // default sub CPU ROM is type C.
-	RAM = machine.root_device().memregion("subsyscg")->base();
-	state->membank("bank20")->set_base(RAM);
-	RAM = state->memregion("subsys_c")->base();
-	state->membank("bank21")->set_base(RAM+0x800);
+	m_video.subrom = 0;  // default sub CPU ROM is type C.
+	RAM = machine().root_device().memregion("subsyscg")->base();
+	membank("bank20")->set_base(RAM);
+	RAM = memregion("subsys_c")->base();
+	membank("bank21")->set_base(RAM+0x800);
 
-	state->m_type = SYS_FM77AV;
-	beep_set_frequency(machine.device(BEEPER_TAG),1200);
-	beep_set_state(machine.device(BEEPER_TAG),0);
+	m_type = SYS_FM77AV;
+	beep_set_frequency(machine().device(BEEPER_TAG),1200);
+	beep_set_state(machine().device(BEEPER_TAG),0);
 }
 
-static MACHINE_START(fm11)
+MACHINE_START_MEMBER(fm7_state,fm11)
 {
-	fm7_state *state = machine.driver_data<fm7_state>();
-	UINT8* RAM = machine.root_device().memregion("maincpu")->base();
-	UINT8* ROM = state->memregion("init")->base();
+	UINT8* RAM = machine().root_device().memregion("maincpu")->base();
+	UINT8* ROM = memregion("init")->base();
 
-	memset(state->m_shared_ram,0xff,0x80);
-	state->m_type = SYS_FM11;
-	beep_set_frequency(machine.device(BEEPER_TAG),1200);
-	beep_set_state(machine.device(BEEPER_TAG),0);
+	memset(m_shared_ram,0xff,0x80);
+	m_type = SYS_FM11;
+	beep_set_frequency(machine().device(BEEPER_TAG),1200);
+	beep_set_state(machine().device(BEEPER_TAG),0);
 	// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)
 	memcpy(RAM+0x3fff0,ROM+0x0ff0,16);
 }
 
-static MACHINE_START(fm16)
+MACHINE_START_MEMBER(fm7_state,fm16)
 {
-	fm7_state *state = machine.driver_data<fm7_state>();
 
-	state->m_type = SYS_FM16;
-	beep_set_frequency(machine.device(BEEPER_TAG),1200);
-	beep_set_state(machine.device(BEEPER_TAG),0);
+	m_type = SYS_FM16;
+	beep_set_frequency(machine().device(BEEPER_TAG),1200);
+	beep_set_state(machine().device(BEEPER_TAG),0);
 }
 
-static MACHINE_RESET(fm7)
+void fm7_state::machine_reset()
 {
-	fm7_state *state = machine.driver_data<fm7_state>();
-	UINT8* RAM = machine.root_device().memregion("maincpu")->base();
-	UINT8* ROM = state->memregion("init")->base();
+	UINT8* RAM = machine().root_device().memregion("maincpu")->base();
+	UINT8* ROM = memregion("init")->base();
 
-	state->m_timer->adjust(attotime::from_nsec(2034500),0,attotime::from_nsec(2034500));
-	state->m_subtimer->adjust(attotime::from_msec(20),0,attotime::from_msec(20));
-	state->m_keyboard_timer->adjust(attotime::zero,0,attotime::from_msec(10));
-	if(state->m_type == SYS_FM77AV || state->m_type == SYS_FM77AV40EX || state->m_type == SYS_FM11)
-		state->m_fm77av_vsync_timer->adjust(machine.primary_screen->time_until_vblank_end());
+	m_timer->adjust(attotime::from_nsec(2034500),0,attotime::from_nsec(2034500));
+	m_subtimer->adjust(attotime::from_msec(20),0,attotime::from_msec(20));
+	m_keyboard_timer->adjust(attotime::zero,0,attotime::from_msec(10));
+	if(m_type == SYS_FM77AV || m_type == SYS_FM77AV40EX || m_type == SYS_FM11)
+		m_fm77av_vsync_timer->adjust(machine().primary_screen->time_until_vblank_end());
 
-	state->m_irq_mask = 0x00;
-	state->m_irq_flags = 0x00;
-	state->m_video.attn_irq = 0;
-	state->m_video.sub_busy = 0x80;  // busy at reset
-	if(state->m_type == SYS_FM11 || state->m_type == SYS_FM16)
-		state->m_basic_rom_en = 0;  // all FM11/16 systems have no BASIC ROM except for the FM-11 ST
+	m_irq_mask = 0x00;
+	m_irq_flags = 0x00;
+	m_video.attn_irq = 0;
+	m_video.sub_busy = 0x80;  // busy at reset
+	if(m_type == SYS_FM11 || m_type == SYS_FM16)
+		m_basic_rom_en = 0;  // all FM11/16 systems have no BASIC ROM except for the FM-11 ST
 	else
-		state->m_basic_rom_en = 1;  // enabled at reset
-	if(state->m_type == SYS_FM77AV || state->m_type == SYS_FM77AV40EX)
+		m_basic_rom_en = 1;  // enabled at reset
+	if(m_type == SYS_FM77AV || m_type == SYS_FM77AV40EX)
 	{
-		state->m_init_rom_en = 1;
+		m_init_rom_en = 1;
 		// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)
 		memcpy(RAM+0x3fff0,ROM+0x1ff0,16);
 	}
-	else if (state->m_type == SYS_FM11)
+	else if (m_type == SYS_FM11)
 	{
-		state->m_init_rom_en = 1;
+		m_init_rom_en = 1;
 		// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)
 		memcpy(RAM+0x3fff0,ROM+0x0ff0,16);
 	}
 	else
-		state->m_init_rom_en = 0;
-	if(state->m_type == SYS_FM7)
-		state->membank("bank1")->set_base(RAM+0x38000);
-	state->m_key_delay = 700;  // 700ms on FM-7
-	state->m_key_repeat = 70;  // 70ms on FM-7
-	state->m_break_flag = 0;
-	state->m_key_scan_mode = KEY_MODE_FM7;
-	state->m_psg_regsel = 0;
-	state->m_psg_data = 0;
-	state->m_fdc_side = 0;
-	state->m_fdc_drive = 0;
-	state->m_mmr.mode = 0;
-	state->m_mmr.segment = 0;
-	state->m_mmr.enabled = 0;
-	state->m_fm77av_ym_irq = 0;
-	state->m_encoder.latch = 1;
-	state->m_encoder.ack = 1;
+		m_init_rom_en = 0;
+	if(m_type == SYS_FM7)
+		membank("bank1")->set_base(RAM+0x38000);
+	m_key_delay = 700;  // 700ms on FM-7
+	m_key_repeat = 70;  // 70ms on FM-7
+	m_break_flag = 0;
+	m_key_scan_mode = KEY_MODE_FM7;
+	m_psg_regsel = 0;
+	m_psg_data = 0;
+	m_fdc_side = 0;
+	m_fdc_drive = 0;
+	m_mmr.mode = 0;
+	m_mmr.segment = 0;
+	m_mmr.enabled = 0;
+	m_fm77av_ym_irq = 0;
+	m_encoder.latch = 1;
+	m_encoder.ack = 1;
 	// set boot mode (FM-7 only, AV and later has boot RAM instead)
-	if(state->m_type == SYS_FM7)
+	if(m_type == SYS_FM7)
 	{
-		if(!(machine.root_device().ioport("DSW")->read() & 0x02))
+		if(!(machine().root_device().ioport("DSW")->read() & 0x02))
 		{  // DOS mode
-			state->membank("bank17")->set_base(machine.root_device().memregion("dos")->base());
+			membank("bank17")->set_base(machine().root_device().memregion("dos")->base());
 		}
 		else
 		{  // BASIC mode
-			state->membank("bank17")->set_base(machine.root_device().memregion("basic")->base());
+			membank("bank17")->set_base(machine().root_device().memregion("basic")->base());
 		}
 	}
-	if(state->m_type == SYS_FM77AV || state->m_type == SYS_FM77AV40EX || state->m_type == SYS_FM11)
+	if(m_type == SYS_FM77AV || m_type == SYS_FM77AV40EX || m_type == SYS_FM11)
 	{
-		fm7_mmr_refresh(machine.device("maincpu")->memory().space(AS_PROGRAM));
+		fm7_mmr_refresh(machine().device("maincpu")->memory().space(AS_PROGRAM));
 	}
-	if(state->m_type == SYS_FM11)
+	if(m_type == SYS_FM11)
 	{
 		// Probably best to halt the 8088, I'm pretty sure it and the main 6809 should not be running at the same time
-		machine.device("x86")->execute().set_input_line(INPUT_LINE_HALT,ASSERT_LINE);
+		machine().device("x86")->execute().set_input_line(INPUT_LINE_HALT,ASSERT_LINE);
 	}
 }
 
@@ -2049,8 +2044,7 @@ static MACHINE_CONFIG_START( fm7, fm7_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.25)
 
-	MCFG_MACHINE_START(fm7)
-	MCFG_MACHINE_RESET(fm7)
+	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2062,9 +2056,7 @@ static MACHINE_CONFIG_START( fm7, fm7_state )
 	MCFG_SCREEN_UPDATE_STATIC(fm7)
 
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(fm7)
 
-	MCFG_VIDEO_START(fm7)
 
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_interface)
 
@@ -2094,8 +2086,7 @@ static MACHINE_CONFIG_START( fm8, fm7_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
 
-	MCFG_MACHINE_START(fm7)
-	MCFG_MACHINE_RESET(fm7)
+	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2107,9 +2098,7 @@ static MACHINE_CONFIG_START( fm8, fm7_state )
 	MCFG_SCREEN_UPDATE_STATIC(fm7)
 
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(fm7)
 
-	MCFG_VIDEO_START(fm7)
 
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_interface)
 
@@ -2140,8 +2129,7 @@ static MACHINE_CONFIG_START( fm77av, fm7_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
 
-	MCFG_MACHINE_START(fm77av)
-	MCFG_MACHINE_RESET(fm7)
+	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm77av)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2152,9 +2140,7 @@ static MACHINE_CONFIG_START( fm77av, fm7_state )
 	MCFG_SCREEN_UPDATE_STATIC(fm7)
 
 	MCFG_PALETTE_LENGTH(8 + 4096)
-	MCFG_PALETTE_INIT(fm7)
 
-	MCFG_VIDEO_START(fm7)
 
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_interface)
 
@@ -2189,8 +2175,7 @@ static MACHINE_CONFIG_START( fm11, fm7_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
 
-	MCFG_MACHINE_START(fm11)
-	MCFG_MACHINE_RESET(fm7)
+	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm11)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2202,9 +2187,7 @@ static MACHINE_CONFIG_START( fm11, fm7_state )
 	MCFG_SCREEN_UPDATE_STATIC(fm7)
 
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(fm7)
 
-	MCFG_VIDEO_START(fm7)
 
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_interface)
 
@@ -2233,8 +2216,7 @@ static MACHINE_CONFIG_START( fm16beta, fm7_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
 
-	MCFG_MACHINE_START(fm16)
-	MCFG_MACHINE_RESET(fm7)
+	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm16)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2246,9 +2228,7 @@ static MACHINE_CONFIG_START( fm16beta, fm7_state )
 	MCFG_SCREEN_UPDATE_STATIC(fm7)
 
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(fm7)
 
-	MCFG_VIDEO_START(fm7)
 
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_interface)
 

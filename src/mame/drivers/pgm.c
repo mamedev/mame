@@ -500,20 +500,19 @@ TIMER_DEVICE_CALLBACK( pgm_interrupt )
 		if (!state->m_irq4_disabled) state->m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-MACHINE_START( pgm )
+MACHINE_START_MEMBER(pgm_state,pgm)
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
 
-//  machine.base_datetime(state->m_systime);
+//  machine().base_datetime(m_systime);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_soundcpu = machine.device<cpu_device>("soundcpu");
-	state->m_ics = machine.device("ics");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_soundcpu = machine().device<cpu_device>("soundcpu");
+	m_ics = machine().device("ics");
 }
 
-MACHINE_RESET( pgm )
+MACHINE_RESET_MEMBER(pgm_state,pgm)
 {
-	machine.device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 
@@ -528,8 +527,8 @@ MACHINE_CONFIG_FRAGMENT( pgmbase )
 	MCFG_CPU_PROGRAM_MAP(pgm_z80_mem)
 	MCFG_CPU_IO_MAP(pgm_z80_io)
 
-	MCFG_MACHINE_START( pgm )
-	MCFG_MACHINE_RESET( pgm )
+	MCFG_MACHINE_START_OVERRIDE(pgm_state, pgm )
+	MCFG_MACHINE_RESET_OVERRIDE(pgm_state, pgm )
 	MCFG_NVRAM_ADD_0FILL("sram")
 
 	MCFG_V3021_ADD("rtc")
@@ -546,7 +545,7 @@ MACHINE_CONFIG_FRAGMENT( pgmbase )
 	MCFG_GFXDECODE(pgm)
 	MCFG_PALETTE_LENGTH(0x1200/2)
 
-	MCFG_VIDEO_START(pgm)
+	MCFG_VIDEO_START_OVERRIDE(pgm_state,pgm)
 
 	/*sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

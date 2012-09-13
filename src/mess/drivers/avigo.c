@@ -909,7 +909,6 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 
 	MCFG_GFXDECODE(avigo)
 	MCFG_PALETTE_LENGTH(AVIGO_NUM_COLOURS)
-	MCFG_PALETTE_INIT( avigo )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -160,6 +160,9 @@ public:
 	DECLARE_WRITE32_MEMBER(dreamwld_palette_w);
 	TILE_GET_INFO_MEMBER(get_dreamwld_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_dreamwld_bg2_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -262,22 +265,21 @@ TILE_GET_INFO_MEMBER(dreamwld_state::get_dreamwld_bg2_tile_info)
 	SET_TILE_INFO_MEMBER(1, tileno + m_tilebank[1] * 0x2000, 0xc0 + colour, 0);
 }
 
-static VIDEO_START( dreamwld )
+void dreamwld_state::video_start()
 {
-	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dreamwld_state::get_dreamwld_bg_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16, 64,32);
-	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dreamwld_state::get_dreamwld_bg2_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16, 64,32);
-	state->m_bg2_tilemap->set_transparent_pen(0);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dreamwld_state::get_dreamwld_bg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 64,32);
+	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dreamwld_state::get_dreamwld_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 64,32);
+	m_bg2_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap->set_scroll_rows(256);	// line scrolling
-	state->m_bg_tilemap->set_scroll_cols(1);
+	m_bg_tilemap->set_scroll_rows(256);	// line scrolling
+	m_bg_tilemap->set_scroll_cols(1);
 
-	state->m_bg2_tilemap->set_scroll_rows(256);	// line scrolling
-	state->m_bg2_tilemap->set_scroll_cols(1);
+	m_bg2_tilemap->set_scroll_rows(256);	// line scrolling
+	m_bg2_tilemap->set_scroll_cols(1);
 
-	state->m_spritebuf1 = auto_alloc_array(machine, UINT32, 0x2000 / 4);
-	state->m_spritebuf2 = auto_alloc_array(machine, UINT32, 0x2000 / 4);
+	m_spritebuf1 = auto_alloc_array(machine(), UINT32, 0x2000 / 4);
+	m_spritebuf2 = auto_alloc_array(machine(), UINT32, 0x2000 / 4);
 
 
 }
@@ -563,22 +565,20 @@ GFXDECODE_END
 
 
 
-static MACHINE_START( dreamwld )
+void dreamwld_state::machine_start()
 {
-	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 
-	state->save_item(NAME(state->m_protindex));
-	state->save_item(NAME(state->m_tilebank));
-	state->save_item(NAME(state->m_tilebankold));
+	save_item(NAME(m_protindex));
+	save_item(NAME(m_tilebank));
+	save_item(NAME(m_tilebankold));
 }
 
-static MACHINE_RESET( dreamwld )
+void dreamwld_state::machine_reset()
 {
-	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 
-	state->m_tilebankold[0] = state->m_tilebankold[1] = -1;
-	state->m_tilebank[0] = state->m_tilebank[1] = 0;
-	state->m_protindex = 0;
+	m_tilebankold[0] = m_tilebankold[1] = -1;
+	m_tilebank[0] = m_tilebank[1] = 0;
+	m_protindex = 0;
 }
 
 
@@ -591,8 +591,6 @@ static MACHINE_CONFIG_START( baryon, dreamwld_state )
 	MCFG_CPU_PROGRAM_MAP(baryon_map)
 	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold )
 
-	MCFG_MACHINE_START(dreamwld)
-	MCFG_MACHINE_RESET(dreamwld)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -606,7 +604,6 @@ static MACHINE_CONFIG_START( baryon, dreamwld_state )
 	MCFG_PALETTE_LENGTH(0x1000)
 	MCFG_GFXDECODE(dreamwld)
 
-	MCFG_VIDEO_START(dreamwld)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

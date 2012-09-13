@@ -95,6 +95,9 @@ public:
 	DECLARE_WRITE16_MEMBER(io_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -249,9 +252,9 @@ READ16_MEMBER(guab_state::ef9369_r)
 }
 
 
-static VIDEO_START( guab )
+void guab_state::video_start()
 {
-	tms34061_start(machine, &tms34061intf);
+	tms34061_start(machine(), &tms34061intf);
 }
 
 
@@ -799,16 +802,14 @@ static const sn76496_config psg_intf =
  *
  *************************************/
 
- static MACHINE_START( guab )
+void guab_state::machine_start()
 {
-	guab_state *state = machine.driver_data<guab_state>();
-	state->m_fdc_timer = machine.scheduler().timer_alloc(FUNC(fdc_data_callback));
+	m_fdc_timer = machine().scheduler().timer_alloc(FUNC(fdc_data_callback));
 }
 
-static MACHINE_RESET( guab )
+void guab_state::machine_reset()
 {
-	guab_state *state = machine.driver_data<guab_state>();
-	memset(&state->m_fdc, 0, sizeof(state->m_fdc));
+	memset(&m_fdc, 0, sizeof(m_fdc));
 }
 
 static MACHINE_CONFIG_START( guab, guab_state )
@@ -816,8 +817,6 @@ static MACHINE_CONFIG_START( guab, guab_state )
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(guab_map)
 
-	MCFG_MACHINE_START(guab)
-	MCFG_MACHINE_RESET(guab)
 
 	/* TODO: Use real video timings */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -829,7 +828,6 @@ static MACHINE_CONFIG_START( guab, guab_state )
 
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_VIDEO_START(guab)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

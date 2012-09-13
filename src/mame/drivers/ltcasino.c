@@ -33,6 +33,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ltcasino_tile_atr_w);
 	DECLARE_DRIVER_INIT(mv4in1);
 	TILE_GET_INFO_MEMBER(get_ltcasino_tile_info);
+	virtual void video_start();
 };
 
 
@@ -50,10 +51,9 @@ TILE_GET_INFO_MEMBER(ltcasino_state::get_ltcasino_tile_info)
 	SET_TILE_INFO_MEMBER(0,tileno,0,0);
 }
 
-static VIDEO_START(ltcasino)
+void ltcasino_state::video_start()
 {
-	ltcasino_state *state = machine.driver_data<ltcasino_state>();
-	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ltcasino_state::get_ltcasino_tile_info),state),TILEMAP_SCAN_ROWS,8, 8,64,32);
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ltcasino_state::get_ltcasino_tile_info),this),TILEMAP_SCAN_ROWS,8, 8,64,32);
 }
 
 
@@ -660,7 +660,6 @@ static MACHINE_CONFIG_START( ltcasino, ltcasino_state )
 	MCFG_GFXDECODE(ltcasino)
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(ltcasino)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -28,16 +28,15 @@ static void galastrm_exit(running_machine &machine)
 	poly_free(state->m_poly);
 }
 
-VIDEO_START( galastrm )
+void galastrm_state::video_start()
 {
-	galastrm_state *state = machine.driver_data<galastrm_state>();
-	state->m_spritelist = auto_alloc_array(machine, struct tempsprite, 0x4000);
+	m_spritelist = auto_alloc_array(machine(), struct tempsprite, 0x4000);
 
-	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmaps);
-	machine.primary_screen->register_screen_bitmap(state->m_polybitmap);
+	machine().primary_screen->register_screen_bitmap(m_tmpbitmaps);
+	machine().primary_screen->register_screen_bitmap(m_polybitmap);
 
-	state->m_poly = poly_alloc(machine, 16, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(galastrm_exit), &machine));
+	m_poly = poly_alloc(machine(), 16, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(galastrm_exit), &machine()));
 }
 
 /************************************************************

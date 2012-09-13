@@ -121,7 +121,6 @@ static MACHINE_CONFIG_START( sym1, sym1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, SYM1_CLOCK)  /* 1 MHz */
 	MCFG_CPU_PROGRAM_MAP(sym1_map)
-	MCFG_MACHINE_RESET(sym1)
 
 	MCFG_DEFAULT_LAYOUT(layout_sym1)
 

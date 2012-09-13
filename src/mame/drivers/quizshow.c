@@ -60,6 +60,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(quizshow_category_select);
 	DECLARE_DRIVER_INIT(quizshow);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -69,12 +72,12 @@ public:
 
 ***************************************************************************/
 
-PALETTE_INIT( quizshow )
+void quizshow_state::palette_init()
 {
-	machine.colortable = colortable_alloc(machine, 2);
+	machine().colortable = colortable_alloc(machine(), 2);
 
-	colortable_palette_set_color(machine.colortable, 0, RGB_BLACK);
-	colortable_palette_set_color(machine.colortable, 1, RGB_WHITE);
+	colortable_palette_set_color(machine().colortable, 0, RGB_BLACK);
+	colortable_palette_set_color(machine().colortable, 1, RGB_WHITE);
 
 	// normal, blink/off, invert, blink+invert
 	const int lut_pal[16] = {
@@ -85,7 +88,7 @@ PALETTE_INIT( quizshow )
 	};
 
 	for (int i = 0; i < 16 ; i++)
-		colortable_entry_set_value(machine.colortable, i, lut_pal[i]);
+		colortable_entry_set_value(machine().colortable, i, lut_pal[i]);
 }
 
 TILE_GET_INFO_MEMBER(quizshow_state::get_tile_info)
@@ -98,10 +101,9 @@ TILE_GET_INFO_MEMBER(quizshow_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0, code & 0x3f, color, 0);
 }
 
-VIDEO_START( quizshow )
+void quizshow_state::video_start()
 {
-	quizshow_state *state = machine.driver_data<quizshow_state>();
-	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(quizshow_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 16, 32, 16);
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(quizshow_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 16, 32, 16);
 }
 
 SCREEN_UPDATE_IND16( quizshow )
@@ -362,12 +364,11 @@ static TIMER_DEVICE_CALLBACK( quizshow_clock_timer_cb )
 		state->m_tilemap->mark_all_dirty();
 }
 
-static MACHINE_RESET(quizshow)
+void quizshow_state::machine_reset()
 {
-	quizshow_state *state = machine.driver_data<quizshow_state>();
 
-	state->m_category_enable = 0;
-	state->m_tape_head_pos = 0;
+	m_category_enable = 0;
+	m_tape_head_pos = 0;
 }
 
 static MACHINE_CONFIG_START( quizshow, quizshow_state )
@@ -386,9 +387,6 @@ static MACHINE_CONFIG_START( quizshow, quizshow_state )
 	MCFG_GFXDECODE(quizshow)
 	MCFG_PALETTE_LENGTH(8*2)
 
-	MCFG_PALETTE_INIT(quizshow)
-	MCFG_VIDEO_START(quizshow)
-	MCFG_MACHINE_RESET(quizshow)
 
 	/* sound hardware (discrete) */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -96,6 +96,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<UINT8> m_p_videoram;
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 
@@ -212,16 +215,16 @@ static INPUT_PORTS_START( pv1000 )
 INPUT_PORTS_END
 
 
-static PALETTE_INIT( pv1000 )
+void pv1000_state::palette_init()
 {
-	palette_set_color_rgb( machine,  0,   0,   0,   0 );
-	palette_set_color_rgb( machine,  1,   0,   0, 255 );
-	palette_set_color_rgb( machine,  2,   0, 255,   0 );
-	palette_set_color_rgb( machine,  3,   0, 255, 255 );
-	palette_set_color_rgb( machine,  4, 255,   0,   0 );
-	palette_set_color_rgb( machine,  5, 255,   0, 255 );
-	palette_set_color_rgb( machine,  6, 255, 255,   0 );
-	palette_set_color_rgb( machine,  7, 255, 255, 255 );
+	palette_set_color_rgb( machine(),  0,   0,   0,   0 );
+	palette_set_color_rgb( machine(),  1,   0,   0, 255 );
+	palette_set_color_rgb( machine(),  2,   0, 255,   0 );
+	palette_set_color_rgb( machine(),  3,   0, 255, 255 );
+	palette_set_color_rgb( machine(),  4, 255,   0,   0 );
+	palette_set_color_rgb( machine(),  5, 255,   0, 255 );
+	palette_set_color_rgb( machine(),  6, 255, 255,   0 );
+	palette_set_color_rgb( machine(),  7, 255, 255, 255 );
 }
 
 
@@ -369,23 +372,21 @@ static TIMER_CALLBACK( d65010_irq_off_cb )
 }
 
 
-static MACHINE_START( pv1000 )
+void pv1000_state::machine_start()
 {
-	pv1000_state *state = machine.driver_data<pv1000_state>();
 
-	state->m_irq_on_timer = machine.scheduler().timer_alloc(FUNC(d65010_irq_on_cb));
-	state->m_irq_off_timer = machine.scheduler().timer_alloc(FUNC(d65010_irq_off_cb));
+	m_irq_on_timer = machine().scheduler().timer_alloc(FUNC(d65010_irq_on_cb));
+	m_irq_off_timer = machine().scheduler().timer_alloc(FUNC(d65010_irq_off_cb));
 }
 
 
-static MACHINE_RESET( pv1000 )
+void pv1000_state::machine_reset()
 {
-	pv1000_state *state = machine.driver_data<pv1000_state>();
 
-	state->m_io_regs[5] = 0;
-	state->m_fd_data = 0;
-	state->m_irq_on_timer->adjust( state->m_screen->time_until_pos(195, 0 ) );
-	state->m_irq_off_timer->adjust( attotime::never );
+	m_io_regs[5] = 0;
+	m_fd_data = 0;
+	m_irq_on_timer->adjust( m_screen->time_until_pos(195, 0 ) );
+	m_irq_off_timer->adjust( attotime::never );
 }
 
 
@@ -413,8 +414,6 @@ static MACHINE_CONFIG_START( pv1000, pv1000_state )
 	MCFG_CPU_PROGRAM_MAP( pv1000 )
 	MCFG_CPU_IO_MAP( pv1000_io )
 
-	MCFG_MACHINE_START( pv1000 )
-	MCFG_MACHINE_RESET( pv1000 )
 
 	/* D65010G031 - Video & sound chip */
 	MCFG_SCREEN_ADD( "screen", RASTER )
@@ -422,7 +421,6 @@ static MACHINE_CONFIG_START( pv1000, pv1000_state )
 	MCFG_SCREEN_UPDATE_STATIC( pv1000 )
 
 	MCFG_PALETTE_LENGTH( 8 )
-	MCFG_PALETTE_INIT( pv1000 )
 	MCFG_GFXDECODE( pv1000 )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

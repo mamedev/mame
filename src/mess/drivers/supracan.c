@@ -198,6 +198,10 @@ public:
 	TILE_GET_INFO_MEMBER(get_supracan_tilemap1_tile_info);
 	TILE_GET_INFO_MEMBER(get_supracan_tilemap2_tile_info);
 	TILE_GET_INFO_MEMBER(get_supracan_roz_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -399,34 +403,33 @@ TILE_GET_INFO_MEMBER(supracan_state::get_supracan_roz_tile_info)
 }
 
 
-static VIDEO_START( supracan )
+void supracan_state::video_start()
 {
-	supracan_state *state = machine.driver_data<supracan_state>();
-	state->m_sprite_final_bitmap.allocate(1024, 1024, BITMAP_FORMAT_IND16);
+	m_sprite_final_bitmap.allocate(1024, 1024, BITMAP_FORMAT_IND16);
 
-	state->m_vram = (UINT16*)(*machine.root_device().memregion("ram_gfx"));
-	state->m_vram_swapped = (UINT16*)(*machine.root_device().memregion("ram_gfx2"));
-	state->m_vram_addr_swapped = (UINT8*)(*state->memregion("ram_gfx3")); // hack for 1bpp layer at startup
+	m_vram = (UINT16*)(*machine().root_device().memregion("ram_gfx"));
+	m_vram_swapped = (UINT16*)(*machine().root_device().memregion("ram_gfx2"));
+	m_vram_addr_swapped = (UINT8*)(*memregion("ram_gfx3")); // hack for 1bpp layer at startup
 
-	state->m_tilemap_sizes[0][0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap0_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_tilemap_sizes[0][1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap0_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_tilemap_sizes[0][2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap0_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
-	state->m_tilemap_sizes[0][3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap0_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap_sizes[0][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap_sizes[0][1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap_sizes[0][2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_tilemap_sizes[0][3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
-	state->m_tilemap_sizes[1][0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap1_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_tilemap_sizes[1][1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap1_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_tilemap_sizes[1][2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap1_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
-	state->m_tilemap_sizes[1][3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap1_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap_sizes[1][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap_sizes[1][1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap_sizes[1][2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_tilemap_sizes[1][3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
-	state->m_tilemap_sizes[2][0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap2_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_tilemap_sizes[2][1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap2_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_tilemap_sizes[2][2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap2_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
-	state->m_tilemap_sizes[2][3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap2_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap_sizes[2][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap_sizes[2][1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap_sizes[2][2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_tilemap_sizes[2][3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
-	state->m_tilemap_sizes[3][0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_roz_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_tilemap_sizes[3][1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_roz_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_tilemap_sizes[3][2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_roz_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
-	state->m_tilemap_sizes[3][3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_roz_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap_sizes[3][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_roz_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap_sizes[3][1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_roz_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap_sizes[3][2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_roz_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_tilemap_sizes[3][3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_roz_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 }
 
 static int get_tilemap_dimensions(running_machine &machine, int &xsize, int &ysize, int layer)
@@ -1336,7 +1339,7 @@ static INPUT_PORTS_START( supracan )
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 Button A")
 INPUT_PORTS_END
 
-static PALETTE_INIT( supracan )
+void supracan_state::palette_init()
 {
 	// Used for debugging purposes for now
 	//#if 0
@@ -1347,7 +1350,7 @@ static PALETTE_INIT( supracan )
 		r = (i & 0x1f) << 3;
 		g = ((i >> 5) & 0x1f) << 3;
 		b = ((i >> 10) & 0x1f) << 3;
-		palette_set_color_rgb( machine, i, r, g, b );
+		palette_set_color_rgb( machine(), i, r, g, b );
 	}
 	//#endif
 }
@@ -1768,25 +1771,23 @@ static DEVICE_IMAGE_LOAD( supracan_cart )
 }
 
 
-static MACHINE_START( supracan )
+void supracan_state::machine_start()
 {
-	supracan_state *state = machine.driver_data<supracan_state>();
 
-	state->m_video_timer = machine.scheduler().timer_alloc(FUNC(supracan_video_callback));
-	state->m_hbl_timer = machine.scheduler().timer_alloc(FUNC(supracan_hbl_callback));
-	state->m_line_on_timer = machine.scheduler().timer_alloc(FUNC(supracan_line_on_callback));
-	state->m_line_off_timer = machine.scheduler().timer_alloc(FUNC(supracan_line_off_callback));
+	m_video_timer = machine().scheduler().timer_alloc(FUNC(supracan_video_callback));
+	m_hbl_timer = machine().scheduler().timer_alloc(FUNC(supracan_hbl_callback));
+	m_line_on_timer = machine().scheduler().timer_alloc(FUNC(supracan_line_on_callback));
+	m_line_off_timer = machine().scheduler().timer_alloc(FUNC(supracan_line_off_callback));
 }
 
 
-static MACHINE_RESET( supracan )
+void supracan_state::machine_reset()
 {
-	supracan_state *state = machine.driver_data<supracan_state>();
 
-	machine.device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
-	state->m_video_timer->adjust( machine.primary_screen->time_until_pos( 0, 0 ) );
-	state->m_irq_mask = 0;
+	m_video_timer->adjust( machine().primary_screen->time_until_pos( 0, 0 ) );
+	m_irq_mask = 0;
 }
 
 /* gfxdecode is retained for reference purposes but not otherwise used by the driver */
@@ -1914,15 +1915,11 @@ static MACHINE_CONFIG_START( supracan, supracan_state )
 	MCFG_QUANTUM_PERFECT_CPU("soundcpu")
 #endif
 
-	MCFG_MACHINE_START( supracan )
-	MCFG_MACHINE_RESET( supracan )
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, 348, 0, 256, 256, 0, 240 )	/* No idea if this is correct */
 	MCFG_SCREEN_UPDATE_STATIC( supracan )
-	MCFG_VIDEO_START( supracan )
 	MCFG_PALETTE_LENGTH( 32768 )
-	MCFG_PALETTE_INIT( supracan )
 	MCFG_GFXDECODE(supracan)
 
 	MCFG_CARTSLOT_ADD("cart")

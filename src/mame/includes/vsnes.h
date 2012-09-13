@@ -91,17 +91,25 @@ public:
 	DECLARE_DRIVER_INIT(platoon);
 	DECLARE_DRIVER_INIT(rbibb);
 	DECLARE_DRIVER_INIT(vsdual);
+	DECLARE_MACHINE_START(vsnes);
+	DECLARE_MACHINE_RESET(vsnes);
+	DECLARE_VIDEO_START(vsnes);
+	DECLARE_PALETTE_INIT(vsnes);
+	DECLARE_MACHINE_START(vsdual);
+	DECLARE_MACHINE_RESET(vsdual);
+	DECLARE_VIDEO_START(vsdual);
+	DECLARE_PALETTE_INIT(vsdual);
 };
 
 
 /*----------- defined in video/vsnes.c -----------*/
 
-VIDEO_START( vsnes );
-PALETTE_INIT( vsnes );
+
+
 SCREEN_UPDATE_IND16( vsnes );
-VIDEO_START( vsdual );
+
 SCREEN_UPDATE_IND16( vsnes_bottom );
-PALETTE_INIT( vsdual );
+
 
 extern const ppu2c0x_interface vsnes_ppu_interface_1;
 extern const ppu2c0x_interface vsnes_ppu_interface_2;
@@ -109,9 +117,9 @@ extern const ppu2c0x_interface vsnes_ppu_interface_2;
 
 /*----------- defined in machine/vsnes.c -----------*/
 
-MACHINE_RESET( vsnes );
-MACHINE_RESET( vsdual );
-MACHINE_START( vsnes );
-MACHINE_START( vsdual );
+
+
+
+
 
 

@@ -117,25 +117,25 @@
  *
  *************************************/
 
-static PALETTE_INIT( atarifb )
+void atarifb_state::palette_init()
 {
 	/* chars */
-	palette_set_color(machine, 0, MAKE_RGB(0xff,0xff,0xff)); /* white  */
-	palette_set_color(machine, 1, MAKE_RGB(0x00,0x00,0x00)); /* black  */
+	palette_set_color(machine(), 0, MAKE_RGB(0xff,0xff,0xff)); /* white  */
+	palette_set_color(machine(), 1, MAKE_RGB(0x00,0x00,0x00)); /* black  */
 
 	/* sprites */
-	palette_set_color(machine, 2, MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette_set_color(machine, 3, MAKE_RGB(0xff,0xff,0xff)); /* white  */
-	palette_set_color(machine, 4, MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette_set_color(machine, 5, MAKE_RGB(0x00,0x00,0x00)); /* black  */
+	palette_set_color(machine(), 2, MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette_set_color(machine(), 3, MAKE_RGB(0xff,0xff,0xff)); /* white  */
+	palette_set_color(machine(), 4, MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette_set_color(machine(), 5, MAKE_RGB(0x00,0x00,0x00)); /* black  */
 
 	/* sprite masks */
-	palette_set_color(machine, 6, MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette_set_color(machine, 7, MAKE_RGB(0x80,0x80,0x80)); /* grey  */
-	palette_set_color(machine, 8, MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette_set_color(machine, 9, MAKE_RGB(0x00,0x00,0x00)); /* black  */
-	palette_set_color(machine, 10, MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette_set_color(machine, 11, MAKE_RGB(0xff,0xff,0xff)); /* white  */
+	palette_set_color(machine(), 6, MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette_set_color(machine(), 7, MAKE_RGB(0x80,0x80,0x80)); /* grey  */
+	palette_set_color(machine(), 8, MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette_set_color(machine(), 9, MAKE_RGB(0x00,0x00,0x00)); /* black  */
+	palette_set_color(machine(), 10, MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette_set_color(machine(), 11, MAKE_RGB(0xff,0xff,0xff)); /* white  */
 }
 
 
@@ -504,52 +504,50 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( atarifb )
+void atarifb_state::machine_start()
 {
-	atarifb_state *state = machine.driver_data<atarifb_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
 
-	state->save_item(NAME(state->m_CTRLD));
-	state->save_item(NAME(state->m_sign_x_1));
-	state->save_item(NAME(state->m_sign_x_2));
-	state->save_item(NAME(state->m_sign_x_3));
-	state->save_item(NAME(state->m_sign_x_4));
-	state->save_item(NAME(state->m_sign_y_1));
-	state->save_item(NAME(state->m_sign_y_2));
-	state->save_item(NAME(state->m_sign_y_3));
-	state->save_item(NAME(state->m_sign_y_4));
-	state->save_item(NAME(state->m_counter_x_in0));
-	state->save_item(NAME(state->m_counter_y_in0));
-	state->save_item(NAME(state->m_counter_x_in0b));
-	state->save_item(NAME(state->m_counter_y_in0b));
-	state->save_item(NAME(state->m_counter_x_in2));
-	state->save_item(NAME(state->m_counter_y_in2));
-	state->save_item(NAME(state->m_counter_x_in2b));
-	state->save_item(NAME(state->m_counter_y_in2b));
+	save_item(NAME(m_CTRLD));
+	save_item(NAME(m_sign_x_1));
+	save_item(NAME(m_sign_x_2));
+	save_item(NAME(m_sign_x_3));
+	save_item(NAME(m_sign_x_4));
+	save_item(NAME(m_sign_y_1));
+	save_item(NAME(m_sign_y_2));
+	save_item(NAME(m_sign_y_3));
+	save_item(NAME(m_sign_y_4));
+	save_item(NAME(m_counter_x_in0));
+	save_item(NAME(m_counter_y_in0));
+	save_item(NAME(m_counter_x_in0b));
+	save_item(NAME(m_counter_y_in0b));
+	save_item(NAME(m_counter_x_in2));
+	save_item(NAME(m_counter_y_in2));
+	save_item(NAME(m_counter_x_in2b));
+	save_item(NAME(m_counter_y_in2b));
 }
 
-static MACHINE_RESET( atarifb )
+void atarifb_state::machine_reset()
 {
-	atarifb_state *state = machine.driver_data<atarifb_state>();
 
-	state->m_CTRLD = 0;
-	state->m_sign_x_1 = 0;
-	state->m_sign_y_1 = 0;
-	state->m_sign_x_2 = 0;
-	state->m_sign_y_2 = 0;
-	state->m_sign_x_3 = 0;
-	state->m_sign_y_3 = 0;
-	state->m_sign_x_4 = 0;
-	state->m_sign_y_4 = 0;
-	state->m_counter_x_in0 = 0;
-	state->m_counter_y_in0 = 0;
-	state->m_counter_x_in0b = 0;
-	state->m_counter_y_in0b = 0;
-	state->m_counter_x_in2 = 0;
-	state->m_counter_y_in2 = 0;
-	state->m_counter_x_in2b = 0;
-	state->m_counter_y_in2b = 0;
+	m_CTRLD = 0;
+	m_sign_x_1 = 0;
+	m_sign_y_1 = 0;
+	m_sign_x_2 = 0;
+	m_sign_y_2 = 0;
+	m_sign_x_3 = 0;
+	m_sign_y_3 = 0;
+	m_sign_x_4 = 0;
+	m_sign_y_4 = 0;
+	m_counter_x_in0 = 0;
+	m_counter_y_in0 = 0;
+	m_counter_x_in0b = 0;
+	m_counter_y_in0b = 0;
+	m_counter_x_in2 = 0;
+	m_counter_y_in2 = 0;
+	m_counter_x_in2b = 0;
+	m_counter_y_in2b = 0;
 }
 
 static MACHINE_CONFIG_START( atarifb, atarifb_state )
@@ -559,8 +557,6 @@ static MACHINE_CONFIG_START( atarifb, atarifb_state )
 	MCFG_CPU_PROGRAM_MAP(atarifb_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)
 
-	MCFG_MACHINE_START(atarifb)
-	MCFG_MACHINE_RESET(atarifb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -573,8 +569,6 @@ static MACHINE_CONFIG_START( atarifb, atarifb_state )
 	MCFG_GFXDECODE(atarifb)
 	MCFG_PALETTE_LENGTH(12)
 
-	MCFG_PALETTE_INIT(atarifb)
-	MCFG_VIDEO_START(atarifb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

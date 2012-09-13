@@ -30,9 +30,9 @@ WRITE8_MEMBER(ksayakyu_state::ksayakyu_videoctrl_w)
 		m_tilemap->set_flip((data & 2) ? TILEMAP_FLIPX : 0);
 }
 
-PALETTE_INIT( ksayakyu )
+void ksayakyu_state::palette_init()
 {
-	const UINT8 *prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *prom = machine().root_device().memregion("proms")->base();
 	int r, g, b, i;
 
 	for (i = 0; i < 0x100; i++)
@@ -41,7 +41,7 @@ PALETTE_INIT( ksayakyu )
 		g = (prom[i] & 0x38) >> 3;
 		b = (prom[i] & 0xc0) >> 6;
 
-		palette_set_color_rgb(machine, i, pal3bit(r), pal3bit(g), pal2bit(b));
+		palette_set_color_rgb(machine(), i, pal3bit(r), pal3bit(g), pal2bit(b));
 	}
 }
 
@@ -113,12 +113,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-VIDEO_START(ksayakyu)
+void ksayakyu_state::video_start()
 {
-	ksayakyu_state *state = machine.driver_data<ksayakyu_state>();
-	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ksayakyu_state::get_ksayakyu_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32 * 8);
-	state->m_textmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ksayakyu_state::get_text_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_textmap->set_transparent_pen(0);
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ksayakyu_state::get_ksayakyu_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32 * 8);
+	m_textmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ksayakyu_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_textmap->set_transparent_pen(0);
 }
 
 SCREEN_UPDATE_IND16(ksayakyu)

@@ -46,12 +46,16 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_sl_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/dday.c -----------*/
 
-PALETTE_INIT( dday );
-VIDEO_START( dday );
+
+
 SCREEN_UPDATE_IND16( dday );
 

@@ -31,12 +31,16 @@ public:
 	DECLARE_READ8_MEMBER(ikki_e000_r);
 	DECLARE_WRITE8_MEMBER(ikki_coin_counters);
 	DECLARE_WRITE8_MEMBER(ikki_scrn_ctrl_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/ikki.c -----------*/
 
 
-PALETTE_INIT( ikki );
-VIDEO_START( ikki );
+
+
 SCREEN_UPDATE_IND16( ikki );

@@ -21,7 +21,7 @@ static void arcadecl_bitmap_render(running_machine &machine, bitmap_ind16 &bitma
  *
  *************************************/
 
-VIDEO_START( arcadecl )
+VIDEO_START_MEMBER(arcadecl_state,arcadecl)
 {
 	static const atarimo_desc modesc =
 	{
@@ -59,15 +59,14 @@ VIDEO_START( arcadecl )
 		0,					/* resulting value to indicate "special" */
 		0,					/* callback routine for special entries */
 	};
-	arcadecl_state *state = machine.driver_data<arcadecl_state>();
 
 	/* initialize the motion objects */
-	atarimo_init(machine, 0, &modesc);
+	atarimo_init(machine(), 0, &modesc);
 
 	/* set the intial scroll offset */
 	atarimo_set_xscroll(0, -12);
 	atarimo_set_yscroll(0, 0x110);
-	state->m_has_mo = (machine.gfx[0]->elements() > 10);
+	m_has_mo = (machine().gfx[0]->elements() > 10);
 }
 
 

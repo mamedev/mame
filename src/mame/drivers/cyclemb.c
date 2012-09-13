@@ -116,13 +116,16 @@ public:
 	DECLARE_WRITE8_MEMBER(skydest_i8741_0_w);
 	DECLARE_DRIVER_INIT(skydest);
 	DECLARE_DRIVER_INIT(cyclemb);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 
-static PALETTE_INIT( cyclemb )
+void cyclemb_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 
@@ -143,12 +146,12 @@ static PALETTE_INIT( cyclemb )
 		bit2 = (val >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
 
-static VIDEO_START( cyclemb )
+void cyclemb_state::video_start()
 {
 
 }
@@ -591,9 +594,9 @@ static ADDRESS_MAP_START( cyclemb_sound_io, AS_IO, 8, cyclemb_state )
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_byte_r) AM_WRITE(soundlatch2_byte_w)
 ADDRESS_MAP_END
 
-static MACHINE_RESET( cyclemb )
+void cyclemb_state::machine_reset()
 {
-	skydest_i8741_reset(machine);
+	skydest_i8741_reset(machine());
 }
 
 
@@ -918,11 +921,8 @@ static MACHINE_CONFIG_START( cyclemb, cyclemb_state )
 
 	MCFG_GFXDECODE(cyclemb)
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(cyclemb)
 
-	MCFG_VIDEO_START(cyclemb)
 
-	MCFG_MACHINE_RESET(cyclemb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -940,7 +940,7 @@ static MACHINE_CONFIG_DERIVED( skydest, cyclemb )
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 34*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(skydest)
 
-//  MCFG_PALETTE_INIT(skydest)
+//  MCFG_PALETTE_INIT_OVERRIDE(cyclemb_state,skydest)
 MACHINE_CONFIG_END
 
 /***************************************************************************

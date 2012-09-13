@@ -48,6 +48,8 @@ public:
 	DECLARE_READ8_MEMBER(triplhnt_da_latch_r);
 	DECLARE_DRIVER_INIT(triplhnt);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -64,7 +66,7 @@ extern const samples_interface triplhnt_samples_interface;
 
 /*----------- defined in video/triplhnt.c -----------*/
 
-VIDEO_START( triplhnt );
+
 SCREEN_UPDATE_IND16( triplhnt );
 
 

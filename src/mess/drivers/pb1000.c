@@ -50,6 +50,7 @@ public:
 	UINT16 pb1000_kb_r(running_machine &machine);
 	void kb_matrix_w(running_machine &machine, UINT8 matrix);
 	UINT16 read_touchscreen(running_machine &machine, UINT8 line);
+	virtual void palette_init();
 };
 
 static ADDRESS_MAP_START(pb1000_mem, AS_PROGRAM, 16, pb1000_state)
@@ -276,10 +277,10 @@ static INPUT_PORTS_START( pb2000c )
 		PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static PALETTE_INIT( pb1000 )
+void pb1000_state::palette_init()
 {
-	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
+	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
+	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
 }
 
 
@@ -515,7 +516,6 @@ static MACHINE_CONFIG_START( pb1000, pb1000_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 32-1)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT( pb1000 )
 	MCFG_GFXDECODE( pb1000 )
 
 	MCFG_HD44352_ADD("hd44352", 910000, hd44352_pb1000_conf)

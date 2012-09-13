@@ -40,12 +40,14 @@ public:
 	DECLARE_WRITE8_MEMBER(subs_lamp2_w);
 	DECLARE_WRITE8_MEMBER(subs_invert1_w);
 	DECLARE_WRITE8_MEMBER(subs_invert2_w);
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in machine/subs.c -----------*/
 
-MACHINE_RESET( subs );
+
 INTERRUPT_GEN( subs_interrupt );
 
 

@@ -224,18 +224,16 @@
  *
  *************************************/
 
-static MACHINE_START( bzone )
+void bzone_state::machine_start()
 {
-	bzone_state *state = machine.driver_data<bzone_state>();
-	state_save_register_global(machine, state->m_analog_data);
+	state_save_register_global(machine(), m_analog_data);
 }
 
 
-static MACHINE_START( redbaron )
+MACHINE_START_MEMBER(bzone_state,redbaron)
 {
-	bzone_state *state = machine.driver_data<bzone_state>();
-	state_save_register_global(machine, state->m_analog_data);
-	state_save_register_global(machine, state->m_rb_input_select);
+	state_save_register_global(machine(), m_analog_data);
+	state_save_register_global(machine(), m_rb_input_select);
 }
 
 
@@ -557,7 +555,6 @@ static MACHINE_CONFIG_START( bzone_base, bzone_state )
 	MCFG_CPU_PROGRAM_MAP(bzone_map)
 	MCFG_CPU_PERIODIC_INT(bzone_interrupt, (double)BZONE_MASTER_CLOCK / 4096 / 12)
 
-	MCFG_MACHINE_START(bzone)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", VECTOR)
@@ -589,7 +586,7 @@ static MACHINE_CONFIG_DERIVED( redbaron, bzone_base )
 	MCFG_CPU_PROGRAM_MAP(redbaron_map)
 	MCFG_CPU_PERIODIC_INT(bzone_interrupt, (double)BZONE_MASTER_CLOCK / 4096 / 12)
 
-	MCFG_MACHINE_START(redbaron)
+	MCFG_MACHINE_START_OVERRIDE(bzone_state,redbaron)
 
 	MCFG_ATARIVGEAROM_ADD("earom")
 
@@ -598,7 +595,6 @@ static MACHINE_CONFIG_DERIVED( redbaron, bzone_base )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VISIBLE_AREA(0, 520, 0, 400)
 
-	MCFG_VIDEO_START(avg_bzone)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

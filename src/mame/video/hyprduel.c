@@ -356,56 +356,53 @@ static void expand_gfx1(hyprduel_state &state)
 	}
 }
 
-static VIDEO_START( common_14220 )
+VIDEO_START_MEMBER(hyprduel_state,common_14220)
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
-	expand_gfx1(*state);
-	alloc_empty_tiles(machine);
-	state->m_tiletable_old = auto_alloc_array(machine, UINT16, state->m_tiletable.bytes() / 2);
-	state->m_dirtyindex = auto_alloc_array(machine, UINT8, state->m_tiletable.bytes() / 4);
+	expand_gfx1(*this);
+	alloc_empty_tiles(machine());
+	m_tiletable_old = auto_alloc_array(machine(), UINT16, m_tiletable.bytes() / 2);
+	m_dirtyindex = auto_alloc_array(machine(), UINT8, m_tiletable.bytes() / 4);
 
-	state->save_pointer(NAME(state->m_tiletable_old), state->m_tiletable.bytes() / 2);
-	state->save_pointer(NAME(state->m_dirtyindex), state->m_tiletable.bytes() / 4);
+	save_pointer(NAME(m_tiletable_old), m_tiletable.bytes() / 2);
+	save_pointer(NAME(m_dirtyindex), m_tiletable.bytes() / 4);
 
-	state->m_bg_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hyprduel_state::get_tile_info_0_8bit),state), TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
-	state->m_bg_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hyprduel_state::get_tile_info_1_8bit),state), TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
-	state->m_bg_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hyprduel_state::get_tile_info_2_8bit),state), TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
+	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(hyprduel_state::get_tile_info_0_8bit),this), TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
+	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(hyprduel_state::get_tile_info_1_8bit),this), TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
+	m_bg_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(hyprduel_state::get_tile_info_2_8bit),this), TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
 
-	state->m_bg_tilemap[0]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-	state->m_bg_tilemap[0]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
+	m_bg_tilemap[0]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+	m_bg_tilemap[0]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
 
-	state->m_bg_tilemap[1]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-	state->m_bg_tilemap[1]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
+	m_bg_tilemap[1]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+	m_bg_tilemap[1]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
 
-	state->m_bg_tilemap[2]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-	state->m_bg_tilemap[2]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
+	m_bg_tilemap[2]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+	m_bg_tilemap[2]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
 
-	state->m_bg_tilemap[0]->set_scrolldx(0, 0);
-	state->m_bg_tilemap[1]->set_scrolldx(0, 0);
-	state->m_bg_tilemap[2]->set_scrolldx(0, 0);
+	m_bg_tilemap[0]->set_scrolldx(0, 0);
+	m_bg_tilemap[1]->set_scrolldx(0, 0);
+	m_bg_tilemap[2]->set_scrolldx(0, 0);
 
 	/* Set up save state */
-	state->save_item(NAME(state->m_sprite_xoffs));
-	state->save_item(NAME(state->m_sprite_yoffs));
-	machine.save().register_postload(save_prepost_delegate(FUNC(hyprduel_postload), &machine));
+	save_item(NAME(m_sprite_xoffs));
+	save_item(NAME(m_sprite_yoffs));
+	machine().save().register_postload(save_prepost_delegate(FUNC(hyprduel_postload), &machine()));
 }
 
-VIDEO_START( hyprduel_14220 )
+VIDEO_START_MEMBER(hyprduel_state,hyprduel_14220)
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 
-	state->m_sprite_yoffs_sub = 2;
+	m_sprite_yoffs_sub = 2;
 
-	VIDEO_START_CALL(common_14220);
+	VIDEO_START_CALL_MEMBER(common_14220);
 }
 
-VIDEO_START( magerror_14220 )
+VIDEO_START_MEMBER(hyprduel_state,magerror_14220)
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 
-	state->m_sprite_yoffs_sub = 0;
+	m_sprite_yoffs_sub = 0;
 
-	VIDEO_START_CALL(common_14220);
+	VIDEO_START_CALL_MEMBER(common_14220);
 }
 
 /***************************************************************************

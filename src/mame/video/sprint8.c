@@ -8,23 +8,23 @@ Atari Sprint 8 video emulation
 #include "includes/sprint8.h"
 
 
-PALETTE_INIT( sprint8 )
+void sprint8_state::palette_init()
 {
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x12);
+	machine().colortable = colortable_alloc(machine(), 0x12);
 
 	for (i = 0; i < 0x10; i++)
 	{
-		colortable_entry_set_value(machine.colortable, 2 * i + 0, 0x10);
-		colortable_entry_set_value(machine.colortable, 2 * i + 1, i);
+		colortable_entry_set_value(machine().colortable, 2 * i + 0, 0x10);
+		colortable_entry_set_value(machine().colortable, 2 * i + 1, i);
 	}
 
-	colortable_entry_set_value(machine.colortable, 0x20, 0x10);
-	colortable_entry_set_value(machine.colortable, 0x21, 0x10);
-	colortable_entry_set_value(machine.colortable, 0x22, 0x10);
-	colortable_entry_set_value(machine.colortable, 0x23, 0x11);
+	colortable_entry_set_value(machine().colortable, 0x20, 0x10);
+	colortable_entry_set_value(machine().colortable, 0x21, 0x10);
+	colortable_entry_set_value(machine().colortable, 0x22, 0x10);
+	colortable_entry_set_value(machine().colortable, 0x23, 0x11);
 }
 
 
@@ -111,17 +111,16 @@ WRITE8_MEMBER(sprint8_state::sprint8_video_ram_w)
 }
 
 
-VIDEO_START( sprint8 )
+void sprint8_state::video_start()
 {
-	sprint8_state *state = machine.driver_data<sprint8_state>();
-	machine.primary_screen->register_screen_bitmap(state->m_helper1);
-	machine.primary_screen->register_screen_bitmap(state->m_helper2);
+	machine().primary_screen->register_screen_bitmap(m_helper1);
+	machine().primary_screen->register_screen_bitmap(m_helper2);
 
-	state->m_tilemap1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sprint8_state::get_tile_info1),state), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
-	state->m_tilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sprint8_state::get_tile_info2),state), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sprint8_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sprint8_state::get_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 
-	state->m_tilemap1->set_scrolly(0, +24);
-	state->m_tilemap2->set_scrolly(0, +24);
+	m_tilemap1->set_scrolly(0, +24);
+	m_tilemap2->set_scrolly(0, +24);
 }
 
 

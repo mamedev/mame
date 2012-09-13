@@ -63,23 +63,22 @@ Word | Bit(s)           | Use
 
 
 
-VIDEO_START( shangha3 )
+void shangha3_state::video_start()
 {
-	shangha3_state *state = machine.driver_data<shangha3_state>();
 	int i;
 
-	machine.primary_screen->register_screen_bitmap(state->m_rawbitmap);
+	machine().primary_screen->register_screen_bitmap(m_rawbitmap);
 
 	for (i = 0;i < 14;i++)
-		state->m_drawmode_table[i] = DRAWMODE_SOURCE;
-	state->m_drawmode_table[14] = state->m_do_shadows ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
-	state->m_drawmode_table[15] = DRAWMODE_NONE;
+		m_drawmode_table[i] = DRAWMODE_SOURCE;
+	m_drawmode_table[14] = m_do_shadows ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+	m_drawmode_table[15] = DRAWMODE_NONE;
 
-	if (state->m_do_shadows)
+	if (m_do_shadows)
 	{
 		/* Prepare the shadow table */
 		for (i = 0;i < 128;i++)
-			machine.shadow_table[i] = i+128;
+			machine().shadow_table[i] = i+128;
 	}
 }
 

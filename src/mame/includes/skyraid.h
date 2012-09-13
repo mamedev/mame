@@ -23,6 +23,8 @@ public:
 	DECLARE_WRITE8_MEMBER(skyraid_range_w);
 	DECLARE_WRITE8_MEMBER(skyraid_offset_w);
 	DECLARE_WRITE8_MEMBER(skyraid_scroll_w);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -35,5 +37,5 @@ WRITE8_DEVICE_HANDLER( skyraid_sound_w );
 
 /*----------- defined in video/skyraid.c -----------*/
 
-VIDEO_START(skyraid);
+
 SCREEN_UPDATE_IND16(skyraid);

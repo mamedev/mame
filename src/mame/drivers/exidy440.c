@@ -441,21 +441,19 @@ WRITE8_MEMBER(exidy440_state::topsecex_yscroll_w)
  *
  *************************************/
 
-static MACHINE_START( exidy440 )
+void exidy440_state::machine_start()
 {
-	exidy440_state *state = machine.driver_data<exidy440_state>();
 	/* the EEROM lives in the uppermost 8k of the top bank */
-	UINT8 *rom = state->memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
-	state->m_custom = machine.device("custom");
-	machine.device<nvram_device>("nvram")->set_base(&rom[0x10000 + 15 * 0x4000 + 0x2000], 0x2000);
+	m_custom = machine().device("custom");
+	machine().device<nvram_device>("nvram")->set_base(&rom[0x10000 + 15 * 0x4000 + 0x2000], 0x2000);
 }
 
-static MACHINE_RESET( exidy440 )
+void exidy440_state::machine_reset()
 {
-	exidy440_state *state = machine.driver_data<exidy440_state>();
-	state->m_bank = 0xff;
-	exidy440_bank_select(machine, 0);
+	m_bank = 0xff;
+	exidy440_bank_select(machine(), 0);
 }
 
 
@@ -1003,8 +1001,6 @@ static MACHINE_CONFIG_START( exidy440, exidy440_state )
 	MCFG_CPU_PROGRAM_MAP(exidy440_map)
 	MCFG_CPU_VBLANK_INT("screen", exidy440_vblank_interrupt)
 
-	MCFG_MACHINE_START(exidy440)
-	MCFG_MACHINE_RESET(exidy440)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */

@@ -22,7 +22,7 @@ const gfx_layout ac1_charlayout =
 	8*8					/* size of one char */
 };
 
-VIDEO_START( ac1 )
+void ac1_state::video_start()
 {
 }
 

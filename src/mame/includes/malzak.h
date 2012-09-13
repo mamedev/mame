@@ -31,6 +31,9 @@ public:
 	DECLARE_WRITE8_MEMBER(portc0_w);
 	DECLARE_READ8_MEMBER(collision_r);
 	DECLARE_WRITE8_MEMBER(malzak_playfield_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 

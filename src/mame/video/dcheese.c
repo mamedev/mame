@@ -25,9 +25,9 @@
  *
  *************************************/
 
-PALETTE_INIT( dcheese )
+void dcheese_state::palette_init()
 {
-	const UINT16 *src = (UINT16 *)machine.root_device().memregion("user1")->base();
+	const UINT16 *src = (UINT16 *)machine().root_device().memregion("user1")->base();
 	int i;
 
 	/* really 65536 colors, but they don't use the later ones so we can stay */
@@ -35,7 +35,7 @@ PALETTE_INIT( dcheese )
 	for (i = 0; i < 65534; i++)
 	{
 		int data = *src++;
-		palette_set_color_rgb(machine, i, pal6bit(data >> 0), pal5bit(data >> 6), pal5bit(data >> 11));
+		palette_set_color_rgb(machine(), i, pal6bit(data >> 0), pal5bit(data >> 6), pal5bit(data >> 11));
 	}
 }
 
@@ -90,22 +90,21 @@ static TIMER_CALLBACK( dcheese_signal_irq_callback )
  *
  *************************************/
 
-VIDEO_START( dcheese )
+void dcheese_state::video_start()
 {
-	dcheese_state *state = machine.driver_data<dcheese_state>();
 
 	/* the destination bitmap is not directly accessible to the CPU */
-	state->m_dstbitmap = auto_bitmap_ind16_alloc(machine, DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT);
+	m_dstbitmap = auto_bitmap_ind16_alloc(machine(), DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT);
 
 	/* create a timer */
-	state->m_blitter_timer = machine.scheduler().timer_alloc(FUNC(blitter_scanline_callback));
+	m_blitter_timer = machine().scheduler().timer_alloc(FUNC(blitter_scanline_callback));
 
 	/* register for saving */
-	state->save_item(NAME(state->m_blitter_color));
-	state->save_item(NAME(state->m_blitter_xparam));
-	state->save_item(NAME(state->m_blitter_yparam));
-	state->save_item(NAME(state->m_blitter_vidparam));
-	state->save_item(NAME(*state->m_dstbitmap));
+	save_item(NAME(m_blitter_color));
+	save_item(NAME(m_blitter_xparam));
+	save_item(NAME(m_blitter_yparam));
+	save_item(NAME(m_blitter_vidparam));
+	save_item(NAME(*m_dstbitmap));
 }
 
 

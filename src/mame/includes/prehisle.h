@@ -26,11 +26,12 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/prehisle.c -----------*/
 
 
-VIDEO_START( prehisle );
+
 SCREEN_UPDATE_IND16( prehisle );

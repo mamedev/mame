@@ -111,22 +111,21 @@ WRITE16_HANDLER( galpani2_bg15_w )
 
 ***************************************************************************/
 
-PALETTE_INIT( galpani2 )
+void galpani2_state::palette_init()
 {
 	int i;
 	/* first $4200 colors are dynamic */
 
 	/* initialize 555 RGB lookup */
 	for (i = 0; i < 0x8000; i++)
-		palette_set_color_rgb(machine,0x4200+i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
+		palette_set_color_rgb(machine(),0x4200+i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
 }
 
-VIDEO_START( galpani2 )
+void galpani2_state::video_start()
 {
-	galpani2_state *state = machine.driver_data<galpani2_state>();
-	state->m_bg15_bitmap  = auto_bitmap_ind16_alloc(machine, 256*8, 256);
-	state->m_bg8_bitmap[0] = auto_bitmap_ind16_alloc(machine, 512, 256);
-	state->m_bg8_bitmap[1] = auto_bitmap_ind16_alloc(machine, 512, 256);
+	m_bg15_bitmap  = auto_bitmap_ind16_alloc(machine(), 256*8, 256);
+	m_bg8_bitmap[0] = auto_bitmap_ind16_alloc(machine(), 512, 256);
+	m_bg8_bitmap[1] = auto_bitmap_ind16_alloc(machine(), 512, 256);
 }
 
 

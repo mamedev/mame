@@ -36,6 +36,9 @@ public:
 	DECLARE_READ8_MEMBER(gunsaux_r);
 	DECLARE_WRITE8_MEMBER(lethalen_palette_control);
 	DECLARE_DRIVER_INIT(lethalen);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 /*----------- defined in video/lethal.c -----------*/
@@ -44,5 +47,5 @@ extern void lethalen_sprite_callback(running_machine &machine, int *code, int *c
 extern void lethalen_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
 
 
-VIDEO_START(lethalen);
+
 SCREEN_UPDATE_IND16(lethalen);

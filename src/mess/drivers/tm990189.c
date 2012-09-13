@@ -140,7 +140,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sys9901_tapewdata_w);
 
 	DECLARE_WRITE8_MEMBER( xmit_callback );
-
+	DECLARE_MACHINE_START(tm990_189);
+	DECLARE_MACHINE_RESET(tm990_189);
+	DECLARE_MACHINE_START(tm990_189_v);
+	DECLARE_MACHINE_RESET(tm990_189_v);
 private:
 	void draw_digit(void);
 	void led_set(int number, bool state);
@@ -156,18 +159,16 @@ static void hold_load(running_machine &machine);
 
 
 
-static MACHINE_RESET( tm990_189 )
+MACHINE_RESET_MEMBER(tm990189,tm990_189)
 {
-	tm990189 *state = machine.driver_data<tm990189>();
-	state->m_tms9980a->set_ready(ASSERT_LINE);
-	state->m_tms9980a->set_hold(CLEAR_LINE);
-	hold_load(machine);
+	m_tms9980a->set_ready(ASSERT_LINE);
+	m_tms9980a->set_hold(CLEAR_LINE);
+	hold_load(machine());
 }
 
-static MACHINE_START( tm990_189 )
+MACHINE_START_MEMBER(tm990189,tm990_189)
 {
-	tm990189 *state = machine.driver_data<tm990189>();
-	state->m_displayena_timer = machine.scheduler().timer_alloc(FUNC_NULL);
+	m_displayena_timer = machine().scheduler().timer_alloc(FUNC_NULL);
 }
 
 static TMS9928A_INTERFACE(tms9918_interface)
@@ -177,24 +178,22 @@ static TMS9928A_INTERFACE(tms9918_interface)
 	DEVCB_NULL
 };
 
-static MACHINE_START( tm990_189_v )
+MACHINE_START_MEMBER(tm990189,tm990_189_v)
 {
-	tm990189 *state = machine.driver_data<tm990189>();
 
-	state->m_displayena_timer = machine.scheduler().timer_alloc(FUNC_NULL);
+	m_displayena_timer = machine().scheduler().timer_alloc(FUNC_NULL);
 
-	state->m_joy1x_timer = machine.scheduler().timer_alloc(FUNC_NULL);
-	state->m_joy1y_timer = machine.scheduler().timer_alloc(FUNC_NULL);
-	state->m_joy2x_timer = machine.scheduler().timer_alloc(FUNC_NULL);
-	state->m_joy2y_timer = machine.scheduler().timer_alloc(FUNC_NULL);
+	m_joy1x_timer = machine().scheduler().timer_alloc(FUNC_NULL);
+	m_joy1y_timer = machine().scheduler().timer_alloc(FUNC_NULL);
+	m_joy2x_timer = machine().scheduler().timer_alloc(FUNC_NULL);
+	m_joy2y_timer = machine().scheduler().timer_alloc(FUNC_NULL);
 }
 
-static MACHINE_RESET( tm990_189_v )
+MACHINE_RESET_MEMBER(tm990189,tm990_189_v)
 {
-	tm990189 *state = machine.driver_data<tm990189>();
-	state->m_tms9980a->set_ready(ASSERT_LINE);
-	state->m_tms9980a->set_hold(CLEAR_LINE);
-	hold_load(machine);
+	m_tms9980a->set_ready(ASSERT_LINE);
+	m_tms9980a->set_hold(CLEAR_LINE);
+	hold_load(machine());
 }
 
 /*
@@ -837,8 +836,8 @@ static MACHINE_CONFIG_START( tm990_189, tm990189 )
 	/* basic machine hardware */
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2000000, tm990_189_memmap, tm990_189_cru_map, cpuconf)
 
-	MCFG_MACHINE_START( tm990_189 )
-	MCFG_MACHINE_RESET( tm990_189 )
+	MCFG_MACHINE_START_OVERRIDE(tm990189, tm990_189 )
+	MCFG_MACHINE_RESET_OVERRIDE(tm990189, tm990_189 )
 
 	/* Video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_tm990189)
@@ -866,8 +865,8 @@ static MACHINE_CONFIG_START( tm990_189_v, tm990189 )
 	/* basic machine hardware */
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2000000, tm990_189_v_memmap, tm990_189_cru_map, cpuconf)
 
-	MCFG_MACHINE_START( tm990_189_v )
-	MCFG_MACHINE_RESET( tm990_189_v )
+	MCFG_MACHINE_START_OVERRIDE(tm990189, tm990_189_v )
+	MCFG_MACHINE_RESET_OVERRIDE(tm990189, tm990_189_v )
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9918", TMS9918, tms9918_interface )

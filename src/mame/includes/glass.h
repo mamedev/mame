@@ -43,11 +43,14 @@ public:
 	DECLARE_DRIVER_INIT(glass);
 	TILE_GET_INFO_MEMBER(get_tile_info_glass_screen0);
 	TILE_GET_INFO_MEMBER(get_tile_info_glass_screen1);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/glass.c -----------*/
 
 
-VIDEO_START( glass );
+
 SCREEN_UPDATE_IND16( glass );

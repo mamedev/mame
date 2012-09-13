@@ -175,16 +175,15 @@ GFXDECODE_END
 
 
 
-static MACHINE_START( contra )
+void contra_state::machine_start()
 {
-	contra_state *state = machine.driver_data<contra_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x2000);
+	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x2000);
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_k007121_1 = machine.device("k007121_1");
-	state->m_k007121_2 = machine.device("k007121_2");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_k007121_1 = machine().device("k007121_1");
+	m_k007121_2 = machine().device("k007121_2");
 }
 
 static MACHINE_CONFIG_START( contra, contra_state )
@@ -199,7 +198,6 @@ static MACHINE_CONFIG_START( contra, contra_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* enough for the sound CPU to read all commands */
 
-	MCFG_MACHINE_START(contra)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -212,8 +210,6 @@ static MACHINE_CONFIG_START( contra, contra_state )
 	MCFG_GFXDECODE(contra)
 	MCFG_PALETTE_LENGTH(2*8*16*16)
 
-	MCFG_PALETTE_INIT(contra)
-	MCFG_VIDEO_START(contra)
 
 	MCFG_K007121_ADD("k007121_1")
 	MCFG_K007121_ADD("k007121_2")

@@ -180,12 +180,16 @@ public:
 	DECLARE_DRIVER_INIT(apollo);
 
 	required_shared_ptr<UINT32> m_messram_ptr;
+	virtual void machine_start();
+	virtual void machine_reset();
+	DECLARE_MACHINE_RESET(apollo);
+	DECLARE_MACHINE_START(apollo);
 };
 
 MACHINE_CONFIG_EXTERN( apollo );
 
-MACHINE_START( apollo );
-MACHINE_RESET( apollo );
+
+
 
 /*----------- machine/apollo_config.c -----------*/
 

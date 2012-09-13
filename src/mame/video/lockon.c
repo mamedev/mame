@@ -98,9 +98,9 @@ static const res_net_info lockon_pd_net_info =
 	}
 };
 
-PALETTE_INIT( lockon )
+void lockon_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 1024; ++i)
@@ -122,7 +122,7 @@ PALETTE_INIT( lockon )
 			b = compute_res_net((p1 & 0x1f), 2, &lockon_pd_net_info);
 		}
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -895,30 +895,29 @@ static void hud_draw( running_machine &machine, bitmap_ind16 &bitmap, const rect
  *
  *************************************/
 
-VIDEO_START( lockon )
+void lockon_state::video_start()
 {
-	lockon_state *state = machine.driver_data<lockon_state>();
 
-	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lockon_state::get_lockon_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_tilemap->set_transparent_pen(0);
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lockon_state::get_lockon_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap->set_transparent_pen(0);
 
 	/* Allocate the two frame buffers for rotation */
-	state->m_back_buffer = auto_bitmap_ind16_alloc(machine, 512, 512);
-	state->m_front_buffer = auto_bitmap_ind16_alloc(machine, 512, 512);
+	m_back_buffer = auto_bitmap_ind16_alloc(machine(), 512, 512);
+	m_front_buffer = auto_bitmap_ind16_alloc(machine(), 512, 512);
 
 	/* 2kB of object ASIC palette RAM */
-	state->m_obj_pal_ram = auto_alloc_array(machine, UINT8, 2048);
+	m_obj_pal_ram = auto_alloc_array(machine(), UINT8, 2048);
 
 	/* Timer for ground display list callback */
-	state->m_bufend_timer = machine.scheduler().timer_alloc(FUNC(bufend_callback));
+	m_bufend_timer = machine().scheduler().timer_alloc(FUNC(bufend_callback));
 
 	/* Timer for the CRTC cursor pulse */
-	state->m_cursor_timer = machine.scheduler().timer_alloc(FUNC(cursor_callback));
-	state->m_cursor_timer->adjust(machine.primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
+	m_cursor_timer = machine().scheduler().timer_alloc(FUNC(cursor_callback));
+	m_cursor_timer->adjust(machine().primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 
-	state->save_item(NAME(*state->m_back_buffer));
-	state->save_item(NAME(*state->m_front_buffer));
-	state->save_pointer(NAME(state->m_obj_pal_ram), 2048);
+	save_item(NAME(*m_back_buffer));
+	save_item(NAME(*m_front_buffer));
+	save_pointer(NAME(m_obj_pal_ram), 2048);
 }
 
 SCREEN_UPDATE_IND16( lockon )

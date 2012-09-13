@@ -23,11 +23,10 @@ INLINE void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color
 }
 
 /* Update FLASH status for ts2068. Assumes flash update every 1/2s. */
-VIDEO_START( ts2068 )
+VIDEO_START_MEMBER(spectrum_state,ts2068)
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
-	VIDEO_START_CALL( spectrum );
-	state->m_frame_invert_count = 30;
+	VIDEO_START_CALL_MEMBER( spectrum );
+	m_frame_invert_count = 30;
 }
 
 

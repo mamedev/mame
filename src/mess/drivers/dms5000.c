@@ -16,6 +16,8 @@ public:
 	dms5000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -34,11 +36,11 @@ static INPUT_PORTS_START( dms5000 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(dms5000)
+void dms5000_state::machine_reset()
 {
 }
 
-static VIDEO_START( dms5000 )
+void dms5000_state::video_start()
 {
 }
 
@@ -53,7 +55,6 @@ static MACHINE_CONFIG_START( dms5000, dms5000_state )
 	MCFG_CPU_PROGRAM_MAP(dms5000_mem)
 	MCFG_CPU_IO_MAP(dms5000_io)
 
-	MCFG_MACHINE_RESET(dms5000)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -61,7 +62,6 @@ static MACHINE_CONFIG_START( dms5000, dms5000_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_VIDEO_START(dms5000)
 	MCFG_SCREEN_UPDATE_STATIC(dms5000)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

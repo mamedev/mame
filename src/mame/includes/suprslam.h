@@ -46,11 +46,14 @@ public:
 	DECLARE_WRITE16_MEMBER(suprslam_bank_w);
 	TILE_GET_INFO_MEMBER(get_suprslam_tile_info);
 	TILE_GET_INFO_MEMBER(get_suprslam_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/suprslam.c -----------*/
 
 
-VIDEO_START( suprslam );
+
 SCREEN_UPDATE_IND16( suprslam );

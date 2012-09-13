@@ -45,6 +45,11 @@ public:
 	DECLARE_READ8_MEMBER(k052109_051960_r);
 	DECLARE_WRITE8_MEMBER(k052109_051960_w);
 	DECLARE_WRITE8_MEMBER(scontra_snd_bankswitch_w);
+	virtual void video_start();
+	DECLARE_MACHINE_START(scontra);
+	DECLARE_MACHINE_RESET(scontra);
+	DECLARE_MACHINE_START(thunderx);
+	DECLARE_MACHINE_RESET(thunderx);
 };
 
 
@@ -53,5 +58,5 @@ public:
 extern void thunderx_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
 extern void thunderx_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask,int *shadow);
 
-VIDEO_START( scontra );
+
 SCREEN_UPDATE_IND16( scontra );

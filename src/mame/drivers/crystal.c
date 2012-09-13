@@ -188,6 +188,8 @@ public:
 	DECLARE_DRIVER_INIT(officeye);
 	DECLARE_DRIVER_INIT(crysking);
 	DECLARE_DRIVER_INIT(evosocc);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 static void IntReq( running_machine &machine, int num )
@@ -574,66 +576,64 @@ static void crystal_banksw_postload(running_machine &machine)
 		state->membank("bank1")->set_base(state->memregion("user2")->base());
 }
 
-static MACHINE_START( crystal )
+void crystal_state::machine_start()
 {
-	crystal_state *state = machine.driver_data<crystal_state>();
 	int i;
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_ds1302 = machine.device<ds1302_device>("rtc");
-	state->m_vr0video = machine.device("vr0");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_ds1302 = machine().device<ds1302_device>("rtc");
+	m_vr0video = machine().device("vr0");
 
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(icallback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(icallback);
 	for (i = 0; i < 4; i++)
-		state->m_Timer[i] = machine.scheduler().timer_alloc(FUNC(Timercb), (void*)(FPTR)i);
+		m_Timer[i] = machine().scheduler().timer_alloc(FUNC(Timercb), (void*)(FPTR)i);
 
-	PatchReset(machine);
+	PatchReset(machine());
 
 #ifdef IDLE_LOOP_SPEEDUP
-	state->save_item(NAME(state->m_FlipCntRead));
+	save_item(NAME(m_FlipCntRead));
 #endif
 
-	state->save_item(NAME(state->m_Bank));
-	state->save_item(NAME(state->m_FlipCount));
-	state->save_item(NAME(state->m_IntHigh));
-	state->save_item(NAME(state->m_Timerctrl));
-	state->save_item(NAME(state->m_FlashCmd));
-	state->save_item(NAME(state->m_PIO));
-	state->save_item(NAME(state->m_DMActrl));
-	state->save_item(NAME(state->m_OldPort4));
-	machine.save().register_postload(save_prepost_delegate(FUNC(crystal_banksw_postload), &machine));
+	save_item(NAME(m_Bank));
+	save_item(NAME(m_FlipCount));
+	save_item(NAME(m_IntHigh));
+	save_item(NAME(m_Timerctrl));
+	save_item(NAME(m_FlashCmd));
+	save_item(NAME(m_PIO));
+	save_item(NAME(m_DMActrl));
+	save_item(NAME(m_OldPort4));
+	machine().save().register_postload(save_prepost_delegate(FUNC(crystal_banksw_postload), &machine()));
 }
 
-static MACHINE_RESET( crystal )
+void crystal_state::machine_reset()
 {
-	crystal_state *state = machine.driver_data<crystal_state>();
 	int i;
 
-	memset(state->m_sysregs, 0, 0x10000);
-	memset(state->m_vidregs, 0, 0x10000);
-	state->m_FlipCount = 0;
-	state->m_IntHigh = 0;
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(icallback);
-	state->m_Bank = 0;
-	state->membank("bank1")->set_base(state->memregion("user1")->base() + 0);
-	state->m_FlashCmd = 0xff;
-	state->m_OldPort4 = 0;
+	memset(m_sysregs, 0, 0x10000);
+	memset(m_vidregs, 0, 0x10000);
+	m_FlipCount = 0;
+	m_IntHigh = 0;
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(icallback);
+	m_Bank = 0;
+	membank("bank1")->set_base(memregion("user1")->base() + 0);
+	m_FlashCmd = 0xff;
+	m_OldPort4 = 0;
 
-	state->m_DMActrl[0] = 0;
-	state->m_DMActrl[1] = 0;
+	m_DMActrl[0] = 0;
+	m_DMActrl[1] = 0;
 
 	for (i = 0; i < 4; i++)
 	{
-		state->m_Timerctrl[i] = 0;
-		state->m_Timer[i]->adjust(attotime::never);
+		m_Timerctrl[i] = 0;
+		m_Timer[i]->adjust(attotime::never);
 	}
 
-	vr0_snd_set_areas(machine.device("vrender"), state->m_textureram, state->m_frameram);
+	vr0_snd_set_areas(machine().device("vrender"), m_textureram, m_frameram);
 #ifdef IDLE_LOOP_SPEEDUP
-	state->m_FlipCntRead = 0;
+	m_FlipCntRead = 0;
 #endif
 
-	PatchReset(machine);
+	PatchReset(machine());
 }
 
 static UINT16 GetVidReg( address_space *space, UINT16 reg )
@@ -843,8 +843,6 @@ static MACHINE_CONFIG_START( crystal, crystal_state )
 	MCFG_CPU_PROGRAM_MAP(crystal_mem)
 	MCFG_CPU_VBLANK_INT("screen", crystal_interrupt)
 
-	MCFG_MACHINE_START(crystal)
-	MCFG_MACHINE_RESET(crystal)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

@@ -321,12 +321,11 @@ WRITE16_MEMBER(ssv_state::ssv_lockout_inv_w)
 	}
 }
 
-static MACHINE_RESET( ssv )
+void ssv_state::machine_reset()
 {
-	ssv_state *state = machine.driver_data<ssv_state>();
-	state->m_requested_int = 0;
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(ssv_irq_callback);
-	state->membank("bank1")->set_base(state->memregion("user1")->base());
+	m_requested_int = 0;
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(ssv_irq_callback);
+	membank("bank1")->set_base(memregion("user1")->base());
 }
 
 
@@ -2605,7 +2604,6 @@ static MACHINE_CONFIG_START( ssv, ssv_state )
 	MCFG_CPU_ADD("maincpu", V60, 16000000) /* Based on STA-0001 & STA-0001B System boards */
 	MCFG_TIMER_ADD_SCANLINE("scantimer", ssv_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET(ssv)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2616,7 +2614,6 @@ static MACHINE_CONFIG_START( ssv, ssv_state )
 
 	MCFG_GFXDECODE(ssv)
 	MCFG_PALETTE_LENGTH(0x8000)
-	MCFG_VIDEO_START(ssv)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2666,7 +2663,7 @@ static MACHINE_CONFIG_DERIVED( gdfs, ssv )
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
 
 	MCFG_GFXDECODE(gdfs)
-	MCFG_VIDEO_START(gdfs)
+	MCFG_VIDEO_START_OVERRIDE(ssv_state,gdfs)
 MACHINE_CONFIG_END
 
 
@@ -2844,7 +2841,7 @@ static MACHINE_CONFIG_DERIVED( eaglshot, ssv )
 	MCFG_SCREEN_UPDATE_STATIC(eaglshot)
 
 	MCFG_GFXDECODE(eaglshot)
-	MCFG_VIDEO_START(eaglshot)
+	MCFG_VIDEO_START_OVERRIDE(ssv_state,eaglshot)
 MACHINE_CONFIG_END
 
 

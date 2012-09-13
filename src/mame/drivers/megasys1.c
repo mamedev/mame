@@ -129,20 +129,18 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 #include "includes/megasys1.h"
 
 
-static MACHINE_RESET( megasys1 )
+MACHINE_RESET_MEMBER(megasys1_state,megasys1)
 {
-	megasys1_state *state = machine.driver_data<megasys1_state>();
-	state->m_ignore_oki_status = 1;	/* ignore oki status due 'protection' */
-	state->m_ip_select = 0;	/* reset protection */
-	state->m_mcu_hs = 0;
+	m_ignore_oki_status = 1;	/* ignore oki status due 'protection' */
+	m_ip_select = 0;	/* reset protection */
+	m_mcu_hs = 0;
 }
 
-static MACHINE_RESET( megasys1_hachoo )
+MACHINE_RESET_MEMBER(megasys1_state,megasys1_hachoo)
 {
-	megasys1_state *state = machine.driver_data<megasys1_state>();
-	state->m_ignore_oki_status = 0;	/* strangely hachoo need real oki status */
-	state->m_ip_select = 0;	/* reset protection */
-	state->m_mcu_hs = 0;
+	m_ignore_oki_status = 0;	/* strangely hachoo need real oki status */
+	m_ip_select = 0;	/* reset protection */
+	m_mcu_hs = 0;
 }
 
 
@@ -1475,7 +1473,7 @@ static MACHINE_CONFIG_START( system_A, megasys1_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(120000))
 
-	MCFG_MACHINE_RESET(megasys1)
+	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1489,8 +1487,8 @@ static MACHINE_CONFIG_START( system_A, megasys1_state )
 	MCFG_GFXDECODE(ABC)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_PALETTE_INIT(megasys1)
-	MCFG_VIDEO_START(megasys1)
+	MCFG_PALETTE_INIT_OVERRIDE(megasys1_state,megasys1)
+	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1510,7 +1508,7 @@ static MACHINE_CONFIG_START( system_A, megasys1_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system_A_hachoo, system_A )
-	MCFG_MACHINE_RESET(megasys1_hachoo)
+	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1_hachoo)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system_B, system_A )
@@ -1535,7 +1533,7 @@ static MACHINE_CONFIG_START( system_Bbl, megasys1_state )
 	MCFG_CPU_PROGRAM_MAP(megasys1B_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", megasys1B_scanline, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET(megasys1)
+	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1549,8 +1547,8 @@ static MACHINE_CONFIG_START( system_Bbl, megasys1_state )
 	MCFG_GFXDECODE(ABC)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_PALETTE_INIT(megasys1)
-	MCFG_VIDEO_START(megasys1)
+	MCFG_PALETTE_INIT_OVERRIDE(megasys1_state,megasys1)
+	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1607,7 +1605,7 @@ static MACHINE_CONFIG_START( system_D, megasys1_state )
 	MCFG_CPU_PROGRAM_MAP(megasys1D_map)
 	MCFG_CPU_VBLANK_INT("screen", megasys1D_irq)
 
-	MCFG_MACHINE_RESET(megasys1)
+	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1621,8 +1619,8 @@ static MACHINE_CONFIG_START( system_D, megasys1_state )
 	MCFG_GFXDECODE(ABC)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_PALETTE_INIT(megasys1)
-	MCFG_VIDEO_START(megasys1)
+	MCFG_PALETTE_INIT_OVERRIDE(megasys1_state,megasys1)
+	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1683,7 +1681,7 @@ static MACHINE_CONFIG_START( system_Z, megasys1_state )
 	MCFG_GFXDECODE(Z)
 	MCFG_PALETTE_LENGTH(768)
 
-	MCFG_VIDEO_START(megasys1)
+	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

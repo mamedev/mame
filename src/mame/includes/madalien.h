@@ -60,6 +60,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_BG_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_BG_2);
 	TILE_GET_INFO_MEMBER(get_tile_info_FG);
+	DECLARE_VIDEO_START(madalien);
+	DECLARE_PALETTE_INIT(madalien);
 };
 
 

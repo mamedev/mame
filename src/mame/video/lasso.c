@@ -64,30 +64,30 @@ static rgb_t get_color( int data )
 }
 
 
-PALETTE_INIT( lasso )
+void lasso_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x40; i++)
-		palette_set_color(machine, i, get_color(color_prom[i]));
+		palette_set_color(machine(), i, get_color(color_prom[i]));
 }
 
 
-PALETTE_INIT( wwjgtin )
+PALETTE_INIT_MEMBER(lasso_state,wwjgtin)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x40);
+	machine().colortable = colortable_alloc(machine(), 0x40);
 
 	for (i = 0; i < 0x40; i++)
-		colortable_palette_set_color(machine.colortable, i, get_color(color_prom[i]));
+		colortable_palette_set_color(machine().colortable, i, get_color(color_prom[i]));
 
 	/* characters/sprites */
 	for (i = 0; i < 0x40; i++)
-		colortable_entry_set_value(machine.colortable, i, i);
+		colortable_entry_set_value(machine().colortable, i, i);
 
 	/* track */
 	for (i = 0x40; i < 0x140; i++)
@@ -99,7 +99,7 @@ PALETTE_INIT( wwjgtin )
 		else
 			ctabentry = 0;
 
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 
@@ -163,35 +163,32 @@ TILE_GET_INFO_MEMBER(lasso_state::pinbo_get_bg_tile_info)
  *
  *************************************/
 
-VIDEO_START( lasso )
+void lasso_state::video_start()
 {
-	lasso_state *state = machine.driver_data<lasso_state>();
 
 	/* create tilemap */
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lasso_state::lasso_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lasso_state::lasso_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_transparent_pen(0);
 }
 
-VIDEO_START( wwjgtin )
+VIDEO_START_MEMBER(lasso_state,wwjgtin)
 {
-	lasso_state *state = machine.driver_data<lasso_state>();
 
 	/* create tilemaps */
-	state->m_bg_tilemap =    &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lasso_state::lasso_get_bg_tile_info),state),      TILEMAP_SCAN_ROWS,  8,  8,  32, 32);
-	state->m_track_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lasso_state::wwjgtin_get_track_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 128, 64);
+	m_bg_tilemap =    &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lasso_state::lasso_get_bg_tile_info),this),      TILEMAP_SCAN_ROWS,  8,  8,  32, 32);
+	m_track_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lasso_state::wwjgtin_get_track_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 128, 64);
 
-	state->m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_transparent_pen(0);
 }
 
-VIDEO_START( pinbo )
+VIDEO_START_MEMBER(lasso_state,pinbo)
 {
-	lasso_state *state = machine.driver_data<lasso_state>();
 
 	/* create tilemap */
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lasso_state::pinbo_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lasso_state::pinbo_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_transparent_pen(0);
 }
 
 

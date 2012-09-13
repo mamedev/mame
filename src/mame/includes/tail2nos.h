@@ -35,6 +35,9 @@ public:
 	DECLARE_WRITE16_MEMBER(tail2nos_gfxbank_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -43,5 +46,5 @@ public:
 extern void tail2nos_zoom_callback(running_machine &machine, int *code,int *color,int *flags);
 
 
-VIDEO_START( tail2nos );
+
 SCREEN_UPDATE_IND16( tail2nos );

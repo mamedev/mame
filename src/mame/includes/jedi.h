@@ -73,6 +73,9 @@ public:
 	DECLARE_WRITE8_MEMBER(speech_strobe_w);
 	DECLARE_READ8_MEMBER(speech_ready_r);
 	DECLARE_WRITE8_MEMBER(speech_reset_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	DECLARE_VIDEO_START(jedi);
 };
 
 

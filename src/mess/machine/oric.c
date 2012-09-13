@@ -1052,23 +1052,21 @@ static void oric_common_init_machine(running_machine &machine)
 	machine.scheduler().timer_pulse(attotime::from_hz(4800), FUNC(oric_refresh_tape));
 }
 
-MACHINE_START( oric )
+void oric_state::machine_start()
 {
-	oric_state *state = machine.driver_data<oric_state>();
-	oric_common_init_machine(machine);
+	oric_common_init_machine(machine());
 
-	state->m_is_telestrat = 0;
+	m_is_telestrat = 0;
 
-	state->m_ram_0x0c000 = auto_alloc_array(machine, UINT8, 16384);
+	m_ram_0x0c000 = auto_alloc_array(machine(), UINT8, 16384);
 }
 
 
-MACHINE_RESET( oric )
+void oric_state::machine_reset()
 {
-	oric_state *state = machine.driver_data<oric_state>();
-	int disc_interface_id = machine.root_device().ioport("FLOPPY")->read() & 0x07;
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	if (state->m_is_telestrat)
+	int disc_interface_id = machine().root_device().ioport("FLOPPY")->read() & 0x07;
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	if (m_is_telestrat)
 		return;
 
 	switch (disc_interface_id)
@@ -1082,48 +1080,48 @@ MACHINE_RESET( oric )
 			unsigned char *rom_ptr;
 
 			/* os rom */
-			oric_enable_memory(machine, 1, 3, TRUE, FALSE);
-			rom_ptr = state->memregion("maincpu")->base() + 0x010000;
-			state->membank("bank1")->set_base(rom_ptr);
-			state->membank("bank2")->set_base(rom_ptr+0x02000);
-			state->membank("bank3")->set_base(rom_ptr+0x03800);
-			state->membank("bank5")->set_base(rom_ptr);
-			state->membank("bank6")->set_base(rom_ptr+0x02000);
-			state->membank("bank7")->set_base(rom_ptr+0x03800);
+			oric_enable_memory(machine(), 1, 3, TRUE, FALSE);
+			rom_ptr = memregion("maincpu")->base() + 0x010000;
+			membank("bank1")->set_base(rom_ptr);
+			membank("bank2")->set_base(rom_ptr+0x02000);
+			membank("bank3")->set_base(rom_ptr+0x03800);
+			membank("bank5")->set_base(rom_ptr);
+			membank("bank6")->set_base(rom_ptr+0x02000);
+			membank("bank7")->set_base(rom_ptr+0x03800);
 
 
 			if (disc_interface_id==ORIC_FLOPPY_INTERFACE_APPLE2)
 			{
-				oric_install_apple2_interface(machine);
+				oric_install_apple2_interface(machine());
 			}
 			else
 			{
-				space->install_read_handler(0x0300, 0x03ff, read8_delegate(FUNC(oric_state::oric_IO_r),state));
-				space->install_write_handler(0x0300, 0x03ff, write8_delegate(FUNC(oric_state::oric_IO_w),state));
+				space->install_read_handler(0x0300, 0x03ff, read8_delegate(FUNC(oric_state::oric_IO_r),this));
+				space->install_write_handler(0x0300, 0x03ff, write8_delegate(FUNC(oric_state::oric_IO_w),this));
 			}
 		}
 		break;
 
 		case ORIC_FLOPPY_INTERFACE_APPLE2_V2:
 		{
-			oric_install_apple2_v2_interface(machine);
+			oric_install_apple2_v2_interface(machine());
 		}
 		break;
 
 
 		case ORIC_FLOPPY_INTERFACE_MICRODISC:
 		{
-			oric_install_microdisc_interface(machine);
+			oric_install_microdisc_interface(machine());
 		}
 		break;
 
 		case ORIC_FLOPPY_INTERFACE_JASMIN:
 		{
-			oric_install_jasmin_interface(machine);
+			oric_install_jasmin_interface(machine());
 		}
 		break;
 	}
-	machine.device("maincpu")->reset();
+	machine().device("maincpu")->reset();
 }
 
 
@@ -1381,50 +1379,49 @@ static void telestrat_acia_callback(running_machine &machine, int irq_state)
 }
 #endif
 
-MACHINE_START( telestrat )
+MACHINE_START_MEMBER(oric_state,telestrat)
 {
-	oric_state *state = machine.driver_data<oric_state>();
-	UINT8 *mem = state->memregion("maincpu")->base();
+	UINT8 *mem = memregion("maincpu")->base();
 
-	oric_common_init_machine(machine);
+	oric_common_init_machine(machine());
 
-	state->m_telestrat_via2_port_a_data = 0;
-	state->m_telestrat_via2_port_b_data = 0;
-	state->m_is_telestrat = 1;
+	m_telestrat_via2_port_a_data = 0;
+	m_telestrat_via2_port_b_data = 0;
+	m_is_telestrat = 1;
 
 	/* initialise overlay ram */
-	state->m_telestrat_blocks[0].MemType = TELESTRAT_MEM_BLOCK_RAM;
-	state->m_telestrat_blocks[0].ptr = mem+0x020000; //auto_alloc_array(machine, UINT8, 16384);
+	m_telestrat_blocks[0].MemType = TELESTRAT_MEM_BLOCK_RAM;
+	m_telestrat_blocks[0].ptr = mem+0x020000; //auto_alloc_array(machine(), UINT8, 16384);
 
-	state->m_telestrat_blocks[1].MemType = TELESTRAT_MEM_BLOCK_RAM;
-	state->m_telestrat_blocks[1].ptr = mem+0x024000; //auto_alloc_array(machine, UINT8, 16384);
+	m_telestrat_blocks[1].MemType = TELESTRAT_MEM_BLOCK_RAM;
+	m_telestrat_blocks[1].ptr = mem+0x024000; //auto_alloc_array(machine(), UINT8, 16384);
 
-	state->m_telestrat_blocks[2].MemType = TELESTRAT_MEM_BLOCK_RAM;
-	state->m_telestrat_blocks[2].ptr = mem+0x028000; //auto_alloc_array(machine, UINT8, 16384);
-
-	/* initialise default cartridge */
-	state->m_telestrat_blocks[3].MemType = TELESTRAT_MEM_BLOCK_ROM;
-	state->m_telestrat_blocks[3].ptr = mem+0x010000; // telmatic.rom
-
-	state->m_telestrat_blocks[4].MemType = TELESTRAT_MEM_BLOCK_RAM;
-	state->m_telestrat_blocks[4].ptr = mem+0x02c000; //auto_alloc_array(machine, UINT8, 16384);
+	m_telestrat_blocks[2].MemType = TELESTRAT_MEM_BLOCK_RAM;
+	m_telestrat_blocks[2].ptr = mem+0x028000; //auto_alloc_array(machine(), UINT8, 16384);
 
 	/* initialise default cartridge */
-	state->m_telestrat_blocks[5].MemType = TELESTRAT_MEM_BLOCK_ROM;
-	state->m_telestrat_blocks[5].ptr = mem+0x014000;  // teleass.rom
+	m_telestrat_blocks[3].MemType = TELESTRAT_MEM_BLOCK_ROM;
+	m_telestrat_blocks[3].ptr = mem+0x010000; // telmatic.rom
+
+	m_telestrat_blocks[4].MemType = TELESTRAT_MEM_BLOCK_RAM;
+	m_telestrat_blocks[4].ptr = mem+0x02c000; //auto_alloc_array(machine(), UINT8, 16384);
 
 	/* initialise default cartridge */
-	state->m_telestrat_blocks[6].MemType = TELESTRAT_MEM_BLOCK_ROM;
-	state->m_telestrat_blocks[6].ptr = mem+0x018000; // hyperbas.rom
+	m_telestrat_blocks[5].MemType = TELESTRAT_MEM_BLOCK_ROM;
+	m_telestrat_blocks[5].ptr = mem+0x014000;  // teleass.rom
 
 	/* initialise default cartridge */
-	state->m_telestrat_blocks[7].MemType = TELESTRAT_MEM_BLOCK_ROM;
-	state->m_telestrat_blocks[7].ptr = mem+0x01c000; // telmon24.rom
+	m_telestrat_blocks[6].MemType = TELESTRAT_MEM_BLOCK_ROM;
+	m_telestrat_blocks[6].ptr = mem+0x018000; // hyperbas.rom
 
-	state->m_telestrat_bank_selection = 7;
-	telestrat_refresh_mem(machine);
+	/* initialise default cartridge */
+	m_telestrat_blocks[7].MemType = TELESTRAT_MEM_BLOCK_ROM;
+	m_telestrat_blocks[7].ptr = mem+0x01c000; // telmon24.rom
+
+	m_telestrat_bank_selection = 7;
+	telestrat_refresh_mem(machine());
 
 	/* disable os rom, enable microdisc rom */
 	/* 0x0c000-0x0dfff will be ram, 0x0e000-0x0ffff will be microdisc rom */
-	state->m_port_314_w = 0x0ff^((1<<7) | (1<<1));
+	m_port_314_w = 0x0ff^((1<<7) | (1<<1));
 }

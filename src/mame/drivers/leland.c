@@ -743,8 +743,8 @@ static MACHINE_CONFIG_START( leland, leland_state )
 	MCFG_CPU_PROGRAM_MAP(slave_small_map_program)
 	MCFG_CPU_IO_MAP(slave_map_io)
 
-	MCFG_MACHINE_START(leland)
-	MCFG_MACHINE_RESET(leland)
+	MCFG_MACHINE_START_OVERRIDE(leland_state,leland)
+	MCFG_MACHINE_RESET_OVERRIDE(leland_state,leland)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 	MCFG_NVRAM_ADD_0FILL("battery")

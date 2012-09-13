@@ -94,15 +94,22 @@ public:
 	DECLARE_READ8_MEMBER( ti83_port_0002_r );
 	DECLARE_READ8_MEMBER( ti83_port_0003_r );
 	DECLARE_READ8_MEMBER( ti83p_port_0002_r );
+	virtual void machine_start();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_MACHINE_RESET(ti85);
+	DECLARE_PALETTE_INIT(ti82);
+	DECLARE_MACHINE_START(ti86);
+	DECLARE_MACHINE_START(ti83p);
 };
 
 
 /*----------- defined in machine/ti85.c -----------*/
 
-MACHINE_START( ti81 );
-MACHINE_START( ti83p );
-MACHINE_START( ti86 );
-MACHINE_RESET( ti85 );
+
+
+
+
 
 NVRAM_HANDLER( ti83p );
 NVRAM_HANDLER( ti86 );
@@ -112,10 +119,10 @@ SNAPSHOT_LOAD( ti8x );
 
 /*----------- defined in video/ti85.c -----------*/
 
-VIDEO_START( ti85 );
+
 SCREEN_UPDATE_IND16( ti85 );
-PALETTE_INIT( ti85 );
-PALETTE_INIT( ti82 );
+
+
 
 
 #endif /* TI85_H_ */

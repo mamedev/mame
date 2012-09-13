@@ -334,27 +334,25 @@ static const ym2203_interface ym2203_config =
  *
  *************************************/
 
-static MACHINE_START( capbowl )
+void capbowl_state::machine_start()
 {
-	capbowl_state *state = machine.driver_data<capbowl_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_blitter_addr));
-	state->save_item(NAME(state->m_last_trackball_val[0]));
-	state->save_item(NAME(state->m_last_trackball_val[1]));
+	save_item(NAME(m_blitter_addr));
+	save_item(NAME(m_last_trackball_val[0]));
+	save_item(NAME(m_last_trackball_val[1]));
 }
 
-static MACHINE_RESET( capbowl )
+void capbowl_state::machine_reset()
 {
-	capbowl_state *state = machine.driver_data<capbowl_state>();
 
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(32), FUNC(capbowl_update), 32);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(32), FUNC(capbowl_update), 32);
 
-	state->m_blitter_addr = 0;
-	state->m_last_trackball_val[0] = 0;
-	state->m_last_trackball_val[1] = 0;
+	m_blitter_addr = 0;
+	m_last_trackball_val[0] = 0;
+	m_last_trackball_val[1] = 0;
 }
 
 
@@ -368,14 +366,11 @@ static MACHINE_CONFIG_START( capbowl, capbowl_state )
 	MCFG_CPU_ADD("audiocpu", M6809E, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(capbowl)
-	MCFG_MACHINE_RESET(capbowl)
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", capbowl_state, init_nvram)
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
-	MCFG_VIDEO_START(capbowl)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(360, 256)

@@ -11,12 +11,14 @@ public:
 	DECLARE_WRITE8_MEMBER(gat_videoram_w);
 	DECLARE_WRITE8_MEMBER(output_port_1_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/gatron.c -----------*/
 
-PALETTE_INIT( gat );
-VIDEO_START( gat );
+
+
 SCREEN_UPDATE_IND16( gat );
 

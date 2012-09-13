@@ -91,6 +91,11 @@ public:
 	DECLARE_DRIVER_INIT(kageki);
 	DECLARE_DRIVER_INIT(chukatai);
 	DECLARE_DRIVER_INIT(tnzsb);
+	DECLARE_MACHINE_START(tnzs);
+	DECLARE_MACHINE_RESET(tnzs);
+	DECLARE_PALETTE_INIT(arknoid2);
+	DECLARE_MACHINE_START(jpopnics);
+	DECLARE_MACHINE_RESET(jpopnics);
 };
 
 
@@ -99,14 +104,14 @@ public:
 INTERRUPT_GEN( arknoid2_interrupt );
 
 
-MACHINE_START( tnzs );
-MACHINE_RESET( tnzs );
-MACHINE_RESET( jpopnics );
-MACHINE_START( jpopnics );
+
+
+
+
 
 
 /*----------- defined in video/tnzs.c -----------*/
 
-PALETTE_INIT( arknoid2 );
+
 SCREEN_UPDATE_IND16( tnzs );
 SCREEN_VBLANK( tnzs );

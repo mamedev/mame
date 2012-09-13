@@ -372,8 +372,6 @@ static MACHINE_CONFIG_START( strnskil, strnskil_state )
 	MCFG_GFXDECODE(strnskil)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_PALETTE_INIT(strnskil)
-	MCFG_VIDEO_START(strnskil)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

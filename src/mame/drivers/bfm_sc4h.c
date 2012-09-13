@@ -586,22 +586,21 @@ UINT16 bfm_sc4_68307_portb_r(address_space *space, bool dedicated, UINT16 line_m
 	}
 }
 
-static MACHINE_RESET( sc4 )
+MACHINE_RESET_MEMBER(sc4_state,sc4)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
 
 	int pattern =0, i;
 
-	for ( i = 0; i < state->m_reels; i++)
+	for ( i = 0; i < m_reels; i++)
 	{
 		stepper_reset_position(i);
 		if ( stepper_optic_state(i) ) pattern |= 1<<i;
 	}
 
-	state->m_dochk41 = true;
+	m_dochk41 = true;
 
-	state->m_optic_pattern = pattern;
-	state->sec.reset();
+	m_optic_pattern = pattern;
+	sec.reset();
 }
 
 static NVRAM_HANDLER( bfm_sc4 )
@@ -622,26 +621,25 @@ static NVRAM_HANDLER( bfm_sc4 )
 
 
 
-static MACHINE_START( sc4 )
+MACHINE_START_MEMBER(sc4_state,sc4)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	state->m_cpuregion = (UINT16*)state->memregion( "maincpu" )->base();
-	state->m_mainram = (UINT16*)auto_alloc_array_clear(machine, UINT16, 0x10000);
-	state->m_duart = machine.device("duart68681");
-	state->m_ymz = machine.device("ymz");
-	m68307_set_port_callbacks(machine.device("maincpu"),
+	m_cpuregion = (UINT16*)memregion( "maincpu" )->base();
+	m_mainram = (UINT16*)auto_alloc_array_clear(machine(), UINT16, 0x10000);
+	m_duart = machine().device("duart68681");
+	m_ymz = machine().device("ymz");
+	m68307_set_port_callbacks(machine().device("maincpu"),
 		bfm_sc4_68307_porta_r,
 		bfm_sc4_68307_porta_w,
 		bfm_sc4_68307_portb_r,
 		bfm_sc4_68307_portb_w );
-	m68307_set_duart68681(machine.device("maincpu"),machine.device("m68307_68681"));
+	m68307_set_duart68681(machine().device("maincpu"),machine().device("m68307_68681"));
 
 	int reels = 6;
-	state->m_reels=reels;
+	m_reels=reels;
 
 	for ( int n = 0; n < reels; n++ )
 	{
-		 if (state->m_reel_setup[n]) stepper_config(machine, n, state->m_reel_setup[n]);
+		 if (m_reel_setup[n]) stepper_config(machine(), n, m_reel_setup[n]);
 	}
 }
 
@@ -764,8 +762,8 @@ MACHINE_CONFIG_START( sc4, sc4_state )
 	// internal duart of the 68307... paired in machine start
 	MCFG_DUART68681_ADD("m68307_68681", 16000000/4, m68307_duart68681_config) // ?? Mhz
 
-	MCFG_MACHINE_START( sc4 )
-	MCFG_MACHINE_RESET( sc4 )
+	MCFG_MACHINE_START_OVERRIDE(sc4_state, sc4 )
+	MCFG_MACHINE_RESET_OVERRIDE(sc4_state, sc4 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -785,19 +783,18 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_START( adder4 )
+MACHINE_START_MEMBER(sc4_adder4_state,adder4)
 {
-	sc4_adder4_state *state = machine.driver_data<sc4_adder4_state>();
-	state->m_adder4cpuregion = (UINT32*)state->memregion( "adder4" )->base();
-	state->m_adder4ram = (UINT32*)auto_alloc_array_clear(machine, UINT32, 0x10000);
-	MACHINE_START_CALL(sc4);
+	m_adder4cpuregion = (UINT32*)memregion( "adder4" )->base();
+	m_adder4ram = (UINT32*)auto_alloc_array_clear(machine(), UINT32, 0x10000);
+	MACHINE_START_CALL_MEMBER(sc4);
 }
 
 MACHINE_CONFIG_DERIVED_CLASS( sc4_adder4, sc4, sc4_adder4_state )
 	MCFG_CPU_ADD("adder4", M68340, 25175000)	 // 68340 (CPU32 core)
 	MCFG_CPU_PROGRAM_MAP(sc4_adder4_map)
 
-	MCFG_MACHINE_START( adder4 )
+	MCFG_MACHINE_START_OVERRIDE(sc4_adder4_state, adder4 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED_CLASS( sc4dmd, sc4, sc4_state )
@@ -808,7 +805,7 @@ MACHINE_CONFIG_DERIVED_CLASS( sc4dmd, sc4, sc4_state )
 	MCFG_CPU_PROGRAM_MAP(bfm_dm01_memmap)
 	MCFG_CPU_PERIODIC_INT(bfm_dm01_vbl, 1500 )			/* generate 1500 NMI's per second ?? what is the exact freq?? */
 
-	MCFG_MACHINE_START( sc4 )
+	MCFG_MACHINE_START_OVERRIDE(sc4_state, sc4 )
 MACHINE_CONFIG_END
 
 INPUT_PORTS_START( sc4_base )

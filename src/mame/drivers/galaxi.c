@@ -91,6 +91,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg4_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -158,25 +161,24 @@ WRITE16_MEMBER(galaxi_state::galaxi_fg_w)
 	m_fg_tmap->mark_tile_dirty(offset);
 }
 
-static VIDEO_START(galaxi)
+void galaxi_state::video_start()
 {
-	galaxi_state *state = machine.driver_data<galaxi_state>();
 
-	state->m_bg1_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_bg1_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
-	state->m_bg2_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_bg2_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
-	state->m_bg3_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_bg3_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
-	state->m_bg4_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_bg4_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	m_bg1_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	m_bg2_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	m_bg3_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_bg3_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	m_bg4_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_bg4_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
 
-	state->m_fg_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20);
+	m_fg_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20);
 
-	state->m_bg1_tmap->set_transparent_pen(0);
-	state->m_bg2_tmap->set_transparent_pen(0);
-	state->m_bg3_tmap->set_transparent_pen(0);
-	state->m_bg4_tmap->set_transparent_pen(0);
+	m_bg1_tmap->set_transparent_pen(0);
+	m_bg2_tmap->set_transparent_pen(0);
+	m_bg3_tmap->set_transparent_pen(0);
+	m_bg4_tmap->set_transparent_pen(0);
 
-	state->m_fg_tmap->set_transparent_pen(0);
+	m_fg_tmap->set_transparent_pen(0);
 
-	state->m_bg3_tmap->set_scrolldx(-8, 0);
+	m_bg3_tmap->set_scrolldx(-8, 0);
 }
 
 static SCREEN_UPDATE_IND16(galaxi)
@@ -381,24 +383,22 @@ GFXDECODE_END
                               Machine Drivers
 ***************************************************************************/
 
-static MACHINE_START( galaxi )
+void galaxi_state::machine_start()
 {
-	galaxi_state *state = machine.driver_data<galaxi_state>();
 
-	state->save_item(NAME(state->m_hopper));
-	state->save_item(NAME(state->m_ticket));
-	state->save_item(NAME(state->m_out));
+	save_item(NAME(m_hopper));
+	save_item(NAME(m_ticket));
+	save_item(NAME(m_out));
 }
 
-static MACHINE_RESET( galaxi )
+void galaxi_state::machine_reset()
 {
-	galaxi_state *state = machine.driver_data<galaxi_state>();
 
-	state->m_hopper = 0;
-	state->m_ticket = 0;
-	state->m_out[0] = 0;
-	state->m_out[1] = 0;
-	state->m_out[2] = 0;
+	m_hopper = 0;
+	m_ticket = 0;
+	m_out[0] = 0;
+	m_out[1] = 0;
+	m_out[2] = 0;
 }
 
 static MACHINE_CONFIG_START( galaxi, galaxi_state )
@@ -408,8 +408,6 @@ static MACHINE_CONFIG_START( galaxi, galaxi_state )
 	MCFG_CPU_PROGRAM_MAP(galaxi_map)
 	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MCFG_MACHINE_START(galaxi)
-	MCFG_MACHINE_RESET(galaxi)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -423,7 +421,6 @@ static MACHINE_CONFIG_START( galaxi, galaxi_state )
 	MCFG_GFXDECODE(galaxi)
 	MCFG_PALETTE_LENGTH(0x400)
 
-	MCFG_VIDEO_START(galaxi)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

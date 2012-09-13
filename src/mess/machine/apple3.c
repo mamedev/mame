@@ -541,7 +541,7 @@ const via6522_interface apple3_via_1_intf =
 
 
 
-MACHINE_RESET( apple3 )
+MACHINE_RESET_MEMBER(apple3_state,apple3)
 {
 }
 

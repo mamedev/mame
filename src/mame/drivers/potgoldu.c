@@ -26,6 +26,8 @@ class potgold_state : public driver_device
 public:
 	potgold_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -37,7 +39,7 @@ public:
 
 
 
-static VIDEO_START( potgold )
+void potgold_state::video_start()
 {
 
 }
@@ -48,7 +50,7 @@ static void scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int sca
 }
 
 
-static MACHINE_RESET( potgold )
+void potgold_state::machine_reset()
 {
 
 }
@@ -84,9 +86,7 @@ static MACHINE_CONFIG_START( potgold, potgold_state )
 	MCFG_CPU_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(potgold_map)
 
-	MCFG_MACHINE_RESET(potgold)
 
-	MCFG_VIDEO_START(potgold)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200)

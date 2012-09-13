@@ -253,9 +253,8 @@ WRITE8_MEMBER(nycaptor_state::sound_cpu_reset_w)
 }
 
 
-static MACHINE_RESET( ta7630 )
+MACHINE_RESET_MEMBER(nycaptor_state,ta7630)
 {
-	nycaptor_state *state = machine.driver_data<nycaptor_state>();
 	int i;
 	double db			= 0.0;
 	double db_step		= 0.50;	/* 0.50 dB step (at least, maybe more) */
@@ -264,8 +263,8 @@ static MACHINE_RESET( ta7630 )
 	for (i = 0; i < 16; i++)
 	{
 		double max = 100.0 / pow(10.0, db/20.0 );
-		state->m_vol_ctrl[15 - i] = max;
-		/*logerror("vol_ctrl[%x] = %i (%f dB)\n", 15 - i, state->m_vol_ctrl[15 - i], db);*/
+		m_vol_ctrl[15 - i] = max;
+		/*logerror("vol_ctrl[%x] = %i (%f dB)\n", 15 - i, m_vol_ctrl[15 - i], db);*/
 		db += db_step;
 		db_step += db_step_inc;
 	}
@@ -763,70 +762,68 @@ GFXDECODE_END
 
 
 
-static MACHINE_START( nycaptor )
+void nycaptor_state::machine_start()
 {
-	nycaptor_state *state = machine.driver_data<nycaptor_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_subcpu = machine.device<cpu_device>("sub");
-	state->m_mcu = machine.device("mcu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_subcpu = machine().device<cpu_device>("sub");
+	m_mcu = machine().device("mcu");
 
-	state->save_item(NAME(state->m_generic_control_reg));
-	state->save_item(NAME(state->m_sound_nmi_enable));
-	state->save_item(NAME(state->m_pending_nmi));
-	state->save_item(NAME(state->m_snd_data));
-	state->save_item(NAME(state->m_vol_ctrl));
+	save_item(NAME(m_generic_control_reg));
+	save_item(NAME(m_sound_nmi_enable));
+	save_item(NAME(m_pending_nmi));
+	save_item(NAME(m_snd_data));
+	save_item(NAME(m_vol_ctrl));
 
-	state->save_item(NAME(state->m_char_bank));
-	state->save_item(NAME(state->m_palette_bank));
-	state->save_item(NAME(state->m_gfxctrl));
+	save_item(NAME(m_char_bank));
+	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_gfxctrl));
 
-	state->save_item(NAME(state->m_port_a_in));
-	state->save_item(NAME(state->m_port_a_out));
-	state->save_item(NAME(state->m_ddr_a));
-	state->save_item(NAME(state->m_port_b_in));
-	state->save_item(NAME(state->m_port_b_out));
-	state->save_item(NAME(state->m_ddr_b));
-	state->save_item(NAME(state->m_port_c_in));
-	state->save_item(NAME(state->m_port_c_out));
-	state->save_item(NAME(state->m_ddr_c));
-	state->save_item(NAME(state->m_mcu_sent));
-	state->save_item(NAME(state->m_main_sent));
-	state->save_item(NAME(state->m_from_main));
-	state->save_item(NAME(state->m_from_mcu));
+	save_item(NAME(m_port_a_in));
+	save_item(NAME(m_port_a_out));
+	save_item(NAME(m_ddr_a));
+	save_item(NAME(m_port_b_in));
+	save_item(NAME(m_port_b_out));
+	save_item(NAME(m_ddr_b));
+	save_item(NAME(m_port_c_in));
+	save_item(NAME(m_port_c_out));
+	save_item(NAME(m_ddr_c));
+	save_item(NAME(m_mcu_sent));
+	save_item(NAME(m_main_sent));
+	save_item(NAME(m_from_main));
+	save_item(NAME(m_from_mcu));
 }
 
-static MACHINE_RESET( nycaptor )
+void nycaptor_state::machine_reset()
 {
-	nycaptor_state *state = machine.driver_data<nycaptor_state>();
 
-	MACHINE_RESET_CALL(ta7630);
+	MACHINE_RESET_CALL_MEMBER(ta7630);
 
-	state->m_generic_control_reg = 0;
-	state->m_sound_nmi_enable = 0;
-	state->m_pending_nmi = 0;
-	state->m_snd_data = 0;
+	m_generic_control_reg = 0;
+	m_sound_nmi_enable = 0;
+	m_pending_nmi = 0;
+	m_snd_data = 0;
 
-	state->m_char_bank = 0;
-	state->m_palette_bank = 0;
-	state->m_gfxctrl = 0;
+	m_char_bank = 0;
+	m_palette_bank = 0;
+	m_gfxctrl = 0;
 
-	state->m_port_a_in = 0;
-	state->m_port_a_out = 0;
-	state->m_ddr_a = 0;
-	state->m_port_b_in = 0;
-	state->m_port_b_out = 0;
-	state->m_ddr_b = 0;
-	state->m_port_c_in = 0;
-	state->m_port_c_out = 0;
-	state->m_ddr_c = 0;
-	state->m_mcu_sent = 0;
-	state->m_main_sent = 0;
-	state->m_from_main = 0;
-	state->m_from_mcu = 0;
+	m_port_a_in = 0;
+	m_port_a_out = 0;
+	m_ddr_a = 0;
+	m_port_b_in = 0;
+	m_port_b_out = 0;
+	m_ddr_b = 0;
+	m_port_c_in = 0;
+	m_port_c_out = 0;
+	m_ddr_c = 0;
+	m_mcu_sent = 0;
+	m_main_sent = 0;
+	m_from_main = 0;
+	m_from_mcu = 0;
 
-	memset(state->m_vol_ctrl, 0, sizeof(state->m_vol_ctrl));
+	memset(m_vol_ctrl, 0, sizeof(m_vol_ctrl));
 }
 
 static MACHINE_CONFIG_START( nycaptor, nycaptor_state )
@@ -849,8 +846,6 @@ static MACHINE_CONFIG_START( nycaptor, nycaptor_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs */
 
-	MCFG_MACHINE_START(nycaptor)
-	MCFG_MACHINE_RESET(nycaptor)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -863,7 +858,6 @@ static MACHINE_CONFIG_START( nycaptor, nycaptor_state )
 	MCFG_GFXDECODE(nycaptor)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(nycaptor)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -911,8 +905,6 @@ static MACHINE_CONFIG_START( cyclshtg, nycaptor_state )
 #endif
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_MACHINE_START(nycaptor)
-	MCFG_MACHINE_RESET(nycaptor)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -924,7 +916,6 @@ static MACHINE_CONFIG_START( cyclshtg, nycaptor_state )
 	MCFG_GFXDECODE(nycaptor)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(nycaptor)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -968,8 +959,6 @@ static MACHINE_CONFIG_START( bronx, nycaptor_state )
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(120))
-	MCFG_MACHINE_START(nycaptor)
-	MCFG_MACHINE_RESET(nycaptor)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -981,7 +970,6 @@ static MACHINE_CONFIG_START( bronx, nycaptor_state )
 	MCFG_GFXDECODE(nycaptor)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(nycaptor)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -169,6 +169,8 @@ public:
 	UINT8 m_return_code;
 	UINT8 m_digit;
 	DECLARE_DRIVER_INIT(mmd2);
+	DECLARE_MACHINE_RESET(mmd1);
+	DECLARE_MACHINE_RESET(mmd2);
 };
 
 
@@ -439,23 +441,21 @@ static I8085_CONFIG( mmd2_cpu_config )
 	DEVCB_NULL					/* SOD changed callback (I8085A only) */
 };
 
-static MACHINE_RESET( mmd1 )
+MACHINE_RESET_MEMBER(mmd1_state,mmd1)
 {
-	mmd1_state *state = machine.driver_data<mmd1_state>();
-	state->m_return_code = 0xff;
+	m_return_code = 0xff;
 }
 
-static MACHINE_RESET( mmd2 )
+MACHINE_RESET_MEMBER(mmd1_state,mmd2)
 {
-	mmd1_state *state = machine.driver_data<mmd1_state>();
-	state->membank("bank1")->set_entry(0);
-	state->membank("bank2")->set_entry(0);
-	state->membank("bank3")->set_entry(0);
-	state->membank("bank4")->set_entry(0);
-	state->membank("bank5")->set_entry(0);
-	state->membank("bank6")->set_entry(0);
-	state->membank("bank7")->set_entry(0);
-	state->membank("bank8")->set_entry(0);
+	membank("bank1")->set_entry(0);
+	membank("bank2")->set_entry(0);
+	membank("bank3")->set_entry(0);
+	membank("bank4")->set_entry(0);
+	membank("bank5")->set_entry(0);
+	membank("bank6")->set_entry(0);
+	membank("bank7")->set_entry(0);
+	membank("bank8")->set_entry(0);
 }
 
 DRIVER_INIT_MEMBER(mmd1_state,mmd2)
@@ -497,7 +497,7 @@ static MACHINE_CONFIG_START( mmd1, mmd1_state )
 	MCFG_CPU_PROGRAM_MAP(mmd1_mem)
 	MCFG_CPU_IO_MAP(mmd1_io)
 
-	MCFG_MACHINE_RESET(mmd1)
+	MCFG_MACHINE_RESET_OVERRIDE(mmd1_state,mmd1)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mmd1)
@@ -510,7 +510,7 @@ static MACHINE_CONFIG_START( mmd2, mmd1_state )
 	MCFG_CPU_IO_MAP(mmd2_io)
 	MCFG_CPU_CONFIG(mmd2_cpu_config)
 
-	MCFG_MACHINE_RESET(mmd2)
+	MCFG_MACHINE_RESET_OVERRIDE(mmd1_state,mmd2)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mmd2)

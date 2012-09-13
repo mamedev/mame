@@ -270,12 +270,11 @@ static INTERRUPT_GEN( sprcros2_s_interrupt )
 		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_START( sprcros2 )
+void sprcros2_state::machine_start()
 {
-	sprcros2_state *state = machine.driver_data<sprcros2_state>();
 
-	state->save_item(NAME(state->m_port7));
-	state->save_item(NAME(state->m_s_port3));
+	save_item(NAME(m_port7));
+	save_item(NAME(m_s_port3));
 }
 
 static MACHINE_CONFIG_START( sprcros2, sprcros2_state )
@@ -291,7 +290,6 @@ static MACHINE_CONFIG_START( sprcros2, sprcros2_state )
 	MCFG_CPU_IO_MAP(sprcros2_slave_io_map)
 	MCFG_CPU_PERIODIC_INT(sprcros2_s_interrupt,2*60)	//2 nmis
 
-	MCFG_MACHINE_START(sprcros2)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -304,8 +302,6 @@ static MACHINE_CONFIG_START( sprcros2, sprcros2_state )
 	MCFG_GFXDECODE(sprcros2)
 	MCFG_PALETTE_LENGTH(768)
 
-	MCFG_PALETTE_INIT(sprcros2)
-	MCFG_VIDEO_START(sprcros2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -32,6 +32,8 @@ public:
 	DECLARE_WRITE8_MEMBER(bankedram_w);
 	DECLARE_WRITE8_MEMBER(surpratk_videobank_w);
 	DECLARE_WRITE8_MEMBER(surpratk_5fc0_w);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 /*----------- defined in video/surpratk.c -----------*/

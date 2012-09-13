@@ -293,25 +293,23 @@ static const k053936_interface suprslam_k053936_intf =
 	1, -45, -21	/* wrap, xoff, yoff */
 };
 
-static MACHINE_START( suprslam )
+void suprslam_state::machine_start()
 {
-	suprslam_state *state = machine.driver_data<suprslam_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_k053936 = machine.device("k053936");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_k053936 = machine().device("k053936");
 
-	state->save_item(NAME(state->m_screen_bank));
-	state->save_item(NAME(state->m_bg_bank));
-	state->save_item(NAME(state->m_pending_command));
+	save_item(NAME(m_screen_bank));
+	save_item(NAME(m_bg_bank));
+	save_item(NAME(m_pending_command));
 }
 
-static MACHINE_RESET( suprslam )
+void suprslam_state::machine_reset()
 {
-	suprslam_state *state = machine.driver_data<suprslam_state>();
 
-	state->m_screen_bank = 0;
-	state->m_bg_bank = 0;
-	state->m_pending_command = 0;
+	m_screen_bank = 0;
+	m_bg_bank = 0;
+	m_pending_command = 0;
 }
 
 static MACHINE_CONFIG_START( suprslam, suprslam_state )
@@ -324,8 +322,6 @@ static MACHINE_CONFIG_START( suprslam, suprslam_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
-	MCFG_MACHINE_START(suprslam)
-	MCFG_MACHINE_RESET(suprslam)
 
 	MCFG_GFXDECODE(suprslam)
 
@@ -340,7 +336,6 @@ static MACHINE_CONFIG_START( suprslam, suprslam_state )
 
 	MCFG_PALETTE_LENGTH(0x800)
 
-	MCFG_VIDEO_START(suprslam)
 
 	MCFG_K053936_ADD("k053936", suprslam_k053936_intf)
 

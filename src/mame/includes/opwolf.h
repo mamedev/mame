@@ -70,6 +70,8 @@ public:
 	DECLARE_WRITE8_MEMBER(opwolf_adpcm_c_w);
 	DECLARE_DRIVER_INIT(opwolf);
 	DECLARE_DRIVER_INIT(opwolfb);
+	virtual void machine_start();
+	DECLARE_MACHINE_RESET(opwolf);
 };
 
 

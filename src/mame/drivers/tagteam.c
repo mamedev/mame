@@ -226,8 +226,6 @@ static MACHINE_CONFIG_START( tagteam, tagteam_state )
 	MCFG_GFXDECODE(tagteam)
 	MCFG_PALETTE_LENGTH(32)
 
-	MCFG_PALETTE_INIT(tagteam)
-	MCFG_VIDEO_START(tagteam)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -38,7 +38,7 @@ enum
 
 ******************************************************************************/
 
-PALETTE_INIT( mbmj8688_8bit )
+PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_8bit)
 {
 	int i;
 	int bit0, bit1, bit2, r, g, b;
@@ -63,11 +63,11 @@ PALETTE_INIT( mbmj8688_8bit )
 		bit2 = ((i >> 7) & 0x01);
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
-PALETTE_INIT( mbmj8688_12bit )
+PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_12bit)
 {
 	int i;
 	int r, g, b;
@@ -80,11 +80,11 @@ PALETTE_INIT( mbmj8688_12bit )
 		g = ((i & 0x38) >> 2) | (((i >> 8) & 0x02) >> 1);
 		b = ((i & 0xc0) >> 4) | (((i >> 8) & 0x0c) >> 2);
 
-		palette_set_color_rgb(machine, i, pal4bit(r), pal4bit(g), pal4bit(b));
+		palette_set_color_rgb(machine(), i, pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
 
-PALETTE_INIT( mbmj8688_16bit )
+PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_16bit)
 {
 	int i;
 	int r, g, b;
@@ -96,7 +96,7 @@ PALETTE_INIT( mbmj8688_16bit )
 		g = (((i & 0x3800) >>  9) | ((i & 0x0018) >>  3));	// G 5bit
 		b = (((i & 0xc000) >> 11) | ((i & 0x00e0) >>  5));	// B 5bit
 
-		palette_set_color_rgb(machine, i, pal6bit(r), pal5bit(g), pal5bit(b));
+		palette_set_color_rgb(machine(), i, pal6bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -546,50 +546,44 @@ static void common_video_start(running_machine &machine)
 	state->m_mjsikaku_scrolly = 0;	// reset because crystalg/crystal2 don't write to this register
 }
 
-VIDEO_START( mbmj8688_8bit )
+VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_8bit)
 {
-	nbmj8688_state *state = machine.driver_data<nbmj8688_state>();
-	state->m_mjsikaku_gfxmode = GFXTYPE_8BIT;
-	common_video_start(machine);
+	m_mjsikaku_gfxmode = GFXTYPE_8BIT;
+	common_video_start(machine());
 }
 
-VIDEO_START( mbmj8688_hybrid_12bit )
+VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_hybrid_12bit)
 {
-	nbmj8688_state *state = machine.driver_data<nbmj8688_state>();
-	state->m_mjsikaku_gfxmode = GFXTYPE_HYBRID_12BIT;
-	common_video_start(machine);
+	m_mjsikaku_gfxmode = GFXTYPE_HYBRID_12BIT;
+	common_video_start(machine());
 }
 
-VIDEO_START( mbmj8688_pure_12bit )
+VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_pure_12bit)
 {
-	nbmj8688_state *state = machine.driver_data<nbmj8688_state>();
-	state->m_mjsikaku_gfxmode = GFXTYPE_PURE_12BIT;
-	common_video_start(machine);
+	m_mjsikaku_gfxmode = GFXTYPE_PURE_12BIT;
+	common_video_start(machine());
 }
 
-VIDEO_START( mbmj8688_hybrid_16bit )
+VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_hybrid_16bit)
 {
-	nbmj8688_state *state = machine.driver_data<nbmj8688_state>();
-	state->m_mjsikaku_gfxmode = GFXTYPE_HYBRID_16BIT;
-	common_video_start(machine);
+	m_mjsikaku_gfxmode = GFXTYPE_HYBRID_16BIT;
+	common_video_start(machine());
 }
 
-VIDEO_START( mbmj8688_pure_16bit )
+VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_pure_16bit)
 {
-	nbmj8688_state *state = machine.driver_data<nbmj8688_state>();
-	state->m_mjsikaku_gfxmode = GFXTYPE_PURE_16BIT;
-	common_video_start(machine);
+	m_mjsikaku_gfxmode = GFXTYPE_PURE_16BIT;
+	common_video_start(machine());
 }
 
-VIDEO_START( mbmj8688_pure_16bit_LCD )
+VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_pure_16bit_LCD)
 {
-	nbmj8688_state *state = machine.driver_data<nbmj8688_state>();
-	state->m_mjsikaku_gfxmode = GFXTYPE_PURE_16BIT;
+	m_mjsikaku_gfxmode = GFXTYPE_PURE_16BIT;
 
-	state->m_HD61830B_ram[0] = auto_alloc_array(machine, UINT8, 0x10000);
-	state->m_HD61830B_ram[1] = auto_alloc_array(machine, UINT8, 0x10000);
+	m_HD61830B_ram[0] = auto_alloc_array(machine(), UINT8, 0x10000);
+	m_HD61830B_ram[1] = auto_alloc_array(machine(), UINT8, 0x10000);
 
-	common_video_start(machine);
+	common_video_start(machine());
 }
 
 

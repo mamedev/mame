@@ -421,17 +421,16 @@ static TIMER_DEVICE_CALLBACK( interrupt_callback )
 	timer.machine().device("maincpu")->execute().set_input_line(param, HOLD_LINE);
 }
 
-static MACHINE_RESET(skns)
+void skns_state::machine_reset()
 {
-	skns_state *state = machine.driver_data<skns_state>();
-	hit_t &hit = state->m_hit;
+	hit_t &hit = m_hit;
 
-	if (state->m_region != 'A')
+	if (m_region != 'A')
 		hit.disconnect= 1;
 	else
 		hit.disconnect= 0;
 
-	state->membank("bank1")->set_base(state->memregion("user1")->base());
+	membank("bank1")->set_base(memregion("user1")->base());
 }
 
 
@@ -762,7 +761,6 @@ static MACHINE_CONFIG_START( skns, skns_state )
 
 	MCFG_MSM6242_ADD("rtc", rtc_intf)
 
-	MCFG_MACHINE_RESET(skns)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_ADD_PERIODIC("int15_timer", interrupt_callback, attotime::from_msec(2))
@@ -787,8 +785,6 @@ static MACHINE_CONFIG_START( skns, skns_state )
 
 	MCFG_DEVICE_ADD("spritegen", SKNS_SPRITE, 0)
 
-	MCFG_VIDEO_START(skns)
-	MCFG_VIDEO_RESET(skns)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -799,60 +795,55 @@ static MACHINE_CONFIG_START( skns, skns_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_RESET(sknsa)
+MACHINE_RESET_MEMBER(skns_state,sknsa)
 {
-	skns_state *state = machine.driver_data<skns_state>();
-	state->m_region = 'A';
-	MACHINE_RESET_CALL(skns);
+	m_region = 'A';
+	skns_state::machine_reset();
 }
 
-static MACHINE_RESET(sknsj)
+MACHINE_RESET_MEMBER(skns_state,sknsj)
 {
-	skns_state *state = machine.driver_data<skns_state>();
-	state->m_region = 'J';
-	MACHINE_RESET_CALL(skns);
+	m_region = 'J';
+	skns_state::machine_reset();
 }
 
-static MACHINE_RESET(sknsu)
+MACHINE_RESET_MEMBER(skns_state,sknsu)
 {
-	skns_state *state = machine.driver_data<skns_state>();
-	state->m_region = 'U';
-	MACHINE_RESET_CALL(skns);
+	m_region = 'U';
+	skns_state::machine_reset();
 }
 
-static MACHINE_RESET(sknse)
+MACHINE_RESET_MEMBER(skns_state,sknse)
 {
-	skns_state *state = machine.driver_data<skns_state>();
-	state->m_region = 'E';
-	MACHINE_RESET_CALL(skns);
+	m_region = 'E';
+	skns_state::machine_reset();
 }
 
-static MACHINE_RESET(sknsk)
+MACHINE_RESET_MEMBER(skns_state,sknsk)
 {
-	skns_state *state = machine.driver_data<skns_state>();
-	state->m_region = 'K';
-	MACHINE_RESET_CALL(skns);
+	m_region = 'K';
+	skns_state::machine_reset();
 }
 
 
 static MACHINE_CONFIG_DERIVED( sknsa, skns )
-	MCFG_MACHINE_RESET(sknsa)
+	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknsa)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sknsj, skns )
-	MCFG_MACHINE_RESET(sknsj)
+	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknsj)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sknsu, skns )
-	MCFG_MACHINE_RESET(sknsu)
+	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknsu)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sknse, skns )
-	MCFG_MACHINE_RESET(sknse)
+	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknse)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sknsk, skns )
-	MCFG_MACHINE_RESET(sknsk)
+	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknsk)
 MACHINE_CONFIG_END
 
 /***** IDLE SKIPPING *****/

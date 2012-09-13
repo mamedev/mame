@@ -1,13 +1,13 @@
 #include "emu.h"
 #include "includes/xyonix.h"
 
-PALETTE_INIT( xyonix )
+void xyonix_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -26,7 +26,7 @@ PALETTE_INIT( xyonix )
 		bit1 = (color_prom[i] >> 4) & 0x01;
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -48,11 +48,10 @@ WRITE8_MEMBER(xyonix_state::xyonix_vidram_w)
 	m_tilemap->mark_tile_dirty((offset-1)&0x0fff);
 }
 
-VIDEO_START(xyonix)
+void xyonix_state::video_start()
 {
-	xyonix_state *state = machine.driver_data<xyonix_state>();
 
-	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(xyonix_state::get_xyonix_tile_info),state), TILEMAP_SCAN_ROWS, 4, 8, 80, 32);
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(xyonix_state::get_xyonix_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 80, 32);
 }
 
 SCREEN_UPDATE_IND16(xyonix)

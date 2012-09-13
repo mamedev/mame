@@ -179,7 +179,6 @@ static MACHINE_CONFIG_START( odyssey2, odyssey2_state )
 	MCFG_CPU_IO_MAP(odyssey2_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_RESET( odyssey2 )
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -188,9 +187,7 @@ static MACHINE_CONFIG_START( odyssey2, odyssey2_state )
 
 	MCFG_GFXDECODE( odyssey2 )
 	MCFG_PALETTE_LENGTH(24)
-	MCFG_PALETTE_INIT( odyssey2 )
 
-	MCFG_VIDEO_START( odyssey2 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -212,7 +209,6 @@ static MACHINE_CONFIG_START( videopac, odyssey2_state )
 	MCFG_CPU_IO_MAP(odyssey2_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_RESET( odyssey2 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -221,9 +217,7 @@ static MACHINE_CONFIG_START( videopac, odyssey2_state )
 
 	MCFG_GFXDECODE( odyssey2 )
 	MCFG_PALETTE_LENGTH(24)
-	MCFG_PALETTE_INIT( odyssey2 )
 
-	MCFG_VIDEO_START( odyssey2 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -244,7 +238,6 @@ static MACHINE_CONFIG_START( g7400, odyssey2_state )
 	MCFG_CPU_IO_MAP(g7400_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_RESET( odyssey2 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -253,9 +246,7 @@ static MACHINE_CONFIG_START( g7400, odyssey2_state )
 
 	MCFG_GFXDECODE( odyssey2 )
 	MCFG_PALETTE_LENGTH(24)
-	MCFG_PALETTE_INIT( odyssey2 )
 
-	MCFG_VIDEO_START( odyssey2 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

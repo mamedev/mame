@@ -234,6 +234,7 @@ public:
 	DECLARE_WRITE8_MEMBER(omegrace_leds_w);
 	DECLARE_WRITE8_MEMBER(omegrace_soundlatch_w);
 	DECLARE_DRIVER_INIT(omegrace);
+	virtual void machine_reset();
 };
 
 
@@ -243,9 +244,9 @@ public:
  *
  *************************************/
 
-static MACHINE_RESET( omegrace )
+void omegrace_state::machine_reset()
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/* Omega Race expects the vector processor to be ready. */
 	avgdvg_reset_w(space, 0, 0);
 }
@@ -501,7 +502,6 @@ static MACHINE_CONFIG_START( omegrace, omegrace_state )
 	MCFG_CPU_IO_MAP(sound_port)
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,250)
 
-	MCFG_MACHINE_RESET(omegrace)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */

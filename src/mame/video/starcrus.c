@@ -17,14 +17,13 @@ WRITE8_MEMBER(starcrus_state::starcrus_p1_y_w){ m_p1_y = data^0xff; }
 WRITE8_MEMBER(starcrus_state::starcrus_p2_x_w){ m_p2_x = data^0xff; }
 WRITE8_MEMBER(starcrus_state::starcrus_p2_y_w){ m_p2_y = data^0xff; }
 
-VIDEO_START( starcrus )
+void starcrus_state::video_start()
 {
-	starcrus_state *state = machine.driver_data<starcrus_state>();
-	state->m_ship1_vid = auto_bitmap_ind16_alloc(machine, 16, 16);
-	state->m_ship2_vid = auto_bitmap_ind16_alloc(machine, 16, 16);
+	m_ship1_vid = auto_bitmap_ind16_alloc(machine(), 16, 16);
+	m_ship2_vid = auto_bitmap_ind16_alloc(machine(), 16, 16);
 
-	state->m_proj1_vid = auto_bitmap_ind16_alloc(machine, 16, 16);
-	state->m_proj2_vid = auto_bitmap_ind16_alloc(machine, 16, 16);
+	m_proj1_vid = auto_bitmap_ind16_alloc(machine(), 16, 16);
+	m_proj2_vid = auto_bitmap_ind16_alloc(machine(), 16, 16);
 }
 
 WRITE8_MEMBER(starcrus_state::starcrus_ship_parm_1_w)

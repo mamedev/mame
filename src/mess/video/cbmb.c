@@ -10,7 +10,7 @@
 
 
 
-VIDEO_START( cbmb_crtc )
+VIDEO_START_MEMBER(cbmb_state,cbmb_crtc)
 {
 }
 
@@ -38,7 +38,7 @@ void cbm700_vh_init(running_machine &machine)
 	}
 }
 
-VIDEO_START( cbm700 )
+VIDEO_START_MEMBER(cbmb_state,cbm700)
 {
 	int i;
 
@@ -48,9 +48,9 @@ VIDEO_START( cbm700 )
 //      if( i < 176 || i > 223 )
 		{
 			int y;
-			for( y = 0; y < machine.gfx[0]->height(); y++ ) {
-				*const_cast<UINT8 *>(machine.gfx[0]->get_data(i) + y * machine.gfx[0]->rowbytes() + 8) = 0;
-				*const_cast<UINT8 *>(machine.gfx[1]->get_data(i) + y * machine.gfx[1]->rowbytes() + 8) = 0;
+			for( y = 0; y < machine().gfx[0]->height(); y++ ) {
+				*const_cast<UINT8 *>(machine().gfx[0]->get_data(i) + y * machine().gfx[0]->rowbytes() + 8) = 0;
+				*const_cast<UINT8 *>(machine().gfx[1]->get_data(i) + y * machine().gfx[1]->rowbytes() + 8) = 0;
 			}
 		}
 	}

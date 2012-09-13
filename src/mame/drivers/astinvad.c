@@ -76,6 +76,11 @@ public:
 	DECLARE_WRITE8_MEMBER(astinvad_sound2_w);
 	DECLARE_DRIVER_INIT(kamikaze);
 	DECLARE_DRIVER_INIT(spcking2);
+	DECLARE_MACHINE_START(kamikaze);
+	DECLARE_MACHINE_RESET(kamikaze);
+	DECLARE_MACHINE_START(spaceint);
+	DECLARE_MACHINE_RESET(spaceint);
+	DECLARE_VIDEO_START(spaceint);
 };
 
 
@@ -116,13 +121,12 @@ static I8255A_INTERFACE( ppi8255_1_intf )
  *
  *************************************/
 
-static VIDEO_START( spaceint )
+VIDEO_START_MEMBER(astinvad_state,spaceint)
 {
-	astinvad_state *state = machine.driver_data<astinvad_state>();
-	state->m_colorram = auto_alloc_array(machine, UINT8, state->m_videoram.bytes());
+	m_colorram = auto_alloc_array(machine(), UINT8, m_videoram.bytes());
 
-	state->save_item(NAME(state->m_color_latch));
-	state->save_pointer(NAME(state->m_colorram), state->m_videoram.bytes());
+	save_item(NAME(m_color_latch));
+	save_pointer(NAME(m_colorram), m_videoram.bytes());
 }
 
 
@@ -235,49 +239,45 @@ static TIMER_CALLBACK( kamizake_int_gen )
 }
 
 
-static MACHINE_START( kamikaze )
+MACHINE_START_MEMBER(astinvad_state,kamikaze)
 {
-	astinvad_state *state = machine.driver_data<astinvad_state>();
 
-	state->m_samples = machine.device<samples_device>("samples");
+	m_samples = machine().device<samples_device>("samples");
 
-	state->m_int_timer = machine.scheduler().timer_alloc(FUNC(kamizake_int_gen));
-	state->m_int_timer->adjust(machine.primary_screen->time_until_pos(128), 128);
+	m_int_timer = machine().scheduler().timer_alloc(FUNC(kamizake_int_gen));
+	m_int_timer->adjust(machine().primary_screen->time_until_pos(128), 128);
 
-	state->save_item(NAME(state->m_screen_flip));
-	state->save_item(NAME(state->m_screen_red));
-	state->save_item(NAME(state->m_sound_state));
+	save_item(NAME(m_screen_flip));
+	save_item(NAME(m_screen_red));
+	save_item(NAME(m_sound_state));
 }
 
-static MACHINE_RESET( kamikaze )
+MACHINE_RESET_MEMBER(astinvad_state,kamikaze)
 {
-	astinvad_state *state = machine.driver_data<astinvad_state>();
 
-	state->m_screen_flip = 0;
-	state->m_screen_red = 0;
-	state->m_sound_state[0] = 0;
-	state->m_sound_state[1] = 0;
+	m_screen_flip = 0;
+	m_screen_red = 0;
+	m_sound_state[0] = 0;
+	m_sound_state[1] = 0;
 }
 
 
-static MACHINE_START( spaceint )
+MACHINE_START_MEMBER(astinvad_state,spaceint)
 {
-	astinvad_state *state = machine.driver_data<astinvad_state>();
 
-	state->m_samples = machine.device<samples_device>("samples");
+	m_samples = machine().device<samples_device>("samples");
 
-	state->save_item(NAME(state->m_screen_flip));
-	state->save_item(NAME(state->m_sound_state));
+	save_item(NAME(m_screen_flip));
+	save_item(NAME(m_sound_state));
 }
 
-static MACHINE_RESET( spaceint )
+MACHINE_RESET_MEMBER(astinvad_state,spaceint)
 {
-	astinvad_state *state = machine.driver_data<astinvad_state>();
 
-	state->m_screen_flip = 0;
-	state->m_sound_state[0] = 0;
-	state->m_sound_state[1] = 0;
-	state->m_color_latch = 0;
+	m_screen_flip = 0;
+	m_sound_state[0] = 0;
+	m_sound_state[1] = 0;
+	m_color_latch = 0;
 }
 
 
@@ -592,8 +592,8 @@ static MACHINE_CONFIG_START( kamikaze, astinvad_state )
 	MCFG_CPU_PROGRAM_MAP(kamikaze_map)
 	MCFG_CPU_IO_MAP(kamikaze_portmap)
 
-	MCFG_MACHINE_START(kamikaze)
-	MCFG_MACHINE_RESET(kamikaze)
+	MCFG_MACHINE_START_OVERRIDE(astinvad_state,kamikaze)
+	MCFG_MACHINE_RESET_OVERRIDE(astinvad_state,kamikaze)
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
@@ -627,11 +627,11 @@ static MACHINE_CONFIG_START( spaceint, astinvad_state )
 	MCFG_CPU_IO_MAP(spaceint_portmap)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(spaceint)
-	MCFG_MACHINE_RESET(spaceint)
+	MCFG_MACHINE_START_OVERRIDE(astinvad_state,spaceint)
+	MCFG_MACHINE_RESET_OVERRIDE(astinvad_state,spaceint)
 
 	/* video hardware */
-	MCFG_VIDEO_START(spaceint)
+	MCFG_VIDEO_START_OVERRIDE(astinvad_state,spaceint)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(32*8, 32*8)

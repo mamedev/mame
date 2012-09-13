@@ -186,26 +186,40 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_2);
 	TILE_GET_INFO_MEMBER(get_tile_info_3);
+	DECLARE_MACHINE_START(cave);
+	DECLARE_MACHINE_RESET(cave);
+	DECLARE_VIDEO_START(cave_2_layers);
+	DECLARE_PALETTE_INIT(dfeveron);
+	DECLARE_VIDEO_START(cave_3_layers);
+	DECLARE_PALETTE_INIT(ddonpach);
+	DECLARE_PALETTE_INIT(cave);
+	DECLARE_VIDEO_START(cave_1_layer);
+	DECLARE_PALETTE_INIT(korokoro);
+	DECLARE_PALETTE_INIT(mazinger);
+	DECLARE_VIDEO_START(cave_4_layers);
+	DECLARE_PALETTE_INIT(pwrinst2);
+	DECLARE_VIDEO_START(sailormn_3_layers);
+	DECLARE_PALETTE_INIT(sailormn);
 };
 
 /*----------- defined in video/cave.c -----------*/
 
 
 
-PALETTE_INIT( cave );
-PALETTE_INIT( ddonpach );
-PALETTE_INIT( dfeveron );
-PALETTE_INIT( mazinger );
-PALETTE_INIT( sailormn );
-PALETTE_INIT( pwrinst2 );
-PALETTE_INIT( korokoro );
 
-VIDEO_START( cave_1_layer );
-VIDEO_START( cave_2_layers );
-VIDEO_START( cave_3_layers );
-VIDEO_START( cave_4_layers );
 
-VIDEO_START( sailormn_3_layers );
+
+
+
+
+
+
+
+
+
+
+
+
 
 SCREEN_UPDATE_IND16( cave );
 

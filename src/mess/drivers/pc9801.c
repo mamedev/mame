@@ -408,7 +408,13 @@ public:
 private:
 	UINT8 m_sdip_read(UINT16 port, UINT8 sdip_offset);
 	void m_sdip_write(UINT16 port, UINT8 sdip_offset,UINT8 data);
-
+public:
+	DECLARE_MACHINE_START(pc9801);
+	DECLARE_MACHINE_RESET(pc9801);
+	DECLARE_MACHINE_RESET(pc9801f);
+	DECLARE_PALETTE_INIT(pc9801);
+	DECLARE_MACHINE_RESET(pc9801rs);
+	DECLARE_MACHINE_START(pc9821);
 };
 
 
@@ -2506,14 +2512,14 @@ static const i8251_interface pc9801_uart_interface =
 *
 ****************************************/
 
-static PALETTE_INIT( pc9801 )
+PALETTE_INIT_MEMBER(pc9801_state,pc9801)
 {
 	int i;
 
 	for(i=0;i<8;i++)
-		palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
-	for(i=8;i<machine.total_colors();i++)
-		palette_set_color_rgb(machine, i, pal1bit(0), pal1bit(0), pal1bit(0));
+		palette_set_color_rgb(machine(), i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+	for(i=8;i<machine().total_colors();i++)
+		palette_set_color_rgb(machine(), i, pal1bit(0), pal1bit(0), pal1bit(0));
 }
 
 static IRQ_CALLBACK(irq_callback)
@@ -2521,19 +2527,17 @@ static IRQ_CALLBACK(irq_callback)
 	return pic8259_acknowledge( device->machine().device( "pic8259_master" ));
 }
 
-static MACHINE_START(pc9801)
+MACHINE_START_MEMBER(pc9801_state,pc9801)
 {
-	pc9801_state *state = machine.driver_data<pc9801_state>();
 
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 
-	state->m_rtc->cs_w(1);
-	state->m_rtc->oe_w(1);
+	m_rtc->cs_w(1);
+	m_rtc->oe_w(1);
 }
 
-static MACHINE_RESET(pc9801)
+MACHINE_RESET_MEMBER(pc9801_state,pc9801)
 {
-	pc9801_state *state = machine.driver_data<pc9801_state>();
 
 	/* this looks like to be some kind of backup ram, system will boot with green colors otherwise */
 	{
@@ -2545,64 +2549,62 @@ static MACHINE_RESET(pc9801)
 		};
 
 		for(i=0;i<0x10;i++)
-			state->m_tvram[(0x3fe0)+i*2] = default_memsw_data[i];
+			m_tvram[(0x3fe0)+i*2] = default_memsw_data[i];
 	}
 
-	beep_set_frequency(machine.device(BEEPER_TAG),2400);
-	beep_set_state(machine.device(BEEPER_TAG),0);
+	beep_set_frequency(machine().device(BEEPER_TAG),2400);
+	beep_set_state(machine().device(BEEPER_TAG),0);
 
-	state->m_nmi_ff = 0;
+	m_nmi_ff = 0;
 }
 
-static MACHINE_RESET(pc9801f)
+MACHINE_RESET_MEMBER(pc9801_state,pc9801f)
 {
-	MACHINE_RESET_CALL(pc9801);
+	MACHINE_RESET_CALL_MEMBER(pc9801);
 
 	/* 2dd interface ready line is ON by default */
-	floppy_mon_w(floppy_get_device(machine, 0), CLEAR_LINE);
-	floppy_mon_w(floppy_get_device(machine, 1), CLEAR_LINE);
-	floppy_drive_set_ready_state(floppy_get_device(machine, 0), (1), 0);
-	floppy_drive_set_ready_state(floppy_get_device(machine, 1), (1), 0);
+	floppy_mon_w(floppy_get_device(machine(), 0), CLEAR_LINE);
+	floppy_mon_w(floppy_get_device(machine(), 1), CLEAR_LINE);
+	floppy_drive_set_ready_state(floppy_get_device(machine(), 0), (1), 0);
+	floppy_drive_set_ready_state(floppy_get_device(machine(), 1), (1), 0);
 
 	{
 		UINT8 op_mode;
 		UINT8 *ROM;
-		UINT8 *PRG = machine.root_device().memregion("fdc_data")->base();
+		UINT8 *PRG = machine().root_device().memregion("fdc_data")->base();
 		int i;
 
-		ROM = machine.root_device().memregion("fdc_bios_2dd")->base();
-		op_mode = (machine.root_device().ioport("ROM_LOAD")->read() & 2) >> 1;
+		ROM = machine().root_device().memregion("fdc_bios_2dd")->base();
+		op_mode = (machine().root_device().ioport("ROM_LOAD")->read() & 2) >> 1;
 
 		for(i=0;i<0x1000;i++)
 			ROM[i] = PRG[i+op_mode*0x8000];
 
-		ROM = machine.root_device().memregion("fdc_bios_2hd")->base();
-		op_mode = machine.root_device().ioport("ROM_LOAD")->read() & 1;
+		ROM = machine().root_device().memregion("fdc_bios_2hd")->base();
+		op_mode = machine().root_device().ioport("ROM_LOAD")->read() & 1;
 
 		for(i=0;i<0x1000;i++)
 			ROM[i] = PRG[i+op_mode*0x8000+0x10000];
 	}
 }
 
-static MACHINE_RESET(pc9801rs)
+MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 {
-	pc9801_state *state = machine.driver_data<pc9801_state>();
-	MACHINE_RESET_CALL(pc9801);
+	MACHINE_RESET_CALL_MEMBER(pc9801);
 
-	state->m_gate_a20 = 0;
-	state->m_rom_bank = 0;
-	state->m_fdc_ctrl = 3;
-	state->m_access_ctrl = 0;
+	m_gate_a20 = 0;
+	m_rom_bank = 0;
+	m_fdc_ctrl = 3;
+	m_access_ctrl = 0;
 
-	state->m_ram_size = machine.device<ram_device>(RAM_TAG)->size() - 0xa0000;
+	m_ram_size = machine().device<ram_device>(RAM_TAG)->size() - 0xa0000;
 }
 
-static MACHINE_START(pc9821)
+MACHINE_START_MEMBER(pc9801_state,pc9821)
 {
-	pc9801_state *state = machine.driver_data<pc9801_state>();
 
-	MACHINE_START_CALL(pc9801);
-	state_save_register_global_pointer(machine, state->m_sdip, 24);
+	MACHINE_START_CALL_MEMBER(pc9801);
+	state_save_register_global_pointer(machine(), m_sdip, 24);
 }
 
 static INTERRUPT_GEN(pc9801_vrtc_irq)
@@ -2639,8 +2641,8 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_CPU_IO_MAP(pc9801_io)
 	MCFG_CPU_VBLANK_INT("screen",pc9801_vrtc_irq)
 
-	MCFG_MACHINE_START(pc9801)
-	MCFG_MACHINE_RESET(pc9801f)
+	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801f)
 
 	MCFG_PIT8253_ADD( "pit8253", pit8253_config )
 	MCFG_I8237_ADD( "dma8237", 5000000, dma8237_config ) //unknown clock
@@ -2675,7 +2677,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_UPD7220_ADD("upd7220_btm", 5000000/2, hgdc_2_intf, upd7220_2_map)
 
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT(pc9801)
+	MCFG_PALETTE_INIT_OVERRIDE(pc9801_state,pc9801)
 	MCFG_GFXDECODE(pc9801)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2702,8 +2704,8 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_CPU_IO_MAP(pc9801rs_io)
 	MCFG_CPU_VBLANK_INT("screen",pc9801_vrtc_irq)
 
-	MCFG_MACHINE_START(pc9801)
-	MCFG_MACHINE_RESET(pc9801rs)
+	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801rs)
 
 	MCFG_PIT8253_ADD( "pit8253", pc9801rs_pit8253_config )
 	MCFG_I8237_ADD( "dma8237", 16000000, dma8237_config ) //unknown clock
@@ -2734,7 +2736,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_UPD7220_ADD("upd7220_btm", 5000000/2, hgdc_2_intf, upd7220_2_map)
 
 	MCFG_PALETTE_LENGTH(16+16)
-	MCFG_PALETTE_INIT(pc9801)
+	MCFG_PALETTE_INIT_OVERRIDE(pc9801_state,pc9801)
 	MCFG_GFXDECODE(pc9801)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2762,8 +2764,8 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_CPU_IO_MAP(pc9821_io)
 	MCFG_CPU_VBLANK_INT("screen",pc9801_vrtc_irq)
 
-	MCFG_MACHINE_START(pc9821)
-	MCFG_MACHINE_RESET(pc9801rs)
+	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9821)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801rs)
 
 	MCFG_PIT8253_ADD( "pit8253", pc9801rs_pit8253_config )
 	MCFG_I8237_ADD( "dma8237", 16000000, dma8237_config ) //unknown clock
@@ -2794,7 +2796,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_UPD7220_ADD("upd7220_btm", 5000000/2, hgdc_2_intf, upd7220_2_map)
 
 	MCFG_PALETTE_LENGTH(16+16+256)
-	MCFG_PALETTE_INIT(pc9801)
+	MCFG_PALETTE_INIT_OVERRIDE(pc9801_state,pc9801)
 	MCFG_GFXDECODE(pc9801)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

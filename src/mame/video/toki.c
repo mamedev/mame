@@ -82,16 +82,15 @@ TILE_GET_INFO_MEMBER(toki_state::get_fore_tile_info)
  *
  *************************************/
 
-VIDEO_START( toki )
+void toki_state::video_start()
 {
-	toki_state *state = machine.driver_data<toki_state>();
-	state->m_text_layer       = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(toki_state::get_text_tile_info),state),TILEMAP_SCAN_ROWS,  8,8,32,32);
-	state->m_background_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(toki_state::get_back_tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_foreground_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(toki_state::get_fore_tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_text_layer       = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(toki_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,32,32);
+	m_background_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(toki_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_foreground_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(toki_state::get_fore_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 
-	state->m_text_layer->set_transparent_pen(15);
-	state->m_background_layer->set_transparent_pen(15);
-	state->m_foreground_layer->set_transparent_pen(15);
+	m_text_layer->set_transparent_pen(15);
+	m_background_layer->set_transparent_pen(15);
+	m_foreground_layer->set_transparent_pen(15);
 }
 
 /*************************************/

@@ -816,19 +816,17 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static MACHINE_START( fantland )
+MACHINE_START_MEMBER(fantland_state,fantland)
 {
-	fantland_state *state = machine.driver_data<fantland_state>();
 
-	state->m_audio_cpu = machine.device("audiocpu");
+	m_audio_cpu = machine().device("audiocpu");
 
-	state->save_item(NAME(state->m_nmi_enable));
+	save_item(NAME(m_nmi_enable));
 }
 
-static MACHINE_RESET( fantland )
+MACHINE_RESET_MEMBER(fantland_state,fantland)
 {
-	fantland_state *state = machine.driver_data<fantland_state>();
-	state->m_nmi_enable = 0;
+	m_nmi_enable = 0;
 }
 
 static INTERRUPT_GEN( fantland_irq )
@@ -856,8 +854,8 @@ static MACHINE_CONFIG_START( fantland, fantland_state )
 	MCFG_CPU_PERIODIC_INT(fantland_sound_irq, 8000)
 	// NMI when soundlatch is written
 
-	MCFG_MACHINE_START(fantland)
-	MCFG_MACHINE_RESET(fantland)
+	MCFG_MACHINE_START_OVERRIDE(fantland_state,fantland)
+	MCFG_MACHINE_RESET_OVERRIDE(fantland_state,fantland)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(8000))	// sound irq must feed the DAC at 8kHz
 
@@ -908,8 +906,8 @@ static MACHINE_CONFIG_START( galaxygn, fantland_state )
 	MCFG_CPU_IO_MAP(galaxygn_sound_iomap)
 	// IRQ by YM2151, NMI when soundlatch is written
 
-	MCFG_MACHINE_START(fantland)
-	MCFG_MACHINE_RESET(fantland)
+	MCFG_MACHINE_START_OVERRIDE(fantland_state,fantland)
+	MCFG_MACHINE_RESET_OVERRIDE(fantland_state,fantland)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -954,54 +952,52 @@ static const msm5205_interface msm5205_config_3 =
 	MSM5205_S48_4B		/* 8 kHz, 4 Bits  */
 };
 
-static MACHINE_START( borntofi )
+MACHINE_START_MEMBER(fantland_state,borntofi)
 {
-	fantland_state *state = machine.driver_data<fantland_state>();
 
-	MACHINE_START_CALL(fantland);
+	MACHINE_START_CALL_MEMBER(fantland);
 
-	state->m_msm1 = machine.device("msm1");
-	state->m_msm2 = machine.device("msm2");
-	state->m_msm3 = machine.device("msm3");
-	state->m_msm4 = machine.device("msm4");
+	m_msm1 = machine().device("msm1");
+	m_msm2 = machine().device("msm2");
+	m_msm3 = machine().device("msm3");
+	m_msm4 = machine().device("msm4");
 
-	state->save_item(NAME(state->m_old_x));
-	state->save_item(NAME(state->m_old_y));
-	state->save_item(NAME(state->m_old_f));
-	state->save_item(NAME(state->m_input_ret));
-	state->save_item(NAME(state->m_adpcm_playing));
-	state->save_item(NAME(state->m_adpcm_addr[0]));
-	state->save_item(NAME(state->m_adpcm_addr[1]));
-	state->save_item(NAME(state->m_adpcm_nibble));
+	save_item(NAME(m_old_x));
+	save_item(NAME(m_old_y));
+	save_item(NAME(m_old_f));
+	save_item(NAME(m_input_ret));
+	save_item(NAME(m_adpcm_playing));
+	save_item(NAME(m_adpcm_addr[0]));
+	save_item(NAME(m_adpcm_addr[1]));
+	save_item(NAME(m_adpcm_nibble));
 }
 
-static MACHINE_RESET( borntofi )
+MACHINE_RESET_MEMBER(fantland_state,borntofi)
 {
-	fantland_state *state = machine.driver_data<fantland_state>();
 	int i;
 
-	MACHINE_RESET_CALL(fantland);
+	MACHINE_RESET_CALL_MEMBER(fantland);
 
 	for (i = 0; i < 2; i++)
 	{
-		state->m_old_x[i] = 0;
-		state->m_old_y[i] = 0;
-		state->m_old_f[i] = 0;
-		state->m_input_ret[i] = 0;
+		m_old_x[i] = 0;
+		m_old_y[i] = 0;
+		m_old_f[i] = 0;
+		m_input_ret[i] = 0;
 	}
 
 	for (i = 0; i < 4; i++)
 	{
-		state->m_adpcm_playing[i] = 1;
-		state->m_adpcm_addr[0][i] = 0;
-		state->m_adpcm_addr[1][i] = 0;
-		state->m_adpcm_nibble[i] = 0;
+		m_adpcm_playing[i] = 1;
+		m_adpcm_addr[0][i] = 0;
+		m_adpcm_addr[1][i] = 0;
+		m_adpcm_nibble[i] = 0;
 	}
 
-	borntofi_adpcm_stop(machine.device("msm1"), 0);
-	borntofi_adpcm_stop(machine.device("msm2"), 1);
-	borntofi_adpcm_stop(machine.device("msm3"), 2);
-	borntofi_adpcm_stop(machine.device("msm4"), 3);
+	borntofi_adpcm_stop(machine().device("msm1"), 0);
+	borntofi_adpcm_stop(machine().device("msm2"), 1);
+	borntofi_adpcm_stop(machine().device("msm3"), 2);
+	borntofi_adpcm_stop(machine().device("msm4"), 3);
 }
 
 static MACHINE_CONFIG_START( borntofi, fantland_state )
@@ -1014,8 +1010,8 @@ static MACHINE_CONFIG_START( borntofi, fantland_state )
 	MCFG_CPU_ADD("audiocpu", I8088, 18432000/3)        // 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
 	MCFG_CPU_PROGRAM_MAP(borntofi_sound_map)
 
-	MCFG_MACHINE_START(borntofi)
-	MCFG_MACHINE_RESET(borntofi)
+	MCFG_MACHINE_START_OVERRIDE(fantland_state,borntofi)
+	MCFG_MACHINE_RESET_OVERRIDE(fantland_state,borntofi)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1054,8 +1050,8 @@ static MACHINE_CONFIG_START( wheelrun, fantland_state )
 	MCFG_CPU_PROGRAM_MAP(wheelrun_sound_map)
 	// IRQ by YM3526, NMI when soundlatch is written
 
-	MCFG_MACHINE_START(fantland)
-	MCFG_MACHINE_RESET(fantland)
+	MCFG_MACHINE_START_OVERRIDE(fantland_state,fantland)
+	MCFG_MACHINE_RESET_OVERRIDE(fantland_state,fantland)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

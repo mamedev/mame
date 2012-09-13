@@ -371,22 +371,19 @@ WRITE16_MEMBER(dec0_state::dec0_priority_w)
 	COMBINE_DATA(&m_pri);
 }
 
-VIDEO_START( dec0_nodma )
+VIDEO_START_MEMBER(dec0_state,dec0_nodma)
 {
-	dec0_state *state = machine.driver_data<dec0_state>();
-	state->m_buffered_spriteram = state->m_spriteram;
+	m_buffered_spriteram = m_spriteram;
 }
 
-VIDEO_START( dec0 )
+VIDEO_START_MEMBER(dec0_state,dec0)
 {
-	dec0_state *state = machine.driver_data<dec0_state>();
-	VIDEO_START_CALL(dec0_nodma);
-	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, 0x800/2);
+	VIDEO_START_CALL_MEMBER(dec0_nodma);
+	m_buffered_spriteram = auto_alloc_array(machine(), UINT16, 0x800/2);
 }
 
-VIDEO_START( automat )
+VIDEO_START_MEMBER(dec0_automat_state,automat)
 {
-//  dec0_state *state = machine.driver_data<dec0_state>();
 }
 
 /******************************************************************************/

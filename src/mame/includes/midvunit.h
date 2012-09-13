@@ -115,6 +115,10 @@ public:
 	DECLARE_DRIVER_INIT(crusnusa);
 	void init_crusnwld_common(offs_t speedup);
 	void init_crusnusa_common(offs_t speedup);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	DECLARE_MACHINE_RESET(midvplus);
 };
 
 
@@ -127,5 +131,5 @@ public:
 
 
 
-VIDEO_START( midvunit );
+
 SCREEN_UPDATE_IND16( midvunit );

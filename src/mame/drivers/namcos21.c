@@ -1479,9 +1479,9 @@ static const c140_interface C140_interface =
 	C140_TYPE_SYSTEM21
 };
 
-static MACHINE_START( namcos21 )
+MACHINE_START_MEMBER(namcos21_state,namcos21)
 {
-	MACHINE_START_CALL( namcos2 );
+	MACHINE_START_CALL_MEMBER( namcos2 );
 	namcos2_kickstart = namcos21_kickstart;
 }
 
@@ -1516,8 +1516,8 @@ static MACHINE_CONFIG_START( namcos21, namcos21_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
-	MCFG_MACHINE_START(namcos21)
-	MCFG_MACHINE_RESET(namcos2)
+	MCFG_MACHINE_START_OVERRIDE(namcos21_state,namcos21)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 
@@ -1531,7 +1531,7 @@ static MACHINE_CONFIG_START( namcos21, namcos21_state )
 	MCFG_GFXDECODE(namcos21)
 	MCFG_PALETTE_LENGTH(NAMCOS21_NUM_COLORS)
 
-	MCFG_VIDEO_START(namcos21)
+	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1571,8 +1571,8 @@ static MACHINE_CONFIG_START( driveyes, namcos21_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
-	MCFG_MACHINE_START(namcos21)
-	MCFG_MACHINE_RESET(namcos2)
+	MCFG_MACHINE_START_OVERRIDE(namcos21_state,namcos21)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 
@@ -1586,7 +1586,7 @@ static MACHINE_CONFIG_START( driveyes, namcos21_state )
 	MCFG_GFXDECODE(namcos21)
 	MCFG_PALETTE_LENGTH(NAMCOS21_NUM_COLORS)
 
-	MCFG_VIDEO_START(namcos21)
+	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1630,8 +1630,8 @@ static MACHINE_CONFIG_START( winrun, namcos21_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
-	MCFG_MACHINE_START(namcos21)
-	MCFG_MACHINE_RESET(namcos2)
+	MCFG_MACHINE_START_OVERRIDE(namcos21_state,namcos21)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 
@@ -1644,7 +1644,7 @@ static MACHINE_CONFIG_START( winrun, namcos21_state )
 
 	MCFG_PALETTE_LENGTH(NAMCOS21_NUM_COLORS)
 
-	MCFG_VIDEO_START(namcos21)
+	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

@@ -359,11 +359,10 @@ static ADDRESS_MAP_START( uballoon_pcm_1_io_map, AS_IO, 8, suna16_state )
 	AM_RANGE(0x03, 0x03) AM_WRITE(uballoon_pcm_1_bankswitch_w)	// Rom Bank
 ADDRESS_MAP_END
 
-static MACHINE_RESET(uballoon)
+MACHINE_RESET_MEMBER(suna16_state,uballoon)
 {
-	suna16_state *state = machine.driver_data<suna16_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	state->uballoon_pcm_1_bankswitch_w(*space, 0, 0);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	uballoon_pcm_1_bankswitch_w(*space, 0, 0);
 }
 
 
@@ -797,7 +796,6 @@ static MACHINE_CONFIG_START( bssoccer, suna16_state )
 	MCFG_GFXDECODE(suna16)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(suna16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -843,7 +841,7 @@ static MACHINE_CONFIG_START( uballoon, suna16_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_RESET(uballoon)
+	MCFG_MACHINE_RESET_OVERRIDE(suna16_state,uballoon)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -856,7 +854,6 @@ static MACHINE_CONFIG_START( uballoon, suna16_state )
 	MCFG_GFXDECODE(suna16)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(suna16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -905,7 +902,6 @@ static MACHINE_CONFIG_START( sunaq, suna16_state )
 	MCFG_GFXDECODE(suna16)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(suna16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -972,7 +968,6 @@ static MACHINE_CONFIG_START( bestbest, suna16_state )
 	MCFG_GFXDECODE(bestbest)
 	MCFG_PALETTE_LENGTH(256*8)
 
-	MCFG_VIDEO_START(suna16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

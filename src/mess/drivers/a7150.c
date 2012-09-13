@@ -18,6 +18,8 @@ public:
 	a7150_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -32,11 +34,11 @@ static INPUT_PORTS_START( a7150 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(a7150)
+void a7150_state::machine_reset()
 {
 }
 
-static VIDEO_START( a7150 )
+void a7150_state::video_start()
 {
 }
 
@@ -50,7 +52,6 @@ static MACHINE_CONFIG_START( a7150, a7150_state )
 	MCFG_CPU_ADD("maincpu", I8086, 4915000)
 	MCFG_CPU_PROGRAM_MAP(a7150_mem)
 
-	MCFG_MACHINE_RESET(a7150)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -63,7 +64,6 @@ static MACHINE_CONFIG_START( a7150, a7150_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START(a7150)
 MACHINE_CONFIG_END
 
 /* ROM definition */

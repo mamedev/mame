@@ -324,12 +324,12 @@ const struct star star_seed_tab[252]=
 
 ***************************************************************************/
 
-PALETTE_INIT( galaga )
+PALETTE_INIT_MEMBER(galaga_state,galaga)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	machine.colortable = colortable_alloc(machine, 32+64);
+	machine().colortable = colortable_alloc(machine(), 32+64);
 
 	/* core palette */
 	for (i = 0;i < 32;i++)
@@ -349,7 +349,7 @@ PALETTE_INIT( galaga )
 		bit2 = ((*color_prom) >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine.colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -366,20 +366,20 @@ PALETTE_INIT( galaga )
 		bits = (i >> 4) & 0x03;
 		b = map[bits];
 
-		colortable_palette_set_color(machine.colortable,32 + i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable,32 + i,MAKE_RGB(r,g,b));
 	}
 
 	/* characters */
 	for (i = 0;i < 64*4;i++)
-		colortable_entry_set_value(machine.colortable, i, (*(color_prom++) & 0x0f) + 0x10);	/* chars */
+		colortable_entry_set_value(machine().colortable, i, (*(color_prom++) & 0x0f) + 0x10);	/* chars */
 
 	/* sprites */
 	for (i = 0;i < 64*4;i++)
-		colortable_entry_set_value(machine.colortable, 64*4+i, (*(color_prom++) & 0x0f));
+		colortable_entry_set_value(machine().colortable, 64*4+i, (*(color_prom++) & 0x0f));
 
 	/* now the stars */
 	for (i = 0;i < 64;i++)
-		colortable_entry_set_value(machine.colortable, 64*4+64*4+i, 32 + i);
+		colortable_entry_set_value(machine().colortable, 64*4+64*4+i, 32 + i);
 }
 
 
@@ -430,17 +430,16 @@ TILE_GET_INFO_MEMBER(galaga_state::get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( galaga )
+VIDEO_START_MEMBER(galaga_state,galaga)
 {
-	galaga_state *state =  machine.driver_data<galaga_state>();
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaga_state::get_tile_info),state),tilemap_mapper_delegate(FUNC(galaga_state::tilemap_scan),state),8,8,36,28);
-	colortable_configure_tilemap_groups(machine.colortable, state->m_fg_tilemap, machine.gfx[0], 0x1f);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaga_state::get_tile_info),this),tilemap_mapper_delegate(FUNC(galaga_state::tilemap_scan),this),8,8,36,28);
+	colortable_configure_tilemap_groups(machine().colortable, m_fg_tilemap, machine().gfx[0], 0x1f);
 
-	state->m_galaga_gfxbank = 0;
+	m_galaga_gfxbank = 0;
 
-	state->save_item(NAME(state->m_stars_scrollx));
-	state->save_item(NAME(state->m_stars_scrolly));
-	state->save_item(NAME(state->m_galaga_gfxbank));
+	save_item(NAME(m_stars_scrollx));
+	save_item(NAME(m_stars_scrolly));
+	save_item(NAME(m_galaga_gfxbank));
 }
 
 

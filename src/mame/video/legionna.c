@@ -131,86 +131,81 @@ TILE_GET_INFO_MEMBER(legionna_state::get_text_tile_info)
 	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
-VIDEO_START( legionna )
+VIDEO_START_MEMBER(legionna_state,legionna)
 {
-	legionna_state *state = machine.driver_data<legionna_state>();
-	state->m_background_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_foreground_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_midground_layer =  &machine.tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info),state), TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_text_layer =       &machine.tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),state),TILEMAP_SCAN_ROWS,  8,8,64,32);
+	m_background_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_foreground_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_midground_layer =  &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_text_layer =       &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
 
-	state->m_scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
-	state->m_sprite_xoffs = 0;
-	state->m_sprite_yoffs = 0;
+	m_scrollram16 = auto_alloc_array(machine(), UINT16, 0x60/2);
+	m_sprite_xoffs = 0;
+	m_sprite_yoffs = 0;
 
-	state->m_has_extended_banking = 0;
-	state->m_has_extended_priority = 0;
+	m_has_extended_banking = 0;
+	m_has_extended_priority = 0;
 
-	state->m_background_layer->set_transparent_pen(15);
-	state->m_midground_layer->set_transparent_pen(15);
-	state->m_foreground_layer->set_transparent_pen(15);
-	state->m_text_layer->set_transparent_pen(15);
+	m_background_layer->set_transparent_pen(15);
+	m_midground_layer->set_transparent_pen(15);
+	m_foreground_layer->set_transparent_pen(15);
+	m_text_layer->set_transparent_pen(15);
 }
 
-VIDEO_START( denjinmk )
+VIDEO_START_MEMBER(legionna_state,denjinmk)
 {
-	legionna_state *state = machine.driver_data<legionna_state>();
-	state->m_background_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_foreground_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info_denji),state),TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_midground_layer =  &machine.tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info_denji),state), TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_text_layer =       &machine.tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),state),TILEMAP_SCAN_ROWS,  8,8,64,32);
+	m_background_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_foreground_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info_denji),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_midground_layer =  &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info_denji),this), TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_text_layer =       &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
 
-	state->m_scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
-	state->m_sprite_xoffs = 0;
-	state->m_sprite_yoffs = 0;
+	m_scrollram16 = auto_alloc_array(machine(), UINT16, 0x60/2);
+	m_sprite_xoffs = 0;
+	m_sprite_yoffs = 0;
 
-	state->m_has_extended_banking = 1;
-	state->m_has_extended_priority = 0;
+	m_has_extended_banking = 1;
+	m_has_extended_priority = 0;
 
-	state->m_background_layer->set_transparent_pen(15);
-	state->m_midground_layer->set_transparent_pen(15);
-	state->m_foreground_layer->set_transparent_pen(15);
-	state->m_text_layer->set_transparent_pen(7);//?
+	m_background_layer->set_transparent_pen(15);
+	m_midground_layer->set_transparent_pen(15);
+	m_foreground_layer->set_transparent_pen(15);
+	m_text_layer->set_transparent_pen(7);//?
 }
 
-VIDEO_START( cupsoc )
+VIDEO_START_MEMBER(legionna_state,cupsoc)
 {
-	legionna_state *state = machine.driver_data<legionna_state>();
-	state->m_background_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_foreground_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_midground_layer =  &machine.tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info_cupsoc),state), TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_text_layer =       &machine.tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),state),TILEMAP_SCAN_ROWS,  8,8,64,32);
+	m_background_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_foreground_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_midground_layer =  &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info_cupsoc),this), TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_text_layer =       &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
 
-	state->m_scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
-	state->m_sprite_xoffs = 0;
-	state->m_sprite_yoffs = 0;
+	m_scrollram16 = auto_alloc_array(machine(), UINT16, 0x60/2);
+	m_sprite_xoffs = 0;
+	m_sprite_yoffs = 0;
 
-	state->m_has_extended_banking = 0;
-	state->m_has_extended_priority = 1;
+	m_has_extended_banking = 0;
+	m_has_extended_priority = 1;
 
-	state->m_background_layer->set_transparent_pen(15);
-	state->m_midground_layer->set_transparent_pen(15);
-	state->m_foreground_layer->set_transparent_pen(15);
-	state->m_text_layer->set_transparent_pen(15);
+	m_background_layer->set_transparent_pen(15);
+	m_midground_layer->set_transparent_pen(15);
+	m_foreground_layer->set_transparent_pen(15);
+	m_text_layer->set_transparent_pen(15);
 }
 
-VIDEO_START(grainbow)
+VIDEO_START_MEMBER(legionna_state,grainbow)
 {
-	legionna_state *state = machine.driver_data<legionna_state>();
-	VIDEO_START_CALL(legionna);
-	state->m_sprite_xoffs = state->m_sprite_yoffs = 16;
+	VIDEO_START_CALL_MEMBER(legionna);
+	m_sprite_xoffs = m_sprite_yoffs = 16;
 
-	state->m_has_extended_banking = 0;
-	state->m_has_extended_priority = 1;
+	m_has_extended_banking = 0;
+	m_has_extended_priority = 1;
 }
 
-VIDEO_START(godzilla)
+VIDEO_START_MEMBER(legionna_state,godzilla)
 {
-	legionna_state *state = machine.driver_data<legionna_state>();
-	VIDEO_START_CALL(legionna);
+	VIDEO_START_CALL_MEMBER(legionna);
 
-	state->m_has_extended_banking = 1;
-	state->m_has_extended_priority = 0;
+	m_has_extended_banking = 1;
+	m_has_extended_priority = 0;
 
 }
 

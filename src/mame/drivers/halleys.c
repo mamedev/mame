@@ -261,6 +261,9 @@ public:
 	DECLARE_DRIVER_INIT(halley87);
 	DECLARE_DRIVER_INIT(benberob);
 	DECLARE_DRIVER_INIT(halleys);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -1104,16 +1107,15 @@ READ8_MEMBER(halleys_state::collision_id_r)
 //**************************************************************************
 // Video Initializations and Updates
 
-static PALETTE_INIT( halleys )
+void halleys_state::palette_init()
 {
-	halleys_state *state = machine.driver_data<halleys_state>();
 	UINT32 d, r, g, b, i, j, count;
-	UINT32 *pal_ptr = state->m_internal_palette;
+	UINT32 *pal_ptr = m_internal_palette;
 
 	for (count=0; count<1024; count++)
 	{
 		pal_ptr[count] = 0;
-		palette_set_color(machine, count, MAKE_RGB(0, 0, 0));
+		palette_set_color(machine(), count, MAKE_RGB(0, 0, 0));
 	}
 
 	// 00-31: palette RAM(ffc0-ffdf)
@@ -1134,7 +1136,7 @@ static PALETTE_INIT( halleys )
 			g = r + count + BG_MONO;
 			r += i;
 			pal_ptr[g] = d;
-			palette_set_color(machine, g, MAKE_RGB(r, r, r));
+			palette_set_color(machine(), g, MAKE_RGB(r, r, r));
 		}
 	}
 
@@ -1149,7 +1151,7 @@ static PALETTE_INIT( halleys )
 		g = d    & 0x0c; g |= i;
 		b = d<<2 & 0x0c; b |= i;
 
-		palette_set_color_rgb(machine, j, pal4bit(r), pal4bit(g), pal4bit(b));
+		palette_set_color_rgb(machine(), j, pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
 
@@ -1228,9 +1230,8 @@ WRITE8_MEMBER(halleys_state::halleys_paletteram_IIRRGGBB_w)
 }
 
 
-static VIDEO_START( halleys )
+void halleys_state::video_start()
 {
-	halleys_state *state = machine.driver_data<halleys_state>();
 #define HALLEYS_Y0  0x8e
 #define HALLEYS_X0  0x9a
 #define HALLEYS_Y1  0xa2
@@ -1239,10 +1240,10 @@ static VIDEO_START( halleys )
 	int dst, src, c;
 
 	// create short cuts to scroll registers
-	state->m_scrolly0 = state->m_io_ram + HALLEYS_Y0;
-	state->m_scrollx0 = state->m_io_ram + HALLEYS_X0;
-	state->m_scrolly1 = state->m_io_ram + HALLEYS_Y1;
-	state->m_scrollx1 = state->m_io_ram + HALLEYS_X1;
+	m_scrolly0 = m_io_ram + HALLEYS_Y0;
+	m_scrollx0 = m_io_ram + HALLEYS_X0;
+	m_scrolly1 = m_io_ram + HALLEYS_Y1;
+	m_scrollx1 = m_io_ram + HALLEYS_X1;
 
 	// fill alpha table
 	for (src=0; src<256; src++)
@@ -1253,7 +1254,7 @@ static VIDEO_START( halleys )
 		c += (((src&0x0c)+(dst&0x0c))>>1) & 0x0c;
 		c += (((src&0x03)+(dst&0x03))>>1) & 0x03;
 
-		state->m_alpha_table[(src<<8)+dst] = c | BG_RGB;
+		m_alpha_table[(src<<8)+dst] = c | BG_RGB;
 	}
 }
 
@@ -1929,19 +1930,18 @@ INPUT_PORTS_END
 //**************************************************************************
 // Machine Definitions and Initializations
 
-static MACHINE_RESET( halleys )
+void halleys_state::machine_reset()
 {
-	halleys_state *state = machine.driver_data<halleys_state>();
-	state->m_mVectorType     = 0;
-	state->m_firq_level      = 0;
-	state->m_blitter_busy    = 0;
-	state->m_collision_count = 0;
-	state->m_stars_enabled   = 0;
-	state->m_bgcolor         = get_black_pen(machine);
-	state->m_fftail = state->m_ffhead = state->m_ffcount = 0;
+	m_mVectorType     = 0;
+	m_firq_level      = 0;
+	m_blitter_busy    = 0;
+	m_collision_count = 0;
+	m_stars_enabled   = 0;
+	m_bgcolor         = get_black_pen(machine());
+	m_fftail = m_ffhead = m_ffcount = 0;
 
-	memset(state->m_io_ram, 0xff, state->m_io_ram.bytes());
-	memset(state->m_render_layer[0], 0, SCREEN_BYTESIZE * MAX_LAYERS);
+	memset(m_io_ram, 0xff, m_io_ram.bytes());
+	memset(m_render_layer[0], 0, SCREEN_BYTESIZE * MAX_LAYERS);
 }
 
 
@@ -1965,7 +1965,6 @@ static MACHINE_CONFIG_START( halleys, halleys_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, (double)6000000/(4*16*16*10*16))
 
-	MCFG_MACHINE_RESET(halleys)
 
 	// video hardware
 
@@ -1977,9 +1976,7 @@ static MACHINE_CONFIG_START( halleys, halleys_state )
 	MCFG_SCREEN_UPDATE_STATIC(halleys)
 
 	MCFG_PALETTE_LENGTH(PALETTE_SIZE)
-	MCFG_PALETTE_INIT(halleys)
 
-	MCFG_VIDEO_START(halleys)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -190,29 +190,27 @@ static const k051316_interface ultraman_k051316_intf_2 =
 	ultraman_zoom_callback_2
 };
 
-static MACHINE_START( ultraman )
+void ultraman_state::machine_start()
 {
-	ultraman_state *state = machine.driver_data<ultraman_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_k051960 = machine.device("k051960");
-	state->m_k051316_1 = machine.device("k051316_1");
-	state->m_k051316_2 = machine.device("k051316_2");
-	state->m_k051316_3 = machine.device("k051316_3");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_k051960 = machine().device("k051960");
+	m_k051316_1 = machine().device("k051316_1");
+	m_k051316_2 = machine().device("k051316_2");
+	m_k051316_3 = machine().device("k051316_3");
 
-	state->save_item(NAME(state->m_bank0));
-	state->save_item(NAME(state->m_bank1));
-	state->save_item(NAME(state->m_bank2));
+	save_item(NAME(m_bank0));
+	save_item(NAME(m_bank1));
+	save_item(NAME(m_bank2));
 }
 
-static MACHINE_RESET( ultraman )
+void ultraman_state::machine_reset()
 {
-	ultraman_state *state = machine.driver_data<ultraman_state>();
 
-	state->m_bank0 = -1;
-	state->m_bank1 = -1;
-	state->m_bank2 = -1;
+	m_bank0 = -1;
+	m_bank1 = -1;
+	m_bank2 = -1;
 }
 
 static MACHINE_CONFIG_START( ultraman, ultraman_state )
@@ -228,8 +226,6 @@ static MACHINE_CONFIG_START( ultraman, ultraman_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START(ultraman)
-	MCFG_MACHINE_RESET(ultraman)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -243,7 +239,6 @@ static MACHINE_CONFIG_START( ultraman, ultraman_state )
 
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(ultraman)
 
 	MCFG_K051960_ADD("k051960", ultraman_k051960_intf)
 	MCFG_K051316_ADD("k051316_1", ultraman_k051316_intf_0)

@@ -32,10 +32,13 @@ public:
 	DECLARE_WRITE8_MEMBER(mouser_flip_screen_x_w);
 	DECLARE_WRITE8_MEMBER(mouser_flip_screen_y_w);
 	DECLARE_DRIVER_INIT(mouser);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 /*----------- defined in video/mouser.c -----------*/
 
 
-PALETTE_INIT( mouser );
+
 SCREEN_UPDATE_IND16( mouser );

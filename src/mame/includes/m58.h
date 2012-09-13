@@ -28,11 +28,13 @@ public:
 	DECLARE_DRIVER_INIT(yard85);
 	TILE_GET_INFO_MEMBER(yard_get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(yard_tilemap_scan_rows);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 /*----------- defined in video/m58.c -----------*/
 
 
-PALETTE_INIT( yard );
-VIDEO_START( yard );
+
+
 SCREEN_UPDATE_IND16( yard );

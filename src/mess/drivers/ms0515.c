@@ -32,6 +32,7 @@ public:
 	UINT8 *m_video_ram;
 	UINT8 m_sysreg;
 	int m_blink;
+	virtual void palette_init();
 };
 
 static ADDRESS_MAP_START(ms0515_mem, AS_PROGRAM, 16, ms0515_state)
@@ -212,25 +213,25 @@ static SCREEN_UPDATE_IND16( ms0515 )
 	return 0;
 }
 
-static PALETTE_INIT( ms0515 )
+void ms0515_state::palette_init()
 {
-	palette_set_color(machine, 0, MAKE_RGB(0, 0, 0));
-	palette_set_color(machine, 1, MAKE_RGB(0, 0, 127));
-	palette_set_color(machine, 2, MAKE_RGB(127, 0, 0));
-	palette_set_color(machine, 3, MAKE_RGB(127, 0, 127));
-	palette_set_color(machine, 4, MAKE_RGB(0, 127, 0));
-	palette_set_color(machine, 5, MAKE_RGB(0, 127, 127));
-	palette_set_color(machine, 6, MAKE_RGB(127, 127, 0));
-	palette_set_color(machine, 7, MAKE_RGB(127, 127, 127));
+	palette_set_color(machine(), 0, MAKE_RGB(0, 0, 0));
+	palette_set_color(machine(), 1, MAKE_RGB(0, 0, 127));
+	palette_set_color(machine(), 2, MAKE_RGB(127, 0, 0));
+	palette_set_color(machine(), 3, MAKE_RGB(127, 0, 127));
+	palette_set_color(machine(), 4, MAKE_RGB(0, 127, 0));
+	palette_set_color(machine(), 5, MAKE_RGB(0, 127, 127));
+	palette_set_color(machine(), 6, MAKE_RGB(127, 127, 0));
+	palette_set_color(machine(), 7, MAKE_RGB(127, 127, 127));
 
-	palette_set_color(machine, 8, MAKE_RGB(127, 127, 127));
-	palette_set_color(machine, 9, MAKE_RGB(127, 127, 255));
-	palette_set_color(machine, 10, MAKE_RGB(255, 127, 127));
-	palette_set_color(machine, 11, MAKE_RGB(255, 127, 255));
-	palette_set_color(machine, 12, MAKE_RGB(127, 255, 127));
-	palette_set_color(machine, 13, MAKE_RGB(127, 255, 255));
-	palette_set_color(machine, 14, MAKE_RGB(255, 255, 127));
-	palette_set_color(machine, 15, MAKE_RGB(255, 255, 255));
+	palette_set_color(machine(), 8, MAKE_RGB(127, 127, 127));
+	palette_set_color(machine(), 9, MAKE_RGB(127, 127, 255));
+	palette_set_color(machine(), 10, MAKE_RGB(255, 127, 127));
+	palette_set_color(machine(), 11, MAKE_RGB(255, 127, 255));
+	palette_set_color(machine(), 12, MAKE_RGB(127, 255, 127));
+	palette_set_color(machine(), 13, MAKE_RGB(127, 255, 255));
+	palette_set_color(machine(), 14, MAKE_RGB(255, 255, 127));
+	palette_set_color(machine(), 15, MAKE_RGB(255, 255, 255));
 }
 
 static WRITE8_DEVICE_HANDLER(ms0515_portc_w)
@@ -267,7 +268,6 @@ static MACHINE_CONFIG_START( ms0515, ms0515_state )
     MCFG_SCREEN_UPDATE_STATIC(ms0515)
 
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT(ms0515)
 
 	MCFG_I8255_ADD( "ppi8255_1", ms0515_ppi8255_interface_1 )
 	//MCFG_I8255_ADD( "ppi8255_2", ms0515_ppi8255_interface_2 )

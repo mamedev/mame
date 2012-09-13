@@ -23,9 +23,9 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( fastfred )
+PALETTE_INIT_MEMBER(fastfred_state,fastfred)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	static const int resistances[4] = { 1000, 470, 220, 100 };
 	double rweights[4], gweights[4], bweights[4];
 	int i;
@@ -37,7 +37,7 @@ PALETTE_INIT( fastfred )
 			4, resistances, bweights, 470, 0);
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x100);
+	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -66,12 +66,12 @@ PALETTE_INIT( fastfred )
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
 		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* characters and sprites use the same palette */
 	for (i = 0; i < 0x100; i++)
-		colortable_entry_set_value(machine.colortable, i, i);
+		colortable_entry_set_value(machine().colortable, i, i);
 }
 
 /***************************************************************************
@@ -98,13 +98,12 @@ TILE_GET_INFO_MEMBER(fastfred_state::get_tile_info)
  *
  *************************************/
 
-VIDEO_START( fastfred )
+VIDEO_START_MEMBER(fastfred_state,fastfred)
 {
-	fastfred_state *state = machine.driver_data<fastfred_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fastfred_state::get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fastfred_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	state->m_bg_tilemap->set_transparent_pen(0);
-	state->m_bg_tilemap->set_scroll_cols(32);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scroll_cols(32);
 }
 
 
@@ -345,23 +344,22 @@ WRITE8_HANDLER( imago_charbank_w )
 	}
 }
 
-VIDEO_START( imago )
+VIDEO_START_MEMBER(fastfred_state,imago)
 {
-	fastfred_state *state = machine.driver_data<fastfred_state>();
-	state->m_web_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fastfred_state::imago_get_tile_info_web),state),TILEMAP_SCAN_ROWS,     8,8,32,32);
-	state->m_bg_tilemap   = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fastfred_state::imago_get_tile_info_bg),state), TILEMAP_SCAN_ROWS,8,8,32,32);
-	state->m_fg_tilemap   = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fastfred_state::imago_get_tile_info_fg),state), TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_web_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fastfred_state::imago_get_tile_info_web),this),TILEMAP_SCAN_ROWS,     8,8,32,32);
+	m_bg_tilemap   = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fastfred_state::imago_get_tile_info_bg),this), TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_fg_tilemap   = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fastfred_state::imago_get_tile_info_fg),this), TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	state->m_bg_tilemap->set_transparent_pen(0);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 
 	/* the game has a galaxian starfield */
-	galaxold_init_stars(machine, 256);
-	state->m_stars_on = 1;
+	galaxold_init_stars(machine(), 256);
+	m_stars_on = 1;
 
 	/* web colors */
-	palette_set_color(machine,256+64+0,MAKE_RGB(0x50,0x00,0x00));
-	palette_set_color(machine,256+64+1,MAKE_RGB(0x00,0x00,0x00));
+	palette_set_color(machine(),256+64+0,MAKE_RGB(0x50,0x00,0x00));
+	palette_set_color(machine(),256+64+1,MAKE_RGB(0x00,0x00,0x00));
 }
 
 SCREEN_UPDATE_IND16( imago )

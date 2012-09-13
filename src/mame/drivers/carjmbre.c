@@ -183,12 +183,11 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_RESET( carjmbre )
+void carjmbre_state::machine_reset()
 {
-	carjmbre_state *state = machine.driver_data<carjmbre_state>();
 
-	state->m_flipscreen = 0;
-	state->m_bgcolor = 0;
+	m_flipscreen = 0;
+	m_bgcolor = 0;
 }
 
 static INTERRUPT_GEN( vblank_irq )
@@ -206,7 +205,6 @@ static MACHINE_CONFIG_START( carjmbre, carjmbre_state )
 	MCFG_CPU_PROGRAM_MAP(carjmbre_map)
 	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
-	MCFG_MACHINE_RESET(carjmbre)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6/2)
 	MCFG_CPU_PROGRAM_MAP(carjmbre_sound_map)
@@ -224,8 +222,6 @@ static MACHINE_CONFIG_START( carjmbre, carjmbre_state )
 	MCFG_GFXDECODE(carjmbre)
 	MCFG_PALETTE_LENGTH(64)
 
-	MCFG_PALETTE_INIT(carjmbre)
-	MCFG_VIDEO_START(carjmbre)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

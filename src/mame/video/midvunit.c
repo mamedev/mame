@@ -50,18 +50,17 @@ static TIMER_CALLBACK( scanline_timer_cb )
 }
 
 
-VIDEO_START( midvunit )
+void midvunit_state::video_start()
 {
-	midvunit_state *state = machine.driver_data<midvunit_state>();
-	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(scanline_timer_cb));
+	m_scanline_timer = machine().scheduler().timer_alloc(FUNC(scanline_timer_cb));
 
-	state->m_poly = auto_alloc(machine, midvunit_renderer(*state));
+	m_poly = auto_alloc(machine(), midvunit_renderer(*this));
 
-	state_save_register_global_array(machine, state->m_video_regs);
-	state_save_register_global_array(machine, state->m_dma_data);
-	state_save_register_global(machine, state->m_dma_data_index);
-	state_save_register_global(machine, state->m_page_control);
-	state_save_register_global(machine, state->m_video_changed);
+	state_save_register_global_array(machine(), m_video_regs);
+	state_save_register_global_array(machine(), m_dma_data);
+	state_save_register_global(machine(), m_dma_data_index);
+	state_save_register_global(machine(), m_page_control);
+	state_save_register_global(machine(), m_video_changed);
 }
 
 

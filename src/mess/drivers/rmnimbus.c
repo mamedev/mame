@@ -278,13 +278,13 @@ static ADDRESS_MAP_START( nimbus_iocpu_io , AS_IO, 8, rmnimbus_state )
 ADDRESS_MAP_END
 
 
-static PALETTE_INIT( nimbus )
+void rmnimbus_state::palette_init()
 {
 	int colourno;
 
 	for ( colourno = 0; colourno < SCREEN_NO_COLOURS; colourno++ )
     {
-		palette_set_color_rgb(machine, colourno, nimbus_palette[colourno][RED], nimbus_palette[colourno][GREEN], nimbus_palette[colourno][BLUE]);
+		palette_set_color_rgb(machine(), colourno, nimbus_palette[colourno][RED], nimbus_palette[colourno][GREEN], nimbus_palette[colourno][BLUE]);
 	}
 }
 
@@ -299,9 +299,7 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
     MCFG_CPU_PROGRAM_MAP(nimbus_iocpu_mem)
     MCFG_CPU_IO_MAP(nimbus_iocpu_io)
 
-    MCFG_MACHINE_START( nimbus )
 
-    MCFG_MACHINE_RESET(nimbus)
 
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)
@@ -313,13 +311,10 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
     MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
     MCFG_PALETTE_LENGTH(SCREEN_NO_COLOURS * 3)
-	MCFG_PALETTE_INIT( nimbus )
 
     MCFG_SCREEN_SIZE(650, 260)
     MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 
-    MCFG_VIDEO_START(nimbus)
-    MCFG_VIDEO_RESET(nimbus)
 
 
     /* Backing storage */

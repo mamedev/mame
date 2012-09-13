@@ -227,12 +227,11 @@ static const namco_62xx_interface namco_62xx_intf =
 };
 
 
-static MACHINE_RESET( gaplus )
+void gaplus_state::machine_reset()
 {
-	gaplus_state *state = machine.driver_data<gaplus_state>();
 	/* on reset, VINTON is reset, while the other flags don't seem to be affected */
-	state->m_sub_irq_mask = 0;
-	machine.device("sub")->execute().set_input_line(0, CLEAR_LINE);
+	m_sub_irq_mask = 0;
+	machine().device("sub")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( namcoio_run )
@@ -572,7 +571,6 @@ static MACHINE_CONFIG_START( gaplus, gaplus_state )
 	MCFG_CPU_VBLANK_INT("screen", gaplus_vblank_sub2_irq)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* a high value to ensure proper synchronization of the CPUs */
-	MCFG_MACHINE_RESET(gaplus)
 
 	MCFG_NAMCO56XX_ADD("56xx", intf0_lamps)
 	MCFG_NAMCO58XX_ADD("58xx", intf1)
@@ -591,8 +589,6 @@ static MACHINE_CONFIG_START( gaplus, gaplus_state )
 	MCFG_GFXDECODE(gaplus)
 	MCFG_PALETTE_LENGTH(64*4+64*8)
 
-	MCFG_PALETTE_INIT(gaplus)
-	MCFG_VIDEO_START(gaplus)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -52,6 +52,8 @@ public:
 	const UINT8 *m_p_chargen;
 	required_shared_ptr<const UINT8> m_p_videoram;
 	DECLARE_DRIVER_INIT(mz80k);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 

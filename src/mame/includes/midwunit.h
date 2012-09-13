@@ -39,6 +39,8 @@ public:
 	DECLARE_DRIVER_INIT(rmpgwt);
 	DECLARE_DRIVER_INIT(umk3r11);
 	DECLARE_DRIVER_INIT(mk3r20);
+	DECLARE_MACHINE_RESET(midwunit);
+	DECLARE_VIDEO_START(midwunit);
 };
 
 /*----------- defined in machine/midwunit.c -----------*/
@@ -48,6 +50,6 @@ public:
 
 
 
-MACHINE_RESET( midwunit );
+
 
 

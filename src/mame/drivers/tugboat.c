@@ -47,18 +47,20 @@ public:
 	DECLARE_READ8_MEMBER(tugboat_input_r);
 	DECLARE_READ8_MEMBER(tugboat_ctrl_r);
 	DECLARE_WRITE8_MEMBER(tugboat_ctrl_w);
+	virtual void machine_reset();
+	virtual void palette_init();
 };
 
 
 /*  there isn't the usual resistor array anywhere near the color prom,
     just four 1k resistors. */
-static PALETTE_INIT( tugboat )
+void tugboat_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 
-	for (i = 0;i < machine.total_colors();i++)
+	for (i = 0;i < machine().total_colors();i++)
 	{
 		int r,g,b,brt;
 
@@ -69,7 +71,7 @@ static PALETTE_INIT( tugboat )
 		g = brt * ((color_prom[i] >> 1) & 0x01);
 		b = brt * ((color_prom[i] >> 2) & 0x01);
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -206,9 +208,9 @@ static TIMER_CALLBACK( interrupt_gen )
 	machine.scheduler().timer_set(machine.primary_screen->frame_period(), FUNC(interrupt_gen));
 }
 
-static MACHINE_RESET( tugboat )
+void tugboat_state::machine_reset()
 {
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(30*8+4), FUNC(interrupt_gen));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(30*8+4), FUNC(interrupt_gen));
 }
 
 
@@ -333,7 +335,6 @@ static MACHINE_CONFIG_START( tugboat, tugboat_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MCFG_MACHINE_RESET(tugboat)
 
 	MCFG_PIA6821_ADD("pia0", pia0_intf)
 	MCFG_PIA6821_ADD("pia1", pia1_intf)
@@ -347,7 +348,6 @@ static MACHINE_CONFIG_START( tugboat, tugboat_state )
 	MCFG_GFXDECODE(tugboat)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(tugboat)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

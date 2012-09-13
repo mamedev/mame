@@ -56,6 +56,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(stactics_get_not_shot_arrive);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_motor_not_ready);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_rng);
+	virtual void machine_start();
+	DECLARE_VIDEO_START(stactics);
+	DECLARE_PALETTE_INIT(stactics);
 };
 
 

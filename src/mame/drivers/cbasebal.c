@@ -239,38 +239,36 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( cbasebal )
+void cbasebal_state::machine_start()
 {
-	cbasebal_state *state = machine.driver_data<cbasebal_state>();
 
-	state->membank("bank1")->configure_entries(0, 32, state->memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x4000);
 
-	state->save_item(NAME(state->m_rambank));
-	state->save_item(NAME(state->m_tilebank));
-	state->save_item(NAME(state->m_spritebank));
-	state->save_item(NAME(state->m_text_on));
-	state->save_item(NAME(state->m_bg_on));
-	state->save_item(NAME(state->m_obj_on));
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_scroll_x));
-	state->save_item(NAME(state->m_scroll_y));
+	save_item(NAME(m_rambank));
+	save_item(NAME(m_tilebank));
+	save_item(NAME(m_spritebank));
+	save_item(NAME(m_text_on));
+	save_item(NAME(m_bg_on));
+	save_item(NAME(m_obj_on));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_scroll_x));
+	save_item(NAME(m_scroll_y));
 }
 
-static MACHINE_RESET( cbasebal )
+void cbasebal_state::machine_reset()
 {
-	cbasebal_state *state = machine.driver_data<cbasebal_state>();
 
-	state->m_rambank = 0;
-	state->m_tilebank = 0;
-	state->m_spritebank = 0;
-	state->m_text_on = 0;
-	state->m_bg_on = 0;
-	state->m_obj_on = 0;
-	state->m_flipscreen = 0;
-	state->m_scroll_x[0] = 0;
-	state->m_scroll_x[1] = 0;
-	state->m_scroll_y[0] = 0;
-	state->m_scroll_y[1] = 0;
+	m_rambank = 0;
+	m_tilebank = 0;
+	m_spritebank = 0;
+	m_text_on = 0;
+	m_bg_on = 0;
+	m_obj_on = 0;
+	m_flipscreen = 0;
+	m_scroll_x[0] = 0;
+	m_scroll_x[1] = 0;
+	m_scroll_y[0] = 0;
+	m_scroll_y[1] = 0;
 }
 
 static MACHINE_CONFIG_START( cbasebal, cbasebal_state )
@@ -281,8 +279,6 @@ static MACHINE_CONFIG_START( cbasebal, cbasebal_state )
 	MCFG_CPU_IO_MAP(cbasebal_portmap)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* ??? */
 
-	MCFG_MACHINE_START(cbasebal)
-	MCFG_MACHINE_RESET(cbasebal)
 
 	MCFG_EEPROM_ADD("eeprom", cbasebal_eeprom_intf)
 
@@ -299,7 +295,6 @@ static MACHINE_CONFIG_START( cbasebal, cbasebal_state )
 	MCFG_GFXDECODE(cbasebal)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(cbasebal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

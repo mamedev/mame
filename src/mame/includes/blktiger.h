@@ -59,6 +59,9 @@ public:
 	TILEMAP_MAPPER_MEMBER(bg4x8_scan);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -66,5 +69,5 @@ public:
 
 
 
-VIDEO_START( blktiger );
+
 SCREEN_UPDATE_IND16( blktiger );

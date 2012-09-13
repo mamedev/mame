@@ -3650,8 +3650,8 @@ static MACHINE_CONFIG_START( marvins, snk_state )
 	MCFG_GFXDECODE(marvins)
 	MCFG_PALETTE_LENGTH(0x400)
 
-	MCFG_PALETTE_INIT(tnk3)
-	MCFG_VIDEO_START(marvins)
+	MCFG_PALETTE_INIT_OVERRIDE(snk_state,tnk3)
+	MCFG_VIDEO_START_OVERRIDE(snk_state,marvins)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3719,8 +3719,8 @@ static MACHINE_CONFIG_START( jcross, snk_state )
 	MCFG_GFXDECODE(tnk3)
 	MCFG_PALETTE_LENGTH(0x400)
 
-	MCFG_PALETTE_INIT(tnk3)
-	MCFG_VIDEO_START(jcross)
+	MCFG_PALETTE_INIT_OVERRIDE(snk_state,tnk3)
+	MCFG_VIDEO_START_OVERRIDE(snk_state,jcross)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3746,7 +3746,7 @@ static MACHINE_CONFIG_DERIVED( sgladiat, jcross )
 	/* visible area is correct. Debug info is shown in the black bars at the sides
        of the screen when the Debug dip switch is on */
 
-	MCFG_VIDEO_START(sgladiat)
+	MCFG_VIDEO_START_OVERRIDE(snk_state,sgladiat)
 MACHINE_CONFIG_END
 
 
@@ -3765,7 +3765,7 @@ static MACHINE_CONFIG_DERIVED( hal21, jcross )
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 220) // music tempo, hand tuned
 
 	/* video hardware */
-	MCFG_VIDEO_START(hal21)
+	MCFG_VIDEO_START_OVERRIDE(snk_state,hal21)
 MACHINE_CONFIG_END
 
 
@@ -3797,8 +3797,8 @@ static MACHINE_CONFIG_START( tnk3, snk_state )
 	MCFG_GFXDECODE(tnk3)
 	MCFG_PALETTE_LENGTH(0x400)
 
-	MCFG_PALETTE_INIT(tnk3)
-	MCFG_VIDEO_START(tnk3)
+	MCFG_PALETTE_INIT_OVERRIDE(snk_state,tnk3)
+	MCFG_VIDEO_START_OVERRIDE(snk_state,tnk3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3822,7 +3822,7 @@ static MACHINE_CONFIG_DERIVED( aso, tnk3 )
 	MCFG_CPU_PROGRAM_MAP(aso_YM3526_sound_map)
 
 	/* video hardware */
-	MCFG_VIDEO_START(aso)
+	MCFG_VIDEO_START_OVERRIDE(snk_state,aso)
 MACHINE_CONFIG_END
 
 
@@ -3882,7 +3882,7 @@ static MACHINE_CONFIG_START( ikari, snk_state )
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MCFG_VIDEO_START(ikari)
+	MCFG_VIDEO_START_OVERRIDE(snk_state,ikari)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3938,7 +3938,7 @@ static MACHINE_CONFIG_START( bermudat, snk_state )
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MCFG_VIDEO_START(gwar)
+	MCFG_VIDEO_START_OVERRIDE(snk_state,gwar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3956,7 +3956,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( psychos, bermudat )
 
 	/* video hardware */
-	MCFG_VIDEO_START(psychos)
+	MCFG_VIDEO_START_OVERRIDE(snk_state,psychos)
 MACHINE_CONFIG_END
 
 
@@ -4042,7 +4042,7 @@ static MACHINE_CONFIG_START( tdfever, snk_state )
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MCFG_VIDEO_START(tdfever)
+	MCFG_VIDEO_START_OVERRIDE(snk_state,tdfever)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -22,17 +22,16 @@
  *
  *************************************/
 
-VIDEO_START( policetr )
+void policetr_state::video_start()
 {
-	policetr_state *state = machine.driver_data<policetr_state>();
 	/* the source bitmap is in ROM */
-	state->m_srcbitmap = state->memregion("gfx1")->base();
+	m_srcbitmap = memregion("gfx1")->base();
 
 	/* compute the height */
-	state->m_srcbitmap_height_mask = (state->memregion("gfx1")->bytes() / SRCBITMAP_WIDTH) - 1;
+	m_srcbitmap_height_mask = (memregion("gfx1")->bytes() / SRCBITMAP_WIDTH) - 1;
 
 	/* the destination bitmap is not directly accessible to the CPU */
-	state->m_dstbitmap = auto_alloc_array(machine, UINT8, DSTBITMAP_WIDTH * DSTBITMAP_HEIGHT);
+	m_dstbitmap = auto_alloc_array(machine(), UINT8, DSTBITMAP_WIDTH * DSTBITMAP_HEIGHT);
 }
 
 

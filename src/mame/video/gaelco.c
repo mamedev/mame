@@ -72,24 +72,22 @@ WRITE16_MEMBER(gaelco_state::gaelco_vram_w)
 
 ***************************************************************************/
 
-VIDEO_START( bigkarnk )
+VIDEO_START_MEMBER(gaelco_state,bigkarnk)
 {
-	gaelco_state *state = machine.driver_data<gaelco_state>();
-	state->m_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaelco_state::get_tile_info_gaelco_screen0),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaelco_state::get_tile_info_gaelco_screen1),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gaelco_state::get_tile_info_gaelco_screen0),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gaelco_state::get_tile_info_gaelco_screen1),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	state->m_tilemap[0]->set_transmask(0, 0xff01, 0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
-	state->m_tilemap[1]->set_transmask(0, 0xff01, 0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
+	m_tilemap[0]->set_transmask(0, 0xff01, 0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
+	m_tilemap[1]->set_transmask(0, 0xff01, 0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
 }
 
-VIDEO_START( maniacsq )
+VIDEO_START_MEMBER(gaelco_state,maniacsq)
 {
-	gaelco_state *state = machine.driver_data<gaelco_state>();
-	state->m_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaelco_state::get_tile_info_gaelco_screen0),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaelco_state::get_tile_info_gaelco_screen1),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gaelco_state::get_tile_info_gaelco_screen0),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gaelco_state::get_tile_info_gaelco_screen1),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	state->m_tilemap[0]->set_transparent_pen(0);
-	state->m_tilemap[1]->set_transparent_pen(0);
+	m_tilemap[0]->set_transparent_pen(0);
+	m_tilemap[1]->set_transparent_pen(0);
 }
 
 

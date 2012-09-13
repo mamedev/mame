@@ -146,6 +146,9 @@ public:
 	DECLARE_WRITE8_MEMBER(unk_f710_w);
 	DECLARE_READ8_MEMBER(unk_f721_r);
 	DECLARE_DRIVER_INIT(jwildb52);
+	virtual void machine_start();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -156,7 +159,7 @@ public:
 *************************/
 
 
-static VIDEO_START( jwildb52 )
+void sigmab52_state::video_start()
 {
 
 }
@@ -230,7 +233,7 @@ if (!screen.machine().input().code_pressed(KEYCODE_O))
 }
 
 
-static PALETTE_INIT( jwildb52 )
+void sigmab52_state::palette_init()
 {
 
 }
@@ -541,13 +544,13 @@ static INTERRUPT_GEN( timer_irq )
 *     Machine Start      *
 *************************/
 
-static MACHINE_START(jwildb52)
+void sigmab52_state::machine_start()
 {
-	machine.root_device().membank("bank1")->set_base(&machine.root_device().memregion("maincpu")->base()[0x10000 + 0x0000]);
+	machine().root_device().membank("bank1")->set_base(&machine().root_device().memregion("maincpu")->base()[0x10000 + 0x0000]);
 
-	machine.root_device().membank("bank2")->set_base(&machine.root_device().memregion("maincpu")->base()[0x10000 + 0xf800]);
+	machine().root_device().membank("bank2")->set_base(&machine().root_device().memregion("maincpu")->base()[0x10000 + 0xf800]);
 
-	machine.root_device().membank("bank3")->set_base(&machine.root_device().memregion("maincpu")->base()[0x10000 + 0x8000]);
+	machine().root_device().membank("bank3")->set_base(&machine().root_device().memregion("maincpu")->base()[0x10000 + 0x8000]);
 
 /*
 
@@ -561,10 +564,10 @@ static MACHINE_START(jwildb52)
 */
 
 	{
-		UINT16 *rom = (UINT16*)machine.root_device().memregion("gfx1")->base();
+		UINT16 *rom = (UINT16*)machine().root_device().memregion("gfx1")->base();
 		int i;
 
-		device_t *hd63484 = machine.device("hd63484");
+		device_t *hd63484 = machine().device("hd63484");
 
 		for(i = 0; i < 0x40000/2; ++i)
 		{
@@ -594,7 +597,6 @@ static MACHINE_CONFIG_START( jwildb52, sigmab52_state )
 	MCFG_CPU_PERIODIC_INT(timer_irq, 1000)			/* Fix me */
 #endif
 
-	MCFG_MACHINE_START(jwildb52)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(30)
@@ -605,10 +607,8 @@ static MACHINE_CONFIG_START( jwildb52, sigmab52_state )
 
 	MCFG_HD63484_ADD("hd63484", jwildb52_hd63484_intf)
 
-	MCFG_PALETTE_INIT(jwildb52)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(jwildb52)
 
 MACHINE_CONFIG_END
 

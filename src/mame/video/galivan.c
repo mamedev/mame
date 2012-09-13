@@ -52,13 +52,13 @@ background: 0x4000 bytes of ROM:    76543210    tile code low bits
 
 ***************************************************************************/
 
-PALETTE_INIT( galivan )
+void galivan_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x100);
+	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -67,7 +67,7 @@ PALETTE_INIT( galivan )
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -75,7 +75,7 @@ PALETTE_INIT( galivan )
 
 	/* characters use colors 0-0x7f */
 	for (i = 0; i < 0x80; i++)
-		colortable_entry_set_value(machine.colortable, i, i);
+		colortable_entry_set_value(machine().colortable, i, i);
 
 	/* I think that */
 	/* background tiles use colors 0xc0-0xff in four banks */
@@ -90,7 +90,7 @@ PALETTE_INIT( galivan )
 		else
 			ctabentry = 0xc0 | (i & 0x0f) | ((i & 0x30) >> 0);
 
-		colortable_entry_set_value(machine.colortable, 0x80 + i, ctabentry);
+		colortable_entry_set_value(machine().colortable, 0x80 + i, ctabentry);
 	}
 
 	/* sprites use colors 0x80-0xbf in four banks */
@@ -108,7 +108,7 @@ PALETTE_INIT( galivan )
 		else
 			ctabentry = 0x80 | ((i & 0x03) << 4) | (color_prom[i >> 4] & 0x0f);
 
-		colortable_entry_set_value(machine.colortable, 0x180 + i_swapped, ctabentry);
+		colortable_entry_set_value(machine().colortable, 0x180 + i_swapped, ctabentry);
 	}
 }
 
@@ -179,24 +179,22 @@ TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_tx_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( galivan )
+VIDEO_START_MEMBER(galivan_state,galivan)
 {
-	galivan_state *state = machine.driver_data<galivan_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galivan_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galivan_state::get_tx_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galivan_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galivan_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
-	state->m_tx_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(15);
 }
 
-VIDEO_START( ninjemak )
+VIDEO_START_MEMBER(galivan_state,ninjemak)
 {
-	galivan_state *state = machine.driver_data<galivan_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galivan_state::ninjemak_get_bg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 512, 32);
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galivan_state::ninjemak_get_tx_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galivan_state::ninjemak_get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 512, 32);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galivan_state::ninjemak_get_tx_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
-	state->m_tx_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(15);
 }
 
 

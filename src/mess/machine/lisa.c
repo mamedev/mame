@@ -815,7 +815,7 @@ static READ8_DEVICE_HANDLER(parallel_via_in_b)
     LISA video emulation
 */
 
-VIDEO_START( lisa )
+void lisa_state::video_start()
 {
 }
 
@@ -1031,63 +1031,61 @@ DRIVER_INIT_MEMBER(lisa_state,mac_xl)
 	m_bad_parity_table = auto_alloc_array(machine(), UINT8, 0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
-MACHINE_START( lisa )
+void lisa_state::machine_start()
 {
-	lisa_state *state = machine.driver_data<lisa_state>();
-	state->m_mouse_timer = machine.scheduler().timer_alloc(FUNC(handle_mouse));
+	m_mouse_timer = machine().scheduler().timer_alloc(FUNC(handle_mouse));
 
 	/* read command every ms (don't know the real value) */
-	machine.scheduler().timer_pulse(attotime::from_msec(1), FUNC(set_COPS_ready));
+	machine().scheduler().timer_pulse(attotime::from_msec(1), FUNC(set_COPS_ready));
 }
 
-MACHINE_RESET( lisa )
+void lisa_state::machine_reset()
 {
-	lisa_state *state = machine.driver_data<lisa_state>();
-	state->m_ram_ptr = machine.root_device().memregion("maincpu")->base() + RAM_OFFSET;
-	state->m_rom_ptr = machine.root_device().memregion("maincpu")->base() + ROM_OFFSET;
-	state->m_videoROM_ptr = state->memregion("gfx1")->base();
+	m_ram_ptr = machine().root_device().memregion("maincpu")->base() + RAM_OFFSET;
+	m_rom_ptr = machine().root_device().memregion("maincpu")->base() + ROM_OFFSET;
+	m_videoROM_ptr = memregion("gfx1")->base();
 
-//  machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(lisa_OPbaseoverride, *machine));
-//  m68k_set_reset_callback(machine.device("maincpu"), /*lisa_reset_instr_callback*/NULL);
+//  machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(lisa_OPbaseoverride, *machine()));
+//  m68k_set_reset_callback(machine().device("maincpu"), /*lisa_reset_instr_callback*/NULL);
 
 	/* init MMU */
-	state->m_setup = 1;
-	state->m_seg = 0;
+	m_setup = 1;
+	m_seg = 0;
 
 	/* init parity */
-	state->m_diag2 = 0;
-	state->m_test_parity = 0;
-	state->m_parity_error_pending = 0;
+	m_diag2 = 0;
+	m_test_parity = 0;
+	m_parity_error_pending = 0;
 
-	state->m_bad_parity_count = 0;
-	memset(state->m_bad_parity_table, 0, 0x40000);	/* Clear */
+	m_bad_parity_count = 0;
+	memset(m_bad_parity_table, 0, 0x40000);	/* Clear */
 
 	/* init video */
 
-	state->m_VTMSK = 0;
-	set_VTIR(machine, 0);
+	m_VTMSK = 0;
+	set_VTIR(machine(), 0);
 
-	state->m_video_address_latch = 0;
-	state->m_videoram_ptr = (UINT16 *) state->m_ram_ptr;
+	m_video_address_latch = 0;
+	m_videoram_ptr = (UINT16 *) m_ram_ptr;
 
 	/* reset COPS keyboard/mouse controller */
-	init_COPS(machine);
+	init_COPS(machine());
 
 	{
-		via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
+		via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 		COPS_via_out_ca2(via_0, 0, 0);	/* VIA core forgets to do so */
 	}
 
 	/* initialize floppy */
 	{
-		if (state->m_features.floppy_hardware == sony_lisa2)
+		if (m_features.floppy_hardware == sony_lisa2)
 		{
-			sony_set_enable_lines(machine.device("fdc"),1);	/* on lisa2, drive unit 1 is always selected (?) */
+			sony_set_enable_lines(machine().device("fdc"),1);	/* on lisa2, drive unit 1 is always selected (?) */
 		}
 	}
 
 	/* reset 68k to pick up proper vectors from MMU */
-	machine.device("maincpu")->reset();
+	machine().device("maincpu")->reset();
 }
 
 INTERRUPT_GEN( lisa_interrupt )

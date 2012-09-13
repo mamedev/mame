@@ -41,6 +41,10 @@ public:
 	DECLARE_READ8_MEMBER(m6803_port2_r);
 	DECLARE_WRITE8_MEMBER(unused_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -48,6 +52,6 @@ public:
 /*----------- defined in video/kncljoe.c -----------*/
 
 
-PALETTE_INIT( kncljoe );
-VIDEO_START( kncljoe );
+
+
 SCREEN_UPDATE_IND16( kncljoe );

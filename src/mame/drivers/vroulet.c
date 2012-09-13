@@ -61,6 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi8255_b_w);
 	DECLARE_WRITE8_MEMBER(ppi8255_c_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
 };
 
 
@@ -108,10 +109,9 @@ TILE_GET_INFO_MEMBER(vroulet_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static VIDEO_START(vroulet)
+void vroulet_state::video_start()
 {
-	vroulet_state *state = machine.driver_data<vroulet_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(vroulet_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(vroulet_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 		8, 8, 32, 32);
 }
 
@@ -307,7 +307,6 @@ static MACHINE_CONFIG_START( vroulet, vroulet_state )
 	MCFG_GFXDECODE(vroulet)
 	MCFG_PALETTE_LENGTH(128*4)
 
-	MCFG_VIDEO_START(vroulet)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

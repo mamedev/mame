@@ -64,7 +64,8 @@ public:
 	DECLARE_WRITE8_MEMBER( port71_w );
 	DECLARE_READ8_MEMBER( ppi_pc_r );
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
-
+	DECLARE_PALETTE_INIT(pc8401a);
+	
 	void scan_keyboard();
 	void bankswitch(UINT8 data);
 

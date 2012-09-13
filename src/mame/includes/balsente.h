@@ -189,6 +189,9 @@ public:
 	DECLARE_DRIVER_INIT(minigolf2);
 	DECLARE_DRIVER_INIT(nametune);
 	DECLARE_DRIVER_INIT(gghost);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -196,8 +199,8 @@ public:
 
 TIMER_DEVICE_CALLBACK( balsente_interrupt_timer );
 
-MACHINE_START( balsente );
-MACHINE_RESET( balsente );
+
+
 
 void balsente_noise_gen(device_t *device, int count, short *buffer);
 
@@ -220,6 +223,6 @@ TIMER_DEVICE_CALLBACK( balsente_clock_counter_0_ff );
 
 /*----------- defined in video/balsente.c -----------*/
 
-VIDEO_START( balsente );
+
 SCREEN_UPDATE_IND16( balsente );
 

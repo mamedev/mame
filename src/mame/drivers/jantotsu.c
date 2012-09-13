@@ -126,6 +126,10 @@ public:
 	DECLARE_WRITE8_MEMBER(jantotsu_mux_w);
 	DECLARE_READ8_MEMBER(jantotsu_dsw2_r);
 	DECLARE_WRITE8_MEMBER(jan_adpcm_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -135,11 +139,10 @@ public:
  *
  *************************************/
 
-static VIDEO_START(jantotsu)
+void jantotsu_state::video_start()
 {
-	jantotsu_state *state = machine.driver_data<jantotsu_state>();
 
-	state->save_item(NAME(state->m_bitmap));
+	save_item(NAME(m_bitmap));
 }
 
 static SCREEN_UPDATE_RGB32(jantotsu)
@@ -199,9 +202,9 @@ WRITE8_MEMBER(jantotsu_state::bankaddr_w)
 		logerror("I/O port $07 write trips %02x\n",data);
 }
 
-static PALETTE_INIT( jantotsu )
+void jantotsu_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int	bit0, bit1, bit2, r, g, b;
 	int	i;
 
@@ -220,7 +223,7 @@ static PALETTE_INIT( jantotsu )
 		bit2 = (color_prom[0] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 }
@@ -485,31 +488,29 @@ static const sn76496_config psg_intf =
  *
  *************************************/
 
-static MACHINE_START( jantotsu )
+void jantotsu_state::machine_start()
 {
-	jantotsu_state *state = machine.driver_data<jantotsu_state>();
 
-	state->save_item(NAME(state->m_vram_bank));
-	state->save_item(NAME(state->m_mux_data));
-	state->save_item(NAME(state->m_adpcm_pos));
-	state->save_item(NAME(state->m_adpcm_idle));
-	state->save_item(NAME(state->m_adpcm_data));
-	state->save_item(NAME(state->m_adpcm_trigger));
+	save_item(NAME(m_vram_bank));
+	save_item(NAME(m_mux_data));
+	save_item(NAME(m_adpcm_pos));
+	save_item(NAME(m_adpcm_idle));
+	save_item(NAME(m_adpcm_data));
+	save_item(NAME(m_adpcm_trigger));
 }
 
-static MACHINE_RESET( jantotsu )
+void jantotsu_state::machine_reset()
 {
-	jantotsu_state *state = machine.driver_data<jantotsu_state>();
 
 	/*Load hard-wired background color.*/
-	state->m_col_bank = (state->ioport("DSW2")->read() & 0xc0) >> 3;
+	m_col_bank = (ioport("DSW2")->read() & 0xc0) >> 3;
 
-	state->m_vram_bank = 0;
-	state->m_mux_data = 0;
-	state->m_adpcm_pos = 0;
-	state->m_adpcm_idle = 1;
-	state->m_adpcm_data = 0;
-	state->m_adpcm_trigger = 0;
+	m_vram_bank = 0;
+	m_mux_data = 0;
+	m_adpcm_pos = 0;
+	m_adpcm_idle = 1;
+	m_adpcm_data = 0;
+	m_adpcm_trigger = 0;
 }
 
 static MACHINE_CONFIG_START( jantotsu, jantotsu_state )
@@ -520,8 +521,6 @@ static MACHINE_CONFIG_START( jantotsu, jantotsu_state )
 	MCFG_CPU_IO_MAP(jantotsu_io)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MCFG_MACHINE_START(jantotsu)
-	MCFG_MACHINE_RESET(jantotsu)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -531,10 +530,8 @@ static MACHINE_CONFIG_START( jantotsu, jantotsu_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_STATIC(jantotsu)
 
-	MCFG_PALETTE_INIT(jantotsu)
 	MCFG_PALETTE_LENGTH(0x20)
 
-	MCFG_VIDEO_START(jantotsu)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

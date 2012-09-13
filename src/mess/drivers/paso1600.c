@@ -52,6 +52,9 @@ public:
 	}m_keyb;
 	DECLARE_READ8_MEMBER(pc_dma_read_byte);
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 #define mc6845_h_char_total 	(state->m_crtc_vreg[0])
@@ -72,11 +75,10 @@ public:
 #define mc6845_update_addr  	(((state->m_crtc_vreg[0x12]<<8) & 0x3f00) | (state->m_crtc_vreg[0x13] & 0xff))
 
 
-static VIDEO_START( paso1600 )
+void paso1600_state::video_start()
 {
-	paso1600_state *state = machine.driver_data<paso1600_state>();
-	state->m_p_chargen = machine.root_device().memregion("chargen")->base();
-	state->m_p_pcg = state->memregion("pcg")->base();
+	m_p_chargen = machine().root_device().memregion("chargen")->base();
+	m_p_pcg = memregion("pcg")->base();
 }
 
 static SCREEN_UPDATE_IND16( paso1600 )
@@ -289,14 +291,13 @@ static const struct pic8259_interface paso1600_pic8259_config =
 	DEVCB_NULL
 };
 
-static MACHINE_START(paso1600)
+void paso1600_state::machine_start()
 {
-	paso1600_state *state = machine.driver_data<paso1600_state>();
-	state->m_maincpu->set_irq_acknowledge_callback(paso1600_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(paso1600_irq_callback);
 }
 
 
-static MACHINE_RESET(paso1600)
+void paso1600_state::machine_reset()
 {
 }
 
@@ -335,8 +336,6 @@ static MACHINE_CONFIG_START( paso1600, paso1600_state )
 	MCFG_CPU_PROGRAM_MAP(paso1600_map)
 	MCFG_CPU_IO_MAP(paso1600_io)
 
-	MCFG_MACHINE_START(paso1600)
-	MCFG_MACHINE_RESET(paso1600)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -344,7 +343,6 @@ static MACHINE_CONFIG_START( paso1600, paso1600_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_VIDEO_START(paso1600)
 	MCFG_SCREEN_UPDATE_STATIC(paso1600)
 	MCFG_GFXDECODE(paso1600)
 	MCFG_PALETTE_LENGTH(8)

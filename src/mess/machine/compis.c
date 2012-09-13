@@ -1370,26 +1370,25 @@ DRIVER_INIT_MEMBER(compis_state,compis)
 	memset (&m_compis, 0, sizeof (m_compis) );
 }
 
-MACHINE_START( compis )
+void compis_state::machine_start()
 {
 	/* CPU */
-	compis_cpu_init(machine);
+	compis_cpu_init(machine());
 }
 /*-------------------------------------------------------------------------*/
 /* Name: compis                                                            */
 /* Desc: Machine - Init                                                    */
 /*-------------------------------------------------------------------------*/
-MACHINE_RESET( compis )
+void compis_state::machine_reset()
 {
-	compis_state *state = machine.driver_data<compis_state>();
 	/* FDC */
-	compis_fdc_reset(machine);
+	compis_fdc_reset(machine());
 
 	/* Keyboard */
-	compis_keyb_init(state);
+	compis_keyb_init(this);
 
 	/* OSP PIC 8259 */
-	state->m_maincpu->set_irq_acknowledge_callback(compis_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(compis_irq_callback);
 }
 
 /*-------------------------------------------------------------------------*/

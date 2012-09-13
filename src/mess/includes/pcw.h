@@ -95,6 +95,10 @@ public:
 	DECLARE_WRITE8_MEMBER(pcw9512_parallel_w);
 	void mcu_transmit_serial(UINT8 bit);
 	DECLARE_DRIVER_INIT(pcw);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 

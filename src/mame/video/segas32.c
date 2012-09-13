@@ -279,15 +279,15 @@ static void common_start(running_machine &machine, int multi32)
 }
 
 
-VIDEO_START( system32 )
+VIDEO_START_MEMBER(segas32_state,system32)
 {
-	common_start(machine, 0);
+	common_start(machine(), 0);
 }
 
 
-VIDEO_START( multi32 )
+VIDEO_START_MEMBER(segas32_state,multi32)
 {
-	common_start(machine, 1);
+	common_start(machine(), 1);
 }
 
 

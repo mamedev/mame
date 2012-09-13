@@ -321,7 +321,6 @@ static MACHINE_CONFIG_START( ohpaipee, nbmj8900_state )
 	MCFG_SCREEN_UPDATE_STATIC(nbmj8900)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(nbmj8900_2layer)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

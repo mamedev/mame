@@ -74,11 +74,14 @@ public:
 	DECLARE_READ8_MEMBER(irobot_status_r);
 	DECLARE_WRITE8_MEMBER(irobot_paletteram_w);
 	DECLARE_DRIVER_INIT(irobot);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 /*----------- defined in machine/irobot.c -----------*/
 
-MACHINE_RESET( irobot );
+
 
 TIMER_DEVICE_CALLBACK( irobot_irvg_done_callback );
 TIMER_DEVICE_CALLBACK( irobot_irmb_done_callback );
@@ -87,8 +90,8 @@ TIMER_DEVICE_CALLBACK( irobot_irmb_done_callback );
 
 /*----------- defined in video/irobot.c -----------*/
 
-PALETTE_INIT( irobot );
-VIDEO_START( irobot );
+
+
 SCREEN_UPDATE_IND16( irobot );
 
 

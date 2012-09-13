@@ -18,14 +18,13 @@
 
 /*******************************************************************/
 
-PALETTE_INIT( tceptor )
+void tceptor_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	tceptor_state *state = machine.driver_data<tceptor_state>();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x400);
+	machine().colortable = colortable_alloc(machine(), 0x400);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x400; i++)
@@ -34,7 +33,7 @@ PALETTE_INIT( tceptor )
 		int g = pal4bit(color_prom[i + 0x400]);
 		int b = pal4bit(color_prom[i + 0x800]);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -53,36 +52,36 @@ PALETTE_INIT( tceptor )
 	for (i = 0; i < 0x0400; i++)
 	{
 		int ctabentry = color_prom[i];
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	/* sprites lookup table (1024 colors) */
 	for (i = 0x0400; i < 0x0800; i++)
 	{
 		int ctabentry = color_prom[i] | 0x300;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	/* background: no lookup PROM, use directly (512 colors) */
 	for (i = 0x0a00; i < 0x0c00; i++)
 	{
 		int ctabentry = i & 0x1ff;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	/* road lookup table (256 colors) */
 	for (i = 0x0f00; i < 0x1000; i++)
 	{
 		int ctabentry = color_prom[i - 0x700] | 0x200;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	/* setup sprite mask color map */
 	/* tceptor2: only 0x23 */
-	memset(state->m_is_mask_spr, 0, sizeof state->m_is_mask_spr);
+	memset(m_is_mask_spr, 0, sizeof m_is_mask_spr);
 	for (i = 0; i < 0x400; i++)
-		if (colortable_entry_get_value(machine.colortable, i | 0x400) == SPR_MASK_COLOR)
-			state->m_is_mask_spr[i >> 4] = 1;
+		if (colortable_entry_get_value(machine().colortable, i | 0x400) == SPR_MASK_COLOR)
+			m_is_mask_spr[i >> 4] = 1;
 }
 
 
@@ -365,47 +364,46 @@ static void decode_sprite32(running_machine &machine, const char * region)
 	decode_sprite(machine, state->m_sprite32, &spr32_layout, dst);
 }
 
-VIDEO_START( tceptor )
+void tceptor_state::video_start()
 {
-	tceptor_state *state = machine.driver_data<tceptor_state>();
 	int gfx_index;
 
-	state->m_sprite_ram_buffered = auto_alloc_array_clear(machine, UINT16, 0x200/2);
+	m_sprite_ram_buffered = auto_alloc_array_clear(machine(), UINT16, 0x200/2);
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine.gfx[gfx_index] == 0)
+		if (machine().gfx[gfx_index] == 0)
 			break;
 	assert(gfx_index + 4 <= MAX_GFX_ELEMENTS);
 
-	state->m_bg = gfx_index++;
-	decode_bg(machine, "gfx2");
+	m_bg = gfx_index++;
+	decode_bg(machine(), "gfx2");
 
-	state->m_sprite16 = gfx_index++;
-	decode_sprite16(machine, "gfx3");
+	m_sprite16 = gfx_index++;
+	decode_sprite16(machine(), "gfx3");
 
-	state->m_sprite32 = gfx_index++;
-	decode_sprite32(machine, "gfx4");
+	m_sprite32 = gfx_index++;
+	decode_sprite32(machine(), "gfx4");
 
 	/* allocate temp bitmaps */
-	machine.primary_screen->register_screen_bitmap(state->m_temp_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_temp_bitmap);
 
-	state->m_c45_road->set_transparent_color(colortable_entry_get_value(machine.colortable, 0xfff));
+	m_c45_road->set_transparent_color(colortable_entry_get_value(machine().colortable, 0xfff));
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tceptor_state::get_tx_tile_info),state), TILEMAP_SCAN_COLS,  8, 8, 34, 28);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tceptor_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,  8, 8, 34, 28);
 
-	state->m_tx_tilemap->set_scrollx(0, -2*8);
-	state->m_tx_tilemap->set_scrolly(0, 0);
-	colortable_configure_tilemap_groups(machine.colortable, state->m_tx_tilemap, machine.gfx[0], 7);
+	m_tx_tilemap->set_scrollx(0, -2*8);
+	m_tx_tilemap->set_scrolly(0, 0);
+	colortable_configure_tilemap_groups(machine().colortable, m_tx_tilemap, machine().gfx[0], 7);
 
-	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tceptor_state::get_bg1_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tceptor_state::get_bg2_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tceptor_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tceptor_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
-	state_save_register_global_pointer(machine, state->m_sprite_ram_buffered, 0x200 / 2);
-	state_save_register_global(machine, state->m_bg1_scroll_x);
-	state_save_register_global(machine, state->m_bg1_scroll_y);
-	state_save_register_global(machine, state->m_bg2_scroll_x);
-	state_save_register_global(machine, state->m_bg2_scroll_y);
+	state_save_register_global_pointer(machine(), m_sprite_ram_buffered, 0x200 / 2);
+	state_save_register_global(machine(), m_bg1_scroll_x);
+	state_save_register_global(machine(), m_bg1_scroll_y);
+	state_save_register_global(machine(), m_bg2_scroll_x);
+	state_save_register_global(machine(), m_bg2_scroll_y);
 }
 
 

@@ -367,28 +367,25 @@ void msx_state::msx_ch_reset_core ()
 	msx_memory_map_all ();
 }
 
-MACHINE_START( msx )
+MACHINE_START_MEMBER(msx_state,msx)
 {
-	MACHINE_START_CALL( msx2 );
+	MACHINE_START_CALL_MEMBER( msx2 );
 }
 
-MACHINE_START( msx2 )
+MACHINE_START_MEMBER(msx_state,msx2)
 {
-	msx_state *state = machine.driver_data<msx_state>();
-	state->m_port_c_old = 0xff;
-	state->m_dsk_stat = 0x7f;
+	m_port_c_old = 0xff;
+	m_dsk_stat = 0x7f;
 }
 
-MACHINE_RESET( msx )
+MACHINE_RESET_MEMBER(msx_state,msx)
 {
-	msx_state *state = machine.driver_data<msx_state>();
-	state->msx_ch_reset_core ();
+	msx_ch_reset_core ();
 }
 
-MACHINE_RESET( msx2 )
+MACHINE_RESET_MEMBER(msx_state,msx2)
 {
-	msx_state *state = machine.driver_data<msx_state>();
-	state->msx_ch_reset_core ();
+	msx_ch_reset_core ();
 }
 
 I8255_INTERFACE( msx_ppi8255_interface )

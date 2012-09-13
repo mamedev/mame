@@ -101,6 +101,10 @@ public:
 	DECLARE_DRIVER_INIT(nslasher);
 	DECLARE_DRIVER_INIT(captaven);
 	DECLARE_DRIVER_INIT(fghthist);
+	DECLARE_MACHINE_RESET(deco32);
+	DECLARE_VIDEO_START(captaven);
+	DECLARE_VIDEO_START(fghthist);
+	DECLARE_VIDEO_START(nslasher);
 };
 
 class dragngun_state : public deco32_state
@@ -125,17 +129,19 @@ public:
 	DECLARE_WRITE32_MEMBER(dragngun_spriteram_dma_w);
 	DECLARE_DRIVER_INIT(dragngun);
 	DECLARE_DRIVER_INIT(lockload);
+	DECLARE_VIDEO_START(dragngun);
+	DECLARE_VIDEO_START(lockload);	
 };
 
 
 
 /*----------- defined in video/deco32.c -----------*/
 
-VIDEO_START( captaven );
-VIDEO_START( fghthist );
-VIDEO_START( dragngun );
-VIDEO_START( lockload );
-VIDEO_START( nslasher );
+
+
+
+
+
 
 SCREEN_VBLANK( captaven );
 SCREEN_VBLANK( dragngun );

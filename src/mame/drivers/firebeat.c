@@ -180,6 +180,9 @@ public:
 	DECLARE_DRIVER_INIT(ppd);
 	DECLARE_DRIVER_INIT(kbm);
 	DECLARE_DRIVER_INIT(ppp);
+	DECLARE_MACHINE_START(firebeat);
+	DECLARE_MACHINE_RESET(firebeat);
+	DECLARE_VIDEO_START(firebeat);
 };
 
 
@@ -187,13 +190,12 @@ public:
 
 
 
-static VIDEO_START(firebeat)
+VIDEO_START_MEMBER(firebeat_state,firebeat)
 {
-	firebeat_state *state = machine.driver_data<firebeat_state>();
-	state->m_gcu[0].vram = auto_alloc_array(machine, UINT32, 0x2000000/4);
-	state->m_gcu[1].vram = auto_alloc_array(machine, UINT32, 0x2000000/4);
-	memset(state->m_gcu[0].vram, 0, 0x2000000);
-	memset(state->m_gcu[1].vram, 0, 0x2000000);
+	m_gcu[0].vram = auto_alloc_array(machine(), UINT32, 0x2000000/4);
+	m_gcu[1].vram = auto_alloc_array(machine(), UINT32, 0x2000000/4);
+	memset(m_gcu[0].vram, 0, 0x2000000);
+	memset(m_gcu[1].vram, 0, 0x2000000);
 }
 
 
@@ -1730,18 +1732,17 @@ static READ16_HANDLER(spu_unk_r)
 
 /*****************************************************************************/
 
-static MACHINE_START( firebeat )
+MACHINE_START_MEMBER(firebeat_state,firebeat)
 {
-	firebeat_state *state = machine.driver_data<firebeat_state>();
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine.device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(machine().device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x01ffffff, FALSE, state->m_work_ram);
+	ppcdrc_add_fastram(machine().device("maincpu"), 0x00000000, 0x01ffffff, FALSE, m_work_ram);
 
-	state->m_flash[0] = machine.device<fujitsu_29f016a_device>("flash0");
-	state->m_flash[1] = machine.device<fujitsu_29f016a_device>("flash1");
-	state->m_flash[2] = machine.device<fujitsu_29f016a_device>("flash2");
+	m_flash[0] = machine().device<fujitsu_29f016a_device>("flash0");
+	m_flash[1] = machine().device<fujitsu_29f016a_device>("flash1");
+	m_flash[2] = machine().device<fujitsu_29f016a_device>("flash2");
 }
 
 static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32, firebeat_state )
@@ -1944,21 +1945,20 @@ static INTERRUPT_GEN(firebeat_interrupt)
 	device->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-static MACHINE_RESET( firebeat )
+MACHINE_RESET_MEMBER(firebeat_state,firebeat)
 {
-	firebeat_state *state = machine.driver_data<firebeat_state>();
 	void *cd;
 	int i;
-	UINT8 *sound = state->memregion("ymz")->base();
+	UINT8 *sound = memregion("ymz")->base();
 
 	for (i=0; i < 0x200000; i++)
 	{
-		sound[i] = state->m_flash[1]->read(i);
-		sound[i+0x200000] = state->m_flash[2]->read(i);
+		sound[i] = m_flash[1]->read(i);
+		sound[i+0x200000] = m_flash[2]->read(i);
 	}
 
-	state->m_atapi_device_data[1]->GetDevice( &cd );
-	cdda_set_cdrom(machine.device("cdda"), cd);
+	m_atapi_device_data[1]->GetDevice( &cd );
+	cdda_set_cdrom(machine().device("cdda"), cd);
 }
 
 const rtc65271_interface firebeat_rtc =
@@ -1973,8 +1973,8 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	MCFG_CPU_PROGRAM_MAP(firebeat_map)
 	MCFG_CPU_VBLANK_INT("screen", firebeat_interrupt)
 
-	MCFG_MACHINE_START(firebeat)
-	MCFG_MACHINE_RESET(firebeat)
+	MCFG_MACHINE_START_OVERRIDE(firebeat_state,firebeat)
+	MCFG_MACHINE_RESET_OVERRIDE(firebeat_state,firebeat)
 
 	MCFG_RTC65271_ADD("rtc", firebeat_rtc)
 
@@ -1996,7 +1996,7 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_STATIC(firebeat_0)
 
-	MCFG_VIDEO_START(firebeat)
+	MCFG_VIDEO_START_OVERRIDE(firebeat_state,firebeat)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2019,8 +2019,8 @@ static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 	MCFG_CPU_PROGRAM_MAP(firebeat_map)
 	MCFG_CPU_VBLANK_INT("lscreen", firebeat_interrupt)
 
-	MCFG_MACHINE_START(firebeat)
-	MCFG_MACHINE_RESET(firebeat)
+	MCFG_MACHINE_START_OVERRIDE(firebeat_state,firebeat)
+	MCFG_MACHINE_RESET_OVERRIDE(firebeat_state,firebeat)
 
 	MCFG_RTC65271_ADD("rtc", firebeat_rtc)
 
@@ -2049,7 +2049,7 @@ static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_STATIC(firebeat_1)
 
-	MCFG_VIDEO_START(firebeat)
+	MCFG_VIDEO_START_OVERRIDE(firebeat_state,firebeat)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

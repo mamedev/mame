@@ -43,14 +43,13 @@ WRITE16_MEMBER(pass_state::pass_fg_videoram_w)
 
 /* video update / start */
 
-VIDEO_START( pass )
+void pass_state::video_start()
 {
-	pass_state *state = machine.driver_data<pass_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pass_state::get_pass_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8,  64, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pass_state::get_pass_fg_tile_info),state), TILEMAP_SCAN_ROWS, 4, 4, 128, 64);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pass_state::get_pass_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8,  64, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pass_state::get_pass_fg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 4, 128, 64);
 
-	state->m_fg_tilemap->set_transparent_pen(255);
+	m_fg_tilemap->set_transparent_pen(255);
 }
 
 SCREEN_UPDATE_IND16( pass )

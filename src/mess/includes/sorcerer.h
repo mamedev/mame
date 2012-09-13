@@ -83,15 +83,18 @@ public:
 	required_ioport m_iop_config;
 	required_ioport m_iop_vs;
 	DECLARE_DRIVER_INIT(sorcerer);
+	virtual void machine_start();
+	virtual void machine_reset();
+	DECLARE_MACHINE_START(sorcererd);
 };
 
 
 /*----------- defined in machine/sorcerer.c -----------*/
 
 
-MACHINE_START( sorcererd );
-MACHINE_START( sorcerer );
-MACHINE_RESET( sorcerer );
+
+
+
 SNAPSHOT_LOAD( sorcerer );
 
 #endif /* SORCERER_H_ */

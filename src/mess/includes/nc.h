@@ -73,6 +73,12 @@ public:
 	DECLARE_WRITE8_MEMBER(nc200_uart_control_w);
 	DECLARE_WRITE8_MEMBER(nc200_memory_card_wait_state_w);
 	DECLARE_WRITE8_MEMBER(nc200_poweroff_control_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_MACHINE_START(nc200);
+	DECLARE_MACHINE_RESET(nc200);
 };
 
 

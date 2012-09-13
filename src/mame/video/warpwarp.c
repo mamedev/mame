@@ -18,24 +18,24 @@ static const rgb_t geebee_palette[] =
 	MAKE_RGB(0x7f,0x7f,0x7f)  /* grey  */
 };
 
-PALETTE_INIT( geebee )
+PALETTE_INIT_MEMBER(warpwarp_state,geebee)
 {
-	palette_set_color(machine, 0, geebee_palette[0]);
-	palette_set_color(machine, 1, geebee_palette[1]);
-	palette_set_color(machine, 2, geebee_palette[1]);
-	palette_set_color(machine, 3, geebee_palette[0]);
-	palette_set_color(machine, 4, geebee_palette[0]);
-	palette_set_color(machine, 5, geebee_palette[2]);
-	palette_set_color(machine, 6, geebee_palette[2]);
-	palette_set_color(machine, 7, geebee_palette[0]);
+	palette_set_color(machine(), 0, geebee_palette[0]);
+	palette_set_color(machine(), 1, geebee_palette[1]);
+	palette_set_color(machine(), 2, geebee_palette[1]);
+	palette_set_color(machine(), 3, geebee_palette[0]);
+	palette_set_color(machine(), 4, geebee_palette[0]);
+	palette_set_color(machine(), 5, geebee_palette[2]);
+	palette_set_color(machine(), 6, geebee_palette[2]);
+	palette_set_color(machine(), 7, geebee_palette[0]);
 }
 
-PALETTE_INIT( navarone )
+PALETTE_INIT_MEMBER(warpwarp_state,navarone)
 {
-	palette_set_color(machine, 0, geebee_palette[0]);
-	palette_set_color(machine, 1, geebee_palette[1]);
-	palette_set_color(machine, 2, geebee_palette[1]);
-	palette_set_color(machine, 3, geebee_palette[0]);
+	palette_set_color(machine(), 0, geebee_palette[0]);
+	palette_set_color(machine(), 1, geebee_palette[1]);
+	palette_set_color(machine(), 2, geebee_palette[1]);
+	palette_set_color(machine(), 3, geebee_palette[0]);
 }
 
 
@@ -59,7 +59,7 @@ PALETTE_INIT( navarone )
 
 ***************************************************************************/
 
-PALETTE_INIT( warpwarp )
+PALETTE_INIT_MEMBER(warpwarp_state,warpwarp)
 {
 	int i;
 	static const int resistances_tiles_rg[] = { 1600, 820, 390 };
@@ -95,11 +95,11 @@ PALETTE_INIT( warpwarp )
 		bit1 = (i >> 7) & 0x01;
 		b = combine_2_weights(weights_tiles_b, bit0, bit1);
 
-		palette_set_color(machine, (i * 2) + 0, RGB_BLACK);
-		palette_set_color(machine, (i * 2) + 1, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), (i * 2) + 0, RGB_BLACK);
+		palette_set_color(machine(), (i * 2) + 1, MAKE_RGB(r, g, b));
 	}
 
-	palette_set_color(machine, 0x200, MAKE_RGB(weight_ball[0], weight_ball[0], weight_ball[0]));
+	palette_set_color(machine(), 0x200, MAKE_RGB(weight_ball[0], weight_ball[0], weight_ball[0]));
 }
 
 
@@ -164,22 +164,19 @@ TILE_GET_INFO_MEMBER(warpwarp_state::warpwarp_get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( geebee )
+VIDEO_START_MEMBER(warpwarp_state,geebee)
 {
-	warpwarp_state *state = machine.driver_data<warpwarp_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(warpwarp_state::geebee_get_tile_info),state),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),state),8,8,34,28);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(warpwarp_state::geebee_get_tile_info),this),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),this),8,8,34,28);
 }
 
-VIDEO_START( navarone )
+VIDEO_START_MEMBER(warpwarp_state,navarone)
 {
-	warpwarp_state *state = machine.driver_data<warpwarp_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(warpwarp_state::navarone_get_tile_info),state),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),state),8,8,34,28);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(warpwarp_state::navarone_get_tile_info),this),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),this),8,8,34,28);
 }
 
-VIDEO_START( warpwarp )
+VIDEO_START_MEMBER(warpwarp_state,warpwarp)
 {
-	warpwarp_state *state = machine.driver_data<warpwarp_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(warpwarp_state::warpwarp_get_tile_info),state),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),state),8,8,34,28);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(warpwarp_state::warpwarp_get_tile_info),this),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),this),8,8,34,28);
 }
 
 

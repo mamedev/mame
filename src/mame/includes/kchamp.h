@@ -43,13 +43,18 @@ public:
 	DECLARE_DRIVER_INIT(kchampvs);
 	DECLARE_DRIVER_INIT(kchampvs2);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_MACHINE_START(kchampvs);
+	DECLARE_MACHINE_START(kchamp);
 };
 
 
 /*----------- defined in video/kchamp.c -----------*/
 
 
-PALETTE_INIT( kchamp );
-VIDEO_START( kchamp );
+
+
 SCREEN_UPDATE_IND16( kchamp );
 SCREEN_UPDATE_IND16( kchampvs );

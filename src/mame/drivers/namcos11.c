@@ -341,6 +341,7 @@ public:
 	DECLARE_DRIVER_INIT(tekken);
 	DECLARE_DRIVER_INIT(xevi3dg);
 	DECLARE_DRIVER_INIT(tekken2);
+	DECLARE_MACHINE_RESET(namcos11);
 };
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
@@ -992,11 +993,10 @@ DRIVER_INIT_MEMBER(namcos11_state,ptblank2ua)
 	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler (0x1f780000, 0x1f78000f, read32_delegate(FUNC(namcos11_state::lightgun_r),this));
 }
 
-static MACHINE_RESET( namcos11 )
+MACHINE_RESET_MEMBER(namcos11_state,namcos11)
 {
-	namcos11_state *state = machine.driver_data<namcos11_state>();
 
-	memset( state->m_keycus, 0, state->m_keycus_size );
+	memset( m_keycus, 0, m_keycus_size );
 }
 
 
@@ -1034,7 +1034,7 @@ static MACHINE_CONFIG_START( coh100, namcos11_state )
 	MCFG_TIMER_ADD_PERIODIC("mcu_irq2", mcu_irq2_cb, attotime::from_hz(60))
 	MCFG_TIMER_ADD_PERIODIC("mcu_adc",  mcu_adc_cb, attotime::from_hz(60))
 
-	MCFG_MACHINE_RESET( namcos11 )
+	MCFG_MACHINE_RESET_OVERRIDE(namcos11_state, namcos11 )
 
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8538Q, 0x200000, XTAL_53_693175MHz )
 

@@ -58,6 +58,7 @@ public:
 	DECLARE_READ8_MEMBER(maxaflex_atari_pia_pa_r);
 	DECLARE_READ8_MEMBER(maxaflex_atari_pia_pb_r);
 	DECLARE_DRIVER_INIT(a600xl);
+	DECLARE_MACHINE_RESET(supervisor_board);
 };
 
 
@@ -239,14 +240,13 @@ WRITE8_MEMBER(maxaflex_state::mcu_tcr_w)
 	}
 }
 
-static MACHINE_RESET(supervisor_board)
+MACHINE_RESET_MEMBER(maxaflex_state,supervisor_board)
 {
-	maxaflex_state *state = machine.driver_data<maxaflex_state>();
-	state->m_portA_in = state->m_portA_out = state->m_ddrA	= 0;
-	state->m_portB_in = state->m_portB_out = state->m_ddrB	= 0;
-	state->m_portC_in = state->m_portC_out = state->m_ddrC	= 0;
-	state->m_tdr = state->m_tcr = 0;
-	state->m_mcu_timer = machine.device<timer_device>("mcu_timer");
+	m_portA_in = m_portA_out = m_ddrA	= 0;
+	m_portB_in = m_portB_out = m_ddrB	= 0;
+	m_portC_in = m_portC_out = m_ddrC	= 0;
+	m_tdr = m_tcr = 0;
+	m_mcu_timer = machine().device<timer_device>("mcu_timer");
 
 	output_set_lamp_value(0, 0);
 	output_set_lamp_value(1, 0);
@@ -443,7 +443,7 @@ static MACHINE_CONFIG_START( a600xl, maxaflex_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maxaflex, a600xl )
-	MCFG_MACHINE_RESET( supervisor_board )
+	MCFG_MACHINE_RESET_OVERRIDE(maxaflex_state, supervisor_board )
 MACHINE_CONFIG_END
 
 ROM_START(maxaflex)

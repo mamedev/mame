@@ -80,6 +80,8 @@ public:
 	DECLARE_WRITE8_MEMBER(debug_w);
 	DECLARE_READ8_MEMBER(debug_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -119,10 +121,9 @@ TILE_GET_INFO_MEMBER(nsmpoker_state::get_bg_tile_info)
 }
 
 
-static VIDEO_START( nsmpoker )
+void nsmpoker_state::video_start()
 {
-	nsmpoker_state *state = machine.driver_data<nsmpoker_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(nsmpoker_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(nsmpoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -134,7 +135,7 @@ static SCREEN_UPDATE_IND16( nsmpoker )
 }
 
 
-static PALETTE_INIT( nsmpoker )
+void nsmpoker_state::palette_init()
 {
 
 }
@@ -409,10 +410,8 @@ static MACHINE_CONFIG_START( nsmpoker, nsmpoker_state )
 
 	MCFG_GFXDECODE(nsmpoker)
 
-	MCFG_PALETTE_INIT(nsmpoker)
 	MCFG_PALETTE_LENGTH(8)
 
-	MCFG_VIDEO_START(nsmpoker)
 
 MACHINE_CONFIG_END
 

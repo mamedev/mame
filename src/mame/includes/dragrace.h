@@ -49,6 +49,10 @@ public:
 	DECLARE_READ8_MEMBER(dragrace_steering_r);
 	DECLARE_READ8_MEMBER(dragrace_scanline_r);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -58,5 +62,5 @@ DISCRETE_SOUND_EXTERN( dragrace );
 
 /*----------- defined in video/dragrace.c -----------*/
 
-VIDEO_START( dragrace );
+
 SCREEN_UPDATE_IND16( dragrace );

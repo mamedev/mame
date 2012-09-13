@@ -219,34 +219,32 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
  Draw Order / Priority seems to affect where the scroll values are used also.
 *******************************************************************************/
 
-VIDEO_START( wwfwfest )
+void wwfwfest_state::video_start()
 {
-	wwfwfest_state *state = machine.driver_data<wwfwfest_state>();
-    state_save_register_global(machine, state->m_pri);
-    state_save_register_global(machine, state->m_bg0_scrollx);
-    state_save_register_global(machine, state->m_bg0_scrolly);
-    state_save_register_global(machine, state->m_bg1_scrollx);
-    state_save_register_global(machine, state->m_bg1_scrolly);
+    state_save_register_global(machine(), m_pri);
+    state_save_register_global(machine(), m_bg0_scrollx);
+    state_save_register_global(machine(), m_bg0_scrolly);
+    state_save_register_global(machine(), m_bg1_scrollx);
+    state_save_register_global(machine(), m_bg1_scrolly);
 
-	state->m_fg0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wwfwfest_state::get_fg0_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,32);
-	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wwfwfest_state::get_bg1_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16,32,32);
-	state->m_bg0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wwfwfest_state::get_bg0_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16,32,32);
+	m_fg0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wwfwfest_state::get_fg0_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wwfwfest_state::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);
+	m_bg0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wwfwfest_state::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);
 
-	state->m_fg0_tilemap->set_transparent_pen(0);
-	state->m_bg1_tilemap->set_transparent_pen(0);
-	state->m_bg0_tilemap->set_transparent_pen(0);
+	m_fg0_tilemap->set_transparent_pen(0);
+	m_bg1_tilemap->set_transparent_pen(0);
+	m_bg0_tilemap->set_transparent_pen(0);
 
-	state->m_sprite_xoff = state->m_bg0_dx = state->m_bg1_dx[0] = state->m_bg1_dx[1] = 0;
+	m_sprite_xoff = m_bg0_dx = m_bg1_dx[0] = m_bg1_dx[1] = 0;
 }
 
-VIDEO_START( wwfwfstb )
+VIDEO_START_MEMBER(wwfwfest_state,wwfwfstb)
 {
-	wwfwfest_state *state = machine.driver_data<wwfwfest_state>();
-	VIDEO_START_CALL(wwfwfest);
+	wwfwfest_state::video_start();
 
-	state->m_sprite_xoff = 2;
-	state->m_bg0_dx = state->m_bg1_dx[0] = -4;
-	state->m_bg1_dx[1] = -2;
+	m_sprite_xoff = 2;
+	m_bg0_dx = m_bg1_dx[0] = -4;
+	m_bg1_dx[1] = -2;
 }
 
 SCREEN_UPDATE_IND16( wwfwfest )

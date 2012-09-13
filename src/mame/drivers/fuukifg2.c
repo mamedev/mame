@@ -439,28 +439,26 @@ static TIMER_CALLBACK( raster_interrupt_callback )
 }
 
 
-static MACHINE_START( fuuki16 )
+void fuuki16_state::machine_start()
 {
-	fuuki16_state *state = machine.driver_data<fuuki16_state>();
-	UINT8 *ROM = state->memregion("audiocpu")->base();
+	UINT8 *ROM = memregion("audiocpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 3, &ROM[0x10000], 0x8000);
+	membank("bank1")->configure_entries(0, 3, &ROM[0x10000], 0x8000);
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->m_raster_interrupt_timer = machine.scheduler().timer_alloc(FUNC(raster_interrupt_callback));
+	m_raster_interrupt_timer = machine().scheduler().timer_alloc(FUNC(raster_interrupt_callback));
 }
 
 
-static MACHINE_RESET( fuuki16 )
+void fuuki16_state::machine_reset()
 {
-	fuuki16_state *state = machine.driver_data<fuuki16_state>();
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = machine().primary_screen->visible_area();
 
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(248), FUNC(level_1_interrupt_callback));
-	machine.scheduler().timer_set(machine.primary_screen->time_until_vblank_start(), FUNC(vblank_interrupt_callback));
-	state->m_raster_interrupt_timer->adjust(machine.primary_screen->time_until_pos(0, visarea.max_x + 1));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(248), FUNC(level_1_interrupt_callback));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_vblank_start(), FUNC(vblank_interrupt_callback));
+	m_raster_interrupt_timer->adjust(machine().primary_screen->time_until_pos(0, visarea.max_x + 1));
 }
 
 
@@ -474,8 +472,6 @@ static MACHINE_CONFIG_START( fuuki16, fuuki16_state )
 	MCFG_CPU_PROGRAM_MAP(fuuki16_sound_map)
 	MCFG_CPU_IO_MAP(fuuki16_sound_io_map)
 
-	MCFG_MACHINE_START(fuuki16)
-	MCFG_MACHINE_RESET(fuuki16)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -487,7 +483,6 @@ static MACHINE_CONFIG_START( fuuki16, fuuki16_state )
 	MCFG_GFXDECODE(fuuki16)
 	MCFG_PALETTE_LENGTH(0x800*4)
 
-	MCFG_VIDEO_START(fuuki16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

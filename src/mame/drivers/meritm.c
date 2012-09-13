@@ -233,6 +233,12 @@ public:
 	DECLARE_DRIVER_INIT(megat2);
 	DECLARE_DRIVER_INIT(pbst30);
 	DECLARE_DRIVER_INIT(megat3te);
+	virtual void machine_start();
+	virtual void video_start();
+	DECLARE_MACHINE_START(meritm_crt250_questions);
+	DECLARE_MACHINE_START(meritm_crt250_crt252_crt258);
+	DECLARE_MACHINE_START(meritm_crt260);
+	DECLARE_MACHINE_START(merit_common);
 };
 
 
@@ -445,15 +451,14 @@ static void meritm_vdp1_interrupt(device_t *, v99x8_device &device, int i)
 }
 
 
-static VIDEO_START( meritm )
+void meritm_state::video_start()
 {
-	meritm_state *state = machine.driver_data<meritm_state>();
-	state->m_layer0_enabled = state->m_layer1_enabled = 1;
+	m_layer0_enabled = m_layer1_enabled = 1;
 
-	state->m_vint = 0x18;
-	state_save_register_global(machine, state->m_vint);
-	state_save_register_global(machine, state->m_interrupt_vdp0_state);
-	state_save_register_global(machine, state->m_interrupt_vdp1_state);
+	m_vint = 0x18;
+	state_save_register_global(machine(), m_vint);
+	state_save_register_global(machine(), m_interrupt_vdp0_state);
+	state_save_register_global(machine(), m_interrupt_vdp1_state);
 }
 
 static SCREEN_UPDATE_IND16( meritm )
@@ -1088,57 +1093,53 @@ static const z80_daisy_config meritm_daisy_chain[] =
 	{ NULL }
 };
 
-static MACHINE_START(merit_common)
+MACHINE_START_MEMBER(meritm_state,merit_common)
 {
-	meritm_state *state = machine.driver_data<meritm_state>();
 
-	state->m_z80pio_0->strobe_a(1);
-	state->m_z80pio_0->strobe_b(1);
-	state->m_z80pio_1->strobe_a(1);
-	state->m_z80pio_1->strobe_b(1);
+	m_z80pio_0->strobe_a(1);
+	m_z80pio_0->strobe_b(1);
+	m_z80pio_1->strobe_a(1);
+	m_z80pio_1->strobe_b(1);
 };
 
-static MACHINE_START(meritm_crt250)
+void meritm_state::machine_start()
 {
-	meritm_state *state = machine.driver_data<meritm_state>();
-	state->membank("bank1")->configure_entries(0, 8, state->memregion("maincpu")->base(), 0x10000);
-	state->m_bank = 0xff;
-	meritm_crt250_switch_banks(machine);
-	MACHINE_START_CALL(merit_common);
-	state_save_register_global(machine, state->m_bank);
+	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base(), 0x10000);
+	m_bank = 0xff;
+	meritm_crt250_switch_banks(machine());
+	MACHINE_START_CALL_MEMBER(merit_common);
+	state_save_register_global(machine(), m_bank);
 
 };
 
-static MACHINE_START(meritm_crt250_questions)
+MACHINE_START_MEMBER(meritm_state,meritm_crt250_questions)
 {
-	meritm_state *state = machine.driver_data<meritm_state>();
-	MACHINE_START_CALL(meritm_crt250);
-	state_save_register_global(machine, state->m_questions_loword_address);
+	meritm_state::machine_start();
+	state_save_register_global(machine(), m_questions_loword_address);
 };
 
-static MACHINE_START(meritm_crt250_crt252_crt258)
+MACHINE_START_MEMBER(meritm_state,meritm_crt250_crt252_crt258)
 {
-	MACHINE_START_CALL(meritm_crt250_questions);
-	pc16552d_init(machine, 0, UART_CLK, NULL, pc16650d_tx_callback);
+	MACHINE_START_CALL_MEMBER(meritm_crt250_questions);
+	pc16552d_init(machine(), 0, UART_CLK, NULL, pc16650d_tx_callback);
 }
 
-static MACHINE_START(meritm_crt260)
+MACHINE_START_MEMBER(meritm_state,meritm_crt260)
 {
-	meritm_state *state = machine.driver_data<meritm_state>();
-	state->m_ram = auto_alloc_array(machine, UINT8,  0x8000 );
-	machine.device<nvram_device>("nvram")->set_base(state->m_ram, 0x8000);
-	memset(state->m_ram, 0x00, 0x8000);
-	state->membank("bank1")->configure_entries(0, 128, state->memregion("maincpu")->base(), 0x8000);
-	state->membank("bank2")->configure_entries(0, 128, state->memregion("maincpu")->base(), 0x8000);
-	state->membank("bank3")->configure_entries(0, 4, state->m_ram, 0x2000);
-	state->m_bank = 0xff;
-	state->m_psd_a15 = 0;
-	meritm_switch_banks(machine);
-	MACHINE_START_CALL(merit_common);
-	pc16552d_init(machine, 0, UART_CLK, NULL, pc16650d_tx_callback);
-	state_save_register_global(machine, state->m_bank);
-	state_save_register_global(machine, state->m_psd_a15);
-	state_save_register_global_pointer(machine, state->m_ram, 0x8000);
+	m_ram = auto_alloc_array(machine(), UINT8,  0x8000 );
+	machine().device<nvram_device>("nvram")->set_base(m_ram, 0x8000);
+	memset(m_ram, 0x00, 0x8000);
+	membank("bank1")->configure_entries(0, 128, memregion("maincpu")->base(), 0x8000);
+	membank("bank2")->configure_entries(0, 128, memregion("maincpu")->base(), 0x8000);
+	membank("bank3")->configure_entries(0, 4, m_ram, 0x2000);
+	m_bank = 0xff;
+	m_psd_a15 = 0;
+	meritm_switch_banks(machine());
+	MACHINE_START_CALL_MEMBER(merit_common);
+	pc16552d_init(machine(), 0, UART_CLK, NULL, pc16650d_tx_callback);
+	state_save_register_global(machine(), m_bank);
+	state_save_register_global(machine(), m_psd_a15);
+	state_save_register_global_pointer(machine(), m_ram, 0x8000);
 };
 
 // from MSX2 driver, may be not accurate for merit games
@@ -1172,7 +1173,6 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 	MCFG_CPU_CONFIG(meritm_daisy_chain)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", meritm_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_START(meritm_crt250)
 
 	MCFG_I8255A_ADD( "ppi8255", crt250_ppi8255_intf )
 
@@ -1203,7 +1203,6 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 
 	MCFG_PALETTE_INIT( v9938 )
 
-	MCFG_VIDEO_START(meritm)
 
   /* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1217,13 +1216,13 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( meritm_crt250_questions, meritm_crt250 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(meritm_crt250_questions_map)
-	MCFG_MACHINE_START(meritm_crt250_questions)
+	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt250_questions)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( meritm_crt250_crt252_crt258, meritm_crt250_questions )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(meritm_crt250_crt258_io_map)
-	MCFG_MACHINE_START(meritm_crt250_crt252_crt258)
+	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt250_crt252_crt258)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( meritm_crt260, meritm_crt250 )
@@ -1235,7 +1234,7 @@ static MACHINE_CONFIG_DERIVED( meritm_crt260, meritm_crt250 )
 	MCFG_I8255A_ADD( "ppi8255", crt260_ppi8255_intf )
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200))	// DS1232, TD connected to VCC
-	MCFG_MACHINE_START(meritm_crt260)
+	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt260)
 
 MACHINE_CONFIG_END
 

@@ -66,10 +66,10 @@ Added Dip locations according to manual.
  *
  *************************************/
 
-static PALETTE_INIT( copsnrob )
+void copsnrob_state::palette_init()
 {
-	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* black */
-	palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0xff));  /* white */
+	palette_set_color(machine(),0,MAKE_RGB(0x00,0x00,0x00)); /* black */
+	palette_set_color(machine(),1,MAKE_RGB(0xff,0xff,0xff));  /* white */
 }
 
 
@@ -248,20 +248,18 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( copsnrob )
+void copsnrob_state::machine_start()
 {
-	copsnrob_state *state = machine.driver_data<copsnrob_state>();
 
-	state->save_item(NAME(state->m_ic_h3_data));
-	state->save_item(NAME(state->m_misc));
+	save_item(NAME(m_ic_h3_data));
+	save_item(NAME(m_misc));
 }
 
-static MACHINE_RESET( copsnrob )
+void copsnrob_state::machine_reset()
 {
-	copsnrob_state *state = machine.driver_data<copsnrob_state>();
 
-	state->m_ic_h3_data = 0;
-	state->m_misc = 0;
+	m_ic_h3_data = 0;
+	m_misc = 0;
 }
 
 
@@ -271,8 +269,6 @@ static MACHINE_CONFIG_START( copsnrob, copsnrob_state )
 	MCFG_CPU_ADD("maincpu", M6502,14318180/16)		/* 894886.25 kHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_START(copsnrob)
-	MCFG_MACHINE_RESET(copsnrob)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -285,7 +281,6 @@ static MACHINE_CONFIG_START( copsnrob, copsnrob_state )
 	MCFG_GFXDECODE(copsnrob)
 	MCFG_PALETTE_LENGTH(2)
 
-	MCFG_PALETTE_INIT(copsnrob)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

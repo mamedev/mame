@@ -457,95 +457,89 @@ static TIMER_DEVICE_CALLBACK( helifire_dac_volume_timer )
 }
 
 
-MACHINE_START( spacefev_sound )
+MACHINE_START_MEMBER(n8080_state,spacefev_sound)
 {
-	n8080_state *state = machine.driver_data<n8080_state>();
 
-	state->m_sound_timer[0] = machine.scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
-	state->m_sound_timer[1] = machine.scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
-	state->m_sound_timer[2] = machine.scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
+	m_sound_timer[0] = machine().scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
+	m_sound_timer[1] = machine().scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
+	m_sound_timer[2] = machine().scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
 
-	state->save_item(NAME(state->m_prev_snd_data));
-	state->save_item(NAME(state->m_prev_sound_pins));
-	state->save_item(NAME(state->m_curr_sound_pins));
-	state->save_item(NAME(state->m_n8080_hardware));
-	state->save_item(NAME(state->m_mono_flop));
+	save_item(NAME(m_prev_snd_data));
+	save_item(NAME(m_prev_sound_pins));
+	save_item(NAME(m_curr_sound_pins));
+	save_item(NAME(m_n8080_hardware));
+	save_item(NAME(m_mono_flop));
 }
 
-MACHINE_RESET( spacefev_sound )
+MACHINE_RESET_MEMBER(n8080_state,spacefev_sound)
 {
-	n8080_state *state = machine.driver_data<n8080_state>();
-	state->m_n8080_hardware = 1;
+	m_n8080_hardware = 1;
 
-	state->m_mono_flop[0] = 0;
-	state->m_mono_flop[1] = 0;
-	state->m_mono_flop[2] = 0;
-	state->m_prev_snd_data = 0;
-	state->m_prev_sound_pins = 0;
-	state->m_curr_sound_pins = 0;
+	m_mono_flop[0] = 0;
+	m_mono_flop[1] = 0;
+	m_mono_flop[2] = 0;
+	m_prev_snd_data = 0;
+	m_prev_sound_pins = 0;
+	m_curr_sound_pins = 0;
 
-	delayed_sound_1(machine, 0);
-	delayed_sound_2(machine, 0);
-}
-
-
-MACHINE_START( sheriff_sound )
-{
-	n8080_state *state = machine.driver_data<n8080_state>();
-
-	state->m_sound_timer[0] = machine.scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
-	state->m_sound_timer[1] = machine.scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
-
-	state->save_item(NAME(state->m_prev_snd_data));
-	state->save_item(NAME(state->m_prev_sound_pins));
-	state->save_item(NAME(state->m_curr_sound_pins));
-	state->save_item(NAME(state->m_n8080_hardware));
-	state->save_item(NAME(state->m_mono_flop));
-}
-
-MACHINE_RESET( sheriff_sound )
-{
-	n8080_state *state = machine.driver_data<n8080_state>();
-	state->m_n8080_hardware = 2;
-
-	state->m_mono_flop[0] = 0;
-	state->m_mono_flop[1] = 0;
-	state->m_prev_snd_data = 0;
-	state->m_prev_sound_pins = 0;
-	state->m_curr_sound_pins = 0;
-
-	delayed_sound_1(machine, 0);
-	delayed_sound_2(machine, 0);
+	delayed_sound_1(machine(), 0);
+	delayed_sound_2(machine(), 0);
 }
 
 
-MACHINE_START( helifire_sound )
+MACHINE_START_MEMBER(n8080_state,sheriff_sound)
 {
-	n8080_state *state = machine.driver_data<n8080_state>();
 
-	state->save_item(NAME(state->m_prev_snd_data));
-	state->save_item(NAME(state->m_prev_sound_pins));
-	state->save_item(NAME(state->m_curr_sound_pins));
-	state->save_item(NAME(state->m_n8080_hardware));
-	state->save_item(NAME(state->m_helifire_dac_volume));
-	state->save_item(NAME(state->m_helifire_dac_timing));
-	state->save_item(NAME(state->m_helifire_dac_phase));
+	m_sound_timer[0] = machine().scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
+	m_sound_timer[1] = machine().scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
+
+	save_item(NAME(m_prev_snd_data));
+	save_item(NAME(m_prev_sound_pins));
+	save_item(NAME(m_curr_sound_pins));
+	save_item(NAME(m_n8080_hardware));
+	save_item(NAME(m_mono_flop));
 }
 
-MACHINE_RESET( helifire_sound )
+MACHINE_RESET_MEMBER(n8080_state,sheriff_sound)
 {
-	n8080_state *state = machine.driver_data<n8080_state>();
-	state->m_n8080_hardware = 3;
+	m_n8080_hardware = 2;
 
-	state->m_helifire_dac_volume = 1;
-	state->m_helifire_dac_timing = 0;
-	state->m_helifire_dac_phase = 0;
-	state->m_prev_snd_data = 0;
-	state->m_prev_sound_pins = 0;
-	state->m_curr_sound_pins = 0;
+	m_mono_flop[0] = 0;
+	m_mono_flop[1] = 0;
+	m_prev_snd_data = 0;
+	m_prev_sound_pins = 0;
+	m_curr_sound_pins = 0;
 
-	delayed_sound_1(machine, 0);
-	delayed_sound_2(machine, 0);
+	delayed_sound_1(machine(), 0);
+	delayed_sound_2(machine(), 0);
+}
+
+
+MACHINE_START_MEMBER(n8080_state,helifire_sound)
+{
+
+	save_item(NAME(m_prev_snd_data));
+	save_item(NAME(m_prev_sound_pins));
+	save_item(NAME(m_curr_sound_pins));
+	save_item(NAME(m_n8080_hardware));
+	save_item(NAME(m_helifire_dac_volume));
+	save_item(NAME(m_helifire_dac_timing));
+	save_item(NAME(m_helifire_dac_phase));
+}
+
+MACHINE_RESET_MEMBER(n8080_state,helifire_sound)
+{
+	m_n8080_hardware = 3;
+
+	m_helifire_dac_volume = 1;
+	m_helifire_dac_timing = 0;
+	m_helifire_dac_phase = 0;
+	m_prev_snd_data = 0;
+	m_prev_sound_pins = 0;
+	m_curr_sound_pins = 0;
+
+	delayed_sound_1(machine(), 0);
+	delayed_sound_2(machine(), 0);
 }
 
 

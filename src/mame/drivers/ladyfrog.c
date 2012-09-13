@@ -276,30 +276,28 @@ static GFXDECODE_START( ladyfrog )
 GFXDECODE_END
 
 
-static MACHINE_START( ladyfrog )
+void ladyfrog_state::machine_start()
 {
-	ladyfrog_state *state = machine.driver_data<ladyfrog_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_tilebank));
-	state->save_item(NAME(state->m_palette_bank));
-	state->save_item(NAME(state->m_sound_nmi_enable));
-	state->save_item(NAME(state->m_pending_nmi));
-	state->save_item(NAME(state->m_snd_flag));
-	state->save_item(NAME(state->m_snd_data));
+	save_item(NAME(m_tilebank));
+	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_sound_nmi_enable));
+	save_item(NAME(m_pending_nmi));
+	save_item(NAME(m_snd_flag));
+	save_item(NAME(m_snd_data));
 }
 
-static MACHINE_RESET( ladyfrog )
+void ladyfrog_state::machine_reset()
 {
-	ladyfrog_state *state = machine.driver_data<ladyfrog_state>();
 
-	state->m_tilebank = 0;
-	state->m_palette_bank = 0;
-	state->m_sound_nmi_enable = 0;
-	state->m_pending_nmi = 0;
-	state->m_snd_flag = 0;
-	state->m_snd_data = 0;
+	m_tilebank = 0;
+	m_palette_bank = 0;
+	m_sound_nmi_enable = 0;
+	m_pending_nmi = 0;
+	m_snd_flag = 0;
+	m_snd_data = 0;
 }
 
 static MACHINE_CONFIG_START( ladyfrog, ladyfrog_state )
@@ -313,8 +311,6 @@ static MACHINE_CONFIG_START( ladyfrog, ladyfrog_state )
 	MCFG_CPU_PROGRAM_MAP(ladyfrog_sound_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
 
-	MCFG_MACHINE_START(ladyfrog)
-	MCFG_MACHINE_RESET(ladyfrog)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -329,7 +325,6 @@ static MACHINE_CONFIG_START( ladyfrog, ladyfrog_state )
 	MCFG_GFXDECODE(ladyfrog)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_VIDEO_START(ladyfrog)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -354,7 +349,7 @@ static MACHINE_CONFIG_START( ladyfrog, ladyfrog_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( toucheme, ladyfrog )
-	MCFG_VIDEO_START(toucheme)
+	MCFG_VIDEO_START_OVERRIDE(ladyfrog_state,toucheme)
 MACHINE_CONFIG_END
 
 

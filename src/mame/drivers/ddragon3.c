@@ -558,36 +558,34 @@ static TIMER_DEVICE_CALLBACK( ddragon3_scanline )
  *
  *************************************/
 
-static MACHINE_START( ddragon3 )
+void ddragon3_state::machine_start()
 {
-	ddragon3_state *state = machine.driver_data<ddragon3_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_vreg));
-	state->save_item(NAME(state->m_bg_scrollx));
-	state->save_item(NAME(state->m_bg_scrolly));
-	state->save_item(NAME(state->m_fg_scrollx));
-	state->save_item(NAME(state->m_fg_scrolly));
-	state->save_item(NAME(state->m_bg_tilebase));
-	state->save_item(NAME(state->m_io_reg));
+	save_item(NAME(m_vreg));
+	save_item(NAME(m_bg_scrollx));
+	save_item(NAME(m_bg_scrolly));
+	save_item(NAME(m_fg_scrollx));
+	save_item(NAME(m_fg_scrolly));
+	save_item(NAME(m_bg_tilebase));
+	save_item(NAME(m_io_reg));
 }
 
-static MACHINE_RESET( ddragon3 )
+void ddragon3_state::machine_reset()
 {
-	ddragon3_state *state = machine.driver_data<ddragon3_state>();
 	int i;
 
-	state->m_vreg = 0;
-	state->m_bg_scrollx = 0;
-	state->m_bg_scrolly = 0;
-	state->m_fg_scrollx = 0;
-	state->m_fg_scrolly = 0;
-	state->m_bg_tilebase = 0;
+	m_vreg = 0;
+	m_bg_scrollx = 0;
+	m_bg_scrolly = 0;
+	m_fg_scrollx = 0;
+	m_fg_scrolly = 0;
+	m_bg_tilebase = 0;
 
 	for (i = 0; i < 8; i++)
-		state->m_io_reg[i] = 0;
+		m_io_reg[i] = 0;
 }
 
 static MACHINE_CONFIG_START( ddragon3, ddragon3_state )
@@ -600,8 +598,6 @@ static MACHINE_CONFIG_START( ddragon3, ddragon3_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(ddragon3)
-	MCFG_MACHINE_RESET(ddragon3)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -611,7 +607,6 @@ static MACHINE_CONFIG_START( ddragon3, ddragon3_state )
 	MCFG_GFXDECODE(ddragon3)
 	MCFG_PALETTE_LENGTH(768)
 
-	MCFG_VIDEO_START(ddragon3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

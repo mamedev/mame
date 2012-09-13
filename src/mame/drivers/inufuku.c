@@ -311,38 +311,36 @@ static const ym2610_interface ym2610_config =
 
 ******************************************************************************/
 
-static MACHINE_START( inufuku )
+void inufuku_state::machine_start()
 {
-	inufuku_state *state = machine.driver_data<inufuku_state>();
-	UINT8 *ROM = state->memregion("audiocpu")->base();
+	UINT8 *ROM = memregion("audiocpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x8000);
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x8000);
+	membank("bank1")->set_entry(0);
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_pending_command));
-	state->save_item(NAME(state->m_bg_scrollx));
-	state->save_item(NAME(state->m_bg_scrolly));
-	state->save_item(NAME(state->m_tx_scrollx));
-	state->save_item(NAME(state->m_tx_scrolly));
-	state->save_item(NAME(state->m_bg_raster));
-	state->save_item(NAME(state->m_bg_palettebank));
-	state->save_item(NAME(state->m_tx_palettebank));
+	save_item(NAME(m_pending_command));
+	save_item(NAME(m_bg_scrollx));
+	save_item(NAME(m_bg_scrolly));
+	save_item(NAME(m_tx_scrollx));
+	save_item(NAME(m_tx_scrolly));
+	save_item(NAME(m_bg_raster));
+	save_item(NAME(m_bg_palettebank));
+	save_item(NAME(m_tx_palettebank));
 }
 
-static MACHINE_RESET( inufuku )
+void inufuku_state::machine_reset()
 {
-	inufuku_state *state = machine.driver_data<inufuku_state>();
 
-	state->m_pending_command = 1;
-	state->m_bg_scrollx = 0;
-	state->m_bg_scrolly = 0;
-	state->m_tx_scrollx = 0;
-	state->m_tx_scrolly = 0;
-	state->m_bg_raster = 0;
-	state->m_bg_palettebank = 0;
-	state->m_tx_palettebank = 0;
+	m_pending_command = 1;
+	m_bg_scrollx = 0;
+	m_bg_scrolly = 0;
+	m_tx_scrollx = 0;
+	m_tx_scrolly = 0;
+	m_bg_raster = 0;
+	m_bg_palettebank = 0;
+	m_tx_palettebank = 0;
 }
 
 static MACHINE_CONFIG_START( inufuku, inufuku_state )
@@ -357,8 +355,6 @@ static MACHINE_CONFIG_START( inufuku, inufuku_state )
 	MCFG_CPU_IO_MAP(inufuku_sound_io_map)
 								/* IRQs are triggered by the YM2610 */
 
-	MCFG_MACHINE_START(inufuku)
-	MCFG_MACHINE_RESET(inufuku)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -373,7 +369,6 @@ static MACHINE_CONFIG_START( inufuku, inufuku_state )
 	MCFG_GFXDECODE(inufuku)
 	MCFG_PALETTE_LENGTH(4096)
 
-	MCFG_VIDEO_START(inufuku)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

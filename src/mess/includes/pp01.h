@@ -29,6 +29,10 @@ public:
 	DECLARE_WRITE8_MEMBER(pp01_video_b_2_w);
 	DECLARE_WRITE8_MEMBER(pp01_mem_block_w);
 	DECLARE_READ8_MEMBER(pp01_mem_block_r);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 

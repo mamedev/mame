@@ -73,10 +73,9 @@ TILEMAP_MAPPER_MEMBER(amspdwy_state::tilemap_scan_cols_back)
 }
 
 
-VIDEO_START( amspdwy )
+void amspdwy_state::video_start()
 {
-	amspdwy_state *state = machine.driver_data<amspdwy_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(amspdwy_state::get_tile_info),state), tilemap_mapper_delegate(FUNC(amspdwy_state::tilemap_scan_cols_back),state), 8, 8, 0x20, 0x20);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(amspdwy_state::get_tile_info),this), tilemap_mapper_delegate(FUNC(amspdwy_state::tilemap_scan_cols_back),this), 8, 8, 0x20, 0x20);
 }
 
 

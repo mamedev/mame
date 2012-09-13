@@ -41,6 +41,9 @@ public:
 	DECLARE_WRITE16_MEMBER(applix_index_w);
 	DECLARE_WRITE16_MEMBER(applix_register_w);
 	required_shared_ptr<UINT16> m_base;
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 WRITE16_MEMBER( applix_state::applix_index_w )
@@ -102,16 +105,15 @@ static INPUT_PORTS_START( applix )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(applix)
+void applix_state::machine_reset()
 {
-	applix_state *state = machine.driver_data<applix_state>();
-	UINT8* RAM = state->memregion("maincpu")->base();
-	memcpy(state->m_base, RAM+0x500000, 16);
-	machine.device("maincpu")->reset();
+	UINT8* RAM = memregion("maincpu")->base();
+	memcpy(m_base, RAM+0x500000, 16);
+	machine().device("maincpu")->reset();
 }
 
 
-static PALETTE_INIT( applix )
+void applix_state::palette_init()
 { // shades need to be verified - the names on the right are from the manual
 	const UINT8 colors[16*3] = {
 	0x00, 0x00, 0x00,	//  0 Black
@@ -136,12 +138,12 @@ static PALETTE_INIT( applix )
 	for (i = 0; i < 48; color_count++)
 	{
 		r = colors[i++]; g = colors[i++]; b = colors[i++];
-		palette_set_color(machine, color_count, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), color_count, MAKE_RGB(r, g, b));
 	}
 }
 
 
-static VIDEO_START( applix )
+void applix_state::video_start()
 {
 }
 
@@ -205,7 +207,6 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	MCFG_CPU_ADD("maincpu", M68000, 7500000)
 	MCFG_CPU_PROGRAM_MAP(applix_mem)
 
-	MCFG_MACHINE_RESET(applix)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -216,9 +217,7 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT(applix)
 
-	MCFG_VIDEO_START(applix)
 	MCFG_MC6845_ADD("crtc", MC6845, 1875000, applix_crtc) // 6545
 MACHINE_CONFIG_END
 

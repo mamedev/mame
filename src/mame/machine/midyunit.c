@@ -540,26 +540,25 @@ DRIVER_INIT_MEMBER(midyunit_state,totcarn)
  *
  *************************************/
 
-MACHINE_RESET( midyunit )
+MACHINE_RESET_MEMBER(midyunit_state,midyunit)
 {
-	midyunit_state *state = machine.driver_data<midyunit_state>();
 	/* reset sound */
-	switch (state->m_chip_type)
+	switch (m_chip_type)
 	{
 		case SOUND_NARC:
-			state->m_narc_sound->reset_write(1);
-			state->m_narc_sound->reset_write(0);
+			m_narc_sound->reset_write(1);
+			m_narc_sound->reset_write(0);
 			break;
 
 		case SOUND_CVSD:
 		case SOUND_CVSD_SMALL:
-			state->m_cvsd_sound->reset_write(1);
-			state->m_cvsd_sound->reset_write(0);
+			m_cvsd_sound->reset_write(1);
+			m_cvsd_sound->reset_write(0);
 			break;
 
 		case SOUND_ADPCM:
-			state->m_adpcm_sound->reset_write(1);
-			state->m_adpcm_sound->reset_write(0);
+			m_adpcm_sound->reset_write(1);
+			m_adpcm_sound->reset_write(0);
 			break;
 
 		case SOUND_YAWDIM:

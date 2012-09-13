@@ -267,23 +267,21 @@ static const ym3526_interface ym3526_config =
  *
  *************************************/
 
-static MACHINE_START( battlane )
+void battlane_state::machine_start()
 {
-	battlane_state *state = machine.driver_data<battlane_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_subcpu = machine.device<cpu_device>("sub");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_subcpu = machine().device<cpu_device>("sub");
 
-	state->save_item(NAME(state->m_video_ctrl));
-	state->save_item(NAME(state->m_cpu_control));
+	save_item(NAME(m_video_ctrl));
+	save_item(NAME(m_cpu_control));
 }
 
-static MACHINE_RESET( battlane )
+void battlane_state::machine_reset()
 {
-	battlane_state *state = machine.driver_data<battlane_state>();
 
-	state->m_video_ctrl = 0;
-	state->m_cpu_control = 0;
+	m_video_ctrl = 0;
+	m_cpu_control = 0;
 }
 
 static MACHINE_CONFIG_START( battlane, battlane_state )
@@ -298,8 +296,6 @@ static MACHINE_CONFIG_START( battlane, battlane_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START(battlane)
-	MCFG_MACHINE_RESET(battlane)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -312,7 +308,6 @@ static MACHINE_CONFIG_START( battlane, battlane_state )
 	MCFG_GFXDECODE(battlane)
 	MCFG_PALETTE_LENGTH(64)
 
-	MCFG_VIDEO_START(battlane)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

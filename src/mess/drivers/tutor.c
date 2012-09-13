@@ -204,6 +204,8 @@ public:
 	char m_printer_strobe;
 	DECLARE_DRIVER_INIT(tutor);
 	DECLARE_DRIVER_INIT(pyuuta);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -246,19 +248,18 @@ static TMS9928A_INTERFACE(tutor_tms9928a_interface)
 	DEVCB_NULL
 };
 
-static MACHINE_START(tutor)
+void tutor_state::machine_start()
 {
 }
 
-static MACHINE_RESET(tutor)
+void tutor_state::machine_reset()
 {
-	tutor_state *state = machine.driver_data<tutor_state>();
-	state->m_cartridge_enable = 0;
+	m_cartridge_enable = 0;
 
-	state->m_tape_interrupt_enable = 0;
+	m_tape_interrupt_enable = 0;
 
-	state->m_printer_data = 0;
-	state->m_printer_strobe = 0;
+	m_printer_data = 0;
+	m_printer_strobe = 0;
 }
 
 /*
@@ -759,8 +760,6 @@ static MACHINE_CONFIG_START( tutor, tutor_state )
 	MCFG_CPU_PROGRAM_MAP(tutor_memmap)
 	MCFG_CPU_IO_MAP(tutor_io)
 
-	MCFG_MACHINE_START( tutor )
-	MCFG_MACHINE_RESET( tutor )
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, tutor_tms9928a_interface )

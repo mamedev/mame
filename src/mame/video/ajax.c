@@ -68,15 +68,14 @@ void ajax_zoom_callback( running_machine &machine, int *code, int *color, int *f
 
 ***************************************************************************/
 
-VIDEO_START( ajax )
+void ajax_state::video_start()
 {
-	ajax_state *state = machine.driver_data<ajax_state>();
 
-	state->m_layer_colorbase[0] = 64;
-	state->m_layer_colorbase[1] = 0;
-	state->m_layer_colorbase[2] = 32;
-	state->m_sprite_colorbase = 16;
-	state->m_zoom_colorbase = 6;	/* == 48 since it's 7-bit graphics */
+	m_layer_colorbase[0] = 64;
+	m_layer_colorbase[1] = 0;
+	m_layer_colorbase[2] = 32;
+	m_sprite_colorbase = 16;
+	m_zoom_colorbase = 6;	/* == 48 since it's 7-bit graphics */
 }
 
 

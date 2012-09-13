@@ -869,22 +869,20 @@ static const deco16ic_interface mutantf_deco16ic_tilegen2_intf =
 };
 
 
-static MACHINE_START( cninja )
+void cninja_state::machine_start()
 {
-	cninja_state *state = machine.driver_data<cninja_state>();
 
-	state->save_item(NAME(state->m_scanline));
-	state->save_item(NAME(state->m_irq_mask));
+	save_item(NAME(m_scanline));
+	save_item(NAME(m_irq_mask));
 
-	decoprot_reset(machine);
+	decoprot_reset(machine());
 }
 
-static MACHINE_RESET( cninja )
+void cninja_state::machine_reset()
 {
-	cninja_state *state = machine.driver_data<cninja_state>();
 
-	state->m_scanline = 0;
-	state->m_irq_mask = 0;
+	m_scanline = 0;
+	m_irq_mask = 0;
 }
 
 
@@ -913,8 +911,6 @@ static MACHINE_CONFIG_START( cninja, cninja_state )
 	MCFG_CPU_ADD("audiocpu", H6280,32220000/8)	/* Accurate */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(cninja)
-	MCFG_MACHINE_RESET(cninja)
 
 	MCFG_TIMER_ADD("raster_timer", interrupt_gen)
 
@@ -967,8 +963,6 @@ static MACHINE_CONFIG_START( stoneage, cninja_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(stoneage_s_map)
 
-	MCFG_MACHINE_START(cninja)
-	MCFG_MACHINE_RESET(cninja)
 
 	MCFG_TIMER_ADD("raster_timer", interrupt_gen)
 
@@ -982,7 +976,7 @@ static MACHINE_CONFIG_START( stoneage, cninja_state )
 	MCFG_GFXDECODE(cninja)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(stoneage)
+	MCFG_VIDEO_START_OVERRIDE(cninja_state,stoneage)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
@@ -1021,8 +1015,6 @@ static MACHINE_CONFIG_START( cninjabl, cninja_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(stoneage_s_map)
 
-	MCFG_MACHINE_START(cninja)
-	MCFG_MACHINE_RESET(cninja)
 
 	MCFG_TIMER_ADD("raster_timer", interrupt_gen)
 
@@ -1066,8 +1058,6 @@ static MACHINE_CONFIG_START( edrandy, cninja_state )
 	MCFG_CPU_ADD("audiocpu", H6280,32220000/8)	/* Accurate */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(cninja)
-	MCFG_MACHINE_RESET(cninja)
 
 	MCFG_TIMER_ADD("raster_timer", interrupt_gen)
 
@@ -1120,8 +1110,6 @@ static MACHINE_CONFIG_START( robocop2, cninja_state )
 	MCFG_CPU_ADD("audiocpu", H6280,32220000/8)	/* Accurate */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(cninja)
-	MCFG_MACHINE_RESET(cninja)
 
 	MCFG_TIMER_ADD("raster_timer", interrupt_gen)
 
@@ -1177,8 +1165,6 @@ static MACHINE_CONFIG_START( mutantf, cninja_state )
 	MCFG_CPU_ADD("audiocpu", H6280,32220000/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map_mutantf)
 
-	MCFG_MACHINE_START(cninja)
-	MCFG_MACHINE_RESET(cninja)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1187,7 +1173,7 @@ static MACHINE_CONFIG_START( mutantf, cninja_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(mutantf)
 
-	MCFG_VIDEO_START(mutantf)
+	MCFG_VIDEO_START_OVERRIDE(cninja_state,mutantf)
 
 	MCFG_GFXDECODE(mutantf)
 	MCFG_PALETTE_LENGTH(2048)

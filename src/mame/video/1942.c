@@ -24,9 +24,9 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( 1942 )
+void _1942_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	rgb_t palette[256];
 	int i, colorbase;
 
@@ -63,23 +63,23 @@ PALETTE_INIT( 1942 )
 	/* characters use palette entries 128-143 */
 	colorbase = 0;
 	for (i = 0; i < 64 * 4; i++)
-		palette_set_color(machine, colorbase + i, palette[0x80 | *color_prom++]);
+		palette_set_color(machine(), colorbase + i, palette[0x80 | *color_prom++]);
 	colorbase += 64 * 4;
 
 	/* background tiles use palette entries 0-63 in four banks */
 	for (i = 0; i < 32 * 8; i++)
 	{
-		palette_set_color(machine, colorbase + 0 * 32 * 8 + i, palette[0x00 | *color_prom]);
-		palette_set_color(machine, colorbase + 1 * 32 * 8 + i, palette[0x10 | *color_prom]);
-		palette_set_color(machine, colorbase + 2 * 32 * 8 + i, palette[0x20 | *color_prom]);
-		palette_set_color(machine, colorbase + 3 * 32 * 8 + i, palette[0x30 | *color_prom]);
+		palette_set_color(machine(), colorbase + 0 * 32 * 8 + i, palette[0x00 | *color_prom]);
+		palette_set_color(machine(), colorbase + 1 * 32 * 8 + i, palette[0x10 | *color_prom]);
+		palette_set_color(machine(), colorbase + 2 * 32 * 8 + i, palette[0x20 | *color_prom]);
+		palette_set_color(machine(), colorbase + 3 * 32 * 8 + i, palette[0x30 | *color_prom]);
 		color_prom++;
 	}
 	colorbase += 4 * 32 * 8;
 
 	/* sprites use palette entries 64-79 */
 	for (i = 0; i < 16 * 16; i++)
-		palette_set_color(machine, colorbase + i, palette[0x40 | *color_prom++]);
+		palette_set_color(machine(), colorbase + i, palette[0x40 | *color_prom++]);
 }
 
 
@@ -123,13 +123,12 @@ TILE_GET_INFO_MEMBER(_1942_state::get_bg_tile_info)
   Start the video hardware emulation.
 
 ***************************************************************************/
-VIDEO_START( 1942 )
+void _1942_state::video_start()
 {
-	_1942_state *state = machine.driver_data<_1942_state>();
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(_1942_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(_1942_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 16);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(_1942_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(_1942_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 16);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 

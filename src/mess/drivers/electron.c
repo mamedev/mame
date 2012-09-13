@@ -41,9 +41,9 @@ static const rgb_t electron_palette[8]=
 	MAKE_RGB(0x000,0x000,0x000)
 };
 
-static PALETTE_INIT( electron )
+void electron_state::palette_init()
 {
-	palette_set_colors(machine, 0, electron_palette, ARRAY_LENGTH(electron_palette));
+	palette_set_colors(machine(), 0, electron_palette, ARRAY_LENGTH(electron_palette));
 }
 
 static ADDRESS_MAP_START(electron_mem, AS_PROGRAM, 8, electron_state )
@@ -180,7 +180,6 @@ static MACHINE_CONFIG_START( electron, electron_state )
 	MCFG_CPU_ADD( "maincpu", M6502, 2000000 )
 	MCFG_CPU_PROGRAM_MAP( electron_mem)
 
-	MCFG_MACHINE_START( electron )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( 50.08 )
@@ -189,9 +188,7 @@ static MACHINE_CONFIG_START( electron, electron_state )
 	MCFG_SCREEN_UPDATE_STATIC(electron)
 
 	MCFG_PALETTE_LENGTH( 16 )
-	MCFG_PALETTE_INIT(electron)
 
-	MCFG_VIDEO_START(electron)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )

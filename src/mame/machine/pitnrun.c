@@ -12,12 +12,11 @@
 #include "includes/pitnrun.h"
 
 
-MACHINE_RESET( pitnrun )
+void pitnrun_state::machine_reset()
 {
-	pitnrun_state *state = machine.driver_data<pitnrun_state>();
-	state->m_zaccept = 1;
-	state->m_zready = 0;
-	machine.device("mcu")->execute().set_input_line(0, CLEAR_LINE);
+	m_zaccept = 1;
+	m_zready = 0;
+	machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( pitnrun_mcu_real_data_r )

@@ -91,6 +91,7 @@ public:
 	TILEMAP_MAPPER_MEMBER(bg_scan);
 	TILE_GET_INFO_MEMBER(ac_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(ac_get_tx_tile_info);
+	virtual void video_start();
 };
 
 
@@ -180,15 +181,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 }
 
 
-static VIDEO_START( acommand )
+void acommand_state::video_start()
 {
-	acommand_state *state = machine.driver_data<acommand_state>();
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(acommand_state::ac_get_tx_tile_info),state),TILEMAP_SCAN_COLS,8,8,512,32);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(acommand_state::ac_get_bg_tile_info),state),tilemap_mapper_delegate(FUNC(acommand_state::bg_scan),state),16,16,256,16);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(acommand_state::ac_get_tx_tile_info),this),TILEMAP_SCAN_COLS,8,8,512,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(acommand_state::ac_get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(acommand_state::bg_scan),this),16,16,256,16);
 
-	state->m_ac_vregs = auto_alloc_array(machine, UINT16, 0x80/2);
+	m_ac_vregs = auto_alloc_array(machine(), UINT16, 0x80/2);
 
-	state->m_tx_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(15);
 }
 
 
@@ -614,7 +614,6 @@ static MACHINE_CONFIG_START( acommand, acommand_state )
 	MCFG_GFXDECODE(acommand)
 	MCFG_PALETTE_LENGTH(0x4000)
 
-	MCFG_VIDEO_START(acommand)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

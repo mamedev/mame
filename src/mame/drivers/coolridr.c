@@ -317,17 +317,18 @@ public:
 	DECLARE_READ32_MEMBER(coolridr_hack1_r);
 	DECLARE_READ32_MEMBER(coolridr_hack2_r);
 	DECLARE_DRIVER_INIT(coolridr);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
 
 /* video */
 
-static VIDEO_START(coolridr)
+void coolridr_state::video_start()
 {
-	coolridr_state *state = machine.driver_data<coolridr_state>();
-	machine.primary_screen->register_screen_bitmap(state->m_temp_bitmap_sprites);
-	state->m_test_offs = 0x2000;
+	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites);
+	m_test_offs = 0x2000;
 }
 
 static SCREEN_UPDATE_RGB32(coolridr)
@@ -1155,10 +1156,10 @@ static TIMER_DEVICE_CALLBACK( system_h1_sub )
 	}
 }
 
-static MACHINE_RESET ( coolridr )
+void coolridr_state::machine_reset()
 {
-//  machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	machine.device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+//  machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( coolridr, coolridr_state )
@@ -1183,9 +1184,7 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_SCREEN_UPDATE_STATIC(coolridr)
 
 	MCFG_PALETTE_LENGTH(0x10000)
-	MCFG_MACHINE_RESET(coolridr)
 
-	MCFG_VIDEO_START(coolridr)
 MACHINE_CONFIG_END
 
 ROM_START( coolridr )

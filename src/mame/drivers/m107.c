@@ -40,7 +40,7 @@ confirmed for m107 games as well.
 
 /*****************************************************************************/
 
-static MACHINE_START( m107 )
+void m107_state::machine_start()
 {
 	// TODO: state save registrations
 }
@@ -779,7 +779,6 @@ static MACHINE_CONFIG_START( firebarr, m107_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_CONFIG(firebarr_config)
 
-	MCFG_MACHINE_START(m107)
 
 	MCFG_TIMER_ADD_SCANLINE("scantimer", m107_scanline_interrupt, "screen", 0, 1)
 
@@ -794,7 +793,6 @@ static MACHINE_CONFIG_START( firebarr, m107_state )
 	MCFG_GFXDECODE(firebarr)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(m107)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

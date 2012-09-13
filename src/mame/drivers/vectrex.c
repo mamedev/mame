@@ -108,7 +108,6 @@ static MACHINE_CONFIG_START( vectrex, vectrex_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 299)
 	MCFG_SCREEN_UPDATE_STATIC(vectrex)
 
-	MCFG_VIDEO_START(vectrex)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -206,7 +205,7 @@ static MACHINE_CONFIG_DERIVED( raaspec, vectrex )
 	MCFG_CPU_PROGRAM_MAP(raaspec_map)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_VIDEO_START(raaspec)
+	MCFG_VIDEO_START_OVERRIDE(vectrex_state,raaspec)
 
 	/* via */
 	MCFG_DEVICE_REMOVE("via6522_0")

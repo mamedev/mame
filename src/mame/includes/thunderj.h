@@ -21,10 +21,13 @@ public:
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);
+	DECLARE_MACHINE_START(thunderj);
+	DECLARE_MACHINE_RESET(thunderj);
+	DECLARE_VIDEO_START(thunderj);
 };
 
 
 /*----------- defined in video/thunderj.c -----------*/
 
-VIDEO_START( thunderj );
+
 SCREEN_UPDATE_IND16( thunderj );

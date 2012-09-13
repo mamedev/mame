@@ -51,13 +51,16 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(wolfpack_dial_r);
 	DECLARE_WRITE8_MEMBER(wolfpack_word_w);
 	DECLARE_WRITE8_MEMBER(wolfpack_start_speech_w);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/wolfpack.c -----------*/
 
-PALETTE_INIT( wolfpack );
+
 SCREEN_UPDATE_IND16( wolfpack );
-VIDEO_START( wolfpack );
+
 SCREEN_VBLANK( wolfpack );
 

@@ -105,6 +105,10 @@ public:
 	DECLARE_READ8_MEMBER(psg_4015_r);
 	DECLARE_WRITE8_MEMBER(psg_4015_w);
 	DECLARE_WRITE8_MEMBER(psg_4017_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 /******************************************************
@@ -508,10 +512,10 @@ static const nes_interface famibox_interface_1 =
 	"maincpu"
 };
 
-static PALETTE_INIT( famibox )
+void famibox_state::palette_init()
 {
-	ppu2c0x_device *ppu = machine.device<ppu2c0x_device>("ppu");
-	ppu->init_palette(machine, 0);
+	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
+	ppu->init_palette(machine(), 0);
 }
 
 static void ppu_irq( device_t *device, int *ppu_regs )
@@ -530,7 +534,7 @@ static const ppu2c0x_interface ppu_interface =
 	ppu_irq				/* irq */
 };
 
-static VIDEO_START( famibox )
+void famibox_state::video_start()
 {
 }
 
@@ -546,33 +550,32 @@ static GFXDECODE_START( famibox )
 	/* none, the ppu generates one */
 GFXDECODE_END
 
-static MACHINE_RESET( famibox )
+void famibox_state::machine_reset()
 {
-	famicombox_bankswitch(machine, 0);
+	famicombox_bankswitch(machine(), 0);
 }
 
-static MACHINE_START( famibox )
+void famibox_state::machine_start()
 {
-	famibox_state *state = machine.driver_data<famibox_state>();
-	state->m_nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
-	state->m_nt_page[0] = state->m_nt_ram;
-	state->m_nt_page[1] = state->m_nt_ram + 0x400;
-	state->m_nt_page[2] = state->m_nt_ram + 0x800;
-	state->m_nt_page[3] = state->m_nt_ram + 0xc00;
+	m_nt_ram = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_nt_page[0] = m_nt_ram;
+	m_nt_page[1] = m_nt_ram + 0x400;
+	m_nt_page[2] = m_nt_ram + 0x800;
+	m_nt_page[3] = m_nt_ram + 0xc00;
 
-	machine.device("ppu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(famibox_state::famibox_nt_r), state), write8_delegate(FUNC(famibox_state::famibox_nt_w), state));
-	machine.device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "ppubank1");
+	machine().device("ppu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(famibox_state::famibox_nt_r), this), write8_delegate(FUNC(famibox_state::famibox_nt_w), this));
+	machine().device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "ppubank1");
 
-	famicombox_bankswitch(machine, 0);
+	famicombox_bankswitch(machine(), 0);
 
 
-	state->m_attract_timer = machine.scheduler().timer_alloc(FUNC(famicombox_attract_timer_callback));
-	state->m_gameplay_timer = machine.scheduler().timer_alloc(FUNC(famicombox_gameplay_timer_callback));
-	state->m_exception_cause = 0xff;
-	state->m_exception_mask = 0;
-	state->m_attract_timer_period = 0;
-	state->m_money_reg = 0;
-	state->m_coins = 0;
+	m_attract_timer = machine().scheduler().timer_alloc(FUNC(famicombox_attract_timer_callback));
+	m_gameplay_timer = machine().scheduler().timer_alloc(FUNC(famicombox_gameplay_timer_callback));
+	m_exception_cause = 0xff;
+	m_exception_mask = 0;
+	m_attract_timer_period = 0;
+	m_money_reg = 0;
+	m_coins = 0;
 }
 
 static MACHINE_CONFIG_START( famibox, famibox_state )
@@ -580,8 +583,6 @@ static MACHINE_CONFIG_START( famibox, famibox_state )
 	MCFG_CPU_ADD("maincpu", N2A03, N2A03_DEFAULTCLOCK)
 	MCFG_CPU_PROGRAM_MAP(famibox_map)
 
-	MCFG_MACHINE_START( famibox )
-	MCFG_MACHINE_RESET( famibox )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -593,8 +594,6 @@ static MACHINE_CONFIG_START( famibox, famibox_state )
 	MCFG_GFXDECODE(famibox)
 	MCFG_PALETTE_LENGTH(8*4*16)
 
-	MCFG_PALETTE_INIT(famibox)
-	MCFG_VIDEO_START(famibox)
 
 	MCFG_PPU2C04_ADD("ppu", ppu_interface)
 

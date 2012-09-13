@@ -77,10 +77,11 @@ public:
 	DECLARE_WRITE16_MEMBER(midas_eeprom_w);
 	DECLARE_DRIVER_INIT(livequiz);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void video_start();
 };
 
 
-static VIDEO_START( midas );
+
 static SCREEN_UPDATE_IND16( midas );
 
 
@@ -90,14 +91,13 @@ TILE_GET_INFO_MEMBER(midas_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(1, code & 0xfff, (code >> 12) & 0xf, TILE_FLIPXY( 0 ));
 }
 
-static VIDEO_START( midas )
+void midas_state::video_start()
 {
-	midas_state *state = machine.driver_data<midas_state>();
-	state->m_gfxram = auto_alloc_array(machine, UINT16, 0x20000/2);
+	m_gfxram = auto_alloc_array(machine(), UINT16, 0x20000/2);
 
-	state->m_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(midas_state::get_tile_info),state), TILEMAP_SCAN_COLS,8,8,0x80,0x20);
+	m_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(midas_state::get_tile_info),this), TILEMAP_SCAN_COLS,8,8,0x80,0x20);
 
-	state->m_tmap->set_transparent_pen(0);
+	m_tmap->set_transparent_pen(0);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -716,7 +716,6 @@ static MACHINE_CONFIG_START( livequiz, midas_state )
 	MCFG_GFXDECODE(midas)
 	MCFG_PALETTE_LENGTH(0x10000)
 
-	MCFG_VIDEO_START(midas)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -750,7 +749,6 @@ static MACHINE_CONFIG_START( hammer, midas_state )
 	MCFG_GFXDECODE(midas)
 	MCFG_PALETTE_LENGTH(0x10000)
 
-	MCFG_VIDEO_START(midas)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

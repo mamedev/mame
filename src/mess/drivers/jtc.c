@@ -535,7 +535,7 @@ UINT32 jtces23_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
     return 0;
 }
 
-static PALETTE_INIT( jtc_es40 )
+PALETTE_INIT_MEMBER(jtc_state,jtc_es40)
 {
 }
 
@@ -718,7 +718,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( jtces40, basic, jtces40_state )
 
 	MCFG_GFXDECODE(jtces40)
     MCFG_PALETTE_LENGTH(16)
-    MCFG_PALETTE_INIT(jtc_es40)
+    MCFG_PALETTE_INIT_OVERRIDE(jtc_state,jtc_es40)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

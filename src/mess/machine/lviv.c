@@ -230,32 +230,31 @@ I8255A_INTERFACE( lviv_ppi8255_interface_1 )
 	DEVCB_HANDLER(lviv_ppi_1_portc_w)
 };
 
-MACHINE_RESET( lviv )
+void lviv_state::machine_reset()
 {
-	lviv_state *state = machine.driver_data<lviv_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *mem;
 
-	space->set_direct_update_handler(direct_update_delegate(FUNC(lviv_state::lviv_directoverride), state));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(lviv_state::lviv_directoverride), this));
 
-	state->m_video_ram = machine.device<ram_device>(RAM_TAG)->pointer() + 0xc000;
+	m_video_ram = machine().device<ram_device>(RAM_TAG)->pointer() + 0xc000;
 
-	state->m_startup_mem_map = 1;
+	m_startup_mem_map = 1;
 
 	space->unmap_write(0x0000, 0x3fff);
 	space->unmap_write(0x4000, 0x7fff);
 	space->unmap_write(0x8000, 0xbfff);
 	space->unmap_write(0xC000, 0xffff);
 
-	mem = state->memregion("maincpu")->base();
-	state->membank("bank1")->set_base(mem + 0x010000);
-	state->membank("bank2")->set_base(mem + 0x010000);
-	state->membank("bank3")->set_base(mem + 0x010000);
-	state->membank("bank4")->set_base(mem + 0x010000);
+	mem = memregion("maincpu")->base();
+	membank("bank1")->set_base(mem + 0x010000);
+	membank("bank2")->set_base(mem + 0x010000);
+	membank("bank3")->set_base(mem + 0x010000);
+	membank("bank4")->set_base(mem + 0x010000);
 
-	/*machine.scheduler().timer_pulse(TIME_IN_NSEC(200), FUNC(lviv_draw_pixel));*/
+	/*machine().scheduler().timer_pulse(TIME_IN_NSEC(200), FUNC(lviv_draw_pixel));*/
 
-	/*memset(machine.device<ram_device>(RAM_TAG)->pointer(), 0, sizeof(unsigned char)*0xffff);*/
+	/*memset(machine().device<ram_device>(RAM_TAG)->pointer(), 0, sizeof(unsigned char)*0xffff);*/
 }
 
 

@@ -301,6 +301,11 @@ public:
 	TILE_GET_INFO_MEMBER(get_stisub_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_subsino_reel3_tile_info);
 	TILE_GET_INFO_MEMBER(get_stisub_reel3_tile_info);
+	DECLARE_VIDEO_START(subsino);
+	DECLARE_PALETTE_INIT(subsino_2proms);
+	DECLARE_PALETTE_INIT(subsino_3proms);
+	DECLARE_VIDEO_START(subsino_reels);
+	DECLARE_VIDEO_START(stisub);
 };
 
 
@@ -346,12 +351,11 @@ TILE_GET_INFO_MEMBER(subsino_state::get_stisub_tile_info)
 }
 
 
-static VIDEO_START( subsino )
+VIDEO_START_MEMBER(subsino_state,subsino)
 {
-	subsino_state *state = machine.driver_data<subsino_state>();
-	state->m_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20 );
-	state->m_tmap->set_transparent_pen(0 );
-	state->m_tiles_offset = 0;
+	m_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20 );
+	m_tmap->set_transparent_pen(0 );
+	m_tiles_offset = 0;
 }
 
 
@@ -448,36 +452,34 @@ TILE_GET_INFO_MEMBER(subsino_state::get_stisub_reel3_tile_info)
 }
 
 
-static VIDEO_START( subsino_reels )
+VIDEO_START_MEMBER(subsino_state,subsino_reels)
 {
-	subsino_state *state = machine.driver_data<subsino_state>();
-	VIDEO_START_CALL( subsino );
+	VIDEO_START_CALL_MEMBER( subsino );
 
-	state->m_reel1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_subsino_reel1_tile_info),state),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	state->m_reel2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_subsino_reel2_tile_info),state),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	state->m_reel3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_subsino_reel3_tile_info),state),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_subsino_reel1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_subsino_reel2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_subsino_reel3_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
-	state->m_reel1_tilemap->set_scroll_cols(64);
-	state->m_reel2_tilemap->set_scroll_cols(64);
-	state->m_reel3_tilemap->set_scroll_cols(64);
+	m_reel1_tilemap->set_scroll_cols(64);
+	m_reel2_tilemap->set_scroll_cols(64);
+	m_reel3_tilemap->set_scroll_cols(64);
 
 }
 
-static VIDEO_START( stisub )
+VIDEO_START_MEMBER(subsino_state,stisub)
 {
-	subsino_state *state = machine.driver_data<subsino_state>();
-	state->m_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_stisub_tile_info),state), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20 );
-	state->m_tmap->set_transparent_pen(0 );
+	m_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_stisub_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20 );
+	m_tmap->set_transparent_pen(0 );
 
-	state->m_reel1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_stisub_reel1_tile_info),state),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	state->m_reel2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_stisub_reel2_tile_info),state),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	state->m_reel3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_stisub_reel3_tile_info),state),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_stisub_reel1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_stisub_reel2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_stisub_reel3_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
-	state->m_reel1_tilemap->set_scroll_cols(64);
-	state->m_reel2_tilemap->set_scroll_cols(64);
-	state->m_reel3_tilemap->set_scroll_cols(64);
+	m_reel1_tilemap->set_scroll_cols(64);
+	m_reel2_tilemap->set_scroll_cols(64);
+	m_reel3_tilemap->set_scroll_cols(64);
 
-	state->m_out_c = 0x08;
+	m_out_c = 0x08;
 }
 
 
@@ -557,9 +559,9 @@ static SCREEN_UPDATE_IND16( stisub_reels )
 
 
 
-static PALETTE_INIT( subsino_2proms )
+PALETTE_INIT_MEMBER(subsino_state,subsino_2proms)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 
@@ -580,13 +582,13 @@ static PALETTE_INIT( subsino_2proms )
 		bit2 = (val >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
-static PALETTE_INIT( subsino_3proms )
+PALETTE_INIT_MEMBER(subsino_state,subsino_3proms)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 
@@ -607,7 +609,7 @@ static PALETTE_INIT( subsino_3proms )
 		bit2 = (val >> 0) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -2660,9 +2662,9 @@ static MACHINE_CONFIG_START( victor21, subsino_state )
 	MCFG_GFXDECODE(subsino_depth3)
 
 	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT(subsino_2proms)
+	MCFG_PALETTE_INIT_OVERRIDE(subsino_state,subsino_2proms)
 
-	MCFG_VIDEO_START(subsino)
+	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2700,9 +2702,9 @@ static MACHINE_CONFIG_START( crsbingo, subsino_state )
 	MCFG_GFXDECODE(subsino_depth4)
 
 	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT(subsino_2proms)
+	MCFG_PALETTE_INIT_OVERRIDE(subsino_state,subsino_2proms)
 
-	MCFG_VIDEO_START(subsino)
+	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2729,9 +2731,9 @@ static MACHINE_CONFIG_START( srider, subsino_state )
 	MCFG_GFXDECODE(subsino_depth4)
 
 	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT(subsino_3proms)
+	MCFG_PALETTE_INIT_OVERRIDE(subsino_state,subsino_3proms)
 
-	MCFG_VIDEO_START(subsino)
+	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2768,9 +2770,9 @@ static MACHINE_CONFIG_START( tisub, subsino_state )
 	MCFG_GFXDECODE(subsino_depth4_reels)
 
 	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT(subsino_3proms)
+	MCFG_PALETTE_INIT_OVERRIDE(subsino_state,subsino_3proms)
 
-	MCFG_VIDEO_START(subsino_reels)
+	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino_reels)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2796,9 +2798,9 @@ static MACHINE_CONFIG_START( stisub, subsino_state )
 	MCFG_GFXDECODE(subsino_stisub)
 
 	MCFG_PALETTE_LENGTH(0x100)
-	//MCFG_PALETTE_INIT(subsino_3proms)
+	//MCFG_PALETTE_INIT_OVERRIDE(subsino_state,subsino_3proms)
 
-	MCFG_VIDEO_START(stisub)
+	MCFG_VIDEO_START_OVERRIDE(subsino_state,stisub)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

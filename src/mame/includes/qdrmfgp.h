@@ -33,12 +33,17 @@ public:
 	DECLARE_WRITE16_MEMBER(ide_alt_w);
 	DECLARE_WRITE_LINE_MEMBER(qdrmfgp_irq3_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(qdrmfgp_irq4_ack_w);
+	virtual void machine_reset();
+	DECLARE_MACHINE_START(qdrmfgp);
+	DECLARE_VIDEO_START(qdrmfgp);
+	DECLARE_MACHINE_START(qdrmfgp2);
+	DECLARE_VIDEO_START(qdrmfgp2);
 };
 
 /*----------- defined in video/qdrmfgp.c -----------*/
 
-VIDEO_START( qdrmfgp );
-VIDEO_START( qdrmfgp2 );
+
+
 SCREEN_UPDATE_IND16( qdrmfgp );
 
 void qdrmfgp_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);

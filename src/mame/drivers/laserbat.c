@@ -485,14 +485,13 @@ TILE_GET_INFO_MEMBER(laserbat_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], m_colorram[tile_index] & 0x7f, 0);
 }
 
-static VIDEO_START( laserbat )
+void laserbat_state::video_start()
 {
-	laserbat_state *state = machine.driver_data<laserbat_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(laserbat_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(laserbat_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->save_item(NAME(state->m_videoram));
-	state->save_item(NAME(state->m_colorram));
+	save_item(NAME(m_videoram));
+	save_item(NAME(m_colorram));
 }
 
 static SCREEN_UPDATE_IND16( laserbat )
@@ -686,66 +685,64 @@ static const s2636_interface s2636_3_config =
 	NULL
 };
 
-static MACHINE_START( laserbat )
+void laserbat_state::machine_start()
 {
-	laserbat_state *state = machine.driver_data<laserbat_state>();
 
-	state->m_s2636_1 = machine.device("s2636_1");
-	state->m_s2636_2 = machine.device("s2636_2");
-	state->m_s2636_3 = machine.device("s2636_3");
-	state->m_pia = machine.device<pia6821_device>("pia");
-	state->m_sn = machine.device("snsnd");
-	state->m_tms1 = machine.device("tms1");
-	state->m_tms2 = machine.device("tms2");
-	state->m_ay1 = machine.device("ay1");
-	state->m_ay2 = machine.device("ay2");
+	m_s2636_1 = machine().device("s2636_1");
+	m_s2636_2 = machine().device("s2636_2");
+	m_s2636_3 = machine().device("s2636_3");
+	m_pia = machine().device<pia6821_device>("pia");
+	m_sn = machine().device("snsnd");
+	m_tms1 = machine().device("tms1");
+	m_tms2 = machine().device("tms2");
+	m_ay1 = machine().device("ay1");
+	m_ay2 = machine().device("ay2");
 
-	state->save_item(NAME(state->m_video_page));
-	state->save_item(NAME(state->m_input_mux));
-	state->save_item(NAME(state->m_active_8910));
-	state->save_item(NAME(state->m_port0a));
-	state->save_item(NAME(state->m_last_port0b));
-	state->save_item(NAME(state->m_cb1_toggle));
-	state->save_item(NAME(state->m_sprite_x));
-	state->save_item(NAME(state->m_sprite_y));
-	state->save_item(NAME(state->m_sprite_code));
-	state->save_item(NAME(state->m_sprite_color));
-	state->save_item(NAME(state->m_sprite_enable));
-	state->save_item(NAME(state->m_csound1));
-	state->save_item(NAME(state->m_ksound1));
-	state->save_item(NAME(state->m_ksound2));
-	state->save_item(NAME(state->m_ksound3));
-	state->save_item(NAME(state->m_degr));
-	state->save_item(NAME(state->m_filt));
-	state->save_item(NAME(state->m_a));
-	state->save_item(NAME(state->m_us));
-	state->save_item(NAME(state->m_bit14));
+	save_item(NAME(m_video_page));
+	save_item(NAME(m_input_mux));
+	save_item(NAME(m_active_8910));
+	save_item(NAME(m_port0a));
+	save_item(NAME(m_last_port0b));
+	save_item(NAME(m_cb1_toggle));
+	save_item(NAME(m_sprite_x));
+	save_item(NAME(m_sprite_y));
+	save_item(NAME(m_sprite_code));
+	save_item(NAME(m_sprite_color));
+	save_item(NAME(m_sprite_enable));
+	save_item(NAME(m_csound1));
+	save_item(NAME(m_ksound1));
+	save_item(NAME(m_ksound2));
+	save_item(NAME(m_ksound3));
+	save_item(NAME(m_degr));
+	save_item(NAME(m_filt));
+	save_item(NAME(m_a));
+	save_item(NAME(m_us));
+	save_item(NAME(m_bit14));
 }
 
-static MACHINE_RESET( laserbat )
+void laserbat_state::machine_reset()
 {
-	laserbat_state *state = machine.driver_data<laserbat_state>();
 
-	state->m_video_page = 0;
-	state->m_input_mux = 0;
-	state->m_active_8910 = 0;
-	state->m_port0a = 0;
-	state->m_last_port0b = 0;
-	state->m_cb1_toggle = 0;
-	state->m_sprite_x = 0;
-	state->m_sprite_y = 0;
-	state->m_sprite_code = 0;
-	state->m_sprite_color = 0;
-	state->m_sprite_enable = 0;
-	state->m_csound1 = 0;
-	state->m_ksound1 = 0;
-	state->m_ksound2 = 0;
-	state->m_ksound3 = 0;
-	state->m_degr = 0;
-	state->m_filt = 0;
-	state->m_a = 0;
-	state->m_us = 0;
-	state->m_bit14 = 0;
+	m_video_page = 0;
+	m_input_mux = 0;
+	m_active_8910 = 0;
+	m_port0a = 0;
+	m_last_port0b = 0;
+	m_cb1_toggle = 0;
+	m_sprite_x = 0;
+	m_sprite_y = 0;
+	m_sprite_code = 0;
+	m_sprite_color = 0;
+	m_sprite_enable = 0;
+	m_csound1 = 0;
+	m_ksound1 = 0;
+	m_ksound2 = 0;
+	m_ksound3 = 0;
+	m_degr = 0;
+	m_filt = 0;
+	m_a = 0;
+	m_us = 0;
+	m_bit14 = 0;
 }
 
 static MACHINE_CONFIG_START( laserbat, laserbat_state )
@@ -756,8 +753,6 @@ static MACHINE_CONFIG_START( laserbat, laserbat_state )
 	MCFG_CPU_IO_MAP(laserbat_io_map)
 	MCFG_CPU_VBLANK_INT("screen", laserbat_interrupt)
 
-	MCFG_MACHINE_START(laserbat)
-	MCFG_MACHINE_RESET(laserbat)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -774,7 +769,6 @@ static MACHINE_CONFIG_START( laserbat, laserbat_state )
 	MCFG_S2636_ADD("s2636_2", s2636_2_config)
 	MCFG_S2636_ADD("s2636_3", s2636_3_config)
 
-	MCFG_VIDEO_START(laserbat)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -803,8 +797,6 @@ static MACHINE_CONFIG_START( catnmous, laserbat_state )
 
 	MCFG_PIA6821_ADD("pia", pia_intf)
 
-	MCFG_MACHINE_START(laserbat)
-	MCFG_MACHINE_RESET(laserbat)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -821,7 +813,6 @@ static MACHINE_CONFIG_START( catnmous, laserbat_state )
 	MCFG_S2636_ADD("s2636_2", s2636_2_config)
 	MCFG_S2636_ADD("s2636_3", s2636_3_config)
 
-	MCFG_VIDEO_START(laserbat)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

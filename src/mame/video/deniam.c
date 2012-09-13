@@ -100,15 +100,14 @@ TILE_GET_INFO_MEMBER(deniam_state::get_tx_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( deniam )
+void deniam_state::video_start()
 {
-	deniam_state *state = machine.driver_data<deniam_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(deniam_state::get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(deniam_state::scan_pages),state), 8, 8, 128, 64);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(deniam_state::get_fg_tile_info),state), tilemap_mapper_delegate(FUNC(deniam_state::scan_pages),state), 8, 8, 128, 64);
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(deniam_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deniam_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(deniam_state::scan_pages),this), 8, 8, 128, 64);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deniam_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(deniam_state::scan_pages),this), 8, 8, 128, 64);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deniam_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(0);
-	state->m_tx_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
 }
 
 

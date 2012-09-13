@@ -200,7 +200,7 @@ static MACHINE_CONFIG_START( mikrosha, mikrosha_state )
 	MCFG_CPU_PROGRAM_MAP(mikrosha_mem)
 	MCFG_CPU_IO_MAP(mikrosha_io)
 
-	MCFG_MACHINE_RESET( radio86 )
+	MCFG_MACHINE_RESET_OVERRIDE(mikrosha_state, radio86 )
 
 	MCFG_I8255_ADD( "ppi8255_1", mikrosha_ppi8255_interface_1 )
 
@@ -220,7 +220,7 @@ static MACHINE_CONFIG_START( mikrosha, mikrosha_state )
 
 	MCFG_GFXDECODE(mikrosha)
 	MCFG_PALETTE_LENGTH(3)
-	MCFG_PALETTE_INIT(radio86)
+	MCFG_PALETTE_INIT_OVERRIDE(mikrosha_state,radio86)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)

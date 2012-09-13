@@ -65,18 +65,29 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_grid_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	DECLARE_MACHINE_START(ladybug);
+	DECLARE_VIDEO_START(ladybug);
+	DECLARE_PALETTE_INIT(ladybug);
+	DECLARE_MACHINE_START(sraider);
+	DECLARE_MACHINE_RESET(sraider);
+	DECLARE_VIDEO_START(sraider);
+	DECLARE_PALETTE_INIT(sraider);
+	DECLARE_MACHINE_START(redclash);
+	DECLARE_MACHINE_RESET(redclash);
+	DECLARE_VIDEO_START(redclash);
+	DECLARE_PALETTE_INIT(redclash);
 };
 
 
 /*----------- defined in video/ladybug.c -----------*/
 
 
-PALETTE_INIT( ladybug );
-VIDEO_START( ladybug );
+
+
 SCREEN_UPDATE_IND16( ladybug );
 
-PALETTE_INIT( sraider );
-VIDEO_START( sraider );
+
+
 SCREEN_UPDATE_IND16( sraider );
 SCREEN_VBLANK( sraider );
 
@@ -91,8 +102,8 @@ WRITE8_HANDLER( redclash_star1_w );
 WRITE8_HANDLER( redclash_star2_w );
 WRITE8_HANDLER( redclash_star_reset_w );
 
-PALETTE_INIT( redclash );
-VIDEO_START( redclash );
+
+
 SCREEN_UPDATE_IND16( redclash );
 SCREEN_VBLANK( redclash );
 

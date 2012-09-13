@@ -29,9 +29,9 @@
 
 ***************************************************************************/
 
-PALETTE_INIT( docastle )
+void docastle_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 256; i++)
@@ -57,8 +57,8 @@ PALETTE_INIT( docastle )
 		/* because the graphics are decoded as 4bpp with the top bit used for transparency
            or priority, we create matching 3bpp sets of palette entries, which effectively
            ignores the value of the top bit */
-		palette_set_color(machine, ((i & 0xf8) << 1) | 0x00 | (i & 0x07), MAKE_RGB(r,g,b));
-		palette_set_color(machine, ((i & 0xf8) << 1) | 0x08 | (i & 0x07), MAKE_RGB(r,g,b));
+		palette_set_color(machine(), ((i & 0xf8) << 1) | 0x00 | (i & 0x07), MAKE_RGB(r,g,b));
+		palette_set_color(machine(), ((i & 0xf8) << 1) | 0x08 | (i & 0x07), MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -116,14 +116,14 @@ static void video_start_common( running_machine &machine, UINT32 tile_transmask 
 	state->m_do_tilemap->set_transmask(0, tile_transmask, 0x0000);
 }
 
-VIDEO_START( docastle )
+void docastle_state::video_start()
 {
-	video_start_common(machine, 0x00ff);
+	video_start_common(machine(), 0x00ff);
 }
 
-VIDEO_START( dorunrun )
+VIDEO_START_MEMBER(docastle_state,dorunrun)
 {
-	video_start_common(machine, 0xff00);
+	video_start_common(machine(), 0xff00);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

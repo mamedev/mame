@@ -177,33 +177,31 @@ static const ym3812_interface ym3812_config =
 	irqhandler
 };
 
-static MACHINE_START( hcastle )
+void hcastle_state::machine_start()
 {
-	hcastle_state *state = machine.driver_data<hcastle_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x2000);
+	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x2000);
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_k007121_1 = machine.device("k007121_1");
-	state->m_k007121_2 = machine.device("k007121_2");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_k007121_1 = machine().device("k007121_1");
+	m_k007121_2 = machine().device("k007121_2");
 
-	state->save_item(NAME(state->m_pf2_bankbase));
-	state->save_item(NAME(state->m_pf1_bankbase));
-	state->save_item(NAME(state->m_gfx_bank));
-	state->save_item(NAME(state->m_old_pf1));
-	state->save_item(NAME(state->m_old_pf2));
+	save_item(NAME(m_pf2_bankbase));
+	save_item(NAME(m_pf1_bankbase));
+	save_item(NAME(m_gfx_bank));
+	save_item(NAME(m_old_pf1));
+	save_item(NAME(m_old_pf2));
 }
 
-static MACHINE_RESET( hcastle )
+void hcastle_state::machine_reset()
 {
-	hcastle_state *state = machine.driver_data<hcastle_state>();
 
-	state->m_pf2_bankbase = 0;
-	state->m_pf1_bankbase = 0;
-	state->m_gfx_bank = 0;
-	state->m_old_pf1 = -1;
-	state->m_old_pf2 = -1;
+	m_pf2_bankbase = 0;
+	m_pf1_bankbase = 0;
+	m_gfx_bank = 0;
+	m_old_pf1 = -1;
+	m_old_pf2 = -1;
 }
 
 static MACHINE_CONFIG_START( hcastle, hcastle_state )
@@ -216,8 +214,6 @@ static MACHINE_CONFIG_START( hcastle, hcastle_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(hcastle)
-	MCFG_MACHINE_RESET(hcastle)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -233,8 +229,6 @@ static MACHINE_CONFIG_START( hcastle, hcastle_state )
 	MCFG_GFXDECODE(hcastle)
 	MCFG_PALETTE_LENGTH(2*8*16*16)
 
-	MCFG_PALETTE_INIT(hcastle)
-	MCFG_VIDEO_START(hcastle)
 
 	MCFG_K007121_ADD("k007121_1")
 	MCFG_K007121_ADD("k007121_2")

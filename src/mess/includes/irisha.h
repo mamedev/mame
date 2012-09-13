@@ -43,6 +43,9 @@ public:
 	void update_speaker();
 
 	DECLARE_DRIVER_INIT(irisha);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 

@@ -35,6 +35,9 @@ public:
 	DECLARE_WRITE8_MEMBER(flkatck_k007121_regs_w);
 	TILE_GET_INFO_MEMBER(get_tile_info_A);
 	TILE_GET_INFO_MEMBER(get_tile_info_B);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -44,5 +47,5 @@ public:
 /*----------- defined in video/flkatck.c -----------*/
 
 
-VIDEO_START( flkatck );
+
 SCREEN_UPDATE_IND16( flkatck );

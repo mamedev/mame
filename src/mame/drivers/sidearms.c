@@ -676,7 +676,6 @@ static MACHINE_CONFIG_START( sidearms, sidearms_state )
 	MCFG_GFXDECODE(sidearms)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(sidearms)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -720,7 +719,6 @@ static MACHINE_CONFIG_START( turtship, sidearms_state )
 	MCFG_GFXDECODE(turtship)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(sidearms)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -767,7 +765,6 @@ static MACHINE_CONFIG_START( whizz, sidearms_state )
 	MCFG_GFXDECODE(turtship)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(sidearms)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

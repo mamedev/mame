@@ -29,11 +29,12 @@ public:
 	DECLARE_WRITE16_MEMBER(taotaido_bgvideoram_w);
 	TILE_GET_INFO_MEMBER(taotaido_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(taotaido_tilemap_scan_rows);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/taotaido.c -----------*/
 
-VIDEO_START( taotaido );
+
 SCREEN_UPDATE_IND16( taotaido );
 SCREEN_VBLANK( taotaido );

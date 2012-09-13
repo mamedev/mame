@@ -32,10 +32,9 @@ TILE_GET_INFO_MEMBER(meadows_state::get_tile_info)
  *
  *************************************/
 
-VIDEO_START( meadows )
+void meadows_state::video_start()
 {
-	meadows_state *state = machine.driver_data<meadows_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(meadows_state::get_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 32,30);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(meadows_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,30);
 }
 
 

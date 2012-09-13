@@ -24,6 +24,8 @@ public:
 	DECLARE_READ8_MEMBER(redbaron_joy_r);
 	DECLARE_WRITE8_MEMBER(redbaron_joysound_w);
 	DECLARE_DRIVER_INIT(bradley);
+	virtual void machine_start();
+	DECLARE_MACHINE_START(redbaron);
 };
 
 

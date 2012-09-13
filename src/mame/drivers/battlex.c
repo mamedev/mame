@@ -225,25 +225,23 @@ static const ay8910_interface battlex_ay8910_interface =
 	DEVCB_NULL
 };
 
-static MACHINE_START( battlex )
+void battlex_state::machine_start()
 {
-	battlex_state *state = machine.driver_data<battlex_state>();
 
 	/* register for save states */
-	state->save_item(NAME(state->m_scroll_lsb));
-	state->save_item(NAME(state->m_scroll_msb));
-	state->save_item(NAME(state->m_starfield_enabled));
-	state->save_item(NAME(state->m_in0_b4));
+	save_item(NAME(m_scroll_lsb));
+	save_item(NAME(m_scroll_msb));
+	save_item(NAME(m_starfield_enabled));
+	save_item(NAME(m_in0_b4));
 }
 
-static MACHINE_RESET( battlex )
+void battlex_state::machine_reset()
 {
-	battlex_state *state = machine.driver_data<battlex_state>();
 
-	state->m_scroll_lsb = 0;
-	state->m_scroll_msb = 0;
-	state->m_starfield_enabled = 0;
-	state->m_in0_b4 = 0;
+	m_scroll_lsb = 0;
+	m_scroll_msb = 0;
+	m_starfield_enabled = 0;
+	m_in0_b4 = 0;
 }
 
 static MACHINE_CONFIG_START( battlex, battlex_state )
@@ -254,8 +252,6 @@ static MACHINE_CONFIG_START( battlex, battlex_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_PERIODIC_INT(battlex_interrupt,400)	/* controls game speed? */
 
-	MCFG_MACHINE_START(battlex)
-	MCFG_MACHINE_RESET(battlex)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -267,7 +263,6 @@ static MACHINE_CONFIG_START( battlex, battlex_state )
 
 	MCFG_GFXDECODE(battlex)
 	MCFG_PALETTE_LENGTH(64)
-	MCFG_VIDEO_START(battlex)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

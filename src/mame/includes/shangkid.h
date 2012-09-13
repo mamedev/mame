@@ -26,14 +26,18 @@ public:
 	DECLARE_DRIVER_INIT(shangkid);
 	DECLARE_DRIVER_INIT(chinhero);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	DECLARE_MACHINE_RESET(chinhero);
+	DECLARE_VIDEO_START(shangkid);
+	DECLARE_PALETTE_INIT(dynamski);
+	DECLARE_MACHINE_RESET(shangkid);
 };
 
 
 /*----------- defined in video/shangkid.c -----------*/
 
-VIDEO_START( shangkid );
+
 SCREEN_UPDATE_IND16( shangkid );
 
-PALETTE_INIT( dynamski );
+
 SCREEN_UPDATE_IND16( dynamski );
 

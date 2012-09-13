@@ -45,14 +45,13 @@ TILE_GET_INFO_MEMBER(pushman_state::get_text_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( pushman )
+void pushman_state::video_start()
 {
-	pushman_state *state = machine.driver_data<pushman_state>();
 
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pushman_state::get_back_tile_info),state), tilemap_mapper_delegate(FUNC(pushman_state::background_scan_rows),state), 32, 32, 128, 64);
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pushman_state::get_text_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pushman_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(pushman_state::background_scan_rows),this), 32, 32, 128, 64);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pushman_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	state->m_tx_tilemap->set_transparent_pen(3);
+	m_tx_tilemap->set_transparent_pen(3);
 }
 
 

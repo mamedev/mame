@@ -251,7 +251,6 @@ static MACHINE_CONFIG_START( stadhero, stadhero_state )
 	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
 	deco_mxc06_device::set_gfx_region(*device, 2);
 
-	MCFG_VIDEO_START(stadhero)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

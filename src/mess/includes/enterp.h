@@ -26,13 +26,16 @@ public:
 	struct _NICK_STATE *nick;
 	DECLARE_READ8_MEMBER(exdos_card_r);
 	DECLARE_WRITE8_MEMBER(exdos_card_w);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/epnick.c -----------*/
 
-PALETTE_INIT( epnick );
-VIDEO_START( epnick );
+
+
 SCREEN_UPDATE_IND16( epnick );
 
 WRITE8_HANDLER( epnick_reg_w );

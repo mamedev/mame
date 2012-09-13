@@ -36,6 +36,7 @@ public:
 	required_shared_ptr<UINT8> m_video_ram;
 	required_shared_ptr<UINT8> m_display_ram;
 	UINT16 m_ko;				/* KO lines KO1 - KO14 */
+	virtual void palette_init();
 };
 
 
@@ -185,12 +186,12 @@ static INPUT_PORTS_START( cfx9850 )
 INPUT_PORTS_END
 
 
-static PALETTE_INIT( cfx9850 )
+void cfx9850_state::palette_init()
 {
-	palette_set_color_rgb( machine, 0, 0xff, 0xff, 0xff );
-	palette_set_color_rgb( machine, 1, 0x00, 0x00, 0xff );
-	palette_set_color_rgb( machine, 2, 0x00, 0xff, 0x00 );
-	palette_set_color_rgb( machine, 3, 0xff, 0x00, 0x00 );
+	palette_set_color_rgb( machine(), 0, 0xff, 0xff, 0xff );
+	palette_set_color_rgb( machine(), 1, 0x00, 0x00, 0xff );
+	palette_set_color_rgb( machine(), 2, 0x00, 0xff, 0x00 );
+	palette_set_color_rgb( machine(), 3, 0xff, 0x00, 0x00 );
 }
 
 
@@ -238,7 +239,6 @@ static MACHINE_CONFIG_START( cfx9850, cfx9850_state )
 
 	/* TODO: It uses a color display, but I'm being lazy here. 3 colour lcd */
 	MCFG_PALETTE_LENGTH( 4 )
-	MCFG_PALETTE_INIT( cfx9850 )
 MACHINE_CONFIG_END
 
 

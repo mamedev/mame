@@ -218,6 +218,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tilemap0_tile_info);
 	TILE_GET_INFO_MEMBER(get_tilemap1_tile_info);
 	TILE_GET_INFO_MEMBER(get_tilemap2_tile_info);
+	virtual void video_start();
 };
 
 /* tile format
@@ -270,17 +271,16 @@ TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap2_tile_info)
 			0);
 }
 
-static VIDEO_START( cybertnk )
+void cybertnk_state::video_start()
 {
-	cybertnk_state *state = machine.driver_data<cybertnk_state>();
-	state->m_tilemap0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap0_tile_info),state),TILEMAP_SCAN_ROWS,8,8,128,32);
-	state->m_tilemap0_tilemap->set_transparent_pen(0);
+	m_tilemap0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap0_tilemap->set_transparent_pen(0);
 
-	state->m_tilemap1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap1_tile_info),state),TILEMAP_SCAN_ROWS,8,8,128,32);
-	state->m_tilemap1_tilemap->set_transparent_pen(0);
+	m_tilemap1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap1_tilemap->set_transparent_pen(0);
 
-	state->m_tilemap2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap2_tile_info),state),TILEMAP_SCAN_ROWS,8,8,128,32);
-	state->m_tilemap2_tilemap->set_transparent_pen(0);
+	m_tilemap2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap2_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap2_tilemap->set_transparent_pen(0);
 }
 
 
@@ -858,7 +858,6 @@ static MACHINE_CONFIG_START( cybertnk, cybertnk_state )
 	MCFG_GFXDECODE(cybertnk)
 	MCFG_PALETTE_LENGTH(0x4000)
 
-	MCFG_VIDEO_START(cybertnk)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

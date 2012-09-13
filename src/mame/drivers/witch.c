@@ -237,6 +237,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_gfx0b_tile_info);
 	TILE_GET_INFO_MEMBER(get_gfx0a_tile_info);
 	TILE_GET_INFO_MEMBER(get_gfx1_tile_info);
+	virtual void video_start();
 };
 
 
@@ -702,18 +703,17 @@ static GFXDECODE_START( witch )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-static VIDEO_START(witch)
+void witch_state::video_start()
 {
-	witch_state *state = machine.driver_data<witch_state>();
-	state->m_gfx0a_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(witch_state::get_gfx0a_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
-	state->m_gfx0b_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(witch_state::get_gfx0b_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
-	state->m_gfx1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(witch_state::get_gfx1_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_gfx0a_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(witch_state::get_gfx0a_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_gfx0b_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(witch_state::get_gfx0b_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_gfx1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(witch_state::get_gfx1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	state->m_gfx0a_tilemap->set_transparent_pen(0);
-	state->m_gfx0b_tilemap->set_transparent_pen(0);
-	state->m_gfx0a_tilemap->set_palette_offset(0x100);
-	state->m_gfx0b_tilemap->set_palette_offset(0x100);
-	state->m_gfx1_tilemap->set_palette_offset(0x200);
+	m_gfx0a_tilemap->set_transparent_pen(0);
+	m_gfx0b_tilemap->set_transparent_pen(0);
+	m_gfx0a_tilemap->set_palette_offset(0x100);
+	m_gfx0b_tilemap->set_palette_offset(0x100);
+	m_gfx1_tilemap->set_palette_offset(0x200);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -813,7 +813,6 @@ static MACHINE_CONFIG_START( witch, witch_state )
 	MCFG_GFXDECODE(witch)
 	MCFG_PALETTE_LENGTH(0x800)
 
-	MCFG_VIDEO_START(witch)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

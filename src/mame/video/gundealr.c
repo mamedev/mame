@@ -50,13 +50,12 @@ TILE_GET_INFO_MEMBER(gundealr_state::get_fg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( gundealr )
+void gundealr_state::video_start()
 {
-	gundealr_state *state = machine.driver_data<gundealr_state>();
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gundealr_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gundealr_state::get_fg_tile_info),state), tilemap_mapper_delegate(FUNC(gundealr_state::gundealr_scan),state), 16, 16, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gundealr_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gundealr_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(gundealr_state::gundealr_scan),this), 16, 16, 64, 32);
 
-	state->m_fg_tilemap->set_transparent_pen(15);
+	m_fg_tilemap->set_transparent_pen(15);
 }
 
 

@@ -245,38 +245,36 @@ static const vlm5030_interface vlm5030_config =
 
 
 
-static MACHINE_START( ddribble )
+void ddribble_state::machine_start()
 {
-	ddribble_state *state = machine.driver_data<ddribble_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
-	state->membank("bank1")->configure_entries(0, 5, &ROM[0x10000], 0x2000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 5, &ROM[0x10000], 0x2000);
 
-	state->m_filter1 = machine.device("filter1");
-	state->m_filter2 = machine.device("filter2");
-	state->m_filter3 = machine.device("filter3");
+	m_filter1 = machine().device("filter1");
+	m_filter2 = machine().device("filter2");
+	m_filter3 = machine().device("filter3");
 
-	state->save_item(NAME(state->m_int_enable_0));
-	state->save_item(NAME(state->m_int_enable_1));
-	state->save_item(NAME(state->m_vregs[0]));
-	state->save_item(NAME(state->m_vregs[1]));
-	state->save_item(NAME(state->m_charbank));
+	save_item(NAME(m_int_enable_0));
+	save_item(NAME(m_int_enable_1));
+	save_item(NAME(m_vregs[0]));
+	save_item(NAME(m_vregs[1]));
+	save_item(NAME(m_charbank));
 }
 
-static MACHINE_RESET( ddribble )
+void ddribble_state::machine_reset()
 {
-	ddribble_state *state = machine.driver_data<ddribble_state>();
 	int i;
 
 	for (i = 0; i < 5; i++)
 	{
-		state->m_vregs[0][i] = 0;
-		state->m_vregs[1][i] = 0;
+		m_vregs[0][i] = 0;
+		m_vregs[1][i] = 0;
 	}
 
-	state->m_int_enable_0 = 0;
-	state->m_int_enable_1 = 0;
-	state->m_charbank[0] = 0;
-	state->m_charbank[1] = 0;
+	m_int_enable_0 = 0;
+	m_int_enable_1 = 0;
+	m_charbank[0] = 0;
+	m_charbank[1] = 0;
 }
 
 static MACHINE_CONFIG_START( ddribble, ddribble_state )
@@ -295,8 +293,6 @@ static MACHINE_CONFIG_START( ddribble, ddribble_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* we need heavy synch */
 
-	MCFG_MACHINE_START(ddribble)
-	MCFG_MACHINE_RESET(ddribble)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -311,8 +307,6 @@ static MACHINE_CONFIG_START( ddribble, ddribble_state )
 	MCFG_GFXDECODE(ddribble)
 	MCFG_PALETTE_LENGTH(64 + 256)
 
-	MCFG_PALETTE_INIT(ddribble)
-	MCFG_VIDEO_START(ddribble)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

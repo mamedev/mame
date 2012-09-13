@@ -168,6 +168,9 @@ public:
 	DECLARE_READ8_MEMBER(trackball_r);
 	DECLARE_WRITE8_MEMBER(champbwl_misc_w);
 	DECLARE_WRITE8_MEMBER(doraemon_outputs_w);
+	DECLARE_MACHINE_START(champbwl);
+	DECLARE_MACHINE_RESET(champbwl);
+	DECLARE_MACHINE_START(doraemon);
 };
 
 
@@ -427,27 +430,25 @@ static const x1_010_interface champbwl_sound_intf =
 	0x0000		/* address */
 };
 
-static MACHINE_START( champbwl )
+MACHINE_START_MEMBER(champbwl_state,champbwl)
 {
-	champbwl_state *state = machine.driver_data<champbwl_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->m_mcu = NULL;
+	m_mcu = NULL;
 
-	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
-	state->save_item(NAME(state->m_screenflip));
-	state->save_item(NAME(state->m_last_trackball_val));
+	save_item(NAME(m_screenflip));
+	save_item(NAME(m_last_trackball_val));
 }
 
-static MACHINE_RESET( champbwl )
+MACHINE_RESET_MEMBER(champbwl_state,champbwl)
 {
-	champbwl_state *state = machine.driver_data<champbwl_state>();
 
-	state->m_screenflip = 0;
-	state->m_mcu_type = -1;
-	state->m_last_trackball_val[0] = 0;
-	state->m_last_trackball_val[1] = 0;
+	m_screenflip = 0;
+	m_mcu_type = -1;
+	m_last_trackball_val[0] = 0;
+	m_last_trackball_val[1] = 0;
 
 }
 
@@ -479,8 +480,8 @@ static MACHINE_CONFIG_START( champbwl, champbwl_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_MACHINE_START(champbwl)
-	MCFG_MACHINE_RESET(champbwl)
+	MCFG_MACHINE_START_OVERRIDE(champbwl_state,champbwl)
+	MCFG_MACHINE_RESET_OVERRIDE(champbwl_state,champbwl)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
@@ -496,7 +497,7 @@ static MACHINE_CONFIG_START( champbwl, champbwl_state )
 	MCFG_GFXDECODE(champbwl)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_PALETTE_INIT(arknoid2)
+	MCFG_PALETTE_INIT_OVERRIDE(champbwl_state,arknoid2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -528,10 +529,10 @@ static SCREEN_VBLANK( doraemon )
 		screen.machine().device<seta001_device>("spritegen")->setac_eof();
 }
 
-static MACHINE_START( doraemon )
+MACHINE_START_MEMBER(champbwl_state,doraemon)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	machine.root_device().membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	machine().root_device().membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 }
 
 static MACHINE_CONFIG_START( doraemon, champbwl_state )
@@ -545,7 +546,7 @@ static MACHINE_CONFIG_START( doraemon, champbwl_state )
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 
-	MCFG_MACHINE_START(doraemon)
+	MCFG_MACHINE_START_OVERRIDE(champbwl_state,doraemon)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -559,7 +560,7 @@ static MACHINE_CONFIG_START( doraemon, champbwl_state )
 	MCFG_GFXDECODE(champbwl)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_PALETTE_INIT(arknoid2)
+	MCFG_PALETTE_INIT_OVERRIDE(champbwl_state,arknoid2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -398,15 +398,14 @@ static const ttl74123_interface ic60_intf =
  *
  *************************************/
 
-static MACHINE_START( spiders )
+void spiders_state::machine_start()
 {
-	spiders_state *state = machine.driver_data<spiders_state>();
 	/* setup for save states */
-	state_save_register_global(machine, state->m_flipscreen);
-	state_save_register_global(machine, state->m_gfx_rom_address);
-	state_save_register_global(machine, state->m_gfx_rom_ctrl_mode);
-	state_save_register_global(machine, state->m_gfx_rom_ctrl_latch);
-	state_save_register_global(machine, state->m_gfx_rom_ctrl_data);
+	state_save_register_global(machine(), m_flipscreen);
+	state_save_register_global(machine(), m_gfx_rom_address);
+	state_save_register_global(machine(), m_gfx_rom_ctrl_mode);
+	state_save_register_global(machine(), m_gfx_rom_ctrl_latch);
+	state_save_register_global(machine(), m_gfx_rom_ctrl_data);
 }
 
 
@@ -698,7 +697,6 @@ static MACHINE_CONFIG_START( spiders, spiders_state )
 	MCFG_CPU_ADD("audiocpu", M6802, 3000000)
 	MCFG_CPU_PROGRAM_MAP(spiders_audio_map)
 
-	MCFG_MACHINE_START(spiders)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */

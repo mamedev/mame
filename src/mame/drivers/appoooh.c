@@ -410,25 +410,23 @@ static const sn76496_config psg_intf =
  *
  *************************************/
 
-static MACHINE_START( appoooh )
+void appoooh_state::machine_start()
 {
-	appoooh_state *state = machine.driver_data<appoooh_state>();
 
-	state->m_adpcm = machine.device("msm");
+	m_adpcm = machine().device("msm");
 
-	state->save_item(NAME(state->m_adpcm_data));
-	state->save_item(NAME(state->m_adpcm_address));
+	save_item(NAME(m_adpcm_data));
+	save_item(NAME(m_adpcm_address));
 }
 
 
-static MACHINE_RESET( appoooh )
+void appoooh_state::machine_reset()
 {
-	appoooh_state *state = machine.driver_data<appoooh_state>();
 
-	state->m_adpcm_address = 0xffffffff;
-	state->m_adpcm_data = 0;
-	state->m_scroll_x = 0;
-	state->m_priority = 0;
+	m_adpcm_address = 0xffffffff;
+	m_adpcm_data = 0;
+	m_scroll_x = 0;
+	m_priority = 0;
 }
 
 static INTERRUPT_GEN( vblank_irq )
@@ -447,8 +445,6 @@ static MACHINE_CONFIG_START( appoooh_common, appoooh_state )
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
-	MCFG_MACHINE_START(appoooh)
-	MCFG_MACHINE_RESET(appoooh)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -484,8 +480,8 @@ static MACHINE_CONFIG_DERIVED( appoooh, appoooh_common )
 	MCFG_GFXDECODE(appoooh)
 	MCFG_PALETTE_LENGTH(32*8+32*8)
 
-	MCFG_PALETTE_INIT(appoooh)
-	MCFG_VIDEO_START(appoooh)
+	MCFG_PALETTE_INIT_OVERRIDE(appoooh_state,appoooh)
+	MCFG_VIDEO_START_OVERRIDE(appoooh_state,appoooh)
 MACHINE_CONFIG_END
 
 
@@ -502,8 +498,8 @@ static MACHINE_CONFIG_DERIVED( robowres, appoooh_common )
 	MCFG_GFXDECODE(robowres)
 	MCFG_PALETTE_LENGTH(32*8+32*8)
 
-	MCFG_PALETTE_INIT(robowres)
-	MCFG_VIDEO_START(appoooh)
+	MCFG_PALETTE_INIT_OVERRIDE(appoooh_state,robowres)
+	MCFG_VIDEO_START_OVERRIDE(appoooh_state,appoooh)
 MACHINE_CONFIG_END
 
 /*************************************

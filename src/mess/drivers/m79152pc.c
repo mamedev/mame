@@ -22,6 +22,8 @@ public:
 	UINT8 *m_p_chargen;
 	required_shared_ptr<UINT8> m_p_videoram;
 	required_shared_ptr<UINT8> m_p_attributes;
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 static ADDRESS_MAP_START(m79152pc_mem, AS_PROGRAM, 8, m79152pc_state)
@@ -42,14 +44,13 @@ static INPUT_PORTS_START( m79152pc )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(m79152pc)
+void m79152pc_state::machine_reset()
 {
 }
 
-static VIDEO_START( m79152pc )
+void m79152pc_state::video_start()
 {
-	m79152pc_state *state = machine.driver_data<m79152pc_state>();
-	state->m_p_chargen = state->memregion("chargen")->base()+4;
+	m_p_chargen = memregion("chargen")->base()+4;
 }
 
 static SCREEN_UPDATE_IND16( m79152pc )
@@ -111,7 +112,6 @@ static MACHINE_CONFIG_START( m79152pc, m79152pc_state )
 	MCFG_CPU_PROGRAM_MAP(m79152pc_mem)
 	MCFG_CPU_IO_MAP(m79152pc_io)
 
-	MCFG_MACHINE_RESET(m79152pc)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -119,7 +119,6 @@ static MACHINE_CONFIG_START( m79152pc, m79152pc_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 300-1)
-	MCFG_VIDEO_START(m79152pc)
 	MCFG_SCREEN_UPDATE_STATIC(m79152pc)
 	MCFG_GFXDECODE(m79152pc)
 	MCFG_PALETTE_LENGTH(2)

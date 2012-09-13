@@ -53,6 +53,8 @@ public:
 	DECLARE_WRITE8_MEMBER(concept_fdc_reg_w);
 	DECLARE_READ8_MEMBER(concept_hdc_reg_r);
 	DECLARE_WRITE8_MEMBER(concept_hdc_reg_w);
+	virtual void machine_start();
+	virtual void video_start();
 };
 
 
@@ -61,8 +63,8 @@ public:
 extern const via6522_interface concept_via6522_intf;
 extern const wd17xx_interface concept_wd17xx_interface;
 
-MACHINE_START(concept);
-VIDEO_START(concept);
+
+
 SCREEN_UPDATE_IND16(concept);
 INTERRUPT_GEN( concept_interrupt );
 

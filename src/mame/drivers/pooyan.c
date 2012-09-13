@@ -173,20 +173,18 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_START( pooyan )
+void pooyan_state::machine_start()
 {
-	pooyan_state *state = machine.driver_data<pooyan_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
 
-	state->save_item(NAME(state->m_irq_enable));
+	save_item(NAME(m_irq_enable));
 }
 
 
-static MACHINE_RESET( pooyan )
+void pooyan_state::machine_reset()
 {
-	pooyan_state *state = machine.driver_data<pooyan_state>();
-	state->m_irq_enable = 0;
+	m_irq_enable = 0;
 }
 
 
@@ -197,8 +195,6 @@ static MACHINE_CONFIG_START( pooyan, pooyan_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", pooyan_interrupt)
 
-	MCFG_MACHINE_START(pooyan)
-	MCFG_MACHINE_RESET(pooyan)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -210,8 +206,6 @@ static MACHINE_CONFIG_START( pooyan, pooyan_state )
 	MCFG_GFXDECODE(pooyan)
 	MCFG_PALETTE_LENGTH(16*16+16*16)
 
-	MCFG_PALETTE_INIT(pooyan)
-	MCFG_VIDEO_START(pooyan)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(timeplt_sound)

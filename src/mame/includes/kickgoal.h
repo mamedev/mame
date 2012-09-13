@@ -70,12 +70,16 @@ public:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_kicksbg);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_kicksbg2);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_actionhwbg2);
+	virtual void machine_start();
+	virtual void machine_reset();
+	DECLARE_VIDEO_START(kickgoal);
+	DECLARE_VIDEO_START(actionhw);
 };
 
 
 /*----------- defined in video/kickgoal.c -----------*/
 
-VIDEO_START( actionhw );
-VIDEO_START( kickgoal );
+
+
 SCREEN_UPDATE_IND16( kickgoal );
 

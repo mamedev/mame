@@ -296,7 +296,6 @@ static MACHINE_CONFIG_START( silkroad, silkroad_state )
 	MCFG_GFXDECODE(silkroad)
 	MCFG_PALETTE_LENGTH(0x2000)
 
-	MCFG_VIDEO_START(silkroad)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

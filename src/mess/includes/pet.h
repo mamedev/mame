@@ -52,6 +52,9 @@ public:
 	DECLARE_DRIVER_INIT(pet80);
 	DECLARE_DRIVER_INIT(pet);
 	DECLARE_DRIVER_INIT(pet2001);
+	virtual void machine_reset();
+	virtual void palette_init();
+	DECLARE_VIDEO_START(pet_crtc);
 };
 
 /*----------- defined in video/pet.c -----------*/
@@ -78,7 +81,7 @@ WRITE8_HANDLER(cbm8096_w);
 extern READ8_HANDLER(superpet_r);
 extern WRITE8_HANDLER(superpet_w);
 
-MACHINE_RESET( pet );
+
 INTERRUPT_GEN( pet_frame_interrupt );
 
 MACHINE_CONFIG_EXTERN( pet_cartslot );

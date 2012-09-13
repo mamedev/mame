@@ -32,11 +32,14 @@ public:
 	DECLARE_WRITE8_MEMBER(cheekyms_port_80_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	TILE_GET_INFO_MEMBER(cheekyms_get_tile_info);
+	virtual void machine_start();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/cheekyms.c -----------*/
 
-PALETTE_INIT( cheekyms );
-VIDEO_START( cheekyms );
+
+
 SCREEN_UPDATE_IND16( cheekyms );

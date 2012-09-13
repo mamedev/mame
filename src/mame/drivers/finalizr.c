@@ -252,28 +252,26 @@ static const sn76496_config psg_intf =
 };
 
 
-static MACHINE_START( finalizr )
+void finalizr_state::machine_start()
 {
-	finalizr_state *state = machine.driver_data<finalizr_state>();
 
-	state->m_audio_cpu = machine.device("audiocpu");
+	m_audio_cpu = machine().device("audiocpu");
 
-	state->save_item(NAME(state->m_spriterambank));
-	state->save_item(NAME(state->m_charbank));
-	state->save_item(NAME(state->m_T1_line));
-	state->save_item(NAME(state->m_nmi_enable));
-	state->save_item(NAME(state->m_irq_enable));
+	save_item(NAME(m_spriterambank));
+	save_item(NAME(m_charbank));
+	save_item(NAME(m_T1_line));
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_irq_enable));
 }
 
-static MACHINE_RESET( finalizr )
+void finalizr_state::machine_reset()
 {
-	finalizr_state *state = machine.driver_data<finalizr_state>();
 
-	state->m_spriterambank = 0;
-	state->m_charbank = 0;
-	state->m_T1_line = 0;
-	state->m_nmi_enable = 0;
-	state->m_irq_enable = 0;
+	m_spriterambank = 0;
+	m_charbank = 0;
+	m_T1_line = 0;
+	m_nmi_enable = 0;
+	m_irq_enable = 0;
 }
 
 static MACHINE_CONFIG_START( finalizr, finalizr_state )
@@ -287,8 +285,6 @@ static MACHINE_CONFIG_START( finalizr, finalizr_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
-	MCFG_MACHINE_START(finalizr)
-	MCFG_MACHINE_RESET(finalizr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -301,8 +297,6 @@ static MACHINE_CONFIG_START( finalizr, finalizr_state )
 	MCFG_GFXDECODE(finalizr)
 	MCFG_PALETTE_LENGTH(2*16*16)
 
-	MCFG_PALETTE_INIT(finalizr)
-	MCFG_VIDEO_START(finalizr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

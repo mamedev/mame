@@ -70,6 +70,7 @@ private:
 	static const device_timer_id SYSTEM_TIMER = 0;
 	static const device_timer_id SERIAL_TIMER = 1;
 	UINT8 m_timer_bit;
+	virtual void palette_init();
 };
 
 static TIMER_CALLBACK( alphatro_beepoff )
@@ -363,19 +364,19 @@ void alphatro_state::machine_reset()
 	beep_set_frequency(m_beep, 950);	/* piezo-device needs to be measured */
 }
 
-static PALETTE_INIT( alphatro )
+void alphatro_state::palette_init()
 {
 	// RGB colours
-	palette_set_color_rgb(machine, 0, 0x00, 0x00, 0x00);
-	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0xff);
-	palette_set_color_rgb(machine, 2, 0xff, 0x00, 0x00);
-	palette_set_color_rgb(machine, 3, 0xff, 0x00, 0xff);
-	palette_set_color_rgb(machine, 4, 0x00, 0xff, 0x00);
-	palette_set_color_rgb(machine, 5, 0x00, 0xff, 0xff);
-	palette_set_color_rgb(machine, 6, 0xff, 0xff, 0x00);
-	palette_set_color_rgb(machine, 7, 0xff, 0xff, 0xff);
+	palette_set_color_rgb(machine(), 0, 0x00, 0x00, 0x00);
+	palette_set_color_rgb(machine(), 1, 0x00, 0x00, 0xff);
+	palette_set_color_rgb(machine(), 2, 0xff, 0x00, 0x00);
+	palette_set_color_rgb(machine(), 3, 0xff, 0x00, 0xff);
+	palette_set_color_rgb(machine(), 4, 0x00, 0xff, 0x00);
+	palette_set_color_rgb(machine(), 5, 0x00, 0xff, 0xff);
+	palette_set_color_rgb(machine(), 6, 0xff, 0xff, 0x00);
+	palette_set_color_rgb(machine(), 7, 0xff, 0xff, 0xff);
 	// Amber
-	palette_set_color_rgb(machine, 8, 0xf7, 0xaa, 0x00);
+	palette_set_color_rgb(machine(), 8, 0xf7, 0xaa, 0x00);
 }
 
 static const mc6845_interface alphatro_crtc6845_interface =
@@ -430,7 +431,6 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_GFXDECODE(alphatro)
-	MCFG_PALETTE_INIT(alphatro)
 	MCFG_PALETTE_LENGTH(9) // 8 colours + amber
 
 	/* sound hardware */

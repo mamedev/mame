@@ -220,31 +220,30 @@ static void create_tilemaps(running_machine &machine);
 
 
 
-VIDEO_START( megasys1 )
+VIDEO_START_MEMBER(megasys1_state,megasys1)
 {
-	megasys1_state *state = machine.driver_data<megasys1_state>();
 	int i;
 
-	state->m_spriteram = &state->m_ram[0x8000/2];
+	m_spriteram = &m_ram[0x8000/2];
 
-	state->m_buffer_objectram = auto_alloc_array(machine, UINT16, 0x2000);
-	state->m_buffer_spriteram16 = auto_alloc_array(machine, UINT16, 0x2000);
-	state->m_buffer2_objectram = auto_alloc_array(machine, UINT16, 0x2000);
-	state->m_buffer2_spriteram16 = auto_alloc_array(machine, UINT16, 0x2000);
+	m_buffer_objectram = auto_alloc_array(machine(), UINT16, 0x2000);
+	m_buffer_spriteram16 = auto_alloc_array(machine(), UINT16, 0x2000);
+	m_buffer2_objectram = auto_alloc_array(machine(), UINT16, 0x2000);
+	m_buffer2_spriteram16 = auto_alloc_array(machine(), UINT16, 0x2000);
 
-	create_tilemaps(machine);
-	state->m_tmap[0] = state->m_tilemap[0][0][0];
-	state->m_tmap[1] = state->m_tilemap[1][0][0];
-	state->m_tmap[2] = state->m_tilemap[2][0][0];
+	create_tilemaps(machine());
+	m_tmap[0] = m_tilemap[0][0][0];
+	m_tmap[1] = m_tilemap[1][0][0];
+	m_tmap[2] = m_tilemap[2][0][0];
 
-	state->m_active_layers = state->m_sprite_bank = state->m_screen_flag = state->m_sprite_flag = 0;
+	m_active_layers = m_sprite_bank = m_screen_flag = m_sprite_flag = 0;
 
 	for (i = 0; i < 3; i ++)
 	{
-		state->m_scroll_flag[i] = state->m_scrollx[i] = state->m_scrolly[i] = 0;
+		m_scroll_flag[i] = m_scrollx[i] = m_scrolly[i] = 0;
 	}
 
-	state->m_bits_per_color_code = 4;
+	m_bits_per_color_code = 4;
 
 /*
     The tile code of a specific layer is multiplied for a constant
@@ -263,19 +262,19 @@ VIDEO_START( megasys1 )
     for each layer and hardwired to 1x or 4x for both tile sizes
 */
 
-	state->m_8x8_scroll_factor[0] = 1;	state->m_16x16_scroll_factor[0] = 4;
-	state->m_8x8_scroll_factor[1] = 1;	state->m_16x16_scroll_factor[1] = 4;
-	state->m_8x8_scroll_factor[2] = 1;	state->m_16x16_scroll_factor[2] = 4;
+	m_8x8_scroll_factor[0] = 1;	m_16x16_scroll_factor[0] = 4;
+	m_8x8_scroll_factor[1] = 1;	m_16x16_scroll_factor[1] = 4;
+	m_8x8_scroll_factor[2] = 1;	m_16x16_scroll_factor[2] = 4;
 
-	if (strcmp(machine.system().name, "soldamj") == 0)
+	if (strcmp(machine().system().name, "soldamj") == 0)
 	{
-		state->m_8x8_scroll_factor[1] = 4;	state->m_16x16_scroll_factor[1] = 4;
+		m_8x8_scroll_factor[1] = 4;	m_16x16_scroll_factor[1] = 4;
 	}
 
-	state->m_hardware_type_z = 0;
-	if (strcmp(machine.system().name, "lomakai") == 0 ||
-		strcmp(machine.system().name, "makaiden") == 0)
-		state->m_hardware_type_z = 1;
+	m_hardware_type_z = 0;
+	if (strcmp(machine().system().name, "lomakai") == 0 ||
+		strcmp(machine().system().name, "makaiden") == 0)
+		m_hardware_type_z = 1;
 }
 
 /***************************************************************************
@@ -749,10 +748,9 @@ static const struct priority priorities[] =
     pens.
 */
 
-PALETTE_INIT( megasys1 )
+PALETTE_INIT_MEMBER(megasys1_state,megasys1)
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	megasys1_state *state = machine.driver_data<megasys1_state>();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int pri_code, offset, i, order;
 
 	/* First check if we have an hand-crafted priority scheme
@@ -761,13 +759,13 @@ PALETTE_INIT( megasys1 )
 
 	i = 0;
 	while (	priorities[i].driver &&
-			strcmp(priorities[i].driver, machine.system().name) != 0 &&
-			strcmp(priorities[i].driver, machine.system().parent) != 0)
+			strcmp(priorities[i].driver, machine().system().name) != 0 &&
+			strcmp(priorities[i].driver, machine().system().parent) != 0)
 		i++;
 
 	if (priorities[i].driver)
 	{
-		memcpy (state->m_layers_order, priorities[i].priorities, 16 * sizeof(int));
+		memcpy (m_layers_order, priorities[i].priorities, 16 * sizeof(int));
 
 		logerror("WARNING: using an hand-crafted priorities scheme\n");
 
@@ -895,7 +893,7 @@ PALETTE_INIT( megasys1 )
 
 		}	// merging
 
-		state->m_layers_order[pri_code] = order & 0xfffff;	// at last!
+		m_layers_order[pri_code] = order & 0xfffff;	// at last!
 
 	}	// pri_code
 
@@ -904,7 +902,7 @@ PALETTE_INIT( megasys1 )
 #if 0
 	/* log the priority schemes */
 	for (i = 0; i < 16; i++)
-		logerror("PROM %X] %05x\n", i, state->m_layers_order[i]);
+		logerror("PROM %X] %05x\n", i, m_layers_order[i]);
 #endif
 
 

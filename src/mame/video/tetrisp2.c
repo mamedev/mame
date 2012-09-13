@@ -234,63 +234,59 @@ WRITE16_MEMBER(tetrisp2_state::rocknms_sub_vram_rot_w)
 
 
 
-VIDEO_START( tetrisp2 )
+VIDEO_START_MEMBER(tetrisp2_state,tetrisp2)
 {
-	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
-	state->m_flipscreen_old = -1;
+	m_flipscreen_old = -1;
 
-	state->m_tilemap_bg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_bg),state),TILEMAP_SCAN_ROWS,16,16,NX_0,NY_0);
-	state->m_tilemap_fg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_fg),state),TILEMAP_SCAN_ROWS,8,8,NX_1,NY_1);
-	state->m_tilemap_rot = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rot),state),TILEMAP_SCAN_ROWS,16,16,NX_0*2,NY_0*2);
-	state->m_tilemap_bg->set_transparent_pen(0);
-	state->m_tilemap_fg->set_transparent_pen(0);
-	state->m_tilemap_rot->set_transparent_pen(0);
+	m_tilemap_bg = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_bg),this),TILEMAP_SCAN_ROWS,16,16,NX_0,NY_0);
+	m_tilemap_fg = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_fg),this),TILEMAP_SCAN_ROWS,8,8,NX_1,NY_1);
+	m_tilemap_rot = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rot),this),TILEMAP_SCAN_ROWS,16,16,NX_0*2,NY_0*2);
+	m_tilemap_bg->set_transparent_pen(0);
+	m_tilemap_fg->set_transparent_pen(0);
+	m_tilemap_rot->set_transparent_pen(0);
 
 	// should be smaller and mirrored like m32 I guess
-	state->m_priority = auto_alloc_array(machine, UINT8, 0x40000);
-	ms32_rearrange_sprites(machine, "gfx1");
+	m_priority = auto_alloc_array(machine(), UINT8, 0x40000);
+	ms32_rearrange_sprites(machine(), "gfx1");
 }
 
-VIDEO_START( nndmseal )
+VIDEO_START_MEMBER(tetrisp2_state,nndmseal)
 {
-	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
-	VIDEO_START_CALL( tetrisp2 );
-	state->m_tilemap_bg->set_scrolldx(-4,-4);
+	VIDEO_START_CALL_MEMBER( tetrisp2 );
+	m_tilemap_bg->set_scrolldx(-4,-4);
 }
 
-VIDEO_START( rockntread )
+VIDEO_START_MEMBER(tetrisp2_state,rockntread)
 {
-	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
-	state->m_flipscreen_old = -1;
+	m_flipscreen_old = -1;
 
-	state->m_tilemap_bg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_bg),state),TILEMAP_SCAN_ROWS,16, 16, 256, 16);	// rockn ms(main),1,2,3,4
-	state->m_tilemap_fg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_fg),state),TILEMAP_SCAN_ROWS,8, 8, 64, 64);
-	state->m_tilemap_rot = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rot),state),TILEMAP_SCAN_ROWS,16, 16, 128, 128);
+	m_tilemap_bg = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_bg),this),TILEMAP_SCAN_ROWS,16, 16, 256, 16);	// rockn ms(main),1,2,3,4
+	m_tilemap_fg = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_fg),this),TILEMAP_SCAN_ROWS,8, 8, 64, 64);
+	m_tilemap_rot = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rot),this),TILEMAP_SCAN_ROWS,16, 16, 128, 128);
 
-	state->m_tilemap_bg->set_transparent_pen(0);
-	state->m_tilemap_fg->set_transparent_pen(0);
-	state->m_tilemap_rot->set_transparent_pen(0);
+	m_tilemap_bg->set_transparent_pen(0);
+	m_tilemap_fg->set_transparent_pen(0);
+	m_tilemap_rot->set_transparent_pen(0);
 
 	// should be smaller and mirrored like m32 I guess
-	state->m_priority = auto_alloc_array(machine, UINT8, 0x40000);
-	ms32_rearrange_sprites(machine, "gfx1");
+	m_priority = auto_alloc_array(machine(), UINT8, 0x40000);
+	ms32_rearrange_sprites(machine(), "gfx1");
 }
 
 
-VIDEO_START( rocknms )
+VIDEO_START_MEMBER(tetrisp2_state,rocknms)
 {
-	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
-	VIDEO_START_CALL( rockntread );
+	VIDEO_START_CALL_MEMBER( rockntread );
 
-	state->m_tilemap_sub_bg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rocknms_sub_bg),state),TILEMAP_SCAN_ROWS,16, 16, 32, 256);	// rockn ms(sub)
-	state->m_tilemap_sub_fg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rocknms_sub_fg),state),TILEMAP_SCAN_ROWS,8, 8, 64, 64);
-	state->m_tilemap_sub_rot = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rocknms_sub_rot),state),TILEMAP_SCAN_ROWS,16, 16, 128, 128);
+	m_tilemap_sub_bg = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rocknms_sub_bg),this),TILEMAP_SCAN_ROWS,16, 16, 32, 256);	// rockn ms(sub)
+	m_tilemap_sub_fg = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rocknms_sub_fg),this),TILEMAP_SCAN_ROWS,8, 8, 64, 64);
+	m_tilemap_sub_rot = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rocknms_sub_rot),this),TILEMAP_SCAN_ROWS,16, 16, 128, 128);
 
-	state->m_tilemap_sub_bg->set_transparent_pen(0);
-	state->m_tilemap_sub_fg->set_transparent_pen(0);
-	state->m_tilemap_sub_rot->set_transparent_pen(0);
+	m_tilemap_sub_bg->set_transparent_pen(0);
+	m_tilemap_sub_fg->set_transparent_pen(0);
+	m_tilemap_sub_rot->set_transparent_pen(0);
 
-	ms32_rearrange_sprites(machine, "gfx5");
+	ms32_rearrange_sprites(machine(), "gfx5");
 }
 
 
@@ -746,24 +742,23 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::stepstag_get_tile_info_fg)
 			0);
 }
 
-VIDEO_START( stepstag )
+VIDEO_START_MEMBER(stepstag_state,stepstag)
 {
-	stepstag_state *state = machine.driver_data<stepstag_state>();
-	state->m_flipscreen_old = -1;
+	m_flipscreen_old = -1;
 
-	state->m_tilemap_bg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_bg),state),TILEMAP_SCAN_ROWS,16,16,NX_0,NY_0);
+	m_tilemap_bg = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_bg),this),TILEMAP_SCAN_ROWS,16,16,NX_0,NY_0);
 	// Temporary hack
-	state->m_tilemap_fg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::stepstag_get_tile_info_fg),state),TILEMAP_SCAN_ROWS,8,8,NX_1,NY_1);
-	state->m_tilemap_rot = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rot),state),TILEMAP_SCAN_ROWS,16,16,NX_0*2,NY_0*2);
-	state->m_tilemap_bg->set_transparent_pen(0);
-	state->m_tilemap_fg->set_transparent_pen(0);
-	state->m_tilemap_rot->set_transparent_pen(0);
+	m_tilemap_fg = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::stepstag_get_tile_info_fg),this),TILEMAP_SCAN_ROWS,8,8,NX_1,NY_1);
+	m_tilemap_rot = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rot),this),TILEMAP_SCAN_ROWS,16,16,NX_0*2,NY_0*2);
+	m_tilemap_bg->set_transparent_pen(0);
+	m_tilemap_fg->set_transparent_pen(0);
+	m_tilemap_rot->set_transparent_pen(0);
 
 	// should be smaller and mirrored like m32 I guess
-	state->m_priority = auto_alloc_array(machine, UINT8, 0x40000);
+	m_priority = auto_alloc_array(machine(), UINT8, 0x40000);
 
-	ms32_rearrange_sprites(machine, "sprites_horiz");
-	ms32_rearrange_sprites(machine, "sprites_vert");
+	ms32_rearrange_sprites(machine(), "sprites_horiz");
+	ms32_rearrange_sprites(machine(), "sprites_vert");
 }
 
 SCREEN_UPDATE_IND16( stepstag_left )

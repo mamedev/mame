@@ -11,7 +11,7 @@
 #include "includes/pp01.h"
 #include "machine/ram.h"
 
-VIDEO_START( pp01 )
+void pp01_state::video_start()
 {
 }
 
@@ -51,7 +51,7 @@ static const rgb_t pp01_palette[8] = {
 	MAKE_RGB(0x80, 0x80, 0x80), // 7
 };
 
-PALETTE_INIT( pp01 )
+void pp01_state::palette_init()
 {
-	palette_set_colors(machine, 0, pp01_palette, ARRAY_LENGTH(pp01_palette));
+	palette_set_colors(machine(), 0, pp01_palette, ARRAY_LENGTH(pp01_palette));
 }

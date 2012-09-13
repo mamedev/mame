@@ -221,28 +221,26 @@ static const k007420_interface bladestl_k007420_intf =
 };
 
 
-static MACHINE_START( battlnts )
+void battlnts_state::machine_start()
 {
-	battlnts_state *state = machine.driver_data<battlnts_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_k007342 = machine.device("k007342");
-	state->m_k007420 = machine.device("k007420");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_k007342 = machine().device("k007342");
+	m_k007420 = machine().device("k007420");
 
-	state->save_item(NAME(state->m_spritebank));
-	state->save_item(NAME(state->m_layer_colorbase));
+	save_item(NAME(m_spritebank));
+	save_item(NAME(m_layer_colorbase));
 }
 
-static MACHINE_RESET( battlnts )
+void battlnts_state::machine_reset()
 {
-	battlnts_state *state = machine.driver_data<battlnts_state>();
 
-	state->m_layer_colorbase[0] = 0;
-	state->m_layer_colorbase[1] = 0;
-	state->m_spritebank = 0;
+	m_layer_colorbase[0] = 0;
+	m_layer_colorbase[1] = 0;
+	m_spritebank = 0;
 }
 
 static MACHINE_CONFIG_START( battlnts, battlnts_state )
@@ -255,8 +253,6 @@ static MACHINE_CONFIG_START( battlnts, battlnts_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz / 6 /* 3579545? */)
 	MCFG_CPU_PROGRAM_MAP(battlnts_sound_map)
 
-	MCFG_MACHINE_START(battlnts)
-	MCFG_MACHINE_RESET(battlnts)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

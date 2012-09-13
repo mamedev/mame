@@ -379,6 +379,8 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(missile_direct_handler);
 	DECLARE_DRIVER_INIT(missilem);
 	DECLARE_DRIVER_INIT(suprmatk);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -507,41 +509,39 @@ DIRECT_UPDATE_MEMBER(missile_state::missile_direct_handler)
 }
 
 
-static MACHINE_START( missile )
+void missile_state::machine_start()
 {
-	missile_state *state = machine.driver_data<missile_state>();
 
 	/* initialize globals */
-	state->m_writeprom = state->memregion("proms")->base();
-	state->m_flipscreen = 0;
+	m_writeprom = memregion("proms")->base();
+	m_flipscreen = 0;
 
 	/* set up an opcode base handler since we use mapped handlers for RAM */
-	address_space *space = state->m_maincpu->space(AS_PROGRAM);
-	space->set_direct_update_handler(direct_update_delegate(FUNC(missile_state::missile_direct_handler), state));
+	address_space *space = m_maincpu->space(AS_PROGRAM);
+	space->set_direct_update_handler(direct_update_delegate(FUNC(missile_state::missile_direct_handler), this));
 
 	/* create a timer to speed/slow the CPU */
-	state->m_cpu_timer = machine.scheduler().timer_alloc(FUNC(adjust_cpu_speed));
-	state->m_cpu_timer->adjust(machine.primary_screen->time_until_pos(v_to_scanline(state, 0), 0));
+	m_cpu_timer = machine().scheduler().timer_alloc(FUNC(adjust_cpu_speed));
+	m_cpu_timer->adjust(machine().primary_screen->time_until_pos(v_to_scanline(this, 0), 0));
 
 	/* create a timer for IRQs and set up the first callback */
-	state->m_irq_timer = machine.scheduler().timer_alloc(FUNC(clock_irq));
-	state->m_irq_state = 0;
-	schedule_next_irq(machine, -32);
+	m_irq_timer = machine().scheduler().timer_alloc(FUNC(clock_irq));
+	m_irq_state = 0;
+	schedule_next_irq(machine(), -32);
 
 	/* setup for save states */
-	state->save_item(NAME(state->m_irq_state));
-	state->save_item(NAME(state->m_ctrld));
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_madsel_delay));
-	state->save_item(NAME(state->m_madsel_lastpc));
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_ctrld));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_madsel_delay));
+	save_item(NAME(m_madsel_lastpc));
 }
 
 
-static MACHINE_RESET( missile )
+void missile_state::machine_reset()
 {
-	missile_state *state = machine.driver_data<missile_state>();
-	state->m_maincpu->set_input_line(0, CLEAR_LINE);
-	state->m_irq_state = 0;
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_irq_state = 0;
 }
 
 
@@ -1037,8 +1037,6 @@ static MACHINE_CONFIG_START( missile, missile_state )
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_START(missile)
-	MCFG_MACHINE_RESET(missile)
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
 	/* video hardware */

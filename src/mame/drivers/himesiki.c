@@ -266,26 +266,24 @@ static GFXDECODE_START( himesiki )
 GFXDECODE_END
 
 
-static MACHINE_START( himesiki )
+void himesiki_state::machine_start()
 {
-	himesiki_state *state = machine.driver_data<himesiki_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
-	state->m_subcpu = machine.device<cpu_device>("sub");
+	m_subcpu = machine().device<cpu_device>("sub");
 
-	state->save_item(NAME(state->m_scrollx));
-	state->save_item(NAME(state->m_flipscreen));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_flipscreen));
 }
 
-static MACHINE_RESET( himesiki )
+void himesiki_state::machine_reset()
 {
-	himesiki_state *state = machine.driver_data<himesiki_state>();
 
-	state->m_scrollx[0] = 0;
-	state->m_scrollx[1] = 0;
-	state->m_flipscreen = 0;
+	m_scrollx[0] = 0;
+	m_scrollx[1] = 0;
+	m_flipscreen = 0;
 }
 
 static MACHINE_CONFIG_START( himesiki, himesiki_state )
@@ -300,8 +298,6 @@ static MACHINE_CONFIG_START( himesiki, himesiki_state )
 	MCFG_CPU_PROGRAM_MAP(himesiki_prm1)
 	MCFG_CPU_IO_MAP(himesiki_iom1)
 
-	MCFG_MACHINE_START(himesiki)
-	MCFG_MACHINE_RESET(himesiki)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -314,7 +310,6 @@ static MACHINE_CONFIG_START( himesiki, himesiki_state )
 	MCFG_GFXDECODE(himesiki)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_VIDEO_START(himesiki)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

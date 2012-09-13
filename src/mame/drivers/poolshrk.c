@@ -202,12 +202,12 @@ static GFXDECODE_START( poolshrk )
 GFXDECODE_END
 
 
-static PALETTE_INIT( poolshrk )
+void poolshrk_state::palette_init()
 {
-	palette_set_color(machine,0,MAKE_RGB(0x7F, 0x7F, 0x7F));
-	palette_set_color(machine,1,MAKE_RGB(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine,2,MAKE_RGB(0x7F, 0x7F, 0x7F));
-	palette_set_color(machine,3,MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine(),0,MAKE_RGB(0x7F, 0x7F, 0x7F));
+	palette_set_color(machine(),1,MAKE_RGB(0xFF, 0xFF, 0xFF));
+	palette_set_color(machine(),2,MAKE_RGB(0x7F, 0x7F, 0x7F));
+	palette_set_color(machine(),3,MAKE_RGB(0x00, 0x00, 0x00));
 }
 
 
@@ -227,8 +227,6 @@ static MACHINE_CONFIG_START( poolshrk, poolshrk_state )
 
 	MCFG_GFXDECODE(poolshrk)
 	MCFG_PALETTE_LENGTH(4)
-	MCFG_PALETTE_INIT(poolshrk)
-	MCFG_VIDEO_START(poolshrk)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

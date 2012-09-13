@@ -986,58 +986,57 @@ static void neogeo_postload(running_machine &machine)
 	set_outputs(machine);
 }
 
-static MACHINE_START( neogeo )
+void neogeo_state::machine_start()
 {
-	neogeo_state *state = machine.driver_data<neogeo_state>();
 
 	/* configure NVRAM */
-	machine.device<nvram_device>("saveram")->set_base(state->m_save_ram, 0x10000);
+	machine().device<nvram_device>("saveram")->set_base(m_save_ram, 0x10000);
 
 	/* set the BIOS bank */
-	state->membank(NEOGEO_BANK_BIOS)->set_base(state->memregion("mainbios")->base());
+	membank(NEOGEO_BANK_BIOS)->set_base(memregion("mainbios")->base());
 
 	/* set the initial main CPU bank */
-	main_cpu_banking_init(machine);
+	main_cpu_banking_init(machine());
 
 	/* set the initial audio CPU ROM banks */
-	audio_cpu_banking_init(machine);
+	audio_cpu_banking_init(machine());
 
-	create_interrupt_timers(machine);
+	create_interrupt_timers(machine());
 
 	/* initialize the memcard data structure */
-	memcard_data = auto_alloc_array_clear(machine, UINT8, MEMCARD_SIZE);
+	memcard_data = auto_alloc_array_clear(machine(), UINT8, MEMCARD_SIZE);
 
 	/* start with an IRQ3 - but NOT on a reset */
-	state->m_irq3_pending = 1;
+	m_irq3_pending = 1;
 
 	/* get devices */
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_upd4990a = machine.device("upd4990a");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
+	m_upd4990a = machine().device("upd4990a");
 
 	/* register state save */
-	state->save_item(NAME(state->m_display_position_interrupt_control));
-	state->save_item(NAME(state->m_display_counter));
-	state->save_item(NAME(state->m_vblank_interrupt_pending));
-	state->save_item(NAME(state->m_display_position_interrupt_pending));
-	state->save_item(NAME(state->m_irq3_pending));
-	state->save_item(NAME(state->m_audio_result));
-	state->save_item(NAME(state->m_controller_select));
-	state->save_item(NAME(state->m_main_cpu_bank_address));
-	state->save_item(NAME(state->m_main_cpu_vector_table_source));
-	state->save_item(NAME(state->m_audio_cpu_banks));
-	state->save_item(NAME(state->m_audio_cpu_rom_source));
-	state->save_item(NAME(state->m_audio_cpu_rom_source_last));
-	state->save_item(NAME(state->m_save_ram_unlocked));
-	state_save_register_global_pointer(machine, memcard_data, 0x800);
-	state->save_item(NAME(state->m_output_data));
-	state->save_item(NAME(state->m_output_latch));
-	state->save_item(NAME(state->m_el_value));
-	state->save_item(NAME(state->m_led1_value));
-	state->save_item(NAME(state->m_led2_value));
-	state->save_item(NAME(state->m_recurse));
+	save_item(NAME(m_display_position_interrupt_control));
+	save_item(NAME(m_display_counter));
+	save_item(NAME(m_vblank_interrupt_pending));
+	save_item(NAME(m_display_position_interrupt_pending));
+	save_item(NAME(m_irq3_pending));
+	save_item(NAME(m_audio_result));
+	save_item(NAME(m_controller_select));
+	save_item(NAME(m_main_cpu_bank_address));
+	save_item(NAME(m_main_cpu_vector_table_source));
+	save_item(NAME(m_audio_cpu_banks));
+	save_item(NAME(m_audio_cpu_rom_source));
+	save_item(NAME(m_audio_cpu_rom_source_last));
+	save_item(NAME(m_save_ram_unlocked));
+	state_save_register_global_pointer(machine(), memcard_data, 0x800);
+	save_item(NAME(m_output_data));
+	save_item(NAME(m_output_latch));
+	save_item(NAME(m_el_value));
+	save_item(NAME(m_led1_value));
+	save_item(NAME(m_led2_value));
+	save_item(NAME(m_recurse));
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(neogeo_postload), &machine));
+	machine().save().register_postload(save_prepost_delegate(FUNC(neogeo_postload), &machine()));
 }
 
 
@@ -1048,29 +1047,28 @@ static MACHINE_START( neogeo )
  *
  *************************************/
 
-static MACHINE_RESET( neogeo )
+void neogeo_state::machine_reset()
 {
-	neogeo_state *state = machine.driver_data<neogeo_state>();
 	offs_t offs;
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* reset system control registers */
 	for (offs = 0; offs < 8; offs++)
-		state->system_control_w(*space, offs, 0, 0x00ff);
+		system_control_w(*space, offs, 0, 0x00ff);
 
-	machine.device("maincpu")->reset();
+	machine().device("maincpu")->reset();
 
-	neogeo_reset_rng(machine);
+	neogeo_reset_rng(machine());
 
-	start_interrupt_timers(machine);
+	start_interrupt_timers(machine());
 
 	/* trigger the IRQ3 that was set by MACHINE_START */
-	update_interrupts(machine);
+	update_interrupts(machine());
 
-	state->m_recurse = 0;
+	m_recurse = 0;
 
 	/* AES apparently always uses the cartridge's fixed bank mode */
-	// neogeo_set_fixed_layer_source(machine,1);
+	// neogeo_set_fixed_layer_source(machine(),1);
 
 }
 
@@ -1369,14 +1367,10 @@ static MACHINE_CONFIG_START( neogeo, neogeo_state )
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_usec(128762))
 
-	MCFG_MACHINE_START(neogeo)
-	MCFG_MACHINE_RESET(neogeo)
 	MCFG_NVRAM_ADD_0FILL("saveram")
 	MCFG_MEMCARD_HANDLER(neogeo)
 
 	/* video hardware */
-	MCFG_VIDEO_START(neogeo)
-	MCFG_VIDEO_RESET(neogeo)
 	MCFG_DEFAULT_LAYOUT(layout_neogeo)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

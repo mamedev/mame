@@ -25,14 +25,19 @@ public:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_rows_extra);
 	TILE_GET_INFO_MEMBER(get_tile_info_fb1);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
+	virtual void machine_reset();
+	DECLARE_VIDEO_START(firebatl);
+	DECLARE_PALETTE_INIT(firebatl);
+	DECLARE_VIDEO_START(clshroad);
+	DECLARE_PALETTE_INIT(clshroad);
 };
 
 
 /*----------- defined in video/clshroad.c -----------*/
 
 
-PALETTE_INIT( firebatl );
-PALETTE_INIT( clshroad );
-VIDEO_START( firebatl );
-VIDEO_START( clshroad );
+
+
+
+
 SCREEN_UPDATE_IND16( clshroad );

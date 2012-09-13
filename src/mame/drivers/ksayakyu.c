@@ -247,25 +247,23 @@ static GFXDECODE_START( ksayakyu )
 GFXDECODE_END
 
 
-static MACHINE_START( ksayakyu )
+void ksayakyu_state::machine_start()
 {
-	ksayakyu_state *state = machine.driver_data<ksayakyu_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
-	state->save_item(NAME(state->m_sound_status));
-	state->save_item(NAME(state->m_video_ctrl));
-	state->save_item(NAME(state->m_flipscreen));
+	save_item(NAME(m_sound_status));
+	save_item(NAME(m_video_ctrl));
+	save_item(NAME(m_flipscreen));
 }
 
-static MACHINE_RESET( ksayakyu )
+void ksayakyu_state::machine_reset()
 {
-	ksayakyu_state *state = machine.driver_data<ksayakyu_state>();
 
-	state->m_sound_status = 0xff;
-	state->m_video_ctrl = 0;
-	state->m_flipscreen = 0;
+	m_sound_status = 0xff;
+	m_video_ctrl = 0;
+	m_flipscreen = 0;
 }
 
 static MACHINE_CONFIG_START( ksayakyu, ksayakyu_state )
@@ -281,8 +279,6 @@ static MACHINE_CONFIG_START( ksayakyu, ksayakyu_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
-	MCFG_MACHINE_START(ksayakyu)
-	MCFG_MACHINE_RESET(ksayakyu)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -293,10 +289,8 @@ static MACHINE_CONFIG_START( ksayakyu, ksayakyu_state )
 	MCFG_SCREEN_UPDATE_STATIC(ksayakyu)
 
 	MCFG_GFXDECODE(ksayakyu)
-	MCFG_PALETTE_INIT(ksayakyu)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_VIDEO_START(ksayakyu)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

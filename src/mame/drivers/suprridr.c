@@ -377,8 +377,6 @@ static MACHINE_CONFIG_START( suprridr, suprridr_state )
 	MCFG_GFXDECODE(suprridr)
 	MCFG_PALETTE_LENGTH(96)
 
-	MCFG_PALETTE_INIT(suprridr)
-	MCFG_VIDEO_START(suprridr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

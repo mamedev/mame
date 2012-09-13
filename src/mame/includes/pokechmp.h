@@ -16,11 +16,12 @@ public:
 	DECLARE_WRITE8_MEMBER(pokechmp_flipscreen_w);
 	DECLARE_DRIVER_INIT(pokechmp);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start();
 };
 
 
 /*----------- defined in video/pokechmp.c -----------*/
 
 
-VIDEO_START( pokechmp );
+
 SCREEN_UPDATE_IND16( pokechmp );

@@ -309,12 +309,12 @@ static const unsigned char oric_palette[8*3] =
 };
 
 /* Initialise the palette */
-static PALETTE_INIT( oric )
+void oric_state::palette_init()
 {
 	int i;
 
 	for ( i = 0; i < sizeof(oric_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, oric_palette[i*3], oric_palette[i*3+1], oric_palette[i*3+2]);
+		palette_set_color_rgb(machine(), i, oric_palette[i*3], oric_palette[i*3+1], oric_palette[i*3+2]);
 	}
 }
 
@@ -379,8 +379,6 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	MCFG_CPU_PROGRAM_MAP(oric_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START( oric )
-	MCFG_MACHINE_RESET( oric )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -391,9 +389,7 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	MCFG_SCREEN_UPDATE_STATIC( oric )
 
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT( oric )
 
-	MCFG_VIDEO_START( oric )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -426,7 +422,7 @@ static MACHINE_CONFIG_DERIVED( telstrat, oric )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( telestrat_mem)
 
-	MCFG_MACHINE_START( telestrat )
+	MCFG_MACHINE_START_OVERRIDE(oric_state, telestrat )
 
 	/* acia */
 	MCFG_ACIA6551_ADD("acia")

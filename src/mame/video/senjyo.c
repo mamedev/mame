@@ -87,30 +87,29 @@ TILE_GET_INFO_MEMBER(senjyo_state::get_bg3_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START( senjyo )
+void senjyo_state::video_start()
 {
-	senjyo_state *state = machine.driver_data<senjyo_state>();
 
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	if (state->m_is_senjyo)
+	if (m_is_senjyo)
 	{
-		state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::senjyo_bg1_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
-		state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg2_tile_info),state),    TILEMAP_SCAN_ROWS, 16, 16, 16, 48);	/* only 16x32 used by Star Force */
-		state->m_bg3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg3_tile_info),state),    TILEMAP_SCAN_ROWS, 16, 16, 16, 56);	/* only 16x32 used by Star Force */
+		m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::senjyo_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
+		m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg2_tile_info),this),    TILEMAP_SCAN_ROWS, 16, 16, 16, 48);	/* only 16x32 used by Star Force */
+		m_bg3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg3_tile_info),this),    TILEMAP_SCAN_ROWS, 16, 16, 16, 56);	/* only 16x32 used by Star Force */
 	}
 	else
 	{
-		state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::starforc_bg1_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
-		state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg2_tile_info),state),      TILEMAP_SCAN_ROWS, 16, 16, 16, 32);	/* only 16x32 used by Star Force */
-		state->m_bg3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg3_tile_info),state),      TILEMAP_SCAN_ROWS, 16, 16, 16, 32);	/* only 16x32 used by Star Force */
+		m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::starforc_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
+		m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg2_tile_info),this),      TILEMAP_SCAN_ROWS, 16, 16, 16, 32);	/* only 16x32 used by Star Force */
+		m_bg3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg3_tile_info),this),      TILEMAP_SCAN_ROWS, 16, 16, 16, 32);	/* only 16x32 used by Star Force */
 	}
 
-	state->m_fg_tilemap->set_transparent_pen(0);
-	state->m_bg1_tilemap->set_transparent_pen(0);
-	state->m_bg2_tilemap->set_transparent_pen(0);
-	state->m_bg3_tilemap->set_transparent_pen(0);
-	state->m_fg_tilemap->set_scroll_cols(32);
+	m_fg_tilemap->set_transparent_pen(0);
+	m_bg1_tilemap->set_transparent_pen(0);
+	m_bg2_tilemap->set_transparent_pen(0);
+	m_bg3_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_scroll_cols(32);
 }
 
 

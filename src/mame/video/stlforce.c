@@ -176,20 +176,19 @@ SCREEN_UPDATE_IND16( stlforce )
 	return 0;
 }
 
-VIDEO_START( stlforce )
+void stlforce_state::video_start()
 {
-	stlforce_state *state = machine.driver_data<stlforce_state>();
 
-	state->m_bg_tilemap    = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_bg_tile_info),state),   TILEMAP_SCAN_COLS,      16,16,64,16);
-	state->m_mlow_tilemap  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_mlow_tile_info),state), TILEMAP_SCAN_COLS, 16,16,64,16);
-	state->m_mhigh_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_mhigh_tile_info),state),TILEMAP_SCAN_COLS, 16,16,64,16);
-	state->m_tx_tilemap    = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_tx_tile_info),state),   TILEMAP_SCAN_ROWS,  8, 8,64,32);
+	m_bg_tilemap    = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_bg_tile_info),this),   TILEMAP_SCAN_COLS,      16,16,64,16);
+	m_mlow_tilemap  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_mlow_tile_info),this), TILEMAP_SCAN_COLS, 16,16,64,16);
+	m_mhigh_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_mhigh_tile_info),this),TILEMAP_SCAN_COLS, 16,16,64,16);
+	m_tx_tilemap    = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_tx_tile_info),this),   TILEMAP_SCAN_ROWS,  8, 8,64,32);
 
-	state->m_mlow_tilemap->set_transparent_pen(0);
-	state->m_mhigh_tilemap->set_transparent_pen(0);
-	state->m_tx_tilemap->set_transparent_pen(0);
+	m_mlow_tilemap->set_transparent_pen(0);
+	m_mhigh_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap->set_scroll_rows(256);
-	state->m_mlow_tilemap->set_scroll_rows(256);
-	state->m_mhigh_tilemap->set_scroll_rows(256);
+	m_bg_tilemap->set_scroll_rows(256);
+	m_mlow_tilemap->set_scroll_rows(256);
+	m_mhigh_tilemap->set_scroll_rows(256);
 }

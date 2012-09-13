@@ -78,6 +78,10 @@ public:
 	DECLARE_WRITE8_MEMBER(einstein_kybintmsk_w);
 	DECLARE_WRITE8_MEMBER(einstein_adcintmsk_w);
 	DECLARE_WRITE8_MEMBER(einstein_fire_int_w);
+	virtual void machine_start();
+	virtual void machine_reset();
+	DECLARE_MACHINE_START(einstein2);
+	DECLARE_MACHINE_RESET(einstein2);
 };
 
 

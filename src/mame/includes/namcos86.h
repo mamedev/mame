@@ -49,13 +49,16 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 	TILE_GET_INFO_MEMBER(get_tile_info3);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/namcos86.c -----------*/
 
-PALETTE_INIT( namcos86 );
-VIDEO_START( namcos86 );
+
+
 SCREEN_UPDATE_IND16( namcos86 );
 SCREEN_VBLANK( namcos86 );
 

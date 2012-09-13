@@ -102,6 +102,10 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_rocknms_sub_fg);
 	TILE_GET_INFO_MEMBER(get_tile_info_rocknms_sub_rot);
 	TILE_GET_INFO_MEMBER(stepstag_get_tile_info_fg);
+	DECLARE_VIDEO_START(tetrisp2);
+	DECLARE_VIDEO_START(nndmseal);
+	DECLARE_VIDEO_START(rockntread);
+	DECLARE_VIDEO_START(rocknms);
 };
 
 class stepstag_state : public tetrisp2_state
@@ -120,6 +124,7 @@ public:
 	DECLARE_WRITE16_MEMBER(stepstag_leds_w);
 	DECLARE_WRITE16_MEMBER( stepstag_palette_w );
 	DECLARE_DRIVER_INIT(stepstag);
+	DECLARE_VIDEO_START(stepstag);
 };
 
 /*----------- defined in video/tetrisp2.c -----------*/
@@ -127,19 +132,19 @@ public:
 
 
 
-VIDEO_START( tetrisp2 );
+
 SCREEN_UPDATE_IND16( tetrisp2 );
 
-VIDEO_START( rockntread );
+
 SCREEN_UPDATE_IND16( rockntread );
 
-VIDEO_START( rocknms );
+
 SCREEN_UPDATE_RGB32( rocknms_left );
 SCREEN_UPDATE_RGB32( rocknms_right );
 
-VIDEO_START( nndmseal );
 
-VIDEO_START( stepstag );
+
+
 SCREEN_UPDATE_IND16( stepstag_left );
 SCREEN_UPDATE_IND16( stepstag_mid );
 SCREEN_UPDATE_IND16( stepstag_right );

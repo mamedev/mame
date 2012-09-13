@@ -250,29 +250,27 @@ static const ym2151_interface ym2151_config =
 };
 
 
-static MACHINE_START( gotcha )
+void gotcha_state::machine_start()
 {
-	gotcha_state *state = machine.driver_data<gotcha_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_banksel));
-	state->save_item(NAME(state->m_gfxbank));
-	state->save_item(NAME(state->m_scroll));
+	save_item(NAME(m_banksel));
+	save_item(NAME(m_gfxbank));
+	save_item(NAME(m_scroll));
 }
 
-static MACHINE_RESET( gotcha )
+void gotcha_state::machine_reset()
 {
-	gotcha_state *state = machine.driver_data<gotcha_state>();
 	int i;
 
 	for (i = 0; i < 4; i++)
 	{
-		state->m_gfxbank[i] = 0;
-		state->m_scroll[i] = 0;
+		m_gfxbank[i] = 0;
+		m_scroll[i] = 0;
 	}
 
-	state->m_banksel = 0;
+	m_banksel = 0;
 }
 
 static MACHINE_CONFIG_START( gotcha, gotcha_state )
@@ -286,8 +284,6 @@ static MACHINE_CONFIG_START( gotcha, gotcha_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 //  MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MCFG_MACHINE_START(gotcha)
-	MCFG_MACHINE_RESET(gotcha)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -300,7 +296,6 @@ static MACHINE_CONFIG_START( gotcha, gotcha_state )
 	MCFG_GFXDECODE(gotcha)
 	MCFG_PALETTE_LENGTH(768)
 
-	MCFG_VIDEO_START(gotcha)
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 1);

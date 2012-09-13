@@ -45,13 +45,13 @@ other 2 bits (output & 0x0c) unknown
 
 ***************************************************************************/
 
-PALETTE_INIT( 1943 )
+void _1943_state::palette_init()
 {
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, 0x100);
+	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	for (i = 0; i < 0x100; i++)
 	{
@@ -79,7 +79,7 @@ PALETTE_INIT( 1943 )
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -89,7 +89,7 @@ PALETTE_INIT( 1943 )
 	for (i = 0x00; i < 0x80; i++)
 	{
 		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0x40;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	/* foreground tiles use colors 0x00-0x3f */
@@ -97,7 +97,7 @@ PALETTE_INIT( 1943 )
 	{
 		UINT8 ctabentry = ((color_prom[0x200 + (i - 0x080)] & 0x03) << 4) |
 						  ((color_prom[0x100 + (i - 0x080)] & 0x0f) << 0);
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	/* background tiles also use colors 0x00-0x3f */
@@ -105,7 +105,7 @@ PALETTE_INIT( 1943 )
 	{
 		UINT8 ctabentry = ((color_prom[0x400 + (i - 0x180)] & 0x03) << 4) |
 						  ((color_prom[0x300 + (i - 0x180)] & 0x0f) << 0);
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
 	/* sprites use colors 0x80-0xff
@@ -115,7 +115,7 @@ PALETTE_INIT( 1943 )
 	{
 		UINT8 ctabentry = ((color_prom[0x600 + (i - 0x280)] & 0x07) << 4) |
 						  ((color_prom[0x500 + (i - 0x280)] & 0x0f) << 0) | 0x80;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
 
@@ -201,20 +201,19 @@ TILE_GET_INFO_MEMBER(_1943_state::c1943_get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-VIDEO_START( 1943 )
+void _1943_state::video_start()
 {
-	_1943_state *state = machine.driver_data<_1943_state>();
-	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(_1943_state::c1943_get_bg2_tile_info),state), TILEMAP_SCAN_COLS, 32, 32, 2048, 8);
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(_1943_state::c1943_get_bg_tile_info),state), TILEMAP_SCAN_COLS, 32, 32, 2048, 8);
-	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(_1943_state::c1943_get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(_1943_state::c1943_get_bg2_tile_info),this), TILEMAP_SCAN_COLS, 32, 32, 2048, 8);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(_1943_state::c1943_get_bg_tile_info),this), TILEMAP_SCAN_COLS, 32, 32, 2048, 8);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(_1943_state::c1943_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	colortable_configure_tilemap_groups(machine.colortable, state->m_bg_tilemap, machine.gfx[1], 0x0f);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, machine().gfx[1], 0x0f);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->save_item(NAME(state->m_char_on));
-	state->save_item(NAME(state->m_obj_on));
-	state->save_item(NAME(state->m_bg1_on));
-	state->save_item(NAME(state->m_bg2_on));
+	save_item(NAME(m_char_on));
+	save_item(NAME(m_obj_on));
+	save_item(NAME(m_bg1_on));
+	save_item(NAME(m_bg2_on));
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )

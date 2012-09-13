@@ -72,6 +72,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bsmt_data_hi_w);
 	DECLARE_WRITE8_MEMBER(bsmt_reg_w);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
+	virtual void video_start();
 };
 
 WRITE16_MEMBER(tapatune_state::palette_w)
@@ -352,7 +353,7 @@ static MC6845_UPDATE_ROW( update_row )
 	}
 }
 
-static VIDEO_START( tapatune )
+void tapatune_state::video_start()
 {
 }
 
@@ -396,7 +397,6 @@ static MACHINE_CONFIG_START( tapatune, tapatune_state )
 
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_VIDEO_START(tapatune)
 
 	MCFG_MC6845_ADD("crtc", H46505, 24000000/16, h46505_intf)	/* H46505 */
 

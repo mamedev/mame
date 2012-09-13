@@ -42,6 +42,10 @@ public:
 	DECLARE_DRIVER_INIT(mightguy);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
@@ -49,7 +53,7 @@ public:
 /*----------- defined in video/cop01.c -----------*/
 
 
-PALETTE_INIT( cop01 );
-VIDEO_START( cop01 );
+
+
 SCREEN_UPDATE_IND16( cop01 );
 

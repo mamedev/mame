@@ -453,7 +453,6 @@ static MACHINE_CONFIG_START( sharkatt, thief_state )
 
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_VIDEO_START(thief)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -489,7 +488,6 @@ static MACHINE_CONFIG_START( thief, thief_state )
 
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_VIDEO_START(thief)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -525,7 +523,6 @@ static MACHINE_CONFIG_START( natodef, thief_state )
 
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_VIDEO_START(thief)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

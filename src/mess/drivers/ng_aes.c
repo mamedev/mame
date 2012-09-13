@@ -88,6 +88,10 @@ public:
 	DECLARE_READ16_MEMBER(aes_in1_r);
 	DECLARE_READ16_MEMBER(aes_in2_r);
 	DECLARE_DRIVER_INIT(neogeo);
+	DECLARE_MACHINE_START(neocd);
+	DECLARE_MACHINE_START(neogeo);
+	DECLARE_MACHINE_RESET(neogeo);
+	
 };
 
 
@@ -972,7 +976,7 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 		logerror("CTRL: 0xExxxxx set to area %i\n",data & 0xff);
 		break;
 	case 0x140/2:  // end sprite transfer
-		video_reset_neogeo(machine());
+		video_reset();
 		break;
 	case 0x142/2:  // end PCM transfer
 		break;
@@ -980,7 +984,7 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET,PULSE_LINE);
 		break;
 	case 0x148/2:  // end FIX transfer
-		video_reset_neogeo(machine());
+		video_reset();
 		break;
 	case 0x1a0/2:
 		m_neocd_ctrl.spr_bank_sel = data & 0xff;
@@ -1194,31 +1198,29 @@ static void common_machine_start(running_machine &machine)
 	machine.save().register_postload(save_prepost_delegate(FUNC(aes_postload), state));
 }
 
-static MACHINE_START( neogeo )
+MACHINE_START_MEMBER(ng_aes_state,neogeo)
 {
-	ng_aes_state *state = machine.driver_data<ng_aes_state>();
-	common_machine_start(machine);
+	common_machine_start(machine());
 
 	/* initialize the memcard data structure */
-	state->m_memcard_data = auto_alloc_array_clear(machine, UINT8, MEMCARD_SIZE);
-	state->save_pointer(NAME(state->m_memcard_data), 0x0800);
+	m_memcard_data = auto_alloc_array_clear(machine(), UINT8, MEMCARD_SIZE);
+	save_pointer(NAME(m_memcard_data), 0x0800);
 }
 
-static MACHINE_START(neocd)
+MACHINE_START_MEMBER(ng_aes_state,neocd)
 {
-	ng_aes_state *state = machine.driver_data<ng_aes_state>();
-	UINT8* ROM = machine.root_device().memregion("mainbios")->base();
-	UINT8* RAM = machine.root_device().memregion("maincpu")->base();
-	UINT8* Z80bios = machine.root_device().memregion("audiobios")->base();
-	UINT8* FIXbios = state->memregion("fixedbios")->base();
+	UINT8* ROM = machine().root_device().memregion("mainbios")->base();
+	UINT8* RAM = machine().root_device().memregion("maincpu")->base();
+	UINT8* Z80bios = machine().root_device().memregion("audiobios")->base();
+	UINT8* FIXbios = memregion("fixedbios")->base();
 	int x;
 
-	common_machine_start(machine);
+	common_machine_start(machine());
 
 	/* initialize the memcard data structure */
 	/* NeoCD doesn't have memcard slots, rather, it has a larger internal memory which works the same */
-	state->m_memcard_data = auto_alloc_array_clear(machine, UINT8, 0x2000);
-	state->save_pointer(NAME(state->m_memcard_data), 0x2000);
+	m_memcard_data = auto_alloc_array_clear(machine(), UINT8, 0x2000);
+	save_pointer(NAME(m_memcard_data), 0x2000);
 
 	// copy initial 68k vectors into RAM
 	memcpy(RAM,ROM,0x80);
@@ -1248,29 +1250,28 @@ static MACHINE_START(neocd)
  *
  *************************************/
 
-static MACHINE_RESET( neogeo )
+MACHINE_RESET_MEMBER(ng_aes_state,neogeo)
 {
-	neogeo_state *state = machine.driver_data<neogeo_state>();
 	offs_t offs;
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* reset system control registers */
 	for (offs = 0; offs < 8; offs++)
-		state->system_control_w(*space, offs, 0, 0x00ff);
+		system_control_w(*space, offs, 0, 0x00ff);
 
-	machine.device("maincpu")->reset();
+	machine().device("maincpu")->reset();
 
-	neogeo_reset_rng(machine);
+	neogeo_reset_rng(machine());
 
-	start_interrupt_timers(machine);
+	start_interrupt_timers(machine());
 
 	/* trigger the IRQ3 that was set by MACHINE_START */
-	update_interrupts(machine);
+	update_interrupts(machine());
 
-	state->m_recurse = 0;
+	m_recurse = 0;
 
 	/* AES apparently always uses the cartridge's fixed bank mode */
-	neogeo_set_fixed_layer_source(machine,1);
+	neogeo_set_fixed_layer_source(machine(),1);
 }
 
 
@@ -1639,12 +1640,10 @@ static MACHINE_CONFIG_START( neogeo, ng_aes_state )
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_IO_MAP(audio_io_map)
 
-	MCFG_MACHINE_START(neogeo)
-	MCFG_MACHINE_RESET(neogeo)
+	MCFG_MACHINE_START_OVERRIDE(ng_aes_state, neogeo)
+	MCFG_MACHINE_RESET_OVERRIDE(ng_aes_state, neogeo)
 
 	/* video hardware */
-	MCFG_VIDEO_START(neogeo)
-	MCFG_VIDEO_RESET(neogeo)
 	MCFG_DEFAULT_LAYOUT(layout_neogeo)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1683,7 +1682,7 @@ static MACHINE_CONFIG_DERIVED( neocd, neogeo )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(neocd_main_map)
 
-	MCFG_MACHINE_START(neocd)
+	MCFG_MACHINE_START_OVERRIDE(ng_aes_state,neocd)
 MACHINE_CONFIG_END
 
 /*************************************

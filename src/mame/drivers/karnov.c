@@ -765,41 +765,39 @@ static const ym3526_interface ym3526_config =
  *
  *************************************/
 
-static MACHINE_START( karnov )
+void karnov_state::machine_start()
 {
-	karnov_state *state = machine.driver_data<karnov_state>();
 
-	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_scroll));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_scroll));
 
-	state->save_item(NAME(state->m_i8751_return));
-	state->save_item(NAME(state->m_i8751_needs_ack));
-	state->save_item(NAME(state->m_i8751_coin_pending));
-	state->save_item(NAME(state->m_i8751_command_queue));
-	state->save_item(NAME(state->m_i8751_level));
-	state->save_item(NAME(state->m_latch));
+	save_item(NAME(m_i8751_return));
+	save_item(NAME(m_i8751_needs_ack));
+	save_item(NAME(m_i8751_coin_pending));
+	save_item(NAME(m_i8751_command_queue));
+	save_item(NAME(m_i8751_level));
+	save_item(NAME(m_latch));
 
 }
 
-static MACHINE_RESET( karnov )
+void karnov_state::machine_reset()
 {
-	karnov_state *state = machine.driver_data<karnov_state>();
 
-	memset(state->m_ram, 0, 0x4000 / 2); /* Chelnov likes ram clear on reset.. */
+	memset(m_ram, 0, 0x4000 / 2); /* Chelnov likes ram clear on reset.. */
 
-	state->m_i8751_return = 0;
-	state->m_i8751_needs_ack = 0;
-	state->m_i8751_coin_pending = 0;
-	state->m_i8751_command_queue = 0;
-	state->m_i8751_level = 0;
-//  state->m_latch = 0;
+	m_i8751_return = 0;
+	m_i8751_needs_ack = 0;
+	m_i8751_coin_pending = 0;
+	m_i8751_command_queue = 0;
+	m_i8751_level = 0;
+//  m_latch = 0;
 
-	state->m_flipscreen = 0;
-	state->m_scroll[0] = 0;
-	state->m_scroll[1] = 0;
+	m_flipscreen = 0;
+	m_scroll[0] = 0;
+	m_scroll[1] = 0;
 }
 
 
@@ -813,8 +811,6 @@ static MACHINE_CONFIG_START( karnov, karnov_state )
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)	/* Accurate */
 	MCFG_CPU_PROGRAM_MAP(karnov_sound_map)
 
-	MCFG_MACHINE_START(karnov)
-	MCFG_MACHINE_RESET(karnov)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -832,8 +828,7 @@ static MACHINE_CONFIG_START( karnov, karnov_state )
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 2);
 
-	MCFG_PALETTE_INIT(karnov)
-	MCFG_VIDEO_START(karnov)
+	MCFG_VIDEO_START_OVERRIDE(karnov_state,karnov)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -857,8 +852,6 @@ static MACHINE_CONFIG_START( wndrplnt, karnov_state )
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)	/* Accurate */
 	MCFG_CPU_PROGRAM_MAP(karnov_sound_map)
 
-	MCFG_MACHINE_START(karnov)
-	MCFG_MACHINE_RESET(karnov)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -876,8 +869,7 @@ static MACHINE_CONFIG_START( wndrplnt, karnov_state )
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 2);
 
-	MCFG_PALETTE_INIT(karnov)
-	MCFG_VIDEO_START(wndrplnt)
+	MCFG_VIDEO_START_OVERRIDE(karnov_state,wndrplnt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

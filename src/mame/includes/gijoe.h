@@ -41,6 +41,9 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_cmd_w);
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
 	DECLARE_READ16_MEMBER(sound_status_r);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 /*----------- defined in video/gijoe.c -----------*/
@@ -48,5 +51,5 @@ public:
 extern void gijoe_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);
 extern void gijoe_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
 
-VIDEO_START( gijoe );
+
 SCREEN_UPDATE_IND16( gijoe );

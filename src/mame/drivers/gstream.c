@@ -180,6 +180,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_gs1_tile_info);
 	TILE_GET_INFO_MEMBER(get_gs2_tile_info);
 	TILE_GET_INFO_MEMBER(get_gs3_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -467,15 +470,14 @@ TILE_GET_INFO_MEMBER(gstream_state::get_gs3_tile_info)
 }
 
 
-static VIDEO_START(gstream)
+void gstream_state::video_start()
 {
-	gstream_state *state = machine.driver_data<gstream_state>();
-	state->m_tilemap1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gstream_state::get_gs1_tile_info),state), TILEMAP_SCAN_ROWS, 32, 32, 16, 16);
-	state->m_tilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gstream_state::get_gs2_tile_info),state), TILEMAP_SCAN_ROWS, 32, 32, 16, 16);
-	state->m_tilemap3 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gstream_state::get_gs3_tile_info),state), TILEMAP_SCAN_ROWS, 32, 32, 16, 16);
+	m_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gstream_state::get_gs1_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 16, 16);
+	m_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gstream_state::get_gs2_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 16, 16);
+	m_tilemap3 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gstream_state::get_gs3_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 16, 16);
 
-	state->m_tilemap1->set_transparent_pen(0);
-	state->m_tilemap2->set_transparent_pen(0);
+	m_tilemap1->set_transparent_pen(0);
+	m_tilemap2->set_transparent_pen(0);
 }
 
 static SCREEN_UPDATE_IND16(gstream)
@@ -531,32 +533,30 @@ static SCREEN_UPDATE_IND16(gstream)
 }
 
 
-static MACHINE_START( gstream )
+void gstream_state::machine_start()
 {
-	gstream_state *state = machine.driver_data<gstream_state>();
 
-	state->save_item(NAME(state->m_tmap1_scrollx));
-	state->save_item(NAME(state->m_tmap2_scrollx));
-	state->save_item(NAME(state->m_tmap3_scrollx));
-	state->save_item(NAME(state->m_tmap1_scrolly));
-	state->save_item(NAME(state->m_tmap2_scrolly));
-	state->save_item(NAME(state->m_tmap3_scrolly));
-	state->save_item(NAME(state->m_oki_bank_1));
-	state->save_item(NAME(state->m_oki_bank_2));
+	save_item(NAME(m_tmap1_scrollx));
+	save_item(NAME(m_tmap2_scrollx));
+	save_item(NAME(m_tmap3_scrollx));
+	save_item(NAME(m_tmap1_scrolly));
+	save_item(NAME(m_tmap2_scrolly));
+	save_item(NAME(m_tmap3_scrolly));
+	save_item(NAME(m_oki_bank_1));
+	save_item(NAME(m_oki_bank_2));
 }
 
-static MACHINE_RESET( gstream )
+void gstream_state::machine_reset()
 {
-	gstream_state *state = machine.driver_data<gstream_state>();
 
-	state->m_tmap1_scrollx = 0;
-	state->m_tmap2_scrollx = 0;
-	state->m_tmap3_scrollx = 0;
-	state->m_tmap1_scrolly = 0;
-	state->m_tmap2_scrolly = 0;
-	state->m_tmap3_scrolly = 0;
-	state->m_oki_bank_1 = 0;
-	state->m_oki_bank_2 = 0;
+	m_tmap1_scrollx = 0;
+	m_tmap2_scrollx = 0;
+	m_tmap3_scrollx = 0;
+	m_tmap1_scrolly = 0;
+	m_tmap2_scrolly = 0;
+	m_tmap3_scrolly = 0;
+	m_oki_bank_1 = 0;
+	m_oki_bank_2 = 0;
 }
 
 static MACHINE_CONFIG_START( gstream, gstream_state )
@@ -567,8 +567,6 @@ static MACHINE_CONFIG_START( gstream, gstream_state )
 	MCFG_CPU_IO_MAP(gstream_io)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_START(gstream)
-	MCFG_MACHINE_RESET(gstream)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -583,7 +581,6 @@ static MACHINE_CONFIG_START( gstream, gstream_state )
 	MCFG_PALETTE_LENGTH(0x1000 + 0x400 + 0x400 + 0x400) // sprites + 3 bg layers
 	MCFG_GFXDECODE(gstream)
 
-	MCFG_VIDEO_START(gstream)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

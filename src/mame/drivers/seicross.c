@@ -73,10 +73,10 @@ static NVRAM_HANDLER( seicross )
 
 
 
-static MACHINE_RESET( friskyt )
+void seicross_state::machine_reset()
 {
 	/* start with the protection mcu halted */
-	machine.device("mcu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	machine().device("mcu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 
@@ -411,7 +411,6 @@ static MACHINE_CONFIG_START( nvram, seicross_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))	/* 20 CPU slices per frame - an high value to ensure proper */
 						/* synchronization of the CPUs */
-	MCFG_MACHINE_RESET(friskyt)
 	MCFG_NVRAM_HANDLER(seicross)
 
 	/* video hardware */
@@ -425,8 +424,6 @@ static MACHINE_CONFIG_START( nvram, seicross_state )
 	MCFG_GFXDECODE(seicross)
 	MCFG_PALETTE_LENGTH(64)
 
-	MCFG_PALETTE_INIT(seicross)
-	MCFG_VIDEO_START(seicross)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

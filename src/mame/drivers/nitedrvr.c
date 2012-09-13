@@ -142,8 +142,6 @@ static MACHINE_CONFIG_START( nitedrvr, nitedrvr_state )
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MCFG_WATCHDOG_VBLANK_INIT(3)
 
-	MCFG_MACHINE_START(nitedrvr)
-	MCFG_MACHINE_RESET(nitedrvr)
 
 	MCFG_TIMER_ADD_PERIODIC("crash_timer", nitedrvr_crash_toggle_callback, PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)))
 
@@ -159,7 +157,6 @@ static MACHINE_CONFIG_START( nitedrvr, nitedrvr_state )
 	MCFG_PALETTE_LENGTH(2)
 
 	MCFG_PALETTE_INIT(black_and_white)
-	MCFG_VIDEO_START(nitedrvr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

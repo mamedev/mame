@@ -24,24 +24,23 @@ void bishi_tile_callback( running_machine &machine, int layer, int *code, int *c
 	*color = state->m_layer_colorbase[layer] + ((*color & 0xf0));
 }
 
-VIDEO_START( bishi )
+void bishi_state::video_start()
 {
-	bishi_state *state = machine.driver_data<bishi_state>();
 
-	assert(machine.primary_screen->format() == BITMAP_FORMAT_RGB32);
+	assert(machine().primary_screen->format() == BITMAP_FORMAT_RGB32);
 
-	k056832_set_layer_association(state->m_k056832, 0);
+	k056832_set_layer_association(m_k056832, 0);
 
-	k056832_set_layer_offs(state->m_k056832, 0, -2, 0);
-	k056832_set_layer_offs(state->m_k056832, 1,  2, 0);
-	k056832_set_layer_offs(state->m_k056832, 2,  4, 0);
-	k056832_set_layer_offs(state->m_k056832, 3,  6, 0);
+	k056832_set_layer_offs(m_k056832, 0, -2, 0);
+	k056832_set_layer_offs(m_k056832, 1,  2, 0);
+	k056832_set_layer_offs(m_k056832, 2,  4, 0);
+	k056832_set_layer_offs(m_k056832, 3,  6, 0);
 
 	// the 55555 is set to "0x10, 0x11, 0x12, 0x13", but these values are almost correct...
-	state->m_layer_colorbase[0] = 0x00;
-	state->m_layer_colorbase[1] = 0x40;	// this one is wrong
-	state->m_layer_colorbase[2] = 0x80;
-	state->m_layer_colorbase[3] = 0xc0;
+	m_layer_colorbase[0] = 0x00;
+	m_layer_colorbase[1] = 0x40;	// this one is wrong
+	m_layer_colorbase[2] = 0x80;
+	m_layer_colorbase[3] = 0xc0;
 }
 
 SCREEN_UPDATE_RGB32(bishi)

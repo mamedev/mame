@@ -24,12 +24,16 @@ public:
 	DECLARE_WRITE8_MEMBER(timelimt_scroll_y_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
 };
 
 
 /*----------- defined in video/timelimt.c -----------*/
 
-VIDEO_START( timelimt );
-PALETTE_INIT( timelimt );
+
+
 SCREEN_UPDATE_IND16( timelimt );
 

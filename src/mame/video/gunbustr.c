@@ -4,10 +4,9 @@
 
 /************************************************************/
 
-VIDEO_START( gunbustr )
+void gunbustr_state::video_start()
 {
-	gunbustr_state *state = machine.driver_data<gunbustr_state>();
-	state->m_spritelist = auto_alloc_array(machine, struct tempsprite, 0x4000);
+	m_spritelist = auto_alloc_array(machine(), struct tempsprite, 0x4000);
 }
 
 /************************************************************

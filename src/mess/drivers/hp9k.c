@@ -25,6 +25,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_p_videoram;
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
@@ -42,7 +44,7 @@ static INPUT_PORTS_START( hp9k )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(hp9k)
+void hp9k_state::machine_reset()
 {
 }
 
@@ -65,7 +67,7 @@ static GFXDECODE_START( hp9k )
 GFXDECODE_END
 
 
-static VIDEO_START( hp9k )
+void hp9k_state::video_start()
 {
 }
 
@@ -79,7 +81,6 @@ static MACHINE_CONFIG_START( hp9k, hp9k_state )
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(hp9k_mem)
 
-	MCFG_MACHINE_RESET(hp9k)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -87,7 +88,6 @@ static MACHINE_CONFIG_START( hp9k, hp9k_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_VIDEO_START(hp9k)
 	MCFG_SCREEN_UPDATE_STATIC(hp9k)
 	MCFG_GFXDECODE(hp9k)
 	MCFG_PALETTE_LENGTH(2)
