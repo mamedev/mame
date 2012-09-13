@@ -180,10 +180,6 @@ public:
 };
 
 
-/*----------- defined in video/kc.c -----------*/
-
-extern PALETTE_INIT( kc85 );
-
 /*----------- defined in machine/kc.c -----------*/
 
 QUICKLOAD_LOAD( kc );
