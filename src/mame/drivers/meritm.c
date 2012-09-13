@@ -3,18 +3,71 @@
 
   Driver by Mariusz Wojcieszek
 
-  CRT 250 (basic components, also used by CRT260)
-   Main CPU: Z80B
-      Sound: Yamaha YM2149F (or compatible)
-      Video: 2 Yamaha V9938 (MSX2 video chip!)
-      Other: 2 Z80APIO (I/O and interrupt controllers)
-             1 8255 (I/O)
+CRT-250
++-----------------------------------------------+
+|                                 JP6      JP7  |
+| 81464 81464 81464 81464     DS1225Y U9   U13  |
+| 81464 81464 81464 81464 Z80    PAL  U10  U14  |
+| 81464 81464 81464 81464  PAL        U11  U15  |
+|      21.47727MHz                    U12  U16  |
+|                                               |
+|   V9938 V9938                AY8930           |
+|                                               |
+|                              Z80APIO          |
+|                                               |
+|                P8255A        Z80APIO          |
+|                                               |
+|                                               |
+| |----------------J3-----------------| DSW VOL |
++-----------------------------------------------+
+
+  CPU: Z80B
+Video: Yamaha V9938 Video Processor x 2 (MSX2 video chip)
+Sound: AY8930 (or compatible)
+  OSC: 21.47727MHz
+Other: Z80APIO x 2  (I/O and interrupt controllers)
+       P8255A (I/O)
+       8-switch DSW (socketted)
+       Volume pot
+
+Memory: Fujitsu MB81464-12 (or compatible) all socketted. The 3rd row or memory
+        may or may not be populated.
+
+JP6 - 3 pin jumper: ROM size (1-2 = 27256, 2-3 = 27512)
+JP7 - 3 pin jumper: RAM / ROM for U13 to U16? (1-2 = RAM, 2-3 = ROM)
+J3 - 65 Pin connector:
+
+ #1 - Blue  (video out)    #23 - V-Meter Lamp              #45 - P2 Discard 3 Switch
+ #2 - Green (video out)    #24 - P2 Play Lamp              #46 - P2 Discard 2 Switch
+ #3 - Red   (video out)    #25 - Audit Meter #2 12v        #47 - P2 Discard 1 Switch
+ #4 - Vertical Sync        #26 - Audit Meter #1 12v        #48 - Adjust 3 Terminal
+ #5 - Horizontal Sync      #27 - V-Lamp return             #49 - Adjust 2 Terminal
+ #6 - NC                   #28 - Lockout Coil Option 12v   #50 - Adjust 1 Terminal
+ #7 - Video Ground         #29 - P2 Cancel Lamp            #51 - Switch Common Ground
+ #8 - Ground               #30 - Undefined Lamp            #52 - Switch Common Ground
+ #9 - Logic (PCB) Ground   #31 - P1 Cancel Lamp            #53 - P2 Cancel Switch
+#10 - Logic (PCB) Ground   #32 - P1 Play Lamp              #54 - Diagnostics Switch
+#11 - +5VDC Power          #33 - P1 Discard 5 Lamp         #55 - Books Switch
+#12 - +5VDC Power          #34 - P1 Discard 4 Lamp         #56 - Coin 2 Switch
+#13 - +12VDC Power         #35 - P1 Discard 3 Lamp         #57 - Coin 1 Switch
+#14 - V-Lamp               #36 - P1 Discard 2 Lamp         #58 - Undefined Switch
+#15 - V-Lamp Return        #37 - P1 Discard 1 Lamp         #59 - P1 Cancel Switch
+#16 - NC                   #38 - NC                        #60 - P1 Play Switch
+#17 - P2 Discard 1 Lamp    #39 - Speaker -                 #61 - P1 Discard 5 Switch
+#18 - P2 Discard 2 Lamp    #40 - Speaker +                 #62 - P1 Discard 4 Switch
+#19 - P2 Discard 3 Lamp    #41 - NC                        #63 - P1 Discard 3 Switch
+#20 - P2 Discard 4 Lamp    #42 - P2 Play Switch            #64 - P1 Discard 2 Switch
+#21 - P2 Discard 5 Lamp    #43 - P2 Discard 5 Switch       #65 - P1 Discard 1 Switch
+#22 - V-Meter Lamp         #44 - P2 Discard 4 Switch
+
+Power & Common Ground wires are 18 gauge, all other wires are 20 or 22 gauge.
 
   CRT 256: addon board for CRT 250, stores question roms (aka Memory Expansion board)
 
   CRT 258: addon board for CRT 250, contains UART and Microtouch touch screen controller
 
-  CRT 260 additional components:
+
+  CRT 260 same basic components as CRT 250 with these additional components:
   - Microtouch touch screen controller (SMT-3)
   - PC16550 UART (for communication with touch screen controller)
   - DS1204 Electronic Key (for protection)
