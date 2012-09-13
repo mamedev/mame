@@ -1400,7 +1400,7 @@ ROM_END
 
 ROM_START( bigappg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2131-13_u5-0.u5", 0x0000, 0x8000, CRC(47bad6fd) SHA1(87f6c603b52e184f82179869d7b58453cbd34814) )
+	ROM_LOAD( "2131-13_u5-0.u5", 0x0000, 0x8000, CRC(47bad6fd) SHA1(87f6c603b52e184f82179869d7b58453cbd34814) ) /* 2131-13 U5-0 111786 */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "haip_u39.u39", 0x0000, 0x2000, CRC(506e20b4) SHA1(cd28d4f56f83ed3f7cfa44280975c0a6af474707) )
@@ -2107,7 +2107,7 @@ GAME( 1986, phrcrazeb,phrcraze,phrcraze, phrcrazs, merit_state, key_7,  ROT0,  "
 GAME( 1986, phrcrazec,phrcraze,phrcraze, phrcrazs, merit_state, key_7,  ROT0,  "Merit", "Phraze Craze (Expanded Questions, set 2)",    GAME_SUPPORTS_SAVE )
 GAME( 1986, phrcrazev,phrcraze,phrcraze, phrcrazs, merit_state, key_7,  ROT90, "Merit", "Phraze Craze (Sex Kit, Vertical)",            GAME_SUPPORTS_SAVE )
 
-GAME( 1986, bigappg,  0,       bigappg,  bigappg, driver_device,  0,    ROT0,  "Merit", "Big Apple Games",                             GAME_SUPPORTS_SAVE )
+GAME( 1986, bigappg,  0,       bigappg,  bigappg, driver_device,  0,    ROT0,  "Merit", "Big Apple Games (2131-13)",                   GAME_SUPPORTS_SAVE )
 
 GAME( 1986, dodgectya,dodgecty,dodge,    couple, driver_device,   0,    ROT0,  "Merit", "Dodge City (2131-82, set 1)",                 GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1986, dodgectyb,dodgecty,dodge,    couple, driver_device,   0,    ROT0,  "Merit", "Dodge City (2131-82, set 2)",                 GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
