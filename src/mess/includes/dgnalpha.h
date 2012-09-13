@@ -36,7 +36,13 @@
 class dragon_alpha_state : public dragon64_state
 {
 public:
-	dragon_alpha_state(const machine_config &mconfig, device_type type, const char *tag);
+	dragon_alpha_state(const machine_config &mconfig, device_type type, const char *tag)
+	: dragon64_state(mconfig, type, tag),
+	  m_pia_2(*this, PIA2_TAG),
+	  m_ay8912(*this, AY8912_TAG),
+	  m_fdc(*this, WD2797_TAG)
+	{
+	}
 
 	required_device<pia6821_device> m_pia_2;
 	required_device<device_t> m_ay8912;

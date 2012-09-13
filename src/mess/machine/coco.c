@@ -75,28 +75,6 @@ DAC and bitbanger values written should be reflected in the read.
 //**************************************************************************
 
 //-------------------------------------------------
-//  ctor
-//-------------------------------------------------
-
-coco_state::coco_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-	  m_maincpu(*this, MAINCPU_TAG),
-	  m_pia_0(*this, PIA0_TAG),
-	  m_pia_1(*this, PIA1_TAG),
-	  m_dac(*this, DAC_TAG),
-	  m_wave(*this, WAVE_TAG),
-	  m_cococart(*this, CARTRIDGE_TAG),
-	  m_ram(*this, RAM_TAG),
-	  m_cassette(*this, CASSETTE_TAG),
-	  m_bitbanger(*this, BITBANGER_TAG),
-	  m_vhd_0(*this, VHD0_TAG),
-	  m_vhd_1(*this, VHD1_TAG)
-{
-}
-
-
-
-//-------------------------------------------------
 //  analog_port_start
 //-------------------------------------------------
 

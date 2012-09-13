@@ -81,7 +81,21 @@ MACHINE_CONFIG_EXTERN( coco_sound );
 class coco_state : public driver_device
 {
 public:
-	coco_state(const machine_config &mconfig, device_type type, const char *tag);
+	coco_state(const machine_config &mconfig, device_type type, const char *tag)
+	: driver_device(mconfig, type, tag),
+	  m_maincpu(*this, MAINCPU_TAG),
+	  m_pia_0(*this, PIA0_TAG),
+	  m_pia_1(*this, PIA1_TAG),
+	  m_dac(*this, DAC_TAG),
+	  m_wave(*this, WAVE_TAG),
+	  m_cococart(*this, CARTRIDGE_TAG),
+	  m_ram(*this, RAM_TAG),
+	  m_cassette(*this, CASSETTE_TAG),
+	  m_bitbanger(*this, BITBANGER_TAG),
+	  m_vhd_0(*this, VHD0_TAG),
+	  m_vhd_1(*this, VHD1_TAG)
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_0;

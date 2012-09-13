@@ -43,20 +43,6 @@
 
 #include "includes/coco3.h"
 
-
-
-//-------------------------------------------------
-//  ctor
-//-------------------------------------------------
-
-coco3_state::coco3_state(const machine_config &mconfig, device_type type, const char *tag)
-	: coco_state(mconfig, type, tag),
-	  m_gime(*this, GIME_TAG)
-{
-}
-
-
-
 //-------------------------------------------------
 //  ff20_write
 //-------------------------------------------------

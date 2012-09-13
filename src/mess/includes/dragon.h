@@ -34,7 +34,11 @@
 class dragon_state : public coco12_state
 {
 public:
-	dragon_state(const machine_config &mconfig, device_type type, const char *tag);
+	dragon_state(const machine_config &mconfig, device_type type, const char *tag)
+	: coco12_state(mconfig, type, tag),
+	  m_printer(*this, PRINTER_TAG)
+	{
+	}
 
 	required_device<printer_image_device> m_printer;
 
@@ -47,7 +51,11 @@ protected:
 class dragon64_state : public dragon_state
 {
 public:
-	dragon64_state(const machine_config &mconfig, device_type type, const char *tag);
+	dragon64_state(const machine_config &mconfig, device_type type, const char *tag)
+	: dragon_state(mconfig, type, tag),
+	  m_acia(*this, ACIA_TAG)
+	{
+	}
 
 	required_device<acia6551_device> m_acia;
 

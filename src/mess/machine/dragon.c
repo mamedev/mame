@@ -43,18 +43,6 @@ easier to manage.
 ***************************************************************************/
 
 //-------------------------------------------------
-//  ctor
-//-------------------------------------------------
-
-dragon_state::dragon_state(const machine_config &mconfig, device_type type, const char *tag)
-	: coco12_state(mconfig, type, tag),
-	  m_printer(*this, PRINTER_TAG)
-{
-}
-
-
-
-//-------------------------------------------------
 //  pia1_pa_changed - called when PIA1 PA changes
 //-------------------------------------------------
 
@@ -75,18 +63,6 @@ void dragon_state::pia1_pa_changed(void)
 /***************************************************************************
   DRAGON64
 ***************************************************************************/
-
-//-------------------------------------------------
-//  ctor
-//-------------------------------------------------
-
-dragon64_state::dragon64_state(const machine_config &mconfig, device_type type, const char *tag)
-	: dragon_state(mconfig, type, tag),
-	  m_acia(*this, ACIA_TAG)
-{
-}
-
-
 
 //-------------------------------------------------
 //  ff00_read

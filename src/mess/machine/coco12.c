@@ -9,19 +9,6 @@
 #include "includes/coco12.h"
 
 //-------------------------------------------------
-//  ctor
-//-------------------------------------------------
-
-coco12_state::coco12_state(const machine_config &mconfig, device_type type, const char *tag)
-	: coco_state(mconfig, type, tag),
-	  m_sam(*this, SAM_TAG),
-	  m_vdg(*this, VDG_TAG)
-{
-}
-
-
-
-//-------------------------------------------------
 //  device_start
 //-------------------------------------------------
 

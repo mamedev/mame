@@ -34,7 +34,13 @@
 class coco12_state : public coco_state
 {
 public:
-	coco12_state(const machine_config &mconfig, device_type type, const char *tag);
+	coco12_state(const machine_config &mconfig, device_type type, const char *tag)
+	: coco_state(mconfig, type, tag),
+	  m_sam(*this, SAM_TAG),
+	  m_vdg(*this, VDG_TAG)
+	{
+	}
+
 
 	required_device<sam6883_device> m_sam;
 	required_device<mc6847_base_device> m_vdg;

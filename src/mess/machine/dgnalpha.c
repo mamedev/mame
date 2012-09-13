@@ -68,20 +68,6 @@ keeping track of it in a variable in the driver.
 #include "sound/ay8910.h"
 #include "imagedev/flopdrv.h"
 
-
-//-------------------------------------------------
-//  ctor
-//-------------------------------------------------
-
-dragon_alpha_state::dragon_alpha_state(const machine_config &mconfig, device_type type, const char *tag)
-	: dragon64_state(mconfig, type, tag),
-	  m_pia_2(*this, PIA2_TAG),
-	  m_ay8912(*this, AY8912_TAG),
-	  m_fdc(*this, WD2797_TAG)
-{
-}
-
-
 //-------------------------------------------------
 //  device_start
 //-------------------------------------------------
