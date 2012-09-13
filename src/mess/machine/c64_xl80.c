@@ -95,7 +95,7 @@ void c64_xl80_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitma
 		for (int bit = 0; bit < 8; bit++)
 		{
 			int x = (column * 8) + bit;
-			int color = BIT(data, 7) ? 7 : 0;
+			int color = BIT(data, 7);
 
 			bitmap.pix32(y, x) = RGB_MONOCHROME_WHITE[color];
 
