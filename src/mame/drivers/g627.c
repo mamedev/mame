@@ -15,10 +15,27 @@
 
     Schematic and PinMAME used as references
 
+Machine Operation:
+1. Press num-enter then END then .(period key)   (the displays will flash 400000)
+2. Press num-enter
+3. Insert a coin, credit will be registered
+4. Hold X and start game. When 00 is flashing, release X
+5. Press any of QWERYUIOASDFGHJKLZ-='; to simulate scoring shots (T will tilt)
+6. Press and hold X to simulate losing the ball
+7. When score starts flashing, release X and go to step 5 to play next ball
+
+Notes: Do not play more than one player because the machine will try to
+rotate the table, and the motor circuits are not emulated due to lack of info.
+This means that the score labels of East, West and South are not verified.
+
+The manual explains the tests available, and also how to set number of balls,
+high score, etc., with the diagnostic keyboard.
+
 ToDo:
 - Battery backup
 - Outputs
-- Displays / Layout to fix
+- Simulate motor circuitry and sensor feedback
+- Verify labels of East, West and South on the display panel
 - Possibility of a rom missing (most likely it is optional)
 
 *******************************************************************************/
@@ -43,6 +60,7 @@ public:
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
+	DECLARE_WRITE8_MEMBER(lamp_w);
 
 protected:
 
@@ -66,15 +84,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( g627_io, AS_IO, 8, g627_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x02) AM_WRITE(disp_w)
-	//AM_RANGE(0x03, 0x07) AM_WRITE(port_0x_w)
+	AM_RANGE(0x03, 0x07) AM_WRITE(lamp_w)
 	AM_RANGE(0x10, 0x17) AM_DEVWRITE_LEGACY("astrocade", astrocade_sound_w)
 	AM_RANGE(0x20, 0x27) AM_DEVREADWRITE("i8156", i8155_device, io_r, io_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( g627 )
 	PORT_START("X0")
+	PORT_BIT(0x03, IP_ACTIVE_LOW, IPT_UNUSED) // force 3 here so game can start
 	//bits 0,1 : optical encoder for precise table alignment. Correct position = 3.
 	//bit2-7   : position of table as it turns, using Gray code.
+	// code to convert a number to a Gray Code: { return (input >> 1)^input; }
 	PORT_START("X1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Centre TB") PORT_CODE(KEYCODE_Q)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Bank Shot Outlane") PORT_CODE(KEYCODE_W)
@@ -92,7 +112,7 @@ static INPUT_PORTS_START( g627 )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("North Slam")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("North Test") PORT_CODE(KEYCODE_9)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("North Coin")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("North Tilt") PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_TILT) PORT_NAME("North Tilt")
 	PORT_START("X3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Top Slingshot") PORT_CODE(KEYCODE_O)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Bank Shot Advance") PORT_CODE(KEYCODE_A)
@@ -181,13 +201,18 @@ READ8_MEMBER( g627_state::portb_r )
 	return 0;
 }
 
-// write the 6 digits of 1 display panel
+// write 6 digits
 WRITE8_MEMBER( g627_state::portc_w )
 {
 	m_portc = data;
-	if (data < 7)
-		for (int i = 0; i < 6; i++)
-			output_set_digit_value(data * 10 + i, m_seg[i]);
+	if (data < 6)
+	{
+		output_set_digit_value(data, m_seg[0]);
+		output_set_digit_value(10 + data, m_seg[1]);
+		output_set_digit_value(20 + data, m_seg[2]);
+		output_set_digit_value(30 + data, m_seg[3]);
+		output_set_digit_value(50 + data, m_seg[5]);
+	}
 }
 
 // save segments until we can write the digits
@@ -197,6 +222,11 @@ WRITE8_MEMBER( g627_state::disp_w )
 	offset <<= 1;
 	m_seg[offset] = patterns[data>>4];
 	m_seg[++offset] = patterns[data&15];
+}
+
+// lamps and solenoids
+WRITE8_MEMBER( g627_state::lamp_w )
+{
 }
 
 static I8156_INTERFACE(i8156_intf)
@@ -235,4 +265,4 @@ ROM_START(rotation)
 ROM_END
 
 
-GAME(1978,  rotation,  0,  g627,  g627, driver_device,  0,  ROT0,  "Midway", "Rotation VIII", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD)
+GAME(1978,  rotation,  0,  g627,  g627, driver_device,  0,  ROT0,  "Midway", "Rotation VIII", GAME_MECHANICAL )
