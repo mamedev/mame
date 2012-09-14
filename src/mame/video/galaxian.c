@@ -552,10 +552,13 @@ static void sprites_draw(running_machine &machine, bitmap_rgb32 &bitmap, const r
 	rectangle clip = cliprect;
 	int sprnum;
 
+	/* the existence of +1 (sprite vs tile layer) is supported by a LOT of games */
+	const int hoffset = 1;
+	
 	/* 16 of the 256 pixels of the sprites are hard-clipped at the line buffer */
 	/* according to the schematics, it should be the first 16 pixels */
-	clip.min_x = MAX(clip.min_x, (!state->m_flipscreen_x) * 16 * GALAXIAN_XSCALE);
-	clip.max_x = MIN(clip.max_x, (256 - state->m_flipscreen_x * 16) * GALAXIAN_XSCALE - 1);
+	clip.min_x = MAX(clip.min_x, (!state->m_flipscreen_x) * (16 + hoffset) * GALAXIAN_XSCALE);
+	clip.max_x = MIN(clip.max_x, (256 - state->m_flipscreen_x * (16 + hoffset)) * GALAXIAN_XSCALE - 1);
 
 	/* The line buffer is only written if it contains a '0' currently; */
 	/* it is cleared during the visible area, and populated during HBLANK */
@@ -572,7 +575,7 @@ static void sprites_draw(running_machine &machine, bitmap_rgb32 &bitmap, const r
 		UINT8 flipx = base[1] & 0x40;
 		UINT8 flipy = base[1] & 0x80;
 		UINT8 color = base[2] & 7;
-		UINT8 sx = base[3] + 1;
+		UINT8 sx = base[3] + hoffset;
 
 		/* extend the sprite information */
 		if (state->m_extend_sprite_info_ptr != NULL)
