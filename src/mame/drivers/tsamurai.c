@@ -741,6 +741,7 @@ static MACHINE_CONFIG_START( vsgongf, tsamurai_state )
 	MCFG_GFXDECODE(tsamurai)
 	MCFG_PALETTE_LENGTH(256)
 
+	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,vsgongf)
 
 	/* sound hardware */
