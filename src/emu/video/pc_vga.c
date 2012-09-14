@@ -3103,8 +3103,25 @@ WRITE8_HANDLER(s3_port_03d0_w)
 	}
 }
 
-/* accelerated ports, TBD ... */
+READ8_HANDLER( ati_port_03c0_r )
+{
+	UINT8 data = 0xff;
 
+	switch(offset)
+	{
+	case 1:
+		if ((vga.attribute.index&0x1f) < sizeof(vga.attribute.data))
+			data = vga.attribute.data[vga.attribute.index&0x1f];
+		break;
+	default:
+		data = vga_port_03c0_r(space,offset);
+		break;
+	}
+	return data;
+}
+
+
+/* accelerated ports, TBD ... */
 
 static void s3_write_fg(UINT32 offset)
 {
@@ -4858,6 +4875,7 @@ static void ati_define_video_mode(running_machine &machine)
 	int clock;
 	UINT8 clock_type;
 	int div = ((ati.ext_reg[0x38] & 0xc0) >> 6) + 1;
+	int divisor = 1;
 
 	svga.rgb8_en = 0;
 	svga.rgb15_en = 0;
@@ -4922,8 +4940,8 @@ static void ati_define_video_mode(running_machine &machine)
 		clock = XTAL_42_9545MHz;
 		logerror("Invalid dot clock %i selected.\n",clock_type);
 	}
-
-	recompute_params_clock(machine,1,clock / div);
+//	logerror("ATI: Clock select type %i (%iHz / %i)\n",clock_type,clock,div);
+	recompute_params_clock(machine,divisor,clock / div);
 }
 
 READ8_HANDLER( ati_mem_r )
@@ -4978,7 +4996,6 @@ READ8_DEVICE_HANDLER(ati_port_ext_r)
 		}
 		break;
 	}
-
 	return ret;
 }
 
@@ -4996,6 +5013,7 @@ WRITE8_DEVICE_HANDLER(ati_port_ext_w)
 		case 0x23:
 			vga.crtc.start_addr = (vga.crtc.start_addr & 0xfffdffff) | ((data & 0x10) << 13);
 			vga.crtc.cursor_addr = (vga.crtc.cursor_addr & 0xfffdffff) | ((data & 0x08) << 14);
+			logerror("ATI: ATI23 write %02x\n",data);
 			break;
 		case 0x2d:
 			if(data & 0x08)
@@ -5003,12 +5021,13 @@ WRITE8_DEVICE_HANDLER(ati_port_ext_w)
 				vga.crtc.horz_total = (vga.crtc.horz_total & 0x00ff) | (data & 0x01) << 8;
 				// bit 1 = bit 8 of horizontal blank start
 				// bit 2 = bit 8 of horizontal retrace start
-				logerror("ATI: ATI2D (extensions) write %02x\n",data);
 			}
+			logerror("ATI: ATI2D (extensions) write %02x\n",data);
 			break;
 		case 0x30:
 			vga.crtc.start_addr = (vga.crtc.start_addr & 0xfffeffff) | ((data & 0x40) << 10);
 			vga.crtc.cursor_addr = (vga.crtc.cursor_addr & 0xfffeffff) | ((data & 0x04) << 14);
+			logerror("ATI: ATI30 write %02x\n",data);
 			break;
 		case 0x32:  // memory page select
 			if(ati.ext_reg[0x3e] & 0x08)
@@ -5021,7 +5040,7 @@ WRITE8_DEVICE_HANDLER(ati_port_ext_w)
 				svga.bank_r = ((data & 0x1e) >> 1);
 				svga.bank_w = ((data & 0x1e) >> 1);
 			}
-			logerror("ATI: Memory Page Select write %02x (read: %i write %i)\n",data,svga.bank_r,svga.bank_w);
+			//logerror("ATI: Memory Page Select write %02x (read: %i write %i)\n",data,svga.bank_r,svga.bank_w);
 			break;
 		case 0x33:  // EEPROM
 			if(data & 0x04)
@@ -5034,6 +5053,8 @@ WRITE8_DEVICE_HANDLER(ati_port_ext_w)
 					eep->set_cs_line((data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 				}
 			}
+			else
+				logerror("ATI: ATI33 write %02x\n",data);
 			break;
 		default:
 			logerror("ATI: Extended VGA register 0x01CE index %02x write %02x\n",ati.ext_reg_select,data);

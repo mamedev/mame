@@ -98,6 +98,7 @@ WRITE16_HANDLER(s3_pixel_xfer_w);
 READ8_HANDLER(s3_mem_r);
 WRITE8_HANDLER(s3_mem_w);
 
+READ8_HANDLER( ati_port_03c0_r );
 READ8_DEVICE_HANDLER(ati_port_ext_r);
 WRITE8_DEVICE_HANDLER(ati_port_ext_w);
 READ16_HANDLER(ibm8514_gpstatus_r);

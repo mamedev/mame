@@ -81,7 +81,7 @@ void isa16_vga_gfxultra_device::device_start()
 	m_isa->install_device(this, 0x1ce, 0x1cf, 0, 0, FUNC(ati_port_ext_r), FUNC(ati_port_ext_w));
 	m_isa->install16_device(0x2e8, 0x2eb, 0, 0, FUNC(mach8_status_r), FUNC(mach8_htotal_w));
 	m_isa->install_device(0x3b0, 0x3bf, 0, 0, FUNC(vga_port_03b0_r), FUNC(vga_port_03b0_w));
-	m_isa->install_device(0x3c0, 0x3cf, 0, 0, FUNC(vga_port_03c0_r), FUNC(vga_port_03c0_w));
+	m_isa->install_device(0x3c0, 0x3cf, 0, 0, FUNC(ati_port_03c0_r), FUNC(vga_port_03c0_w));
 	m_isa->install_device(0x3d0, 0x3df, 0, 0, FUNC(vga_port_03d0_r), FUNC(vga_port_03d0_w));
 	m_isa->install16_device(0x12e8, 0x12eb, 0, 0, FUNC(mach8_vtotal_r),FUNC(mach8_vtotal_w));
 	m_isa->install16_device(0x12ec, 0x12ef, 0, 0, FUNC(mach8_config1_r),NULL,NULL);
