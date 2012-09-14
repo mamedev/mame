@@ -1997,7 +1997,7 @@ READ8_MEMBER(gb_state::gbc_io2_r)
 	switch( offset )
 	{
 	case 0x0D:	/* KEY1 */
-		machine().device<lr35902_cpu_device>(":maincpu")->get_speed();
+		return machine().device<lr35902_cpu_device>(":maincpu")->get_speed();
 	case 0x16:	/* RP - Infrared port */
 		break;
 	case 0x30:	/* SVBK - RAM bank select */
