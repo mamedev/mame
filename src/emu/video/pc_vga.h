@@ -125,6 +125,7 @@ READ16_HANDLER(mach8_vdisp_r);
 WRITE16_HANDLER(mach8_vdisp_w);
 READ16_HANDLER(mach8_vsync_r);
 WRITE16_HANDLER(mach8_vsync_w);
+WRITE16_HANDLER(mach8_linedraw_w);
 READ16_HANDLER(mach8_ec0_r);
 WRITE16_HANDLER(mach8_ec0_w);
 READ16_HANDLER(mach8_ec1_r);

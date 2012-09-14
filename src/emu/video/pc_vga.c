@@ -5252,6 +5252,39 @@ WRITE16_HANDLER(mach8_bresenham_count_w)
 	logerror("Mach8: Bresenham count write %04x\n",data);
 }
 
+WRITE16_HANDLER(mach8_linedraw_w)
+{
+	// TODO: actually draw the lines
+	switch(ati.linedraw)
+	{
+	case 0:  // Set current X
+		s3.curr_x = data;
+		ati.linedraw++;
+		break;
+	case 1:  // Set current Y
+		s3.curr_y = data;
+		ati.linedraw++;
+		break;
+	case 2:  // Line end X
+		s3.curr_x = data;
+		ati.linedraw++;
+		break;
+	case 3:  // Line end Y
+		s3.curr_y = data;
+		ati.linedraw = 2;
+		break;
+	case 4:  // Set current X
+		s3.curr_x = data;
+		ati.linedraw++;
+		break;
+	case 5:  // Set current Y
+		s3.curr_y = data;
+		ati.linedraw = 4;
+		break;
+	}
+	logerror("ATI: Linedraw register write %04x, mode %i\n",data,ati.linedraw);
+}
+
 READ16_HANDLER(mach8_scratch0_r)
 {
 	return ati.scratch0;

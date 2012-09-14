@@ -113,6 +113,7 @@ void isa16_vga_gfxultra_device::device_start()
 	m_isa->install16_device(0xbae8, 0xbaeb, 0, 0, FUNC(s3_foremix_r), FUNC(s3_foremix_w));
 	m_isa->install16_device(0xbee8, 0xbeeb, 0, 0, FUNC(s3_multifunc_r), FUNC(s3_multifunc_w));
 	m_isa->install16_device(0xe2e8, 0xe2eb, 0, 0, FUNC(s3_pixel_xfer_r), FUNC(s3_pixel_xfer_w));
+	m_isa->install16_device(0xfeec, 0xfeef, 0, 0, NULL, NULL, FUNC(mach8_linedraw_w));
 
 	m_isa->install_memory(0xa0000, 0xbffff, 0, 0, FUNC(ati_mem_r), FUNC(ati_mem_w));
 }
