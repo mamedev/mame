@@ -1259,7 +1259,6 @@ static ADDRESS_MAP_START( namcos12_map, AS_PROGRAM, 32, namcos12_state )
 	AM_RANGE(0x1f140000, 0x1f140fff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0x00ff00ff) /* eeprom */
 	AM_RANGE(0x1f1bff08, 0x1f1bff0f) AM_WRITENOP    /* ?? */
 	AM_RANGE(0x1f700000, 0x1f70ffff) AM_WRITE(dmaoffset_w)  /* dma */
-	AM_RANGE(0x1f801000, 0x1f801003) AM_WRITE(s12_dma_bias_w)
 	AM_RANGE(0x1fa00000, 0x1fbfffff) AM_ROMBANK("bank1") /* banked roms */
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
 	AM_RANGE(0x80000000, 0x803fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
@@ -1389,7 +1388,11 @@ MACHINE_RESET_MEMBER(namcos12_state,namcos12)
 {
 	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	bankoffset_w(*space,0,0,0xffffffff);
+
+	space->install_write_handler(0x1f801000, 0x1f801003, write32_delegate(FUNC(namcos12_state::s12_dma_bias_w),this));
+
 	m_has_tektagt_dma = 0;
+
 
 	if( strcmp( machine().system().name, "tektagt" ) == 0 ||
 		strcmp( machine().system().name, "tektagtac" ) == 0 ||

@@ -1527,7 +1527,7 @@ static ADDRESS_MAP_START( psxcpu_internal_map, AS_PROGRAM, 32, psxcpu_device )
 	AM_RANGE(0x00800000, 0x1effffff) AM_READWRITE( berr_r, berr_w )
 	AM_RANGE(0x1f800000, 0x1f8003ff) AM_NOP /* scratchpad */
 	AM_RANGE(0x1f800400, 0x1f800fff) AM_READWRITE( berr_r, berr_w )
-	AM_RANGE(0x1f801004, 0x1f80101f) AM_RAM
+	AM_RANGE(0x1f801000, 0x1f80101f) AM_RAM
 	/* 1f801014 spu delay */
 	/* 1f801018 dv delay */
 	AM_RANGE(0x1f801020, 0x1f801023) AM_READWRITE_LEGACY( psx_com_delay_r, psx_com_delay_w )
@@ -1557,7 +1557,7 @@ static ADDRESS_MAP_START( cxd8661r_internal_map, AS_PROGRAM, 32, psxcpu_device )
 	AM_RANGE(0x01000000, 0x1effffff) AM_READWRITE( berr_r, berr_w )
 	AM_RANGE(0x1f800000, 0x1f8003ff) AM_NOP /* scratchpad */
 	AM_RANGE(0x1f800400, 0x1f800fff) AM_READWRITE( berr_r, berr_w )
-	AM_RANGE(0x1f801004, 0x1f80101f) AM_RAM
+	AM_RANGE(0x1f801000, 0x1f80101f) AM_RAM
 	AM_RANGE(0x1f801020, 0x1f801023) AM_READWRITE_LEGACY( psx_com_delay_r, psx_com_delay_w )
 	AM_RANGE(0x1f801024, 0x1f80102f) AM_RAM
 	AM_RANGE(0x1f801040, 0x1f80105f) AM_DEVREADWRITE( "sio", psxsio_device, read, write )
