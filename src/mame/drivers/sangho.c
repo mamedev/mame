@@ -474,6 +474,7 @@ static MACHINE_CONFIG_START( sexyboom, sangho_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(sangho_state,sexyboom)
 
+	MCFG_PALETTE_INIT( v9958 )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ymsnd", YM2413, 3580000)

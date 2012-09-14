@@ -108,7 +108,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
 	TILE_GET_INFO_MEMBER(get_sc1_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(kingdrby);
 	DECLARE_PALETTE_INIT(kingdrbb);
 };
 
@@ -955,7 +955,7 @@ static const ym2203_interface cowrace_ym2203_interface =
 	DEVCB_NULL
 };
 
-void kingdrby_state::palette_init()
+PALETTE_INIT_MEMBER(kingdrby_state,kingdrby)
 {
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int	bit0, bit1, bit2 , r, g, b;
@@ -1038,7 +1038,7 @@ static MACHINE_CONFIG_START( kingdrby, kingdrby_state )
 
 	MCFG_GFXDECODE(kingdrby)
 	MCFG_PALETTE_LENGTH(0x200)
-
+	MCFG_PALETTE_INIT_OVERRIDE(kingdrby_state,kingdrby)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -1076,7 +1076,7 @@ static MACHINE_CONFIG_DERIVED( cowrace, kingdrbb )
 	MCFG_CPU_IO_MAP(cowrace_sound_io)
 
 	MCFG_GFXDECODE(cowrace)
-
+	MCFG_PALETTE_INIT_OVERRIDE(kingdrby_state,kingdrby)
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
