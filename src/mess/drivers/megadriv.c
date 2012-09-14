@@ -9,8 +9,6 @@ public:
 	: md_cons_state(mconfig, type, tag) { }
 
 	UINT8 m_page_register;
-	DECLARE_MACHINE_START(ms_megadriv);
-	DECLARE_MACHINE_RESET(ms_megadriv);
 };
 
 /*************************************
@@ -317,23 +315,23 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(pico_state,ms_megadriv)
+static MACHINE_START( ms_megadriv )
 {
-	mess_init_6buttons_pad(machine());
-	MACHINE_START_CALL_LEGACY( md_sram );
+	mess_init_6buttons_pad(machine);
+	MACHINE_START_CALL( md_sram );
 }
 
-MACHINE_RESET_MEMBER(pico_state,ms_megadriv)
+static MACHINE_RESET( ms_megadriv )
 {
-	MACHINE_RESET_CALL_LEGACY( megadriv );
+	MACHINE_RESET_CALL( megadriv );
 }
 
 static MACHINE_CONFIG_START( ms_megadriv, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 	MCFG_NVRAM_HANDLER_CLEAR()
 
-	MCFG_MACHINE_START_OVERRIDE(pico_state, ms_megadriv )
-	MCFG_MACHINE_RESET_OVERRIDE(pico_state, ms_megadriv )
+	MCFG_MACHINE_START( ms_megadriv )
+	MCFG_MACHINE_RESET( ms_megadriv )
 
 	MCFG_FRAGMENT_ADD( genesis_cartslot )
 MACHINE_CONFIG_END
@@ -342,8 +340,8 @@ static MACHINE_CONFIG_START( ms_megadpal, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_pal )
 	MCFG_NVRAM_HANDLER_CLEAR()
 
-	MCFG_MACHINE_START_OVERRIDE(pico_state, ms_megadriv )
-	MCFG_MACHINE_RESET_OVERRIDE(pico_state, ms_megadriv )
+	MCFG_MACHINE_START( ms_megadriv )
+	MCFG_MACHINE_RESET( ms_megadriv )
 
 	MCFG_FRAGMENT_ADD( genesis_cartslot )
 MACHINE_CONFIG_END
@@ -353,8 +351,8 @@ static MACHINE_CONFIG_START( ms_megdsvp, mdsvp_state )
 	MCFG_FRAGMENT_ADD( md_svp )
 	MCFG_NVRAM_HANDLER_CLEAR()
 
-	MCFG_MACHINE_START_OVERRIDE(pico_state, ms_megadriv )
-	MCFG_MACHINE_RESET_OVERRIDE(pico_state, ms_megadriv )
+	MCFG_MACHINE_START( ms_megadriv )
+	MCFG_MACHINE_RESET( ms_megadriv )
 
 	MCFG_FRAGMENT_ADD( genesis_cartslot )
 MACHINE_CONFIG_END
@@ -364,8 +362,8 @@ static MACHINE_CONFIG_START( ms_megdsvppal, mdsvp_state )
 	MCFG_FRAGMENT_ADD( md_svp )
 	MCFG_NVRAM_HANDLER_CLEAR()
 
-	MCFG_MACHINE_START_OVERRIDE(pico_state, ms_megadriv )
-	MCFG_MACHINE_RESET_OVERRIDE(pico_state, ms_megadriv )
+	MCFG_MACHINE_START( ms_megadriv )
+	MCFG_MACHINE_RESET( ms_megadriv )
 
 	MCFG_FRAGMENT_ADD( genesis_cartslot )
 MACHINE_CONFIG_END
@@ -622,10 +620,10 @@ ROM_START( 32x_scd )
 	ROM_REGION16_BE( 0x400000, "32x_68k_bios", 0 ) /* 68000 Code */
 	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )
 
-	ROM_REGION32_BE( 0x400000, "32x_master_sh2", 0 ) /* SH2 Code */
+	ROM_REGION32_BE( 0x400000, "master", 0 ) /* SH2 Code */
 	ROM_LOAD( "32x_m_bios.bin", 0x000000,  0x000800, CRC(dd9c46b8) SHA1(1e5b0b2441a4979b6966d942b20cc76c413b8c5e) )
 
-	ROM_REGION32_BE( 0x400000, "32x_slave_sh2", 0 ) /* SH2 Code */
+	ROM_REGION32_BE( 0x400000, "slave", 0 ) /* SH2 Code */
 	ROM_LOAD( "32x_s_bios.bin", 0x000000,  0x000400, CRC(bfda1fe5) SHA1(4103668c1bbd66c5e24558e73d4f3f92061a109a) )
 ROM_END
 
@@ -826,7 +824,7 @@ static MACHINE_CONFIG_START( pico, pico_state )
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 
-	MCFG_MACHINE_RESET_OVERRIDE(pico_state, ms_megadriv )
+	MCFG_MACHINE_RESET( ms_megadriv )
 
 	MCFG_FRAGMENT_ADD( pico_cartslot )
 MACHINE_CONFIG_END
@@ -840,7 +838,7 @@ static MACHINE_CONFIG_START( picopal, pico_state )
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 
-	MCFG_MACHINE_RESET_OVERRIDE(pico_state, ms_megadriv )
+	MCFG_MACHINE_RESET( ms_megadriv )
 
 	MCFG_FRAGMENT_ADD( pico_cartslot )
 MACHINE_CONFIG_END
