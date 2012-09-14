@@ -1830,16 +1830,20 @@ King Ghidorah 0x12c8 X = 0x26eb Y = 0x55dc
 Mecha Ghidorah 0x12dc X = 0x24ec Y = 0x55dc
 Mecha Godzilla 0x12d4 X = 0x1cf1 Y = 0x52dc
 Gigan 0x12cc X = 0x23e8 Y = 0x55db
+
+(DC.W $1020, $F0C0, $0000, $0000)
+X = collides at the same spot
+Y = collides between 0xd0 and 0x20
+
 */
 static void cop_take_hit_box_params(UINT8 offs)
 {
 	INT16 start_x,start_y,end_x,end_y;
 
-	start_x = INT8(cop_collision_info[offs].hitbox_x);
-	start_y = INT8(cop_collision_info[offs].hitbox_y);
-
-	end_x = INT8(cop_collision_info[offs].hitbox_x >> 8);
 	end_y = INT8(cop_collision_info[offs].hitbox_y >> 8);
+	start_y = INT8(cop_collision_info[offs].hitbox_y);
+	end_x = INT8(cop_collision_info[offs].hitbox_x >> 8);
+	start_x = INT8(cop_collision_info[offs].hitbox_x);
 
 	cop_collision_info[offs].min_x = start_x + (cop_collision_info[offs].x >> 16);
 	cop_collision_info[offs].min_y = start_y + (cop_collision_info[offs].y >> 16);
