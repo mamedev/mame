@@ -57,7 +57,7 @@ READ8_MEMBER(nbmj8991_state::nbmj8991_sound_r)
 	return data;
 }
 
-MACHINE_RESET_MEMBER(nbmj8991_state,nbmj8991)
+void nbmj8991_state::machine_reset()
 {
 	device_t *audiocpu = machine().device("audiocpu");
 	if (audiocpu != NULL && audiocpu->type() == Z80)
@@ -65,7 +65,7 @@ MACHINE_RESET_MEMBER(nbmj8991_state,nbmj8991)
 		machine().root_device().membank("bank1")->configure_entries(0, 4, machine().root_device().memregion("audiocpu")->base() + 0x8000, 0x8000);
 		machine().root_device().membank("bank1")->set_entry(0);
 	}
-	nbmj8991_state::machine_reset();
+	MACHINE_RESET_CALL_LEGACY(nb1413m3);
 }
 
 DRIVER_INIT_MEMBER(nbmj8991_state,pstadium)
@@ -1475,8 +1475,6 @@ static MACHINE_CONFIG_START( nbmjdrv1, nbmj8991_state )	// galkoku
 	MCFG_CPU_IO_MAP(galkoku_io_map)
 	MCFG_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
-	MCFG_MACHINE_RESET_OVERRIDE(nbmj8991_state,nbmj8991)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1486,8 +1484,6 @@ static MACHINE_CONFIG_START( nbmjdrv1, nbmj8991_state )	// galkoku
 	MCFG_SCREEN_UPDATE_STATIC(nbmj8991_type1)
 
 	MCFG_PALETTE_LENGTH(256)
-
-	MCFG_VIDEO_START_OVERRIDE(nbmj8991_state,nbmj8991)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1512,8 +1508,6 @@ static MACHINE_CONFIG_START( nbmjdrv2, nbmj8991_state )	// pstadium
 	MCFG_CPU_IO_MAP(nbmj8991_sound_io_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 128*60) // ?
 
-	MCFG_MACHINE_RESET_OVERRIDE(nbmj8991_state,nbmj8991)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1523,8 +1517,6 @@ static MACHINE_CONFIG_START( nbmjdrv2, nbmj8991_state )	// pstadium
 	MCFG_SCREEN_UPDATE_STATIC(nbmj8991_type2)
 
 	MCFG_PALETTE_LENGTH(256)
-
-	MCFG_VIDEO_START_OVERRIDE(nbmj8991_state,nbmj8991)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

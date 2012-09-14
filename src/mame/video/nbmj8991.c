@@ -287,7 +287,7 @@ static void nbmj8991_gfxdraw(running_machine &machine)
 
 
 ******************************************************************************/
-VIDEO_START_MEMBER(nbmj8991_state,nbmj8991)
+void nbmj8991_state::video_start()
 {
 	int width = machine().primary_screen->width();
 	int height = machine().primary_screen->height();

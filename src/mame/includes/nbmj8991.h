@@ -49,8 +49,8 @@ public:
 	DECLARE_DRIVER_INIT(mcontest);
 	DECLARE_DRIVER_INIT(finalbny);
 	DECLARE_DRIVER_INIT(qmhayaku);
-	DECLARE_MACHINE_RESET(nbmj8991);
-	DECLARE_VIDEO_START(nbmj8991);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
 
