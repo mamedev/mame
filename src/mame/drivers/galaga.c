@@ -888,7 +888,7 @@ MACHINE_START_MEMBER(galaga_state,galaga)
 
 static void bosco_latch_reset(running_machine &machine)
 {
-	bosco_state *state = machine.driver_data<bosco_state>();
+	galaga_state *state = machine.driver_data<galaga_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
@@ -1750,8 +1750,8 @@ static MACHINE_CONFIG_START( galaga, galaga_state )
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MCFG_MACHINE_START_OVERRIDE(bosco_state,galaga)
-	MCFG_MACHINE_RESET_OVERRIDE(bosco_state,galaga)
+	MCFG_MACHINE_START_OVERRIDE(galaga_state,galaga)
+	MCFG_MACHINE_RESET_OVERRIDE(galaga_state,galaga)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1762,8 +1762,8 @@ static MACHINE_CONFIG_START( galaga, galaga_state )
 	MCFG_GFXDECODE(galaga)
 	MCFG_PALETTE_LENGTH(64*4+64*4+64)
 
-	MCFG_PALETTE_INIT_OVERRIDE(bosco_state,galaga)
-	MCFG_VIDEO_START_OVERRIDE(bosco_state,galaga)
+	MCFG_PALETTE_INIT_OVERRIDE(galaga_state,galaga)
+	MCFG_VIDEO_START_OVERRIDE(galaga_state,galaga)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

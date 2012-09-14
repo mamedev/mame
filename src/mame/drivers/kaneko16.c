@@ -1697,7 +1697,7 @@ static MACHINE_CONFIG_START( bakubrkr, kaneko16_state )
 	MCFG_CPU_PROGRAM_MAP(bakubrkr)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", kaneko16_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_berlwall_state,gtmr)
+	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_state,gtmr)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
@@ -1727,7 +1727,7 @@ static MACHINE_CONFIG_START( bakubrkr, kaneko16_state )
 
 
 
-	MCFG_VIDEO_START_OVERRIDE(kaneko16_berlwall_state,kaneko16)
+	MCFG_VIDEO_START_OVERRIDE(kaneko16_state,kaneko16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1792,7 +1792,7 @@ static MACHINE_CONFIG_START( blazeon, kaneko16_state )
 
 	// there is actually a 2nd sprite chip! looks like our device emulation handles both at once
 
-	MCFG_VIDEO_START_OVERRIDE(kaneko16_berlwall_state,kaneko16)
+	MCFG_VIDEO_START_OVERRIDE(kaneko16_state,kaneko16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1825,7 +1825,7 @@ static MACHINE_CONFIG_START( gtmr, kaneko16_gtmr_state )
 	MCFG_CPU_PROGRAM_MAP(gtmr_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", kaneko16_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_berlwall_state,gtmr)
+	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_gtmr_state,gtmr)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -1860,7 +1860,7 @@ static MACHINE_CONFIG_START( gtmr, kaneko16_gtmr_state )
 	kaneko_hit_device::set_type(*device, 1);
 
 
-	MCFG_VIDEO_START_OVERRIDE(kaneko16_berlwall_state,kaneko16)
+	MCFG_VIDEO_START_OVERRIDE(kaneko16_gtmr_state,kaneko16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1898,7 +1898,7 @@ static MACHINE_CONFIG_DERIVED( bloodwar, gtmr )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bloodwar)
 
-	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_berlwall_state, gtmr )
+	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_gtmr_state, gtmr )
 
 	MCFG_DEVICE_MODIFY("kan_spr")
 	kaneko16_sprite_device::set_priorities(*device, 2 /* never used? */ ,3 /* character selection / vs. portraits */ ,5 /* winning portrait*/ ,7 /* ? */);
@@ -1919,7 +1919,7 @@ static MACHINE_CONFIG_DERIVED( bonkadv, gtmr )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bonkadv)
 
-	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_berlwall_state, gtmr )
+	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_gtmr_state, gtmr )
 
 	MCFG_DEVICE_MODIFY("kan_spr")
 	kaneko16_sprite_device::set_priorities(*device, 2 /* never used? */ ,3 /* volcano lava on level 2 */ ,5 /* in-game player */ ,7 /* demostration text */);
@@ -1944,7 +1944,7 @@ static MACHINE_CONFIG_START( mgcrystl, kaneko16_state )
 	MCFG_CPU_PROGRAM_MAP(mgcrystl)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", kaneko16_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_berlwall_state,mgcrystl)
+	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_state,mgcrystl)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
@@ -1974,7 +1974,7 @@ static MACHINE_CONFIG_START( mgcrystl, kaneko16_state )
 
 
 
-	MCFG_VIDEO_START_OVERRIDE(kaneko16_berlwall_state,kaneko16)
+	MCFG_VIDEO_START_OVERRIDE(kaneko16_state,kaneko16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2068,7 +2068,7 @@ static MACHINE_CONFIG_START( shogwarr, kaneko16_shogwarr_state )
 	MCFG_CPU_PROGRAM_MAP(shogwarr)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", shogwarr_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_berlwall_state,mgcrystl)
+	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_shogwarr_state,mgcrystl)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 	MCFG_EEPROM_DATA(shogwarr_default_eeprom, 128)
@@ -2090,7 +2090,7 @@ static MACHINE_CONFIG_START( shogwarr, kaneko16_shogwarr_state )
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
 	kaneko_view2_tilemap_device::set_offset(*device, 0x33, -0x8, 320, 240);
 
-	MCFG_VIDEO_START_OVERRIDE(kaneko16_berlwall_state,kaneko16)
+	MCFG_VIDEO_START_OVERRIDE(kaneko16_shogwarr_state,kaneko16)
 
 	MCFG_DEVICE_ADD_VU002_SPRITES
 	kaneko16_sprite_device::set_priorities(*device, 1 /* below all */ ,3 /* above tile[0], below the others */ ,5 /* above all */ ,7 /* above all */);
