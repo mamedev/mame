@@ -3259,6 +3259,9 @@ DRIVER_INIT_MEMBER(galaxian_state,kingball)
 	/* video extensions */
 	common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
 
+	/* disable the stars */
+	space->unmap_write(0xb004, 0xb004, 0, 0x07f8);
+
 	space->install_write_handler(0xb000, 0xb000, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::kingball_sound1_w),this));
 	space->install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::irq_enable_w),this));
 	space->install_write_handler(0xb002, 0xb002, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::kingball_sound2_w),this));
