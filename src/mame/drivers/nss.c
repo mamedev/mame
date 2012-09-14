@@ -327,8 +327,8 @@ public:
 	DECLARE_DRIVER_INIT(nss);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(game_over_flag_r);
-	DECLARE_MACHINE_START(nss);
-	DECLARE_MACHINE_RESET(nss);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -619,7 +619,7 @@ static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, nss_state )
 	AM_RANGE(0x07, 0x07) AM_WRITE(port_07_w)
 ADDRESS_MAP_END
 
-MACHINE_START_MEMBER(nss_state,nss)
+void nss_state::machine_start()
 {
 
 	MACHINE_START_CALL_LEGACY(snes);
@@ -800,9 +800,6 @@ static MACHINE_CONFIG_START( snes, nss_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_MACHINE_START( snes )
-	MCFG_MACHINE_RESET( snes )
-
 	/* video hardware */
 	MCFG_VIDEO_START( snes )
 
@@ -825,7 +822,7 @@ static INTERRUPT_GEN ( nss_vblank_irq )
 		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-MACHINE_RESET_MEMBER(nss_state,nss)
+void nss_state::machine_reset()
 {
 
 	MACHINE_RESET_CALL_LEGACY( snes );
@@ -854,9 +851,6 @@ static MACHINE_CONFIG_DERIVED( nss, snes )
 	MCFG_S3520CF_ADD("s3520cf") /* RTC */
 	MCFG_RP5H01_ADD("rp5h01")
 	MCFG_M6M80011AP_ADD("m6m80011ap")
-
-	MCFG_MACHINE_START_OVERRIDE(nss_state, nss )
-	MCFG_MACHINE_RESET_OVERRIDE(nss_state, nss )
 
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)

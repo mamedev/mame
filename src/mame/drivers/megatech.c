@@ -509,8 +509,10 @@ static MACHINE_CONFIG_START( megatech, mtech_state )
 	MCFG_CPU_PROGRAM_MAP(megatech_bios_map)
 	MCFG_CPU_IO_MAP(megatech_bios_portmap)
 
+	MCFG_MACHINE_RESET(0)
 	MCFG_MACHINE_RESET_OVERRIDE(mtech_state,mtnew)
 
+	MCFG_VIDEO_START(0)
 	MCFG_VIDEO_START_OVERRIDE(mtech_state,mtnew)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhovu)
