@@ -188,6 +188,8 @@ public:
 	DECLARE_READ8_MEMBER( i8155_pc_r );
 	DECLARE_WRITE_LINE_MEMBER( i8155_to_w );
 
+	DECLARE_PALETTE_INIT(tandy200);
+
 	void bankswitch(UINT8 data);
 
 	/* memory state */
