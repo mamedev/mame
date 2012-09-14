@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
-// #include "rowamet.lh"
+#include "rowamet.lh"
 
 class rowamet_state : public driver_device
 {
@@ -121,7 +121,7 @@ static MACHINE_CONFIG_START( rowamet, rowamet_state )
 	MCFG_TIMER_ADD_PERIODIC("rowamet_timer", rowamet_timer, attotime::from_hz(200))
 
 	/* Video */
-	//MCFG_DEFAULT_LAYOUT(layout_rowamet)
+	MCFG_DEFAULT_LAYOUT(layout_rowamet)
 
 	/* Sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

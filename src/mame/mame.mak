@@ -2170,6 +2170,8 @@ $(DRIVERS)/re900.o:	$(LAYOUT)/re900.lh
 
 $(DRIVERS)/roul.o:	$(LAYOUT)/roul.lh
 
+$(DRIVERS)/rowamet.o:	$(LAYOUT)/rowamet.lh
+
 $(DRIVERS)/sbrkout.o:	$(LAYOUT)/sbrkout.lh
 
 $(DRIVERS)/sderby.o:	$(LAYOUT)/sderby.lh \
