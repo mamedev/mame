@@ -20,7 +20,7 @@ public:
 	UINT32       *m_videoram;
 
 	/* misc */
-	UINT8        m_clock;
+	UINT8        m_mcu_clock;
 	DECLARE_READ8_MEMBER(mcu_sim_r);
 	DECLARE_WRITE8_MEMBER(mcu_sim_w);
 	DECLARE_WRITE8_MEMBER(kangaroo_coin_counter_w);

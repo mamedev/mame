@@ -182,7 +182,7 @@ MACHINE_START_MEMBER(kangaroo_state,kangaroo_mcu)
 {
 	kangaroo_state::machine_start();
 	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xef00, 0xefff, read8_delegate(FUNC(kangaroo_state::mcu_sim_r),this), write8_delegate(FUNC(kangaroo_state::mcu_sim_w),this));
-	save_item(NAME(m_clock));
+	save_item(NAME(m_mcu_clock));
 }
 
 
@@ -202,7 +202,7 @@ void kangaroo_state::machine_reset()
 	/* properly starts. */
 	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
-	m_clock = 0;
+	m_mcu_clock = 0;
 }
 
 
@@ -219,7 +219,7 @@ void kangaroo_state::machine_reset()
 
 READ8_MEMBER(kangaroo_state::mcu_sim_r)
 {
-	return ++m_clock & 0x0f;
+	return ++m_mcu_clock & 0x0f;
 }
 
 WRITE8_MEMBER(kangaroo_state::mcu_sim_w)
