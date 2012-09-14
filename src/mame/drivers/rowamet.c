@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
-#include "rowamet.lh"
+// #include "rowamet.lh"
 
 class rowamet_state : public driver_device
 {
