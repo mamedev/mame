@@ -57,11 +57,6 @@ public:
 void heatbrl_setgfxbank(running_machine &machine, UINT16 data);
 void denjinmk_setgfxbank(running_machine &machine, UINT16 data);
 
-
-
-
-
-
 SCREEN_UPDATE_IND16( legionna );
 SCREEN_UPDATE_IND16( godzilla );
 SCREEN_UPDATE_IND16( grainbow );

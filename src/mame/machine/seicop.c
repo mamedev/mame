@@ -2464,6 +2464,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			// cupsoc 1b | 5 | 7ff7 | dde5 | f80 aa2 984 0c2
 			/* radar x/y positions */
 			/* FIXME: x/ys are offsetted */
+			/* FIXME: uses 0x10044a for something */
 			if(COP_CMD(0xf80,0xaa2,0x984,0x0c2,0x000,0x000,0x000,0x000,5,0x7ff7))
 			{
 				UINT8 offs;
