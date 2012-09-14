@@ -18,7 +18,7 @@
 
 #include "emu.h"
 #include "includes/bbc.h"
-#include "saa505x.h"
+#include "video/saa5050.h"
 #include "video/mc6845.h"
 
 /************************************************************************
@@ -191,7 +191,6 @@ int returned_pixels[6];
 
 static MC6845_UPDATE_ROW( vid_update_row )
 {
-
 	bbc_state *state = device->machine().driver_data<bbc_state>();
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
@@ -199,9 +198,8 @@ static MC6845_UPDATE_ROW( vid_update_row )
 
 	if (state->m_videoULA_teletext_normal_select)
 	{
-
-			teletext_LOSE_w(state->m_saa505x, 0,0);
-			teletext_LOSE_w(state->m_saa505x, 0,1);
+		state->m_trom->lose_w(1);
+		state->m_trom->lose_w(0);
 
 		for(int x_pos=0; x_pos<x_count; x_pos++)
 		{
@@ -211,25 +209,38 @@ static MC6845_UPDATE_ROW( vid_update_row )
 
 			returned_pixel_count=0;
 
+			state->m_trom->write((state->m_Teletext_Latch&0x3f)|(state->m_Teletext_Latch&0x40));
 
-			teletext_F1(state->m_saa505x);
-
-			teletext_data_w(state->m_saa505x, 0, (state->m_Teletext_Latch&0x3f)|(state->m_Teletext_Latch&0x40));
+			state->m_trom->f1_w(1);
+			state->m_trom->f1_w(0);
 
 			if (((ma>>13)&1)==0)
 			{
 				state->m_Teletext_Latch=0;
 			} else {
-				state->m_Teletext_Latch=(state->m_BBC_Video_RAM[calculate_video_address(state,ma+x_pos,ra)]&0x7f);
+				state->m_Teletext_Latch=(state->m_BBC_Video_RAM[calculate_video_address(state,ma+x_pos,ra)]);
 			}
 			for(int pixelno=0;pixelno<6;pixelno++)
 			{
-				int col=returned_pixels[pixelno];
+				state->m_trom->tr6_w(1);
+				state->m_trom->tr6_w(0);
 
-					bitmap.pix32(y, (x_pos*state->m_pixels_per_byte)+pixelno)=palette[col];
+				int col=state->m_trom->get_rgb();
+
+				int r = BIT(col, 0) * 0xff;
+				int g = BIT(col, 1) * 0xff;
+				int b = BIT(col, 2) * 0xff;
+
+				rgb_t rgb = MAKE_RGB(r, g, b);
+
+				bitmap.pix32(y, (x_pos*state->m_pixels_per_byte)+pixelno) = rgb;
 			}
+		}
 
-
+		if (ra == 18)
+		{
+			state->m_trom->lose_w(1);
+			state->m_trom->lose_w(0);
 		}
 	}
 	else
@@ -268,7 +279,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 static WRITE_LINE_DEVICE_HANDLER( bbc_vsync )
 {
 	bbc_state *bstate = device->machine().driver_data<bbc_state>();
-	teletext_DEW(bstate->m_saa505x);
+	bstate->m_trom->dew_w(state);
 }
 
 
@@ -285,14 +296,6 @@ const mc6845_interface bbc_mc6845_intf =
 	DEVCB_LINE(bbc_vsync),			/* on_vsync_changed */
 	NULL
 };
-
-
-void bbc_draw_RGB_in(device_t *device, int offset,int data)
-{
-	if (returned_pixel_count<6)
-		returned_pixels[returned_pixel_count++]=7-data;
-
-}
 
 
 
@@ -360,7 +363,6 @@ static void common_init(running_machine &machine, int memorySize)
 	state->m_VideoULA_CR_counter = 0;
 
 	set_pixel_lookup(state);
-	state->m_saa505x = machine.device("saa505x");
 
 	state->m_BBC_Video_RAM = state->memregion("maincpu")->base();
 	state->m_memorySize=memorySize;

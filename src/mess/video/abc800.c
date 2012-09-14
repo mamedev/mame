@@ -14,6 +14,19 @@
 #define VERTICAL_PORCH_HACK		29
 
 
+static const rgb_t PALETTE[] =
+{
+	RGB_BLACK,
+	MAKE_RGB(0xff, 0x00, 0x00), // red
+	MAKE_RGB(0x00, 0xff, 0x00), // green
+	MAKE_RGB(0xff, 0xff, 0x00), // yellow
+	MAKE_RGB(0x00, 0x00, 0xff), // blue
+	MAKE_RGB(0xff, 0x00, 0xff), // magenta
+	MAKE_RGB(0x00, 0xff, 0xff), // cyan
+	RGB_WHITE
+};
+
+
 
 //**************************************************************************
 //  HIGH RESOLUTION GRAPHICS
@@ -50,33 +63,15 @@ WRITE8_MEMBER( abc800_state::hrc_w )
 
 offs_t abc800c_state::translate_trom_offset(offs_t offset)
 {
-	int row = offset >> 7;
-	int col = offset & 0x7f;
+	int row = offset / 40;
+	int col = offset % 40;
 
-	if (col >= 80) row += 16;
-	else if (col >= 40) row += 8;
+	offset = ((row & 0x07) * 0x80) + col;
 
-	return (row * 40) + (col % 40);
-}
+	if (row & 0x08) offset += 0x28;
+	if (row & 0x10) offset += 0x50;
 
-
-//-------------------------------------------------
-//  char_ram_r - character RAM read
-//-------------------------------------------------
-
-READ8_MEMBER( abc800c_state::char_ram_r )
-{
-	return saa5050_videoram_r(m_trom, translate_trom_offset(offset));
-}
-
-
-//-------------------------------------------------
-//  char_ram_w - character RAM write
-//-------------------------------------------------
-
-WRITE8_MEMBER( abc800c_state::char_ram_w )
-{
-	saa5050_videoram_w(m_trom, translate_trom_offset(offset), data);
+	return offset;
 }
 
 
@@ -84,7 +79,7 @@ WRITE8_MEMBER( abc800c_state::char_ram_w )
 //  hr_update - high resolution screen update
 //-------------------------------------------------
 
-void abc800c_state::hr_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void abc800c_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT16 addr = 0;
 
@@ -104,19 +99,16 @@ void abc800c_state::hr_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 				if (color)
 				{
-					rgb_t rgb = palette_entry_get_color(machine().palette, bitmap.pix16(y, x));
-					bool black = !RGB_RED(rgb) && !RGB_GREEN(rgb) && !RGB_BLUE(rgb);
+					bool black = bitmap.pix32(y, x) == RGB_BLACK;
 					bool opaque = !BIT(fgctl, 3);
 
 					if (black || opaque)
 					{
-						color += 128;
+						bitmap.pix32(y, x) = PALETTE[color];
+						bitmap.pix32(y, x + 1) = PALETTE[color];
 
-						bitmap.pix16(y, x) = color;
-						bitmap.pix16(y, x + 1) = color;
-
-						bitmap.pix16(y + 1, x) = color;
-						bitmap.pix16(y + 1, x + 1) = color;
+						bitmap.pix32(y + 1, x) = PALETTE[color];
+						bitmap.pix32(y + 1, x + 1) = PALETTE[color];
 					}
 				}
 
@@ -145,41 +137,19 @@ void abc800_state::video_start()
 
 
 //-------------------------------------------------
-//  VIDEO_START( abc800c )
-//-------------------------------------------------
-
-void abc800c_state::video_start()
-{
-	abc800_state::video_start();
-
-	// initialize palette
-	palette_set_color_rgb(machine(), 128+0, 0x00, 0x00, 0x00); // black
-	palette_set_color_rgb(machine(), 128+1, 0xff, 0x00, 0x00); // red
-	palette_set_color_rgb(machine(), 128+2, 0x00, 0xff, 0x00); // green
-	palette_set_color_rgb(machine(), 128+3, 0xff, 0xff, 0x00); // yellow
-	palette_set_color_rgb(machine(), 128+4, 0x00, 0x00, 0xff); // blue
-	palette_set_color_rgb(machine(), 128+5, 0xff, 0x00, 0xff); // magenta
-	palette_set_color_rgb(machine(), 128+6, 0x00, 0xff, 0xff); // cyan
-	palette_set_color_rgb(machine(), 128+7, 0xff, 0xff, 0xff); // white
-}
-
-
-//-------------------------------------------------
 //  SCREEN_UPDATE( abc800c )
 //-------------------------------------------------
 
-UINT32 abc800c_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 abc800c_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// clear screen
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(RGB_BLACK, cliprect);
 
 	// draw text
 	if (!BIT(m_fgctl, 7))
 	{
-		saa5050_update(m_trom, bitmap, cliprect);
+		m_trom->screen_update(screen, bitmap, cliprect);
 	}
-
-	saa5050_frame_advance(m_trom);
 
 	// draw HR graphics
 	hr_update(bitmap, cliprect);
@@ -189,15 +159,18 @@ UINT32 abc800c_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 
 //-------------------------------------------------
-//  saa5050_interface trom_intf
+//  SAA5050_INTERFACE( trom_intf )
 //-------------------------------------------------
 
-static const saa5050_interface trom_intf =
+READ8_MEMBER( abc800c_state::char_ram_r )
 {
-	SCREEN_TAG,
-	0,	// starting gfxnum
-	40, 24, 40,  // x, y, size
-	0	// rev y order
+	return m_char_ram[translate_trom_offset(offset)];
+}
+
+static SAA5050_INTERFACE( trom_intf )
+{
+	DEVCB_DRIVER_MEMBER(abc800c_state, char_ram_r),
+	40, 24, 40  // x, y, size
 };
 
 
@@ -214,12 +187,7 @@ MACHINE_CONFIG_FRAGMENT( abc800c_video )
 	MCFG_SCREEN_SIZE(480, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 480-1)
 
-	MCFG_PALETTE_LENGTH(128+8)
-	MCFG_PALETTE_INIT(saa5050)
-
-	MCFG_GFXDECODE(saa5050)
-
-	MCFG_SAA5050_ADD(SAA5052_TAG, trom_intf)
+	MCFG_SAA5052_ADD(SAA5052_TAG, XTAL_12MHz/2, trom_intf)
 MACHINE_CONFIG_END
 
 

@@ -22,13 +22,16 @@ class a6809_state : public driver_device
 public:
 	a6809_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_via(*this, "via")
+		  m_via(*this, "via"),
+		  m_videoram(*this, "videoram")
 	{ }
 
 	required_device<via6522_device> m_via;
+	required_shared_ptr<UINT8> m_videoram;
 
 	DECLARE_READ8_MEMBER( via_pb_r );
 	DECLARE_WRITE8_MEMBER( kb_w );
+	DECLARE_READ8_MEMBER( videoram_r );
 
 	UINT8 m_keydata;
 	virtual void machine_reset();
@@ -38,7 +41,7 @@ public:
 static ADDRESS_MAP_START(a6809_mem, AS_PROGRAM, 8, a6809_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x03ff) AM_RAM
-	AM_RANGE(0x0400,0x07ff) AM_DEVREADWRITE_LEGACY("saa5050", saa5050_videoram_r, saa5050_videoram_w)
+	AM_RANGE(0x0400,0x07ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x0800,0x0800) AM_DEVWRITE("mc6845", mc6845_device, address_w)
 	AM_RANGE(0x0801,0x0801) AM_DEVREADWRITE("mc6845", mc6845_device, register_r, register_w)
 	AM_RANGE(0x0900,0x090f) AM_MIRROR(0xf0) AM_DEVREADWRITE("via", via6522_device, read, write)
@@ -59,16 +62,6 @@ void a6809_state::machine_reset()
 {
 }
 
-static SCREEN_UPDATE_IND16( a6809 )
-{
-	device_t *saa5050 = screen.machine().device("saa5050");
-
-	saa5050_update(saa5050, bitmap, cliprect);
-	saa5050_frame_advance(saa5050);
-
-	return 0;
-}
-
 static MC6845_UPDATE_ROW( a6809_update_row )
 {
 }
@@ -87,12 +80,15 @@ static const mc6845_interface a6809_crtc6845_interface =
 	NULL
 };
 
-static const saa5050_interface a6809_saa5050_intf =
+READ8_MEMBER( a6809_state::videoram_r )
 {
-	"screen",
-	0,	/* starting gfxnum */
-	40, 25, 40,  /* x, y, size */
-	0	/* rev y order */
+	return m_videoram[offset];
+}
+
+static SAA5050_INTERFACE( a6809_saa5050_intf )
+{
+	DEVCB_DRIVER_MEMBER(a6809_state, videoram_r),
+	40, 25, 40  /* x, y, size */
 };
 
 READ8_MEMBER( a6809_state::via_pb_r )
@@ -140,16 +136,12 @@ static MACHINE_CONFIG_START( a6809, a6809_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(SAA5050_VBLANK))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(40 * 12, 24 * 20)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 12 - 1, 0, 24 * 20 - 1)
-	MCFG_SCREEN_UPDATE_STATIC(a6809)
+	MCFG_SCREEN_UPDATE_DEVICE("saa5050", saa5050_device, screen_update)
 
-	MCFG_GFXDECODE(saa5050)
-	MCFG_PALETTE_LENGTH(128)
-	MCFG_PALETTE_INIT(saa5050)
-
-	MCFG_SAA5050_ADD("saa5050", a6809_saa5050_intf)
+	MCFG_SAA5050_ADD("saa5050", 6000000, a6809_saa5050_intf)
 
 	MCFG_VIA6522_ADD("via", XTAL_4MHz / 4, via_intf)
 
@@ -165,9 +157,6 @@ ROM_START( a6809 )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "acorn6809.ic11", 0x0000, 0x0100, CRC(7908317d) SHA1(e0f1e5bd3a8598d3b62bc432dd1f3892ed7e66d8) ) // address decoder
-
-	ROM_REGION(0x01000, "gfx1",0)
-	ROM_LOAD( "p2000.chr", 0x0140, 0x08c0, BAD_DUMP CRC(78c17e3e) SHA1(4e1c59dc484505de1dc0b1ba7e5f70a54b0d4ccc) ) // copied from p2000t.c
 ROM_END
 
 /* Driver */

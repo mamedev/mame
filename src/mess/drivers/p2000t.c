@@ -47,7 +47,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( p2000t_mem, AS_PROGRAM, 8, p2000t_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x4fff) AM_ROM
-	AM_RANGE(0x5000, 0x57ff) AM_DEVREADWRITE_LEGACY("saa5050", saa5050_videoram_r, saa5050_videoram_w)
+	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x5800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xffff) AM_NOP
 ADDRESS_MAP_END
@@ -55,7 +55,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( p2000m_mem, AS_PROGRAM, 8, p2000t_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x4fff) AM_ROM
-	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x6000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xffff) AM_NOP
 ADDRESS_MAP_END
@@ -207,23 +207,15 @@ static INTERRUPT_GEN( p2000_interrupt )
 	device->machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
-
-static SCREEN_UPDATE_IND16( p2000t )
+READ8_MEMBER( p2000t_state::videoram_r )
 {
-	device_t *saa5050 = screen.machine().device("saa5050");
-
-	saa5050_update(saa5050, bitmap, cliprect);
-	saa5050_frame_advance(saa5050);
-
-	return 0;
+	return m_videoram[offset];
 }
 
-static const saa5050_interface p2000t_saa5050_intf =
+static SAA5050_INTERFACE( p2000t_saa5050_intf )
 {
-	"screen",
-	0,	/* starting gfxnum */
-	40, 24 - 1, 80,  /* x, y, size */
-	0	/* rev y order */
+	DEVCB_DRIVER_MEMBER(p2000t_state, videoram_r),
+	40, 24 - 1, 80  /* x, y, size */
 };
 
 /* Machine definition */
@@ -237,15 +229,12 @@ static MACHINE_CONFIG_START( p2000t, p2000t_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(SAA5050_VBLANK))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(40 * 12, 24 * 20)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 12 - 1, 0, 24 * 20 - 1)
-	MCFG_SCREEN_UPDATE_STATIC(p2000t)
-	MCFG_GFXDECODE(saa5050)
-	MCFG_PALETTE_LENGTH(128)
-	MCFG_PALETTE_INIT(saa5050)
+	MCFG_SCREEN_UPDATE_DEVICE("saa5050", saa5050_device, screen_update)
 
-	MCFG_SAA5050_ADD("saa5050", p2000t_saa5050_intf)
+	MCFG_SAA5050_ADD("saa5050", 6000000, p2000t_saa5050_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -286,14 +275,13 @@ ROM_START(p2000t)
 	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("p2000.rom", 0x0000, 0x1000, CRC(650784a3) SHA1(4dbb28adad30587f2ea536ba116898d459faccac))
 	ROM_LOAD("basic.rom", 0x1000, 0x4000, CRC(9d9d38f9) SHA1(fb5100436c99634a2592a10dff867f85bcff7aec))
-	ROM_REGION(0x01000, "gfx1",0)
-	ROM_LOAD("p2000.chr", 0x0140, 0x08c0, BAD_DUMP CRC(78c17e3e) SHA1(4e1c59dc484505de1dc0b1ba7e5f70a54b0d4ccc))
 ROM_END
 
 ROM_START(p2000m)
 	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("p2000.rom", 0x0000, 0x1000, CRC(650784a3) SHA1(4dbb28adad30587f2ea536ba116898d459faccac))
 	ROM_LOAD("basic.rom", 0x1000, 0x4000, CRC(9d9d38f9) SHA1(fb5100436c99634a2592a10dff867f85bcff7aec))
+
 	ROM_REGION(0x01000, "gfx1",0)
 	ROM_LOAD("p2000.chr", 0x0140, 0x08c0, BAD_DUMP CRC(78c17e3e) SHA1(4e1c59dc484505de1dc0b1ba7e5f70a54b0d4ccc))
 ROM_END

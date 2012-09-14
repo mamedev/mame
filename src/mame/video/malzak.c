@@ -17,17 +17,16 @@
 #include "video/saa5050.h"
 #include "includes/malzak.h"
 
-
-SCREEN_UPDATE_IND16( malzak )
+SCREEN_UPDATE_RGB32( malzak )
 {
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	malzak_state *state = screen.machine().driver_data<malzak_state>();
 	int sx, sy;
 	int x,y;
 
-	bitmap.fill(0);
+	bitmap.fill(RGB_BLACK);
 
-	saa5050_update(state->m_saa5050, bitmap, cliprect);
-	saa5050_frame_advance(state->m_saa5050);
+	state->m_trom->screen_update(screen, bitmap, cliprect);
 
 	// playfield - not sure exactly how this works...
 	for (x = 0; x < 16; x++)
@@ -41,7 +40,7 @@ SCREEN_UPDATE_IND16( malzak )
 			if (sx < -15*2)
 				sx += 256*2;
 
-			drawgfxzoom_transpen(bitmap,cliprect, screen.machine().gfx[0], state->m_playfield_code[x * 16 + y], 7*2, 0, 0, sx, sy, 0x20000, 0x20000, 0);
+			drawgfxzoom_transpen(bitmap,cliprect, screen.machine().gfx[0], state->m_playfield_code[x * 16 + y], 2, 0, 0, sx, sy, 0x20000, 0x20000, 0);
 		}
 
 	/* update the S2636 chips */
@@ -62,17 +61,17 @@ SCREEN_UPDATE_IND16( malzak )
 				int pixel1 = s2636_1_bitmap.pix16(y, x);
 
 				if (S2636_IS_PIXEL_DRAWN(pixel0)) {
-					bitmap.pix16(y*2, x*2) = S2636_PIXEL_COLOR(pixel0);
-					bitmap.pix16(y*2+1, x*2) = S2636_PIXEL_COLOR(pixel0);
-					bitmap.pix16(y*2, x*2+1) = S2636_PIXEL_COLOR(pixel0);
-					bitmap.pix16(y*2+1, x*2+1) = S2636_PIXEL_COLOR(pixel0);
+					bitmap.pix32(y*2, x*2) = palette[S2636_PIXEL_COLOR(pixel0)];
+					bitmap.pix32(y*2+1, x*2) = palette[S2636_PIXEL_COLOR(pixel0)];
+					bitmap.pix32(y*2, x*2+1) = palette[S2636_PIXEL_COLOR(pixel0)];
+					bitmap.pix32(y*2+1, x*2+1) = palette[S2636_PIXEL_COLOR(pixel0)];
 				}
 
 				if (S2636_IS_PIXEL_DRAWN(pixel1)) {
-					bitmap.pix16(y*2, x*2) = S2636_PIXEL_COLOR(pixel1);
-					bitmap.pix16(y*2+1, x*2) = S2636_PIXEL_COLOR(pixel1);
-					bitmap.pix16(y*2, x*2+1) = S2636_PIXEL_COLOR(pixel1);
-					bitmap.pix16(y*2+1, x*2+1) = S2636_PIXEL_COLOR(pixel1);
+					bitmap.pix32(y*2, x*2) = palette[S2636_PIXEL_COLOR(pixel1)];
+					bitmap.pix32(y*2+1, x*2) = palette[S2636_PIXEL_COLOR(pixel1)];
+					bitmap.pix32(y*2, x*2+1) = palette[S2636_PIXEL_COLOR(pixel1)];
+					bitmap.pix32(y*2+1, x*2+1) = palette[S2636_PIXEL_COLOR(pixel1)];
 				}
 			}
 		}

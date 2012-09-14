@@ -187,18 +187,16 @@ public:
 		  m_trom(*this, SAA5052_TAG)
 	{ }
 
-	required_device<saa5050_device> m_trom;
+	required_device<saa5052_device> m_trom;
 
 	DECLARE_DRIVER_INIT(driver_init);
 
-	virtual void video_start();
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	offs_t translate_trom_offset(offs_t offset);
-	void hr_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( char_ram_r );
-	DECLARE_WRITE8_MEMBER( char_ram_w );
 	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
 };
 

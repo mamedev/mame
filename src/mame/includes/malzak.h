@@ -4,12 +4,19 @@
 
 *************************************************************************/
 
+#include "video/saa5050.h"
 
 class malzak_state : public driver_device
 {
 public:
 	malzak_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_trom(*this, "saa5050"),
+		  m_videoram(*this, "videoram")
+	{ }
+
+	required_device<saa5050_device> m_trom;
+	required_shared_ptr<UINT8> m_videoram;
 
 	/* misc */
 //  int playfield_x[256];
@@ -31,6 +38,7 @@ public:
 	DECLARE_WRITE8_MEMBER(portc0_w);
 	DECLARE_READ8_MEMBER(collision_r);
 	DECLARE_WRITE8_MEMBER(malzak_playfield_w);
+	DECLARE_READ8_MEMBER(videoram_r);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void palette_init();
@@ -40,4 +48,4 @@ public:
 /*----------- defined in video/malzak.c -----------*/
 
 
-SCREEN_UPDATE_IND16( malzak );
+SCREEN_UPDATE_RGB32( malzak );

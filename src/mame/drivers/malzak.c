@@ -110,7 +110,7 @@ static ADDRESS_MAP_START( malzak_map, AS_PROGRAM, 8, malzak_state )
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_RAM_WRITE(malzak_playfield_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1800, 0x1fff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("saa5050", saa5050_videoram_r, saa5050_videoram_w)
+	AM_RANGE(0x1800, 0x1fff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_ROM
@@ -131,7 +131,7 @@ static ADDRESS_MAP_START( malzak2_map, AS_PROGRAM, 8, malzak_state )
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_RAM_WRITE(malzak_playfield_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x1800, 0x1fff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("saa5050", saa5050_videoram_r, saa5050_videoram_w)
+	AM_RANGE(0x1800, 0x1fff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_ROM
@@ -256,48 +256,9 @@ static const gfx_layout charlayout =
 //  8*8
 };
 
-static const gfx_layout saa5050_charlayout =
-{
-	6, 10,
-	256,
-	1,
-	{ 0 },
-	{ 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8,
-	  5*8, 6*8, 7*8, 8*8, 9*8 },
-	8 * 10
-};
-
-static const gfx_layout saa5050_hilayout =
-{
-	6, 10,
-	256,
-	1,
-	{ 0 },
-	{ 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 0*8, 1*8, 1*8, 2*8,
-	  2*8, 3*8, 3*8, 4*8, 4*8 },
-	8 * 10
-};
-
-static const gfx_layout saa5050_lolayout =
-{
-	6, 10,
-	256,
-	1,
-	{ 0 },
-	{ 2, 3, 4, 5, 6, 7 },
-	{ 5*8, 5*8, 6*8, 6*8, 7*8,
-	  7*8, 8*8, 8*8, 9*8, 9*8 },
-	8 * 10
-};
-
 
 static GFXDECODE_START( malzak )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,         0,  16 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, saa5050_charlayout, 0, 128 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, saa5050_hilayout,   0, 128 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, saa5050_lolayout,   0, 128 )
 GFXDECODE_END
 
 
@@ -357,14 +318,16 @@ static const s2636_interface malzac_s2636_1_config =
 	"s2636snd_1"
 };
 
-static const saa5050_interface malzac_saa5050_intf =
+READ8_MEMBER(malzak_state::videoram_r)
 {
-	"screen",
-	1,	/* starting gfxnum */
-	42, 24, 64,  /* x, y, size */
-      1 	/* rev y order */
-};
+	return m_videoram[offset];
+}
 
+static SAA5050_INTERFACE( malzac_saa5050_intf )
+{
+	DEVCB_DRIVER_MEMBER(malzak_state, videoram_r),
+	42, 24, 64  /* x, y, size */
+};
 
 void malzak_state::machine_start()
 {
@@ -400,7 +363,7 @@ static MACHINE_CONFIG_START( malzak, malzak_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(SAA5050_VBLANK))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(480, 512)	/* vert size is a guess */
 	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 479)
 	MCFG_SCREEN_UPDATE_STATIC(malzak)
@@ -411,7 +374,7 @@ static MACHINE_CONFIG_START( malzak, malzak_state )
 	MCFG_S2636_ADD("s2636_0", malzac_s2636_0_config)
 	MCFG_S2636_ADD("s2636_1", malzac_s2636_1_config)
 
-	MCFG_SAA5050_ADD("saa5050", malzac_saa5050_intf)
+	MCFG_SAA5050_ADD("saa5050", 6000000, malzac_saa5050_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -454,10 +417,6 @@ ROM_START( malzak )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "malzak.1",     0x0000, 0x0800, CRC(74d5ff7b) SHA1(cae326370dc83b86542f9d070e2dc91b1b833356) )
-
-	ROM_REGION(0x01000, "gfx2",0) // SAA5050 internal character ROM
-	ROM_LOAD("p2000.chr", 0x0140, 0x08c0, BAD_DUMP CRC(78c17e3e) SHA1(4e1c59dc484505de1dc0b1ba7e5f70a54b0d4ccc) )
-
 ROM_END
 
 ROM_START( malzak2 )
@@ -478,10 +437,6 @@ ROM_START( malzak2 )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "malzak.1",     0x0000, 0x0800, CRC(74d5ff7b) SHA1(cae326370dc83b86542f9d070e2dc91b1b833356) )
-
-	ROM_REGION(0x01000, "gfx2",0) // SAA5050 internal character ROM
-	ROM_LOAD("p2000.chr", 0x0140, 0x08c0, BAD_DUMP CRC(78c17e3e) SHA1(4e1c59dc484505de1dc0b1ba7e5f70a54b0d4ccc) )
-
 ROM_END
 
 

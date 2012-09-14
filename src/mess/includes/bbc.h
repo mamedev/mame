@@ -17,6 +17,7 @@
 #include "machine/wd17xx.h"
 #include "machine/upd7002.h"
 #include "video/mc6845.h"
+#include "video/saa5050.h"
 #include "sound/sn76496.h"
 
 class bbc_state : public driver_device
@@ -26,6 +27,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_sn(*this, "sn76489"),
+		  m_trom(*this, "saa505x"),
 		  m_ACCCON_IRR(CLEAR_LINE),
 		  m_via_system_irq(CLEAR_LINE),
 		  m_via_user_irq(CLEAR_LINE),
@@ -34,6 +36,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<sn76489_new_device> m_sn;
+	required_device<saa5050_device> m_trom;
 
 	void check_interrupts();
 
@@ -193,7 +196,6 @@ public:
 	unsigned char m_pixel_bits[256];
 	int m_BBC_HSync;
 	int m_BBC_VSync;
-	device_t *m_saa505x;
 
 
 
@@ -336,7 +338,6 @@ extern const uPD7002_interface bbc_uPD7002;
 
 SCREEN_UPDATE_IND16( bbc );
 
-void bbc_draw_RGB_in(device_t *device, int offset, int data);
 void bbc_set_video_memory_lookups(running_machine &machine, int ramsize);
 void bbc_setscreenstart(running_machine &machine, int b4, int b5);
 void bbcbp_setvideoshadow(running_machine &machine, int vdusel);

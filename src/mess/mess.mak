@@ -543,7 +543,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_VIDEO)/hd44780.o		\
 	$(MESS_VIDEO)/hd66421.o		\
 	$(MESS_VIDEO)/mc6847.o		\
-	$(MESS_VIDEO)/saa505x.o		\
 	$(MESS_VIDEO)/tms3556.o		\
 	$(MESS_VIDEO)/upd7220.o		\
 	$(MESS_MACHINE)/applefdc.o	\

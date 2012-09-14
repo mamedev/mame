@@ -1,393 +1,152 @@
-/***************************************************************************
+/**********************************************************************
 
-    saa5050.c
+    Mullard SAA5050 Teletext Character Generator emulation
 
-    Functions to emulate the
-    SAA5050 - Teletext Character Generator.
+    http://www.bighole.nl/pub/mirror/homepage.ntlworld.com/kryten_droid/teletext/spec/teletext_spec_1974.htm
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
+/*
 
     TODO:
-    -  Implement BOX and dirtybuffer
-    -  Add support for non-English version (SAA505x), possibly merging
-       src/mess/video/saa505x.c unsed by bbc.c in MESS
-    -  Investigate why supporting code 0 behavior breaks p2000t vscroll
-       in MESS (but not supporting breaks malzak title background)
-    -  x,y sizes should probably be calculated from the screen parameters
-       rather than passed in the device interface
 
-***************************************************************************/
+	- character rounding
+	- remote controller input
+	- boxing
 
-#include "emu.h"
-#include "video/saa5050.h"
+*/
 
-#define SAA5050_DBLHI   0x0001
-#define SAA5050_SEPGR   0x0002
-#define SAA5050_FLASH   0x0004
-#define SAA5050_BOX     0x0008
-#define SAA5050_GRAPH   0x0010
-#define SAA5050_CONCEAL 0x0020
-#define SAA5050_HOLDGR  0x0040
-
-#define SAA5050_BLACK   0
-#define SAA5050_WHITE   7
+#include "saa5050.h"
 
 
-typedef struct _saa5050_state  saa5050_state;
-struct _saa5050_state
-{
-	device_t *screen;
-	int         gfxnum;
-	int         x, y;
-	int         size;
-	int         rev;
-
-	UINT8 *     videoram;
-	UINT16      flags;
-	UINT8	      forecol;
-	UINT8	      backcol;
-	UINT8	      prvcol;
-	UINT8	      prvchr;
-	INT8        frame_count;
-};
-
-
-/*************************************
- *
- *  Inline functions
- *
- *************************************/
-
-INLINE saa5050_state *get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == SAA5050);
-
-	return (saa5050_state *)downcast<saa5050_device *>(device)->token();
-}
-
-INLINE const saa5050_interface *get_interface( device_t *device )
-{
-	assert(device != NULL);
-	assert((device->type() == SAA5050));
-	return (const saa5050_interface *) device->static_config();
-}
-
-/*************************************
- *
- *  Graphics definitions
- *
- *************************************/
-
-static const gfx_layout saa5050_charlayout =
-{
-	6, 10,
-	256,
-	1,
-	{ 0 },
-	{ 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8,
-	  5*8, 6*8, 7*8, 8*8, 9*8 },
-	8 * 10
-};
-
-static const gfx_layout saa5050_hilayout =
-{
-	6, 10,
-	256,
-	1,
-	{ 0 },
-	{ 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 0*8, 1*8, 1*8, 2*8,
-	  2*8, 3*8, 3*8, 4*8, 4*8 },
-	8 * 10
-};
-
-static const gfx_layout saa5050_lolayout =
-{
-	6, 10,
-	256,
-	1,
-	{ 0 },
-	{ 2, 3, 4, 5, 6, 7 },
-	{ 5*8, 5*8, 6*8, 6*8, 7*8,
-	  7*8, 8*8, 8*8, 9*8, 9*8 },
-	8 * 10
-};
-
-GFXDECODE_START( saa5050 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, saa5050_charlayout, 0, 64 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, saa5050_hilayout, 0, 64 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, saa5050_lolayout, 0, 64 )
-GFXDECODE_END
-
-
-/*************************************
- *
- *  Palette initialization
- *
- *************************************/
-
-static const UINT8 saa5050_colors[8 * 3] =
-{
-	0x00, 0x00, 0x00,	/* black */
-	0xff, 0x00, 0x00,	/* red */
-	0x00, 0xff, 0x00,	/* green */
-	0xff, 0xff, 0x00,	/* yellow */
-	0x00, 0x00, 0xff,	/* blue */
-	0xff, 0x00, 0xff,	/* magenta */
-	0x00, 0xff, 0xff,	/* cyan */
-	0xff, 0xff, 0xff	/* white */
-};
-
-static const UINT16 saa5050_palette[64 * 2] =	/* bgnd, fgnd */
-{
-	0,1, 0,1, 0,2, 0,3, 0,4, 0,5, 0,6, 0,7,
-	1,0, 1,1, 1,2, 1,3, 1,4, 1,5, 1,6, 1,7,
-	2,0, 2,1, 2,2, 2,3, 2,4, 2,5, 2,6, 2,7,
-	3,0, 3,1, 3,2, 3,3, 3,4, 3,5, 3,6, 3,7,
-	4,0, 4,1, 4,2, 4,3, 4,4, 4,5, 4,6, 4,7,
-	5,0, 5,1, 5,2, 5,3, 5,4, 5,5, 5,6, 5,7,
-	6,0, 6,1, 6,2, 6,3, 6,4, 6,5, 6,6, 6,7,
-	7,0, 7,1, 7,2, 7,3, 7,4, 7,5, 7,6, 7,7
-};
-
-PALETTE_INIT( saa5050 )
-{
-	UINT8 i, r, g, b;
-
-	machine.colortable = colortable_alloc(machine, 8);
-
-	for ( i = 0; i < 8; i++ )
-	{
-		r = saa5050_colors[i * 3];
-		g = saa5050_colors[i * 3 + 1];
-		b = saa5050_colors[i * 3 + 2];
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
-	}
-
-	for (i = 0; i < 128; i++)
-		colortable_entry_set_value(machine.colortable, i, saa5050_palette[i]);
-}
-
-/*************************************
- *
- *  Videoram access handlers
- *
- *************************************/
-
-WRITE8_DEVICE_HANDLER( saa5050_videoram_w )
-{
-	saa5050_state *saa5050 = get_safe_token(device);
-	saa5050->videoram[offset] = data;
-}
-
-
-READ8_DEVICE_HANDLER( saa5050_videoram_r )
-{
-	saa5050_state *saa5050 = get_safe_token(device);
-	return saa5050->videoram[offset];
-}
-
-/*************************************
- *
- *  Emulation
- *
- *************************************/
-
-
-/* this should probably be put at the end of saa5050 update,
-but p2000t in MESS does not seem to currently support it.
-Hence, we leave it independent for the moment */
-void saa5050_frame_advance( device_t *device )
-{
-	saa5050_state *saa5050 = get_safe_token(device);
-
-	saa5050->frame_count++;
-	if (saa5050->frame_count > 50)
-		saa5050->frame_count = 0;
-}
-
-void saa5050_update( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect  )
-{
-	saa5050_state *saa5050 = get_safe_token(device);
-	int code, colour;
-	int sx, sy, ssy;
-
-	for (sy = 0; sy <= saa5050->y; sy++)
-	{
-		bool dblhi = false;
-
-		/* Set start of line state */
-		saa5050->flags = 0;
-		saa5050->prvchr = 32;
-		saa5050->forecol = SAA5050_WHITE;
-		saa5050->prvcol = SAA5050_WHITE;
-		saa5050->backcol = SAA5050_BLACK;
-
-		/* should we go in reverse order? */
-		ssy = saa5050->rev ? saa5050->y - sy : sy;
-
-		for (sx = 0; sx < saa5050->x; sx++)
-		{
-			int blank = 0;
-			code = saa5050->videoram[ssy * saa5050->size + sx];
-			if (code < 32)
-			{
-				switch (code)
-				{
-				case 0x00:
-					// Temporary hack until proper docs are found
-					if (saa5050->rev) // This is not ok, but it is done only in case of malzak
-						blank = 1;  // code 0x00 should not display anything, unless HOLDGR is set
-					break;
-				case 0x01: case 0x02: case 0x03: case 0x04:
-				case 0x05: case 0x06: case 0x07:
-					saa5050->prvcol = saa5050->forecol = code;
-					saa5050->flags &= ~(SAA5050_GRAPH | SAA5050_CONCEAL);
-					break;
-				case 0x11: case 0x12: case 0x13: case 0x14:
-				case 0x15: case 0x16: case 0x17:
-					saa5050->prvcol = (saa5050->forecol = (code & 0x07));
-					saa5050->flags &= ~SAA5050_CONCEAL;
-					saa5050->flags |= SAA5050_GRAPH;
-					break;
-				case 0x08:
-					saa5050->flags |= SAA5050_FLASH;
-					break;
-				case 0x09:
-					saa5050->flags &= ~SAA5050_FLASH;
-					break;
-				case 0x0a:
-					saa5050->flags |= SAA5050_BOX;
-					break;
-				case 0x0b:
-					saa5050->flags &= ~SAA5050_BOX;
-					break;
-				case 0x0c:
-					saa5050->flags &= ~SAA5050_DBLHI;
-					break;
-				case 0x0d:
-					saa5050->flags |= SAA5050_DBLHI;
-					dblhi = true;
-					break;
-				case 0x18:
-					saa5050->flags |= SAA5050_CONCEAL;
-					break;
-				case 0x19:
-					saa5050->flags |= SAA5050_SEPGR;
-					break;
-				case 0x1a:
-					saa5050->flags &= ~SAA5050_SEPGR;
-					break;
-				case 0x1c:
-					saa5050->backcol = SAA5050_BLACK;
-					break;
-				case 0x1d:
-					saa5050->backcol = saa5050->prvcol;
-					break;
-				case 0x1e:
-					saa5050->flags |= SAA5050_HOLDGR;
-					break;
-				case 0x1f:
-					saa5050->flags &= ~SAA5050_HOLDGR;
-					break;
-				}
-
-				if (saa5050->flags & SAA5050_HOLDGR)
-					code = saa5050->prvchr;
-				else
-					code = 32;
-			}
-
-			if (code & 0x80)
-				colour = (saa5050->forecol << 3) | saa5050->backcol;
-			else
-				colour = saa5050->forecol | (saa5050->backcol << 3);
-
-			if (saa5050->flags & SAA5050_CONCEAL)
-				code = 32;
-			else if ((saa5050->flags & SAA5050_FLASH) && (saa5050->frame_count > 38))
-				code = 32;
-			else
-			{
-				saa5050->prvchr = code;
-				if ((saa5050->flags & SAA5050_GRAPH) && (code & 0x20))
-				{
-					code += (code & 0x40) ? 64 : 96;
-					if (saa5050->flags & SAA5050_SEPGR)
-						code += 64;
-				}
-			}
-
-			if((blank == 0) || (saa5050->flags & SAA5050_HOLDGR))
-			{
-				if (saa5050->flags & SAA5050_DBLHI)
-				{
-					drawgfxzoom_opaque(bitmap, cliprect, saa5050->screen->machine().gfx[saa5050->gfxnum + 1], code & 0x7f, colour, 0, 0, sx * 12, ssy * 20, 0x20000, 0x20000);
-					drawgfxzoom_opaque(bitmap, cliprect, saa5050->screen->machine().gfx[saa5050->gfxnum + 2], code & 0x7f, colour, 0, 0, sx * 12, (ssy + 1) * 20, 0x20000, 0x20000);
-				}
-				else
-				{
-					drawgfxzoom_opaque(bitmap, cliprect, saa5050->screen->machine().gfx[saa5050->gfxnum + 0], code & 0x7f, colour, 0, 0, sx * 12, ssy * 20, 0x20000, 0x20000);
-				}
-			}
-		}
-
-		if (dblhi)
-		{
-			sy++;
-		}
-	}
-}
-
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
-
-static DEVICE_START( saa5050 )
-{
-	saa5050_state *saa5050 = get_safe_token(device);
-	const saa5050_interface *intf = get_interface(device);
-
-	saa5050->screen = device->machine().device(intf->screen);
-	saa5050->gfxnum = intf->gfxnum;
-	saa5050->x = intf->x;
-	saa5050->y = intf->y;
-	saa5050->size = intf->size;
-	saa5050->rev = intf->rev;
-
-	saa5050->videoram = auto_alloc_array(device->machine(), UINT8, 0x800);
-
-	device->save_pointer(NAME(saa5050->videoram), 0x800);
-	device->save_item(NAME(saa5050->flags));
-	device->save_item(NAME(saa5050->forecol));
-	device->save_item(NAME(saa5050->backcol));
-	device->save_item(NAME(saa5050->prvcol));
-	device->save_item(NAME(saa5050->prvchr));
-	device->save_item(NAME(saa5050->frame_count));
-}
-
-static DEVICE_RESET( saa5050 )
-{
-	saa5050_state *saa5050 = get_safe_token(device);
-
-	memset(saa5050->videoram, 0x00, 0x800);
-
-	saa5050->flags = 0;
-	saa5050->forecol = SAA5050_WHITE;
-	saa5050->backcol = SAA5050_BLACK;
-	saa5050->prvcol = SAA5050_WHITE;
-	saa5050->prvchr = 32;
-	saa5050->frame_count = 0;
-}
-
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
 
 const device_type SAA5050 = &device_creator<saa5050_device>;
+const device_type SAA5052 = &device_creator<saa5052_device>;
+
+
+//-------------------------------------------------
+//  ROM( saa5050 )
+//-------------------------------------------------
+
+ROM_START( saa5050 )
+	ROM_REGION( 0x10000, "chargen", 0 )
+	ROM_LOAD( "saa5050", 0x0140, 0x08c0, BAD_DUMP CRC(78c17e3e) SHA1(4e1c59dc484505de1dc0b1ba7e5f70a54b0d4ccc) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( saa5052 )
+//-------------------------------------------------
+
+ROM_START( saa5052 )
+	ROM_REGION( 0x10000, "chargen", 0 )
+	ROM_LOAD( "saa5052", 0x0140, 0x08c0, BAD_DUMP CRC(cda3bf79) SHA1(cf5ea94459c09001d422dadc212bc970b4b4aa20) )
+ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *saa5050_device::device_rom_region() const
+{
+	switch (m_variant)
+	{
+		default:		return ROM_NAME( saa5050 );
+		case TYPE_5052:	return ROM_NAME( saa5052 );
+	}
+}
+
+
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+enum
+{
+	NUL = 0,
+	ALPHA_RED,
+	ALPHA_GREEN,
+	ALPHA_YELLOW,
+	ALPHA_BLUE,
+	ALPHA_MAGENTA,
+	ALPHA_CYAN,
+	ALPHA_WHITE,
+	FLASH,
+	STEADY,
+	END_BOX,
+	START_BOX,
+	NORMAL_HEIGHT,
+	DOUBLE_HEIGHT,
+	S0,
+	S1,
+	DLE,
+	GRAPHICS_RED,
+	GRAPHICS_GREEN,
+	GRAPHICS_YELLOW,
+	GRAPHICS_BLUE,
+	GRAPHICS_MAGENTA,
+	GRAPHICS_CYAN,
+	GRAPHICS_WHITE,
+	CONCEAL_DISPLAY,
+	CONTIGUOUS_GFX,
+	SEPARATED_GFX,
+	ESC,
+	BLACK_BACKGROUND,
+	NEW_BACKGROUND,
+	HOLD_GRAPHICS,
+	RELEASE_GRAPHICS
+};
+
+
+static const rgb_t PALETTE[] =
+{
+	RGB_BLACK,
+	MAKE_RGB(0xff, 0x00, 0x00),
+	MAKE_RGB(0x00, 0xff, 0x00),
+	MAKE_RGB(0xff, 0xff, 0x00),
+	MAKE_RGB(0x00, 0x00, 0xff),
+	MAKE_RGB(0xff, 0x00, 0xff),
+	MAKE_RGB(0x00, 0xff, 0xff),
+	RGB_WHITE
+};
+
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  saa5050_device - constructor
+//-------------------------------------------------
+
+saa5050_device::saa5050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
+    : device_t(mconfig, type, name, tag, owner, clock),
+      m_frame_count(0),
+      m_variant(variant)
+{
+}
 
 saa5050_device::saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SAA5050, "SAA5050", tag, owner, clock)
+    : device_t(mconfig, SAA5050, "SAA5050", tag, owner, clock),
+      m_frame_count(0),
+      m_variant(TYPE_5050)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(saa5050_state));
 }
+
+saa5052_device::saa5052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : saa5050_device(mconfig, SAA5052, "SAA5052", tag, owner, clock, TYPE_5052)
+{
+}
+
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -397,7 +156,24 @@ saa5050_device::saa5050_device(const machine_config &mconfig, const char *tag, d
 
 void saa5050_device::device_config_complete()
 {
+	// inherit a copy of the static code
+	const saa5050_interface *intf = reinterpret_cast<const saa5050_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<saa5050_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_in_d_cb, 0, sizeof(m_in_d_cb));
+	}
+
+	switch (m_variant)
+	{
+		default:		m_shortname = "saa5050"; break;
+		case TYPE_5052:	m_shortname = "saa5052"; break;
+	}
 }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -405,16 +181,299 @@ void saa5050_device::device_config_complete()
 
 void saa5050_device::device_start()
 {
-	DEVICE_START_NAME( saa5050 )(this);
+	// resolve callbacks
+	m_in_d_func.resolve(m_in_d_cb, *this);
+
+	// find memory regions
+	m_char_rom = memregion("chargen")->base();
+
+	// register for state saving
+	save_item(NAME(m_code));
+	save_item(NAME(m_last_code));
+	save_item(NAME(m_char_data));
+	save_item(NAME(m_bit));
+	save_item(NAME(m_color));
+	save_item(NAME(m_ra));
+	save_item(NAME(m_bg));
+	save_item(NAME(m_fg));
+	save_item(NAME(m_graphics));
+	save_item(NAME(m_separated));
+	save_item(NAME(m_conceal));
+	save_item(NAME(m_flash));
+	save_item(NAME(m_boxed));
+	save_item(NAME(m_double_height));
+	save_item(NAME(m_double_height_top_row));
+	save_item(NAME(m_double_height_bottom_row));
+	save_item(NAME(m_hold));
+	save_item(NAME(m_frame_count));
+	save_item(NAME(m_variant));
 }
 
+
 //-------------------------------------------------
-//  device_reset - device-specific reset
+//  process_control_character -
 //-------------------------------------------------
 
-void saa5050_device::device_reset()
+void saa5050_device::process_control_character(UINT8 data)
 {
-	DEVICE_RESET_NAME( saa5050 )(this);
+	switch (data)
+	{
+	case ALPHA_RED:
+	case ALPHA_GREEN:
+	case ALPHA_YELLOW:
+	case ALPHA_BLUE:
+	case ALPHA_MAGENTA:
+	case ALPHA_CYAN:
+	case ALPHA_WHITE:
+		m_graphics = false;
+		m_conceal = false;
+		m_fg = data & 0x07;
+		break;
+
+	case FLASH:
+		m_flash = true;
+		break;
+
+	case STEADY:
+		m_flash = false;
+		break;
+		
+	case END_BOX:
+	case START_BOX:
+		// TODO
+		break;
+
+	case NORMAL_HEIGHT:
+		m_double_height = 0;
+		break;
+
+	case DOUBLE_HEIGHT:
+		if (!m_double_height_bottom_row)
+		{
+			m_double_height_top_row = true;
+		}
+
+		m_double_height = 1;
+		break;
+
+	case GRAPHICS_RED:
+	case GRAPHICS_GREEN:
+	case GRAPHICS_YELLOW:
+	case GRAPHICS_BLUE:
+	case GRAPHICS_MAGENTA:
+	case GRAPHICS_CYAN:
+	case GRAPHICS_WHITE:
+		m_graphics = true;
+		m_conceal = false;
+		m_fg = data & 0x07;
+		break;
+
+	case CONCEAL_DISPLAY:
+		m_conceal = true;
+		break;
+
+	case CONTIGUOUS_GFX:
+		m_separated = false;
+		break;
+
+	case SEPARATED_GFX:
+		m_separated = true;
+		break;
+
+	case BLACK_BACKGROUND:
+		m_bg = 0;
+		break;
+
+	case NEW_BACKGROUND:
+		m_bg = m_fg;
+		break;
+
+	case HOLD_GRAPHICS:
+		m_hold = true;
+		break;
+
+	case RELEASE_GRAPHICS:
+		m_hold = false;
+		break;
+	}
 }
 
 
+//-------------------------------------------------
+//  get_character_data -
+//-------------------------------------------------
+
+void saa5050_device::get_character_data(UINT8 data)
+{
+	if (m_graphics && (data & 0x20))
+	{
+		data += (data & 0x40) ? 64 : 96;
+		if (m_separated) data += 64;
+	}
+
+	if ((data < 0x20) && m_hold) data = m_last_code;
+	if (m_conceal) data = 0x20;
+	if (m_flash && (m_frame_count > 38)) data = 0x20;
+	if (m_double_height_bottom_row && !m_double_height) data = 0x20;
+	m_last_code = data;
+
+	offs_t ra = m_ra >> 1;
+	if (m_double_height) ra >>= 1;
+	if (m_double_height && m_double_height_bottom_row) ra += 5;
+
+	offs_t char_rom_addr = (data * 10) + ra;
+	m_char_data = m_char_rom[char_rom_addr];
+}
+
+
+//-------------------------------------------------
+//  dew_w - data entry window
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( saa5050_device::dew_w )
+{
+	if (state)
+	{
+		m_ra = 19;
+		m_double_height_top_row = false;
+		
+		m_frame_count++;
+		if (m_frame_count > 50) m_frame_count = 0;
+	}
+}
+
+
+//-------------------------------------------------
+//  lose_w - load output shift register enable
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( saa5050_device::lose_w )
+{
+	if (state)
+	{
+		m_ra++;
+		m_ra %= 20;
+
+		m_fg = 7;
+		m_bg = 0;
+		m_graphics = false;
+		m_separated = false;
+		m_conceal = false;
+		m_flash = false;
+		m_boxed = false;
+		m_hold = false;
+		m_double_height = 0;
+		m_bit = 5;
+		m_last_code = 0x20;
+
+		if (!m_ra)
+		{
+			m_double_height_bottom_row = m_double_height_top_row;
+			m_double_height_top_row = false;
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  write - character data write
+//-------------------------------------------------
+
+void saa5050_device::write(UINT8 data)
+{
+	m_code = data & 0x7f;
+}
+
+
+//-------------------------------------------------
+//  f1_w - character clock
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( saa5050_device::f1_w )
+{
+	if (state)
+	{
+		process_control_character(m_code);
+		get_character_data(m_code);
+	}
+}
+
+
+//-------------------------------------------------
+//  tr6_w - pixel clock
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( saa5050_device::tr6_w )
+{
+	if (state)
+	{
+		m_color = BIT(m_char_data, m_bit) ? m_fg : m_bg;
+
+		m_bit--;
+		if (m_bit < 0) m_bit = 5;
+	}
+}
+
+
+//-------------------------------------------------
+//  get_rgb - get output color
+//-------------------------------------------------
+
+int saa5050_device::get_rgb()
+{
+	return m_color;
+}
+
+
+//-------------------------------------------------
+//  screen_update -
+//-------------------------------------------------
+
+UINT32 saa5050_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	dew_w(1);
+	dew_w(0);
+
+	for (int y = 0; y < m_rows * 20; y++)
+	{
+		int sy = y / 20;
+		int x = 0;
+
+		lose_w(1);
+		lose_w(0);
+
+		int ssy = m_double_height_bottom_row ? sy - 1 : sy;
+		offs_t video_ram_addr = ssy * m_size;
+
+		for (int sx = 0; sx < m_cols; sx++)
+		{
+			UINT8 code = m_in_d_func(video_ram_addr++);
+
+			write(code & 0x7f);
+
+			f1_w(1);
+			f1_w(0);
+
+			for (int bit = 0; bit < 6; bit++)
+			{
+				tr6_w(1);
+				tr6_w(0);
+
+				int color = get_rgb();
+
+				if (BIT(code, 7)) color ^= 0x07;
+
+				int r = BIT(color, 0) * 0xff;
+				int g = BIT(color, 1) * 0xff;
+				int b = BIT(color, 2) * 0xff;
+
+				rgb_t rgb = MAKE_RGB(r, g, b);
+
+				bitmap.pix32(y, x++) = rgb;
+				bitmap.pix32(y, x++) = rgb;
+			}
+		}
+	}
+
+	return 0;
+}

@@ -39,17 +39,20 @@ class poly_state : public driver_device
 public:
 	poly_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_pia0(*this, "pia0"),
-	m_pia1(*this, "pia1")
+		  m_maincpu(*this, "maincpu"),
+		  m_pia0(*this, "pia0"),
+		  m_pia1(*this, "pia1"),
+		  m_videoram(*this, "videoram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
+	required_shared_ptr<UINT8> m_videoram;
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(pia1_b_in);
 	DECLARE_READ_LINE_MEMBER(pia1_cb1_in);
+	DECLARE_READ8_MEMBER(videoram_r);
 	UINT8 m_term_data;
 	bool m_term_key;
 	virtual void machine_reset();
@@ -70,7 +73,7 @@ static ADDRESS_MAP_START(poly_mem, AS_PROGRAM, 8, poly_state)
 	AM_RANGE(0xe050,0xe05f) AM_RAM //Dynamic Address Translater (arranges memory banks)
 	// AM_RANGE(0xe060,0xe060) Select Map 1
 	// AM_RANGE(0xe070,0xe070) Select Map 2
-	AM_RANGE(0xe800,0xebbf) AM_DEVREADWRITE_LEGACY("saa5050", saa5050_videoram_r, saa5050_videoram_w)
+	AM_RANGE(0xe800,0xebbf) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xebc0,0xebff) AM_RAM
 	AM_RANGE(0xec00,0xefbf) AM_RAM // screen 2 AM_DEVREADWRITE_LEGACY("saa5050", saa5050_videoram_r, saa5050_videoram_w)
 	AM_RANGE(0xefc0,0xefff) AM_RAM
@@ -142,23 +145,15 @@ static const ptm6840_interface poly_ptm_intf =
 	DEVCB_NULL
 };
 
-static SCREEN_UPDATE_IND16( poly )
+READ8_MEMBER( poly_state::videoram_r )
 {
-	device_t *saa5050 = screen.machine().device("saa5050");
-
-	saa5050_update(saa5050, bitmap, cliprect);
-	saa5050_frame_advance(saa5050);
-
-	return 0;
+	return m_videoram[offset];
 }
 
-
-static const saa5050_interface poly_saa5050_intf =
+static SAA5050_INTERFACE( poly_saa5050_intf )
 {
-	"screen",
-	0,	/* starting gfxnum */
-	40, 24, 40,  /* x, y, size */
-	0	/* rev y order */
+	DEVCB_DRIVER_MEMBER(poly_state, videoram_r),
+	40, 24, 40  /* x, y, size */
 };
 
 // temporary hack
@@ -185,16 +180,13 @@ static MACHINE_CONFIG_START( poly, poly_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(SAA5050_VBLANK))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(40 * 12, 24 * 20)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 12 - 1, 0, 24 * 20 - 1)
-	MCFG_SCREEN_UPDATE_STATIC(poly)
-	MCFG_GFXDECODE(saa5050)
-	MCFG_PALETTE_LENGTH(128)
-	MCFG_PALETTE_INIT(saa5050)
+	MCFG_SCREEN_UPDATE_DEVICE("saa5050", saa5050_device, screen_update)
 
 	/* Devices */
-	MCFG_SAA5050_ADD("saa5050", poly_saa5050_intf)
+	MCFG_SAA5050_ADD("saa5050", 6000000, poly_saa5050_intf)
 	MCFG_PIA6821_ADD( "pia0", poly_pia0_intf )
 	MCFG_PIA6821_ADD( "pia1", poly_pia1_intf )
 	MCFG_PTM6840_ADD("ptm", poly_ptm_intf)
@@ -222,10 +214,6 @@ ROM_START( poly1 )
 	ROMX_LOAD( "v2bas3.bin", 0xc000, 0x1000, CRC(04a58be5) SHA1(729fa02c76783213e40bb179e60c09d4b439ab90), ROM_BIOS(2) )
 	ROMX_LOAD( "v2bas4.bin", 0x9000, 0x1000, CRC(328fe790) SHA1(43dca92092b27627603d3588f91cf9eca24ed29f), ROM_BIOS(2) )
 	ROMX_LOAD( "slrt14_00f9.bin", 0xf000, 0x1000, CRC(6559a2ce) SHA1(7c38f449ca122342732123b56992ed0c446406c2), ROM_BIOS(2) )
-
-	/* This is SAA5050 came with poly emulator, identical to p2000t */
-	ROM_REGION(0x01000, "gfx1",0)
-	ROM_LOAD("p2000.chr", 0x0140, 0x08c0, CRC(78c17e3e) SHA1(4e1c59dc484505de1dc0b1ba7e5f70a54b0d4ccc))
 ROM_END
 
 /* Driver */

@@ -26,7 +26,7 @@
 #include "formats/uef_cas.h"
 #include "formats/csw_cas.h"
 #include "sound/sn76496.h"
-#include "video/saa505x.h"
+#include "video/saa5050.h"
 #include "includes/bbc.h"
 
 
@@ -772,9 +772,11 @@ static const floppy_interface bbc_floppy_interface =
 	NULL
 };
 
-static const saa505x_interface bbc_saa505x_intf =
+
+static SAA5050_INTERFACE( trom_intf )
 {
-	bbc_draw_RGB_in,
+	DEVCB_NULL,
+	40, 24, 40  // x, y, size
 };
 
 static const mc6854_interface adlc_intf =
@@ -854,7 +856,7 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT_OVERRIDE(bbc_state,bbc)
-	MCFG_SAA505X_VIDEO_ADD("saa505x", bbc_saa505x_intf)
+	MCFG_SAA5050_ADD("saa505x", XTAL_12MHz/2, trom_intf)
 
     MCFG_MC6845_ADD("mc6845",MC6845,2000000, bbc_mc6845_intf)
 
@@ -948,7 +950,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_PALETTE_INIT_OVERRIDE(bbc_state,bbc)
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update)
 
-	MCFG_SAA505X_VIDEO_ADD("saa505x", bbc_saa505x_intf)
+	MCFG_SAA5050_ADD("saa505x", XTAL_12MHz/2, trom_intf)
 
     MCFG_MC6845_ADD("mc6845",MC6845,2000000, bbc_mc6845_intf)
 
