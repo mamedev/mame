@@ -1400,6 +1400,63 @@ Miscellaneous registers:
 0x470
 ???? ???? ???? ???? External pin register, used by some games for prg/gfx banking (per-game specific)
 
+
+---
+
+commands 0x8100/0x8900:
+
+status always 0x8007 (doesn't seem to care)
+raw | amp | scale | sin       | cos      |
+------------------------------------------
+y	  0x00     x    0x00000000 0x00000000 (i.e. if amp is 0 then sin/cos are zero too)
+0     0x40     0    0x00000000 0x00020000
+0     0x40     1    0x00000000 0x00040000
+0     0x40     2    0x00000000 0x00080000
+0     0x40     3    0x00000000 0x00100000
+0x40  0x40     0    0x00020000 0x00000000
+0x40  0x40     1    0x00040000 0x00000000
+0x40  0x40     2    0x00080000 0x00000000
+0x40  0x40     3    0x00100000 0x00000000
+0x80  0x40     0    0x00000000 0xfffc0000
+0x80  0x40     1    0x00000000 0xfff80000
+0x80  0x40     2    0x00000000 0xfff00000
+0x80  0x40     3    0x00000000 0xffe00000
+0xc0  0x40     0    0xfffc0000 0x00000000
+0xc0  0x40     1    0xfff80000 0x00000000
+0xc0  0x40     2    0xfff00000 0x00000000
+0xc0  0x40     3    0xffe00000 0x00000000
+0     0x80     0    0x00000000 0x00040000
+0     0x80     1    0x00000000 0x00080000
+0     0x80     2    0x00000000 0x00100000
+0     0x80     3    0x00000000 0x00200000
+0x40  0x80     0    0x00040000 0x00000000
+0x40  0x80     1    0x00080000 0x00000000
+0x40  0x80     2    0x00100000 0x00000000
+0x40  0x80     3    0x00200000 0x00000000
+0x80  0x80     0    0x00000000 0xfff80000
+0x80  0x80     1    0x00000000 0xfff00000
+0x80  0x80     2    0x00000000 0xffe00000
+0x80  0x80     3    0x00000000 0xffc00000
+0xc0  0x80     0    0xfff80000 0x00000000
+0xc0  0x80     1    0xfff00000 0x00000000
+0xc0  0x80     2    0xffe00000 0x00000000
+0xc0  0x80     3    0xffc00000 0x00000000
+0     0xc0     0    0x00000000 0x00060000
+0     0xc0     1    0x00000000 0x000c0000
+0     0xc0     2    0x00000000 0x00180000
+0     0xc0     3    0x00000000 0x00300000
+0x40  0xc0     0    0x00060000 0x00000000
+0x40  0xc0     1    0x000c0000 0x00000000
+0x40  0xc0     2    0x00180000 0x00000000
+0x40  0xc0     3    0x00300000 0x00000000
+0x80  0xc0     0    0x00000000 0xfff40000
+0x80  0xc0     1    0x00000000 0xffe80000
+0x80  0xc0     2    0x00000000 0xffd00000
+0x80  0xc0     3    0x00000000 0xffa00000
+0xc0  0xc0     0    0xfff40000 0x00000000
+0xc0  0xc0     1    0xffe80000 0x00000000
+0xc0  0xc0     2    0xffd00000 0x00000000
+0xc0  0xc0     3    0xffa00000 0x00000000
 */
 
 #include "emu.h"
@@ -2040,10 +2097,7 @@ static WRITE16_HANDLER( generic_cop_w )
 
 		case (0x044/2):
 		{
-			/*TODO: this appears to control trigonometry maths, but all games here doesn't seem to like current implementation ... */
-			cop_scale = 1;
-			if(data == 4)
-				cop_scale = 0;
+			cop_scale = data & 3;
 			break;
 		}
 
@@ -2181,13 +2235,16 @@ static WRITE16_HANDLER( generic_cop_w )
 			{
 				int raw_angle = (space->read_word(cop_register[0]+(0x34^2)) & 0xff);
 				double angle = raw_angle * M_PI / 128;
-				double amp = 65536*(space->read_word(cop_register[0]+(0x36^2)) & 0xff);
+				double amp = (65536 >> 5)*(space->read_word(cop_register[0]+(0x36^2)) & 0xff);
+				int res;
 
 				/* TODO: up direction, why? */
 				if(raw_angle == 0xc0)
 					amp*=2;
 
-				space->write_dword(cop_register[0] + 16, int(amp*sin(angle)) >> (5-cop_scale));
+				res = int(amp*sin(angle)) << cop_scale;
+
+				space->write_dword(cop_register[0] + 16, res);
 				return;
 			}
 
@@ -2208,13 +2265,16 @@ static WRITE16_HANDLER( generic_cop_w )
 			{
 				int raw_angle = (space->read_word(cop_register[0]+(0x34^2)) & 0xff);
 				double angle = raw_angle * M_PI / 128;
-				double amp = 65536*(space->read_word(cop_register[0]+(0x36^2)) & 0xff);
+				double amp = (65536 >> 5)*(space->read_word(cop_register[0]+(0x36^2)) & 0xff);
+				int res;
 
 				/* TODO: left direction, why? */
 				if(raw_angle == 0x80)
 					amp*=2;
 
-				space->write_dword(cop_register[0] + 20, int(amp*cos(angle)) >> (5-cop_scale));
+				res = int(amp*cos(angle)) << cop_scale;
+
+				space->write_dword(cop_register[0] + 20, res);
 				return;
 			}
 
@@ -2295,10 +2355,18 @@ static WRITE16_HANDLER( generic_cop_w )
 			if(COP_CMD(0xf9a,0xb9a,0xb9c,0xb9c,0xb9c,0x29c,0x000,0x000,5,0xfcdd))
 			{
 				int div = space->read_word(cop_register[0]+(0x36^2));
-				if(!div)
-					div = 1;
+				int res;
 
-				space->write_word(cop_register[0]+(0x38^2), (space->read_word(cop_register[0]+(0x38^2)) << (5-cop_scale)) / div);
+				if(!div)
+				{
+					printf("divide by zero?\n");
+					div = 1;
+				}
+
+				res = space->read_word(cop_register[0]+(0x38^2)) / div;
+				res <<= cop_scale + 2; /* TODO: check this */
+
+				space->write_word(cop_register[0]+(0x38^2), res);
 				return;
 			}
 

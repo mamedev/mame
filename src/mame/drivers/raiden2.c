@@ -428,6 +428,7 @@ READ16_MEMBER(raiden2_state::cop_dist_r)
 WRITE16_MEMBER(raiden2_state::cop_scale_w)
 {
 	COMBINE_DATA(&cop_scale);
+	cop_scale &= 3;
 }
 
 READ16_MEMBER(raiden2_state::cop_reg_high_r)
@@ -540,31 +541,41 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 
 	case 0x42c2: { // 42c2 0005 fcdd 0040 - 0f9a 0b9a 0b9c 0b9c 0b9c 029c 0000 0000
 		int div = space.read_word(cop_regs[0]+0x36);
+		int res;
 		if(!div)
+		{
+			printf("divide by zero?\n");
 			div = 1;
-		space.write_word(cop_regs[0]+0x38, (space.read_word(cop_regs[0]+0x38) << (5-cop_scale)) / div);
+		}
+		res = space.read_word(cop_regs[0]+(0x38)) / div;
+		res <<= cop_scale + 2; /* TODO: check this */
+		space.write_word(cop_regs[0]+0x38, res);
 		break;
 	}
 
 	case 0x8100: { // 8100 0007 fdfb 0080 - 0b9a 0b88 0888 0000 0000 0000 0000 0000
-		int raw_angle = (space.read_word(cop_regs[0]+0x34) & 0xff);
+		int raw_angle = (space.read_word(cop_regs[0]+(0x34)) & 0xff);
 		double angle = raw_angle * M_PI / 128;
-		double amp = 65536*(space.read_word(cop_regs[0]+0x36) & 0xff);
+		double amp = (65536 >> 5)*(space.read_word(cop_regs[0]+(0x36)) & 0xff);
+		int res;
 		/* TODO: up direction, why? (check machine/seicop.c) */
 		if(raw_angle == 0xc0)
 			amp*=2;
-		space.write_dword(cop_regs[0] + 16, int(amp*sin(angle)) >> (5-cop_scale));
+		res = int(amp*sin(angle)) << cop_scale;
+		space.write_dword(cop_regs[0] + 16, res);
 		break;
 	}
 
 	case 0x8900: { // 8900 0007 fdfb 0088 - 0b9a 0b8a 088a 0000 0000 0000 0000 0000
-		int raw_angle = (space.read_word(cop_regs[0]+0x34) & 0xff);
+		int raw_angle = (space.read_word(cop_regs[0]+(0x34)) & 0xff);
 		double angle = raw_angle * M_PI / 128;
-		double amp = 65536*(space.read_word(cop_regs[0]+0x36) & 0xff);
+		double amp = (65536 >> 5)*(space.read_word(cop_regs[0]+(0x36)) & 0xff);
+		int res;
 		/* TODO: left direction, why? (check machine/seicop.c) */
 		if(raw_angle == 0x80)
 			amp*=2;
-		space.write_dword(cop_regs[0] + 20, int(amp*cos(angle)) >> (5-cop_scale));
+		res = int(amp*cos(angle)) << cop_scale;
+		space.write_dword(cop_regs[0] + 20, res);
 		break;
 	}
 
