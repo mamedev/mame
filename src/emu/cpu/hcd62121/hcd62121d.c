@@ -32,12 +32,12 @@ enum
 	_4,			/* for nibble shifts */
 };
 
-typedef struct
+struct hcd62121_dasm 
 {
 	const char *str;
 	UINT8		arg1;
 	UINT8		arg2;
-} hcd62121_dasm;
+};
 
 
 static const hcd62121_dasm hcd62121_ops[256] =

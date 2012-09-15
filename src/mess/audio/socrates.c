@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "socrates.h"
 
-typedef struct
+struct SocratesASIC 
 {
 	sound_stream *stream;
 	UINT8 freq[2]; /* channel 1,2 frequencies */
@@ -20,7 +20,7 @@ typedef struct
 	UINT8 state[3]; /* output states for channels 1,2,3 */
 	UINT8 accum[3]; /* accumulators for channels 1,2,3 */
 	UINT16 DAC_output; /* output */
-} SocratesASIC;
+};
 
 
 INLINE SocratesASIC *get_safe_token(device_t *device)

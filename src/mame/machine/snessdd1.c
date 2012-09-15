@@ -178,12 +178,12 @@ static UINT8 SDD1_BG_getBit(SDD1_BG* thisptr, UINT8* endOfRun)
 }
 
 
-typedef struct
+struct SDD1_PEM_state 
 {
 	UINT8 code_num;
 	UINT8 nextIfMPS;
 	UINT8 nextIfLPS;
-} SDD1_PEM_state;
+};
 
 static const SDD1_PEM_state SDD1_PEM_evolution_table[33] =
 {
@@ -222,11 +222,11 @@ static const SDD1_PEM_state SDD1_PEM_evolution_table[33] =
 	{ 7,24,22}
 };
 
-typedef struct
+struct SDD1_PEM_ContextInfo 
 {
 	UINT8 status;
 	UINT8 MPS;
-} SDD1_PEM_ContextInfo;
+};
 
 class SDD1_PEM //Probability Estimation Module
 {

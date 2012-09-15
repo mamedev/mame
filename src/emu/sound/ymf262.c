@@ -141,7 +141,7 @@ static FILE * cymfile = NULL;
 #define OPL3_TYPE_YMF262 (0)	/* 36 operators, 8 waveforms */
 
 
-typedef struct
+struct OPL3_SLOT 
 {
 	UINT32	ar;			/* attack rate: AR<<2           */
 	UINT32	dr;			/* decay rate:  DR<<2           */
@@ -190,9 +190,9 @@ typedef struct
 //unsigned char reserved[128-84];//speedup: pump up the struct size to power of 2
 unsigned char reserved[128-100];//speedup: pump up the struct size to power of 2
 
-} OPL3_SLOT;
+};
 
-typedef struct
+struct OPL3_CH 
 {
 	OPL3_SLOT SLOT[2];
 
@@ -215,10 +215,10 @@ typedef struct
 
 unsigned char reserved[512-272];//speedup:pump up the struct size to power of 2
 
-} OPL3_CH;
+};
 
 /* OPL3 state */
-typedef struct
+struct OPL3 
 {
 	OPL3_CH	P_CH[18];				/* OPL3 chips have 18 channels  */
 
@@ -278,7 +278,7 @@ typedef struct
 	double freqbase;				/* frequency base               */
 	attotime TimerBase;			/* Timer base time (==sampling time)*/
 	device_t *device;
-} OPL3;
+};
 
 
 

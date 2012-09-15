@@ -3660,14 +3660,14 @@ MACHINE_RESET_MEMBER(konamigx_state,konamigx)
 	}
 }
 
-typedef struct
+struct GXGameInfoT 
 {
 	const char *romname;
 	UINT32 cfgport;
 	UINT32 sndhack;
 	UINT32 special;
 	UINT32 readback;
-} GXGameInfoT;
+};
 
 #define BPP4  0
 #define BPP5  1

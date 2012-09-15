@@ -193,16 +193,16 @@ static const UINT32 banks[4] = { 0, 0x40000/2, 0x20000/2, 0x60000/2 };
 
 #define DRAM_BANK_SEL		(banks[(VREG(DSBA) >> 7) & 3])
 
-typedef struct
+struct i82716_t 
 {
 	UINT16	r[16];
 	UINT16	*dram;
 
 	UINT8	*line_buf;	// there's actually two
-} i82716_t;
+};
 
 
-typedef struct
+struct i8279_t 
 {
 	UINT8	command;
 	UINT8	mode;
@@ -211,7 +211,7 @@ typedef struct
 	UINT8	clear;
 	UINT8	fifo[8];
 	UINT8	ram[16];
-} i8279_t;
+};
 
 class maygayv1_state : public driver_device
 {

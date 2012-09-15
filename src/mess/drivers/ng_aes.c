@@ -44,7 +44,7 @@ static const char *audio_banks[4] =
 };
 
 // CD-ROM / DMA control registers
-typedef struct
+struct neocd_ctrl_t 
 {
 	UINT8 area_sel;
 	UINT8 pcm_bank_sel;
@@ -54,7 +54,7 @@ typedef struct
 	UINT16 fill_word;
 	UINT32 word_count;
 	UINT16 dma_mode[10];
-} neocd_ctrl_t;
+};
 
 class ng_aes_state : public neogeo_state
 {

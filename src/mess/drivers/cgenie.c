@@ -626,7 +626,7 @@ ROM_END
 //   GATL GAT Length
 //   GATM GAT Mask
 //   DDGA Disk Directory Granule Allocation
-typedef struct
+struct PDRIVE 
 {
     UINT8 DDSL;      // Disk Directory Start Lump (lump number of GAT)
     UINT8 GATL;      // # of bytes used in the Granule Allocation Table sector
@@ -638,7 +638,7 @@ typedef struct
     UINT8 FLAGS;     // ???? some flags (SS/DS bit 6)
     UINT8 GPL;       // Sectors per granule (always 5 for the Colour Genie)
     UINT8 DDGA;      // Disk Directory Granule allocation (number of driectory granules)
-}   PDRIVE;
+};
 
 static const PDRIVE pd_list[12] = {
     {0x14, 0x28, 0x07, 0x28, 0x0A, 0x02, 0x00, 0x00, 0x05, 0x02}, // CMD"<0=A" 40 tracks, SS, SD

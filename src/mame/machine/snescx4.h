@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-typedef struct
+struct CX4 
 {
        UINT8 ram[0x0c00];
        UINT8 reg[0x0100];
@@ -21,4 +21,4 @@ typedef struct
        double tanval;
        double c4x, c4y, c4z;
        double c4x2, c4y2, c4z2;
-} CX4;
+};

@@ -1158,13 +1158,13 @@ static TIMER_CALLBACK( h8s_tpu_callback)
 // SERIAL CONTROLLER INTERFACE //
 /////////////////////////////////
 
-typedef struct
+struct H8S_SCI_ENTRY 
 {
 	UINT32 reg_smr, reg_brr, reg_scr, reg_tdr, reg_ssr, reg_rdr;
 	UINT32 reg_pdr, reg_port;
 	UINT8 port_mask_sck, port_mask_txd, port_mask_rxd;
 	UINT8 int_tx, int_rx;
-} H8S_SCI_ENTRY;
+};
 
 const H8S_SCI_ENTRY H8S_SCI_TABLE[] =
 {

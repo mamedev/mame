@@ -46,7 +46,7 @@ enum
 	TMS32051_AR7,
 };
 
-typedef struct
+struct PMST 
 {
 	UINT16 iptr;
 	UINT16 avis;
@@ -56,18 +56,18 @@ typedef struct
 	UINT16 ndx;
 	UINT16 trm;
 	UINT16 braf;
-} PMST;
+};
 
-typedef struct
+struct ST0 
 {
 	UINT16 dp;
 	UINT16 intm;
 	UINT16 ovm;
 	UINT16 ov;
 	UINT16 arp;
-} ST0;
+};
 
-typedef struct
+struct ST1 
 {
 	UINT16 arb;
 	UINT16 cnf;
@@ -77,7 +77,7 @@ typedef struct
 	UINT16 hm;
 	UINT16 xf;
 	UINT16 pm;
-} ST1;
+};
 
 struct tms32051_state
 {

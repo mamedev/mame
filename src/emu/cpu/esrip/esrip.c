@@ -61,7 +61,7 @@ CPU_DISASSEMBLE( esrip );
     STRUCTURES & TYPEDEFS
 ***************************************************************************/
 
-typedef struct
+struct esrip_state 
 {
 	UINT16	ram[32];
 	UINT16	acc;
@@ -118,7 +118,7 @@ typedef struct
 	write16_device_func	fdt_w;
 	UINT8 (*status_in)(running_machine &machine);
 	int (*draw)(running_machine &machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank);
-} esrip_state;
+};
 
 
 INLINE esrip_state *get_safe_token(device_t *device)

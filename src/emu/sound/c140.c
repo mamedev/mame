@@ -65,7 +65,7 @@ struct voice_registers
 	UINT8 reserved[4];
 };
 
-typedef struct
+struct VOICE 
 {
 	long	ptoffset;
 	long	pos;
@@ -84,7 +84,7 @@ typedef struct
 	long	sample_start;
 	long	sample_end;
 	long	sample_loop;
-} VOICE;
+};
 
 struct c140_state
 {

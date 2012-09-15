@@ -3,7 +3,7 @@
 #define CALC3_VERBOSE_OUTPUT 0
 
 
-typedef struct
+struct calc3_t 
 {
 	int mcu_status;
 	int mcu_command_offset;
@@ -23,7 +23,7 @@ typedef struct
 	UINT16 eeprom_addr;
 	UINT16 poll_addr;
 	UINT16 checksumaddress;
-} calc3_t;
+};
 
 
 

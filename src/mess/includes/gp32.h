@@ -34,7 +34,7 @@
 #define INT_EINT1      1
 #define INT_EINT0      0
 
-typedef struct
+struct s3c240x_lcd_t 
 {
 	UINT32 vramaddr_cur;
 	UINT32 vramaddr_max;
@@ -45,9 +45,9 @@ typedef struct
 	UINT32 bswp, hwswp;
 	UINT32 hozval, lineval;
 	int vpos, hpos;
-} s3c240x_lcd_t;
+};
 
-typedef struct
+struct smc_t 
 {
 	int add_latch;
 	int chip;
@@ -59,27 +59,27 @@ typedef struct
 	int busy;
 	UINT8 datarx;
 	UINT8 datatx;
-} smc_t;
+};
 
-typedef struct
+struct i2s_t 
 {
 	int l3d;
 	int l3m;
 	int l3c;
-} i2s_t;
+};
 
-typedef struct
+struct s3c240x_iic_t 
 {
 	UINT8 data[4];
 	int data_index;
 	UINT16 address;
-} s3c240x_iic_t;
+};
 
-typedef struct
+struct s3c240x_iis_t 
 {
 	UINT16 fifo[16/2];
 	int fifo_index;
-} s3c240x_iis_t;
+};
 
 
 class gp32_state : public driver_device

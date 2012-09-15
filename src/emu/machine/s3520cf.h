@@ -29,10 +29,10 @@ typedef enum
 	RTC_SET_DATA
 } s3520cf_state_t;
 
-typedef struct
+struct rtc_regs_t 
 {
 	UINT8 sec, min, hour, day, wday, month, year;
-} rtc_regs_t;
+};
 
 
 // ======================> s3520cf_device

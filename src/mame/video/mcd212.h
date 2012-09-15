@@ -24,7 +24,7 @@ TODO:
 
 #include "emu.h"
 
-typedef struct
+struct mcd212_channel_t 
 {
     UINT8 csrr;
     UINT16 csrw;
@@ -58,7 +58,7 @@ typedef struct
     UINT32 mosaic_hold_b;
     UINT8 weight_factor_a[768];
     UINT8 weight_factor_b[768];
-} mcd212_channel_t;
+};
 
 typedef struct
 {

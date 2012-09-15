@@ -19,7 +19,7 @@
 #include "machine/psxcd.h"
 #include "machine/psxcard.h"
 
-typedef struct
+struct pad_t 
 {
 	UINT8 n_shiftin;
 	UINT8 n_shiftout;
@@ -28,7 +28,7 @@ typedef struct
 	int n_byte;
 	int b_lastclock;
 	int b_ack;
-} pad_t;
+};
 
 
 class psx1_state : public psx_state

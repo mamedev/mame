@@ -374,7 +374,7 @@ enum
 };
 
 
-typedef struct
+struct decode_tbl_t 
 {
 	/* Disassembly function for this opcode.
        Call with buffer, mnemonic, pc, insn.  */
@@ -386,7 +386,7 @@ typedef struct
     /* Mnemonic of this opcode (sometimes partial when more decode is
        done in disassembly routines-- e.g., loads and stores).  */
 	const char *mnemonic;
-} decode_tbl_t;
+};
 
 
 /* First-level decode table (i.e., for the 6 primary opcode bits).  */

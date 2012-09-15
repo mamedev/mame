@@ -34,7 +34,7 @@
  *************************************/
 
 
-typedef struct
+struct cage_t 
 {
 	cpu_device *cpu;
 	attotime cpu_h1_clock_period;
@@ -59,7 +59,7 @@ typedef struct
 
 	UINT32 *speedup_ram;
 	dmadac_sound_device *dmadac[DAC_BUFFER_CHANNELS];
-} cage_t;
+};
 
 static cage_t cage;
 

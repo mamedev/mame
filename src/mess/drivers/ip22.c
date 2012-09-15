@@ -57,14 +57,14 @@
 #include "machine/scsihd.h"
 #include "machine/wd33c93.h"
 
-typedef struct
+struct RTC_t 
 {
 	UINT8 nRegs[0x80];
 	UINT8 nUserRAM[0x200];
 	UINT8 nRAM[0x800];
-} RTC_t;
+};
 
-typedef struct
+struct HPC3_t 
 {
 	UINT32 nenetr_nbdp;
 	UINT32 nenetr_cbp;
@@ -73,22 +73,22 @@ typedef struct
 	UINT32 nIC_Unk0;
 	UINT32 nSCSI0Descriptor;
 	UINT32 nSCSI0DMACtrl;
-} HPC3_t;
+};
 
-typedef struct
+struct HAL2_t 
 {
 	UINT32 nIAR;
 	UINT32 nIDR[4];
-} HAL2_t;
+};
 
-typedef struct
+struct PBUS_DMA_t 
 {
 	UINT8 nActive;
 	UINT32 nCurPtr;
 	UINT32 nDescPtr;
 	UINT32 nNextPtr;
 	UINT32 nWordsLeft;
-} PBUS_DMA_t;
+};
 
 class ip22_state : public driver_device
 {

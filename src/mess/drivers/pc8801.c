@@ -271,19 +271,19 @@
 #define UPD1990A_TAG	"upd1990a"
 #define I8251_TAG		"i8251"
 
-typedef struct
+struct crtc_t 
 {
 	UINT8 cmd,param_count,cursor_on,status,irq_mask;
 	UINT8 param[8][5];
 	UINT8 inverse;
-} crtc_t;
+};
 
-typedef struct
+struct mouse_t 
 {
 	UINT8 phase;
 	UINT8 x,y;
 	attotime time;
-} mouse_t;
+};
 
 class pc8801_state : public driver_device
 {

@@ -86,12 +86,12 @@ static const UINT8 t6834_cmd_len[0x47] =
 	0x01, 0x09, 0x01, 0x03, 0x03, 0x01, 0x01
 };
 
-typedef struct
+struct x07_kb 
 {
 	const char *tag;		//input port tag
 	UINT8		mask;		//bit mask
 	UINT8		codes[7];	//port codes
-} x07_kb;
+};
 
 static const x07_kb x07_keycodes[56] =
 {

@@ -86,7 +86,7 @@
 ***************************************************************************/
 
 /* MIPS3 Registers */
-typedef struct
+struct mips3_regs 
 {
 	/* core state */
 	mips3_state	core;
@@ -112,7 +112,7 @@ typedef struct
 	void		(*ldr)(UINT32 op);
 	void		(*sdl)(UINT32 op);
 	void		(*sdr)(UINT32 op);
-} mips3_regs;
+};
 
 
 

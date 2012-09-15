@@ -17,7 +17,7 @@ silence compression: '00 nn' must be replaced by nn+1 times '80'.
 #include "n63701x.h"
 
 
-typedef struct
+struct voice 
 {
 	int select;
 	int playing;
@@ -25,7 +25,7 @@ typedef struct
 	int position;
 	int volume;
 	int silence_counter;
-} voice;
+};
 
 
 struct namco_63701x

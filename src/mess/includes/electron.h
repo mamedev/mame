@@ -23,7 +23,7 @@
 
 /* ULA context */
 
-typedef struct
+struct ULA 
 {
 	UINT8 interrupt_status;
 	UINT8 interrupt_control;
@@ -48,7 +48,7 @@ typedef struct
 	int stop_bit;
 	int tape_running;
 	UINT8 tape_byte;
-} ULA;
+};
 
 
 class electron_state : public driver_device

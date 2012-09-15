@@ -60,7 +60,7 @@ enum
     Structure that describes the state of a floppy drive, and the associated
     disk image
 */
-typedef struct
+struct floppy_t 
 {
 	device_t *img;
 	emu_file *fd;
@@ -78,9 +78,9 @@ typedef struct
 
 	int is_fdhd;				/* is drive an FDHD? */
     int is_400k;                /* drive is single-sided, which means 400K */
-} floppy_t;
+};
 
-typedef struct
+struct sonydriv_t 
 {
 	int lines;				/* four lines SONY_CA0 - SONY_LSTRB */
 
@@ -91,7 +91,7 @@ typedef struct
 
 	unsigned int rotation_speed;		/* drive rotation speed - ignored if ext_speed_control == 0 */
 	floppy_t floppy[2];			/* data for two floppy disk units */
-} sonydriv_t;
+};
 static sonydriv_t sony;
 
 /* bit of code used in several places - I am unsure why it is here */

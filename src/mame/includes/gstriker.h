@@ -5,20 +5,20 @@
 
 #define MAX_VS920A 2
 
-typedef struct
+struct sVS920A 
 {
 	tilemap_t* tmap;
 	UINT16* vram;
 	UINT16 pal_base;
 	UINT8 gfx_region;
 
-} sVS920A;
+};
 
 /*** MB60553 **********************************************/
 
 #define MAX_MB60553 2
 
-typedef struct
+struct tMB60553 
 {
 	tilemap_t* tmap;
 	UINT16* vram;
@@ -27,20 +27,20 @@ typedef struct
 	UINT16 pal_base;
 	UINT8 gfx_region;
 
-} tMB60553;
+};
 
 /*** CG10103 **********************************************/
 
 #define MAX_CG10103 2
 
-typedef struct
+struct tCG10103 
 {
 	UINT16* vram;
 	UINT16 pal_base;
 	UINT8 gfx_region;
 	UINT8 transpen;
 
-} tCG10103;
+};
 
 class gstriker_state : public driver_device
 {

@@ -195,15 +195,15 @@ static UINT32		ppc_field_xlat[256];
 #define BYTE_REVERSE16(x)	((((x) >> 8) & 0xff) | (((x) << 8) & 0xff00))
 #define BYTE_REVERSE32(x)	((((x) >> 24) & 0xff) | (((x) >> 8) & 0xff00) | (((x) << 8) & 0xff0000) | (((x) << 24) & 0xff000000))
 
-typedef struct {
+struct DMA_REGS {
 	UINT32 cr;
 	UINT32 da;
 	UINT32 sa;
 	UINT32 ct;
 	UINT32 cc;
-} DMA_REGS;
+};
 
-typedef struct {
+struct SPU_REGS {
 	UINT8 spls;
 	UINT8 sphs;
 	UINT16 brd;
@@ -214,7 +214,7 @@ typedef struct {
 	UINT8 sptb;
 	emu_timer *rx_timer;
 	emu_timer *tx_timer;
-} SPU_REGS;
+};
 
 typedef union {
 	UINT64	id;
@@ -226,13 +226,13 @@ typedef union {
 	float f;
 } FPR32;
 
-typedef struct {
+struct BATENT {
 	UINT32 u;
 	UINT32 l;
-} BATENT;
+};
 
 
-typedef struct {
+struct PPC_REGS {
 	UINT32 r[32];
 	UINT32 pc;
 	UINT32 npc;
@@ -350,15 +350,15 @@ typedef struct {
 	void (* optable59[1024])(UINT32);
 	void (* optable63[1024])(UINT32);
 	void (* optable[64])(UINT32);
-} PPC_REGS;
+};
 
 
 
-typedef struct {
+struct PPC_OPCODE {
 	int code;
 	int subcode;
 	void (* handler)(UINT32);
-} PPC_OPCODE;
+};
 
 
 

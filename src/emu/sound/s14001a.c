@@ -237,7 +237,7 @@ and off as it normally does during speech). Once START has gone low-high-low, th
 #include "emu.h"
 #include "s14001a.h"
 
-typedef struct
+struct S14001AChip 
 {
 	sound_stream * stream;
 
@@ -262,7 +262,7 @@ typedef struct
 	UINT8 *SpeechRom; // array to hold rom contents, mame will not need this, will use a pointer
 	INT16 filtervals[8];
 	UINT8 VSU1000_amp; // amplitude setting on VSU-1000 board
-} S14001AChip;
+};
 
 INLINE S14001AChip *get_safe_token(device_t *device)
 {

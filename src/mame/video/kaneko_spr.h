@@ -11,10 +11,10 @@
 
 
 
-typedef struct
+struct kaneko16_priority_t 
 {
 	int sprite[4];
-} kaneko16_priority_t;
+};
 
 struct tempsprite
 {

@@ -1,9 +1,9 @@
-typedef struct {
+struct coprocessor_t {
 	UINT8 *context_ram;
 	UINT8 bank;
 	UINT8 *image_ram;
 	UINT8 param[0x9];
-} coprocessor_t;
+};
 
 class thief_state : public driver_device
 {

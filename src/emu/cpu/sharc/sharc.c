@@ -39,13 +39,13 @@ enum
 	SHARC_B12,		SHARC_B13,		SHARC_B14,		SHARC_B15,
 };
 
-typedef struct
+struct SHARC_DAG 
 {
 	UINT32 i[8];
 	UINT32 m[8];
 	UINT32 b[8];
 	UINT32 l[8];
-} SHARC_DAG;
+};
 
 typedef union
 {
@@ -53,7 +53,7 @@ typedef union
 	float f;
 } SHARC_REG;
 
-typedef struct
+struct DMA_REGS 
 {
 	UINT32 control;
 	UINT32 int_index;
@@ -64,16 +64,16 @@ typedef struct
 	UINT32 ext_index;
 	UINT32 ext_modifier;
 	UINT32 ext_count;
-} DMA_REGS;
+};
 
-typedef struct
+struct LADDR 
 {
 	UINT32 addr;
 	UINT32 code;
 	UINT32 loop_type;
-} LADDR;
+};
 
-typedef struct
+struct DMA_OP 
 {
 	UINT32 src;
 	UINT32 dst;
@@ -86,7 +86,7 @@ typedef struct
 	INT32 chained_direction;
 	emu_timer *timer;
 	bool active;
-} DMA_OP;
+};
 
 typedef struct _SHARC_REGS SHARC_REGS;
 struct _SHARC_REGS

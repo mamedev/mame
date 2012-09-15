@@ -6,9 +6,9 @@ typedef float MATRIX[4][4];
 typedef float VECTOR[4];
 typedef float VECTOR3[3];
 
-typedef struct {
+struct PLANE {
 	float x,y,z,d;
-} PLANE;
+};
 
 typedef struct _cached_texture cached_texture;
 

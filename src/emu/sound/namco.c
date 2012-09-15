@@ -36,7 +36,7 @@
 
 
 /* this structure defines the parameters for a channel */
-typedef struct
+struct sound_channel 
 {
 	UINT32 frequency;
 	UINT32 counter;
@@ -47,7 +47,7 @@ typedef struct
 	UINT32 noise_counter;
 	INT32 noise_hold;
 	INT32 waveform_select;
-} sound_channel;
+};
 
 
 struct namco_sound

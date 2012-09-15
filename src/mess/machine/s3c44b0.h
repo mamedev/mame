@@ -373,12 +373,12 @@ void s3c44b0_request_eint( device_t *device, UINT32 number);
     TYPE DEFINITIONS
 *******************************************************************************/
 
-typedef struct
+struct s3c44b0_memcon_regs_t 
 {
 	UINT32 data[0x34/4];
-} s3c44b0_memcon_regs_t;
+};
 
-typedef struct
+struct s3c44b0_irq_regs_t 
 {
 	UINT32 intcon;
 	UINT32 intpnd;
@@ -393,9 +393,9 @@ typedef struct
 	UINT32 reserved[4];
 	UINT32 f_ispr;
 	UINT32 f_ispc;
-} s3c44b0_irq_regs_t;
+};
 
-typedef struct
+struct s3c44b0_dma_regs_t 
 {
 	UINT32 dcon;
 	UINT32 disrc;
@@ -404,17 +404,17 @@ typedef struct
 	UINT32 dcsrc;
 	UINT32 dcdst;
 	UINT32 dccnt;
-} s3c44b0_dma_regs_t;
+};
 
-typedef struct
+struct s3c44b0_clkpow_regs_t 
 {
 	UINT32 pllcon;
 	UINT32 clkcon;
 	UINT32 clkslow;
 	UINT32 locktime;
-} s3c44b0_clkpow_regs_t;
+};
 
-typedef struct
+struct s3c44b0_lcd_regs_t 
 {
 	UINT32 lcdcon1;
 	UINT32 lcdcon2;
@@ -427,9 +427,9 @@ typedef struct
 	UINT32 reserved[8];
 	UINT32 lcdcon3;
 	UINT32 dithmode;
-} s3c44b0_lcd_regs_t;
+};
 
-typedef struct
+struct s3c44b0_uart_regs_t 
 {
 	UINT32 ulcon;
 	UINT32 ucon;
@@ -442,18 +442,18 @@ typedef struct
 	UINT32 utxh;
 	UINT32 urxh;
 	UINT32 ubrdiv;
-} s3c44b0_uart_regs_t;
+};
 
-typedef struct
+struct s3c44b0_sio_regs_t 
 {
 	UINT32 siocon;
 	UINT32 siodat;
 	UINT32 sbrdr;
 	UINT32 itvcnt;
 	UINT32 dcntz;
-} s3c44b0_sio_regs_t;
+};
 
-typedef struct
+struct s3c44b0_pwm_regs_t 
 {
 	UINT32 tcfg0;
 	UINT32 tcfg1;
@@ -475,33 +475,33 @@ typedef struct
 	UINT32 tcnto4;
 	UINT32 tcntb5;
 	UINT32 tcnto5;
-} s3c44b0_pwm_regs_t;
+};
 
-typedef struct
+struct s3c44b0_wdt_regs_t 
 {
 	UINT32 wtcon;
 	UINT32 wtdat;
 	UINT32 wtcnt;
-} s3c44b0_wdt_regs_t;
+};
 
-typedef struct
+struct s3c44b0_iic_regs_t 
 {
 	UINT32 iiccon;
 	UINT32 iicstat;
 	UINT32 iicadd;
 	UINT32 iicds;
-} s3c44b0_iic_regs_t;
+};
 
-typedef struct
+struct s3c44b0_iis_regs_t 
 {
 	UINT32 iiscon;
 	UINT32 iismod;
 	UINT32 iispsr;
 	UINT32 iisfcon;
 	UINT32 iisfifo;
-} s3c44b0_iis_regs_t;
+};
 
-typedef struct
+struct s3c44b0_gpio_regs_t 
 {
 	UINT32 gpacon;
 	UINT32 gpadat;
@@ -525,9 +525,9 @@ typedef struct
 	UINT32 spucr;
 	UINT32 extint;
 	UINT32 extintpnd;
-} s3c44b0_gpio_regs_t;
+};
 
-typedef struct
+struct s3c44b0_rtc_regs_t 
 {
 	UINT32 rtccon;
 	UINT32 reserved[3];
@@ -547,50 +547,50 @@ typedef struct
 	UINT32 bcdmon;
 	UINT32 bcdyear;
 	UINT32 ticnt;
-} s3c44b0_rtc_regs_t;
+};
 
-typedef struct
+struct s3c44b0_adc_regs_t 
 {
 	UINT32 adccon;
 	UINT32 adcpsr;
 	UINT32 adcdat;
-} s3c44b0_adc_regs_t;
+};
 
-typedef struct
+struct s3c44b0_cpuwrap_regs_t 
 {
 	UINT32 syscfg;
 	UINT32 ncachbe0;
 	UINT32 ncachbe1;
-} s3c44b0_cpuwrap_regs_t;
+};
 
-typedef struct
+struct s3c44b0_memcon_t 
 {
 	s3c44b0_memcon_regs_t regs;
-} s3c44b0_memcon_t;
+};
 
-typedef struct
+struct s3c44b0_irq_t 
 {
 	s3c44b0_irq_regs_t regs;
 	int line_irq, line_fiq;
-} s3c44b0_irq_t;
+};
 
-typedef struct
+struct s3c44b0_dma_t 
 {
 	s3c44b0_dma_regs_t regs;
 	emu_timer *timer;
-} s3c44b0_dma_t;
+};
 
-typedef struct
+struct s3c44b0_clkpow_t 
 {
 	s3c44b0_clkpow_regs_t regs;
-} s3c44b0_clkpow_t;
+};
 
-typedef struct
+struct rectangle_t 
 {
 	int x1, y1, x2, y2;
-} rectangle_t;
+};
 
-typedef struct
+struct s3c44b0_lcd_t 
 {
 	s3c44b0_lcd_regs_t regs;
 	emu_timer *timer;
@@ -607,74 +607,74 @@ typedef struct
 	UINT32 hpos_min, hpos_max, hpos_end, vpos_min, vpos_max, vpos_end;
 	attotime frame_time;
 	attoseconds_t frame_period, pixeltime, scantime;
-} s3c44b0_lcd_t;
+};
 
-typedef struct
+struct s3c44b0_uart_t 
 {
 	s3c44b0_uart_regs_t regs;
 	emu_timer *timer;
-} s3c44b0_uart_t;
+};
 
-typedef struct
+struct s3c44b0_sio_t 
 {
 	s3c44b0_sio_regs_t regs;
 	emu_timer *timer;
-} s3c44b0_sio_t;
+};
 
-typedef struct
+struct s3c44b0_pwm_t 
 {
 	s3c44b0_pwm_regs_t regs;
 	emu_timer *timer[6];
 	UINT32 cnt[6];
 	UINT32 cmp[6];
 	UINT32 freq[6];
-} s3c44b0_pwm_t;
+};
 
-typedef struct
+struct s3c44b0_wdt_t 
 {
 	s3c44b0_wdt_regs_t regs;
 	emu_timer *timer;
-} s3c44b0_wdt_t;
+};
 
-typedef struct
+struct s3c44b0_iic_t 
 {
 	s3c44b0_iic_regs_t regs;
 	emu_timer *timer;
 	int count;
-} s3c44b0_iic_t;
+};
 
-typedef struct
+struct s3c44b0_iis_t 
 {
 	s3c44b0_iis_regs_t regs;
 	emu_timer *timer;
 	UINT16 fifo[16/2];
 	int fifo_index;
-} s3c44b0_iis_t;
+};
 
-typedef struct
+struct s3c44b0_gpio_t 
 {
 	s3c44b0_gpio_regs_t regs;
-} s3c44b0_gpio_t;
+};
 
-typedef struct
+struct s3c44b0_rtc_t 
 {
 	s3c44b0_rtc_regs_t regs;
 	emu_timer *timer_tick_count;
 	emu_timer *timer_update;
-} s3c44b0_rtc_t;
+};
 
-typedef struct
+struct s3c44b0_adc_t 
 {
 	s3c44b0_adc_regs_t regs;
 	emu_timer *timer;
-} s3c44b0_adc_t;
+};
 
-typedef struct
+struct s3c44b0_cpuwrap_t 
 {
 	s3c44b0_cpuwrap_regs_t regs;
-} s3c44b0_cpuwrap_t;
+};
 
-typedef struct
+struct s3c44b0_t 
 {
 	const s3c44b0_interface *iface;
 	address_space* space;
@@ -695,6 +695,6 @@ typedef struct
 	s3c44b0_rtc_t rtc;
 	s3c44b0_adc_t adc;
 	s3c44b0_cpuwrap_t cpuwrap;
-} s3c44b0_t;
+};
 
 #endif

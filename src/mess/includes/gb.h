@@ -51,7 +51,7 @@ struct layer_struct {
 	INT16  bgline;
 };
 
-typedef struct {
+struct gb_lcd_t {
 	int	window_lines_drawn;
 
 	UINT8	gb_vid_regs[_NR_GB_VID_REGS];
@@ -101,7 +101,7 @@ typedef struct {
 	UINT8	*gbc_chrgen;	/* CGB Character generator */
 	UINT8	*gbc_bgdtab;	/* CGB Background character table */
 	UINT8	*gbc_wndtab;	/* CGB Window character table */
-} gb_lcd_t;
+};
 
 
 

@@ -83,20 +83,20 @@ const device_type DISCRETE = &device_creator<discrete_sound_device>;
  *
  *************************************/
 
-typedef struct
+struct output_buffer 
 {
 	double						*node_buf;
 	const double				*source;
 	volatile double				*ptr;
 	int							node_num;
-} output_buffer;
+};
 
-typedef struct
+struct input_buffer 
 {
 	volatile const double		*ptr;				/* pointer into linked_outbuf.nodebuf */
 	output_buffer *				linked_outbuf;		/* what output are we connected to ? */
 	double						buffer;				/* input[] will point here */
-} input_buffer;
+};
 
 class discrete_task
 {

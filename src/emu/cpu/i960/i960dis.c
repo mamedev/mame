@@ -8,11 +8,11 @@
 #include "i960.h"
 #include "i960dis.h"
 
-typedef struct
+struct mnemonic_t 
 {
 	const char		*mnem;
 	unsigned short	type;
-} mnemonic_t;
+};
 
 
 static const mnemonic_t mnemonic[256] = {

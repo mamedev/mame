@@ -29,7 +29,7 @@
 #include "sound/2203intf.h"
 #include "formats/basicdsk.h"
 
-typedef struct
+struct tsp_t 
 {
 	UINT16 tvram_vreg_offset;
 	UINT16 attr_offset;
@@ -43,7 +43,7 @@ typedef struct
 	UINT16 cur_pos_x,cur_pos_y;
 	UINT8 curn;
 	UINT8 curn_blink;
-} tsp_t;
+};
 
 
 class pc88va_state : public driver_device

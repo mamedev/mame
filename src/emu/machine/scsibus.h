@@ -100,7 +100,7 @@
 
 #define SCSI_SENSE_SIZE				4
 
-typedef struct
+struct adaptec_sense_t 
 {
 	// parameter list
 	UINT8		reserved1[3];
@@ -121,7 +121,7 @@ typedef struct
 	UINT8		step_pulse_code;
 	UINT8		bit_flags;
 	UINT8		sectors_per_track;
-} adaptec_sense_t;
+};
 
 class scsibus_device : public device_t
 {

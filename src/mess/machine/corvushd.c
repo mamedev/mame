@@ -89,14 +89,14 @@
 //
 
 // Sector addressing scheme for Rev B/H drives used in various commands (Called a DADR in the docs)
-typedef struct {
+struct dadr_t {
 	UINT8 address_msn_and_drive;// Most significant nibble: Most signficant nibble of sector address, Least significant nibble: Drive #
 	UINT8 address_lsb;			// Least significant byte of sector address
 	UINT8 address_mid;			// Middle byte of sector address
-} dadr_t;
+};
 
 // Controller structure
-typedef struct {
+struct corvus_hdc_t {
 	UINT8	status;				// Controller status byte (DIRECTION + BUSY/READY)
 	char	prep_mode;			// Whether the controller is in Prep Mode or not
 	// Physical drive info
@@ -317,7 +317,7 @@ typedef struct {
 			UINT8	pattern[512]; // Pattern to be written
 		} format_drive_revbh_command;
 	} buffer;
-} corvus_hdc_t;
+};
 
 // Structure of Block #1, the Disk Parameter Block
 typedef struct {
@@ -340,7 +340,7 @@ typedef struct {
 } disk_parameter_block_t;
 
 // Structure of Block #3, the Constellation Parameter Block
-typedef struct {
+struct constellation_parameter_block_t {
 	UINT8	mux_parameters[12];
 	UINT8	pipe_name_table_ptr[2];
 	UINT8	pipe_ptr_table_ptr[2];
@@ -348,7 +348,7 @@ typedef struct {
 	UINT8	reserved[470];
 	UINT8	software_protection[12];
 	UINT8	serial_number[12];
-} constellation_parameter_block_t;
+};
 
 // Structure of Block #7, the Semaphore Table Block
 typedef struct {
@@ -362,10 +362,10 @@ typedef struct {
 } semaphore_table_block_t;
 
 // Command size structure (number of bytes to xmit and recv for each command)
-typedef struct {
+struct corvus_cmd_t {
 	UINT16	recv_bytes;							// Number of bytes from host for this command
 	UINT16	xmit_bytes;							// Number of bytes to return to host
-} corvus_cmd_t;
+};
 
 //
 // Prototypes

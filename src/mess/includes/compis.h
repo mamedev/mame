@@ -73,17 +73,17 @@ struct intr_state
 	UINT16	ext[4];
 };
 
-typedef struct
+struct i186_state 
 {
 	struct timer_state	timer[3];
 	struct dma_state	dma[2];
 	struct intr_state	intr;
 	struct mem_state	mem;
-} i186_state;
+};
 
 
 /* Keyboard */
-typedef struct
+struct TYP_COMPIS_KEYBOARD 
 {
 	UINT8 nationality;   /* Character set, keyboard layout (Swedish) */
 	UINT8 release_time;  /* Autorepeat release time (0.8)   */
@@ -99,30 +99,30 @@ typedef struct
 	UINT8 boot_order[4]; /* Boot device order (FD HD NW PD) */
 	UINT8 key_code;
 	UINT8 key_status;
-} TYP_COMPIS_KEYBOARD;
+};
 
 /* USART 8251 */
-typedef struct
+struct TYP_COMPIS_USART 
 {
 	UINT8 status;
 	UINT8 bytes_sent;
-} TYP_COMPIS_USART;
+};
 
 /* Printer */
-typedef struct
+struct TYP_COMPIS_PRINTER 
 {
 	UINT8 data;
 	UINT8 strobe;
-} TYP_COMPIS_PRINTER;
+};
 
 
 /* Main emulation */
-typedef struct
+struct TYP_COMPIS 
 {
 	TYP_COMPIS_PRINTER	printer;	/* Printer */
 	TYP_COMPIS_USART	usart;		/* USART 8251 */
 	TYP_COMPIS_KEYBOARD	keyboard;	/* Keyboard  */
-} TYP_COMPIS;
+};
 
 
 class compis_state : public driver_device

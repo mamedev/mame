@@ -10,13 +10,13 @@
 #include "includes/c64_legacy.h"
 #include "machine/6526cia.h"
 
-typedef struct
+struct dma_t 
 {
 	int version;
 	UINT8 data[4];
-} dma_t;
+};
 
-typedef struct
+struct fdc_t 
 {
 	int state;
 
@@ -30,12 +30,12 @@ typedef struct
 
 	attotime time;
 	int head,track,sector;
-} fdc_t;
+};
 
-typedef struct
+struct expansion_ram_t 
 {
 	UINT8 reg;
-} expansion_ram_t;
+};
 
 class c65_state : public legacy_c64_state
 {

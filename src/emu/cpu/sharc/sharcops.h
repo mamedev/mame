@@ -1,9 +1,9 @@
-typedef struct
+struct SHARC_OP 
 {
 	UINT32 op_mask;
 	UINT32 op_bits;
 	void (*handler)(SHARC_REGS *cpustate);
-} SHARC_OP;
+};
 
 static const SHARC_OP sharc_opcode_table[] =
 {

@@ -30,7 +30,7 @@ DECLARE_LEGACY_CPU_DEVICE(DSP56156, dsp56k);
     STRUCTURES & TYPEDEFS
 ***************************************************************************/
 // 5-4 Host Interface
-typedef struct
+struct dsp56k_host_interface 
 {
 	// **** Dsp56k side **** //
 	// Host Control Register
@@ -62,10 +62,10 @@ typedef struct
 	// HACK - Host interface bootstrap write offset
 	UINT16 bootstrap_offset;
 
-} dsp56k_host_interface;
+};
 
 // 1-9 ALU
-typedef struct
+struct dsp56k_data_alu 
 {
 	// Four 16-bit input registers (can be accessed as 2 32-bit registers)
 	PAIR x;
@@ -79,10 +79,10 @@ typedef struct
 	// One data bus shifter/limiter
 	// A parallel, single cycle, non-pipelined Multiply-Accumulator (MAC) unit
 	// Basics
-} dsp56k_data_alu;
+};
 
 // 1-10 Address Generation Unit (AGU)
-typedef struct
+struct dsp56k_agu 
 {
 	// Four address registers
 	UINT16 r0;
@@ -109,10 +109,10 @@ typedef struct
 	// UINT8 status;
 
 	// Basics
-} dsp56k_agu;
+};
 
 // 1-11 Program Control Unit (PCU)
-typedef struct
+struct dsp56k_pcu 
 {
 	// Program Counter
 	UINT16 pc;
@@ -146,10 +146,10 @@ typedef struct
 	// Other PCU internals
 	UINT16 reset_vector;
 
-} dsp56k_pcu;
+};
 
 // 1-8 The dsp56156 CORE
-typedef struct
+struct dsp56k_core 
 {
 	// PROGRAM CONTROLLER
 	dsp56k_pcu PCU;
@@ -197,7 +197,7 @@ typedef struct
 
 	UINT16 peripheral_ram[0x40];
 	UINT16 program_ram[0x800];
-} dsp56k_core;
+};
 
 
 INLINE dsp56k_core *get_safe_token(device_t *device)

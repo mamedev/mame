@@ -26,7 +26,7 @@
 #include "machine/scsicd.h"
 #include "machine/wd33c93.h"
 
-typedef struct
+struct HPC_t 
 {
 	UINT8 nMiscStatus;
 	UINT32 nParBufPtr;
@@ -36,13 +36,13 @@ typedef struct
 	UINT32 nVMEIntMask1;
 	UINT32 nSCSI0Descriptor;
 	UINT32 nSCSI0DMACtrl;
-} HPC_t;
+};
 
-typedef struct
+struct RTC_t 
 {
 	UINT8 nRAM[32];
 	UINT8 nTemp;
-} RTC_t;
+};
 
 class ip20_state : public driver_device
 {

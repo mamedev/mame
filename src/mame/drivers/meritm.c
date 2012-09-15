@@ -164,7 +164,7 @@ Not all regional versions are available for each Megatouch series
 #include "machine/nvram.h"
 
 
-typedef struct
+struct ds1204_t 
 {
 	int state;
 	int read_ptr;
@@ -174,7 +174,7 @@ typedef struct
 	int out_bit;
 	UINT8 command[3];
 
-} ds1204_t;
+};
 
 class meritm_state : public driver_device
 {

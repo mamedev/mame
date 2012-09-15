@@ -18,10 +18,10 @@
 ***************************************************************************/
 
 /* intermediate RGB values are stored in a struct */
-typedef struct { INT16 dummy, r, g, b; } rgbint;
+struct rgbint { INT16 dummy, r, g, b; };
 
 /* intermediate RGB values are stored in a struct */
-typedef struct { INT16 a, r, g, b; } rgbaint;
+struct rgbaint { INT16 a, r, g, b; };
 
 
 

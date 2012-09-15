@@ -88,12 +88,12 @@ enum e_operand
 };
 
 
-typedef struct
+struct tlcs900inst 
 {
 	e_mnemonics	mnemonic;
 	e_operand	operand1;
 	e_operand	operand2;
-} tlcs900inst;
+};
 
 
 static const tlcs900inst mnemonic_80[256] =

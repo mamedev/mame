@@ -35,12 +35,12 @@ struct nes_input
 #define CHRROM 0
 #define CHRRAM 1
 
-typedef struct
+struct chr_bank 
 {
 	int source;	//defines source of base pointer
 	int origin; //defines offset of 0x400 byte segment at base pointer
 	UINT8* access;	//source translated + origin -> valid pointer!
-} chr_bank;
+};
 
 /*PPU nametable fast banking constants and structures */
 
@@ -53,13 +53,13 @@ typedef struct
 #define NES_BATTERY 0
 #define NES_WRAM 1
 
-typedef struct
+struct name_table 
 {
 	int source;		/* defines source of base pointer */
 	int origin;		/* defines offset of 0x400 byte segment at base pointer */
 	int writable;	/* ExRAM, at least, can be write-protected AND used as nametable */
 	UINT8* access;	/* direct access when possible */
-} name_table;
+};
 
 typedef void (*nes_prg_callback)(running_machine &machine, int start, int bank);
 typedef void (*nes_chr_callback)(running_machine &machine, int start, int bank, int source);

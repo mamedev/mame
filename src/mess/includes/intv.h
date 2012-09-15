@@ -7,7 +7,7 @@
 #ifndef INTV_H_
 #define INTV_H_
 
-typedef struct
+struct intv_sprite_type 
 {
 	int visible;
 	int xpos;
@@ -25,7 +25,7 @@ typedef struct
 	int color;
 	int doubleyres;
 	int dirty;
-} intv_sprite_type;
+};
 
 class intv_state : public driver_device
 {

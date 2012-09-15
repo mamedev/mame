@@ -44,7 +44,7 @@ enum fm_mode_t
 	FM_CONFPART1,	// first half of configuration, awaiting second
 	FM_WRPROTPART1	// first half of protection program, awaiting second
 };
-typedef struct
+struct strata_t 
 {
 	fm_mode_t mode;				// current operation mode
 	int hard_unlock;	// 1 if RP* pin is at Vhh (not fully implemented)
@@ -57,7 +57,7 @@ typedef struct
 	UINT8 *data_ptr;	// main FEEPROM area
 	UINT8 *blocklock;	// block lock flags
 	UINT8 *prot_regs;	// protection registers
-} strata_t;
+};
 
 /* accessors for individual block lock flags */
 #define READ_BLOCKLOCK(strata, block) (((strata)->blocklock[(block) >> 3] >> ((block) & 7)) & 1)

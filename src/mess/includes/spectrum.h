@@ -51,7 +51,7 @@
 #define TS2068_RIGHT_BORDER  96   /* Number of right hand border pixels */
 #define TS2068_SCREEN_WIDTH (TS2068_LEFT_BORDER + TS2068_DISPLAY_XSIZE + TS2068_RIGHT_BORDER)
 
-typedef struct
+struct EVENT_LIST_ITEM 
 {
 	/* driver defined ID for this write */
 	int	Event_ID;
@@ -59,7 +59,7 @@ typedef struct
 	int	Event_Data;
 	/* time at which this write occurred */
 	int Event_Time;
-} EVENT_LIST_ITEM;
+};
 
 
 class spectrum_state : public driver_device

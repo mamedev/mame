@@ -13,13 +13,13 @@
 
 #define KEYBOARD_BUFFER_SIZE	256
 
-typedef struct
+struct amigakbd_t 
 {
 	UINT8 *buf;
 	int buf_pos;
 	int cur_pos;
 	emu_timer *timer;
-} amigakbd_t;
+};
 static amigakbd_t kbd;
 
 static void kbd_sendscancode( running_machine &machine, UINT8 scancode )

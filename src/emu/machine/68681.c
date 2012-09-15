@@ -44,7 +44,7 @@ static const char *const duart68681_reg_write_names[0x10] =
 
 #define RX_FIFO_SIZE				3
 
-typedef struct
+struct DUART68681_CHANNEL 
 {
 	/* Registers */
 	UINT8 CR;  /* Command register */
@@ -70,9 +70,9 @@ typedef struct
 	UINT8 tx_ready;
 	emu_timer *tx_timer;
 
-} DUART68681_CHANNEL;
+};
 
-typedef struct
+struct duart68681_state 
 {
 	/* device */
 	device_t *device;
@@ -99,7 +99,7 @@ typedef struct
 	/* UART channels */
 	DUART68681_CHANNEL channel[2];
 
-} duart68681_state;
+};
 
 INLINE duart68681_state *get_safe_token(device_t *device)
 {

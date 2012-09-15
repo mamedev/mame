@@ -36,7 +36,7 @@
 
 #define MAX_PS_TIMERS	3
 
-typedef struct
+struct ps_ftlb_regs_t 
 {
 	UINT32 control;
 	UINT32 stat;
@@ -45,45 +45,45 @@ typedef struct
 	UINT32 wait2;
 	UINT32 entry[16];
 	UINT32 serial;
-} ps_ftlb_regs_t;
+};
 
-typedef struct
+struct ps_intc_regs_t 
 {
 	UINT32 hold;
 	UINT32 status;
 	UINT32 enable;
 	UINT32 mask;
-} ps_intc_regs_t;
+};
 
-typedef struct
+struct ps_timer_t 
 {
 	UINT32 period;
 	UINT32 count;
 	UINT32 control;
 	emu_timer *timer;
-} ps_timer_t;
+};
 
-typedef struct
+struct ps_timer_regs_t 
 {
 	ps_timer_t timer[MAX_PS_TIMERS];
-} ps_timer_regs_t;
+};
 
-typedef struct
+struct ps_clock_regs_t 
 {
 	UINT32 mode;
 	UINT32 control;
-} ps_clock_regs_t;
+};
 
 #define PS_CLOCK_STEADY		0x10
 
-typedef struct
+struct ps_rtc_regs_t 
 {
 	UINT32 mode;
 	UINT32 control;
 	UINT32 time;
 	UINT32 date;
 	emu_timer *timer;
-} ps_rtc_regs_t;
+};
 
 
 

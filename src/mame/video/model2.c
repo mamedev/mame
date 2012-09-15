@@ -104,21 +104,21 @@
  *
  *******************************************/
 
-typedef struct
+struct plane 
 {
 	poly_vertex	normal;
 	float		distance;
-} plane;
+};
 
-typedef struct
+struct texture_parameter 
 {
 	float	diffuse;
 	float	ambient;
 	UINT32	specular_control;
 	float	specular_scale;
-} texture_parameter;
+};
 
-typedef struct
+struct triangle 
 {
 	void *				next;
 	poly_vertex			v[3];
@@ -127,15 +127,15 @@ typedef struct
 	UINT8				luma;
 	INT16				viewport[4];
 	INT16				center[2];
-} triangle;
+};
 
-typedef struct
+struct _quad_m2 
 {
 	poly_vertex			v[4];
 	UINT16				z;
 	UINT16				texheader[4];
 	UINT8				luma;
-} _quad_m2;
+};
 
 struct poly_extra_data
 {

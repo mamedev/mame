@@ -18,7 +18,7 @@
 
 /* Components */
 
-typedef struct
+struct hd63701y0_t 
 {
 	UINT8 data[8];
 	UINT8 P1DDR;
@@ -55,9 +55,9 @@ typedef struct
 	UINT8 TSTREG;
 	UINT8 P5DDR;
 	UINT8 P6CSR;
-} hd63701y0_t;
+};
 
-typedef struct
+struct rvoicepc_t 
 {
 	UINT8 data[8];
 	UINT8 port1;
@@ -67,7 +67,7 @@ typedef struct
 	UINT8 port5;
 	UINT8 port6;
 	UINT8 port7;
-} rvoicepc_t;
+};
 
 class rvoice_state : public driver_device
 {

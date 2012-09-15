@@ -519,7 +519,7 @@ static FILE *sample[1];
 
 
 /* struct describing a single operator (SLOT) */
-typedef struct
+struct FM_SLOT 
 {
 	INT32	*DT;		/* detune          :dt_tab[DT] */
 	UINT8	KSR;		/* key scale rate  :3-KSR */
@@ -558,9 +558,9 @@ typedef struct
 	/* LFO */
 	UINT32	AMmask;		/* AM enable flag */
 
-} FM_SLOT;
+};
 
-typedef struct
+struct FM_CH 
 {
 	FM_SLOT	SLOT[4];	/* four SLOTs (operators) */
 
@@ -582,10 +582,10 @@ typedef struct
 	UINT32	fc;			/* fnum,blk:adjusted to sample rate */
 	UINT8	kcode;		/* key code:                        */
 	UINT32	block_fnum;	/* current blk/fnum value for this slot (can be different betweeen slots of one channel in 3slot mode) */
-} FM_CH;
+};
 
 
-typedef struct
+struct FM_ST 
 {
 	device_t *device;
 	void *		param;				/* this chip parameter  */
@@ -613,7 +613,7 @@ typedef struct
 	FM_TIMERHANDLER	timer_handler;
 	FM_IRQHANDLER	IRQ_Handler;
 	const ssg_callbacks *SSG;
-} FM_ST;
+};
 
 
 
@@ -622,16 +622,16 @@ typedef struct
 /***********************************************************/
 
 /* OPN 3slot struct */
-typedef struct
+struct FM_3SLOT 
 {
 	UINT32  fc[3];			/* fnum3,blk3: calculated */
 	UINT8	fn_h;			/* freq3 latch */
 	UINT8	kcode[3];		/* key code */
 	UINT32	block_fnum[3];	/* current fnum value for this slot (can be different betweeen slots of one channel in 3slot mode) */
-} FM_3SLOT;
+};
 
 /* OPN/A/B common state */
-typedef struct
+struct FM_OPN 
 {
 	UINT8	type;			/* chip type */
 	FM_ST	ST;				/* general state */
@@ -669,7 +669,7 @@ typedef struct
 	INT32	out_adpcm[4];	/* channel output NONE,LEFT,RIGHT or CENTER for YM2608/YM2610 ADPCM */
 	INT32	out_delta[4];	/* channel output NONE,LEFT,RIGHT or CENTER for YM2608/YM2610 DELTAT*/
 #endif
-} FM_OPN;
+};
 
 
 
@@ -2089,12 +2089,12 @@ static void OPNPrescaler_w(FM_OPN *OPN , int addr, int pre_divider)
 /*****************************************************************************/
 
 /* here's the virtual YM2203(OPN) */
-typedef struct
+struct YM2203 
 {
 	UINT8 REGS[256];		/* registers         */
 	FM_OPN OPN;				/* OPN state         */
 	FM_CH CH[3];			/* channel state     */
-} YM2203;
+};
 
 /* Generate samples for one of the YM2203s */
 void ym2203_update_one(void *chip, FMSAMPLE *buffer, int length)
@@ -2385,7 +2385,7 @@ int ym2203_timer_over(void *chip,int c)
 #if (BUILD_YM2608||BUILD_YM2610||BUILD_YM2610B)
 
 /* ADPCM type A channel struct */
-typedef struct
+struct ADPCM_CH 
 {
 	UINT8		flag;			/* port state               */
 	UINT8		flagMask;		/* arrived flag mask        */
@@ -2402,10 +2402,10 @@ typedef struct
 	INT8		vol_mul;		/* volume in "0.75dB" steps */
 	UINT8		vol_shift;		/* volume in "-6dB" steps   */
 	INT32		*pan;			/* &out_adpcm[OPN_xxxx]     */
-} ADPCM_CH;
+};
 
 /* here's the virtual YM2610 */
-typedef struct
+struct YM2610 
 {
 	UINT8		REGS[512];			/* registers            */
 	FM_OPN		OPN;				/* OPN state            */
@@ -2423,7 +2423,7 @@ typedef struct
 
 	UINT8		flagmask;			/* YM2608 only */
 	UINT8		irqmask;			/* YM2608 only */
-} YM2610;
+};
 
 /* here is the virtual YM2608 */
 typedef YM2610 YM2608;

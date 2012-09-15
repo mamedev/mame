@@ -20,7 +20,7 @@ typedef enum {
 } hp48_models;
 
 /* memory module configuration */
-typedef struct
+struct hp48_module 
 {
 	/* static part */
 	UINT32 off_mask;             /* offset bit-mask, indicates the real size */
@@ -36,7 +36,7 @@ typedef struct
 	UINT32 base;                 /* base address */
 	UINT32 mask;                 /* often improperly called size, it is an address select mask */
 
-} hp48_module;
+};
 
 
 /* screen image averaging */

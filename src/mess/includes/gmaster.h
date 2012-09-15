@@ -1,7 +1,7 @@
 #ifndef __GMASTER_H__
 #define __GMASTER_H__
 
-typedef struct
+struct GMASTER_VIDEO 
 {
 	UINT8 data[8];
 	int index;
@@ -9,12 +9,12 @@ typedef struct
 	/*bool*/int mode; // true read does not increase address
 	/*bool*/int delayed;
 	UINT8 pixels[8][64/*>=62 sure*/];
-} GMASTER_VIDEO;
+};
 
-typedef struct
+struct GMASTER_MACHINE 
 {
 	UINT8 ports[5];
-} GMASTER_MACHINE;
+};
 
 
 class gmaster_state : public driver_device

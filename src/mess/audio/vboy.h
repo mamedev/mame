@@ -31,7 +31,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef struct {
+struct s_snd_channel {
 	INT8		playing;	// the sound is playing
 
     // state when sound was enabled
@@ -48,9 +48,9 @@ typedef struct {
 	int			time;				// the duration that this sample is to be played
 	UINT8		envelope;			// Current envelope level (604)
 	int			env_time;			// The duration between envelope decay/grow (608)
-} s_snd_channel;
+};
 
-typedef struct {
+struct s_regchan {
 	INT32 sINT;
 	INT32 sLRV;
 	INT32 sFQL;
@@ -58,12 +58,12 @@ typedef struct {
 	INT32 sEV0;
 	INT32 sEV1;
 	INT32 sRAM;
-} s_regchan;
+};
 
-typedef struct {
+struct s_sreg {
 	// Sound registers structure
 	s_regchan c[4];
-} s_sreg;
+};
 
 // ======================> vboysnd_device
 

@@ -24,13 +24,13 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 	}
 }
 
-typedef struct
+struct lcd_spi_t 
 {
 	int l1;
 	int data;
 	int l3;
 	UINT32 shift, bits;
-} lcd_spi_t;
+};
 
 class hp49gp_state : public driver_device
 {

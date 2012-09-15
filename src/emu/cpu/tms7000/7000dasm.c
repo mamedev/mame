@@ -4,17 +4,17 @@
 
 typedef enum { DONE, NONE, UI8, I8, UI16, I16, PCREL, PCABS, TRAP } operandtype;
 
-typedef struct {
+struct oprandinfo {
 	char		opstr[4][12];
 	operandtype	decode[4];
-} oprandinfo;
+};
 
-typedef struct {
+struct opcodeinfo {
 	int		opcode;
 	char		name[8];
 	int		operand;
 	UINT32		s_flag;
-} opcodeinfo;
+};
 
 static const oprandinfo of[] = {
 /* 00 */ { {" B,A",		"",			"",			""},		{NONE, DONE, DONE, DONE} },

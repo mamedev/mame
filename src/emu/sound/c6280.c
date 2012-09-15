@@ -56,7 +56,7 @@
 #include "emu.h"
 #include "c6280.h"
 
-typedef struct {
+struct t_channel {
     UINT16 frequency;
     UINT8 control;
     UINT8 balance;
@@ -66,9 +66,9 @@ typedef struct {
     UINT8 noise_control;
     UINT32 noise_counter;
     UINT32 counter;
-} t_channel;
+};
 
-typedef struct {
+struct c6280_t {
 	sound_stream *stream;
 	device_t *device;
 	device_t *cpudevice;
@@ -80,7 +80,7 @@ typedef struct {
     INT16 volume_table[32];
     UINT32 noise_freq_tab[32];
     UINT32 wave_freq_tab[4096];
-} c6280_t;
+};
 
 INLINE c6280_t *get_safe_token(device_t *device)
 {

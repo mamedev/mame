@@ -788,7 +788,7 @@ enum RTC_Mode
 
 static const UINT32 spc7110_months[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-typedef struct
+struct _snes_spc7110_t 
 {
 	//==================
 	//decompression unit
@@ -871,7 +871,7 @@ typedef struct
 	UINT8 rtc_ram[16];	// 0-12 secs, min, hrs, etc.; 13-14-15 control registers
 
 	UINT32 size;
-} _snes_spc7110_t;
+};
 
 static _snes_spc7110_t snes_spc7110;
 

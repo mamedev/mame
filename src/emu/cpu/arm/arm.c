@@ -227,7 +227,7 @@ enum
 /* Private Data */
 
 /* sArmRegister defines the CPU state */
-typedef struct
+struct ARM_REGS 
 {
 	int icount;
 	UINT32 sArmRegister[kNumRegisters];
@@ -239,7 +239,7 @@ typedef struct
 	address_space *program;
 	direct_read_data *direct;
 	endianness_t endian;
-} ARM_REGS;
+};
 
 /* Prototypes */
 static void HandleALU( ARM_REGS* cpustate, UINT32 insn);

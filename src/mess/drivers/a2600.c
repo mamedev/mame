@@ -15,7 +15,7 @@
 #include "video/tia.h"
 #include "hashfile.h"
 
-typedef struct {
+struct df_t {
 	UINT8	top;
 	UINT8	bottom;
 	UINT8	low;
@@ -23,9 +23,9 @@ typedef struct {
 	UINT8	flag;
 	UINT8	music_mode;		/* Only used by data fetchers 5,6, and 7 */
 	UINT8	osc_clk;		/* Only used by data fetchers 5,6, and 7 */
-} df_t;
+};
 
-typedef struct
+struct dpc_t 
 {
 	df_t df[8];
 	UINT8	movamt;
@@ -34,7 +34,7 @@ typedef struct
 	UINT8	dlc;
 	UINT8	shift_reg;
 	emu_timer	*oscillator;
-} dpc_t;
+};
 
 
 class a2600_state : public driver_device

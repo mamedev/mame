@@ -81,7 +81,7 @@ AUD_A_RIGHT EQU %00000001
 
 #define LYNX_AUDIO_CHANNELS 4
 
-typedef struct {
+struct LYNX_AUDIO {
     struct {
 		INT8 volume;
 		UINT8 feedback;
@@ -97,7 +97,7 @@ typedef struct {
     UINT16 shifter; // 12-bit
     float ticks;
     int count;
-} LYNX_AUDIO;
+};
 
 struct lynx_sound_state
 {

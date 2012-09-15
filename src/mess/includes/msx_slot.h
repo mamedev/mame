@@ -15,12 +15,12 @@ enum {
 	MSX_LAYOUT_LAST
 };
 
-typedef struct {
+struct msx_slot_layout {
 	int entry;
 	int type;
 	int slot_primary, slot_secondary, slot_page, page_extent;
 	int size, option;
-} msx_slot_layout;
+};
 
 #define MSX_LAYOUT_INIT(msx) \
 static const msx_slot_layout msx_slot_layout_##msx[] = {
@@ -112,7 +112,7 @@ enum msx_mem_type {
 	MSX_MEM_HANDLER
 };
 
-typedef struct {
+struct slot_state {
 	int m_type;
 	int m_start_page;
 	int m_bank_mask;
@@ -143,9 +143,9 @@ typedef struct {
 			int mode;
 		} sccp;
 	} m_cart;
-} slot_state;
+};
 
-typedef struct {
+struct msx_slot {
 	int slot_type;
 	int mem_type;
 	char name[32];
@@ -155,7 +155,7 @@ typedef struct {
 	void (*write)(running_machine &machine, slot_state*, UINT16, UINT8);
 	int (*loadsram)(running_machine &machine, slot_state*);
 	int (*savesram)(running_machine &machine, slot_state*);
-} msx_slot;
+};
 
 extern const msx_slot msx_slot_list[];
 
@@ -239,10 +239,10 @@ const msx_slot msx_slot_list[] = {
 #define MSX_SLOT_SAVESRAM(nm)		\
 	static int slot_##nm##_savesram (running_machine &machine, slot_state *state)
 
-typedef struct {
+struct msx_driver_struct {
 	char name[9];
 	const msx_slot_layout *layout;
-} msx_driver_struct;
+};
 
 extern const msx_driver_struct msx_driver_list[];
 

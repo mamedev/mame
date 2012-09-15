@@ -28,18 +28,18 @@
 #include "machine/sst39vfx.h"
 #include "machine/ram.h"
 
-typedef struct
+struct CYBIKO_RS232_PINS 
 {
 	int sck; // serial clock
 	int txd; // transmit data
 	int rxd; // receive data
-} CYBIKO_RS232_PINS;
+};
 
-typedef struct
+struct CYBIKO_RS232 
 {
 	CYBIKO_RS232_PINS pin;
 	UINT8 rx_bits, rx_byte, tx_byte, tx_bits;
-} CYBIKO_RS232;
+};
 
 class cybiko_state : public driver_device
 {

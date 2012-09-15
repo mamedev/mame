@@ -39,13 +39,13 @@ enum
 	OP_RSIR,
 };
 
-typedef struct
+struct hd61700_dasm 
 {
 	const char *str;
 	UINT8		arg1;
 	UINT8		arg2;
 	bool		optjr;
-} hd61700_dasm;
+};
 
 static const hd61700_dasm hd61700_ops[256] =
 {

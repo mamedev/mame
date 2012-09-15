@@ -10,7 +10,7 @@
 #include "machine/wd17xx.h"
 
 // CRTC 6845
-typedef struct
+struct CRTC6845 
 {
 	UINT8    cursor_address_lo;
 	UINT8    cursor_address_hi;
@@ -31,7 +31,7 @@ typedef struct
 	UINT8    idx;
 	UINT8    cursor_visible;
 	UINT8    cursor_phase;
-} CRTC6845;
+};
 
 
 class cgenie_state : public driver_device

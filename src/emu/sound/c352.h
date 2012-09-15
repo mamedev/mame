@@ -63,7 +63,7 @@ private:
     	C352_FLG_REVERSE	= 0x0001,	// play sample backwards
     };
 
-    typedef struct
+    struct c352_ch_t 
     {
     	UINT8	vol_l;
     	UINT8	vol_r;
@@ -83,7 +83,7 @@ private:
     	UINT16	repeat;
     	UINT32	current_addr;
     	UINT32	pos;
-    } c352_ch_t;
+    };
 
 	c352_ch_t m_c352_ch[32];
 	int m_sample_rate_base;

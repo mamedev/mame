@@ -4,10 +4,10 @@
 #define __SM8500_H__
 
 
-typedef struct {
+struct SM8500_CONFIG {
 	void (*handle_dma)(device_t *device, int cycles);
 	void (*handle_timers)(device_t *device, int cycles);
-} SM8500_CONFIG;
+};
 
 /* interrupts */
 #define ILL_INT         0

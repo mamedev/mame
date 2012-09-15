@@ -175,7 +175,7 @@ enum
 
 
 /* Everything we need to know about an opcode */
-typedef struct
+struct opcode_struct 
 {
 	char name[MAX_NAME_LENGTH];           /* opcode handler name */
 	unsigned char size;                   /* Size of operation */
@@ -188,33 +188,33 @@ typedef struct
 	char cpu_mode[NUM_CPUS];              /* User or supervisor mode */
 	char cpus[NUM_CPUS+1];                /* Allowed CPUs */
 	unsigned char cycles[NUM_CPUS];       /* cycles for 000, 010, 020, 030, 040 */
-} opcode_struct;
+};
 
 
 /* All modifications necessary for a specific EA mode of an instruction */
-typedef struct
+struct ea_info_struct 
 {
 	const char* fname_add;
 	const char* ea_add;
 	unsigned int mask_add;
 	unsigned int match_add;
-} ea_info_struct;
+};
 
 
 /* Holds the body of a function */
-typedef struct
+struct body_struct 
 {
 	char body[MAX_BODY_LENGTH][MAX_LINE_LENGTH+1];
 	int length;
-} body_struct;
+};
 
 
 /* Holds a sequence of search / replace strings */
-typedef struct
+struct replace_struct 
 {
 	char replace[MAX_REPLACE_LENGTH][2][MAX_LINE_LENGTH+1];
 	int length;
-} replace_struct;
+};
 
 
 /* Function Prototypes */

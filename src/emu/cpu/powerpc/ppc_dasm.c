@@ -102,7 +102,7 @@ enum
  * Describes the layout of an instruction.
  */
 
-typedef struct
+struct IDESCR 
 {
 	char	mnem[32];	// mnemonic
 	UINT32	match;		// bit pattern of instruction after it has been masked
@@ -110,7 +110,7 @@ typedef struct
 						// bit pattern to determine a match)
 	int	format;			// operand format
 	int	flags;			// flags
-} IDESCR;
+};
 
 /*
  * Instruction Table

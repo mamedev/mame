@@ -12,7 +12,7 @@
 
 typedef short termchar_t;
 
-typedef struct
+struct terminal_t 
 {
 	tilemap_t *tm;
 	int gfx;
@@ -24,7 +24,7 @@ typedef struct
 	int cur_offset;
 	int cur_hidden;
 	termchar_t mem[1];
-} terminal_t;
+};
 
 
 class apple1_state : public driver_device

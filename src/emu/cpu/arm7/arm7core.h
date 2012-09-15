@@ -185,7 +185,7 @@ enum
 
 
 /* CPU state struct */
-typedef struct
+struct arm_state 
 {
 	ARM7CORE_REGS			// these must be included in your cpu specific register implementation
 	ARM7COPRO_REGS
@@ -196,7 +196,7 @@ typedef struct
 #if ARM7_MMU_ENABLE_HACK
 	UINT32 mmu_enable_addr;	// workaround for "MMU is enabled when PA != VA" problem
 #endif
-} arm_state;
+};
 
 /****************************************************************************************************
  *  VARIOUS INTERNAL STRUCS/DEFINES/ETC..

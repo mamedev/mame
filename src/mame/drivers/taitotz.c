@@ -373,10 +373,10 @@ struct taitotz_polydata
 	int specular_r, specular_g, specular_b;
 };
 
-typedef struct
+struct PLANE 
 {
 	float x, y, z, d;
-} PLANE;
+};
 
 typedef float VECTOR3[3];
 

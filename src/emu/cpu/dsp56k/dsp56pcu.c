@@ -236,11 +236,11 @@ void pcu_reset(dsp56k_core* cpustate)
 /***************************************************************************
     INTERRUPT HANDLING
 ***************************************************************************/
-typedef struct
+struct dsp56k_irq_data 
 {
 	UINT16 irq_vector;
 	char   irq_source[128];
-} dsp56k_irq_data;
+};
 
 dsp56k_irq_data dsp56k_interrupt_sources[32];
 

@@ -30,14 +30,14 @@
 
 
 /* this structure defines the parameters for a channel */
-typedef struct
+struct k051649_sound_channel 
 {
 	unsigned long counter;
 	int frequency;
 	int volume;
 	int key;
 	signed char waveram[32];
-} k051649_sound_channel;
+};
 
 struct k051649_state
 {

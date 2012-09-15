@@ -28,7 +28,7 @@
 /******************* internal chip data structure ******************/
 
 
-typedef struct
+struct mc6846_t 
 {
 
 	const mc6846_interface* iface;
@@ -61,7 +61,7 @@ typedef struct
 
 	int old_cif;
 	int old_cto;
-} mc6846_t;
+};
 
 
 

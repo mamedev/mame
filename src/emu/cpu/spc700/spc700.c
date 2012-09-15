@@ -66,7 +66,7 @@ Address  Function Register  R/W  When Reset          Remarks
 #include "spc700.h"
 
 /* CPU Structure */
-typedef struct
+struct spc700i_cpu 
 {
 	uint a;		/* Accumulator */
 	uint x;		/* Index Register X */
@@ -96,7 +96,7 @@ typedef struct
 	uint temp1, temp2, temp3;
 	short spc_int16;
 	int spc_int32;
-} spc700i_cpu;
+};
 
 INLINE spc700i_cpu *get_safe_token(device_t *device)
 {

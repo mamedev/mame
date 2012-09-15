@@ -1970,11 +1970,11 @@ static const struct nimbus_meminfo memmap[] =
     { 0xE0000, 0xEFFFF }
 };
 
-typedef struct
+struct nimbus_block 
 {
     int     blockbase;
     int     blocksize;
-} nimbus_block;
+};
 
 typedef nimbus_block nimbus_blocks[3];
 

@@ -8,7 +8,7 @@
 #define SSYSTEM3_H_
 
 
-typedef struct
+struct playfield_t 
 {
 	int signal;
 	//  int on;
@@ -24,14 +24,14 @@ typedef struct
 		} s;
 		UINT8 data[7+8*8/2+5];
 	} u;
-} playfield_t;
+};
 
-typedef struct
+struct lcd_t 
 {
 	UINT8 data[5];
 	int clock;
 	int count;
-} lcd_t;
+};
 
 
 class ssystem3_state : public driver_device

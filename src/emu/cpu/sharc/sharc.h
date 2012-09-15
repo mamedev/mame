@@ -17,9 +17,9 @@ typedef enum
 	BOOT_MODE_NOBOOT
 } SHARC_BOOT_MODE;
 
-typedef struct {
+struct sharc_config {
 	SHARC_BOOT_MODE boot_mode;
-} sharc_config;
+};
 
 extern void sharc_set_flag_input(device_t *device, int flag_num, int state);
 

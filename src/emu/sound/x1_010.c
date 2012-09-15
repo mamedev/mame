@@ -67,7 +67,7 @@ Registers:
 #define	VOL_BASE	(2*32*256/30)					// Volume base
 
 /* this structure defines the parameters for a channel */
-typedef struct {
+struct X1_010_CHANNEL {
 	unsigned char	status;
 	unsigned char	volume;						//        volume / wave form no.
 	unsigned char	frequency;					//     frequency / pitch lo
@@ -75,7 +75,7 @@ typedef struct {
 	unsigned char	start;						// start address / envelope time
 	unsigned char	end;						//   end address / envelope no.
 	unsigned char	reserve[2];
-} X1_010_CHANNEL;
+};
 
 struct x1_010_state
 {

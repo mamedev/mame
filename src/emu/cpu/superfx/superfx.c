@@ -2,18 +2,18 @@
 #include "debugger.h"
 #include "superfx.h"
 
-typedef struct
+struct pixelcache_t 
 {
 	UINT16 offset;
 	UINT8 bitpend;
 	UINT8 data[8];
-} pixelcache_t;
+};
 
-typedef struct
+struct cache_t 
 {
 	UINT8 buffer[0x200];
 	UINT8 valid[0x20];
-} cache_t;
+};
 
 struct superfx_state
 {

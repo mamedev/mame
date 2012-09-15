@@ -208,14 +208,14 @@ typedef struct {
 }	ANTIC_W;  /* write registers */
 
 /* per scanline buffer for video data (and optimization variables) */
-typedef struct {
+struct VIDEO {
     UINT32  cmd;                /* antic command for this scanline */
     UINT16  data[HWIDTH];       /* graphics data buffer (text through chargen) */
-}   VIDEO;
+};
 
 typedef void (*atari_renderer_func)(address_space *space, VIDEO *video);
 
-typedef struct {
+struct ANTIC {
 	atari_renderer_func	renderer;	/* current renderer */
 	UINT32	cmd;				/* currently executed display list command */
 	UINT32	steal_cycles;		/* steal how many cpu cycles for this line ? */
@@ -261,7 +261,7 @@ typedef struct {
 	UINT8   *uc_g2;				/* used colors for gfx GTIA 2 */
 	UINT8   *uc_g3;				/* used colors for gfx GTIA 3 */
 	bitmap_ind16 *bitmap;
-}   ANTIC;
+};
 
 #define RDANTIC(space)		space->read_byte(antic.dpage+antic.doffs)
 #define RDVIDEO(space,o)	space->read_byte(antic.vpage+((antic.voffs+(o))&VOFFS))

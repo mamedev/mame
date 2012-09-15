@@ -21,13 +21,13 @@ enum
 	MaxKeyMessageLen = 1
 };
 
-typedef struct
+struct expansion_slot_t 
 {
 	read8_space_func reg_read;
 	write8_space_func reg_write;
 	read8_space_func rom_read;
 	write8_space_func rom_write;
-} expansion_slot_t;
+};
 
 
 class concept_state : public driver_device

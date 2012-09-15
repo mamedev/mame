@@ -18,12 +18,12 @@ enum
 	TIMEX_CART_HOME
 };
 
-typedef struct
+struct timex_cart_t 
 {
 	int type;
 	UINT8 chunks;
 	UINT8 *data;
-} timex_cart_t;
+};
 
 const timex_cart_t *timex_cart_data(void);
 

@@ -131,7 +131,7 @@ static const char *const InsNames[]={
 	"RPV", "SPV",
 };
 
-typedef struct { Ins ins; Adr adr; Regs reg; } Entry;
+struct Entry { Ins ins; Adr adr; Regs reg; };
 
 static const Entry table[0x100]={
 	{ SBC, Reg, XL }, // 0

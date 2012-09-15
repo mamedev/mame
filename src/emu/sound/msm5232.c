@@ -9,7 +9,7 @@
     8 channel tone generator
 */
 
-typedef struct {
+struct VOICE {
 	UINT8 mode;
 
 	int		TG_count_period;
@@ -35,10 +35,10 @@ typedef struct {
 	int		pitch;			/* current pitch data */
 
 	int GF;
-} VOICE;
+};
 
 
-typedef struct {
+struct msm5232_state {
 	sound_stream *stream;
 
 	VOICE	voi[8];
@@ -71,7 +71,7 @@ typedef struct {
 	device_t *device;
 	void (*gate_handler)(device_t *device, int state);	/* callback called when the GATE output pin changes state */
 
-} msm5232_state;
+};
 
 
 INLINE msm5232_state *get_safe_token(device_t *device)

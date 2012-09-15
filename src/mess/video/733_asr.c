@@ -34,7 +34,7 @@ enum
 	asr_scroll_step = 8
 };
 
-typedef struct
+struct asr_t 
 {
 #if 0
 	UINT8 OutQueue[ASROutQueueSize];
@@ -58,7 +58,7 @@ typedef struct
 	void (*int_callback)(running_machine &, int state);
 
 	bitmap_ind16 *bitmap;
-} asr_t;
+};
 
 enum
 {

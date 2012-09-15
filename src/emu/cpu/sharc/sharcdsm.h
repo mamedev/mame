@@ -69,9 +69,9 @@ static const char mr_regnames[16][8] =
 	"???",	"???",	"???",	"???",	"???",	"???",	"???",	"???"
 };
 
-typedef struct
+struct SHARC_DASM_OP 
 {
 	UINT32 op_mask;
 	UINT32 op_bits;
 	UINT32 (* handler)(UINT32, UINT64);
-} SHARC_DASM_OP;
+};

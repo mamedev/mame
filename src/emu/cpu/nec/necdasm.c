@@ -74,19 +74,19 @@ enum
 	SEG_SS
 };
 
-typedef struct {
+struct I386_OPCODE {
 	char mnemonic[32];
 	UINT32 flags;
 	UINT32 param1;
 	UINT32 param2;
 	UINT32 param3;
 	offs_t dasm_flags;
-} I386_OPCODE;
+};
 
-typedef struct {
+struct GROUP_OP {
 	char mnemonic[32];
 	const I386_OPCODE *opcode;
-} GROUP_OP;
+};
 
 static const UINT8 *opcode_ptr;
 static const UINT8 *opcode_ptr_base;

@@ -150,13 +150,13 @@ typedef	struct
 	float x, y, w, u, v;
 } vert;
 
-typedef struct
+struct strip 
 {
 	int svert, evert;
 	texinfo ti;
-} strip;
+};
 
-typedef struct {
+struct receiveddata {
 	vert verts[65536];
 	strip strips[65536];
 
@@ -166,9 +166,9 @@ typedef struct {
 	UINT32 fbwsof2;
 	int busy;
 	int valid;
-} receiveddata;
+};
 
-typedef struct {
+struct pvrta_state {
 	int tafifo_pos, tafifo_mask, tafifo_vertexwords, tafifo_listtype;
 	int start_render_received;
 	int renderselect;
@@ -184,7 +184,7 @@ typedef struct {
 	UINT32 blend_mode, srcselect,dstselect,fogcontrol,colorclamp, use_alpha;
 	UINT32 ignoretexalpha,flipuv,clampuv,filtermode,sstexture,mmdadjust,tsinstruction;
 	UINT32 depthcomparemode,cullingmode,zwritedisable,cachebypass,dcalcctrl,volumeinstruction,mipmapped,vqcompressed,strideselect,paletteselector;
-} pvrta_state;
+};
 
 enum
 {

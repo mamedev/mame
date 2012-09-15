@@ -23,7 +23,7 @@
 
 #define SORCERER_USING_RS232 0
 
-typedef struct {
+struct cass_data_t {
 	struct {
 		int length;		/* time cassette level is at input.level */
 		int level;		/* cassette level */
@@ -34,7 +34,7 @@ typedef struct {
 		int level;		/* cassette level */
 		int bit;		/* bit to to output */
 	} output;
-} cass_data_t;
+};
 
 
 class sorcerer_state : public driver_device

@@ -12,7 +12,7 @@
 
 
 
-typedef struct
+struct TRIANGLE 
 {
 	poly_vertex v[3];
 	UINT8 texture_x, texture_y;
@@ -21,7 +21,7 @@ typedef struct
 	UINT8 texture_format, param;
 	int intensity;
 	UINT32 color;
-} TRIANGLE;
+};
 
 struct _cached_texture
 {

@@ -65,7 +65,7 @@ TODO:
 #define EXEC_01 0x01
 
 
-typedef struct {
+struct minx_state {
 //  MINX_CONFIG  config;
 	UINT16	PC;
 	UINT16	SP;
@@ -87,7 +87,7 @@ typedef struct {
 	legacy_cpu_device *device;
 	address_space *program;
 	int icount;
-} minx_state;
+};
 
 #define RD(offset)		minx->program->read_byte( offset )
 #define WR(offset,data)	minx->program->write_byte( offset, data )

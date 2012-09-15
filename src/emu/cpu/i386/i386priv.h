@@ -197,16 +197,16 @@ enum
 #define MXCSR_RC  (3<<13) // Rounding Control
 #define MXCSR_FZ  (1<<15) // Flush to Zero
 
-typedef struct {
+struct I386_SREG {
 	UINT16 selector;
 	UINT16 flags;
 	UINT32 base;
 	UINT32 limit;
 	int d;		// Operand size
 	bool valid;
-} I386_SREG;
+};
 
-typedef struct
+struct I386_CALL_GATE 
 {
 	UINT16 segment;
 	UINT16 selector;
@@ -215,19 +215,19 @@ typedef struct
 	UINT8 dpl;
 	UINT8 dword_count;
 	UINT8 present;
-} I386_CALL_GATE;
+};
 
-typedef struct {
+struct I386_SYS_TABLE {
 	UINT32 base;
 	UINT16 limit;
-} I386_SYS_TABLE;
+};
 
-typedef struct {
+struct I386_SEG_DESC {
 	UINT16 segment;
 	UINT16 flags;
 	UINT32 base;
 	UINT32 limit;
-} I386_SEG_DESC;
+};
 
 typedef union {
 	UINT32 d[8];
@@ -420,7 +420,7 @@ static int i386_limit_check(i386_state *cpustate, int seg, UINT32 offset);
 
 /***********************************************************************************/
 
-typedef struct {
+struct MODRM_TABLE {
 	struct {
 		int b;
 		int w;
@@ -431,7 +431,7 @@ typedef struct {
 		int w;
 		int d;
 	} rm;
-} MODRM_TABLE;
+};
 
 extern MODRM_TABLE i386_MODRM_table[256];
 

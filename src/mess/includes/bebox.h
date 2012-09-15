@@ -13,13 +13,13 @@
 #include "machine/8237dma.h"
 #include "machine/53c810.h"
 
-typedef struct
+struct bebox_devices_t 
 {
 	device_t *pic8259_master;
 	device_t *pic8259_slave;
 	device_t *dma8237_1;
 	device_t *dma8237_2;
-} bebox_devices_t;
+};
 
 
 class bebox_state : public driver_device

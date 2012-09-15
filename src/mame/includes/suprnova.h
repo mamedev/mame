@@ -1,4 +1,4 @@
-typedef struct
+struct hit_t 
 {
 	UINT16 x1p, y1p, z1p, x1s, y1s, z1s;
 	UINT16 x2p, y2p, z2p, x2s, y2s, z2s;
@@ -11,7 +11,7 @@ typedef struct
 	UINT16 flag;
 
 	UINT8 disconnect;
-} hit_t;
+};
 
 
 class skns_state : public driver_device

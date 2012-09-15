@@ -442,7 +442,7 @@
 
 
 
-typedef struct
+struct dynamic_address 
 {
 	offs_t			start;
 	offs_t			end;
@@ -453,7 +453,7 @@ typedef struct
 	device_t *device;
 	const char *	rdname;
 	const char *	wrname;
-} dynamic_address;
+};
 
 class vegas_state : public driver_device
 {

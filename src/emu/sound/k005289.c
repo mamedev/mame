@@ -31,13 +31,13 @@
 #define FREQBASEBITS	16
 
 /* this structure defines the parameters for a channel */
-typedef struct
+struct k005289_sound_channel 
 {
 	int frequency;
 	int counter;
 	int volume;
 	const unsigned char *wave;
-} k005289_sound_channel;
+};
 
 struct k005289_state
 {

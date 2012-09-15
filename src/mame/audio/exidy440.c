@@ -71,7 +71,7 @@ typedef struct sound_cache_entry
 
 
 
-typedef struct
+struct exidy440_audio_state 
 {
 	UINT8 sound_command;
 	UINT8 sound_command_ack;
@@ -100,7 +100,7 @@ typedef struct
 
 	/* channel frequency is configurable */
 	int channel_frequency[4];
-}  exidy440_audio_state;
+};
 
 /* constant channel parameters */
 static const int channel_bits[4] =

@@ -233,17 +233,17 @@ SCREEN_UPDATE_IND16( namcos21 )
 
 /*********************************************************************************************/
 
-typedef struct
+struct vertex 
 {
 	double x,y;
 	double z;
-} vertex;
+};
 
-typedef struct
+struct edge 
 {
 	double x;
 	double z;
-} edge;
+};
 
 #define SWAP(T,A,B) { const T *temp = A; A = B; B = temp; }
 

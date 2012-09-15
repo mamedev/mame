@@ -20,7 +20,7 @@ TODO:
 
 
 /* this structure defines the parameters for a channel */
-typedef struct
+struct sound_channel 
 {
 	UINT32 start;
 	UINT32 pos;
@@ -32,7 +32,7 @@ typedef struct
 	UINT8 effect;
 	UINT32 ecount;
 
-} sound_channel;
+};
 
 
 struct flower_sound_state

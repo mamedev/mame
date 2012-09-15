@@ -317,12 +317,12 @@ poly3d_NoClip( void )
 	mClip.scissor.set(0, 639, 0, 479);
 }
 
-typedef struct
+struct Poly3dVertex 
 {
 	float x,y,z;
 	int u,v; /* 0..0xfff */
 	int bri; /* 0..0xff */
-} Poly3dVertex;
+};
 
 #define MIN_Z (10.0f)
 

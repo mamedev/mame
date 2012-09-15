@@ -9,20 +9,20 @@
 
 #define MAX_CX_TIMERS	16
 
-typedef struct
+struct cx_timer_t 
 {
 	UINT32 value;
 	UINT32 limit;
 	UINT32 mode;
 	UINT32 timebase;
 	emu_timer *timer;
-} cx_timer_t;
+};
 
-typedef struct
+struct cx_timer_regs_t 
 {
 	cx_timer_t timer[MAX_CX_TIMERS];
 	UINT32 timer_irq;
-} cx_timer_regs_t;
+};
 
 class cxhumax_state : public driver_device
 {

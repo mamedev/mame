@@ -164,7 +164,7 @@ static FILE * cymfile = NULL;
 
 
 
-typedef struct
+struct OPLL_SLOT 
 {
 	UINT32	ar;			/* attack rate: AR<<2           */
 	UINT32	dr;			/* decay rate:  DR<<2           */
@@ -207,9 +207,9 @@ typedef struct
 
 	/* waveform select */
 	unsigned int wavetable;
-} OPLL_SLOT;
+};
 
-typedef struct
+struct OPLL_CH 
 {
 	OPLL_SLOT SLOT[2];
 	/* phase generator state */
@@ -218,10 +218,10 @@ typedef struct
 	UINT32  ksl_base;	/* KeyScaleLevel Base step      */
 	UINT8   kcode;		/* key code (for key scaling)   */
 	UINT8   sus;		/* sus on/off (release speed in percussive mode)*/
-} OPLL_CH;
+};
 
 /* chip state */
-typedef struct
+struct YM2413 
 {
 	OPLL_CH	P_CH[9];				/* OPLL chips have 9 channels*/
 	UINT8	instvol_r[9];			/* instrument/volume (or volume/volume in percussive mode)*/
@@ -272,7 +272,7 @@ typedef struct
 	signed int output[2];
 	signed int outchan;
 
-} YM2413;
+};
 
 /* key scale level */
 /* table is 3dB/octave, DV converts this into 6dB/octave */

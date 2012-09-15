@@ -13,7 +13,7 @@ typedef enum
 	SVISION_NOISE_Type14Bit
 } SVISION_NOISE_Type;
 
-typedef struct
+struct SVISION_NOISE 
 {
 	UINT8 reg[3];
 	int on, right, left, play;
@@ -23,9 +23,9 @@ typedef struct
 	int count;
 	double step, pos;
 	int value; // currently simple random function
-} SVISION_NOISE;
+};
 
-typedef struct
+struct SVISION_DMA 
 {
 	UINT8 reg[5];
 	int on, right, left;
@@ -33,9 +33,9 @@ typedef struct
 	int start,size;
 	double pos, step;
 	int finished;
-} SVISION_DMA;
+};
 
-typedef struct
+struct SVISION_CHANNEL 
 {
 	UINT8 reg[4];
 	int on;
@@ -43,7 +43,7 @@ typedef struct
 	int pos;
 	int size;
 	int count;
-} SVISION_CHANNEL;
+};
 
 struct svision_sound_state
 {

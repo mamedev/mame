@@ -3852,13 +3852,13 @@ static void _ZCF(tlcs900_state *cpustate)
 }
 
 
-typedef struct
+struct tlcs900inst 
 {
 	void (*opfunc)(tlcs900_state *cpustate);
 	int		operand1;
 	int		operand2;
 	int		cycles;
-} tlcs900inst;
+};
 
 
 static void prepare_operands(tlcs900_state *cpustate, const tlcs900inst *inst)

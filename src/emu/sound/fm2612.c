@@ -531,7 +531,7 @@ static FILE *sample[1];
 
 
 /* struct describing a single operator (SLOT) */
-typedef struct
+struct FM_SLOT 
 {
 	INT32	*DT;		/* detune          :dt_tab[DT] */
 	UINT8	KSR;		/* key scale rate  :3-KSR */
@@ -570,9 +570,9 @@ typedef struct
 	/* LFO */
 	UINT32	AMmask;		/* AM enable flag */
 
-} FM_SLOT;
+};
 
-typedef struct
+struct FM_CH 
 {
 	FM_SLOT	SLOT[4];	/* four SLOTs (operators) */
 
@@ -594,10 +594,10 @@ typedef struct
 	UINT32	fc;			/* fnum,blk:adjusted to sample rate */
 	UINT8	kcode;		/* key code:                        */
 	UINT32	block_fnum;	/* current blk/fnum value for this slot (can be different betweeen slots of one channel in 3slot mode) */
-} FM_CH;
+};
 
 
-typedef struct
+struct FM_ST 
 {
 	device_t *device;
 	void *		param;				/* this chip parameter  */
@@ -625,7 +625,7 @@ typedef struct
 	FM_TIMERHANDLER	timer_handler;
 	FM_IRQHANDLER	IRQ_Handler;
 	const ssg_callbacks *SSG;
-} FM_ST;
+};
 
 
 
@@ -634,17 +634,17 @@ typedef struct
 /***********************************************************/
 
 /* OPN 3slot struct */
-typedef struct
+struct FM_3SLOT 
 {
 	UINT32  fc[3];			/* fnum3,blk3: calculated */
 	UINT8	fn_h;			/* freq3 latch */
 	UINT8	kcode[3];		/* key code */
 	UINT32	block_fnum[3];	/* current fnum value for this slot (can be different betweeen slots of one channel in 3slot mode) */
 	UINT8   key_csm;        /* CSM mode Key-ON flag */
-} FM_3SLOT;
+};
 
 /* OPN/A/B common state */
-typedef struct
+struct FM_OPN 
 {
 	UINT8	type;			/* chip type */
 	FM_ST	ST;				/* general state */
@@ -675,10 +675,10 @@ typedef struct
 	INT32	mem;			/* one sample delay memory */
 	INT32	out_fm[8];		/* outputs of working channels */
 
-} FM_OPN;
+};
 
 /* here's the virtual YM2612 */
-typedef struct
+struct YM2612 
 {
 	UINT8		REGS[512];			/* registers            */
 	FM_OPN		OPN;				/* OPN state            */
@@ -688,7 +688,7 @@ typedef struct
 	/* dac output (YM2612) */
 	int			dacen;
 	INT32		dacout;
-} YM2612;
+};
 
 /* log output level */
 #define LOG_ERR  3      /* ERROR       */

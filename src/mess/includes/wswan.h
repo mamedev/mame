@@ -40,7 +40,7 @@
 #include "machine/nvram.h"
 
 
-typedef struct
+struct EEPROM 
 {
 	UINT8	mode;		/* eeprom mode */
 	UINT16	address;	/* Read/write address */
@@ -50,9 +50,9 @@ typedef struct
 	int	size;		/* size of eeprom/sram area */
 	UINT8	*data;		/* pointer to start of sram/eeprom data */
 	UINT8	*page;		/* pointer to current sram/eeprom page */
-} EEPROM;
+};
 
-typedef struct
+struct RTC 
 {
 	UINT8	present;	/* Is an RTC present */
 	UINT8	setting;	/* Timer setting byte */
@@ -64,16 +64,16 @@ typedef struct
 	UINT8	minute;		/* Minute */
 	UINT8	second;		/* Second */
 	UINT8	index;		/* index for reading/writing of current of alarm time */
-} RTC;
+};
 
-typedef struct
+struct SoundDMA 
 {
 	UINT32	source;		/* Source address */
 	UINT16	size;		/* Size */
 	UINT8	enable;		/* Enabled */
-} SoundDMA;
+};
 
-typedef struct
+struct VDP 
 {
 	UINT8 layer_bg_enable;			/* Background layer on/off */
 	UINT8 layer_fg_enable;			/* Foreground layer on/off */
@@ -117,7 +117,7 @@ typedef struct
 	UINT8 *palette_vram;			/* pointer to start of palette area in ram/vram (set by MACHINE_RESET), WSC only */
 	int main_palette[8];
 	emu_timer *timer;
-} VDP;
+};
 
 class wswan_state : public driver_device
 {

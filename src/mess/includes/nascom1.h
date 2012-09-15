@@ -10,18 +10,18 @@
 #include "imagedev/snapquik.h"
 #include "machine/wd17xx.h"
 
-typedef struct
+struct nascom1_portstat_t 
 {
 	UINT8	stat_flags;
 	UINT8	stat_count;
-} nascom1_portstat_t;
+};
 
-typedef struct
+struct nascom2_fdc_t 
 {
 	UINT8 select;
 	UINT8 irq;
 	UINT8 drq;
-} nascom2_fdc_t;
+};
 
 
 class nascom1_state : public driver_device

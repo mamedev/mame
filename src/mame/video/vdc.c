@@ -20,7 +20,7 @@ typedef union
 
 /* the VDC context */
 
-typedef struct
+struct VDC 
 {
 	int dvssr_write;			/* Set when the DVSSR register has been written to */
 	int physical_width;			/* Width of the display */
@@ -39,30 +39,30 @@ typedef struct
 	pair vdc_data[32];
 	int status;
 	int y_scroll;
-}VDC;
+};
 
-typedef struct {
+struct VCE {
 	UINT8	vce_control;			/* VCE control register */
 	pair	vce_address;			/* Current address in the palette */
 	pair	vce_data[512];			/* Palette data */
 	int		current_bitmap_line;	/* The current line in the display we are on */
 	bitmap_ind16	*bmp;
-}VCE;
+};
 
-typedef struct {
+struct VPC_PRIO {
 	UINT8 prio;
 	UINT8 vdc0_enabled;
 	UINT8 vdc1_enabled;
-} VPC_PRIO;
+};
 
-typedef struct {
+struct VPC {
 	VPC_PRIO vpc_prio[4];
 	UINT8	prio_map[512];		/* Pre-calculated priority map */
 	pair	priority;			/* Priority settings registers */
 	pair	window1;			/* Window 1 setting */
 	pair	window2;			/* Window 2 setting */
 	UINT8	vdc_select;			/* Which VDC do the ST0, ST1, and ST2 instructions write to */
-}VPC;
+};
 
 static VDC vdc[2];
 static VCE vce;

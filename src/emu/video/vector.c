@@ -127,14 +127,14 @@ static render_texture *get_vector_texture(float dx, float dy, float intensity)
 #define VCLIP   2
 
 /* The vertices are buffered here */
-typedef struct
+struct point 
 {
 	int x; int y;
 	rgb_t col;
 	int intensity;
 	int arg1; int arg2; /* start/end in pixel array or clipping info */
 	int status;         /* for dirty and clipping handling */
-} point;
+};
 
 
 

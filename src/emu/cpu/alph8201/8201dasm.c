@@ -259,14 +259,14 @@ static const char *const Formats[] = {
 
 #define MAX_OPS (((sizeof(Formats) / sizeof(Formats[0])) - 1) / PTRS_PER_FORMAT)
 
-typedef struct opcode {
+struct AD8201Opcode {
 	byte mask;
 	byte bits;
 	byte type;
 	byte pmask;
 	byte pdown;
 	const char *fmt;
-} AD8201Opcode;
+};
 
 static AD8201Opcode Op[MAX_OPS+1];
 static int OpInizialized = 0;

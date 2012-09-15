@@ -31,26 +31,26 @@ enum {
 
 enum { PA, PC, PD, PD24, PI, PML, PMO, PMV, PB, PWA, PWC, PWD, SFAI };
 
-typedef struct {
+struct instr {
   char *name;
   char *dasm;
   char *run;
   int line, cycles, type, baseval, variants;
   unsigned int flags;
-} instr;
+};
 
-typedef struct {
+struct pdesc {
   const char *opt;
   int pcount, id;
-} pdesc;
+};
 
-typedef struct {
+struct pinf {
   const char *start;
   int size;
   int id;
   int pcount;
   int ppos[4];
-} pinf;
+};
 
 static const pdesc pp_r[] = {
   { "a",    0, PA   },
@@ -74,12 +74,12 @@ static instr cat1[0x40], cat2[0x80], cat3[0x80];
 static pinf parse_res[4096];
 static int parse_count;
 
-typedef struct {
+struct vinfo {
   unsigned int mask;
   int variants;
   const char *name;
   const char *getter;
-} vinfo;
+};
 
 enum { IxCMODE, IxDMODE, IxSFAI, IxCRM, IxDBP, IxSFAO, IxSFMO, IxRND, IxMOVM, IxSFMA, IxCOUNT };
 

@@ -13,11 +13,11 @@
 #include "machine/ieee488.h"
 #include "imagedev/cartslot.h"
 
-typedef struct
+struct spet_t 
 {
 	int bank; /* rambank to be switched in 0x9000 */
 	int rom; /* rom socket 6502? at 0x9000 */
-} spet_t;
+};
 
 
 class pet_state : public driver_device

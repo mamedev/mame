@@ -71,7 +71,7 @@ enum alu_dst
     STRUCTURES & TYPEDEFS
 ***************************************************************************/
 
-typedef struct
+struct cquestsnd_state 
 {
 	/* AM2901 internals */
 	UINT16	ram[16];
@@ -101,10 +101,10 @@ typedef struct
 	address_space *program;
 	direct_read_data *direct;
 	int icount;
-} cquestsnd_state;
+};
 
 
-typedef struct
+struct cquestrot_state 
 {
 	/* AM2901 internals */
 	UINT16	ram[16];
@@ -143,10 +143,10 @@ typedef struct
 	address_space *program;
 	direct_read_data *direct;
 	int icount;
-} cquestrot_state;
+};
 
 
-typedef struct
+struct cquestlin_state 
 {
 	/* 12-bit AM2901 internals */
 	UINT16	ram[16];
@@ -190,7 +190,7 @@ typedef struct
 	address_space *program;
 	direct_read_data *direct;
 	int icount;
-} cquestlin_state;
+};
 
 /***************************************************************************
     STATE ACCESSORS

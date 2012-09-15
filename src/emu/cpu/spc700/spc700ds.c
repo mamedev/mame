@@ -20,11 +20,11 @@ author (Karl Stenerud) at karl@higashiyama-unet.ocn.ne.jp.
 
 
 
-typedef struct
+struct opcode_struct 
 {
 	unsigned char name;
 	unsigned char args[2];
-} opcode_struct;
+};
 
 enum
 {

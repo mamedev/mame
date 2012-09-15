@@ -42,7 +42,7 @@
 
 /******************* internal chip data structure ******************/
 
-typedef struct
+struct mc6843_t 
 {
 
 	/* interface */
@@ -72,7 +72,7 @@ typedef struct
 	/* trigger delayed actions (bottom halves) */
 	emu_timer* timer_cont;
 
-} mc6843_t;
+};
 
 
 

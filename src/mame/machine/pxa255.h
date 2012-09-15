@@ -163,7 +163,7 @@
 		#define PXA255_DCMD_WIDTH_2	(0x00008000)
 		#define PXA255_DCMD_WIDTH_4	(0x0000c000)
 
-typedef struct
+struct PXA255_DMA_Regs 
 {
 	UINT32 dcsr[16];
 
@@ -183,7 +183,7 @@ typedef struct
 	UINT32 dcmd[16];
 
 	emu_timer* timer[16];
-} PXA255_DMA_Regs;
+};
 
 /*
 
@@ -230,7 +230,7 @@ typedef struct
 #define PXA255_SADIV			(PXA255_I2S_BASE_ADDR + 0x00000060)
 #define PXA255_SADR				(PXA255_I2S_BASE_ADDR + 0x00000080)
 
-typedef struct
+struct PXA255_I2S_Regs 
 {
 	UINT32 sacr0;
 	UINT32 sacr1;
@@ -251,7 +251,7 @@ typedef struct
 	UINT32 pad3[6];
 
 	UINT32 sadr;
-} PXA255_I2S_Regs;
+};
 
 /*
 
@@ -279,7 +279,7 @@ typedef struct
 	#define PXA255_OIER_E2		(0x00000004)
 	#define PXA255_OIER_E3		(0x00000008)
 
-typedef struct
+struct PXA255_OSTMR_Regs 
 {
 	UINT32 osmr[4];
 	UINT32 oscr;
@@ -288,7 +288,7 @@ typedef struct
 	UINT32 oier;
 
 	emu_timer* timer[4];
-} PXA255_OSTMR_Regs;
+};
 
 /*
 
@@ -331,7 +331,7 @@ typedef struct
 #define PXA255_INT_RTC_HZ		(1 << 30)
 #define PXA255_INT_RTC_ALARM	(1 << 31)
 
-typedef struct
+struct PXA255_INTC_Regs 
 {
 	UINT32 icip;
 	UINT32 icmr;
@@ -339,7 +339,7 @@ typedef struct
 	UINT32 icfp;
 	UINT32 icpr;
 	UINT32 iccr;
-} PXA255_INTC_Regs;
+};
 
 /*
 
@@ -378,7 +378,7 @@ typedef struct
 #define PXA255_GAFR2_L			(PXA255_GPIO_BASE_ADDR + 0x00000064)
 #define PXA255_GAFR2_U			(PXA255_GPIO_BASE_ADDR + 0x00000068)
 
-typedef struct
+struct PXA255_GPIO_Regs 
 {
 	UINT32 gplr0; // GPIO Pin-Leve
 	UINT32 gplr1;
@@ -414,7 +414,7 @@ typedef struct
 	UINT32 gafr1u;
 	UINT32 gafr2l;
 	UINT32 gafr2u;
-} PXA255_GPIO_Regs;
+};
 
 /*
 
@@ -476,16 +476,16 @@ typedef struct
 #define PXA255_FIDR1			(PXA255_LCD_BASE_ADDR + 0x00000218)
 #define PXA255_LDCMD1			(PXA255_LCD_BASE_ADDR + 0x0000021c)
 
-typedef struct
+struct PXA255_LCD_DMA_Regs 
 {
 	UINT32 fdadr;
 	UINT32 fsadr;
 	UINT32 fidr;
 	UINT32 ldcmd;
 	emu_timer *eof;
-} PXA255_LCD_DMA_Regs;
+};
 
-typedef struct
+struct PXA255_LCD_Regs 
 {
 	UINT32 lccr0;
 	UINT32 lccr1;
@@ -506,4 +506,4 @@ typedef struct
 	UINT32 pad2[110];
 
 	PXA255_LCD_DMA_Regs dma[2];
-} PXA255_LCD_Regs;
+};

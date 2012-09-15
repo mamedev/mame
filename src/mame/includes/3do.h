@@ -7,7 +7,7 @@
 #ifndef _3DO_H_
 #define _3DO_H_
 
-typedef struct {
+struct SLOW2 {
 	/* 03180000 - 0318003f - configuration group */
 	/* 03180040 - 0318007f - diagnostic UART */
 
@@ -15,10 +15,10 @@ typedef struct {
 	UINT8	cg_w_count;
 	UINT32	cg_input;
 	UINT32	cg_output;
-} SLOW2;
+};
 
 
-typedef struct {
+struct MADAM {
 	UINT32	revision;		/* 03300000 */
 	UINT32	msysbits;		/* 03300004 */
 	UINT32	mctl;			/* 03300008 */
@@ -51,10 +51,10 @@ typedef struct {
 	UINT32	mult[40];		/* 03300600-0330069c */
 	UINT32	mult_control;	/* 033007f0-033007f4 */
 	UINT32	mult_status;	/* 033007f8 */
-} MADAM;
+};
 
 
-typedef struct {
+struct CLIO {
 	screen_device *screen;
 
 	UINT32	revision;		/* 03400000 */
@@ -150,13 +150,13 @@ typedef struct {
 	UINT32	uncle_soft_rev;	/* 0340c004 */
 	UINT32	uncle_addr;		/* 0340c008 */
 	UINT32	uncle_rom;		/* 0340c00c */
-} CLIO;
+};
 
 
-typedef struct {
+struct SVF {
 	UINT32	sport[512];
 	UINT32	color;
-} SVF;
+};
 
 
 class _3do_state : public driver_device

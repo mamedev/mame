@@ -34,7 +34,7 @@ class amm;
 
 class ymz770_device : public device_t, public device_sound_interface
 {
-    typedef struct
+    struct ymz_channel 
     {
         UINT8 phrase;
         UINT8 pan;
@@ -55,7 +55,7 @@ class ymz770_device : public device_t, public device_sound_interface
     	UINT8 *seqdata;
     	bool is_seq_playing;
 
-    } ymz_channel;
+    };
 
 
 public:

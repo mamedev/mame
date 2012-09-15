@@ -19,12 +19,12 @@
 #define ANALOG_HACK
 
 
-typedef struct
+struct SPRITE_HELPER 
 {
 	UINT8 bitmap[10],x1,x2,y1,y2, res1, res2;
-} SPRITE_HELPER;
+};
 
-typedef struct
+struct SPRITE 
 {
 	const SPRITE_HELPER *data;
 	int mask;
@@ -35,9 +35,9 @@ typedef struct
 	UINT8 scolor;
 	int finished;
 	int finished_now;
-} SPRITE;
+};
 
-typedef struct
+struct vc4000_video_t 
 {
 	SPRITE sprites[4];
 	int line;
@@ -66,7 +66,7 @@ typedef struct
 			UINT8 sprite_collision;
 		} d;
 	} reg;
-} vc4000_video_t;
+} ;
 
 class vc4000_state : public driver_device
 {

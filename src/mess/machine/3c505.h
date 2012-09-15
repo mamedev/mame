@@ -126,7 +126,7 @@ struct Memdump
  between the host and the adapter is done with these. (Except for the actual
  Ethernet data, which has different packaging.)
  */
-typedef struct
+struct pcb_struct
 {
 	UINT8 command;
 	UINT8 length;
@@ -147,7 +147,7 @@ typedef struct
 		struct Memdump memdump;
 		UINT8 raw[62];
 	} data;
-} pcb_struct;
+};
 
 // ======================> threecom3c505_device
 

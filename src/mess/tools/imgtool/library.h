@@ -57,7 +57,7 @@ typedef enum
 	ITLS_DESCRIPTION
 } imgtool_libsort_t;
 
-typedef struct
+struct imgtool_dirent 
 {
 	char filename[1024];
 	char attr[64];
@@ -75,13 +75,13 @@ typedef struct
 	unsigned int corrupt : 1;
 	unsigned int directory : 1;
 	unsigned int hardlink : 1;
-} imgtool_dirent;
+};
 
-typedef struct
+struct imgtool_chainent 
 {
 	UINT8 level;
 	UINT64 block;
-} imgtool_chainent;
+};
 
 typedef enum
 {
@@ -91,20 +91,20 @@ typedef enum
 	FORK_ALTERNATE
 } imgtool_forktype_t;
 
-typedef struct
+struct imgtool_forkent 
 {
 	imgtool_forktype_t type;
 	UINT64 size;
 	char forkname[64];
-} imgtool_forkent;
+};
 
-typedef struct
+struct imgtool_transfer_suggestion 
 {
 	imgtool_suggestion_viability_t viability;
 	filter_getinfoproc filter;
 	const char *fork;
 	const char *description;
-} imgtool_transfer_suggestion;
+};
 
 enum
 {
@@ -140,13 +140,13 @@ typedef union
 	time_t	t;
 } imgtool_attribute;
 
-typedef struct
+struct imgtool_iconinfo 
 {
 	unsigned icon16x16_specified : 1;
 	unsigned icon32x32_specified : 1;
 	UINT32 icon16x16[16][16];
 	UINT32 icon32x32[32][32];
-} imgtool_iconinfo;
+};
 
 enum
 {

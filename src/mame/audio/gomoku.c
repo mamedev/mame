@@ -19,14 +19,14 @@ static const int defgain = 48;
 
 
 /* this structure defines the parameters for a channel */
-typedef struct
+struct sound_channel 
 {
 	int channel;
 	int frequency;
 	int counter;
 	int volume;
 	int oneshotplaying;
-} sound_channel;
+};
 
 
 struct gomoku_sound_state

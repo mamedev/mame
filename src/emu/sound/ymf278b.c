@@ -71,7 +71,7 @@
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-typedef struct
+struct YMF278BSlot 
 {
 	INT16 wave;		/* wavetable number */
 	INT16 F_NUMBER;	/* frequency */
@@ -111,7 +111,7 @@ typedef struct
 
 	int num;		/* slot number (for debug only) */
 	struct _YMF278BChip *chip;	/* pointer back to parent chip */
-} YMF278BSlot;
+};
 
 typedef struct _YMF278BChip
 {

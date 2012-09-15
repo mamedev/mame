@@ -52,13 +52,13 @@ static WRITE32_HANDLER( newport_xmap1_w );
 static READ32_HANDLER( newport_vc2_r );
 static WRITE32_HANDLER( newport_vc2_w );
 
-typedef struct
+struct VC2_t 
 {
 	UINT16 nRegister[0x21];
 	UINT16 nRAM[0x8000];
 	UINT8 nRegIdx;
 	UINT16 nRegData;
-} VC2_t;
+};
 
 #define VC2_VIDENTRY		pNVID->VC2.nRegister[0x00]
 #define VC2_CURENTRY		pNVID->VC2.nRegister[0x01]
@@ -79,11 +79,11 @@ typedef struct
 #define VC2_DISPLAYCTRL		pNVID->VC2.nRegister[0x10]
 #define VC2_CONFIG			pNVID->VC2.nRegister[0x1f]
 
-typedef struct
+struct XMAP_t 
 {
 	UINT32 nRegister[0x08];
 	UINT32 nModeTable[0x20];
-} XMAP_t;
+};
 
 #define XMAP0_CONFIG		pNVID->XMAP0.nRegister[0x00]
 #define XMAP0_REVISION		pNVID->XMAP0.nRegister[0x01]
@@ -100,7 +100,7 @@ typedef struct
 #define XMAP1_MODETBLIDX	pNVID->XMAP1.nRegister[0x07]
 
 
-typedef struct
+struct REX3_t 
 {
 	UINT32 nDrawMode1;
 	UINT32 nDrawMode0;
@@ -177,14 +177,14 @@ typedef struct
 	UINT32 nCurrentY;
 #endif
 	UINT32 nKludge_SkipLine;
-} REX3_t;
+};
 
 
-typedef struct
+struct CMAP_t 
 {
 	UINT16 nPaletteIndex;
 	UINT32 nPalette[0x10000];
-} CMAP_t;
+};
 
 struct newport_video_t
 {

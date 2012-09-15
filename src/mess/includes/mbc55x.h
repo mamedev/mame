@@ -75,13 +75,13 @@
 #define FDC_TAG                 "wd1793"
 
 
-typedef struct
+struct keyboard_t 
 {
 	UINT8       keyrows[MBC55X_KEYROWS];
 	emu_timer   *keyscan_timer;
 
 	UINT8		key_special;
-}  keyboard_t;
+};
 
 
 class mbc55x_state : public driver_device
@@ -161,9 +161,9 @@ public:
 /* IO chips */
 
 
-typedef struct
+struct msm_rx_t 
 {
-} msm_rx_t;
+};
 
 /*----------- defined in drivers/mbc55x.c -----------*/
 

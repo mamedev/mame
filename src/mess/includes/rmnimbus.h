@@ -26,16 +26,16 @@
 
 /* Nimbus sub-bios structures for debugging */
 
-typedef struct
+struct t_area_params 
 {
 	UINT16  ofs_brush;
 	UINT16  seg_brush;
 	UINT16  ofs_data;
 	UINT16  seg_data;
 	UINT16  count;
-} t_area_params;
+};
 
-typedef struct
+struct t_plot_string_params 
 {
 	UINT16  ofs_font;
 	UINT16  seg_font;
@@ -44,9 +44,9 @@ typedef struct
 	UINT16  x;
 	UINT16  y;
 	UINT16  length;
-} t_plot_string_params;
+};
 
-typedef struct
+struct t_nimbus_brush 
 {
 	UINT16  style;
 	UINT16  style_index;
@@ -56,7 +56,7 @@ typedef struct
 	UINT16  boundary_spec;
 	UINT16  boundary_colour;
 	UINT16  save_colour;
-} t_nimbus_brush;
+};
 
 #define SCREEN_WIDTH_PIXELS     640
 #define SCREEN_HEIGHT_LINES     250
@@ -110,25 +110,25 @@ struct intr_state
 	UINT16  ext_vector[2]; // external vectors, when in cascade mode
 };
 
-typedef struct
+struct i186_state 
 {
 	struct timer_state	timer[3];
 	struct dma_state	dma[2];
 	struct intr_state	intr;
 	struct mem_state	mem;
-} i186_state;
+};
 
-typedef struct
+struct keyboard_t 
 {
 	UINT8       keyrows[NIMBUS_KEYROWS];
 	emu_timer   *keyscan_timer;
 	UINT8       queue[KEYBOARD_QUEUE_SIZE];
 	UINT8       head;
 	UINT8       tail;
-}  keyboard_t;
+};
 
 // Static data related to Floppy and SCSI hard disks
-typedef struct
+struct nimbus_drives_t 
 {
 	UINT8   reg400;
 	UINT8   reg410_in;
@@ -137,10 +137,10 @@ typedef struct
 
 	UINT8   drq_ff;
 	UINT8   int_ff;
-} nimbus_drives_t;
+};
 
 /* 8031 Peripheral controler */
-typedef struct
+struct ipc_interface_t 
 {
 	UINT8   ipc_in;
 	UINT8   ipc_out;
@@ -149,10 +149,10 @@ typedef struct
 	UINT8   int_8c_pending;
 	UINT8   int_8e_pending;
 	UINT8   int_8f_pending;
-} ipc_interface_t;
+};
 
 /* Mouse/Joystick */
-typedef struct
+struct _mouse_joy_state 
 {
 	UINT8   m_mouse_px;
 	UINT8   m_mouse_py;
@@ -169,7 +169,7 @@ typedef struct
 	UINT8   m_reg0a4;
 
 	emu_timer   *m_mouse_timer;
-} _mouse_joy_state;
+};
 
 
 class rmnimbus_state : public driver_device

@@ -198,7 +198,7 @@ static FILE * cymfile = NULL;
 
 
 
-typedef struct
+struct OPL_SLOT 
 {
 	UINT32	ar;			/* attack rate: AR<<2           */
 	UINT32	dr;			/* decay rate:  DR<<2           */
@@ -237,9 +237,9 @@ typedef struct
 
 	/* waveform select */
 	UINT16	wavetable;
-} OPL_SLOT;
+};
 
-typedef struct
+struct OPL_CH 
 {
 	OPL_SLOT SLOT[2];
 	/* phase generator state */
@@ -247,10 +247,10 @@ typedef struct
 	UINT32  fc;			/* Freq. Increment base         */
 	UINT32  ksl_base;	/* KeyScaleLevel Base step      */
 	UINT8   kcode;		/* key code (for key scaling)   */
-} OPL_CH;
+};
 
 /* OPL state */
-typedef struct
+struct FM_OPL 
 {
 	/* FM channel slots */
 	OPL_CH	P_CH[9];				/* OPL/OPL2 chips have 9 channels*/
@@ -325,7 +325,7 @@ typedef struct
 #if BUILD_Y8950
 	INT32 output_deltat[4];		/* for Y8950 DELTA-T, chip is mono, that 4 here is just for safety */
 #endif
-} FM_OPL;
+};
 
 
 

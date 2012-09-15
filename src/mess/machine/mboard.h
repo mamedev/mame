@@ -42,11 +42,11 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct {
+struct MOUSE_HOLD {
 	int border_piece;
 	UINT8 from;
 	UINT8 piece;
-} MOUSE_HOLD;
+};
 
 /***************************************************************************
     FUNCTION PROTOTYPES

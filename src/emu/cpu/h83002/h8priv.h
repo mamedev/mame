@@ -11,30 +11,30 @@
 
 #define H8_MAX_PORTS (16)  // number of I/O ports defined architecturally (1-9 and A-G = 16)
 
-typedef struct
+struct H8S2XXX_TPU_ITEM 
 {
 	UINT32 tgr, irq, out;
-} H8S2XXX_TPU_ITEM;
+};
 
-typedef struct
+struct H8S2XXX_TPU 
 {
 	emu_timer *timer;
 	int cycles_per_tick;
 	UINT64 timer_cycles;
-} H8S2XXX_TPU;
+};
 
-typedef struct
+struct H8S2XXX_SCI 
 {
 	emu_timer *timer;
 	UINT32 bitrate;
-} H8S2XXX_SCI;
+};
 
-typedef struct
+struct H8S2XXX_TMR 
 {
 	emu_timer *timer;
 	int cycles_per_tick;
 	UINT64 timer_cycles;
-} H8S2XXX_TMR;
+};
 
 struct h83xx_state
 {

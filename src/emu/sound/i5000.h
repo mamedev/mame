@@ -47,7 +47,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 private:
-    typedef struct
+    struct channel_t 
     {
         bool is_playing;
     	oki_adpcm_state m_adpcm;
@@ -65,7 +65,7 @@ private:
         int output_r;
         int output_l;
 
-    } channel_t;
+    };
 
     channel_t m_channels[16];
 

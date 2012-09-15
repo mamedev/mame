@@ -59,7 +59,7 @@ DMAC controller.
 #define ISTR_FF_FLG     (1<<1)  /* FIFO-Full Flag */
 #define ISTR_FE_FLG     (1<<0)  /* FIFO-Empty Flag */
 
-typedef struct
+struct _dmac_data 
 {
 	UINT16		istr;		/* Interrupt Status Register (R) */
 	UINT16		cntr;		/* Control Register (RW) */
@@ -67,7 +67,7 @@ typedef struct
 	UINT32		acr;		/* Address Count Register (RW) */
 	UINT16		dawr;		/* DACK Width Register (W) */
 	emu_timer *dma_timer;
-} _dmac_data;
+};
 
 static _dmac_data dmac_data;
 

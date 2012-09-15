@@ -586,12 +586,12 @@ enum _opcode_adr
 };
 typedef enum _opcode_adr opcode_adr;
 
-typedef struct
+struct OPCODE 
 {
 	opcode_sel sel;
 	opcode_adr adr;
 	MNEMONICS mnemonic;
-} OPCODE;
+};
 
 static const char *field_2_string(int adr_enum)
 {

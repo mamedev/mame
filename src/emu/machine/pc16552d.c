@@ -34,7 +34,7 @@
 #define INT_ENABLE_RX_LINE_STATUS	0x04
 #define INT_ENABLE_MODEM_STATUS		0x08
 
-typedef struct
+struct PC16552D_CHANNEL 
 {
 	UINT16 divisor;
 	UINT8 reg[8];
@@ -48,15 +48,15 @@ typedef struct
 	int tx_fifo_write_ptr;
 	int tx_fifo_num;
 	emu_timer *tx_fifo_timer;
-} PC16552D_CHANNEL;
+};
 
-typedef struct
+struct PC16552D_REGS 
 {
 	PC16552D_CHANNEL ch[2];
 	int frequency;
 	void (* irq_handler)(running_machine &machine, int channel, int value);
 	void (* tx_callback)(running_machine &machine, int channel, int count, UINT8* data);
-} PC16552D_REGS;
+};
 
 #define MAX_PC16552D_CHIPS		4
 

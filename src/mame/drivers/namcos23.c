@@ -1269,42 +1269,42 @@ struct namcos23_poly_entry {
 enum { RENDER_MAX_ENTRIES = 1000, POLY_MAX_ENTRIES = 10000 };
 
 
-typedef struct
+struct c417_t 
 {
 	UINT16 ram[0x10000];
 	UINT16 adr;
 	UINT32 pointrom_adr;
-} c417_t;
+};
 
-typedef struct
+struct c412_t 
 {
 	UINT16 sdram_a[0x100000]; // Framebuffers, probably
 	UINT16 sdram_b[0x100000];
 	UINT16 sram[0x20000];     // Ram-based tiles for rendering
 	UINT16 pczram[0x200];     // Ram-based tilemap for rendering, or something else
 	UINT32 adr;
-} c412_t;
+};
 
-typedef struct
+struct c421_t 
 {
 	UINT16 dram_a[0x40000];
 	UINT16 dram_b[0x40000];
 	UINT16 sram[0x8000];
 	UINT32 adr;
-} c421_t;
+};
 
-typedef struct
+struct c422_t 
 {
 	INT16 regs[0x10];
-} c422_t;
+};
 
-typedef struct
+struct c361_t 
 {
 	emu_timer *timer;
 	int scanline;
-} c361_t;
+};
 
-typedef struct
+struct render_t 
 {
 	poly_manager *polymgr;
 	int cur;
@@ -1313,7 +1313,7 @@ typedef struct
 	namcos23_render_entry entries[2][RENDER_MAX_ENTRIES];
 	namcos23_poly_entry polys[POLY_MAX_ENTRIES];
 	namcos23_poly_entry *poly_order[POLY_MAX_ENTRIES];
-} render_t;
+};
 
 class namcos23_state : public driver_device
 {

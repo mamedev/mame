@@ -37,10 +37,10 @@ typedef enum
 
 } rtc9701_state_t;
 
-typedef struct
+struct rtc_regs_t 
 {
 	UINT8 sec, min, hour, day, wday, month, year;
-} rtc_regs_t;
+};
 
 
 // ======================> rtc9701_device

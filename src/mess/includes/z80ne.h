@@ -33,7 +33,7 @@ typedef enum
 	TAPE_1200BPS = 1200 /* 1200 bps */
 } z80netape_speed;
 
-typedef struct {
+struct cass_data_t {
 	struct {
 		int length;		/* time cassette level is at input.level */
 		int level;		/* cassette level */
@@ -49,14 +49,14 @@ typedef struct {
 	int wave_length;
 	int wave_short;
 	int wave_long;
-} cass_data_t;
+};
 
-typedef struct {
+struct wd17xx_state_t {
 	int drq;
 	int intrq;
 	UINT8 drive; /* current drive */
 	UINT8 head;  /* current head */
-} wd17xx_state_t;
+};
 
 
 class z80ne_state : public driver_device

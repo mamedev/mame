@@ -10,7 +10,7 @@
 #ifndef __MC68328_PRIVATE_H_
 #define __MC68328_PRIVATE_H_
 
-typedef struct
+struct mc68328_regs_t 
 {
     // $(FF)FFF000
     UINT8   scr;        // System Control Register
@@ -201,9 +201,9 @@ typedef struct
     UINT16  rtcienr;    // RTC Interrupt Enable Register
     UINT16  stpwtch;    // Stopwatch Minutes
     UINT8   unused42[1260];
-} mc68328_regs_t;
+};
 
-typedef struct
+struct mc68328_t 
 {
     const mc68328_interface* iface;
 
@@ -212,7 +212,7 @@ typedef struct
     emu_timer *gptimer[2];
     emu_timer *rtc;
     emu_timer *pwm;
-} mc68328_t;
+};
 
 #define SCR_BETO                0x80
 #define SCR_WPV                 0x40

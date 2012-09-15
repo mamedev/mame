@@ -33,7 +33,7 @@
 
 //#define log2(n) (log((float) n)/log((float) 2))
 
-typedef struct
+struct YMF271Slot 
 {
 	INT8  extout;
 	UINT8 lfoFreq;
@@ -80,14 +80,14 @@ typedef struct
 	INT32 lfo_phase, lfo_step;
 	INT32 lfo_amplitude;
 	double lfo_phasemod;
-} YMF271Slot;
+};
 
-typedef struct
+struct YMF271Group 
 {
 	INT8 sync, pfm;
-} YMF271Group;
+};
 
-typedef struct
+struct YMF271Chip 
 {
 	YMF271Slot slots[48];
 	YMF271Group groups[12];
@@ -112,7 +112,7 @@ typedef struct
 	UINT32 clock;
 	sound_stream * stream;
 	device_t *device;
-} YMF271Chip;
+};
 
 // slot mapping assists
 static const int fm_tab[] = { 0, 1, 2, -1, 3, 4, 5, -1, 6, 7, 8, -1, 9, 10, 11, -1 };

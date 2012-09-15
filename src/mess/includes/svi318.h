@@ -13,7 +13,7 @@
 #include "machine/ins8250.h"
 #include "machine/wd17xx.h"
 
-typedef struct
+struct SVI_318 
 {
 	/* general */
 	UINT8	svi318;		/* Are we dealing with an SVI-318 or a SVI-328 model. 0 = 328, 1 = 318 */
@@ -35,15 +35,15 @@ typedef struct
 	UINT8	svi806_ram_enabled;
 	memory_region	*svi806_ram;
 	UINT8	*svi806_gfx;
-} SVI_318;
+};
 
-typedef struct
+struct SVI318_FDC_STRUCT 
 {
 	UINT8 driveselect;
 	int drq;
 	int irq;
 	UINT8 heads[2];
-} SVI318_FDC_STRUCT;
+};
 
 
 class svi318_state : public driver_device

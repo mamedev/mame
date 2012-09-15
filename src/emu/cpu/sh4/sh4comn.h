@@ -49,7 +49,7 @@ class sh4_frontend;
 #endif
 
 
-typedef struct
+struct sh4_state 
 {
 	UINT32	ppc;
 	UINT32	pc, spc;
@@ -208,7 +208,7 @@ typedef struct
 	UINT32 prefadr;
 	UINT32 target;
 #endif
-} sh4_state;
+};
 
 #ifdef USE_SH4DRC
 class sh4_frontend : public drc_frontend

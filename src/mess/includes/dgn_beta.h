@@ -74,11 +74,11 @@ typedef enum
 
 #define iosize	(0xfEFF-0xfc00)
 
-typedef struct
+struct PageReg 
 {
 	int	    value;			/* Value of the page register */
 	UINT8	*memory;		/* The memory it actually points to */
-} PageReg;
+};
 
 
 class dgn_beta_state : public driver_device

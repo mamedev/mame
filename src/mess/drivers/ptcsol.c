@@ -108,7 +108,7 @@
 #include "machine/ay31015.h"
 
 
-typedef struct {
+struct cass_data_t {
 	struct {
 		int length;		/* time cassette level is at input.level */
 		int level;		/* cassette level */
@@ -119,7 +119,7 @@ typedef struct {
 		int level;		/* cassette level */
 		int bit;		/* bit to to output */
 	} output;
-} cass_data_t;
+};
 
 class sol20_state : public driver_device
 {

@@ -26,10 +26,10 @@ enum
 	PAGE4,
 };
 
-typedef struct {
+struct M68HC11_OPCODE {
 	char mnemonic[32];
 	int address_mode;
-} M68HC11_OPCODE;
+};
 
 static const M68HC11_OPCODE opcode_table[256] =
 {

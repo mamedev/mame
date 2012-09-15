@@ -447,7 +447,7 @@ static void mpc8240_interrupt(running_machine &machine, int irq);
 #define I2C_STATE_DATA_TRANSFER		2
 
 
-typedef struct
+struct MPC8240_IRQ 
 {
 	UINT32 vector;
 	int priority;
@@ -455,18 +455,18 @@ typedef struct
 	int active;
 	int pending;
 	int mask;
-} MPC8240_IRQ;
+};
 
-typedef struct
+struct MPC8240_GLOBAL_TIMER 
 {
 	UINT32 base_count;
 	int enable;
 	emu_timer *timer;
-} MPC8240_GLOBAL_TIMER;
+};
 
 
 
-typedef struct
+struct MPC8240_EPIC 
 {
 	UINT32 iack;
 	UINT32 eicr;
@@ -484,7 +484,7 @@ typedef struct
 
 	MPC8240_GLOBAL_TIMER global_timer[4];
 
-} MPC8240_EPIC;
+};
 
 // TODO: move to viper_state
 static MPC8240_EPIC epic;

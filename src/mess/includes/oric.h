@@ -30,17 +30,17 @@ enum
 	TELESTRAT_MEM_BLOCK_ROM
 };
 
-typedef struct
+struct telestrat_mem_block 
 {
 	int		MemType;
 	unsigned char *ptr;
-} telestrat_mem_block;
+};
 
 
 /* current state of the display */
 /* some attributes persist until they are turned off.
 This structure holds this persistant information */
-typedef struct
+struct oric_vh_state 
 {
 	/* foreground and background colour used for rendering */
 	/* if flash attribute is set, these two will both be equal to background colour */
@@ -63,7 +63,7 @@ typedef struct
 	/* if (1<<3), display graphics, if 0, hide graphics */
 	/* current count */
 	UINT8 flash_count;
-} oric_vh_state;
+};
 
 
 class oric_state : public driver_device

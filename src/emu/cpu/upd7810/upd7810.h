@@ -33,10 +33,10 @@ typedef enum
 typedef int (*upd7810_io_callback)(device_t *device, int ioline, int state);
 
 // use it as reset parameter in the Machine struct
-typedef struct {
+struct UPD7810_CONFIG {
     UPD7810_TYPE type;
     upd7810_io_callback io_callback;
-} UPD7810_CONFIG;
+};
 
 enum
 {

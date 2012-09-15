@@ -54,7 +54,7 @@ typedef union {
     } s;
 } o2_vdc_t;
 
-typedef struct
+struct ef9341_t 
 {
 	UINT8	X;
 	UINT8	Y;
@@ -65,7 +65,7 @@ typedef struct
 	UINT8	TB;
 	UINT8	busy;
 	UINT8	ram[1024];
-} ef9341_t;
+};
 
 
 class odyssey2_state : public driver_device

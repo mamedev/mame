@@ -55,7 +55,7 @@ typedef enum
 ALLOW_SAVE_TYPE( mea8000_state );
 
 
-typedef struct
+struct filter_t 
 {
 #ifdef FLOAT_MODE
 	double fm, last_fm;         /* frequency, in Hz */
@@ -66,11 +66,11 @@ typedef struct
 	UINT16 bw, last_bw;
 	INT32  output, last_output;
 #endif
-} filter_t;
+};
 
 
 
-typedef struct
+struct mea8000_t 
 {
 
 	/* configuration parameters */
@@ -102,7 +102,7 @@ typedef struct
 
 	emu_timer *timer;
 
-} mea8000_t;
+};
 
 
 

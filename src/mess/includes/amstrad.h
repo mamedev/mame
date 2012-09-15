@@ -23,7 +23,7 @@
 /****************************
  * Gate Array data (CPC) -
  ****************************/
-typedef struct
+struct gate_array_t 
 {
 	bitmap_ind16	*bitmap;		/* The bitmap we work on */
 	UINT8	pen_selected;		/* Pen selection */
@@ -55,12 +55,12 @@ typedef struct
 	UINT16	line_ticks;
 	UINT8	colour_ticks;
 	UINT8	max_colour_ticks;
-} gate_array_t;
+};
 
 /****************************
  * ASIC data (CPC plus)
  ****************************/
-typedef struct
+struct asic_t 
 {
 	UINT8	*ram;				/* pointer to RAM used for the CPC+ ASIC memory-mapped registers */
 	UINT8	enabled;			/* Are CPC plus features enabled/unlocked */
@@ -85,7 +85,7 @@ typedef struct
 	UINT16	dma_addr[3];		/* DMA channel address */
 	UINT16	dma_loopcount[3];	/* Count loops taken on this channel */
 	UINT16	dma_pause[3];		/* DMA pause count */
-} asic_t;
+};
 
 
 class amstrad_state : public driver_device

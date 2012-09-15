@@ -19,7 +19,7 @@ static const int defgain = 48;
 
 
 /* this structure defines the parameters for a channel */
-typedef struct
+struct sound_channel 
 {
 	int frequency;
 	int counter;
@@ -27,7 +27,7 @@ typedef struct
 	const UINT8 *wave;
 	int oneshot;
 	int oneshotplaying;
-} sound_channel;
+};
 
 
 

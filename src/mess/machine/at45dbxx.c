@@ -36,7 +36,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct
+struct AT45DBXX_PINS 
 {
 	int cs;    // chip select
 	int sck;   // serial clock
@@ -45,18 +45,18 @@ typedef struct
 	int wp;    // write protect
 	int reset; // reset
 	int busy;  // busy
-} AT45DBXX_PINS;
+};
 
-typedef struct
+struct AT45DBXX_CMD 
 {
 	UINT8 data[8], size;
-} AT45DBXX_CMD;
+};
 
-typedef struct
+struct AT45DBXX_IO 
 {
 	UINT8 *data;
 	UINT32 size, pos;
-} AT45DBXX_IO;
+};
 
 struct at45dbxx_t
 {

@@ -56,7 +56,7 @@
 
 
 /* special priority type meaning "none" */
-typedef struct { char dummy[3]; } NO_PRIORITY;
+struct NO_PRIORITY { char dummy[3]; };
 
 extern bitmap_ind8 drawgfx_dummy_priority_bitmap;
 #define DECLARE_NO_PRIORITY bitmap_t &priority = drawgfx_dummy_priority_bitmap;

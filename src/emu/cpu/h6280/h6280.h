@@ -37,7 +37,7 @@ enum
 /****************************************************************************
  * The 6280 registers.
  ****************************************************************************/
-typedef struct
+struct h6280_Regs 
 {
 	int ICount;
 
@@ -70,7 +70,7 @@ typedef struct
     INT32 NZ;			/* last value (lazy N and Z flag) */
 #endif
 	UINT8 io_buffer;	/* last value written to the PSG, timer, and interrupt pages */
-} h6280_Regs;
+};
 
 
 DECLARE_LEGACY_CPU_DEVICE(H6280, h6280);

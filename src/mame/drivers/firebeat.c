@@ -121,25 +121,25 @@
 #include "firebeat.lh"
 
 
-typedef struct
+struct GCU_REGS 
 {
 	UINT32 *vram;
 	UINT32 vram_read_address;
 	UINT32 vram_write_fifo_address;
 	UINT32 visible_area;
-} GCU_REGS;
+};
 
-typedef struct
+struct IBUTTON_SUBKEY 
 {
 	UINT8 identifier[8];
 	UINT8 password[8];
 	UINT8 data[0x30];
-} IBUTTON_SUBKEY;
+};
 
-typedef struct
+struct IBUTTON 
 {
 	IBUTTON_SUBKEY subkey[3];
-} IBUTTON;
+};
 
 
 

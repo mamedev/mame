@@ -44,7 +44,7 @@ private:
 	virtual void z80daisy_irq_reti();
 };
 
-typedef struct
+struct scrn_reg_t 
 {
 	UINT8 gfx_bank;
 	UINT8 disp_bank;
@@ -54,20 +54,20 @@ typedef struct
 
 	UINT8 pri;
 	UINT8 blackclip; // x1 turbo specific
-} scrn_reg_t;
+};
 
-typedef struct
+struct turbo_reg_t 
 {
 	UINT8 pal;
 	UINT8 gfx_pal;
 	UINT8 txt_pal[8];
 	UINT8 txt_disp;
-} turbo_reg_t;
+};
 
-typedef struct
+struct x1_rtc_t 
 {
 	UINT8 sec, min, hour, day, wday, month, year;
-} x1_rtc_t;
+};
 
 
 class x1_state : public driver_device

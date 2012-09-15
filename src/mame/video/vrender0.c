@@ -20,7 +20,7 @@ Missing:
 
 **************/
 
-typedef struct
+struct _Quad
 {
 	UINT16 *Dest;
 	UINT32 Pitch;	//in UINT16s
@@ -48,9 +48,9 @@ typedef struct
 	UINT32 SrcColor;
 	UINT8 DstAlpha;
 	UINT32 DstColor;
-} _Quad;
+};
 
-typedef struct
+struct _RenderState 
 {
 	UINT32 Tx;
 	UINT32 Ty;
@@ -72,7 +72,7 @@ typedef struct
 	UINT32 PixelFormat;
 	UINT32 Width;
 	UINT32 Height;
-} _RenderState;
+};
 
 struct vr0video_state
 {

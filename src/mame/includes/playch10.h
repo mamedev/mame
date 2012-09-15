@@ -1,8 +1,8 @@
-typedef struct
+struct chr_bank 
 {
 	int writable;	// 1 for RAM, 0 for ROM
 	UINT8* chr;		// direct access to the memory
-} chr_bank;
+};
 
 class playch10_state : public driver_device
 {

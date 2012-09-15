@@ -24,7 +24,7 @@ TODO:
 
 #include "emu.h"
 
-typedef struct
+struct scc68070_i2c_regs_t 
 {
 	UINT8 reserved0;
 	UINT8 data_register;
@@ -36,7 +36,7 @@ typedef struct
 	UINT8 control_register;
 	UINT8 reserved;
 	UINT8 clock_control_register;
-} scc68070_i2c_regs_t;
+};
 
 #define ISR_MST		0x80	// Master
 #define ISR_TRX		0x40	// Transmitter
@@ -47,7 +47,7 @@ typedef struct
 #define ISR_AD0		0x02	// Address Zero
 #define ISR_LRB		0x01	// Last Received Bit
 
-typedef struct
+struct scc68070_uart_regs_t 
 {
 	UINT8 reserved0;
 	UINT8 mode_register;
@@ -69,7 +69,7 @@ typedef struct
 	INT16 transmit_pointer;
 	UINT8 transmit_buffer[32768];
 	emu_timer* tx_timer;
-} scc68070_uart_regs_t;
+};
 
 #define UMR_OM			0xc0
 #define UMR_OM_NORMAL	0x00
@@ -90,7 +90,7 @@ typedef struct
 #define USR_TXRDY		0x04
 #define USR_RXRDY		0x01
 
-typedef struct
+struct scc68070_timer_regs_t 
 {
 	UINT8 timer_status_register;
 	UINT8 timer_control_register;
@@ -99,7 +99,7 @@ typedef struct
 	UINT16 timer1;
 	UINT16 timer2;
 	emu_timer* timer0_timer;
-} scc68070_timer_regs_t;
+};
 
 #define TSR_OV0			0x80
 #define TSR_MA1			0x40
@@ -130,7 +130,7 @@ typedef struct
 #define TCR_M2_CAPTURE	0x02
 #define TCR_M2_COUNT	0x03
 
-typedef struct
+struct scc68070_dma_channel_t 
 {
 	UINT8 channel_status;
 	UINT8 channel_error;
@@ -153,7 +153,7 @@ typedef struct
 	UINT32 device_address_counter;
 
 	UINT8 reserved3[40];
-} scc68070_dma_channel_t;
+};
 
 #define CSR_COC			0x80
 #define CSR_NDT			0x20
@@ -193,21 +193,21 @@ typedef struct
 #define CCR_INE			0x08
 #define CCR_IPL			0x07
 
-typedef struct
+struct scc68070_dma_regs_t 
 {
 	scc68070_dma_channel_t channel[2];
-} scc68070_dma_regs_t;
+};
 
-typedef struct
+struct scc68070_mmu_desc_t 
 {
 	UINT16 attr;
 	UINT16 length;
 	UINT8  undefined;
 	UINT8  segment;
 	UINT16 base;
-} scc68070_mmu_desc_t;
+};
 
-typedef struct
+struct scc68070_mmu_regs_t 
 {
 	UINT8 status;
 	UINT8 control;
@@ -215,9 +215,9 @@ typedef struct
 	UINT8 reserved[0x3e];
 
 	scc68070_mmu_desc_t desc[8];
-} scc68070_mmu_regs_t;
+};
 
-typedef struct
+struct scc68070_regs_t 
 {
 	UINT16 lir;
 	UINT8 picr1;
@@ -228,7 +228,7 @@ typedef struct
 	scc68070_timer_regs_t timers;
 	scc68070_dma_regs_t dma;
 	scc68070_mmu_regs_t mmu;
-} scc68070_regs_t;
+};
 
 // Member functions
 TIMER_CALLBACK( scc68070_timer0_callback );

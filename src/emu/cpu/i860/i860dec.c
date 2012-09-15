@@ -4073,13 +4073,13 @@ enum {
 };
 
 
-typedef struct {
+struct decode_tbl_t {
 	/* Execute function for this opcode.  */
 	void (*insn_exec)(i860s *, UINT32);
 
 	/* Flags for this opcode.  */
 	char flags;
-} decode_tbl_t;
+};
 
 
 /* First-level decode table (i.e., for the 6 primary opcode bits).  */

@@ -17,12 +17,12 @@
 #include "cpu/mips/r3000.h"
 
 
-typedef struct
+struct ip6_regs_t 
 {
 	UINT16 unknown_half_0;
 	UINT8 unknown_byte_0;
 	UINT8 unknown_byte_1;
-} ip6_regs_t;
+};
 
 class sgi_ip6_state : public driver_device
 {

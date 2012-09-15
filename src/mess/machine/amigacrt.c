@@ -24,12 +24,12 @@ enum
 	ACTION_REPLAY_MKIII
 };
 
-typedef struct
+struct amigacrt_t 
 {
 	int cart_type;
 	int ar1_spurious;
 	UINT16 ar23_mode;
-} amigacrt_t;
+};
 static amigacrt_t amigacrt;
 
 /***************************************************************************

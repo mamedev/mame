@@ -21,13 +21,13 @@
 #include "includes/apollo.h"
 #include "machine/3c505.h"
 
-typedef struct {
+struct ethernet_header {
 	UINT8 dest[6];
 	UINT8 source[6];
 	UINT16 proto;
-} ethernet_header;
+};
 
-typedef struct
+struct ip_header 
 {
 	UINT8 version;
 	UINT8 tos;
@@ -39,7 +39,7 @@ typedef struct
 	UINT16 check;
 	UINT32 saddr;
 	UINT32 daddr;
-} ip_header;
+};
 
 #define ETHERNET_HEADER_SIZE sizeof(ethernet_header)
 

@@ -32,19 +32,19 @@ Theory of operation:
 #include "video/crt.h"
 
 
-typedef struct
+struct point 
 {
 	int intensity;		/* current intensity of the pixel */
 							/* a node is not in the list when (intensity == -1) */
 	int next;			/* index of next pixel in list */
-} point;
+};
 
 enum
 {
 	intensity_pixel_not_in_list = -1	/* special value that tells that the node is not in list */
 };
 
-typedef struct
+struct crt_t 
 {
 	point *list;		/* array of (crt_window_width*crt_window_height) point */
 	int *list_head;	/* head of the list of lit pixels (index in the array) */
@@ -56,7 +56,7 @@ typedef struct
 	int num_intensity_levels;
 	int window_offset_x, window_offset_y;
 	int window_width, window_height;
-} crt_t;
+};
 
 
 INLINE crt_t *get_safe_token(device_t *device)

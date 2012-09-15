@@ -14,7 +14,7 @@
 #include "rendlay.h"
 
 
-typedef struct
+struct PRC 
 {
 	UINT8		colors_inverted;
 	UINT8		background_enabled;
@@ -28,10 +28,10 @@ typedef struct
 	UINT32		spr_tiles;
 	UINT8		count;
 	emu_timer	*count_timer;
-} PRC;
+};
 
 
-typedef struct
+struct TIMERS 
 {
 	emu_timer	*seconds_timer;
 	emu_timer	*hz256_timer;
@@ -41,7 +41,7 @@ typedef struct
 	emu_timer	*timer2_hi;				/* Timer 2 high */
 	emu_timer	*timer3;				/* Timer 3 low or 16bit */
 	emu_timer	*timer3_hi;				/* Timer 3 high */
-} TIMERS;
+};
 
 
 class pokemini_state : public driver_device

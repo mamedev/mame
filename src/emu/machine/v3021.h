@@ -27,10 +27,10 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef struct
+struct rtc_regs_t 
 {
 	UINT8 sec, min, hour, day, wday, month, year;
-} rtc_regs_t;
+};
 
 
 // ======================> v3021_device

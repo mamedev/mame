@@ -23,7 +23,7 @@ static FILE * cymfile = NULL;
 
 
 /* struct describing a single operator */
-typedef struct
+struct YM2151Operator 
 {
 	UINT32		phase;					/* accumulated operator phase */
 	UINT32		freq;					/* operator frequency count */
@@ -73,10 +73,10 @@ typedef struct
 	UINT32		reserved0;				/**/
 	UINT32		reserved1;				/**/
 
-} YM2151Operator;
+};
 
 
-typedef struct
+struct YM2151 
 {
 	signed int chanout[8];
 	signed int m2,c1,c2; /* Phase Modulation input for operators 2,3,4 */
@@ -168,7 +168,7 @@ typedef struct
 	device_t *device;
 	unsigned int clock;					/* chip clock in Hz (passed from 2151intf.c) */
 	unsigned int sampfreq;				/* sampling frequency in Hz (passed from 2151intf.c) */
-} YM2151;
+};
 
 
 #define FREQ_SH			16  /* 16.16 fixed point (frequency calculations) */

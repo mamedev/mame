@@ -149,7 +149,7 @@ enum
 	SM8521_SG1W15	= 0x7F
 };
 
-typedef struct
+struct GAMECOM_DMA 
 {
 	int enabled;
 	int transfer_mode;
@@ -180,17 +180,17 @@ typedef struct
 	unsigned int dest_current;
 	unsigned int dest_line;
 	unsigned int dest_mask;
-} GAMECOM_DMA;
+};
 
-typedef struct
+struct GAMECOM_TIMER 
 {
 	int enabled;
 	int state_count;
 	int state_limit;
 	int check_value;
-} GAMECOM_TIMER;
+};
 
-typedef struct
+struct gamecom_sound_t 
 {
 	UINT8 sgc;
 	UINT8 sg0l;
@@ -202,7 +202,7 @@ typedef struct
 	UINT8 sgda;
 	UINT8 sg0w[16];
 	UINT8 sg1w[16];
-} gamecom_sound_t;
+};
 
 
 class gamecom_state : public driver_device

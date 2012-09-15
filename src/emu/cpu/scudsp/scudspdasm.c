@@ -26,12 +26,12 @@ enum
 	EA_MVIDSTMEM,
 };
 
-typedef struct {
+struct SCUDSP_OPCODE {
 	char mnemonic[32];
 	int address_mode_1;
 	int address_mode_2;
 	int address_mode_3,
-} SCUDSP_OPCODE;
+};
 
 static const SCUDSP_OPCODE alu_table[16] =
 {

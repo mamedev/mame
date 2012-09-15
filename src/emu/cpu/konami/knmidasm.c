@@ -1581,10 +1581,10 @@ static void absd( char *buf ) {
 
 *********************************************************************************/
 
-typedef struct {
+struct konami_opcode_def {
 	void (*decode)( char *buf );
 	int confirmed;
-} konami_opcode_def;
+};
 
 static const konami_opcode_def op_table[256] = {
 	/* 00 */	{ illegal, 0 },

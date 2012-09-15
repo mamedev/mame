@@ -31,7 +31,7 @@
 /* the largest possible cartridge image (street fighter 2 - 2.5MB) */
 #define PCE_ROM_MAXSIZE		0x280000
 
-typedef struct
+struct pce_cd_t 
 {
 	UINT8	regs[16];
 	UINT8	*bram;
@@ -101,7 +101,7 @@ typedef struct
 	emu_timer	*adpcm_fadeout_timer;
 	emu_timer	*adpcm_fadein_timer;
 	double	adpcm_volume;
-} pce_cd_t;
+};
 
 
 class pce_state : public driver_device

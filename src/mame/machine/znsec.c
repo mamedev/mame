@@ -85,11 +85,11 @@
 #include "emu.h"
 #include "znsec.h"
 
-typedef struct {
+struct znsec_state {
 	const UINT8 *transform;
 	UINT8 state;
 	UINT8 bit;
-} znsec_state;
+};
 
 static znsec_state zns[2];
 

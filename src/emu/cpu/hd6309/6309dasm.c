@@ -25,14 +25,14 @@
 #include "hd6309.h"
 
 // Opcode structure
-typedef struct
+struct opcodeinfo 
 {
    UINT8	opcode;		// 8-bit opcode value
    UINT8	length;		// Opcode length in bytes
    char 	name[6];	// Opcode name
    UINT8	mode;		// Addressing mode
    unsigned flags;		// Disassembly flags
-} opcodeinfo;
+};
 
 enum hd6309_addressing_modes
 {

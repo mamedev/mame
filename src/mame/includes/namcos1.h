@@ -1,13 +1,13 @@
 #define NAMCOS1_MAX_BANK 0x400
 
 /* Bank handler definitions */
-typedef struct
+struct bankhandler 
 {
 	read8_space_func bank_handler_r;
 	write8_space_func bank_handler_w;
 	int           bank_offset;
 	UINT8 *bank_pointer;
-} bankhandler;
+};
 
 class namcos1_state : public driver_device
 {

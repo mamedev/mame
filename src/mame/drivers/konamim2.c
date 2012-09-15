@@ -191,14 +191,14 @@ Notes:
 #include "cpu/powerpc/ppc.h"
 
 
-typedef struct
+struct CDE_DMA 
 {
 	UINT32 dst_addr;
 	int length;
 	UINT32 next_dst_addr;
 	int next_length;
 	int dma_done;
-} CDE_DMA;
+};
 
 class konamim2_state : public driver_device
 {

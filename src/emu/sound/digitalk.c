@@ -237,7 +237,7 @@ complete set of waveforms is repeated R times.
 */
 
 
-typedef struct {
+struct digitalker {
 	const UINT8 *rom;
 	device_t *device;
 	sound_stream *stream;
@@ -258,7 +258,7 @@ typedef struct {
 	UINT8 dac_index; // 128 for done
 	INT16 dac[128];
 
-} digitalker;
+};
 
 // Quantized intensity values, first index is the volume, second the
 // intensity (positive half only, real value goes -8..7)

@@ -45,7 +45,7 @@ enum
 };
 
 /* 6805 Registers */
-typedef struct
+struct m6805_Regs 
 {
 	/* Pre-pointerafied public globals */
 	int iCount;
@@ -67,7 +67,7 @@ typedef struct
 	direct_read_data *direct;
 	int 	irq_state[9];		/* KW Additional lines for HD63705 */
 	int		nmi_state;
-} m6805_Regs;
+};
 
 INLINE m6805_Regs *get_safe_token(device_t *device)
 {

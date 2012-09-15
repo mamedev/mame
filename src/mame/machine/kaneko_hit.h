@@ -1,7 +1,7 @@
 /* Kaneko Hit protection */
 
 
-typedef struct
+struct calc1_hit_t 
 {
 	UINT16 x1p, y1p, x1s, y1s;
 	UINT16 x2p, y2p, x2s, y2s;
@@ -9,9 +9,9 @@ typedef struct
 	INT16 x12, y12, x21, y21;
 
 	UINT16 mult_a, mult_b;
-} calc1_hit_t;
+};
 
-typedef struct
+struct calc3_hit_t 
 {
 	int x1p, y1p, z1p, x1s, y1s, z1s;
 	int x2p, y2p, z2p, x2s, y2s, z2s;
@@ -29,7 +29,7 @@ typedef struct
 
 	UINT16 flags;
 	UINT16 mode;
-} calc3_hit_t;
+};
 
 
 
