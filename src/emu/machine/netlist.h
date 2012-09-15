@@ -108,7 +108,11 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 		netlist.parse((char *)downcast<netlist_t &>(netlist.netlist()).machine().root_device().memregion(_name)->base());		\
 
 #if defined(__GNUC__) && (__GNUC__ >= 3)
+#if !defined(__ppc__) && !defined (__PPC__) && !defined(__ppc64__) && !defined(__PPC64__)
 #define ATTR_ALIGN __attribute__ ((aligned(128)))
+#else
+#define ATTR_ALIGN
+#endif
 #else
 #define ATTR_ALIGN
 #endif
@@ -1125,6 +1129,7 @@ public:
 
 	// construction/destruction
 	netlist_mame_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+    virtual ~netlist_mame_device() {}
 
 	static void static_set_constructor(device_t &device, void (*setup_func)(netlist_setup_t &));
 
@@ -1168,6 +1173,7 @@ class netlist_mame_device::on_device_start
 {
 public:
 	virtual bool OnDeviceStart() = 0;
+    virtual ~on_device_start() {}
 };
 
 // device finder template

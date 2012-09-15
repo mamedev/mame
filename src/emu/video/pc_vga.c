@@ -4014,7 +4014,7 @@ static void ibm8514_wait_draw_vector()
 	bool draw = ibm8514.wait_vector_draw;
 	UINT8 count = ibm8514.wait_vector_count;
 	UINT32 offset;
-	UINT8 data_size;
+	UINT8 data_size = 0;
 	int x;
 
 	if(s3.bus_size == 0)  // 8-bit
