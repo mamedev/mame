@@ -26,76 +26,77 @@
     CONSTANTS
 ***************************************************************************/
 
-#define MINIMUM_COMMAND_TIME			(attotime::from_usec(10))
+#define MINIMUM_COMMAND_TIME				(attotime::from_usec(10))
 
-#define TIME_PER_SECTOR					(attotime::from_usec(100))
-#define TIME_PER_ROTATION				(attotime::from_hz(5400/60))
-#define TIME_SECURITY_ERROR				(attotime::from_msec(1000))
+#define TIME_PER_SECTOR						(attotime::from_usec(100))
+#define TIME_PER_ROTATION					(attotime::from_hz(5400/60))
+#define TIME_SECURITY_ERROR					(attotime::from_msec(1000))
 
-#define TIME_SEEK_MULTISECTOR			(attotime::from_msec(13))
-#define TIME_NO_SEEK_MULTISECTOR		(attotime::from_nsec(16300))
+#define TIME_SEEK_MULTISECTOR				(attotime::from_msec(13))
+#define TIME_NO_SEEK_MULTISECTOR			(attotime::from_nsec(16300))
 
-#define IDE_STATUS_ERROR				0x01
-#define IDE_STATUS_HIT_INDEX			0x02
-#define IDE_STATUS_BUFFER_READY			0x08
-#define IDE_STATUS_SEEK_COMPLETE		0x10
-#define IDE_STATUS_DRIVE_READY			0x40
-#define IDE_STATUS_BUSY					0x80
+#define IDE_STATUS_ERROR					0x01
+#define IDE_STATUS_HIT_INDEX				0x02
+#define IDE_STATUS_BUFFER_READY				0x08
+#define IDE_STATUS_SEEK_COMPLETE			0x10
+#define IDE_STATUS_DRIVE_READY				0x40
+#define IDE_STATUS_BUSY						0x80
 
-#define IDE_CONFIG_REGISTERS			0x10
+#define IDE_CONFIG_REGISTERS				0x10
 
 #define BANK(b, v) (((v) << 4) | (b))
 
-#define IDE_BANK0_DATA					BANK(0, 0)
-#define IDE_BANK0_ERROR					BANK(0, 1)
-#define IDE_BANK0_SECTOR_COUNT			BANK(0, 2)
-#define IDE_BANK0_SECTOR_NUMBER			BANK(0, 3)
-#define IDE_BANK0_CYLINDER_LSB			BANK(0, 4)
-#define IDE_BANK0_CYLINDER_MSB			BANK(0, 5)
-#define IDE_BANK0_HEAD_NUMBER			BANK(0, 6)
-#define IDE_BANK0_STATUS_COMMAND		BANK(0, 7)
+#define IDE_BANK0_DATA						BANK(0, 0)
+#define IDE_BANK0_ERROR						BANK(0, 1)
+#define IDE_BANK0_SECTOR_COUNT				BANK(0, 2)
+#define IDE_BANK0_SECTOR_NUMBER				BANK(0, 3)
+#define IDE_BANK0_CYLINDER_LSB				BANK(0, 4)
+#define IDE_BANK0_CYLINDER_MSB				BANK(0, 5)
+#define IDE_BANK0_HEAD_NUMBER				BANK(0, 6)
+#define IDE_BANK0_STATUS_COMMAND			BANK(0, 7)
 
-#define IDE_BANK1_STATUS_CONTROL		BANK(1, 6)
+#define IDE_BANK1_STATUS_CONTROL			BANK(1, 6)
 
-#define IDE_BANK2_CONFIG_UNK			BANK(2, 4)
-#define IDE_BANK2_CONFIG_REGISTER		BANK(2, 8)
-#define IDE_BANK2_CONFIG_DATA			BANK(2, 0xc)
+#define IDE_BANK2_CONFIG_UNK				BANK(2, 4)
+#define IDE_BANK2_CONFIG_REGISTER			BANK(2, 8)
+#define IDE_BANK2_CONFIG_DATA				BANK(2, 0xc)
 
-#define IDE_COMMAND_READ_MULTIPLE		0x20
-#define IDE_COMMAND_READ_MULTIPLE_ONCE	0x21
-#define IDE_COMMAND_WRITE_MULTIPLE		0x30
-#define IDE_COMMAND_DIAGNOSTIC			0x90
-#define IDE_COMMAND_SET_CONFIG			0x91
-#define IDE_COMMAND_READ_MULTIPLE_BLOCK	0xc4
-#define IDE_COMMAND_WRITE_MULTIPLE_BLOCK 0xc5
-#define IDE_COMMAND_SET_BLOCK_COUNT		0xc6
-#define IDE_COMMAND_READ_DMA			0xc8
-#define IDE_COMMAND_WRITE_DMA			0xca
-#define IDE_COMMAND_GET_INFO			0xec
-#define IDE_COMMAND_SET_FEATURES		0xef
-#define IDE_COMMAND_SECURITY_UNLOCK		0xf2
-#define IDE_COMMAND_UNKNOWN_F9			0xf9
-#define IDE_COMMAND_VERIFY_MULTIPLE		0x40
-#define IDE_COMMAND_VERIFY_NORETRY		0x41
-#define IDE_COMMAND_ATAPI_IDENTIFY		0xa1
-#define IDE_COMMAND_RECALIBRATE			0x10
-#define IDE_COMMAND_SEEK				0x70
-#define IDE_COMMAND_IDLE_IMMEDIATE		0xe1
-#define IDE_COMMAND_IDLE				0xe3
-#define IDE_COMMAND_TAITO_GNET_UNLOCK_1 0xfe
-#define IDE_COMMAND_TAITO_GNET_UNLOCK_2 0xfc
-#define IDE_COMMAND_TAITO_GNET_UNLOCK_3 0x0f
+#define IDE_COMMAND_READ_MULTIPLE			0x20
+#define IDE_COMMAND_READ_MULTIPLE_NORETRY	0x21
+#define IDE_COMMAND_WRITE_MULTIPLE			0x30
+#define IDE_COMMAND_WRITE_MULTIPLE_NORETRY	0x31
+#define IDE_COMMAND_DIAGNOSTIC				0x90
+#define IDE_COMMAND_SET_CONFIG				0x91
+#define IDE_COMMAND_READ_MULTIPLE_BLOCK		0xc4
+#define IDE_COMMAND_WRITE_MULTIPLE_BLOCK	0xc5
+#define IDE_COMMAND_SET_BLOCK_COUNT			0xc6
+#define IDE_COMMAND_READ_DMA				0xc8
+#define IDE_COMMAND_WRITE_DMA				0xca
+#define IDE_COMMAND_GET_INFO				0xec
+#define IDE_COMMAND_SET_FEATURES			0xef
+#define IDE_COMMAND_SECURITY_UNLOCK			0xf2
+#define IDE_COMMAND_UNKNOWN_F9				0xf9
+#define IDE_COMMAND_VERIFY_MULTIPLE			0x40
+#define IDE_COMMAND_VERIFY_NORETRY			0x41
+#define IDE_COMMAND_ATAPI_IDENTIFY			0xa1
+#define IDE_COMMAND_RECALIBRATE				0x10
+#define IDE_COMMAND_SEEK					0x70
+#define IDE_COMMAND_IDLE_IMMEDIATE			0xe1
+#define IDE_COMMAND_IDLE					0xe3
+#define IDE_COMMAND_TAITO_GNET_UNLOCK_1		0xfe
+#define IDE_COMMAND_TAITO_GNET_UNLOCK_2		0xfc
+#define IDE_COMMAND_TAITO_GNET_UNLOCK_3		0x0f
 
-#define IDE_ERROR_NONE					0x00
-#define IDE_ERROR_DEFAULT				0x01
-#define IDE_ERROR_TRACK0_NOT_FOUND		0x02
-#define IDE_ERROR_UNKNOWN_COMMAND		0x04
-#define IDE_ERROR_BAD_LOCATION			0x10
-#define IDE_ERROR_BAD_SECTOR			0x80
+#define IDE_ERROR_NONE						0x00
+#define IDE_ERROR_DEFAULT					0x01
+#define IDE_ERROR_TRACK0_NOT_FOUND			0x02
+#define IDE_ERROR_UNKNOWN_COMMAND			0x04
+#define IDE_ERROR_BAD_LOCATION				0x10
+#define IDE_ERROR_BAD_SECTOR				0x80
 
-#define IDE_BUSMASTER_STATUS_ACTIVE		0x01
-#define IDE_BUSMASTER_STATUS_ERROR		0x02
-#define IDE_BUSMASTER_STATUS_IRQ		0x04
+#define IDE_BUSMASTER_STATUS_ACTIVE			0x01
+#define IDE_BUSMASTER_STATUS_ERROR			0x02
+#define IDE_BUSMASTER_STATUS_IRQ			0x04
 
 
 
@@ -1003,7 +1004,7 @@ static void handle_command(ide_state *ide, UINT8 command)
 	switch (command)
 	{
 		case IDE_COMMAND_READ_MULTIPLE:
-		case IDE_COMMAND_READ_MULTIPLE_ONCE:
+		case IDE_COMMAND_READ_MULTIPLE_NORETRY:
 			LOGPRINT(("IDE Read multiple: C=%d H=%d S=%d LBA=%d count=%d\n",
 				ide->drive[ide->cur_drive].cur_cylinder, ide->drive[ide->cur_drive].cur_head, ide->drive[ide->cur_drive].cur_sector, lba_address(ide), ide->sector_count));
 
@@ -1062,6 +1063,7 @@ static void handle_command(ide_state *ide, UINT8 command)
 			break;
 
 		case IDE_COMMAND_WRITE_MULTIPLE:
+		case IDE_COMMAND_WRITE_MULTIPLE_NORETRY:
 			LOGPRINT(("IDE Write multiple: C=%d H=%d S=%d LBA=%d count=%d\n",
 				ide->drive[ide->cur_drive].cur_cylinder, ide->drive[ide->cur_drive].cur_head, ide->drive[ide->cur_drive].cur_sector, lba_address(ide), ide->sector_count));
 
