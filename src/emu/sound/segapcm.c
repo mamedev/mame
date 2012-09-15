@@ -5,8 +5,7 @@
 #include "emu.h"
 #include "segapcm.h"
 
-typedef struct _segapcm_state segapcm_state;
-struct _segapcm_state
+struct segapcm_state
 {
 	UINT8  *ram;
 	UINT8 low[16];

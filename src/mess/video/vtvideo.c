@@ -25,8 +25,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _vt_video_t vt_video_t;
-struct _vt_video_t
+struct vt_video_t
 {
 	devcb_resolved_read8		in_ram_func;
 	devcb_resolved_write8		clear_video_interrupt;

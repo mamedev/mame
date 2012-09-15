@@ -38,8 +38,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _mos6530_port mos6530_port;
-struct _mos6530_port
+struct mos6530_port
 {
 	devcb_resolved_read8		in_port_func;
 	devcb_resolved_write8		out_port_func;
@@ -50,8 +49,7 @@ struct _mos6530_port
 };
 
 
-typedef struct _mos6530_state mos6530_state;
-struct _mos6530_state
+struct mos6530_state
 {
 	devcb_resolved_write_line	out_irq_func;
 

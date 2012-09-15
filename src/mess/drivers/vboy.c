@@ -41,8 +41,7 @@ struct _vboy_regs_t
 	UINT32 tcr, wcr, kcr;
 };
 
-typedef struct _vip_regs_t vip_regs_t;
-struct _vip_regs_t
+struct vip_regs_t
 {
 
 	UINT16 INTPND;
@@ -1337,8 +1336,7 @@ static GFXDECODE_START( vboy )
 	GFXDECODE_ENTRY( "pcg",     0x00000, vboy_pcg_8x8,      0, 1 )
 GFXDECODE_END
 
-typedef struct _vboy_pcb  vboy_pcb;
-struct _vboy_pcb
+struct vboy_pcb
 {
 	const char              *pcb_name;
 	int                     pcb_id;

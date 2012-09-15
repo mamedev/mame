@@ -70,8 +70,7 @@ static const char fat32_string[8] = { 'F', 'A', 'T', '3', '2', ' ', ' ', ' ' };
 extern void fat_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info);
 
 
-typedef struct _pc_chd_image_info pc_chd_image_info;
-struct _pc_chd_image_info
+struct pc_chd_image_info
 {
 	struct mess_hard_disk_file hard_disk;
 

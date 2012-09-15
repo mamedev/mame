@@ -57,8 +57,7 @@ sound generator (?), CD40105BE (RCA H 432) and a 74LS222A logic chip.
 #include "audio/t6721.h"
 
 
-typedef struct _t6721_state  t6721_state;
-struct _t6721_state
+struct t6721_state
 {
 	emu_timer *timer;
 

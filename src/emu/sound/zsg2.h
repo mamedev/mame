@@ -10,8 +10,7 @@
 READ16_DEVICE_HANDLER( zsg2_r );
 WRITE16_DEVICE_HANDLER( zsg2_w );
 
-typedef struct _zsg2_interface zsg2_interface;
-struct _zsg2_interface
+struct zsg2_interface
 {
 	const char *samplergn;
 };

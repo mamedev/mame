@@ -19,8 +19,7 @@
  *
  *************************************/
 
-typedef struct _s2636_interface s2636_interface;
-struct _s2636_interface
+struct s2636_interface
 {
 	const char *screen;
 	int        work_ram_size;

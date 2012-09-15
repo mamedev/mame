@@ -60,8 +60,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _dave_interface dave_interface;
-struct _dave_interface
+struct dave_interface
 {
 	devcb_read8 reg_r;
 	devcb_write8 reg_w;

@@ -39,8 +39,7 @@
  *
  *************************************/
 
-typedef struct _dmadac_state dmadac_state;
-struct _dmadac_state
+struct dmadac_state
 {
 	/* sound stream and buffers */
 	sound_stream *	channel;

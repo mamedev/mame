@@ -106,8 +106,7 @@ enum
 	PSOLAR						 /* Pier Solar */
 };
 
-typedef struct _md_pcb  md_pcb;
-struct _md_pcb
+struct md_pcb
 {
 	const char              *pcb_name;
 	int                     pcb_id;

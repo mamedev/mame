@@ -18,8 +18,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _vdc8563_interface vdc8563_interface;
-struct _vdc8563_interface
+struct vdc8563_interface
 {
 	const char         *screen;
 	int                ram16konly;

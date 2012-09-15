@@ -8,8 +8,7 @@
 #include "sound/s2636.h"
 
 
-typedef struct _s2636_sound s2636_sound;
-struct _s2636_sound
+struct s2636_sound
 {
     sound_stream *channel;
     UINT8 reg[1];

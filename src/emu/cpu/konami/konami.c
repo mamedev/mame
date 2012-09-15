@@ -43,8 +43,7 @@
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 /* Konami Registers */
-typedef struct _konami_state konami_state;
-struct _konami_state
+struct konami_state
 {
 	PAIR	pc; 		/* Program counter */
     PAIR    ppc;        /* Previous program counter */

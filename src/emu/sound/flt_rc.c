@@ -1,8 +1,7 @@
 #include "emu.h"
 #include "flt_rc.h"
 
-typedef struct _filter_rc_state filter_rc_state;
-struct _filter_rc_state
+struct filter_rc_state
 {
 	device_t *device;
 	sound_stream *	stream;

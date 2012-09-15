@@ -292,8 +292,7 @@ struct _delay
 };
 
 /* Internal registers */
-typedef struct _hyperstone_state hyperstone_state;
-struct _hyperstone_state
+struct hyperstone_state
 {
 	UINT32	global_regs[32];
 	UINT32	local_regs[64];

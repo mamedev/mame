@@ -108,8 +108,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _adjustment adjustment;
-struct _adjustment
+struct adjustment
 {
 	int		visible;
 	int		lower;

@@ -66,8 +66,7 @@ typedef union
 	UINT8  b[256];
 } internalram;
 
-typedef struct _v25_state_t v25_state_t;
-struct _v25_state_t
+struct v25_state_t
 {
 	internalram ram;
 	offs_t	fetch_xor;

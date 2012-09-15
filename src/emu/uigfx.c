@@ -23,8 +23,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _ui_gfx_state ui_gfx_state;
-struct _ui_gfx_state
+struct ui_gfx_state
 {
 	UINT8			mode;				/* which mode are we in? */
 

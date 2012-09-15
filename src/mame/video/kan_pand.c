@@ -50,8 +50,7 @@
 #include "emu.h"
 #include "video/kan_pand.h"
 
-typedef struct _kaneko_pandora_state  kaneko_pandora_state;
-struct _kaneko_pandora_state
+struct kaneko_pandora_state
 {
 	screen_device *screen;
 	UINT8 *      spriteram;

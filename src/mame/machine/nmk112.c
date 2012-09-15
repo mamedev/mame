@@ -13,8 +13,7 @@
 #define TABLESIZE   0x100
 #define BANKSIZE    0x10000
 
-typedef struct _nmk112_state nmk112_state;
-struct _nmk112_state
+struct nmk112_state
 {
 	/* which chips have their sample address table divided into pages */
 	UINT8 page_mask;

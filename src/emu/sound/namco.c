@@ -50,8 +50,7 @@ typedef struct
 } sound_channel;
 
 
-typedef struct _namco_sound namco_sound;
-struct _namco_sound
+struct namco_sound
 {
 	/* data about the sound system */
 	sound_channel channel_list[MAX_VOICES];

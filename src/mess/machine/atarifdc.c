@@ -22,8 +22,7 @@
 #define VERBOSE_SERIAL	0
 #define VERBOSE_CHKSUM	0
 
-typedef struct _atari_drive atari_drive;
-struct _atari_drive
+struct atari_drive
 {
 	UINT8 *image;		/* malloc'd image */
 	int type;			/* type of image (XFD, ATR, DSK) */
@@ -38,8 +37,7 @@ struct _atari_drive
 	int sectors;		/* total sectors, ie. tracks x heads x spt */
 };
 
-typedef struct _atari_fdc_t atari_fdc_t;
-struct _atari_fdc_t
+struct atari_fdc_t
 {
 	int  serout_count;
 	int  serout_offs;
@@ -87,8 +85,7 @@ INLINE atari_fdc_t *get_safe_token(device_t *device)
  * It is used to determine the format of a XFD image by it's size only
  *****************************************************************************/
 
-typedef struct _dsk_format dsk_format;
-struct _dsk_format
+struct dsk_format
 {
 	UINT8 density;
 	UINT8 tracks;
@@ -108,8 +105,7 @@ struct _dsk_format
 };
 
 /* combined with the size the image should have */
-typedef struct _xfd_format xfd_format;
-struct _xfd_format
+struct xfd_format
 {
 	int size;
 	dsk_format dsk;

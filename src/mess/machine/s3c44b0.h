@@ -63,35 +63,30 @@ extern const device_type S3C44B0;
 typedef UINT32 (*s3c44b0_gpio_port_r_func)( device_t *device, int port);
 typedef void (*s3c44b0_gpio_port_w_func)( device_t *device, int port, UINT32 data);
 
-typedef struct _s3c44b0_interface_gpio s3c44b0_interface_gpio;
-struct _s3c44b0_interface_gpio
+struct s3c44b0_interface_gpio
 {
 	s3c44b0_gpio_port_r_func port_r;
 	s3c44b0_gpio_port_w_func port_w;
 };
 
-typedef struct _s3c44b0_interface_i2c s3c44b0_interface_i2c;
-struct _s3c44b0_interface_i2c
+struct s3c44b0_interface_i2c
 {
 	write_line_device_func scl_w;
 	read_line_device_func sda_r;
 	write_line_device_func sda_w;
 };
 
-typedef struct _s3c44b0_interface_adc s3c44b0_interface_adc;
-struct _s3c44b0_interface_adc
+struct s3c44b0_interface_adc
 {
 	read32_device_func data_r;
 };
 
-typedef struct _s3c44b0_interface_i2s s3c44b0_interface_i2s;
-struct _s3c44b0_interface_i2s
+struct s3c44b0_interface_i2s
 {
 	write16_device_func data_w;
 };
 
-typedef struct _s3c44b0_interface s3c44b0_interface;
-struct _s3c44b0_interface
+struct s3c44b0_interface
 {
 	s3c44b0_interface_gpio gpio;
 	s3c44b0_interface_i2c i2c;

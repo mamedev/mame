@@ -250,8 +250,7 @@ typedef union {
 	float f[4];
 } XMM_REG;
 
-typedef struct _i386_state i386_state;
-struct _i386_state
+struct i386_state
 {
 	I386_GPR reg;
 	I386_SREG sreg[6];

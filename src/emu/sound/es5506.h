@@ -12,8 +12,7 @@
 
 #include "devlegcy.h"
 
-typedef struct _es5505_interface es5505_interface;
-struct _es5505_interface
+struct es5505_interface
 {
 	const char * region0;						/* memory region where the sample ROM lives */
 	const char * region1;						/* memory region where the sample ROM lives */
@@ -53,8 +52,7 @@ extern const device_type ES5506;
 
 
 
-typedef struct _es5506_interface es5506_interface;
-struct _es5506_interface
+struct es5506_interface
 {
 	const char * region0;						/* memory region where the sample ROM lives */
 	const char * region1;						/* memory region where the sample ROM lives */

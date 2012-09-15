@@ -26,22 +26,19 @@ typedef void (*k051316_callback)(running_machine &machine, int *code, int *color
 typedef void (*k056832_callback)(running_machine &machine, int layer, int *code, int *color, int *flags);
 
 
-typedef struct _k007342_interface k007342_interface;
-struct _k007342_interface
+struct k007342_interface
 {
 	int                gfxnum;
 	k007342_callback   callback;
 };
 
-typedef struct _k007420_interface k007420_interface;
-struct _k007420_interface
+struct k007420_interface
 {
 	int                banklimit;
 	k007420_callback   callback;
 };
 
-typedef struct _k052109_interface k052109_interface;
-struct _k052109_interface
+struct k052109_interface
 {
 	const char         *gfx_memory_region;
 	int                gfx_num;
@@ -50,8 +47,7 @@ struct _k052109_interface
 	k052109_callback   callback;
 };
 
-typedef struct _k051960_interface k051960_interface;
-struct _k051960_interface
+struct k051960_interface
 {
 	const char         *gfx_memory_region;
 	int                gfx_num;
@@ -60,8 +56,7 @@ struct _k051960_interface
 	k051960_callback   callback;
 };
 
-typedef struct _k05324x_interface k05324x_interface;
-struct _k05324x_interface
+struct k05324x_interface
 {
 	const char         *gfx_memory_region;
 	int                gfx_num;
@@ -71,8 +66,7 @@ struct _k05324x_interface
 	k05324x_callback   callback;
 };
 
-typedef struct _k053247_interface k053247_interface;
-struct _k053247_interface
+struct k053247_interface
 {
 	const char         *screen;
 	const char         *gfx_memory_region;
@@ -83,8 +77,7 @@ struct _k053247_interface
 	k05324x_callback   callback;
 };
 
-typedef struct _k051316_interface k051316_interface;
-struct _k051316_interface
+struct k051316_interface
 {
 	const char         *gfx_memory_region;
 	int                gfx_num;
@@ -93,14 +86,12 @@ struct _k051316_interface
 	k051316_callback   callback;
 };
 
-typedef struct _k053936_interface k053936_interface;
-struct _k053936_interface
+struct k053936_interface
 {
 	int                wrap, xoff, yoff;
 };
 
-typedef struct _k056832_interface k056832_interface;
-struct _k056832_interface
+struct k056832_interface
 {
 	const char         *gfx_memory_region;
 	int                gfx_num;
@@ -113,22 +104,19 @@ struct _k056832_interface
 	const char         *k055555;	// tbyahhoo uses the k056832 together with a k055555
 };
 
-typedef struct _k054338_interface k054338_interface;
-struct _k054338_interface
+struct k054338_interface
 {
 	const char         *screen;
 	int                alpha_inv;
 	const char         *k055555;
 };
 
-typedef struct _k001006_interface k001006_interface;
-struct _k001006_interface
+struct k001006_interface
 {
 	const char     *gfx_region;
 };
 
-typedef struct _k001005_interface k001005_interface;
-struct _k001005_interface
+struct k001005_interface
 {
 	const char     *screen;
 	const char     *cpu;
@@ -140,8 +128,7 @@ struct _k001005_interface
 	int            gfx_index;
 };
 
-typedef struct _k001604_interface k001604_interface;
-struct _k001604_interface
+struct k001604_interface
 {
 	int            gfx_index_1;
 	int            gfx_index_2;
@@ -151,8 +138,7 @@ struct _k001604_interface
 	int            is_slrasslt;
 };
 
-typedef struct _k037122_interface k037122_interface;
-struct _k037122_interface
+struct k037122_interface
 {
 	const char     *screen;
 	int            gfx_index;

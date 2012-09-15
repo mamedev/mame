@@ -4,8 +4,7 @@
 
 #include "emu.h"
 
-typedef struct _hd63450_interface hd63450_intf;
-struct _hd63450_interface
+struct hd63450_intf
 {
 	const char *cpu_tag;
 	attotime clock[4];

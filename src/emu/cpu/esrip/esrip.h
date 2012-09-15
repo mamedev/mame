@@ -80,8 +80,7 @@ enum
 /***************************************************************************
     CONFIGURATION STRUCTURE
 ***************************************************************************/
-typedef struct _esrip_config_ esrip_config;
-struct _esrip_config_
+struct esrip_config
 {
 	read16_device_func	fdt_r;
 	write16_device_func	fdt_w;

@@ -67,8 +67,7 @@ typedef enum
 } sec_type;
 
 
-typedef struct _amiga_date amiga_date;
-struct _amiga_date
+struct amiga_date
 {
 	UINT32 days;  /* days since 1 jan 78 */
 	UINT32 mins;  /* minutes past midnight */
@@ -76,8 +75,7 @@ struct _amiga_date
 };
 
 
-typedef struct _root_block root_block;
-struct _root_block
+struct root_block
 {
 	UINT32 ht_size;      /* Hash table size in long */
 	UINT32 chksum;       /* Rootblock checksum */
@@ -93,24 +91,21 @@ struct _root_block
 };
 
 
-typedef struct _bitmap_block bitmap_block;
-struct _bitmap_block
+struct bitmap_block
 {
 	UINT32 chksum;      /* checksum, normal algorithm */
 	UINT32 map[MSIZE];  /* bitmap */
 };
 
 
-typedef struct _bitmap_ext_block bitmap_ext_block;
-struct _bitmap_ext_block
+struct bitmap_ext_block
 {
 	UINT32 map[MSIZE];  /* bitmap */
 	UINT32 next;        /* next extension block */
 };
 
 
-typedef struct _file_block file_block;
-struct _file_block
+struct file_block
 {
 	UINT32 header_key;   /* self pointer (to this block) */
 	UINT32 high_seq;     /* number of data block ptr stored here */
@@ -134,8 +129,7 @@ struct _file_block
 };
 
 
-typedef struct _file_ext_block file_ext_block;
-struct _file_ext_block
+struct file_ext_block
 {
 	UINT32 header_key;   /* self pointer (to this block) */
 	UINT32 high_seq;     /* number of data block ptr stored here */
@@ -146,8 +140,7 @@ struct _file_ext_block
 };
 
 
-typedef struct _data_block data_block;
-struct _data_block
+struct data_block
 {
 	UINT32 header_key;     /* self pointer (to this block) */
 	UINT32 seq_num;        /* file data block number */
@@ -158,8 +151,7 @@ struct _data_block
 };
 
 
-typedef struct _dir_block dir_block;
-struct _dir_block
+struct dir_block
 {
 	UINT32 header_key;   /* self pointer (to this block) */
 	UINT32 chksum;       /* same algorithm as rootblock */
@@ -179,8 +171,7 @@ struct _dir_block
 };
 
 
-typedef struct _hardlink_block hardlink_block;
-struct _hardlink_block
+struct hardlink_block
 {
 	UINT32 header_key;   /* self pointer (to this block) */
 	UINT32 chksum;       /* same algorithm as rootblock */
@@ -198,8 +189,7 @@ struct _hardlink_block
 };
 
 
-typedef struct _softlink_block softlink_block;
-struct _softlink_block
+struct softlink_block
 {
 	UINT32 header_key;   /* self pointer (to this block) */
 	UINT32 chksum;       /* same algorithm as rootblock */
@@ -216,8 +206,7 @@ struct _softlink_block
 
 
 /* Basic Amiga floppy disk image info */
-typedef struct _amiga_floppy amiga_floppy;
-struct _amiga_floppy
+struct amiga_floppy
 {
 	imgtool_stream *stream;
 	UINT8 sectors;
@@ -225,8 +214,7 @@ struct _amiga_floppy
 
 
 /* iterator used to walk through directory entries */
-typedef struct _amiga_iterator amiga_iterator;
-struct _amiga_iterator
+struct amiga_iterator
 {
 	unsigned int index;    /* current file index */
 	int block;             /* block number we are iterating */

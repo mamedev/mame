@@ -157,8 +157,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _i8085_state i8085_state;
-struct _i8085_state
+struct i8085_state
 {
 	i8085_config		config;
 

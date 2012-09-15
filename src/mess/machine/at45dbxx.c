@@ -58,8 +58,7 @@ typedef struct
 	UINT32 size, pos;
 } AT45DBXX_IO;
 
-typedef struct _at45dbxx_t at45dbxx_t;
-struct _at45dbxx_t
+struct at45dbxx_t
 {
 	UINT8 *data;
 	UINT32 size;

@@ -41,8 +41,7 @@ typedef void ( *psx_sio_handler )( running_machine &, int );
 #define SIO_CONTROL_DSR_IENA ( 1 << 12 )
 #define SIO_CONTROL_DTR ( 1 << 13 )
 
-typedef struct _psx_sio psx_sio;
-struct _psx_sio
+struct psx_sio
 {
 	UINT32 n_status;
 	UINT32 n_mode;

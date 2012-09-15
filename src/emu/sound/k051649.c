@@ -39,8 +39,7 @@ typedef struct
 	signed char waveram[32];
 } k051649_sound_channel;
 
-typedef struct _k051649_state k051649_state;
-struct _k051649_state
+struct k051649_state
 {
 	k051649_sound_channel channel_list[5];
 

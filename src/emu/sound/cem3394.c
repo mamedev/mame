@@ -103,8 +103,7 @@
 
 
 /* this structure defines the parameters for a channel */
-typedef struct _cem3394_state cem3394_state;
-struct _cem3394_state
+struct cem3394_state
 {
 	sound_stream * stream;			/* our stream */
 	void (*external)(device_t *, int, short *);/* callback to generate external samples */

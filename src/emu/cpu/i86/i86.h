@@ -16,8 +16,7 @@
 #define INPUT_LINE_TMRIN1		24
 
 
-typedef struct _i80186_interface i80186_interface;
-struct _i80186_interface
+struct i80186_interface
 {
 	devcb_write_line		out_tmrout0_func;
 	devcb_write_line		out_tmrout1_func;

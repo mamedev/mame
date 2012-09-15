@@ -82,12 +82,11 @@ struct pit8253_timer
 	UINT32 cycles_to_output;		/* cycles until output callback called */
 };
 
-typedef struct _pit8253_t	pit8253_t;
-struct _pit8253_t
+struct 	pit8253_t
 {
-	const struct pit8253_config *config;
+	const pit8253_config *config;
 	int	device_type;
-	struct pit8253_timer timers[MAX_TIMER];
+	pit8253_timer timers[MAX_TIMER];
 };
 
 #define	CTRL_ACCESS(control)		(((control)	>> 4) &	0x03)
@@ -111,7 +110,7 @@ INLINE pit8253_t *get_safe_token(device_t *device)
 }
 
 
-static struct pit8253_timer	*get_timer(struct _pit8253_t *pit,int which)
+static pit8253_timer	*get_timer(pit8253_t *pit,int which)
 {
 	which &= 3;
 	if (which < MAX_TIMER)
@@ -120,7 +119,7 @@ static struct pit8253_timer	*get_timer(struct _pit8253_t *pit,int which)
 }
 
 
-static int pit8253_gate(struct pit8253_timer *timer)
+static int pit8253_gate(pit8253_timer *timer)
 {
 	if (!timer->in_gate_func.isnull())
 		return timer->in_gate_func();
@@ -159,7 +158,7 @@ static UINT32 adjusted_count(int bcd,UINT16	val)
 /* This function subtracts 1 from timer->value "cycles" times, taking into
    account binary or BCD operation, and wrapping around from 0 to 0xFFFF or
    0x9999 as necessary. */
-static void	decrease_counter_value(struct pit8253_timer	*timer,UINT64 cycles)
+static void	decrease_counter_value(pit8253_timer	*timer,UINT64 cycles)
 {
 	UINT16 value;
 	int units, tens, hundreds, thousands;
@@ -215,7 +214,7 @@ static void	decrease_counter_value(struct pit8253_timer	*timer,UINT64 cycles)
 
 
 /* Counter loading: transfer of a count from the CR to the CE */
-static void load_counter_value(device_t *device, struct pit8253_timer *timer)
+static void load_counter_value(device_t *device, pit8253_timer *timer)
 {
 	timer->value = timer->count;
 	timer->null_count = 1;
@@ -224,7 +223,7 @@ static void load_counter_value(device_t *device, struct pit8253_timer *timer)
 }
 
 
-static void	set_output(device_t *device, struct pit8253_timer *timer,int output)
+static void	set_output(device_t *device, pit8253_timer *timer,int output)
 {
 	if (output != timer->output)
 	{
@@ -236,7 +235,7 @@ static void	set_output(device_t *device, struct pit8253_timer *timer,int output)
 
 /* This emulates timer "timer" for "elapsed_cycles" cycles and assumes no
    callbacks occur during that time. */
-static void	simulate2(device_t *device, struct pit8253_timer *timer, INT64 elapsed_cycles)
+static void	simulate2(device_t *device, pit8253_timer *timer, INT64 elapsed_cycles)
 {
 	UINT32 adjusted_value;
 	int	bcd	= CTRL_BCD(timer->control);
@@ -639,7 +638,7 @@ static void	simulate2(device_t *device, struct pit8253_timer *timer, INT64 elaps
    inaccurate by more than one cycle, and the output changed multiple
    times during the discrepancy. In practice updates should still be O(1).
 */
-static void	simulate(device_t *device, struct pit8253_timer *timer, INT64 elapsed_cycles)
+static void	simulate(device_t *device, pit8253_timer *timer, INT64 elapsed_cycles)
 {
 	if ( elapsed_cycles > 0 )
 		simulate2(device, timer, elapsed_cycles);
@@ -650,7 +649,7 @@ static void	simulate(device_t *device, struct pit8253_timer *timer, INT64 elapse
 
 
 /* This brings timer "timer" up to date */
-static void	update(device_t *device, struct pit8253_timer *timer)
+static void	update(device_t *device, pit8253_timer *timer)
 {
 	/* With the 82C54's maximum clockin of 10MHz, 64 bits is nearly 60,000
        years of time. Should be enough for now. */
@@ -677,7 +676,7 @@ static TIMER_CALLBACK( update_timer_cb )
 {
 	device_t *device = (device_t *)ptr;
 	pit8253_t	*pit8253 = get_safe_token(device);
-	struct pit8253_timer *timer = get_timer(pit8253,param);
+	pit8253_timer *timer = get_timer(pit8253,param);
 
 	LOG2(("pit8253: output_changed(): timer %d\n",param));
 
@@ -688,7 +687,7 @@ static TIMER_CALLBACK( update_timer_cb )
 /* We recycle bit 0 of timer->value to hold the phase in mode 3 when count is
    odd. Since read commands in mode 3 always return even numbers, we need to
    mask this bit off. */
-static UINT16 masked_value(struct pit8253_timer	*timer)
+static UINT16 masked_value(pit8253_timer	*timer)
 {
 	LOG2(("pit8253: masked_value\n"));
 
@@ -705,7 +704,7 @@ static UINT16 masked_value(struct pit8253_timer	*timer)
 READ8_DEVICE_HANDLER( pit8253_r )
 {
 	pit8253_t	*pit8253 = get_safe_token(device);
-	struct pit8253_timer *timer	= get_timer(pit8253,offset);
+	pit8253_timer *timer	= get_timer(pit8253,offset);
 	UINT8	data;
 	UINT16 value;
 
@@ -773,7 +772,7 @@ READ8_DEVICE_HANDLER( pit8253_r )
 
 
 /* Loads a new value from the bus to the count register (CR) */
-static void	load_count(device_t *device, struct pit8253_timer *timer, UINT16 newcount)
+static void	load_count(device_t *device, pit8253_timer *timer, UINT16 newcount)
 {
 	int	mode = CTRL_MODE(timer->control);
 
@@ -806,7 +805,7 @@ static void	load_count(device_t *device, struct pit8253_timer *timer, UINT16 new
 }
 
 
-static void	readback(device_t *device, struct pit8253_timer *timer,int command)
+static void	readback(device_t *device, pit8253_timer *timer,int command)
 {
 	UINT16 value;
 	update(device, timer);
@@ -861,7 +860,7 @@ static void	readback(device_t *device, struct pit8253_timer *timer,int command)
 WRITE8_DEVICE_HANDLER( pit8253_w )
 {
 	pit8253_t	*pit8253 = get_safe_token(device);
-	struct pit8253_timer *timer	= get_timer(pit8253,offset);
+	pit8253_timer *timer	= get_timer(pit8253,offset);
 	int	read_command;
 
 	LOG2(("pit8253_w(): offset=%d data=0x%02x\n", offset, data));
@@ -984,7 +983,7 @@ WRITE8_DEVICE_HANDLER( pit8253_w )
 static void pit8253_gate_w(device_t *device, int gate, int state)
 {
 	pit8253_t	*pit8253 = get_safe_token(device);
-	struct pit8253_timer *timer	= get_timer(pit8253, gate);
+	pit8253_timer *timer	= get_timer(pit8253, gate);
 
 	LOG2(("pit8253_gate_w(): gate=%d state=%d\n", gate, state));
 
@@ -1022,7 +1021,7 @@ WRITE_LINE_DEVICE_HANDLER( pit8253_gate2_w ) { pit8253_gate_w(device, 2, state);
 int	pit8253_get_output(device_t *device, int timerno)
 {
 	pit8253_t	*pit8253 = get_safe_token(device);
-	struct pit8253_timer *timer	= get_timer(pit8253,timerno);
+	pit8253_timer *timer	= get_timer(pit8253,timerno);
 	int	result;
 
 	update(device, timer);
@@ -1036,7 +1035,7 @@ int	pit8253_get_output(device_t *device, int timerno)
 void pit8253_set_clockin(device_t *device, int timerno, double new_clockin)
 {
 	pit8253_t	*pit8253 = get_safe_token(device);
-	struct pit8253_timer *timer	= get_timer(pit8253,timerno);
+	pit8253_timer *timer	= get_timer(pit8253,timerno);
 
 	LOG2(("pit8253_set_clockin(): PIT timer=%d, clockin = %lf\n", timerno,new_clockin));
 
@@ -1049,7 +1048,7 @@ void pit8253_set_clockin(device_t *device, int timerno, double new_clockin)
 static void pit8253_set_clock_signal(device_t *device, int timerno, int state)
 {
 	pit8253_t	*pit8253 = get_safe_token(device);
-	struct pit8253_timer *timer = get_timer(pit8253,timerno);
+	pit8253_timer *timer = get_timer(pit8253,timerno);
 
 	LOG2(("pit8253_set_clock_signal(): PIT timer=%d, state = %d\n", timerno, state));
 
@@ -1077,7 +1076,7 @@ static void common_start( device_t *device, int device_type ) {
 	/* register for state saving */
 	for (timerno = 0; timerno < MAX_TIMER; timerno++)
 	{
-		struct pit8253_timer *timer = get_timer(pit8253, timerno);
+		pit8253_timer *timer = get_timer(pit8253, timerno);
 
 		/* initialize timer */
 		timer->clockin = pit8253->config->timer[timerno].clockin;
@@ -1127,7 +1126,7 @@ static DEVICE_RESET( pit8253 ) {
 
 	for (i = 0; i < MAX_TIMER; i++)
 	{
-		struct pit8253_timer *timer = get_timer(pit,i);
+		pit8253_timer *timer = get_timer(pit,i);
 		/* According to Intel's 8254 docs, the state of a timer is undefined
            until the first mode control word is written. Here we define this
            undefined behaviour */

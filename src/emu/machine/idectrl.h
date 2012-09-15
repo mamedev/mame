@@ -130,8 +130,7 @@ extern const device_type IDE_HARDDISK_IMAGE;
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _ide_config ide_config;
-struct _ide_config
+struct ide_config
 {
 	void	(*interrupt)(device_t *device, int state);
 	const char *bmcpu;		/* name of bus master CPU */

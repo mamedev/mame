@@ -16,8 +16,7 @@
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-typedef struct _namco_62xx_state namco_62xx_state;
-struct _namco_62xx_state
+struct namco_62xx_state
 {
 	device_t* m_cpu;
 	devcb_resolved_read8 m_in[4];

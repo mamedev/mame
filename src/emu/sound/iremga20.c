@@ -45,8 +45,7 @@ struct IremGA20_channel_def
 	UINT32 play;
 };
 
-typedef struct _ga20_state ga20_state;
-struct _ga20_state
+struct ga20_state
 {
 	UINT8 *rom;
 	INT32 rom_size;

@@ -71,8 +71,7 @@
 #include "emu.h"
 #include "machine/mb87078.h"
 
-typedef struct _mb87078_state  mb87078_state;
-struct _mb87078_state
+struct mb87078_state
 {
 	int          gain[4];		/* gain index 0-63,64,65 */
 	int          channel_latch;	/* current channel */

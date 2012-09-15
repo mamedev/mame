@@ -33,8 +33,7 @@ struct _cached_texture
 	rgb_t		data[1];
 };
 
-typedef struct _poly_extra_data poly_extra_data;
-struct _poly_extra_data
+struct poly_extra_data
 {
 	cached_texture *texture;
 	bitmap_ind32 *zbuffer;

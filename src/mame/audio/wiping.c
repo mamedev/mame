@@ -32,8 +32,7 @@ typedef struct
 
 
 
-typedef struct _wiping_sound_state wiping_sound_state;
-struct _wiping_sound_state
+struct wiping_sound_state
 {
 	/* data about the sound system */
 	sound_channel m_channel_list[MAX_VOICES];

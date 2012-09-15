@@ -491,8 +491,7 @@ enum
 ***************************************************************************/
 
 /* PowerPC 4XX-specific serial port state */
-typedef struct _ppc4xx_spu_state ppc4xx_spu_state;
-struct _ppc4xx_spu_state
+struct ppc4xx_spu_state
 {
 	UINT8			regs[9];
 	UINT8			txbuf;
@@ -509,8 +508,7 @@ typedef struct _ppcimp_state ppcimp_state;
 
 
 /* PowerPC state */
-typedef struct _powerpc_state powerpc_state;
-struct _powerpc_state
+struct powerpc_state
 {
 	/* core registers */
 	UINT32			pc;

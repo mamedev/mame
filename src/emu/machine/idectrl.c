@@ -103,8 +103,7 @@
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-typedef struct _ide_device ide_device;
-struct _ide_device
+struct ide_device
 {
 	UINT16			cur_cylinder;
 	UINT8			cur_sector;
@@ -115,8 +114,7 @@ struct _ide_device
 };
 
 
-typedef struct _ide_state ide_state;
-struct _ide_state
+struct ide_state
 {
 	device_t *device;
 

@@ -30,8 +30,7 @@ extern const device_type K053252;
 
 
 
-typedef struct _k053252_interface k053252_interface;
-struct _k053252_interface
+struct k053252_interface
 {
 	const char         *screen;
 	devcb_write_line   int1_en;

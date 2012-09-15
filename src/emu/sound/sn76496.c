@@ -122,8 +122,7 @@
 #define NOISEMODE (R->Register[6]&4)?1:0
 
 
-typedef struct _sn76496_state sn76496_state;
-struct _sn76496_state
+struct sn76496_state
 {
 	sound_stream * Channel;
 	INT32 VolTable[16];	/* volume table (for 4-bit to db conversion)*/

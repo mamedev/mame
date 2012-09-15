@@ -380,8 +380,7 @@
  *
  *************************************/
 
-typedef struct _galileo_timer galileo_timer;
-struct _galileo_timer
+struct galileo_timer
 {
 	emu_timer *		timer;
 	UINT32			count;
@@ -389,8 +388,7 @@ struct _galileo_timer
 };
 
 
-typedef struct _galileo_data galileo_data;
-struct _galileo_data
+struct galileo_data
 {
 	/* raw register data */
 	UINT32			reg[0x1000/4];
@@ -409,8 +407,7 @@ struct _galileo_data
 };
 
 
-typedef struct _widget_data widget_data;
-struct _widget_data
+struct widget_data
 {
 	/* ethernet register address */
 	UINT8			ethernet_addr;

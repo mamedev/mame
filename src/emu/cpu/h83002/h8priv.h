@@ -36,8 +36,7 @@ typedef struct
 	UINT64 timer_cycles;
 } H8S2XXX_TMR;
 
-typedef struct _h83xx_state h83xx_state;
-struct _h83xx_state
+struct h83xx_state
 {
 	// main CPU stuff
 	UINT32 h8err;

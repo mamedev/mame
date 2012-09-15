@@ -6,8 +6,7 @@
 #include "devlegcy.h"
 
 
-typedef struct _vr0_interface vr0_interface;
-struct _vr0_interface
+struct vr0_interface
 {
 	UINT32 RegBase;
 };

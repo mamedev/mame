@@ -77,8 +77,7 @@ enum
 ***************************************************************************/
 
 /* configuration of the DS5002FP */
-typedef struct _ds5002fp_config ds5002fp_config;
-struct _ds5002fp_config
+struct ds5002fp_config
 {
 	UINT8	mcon;					/* bootstrap loader MCON register */
 	UINT8	rpctl;					/* bootstrap loader RPCTL register */

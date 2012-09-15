@@ -32,8 +32,7 @@ should be 312, but 312 = 39*8 so it doesn't look right because a divider by 39 i
 */
 #define CLOCK_DIVIDER (7*6*8)
 
-typedef struct _sp0250_state sp0250_state;
-struct _sp0250_state
+struct sp0250_state
 {
 	INT16 amp;
 	UINT8 pitch;

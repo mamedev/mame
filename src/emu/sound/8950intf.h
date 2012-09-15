@@ -5,8 +5,7 @@
 
 #include "devlegcy.h"
 
-typedef struct _y8950_interface y8950_interface;
-struct _y8950_interface
+struct y8950_interface
 {
 	void (*handler)(device_t *device, int linestate);
 

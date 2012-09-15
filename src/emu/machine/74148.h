@@ -44,8 +44,7 @@
 #include "devlegcy.h"
 
 
-typedef struct _ttl74148_config ttl74148_config;
-struct _ttl74148_config
+struct ttl74148_config
 {
 	void (*output_cb)(device_t *device);
 };

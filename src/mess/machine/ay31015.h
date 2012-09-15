@@ -49,8 +49,7 @@ typedef enum
 } ay31015_output_pin_t;
 
 
-typedef struct _ay31015_config	ay31015_config;
-struct _ay31015_config
+struct 	ay31015_config
 {
 	ay31015_type_t		type;					/* Type of chip */
 	double				transmitter_clock;		/* TCP - pin 40 */

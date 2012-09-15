@@ -41,8 +41,7 @@ enum _cococart_line_value
 };
 typedef enum _cococart_line_value cococart_line_value;
 
-typedef struct _coco_cartridge_line coco_cartridge_line;
-struct _coco_cartridge_line
+struct coco_cartridge_line
 {
 	emu_timer					*timer[TIMER_POOL];
 	int                 		timer_index;

@@ -79,8 +79,7 @@ typedef enum
 } kr2376_output_pin_t;
 
 /* interface */
-typedef struct _kr2376_interface kr2376_interface;
-struct _kr2376_interface
+struct kr2376_interface
 {
 	/* The clock of the chip (Typical 50 kHz) */
 	int clock;

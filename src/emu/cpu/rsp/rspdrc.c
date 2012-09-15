@@ -82,8 +82,7 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 ***************************************************************************/
 
 /* fast RAM info */
-typedef struct _fast_ram_info fast_ram_info;
-struct _fast_ram_info
+struct fast_ram_info
 {
 	offs_t				start;						/* start of the RAM block */
 	offs_t				end;						/* end of the RAM block */
@@ -93,8 +92,7 @@ struct _fast_ram_info
 
 
 /* internal compiler state */
-typedef struct _compiler_state compiler_state;
-struct _compiler_state
+struct compiler_state
 {
 	UINT32				cycles;						/* accumulated cycles */
 	UINT8				checkints;					/* need to check interrupts before next instruction */

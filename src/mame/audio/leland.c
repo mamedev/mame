@@ -184,8 +184,7 @@ struct counter_state
 	UINT8 writebyte;
 };
 
-typedef struct _leland_sound_state leland_sound_state;
-struct _leland_sound_state
+struct leland_sound_state
 {
 	/* 1st gen */
 	UINT8 *m_dac_buffer[2];

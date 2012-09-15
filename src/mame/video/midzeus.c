@@ -33,8 +33,7 @@
  *
  *************************************/
 
-typedef struct _poly_extra_data poly_extra_data;
-struct _poly_extra_data
+struct poly_extra_data
 {
 	const void *	palbase;
 	const void *	texbase;

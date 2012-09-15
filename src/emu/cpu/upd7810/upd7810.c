@@ -408,8 +408,7 @@ STOP            01001000  10111011          12  stop
 #include "debugger.h"
 #include "upd7810.h"
 
-typedef struct _upd7810_state upd7810_state;
-struct _upd7810_state
+struct upd7810_state
 {
 	PAIR	ppc;	/* previous program counter */
 	PAIR	pc; 	/* program counter */

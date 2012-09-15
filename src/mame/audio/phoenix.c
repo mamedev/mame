@@ -60,8 +60,7 @@ struct n_state
 	INT32 lowpass_polybit;
 };
 
-typedef struct _phoenix_sound_state phoenix_sound_state;
-struct _phoenix_sound_state
+struct phoenix_sound_state
 {
 	struct c_state		m_c24_state;
 	struct c_state		m_c25_state;

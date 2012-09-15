@@ -5,8 +5,7 @@
 *************************************************************************/
 
 
-typedef struct _pf_layer_info pf_layer_info;
-struct _pf_layer_info
+struct pf_layer_info
 {
 	tilemap_t *		tmap;
 	UINT16			vram_base;

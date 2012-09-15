@@ -138,8 +138,7 @@ typedef struct _KEYBOARD_INDICATOR_PARAMETERS
 } KEYBOARD_INDICATOR_PARAMETERS, *PKEYBOARD_INDICATOR_PARAMETERS;
 
 
-typedef struct _id_map_entry id_map_entry;
-struct _id_map_entry
+struct id_map_entry
 {
 	id_map_entry *			next;
 	const char *			name;

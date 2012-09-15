@@ -15,8 +15,7 @@
 
 #define SPEAKER_TAG		"speaker"
 
-typedef struct _speaker_interface speaker_interface;
-struct _speaker_interface
+struct speaker_interface
 {
 	int num_level;	/* optional: number of levels (if not two) */
 	const INT16 *levels;	/* optional: pointer to level lookup table */

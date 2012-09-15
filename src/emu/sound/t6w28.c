@@ -37,8 +37,7 @@ Offset 0:
 
 #define STEP 0x10000
 
-typedef struct _t6w28_state t6w28_state;
-struct _t6w28_state
+struct t6w28_state
 {
 	sound_stream * Channel;
 	int SampleRate;

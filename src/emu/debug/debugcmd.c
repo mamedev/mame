@@ -34,16 +34,14 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _global_entry global_entry;
-struct _global_entry
+struct global_entry
 {
 	void *		base;
 	UINT32		size;
 };
 
 
-typedef struct _cheat_map cheat_map;
-struct _cheat_map
+struct cheat_map
 {
 	UINT64		offset;
 	UINT64		first_value;
@@ -53,8 +51,7 @@ struct _cheat_map
 };
 
 
-typedef struct _cheat_system cheat_system;
-struct _cheat_system
+struct cheat_system
 {
 	char		cpu;
 	UINT64		length;
@@ -66,8 +63,7 @@ struct _cheat_system
 };
 
 
-typedef struct _cheat_region_map cheat_region_map;
-struct _cheat_region_map
+struct cheat_region_map
 {
 	UINT64		offset;
 	UINT64		endoffset;

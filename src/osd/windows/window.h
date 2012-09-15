@@ -114,8 +114,7 @@ private:
 };
 
 
-typedef struct _win_draw_callbacks win_draw_callbacks;
-struct _win_draw_callbacks
+struct win_draw_callbacks
 {
 	void (*exit)(void);
 

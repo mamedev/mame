@@ -15,8 +15,7 @@
 
 #define UPD7759_STANDARD_CLOCK		XTAL_640kHz
 
-typedef struct _upd7759_interface upd7759_interface;
-struct _upd7759_interface
+struct upd7759_interface
 {
 	void (*drqcallback)(device_t *device, int param);	/* drq callback (per chip, slave mode only) */
 };

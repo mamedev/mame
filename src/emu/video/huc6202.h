@@ -16,8 +16,7 @@
 	MCFG_DEVICE_CONFIG( _intrf )
 
 
-typedef struct _huc6202_interface huc6202_interface;
-struct _huc6202_interface
+struct huc6202_interface
 {
 	/* First gfx input device */
 	devcb_read16				device_0_next_pixel;

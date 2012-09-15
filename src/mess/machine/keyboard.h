@@ -8,8 +8,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _keyboard_interface keyboard_interface;
-struct _keyboard_interface
+struct keyboard_interface
 {
 	devcb_write8 m_keyboard_cb;
 };
@@ -40,7 +39,7 @@ struct serial_keyboard_interface
 
 class generic_keyboard_device :
 	public device_t,
-	public _keyboard_interface
+	public keyboard_interface
 {
 public:
 	generic_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);

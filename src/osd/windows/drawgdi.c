@@ -57,8 +57,7 @@
 //============================================================
 
 /* gdi_info is the information for the current screen */
-typedef struct _gdi_info gdi_info;
-struct _gdi_info
+struct gdi_info
 {
 	BITMAPINFO				bminfo;
 	RGBQUAD					colors[256];

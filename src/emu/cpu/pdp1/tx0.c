@@ -21,8 +21,7 @@ static void pulse_reset(device_t *device);
 
 
 /* TX-0 Registers */
-typedef struct _tx0_state tx0_state;
-struct _tx0_state
+struct tx0_state
 {
 	const tx0_reset_param_t *iface;
 

@@ -30,8 +30,7 @@
 #define OV 0x20
 #define C  0x10
 
-typedef struct _cp1610_state cp1610_state;
-struct _cp1610_state
+struct cp1610_state
 {
 	UINT16	r[8];	/* registers */
 	UINT8	flags;	/* flags */

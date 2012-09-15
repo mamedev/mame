@@ -13,8 +13,7 @@
 
 #include "includes/atari.h"
 
-typedef struct _gtia_interface gtia_interface;
-struct _gtia_interface
+struct gtia_interface
 {
 	UINT8 (*console_read)(address_space *space);
 	void (*console_write)(address_space *space, UINT8 data);
@@ -24,8 +23,7 @@ struct _gtia_interface
 
 
 /* reading registers */
-typedef struct _gtia_readregs gtia_readregs;
-struct _gtia_readregs
+struct gtia_readregs
 {
 	UINT8	m0pf;		/* d000 missile 0 playfield collisions */
 	UINT8	m1pf;		/* d001 missile 1 playfield collisions */
@@ -59,8 +57,7 @@ struct _gtia_readregs
 };
 
 /* writing registers */
-typedef struct _gtia_writeregs gtia_writeregs;
-struct _gtia_writeregs
+struct gtia_writeregs
 {
 	UINT8	hposp0; 	/* d000 player 0 horz position */
 	UINT8	hposp1; 	/* d001 player 1 horz position */
@@ -97,8 +94,7 @@ struct _gtia_writeregs
 };
 
 /* helpers */
-typedef struct _gtia_helpervars gtia_helpervars;
-struct _gtia_helpervars
+struct gtia_helpervars
 {
 	UINT8	grafp0; 	/* optimized graphics data player 0 */
 	UINT8	grafp1; 	/* optimized graphics data player 1 */
@@ -125,8 +121,7 @@ struct _gtia_helpervars
 	UINT8	vdelay_p3;	/* vertical delay for player 3 */
 };
 
-typedef struct _gtia_struct gtia_struct;
-struct _gtia_struct
+struct gtia_struct
 {
 	gtia_interface intf;
 	gtia_readregs	r;			/* read registers */

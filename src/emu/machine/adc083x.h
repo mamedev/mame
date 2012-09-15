@@ -101,8 +101,7 @@ extern const device_type ADC0838;
 
 typedef double (*adc083x_input_convert_func)(device_t *device, UINT8 input);
 
-typedef struct _adc083x_interface adc083x_interface;
-struct _adc083x_interface
+struct adc083x_interface
 {
 	adc083x_input_convert_func input_callback_r;
 };

@@ -689,8 +689,7 @@ typedef enum
 } hng64trans_t;
 
 
-typedef struct _blit_parameters blit_parameters;
-struct _blit_parameters
+struct blit_parameters
 {
 	bitmap_rgb32 *			bitmap;
 	rectangle			cliprect;

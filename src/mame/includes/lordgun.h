@@ -4,8 +4,7 @@
 
 *************************************************************************/
 
-typedef struct _lordgun_gun_data lordgun_gun_data;
-struct _lordgun_gun_data
+struct lordgun_gun_data
 {
 	int		scr_x,	scr_y;
 	UINT16	hw_x,	hw_y;

@@ -24,8 +24,7 @@ typedef unsigned char UINT8;
 //  TYPE DEFINITIONS
 //============================================================
 
-typedef struct _version_info version_info;
-struct _version_info
+struct version_info
 {
 	int version_major;
 	int version_minor;

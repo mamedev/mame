@@ -21,8 +21,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc_lpt_ack_w );
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _pc_lpt_state pc_lpt_state;
-struct _pc_lpt_state
+struct pc_lpt_state
 {
 	centronics_device *centronics;
 

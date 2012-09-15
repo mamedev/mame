@@ -8,8 +8,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _tc0140syt_interface tc0140syt_interface;
-struct _tc0140syt_interface
+struct tc0140syt_interface
 {
 	const char         *master;
 	const char         *slave;

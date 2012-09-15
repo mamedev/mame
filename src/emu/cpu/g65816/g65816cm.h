@@ -67,8 +67,7 @@ INLINE int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 /* ======================================================================== */
 
 /* CPU Structure */
-typedef struct _g65816i_cpu_struct g65816i_cpu_struct;
-struct _g65816i_cpu_struct
+struct g65816i_cpu_struct
 {
 	uint a;				/* Accumulator */
 	uint b;				/* holds high byte of accumulator */

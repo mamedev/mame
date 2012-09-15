@@ -6,8 +6,7 @@
 #ifndef BFM_DM01
 #define BFM_DM01
 
-typedef struct _bfmdm01_interface bfmdm01_interface;
-struct _bfmdm01_interface
+struct bfmdm01_interface
 {
 	void (*busy_func)(running_machine &machine, int state);
 };

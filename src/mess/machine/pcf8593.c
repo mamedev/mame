@@ -42,8 +42,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _pcf8593_t pcf8593_t;
-struct _pcf8593_t
+struct pcf8593_t
 {
 	UINT8 data[16];
 	int pin_scl, pin_sda, inp;

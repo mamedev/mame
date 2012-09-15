@@ -5,8 +5,7 @@
 
 #include "devlegcy.h"
 
-typedef struct _msm5232_interface msm5232_interface;
-struct _msm5232_interface
+struct msm5232_interface
 {
 	double capacity[8];	/* in Farads, capacitors connected to pins: 24,25,26,27 and 37,38,39,40 */
 	void (*gate_handler)(device_t *device, int state);	/* callback called when the GATE output pin changes state */

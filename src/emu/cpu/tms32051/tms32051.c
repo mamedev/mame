@@ -79,8 +79,7 @@ typedef struct
 	UINT16 pm;
 } ST1;
 
-typedef struct _tms32051_state tms32051_state;
-struct _tms32051_state
+struct tms32051_state
 {
 	UINT16 pc;
 	UINT16 op;

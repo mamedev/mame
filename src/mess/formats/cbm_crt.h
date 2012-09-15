@@ -116,8 +116,7 @@ enum
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef struct _cbm_crt_header cbm_crt_header;
-struct _cbm_crt_header
+struct cbm_crt_header
 {
 	UINT8 signature[16];
 	UINT8 header_length[4];
@@ -130,8 +129,7 @@ struct _cbm_crt_header
 };
 
 
-typedef struct _cbm_crt_chip cbm_crt_chip;
-struct _cbm_crt_chip
+struct cbm_crt_chip
 {
 	UINT8 signature[4];
 	UINT8 packet_length[4];

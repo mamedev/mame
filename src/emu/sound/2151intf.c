@@ -12,8 +12,7 @@
 #include "ym2151.h"
 
 
-typedef struct _ym2151_state ym2151_state;
-struct _ym2151_state
+struct ym2151_state
 {
 	sound_stream *			stream;
 	emu_timer *				timer[2];

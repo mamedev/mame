@@ -17,8 +17,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _beta_disk_state beta_disk_state;
-struct _beta_disk_state
+struct beta_disk_state
 {
 	UINT8 betadisk_status;
 	UINT8 betadisk_active;

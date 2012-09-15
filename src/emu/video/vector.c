@@ -66,8 +66,7 @@
 #define VECTOR_INT_SCALE			(255.0f * 1.5f)
 
 
-typedef struct _vector_texture vector_texture;
-struct _vector_texture
+struct vector_texture
 {
 	render_texture *	texture;
 	bitmap_argb32 *		bitmap;

@@ -22,8 +22,7 @@
 
 typedef void (*omti8621_set_irq)(const running_machine*, int);
 
-typedef struct _omti8621_config omti8621_config;
-struct _omti8621_config {
+struct omti8621_config {
 	omti8621_set_irq set_irq;
 };
 

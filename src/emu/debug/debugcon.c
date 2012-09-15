@@ -36,8 +36,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _debug_command debug_command;
-struct _debug_command
+struct debug_command
 {
 	debug_command *	next;
 	char			command[32];

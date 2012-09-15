@@ -43,8 +43,7 @@
 ***************************************************************************/
 
 /* user-controllable settings for a player */
-typedef struct _crosshair_user_settings crosshair_user_settings;
-struct _crosshair_user_settings
+struct crosshair_user_settings
 {
 	UINT8			used;		/* is used */
 	UINT8			mode;		/* visibility mode */

@@ -62,7 +62,7 @@
 #define IRQ_VOLUME_RAMP   0x40
 #define IRQ_DRAM_TC_DMA   0x80
 
-struct _gus_voice
+struct gus_voice
 {
 	UINT8 voice_ctrl;
 	UINT16 freq_ctrl;
@@ -79,9 +79,7 @@ struct _gus_voice
 	bool rollover;
     INT16 sample;  // current sample data
 };
-typedef struct _gus_voice gus_voice;
-
-struct _gf1_interface
+struct gf1_interface
 {
 	devcb_write_line wave_irq_cb;
 	devcb_write_line ramp_irq_cb;
@@ -93,7 +91,6 @@ struct _gf1_interface
 	devcb_write_line drq2_cb;
 	devcb_write_line nmi_cb;
 };
-typedef struct _gf1_interface gf1_interface;
 
 class gf1_device :
 		public device_t,

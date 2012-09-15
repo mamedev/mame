@@ -41,8 +41,7 @@ struct _XY
 #endif
 };
 
-typedef struct _tms34010_state tms34010_state;
-struct _tms34010_state
+struct tms34010_state
 {
 	UINT32				pc;
 	UINT32				ppc;

@@ -26,8 +26,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _output_notify output_notify;
-struct _output_notify
+struct output_notify
 {
 	output_notify *		next;			/* link to next item */
 	output_notifier_func		notifier;		/* callback to call */
@@ -35,8 +34,7 @@ struct _output_notify
 };
 
 
-typedef struct _output_item output_item;
-struct _output_item
+struct output_item
 {
 	output_item *		next;			/* next item in list */
 	const char *		name;			/* string name of the item */

@@ -16,8 +16,7 @@
 #define   BANK_MASKF    (0xf0<<16)
 #define   BANK_MASKF8   (0xf8<<16)
 
-typedef struct _sega_pcm_interface sega_pcm_interface;
-struct _sega_pcm_interface
+struct sega_pcm_interface
 {
 	int  bank;
 };

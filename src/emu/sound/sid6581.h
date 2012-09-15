@@ -23,8 +23,7 @@ typedef enum
 #define MOS6581_INTERFACE(name) \
 	const sid6581_interface (name) =
 
-typedef struct _sid6581_interface sid6581_interface;
-struct _sid6581_interface
+struct sid6581_interface
 {
 	devcb_read8 in_potx_cb;
 	devcb_read8 in_poty_cb;

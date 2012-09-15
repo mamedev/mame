@@ -64,8 +64,7 @@ static const UINT8 KR2376_KEY_CODES[3][8][11] =
 	}
 };
 
-typedef struct _kr2376_t kr2376_t;
-struct _kr2376_t
+struct kr2376_t
 {
 	const kr2376_interface *intf;
 	int	pins[41];

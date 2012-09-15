@@ -20,8 +20,7 @@
 
 #define OUTPUT_RATE		(48000)
 
-typedef struct _redbaron_sound_state redbaron_sound_state;
-struct _redbaron_sound_state
+struct redbaron_sound_state
 {
 	INT16 *m_vol_lookup;
 

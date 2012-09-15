@@ -71,8 +71,7 @@
 #define CR2_SHIFT_ACCESS 0x02
 #define CR2_PLANE_ACCESS 0x03
 
-typedef struct _screen_data screen_data_t;
-struct _screen_data {
+struct screen_data_t {
 	UINT16 width;
 	UINT16 height;
 	UINT16 buffer_width;

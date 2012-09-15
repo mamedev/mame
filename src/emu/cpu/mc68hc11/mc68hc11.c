@@ -36,8 +36,7 @@ enum
 
 static const int div_tab[4] = { 1, 4, 8, 16 };
 
-typedef struct _hc11_state hc11_state;
-struct _hc11_state
+struct hc11_state
 {
 	union {
 		struct {

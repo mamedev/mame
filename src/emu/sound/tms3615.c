@@ -8,8 +8,7 @@
 
 static const int divisor[TONES] = { 478, 451, 426, 402, 379, 358, 338, 319, 301, 284, 268, 253, 239 };
 
-typedef struct _tms_state tms_state;
-struct _tms_state {
+struct tms_state {
 	sound_stream *channel;	/* returned by stream_create() */
 	int samplerate; 		/* output sample rate */
 	int basefreq;			/* chip's base frequency */

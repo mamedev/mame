@@ -9,8 +9,7 @@
 
 void ym2610_update_request(void *param);
 
-typedef struct _ym2610_interface ym2610_interface;
-struct _ym2610_interface
+struct ym2610_interface
 {
 	void ( *handler )( device_t *device, int irq );	/* IRQ handler for the YM2610 */
 };

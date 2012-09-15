@@ -2,8 +2,7 @@
 #include "flt_vol.h"
 
 
-typedef struct _filter_volume_state filter_volume_state;
-struct _filter_volume_state
+struct filter_volume_state
 {
 	sound_stream *	stream;
 	int				gain;

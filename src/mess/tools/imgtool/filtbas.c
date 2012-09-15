@@ -36,8 +36,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _basictoken_tableent basictoken_tableent;
-struct _basictoken_tableent
+struct basictoken_tableent
 {
 	UINT8 shift;
 	UINT8 base;
@@ -47,8 +46,7 @@ struct _basictoken_tableent
 
 
 
-typedef struct _basictokens basictokens;
-struct _basictokens
+struct basictokens
 {
 	UINT16 baseaddress;
 	unsigned int skip_bytes : 15;

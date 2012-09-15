@@ -72,8 +72,7 @@ INLINE int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 /* ======================================================================== */
 
 /* CPU Structure */
-typedef struct _m37710i_cpu_struct m37710i_cpu_struct;
-struct _m37710i_cpu_struct
+struct m37710i_cpu_struct
 {
 	uint a;			/* Accumulator */
 	uint b;			/* holds high byte of accumulator */

@@ -82,8 +82,7 @@ enum _text_file_type
 typedef enum _text_file_type text_file_type;
 
 
-typedef struct _zlib_data zlib_data;
-struct _zlib_data
+struct zlib_data
 {
 	z_stream		stream;
 	UINT8			buffer[1024];

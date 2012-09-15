@@ -264,16 +264,14 @@ enum
  *
  *************************************/
 
-typedef struct _sdrc_state sdrc_state;
-struct _sdrc_state
+struct sdrc_state
 {
 	UINT16		reg[4];
 	UINT8		seed;
 };
 
 
-typedef struct _dsio_denver_state dsio_state;
-struct _dsio_denver_state
+struct dsio_state
 {
 	UINT16		reg[4];
 	UINT8		start_on_next_write;
@@ -281,8 +279,7 @@ struct _dsio_denver_state
 };
 
 
-typedef struct _hle_transfer_state hle_transfer_state;
-struct _hle_transfer_state
+struct hle_transfer_state
 {
 	UINT8		hle_enabled;
 	INT32		dcs_state;
@@ -298,8 +295,7 @@ struct _hle_transfer_state
 };
 
 
-typedef struct _dcs_state dcs_state;
-struct _dcs_state
+struct dcs_state
 {
 	adsp21xx_device *cpu;
 	address_space *program;

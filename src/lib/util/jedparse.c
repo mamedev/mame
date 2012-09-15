@@ -65,8 +65,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _parse_info parse_info;
-struct _parse_info
+struct parse_info
 {
 	UINT16		checksum;				/* checksum value */
 	UINT32		explicit_numfuses;		/* explicitly specified number of fuses */

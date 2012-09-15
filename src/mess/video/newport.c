@@ -186,8 +186,7 @@ typedef struct
 	UINT32 nPalette[0x10000];
 } CMAP_t;
 
-typedef struct _newport_video_t newport_video_t;
-struct _newport_video_t
+struct newport_video_t
 {
 	VC2_t VC2;
 	XMAP_t XMAP0;

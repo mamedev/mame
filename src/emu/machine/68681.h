@@ -3,8 +3,7 @@
 
 #include "devlegcy.h"
 
-typedef struct _duart68681_config duart68681_config;
-struct _duart68681_config
+struct duart68681_config
 {
 	void (*irq_handler)(device_t *device, int state, UINT8 vector);
 	void (*tx_callback)(device_t *device, int channel, UINT8 data);

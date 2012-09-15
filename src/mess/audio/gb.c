@@ -147,8 +147,7 @@ struct SOUNDC
 };
 
 
-typedef struct _gb_sound_t gb_sound_t;
-struct _gb_sound_t
+struct gb_sound_t
 {
 	sound_stream *channel;
 	int rate;

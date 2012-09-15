@@ -281,8 +281,7 @@ typedef struct _osd_directory osd_directory;
 
 /* osd_directory_entry contains basic information about a file when iterating through */
 /* a directory */
-typedef struct _osd_directory_entry osd_directory_entry;
-struct _osd_directory_entry
+struct osd_directory_entry
 {
 	const char *		name;			/* name of the entry */
 	osd_dir_entry_type	type;			/* type of the entry */

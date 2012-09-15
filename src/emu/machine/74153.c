@@ -37,8 +37,7 @@
 #include "machine/74153.h"
 
 
-typedef struct _ttl74153_state ttl74153_state;
-struct _ttl74153_state
+struct ttl74153_state
 {
 	/* callback */
 	void (*output_cb)(device_t *device);

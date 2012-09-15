@@ -41,8 +41,7 @@ enum
 typedef UINT8 (*ccpu_input_func)(device_t *device);
 typedef void (*ccpu_vector_func)(device_t *device, INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift);
 
-typedef struct _ccpu_config ccpu_config;
-struct _ccpu_config
+struct ccpu_config
 {
 	ccpu_input_func		external_input;		/* if NULL, assume JMI jumper is present */
 	ccpu_vector_func	vector_callback;

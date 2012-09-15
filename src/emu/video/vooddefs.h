@@ -1394,11 +1394,10 @@ static const UINT8 dither_matrix_2x2[16] =
  *************************************/
 
 typedef struct _voodoo_state voodoo_state;
-typedef struct _poly_extra_data poly_extra_data;
+typedef struct poly_extra_data poly_extra_data;
 
 
-typedef struct _rgba rgba;
-struct _rgba
+struct rgba
 {
 #ifdef LSB_FIRST
 	UINT8				b, g, r, a;
@@ -1421,8 +1420,7 @@ union _voodoo_reg
 typedef voodoo_reg rgb_union;
 
 
-typedef struct _voodoo_stats voodoo_stats;
-struct _voodoo_stats
+struct voodoo_stats
 {
 	UINT8				lastkey;				/* last key state */
 	UINT8				display;				/* display stats? */
@@ -1448,8 +1446,7 @@ struct _voodoo_stats
 
 
 /* note that this structure is an even 64 bytes long */
-typedef struct _stats_block stats_block;
-struct _stats_block
+struct stats_block
 {
 	INT32				pixels_in;				/* pixels in statistic */
 	INT32				pixels_out;				/* pixels out statistic */
@@ -1462,8 +1459,7 @@ struct _stats_block
 };
 
 
-typedef struct _fifo_state fifo_state;
-struct _fifo_state
+struct fifo_state
 {
 	UINT32 *			base;					/* base of the FIFO */
 	INT32				size;					/* size of the FIFO */
@@ -1472,8 +1468,7 @@ struct _fifo_state
 };
 
 
-typedef struct _cmdfifo_info cmdfifo_info;
-struct _cmdfifo_info
+struct cmdfifo_info
 {
 	UINT8				enable;					/* enabled? */
 	UINT8				count_holes;			/* count holes? */
@@ -1487,8 +1482,7 @@ struct _cmdfifo_info
 };
 
 
-typedef struct _pci_state pci_state;
-struct _pci_state
+struct pci_state
 {
 	fifo_state			fifo;					/* PCI FIFO */
 	UINT32				init_enable;			/* initEnable value */
@@ -1501,8 +1495,7 @@ struct _pci_state
 };
 
 
-typedef struct _ncc_table ncc_table;
-struct _ncc_table
+struct ncc_table
 {
 	UINT8				dirty;					/* is the texel lookup dirty? */
 	voodoo_reg *		reg;					/* pointer to our registers */
@@ -1515,8 +1508,7 @@ struct _ncc_table
 };
 
 
-typedef struct _tmu_state tmu_state;
-struct _tmu_state
+struct tmu_state
 {
 	UINT8 *				ram;					/* pointer to our RAM */
 	UINT32				mask;					/* mask to apply to pointers */
@@ -1556,8 +1548,7 @@ struct _tmu_state
 };
 
 
-typedef struct _tmu_shared_state tmu_shared_state;
-struct _tmu_shared_state
+struct tmu_shared_state
 {
 	rgb_t				rgb332[256];			/* RGB 3-3-2 lookup table */
 	rgb_t				alpha8[256];			/* alpha 8-bit lookup table */
@@ -1570,8 +1561,7 @@ struct _tmu_shared_state
 };
 
 
-typedef struct _setup_vertex setup_vertex;
-struct _setup_vertex
+struct setup_vertex
 {
 	float				x, y;					/* X, Y coordinates */
 	float				a, r, g, b;				/* A, R, G, B values */
@@ -1581,8 +1571,7 @@ struct _setup_vertex
 };
 
 
-typedef struct _fbi_state fbi_state;
-struct _fbi_state
+struct fbi_state
 {
 	UINT8 *				ram;					/* pointer to frame buffer RAM */
 	UINT32				mask;					/* mask to apply to pointers */
@@ -1650,18 +1639,16 @@ struct _fbi_state
 };
 
 
-typedef struct _dac_state dac_state;
-struct _dac_state
+struct dac_state
 {
 	UINT8				reg[8];					/* 8 registers */
 	UINT8				read_result;			/* pending read result */
 };
 
 
-typedef struct _raster_info raster_info;
-struct _raster_info
+struct raster_info
 {
-	struct _raster_info *next;					/* pointer to next entry with the same hash */
+	raster_info *		next;					/* pointer to next entry with the same hash */
 	poly_draw_scanline_func callback;			/* callback pointer */
 	UINT8				is_generic;				/* TRUE if this is one of the generic rasterizers */
 	UINT8				display;				/* display index */
@@ -1676,7 +1663,7 @@ struct _raster_info
 };
 
 
-struct _poly_extra_data
+struct poly_extra_data
 {
 	voodoo_state *		state;					/* pointer back to the voodoo state */
 	raster_info *		info;					/* pointer to rasterizer information */
@@ -1712,8 +1699,7 @@ struct _poly_extra_data
 };
 
 
-typedef struct _banshee_info banshee_info;
-struct _banshee_info
+struct banshee_info
 {
 	UINT32				io[0x40];				/* I/O registers */
 	UINT32				agp[0x80];				/* AGP registers */

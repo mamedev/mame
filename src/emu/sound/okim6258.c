@@ -21,8 +21,7 @@
 
 static const int dividers[4] = { 1024, 768, 512, 512 };
 
-typedef struct _okim6258_state okim6258_state;
-struct _okim6258_state
+struct okim6258_state
 {
 	UINT8  status;
 

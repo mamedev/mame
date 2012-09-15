@@ -9,8 +9,7 @@
 
 #define TIMER_RATE (4096/4)
 
-typedef struct _trackfld_audio_state trackfld_audio_state;
-struct _trackfld_audio_state
+struct trackfld_audio_state
 {
 	/* sound-related */
 	int      m_last_addr;

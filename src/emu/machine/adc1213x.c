@@ -20,8 +20,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _adc12138_state adc12138_state;
-struct _adc12138_state
+struct adc12138_state
 {
 	adc1213x_input_convert_func input_callback_r;
 

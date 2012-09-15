@@ -13,8 +13,7 @@
 
 #define BASE_SHIFT	16
 
-typedef struct _k053260_channel k053260_channel;
-struct _k053260_channel
+struct k053260_channel
 {
 	UINT32		rate;
 	UINT32		size;
@@ -29,8 +28,7 @@ struct _k053260_channel
 	int			ppcm_data;
 };
 
-typedef struct _k053260_state k053260_state;
-struct _k053260_state
+struct k053260_state
 {
 	sound_stream *				channel;
 	int							mode;

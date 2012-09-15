@@ -97,8 +97,7 @@ struct upd71071_reg
 	UINT8 mask;
 };
 
-typedef struct _upd71071_t upd71071_t;
-struct _upd71071_t
+struct upd71071_t
 {
 	struct upd71071_reg reg;
 	int selected_channel;

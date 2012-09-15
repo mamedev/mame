@@ -296,8 +296,7 @@ static READ8_HANDLER( bbsb_bankh_r )
 }
 #endif
 
-typedef struct _a800_pcb  a800_pcb;
-struct _a800_pcb
+struct a800_pcb
 {
 	const char              *pcb_name;
 	int                     pcb_id;

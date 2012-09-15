@@ -34,8 +34,7 @@ extern const device_type MEA8000;
 
 /* ---------- configuration ------------ */
 
-typedef struct _mea8000_interface mea8000_interface;
-struct _mea8000_interface
+struct mea8000_interface
 {
 	/* output channel */
 	const char *           channel;

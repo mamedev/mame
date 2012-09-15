@@ -77,8 +77,7 @@
 #define LINK_SLACK_B ((LINK_SLACK / 3) + 1)
 
 
-typedef struct _buf_t buf_t;
-struct _buf_t
+struct buf_t
 {
 	volatile UINT8 data;
 	volatile UINT8 stat;
@@ -86,8 +85,7 @@ struct _buf_t
 	volatile int data_cnt;
 };
 
-typedef struct _shmem_t shmem_t;
-struct _shmem_t
+struct shmem_t
 {
 	volatile INT32	lock;
 	buf_t				buf[2];
@@ -95,8 +93,7 @@ struct _shmem_t
 
 typedef struct _osd_shared_mem osd_shared_mem;
 
-typedef struct _gaelco_serial_state gaelco_serial_state;
-struct _gaelco_serial_state
+struct gaelco_serial_state
 {
 	device_t *m_device;
 	devcb_resolved_write_line m_irq_func;

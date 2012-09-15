@@ -37,8 +37,7 @@
     STRUCTURES & TYPEDEFS
 ***************************************************************************/
 
-typedef struct _mb88_state mb88_state;
-struct _mb88_state
+struct mb88_state
 {
 	UINT8	PC; 	/* Program Counter: 6 bits */
 	UINT8	PA; 	/* Page Address: 4 bits */

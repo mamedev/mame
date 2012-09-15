@@ -9,8 +9,7 @@
 
 #include "devlegcy.h"
 
-typedef struct _k007232_interface k007232_interface;
-struct _k007232_interface
+struct k007232_interface
 {
 	void (*portwritehandler)(device_t *, int);
 };

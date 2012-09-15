@@ -7,8 +7,7 @@
 
 void ym2612_update_request(void *param);
 
-typedef struct _ym2612_interface ym2612_interface;
-struct _ym2612_interface
+struct ym2612_interface
 {
 	void (*handler)(device_t *device, int irq);
 };
@@ -55,8 +54,7 @@ extern const device_type YM2612;
 
 
 
-typedef struct _ym3438_interface ym3438_interface;
-struct _ym3438_interface
+struct ym3438_interface
 {
 	void (*handler)(device_t *device, int irq);
 };

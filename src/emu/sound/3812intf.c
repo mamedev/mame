@@ -22,8 +22,7 @@
 #include "sound/fmopl.h"
 
 
-typedef struct _ym3812_state ym3812_state;
-struct _ym3812_state
+struct ym3812_state
 {
 	sound_stream *	stream;
 	emu_timer *		timer[2];

@@ -9,8 +9,7 @@
 #define VERBOSE (0)
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-typedef struct _st0016_state st0016_state;
-struct _st0016_state
+struct st0016_state
 {
 	sound_stream * stream;
 	UINT8 **sound_ram;

@@ -88,8 +88,7 @@ static int proximity_out_type  = INVALID_EVENT_TYPE;
 //============================================================
 
 // state information for a keyboard
-typedef struct _keyboard_state keyboard_state;
-struct _keyboard_state
+struct keyboard_state
 {
 	INT32	state[0x3ff];                               	// must be INT32!
 	INT8	oldkey[MAX_KEYS];
@@ -98,8 +97,7 @@ struct _keyboard_state
 
 
 // state information for a mouse
-typedef struct _mouse_state mouse_state;
-struct _mouse_state
+struct mouse_state
 {
 	INT32 lX, lY;
 	INT32 buttons[MAX_BUTTONS];
@@ -107,8 +105,7 @@ struct _mouse_state
 
 
 // state information for a joystick; DirectInput state must be first element
-typedef struct _joystick_state joystick_state;
-struct _joystick_state
+struct joystick_state
 {
 	SDL_Joystick *device;
 	INT32 axes[MAX_AXES];
@@ -119,8 +116,7 @@ struct _joystick_state
 
 #if (USE_XINPUT)
 // state information for a lightgun
-typedef struct _lightgun_state lightgun_state;
-struct _lightgun_state
+struct lightgun_state
 {
     INT32 lX, lY;
     INT32 buttons[MAX_BUTTONS];
@@ -131,8 +127,7 @@ struct _lightgun_state
 #endif
 
 // generic device information
-typedef struct _device_info device_info;
-struct _device_info
+struct device_info
 {
 	// device information
 	device_info **			head;
@@ -187,8 +182,7 @@ static device_info *		joystick_list;
 
 // joystick mapper
 
-typedef struct _device_map_t device_map_t;
-struct _device_map_t
+struct device_map_t
 {
 	struct {
 		char	*name;
@@ -236,8 +230,7 @@ static device_info *generic_device_find_index(device_info *devlist_head, int ind
 //============================================================
 
 // master keyboard translation table
-typedef struct _kt_table kt_table;
-struct _kt_table {
+struct kt_table {
 	input_item_id	mame_key;
 	INT32			sdl_key;
 	//const char *  vkey;
@@ -503,8 +496,7 @@ static kt_table sdl_key_trans_table[] =
 };
 #endif
 
-typedef struct _key_lookup_table key_lookup_table;
-struct _key_lookup_table
+struct key_lookup_table
 {
 	int code;
 	const char *name;

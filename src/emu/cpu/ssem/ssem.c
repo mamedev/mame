@@ -14,8 +14,7 @@ CPU_DISASSEMBLE( ssem );
 #define SSEM_DISASM_ON_UNIMPL           0
 #define SSEM_DUMP_MEM_ON_UNIMPL         0
 
-typedef struct _ssem_state ssem_state;
-struct _ssem_state
+struct ssem_state
 {
     UINT32 pc;
     UINT32 a;

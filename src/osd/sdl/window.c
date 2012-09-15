@@ -100,8 +100,7 @@ static SDL_threadID window_threadid;
 
 static sdl_draw_info draw;
 
-typedef struct _worker_param worker_param;
-struct _worker_param {
+struct worker_param {
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 	sdl_window_info *window;
 	render_primitive_list *list;

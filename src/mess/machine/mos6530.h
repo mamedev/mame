@@ -69,8 +69,7 @@ extern const device_type MOS6530;
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _mos6530_interface mos6530_interface;
-struct _mos6530_interface
+struct mos6530_interface
 {
 	devcb_read8				in_pa_func;
 	devcb_write8			out_pa_func;

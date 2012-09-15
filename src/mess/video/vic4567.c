@@ -31,8 +31,7 @@ struct vic3_sprite
 	UINT8 bitmap[8][SPRITE_BASE_X_SIZE * 2 / 8 + 1  /*for simplier sprite collision detection*/];
 };
 
-typedef struct _vic3_state  vic3_state;
-struct _vic3_state
+struct vic3_state
 {
 	vic3_type  type;
 

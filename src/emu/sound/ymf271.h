@@ -6,8 +6,7 @@
 #include "devlegcy.h"
 
 
-typedef struct _ymf271_interface ymf271_interface;
-struct _ymf271_interface
+struct ymf271_interface
 {
 	devcb_read8 ext_read;		/* external memory read */
 	devcb_write8 ext_write;	/* external memory write */

@@ -5,8 +5,7 @@
 
 #include "devlegcy.h"
 
-typedef struct _namco_interface namco_interface;
-struct _namco_interface
+struct namco_interface
 {
 	int voices;		/* number of voices */
 	int stereo;		/* set to 1 to indicate stereo (e.g., System 1) */

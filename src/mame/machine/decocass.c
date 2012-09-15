@@ -1869,8 +1869,7 @@ typedef enum _tape_byte tape_byte;
 
 
 /* state of the tape */
-typedef struct _tape_state tape_state;
-struct _tape_state
+struct tape_state
 {
 	running_machine *	machine;			/* pointer back to the machine */
 	emu_timer *			timer;				/* timer for running the tape */

@@ -111,8 +111,7 @@ $8000 - $ffff   ROM
 
 /********************************************************************************************/
 
-typedef struct _renegade_adpcm_state renegade_adpcm_state;
-struct _renegade_adpcm_state
+struct renegade_adpcm_state
 {
 	oki_adpcm_state m_adpcm;
 	sound_stream *m_stream;

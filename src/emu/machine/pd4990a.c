@@ -48,8 +48,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _upd4990a_state upd4990a_state;
-struct _upd4990a_state
+struct upd4990a_state
 {
 	int seconds;	/* seconds BCD */
 	int minutes;	/* minutes BCD */

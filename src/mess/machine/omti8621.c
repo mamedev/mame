@@ -128,8 +128,7 @@ enum {
 #define OMTI_CMD_READ_CONFIGURATION 0xec
 #define OMTI_CMD_INVALID_COMMAND 0xff
 
-typedef struct _disk_data disk_data;
-struct _disk_data
+struct disk_data
 {
 	device_t *device;
     UINT16 type;
@@ -148,8 +147,7 @@ struct _disk_data
 	UINT8 esdi_defect_list[256];
 };
 
-typedef struct _omti8621_state omti8621_state;
-struct _omti8621_state {
+struct omti8621_state {
 	device_t *device;
 	omti8621_set_irq irq_handler;
 

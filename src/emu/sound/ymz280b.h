@@ -13,8 +13,7 @@
 #include "devlegcy.h"
 
 
-typedef struct _ymz280b_interface ymz280b_interface;
-struct _ymz280b_interface
+struct ymz280b_interface
 {
 	void (*irq_callback)(device_t *device, int state);	/* irq callback */
 	devcb_read8 ext_read;			/* external RAM read */

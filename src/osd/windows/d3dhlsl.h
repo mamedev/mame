@@ -52,8 +52,7 @@
 
 /* hlsl_options is the information about runtime-mutable Direct3D HLSL options */
 /* in the future this will be moved into an OSD/emu shared buffer */
-typedef struct _hlsl_options hlsl_options;
-struct _hlsl_options
+struct hlsl_options
 {
 	bool					params_dirty;
 	float					shadow_mask_alpha;

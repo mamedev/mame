@@ -52,8 +52,7 @@ PALETTE_INIT( sega315_5378 );
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _sega315_5124_interface sega315_5124_interface;
-struct _sega315_5124_interface
+struct sega315_5124_interface
 {
 	bool               m_is_pal;             /* false = NTSC, true = PAL */
 	const char         *m_screen_tag;

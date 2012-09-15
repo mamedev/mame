@@ -177,8 +177,7 @@ enum
 
 
 /* Configuration structure */
-typedef struct _tms34010_display_params tms34010_display_params;
-struct _tms34010_display_params
+struct tms34010_display_params
 {
 	UINT16	vcount;								/* most recent VCOUNT */
 	UINT16	veblnk, vsblnk;						/* start/end of VBLANK */
@@ -189,8 +188,7 @@ struct _tms34010_display_params
 };
 
 
-typedef struct _tms34010_config tms34010_config;
-struct _tms34010_config
+struct tms34010_config
 {
 	UINT8	halt_on_reset;						/* /HCS pin, which determines HALT state after reset */
 	const char *screen_tag;						/* the screen operated on */

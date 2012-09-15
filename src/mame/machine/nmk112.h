@@ -13,8 +13,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _nmk112_interface nmk112_interface;
-struct _nmk112_interface
+struct nmk112_interface
 {
 	const char *rgn0, *rgn1;
 	UINT8 disable_page_mask;

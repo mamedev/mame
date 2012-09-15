@@ -54,8 +54,7 @@ enum
 	LH5801_IRQ_STATE
 };
 
-typedef struct _lh5801_state lh5801_state;
-struct _lh5801_state
+struct lh5801_state
 {
 	const lh5801_cpu_core *config;
 	legacy_cpu_device *device;

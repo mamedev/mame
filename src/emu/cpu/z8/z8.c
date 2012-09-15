@@ -156,8 +156,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _z8_state z8_state;
-struct _z8_state
+struct z8_state
 {
     address_space *program;
     direct_read_data *direct;
@@ -541,8 +540,7 @@ INSTRUCTION( illegal )
 
 typedef void (*z8_opcode_func) (z8_state *cpustate, UINT8 opcode, int *cycles);
 
-typedef struct _z8_opcode_map z8_opcode_map;
-struct _z8_opcode_map
+struct z8_opcode_map
 {
 	z8_opcode_func	function;
 	int				execution_cycles;

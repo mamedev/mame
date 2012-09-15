@@ -21,8 +21,7 @@
 #define	SAMPLE_GAIN				10000.0
 
 
-typedef struct _hc55516_state hc55516_state;
-struct _hc55516_state
+struct hc55516_state
 {
 	sound_stream *channel;
 	int		clock;		/* 0 = software driven, non-0 = oscillator */

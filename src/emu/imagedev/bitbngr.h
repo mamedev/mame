@@ -65,8 +65,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _bitbanger_config bitbanger_config;
-struct _bitbanger_config
+struct bitbanger_config
 {
 	/* callback to driver */
 	devcb_write_line		m_input_callback;
@@ -85,7 +84,7 @@ struct _bitbanger_config
 
 class bitbanger_device :	public device_t,
 							public device_image_interface,
-							public _bitbanger_config
+							public bitbanger_config
 {
 public:
 	// construction/destruction

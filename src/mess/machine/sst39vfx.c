@@ -18,8 +18,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _sst39vfx_t sst39vfx_t;
-struct _sst39vfx_t
+struct sst39vfx_t
 {
 	UINT8 *data;
 	UINT32 size;

@@ -32,8 +32,7 @@ extern const device_type MC6846;
 
 /* ---------- configuration ------------ */
 
-typedef struct _mc6846_interface mc6846_interface;
-struct _mc6846_interface
+struct mc6846_interface
 {
   /* CPU write to the outside through chip */
   write8_device_func out_port_func;  /* 8-bit output */

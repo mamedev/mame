@@ -112,8 +112,7 @@ enum
 //============================================================
 
 // state information for a keyboard; DirectInput state must be first element
-typedef struct _keyboard_state keyboard_state;
-struct _keyboard_state
+struct keyboard_state
 {
 	UINT8					state[MAX_KEYS];
 	INT8					oldkey[MAX_KEYS];
@@ -122,8 +121,7 @@ struct _keyboard_state
 
 
 // state information for a mouse; DirectInput state must be first element
-typedef struct _mouse_state mouse_state;
-struct _mouse_state
+struct mouse_state
 {
 	DIMOUSESTATE2			state;
 	LONG					raw_x, raw_y, raw_z;
@@ -131,8 +129,7 @@ struct _mouse_state
 
 
 // state information for a joystick; DirectInput state must be first element
-typedef struct _joystick_state joystick_state;
-struct _joystick_state
+struct joystick_state
 {
 	DIJOYSTATE				state;
 	LONG					rangemin[8];
@@ -141,8 +138,7 @@ struct _joystick_state
 
 
 // DirectInput-specific information about a device
-typedef struct _dinput_device_info dinput_device_info;
-struct _dinput_device_info
+struct dinput_device_info
 {
 	LPDIRECTINPUTDEVICE		device;
 	LPDIRECTINPUTDEVICE2	device2;
@@ -152,8 +148,7 @@ struct _dinput_device_info
 
 
 // RawInput-specific information about a device
-typedef struct _rawinput_device_info rawinput_device_info;
-struct _rawinput_device_info
+struct rawinput_device_info
 {
 	HANDLE					device;
 };

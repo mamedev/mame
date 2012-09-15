@@ -52,8 +52,7 @@
 
  */
 
-typedef struct _msm5205_state msm5205_state;
-struct _msm5205_state
+struct msm5205_state
 {
 	const msm5205_interface *intf;
 	device_t *device;

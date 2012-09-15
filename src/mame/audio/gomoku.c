@@ -29,8 +29,7 @@ typedef struct
 } sound_channel;
 
 
-typedef struct _gomoku_sound_state gomoku_sound_state;
-struct _gomoku_sound_state
+struct gomoku_sound_state
 {
 	/* data about the sound system */
 	sound_channel m_channel_list[MAX_VOICES];

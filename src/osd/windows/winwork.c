@@ -106,8 +106,7 @@ INLINE void YieldProcessor(void)
 //  TYPE DEFINITIONS
 //============================================================
 
-typedef struct _scalable_lock scalable_lock;
-struct _scalable_lock
+struct scalable_lock
 {
 #if USE_SCALABLE_LOCKS
    struct
@@ -122,8 +121,7 @@ struct _scalable_lock
 };
 
 
-typedef struct _work_thread_info work_thread_info;
-struct _work_thread_info
+struct work_thread_info
 {
 	osd_work_queue *	queue;			// pointer back to the queue
 	HANDLE				handle;			// handle to the thread

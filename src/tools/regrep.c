@@ -84,8 +84,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _summary_file summary_file;
-struct _summary_file
+struct summary_file
 {
     summary_file *  next;
     char            name[20];
@@ -98,8 +97,7 @@ struct _summary_file
 };
 
 
-typedef struct _summary_list summary_list;
-struct _summary_list
+struct summary_list
 {
     summary_list *  next;
     summary_file *  files;

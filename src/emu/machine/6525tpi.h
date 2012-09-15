@@ -34,8 +34,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _tpi6525_interface tpi6525_interface;
-struct _tpi6525_interface
+struct tpi6525_interface
 {
 	devcb_write_line	out_irq_func;
 

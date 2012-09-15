@@ -21,8 +21,7 @@
 typedef int (*deco16_bank_cb)( const int bank );
 
 
-typedef struct _deco16ic_interface deco16ic_interface;
-struct _deco16ic_interface
+struct deco16ic_interface
 {
 	const char         *screen;
 	int                split;

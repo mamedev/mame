@@ -36,8 +36,7 @@
 static int count = 0;
 #endif
 
-typedef struct _poly_extra_data poly_extra_data;
-struct _poly_extra_data
+struct poly_extra_data
 {
 	UINT32 color;
 	int texture_x, texture_y;

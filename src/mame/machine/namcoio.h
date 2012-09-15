@@ -7,8 +7,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _namcoio_interface namcoio_interface;
-struct _namcoio_interface
+struct namcoio_interface
 {
 	devcb_read8 in[4];
 	devcb_write8 out[2];

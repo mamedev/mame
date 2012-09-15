@@ -79,8 +79,7 @@
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 /* 6809 Registers */
-typedef struct _m68_state_t m68_state_t;
-struct _m68_state_t
+struct m68_state_t
 {
 	PAIR	pc; 		/* Program counter */
 	PAIR	ppc;		/* Previous program counter */

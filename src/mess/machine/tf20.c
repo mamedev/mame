@@ -30,8 +30,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _tf20_state tf20_state;
-struct _tf20_state
+struct tf20_state
 {
 	ram_device *ram;
 	device_t *upd765a;

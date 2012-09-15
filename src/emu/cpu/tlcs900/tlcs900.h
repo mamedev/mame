@@ -37,8 +37,7 @@ enum
 };
 
 
-typedef struct _tlcs900_interface tlcs900_interface;
-struct _tlcs900_interface
+struct tlcs900_interface
 {
 	devcb_write8	to1;
 	devcb_write8	to3;

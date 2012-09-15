@@ -67,8 +67,7 @@
 
 
 
-typedef struct _pic16c5x_state pic16c5x_state;
-struct _pic16c5x_state
+struct pic16c5x_state
 {
 	/******************** CPU Internal Registers *******************/
 	UINT16	PC;
@@ -117,8 +116,7 @@ INLINE pic16c5x_state *get_safe_token(device_t *device)
 
 
 /* opcode table entry */
-typedef struct _pic16c5x_opcode pic16c5x_opcode;
-struct _pic16c5x_opcode
+struct pic16c5x_opcode
 {
 	UINT8	cycles;
 	void	(*function)(pic16c5x_state *);

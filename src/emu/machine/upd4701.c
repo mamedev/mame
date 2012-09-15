@@ -15,8 +15,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _upd4701_state upd4701_state;
-struct _upd4701_state
+struct upd4701_state
 {
 	int cs;
 	int xy;

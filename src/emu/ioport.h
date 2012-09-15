@@ -685,7 +685,7 @@ class ioport_field;
 struct ioport_field_live;
 class ioport_manager;
 class emu_timer;
-typedef struct _xml_data_node xml_data_node;
+struct xml_data_node;
 class analog_field;
 
 // constructor function pointer

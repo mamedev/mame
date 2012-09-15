@@ -71,8 +71,7 @@ int osd_num_processors = 0;
 //  TYPE DEFINITIONS
 //============================================================
 
-typedef struct _work_thread_info work_thread_info;
-struct _work_thread_info
+struct work_thread_info
 {
 	osd_work_queue *	queue;			// pointer back to the queue
 	osd_thread *		handle;			// handle to the thread

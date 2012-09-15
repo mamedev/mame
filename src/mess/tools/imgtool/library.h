@@ -241,8 +241,7 @@ struct _imgtool_class
 
 
 
-typedef struct _imgtool_partition_info imgtool_partition_info;
-struct _imgtool_partition_info
+struct imgtool_partition_info
 {
 	imgtool_get_info get_info;
 	UINT64 base_block;
@@ -334,8 +333,7 @@ char *imgtool_temp_str(void);
 
 
 
-typedef struct _imgtool_module imgtool_module;
-struct _imgtool_module
+struct imgtool_module
 {
 	imgtool_module *previous;
 	imgtool_module *next;

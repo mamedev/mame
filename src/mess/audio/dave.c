@@ -28,8 +28,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _dave_t dave_t;
-struct _dave_t
+struct dave_t
 {
 	devcb_resolved_read8 reg_r;
 	devcb_resolved_write8 reg_w;

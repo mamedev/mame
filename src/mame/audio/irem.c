@@ -11,8 +11,7 @@
 #include "sound/discrete.h"
 #include "audio/irem.h"
 
-typedef struct _irem_audio_state irem_audio_state;
-struct _irem_audio_state
+struct irem_audio_state
 {
 	UINT8                m_port1;
 	UINT8                m_port2;

@@ -99,8 +99,7 @@ typedef struct {
     int count;
 } LYNX_AUDIO;
 
-typedef struct _lynx_sound_state lynx_sound_state;
-struct _lynx_sound_state
+struct lynx_sound_state
 {
 	sound_stream *mixer_channel;
 	float usec_per_sample;

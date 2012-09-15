@@ -10,8 +10,7 @@
 
 */
 
-typedef struct _se3208_state_t se3208_state_t;
-struct _se3208_state_t
+struct se3208_state_t
 {
 	//GPR
 	UINT32 R[8];

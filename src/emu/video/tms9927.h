@@ -73,8 +73,7 @@ extern const device_type CRT5057;
 
 
 /* interface */
-typedef struct _tms9927_interface tms9927_interface;
-struct _tms9927_interface
+struct tms9927_interface
 {
 	const char *screen_tag;			/* screen we are acting on */
 	int hpixels_per_column;			/* number of pixels per video memory address */

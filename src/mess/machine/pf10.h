@@ -17,8 +17,7 @@
 ***************************************************************************/
 
 #if 0
-typedef struct _pf10_interface pf10_interface;
-struct _pf10_interface
+struct pf10_interface
 {
 };
 #endif

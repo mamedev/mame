@@ -349,8 +349,7 @@ public:
 	DECLARE_MACHINE_RESET(mtnew);
 };
 
-typedef struct _megadriv_cart  megadriv_cart;
-struct _megadriv_cart
+struct megadriv_cart
 {
 	int type;
 

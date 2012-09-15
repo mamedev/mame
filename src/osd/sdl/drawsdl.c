@@ -46,8 +46,7 @@ typedef struct _sdl_scale_mode sdl_scale_mode;
 #endif
 
 /* sdl_info is the information about SDL for the current screen */
-typedef struct _sdl_info sdl_info;
-struct _sdl_info
+struct sdl_info
 {
 	INT32				blittimer;
 	UINT32				extra_flags;

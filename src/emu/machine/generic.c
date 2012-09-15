@@ -28,7 +28,7 @@ static void counters_save(running_machine &machine, int config_type, xml_data_no
     TYPE DEFINITIONS
 ***************************************************************************/
 
-struct _generic_machine_private
+struct generic_machine_private
 {
 	/* tickets and coin counters */
 	UINT32		dispensed_tickets;

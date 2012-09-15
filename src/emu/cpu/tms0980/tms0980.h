@@ -9,8 +9,7 @@ enum {
 };
 
 
-typedef struct _tms0980_config tms0980_config;
-struct _tms0980_config {
+struct tms0980_config {
 	/* O-output PLA configuration */
 	struct {
 		UINT8	value;

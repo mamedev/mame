@@ -167,8 +167,7 @@ typedef enum _mips3_flavor mips3_flavor;
 ***************************************************************************/
 
 /* MIPS3 TLB entry */
-typedef struct _mips3_tlb_entry mips3_tlb_entry;
-struct _mips3_tlb_entry
+struct mips3_tlb_entry
 {
 	UINT64			page_mask;
 	UINT64			entry_hi;
@@ -181,8 +180,7 @@ typedef struct _mips3imp_state mips3imp_state;
 
 
 /* MIPS3 state */
-typedef struct _mips3_state mips3_state;
-struct _mips3_state
+struct mips3_state
 {
 	/* core registers */
 	UINT32			pc;

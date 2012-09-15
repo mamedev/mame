@@ -129,8 +129,7 @@ extern offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op);
 ***************************************************************************/
 
 /* fast RAM info */
-typedef struct _fast_ram_info fast_ram_info;
-struct _fast_ram_info
+struct fast_ram_info
 {
 	offs_t				start;						/* start of the RAM block */
 	offs_t				end;						/* end of the RAM block */
@@ -140,8 +139,7 @@ struct _fast_ram_info
 
 
 /* hotspot info */
-typedef struct _hotspot_info hotspot_info;
-struct _hotspot_info
+struct hotspot_info
 {
 	offs_t				pc;							/* PC to consider */
 	UINT32				opcode;						/* required opcode at that PC */
@@ -150,8 +148,7 @@ struct _hotspot_info
 
 
 /* internal compiler state */
-typedef struct _compiler_state compiler_state;
-struct _compiler_state
+struct compiler_state
 {
 	UINT32				cycles;						/* accumulated cycles */
 	UINT8				checkints;					/* need to check interrupts before next instruction */

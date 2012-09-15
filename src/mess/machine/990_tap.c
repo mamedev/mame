@@ -44,8 +44,7 @@ typedef struct tape_unit_t
 	unsigned int wp : 1;	/* TRUE if tape is write-protected */
 } tape_unit_t;
 
-typedef struct _tap_990_t tap_990_t;
-struct _tap_990_t
+struct tap_990_t
 {
 	UINT16 w[8];
 
@@ -54,8 +53,7 @@ struct _tap_990_t
 	tape_unit_t t[MAX_TAPE_UNIT];
 };
 
-typedef struct _ti990_tape_t ti990_tape_t;
-struct _ti990_tape_t
+struct ti990_tape_t
 {
 	int dummy;
 };

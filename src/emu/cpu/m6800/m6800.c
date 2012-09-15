@@ -106,8 +106,7 @@ enum
 #endif
 
 /* 6800 Registers */
-typedef struct _m6800_state m6800_state;
-struct _m6800_state
+struct m6800_state
 {
 //  int     subtype;        /* CPU subtype */
 	PAIR	ppc;			/* Previous program counter */

@@ -4,8 +4,7 @@
 
 ****************************************************************************************/
 
-typedef struct _nes_pcb  nes_pcb;
-struct _nes_pcb
+struct nes_pcb
 {
 	const char              *pcb_name;
 	int                     pcb_id;
@@ -11894,8 +11893,7 @@ struct nes_memory_accessor
 	const char		  *read_name;
 };
 
-typedef struct _nes_pcb_intf  nes_pcb_intf;
-struct _nes_pcb_intf
+struct nes_pcb_intf
 {
 	int                     mmc_pcb;
 	nes_memory_accessor     mmc_l;  /* $4100-$5fff read/write routines */

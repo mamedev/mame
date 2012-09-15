@@ -17,8 +17,7 @@ enum
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-typedef struct _scmp_config scmp_config;
-struct _scmp_config
+struct scmp_config
 {
 	devcb_write8		flag_out_func;
 	devcb_write_line	sout_func;

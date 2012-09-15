@@ -45,8 +45,7 @@ extern const device_type MICROPOLIS;
 ***************************************************************************/
 
 /* Interface */
-typedef struct _micropolis_interface micropolis_interface;
-struct _micropolis_interface
+struct micropolis_interface
 {
 	devcb_read_line in_dden_func;
 	devcb_write_line out_intrq_func;

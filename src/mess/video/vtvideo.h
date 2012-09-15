@@ -48,8 +48,7 @@ extern const device_type VT100_VIDEO;
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _vt_video_interface vt_video_interface;
-struct _vt_video_interface
+struct vt_video_interface
 {
 	const char *screen_tag;		/* screen we are acting on */
 	const char *char_rom_region_tag; /* character rom region */

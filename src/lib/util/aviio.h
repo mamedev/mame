@@ -107,8 +107,7 @@ typedef enum _avi_datatype avi_datatype;
 typedef struct _avi_file avi_file;
 
 
-typedef struct _avi_movie_info avi_movie_info;
-struct _avi_movie_info
+struct avi_movie_info
 {
 	UINT32			video_format;				/* format of video data */
 	UINT32			video_timescale;			/* timescale for video data */

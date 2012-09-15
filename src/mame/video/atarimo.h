@@ -35,15 +35,13 @@
 typedef int (*atarimo_special_func)(bitmap_ind16 &bitmap, const rectangle &clip, int code, int color, int xpos, int ypos, rectangle *mobounds);
 
 /* description for a four-word mask */
-typedef struct _atarimo_entry atarimo_entry;
-struct _atarimo_entry
+struct atarimo_entry
 {
 	UINT16			data[4];
 };
 
 /* description of the motion objects */
-typedef struct _atarimo_desc atarimo_desc;
-struct _atarimo_desc
+struct atarimo_desc
 {
 	UINT8				gfxindex;			/* index to which gfx system */
 	UINT8				banks;				/* number of motion object banks */
@@ -81,8 +79,7 @@ struct _atarimo_desc
 };
 
 /* rectangle list */
-typedef struct _atarimo_rect_list atarimo_rect_list;
-struct _atarimo_rect_list
+struct atarimo_rect_list
 {
 	int					numrects;
 	rectangle *			rect;

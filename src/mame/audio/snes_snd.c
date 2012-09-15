@@ -195,8 +195,7 @@ typedef struct                      /* Source directory entry       */
 } src_dir_type;
 
 
-typedef struct _snes_sound_state  snes_sound_state;
-struct _snes_sound_state
+struct snes_sound_state
 {
 	UINT8                   *ram;
 	sound_stream            *channel;

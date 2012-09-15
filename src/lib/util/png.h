@@ -109,8 +109,7 @@ typedef enum _png_error png_error;
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _png_text png_text;
-struct _png_text
+struct png_text
 {
 	png_text *		next;
 	const char *	keyword;		/* this is allocated */
@@ -118,8 +117,7 @@ struct _png_text
 };
 
 
-typedef struct _png_info png_info;
-struct _png_info
+struct png_info
 {
 	UINT8 *			image;
 	UINT32			width, height;

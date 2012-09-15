@@ -19,9 +19,7 @@
 
 #include "unicode.h"
 
-typedef struct _key_lookup_table key_lookup_table;
-
-struct _key_lookup_table
+struct key_lookup_table
 {
 	int code;
 	const char *name;

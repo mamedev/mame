@@ -226,8 +226,7 @@ unknown cycle: CME, SSE, SSS
 #define I_YNEC		( MICRO_MASK | M_YTP | M_CKN | M_NE )
 
 
-typedef struct _tms0980_state tms0980_state;
-struct _tms0980_state
+struct tms0980_state
 {
 	UINT8	prev_pc;		/* previous program counter */
 	UINT8	prev_pa;		/* previous page address register */

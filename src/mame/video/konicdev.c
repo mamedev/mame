@@ -1332,8 +1332,7 @@ void konami_sortlayers5( int *layer, int *pri )
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _k007121_state  k007121_state ;
-struct _k007121_state
+struct k007121_state
 {
 
 	UINT8    ctrlram[8];
@@ -1619,8 +1618,7 @@ void k007121_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _k007342_state k007342_state;
-struct _k007342_state
+struct k007342_state
 {
 	UINT8    *ram;
 	UINT8    *scroll_ram;
@@ -1932,8 +1930,7 @@ void k007342_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _k007420_state k007420_state;
-struct _k007420_state
+struct k007420_state
 {
 	UINT8        *ram;
 
@@ -2227,8 +2224,7 @@ void k007420_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _k052109_state k052109_state;
-struct _k052109_state
+struct k052109_state
 {
 	UINT8    *ram;
 	UINT8    *videoram_F;
@@ -2897,8 +2893,7 @@ void k052109_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _k051960_state k051960_state;
-struct _k051960_state
+struct k051960_state
 {
 	UINT8    *ram;
 
@@ -3477,8 +3472,7 @@ void k051960_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _k05324x_state k05324x_state;
-struct _k05324x_state
+struct k05324x_state
 {
 	UINT16    *ram;
 	UINT16    *buffer;
@@ -4303,8 +4297,7 @@ void k05324x_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _k053247_state k053247_state;
-struct _k053247_state
+struct k053247_state
 {
 	UINT16    *ram;
 
@@ -5380,8 +5373,7 @@ void k053247_set_z_rejection( device_t *device, int zcode )
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _k051316_state k051316_state;
-struct _k051316_state
+struct k051316_state
 {
 	UINT8    *ram;
 
@@ -5696,8 +5688,7 @@ void k051316_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _k053936_state k053936_state;
-struct _k053936_state
+struct k053936_state
 {
 	UINT16    *ctrl;
 	UINT16    *linectrl;
@@ -5959,8 +5950,7 @@ void k053936_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _k053251_state k053251_state;
-struct _k053251_state
+struct k053251_state
 {
 	int      dirty_tmap[5];
 
@@ -6149,8 +6139,7 @@ void k053251_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _k054000_state k054000_state;
-struct _k054000_state
+struct k054000_state
 {
 	UINT8    regs[0x20];
 };
@@ -6296,8 +6285,7 @@ void k054000_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _k051733_state k051733_state;
-struct _k051733_state
+struct k051733_state
 {
 	UINT8    ram[0x20];
 	UINT8    rng;
@@ -6491,8 +6479,7 @@ void k051733_device::device_reset()
 #define K056832_PAGE_WIDTH  (K056832_PAGE_COLS*8)
 #define K056832_PAGE_COUNT 16
 
-typedef struct _k056832_state k056832_state;
-struct _k056832_state
+struct k056832_state
 {
 	tilemap_t   *tilemap[K056832_PAGE_COUNT];
 	bitmap_ind16  *pixmap[K056832_PAGE_COUNT];
@@ -8473,8 +8460,7 @@ void k056832_device::device_start()
 /* K055555 5-bit-per-pixel priority encoder */
 /* This device has 48 8-bit-wide registers */
 
-typedef struct _k055555_state k055555_state;
-struct _k055555_state
+struct k055555_state
 {
 	UINT8    regs[128];
 };
@@ -8630,8 +8616,7 @@ void k055555_device::device_reset()
 // register-handling shell.
 
 
-typedef struct _k054338_state k054338_state;
-struct _k054338_state
+struct k054338_state
 {
 	UINT16    regs[32];
 	int       shd_rgb[9];
@@ -8974,8 +8959,7 @@ void k054338_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _k001006_state k001006_state;
-struct _k001006_state
+struct k001006_state
 {
 	screen_device *screen;
 
@@ -9182,8 +9166,7 @@ void k001006_device::device_reset()
 #include "video/poly.h"
 #include "cpu/sharc/sharc.h"
 
-typedef struct _poly_extra_data poly_extra_data;
-struct _poly_extra_data
+struct poly_extra_data
 {
 	UINT32 color;
 	int texture_x, texture_y;
@@ -9193,8 +9176,7 @@ struct _poly_extra_data
 	int texture_mirror_y;
 };
 
-typedef struct _k001005_state k001005_state;
-struct _k001005_state
+struct k001005_state
 {
 	screen_device *screen;
 	device_t *cpu;
@@ -10151,8 +10133,7 @@ void k001005_device::device_stop()
 /***************************************************************************/
 
 
-typedef struct _k001604_state k001604_state;
-struct _k001604_state
+struct k001604_state
 {
 	screen_device *screen;
 	tilemap_t        *layer_8x8[2];
@@ -10597,8 +10578,7 @@ void k001604_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _k037122_state k037122_state;
-struct _k037122_state
+struct k037122_state
 {
 	screen_device *screen;
 	tilemap_t        *layer[2];

@@ -51,8 +51,7 @@ enum
 
 
 
-typedef struct _nile_state nile_state;
-struct _nile_state
+struct nile_state
 {
 	sound_stream * stream;
 	UINT8 *sound_ram;

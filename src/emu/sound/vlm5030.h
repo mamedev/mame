@@ -5,8 +5,7 @@
 
 #include "devlegcy.h"
 
-typedef struct _vlm5030_interface vlm5030_interface;
-struct _vlm5030_interface
+struct vlm5030_interface
 {
 	int memory_size;    /* memory size of speech rom (0=memory region length) */
 };

@@ -16,8 +16,7 @@
 ***************************************************************************/
 
 
-typedef struct _decocomn_interface decocomn_interface;
-struct _decocomn_interface
+struct decocomn_interface
 {
 	const char         *screen;
 };

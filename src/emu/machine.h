@@ -152,11 +152,11 @@ class tilemap_manager;
 class debug_view_manager;
 class osd_interface;
 
-typedef struct _palette_private palette_private;
-typedef struct _romload_private romload_private;
-typedef struct _ui_input_private ui_input_private;
-typedef struct _debugcpu_private debugcpu_private;
-typedef struct _generic_machine_private generic_machine_private;
+struct palette_private;
+struct romload_private;
+struct ui_input_private;
+struct debugcpu_private;
+struct generic_machine_private;
 
 
 // ======================> system_time

@@ -99,8 +99,7 @@ enum _cop400_microbus {
 typedef enum _cop400_microbus cop400_microbus;
 
 /* interface */
-typedef struct _cop400_interface cop400_interface;
-struct _cop400_interface
+struct cop400_interface
 {
 	cop400_cki_bond		cki;			/* CKI bonding option */
 	cop400_cko_bond		cko;			/* CKO bonding option */

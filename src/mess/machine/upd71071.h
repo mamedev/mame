@@ -3,8 +3,7 @@
 
 #include "emu.h"
 
-typedef struct _upd71071_interface upd71071_intf;
-struct _upd71071_interface
+struct upd71071_intf
 {
 	const char* cputag;
 	int clock;

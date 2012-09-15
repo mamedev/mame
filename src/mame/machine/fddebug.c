@@ -220,8 +220,7 @@ void fd1094_init_debugging(running_machine &machine, const char *cpureg, const c
 ***************************************************************************/
 
 /* a single possible instruction decoding */
-typedef struct _fd1094_possibility fd1094_possibility;
-struct _fd1094_possibility
+struct fd1094_possibility
 {
 	offs_t		basepc;				/* starting PC of the possibility */
 	int			length;				/* number of words */
@@ -232,8 +231,7 @@ struct _fd1094_possibility
 };
 
 /* an entry in the opcode table */
-typedef struct _optable_entry optable_entry;
-struct _optable_entry
+struct optable_entry
 {
 	UINT32			flags;			/* per-opcode flags */
 	const char *	string;			/* identifying string */

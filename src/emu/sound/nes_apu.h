@@ -37,8 +37,7 @@
  * processor, as each is shared.
  */
 
-typedef struct _nes_interface nes_interface;
-struct _nes_interface
+struct nes_interface
 {
 	const char *cpu_tag;  /* CPU tag */
 };

@@ -21,8 +21,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _latch8_devread latch8_devread;
-struct _latch8_devread
+struct latch8_devread
 {
 	/* only for byte reads, does not affect bit reads and node_map */
 	UINT32					from_bit;
@@ -31,8 +30,7 @@ struct _latch8_devread
 	read8_space_func		read_handler;
 };
 
-typedef struct _latch8_config latch8_config;
-struct _latch8_config
+struct latch8_config
 {
 	/* only for byte reads, does not affect bit reads and node_map */
 	UINT32					maskout;

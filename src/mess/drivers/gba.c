@@ -2976,8 +2976,7 @@ static UINT32 gba_fix_wrong_chip(running_machine &machine, UINT32 cart_size, UIN
 	return chip;
 }
 
-typedef struct _gba_pcb  gba_pcb;
-struct _gba_pcb
+struct gba_pcb
 {
 	const char              *pcb_name;
 	int                     pcb_id;

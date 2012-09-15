@@ -120,8 +120,7 @@ typedef enum __7z_error _7z_error;
 ***************************************************************************/
 
 /* describes an open _7Z file */
-typedef struct __7z_file _7z_file;
-struct __7z_file
+struct  _7z_file
 {
 	const char *	filename;				/* copy of _7Z filename (for caching) */
 

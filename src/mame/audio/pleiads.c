@@ -38,8 +38,7 @@ struct n_state
 	int freq;
 };
 
-typedef struct _pleiads_sound_state pleiads_sound_state;
-struct _pleiads_sound_state
+struct pleiads_sound_state
 {
 	device_t *m_tms;
 	sound_stream *m_channel;

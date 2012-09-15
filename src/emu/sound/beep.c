@@ -17,8 +17,7 @@
 
 #define BEEP_RATE			48000
 
-typedef struct _beep_state beep_state;
-struct _beep_state
+struct beep_state
 {
 	sound_stream *stream;	/* stream number */
 	int enable; 			/* enable beep */

@@ -112,8 +112,7 @@ private:
 	running_machine *m_machine;
 };
 
-typedef struct _vgconf vgconf;
-struct _vgconf
+struct vgconf
 {
 	int (*handler[8])(vgdata *);
 	UINT8 (*state_addr)(vgdata *);

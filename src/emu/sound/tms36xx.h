@@ -11,8 +11,7 @@
 #define TMS3617 	17		/* Monster Bash (13 notes, six outputs) */
 
 /* The interface structure */
-typedef struct _tms36xx_interface tms36xx_interface;
-struct _tms36xx_interface
+struct tms36xx_interface
 {
 	int subtype;
 	double decay[6];	/* decay times for the six harmonic notes */

@@ -55,8 +55,7 @@ TODO:
 #include "emu.h"
 #include "k053252.h"
 
-typedef struct _k053252_state k053252_state;
-struct _k053252_state
+struct k053252_state
 {
 	UINT8   regs[16];
 	UINT16  hc,hfp,hbp;

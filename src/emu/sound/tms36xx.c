@@ -11,8 +11,7 @@
 /* the frequencies are later adjusted by "* clock / FSCALE" */
 #define FSCALE	1024
 
-typedef struct _tms_state tms_state;
-struct _tms_state {
+struct tms_state {
 	char *subtype;		/* subtype name MM6221AA, TMS3615 or TMS3617 */
 	sound_stream * channel;	/* returned by stream_create() */
 

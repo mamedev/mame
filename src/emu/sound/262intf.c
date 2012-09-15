@@ -10,8 +10,7 @@
 #include "ymf262.h"
 
 
-typedef struct _ymf262_state ymf262_state;
-struct _ymf262_state
+struct ymf262_state
 {
 	sound_stream *	stream;
 	emu_timer *		timer[2];

@@ -33,8 +33,7 @@ typedef enum _huc6270_h_state huc6270_h_state;
 	MCFG_DEVICE_CONFIG( _intrf )
 
 
-typedef struct _huc6270_interface huc6270_interface;
-struct _huc6270_interface
+struct huc6270_interface
 {
 	/* Size of Video ram (mandatory) */
 	UINT32				vram_size;

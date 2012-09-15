@@ -53,8 +53,7 @@ extern const device_type MC6854;
 
 /* ---------- configuration ------------ */
 
-typedef struct _mc6854_interface mc6854_interface;
-struct _mc6854_interface
+struct mc6854_interface
 {
   devcb_write_line  out_irq_func; /* interrupt request */
 

@@ -3,8 +3,7 @@
 #include "sound/msm5205.h"
 #include "audio/hyprolyb.h"
 
-typedef struct _hyprolyb_adpcm_state hyprolyb_adpcm_state;
-struct _hyprolyb_adpcm_state
+struct hyprolyb_adpcm_state
 {
 	device_t *m_msm;
 	address_space *m_space;

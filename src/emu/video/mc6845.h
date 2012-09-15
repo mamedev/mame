@@ -68,8 +68,7 @@ typedef void (*mc6845_on_update_addr_changed_func)(mc6845_device *device, int ad
 
 
 /* interface */
-typedef struct _mc6845_interface mc6845_interface;
-struct _mc6845_interface
+struct mc6845_interface
 {
 	const char *m_screen_tag;		/* screen we are acting on */
 	int m_hpixels_per_column;		/* number of pixels per video memory address */

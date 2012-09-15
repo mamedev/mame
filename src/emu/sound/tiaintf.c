@@ -2,8 +2,7 @@
 #include "tiaintf.h"
 #include "tiasound.h"
 
-typedef struct _tia_state tia_state;
-struct _tia_state
+struct tia_state
 {
 	sound_stream * channel;
 	void *chip;

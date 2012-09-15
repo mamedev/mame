@@ -57,8 +57,7 @@ private:
 };
 
 
-typedef struct _romload_private rom_load_data;
-struct _romload_private
+struct romload_private
 {
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 
@@ -283,7 +282,7 @@ static void CLIB_DECL ATTR_PRINTF(1,2) debugload(const char *string, ...)
     from SystemBios structure and OPTION_BIOS
 -------------------------------------------------*/
 
-static void determine_bios_rom(rom_load_data *romdata, device_t *device,const char *specbios)
+static void determine_bios_rom(romload_private *romdata, device_t *device,const char *specbios)
 {
 	const char *defaultname = NULL;
 	const rom_entry *rom;
@@ -337,7 +336,7 @@ static void determine_bios_rom(rom_load_data *romdata, device_t *device,const ch
     that will need to be loaded
 -------------------------------------------------*/
 
-static void count_roms(rom_load_data *romdata)
+static void count_roms(romload_private *romdata)
 {
 	const rom_entry *region, *rom;
 
@@ -375,7 +374,7 @@ static void fill_random(running_machine &machine, UINT8 *base, UINT32 length)
     for missing files
 -------------------------------------------------*/
 
-static void handle_missing_file(rom_load_data *romdata, const rom_entry *romp)
+static void handle_missing_file(romload_private *romdata, const rom_entry *romp)
 {
 	/* optional files are okay */
 	if (ROM_ISOPTIONAL(romp))
@@ -406,7 +405,7 @@ static void handle_missing_file(rom_load_data *romdata, const rom_entry *romp)
     correct checksums for a given ROM
 -------------------------------------------------*/
 
-static void dump_wrong_and_correct_checksums(rom_load_data *romdata, const hash_collection &hashes, const hash_collection &acthashes)
+static void dump_wrong_and_correct_checksums(romload_private *romdata, const hash_collection &hashes, const hash_collection &acthashes)
 {
 	astring tempstr;
 	romdata->errorstring.catprintf("    EXPECTED: %s\n", hashes.macro_string(tempstr));
@@ -419,7 +418,7 @@ static void dump_wrong_and_correct_checksums(rom_load_data *romdata, const hash_
     and hash signatures of a file
 -------------------------------------------------*/
 
-static void verify_length_and_hash(rom_load_data *romdata, const char *name, UINT32 explength, const hash_collection &hashes)
+static void verify_length_and_hash(romload_private *romdata, const char *name, UINT32 explength, const hash_collection &hashes)
 {
 	/* we've already complained if there is no file */
 	if (romdata->file == NULL)
@@ -463,7 +462,7 @@ static void verify_length_and_hash(rom_load_data *romdata, const char *name, UIN
     messages about ROM loading to the user
 -------------------------------------------------*/
 
-static void display_loading_rom_message(rom_load_data *romdata, const char *name)
+static void display_loading_rom_message(romload_private *romdata, const char *name)
 {
 	char buffer[200];
 
@@ -483,7 +482,7 @@ static void display_loading_rom_message(rom_load_data *romdata, const char *name
     results of ROM loading
 -------------------------------------------------*/
 
-static void display_rom_load_results(rom_load_data *romdata)
+static void display_rom_load_results(romload_private *romdata)
 {
 	/* final status display */
 	display_loading_rom_message(romdata, NULL);
@@ -512,7 +511,7 @@ static void display_rom_load_results(rom_load_data *romdata)
     byte swapping and inverting data as necessary
 -------------------------------------------------*/
 
-static void region_post_process(rom_load_data *romdata, const char *rgntag, bool invert)
+static void region_post_process(romload_private *romdata, const char *rgntag, bool invert)
 {
 	memory_region *region = romdata->machine().root_device().memregion(rgntag);
 	UINT8 *base;
@@ -553,7 +552,7 @@ static void region_post_process(rom_load_data *romdata, const char *rgntag, bool
     up the parent and loading by checksum
 -------------------------------------------------*/
 
-static int open_rom_file(rom_load_data *romdata, const char *regiontag, const rom_entry *romp)
+static int open_rom_file(romload_private *romdata, const char *regiontag, const rom_entry *romp)
 {
 	file_error filerr = FILERR_NOT_FOUND;
 	UINT32 romsize = rom_file_size(romp);
@@ -651,7 +650,7 @@ static int open_rom_file(rom_load_data *romdata, const char *regiontag, const ro
     random data for a NULL file
 -------------------------------------------------*/
 
-static int rom_fread(rom_load_data *romdata, UINT8 *buffer, int length, const rom_entry *parent_region)
+static int rom_fread(romload_private *romdata, UINT8 *buffer, int length, const rom_entry *parent_region)
 {
 	/* files just pass through */
 	if (romdata->file != NULL)
@@ -670,7 +669,7 @@ static int rom_fread(rom_load_data *romdata, UINT8 *buffer, int length, const ro
     entry
 -------------------------------------------------*/
 
-static int read_rom_data(rom_load_data *romdata, const rom_entry *parent_region, const rom_entry *romp)
+static int read_rom_data(romload_private *romdata, const rom_entry *parent_region, const rom_entry *romp)
 {
 	int datashift = ROM_GETBITSHIFT(romp);
 	int datamask = ((1 << ROM_GETBITWIDTH(romp)) - 1) << datashift;
@@ -790,7 +789,7 @@ static int read_rom_data(rom_load_data *romdata, const rom_entry *parent_region,
     fill_rom_data - fill a region of ROM space
 -------------------------------------------------*/
 
-static void fill_rom_data(rom_load_data *romdata, const rom_entry *romp)
+static void fill_rom_data(romload_private *romdata, const rom_entry *romp)
 {
 	UINT32 numbytes = ROM_GETLENGTH(romp);
 	UINT8 *base = romdata->region->base() + ROM_GETOFFSET(romp);
@@ -812,7 +811,7 @@ static void fill_rom_data(rom_load_data *romdata, const rom_entry *romp)
     copy_rom_data - copy a region of ROM space
 -------------------------------------------------*/
 
-static void copy_rom_data(rom_load_data *romdata, const rom_entry *romp)
+static void copy_rom_data(romload_private *romdata, const rom_entry *romp)
 {
 	UINT8 *base = romdata->region->base() + ROM_GETOFFSET(romp);
 	const char *srcrgntag = ROM_GETNAME(romp);
@@ -846,7 +845,7 @@ static void copy_rom_data(rom_load_data *romdata, const rom_entry *romp)
     for a region
 -------------------------------------------------*/
 
-static void process_rom_entries(rom_load_data *romdata, const char *regiontag, const rom_entry *parent_region, const rom_entry *romp, device_t *device)
+static void process_rom_entries(romload_private *romdata, const char *regiontag, const rom_entry *parent_region, const rom_entry *romp, device_t *device)
 {
 	UINT32 lastflags = 0;
 
@@ -1137,7 +1136,7 @@ static chd_error open_disk_diff(emu_options &options, const rom_entry *romp, chd
     for a region
 -------------------------------------------------*/
 
-static void process_disk_entries(rom_load_data *romdata, const char *regiontag, const rom_entry *parent_region, const rom_entry *romp, const char *locationtag)
+static void process_disk_entries(romload_private *romdata, const char *regiontag, const rom_entry *parent_region, const rom_entry *romp, const char *locationtag)
 {
 	/* loop until we hit the end of this region */
 	for ( ; !ROMENTRY_ISREGIONEND(romp); romp++)
@@ -1262,7 +1261,7 @@ static void normalize_flags_for_device(running_machine &machine, const char *rgn
 void load_software_part_region(device_t *device, char *swlist, char *swname, rom_entry *start_region)
 {
 	astring locationtag(swlist), breakstr("%");
-	rom_load_data *romdata = device->machine().romload_data;
+	romload_private *romdata = device->machine().romload_data;
 	const rom_entry *region;
 	astring regiontag;
 
@@ -1375,7 +1374,7 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
     process_region_list - process a region list
 -------------------------------------------------*/
 
-static void process_region_list(rom_load_data *romdata)
+static void process_region_list(romload_private *romdata)
 {
 	astring regiontag;
 
@@ -1442,7 +1441,7 @@ static void process_region_list(rom_load_data *romdata)
 
 void rom_init(running_machine &machine)
 {
-	rom_load_data *romdata;
+	romload_private *romdata;
 
 	/* allocate private data */
 	machine.romload_data = romdata = auto_alloc_clear(machine, romload_private);

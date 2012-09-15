@@ -10,8 +10,7 @@
 
 
 /* for stream system */
-typedef struct _ym2413_state ym2413_state;
-struct _ym2413_state
+struct ym2413_state
 {
 	sound_stream *	stream;
 	void *			chip;

@@ -11,8 +11,7 @@
 /* usually 640000 for 8000 Hz sample rate or */
 /* usually 800000 for 10000 Hz sample rate.  */
 
-typedef struct _tms5220_interface tms5220_interface;
-struct _tms5220_interface
+struct tms5220_interface
 {
 	devcb_write_line irq_func;		/* IRQ callback function, active low, i.e. state=0 */
 	devcb_write_line readyq_func;	/* Ready callback function, active low, i.e. state=0 */

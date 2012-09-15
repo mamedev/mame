@@ -34,7 +34,7 @@ enum
 ***************************************************************************/
 
 /* private input port state */
-struct _ui_input_private
+struct ui_input_private
 {
 	/* pressed states; retrieved with ui_input_pressed() */
 	osd_ticks_t					next_repeat[IPT_COUNT];

@@ -15,8 +15,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _tc0220ioc_interface tc0220ioc_interface;
-struct _tc0220ioc_interface
+struct tc0220ioc_interface
 {
 	devcb_read8 read_0;
 	devcb_read8 read_1;
@@ -26,8 +25,7 @@ struct _tc0220ioc_interface
 };
 
 
-typedef struct _tc0510nio_interface tc0510nio_interface;
-struct _tc0510nio_interface
+struct tc0510nio_interface
 {
 	devcb_read8 read_0;
 	devcb_read8 read_1;
@@ -37,8 +35,7 @@ struct _tc0510nio_interface
 };
 
 
-typedef struct _tc0640fio_interface tc0640fio_interface;
-struct _tc0640fio_interface
+struct tc0640fio_interface
 {
 	devcb_read8 read_0;
 	devcb_read8 read_1;

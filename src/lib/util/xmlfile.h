@@ -75,8 +75,7 @@ struct XML_ParserStruct;
 
 
 /* a node representing an attribute */
-typedef struct _xml_attribute_node xml_attribute_node;
-struct _xml_attribute_node
+struct xml_attribute_node
 {
 	xml_attribute_node *	next;			/* pointer to next attribute node */
 	const char *			name;			/* pointer to copy of tag name */
@@ -85,8 +84,7 @@ struct _xml_attribute_node
 
 
 /* a node representing a data item and its relationships */
-typedef struct _xml_data_node xml_data_node;
-struct _xml_data_node
+struct xml_data_node
 {
 	xml_data_node *			next;			/* pointer to next sibling node */
 	xml_data_node *			parent;			/* pointer to parent node */
@@ -99,8 +97,7 @@ struct _xml_data_node
 
 
 /* extended error information from parsing */
-typedef struct _xml_parse_error xml_parse_error;
-struct _xml_parse_error
+struct xml_parse_error
 {
 	const char *			error_message;
 	int						error_line;
@@ -109,8 +106,7 @@ struct _xml_parse_error
 
 
 /* parsing options */
-typedef struct _xml_parse_options xml_parse_options;
-struct _xml_parse_options
+struct xml_parse_options
 {
 	xml_parse_error *		error;
 	void					(*init_parser)(struct XML_ParserStruct *parser);

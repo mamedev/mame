@@ -31,8 +31,7 @@ struct _pit8253_state
 	int idx[3];
 };
 
-typedef struct _tx1_sound_state tx1_sound_state;
-struct _tx1_sound_state
+struct tx1_sound_state
 {
 	sound_stream *m_stream;
 	UINT32 m_freq_to_step;

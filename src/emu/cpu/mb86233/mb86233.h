@@ -45,8 +45,7 @@ enum
 typedef int (*mb86233_fifo_read_func)(device_t *device, UINT32 *data);
 typedef void (*mb86233_fifo_write_func)(device_t *device, UINT32 data);
 
-typedef struct _mb86233_cpu_core mb86233_cpu_core;
-struct _mb86233_cpu_core
+struct mb86233_cpu_core
 {
 	mb86233_fifo_read_func fifo_read_cb;
 	mb86233_fifo_write_func fifo_write_cb;

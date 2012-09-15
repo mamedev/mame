@@ -75,42 +75,36 @@ typedef void (*s3c24xx_gpio_port_w_func)( device_t *device, int port, UINT32 mas
 typedef int (*s3c24xx_core_pin_r_func)( device_t *device, int pin);
 typedef void (*s3c24xx_core_pin_w_func)( device_t *device, int pin, int data);
 
-typedef struct _s3c2410_interface_core s3c2410_interface_core;
-struct _s3c2410_interface_core
+struct s3c2410_interface_core
 {
 	s3c24xx_core_pin_r_func pin_r;
 	s3c24xx_core_pin_w_func pin_w;
 };
 
-typedef struct _s3c2410_interface_gpio s3c2410_interface_gpio;
-struct _s3c2410_interface_gpio
+struct s3c2410_interface_gpio
 {
 	s3c24xx_gpio_port_r_func port_r;
 	s3c24xx_gpio_port_w_func port_w;
 };
 
-typedef struct _s3c2410_interface_i2c s3c2410_interface_i2c;
-struct _s3c2410_interface_i2c
+struct s3c2410_interface_i2c
 {
 	write_line_device_func scl_w;
 	read_line_device_func sda_r;
 	write_line_device_func sda_w;
 };
 
-typedef struct _s3c2410_interface_adc s3c2410_interface_adc;
-struct _s3c2410_interface_adc
+struct s3c2410_interface_adc
 {
 	read32_device_func data_r;
 };
 
-typedef struct _s3c2410_interface_i2s s3c2410_interface_i2s;
-struct _s3c2410_interface_i2s
+struct s3c2410_interface_i2s
 {
 	write16_device_func data_w;
 };
 
-typedef struct _s3c2410_interface_nand s3c2410_interface_nand;
-struct _s3c2410_interface_nand
+struct s3c2410_interface_nand
 {
 	write8_device_func command_w;
 	write8_device_func address_w;
@@ -118,14 +112,12 @@ struct _s3c2410_interface_nand
 	write8_device_func data_w;
 };
 
-typedef struct _s3c2410_interface_lcd s3c2410_interface_lcd;
-struct _s3c2410_interface_lcd
+struct s3c2410_interface_lcd
 {
 	int flags;
 };
 
-typedef struct _s3c2410_interface s3c2410_interface;
-struct _s3c2410_interface
+struct s3c2410_interface
 {
 	s3c2410_interface_core core;
 	s3c2410_interface_gpio gpio;

@@ -107,8 +107,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _avi_chunk avi_chunk;
-struct _avi_chunk
+struct avi_chunk
 {
 	UINT64				offset;					/* file offset of chunk header */
 	UINT64				size;					/* size of this chunk */
@@ -117,16 +116,14 @@ struct _avi_chunk
 };
 
 
-typedef struct _avi_chunk_list avi_chunk_list;
-struct _avi_chunk_list
+struct avi_chunk_list
 {
 	UINT64				offset;					/* offset in the file of header */
 	UINT32				length;					/* length of the chunk including header */
 };
 
 
-typedef struct _huffyuv_table huffyuv_table;
-struct _huffyuv_table
+struct huffyuv_table
 {
 	UINT8				shift[256];				/* bit shift amounts */
 	UINT32				bits[256];				/* bit match values */
@@ -136,16 +133,14 @@ struct _huffyuv_table
 };
 
 
-typedef struct _huffyuv_data huffyuv_data;
-struct _huffyuv_data
+struct huffyuv_data
 {
 	UINT8				predictor;				/* predictor */
 	huffyuv_table		table[3];				/* array of tables */
 };
 
 
-typedef struct _avi_stream avi_stream;
-struct _avi_stream
+struct avi_stream
 {
 	UINT32				type;					/* subtype of stream */
 	UINT32				format;					/* format of stream data */

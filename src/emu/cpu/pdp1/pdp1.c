@@ -348,8 +348,7 @@
 
 
 /* PDP1 Registers */
-typedef struct _pdp1_state pdp1_state;
-struct _pdp1_state
+struct pdp1_state
 {
 	/* processor registers */
 	UINT32 pc;		/* program counter (12, 15 or 16 bits) */

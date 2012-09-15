@@ -21,9 +21,7 @@
 #include "emu.h"
 #include "mm58274c.h"
 
-typedef struct _mm58274c_t mm58274c_t;
-
-struct _mm58274c_t
+struct mm58274c_t
 {
 	const mm58274c_interface *intf;
 

@@ -71,8 +71,7 @@ typedef void (*voodoo_vblank_func)(device_t *device, int state);
 typedef void (*voodoo_stall_func)(device_t *device, int state);
 
 
-typedef struct _voodoo_config voodoo_config;
-struct _voodoo_config
+struct voodoo_config
 {
 	UINT8				fbmem;
 	UINT8				tmumem0;

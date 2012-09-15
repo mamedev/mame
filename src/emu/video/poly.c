@@ -45,8 +45,7 @@ typedef struct _polygon_info polygon_info;
 
 
 /* tri_extent describes start/end points for a scanline */
-typedef struct _tri_extent tri_extent;
-struct _tri_extent
+struct tri_extent
 {
 	INT16		startx;						/* starting X coordinate (inclusive) */
 	INT16		stopx;						/* ending X coordinate (exclusive) */
@@ -54,8 +53,7 @@ struct _tri_extent
 
 
 /* single set of polygon per-parameter data */
-typedef struct _poly_param poly_param;
-struct _poly_param
+struct poly_param
 {
 	float		start;						/* parameter value at starting X,Y */
 	float		dpdx;						/* dp/dx relative to starting X */
@@ -64,8 +62,7 @@ struct _poly_param
 
 
 /* poly edge is used internally for quad rendering */
-typedef struct _poly_edge poly_edge;
-struct _poly_edge
+struct poly_edge
 {
 	poly_edge *			next;					/* next edge in sequence */
 	int					index;					/* index of this edge */
@@ -77,8 +74,7 @@ struct _poly_edge
 
 
 /* poly section is used internally for quad rendering */
-typedef struct _poly_section poly_section;
-struct _poly_section
+struct poly_section
 {
 	const poly_edge *	ledge;					/* pointer to left edge */
 	const poly_edge *	redge;					/* pointer to right edge */
@@ -87,8 +83,7 @@ struct _poly_section
 
 
 /* work_unit_shared is a common set of data shared between tris and quads */
-typedef struct _work_unit_shared work_unit_shared;
-struct _work_unit_shared
+struct work_unit_shared
 {
 	polygon_info *		polygon;				/* pointer to polygon */
 	volatile UINT32		count_next;				/* number of scanlines and index of next item to process */
@@ -101,8 +96,7 @@ struct _work_unit_shared
 
 
 /* tri_work_unit is a triangle-specific work-unit */
-typedef struct _tri_work_unit tri_work_unit;
-struct _tri_work_unit
+struct tri_work_unit
 {
 	work_unit_shared	shared;					/* shared data */
 	tri_extent			extent[SCANLINES_PER_BUCKET]; /* array of scanline extents */
@@ -110,8 +104,7 @@ struct _tri_work_unit
 
 
 /* quad_work_unit is a quad-specific work-unit */
-typedef struct _quad_work_unit quad_work_unit;
-struct _quad_work_unit
+struct quad_work_unit
 {
 	work_unit_shared	shared;					/* shared data */
 	poly_extent			extent[SCANLINES_PER_BUCKET]; /* array of scanline extents */

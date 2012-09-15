@@ -22,8 +22,7 @@
 
 extern int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom);
 
-typedef struct _mn102_info mn102_info;
-struct _mn102_info
+struct mn102_info
 {
 	// The UINT32s are really UINT24
 	UINT32 pc;

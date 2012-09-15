@@ -35,8 +35,7 @@ typedef struct
 } sound_channel;
 
 
-typedef struct _flower_sound_state flower_sound_state;
-struct _flower_sound_state
+struct flower_sound_state
 {
 	emu_timer *m_effect_timer;
 

@@ -52,8 +52,7 @@ extern const device_type K2GE;
 	MCFG_DEVICE_CONFIG( _config )
 
 
-typedef struct _k1ge_interface k1ge_interface;
-struct _k1ge_interface
+struct k1ge_interface
 {
 	const char		*screen_tag;		/* screen we are drawing on */
 	const char		*vram_tag;			/* memory region we will use for video ram */

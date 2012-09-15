@@ -21,8 +21,7 @@ static const UINT8 kbp_table[] = { 0x00,0x01,0x02,0x0f,0x03,0x0f,0x0f,0x0f,0x04,
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _i4004_state i4004_state;
-struct _i4004_state
+struct i4004_state
 {
 	UINT8	A; // Accumulator
 	UINT8	R[8];

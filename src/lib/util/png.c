@@ -50,8 +50,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _image_data_chunk image_data_chunk;
-struct _image_data_chunk
+struct image_data_chunk
 {
 	image_data_chunk *	next;
 	int					length;
@@ -59,8 +58,7 @@ struct _image_data_chunk
 };
 
 
-typedef struct _png_private png_private;
-struct _png_private
+struct png_private
 {
 	png_info *			pnginfo;
 	image_data_chunk *	idata;

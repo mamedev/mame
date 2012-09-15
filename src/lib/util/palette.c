@@ -48,8 +48,7 @@
 ***************************************************************************/
 
 /* object to track dirty states */
-typedef struct _dirty_state dirty_state;
-struct _dirty_state
+struct dirty_state
 {
 	UINT32 *		dirty;						/* bitmap of dirty entries */
 	UINT32			mindirty;					/* minimum dirty entry */

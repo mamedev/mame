@@ -58,8 +58,7 @@ enum
 //============================================================
 
 
-typedef struct _quad_setup_data quad_setup_data;
-struct _quad_setup_data
+struct quad_setup_data
 {
 	INT32			dudx, dvdx, dudy, dvdy;
 	INT32			startu, startv;
@@ -70,8 +69,7 @@ typedef struct _texture_info texture_info;
 
 typedef void (*texture_copy_func)(texture_info *texture, const render_texinfo *texsource);
 
-typedef struct _copy_info copy_info;
-struct _copy_info {
+struct copy_info {
 	int 				src_fmt;
 	Uint32				dst_fmt;
 	int					dst_bpp;
@@ -117,8 +115,7 @@ struct _texture_info
 };
 
 /* sdl_info is the information about SDL for the current screen */
-typedef struct _sdl_info sdl_info;
-struct _sdl_info
+struct sdl_info
 {
 	INT32			blittimer;
 	UINT32			extra_flags;

@@ -29,8 +29,7 @@
 ***************************************************************************/
 
 /* information about a shadow table */
-typedef struct _shadow_table_data shadow_table_data;
-struct _shadow_table_data
+struct shadow_table_data
 {
 	UINT32 *			base;				/* pointer to the base of the table */
 	INT16				dr;					/* delta red value */
@@ -41,7 +40,7 @@ struct _shadow_table_data
 
 
 /* typedef struct _palette_private palette_private; */
-struct _palette_private
+struct palette_private
 {
 	bitmap_format		format;				/* format assumed for palette data */
 

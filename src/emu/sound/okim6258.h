@@ -7,8 +7,7 @@
 
 /* an interface for the OKIM6258 and similar chips */
 
-typedef struct _okim6258_interface okim6258_interface;
-struct _okim6258_interface
+struct okim6258_interface
 {
 	int divider;
 	int adpcm_type;

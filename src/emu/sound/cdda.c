@@ -7,8 +7,7 @@
 #include "cdrom.h"
 #include "cdda.h"
 
-typedef struct _cdda_info cdda_info;
-struct _cdda_info
+struct cdda_info
 {
 	sound_stream *		stream;
 	cdrom_file *		disc;

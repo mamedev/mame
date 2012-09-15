@@ -74,8 +74,7 @@ struct YMZ280BVoice
 	UINT8 irq_schedule;		/* 1 if the IRQ state is updated by timer */
 };
 
-typedef struct _ymz280b_state ymz280b_state;
-struct _ymz280b_state
+struct ymz280b_state
 {
 	sound_stream * stream;			/* which stream are we using */
 	UINT8 *region_base;				/* pointer to the base of the region */

@@ -3,8 +3,7 @@
 
 static const int max_amplitude = 0x7fff;
 
-typedef struct _channelf_sound_state channelf_sound_state;
-struct _channelf_sound_state
+struct channelf_sound_state
 {
 	sound_stream *channel;
 	int sound_mode;

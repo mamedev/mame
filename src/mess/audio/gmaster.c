@@ -7,8 +7,7 @@
 #include "cpu/upd7810/upd7810.h"
 #include "includes/gmaster.h"
 
-typedef struct _gmaster_sound gmaster_sound;
-struct _gmaster_sound
+struct gmaster_sound
 {
 	/*bool*/int level;
 	sound_stream *mixer_channel;

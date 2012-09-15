@@ -8,8 +8,7 @@
 
 #include "devlegcy.h"
 
-typedef struct _aica_interface aica_interface;
-struct _aica_interface
+struct aica_interface
 {
 	int master;
 	int roffset;				/* offset in the region */

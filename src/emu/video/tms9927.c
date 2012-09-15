@@ -30,8 +30,7 @@ static const UINT8 skew_bits_value[4] = { 0, 1, 2, 2 };
 #define CURSOR_ROW_ADDRESS(t)	((t)->reg[8] & 0x3f)
 
 
-typedef struct _tms9927_state tms9927_state;
-struct _tms9927_state
+struct tms9927_state
 {
 	/* driver-controlled state */
 	const tms9927_interface *intf;

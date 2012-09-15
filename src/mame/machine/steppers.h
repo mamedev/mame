@@ -34,8 +34,7 @@
 
 /*------------- Stepper motor interface structure -----------------*/
 
-typedef struct _stepper_interface stepper_interface;
-struct _stepper_interface
+struct stepper_interface
 {
 	UINT8 type; /* Reel unit type */
 	INT16 index_start;/* start position of index (in half steps) */

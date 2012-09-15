@@ -210,8 +210,7 @@ enum
     STRUCTURES
 ***************************************************************************/
 
-typedef struct _mips3_config mips3_config;
-struct _mips3_config
+struct mips3_config
 {
 	size_t		icache;							/* code cache size */
 	size_t		dcache;							/* data cache size */

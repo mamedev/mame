@@ -55,8 +55,7 @@
 #define  SYNCS_MAX2     0x80
 
 /* GLOBAL VARIABLES */
-typedef struct _nesapu_state nesapu_state;
-struct _nesapu_state
+struct nesapu_state
 {
 	apu_t   APU;			       /* Actual APUs */
 	float   apu_incsize;           /* Adjustment increment */

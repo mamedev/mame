@@ -66,8 +66,7 @@
 //  TYPEDEFS
 //============================================================
 
-typedef struct _registered_client registered_client;
-struct _registered_client
+struct registered_client
 {
 	registered_client *	next;		// next client in the list
 	LPARAM				id;			// client-specified ID

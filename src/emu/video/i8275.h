@@ -47,8 +47,7 @@ typedef void (*i8275_display_pixels_func)(device_t *device, int x, int y, UINT8 
 #define I8275_DISPLAY_PIXELS(name)	void name(device_t *device, int x, int y, UINT8 linecount, UINT8 charcode, UINT8 lineattr, UINT8 lten, UINT8 rvv, UINT8 vsp, UINT8 gpa, UINT8 hlgt)
 
 /* interface */
-typedef struct _i8275_interface i8275_interface;
-struct _i8275_interface
+struct i8275_interface
 {
 	const char *screen_tag;		/* screen we are acting on */
 	int width;					/* char width in pixels */

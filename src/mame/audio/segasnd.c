@@ -38,16 +38,14 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _filter_state filter_state;
-struct _filter_state
+struct filter_state
 {
 	double				capval;				/* current capacitor value */
 	double				exponent;			/* constant exponent */
 };
 
 
-typedef struct _timer8253_channel timer8253_channel;
-struct _timer8253_channel
+struct timer8253_channel
 {
 	UINT8				holding;			/* holding until counts written? */
 	UINT8				latchmode;			/* latching mode */
@@ -63,8 +61,7 @@ struct _timer8253_channel
 };
 
 
-typedef struct _timer8253 timer8253;
-struct _timer8253
+struct timer8253
 {
 	timer8253_channel	chan[3];			/* three channels' worth of information */
 	double				env[3];				/* envelope value for each channel */
@@ -75,8 +72,7 @@ struct _timer8253
 };
 
 
-typedef struct _usb_state usb_state;
-struct _usb_state
+struct usb_state
 {
 	sound_stream *		stream;				/* output stream */
 	device_t *cpu;				/* CPU index of the 8035 */
@@ -101,8 +97,7 @@ struct _usb_state
 };
 
 /* SP0250-based speech board */
-typedef struct _speech_state speech_state;
-struct _speech_state
+struct speech_state
 {
 	UINT8 latch, t0, p2, drq;
 	UINT8 *speech;

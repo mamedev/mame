@@ -1,5 +1,4 @@
-typedef struct _hc11_opcode_list_struct hc11_opcode_list_struct;
-struct _hc11_opcode_list_struct
+struct hc11_opcode_list_struct
 {
 	int page;
 	int opcode;

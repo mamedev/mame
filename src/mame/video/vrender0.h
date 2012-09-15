@@ -7,8 +7,7 @@
  TYPE DEFINITIONS
  ***************************************************************************/
 
-typedef struct _vr0video_interface vr0video_interface;
-struct _vr0video_interface
+struct vr0video_interface
 {
 	const char *cpu;
 };

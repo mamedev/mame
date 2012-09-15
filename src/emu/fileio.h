@@ -55,11 +55,11 @@
 //**************************************************************************
 
 // forward declarations
-typedef struct _zip_file_header zip_file_header;
-typedef struct _zip_file zip_file;
+struct zip_file_header;
+struct zip_file;
 
-typedef struct __7z_file_header _7z_file_header;
-typedef struct __7z_file _7z_file;
+struct _7z_file_header;
+struct _7z_file;
 
 // ======================> path_iterator
 

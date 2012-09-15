@@ -19,8 +19,7 @@
 #define POLEPOS_R167_SHUNT	1.0/(1.0/POLEPOS_R166 + 1.0/250)
 #define POLEPOS_R168_SHUNT	1.0/(1.0/POLEPOS_R166 + 1.0/250)
 
-typedef struct _polepos_sound_state polepos_sound_state;
-struct _polepos_sound_state
+struct polepos_sound_state
 {
 	UINT32 m_current_position;
 	int m_sample_msb;

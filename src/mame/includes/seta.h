@@ -15,8 +15,7 @@ struct _uPD71054_state
 	UINT8	reg[4];				//
 };
 
-typedef struct _game_offset game_offset;
-struct _game_offset
+struct game_offset
 {
 	/* 2 values, for normal and flipped */
 	const char *gamename;

@@ -4,8 +4,7 @@
 #include "devlegcy.h"
 
 
-typedef struct _namco_51xx_interface namco_51xx_interface;
-struct _namco_51xx_interface
+struct namco_51xx_interface
 {
 	devcb_read8 	in[4];		/* read handlers for ports A-D */
 	devcb_write8	out[2];		/* write handlers for ports A-B */

@@ -29,8 +29,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _floppy_drive floppy_drive;
-struct _floppy_drive
+struct floppy_drive
 {
 	/* callbacks */
 	devcb_resolved_write_line out_idx_func;
@@ -91,8 +90,7 @@ struct _floppy_drive
 };
 
 
-typedef struct _floppy_error_map floppy_error_map;
-struct _floppy_error_map
+struct floppy_error_map
 {
 	floperr_t ferr;
 	image_error_t ierr;

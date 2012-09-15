@@ -70,8 +70,7 @@ struct QSOUND_CHANNEL
 	INT32 offset;	 /* current offset counter */
 };
 
-typedef struct _qsound_state qsound_state;
-struct _qsound_state
+struct qsound_state
 {
 	/* Private variables */
 	sound_stream * stream;				/* Audio stream */

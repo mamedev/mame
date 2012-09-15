@@ -192,8 +192,7 @@ INLINE tms32025_state *get_safe_token(device_t *device)
 }
 
 /* opcode table entry */
-typedef struct _tms32025_opcode tms32025_opcode;
-struct _tms32025_opcode
+struct tms32025_opcode
 {
 	UINT8	cycles;
 	void	(*function)(tms32025_state *);

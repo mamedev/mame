@@ -22,8 +22,7 @@
 #include "sound/fmopl.h"
 
 
-typedef struct _y8950_state y8950_state;
-struct _y8950_state
+struct y8950_state
 {
 	sound_stream *	stream;
 	emu_timer *		timer[2];

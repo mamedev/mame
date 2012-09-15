@@ -50,8 +50,7 @@ HP38G             09/??/95              1LT8             Yorke
 #define SATURN_INT_IRQ	1
 #define SATURN_INT_NMI	2
 
-typedef struct _saturn_cpu_core saturn_cpu_core;
-struct _saturn_cpu_core
+struct saturn_cpu_core
 {
 	void (*out)(device_t*,int);
 	int (*in)(device_t*);

@@ -16,8 +16,7 @@ CPU_DISASSEMBLE( i960  );
 
 enum { RCACHE_SIZE = 4 };
 
-typedef struct _i960_state_t i960_state_t;
-struct _i960_state_t {
+struct i960_state_t {
 	UINT32 r[0x20];
 	UINT32 rcache[RCACHE_SIZE][0x10];
 	UINT32 rcache_frame_addr[RCACHE_SIZE];

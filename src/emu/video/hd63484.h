@@ -37,8 +37,7 @@ extern const device_type HD63484;
 
 #define HD63484_RAM_SIZE 0x100000
 
-typedef struct _hd63484_interface hd63484_interface;
-struct _hd63484_interface
+struct hd63484_interface
 {
 	int        skattva_hack;
 };

@@ -63,8 +63,7 @@ typedef void (*atarigen_int_func)(running_machine &machine);
 
 typedef void (*atarigen_scanline_func)(screen_device &screen, int scanline);
 
-typedef struct _atarivc_state_desc atarivc_state_desc;
-struct _atarivc_state_desc
+struct atarivc_state_desc
 {
 	UINT32 latch1;							/* latch #1 value (-1 means disabled) */
 	UINT32 latch2;							/* latch #2 value (-1 means disabled) */
@@ -81,8 +80,7 @@ struct _atarivc_state_desc
 };
 
 
-typedef struct _atarigen_screen_timer atarigen_screen_timer;
-struct _atarigen_screen_timer
+struct atarigen_screen_timer
 {
 	screen_device *screen;
 	emu_timer *			scanline_interrupt_timer;

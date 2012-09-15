@@ -6,8 +6,7 @@
 
 #include "hd63450.h"
 
-typedef struct _hd63450_regs hd63450_regs;
-struct _hd63450_regs
+struct hd63450_regs
 {  // offsets in bytes
 	unsigned char csr;  // [00] Channel status register (R/W)
 	unsigned char cer;  // [01] Channel error register (R)
@@ -29,8 +28,7 @@ struct _hd63450_regs
 	unsigned char gcr;  // [3f]  General Control Register (R/W)
 };
 
-typedef struct _hd63450_t hd63450_t;
-struct _hd63450_t
+struct hd63450_t
 {
 	hd63450_regs reg[4];
 	emu_timer* timer[4];  // for timing data reading/writing each channel

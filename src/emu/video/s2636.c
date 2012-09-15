@@ -96,8 +96,7 @@ static const int sprite_offsets[4] = { 0x00, 0x10, 0x20, 0x40 };
  *
  *************************************/
 
-typedef struct _s2636_state  s2636_state;
-struct _s2636_state
+struct s2636_state
 {
 	UINT8     *work_ram;
 	int       work_ram_size;

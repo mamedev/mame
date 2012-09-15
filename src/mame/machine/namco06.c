@@ -93,8 +93,7 @@
 
 
 
-typedef struct _namco_06xx_state namco_06xx_state;
-struct _namco_06xx_state
+struct namco_06xx_state
 {
 	UINT8 m_control;
 	emu_timer *m_nmi_timer;

@@ -32,8 +32,7 @@ typedef enum
 	VIC4567_PAL
 } vic3_type;
 
-typedef struct _vic3_interface vic3_interface;
-struct _vic3_interface
+struct vic3_interface
 {
 	const char         *screen;
 	const char         *cpu;

@@ -27,8 +27,7 @@ PALETTE_INIT( huc6260 );
 	MCFG_DEVICE_CONFIG( _intrf )
 
 
-typedef struct _huc6260_interface huc6260_interface;
-struct _huc6260_interface
+struct huc6260_interface
 {
 	/* Tag for the screen we will be drawing on */
 	const char *screen_tag;

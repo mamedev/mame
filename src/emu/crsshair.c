@@ -30,8 +30,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _crosshair_global crosshair_global;
-struct _crosshair_global
+struct crosshair_global
 {
 	UINT8				usage;					/* true if any crosshairs are used */
 	UINT8				used[MAX_PLAYERS];		/* usage per player */

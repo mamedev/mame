@@ -10,8 +10,7 @@
 
 
 
-typedef struct _sprite_info sprite_info;
-struct _sprite_info
+struct sprite_info
 {
 	UINT16	ve;					/* VE0-15 signals for this row */
 	UINT8	lst;				/* LST0-7 signals for this row */

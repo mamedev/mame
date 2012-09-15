@@ -15,8 +15,7 @@
 #define CLOCK_SHIFT 8
 
 
-typedef struct _snkwave_state snkwave_state;
-struct _snkwave_state
+struct snkwave_state
 {
 	/* global sound parameters */
 	sound_stream * stream;

@@ -30,8 +30,7 @@ they are internally.
 #define FLAG_B	0x02
 #define FLAG_I	0x01
 
-typedef struct _sm8500_state sm8500_state;
-struct _sm8500_state
+struct sm8500_state
 {
 	SM8500_CONFIG config;
 	UINT16 PC;

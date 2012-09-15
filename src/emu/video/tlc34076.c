@@ -22,8 +22,7 @@
 #define TEST_REGISTER		0x0e
 #define RESET_STATE			0x0f
 
-typedef struct _tlc34076_state  tlc34076_state;
-struct _tlc34076_state
+struct tlc34076_state
 {
 	UINT8 local_paletteram[0x300];
 	UINT8 regs[0x10];

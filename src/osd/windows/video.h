@@ -62,8 +62,7 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-typedef struct _win_monitor_info win_monitor_info;
-struct _win_monitor_info
+struct win_monitor_info
 {
 	win_monitor_info  *	next;					// pointer to next monitor in list
 	HMONITOR			handle;					// handle to the monitor
@@ -74,8 +73,7 @@ struct _win_monitor_info
 };
 
 
-typedef struct _win_window_config win_window_config;
-struct _win_window_config
+struct win_window_config
 {
 	float				aspect;						// decoded aspect ratio
 	int					width;						// decoded width
@@ -84,8 +82,7 @@ struct _win_window_config
 };
 
 
-typedef struct _win_video_config win_video_config;
-struct _win_video_config
+struct win_video_config
 {
 	// global configuration
 	int					windowed;					// start windowed?

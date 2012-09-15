@@ -23,8 +23,7 @@ extern const device_type PSX_RCNT;
 #define PSX_RC_CLC ( 0x100 )
 #define PSX_RC_DIV ( 0x200 )
 
-typedef struct _psx_root psx_root;
-struct _psx_root
+struct psx_root
 {
 	emu_timer *timer;
 	UINT16 n_count;

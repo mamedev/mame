@@ -6,8 +6,7 @@
 #define __M6800_H__
 
 
-typedef struct _m6801_interface m6801_interface;
-struct _m6801_interface
+struct m6801_interface
 {
 	devcb_write_line		out_sc2_func;
 };

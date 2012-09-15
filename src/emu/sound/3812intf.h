@@ -5,8 +5,7 @@
 
 #include "devlegcy.h"
 
-typedef struct _ym3812_interface ym3812_interface;
-struct _ym3812_interface
+struct ym3812_interface
 {
 	void (*handler)(device_t *device, int linestate);
 };

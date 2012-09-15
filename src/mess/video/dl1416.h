@@ -22,8 +22,7 @@
 
 typedef void (*dl1416_update_func)(device_t *device, int digit, int data);
 
-typedef struct _dl1416_interface dl1416_interface;
-struct _dl1416_interface
+struct dl1416_interface
 {
 	dl1416_update_func update;
 };

@@ -73,8 +73,7 @@ struct sh8253_timer_channel
 	UINT32	fraction;
 };
 
-typedef struct _exidy_sound_state exidy_sound_state;
-struct _exidy_sound_state
+struct exidy_sound_state
 {
 	cpu_device *m_maincpu;
 

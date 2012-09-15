@@ -94,8 +94,7 @@
 
 /* Structures */
 
-typedef struct _res_net_channel_info res_net_channel_info;
-struct _res_net_channel_info {
+struct res_net_channel_info {
 	// per channel options
 	UINT32	options;
 	// Pullup resistor value in Ohms
@@ -121,8 +120,7 @@ struct _res_net_channel_info {
 	double	vBias;
 };
 
-typedef struct _res_net_info res_net_info;
-struct _res_net_info {
+struct res_net_info {
 	// global options
 	UINT32	options;
 	// The three color channels
@@ -144,8 +142,7 @@ struct _res_net_info {
 
 #define RES_NET_MAX_COMP	3
 
-typedef struct _res_net_decode_info res_net_decode_info;
-struct _res_net_decode_info {
+struct res_net_decode_info {
 	int	numcomp;
 	int	start;
 	int	end;

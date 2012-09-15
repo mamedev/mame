@@ -4,8 +4,7 @@
 #include "devlegcy.h"
 
 
-typedef struct _namco_06xx_config namco_06xx_config;
-struct _namco_06xx_config
+struct namco_06xx_config
 {
 	const char *nmicpu;
 	const char *chip0;

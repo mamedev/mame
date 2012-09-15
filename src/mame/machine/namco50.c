@@ -135,8 +135,7 @@ Flags: 80=high score, 40=first bonus, 20=interval bonus, 10=?
 #include "cpu/mb88xx/mb88xx.h"
 
 
-typedef struct _namco_50xx_state namco_50xx_state;
-struct _namco_50xx_state
+struct namco_50xx_state
 {
 	device_t *	m_cpu;
 	UINT8					m_latched_cmd;

@@ -12,8 +12,7 @@
 
 /*----------- defined in video/crt.c -----------*/
 
-typedef struct _crt_interface crt_interface;
-struct _crt_interface
+struct crt_interface
 {
 	int num_levels;
 	int offset_x, offset_y;

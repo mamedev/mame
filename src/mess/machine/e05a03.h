@@ -14,8 +14,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _e05a03_interface e05a03_interface;
-struct _e05a03_interface
+struct e05a03_interface
 {
 	devcb_read8 in_data_func;
 

@@ -8,16 +8,14 @@
 
 #define CPS3_VOICES		16
 
-typedef struct _cps3_voice cps3_voice;
-struct _cps3_voice
+struct cps3_voice
 {
 	UINT32 regs[8];
 	UINT32 pos;
 	UINT16 frac;
 };
 
-typedef struct _cps3_sound_state cps3_sound_state;
-struct _cps3_sound_state
+struct cps3_sound_state
 {
 	sound_stream *m_stream;
 	cps3_voice m_voice[CPS3_VOICES];

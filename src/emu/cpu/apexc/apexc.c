@@ -343,8 +343,7 @@ without danger */
 
 #define apexc_readop(address)	apexc_readmem(address)
 
-typedef struct _apexc_state apexc_state;
-struct _apexc_state
+struct apexc_state
 {
 	UINT32 a;	/* accumulator */
 	UINT32 r;	/* register */

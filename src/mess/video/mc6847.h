@@ -40,8 +40,7 @@
 	MCFG_SCREEN_VBLANK_TIME(0)									\
 
 /* interface */
-typedef struct _mc6847_interface mc6847_interface;
-struct _mc6847_interface
+struct mc6847_interface
 {
 	/* screen we are acting on */
 	const char *m_screen_tag;

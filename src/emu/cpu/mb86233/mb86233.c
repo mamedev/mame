@@ -30,8 +30,7 @@ typedef union
 	float	f;
 } MB86233_REG;
 
-typedef struct _mb86233_state mb86233_state;
-struct _mb86233_state
+struct mb86233_state
 {
 	UINT16			pc;
 	MB86233_REG		a;

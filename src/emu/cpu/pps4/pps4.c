@@ -19,8 +19,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _pps4_state pps4_state;
-struct _pps4_state
+struct pps4_state
 {
 	UINT8	A; // Accumulator
 	UINT8	X;

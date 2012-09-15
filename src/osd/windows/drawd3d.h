@@ -60,8 +60,7 @@
 //============================================================
 
 /* d3d_info is the information about Direct3D for the current screen */
-typedef struct _d3d_info d3d_info;
-struct _d3d_info
+struct d3d_info
 {
 	int						adapter;					// ordinal adapter number
 	int						width, height;				// current width, height

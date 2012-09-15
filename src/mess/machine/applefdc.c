@@ -119,8 +119,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _applefdc_token applefdc_token;
-struct _applefdc_token
+struct applefdc_token
 {
 	/* data that is constant for the lifetime of the emulation */
 	emu_timer *motor_timer;

@@ -6,8 +6,7 @@
 #include "devlegcy.h"
 
 
-typedef struct _x1_010_interface x1_010_interface;
-struct _x1_010_interface
+struct x1_010_interface
 {
 	int adr;	/* address */
 };

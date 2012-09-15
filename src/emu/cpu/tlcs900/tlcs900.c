@@ -17,8 +17,7 @@ TODO:
 #include "debugger.h"
 #include "tlcs900.h"
 
-typedef struct _tlcs900_state tlcs900_state;
-struct _tlcs900_state
+struct tlcs900_state
 {
 	const tlcs900_interface *intf;
 

@@ -92,7 +92,6 @@ enum
 
 typedef struct _cdrom_file cdrom_file;
 
-
 struct cdrom_track_info
 {
 	/* fields used by CHDMAN and in MAME */

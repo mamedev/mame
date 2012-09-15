@@ -119,8 +119,7 @@ chirp 12-..: vokume   0   : silent
 #define IP_SIZE_FAST    (120/FR_SIZE)
 #define IP_SIZE_FASTER  ( 80/FR_SIZE)
 
-typedef struct _vlm5030_state vlm5030_state;
-struct _vlm5030_state
+struct vlm5030_state
 {
 	device_t *device;
 	const vlm5030_interface *intf;

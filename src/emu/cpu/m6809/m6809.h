@@ -23,8 +23,7 @@ DECLARE_LEGACY_CPU_DEVICE(M6809E, m6809e);
 
 CPU_DISASSEMBLE( m6809 );
 
-typedef struct _m6809_config m6809_config;
-struct _m6809_config
+struct m6809_config
 {
 	UINT8	encrypt_only_first_byte;		/* encrypt only the first byte in 10 xx and 11 xx opcodes */
 };

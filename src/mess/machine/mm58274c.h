@@ -36,8 +36,7 @@ extern const device_type MM58274C;
     to 6 (saturday) and is needed to correctly retrieve the day-of-week
     from the host system clock.
 */
-typedef struct _mm58274c_interface mm58274c_interface;
-struct _mm58274c_interface
+struct mm58274c_interface
 {
 	int	mode24;		/* 24/12 mode */
 	int	day1;		/* first day of week */

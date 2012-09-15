@@ -52,8 +52,7 @@ typedef SaturnNib Saturn64[16];
 /****************************************************************************
  * The SATURN registers.
  ****************************************************************************/
-typedef struct _saturn_state saturn_state;
-struct _saturn_state
+struct saturn_state
 {
 	saturn_cpu_core *config;
 

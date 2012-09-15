@@ -15,8 +15,7 @@ typedef struct
 	UINT8 valid[0x20];
 } cache_t;
 
-typedef struct _superfx_state superfx_state;
-struct _superfx_state
+struct superfx_state
 {
 	superfx_config config;
 

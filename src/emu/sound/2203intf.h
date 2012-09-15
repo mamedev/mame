@@ -9,8 +9,7 @@
 
 void ym2203_update_request(void *param);
 
-typedef struct _ym2203_interface ym2203_interface;
-struct _ym2203_interface
+struct ym2203_interface
 {
 	const ay8910_interface ay8910_intf;
 	devcb_write_line irqhandler;

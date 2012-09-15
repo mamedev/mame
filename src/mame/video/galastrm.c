@@ -6,14 +6,12 @@
 #define X_OFFSET 96
 #define Y_OFFSET 60
 
-typedef struct _poly_extra_data poly_extra_data;
-struct _poly_extra_data
+struct poly_extra_data
 {
 	bitmap_ind16 *texbase;
 };
 
-typedef struct _polygon polygon;
-struct _polygon
+struct polygon
 {
 	float x;
 	float y;

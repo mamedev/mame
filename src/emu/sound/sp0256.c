@@ -72,8 +72,7 @@ struct lpc12_t
 };
 
 
-typedef struct _sp0256_state sp0256_state;
-struct _sp0256_state
+struct sp0256_state
 {
 	device_t *device;
 	sound_stream  *stream;	        /* MAME core sound stream                       */

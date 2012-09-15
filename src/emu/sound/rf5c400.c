@@ -18,8 +18,7 @@
 #include "emu.h"
 #include "rf5c400.h"
 
-typedef struct _rf5c400_channel rf5c400_channel;
-struct _rf5c400_channel
+struct rf5c400_channel
 {
 	UINT16	startH;
 	UINT16	startL;
@@ -47,8 +46,7 @@ struct _rf5c400_channel
 	double env_scale;
 };
 
-typedef struct _rf5c400_state rf5c400_state;
-struct _rf5c400_state
+struct rf5c400_state
 {
 	INT16 *rom;
 	UINT32 rom_length;

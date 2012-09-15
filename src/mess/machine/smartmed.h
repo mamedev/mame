@@ -11,8 +11,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _smartmedia_cartslot_config smartmedia_cartslot_config;
-struct _smartmedia_cartslot_config
+struct smartmedia_cartslot_config
 {
 	const char *					interface;
 };
@@ -47,8 +46,7 @@ enum pointer_sm_mode_t
 #define NAND_CHIP_K9F1G08U0B   { 5, { 0xEC, 0xF1, 0x00, 0x95, 0x40 }, 2048, 64,  64, 1024, 2, 2, 0 } /* K9F1G08U0B */
 #define NAND_CHIP_K9LAG08U0M   { 5, { 0xEC, 0xD5, 0x55, 0x25, 0x68 }, 2048, 64, 128, 8192, 2, 3, 0 } /* K9LAG08U0M */
 
-typedef struct _nand_chip nand_chip;
-struct _nand_chip
+struct nand_chip
 {
 	int id_len;
 	UINT8 id[5];

@@ -11,8 +11,7 @@
 #include "includes/warpwarp.h"
 
 
-typedef struct _geebee_sound_state geebee_sound_state;
-struct _geebee_sound_state
+struct geebee_sound_state
 {
 	emu_timer *m_volume_timer;
 	UINT16 *m_decay;

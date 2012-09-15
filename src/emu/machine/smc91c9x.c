@@ -106,8 +106,7 @@ static const char *const ethernet_regname[64] =
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _smc91c9x_state smc91c9x_state;
-struct _smc91c9x_state
+struct smc91c9x_state
 {
 	device_t *device;
 	smc91c9x_irq_func irq_handler;

@@ -34,8 +34,7 @@ typedef struct _filter_
 	biquad ProtoCoef[2];
 } lp_filter;
 
-typedef struct _filter_state filter_state;
-struct _filter_state
+struct filter_state
 {
 	double		capval;
 	double		exponent;

@@ -33,8 +33,7 @@ typedef union
     UINT8  b[16];   /* or as 8 bit registers */
 } necbasicregs;
 
-typedef struct _nec_state_t nec_state_t;
-struct _nec_state_t
+struct nec_state_t
 {
 	necbasicregs regs;
 	offs_t	fetch_xor;

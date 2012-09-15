@@ -86,8 +86,7 @@ extern const device_type SWIM;
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _applefdc_interface applefdc_interface;
-struct _applefdc_interface
+struct applefdc_interface
 {
 	void (*set_lines)(device_t *device, UINT8 lines);
 	void (*set_enable_lines)(device_t *device, int enable_mask);

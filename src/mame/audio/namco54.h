@@ -5,8 +5,7 @@
 #include "sound/discrete.h"
 
 
-typedef struct _namco_54xx_config namco_54xx_config;
-struct _namco_54xx_config
+struct namco_54xx_config
 {
 	const char *discrete;	/* name of the discrete sound device */
 	int			firstnode;	/* index of the first node */

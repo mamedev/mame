@@ -157,8 +157,7 @@ typedef INT16 SWORD68K;
 
 
 
-typedef struct _mcd212_ab_t mcd212_ab_t;
-struct _mcd212_ab_t
+struct mcd212_ab_t
 {
     //* Color limit array.
     BYTE68K limit[3 * BYTE68K_MAX];

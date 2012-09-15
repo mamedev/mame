@@ -106,8 +106,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _tpi6525_state tpi6525_state;
-struct _tpi6525_state
+struct tpi6525_state
 {
 	devcb_resolved_write_line	out_irq_func;
 	devcb_resolved_read8		in_pa_func;

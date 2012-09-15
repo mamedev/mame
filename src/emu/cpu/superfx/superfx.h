@@ -83,8 +83,7 @@ enum
 #define SUPERFX_CFGR_IRQ	0x80	// IRQ
 #define SUPERFX_CFGR_MS0	0x20	// MS0
 
-typedef struct _superfx_config superfx_config;
-struct _superfx_config
+struct superfx_config
 {
 	devcb_write_line	out_irq_func;			/* IRQ changed callback */
 };

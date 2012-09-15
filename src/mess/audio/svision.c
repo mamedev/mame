@@ -45,8 +45,7 @@ typedef struct
 	int count;
 } SVISION_CHANNEL;
 
-typedef struct _svision_sound_state svision_sound_state;
-struct _svision_sound_state
+struct svision_sound_state
 {
 	sound_stream *mixer_channel;
 	SVISION_DMA dma;

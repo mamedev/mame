@@ -11,8 +11,7 @@
 
 #include "devlegcy.h"
 
-typedef struct _k053260_interface k053260_interface;
-struct _k053260_interface {
+struct k053260_interface {
 	const char *rgnoverride;
 	timer_expired_func irq;			/* called on SH1 complete cycle ( clock / 32 ) */
 };

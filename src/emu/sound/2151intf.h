@@ -5,8 +5,7 @@
 
 #include "devlegcy.h"
 
-typedef struct _ym2151_interface ym2151_interface;
-struct _ym2151_interface
+struct ym2151_interface
 {
 	devcb_write_line irqhandler;
 	devcb_write8 portwritehandler;

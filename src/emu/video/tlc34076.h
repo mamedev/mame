@@ -17,8 +17,7 @@ const pen_t *tlc34076_get_pens(device_t *device);
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _tlc34076_config tlc34076_config;
-struct _tlc34076_config
+struct tlc34076_config
 {
 	int res_sel;
 };

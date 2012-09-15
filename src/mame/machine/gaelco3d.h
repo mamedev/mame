@@ -34,8 +34,7 @@
     DEVICE INTERFACE TYPE
 ***************************************************************************/
 
-typedef struct _gaelco_serial_interface gaelco_serial_interface;
-struct _gaelco_serial_interface
+struct gaelco_serial_interface
 {
 	devcb_write_line irq_func;
 };

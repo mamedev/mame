@@ -164,8 +164,7 @@ enum
 
 typedef void (*ppc4xx_spu_tx_handler)(device_t *device, UINT8 data);
 
-typedef struct _powerpc_config powerpc_config;
-struct _powerpc_config
+struct powerpc_config
 {
 	UINT32		bus_frequency;
 	read32_device_func	dcr_read_func;

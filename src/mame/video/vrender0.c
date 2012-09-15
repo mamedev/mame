@@ -74,8 +74,7 @@ typedef struct
 	UINT32 Height;
 } _RenderState;
 
-typedef struct _vr0video_state  vr0video_state;
-struct _vr0video_state
+struct vr0video_state
 {
 	device_t *cpu;
 

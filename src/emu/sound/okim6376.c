@@ -34,8 +34,7 @@ struct ADPCMVoice
 	INT32 step;
 };
 
-typedef struct _okim6376_state okim6376_state;
-struct _okim6376_state
+struct okim6376_state
 {
 	#define OKIM6376_VOICES		2
 	struct ADPCMVoice voice[OKIM6376_VOICES];

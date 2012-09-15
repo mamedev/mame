@@ -24,8 +24,7 @@
 #define MSM6585_S80   (6+8)  /* prescaler 1/80 (8KHz), data 4bit */
 #define MSM6585_S20   (7+8)  /* prescaler 1/20(32KHz), data 4bit */
 
-typedef struct _msm5205_interface msm5205_interface;
-struct _msm5205_interface
+struct msm5205_interface
 {
 	void (*vclk_callback)(device_t *);   /* VCLK callback              */
 	int select;       /* prescaler / bit width selector        */

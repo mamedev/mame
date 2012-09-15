@@ -88,8 +88,7 @@ typedef enum
 	A2MEM_DUAL		= 2		/* this is a bank where read and write can go different places */
 } bank_disposition_t;
 
-typedef struct _apple2_meminfo apple2_meminfo;
-struct _apple2_meminfo
+struct apple2_meminfo
 {
 	UINT32 read_mem;
 	read8_delegate *read_handler;
@@ -97,8 +96,7 @@ struct _apple2_meminfo
 	write8_delegate *write_handler;
 };
 
-typedef struct _apple2_memmap_entry apple2_memmap_entry;
-struct _apple2_memmap_entry
+struct apple2_memmap_entry
 {
 	offs_t begin;
 	offs_t end;
@@ -106,8 +104,7 @@ struct _apple2_memmap_entry
 	bank_disposition_t bank_disposition;
 };
 
-typedef struct _apple2_memmap_config apple2_memmap_config;
-struct _apple2_memmap_config
+struct apple2_memmap_config
 {
 	int first_bank;
 	UINT8 *auxmem;

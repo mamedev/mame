@@ -94,8 +94,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _mc68328_interface mc68328_interface;
-struct _mc68328_interface
+struct mc68328_interface
 {
     const char *m68k_cpu_tag;
 

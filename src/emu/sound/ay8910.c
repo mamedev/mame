@@ -151,8 +151,7 @@ has twice the steps, happening twice as fast.
  *
  *************************************/
 
-typedef struct _ay_ym_param ay_ym_param;
-struct _ay_ym_param
+struct ay_ym_param
 {
 	double r_up;
 	double r_down;
@@ -160,8 +159,7 @@ struct _ay_ym_param
 	double res[32];
 };
 
-typedef struct _ay8910_context ay8910_context;
-struct _ay8910_context
+struct ay8910_context
 {
 	device_t *device;
 	int streams;

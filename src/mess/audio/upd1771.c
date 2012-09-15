@@ -118,8 +118,7 @@ const char WAVEFORMS[8][32]={
 #define STATE_TONE    2
 #define STATE_ADPCM   3
 
-typedef struct _upd1771_state upd1771_state;
-struct _upd1771_state
+struct upd1771_state
 {
     sound_stream *channel;
     devcb_resolved_write_line ack_out_func;

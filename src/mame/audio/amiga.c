@@ -40,8 +40,7 @@
  *
  *************************************/
 
-typedef struct _audio_channel audio_channel;
-struct _audio_channel
+struct audio_channel
 {
 	emu_timer *	irq_timer;
 	UINT32			curlocation;
@@ -54,8 +53,7 @@ struct _audio_channel
 };
 
 
-typedef struct _amiga_audio amiga_audio;
-struct _amiga_audio
+struct amiga_audio
 {
 	audio_channel	channel[4];
 	sound_stream *	stream;

@@ -13,8 +13,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _upd1771_interface upd1771_interface;
-struct _upd1771_interface
+struct upd1771_interface
 {
 	devcb_write_line	ack_callback;
 };

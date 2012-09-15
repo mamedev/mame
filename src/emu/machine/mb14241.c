@@ -7,8 +7,7 @@
 #include "emu.h"
 #include "machine/mb14241.h"
 
-typedef struct _mb14241_state  mb14241_state;
-struct _mb14241_state
+struct mb14241_state
 {
 	UINT16 shift_data;	/* 15 bits only */
 	UINT8 shift_count;	/* 3 bits */

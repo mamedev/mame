@@ -137,8 +137,7 @@ typedef struct
 	UINT8				luma;
 } _quad_m2;
 
-typedef struct _poly_extra_data poly_extra_data;
-struct _poly_extra_data
+struct poly_extra_data
 {
 	model2_state *	state;
 	UINT32		lumabase;

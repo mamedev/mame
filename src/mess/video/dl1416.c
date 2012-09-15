@@ -95,8 +95,7 @@ static const int dl1416t_segments[128] = {
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _dl1416_state dl1416_state;
-struct _dl1416_state
+struct dl1416_state
 {
 	int write_enable;
 	int chip_enable;

@@ -84,8 +84,7 @@ typedef enum
 
 #define UPD765_BAD_MEDIA 0x100
 
-typedef struct _upd765_t upd765_t;
-struct _upd765_t
+struct upd765_t
 {
 	devcb_resolved_write_line	out_int_func;
 	devcb_resolved_write_line	out_drq_func;

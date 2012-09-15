@@ -18,8 +18,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _pf10_state pf10_state;
-struct _pf10_state
+struct pf10_state
 {
 	UINT8 dummy;
 };

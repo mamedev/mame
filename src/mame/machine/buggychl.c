@@ -2,8 +2,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/buggychl.h"
 
-typedef struct _buggychl_mcu_state buggychl_mcu_state;
-struct _buggychl_mcu_state
+struct buggychl_mcu_state
 {
 	UINT8       m_port_a_in;
 	UINT8       m_port_a_out;

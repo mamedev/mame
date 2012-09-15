@@ -47,14 +47,12 @@
 #include "zsg2.h"
 
 // 16 registers per channel, 48 channels
-typedef struct _zchan zchan;
-struct _zchan
+struct zchan
 {
 	UINT16 v[16];
 };
 
-typedef struct _zsg2_state zsg2_state;
-struct _zsg2_state
+struct zsg2_state
 {
 	zchan zc[48];
 	UINT16 act[3];

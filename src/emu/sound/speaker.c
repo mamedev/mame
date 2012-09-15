@@ -84,8 +84,7 @@ static double ampl[FILTER_LENGTH];
 /* Internal oversampling factor (interm. samples vs stream samples) */
 static const int RATE_MULTIPLIER = 4;
 
-typedef struct _speaker_state speaker_state;
-struct _speaker_state
+struct speaker_state
 {
 	sound_stream *channel;
 	const INT16 *levels;

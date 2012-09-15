@@ -58,8 +58,7 @@
 ***************************************************************************/
 
 /* an object type entry */
-typedef struct _objtype_entry objtype_entry;
-struct _objtype_entry
+struct objtype_entry
 {
 	objtype_entry *		next;
 	UINT32				type;
@@ -69,8 +68,7 @@ struct _objtype_entry
 
 
 /* an entry in a pool */
-typedef struct _object_entry object_entry;
-struct _object_entry
+struct object_entry
 {
 	object_entry *		next;
 	object_entry *		globalnext;
@@ -84,8 +82,7 @@ struct _object_entry
 
 
 /* a block of entry items */
-typedef struct _object_entry_block object_entry_block;
-struct _object_entry_block
+struct object_entry_block
 {
 	object_entry_block *next;
 	object_entry		entry[OBJECT_ENTRY_BLOCK];

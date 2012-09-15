@@ -12,8 +12,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _e05a03_state e05a03_state;
-struct _e05a03_state
+struct e05a03_state
 {
 	/* 24-bit shift register, port 0x00, 0x01 and 0x02 */
 	UINT32 shift;

@@ -52,8 +52,7 @@ Newer version of the I/O chip ?
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _tc0220ioc_state tc0220ioc_state;
-struct _tc0220ioc_state
+struct tc0220ioc_state
 {
 	UINT8      regs[8];
 	UINT8      port;
@@ -210,8 +209,7 @@ static DEVICE_RESET( tc0220ioc )
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _tc0510nio_state tc0510nio_state;
-struct _tc0510nio_state
+struct tc0510nio_state
 {
 	UINT8   regs[8];
 
@@ -361,8 +359,7 @@ static DEVICE_RESET( tc0510nio )
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _tc0640fio_state tc0640fio_state;
-struct _tc0640fio_state
+struct tc0640fio_state
 {
 	UINT8   regs[8];
 

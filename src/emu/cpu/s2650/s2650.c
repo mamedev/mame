@@ -25,8 +25,7 @@
 /* define this to expand all EA calculations inline */
 #define INLINE_EA	1
 
-typedef struct _s2650_regs s2650_regs;
-struct _s2650_regs {
+struct s2650_regs {
 	UINT16	ppc;	/* previous program counter (page + iar) */
     UINT16  page;   /* 8K page select register (A14..A13) */
     UINT16  iar;    /* instruction address register (A12..A0) */

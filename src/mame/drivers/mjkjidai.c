@@ -51,8 +51,7 @@ private:
 extern const device_type MJKJIDAI;
 
 /* Start of ADPCM custom chip code */
-typedef struct _mjkjidai_adpcm_state mjkjidai_adpcm_state;
-struct _mjkjidai_adpcm_state
+struct mjkjidai_adpcm_state
 {
 	oki_adpcm_state m_adpcm;
 	sound_stream *m_stream;

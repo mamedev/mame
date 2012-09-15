@@ -77,8 +77,7 @@ YMZ294: 0 I/O port
 #define AY8910_INTERFACE(name) \
 	const ay8910_interface (name) =
 
-typedef struct _ay8910_interface ay8910_interface;
-struct _ay8910_interface
+struct ay8910_interface
 {
 	int					flags;			/* Flags */
 	int					res_load[3];	/* Load on channel in ohms */

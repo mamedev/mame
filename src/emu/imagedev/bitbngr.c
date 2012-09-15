@@ -331,10 +331,10 @@ void bitbanger_device::device_start(void)
 
 void bitbanger_device::device_config_complete(void)
 {
-	const _bitbanger_config *intf = reinterpret_cast<const _bitbanger_config *>(static_config());
+	const bitbanger_config *intf = reinterpret_cast<const bitbanger_config *>(static_config());
 	if(intf != NULL)
 	{
-		*static_cast<_bitbanger_config *>(this) = *intf;
+		*static_cast<bitbanger_config *>(this) = *intf;
 	}
 	else
 	{

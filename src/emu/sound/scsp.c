@@ -175,8 +175,7 @@ struct _SLOT
 
 #define USEDSP
 
-typedef struct _scsp_state scsp_state;
-struct _scsp_state
+struct scsp_state
 {
 	union
 	{

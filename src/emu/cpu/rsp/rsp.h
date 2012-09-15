@@ -70,8 +70,7 @@ enum
 
 typedef void (*rsp_set_status_func)(device_t *device, UINT32 status);
 
-typedef struct _rsp_config rsp_config;
-struct _rsp_config
+struct rsp_config
 {
 	read32_device_func dp_reg_r;
 	write32_device_func dp_reg_w;
@@ -155,8 +154,7 @@ typedef union
 } ACCUMULATOR_REG;
 
 typedef struct _rspimp_state rspimp_state;
-typedef struct _rsp_state rsp_state;
-struct _rsp_state
+struct rsp_state
 {
 	const rsp_config *config;
 	FILE *exec_output;

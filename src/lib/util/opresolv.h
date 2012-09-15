@@ -57,8 +57,7 @@ enum option_type
 	OPTIONTYPE_ENUM_VALUE
 };
 
-typedef struct _option_guide option_guide;
-struct _option_guide
+struct option_guide
 {
 	enum option_type option_type;
 	int parameter;

@@ -62,8 +62,7 @@ enum _display_type
 typedef enum _display_type display_type;
 
 
-typedef struct _dasm_table_entry dasm_table_entry;
-struct _dasm_table_entry
+struct dasm_table_entry
 {
 	const char *			name;
 	display_type			display;
@@ -72,8 +71,7 @@ struct _dasm_table_entry
 };
 
 
-typedef struct _options options;
-struct _options
+struct options
 {
 	const char *			filename;
 	offs_t					basepc;

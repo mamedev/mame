@@ -17,8 +17,7 @@
 ***************************************************************************/
 
 #if 0
-typedef struct _tf20_interface tf20_interface;
-struct _tf20_interface
+struct tf20_interface
 {
 };
 #endif

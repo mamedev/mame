@@ -61,8 +61,7 @@
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
-typedef struct _namco_53xx_state namco_53xx_state;
-struct _namco_53xx_state
+struct namco_53xx_state
 {
 	device_t *	m_cpu;
 	UINT8					m_portO;

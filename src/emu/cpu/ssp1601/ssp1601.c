@@ -29,8 +29,7 @@ CPU_DISASSEMBLE( ssp1601 );
 
 
 
-typedef struct _ssp1601_state_t ssp1601_state_t;
-struct _ssp1601_state_t
+struct ssp1601_state_t
 {
 	PAIR gr[8];		/* general regs, some are 16bit, some 32bit */
 	union {

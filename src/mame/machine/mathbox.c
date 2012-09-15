@@ -29,8 +29,7 @@
 #define MB_TEST 0
 #define LOG(x) do { if (MB_TEST) logerror x; } while (0)
 
-typedef struct _mathbox_state mathbox_state;
-struct _mathbox_state
+struct mathbox_state
 {
 	device_t *device;
 	/* math box scratch registers */

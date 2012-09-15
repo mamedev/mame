@@ -84,8 +84,7 @@
 
 typedef struct _cop400_opcode_map cop400_opcode_map;
 
-typedef struct _cop400_state cop400_state;
-struct _cop400_state
+struct cop400_state
 {
 	const cop400_interface *intf;
 

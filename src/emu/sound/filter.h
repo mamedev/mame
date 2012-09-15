@@ -16,15 +16,13 @@ typedef int filter_real;
 typedef double filter_real;
 #endif
 
-typedef struct _filter filter;
-struct _filter
+struct filter
 {
 	filter_real xcoeffs[(FILTER_ORDER_MAX+1)/2];
 	unsigned order;
 };
 
-typedef struct _filter_state filter_state;
-struct _filter_state
+struct filter_state
 {
 	unsigned prev_mac;
 	filter_real xprev[FILTER_ORDER_MAX];
@@ -65,8 +63,7 @@ filter_real filter_compute(filter* f, filter_state* s);
 
 #define Q_TO_DAMP(q)	(1.0/q)
 
-typedef struct _filter2_context filter2_context;
-struct _filter2_context
+struct filter2_context
 {
 	double x0, x1, x2;	/* x[k], x[k-1], x[k-2], current and previous 2 input values */
 	double y0, y1, y2;	/* y[k], y[k-1], y[k-2], current and previous 2 output values */

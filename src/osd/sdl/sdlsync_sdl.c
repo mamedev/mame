@@ -28,8 +28,7 @@
 #else
 #define LOG( x )
 #endif
-typedef struct _hidden_mutex_t hidden_mutex_t;
-struct _hidden_mutex_t {
+struct hidden_mutex_t {
 	SDL_mutex *			id;
 	volatile INT32		locked;
 	volatile INT32		threadid;

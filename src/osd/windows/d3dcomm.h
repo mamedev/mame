@@ -53,8 +53,7 @@
 //============================================================
 
 /* d3d_texture_info holds information about a texture */
-typedef struct _d3d_texture_info d3d_texture_info;
-struct _d3d_texture_info
+struct d3d_texture_info
 {
 	d3d_texture_info *		next;						// next texture in the list
 	d3d_texture_info *		prev;						// prev texture in the list
@@ -79,8 +78,7 @@ struct _d3d_texture_info
 
 
 /* d3d_poly_info holds information about a single polygon/d3d primitive */
-typedef struct _d3d_poly_info d3d_poly_info;
-struct _d3d_poly_info
+struct d3d_poly_info
 {
 	 D3DPRIMITIVETYPE		type;						// type of primitive
 	 UINT32					count;						// total number of primitives
@@ -92,8 +90,7 @@ struct _d3d_poly_info
 
 
 /* d3d_vertex describes a single vertex */
-typedef struct _d3d_vertex d3d_vertex;
-struct _d3d_vertex
+struct d3d_vertex
 {
 	float					x, y, z;					// X,Y,Z coordinates
 	float					rhw;						// RHW when no HLSL, padding when HLSL
@@ -103,8 +100,7 @@ struct _d3d_vertex
 
 
 /* line_aa_step is used for drawing antialiased lines */
-typedef struct _line_aa_step line_aa_step;
-struct _line_aa_step
+struct line_aa_step
 {
 	float					xoffs, yoffs;				// X/Y deltas
 	float					weight;						// weight contribution

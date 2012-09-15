@@ -49,8 +49,7 @@
 #include "namco52.h"
 #include "cpu/mb88xx/mb88xx.h"
 
-typedef struct _namco_52xx_state namco_52xx_state;
-struct _namco_52xx_state
+struct namco_52xx_state
 {
 	device_t *m_cpu;
 	device_t *m_discrete;

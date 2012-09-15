@@ -88,8 +88,7 @@ typedef D3DMATRIX d3d_matrix;
 //  Abstracted presentation parameters
 //============================================================
 
-typedef struct _d3d_present_parameters d3d_present_parameters;
-struct _d3d_present_parameters
+struct d3d_present_parameters
 {
 	UINT BackBufferWidth;
 	UINT BackBufferHeight;
@@ -112,8 +111,7 @@ struct _d3d_present_parameters
 //  Abstracted device identifier
 //============================================================
 
-typedef struct _d3d_adapter_identifier d3d_adapter_identifier;
-struct _d3d_adapter_identifier
+struct d3d_adapter_identifier
 {
     char            Driver[512];
     char            Description[512];
@@ -155,8 +153,7 @@ typedef enum _d3d_caps_index d3d_caps_index;
 //  Direct3D interfaces
 //============================================================
 
-typedef struct _d3d_interface d3d_interface;
-struct _d3d_interface
+struct d3d_interface
 {
 	HRESULT  (*check_device_format)(d3d *d3dptr, UINT adapter, D3DDEVTYPE devtype, D3DFORMAT adapterformat, DWORD usage, D3DRESOURCETYPE restype, D3DFORMAT format);
 	HRESULT  (*check_device_type)(d3d *d3dptr, UINT adapter, D3DDEVTYPE devtype, D3DFORMAT format, D3DFORMAT backformat, BOOL windowed);
@@ -176,8 +173,7 @@ struct _d3d_interface
 //  Direct3DDevice interfaces
 //============================================================
 
-typedef struct _d3d_device_interface d3d_device_interface;
-struct _d3d_device_interface
+struct d3d_device_interface
 {
 	HRESULT (*begin_scene)(d3d_device *dev);
 	HRESULT (*clear)(d3d_device *dev, DWORD count, const D3DRECT *rects, DWORD flags, D3DCOLOR color, float z, DWORD stencil);
@@ -210,8 +206,7 @@ struct _d3d_device_interface
 //  Direct3DSurface interfaces
 //============================================================
 
-typedef struct _d3d_surface_interface d3d_surface_interface;
-struct _d3d_surface_interface
+struct d3d_surface_interface
 {
 	HRESULT (*lock_rect)(d3d_surface *surf, D3DLOCKED_RECT *locked, const RECT *rect, DWORD flags);
 	ULONG   (*release)(d3d_surface *tex);
@@ -223,8 +218,7 @@ struct _d3d_surface_interface
 //  Direct3DTexture interfaces
 //============================================================
 
-typedef struct _d3d_texture_interface d3d_texture_interface;
-struct _d3d_texture_interface
+struct d3d_texture_interface
 {
 	HRESULT (*get_surface_level)(d3d_texture *tex, UINT level, d3d_surface **surface);
 	HRESULT (*lock_rect)(d3d_texture *tex, UINT level, D3DLOCKED_RECT *locked, const RECT *rect, DWORD flags);
@@ -237,8 +231,7 @@ struct _d3d_texture_interface
 //  Direct3DVertexBuffer interfaces
 //============================================================
 
-typedef struct _d3d_vertex_buffer_interface d3d_vertex_buffer_interface;
-struct _d3d_vertex_buffer_interface
+struct d3d_vertex_buffer_interface
 {
 	HRESULT (*lock)(d3d_vertex_buffer *vbuf, UINT offset, UINT size, VOID **data, DWORD flags);
 	ULONG   (*release)(d3d_vertex_buffer *vbuf);
@@ -250,8 +243,7 @@ struct _d3d_vertex_buffer_interface
 //  Direct3DEffect interfaces
 //============================================================
 
-typedef struct _d3d_effect_interface d3d_effect_interface;
-struct _d3d_effect_interface
+struct d3d_effect_interface
 {
 	void     (*begin)(d3d_effect *effect, UINT *passes, DWORD flags);
 	void     (*end)(d3d_effect *effect);

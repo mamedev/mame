@@ -84,8 +84,7 @@
 #define CTL_STATE_OUTPUT		(1)
 #define CTL_STATE_NEXT_OUTPUT	(2)
 
-typedef struct _tms5110_state tms5110_state;
-struct _tms5110_state
+struct tms5110_state
 {
 	/* coefficient tables */
 	int variant;				/* Variant of the 5110 - see tms5110.h */
@@ -163,8 +162,7 @@ struct _tms5110_state
 	UINT8 romclk_hack_state;
 };
 
-typedef struct _tmsprom_state tmsprom_state;
-struct _tmsprom_state
+struct tmsprom_state
 {
 	/* Rom interface */
 	UINT32 address;

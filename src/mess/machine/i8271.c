@@ -22,8 +22,7 @@
 it is from cpu to fdc */
 #define I8271_FLAGS_DATA_DIRECTION 0x02
 
-typedef struct _i8271_t i8271_t;
-struct _i8271_t
+struct i8271_t
 {
 	int flags;
 	int state;

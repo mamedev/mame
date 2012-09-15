@@ -57,9 +57,7 @@
 #define	LOG(x)		do { if (VERBOSE) logerror x; } while (0)
 
 
-typedef struct _i8275_t i8275_t;
-
-struct _i8275_t
+struct i8275_t
 {
 	devcb_resolved_write_line	out_drq_func;
 	devcb_resolved_write_line	out_irq_func;

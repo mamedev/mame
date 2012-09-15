@@ -233,8 +233,7 @@ extern const device_type MB8877;
 ***************************************************************************/
 
 /* Interface */
-typedef struct _wd17xx_interface wd17xx_interface;
-struct _wd17xx_interface
+struct wd17xx_interface
 {
 	devcb_read_line in_dden_func;
 	devcb_write_line out_intrq_func;

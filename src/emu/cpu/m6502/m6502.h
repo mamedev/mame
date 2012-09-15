@@ -56,8 +56,7 @@ enum
 #define M6510_INTERFACE(name) \
    	const m6502_interface (name) =
 
-typedef struct _m6502_interface m6502_interface;
-struct _m6502_interface
+struct m6502_interface
 {
 	devcb_read8				read_indexed_func;
 	devcb_write8			write_indexed_func;

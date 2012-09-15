@@ -92,8 +92,7 @@ struct sh6840_timer_channel
 	} counter;
 };
 
-typedef struct _beezer_sound_state beezer_sound_state;
-struct _beezer_sound_state
+struct beezer_sound_state
 {
 	cpu_device *m_maincpu;
 

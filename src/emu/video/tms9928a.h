@@ -76,8 +76,7 @@ extern const device_type TMS9929A;
 extern const device_type TMS9129;
 
 
-typedef struct _tms9928a_interface tms9928a_interface;
-struct _tms9928a_interface
+struct tms9928a_interface
 {
 	const char			*m_screen_tag;
 	int					m_vram_size;	/* 4K, 8K, or 16K. This should be replaced by fetching data from an address space? */

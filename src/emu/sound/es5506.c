@@ -135,8 +135,7 @@ Ensoniq OTIS - ES5505                                            Ensoniq OTTO - 
 ***********************************************************************************************/
 
 /* struct describing a single playing voice */
-typedef struct _es5506_voice es5506_voice;
-struct _es5506_voice
+struct es5506_voice
 {
 	/* external state */
 	UINT32		control;				/* control register */
@@ -167,8 +166,7 @@ struct _es5506_voice
 	UINT32		accum_mask;
 };
 
-typedef struct _es5506_state es5506_state;
-struct _es5506_state
+struct es5506_state
 {
 	sound_stream *stream;				/* which stream are we using */
 	int			sample_rate;			/* current sample rate */

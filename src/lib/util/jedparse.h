@@ -62,8 +62,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _jed_data jed_data;
-struct _jed_data
+struct jed_data
 {
 	UINT32		numfuses;			/* number of defined fuses */
 	UINT8		fusemap[JED_MAX_FUSES / 8];/* array of bit-packed data */

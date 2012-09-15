@@ -69,8 +69,7 @@ typedef HRESULT (WINAPI *directdrawenumerateex_ptr)(LPDDENUMCALLBACKEXA lpCallba
 
 
 /* dd_info is the information about DirectDraw for the current screen */
-typedef struct _dd_info dd_info;
-struct _dd_info
+struct dd_info
 {
 	GUID					adapter;					// current display adapter
 	GUID *					adapter_ptr;				// pointer to current display adapter
@@ -101,8 +100,7 @@ struct _dd_info
 
 
 /* monitor_enum_info holds information during a monitor enumeration */
-typedef struct _monitor_enum_info monitor_enum_info;
-struct _monitor_enum_info
+struct monitor_enum_info
 {
 	win_monitor_info *		monitor;					// pointer to monitor we want
 	GUID					guid;						// GUID of the one we found
@@ -112,8 +110,7 @@ struct _monitor_enum_info
 
 
 /* mode_enum_info holds information during a display mode enumeration */
-typedef struct _mode_enum_info mode_enum_info;
-struct _mode_enum_info
+struct mode_enum_info
 {
 	win_window_info *		window;
 	INT32					minimum_width, minimum_height;

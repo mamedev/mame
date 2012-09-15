@@ -9,8 +9,7 @@
 
 #include "includes/special.h"
 
-typedef struct _specimx_sound_state specimx_sound_state;
-struct _specimx_sound_state
+struct specimx_sound_state
 {
 	sound_stream *mixer_channel;
 	int specimx_input[3];

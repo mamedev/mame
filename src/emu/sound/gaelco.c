@@ -49,8 +49,7 @@ Registers per channel:
 #define VOLUME_LEVELS			0x10
 
 /* this structure defines a channel */
-typedef struct _gaelco_sound_channel gaelco_sound_channel;
-struct _gaelco_sound_channel
+struct gaelco_sound_channel
 {
 	int active;			/* is it playing? */
 	int loop;			/* = 0 no looping, = 1 looping */
@@ -58,8 +57,7 @@ struct _gaelco_sound_channel
 };
 
 /* this structure defines the Gaelco custom sound chip */
-typedef struct _gaelco_sound_state gaelco_sound_state;
-struct _gaelco_sound_state
+struct gaelco_sound_state
 {
 	sound_stream *stream;									/* our stream */
 	UINT8 *snd_data;										/* PCM data */

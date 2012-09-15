@@ -81,8 +81,7 @@ are attached to two switches. The keys appear twice in the keyboard matrix.
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _kb_keytr_state kb_keytr_state;
-struct _kb_keytr_state
+struct kb_keytr_state
 {
 	device_t *cpu;
 

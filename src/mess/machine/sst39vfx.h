@@ -18,8 +18,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _sst39vfx_config sst39vfx_config;
-struct _sst39vfx_config
+struct sst39vfx_config
 {
 	int cpu_datawidth;
 	int cpu_endianess;

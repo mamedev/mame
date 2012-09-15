@@ -336,8 +336,7 @@ INLINE unsigned texel( namcos22_state *state, unsigned x, unsigned y )
 
 
 
-typedef struct _poly_extra_data poly_extra_data;
-struct _poly_extra_data
+struct poly_extra_data
 {
 	/* poly / sprites */
 	running_machine *machine;

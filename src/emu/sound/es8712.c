@@ -19,8 +19,7 @@
 
 
 /* struct describing a playing ADPCM chip */
-typedef struct _es8712_state es8712_state;
-struct _es8712_state
+struct es8712_state
 {
 	UINT8 playing;			/* 1 if we're actively playing */
 

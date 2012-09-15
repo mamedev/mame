@@ -86,8 +86,7 @@ typedef struct
 	long	sample_loop;
 } VOICE;
 
-typedef struct _c140_state c140_state;
-struct _c140_state
+struct c140_state
 {
 	int sample_rate;
 	sound_stream *stream;

@@ -234,8 +234,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _mcs51_uart mcs51_uart;
-struct _mcs51_uart
+struct mcs51_uart
 {
 	UINT8	data_out;		//Data to send out
 	UINT8	bits_to_send;	//How many bits left to send when transmitting out the serial port
@@ -246,8 +245,7 @@ struct _mcs51_uart
 	UINT8	delay_cycles;	//Gross Hack;
 };
 
-typedef struct _mcs51_state_t mcs51_state_t;
-struct _mcs51_state_t
+struct mcs51_state_t
 {
 	//Internal stuff
 	UINT16	ppc;			//previous pc

@@ -32,8 +32,7 @@ typedef UINT32 HashT;
 //  TYPE DEFINITIONS
 //============================================================
 
-typedef struct _sdl_window_info sdl_window_info;
-struct _sdl_window_info
+struct sdl_window_info
 {
 	// Pointer to next window
 	sdl_window_info *	next;
@@ -101,8 +100,7 @@ struct _sdl_window_info
 #endif
 };
 
-typedef struct _sdl_draw_info sdl_draw_info;
-struct _sdl_draw_info
+struct sdl_draw_info
 {
 	void (*exit)(void);
 	void (*attach)(sdl_draw_info *info, sdl_window_info *window);

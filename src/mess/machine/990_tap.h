@@ -8,8 +8,7 @@ extern WRITE16_DEVICE_HANDLER(ti990_tpc_w);
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _ti990_tpc_interface ti990_tpc_interface;
-struct _ti990_tpc_interface
+struct ti990_tpc_interface
 {
 	void (*interrupt_callback)(running_machine &machine, int state);
 };

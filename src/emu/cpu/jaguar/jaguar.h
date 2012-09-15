@@ -74,8 +74,7 @@ enum
 typedef void (*jaguar_int_func)(device_t *device);
 
 
-typedef struct _jaguar_cpu_config jaguar_cpu_config;
-struct _jaguar_cpu_config
+struct jaguar_cpu_config
 {
 	jaguar_int_func		cpu_int_callback;
 };

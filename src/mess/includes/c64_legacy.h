@@ -23,8 +23,7 @@ typedef struct {
 	int addr, size, index, start;
 } C64_ROM;
 
-typedef struct _c64_cart_t c64_cart_t;
-struct _c64_cart_t {
+struct c64_cart_t {
 	C64_ROM     bank[C64_MAX_ROMBANK];
 	INT8        game;
 	INT8        exrom;

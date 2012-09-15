@@ -22,8 +22,7 @@
  *
  *************************************/
 
-typedef struct _t11_state t11_state;
-struct _t11_state
+struct t11_state
 {
 	PAIR				ppc;	/* previous program counter */
     PAIR				reg[8];

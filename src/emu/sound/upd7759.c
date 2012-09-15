@@ -167,8 +167,7 @@ enum
 
 *************************************************************/
 
-typedef struct _upd7759_state upd7759_state;
-struct _upd7759_state
+struct upd7759_state
 {
 	device_t *device;
 	sound_stream *channel;					/* stream channel for playback */

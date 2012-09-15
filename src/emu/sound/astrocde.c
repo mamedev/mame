@@ -43,8 +43,7 @@
 #include "astrocde.h"
 
 
-typedef struct _astrocade_state astrocade_state;
-struct _astrocade_state
+struct astrocade_state
 {
 	sound_stream *stream;		/* sound stream */
 

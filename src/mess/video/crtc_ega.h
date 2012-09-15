@@ -36,8 +36,7 @@ typedef void (*crtc_ega_end_update_func)(crtc_ega_device *device, bitmap_ind16 &
 
 
 /* interface */
-typedef struct _crtc_ega_interface crtc_ega_interface;
-struct _crtc_ega_interface
+struct crtc_ega_interface
 {
 	const char *m_screen_tag;		/* screen we are acting on */
 	int m_hpixels_per_column;		/* number of pixels per video memory address */

@@ -37,8 +37,7 @@
    64 kb external ram (first 8kbyte not seen for program execution?) */
 
 
-typedef struct _sc61860_cpu_core sc61860_cpu_core;
-struct _sc61860_cpu_core
+struct sc61860_cpu_core
 {
     int (*reset)(device_t *device);
     int (*brk)(device_t *device);

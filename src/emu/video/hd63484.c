@@ -29,8 +29,7 @@
 
 #define FIFO_LENGTH 256
 
-typedef struct _hd63484_state hd63484_state;
-struct _hd63484_state
+struct hd63484_state
 {
 	UINT16 *   ram;
 	UINT16 reg[256/2];

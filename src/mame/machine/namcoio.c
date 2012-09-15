@@ -116,8 +116,7 @@ TODO:
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
-typedef struct _namcoio_state namcoio_state;
-struct _namcoio_state
+struct namcoio_state
 {
 	UINT8          ram[16];
 

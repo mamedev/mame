@@ -29,8 +29,7 @@ enum {
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _rp5h01_state rp5h01_state;
-struct _rp5h01_state
+struct rp5h01_state
 {
 	int counter;
 	int counter_mode;	/* test pin */

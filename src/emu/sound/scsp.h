@@ -9,8 +9,7 @@
 
 #include "devlegcy.h"
 
-typedef struct _scsp_interface scsp_interface;
-struct _scsp_interface
+struct scsp_interface
 {
 	int roffset;				/* offset in the region */
 	void (*irq_callback)(device_t *device, int state);	/* irq callback */

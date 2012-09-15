@@ -62,8 +62,7 @@ static const UINT8 track_SD[][2] = {
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _micropolis_state micropolis_state;
-struct _micropolis_state
+struct micropolis_state
 {
 	/* register */
 	UINT8 data;

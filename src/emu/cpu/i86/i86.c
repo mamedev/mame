@@ -29,8 +29,7 @@ typedef union
 }
 i8086basicregs;
 
-typedef struct _i8086_state i8086_state;
-struct _i8086_state
+struct i8086_state
 {
 	i8086basicregs regs;
 	offs_t fetch_xor;

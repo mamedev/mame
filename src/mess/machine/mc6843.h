@@ -33,8 +33,7 @@ extern const device_type MC6843;
 
 /* ---------- configuration ------------ */
 
-typedef struct _mc6843_interface mc6843_interface;
-struct _mc6843_interface
+struct mc6843_interface
 {
 	void ( * irq_func ) ( device_t *device, int state );
 };

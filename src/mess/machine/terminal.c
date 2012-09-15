@@ -333,10 +333,10 @@ void generic_terminal_device::device_start()
 
 void generic_terminal_device::device_config_complete()
 {
-	const _terminal_interface *intf = reinterpret_cast<const _terminal_interface *>(static_config());
+	const terminal_interface *intf = reinterpret_cast<const terminal_interface *>(static_config());
 	if(intf != NULL)
 	{
-		*static_cast<_terminal_interface *>(this) = *intf;
+		*static_cast<terminal_interface *>(this) = *intf;
 	}
 	else
 	{

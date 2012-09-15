@@ -21,8 +21,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _er59256_t er59256_t;
-struct _er59256_t
+struct er59256_t
 {
     /* The actual memory */
 	UINT16  eerom[EEROM_WORDS];

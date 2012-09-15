@@ -21,8 +21,7 @@
 /* usually 640000 for 8000 Hz sample rate or */
 /* usually 800000 for 10000 Hz sample rate.  */
 
-typedef struct _tms5110_interface tms5110_interface;
-struct _tms5110_interface
+struct tms5110_interface
 {
 	/* legacy interface */
 	int (*M0_callback)(device_t *device);	/* function to be called when chip requests another bit */
@@ -169,8 +168,7 @@ extern const device_type M58817;
 
 /* PROM controlled TMS5110 interface */
 
-typedef struct _tmsprom_interface tmsprom_interface;
-struct _tmsprom_interface
+struct tmsprom_interface
 {
 	const char *prom_region;		/* prom memory region - sound region is automatically assigned */
 	UINT32 rom_size;				/* individual rom_size */

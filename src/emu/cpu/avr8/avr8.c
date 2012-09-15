@@ -21,8 +21,7 @@
 #include "debugger.h"
 #include "avr8.h"
 
-typedef struct _avr8_state avr8_state;
-struct _avr8_state
+struct avr8_state
 {
     UINT32 pc;
 

@@ -13,8 +13,7 @@
 #define CLOCK_16H	(18432000/3/2/16)
 #define CLOCK_1V    (18432000/3/2/384)
 
-typedef struct _warpwarp_sound_state warpwarp_sound_state;
-struct _warpwarp_sound_state
+struct warpwarp_sound_state
 {
 	INT16 *m_decay;
 	sound_stream *m_channel;

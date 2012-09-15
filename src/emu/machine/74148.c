@@ -42,8 +42,7 @@
 #include "machine/74148.h"
 
 
-typedef struct _ttl74148_state ttl74148_state;
-struct _ttl74148_state
+struct ttl74148_state
 {
 	/* callback */
 	void (*output_cb)(device_t *device);

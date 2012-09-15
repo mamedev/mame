@@ -17,8 +17,7 @@
     STRUCTURES & TYPEDEFS
 ***************************************************************************/
 
-typedef struct _ccpu_state ccpu_state;
-struct _ccpu_state
+struct ccpu_state
 {
     UINT16				PC;
     UINT16				A;

@@ -140,8 +140,7 @@ const seibu_adpcm_interface seibu_adpcm2_intf =
 	"adpcm2"
 };
 
-typedef struct _seibu_adpcm_state seibu_adpcm_state;
-struct _seibu_adpcm_state
+struct seibu_adpcm_state
 {
 	oki_adpcm_state m_adpcm;
 	sound_stream *m_stream;

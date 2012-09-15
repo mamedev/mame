@@ -9,7 +9,7 @@ null_modem_device::null_modem_device(const machine_config &mconfig, const char *
 {
 }
 
-static struct _bitbanger_config null_modem_image_config =
+static bitbanger_config null_modem_image_config =
 {
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, null_modem_device, read),
 	BITBANGER_MODEM,

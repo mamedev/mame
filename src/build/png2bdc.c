@@ -68,8 +68,7 @@
 ***************************************************************************/
 
 /* a render_font contains information about a single character in a font */
-typedef struct _render_font_char render_font_char;
-struct _render_font_char
+struct render_font_char
 {
 	INT32				width;				/* width from this character to the next */
 	INT32				xoffs, yoffs;		/* X and Y offset from baseline to top,left of bitmap */
@@ -79,8 +78,7 @@ struct _render_font_char
 
 
 /* a render_font contains information about a font */
-typedef struct _render_font render_font;
-struct _render_font
+struct render_font
 {
 	int					height;				/* height of the font, from ascent to descent */
 	int					yoffs;				/* y offset from baseline to descent */

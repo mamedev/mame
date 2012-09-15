@@ -16,8 +16,7 @@
 #include "sound/2612intf.h"
 
 
-typedef struct _ym2612_state ym2612_state;
-struct _ym2612_state
+struct ym2612_state
 {
 	sound_stream *	stream;
 	emu_timer *		timer[2];

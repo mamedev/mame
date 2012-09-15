@@ -67,8 +67,7 @@ enum
 	Z80_CLEAR
 };
 
-typedef struct _m72_audio_state m72_audio_state;
-struct _m72_audio_state
+struct m72_audio_state
 {
 	UINT8 irqvector;
 	UINT32 sample_addr;

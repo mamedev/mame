@@ -87,8 +87,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _vbi_metadata vbi_metadata;
-struct _vbi_metadata
+struct vbi_metadata
 {
 	UINT8		white;				/* white flag: on or off */
 	UINT32		line16;				/* line 16 code */

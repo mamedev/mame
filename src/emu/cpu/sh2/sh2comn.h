@@ -26,8 +26,7 @@ class sh2_frontend;
 
 #define SH2_CODE_XOR(a)		((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0))
 
-typedef struct _irq_entry irq_entry;
-struct _irq_entry
+struct irq_entry
 {
 	int irq_vector;
 	int irq_priority;

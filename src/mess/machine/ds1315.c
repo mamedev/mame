@@ -22,8 +22,7 @@ typedef enum
 } ds1315_mode_t;
 
 
-typedef struct _ds1315_t ds1315_t;
-struct _ds1315_t
+struct ds1315_t
 {
 	int count;
 	ds1315_mode_t mode;

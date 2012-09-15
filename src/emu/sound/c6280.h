@@ -5,8 +5,7 @@
 
 #include "devlegcy.h"
 
-typedef struct _c6280_interface c6280_interface;
-struct _c6280_interface
+struct c6280_interface
 {
 	const char *	cpu;
 };

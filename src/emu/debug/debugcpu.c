@@ -71,8 +71,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* in mame.h: typedef struct _debugcpu_private debugcpu_private; */
-struct _debugcpu_private
+struct debugcpu_private
 {
 	device_t *livecpu;
 	device_t *visiblecpu;

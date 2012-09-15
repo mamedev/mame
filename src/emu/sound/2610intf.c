@@ -16,8 +16,7 @@
 #include "2610intf.h"
 #include "fm.h"
 
-typedef struct _ym2610_state ym2610_state;
-struct _ym2610_state
+struct ym2610_state
 {
 	sound_stream *	stream;
 	emu_timer *		timer[2];

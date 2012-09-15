@@ -73,8 +73,7 @@
 #define TMS6100_READ_PENDING		0x01
 #define TMS6100_NEXT_READ_IS_DUMMY	0x02
 
-typedef struct _tms6100_state tms6100_state;
-struct _tms6100_state
+struct tms6100_state
 {
 	/* Rom interface */
 	UINT32 address;

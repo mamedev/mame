@@ -19,8 +19,7 @@
 
 
 /* interface */
-typedef struct _sam6883_interface sam6883_interface;
-struct _sam6883_interface
+struct sam6883_interface
 {
 	/* the CPU/space from which the SAM reads data */
 	const char *		m_cpu_tag;

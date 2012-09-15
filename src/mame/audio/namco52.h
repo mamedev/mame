@@ -6,8 +6,7 @@
 #include "devcb.h"
 
 
-typedef struct _namco_52xx_interface namco_52xx_interface;
-struct _namco_52xx_interface
+struct namco_52xx_interface
 {
 	const char *	discrete;	/* name of the discrete sound device */
 	int				firstnode;	/* index of the first node */

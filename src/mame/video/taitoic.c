@@ -544,8 +544,7 @@ INLINE void taitoic_drawscanline( bitmap_ind16 &bitmap, const rectangle &cliprec
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _pc080sn_state pc080sn_state;
-struct _pc080sn_state
+struct pc080sn_state
 {
 	UINT16         ctrl[8];
 
@@ -1048,8 +1047,7 @@ void pc080sn_device::device_start()
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _pc090oj_state pc090oj_state;
-struct _pc090oj_state
+struct pc090oj_state
 {
 /* NB: pc090oj_ctrl is the internal register controlling flipping
 
@@ -1278,8 +1276,7 @@ void pc090oj_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _tc0080vco_state tc0080vco_state;
-struct _tc0080vco_state
+struct tc0080vco_state
 {
 	UINT16 *       ram;
 	UINT16 *       bg0_ram_0;
@@ -1991,8 +1988,7 @@ void tc0080vco_device::device_start()
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _tc0100scn_state tc0100scn_state;
-struct _tc0100scn_state
+struct tc0100scn_state
 {
 	UINT16       ctrl[8];
 
@@ -2636,8 +2632,7 @@ void tc0100scn_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _tc0280grd_state tc0280grd_state;
-struct _tc0280grd_state
+struct tc0280grd_state
 {
 	UINT16 *       ram;
 
@@ -2835,8 +2830,7 @@ void tc0280grd_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _tc0360pri_state tc0360pri_state;
-struct _tc0360pri_state
+struct tc0360pri_state
 {
 	UINT8   regs[16];
 };
@@ -2941,8 +2935,7 @@ void tc0360pri_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _tc0480scp_state tc0480scp_state;
-struct _tc0480scp_state
+struct tc0480scp_state
 {
 	UINT16           ctrl[0x18];
 
@@ -3925,8 +3918,7 @@ void tc0480scp_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _tc0150rod_state tc0150rod_state;
-struct _tc0150rod_state
+struct tc0150rod_state
 {
 	UINT16 *        ram;
 
@@ -4761,8 +4753,7 @@ void tc0150rod_device::device_start()
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _tc0110pcr_state tc0110pcr_state;
-struct _tc0110pcr_state
+struct tc0110pcr_state
 {
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 	UINT16 *     ram;
@@ -5019,8 +5010,7 @@ void tc0110pcr_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-typedef struct _tc0180vcu_state tc0180vcu_state;
-struct _tc0180vcu_state
+struct tc0180vcu_state
 {
 	UINT16         ctrl[0x10];
 

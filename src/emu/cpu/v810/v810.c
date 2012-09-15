@@ -31,8 +31,7 @@
 #define clkIF 3
 #define clkMEM 3
 
-typedef struct _v810_state v810_state;
-struct _v810_state
+struct v810_state
 {
 	UINT32 reg[65];
 	UINT8 irq_line;

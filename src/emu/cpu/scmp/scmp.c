@@ -20,8 +20,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _scmp_state scmp_state;
-struct _scmp_state
+struct scmp_state
 {
 	scmp_config 		config;
 	PAIR	PC;

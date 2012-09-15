@@ -54,8 +54,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _xml_parse_info xml_parse_info;
-struct _xml_parse_info
+struct xml_parse_info
 {
 	XML_Parser			parser;
 	xml_data_node *		rootnode;

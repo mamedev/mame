@@ -188,10 +188,10 @@ void generic_keyboard_device::device_start()
 
 void generic_keyboard_device::device_config_complete()
 {
-	const _keyboard_interface *intf = reinterpret_cast<const _keyboard_interface *>(static_config());
+	const keyboard_interface *intf = reinterpret_cast<const keyboard_interface *>(static_config());
 	if(intf != NULL)
 	{
-		*static_cast<_keyboard_interface *>(this) = *intf;
+		*static_cast<keyboard_interface *>(this) = *intf;
 	}
 	else
 	{

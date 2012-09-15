@@ -3,8 +3,7 @@
 #include "fm.h"
 
 
-typedef struct _ym2203_state ym2203_state;
-struct _ym2203_state
+struct ym2203_state
 {
 	sound_stream *	stream;
 	emu_timer *		timer[2];

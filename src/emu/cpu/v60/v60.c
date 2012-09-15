@@ -71,8 +71,7 @@
 #define SETREG8(a, b)		(a) = ((a) & ~0xff) | ((b) & 0xff)
 #define SETREG16(a, b)		(a) = ((a) & ~0xffff) | ((b) & 0xffff)
 
-typedef struct _v60_flags v60_flags;
-struct _v60_flags
+struct v60_flags
 {
 	UINT8 CY;
 	UINT8 OV;
@@ -81,8 +80,7 @@ struct _v60_flags
 };
 
 // v60 Register Inside (Hm... It's not a pentium inside :-))) )
-typedef struct _v60_state v60_state;
-struct _v60_state
+struct v60_state
 {
 	offs_t				fetch_xor;
 	offs_t				start_pc;

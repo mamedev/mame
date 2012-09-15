@@ -67,8 +67,7 @@
 #define WRITE_PORT(st,num,data) 	(st)->m_out[num](0, data)
 
 
-typedef struct _namco_51xx_state namco_51xx_state;
-struct _namco_51xx_state
+struct namco_51xx_state
 {
 	device_t *	m_cpu;
 	devcb_resolved_read8 m_in[4];

@@ -84,8 +84,7 @@ typedef enum
 } state_t;
 
 
-typedef struct _ay31015_t ay31015_t;
-struct _ay31015_t
+struct ay31015_t
 {
 	const ay31015_config	*config;
 

@@ -9,8 +9,7 @@
 #include "emu.h"
 #include "sound/k056800.h"
 
-typedef struct _k056800_state k056800_state;
-struct _k056800_state
+struct k056800_state
 {
 	UINT8                host_reg[8];
 	UINT8                sound_reg[8];

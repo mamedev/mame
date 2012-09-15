@@ -3832,8 +3832,7 @@ private:
  *
  *************************************/
 
-typedef struct _discrete_lfsr_desc discrete_lfsr_desc;
-struct _discrete_lfsr_desc
+struct discrete_lfsr_desc
 {
 	int clock_type;
 	int bitlength;
@@ -3854,8 +3853,7 @@ struct _discrete_lfsr_desc
 };
 
 
-typedef struct _discrete_op_amp_osc_info discrete_op_amp_osc_info;
-struct _discrete_op_amp_osc_info
+struct discrete_op_amp_osc_info
 {
 	UINT32	type;
 	double	r1;
@@ -3875,8 +3873,7 @@ struct _discrete_op_amp_osc_info
 
 #define DEFAULT_74LS14_VALUES	1.6, 0.8, 3.4
 
-typedef struct _discrete_schmitt_osc_desc discrete_schmitt_osc_desc;
-struct _discrete_schmitt_osc_desc
+struct discrete_schmitt_osc_desc
 {
 	double	rIn;
 	double	rFeedback;
@@ -3888,8 +3885,7 @@ struct _discrete_schmitt_osc_desc
 };
 
 
-typedef struct _discrete_comp_adder_table discrete_comp_adder_table;
-struct _discrete_comp_adder_table
+struct discrete_comp_adder_table
 {
 	int		type;
 	double	cDefault;				// Default componet.  0 if not used.
@@ -3898,8 +3894,7 @@ struct _discrete_comp_adder_table
 };
 
 
-typedef struct _discrete_dac_r1_ladder discrete_dac_r1_ladder;
-struct _discrete_dac_r1_ladder
+struct discrete_dac_r1_ladder
 {
 	int		ladderLength;		// 2 to DISC_LADDER_MAXRES.  1 would be useless.
 	double	r[DISC_LADDER_MAXRES];	// Don't use 0 for valid resistors.  That is a short.
@@ -3910,8 +3905,7 @@ struct _discrete_dac_r1_ladder
 };
 
 
-typedef struct _discrete_integrate_info discrete_integrate_info;
-struct _discrete_integrate_info
+struct discrete_integrate_info
 {
 	UINT32	type;
 	double	r1;		// r1a + r1b
@@ -3927,8 +3921,7 @@ struct _discrete_integrate_info
 
 
 #define DISC_MAX_MIXER_INPUTS	8
-typedef struct _discrete_mixer_desc discrete_mixer_desc;
-struct _discrete_mixer_desc
+struct discrete_mixer_desc
 {
 	int		type;
 	double	r[DISC_MAX_MIXER_INPUTS];		/* static input resistance values.  These are in series with rNode, if used. */
@@ -3943,8 +3936,7 @@ struct _discrete_mixer_desc
 };
 
 
-typedef struct _discrete_op_amp_info discrete_op_amp_info;
-struct _discrete_op_amp_info
+struct discrete_op_amp_info
 {
 	UINT32	type;
 	double	r1;
@@ -3957,8 +3949,7 @@ struct _discrete_op_amp_info
 };
 
 
-typedef struct _discrete_op_amp_1sht_info discrete_op_amp_1sht_info;
-struct _discrete_op_amp_1sht_info
+struct discrete_op_amp_1sht_info
 {
 	UINT32	type;
 	double	r1;
@@ -3973,8 +3964,7 @@ struct _discrete_op_amp_1sht_info
 };
 
 
-typedef struct _discrete_op_amp_tvca_info discrete_op_amp_tvca_info;
-struct _discrete_op_amp_tvca_info
+struct discrete_op_amp_tvca_info
 {
 	double	r1;
 	double	r2;		// r2a + r2b
@@ -4004,8 +3994,7 @@ struct _discrete_op_amp_tvca_info
 };
 
 
-typedef struct _discrete_op_amp_filt_info discrete_op_amp_filt_info;
-struct _discrete_op_amp_filt_info
+struct discrete_op_amp_filt_info
 {
 	double	r1;
 	double	r2;
@@ -4025,8 +4014,7 @@ struct _discrete_op_amp_filt_info
 #define DEFAULT_555_HIGH		-1
 #define DEFAULT_555_VALUES		DEFAULT_555_CHARGE, DEFAULT_555_HIGH
 
-typedef struct _discrete_555_desc discrete_555_desc;
-struct _discrete_555_desc
+struct discrete_555_desc
 {
 	int		options;	/* bit mapped options */
 	double	v_pos;		/* B+ voltage of 555 */
@@ -4036,8 +4024,7 @@ struct _discrete_555_desc
 
 #define DEFAULT_555_CC_SOURCE	DEFAULT_555_CHARGE
 
-typedef struct _discrete_555_cc_desc discrete_555_cc_desc;
-struct _discrete_555_cc_desc
+struct discrete_555_cc_desc
 {
 	int		options;		/* bit mapped options */
 	double	v_pos;			/* B+ voltage of 555 */
@@ -4047,8 +4034,7 @@ struct _discrete_555_cc_desc
 };
 
 
-typedef struct _discrete_555_vco1_desc discrete_555_vco1_desc;
-struct _discrete_555_vco1_desc
+struct discrete_555_vco1_desc
 {
 	int    options;				/* bit mapped options */
 	double r1, r2, r3, r4, c;
@@ -4058,8 +4044,7 @@ struct _discrete_555_vco1_desc
 };
 
 
-typedef struct _discrete_adsr discrete_adsr;
-struct _discrete_adsr
+struct discrete_adsr
 {
 	double attack_time;  /* All times are in seconds */
 	double attack_value;

@@ -96,8 +96,7 @@ struct saa1099_noise
 };
 
 /* this structure defines a SAA1099 chip */
-typedef struct _saa1099_state saa1099_state;
-struct _saa1099_state
+struct saa1099_state
 {
 	device_t *device;
 	sound_stream * stream;			/* our stream */

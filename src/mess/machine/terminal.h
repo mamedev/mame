@@ -10,8 +10,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _terminal_interface terminal_interface;
-struct _terminal_interface
+struct terminal_interface
 {
 	devcb_write8 m_keyboard_cb;
 };
@@ -49,7 +48,7 @@ struct serial_terminal_interface
 
 class generic_terminal_device :
 	public device_t,
-	public _terminal_interface
+	public terminal_interface
 {
 public:
 	generic_terminal_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);

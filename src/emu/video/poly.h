@@ -59,8 +59,7 @@ typedef struct _poly_manager poly_manager;
 
 
 /* input vertex data */
-typedef struct _poly_vertex poly_vertex;
-struct _poly_vertex
+struct poly_vertex
 {
 	float		x;							/* X coordinate */
 	float		y;							/* Y coordinate */
@@ -69,8 +68,7 @@ struct _poly_vertex
 
 
 /* poly_param_extent describes information for a single parameter in an extent */
-typedef struct _poly_param_extent poly_param_extent;
-struct _poly_param_extent
+struct poly_param_extent
 {
 	float		start;						/* parameter value at starting X,Y */
 	float		dpdx;						/* dp/dx relative to starting X */
@@ -78,8 +76,7 @@ struct _poly_param_extent
 
 
 /* poly_extent describes start/end points for a scanline, along with per-scanline parameters */
-typedef struct _poly_extent poly_extent;
-struct _poly_extent
+struct poly_extent
 {
 	INT16		startx;						/* starting X coordinate (inclusive) */
 	INT16		stopx;						/* ending X coordinate (exclusive) */

@@ -13,9 +13,7 @@
 #include "video/huc6270.h"
 #include "video/huc6272.h"
 
-typedef struct _pcfx_pad_t pcfx_pad_t;
-
-struct _pcfx_pad_t
+struct pcfx_pad_t
 {
 	UINT8 ctrl[2];
 	UINT8 status[2];

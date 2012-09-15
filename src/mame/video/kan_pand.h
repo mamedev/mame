@@ -15,8 +15,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _kaneko_pandora_interface kaneko_pandora_interface;
-struct _kaneko_pandora_interface
+struct kaneko_pandora_interface
 {
 	const char *screen;
 	UINT8      gfx_region;

@@ -19,8 +19,7 @@
 
 typedef int (*adc1038_input_read_func)(device_t *device, int input);
 
-typedef struct _adc1038_interface adc1038_interface;
-struct _adc1038_interface
+struct adc1038_interface
 {
 	int gticlub_hack;
 	adc1038_input_read_func input_callback_r;

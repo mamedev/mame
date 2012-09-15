@@ -111,8 +111,7 @@
 
 typedef int (*command_func_type)(int argc, char *argv[]);
 
-typedef struct _command_entry command_entry;
-struct _command_entry
+struct command_entry
 {
     const char *command;
     command_func_type command_func;
@@ -126,8 +125,7 @@ struct _command_entry
 
 
 /* Pin fuse row configuration */
-typedef struct _pin_fuse_rows pin_fuse_rows;
-struct _pin_fuse_rows
+struct pin_fuse_rows
 {
     UINT16 pin;                  /* Pin number */
     UINT16 fuserowoutputenable; /* Fuse row for the output enable */
@@ -138,8 +136,7 @@ struct _pin_fuse_rows
 
 
 /* Pin fuse column configuration */
-typedef struct _pin_fuse_columns pin_fuse_columns;
-struct _pin_fuse_columns
+struct pin_fuse_columns
 {
     UINT16 pin;             /* Pin number */
     UINT16 lowfusecolumn;  /* Column number for low output */

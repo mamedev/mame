@@ -73,8 +73,7 @@ extern const device_type ADC12132;
 
 typedef double (*adc1213x_input_convert_func)(device_t *device, UINT8 input);
 
-typedef struct _adc12138_interface adc12138_interface;
-struct _adc12138_interface
+struct adc12138_interface
 {
 	adc1213x_input_convert_func input_callback_r;
 };

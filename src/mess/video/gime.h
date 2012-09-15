@@ -21,8 +21,7 @@
 //**************************************************************************
 
 /* interface */
-typedef struct _gime_interface gime_interface;
-struct _gime_interface
+struct gime_interface
 {
 	const char *m_screen_tag;	/* screen we are acting on */
 	const char *m_maincpu_tag;	/* tag of main CPU */

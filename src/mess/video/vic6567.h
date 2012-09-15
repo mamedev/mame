@@ -22,8 +22,7 @@ typedef enum
 	VIC8566	// VIC IIe PAL
 } vic2_type;
 
-typedef struct _vic2_interface vic2_interface;
-struct _vic2_interface
+struct vic2_interface
 {
 	const char			*screen;
 	const char			*cpu;

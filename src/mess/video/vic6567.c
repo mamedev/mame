@@ -74,8 +74,7 @@
 #include "emu.h"
 #include "video/vic6567.h"
 
-typedef struct _vic2_state  vic2_state;
-struct _vic2_state
+struct vic2_state
 {
 	vic2_type  type;
 

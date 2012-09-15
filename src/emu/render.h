@@ -171,7 +171,7 @@ class device_t;
 class screen_device;
 class render_container;
 class render_manager;
-typedef struct _xml_data_node xml_data_node;
+struct xml_data_node;
 class render_font;
 struct object_transform;
 class layout_element;

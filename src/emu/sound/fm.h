@@ -28,8 +28,7 @@
 
 /* --- external SSG(YM2149/AY-3-8910)emulator interface port */
 /* used by YM2203,YM2608,and YM2610 */
-typedef struct _ssg_callbacks ssg_callbacks;
-struct _ssg_callbacks
+struct ssg_callbacks
 {
 	void (*set_clock)(void *param, int clock);
 	void (*write)(void *param, int address, int data);

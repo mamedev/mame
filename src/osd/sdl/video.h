@@ -50,15 +50,13 @@ enum {
 //  TYPE DEFINITIONS
 //============================================================
 
-typedef struct _sdl_mode sdl_mode;
-struct _sdl_mode
+struct sdl_mode
 {
 	int					width;
 	int					height;
 };
 
-typedef struct _sdl_monitor_info sdl_monitor_info;
-struct _sdl_monitor_info
+struct sdl_monitor_info
 {
 	sdl_monitor_info  *	next;					// pointer to next monitor in list
 #ifdef PTR64
@@ -75,8 +73,7 @@ struct _sdl_monitor_info
 };
 
 
-typedef struct _sdl_window_config sdl_window_config;
-struct _sdl_window_config
+struct sdl_window_config
 {
 	float				aspect;						// decoded aspect ratio
 	int					width;						// decoded width
@@ -88,8 +85,7 @@ struct _sdl_window_config
 };
 
 
-typedef struct _sdl_video_config sdl_video_config;
-struct _sdl_video_config
+struct sdl_video_config
 {
 	// performance options
 	int					novideo;				// don't draw, for pure CPU benchmarking

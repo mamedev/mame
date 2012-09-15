@@ -15,8 +15,7 @@
 #define TC0140SYT_PORT01_FULL_MASTER  (0x04)
 #define TC0140SYT_PORT23_FULL_MASTER  (0x08)
 
-typedef struct _tc0140syt_state tc0140syt_state;
-struct _tc0140syt_state
+struct tc0140syt_state
 {
 	UINT8     slavedata[4];  /* Data on master->slave port (4 nibbles) */
 	UINT8     masterdata[4]; /* Data on slave->master port (4 nibbles) */

@@ -131,8 +131,7 @@
 #define	ROOTDIR_BLOCK			2
 #define BLOCK_SIZE				512
 
-typedef struct _prodos_diskinfo prodos_diskinfo;
-struct _prodos_diskinfo
+struct prodos_diskinfo
 {
 	imgtoolerr_t (*load_block)(imgtool_image *image, int block, void *buffer);
 	imgtoolerr_t (*save_block)(imgtool_image *image, int block, const void *buffer);
@@ -142,16 +141,14 @@ struct _prodos_diskinfo
 	UINT16 total_blocks;
 };
 
-typedef struct _prodos_direnum prodos_direnum;
-struct _prodos_direnum
+struct prodos_direnum
 {
 	UINT32 block;
 	UINT32 index;
 	UINT8 block_data[BLOCK_SIZE];
 };
 
-typedef struct _prodos_dirent prodos_dirent;
-struct _prodos_dirent
+struct prodos_dirent
 {
 	char filename[16];
 	UINT8 storage_type;

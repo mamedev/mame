@@ -27,8 +27,7 @@ typedef void (*pdp1_read_binary_word_func)(device_t *device);
 typedef void (*pdp1_io_sc_func)(device_t *device);
 
 
-typedef struct _pdp1_reset_param_t pdp1_reset_param_t;
-struct _pdp1_reset_param_t
+struct pdp1_reset_param_t
 {
 	/* callbacks for iot instructions (required for any I/O) */
 	pdp1_extern_iot_func extern_iot[64];

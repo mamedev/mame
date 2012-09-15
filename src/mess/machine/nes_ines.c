@@ -6,8 +6,7 @@
 
 ****************************************************************************************/
 
-typedef struct _nes_mmc  nes_mmc;
-struct _nes_mmc
+struct nes_mmc
 {
 	int    iNesMapper; /* iNES Mapper # */
 	int    pcb_id;

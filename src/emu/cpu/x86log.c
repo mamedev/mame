@@ -31,8 +31,7 @@
 ***************************************************************************/
 
 /* code logging info */
-typedef struct _log_comment log_comment;
-struct _log_comment
+struct log_comment
 {
 	x86code *		base;
 	const char *	string;
@@ -40,8 +39,7 @@ struct _log_comment
 
 
 /* data ranges */
-typedef struct _data_range_t data_range_t;
-struct _data_range_t
+struct data_range_t
 {
 	x86code *		base;
 	x86code *		end;

@@ -92,8 +92,7 @@ DEBUG TRICKS:
 
 #define ENABLE_VERBOSE_LOG (1)
 
-typedef struct _acan_dma_regs_t acan_dma_regs_t;
-struct _acan_dma_regs_t
+struct acan_dma_regs_t
 {
 	UINT32 source[2];
 	UINT32 dest[2];
@@ -101,8 +100,7 @@ struct _acan_dma_regs_t
 	UINT16 control[2];
 };
 
-typedef struct _acan_sprdma_regs_t acan_sprdma_regs_t;
-struct _acan_sprdma_regs_t
+struct acan_sprdma_regs_t
 {
 	UINT32 src;
 	UINT16 src_inc;

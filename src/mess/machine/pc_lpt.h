@@ -15,8 +15,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _pc_lpt_interface pc_lpt_interface;
-struct _pc_lpt_interface
+struct pc_lpt_interface
 {
 	devcb_write_line out_irq_func;
 };

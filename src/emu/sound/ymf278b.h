@@ -8,8 +8,7 @@
 #define YMF278B_STD_CLOCK (33868800)			/* standard clock for OPL4 */
 
 
-typedef struct _ymf278b_interface ymf278b_interface;
-struct _ymf278b_interface
+struct ymf278b_interface
 {
 	void (*irq_callback)(device_t *device, int state);	/* irq callback */
 };

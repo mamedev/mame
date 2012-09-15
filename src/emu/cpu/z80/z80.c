@@ -142,8 +142,7 @@
 /* The Z80 registers. halt is set to 1 when the CPU is halted, the refresh  */
 /* register is calculated as follows: refresh=(r&127)|(r2&128)    */
 /****************************************************************************/
-typedef struct _z80_state z80_state;
-struct _z80_state
+struct z80_state
 {
 	PAIR			prvpc,pc,sp,af,bc,de,hl,ix,iy,wz;
 	PAIR			af2,bc2,de2,hl2;

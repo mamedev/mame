@@ -112,8 +112,7 @@
 
 // ======================> pokey_interface
 
-typedef struct _pokey_interface pokey_interface;
-struct _pokey_interface
+struct pokey_interface
 {
 	devcb_read8 m_pot_r_cb[8];
 	devcb_read8 m_allpot_r_cb;

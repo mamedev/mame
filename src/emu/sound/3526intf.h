@@ -5,8 +5,7 @@
 
 #include "devlegcy.h"
 
-typedef struct _ym3526_interface ym3526_interface;
-struct _ym3526_interface
+struct ym3526_interface
 {
 	devcb_write_line out_int_func;
 };

@@ -18,8 +18,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _hash_info hash_info;
-struct _hash_info
+struct hash_info
 {
 	hash_collection *hashes;
 	const char *extrainfo;

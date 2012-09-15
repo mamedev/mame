@@ -10,8 +10,7 @@
 #include "sound/discrete.h"
 #include "latch8.h"
 
-typedef struct _latch8_t latch8_t;
-struct _latch8_t
+struct latch8_t
 {
 	latch8_config	*intf;
 	UINT8			 value;

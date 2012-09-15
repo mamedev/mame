@@ -64,7 +64,7 @@ const int COMMENT_VERSION				= 1;
 typedef int (*debug_instruction_hook_func)(device_t &device, offs_t curpc);
 
 
-typedef struct _xml_data_node xml_data_node;
+struct xml_data_node;
 
 
 class device_debug

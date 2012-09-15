@@ -164,8 +164,7 @@ Rowscroll style:
 #include "ui.h"
 
 
-typedef struct _deco16ic_state deco16ic_state;
-struct _deco16ic_state
+struct deco16ic_state
 {
 	screen_device *screen;
 

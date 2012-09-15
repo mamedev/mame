@@ -9,8 +9,7 @@
 #include "ui.h"
 
 
-typedef struct _decocomn_state decocomn_state;
-struct _decocomn_state
+struct decocomn_state
 {
 	screen_device *screen;
 	UINT8 *dirty_palette;

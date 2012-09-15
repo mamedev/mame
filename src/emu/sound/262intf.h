@@ -6,8 +6,7 @@
 #include "devlegcy.h"
 
 
-typedef struct _ymf262_interface ymf262_interface;
-struct _ymf262_interface
+struct ymf262_interface
 {
 	void (*handler)(device_t *device, int irq);
 };

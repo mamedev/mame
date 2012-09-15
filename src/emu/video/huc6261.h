@@ -23,8 +23,7 @@
 	MCFG_DEVICE_CONFIG( _intrf )
 
 
-typedef struct _huc6261_interface huc6261_interface;
-struct _huc6261_interface
+struct huc6261_interface
 {
 	/* Tag for the screen we will be drawing on */
 	const char *screen_tag;

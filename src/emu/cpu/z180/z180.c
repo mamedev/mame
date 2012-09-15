@@ -114,8 +114,7 @@ Hitachi HD647180 series:
 /* The Z180 registers. HALT is set to 1 when the CPU is halted, the refresh */
 /* register is calculated as follows: refresh=(Regs.R&127)|(Regs.R2&128)    */
 /****************************************************************************/
-typedef struct _z180_state z180_state;
-struct _z180_state
+struct z180_state
 {
 	PAIR	PREPC,PC,SP,AF,BC,DE,HL,IX,IY;
 	PAIR	AF2,BC2,DE2,HL2;

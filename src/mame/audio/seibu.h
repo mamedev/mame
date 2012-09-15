@@ -91,8 +91,7 @@ extern const ym3812_interface seibu_ym3812_interface;
 extern const ym2151_interface seibu_ym2151_interface;
 extern const ym2203_interface seibu_ym2203_interface;
 
-typedef struct _seibu_adpcm_interface seibu_adpcm_interface;
-struct _seibu_adpcm_interface
+struct seibu_adpcm_interface
 {
     const char *rom_region;
 };

@@ -170,8 +170,7 @@ Timming
 #define M_RDOP(A)		cpustate->direct->read_decrypted_byte(A)
 #define M_RDOP_ARG(A)	cpustate->direct->read_raw_byte(A)
 
-typedef struct _alpha8201_state alpha8201_state;
-struct _alpha8201_state
+struct alpha8201_state
 {
 	UINT8 RAM[8*8];  /* internal GP register 8 * 8bank       */
 	unsigned PREVPC;

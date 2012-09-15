@@ -34,8 +34,7 @@
 #include <signal.h>
 #include <sys/time.h>
 
-typedef struct _hidden_mutex_t hidden_mutex_t;
-struct _hidden_mutex_t {
+struct hidden_mutex_t {
 	pthread_mutex_t id;
 };
 

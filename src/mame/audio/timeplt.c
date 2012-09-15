@@ -19,8 +19,7 @@
 
 #define MASTER_CLOCK         XTAL_14_31818MHz
 
-typedef struct _timeplt_audio_state timeplt_audio_state;
-struct _timeplt_audio_state
+struct timeplt_audio_state
 {
 	UINT8    m_last_irq_state;
 	cpu_device *m_soundcpu;

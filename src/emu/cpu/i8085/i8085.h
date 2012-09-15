@@ -36,8 +36,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _i8085_config i8085_config;
-struct _i8085_config
+struct i8085_config
 {
 	devcb_write8		out_status_func;	/* STATUS changed callback */
 	devcb_write_line	out_inte_func;		/* INTE changed callback */

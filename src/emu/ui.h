@@ -93,8 +93,7 @@ enum
 
 typedef INT32 (*slider_update)(running_machine &machine, void *arg, astring *string, INT32 newval);
 
-typedef struct _slider_state slider_state;
-struct _slider_state
+struct slider_state
 {
 	slider_state *	next;				/* pointer to next slider */
 	slider_update	update;				/* callback */

@@ -80,8 +80,7 @@
 
 #define SPEEDUP_HACKS	1
 
-typedef struct _speedup_entry speedup_entry;
-struct _speedup_entry
+struct speedup_entry
 {
 	UINT32			offset;
 	UINT32			pc;

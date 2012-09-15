@@ -53,8 +53,7 @@ struct timer8253struct {
 	struct timer8253chan channel[3];
 };
 
-typedef struct _tiamc1_sound_state tiamc1_sound_state;
-struct _tiamc1_sound_state
+struct tiamc1_sound_state
 {
 	sound_stream *m_channel;
 	int m_timer1_divider;

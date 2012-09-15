@@ -12,8 +12,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _pc080sn_interface pc080sn_interface;
-struct _pc080sn_interface
+struct pc080sn_interface
 {
 	int                gfxnum;
 
@@ -23,8 +22,7 @@ struct _pc080sn_interface
 };
 
 
-typedef struct _pc090oj_interface pc090oj_interface;
-struct _pc090oj_interface
+struct pc090oj_interface
 {
 	int                gfxnum;
 
@@ -33,8 +31,7 @@ struct _pc090oj_interface
 };
 
 
-typedef struct _tc0080vco_interface tc0080vco_interface;
-struct _tc0080vco_interface
+struct tc0080vco_interface
 {
 	int                gfxnum;
 	int                txnum;
@@ -45,8 +42,7 @@ struct _tc0080vco_interface
 	int                has_fg0;	/* for debug */
 };
 
-typedef struct _tc0100scn_interface tc0100scn_interface;
-struct _tc0100scn_interface
+struct tc0100scn_interface
 {
 	const char         *screen;
 
@@ -62,15 +58,13 @@ struct _tc0100scn_interface
 };
 
 
-typedef struct _tc0280grd_interface tc0280grd_interface;
-struct _tc0280grd_interface
+struct tc0280grd_interface
 {
 	int                gfxnum;
 };
 
 
-typedef struct _tc0480scp_interface tc0480scp_interface;
-struct _tc0480scp_interface
+struct tc0480scp_interface
 {
 	int                gfxnum;
 	int                txnum;
@@ -85,21 +79,18 @@ struct _tc0480scp_interface
 };
 
 
-typedef struct _tc0150rod_interface tc0150rod_interface;
-struct _tc0150rod_interface
+struct tc0150rod_interface
 {
 	const char      *gfx_region;	/* gfx region for the road */
 };
 
 
-typedef struct _tc0110pcr_interface tc0110pcr_interface;
-struct _tc0110pcr_interface
+struct tc0110pcr_interface
 {
 	int               pal_offs;
 };
 
-typedef struct _tc0180vcu_interface tc0180vcu_interface;
-struct _tc0180vcu_interface
+struct tc0180vcu_interface
 {
 	int            bg_color_base;
 	int            fg_color_base;

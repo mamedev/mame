@@ -22,8 +22,7 @@
 #include "emu.h"
 #include "video/vdc8563.h"
 
-typedef struct _vdc8563_state vdc8563_state;
-struct _vdc8563_state
+struct vdc8563_state
 {
 	screen_device *screen;
 

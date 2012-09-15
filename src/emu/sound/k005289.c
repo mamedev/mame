@@ -39,8 +39,7 @@ typedef struct
 	const unsigned char *wave;
 } k005289_sound_channel;
 
-typedef struct _k005289_state k005289_state;
-struct _k005289_state
+struct k005289_state
 {
 	k005289_sound_channel channel_list[2];
 

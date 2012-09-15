@@ -30,8 +30,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _mac_sound mac_sound;
-struct _mac_sound
+struct mac_sound
 {
 	sound_stream *mac_stream;
 	int sample_enable;

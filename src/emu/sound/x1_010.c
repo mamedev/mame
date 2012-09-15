@@ -77,8 +77,7 @@ typedef struct {
 	unsigned char	reserve[2];
 } X1_010_CHANNEL;
 
-typedef struct _x1_010_state x1_010_state;
-struct _x1_010_state
+struct x1_010_state
 {
 	/* Variables only used here */
 	int	rate;								// Output sampling rate (Hz)

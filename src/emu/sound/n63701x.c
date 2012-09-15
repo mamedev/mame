@@ -28,8 +28,7 @@ typedef struct
 } voice;
 
 
-typedef struct _namco_63701x namco_63701x;
-struct _namco_63701x
+struct namco_63701x
 {
 	voice voices[2];
 	sound_stream * stream;		/* channel assigned by the mixer */

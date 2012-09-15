@@ -41,8 +41,7 @@ typedef struct tone
 	INT16	form[16];
 } TONE;
 
-typedef struct _snk6502_sound_state snk6502_sound_state;
-struct _snk6502_sound_state
+struct snk6502_sound_state
 {
 	TONE m_tone_channels[CHANNELS];
 	INT32 m_tone_clock_expire;

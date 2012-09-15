@@ -18,8 +18,7 @@ to make the standard pc driver one level more complex, so own driver
   rtc interrupt irq 2
  */
 
-typedef struct _vg230_t vg230_t;
-struct _vg230_t
+struct vg230_t
 {
 	UINT8 index;
 	UINT8 data[0x100];
@@ -40,8 +39,7 @@ struct _vg230_t
 	} pmu;
 };
 
-typedef struct _ems_t ems_t;
-struct _ems_t
+struct ems_t
 {
 	UINT8 data;
 	int index;
@@ -66,8 +64,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ems_w);
 	DECLARE_READ8_MEMBER(vg230_io_r);
 	DECLARE_WRITE8_MEMBER(vg230_io_w);
-	struct _vg230_t m_vg230;
-	struct _ems_t m_ems;
+	vg230_t m_vg230;
+	ems_t m_ems;
 	DECLARE_DRIVER_INIT(pasogo);
 	virtual void machine_reset();
 	virtual void palette_init();
@@ -467,7 +465,7 @@ void pasogo_state::machine_reset()
 
 //static const unsigned i86_address_mask = 0x000fffff;
 
-static const struct pit8253_config pc_pit8254_config =
+static const pit8253_config pc_pit8254_config =
 {
 	{
 		{
@@ -492,7 +490,7 @@ static WRITE_LINE_DEVICE_HANDLER( pasogo_pic8259_set_int_line )
 	device->machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-static const struct pic8259_interface pasogo_pic8259_config =
+static const pic8259_interface pasogo_pic8259_config =
 {
 	DEVCB_LINE(pasogo_pic8259_set_int_line),
 	DEVCB_LINE_VCC,

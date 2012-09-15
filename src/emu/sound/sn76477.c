@@ -193,8 +193,7 @@ static const double out_neg_gain[] =
  *
  *****************************************************************************/
 
-typedef struct _sn76477_state sn76477_state;
-struct _sn76477_state
+struct sn76477_state
 {
 	/* chip's external interface */
 	UINT32 enable;

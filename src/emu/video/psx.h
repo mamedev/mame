@@ -44,8 +44,7 @@ extern const device_type CXD8654Q;
 #define DEBUG_COORDS ( 10 )
 #define DEBUG_MAX ( 512 )
 
-typedef struct _psx_gpu_debug psx_gpu_debug;
-struct _psx_gpu_debug
+struct psx_gpu_debug
 {
 	bitmap_ind16 *mesh;
 	int b_clear;

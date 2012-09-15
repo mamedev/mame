@@ -118,8 +118,7 @@ T0 output clock
 ***************************************************************************/
 
 /* live processor state */
-typedef struct _mcs48_state mcs48_state;
-struct _mcs48_state
+struct mcs48_state
 {
 	UINT16		prevpc;				/* 16-bit previous program counter */
 	UINT16		pc;					/* 16-bit program counter */

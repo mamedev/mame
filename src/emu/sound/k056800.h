@@ -17,8 +17,7 @@
 typedef void (*k056800_irq_cb)(running_machine &, int);
 
 
-typedef struct _k056800_interface k056800_interface;
-struct _k056800_interface
+struct k056800_interface
 {
 	k056800_irq_cb       irq_cb;
 };

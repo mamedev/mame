@@ -22,8 +22,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _st2_header st2_header;
-struct _st2_header
+struct st2_header
 {
 	UINT8 header[4];			/* "RCA2" in ASCII code */
 	UINT8 blocks;				/* Total number of 256 byte blocks in file (including this one) */

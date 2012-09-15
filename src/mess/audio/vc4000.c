@@ -8,8 +8,7 @@
 #include "includes/vc4000.h"
 
 
-typedef struct _vc4000_sound vc4000_sound;
-struct _vc4000_sound
+struct vc4000_sound
 {
     sound_stream *channel;
     UINT8 reg[1];

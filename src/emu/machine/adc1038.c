@@ -14,8 +14,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _adc1038_state adc1038_state;
-struct _adc1038_state
+struct adc1038_state
 {
 	int cycle;
 	int clk;

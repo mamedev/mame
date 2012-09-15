@@ -52,8 +52,7 @@
 #include "devlegcy.h"
 
 
-typedef struct _sp0256_interface sp0256_interface;
-struct _sp0256_interface
+struct sp0256_interface
 {
 	devcb_write_line lrq_callback;
 	devcb_write_line sby_callback;

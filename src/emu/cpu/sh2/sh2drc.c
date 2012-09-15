@@ -89,8 +89,7 @@ extern int sh2_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 ***************************************************************************/
 
 /* internal compiler state */
-typedef struct _compiler_state compiler_state;
-struct _compiler_state
+struct compiler_state
 {
 	UINT32			cycles;						/* accumulated cycles */
 	UINT8			checkints;					/* need to check interrupts before next instruction */

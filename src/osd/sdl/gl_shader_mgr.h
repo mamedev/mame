@@ -22,8 +22,7 @@ typedef enum {
 // old code passed sdl_info * to functions here
 // however the parameter was not used
 // changed interface to more generic one.
-typedef struct _glsl_shader_info glsl_shader_info;
-struct _glsl_shader_info
+struct glsl_shader_info
 {
 	int dummy; // avoid compiler breakage
 };

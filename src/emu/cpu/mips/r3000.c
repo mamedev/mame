@@ -116,8 +116,7 @@ CPU_DISASSEMBLE( r3000le );
 ***************************************************************************/
 
 /* R3000 Registers */
-typedef struct _r3000_state r3000_state;
-struct _r3000_state
+struct r3000_state
 {
 	/* core registers */
 	UINT32		pc;

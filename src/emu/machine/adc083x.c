@@ -44,8 +44,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _adc0831_state adc0831_state;
-struct _adc0831_state
+struct adc0831_state
 {
 	adc083x_input_convert_func input_callback_r;
 

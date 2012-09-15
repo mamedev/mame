@@ -57,8 +57,7 @@ enum
 	SH2_R8, SH2_R9, SH2_R10, SH2_R11, SH2_R12, SH2_R13, SH2_R14, SH2_R15, SH2_EA
 };
 
-typedef struct _sh2_cpu_core sh2_cpu_core;
-struct _sh2_cpu_core
+struct sh2_cpu_core
 {
 	int is_slave;
 	int  (*dma_callback_kludge)(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size);

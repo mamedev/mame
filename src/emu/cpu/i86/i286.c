@@ -32,8 +32,7 @@ typedef union
     UINT8  b[16];   /* or as 8 bit registers */
 } i80286basicregs;
 
-typedef struct _i80286_state i80286_state;
-struct _i80286_state
+struct i80286_state
 {
     i80286basicregs regs;
     offs_t fetch_xor;

@@ -17,8 +17,7 @@ extern const device_type PSX_DMA;
 typedef delegate<void (UINT32, INT32)> psx_dma_read_delegate;
 typedef delegate<void (UINT32, INT32)> psx_dma_write_delegate;
 
-typedef struct _psx_dma_channel psx_dma_channel;
-struct _psx_dma_channel
+struct psx_dma_channel
 {
 	UINT32 n_base;
 	UINT32 n_blockcontrol;

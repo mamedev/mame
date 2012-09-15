@@ -45,8 +45,7 @@
  *
  */
 
-typedef struct _flt_rc_config flt_rc_config;
-struct _flt_rc_config
+struct flt_rc_config
 {
 	int	type;
 	double	R1;

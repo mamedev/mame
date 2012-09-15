@@ -9,8 +9,7 @@
 #define  NUM_CHANNELS    (8)
 
 
-typedef struct _pcm_channel pcm_channel;
-struct _pcm_channel
+struct pcm_channel
 {
 	UINT8		enable;
 	UINT8		env;
@@ -22,8 +21,7 @@ struct _pcm_channel
 };
 
 
-typedef struct _rf5c68_state rf5c68_state;
-struct _rf5c68_state
+struct rf5c68_state
 {
 	sound_stream *		stream;
 	pcm_channel			chan[NUM_CHANNELS];

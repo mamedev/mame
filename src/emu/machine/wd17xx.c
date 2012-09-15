@@ -287,8 +287,7 @@ static const UINT8 track_SD[][2] = {
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _wd1770_state wd1770_state;
-struct _wd1770_state
+struct wd1770_state
 {
 	/* callbacks */
 	devcb_resolved_read_line in_dden_func;
