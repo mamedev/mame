@@ -4140,7 +4140,7 @@ ROM_START( crszonea )
 ROM_END
 
 ROM_START( crszoneb )
-	ROM_REGION32_BE( 0x80000f, "user1", 0 ) /* 4 megs for main R4650 code */
+	ROM_REGION32_BE( 0x800000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_WORD_SWAP( "cszo3vera.ic4", 0x400000, 0x400000, CRC(09b0c91e) SHA1(226c3788d6a50272e2544d04d9ca20df81014fb6) )
 	ROM_CONTINUE( 0x000000, 0x400000 )
 
