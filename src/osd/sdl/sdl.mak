@@ -72,6 +72,9 @@ USE_DISPATCH_GL = 1
 # Get what you need here: http://www.gtk.org/download-windows.html
 # GTK_INSTALL_ROOT = y:/couriersud/win/gtk-32
 
+# uncomment to use Xinput for multiple mice on X11 systems
+# (currently defaults disabled due to causing issues with mouse capture, esp. in MESS)
+NO_USE_XINPUT = 1
 
 
 ###########################################################################
