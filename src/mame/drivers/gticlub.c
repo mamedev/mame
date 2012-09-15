@@ -675,10 +675,10 @@ static INPUT_PORTS_START( hangplt )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
 	PORT_START("AN0")			// Rudder
-	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_X ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_X ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_REVERSE
 
 	PORT_START("AN1")			// Control Bar
-	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_REVERSE
 
 	PORT_START("AN2")
 	PORT_BIT( 0x3ff, 0x000, IPT_UNKNOWN )
@@ -1222,6 +1222,11 @@ DRIVER_INIT_MEMBER(gticlub_state,hangplt)
 
 	m_sharc_dataram_0 = auto_alloc_array(machine(), UINT32, 0x100000/4);
 	m_sharc_dataram_1 = auto_alloc_array(machine(), UINT32, 0x100000/4);
+
+	// workaround for lock/unlock errors
+	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
+	rom[(0x153ac^4) / 4] = 0x4e800020;
+	rom[(0x15428^4) / 4] = 0x4e800020;
 }
 
 /*************************************************************************/
