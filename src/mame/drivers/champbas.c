@@ -1040,7 +1040,7 @@ ROM_END
 
 ROM_START( exctsccru ) /* Teams: ITA USA GBR FRA FRG BRA */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "vr1u_g10",    0x0000, 0x2000, CRC(ef39676d) SHA1(f7728d86b2c68bb93a0fcf02931cda8cb65e6d48) ) /* Team USA in place of Austria */
+	ROM_LOAD( "vr1u.g10",    0x0000, 0x2000, CRC(ef39676d) SHA1(f7728d86b2c68bb93a0fcf02931cda8cb65e6d48) ) /* Team USA in place of Austria */
 	ROM_LOAD( "vr2u.h10",    0x2000, 0x2000, CRC(37994b86) SHA1(681a27a009909cc8d26f8046c54532ec56145f97) )
 	ROM_LOAD( "vr3u.j10",    0x4000, 0x2000, CRC(2ed3c6bb) SHA1(d3bad24cbbb34eb6c43cb603cbf66ab35be2c845) )
 
