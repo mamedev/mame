@@ -1231,11 +1231,11 @@ DRIVER_INIT_MEMBER(gticlub_state,hangplt)
 
 /*************************************************************************/
 
-GAME( 1996, gticlub,  0,        gticlub,  gticlub,  gticlub_state, gticlub, ROT0, "Konami", "GTI Club (ver EAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME( 1996, gticlubu, gticlub,  gticlub,  gticlub,  gticlub_state, gticlub, ROT0, "Konami", "GTI Club (ver UAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME( 1996, gticluba, gticlub,  gticlub,  gticlub,  gticlub_state, gticlub, ROT0, "Konami", "GTI Club (ver AAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME( 1996, gticlubj, gticlub,  gticlub,  gticlub,  gticlub_state, gticlub, ROT0, "Konami", "GTI Club (ver JAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1996, gticlub,  0,        gticlub,  gticlub,  gticlub_state, gticlub, ROT0, "Konami", "GTI Club (ver EAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, gticlubu, gticlub,  gticlub,  gticlub,  gticlub_state, gticlub, ROT0, "Konami", "GTI Club (ver UAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, gticluba, gticlub,  gticlub,  gticlub,  gticlub_state, gticlub, ROT0, "Konami", "GTI Club (ver AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, gticlubj, gticlub,  gticlub,  gticlub,  gticlub_state, gticlub, ROT0, "Konami", "GTI Club (ver JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, thunderh, 0,        thunderh, thunderh, gticlub_state, gticlub, ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 GAME( 1996, thunderhu,thunderh, thunderh, thunderh, gticlub_state, gticlub, ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME( 1997, slrasslt, 0,        slrasslt, slrasslt, gticlub_state, gticlub, ROT0, "Konami", "Solar Assault (ver UAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAMEL( 1997, hangplt, 0,        hangplt,  hangplt,  gticlub_state, hangplt, ROT0, "Konami", "Hang Pilot", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND, layout_dualhovu )
+GAME( 1997, slrasslt, 0,        slrasslt, slrasslt, gticlub_state, gticlub, ROT0, "Konami", "Solar Assault (ver UAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAMEL( 1997, hangplt, 0,        hangplt,  hangplt,  gticlub_state, hangplt, ROT0, "Konami", "Hang Pilot", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND, layout_dualhovu )
