@@ -23,6 +23,11 @@
 #define POLY_V		4
 #define POLY_W		5
 
+#define POLY_R		3
+#define POLY_G		4
+#define POLY_B		5
+#define POLY_A		2
+
 #define ZBUFFER_MAX					10000000000.0f
 
 #define LOG_POLY_FIFO				0
@@ -778,6 +783,62 @@ static void draw_scanline_tex(void *dest, INT32 scanline, const poly_extent *ext
 	}
 }
 
+static void draw_scanline_gouraud_blend(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
+{
+	bitmap_rgb32 *destmap = (bitmap_rgb32 *)dest;
+	float z = extent->param[POLY_Z].start;
+	float dz = extent->param[POLY_Z].dpdx;
+	float r = extent->param[POLY_R].start;
+	float dr = extent->param[POLY_R].dpdx;
+	float g = extent->param[POLY_G].start;
+	float dg = extent->param[POLY_G].dpdx;
+	float b = extent->param[POLY_B].start;
+	float db = extent->param[POLY_B].dpdx;
+	float a = extent->param[POLY_A].start;
+	float da = extent->param[POLY_A].dpdx;
+	UINT32 *fb = &destmap->pix32(scanline);
+	float *zb = (float*)&K001005_zbuffer->pix32(scanline);
+	int x;
+
+	for (x = extent->startx; x < extent->stopx; x++)
+	{
+		if (z <= zb[x])
+		{
+			int ir = (int)(r);
+			int ig = (int)(g);
+			int ib = (int)(b);
+			int ia = (int)(a);
+
+			if (ia > 0)
+			{
+				if (ia != 0xff)
+				{
+					int sr = (fb[x] >> 16) & 0xff;
+					int sg = (fb[x] >> 8) & 0xff;
+					int sb = fb[x] & 0xff;
+
+					ir = ((ir * ia) >> 8) + ((sr * (0xff-ia)) >> 8);
+					ig = ((ig * ia) >> 8) + ((sg * (0xff-ia)) >> 8);
+					ib = ((ib * ia) >> 8) + ((sb * (0xff-ia)) >> 8);
+				}
+
+				if (ir < 0) ir = 0; if (ir > 255) ir = 255;
+				if (ig < 0) ig = 0; if (ig > 255) ig = 255;
+				if (ib < 0) ib = 0; if (ib > 255) ib = 255;
+
+				fb[x] = 0xff000000 | (ir << 16) | (ig << 8) | ib;
+				zb[x] = z;
+			}
+		}
+
+		z += dz;
+		r += dr;
+		g += dg;
+		b += db;
+		a += da;
+	}
+}
+
 static void render_polygons(running_machine &machine)
 {
 	const rectangle& visarea = machine.primary_screen->visible_area();
@@ -807,6 +868,7 @@ static void render_polygons(running_machine &machine)
 		// 0x20: Gouraud shading enable?
 		// 0x40: Unused?
 		// 0x80: Used by textured polygons.
+		// 0x100: Alpha blending? Only used by Winding Heat car selection so far.
 
 		if (cmd == 0x800000ae || cmd == 0x8000008e || cmd == 0x80000096 || cmd == 0x800000b6 ||
 			cmd == 0x8000002e || cmd == 0x8000000e || cmd == 0x80000016 || cmd == 0x80000036 ||
@@ -1415,6 +1477,60 @@ static void render_polygons(running_machine &machine)
 				poly_render_quad(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline_2d_tex, 5, &v[0], &v[1], &v[2], &v[3]);
 			}
 		}
+		else if (cmd == 0x80000121)
+		{
+			// no texture, color gouraud, Z
+
+			poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
+			UINT32 color;
+
+			int last_vertex = 0;
+			int vert_num = 0;
+			do
+			{
+				int x, y, z;
+
+				x = ((fifo[index] >>  0) & 0x3fff);
+				y = ((fifo[index] >> 16) & 0x1fff);
+				x |= ((x & 0x2000) ? 0xffffc000 : 0);
+				y |= ((y & 0x1000) ? 0xffffe000 : 0);
+
+				poly_type = fifo[index] & 0x4000;
+				last_vertex = fifo[index] & 0x8000;
+				index++;
+
+				z = fifo[index] & 0xffffff00;
+				brightness = fifo[index] & 0xff;
+				index++;
+
+				color = fifo[index];
+				index++;
+
+				v[vert_num].x = ((float)(x) / 16.0f) + 256.0f;
+				v[vert_num].y = ((float)(-y) / 16.0f) + 192.0f + 8;
+				v[vert_num].p[POLY_Z] = *(float*)(&z);
+				v[vert_num].p[POLY_R] = (color >> 16) & 0xff;
+				v[vert_num].p[POLY_G] = (color >> 8) & 0xff;
+				v[vert_num].p[POLY_B] = color & 0xff;
+				v[vert_num].p[POLY_A] = (color >> 24) & 0xff;
+				vert_num++;
+			}
+			while (!last_vertex);
+
+			extra->color = color;
+			extra->flags = cmd;
+
+			if (poly_type == 0)
+			{
+				poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline_gouraud_blend, 6, &v[0], &v[1], &v[2]);
+			}
+			else
+			{
+				poly_render_quad(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline_gouraud_blend, 6, &v[0], &v[1], &v[2], &v[3]);
+			}
+
+			// TODO: can this poly type form strips?
+		}
 		else if (cmd == 0x80000000)
 		{
 
@@ -1423,7 +1539,7 @@ static void render_polygons(running_machine &machine)
 		{
 
 		}
-		else if ((cmd & 0xffffff00) == 0x80000000)
+		else if ((cmd & 0xffff0000) == 0x80000000)
 		{
 			/*
             mame_printf_debug("Unknown polygon type %08X:\n", fifo[index-1]);
