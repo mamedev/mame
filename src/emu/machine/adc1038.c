@@ -56,6 +56,9 @@ READ_LINE_DEVICE_HANDLER( adc1038_do_read )
 {
 	adc1038_state *adc1038 = adc1038_get_safe_token(device);
 
+	adc1038->data_out = (adc1038->adc_data & 0x200) ? 1 : 0;
+	adc1038->adc_data <<= 1;
+
 	//printf("ADC DO\n");
 	return adc1038->data_out;
 }
@@ -101,9 +104,6 @@ WRITE_LINE_DEVICE_HANDLER( adc1038_clk_write )
 			adc1038->adr |= (adc1038->data_in << 0);
 		}
 
-		adc1038->data_out = (adc1038->adc_data & 0x200) ? 1 : 0;
-		adc1038->adc_data <<= 1;
-
 		adc1038->cycle++;
 	}
 
@@ -118,9 +118,6 @@ READ_LINE_DEVICE_HANDLER( adc1038_sars_read )
 
 	/* notice that adc1038->adr is always < 7! */
 	adc1038->adc_data = adc1038->input_callback_r(device, adc1038->adr);
-
-	adc1038->data_out = (adc1038->adc_data & 0x200) ? 1 : 0;
-	adc1038->adc_data <<= 1;
 
 	adc1038->sars ^= 1;
 	return adc1038->sars;
