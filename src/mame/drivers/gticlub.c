@@ -410,7 +410,6 @@ WRITE8_MEMBER(gticlub_state::sysreg_w)
 
 MACHINE_START_MEMBER(gticlub_state,gticlub)
 {
-
 	/* set conservative DRC options */
 	ppcdrc_set_options(machine().device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
@@ -671,15 +670,15 @@ static INPUT_PORTS_START( hangplt )
 	PORT_DIPNAME( 0x02, 0x00, "Disable Test Mode" )
 	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01, 0x00, "Disable Machine Init" )
+	PORT_DIPNAME( 0x01, 0x01, "Disable Machine Init" )				// NOTE: Disabling Machine Init also disables analog controls
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-	PORT_START("AN0")
-	PORT_BIT( 0x3ff, 0x000, IPT_UNKNOWN )
+	PORT_START("AN0")			// Rudder
+	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_X ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("AN1")
-	PORT_BIT( 0x3ff, 0x000, IPT_UNKNOWN )
+	PORT_START("AN1")			// Control Bar
+	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 	PORT_START("AN2")
 	PORT_BIT( 0x3ff, 0x000, IPT_UNKNOWN )
