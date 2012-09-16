@@ -17,7 +17,7 @@
 
 <!-- Confirmed dump by ElBarto -->
 
-	<software name="doom" supported="no">
+	<software name="doom">
 		<description>Doom (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -33,7 +33,7 @@
 		</part>
 	</software>
 
-	<software name="motox" supported="no">
+	<software name="motox">
 		<description>Motocross Championship (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -46,7 +46,7 @@
 		</part>
 	</software>
 
-	<software name="sharrier" supported="no">
+	<software name="sharrier">
 		<description>Space Harrier (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -75,7 +75,7 @@
 		</part>
 	</software>
 
-	<software name="toughman" supported="no">
+	<software name="toughman">
 		<description>Toughman Contest (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
@@ -109,7 +109,7 @@
 
 <!-- Old interleaved/unconfirmed dump -->
 
-	<software name="aburner" supported="no">
+	<software name="aburner">
 		<description>After Burner Complete (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -120,7 +120,7 @@
 		</part>
 	</software>
 
-	<software name="aburnerju" cloneof="aburner" supported="no">
+	<software name="aburnerju" cloneof="aburner">
 		<description>After Burner (USA) ~ After Burner Complete (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -134,7 +134,7 @@
 		</part>
 	</software>
 
-	<software name="spidwebf" supported="no">
+	<software name="spidwebf">
 		<description>The Amazing Spider-Man - Web of Fire (USA)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -145,7 +145,7 @@
 		</part>
 	</software>
 
-	<software name="bcracers" supported="no">
+	<software name="bcracers">
 		<description>BC Racers (USA)</description>
 		<year>1995</year>
 		<publisher>Front Street Publishing</publisher>
@@ -156,7 +156,7 @@
 		</part>
 	</software>
 
-	<software name="blackthr" supported="no">
+	<software name="blackthr">
 		<description>Blackthorne (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -167,7 +167,7 @@
 		</part>
 	</software>
 
-	<software name="brutal" supported="no">
+	<software name="brutal">
 		<description>Brutal Unleashed - Above the Claw (USA)</description>
 		<year>1995</year>
 		<publisher>GameTek</publisher>
@@ -178,7 +178,7 @@
 		</part>
 	</software>
 
-	<software name="cosmicc" supported="no">
+	<software name="cosmicc">
 		<description>Cosmic Carnage (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -189,7 +189,7 @@
 		</part>
 	</software>
 
-	<software name="cyberb" cloneof="cosmicc" supported="no">
+	<software name="cyberb" cloneof="cosmicc">
 		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -203,8 +203,8 @@
 		</part>
 	</software>
 
-	<software name="cosmiccp" cloneof="cosmicc" supported="no">
-		<description>Cosmic Carnage (Prototype, 19941011)</description>
+	<software name="cosmiccp" cloneof="cosmicc">
+		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19941011)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -214,8 +214,8 @@
 		</part>
 	</software>
 
-	<software name="cosmiccp1" cloneof="cosmicc" supported="no">
-		<description>Cosmic Carnage (Prototype, 19941007)</description>
+	<software name="cosmiccp1" cloneof="cosmicc">
+		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19941007)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -225,8 +225,8 @@
 		</part>
 	</software>
 
-	<software name="cosmiccp2" cloneof="cosmicc" supported="no">
-		<description>Cosmic Carnage (Prototype, 19941005)</description>
+	<software name="cosmiccp2" cloneof="cosmicc">
+		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19941005)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -236,8 +236,8 @@
 		</part>
 	</software>
 
-	<software name="cosmiccp3" cloneof="cosmicc" supported="no">
-		<description>Cosmic Carnage (Prototype, 19941004)</description>
+	<software name="cosmiccp3" cloneof="cosmicc">
+		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19941004)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -247,8 +247,8 @@
 		</part>
 	</software>
 
-	<software name="cosmiccp4" cloneof="cosmicc" supported="no">
-		<description>Cosmic Carnage (Prototype, 19940928)</description>
+	<software name="cosmiccp4" cloneof="cosmicc">
+		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19940928)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -258,8 +258,8 @@
 		</part>
 	</software>
 
-	<software name="cosmiccp5" cloneof="cosmicc" supported="no">
-		<description>Cosmic Carnage (Prototype, 19940926)</description>
+	<software name="cosmiccp5" cloneof="cosmicc">
+		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19940926)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -269,8 +269,8 @@
 		</part>
 	</software>
 
-	<software name="cosmiccp6" cloneof="cosmicc" supported="no">
-		<description>Cosmic Carnage (Prototype, 19940921)</description>
+	<software name="cosmiccp6" cloneof="cosmicc">
+		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19940921)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -280,8 +280,8 @@
 		</part>
 	</software>
 
-	<software name="cosmiccp7" cloneof="cosmicc" supported="no">
-		<description>Cosmic Carnage (Prototype, 19940906)</description>
+	<software name="cosmiccp7" cloneof="cosmicc">
+		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19940906)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -291,7 +291,7 @@
 		</part>
 	</software>
 
-	<software name="darxide" supported="no">
+	<software name="darxide">
 		<description>Darxide (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -302,7 +302,7 @@
 		</part>
 	</software>
 
-	<software name="doomju" cloneof="doom" supported="no">
+	<software name="doomju" cloneof="doom">
 		<description>Doom (Jpn, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -316,7 +316,7 @@
 		</part>
 	</software>
 
-	<software name="doomp" cloneof="doom" supported="no">
+	<software name="doomp" cloneof="doom">
 		<description>Doom (Prototype, 19941201)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -327,8 +327,8 @@
 		</part>
 	</software>
 
-	<software name="doomp1" cloneof="doom" supported="no">
-		<description>Doom (Prototype, 19941002)</description>
+	<software name="doomp1" cloneof="doom">
+		<description>Doom (Euro, Prototype, 19941002)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -338,9 +338,9 @@
 		</part>
 	</software>
 
-	<software name="doomp2" cloneof="doom" supported="no">
+	<software name="doomp2" cloneof="doom">
         <!-- the same checksum is shared by the prototype (19940927), released by drx -->
-		<description>Doom (Prototype, 19940928)</description>
+		<description>Doom (USA, Prototype, 19940928)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -350,7 +350,7 @@
 		</part>
 	</software>
 
-	<software name="doomp3" cloneof="doom" supported="no">
+	<software name="doomp3" cloneof="doom">
 		<description>Doom (Prototype, 19940925)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -361,7 +361,7 @@
 		</part>
 	</software>
 
-	<software name="doomp4" cloneof="doom" supported="no">
+	<software name="doomp4" cloneof="doom">
 		<description>Doom (Prototype, 19940923)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -372,7 +372,7 @@
 		</part>
 	</software>
 
-	<software name="doomp5" cloneof="doom" supported="no">
+	<software name="doomp5" cloneof="doom" supported="partial">
 		<description>Doom (Prototype, 19940921)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -383,7 +383,7 @@
 		</part>
 	</software>
 
-	<software name="doomp6" cloneof="doom" supported="no">
+	<software name="doomp6" cloneof="doom" supported="partial">
 		<description>Doom (Prototype, 19940916)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -394,7 +394,7 @@
 		</part>
 	</software>
 
-	<software name="doomp7" cloneof="doom" supported="no">
+	<software name="doomp7" cloneof="doom" supported="partial">
 		<description>Doom (Prototype, 19940914)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -405,7 +405,7 @@
 		</part>
 	</software>
 
-	<software name="doomp8" cloneof="doom" supported="no">
+	<software name="doomp8" cloneof="doom" supported="partial">
 		<description>Doom (Prototype, 19940909)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -416,7 +416,7 @@
 		</part>
 	</software>
 
-	<software name="doomp9" cloneof="doom" supported="no">
+	<software name="doomp9" cloneof="doom" supported="partial">
 		<description>Doom (Prototype, 19940906)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -427,8 +427,8 @@
 		</part>
 	</software>
 
-	<software name="doomrr" cloneof="doom" supported="no">
-		<description>Doom RR (Prototype, 19950307)</description>
+	<software name="doomrr" cloneof="doom">
+		<description>Doom RR (USA, Prototype, 19950307)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -438,8 +438,8 @@
 		</part>
 	</software>
 
-	<software name="doomrr1" cloneof="doom" supported="no">
-		<description>Doom RR (Prototype, 19950221)</description>
+	<software name="doomrr1" cloneof="doom">
+		<description>Doom RR (USA, Prototype, 19950221)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -449,8 +449,8 @@
 		</part>
 	</software>
 
-	<software name="doomrr2" cloneof="doom" supported="no">
-		<description>Doom RR (Prototype, 19950215)</description>
+	<software name="doomrr2" cloneof="doom">
+		<description>Doom RR (USA, Prototype, 19950215)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -461,7 +461,7 @@
 	</software>
 
 	<software name="eccodemo" supported="no">
-		<description>ECCO the Dolphin CinePak Demo (Jpn, USA, Developer Cart)</description>
+		<description>Ecco the Dolphin CinePak Demo (Jpn, USA, Developer Cart)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -471,7 +471,7 @@
 		</part>
 	</software>
 
-	<software name="fifa96" supported="no">
+	<software name="fifa96">
 		<description>FIFA Soccer 96 (Euro)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
@@ -507,8 +507,8 @@
 		</part>
 	</software>
 
-	<software name="36greatp" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941221-B)</description>
+	<software name="36greatp" cloneof="36great" supported="partial">
+		<description>36 Great Holes starring Fred Couples (Euro, Prototype, 19941221-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -518,8 +518,8 @@
 		</part>
 	</software>
 
-	<software name="36greatp1" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941221)</description>
+	<software name="36greatp1" cloneof="36great" supported="partial">
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941221)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -530,7 +530,7 @@
 	</software>
 
 	<software name="36greatp2" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941219)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941219)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -540,8 +540,8 @@
 		</part>
 	</software>
 
-	<software name="36greatp3" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941214)</description>
+	<software name="36greatp3" cloneof="36great" supported="partial">
+		<description>36 Great Holes starring Fred Couples (Euro, Prototype, 19941214)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -552,7 +552,7 @@
 	</software>
 
 	<software name="36greatp4" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941213)</description>
+		<description>36 Great Holes starring Fred Couples (Euro, Prototype, 19941213)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -563,7 +563,7 @@
 	</software>
 
 	<software name="36greatp5" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941206)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941206)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -574,7 +574,7 @@
 	</software>
 
 	<software name="36greatp6" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941203)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941203)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -585,7 +585,7 @@
 	</software>
 
 	<software name="36greatp7" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941202)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941202)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -596,7 +596,7 @@
 	</software>
 
 	<software name="36greatp8" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941130)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941130)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -607,7 +607,7 @@
 	</software>
 
 	<software name="36greatp9" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941129)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941129)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -618,7 +618,7 @@
 	</software>
 
 	<software name="36greatp10" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941128-B)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941128-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -629,7 +629,7 @@
 	</software>
 
 	<software name="36greatp11" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941128)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941128)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -640,7 +640,7 @@
 	</software>
 
 	<software name="36greatp12" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941127)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941127)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -651,7 +651,7 @@
 	</software>
 
 	<software name="36greatp13" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941126)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941126)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -662,7 +662,7 @@
 	</software>
 
 	<software name="36greatp14" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941123)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941123)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -673,7 +673,7 @@
 	</software>
 
 	<software name="36greatp15" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941122-B)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941122-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -684,7 +684,7 @@
 	</software>
 
 	<software name="36greatp16" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941122)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941122)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -695,7 +695,7 @@
 	</software>
 
 	<software name="36greatp17" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941121)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941121)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -706,7 +706,7 @@
 	</software>
 
 	<software name="36greatp18" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941119-B)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941119-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -717,7 +717,7 @@
 	</software>
 
 	<software name="36greatp19" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941119)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941119)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -727,8 +727,8 @@
 		</part>
 	</software>
 
-	<software name="36greatp20" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941118)</description>
+	<software name="36greatp20" cloneof="36great" supported="partial">
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941118)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -739,7 +739,7 @@
 	</software>
 
 	<software name="36greatp21" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941116)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941116)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -749,8 +749,8 @@
 		</part>
 	</software>
 
-	<software name="36greatp22" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941110)</description>
+	<software name="36greatp22" cloneof="36great" supported="partial">
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941110)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -760,8 +760,8 @@
 		</part>
 	</software>
 
-	<software name="36greatp23" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941108)</description>
+	<software name="36greatp23" cloneof="36great" supported="partial">
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941108)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -771,9 +771,9 @@
 		</part>
 	</software>
 
-	<!-- // this is the earliest set that doesn't just crash it -->
-	<software name="36greatp24" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941107)</description>
+	<!-- this is the earliest set that doesn't just crash it -->
+	<software name="36greatp24" cloneof="36great" supported="partial">
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941107)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -784,7 +784,7 @@
 	</software>
 
 	<software name="36greatp25" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941105)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941105)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -795,7 +795,7 @@
 	</software>
 
 	<software name="36greatp26" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941103)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941103)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -806,7 +806,7 @@
 	</software>
 
 	<software name="36greatp27" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941101)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941101)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -817,7 +817,7 @@
 	</software>
 
 	<software name="36greatp28" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941026)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941026)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -828,7 +828,7 @@
 	</software>
 
 	<software name="36greatp29" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941024)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941024)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -839,7 +839,7 @@
 	</software>
 
 	<software name="36greatp30" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941018)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941018)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -850,7 +850,7 @@
 	</software>
 
 	<software name="36greatp31" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941017)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941017)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -861,7 +861,7 @@
 	</software>
 
 	<software name="36greatp32" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Prototype, 19941011)</description>
+		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941011)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -872,7 +872,7 @@
 	</software>
 
 	<software name="36greatp33" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (v1.x Prototype, 19940706)</description>
+		<description>36 Great Holes starring Fred Couples (USA, v1.x Prototype, 19940706)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -882,10 +882,11 @@
 		</part>
 	</software>
 
-	<software name="knuckle" supported="no">
-		<description>Knuckles' Chaotix (Euro)</description>
+	<software name="chaotix">
+		<description>Chaotix (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="Knuckles' Chaotix (Box)"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="knuckles' chaotix (europe).bin" size="3145728" crc="41d63572" sha1="5c1a2e327a656217604d4bae7e141764a7e59922" offset="000000" />
@@ -893,13 +894,13 @@
 		</part>
 	</software>
 
-	<software name="chaotix" cloneof="knuckle" supported="no">
-		<description>Chaotix (Jpn) ~ Knuckles' Chaotix (USA)</description>
+	<software name="chaotixju" cloneof="chaotix">
+		<description>Chaotix (Jpn, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GM-5003 (JPN)"/>
 		<info name="release" value="19950421 (JPN)"/>
-		<info name="alt_title" value="カオティクス フィーチャリング ナックルズ ザ エキドゥナ"/>
+		<info name="alt_title" value="カオティクス フィーチャリング ナックルズ ザ エキドゥナ, Knuckles' Chaotix (USA Box)"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="chaotix ~ knuckles' chaotix (japan, usa).bin" size="3145728" crc="d0b0b842" sha1="0c2fff7bc79ed26507c08ac47464c3af19f7ced7" offset="000000" />
@@ -907,8 +908,8 @@
 		</part>
 	</software>
 
-	<software name="knucklep" cloneof="knuckle" supported="no">
-		<description>Knuckles' Chaotix (Prototype 214, 19950214, 06.46)</description>
+	<software name="chaotixjup" cloneof="chaotix">
+		<description>Chaotix (Jpn, USA, Prototype 214, 19950214, 06.46)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -918,8 +919,8 @@
 		</part>
 	</software>
 
-	<software name="knucklep1" cloneof="knuckle" supported="no">
-		<description>Knuckles' Chaotix (Prototype 0213, 19950213, 07.30)</description>
+	<software name="chaotixjup1" cloneof="chaotix">
+		<description>Chaotix (Jpn, USA, Prototype 0213, 19950213, 07.30)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -929,8 +930,8 @@
 		</part>
 	</software>
 
-	<software name="knucklep2" cloneof="knuckle" supported="no">
-		<description>Knuckles' Chaotix (Prototype 213B, 19950213, 06.46)</description>
+	<software name="chaotixjup2" cloneof="chaotix">
+		<description>Chaotix (Jpn, USA, Prototype 213B, 19950213, 06.46)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -940,8 +941,8 @@
 		</part>
 	</software>
 
-	<software name="knucklep3" cloneof="knuckle" supported="no">
-		<description>Knuckles' Chaotix (Prototype 210, 19950210, 06.28)</description>
+	<software name="chaotixjup3" cloneof="chaotix">
+		<description>Chaotix (Jpn, USA, Prototype 210, 19950210, 06.28)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -951,8 +952,8 @@
 		</part>
 	</software>
 
-	<software name="knucklep4" cloneof="knuckle" supported="no">
-		<description>Knuckles' Chaotix (Prototype 209, 19950209, 08.25)</description>
+	<software name="chaotixjup4" cloneof="chaotix">
+		<description>Chaotix (Jpn, USA, Prototype 209, 19950209, 08.25)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -962,8 +963,8 @@
 		</part>
 	</software>
 
-	<software name="knucklep5" cloneof="knuckle" supported="no">
-		<description>Knuckles' Chaotix (Prototype 208, 19950208, 11.17)</description>
+	<software name="chaotixjup5" cloneof="chaotix">
+		<description>Chaotix (Jpn, USA, Prototype 208, 19950208, 11.17)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -973,8 +974,8 @@
 		</part>
 	</software>
 
-	<software name="knucklep6" cloneof="knuckle" supported="no">
-		<description>Knuckles' Chaotix (Prototype 0202, 19950207, 15.25)</description>
+	<software name="chaotixjup6" cloneof="chaotix" supported="no">
+		<description>Chaotix (Jpn, USA, Prototype 0202, 19950207, 15.25)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -984,8 +985,8 @@
 		</part>
 	</software>
 
-	<software name="knucklep7" cloneof="knuckle" supported="no">
-		<description>Knuckles' Chaotix (Prototype 119, 19950119, 07.04)</description>
+	<software name="chaotixjup7" cloneof="chaotix" supported="no">
+		<description>Chaotix (Jpn, USA, Prototype 119, 19950119, 07.04)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -995,8 +996,8 @@
 		</part>
 	</software>
 
-	<software name="knucklep8" cloneof="knuckle" supported="no">
-		<description>Knuckles' Chaotix (Prototype 0111, 19950112, 09.36)</description>
+	<software name="chaotixjup8" cloneof="chaotix" supported="no">
+		<description>Chaotix (Jpn, USA, Prototype 0111, 19950112, 09.36)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1006,8 +1007,8 @@
 		</part>
 	</software>
 
-	<software name="knucklep9" cloneof="knuckle" supported="no">
-		<description>Knuckles' Chaotix (Prototype 1207, 19941207, 07.15)</description>
+	<software name="chaotixjup9" cloneof="chaotix" supported="no">
+		<description>Chaotix (Jpn, USA, Prototype 1207, 19941207, 07.15)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1017,8 +1018,8 @@
 		</part>
 	</software>
 
-	<software name="knucklep10" cloneof="knuckle" supported="no">
-		<description>Knuckles' Chaotix (Prototype 1227, 19941227, 10.28)</description>
+	<software name="chaotixjup10" cloneof="chaotix" supported="no">
+		<description>Chaotix (Jpn, USA, Prototype 1227, 19941227, 10.28)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1028,8 +1029,8 @@
 		</part>
 	</software>
 
-	<software name="knucklep11" cloneof="knuckle" supported="no">
-		<description>Knuckles' Chaotix (Prototype 1229, 19941230, 15.31)</description>
+	<software name="chaotixjup11" cloneof="chaotix" supported="no">
+		<description>Chaotix (Jpn, USA, Prototype 1229, 19941230, 15.31)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1039,7 +1040,7 @@
 		</part>
 	</software>
 
-	<software name="kolibri" supported="no">
+	<software name="kolibri">
 		<description>Kolibri (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1050,7 +1051,7 @@
 		</part>
 	</software>
 
-	<software name="marsch" supported="no">
+	<software name="marsch">
 		<description>Mars Check Program Version 1.0 (Jpn, USA, SDK Build Set 1)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1061,7 +1062,7 @@
 		</part>
 	</software>
 
-	<software name="marsch1" cloneof="marsch" supported="no">
+	<software name="marsch1" cloneof="marsch">
 		<description>Mars Check Program Version 1.0 (Jpn, USA, SDK Build Set 2)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1072,7 +1073,7 @@
 		</part>
 	</software>
 
-	<software name="marssa" supported="no">
+	<software name="marssa">
 		<description>Mars Sample Program - Gnu Sierra (Jpn, USA, SDK Build)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1083,7 +1084,7 @@
 		</part>
 	</software>
 
-	<software name="marssa1" cloneof="marssa" supported="no">
+	<software name="marssa1" cloneof="marssa">
 		<description>Mars Sample Program - Pharaoh (Jpn, USA, SDK Build)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1094,7 +1095,7 @@
 		</part>
 	</software>
 
-	<software name="marssa2" cloneof="marssa" supported="no">
+	<software name="marssa2" cloneof="marssa">
 		<description>Mars Sample Program - Runlength Mode Test (Jpn, USA, SDK Build)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1105,7 +1106,7 @@
 		</part>
 	</software>
 
-	<software name="marssa3" cloneof="marssa" supported="no">
+	<software name="marssa3" cloneof="marssa">
 		<description>Mars Sample Program - Texture Test (Jpn, USA, SDK Build)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1116,7 +1117,7 @@
 		</part>
 	</software>
 
-	<software name="metalhd" supported="no">
+	<software name="metalhd">
 		<description>Metal Head (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1127,7 +1128,7 @@
 		</part>
 	</software>
 
-	<software name="metalhdju" cloneof="metalhd" supported="no">
+	<software name="metalhdju" cloneof="metalhd">
 		<description>Metal Head (Jpn, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1141,8 +1142,8 @@
 		</part>
 	</software>
 
-	<software name="metalhdp" cloneof="metalhd" supported="no">
-		<description>Metal Head (Prototype, 19941220)</description>
+	<software name="metalhdp" cloneof="metalhd">
+		<description>Metal Head (Jpn, USA, Prototype, 19941220)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1152,8 +1153,8 @@
 		</part>
 	</software>
 
-	<software name="metalhdp1" cloneof="metalhd" supported="no">
-		<description>Metal Head (Prototype, 19941213)</description>
+	<software name="metalhdp1" cloneof="metalhd">
+		<description>Metal Head (Jpn, USA, Prototype, 19941213)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1163,8 +1164,8 @@
 		</part>
 	</software>
 
-	<software name="metalhdp2" cloneof="metalhd" supported="no">
-		<description>Metal Head (Prototype, 19941209)</description>
+	<software name="metalhdp2" cloneof="metalhd">
+		<description>Metal Head (Jpn, USA, Prototype, 19941209)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1174,8 +1175,8 @@
 		</part>
 	</software>
 
-	<software name="metalhdp3" cloneof="metalhd" supported="no">
-		<description>Metal Head (Prototype, 19941207-B)</description>
+	<software name="metalhdp3" cloneof="metalhd">
+		<description>Metal Head (Jpn, USA, Prototype, 19941207-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1185,8 +1186,8 @@
 		</part>
 	</software>
 
-	<software name="metalhdp4" cloneof="metalhd" supported="no">
-		<description>Metal Head (Prototype, 19941207)</description>
+	<software name="metalhdp4" cloneof="metalhd">
+		<description>Metal Head (Jpn, USA, Prototype, 19941207)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1196,8 +1197,8 @@
 		</part>
 	</software>
 
-	<software name="metalhdp5" cloneof="metalhd" supported="no">
-		<description>Metal Head (Prototype, 19941202)</description>
+	<software name="metalhdp5" cloneof="metalhd">
+		<description>Metal Head (Jpn, USA, Prototype, 19941202)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1207,8 +1208,9 @@
 		</part>
 	</software>
 
-	<software name="metalhdp6" cloneof="metalhd" supported="no">
-		<description>Metal Head (Prototype, 19941121)</description>
+<!-- Also works on PAL -->
+	<software name="metalhdp6" cloneof="metalhd">
+		<description>Metal Head (Jpn, USA, Prototype, 19941121)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1218,8 +1220,9 @@
 		</part>
 	</software>
 
-	<software name="metalhdp7" cloneof="metalhd" supported="no">
-		<description>Metal Head (Prototype, 19941118)</description>
+<!-- Also works on PAL -->
+	<software name="metalhdp7" cloneof="metalhd">
+		<description>Metal Head (Jpn, USA, Prototype, 19941118)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1229,8 +1232,9 @@
 		</part>
 	</software>
 
-	<software name="metalhdp8" cloneof="metalhd" supported="no">
-		<description>Metal Head (Prototype, 19941114)</description>
+<!-- Also works on PAL -->
+	<software name="metalhdp8" cloneof="metalhd">
+		<description>Metal Head (Jpn, USA, Prototype, 19941114)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1240,7 +1244,7 @@
 		</part>
 	</software>
 
-	<software name="mk2" supported="no">
+	<software name="mk2">
 		<description>Mortal Kombat II (Euro)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -1251,7 +1255,7 @@
 		</part>
 	</software>
 
-	<software name="mk2ju" cloneof="mk2" supported="no">
+	<software name="mk2ju" cloneof="mk2">
 		<description>Mortal Kombat II - Kyuukyoku Shinken (Jpn) ~ Mortal Kombat II (USA)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -1265,7 +1269,7 @@
 		</part>
 	</software>
 
-	<software name="motoxu" cloneof="motox" supported="no">
+	<software name="motoxu" cloneof="motox">
 		<description>Motocross Championship (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1276,8 +1280,8 @@
 		</part>
 	</software>
 
-	<software name="motoxp" cloneof="motox" supported="no">
-		<description>Motocross Championship (Prototype, 19941111)</description>
+	<software name="motoxp" cloneof="motox">
+		<description>Motocross Championship (USA, Prototype, 19941111)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1287,8 +1291,8 @@
 		</part>
 	</software>
 
-	<software name="motoxpa" cloneof="motox" supported="no">
-		<description>Motocross Championship (Prototype, 19941108)</description>
+	<software name="motoxpa" cloneof="motox">
+		<description>Motocross Championship (USA, Prototype, 19941108)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1298,8 +1302,8 @@
 		</part>
 	</software>
 
-	<software name="motoxpb" cloneof="motox" supported="no">
-		<description>Motocross Championship (Prototype, 19941107)</description>
+	<software name="motoxpb" cloneof="motox">
+		<description>Motocross Championship (USA, Prototype, 19941107)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1309,8 +1313,8 @@
 		</part>
 	</software>
 
-	<software name="motoxpc" cloneof="motox" supported="no">
-		<description>Motocross Championship (Prototype, 19941104)</description>
+	<software name="motoxpc" cloneof="motox">
+		<description>Motocross Championship (USA, Prototype, 19941104)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1320,8 +1324,8 @@
 		</part>
 	</software>
 
-	<software name="motoxpd" cloneof="motox" supported="no">
-		<description>Motocross Championship (Prototype, 19941103)</description>
+	<software name="motoxpd" cloneof="motox">
+		<description>Motocross Championship (USA, Prototype, 19941103)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1331,8 +1335,8 @@
 		</part>
 	</software>
 
-	<software name="motoxpe" cloneof="motox" supported="no">
-		<description>Motocross Championship (Prototype, 19941102-B)</description>
+	<software name="motoxpe" cloneof="motox">
+		<description>Motocross Championship (USA, Prototype, 19941102-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1342,8 +1346,8 @@
 		</part>
 	</software>
 
-	<software name="motoxpf" cloneof="motox" supported="no">
-		<description>Motocross Championship (Prototype, 19941102)</description>
+	<software name="motoxpf" cloneof="motox">
+		<description>Motocross Championship (USA, Prototype, 19941102)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1353,8 +1357,8 @@
 		</part>
 	</software>
 
-	<software name="motoxpg" cloneof="motox" supported="no">
-		<description>Motocross Championship (Prototype, 19941101)</description>
+	<software name="motoxpg" cloneof="motox">
+		<description>Motocross Championship (USA, Prototype, 19941101)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1364,8 +1368,8 @@
 		</part>
 	</software>
 
-	<software name="motoxph" cloneof="motox" supported="no">
-		<description>Motocross Championship (Prototype, 19941028)</description>
+	<software name="motoxph" cloneof="motox">
+		<description>Motocross Championship (USA, Prototype, 19941028)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1375,8 +1379,8 @@
 		</part>
 	</software>
 
-	<software name="motoxpi" cloneof="motox" supported="no">
-		<description>Motocross Championship (Prototype, 19941024)</description>
+	<software name="motoxpi" cloneof="motox">
+		<description>Motocross Championship (USA, Prototype, 19941024)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1386,8 +1390,8 @@
 		</part>
 	</software>
 
-	<software name="motoxpj" cloneof="motox" supported="no">
-		<description>Motocross Championship (Prototype, 19941020)</description>
+	<software name="motoxpj" cloneof="motox">
+		<description>Motocross Championship (USA, Prototype, 19941020)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1397,8 +1401,8 @@
 		</part>
 	</software>
 
-	<software name="motoxpk" cloneof="motox" supported="no">
-		<description>Motocross Championship (Prototype, 19941019)</description>
+	<software name="motoxpk" cloneof="motox">
+		<description>Motocross Championship (USA, Prototype, 19941019)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1408,8 +1412,8 @@
 		</part>
 	</software>
 
-	<software name="motoxpl" cloneof="motox" supported="no">
-		<description>Motocross Championship (Prototype, 19941018)</description>
+	<software name="motoxpl" cloneof="motox">
+		<description>Motocross Championship (USA, Prototype, 19941018)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1419,7 +1423,7 @@
 		</part>
 	</software>
 
-	<software name="motoxpm" cloneof="motox" supported="no">
+	<software name="motoxpm" cloneof="motox">
 		<description>Motocross Championship (Prototype, 19941017)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1430,7 +1434,7 @@
 		</part>
 	</software>
 
-	<software name="motoxpn" cloneof="motox" supported="no">
+	<software name="motoxpn" cloneof="motox">
 		<description>Motocross Championship (Prototype, 19941012)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1469,7 +1473,7 @@
 		</part>
 	</software>
 
-	<software name="pitfall" supported="no">
+	<software name="pitfall">
 		<description>Pitfall - The Mayan Adventure (USA)</description>
 		<year>1995</year>
 		<publisher>Activision</publisher>
@@ -1480,7 +1484,7 @@
 		</part>
 	</software>
 
-	<software name="primal" supported="no">
+	<software name="primal">
 		<description>Primal Rage (Euro, USA)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -1491,7 +1495,7 @@
 		</part>
 	</software>
 
-	<software name="rbibb95" supported="no">
+	<software name="rbibb95">
 		<description>R.B.I. Baseball '95 (USA)</description>
 		<year>1995</year>
 		<publisher>Time Warner Interactive</publisher>
@@ -1516,8 +1520,8 @@
 		</part>
 	</software>
 
-	<software name="stellar" supported="no">
-		<description>Shadow Squadron (USA) ~ Stellar Assault (Euro)</description>
+	<software name="stellar">
+		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1527,7 +1531,7 @@
 		</part>
 	</software>
 
-	<software name="stellarj" cloneof="stellar" supported="no">
+	<software name="stellarj" cloneof="stellar">
 		<description>Stellar Assault (Jpn)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1541,8 +1545,8 @@
 		</part>
 	</software>
 
-	<software name="shadsqp" cloneof="stellar" supported="no">
-		<description>Shadow Squadron (Prototype, 19950313-B)</description>
+	<software name="stellarp" cloneof="stellar">
+		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (Prototype, 19950313-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1552,8 +1556,8 @@
 		</part>
 	</software>
 
-	<software name="shadsqp1" cloneof="stellar" supported="no">
-		<description>Shadow Squadron (Prototype, 19950313)</description>
+	<software name="stellarp1" cloneof="stellar">
+		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (Prototype, 19950313)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1563,8 +1567,8 @@
 		</part>
 	</software>
 
-	<software name="shadsqp2" cloneof="stellar" supported="no">
-		<description>Shadow Squadron (Prototype, 19950306)</description>
+	<software name="stellarp2" cloneof="stellar">
+		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (Prototype, 19950306)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1574,8 +1578,8 @@
 		</part>
 	</software>
 
-	<software name="shadsqp3" cloneof="stellar" supported="no">
-		<description>Shadow Squadron (Prototype, 19950302)</description>
+	<software name="stellarp3" cloneof="stellar">
+		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (Prototype, 19950302)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1585,8 +1589,8 @@
 		</part>
 	</software>
 
-	<software name="shadsqp4" cloneof="stellar" supported="no">
-		<description>Shadow Squadron (Prototype, 19950222)</description>
+	<software name="stellarp4" cloneof="stellar">
+		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (Prototype, 19950222)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1596,8 +1600,8 @@
 		</part>
 	</software>
 
-	<software name="shadsqp5" cloneof="stellar" supported="no">
-		<description>Shadow Squadron (Prototype, 19950213)</description>
+	<software name="stellarp5" cloneof="stellar">
+		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (Prototype, 19950213)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1607,8 +1611,8 @@
 		</part>
 	</software>
 
-	<software name="shadsqp6" cloneof="stellar" supported="no">
-		<description>Shadow Squadron (Prototype, 19950206)</description>
+	<software name="stellarp6" cloneof="stellar">
+		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (Prototype, 19950206)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1630,7 +1634,7 @@
 		</part>
 	</software>
 
-	<software name="sharrierju" cloneof="sharrier" supported="no">
+	<software name="sharrierju" cloneof="sharrier">
 		<description>Space Harrier (Jpn, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1644,7 +1648,7 @@
 		</part>
 	</software>
 
-	<software name="sharrierp" cloneof="sharrier" supported="no">
+	<software name="sharrierp" cloneof="sharrier">
 		<description>Space Harrier (Prototype, 19940920)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1655,7 +1659,7 @@
 		</part>
 	</software>
 
-	<software name="stsfleet" supported="no">
+	<software name="stsfleet">
 		<description>Star Trek - Starfleet Academy - Starship Bridge Simulator (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1692,7 +1696,7 @@
 	</software>
 
 	<software name="swap" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Prototype, 19941007-B)</description>
+		<description>Star Wars Arcade (Euro, Prototype, 19941007-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1703,7 +1707,7 @@
 	</software>
 
 	<software name="swap1" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Prototype, 19941006-P)</description>
+		<description>Star Wars Arcade (Euro, Prototype, 19941006-P)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1714,7 +1718,7 @@
 	</software>
 
 	<software name="swap2" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Prototype, 19941005)</description>
+		<description>Star Wars Arcade (Jpn, Prototype, 19941005)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1725,7 +1729,7 @@
 	</software>
 
 	<software name="swap3" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Prototype, 19941003)</description>
+		<description>Star Wars Arcade (Jpn, Prototype, 19941003)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1736,7 +1740,7 @@
 	</software>
 
 	<software name="swap4" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Prototype, 19940930-B)</description>
+		<description>Star Wars Arcade (Jpn, Prototype, 19940930-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1747,7 +1751,7 @@
 	</software>
 
 	<software name="swap5" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Prototype, 19940929)</description>
+		<description>Star Wars Arcade (Euro, Prototype, 19940929)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1769,7 +1773,7 @@
 	</software>
 
 	<software name="swap7" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Prototype, 19940918)</description>
+		<description>Star Wars Arcade (USA, Prototype, 19940918)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1780,7 +1784,7 @@
 	</software>
 
 	<software name="swap8" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Prototype, 19940916)</description>
+		<description>Star Wars Arcade (USA, Prototype, 19940916)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1802,7 +1806,7 @@
 	</software>
 
 	<software name="swap10" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Prototype, 19940914-D)</description>
+		<description>Star Wars Arcade (USA, Prototype, 19940914-D)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1813,7 +1817,7 @@
 	</software>
 
 	<software name="swap11" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Prototype, 19940913-B)</description>
+		<description>Star Wars Arcade (USA, Prototype, 19940913-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1824,7 +1828,7 @@
 	</software>
 
 	<software name="swap12" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Prototype, 19940912)</description>
+		<description>Star Wars Arcade (USA, Prototype, 19940912)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1889,7 +1893,7 @@
 		</part>
 	</software>
 
-	<software name="tmek" supported="no">
+	<software name="tmek">
 		<description>T-Mek (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1900,7 +1904,7 @@
 		</part>
 	</software>
 
-	<software name="tempo" supported="no">
+	<software name="tempo">
 		<description>Tempo (Jpn, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1914,8 +1918,8 @@
 		</part>
 	</software>
 
-	<software name="tempop" cloneof="tempo" supported="no">
-		<description>Tempo (Prototype, 19950207)</description>
+	<software name="tempop" cloneof="tempo">
+		<description>Tempo (USA, Prototype, 19950207)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1925,8 +1929,8 @@
 		</part>
 	</software>
 
-	<software name="tempop1" cloneof="tempo" supported="no">
-		<description>Tempo (Prototype, 19950206)</description>
+	<software name="tempop1" cloneof="tempo">
+		<description>Tempo (USA, Prototype, 19950206)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1936,8 +1940,8 @@
 		</part>
 	</software>
 
-	<software name="tempop2" cloneof="tempo" supported="no">
-		<description>Tempo (Prototype, 19950206-B)</description>
+	<software name="tempop2" cloneof="tempo">
+		<description>Tempo (USA, Prototype, 19950206-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1947,8 +1951,8 @@
 		</part>
 	</software>
 
-	<software name="tempop3" cloneof="tempo" supported="no">
-		<description>Tempo (Prototype, 19950204)</description>
+	<software name="tempop3" cloneof="tempo">
+		<description>Tempo (USA, Prototype, 19950204)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1958,8 +1962,8 @@
 		</part>
 	</software>
 
-	<software name="tempop4" cloneof="tempo" supported="no">
-		<description>Tempo (Prototype, 19950126)</description>
+	<software name="tempop4" cloneof="tempo">
+		<description>Tempo (USA, Prototype, 19950126)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1969,8 +1973,8 @@
 		</part>
 	</software>
 
-	<software name="tempop5" cloneof="tempo" supported="no">
-		<description>Tempo (Prototype, 19950124)</description>
+	<software name="tempop5" cloneof="tempo">
+		<description>Tempo (USA, Prototype, 19950124)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1980,7 +1984,7 @@
 		</part>
 	</software>
 
-	<software name="tempop6" cloneof="tempo" supported="no">
+	<software name="tempop6" cloneof="tempo">
 		<description>Tempo (Prototype, 19950121)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1991,7 +1995,7 @@
 		</part>
 	</software>
 
-	<software name="tempop7" cloneof="tempo" supported="no">
+	<software name="tempop7" cloneof="tempo">
 		<description>Tempo (Prototype, 19941229)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -2002,7 +2006,7 @@
 		</part>
 	</software>
 
-	<software name="vf" supported="no">
+	<software name="vf">
 		<description>Virtua Fighter (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -2013,7 +2017,7 @@
 		</part>
 	</software>
 
-	<software name="vfju" cloneof="vf" supported="no">
+	<software name="vfju" cloneof="vf">
 		<description>Virtua Fighter (Jpn, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -2027,8 +2031,8 @@
 		</part>
 	</software>
 
-	<software name="vfp" cloneof="vf" supported="no">
-		<description>Virtua Fighter (Prototype, 19950725)</description>
+	<software name="vfp" cloneof="vf">
+		<description>Virtua Fighter (USA, Prototype, 19950725)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2038,8 +2042,8 @@
 		</part>
 	</software>
 
-	<software name="vfp1" cloneof="vf" supported="no">
-		<description>Virtua Fighter (Prototype, 19950724)</description>
+	<software name="vfp1" cloneof="vf">
+		<description>Virtua Fighter (USA, Prototype, 19950724)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2049,8 +2053,8 @@
 		</part>
 	</software>
 
-	<software name="vfp2" cloneof="vf" supported="no">
-		<description>Virtua Fighter (Prototype, 19950721)</description>
+	<software name="vfp2" cloneof="vf">
+		<description>Virtua Fighter (USA, Prototype, 19950721)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2060,8 +2064,8 @@
 		</part>
 	</software>
 
-	<software name="vfp3" cloneof="vf" supported="no">
-		<description>Virtua Fighter (Prototype, 19950717)</description>
+	<software name="vfp3" cloneof="vf">
+		<description>Virtua Fighter (USA, Prototype, 19950717)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2071,7 +2075,7 @@
 		</part>
 	</software>
 
-	<software name="vfp4" cloneof="vf" supported="no">
+	<software name="vfp4" cloneof="vf">
 		<description>Virtua Fighter (Prototype, 19950630)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -2082,7 +2086,7 @@
 		</part>
 	</software>
 
-	<software name="vfp5" cloneof="vf" supported="no">
+	<software name="vfp5" cloneof="vf">
 		<description>Virtua Fighter (Prototype, 19950615)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -2093,7 +2097,7 @@
 		</part>
 	</software>
 
-	<software name="vfp6" cloneof="vf" supported="no">
+	<software name="vfp6" cloneof="vf">
 		<description>Virtua Fighter (Prototype, 19950530)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -2104,8 +2108,8 @@
 		</part>
 	</software>
 
-	<software name="vham" supported="no">
-		<description>Virtua Hamster (Usa, Prototype)</description>
+	<software name="vham">
+		<description>Virtua Hamster (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2141,7 +2145,7 @@
 	</software>
 
 	<software name="vrdxp" cloneof="vrdx" supported="no">
-		<description>Virtua Racing Deluxe (Prototype, 19940905)</description>
+		<description>Virtua Racing Deluxe (USA, Prototype, 19940905)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2152,7 +2156,7 @@
 	</software>
 
 	<software name="vrdxp1" cloneof="vrdx" supported="no">
-		<description>Virtua Racing Deluxe (Prototype, 19940829)</description>
+		<description>Virtua Racing Deluxe (USA, Prototype, 19940829)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2162,7 +2166,7 @@
 		</part>
 	</software>
 
-	<software name="vrdxp2" cloneof="vrdx" supported="no">
+	<software name="vrdxp2" cloneof="vrdx">
 		<description>Virtua Racing Deluxe (Prototype, 19940822)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -2173,7 +2177,7 @@
 		</part>
 	</software>
 
-	<software name="wsb" supported="no">
+	<software name="wsb">
 		<description>World Series Baseball Starring Deion Sanders (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -2184,7 +2188,7 @@
 		</part>
 	</software>
 
-	<software name="wwfraw" supported="no">
+	<software name="wwfraw">
 		<description>WWF Raw (World)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -2209,7 +2213,7 @@
 	</software>
 
 	<software name="xmen" supported="no">
-		<description>X-Men (Usa, Prototype)</description>
+		<description>X-Men (USA, Prototype)</description>
 		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2219,7 +2223,7 @@
 		</part>
 	</software>
 
-	<software name="zaxxon2k" supported="no">
+	<software name="zaxxon2k">
 		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -2233,8 +2237,8 @@
 		</part>
 	</software>
 
-	<software name="zaxxon2kp" cloneof="zaxxon2k" supported="no">
-		<description>Zaxxon's Motherbase 2000 (Prototype, 19950331)</description>
+	<software name="zaxxon2kp" cloneof="zaxxon2k">
+		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950331)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2244,8 +2248,8 @@
 		</part>
 	</software>
 
-	<software name="zaxxon2kp1" cloneof="zaxxon2k" supported="no">
-		<description>Zaxxon's Motherbase 2000 (Prototype, 19950315)</description>
+	<software name="zaxxon2kp1" cloneof="zaxxon2k">
+		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950315)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2255,8 +2259,8 @@
 		</part>
 	</software>
 
-	<software name="zaxxon2kp2" cloneof="zaxxon2k" supported="no">
-		<description>Zaxxon's Motherbase 2000 (Prototype, 19950310)</description>
+	<software name="zaxxon2kp2" cloneof="zaxxon2k">
+		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950310)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2266,8 +2270,8 @@
 		</part>
 	</software>
 
-	<software name="zaxxon2kp3" cloneof="zaxxon2k" supported="no">
-		<description>Zaxxon's Motherbase 2000 (Prototype, 19950306)</description>
+	<software name="zaxxon2kp3" cloneof="zaxxon2k">
+		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950306)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2278,7 +2282,7 @@
 	</software>
 
 	<software name="zaxxon2kp4" cloneof="zaxxon2k" supported="no">
-		<description>Zaxxon's Motherbase 2000 (Prototype, 19950303)</description>
+		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950303)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2288,8 +2292,8 @@
 		</part>
 	</software>
 
-	<software name="zaxxon2kp5" cloneof="zaxxon2k" supported="no">
-		<description>Zaxxon's Motherbase 2000 (Prototype, 19950227)</description>
+	<software name="zaxxon2kp5" cloneof="zaxxon2k">
+		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950227)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2299,8 +2303,8 @@
 		</part>
 	</software>
 
-	<software name="zaxxon2kp6" cloneof="zaxxon2k" supported="no">
-		<description>Zaxxon's Motherbase 2000 (Prototype, 19950223)</description>
+	<software name="zaxxon2kp6" cloneof="zaxxon2k">
+		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950223)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2310,8 +2314,8 @@
 		</part>
 	</software>
 
-	<software name="zaxxon2kp7" cloneof="zaxxon2k" supported="no">
-		<description>Zaxxon's Motherbase 2000 (Prototype, 19950221)</description>
+	<software name="zaxxon2kp7" cloneof="zaxxon2k">
+		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950221)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2321,8 +2325,8 @@
 		</part>
 	</software>
 
-	<software name="zaxxon2kp8" cloneof="zaxxon2k" supported="no">
-		<description>Zaxxon's Motherbase 2000 (Prototype, 19950210)</description>
+	<software name="zaxxon2kp8" cloneof="zaxxon2k">
+		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950210)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">

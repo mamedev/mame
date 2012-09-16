@@ -25,10 +25,8 @@ Undumped:
 - Mary-Kate and Ashley - Pocket Planner DMG-BMAP-EUR
 - Matchbox Emergency Patrol CGB-BEPP-EUR
 - Mickey's Racing Adventure CGB-ARNP-EUR
-- Mickey's Speedway USA CGB-BSNP-EUR
 - Microsoft Pinball Arcade CGB-BMQP-EUR
 - MTV Sports - Skateboarding featuring Andy MacDonald CGB-BMTP-EUR
-- NBA Jam 2001 CGB-BJAP-EUR
 - NHL 2000 DMG-ANRP-EUR
 - Rampage 2 - Universal Tour CGB-AUTP-EUR
 - Road Rash CGB-BRRP-EUR
@@ -40,7 +38,6 @@ Undumped:
 - Space Invaders DMG-AIVP-(EUR/NOE)
 - Spider-Man 2 - The Sinister Six CGB-B2SP-EUR
 - TOCA Touring Car Championship CGB-BTCP-EUR
-- Tony Hawk's Pro Skater 2 CGB-BTGP-EUR
 - Toy Story Racer CGB-BTBP-EUR? [unclear pic]
 - Yoda Stories DMG-AYDP-EUR
 - WWF Attitude CGB-AWTP-AUS
@@ -10086,10 +10083,10 @@ Undumped Pirates:
 
 	<software name="micksped">
 		<!-- Notes: GBC only -->
-		<description>Mickey's Speedway USA (USA)</description>
+		<description>Mickey's Speedway USA (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="CGB-BSNE-USA"/>
+		<info name="serial" value="CGB-BSNE-USA, CGB-BSNP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="mickey's speedway usa (usa) (en,fr,de,es).bin" size="4194304" crc="11763934" sha1="edd7f3fecfef81bcd5445b6b5df89ca2be897d2f" offset="000000" />
@@ -11199,10 +11196,10 @@ Undumped Pirates:
 
 	<software name="nbajm2k1">
 		<!-- Notes: GBC only -->
-		<description>NBA Jam 2001 (USA)</description>
+		<description>NBA Jam 2001 (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="CGB-BJAE-USA"/>
+		<info name="serial" value="CGB-BJAE-USA, CGB-BJAP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="nba jam 2001 (usa).bin" size="1048576" crc="3aa75f1c" sha1="b1f7230dcccaecb7ae9b2a0e786effac2fc24497" offset="000000" />
@@ -16933,10 +16930,10 @@ Undumped Pirates:
 
 	<software name="thps2">
 		<!-- Notes: GBC only -->
-		<description>Tony Hawk's Pro Skater 2 (USA)</description>
+		<description>Tony Hawk's Pro Skater 2 (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="CGB-BTGE-USA-1"/>
+		<info name="serial" value="CGB-BTGE-USA-1, CGB-BTGP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="tony hawk's pro skater 2 (usa).bin" size="2097152" crc="2c27c61f" sha1="300fe89f98711853bee86ccd81481d55b5097b2d" offset="000000" />
