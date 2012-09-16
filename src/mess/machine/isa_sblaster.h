@@ -34,6 +34,7 @@ struct sb8_dsp_state
     UINT16 version;
     UINT8 test_reg;
     UINT8 speaker_on;
+    bool dma_no_irq;
     UINT32 prot_count;
     INT32 prot_value;
     UINT32 frequency;

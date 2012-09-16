@@ -435,6 +435,8 @@ void sb_device::process_fifo(UINT8 cmd)
                 m_dsp.prot_count &= 3;
 				m_dsp.adc_transferred = 0;
 				m_dsp.adc_length = 1;
+				m_dsp.wbuf_status = 0x80;
+				m_dsp.dma_no_irq = true;
                 m_dack_out = (UINT8)(m_dsp.prot_value & 0xff);
                 drq_w(1);
                 break;
@@ -912,6 +914,7 @@ void sb_device::device_reset()
 	m_dsp.frequency = 8000; // per stereo-fx 
 	m_dsp.irq_active = 0;
 	m_mixer_index = 0;
+	m_dsp.dma_no_irq = false;
 }
 
 UINT8 sb_device::dack_r(int line)
@@ -926,7 +929,12 @@ UINT8 sb_device::dack_r(int line)
 			m_dsp.adc_transferred = 0;
             drq_w(1);
 		}
-		irq_w(1, IRQ_DMA8);
+		else
+			m_dsp.wbuf_status = 0;
+		if(!m_dsp.dma_no_irq)
+			irq_w(1, IRQ_DMA8);
+		else
+			m_dsp.dma_no_irq = false;
 	}
 	else
 		drq_w(1);
@@ -1110,7 +1118,7 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 				m_dsp.adpcm_ref = m_dsp.data[m_dsp.d_rptr++];
 				m_dsp.adpcm_new_ref = false;
 				m_dacl->write_unsigned8(m_dsp.adpcm_ref);
-				m_dacl->write_unsigned8(m_dsp.adpcm_ref);
+				m_dacr->write_unsigned8(m_dsp.adpcm_ref);
 				break;
 			}
 			lsample = m_dsp.data[m_dsp.d_rptr];
@@ -1138,7 +1146,7 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 				m_dsp.adpcm_ref = m_dsp.data[m_dsp.d_rptr++];
 				m_dsp.adpcm_new_ref = false;
 				m_dacl->write_unsigned8(m_dsp.adpcm_ref);
-				m_dacl->write_unsigned8(m_dsp.adpcm_ref);
+				m_dacr->write_unsigned8(m_dsp.adpcm_ref);
 				break;
 			}	
 			lsample = m_dsp.data[m_dsp.d_rptr];
@@ -1163,7 +1171,7 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 				m_dsp.adpcm_ref = m_dsp.data[m_dsp.d_rptr++];
 				m_dsp.adpcm_new_ref = false;
 				m_dacl->write_unsigned8(m_dsp.adpcm_ref);
-				m_dacl->write_unsigned8(m_dsp.adpcm_ref);
+				m_dacr->write_unsigned8(m_dsp.adpcm_ref);
 				break;
 			}	
 			lsample = m_dsp.data[m_dsp.d_rptr];
