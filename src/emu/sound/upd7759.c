@@ -250,7 +250,7 @@ static const int upd7759_state_table[16] = { -1, -1, 0, 0, 1, 2, 2, 3, -1, -1, 0
 INLINE upd7759_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
-	assert(device->type() == UPD7759);
+	assert(device->type() == UPD7759 || device->type() == UPD7756);
 	return (upd7759_state *)downcast<upd7759_device *>(device)->token();
 }
 
