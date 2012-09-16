@@ -4325,8 +4325,11 @@ INLINE k053247_state *k053247_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K053246 || device->type() == K053247 || device->type() == K055673));
-
-	return (k053247_state *)downcast<k053247_device *>(device)->token();
+	if (device->type() == K055673) {
+		return (k053247_state *)downcast<k055673_device *>(device)->token();
+	} else {
+		return (k053247_state *)downcast<k053247_device *>(device)->token();
+	}
 }
 
 INLINE const k053247_interface *k053247_get_interface( device_t *device )
