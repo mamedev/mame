@@ -1980,7 +1980,8 @@ static ADDRESS_MAP_START( quizchq_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM												// ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM												// RAM
 	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")								// RAM (Banked)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE(rongrong_palette_w)	// ROM (Banked)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")								// ROM (Banked)
+	AM_RANGE(0x8000, 0x81ff) AM_WRITE(rongrong_palette_w)	
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quizchq_portmap, AS_IO, 8, dynax_state )
@@ -2017,7 +2018,8 @@ static ADDRESS_MAP_START( rongrong_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM												// ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM												// RAM
 	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")								// RAM (Banked)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE(rongrong_palette_w)	// ROM (Banked)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")								// ROM (Banked)
+	AM_RANGE(0xf000, 0xf1ff) AM_WRITE(rongrong_palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rongrong_portmap, AS_IO, 8, dynax_state )
@@ -2124,7 +2126,8 @@ static ADDRESS_MAP_START( mmpanic_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM												// ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM												// RAM
 	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")								// RAM (Banked)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE(rongrong_palette_w)	// ROM (Banked)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")								// ROM (Banked)
+	AM_RANGE(0x8000, 0x81ff) AM_WRITE(rongrong_palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mmpanic_portmap, AS_IO, 8, dynax_state )
