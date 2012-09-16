@@ -409,8 +409,9 @@ ROM_START(apple2gsr0)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT       INIT      COMPANY            FULLNAME */
-COMP( 1989, apple2gs, 0,        apple2, apple2gs, apple2gs, driver_device,   0, "Apple Computer", "Apple IIgs (ROM03)", 0 )
+COMP( 1989, apple2gs, 0,        apple2, apple2gs, apple2gs, driver_device,   0, "Apple Computer", "Apple IIgs (ROM03)", GAME_SUPPORTS_SAVE )
 COMP( 198?, apple2gsr3p, apple2gs, 0,   apple2gs, apple2gs, driver_device,   0, "Apple Computer", "Apple IIgs (ROM03 prototype)", GAME_NOT_WORKING )
 COMP( 1989, apple2gsr3lp, apple2gs, 0,  apple2gs, apple2gs, driver_device,   0, "Apple Computer", "Apple IIgs (ROM03 late prototype?)", GAME_NOT_WORKING )
-COMP( 1987, apple2gsr1, apple2gs, 0,    apple2gsr1, apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM01)", 0 )
-COMP( 1986, apple2gsr0, apple2gs, 0,    apple2gsr1, apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM00)", 0 )
+COMP( 1987, apple2gsr1, apple2gs, 0,    apple2gsr1, apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM01)", GAME_SUPPORTS_SAVE )
+COMP( 1986, apple2gsr0, apple2gs, 0,    apple2gsr1, apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM00)", GAME_SUPPORTS_SAVE )
+

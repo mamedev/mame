@@ -1949,7 +1949,7 @@ MACHINE_START_MEMBER(apple2gs_state,apple2gscommon)
 	state_save_register_item_pointer(machine(), "APPLE2GS_RAM", NULL, 0, ram, machine().device<ram_device>(RAM_TAG)->size());
 
 	state_save_register_item(machine(), "NEWVIDEO", NULL, 0, m_newvideo);
-
+	state_save_register_item(machine(), "BORDERCOLOR", NULL, 0, m_bordercolor);
 	state_save_register_item(machine(), "VGCINT", NULL,0, m_vgcint);
 	state_save_register_item(machine(), "LANGSEL", NULL,0, m_langsel);
 	state_save_register_item(machine(), "SLTROMSEL", NULL,0, m_sltromsel);
@@ -1990,6 +1990,8 @@ MACHINE_START_MEMBER(apple2gs_state,apple2gscommon)
 	state_save_register_item(machine(), "SNDGLUCTRL", NULL,0, m_sndglu_ctrl);
 	state_save_register_item(machine(), "SNDGLUADDR", NULL,0, m_sndglu_addr);
 	state_save_register_item(machine(), "SNDGLUDUMMYRD", NULL,0, m_sndglu_dummy_read);
+
+	state_save_register_item(machine(), "ECHOBANK", NULL,0, m_echo_bank);
 
 	m_clock_timer = machine().scheduler().timer_alloc(FUNC(apple2gs_clock_tick));
 	m_clock_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
