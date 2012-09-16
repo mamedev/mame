@@ -2831,7 +2831,7 @@ static const int MOUSE_XYB[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 
 static void mouse_js_reset(running_machine &machine)
 {
 	rmnimbus_state *drvstate = machine.driver_data<rmnimbus_state>();
-    _mouse_joy_state *state = &drvstate->m_nimbus_mouse;
+    mouse_joy_state *state = &drvstate->m_nimbus_mouse;
 
     state->m_mouse_px=0;
     state->m_mouse_py=0;
@@ -2860,7 +2860,7 @@ static TIMER_CALLBACK(mouse_callback)
     int     xint;
     int     yint;
 
-    _mouse_joy_state *state = &drvstate->m_nimbus_mouse;
+    mouse_joy_state *state = &drvstate->m_nimbus_mouse;
 
 
 	state->m_reg0a4 = machine.root_device().ioport(MOUSE_BUTTON_TAG)->read() | 0xC0;
@@ -3000,7 +3000,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_mouse_js_r)
     */
 	UINT8 result;
 	//int pc=machine().device(MAINCPU_TAG)->safe_pc();
-	_mouse_joy_state *state = &m_nimbus_mouse;
+	mouse_joy_state *state = &m_nimbus_mouse;
 
 	if (ioport("config")->read() & 0x01)
 	{

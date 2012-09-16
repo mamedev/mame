@@ -21,8 +21,7 @@ struct CHAN {
 	INT8	signal;			/* signal */
 };
 
-typedef struct SND wswan_sound_state;
-struct SND {
+struct wswan_sound_state {
 	sound_stream *channel;
 	struct CHAN audio1;		/* Audio channel 1 */
 	struct CHAN audio2;		/* Audio channel 2 */

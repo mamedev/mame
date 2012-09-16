@@ -25,7 +25,7 @@ extern const device_type TI99_MFMHD;
     Needed to adapt to higher cylinder numbers. Floppies do not have such
     high numbers.
 */
-typedef struct chrn_id_hd
+struct chrn_id_hd 
 {
 	UINT16 C;
 	UINT8 H;
@@ -33,7 +33,7 @@ typedef struct chrn_id_hd
 	UINT8 N;
 	int data_id;			// id for read/write data command
 	unsigned long flags;
-} chrn_id_hd;
+};
 
 class mfm_harddisk_device : public device_t
 {

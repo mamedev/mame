@@ -22,11 +22,11 @@
 
 extern const device_type JOYPORT;
 
-typedef struct _joyport_config
+struct joyport_config 
 {
 	devcb_write_line		interrupt;
 	int						vdp_clock;
-} joyport_config;
+};
 
 #define JOYPORT_CONFIG(name) \
 	const joyport_config(name) =

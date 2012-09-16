@@ -21,19 +21,19 @@ struct sw_storage
 #endif
 };
 
-struct __SID6581;
+struct SID6581_t;
 
-typedef struct _sidOperator
+struct sidOperator
 {
-	struct __SID6581 *sid;
+	SID6581_t *sid;
 	UINT8 reg[7];
 	UINT32 SIDfreq;
 	UINT16 SIDpulseWidth;
 	UINT8 SIDctrl;
 	UINT8 SIDAD, SIDSR;
 
-	struct _sidOperator* carrier;
-	struct _sidOperator* modulator;
+	sidOperator* carrier;
+	sidOperator* modulator;
 	int sync;
 
 	UINT16 pulseIndex, newPulseIndex;
@@ -55,8 +55,8 @@ typedef struct _sidOperator
 	UINT16 cycleLen, cycleLenPnt;
 #endif
 
-	INT8(*outProc)(struct _sidOperator *);
-	void(*waveProc)(struct _sidOperator *);
+	INT8(*outProc)(sidOperator *);
+	void(*waveProc)(sidOperator *);
 
 #if defined(DIRECT_FIXPOINT)
 	cpuLword waveStep, waveStepAdd;
@@ -80,7 +80,7 @@ typedef struct _sidOperator
 
 	UINT8 ADSRctrl;
 //  int gateOnCtrl, gateOffCtrl;
-	UINT16 (*ADSRproc)(struct _sidOperator *);
+	UINT16 (*ADSRproc)(sidOperator *);
 
 #ifdef SID_FPUENVE
 	float fenveStep, fenveStepAdd;
@@ -93,7 +93,7 @@ typedef struct _sidOperator
 #endif
 	UINT8 enveVol, enveSusVol;
 	UINT16 enveShortAttackCount;
-} sidOperator;
+};
 
 typedef INT8 (*ptr2sidFunc)(sidOperator *);
 typedef UINT16 (*ptr2sidUwordFunc)(sidOperator *);

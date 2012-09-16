@@ -61,7 +61,7 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-struct _osd_directory
+struct osd_directory
 {
 	HANDLE				find;					// handle to the finder
 	int					is_first;				// TRUE if this is the first entry

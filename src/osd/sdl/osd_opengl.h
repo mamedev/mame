@@ -54,9 +54,7 @@
 	#define OSD_GL(ret,func,params) ret (APIENTRY *func) params;
 	#define OSD_GL_UNUSED(ret,func,params)
 
-	typedef struct _osd_gl_dispatch osd_gl_dispatch;
-
-	struct _osd_gl_dispatch
+	struct osd_gl_dispatch
 	{
 		#define GET_GLFUNC 1
 		#include "osd_opengl.h"

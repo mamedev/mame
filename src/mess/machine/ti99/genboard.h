@@ -44,10 +44,10 @@ private:
 
 /*****************************************************************************/
 
-typedef struct _geneve_keyboard_config
+struct geneve_keyboard_config 
 {
 	devcb_write_line	interrupt;
-} geneve_keyboard_config;
+};
 
 #define GENEVE_KEYBOARD_CONFIG(name) \
 	const geneve_keyboard_config(name) =
@@ -110,10 +110,10 @@ private:
 
 /*****************************************************************************/
 
-typedef struct _geneve_mapper_config
+struct geneve_mapper_config 
 {
 	devcb_write_line	ready;
-} geneve_mapper_config;
+};
 
 class geneve_mapper_device : public device_t
 {

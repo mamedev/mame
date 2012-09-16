@@ -229,11 +229,11 @@ int strataflash_save(device_t *device, emu_file *file)
 }
 
 /* bus width for 8/16-bit handlers */
-typedef enum bus_width_t
+enum bus_width_t 
 {
 	bw_8,
 	bw_16
-} bus_width_t;
+};
 
 /*
     read a 8/16-bit word from FEEPROM

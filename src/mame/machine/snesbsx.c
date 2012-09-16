@@ -21,7 +21,7 @@ enum
 };
 
 
-struct _snes_bsx_state
+struct snes_bsx_state
 {
 	// base regs
 	// we don't emulate the base unit yet
@@ -42,7 +42,7 @@ struct _snes_bsx_state
 	int ram_source;
 };
 
-static struct _snes_bsx_state  bsx_state;
+static snes_bsx_state bsx_state;
 
 
 static void bsx_update_memory_map(void)

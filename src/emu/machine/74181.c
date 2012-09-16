@@ -16,8 +16,7 @@
 
 
 
-typedef struct _TTL74181_state TTL74181_state;
-struct _TTL74181_state
+struct TTL74181_state
 {
 	UINT8 inputs[TTL74181_INPUT_TOTAL];
 	UINT8 outputs[TTL74181_OUTPUT_TOTAL];

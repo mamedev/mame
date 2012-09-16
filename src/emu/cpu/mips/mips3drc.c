@@ -179,7 +179,7 @@ struct compiler_state
 
 
 /* MIPS3 registers */
-struct _mips3imp_state
+struct mips3imp_state
 {
 	/* core state */
 	drc_cache *			cache;						/* pointer to the DRC code cache */

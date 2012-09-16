@@ -285,7 +285,7 @@ enum
 
 
 /* Delay information */
-struct _delay
+struct delay_info
 {
 	INT32	delay_cmd;
 	UINT32	delay_pc;
@@ -315,7 +315,7 @@ struct hyperstone_state
 	UINT8	timer_int_pending;
 	emu_timer *timer;
 
-	struct _delay delay;
+	delay_info delay;
 
 	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;

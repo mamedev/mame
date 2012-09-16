@@ -10,22 +10,22 @@
 #include "debugger.h"
 #include "tlcs90.h"
 
-typedef enum					{	UNKNOWN,	NOP,	EX,		EXX,	LD,		LDW,	LDA,	LDI,	LDIR,	LDD,	LDDR,	CPI,	CPIR,	CPD,	CPDR,	PUSH,	POP,	JP,		JR,		CALL,	CALLR,		RET,	RETI,	HALT,	DI,		EI,		SWI,	DAA,	CPL,	NEG,	LDAR,	RCF,	SCF,	CCF,	TSET,	BIT,	SET,	RES,	INC,	DEC,	INCX,	DECX,	INCW,	DECW,	ADD,	ADC,	SUB,	SBC,	AND,	XOR,	OR,		CP,		RLC,	RRC,	RL,		RR,		SLA,	SRA,	SLL,	SRL,	RLD,	RRD,	DJNZ,	MUL,	DIV		}	_e_op;
+enum _e_op {	UNKNOWN,	NOP,	EX,		EXX,	LD,		LDW,	LDA,	LDI,	LDIR,	LDD,	LDDR,	CPI,	CPIR,	CPD,	CPDR,	PUSH,	POP,	JP,		JR,		CALL,	CALLR,		RET,	RETI,	HALT,	DI,		EI,		SWI,	DAA,	CPL,	NEG,	LDAR,	RCF,	SCF,	CCF,	TSET,	BIT,	SET,	RES,	INC,	DEC,	INCX,	DECX,	INCW,	DECW,	ADD,	ADC,	SUB,	SBC,	AND,	XOR,	OR,		CP,		RLC,	RRC,	RL,		RR,		SLA,	SRA,	SLL,	SRL,	RLD,	RRD,	DJNZ,	MUL,	DIV		};
 typedef UINT8 e_op;
 static const char *const op_names[] =	{	"??",		"nop",	"ex",	"exx",	"ld",	"ldw",	"lda",	"ldi",	"ldir",	"ldd",	"lddr",	"cpi",	"cpir",	"cpd",	"cpdr",	"push",	"pop",	"jp",	"jr",	"call",	"callr",	"ret",	"reti",	"halt",	"di",	"ei",	"swi",	"daa",	"cpl",	"neg",	"ldar",	"rcf",	"scf",	"ccf",	"tset",	"bit",	"set",	"res",	"inc",	"dec",	"incx",	"decx",	"incw",	"decw",	"add",	"adc",	"sub",	"sbc",	"and",	"xor",	"or",	"cp",	"rlc",	"rrc",	"rl",	"rr",	"sla",	"sra",	"sll",	"srl",	"rld",	"rrd",	"djnz",	"mul",	"div"	};
 
-typedef enum	{
+enum e_mode {
 	MODE_NONE,	MODE_BIT8,	MODE_CC,
 	MODE_I8,	MODE_D8,	MODE_R8,
 	MODE_I16,	MODE_D16,	MODE_R16,
 	MODE_MI16,	MODE_MR16,	MODE_MR16D8,	MODE_MR16R8,
 	MODE_R16D8,	MODE_R16R8
-}	e_mode;
+};
 ALLOW_SAVE_TYPE(e_mode); // allow save_item on a non-fundamental type
 
 typedef UINT16 e_r;
 
-typedef struct
+struct t90_Regs
 {
 	PAIR		prvpc,pc,sp,af,bc,de,hl,ix,iy;
 	PAIR		af2,bc2,de2,hl2;
@@ -59,7 +59,7 @@ typedef struct
 
 	UINT32	addr;
 
-}	t90_Regs;
+};
 
 INLINE t90_Regs *get_safe_token(device_t *device)
 {
@@ -1280,7 +1280,7 @@ INT2        P82         Rising Edge     -
 
 *************************************************************************************************************/
 
-typedef enum	{	INTSWI = 0,	INTNMI,	INTWD,	INT0,	INTT0,	INTT1,	INTT2,	INTT3,	INTT4,	INT1,	INTT5,	INT2,	INTRX,	INTTX,	INTMAX	}	e_irq;
+enum e_irq {	INTSWI = 0,	INTNMI,	INTWD,	INT0,	INTT0,	INTT1,	INTT2,	INTT3,	INTT4,	INT1,	INTT5,	INT2,	INTRX,	INTTX,	INTMAX	};
 DECLARE_ENUM_OPERATORS(e_irq)
 
 INLINE void leave_halt(t90_Regs *cpustate)

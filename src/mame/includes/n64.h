@@ -42,11 +42,11 @@ struct n64_savable_data_t
 class n64_periphs : public device_t
 {
 private:
-	typedef struct
+	struct AUDIO_DMA
 	{
 		UINT32 address;
 		UINT32 length;
-	} AUDIO_DMA;
+	};
 
 public:
     // construction/destruction

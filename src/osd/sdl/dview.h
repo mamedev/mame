@@ -21,17 +21,17 @@ GType dview_get_type(void);
 #define DVIEW_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS((obj), DVIEW_TYPE, DViewClass))
 
 
-typedef struct _DViewClass  DViewClass;
-typedef struct _DView       DView;
+struct  DViewClass;
+struct  DView;
 
-struct _DViewClass
+struct DViewClass
 {
   GtkContainerClass parent_class;
   PangoFontDescription *fixedfont;
   int fixedfont_width, fixedfont_height;
 };
 
-struct _DView
+struct DView
 {
   GtkContainer parent;
   GtkAdjustment *hadj, *vadj;

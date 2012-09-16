@@ -34,29 +34,29 @@ struct mn102_info
 	UINT16 psw;
 	UINT16 mdr;
 
-	struct _simple_timer {
-	UINT8 mode;
-	UINT8 base;
-	UINT8 cur;
+	struct {
+		UINT8 mode;
+		UINT8 base;
+		UINT8 cur;
 	} simple_timer[NUM_TIMERS_8BIT];
 
 	emu_timer *timer_timers[NUM_TIMERS_8BIT];
 
-	struct _prescaler {
-	UINT8 cycles;
-	UINT8 mode;
+	struct {
+		UINT8 cycles;
+		UINT8 mode;
 	} prescaler[NUM_PRESCALERS];
 
-	struct _dma {
-	UINT32 adr;
-	UINT32 count;
-	UINT16 iadr;
-	UINT8 ctrll, ctrlh, irq;
+	struct {
+		UINT32 adr;
+		UINT32 count;
+		UINT16 iadr;
+		UINT8 ctrll, ctrlh, irq;
 	} dma[8];
 
-	struct _serial {
-	UINT8 ctrll, ctrlh;
-	UINT8 buf;
+	struct {
+		UINT8 ctrll, ctrlh;
+		UINT8 buf;
 	} serial[2];
 
 	UINT8 ddr[8];

@@ -56,10 +56,10 @@ typedef UINT32 rgb_t;
 typedef UINT16 rgb15_t;
 
 /* a palette is an opaque, reference counted object */
-typedef struct _palette_t palette_t;
+struct palette_t;
 
 /* a palette client is someone who is tracking the dirty state of a palette */
-typedef struct _palette_client palette_client;
+struct palette_client;
 
 
 

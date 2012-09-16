@@ -440,9 +440,7 @@ extern const device_type CXD8606CQ;
 
 
 
-typedef struct _DasmPSXCPU_state DasmPSXCPU_state;
-
-struct _DasmPSXCPU_state
+struct DasmPSXCPU_state
 {
 	UINT32 pc;
 	int delayr;

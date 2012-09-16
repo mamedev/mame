@@ -23,7 +23,7 @@ struct TRIANGLE
 	UINT32 color;
 };
 
-struct _cached_texture
+struct cached_texture
 {
 	cached_texture *next;
 	UINT8		width;

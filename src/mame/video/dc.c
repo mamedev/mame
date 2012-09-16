@@ -136,14 +136,14 @@ static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,in
 static bitmap_rgb32 *fake_accumulationbuffer_bitmap;
 static void render_to_accumulation_buffer(running_machine &machine,bitmap_rgb32 &bitmap,const rectangle &cliprect);
 
-typedef struct texinfo {
+struct texinfo  {
 	UINT32 address, vqbase;
 	int textured, sizex, sizey, stride, sizes, pf, palette, mode, mipmapped, blend_mode, filter_mode, flip_u, flip_v;
 
 	UINT32 (*r)(running_machine &machine, struct texinfo *t, float x, float y);
 	UINT32 (*blend)(UINT32 s, UINT32 d);
 	int palbase, cd;
-} texinfo;
+};
 
 typedef	struct
 {

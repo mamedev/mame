@@ -12,18 +12,18 @@
 
 
 
-static _SID6581 *get_sid(device_t *device)
+static SID6581_t *get_sid(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == SID6581) || (device->type() == SID8580));
-	return (_SID6581 *) downcast<sid6581_device *>(device)->token();
+	return (SID6581_t *) downcast<sid6581_device *>(device)->token();
 }
 
 
 
 static STREAM_UPDATE( sid_update )
 {
-	_SID6581 *sid = (_SID6581 *) param;
+	SID6581_t *sid = (SID6581_t *) param;
 	sidEmuFillBuffer(sid, outputs[0], samples);
 }
 
@@ -31,7 +31,7 @@ static STREAM_UPDATE( sid_update )
 
 static void sid_start(device_t *device, SIDTYPE sidtype)
 {
-	_SID6581 *sid = get_sid(device);
+	SID6581_t *sid = get_sid(device);
 	const sid6581_interface *iface = (const sid6581_interface*) device->static_config();
 	assert(iface);
 	
@@ -53,7 +53,7 @@ static void sid_start(device_t *device, SIDTYPE sidtype)
 
 static DEVICE_RESET( sid )
 {
-	_SID6581 *sid = get_sid(device);
+	SID6581_t *sid = get_sid(device);
 	sidEmuReset(sid);
 }
 
@@ -90,13 +90,13 @@ sid6581_device::sid6581_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, SID6581, "SID6581", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(_SID6581));
+	m_token = global_alloc_array_clear(UINT8, sizeof(SID6581));
 }
 sid6581_device::sid6581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(_SID6581));
+	m_token = global_alloc_array_clear(UINT8, sizeof(SID6581));
 }
 
 //-------------------------------------------------

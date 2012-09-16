@@ -12,14 +12,14 @@
 
 ***************************************************************************/
 
-struct _snes_obc1_state
+struct snes_obc1_state
 {
 	int address;
 	int offset;
 	int shift;
 };
 
-static struct _snes_obc1_state  obc1_state;
+static snes_obc1_state obc1_state;
 
 
 static READ8_HANDLER( obc1_read )

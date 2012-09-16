@@ -20,13 +20,13 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-struct _imgtool_image
+struct imgtool_image
 {
 	const imgtool_module *module;
 	object_pool *pool;
 };
 
-struct _imgtool_partition
+struct imgtool_partition
 {
 	imgtool_image *image;
 	object_pool *pool;
@@ -68,7 +68,7 @@ struct _imgtool_partition
 	const char *writefile_optspec;
 };
 
-struct _imgtool_directory
+struct imgtool_directory
 {
 	imgtool_partition *partition;
 };
@@ -1121,7 +1121,7 @@ static imgtoolerr_t internal_open(const imgtool_module *module, const char *fnam
 	}
 
 	/* setup the image structure */
-	size = sizeof(struct _imgtool_image) + module->image_extra_bytes;
+	size = sizeof(imgtool_image) + module->image_extra_bytes;
 	image = (imgtool_image *) pool_malloc_lib(pool, size);
 	if (!image)
 	{
@@ -2640,7 +2640,7 @@ imgtoolerr_t imgtool_directory_open(imgtool_partition *partition, const char *pa
 	if (err)
 		goto done;
 
-	size = sizeof(struct _imgtool_directory) + partition->directory_extra_bytes;
+	size = sizeof(imgtool_directory) + partition->directory_extra_bytes;
 	enumeration = (imgtool_directory *) malloc(size);
 	if (!enumeration)
 	{

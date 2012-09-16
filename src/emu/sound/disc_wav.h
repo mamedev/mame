@@ -103,7 +103,7 @@ class DISCRETE_CLASS_NAME(dss_inverter_osc): public discrete_base_node, public d
 	DISCRETE_CLASS_CONSTRUCTOR(dss_inverter_osc, base)
 	DISCRETE_CLASS_DESTRUCTOR(dss_inverter_osc)
 public:
-	typedef struct
+	struct description
 	{
 		double	vB;
 		double	vOutLow;
@@ -112,7 +112,7 @@ public:
 		double	vInRise;	// voltage that triggers the gate input to go high (vGate) on rise
 		double	clamp;		// voltage is clamped to -clamp ... vb+clamp if clamp>= 0;
 		int		options;	// bitmaped options
-	} description;
+	};
 	enum {
 		IS_TYPE1 = 0x00,
 		IS_TYPE2 = 0x01,

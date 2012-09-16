@@ -90,7 +90,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _cdrom_file cdrom_file;
+struct cdrom_file;
 
 struct cdrom_track_info
 {

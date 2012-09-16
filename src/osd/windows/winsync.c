@@ -63,7 +63,7 @@
 
 typedef BOOL (WINAPI *try_enter_critical_section_ptr)(LPCRITICAL_SECTION lpCriticalSection);
 
-struct _osd_lock
+struct osd_lock
 {
 	CRITICAL_SECTION	critsect;
 };

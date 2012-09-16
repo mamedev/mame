@@ -24,7 +24,7 @@
 #define I824X_SCREEN_HEIGHT				243
 #define I824X_LINE_CLOCKS				228
 
-typedef union {
+union o2_vdc_t {
     UINT8 reg[0x100];
     struct {
 	struct {
@@ -52,7 +52,7 @@ typedef union {
 	UINT8 hgrid[2][0x10];
 	UINT8 vgrid[0x10];
     } s;
-} o2_vdc_t;
+};
 
 struct ef9341_t 
 {

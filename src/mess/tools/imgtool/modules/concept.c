@@ -12,10 +12,10 @@
 #include <limits.h>
 #include "imgtool.h"
 
-typedef struct UINT16xE
+struct UINT16xE 
 {
 	UINT8 bytes[2];
-} UINT16xE;
+};
 
 /*
     get_UINT16xE
@@ -69,7 +69,7 @@ INLINE void set_UINT16xE(int little_endian, UINT16xE *word, UINT16 data)
     device directory record (Disk sector 2-5)
 */
 
-typedef struct concept_vol_hdr_entry
+struct concept_vol_hdr_entry 
 {
 	UINT16xE	first_block;
 	UINT16xE	next_block;
@@ -83,9 +83,9 @@ typedef struct concept_vol_hdr_entry
 	char		mem_flipped;
 	char		disk_flipped;
 	UINT16xE	unused;
-} concept_vol_hdr_entry;
+};
 
-typedef struct concept_file_dir_entry
+struct concept_file_dir_entry 
 {
 	UINT16xE	first_block;
 	UINT16xE	next_block;
@@ -94,32 +94,32 @@ typedef struct concept_file_dir_entry
 	unsigned char	filename[16];
 	UINT16xE	last_byte;
 	UINT16xE	last_access;
-} concept_file_dir_entry;
+};
 
-typedef struct concept_dev_dir
+struct concept_dev_dir 
 {
 	concept_vol_hdr_entry vol_hdr;
 	concept_file_dir_entry file_dir[77];
 	char unused[20];
-} concept_dev_dir;
+};
 
 /*
     concept disk image descriptor
 */
-typedef struct concept_image
+struct concept_image 
 {
 	imgtool_stream *file_handle;		/* imgtool file handle */
 	concept_dev_dir dev_dir;	/* cached copy of device directory */
-} concept_image;
+};
 
 /*
     concept catalog iterator, used when imgtool reads the catalog
 */
-typedef struct concept_iterator
+struct concept_iterator 
 {
 	concept_image *image;
 	int index;							/* current index */
-} concept_iterator;
+};
 
 
 static imgtoolerr_t concept_image_init(imgtool_image *img, imgtool_stream *f);

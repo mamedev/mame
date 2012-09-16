@@ -48,11 +48,11 @@ typedef UINT8         boolean;
 #define QUEUE_SIZE 0x2000
 #define QUEUE_MAX  (QUEUE_SIZE-1)
 
-typedef struct queue_s
+struct queue_t 
 {
 	int pos;
 	unsigned char reg,val;
-} queue_t;
+};
 
 #endif
 
@@ -84,7 +84,7 @@ typedef struct queue_s
 /* CHANNEL TYPE DEFINITIONS */
 
 /* Square Wave */
-typedef struct square_s
+struct square_t 
 {
 	uint8 regs[4];
 	int vbl_length;
@@ -96,10 +96,10 @@ typedef struct square_s
 	uint8 adder;
 	uint8 env_vol;
 	boolean enabled;
-} square_t;
+};
 
 /* Triangle Wave */
-typedef struct triangle_s
+struct triangle_t 
 {
 	uint8 regs[4]; /* regs[1] unused */
 	int linear_length;
@@ -110,10 +110,10 @@ typedef struct triangle_s
 	uint8 adder;
 	boolean counter_started;
 	boolean enabled;
-} triangle_t;
+};
 
 /* Noise Wave */
-typedef struct noise_s
+struct noise_t 
 {
 	uint8 regs[4]; /* regs[1] unused */
 	int cur_pos;
@@ -123,10 +123,10 @@ typedef struct noise_s
 	float env_phase;
 	uint8 env_vol;
 	boolean enabled;
-} noise_t;
+};
 
 /* DPCM Wave */
-typedef struct dpcm_s
+struct dpcm_t 
 {
 	uint8 regs[4];
 	uint32 address;
@@ -139,10 +139,10 @@ typedef struct dpcm_s
 	boolean irq_occurred;
 	address_space *memory;
 	signed char vol;
-} dpcm_t;
+};
 
 /* APU type */
-typedef struct apu
+struct apu_t 
 {
 	/* Sound channels */
 	square_t   squ[2];
@@ -169,7 +169,7 @@ typedef struct apu
 #endif
 
 	int step_mode;
-} apu_t;
+};
 
 /* CONSTANTS */
 

@@ -10,7 +10,7 @@ struct PLANE {
 	float x,y,z,d;
 };
 
-typedef struct _cached_texture cached_texture;
+struct cached_texture;
 
 class model3_state : public driver_device
 {

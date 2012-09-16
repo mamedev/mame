@@ -22,7 +22,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _x86log_context x86log_context;
+struct x86log_context;
 
 
 

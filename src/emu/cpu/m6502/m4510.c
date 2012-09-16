@@ -120,8 +120,7 @@ z:      xxxx address bits a19 .. a16 for memory accesses with a15 1 ?
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
-typedef struct _m4510_Regs m4510_Regs;
-struct _m4510_Regs {
+struct m4510_Regs {
 	void	(*const *insn)(m4510_Regs *); /* pointer to the function pointer table */
 	PAIR	ppc;			/* previous program counter */
 	PAIR	pc; 			/* program counter */

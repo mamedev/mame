@@ -48,8 +48,7 @@
 /****************************************************************************
  * The 6502 registers.
  ****************************************************************************/
-typedef struct _m6502_Regs m6502_Regs;
-struct _m6502_Regs
+struct m6502_Regs
 {
 	UINT8	subtype;		/* currently selected cpu sub type */
 	void	(*const *insn)(m6502_Regs *); /* pointer to the function pointer table */

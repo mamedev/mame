@@ -24,7 +24,7 @@ struct hash_info
 	const char *extrainfo;
 };
 
-typedef struct _hash_file hash_file;
+struct hash_file;
 
 typedef void (*hashfile_error_func)(const char *message);
 
@@ -47,7 +47,7 @@ const hash_info *hashfile_lookup(hash_file *hashfile, const hash_collection *has
     TYPE DEFINITIONS
 ***************************************************************************/
 
-struct _hash_file
+struct hash_file
 {
 	emu_file *file;
 	object_pool *pool;

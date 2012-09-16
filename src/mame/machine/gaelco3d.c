@@ -91,7 +91,7 @@ struct shmem_t
 	buf_t				buf[2];
 };
 
-typedef struct _osd_shared_mem osd_shared_mem;
+struct osd_shared_mem;
 
 struct gaelco_serial_state
 {
@@ -110,7 +110,7 @@ struct gaelco_serial_state
 	shmem_t *m_shmem;
 };
 
-struct _osd_shared_mem
+struct osd_shared_mem
 {
 	char *fn;
 	size_t size;

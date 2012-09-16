@@ -41,7 +41,7 @@
 
 ***************************************************************************/
 
-typedef enum
+enum floperr_t
 {
 	FLOPPY_ERROR_SUCCESS,			/* no error */
 	FLOPPY_ERROR_INTERNAL,			/* fatal internal error */
@@ -53,10 +53,9 @@ typedef enum
 	FLOPPY_ERROR_NOSPACE,
 	FLOPPY_ERROR_PARAMOUTOFRANGE,
 	FLOPPY_ERROR_PARAMNOTSPECIFIED
-}
-floperr_t;
+};
 
-typedef struct _floppy_image floppy_image_legacy;
+struct floppy_image_legacy;
 
 struct FloppyCallbacks
 {

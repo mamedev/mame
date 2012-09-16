@@ -529,8 +529,7 @@ typedef class _m68ki_cpu_core m68ki_cpu_core;
 /* =============================== PROTOTYPES ============================= */
 /* ======================================================================== */
 
-typedef union _fp_reg fp_reg;
-union _fp_reg
+union fp_reg
 {
 	UINT64 i;
 	double f;

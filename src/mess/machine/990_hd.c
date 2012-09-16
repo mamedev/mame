@@ -40,10 +40,10 @@ for TI990. */
 /* We can use MAME's harddisk.c image format instead. */
 
 /* machine-independent big-endian 32-bit integer */
-typedef struct UINT32BE
+struct UINT32BE 
 {
 	UINT8 bytes[4];
-} UINT32BE;
+};
 
 INLINE UINT32 get_UINT32BE(UINT32BE word)
 {
@@ -61,13 +61,13 @@ INLINE void set_UINT32BE(UINT32BE *word, UINT32 data)
 #endif
 
 /* disk image header */
-typedef struct disk_image_header
+struct disk_image_header 
 {
 	UINT32BE cylinders;			/* number of cylinders on hard disk (big-endian) */
 	UINT32BE heads;				/* number of heads on hard disk (big-endian) */
 	UINT32BE sectors_per_track;	/* number of sectors per track on hard disk (big-endian) */
 	UINT32BE bytes_per_sector;	/* number of bytes of data per sector on hard disk (big-endian) */
-} disk_image_header;
+};
 
 enum
 {
@@ -81,7 +81,7 @@ enum format_t
 };
 
 /* disk drive unit descriptor */
-typedef struct hd_unit_t
+struct hd_unit_t 
 {
 	device_image_interface *img;						/* image descriptor */
 	format_t format;
@@ -91,17 +91,17 @@ typedef struct hd_unit_t
 
 	/* disk geometry */
 	unsigned int cylinders, heads, sectors_per_track, bytes_per_sector;
-} hd_unit_t;
+};
 
 /* disk controller */
-typedef struct hdc_t
+struct hdc_t 
 {
 	UINT16 w[8];
 
 	void (*interrupt_callback)(running_machine &machine, int state);
 
 	hd_unit_t d[MAX_DISK_UNIT];
-} hdc_t;
+};
 
 /* masks for individual bits controller registers */
 enum

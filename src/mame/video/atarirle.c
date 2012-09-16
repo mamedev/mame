@@ -27,7 +27,6 @@
 ***************************************************************************/
 
 /* internal structure containing a word index, shift and mask */
-typedef struct atarirle_mask atarirle_mask;
 struct atarirle_mask
 {
 	int				word;				/* word index */
@@ -36,7 +35,6 @@ struct atarirle_mask
 };
 
 /* internal structure for sorting the motion objects */
-typedef struct mo_sort_entry mo_sort_entry;
 struct mo_sort_entry
 {
 	mo_sort_entry *	next;
@@ -44,7 +42,6 @@ struct mo_sort_entry
 };
 
 /* internal structure describing each object in the ROMs */
-typedef struct atarirle_info atarirle_info;
 struct atarirle_info
 {
 	INT16			width;
@@ -57,7 +54,6 @@ struct atarirle_info
 };
 
 /* internal structure containing the state of the motion objects */
-typedef struct atarirle_data atarirle_data;
 struct atarirle_data
 {
 	int				bitmapwidth;		/* width of the full playfield bitmap */

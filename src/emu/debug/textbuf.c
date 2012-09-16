@@ -26,8 +26,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* typedef struct _text_buffer text_buffer; -- declared in textbuf.h */
-struct _text_buffer
+struct text_buffer
 {
 	char *					buffer;
 	INT32 *					lineoffs;

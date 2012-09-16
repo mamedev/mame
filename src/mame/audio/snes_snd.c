@@ -157,17 +157,17 @@ static int advance_envelope( device_t *device, int v);
  TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef enum                        /* ADSR state type              */
+enum env_state_t32                        /* ADSR state type              */
 {
 	ATTACK,
 	DECAY,
 	SUSTAIN,
 	RELEASE
-} env_state_t32;
+};
 
 ALLOW_SAVE_TYPE(env_state_t32);
 
-typedef struct                      /* Voice state type             */
+struct voice_state_type                      /* Voice state type             */
 {
 	UINT16          mem_ptr;        /* Sample data memory pointer   */
 	int             end;            /* End or loop after block      */
@@ -186,13 +186,13 @@ typedef struct                      /* Voice state type             */
 	INT32           smp1;           /* Last sample (for BRR filter) */
 	INT32           smp2;           /* Second-to-last sample decoded*/
 	short           sampbuf[4];   /* Buffer for Gaussian interp   */
-} voice_state_type;
+};
 
-typedef struct                      /* Source directory entry       */
+struct src_dir_type                      /* Source directory entry       */
 {
 	UINT16  vptr;           /* Ptr to start of sample data  */
 	UINT16  lptr;           /* Loop pointer in sample data  */
-} src_dir_type;
+};
 
 
 struct snes_sound_state

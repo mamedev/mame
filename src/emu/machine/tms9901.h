@@ -50,13 +50,13 @@ enum
     CLASS DEFINITION
 ***************************************************************************/
 
-typedef struct _tms9901_interface
+struct tms9901_interface 
 {
 	int 				interrupt_mask;			// a bit for each input pin whose state is always notified to the TMS9901 core
 	devcb_read8 		read_handler;			// 4*8 bits, to be selected using the offset (0-3)
 	devcb_write_line	write_handler[16];		// 16 Pn outputs
 	devcb_write8		interrupt_callback; 	// called when interrupt bus state changes
-} tms9901_interface;
+};
 
 class tms9901_device : public device_t
 {

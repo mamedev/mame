@@ -29,8 +29,7 @@
 ***************************************************************************/
 
 /* TMS34010 State */
-typedef struct _XY XY;
-struct _XY
+struct XY
 {
 #ifdef LSB_FIRST
 	INT16 x;

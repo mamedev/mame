@@ -9,7 +9,7 @@
 
 ****************************************************************************************/
 
-typedef struct __unif
+struct unif 
 {
 	const char *board; /* UNIF board */
 
@@ -17,7 +17,7 @@ typedef struct __unif
 	int wram;
 	int chrram;
 	int board_idx;
-} unif;
+};
 
 
 /*************************************************************

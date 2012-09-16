@@ -61,14 +61,13 @@
     The X value shows where the data word is located, and the Y value is the
     address of the next instruction.
 */
-enum _format_type {branch, shiftl, shiftr, multiply, store, swap, one_address, two_address};
-typedef enum _format_type format_type;
+enum format_type {branch, shiftl, shiftr, multiply, store, swap, one_address, two_address};
 
-typedef struct instr_desc
+struct instr_desc 
 {
 	const char *mnemonic;
 	format_type format;	/* -> X and Y are format */
-} instr_desc;
+};
 
 static const instr_desc instructions[16] =
 {

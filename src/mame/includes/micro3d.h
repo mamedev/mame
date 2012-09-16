@@ -116,10 +116,10 @@ public:
 	virtual void video_reset();
 };
 
-typedef struct _micro3d_vtx_
+struct micro3d_vtx 
 {
 	INT32 x, y, z;
-} micro3d_vtx;
+};
 
 
 /*----------- defined in machine/micro3d.c -----------*/

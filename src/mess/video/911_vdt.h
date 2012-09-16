@@ -33,12 +33,12 @@ enum vdt911_model_t
 	vdt911_model_FrenchWP	/* French word processing */
 };
 
-typedef struct vdt911_init_params_t
+struct vdt911_init_params_t 
 {
 	vdt911_screen_size_t screen_size;
 	vdt911_model_t model;
 	void (*int_callback)(running_machine &machine, int state);
-} vdt911_init_params_t;
+};
 
 PALETTE_INIT( vdt911 );
 

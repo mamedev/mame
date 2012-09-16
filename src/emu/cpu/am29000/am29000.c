@@ -75,7 +75,7 @@
     STRUCTURES & TYPEDEFS
 ***************************************************************************/
 
-typedef struct _am29000_state
+struct am29000_state 
 {
 	INT32			icount;
 	UINT32			pc;
@@ -136,7 +136,7 @@ typedef struct _am29000_state
 	address_space *data;
 	direct_read_data *datadirect;
 	address_space *io;
-} am29000_state;
+};
 
 
 /***************************************************************************

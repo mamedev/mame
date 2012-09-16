@@ -156,13 +156,13 @@ static const char *const TMS32010Formats[] = {
 
 #define MAX_OPS (((sizeof(TMS32010Formats) / sizeof(TMS32010Formats[0])) - 1) / PTRS_PER_FORMAT)
 
-typedef struct opcode {
+struct TMS32010Opcode  {
 	word mask;			/* instruction mask */
 	word bits;			/* constant bits */
 	word extcode;		/* value that gets extension code */
 	const char *parse;		/* how to parse bits */
 	const char *fmt;			/* instruction format */
-} TMS32010Opcode;
+};
 
 static TMS32010Opcode Op[MAX_OPS+1];
 static int OpInizialized = 0;

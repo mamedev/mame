@@ -4177,7 +4177,7 @@ enum discrete_node_type
  *
  *************************************/
 
-typedef struct _discrete_sound_block discrete_block;
+struct discrete_block;
 class discrete_node_base_factory;
 class discrete_task;
 class discrete_base_node;
@@ -4202,7 +4202,7 @@ typedef dynamic_array_t<discrete_task *> task_list_t;
  *
  *************************************/
 
-struct _discrete_sound_block
+struct discrete_block
 {
 	int				node;							/* Output node number */
 	discrete_node_base_factory	*factory;

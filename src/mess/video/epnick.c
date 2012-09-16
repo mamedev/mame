@@ -43,7 +43,7 @@
 
 /* Nick executes a Display list, in the form of a list of Line Parameter
 Tables, this is the form of the data */
-typedef struct LPT_ENTRY
+struct LPT_ENTRY 
 {
 	unsigned char SC;		/* scanlines in this modeline (two's complement) */
 	unsigned char MB;		/* the MODEBYTE (defines video display mode) */
@@ -54,9 +54,9 @@ typedef struct LPT_ENTRY
 	unsigned char LD2L;	/* (a7..a0) of line data pointer LD2 */
 	unsigned char LD2H;	/* (a8..a15) of line data pointer LD2 */
 	unsigned char COL[8];	/* COL0..COL7 */
-} LPT_ENTRY;
+};
 
-typedef struct _NICK_STATE
+struct NICK_STATE 
 {
 	/* horizontal position */
 	unsigned char HorizontalClockCount;
@@ -90,7 +90,7 @@ typedef struct _NICK_STATE
 	unsigned int PenIndexLookup_16Colour[256];
 
 	UINT8 *videoram;
-} NICK_STATE;
+};
 
 /* colour mode types */
 #define	NICK_2_COLOUR_MODE	0

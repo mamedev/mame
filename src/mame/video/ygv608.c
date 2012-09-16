@@ -555,7 +555,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
   // - regardless of the visible display dimensions
   rectangle spriteClip(0, 512, 0, 512);
 
-  PSPRITE_ATTR sa;
+  SPRITE_ATTR *sa;
   int flipx = 0, flipy = 0;
   int i;
 

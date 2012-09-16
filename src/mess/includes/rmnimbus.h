@@ -152,7 +152,7 @@ struct ipc_interface_t
 };
 
 /* Mouse/Joystick */
-struct _mouse_joy_state 
+struct mouse_joy_state 
 {
 	UINT8   m_mouse_px;
 	UINT8   m_mouse_py;
@@ -186,7 +186,7 @@ public:
 	UINT8 m_mcu_reg080;
 	UINT8 m_iou_reg092;
 	UINT8 m_last_playmode;
-	_mouse_joy_state m_nimbus_mouse;
+	mouse_joy_state m_nimbus_mouse;
 	UINT8 m_ay8910_a;
 	UINT16 m_IOPorts[num_ioports];
 	UINT8 m_sio_int_state;

@@ -6,7 +6,7 @@
 
 #define IR_TIMING				1		/* try to emulate MB and VG running time */
 
-typedef struct irmb_ops
+struct irmb_ops 
 {
 	const struct irmb_ops *nxtop;
 	UINT32 func;
@@ -18,7 +18,7 @@ typedef struct irmb_ops
 	UINT8 diren;
 	UINT8 flags;
 	UINT8 ramsel;
-} irmb_ops;
+};
 
 
 class irobot_state : public driver_device

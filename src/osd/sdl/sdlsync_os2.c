@@ -33,7 +33,7 @@
 #define pthread_t       int
 #define pthread_self    _gettid
 
-struct _osd_lock {
+struct osd_lock {
 	volatile pthread_t	holder;
 	INT32				count;
 #ifdef PTR64
@@ -43,7 +43,7 @@ struct _osd_lock {
 #endif
 };
 
-struct _osd_event {
+struct osd_event {
     HMTX                hmtx;
     HEV                 hev;
     volatile INT32      autoreset;
@@ -54,13 +54,13 @@ struct _osd_event {
 //  TYPE DEFINITIONS
 //============================================================
 
-struct _osd_thread {
+struct osd_thread {
 	pthread_t			thread;
 	osd_thread_callback callback;
 	void *param;
 };
 
-struct _osd_scalable_lock
+struct osd_scalable_lock
 {
 	struct
 	{

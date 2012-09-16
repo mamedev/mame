@@ -28,7 +28,7 @@
 ***************************************************************************/
 
 /* VTLB state */
-struct _vtlb_state
+struct vtlb_state
 {
 	cpu_device *		cpudevice;			/* CPU device */
 	address_spacenum	space;				/* address space */

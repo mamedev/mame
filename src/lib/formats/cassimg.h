@@ -91,7 +91,7 @@ struct CassetteInfo
 	size_t sample_count;
 };
 
-struct _cassette_image
+struct cassette_image
 {
 	const struct CassetteFormat *format;
 	struct io_generic io;
@@ -105,8 +105,6 @@ struct _cassette_image
 	size_t block_count;
 	size_t sample_count;
 };
-
-typedef struct _cassette_image cassette_image;
 
 struct CassetteFormat
 {

@@ -65,11 +65,11 @@ static const UINT32 s_flags[] = {
 	0, 0, 0
 };
 
-typedef struct
+struct sm8500dasm
 {
 	UINT8	mnemonic;
 	UINT8	arguments;
-}	sm8500dasm;
+};
 
 static const char *const sm8500_cond[16] = {
 	"F", "LT", "LE", "ULE", "OV",  "MI", "Z",  "C",

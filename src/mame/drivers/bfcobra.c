@@ -101,7 +101,7 @@ INLINE void z80_bank(running_machine &machine, int num, int data);
 
 ***************************************************************************/
 
-typedef union
+union ADDR_REG
 {
 #ifdef LSB_FIRST
 	struct { UINT16 loword, hiword ; } ;
@@ -111,7 +111,7 @@ typedef union
 	struct { UINT8 addr2, addr1, addr0; };
 #endif
 	UINT32 addr;
-} ADDR_REG;
+};
 
 /* Blitter register flag bits */
 #define	CMD_RUN			0x01

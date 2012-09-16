@@ -6,8 +6,7 @@
 
 #define	__uPD71054_TIMER	1
 
-typedef struct _uPD71054_state uPD71054_state;
-struct _uPD71054_state
+struct uPD71054_state
 {
 	emu_timer *timer[3];			// Timer
 	UINT16	max[3];				// Max counter

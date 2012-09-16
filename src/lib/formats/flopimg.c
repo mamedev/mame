@@ -24,7 +24,7 @@
 #define TRACK_DIRTY			0x02
 
 
-struct _floppy_image
+struct floppy_image_legacy
 {
 	struct io_generic io;
 
@@ -46,7 +46,7 @@ struct _floppy_image
 
 
 
-struct _floppy_params
+struct floppy_params
 {
 	int param;
 	int value;
@@ -77,7 +77,7 @@ static floppy_image_legacy *floppy_init(void *fp, const struct io_procs *procs, 
 {
 	floppy_image_legacy *floppy;
 
-	floppy = (floppy_image_legacy *)malloc(sizeof(struct _floppy_image));
+	floppy = (floppy_image_legacy *)malloc(sizeof(floppy_image));
 	if (!floppy)
 		return NULL;
 

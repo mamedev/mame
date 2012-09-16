@@ -18,11 +18,11 @@ extern const device_type GROMPORT;
 #define GROMPORT_CONFIG(name) \
 	const gromport_config(name) =
 
-typedef struct _gromport_config
+struct gromport_config 
 {
 	devcb_write_line	ready;
 	devcb_write_line	reset;
-} gromport_config;
+};
 
 class ti99_cartridge_connector_device;
 
@@ -366,11 +366,11 @@ private:
 };
 
 
-typedef struct _pcb_type
+struct pcb_type 
 {
 	int id;
 	const char* name;
-} pcb_type;
+};
 
 /*************************************************************************
     RPK support
@@ -437,7 +437,7 @@ private:
 	void add_socket(const char* id, rpk_socket *newsock);
 };
 
-enum _rpk_open_error
+enum rpk_open_error
 {
 	RPK_OK,
 	RPK_NOT_ZIP_FORMAT,
@@ -455,7 +455,6 @@ enum _rpk_open_error
 	RPK_NO_PCB_OR_RESOURCES,
 	RPK_UNKNOWN_PCB_TYPE
 };
-typedef enum _rpk_open_error rpk_open_error;
 
 static const char error_text[15][30] =
 {

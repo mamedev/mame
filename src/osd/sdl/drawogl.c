@@ -160,14 +160,14 @@ enum
 //  TYPES
 //============================================================
 
-typedef struct _texture_info texture_info;
+struct texture_info;
 
 #if USE_OPENGL
 typedef void (*texture_copy_func)(texture_info *texture, const render_texinfo *texsource);
 #endif
 
 /* texture_info holds information about a texture */
-struct _texture_info
+struct texture_info
 {
 #ifdef OLD_CODE
 	texture_info *		next;				// next texture in the list

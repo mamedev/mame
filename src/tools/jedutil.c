@@ -144,11 +144,11 @@ struct pin_fuse_columns
 };
 
 
-typedef struct _pal_data pal_data;
+struct pal_data;
 
 typedef void (*print_product_terms_func)(const pal_data* pal, const jed_data* jed);
 
-struct _pal_data
+struct pal_data
 {
     const char *name;
     const pin_fuse_rows *pinfuserows;

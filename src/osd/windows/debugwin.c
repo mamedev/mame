@@ -151,11 +151,11 @@ enum
 //  TYPES
 //============================================================
 
-typedef struct _debugview_info debugview_info;
+struct debugview_info;
 class debugwin_info;
 
 
-struct _debugview_info
+struct debugview_info
 {
 	debugwin_info *			owner;
 	debug_view *			view;

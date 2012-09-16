@@ -58,11 +58,11 @@ static const UINT32 s_flags[] = {
 	_OVER,0    ,0    ,0
 };
 
-typedef struct
+struct lr35902dasm
 {
 	UINT8	mnemonic;
 	const char *arguments;
-}	lr35902dasm;
+};
 
 static const lr35902dasm mnemonic_cb[256] = {
 	{zRLC,"b"},     {zRLC,"c"},     {zRLC,"d"},     {zRLC,"e"},

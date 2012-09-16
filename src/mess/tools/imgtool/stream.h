@@ -12,7 +12,7 @@
 #include "imgterrs.h"
 #include "corefile.h"
 
-typedef struct _imgtool_stream imgtool_stream;
+struct imgtool_stream;
 
 imgtool_stream *stream_open(const char *fname, int read_or_write);	/* similar params to mame_fopen */
 imgtool_stream *stream_open_write_stream(int filesize);

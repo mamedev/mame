@@ -16,21 +16,21 @@
 #define KB_COP421_TAG	"kbcop"
 
 /* lisa MMU segment regs */
-typedef struct real_mmu_entry
+struct real_mmu_entry 
 {
 	UINT16 sorg;
 	UINT16 slim;
-} real_mmu_entry;
+};
 
 /* MMU regs translated into a more efficient format */
 enum mmu_entry_t { RAM_stack_r, RAM_r, RAM_stack_rw, RAM_rw, IO, invalid, special_IO };
 
-typedef struct mmu_entry
+struct mmu_entry 
 {
 	offs_t sorg;	/* (real_sorg & 0x0fff) << 9 */
 	mmu_entry_t type;	/* <-> (real_slim & 0x0f00) */
 	int slim;	/* (~ ((real_slim & 0x00ff) << 9)) & 0x01ffff */
-} mmu_entry;
+};
 
 enum floppy_hardware_t
 {
@@ -48,7 +48,7 @@ enum clock_mode_t
 };			/* clock mode */
 
 /* clock registers */
-typedef struct _clock_regs_t
+struct clock_regs_t 
 {
 	long alarm;		/* alarm (20-bit binary) */
 	int years;		/* years (4-bit binary ) */
@@ -66,9 +66,9 @@ typedef struct _clock_regs_t
 	int clock_write_ptr;	/* clock byte to be written next (-1 if clock write disabled) */
 
 	enum clock_mode_t clock_mode;
-} clock_regs_t;
+};
 
-typedef struct _lisa_features_t
+struct lisa_features_t 
 {
 	unsigned int has_fast_timers : 1;	/* I/O board VIAs are clocked at 1.25 MHz (?) instead of .5 MHz (?) (Lisa 2/10, Mac XL) */
 										/* Note that the beep routine in boot ROMs implies that
@@ -86,7 +86,7 @@ typedef struct _lisa_features_t
 	floppy_hardware_t floppy_hardware;
 	unsigned int has_double_sided_floppy : 1;	/* true on lisa 1 and *hacked* lisa 2/10 / Mac XL */
 	unsigned int has_mac_xl_video : 1;	/* modified video for MacXL */
-} lisa_features_t;
+};
 
 
 class lisa_state : public driver_device

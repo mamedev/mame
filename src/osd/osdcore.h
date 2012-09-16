@@ -72,7 +72,7 @@ extern "C" {
 #define OPEN_FLAG_NO_PRELOAD	0x0010		/* do not decompress on open */
 
 /* error codes returned by routines below */
-enum _file_error
+enum file_error
 {
 	FILERR_NONE,
 	FILERR_FAILURE,
@@ -84,10 +84,9 @@ enum _file_error
 	FILERR_INVALID_DATA,
 	FILERR_INVALID_ACCESS
 };
-typedef enum _file_error file_error;
 
 /* osd_file is an opaque type which represents an open file */
-typedef struct _osd_file osd_file;
+struct osd_file;
 
 /*-----------------------------------------------------------------------------
     osd_open: open a new file.
@@ -267,17 +266,16 @@ int osd_uchar_from_osdchar(UINT32 /* unicode_char */ *uchar, const char *osdchar
 ***************************************************************************/
 
 /* types of directory entries that can be returned */
-enum _osd_dir_entry_type
+enum osd_dir_entry_type
 {
 	ENTTYPE_NONE,
 	ENTTYPE_FILE,
 	ENTTYPE_DIR,
 	ENTTYPE_OTHER
 };
-typedef enum _osd_dir_entry_type osd_dir_entry_type;
 
 /* osd_directory is an opaque type which represents an open directory */
-typedef struct _osd_directory osd_directory;
+struct osd_directory;
 
 /* osd_directory_entry contains basic information about a file when iterating through */
 /* a directory */
@@ -428,7 +426,7 @@ void osd_sleep(osd_ticks_t duration);
 ***************************************************************************/
 
 /* osd_lock is an opaque type which represents a recursive lock/mutex */
-typedef struct _osd_lock osd_lock;
+struct osd_lock;
 
 
 /*-----------------------------------------------------------------------------
@@ -527,10 +525,10 @@ void osd_lock_free(osd_lock *lock);
 #define WORK_ITEM_FLAG_AUTO_RELEASE	0x0001
 
 /* osd_work_queue is an opaque type which represents a queue of work items */
-typedef struct _osd_work_queue osd_work_queue;
+struct osd_work_queue;
 
 /* osd_work_item is an opaque type which represents a single work item */
-typedef struct _osd_work_item osd_work_item;
+struct osd_work_item;
 
 /* osd_work_callback is a callback function that does work */
 typedef void *(*osd_work_callback)(void *param, int threadid);

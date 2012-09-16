@@ -32,7 +32,7 @@ struct option_resolution_entry
 	} u;
 };
 
-struct _option_resolution
+struct option_resolution
 {
 	object_pool *pool;
 	const char *specification;

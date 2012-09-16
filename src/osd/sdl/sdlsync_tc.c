@@ -38,7 +38,7 @@ struct hidden_mutex_t {
 	pthread_mutex_t id;
 };
 
-struct _osd_event {
+struct osd_event {
 	pthread_mutex_t 	mutex;
 	pthread_cond_t		cond;
 	volatile INT32		autoreset;
@@ -54,11 +54,11 @@ struct _osd_event {
 //  TYPE DEFINITIONS
 //============================================================
 
-struct _osd_thread {
+struct osd_thread {
 	pthread_t			thread;
 };
 
-struct _osd_scalable_lock
+struct osd_scalable_lock
 {
 	osd_lock			*lock;
 };

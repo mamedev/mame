@@ -261,13 +261,13 @@ protected:
 		static pixel_t mix_color(double factor, UINT8 c0, UINT8 c1);
 	};
 
-	typedef enum
+	enum border_color_t
 	{
 		BORDER_COLOR_BLACK,
 		BORDER_COLOR_GREEN,
 		BORDER_COLOR_WHITE,
 		BORDER_COLOR_ORANGE
-	} border_color_t;
+	};
 
 	// callbacks
 	devcb_resolved_write_line m_res_out_hsync_func;

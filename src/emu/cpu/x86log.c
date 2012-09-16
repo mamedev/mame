@@ -48,7 +48,7 @@ struct data_range_t
 
 
 /* the code logging context */
-struct _x86log_context
+struct x86log_context
 {
 	astring			filename;						/* name of the file */
 	FILE *			file;							/* file we are logging to */

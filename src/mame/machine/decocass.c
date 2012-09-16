@@ -1831,7 +1831,7 @@ READ8_HANDLER( i8041_p2_r )
 ***************************************************************************/
 
 /* regions within the virtual tape */
-enum _tape_region
+enum tape_region
 {
 	REGION_LEADER,				/* in clear leader section */
 	REGION_LEADER_GAP,			/* in gap between leader and BOT */
@@ -1844,11 +1844,10 @@ enum _tape_region
 	REGION_TRAILER_GAP,			/* in gap between trailer and EOT */
 	REGION_TRAILER				/* in clear trailer section */
 };
-typedef enum _tape_region tape_region;
 
 
 /* bytes within a data block on a virtual tape */
-enum _tape_byte
+enum tape_byte
 {
 	BYTE_PRE_GAP_0,				/* 34 bytes of gap, clock held to 0, no data */
 	BYTE_PRE_GAP_33 = BYTE_PRE_GAP_0 + 33,
@@ -1865,7 +1864,6 @@ enum _tape_byte
 	BYTE_POSTGAP_33 = BYTE_POSTGAP_0 + 33,
 	BYTE_BLOCK_TOTAL			/* total number of bytes in block */
 };
-typedef enum _tape_byte tape_byte;
 
 
 /* state of the tape */

@@ -3166,11 +3166,11 @@ static offs_t mac_dasm_override(device_t &device, char *buffer, offs_t pc, const
 #ifdef MAC_TRACETRAP
 static void mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 {
-	typedef struct
+	struct sonycscodeentry
 	{
 		int csCode;
 		const char *name;
-	} sonycscodeentry;
+	};
 
 	static const sonycscodeentry cscodes[] =
 	{

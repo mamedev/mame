@@ -44,7 +44,7 @@
 #define PPCCAP_604_MMU				0x100		/* TRUE if we have 604-class MMU features */
 
 /* PowerPC flavors */
-enum _powerpc_flavor
+enum powerpc_flavor
 {
 	PPC_MODEL_403GA				= 0x00200000,
 	PPC_MODEL_403GB				= 0x00200100,
@@ -75,7 +75,6 @@ enum _powerpc_flavor
 	PPC_MODEL_MPC8241			= 0x80811014,	/* "Kahlua Lt" */
 	PPC_MODEL_MPC8245			= 0x80811014,	/* "Kahlua II" */
 };
-typedef enum _powerpc_flavor powerpc_flavor;
 
 
 /* exception types */
@@ -504,7 +503,7 @@ struct ppc4xx_spu_state
 
 
 /* forward declaration of implementation-specific state */
-typedef struct _ppcimp_state ppcimp_state;
+struct ppcimp_state;
 
 
 /* PowerPC state */

@@ -3,7 +3,7 @@
 #include "se3208.h"
 
 
-static struct _DisSE3208
+static struct
 {
 	UINT32 PC;
 	UINT32 SR;

@@ -103,14 +103,13 @@ static void compatiblemodes(int mode,int *start,int *end)
 	}
 }
 
-struct _fileinfo
+struct fileinfo
 {
 	char name[MAX_FILENAME_LEN+1];
 	int size;
 	unsigned char *buf;	/* file is read in here */
 	int listed;
 };
-typedef struct _fileinfo fileinfo;
 
 static fileinfo files[2][MAX_FILES];
 static float matchscore[MAX_FILES][MAX_FILES][TOTAL_MODES][TOTAL_MODES];

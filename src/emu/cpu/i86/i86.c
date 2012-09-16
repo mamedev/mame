@@ -22,12 +22,11 @@ extern int i386_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int mode)
 
 
 /* I86 registers */
-typedef union
+union i8086basicregs
 {									   /* eight general registers */
 	UINT16 w[8];					   /* viewed as 16 bits registers */
 	UINT8 b[16];					   /* or as 8 bit registers */
-}
-i8086basicregs;
+};
 
 struct i8086_state
 {

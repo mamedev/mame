@@ -114,7 +114,7 @@ struct OptionResolutionError
 
 
 
-typedef struct _option_resolution option_resolution;
+struct option_resolution;
 
 struct OptionRange
 {

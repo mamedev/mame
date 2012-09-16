@@ -88,8 +88,7 @@ struct DMA_OP
 	bool active;
 };
 
-typedef struct _SHARC_REGS SHARC_REGS;
-struct _SHARC_REGS
+struct SHARC_REGS
 {
 	UINT32 pc;
 	SHARC_REG r[16];

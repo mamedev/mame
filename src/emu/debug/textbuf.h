@@ -17,7 +17,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _text_buffer text_buffer;
+struct text_buffer;
 
 
 

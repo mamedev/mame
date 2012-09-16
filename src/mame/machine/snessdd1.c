@@ -533,7 +533,7 @@ static void SDD1emu_decompress(SDD1emu* thisptr, UINT32 in_buf, UINT16 out_len, 
 	SDD1_OL_launch(thisptr->OL);
 }
 
-typedef struct
+struct snes_sdd1_t
 {
 	UINT8 sdd1_enable;	// channel bit-mask
 	UINT8 xfer_enable;	// channel bit-mask
@@ -553,9 +553,9 @@ typedef struct
 		UINT32 size;	// length of data buffer; reads decrement counter, set ready to false at 0
 		UINT8 ready;	// 1 when data[] is valid; 0 to invoke sdd1emu.decompress()
 	} buffer;
-} _snes_sdd1_t;
+} ;
 
-static _snes_sdd1_t snes_sdd1;
+static snes_sdd1_t snes_sdd1;
 
 static void sdd1_init(running_machine& machine)
 {

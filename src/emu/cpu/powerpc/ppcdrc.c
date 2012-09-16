@@ -158,7 +158,7 @@ struct compiler_state
 
 
 /* PowerPC implementation state */
-struct _ppcimp_state
+struct ppcimp_state
 {
 	/* core state */
 	drc_cache *			cache;						/* pointer to the DRC code cache */

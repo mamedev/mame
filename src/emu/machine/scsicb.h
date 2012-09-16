@@ -23,8 +23,7 @@
 	MCFG_DEVICE_CONFIG(_intf)
 
 
-typedef struct _SCSICB_interface SCSICB_interface;
-struct _SCSICB_interface
+struct SCSICB_interface
 {
 	void (*line_change_cb)(device_t *, UINT8 line, UINT8 state);
 

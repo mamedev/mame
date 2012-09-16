@@ -34,7 +34,7 @@ struct hidden_mutex_t {
 	volatile INT32		threadid;
 };
 
-struct _osd_event {
+struct osd_event {
 	SDL_mutex *			mutex;
 	SDL_cond *			cond;
 	volatile INT32		autoreset;
@@ -45,13 +45,13 @@ struct _osd_event {
 //  TYPE DEFINITIONS
 //============================================================
 
-struct _osd_thread {
+struct osd_thread {
 	SDL_Thread *		thread;
 	osd_thread_callback callback;
 	void *param;
 };
 
-struct _osd_scalable_lock
+struct osd_scalable_lock
 {
 	SDL_mutex *			mutex;
 };

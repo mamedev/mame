@@ -56,8 +56,7 @@ addresses take place.
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
-typedef struct _m6509_Regs m6509_Regs;
-struct _m6509_Regs {
+struct m6509_Regs {
 	UINT8	subtype;		/* currently selected cpu sub type */
 	void	(*const *insn)(m6509_Regs *); /* pointer to the function pointer table */
 	PAIR	ppc;			/* previous program counter */

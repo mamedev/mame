@@ -109,7 +109,7 @@ static const char opname[][5] =
 	"*int"
 };
 
-typedef struct _tms99xx_config
+struct tms99xx_config 
 {
 	devcb_write8		external_callback;
 	devcb_read8			irq_level;
@@ -117,7 +117,7 @@ typedef struct _tms99xx_config
 	devcb_write_line	clock_out;
 	devcb_write_line	wait_line;
 	devcb_write_line	holda_line;
-} tms99xx_config;
+};
 
 #define TMS99xx_CONFIG(name) \
 	const tms99xx_config(name) =
@@ -270,20 +270,20 @@ private:
 	typedef void (tms99xx_device::*ophandler)(void);
 
 	// Opcode list entry
-	typedef struct _tms_instruction
+	struct tms_instruction
 	{
 		UINT16				opcode;
 		int					id;
 		int					format;
 		microprogram		prog;		// Microprogram
-	} tms_instruction;
+	};
 
 	// Lookup table entry
-	typedef struct _lookup_entry
+	struct lookup_entry
 	{
-		struct _lookup_entry *next_digit;
+		lookup_entry *next_digit;
 		const tms_instruction *entry;
-	} lookup_entry;
+	};
 
 	// Pointer to the lookup table
 	lookup_entry*	m_command_lookup_table;

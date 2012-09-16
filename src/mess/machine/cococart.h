@@ -23,23 +23,21 @@
 ***************************************************************************/
 
 /* output lines on the CoCo cartridge slot */
-enum _cococart_line
+enum cococart_line
 {
 	COCOCART_LINE_CART,				/* connects to PIA1 CB1 */
 	COCOCART_LINE_NMI,				/* connects to NMI line on CPU */
 	COCOCART_LINE_HALT,				/* connects to HALT line on CPU */
 	COCOCART_LINE_SOUND_ENABLE		/* sound enable */
 };
-typedef enum _cococart_line cococart_line;
 
 /* since we have a special value "Q" - we have to use a special enum here */
-enum _cococart_line_value
+enum cococart_line_value
 {
 	COCOCART_LINE_VALUE_CLEAR,
 	COCOCART_LINE_VALUE_ASSERT,
 	COCOCART_LINE_VALUE_Q
 };
-typedef enum _cococart_line_value cococart_line_value;
 
 struct coco_cartridge_line
 {

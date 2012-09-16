@@ -86,13 +86,13 @@ static const char *const PIC16C5xFormats[] = {
 
 #define MAX_OPS (((sizeof(PIC16C5xFormats) / sizeof(PIC16C5xFormats[0])) - 1) / PTRS_PER_FORMAT)
 
-typedef struct opcode {
+struct PIC16C5xOpcode  {
 	word mask;			/* instruction mask */
 	word bits;			/* constant bits */
 	word extcode;		/* value that gets extension code */
 	const char *parse;	/* how to parse bits */
 	const char *fmt;	/* instruction format */
-} PIC16C5xOpcode;
+};
 
 static PIC16C5xOpcode Op[MAX_OPS+1];
 static int OpInizialized = 0;

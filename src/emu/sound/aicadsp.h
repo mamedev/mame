@@ -4,7 +4,7 @@
 #define __AICADSP_H__
 
 //the DSP Context
-struct _AICADSP
+struct AICADSP
 {
 //Config
 	UINT16 *AICARAM;
@@ -32,9 +32,9 @@ struct _AICADSP
 	int LastStep;
 };
 
-void aica_dsp_init(struct _AICADSP *DSP);
-void aica_dsp_setsample(struct _AICADSP *DSP, INT32 sample, INT32 SEL, INT32 MXL);
-void aica_dsp_step(struct _AICADSP *DSP);
-void aica_dsp_start(struct _AICADSP *DSP);
+void aica_dsp_init(AICADSP *DSP);
+void aica_dsp_setsample(AICADSP *DSP, INT32 sample, INT32 SEL, INT32 MXL);
+void aica_dsp_step(AICADSP *DSP);
+void aica_dsp_start(AICADSP *DSP);
 
 #endif /* __AICADSP_H__ */

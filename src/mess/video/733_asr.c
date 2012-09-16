@@ -658,13 +658,13 @@ static const unsigned char key_translate[3][51] =
 void asr733_keyboard(device_t *device)
 {
 	asr_t *asr = get_safe_token(device);
-	typedef enum
+	enum modifier_state_t
 	{
 		/* key modifier states */
 		unshifted = 0, shift, control,
 		/* special value to stop repeat if the modifier state changes */
 		special_debounce = -1
-	} modifier_state_t;
+	} ;
 
 	enum { repeat_delay = 5 /* approx. 1/10s */ };
 

@@ -55,7 +55,7 @@ enum irg_pos_t
 
 
 /* tape reader registers */
-typedef struct tape_reader_t
+struct tape_reader_t 
 {
 	device_image_interface *fd;	/* file descriptor of tape image */
 
@@ -65,31 +65,31 @@ typedef struct tape_reader_t
 	int rc;			/* 2-bit reader counter */
 
 	emu_timer *timer;	/* timer to simulate reader timing */
-} tape_reader_t;
+};
 
 
 
 /* tape puncher registers */
-typedef struct tape_puncher_t
+struct tape_puncher_t 
 {
 	device_image_interface *fd;	/* file descriptor of tape image */
 
 	emu_timer *timer;	/* timer to generate completion pulses */
-} tape_puncher_t;
+};
 
 
 
 /* typewriter registers */
-typedef struct typewriter_t
+struct typewriter_t 
 {
 	device_image_interface *fd;	/* file descriptor of output image */
 
 	emu_timer *prt_timer;/* timer to generate completion pulses */
-} typewriter_t;
+};
 
 
 /* magnetic tape unit registers */
-typedef struct magtape_t
+struct magtape_t 
 {
 	device_image_interface *img;		/* image descriptor */
 
@@ -121,7 +121,7 @@ typedef struct magtape_t
 	int long_parity;
 
 	emu_timer *timer;	/* timer to simulate reader timing */
-} magtape_t;
+};
 
 
 class tx0_state : public driver_device

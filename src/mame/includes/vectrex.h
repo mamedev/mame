@@ -11,12 +11,12 @@
 
 #define NVECT 10000
 
-typedef struct _vectrex_point
+struct vectrex_point 
 {
 	int x; int y;
 	rgb_t col;
 	int intensity;
-} vectrex_point;
+};
 
 class vectrex_state : public driver_device
 {

@@ -65,7 +65,7 @@ struct quad_setup_data
 	INT32			rotwidth, rotheight;
 };
 
-typedef struct _texture_info texture_info;
+struct texture_info;
 
 typedef void (*texture_copy_func)(texture_info *texture, const render_texinfo *texsource);
 
@@ -88,7 +88,7 @@ struct copy_info {
 };
 
 /* texture_info holds information about a texture */
-struct _texture_info
+struct texture_info
 {
 	texture_info *		next;				// next texture in the list
 

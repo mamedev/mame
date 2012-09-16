@@ -100,7 +100,7 @@ struct compiler_state
 	code_label	labelnum;					/* index for local labels */
 };
 
-struct _rspimp_state
+struct rspimp_state
 {
 	/* core state */
 	drc_cache *			cache;						/* pointer to the DRC code cache */

@@ -61,14 +61,14 @@ DECLARE_LEGACY_CPU_DEVICE(TI990_10L, ti990_10l);
     structure with the parameters ti990_10_reset wants.
 */
 
-typedef struct ti990_10reset_param
+struct ti990_10reset_param 
 {
 	ti99xx_idle_func	idle_callback;
 	ti99xx_rset_func	rset_callback;
 	ti99xx_lrex_func	lrex_callback;
 	ti99xx_ckon_ckof_func	ckon_ckof_callback;
 	ti99xx_error_interrupt_func	error_interrupt_callback;
-} ti990_10reset_param;
+};
 
 /* accessor for the internal ROM */
 extern READ16_HANDLER(ti990_10_internal_r);
@@ -87,10 +87,10 @@ DECLARE_LEGACY_CPU_DEVICE(TMS9900L, tms9900l);
 /*
     structure with optional parameters for tms9900_reset.
 */
-typedef struct tms9900reset_param
+struct tms9900reset_param 
 {
 	ti99xx_idle_func	idle_callback;
-} tms9900reset_param;
+};
 
 
 
@@ -99,10 +99,10 @@ typedef struct tms9900reset_param
 /*
     structure with optional parameters for tms9940_reset.
 */
-typedef struct tms9940reset_param
+struct tms9940reset_param 
 {
 	ti99xx_idle_func	idle_callback;
-} tms9940reset_param;
+};
 
 
 
@@ -111,10 +111,10 @@ DECLARE_LEGACY_CPU_DEVICE(TMS9980L, tms9980al);
 /*
     structure with optional parameters for tms9980a_reset.
 */
-typedef struct tms9980areset_param
+struct tms9980areset_param 
 {
 	ti99xx_idle_func	idle_callback;
-} tms9980areset_param;
+};
 
 
 
@@ -123,10 +123,10 @@ typedef struct tms9980areset_param
 /*//
     structure with optional parameters for tms9985_reset.
 */
-typedef struct tms9985reset_param
+struct tms9985reset_param 
 {
 	ti99xx_idle_func	idle_callback;
-} tms9985reset_param;
+};
 
 
 
@@ -135,10 +135,10 @@ typedef struct tms9985reset_param
 /*
     structure with optional parameters for tms9989_reset.
 */
-typedef struct tms9989reset_param
+struct tms9989reset_param 
 {
 	ti99xx_idle_func	idle_callback;
-} tms9989reset_param;
+};
 
 
 
@@ -147,7 +147,7 @@ DECLARE_LEGACY_CPU_DEVICE(TMS9995L, tms9995l);
 /*
   structure with the parameters tms9995_reset wants.
 */
-typedef struct tms9995reset_param
+struct tms9995reset_param 
 {
 	/* auto_wait_state : a non-zero value makes tms9995 generate a wait state automatically on each
        memory access */
@@ -159,7 +159,7 @@ typedef struct tms9995reset_param
         disabled.  This chip is used by the ti99/8 so that internal RAM does
         not prevent the mapper from working correctly. */
 	int is_mp9537;
-} tms9995reset_param;
+};
 
 /* accessor for the first 252 bytes of internal RAM */
 extern READ8_HANDLER(tms9995_internal1_r);
@@ -175,10 +175,10 @@ extern WRITE8_HANDLER(tms9995_internal2_w);
 /*
     structure with optional parameters for tms99000_reset.
 */
-typedef struct tms99000reset_param
+struct tms99000reset_param 
 {
 	ti99xx_idle_func	idle_callback;
-} tms99000reset_param;
+};
 
 
 
@@ -187,10 +187,10 @@ typedef struct tms99000reset_param
 /*
     structure with optional parameters for tms99105a_reset.
 */
-typedef struct tms99105areset_param
+struct tms99105areset_param 
 {
 	ti99xx_idle_func	idle_callback;
-} tms99105areset_param;
+};
 
 
 
@@ -199,10 +199,10 @@ typedef struct tms99105areset_param
 /*
     structure with optional parameters for tms99110a_reset.
 */
-typedef struct tms99110areset_param
+struct tms99110areset_param 
 {
 	ti99xx_idle_func	idle_callback;
-} tms99110areset_param;
+};
 
 
 unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const UINT8 *oprom, const UINT8 *opram);

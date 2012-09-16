@@ -13,7 +13,7 @@
 
 #include "ti99defs.h"
 
-typedef struct _ti99grom_config
+struct ti99grom_config 
 {
 	bool				writable;
 	int 				ident;
@@ -22,7 +22,7 @@ typedef struct _ti99grom_config
 	int					size;
 	devcb_write_line	ready;
 	int					clockrate;
-} ti99grom_config;
+};
 
 #define GROM_CONFIG(name) \
 	const ti99grom_config(name) =

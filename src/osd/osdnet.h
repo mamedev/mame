@@ -8,14 +8,14 @@ class netdev;
 #define CREATE_NETDEV(name) class netdev *name(const char *ifname, class device_network_interface *ifdev, int rate)
 typedef class netdev *(*create_netdev)(const char *ifname, class device_network_interface *ifdev, int rate);
 
-typedef struct netdev_entry
+struct netdev_entry_t 
 {
 	int id;
 	char name[256];
 	char description[256];
 	create_netdev func;
-	struct netdev_entry *m_next;
-} netdev_entry_t;
+	netdev_entry_t *m_next;
+};
 
 class netdev
 {

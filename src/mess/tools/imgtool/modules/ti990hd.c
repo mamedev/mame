@@ -35,15 +35,15 @@ that is longer than 39 characters. */
 #define MAX_DIR_LEVEL 25	/* We need to put a recursion limit to avoid endless recursion hazard */
 
 
-typedef struct UINT16BE
+struct UINT16BE 
 {
 	UINT8 bytes[2];
-} UINT16BE;
+};
 
-typedef struct UINT32BE
+struct UINT32BE 
 {
 	UINT8 bytes[4];
-} UINT32BE;
+};
 
 INLINE UINT16 get_UINT16BE(UINT16BE word)
 {
@@ -72,13 +72,13 @@ INLINE void set_UINT32BE(UINT32BE *word, UINT32 data)
 /*
     disk image header
 */
-typedef struct disk_image_header
+struct disk_image_header 
 {
 	UINT32BE cylinders;			/* number of cylinders on hard disk (big-endian) */
 	UINT32BE heads;				/* number of heads on hard disk (big-endian) */
 	UINT32BE sectors_per_track;	/* number of sectors per track on hard disk (big-endian) */
 	UINT32BE bytes_per_sector;	/* number of bytes of data per sector on hard disk (big-endian) */
-} disk_image_header;
+};
 
 enum
 {
@@ -101,7 +101,7 @@ enum
 /*
     SC0 record (Disk sector 0)
 */
-typedef struct ti990_sc0
+struct ti990_sc0 
 {
 	char		vnm[8];			/* volume name */
 	UINT16BE	tna;			/* total number of ADUs */
@@ -148,12 +148,12 @@ typedef struct ti990_sc0
 	UINT16BE	dct;			/* disk creation time */
 	UINT16BE	fsf;			/* * * RESERVED * * */
 	/* SCOSIZ = >AA */
-} ti990_sc0;
+};
 
 /*
     DOR (Directory Overhead Record)
 */
-typedef struct ti990_dor
+struct ti990_dor 
 {
 	UINT16BE nrc;				/* # records in directory (minus DOR) nrc = nfl + nar (+ tfc???) */
 	UINT16BE nfl;				/* # files currently in directory */
@@ -164,7 +164,7 @@ typedef struct ti990_dor
 	char pnm[8];				/* name of parent directory (VCATALOG for root, even though it makes little sense) */
 	UINT16BE prs;				/* "default physical record length (used for file creation)" */
 	/* DORSIZ = >1C */
-} ti990_dor;
+};
 
 /*
     file flags found in fdr
@@ -198,16 +198,16 @@ enum
 /*
     ACE subrecord found in FDR
 */
-typedef struct ti990_ace
+struct ti990_ace 
 {
 	char		agn[8];				/* access group name */
 	UINT16BE	flg;				/* flags */
-} ti990_ace;
+};
 
 /*
     FDR record
 */
-typedef struct ti990_fdr
+struct ti990_fdr 
 {
 	UINT16BE	hkc;			/* hask key count: the number of file descriptor records that are present in the directory that hashed to this record number */
 	UINT16BE	hkv;			/* hask key value: the result of the hash algorithm for the file name actually covered in this record */
@@ -243,7 +243,7 @@ typedef struct ti990_fdr
 	UINT16BE	psa;			/* public security attribute */
 	ti990_ace	ace[9];			/* 9 access control entries */
 	UINT8		fil[2];			/* not used */
-} ti990_fdr;
+};
 
 /*
     ADR record: variant of FDR for Aliases
@@ -251,7 +251,7 @@ typedef struct ti990_fdr
     The fields marked here with *** are in the ADR template to maintain
     compatability with the FDR template.
 */
-typedef struct ti990_adr
+struct ti990_adr 
 {
 	UINT16BE	hkc;			/* hask key count */
 	UINT16BE	hkv;			/* hask key value */
@@ -266,7 +266,7 @@ typedef struct ti990_adr
 	UINT16BE	fill05;			/* *** secondary allocation address */
 	UINT16BE	rna;			/* record number of next ADR */
 	UINT16BE	raf;			/* record # of actual FDR (from 1 through dor.nrc) */
-} ti990_adr;
+};
 
 /*
     CDR record: variant of FDR for Channel
@@ -274,7 +274,7 @@ typedef struct ti990_adr
     The CDR is the permanent record of a channel.  It is carried as an alias
     of the program file in which the channel owner task resides.
 */
-typedef struct ti990_cdr
+struct ti990_cdr 
 {
 	UINT16BE	hkc;			/* hask key count */
 	UINT16BE	hkv;			/* hask key value */
@@ -295,7 +295,7 @@ typedef struct ti990_cdr
 	UINT16BE	psa;			/* public security attribute */
 	UINT8		scg[94];		/* "SDT with 9 control groups" (whatever it means - and, no, 94 is not dividable by 9) */
 	UINT8		fill06[8];		/* reserved */
-} ti990_cdr;
+};
 
 /*
     Based on contents of the flags field, catalog entries may be either an FDR,
@@ -305,19 +305,19 @@ typedef struct ti990_cdr
     field starts at offset 4, and therefore if we try to interpret a KDR as an
     FDR (or ADR, CDR), we will find fnm[0] and assume the FDR is empty.
 */
-typedef union directory_entry
+union directory_entry 
 {
 	ti990_fdr fdr;
 	ti990_adr adr;
 	ti990_cdr cdr;
-} directory_entry;
+};
 
 #if 0
 
 /*
     tifile header: stand-alone file
 */
-typedef struct tifile_header
+struct tifile_header 
 {
 	char tifiles[8];		/* always '\7TIFILES' */
 	UINT8 secsused_MSB;		/* file length in sectors (big-endian) */
@@ -329,59 +329,59 @@ typedef struct tifile_header
 	UINT8 fixrecs_MSB;		/* file length in records (big-endian) */
 	UINT8 fixrecs_LSB;
 	UINT8 res[128-16];		/* reserved */
-} tifile_header;
+};
 
 
 /*
     catalog entry (used for in-memory catalog)
 */
-typedef struct catalog_entry
+struct catalog_entry 
 {
 	UINT16 fdr_secnum;
 	char filename[10];
-} catalog_entry;
+};
 
 #endif
 
 /*
     Disk geometry
 */
-typedef struct ti990_geometry
+struct ti990_geometry 
 {
 	unsigned int cylinders, heads, sectors_per_track, bytes_per_sector;
-} ti990_geometry;
+};
 
 /*
     Physical sector address
 */
-typedef struct ti990_phys_sec_address
+struct ti990_phys_sec_address 
 {
 	int cylinder;
 	int head;
 	int sector;
-} ti990_phys_sec_address;
+};
 
 /*
     ti99 disk image descriptor
 */
-typedef struct ti990_image
+struct ti990_image 
 {
 	imgtool_stream *file_handle;		/* imgtool file handle */
 	ti990_geometry geometry;	/* geometry */
 	ti990_sc0 sec0;				/* cached copy of sector 0 */
-} ti990_image;
+};
 
 /*
     ti990 catalog iterator, used when imgtool reads the catalog
 */
-typedef struct ti990_iterator
+struct ti990_iterator 
 {
 	ti990_image *image;
 	int level;							/* current recursion level */
 	int nrc[MAX_DIR_LEVEL];				/* length of disk catalogs in records */
 	int index[MAX_DIR_LEVEL];			/* current index in the disk catalog */
 	directory_entry xdr[MAX_DIR_LEVEL];	/* fdr records */
-} ti990_iterator;
+};
 
 
 static imgtoolerr_t ti990_image_init(imgtool_image *img, imgtool_stream *f);

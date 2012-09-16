@@ -66,7 +66,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _core_file core_file;
+struct core_file;
 
 
 

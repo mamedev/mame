@@ -36,7 +36,7 @@
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
-typedef struct _tms7000_state tms7000_state;
+struct tms7000_state;
 
 /* Private prototypes */
 
@@ -64,7 +64,7 @@ static UINT16 bcd_sub( UINT16 a, UINT16 b);
 #define PULLBYTE(b) b = RM(pSP); pSP--
 #define PULLWORD(w) w.b.l = RM(pSP); pSP--; w.b.h = RM(pSP); pSP--
 
-struct _tms7000_state
+struct tms7000_state
 {
 	PAIR		pc; 		/* Program counter */
 	UINT8		sp;		/* Stack Pointer */

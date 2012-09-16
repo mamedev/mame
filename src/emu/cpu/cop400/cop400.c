@@ -82,7 +82,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _cop400_opcode_map cop400_opcode_map;
+struct cop400_opcode_map;
 
 struct cop400_state
 {
@@ -151,7 +151,7 @@ struct cop400_state
 
 typedef void (*cop400_opcode_func) (cop400_state *cpustate, UINT8 opcode);
 
-struct _cop400_opcode_map {
+struct cop400_opcode_map {
 	unsigned cycles;
 	cop400_opcode_func function;
 };

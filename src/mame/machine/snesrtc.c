@@ -22,14 +22,14 @@ enum
 	RTCM_Write
 };
 
-struct _snes_rtc_state
+struct snes_rtc_state
 {
 	UINT8  ram[13];
 	INT32  mode;
 	INT8   index;
 };
 
-static _snes_rtc_state rtc_state;
+static snes_rtc_state rtc_state;
 
 static const UINT8 srtc_months[12] =
 {

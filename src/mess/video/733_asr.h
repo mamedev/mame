@@ -9,10 +9,10 @@ enum
 	asr733_chr_region_len	= 128*asr733_single_char_len
 };
 
-typedef struct asr733_init_params_t
+struct asr733_init_params_t 
 {
 	void (*int_callback)(running_machine &machine, int state);
-} asr733_init_params_t;
+};
 
 GFXDECODE_EXTERN( asr733 );
 

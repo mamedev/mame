@@ -30,7 +30,7 @@ added external port callback, and functions to set the volume of the channels
 #define  KDAC_A_PCM_MAX    (2)		/* Channels per chip */
 
 
-typedef struct kdacApcm
+struct KDAC_A_PCM 
 {
 	UINT8			vol[KDAC_A_PCM_MAX][2];	/* volume for the left and right channel */
 	UINT32			addr[KDAC_A_PCM_MAX];
@@ -48,7 +48,7 @@ typedef struct kdacApcm
 	sound_stream *	stream;
 	const k007232_interface *intf;
 	UINT32			fncode[0x200];
-} KDAC_A_PCM;
+};
 
 
 #define   BASE_SHIFT    (12)

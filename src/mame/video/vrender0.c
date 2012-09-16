@@ -20,7 +20,7 @@ Missing:
 
 **************/
 
-struct _Quad
+struct QuadInfo
 {
 	UINT16 *Dest;
 	UINT32 Pitch;	//in UINT16s
@@ -50,7 +50,7 @@ struct _Quad
 	UINT32 DstColor;
 };
 
-struct _RenderState 
+struct RenderStateInfo
 {
 	UINT32 Tx;
 	UINT32 Ty;
@@ -81,7 +81,7 @@ struct vr0video_state
 	UINT16 InternalPalette[256];
 	UINT32 LastPalUpdate;
 
-	_RenderState RenderState;
+	RenderStateInfo RenderState;
 };
 
 
@@ -135,7 +135,7 @@ INLINE UINT16 Shade(UINT16 Src, UINT32 Shade)
 	return RGB16(scr, scg, scb);
 }
 
-static UINT16 Alpha(_Quad *Quad, UINT16 Src, UINT16 Dst)
+static UINT16 Alpha(QuadInfo *Quad, UINT16 Src, UINT16 Dst)
 {
 	UINT32 scr = (EXTRACTR8(Src) * ((Quad->Shade >> 16) & 0xff)) >> 8;
 	UINT32 scg = (EXTRACTG8(Src) * ((Quad->Shade >>  8) & 0xff)) >> 8;
@@ -238,7 +238,7 @@ static UINT16 Alpha(_Quad *Quad, UINT16 Src, UINT16 Dst)
 }
 
 #define TILENAME(bpp, t, a) \
-static void DrawQuad##bpp##t##a(_Quad *Quad)
+static void DrawQuad##bpp##t##a(QuadInfo *Quad)
 
 //TRUST ON THE COMPILER OPTIMIZATIONS
 #define TILETEMPL(bpp, t, a) \
@@ -338,7 +338,7 @@ TILETEMPL(4,1,0) TILETEMPL(4,1,1) TILETEMPL(4,1,2)
 DrawQuad##bpp##t##a
 
 
-static void DrawQuadFill(_Quad *Quad)
+static void DrawQuadFill(QuadInfo *Quad)
 {
 	UINT32 x, y;
 	UINT16 *line = Quad->Dest;
@@ -358,7 +358,7 @@ static void DrawQuadFill(_Quad *Quad)
 	}
 }
 
-typedef void (*_DrawTemplate)(_Quad *);
+typedef void (*_DrawTemplate)(QuadInfo *);
 
 static const _DrawTemplate DrawImage[]=
 {
@@ -486,7 +486,7 @@ int vrender0_ProcessPacket(device_t *device, UINT32 PacketPtr, UINT16 *Dest, UIN
 
 	if (Packet0 & 0x100)
 	{
-		_Quad Quad;
+		QuadInfo Quad;
 
 		Quad.Pitch = 512;
 

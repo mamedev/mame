@@ -114,20 +114,20 @@
 #pragma mark MISCELLANEOUS UTILITIES
 #endif
 
-typedef struct UINT16BE
+struct UINT16BE 
 {
 	UINT8 bytes[2];
-} UINT16BE;
+};
 
-typedef struct UINT24BE
+struct UINT24BE 
 {
 	UINT8 bytes[3];
-} UINT24BE;
+};
 
-typedef struct UINT32BE
+struct UINT32BE 
 {
 	UINT8 bytes[4];
-} UINT32BE;
+};
 
 INLINE UINT16 get_UINT16BE(UINT16BE word)
 {
@@ -181,27 +181,27 @@ typedef UINT32BE mac_type;
 /*
     point record, with the y and x coordinates
 */
-typedef struct mac_point
+struct mac_point 
 {
 	UINT16BE v;		/* actually signed */
 	UINT16BE h;		/* actually signed */
-} mac_point;
+};
 
 /*
     rect record, with the corner coordinates
 */
-typedef struct mac_rect
+struct mac_rect 
 {
 	UINT16BE top;	/* actually signed */
 	UINT16BE left;	/* actually signed */
 	UINT16BE bottom;/* actually signed */
 	UINT16BE right;	/* actually signed */
-} mac_rect;
+};
 
 /*
     FInfo (Finder file info) record
 */
-typedef struct mac_FInfo
+struct mac_FInfo
 {
 	mac_type  type;			/* file type */
 	mac_type  creator;		/* file creator */
@@ -221,12 +221,12 @@ typedef struct mac_FInfo
 							/* HFS & HFS+:
                                 System 7: The window in which the file???s icon appears
                                 System 8: reserved (set to 0) */
-} mac_FInfo;
+};
 
 /*
     FXInfo (Finder extended file info) record -- not found in MFS
 */
-typedef struct mac_FXInfo
+struct mac_FXInfo 
 {
 	UINT16BE iconID;		/* System 7: An ID number for the file???s icon; the
                                 numbers that identify icons are assigned by the
@@ -243,12 +243,12 @@ typedef struct mac_FXInfo
                                 file onto the desktop, the directory ID of the
                                 folder from which the user moves the file is
                                 saved here) */
-} mac_FXInfo;
+};
 
 /*
     DInfo (Finder folder info) record -- not found in MFS
 */
-typedef struct mac_DInfo
+struct mac_DInfo
 {
 	mac_rect rect;			/* Folder's window bounds */
 	UINT16BE flags;			/* Finder flags, e.g. kIsInvisible, kNameLocked, etc */
@@ -259,12 +259,12 @@ typedef struct mac_DInfo
 	UINT16BE view;			/* System 7: The manner in which folders are
                                 displayed */
 							/* System 8: reserved (set to 0) */
-} mac_DInfo;
+};
 
 /*
     DXInfo (Finder extended folder info) record -- not found in MFS
 */
-typedef struct mac_DXInfo
+struct mac_DXInfo 
 {
 	mac_point scroll;		/* Scroll position */
 	UINT32BE openChain;		/* System 7: chain of directory IDs for open folders */
@@ -279,7 +279,7 @@ typedef struct mac_DXInfo
                                 folder onto the desktop, the directory ID of
                                 the folder from which the user moves it is
                                 saved here) */
-} mac_DXInfo;
+};
 
 /*
     defines for FInfo & DInfo flags fields
@@ -609,11 +609,11 @@ static void mac_strncpy(UINT8 *dest, int n, const UINT8 *src)
 /*
     disk image reference
 */
-typedef struct mac_l1_imgref
+struct mac_l1_imgref 
 {
 	imgtool_image *image;
 	UINT32 heads;
-} mac_l1_imgref;
+};
 
 
 
@@ -752,12 +752,10 @@ enum mac_format
 
 enum mac_forkID { data_fork = 0x00, rsrc_fork = 0xff };
 
-typedef struct mac_l2_imgref mac_l2_imgref;
-
 /*
     MFS image ref
 */
-typedef struct mfs_l2_imgref
+struct mfs_l2_imgref 
 {
 	UINT16 dir_num_files;
 	UINT16 dir_start;
@@ -769,16 +767,16 @@ typedef struct mfs_l2_imgref
 
 	unsigned char ABlink_dirty[13];	/* dirty flag for each disk block in the ABlink array */
 	UINT8 ABlink[6141];
-} mfs_l2_imgref;
+};
 
 /*
     HFS extent descriptor
 */
-typedef struct hfs_extent
+struct hfs_extent 
 {
 	UINT16BE stABN;			/* first allocation block */
 	UINT16BE numABlks;		/* number of allocation blocks */
-} hfs_extent;
+};
 
 /*
     HFS likes to group extents by 3 (it is 8 with HFS+), so we create a
@@ -789,26 +787,26 @@ typedef hfs_extent hfs_extent_3[3];
 /*
     MFS open file ref
 */
-typedef struct mfs_fileref
+struct mfs_fileref 
 {
 	UINT16 stBlk;					/* first allocation block of file */
-} mfs_fileref;
+};
 
 /*
     HFS open file ref
 */
-typedef struct hfs_fileref
+struct hfs_fileref 
 {
 	hfs_extent_3 extents;			/* first 3 file extents */
 
 	UINT32 parID;					/* CNID of parent directory (undefined for extent & catalog files) */
 	mac_str31 filename;				/* file name (undefined for extent & catalog files) */
-} hfs_fileref;
+};
 
 /*
     MFS/HFS open file ref
 */
-typedef struct mac_fileref
+struct u 
 {
 	mac_l2_imgref *l2_img;			/* image pointer */
 
@@ -828,13 +826,13 @@ typedef struct mac_fileref
 	{
 		mfs_fileref mfs;
 		hfs_fileref hfs;
-	} u;
+	};
 } mac_fileref;
 
 /*
     open BT ref
 */
-typedef struct mac_BTref
+struct mac_BTref 
 {
 	mac_fileref fileref;	/* open B-tree file ref */
 
@@ -849,7 +847,7 @@ typedef struct mac_BTref
 	int (*key_compare_func)(const void *key1, const void *key2);
 
 	void *node_buf;			/* current node buffer */
-} mac_BTref;
+};
 
 /*
     Constants for BTHeaderRec attributes field
@@ -864,7 +862,7 @@ enum
 /*
     HFS image ref
 */
-typedef struct hfs_l2_imgref
+struct hfs_l2_imgref 
 {
 	UINT16 VBM_start;
 
@@ -876,7 +874,7 @@ typedef struct hfs_l2_imgref
 	mac_BTref cat_BT;
 
 	UINT8 VBM[8192];
-} hfs_l2_imgref;
+};
 
 /*
     MFS/HFS image ref
@@ -903,7 +901,7 @@ struct mac_l2_imgref
 /*
     MFS Master Directory Block
 */
-typedef struct mfs_mdb_t
+struct mfs_mdb_ 
 {
 	UINT8    sigWord[2];	/* volume signature - always $D2D7 */
 	UINT32BE crDate;		/* date and time of volume creation */
@@ -938,12 +936,12 @@ typedef struct mfs_mdb_t
                             was that the disk utility could rely on the tag
                             data to rebuild the link array if it should ever
                             be corrupted. */
-} mfs_mdb_;
+};
 
 /*
     HFS Master Directory Block
 */
-typedef struct hfs_mdb_t
+struct v1 
 {
 /* First fields are similar to MFS, though several fields have a different meaning */
 	UINT8    sigWord[2];	/* volume signature - always $D2D7 */
@@ -983,7 +981,7 @@ typedef struct hfs_mdb_t
 			UINT16BE VCSize;		/* size (in blocks) of volume cache */
 			UINT16BE VBMCSize;		/* size (in blocks) of volume bitmap cache */
 			UINT16BE ctlCSize;		/* size (in blocks) of common volume cache */
-		} v1;
+		};
 		struct
 		{
 			UINT16BE embedSigWord;	/* embedded volume signature */
@@ -998,17 +996,17 @@ typedef struct hfs_mdb_t
 } hfs_mdb_t;
 
 /* to save a little stack space, we use the same buffer for MDB and next blocks */
-typedef union img_open_buf
+union img_open_buf 
 {
 	mfs_mdb_t mfs_mdb;
 	hfs_mdb_t hfs_mdb;
 	UINT8 raw[512];
-} img_open_buf;
+};
 
 /*
     Information extracted from catalog/directory
 */
-typedef struct mac_dirent
+struct mac_dirent 
 {
 	UINT16 dataRecType;			/* type of data record */
 
@@ -1026,14 +1024,14 @@ typedef struct mac_dirent
 
 	UINT32 createDate;			/* date and time of creation */
 	UINT32 modifyDate;			/* date and time of last modification */
-} mac_dirent;
+};
 
 /*
     Tag record for GCR floppies (12 bytes)
 
     And, no, I don't know the format of the 20-byte tag record of the HD20
 */
-typedef struct floppy_tag_record
+struct floppy_tag_record 
 {
 	UINT32BE fileID;			/* a.k.a. CNID */
 								/* a value of 1 seems to be the default for non-AB blocks, but this is not consistent */
@@ -1051,7 +1049,7 @@ typedef struct floppy_tag_record
                                     each time a volume is written to, the current value of
                                     wrCnt is written in the tag field, then it is incremented */
 								/* (DV17 says "disk block number", but it cannot be true) */
-} floppy_tag_record;
+};
 
 #ifdef UNUSED_FUNCTION
 static void hfs_image_close(mac_l2_imgref *l2_img);
@@ -1452,7 +1450,7 @@ static imgtoolerr_t mac_file_seteof(mac_fileref *fileref, UINT32 newEof)
     files appear does not match file names, and it does not always match file
     IDs.
 */
-typedef struct mfs_dir_entry
+struct mfs_dir_entry 
 {
 	UINT8    flags;				/* bit 7=1 if entry used, bit 0=1 if file locked */
 								/* 0x00 means end of block: if we are not done
@@ -1478,7 +1476,7 @@ typedef struct mfs_dir_entry
 								/* next chars are file name - 255 chars at most */
 								/* IIRC, Finder 7 only supports 31 chars,
                                 wheareas earlier versions support 63 chars */
-} mfs_dir_entry;
+};
 
 /*
     FOBJ desktop resource: describes a folder, or the location of the volume
@@ -1487,7 +1485,7 @@ typedef struct mfs_dir_entry
     In typical Apple manner, this resource is not documented.  However, I have
     managed to reverse engineer some parts of it.
 */
-typedef struct mfs_FOBJ
+struct mfs_FOBJ
 {
 	UINT8 unknown0[2];		/* $00: $0004 for disk, $0008 for folder??? */
 	mac_point location;		/* $02: location in parent window */
@@ -1522,19 +1520,19 @@ typedef struct mfs_FOBJ
 			UINT8 name[1];			/* variable-length macintosh string */
 		} v2;
 	} u;
-} mfs_FOBJ;
+};
 
 /*
     MFS open dir ref
 */
-typedef struct mfs_dirref
+struct mfs_dirref 
 {
 	mac_l2_imgref *l2_img;			/* image pointer */
 	UINT16 index;					/* current file index in the disk directory */
 	UINT16 cur_block;				/* current block offset in directory file */
 	UINT16 cur_offset;				/* current byte offset in current block of directory file */
 	UINT8 block_buffer[512];		/* buffer with current directory block */
-} mfs_dirref;
+};
 
 
 
@@ -2770,13 +2768,13 @@ static int mfs_hashString(const mac_str255 string)
 /*
     HFS extents B-tree key
 */
-typedef struct hfs_extentKey
+struct hfs_extentKey 
 {
 	UINT8    keyLength;		/* length of key, excluding this field */
 	UINT8    forkType;		/* 0 = data fork, FF = resource fork */
 	UINT32BE fileID;		/* file ID */
 	UINT16BE startBlock;	/* first file allocation block number in this extent */
-} hfs_extentKey;
+};
 enum
 {
 	keyLength_hfs_extentKey = sizeof(hfs_extentKey) - sizeof(UINT8)
@@ -2785,7 +2783,7 @@ enum
 /*
     HFS catalog B-tree key
 */
-typedef struct hfs_catKey
+struct hfs_catKey 
 {
 	UINT8    keyLen;		/* key length */
 	UINT8    resrv1;		/* reserved */
@@ -2793,12 +2791,12 @@ typedef struct hfs_catKey
 	mac_str31 cName;		/* catalog node name */
 							/* note that in index nodes, it is a mac_str31, but
                                 in leaf keys it's a variable-length string */
-} hfs_catKey;
+};
 
 /*
     HFS catalog data record for a folder - 70 bytes
 */
-typedef struct hfs_catFolderData
+struct hfs_catFolderData 
 {
 	UINT16BE recordType;		/* record type */
 	UINT16BE flags;				/* folder flags */
@@ -2810,12 +2808,12 @@ typedef struct hfs_catFolderData
 	mac_DInfo userInfo;			/* Finder information */
 	mac_DXInfo finderInfo;		/* additional Finder information */
 	UINT32BE reserved[4];		/* reserved - set to zero */
-} hfs_catFolderData;
+};
 
 /*
     HFS catalog data record for a file - 102 bytes
 */
-typedef struct hfs_catFileData
+struct hfs_catFileData 
 {
 	UINT16BE recordType;		/* record type */
 	UINT8    flags;				/* file flags */
@@ -2836,7 +2834,7 @@ typedef struct hfs_catFileData
 	hfs_extent_3 dataExtents;	/* first data fork extent record */
 	hfs_extent_3 rsrcExtents;	/* first resource fork extent record */
 	UINT32BE reserved;			/* reserved - set to zero */
-} hfs_catFileData;
+};
 
 /*
     HFS catalog data record for a thread - 46 bytes
@@ -2844,24 +2842,24 @@ typedef struct hfs_catFileData
     The key for a thread record features the CNID of the item and an empty
     name, instead of the CNID of the parent and the item name.
 */
-typedef struct hfs_catThreadData
+struct hfs_catThreadData 
 {
 	UINT16BE recordType;		/* record type */
 	UINT32BE reserved[2];		/* reserved - set to zero */
 	UINT32BE parID;				/* parent ID for this catalog node */
 	mac_str31 nodeName;			/* name of this catalog node */
-} hfs_catThreadData;
+};
 
 /*
     union for all types at once
 */
-typedef union hfs_catData
+union hfs_catData 
 {
 	UINT16BE dataType;
 	hfs_catFolderData folder;
 	hfs_catFileData file;
 	hfs_catThreadData thread;
-} hfs_catData;
+};
 
 /*
     HFS catalog record types
@@ -2890,12 +2888,12 @@ enum
 /*
     BT functions used by HFS functions
 */
-typedef struct BT_leaf_rec_enumerator
+struct BT_leaf_rec_enumerator 
 {
 	mac_BTref *BTref;
 	UINT32 cur_node;
 	int cur_rec;
-} BT_leaf_rec_enumerator;
+};
 
 static imgtoolerr_t BT_open(mac_BTref *BTref, int (*key_compare_func)(const void *key1, const void *key2), int is_extent);
 static void BT_close(mac_BTref *BTref);
@@ -2907,12 +2905,12 @@ static imgtoolerr_t BT_get_keyed_record_data(mac_BTref *BTref, void *rec_ptr, in
 static imgtoolerr_t BT_leaf_rec_enumerator_open(mac_BTref *BTref, BT_leaf_rec_enumerator *enumerator);
 static imgtoolerr_t BT_leaf_rec_enumerator_read(BT_leaf_rec_enumerator *enumerator, void **record_ptr, int *rec_len);
 
-typedef struct hfs_cat_enumerator
+struct hfs_cat_enumerator 
 {
 	mac_l2_imgref *l2_img;
 	BT_leaf_rec_enumerator BT_enumerator;
 	UINT32 parID;
-} hfs_cat_enumerator;
+};
 
 /*
     hfs_open_extents_file
@@ -3640,7 +3638,7 @@ static imgtoolerr_t hfs_file_get_nth_block_address(mac_fileref *fileref, UINT32 
 
     Header of a node record
 */
-typedef struct BTNodeHeader
+struct BTNodeHeader 
 {
 	UINT32BE fLink;			/* (index of) next node at this level */
 	UINT32BE bLink;			/* (index of) previous node at this level */
@@ -3650,7 +3648,7 @@ typedef struct BTNodeHeader
                                 parent, whatever IM says) */
 	UINT16BE numRecords;	/* number of records in this node */
 	UINT16BE reserved;		/* reserved; set to zero */
-} BTNodeHeader;
+};
 
 /*
     Constants for BTNodeHeader kind field
@@ -3672,7 +3670,7 @@ enum
     BTHeaderRecord: first record of a B-tree header node (second record is
     unused, and third is node allocation bitmap).
 */
-typedef struct BTHeaderRecord
+struct BTHeaderRecord 
 {
 	UINT16BE treeDepth;		/* maximum height (usually leaf nodes) */
 	UINT32BE rootNode;		/* node number of root node */
@@ -3693,7 +3691,7 @@ typedef struct BTHeaderRecord
 	UINT8    reserved2;		/* reserved */
 	UINT32BE attributes;	/* persistent attributes about the tree */
 	UINT32BE reserved3[16];	/* reserved */
-} BTHeaderRecord;
+};
 
 static imgtoolerr_t BT_check(mac_BTref *BTref, int is_extent);
 
@@ -3955,13 +3953,13 @@ static imgtoolerr_t BT_get_keyed_record_data(mac_BTref *BTref, void *rec_ptr, in
 
     Return imgtool error code
 */
-typedef struct data_nodes_t
+struct data_nodes_t 
 {
 	void *buf;
 	UINT32 node_num;
 	UINT32 cur_rec;
 	UINT32 num_recs;
-} data_nodes_t;
+};
 static imgtoolerr_t BT_check(mac_BTref *BTref, int is_extent)
 {
 	UINT16 node_numRecords;
@@ -4842,13 +4840,13 @@ static imgtoolerr_t BT_leaf_rec_enumerator_read(BT_leaf_rec_enumerator *enumerat
 /*
     Resource header
 */
-typedef struct rsrc_header
+struct rsrc_header 
 {
 	UINT32BE data_offs;		/* Offset from beginning of resource fork to resource data */
 	UINT32BE map_offs;		/* Offset from beginning of resource fork to resource map */
 	UINT32BE data_len;		/* Length of resource data */
 	UINT32BE map_len;		/* Length of resource map */
-} rsrc_header;
+};
 
 /*
     Resource data: each data entry is preceded by its len (UINT32BE)
@@ -4858,7 +4856,7 @@ typedef struct rsrc_header
 /*
     Resource map:
 */
-typedef struct rsrc_map_header
+struct rsrc_map_header 
 {
 	rsrc_header reserved0;	/* Reserved for copy of resource header */
 	UINT32BE reserved1;		/* Reserved for handle to next resource map */
@@ -4869,22 +4867,22 @@ typedef struct rsrc_map_header
 	UINT16BE namelist_offs;	/* Offset from beginning of map to resource name list */
 	UINT16BE type_count;	/* Number of types in the map minus 1 */
 							/* This is actually part of the type list, which matters for offsets */
-} rsrc_map_header;
+};
 
 /*
     Resource type list entry
 */
-typedef struct rsrc_type_entry
+struct rsrc_type_entry 
 {
 	UINT32BE type;			/* Resource type */
 	UINT16BE ref_count;		/* Number of resources of this type in map minus 1 */
 	UINT16BE ref_offs;		/* Offset from beginning of resource type list to reference list for this type */
-} rsrc_type_entry;
+};
 
 /*
     Resource reference list entry
 */
-typedef struct rsrc_ref_entry
+struct rsrc_ref_entry 
 {
 	UINT16BE id;			/* Resource ID */
 	UINT16BE name_offs;		/* Offset from beginning of resource name list to resource name */
@@ -4892,13 +4890,13 @@ typedef struct rsrc_ref_entry
 	UINT8 attr;				/* Resource attributes */
 	UINT24BE data_offs;		/* Offset from beginning of resource data to data for this resource */
 	UINT32BE reserved;		/* Reserved for handle to resource */
-} rsrc_ref_entry;
+};
 
 /*
     Resource name list entry: this is just a standard macintosh string
 */
 
-typedef struct mac_resfileref
+struct mac_resfileref 
 {
 	mac_fileref fileref;	/* open resource fork ref (you may open resources
                                 files in data fork, too, if you ever need to,
@@ -4911,7 +4909,7 @@ typedef struct mac_resfileref
 	UINT16 namelist_offs;	/* Offset from beginning of map to resource name list */
 	UINT16 type_count;		/* Number of types in the map minus 1 */
 							/* This is actually part of the type list, which matters for offsets */
-} mac_resfileref;
+};
 
 #ifdef UNUSED_FUNCTION
 /*
@@ -5311,7 +5309,7 @@ static void mac_image_info(imgtool_image *img, char *string, size_t len)
 /*
     MFS/HFS catalog iterator, used when imgtool reads the catalog
 */
-typedef struct mac_iterator
+struct mac_iterator
 {
 	mac_format format;
 	mac_l2_imgref *l2_img;
@@ -5326,7 +5324,7 @@ typedef struct mac_iterator
 			hfs_cat_enumerator catref;		/* catalog file enumerator */
 		} hfs;
 	} u;
-} mac_iterator;
+};
 
 /*
     Open the disk catalog for enumeration

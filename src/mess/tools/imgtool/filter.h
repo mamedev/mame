@@ -14,7 +14,7 @@
 
 #include "library.h"
 
-typedef struct _imgtool_filter imgtool_filter;
+struct imgtool_filter;
 
 enum
 {

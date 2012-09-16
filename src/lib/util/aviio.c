@@ -169,7 +169,7 @@ struct avi_stream
 };
 
 
-struct _avi_file
+struct avi_file
 {
 	/* shared data */
 	osd_file *			file;					/* pointer to open file */

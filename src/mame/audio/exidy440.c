@@ -38,7 +38,7 @@
 
 
 /* channel_data structure holds info about each 6844 DMA channel */
-typedef struct m6844_channel_data
+struct m6844_channel_data 
 {
 	int active;
 	int address;
@@ -46,20 +46,20 @@ typedef struct m6844_channel_data
 	UINT8 control;
 	int start_address;
 	int start_counter;
-} m6844_channel_data;
+};
 
 
 /* channel_data structure holds info about each active sound channel */
-typedef struct sound_channel_data
+struct sound_channel_data 
 {
 	INT16 *base;
 	int offset;
 	int remaining;
-} sound_channel_data;
+};
 
 
 /* sound_cache_entry structure contains info on each decoded sample */
-typedef struct sound_cache_entry
+struct sound_cache_entry 
 {
 	struct sound_cache_entry *next;
 	int address;
@@ -67,7 +67,7 @@ typedef struct sound_cache_entry
 	int bits;
 	int frequency;
 	INT16 data[1];
-} sound_cache_entry;
+};
 
 
 

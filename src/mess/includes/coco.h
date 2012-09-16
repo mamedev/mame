@@ -179,38 +179,38 @@ private:
 	static const device_timer_id TIMER_HIRES_JOYSTICK_Y = 1;
 	static const device_timer_id TIMER_DIECOM_LIGHTGUN = 2;
 
-	typedef enum
+	enum soundmux_status_t
 	{
 		SOUNDMUX_SEL1 = 1,
 		SOUNDMUX_SEL2 = 2,
 		SOUNDMUX_ENABLE = 4
-	} soundmux_status_t;
+	};
 
-	typedef enum
+	enum joystick_type_t
 	{
 		JOYSTICK_NONE = 0x00,
 		JOYSTICK_NORMAL = 0x01,
 		JOYSTICK_RAT_MOUSE = 0x02,
 		JOYSTICK_DIECOM_LIGHT_GUN = 0x03
-	} joystick_type_t;
+	};
 
-	typedef enum
+	enum hires_type_t
 	{
 		HIRES_NONE = 0x00,
 		HIRES_RIGHT = 0x01,
 		HIRES_RIGHT_COCOMAX3 = 0x02,
 		HIRES_LEFT = 0x03,
 		HIRES_LEFT_COCOMAX3 = 0x04,
-	} hires_type_t;
+	};
 
-	typedef struct
+	struct analog_input_t
 	{
 		ioport_port *m_input[2][2];
 		ioport_port *m_buttons;
 
 		UINT8 input(int joystick, int axis) const { return m_input[joystick][axis] ? m_input[joystick][axis]->read() : 0x00; }
 		UINT8 buttons(void) const { return m_buttons ? m_buttons->read() : 0x00; }
-	} analog_input_t;
+	};
 
 	void analog_port_start(analog_input_t *analog, const char *rx_tag, const char *ry_tag, const char *lx_tag, const char *ly_tag, const char *buttons_tag);
 

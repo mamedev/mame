@@ -12,8 +12,7 @@
 #include "upd7002.h"
 
 
-typedef struct _uPD7002_t uPD7002_t;
-struct _uPD7002_t
+struct uPD7002_t
 {
 	/* Pointer to our interface */
 	const uPD7002_interface *intf;

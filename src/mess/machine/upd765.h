@@ -91,7 +91,7 @@ typedef device_t *(*upd765_get_image_func)(device_t *device, int floppy_index);
 #define UPD765_GET_IMAGE(name)	device_t *name(device_t *device, int floppy_index )
 
 
-typedef struct upd765_interface
+struct upd765_interface 
 {
 	/* interrupt issued */
 	devcb_write_line out_int_func;
@@ -105,7 +105,7 @@ typedef struct upd765_interface
 	UPD765_RDY_PIN rdy_pin;
 
 	const char *floppy_drive_tags[4];
-} upd765_interface;
+};
 
 
 /***************************************************************************

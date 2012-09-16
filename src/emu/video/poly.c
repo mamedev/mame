@@ -41,7 +41,7 @@
 ***************************************************************************/
 
 /* forward definitions */
-typedef struct _polygon_info polygon_info;
+struct polygon_info;
 
 
 /* tri_extent describes start/end points for a scanline */
@@ -112,8 +112,7 @@ struct quad_work_unit
 
 
 /* work_unit is a union of the two types */
-typedef union _work_unit work_unit;
-union _work_unit
+union work_unit
 {
 	work_unit_shared	shared;					/* shared data */
 	tri_work_unit		tri;					/* triangle work unit */
@@ -122,7 +121,7 @@ union _work_unit
 
 
 /* polygon_info describes a single polygon, which includes the poly_params */
-struct _polygon_info
+struct polygon_info
 {
 	poly_manager *		poly;					/* pointer back to the poly manager */
 	void *				dest;					/* pointer to the destination we are rendering to */
@@ -137,7 +136,7 @@ struct _polygon_info
 
 
 /* full poly manager description */
-struct _poly_manager
+struct poly_manager
 {
 	/* queue management */
 	osd_work_queue *	queue;					/* work queue */

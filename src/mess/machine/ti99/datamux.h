@@ -23,7 +23,7 @@ extern const device_type DATAMUX;
     if the HGSPL expansion card is used, the GROMs in the console must be
     removed.
 */
-typedef struct _dmux_device_list_entry
+struct dmux_device_list_entry 
 {
 	const char				*name;				// Name of the device (used for looking up the device)
 	UINT16					select;				// State of the address line bits when addressing this device
@@ -32,16 +32,16 @@ typedef struct _dmux_device_list_entry
 	const char				*setting;			// configuration switch that may have an effect for the presence of this device
 	UINT8					set;				// bits that must be set for this switch so that this device is present
 	UINT8					unset;				// bits that must be reset for this switch so that this device is present
-} dmux_device_list_entry;
+};
 
 #define DMUX_CONFIG(name) \
 	const datamux_config(name) =
 
-typedef struct _datamux_config
+struct datamux_config 
 {
 	devcb_write_line				ready;
 	const dmux_device_list_entry	*devlist;
-} datamux_config;
+};
 
 /*
     Device list of this datamux.

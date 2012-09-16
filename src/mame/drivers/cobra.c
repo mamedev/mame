@@ -437,12 +437,12 @@ private:
 class cobra_fifo
 {
 public:
-	typedef enum
+	enum EventType
 	{
 		EVENT_EMPTY,
 		EVENT_HALF_FULL,
 		EVENT_FULL,
-	} EventType;
+	};
 
 	typedef delegate<void (EventType)> event_delegate;
 

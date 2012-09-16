@@ -42,13 +42,13 @@
 
 extern const device_type TMS9902;
 
-typedef struct _tms9902_interface
+struct tms9902_interface 
 {
 	devcb_write_line	int_callback;
 	devcb_write_line	rcv_callback;
 	devcb_write8		xmit_callback;
 	devcb_write8		ctrl_callback;
-} tms9902_interface;
+};
 
 class tms9902_device : public device_t
 {

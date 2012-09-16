@@ -12,6 +12,7 @@
 #include "sound/beep.h"
 #include "video/mc6845.h"
 
+struct kay_kbd_t;
 
 class kaypro_state : public driver_device
 {
@@ -65,7 +66,7 @@ public:
 	UINT8 m_framecnt;
 	UINT16 m_cursor;
 	UINT16 m_mc6845_video_address;
-	struct _kay_kbd_t *m_kbd;
+	kay_kbd_t *m_kbd;
 	void mc6845_cursor_configure();
 	void mc6845_screen_configure();
 	DECLARE_MACHINE_START(kayproii);

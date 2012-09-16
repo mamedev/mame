@@ -77,10 +77,10 @@ extern const device_type V9938VIDEO;
 extern const device_type TISOUND_94624;
 extern const device_type TISOUND_76496;
 
-typedef struct _ti_sound_config
+struct ti_sound_config 
 {
 	devcb_write_line				ready;
-} ti_sound_config;
+};
 
 #define TI_SOUND_CONFIG(name) \
 	const ti_sound_config(name) =

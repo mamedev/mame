@@ -59,7 +59,7 @@ DMAC controller.
 #define ISTR_FF_FLG     (1<<1)  /* FIFO-Full Flag */
 #define ISTR_FE_FLG     (1<<0)  /* FIFO-Empty Flag */
 
-struct _dmac_data 
+struct dmac_data_t
 {
 	UINT16		istr;		/* Interrupt Status Register (R) */
 	UINT16		cntr;		/* Control Register (RW) */
@@ -69,7 +69,7 @@ struct _dmac_data
 	emu_timer *dma_timer;
 };
 
-static _dmac_data dmac_data;
+static dmac_data_t dmac_data;
 
 static void check_interrupts( running_machine &machine )
 {

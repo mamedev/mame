@@ -47,7 +47,7 @@ static void update_optic(int which);
 
 /* local vars */
 
-typedef struct _stepper
+struct stepper 
 {
 	const stepper_interface *intf;
 	UINT8	 pattern,	/* coil pattern */
@@ -64,7 +64,7 @@ typedef struct _stepper
 			index_patt;	/* pattern needed on coils (0=don't care) */
 
 	UINT8 optic;
-} stepper;
+};
 
 static stepper step[MAX_STEPPERS];
 

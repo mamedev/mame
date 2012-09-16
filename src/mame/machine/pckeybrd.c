@@ -167,7 +167,7 @@ static const int at_keyboard_scancode_set_2_3[]=
 
 #define AT_KEYBOARD_QUEUE_MAXSIZE	256
 
-typedef struct at_keyboard
+struct at_keyboard 
 {
 	AT_KEYBOARD_TYPE type;
 	int on;
@@ -184,15 +184,15 @@ typedef struct at_keyboard
 	int last_code;
 
 	ioport_port *ports[8];
-} at_keyboard;
+};
 
 static at_keyboard keyboard;
 
-typedef struct extended_keyboard_code
+struct extended_keyboard_code 
 {
 	const char *pressed;
 	const char *released;
-} extended_keyboard_code;
+};
 
 
 static const extended_keyboard_code keyboard_mf2_code[0x10][2/*numlock off, on*/]={

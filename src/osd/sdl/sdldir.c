@@ -57,7 +57,7 @@ typedef struct stat64 sdl_stat;
 
 #define HAS_DT_XXX defined(SDLMAME_LINUX) || defined(SDLMAME_BSD) || defined(SDLMAME_DARWIN)
 
-struct _osd_directory
+struct osd_directory
 {
 	osd_directory_entry ent;
 	sdl_dirent *data;

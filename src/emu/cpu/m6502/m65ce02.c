@@ -55,8 +55,7 @@
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
-typedef struct	_m65ce02_Regs m65ce02_Regs;
-struct	_m65ce02_Regs {
+struct	m65ce02_Regs {
 	void	(*const *insn)(m65ce02_Regs *); /* pointer to the function pointer table */
 	PAIR	ppc;			/* previous program counter */
 	PAIR	pc;				/* program counter */

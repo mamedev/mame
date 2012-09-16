@@ -10,8 +10,7 @@ used in the Neogeo pocket color.
 #include "emu.h"
 #include "k1ge.h"
 
-typedef struct k1ge k1ge_t;
-struct k1ge
+struct k1ge_t
 {
 	const k1ge_interface *intf;
 	screen_device *screen;

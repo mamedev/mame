@@ -12,7 +12,7 @@
 #include "sidvoice.h"
 
 /* private area */
-typedef struct __SID6581
+struct SID6581_t
 {
     device_t *device;
     sound_stream *mixer_channel; // mame stream/ mixer channel
@@ -54,15 +54,15 @@ typedef struct __SID6581
 
 	sidOperator optr1, optr2, optr3;
     int optr3_outputmask;
-} _SID6581;
+};
 
-void sid6581_init (_SID6581 *This);
+void sid6581_init (SID6581_t *This);
 
-int sidEmuReset(_SID6581 *This);
+int sidEmuReset(SID6581_t *This);
 
-int sid6581_port_r (running_machine &machine, _SID6581 *This, int offset);
-void sid6581_port_w (_SID6581 *This, int offset, int data);
+int sid6581_port_r (running_machine &machine, SID6581_t *This, int offset);
+void sid6581_port_w (SID6581_t *This, int offset, int data);
 
-void sidEmuFillBuffer(_SID6581 *This, stream_sample_t *buffer, UINT32 bufferLen );
+void sidEmuFillBuffer(SID6581_t *This, stream_sample_t *buffer, UINT32 bufferLen );
 
 #endif /* __SID_H__ */

@@ -10,7 +10,7 @@
 
 #define LFO_SHIFT	8
 
-struct _LFO
+struct LFO_t
 {
     unsigned short phase;
     UINT32 phase_step;
@@ -107,7 +107,7 @@ static void LFO_Init(running_machine &machine)
 	}
 }
 
-INLINE signed int PLFO_Step(struct _LFO *LFO)
+INLINE signed int PLFO_Step(LFO_t *LFO)
 {
 	int p;
     LFO->phase+=LFO->phase_step;
@@ -119,7 +119,7 @@ INLINE signed int PLFO_Step(struct _LFO *LFO)
 	return p<<(SHIFT-LFO_SHIFT);
 }
 
-INLINE signed int ALFO_Step(struct _LFO *LFO)
+INLINE signed int ALFO_Step(LFO_t *LFO)
 {
 	int p;
     LFO->phase+=LFO->phase_step;
@@ -131,7 +131,7 @@ INLINE signed int ALFO_Step(struct _LFO *LFO)
 	return p<<(SHIFT-LFO_SHIFT);
 }
 
-static void LFO_ComputeStep(struct _LFO *LFO,UINT32 LFOF,UINT32 LFOWS,UINT32 LFOS,int ALFO)
+static void LFO_ComputeStep(LFO_t *LFO,UINT32 LFOF,UINT32 LFOWS,UINT32 LFOS,int ALFO)
 {
     float step=(float) LFOFreq[LFOF]*256.0/(float)44100;
     LFO->phase_step=(unsigned int) ((float) (1<<LFO_SHIFT)*step);

@@ -39,7 +39,6 @@ struct shadow_table_data
 };
 
 
-/* typedef struct _palette_private palette_private; */
 struct palette_private
 {
 	bitmap_format		format;				/* format assumed for palette data */
@@ -57,7 +56,6 @@ struct palette_private
 };
 
 
-/* typedef struct _colortable_t colortable_t; */
 class colortable_t
 {
 public:

@@ -176,10 +176,10 @@ extern const device_type NCR7496_NEW;
 extern const device_type GAMEGEAR_NEW;
 extern const device_type SEGAPSG_NEW;
 
-typedef struct _sn76496_config
+struct sn76496_config 
 {
 	devcb_write_line		ready;
-} sn76496_config;
+};
 
 class sn76496_base_device : public device_t, public device_sound_interface
 {

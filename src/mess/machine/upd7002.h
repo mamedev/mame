@@ -47,8 +47,7 @@ typedef void (*uPD7002_eoc_func)(device_t *device, int data);
 #define UPD7002_EOC(name)	void name(device_t *device, int data )
 
 
-typedef struct _uPD7002_interface uPD7002_interface;
-struct _uPD7002_interface
+struct uPD7002_interface
 {
 	uPD7002_get_analogue_func get_analogue_func;
 	uPD7002_eoc_func		  EOC_func;

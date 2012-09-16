@@ -16,7 +16,7 @@
  *  8253 Programmable Interval Timer
  *
  *************************************/
-struct _pit8253_state
+struct pit8253_state
 {
 	union
 	{
@@ -39,7 +39,7 @@ struct tx1_sound_state
 	UINT32 m_step1;
 	UINT32 m_step2;
 
-	struct _pit8253_state m_pit8253;
+	pit8253_state m_pit8253;
 
 	UINT8 m_ay_outputa;
 	UINT8 m_ay_outputb;

@@ -60,7 +60,7 @@
 //**************************************************************************
 
 // forward references
-typedef struct _wav_file wav_file;
+struct wav_file;
 
 
 // structure describing an indexed mixer

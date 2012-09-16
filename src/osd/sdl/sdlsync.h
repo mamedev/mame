@@ -18,7 +18,7 @@
 
 /* osd_event is an opaque type which represents a setable/resetable event */
 
-typedef struct _osd_event osd_event;
+struct osd_event;
 
 
 /*-----------------------------------------------------------------------------
@@ -107,7 +107,7 @@ void osd_event_free(osd_event *event);
 ***************************************************************************/
 
 /* osd_thread is an opaque type which represents a thread */
-typedef struct _osd_thread osd_thread;
+struct osd_thread;
 
 
 /* osd_thread_callback is a callback function that will be called from the thread */
@@ -191,7 +191,7 @@ void osd_process_kill(void);
 //  Scalable Locks
 //============================================================
 
-typedef struct _osd_scalable_lock osd_scalable_lock;
+struct osd_scalable_lock;
 
 osd_scalable_lock *osd_scalable_lock_alloc(void);
 

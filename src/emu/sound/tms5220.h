@@ -121,7 +121,7 @@ extern const device_type TMC0285N;
 extern const device_type TMS5200N;
 
 
-typedef struct _tms52xx_config
+struct tms52xx_config 
 {
 	devcb_write_line		irq_func;					// IRQ callback function, active low, i.e. state=0  (TODO: change to ASSERT/CLEAR)
 	devcb_write_line		readyq_func;				// Ready callback function, active low, i.e. state=0
@@ -130,7 +130,7 @@ typedef struct _tms52xx_config
 	devcb_write8			load_address;				// speech ROM load address callback
 	devcb_write8			read_and_branch;			// speech ROM read and branch callback
 
-} tms52xx_config;
+};
 
 // Change back from 5220n to 5220 when all client drivers will be converted
 class tms52xx_device : public device_t, public device_sound_interface

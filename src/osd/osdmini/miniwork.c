@@ -47,7 +47,7 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-struct _osd_work_item
+struct osd_work_item
 {
 	void *result;
 };

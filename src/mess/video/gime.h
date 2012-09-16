@@ -141,11 +141,11 @@ private:
 		INTERRUPT_EI0		= 0x01
 	};
 
-	typedef enum
+	enum timer_type_t
 	{
 		GIME_TIMER_HBORD,
 		GIME_TIMER_CLOCK
-	} timer_type_t;
+	};
 
 	// timer constants
 	static const device_timer_id TIMER_GIME_CLOCK = 4;

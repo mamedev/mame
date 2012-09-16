@@ -30,10 +30,8 @@
 #include "audio/vboy.h"
 #include "vboy.lh"
 
-typedef struct _vboy_regs_t vboy_regs_t;
-
 /* FIXME: most if not all of these must be UINT8 */
-struct _vboy_regs_t
+struct vboy_regs_t
 {
 	UINT32 lpc, lpc2, lpt, lpr;
 	UINT32 khb, klb;
@@ -63,13 +61,13 @@ struct vip_regs_t
 	UINT16 BKCOL;
 };
 
-struct _vboy_timer_t
+struct vboy_timer_t
 {
 	UINT16 count;
 	UINT16 latch;
 };
 
-typedef struct _vboy_timer_t vboy_timer_t;
+struct vboy_timer_t;
 
 class vboy_state : public driver_device
 {

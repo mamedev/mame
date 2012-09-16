@@ -1,7 +1,7 @@
 #include "osdcore.h"
 #include "sound/wavwrite.h"
 
-struct _wav_file
+struct wav_file
 {
 	FILE *file;
 	UINT32 total_offs;
@@ -16,7 +16,7 @@ wav_file *wav_open(const char *filename, int sample_rate, int channels)
 	UINT16 align, temp16;
 
 	/* allocate memory for the wav struct */
-	wav = (wav_file *) osd_malloc(sizeof(struct _wav_file));
+	wav = (wav_file *) osd_malloc(sizeof(wav_file));
 	if (!wav)
 		return NULL;
 

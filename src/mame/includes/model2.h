@@ -1,8 +1,8 @@
 #include "video/poly.h"
 
 
-typedef struct _raster_state raster_state;
-typedef struct _geo_state geo_state;
+struct raster_state;
+struct geo_state;
 
 
 class model2_state : public driver_device

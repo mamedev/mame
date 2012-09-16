@@ -81,11 +81,11 @@ static const double DRTimes[64]={100000/*infinity*/,100000/*infinity*/,118200.0,
 					28.0,25.0,22.0,18.0,14.0,12.0,11.0,8.5,7.1,6.1,5.4,4.3,3.6,3.1};
 static INT32 EG_TABLE[0x400];
 
-enum _STATE {ATTACK,DECAY1,DECAY2,RELEASE};
-struct _EG
+enum STATE {ATTACK,DECAY1,DECAY2,RELEASE};
+struct EG_t
 {
 	int volume;	//
-	_STATE state;
+	STATE state;
 	int step;
 	//step vals
 	int AR;		//Attack
@@ -97,7 +97,7 @@ struct _EG
 	UINT8 LPLINK;
 };
 
-struct _SLOT
+struct SLOT
 {
 	union
 	{
@@ -111,9 +111,9 @@ struct _SLOT
 	UINT32 nxt_addr;	//next play address
 	UINT32 step;		//pitch step (24.8)
 	UINT8 Backwards;	//the wave is playing backwards
-	struct _EG EG;			//Envelope
-	struct _LFO PLFO;		//Phase LFO
-	struct _LFO ALFO;		//Amplitude LFO
+	EG_t EG;			//Envelope
+	LFO_t PLFO;		//Phase LFO
+	LFO_t ALFO;		//Amplitude LFO
 	int slot;
 	int cur_sample;       //current ADPCM sample
 	int cur_quant;        //current ADPCM step
@@ -155,8 +155,7 @@ struct _SLOT
 #define SCITMA	6
 #define SCITMB	7
 
-typedef struct _AICA aica_state;
-struct _AICA
+struct aica_state
 {
 	union
 	{
@@ -165,7 +164,7 @@ struct _AICA
 	} udata;
 	UINT16 IRQL, IRQR;
 	UINT16 EFSPAN[0x48];
-	struct _SLOT Slots[64];
+	SLOT Slots[64];
 	signed short RINGBUF[64];
 	unsigned char BUFPTR;
 	unsigned char *AICARAM;
@@ -200,7 +199,7 @@ struct _AICA
 
 	int ARTABLE[64], DRTABLE[64];
 
-	struct _AICADSP DSP;
+	AICADSP DSP;
 	device_t *device;
 };
 
@@ -341,7 +340,7 @@ static int Get_RR(aica_state *AICA,int base,int R)
 	return AICA->DRTABLE[Rate];
 }
 
-static void Compute_EG(aica_state *AICA,struct _SLOT *slot)
+static void Compute_EG(aica_state *AICA,SLOT *slot)
 {
 	int octave=(OCT(slot)^8)-8;
 	int rate;
@@ -358,9 +357,9 @@ static void Compute_EG(aica_state *AICA,struct _SLOT *slot)
 	slot->EG.DL=0x1f-DL(slot);
 }
 
-static void AICA_StopSlot(struct _SLOT *slot,int keyoff);
+static void AICA_StopSlot(SLOT *slot,int keyoff);
 
-static int EG_Update(struct _SLOT *slot)
+static int EG_Update(SLOT *slot)
 {
 	switch(slot->EG.state)
 	{
@@ -408,7 +407,7 @@ static int EG_Update(struct _SLOT *slot)
 	return (slot->EG.volume>>EG_SHIFT)<<(SHIFT-10);
 }
 
-static UINT32 AICA_Step(struct _SLOT *slot)
+static UINT32 AICA_Step(SLOT *slot)
 {
 	int octave=(OCT(slot)^8)-8+SHIFT-10;
 	UINT32 Fn=FNS(slot) + (0x400);
@@ -420,7 +419,7 @@ static UINT32 AICA_Step(struct _SLOT *slot)
 }
 
 
-static void Compute_LFO(struct _SLOT *slot)
+static void Compute_LFO(SLOT *slot)
 {
 	if(PLFOS(slot)!=0)
 		AICALFO_ComputeStep(&(slot->PLFO),LFOF(slot),PLFOWS(slot),PLFOS(slot),0);
@@ -450,7 +449,7 @@ INLINE signed short DecodeADPCM(int *PrevSignal, unsigned char Delta, int *PrevQ
 	return *PrevSignal;
 }
 
-static void AICA_StartSlot(aica_state *AICA, struct _SLOT *slot)
+static void AICA_StartSlot(aica_state *AICA, SLOT *slot)
 {
 	UINT64 start_offset;
 
@@ -480,7 +479,7 @@ static void AICA_StartSlot(aica_state *AICA, struct _SLOT *slot)
 	}
 }
 
-static void AICA_StopSlot(struct _SLOT *slot,int keyoff)
+static void AICA_StopSlot(SLOT *slot,int keyoff)
 {
 	if(keyoff /*&& slot->EG.state!=RELEASE*/)
 	{
@@ -628,7 +627,7 @@ static void AICA_Init(device_t *device, aica_state *AICA, const aica_interface *
 
 static void AICA_UpdateSlotReg(aica_state *AICA,int s,int r)
 {
-	struct _SLOT *slot=AICA->Slots+s;
+	SLOT *slot=AICA->Slots+s;
 	int sl;
 	switch(r&0x7f)
 	{
@@ -638,7 +637,7 @@ static void AICA_UpdateSlotReg(aica_state *AICA,int s,int r)
 			{
 				for(sl=0;sl<64;++sl)
 				{
-					struct _SLOT *s2=AICA->Slots+sl;
+					SLOT *s2=AICA->Slots+sl;
 					{
 						if(KEYONB(s2) && s2->EG.state==RELEASE/*&& !s2->active*/)
 						{
@@ -848,7 +847,7 @@ static void AICA_UpdateRegR(aica_state *AICA, int reg)
 		case 0x11:
 			{
 				int slotnum = MSLC(AICA);
-				struct _SLOT *slot=AICA->Slots + slotnum;
+				SLOT *slot=AICA->Slots + slotnum;
 				UINT16 LP = 0;
 				if (!(AFSEL(AICA)))
 				{
@@ -877,7 +876,7 @@ static void AICA_UpdateRegR(aica_state *AICA, int reg)
 		case 0x15:
 			{
 				int slotnum = MSLC(AICA);
-				struct _SLOT *slot=AICA->Slots+slotnum;
+				SLOT *slot=AICA->Slots+slotnum;
 				unsigned int CA = 0;
 
 				if (PCMS(slot) == 0)	// 16-bit samples
@@ -1036,7 +1035,7 @@ static void AICA_TimersAddTicks(aica_state *AICA, int ticks)
 }
 #endif
 
-INLINE INT32 AICA_UpdateSlot(aica_state *AICA, struct _SLOT *slot)
+INLINE INT32 AICA_UpdateSlot(aica_state *AICA, SLOT *slot)
 {
 	INT32 sample;
 	int step=slot->step;
@@ -1211,7 +1210,7 @@ static void AICA_DoMasterSamples(aica_state *AICA, int nsamples)
 		// mix slots' direct output
 		for(sl=0;sl<64;++sl)
 		{
-			struct _SLOT *slot=AICA->Slots+sl;
+			SLOT *slot=AICA->Slots+sl;
 			RBUFDST=AICA->RINGBUF+AICA->BUFPTR;
 			if(AICA->Slots[sl].active)
 			{

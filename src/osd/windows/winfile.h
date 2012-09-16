@@ -23,7 +23,7 @@ enum
 //  TYPE DEFINITIONS
 //============================================================
 
-struct _osd_file
+struct osd_file
 {
 	HANDLE		handle;
 	SOCKET		socket;

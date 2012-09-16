@@ -79,7 +79,7 @@ static const unsigned short vdt911_palette[] =
 	2, 1	/* low intensity, reverse */
 };
 
-typedef struct vdt_t
+struct vdt_t 
 {
 	vdt911_screen_size_t screen_size;	/* char_960 for 960-char, 12-line model; char_1920 for 1920-char, 24-line model */
 	vdt911_model_t model;				/* country code */
@@ -110,7 +110,7 @@ typedef struct vdt_t
 	UINT8 last_key_pressed;
 	int last_modifier_state;
 	char foreign_mode;
-} vdt_t;
+};
 
 /*
     Macros for model features
@@ -576,7 +576,7 @@ void vdt911_keyboard(device_t *device)
 {
 	vdt_t *vdt = get_safe_token(device);
 
-	typedef enum
+	enum modifier_state_t
 	{
 		/* states for western keyboards and katakana/arabic keyboards in romaji/latin mode */
 		lower_case = 0, upper_case, shift, control,
@@ -584,7 +584,7 @@ void vdt911_keyboard(device_t *device)
 		foreign, foreign_shift,
 		/* special value to stop repeat if the modifier state changes */
 		special_debounce = -1
-	} modifier_state_t;
+	};
 
 	static unsigned char repeat_timer;
 	enum { repeat_delay = 5 /* approx. 1/10s */ };

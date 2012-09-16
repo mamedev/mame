@@ -55,7 +55,7 @@
 ***************************************************************************/
 
 /* opaque reference to the poly manager */
-typedef struct _poly_manager poly_manager;
+struct poly_manager;
 
 
 /* input vertex data */

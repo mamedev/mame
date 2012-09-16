@@ -12,7 +12,7 @@
 #include "library.h"
 #include "pool.h"
 
-struct _imgtool_library
+struct imgtool_library
 {
 	object_pool *pool;
 	imgtool_module *first;
@@ -32,7 +32,7 @@ imgtool_library *imgtool_library_create(void)
 		goto error;
 
 	/* allocate the main structure */
-	library = (imgtool_library *)pool_malloc_lib(pool, sizeof(struct _imgtool_library));
+	library = (imgtool_library *)pool_malloc_lib(pool, sizeof(imgtool_library));
 	if (!library)
 		goto error;
 

@@ -27,10 +27,10 @@
 #define MAX_SMARTMEDIA	1
 
 /* machine-independent big-endian 32-bit integer */
-typedef struct UINT32BE
+struct UINT32BE 
 {
 	UINT8 bytes[4];
-} UINT32BE;
+};
 
 INLINE UINT32 get_UINT32BE(UINT32BE word)
 {
@@ -48,23 +48,23 @@ INLINE void set_UINT32BE(UINT32BE *word, UINT32 data)
 #endif
 
 /* SmartMedia image header */
-typedef struct disk_image_header
+struct disk_image_header 
 {
 	UINT8 version;
 	UINT32BE page_data_size;
 	UINT32BE page_total_size;
 	UINT32BE num_pages;
 	UINT32BE log2_pages_per_block;
-} disk_image_header;
+};
 
-typedef struct disk_image_format_2_header
+struct disk_image_format_2_header 
 {
 	UINT8 data1[3];
 	UINT8 padding1[256-3];
 	UINT8 data2[16];
 	UINT8 data3[16];
 	UINT8 padding2[768-32];
-} disk_image_format_2_header;
+};
 
 enum
 {

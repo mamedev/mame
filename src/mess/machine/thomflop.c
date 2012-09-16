@@ -495,7 +495,7 @@ static void to7_5p14sd_init( running_machine &machine )
 #define QDD_MAXBUF ( THOM_QDD_SIZE_ID + THOM_QDD_SIZE_DATA ) * 512
 
 
-static struct _to7qdd
+struct to7qdd_t
 {
 	/* MC6852 registers */
 	UINT8 status;
@@ -514,7 +514,9 @@ static struct _to7qdd
 	UINT8  data_crc;          /* checksum when writing */
 	UINT8  index_pulse;       /* one pulse per track */
 
-} * to7qdd;
+};
+
+static to7qdd_t * to7qdd;
 
 
 
@@ -860,7 +862,7 @@ static void to7_qdd_init( running_machine &machine )
 {
 	LOG(( "to7_qdd_init: CQ 90-028 controller\n" ));
 
-	to7qdd = auto_alloc(machine, struct _to7qdd);
+	to7qdd = auto_alloc(machine, to7qdd_t);
 
 	state_save_register_global( machine, to7qdd->status );
 	state_save_register_global( machine, to7qdd->ctrl1 );
@@ -904,7 +906,7 @@ static void to7_qdd_init( running_machine &machine )
 #define THOM_MAXBUF ( THOM_QDD_SIZE_ID + THOM_QDD_SIZE_DATA ) * 512
 
 
-static struct _thmfc1
+struct thmfc1_t
 {
 
 	UINT8   op;
@@ -928,7 +930,9 @@ static struct _thmfc1
 
 	UINT8   stat0;             /* status register */
 
-} * thmfc1;
+};
+
+static thmfc1_t * thmfc1;
 
 
 static emu_timer* thmfc_floppy_cmd;
@@ -1560,7 +1564,7 @@ void thmfc_floppy_init( running_machine &machine )
 {
 	LOG(( "thmfc_floppy_init: THMFC1 controller\n" ));
 
-	thmfc1 = auto_alloc(machine, struct _thmfc1);
+	thmfc1 = auto_alloc(machine, thmfc1_t);
 
 	thmfc_floppy_cmd = machine.scheduler().timer_alloc(FUNC(thmfc_floppy_cmd_complete_cb));
 

@@ -65,11 +65,11 @@ static const UINT32 s_flags[] =
 	0    ,0    ,0    ,0    ,0
 };
 
-typedef struct
+struct z80dasm
 {
 	UINT8 mnemonic;
 	const char *arguments;
-}	z80dasm;
+};
 
 static const z80dasm mnemonic_xx_cb[256] =
 {

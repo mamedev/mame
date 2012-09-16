@@ -32,12 +32,12 @@
 
 #define USE_SCALABLE_LOCKS		(0)
 
-struct _osd_event
+struct osd_event
 {
 	void *	ptr;
 };
 
-struct _osd_thread {
+struct osd_thread {
 	HANDLE handle;
 	osd_thread_callback callback;
 	void *param;
@@ -93,7 +93,7 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 //  Scalable Locks
 //============================================================
 
-struct _osd_scalable_lock
+struct osd_scalable_lock
 {
 #if USE_SCALABLE_LOCKS
    struct

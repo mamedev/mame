@@ -137,9 +137,7 @@ Table 3-2.  TMS32025/26 Memory Blocks
 
 
 
-typedef struct _tms32025_state tms32025_state;		/* Page 3-6 (45) shows all registers */
-struct _tms32025_state
-
+struct tms32025_state
 {
 	/******************** CPU Internal Registers *******************/
 	UINT16	PREVPC;		/* previous program counter */
@@ -198,15 +196,13 @@ struct tms32025_opcode
 	void	(*function)(tms32025_state *);
 };
 /* opcode table entry (Opcode CE has sub-opcodes) */
-typedef struct _tms32025_opcode_CE tms32025_opcode_CE;
-struct _tms32025_opcode_CE
+struct tms32025_opcode_CE
 {
 	UINT8	cycles;
 	void	(*function)(tms32025_state *);
 };
 /* opcode table entry (Opcode Dx has sub-opcodes) */
-typedef struct _tms32025_opcode_Dx tms32025_opcode_Dx;
-struct _tms32025_opcode_Dx
+struct tms32025_opcode_Dx
 {
 	UINT8	cycles;
 	void	(*function)(tms32025_state *);

@@ -36,7 +36,7 @@ extern const device_type MAPPER8;
 #define SRAM_SIZE 2048
 #define DRAM_SIZE 65536
 
-typedef struct _mapper8_list_entry
+struct mapper8_list_entry 
 {
 	const char*	name;				// Name of the device (used for looking up the device)
 	int			mode;				// Mode of the system which applies to this entry
@@ -44,16 +44,16 @@ typedef struct _mapper8_list_entry
 	UINT32		select_pattern;		// State of the address line bits when addressing this device
 	UINT32		address_mask;		// Bits of the address bus used to address this device
 	UINT32		write_select;		// Additional bits set when doing write accesses to this device
-} mapper8_list_entry;
+};
 
 #define MAPPER8_CONFIG(name) \
 	const mapper8_config(name) =
 
-typedef struct _mapper8_config
+struct mapper8_config 
 {
 	devcb_write_line				ready;
 	const mapper8_list_entry		*devlist;
-} mapper8_config;
+};
 
 /*
     Device list of the mapper.

@@ -84,7 +84,7 @@ static cassette_image *cassette_init(const struct CassetteFormat *format, void *
 {
 	cassette_image *cassette;
 
-	cassette = (cassette_image *)malloc(sizeof(struct _cassette_image));
+	cassette = (cassette_image *)malloc(sizeof(cassette_image));
 	if (!cassette)
 		return NULL;
 

@@ -56,8 +56,7 @@
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
-typedef union _z8000_reg_file z8000_reg_file;
-union _z8000_reg_file
+union z8000_reg_file
 {
     UINT8   B[16]; /* RL0,RH0,RL1,RH1...RL7,RH7 */
     UINT16  W[16]; /* R0,R1,R2...R15 */
@@ -65,8 +64,7 @@ union _z8000_reg_file
     UINT64  Q[4];  /* RQ0,RQ4,..RQ12 */
 };
 
-/* In z8000cpu.h: typedef struct _z8000_state z8000_state; */
-struct _z8000_state
+struct z8000_state
 {
     UINT32  op[4];      /* opcodes/data of current instruction */
 	UINT32	ppc;		/* previous program counter */

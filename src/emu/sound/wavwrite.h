@@ -3,7 +3,7 @@
 #ifndef __WAVWRITE_H__
 #define __WAVWRITE_H__
 
-typedef struct _wav_file wav_file;
+struct wav_file;
 
 wav_file *wav_open(const char *filename, int sample_rate, int channels);
 void wav_close(wav_file*wavptr);

@@ -53,7 +53,7 @@ static void MixerInit(int threeVoiceAmplify)
 }
 
 
-INLINE void syncEm(_SID6581 *This)
+INLINE void syncEm(SID6581_t *This)
 {
 	int sync1 = (This->optr1.modulator->cycleLenCount <= 0);
 	int sync2 = (This->optr2.modulator->cycleLenCount <= 0);
@@ -96,9 +96,9 @@ INLINE void syncEm(_SID6581 *This)
 }
 
 
-void sidEmuFillBuffer(_SID6581 *This, stream_sample_t *buffer, UINT32 bufferLen )
+void sidEmuFillBuffer(SID6581_t *This, stream_sample_t *buffer, UINT32 bufferLen )
 {
-//void* fill16bitMono( SID6581 *This, void* buffer, UINT32 numberOfSamples )
+//void* fill16bitMono( SID6581_t *This, void* buffer, UINT32 numberOfSamples )
 
 	for ( ; bufferLen > 0; bufferLen-- )
 	{
@@ -121,7 +121,7 @@ void sidEmuFillBuffer(_SID6581 *This, stream_sample_t *buffer, UINT32 bufferLen 
 
 /* Reset. */
 
-int sidEmuReset(_SID6581 *This)
+int sidEmuReset(SID6581_t *This)
 {
 	sidClearOperator( &This->optr1 );
 	enveEmuResetOperator( &This->optr1 );
@@ -208,7 +208,7 @@ static void filterTableInit(running_machine &machine)
 	filterResTable[15] = resDyMax;
 }
 
-void sid6581_init (_SID6581 *This)
+void sid6581_init (SID6581_t *This)
 {
 	This->optr1.sid=This;
 	This->optr2.sid=This;
@@ -245,7 +245,7 @@ void sid6581_init (_SID6581 *This)
 	sidEmuReset(This);
 }
 
-void sid6581_port_w (_SID6581 *This, int offset, int data)
+void sid6581_port_w (SID6581_t *This, int offset, int data)
 {
 	offset &= 0x1f;
 
@@ -323,7 +323,7 @@ void sid6581_port_w (_SID6581 *This, int offset, int data)
 	}
 }
 
-int sid6581_port_r (running_machine &machine, _SID6581 *This, int offset)
+int sid6581_port_r (running_machine &machine, SID6581_t *This, int offset)
 {
     int data;
 /* SIDPLAY reads last written at a sid address value */

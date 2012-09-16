@@ -38,13 +38,12 @@
 #define UI_MENU_PROCESS_CUSTOM_ONLY	4
 
 /* options for ui_menu_reset */
-enum _ui_menu_reset_options
+enum ui_menu_reset_options
 {
 	UI_MENU_RESET_SELECT_FIRST,
 	UI_MENU_RESET_REMEMBER_POSITION,
 	UI_MENU_RESET_REMEMBER_REF
 };
-typedef enum _ui_menu_reset_options ui_menu_reset_options;
 
 
 

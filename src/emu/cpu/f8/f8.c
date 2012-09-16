@@ -39,8 +39,7 @@
 #define cS  4
 #define cL	6
 
-typedef struct _f8_Regs f8_Regs;
-struct _f8_Regs
+struct f8_Regs
 {
 	UINT16	pc0;	/* program counter 0 */
 	UINT16	pc1;	/* program counter 1 */

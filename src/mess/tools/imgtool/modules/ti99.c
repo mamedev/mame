@@ -266,15 +266,15 @@ will accept paths of such length). */
     Miscellaneous utilities that are used to handle TI data types
 */
 
-typedef struct UINT16BE
+struct UINT16BE 
 {
 	UINT8 bytes[2];
-} UINT16BE;
+};
 
-typedef struct UINT16LE
+struct UINT16LE 
 {
 	UINT8 bytes[2];
-} UINT16LE;
+};
 
 INLINE UINT16 get_UINT16BE(UINT16BE word)
 {
@@ -456,42 +456,42 @@ static int check_fpath(const char *fpath)
 /*
     Disk geometry
 */
-typedef struct ti99_geometry
+struct ti99_geometry 
 {
 	int secspertrack;
 	int cylinders;
 	int heads;
-} ti99_geometry;
+};
 
 /*
     Physical sector address
 */
-typedef struct ti99_sector_address
+struct ti99_sector_address 
 {
 	int sector;
 	int cylinder;
 	int side;
-} ti99_sector_address;
+};
 
 /*
     Time stamp (used in fdr, and WIN VIB/DDR)
 */
-typedef struct ti99_date_time
+struct ti99_date_time 
 {
 	UINT8 time_MSB, time_LSB;/* 0-4: hour, 5-10: minutes, 11-15: seconds/2 */
 	UINT8 date_MSB, date_LSB;/* 0-6: year, 7-10: month, 11-15: day */
-} ti99_date_time;
+};
 
 /*
     Subdirectory descriptor (HFDC only)
 
     The HFDC supports up to 3 subdirectories.
 */
-typedef struct dsk_subdir
+struct dsk_subdir 
 {
 	char name[10];			/* subdirectory name (10 characters, pad with spaces) */
 	UINT16BE fdir_aphysrec;	/* aphysrec address of fdir record for this subdirectory */
-} dsk_subdir;
+};
 
 /*
     DSK VIB record
@@ -499,7 +499,7 @@ typedef struct dsk_subdir
     Most fields in this record are only revelant to level 2 routines, but level
     1 routines need the disk geometry information extracted from the VIB.
 */
-typedef struct dsk_vib
+struct dsk_vib 
 {
 	char name[10];			/* disk volume name (10 characters, pad with spaces) */
 	UINT16BE totphysrecs;	/* total number of physrecs on disk (usually 360, */
@@ -526,7 +526,7 @@ typedef struct dsk_vib
 								/* (AU 0 is associated to LSBit of byte 0, */
 								/* AU 7 to MSBit of byte 0, AU 8 to LSBit */
 								/* of byte 1, etc.) */
-} dsk_vib;
+};
 
 enum ti99_img_format 
 {
@@ -540,7 +540,7 @@ enum ti99_img_format
 /*
     level-1 disk image descriptor
 */
-typedef struct ti99_lvl1_imgref
+struct ti99_lvl1_imgref 
 {
 	ti99_img_format img_format;	/* tells the image format */
 	imgtool_stream *file_handle;		/* imgtool file handle */
@@ -548,7 +548,7 @@ typedef struct ti99_lvl1_imgref
 	ti99_geometry geometry;		/* geometry */
 	unsigned pc99_track_len;		/* unformatted track length (pc99 format) */
 	UINT32 *pc99_data_offset_array;	/* offset for each sector (pc99 format) */
-} ti99_lvl1_imgref;
+};
 
 /*
     calculate CRC for data address marks or sector data
@@ -1384,7 +1384,7 @@ static int write_absolute_physrec(ti99_lvl1_imgref *l1_img, unsigned aphysrec, c
 /*
     WIN VIB/DDR record
 */
-typedef struct win_vib_ddr
+struct win_vib_ddr
 {
 	char name[10];			/* disk volume name (10 characters, pad with spaces) */
 	UINT16BE totAUs;		/* total number of AUs */
@@ -1437,16 +1437,16 @@ typedef struct win_vib_ddr
 		} ddr;
 	} u2;
 	UINT16BE subdir_AU[114];/* points to all subdirectory DDRs */
-} win_vib_ddr;
+};
 
 /*
     AU format
 */
-typedef struct ti99_AUformat
+struct ti99_AUformat 
 {
 	int totAUs;				/* total number of AUs */
 	int physrecsperAU;		/* number of 256-byte physical records per AU */
-} ti99_AUformat;
+};
 
 /*
     DSK directory reference: 0 for root, 1 for 1st subdir, 2 for 2nd subdir, 3
@@ -1457,55 +1457,55 @@ typedef struct ti99_AUformat
 /*
     catalog entry (used for in-memory catalog)
 */
-typedef struct dir_entry
+struct dir_entry 
 {
 	UINT16 dir_ptr;			/* DSK: unused */
 							/* WIN: AU address of the DDR for this directory */
 	char name[10];			/* name of this directory (copied from the VIB for DSK, DDR for WIN) */
-} dir_entry;
+};
 
-typedef struct file_entry
+struct file_entry 
 {
 	UINT16 fdr_ptr;			/* DSK: aphysrec address of the FDR for this file */
 							/* WIN: AU address of the FDR for this file */
 	char name[10];			/* name of this file (copied from FDR) */
-} file_entry;
+};
 
-typedef struct ti99_catalog
+struct ti99_catalog 
 {
 	int num_subdirs;		/* number of subdirectories */
 	int num_files;			/* number of files */
 	dir_entry subdirs[114];	/* description of each subdir */
 	file_entry files[128];	/* description of each file */
-} ti99_catalog;
+};
 
 /*
     level-2 disk image descriptor
 */
-typedef struct ti99_lvl2_imgref_dsk
+struct ti99_lvl2_imgref_dsk 
 {
 	UINT16 totphysrecs;				/* total number of aphysrecs (extracted from vib record in aphysrec 0) */
 	ti99_catalog catalogs[4];		/* catalog of root directory and up to 3 subdirectories */
 	UINT16 fdir_aphysrec[4];		/* fdir aphysrec address for root directory
                                         and up to 3 subdirectories */
-} ti99_lvl2_imgref_dsk;
+};
 
 enum win_vib_t
 {
 	win_vib_v1,
 	win_vib_v2
 };
-typedef struct ti99_lvl2_imgref_win
+struct ti99_lvl2_imgref_win 
 {
 	win_vib_t vib_version;			/* version of the vib record in aphysrec 0 (see win_vib_ddr) */
-} ti99_lvl2_imgref_win;
+};
 
 enum l2i_t
 {
 	L2I_DSK,
 	L2I_WIN
 };
-typedef struct ti99_lvl2_imgref
+struct u 
 {
 	ti99_lvl1_imgref l1_img;/* image format, imgtool image handle, image geometry */
 	ti99_AUformat AUformat;	/* AU format */
@@ -1535,7 +1535,7 @@ typedef struct ti99_lvl2_imgref
 	{
 		ti99_lvl2_imgref_dsk dsk;
 		ti99_lvl2_imgref_win win;
-	} u;					/* structure-specific info */
+	};					/* structure-specific info */
 } ti99_lvl2_imgref;
 
 /*
@@ -1554,7 +1554,7 @@ enum
 /*
     DSK FDR record
 */
-typedef struct dsk_fdr
+struct dsk_fdr 
 {
 	char name[10];			/* file name (10 characters, pad with spaces) */
 	UINT16BE xreclen;		/* extended record len: if record len is >= 256, */
@@ -1595,12 +1595,12 @@ typedef struct dsk_fdr
 								/* bytes each), one entry for each file cluster. */
 								/* 12 bits: address of first AU of cluster */
 								/* 12 bits: offset of last 256-byte record in cluster */
-} dsk_fdr;
+};
 
 /*
     WIN FDR record
 */
-typedef struct win_fdr
+struct win_fdr 
 {
 	char name[10];			/* file name (10 characters, pad with spaces) */
 	UINT16BE xreclen;		/* extended record len: if record len is >= 256, */
@@ -1657,12 +1657,12 @@ typedef struct win_fdr
 								/* bytes each), one entry for each file cluster. */
 								/* 16 bits: address of first AU of cluster */
 								/* 16 bits: address of last AU of cluster */
-} win_fdr;
+};
 
 /*
     tifile header: stand-alone file
 */
-typedef struct tifile_header
+struct tifile_header 
 {
 	char tifiles[8];		/* always '\7TIFILES' */
 	UINT16BE fphysrecs;		/* file length in physrecs */
@@ -1697,32 +1697,32 @@ typedef struct tifile_header
 									/* 4 bytes: time & date of last update */
 									/* 2 bytes: unknown (always >0000) */
 									/* 96 chars: 0xCA53 repeated 56 times */
-} tifile_header;
+};
 
 /*
     level-2 file descriptor
 */
-typedef struct ti99_lvl2_fileref_dsk
+struct ti99_lvl2_fileref_dsk 
 {
 	ti99_lvl2_imgref *l2_img;
 	int fdr_aphysrec;
 	dsk_fdr fdr;
-} ti99_lvl2_fileref_dsk;
+};
 
-typedef struct ti99_lvl2_fileref_win
+struct ti99_lvl2_fileref_win 
 {
 	ti99_lvl2_imgref *l2_img;
 	unsigned fphysrecs;				/* copy of field in the eldest FDR */
 	unsigned eldestfdr_aphysrec;	/* aphysrec address of the eldest FDR */
 	unsigned curfdr_aphysrec;		/* aphysrec address of the currently open sibling FDR */
 	win_fdr curfdr;					/* buffer with currently open sibling FDR */
-} ti99_lvl2_fileref_win;
+};
 
-typedef struct ti99_lvl2_fileref_tifiles
+struct ti99_lvl2_fileref_tifiles 
 {
 	imgtool_stream *file_handle;
 	tifile_header hdr;
-} ti99_lvl2_fileref_tifiles;
+};
 
 enum l2f_type_t
 {
@@ -1730,7 +1730,7 @@ enum l2f_type_t
 	L2F_WIN,
 	L2F_TIFILES
 };
-typedef struct ti99_lvl2_fileref
+struct u 
 {
 	l2f_type_t type;
 	union
@@ -1738,7 +1738,7 @@ typedef struct ti99_lvl2_fileref
 		ti99_lvl2_fileref_dsk dsk;
 		ti99_lvl2_fileref_win win;
 		ti99_lvl2_fileref_tifiles tifiles;
-	} u;
+	};
 } ti99_lvl2_fileref;
 
 
@@ -3696,14 +3696,14 @@ static void current_date_time(ti99_date_time *reply)
     * files with variable-size records (sequential-access)
 */
 
-typedef struct ti99_lvl3_fileref
+struct ti99_lvl3_fileref 
 {
 	ti99_lvl2_fileref l2_file;
 
 	int cur_log_rec;
 	int cur_phys_rec;
 	int cur_pos_in_phys_rec;
-} ti99_lvl3_fileref;
+};
 
 #ifdef UNUSED_FUNCTION
 /*
@@ -3827,23 +3827,23 @@ static int read_next_record(ti99_lvl3_fileref *l3_file, void *dest, int *out_rec
 /*
     ti99 catalog iterator, used when imgtool reads the catalog
 */
-typedef struct dsk_iterator
+struct dsk_iterator 
 {
 	ti99_lvl2_imgref *image;
 	int level;
 	int listing_subdirs;		/* true if we are listing subdirectories at current level */
 	int index[2];				/* current index in the disk catalog */
 	ti99_catalog *cur_catalog;	/* current catalog */
-} dsk_iterator;
+};
 
-typedef struct win_iterator
+struct win_iterator 
 {
 	ti99_lvl2_imgref *image;
 	int level;
 	int listing_subdirs;		/* true if we are listing subdirectories at current level */
 	int index[MAX_DIR_LEVEL];	/* current index in the disk catalog */
 	ti99_catalog catalog[MAX_DIR_LEVEL];	/* current catalog */
-} win_iterator;
+};
 
 
 static imgtoolerr_t dsk_image_init_mess(imgtool_image *image, imgtool_stream *f);

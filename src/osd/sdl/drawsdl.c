@@ -37,7 +37,7 @@
 //  TYPES
 //============================================================
 
-typedef struct _sdl_scale_mode sdl_scale_mode;
+struct sdl_scale_mode;
 
 #if (SDLMAME_SDL2)
 #define	DRAW2_SCALEMODE_NEAREST	"0"
@@ -75,7 +75,7 @@ struct sdl_info
 	int					old_blitheight;
 };
 
-struct _sdl_scale_mode
+struct sdl_scale_mode
 {
 	const char		*name;
 	int				is_scale;			/* Scale mode?           */

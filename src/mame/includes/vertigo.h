@@ -12,14 +12,14 @@
 
 #define MC_LENGTH 512
 
-typedef struct _am2901
+struct am2901 
 {
 	UINT32 ram[16];	  /* internal ram */
 	UINT32 d;		  /* direct data D input */
 	UINT32 q;		  /* Q register */
 	UINT32 f;		  /* F ALU result */
 	UINT32 y;		  /* Y output */
-} am2901;
+};
 
 class vector_generator
 {
@@ -50,7 +50,7 @@ private:
 	running_machine *m_machine;
 };
 
-typedef struct _microcode
+struct microcode 
 {
 	UINT32 x;
 	UINT32 a;
@@ -68,9 +68,9 @@ typedef struct _microcode
 	UINT32 jmp;
 	UINT32 jcon;
 	UINT32 ma;
-} microcode;
+};
 
-typedef struct _vproc
+struct vproc 
 {
 	UINT16 sram[64]; /* external sram */
 	UINT16 ramlatch; /* latch between 2901 and sram */
@@ -78,7 +78,7 @@ typedef struct _vproc
 	UINT32 pc;		 /* program counter */
 	UINT32 ret;		 /* return address */
 
-} vproc;
+};
 
 
 class vertigo_state : public driver_device

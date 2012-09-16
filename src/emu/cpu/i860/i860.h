@@ -55,7 +55,7 @@ DECLARE_LEGACY_CPU_DEVICE(I860, i860);
 ***************************************************************************/
 
 /* i860 state.  */
-typedef struct {
+struct i860_state_t {
 	/* Integer registers (32 x 32-bits).  */
 	UINT32 iregs[32];
 
@@ -173,7 +173,7 @@ typedef struct {
 	UINT32 ppc;
 	int icount;
 
-} i860_state_t;
+};
 
 INLINE i860_state_t *get_safe_token(device_t *device)
 {

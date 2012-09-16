@@ -64,7 +64,7 @@
  * - "Keypad ," is not mapped
  */
 
-typedef struct _kay_kbd_t
+struct kay_kbd_t 
 {
 	device_t *beeper;
 	UINT8 buff[16];
@@ -78,7 +78,7 @@ typedef struct _kay_kbd_t
 	int key;
 	int repeat;
 	int repeater;
-} kay_kbd_t;
+};
 
 INPUT_PORTS_START( kay_kbd )
 	PORT_START("ROW0")

@@ -20,19 +20,19 @@
  *
  *************************************/
 
-typedef struct _biquad_
+struct biquad 
 {
 	double a0, a1, a2;		/* Numerator coefficients */
 	double b0, b1, b2;		/* Denominator coefficients */
-} biquad;
+};
 
-typedef struct _filter_
+struct lp_filter 
 {
 	float *history;
 	float *coef;
 	double fs;
 	biquad ProtoCoef[2];
-} lp_filter;
+};
 
 struct filter_state
 {
@@ -40,7 +40,7 @@ struct filter_state
 	double		exponent;
 };
 
-typedef struct _noise_state
+struct noise_state
 {
 	union
 	{
@@ -62,7 +62,7 @@ typedef struct _noise_state
 	filter_state		noise_filters[4];
 	lp_filter			filter;
 	sound_stream		*stream;
-} noise_state;
+};
 
 
 /*************************************

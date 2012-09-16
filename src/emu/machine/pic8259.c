@@ -29,9 +29,7 @@ enum pic8259_state_t
 	STATE_READY
 };
 
-typedef struct pic8259	pic8259_t;
-
-struct pic8259
+struct pic8259_t
 {
 	devcb_resolved_write_line out_int_func;
 

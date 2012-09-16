@@ -11,21 +11,19 @@
 #include "machine/devhelpr.h"
 
 
-enum _huc6270_v_state {
+enum huc6270_v_state {
 	HUC6270_VSW,
 	HUC6270_VDS,
 	HUC6270_VDW,
 	HUC6270_VCR
 };
-typedef enum _huc6270_v_state huc6270_v_state;
 
-enum _huc6270_h_state {
+enum huc6270_h_state {
 	HUC6270_HDS,
 	HUC6270_HDW,
 	HUC6270_HDE,
 	HUC6270_HSW
 };
-typedef enum _huc6270_h_state huc6270_h_state;
 
 
 #define MCFG_HUC6270_ADD( _tag, _intrf )	\

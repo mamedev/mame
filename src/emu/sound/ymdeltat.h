@@ -13,7 +13,7 @@ typedef void (*STATUS_CHANGE_HANDLER)(void *chip, UINT8 status_bits);
 
 
 /* DELTA-T (adpcm type B) struct */
-typedef struct deltat_adpcm_state {     /* AT: rearranged and tigntened structure */
+struct YM_DELTAT  {     /* AT: rearranged and tigntened structure */
 	UINT8	*memory;
 	INT32	*output_pointer;/* pointer of output pointers   */
 	INT32	*pan;			/* pan : &output_pointer[pan]   */
@@ -69,7 +69,7 @@ typedef struct deltat_adpcm_state {     /* AT: rearranged and tigntened structur
 
 	UINT8	reg[16];		/* adpcm registers      */
 	UINT8	emulation_mode;	/* which chip we're emulating */
-}YM_DELTAT;
+};
 
 /*void YM_DELTAT_BRDY_callback(YM_DELTAT *DELTAT);*/
 

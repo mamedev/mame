@@ -88,7 +88,7 @@ const int ECC_Q_COMP = 43;			// 43 bytes each
     TYPE DEFINITIONS
 ***************************************************************************/
 
-struct _cdrom_file
+struct cdrom_file
 {
 	chd_file *			chd;				/* CHD file */
 	cdrom_toc			cdtoc;				/* TOC for the CD */

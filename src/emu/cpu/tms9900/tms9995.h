@@ -60,7 +60,7 @@ enum
     Configuration for the TMS9995. The connections are provided by the
     main board which contains the processor.
 */
-typedef struct _tms9995_config
+struct tms9995_config 
 {
 	devcb_write8		external_callback;
 	devcb_write_line	iaq_line;
@@ -69,7 +69,7 @@ typedef struct _tms9995_config
 	devcb_write_line	holda_line;
 	int					mode;
 	int					overflow;
-} tms9995_config;
+};
 
 #define TMS9995_CONFIG(name) \
 	const tms9995_config(name) =
@@ -283,14 +283,14 @@ private:
 
 	// ============== Prefetch support =====================
 
-	typedef struct _decoded_instruction
+	struct decoded_instruction
 	{
 		UINT16			IR;
 		UINT16  		command;
 		const UINT8*	program;
 		bool			byteop;
 		int				state;
-	} decoded_instruction;
+	};
 
 	int		m_instindex;
 
@@ -312,20 +312,20 @@ private:
 	typedef void (tms9995_device::*ophandler)(void);
 
 	// Opcode list entry
-	typedef struct _tms_instruction
+	struct tms_instruction
 	{
 		UINT16				opcode;
 		int					id;
 		int					format;
 		microprogram		prog;		// Microprogram
-	} tms_instruction;
+	};
 
 	// Lookup table entry
-	typedef struct _lookup_entry
+	struct lookup_entry
 	{
-		struct _lookup_entry *next_digit;
+		lookup_entry *next_digit;
 		const tms_instruction *entry;
-	} lookup_entry;
+	};
 
 	// Pointer to the lookup table; the entry point for searching the command
 	lookup_entry*	m_command_lookup_table;

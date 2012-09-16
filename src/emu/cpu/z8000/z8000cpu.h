@@ -189,25 +189,25 @@
 #define GET_DSP16		UINT32 dsp16 = addr_add(cpustate, cpustate->pc, (INT16)get_operand(cpustate, 1))
 #define GET_ADDR(o) 	UINT32 addr = (UINT32)get_addr_operand(cpustate, o)
 
-typedef struct _z8000_state z8000_state;
+struct z8000_state;
 
 /* structure for the opcode definition table */
-typedef struct {
+struct Z8000_init {
 	int 	beg, end, step;
 	int 	size, cycles;
 	void	(*opcode)(z8000_state *cpustate);
 	const char	*dasm;
     UINT32 dasmflags;
-}	Z8000_init;
+};
 
 /* structure for the opcode execution table / disassembler */
-typedef struct {
+struct Z8000_exec {
     void    (*opcode)(z8000_state *cpustate);
     int     cycles;
 	int 	size;
     const char    *dasm;
     UINT32 dasmflags;
-}	Z8000_exec;
+};
 
 /* opcode execution table */
 extern Z8000_exec *z8000_exec;

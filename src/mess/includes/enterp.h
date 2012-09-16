@@ -14,6 +14,8 @@
 #define NICK_PALETTE_SIZE	256
 
 
+struct NICK_STATE;
+
 class ep_state : public driver_device
 {
 public:
@@ -23,7 +25,7 @@ public:
 	UINT8 exdos_card_value;  /* state of the wd1770 irq/drq lines */
 	UINT8 keyboard_line;     /* index of keyboard line to read */
 	bitmap_ind16 m_bitmap;
-	struct _NICK_STATE *nick;
+	NICK_STATE *nick;
 	DECLARE_READ8_MEMBER(exdos_card_r);
 	DECLARE_WRITE8_MEMBER(exdos_card_w);
 	virtual void machine_reset();

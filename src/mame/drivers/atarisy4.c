@@ -68,7 +68,7 @@ public:
  *
  *************************************/
 
-struct _gpu_
+struct gpu_
 {
 	/* Memory-mapped registers */
 	UINT16 gr[8];	/* Command parameters */

@@ -65,13 +65,12 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-typedef struct _translation_info translation_info;
-struct _translation_info
+typedef struct
 {
 	DWORD vc_version;
 	const char *gcc_option;
 	const char *vc_option;
-};
+} translation_info;
 
 
 

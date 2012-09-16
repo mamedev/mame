@@ -620,13 +620,13 @@ class n64_rdp : public poly_manager<UINT32, rdp_poly_state, 8, 32000>
 		bool			m_pending_mode_block;
 		bool			m_pipe_clean;
 
-		typedef struct
+		struct CVMASKDERIVATIVE
 		{
 			UINT8 cvg;
 			UINT8 cvbit;
 			UINT8 xoff;
 			UINT8 yoff;
-		} CVMASKDERIVATIVE;
+		};
 		CVMASKDERIVATIVE cvarray[(1 << 8)];
 
 		UINT16 z_com_table[0x40000]; //precalced table of compressed z values, 18b: 512 KB array!

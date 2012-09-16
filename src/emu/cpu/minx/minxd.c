@@ -91,11 +91,11 @@ static const UINT32 s_flags[] = {
 	0, 0, 0, 0, 0,
 };
 
-typedef struct {
+struct minxdasm {
 	UINT8	mnemonic;
 	UINT8	argument1;
 	UINT8	argument2;
-}	minxdasm;
+};
 
 static const minxdasm mnemonic[256] = {
 	/* 00 - 0F */

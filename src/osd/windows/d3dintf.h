@@ -74,12 +74,12 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-typedef struct _d3d d3d;
-typedef struct _d3d_device d3d_device;
-typedef struct _d3d_surface d3d_surface;
-typedef struct _d3d_texture d3d_texture;
-typedef struct _d3d_vertex_buffer d3d_vertex_buffer;
-typedef struct _d3d_effect d3d_effect;
+struct d3d;
+struct d3d_device;
+struct d3d_surface;
+struct d3d_texture;
+struct d3d_vertex_buffer;
+struct d3d_effect;
 typedef D3DXVECTOR4 d3d_vector;
 typedef D3DMATRIX d3d_matrix;
 
@@ -129,7 +129,7 @@ struct d3d_adapter_identifier
 //  Caps enumeration
 //============================================================
 
-enum _d3d_caps_index
+enum d3d_caps_index
 {
 	CAPS_PRESENTATION_INTERVALS,
 	CAPS_CAPS2,
@@ -146,7 +146,6 @@ enum _d3d_caps_index
 	CAPS_STRETCH_RECT_FILTER,
 	CAPS_MAX_PS30_INSN_SLOTS
 };
-typedef enum _d3d_caps_index d3d_caps_index;
 
 
 //============================================================
@@ -263,7 +262,7 @@ struct d3d_effect_interface
 //  Core D3D object
 //============================================================
 
-struct _d3d
+struct d3d
 {
 	// internal objects
 	int							version;

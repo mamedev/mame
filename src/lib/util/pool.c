@@ -90,7 +90,7 @@ struct object_entry_block
 
 
 /* the object pool itself */
-struct _object_pool
+struct object_pool
 {
 	object_entry *		hashtable[POOL_HASH_SIZE];
 	object_entry *		globallist;
@@ -102,7 +102,7 @@ struct _object_pool
 
 
 /* an iterator over objects in a pool */
-struct _object_pool_iterator
+struct object_pool_iterator
 {
 	object_pool *		pool;
 	object_type			type;

@@ -173,13 +173,13 @@ static void set_fullscreen(win_window_info *window, int fullscreen);
 
 // temporary hacks
 #if LOG_THREADS
-struct _mtlog
+struct mtlog
 {
 	osd_ticks_t	timestamp;
 	const char *event;
 };
 
-static struct _mtlog mtlog[100000];
+static mtlog mtlog[100000];
 static volatile LONG mtlogindex;
 
 void mtlog_add(const char *event)

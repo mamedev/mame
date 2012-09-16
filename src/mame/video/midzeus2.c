@@ -77,11 +77,11 @@ static int texel_width;
 static float zbase;
 
 #if TRACK_REG_USAGE
-typedef struct reg_info
+struct reg_info 
 {
 	struct reg_info *next;
 	UINT32 value;
-} reg_info;
+};
 
 static reg_info *regdata[0x80];
 static int regdata_count[0x80];

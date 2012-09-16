@@ -64,7 +64,7 @@ const int MAX_FRAMESKIP = FRAMESKIP_LEVELS - 2;
 // forward references
 class render_target;
 class screen_device;
-typedef struct _avi_file avi_file;
+struct avi_file;
 
 
 

@@ -56,38 +56,38 @@ void SZipFree(void *p, void *address);
 void *SZipAllocTemp(void *p, size_t size);
 void SZipFreeTemp(void *p, void *address);
 
-typedef struct
+struct CSzFile
 {
 	long _7z_currfpos;
 	UINT64			_7z_length;
 	osd_file *		_7z_osdfile;					/* OSD file handle */
 
-} CSzFile;
+};
 
 
-typedef struct
+struct CFileSeqInStream
 {
 	ISeqInStream s;
 	CSzFile file;
-} CFileSeqInStream;
+};
 
 void FileSeqInStream_CreateVTable(CFileSeqInStream *p);
 
 
-typedef struct
+struct CFileInStream
 {
 	ISeekInStream s;
 	CSzFile file;
-} CFileInStream;
+};
 
 void FileInStream_CreateVTable(CFileInStream *p);
 
 
-typedef struct
+struct CFileOutStream
 {
 	ISeqOutStream s;
 	CSzFile file;
-} CFileOutStream;
+} ;
 
 void FileOutStream_CreateVTable(CFileOutStream *p);
 
@@ -99,7 +99,7 @@ void FileOutStream_CreateVTable(CFileOutStream *p);
 
 
 /* Error types */
-enum __7z_error
+enum _7z_error
 {
 	_7ZERR_NONE = 0,
 	_7ZERR_OUT_OF_MEMORY,
@@ -111,7 +111,6 @@ enum __7z_error
 	_7ZERR_UNSUPPORTED,
 	_7ZERR_BUFFER_TOO_SMALL
 };
-typedef enum __7z_error _7z_error;
 
 
 

@@ -52,7 +52,7 @@
 #define ZIP_DECOMPRESS_BUFSIZE	16384
 
 /* Error types */
-enum _zip_error
+enum zip_error
 {
 	ZIPERR_NONE = 0,
 	ZIPERR_OUT_OF_MEMORY,
@@ -64,7 +64,6 @@ enum _zip_error
 	ZIPERR_UNSUPPORTED,
 	ZIPERR_BUFFER_TOO_SMALL
 };
-typedef enum _zip_error zip_error;
 
 
 

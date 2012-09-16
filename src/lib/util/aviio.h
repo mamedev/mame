@@ -48,7 +48,7 @@
     CONSTANTS
 ***************************************************************************/
 
-enum _avi_error
+enum avi_error
 {
 	AVIERR_NONE = 0,
 	AVIERR_END,
@@ -68,10 +68,9 @@ enum _avi_error
 	AVIERR_UNSUPPORTED_AUDIO_FORMAT,
 	AVIERR_EXCEEDED_SOUND_BUFFER
 };
-typedef enum _avi_error avi_error;
 
 
-enum _avi_datatype
+enum avi_datatype
 {
 	AVIDATA_VIDEO,
 	AVIDATA_AUDIO_CHAN0,
@@ -83,7 +82,6 @@ enum _avi_datatype
 	AVIDATA_AUDIO_CHAN6,
 	AVIDATA_AUDIO_CHAN7
 };
-typedef enum _avi_datatype avi_datatype;
 
 
 
@@ -104,7 +102,7 @@ typedef enum _avi_datatype avi_datatype;
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _avi_file avi_file;
+struct avi_file;
 
 
 struct avi_movie_info

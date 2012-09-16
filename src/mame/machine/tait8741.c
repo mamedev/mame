@@ -31,7 +31,7 @@ gladiatr and Great Swordsman set.
 #define CMD_08 1
 #define CMD_4a 2
 
-typedef struct TAITO8741_status{
+struct I8741 {
 	UINT8 toData;    /* to host data      */
 	UINT8 fromData;  /* from host data    */
 	UINT8 fromCmd;   /* from host command */
@@ -48,7 +48,7 @@ typedef struct TAITO8741_status{
 	int coins;
 	read8_space_func portHandler;
 	const  char *portName;
-}I8741;
+};
 
 static const struct TAITO8741interface *intf;
 //static I8741 *taito8741;
@@ -380,7 +380,7 @@ joshi Vollyball set.
 
 static int josvolly_nmi_enable;
 
-typedef struct josvolly_8741_struct {
+struct JV8741  {
 	UINT8 cmd;
 	UINT8 sts;
 	UINT8 txd;
@@ -391,7 +391,7 @@ typedef struct josvolly_8741_struct {
 	UINT8 rst;
 
 	const char *initReadPort;
-}JV8741;
+};
 
 static JV8741 i8741[4];
 

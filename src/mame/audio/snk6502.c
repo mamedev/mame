@@ -29,7 +29,7 @@
 #define FRAC_ONE	(1 << FRAC_BITS)
 #define FRAC_MASK	(FRAC_ONE - 1)
 
-typedef struct tone
+struct TONE 
 {
 	int	mute;
 	int	offset;
@@ -39,7 +39,7 @@ typedef struct tone
 	INT32	sample_step;
 	INT32	sample_cur;
 	INT16	form[16];
-} TONE;
+};
 
 struct snk6502_sound_state
 {

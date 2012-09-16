@@ -73,10 +73,10 @@ static const char *const s_mnemonic[] = {
 	"slp"  ,"sra"  ,"srl"  ,"sub"  ,"tst"  ,"tstio","xor "
 };
 
-typedef struct {
+struct z80dasm {
 	UINT8 mnemonic;
 	const char *arguments;
-}	z80dasm;
+};
 
 static const z80dasm mnemonic_xx_cb[256]= {
 	{zRLC,"b=Y"},   {zRLC,"c=Y"},   {zRLC,"d=Y"},   {zRLC,"e=Y"},

@@ -129,7 +129,7 @@ struct triangle
 	INT16				center[2];
 };
 
-struct _quad_m2 
+struct quad_m2 
 {
 	poly_vertex			v[4];
 	UINT16				z;
@@ -297,7 +297,7 @@ static INT32 clip_polygon(poly_vertex *v, INT32 num_vertices, plane *cp, poly_ve
 
 #define MAX_TRIANGLES		32768
 
-struct _raster_state
+struct raster_state
 {
 	UINT32				mode;				/* bit 0 = Test Mode, bit 2 = Switch 60Hz(1)/30Hz(0) operation */
 	UINT16 *			texture_rom;		/* Texture ROM pointer */
@@ -356,7 +356,7 @@ void model2_3d_set_zclip( running_machine &machine, UINT8 clip )
 
 static void model2_3d_process_quad( raster_state *raster, UINT32 attr )
 {
-	_quad_m2	object;
+	quad_m2		object;
 	UINT16		*th, *tp;
 	INT32		tho;
 	UINT32		cull, i;
@@ -1282,7 +1282,7 @@ static void model2_3d_push( raster_state *raster, UINT32 input )
  *
  *******************************************/
 
-struct _geo_state
+struct geo_state
 {
 	raster_state *			raster;
 	UINT32				mode;					/* bit 0 = Enable Specular, bit 1 = Calculate Normals */

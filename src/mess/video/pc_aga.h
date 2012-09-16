@@ -25,7 +25,7 @@ MACHINE_CONFIG_EXTERN( pcvideo_aga );
 MACHINE_CONFIG_EXTERN( pcvideo_pc200 );
 
 
-typedef enum AGA_MODE { AGA_OFF, AGA_COLOR, AGA_MONO } AGA_MODE;
+enum AGA_MODE  { AGA_OFF, AGA_COLOR, AGA_MONO };
 void pc_aga_set_mode(running_machine &machine, AGA_MODE mode);
 
 READ8_HANDLER( pc_aga_videoram_r );

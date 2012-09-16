@@ -76,8 +76,7 @@
 
 
 
-typedef struct _tms32010_state tms32010_state;		/* Page 3-6 shows all registers */
-struct _tms32010_state
+struct tms32010_state
 {
 	/******************** CPU Internal Registers *******************/
 	UINT16	PC;

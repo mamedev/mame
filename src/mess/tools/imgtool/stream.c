@@ -20,7 +20,7 @@ enum imgtype_t
 	IMG_MEM
 };
 
-struct _imgtool_stream
+struct imgtool_stream
 {
 	imgtype_t imgtype;
 	int write_protect;
@@ -54,7 +54,7 @@ static imgtool_stream *stream_open_zip(const char *zipname, const char *subname,
 		goto error;
 	fclose(f);
 
-	imgfile = (imgtool_stream *)malloc(sizeof(struct _imgtool_stream));
+	imgfile = (imgtool_stream *)malloc(sizeof(imgtool_stream));
 	if (!imgfile)
 		goto error;
 
@@ -156,7 +156,7 @@ imgtool_stream *stream_open(const char *fname, int read_or_write)
 		goto error;
 	}
 
-	imgfile = (imgtool_stream *)malloc(sizeof(struct _imgtool_stream));
+	imgfile = (imgtool_stream *)malloc(sizeof(imgtool_stream));
 	if (!imgfile)
 		goto error;
 
@@ -186,7 +186,7 @@ imgtool_stream *stream_open_write_stream(int size)
 {
 	imgtool_stream *imgfile;
 
-	imgfile = (imgtool_stream *)malloc(sizeof(struct _imgtool_stream));
+	imgfile = (imgtool_stream *)malloc(sizeof(imgtool_stream));
 	if (!imgfile)
 		return NULL;
 
@@ -211,7 +211,7 @@ imgtool_stream *stream_open_mem(void *buf, size_t sz)
 {
 	imgtool_stream *imgfile;
 
-	imgfile = (imgtool_stream *)malloc(sizeof(struct _imgtool_stream));
+	imgfile = (imgtool_stream *)malloc(sizeof(imgtool_stream));
 	if (!imgfile)
 		return NULL;
 

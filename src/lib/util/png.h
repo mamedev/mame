@@ -87,7 +87,7 @@
 #define PNG_PF_Paeth		4
 
 /* Error types */
-enum _png_error
+enum png_error
 {
 	PNGERR_NONE,
 	PNGERR_OUT_OF_MEMORY,
@@ -101,7 +101,6 @@ enum _png_error
 	PNGERR_COMPRESS_ERROR,
 	PNGERR_UNSUPPORTED_FORMAT
 };
-typedef enum _png_error png_error;
 
 
 

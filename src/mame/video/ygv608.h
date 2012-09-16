@@ -126,7 +126,7 @@ enum {
 };
 
 
-typedef struct _ygv_ports {
+struct YGV_PORTS {
 	UINT8 na;			// P#0 - pattern name table data port (read/write)
 	UINT8 p1;			// P#1 - sprite data port (read/write)
 	UINT8 p2;			// P#2 - scroll data port (read/write)
@@ -135,9 +135,9 @@ typedef struct _ygv_ports {
 	UINT8 p5;			// P#5 - register select port (write only)
 	UINT8 p6;			// P#6 - status port (read/write)
 	UINT8 p7;			// P#7 - system control port (read/write)
-} YGV_PORTS, *pYGV_PORTS;
+};
 
-typedef struct _ygv_regs {
+struct YGV_REGS {
 	UINT8 r0;			// R#0 - pattern name table access ptr (r/w)
 	UINT8 r1;			// R#1 - pattern name table access ptr (r/w)
 	UINT8 r2;			// R#2 - built in ram access control
@@ -205,7 +205,7 @@ typedef struct _ygv_regs {
 	UINT8 tb13;
 	UINT8 tn4;
 
-} YGV_REGS, *pYGV_REGS;
+};
 
 #define YGV608_MAX_SPRITES (YGV608_SPRITE_ATTR_TABLE_SIZE>>2)
 
@@ -272,15 +272,15 @@ typedef struct _ygv_regs {
 #define VDW_SHIFT         0
 #define VDW_MASK          0x3f
 
-typedef struct {
+struct SPRITE_ATTR {
 	UINT8 sy;		// y dot position 7:0
 	UINT8 sx;		// x dot position 7:0
 	UINT8 attr;		// 0xf0 = color, 0x0c = size, reverse, 0x02 = x hi bit, 0x01 = y hi bit
 	UINT8 sn;    // pattern name (0-255)
-} SPRITE_ATTR, *PSPRITE_ATTR;
+};
 
 
-typedef struct _ygv608 {
+struct YGV608 {
 
   union {
     UINT8		b[8];
@@ -326,7 +326,7 @@ typedef struct _ygv608 {
   UINT8 screen_resize;  // screen requires resize
   UINT8 tilemap_resize; // tilemap requires resize
 
-} YGV608, *pYGV608;
+};
 
 
 void ygv608_set_gfxbank(UINT8 gfxbank);

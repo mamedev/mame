@@ -204,10 +204,10 @@ struct alpha8201_state
 };
 
 /* The opcode table now is a combination of cycle counts and function pointers */
-typedef struct {
+struct s_opcode {
 	unsigned cycles;
 	void (*function) (alpha8201_state *cpustate);
-}	s_opcode;
+};
 
 
 #define PC				pc.w.l

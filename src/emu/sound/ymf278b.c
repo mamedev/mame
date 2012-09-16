@@ -71,6 +71,8 @@
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
+struct YMF278BChip;
+
 struct YMF278BSlot 
 {
 	INT16 wave;		/* wavetable number */
@@ -110,10 +112,10 @@ struct YMF278BSlot
 	INT8 env_preverb;
 
 	int num;		/* slot number (for debug only) */
-	struct _YMF278BChip *chip;	/* pointer back to parent chip */
+	YMF278BChip *chip;	/* pointer back to parent chip */
 };
 
-typedef struct _YMF278BChip
+struct YMF278BChip 
 {
 	UINT8 pcmregs[256];
 	YMF278BSlot slots[24];
@@ -151,7 +153,7 @@ typedef struct _YMF278BChip
 	INT32 mix_level[8];
 
 	sound_stream * stream;
-} YMF278BChip;
+};
 
 INLINE YMF278BChip *get_safe_token(device_t *device)
 {

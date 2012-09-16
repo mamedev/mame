@@ -20,14 +20,14 @@
 
 extern const device_type TI99_EVPC;
 
-typedef struct _evpc_palette
+struct evpc_palette
 {
 	UINT8		read_index, write_index, mask;
 	int 		read;
 	int 		state;
 	struct { UINT8 red, green, blue; } color[0x100];
 	//int dirty;
-} evpc_palette;
+};
 
 class snug_enhanced_video_device : public ti_expansion_card_device, public device_nvram_interface
 {

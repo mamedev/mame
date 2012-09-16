@@ -1393,8 +1393,8 @@ static const UINT8 dither_matrix_2x2[16] =
  *
  *************************************/
 
-typedef struct _voodoo_state voodoo_state;
-typedef struct poly_extra_data poly_extra_data;
+struct voodoo_state;
+struct poly_extra_data;
 
 
 struct rgba
@@ -1407,8 +1407,7 @@ struct rgba
 };
 
 
-typedef union _voodoo_reg voodoo_reg;
-union _voodoo_reg
+union voodoo_reg
 {
 	INT32				i;
 	UINT32				u;
@@ -1722,8 +1721,7 @@ struct banshee_info
 };
 
 
-/* typedef struct _voodoo_state voodoo_state; -- declared above */
-struct _voodoo_state
+struct voodoo_state
 {
 	UINT8				index;					/* index of board */
 	device_t *device;				/* pointer to our containing device */

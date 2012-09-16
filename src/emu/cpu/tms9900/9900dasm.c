@@ -73,12 +73,12 @@ enum
 	sd_11_15	= 0x200		/* bits 11-15 should be cleared in lwpi, limi, idle, rset, rtwp, ckon, ckof, lrex */
 };
 
-typedef struct description_t
+struct description_t 
 {
 	const char *mnemonic;
 	format_t format;
 	int flags;
-} description_t;
+};
 
 
 enum opcodes {

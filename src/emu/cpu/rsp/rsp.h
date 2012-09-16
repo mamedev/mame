@@ -153,7 +153,7 @@ union ACCUMULATOR_REG
 	INT16 w[4];
 };
 
-typedef struct _rspimp_state rspimp_state;
+struct rspimp_state;
 struct rsp_state
 {
 	const rsp_config *config;

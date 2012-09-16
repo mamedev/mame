@@ -21,10 +21,10 @@ extern const device_type TI99_SPEECH8;
 #define SPEECH8_CONFIG(name) \
 	const speech8_config(name) =
 
-typedef struct _speech8_config
+struct speech8_config 
 {
 	devcb_write_line ready;
-} speech8_config;
+};
 
 
 class ti998_spsyn_device : public bus8z_device

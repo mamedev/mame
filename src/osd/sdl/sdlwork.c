@@ -88,7 +88,7 @@ struct work_thread_info
 };
 
 
-struct _osd_work_queue
+struct osd_work_queue
 {
 	osd_scalable_lock *	lock;			// lock for protecting the queue
 	osd_work_item * volatile list;		// list of items in the queue
@@ -112,7 +112,7 @@ struct _osd_work_queue
 };
 
 
-struct _osd_work_item
+struct osd_work_item
 {
 	osd_work_item *		next;			// pointer to next item
 	osd_work_queue *	queue;			// pointer back to the owning queue

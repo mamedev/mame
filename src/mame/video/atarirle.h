@@ -35,14 +35,12 @@
 ***************************************************************************/
 
 /* description for an eight-word mask */
-typedef struct atarirle_entry atarirle_entry;
 struct atarirle_entry
 {
 	UINT16			data[8];
 };
 
 /* description of the motion objects */
-typedef struct atarirle_desc atarirle_desc;
 struct atarirle_desc
 {
 	const char *	region;				/* region where the GFX data lives */

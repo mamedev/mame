@@ -552,7 +552,7 @@ static const struct {
 
 };
 
-enum _opcode_sel
+enum opcode_sel
 {
 	Complete=-1,
 	Illegal,
@@ -570,9 +570,8 @@ enum _opcode_sel
 	OpcodeE,
 	OpcodeF
 };
-typedef enum _opcode_sel opcode_sel;
 
-enum _opcode_adr
+enum opcode_adr
 {
 	AdrNone,
 	AdrAF, AdrA, AdrB, AdrCount,
@@ -584,7 +583,6 @@ enum _opcode_adr
 	FieldP, FieldWP, FieldXS, FieldX, FieldS, FieldM, FieldB, FieldW, FieldA,
 	AdrImmCount
 };
-typedef enum _opcode_adr opcode_adr;
 
 struct OPCODE 
 {

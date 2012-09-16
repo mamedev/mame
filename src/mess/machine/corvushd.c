@@ -320,7 +320,7 @@ struct corvus_hdc_t {
 };
 
 // Structure of Block #1, the Disk Parameter Block
-typedef struct {
+struct disk_parameter_block_t {
 	struct {
 		UINT8	lsb;
 		UINT8	msb;
@@ -337,7 +337,7 @@ typedef struct {
 		UINT8	lsb;
 		UINT8	msb;
 	} revh_spare_table[16];
-} disk_parameter_block_t;
+};
 
 // Structure of Block #3, the Constellation Parameter Block
 struct constellation_parameter_block_t {
@@ -351,7 +351,7 @@ struct constellation_parameter_block_t {
 };
 
 // Structure of Block #7, the Semaphore Table Block
-typedef struct {
+struct semaphore_table_block_t {
 	union {
 		UINT8	semaphore_table[256];			// Table consists of 256 bytes
 		struct {
@@ -359,7 +359,7 @@ typedef struct {
 		} semaphore_entry[32];					// 32 Entries
 	} semaphore_block;
 	UINT8	unused[256];						// Remaining half of block is unused
-} semaphore_table_block_t;
+};
 
 // Command size structure (number of bytes to xmit and recv for each command)
 struct corvus_cmd_t {

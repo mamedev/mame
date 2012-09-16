@@ -69,10 +69,10 @@
 typedef UINT32 object_type;
 
 /* opaque type representing a pool of objects */
-typedef struct _object_pool object_pool;
+struct object_pool;
 
 /* opaque type representing an iterator over pool objects */
-typedef struct _object_pool_iterator object_pool_iterator;
+struct object_pool_iterator;
 
 
 

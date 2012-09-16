@@ -34,12 +34,11 @@ enum dataType { DT_BYTE,
 				DT_DOUBLE_WORD,
 				DT_LONG_WORD };
 
-struct _typed_pointer
+struct typed_pointer
 {
 	void* addr;
 	char  data_type;
 };
-typedef struct _typed_pointer typed_pointer;
 
 //#define ADDRESS(X) (X<<1)
 #define BITS(CUR,MASK) (Dsp56kOpMask(CUR,MASK))

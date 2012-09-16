@@ -131,11 +131,11 @@ typedef int running_machine;
 //  TYPE DEFINITIONS
 //============================================================
 
-typedef struct _KEYBOARD_INDICATOR_PARAMETERS
+struct KEYBOARD_INDICATOR_PARAMETERS
 {
     USHORT UnitId;             // Unit identifier.
     USHORT LedFlags;           // LED indicator state.
-} KEYBOARD_INDICATOR_PARAMETERS, *PKEYBOARD_INDICATOR_PARAMETERS;
+};
 
 
 struct id_map_entry

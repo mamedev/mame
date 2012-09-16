@@ -25,10 +25,10 @@
 #include "charconv.h"
 
 
-typedef struct _imgtool_image imgtool_image;
-typedef struct _imgtool_partition imgtool_partition;
-typedef struct _imgtool_directory imgtool_directory;
-typedef struct _imgtool_library imgtool_library;
+struct imgtool_image;
+struct imgtool_partition;
+struct imgtool_directory;
+struct imgtool_library;
 
 enum imgtool_suggestion_viability_t 
 {
@@ -228,11 +228,11 @@ enum
 
 
 union imgtoolinfo;
-typedef struct _imgtool_class imgtool_class;
 
+struct imgtool_class;
 typedef void (*imgtool_get_info)(const imgtool_class *, UINT32, union imgtoolinfo *);
 
-struct _imgtool_class
+struct imgtool_class
 {
 	imgtool_get_info get_info;
 	imgtool_get_info derived_get_info;

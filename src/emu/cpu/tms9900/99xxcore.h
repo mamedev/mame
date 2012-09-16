@@ -257,7 +257,7 @@ Other references can be found on spies.com:
 */
 #define USE_16_BIT_ACCESSORS ((TMS99XX_MODEL == TI990_10_ID) || (TMS99XX_MODEL == TMS9900_ID) || (TMS99XX_MODEL == TMS9940_ID) || (IS_99000))
 
-typedef struct _tms99xx_state tms99xx_state;
+struct tms99xx_state;
 
 INLINE void execute(tms99xx_state *cpustate, UINT16 opcode);
 
@@ -394,13 +394,13 @@ a ST_MASK */
 #define R14 28
 #define R15 30
 
-typedef struct map_file_t
+struct map_file_t 
 {
 	UINT16 L[3], B[3];			/* actual registers */
 	UINT32 limit[3], bias[3];	/* equivalent in a more convenient form */
-} map_file_t;
+};
 
-struct _tms99xx_state
+struct tms99xx_state
 {
 /* "actual" tms9900 registers : */
 	UINT16 WP;  /* Workspace pointer */

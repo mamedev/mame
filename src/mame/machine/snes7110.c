@@ -118,7 +118,7 @@ static const UINT8 spc7110_mode2_context_table[32][2] =
 	{ 31, 31 },
 };
 
-typedef struct
+struct SPC7110Decomp
 {
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 
@@ -142,7 +142,7 @@ typedef struct
 	UINT32 morton32[4][256];
 
 	UINT32 rom_size;
-} SPC7110Decomp;
+};
 
 static SPC7110Decomp* SPC7110Decomp_ctor(running_machine &machine, UINT32 size);
 static void SPC7110Decomp_reset(SPC7110Decomp *thisptr);
@@ -788,7 +788,7 @@ enum RTC_Mode
 
 static const UINT32 spc7110_months[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-struct _snes_spc7110_t 
+struct snes_spc7110_t 
 {
 	//==================
 	//decompression unit
@@ -873,7 +873,7 @@ struct _snes_spc7110_t
 	UINT32 size;
 };
 
-static _snes_spc7110_t snes_spc7110;
+static snes_spc7110_t snes_spc7110;
 
 static void spc7110_init(running_machine& machine)
 {

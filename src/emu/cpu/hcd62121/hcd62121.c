@@ -15,7 +15,7 @@ Martin Poupe's site can be found at http://prg.rkk.cz/~mpoupe/
 #include "hcd62121.h"
 
 
-struct _hcd62121_state
+struct hcd62121_state
 {
 	UINT32 prev_pc;
 	UINT16 sp;
@@ -35,8 +35,6 @@ struct _hcd62121_state
 	address_space *io;
 	int icount;
 };
-
-typedef struct _hcd62121_state hcd62121_state;
 
 
 /* From the battery check routine at 20:e874 it looks like

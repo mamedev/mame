@@ -60,7 +60,7 @@ struct mcd212_channel_t
     UINT8 weight_factor_b[768];
 };
 
-typedef struct
+struct mcd212_regs_t
 {
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 
@@ -71,7 +71,7 @@ typedef struct
 
     running_machine *m_machine;
     bitmap_rgb32 m_bitmap;
-} mcd212_regs_t;
+};
 
 #define MCD212_CURCNT_COLOR         0x00000f    // Cursor color
 #define MCD212_CURCNT_CUW           0x008000    // Cursor width
