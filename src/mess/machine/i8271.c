@@ -89,11 +89,11 @@ struct i8271_t
 	emu_timer *command_complete_timer;
 };
 
-typedef enum
+enum I8271_STATE_t 
 {
 	I8271_STATE_EXECUTION_READ = 0,
 	I8271_STATE_EXECUTION_WRITE
-} I8271_STATE_t;
+};
 
 /* commands accepted */
 #define I8271_COMMAND_SPECIFY										0x035

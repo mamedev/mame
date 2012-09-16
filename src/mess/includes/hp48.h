@@ -11,13 +11,13 @@
 #endif
 
 /* model */
-typedef enum {
+enum hp48_models {
 	HP48_S,
 	HP48_SX,
 	HP48_G,
 	HP48_GX,
 	HP48_GP,
-} hp48_models;
+};
 
 /* memory module configuration */
 struct hp48_module 

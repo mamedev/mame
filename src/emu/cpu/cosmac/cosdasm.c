@@ -24,7 +24,7 @@
 
 #include "cosmac.h"
 
-typedef enum
+enum Adr 
 {
 	Ill,
 	Imm,
@@ -33,7 +33,7 @@ typedef enum
 	Imp3, // bit 0,1,2 1..7 contains n0,n1,n2 level
 	Low, // only low byte of address specified
 	Abs
-} Adr;
+};
 
 static const struct { const char *mnemonic; Adr adr; } table[]={
 	{ "IDL",	Imp }, { "LDN",	Imp2},{ 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },

@@ -201,12 +201,12 @@ struct fat_mediatype
 	UINT8 sectors;
 };
 
-typedef enum
+enum creation_policy_t 
 {
 	CREATE_NONE,
 	CREATE_FILE,
 	CREATE_DIR
-} creation_policy_t;
+};
 
 
 
@@ -1395,12 +1395,12 @@ static imgtoolerr_t fat_read_dirent(imgtool_partition *partition, fat_file *file
 
 
 
-typedef enum
+enum sfn_disposition_t 
 {
 	SFN_SUFFICIENT,	/* name fully representable in short file name */
 	SFN_DERIVATIVE,	/* name not fully representable in short file name, but no need to tildize */
 	SFN_MANGLED		/* name not representable in short file name; must tildize */
-} sfn_disposition_t;
+};
 
 static imgtoolerr_t fat_construct_dirent(const char *filename, creation_policy_t create,
 	UINT8 **entry, size_t *entry_len)

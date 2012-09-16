@@ -14,13 +14,13 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef enum
+enum vic2_type 
 {
 	VIC6567,	// VIC II NTSC
 	VIC6569,	// VIC II PAL
 	VIC8564,	// VIC IIe NTSC
 	VIC8566	// VIC IIe PAL
-} vic2_type;
+};
 
 struct vic2_interface
 {

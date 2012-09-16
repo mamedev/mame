@@ -81,7 +81,7 @@ static const double DRTimes[64]={100000/*infinity*/,100000/*infinity*/,118200.0,
 					28.0,25.0,22.0,18.0,14.0,12.0,11.0,8.5,7.1,6.1,5.4,4.3,3.6,3.1};
 static INT32 EG_TABLE[0x400];
 
-typedef enum {ATTACK,DECAY1,DECAY2,RELEASE} _STATE;
+enum _STATE {ATTACK,DECAY1,DECAY2,RELEASE};
 struct _EG
 {
 	int volume;	//

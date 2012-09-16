@@ -30,12 +30,12 @@ typedef struct _imgtool_partition imgtool_partition;
 typedef struct _imgtool_directory imgtool_directory;
 typedef struct _imgtool_library imgtool_library;
 
-typedef enum
+enum imgtool_suggestion_viability_t 
 {
 	SUGGESTION_END,
 	SUGGESTION_POSSIBLE,
 	SUGGESTION_RECOMMENDED
-} imgtool_suggestion_viability_t;
+};
 
 union filterinfo
 {
@@ -51,11 +51,11 @@ union filterinfo
 
 typedef void (*filter_getinfoproc)(UINT32 state, union filterinfo *info);
 
-typedef enum
+enum imgtool_libsort_t 
 {
 	ITLS_NAME,
 	ITLS_DESCRIPTION
-} imgtool_libsort_t;
+};
 
 struct imgtool_dirent 
 {
@@ -83,13 +83,13 @@ struct imgtool_chainent
 	UINT64 block;
 };
 
-typedef enum
+enum imgtool_forktype_t 
 {
 	FORK_END,
 	FORK_DATA,
 	FORK_RESOURCE,
 	FORK_ALTERNATE
-} imgtool_forktype_t;
+};
 
 struct imgtool_forkent 
 {
@@ -134,11 +134,11 @@ enum
 	IMGTOOLATTR_TIME_LASTMODIFIED
 };
 
-typedef union
+union imgtool_attribute 
 {
 	INT64	i;
 	time_t	t;
-} imgtool_attribute;
+};
 
 struct imgtool_iconinfo 
 {

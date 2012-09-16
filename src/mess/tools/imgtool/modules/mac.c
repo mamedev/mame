@@ -744,13 +744,13 @@ static imgtoolerr_t image_write_tag(mac_l1_imgref *image, UINT32 block, const vo
 #pragma mark MFS/HFS WRAPPERS
 #endif
 
-typedef enum
+enum mac_format 
 {
 	L2I_MFS,
 	L2I_HFS
-} mac_format;
+};
 
-typedef enum { data_fork = 0x00, rsrc_fork = 0xff } mac_forkID;
+enum mac_forkID { data_fork = 0x00, rsrc_fork = 0xff };
 
 typedef struct mac_l2_imgref mac_l2_imgref;
 

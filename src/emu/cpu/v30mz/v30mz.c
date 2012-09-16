@@ -45,12 +45,12 @@
 #include "v30mz.h"
 
 
-typedef enum { ES=0, CS, SS, DS } SREGS;
-typedef enum { AW=0, CW, DW, BW, SP, BP, IX, IY } WREGS;
+enum SREGS { ES=0, CS, SS, DS };
+enum WREGS { AW=0, CW, DW, BW, SP, BP, IX, IY };
 
 #define NEC_NMI_INT_VECTOR 2
 
-typedef enum {
+enum BREGS {
    AL = NATIVE_ENDIAN_VALUE_LE_BE(0x0, 0x1),
    AH = NATIVE_ENDIAN_VALUE_LE_BE(0x1, 0x0),
    CL = NATIVE_ENDIAN_VALUE_LE_BE(0x2, 0x3),
@@ -67,7 +67,7 @@ typedef enum {
   IXH = NATIVE_ENDIAN_VALUE_LE_BE(0xd, 0xc),
   IYL = NATIVE_ENDIAN_VALUE_LE_BE(0xe, 0xf),
   IYH = NATIVE_ENDIAN_VALUE_LE_BE(0xf, 0xe)
-} BREGS;
+};
 
 
 #define CF		(m_CarryVal!=0)

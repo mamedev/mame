@@ -14,11 +14,11 @@
 #include "osdcore.h"
 #include "imgtool.h"
 
-typedef enum
+enum imgtype_t 
 {
 	IMG_FILE,
 	IMG_MEM
-} imgtype_t;
+};
 
 struct _imgtool_stream
 {

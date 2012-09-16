@@ -681,12 +681,12 @@ const pia6821_interface to7_pia6821_sys =
 
 
 
-typedef enum
+enum to7_io_dev 
 {
 	TO7_IO_NONE,
 	TO7_IO_CENTRONICS,
 	TO7_IO_RS232
-} to7_io_dev;
+};
 
 /* test whether a parallel or a serial device is connected: both cannot
    be exploited at the same time!

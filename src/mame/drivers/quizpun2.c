@@ -79,7 +79,7 @@ Notes:
 #include "sound/2203intf.h"
 
 
-typedef enum { STATE_IDLE = 0, STATE_ADDR_R, STATE_ROM_R, STATE_EEPROM_R, STATE_EEPROM_W } prot_state;
+enum prot_state { STATE_IDLE = 0, STATE_ADDR_R, STATE_ROM_R, STATE_EEPROM_R, STATE_EEPROM_W };
 struct prot_t {
 	prot_state state;
 	int wait_param;

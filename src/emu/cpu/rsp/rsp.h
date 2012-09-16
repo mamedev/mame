@@ -138,20 +138,20 @@ void rspdrc_add_imem(device_t *device, UINT32 *base);
 
 #define RSPDRC_STRICT_VERIFY	0x0001			/* verify all instructions */
 
-typedef union
+union VECTOR_REG 
 {
 	UINT64 d[2];
 	UINT32 l[4];
 	INT16 s[8];
 	UINT8 b[16];
-} VECTOR_REG;
+};
 
-typedef union
+union ACCUMULATOR_REG 
 {
 	INT64 q;
 	INT32 l[2];
 	INT16 w[4];
-} ACCUMULATOR_REG;
+};
 
 typedef struct _rspimp_state rspimp_state;
 struct rsp_state

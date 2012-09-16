@@ -10,8 +10,8 @@
 
 #define I8086_NMI_INT_VECTOR 2
 
-typedef enum { ES, CS, SS, DS } SREGS;
-typedef enum { AX, CX, DX, BX, SP, BP, SI, DI } WREGS;
+enum SREGS { ES, CS, SS, DS };
+enum WREGS { AX, CX, DX, BX, SP, BP, SI, DI };
 
 #ifndef FALSE
 #define FALSE 0
@@ -19,7 +19,7 @@ typedef enum { AX, CX, DX, BX, SP, BP, SI, DI } WREGS;
 #endif
 
 
-typedef enum {
+enum BREGS {
    AL = NATIVE_ENDIAN_VALUE_LE_BE(0x0, 0x1),
    AH = NATIVE_ENDIAN_VALUE_LE_BE(0x1, 0x0),
    CL = NATIVE_ENDIAN_VALUE_LE_BE(0x2, 0x3),
@@ -36,7 +36,7 @@ typedef enum {
   SIH = NATIVE_ENDIAN_VALUE_LE_BE(0xd, 0xc),
   DIL = NATIVE_ENDIAN_VALUE_LE_BE(0xe, 0xf),
   DIH = NATIVE_ENDIAN_VALUE_LE_BE(0xf, 0xe)
-} BREGS;
+};
 
 /* parameter x = result, y = source 1, z = source 2 */
 

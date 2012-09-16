@@ -27,13 +27,13 @@
     INLINE MATH FUNCTIONS
 ***************************************************************************/
 
-typedef union
+union _x86_union
 {
 	UINT64 u64;
 	struct {
 	    UINT32 l, h;
 	} u32;
-} _x86_union;
+};
 
 /*-------------------------------------------------
     mul_32x32 - perform a signed 32 bit x 32 bit

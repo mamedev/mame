@@ -15,11 +15,11 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef enum
+enum ds1315_mode_t 
 {
 	DS_SEEK_MATCHING,
 	DS_CALENDAR_IO
-} ds1315_mode_t;
+};
 
 
 struct ds1315_t

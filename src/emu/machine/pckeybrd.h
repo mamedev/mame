@@ -12,12 +12,12 @@
 #ifndef PCKEYBRD_H
 #define PCKEYBRD_H
 
-typedef enum
+enum AT_KEYBOARD_TYPE 
 {
 	AT_KEYBOARD_TYPE_PC,
 	AT_KEYBOARD_TYPE_AT,
 	AT_KEYBOARD_TYPE_MF2
-} AT_KEYBOARD_TYPE;
+};
 
 void at_keyboard_init(running_machine &machine, AT_KEYBOARD_TYPE type);
 

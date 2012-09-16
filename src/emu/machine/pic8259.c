@@ -20,14 +20,14 @@
 #define LOG_OCW		0
 #define LOG_GENERAL	 0
 
-typedef enum
+enum pic8259_state_t 
 {
 	STATE_ICW1,
 	STATE_ICW2,
 	STATE_ICW3,
 	STATE_ICW4,
 	STATE_READY
-} pic8259_state_t;
+};
 
 typedef struct pic8259	pic8259_t;
 

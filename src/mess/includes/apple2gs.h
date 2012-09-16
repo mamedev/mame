@@ -24,22 +24,22 @@
 #define BORDER_TOP	(16)	// (plus bottom)
 
 
-typedef enum
+enum apple2gs_clock_mode 
 {
 	CLOCKMODE_IDLE,
 	CLOCKMODE_TIME,
 	CLOCKMODE_INTERNALREGS,
 	CLOCKMODE_BRAM1,
 	CLOCKMODE_BRAM2
-} apple2gs_clock_mode;
+};
 
 
-typedef enum
+enum adbstate_t 
 {
 	ADBSTATE_IDLE,
 	ADBSTATE_INCOMMAND,
 	ADBSTATE_INRESPONSE
-} adbstate_t;
+};
 
 #define IRQ_KBD_SRQ			0x01
 #define IRQ_ADB_DATA		0x02

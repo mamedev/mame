@@ -72,21 +72,21 @@
 #define APPLE2_MEM_FLOATING	0xFFFFFFFF
 #define APPLE2_MEM_MASK		0x00FFFFFF
 
-typedef enum
+enum machine_type_t 
 {
     APPLE_II,           // Apple II/II+
     APPLE_IIEPLUS,      // Apple IIe/IIc/IIgs/IIc+
     TK2000,             // Microdigital TK2000
     LASER128,           // Laser 128/128EX/128EX2
     SPACE84             // "Space 84" with flipped text mode
-} machine_type_t;
+};
 
-typedef enum
+enum bank_disposition_t 
 {
 	A2MEM_IO		= 0,	/* this is always handlers; never banked memory */
 	A2MEM_MONO		= 1,	/* this is a bank where read and write are always in unison */
 	A2MEM_DUAL		= 2		/* this is a bank where read and write can go different places */
-} bank_disposition_t;
+};
 
 struct apple2_meminfo
 {

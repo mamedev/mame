@@ -73,11 +73,11 @@ typedef void * (APIENTRYP PFNGLGETPROCADDRESSOS)(const char *procName);
  */
 int gl_shader_loadExtention(PFNGLGETPROCADDRESSOS GetProcAddress);
 
-typedef enum {
+enum GLSLCheckMode {
         CHECK_QUIET,         /* just return 0, if no error, otherwise the GL error code, no stderr output */
         CHECK_VERBOSE,       /* same as CHECK_QUIET, but in the case of an error, use stderr to be verbose */
         CHECK_ALWAYS_VERBOSE /* always print out all information available */
-} GLSLCheckMode;
+};
 
 #define GL_CHECK_ERROR_VERBOSE() gl_check_error(CHECK_ALWAYS_VERBOSE,__FILE__,__LINE__)
 #define GL_CHECK_ERROR_NORMAL() gl_check_error(CHECK_VERBOSE,__FILE__,__LINE__)

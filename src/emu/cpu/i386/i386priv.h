@@ -17,9 +17,9 @@
 
 extern int i386_dasm_one(char *buffer, UINT32 pc, const UINT8 *oprom, int mode);
 
-typedef enum { ES, CS, SS, DS, FS, GS } SREGS;
+enum SREGS { ES, CS, SS, DS, FS, GS };
 
-typedef enum
+enum BREGS 
 {
 	AL = NATIVE_ENDIAN_VALUE_LE_BE(0,3),
 	AH = NATIVE_ENDIAN_VALUE_LE_BE(1,2),
@@ -29,9 +29,9 @@ typedef enum
 	DH = NATIVE_ENDIAN_VALUE_LE_BE(9,10),
 	BL = NATIVE_ENDIAN_VALUE_LE_BE(12,15),
 	BH = NATIVE_ENDIAN_VALUE_LE_BE(13,14)
-} BREGS;
+};
 
-typedef enum
+enum WREGS 
 {
 	AX = NATIVE_ENDIAN_VALUE_LE_BE(0,1),
 	CX = NATIVE_ENDIAN_VALUE_LE_BE(2,3),
@@ -41,9 +41,9 @@ typedef enum
 	BP = NATIVE_ENDIAN_VALUE_LE_BE(10,11),
 	SI = NATIVE_ENDIAN_VALUE_LE_BE(12,13),
 	DI = NATIVE_ENDIAN_VALUE_LE_BE(14,15)
-} WREGS;
+};
 
-typedef enum { EAX, ECX, EDX, EBX, ESP, EBP, ESI, EDI } DREGS;
+enum DREGS { EAX, ECX, EDX, EBX, ESP, EBP, ESI, EDI };
 
 enum
 {
@@ -229,26 +229,26 @@ struct I386_SEG_DESC {
 	UINT32 limit;
 };
 
-typedef union {
+union I386_GPR {
 	UINT32 d[8];
 	UINT16 w[16];
 	UINT8 b[32];
-} I386_GPR;
+};
 
-typedef union {
+union X87_REG {
 	UINT64 i;
 	double f;
-} X87_REG;
+};
 
 typedef UINT64 MMX_REG;
 
-typedef union {
+union XMM_REG {
 	UINT32 d[4];
 	UINT16 w[8];
 	UINT8 b[16];
 	UINT64 q[2];
 	float f[4];
-} XMM_REG;
+};
 
 struct i386_state
 {

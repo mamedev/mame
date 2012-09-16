@@ -47,11 +47,11 @@ struct SHARC_DAG
 	UINT32 l[8];
 };
 
-typedef union
+union SHARC_REG 
 {
 	INT32 r;
 	float f;
-} SHARC_REG;
+};
 
 struct DMA_REGS 
 {

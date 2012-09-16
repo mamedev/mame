@@ -19,8 +19,8 @@ enum
 
 GFXDECODE_EXTERN( vdt911 );
 
-typedef enum { char_960, char_1920 } vdt911_screen_size_t;
-typedef enum
+enum vdt911_screen_size_t { char_960, char_1920 };
+enum vdt911_model_t 
 {
 	vdt911_model_US,
 	vdt911_model_UK,
@@ -31,7 +31,7 @@ typedef enum
 	vdt911_model_Japanese,	/* Katakana Japanese */
 	/*vdt911_model_Arabic,*//* Arabic */
 	vdt911_model_FrenchWP	/* French word processing */
-} vdt911_model_t;
+};
 
 typedef struct vdt911_init_params_t
 {

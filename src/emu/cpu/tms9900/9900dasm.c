@@ -27,7 +27,7 @@
 #define	MASK	0x0000ffff
 #define BITS(val,n1,n2)	((val>>(15-(n2))) & (MASK>>(15-((n2)-(n1)))))
 
-typedef enum
+enum format_t 
 {
 	format_1,	/* 2 address instructions */
 	format_2a,	/* jump instructions */
@@ -55,7 +55,7 @@ typedef enum
 	format_21,	/* extend precision instruction */
 
 	illegal
-} format_t;
+};
 
 /* definitions for flags */
 enum

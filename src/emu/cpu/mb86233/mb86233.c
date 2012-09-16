@@ -23,12 +23,12 @@ CPU_DISASSEMBLE( mb86233 );
     STRUCTURES & TYPEDEFS
 ***************************************************************************/
 
-typedef union
+union MB86233_REG 
 {
 	INT32	i;
 	UINT32	u;
 	float	f;
-} MB86233_REG;
+};
 
 struct mb86233_state
 {

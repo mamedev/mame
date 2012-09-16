@@ -953,12 +953,12 @@ static struct
 	int power;	/* 0.0..1.0 */
 } mCamera;
 
-typedef enum
+enum SceneNodeType 
 {
 	eSCENENODE_NONLEAF,
 	eSCENENODE_QUAD3D,
 	eSCENENODE_SPRITE
-} SceneNodeType;
+};
 
 #define RADIX_BITS 4
 #define RADIX_BUCKETS (1<<RADIX_BITS)

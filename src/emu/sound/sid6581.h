@@ -14,11 +14,11 @@
 #include "devlegcy.h"
 
 
-typedef enum
+enum SIDTYPE 
 {
 	MOS6581,
 	MOS8580
-} SIDTYPE;
+};
 
 #define MOS6581_INTERFACE(name) \
 	const sid6581_interface (name) =

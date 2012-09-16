@@ -7,11 +7,11 @@
 #include "emu.h"
 #include "includes/svision.h"
 
-typedef enum
+enum SVISION_NOISE_Type 
 {
 	SVISION_NOISE_Type7Bit,
 	SVISION_NOISE_Type14Bit
-} SVISION_NOISE_Type;
+};
 
 struct SVISION_NOISE 
 {

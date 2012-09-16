@@ -33,7 +33,7 @@
 #define MSIZE ((BSIZE/4) - 1) /* Size of bitmaps */
 
 
-typedef enum
+enum disk_type 
 {
 	DT_UNKNOWN       = -1,
 	DT_OFS           =  0,
@@ -42,7 +42,7 @@ typedef enum
 	DT_FFS_INTL      =  3,
 	DT_OFS_INTL_DIRC =  4,
 	DT_FFS_INTL_DIRC =  5
-} disk_type;
+};
 
 
 enum
@@ -55,7 +55,7 @@ enum
 };
 
 
-typedef enum
+enum sec_type 
 {
 	ST_INVALID  =  0,
 	ST_ROOT     =  1,
@@ -64,7 +64,7 @@ typedef enum
 	ST_LINKFILE = -4,
 	ST_LINKDIR  =  4,
 	ST_SOFTLINK =  3
-} sec_type;
+};
 
 
 struct amiga_date

@@ -24,7 +24,7 @@
 
 #include "lh5801.h"
 
-typedef enum
+enum Adr 
 {
 	Imp,
 	Reg,
@@ -44,9 +44,9 @@ typedef enum
 	ME1AbsImm,
 	RelP,
 	RelM
-} Adr;
+};
 
-typedef enum
+enum Regs 
 {
 	RegNone,
 	A,
@@ -54,7 +54,7 @@ typedef enum
 	YL, YH, Y,
 	UL, UH, U,
 	P, S
-} Regs;
+};
 
 static const char *const RegNames[]= {
 	0, "A", "XL", "XH", "X", "YL", "YH", "Y", "UL", "UH", "U", "P", "S"
@@ -64,7 +64,7 @@ static const char *const RegNames[]= {
 #undef SEC
 #endif
 
-typedef enum
+enum Ins 
 {
 	ILL, ILL2, PREFD, NOP,
 
@@ -97,7 +97,7 @@ typedef enum
 	RDP, SDP,// reset display flip flop
 	RPU, SPU,// flip flop pu off
 	RPV, SPV,// flip flop pv off
-} Ins;
+};
 
 static const char *const InsNames[]={
 	"ILL", "ILL", 0, "NOP",

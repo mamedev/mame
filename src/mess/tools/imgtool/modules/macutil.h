@@ -12,18 +12,18 @@
 
 #include "imgtool.h"
 
-typedef enum
+enum mac_fork_t 
 {
 	MAC_FORK_DATA,
 	MAC_FORK_RESOURCE
-} mac_fork_t;
+};
 
-typedef enum
+enum mac_filecategory_t 
 {
 	MAC_FILECATEGORY_DATA,
 	MAC_FILECATEGORY_TEXT,
 	MAC_FILECATEGORY_FORKED
-} mac_filecategory_t;
+};
 
 
 /* converting Classic Mac OS time <==> Imgtool time */

@@ -4139,7 +4139,7 @@ enum {
  *
  *************************************/
 
-typedef enum
+enum discrete_node_type 
 {
 	DSS_NULL,			/* Nothing, nill, zippo, only to be used as terminating node */
 	DSS_NOP,			/* just do nothing, placeholder for potential DISCRETE_REPLACE in parent block */
@@ -4169,7 +4169,7 @@ typedef enum
 
 	/* Marks end of this enum -- must be last entry ! */
 	DSO_LAST
-} discrete_node_type;
+};
 
 /*************************************
  *

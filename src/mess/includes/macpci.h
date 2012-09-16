@@ -24,7 +24,7 @@
 #define MAC_539X_2_TAG "539x_2"
 
 /* tells which model is being emulated (set by macxxx_init) */
-typedef enum
+enum model_t 
 {
     PCIMODEL_MAC_PM5200,
     PCIMODEL_MAC_PM6200,
@@ -66,7 +66,7 @@ typedef enum
 
     PCIMODEL_MAC_PIPPIN,    // Apple/Bandai Pippin
 
-} model_t;
+};
 
 /*----------- defined in machine/pcimac.c -----------*/
 

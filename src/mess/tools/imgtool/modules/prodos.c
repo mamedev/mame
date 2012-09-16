@@ -175,12 +175,12 @@ struct prodos_dirent
 	UINT32 putaway_directory;
 };
 
-typedef enum
+enum creation_policy_t 
 {
 	CREATE_NONE,
 	CREATE_FILE,
 	CREATE_DIR
-} creation_policy_t;
+};
 
 
 

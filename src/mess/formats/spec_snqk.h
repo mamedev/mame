@@ -141,23 +141,23 @@ void spectrum_setup_raw(running_machine &machine, UINT8 *quickdata, UINT32 quick
 #define FRZ_HDR    42
 #define FRZ_SIZE   (FRZ_HDR + 8*SPECTRUM_BANK)
 
-typedef enum
+enum SPECTRUM_SNAPSHOT_TYPE 
 {
     SPECTRUM_SNAPSHOT_NONE,
     SPECTRUM_SNAPSHOT_SNA,
     SPECTRUM_SNAPSHOT_Z80,
     SPECTRUM_SNAPSHOT_SP,
     SPECTRUM_TAPEFILE_TAP
-} SPECTRUM_SNAPSHOT_TYPE;
+};
 
-typedef enum {
+enum SPECTRUM_Z80_SNAPSHOT_TYPE {
     SPECTRUM_Z80_SNAPSHOT_INVALID,
     SPECTRUM_Z80_SNAPSHOT_48K_OLD,
     SPECTRUM_Z80_SNAPSHOT_48K,
     SPECTRUM_Z80_SNAPSHOT_SAMRAM,
     SPECTRUM_Z80_SNAPSHOT_128K,
     SPECTRUM_Z80_SNAPSHOT_TS2068
-} SPECTRUM_Z80_SNAPSHOT_TYPE;
+};
 
 /*****************************************************************************
  *

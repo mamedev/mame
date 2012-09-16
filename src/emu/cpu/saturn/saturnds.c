@@ -71,7 +71,7 @@ static const char number_2_hex[]=
 
 
 // don't split branch and return, source relies on this ordering
-typedef enum
+enum MNEMONICS 
 {
 	Return, ReturnSetXM, ReturnSetCarry, ReturnClearCarry, ReturnFromInterrupt,
 	jump3,jump4,jump,
@@ -197,7 +197,7 @@ typedef enum
 	negateA, negateB, negateC, negateD,
 	notA, notB, notC, notD
 
-} MNEMONICS;
+};
 
 static const struct {
 	const char *name[2];

@@ -79,7 +79,7 @@
 */
 
 
-typedef enum
+enum Adr 
 {
 	Ill,
 	Imp,
@@ -90,7 +90,7 @@ typedef enum
 	Etc,
 	Cal,
 	Lp
-} Adr;
+};
 
 static const struct { const char *mnemonic; Adr adr; } table[]={
 	{ "LII",	Imm	}, { "LIJ",		Imm }, { "LIA",		Imm	}, { "LIB",		Imm },

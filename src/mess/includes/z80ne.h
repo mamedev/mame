@@ -26,12 +26,12 @@
 #define LX385_TAPE_SAMPLE_FREQ 38400
 
 /* wave duration threshold */
-typedef enum
+enum z80netape_speed 
 {
 	TAPE_300BPS  = 300, /*  300 bps */
 	TAPE_600BPS  = 600, /*  600 bps */
 	TAPE_1200BPS = 1200 /* 1200 bps */
-} z80netape_speed;
+};
 
 struct cass_data_t {
 	struct {

@@ -37,14 +37,14 @@
 #define ADB_IS_PM_CLASS	((m_model >= MODEL_MAC_PORTABLE && m_model <= MODEL_MAC_PB100) || (m_model >= MODEL_MAC_PB140 && m_model <= MODEL_MAC_PBDUO_270c))
 
 /* for Egret and CUDA streaming MCU commands, command types */
-typedef enum
+enum mac_streaming_t 
 {
 	MCU_STREAMING_NONE = 0,
 	MCU_STREAMING_PRAMRD,
 	MCU_STREAMING_PRAMWR,
 	MCU_STREAMING_WRAMRD,
 	MCU_STREAMING_WRAMWR
-} mac_streaming_t;
+};
 
 enum
 {
@@ -55,7 +55,7 @@ enum
 };
 
 /* tells which model is being emulated (set by macxxx_init) */
-typedef enum
+enum model_t 
 {
 	MODEL_MAC_128K512K,	// 68000 machines
 	MODEL_MAC_512KE,
@@ -124,7 +124,7 @@ typedef enum
 	MODEL_MAC_POWERMAC_6100,	// NuBus PowerMacs
 	MODEL_MAC_POWERMAC_7100,
 	MODEL_MAC_POWERMAC_8100
-} model_t;
+};
 
 // video parameters for classic Macs
 #define MAC_H_VIS	(512)

@@ -528,14 +528,14 @@ typedef struct dsk_vib
 								/* of byte 1, etc.) */
 } dsk_vib;
 
-typedef enum
+enum ti99_img_format 
 {
 	if_mess,
 	if_v9t9,
 	if_pc99_fm,
 	if_pc99_mfm,
 	if_harddisk
-} ti99_img_format;
+};
 
 /*
     level-1 disk image descriptor

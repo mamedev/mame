@@ -9,13 +9,13 @@
 #define SHARC_INPUT_FLAG2		5
 #define SHARC_INPUT_FLAG3		6
 
-typedef enum
+enum SHARC_BOOT_MODE 
 {
 	BOOT_MODE_EPROM,
 	BOOT_MODE_HOST,
 	BOOT_MODE_LINK,
 	BOOT_MODE_NOBOOT
-} SHARC_BOOT_MODE;
+};
 
 struct sharc_config {
 	SHARC_BOOT_MODE boot_mode;

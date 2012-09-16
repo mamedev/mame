@@ -1993,11 +1993,11 @@ static void set_flag1(tms99xx_state *cpustate, int val)
 
 #endif
 
-typedef enum
+enum cru_error_code 
 {
 	CRU_OK = 0,
 	CRU_PRIVILEGE_VIOLATION = -1
-} cru_error_code;
+};
 
 #define WRITEPORT(cs, port, data) (cs)->io->write_byte(port, data)
 

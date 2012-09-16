@@ -13,12 +13,12 @@
 #include "formats/coco_dsk.h"
 #include "iflopimg.h"
 
-typedef enum
+enum creation_policy_t 
 {
 	CREATE_NONE,
 	CREATE_FILE,
 	CREATE_DIR
-} creation_policy_t;
+};
 
 struct os9_diskinfo
 {

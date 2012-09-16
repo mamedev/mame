@@ -10,12 +10,12 @@
 #ifndef KBDC8042_H
 #define KBDC8042_H
 
-typedef enum
+enum kbdc8042_type_t 
 {
 	KBDC8042_STANDARD,
 	KBDC8042_PS2,		/* another timing of integrated controller */
 	KBDC8042_AT386		/* hack for at386 driver */
-} kbdc8042_type_t;
+};
 
 
 struct kbdc8042_interface

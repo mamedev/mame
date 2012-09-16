@@ -12,11 +12,11 @@
 
 
 /* Supported character sets */
-typedef enum
+enum imgtool_charset 
 {
 	IMGTOOL_CHARSET_UTF8,
 	IMGTOOL_CHARSET_ISO_8859_1,
-} imgtool_charset;
+};
 
 
 /* Convert specified charset to UTF-8 */

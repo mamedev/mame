@@ -66,17 +66,17 @@ extern const device_type KR2376;
 /*
  * Input pins
  */
-typedef enum
+enum kr2376_input_pin_t 
 {
 	KR2376_DSII=20,			/* DSII  - Pin 20 - Data & Strobe Invert Input */
 	KR2376_PII=6			/* PII   - Pin  6 - Parity Invert Input */
-} kr2376_input_pin_t;
+};
 
-typedef enum
+enum kr2376_output_pin_t 
 {
 	KR2376_SO=16,			/* SO    - Pin 16 - Strobe Output */
 	KR2376_PO=7			/* PO    - Pin  7 - Parity Output */
-} kr2376_output_pin_t;
+};
 
 /* interface */
 struct kr2376_interface

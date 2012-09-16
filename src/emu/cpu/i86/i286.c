@@ -26,11 +26,11 @@
 /* cpu state                                                               */
 /***************************************************************************/
 /* I86 registers */
-typedef union
+union i80286basicregs 
 {                   /* eight general registers */
     UINT16 w[8];    /* viewed as 16 bits registers */
     UINT8  b[16];   /* or as 8 bit registers */
-} i80286basicregs;
+};
 
 struct i80286_state
 {

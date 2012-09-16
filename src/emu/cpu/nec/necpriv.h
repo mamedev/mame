@@ -19,19 +19,19 @@ enum
 };
 
 /* interrupt sources */
-typedef enum
+enum INTSOURCES 
 {
 	BRK = 0,
 	INT_IRQ = 1,
 	NMI_IRQ = 2,
-} INTSOURCES;
+};
 
 /* NEC registers */
-typedef union
+union necbasicregs 
 {                   /* eight general registers */
     UINT16 w[8];    /* viewed as 16 bits registers */
     UINT8  b[16];   /* or as 8 bit registers */
-} necbasicregs;
+};
 
 struct nec_state_t
 {
@@ -71,9 +71,9 @@ struct nec_state_t
 	UINT8	seg_prefix;		/* prefix segment indicator */
 };
 
-typedef enum { DS1, PS, SS, DS0 } SREGS;
-typedef enum { AW, CW, DW, BW, SP, BP, IX, IY } WREGS;
-typedef enum {
+enum SREGS { DS1, PS, SS, DS0 };
+enum WREGS { AW, CW, DW, BW, SP, BP, IX, IY };
+enum BREGS {
    AL = NATIVE_ENDIAN_VALUE_LE_BE(0x0, 0x1),
    AH = NATIVE_ENDIAN_VALUE_LE_BE(0x1, 0x0),
    CL = NATIVE_ENDIAN_VALUE_LE_BE(0x2, 0x3),
@@ -82,7 +82,7 @@ typedef enum {
    DH = NATIVE_ENDIAN_VALUE_LE_BE(0x5, 0x4),
    BL = NATIVE_ENDIAN_VALUE_LE_BE(0x6, 0x7),
    BH = NATIVE_ENDIAN_VALUE_LE_BE(0x7, 0x6),
-} BREGS;
+};
 
 #define Sreg(x)			nec_state->sregs[x]
 #define Wreg(x)			nec_state->regs.w[x]

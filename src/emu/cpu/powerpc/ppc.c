@@ -216,15 +216,15 @@ struct SPU_REGS {
 	emu_timer *tx_timer;
 };
 
-typedef union {
+union FPR {
 	UINT64	id;
 	double	fd;
-} FPR;
+};
 
-typedef union {
+union FPR32 {
 	UINT32 i;
 	float f;
-} FPR32;
+};
 
 struct BATENT {
 	UINT32 u;

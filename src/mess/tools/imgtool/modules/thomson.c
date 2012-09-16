@@ -133,14 +133,14 @@ struct thom_floppy {
 };
 
 
-typedef enum {
+enum thom_dirent_type {
 
   THOM_DIRENT_END,
   THOM_DIRENT_FREE,
   THOM_DIRENT_FILE,
   THOM_DIRENT_INVALID,
 
-} thom_dirent_type;
+};
 
 
 struct thom_dirent {

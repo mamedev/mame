@@ -58,12 +58,12 @@
 #define IWM_Q6		0x40
 #define IWM_Q7		0x80
 
-typedef enum
+enum applefdc_t 
 {
 	APPLEFDC_APPLE2,	/* classic Apple II disk controller (pre-IWM) */
 	APPLEFDC_IWM,		/* Integrated Woz Machine */
 	APPLEFDC_SWIM		/* Sander/Woz Integrated Machine */
-} applefdc_t;
+};
 
 
 static UINT8 swim_default_parms[16] =

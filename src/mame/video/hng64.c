@@ -681,12 +681,12 @@ WRITE32_MEMBER(hng64_state::hng64_videoram_w)
 }
 
 /* internal set of transparency states for rendering */
-typedef enum
+enum hng64trans_t 
 {
 	HNG64_TILEMAP_NORMAL = 1,
 	HNG64_TILEMAP_ADDITIVE,
 	HNG64_TILEMAP_ALPHA
-} hng64trans_t;
+};
 
 
 struct blit_parameters

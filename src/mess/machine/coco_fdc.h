@@ -13,13 +13,13 @@
 
 // ======================> coco_rtc_type_t
 
-typedef enum
+enum coco_rtc_type_t 
 {
 	RTC_DISTO	= 0x00,
 	RTC_CLOUD9	= 0x01,
 
 	RTC_NONE	= 0xFF
-} coco_rtc_type_t;
+};
 
 // ======================> coco_fdc_device
 

@@ -24,7 +24,7 @@ Template for skeleton device
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef enum
+enum eeprom_cmd_t 
 {
 	EEPROM_GET_CMD = 0,
 	EEPROM_READ,
@@ -32,7 +32,7 @@ typedef enum
 	EEPROM_WRITE_ENABLE,
 	EEPROM_WRITE_DISABLE,
 	EEPROM_STATUS_OUTPUT
-} eeprom_cmd_t;
+};
 
 
 // ======================> m6m80011ap_device

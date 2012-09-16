@@ -10,7 +10,7 @@
 #define IMGTERRS_H
 
 /* Error codes */
-typedef enum
+enum imgtoolerr_t 
 {
 	IMGTOOLERR_SUCCESS,
 	IMGTOOLERR_OUTOFMEMORY,
@@ -41,7 +41,7 @@ typedef enum
 	IMGTOOLERR_NOFORKS,
 	IMGTOOLERR_FORKNOTFOUND,
 	IMGTOOLERR_INVALIDPARTITION
-} imgtoolerr_t;
+};
 
 
 

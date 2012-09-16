@@ -30,23 +30,23 @@
 #include "machine/upd765.h"
 
 
-typedef enum
+enum UPD765_PHASE 
 {
 	UPD765_COMMAND_PHASE_FIRST_BYTE,
 	UPD765_COMMAND_PHASE_BYTES,
 	UPD765_RESULT_PHASE,
 	UPD765_EXECUTION_PHASE_READ,
 	UPD765_EXECUTION_PHASE_WRITE
-} UPD765_PHASE;
+};
 
 /* supported versions */
-typedef enum
+enum UPD765_VERSION 
 {
 	TYPE_UPD765A = 0,
 	TYPE_UPD765B = 1,
 	TYPE_SMC37C78 = 2,
 	TYPE_UPD72065 = 3
-} UPD765_VERSION;
+};
 
 
 /* uncomment the following line for verbose information */

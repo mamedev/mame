@@ -78,11 +78,11 @@ extern const device_type UPD72065;
 ***************************************************************************/
 
 /* RDY pin connected state */
-typedef enum
+enum UPD765_RDY_PIN 
 {
 	UPD765_RDY_PIN_NOT_CONNECTED = 0,
 	UPD765_RDY_PIN_CONNECTED = 1
-} UPD765_RDY_PIN;
+};
 
 #define UPD765_DAM_DELETED_DATA 0x0f8
 #define UPD765_DAM_DATA 0x0fb

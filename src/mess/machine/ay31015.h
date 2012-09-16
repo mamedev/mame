@@ -12,17 +12,17 @@
 ***************************************************************************/
 
 
-typedef enum
+enum ay31015_type_t 
 {
 	/* For AY-3-1014A, AY-3-1015(D) and HD6402 variants */
 	AY_3_1015,
 
 	/* For AY-3-1014, AY-5-1013 and AY-6-1013 variants */
 	AY_5_1013
-} ay31015_type_t;
+};
 
 
-typedef enum
+enum ay31015_input_pin_t 
 {
 	AY31015_SWE=16,			/* -SWE  - Pin 16 - Status word enable */
 	AY31015_RDAV=18,		/* -RDAV - Pin 18 - Reset data available */
@@ -34,10 +34,10 @@ typedef enum
 	AY31015_NB1=37,			/*  NB1  - Pin 37 - Number of bits #1 */
 	AY31015_NB2=38,			/*  NB2  - Pin 38 - Number of bits #2 */
 	AY31015_EPS=39			/*  EPS  - Pin 39 - Odd/Even parity select */
-} ay31015_input_pin_t;
+};
 
 
-typedef enum
+enum ay31015_output_pin_t 
 {
 	AY31015_PE=13,			/* PE   - Pin 13 - Parity error */
 	AY31015_FE=14,			/* FE   - Pin 14 - Framing error */
@@ -46,7 +46,7 @@ typedef enum
 	AY31015_TBMT=22,		/* TBMT - Pin 22 - Transmit buffer empty */
 	AY31015_EOC=24,			/* EOC  - Pin 24 - End of character */
 	AY31015_SO=25			/* SO   - Pin 25 - Serial output */
-} ay31015_output_pin_t;
+};
 
 
 struct 	ay31015_config

@@ -63,14 +63,14 @@
 
 /***** Video Modes *****/
 
-typedef enum
+enum BETA_VID_MODES 
 {
 	TEXT_40x25,				/* Text mode 40x25 */
 	TEXT_80x25,				/* Text mode 80x25 */
 	GRAPH_320x256x4,		/* Graphics 320x256x4 */
 	GRAPH_320x256x16,		/* Graphics 320x256x16 */
 	GRAPH_640x512x2			/* Graphics 640X512X2 */
-} BETA_VID_MODES;
+};
 
 #define iosize	(0xfEFF-0xfc00)
 

@@ -23,11 +23,11 @@ Template for skeleton device
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef enum
+enum s3520cf_state_t 
 {
 	RTC_SET_ADDRESS = 0,
 	RTC_SET_DATA
-} s3520cf_state_t;
+};
 
 struct rtc_regs_t 
 {

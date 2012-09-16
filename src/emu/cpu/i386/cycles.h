@@ -3,7 +3,7 @@
 #ifndef __CYCLES_H__
 #define __CYCLES_H__
 
-typedef enum
+enum X86_CYCLES 
 {
 	CYCLES_MOV_REG_REG,
 	CYCLES_MOV_REG_MEM,
@@ -327,7 +327,7 @@ typedef enum
 	CYCLES_XADD_REG_MEM,
 
 	CYCLES_NUM_OPCODES
-} X86_CYCLES;
+};
 
 
 #define X86_NUM_CPUS		4

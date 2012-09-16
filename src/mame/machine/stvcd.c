@@ -101,7 +101,7 @@ struct partitionT
 };
 
 // 16-bit transfer types
-typedef enum
+enum transT 
 {
 	XFERTYPE_INVALID,
 	XFERTYPE_TOC,
@@ -109,15 +109,15 @@ typedef enum
 	XFERTYPE_FILEINFO_254,
 	XFERTYPE_SUBQ,
 	XFERTYPE_SUBRW
-} transT;
+};
 
 // 32-bit transfer types
-typedef enum
+enum trans32T 
 {
 	XFERTYPE32_INVALID,
 	XFERTYPE32_GETSECTOR,
 	XFERTYPE32_GETDELETESECTOR
-} trans32T;
+};
 
 // local variables
 static timer_device *sector_timer;

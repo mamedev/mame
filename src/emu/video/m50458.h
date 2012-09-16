@@ -28,11 +28,11 @@ Mitsubishi M50458 OSD chip
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef enum
+enum m50458_state_t 
 {
 	OSD_SET_ADDRESS = 0,
 	OSD_SET_DATA
-} m50458_state_t;
+};
 
 // ======================> upd7220_interface
 

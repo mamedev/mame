@@ -8,7 +8,7 @@
 #define STATE_VCR		3
 
 /* todo: replace this with the PAIR structure */
-typedef union
+union pair
 {
 #ifdef LSB_FIRST
 	struct { unsigned char l,h; } b;
@@ -16,7 +16,7 @@ typedef union
 	struct { unsigned char h,l; } b;
 #endif
 	unsigned short int w;
-}pair;
+};
 
 /* the VDC context */
 

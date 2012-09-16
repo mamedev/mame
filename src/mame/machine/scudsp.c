@@ -93,15 +93,15 @@ Changelog:
 #define SET_Z(_val) (state->m_scu_regs[32] = ((state->m_scu_regs[32] & ~0x00200000) | ((_val) ? 0x00200000 : 0)))
 #define SET_V(_val) (state->m_scu_regs[32] = ((state->m_scu_regs[32] & ~0x00080000) | ((_val) ? 0x00080000 : 0)))
 
-typedef union {
+union SCUDSPREG32 {
 	INT32  si;
 	UINT32 ui;
-} SCUDSPREG32;
+};
 
-typedef union {
+union SCUDSPREG16 {
 	INT16  si;
 	UINT16 ui;
-} SCUDSPREG16;
+};
 
 static struct {
 	   UINT8 pc;							           /*Program Counter*/
