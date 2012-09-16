@@ -1457,6 +1457,26 @@ y	  0x00     x    0x00000000 0x00000000 (i.e. if amp is 0 then sin/cos are zero 
 0xc0  0xc0     1    0xffe80000 0x00000000
 0xc0  0xc0     2    0xffd00000 0x00000000
 0xc0  0xc0     3    0xffa00000 0x00000000
+
+commands 0x130e/0x138e: (dx dy 2 fixed point 0x80)
+dx     dy      angle
+---------------------
+0x00   0x00    0x20
+0x20   0x00    0x25 (0x26 in test)
+0x40   0x00    0x2d (0x2b in test)
+0x60   0x00    0x36
+0x80   0x00    0x00 cop status 0x8007
+0xa0   0x00    0x4a
+0xc0   0x00    0x53
+0xe0   0x00    0x5b (0x5a)
+0x100  0x00    0x60
+0x120  0x00    0x65
+0x140  0x00    0x69 (0x68)
+0x160  0x00    0x6b
+0x180  0x00    0x6e (0x6d)
+0x1a0  0x00    0x6f
+0x1c0  0x00    0x71
+0x1e0  0x00    0x72
 */
 
 #include "emu.h"
@@ -1804,6 +1824,7 @@ static struct
 	UINT16 hitbox;
 	UINT16 hitbox_x,hitbox_y;
 }cop_collision_info[2];
+static int r0, r1;
 
 /* RE from Seibu Cup Soccer bootleg */
 static const UINT8 fade_table(int v)
@@ -2184,8 +2205,6 @@ static WRITE16_HANDLER( generic_cop_w )
 
 			//printf("%04x %04x %04x\n",cop_mcu_ram[offset],u1,u2);
 
-			cop_status &= 0x7fff;
-
 			/*
             Macro notes:
             - endianess changes from/to Raiden 2:
@@ -2226,7 +2245,6 @@ static WRITE16_HANDLER( generic_cop_w )
 			}
 
 			/* SINE math - 0x8100 */
-			/* FIXME: cop scale is unreliable */
 			/*
                  00000-0ffff:
                    amp = x/256
@@ -2256,7 +2274,6 @@ static WRITE16_HANDLER( generic_cop_w )
 			}
 
 			/* COSINE math - 0x8900 */
-			/* FIXME: cop scale is unreliable */
 			/*
              10000-1ffff:
                amp = x/256
@@ -2288,19 +2305,23 @@ static WRITE16_HANDLER( generic_cop_w )
 			/* 0x130e / 0x138e */
 			if(COP_CMD(0x984,0xaa4,0xd82,0xaa2,0x39b,0xb9a,0xb9a,0xa9a,5,0xbf7f))
 			{
-				int dx = space->read_dword(cop_register[1]+4) - space->read_dword(cop_register[0]+4);
-				int dy = space->read_dword(cop_register[1]+8) - space->read_dword(cop_register[0]+8);
+				int dy = space->read_dword(cop_register[1]+4) - space->read_dword(cop_register[0]+4);
+				int dx = space->read_dword(cop_register[1]+8) - space->read_dword(cop_register[0]+8);
 
-				if(!dy) {
+				cop_status = 7;
+				if(!dx) {
 					cop_status |= 0x8000;
 					cop_angle = 0;
 				} else {
-					cop_angle = atan(double(dx)/double(dy)) * 128 / M_PI;
-					if(dy<0)
+					cop_angle = atan(double(dy)/double(dx)) * 128.0 / M_PI;
+					if(dx<0)
 						cop_angle += 0x80;
 				}
 
-				space->write_byte(cop_register[0]+(0x34^3), cop_angle);
+				//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,cop_angle);
+
+				if(cop_mcu_ram[offset] & 0x80)
+					space->write_byte(cop_register[0]+(0x34^3), cop_angle);
 				return;
 			}
 
@@ -2308,25 +2329,28 @@ static WRITE16_HANDLER( generic_cop_w )
 			//(heatbrl)  | 5 | bf7f | 138e | 984 aa4 d82 aa2 39b b9a b9a b9a
 			if(COP_CMD(0x984,0xaa4,0xd82,0xaa2,0x39b,0xb9a,0xb9a,0xb9a,5,0xbf7f))
 			{
-				int dx = space->read_dword(cop_register[1]+4) - space->read_dword(cop_register[0]+4);
-				int dy = space->read_dword(cop_register[1]+8) - space->read_dword(cop_register[0]+8);
-				if(!dy) {
+				int dy = space->read_dword(cop_register[1]+4) - space->read_dword(cop_register[0]+4);
+				int dx = space->read_dword(cop_register[1]+8) - space->read_dword(cop_register[0]+8);
+
+				cop_status = 7;
+				if(!dx) {
 					cop_status |= 0x8000;
 					cop_angle = 0;
 				} else {
-					cop_angle = atan(double(dx)/double(dy)) * 128 / M_PI;
-					if(dy<0)
+					cop_angle = atan(double(dy)/double(dx)) * 128.0 / M_PI;
+					if(dx<0)
 						cop_angle += 0x80;
 				}
 
-				/* TODO: bit 7 of macro command says if we have to write on work RAM */
-				//if(0)
+				r0 = dy;
+				r1 = dx;
+
+				if(cop_mcu_ram[offset] & 0x80)
 					space->write_byte(cop_register[0]+(0x34^3), cop_angle);
 				return;
 			}
 
 			/* Pythagorean theorem, hypotenuse length - 0x3bb0 */
-			//07 | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
 			//(grainbow) | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
 			/*
              40000-7ffff:
@@ -2336,8 +2360,8 @@ static WRITE16_HANDLER( generic_cop_w )
             */
 			if(COP_CMD(0xf9c,0xb9c,0xb9c,0xb9c,0xb9c,0xb9c,0xb9c,0x99c,4,0x007f))
 			{
-				int dx = space->read_dword(cop_register[1]+4) - space->read_dword(cop_register[0]+4);
-				int dy = space->read_dword(cop_register[1]+8) - space->read_dword(cop_register[0]+8);
+				int dy = r0;
+				int dx = r1;
 
 				dx = dx >> 16;
 				dy = dy >> 16;
@@ -2359,12 +2383,11 @@ static WRITE16_HANDLER( generic_cop_w )
                v2 = (x & 1023)*32
                val = !v1 ? 32767 : trunc(v2/v1+0.5)
             */
+            /* TODO: this is WRONG! */
 			if(COP_CMD(0xf9a,0xb9a,0xb9c,0xb9c,0xb9c,0x29c,0x000,0x000,5,0xfcdd))
 			{
 				int div = space->read_word(cop_register[0]+(0x36^2));
 				int res;
-
-				cop_status = 0x8007;
 
 				if(!div)
 				{
