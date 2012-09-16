@@ -65,7 +65,7 @@ public:
 
 	/* memory */
 	UINT16       m_tileram[0x400];
-	DECLARE_WRITE8_MEMBER(mole_videoram_w);
+	DECLARE_WRITE8_MEMBER(mole_tileram_w);
 	DECLARE_WRITE8_MEMBER(mole_tilebank_w);
 	DECLARE_WRITE8_MEMBER(mole_flipscreen_w);
 	DECLARE_READ8_MEMBER(mole_protection_r);
@@ -106,18 +106,15 @@ void mole_state::video_start()
 	save_item(NAME(m_tileram));
 }
 
-WRITE8_MEMBER(mole_state::mole_videoram_w)
+WRITE8_MEMBER(mole_state::mole_tileram_w)
 {
-
 	m_tileram[offset] = data | (m_tile_bank << 8);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(mole_state::mole_tilebank_w)
 {
-
 	m_tile_bank = data;
-	m_bg_tilemap->mark_all_dirty();
 }
 
 WRITE8_MEMBER(mole_state::mole_flipscreen_w)
@@ -202,7 +199,7 @@ static ADDRESS_MAP_START( mole_map, AS_PROGRAM, 8, mole_state )
 	AM_RANGE(0x0800, 0x0800) AM_WRITENOP // ???
 	AM_RANGE(0x0820, 0x0820) AM_WRITENOP // ???
 	AM_RANGE(0x5000, 0x7fff) AM_MIRROR(0x8000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(mole_videoram_w)
+	AM_RANGE(0x8000, 0x83ff) AM_WRITE(mole_tileram_w) AM_READNOP
 	AM_RANGE(0x8400, 0x8400) AM_WRITE(mole_tilebank_w)
 	AM_RANGE(0x8c00, 0x8c01) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x8c40, 0x8c40) AM_WRITENOP // ???
@@ -306,13 +303,11 @@ GFXDECODE_END
 
 void mole_state::machine_start()
 {
-
 	save_item(NAME(m_tile_bank));
 }
 
 void mole_state::machine_reset()
 {
-
 	m_tile_bank = 0;
 }
 
