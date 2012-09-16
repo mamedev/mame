@@ -237,6 +237,20 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
+	<software name="jackjill">
+		<description>Adventures in Letterland with Jack &amp; Jill (USA)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value="T-182021-00"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18588-U" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18588-u.ic1" size="1048576" crc="e846858b" sha1="fe4412ba81673894167841f47780a3f67d93c4e7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="poohcorn">
 		<description>A Year At Pooh Corner (USA)</description>
 		<year>1994</year>
@@ -413,6 +427,20 @@ Games for the MIXT BOOK PLAYER COPERA
 			<feature name="ic1" value="MPR-17438 J11" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-17438 j11.ic1" size="1048576" crc="1041e52a" sha1="422f46d670a5f8094267984051ed6f90babe2dce" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crayola">
+		<description>Crayola - Create a World (USA)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49027-00"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18444-MX" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18444-mx.ic1" size="524288" crc="04fc1c21" sha1="88738c2b5b6302385fbaad60af1221cf70cf0f93" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -766,6 +794,20 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
+	<software name="gccaper">
+		<description>The Great Counting Caper with The 3 Blind Mice (USA)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value="T-182011-00"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18459 J27" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18459 j27.ic1" size="1048576" crc="06dc8145" sha1="76a27504a36f7d4b68892e56f7586a26326d0878" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hucklowlj" cloneof="hucklowl">
 		<description>Richard Scarry's - Huckle to Lowly (Jpn)</description>
 		<year>1995</year>
@@ -787,7 +829,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 	<software name="hucklowl">
 		<description>Richard Scarry's - Huckle and Lowly's Busiest Day Ever (USA)</description>
 		<year>1994</year>
-		<publisher>Sega?</publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="49028-00" />
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-6586A" />
@@ -801,7 +843,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 	<software name="hucklowlf" cloneof="hucklowl">
 		<description>Richard Scarry's - Une Journee Bien Remplie pour Cassis et Asticot (Fra)</description>
 		<year>199?</year>
-		<publisher>Sega?</publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="49028-09" />
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-6586A" />
@@ -826,7 +868,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 	<software name="hucklowls" cloneof="hucklowl">
 		<description>Richard Scarry's - El Día Más Ajetreado de las Vidas de Felipe y Gusy (Spa)</description>
 		<year>199?</year>
-		<publisher>Sega?</publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="49028-06" />
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-6586A" />
@@ -962,7 +1004,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 	<software name="lionking" supported="no">
 		<description>The Lion King - Adventures at Pride Rock (Euro)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega</publisher>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="the lion king - adventures at pride rock (europe).bin" size="1048576" crc="a7b92dc1" sha1="7f20cd3bec73624f93c8235887ad82f33a78077e"  offset="000000" loadflag="load16_word_swap" />
@@ -970,10 +1012,24 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="lionkingu" cloneof="lionking" supported="no">
+		<description>The Lion King - Adventure at Pride Rock (USA)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49037-00"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18098 J15" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18098 j15.ic1" size="1048576" crc="2c0db3b9" sha1="2da72b5ab41d95675163850bab11e38d7e8a098d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lionkings" cloneof="lionking" supported="no">
 		<description>Las Aventuras del Rey León (Spa)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="49037-06"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-6883A" />
@@ -1111,6 +1167,20 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="ic1" value="MPR-17803-H" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-17803-h.ic1" size="524288" crc="b62514d0" sha1="5c128fcc3ce49434e1e3c834a9fcec7b28c5480e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="muppetgo">
+		<description>The Muppets on the Go! (USA)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49046-00"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18874-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18874-t.ic1" size="524288" crc="d686b96e" sha1="731ad3ab65f1681f48594cad86e1a1adb9f57829" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1354,13 +1424,25 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 	<software name="magschol">
 		<description>Scholastic's The Magic School Bus (USA)</description>
 		<year>199?</year>
-		<publisher>Sega?</publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="49038-00"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-6882A" />
 			<feature name="ic1" value="MPR-18587-T" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-18587-t.ic1" size="524288" crc="e6ef55f9" sha1="927e48f24745732235de4745d3acf1656750e12b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sesame">
+		<description>Sesame Street - Alphabet Avenue (USA)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49067-00"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="sesame street - alphabet avenue (usa).bin" size="1048576" crc="ca1bbeef" sha1="62ce7f387eb9f61bdef3f74df8aff98106b022da" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2782,17 +2864,6 @@ Notice that most of these will become parent, when the dumps surface
 		</part>
 	</software>
 
-	<software name="jackjill">
-		<description>Adventures in Letterland with Jack &amp; Jill (USA)</description>
-		<year>199?</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="????">
-				<rom  name="Adventures in Letterland with Jack &amp; Jill (U).bin" size="????" crc="e846858b" sha1="fe4412ba81673894167841f47780a3f67d93c4e7" offset="000000" >
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="abarangr">
 		<description>Bakuryuu Sentai Abaranger (Jpn)</description>
 		<year>199?</year>
@@ -2800,17 +2871,6 @@ Notice that most of these will become parent, when the dumps surface
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="????">
 				<rom name="Bakuryuu Sentai Abaranger (J).bin" size="????" crc="0bd73cf6" sha1="df12e28a2f1e49f51d2d8968d38993f2f93b648c" offset="000000" >
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="crayola">
-		<description>Crayola Crayons - Create a World (USA)</description>
-		<year>199?</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="????">
-				<rom name="Crayola Crayons - Create a World (U).bin" size="????" crc="04fc1c21" sha1="88738c2b5b6302385fbaad60af1221cf70cf0f93" offset="000000" >
 			</dataarea>
 		</part>
 	</software>
@@ -2903,17 +2963,6 @@ Notice that most of these will become parent, when the dumps surface
 		</part>
 	</software>
 
-	<software name="gccaper">
-		<description>The Great Counting Caper with The 3 Blind Mice (USA)</description>
-		<year>199?</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="????">
-				<rom name="Great Counting Caper with The 3 Blind Mice, The (U).bin" size="????" crc="06dc8145" sha1="76a27504a36f7d4b68892e56f7586a26326d0878" offset="000000" >
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="hellokso">
 		<description>Hello Kitty no Suteki na O-tanjoubi (Jpn)</description>
 		<year>199?</year>
@@ -2947,17 +2996,6 @@ Notice that most of these will become parent, when the dumps surface
 		</part>
 	</software>
 
-	<software name="lionking">
-		<description>Lion King - Adventure at Pride Rock (USA)</description>
-		<year>199?</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="????">
-				<rom name="Lion King - Adventure at Pride Rock (U).bin" size="????" crc="2c0db3b9" sha1="2da72b5ab41d95675163850bab11e38d7e8a098d" offset="000000" >
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mcdonald">
 		<description>McDonald de Asobo! (Jpn)</description>
 		<year>199?</year>
@@ -2987,17 +3025,6 @@ Notice that most of these will become parent, when the dumps surface
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="????">
 				<rom name="Minna de O-ryouri O-saihou (J).bin" size="????" crc="b69e3baa" sha1="ea7b9e819e282d7be83b07a5ca6258f01fb77541" offset="000000" >
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="muppetgo">
-		<description>Muppets on the Go! (USA)</description>
-		<year>199?</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="????">
-				<rom name="Muppets on the Go! (U).bin" size="????" crc="d686b96e" sha1="731ad3ab65f1681f48594cad86e1a1adb9f57829" offset="000000" >
 			</dataarea>
 		</part>
 	</software>
@@ -3097,17 +3124,6 @@ Notice that most of these will become parent, when the dumps surface
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="????">
 				<rom name="Sansuu - Eigo de Mojars ni Chousen - Image Training for the Right Side of the Brain (J).bin" size="????" crc="42a578a8" sha1="5ca5f0ef8741acb5d58ce0f61e6789ec2adb00ea" offset="000000" >
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sesame">
-		<description>Sesame Street - Alphabet Avenue (USA)</description>
-		<year>199?</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="????">
-				<rom name="Sesame Street - Alphabet Avenue (U).bin" size="????" crc="ca1bbeef" sha1="62ce7f387eb9f61bdef3f74df8aff98106b022da" offset="000000" >
 			</dataarea>
 		</part>
 	</software>
