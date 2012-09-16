@@ -37,15 +37,14 @@ Known Non-Issues (confirmed on Real Genesis)
 #include "cpu/sh2/sh2comn.h"
 #include "cpu/z80/z80.h"
 #include "sound/2612intf.h"
-#include "sound/cdda.h"
+
 #include "sound/dac.h"
-#include "sound/rf5c68.h"
+
 #include "sound/sn76496.h"
 #include "imagedev/chd_cd.h"
 #include "includes/megadriv.h"
 #include "machine/nvram.h"
 #include "cpu/ssp1601/ssp1601.h"
-#include "megacd.lh"
 
 #include "machine/megavdp.h"
 
@@ -1302,27 +1301,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
-	MCFG_NVRAM_HANDLER_CLEAR()
-	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(segacd_map)
-
-	MCFG_TIMER_ADD("sw_timer", NULL) //stopwatch timer
-
-	MCFG_DEFAULT_LAYOUT( layout_megacd )
-
-	MCFG_NVRAM_ADD_0FILL("backupram")
-
-	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.50 ) // TODO: accurate volume balance
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.50 )
-
-	MCFG_SOUND_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164!
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.50 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.50 )
-
-	MCFG_TIMER_ADD("scd_dma_timer", scd_dma_timer_callback)
-
-	MCFG_QUANTUM_PERFECT_CPU("segacd_68k") // perfect sync to the fastest cpu
+	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
 MACHINE_CONFIG_END
 
 struct cdrom_interface scd_cdrom =
@@ -1349,26 +1328,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 
-	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(segacd_map)
-
-	MCFG_TIMER_ADD("sw_timer", NULL) //stopwatch timer
-	MCFG_NVRAM_ADD_0FILL("backupram")
-	MCFG_TIMER_ADD("scd_dma_timer", scd_dma_timer_callback)
-
-	MCFG_DEFAULT_LAYOUT( layout_megacd )
-
-	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.50 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.50 )
-
-	MCFG_SOUND_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.25 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.25 )
-
-	MCFG_CDROM_ADD( "cdrom", scd_cdrom)
-	MCFG_SOFTWARE_LIST_ADD("cd_list","segacd")
-
+	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
 	//MCFG_QUANTUM_PERFECT_CPU("32x_master_sh2")
 MACHINE_CONFIG_END
 
@@ -1410,13 +1370,13 @@ static void megadriv_init_common(running_machine &machine)
 
 	sega_cd_connected = 0;
 	segacd_wordram_mapped = 0;
-	_segacd_68k_cpu = machine.device<cpu_device>("segacd_68k");
+	_segacd_68k_cpu = machine.device<cpu_device>(":segacd:segacd_68k");
 	if (_segacd_68k_cpu != NULL)
 	{
 		printf("Sega CD secondary 68k cpu found '%s'\n", _segacd_68k_cpu->tag() );
 		sega_cd_connected = 1;
 		segacd_init_main_cpu(machine);
-		scd_dma_timer = machine.device<timer_device>("scd_dma_timer");
+		scd_dma_timer = machine.device<timer_device>(":segacd:scd_dma_timer");
 
 	}
 

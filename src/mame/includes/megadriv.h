@@ -16,6 +16,7 @@
 
 #include "machine/megavdp.h"
 #include "machine/mega32x.h"
+#include "machine/megacd.h"
 #include "video/315_5124.h"
 
 #define MASTER_CLOCK_NTSC 53693175

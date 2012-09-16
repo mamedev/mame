@@ -2268,8 +2268,7 @@ $(DRIVERS)/zac_proto.o:	$(LAYOUT)/zac_proto.lh
 
 $(DRIVERS)/peyper.o:    $(LAYOUT)/peyper.lh
 
-$(MACHINE)/megadriv.o:  $(LAYOUT)/megacd.lh
-
+$(MACHINE)/megacd.o:  $(LAYOUT)/megacd.lh
 
 #-------------------------------------------------
 # misc dependencies

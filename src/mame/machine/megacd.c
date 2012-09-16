@@ -1,9 +1,77 @@
 
 #include "includes/megadriv.h"
+#include "megacd.lh"
+#include "sound/cdda.h"
+#include "sound/rf5c68.h"
 
 // the main MD emulation needs to know the state of these because it appears in the MD regs / affect DMA operations
 int sega_cd_connected = 0x00;
 int segacd_wordram_mapped = 0;
+
+
+
+
+
+const device_type SEGA_SEGACD_US = &device_creator<sega_segacd_us_device>;
+const device_type SEGA_SEGACD_JAPAN = &device_creator<sega_segacd_japan_device>;
+const device_type SEGA_SEGACD_EUROPE = &device_creator<sega_segacd_europe_device>;
+
+sega_segacd_device::sega_segacd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, device_type type)
+	: device_t(mconfig, type, "sega_segacd_device", tag, owner, clock)
+{
+	
+}
+
+sega_segacd_us_device::sega_segacd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sega_segacd_device(mconfig, tag, owner, clock, SEGA_SEGACD_US)
+{
+	
+}
+
+sega_segacd_japan_device::sega_segacd_japan_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sega_segacd_device(mconfig, tag, owner, clock, SEGA_SEGACD_JAPAN)
+{
+	
+}
+
+sega_segacd_europe_device::sega_segacd_europe_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sega_segacd_device(mconfig, tag, owner, clock, SEGA_SEGACD_EUROPE)
+{
+	
+}
+
+
+static MACHINE_CONFIG_FRAGMENT( segacd_fragment )
+
+	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
+	MCFG_CPU_PROGRAM_MAP(segacd_map)
+
+	MCFG_TIMER_ADD("sw_timer", NULL) //stopwatch timer
+
+	MCFG_DEFAULT_LAYOUT( layout_megacd )
+
+	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
+	MCFG_SOUND_ROUTE( 0, ":lspeaker", 0.50 ) // TODO: accurate volume balance
+	MCFG_SOUND_ROUTE( 1, ":rspeaker", 0.50 )
+
+	MCFG_SOUND_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164!
+	MCFG_SOUND_ROUTE( 0, ":lspeaker", 0.50 )
+	MCFG_SOUND_ROUTE( 1, ":rspeaker", 0.50 )
+
+	MCFG_TIMER_ADD("scd_dma_timer", scd_dma_timer_callback)
+
+	MCFG_NVRAM_HANDLER_CLEAR()
+	MCFG_NVRAM_ADD_0FILL("backupram")
+
+	MCFG_QUANTUM_PERFECT_CPU("segacd_68k") // perfect sync to the fastest cpu
+MACHINE_CONFIG_END
+
+
+
+machine_config_constructor sega_segacd_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( segacd_fragment );
+}
 
 
 /* Sega CD stuff */
@@ -153,31 +221,31 @@ segacd_t segacd;
 #define CHECK_SCD_LV5_INTERRUPT \
 	if (segacd_irq_mask & 0x20) \
 	{ \
-		machine.device("segacd_68k")->execute().set_input_line(5, HOLD_LINE); \
+		machine.device(":segacd:segacd_68k")->execute().set_input_line(5, HOLD_LINE); \
 	} \
 
 #define CHECK_SCD_LV4_INTERRUPT \
 	if (segacd_irq_mask & 0x10) \
 	{ \
-		machine.device("segacd_68k")->execute().set_input_line(4, HOLD_LINE); \
+		machine.device(":segacd:segacd_68k")->execute().set_input_line(4, HOLD_LINE); \
 	} \
 
 #define CHECK_SCD_LV3_INTERRUPT \
 	if (segacd_irq_mask & 0x08) \
 	{ \
-		machine.device("segacd_68k")->execute().set_input_line(3, HOLD_LINE); \
+		machine.device(":segacd:segacd_68k")->execute().set_input_line(3, HOLD_LINE); \
 	} \
 
 #define CHECK_SCD_LV2_INTERRUPT \
 	if (segacd_irq_mask & 0x04) \
 	{ \
-		machine.device("segacd_68k")->execute().set_input_line(2, HOLD_LINE); \
+		machine.device(":segacd:segacd_68k")->execute().set_input_line(2, HOLD_LINE); \
 	} \
 
 #define CHECK_SCD_LV1_INTERRUPT \
 	if (segacd_irq_mask & 0x02) \
 	{ \
-		machine.device("segacd_68k")->execute().set_input_line(1, HOLD_LINE); \
+		machine.device(":segacd:segacd_68k")->execute().set_input_line(1, HOLD_LINE); \
 	} \
 
 #define CURRENT_TRACK_IS_DATA \
@@ -542,7 +610,7 @@ void CDD_Stop(running_machine &machine)
 	SCD_STATUS = CDD_STOPPED;
 	CDD_STATUS = 0x0000;
 	SET_CDD_DATA_MODE
-	cdda_stop_audio( machine.device( "cdda" ) ); //stop any pending CD-DA
+	cdda_stop_audio( machine.device( ":segacd:cdda" ) ); //stop any pending CD-DA
 }
 
 
@@ -672,7 +740,7 @@ void CDD_Play(running_machine &machine)
 	printf("%d Track played\n",SCD_CURTRK);
 	CDD_MIN = to_bcd(SCD_CURTRK, false);
 	if(!(CURRENT_TRACK_IS_DATA))
-		cdda_start_audio( machine.device( "cdda" ), SCD_CURLBA, end_msf - SCD_CURLBA );
+		cdda_start_audio( machine.device( ":segacd:cdda" ), SCD_CURLBA, end_msf - SCD_CURLBA );
 	SET_CDC_READ
 }
 
@@ -699,9 +767,9 @@ void CDD_Pause(running_machine &machine)
 	CDD_STATUS = SCD_STATUS;
 	SET_CDD_DATA_MODE
 
-	//segacd.current_frame = cdda_get_audio_lba( machine.device( "cdda" ) );
+	//segacd.current_frame = cdda_get_audio_lba( machine.device( ":segacd:cdda" ) );
 	//if(!(CURRENT_TRACK_IS_DATA))
-	cdda_pause_audio( machine.device( "cdda" ), 1 );
+	cdda_pause_audio( machine.device( ":segacd:cdda" ), 1 );
 }
 
 void CDD_Resume(running_machine &machine)
@@ -715,7 +783,7 @@ void CDD_Resume(running_machine &machine)
 	CDD_MIN = to_bcd (SCD_CURTRK, false);
 	SET_CDC_READ
 	//if(!(CURRENT_TRACK_IS_DATA))
-	cdda_pause_audio( machine.device( "cdda" ), 0 );
+	cdda_pause_audio( machine.device( ":segacd:cdda" ), 0 );
 }
 
 
@@ -816,7 +884,7 @@ void CDC_End_Transfer(running_machine& machine)
 
 void CDC_Do_DMA(running_machine& machine, int rate)
 {
-	address_space* space = machine.device("segacd_68k")->memory().space(AS_PROGRAM);
+	address_space* space = machine.device(":segacd:segacd_68k")->memory().space(AS_PROGRAM);
 
 	UINT32 dstoffset, length;
 	UINT8 *dest;
@@ -1174,24 +1242,24 @@ static WRITE16_HANDLER( scd_a12000_halt_reset_w )
 		// reset line
 		if (a12000_halt_reset_reg&0x0001)
 		{
-			space->machine().device("segacd_68k")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			space->machine().device(":segacd:segacd_68k")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 			if (!(old_halt&0x0001)) printf("clear reset slave\n");
 		}
 		else
 		{
-			space->machine().device("segacd_68k")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			space->machine().device(":segacd:segacd_68k")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 			if ((old_halt&0x0001)) printf("assert reset slave\n");
 		}
 
 		// request BUS
 		if (a12000_halt_reset_reg&0x0002)
 		{
-			space->machine().device("segacd_68k")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+			space->machine().device(":segacd:segacd_68k")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 			if (!(old_halt&0x0002)) printf("halt slave\n");
 		}
 		else
 		{
-			space->machine().device("segacd_68k")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+			space->machine().device(":segacd:segacd_68k")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			if ((old_halt&0x0002)) printf("resume slave\n");
 		}
 	}
@@ -1480,7 +1548,7 @@ static IRQ_CALLBACK(segacd_sub_int_callback)
 	{
 		// clear this bit
 		a12000_halt_reset_reg &= ~0x0100;
-		device->machine().device("segacd_68k")->execute().set_input_line(2, CLEAR_LINE);
+		device->machine().device(":segacd:segacd_68k")->execute().set_input_line(2, CLEAR_LINE);
 	}
 
 	return (0x60+irqline*4)/4; // vector address
@@ -2236,11 +2304,11 @@ void segacd_init_main_cpu( running_machine& machine )
 {
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	
-	segacd_font_bits = reinterpret_cast<UINT16 *>(machine.root_device().memshare("segacd_font")->ptr());
-	segacd_backupram = reinterpret_cast<UINT16 *>(machine.root_device().memshare("backupram")->ptr());
-	segacd_dataram = reinterpret_cast<UINT16 *>(machine.root_device().memshare("dataram")->ptr());
-	segacd_dataram2 = reinterpret_cast<UINT16 *>(machine.root_device().memshare("dataram2")->ptr());
-	segacd_4meg_prgram = reinterpret_cast<UINT16 *>(machine.root_device().memshare("segacd_program")->ptr());
+	segacd_font_bits = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:segacd_font")->ptr());
+	segacd_backupram = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:backupram")->ptr());
+	segacd_dataram = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:dataram")->ptr());
+	segacd_dataram2 = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:dataram2")->ptr());
+	segacd_4meg_prgram = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:segacd_program")->ptr());
 	
 	segacd_4meg_prgbank = 0;
 
@@ -2272,7 +2340,7 @@ void segacd_init_main_cpu( running_machine& machine )
 
 
 
-	machine.device("segacd_68k")->execute().set_irq_acknowledge_callback(segacd_sub_int_callback);
+	machine.device(":segacd:segacd_68k")->execute().set_irq_acknowledge_callback(segacd_sub_int_callback);
 
 	space->install_legacy_read_handler (0x0000070, 0x0000073, FUNC(scd_hint_vector_r) );
 
@@ -2354,8 +2422,8 @@ MACHINE_RESET( segacd )
 			if ( segacd.cd )
 			{
 				segacd.toc = cdrom_get_toc( segacd.cd );
-				cdda_set_cdrom( machine.device("cdda"), segacd.cd );
-				cdda_stop_audio( machine.device( "cdda" ) ); //stop any pending CD-DA
+				cdda_set_cdrom( machine.device(":segacd:cdda"), segacd.cd );
+				cdda_stop_audio( machine.device( ":segacd:cdda" ) ); //stop any pending CD-DA
 			}
 		}
 	}
@@ -2369,7 +2437,7 @@ MACHINE_RESET( segacd )
 
 
 	hock_cmd = 0;
-	stopwatch_timer = machine.device<timer_device>("sw_timer");
+	stopwatch_timer = machine.device<timer_device>(":segacd:sw_timer");
 
 	scd_dma_timer->adjust(attotime::zero);
 
@@ -2962,7 +3030,7 @@ WRITE16_HANDLER( segacd_cdfader_w )
 
 	//printf("%f\n",cdfader_vol);
 
-	cdda_set_volume(space->machine().device("cdda"), cdfader_vol);
+	cdda_set_volume(space->machine().device(":segacd:cdda"), cdfader_vol);
 }
 
 READ16_HANDLER( segacd_backupram_r )
@@ -3060,5 +3128,18 @@ ADDRESS_MAP_START( segacd_map, AS_PROGRAM, 16, driver_device )
 //  AM_RANGE(0xff8180, 0xff81ff) // mirror of subcode buffer area
 
 ADDRESS_MAP_END
+
+
+
+
+void sega_segacd_device::device_start()
+{
+
+}
+
+void sega_segacd_device::device_reset()
+{
+
+}
 
 
