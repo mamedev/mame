@@ -72,7 +72,7 @@ struct msm5205_state
 INLINE msm5205_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
-	assert(device->type() == MSM5205);
+	assert(device->type() == MSM5205 || device->type() == MSM6585);
 	return (msm5205_state *)downcast<msm5205_device *>(device)->token();
 }
 
