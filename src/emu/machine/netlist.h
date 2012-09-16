@@ -280,6 +280,10 @@ public:
 		m_ptr = m_list;
 		m_ptr--;
 	}
+	~net_list_t()
+	{
+		global_free(m_list);
+	}
 	ATTR_HOT inline void add(const _ListClass elem)
 	{
 		assert(m_ptr-m_list <= _NumElements - 1);

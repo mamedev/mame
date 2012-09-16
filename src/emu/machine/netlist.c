@@ -430,6 +430,10 @@ netlist_setup_t::netlist_setup_t(netlist_base_t &netlist)
 
 netlist_setup_t::~netlist_setup_t()
 {
+	for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+	{
+		remove_dev(entry->object()->name());
+	}
 }
 
 
@@ -929,6 +933,9 @@ void netlist_mame_device::device_reset()
 void netlist_mame_device::device_stop()
 {
 	m_setup->print_stats();
+	
+	global_free(m_setup);
+	global_free(m_netlist);
 }
 
 void netlist_mame_device::device_post_load()
