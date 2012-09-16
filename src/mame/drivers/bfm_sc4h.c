@@ -706,7 +706,12 @@ static const duart68681_config bfm_sc4_duart68681_config =
 	bfm_sc4_duart_irq_handler,
 	bfm_sc4_duart_tx,
 	bfm_sc4_duart_input_r,
-	bfm_sc4_duart_output_w
+	bfm_sc4_duart_output_w,
+	// TODO: What are the actual frequencies?
+	XTAL_16MHz/2/8,		/* IP2/RxCB clock */
+	XTAL_16MHz/2/16,	/* IP3/TxCA clock */
+	XTAL_16MHz/2/16,	/* IP4/RxCA clock */
+	XTAL_16MHz/2/8,		/* IP5/TxCB clock */
 };
 
 
