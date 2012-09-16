@@ -325,9 +325,9 @@ static ADDRESS_MAP_START( vsgongf_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0xf801, 0xf801) AM_WRITENOP /* vreg? always 0 */
 	AM_RANGE(0xf803, 0xf803) AM_WRITENOP /* vreg? always 0 */
 	AM_RANGE(0xfc00, 0xfc00) AM_RAM /* vreg? always 0 */
-	AM_RANGE(0xfc01, 0xfc01) AM_RAM_WRITE(nmi_enable_w)
-	AM_RANGE(0xfc02, 0xfc03) AM_RAM_WRITE(tsamurai_coin_counter_w)
-	AM_RANGE(0xfc04, 0xfc04) AM_RAM_WRITE(tsamurai_textbank1_w)
+	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(nmi_enable_w)
+	AM_RANGE(0xfc02, 0xfc03) AM_WRITE(tsamurai_coin_counter_w)
+	AM_RANGE(0xfc04, 0xfc04) AM_WRITE(tsamurai_textbank1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_vsgongf_map, AS_PROGRAM, 8, tsamurai_state )
