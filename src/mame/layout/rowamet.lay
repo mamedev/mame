@@ -16,13 +16,14 @@
 			<color red="0.0" green="0.0" blue="0.0" />
 		</rect>
 	</element>
-	<element name="P0"><text string="Balls"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P0"><text string="Ball"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P1"><text string="Credits"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P3"><text string="Player 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P4"><text string="Player 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P5"><text string="Player 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P6"><text string="Player 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-	<element name="P7"><text string="High Score"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P7"><text string="Match"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P8"><text string="Player"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 
 	<view name="Default Layout">
 
@@ -114,39 +115,23 @@
 			<bounds left="230" top="225" right="264" bottom="264" />
 		</bezel>
 
-		<!-- High Score -->
-		<bezel name="digit24" element="digit">
+		<!-- Player -->
+		<bezel name="digit27" element="digit">
 			<bounds left="10" top="285" right="44" bottom="324" />
 		</bezel>
-		<bezel name="digit25" element="digit">
-			<bounds left="54" top="285" right="88" bottom="324" />
-		</bezel>
+
+		<!-- Match -->
 		<bezel name="digit26" element="digit">
-			<bounds left="98" top="285" right="132" bottom="324" />
-		</bezel>
-		<bezel name="digit27" element="digit">
-			<bounds left="142" top="285" right="176" bottom="324" />
-		</bezel>
-		<bezel name="digit28" element="digit">
-			<bounds left="186" top="285" right="220" bottom="324" />
-		</bezel>
-		<bezel name="digit29" element="digit">
 			<bounds left="230" top="285" right="264" bottom="324" />
 		</bezel>
 
 		<!-- Credits -->
-		<bezel name="digit30" element="digit">
+		<bezel name="digit25" element="digit">
 			<bounds left="10" top="345" right="44" bottom="384" />
 		</bezel>
-		<bezel name="digit31" element="digit">
-			<bounds left="54" top="345" right="88" bottom="384" />
-		</bezel>
 
-		<!-- Match / Balls Left -->
-		<bezel name="digit32" element="digit">
-			<bounds left="186" top="345" right="220" bottom="384" />
-		</bezel>
-		<bezel name="digit33" element="digit">
+		<!-- Ball -->
+		<bezel name="digit24" element="digit">
 			<bounds left="230" top="345" right="264" bottom="384" />
 		</bezel>
 		<bezel element="P0"><bounds left="200" right="258" top="330" bottom="342" /></bezel>
@@ -155,6 +140,7 @@
 		<bezel element="P4"><bounds left="100" right="180" top="90" bottom="102" /></bezel>
 		<bezel element="P5"><bounds left="100" right="180" top="150" bottom="162" /></bezel>
 		<bezel element="P6"><bounds left="100" right="180" top="210" bottom="222" /></bezel>
-		<bezel element="P7"><bounds left="100" right="180" top="270" bottom="282" /></bezel>
+		<bezel element="P7"><bounds left="200" right="258" top="270" bottom="282" /></bezel>
+		<bezel element="P8"><bounds left="30" right="88" top="270" bottom="282" /></bezel>
 	</view>
 </mamelayout>

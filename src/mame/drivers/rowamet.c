@@ -5,6 +5,11 @@
 
     PinMAME used as reference (couldn't find a manual)
 
+ToDO:
+- Inputs
+- Outputs
+- Fix display
+- Doesn't boot properly
 
 *************************************************************************************/
 
@@ -26,7 +31,11 @@ public:
 	DECLARE_READ8_MEMBER(sound_r);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(mute_w);
+	DECLARE_READ8_MEMBER(io_r);
+	DECLARE_WRITE8_MEMBER(io_w);
 	UINT8 m_out_offs;
+	UINT8 m_sndcmd;
+	UINT8 m_io[16];
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_cpu2;
 	required_shared_ptr<UINT8> m_p_ram;
@@ -46,7 +55,10 @@ public:
 static ADDRESS_MAP_START( rowamet_map, AS_PROGRAM, 8, rowamet_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2800, 0x2808) AM_READ(switch_r)
-	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0x4000, 0x407f) AM_RAM
+	AM_RANGE(0x4080, 0x408f) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0x4090, 0x409f) AM_READWRITE(io_r,io_w)
+	AM_RANGE(0x40a0, 0x40ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rowamet_sub_map, AS_PROGRAM, 8, rowamet_state )
@@ -66,7 +78,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( rowamet_state::sound_r )
 {
-	return (m_p_ram[0x92] >> 4) | (m_p_ram[0x93] & 0xf0);
+	return m_sndcmd;
 }
 
 READ8_MEMBER( rowamet_state::switch_r )
@@ -77,10 +89,28 @@ READ8_MEMBER( rowamet_state::switch_r )
 WRITE8_MEMBER( rowamet_state::mute_w )
 {
 	machine().sound().system_enable(~data);
-	printf("%X ",data);
 }
 
-//m_cpu2->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+READ8_MEMBER( rowamet_state::io_r )
+{
+	return m_io[offset];
+}
+
+WRITE8_MEMBER( rowamet_state::io_w )
+{
+	m_io[offset] = data;
+
+	if (offset == 2)
+	{
+		UINT8 cmd = (m_io[2]>>4) | (m_io[3] & 0xf0);
+		if (cmd != m_sndcmd)
+		{
+			m_sndcmd = cmd;
+			machine().device("cpu2")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		}
+	}
+}
+
 void rowamet_state::machine_reset()
 {
 }
@@ -93,22 +123,11 @@ static TIMER_DEVICE_CALLBACK( rowamet_timer )
 {
 	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
 	rowamet_state *state = timer.machine().driver_data<rowamet_state>();
-	state->m_out_offs++;
-	if (state->m_out_offs > 0x9f)
-		state->m_out_offs = 0x80;
+	state->m_out_offs &= 15;
 
-	if (state->m_out_offs < 0x90)
-	{
-		UINT8 digit = state->m_out_offs << 1;
-		output_set_digit_value(digit, patterns[state->m_p_ram[state->m_out_offs]>>4]);
-		output_set_digit_value(++digit, patterns[state->m_p_ram[state->m_out_offs]&15]);
-	}
-	//else
-	//if (state->m_out_offs == 0x90)
-	//	timer.machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
-	//else
-	//if (state->m_out_offs == 0x9f)
-	//	timer.machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	UINT8 digit = state->m_out_offs << 1;
+	output_set_digit_value(digit, patterns[state->m_p_ram[state->m_out_offs]>>4]);
+	output_set_digit_value(++digit, patterns[state->m_p_ram[state->m_out_offs++]&15]);
 }
 
 static MACHINE_CONFIG_START( rowamet, rowamet_state )
