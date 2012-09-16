@@ -1361,6 +1361,88 @@ static INPUT_PORTS_START( chokchok )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( magicbal )
+	PORT_START("PLAYERS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")       // to be confirmed
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( wlstar )
 	PORT_START("PLAYERS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -2154,22 +2236,6 @@ static MACHINE_CONFIG_DERIVED( metlsavr, cookbib )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.10)
 MACHINE_CONFIG_END
 
-static INTERRUPT_GEN( magicbal_interrupt )
-{
-	address_space *space = device->machine().device<legacy_cpu_device>("maincpu")->space();
-	static int i=0x0000;
-	i^=0xffff;
-
-	space->write_word( 0x12189a, i,0xffff );
-	space->write_word( 0x12189c, i,0xffff );
-	space->write_word( 0x12189e, i,0xffff );
-}
-
-
-static MACHINE_CONFIG_DERIVED( magicbal, metlsavr )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT("screen", magicbal_interrupt)
-MACHINE_CONFIG_END
 
 
 
@@ -2883,7 +2949,7 @@ ROM_START( magicbal )
 
 	ROM_REGION16_BE( 0x200, "user1", ROMREGION_ERASE00 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
-//	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200, CRC(17aa17a9) SHA1(5b83159c62473f79e7fced0d86acfaf697ad5537) )
+	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200, CRC(fb67d20d) SHA1(63f2862a7ded075d501e21919f211d156bef4fb4) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "uc1", 0x00000, 0x40000, CRC(6e4cec27) SHA1(9dd07684502300589e957d1bcde0239880eaada2) )
@@ -3211,255 +3277,14 @@ DRIVER_INIT_MEMBER(tumbleb_state,bcstory)
 
 DRIVER_INIT_MEMBER(tumbleb_state,htchctch)
 {
-
-//  UINT16 *HCROM = (UINT16*)memregion("maincpu")->base();
 	UINT16 *PROTDATA = (UINT16*)memregion("user1")->base();
 	int i, len = memregion("user1")->bytes();
 	/* simulate RAM initialization done by the protection MCU */
-	/* verified on real hardware */
-//  static const UINT16 htchctch_mcu68k[] =
-//  {
-//      /* moved to protdata.bin file .. */
-//  };
-
-
-//  for (i = 0; i < sizeof(htchctch_mcu68k) / sizeof(htchctch_mcu68k[0]); i++)
-//      m_mainram[0x000/2 + i] = htchctch_mcu68k[i];
 
 	for (i = 0; i < len / 2; i++)
 		m_mainram[0x000/2 + i] = PROTDATA[i];
 
-
-
 	tumblepb_gfx1_rearrange(machine());
-
-/* trojan.. */
-#if 0
-	/* patch the irq 6 vector */
-	HCROM[0x00078/2] = 0x0001;
-	HCROM[0x0007a/2] = 0xe000;
-
-	/* our new interrupt code */
-
-	/* put registers on stack */
-	HCROM[0x1e000/2] = 0x48e7;
-	HCROM[0x1e002/2] = 0xfffe;
-
-	/* put the address we want to copy FROM in A0 */
-	HCROM[0x1e004/2] = 0x41f9;
-	HCROM[0x1e006/2] = 0x0012;
-	HCROM[0x1e008/2] = 0x0000;
-
-	/* put the address we want to copy TO in A1 */
-	HCROM[0x1e00a/2] = 0x43f9;
-	HCROM[0x1e00c/2] = 0x0012;
-	HCROM[0x1e00e/2] = 0x2000;
-
-	/* put the number of words we want to copy into D0 */
-	HCROM[0x1e010/2] = 0x203c;
-	HCROM[0x1e012/2] = 0x0000;
-	HCROM[0x1e014/2] = 0x0100;
-
-	/* copy a word */
-	HCROM[0x1e016/2] = 0x32d8;
-
-	/* decrease counter d0 */
-	HCROM[0x1e018/2] = 0x5380;
-
-	/* compare d0 to 0 */
-	HCROM[0x1e01a/2] = 0x0c80;
-	HCROM[0x1e01c/2] = 0x0000;
-	HCROM[0x1e01e/2] = 0x0000;
-
-	/* if its not 0 then branch back */
-	HCROM[0x1e020/2] = 0x66f4;
-
-
-
-
-	/* jump to drawing subroutine */
-	HCROM[0x1e022/2] = 0x4eb9;
-	HCROM[0x1e024/2] = 0x0001;
-	HCROM[0x1e026/2] = 0xe100;
-
-	/* get back registers from stack*/
-	HCROM[0x1e028/2] = 0x4cdf;
-	HCROM[0x1e02a/2] = 0x7fff;
-
-	/* jump to where the interrupt vector was copied to */
-	HCROM[0x1e02c/2] = 0x4ef9;
-	HCROM[0x1e02e/2] = 0x0012;
-	HCROM[0x1e030/2] = 0x2000;
-	/* we're back in the game code */
-
-
-	/* these subroutines are called from the new interrupt code above, i use them to draw */
-
-	/* DRAWING SUBROUTINE */
-
-	/* put the address we want to write to in A0 */
-	HCROM[0x1e100/2] = 0x41f9;
-	HCROM[0x1e102/2] = 0x0032;
-	HCROM[0x1e104/2] = 0x0104;
-
-	/* put the character we want to draw into D0 */
-	/* this bit isn't needed .. we end up using d4 then copying it over */
-	HCROM[0x1e106/2] = 0x203c;
-	HCROM[0x1e108/2] = 0x0000;
-	HCROM[0x1e10a/2] = 0x0007;
-
-	/* put the address we to read to in A2 */
-	HCROM[0x1e10c/2] = 0x45f9;
-	HCROM[0x1e10e/2] = 0x0012;
-//  HCROM[0x1e110/2] = 0x2000;
-	HCROM[0x1e110/2] = 0x2000+0x60+0x60+0x60+0x60+0x60;
-
-	/* put the number of rows into D3 */
-	HCROM[0x1e112/2] = 0x263c;
-	HCROM[0x1e114/2] = 0x0000;
-	HCROM[0x1e116/2] = 0x000c;
-
-	/* put the number of bytes per row into D2 */
-	HCROM[0x1e118/2] = 0x243c;
-	HCROM[0x1e11a/2] = 0x0000;
-	HCROM[0x1e11c/2] = 0x0008;
-
-
-	// move content of a2 to d4 (byte)
-	HCROM[0x1e11e/2] = 0x1812;
-
-	HCROM[0x1e120/2] = 0xe84c; // shift d4 right by 4
-
-	HCROM[0x1e122/2] = 0x0244; // mask with 0x000f
-	HCROM[0x1e124/2] = 0x000f; //
-
-	HCROM[0x1e126/2] = 0x3004; // d4 -> d0
-
-	/* jump to character draw to draw first bit */
-	HCROM[0x1e128/2] = 0x4eb9;
-	HCROM[0x1e12a/2] = 0x0001;
-	HCROM[0x1e12c/2] = 0xe200;
-
-	/* add 2 to draw address a0 */
-	HCROM[0x1e12e/2] = 0xd1fc;
-	HCROM[0x1e130/2] = 0x0000;
-	HCROM[0x1e132/2] = 0x0002;
-
-
-	// move content of a2 to d4 (byte)
-	HCROM[0x1e134/2] = 0x1812;
-
-	HCROM[0x1e136/2] = 0x0244; // mask with 0x000f
-	HCROM[0x1e138/2] = 0x000f; //
-
-	HCROM[0x1e13a/2] = 0x3004; // d4 -> d0
-
-	/* jump to character draw to draw second bit */
-	HCROM[0x1e13c/2] = 0x4eb9;
-	HCROM[0x1e13e/2] = 0x0001;
-	HCROM[0x1e140/2] = 0xe200;
-
-	/* add 2 to draw address a0 */
-	HCROM[0x1e142/2] = 0xd1fc;
-	HCROM[0x1e144/2] = 0x0000;
-	HCROM[0x1e146/2] = 0x0002;
-
-	/* add 1 to read address a2 */
-	HCROM[0x1e148/2] = 0xd5fc;
-	HCROM[0x1e14a/2] = 0x0000;
-	HCROM[0x1e14c/2] = 0x0001;
-
-// brr
-	/* decrease counter d2 */
-	HCROM[0x1e14e/2] = 0x5382;
-
-	/* compare d2 to 0 */
-	HCROM[0x1e150/2] = 0x0c82;
-	HCROM[0x1e152/2] = 0x0000;
-	HCROM[0x1e154/2] = 0x0000;
-
-	/* if its not 0 then branch back */
-	HCROM[0x1e156/2] = 0x66c6;
-
-	/* add 0xe0 to draw address a0 (0x100-0x20) */
-	HCROM[0x1e158/2] = 0xd1fc;
-	HCROM[0x1e15a/2] = 0x0000;
-	HCROM[0x1e15c/2] = 0x00e0;
-
-	/* decrease counter d2 */
-	HCROM[0x1e15e/2] = 0x5383;
-
-	/* compare d2 to 0 */
-	HCROM[0x1e160/2] = 0x0c83;
-	HCROM[0x1e162/2] = 0x0000;
-	HCROM[0x1e164/2] = 0x0000;
-
-	/* if its not 0 then branch back */
-	HCROM[0x1e166/2] = 0x66b0;
-
-	HCROM[0x1e168/2] = 0x4e75; // rts
-
-	/* DRAW CHARACTER SUBROUTINE, note, this won't restore a1,d1, don't other places! */
-
-	/* move address into A0->A1 for use by this subroutine */
-	HCROM[0x1e200/2] = 0x2248;
-
-	/* move address into D0->D1 for top half of character */
-	HCROM[0x1e202/2] = 0x2200;
-
-	/* add 0x30 to d1 to get the REAL tile code */
-	HCROM[0x1e204/2] = 0x0681;
-	HCROM[0x1e206/2] = 0x0000;
-	HCROM[0x1e208/2] = 0x0030;
-
-	/* or with 0xf000 to add the tile attribute */
-	HCROM[0x1e20a/2] = 0x0081;
-	HCROM[0x1e20c/2] = 0x0000;
-	HCROM[0x1e20e/2] = 0xf000;
-
-	/* write d1 -> a1 for TOP half */
-	HCROM[0x1e210/2] = 0x32c1; // not ideal .. we don't need to increase a1
-
-	/* move address into A0->A1 for use by this subroutine */
-	HCROM[0x1e212/2] = 0x2248;
-
-	/* add 0x80 to the address so we have the bottom location */
-	HCROM[0x1e214/2] = 0xd2fc;
-	HCROM[0x1e216/2] = 0x0080;
-
-	/* move address into D0->D1 for bottom  half of character */
-	HCROM[0x1e218/2] = 0x2200;
-
-	/* add 0x54 to d1 to get the REAL tile code for bottom half */
-	HCROM[0x1e21a/2] = 0x0681;
-	HCROM[0x1e21c/2] = 0x0000;
-	HCROM[0x1e21e/2] = 0x0054;
-
-	/* or with 0xf000 to add the tile attribute */
-	HCROM[0x1e220/2] = 0x0081;
-	HCROM[0x1e222/2] = 0x0000;
-	HCROM[0x1e224/2] = 0xf000;
-
-	/* write d1 -> a1 for BOTTOM half */
-	HCROM[0x1e226/2] = 0x32c1; // not ideal .. we don't need to increase a1
-
-
-	HCROM[0x1e228/2] = 0x4e75;
-
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x140000, 0x1407ff); // kill palette writes as the interrupt code we don't have controls them
-
-
-	{
-		FILE *fp;
-
-		fp=fopen("hcatch", "w+b");
-		if (fp)
-		{
-			fwrite(HCROM, 0x40000, 1, fp);
-			fclose(fp);
-		}
-	}
-#endif
 
 }
 
@@ -3537,16 +3362,6 @@ DRIVER_INIT_MEMBER(tumbleb_state,dquizgo)
 	tumblepb_gfx1_rearrange(machine());
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,magicbal)
-{
-	DRIVER_INIT_CALL(htchctch);
-
-	// wipe out the palette handler for now
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x140000, 0x140fff);
-
-	/* slightly different banking */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x100002, 0x100003, write16_delegate(FUNC(tumbleb_state::chokchok_tilebank_w),this));
-}
 
 
 /******************************************************************************/
@@ -3564,8 +3379,8 @@ GAME( 1996, fncywld,  0,       fncywld,     fncywld, tumbleb_state,  fncywld,  R
 
 /* First Amusement / Mijin / SemiCom hardware (MCU protected) */ 
 GAME( 1994, metlsavr, 0,       metlsavr,    metlsavr, tumbleb_state, chokchok, ROT0, "First Amusement", "Metal Saver", GAME_SUPPORTS_SAVE )
-GAME( 1994, magicbal, 0,       magicbal,	metlsavr, tumbleb_state, magicbal, ROT0, "SemiCom", "Magicball Fighting (Korea)", GAME_NOT_WORKING) // also still has the Metal Saver (c)1994 First Amusement tiles in the GFX
-GAME( 1995, chokchok, 0,       cookbib,     chokchok, tumbleb_state, chokchok, ROT0, "SemiCom", "Choky! Choky!", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE  ) // corruption during attract mode (tmap disable?)
+GAME( 1994, magicbal, 0,       metlsavr,    magicbal, tumbleb_state, chokchok, ROT0, "SemiCom", "Magicball Fighting (Korea)", GAME_SUPPORTS_SAVE) // also still has the Metal Saver (c)1994 First Amusement tiles in the GFX
+GAME( 1995, chokchok, 0,       cookbib,     chokchok, tumbleb_state, chokchok, ROT0, "SemiCom", "Choky! Choky!", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE  )
 GAME( 1995, wlstar,   0,       cookbib_mcu, wlstar, tumbleb_state,   wlstar,   ROT0, "Mijin",   "Wonder League Star - Sok-Magicball Fighting (Korea)", GAME_SUPPORTS_SAVE ) // translates to 'Wonder League Star - Return of Magicball Fighting'
 GAME( 1995, htchctch, 0,       htchctch,    htchctch, tumbleb_state, htchctch, ROT0, "SemiCom", "Hatch Catch" , GAME_SUPPORTS_SAVE ) // not 100% sure about gfx offsets
 GAME( 1995, cookbib,  0,       cookbib,     cookbib, tumbleb_state,  htchctch, ROT0, "SemiCom", "Cookie & Bibi" , GAME_SUPPORTS_SAVE ) // not 100% sure about gfx offsets

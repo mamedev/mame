@@ -3,12 +3,13 @@ class tumbleb_state : public driver_device
 {
 public:
 	tumbleb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_spriteram(*this, "spriteram"),
 		m_pf1_data(*this, "pf1_data"),
 		m_pf2_data(*this, "pf2_data"),
-		m_control(*this, "control"){ }
+		m_control(*this, "control")
+	{ }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_mainram;
@@ -72,7 +73,6 @@ public:
 	DECLARE_DRIVER_INIT(tumbleb2);
 	DECLARE_DRIVER_INIT(chokchok);
 	DECLARE_DRIVER_INIT(fncywld);
-	DECLARE_DRIVER_INIT(magicbal);
 	TILEMAP_MAPPER_MEMBER(tumblep_scan);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
@@ -93,15 +93,8 @@ public:
 	DECLARE_VIDEO_START(sdfight);
 };
 
+
 /*----------- defined in video/tumbleb.c -----------*/
-
-
-
-
-
-
-
-
 
 SCREEN_UPDATE_IND16( tumblepb );
 SCREEN_UPDATE_IND16( jumpkids );
@@ -109,7 +102,7 @@ SCREEN_UPDATE_IND16( fncywld );
 SCREEN_UPDATE_IND16( semicom );
 SCREEN_UPDATE_IND16( semicom_altoffsets );
 SCREEN_UPDATE_IND16( bcstory );
-SCREEN_UPDATE_IND16(semibase );
+SCREEN_UPDATE_IND16( semibase );
 SCREEN_UPDATE_IND16( suprtrio );
 SCREEN_UPDATE_IND16( pangpang );
 SCREEN_UPDATE_IND16( sdfight );
