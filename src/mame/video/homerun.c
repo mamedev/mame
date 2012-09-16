@@ -53,6 +53,8 @@ WRITE8_MEMBER(homerun_state::homerun_videoram_w)
 
 WRITE8_MEMBER(homerun_state::homerun_color_w)
 {
+	m_colorram[offset] = data;
+
 	/* from PCB photo:
 	    bit 7:  470 ohm resistor \
 	    bit 6:  220 ohm resistor -  --> 470 ohm resistor  --> blue

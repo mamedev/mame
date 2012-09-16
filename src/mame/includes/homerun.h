@@ -15,6 +15,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
+		m_colorram(*this, "colorram"),
 		m_d7756(*this, "d7756"),
 		m_samples(*this, "samples")
 	{ }
@@ -22,6 +23,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_colorram;
 	optional_device<upd7756_device> m_d7756;
 	optional_device<samples_device> m_samples;
 

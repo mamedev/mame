@@ -17,7 +17,6 @@ Todo :
  - dump homerun sample rom
  - improve controls/dips
  - fix sprite glitches in ganjaja Hop Step & Jump
- - fix missing water tiles in ganjaja Hop Step & Jump
 
 -----------------------------------
 Moero!! Pro Yakyuu Homerun Kyousou
@@ -106,7 +105,7 @@ static ADDRESS_MAP_START( homerun_memmap, AS_PROGRAM, 8, homerun_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(homerun_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xb000, 0xb0ff) AM_RAM_WRITE(homerun_color_w)
+	AM_RANGE(0xb000, 0xb03f) AM_RAM_WRITE(homerun_color_w) AM_SHARE("colorram")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
