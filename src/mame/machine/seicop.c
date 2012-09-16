@@ -1599,7 +1599,6 @@ static WRITE16_HANDLER( seibu_common_video_regs_w )
 		case (0x026/2): { state->m_scrollram16[3] = seibu_vregs[offset]; break; }
 		case (0x028/2): { state->m_scrollram16[4] = seibu_vregs[offset]; break; }
 		case (0x02a/2): { state->m_scrollram16[5] = seibu_vregs[offset]; break; }
-
 		default: { logerror("seibu_common_video_regs_w unhandled offset %02x %04x\n",offset*2,data); break; }
 	}
 }
@@ -1834,7 +1833,11 @@ Gigan 0x12cc X = 0x23e8 Y = 0x55db
 (DC.W $1020, $F0C0, $0000, $0000)
 X = collides at the same spot
 Y = collides between 0xd0 and 0x20
-
+0x588 bits 2 & 3 = 0
+(DC.W $F0C0, $1020, $0000, $0000)
+X = collides between 0xb0 and 0x50 (inclusive)
+Y = collides between 0xd0 and 0x30 (not inclusive)
+0x588 bits 2 & 3 = 0x580 bits 0 & 1
 */
 static void cop_take_hit_box_params(UINT8 offs)
 {
@@ -2360,6 +2363,8 @@ static WRITE16_HANDLER( generic_cop_w )
 			{
 				int div = space->read_word(cop_register[0]+(0x36^2));
 				int res;
+
+				cop_status = 0x8007;
 
 				if(!div)
 				{

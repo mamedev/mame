@@ -2,6 +2,16 @@
 
     Legionnaire / Heated Barrel video hardware (derived from D-Con)
 
+	priority test (preliminary):
+	- OBJ 0
+	- TXT
+	- OBJ 1
+	- BK3
+	- OBJ 2
+	- MBK
+	- OBJ 3
+	- LBK
+
 ***************************************************************************/
 
 #include "emu.h"
