@@ -8,8 +8,6 @@
 #include "includes/homerun.h"
 
 
-#define half_screen 116
-
 /**************************************************************************/
 
 WRITE8_MEMBER(homerun_state::homerun_scrollhi_w)
@@ -34,15 +32,17 @@ WRITE8_MEMBER(homerun_state::homerun_scrollx_w)
 WRITE8_DEVICE_HANDLER(homerun_banking_w)
 {
 	homerun_state *state = device->machine().driver_data<homerun_state>();
-	if (device->machine().primary_screen->vpos() > half_screen)
-		state->m_gc_down = data & 3;
-	else
-		state->m_gc_up = data & 3;
-
+	
+	// games do mid-screen gfx bank switching
+	int vpos = device->machine().primary_screen->vpos();
+	device->machine().primary_screen->update_partial(vpos);
+	
+	// d0-d1: gfx bank
+	// d2-d4: ?
+	// d5-d7: prg bank
+	state->m_gfx_ctrl = data;
 	state->m_tilemap->mark_all_dirty();
-
-	data >>= 5;
-	state->membank("bank1")->set_entry(data & 0x07);
+	state->membank("bank1")->set_entry(data >> 5 & 7);
 }
 
 WRITE8_MEMBER(homerun_state::homerun_videoram_w)
@@ -89,8 +89,8 @@ WRITE8_MEMBER(homerun_state::homerun_color_w)
 
 TILE_GET_INFO_MEMBER(homerun_state::get_homerun_tile_info)
 {
-	int tileno = (m_videoram[tile_index]) + ((m_videoram[tile_index + 0x1000] & 0x38) << 5) + ((m_gfx_ctrl & 1) << 11);
-	int palno = (m_videoram[tile_index + 0x1000] & 0x07);
+	int tileno = (m_videoram[tile_index]) | ((m_videoram[tile_index | 0x1000] & 0x38) << 5) | ((m_gfx_ctrl & 1) << 11);
+	int palno = (m_videoram[tile_index | 0x1000] & 0x07);
 
 	SET_TILE_INFO_MEMBER(0, tileno, palno, 0);
 }
@@ -108,44 +108,39 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 4; offs >=0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
-		int code, color, sx, sy, flipx, flipy;
-		sx = spriteram[offs + 3];
-		sy = spriteram[offs + 0] - 16;
-		code = (spriteram[offs + 1]) + ((spriteram[offs + 2] & 0x8) << 5) + (state->m_gfx_ctrl << 9);
-		color = (spriteram[offs + 2] & 0x7) + 8 ;
-		flipx=(spriteram[offs + 2] & 0x40) ;
-		flipy=(spriteram[offs + 2] & 0x80) ;
+		int sx = spriteram[offs + 3];
+		int sy = spriteram[offs + 0] - 16;
+		int code = (spriteram[offs + 1]) | ((spriteram[offs + 2] & 0x8) << 5) | ((state->m_gfx_ctrl & 3) << 9);
+		int color = (spriteram[offs + 2] & 0x07) | 8;
+		int flipx = (spriteram[offs + 2] & 0x40) >> 6;
+		int flipy = (spriteram[offs + 2] & 0x80) >> 7;
+
 		drawgfx_transpen(bitmap, cliprect, machine.gfx[1],
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,0);
+		
+		// wraparound
+		drawgfx_transpen(bitmap, cliprect, machine.gfx[1],
+				code,
+				color,
+				flipx,flipy,
+				sx-256,sy,0);
 	}
 }
 
 SCREEN_UPDATE_IND16(homerun)
 {
 	homerun_state *state = screen.machine().driver_data<homerun_state>();
-	rectangle myclip = cliprect;
 
-	/* upper part */
 	state->m_tilemap->set_scrolly(0, state->m_scrolly);
 	state->m_tilemap->set_scrollx(0, state->m_scrollx);
 
-	myclip.max_y /= 2;
-	state->m_gfx_ctrl = state->m_gc_up;
-	state->m_tilemap->draw(bitmap, myclip, 0, 0);
-	draw_sprites(screen.machine(), bitmap, myclip);
+	state->m_tilemap->draw(bitmap, cliprect, 0, 0);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 
-	/* lower part */
-	myclip.min_y += myclip.max_y;
-	myclip.max_y *= 2;
-	state->m_gfx_ctrl = state->m_gc_down;
-	state->m_tilemap->draw(bitmap, myclip, 0, 0);
-	draw_sprites(screen.machine(), bitmap, myclip);
-
-	state->m_gc_down = state->m_gc_up;
 	return 0;
 }

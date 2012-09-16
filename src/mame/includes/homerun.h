@@ -30,8 +30,6 @@ public:
 
 	tilemap_t *m_tilemap;
 	int m_gfx_ctrl;
-	int m_gc_up;
-	int m_gc_down;
 	int m_scrollx;
 	int m_scrolly;
 	

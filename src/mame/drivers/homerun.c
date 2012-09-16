@@ -16,7 +16,8 @@
 Todo :
  - dump homerun sample rom
  - improve controls/dips
- - better emulation of gfx bank switching (problematic in ganjaja)
+ - fix sprite glitches in ganjaja Hop Step & Jump
+ - fix missing water tiles in ganjaja Hop Step & Jump
 
 -----------------------------------
 Moero!! Pro Yakyuu Homerun Kyousou
@@ -123,6 +124,7 @@ ADDRESS_MAP_END
 
 CUSTOM_INPUT_MEMBER(homerun_state::homerun_40_r)
 {
+	// screen split location is a guess, but works in homerun
 	UINT8 ret = (machine().primary_screen->vpos() > 116) ? 1 : 0;
 
 	return ret;
@@ -269,8 +271,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-// homerun samples, note that this is the complete rom contents
-// not all samples are used in this game
+// homerun samples, note that this is the complete rom contents; not all samples are used in this game
 static const char *const homerun_sample_names[] =
 {
 	"*homerun",
@@ -366,20 +367,15 @@ void homerun_state::machine_start()
 	save_item(NAME(m_control));
 	save_item(NAME(m_sample));
 	save_item(NAME(m_gfx_ctrl));
-	save_item(NAME(m_gc_up));
-	save_item(NAME(m_gc_down));
 	save_item(NAME(m_scrolly));
 	save_item(NAME(m_scrollx));
 }
 
 void homerun_state::machine_reset()
 {
-
 	m_control = 0;
 	m_sample = 0;
 	m_gfx_ctrl = 0;
-	m_gc_up = 0;
-	m_gc_down = 0;
 	m_scrolly = 0;
 	m_scrollx = 0;
 }
@@ -401,13 +397,11 @@ static MACHINE_CONFIG_START( dynashot, homerun_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-25)
-	//MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(homerun)
 
 	MCFG_GFXDECODE(homerun)
 	MCFG_PALETTE_LENGTH(16*4)
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -489,4 +483,4 @@ ROM_END
 
 GAME( 1988, homerun,  0, homerun,  homerun,  driver_device, 0, ROT0, "Jaleco", "Moero!! Pro Yakyuu Homerun Kyousou", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1988, dynashot, 0, dynashot, dynashot, driver_device, 0, ROT0, "Jaleco", "Dynamic Shoot Kyousou", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1990, ganjaja,  0, ganjaja,  ganjaja,  driver_device, 0, ROT0, "Jaleco", "Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1990, ganjaja,  0, ganjaja,  ganjaja,  driver_device, 0, ROT0, "Jaleco", "Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
