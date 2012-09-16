@@ -382,6 +382,7 @@ void segaybd_state::device_timer(emu_timer &timer, device_timer_id id, int param
 				}
 			#endif
 			}
+			break;
 
 		case TID_SOUND_WRITE:
 			soundlatch_write(param);
