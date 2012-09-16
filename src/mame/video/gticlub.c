@@ -601,15 +601,12 @@ static void draw_scanline_2d_tex(void *dest, INT32 scanline, const poly_extent *
 
 	for (x = extent->startx; x < extent->stopx; x++)
 	{
-		int iu = (int)(u);
-		int iv = (int)(v);
+		int iu = (int)(u * 0.0625f);
+		int iv = (int)(v * 0.0625f);
 		int iiv, iiu, texel;
 
-		int iu2 = (iu >> 4) + ((iu & 0x8) ? 1 : 0);
-		int iv2 = (iv >> 4) + ((iv & 0x8) ? 1 : 0);
-
-		iiu = texture_x + x_mirror_table[iu2 & 0x7f];
-		iiv = texture_y + y_mirror_table[iv2 & 0x7f];
+		iiu = texture_x + x_mirror_table[iu & 0x7f];
+		iiv = texture_y + y_mirror_table[iv & 0x7f];
 
 		texel = texrom[((iiv & 0x1ff) * 512) + (iiu & 0x1ff)];
 		color = K001006_palette[pal_chip][palette_index + texel];
@@ -742,14 +739,11 @@ static void draw_scanline_tex(void *dest, INT32 scanline, const poly_extent *ext
 			int iu, iv;
 			int iiv, iiu, texel;
 
-			iu = u * oow;
-			iv = v * oow;
+			iu = u * oow * 0.0625f;
+			iv = v * oow * 0.0625f;
 
-			int iu2 = (iu >> 4) + ((iu & 0x8) ? 1 : 0);
-			int iv2 = (iv >> 4) + ((iv & 0x8) ? 1 : 0);
-
-			iiu = texture_x + x_mirror_table[iu2 & 0x7f];
-			iiv = texture_y + y_mirror_table[iv2 & 0x7f];
+			iiu = texture_x + x_mirror_table[iu & 0x7f];
+			iiv = texture_y + y_mirror_table[iv & 0x7f];
 
 			texel = texrom[((iiv & 0x1ff) * 512) + (iiu & 0x1ff)];
 			color = K001006_palette[pal_chip][palette_index + texel];
