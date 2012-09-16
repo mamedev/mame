@@ -64,11 +64,21 @@ Windows performance options
 	The default is OFF (-nomultithreading).
 	
 -numprocessors <auto|value> / -np <auto|value>
+
 	Specify the number of processors to use for work queues. Specifying
 	"auto" will use the value reported by the system or environment 
 	variable OSDPROCESSORS. To avoid abuse, this value is internally limited
 	to 4 times the number of processors reported by the system. 
 	The default is "auto".
+
+-profile [n]
+
+        Enables profiling, specifying the stack depth of [n] to track.
+
+-bench [n]
+
+        Benchmark for [n] number of emulated seconds; implies the command string:
+        -str [n] -video none -nosound -nothrottle
 
 
 

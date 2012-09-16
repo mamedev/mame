@@ -1,5 +1,5 @@
 MAME(tm), the Multiple Arcade Machine Emulator
-Copyright (c) 1997-2007 by Nicola Salmoria and the MAME team
+Copyright (c) 1997-2012 by Nicola Salmoria and the MAME team
 MAME is a trademark owned by Nicola Salmoria
 
 

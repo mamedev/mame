@@ -218,16 +218,21 @@ of your command:
 	you can limit this list by specifying a driver name or wildcard after
 	the -listsource command.
 
--listcrc
+-listbrothers / -lb [<gamename|wildcard>]
+
+        Displays a list of 'brothers', or rather, other sets which are located
+        in the same sourcefile as the gamename searched for.
+
+-listcrc [<gamename|wildcard>]
 
 	Displays a full list of CRCs of all ROM images referenced by all
 	drivers within MAME.
 
--listroms <gamename>
+-listroms [<gamename|wildcard>]
 
 	Displays a list of ROM images referenced by the specified game.
 
--listsamples <gamename>
+-listsamples [<gamename|wildcard>]
 
 	Displays a list of samples referenced by the specified game.
 
@@ -245,7 +250,7 @@ of your command:
 	however, you can limit this list by specifying a driver name or
 	wildcard after the -verifyroms command.
 
--romident
+-romident [path\to\romstocheck.zip]
 
 	Attempts to identify ROM files, if they are known to MAME, in the
 	specified .zip file or directory. This command can be used to try and
@@ -258,7 +263,36 @@ of your command:
 		8: means some files were identified
 		9: means no files were identified
 
+-listdevices / -ld [<gamename|wildcard>]
 
+        Displays a list of all devices known to be hooked up to a game.  The ":"
+        is considered the game itself with the devices list being attached to give
+        the user a better understanding of what the emulation is using.
+ 
+-listslots [<gamename|wildcard>]
+
+        Show available slots and options for each slot (if available).  Primarily
+        used for MESS to allow control over internal plug-in cards, much like PC's
+        needing video, sound and other cards.
+         
+-listmedia / -lm [<gamename|wildcard>]
+   
+        List available media that the chosen game or system allows to be used.  This
+        includes media types (cartridge, cassette, diskette and more) as well as
+        common file extentions which are supported.
+
+-listsoftware [<gamename|wildcard>]
+  
+        Posts to screen all software lists which can be used by the entered gamename
+        or system.  Notice, this is simply a copy/paste of the .XML file which reside
+        in the HASH folder which are allowed to be used.
+
+-getsoftlist [<gamename|wildcard>]
+
+        Posts to screen a specific software list which matches with the gamename
+        provided.
+ 
+        
 
 Configuration options
 ---------------------
@@ -269,13 +303,16 @@ Configuration options
 	(which is the default), MAME reads the following config files in order:
 
 		- mame.ini
-		- <mymame>.ini (i.e. if MAME was renamed mame060.exe, MAME
-				parses mame060.ini here)
-		- debug.ini (if the debugger is enabled)
-		- vector.ini (for vector games only)
-		- <driver>.ini (based on the source filename of the driver)
-		- <parent>.ini (for clones only, may be called recursively)
+		- <mymame>.ini   (i.e. if MAME was renamed mame060.exe, MAME
+				  parses mame060.ini here)
+		- debug.ini      (if the debugger is enabled)
+		- <parent>.ini   (for clones only, may be called recursively)
 		- <gamename>.ini
+                - vertical.ini   (for games with vertical monitor orientation)
+                - horizont.ini   (for games with horizontal monitor orientation)
+		- vector.ini     (for vector games only)
+		- <driver>.ini   (based on the source filename of the driver)
+
 
 	The settings in the later ini's override those in the earlier ini's.
 	So, for example, if you wanted to disable overlay effects in the
@@ -302,7 +339,7 @@ Core search path options
 	is 'samples' (that is, a directory "samples" in the same directory as
 	the MAME executable).
 
--artpath / -artwork_directory <path>
+-artpath <path> / -artwork_directory <path>
 
 	Specifies a list of paths within which to find artwork files. Multiple
 	paths can be specified by separating them with semicolons. The default
@@ -328,6 +365,13 @@ Core search path options
 	Specifies a list of paths within which to find .BDF font files. Multiple
 	paths can be specified by separating them with semicolons. The default
 	is '.' (that is, search in the same directory as the MAME executable).
+
+-cheatpath <path>
+
+        Specifies a list of paths within which to find .XML cheat files.
+        Multiple paths can be specified by separating them with semicolons. The
+        default is 'cheat' (that is, a folder called 'cheat' located in the same
+        directory as the as the MAME executable).
 
 -crosshairpath <path>
 
@@ -414,16 +458,6 @@ Core Output Directory Options
 
 
 
-Core Filename Options
----------------------
-
--cheat_file <filename>
-
-	Specifies the name of the cheat database file. The default is
-	'cheat.dat'.
-
-
-
 Core state/playback options
 ---------------------------
 
@@ -459,6 +493,26 @@ Core state/playback options
 	(.cfg), NVRAM (.nv), and memory card files deleted. The default is
 	NULL (no recording).
 
+-mngwrite <filename>
+
+	Writes each video frame to the given <filename> in MNG format,
+	producing an animation of the game session. Note that -mngwrite only
+	writes video frames; it does not save any audio data. Use -wavwrite
+	for that, and reassemble the audio/video using offline tools. The
+	default is NULL (no recording).
+
+-aviwrite <filename>
+
+	Stream video and sound data to the given <filename> in AVI format,
+	producing an animation of the game session complete with sound. The
+	default is NULL (no recording).
+
+-wavwrite <filename>
+
+	Writes the final mixer output to the given <filename> in WAV format,
+	producing an audio recording of the game session. The default is
+	NULL (no recording).
+
 -snapname <name>
 
 	Describes how MAME should name files for snapshots. <name> is a string
@@ -471,7 +525,10 @@ Core state/playback options
 	find the next empty value for %i and use that for a filename. The
 	default is %g/%i, which creates a separate folder for each game,
 	and names the snapshots under it starting with 0000 and increasing
-	from there.
+	from there.  In the case of using different media, you can use the
+        %d_[media] indicator.  Replace [media] with the default media being
+        used.  In the example: 'mess nes megaman2u -snapname %g/%d_cart'
+        snapshots will then be placed in 'snaps\nes\megaman2u.png'
 
 -snapsize <width>x<height>
 
@@ -496,26 +553,6 @@ Core state/playback options
 	"Native (15:14)" view even though it is not a perfect match.
 	<viewname> can also be 'auto', which selects the first view with all
 	screens present. The default value is 'internal'.
-
--mngwrite <filename>
-
-	Writes each video frame to the given <filename> in MNG format,
-	producing an animation of the game session. Note that -mngwrite only
-	writes video frames; it does not save any audio data. Use -wavwrite
-	for that, and reassemble the audio/video using offline tools. The
-	default is NULL (no recording).
-
--aviwrite <filename>
-
-	Stream video and sound data to the given <filename> in AVI format,
-	producing an animation of the game session complete with sound. The
-	default is NULL (no recording).
-
--wavwrite <filename>
-
-	Writes the final mixer output to the given <filename> in WAV format,
-	producing an audio recording of the game session. The default is
-	NULL (no recording).
 
 -[no]burnin
 
@@ -616,14 +653,6 @@ Core rotation options
 	specified) or its native state (if -norotate is specified). The
 	default for both of these options is OFF (-noror -norol).
 
--[no]flipx
--[no]flipy
-
-	Flip (mirror) the game screen either horizontally (-flipx) or
-	vertically (-flipy). The flips are applied after the -rotate and
-	-ror/-rol options are applied. The default for both of these options
-	is OFF (-noflipx -noflipy).
-
 -[no]autoror
 -[no]autorol
 
@@ -632,6 +661,14 @@ Core rotation options
 	use -autorol to ensure that the game will fill the screen either
 	horizontally or vertically in one of the directions you can handle.
 	If your screen only pivots counter-clockwise, use -autoror.
+
+-[no]flipx
+-[no]flipy
+
+	Flip (mirror) the game screen either horizontally (-flipx) or
+	vertically (-flipy). The flips are applied after the -rotate and
+	-ror/-rol options are applied. The default for both of these options
+	is OFF (-noflipx -noflipy).
 
 
 
@@ -658,10 +695,20 @@ Core artwork options
 	Enables/disables the display of overlays. The default is ON
 	(-use_overlays).
 
--[no]use_bezels / -[no]bezel
+-[no]use_bezels / -[no]bezels
 
 	Enables/disables the display of bezels. The default is ON
 	(-use_bezels).
+
+-[no]use_cpanels / -[no]cpanels
+
+	Enables/disables the display of control panels. The default is ON
+	(-use_cpanels).
+
+-[no]use_marquees / -[no]marquees
+
+	Enables/disables the display of marquees. The default is ON
+	(-use_marquees).
 
 
 
@@ -842,6 +889,11 @@ Core input options
 	but has the disadvantage of making controls less responsive. The
 	default is OFF (-nosteadykey)
 
+-[no]ui_active
+
+        Enable user interface on top of emulated keyboard (if present).  The
+        default if OFF (-noui_active)
+
 -[no]offscreen_reload / -[no]reload
 
 	Controls whether or not MAME treats a second button input from a
@@ -927,18 +979,36 @@ Core input options
 	1.0, where 0 is the center of the joystick and 1 is the outer limit.
 	The default is 0.85.
 
+-natural
+        Specific whether or not to use a natural keyboard or not.  This allows
+        you to start your game or system in "partial" keyboard emulation mode,
+        giving you the ability to use all normal UI keys.  The default is OFF,
+        (-nonatrual)
+
+-joystick_contradictory
+
+        Enable contradictory direction digital joystick input at the same time
+        such as Left and Right or Up and Down at the same time.  The default
+        is OFF (-nojoystick_contradictory)
+
+-coin_impulse [n]
+
+        Set coin impulse time based on n (n<0 disable impulse, n==0 obey driver,
+        0<n set time n).  Default is 0.
+
 
 
 Core input automatic enable options
 -----------------------------------
 
--paddle_device <keyboard|mouse|joystick|lightgun|none> / -paddle
--adstick_device <keyboard|mouse|joystick|lightgun|none> / -adstick
--pedal_device <keyboard|mouse|joystick|lightgun|none> / -pedal
--dial_device <keyboard|mouse|joystick|lightgun|none> / -dial
--trackball_device <keyboard|mouse|joystick|lightgun|none> / -trackball
--lightgun_device <keyboard|mouse|joystick|lightgun|none>
--positional_device <keyboard|mouse|joystick|lightgun|none>
+-paddle_device       enable (none|keyboard|mouse|lightgun|joystick) if a paddle control is present
+-adstick_device      enable (none|keyboard|mouse|lightgun|joystick) if an analog joystick control is present
+-pedal_device        enable (none|keyboard|mouse|lightgun|joystick) if a pedal control is present
+-dial_device         enable (none|keyboard|mouse|lightgun|joystick) if a dial control is present
+-trackball_device    enable (none|keyboard|mouse|lightgun|joystick) if a trackball control is present
+-lightgun_device     enable (none|keyboard|mouse|lightgun|joystick) if a lightgun control is present
+-positional_device   enable (none|keyboard|mouse|lightgun|joystick) if a positional control is present
+-mouse_device        enable (none|keyboard|mouse|lightgun|joystick) if a mouse control is present
 
 	Each of these options controls autoenabling the mouse, joystick, or
 	lightgun depending on the presence of a particular class of analog
@@ -984,6 +1054,11 @@ Debugging options
 	Specifies a file that contains a list of debugger commands to execute
 	immediately upon startup. The default is NULL (no commands).
 
+-debug_internal
+
+        A special 'internal' debugger for debugging.  Activated when used along
+        with -debug.  The default if OFF (-nodebug_internal).
+        
 
 
 Core misc options
@@ -1007,8 +1082,22 @@ Core misc options
 
 -uifont <fontname>
 
-	Specifies the name of a BDF font file to use for the UI font. If this
-	font cannot be found or cannot be loaded, the system will fall back
-	to its built-in UI font. On some platforms 'fontname' can be a system
-	font name instead of a BDF font file. The default is 'default' (use 
+	Specifies the name of a font file to use for the UI font.  If this font
+        cannot be found or cannot be loaded, the system will fall back to its
+        built-in UI font.  On some platforms 'fontname' can be a system font
+        name (TTF) instead of a (BDF) font file. The default is 'default' (use 
 	the OSD-determined default font).
+
+-ramsize [n]
+
+        Allows you to change the default RAM size (if supported by driver).
+
+-confirm_quit
+
+        Display a Confirm Quit dialong to screen on exit, requiring one extra
+        step to exit MAME.  The default is OFF (-noconfirm_quit).
+
+-ui_mouse
+
+        Displays a mouse cursor when using the built-in UI for MAME.  The default
+        is (-noui_mouse).
