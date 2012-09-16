@@ -22381,7 +22381,7 @@
 		</part>
 	</software>
 
-	<software name="tetrisad">
+	<software name="tetrisad" supported="partial">
 		<description>Minna no Soft Series - Tetris Advance (Jpn)</description>
 		<year>2003</year>
 		<publisher>Success</publisher>
@@ -31729,7 +31729,7 @@
 		</part>
 	</software>
 
-	<software name="swep3">
+	<software name="swep3" supported="no">
 		<description>Star Wars - Episode III - Revenge of the Sith (Euro)</description>
 		<year>2005</year>
 		<publisher>Ubisoft</publisher>
@@ -31742,7 +31742,7 @@
 		</part>
 	</software>
 
-	<software name="swep3u" cloneof="swep3">
+	<software name="swep3u" cloneof="swep3" supported="no">
 		<description>Star Wars - Episode III - Revenge of the Sith (USA)</description>
 		<year>2005</year>
 		<publisher>Ubisoft</publisher>
@@ -31827,7 +31827,7 @@
 		</part>
 	</software>
 
-	<software name="swtrilgy">
+	<software name="swtrilgy" supported="no">
 		<description>Star Wars Trilogy - Apprentice of the Force (Euro)</description>
 		<year>2004</year>
 		<publisher>Ubisoft</publisher>
@@ -31840,7 +31840,7 @@
 		</part>
 	</software>
 
-	<software name="swtrilgyu" cloneof="swtrilgy">
+	<software name="swtrilgyu" cloneof="swtrilgy" supported="no">
 		<description>Star Wars Trilogy - Apprentice of the Force (USA)</description>
 		<year>2004</year>
 		<publisher>Ubisoft</publisher>
@@ -33049,7 +33049,8 @@
 		</part>
 	</software>
 
-	<software name="supmanrt">
+<!-- This freezes -->
+	<software name="supmanrt" supported="no">
 		<description>Superman Returns - Fortress of Solitude (Euro, USA)</description>
 		<year>2006</year>
 		<publisher>Electronic Arts</publisher>
@@ -33062,7 +33063,7 @@
 		</part>
 	</software>
 
-	<software name="surfsupa" cloneof="surfsup">
+	<software name="surfsupa" cloneof="surfsup" supported="no">
 		<description>Surf's Up (Euro, English / French / German / Italian / Spanish)</description>
 		<year>2007</year>
 		<publisher>Ubisoft</publisher>
@@ -33074,7 +33075,7 @@
 		</part>
 	</software>
 
-	<software name="surfsup">
+	<software name="surfsup" supported="no">
 		<description>Surf's Up (Euro, English / French / Spanish)</description>
 		<year>2007</year>
 		<publisher>Ubisoft</publisher>
@@ -33086,7 +33087,7 @@
 		</part>
 	</software>
 
-	<software name="surfsupu" cloneof="surfsup">
+	<software name="surfsupu" cloneof="surfsup" supported="no">
 		<description>Surf's Up (USA)</description>
 		<year>2007</year>
 		<publisher>Ubisoft</publisher>
@@ -33553,7 +33554,7 @@
 	</software>
 
 	<software name="tarzang" cloneof="tarzan">
-		<description>Disneys Tarzan - Rückkehr in den Dschungel (Ger)</description>
+		<description>Disney's Tarzan - Rückkehr in den Dschungel (Ger)</description>
 		<year>2002</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="gba_cart">
@@ -33576,7 +33577,7 @@
 		</part>
 	</software>
 
-	<software name="teentitn">
+	<software name="teentitn" supported="partial">
 		<description>Teen Titans (USA)</description>
 		<year>2005</year>
 		<publisher>Majesco</publisher>
@@ -33589,8 +33590,8 @@
 		</part>
 	</software>
 
-	<software name="teentit2">
-		<description>Teen Titans 2 (USA)</description>
+	<software name="teentit2" supported="partial">
+		<description>Teen Titans 2 - The Brotherhood's Revenge (USA)</description>
 		<year>2006</year>
 		<publisher>Majesco</publisher>
 		<info name="serial" value="AGB-BZUE-USA"/>
@@ -33695,7 +33696,7 @@
 		</part>
 	</software>
 
-	<software name="tenpin2">
+	<software name="tenpin2" supported="no">
 		<description>Ten Pin Alley 2 (USA)</description>
 		<year>2004</year>
 		<publisher>XS Games</publisher>
@@ -33881,7 +33882,7 @@
 		</part>
 	</software>
 
-	<software name="texashld">
+	<software name="texashld" supported="no">
 		<description>Texas Hold 'em Poker (Euro, Rev. 1)</description>
 		<year>2004</year>
 		<publisher>Majesco</publisher>
@@ -33892,7 +33893,7 @@
 		</part>
 	</software>
 
-	<software name="texashlda" cloneof="texashld">
+	<software name="texashlda" cloneof="texashld" supported="no">
 		<description>Texas Hold 'em Poker (Euro, USA)</description>
 		<year>2004</year>
 		<publisher>Majesco</publisher>
@@ -33917,7 +33918,7 @@
 		</part>
 	</software>
 
-	<software name="thatsrv2">
+	<software name="thatsrv2" supported="partial">
 		<description>That's So Raven 2 - Supernatural Style (USA)</description>
 		<year>2005</year>
 		<publisher>Disney Interactive</publisher>
@@ -33978,7 +33979,7 @@
 		</part>
 	</software>
 
-	<software name="thundral">
+	<software name="thundral" supported="no">
 		<description>Thunder Alley (USA)</description>
 		<year>2004</year>
 		<publisher>XS Games</publisher>
@@ -34183,7 +34184,7 @@
 		</part>
 	</software>
 
-	<software name="tmntn">
+	<software name="tmntn" supported="no">
 		<!-- Alt. Title: TMNT - Teenage Mutant Ninja Turtles (Box) -->
 		<description>TMNT (Euro)</description>
 		<year>2007</year>
@@ -34197,7 +34198,7 @@
 		</part>
 	</software>
 
-	<software name="tmntnu" cloneof="tmntn">
+	<software name="tmntnu" cloneof="tmntn" supported="no">
 		<description>TMNT (USA)</description>
 		<year>2007</year>
 		<publisher>Ubisoft</publisher>
@@ -34734,7 +34735,7 @@
 		</part>
 	</software>
 
-	<software name="topguncz">
+	<software name="topguncz" supported="no">
 		<description>Top Gun - Combat Zones (USA)</description>
 		<year>2004</year>
 		<publisher>Mastiff</publisher>
@@ -34879,7 +34880,7 @@
 		</part>
 	</software>
 
-	<software name="tottokh3" cloneof="hamtaroh">
+	<software name="tottokh3" cloneof="hamtaroh" supported="no">
 		<description>Tottoko Hamutarou 3 - Love Love Daibouken Dechu (Jpn)</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
@@ -34894,7 +34895,7 @@
 		</part>
 	</software>
 
-	<software name="tottokh4" cloneof="hamtaror">
+	<software name="tottokh4" cloneof="hamtaror" supported="no">
 		<description>Tottoko Hamutarou 4 - Nijiiro Daikoushin Dechu (Jpn)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
@@ -35256,7 +35257,7 @@
 		</part>
 	</software>
 
-	<software name="tweetymgu" cloneof="tweetymg">
+	<software name="tweetymgu" cloneof="tweetymg" supported="no">
 		<description>Tweety and the Magic Gems (USA)</description>
 		<year>2001</year>
 		<publisher>Kemco</publisher>
@@ -35269,7 +35270,7 @@
 		</part>
 	</software>
 
-	<software name="tweetyhp" cloneof="tweetymg">
+	<software name="tweetyhp" cloneof="tweetymg" supported="no">
 		<description>Tweety no Hearty Party (Jpn)</description>
 		<year>2001</year>
 		<publisher>Kemco</publisher>
@@ -35310,7 +35311,7 @@
 		</part>
 	</software>
 
-	<software name="tyrian2k">
+	<software name="tyrian2k" supported="no">
 		<description>Tyrian 2000 (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>Stealth Productions</publisher>
@@ -35351,7 +35352,7 @@
 		</part>
 	</software>
 
-	<software name="uekihuso">
+	<software name="uekihuso" supported="no">
 		<description>Ueki no Housoku - Jingi Sakuretsu! Nouryokusha Battle (Jpn)</description>
 		<year>2006</year>
 		<publisher>Banpresto</publisher>
@@ -35704,7 +35705,7 @@
 		</part>
 	</software>
 
-	<software name="vip">
+	<software name="vip" supported="no">
 		<description>V.I.P. (Euro)</description>
 		<year>2002</year>
 		<publisher>Ubi Soft</publisher>
@@ -36453,7 +36454,7 @@
 		</part>
 	</software>
 
-	<software name="wintersp">
+	<software name="wintersp" supported="no">
 		<description>Winter Sports (Euro)</description>
 		<year>2006</year>
 		<publisher>East Entertainment Media</publisher>
@@ -36615,7 +36616,7 @@
 		</part>
 	</software>
 
-	<software name="wchampkr">
+	<software name="wchampkr" supported="no">
 		<description>World Championship Poker (Euro)</description>
 		<year>2005</year>
 		<publisher>Play It</publisher>
@@ -36627,7 +36628,7 @@
 		</part>
 	</software>
 
-	<software name="wchampkru" cloneof="wchampkr">
+	<software name="wchampkru" cloneof="wchampkr" supported="no">
 		<description>World Championship Poker (USA)</description>
 		<year>2004</year>
 		<publisher>Crave Entertainment</publisher>
@@ -36712,7 +36713,7 @@
 		</part>
 	</software>
 
-	<software name="wormswp">
+	<software name="wormswp" supported="no">
 		<description>Worms World Party (Euro)</description>
 		<year>2002</year>
 		<publisher>Ubi Soft</publisher>
@@ -36724,7 +36725,7 @@
 		</part>
 	</software>
 
-	<software name="wormswpu" cloneof="wormswp">
+	<software name="wormswpu" cloneof="wormswp" supported="no">
 		<description>Worms World Party (USA)</description>
 		<year>2002</year>
 		<publisher>Ubi Soft</publisher>
@@ -36991,7 +36992,7 @@
 		</part>
 	</software>
 
-	<software name="yoshitt" cloneof="yoshiug">
+	<software name="yoshitt" cloneof="yoshiug" supported="partial">
 		<description>Yoshi - Topsy-Turvy (USA)</description>
 		<year>2005</year>
 		<publisher>Nintendo</publisher>
@@ -37004,7 +37005,7 @@
 		</part>
 	</software>
 
-	<software name="yoshiban" cloneof="yoshiug">
+	<software name="yoshiban" cloneof="yoshiug" supported="partial">
 		<description>Yoshi no Banyuuinryoku (Jpn)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
@@ -37019,7 +37020,7 @@
 		</part>
 	</software>
 
-	<software name="yoshiug">
+	<software name="yoshiug" supported="partial">
 		<description>Yoshi's Universal Gravitation (Euro)</description>
 		<year>2005</year>
 		<publisher>Nintendo</publisher>
