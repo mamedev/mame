@@ -275,7 +275,7 @@ PALETTE_INIT( v9958 )
 	PALETTE_INIT_CALL(v9938);
 
 	if (v99x8_device::s_pal_indYJK == NULL)
-		v99x8_device::s_pal_indYJK = global_alloc_array(UINT16, 0x20000);
+		v99x8_device::s_pal_indYJK = auto_alloc_array(machine,UINT16, 0x20000);
 
 	// set up YJK table
 	LOG(("Building YJK table for V9958 screens, may take a while ... \n"));
