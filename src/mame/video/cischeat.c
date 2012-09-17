@@ -1195,29 +1195,29 @@ if (machine.input().code_pressed(KEYCODE_X))
 
 #ifdef MAME_DEBUG
 #define CISCHEAT_LAYERSCTRL \
-state->m_debugsprites = 0; \
-if ( screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input().code_pressed(KEYCODE_X) ) \
+m_debugsprites = 0; \
+if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed(KEYCODE_X) ) \
 { \
 	int msk = 0; \
-	if (screen.machine().input().code_pressed(KEYCODE_Q))	{ msk |= 0x01;} \
-	if (screen.machine().input().code_pressed(KEYCODE_W))	{ msk |= 0x02;} \
-	if (screen.machine().input().code_pressed(KEYCODE_E))	{ msk |= 0x04;} \
-	if (screen.machine().input().code_pressed(KEYCODE_A))	{ msk |= 0x08; state->m_debugsprites = 1;} \
-	if (screen.machine().input().code_pressed(KEYCODE_S))	{ msk |= 0x08; state->m_debugsprites = 2;} \
-	if (screen.machine().input().code_pressed(KEYCODE_D))	{ msk |= 0x08; state->m_debugsprites = 3;} \
-	if (screen.machine().input().code_pressed(KEYCODE_F))	{ msk |= 0x08; state->m_debugsprites = 4;} \
-	if (screen.machine().input().code_pressed(KEYCODE_R))	{ msk |= 0x10;} \
-	if (screen.machine().input().code_pressed(KEYCODE_T))	{ msk |= 0x20;} \
+	if (machine().input().code_pressed(KEYCODE_Q))	{ msk |= 0x01;} \
+	if (machine().input().code_pressed(KEYCODE_W))	{ msk |= 0x02;} \
+	if (machine().input().code_pressed(KEYCODE_E))	{ msk |= 0x04;} \
+	if (machine().input().code_pressed(KEYCODE_A))	{ msk |= 0x08; m_debugsprites = 1;} \
+	if (machine().input().code_pressed(KEYCODE_S))	{ msk |= 0x08; m_debugsprites = 2;} \
+	if (machine().input().code_pressed(KEYCODE_D))	{ msk |= 0x08; m_debugsprites = 3;} \
+	if (machine().input().code_pressed(KEYCODE_F))	{ msk |= 0x08; m_debugsprites = 4;} \
+	if (machine().input().code_pressed(KEYCODE_R))	{ msk |= 0x10;} \
+	if (machine().input().code_pressed(KEYCODE_T))	{ msk |= 0x20;} \
  \
-	if (msk != 0) state->m_active_layers &= msk; \
+	if (msk != 0) m_active_layers &= msk; \
 } \
 \
 { \
-	if ( screen.machine().input().code_pressed(KEYCODE_Z) && screen.machine().input().code_pressed_once(KEYCODE_U) ) \
-		state->m_show_unknown ^= 1; \
-	if (state->m_show_unknown) \
+	if ( machine().input().code_pressed(KEYCODE_Z) && machine().input().code_pressed_once(KEYCODE_U) ) \
+		m_show_unknown ^= 1; \
+	if (m_show_unknown) \
 		popmessage("0:%04X 2:%04X 4:%04X 6:%04X c:%04X", \
-			state->m_vregs[0],state->m_vregs[1],state->m_vregs[2],state->m_vregs[3],state->m_vregs[0xc/2] ); \
+			m_vregs[0],m_vregs[1],m_vregs[2],m_vregs[3],m_vregs[0xc/2] ); \
 }
 #else
 #define CISCHEAT_LAYERSCTL
@@ -1254,8 +1254,8 @@ UINT32 cischeat_state::screen_update_bigrun(screen_device &screen, bitmap_ind16 
 
 	for (i = 7; i >= 4; i--)
 	{											/* bitmap, road, min_priority, max_priority, transparency */
-		if (m_active_layers & 0x10)	cischeat_draw_road(screen.machine(),bitmap,cliprect,0,i,i,FALSE);
-		if (m_active_layers & 0x20)	cischeat_draw_road(screen.machine(),bitmap,cliprect,1,i,i,TRUE);
+		if (m_active_layers & 0x10)	cischeat_draw_road(machine(),bitmap,cliprect,0,i,i,FALSE);
+		if (m_active_layers & 0x20)	cischeat_draw_road(machine(),bitmap,cliprect,1,i,i,TRUE);
 	}
 
 	flag = 0;
@@ -1264,11 +1264,11 @@ UINT32 cischeat_state::screen_update_bigrun(screen_device &screen, bitmap_ind16 
 
 	for (i = 3; i >= 0; i--)
 	{											/* bitmap, road, min_priority, max_priority, transparency */
-		if (m_active_layers & 0x10)	cischeat_draw_road(screen.machine(),bitmap,cliprect,0,i,i,TRUE);
-		if (m_active_layers & 0x20)	cischeat_draw_road(screen.machine(),bitmap,cliprect,1,i,i,TRUE);
+		if (m_active_layers & 0x10)	cischeat_draw_road(machine(),bitmap,cliprect,0,i,i,TRUE);
+		if (m_active_layers & 0x20)	cischeat_draw_road(machine(),bitmap,cliprect,1,i,i,TRUE);
 	}
 
-	if (m_active_layers & 0x08)	bigrun_draw_sprites(screen.machine(),bitmap,cliprect,15,0);
+	if (m_active_layers & 0x08)	bigrun_draw_sprites(machine(),bitmap,cliprect,15,0);
 
 	cischeat_tmap_DRAW(2)
 
@@ -1306,25 +1306,25 @@ UINT32 cischeat_state::screen_update_cischeat(screen_device &screen, bitmap_ind1
 	bitmap.fill(0, cliprect);
 
 										/* bitmap, road, priority, transparency */
-	if (m_active_layers & 0x10)	cischeat_draw_road(screen.machine(),bitmap,cliprect,0,7,5,FALSE);
-	if (m_active_layers & 0x20)	cischeat_draw_road(screen.machine(),bitmap,cliprect,1,7,5,TRUE);
+	if (m_active_layers & 0x10)	cischeat_draw_road(machine(),bitmap,cliprect,0,7,5,FALSE);
+	if (m_active_layers & 0x20)	cischeat_draw_road(machine(),bitmap,cliprect,1,7,5,TRUE);
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)
 //  else bitmap.fill(0, cliprect);
 	cischeat_tmap_DRAW(1)
 
-	if (m_active_layers & 0x08)	cischeat_draw_sprites(screen.machine(),bitmap,cliprect,15,3);
-	if (m_active_layers & 0x10)	cischeat_draw_road(screen.machine(),bitmap,cliprect,0,4,1,TRUE);
-	if (m_active_layers & 0x20)	cischeat_draw_road(screen.machine(),bitmap,cliprect,1,4,1,TRUE);
-	if (m_active_layers & 0x08)	cischeat_draw_sprites(screen.machine(),bitmap,cliprect,2,2);
-	if (m_active_layers & 0x10)	cischeat_draw_road(screen.machine(),bitmap,cliprect,0,0,0,TRUE);
-	if (m_active_layers & 0x20)	cischeat_draw_road(screen.machine(),bitmap,cliprect,1,0,0,TRUE);
-	if (m_active_layers & 0x08)	cischeat_draw_sprites(screen.machine(),bitmap,cliprect,1,0);
+	if (m_active_layers & 0x08)	cischeat_draw_sprites(machine(),bitmap,cliprect,15,3);
+	if (m_active_layers & 0x10)	cischeat_draw_road(machine(),bitmap,cliprect,0,4,1,TRUE);
+	if (m_active_layers & 0x20)	cischeat_draw_road(machine(),bitmap,cliprect,1,4,1,TRUE);
+	if (m_active_layers & 0x08)	cischeat_draw_sprites(machine(),bitmap,cliprect,2,2);
+	if (m_active_layers & 0x10)	cischeat_draw_road(machine(),bitmap,cliprect,0,0,0,TRUE);
+	if (m_active_layers & 0x20)	cischeat_draw_road(machine(),bitmap,cliprect,1,0,0,TRUE);
+	if (m_active_layers & 0x08)	cischeat_draw_sprites(machine(),bitmap,cliprect,1,0);
 	cischeat_tmap_DRAW(2)
 
 	/* for the map screen */
-	if (m_active_layers & 0x08)	cischeat_draw_sprites(screen.machine(),bitmap,cliprect,0+16,0+16);
+	if (m_active_layers & 0x08)	cischeat_draw_sprites(machine(),bitmap,cliprect,0+16,0+16);
 
 
 	m_active_layers = active_layers1;
@@ -1364,8 +1364,8 @@ UINT32 cischeat_state::screen_update_f1gpstar(screen_device &screen, bitmap_ind1
 /*  1: clouds 5, grad 7, road 0     2: clouds 5, grad 7, road 0, tunnel roof 0 */
 
 	/* road 1!! 0!! */					/* bitmap, road, min_priority, max_priority, transparency */
-	if (m_active_layers & 0x20)	f1gpstar_draw_road(screen.machine(),bitmap,cliprect,1,6,7,TRUE);
-	if (m_active_layers & 0x10)	f1gpstar_draw_road(screen.machine(),bitmap,cliprect,0,6,7,TRUE);
+	if (m_active_layers & 0x20)	f1gpstar_draw_road(machine(),bitmap,cliprect,1,6,7,TRUE);
+	if (m_active_layers & 0x10)	f1gpstar_draw_road(machine(),bitmap,cliprect,0,6,7,TRUE);
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)
@@ -1373,18 +1373,18 @@ UINT32 cischeat_state::screen_update_f1gpstar(screen_device &screen, bitmap_ind1
 	cischeat_tmap_DRAW(1)
 
 	/* road 1!! 0!! */					/* bitmap, road, min_priority, max_priority, transparency */
-	if (m_active_layers & 0x20)	f1gpstar_draw_road(screen.machine(),bitmap,cliprect,1,1,5,TRUE);
-	if (m_active_layers & 0x10)	f1gpstar_draw_road(screen.machine(),bitmap,cliprect,0,1,5,TRUE);
+	if (m_active_layers & 0x20)	f1gpstar_draw_road(machine(),bitmap,cliprect,1,1,5,TRUE);
+	if (m_active_layers & 0x10)	f1gpstar_draw_road(machine(),bitmap,cliprect,0,1,5,TRUE);
 
-	if (m_active_layers & 0x08)	cischeat_draw_sprites(screen.machine(),bitmap,cliprect,15,2);
+	if (m_active_layers & 0x08)	cischeat_draw_sprites(machine(),bitmap,cliprect,15,2);
 
 	/* road 1!! 0!! */					/* bitmap, road, min_priority, max_priority, transparency */
-	if (m_active_layers & 0x20)	f1gpstar_draw_road(screen.machine(),bitmap,cliprect,1,0,0,TRUE);
-	if (m_active_layers & 0x10)	f1gpstar_draw_road(screen.machine(),bitmap,cliprect,0,0,0,TRUE);
+	if (m_active_layers & 0x20)	f1gpstar_draw_road(machine(),bitmap,cliprect,1,0,0,TRUE);
+	if (m_active_layers & 0x10)	f1gpstar_draw_road(machine(),bitmap,cliprect,0,0,0,TRUE);
 
-	if (m_active_layers & 0x08)	cischeat_draw_sprites(screen.machine(),bitmap,cliprect,1,1);
+	if (m_active_layers & 0x08)	cischeat_draw_sprites(machine(),bitmap,cliprect,1,1);
 	cischeat_tmap_DRAW(2)
-	if (m_active_layers & 0x08)	cischeat_draw_sprites(screen.machine(),bitmap,cliprect,0,0);
+	if (m_active_layers & 0x08)	cischeat_draw_sprites(machine(),bitmap,cliprect,0,0);
 
 
 	m_active_layers = active_layers1;
@@ -1405,21 +1405,21 @@ UINT32 cischeat_state::screen_update_scudhamm(screen_device &screen, bitmap_ind1
 
 #ifdef MAME_DEBUG
 m_debugsprites = 0;
-if ( screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input().code_pressed(KEYCODE_X) )
+if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed(KEYCODE_X) )
 {
 	int msk = 0;
-	if (screen.machine().input().code_pressed(KEYCODE_Q))	{ msk |= 0x1;}
-	if (screen.machine().input().code_pressed(KEYCODE_W))	{ msk |= 0x2;}
-	if (screen.machine().input().code_pressed(KEYCODE_E))	{ msk |= 0x4;}
-	if (screen.machine().input().code_pressed(KEYCODE_A))	{ msk |= 0x8; m_debugsprites = 1;}
-	if (screen.machine().input().code_pressed(KEYCODE_S))	{ msk |= 0x8; m_debugsprites = 2;}
-	if (screen.machine().input().code_pressed(KEYCODE_D))	{ msk |= 0x8; m_debugsprites = 3;}
-	if (screen.machine().input().code_pressed(KEYCODE_F))	{ msk |= 0x8; m_debugsprites = 4;}
+	if (machine().input().code_pressed(KEYCODE_Q))	{ msk |= 0x1;}
+	if (machine().input().code_pressed(KEYCODE_W))	{ msk |= 0x2;}
+	if (machine().input().code_pressed(KEYCODE_E))	{ msk |= 0x4;}
+	if (machine().input().code_pressed(KEYCODE_A))	{ msk |= 0x8; m_debugsprites = 1;}
+	if (machine().input().code_pressed(KEYCODE_S))	{ msk |= 0x8; m_debugsprites = 2;}
+	if (machine().input().code_pressed(KEYCODE_D))	{ msk |= 0x8; m_debugsprites = 3;}
+	if (machine().input().code_pressed(KEYCODE_F))	{ msk |= 0x8; m_debugsprites = 4;}
 
 	if (msk != 0) m_active_layers &= msk;
 #if 1
 	{
-		address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		popmessage("Cmd: %04X Pos:%04X Lim:%04X Inp:%04X",
 							m_scudhamm_motor_command,
@@ -1440,7 +1440,7 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input(
 	flag = 0;
 	cischeat_tmap_DRAW(0)
 	// no layer 1
-	if (m_active_layers & 0x08)	cischeat_draw_sprites(screen.machine(),bitmap,cliprect,0,15);
+	if (m_active_layers & 0x08)	cischeat_draw_sprites(machine(),bitmap,cliprect,0,15);
 	cischeat_tmap_DRAW(2)
 
 	m_active_layers = active_layers1;
