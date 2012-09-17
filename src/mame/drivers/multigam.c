@@ -236,7 +236,7 @@ WRITE8_MEMBER(multigam_state::sprite_dma_w)
 {
 	int source = (data & 7);
 	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
-	ppu->spriteram_dma(&space, source);
+	ppu->spriteram_dma(space, source);
 }
 
 READ8_MEMBER(multigam_state::psg_4015_r)
@@ -1138,9 +1138,9 @@ void multigam_state::machine_reset()
 
 MACHINE_RESET_MEMBER(multigam_state,multigm3)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/* reset the ppu */
-	multigm3_switch_prg_rom(*space, 0, 0x01 );
+	multigm3_switch_prg_rom(space, 0, 0x01 );
 };
 
 void multigam_state::machine_start()
@@ -1360,8 +1360,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(multigam_state,multigam)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	multigam_switch_prg_rom(*space, 0x0, 0x01);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	multigam_switch_prg_rom(space, 0x0, 0x01);
 }
 
 static void multigm3_decrypt(UINT8* mem, int memsize, const UINT8* decode_nibble)
@@ -1375,7 +1375,7 @@ static void multigm3_decrypt(UINT8* mem, int memsize, const UINT8* decode_nibble
 
 DRIVER_INIT_MEMBER(multigam_state,multigm3)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	const UINT8 decode[16]  = { 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00, 0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a };
 
@@ -1384,12 +1384,12 @@ DRIVER_INIT_MEMBER(multigam_state,multigm3)
 
 	m_multigmc_mmc3_6000_ram = auto_alloc_array(machine(), UINT8, 0x2000);
 
-	multigam_switch_prg_rom(*space, 0x0, 0x01);
+	multigam_switch_prg_rom(space, 0x0, 0x01);
 }
 
 DRIVER_INIT_MEMBER(multigam_state,multigmt)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	UINT8* buf = auto_alloc_array(machine(), UINT8, 0x80000);
 	UINT8 *rom;
@@ -1425,7 +1425,7 @@ DRIVER_INIT_MEMBER(multigam_state,multigmt)
 	}
 
 	auto_free(machine(), buf);
-	multigam_switch_prg_rom(*space, 0x0, 0x01);
+	multigam_switch_prg_rom(space, 0x0, 0x01);
 };
 
 GAME( 1992, multigam, 0,        multigam, multigam, multigam_state, multigam, ROT0, "<unknown>", "Multi Game (set 1)", 0 )

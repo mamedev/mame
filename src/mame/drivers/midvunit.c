@@ -362,20 +362,20 @@ WRITE32_MEMBER(midvunit_state::bit_reset_w)
 
 READ32_MEMBER(midvunit_state::offroadc_serial_status_r)
 {
-	int status = midway_serial_pic2_status_r(&space);
+	int status = midway_serial_pic2_status_r(space);
 	return (ioport("991030")->read()  & 0x7fff7fff) | (status << 31) | (status << 15);
 }
 
 
 READ32_MEMBER(midvunit_state::offroadc_serial_data_r)
 {
-	return midway_serial_pic2_r(&space) << 16;
+	return midway_serial_pic2_r(space) << 16;
 }
 
 
 WRITE32_MEMBER(midvunit_state::offroadc_serial_data_w)
 {
-	midway_serial_pic2_w(&space, data >> 16);
+	midway_serial_pic2_w(space, data >> 16);
 }
 
 

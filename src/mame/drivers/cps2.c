@@ -692,7 +692,7 @@ static const eeprom_interface cps2_eeprom_interface =
 
 static WRITE16_HANDLER( cps2_eeprom_port_w )
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
+	cps_state *state = space.machine().driver_data<cps_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -724,38 +724,38 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 		if (state->m_audiocpu != NULL)
 			state->m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
 
-		coin_counter_w(space->machine(), 0, data & 0x0001);
-		if ((strncmp(space->machine().system().name, "pzloop2", 8) == 0) ||
-		    (strncmp(space->machine().system().name, "pzloop2j", 8) == 0) ||
-		    (strncmp(space->machine().system().name, "pzloop2jr1", 8) == 0))
+		coin_counter_w(space.machine(), 0, data & 0x0001);
+		if ((strncmp(space.machine().system().name, "pzloop2", 8) == 0) ||
+		    (strncmp(space.machine().system().name, "pzloop2j", 8) == 0) ||
+		    (strncmp(space.machine().system().name, "pzloop2jr1", 8) == 0))
 		{
 			// Puzz Loop 2 uses coin counter 2 input to switch between stick and paddle controls
 			state->m_readpaddle = data & 0x0002;
 		}
 		else
 		{
-			coin_counter_w(space->machine(), 1, data & 0x0002);
+			coin_counter_w(space.machine(), 1, data & 0x0002);
 		}
 
-		if (strncmp(space->machine().system().name, "mmatrix", 7) == 0)		// Mars Matrix seems to require the coin lockout bit to be reversed
+		if (strncmp(space.machine().system().name, "mmatrix", 7) == 0)		// Mars Matrix seems to require the coin lockout bit to be reversed
 		{
-			coin_lockout_w(space->machine(), 0, data & 0x0010);
-			coin_lockout_w(space->machine(), 1, data & 0x0020);
-			coin_lockout_w(space->machine(), 2, data & 0x0040);
-			coin_lockout_w(space->machine(), 3, data & 0x0080);
+			coin_lockout_w(space.machine(), 0, data & 0x0010);
+			coin_lockout_w(space.machine(), 1, data & 0x0020);
+			coin_lockout_w(space.machine(), 2, data & 0x0040);
+			coin_lockout_w(space.machine(), 3, data & 0x0080);
 		}
 		else
 		{
-			coin_lockout_w(space->machine(), 0, ~data & 0x0010);
-			coin_lockout_w(space->machine(), 1, ~data & 0x0020);
-			coin_lockout_w(space->machine(), 2, ~data & 0x0040);
-			coin_lockout_w(space->machine(), 3, ~data & 0x0080);
+			coin_lockout_w(space.machine(), 0, ~data & 0x0010);
+			coin_lockout_w(space.machine(), 1, ~data & 0x0020);
+			coin_lockout_w(space.machine(), 2, ~data & 0x0040);
+			coin_lockout_w(space.machine(), 3, ~data & 0x0080);
 		}
 
 		/*
-        set_led_status(space->machine(), 0, data & 0x01);
-        set_led_status(space->machine(), 1, data & 0x10);
-        set_led_status(space->machine(), 2, data & 0x20);
+        set_led_status(space.machine(), 0, data & 0x01);
+        set_led_status(space.machine(), 1, data & 0x10);
+        set_led_status(space.machine(), 2, data & 0x20);
         */
     }
 }
@@ -769,7 +769,7 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 
 static READ16_HANDLER( cps2_qsound_volume_r )
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
+	cps_state *state = space.machine().driver_data<cps_state>();
 
 	/* Extra adapter memory (0x660000-0x663fff) available when bit 14 = 0 */
 	/* Network adapter (ssf2tb) present when bit 15 = 0 */
@@ -795,7 +795,7 @@ static READ16_HANDLER( kludge_r )
 
 static READ16_HANDLER( joy_or_paddle_r )
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
+	cps_state *state = space.machine().driver_data<cps_state>();
 
 	if (state->m_readpaddle != 0)
 		return (state->ioport("IN0")->read());
@@ -8147,13 +8147,13 @@ DRIVER_INIT_MEMBER(cps_state,pzloop2)
 
 static READ16_HANDLER( gigaman2_dummyqsound_r )
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
+	cps_state *state = space.machine().driver_data<cps_state>();
 	return state->m_gigaman2_dummyqsound_ram[offset];
 };
 
 static WRITE16_HANDLER( gigaman2_dummyqsound_w )
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
+	cps_state *state = space.machine().driver_data<cps_state>();
 	state->m_gigaman2_dummyqsound_ram[offset] = data;
 };
 
@@ -8176,7 +8176,7 @@ static void gigaman2_gfx_reorder(running_machine &machine)
 
 DRIVER_INIT_MEMBER(cps_state,gigaman2)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 	int length = memregion("maincpu")->bytes();
 
@@ -8188,7 +8188,7 @@ DRIVER_INIT_MEMBER(cps_state,gigaman2)
 	save_pointer(NAME(m_gigaman2_dummyqsound_ram), 0x20000 / 2);
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x618000, 0x619fff, FUNC(gigaman2_dummyqsound_r), FUNC(gigaman2_dummyqsound_w)); // no qsound..
-	space->set_decrypted_region(0x000000, (length) - 1, &rom[length/4]);
+	space.set_decrypted_region(0x000000, (length) - 1, &rom[length/4]);
 	m68k_set_encrypted_opcode_range(machine().device("maincpu"), 0, length);
 }
 

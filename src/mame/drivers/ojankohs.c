@@ -99,7 +99,7 @@ WRITE8_MEMBER(ojankohs_state::ojankoc_ctrl_w)
 
 	m_adpcm_reset = BIT(data, 4);
 	msm5205_reset_w(m_msm, !BIT(data, 4));
-	ojankoc_flipscreen(&space, data);
+	ojankoc_flipscreen(space, data);
 }
 
 WRITE8_MEMBER(ojankohs_state::ojankohs_portselect_w)

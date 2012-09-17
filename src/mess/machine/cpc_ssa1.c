@@ -187,28 +187,28 @@ cpc_dkspeech_device::cpc_dkspeech_device(const machine_config &mconfig, const ch
 void cpc_ssa1_device::device_start()
 {
 	device_t* cpu = machine().device("maincpu");
-	address_space* space = cpu->memory().space(AS_IO);
+	address_space& space = *cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 
 	m_rom = memregion("sp0256")->base();
 
 //  m_sp0256_device = subdevice("sp0256");
 
-	space->install_readwrite_handler(0xfaee,0xfaee,0,0,read8_delegate(FUNC(cpc_ssa1_device::ssa1_r),this),write8_delegate(FUNC(cpc_ssa1_device::ssa1_w),this));
-	space->install_readwrite_handler(0xfbee,0xfbee,0,0,read8_delegate(FUNC(cpc_ssa1_device::ssa1_r),this),write8_delegate(FUNC(cpc_ssa1_device::ssa1_w),this));
+	space.install_readwrite_handler(0xfaee,0xfaee,0,0,read8_delegate(FUNC(cpc_ssa1_device::ssa1_r),this),write8_delegate(FUNC(cpc_ssa1_device::ssa1_w),this));
+	space.install_readwrite_handler(0xfbee,0xfbee,0,0,read8_delegate(FUNC(cpc_ssa1_device::ssa1_r),this),write8_delegate(FUNC(cpc_ssa1_device::ssa1_w),this));
 }
 
 void cpc_dkspeech_device::device_start()
 {
 	device_t* cpu = machine().device("maincpu");
-	address_space* space = cpu->memory().space(AS_IO);
+	address_space& space = *cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 
 	m_rom = memregion("sp0256")->base();
 
 //  m_sp0256_device = subdevice("sp0256");
 
-	space->install_readwrite_handler(0xfbfe,0xfbfe,0,0,read8_delegate(FUNC(cpc_dkspeech_device::dkspeech_r),this),write8_delegate(FUNC(cpc_dkspeech_device::dkspeech_w),this));
+	space.install_readwrite_handler(0xfbfe,0xfbfe,0,0,read8_delegate(FUNC(cpc_dkspeech_device::dkspeech_r),this),write8_delegate(FUNC(cpc_dkspeech_device::dkspeech_w),this));
 }
 
 //-------------------------------------------------

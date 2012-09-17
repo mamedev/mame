@@ -85,5 +85,5 @@ public:
 SCREEN_UPDATE_IND16( ojankohs );
 SCREEN_UPDATE_IND16( ojankoc );
 
-void ojankoc_flipscreen(address_space *space, int data);
+void ojankoc_flipscreen(address_space &space, int data);
 

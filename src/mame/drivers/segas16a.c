@@ -767,7 +767,7 @@ void segas16a_state::quartet_i8751_sim()
 	m_maincpu->set_input_line(4, HOLD_LINE);
 
 	// X scroll values
-	address_space *space = m_maincpu->space(AS_PROGRAM);
+	address_space &space = *m_maincpu->space(AS_PROGRAM);
 	segaic16_textram_0_w(space, 0xff8/2, m_workram[0x0d14/2], 0xffff);
 	segaic16_textram_0_w(space, 0xffa/2, m_workram[0x0d18/2], 0xffff);
 

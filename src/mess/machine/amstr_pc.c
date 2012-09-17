@@ -153,8 +153,8 @@ WRITE8_HANDLER( pc1640_port60_w )
 		pc1640.port61=data;
 		if (data==0x30) pc1640.port62=(pc1640.port65&0x10)>>4;
 		else if (data==0x34) pc1640.port62=pc1640.port65&0xf;
-		pit8253_gate2_w(space->machine().device("pit8253"), BIT(data, 0));
-		pc_speaker_set_spkrdata( space->machine(), data & 0x02 );
+		pit8253_gate2_w(space.machine().device("pit8253"), BIT(data, 0));
+		pc_speaker_set_spkrdata( space.machine(), data & 0x02 );
 		pc_keyb_set_clock(data&0x40);
 		break;
 	case 4:
@@ -191,7 +191,7 @@ READ8_HANDLER( pc1640_port60_r )
 
 	case 2:
 		data = pc1640.port62;
-		if (pit8253_get_output(space->machine().device("pit8253"), 2))
+		if (pit8253_get_output(space.machine().device("pit8253"), 2))
 			data |= 0x20;
 		break;
 	}
@@ -200,26 +200,26 @@ READ8_HANDLER( pc1640_port60_r )
 
 READ8_HANDLER( pc200_port378_r )
 {
-	device_t *lpt = space->machine().device("lpt_1");
-	UINT8 data = pc_lpt_r(lpt, *space, offset);
+	device_t *lpt = space.machine().device("lpt_1");
+	UINT8 data = pc_lpt_r(lpt, space, offset);
 
 	if (offset == 1)
-		data = (data & ~7) | (space->machine().root_device().ioport("DSW0")->read() & 7);
+		data = (data & ~7) | (space.machine().root_device().ioport("DSW0")->read() & 7);
 	if (offset == 2)
-		data = (data & ~0xe0) | (space->machine().root_device().ioport("DSW0")->read() & 0xc0);
+		data = (data & ~0xe0) | (space.machine().root_device().ioport("DSW0")->read() & 0xc0);
 
 	return data;
 }
 
 READ8_HANDLER( pc200_port278_r )
 {
-	device_t *lpt = space->machine().device("lpt_2");
-	UINT8 data = pc_lpt_r(lpt, *space, offset);
+	device_t *lpt = space.machine().device("lpt_2");
+	UINT8 data = pc_lpt_r(lpt, space, offset);
 
 	if (offset == 1)
-		data = (data & ~7) | (space->machine().root_device().ioport("DSW0")->read() & 7);
+		data = (data & ~7) | (space.machine().root_device().ioport("DSW0")->read() & 7);
 	if (offset == 2)
-		data = (data & ~0xe0) | (space->machine().root_device().ioport("DSW0")->read() & 0xc0);
+		data = (data & ~0xe0) | (space.machine().root_device().ioport("DSW0")->read() & 0xc0);
 
 	return data;
 }
@@ -227,23 +227,23 @@ READ8_HANDLER( pc200_port278_r )
 
 READ8_HANDLER( pc1640_port378_r )
 {
-	 device_t *lpt = space->machine().device("lpt_1");
-	 UINT8 data = pc_lpt_r(lpt, *space, offset);
+	 device_t *lpt = space.machine().device("lpt_1");
+	 UINT8 data = pc_lpt_r(lpt, space, offset);
 
 	if (offset == 1)
-		data=(data & ~7) | (space->machine().root_device().ioport("DSW0")->read() & 7);
+		data=(data & ~7) | (space.machine().root_device().ioport("DSW0")->read() & 7);
 	if (offset == 2)
 	{
 		switch (pc1640.dipstate)
 		{
 		case 0:
-			data = (data&~0xe0) | (space->machine().root_device().ioport("DSW0")->read() & 0xe0);
+			data = (data&~0xe0) | (space.machine().root_device().ioport("DSW0")->read() & 0xe0);
 			break;
 		case 1:
-			data = (data&~0xe0) | ((space->machine().root_device().ioport("DSW0")->read() & 0xe000)>>8);
+			data = (data&~0xe0) | ((space.machine().root_device().ioport("DSW0")->read() & 0xe000)>>8);
 			break;
 		case 2:
-			data = (data&~0xe0) | ((space->machine().root_device().ioport("DSW0")->read() & 0xe00)>>4);
+			data = (data&~0xe0) | ((space.machine().root_device().ioport("DSW0")->read() & 0xe00)>>4);
 			break;
 
 		}
@@ -254,7 +254,7 @@ READ8_HANDLER( pc1640_port378_r )
 READ8_HANDLER( pc1640_port3d0_r )
 {
 	if (offset==0xa) pc1640.dipstate=0;
-	return space->read_byte(0x3d0+offset);
+	return space.read_byte(0x3d0+offset);
 }
 
 READ8_HANDLER( pc1640_port4278_r )
@@ -273,22 +273,22 @@ READ8_HANDLER( pc1640_port278_r )
 
 READ8_HANDLER( pc1640_mouse_x_r )
 {
-	return pc1640.mouse.x - space->machine().root_device().ioport("pc_mouse_x")->read();
+	return pc1640.mouse.x - space.machine().root_device().ioport("pc_mouse_x")->read();
 }
 
 READ8_HANDLER( pc1640_mouse_y_r )
 {
-	return pc1640.mouse.y - space->machine().root_device().ioport("pc_mouse_y")->read();
+	return pc1640.mouse.y - space.machine().root_device().ioport("pc_mouse_y")->read();
 }
 
 WRITE8_HANDLER( pc1640_mouse_x_w )
 {
-	pc1640.mouse.x = data + space->machine().root_device().ioport("pc_mouse_x")->read();
+	pc1640.mouse.x = data + space.machine().root_device().ioport("pc_mouse_x")->read();
 }
 
 WRITE8_HANDLER( pc1640_mouse_y_w )
 {
-	pc1640.mouse.y = data + space->machine().root_device().ioport("pc_mouse_y")->read();
+	pc1640.mouse.y = data + space.machine().root_device().ioport("pc_mouse_y")->read();
 }
 
 INPUT_PORTS_START( amstrad_keyboard )

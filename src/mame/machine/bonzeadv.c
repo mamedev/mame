@@ -376,16 +376,16 @@ WRITE16_HANDLER( bonzeadv_cchip_ctrl_w )
 
 WRITE16_HANDLER( bonzeadv_cchip_bank_w )
 {
-	asuka_state *state = space->machine().driver_data<asuka_state>();
+	asuka_state *state = space.machine().driver_data<asuka_state>();
 	state->m_current_bank = data & 7;
 }
 
 WRITE16_HANDLER( bonzeadv_cchip_ram_w )
 {
-	asuka_state *state = space->machine().driver_data<asuka_state>();
+	asuka_state *state = space.machine().driver_data<asuka_state>();
 
-//  if (space->device().safe_pc()!=0xa028)
-//  logerror("%08x:  write %04x %04x cchip\n", space->device().safe_pc(), offset, data);
+//  if (space.device().safe_pc()!=0xa028)
+//  logerror("%08x:  write %04x %04x cchip\n", space.device().safe_pc(), offset, data);
 
 	if (state->m_current_bank == 0)
 	{
@@ -393,20 +393,20 @@ WRITE16_HANDLER( bonzeadv_cchip_ram_w )
 		{
 			state->m_cc_port = data;
 
-			coin_lockout_w(space->machine(), 1, data & 0x80);
-			coin_lockout_w(space->machine(), 0, data & 0x40);
-			coin_counter_w(space->machine(), 1, data & 0x20);
-			coin_counter_w(space->machine(), 0, data & 0x10);
+			coin_lockout_w(space.machine(), 1, data & 0x80);
+			coin_lockout_w(space.machine(), 0, data & 0x40);
+			coin_counter_w(space.machine(), 1, data & 0x20);
+			coin_counter_w(space.machine(), 0, data & 0x10);
 		}
 
 		if (offset == 0x0e && data != 0x00)
 		{
-			WriteRestartPos(space->machine(), state->m_current_round);
+			WriteRestartPos(space.machine(), state->m_current_round);
 		}
 
 		if (offset == 0x0f && data != 0x00)
 		{
-			WriteLevelData(space->machine());
+			WriteLevelData(space.machine());
 		}
 
 		if (offset == 0x10)
@@ -438,9 +438,9 @@ READ16_HANDLER( bonzeadv_cchip_ctrl_r )
 
 READ16_HANDLER( bonzeadv_cchip_ram_r )
 {
-	asuka_state *state = space->machine().driver_data<asuka_state>();
+	asuka_state *state = space.machine().driver_data<asuka_state>();
 
-//  logerror("%08x:  read %04x cchip\n", space->device().safe_pc(), offset);
+//  logerror("%08x:  read %04x cchip\n", space.device().safe_pc(), offset);
 
 	if (state->m_current_bank == 0)
 	{

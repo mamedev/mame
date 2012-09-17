@@ -19,9 +19,9 @@ WRITE8_MEMBER(hyhoo_state::hyhoo_blitter_w)
 	switch (offset)
 	{
 		case 0x00:	m_blitter_src_addr = (m_blitter_src_addr & 0xff00) | data;
-					nb1413m3_gfxradr_l_w(&space, 0, data); break;
+					nb1413m3_gfxradr_l_w(space, 0, data); break;
 		case 0x01:	m_blitter_src_addr = (m_blitter_src_addr & 0x00ff) | (data << 8);
-					nb1413m3_gfxradr_h_w(&space, 0, data); break;
+					nb1413m3_gfxradr_h_w(space, 0, data); break;
 		case 0x02:	m_blitter_destx = data; break;
 		case 0x03:	m_blitter_desty = data; break;
 		case 0x04:	m_blitter_sizex = data; break;
@@ -44,7 +44,7 @@ WRITE8_MEMBER(hyhoo_state::hyhoo_romsel_w)
 	int gfxlen = memregion("gfx1")->bytes();
 	m_gfxrom = (((data & 0xc0) >> 4) + (data & 0x03));
 	m_highcolorflag = data;
-	nb1413m3_gfxrombank_w(&space, 0, data);
+	nb1413m3_gfxrombank_w(space, 0, data);
 
 	if ((0x20000 * m_gfxrom) > (gfxlen - 1))
 	{

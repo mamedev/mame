@@ -524,9 +524,9 @@ namcos21_kickstart( running_machine &machine, int internal )
 }
 
 static UINT16
-ReadWordFromSlaveInput( address_space *space )
+ReadWordFromSlaveInput( address_space &space )
 {
-	namcos21_state *state = space->machine().driver_data<namcos21_state>();
+	namcos21_state *state = space.machine().driver_data<namcos21_state>();
 	UINT16 data = 0;
 	if( state->m_mpDspState->slaveBytesAvailable>0 )
 	{
@@ -537,7 +537,7 @@ ReadWordFromSlaveInput( address_space *space )
 		{
 			state->m_mpDspState->slaveBytesAdvertised--;
 		}
-		if (ENABLE_LOGGING) logerror( "%s:-%04x(0x%04x)\n", space->machine().describe_context(), data, state->m_mpDspState->slaveBytesAvailable );
+		if (ENABLE_LOGGING) logerror( "%s:-%04x(0x%04x)\n", space.machine().describe_context(), data, state->m_mpDspState->slaveBytesAvailable );
 	}
 	return data;
 } /* ReadWordFromSlaveInput */
@@ -853,7 +853,7 @@ RenderSlaveOutput( running_machine &machine, UINT16 data )
 
 READ16_MEMBER(namcos21_state::slave_port0_r)
 {
-	return ReadWordFromSlaveInput(&space);
+	return ReadWordFromSlaveInput(space);
 } /* slave_port0_r */
 
 WRITE16_MEMBER(namcos21_state::slave_port0_w)

@@ -166,29 +166,29 @@ void segag80r_state::machine_start()
  *
  *************************************/
 
-static offs_t decrypt_offset(address_space *space, offs_t offset)
+static offs_t decrypt_offset(address_space &space, offs_t offset)
 {
-	segag80r_state *state = space->machine().driver_data<segag80r_state>();
+	segag80r_state *state = space.machine().driver_data<segag80r_state>();
 
 	/* ignore anything but accesses via opcode $32 (LD $(XXYY),A) */
-	offs_t pc = space->device().safe_pcbase();
-	if ((UINT16)pc == 0xffff || space->read_byte(pc) != 0x32)
+	offs_t pc = space.device().safe_pcbase();
+	if ((UINT16)pc == 0xffff || space.read_byte(pc) != 0x32)
 		return offset;
 
 	/* fetch the low byte of the address and munge it */
-	return (offset & 0xff00) | (*state->m_decrypt)(pc, space->read_byte(pc + 1));
+	return (offset & 0xff00) | (*state->m_decrypt)(pc, space.read_byte(pc + 1));
 }
 
 WRITE8_MEMBER(segag80r_state::mainram_w)
 {
-	m_mainram[decrypt_offset(&space, offset)] = data;
+	m_mainram[decrypt_offset(space, offset)] = data;
 }
 
-WRITE8_MEMBER(segag80r_state::vidram_w){ segag80r_videoram_w(space, decrypt_offset(&space, offset), data); }
-WRITE8_MEMBER(segag80r_state::monsterb_vidram_w){ monsterb_videoram_w(space, decrypt_offset(&space, offset), data); }
-WRITE8_MEMBER(segag80r_state::pignewt_vidram_w){ pignewt_videoram_w(space, decrypt_offset(&space, offset), data); }
-WRITE8_MEMBER(segag80r_state::sindbadm_vidram_w){ sindbadm_videoram_w(space, decrypt_offset(&space, offset), data); }
-WRITE8_MEMBER(segag80r_state::usb_ram_w){ device_t *device = machine().device("usbsnd"); sega_usb_ram_w(device, space, decrypt_offset(machine().device("maincpu")->memory().space(AS_PROGRAM), offset), data); }
+WRITE8_MEMBER(segag80r_state::vidram_w){ segag80r_videoram_w(space, decrypt_offset(space, offset), data); }
+WRITE8_MEMBER(segag80r_state::monsterb_vidram_w){ monsterb_videoram_w(space, decrypt_offset(space, offset), data); }
+WRITE8_MEMBER(segag80r_state::pignewt_vidram_w){ pignewt_videoram_w(space, decrypt_offset(space, offset), data); }
+WRITE8_MEMBER(segag80r_state::sindbadm_vidram_w){ sindbadm_videoram_w(space, decrypt_offset(space, offset), data); }
+WRITE8_MEMBER(segag80r_state::usb_ram_w){ device_t *device = machine().device("usbsnd"); sega_usb_ram_w(device, space, decrypt_offset(*machine().device("maincpu")->memory().space(AS_PROGRAM), offset), data); }
 
 
 

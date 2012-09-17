@@ -112,7 +112,7 @@ READ8_DEVICE_HANDLER( tc0220ioc_r )
 			return tc0220ioc->read_7(0);
 
 		default:
-//logerror("PC %06x: warning - read TC0220IOC address %02x\n",space->device().safe_pc(),offset);
+//logerror("PC %06x: warning - read TC0220IOC address %02x\n",space.device().safe_pc(),offset);
 			return 0xff;
 	}
 }
@@ -137,12 +137,12 @@ WRITE8_DEVICE_HANDLER( tc0220ioc_w )
 			coin_counter_w(device->machine(), 1, data & 0x08);
 
 //if (data & 0xf0)
-//logerror("PC %06x: warning - write %02x to TC0220IOC address %02x\n",space->device().safe_pc(),data,offset);
+//logerror("PC %06x: warning - write %02x to TC0220IOC address %02x\n",space.device().safe_pc(),data,offset);
 
 			break;
 
 		default:
-//logerror("PC %06x: warning - write %02x to TC0220IOC address %02x\n",space->device().safe_pc(),data,offset);
+//logerror("PC %06x: warning - write %02x to TC0220IOC address %02x\n",space.device().safe_pc(),data,offset);
 			break;
 	}
 }
@@ -268,7 +268,7 @@ READ8_DEVICE_HANDLER( tc0510nio_r )
 			return tc0510nio->read_7(0);
 
 		default:
-//logerror("PC %06x: warning - read TC0510NIO address %02x\n",space->device().safe_pc(),offset);
+//logerror("PC %06x: warning - read TC0510NIO address %02x\n",space.device().safe_pc(),offset);
 			return 0xff;
 	}
 }
@@ -293,7 +293,7 @@ WRITE8_DEVICE_HANDLER( tc0510nio_w )
 			break;
 
 		default:
-//logerror("PC %06x: warning - write %02x to TC0510NIO address %02x\n",space->device().safe_pc(),data,offset);
+//logerror("PC %06x: warning - write %02x to TC0510NIO address %02x\n",space.device().safe_pc(),data,offset);
 			break;
 	}
 }
@@ -310,7 +310,7 @@ WRITE16_DEVICE_HANDLER( tc0510nio_halfword_w )
 	else
 	{
 		/* driftout writes the coin counters here - bug? */
-//logerror("CPU #0 PC %06x: warning - write to MSB of TC0510NIO address %02x\n",space->device().safe_pc(),offset);
+//logerror("CPU #0 PC %06x: warning - write to MSB of TC0510NIO address %02x\n",space.device().safe_pc(),offset);
 		tc0510nio_w(device, space, offset, (data >> 8) & 0xff);
 	}
 }
@@ -418,7 +418,7 @@ READ8_DEVICE_HANDLER( tc0640fio_r )
 			return tc0640fio->read_7(0);
 
 		default:
-//logerror("PC %06x: warning - read TC0640FIO address %02x\n",space->device().safe_pc(),offset);
+//logerror("PC %06x: warning - read TC0640FIO address %02x\n",space.device().safe_pc(),offset);
 			return 0xff;
 	}
 }
@@ -443,7 +443,7 @@ WRITE8_DEVICE_HANDLER( tc0640fio_w )
 			break;
 
 		default:
-//logerror("PC %06x: warning - write %02x to TC0640FIO address %02x\n",space->device().safe_pc(),data,offset);
+//logerror("PC %06x: warning - write %02x to TC0640FIO address %02x\n",space.device().safe_pc(),data,offset);
 			break;
 	}
 }
@@ -460,7 +460,7 @@ WRITE16_DEVICE_HANDLER( tc0640fio_halfword_w )
 	else
 	{
 		tc0640fio_w(device, space, offset, (data >> 8) & 0xff);
-//logerror("CPU #0 PC %06x: warning - write to MSB of TC0640FIO address %02x\n",space->device().safe_pc(),offset);
+//logerror("CPU #0 PC %06x: warning - write to MSB of TC0640FIO address %02x\n",space.device().safe_pc(),offset);
 	}
 }
 
@@ -476,7 +476,7 @@ WRITE16_DEVICE_HANDLER( tc0640fio_halfword_byteswap_w )
 	else
 	{
 		tc0640fio_w(device, space, offset, data & 0xff);
-//logerror("CPU #0 PC %06x: warning - write to LSB of TC0640FIO address %02x\n",space->device().safe_pc(),offset);
+//logerror("CPU #0 PC %06x: warning - write to LSB of TC0640FIO address %02x\n",space.device().safe_pc(),offset);
 	}
 }
 

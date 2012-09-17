@@ -158,9 +158,9 @@ WRITE8_MEMBER(baraduke_state::baraduke_textram_w)
 }
 
 
-static void scroll_w(address_space *space, int layer, int offset, int data)
+static void scroll_w(address_space &space, int layer, int offset, int data)
 {
-	baraduke_state *state = space->machine().driver_data<baraduke_state>();
+	baraduke_state *state = space.machine().driver_data<baraduke_state>();
 	switch (offset)
 	{
 		case 0:	/* high scroll x */
@@ -177,11 +177,11 @@ static void scroll_w(address_space *space, int layer, int offset, int data)
 
 WRITE8_MEMBER(baraduke_state::baraduke_scroll0_w)
 {
-	scroll_w(&space, 0, offset, data);
+	scroll_w(space, 0, offset, data);
 }
 WRITE8_MEMBER(baraduke_state::baraduke_scroll1_w)
 {
-	scroll_w(&space, 1, offset, data);
+	scroll_w(space, 1, offset, data);
 }
 
 

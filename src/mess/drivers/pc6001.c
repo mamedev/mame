@@ -2068,7 +2068,7 @@ static TIMER_DEVICE_CALLBACK(cassette_callback)
 static TIMER_DEVICE_CALLBACK(keyboard_callback)
 {
 	pc6001_state *state = timer.machine().driver_data<pc6001_state>();
-	address_space *space = timer.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *timer.machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT32 key1 = timer.machine().root_device().ioport("key1")->read();
 	UINT32 key2 = timer.machine().root_device().ioport("key2")->read();
 	UINT32 key3 = timer.machine().root_device().ioport("key3")->read();
@@ -2078,7 +2078,7 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 	{
 		if((key1 != state->m_old_key1) || (key2 != state->m_old_key2) || (key3 != state->m_old_key3))
 		{
-			state->m_cur_keycode = check_keyboard_press(space->machine());
+			state->m_cur_keycode = check_keyboard_press(space.machine());
 			if(IRQ_LOG) printf("KEY IRQ 0x02\n");
 			state->m_irq_vector = 0x02;
 			timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
@@ -2089,7 +2089,7 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 		#if 0
 		else /* joypad polling */
 		{
-			state->m_cur_keycode = check_joy_press(space->machine());
+			state->m_cur_keycode = check_joy_press(space.machine());
 			if(state->m_cur_keycode)
 			{
 				state->m_irq_vector = 0x16;

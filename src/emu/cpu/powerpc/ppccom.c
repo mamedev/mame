@@ -2337,7 +2337,7 @@ updateirq:
 
 static READ8_HANDLER( ppc4xx_spu_r )
 {
-	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(&space->device())->token();
+	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(&space.device())->token();
 	UINT8 result = 0xff;
 
 	switch (offset)
@@ -2364,7 +2364,7 @@ static READ8_HANDLER( ppc4xx_spu_r )
 
 static WRITE8_HANDLER( ppc4xx_spu_w )
 {
-	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(&space->device())->token();
+	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(&space.device())->token();
 	UINT8 oldstate, newstate;
 
 	if (PRINTF_SPU)

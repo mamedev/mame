@@ -131,9 +131,9 @@ WRITE8_DEVICE_HANDLER( leland_gfx_port_w )
  *
  *************************************/
 
-static void leland_video_addr_w(address_space *space, int offset, int data, int num)
+static void leland_video_addr_w(address_space &space, int offset, int data, int num)
 {
-	leland_state *drvstate = space->machine().driver_data<leland_state>();
+	leland_state *drvstate = space.machine().driver_data<leland_state>();
 	struct vram_state_data *state = drvstate->m_vram_state + num;
 
 	if (!offset)
@@ -150,9 +150,9 @@ static void leland_video_addr_w(address_space *space, int offset, int data, int 
  *
  *************************************/
 
-static int leland_vram_port_r(address_space *space, int offset, int num)
+static int leland_vram_port_r(address_space &space, int offset, int num)
 {
-	leland_state *drvstate = space->machine().driver_data<leland_state>();
+	leland_state *drvstate = space.machine().driver_data<leland_state>();
 	struct vram_state_data *state = drvstate->m_vram_state + num;
 	int addr = state->m_addr;
 	int inc = (offset >> 2) & 2;
@@ -178,14 +178,14 @@ static int leland_vram_port_r(address_space *space, int offset, int num)
 
 		default:
 			logerror("%s: Warning: Unknown video port %02x read (address=%04x)\n",
-						space->machine().describe_context(), offset, addr);
+						space.machine().describe_context(), offset, addr);
 			ret = 0;
 			break;
 	}
 	state->m_addr = addr;
 
 	if (LOG_COMM && addr >= 0xf000)
-		logerror("%s:%s comm read %04X = %02X\n", space->machine().describe_context(), num ? "slave" : "master", addr, ret);
+		logerror("%s:%s comm read %04X = %02X\n", space.machine().describe_context(), num ? "slave" : "master", addr, ret);
 
 	return ret;
 }
@@ -198,9 +198,9 @@ static int leland_vram_port_r(address_space *space, int offset, int num)
  *
  *************************************/
 
-static void leland_vram_port_w(address_space *space, int offset, int data, int num)
+static void leland_vram_port_w(address_space &space, int offset, int data, int num)
 {
-	leland_state *drvstate = space->machine().driver_data<leland_state>();
+	leland_state *drvstate = space.machine().driver_data<leland_state>();
 	UINT8 *video_ram = drvstate->m_video_ram;
 	struct vram_state_data *state = drvstate->m_vram_state + num;
 	int addr = state->m_addr;
@@ -209,12 +209,12 @@ static void leland_vram_port_w(address_space *space, int offset, int data, int n
 
 	/* don't fully understand why this is needed.  Isn't the
        video RAM just one big RAM? */
-	int scanline = space->machine().primary_screen->vpos();
+	int scanline = space.machine().primary_screen->vpos();
 	if (scanline > 0)
-		space->machine().primary_screen->update_partial(scanline - 1);
+		space.machine().primary_screen->update_partial(scanline - 1);
 
 	if (LOG_COMM && addr >= 0xf000)
-		logerror("%s:%s comm write %04X = %02X\n", space->machine().describe_context(), num ? "slave" : "master", addr, data);
+		logerror("%s:%s comm write %04X = %02X\n", space.machine().describe_context(), num ? "slave" : "master", addr, data);
 
 	/* based on the low 3 bits of the offset, update the destination */
 	switch (offset & 7)
@@ -266,7 +266,7 @@ static void leland_vram_port_w(address_space *space, int offset, int data, int n
 
 		default:
 			logerror("%s:Warning: Unknown video port write (address=%04x value=%02x)\n",
-						space->machine().describe_context(), offset, addr);
+						space.machine().describe_context(), offset, addr);
 			break;
 	}
 
@@ -284,13 +284,13 @@ static void leland_vram_port_w(address_space *space, int offset, int data, int n
 
 WRITE8_MEMBER(leland_state::leland_master_video_addr_w)
 {
-	leland_video_addr_w(&space, offset, data, 0);
+	leland_video_addr_w(space, offset, data, 0);
 }
 
 
 static TIMER_CALLBACK( leland_delayed_mvram_w )
 {
-	address_space *space = machine.device("master")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("master")->memory().space(AS_PROGRAM);
 
 	int num = (param >> 16) & 1;
 	int offset = (param >> 8) & 0xff;
@@ -307,7 +307,7 @@ WRITE8_MEMBER(leland_state::leland_mvram_port_w)
 
 READ8_MEMBER(leland_state::leland_mvram_port_r)
 {
-	return leland_vram_port_r(&space, offset, 0);
+	return leland_vram_port_r(space, offset, 0);
 }
 
 
@@ -320,19 +320,19 @@ READ8_MEMBER(leland_state::leland_mvram_port_r)
 
 WRITE8_MEMBER(leland_state::leland_slave_video_addr_w)
 {
-	leland_video_addr_w(&space, offset, data, 1);
+	leland_video_addr_w(space, offset, data, 1);
 }
 
 
 WRITE8_MEMBER(leland_state::leland_svram_port_w)
 {
-	leland_vram_port_w(&space, offset, data, 1);
+	leland_vram_port_w(space, offset, data, 1);
 }
 
 
 READ8_MEMBER(leland_state::leland_svram_port_r)
 {
-	return leland_vram_port_r(&space, offset, 1);
+	return leland_vram_port_r(space, offset, 1);
 }
 
 
@@ -353,7 +353,7 @@ WRITE8_MEMBER(leland_state::ataxx_mvram_port_w)
 WRITE8_MEMBER(leland_state::ataxx_svram_port_w)
 {
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
-	leland_vram_port_w(&space, offset, data, 1);
+	leland_vram_port_w(space, offset, data, 1);
 }
 
 
@@ -367,14 +367,14 @@ WRITE8_MEMBER(leland_state::ataxx_svram_port_w)
 READ8_MEMBER(leland_state::ataxx_mvram_port_r)
 {
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
-	return leland_vram_port_r(&space, offset, 0);
+	return leland_vram_port_r(space, offset, 0);
 }
 
 
 READ8_MEMBER(leland_state::ataxx_svram_port_r)
 {
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
-	return leland_vram_port_r(&space, offset, 1);
+	return leland_vram_port_r(space, offset, 1);
 }
 
 

@@ -1447,8 +1447,8 @@ SCREEN_UPDATE_RGB32( hng64 )
 	// but it could be useful
 	if ( screen.machine().input().code_pressed_once(KEYCODE_L) )
 	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-		space->write_byte(0x2f27c8, 0x2);
+		address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+		space.write_byte(0x2f27c8, 0x2);
 	}
 #endif
 

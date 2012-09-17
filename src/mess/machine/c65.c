@@ -219,22 +219,22 @@ const mos6526_interface c65_cia1 =
 /* dma controller and bankswitch hardware ?*/
 static READ8_HANDLER( c65_read_mem )
 {
-	c65_state *state = space->machine().driver_data<c65_state>();
+	c65_state *state = space.machine().driver_data<c65_state>();
 	UINT8 result;
 	if (offset <= 0x0ffff)
 		result = state->m_memory[offset];
 	else
-		result = space->read_byte(offset);
+		result = space.read_byte(offset);
 	return result;
 }
 
 static WRITE8_HANDLER( c65_write_mem )
 {
-	c65_state *state = space->machine().driver_data<c65_state>();
+	c65_state *state = space.machine().driver_data<c65_state>();
 	if (offset <= 0x0ffff)
 		state->m_memory[offset] = data;
 	else
-		space->write_byte(offset, data);
+		space.write_byte(offset, data);
 }
 
 /* dma chip at 0xd700
@@ -268,7 +268,7 @@ static void c65_dma_port_w( running_machine &machine, int offset, int value )
 	PAIR pair, src, dst, len;
 	UINT8 cmd, fill;
 	int i;
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch (offset & 3)
 	{
@@ -299,7 +299,7 @@ static void c65_dma_port_w( running_machine &machine, int offset, int value )
 		case 0:
 			if (src.d == 0x3ffff) state->m_dump_dma = 1;
 			if (state->m_dump_dma)
-				DBG_LOG(space->machine(), 1,"dma copy job",
+				DBG_LOG(space.machine(), 1,"dma copy job",
 						("len:%.4x src:%.6x dst:%.6x sub:%.2x modrm:%.2x\n",
 						 len.w.l, src.d, dst.d, c65_read_mem(space, pair.d),
 						 c65_read_mem(space, pair.d + 1) ) );
@@ -333,7 +333,7 @@ static void c65_dma_port_w( running_machine &machine, int offset, int value )
 			}
 			break;
 		case 3:
-			DBG_LOG(space->machine(), 3,"dma fill job",
+			DBG_LOG(space.machine(), 3,"dma fill job",
 					("len:%.4x value:%.2x dst:%.6x sub:%.2x modrm:%.2x\n",
 					 len.w.l, fill, dst.d, c65_read_mem(space, pair.d),
 					 c65_read_mem(space, pair.d + 1)));
@@ -341,7 +341,7 @@ static void c65_dma_port_w( running_machine &machine, int offset, int value )
 					c65_write_mem(space, dst.d++, fill);
 				break;
 		case 0x30:
-			DBG_LOG(space->machine(), 1,"dma copy down",
+			DBG_LOG(space.machine(), 1,"dma copy down",
 					("len:%.4x src:%.6x dst:%.6x sub:%.2x modrm:%.2x\n",
 					 len.w.l, src.d, dst.d, c65_read_mem(space, pair.d),
 					 c65_read_mem(space, pair.d + 1) ) );
@@ -349,14 +349,14 @@ static void c65_dma_port_w( running_machine &machine, int offset, int value )
 				c65_write_mem(space, dst.d--,c65_read_mem(space, src.d--));
 			break;
 		default:
-			DBG_LOG(space->machine(), 1,"dma job",
+			DBG_LOG(space.machine(), 1,"dma job",
 					("cmd:%.2x len:%.4x src:%.6x dst:%.6x sub:%.2x modrm:%.2x\n",
 					 cmd,len.w.l, src.d, dst.d, c65_read_mem(space, pair.d),
 					 c65_read_mem(space, pair.d + 1)));
 		}
 		break;
 	default:
-		DBG_LOG(space->machine(), 1, "dma chip write", ("%.3x %.2x\n", offset, value));
+		DBG_LOG(space.machine(), 1, "dma chip write", ("%.3x %.2x\n", offset, value));
 		break;
 	}
 }
@@ -615,48 +615,48 @@ static int c65_fdc_r( running_machine &machine, int offset )
 
 static READ8_HANDLER( c65_ram_expansion_r )
 {
-	c65_state *state = space->machine().driver_data<c65_state>();
+	c65_state *state = space.machine().driver_data<c65_state>();
 	UINT8 data = 0xff;
-	if (space->machine().device<ram_device>(RAM_TAG)->size() > (128 * 1024))
+	if (space.machine().device<ram_device>(RAM_TAG)->size() > (128 * 1024))
 		data = state->m_expansion_ram.reg;
 	return data;
 }
 
 static WRITE8_HANDLER( c65_ram_expansion_w )
 {
-	c65_state *state = space->machine().driver_data<c65_state>();
+	c65_state *state = space.machine().driver_data<c65_state>();
 	offs_t expansion_ram_begin;
 	offs_t expansion_ram_end;
 
-	if (space->machine().device<ram_device>(RAM_TAG)->size() > (128 * 1024))
+	if (space.machine().device<ram_device>(RAM_TAG)->size() > (128 * 1024))
 	{
 		state->m_expansion_ram.reg = data;
 
 		expansion_ram_begin = 0x80000;
-		expansion_ram_end = 0x80000 + (space->machine().device<ram_device>(RAM_TAG)->size() - 128*1024) - 1;
+		expansion_ram_end = 0x80000 + (space.machine().device<ram_device>(RAM_TAG)->size() - 128*1024) - 1;
 
 		if (data == 0x00) {
-			space->install_readwrite_bank(expansion_ram_begin, expansion_ram_end,"bank16");
-			state->membank("bank16")->set_base(space->machine().device<ram_device>(RAM_TAG)->pointer() + 128*1024);
+			space.install_readwrite_bank(expansion_ram_begin, expansion_ram_end,"bank16");
+			state->membank("bank16")->set_base(space.machine().device<ram_device>(RAM_TAG)->pointer() + 128*1024);
 		} else {
-			space->nop_readwrite(expansion_ram_begin, expansion_ram_end);
+			space.nop_readwrite(expansion_ram_begin, expansion_ram_end);
 		}
 	}
 }
 
 static WRITE8_HANDLER( c65_write_io )
 {
-	sid6581_device *sid_0 = space->machine().device<sid6581_device>("sid_r");
-	sid6581_device *sid_1 = space->machine().device<sid6581_device>("sid_l");
-	device_t *vic3 = space->machine().device("vic3");
+	sid6581_device *sid_0 = space.machine().device<sid6581_device>("sid_r");
+	sid6581_device *sid_1 = space.machine().device<sid6581_device>("sid_l");
+	device_t *vic3 = space.machine().device("vic3");
 
 	switch (offset & 0xf00)
 	{
 	case 0x000:
 		if (offset < 0x80)
-			vic3_port_w(vic3, *space, offset & 0x7f, data);
+			vic3_port_w(vic3, space, offset & 0x7f, data);
 		else if (offset < 0xa0)
-			c65_fdc_w(space->machine(), offset&0x1f,data);
+			c65_fdc_w(space.machine(), offset&0x1f,data);
 		else
 		{
 			c65_ram_expansion_w(space, offset&0x1f, data);
@@ -666,61 +666,61 @@ static WRITE8_HANDLER( c65_write_io )
 	case 0x100:
 	case 0x200:
 	case 0x300:
-		vic3_palette_w(vic3, *space, offset - 0x100, data);
+		vic3_palette_w(vic3, space, offset - 0x100, data);
 		break;
 	case 0x400:
 		if (offset<0x420) /* maybe 0x20 */
-			sid_0->write(*space, offset & 0x3f, data);
+			sid_0->write(space, offset & 0x3f, data);
 		else if (offset<0x440)
-			sid_1->write(*space, offset & 0x3f, data);
+			sid_1->write(space, offset & 0x3f, data);
 		else
-			DBG_LOG(space->machine(), 1, "io write", ("%.3x %.2x\n", offset, data));
+			DBG_LOG(space.machine(), 1, "io write", ("%.3x %.2x\n", offset, data));
 		break;
 	case 0x500:
-		DBG_LOG(space->machine(), 1, "io write", ("%.3x %.2x\n", offset, data));
+		DBG_LOG(space.machine(), 1, "io write", ("%.3x %.2x\n", offset, data));
 		break;
 	case 0x600:
-		c65_6511_port_w(space->machine(), offset&0xff,data);
+		c65_6511_port_w(space.machine(), offset&0xff,data);
 		break;
 	case 0x700:
-		c65_dma_port_w(space->machine(), offset&0xff, data);
+		c65_dma_port_w(space.machine(), offset&0xff, data);
 		break;
 	}
 }
 
 static WRITE8_HANDLER( c65_write_io_dc00 )
 {
-	device_t *cia_0 = space->machine().device("cia_0");
-	device_t *cia_1 = space->machine().device("cia_1");
+	device_t *cia_0 = space.machine().device("cia_0");
+	device_t *cia_1 = space.machine().device("cia_1");
 
 	switch (offset & 0xf00)
 	{
 	case 0x000:
-		mos6526_w(cia_0, *space, offset, data);
+		mos6526_w(cia_0, space, offset, data);
 		break;
 	case 0x100:
-		mos6526_w(cia_1, *space, offset, data);
+		mos6526_w(cia_1, space, offset, data);
 		break;
 	case 0x200:
 	case 0x300:
-		DBG_LOG(space->machine(), 1, "io write", ("%.3x %.2x\n", offset+0xc00, data));
+		DBG_LOG(space.machine(), 1, "io write", ("%.3x %.2x\n", offset+0xc00, data));
 		break;
 	}
 }
 
 static READ8_HANDLER( c65_read_io )
 {
-	sid6581_device *sid_0 = space->machine().device<sid6581_device>("sid_r");
-	sid6581_device *sid_1 = space->machine().device<sid6581_device>("sid_l");
-	device_t *vic3 = space->machine().device("vic3");
+	sid6581_device *sid_0 = space.machine().device<sid6581_device>("sid_r");
+	sid6581_device *sid_1 = space.machine().device<sid6581_device>("sid_l");
+	device_t *vic3 = space.machine().device("vic3");
 
 	switch (offset & 0xf00)
 	{
 	case 0x000:
 		if (offset < 0x80)
-			return vic3_port_r(vic3, *space, offset & 0x7f);
+			return vic3_port_r(vic3, space, offset & 0x7f);
 		if (offset < 0xa0)
-			return c65_fdc_r(space->machine(), offset&0x1f);
+			return c65_fdc_r(space.machine(), offset&0x1f);
 		else
 		{
 			return c65_ram_expansion_r(space, offset&0x1f);
@@ -731,40 +731,40 @@ static READ8_HANDLER( c65_read_io )
 	case 0x200:
 	case 0x300:
 	/* read only !? */
-		DBG_LOG(space->machine(), 1, "io read", ("%.3x\n", offset));
+		DBG_LOG(space.machine(), 1, "io read", ("%.3x\n", offset));
 		break;
 	case 0x400:
 		if (offset < 0x420)
-			return sid_0->read(*space, offset & 0x3f);
+			return sid_0->read(space, offset & 0x3f);
 		if (offset < 0x440)
-			return sid_1->read(*space, offset & 0x3f);
-		DBG_LOG(space->machine(), 1, "io read", ("%.3x\n", offset));
+			return sid_1->read(space, offset & 0x3f);
+		DBG_LOG(space.machine(), 1, "io read", ("%.3x\n", offset));
 		break;
 	case 0x500:
-		DBG_LOG(space->machine(), 1, "io read", ("%.3x\n", offset));
+		DBG_LOG(space.machine(), 1, "io read", ("%.3x\n", offset));
 		break;
 	case 0x600:
-		return c65_6511_port_r(space->machine(), offset&0xff);
+		return c65_6511_port_r(space.machine(), offset&0xff);
 	case 0x700:
-		return c65_dma_port_r(space->machine(), offset&0xff);
+		return c65_dma_port_r(space.machine(), offset&0xff);
 	}
 	return 0xff;
 }
 
 static READ8_HANDLER( c65_read_io_dc00 )
 {
-	device_t *cia_0 = space->machine().device("cia_0");
-	device_t *cia_1 = space->machine().device("cia_1");
+	device_t *cia_0 = space.machine().device("cia_0");
+	device_t *cia_1 = space.machine().device("cia_1");
 
 	switch (offset & 0x300)
 	{
 	case 0x000:
-		return mos6526_r(cia_0, *space, offset);
+		return mos6526_r(cia_0, space, offset);
 	case 0x100:
-		return mos6526_r(cia_1, *space, offset);
+		return mos6526_r(cia_1, space, offset);
 	case 0x200:
 	case 0x300:
-		DBG_LOG(space->machine(), 1, "io read", ("%.3x\n", offset+0xc00));
+		DBG_LOG(space.machine(), 1, "io read", ("%.3x\n", offset+0xc00));
 		break;
 	}
 	return 0xff;

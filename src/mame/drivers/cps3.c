@@ -1456,9 +1456,9 @@ WRITE32_MEMBER(cps3_state::cps3_gfxflash_w)
 
 
 
-static UINT32 cps3_flashmain_r(address_space *space, int which, UINT32 offset, UINT32 mem_mask)
+static UINT32 cps3_flashmain_r(address_space &space, int which, UINT32 offset, UINT32 mem_mask)
 {
-	cps3_state *state = space->machine().driver_data<cps3_state>();
+	cps3_state *state = space.machine().driver_data<cps3_state>();
 	UINT32 result = 0;
 
 	if (state->m_simm[which][0] == NULL || state->m_simm[which][1] == NULL || state->m_simm[which][2] == NULL || state->m_simm[which][3] == NULL)
@@ -1494,7 +1494,7 @@ static UINT32 cps3_flashmain_r(address_space *space, int which, UINT32 offset, U
 
 READ32_MEMBER(cps3_state::cps3_flash1_r)
 {
-	UINT32 retvalue = cps3_flashmain_r(&space, 0, offset,mem_mask);
+	UINT32 retvalue = cps3_flashmain_r(space, 0, offset,mem_mask);
 
 	if (m_altEncryption) return retvalue;
 
@@ -1504,7 +1504,7 @@ READ32_MEMBER(cps3_state::cps3_flash1_r)
 
 READ32_MEMBER(cps3_state::cps3_flash2_r)
 {
-	UINT32 retvalue = cps3_flashmain_r(&space, 1, offset,mem_mask);
+	UINT32 retvalue = cps3_flashmain_r(space, 1, offset,mem_mask);
 
 	if (m_altEncryption) return retvalue;
 

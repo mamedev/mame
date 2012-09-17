@@ -295,9 +295,9 @@ TILE_GET_INFO_MEMBER(cave_state::sailormn_get_tile_info_2)
 }
 
 
-INLINE void vram_w( address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask, int GFX )
+INLINE void vram_w( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask, int GFX )
 {
-	cave_state *state = space->machine().driver_data<cave_state>();
+	cave_state *state = space.machine().driver_data<cave_state>();
 	UINT16 *VRAM = state->m_vram[GFX];
 	tilemap_t *TILEMAP = state->m_tilemap[GFX];
 
@@ -323,9 +323,9 @@ INLINE void vram_w( address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED
     and 408000-407fff both go to the 8x8 tilemap ram. Use this function
     in this cases. Note that the get_tile_info function looks in the
     4000-7fff range for tiles, so we have to write the data there. */
-INLINE void vram_8x8_w( address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask, int GFX )
+INLINE void vram_8x8_w( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask, int GFX )
 {
-	cave_state *state = space->machine().driver_data<cave_state>();
+	cave_state *state = space.machine().driver_data<cave_state>();
 	UINT16 *VRAM = state->m_vram[GFX];
 	tilemap_t *TILEMAP = state->m_tilemap[GFX];
 
@@ -344,15 +344,15 @@ TILE_GET_INFO_MEMBER(cave_state::get_tile_info_1){ get_tile_info(machine(), tile
 TILE_GET_INFO_MEMBER(cave_state::get_tile_info_2){ get_tile_info(machine(), tileinfo, tile_index, 2); }
 TILE_GET_INFO_MEMBER(cave_state::get_tile_info_3){ get_tile_info(machine(), tileinfo, tile_index, 3); }
 
-WRITE16_MEMBER(cave_state::cave_vram_0_w){ vram_w(&space, offset, data, mem_mask, 0); }
-WRITE16_MEMBER(cave_state::cave_vram_1_w){ vram_w(&space, offset, data, mem_mask, 1); }
-WRITE16_MEMBER(cave_state::cave_vram_2_w){ vram_w(&space, offset, data, mem_mask, 2); }
-WRITE16_MEMBER(cave_state::cave_vram_3_w){ vram_w(&space, offset, data, mem_mask, 3); }
+WRITE16_MEMBER(cave_state::cave_vram_0_w){ vram_w(space, offset, data, mem_mask, 0); }
+WRITE16_MEMBER(cave_state::cave_vram_1_w){ vram_w(space, offset, data, mem_mask, 1); }
+WRITE16_MEMBER(cave_state::cave_vram_2_w){ vram_w(space, offset, data, mem_mask, 2); }
+WRITE16_MEMBER(cave_state::cave_vram_3_w){ vram_w(space, offset, data, mem_mask, 3); }
 
-WRITE16_MEMBER(cave_state::cave_vram_0_8x8_w){ vram_8x8_w(&space, offset, data, mem_mask, 0); }
-WRITE16_MEMBER(cave_state::cave_vram_1_8x8_w){ vram_8x8_w(&space, offset, data, mem_mask, 1); }
-WRITE16_MEMBER(cave_state::cave_vram_2_8x8_w){ vram_8x8_w(&space, offset, data, mem_mask, 2); }
-WRITE16_MEMBER(cave_state::cave_vram_3_8x8_w){ vram_8x8_w(&space, offset, data, mem_mask, 3); }
+WRITE16_MEMBER(cave_state::cave_vram_0_8x8_w){ vram_8x8_w(space, offset, data, mem_mask, 0); }
+WRITE16_MEMBER(cave_state::cave_vram_1_8x8_w){ vram_8x8_w(space, offset, data, mem_mask, 1); }
+WRITE16_MEMBER(cave_state::cave_vram_2_8x8_w){ vram_8x8_w(space, offset, data, mem_mask, 2); }
+WRITE16_MEMBER(cave_state::cave_vram_3_8x8_w){ vram_8x8_w(space, offset, data, mem_mask, 3); }
 
 
 /***************************************************************************

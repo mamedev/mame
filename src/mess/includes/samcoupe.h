@@ -92,7 +92,7 @@ void samcoupe_irq(device_t *device, UINT8 src);
 
 /*----------- defined in machine/samcoupe.c -----------*/
 
-void samcoupe_update_memory(address_space *space);
+void samcoupe_update_memory(address_space &space);
 UINT8 samcoupe_mouse_r(running_machine &machine);
 
 

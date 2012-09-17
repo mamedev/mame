@@ -1929,7 +1929,7 @@ WRITE8_MEMBER( snes_state::snes_vram_write )
 			if (h <= 4)
 				m_snes_vram[offset] = data;
 			else if (h == 6)
-				m_snes_vram[offset] = snes_open_bus_r(&space, 0);
+				m_snes_vram[offset] = snes_open_bus_r(space, 0);
 			else
 			{
 				//printf("%d %d VRAM write, CHECK!\n",h,v);
@@ -2047,8 +2047,8 @@ READ8_MEMBER( snes_state::snes_cgram_read )
 #if 0
 	if (!snes_ppu.screen_disabled)
 	{
-		UINT16 v = space->machine().primary_screen->vpos();
-		UINT16 h = space->machine().primary_screen->hpos();
+		UINT16 v = space.machine().primary_screen->vpos();
+		UINT16 h = space.machine().primary_screen->hpos();
 
 		if (v < snes_ppu.beam.last_visible_line && h >= 128 && h < 1096)
 			offset = 0x1ff;
@@ -2075,8 +2075,8 @@ WRITE8_MEMBER( snes_state::snes_cgram_write )
 	// writes to the cgram address
 	if (!snes_ppu.screen_disabled)
 	{
-		UINT16 v = space->machine().primary_screen->vpos();
-		UINT16 h = space->machine().primary_screen->hpos();
+		UINT16 v = space.machine().primary_screen->vpos();
+		UINT16 h = space.machine().primary_screen->hpos();
 
 		if (v < snes_ppu.beam.last_visible_line && h >= 128 && h < 1096)
 			offset = 0x1ff;
@@ -2093,7 +2093,7 @@ WRITE8_MEMBER( snes_state::snes_cgram_write )
 
 READ8_HANDLER( snes_ppu_read )
 {
-	snes_state *state = space->machine().driver_data<snes_state>();
+	snes_state *state = space.machine().driver_data<snes_state>();
 	UINT8 value;
 
 	switch (offset)
@@ -2140,10 +2140,10 @@ READ8_HANDLER( snes_ppu_read )
 				return snes_ppu.ppu1_open_bus;
 			}
 		case SLHV:		/* Software latch for H/V counter */
-			snes_latch_counters(space->machine());
+			snes_latch_counters(space.machine());
 			return snes_open_bus_r(space, 0);		/* Return value is meaningless */
 		case ROAMDATA:	/* Read data from OAM (DR) */
-			snes_ppu.ppu1_open_bus = state->snes_oam_read(*space, snes_ppu.oam.address);
+			snes_ppu.ppu1_open_bus = state->snes_oam_read(space, snes_ppu.oam.address);
 			snes_ram[OAMDATA] = (snes_ram[OAMDATA] + 1) % 2;
 			if (!snes_ram[OAMDATA])
 			{
@@ -2154,13 +2154,13 @@ READ8_HANDLER( snes_ppu_read )
 			return snes_ppu.ppu1_open_bus;
 		case RVMDATAL:	/* Read data from VRAM (low) */
 			{
-				UINT32 addr = snes_get_vram_address(space->machine());
+				UINT32 addr = snes_get_vram_address(space.machine());
 				snes_ppu.ppu1_open_bus = state->m_vram_read_buffer & 0xff;
 
 				if (!state->m_vram_fgr_high)
 				{
-					state->m_vram_read_buffer = state->snes_vram_read(*space, addr);
-					state->m_vram_read_buffer |= (state->snes_vram_read(*space, addr + 1) << 8);
+					state->m_vram_read_buffer = state->snes_vram_read(space, addr);
+					state->m_vram_read_buffer |= (state->snes_vram_read(space, addr + 1) << 8);
 
 					state->m_vmadd = (state->m_vmadd + state->m_vram_fgr_increment) & 0xffff;
 				}
@@ -2169,13 +2169,13 @@ READ8_HANDLER( snes_ppu_read )
 			}
 		case RVMDATAH:	/* Read data from VRAM (high) */
 			{
-				UINT32 addr = snes_get_vram_address(space->machine());
+				UINT32 addr = snes_get_vram_address(space.machine());
 				snes_ppu.ppu1_open_bus = (state->m_vram_read_buffer >> 8) & 0xff;
 
 				if (state->m_vram_fgr_high)
 				{
-					state->m_vram_read_buffer = state->snes_vram_read(*space, addr);
-					state->m_vram_read_buffer |= (state->snes_vram_read(*space, addr + 1) << 8);
+					state->m_vram_read_buffer = state->snes_vram_read(space, addr);
+					state->m_vram_read_buffer |= (state->snes_vram_read(space, addr + 1) << 8);
 
 					state->m_vmadd = (state->m_vmadd + state->m_vram_fgr_increment) & 0xffff;
 				}
@@ -2184,11 +2184,11 @@ READ8_HANDLER( snes_ppu_read )
 			}
 		case RCGDATA:	/* Read data from CGRAM */
 			if (!(state->m_cgram_address & 0x01))
-				snes_ppu.ppu2_open_bus = state->snes_cgram_read(*space, state->m_cgram_address);
+				snes_ppu.ppu2_open_bus = state->snes_cgram_read(space, state->m_cgram_address);
 			else
 			{
 				snes_ppu.ppu2_open_bus &= 0x80;
-				snes_ppu.ppu2_open_bus |= state->snes_cgram_read(*space, state->m_cgram_address) & 0x7f;
+				snes_ppu.ppu2_open_bus |= state->snes_cgram_read(space, state->m_cgram_address) & 0x7f;
 			}
 
 			state->m_cgram_address = (state->m_cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
@@ -2242,15 +2242,15 @@ READ8_HANDLER( snes_ppu_read )
 
 WRITE8_HANDLER( snes_ppu_write )
 {
-	snes_state *state = space->machine().driver_data<snes_state>();
+	snes_state *state = space.machine().driver_data<snes_state>();
 
 	switch (offset)
 	{
 		case INIDISP:	/* Initial settings for screen */
 			if ((snes_ppu.screen_disabled & 0x80) && (!(data & 0x80))) //a 1->0 force blank transition causes a reset OAM address
 			{
-				space->write_byte(OAMADDL, snes_ppu.oam.saved_address_low);
-				space->write_byte(OAMADDH, snes_ppu.oam.saved_address_high);
+				space.write_byte(OAMADDL, snes_ppu.oam.saved_address_low);
+				space.write_byte(OAMADDH, snes_ppu.oam.saved_address_high);
 				snes_ppu.oam.first_sprite = snes_ppu.oam.priority_rotation ? (snes_ppu.oam.address >> 1) & 127 : 0;
 			}
 			snes_ppu.screen_disabled = data & 0x80;
@@ -2276,7 +2276,7 @@ WRITE8_HANDLER( snes_ppu_write )
 			break;
 		case OAMDATA:	/* Data for OAM write (DW) */
 			if (snes_ppu.oam.address >= 0x100)
-				state->snes_oam_write(*space, snes_ppu.oam.address, data);
+				state->snes_oam_write(space, snes_ppu.oam.address, data);
 			else
 			{
 				if (!snes_ram[OAMDATA])
@@ -2286,9 +2286,9 @@ WRITE8_HANDLER( snes_ppu_write )
 					// in this case, we not only write data to the upper byte of the word,
 					// but also snes_ppu.oam.write_latch to the lower byte (recall that
 					// snes_ram[OAMDATA] is used to select high/low byte)
-					state->snes_oam_write(*space, snes_ppu.oam.address, data);
+					state->snes_oam_write(space, snes_ppu.oam.address, data);
 					snes_ram[OAMDATA] = 0;
-					state->snes_oam_write(*space, snes_ppu.oam.address, snes_ppu.oam.write_latch);
+					state->snes_oam_write(space, snes_ppu.oam.address, snes_ppu.oam.write_latch);
 					snes_ram[OAMDATA] = 1;
 				}
 			}
@@ -2302,7 +2302,7 @@ WRITE8_HANDLER( snes_ppu_write )
 			return;
 		case BGMODE:	/* BG mode and character size settings */
 			snes_ppu.mode = data & 0x07;
-			snes_dynamic_res_change(space->machine());
+			snes_dynamic_res_change(space.machine());
 			snes_ppu.bg3_priority_bit = BIT(data, 3);
 			snes_ppu.layer[SNES_BG1].tile_size = BIT(data, 4);
 			snes_ppu.layer[SNES_BG2].tile_size = BIT(data, 5);
@@ -2404,24 +2404,24 @@ WRITE8_HANDLER( snes_ppu_write )
 			{
 				UINT32 addr;
 				state->m_vmadd = (state->m_vmadd & 0xff00) | (data << 0);
-				addr = snes_get_vram_address(space->machine());
-				state->m_vram_read_buffer = state->snes_vram_read(*space, addr);
-				state->m_vram_read_buffer |= (state->snes_vram_read(*space, addr + 1) << 8);
+				addr = snes_get_vram_address(space.machine());
+				state->m_vram_read_buffer = state->snes_vram_read(space, addr);
+				state->m_vram_read_buffer |= (state->snes_vram_read(space, addr + 1) << 8);
 			}
 			break;
 		case VMADDH:	/* Address for VRAM read/write (high) */
 			{
 				UINT32 addr;
 				state->m_vmadd = (state->m_vmadd & 0x00ff) | (data << 8);
-				addr = snes_get_vram_address(space->machine());
-				state->m_vram_read_buffer = state->snes_vram_read(*space, addr);
-				state->m_vram_read_buffer |= (state->snes_vram_read(*space, addr + 1) << 8);
+				addr = snes_get_vram_address(space.machine());
+				state->m_vram_read_buffer = state->snes_vram_read(space, addr);
+				state->m_vram_read_buffer |= (state->snes_vram_read(space, addr + 1) << 8);
 			}
 			break;
 		case VMDATAL:	/* 2118: Data for VRAM write (low) */
 			{
-				UINT32 addr = snes_get_vram_address(space->machine());
-				state->snes_vram_write(*space, addr, data);
+				UINT32 addr = snes_get_vram_address(space.machine());
+				state->snes_vram_write(space, addr, data);
 
 				if (!state->m_vram_fgr_high)
 					state->m_vmadd = (state->m_vmadd + state->m_vram_fgr_increment) & 0xffff;
@@ -2429,8 +2429,8 @@ WRITE8_HANDLER( snes_ppu_write )
 			return;
 		case VMDATAH:	/* 2119: Data for VRAM write (high) */
 			{
-				UINT32 addr = snes_get_vram_address(space->machine());
-				state->snes_vram_write(*space, addr + 1, data);
+				UINT32 addr = snes_get_vram_address(space.machine());
+				state->snes_vram_write(space, addr + 1, data);
 
 				if (state->m_vram_fgr_high)
 					state->m_vmadd = (state->m_vmadd + state->m_vram_fgr_increment) & 0xffff;
@@ -2471,7 +2471,7 @@ WRITE8_HANDLER( snes_ppu_write )
 			state->m_cgram_address = data << 1;
 			break;
 		case CGDATA:	/* Data for colour RAM */
-			state->snes_cgram_write(*space, state->m_cgram_address, data);
+			state->snes_cgram_write(space, state->m_cgram_address, data);
 			state->m_cgram_address = (state->m_cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
 			break;
 		case W12SEL:	/* Window mask settings for BG1-2 */
@@ -2633,7 +2633,7 @@ WRITE8_HANDLER( snes_ppu_write )
 			snes_ppu.beam.last_visible_line = (data & 0x04) ? 240 : 225;
 			snes_ppu.pseudo_hires = BIT(data, 3);
 			snes_ppu.mode7.extbg = BIT(data, 6);
-			snes_dynamic_res_change(space->machine());
+			snes_dynamic_res_change(space.machine());
 #ifdef SNES_DBG_REG_W
 			if ((data & 0x8) != (snes_ram[SETINI] & 0x8))
 				mame_printf_debug( "Pseudo 512 mode: %s\n", (data & 0x8) ? "on" : "off" );

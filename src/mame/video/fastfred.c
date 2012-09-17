@@ -115,7 +115,7 @@ VIDEO_START_MEMBER(fastfred_state,fastfred)
 
 WRITE8_HANDLER( fastfred_videoram_w )
 {
-	fastfred_state *state = space->machine().driver_data<fastfred_state>();
+	fastfred_state *state = space.machine().driver_data<fastfred_state>();
 	state->m_videoram[offset] = data;
 	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -123,7 +123,7 @@ WRITE8_HANDLER( fastfred_videoram_w )
 
 WRITE8_HANDLER( fastfred_attributes_w )
 {
-	fastfred_state *state = space->machine().driver_data<fastfred_state>();
+	fastfred_state *state = space.machine().driver_data<fastfred_state>();
 	if (state->m_attributesram[offset] != data)
 	{
 		if (offset & 0x01)
@@ -147,7 +147,7 @@ WRITE8_HANDLER( fastfred_attributes_w )
 
 WRITE8_HANDLER( fastfred_charbank1_w )
 {
-	fastfred_state *state = space->machine().driver_data<fastfred_state>();
+	fastfred_state *state = space.machine().driver_data<fastfred_state>();
 	UINT16 new_data = (state->m_charbank & 0x0200) | ((data & 0x01) << 8);
 
 	if (new_data != state->m_charbank)
@@ -160,7 +160,7 @@ WRITE8_HANDLER( fastfred_charbank1_w )
 
 WRITE8_HANDLER( fastfred_charbank2_w )
 {
-	fastfred_state *state = space->machine().driver_data<fastfred_state>();
+	fastfred_state *state = space.machine().driver_data<fastfred_state>();
 	UINT16 new_data = (state->m_charbank & 0x0100) | ((data & 0x01) << 9);
 
 	if (new_data != state->m_charbank)
@@ -174,7 +174,7 @@ WRITE8_HANDLER( fastfred_charbank2_w )
 
 WRITE8_HANDLER( fastfred_colorbank1_w )
 {
-	fastfred_state *state = space->machine().driver_data<fastfred_state>();
+	fastfred_state *state = space.machine().driver_data<fastfred_state>();
 	UINT8 new_data = (state->m_colorbank & 0x10) | ((data & 0x01) << 3);
 
 	if (new_data != state->m_colorbank)
@@ -187,7 +187,7 @@ WRITE8_HANDLER( fastfred_colorbank1_w )
 
 WRITE8_HANDLER( fastfred_colorbank2_w )
 {
-	fastfred_state *state = space->machine().driver_data<fastfred_state>();
+	fastfred_state *state = space.machine().driver_data<fastfred_state>();
 	UINT8 new_data = (state->m_colorbank & 0x08) | ((data & 0x01) << 4);
 
 	if (new_data != state->m_colorbank)
@@ -202,7 +202,7 @@ WRITE8_HANDLER( fastfred_colorbank2_w )
 
 WRITE8_HANDLER( fastfred_flip_screen_x_w )
 {
-	fastfred_state *state = space->machine().driver_data<fastfred_state>();
+	fastfred_state *state = space.machine().driver_data<fastfred_state>();
 	if (state->flip_screen_x() != (data & 0x01))
 	{
 		state->flip_screen_x_set(data & 0x01);
@@ -213,7 +213,7 @@ WRITE8_HANDLER( fastfred_flip_screen_x_w )
 
 WRITE8_HANDLER( fastfred_flip_screen_y_w )
 {
-	fastfred_state *state = space->machine().driver_data<fastfred_state>();
+	fastfred_state *state = space.machine().driver_data<fastfred_state>();
 	if (state->flip_screen_y() != (data & 0x01))
 	{
 		state->flip_screen_y_set(data & 0x01);
@@ -329,14 +329,14 @@ TILE_GET_INFO_MEMBER(fastfred_state::imago_get_tile_info_web)
 
 WRITE8_HANDLER( imago_fg_videoram_w )
 {
-	fastfred_state *state = space->machine().driver_data<fastfred_state>();
+	fastfred_state *state = space.machine().driver_data<fastfred_state>();
 	state->m_imago_fg_videoram[offset] = data;
 	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( imago_charbank_w )
 {
-	fastfred_state *state = space->machine().driver_data<fastfred_state>();
+	fastfred_state *state = space.machine().driver_data<fastfred_state>();
 	if( state->m_charbank != data )
 	{
 		state->m_charbank = data;

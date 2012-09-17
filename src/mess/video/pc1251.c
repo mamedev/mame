@@ -97,7 +97,7 @@ static const POCKETC_FIGURE busy={
 
  READ8_HANDLER(pc1251_lcd_read)
 {
-	pc1251_state *state = space->machine().driver_data<pc1251_state>();
+	pc1251_state *state = space.machine().driver_data<pc1251_state>();
 	int data;
 	data = state->m_reg[offset&0xff];
 	logerror("pc1251 read %.3x %.2x\n",offset,data);
@@ -106,7 +106,7 @@ static const POCKETC_FIGURE busy={
 
 WRITE8_HANDLER(pc1251_lcd_write)
 {
-	pc1251_state *state = space->machine().driver_data<pc1251_state>();
+	pc1251_state *state = space.machine().driver_data<pc1251_state>();
 	logerror("pc1251 write %.3x %.2x\n",offset,data);
 	state->m_reg[offset&0xff] = data;
 }

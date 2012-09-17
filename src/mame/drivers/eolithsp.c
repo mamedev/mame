@@ -18,19 +18,19 @@ static int eolith_speedup_resume_scanline;
 static int eolith_vblank = 0;
 static int eolith_scanline = 0;
 
-void eolith_speedup_read(address_space *space)
+void eolith_speedup_read(address_space &space)
 {
 	/* for debug */
-  //if ((space->device().safe_pc()!=eolith_speedup_address) && (eolith_vblank!=1) )
-  //    printf("%s:eolith speedup_read data %02x\n",space->machine().describe_context(), eolith_vblank);
+  //if ((space.device().safe_pc()!=eolith_speedup_address) && (eolith_vblank!=1) )
+  //    printf("%s:eolith speedup_read data %02x\n",space.machine().describe_context(), eolith_vblank);
 
 	if (eolith_vblank==0 && eolith_scanline < eolith_speedup_resume_scanline)
 	{
-		int pc = space->device().safe_pc();
+		int pc = space.device().safe_pc();
 
 		if ((pc==eolith_speedup_address) || (pc==eolith_speedup_address2))
 		{
-			space->device().execute().spin_until_trigger(1000);
+			space.device().execute().spin_until_trigger(1000);
 		}
 	}
 }

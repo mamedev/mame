@@ -166,9 +166,9 @@ static void stv_vdp1_process_list(running_machine &machine);
 
 READ16_HANDLER( saturn_vdp1_regs_r )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
-	//logerror ("cpu %s (PC=%08X) VDP1: Read from Registers, Offset %04x\n", space->device().tag(), space->device().safe_pc(), offset);
+	//logerror ("cpu %s (PC=%08X) VDP1: Read from Registers, Offset %04x\n", space.device().tag(), space.device().safe_pc(), offset);
 
 	switch(offset)
 	{
@@ -194,7 +194,7 @@ READ16_HANDLER( saturn_vdp1_regs_r )
 
 			return modr;
 		default:
-			printf ("cpu %s (PC=%08X) VDP1: Read from Registers, Offset %04x\n", space->device().tag(), space->device().safe_pc(), offset*2);
+			printf ("cpu %s (PC=%08X) VDP1: Read from Registers, Offset %04x\n", space.device().tag(), space.device().safe_pc(), offset*2);
 			break;
 	}
 
@@ -288,25 +288,25 @@ static void stv_set_framebuffer_config( running_machine &machine )
 
 WRITE16_HANDLER( saturn_vdp1_regs_w )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 	COMBINE_DATA(&state->m_vdp1_regs[offset]);
 
 	switch(offset)
 	{
 		case 0x00/2:
-			stv_set_framebuffer_config(space->machine());
+			stv_set_framebuffer_config(space.machine());
 			if ( VDP1_LOG ) logerror( "VDP1: Access to register TVMR = %1X\n", STV_VDP1_TVMR );
 
 			break;
 		case 0x02/2:
-			stv_set_framebuffer_config(space->machine());
+			stv_set_framebuffer_config(space.machine());
 			if ( VDP1_LOG ) logerror( "VDP1: Access to register FBCR = %1X\n", STV_VDP1_FBCR );
 			state->m_vdp1.fbcr_accessed = 1;
 			break;
 		case 0x04/2:
 			if ( VDP1_LOG ) logerror( "VDP1: Access to register PTMR = %1X\n", STV_VDP1_PTM );
 			if ( STV_VDP1_PTMR == 1 )
-				stv_vdp1_process_list( space->machine() );
+				stv_vdp1_process_list( space.machine() );
 
 			break;
 		case 0x06/2:
@@ -332,21 +332,21 @@ WRITE16_HANDLER( saturn_vdp1_regs_w )
 
 READ32_HANDLER ( saturn_vdp1_vram_r )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 	return state->m_vdp1_vram[offset];
 }
 
 
 WRITE32_HANDLER ( saturn_vdp1_vram_w )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 	UINT8 *vdp1 = state->m_vdp1.gfx_decode;
 
 	COMBINE_DATA (&state->m_vdp1_vram[offset]);
 
 //  if (((offset * 4) > 0xdf) && ((offset * 4) < 0x140))
 //  {
-//      logerror("cpu %s (PC=%08X): VRAM dword write to %08X = %08X & %08X\n", space->device().tag(), space->device().safe_pc(), offset*4, data, mem_mask);
+//      logerror("cpu %s (PC=%08X): VRAM dword write to %08X = %08X & %08X\n", space.device().tag(), space.device().safe_pc(), offset*4, data, mem_mask);
 //  }
 
 	data = state->m_vdp1_vram[offset];
@@ -359,7 +359,7 @@ WRITE32_HANDLER ( saturn_vdp1_vram_w )
 
 WRITE32_HANDLER ( saturn_vdp1_framebuffer0_w )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 	//popmessage ("STV VDP1 Framebuffer 0 WRITE offset %08x data %08x",offset, data);
 	if ( STV_VDP1_TVM & 1 )
 	{
@@ -402,7 +402,7 @@ WRITE32_HANDLER ( saturn_vdp1_framebuffer0_w )
 
 READ32_HANDLER ( saturn_vdp1_framebuffer0_r )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 	UINT32 result = 0;
 	//popmessage ("STV VDP1 Framebuffer 0 READ offset %08x",offset);
 	if ( STV_VDP1_TVM & 1 )

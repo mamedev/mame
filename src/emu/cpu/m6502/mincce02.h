@@ -47,8 +47,8 @@
 
 #define PPC	cpustate->ppc.d
 
-#define RDMEM_ID(a)		cpustate->rdmem_id(cpustate->space, a)
-#define WRMEM_ID(a,d)	cpustate->wrmem_id(cpustate->space, a, d)
+#define RDMEM_ID(a)		cpustate->rdmem_id(*cpustate->space, a)
+#define WRMEM_ID(a,d)	cpustate->wrmem_id(*cpustate->space, a, d)
 
 #define IRQ_STATE	cpustate->irq_state
 #define AFTER_CLI	cpustate->after_cli

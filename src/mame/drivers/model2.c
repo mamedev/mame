@@ -176,18 +176,18 @@ static void copro_fifoin_push(device_t *device, UINT32 data)
 
 
 #define COPRO_FIFOOUT_SIZE	32000
-static UINT32 copro_fifoout_pop(address_space *space)
+static UINT32 copro_fifoout_pop(address_space &space)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+	model2_state *state = space.machine().driver_data<model2_state>();
 	UINT32 r;
 
 	if (state->m_copro_fifoout_num == 0)
 	{
 		/* Reading from empty FIFO causes the i960 to enter wait state */
-		i960_stall(&space->device());
+		i960_stall(&space.device());
 
 		/* spin the main cpu and let the TGP catch up */
-		space->device().execute().spin_until_time(attotime::from_usec(100));
+		space.device().execute().spin_until_time(attotime::from_usec(100));
 
 		return 0;
 	}
@@ -208,11 +208,11 @@ static UINT32 copro_fifoout_pop(address_space *space)
 	{
 		if (state->m_copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 		{
-			sharc_set_flag_input(space->machine().device("dsp"), 1, ASSERT_LINE);
+			sharc_set_flag_input(space.machine().device("dsp"), 1, ASSERT_LINE);
 		}
 		else
 		{
-			sharc_set_flag_input(space->machine().device("dsp"), 1, CLEAR_LINE);
+			sharc_set_flag_input(space.machine().device("dsp"), 1, CLEAR_LINE);
 		}
 	}
 
@@ -639,7 +639,7 @@ WRITE32_MEMBER(model2_state::copro_function_port_w)
 READ32_MEMBER(model2_state::copro_fifo_r)
 {
 	//logerror("copro_fifo_r: %08X, %08X\n", offset, mem_mask);
-	return copro_fifoout_pop(&space);
+	return copro_fifoout_pop(space);
 }
 
 WRITE32_MEMBER(model2_state::copro_fifo_w)
@@ -963,33 +963,33 @@ WRITE32_MEMBER(model2_state::model2_irq_w)
 }
 
 
-static int snd_68k_ready_r(address_space *space)
+static int snd_68k_ready_r(address_space &space)
 {
-	int sr = space->machine().device("audiocpu")->state().state_int(M68K_SR);
+	int sr = space.machine().device("audiocpu")->state().state_int(M68K_SR);
 
 	if ((sr & 0x0700) > 0x0100)
 	{
-		space->device().execute().spin_until_time(attotime::from_usec(40));
+		space.device().execute().spin_until_time(attotime::from_usec(40));
 		return 0;	// not ready yet, interrupts disabled
 	}
 
 	return 0xff;
 }
 
-static void snd_latch_to_68k_w(address_space *space, int data)
+static void snd_latch_to_68k_w(address_space &space, int data)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+	model2_state *state = space.machine().driver_data<model2_state>();
 	if (!snd_68k_ready_r(space))
 	{
-		space->device().execute().spin_until_time(attotime::from_usec(40));
+		space.device().execute().spin_until_time(attotime::from_usec(40));
 	}
 
 	state->m_to_68k = data;
 
-	space->machine().device("audiocpu")->execute().set_input_line(2, HOLD_LINE);
+	space.machine().device("audiocpu")->execute().set_input_line(2, HOLD_LINE);
 
 	// give the 68k time to notice
-	space->device().execute().spin_until_time(attotime::from_usec(40));
+	space.device().execute().spin_until_time(attotime::from_usec(40));
 }
 
 READ32_MEMBER(model2_state::model2_serial_r)
@@ -1006,7 +1006,7 @@ WRITE32_MEMBER(model2_state::model2o_serial_w)
 {
 	if (mem_mask == 0x0000ffff)
 	{
-		snd_latch_to_68k_w(&space, data&0xff);
+		snd_latch_to_68k_w(space, data&0xff);
 	}
 }
 

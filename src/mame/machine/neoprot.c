@@ -24,7 +24,7 @@
 
 static READ16_HANDLER( fatfury2_protection_16_r )
 {
-	neogeo_state *state = space->machine().driver_data<neogeo_state>();
+	neogeo_state *state = space.machine().driver_data<neogeo_state>();
 	UINT16 res = state->m_fatfury2_prot_data >> 24;
 
 	switch (offset)
@@ -42,7 +42,7 @@ static READ16_HANDLER( fatfury2_protection_16_r )
 			return ((res & 0xf0) >> 4) | ((res & 0x0f) << 4);
 
 		default:
-			logerror("unknown protection read at pc %06x, offset %08x\n", space->device().safe_pc(), offset << 1);
+			logerror("unknown protection read at pc %06x, offset %08x\n", space.device().safe_pc(), offset << 1);
 			return 0;
 	}
 }
@@ -50,7 +50,7 @@ static READ16_HANDLER( fatfury2_protection_16_r )
 
 static WRITE16_HANDLER( fatfury2_protection_16_w )
 {
-	neogeo_state *state = space->machine().driver_data<neogeo_state>();
+	neogeo_state *state = space.machine().driver_data<neogeo_state>();
 
 	switch (offset)
 	{
@@ -89,7 +89,7 @@ static WRITE16_HANDLER( fatfury2_protection_16_w )
 			break;
 
 		default:
-			logerror("unknown protection write at pc %06x, offset %08x, data %02x\n", space->device().safe_pc(), offset, data);
+			logerror("unknown protection write at pc %06x, offset %08x, data %02x\n", space.device().safe_pc(), offset, data);
 			break;
 	}
 }
@@ -119,24 +119,24 @@ void fatfury2_install_protection( running_machine &machine )
 static WRITE16_HANDLER ( kof98_prot_w )
 {
 	/* info from razoola */
-	UINT16* mem16 = (UINT16*)space->machine().root_device().memregion("maincpu")->base();
+	UINT16* mem16 = (UINT16*)space.machine().root_device().memregion("maincpu")->base();
 
 	switch (data)
 	{
 	case 0x0090:
-		logerror ("%06x kof98 - protection 0x0090 old %04x %04x\n", space->device().safe_pc(), mem16[0x100/2], mem16[0x102/2]);
+		logerror ("%06x kof98 - protection 0x0090 old %04x %04x\n", space.device().safe_pc(), mem16[0x100/2], mem16[0x102/2]);
 		mem16[0x100/2] = 0x00c2;
 		mem16[0x102/2] = 0x00fd;
 		break;
 
 	case 0x00f0:
-		logerror ("%06x kof98 - protection 0x00f0 old %04x %04x\n", space->device().safe_pc(), mem16[0x100/2], mem16[0x102/2]);
+		logerror ("%06x kof98 - protection 0x00f0 old %04x %04x\n", space.device().safe_pc(), mem16[0x100/2], mem16[0x102/2]);
 		mem16[0x100/2] = 0x4e45;
 		mem16[0x102/2] = 0x4f2d;
 		break;
 
 	default: // 00aa is written, but not needed?
-		logerror ("%06x kof98 - unknown protection write %04x\n", space->device().safe_pc(), data);
+		logerror ("%06x kof98 - unknown protection write %04x\n", space.device().safe_pc(), data);
 		break;
 	}
 }
@@ -375,7 +375,7 @@ static READ16_HANDLER( prot_9a37_r )
 
 static READ16_HANDLER( sma_random_r )
 {
-	neogeo_state *state = space->machine().driver_data<neogeo_state>();
+	neogeo_state *state = space.machine().driver_data<neogeo_state>();
 	UINT16 old = state->m_neogeo_rng;
 
 	UINT16 newbit = ((state->m_neogeo_rng >> 2) ^
@@ -500,9 +500,9 @@ static void pvc_prot2( running_machine &machine ) // on writes to e8/e9/ea/eb
 }
 
 
-static void pvc_write_bankswitch( address_space *space )
+static void pvc_write_bankswitch( address_space &space )
 {
-	neogeo_state *state = space->machine().driver_data<neogeo_state>();
+	neogeo_state *state = space.machine().driver_data<neogeo_state>();
 	UINT32 bankaddress;
 
 	bankaddress = ((state->m_pvc_cartridge_ram[0xff8] >> 8)|(state->m_pvc_cartridge_ram[0xff9] << 8));
@@ -515,20 +515,20 @@ static void pvc_write_bankswitch( address_space *space )
 
 static READ16_HANDLER( pvc_prot_r )
 {
-	neogeo_state *state = space->machine().driver_data<neogeo_state>();
+	neogeo_state *state = space.machine().driver_data<neogeo_state>();
 	return state->m_pvc_cartridge_ram[offset];
 }
 
 
 static WRITE16_HANDLER( pvc_prot_w )
 {
-	neogeo_state *state = space->machine().driver_data<neogeo_state>();
+	neogeo_state *state = space.machine().driver_data<neogeo_state>();
 
 	COMBINE_DATA(&state->m_pvc_cartridge_ram[offset] );
 	if (offset == 0xff0)
-		pvc_prot1(space->machine());
+		pvc_prot1(space.machine());
 	else if(offset >= 0xff4 && offset <= 0xff5)
-		pvc_prot2(space->machine());
+		pvc_prot2(space.machine());
 	else if(offset >= 0xff8)
 		pvc_write_bankswitch(space);
 }

@@ -27,7 +27,7 @@ TODO:
 
 static WRITE8_HANDLER( irqack_w )
 {
-	ladybug_state *state = space->machine().driver_data<ladybug_state>();
+	ladybug_state *state = space.machine().driver_data<ladybug_state>();
 	state->m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 

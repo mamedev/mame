@@ -172,7 +172,7 @@ static WRITE8_HANDLER( x32_bank_w )
 {
 	//  printf("written %x\n", data);
 	int bank = data & 0x03;
-	space->machine().root_device().membank("8000")->set_base(space->machine().root_device().memregion("lslot")->base() + bank * 0x2000);
+	space.machine().root_device().membank("8000")->set_base(space.machine().root_device().memregion("lslot")->base() + bank * 0x2000);
 }
 
 static WRITE8_HANDLER( w64_bank_w )
@@ -180,9 +180,9 @@ static WRITE8_HANDLER( w64_bank_w )
 //  printf("write to %x\n", offset);
 
 	if (offset < 8)
-		space->machine().root_device().membank("a000")->set_base(space->machine().root_device().memregion("lslot")->base() + offset * 0x2000);
+		space.machine().root_device().membank("a000")->set_base(space.machine().root_device().memregion("lslot")->base() + offset * 0x2000);
 	else
-		space->machine().root_device().membank("a000")->set_base(space->machine().root_device().memregion("maincpu")->base());
+		space.machine().root_device().membank("a000")->set_base(space.machine().root_device().memregion("maincpu")->base());
 	// FIXME: writes to 0x8-0xf should disable the cart
 }
 
@@ -192,9 +192,9 @@ static WRITE8_HANDLER( ex64_bank_w )
 //  printf("write to %x\n", offset);
 
 	if (offset < 8)
-		space->machine().root_device().membank("a000")->set_base(space->machine().root_device().memregion("lslot")->base() + (7 - offset) * 0x2000);
+		space.machine().root_device().membank("a000")->set_base(space.machine().root_device().memregion("lslot")->base() + (7 - offset) * 0x2000);
 	else
-		space->machine().root_device().membank("a000")->set_base(space->machine().root_device().memregion("maincpu")->base());
+		space.machine().root_device().membank("a000")->set_base(space.machine().root_device().memregion("maincpu")->base());
 	// FIXME: writes to 0x8-0xf should disable the cart
 }
 
@@ -202,14 +202,14 @@ static WRITE8_HANDLER( bbsb_bankl_w )
 {
 //  printf("write to %x\n", 0x8000 + offset);
 	if (offset >= 0xff6 && offset <= 0xff9)
-		space->machine().root_device().membank("8000")->set_base(space->machine().root_device().memregion("lslot")->base() + 0x0000 + (offset - 0xff6) * 0x1000);
+		space.machine().root_device().membank("8000")->set_base(space.machine().root_device().memregion("lslot")->base() + 0x0000 + (offset - 0xff6) * 0x1000);
 }
 
 static WRITE8_HANDLER( bbsb_bankh_w )
 {
 //  printf("write to %x\n", 0x9000 + offset);
 	if (offset >= 0xff6 && offset <= 0xff9)
-		space->machine().root_device().membank("9000")->set_base(space->machine().root_device().memregion("lslot")->base() + 0x4000 + (offset - 0xff6) * 0x1000);
+		space.machine().root_device().membank("9000")->set_base(space.machine().root_device().memregion("lslot")->base() + 0x4000 + (offset - 0xff6) * 0x1000);
 }
 
 static WRITE8_HANDLER( oss_034m_w )
@@ -218,28 +218,28 @@ static WRITE8_HANDLER( oss_034m_w )
 	{
 		case 0:
 		case 1:
-			space->machine().root_device().membank("a000")->set_base(space->machine().root_device().memregion("lslot")->base());
-			space->machine().root_device().membank("b000")->set_base(space->machine().root_device().memregion("lslot")->base() + 0x3000);
+			space.machine().root_device().membank("a000")->set_base(space.machine().root_device().memregion("lslot")->base());
+			space.machine().root_device().membank("b000")->set_base(space.machine().root_device().memregion("lslot")->base() + 0x3000);
 			break;
 		case 2:
 		case 6:
 			// docs says this should put 0xff in the 0xa000 bank -> let's point to the end of the cart
-			space->machine().root_device().membank("a000")->set_base(space->machine().root_device().memregion("lslot")->base() + 0x4000);
-			space->machine().root_device().membank("b000")->set_base(space->machine().root_device().memregion("lslot")->base() + 0x3000);
+			space.machine().root_device().membank("a000")->set_base(space.machine().root_device().memregion("lslot")->base() + 0x4000);
+			space.machine().root_device().membank("b000")->set_base(space.machine().root_device().memregion("lslot")->base() + 0x3000);
 			break;
 		case 3:
 		case 7:
-			space->machine().root_device().membank("a000")->set_base(space->machine().root_device().memregion("lslot")->base() + 0x1000);
-			space->machine().root_device().membank("b000")->set_base(space->machine().root_device().memregion("lslot")->base() + 0x3000);
+			space.machine().root_device().membank("a000")->set_base(space.machine().root_device().memregion("lslot")->base() + 0x1000);
+			space.machine().root_device().membank("b000")->set_base(space.machine().root_device().memregion("lslot")->base() + 0x3000);
 			break;
 		case 4:
 		case 5:
-			space->machine().root_device().membank("a000")->set_base(space->machine().root_device().memregion("lslot")->base() + 0x2000);
-			space->machine().root_device().membank("b000")->set_base(space->machine().root_device().memregion("lslot")->base() + 0x3000);
+			space.machine().root_device().membank("a000")->set_base(space.machine().root_device().memregion("lslot")->base() + 0x2000);
+			space.machine().root_device().membank("b000")->set_base(space.machine().root_device().memregion("lslot")->base() + 0x3000);
 			break;
 		default:
-			space->machine().root_device().membank("a000")->set_base(space->machine().root_device().memregion("maincpu")->base() + 0xa000);
-			space->machine().root_device().membank("b000")->set_base(space->machine().root_device().memregion("maincpu")->base() + 0xb000);
+			space.machine().root_device().membank("a000")->set_base(space.machine().root_device().memregion("maincpu")->base() + 0xa000);
+			space.machine().root_device().membank("b000")->set_base(space.machine().root_device().memregion("maincpu")->base() + 0xb000);
 			break;
 	}
 }
@@ -249,20 +249,20 @@ static WRITE8_HANDLER( oss_m091_w )
 	switch (offset & 0x09)
 	{
 		case 0:
-			space->machine().root_device().membank("a000")->set_base(space->machine().root_device().memregion("lslot")->base() + 0x1000);
-			space->machine().root_device().membank("b000")->set_base(space->machine().root_device().memregion("lslot")->base());
+			space.machine().root_device().membank("a000")->set_base(space.machine().root_device().memregion("lslot")->base() + 0x1000);
+			space.machine().root_device().membank("b000")->set_base(space.machine().root_device().memregion("lslot")->base());
 			break;
 		case 1:
-			space->machine().root_device().membank("a000")->set_base(space->machine().root_device().memregion("lslot")->base() + 0x3000);
-			space->machine().root_device().membank("b000")->set_base(space->machine().root_device().memregion("lslot")->base());
+			space.machine().root_device().membank("a000")->set_base(space.machine().root_device().memregion("lslot")->base() + 0x3000);
+			space.machine().root_device().membank("b000")->set_base(space.machine().root_device().memregion("lslot")->base());
 			break;
 		case 8:
-			space->machine().root_device().membank("a000")->set_base(space->machine().root_device().memregion("maincpu")->base() + 0xa000);
-			space->machine().root_device().membank("b000")->set_base(space->machine().root_device().memregion("maincpu")->base() + 0xb000);
+			space.machine().root_device().membank("a000")->set_base(space.machine().root_device().memregion("maincpu")->base() + 0xa000);
+			space.machine().root_device().membank("b000")->set_base(space.machine().root_device().memregion("maincpu")->base() + 0xb000);
 			break;
 		case 9:
-			space->machine().root_device().membank("a000")->set_base(space->machine().root_device().memregion("lslot")->base() + 0x2000);
-			space->machine().root_device().membank("b000")->set_base(space->machine().root_device().memregion("lslot")->base());
+			space.machine().root_device().membank("a000")->set_base(space.machine().root_device().memregion("lslot")->base() + 0x2000);
+			space.machine().root_device().membank("b000")->set_base(space.machine().root_device().memregion("lslot")->base());
 			break;
 	}
 }
@@ -284,14 +284,14 @@ static WRITE8_HANDLER( bbsb_bankh_w )
 static READ8_HANDLER( bbsb_bankl_r )
 {
 	// return data from the selected bank (0,1,2,3)
-	UINT8 *mem = space->machine().root_device().memregion("lslot")->base();
+	UINT8 *mem = space.machine().root_device().memregion("lslot")->base();
 	return &mem[0x0000 + bbsb_bankl * 0x1000];
 }
 
 static READ8_HANDLER( bbsb_bankh_r )
 {
 	// return data from the selected bank (4,5,6,7)
-	UINT8 *mem = space->machine().root_device().memregion("lslot")->base();
+	UINT8 *mem = space.machine().root_device().memregion("lslot")->base();
 	return &mem[0x4000 + bbsb_bankh * 0x1000];
 }
 #endif
@@ -658,19 +658,19 @@ static UINT8 xegs_cart = 0;
 
 static WRITE8_HANDLER( xegs_bankswitch )
 {
-	UINT8 *cart = space->machine().root_device().memregion("user1")->base();
+	UINT8 *cart = space.machine().root_device().memregion("user1")->base();
 	data &= xegs_banks - 1;
-	space->machine().root_device().membank("bank0")->set_base(cart + data * 0x2000);
+	space.machine().root_device().membank("bank0")->set_base(cart + data * 0x2000);
 }
 
 MACHINE_START( xegs )
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *cart = space->machine().root_device().memregion("user1")->base();
-	UINT8 *cpu  = space->machine().root_device().memregion("maincpu")->base();
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *cart = space.machine().root_device().memregion("user1")->base();
+	UINT8 *cpu  = space.machine().root_device().memregion("maincpu")->base();
 
 	atari_machine_start(machine);
-	space->install_legacy_write_handler(0xd500, 0xd5ff, FUNC(xegs_bankswitch));
+	space.install_legacy_write_handler(0xd500, 0xd5ff, FUNC(xegs_bankswitch));
 
 	if (xegs_cart)
 	{

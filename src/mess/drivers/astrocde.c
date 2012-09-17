@@ -14,7 +14,7 @@
 #include "machine/ram.h"
 
 MACHINE_RESET( astrocde );
-void get_ram_expansion_settings(address_space *space, int &ram_expansion_installed, int &write_protect_on, int &expansion_ram_start, int &expansion_ram_end, int &shadow_ram_end);
+void get_ram_expansion_settings(address_space &space, int &ram_expansion_installed, int &write_protect_on, int &expansion_ram_start, int &expansion_ram_end, int &shadow_ram_end);
 
 /*************************************
  *
@@ -90,7 +90,7 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( set_write_protect )  // run when RAM expansion write protect switch is changed
 {
 	int ram_expansion_installed = 0, write_protect_on = 0, expansion_ram_start = 0, expansion_ram_end = 0, shadow_ram_end = 0;
-	address_space *space = field.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *field.machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *expram = field.machine().device<ram_device>("ram_tag")->pointer();
 
 	get_ram_expansion_settings(space, ram_expansion_installed, write_protect_on, expansion_ram_start, expansion_ram_end, shadow_ram_end);  // passing by reference
@@ -99,13 +99,13 @@ static INPUT_CHANGED( set_write_protect )  // run when RAM expansion write prote
     {
         if (write_protect_on == 0)  // write protect off, so install memory normally
         {
-            space->install_ram(expansion_ram_start, expansion_ram_end, expram);
+            space.install_ram(expansion_ram_start, expansion_ram_end, expram);
             if (shadow_ram_end > expansion_ram_end)
-                space->install_ram(expansion_ram_end + 1, shadow_ram_end, expram);
+                space.install_ram(expansion_ram_end + 1, shadow_ram_end, expram);
         }
         else  // write protect on, so make memory read only
         {
-            space->nop_write(expansion_ram_start, expansion_ram_end);
+            space.nop_write(expansion_ram_start, expansion_ram_end);
         }
      }
 }
@@ -310,9 +310,9 @@ DRIVER_INIT_MEMBER(astrocde_state,astrocde)
 MACHINE_RESET( astrocde )
 {
     int ram_expansion_installed = 0, write_protect_on = 0, expansion_ram_start = 0, expansion_ram_end = 0, shadow_ram_end = 0;
-    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
     UINT8 *expram = machine.device<ram_device>("ram_tag")->pointer();
-    space->unmap_readwrite(0x5000, 0xffff);  // unmap any previously installed expansion RAM
+    space.unmap_readwrite(0x5000, 0xffff);  // unmap any previously installed expansion RAM
 
     get_ram_expansion_settings(space, ram_expansion_installed, write_protect_on, expansion_ram_start, expansion_ram_end, shadow_ram_end);  // passing by reference
 
@@ -320,27 +320,27 @@ MACHINE_RESET( astrocde )
     {
         if (write_protect_on == 0)  // write protect off, so install memory normally
         {
-            space->install_ram(expansion_ram_start, expansion_ram_end, expram);
+            space.install_ram(expansion_ram_start, expansion_ram_end, expram);
             if (shadow_ram_end > expansion_ram_end)
-                space->install_ram(expansion_ram_end + 1, shadow_ram_end, expram);
+                space.install_ram(expansion_ram_end + 1, shadow_ram_end, expram);
         }
         else  // write protect on, so make memory read only
         {
-            space->nop_write(expansion_ram_start, expansion_ram_end);
+            space.nop_write(expansion_ram_start, expansion_ram_end);
         }
      }
 }
 
-void get_ram_expansion_settings(address_space *space, int &ram_expansion_installed, int &write_protect_on, int &expansion_ram_start, int &expansion_ram_end, int &shadow_ram_end)
+void get_ram_expansion_settings(address_space &space, int &ram_expansion_installed, int &write_protect_on, int &expansion_ram_start, int &expansion_ram_end, int &shadow_ram_end)
 {
-    if (space->machine().root_device().ioport("PROTECT")->read() == 0x01)
+    if (space.machine().root_device().ioport("PROTECT")->read() == 0x01)
         write_protect_on = 1;
     else
         write_protect_on = 0;
 
     ram_expansion_installed = 1;
 
-    switch(space->machine().root_device().ioport("CFG")->read())  // check RAM expansion configuration and set address ranges
+    switch(space.machine().root_device().ioport("CFG")->read())  // check RAM expansion configuration and set address ranges
     {
         case 0x00:  // No RAM Expansion
              ram_expansion_installed = 0;

@@ -176,7 +176,7 @@ WRITE8_MEMBER( v3021_device::write )
 				break;
 
 			case 0xf:  //Load Date
-				//space->machine().base_datetime(m_systime);
+				//space.machine().base_datetime(m_systime);
 				break;
 		}
 	}

@@ -52,13 +52,13 @@ VIDEO_START( pc1403 )
 
 READ8_HANDLER(pc1403_lcd_read)
 {
-	pc1403_state *state = space->machine().driver_data<pc1403_state>();
+	pc1403_state *state = space.machine().driver_data<pc1403_state>();
 	return state->m_reg[offset];
 }
 
 WRITE8_HANDLER(pc1403_lcd_write)
 {
-	pc1403_state *state = space->machine().driver_data<pc1403_state>();
+	pc1403_state *state = space.machine().driver_data<pc1403_state>();
 	state->m_reg[offset]=data;
 }
 

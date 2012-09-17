@@ -32,30 +32,30 @@ void exterm_state::palette_init()
  *
  *************************************/
 
-void exterm_to_shiftreg_master(address_space *space, UINT32 address, UINT16 *shiftreg)
+void exterm_to_shiftreg_master(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
-	exterm_state *state = space->machine().driver_data<exterm_state>();
+	exterm_state *state = space.machine().driver_data<exterm_state>();
 	memcpy(shiftreg, &state->m_master_videoram[TOWORD(address)], 256 * sizeof(UINT16));
 }
 
 
-void exterm_from_shiftreg_master(address_space *space, UINT32 address, UINT16 *shiftreg)
+void exterm_from_shiftreg_master(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
-	exterm_state *state = space->machine().driver_data<exterm_state>();
+	exterm_state *state = space.machine().driver_data<exterm_state>();
 	memcpy(&state->m_master_videoram[TOWORD(address)], shiftreg, 256 * sizeof(UINT16));
 }
 
 
-void exterm_to_shiftreg_slave(address_space *space, UINT32 address, UINT16 *shiftreg)
+void exterm_to_shiftreg_slave(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
-	exterm_state *state = space->machine().driver_data<exterm_state>();
+	exterm_state *state = space.machine().driver_data<exterm_state>();
 	memcpy(shiftreg, &state->m_slave_videoram[TOWORD(address)], 256 * 2 * sizeof(UINT8));
 }
 
 
-void exterm_from_shiftreg_slave(address_space *space, UINT32 address, UINT16 *shiftreg)
+void exterm_from_shiftreg_slave(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
-	exterm_state *state = space->machine().driver_data<exterm_state>();
+	exterm_state *state = space.machine().driver_data<exterm_state>();
 	memcpy(&state->m_slave_videoram[TOWORD(address)], shiftreg, 256 * 2 * sizeof(UINT8));
 }
 

@@ -497,36 +497,36 @@ READ8_MEMBER(px4_state::px4_str_r)
 }
 
 /* helper function to map rom capsules */
-static void install_rom_capsule(address_space *space, int size, const char *region)
+static void install_rom_capsule(address_space &space, int size, const char *region)
 {
-	px4_state *state = space->machine().driver_data<px4_state>();
+	px4_state *state = space.machine().driver_data<px4_state>();
 
 	/* ram, part 1 */
-	space->install_readwrite_bank(0x0000, 0xdfff - size, "bank1");
+	space.install_readwrite_bank(0x0000, 0xdfff - size, "bank1");
 	state->membank("bank1")->set_base(state->m_ram->pointer());
 
 	/* actual rom data, part 1 */
-	space->install_read_bank(0xe000 - size, 0xffff - size, "bank2");
-	space->nop_write(0xe000 - size, 0xffff - size);
-	state->membank("bank2")->set_base(space->machine().root_device().memregion(region)->base() + (size - 0x2000));
+	space.install_read_bank(0xe000 - size, 0xffff - size, "bank2");
+	space.nop_write(0xe000 - size, 0xffff - size);
+	state->membank("bank2")->set_base(space.machine().root_device().memregion(region)->base() + (size - 0x2000));
 
 	/* rom data, part 2 */
 	if (size != 0x2000)
 	{
-		space->install_read_bank(0x10000 - size, 0xdfff, "bank3");
-		space->nop_write(0x10000 - size, 0xdfff);
+		space.install_read_bank(0x10000 - size, 0xdfff, "bank3");
+		space.nop_write(0x10000 - size, 0xdfff);
 		state->membank("bank3")->set_base(state->memregion(region)->base());
 	}
 
 	/* ram, continued */
-	space->install_readwrite_bank(0xe000, 0xffff, "bank4");
+	space.install_readwrite_bank(0xe000, 0xffff, "bank4");
 	state->membank("bank4")->set_base(state->m_ram->pointer() + 0xe000);
 }
 
 /* bank register */
 WRITE8_MEMBER(px4_state::px4_bankr_w)
 {
-	address_space *space_program = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space_program = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (VERBOSE)
 		logerror("%s: px4_bankr_w (0x%02x)\n", machine().describe_context(), data);
@@ -538,16 +538,16 @@ WRITE8_MEMBER(px4_state::px4_bankr_w)
 	{
 	case 0x00:
 		/* system bank */
-		space_program->install_read_bank(0x0000, 0x7fff, "bank1");
-		space_program->nop_write(0x0000, 0x7fff);
+		space_program.install_read_bank(0x0000, 0x7fff, "bank1");
+		space_program.nop_write(0x0000, 0x7fff);
 		membank("bank1")->set_base(machine().root_device().memregion("os")->base());
-		space_program->install_readwrite_bank(0x8000, 0xffff, "bank2");
+		space_program.install_readwrite_bank(0x8000, 0xffff, "bank2");
 		membank("bank2")->set_base(m_ram->pointer() + 0x8000);
 		break;
 
 	case 0x04:
 		/* memory */
-		space_program->install_readwrite_bank(0x0000, 0xffff, "bank1");
+		space_program.install_readwrite_bank(0x0000, 0xffff, "bank1");
 		membank("bank1")->set_base(m_ram->pointer());
 		break;
 

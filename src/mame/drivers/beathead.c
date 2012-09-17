@@ -303,14 +303,14 @@ READ32_MEMBER( beathead_state::input_2_r )
 
 READ32_MEMBER( beathead_state::sound_data_r )
 {
-	return atarigen_sound_r(&space, offset, 0xffff);
+	return atarigen_sound_r(space, offset, 0xffff);
 }
 
 
 WRITE32_MEMBER( beathead_state::sound_data_w )
 {
 	if (ACCESSING_BITS_0_7)
-		atarigen_sound_w(&space, offset, data, mem_mask);
+		atarigen_sound_w(space, offset, data, mem_mask);
 }
 
 

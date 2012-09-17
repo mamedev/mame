@@ -154,7 +154,7 @@ static void gb_rom8_6000( running_machine &machine, UINT8 *addr )
 static void gb_init(running_machine &machine)
 {
 	gb_state *state = machine.driver_data<gb_state>();
-	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
+	address_space &space = *machine.device( "maincpu")->memory().space( AS_PROGRAM );
 
 	/* Initialize the memory banks */
 	state->m_MBC1Mode = 0;
@@ -182,63 +182,63 @@ static void gb_init(running_machine &machine)
 		case MBC_NONE:
 			break;
 		case MBC_MMM01:
-			space->install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_0000_w),state) );
-			space->install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_2000_w),state));
-			space->install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_4000_w),state));
-			space->install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_6000_w),state));
+			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_0000_w),state) );
+			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_2000_w),state));
+			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_4000_w),state));
+			space.install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_6000_w),state));
 			break;
 		case MBC_MBC1:
-			space->install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) );	/* We don't emulate RAM enable yet */
-			space->install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc1),state) );
-			space->install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc1),state) );
-			space->install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_mem_mode_select_mbc1),state) );
+			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) );	/* We don't emulate RAM enable yet */
+			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc1),state) );
+			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc1),state) );
+			space.install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_mem_mode_select_mbc1),state) );
 			break;
 		case MBC_MBC2:
-			space->install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc2),state) );
+			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc2),state) );
 			break;
 		case MBC_MBC3:
 		case MBC_HUC1:	/* Possibly wrong */
 		case MBC_HUC3:	/* Possibly wrong */
-			space->install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) );	/* We don't emulate RAM enable yet */
-			space->install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc3),state) );
-			space->install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc3),state) );
-			space->install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_mem_mode_select_mbc3),state) );
+			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) );	/* We don't emulate RAM enable yet */
+			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc3),state) );
+			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc3),state) );
+			space.install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_mem_mode_select_mbc3),state) );
 			break;
 		case MBC_MBC5:
-			space->install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) );
-			space->install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc5),state) );
-			space->install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc5),state) );
+			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) );
+			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc5),state) );
+			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc5),state) );
 			break;
 		case MBC_MBC6:
-			space->install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc6),state) );
-			space->install_write_handler( 0x2000, 0x2fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc6_1),state) );
-			space->install_write_handler( 0x3000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc6_2),state) );
+			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc6),state) );
+			space.install_write_handler( 0x2000, 0x2fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc6_1),state) );
+			space.install_write_handler( 0x3000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc6_2),state) );
 			break;
 		case MBC_MBC7:
-			space->install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) );
-			space->install_write_handler( 0x2000, 0x2fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc7),state) );
-			space->install_write_handler( 0x3000, 0x7fff, write8_delegate(FUNC(gb_state::gb_rom_bank_unknown_mbc7),state) );
+			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) );
+			space.install_write_handler( 0x2000, 0x2fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc7),state) );
+			space.install_write_handler( 0x3000, 0x7fff, write8_delegate(FUNC(gb_state::gb_rom_bank_unknown_mbc7),state) );
 			break;
 		case MBC_TAMA5:
-			space->install_write_handler( 0xA000, 0xBFFF, write8_delegate(FUNC(gb_state::gb_ram_tama5),state) );
+			space.install_write_handler( 0xA000, 0xBFFF, write8_delegate(FUNC(gb_state::gb_ram_tama5),state) );
 			break;
 		case MBC_WISDOM:
-			space->install_write_handler( 0x0000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_wisdom),state) );
+			space.install_write_handler( 0x0000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_wisdom),state) );
 			break;
 		case MBC_MBC1_KOR:
-			space->install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) ); /* We don't emulate RAM enable yet */
-			space->install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc1_kor),state) );
-			space->install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc1_kor),state) );
-			space->install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_mem_mode_select_mbc1_kor),state) );
+			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) ); /* We don't emulate RAM enable yet */
+			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc1_kor),state) );
+			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc1_kor),state) );
+			space.install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_mem_mode_select_mbc1_kor),state) );
 			break;
 
 		case MBC_MEGADUCK:
-			space->install_write_handler( 0x0001, 0x0001, write8_delegate(FUNC(gb_state::megaduck_rom_bank_select_type1),state) );
-			space->install_write_handler( 0xB000, 0xB000, write8_delegate(FUNC(gb_state::megaduck_rom_bank_select_type2),state) );
+			space.install_write_handler( 0x0001, 0x0001, write8_delegate(FUNC(gb_state::megaduck_rom_bank_select_type1),state) );
+			space.install_write_handler( 0xB000, 0xB000, write8_delegate(FUNC(gb_state::megaduck_rom_bank_select_type2),state) );
 			break;
 	}
 
-	gb_sound_w(space->machine().device("custom"), *space, 0x16, 0x00 );       /* Initialize sound hardware */
+	gb_sound_w(space.machine().device("custom"), space, 0x16, 0x00 );       /* Initialize sound hardware */
 
 	state->m_divcount = 0;
 	state->m_triggering_irq = 0;

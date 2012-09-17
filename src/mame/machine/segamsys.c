@@ -485,7 +485,7 @@ static UINT8 vdp_data_r(struct sms_vdp *chip)
 	return retdata;
 }
 
-static void vdp_data_w(address_space *space, UINT8 data, struct sms_vdp* chip)
+static void vdp_data_w(address_space &space, UINT8 data, struct sms_vdp* chip)
 {
 	/* data writes clear the pending flag */
 	chip->cmd_pend = 0;
@@ -522,7 +522,7 @@ static void vdp_data_w(address_space *space, UINT8 data, struct sms_vdp* chip)
 					g = (palword & 0x00f0)>>4;
 					b = (palword & 0x0f00)>>8;
 					rgb_t rgb = MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b));
-					//palette_set_color(space->machine(),(chip->addr_reg&0x3e)/2, rgb);
+					//palette_set_color(space.machine(),(chip->addr_reg&0x3e)/2, rgb);
 					chip->cram_mamecolours[(chip->addr_reg&0x3e)/2]=rgb;
 				}
 			}
@@ -538,7 +538,7 @@ static void vdp_data_w(address_space *space, UINT8 data, struct sms_vdp* chip)
 				g = (data & 0x0c)>>2;
 				b = (data & 0x30)>>4;
 				rgb_t rgb = MAKE_RGB(pal2bit(r), pal2bit(g), pal2bit(b));
-				//palette_set_color(space->machine(),chip->addr_reg&0x1f, rgb);
+				//palette_set_color(space.machine(),chip->addr_reg&0x1f, rgb);
 				chip->cram_mamecolours[chip->addr_reg&0x1f]=rgb;
 			}
 
@@ -551,7 +551,7 @@ static void vdp_data_w(address_space *space, UINT8 data, struct sms_vdp* chip)
 
 }
 
-static UINT8 vdp_ctrl_r(address_space *space, struct sms_vdp *chip)
+static UINT8 vdp_ctrl_r(address_space &space, struct sms_vdp *chip)
 {
 	UINT8 retvalue;
 
@@ -565,7 +565,7 @@ static UINT8 vdp_ctrl_r(address_space *space, struct sms_vdp *chip)
 	chip->sprite_collision = 0;
 	chip->sprite_overflow = 0;
 
-	(chip->set_irq)(space->machine(), 0); // clear IRQ;
+	(chip->set_irq)(space.machine(), 0); // clear IRQ;
 
 
 	return retvalue;
@@ -615,7 +615,7 @@ static void vdp_set_register(running_machine &machine, struct sms_vdp *chip)
 //  printf("VDP: setting register %01x to %02x\n",reg, chip->cmd_part1);
 }
 
-static void vdp_ctrl_w(address_space *space, UINT8 data, struct sms_vdp *chip)
+static void vdp_ctrl_w(address_space &space, UINT8 data, struct sms_vdp *chip)
 {
 	if (chip->cmd_pend)
 	{ /* Part 2 of a command word write */
@@ -636,7 +636,7 @@ static void vdp_ctrl_w(address_space *space, UINT8 data, struct sms_vdp *chip)
 				break;
 
 			case 0x2: /* REG setting */
-				vdp_set_register(space->machine(), chip);
+				vdp_set_register(space.machine(), chip);
 				chip->writemode = 0;
 				break;
 
@@ -1479,7 +1479,7 @@ static UINT8 ioport_gg00_r(running_machine& machine)
 
 READ8_HANDLER( sms_ioport_gg00_r )
 {
-	return ioport_gg00_r(space->machine());
+	return ioport_gg00_r(space.machine());
 }
 
 
@@ -1564,7 +1564,7 @@ static UINT8* sms_rom;
 /* the SMS inputs should be more complex, like the megadrive ones */
 READ8_HANDLER (megatech_sms_ioport_dc_r)
 {
-	running_machine &machine = space->machine();
+	running_machine &machine = space.machine();
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 4: TL-A; bit 5: TR-A */
 	return (machine.root_device().ioport("PAD1")->read() & 0x3f) | ((machine.root_device().ioport("PAD2")->read() & 0x03) << 6);
@@ -1572,7 +1572,7 @@ READ8_HANDLER (megatech_sms_ioport_dc_r)
 
 READ8_HANDLER (megatech_sms_ioport_dd_r)
 {
-	running_machine &machine = space->machine();
+	running_machine &machine = space.machine();
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 2: TL-B; bit 3: TR-B; bit 4: RESET; bit 5: unused; bit 6: TH-A; bit 7: TH-B*/
 	return ((machine.root_device().ioport("PAD2")->read() & 0x3c) >> 2) | 0x10;
@@ -1602,24 +1602,24 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 			logerror("bank w %02x %02x\n", offset, data);
 			if ((data & 0x08) && smsgg_backupram)
 			{
-				space->install_legacy_readwrite_handler(0x8000, 0x9fff, FUNC(smsgg_backupram_r), FUNC(smsgg_backupram_w));
+				space.install_legacy_readwrite_handler(0x8000, 0x9fff, FUNC(smsgg_backupram_r), FUNC(smsgg_backupram_w));
 			}
 			else
 			{
-				space->install_rom(0x0000, 0xbfff, sms_rom);
-				space->unmap_write(0x0000, 0xbfff);
+				space.install_rom(0x0000, 0xbfff, sms_rom);
+				space.unmap_write(0x0000, 0xbfff);
 			}
 
 			//printf("bank ram??\n");
 			break;
 		case 1:
-			memcpy(sms_rom+0x0000, space->machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x0000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 			break;
 		case 2:
-			memcpy(sms_rom+0x4000, space->machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x4000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 			break;
 		case 3:
-			memcpy(sms_rom+0x8000, space->machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x8000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 			break;
 
 	}
@@ -1628,19 +1628,19 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 static WRITE8_HANDLER( codemasters_rom_bank_0000_w )
 {
 	int bank = data&0x1f;
-	memcpy(sms_rom+0x0000, space->machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
+	memcpy(sms_rom+0x0000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
 static WRITE8_HANDLER( codemasters_rom_bank_4000_w )
 {
 	int bank = data&0x1f;
-	memcpy(sms_rom+0x4000, space->machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
+	memcpy(sms_rom+0x4000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
 static WRITE8_HANDLER( codemasters_rom_bank_8000_w )
 {
 	int bank = data&0x1f;
-	memcpy(sms_rom+0x8000, space->machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
+	memcpy(sms_rom+0x8000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
 

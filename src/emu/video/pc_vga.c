@@ -1462,8 +1462,8 @@ static READ8_HANDLER(vga_crtc_r)
 		vga.attribute.state = 0;
 		data = 0;
 
-		hsync = space->machine().primary_screen->hblank() & 1;
-		vsync = vga_vblank(space->machine()); //space->machine().primary_screen->vblank() & 1;
+		hsync = space.machine().primary_screen->hblank() & 1;
+		vsync = vga_vblank(space.machine()); //space.machine().primary_screen->vblank() & 1;
 
 		data |= (hsync | vsync) & 1; // DD - display disable register
 		data |= (vsync & 1) << 3; // VRetrace register
@@ -1513,11 +1513,11 @@ static WRITE8_HANDLER(vga_crtc_w)
 					data);
 			}
 
-			crtc_reg_write(space->machine(),vga.crtc.index,data);
-			//space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+			crtc_reg_write(space.machine(),vga.crtc.index,data);
+			//space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
 			#if 0
 			if((vga.crtc.index & 0xfe) != 0x0e)
-				printf("%02x %02x %d\n",vga.crtc.index,data,space->machine().primary_screen->vpos());
+				printf("%02x %02x %d\n",vga.crtc.index,data,space.machine().primary_screen->vpos());
 			#endif
 			break;
 
@@ -1687,7 +1687,7 @@ READ8_HANDLER( vga_port_03c0_r )
 			break;
 
 		case 0xf:
-			data = gc_reg_read(space->machine(),vga.gc.index);
+			data = gc_reg_read(space.machine(),vga.gc.index);
 			break;
 	}
 	return data;
@@ -1700,7 +1700,7 @@ READ8_HANDLER(vga_port_03d0_r)
 		data = vga_crtc_r(space, offset);
 	if(offset == 8)
 	{
-		logerror("VGA: 0x3d8 read at %08x\n",space->device().safe_pc());
+		logerror("VGA: 0x3d8 read at %08x\n",space.device().safe_pc());
 		data = 0; // TODO: PC-200 reads back CGA register here, everything else returns open bus OR CGA emulation of register 0x3d8
 	}
 
@@ -1801,7 +1801,7 @@ WRITE8_HANDLER(vga_port_03c0_w)
 		break;
 	case 2:
 		vga.miscellaneous_output=data;
-		recompute_params(space->machine());
+		recompute_params(space.machine());
 		break;
 	case 3:
 		vga.oak.reg = data;
@@ -1822,8 +1822,8 @@ WRITE8_HANDLER(vga_port_03c0_w)
 			vga.sequencer.data[vga.sequencer.index] = data;
 		}
 
-		seq_reg_write(space->machine(),vga.sequencer.index,data);
-		recompute_params(space->machine());
+		seq_reg_write(space.machine(),vga.sequencer.index,data);
+		recompute_params(space.machine());
 		break;
 	case 6:
 		vga.dac.mask=data;
@@ -1863,7 +1863,7 @@ WRITE8_HANDLER(vga_port_03c0_w)
 		vga.gc.index=data;
 		break;
 	case 0xf:
-		gc_reg_write(space->machine(),vga.gc.index,data);
+		gc_reg_write(space.machine(),vga.gc.index,data);
 		break;
 	}
 }
@@ -1920,7 +1920,7 @@ READ8_HANDLER(vga_mem_r)
 	if(vga.sequencer.data[4] & 4)
 	{
 		int data;
-		if (!space->debugger_access())
+		if (!space.debugger_access())
 		{
 			vga.gc.latch[0]=vga.memory[(offset)];
 			vga.gc.latch[1]=vga.memory[(offset)+0x10000];
@@ -2043,7 +2043,7 @@ void pc_vga_init(running_machine &machine, read8_space_func read_dipswitch, cons
 
 }
 
-void pc_vga_io_init(running_machine &machine, address_space *mem_space, offs_t mem_offset, address_space *io_space, offs_t port_offset)
+void pc_vga_io_init(running_machine &machine, address_space &mem_space, offs_t mem_offset, address_space &io_space, offs_t port_offset)
 {
 	int buswidth;
 	UINT64 mask = 0;
@@ -2071,11 +2071,11 @@ void pc_vga_io_init(running_machine &machine, address_space *mem_space, offs_t m
 			fatalerror("VGA: Bus width %d not supported\n", buswidth);
 			break;
 	}
-	io_space->install_legacy_readwrite_handler(port_offset + 0x3b0, port_offset + 0x3bf, FUNC(vga_port_03b0_r), FUNC(vga_port_03b0_w), mask);
-	io_space->install_legacy_readwrite_handler(port_offset + 0x3c0, port_offset + 0x3cf, FUNC(vga_port_03c0_r), FUNC(vga_port_03c0_w), mask);
-	io_space->install_legacy_readwrite_handler(port_offset + 0x3d0, port_offset + 0x3df, FUNC(vga_port_03d0_r), FUNC(vga_port_03d0_w), mask);
+	io_space.install_legacy_readwrite_handler(port_offset + 0x3b0, port_offset + 0x3bf, FUNC(vga_port_03b0_r), FUNC(vga_port_03b0_w), mask);
+	io_space.install_legacy_readwrite_handler(port_offset + 0x3c0, port_offset + 0x3cf, FUNC(vga_port_03c0_r), FUNC(vga_port_03c0_w), mask);
+	io_space.install_legacy_readwrite_handler(port_offset + 0x3d0, port_offset + 0x3df, FUNC(vga_port_03d0_r), FUNC(vga_port_03d0_w), mask);
 
-	mem_space->install_legacy_readwrite_handler(mem_offset + 0x00000, mem_offset + 0x1ffff, FUNC(vga_mem_r), FUNC(vga_mem_w), mask);
+	mem_space.install_legacy_readwrite_handler(mem_offset + 0x00000, mem_offset + 0x1ffff, FUNC(vga_mem_r), FUNC(vga_mem_w), mask);
 }
 
 VIDEO_START( vga )
@@ -2313,7 +2313,7 @@ READ8_HANDLER(tseng_et4k_03b0_r)
 		switch(offset)
 		{
 			case 5:
-				res = tseng_crtc_reg_read(space->machine(),vga.crtc.index);
+				res = tseng_crtc_reg_read(space.machine(),vga.crtc.index);
 				break;
 			case 8:
 				res = et4k.reg_3d8;
@@ -2335,7 +2335,7 @@ WRITE8_HANDLER(tseng_et4k_03b0_w)
 		{
 			case 5:
 				vga.crtc.data[vga.crtc.index] = data;
-				tseng_crtc_reg_write(space->machine(),vga.crtc.index,data);
+				tseng_crtc_reg_write(space.machine(),vga.crtc.index,data);
 				break;
 			case 8:
 				et4k.reg_3d8 = data;
@@ -2349,7 +2349,7 @@ WRITE8_HANDLER(tseng_et4k_03b0_w)
 				break;
 		}
 	}
-	tseng_define_video_mode(space->machine());
+	tseng_define_video_mode(space.machine());
 }
 
 
@@ -2360,7 +2360,7 @@ READ8_HANDLER(tseng_et4k_03c0_r)
 	switch(offset)
 	{
 		case 0x05:
-			res = tseng_seq_reg_read(space->machine(),vga.sequencer.index);
+			res = tseng_seq_reg_read(space.machine(),vga.sequencer.index);
 			break;
 		case 0x0d:
 			res = svga.bank_w & 0xf;
@@ -2392,7 +2392,7 @@ WRITE8_HANDLER(tseng_et4k_03c0_w)
 	switch(offset)
 	{
 		case 0x05:
-			tseng_seq_reg_write(space->machine(),vga.sequencer.index,data);
+			tseng_seq_reg_write(space.machine(),vga.sequencer.index,data);
 			break;
 		case 0x0d:
 			svga.bank_w = data & 0xf;
@@ -2408,7 +2408,7 @@ WRITE8_HANDLER(tseng_et4k_03c0_w)
 			vga_port_03c0_w(space,offset,data);
 			break;
 	}
-	tseng_define_video_mode(space->machine());
+	tseng_define_video_mode(space.machine());
 }
 
 READ8_HANDLER(tseng_et4k_03d0_r)
@@ -2420,7 +2420,7 @@ READ8_HANDLER(tseng_et4k_03d0_r)
 		switch(offset)
 		{
 			case 5:
-				res = tseng_crtc_reg_read(space->machine(),vga.crtc.index);
+				res = tseng_crtc_reg_read(space.machine(),vga.crtc.index);
 				break;
 			case 8:
 				res = et4k.reg_3d8;
@@ -2442,9 +2442,9 @@ WRITE8_HANDLER(tseng_et4k_03d0_w)
 		{
 			case 5:
 				vga.crtc.data[vga.crtc.index] = data;
-				tseng_crtc_reg_write(space->machine(),vga.crtc.index,data);
+				tseng_crtc_reg_write(space.machine(),vga.crtc.index,data);
 				//if((vga.crtc.index & 0xfe) != 0x0e)
-				//  printf("%02x %02x %d\n",vga.crtc.index,data,space->machine().primary_screen->vpos());
+				//  printf("%02x %02x %d\n",vga.crtc.index,data,space.machine().primary_screen->vpos());
 				break;
 			case 8:
 				et4k.reg_3d8 = data;
@@ -2458,7 +2458,7 @@ WRITE8_HANDLER(tseng_et4k_03d0_w)
 				break;
 		}
 	}
-	tseng_define_video_mode(space->machine());
+	tseng_define_video_mode(space.machine());
 }
 
 READ8_HANDLER( tseng_mem_r )
@@ -2489,7 +2489,7 @@ Trident implementation
 
 ******************************************/
 
-void pc_svga_trident_io_init(running_machine &machine, address_space *mem_space, offs_t mem_offset, address_space *io_space, offs_t port_offset)
+void pc_svga_trident_io_init(running_machine &machine, address_space &mem_space, offs_t mem_offset, address_space &io_space, offs_t port_offset)
 {
 	int buswidth;
 	UINT64 mask = 0;
@@ -2517,11 +2517,11 @@ void pc_svga_trident_io_init(running_machine &machine, address_space *mem_space,
 			fatalerror("VGA: Bus width %d not supported\n", buswidth);
 			break;
 	}
-	io_space->install_legacy_readwrite_handler(port_offset + 0x3b0, port_offset + 0x3bf, FUNC(vga_port_03b0_r), FUNC(vga_port_03b0_w), mask);
-	io_space->install_legacy_readwrite_handler(port_offset + 0x3c0, port_offset + 0x3cf, FUNC(trident_03c0_r), FUNC(trident_03c0_w), mask);
-	io_space->install_legacy_readwrite_handler(port_offset + 0x3d0, port_offset + 0x3df, FUNC(trident_03d0_r), FUNC(trident_03d0_w), mask);
+	io_space.install_legacy_readwrite_handler(port_offset + 0x3b0, port_offset + 0x3bf, FUNC(vga_port_03b0_r), FUNC(vga_port_03b0_w), mask);
+	io_space.install_legacy_readwrite_handler(port_offset + 0x3c0, port_offset + 0x3cf, FUNC(trident_03c0_r), FUNC(trident_03c0_w), mask);
+	io_space.install_legacy_readwrite_handler(port_offset + 0x3d0, port_offset + 0x3df, FUNC(trident_03d0_r), FUNC(trident_03d0_w), mask);
 
-	mem_space->install_legacy_readwrite_handler(mem_offset + 0x00000, mem_offset + 0x1ffff, FUNC(trident_mem_r), FUNC(trident_mem_w), mask);
+	mem_space.install_legacy_readwrite_handler(mem_offset + 0x00000, mem_offset + 0x1ffff, FUNC(trident_mem_r), FUNC(trident_mem_w), mask);
 
 	// D3h = TGUI9660XGi
 	svga.id = 0xd3; // TODO: hardcoded for California Chase
@@ -2582,7 +2582,7 @@ READ8_HANDLER(trident_03c0_r)
 	switch(offset)
 	{
 		case 0x05:
-			res = trident_seq_reg_read(space->machine(),vga.sequencer.index);
+			res = trident_seq_reg_read(space.machine(),vga.sequencer.index);
 			break;
 		default:
 			res = vga_port_03c0_r(space,offset);
@@ -2597,7 +2597,7 @@ WRITE8_HANDLER(trident_03c0_w)
 	switch(offset)
 	{
 		case 0x05:
-			trident_seq_reg_write(space->machine(),vga.sequencer.index,data);
+			trident_seq_reg_write(space.machine(),vga.sequencer.index,data);
 			break;
 		default:
 			vga_port_03c0_w(space,offset,data);
@@ -3014,7 +3014,7 @@ READ8_HANDLER(s3_port_03b0_r)
 		switch(offset)
 		{
 			case 5:
-				res = s3_crtc_reg_read(space->machine(),vga.crtc.index);
+				res = s3_crtc_reg_read(space.machine(),vga.crtc.index);
 				break;
 			default:
 				res = vga_port_03b0_r(space,offset);
@@ -3033,7 +3033,7 @@ WRITE8_HANDLER(s3_port_03b0_w)
 		{
 			case 5:
 				vga.crtc.data[vga.crtc.index] = data;
-				s3_crtc_reg_write(space->machine(),vga.crtc.index,data);
+				s3_crtc_reg_write(space.machine(),vga.crtc.index,data);
 				break;
 			default:
 				vga_port_03b0_w(space,offset,data);
@@ -3075,7 +3075,7 @@ READ8_HANDLER(s3_port_03d0_r)
 		switch(offset)
 		{
 			case 5:
-				res = s3_crtc_reg_read(space->machine(),vga.crtc.index);
+				res = s3_crtc_reg_read(space.machine(),vga.crtc.index);
 				break;
 			default:
 				res = vga_port_03d0_r(space,offset);
@@ -3094,7 +3094,7 @@ WRITE8_HANDLER(s3_port_03d0_w)
 		{
 			case 5:
 				vga.crtc.data[vga.crtc.index] = data;
-				s3_crtc_reg_write(space->machine(),vga.crtc.index,data);
+				s3_crtc_reg_write(space.machine(),vga.crtc.index,data);
 				break;
 			default:
 				vga_port_03d0_w(space,offset,data);
@@ -4835,7 +4835,7 @@ WRITE8_HANDLER(vga_port_gamtor_03d0_w)
 	}
 }
 
-void pc_vga_gamtor_io_init(running_machine &machine, address_space *mem_space, offs_t mem_offset, address_space *io_space, offs_t port_offset)
+void pc_vga_gamtor_io_init(running_machine &machine, address_space &mem_space, offs_t mem_offset, address_space &io_space, offs_t port_offset)
 {
 	int buswidth;
 	UINT64 mask = 0;
@@ -4863,11 +4863,11 @@ void pc_vga_gamtor_io_init(running_machine &machine, address_space *mem_space, o
 			fatalerror("VGA: Bus width %d not supported\n", buswidth);
 			break;
 	}
-	io_space->install_legacy_readwrite_handler(port_offset + 0x3b0, port_offset + 0x3bf, FUNC(vga_port_gamtor_03b0_r), FUNC(vga_port_gamtor_03b0_w), mask);
-	io_space->install_legacy_readwrite_handler(port_offset + 0x3c0, port_offset + 0x3cf, FUNC(vga_port_gamtor_03c0_r), FUNC(vga_port_gamtor_03c0_w), mask);
-	io_space->install_legacy_readwrite_handler(port_offset + 0x3d0, port_offset + 0x3df, FUNC(vga_port_gamtor_03d0_r), FUNC(vga_port_gamtor_03d0_w), mask);
+	io_space.install_legacy_readwrite_handler(port_offset + 0x3b0, port_offset + 0x3bf, FUNC(vga_port_gamtor_03b0_r), FUNC(vga_port_gamtor_03b0_w), mask);
+	io_space.install_legacy_readwrite_handler(port_offset + 0x3c0, port_offset + 0x3cf, FUNC(vga_port_gamtor_03c0_r), FUNC(vga_port_gamtor_03c0_w), mask);
+	io_space.install_legacy_readwrite_handler(port_offset + 0x3d0, port_offset + 0x3df, FUNC(vga_port_gamtor_03d0_r), FUNC(vga_port_gamtor_03d0_w), mask);
 
-	mem_space->install_legacy_readwrite_handler(mem_offset + 0x00000, mem_offset + 0x1ffff, FUNC(vga_gamtor_mem_r), FUNC(vga_gamtor_mem_w), mask);
+	mem_space.install_legacy_readwrite_handler(mem_offset + 0x00000, mem_offset + 0x1ffff, FUNC(vga_gamtor_mem_r), FUNC(vga_gamtor_mem_w), mask);
 }
 
 static void ati_define_video_mode(running_machine &machine)
@@ -5079,7 +5079,7 @@ bit     0  SENSE is the result of a wired-OR of 3 comparators, one
  */
 READ16_HANDLER(mach8_status_r)
 {
-	return vga_vblank(space->machine()) << 1;
+	return vga_vblank(space.machine()) << 1;
 }
 
 WRITE16_HANDLER(mach8_htotal_w)
@@ -5112,7 +5112,7 @@ bit   0-3  Interrupt requests. These bits show the state of internal interrupt
 READ16_HANDLER(mach8_substatus_r)
 {
 	// TODO:
-	if(vga_vblank(space->machine()) != 0)  // not correct, but will do for now
+	if(vga_vblank(space.machine()) != 0)  // not correct, but will do for now
 		ibm8514.substatus |= 0x01;
 	return ibm8514.substatus;
 }

@@ -68,7 +68,7 @@ static void oric_vh_update_attribute(running_machine &machine, UINT8 c)
 	oric_state *state = machine.driver_data<oric_state>();
 	/* attribute */
 	UINT8 attribute = c & 0x03f;
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch ((attribute>>3) & 0x03)
 	{
@@ -115,7 +115,7 @@ static void oric_vh_update_attribute(running_machine &machine, UINT8 c)
 				if (state->m_ram)
 					state->m_vh_state.char_base = state->m_ram + (offs_t)0x09800;
 				else
-					state->m_vh_state.char_base = (UINT8 *)space->get_read_ptr(0x09800);
+					state->m_vh_state.char_base = (UINT8 *)space.get_read_ptr(0x09800);
 			}
 			else
 			{
@@ -124,7 +124,7 @@ static void oric_vh_update_attribute(running_machine &machine, UINT8 c)
 				if (state->m_ram)
 					state->m_vh_state.char_base = state->m_ram + (offs_t)0x0b400;
 				else
-					state->m_vh_state.char_base = (UINT8 *)space->get_read_ptr(0x0b400);
+					state->m_vh_state.char_base = (UINT8 *)space.get_read_ptr(0x0b400);
 			}
 			/* changing the mode also changes the position of the standard charset and alternative charset */
 			oric_refresh_charset(state);

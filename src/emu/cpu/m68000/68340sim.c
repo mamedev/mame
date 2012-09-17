@@ -6,43 +6,43 @@
 
 READ16_HANDLER( m68340_internal_sim_r )
 {
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
 	m68340_sim* sim = m68k->m68340SIM;
 	assert(sim != NULL);
 
 	if (sim)
 	{
-		int pc = space->device().safe_pc();
+		int pc = space.device().safe_pc();
 
 		switch (offset<<1)
 		{
 			case m68340SIM_MCR:
 				logerror("%08x m68340_internal_sim_r %04x, (%04x) (MCR - Module Configuration Register)\n", pc, offset*2,mem_mask);
-				return space->machine().rand();
+				return space.machine().rand();
 
 			case m68340SIM_SYNCR:
 				logerror("%08x m68340_internal_sim_r %04x, (%04x) (SYNCR - Clock Synthesizer Register)\n", pc, offset*2,mem_mask);
-				return space->machine().rand();
+				return space.machine().rand();
 
 			case m68340SIM_AVR_RSR:
 				logerror("%08x m68340_internal_sim_r %04x, (%04x) (AVR, RSR - Auto Vector Register, Reset Status Register)\n", pc, offset*2,mem_mask);
-				return space->machine().rand();
+				return space.machine().rand();
 
 			case m68340SIM_SWIV_SYPCR:
 				logerror("%08x m68340_internal_sim_r %04x, (%04x) (SWIV_SYPCR - Software Interrupt Vector, System Protection Control Register)\n", pc, offset*2,mem_mask);
-				return space->machine().rand();
+				return space.machine().rand();
 
 			case m68340SIM_PICR:
 				logerror("%08x m68340_internal_sim_r %04x, (%04x) (PICR - Periodic Interrupt Control Register)\n", pc, offset*2,mem_mask);
-				return space->machine().rand();
+				return space.machine().rand();
 
 			case m68340SIM_PITR:
 				logerror("%08x m68340_internal_sim_r %04x, (%04x) (PITR - Periodic Interrupt Timer Register)\n", pc, offset*2,mem_mask);
-				return space->machine().rand();
+				return space.machine().rand();
 
 			case m68340SIM_SWSR:
 				logerror("%08x m68340_internal_sim_r %04x, (%04x) (SWSR - Software Service)\n", pc, offset*2,mem_mask);
-				return space->machine().rand();
+				return space.machine().rand();
 
 			default:
 				logerror("%08x m68340_internal_sim_r %04x, (%04x)\n", pc, offset*2,mem_mask);
@@ -57,51 +57,51 @@ READ16_HANDLER( m68340_internal_sim_r )
 READ8_HANDLER( m68340_internal_sim_ports_r )
 {
 	offset += 0x10;
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
 	m68340_sim* sim = m68k->m68340SIM;
 	assert(sim != NULL);
 
 	if (sim)
 	{
-		int pc = space->device().safe_pc();
+		int pc = space.device().safe_pc();
 
 		switch (offset)
 		{
 			case m68340SIM_PORTA:
 				logerror("%08x m68340_internal_sim_r %04x (PORTA - Port A Data)\n", pc, offset);
-				return space->machine().rand();
+				return space.machine().rand();
 
 			case m68340SIM_DDRA:
 				logerror("%08x m68340_internal_sim_r %04x (DDRA - Port A Data Direction)\n", pc, offset);
-				return space->machine().rand();
+				return space.machine().rand();
 
 			case m68340SIM_PPRA1:
 				logerror("%08x m68340_internal_sim_r %04x (PPRA1 - Port A Pin Assignment 1)\n", pc, offset);
-				return space->machine().rand();
+				return space.machine().rand();
 
 			case m68340SIM_PPRA2:
 				logerror("%08x m68340_internal_sim_r %04x (PPRA2 - Port A Pin Assignment 2)\n", pc, offset);
-				return space->machine().rand();
+				return space.machine().rand();
 
 			case m68340SIM_PORTB:
 				logerror("%08x m68340_internal_sim_r %04x (PORTB - Port B Data 0)\n", pc, offset);
-				return space->machine().rand();
+				return space.machine().rand();
 
 			case m68340SIM_PORTB1:
 				logerror("%08x m68340_internal_sim_r %04x (PORTB1 - Port B Data 1)\n", pc, offset);
-				return space->machine().rand();
+				return space.machine().rand();
 
 			case m68340SIM_DDRB:
 				logerror("%08x m68340_internal_sim_r %04x (DDR - Port B Data Direction)\n", pc, offset);
-				return space->machine().rand();
+				return space.machine().rand();
 
 			case m68340SIM_PPARB:
 				logerror("%08x m68340_internal_sim_r %04x (PPARB - Port B Pin Assignment)\n", pc, offset);
-				return space->machine().rand();
+				return space.machine().rand();
 
 			default:
 				logerror("%08x m68340_internal_sim_r %04x (ILLEGAL?)\n", pc, offset);
-				return space->machine().rand();
+				return space.machine().rand();
 
 		}
 	}
@@ -113,13 +113,13 @@ READ32_HANDLER( m68340_internal_sim_cs_r )
 {
 	offset += m68340SIM_AM_CS0>>2;
 
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
 	m68340_sim* sim = m68k->m68340SIM;
 	assert(sim != NULL);
 
 	if (sim)
 	{
-		int pc = space->device().safe_pc();
+		int pc = space.device().safe_pc();
 
 		switch (offset<<2)
 		{
@@ -143,13 +143,13 @@ READ32_HANDLER( m68340_internal_sim_cs_r )
 
 WRITE16_HANDLER( m68340_internal_sim_w )
 {
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
 	m68340_sim* sim = m68k->m68340SIM;
 	assert(sim != NULL);
 
 	if (sim)
 	{
-		int pc = space->device().safe_pc();
+		int pc = space.device().safe_pc();
 
 		switch (offset<<1)
 		{
@@ -193,13 +193,13 @@ WRITE16_HANDLER( m68340_internal_sim_w )
 WRITE8_HANDLER( m68340_internal_sim_ports_w )
 {
 	offset += 0x10;
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
 	m68340_sim* sim = m68k->m68340SIM;
 	assert(sim != NULL);
 
 	if (sim)
 	{
-		int pc = space->device().safe_pc();
+		int pc = space.device().safe_pc();
 
 		switch (offset)
 		{
@@ -246,13 +246,13 @@ WRITE8_HANDLER( m68340_internal_sim_ports_w )
 WRITE32_HANDLER( m68340_internal_sim_cs_w )
 {
 	offset += m68340SIM_AM_CS0>>2;
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
 	m68340_sim* sim = m68k->m68340SIM;
 	assert(sim != NULL);
 
 	if (sim)
 	{
-		int pc = space->device().safe_pc();
+		int pc = space.device().safe_pc();
 
 		switch (offset<<2)
 		{

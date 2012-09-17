@@ -216,13 +216,13 @@ SCREEN_UPDATE_IND16( dogfgt )
 
 	if (state->m_lastflip != state->flip_screen() || state->m_lastpixcolor != state->m_pixcolor)
 	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		state->m_lastflip = state->flip_screen();
 		state->m_lastpixcolor = state->m_pixcolor;
 
 		for (offs = 0; offs < BITMAPRAM_SIZE; offs++)
-			state->internal_bitmapram_w(*space, offs, state->m_bitmapram[offs]);
+			state->internal_bitmapram_w(space, offs, state->m_bitmapram[offs]);
 	}
 
 

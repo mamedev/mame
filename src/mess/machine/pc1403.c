@@ -19,7 +19,7 @@
 
 WRITE8_HANDLER(pc1403_asic_write)
 {
-	pc1403_state *state = space->machine().driver_data<pc1403_state>();
+	pc1403_state *state = space.machine().driver_data<pc1403_state>();
     state->m_asic[offset>>9]=data;
     switch( (offset>>9) ){
     case 0/*0x3800*/:
@@ -39,7 +39,7 @@ WRITE8_HANDLER(pc1403_asic_write)
 
 READ8_HANDLER(pc1403_asic_read)
 {
-	pc1403_state *state = space->machine().driver_data<pc1403_state>();
+	pc1403_state *state = space.machine().driver_data<pc1403_state>();
     UINT8 data=state->m_asic[offset>>9];
     switch( (offset>>9) ){
     case 0: case 1: case 2:

@@ -125,12 +125,12 @@ WRITE8_MEMBER(partner_state::partner_floppy_w){
 static void partner_iomap_bank(running_machine &machine,UINT8 *rom)
 {
 	partner_state *state = machine.driver_data<partner_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	switch(state->m_win_mem_page) {
 		case 2 :
 				// FDD
-				space->install_write_handler(0xdc00, 0xddff, write8_delegate(FUNC(partner_state::partner_floppy_w),state));
-				space->install_read_handler (0xdc00, 0xddff, read8_delegate(FUNC(partner_state::partner_floppy_r),state));
+				space.install_write_handler(0xdc00, 0xddff, write8_delegate(FUNC(partner_state::partner_floppy_w),state));
+				space.install_read_handler (0xdc00, 0xddff, read8_delegate(FUNC(partner_state::partner_floppy_r),state));
 				break;
 		case 4 :
 				// Timer
@@ -143,28 +143,28 @@ static void partner_iomap_bank(running_machine &machine,UINT8 *rom)
 static void partner_bank_switch(running_machine &machine)
 {
 	partner_state *state = machine.driver_data<partner_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = state->memregion("maincpu")->base();
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
-	space->install_write_bank(0x0000, 0x07ff, "bank1");
-	space->install_write_bank(0x0800, 0x3fff, "bank2");
-	space->install_write_bank(0x4000, 0x5fff, "bank3");
-	space->install_write_bank(0x6000, 0x7fff, "bank4");
-	space->install_write_bank(0x8000, 0x9fff, "bank5");
-	space->install_write_bank(0xa000, 0xb7ff, "bank6");
-	space->install_write_bank(0xb800, 0xbfff, "bank7");
-	space->install_write_bank(0xc000, 0xc7ff, "bank8");
-	space->install_write_bank(0xc800, 0xcfff, "bank9");
-	space->install_write_bank(0xd000, 0xd7ff, "bank10");
-	space->unmap_write(0xdc00, 0xddff);
-	space->install_read_bank (0xdc00, 0xddff, "bank11");
-	space->unmap_write(0xe000, 0xe7ff);
-	space->unmap_write(0xe800, 0xffff);
+	space.install_write_bank(0x0000, 0x07ff, "bank1");
+	space.install_write_bank(0x0800, 0x3fff, "bank2");
+	space.install_write_bank(0x4000, 0x5fff, "bank3");
+	space.install_write_bank(0x6000, 0x7fff, "bank4");
+	space.install_write_bank(0x8000, 0x9fff, "bank5");
+	space.install_write_bank(0xa000, 0xb7ff, "bank6");
+	space.install_write_bank(0xb800, 0xbfff, "bank7");
+	space.install_write_bank(0xc000, 0xc7ff, "bank8");
+	space.install_write_bank(0xc800, 0xcfff, "bank9");
+	space.install_write_bank(0xd000, 0xd7ff, "bank10");
+	space.unmap_write(0xdc00, 0xddff);
+	space.install_read_bank (0xdc00, 0xddff, "bank11");
+	space.unmap_write(0xe000, 0xe7ff);
+	space.unmap_write(0xe800, 0xffff);
 
 	// BANK 1 (0x0000 - 0x07ff)
 	if (state->m_mem_page==0) {
-		space->unmap_write(0x0000, 0x07ff);
+		space.unmap_write(0x0000, 0x07ff);
 		state->membank("bank1")->set_base(rom + 0x10000);
 	} else {
 		if (state->m_mem_page==7) {
@@ -187,7 +187,7 @@ static void partner_bank_switch(running_machine &machine)
 	} else {
 		if (state->m_mem_page==10) {
 			//window 1
-			space->unmap_write(0x4000, 0x5fff);
+			space.unmap_write(0x4000, 0x5fff);
 			partner_window_1(machine, 3, 0, rom);
 		} else {
 			state->membank("bank3")->set_base(ram + 0x4000);
@@ -206,13 +206,13 @@ static void partner_bank_switch(running_machine &machine)
 		case 5:
 		case 10:
 				//window 2
-				space->unmap_write(0x8000, 0x9fff);
+				space.unmap_write(0x8000, 0x9fff);
 				partner_window_2(machine, 5, 0, rom);
 				break;
 		case 8:
 		case 9:
 				//window 1
-				space->unmap_write(0x8000, 0x9fff);
+				space.unmap_write(0x8000, 0x9fff);
 				partner_window_1(machine, 5, 0, rom);
 				break;
 		case 7:
@@ -228,13 +228,13 @@ static void partner_bank_switch(running_machine &machine)
 		case 5:
 		case 10:
 				//window 2
-				space->unmap_write(0xa000, 0xb7ff);
+				space.unmap_write(0xa000, 0xb7ff);
 				partner_window_2(machine, 6, 0, rom);
 				break;
 		case 6:
 		case 8:
 				//BASIC
-				space->unmap_write(0xa000, 0xb7ff);
+				space.unmap_write(0xa000, 0xb7ff);
 				state->membank("bank6")->set_base(rom + 0x12000); // BASIC
 				break;
 		case 7:
@@ -251,13 +251,13 @@ static void partner_bank_switch(running_machine &machine)
 		case 5:
 		case 10:
 				//window 2
-				space->unmap_write(0xb800, 0xbfff);
+				space.unmap_write(0xb800, 0xbfff);
 				partner_window_2(machine, 7, 0x1800, rom);
 				break;
 		case 6:
 		case 8:
 				//BASIC
-				space->unmap_write(0xb800, 0xbfff);
+				space.unmap_write(0xb800, 0xbfff);
 				state->membank("bank7")->set_base(rom + 0x13800); // BASIC
 				break;
 		case 7:
@@ -275,7 +275,7 @@ static void partner_bank_switch(running_machine &machine)
 				break;
 		case 8:
 		case 10:
-				space->unmap_write(0xc000, 0xc7ff);
+				space.unmap_write(0xc000, 0xc7ff);
 				state->membank("bank8")->set_base(rom + 0x10000);
 				break;
 		default:
@@ -291,11 +291,11 @@ static void partner_bank_switch(running_machine &machine)
 		case 8:
 		case 9:
 				// window 2
-				space->unmap_write(0xc800, 0xcfff);
+				space.unmap_write(0xc800, 0xcfff);
 				partner_window_2(machine, 9, 0, rom);
 				break;
 		case 10:
-				space->unmap_write(0xc800, 0xcfff);
+				space.unmap_write(0xc800, 0xcfff);
 				state->membank("bank9")->set_base(rom + 0x10800);
 				break;
 		default:
@@ -311,7 +311,7 @@ static void partner_bank_switch(running_machine &machine)
 		case 8:
 		case 9:
 				// window 2
-				space->unmap_write(0xd000, 0xd7ff);
+				space.unmap_write(0xd000, 0xd7ff);
 				partner_window_2(machine, 10, 0x0800, rom);
 				break;
 		default:
@@ -366,8 +366,8 @@ static WRITE_LINE_DEVICE_HANDLER( hrq_w )
 	i8257_hlda_w(device, state);
 }
 
-static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
-static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
+static UINT8 memory_read_byte(address_space &space, offs_t address) { return space.read_byte(address); }
+static void memory_write_byte(address_space &space, offs_t address, UINT8 data) { space.write_byte(address, data); }
 
 I8257_INTERFACE( partner_dma )
 {

@@ -411,7 +411,7 @@ static void compute_sensors(running_machine &machine)
 
 READ8_HANDLER( slikz80_port_r )
 {
-	itech8_state *state = space->machine().driver_data<itech8_state>();
+	itech8_state *state = space.machine().driver_data<itech8_state>();
 	int result = 0;
 
 	/* if we have nothing, return 0x03 */
@@ -442,7 +442,7 @@ READ8_HANDLER( slikz80_port_r )
 
 WRITE8_HANDLER( slikz80_port_w )
 {
-	itech8_state *state = space->machine().driver_data<itech8_state>();
+	itech8_state *state = space.machine().driver_data<itech8_state>();
 	state->m_z80_port_val = data;
 	state->m_z80_clear_to_send = 0;
 }
@@ -457,7 +457,7 @@ WRITE8_HANDLER( slikz80_port_w )
 
 READ8_HANDLER( slikshot_z80_r )
 {
-	itech8_state *state = space->machine().driver_data<itech8_state>();
+	itech8_state *state = space.machine().driver_data<itech8_state>();
 	/* allow the Z80 to send us stuff now */
 	state->m_z80_clear_to_send = 1;
 	return state->m_z80_port_val;
@@ -473,7 +473,7 @@ READ8_HANDLER( slikshot_z80_r )
 
 READ8_HANDLER( slikshot_z80_control_r )
 {
-	itech8_state *state = space->machine().driver_data<itech8_state>();
+	itech8_state *state = space.machine().driver_data<itech8_state>();
 	return state->m_z80_ctrl;
 }
 
@@ -513,7 +513,7 @@ static TIMER_CALLBACK( delayed_z80_control_w )
 
 WRITE8_HANDLER( slikshot_z80_control_w )
 {
-	space->machine().scheduler().synchronize(FUNC(delayed_z80_control_w), data);
+	space.machine().scheduler().synchronize(FUNC(delayed_z80_control_w), data);
 }
 
 

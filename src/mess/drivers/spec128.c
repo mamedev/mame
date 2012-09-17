@@ -171,7 +171,7 @@ static const ay8910_interface spectrum_ay_interface =
 
 static WRITE8_HANDLER(spectrum_128_port_7ffd_w)
 {
-	spectrum_state *state = space->machine().driver_data<spectrum_state>();
+	spectrum_state *state = space.machine().driver_data<spectrum_state>();
 
    /* D0-D2: RAM page located at 0x0c000-0x0ffff */
    /* D3 - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
@@ -186,7 +186,7 @@ static WRITE8_HANDLER(spectrum_128_port_7ffd_w)
 	state->m_port_7ffd_data = data;
 
 	/* update memory */
-	spectrum_128_update_memory(space->machine());
+	spectrum_128_update_memory(space.machine());
 }
 
 void spectrum_128_update_memory(running_machine &machine)
@@ -228,8 +228,8 @@ void spectrum_128_update_memory(running_machine &machine)
 
 static  READ8_HANDLER ( spectrum_128_ula_r )
 {
-	spectrum_state *state = space->machine().driver_data<spectrum_state>();
-	int vpos = space->machine().primary_screen->vpos();
+	spectrum_state *state = space.machine().driver_data<spectrum_state>();
+	int vpos = space.machine().primary_screen->vpos();
 
 	return vpos<193 ? state->m_screen_location[0x1800|(vpos&0xf8)<<2]:0xff;
 }

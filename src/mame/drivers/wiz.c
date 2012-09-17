@@ -1059,14 +1059,14 @@ DRIVER_INIT_MEMBER(wiz_state,stinger)
 		{ 5,3,7, 0x80 },
 		{ 5,7,3, 0x28 }
 	};
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	int size = machine().root_device().memregion("maincpu")->bytes();
 	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, size);
 	int A;
 	const UINT8 *tbl;
 
-	space->set_decrypted_region(0x0000, 0xffff, decrypt);
+	space.set_decrypted_region(0x0000, 0xffff, decrypt);
 
 	for (A = 0x0000;A < 0x10000;A++)
 	{

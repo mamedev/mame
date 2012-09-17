@@ -36,7 +36,7 @@ static void fds_irq(device_t *device, int scanline, int vblank, int blanked);
 static void init_nes_core( running_machine &machine )
 {
 	nes_state *state = machine.driver_data<nes_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	static const char *const bank_names[] = { "bank1", "bank2", "bank3", "bank4" };
 	int prg_banks = (state->m_prg_chunks == 1) ? (2 * 2) : (state->m_prg_chunks * 2);
 	int i;
@@ -46,7 +46,7 @@ static void init_nes_core( running_machine &machine )
 	// other pointers got set in the loading routine
 
 	/* Brutal hack put in as a consequence of the new memory system; we really need to fix the NES code */
-	space->install_readwrite_bank(0x0000, 0x07ff, 0, 0x1800, "bank10");
+	space.install_readwrite_bank(0x0000, 0x07ff, 0, 0x1800, "bank10");
 
 	machine.device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0, 0x1fff, FUNC(nes_chr_r), FUNC(nes_chr_w));
 	machine.device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(nes_nt_r), FUNC(nes_nt_w));
@@ -68,12 +68,12 @@ static void init_nes_core( running_machine &machine )
 		if (state->m_fds_ram == NULL)
 			state->m_fds_ram = auto_alloc_array(machine, UINT8, 0x8000);
 
-		space->install_read_handler(0x4030, 0x403f, read8_delegate(FUNC(nes_state::nes_fds_r),state));
-		space->install_read_bank(0x6000, 0xdfff, "bank2");
-		space->install_read_bank(0xe000, 0xffff, "bank1");
+		space.install_read_handler(0x4030, 0x403f, read8_delegate(FUNC(nes_state::nes_fds_r),state));
+		space.install_read_bank(0x6000, 0xdfff, "bank2");
+		space.install_read_bank(0xe000, 0xffff, "bank1");
 
-		space->install_write_handler(0x4020, 0x402f, write8_delegate(FUNC(nes_state::nes_fds_w),state));
-		space->install_write_bank(0x6000, 0xdfff, "bank2");
+		space.install_write_handler(0x4020, 0x402f, write8_delegate(FUNC(nes_state::nes_fds_w),state));
+		space.install_write_bank(0x6000, 0xdfff, "bank2");
 
 		state->membank("bank1")->set_base(&state->m_rom[0xe000]);
 		state->membank("bank2")->set_base(state->m_fds_ram);
@@ -84,11 +84,11 @@ static void init_nes_core( running_machine &machine )
 	pcb_handlers_setup(machine);
 
 	/* Set up the memory handlers for the mapper */
-	space->install_read_bank(0x8000, 0x9fff, "bank1");
-	space->install_read_bank(0xa000, 0xbfff, "bank2");
-	space->install_read_bank(0xc000, 0xdfff, "bank3");
-	space->install_read_bank(0xe000, 0xffff, "bank4");
-	space->install_readwrite_bank(0x6000, 0x7fff, "bank5");
+	space.install_read_bank(0x8000, 0x9fff, "bank1");
+	space.install_read_bank(0xa000, 0xbfff, "bank2");
+	space.install_read_bank(0xc000, 0xdfff, "bank3");
+	space.install_read_bank(0xe000, 0xffff, "bank4");
+	space.install_readwrite_bank(0x6000, 0x7fff, "bank5");
 
 	/* configure banks 1-4 */
 	for (i = 0; i < 4; i++)
@@ -161,35 +161,35 @@ static void init_nes_core( running_machine &machine )
 
 	// there are still some quirk about writes to bank5... I hope to fix them soon. (mappers 34,45,52,246 have both mid_w and WRAM-->check)
 	if (state->m_mmc_write_mid)
-		space->install_legacy_write_handler(0x6000, 0x7fff, state->m_mmc_write_mid,state->m_mmc_write_mid_name);
+		space.install_legacy_write_handler(0x6000, 0x7fff, state->m_mmc_write_mid,state->m_mmc_write_mid_name);
 	if (state->m_mmc_write)
-		space->install_legacy_write_handler(0x8000, 0xffff, state->m_mmc_write, state->m_mmc_write_name);
+		space.install_legacy_write_handler(0x8000, 0xffff, state->m_mmc_write, state->m_mmc_write_name);
 
 	// In fact, we also allow single pcbs to overwrite the bank read handlers defined above,
 	// because some pcbs (mainly pirate ones) require protection values to be read instead of
 	// the expected ROM banks: these handlers, though, must take care of the ROM access as well
 	if (state->m_mmc_read_mid)
-		space->install_legacy_read_handler(0x6000, 0x7fff, state->m_mmc_read_mid,state->m_mmc_read_mid_name);
+		space.install_legacy_read_handler(0x6000, 0x7fff, state->m_mmc_read_mid,state->m_mmc_read_mid_name);
 	if (state->m_mmc_read)
-		space->install_legacy_read_handler(0x8000, 0xffff, state->m_mmc_read,state->m_mmc_read_name);
+		space.install_legacy_read_handler(0x8000, 0xffff, state->m_mmc_read,state->m_mmc_read_name);
 
 	// install additional handlers
 	if (state->m_pcb_id == BTL_SMB2B || state->m_mapper == 50)
 	{
-		space->install_legacy_write_handler(0x4020, 0x403f, FUNC(smb2jb_extra_w));
-		space->install_legacy_write_handler(0x40a0, 0x40bf, FUNC(smb2jb_extra_w));
+		space.install_legacy_write_handler(0x4020, 0x403f, FUNC(smb2jb_extra_w));
+		space.install_legacy_write_handler(0x40a0, 0x40bf, FUNC(smb2jb_extra_w));
 	}
 
 	if (state->m_pcb_id == KAISER_KS7017)
 	{
-		space->install_legacy_read_handler(0x4030, 0x4030, FUNC(ks7017_extra_r));
-		space->install_legacy_write_handler(0x4020, 0x40ff, FUNC(ks7017_extra_w));
+		space.install_legacy_read_handler(0x4030, 0x4030, FUNC(ks7017_extra_r));
+		space.install_legacy_write_handler(0x4020, 0x40ff, FUNC(ks7017_extra_w));
 	}
 
 	if (state->m_pcb_id == UNL_603_5052)
 	{
-		space->install_legacy_read_handler(0x4020, 0x40ff, FUNC(unl_6035052_extra_r));
-		space->install_legacy_write_handler(0x4020, 0x40ff, FUNC(unl_6035052_extra_w));
+		space.install_legacy_read_handler(0x4020, 0x40ff, FUNC(unl_6035052_extra_r));
+		space.install_legacy_write_handler(0x4020, 0x40ff, FUNC(unl_6035052_extra_w));
 	}
 
 	if (state->m_pcb_id == WAIXING_SH2)

@@ -57,17 +57,17 @@ TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_1){ get_tile_info(machine(), t
 TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_2){ get_tile_info(machine(), tileinfo, tile_index, 2); }
 TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_3){ get_tile_info(machine(), tileinfo, tile_index, 3); }
 
-INLINE void fuuki16_vram_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int _N_)
+INLINE void fuuki16_vram_w(address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask, int _N_)
 {
-	fuuki16_state *state = space->machine().driver_data<fuuki16_state>();
+	fuuki16_state *state = space.machine().driver_data<fuuki16_state>();
 	COMBINE_DATA(&state->m_vram[_N_][offset]);
 	state->m_tilemap[_N_]->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(fuuki16_state::fuuki16_vram_0_w){ fuuki16_vram_w(&space, offset, data, mem_mask, 0); }
-WRITE16_MEMBER(fuuki16_state::fuuki16_vram_1_w){ fuuki16_vram_w(&space, offset, data, mem_mask, 1); }
-WRITE16_MEMBER(fuuki16_state::fuuki16_vram_2_w){ fuuki16_vram_w(&space, offset, data, mem_mask, 2); }
-WRITE16_MEMBER(fuuki16_state::fuuki16_vram_3_w){ fuuki16_vram_w(&space, offset, data, mem_mask, 3); }
+WRITE16_MEMBER(fuuki16_state::fuuki16_vram_0_w){ fuuki16_vram_w(space, offset, data, mem_mask, 0); }
+WRITE16_MEMBER(fuuki16_state::fuuki16_vram_1_w){ fuuki16_vram_w(space, offset, data, mem_mask, 1); }
+WRITE16_MEMBER(fuuki16_state::fuuki16_vram_2_w){ fuuki16_vram_w(space, offset, data, mem_mask, 2); }
+WRITE16_MEMBER(fuuki16_state::fuuki16_vram_3_w){ fuuki16_vram_w(space, offset, data, mem_mask, 3); }
 
 
 /***************************************************************************

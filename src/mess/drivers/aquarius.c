@@ -216,9 +216,9 @@ DRIVER_INIT_MEMBER(aquarius_state,aquarius)
 	/* install expansion memory if available */
 	if (machine().device<ram_device>(RAM_TAG)->size() > 0x1000)
 	{
-		address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-		space->install_readwrite_bank(0x4000, 0x4000 + machine().device<ram_device>(RAM_TAG)->size() - 0x1000 - 1, "bank1");
+		space.install_readwrite_bank(0x4000, 0x4000 + machine().device<ram_device>(RAM_TAG)->size() - 0x1000 - 1, "bank1");
 		membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 	}
 }

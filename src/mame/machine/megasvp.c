@@ -56,9 +56,9 @@ INLINE void overwrite_write(UINT16 *dst, UINT16 d)
 	if (d & 0x000f) { *dst &= ~0x000f; *dst |= d & 0x000f; }
 }
 
-static UINT32 pm_io(address_space *space, int reg, int write, UINT32 d)
+static UINT32 pm_io(address_space &space, int reg, int write, UINT32 d)
 {
-	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
+	mdsvp_state *state = space.machine().driver_data<mdsvp_state>();
 	if (state->m_emu_status & SSP_PMC_SET)
 	{
 		state->m_pmac_read[write ? reg + 6 : reg] = state->m_pmc.d;
@@ -71,7 +71,7 @@ static UINT32 pm_io(address_space *space, int reg, int write, UINT32 d)
 		state->m_emu_status &= ~SSP_PMC_HAVE_ADDR;
 	}
 
-	if (reg == 4 || (space->device().state().state_int(SSP_ST) & 0x60))
+	if (reg == 4 || (space.device().state().state_int(SSP_ST) & 0x60))
 	{
 		#define CADDR ((((mode<<16)&0x7f0000)|addr)<<1)
 		UINT16 *dram = (UINT16 *)state->m_dram;
@@ -112,7 +112,7 @@ static UINT32 pm_io(address_space *space, int reg, int write, UINT32 d)
 			int addr = state->m_pmac_read[reg]&0xffff;
 			if      ((mode & 0xfff0) == 0x0800) // ROM, inc 1, verified to be correct
 			{
-				UINT16 *ROM = (UINT16 *) space->machine().root_device().memregion("maincpu")->base();
+				UINT16 *ROM = (UINT16 *) space.machine().root_device().memregion("maincpu")->base();
 				state->m_pmac_read[reg] += 1;
 				d = ROM[addr|((mode&0xf)<<16)];
 			}
@@ -141,7 +141,7 @@ static UINT32 pm_io(address_space *space, int reg, int write, UINT32 d)
 
 static READ16_HANDLER( read_PM0 )
 {
-	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
+	mdsvp_state *state = space.machine().driver_data<mdsvp_state>();
 	UINT32 d = pm_io(space, 0, 0, 0);
 	if (d != (UINT32)-1) return d;
 	d = state->m_XST2;
@@ -151,7 +151,7 @@ static READ16_HANDLER( read_PM0 )
 
 static WRITE16_HANDLER( write_PM0 )
 {
-	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
+	mdsvp_state *state = space.machine().driver_data<mdsvp_state>();
 	UINT32 r = pm_io(space, 0, 1, data);
 	if (r != (UINT32)-1) return;
 	state->m_XST2 = data; // ?
@@ -189,7 +189,7 @@ static WRITE16_HANDLER( write_PM2 )
 
 static READ16_HANDLER( read_XST )
 {
-	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
+	mdsvp_state *state = space.machine().driver_data<mdsvp_state>();
 	UINT32 d = pm_io(space, 3, 0, 0);
 	if (d != (UINT32)-1) return d;
 
@@ -198,7 +198,7 @@ static READ16_HANDLER( read_XST )
 
 static WRITE16_HANDLER( write_XST )
 {
-	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
+	mdsvp_state *state = space.machine().driver_data<mdsvp_state>();
 	UINT32 r = pm_io(space, 3, 1, data);
 	if (r != (UINT32)-1) return;
 
@@ -218,7 +218,7 @@ static WRITE16_HANDLER( write_PM4 )
 
 static READ16_HANDLER( read_PMC )
 {
-	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
+	mdsvp_state *state = space.machine().driver_data<mdsvp_state>();
 	if (state->m_emu_status & SSP_PMC_HAVE_ADDR) {
 		state->m_emu_status |= SSP_PMC_SET;
 		state->m_emu_status &= ~SSP_PMC_HAVE_ADDR;
@@ -231,7 +231,7 @@ static READ16_HANDLER( read_PMC )
 
 static WRITE16_HANDLER( write_PMC )
 {
-	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
+	mdsvp_state *state = space.machine().driver_data<mdsvp_state>();
 	if (state->m_emu_status & SSP_PMC_HAVE_ADDR) {
 		state->m_emu_status |= SSP_PMC_SET;
 		state->m_emu_status &= ~SSP_PMC_HAVE_ADDR;
@@ -244,7 +244,7 @@ static WRITE16_HANDLER( write_PMC )
 
 static READ16_HANDLER( read_AL )
 {
-	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
+	mdsvp_state *state = space.machine().driver_data<mdsvp_state>();
 	state->m_emu_status &= ~(SSP_PMC_SET|SSP_PMC_HAVE_ADDR);
 	return 0;
 }
@@ -257,7 +257,7 @@ static WRITE16_HANDLER( write_AL )
 
 static READ16_HANDLER( svp_68k_io_r )
 {
-	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
+	mdsvp_state *state = space.machine().driver_data<mdsvp_state>();
 	UINT32 d;
 	switch (offset)
 	{
@@ -273,7 +273,7 @@ static READ16_HANDLER( svp_68k_io_r )
 
 static WRITE16_HANDLER( svp_68k_io_w )
 {
-	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
+	mdsvp_state *state = space.machine().driver_data<mdsvp_state>();
 	switch (offset)
 	{
 		// 0xa15000, 0xa15002
@@ -288,7 +288,7 @@ static WRITE16_HANDLER( svp_68k_io_w )
 static READ16_HANDLER( svp_68k_cell1_r )
 {
 	// this is rewritten 68k test code
-	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
+	mdsvp_state *state = space.machine().driver_data<mdsvp_state>();
 	UINT32 a1 = offset;
 	a1 = (a1 & 0x7001) | ((a1 & 0x3e) << 6) | ((a1 & 0xfc0) >> 5);
 	return ((UINT16 *)state->m_dram)[a1];
@@ -297,7 +297,7 @@ static READ16_HANDLER( svp_68k_cell1_r )
 static READ16_HANDLER( svp_68k_cell2_r )
 {
 	// this is rewritten 68k test code
-	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
+	mdsvp_state *state = space.machine().driver_data<mdsvp_state>();
 	UINT32 a1 = offset;
 	a1 = (a1 & 0x7801) | ((a1 & 0x1e) << 6) | ((a1 & 0x7e0) >> 4);
 	return ((UINT16 *)state->m_dram)[a1];
@@ -333,7 +333,7 @@ static UINT8 megadrive_io_read_data_port_svp(running_machine &machine, int portn
 
 static READ16_HANDLER( svp_speedup_r )
 {
-	 space->device().execute().spin_until_time(attotime::from_usec(100));
+	 space.device().execute().spin_until_time(attotime::from_usec(100));
 	return 0x0425;
 }
 

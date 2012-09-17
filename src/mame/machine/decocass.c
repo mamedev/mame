@@ -59,9 +59,9 @@ WRITE8_HANDLER( decocass_coin_counter_w )
 
 WRITE8_HANDLER( decocass_sound_command_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
-	LOG(2,("CPU %s sound command -> $%02x\n", space->device().tag(), data));
-	state->soundlatch_byte_w(*space, 0, data);
+	decocass_state *state = space.machine().driver_data<decocass_state>();
+	LOG(2,("CPU %s sound command -> $%02x\n", space.device().tag(), data));
+	state->soundlatch_byte_w(space, 0, data);
 	state->m_sound_ack |= 0x80;
 	/* remove snd cpu data ack bit. i don't see it in the schems, but... */
 	state->m_sound_ack &= ~0x40;
@@ -70,33 +70,33 @@ WRITE8_HANDLER( decocass_sound_command_w )
 
 READ8_HANDLER( decocass_sound_data_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
-	UINT8 data = state->soundlatch2_byte_r(*space, 0);
-	LOG(2,("CPU %s sound data    <- $%02x\n", space->device().tag(), data));
+	decocass_state *state = space.machine().driver_data<decocass_state>();
+	UINT8 data = state->soundlatch2_byte_r(space, 0);
+	LOG(2,("CPU %s sound data    <- $%02x\n", space.device().tag(), data));
 	return data;
 }
 
 READ8_HANDLER( decocass_sound_ack_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	UINT8 data = state->m_sound_ack;	/* D6+D7 */
-	LOG(4,("CPU %s sound ack     <- $%02x\n", space->device().tag(), data));
+	LOG(4,("CPU %s sound ack     <- $%02x\n", space.device().tag(), data));
 	return data;
 }
 
 WRITE8_HANDLER( decocass_sound_data_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
-	LOG(2,("CPU %s sound data    -> $%02x\n", space->device().tag(), data));
-	state->soundlatch2_byte_w(*space, 0, data);
+	decocass_state *state = space.machine().driver_data<decocass_state>();
+	LOG(2,("CPU %s sound data    -> $%02x\n", space.device().tag(), data));
+	state->soundlatch2_byte_w(space, 0, data);
 	state->m_sound_ack |= 0x40;
 }
 
 READ8_HANDLER( decocass_sound_command_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
-	UINT8 data = state->soundlatch_byte_r(*space, 0);
-	LOG(4,("CPU %s sound command <- $%02x\n", space->device().tag(), data));
+	decocass_state *state = space.machine().driver_data<decocass_state>();
+	UINT8 data = state->soundlatch_byte_r(space, 0);
+	LOG(4,("CPU %s sound command <- $%02x\n", space.device().tag(), data));
 	state->m_audiocpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	state->m_sound_ack &= ~0x80;
 	return data;
@@ -112,14 +112,14 @@ TIMER_DEVICE_CALLBACK( decocass_audio_nmi_gen )
 
 WRITE8_HANDLER( decocass_sound_nmi_enable_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	state->m_audio_nmi_enabled = 1;
 	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, (state->m_audio_nmi_enabled && state->m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_HANDLER( decocass_sound_nmi_enable_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	state->m_audio_nmi_enabled = 1;
 	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, (state->m_audio_nmi_enabled && state->m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 	return 0xff;
@@ -127,29 +127,29 @@ READ8_HANDLER( decocass_sound_nmi_enable_r )
 
 READ8_HANDLER( decocass_sound_data_ack_reset_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	UINT8 data = 0xff;
-	LOG(2,("CPU %s sound ack rst <- $%02x\n", space->device().tag(), data));
+	LOG(2,("CPU %s sound ack rst <- $%02x\n", space.device().tag(), data));
 	state->m_sound_ack &= ~0x40;
 	return data;
 }
 
 WRITE8_HANDLER( decocass_sound_data_ack_reset_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
-	LOG(2,("CPU %s sound ack rst -> $%02x\n", space->device().tag(), data));
+	decocass_state *state = space.machine().driver_data<decocass_state>();
+	LOG(2,("CPU %s sound ack rst -> $%02x\n", space.device().tag(), data));
 	state->m_sound_ack &= ~0x40;
 }
 
 WRITE8_HANDLER( decocass_nmi_reset_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	state->m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE );
 }
 
 WRITE8_HANDLER( decocass_quadrature_decoder_reset_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 
 	/* just latch the analog controls here */
 	state->m_quadrature_decoder[0] = state->ioport("AN0")->read();
@@ -174,14 +174,14 @@ WRITE8_HANDLER( decocass_adc_w )
  */
 READ8_HANDLER( decocass_input_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	UINT8 data = 0xff;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 
 	switch (offset & 7)
 	{
 	case 0: case 1: case 2:
-		data = space->machine().root_device().ioport(portnames[offset & 7])->read();
+		data = space.machine().root_device().ioport(portnames[offset & 7])->read();
 		break;
 	case 3: case 4: case 5: case 6:
 		data = state->m_quadrature_decoder[(offset & 7) - 3];
@@ -209,8 +209,8 @@ READ8_HANDLER( decocass_input_r )
 
 WRITE8_HANDLER( decocass_reset_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
-	LOG(1,("%10s 6502-PC: %04x decocass_reset_w(%02x): $%02x\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
+	decocass_state *state = space.machine().driver_data<decocass_state>();
+	LOG(1,("%10s 6502-PC: %04x decocass_reset_w(%02x): $%02x\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 	state->m_decocass_reset = data;
 
 	/* CPU #1 active high reset */
@@ -277,7 +277,7 @@ static void decocass_fno( running_machine &machine, offs_t offset, UINT8 data )
 
 static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	UINT8 data;
 
 	if (1 == (offset & 1))
@@ -289,7 +289,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 
 		data = (BIT(data, 0) << 0) | (BIT(data, 1) << 1) | 0x7c;
 		LOG(4,("%10s 6502-PC: %04x decocass_type1_latch_26_pass_3_inv_2_r(%02x): $%02x <- (%s %s)\n",
-			space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data,
+			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data,
 			(data & 1) ? "OBF" : "-",
 			(data & 2) ? "IBF" : "-"));
 	}
@@ -297,7 +297,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = space->machine().root_device().memregion("dongle")->base();
+		UINT8 *prom = space.machine().root_device().memregion("dongle")->base();
 
 		if (state->m_firsttime)
 		{
@@ -337,7 +337,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 			(((prom[promaddr] >> 4) & 1)			   << MAP7(state->m_type1_outmap));
 
 		LOG(3,("%10s 6502-PC: %04x decocass_type1_latch_26_pass_3_inv_2_r(%02x): $%02x\n",
-			space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
+			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 
 		state->m_latch1 = save;		/* latch the data for the next A0 == 0 read */
 	}
@@ -357,7 +357,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 
 static READ8_HANDLER( decocass_type1_pass_136_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	UINT8 data;
 
 	if (1 == (offset & 1))
@@ -369,7 +369,7 @@ static READ8_HANDLER( decocass_type1_pass_136_r )
 
 		data = (BIT(data, 0) << 0) | (BIT(data, 1) << 1) | 0x7c;
 		LOG(4,("%10s 6502-PC: %04x decocass_type1_pass_136_r(%02x): $%02x <- (%s %s)\n",
-			space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data,
+			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data,
 			(data & 1) ? "OBF" : "-",
 			(data & 2) ? "IBF" : "-"));
 	}
@@ -377,7 +377,7 @@ static READ8_HANDLER( decocass_type1_pass_136_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = space->machine().root_device().memregion("dongle")->base();
+		UINT8 *prom = space.machine().root_device().memregion("dongle")->base();
 
 		if (state->m_firsttime)
 		{
@@ -417,7 +417,7 @@ static READ8_HANDLER( decocass_type1_pass_136_r )
 			(((prom[promaddr] >> 4) & 1)			   << MAP7(state->m_type1_outmap));
 
 		LOG(3,("%10s 6502-PC: %04x decocass_type1_pass_136_r(%02x): $%02x\n",
-			space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
+			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 
 		state->m_latch1 = save;		/* latch the data for the next A0 == 0 read */
 	}
@@ -437,7 +437,7 @@ static READ8_HANDLER( decocass_type1_pass_136_r )
 
 static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	UINT8 data;
 
 	if (1 == (offset & 1))
@@ -449,7 +449,7 @@ static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 
 		data = (BIT(data, 0) << 0) | (BIT(data, 1) << 1) | 0x7c;
 		LOG(4,("%10s 6502-PC: %04x decocass_type1_latch_27_pass_3_inv_2_r(%02x): $%02x <- (%s %s)\n",
-			space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data,
+			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data,
 			(data & 1) ? "OBF" : "-",
 			(data & 2) ? "IBF" : "-"));
 	}
@@ -457,7 +457,7 @@ static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = space->machine().root_device().memregion("dongle")->base();
+		UINT8 *prom = space.machine().root_device().memregion("dongle")->base();
 
 		if (state->m_firsttime)
 		{
@@ -497,7 +497,7 @@ static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 			(((state->m_latch1 >> MAP7(state->m_type1_inmap)) & 1)	   << MAP7(state->m_type1_outmap));
 
 		LOG(3,("%10s 6502-PC: %04x decocass_type1_latch_27_pass_3_inv_2_r(%02x): $%02x\n",
-			space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
+			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 
 		state->m_latch1 = save;		/* latch the data for the next A0 == 0 read */
 	}
@@ -517,7 +517,7 @@ static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 
 static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	UINT8 data;
 
 	if (1 == (offset & 1))
@@ -529,7 +529,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 
 		data = (BIT(data, 0) << 0) | (BIT(data, 1) << 1) | 0x7c;
 		LOG(4,("%10s 6502-PC: %04x decocass_type1_latch_26_pass_5_inv_2_r(%02x): $%02x <- (%s %s)\n",
-			space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data,
+			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data,
 			(data & 1) ? "OBF" : "-",
 			(data & 2) ? "IBF" : "-"));
 	}
@@ -537,7 +537,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = space->machine().root_device().memregion("dongle")->base();
+		UINT8 *prom = space.machine().root_device().memregion("dongle")->base();
 
 		if (state->m_firsttime)
 		{
@@ -577,7 +577,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 			(((prom[promaddr] >> 4) & 1)			   << MAP7(state->m_type1_outmap));
 
 		LOG(3,("%10s 6502-PC: %04x decocass_type1_latch_26_pass_5_inv_2_r(%02x): $%02x\n",
-			space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
+			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 
 		state->m_latch1 = save;		/* latch the data for the next A0 == 0 read */
 	}
@@ -599,7 +599,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 
 static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	UINT8 data;
 
 	if (1 == (offset & 1))
@@ -611,7 +611,7 @@ static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
 
 		data = (BIT(data, 0) << 0) | (BIT(data, 1) << 1) | 0x7c;
 		LOG(4,("%10s 6502-PC: %04x decocass_type1_latch_16_pass_3_inv_1_r(%02x): $%02x <- (%s %s)\n",
-			space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data,
+			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data,
 			(data & 1) ? "OBF" : "-",
 			(data & 2) ? "IBF" : "-"));
 	}
@@ -619,7 +619,7 @@ static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = space->machine().root_device().memregion("dongle")->base();
+		UINT8 *prom = space.machine().root_device().memregion("dongle")->base();
 
 		if (state->m_firsttime)
 		{
@@ -659,7 +659,7 @@ static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
 			(((prom[promaddr] >> 4) & 1)			   << MAP7(state->m_type1_outmap));
 
 		LOG(3,("%10s 6502-PC: %04x decocass_type1_latch_16_pass_3_inv_1_r(%02x): $%02x\n",
-			space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
+			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 
 		state->m_latch1 = save;		/* latch the data for the next A0 == 0 read */
 	}
@@ -680,7 +680,7 @@ static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
  ***************************************************************************/
 static READ8_HANDLER( decocass_type2_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	UINT8 data;
 
 	if (1 == state->m_type2_xx_latch)
@@ -689,7 +689,7 @@ static READ8_HANDLER( decocass_type2_r )
 		{
 			UINT8 *prom = state->memregion("dongle")->base();
 			data = prom[256 * state->m_type2_d2_latch + state->m_type2_promaddr];
-			LOG(3,("%10s 6502-PC: %04x decocass_type2_r(%02x): $%02x <- prom[%03x]\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, 256 * state->m_type2_d2_latch + state->m_type2_promaddr));
+			LOG(3,("%10s 6502-PC: %04x decocass_type2_r(%02x): $%02x <- prom[%03x]\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, 256 * state->m_type2_d2_latch + state->m_type2_promaddr));
 		}
 		else
 		{
@@ -703,30 +703,30 @@ static READ8_HANDLER( decocass_type2_r )
 		else
 			data = offset & 0xff;
 
-		LOG(3,("%10s 6502-PC: %04x decocass_type2_r(%02x): $%02x <- 8041-%s\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, offset & 1 ? "STATUS" : "DATA"));
+		LOG(3,("%10s 6502-PC: %04x decocass_type2_r(%02x): $%02x <- 8041-%s\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, offset & 1 ? "STATUS" : "DATA"));
 	}
 	return data;
 }
 
 static WRITE8_HANDLER( decocass_type2_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	if (1 == state->m_type2_xx_latch)
 	{
 		if (1 == (offset & 1))
 		{
-			LOG(4,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> set PROM+D2 latch", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
+			LOG(4,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> set PROM+D2 latch", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 		}
 		else
 		{
 			state->m_type2_promaddr = data;
-			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> set PROM addr $%02x\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, state->m_type2_promaddr));
+			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> set PROM addr $%02x\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, state->m_type2_promaddr));
 			return;
 		}
 	}
 	else
 	{
-		LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s ", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041 DATA"));
+		LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s ", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041 DATA"));
 	}
 	if (1 == (offset & 1))
 	{
@@ -740,7 +740,7 @@ static WRITE8_HANDLER( decocass_type2_w )
 	upi41_master_w(state->m_mcu, offset & 1, data);
 
 #ifdef MAME_DEBUG
-	decocass_fno(space->machine(), offset, data);
+	decocass_fno(space.machine(), offset, data);
 #endif
 }
 
@@ -764,7 +764,7 @@ static WRITE8_HANDLER( decocass_type2_w )
  ***************************************************************************/
 static READ8_HANDLER( decocass_type3_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	UINT8 data, save;
 
 	if (1 == (offset & 1))
@@ -773,7 +773,7 @@ static READ8_HANDLER( decocass_type3_r )
 		{
 			UINT8 *prom = state->memregion("dongle")->base();
 			data = prom[state->m_type3_ctrs];
-			LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- prom[$%03x]\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, state->m_type3_ctrs));
+			LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- prom[$%03x]\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, state->m_type3_ctrs));
 			if (++state->m_type3_ctrs == 4096)
 				state->m_type3_ctrs = 0;
 		}
@@ -782,12 +782,12 @@ static READ8_HANDLER( decocass_type3_r )
 			if (0 == (offset & E5XX_MASK))
 			{
 				data = upi41_master_r(state->m_mcu, 1);
-				LOG(4,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- 8041 STATUS\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
+				LOG(4,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- 8041 STATUS\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 			}
 			else
 			{
 				data = 0xff;	/* open data bus? */
-				LOG(4,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- open bus\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
+				LOG(4,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- open bus\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 			}
 		}
 	}
@@ -796,7 +796,7 @@ static READ8_HANDLER( decocass_type3_r )
 		if (1 == state->m_type3_pal_19)
 		{
 			save = data = 0xff;    /* open data bus? */
-			LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- open bus", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
+			LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- open bus", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 		}
 		else
 		{
@@ -938,7 +938,7 @@ static READ8_HANDLER( decocass_type3_r )
 						(BIT(save, 7) << 7);
 				}
 				state->m_type3_d0_latch = save & 1;
-				LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x '%c' <- 8041-DATA\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
+				LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x '%c' <- 8041-DATA\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
 			}
 			else
 			{
@@ -952,7 +952,7 @@ static READ8_HANDLER( decocass_type3_r )
 					(BIT(save, 5) << 5) |
 					(BIT(save, 6) << 7) |
 					(BIT(save, 7) << 6);
-				LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
+				LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
 				state->m_type3_d0_latch = save & 1;
 			}
 		}
@@ -963,13 +963,13 @@ static READ8_HANDLER( decocass_type3_r )
 
 static WRITE8_HANDLER( decocass_type3_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	if (1 == (offset & 1))
 	{
 		if (1 == state->m_type3_pal_19)
 		{
 			state->m_type3_ctrs = data << 4;
-			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, "LDCTRS"));
+			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, "LDCTRS"));
 			return;
 		}
 		else
@@ -981,11 +981,11 @@ static WRITE8_HANDLER( decocass_type3_w )
 		if (1 == state->m_type3_pal_19)
 		{
 			/* write nowhere?? */
-			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, "nowhere?"));
+			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, "nowhere?"));
 			return;
 		}
 	}
-	LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
+	LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
 	upi41_master_w(state->m_mcu, offset, data);
 }
 
@@ -1004,7 +1004,7 @@ static WRITE8_HANDLER( decocass_type3_w )
 
 static READ8_HANDLER( decocass_type4_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	UINT8 data;
 
 	if (1 == (offset & 1))
@@ -1012,22 +1012,22 @@ static READ8_HANDLER( decocass_type4_r )
 		if (0 == (offset & E5XX_MASK))
 		{
 			data = upi41_master_r(state->m_mcu, 1);
-			LOG(4,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x <- 8041 STATUS\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
+			LOG(4,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x <- 8041 STATUS\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 		}
 		else
 		{
 			data = 0xff;	/* open data bus? */
-			LOG(4,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x <- open bus\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
+			LOG(4,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x <- open bus\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 		}
 	}
 	else
 	{
 		if (state->m_type4_latch)
 		{
-			UINT8 *prom = space->machine().root_device().memregion("dongle")->base();
+			UINT8 *prom = space.machine().root_device().memregion("dongle")->base();
 
 			data = prom[state->m_type4_ctrs];
-			LOG(3,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- PROM[%04x]\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, (data >= 32) ? data : '.', state->m_type4_ctrs));
+			LOG(3,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- PROM[%04x]\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, (data >= 32) ? data : '.', state->m_type4_ctrs));
 			state->m_type4_ctrs = (state->m_type4_ctrs + 1) & 0x7fff;
 		}
 		else
@@ -1035,12 +1035,12 @@ static READ8_HANDLER( decocass_type4_r )
 			if (0 == (offset & E5XX_MASK))
 			{
 				data = upi41_master_r(state->m_mcu, 0);
-				LOG(3,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
+				LOG(3,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
 			}
 			else
 			{
 				data = 0xff;	/* open data bus? */
-				LOG(4,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x <- open bus\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
+				LOG(4,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x <- open bus\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 			}
 		}
 	}
@@ -1050,13 +1050,13 @@ static READ8_HANDLER( decocass_type4_r )
 
 static WRITE8_HANDLER( decocass_type4_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	if (1 == (offset & 1))
 	{
 		if (1 == state->m_type4_latch)
 		{
 			state->m_type4_ctrs = (state->m_type4_ctrs & 0x00ff) | ((data & 0x7f) << 8);
-			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> CTRS MSB (%04x)\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, state->m_type4_ctrs));
+			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> CTRS MSB (%04x)\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, state->m_type4_ctrs));
 			return;
 		}
 		else
@@ -1070,11 +1070,11 @@ static WRITE8_HANDLER( decocass_type4_w )
 		if (state->m_type4_latch)
 		{
 			state->m_type4_ctrs = (state->m_type4_ctrs & 0xff00) | data;
-			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> CTRS LSB (%04x)\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, state->m_type4_ctrs));
+			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> CTRS LSB (%04x)\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, state->m_type4_ctrs));
 			return;
 		}
 	}
-	LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
+	LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
 	upi41_master_w(state->m_mcu, offset, data);
 }
 
@@ -1089,7 +1089,7 @@ static WRITE8_HANDLER( decocass_type4_w )
 
 static READ8_HANDLER( decocass_type5_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	UINT8 data;
 
 	if (1 == (offset & 1))
@@ -1097,12 +1097,12 @@ static READ8_HANDLER( decocass_type5_r )
 		if (0 == (offset & E5XX_MASK))
 		{
 			data = upi41_master_r(state->m_mcu, 1);
-			LOG(4,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x <- 8041 STATUS\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
+			LOG(4,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x <- 8041 STATUS\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 		}
 		else
 		{
 			data = 0xff;	/* open data bus? */
-			LOG(4,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x <- open bus\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
+			LOG(4,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x <- open bus\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 		}
 	}
 	else
@@ -1110,19 +1110,19 @@ static READ8_HANDLER( decocass_type5_r )
 		if (state->m_type5_latch)
 		{
 			data = 0x55;	/* Only a fixed value? It looks like this is all we need to do */
-			LOG(3,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x '%c' <- fixed value???\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
+			LOG(3,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x '%c' <- fixed value???\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
 		}
 		else
 		{
 			if (0 == (offset & E5XX_MASK))
 			{
 				data = upi41_master_r(state->m_mcu, 0);
-				LOG(3,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
+				LOG(3,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
 			}
 			else
 			{
 				data = 0xff;	/* open data bus? */
-				LOG(4,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x <- open bus\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
+				LOG(4,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x <- open bus\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 			}
 		}
 	}
@@ -1132,12 +1132,12 @@ static READ8_HANDLER( decocass_type5_r )
 
 static WRITE8_HANDLER( decocass_type5_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	if (1 == (offset & 1))
 	{
 		if (1 == state->m_type5_latch)
 		{
-			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, "latch #2??"));
+			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, "latch #2??"));
 			return;
 		}
 		else
@@ -1149,11 +1149,11 @@ static WRITE8_HANDLER( decocass_type5_w )
 		if (state->m_type5_latch)
 		{
 			/* write nowhere?? */
-			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, "nowhere?"));
+			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, "nowhere?"));
 			return;
 		}
 	}
-	LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
+	LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
 	upi41_master_w(state->m_mcu, offset, data);
 }
 
@@ -1167,7 +1167,7 @@ static WRITE8_HANDLER( decocass_type5_w )
 
 static READ8_HANDLER( decocass_nodong_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	UINT8 data;
 
 	if (1 == (offset & 1))
@@ -1175,12 +1175,12 @@ static READ8_HANDLER( decocass_nodong_r )
 		if (0 == (offset & E5XX_MASK))
 		{
 			data = upi41_master_r(state->m_mcu, 1);
-			LOG(4,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- 8041 STATUS\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
+			LOG(4,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- 8041 STATUS\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 		}
 		else
 		{
 			data = 0xff;	/* open data bus? */
-			LOG(4,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- open bus\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
+			LOG(4,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- open bus\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 		}
 	}
 	else
@@ -1188,12 +1188,12 @@ static READ8_HANDLER( decocass_nodong_r )
 		if (0 == (offset & E5XX_MASK))
 		{
 			data = upi41_master_r(state->m_mcu, 0);
-			LOG(3,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
+			LOG(3,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
 		}
 		else
 		{
 			data = 0xff;	/* open data bus? */
-			LOG(4,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- open bus\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
+			LOG(4,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- open bus\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 		}
 	}
 
@@ -1208,7 +1208,7 @@ static READ8_HANDLER( decocass_nodong_r )
 
 READ8_HANDLER( decocass_e5xx_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	UINT8 data;
 
 	/* E5x2-E5x3 and mirrors */
@@ -1227,8 +1227,8 @@ READ8_HANDLER( decocass_e5xx_r )
 			(!tape_is_present(state->m_cassette) << 7);	/* D7 = cassette present */
 
 		LOG(4,("%10s 6502-PC: %04x decocass_e5xx_r(%02x): $%02x <- STATUS (%s%s%s%s%s%s%s%s)\n",
-			space->machine().time().as_string(6),
-			space->device().safe_pcbase(),
+			space.machine().time().as_string(6),
+			space.device().safe_pcbase(),
 			offset, data,
 			data & 0x01 ? "" : "REQ/",
 			data & 0x02 ? "" : " FNO/",
@@ -1251,7 +1251,7 @@ READ8_HANDLER( decocass_e5xx_r )
 
 WRITE8_HANDLER( decocass_e5xx_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	if (state->m_dongle_w)
 	{
 		(*state->m_dongle_w)(space, offset, data);
@@ -1260,15 +1260,15 @@ WRITE8_HANDLER( decocass_e5xx_w )
 
 	if (0 == (offset & E5XX_MASK))
 	{
-		LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
+		LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
 		upi41_master_w(state->m_mcu, offset & 1, data);
 #ifdef MAME_DEBUG
-		decocass_fno(space->machine(), offset, data);
+		decocass_fno(space.machine(), offset, data);
 #endif
 	}
 	else
 	{
-		LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> dongle\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
+		LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> dongle\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 	}
 }
 
@@ -1286,7 +1286,7 @@ WRITE8_HANDLER( decocass_e5xx_w )
 
 WRITE8_HANDLER( decocass_e900_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	state->m_de0091_enable = data & 1;
 	state->membank("bank1")->set_entry(data & 1);
 	/* Perhaps the second row of ROMs is enabled by another bit.
@@ -1298,7 +1298,7 @@ WRITE8_HANDLER( decocass_e900_w )
 
 WRITE8_HANDLER( decocass_de0091_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	/* don't allow writes to the ROMs */
 	if (!state->m_de0091_enable)
 		decocass_charram_w(space, offset, data);
@@ -1719,12 +1719,12 @@ MACHINE_RESET_MEMBER(decocass_state,cflyball)
 
 WRITE8_HANDLER( i8041_p1_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	if (data != state->m_i8041_p1_write_latch)
 	{
 		LOG(4,("%10s 8041-PC: %03x i8041_p1_w: $%02x (%s%s%s%s%s%s%s%s)\n",
-			space->machine().time().as_string(6),
-			space->device().safe_pcbase(),
+			space.machine().time().as_string(6),
+			space.device().safe_pcbase(),
 			data,
 			data & 0x01 ? "" : "DATA-WRT",
 			data & 0x02 ? "" : " DATA-CLK",
@@ -1754,14 +1754,14 @@ WRITE8_HANDLER( i8041_p1_w )
 
 READ8_HANDLER( i8041_p1_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	UINT8 data = state->m_i8041_p1;
 
 	if (data != state->m_i8041_p1_read_latch)
 	{
 		LOG(4,("%10s 8041-PC: %03x i8041_p1_r: $%02x (%s%s%s%s%s%s%s%s)\n",
-			space->machine().time().as_string(6),
-			space->device().safe_pcbase(),
+			space.machine().time().as_string(6),
+			space.device().safe_pcbase(),
 			data,
 			data & 0x01 ? "" : "DATA-WRT",
 			data & 0x02 ? "" : " DATA-CLK",
@@ -1778,12 +1778,12 @@ READ8_HANDLER( i8041_p1_r )
 
 WRITE8_HANDLER( i8041_p2_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	if (data != state->m_i8041_p2_write_latch)
 	{
 		LOG(4,("%10s 8041-PC: %03x i8041_p2_w: $%02x (%s%s%s%s%s%s%s%s)\n",
-			space->machine().time().as_string(6),
-			space->device().safe_pcbase(),
+			space.machine().time().as_string(6),
+			space.device().safe_pcbase(),
 			data,
 			data & 0x01 ? "" : "FNO/",
 			data & 0x02 ? "" : " EOT/",
@@ -1800,7 +1800,7 @@ WRITE8_HANDLER( i8041_p2_w )
 
 READ8_HANDLER( i8041_p2_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	UINT8 data;
 
 	data = (state->m_i8041_p2 & ~0xe0) | tape_get_status_bits(state->m_cassette);
@@ -1808,8 +1808,8 @@ READ8_HANDLER( i8041_p2_r )
 	if (data != state->m_i8041_p2_read_latch)
 	{
 		LOG(4,("%10s 8041-PC: %03x i8041_p2_r: $%02x (%s%s%s%s%s%s%s%s)\n",
-			space->machine().time().as_string(6),
-			space->device().safe_pcbase(),
+			space.machine().time().as_string(6),
+			space.device().safe_pcbase(),
 			data,
 			data & 0x01 ? "" : "FNO/",
 			data & 0x02 ? "" : " EOT/",

@@ -114,8 +114,8 @@ READ8_HANDLER( gorf_speech_r )
 {
 	UINT8 data = offset >> 8;
 #if USE_FAKE_VOTRAX
-	astrocde_state *state = space->machine().driver_data<astrocde_state>();
-	samples_device *samples = space->machine().device<samples_device>("samples");
+	astrocde_state *state = space.machine().driver_data<astrocde_state>();
+	samples_device *samples = space.machine().device<samples_device>("samples");
 	int Phoneme, Intonation;
 	int i = 0;
 	offset &= 0xff;
@@ -172,9 +172,9 @@ READ8_HANDLER( gorf_speech_r )
 		}
 	}
 #else
-	votrax_sc01_device *votrax = space->machine().device<votrax_sc01_device>("votrax");
-	votrax->inflection_w(*space, 0, data >> 6);
-	votrax->write(*space, 0, data);
+	votrax_sc01_device *votrax = space.machine().device<votrax_sc01_device>("votrax");
+	votrax->inflection_w(space, 0, data >> 6);
+	votrax->write(space, 0, data);
 #endif
 
 	/* Note : We should really also use volume in this as well as frequency */

@@ -87,16 +87,16 @@ static READ8_HANDLER( mariner_protection_2_r )
 
 READ8_HANDLER( triplep_pip_r )
 {
-	logerror("PC %04x: triplep read port 2\n",space->device().safe_pc());
-	if (space->device().safe_pc() == 0x015a) return 0xff;
-	else if (space->device().safe_pc() == 0x0886) return 0x05;
+	logerror("PC %04x: triplep read port 2\n",space.device().safe_pc());
+	if (space.device().safe_pc() == 0x015a) return 0xff;
+	else if (space.device().safe_pc() == 0x0886) return 0x05;
 	else return 0;
 }
 
 READ8_HANDLER( triplep_pap_r )
 {
-	logerror("PC %04x: triplep read port 3\n",space->device().safe_pc());
-	if (space->device().safe_pc() == 0x015d) return 0x04;
+	logerror("PC %04x: triplep read port 3\n",space.device().safe_pc());
+	if (space.device().safe_pc() == 0x015d) return 0x04;
 	else return 0;
 }
 
@@ -115,37 +115,37 @@ static void cavelon_banksw(running_machine &machine)
 
 static READ8_HANDLER( cavelon_banksw_r )
 {
-	scramble_state *state = space->machine().driver_data<scramble_state>();
-	cavelon_banksw(space->machine());
+	scramble_state *state = space.machine().driver_data<scramble_state>();
+	cavelon_banksw(space.machine());
 
 	if ((offset >= 0x0100) && (offset <= 0x0103))
-		return state->m_ppi8255_0->read(*space, offset - 0x0100);
+		return state->m_ppi8255_0->read(space, offset - 0x0100);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		return state->m_ppi8255_1->read(*space, offset - 0x0200);
+		return state->m_ppi8255_1->read(space, offset - 0x0200);
 
 	return 0xff;
 }
 
 static WRITE8_HANDLER( cavelon_banksw_w )
 {
-	scramble_state *state = space->machine().driver_data<scramble_state>();
-	cavelon_banksw(space->machine());
+	scramble_state *state = space.machine().driver_data<scramble_state>();
+	cavelon_banksw(space.machine());
 
 	if ((offset >= 0x0100) && (offset <= 0x0103))
-		state->m_ppi8255_0->write(*space, offset - 0x0100, data);
+		state->m_ppi8255_0->write(space, offset - 0x0100, data);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		state->m_ppi8255_1->write(*space, offset - 0x0200, data);
+		state->m_ppi8255_1->write(space, offset - 0x0200, data);
 }
 
 
 READ8_HANDLER( hunchbks_mirror_r )
 {
-	return space->read_byte(0x1000+offset);
+	return space.read_byte(0x1000+offset);
 }
 
 WRITE8_HANDLER( hunchbks_mirror_w )
 {
-	space->write_byte(0x1000+offset,data);
+	space.write_byte(0x1000+offset,data);
 }
 
 

@@ -1290,12 +1290,12 @@ ROM_END
 static void treahunt_decode( running_machine &machine )
 {
 	int A;
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x4000);
 	int data;
 
-	space->set_decrypted_region(0x0000, 0x3fff, decrypt);
+	space.set_decrypted_region(0x0000, 0x3fff, decrypt);
 
 	/* Thanks to Mike Balfour for helping out with the decryption */
 	for (A = 0; A < 0x4000; A++)

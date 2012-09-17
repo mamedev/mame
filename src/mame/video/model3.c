@@ -772,68 +772,68 @@ void real3d_display_list_end(running_machine &machine)
 	//state->m_real3d_display_list = 1;
 }
 
-void real3d_display_list1_dma(address_space *space, UINT32 src, UINT32 dst, int length, int byteswap)
+void real3d_display_list1_dma(address_space &space, UINT32 src, UINT32 dst, int length, int byteswap)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
+	model3_state *state = space.machine().driver_data<model3_state>();
 	int i;
 	int d = (dst & 0xffffff) / 4;
 	for(i=0; i < length; i+=4) {
 		UINT32 w;
 		if (byteswap) {
-			w = BYTE_REVERSE32(space->read_dword(src));
+			w = BYTE_REVERSE32(space.read_dword(src));
 		} else {
-			w = space->read_dword(src);
+			w = space.read_dword(src);
 		}
 		state->m_display_list_ram[d++] = w;
 		src += 4;
 	}
 }
 
-void real3d_display_list2_dma(address_space *space, UINT32 src, UINT32 dst, int length, int byteswap)
+void real3d_display_list2_dma(address_space &space, UINT32 src, UINT32 dst, int length, int byteswap)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
+	model3_state *state = space.machine().driver_data<model3_state>();
 	int i;
 	int d = (dst & 0xffffff) / 4;
 	for(i=0; i < length; i+=4) {
 		UINT32 w;
 		if (byteswap) {
-			w = BYTE_REVERSE32(space->read_dword(src));
+			w = BYTE_REVERSE32(space.read_dword(src));
 		} else {
-			w = space->read_dword(src);
+			w = space.read_dword(src);
 		}
 		state->m_culling_ram[d++] = w;
 		src += 4;
 	}
 }
 
-void real3d_vrom_texture_dma(address_space *space, UINT32 src, UINT32 dst, int length, int byteswap)
+void real3d_vrom_texture_dma(address_space &space, UINT32 src, UINT32 dst, int length, int byteswap)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
+	model3_state *state = space.machine().driver_data<model3_state>();
 	if((dst & 0xff) == 0) {
 
 		UINT32 address, header;
 
 		if (byteswap) {
-			address = BYTE_REVERSE32(space->read_dword((src+0)));
-			header = BYTE_REVERSE32(space->read_dword((src+4)));
+			address = BYTE_REVERSE32(space.read_dword((src+0)));
+			header = BYTE_REVERSE32(space.read_dword((src+4)));
 		} else {
-			address = space->read_dword((src+0));
-			header = space->read_dword((src+4));
+			address = space.read_dword((src+0));
+			header = space.read_dword((src+4));
 		}
-		real3d_upload_texture(space->machine(), header, (UINT32*)&state->m_vrom[address]);
+		real3d_upload_texture(space.machine(), header, (UINT32*)&state->m_vrom[address]);
 	}
 }
 
-void real3d_texture_fifo_dma(address_space *space, UINT32 src, int length, int byteswap)
+void real3d_texture_fifo_dma(address_space &space, UINT32 src, int length, int byteswap)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
+	model3_state *state = space.machine().driver_data<model3_state>();
 	int i;
 	for(i=0; i < length; i+=4) {
 		UINT32 w;
 		if (byteswap) {
-			w = BYTE_REVERSE32(space->read_dword(src));
+			w = BYTE_REVERSE32(space.read_dword(src));
 		} else {
-			w = space->read_dword(src);
+			w = space.read_dword(src);
 		}
 		state->m_texture_fifo[state->m_texture_fifo_pos] = w;
 		state->m_texture_fifo_pos++;
@@ -841,17 +841,17 @@ void real3d_texture_fifo_dma(address_space *space, UINT32 src, int length, int b
 	}
 }
 
-void real3d_polygon_ram_dma(address_space *space, UINT32 src, UINT32 dst, int length, int byteswap)
+void real3d_polygon_ram_dma(address_space &space, UINT32 src, UINT32 dst, int length, int byteswap)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
+	model3_state *state = space.machine().driver_data<model3_state>();
 	int i;
 	int d = (dst & 0xffffff) / 4;
 	for(i=0; i < length; i+=4) {
 		UINT32 w;
 		if (byteswap) {
-			w = BYTE_REVERSE32(space->read_dword(src));
+			w = BYTE_REVERSE32(space.read_dword(src));
 		} else {
-			w = space->read_dword(src);
+			w = space.read_dword(src);
 		}
 		state->m_polygon_ram[d++] = w;
 		src += 4;

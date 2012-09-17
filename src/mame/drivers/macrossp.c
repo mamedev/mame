@@ -579,7 +579,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int irq)
 {
-	// macrossp_state *state = space->machine().driver_data<macrossp_state>();
+	// macrossp_state *state = space.machine().driver_data<macrossp_state>();
 	logerror("ES5506 irq %d\n", irq);
 
 	/* IRQ lines 1 & 4 on the sound 68000 are definitely triggered by the ES5506,

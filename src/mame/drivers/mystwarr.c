@@ -207,7 +207,7 @@ READ16_MEMBER(mystwarr_state::sound_status_msb_r)
 
 WRITE16_MEMBER(mystwarr_state::irq_ack_w)
 {
-	K056832_b_word_w(&space, offset, data, mem_mask);
+	K056832_b_word_w(space, offset, data, mem_mask);
 
 	if (offset == 3 && ACCESSING_BITS_0_7)
 	{
@@ -227,7 +227,7 @@ READ16_MEMBER(mystwarr_state::K053247_scattered_word_r)
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
-		return K053247_word_r(&space,offset,mem_mask);
+		return K053247_word_r(space,offset,mem_mask);
 	}
 }
 
@@ -242,7 +242,7 @@ WRITE16_MEMBER(mystwarr_state::K053247_scattered_word_w)
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
 
-		K053247_word_w(&space,offset,data,mem_mask);
+		K053247_word_w(space,offset,data,mem_mask);
 	}
 }
 
@@ -377,7 +377,7 @@ READ16_MEMBER(mystwarr_state::K053247_martchmp_word_r)
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x1fe0) >> 2);
-		return K053247_word_r(&space,offset,mem_mask);
+		return K053247_word_r(space,offset,mem_mask);
 	}
 }
 
@@ -391,7 +391,7 @@ WRITE16_MEMBER(mystwarr_state::K053247_martchmp_word_w)
 	{
 		offset = (offset & 0x0007) | ((offset & 0x1fe0) >> 2);
 
-		K053247_word_w(&space,offset,data,mem_mask);
+		K053247_word_w(space,offset,data,mem_mask);
 	}
 }
 

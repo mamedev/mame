@@ -1031,7 +1031,7 @@ static void irq_ym(device_t *device, int irq)
 
 READ16_MEMBER ( segas24_state::sys16_io_r )
 {
-	//  logerror("IO read %02x (%s:%x)\n", offset, space->device().tag(), space->device().safe_pc());
+	//  logerror("IO read %02x (%s:%x)\n", offset, space.device().tag(), space.device().safe_pc());
 	if(offset < 8)
 		return (this->*io_r)(offset);
 	else if (offset < 0x20) {

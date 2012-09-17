@@ -246,7 +246,7 @@ public:
 
 void omegrace_state::machine_reset()
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/* Omega Race expects the vector processor to be ready. */
 	avgdvg_reset_w(space, 0, 0);
 }
@@ -261,7 +261,7 @@ void omegrace_state::machine_reset()
 
 READ8_MEMBER(omegrace_state::omegrace_vg_go_r)
 {
-	avgdvg_go_w(&space,0,0);
+	avgdvg_go_w(space,0,0);
 	return 0;
 }
 

@@ -11,21 +11,21 @@
 
 void skydiver_state::machine_reset()
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* reset all latches */
-	skydiver_start_lamp_1_w(*space, 0, 0);
-	skydiver_start_lamp_2_w(*space, 0, 0);
-	skydiver_lamp_s_w(*space, 0, 0);
-	skydiver_lamp_k_w(*space, 0, 0);
-	skydiver_lamp_y_w(*space, 0, 0);
-	skydiver_lamp_d_w(*space, 0, 0);
+	skydiver_start_lamp_1_w(space, 0, 0);
+	skydiver_start_lamp_2_w(space, 0, 0);
+	skydiver_lamp_s_w(space, 0, 0);
+	skydiver_lamp_k_w(space, 0, 0);
+	skydiver_lamp_y_w(space, 0, 0);
+	skydiver_lamp_d_w(space, 0, 0);
 	output_set_value("lampi", 0);
 	output_set_value("lampv", 0);
 	output_set_value("lampe", 0);
 	output_set_value("lampr", 0);
-	skydiver_width_w(*space, 0, 0);
-	skydiver_coin_lockout_w(*space, 0, 0);
+	skydiver_width_w(space, 0, 0);
+	skydiver_coin_lockout_w(space, 0, 0);
 }
 
 

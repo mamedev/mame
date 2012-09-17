@@ -1405,7 +1405,7 @@ DRIVER_INIT_MEMBER(pc_state,mc1502)
 	mess_init_pc_common(machine(), 0, NULL, pc_set_irq_line);
 }
 
-static READ8_HANDLER( input_port_0_r ) { return space->machine().root_device().ioport("IN0")->read(); }
+static READ8_HANDLER( input_port_0_r ) { return space.machine().root_device().ioport("IN0")->read(); }
 
 DRIVER_INIT_MEMBER(pc_state,pc1640)
 {
@@ -1422,7 +1422,7 @@ DRIVER_INIT_MEMBER(pc_state,pc_vga)
 	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 
 	pc_vga_init(machine(), ::input_port_0_r, NULL);
-	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
+	pc_vga_io_init(machine(), *machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, *machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
 static IRQ_CALLBACK(pc_irq_callback)

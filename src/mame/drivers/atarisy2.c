@@ -341,11 +341,11 @@ WRITE16_MEMBER(atarisy2_state::bankselect_w)
 
 static void bankselect_postload(running_machine &machine)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	atarisy2_state *state = machine.driver_data<atarisy2_state>();
 
-	state->bankselect_w(*space, 0, state->m_bankselect[0], 0xffff);
-	state->bankselect_w(*space, 1, state->m_bankselect[1], 0xffff);
+	state->bankselect_w(space, 0, state->m_bankselect[0], 0xffff);
+	state->bankselect_w(space, 1, state->m_bankselect[1], 0xffff);
 }
 
 
@@ -725,7 +725,7 @@ READ16_MEMBER(atarisy2_state::sound_r)
 	atarigen_update_interrupts(machine());
 
 	/* handle it normally otherwise */
-	return atarigen_sound_r(&space,offset,0xffff);
+	return atarigen_sound_r(space,offset,0xffff);
 }
 
 
@@ -737,7 +737,7 @@ WRITE8_MEMBER(atarisy2_state::sound_6502_w)
 	atarigen_update_interrupts(machine());
 
 	/* handle it normally otherwise */
-	atarigen_6502_sound_w(&space, offset, data);
+	atarigen_6502_sound_w(space, offset, data);
 }
 
 
@@ -749,7 +749,7 @@ READ8_MEMBER(atarisy2_state::sound_6502_r)
 	atarigen_update_interrupts(machine());
 
 	/* handle it normally otherwise */
-	return atarigen_6502_sound_r(&space, offset);
+	return atarigen_6502_sound_r(space, offset);
 }
 
 

@@ -57,7 +57,7 @@ isa8_vga_device::isa8_vga_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-static READ8_HANDLER( input_port_0_r ) { return 0xff; } //return space->machine().root_device().ioport("IN0")->read(); }
+static READ8_HANDLER( input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
 
 void isa8_vga_device::device_start()
 {

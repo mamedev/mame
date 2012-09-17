@@ -301,9 +301,9 @@ static void s3c24xx_lcd_dma_init( device_t *device)
 static UINT32 s3c24xx_lcd_dma_read( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	address_space* space = device->machine().device( "maincpu")->memory().space( AS_PROGRAM);
+	address_space& space = *device->machine().device( "maincpu")->memory().space( AS_PROGRAM);
 	UINT8 *vram, data[4];
-	vram = (UINT8 *)space->get_read_ptr( s3c24xx->lcd.vramaddr_cur);
+	vram = (UINT8 *)space.get_read_ptr( s3c24xx->lcd.vramaddr_cur);
 	for (int i = 0; i < 2; i++)
 	{
 		data[i*2+0] = *vram++;
@@ -314,7 +314,7 @@ static UINT32 s3c24xx_lcd_dma_read( device_t *device)
 		{
 			s3c24xx->lcd.vramaddr_cur += s3c24xx->lcd.offsize << 1;
 			s3c24xx->lcd.pagewidth_cur = 0;
-			vram = (UINT8 *)space->get_read_ptr( s3c24xx->lcd.vramaddr_cur);
+			vram = (UINT8 *)space.get_read_ptr( s3c24xx->lcd.vramaddr_cur);
 		}
 	}
 	if (s3c24xx->lcd.hwswp == 0)
@@ -345,9 +345,9 @@ static UINT32 s3c24xx_lcd_dma_read( device_t *device)
 static UINT32 s3c24xx_lcd_dma_read( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	address_space* space = device->machine().device( "maincpu")->memory().space( AS_PROGRAM);
+	address_space& space = *device->machine().device( "maincpu")->memory().space( AS_PROGRAM);
 	UINT8 *vram, data[4];
-	vram = (UINT8 *)space->get_read_ptr( s3c24xx->lcd.vramaddr_cur);
+	vram = (UINT8 *)space.get_read_ptr( s3c24xx->lcd.vramaddr_cur);
 	for (int i = 0; i < 2; i++)
 	{
 		if (s3c24xx->lcd.hwswp == 0)
@@ -398,7 +398,7 @@ static UINT32 s3c24xx_lcd_dma_read( device_t *device)
 		{
 			s3c24xx->lcd.vramaddr_cur += s3c24xx->lcd.offsize << 1;
 			s3c24xx->lcd.pagewidth_cur = 0;
-			vram = (UINT8 *)space->get_read_ptr( s3c24xx->lcd.vramaddr_cur);
+			vram = (UINT8 *)space.get_read_ptr( s3c24xx->lcd.vramaddr_cur);
 		}
 		else
 		{
@@ -1611,7 +1611,7 @@ static void s3c24xx_dma_trigger( device_t *device, int ch)
 	s3c24xx_t *s3c24xx = get_token( device);
 	s3c24xx_dma_regs_t *regs = &s3c24xx->dma[ch].regs;
 	UINT32 curr_tc, curr_src, curr_dst;
-	address_space *space = device->machine().device( "maincpu")->memory().space( AS_PROGRAM);
+	address_space &space = *device->machine().device( "maincpu")->memory().space( AS_PROGRAM);
 	int dsz, inc_src, inc_dst, servmode, tsz;
 	const UINT32 ch_int[] = { S3C24XX_INT_DMA0, S3C24XX_INT_DMA1, S3C24XX_INT_DMA2, S3C24XX_INT_DMA3};
 	verboselog( device->machine(), 5, "DMA %d trigger\n", ch);
@@ -1636,9 +1636,9 @@ static void s3c24xx_dma_trigger( device_t *device, int ch)
 		{
 			switch (dsz)
 			{
-				case 0 : space->write_byte( curr_dst, space->read_byte( curr_src)); break;
-				case 1 : space->write_word( curr_dst, space->read_word( curr_src)); break;
-				case 2 : space->write_dword( curr_dst, space->read_dword( curr_src)); break;
+				case 0 : space.write_byte( curr_dst, space.read_byte( curr_src)); break;
+				case 1 : space.write_word( curr_dst, space.read_word( curr_src)); break;
+				case 2 : space.write_dword( curr_dst, space.read_dword( curr_src)); break;
 			}
 			if (inc_src == 0) curr_src += (1 << dsz);
 			if (inc_dst == 0) curr_dst += (1 << dsz);
@@ -3701,9 +3701,9 @@ static DEVICE_START( s3c24xx )
 	int om1 = iface_core_pin_r( device, S3C24XX_CORE_PIN_OM1);
 	if ((om0 == 0) && (om1 == 0))
 	{
-		address_space *space = device->machine().device( "maincpu")->memory().space( AS_PROGRAM);
-		space->install_ram( 0x00000000, 0x00000fff, s3c24xx->steppingstone);
-		space->install_ram( 0x40000000, 0x40000fff, s3c24xx->steppingstone);
+		address_space &space = *device->machine().device( "maincpu")->memory().space( AS_PROGRAM);
+		space.install_ram( 0x00000000, 0x00000fff, s3c24xx->steppingstone);
+		space.install_ram( 0x40000000, 0x40000fff, s3c24xx->steppingstone);
 	}
 	#endif
 }

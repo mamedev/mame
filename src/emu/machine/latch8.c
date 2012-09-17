@@ -81,7 +81,7 @@ READ8_DEVICE_HANDLER( latch8_r )
 	if (latch8->has_read)
 	{
 		/*  temporary hack until all relevant systems are devices */
-		address_space *space = &device->machine().driver_data()->generic_space();
+		address_space &space = device->machine().driver_data()->generic_space();
 		int i;
 		for (i=0; i<8; i++)
 		{

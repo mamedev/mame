@@ -536,7 +536,7 @@ static CPU_SET_INFO( h8s_2394 )
 
 static READ16_HANDLER( h8_itu_r )
 {
-	h83xx_state *h8 = get_safe_token(&space->device());
+	h83xx_state *h8 = get_safe_token(&space.device());
 
 	if (mem_mask == 0xffff)
 	{
@@ -557,7 +557,7 @@ static READ16_HANDLER( h8_itu_r )
 
 static WRITE16_HANDLER( h8_itu_w )
 {
-	h83xx_state *h8 = get_safe_token(&space->device());
+	h83xx_state *h8 = get_safe_token(&space.device());
 
 	if (mem_mask == 0xffff)
 	{
@@ -577,7 +577,7 @@ static WRITE16_HANDLER( h8_itu_w )
 
 static READ16_HANDLER( h8_3007_itu_r )
 {
-	h83xx_state *h8 = get_safe_token(&space->device());
+	h83xx_state *h8 = get_safe_token(&space.device());
 
 	if (mem_mask == 0xffff)
 	{
@@ -597,7 +597,7 @@ static READ16_HANDLER( h8_3007_itu_r )
 }
 static WRITE16_HANDLER( h8_3007_itu_w )
 {
-	h83xx_state *h8 = get_safe_token(&space->device());
+	h83xx_state *h8 = get_safe_token(&space.device());
 
 	if (mem_mask == 0xffff)
 	{
@@ -617,7 +617,7 @@ static WRITE16_HANDLER( h8_3007_itu_w )
 
 static READ16_HANDLER( h8_3007_itu1_r )
 {
-	h83xx_state *h8 = get_safe_token(&space->device());
+	h83xx_state *h8 = get_safe_token(&space.device());
 
 	if (mem_mask == 0xffff)
 	{
@@ -637,7 +637,7 @@ static READ16_HANDLER( h8_3007_itu1_r )
 }
 static WRITE16_HANDLER( h8_3007_itu1_w )
 {
-	h83xx_state *h8 = get_safe_token(&space->device());
+	h83xx_state *h8 = get_safe_token(&space.device());
 
 	if (mem_mask == 0xffff)
 	{
@@ -657,7 +657,7 @@ static WRITE16_HANDLER( h8_3007_itu1_w )
 
 static WRITE16_HANDLER( h8s2241_per_regs_w )
 {
-	h83xx_state *h8 = get_safe_token(&space->device());
+	h83xx_state *h8 = get_safe_token(&space.device());
 	if (mem_mask == 0xffff)
 	{
 		h8s2241_per_regs_write_16(h8, (offset << 1), data);
@@ -674,7 +674,7 @@ static WRITE16_HANDLER( h8s2241_per_regs_w )
 
 static WRITE16_HANDLER( h8s2246_per_regs_w )
 {
-	h83xx_state *h8 = get_safe_token(&space->device());
+	h83xx_state *h8 = get_safe_token(&space.device());
 	if (mem_mask == 0xffff)
 	{
 		h8s2246_per_regs_write_16(h8, (offset << 1), data);
@@ -691,7 +691,7 @@ static WRITE16_HANDLER( h8s2246_per_regs_w )
 
 static WRITE16_HANDLER( h8s2323_per_regs_w )
 {
-	h83xx_state *h8 = get_safe_token(&space->device());
+	h83xx_state *h8 = get_safe_token(&space.device());
 	if (mem_mask == 0xffff)
 	{
 		h8s2323_per_regs_write_16(h8, (offset << 1), data);
@@ -708,7 +708,7 @@ static WRITE16_HANDLER( h8s2323_per_regs_w )
 
 static WRITE16_HANDLER( h8s2394_per_regs_w )
 {
-	h83xx_state *h8 = get_safe_token(&space->device());
+	h83xx_state *h8 = get_safe_token(&space.device());
 	if (mem_mask == 0xffff)
 	{
 		h8s2394_per_regs_write_16(h8, (offset << 1), data);
@@ -725,7 +725,7 @@ static WRITE16_HANDLER( h8s2394_per_regs_w )
 
 static READ16_HANDLER( h8s2241_per_regs_r )
 {
-	h83xx_state *h8 = get_safe_token(&space->device());
+	h83xx_state *h8 = get_safe_token(&space.device());
 	if (mem_mask == 0xffff)
 	{
 		return h8s2241_per_regs_read_16(h8, (offset << 1));
@@ -743,7 +743,7 @@ static READ16_HANDLER( h8s2241_per_regs_r )
 
 static READ16_HANDLER( h8s2246_per_regs_r )
 {
-	h83xx_state *h8 = get_safe_token(&space->device());
+	h83xx_state *h8 = get_safe_token(&space.device());
 	if (mem_mask == 0xffff)
 	{
 		return h8s2246_per_regs_read_16(h8, (offset << 1));
@@ -761,7 +761,7 @@ static READ16_HANDLER( h8s2246_per_regs_r )
 
 static READ16_HANDLER( h8s2323_per_regs_r )
 {
-	h83xx_state *h8 = get_safe_token(&space->device());
+	h83xx_state *h8 = get_safe_token(&space.device());
 	if (mem_mask == 0xffff)
 	{
 		return h8s2323_per_regs_read_16(h8, (offset << 1));
@@ -779,7 +779,7 @@ static READ16_HANDLER( h8s2323_per_regs_r )
 
 static READ16_HANDLER( h8s2394_per_regs_r )
 {
-	h83xx_state *h8 = get_safe_token(&space->device());
+	h83xx_state *h8 = get_safe_token(&space.device());
 	if (mem_mask == 0xffff)
 	{
 		return h8s2394_per_regs_read_16(h8, (offset << 1));

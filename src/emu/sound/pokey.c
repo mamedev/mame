@@ -1296,7 +1296,7 @@ READ8_HANDLER( quad_pokeyn_r )
 	int pokey_num = (offset >> 3) & ~0x04;
 	int control = (offset & 0x20) >> 2;
 	int pokey_reg = (offset % 8) | control;
-	pokey_device *pokey = space->machine().device<pokey_device>(devname[pokey_num]);
+	pokey_device *pokey = space.machine().device<pokey_device>(devname[pokey_num]);
 
 	return pokey->read(pokey_reg);
 }
@@ -1307,7 +1307,7 @@ WRITE8_HANDLER( quad_pokeyn_w )
     int pokey_num = (offset >> 3) & ~0x04;
     int control = (offset & 0x20) >> 2;
     int pokey_reg = (offset % 8) | control;
-	pokey_device *pokey = space->machine().device<pokey_device>(devname[pokey_num]);
+	pokey_device *pokey = space.machine().device<pokey_device>(devname[pokey_num]);
 
     pokey->write(pokey_reg, data);
 }

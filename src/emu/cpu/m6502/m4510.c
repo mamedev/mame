@@ -346,7 +346,7 @@ UINT8 m4510_get_port(legacy_cpu_device *device)
 static READ8_HANDLER( m4510_read_0000 )
 {
 	UINT8 result = 0x00;
-	m4510_Regs *cpustate = get_safe_token(&space->device());
+	m4510_Regs *cpustate = get_safe_token(&space.device());
 
 	switch(offset)
 	{
@@ -363,7 +363,7 @@ static READ8_HANDLER( m4510_read_0000 )
 
 static WRITE8_HANDLER( m4510_write_0000 )
 {
-	m4510_Regs *cpustate = get_safe_token(&space->device());
+	m4510_Regs *cpustate = get_safe_token(&space.device());
 
 	switch(offset)
 	{
@@ -375,7 +375,7 @@ static WRITE8_HANDLER( m4510_write_0000 )
 			break;
 	}
 
-	cpustate->out_port_func(0, m4510_get_port(downcast<legacy_cpu_device *>(&space->device())));
+	cpustate->out_port_func(0, m4510_get_port(downcast<legacy_cpu_device *>(&space.device())));
 }
 
 static ADDRESS_MAP_START(m4510_mem, AS_PROGRAM, 8, legacy_cpu_device)

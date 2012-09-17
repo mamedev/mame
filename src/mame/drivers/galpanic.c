@@ -207,7 +207,7 @@ WRITE16_MEMBER(galpanic_state::galpanic_bgvideoram_mirror_w)
 	for(i = 0; i < 8; i++)
 	{
 		// or offset + i * 0x2000 ?
-		galpanic_bgvideoram_w(&space, offset * 8 + i, data, mem_mask);
+		galpanic_bgvideoram_w(space, offset * 8 + i, data, mem_mask);
 	}
 }
 

@@ -2128,14 +2128,14 @@ static void p3d_flush(namcos23_state *state, const UINT16 *p, int size)
 	render.count[render.cur]++;
 }
 
-static void p3d_dma(address_space *space, UINT32 adr, UINT32 size)
+static void p3d_dma(address_space &space, UINT32 adr, UINT32 size)
 {
-	namcos23_state *state = space->machine().driver_data<namcos23_state>();
+	namcos23_state *state = space.machine().driver_data<namcos23_state>();
 	UINT16 buffer[256];
 	adr &= 0x1fffffff;
 	int pos = 0;
 	while(pos < size) {
-		UINT16 h = space->read_word(adr+pos);
+		UINT16 h = space.read_word(adr+pos);
 
 		pos += 2;
 
@@ -2155,7 +2155,7 @@ static void p3d_dma(address_space *space, UINT32 adr, UINT32 size)
 		}
 
 		for(int i=0; i < psize; i++) {
-			buffer[i] = space->read_word(adr+pos);
+			buffer[i] = space.read_word(adr+pos);
 			pos += 2;
 		}
 
@@ -2199,7 +2199,7 @@ WRITE32_MEMBER(namcos23_state::p3d_w)
 	case 0x8: COMBINE_DATA(&m_p3d_size); return;
 	case 0x9:
 		if(data & 1)
-			p3d_dma(&space, m_p3d_address, m_p3d_size);
+			p3d_dma(space, m_p3d_address, m_p3d_size);
 		return;
 	case 0x17:
 		machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ1, CLEAR_LINE);

@@ -109,17 +109,17 @@ static void coolpool_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int s
  *
  *************************************/
 
-static void coolpool_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
+static void coolpool_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
-	coolpool_state *state = space->machine().driver_data<coolpool_state>();
+	coolpool_state *state = space.machine().driver_data<coolpool_state>();
 
 	memcpy(shiftreg, &state->m_vram_base[TOWORD(address) & ~TOWORD(0xfff)], TOBYTE(0x1000));
 }
 
 
-static void coolpool_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
+static void coolpool_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
-	coolpool_state *state = space->machine().driver_data<coolpool_state>();
+	coolpool_state *state = space.machine().driver_data<coolpool_state>();
 
 	memcpy(&state->m_vram_base[TOWORD(address) & ~TOWORD(0xfff)], shiftreg, TOBYTE(0x1000));
 }
@@ -308,9 +308,9 @@ static int amerdart_trackball_dec(int data)
 	return data;
 }
 
-static int amerdart_trackball_direction(address_space *space, int num, int data)
+static int amerdart_trackball_direction(address_space &space, int num, int data)
 {
-	coolpool_state *state = space->machine().driver_data<coolpool_state>();
+	coolpool_state *state = space.machine().driver_data<coolpool_state>();
 
 	UINT16 result_x = (data & 0x0c) >> 2;
 	UINT16 result_y = (data & 0x03) >> 0;
@@ -415,10 +415,10 @@ READ16_MEMBER(coolpool_state::amerdart_trackball_r)
 	m_dy[2] = (INT8)(m_newy[2] - m_oldy[2]);
 
 	/* Determine Trackball 1 direction state */
-	m_result = (m_result & 0xf0ff) | (amerdart_trackball_direction(&space, 1, ((m_result >>  8) & 0xf)) <<  8);
+	m_result = (m_result & 0xf0ff) | (amerdart_trackball_direction(space, 1, ((m_result >>  8) & 0xf)) <<  8);
 
 	/* Determine Trackball 2 direction state */
-	m_result = (m_result & 0x0fff) | (amerdart_trackball_direction(&space, 2, ((m_result >> 12) & 0xf)) << 12);
+	m_result = (m_result & 0x0fff) | (amerdart_trackball_direction(space, 2, ((m_result >> 12) & 0xf)) << 12);
 
 
 //  logerror("%08X:read port 6 (X=%02X Y=%02X oldX=%02X oldY=%02X oldRes=%04X Res=%04X)\n", space.device().safe_pc(), m_newx, m_newy, m_oldx, m_oldy, m_lastresult, m_result);

@@ -287,12 +287,12 @@ static SCREEN_UPDATE_RGB32( supertnk )
 
 void supertnk_state::machine_reset()
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	supertnk_bankswitch_0_w(*space, 0, 0);
-	supertnk_bankswitch_1_w(*space, 0, 0);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	supertnk_bankswitch_0_w(space, 0, 0);
+	supertnk_bankswitch_1_w(space, 0, 0);
 
-	supertnk_bitplane_select_0_w(*space, 0, 0);
-	supertnk_bitplane_select_1_w(*space, 0, 0);
+	supertnk_bitplane_select_0_w(space, 0, 0);
+	supertnk_bitplane_select_1_w(space, 0, 0);
 }
 
 

@@ -437,19 +437,19 @@ static SOUND_START( mario )
 static SOUND_RESET( mario )
 {
 	mario_state	*state = machine.driver_data<mario_state>();
-	address_space *space = machine.device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("audiocpu")->memory().space(AS_PROGRAM);
 
 #if USE_8039
     set_ea(machine, 1);
 #endif
 
     /* FIXME: convert to latch8 */
-	state->soundlatch_clear_byte_w(*space, 0, 0);
-	state->soundlatch2_clear_byte_w(*space, 0, 0);
-	state->soundlatch3_clear_byte_w(*space, 0, 0);
-	state->soundlatch4_clear_byte_w(*space, 0, 0);
-	state->I8035_P1_W(*space, 0x00); /* Input port */
-	I8035_P2_W(*space, 0xff); /* Port is in high impedance state after reset */
+	state->soundlatch_clear_byte_w(space, 0, 0);
+	state->soundlatch2_clear_byte_w(space, 0, 0);
+	state->soundlatch3_clear_byte_w(space, 0, 0);
+	state->soundlatch4_clear_byte_w(space, 0, 0);
+	state->I8035_P1_W(space, 0x00); /* Input port */
+	I8035_P2_W(space, 0xff); /* Port is in high impedance state after reset */
 
 	state->m_last = 0;
 }

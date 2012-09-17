@@ -155,13 +155,13 @@ SNAPSHOT_LOAD( galaxy )
 
 DRIVER_INIT_MEMBER(galaxy_state,galaxy)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	space->install_readwrite_bank( 0x2800, 0x2800 + machine().device<ram_device>(RAM_TAG)->size() - 1, "bank1");
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	space.install_readwrite_bank( 0x2800, 0x2800 + machine().device<ram_device>(RAM_TAG)->size() - 1, "bank1");
 	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 
 	if (machine().device<ram_device>(RAM_TAG)->size() < (6 + 48) * 1024)
 	{
-		space->nop_readwrite( 0x2800 + machine().device<ram_device>(RAM_TAG)->size(), 0xffff);
+		space.nop_readwrite( 0x2800 + machine().device<ram_device>(RAM_TAG)->size(), 0xffff);
 	}
 }
 
@@ -171,15 +171,15 @@ DRIVER_INIT_MEMBER(galaxy_state,galaxy)
 
 MACHINE_RESET_MEMBER(galaxy_state,galaxy)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* ROM 2 enable/disable */
 	if (machine().root_device().ioport("ROM2")->read()) {
-		space->install_read_bank(0x1000, 0x1fff, "bank10");
+		space.install_read_bank(0x1000, 0x1fff, "bank10");
 	} else {
-		space->nop_read(0x1000, 0x1fff);
+		space.nop_read(0x1000, 0x1fff);
 	}
-	space->nop_write(0x1000, 0x1fff);
+	space.nop_write(0x1000, 0x1fff);
 
 	if (machine().root_device().ioport("ROM2")->read())
 		membank("bank10")->set_base(machine().root_device().memregion("maincpu")->base() + 0x1000);
@@ -196,7 +196,7 @@ DRIVER_INIT_MEMBER(galaxy_state,galaxyp)
 MACHINE_RESET_MEMBER(galaxy_state,galaxyp)
 {
 	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(galaxy_irq_callback);
 
@@ -205,8 +205,8 @@ MACHINE_RESET_MEMBER(galaxy_state,galaxyp)
 	ROM[0x03fa] = 0x00;
 	ROM[0x03fb] = 0xe0;
 
-	space->install_read_bank(0xe000, 0xefff, "bank11");
-	space->nop_write(0xe000, 0xefff);
+	space.install_read_bank(0xe000, 0xefff, "bank11");
+	space.nop_write(0xe000, 0xefff);
 	membank("bank11")->set_base(memregion("maincpu")->base() + 0xe000);
 	m_interrupts_enabled = TRUE;
 }

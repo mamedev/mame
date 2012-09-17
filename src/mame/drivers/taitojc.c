@@ -569,9 +569,9 @@ WRITE32_MEMBER(taitojc_state::dsp_shared_w)
 
 
 
-static UINT8 mcu_comm_reg_r(address_space *space, int reg)
+static UINT8 mcu_comm_reg_r(address_space &space, int reg)
 {
-	taitojc_state *state = space->machine().driver_data<taitojc_state>();
+	taitojc_state *state = space.machine().driver_data<taitojc_state>();
 	UINT8 r = 0;
 
 	switch (reg)
@@ -588,7 +588,7 @@ static UINT8 mcu_comm_reg_r(address_space *space, int reg)
 		}
 		default:
 		{
-			//mame_printf_debug("hc11_reg_r: %02X at %08X\n", reg, space->device().safe_pc());
+			//mame_printf_debug("hc11_reg_r: %02X at %08X\n", reg, space.device().safe_pc());
 			break;
 		}
 	}
@@ -596,9 +596,9 @@ static UINT8 mcu_comm_reg_r(address_space *space, int reg)
 	return r;
 }
 
-static void mcu_comm_reg_w(address_space *space, int reg, UINT8 data)
+static void mcu_comm_reg_w(address_space &space, int reg, UINT8 data)
 {
-	taitojc_state *state = space->machine().driver_data<taitojc_state>();
+	taitojc_state *state = space.machine().driver_data<taitojc_state>();
 
 	switch (reg)
 	{
@@ -615,7 +615,7 @@ static void mcu_comm_reg_w(address_space *space, int reg, UINT8 data)
 		}
 		default:
 		{
-			//mame_printf_debug("hc11_reg_w: %02X, %02X at %08X\n", reg, data, space->device().safe_pc());
+			//mame_printf_debug("hc11_reg_w: %02X, %02X at %08X\n", reg, data, space.device().safe_pc());
 			break;
 		}
 	}
@@ -628,19 +628,19 @@ READ32_MEMBER(taitojc_state::mcu_comm_r)
 
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= mcu_comm_reg_r(&space, reg + 0) << 24;
+		r |= mcu_comm_reg_r(space, reg + 0) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= mcu_comm_reg_r(&space, reg + 1) << 16;
+		r |= mcu_comm_reg_r(space, reg + 1) << 16;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= mcu_comm_reg_r(&space, reg + 2) << 8;
+		r |= mcu_comm_reg_r(space, reg + 2) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= mcu_comm_reg_r(&space, reg + 3) << 0;
+		r |= mcu_comm_reg_r(space, reg + 3) << 0;
 	}
 
 	return r;
@@ -652,19 +652,19 @@ WRITE32_MEMBER(taitojc_state::mcu_comm_w)
 
 	if (ACCESSING_BITS_24_31)
 	{
-		mcu_comm_reg_w(&space, reg + 0, (data >> 24) & 0xff);
+		mcu_comm_reg_w(space, reg + 0, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		mcu_comm_reg_w(&space, reg + 1, (data >> 16) & 0xff);
+		mcu_comm_reg_w(space, reg + 1, (data >> 16) & 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		mcu_comm_reg_w(&space, reg + 2, (data >> 8) & 0xff);
+		mcu_comm_reg_w(space, reg + 2, (data >> 8) & 0xff);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		mcu_comm_reg_w(&space, reg + 3, (data >> 0) & 0xff);
+		mcu_comm_reg_w(space, reg + 3, (data >> 0) & 0xff);
 	}
 }
 

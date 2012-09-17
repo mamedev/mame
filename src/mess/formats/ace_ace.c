@@ -27,7 +27,7 @@ SNAPSHOT_LOAD( ace )
 {
 	cpu_device *cpu = image.device().machine().firstcpu;
 	UINT8 *RAM = image.device().machine().root_device().memregion(cpu->tag())->base();
-	address_space *space = cpu->space(AS_PROGRAM);
+	address_space &space = *cpu->space(AS_PROGRAM);
 	unsigned char ace_repeat, ace_byte, loop;
 	int done=0, ace_index=0x2000;
 
@@ -108,7 +108,7 @@ SNAPSHOT_LOAD( ace )
 
 	/* Copy data to the address space */
 	for (ace_index = 0x2000; ace_index < 0x8000; ace_index++)
-		space->write_byte(ace_index, RAM[ace_index]);
+		space.write_byte(ace_index, RAM[ace_index]);
 
 	return IMAGE_INIT_PASS;
 }

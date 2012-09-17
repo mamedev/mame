@@ -44,4 +44,4 @@ SCREEN_UPDATE_IND16( pastelg );
 
 
 
-int pastelg_blitter_src_addr_r(address_space *space);
+int pastelg_blitter_src_addr_r(address_space &space);

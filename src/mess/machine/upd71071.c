@@ -123,7 +123,7 @@ static TIMER_CALLBACK(dma_transfer_timer)
 	// single byte or word transfer
 	device_t* device = (device_t*)ptr;
 	upd71071_t* dmac = get_safe_token(device);
-	address_space* space = device->machine().device(dmac->intf->cputag)->memory().space(AS_PROGRAM);
+	address_space& space = *device->machine().device(dmac->intf->cputag)->memory().space(AS_PROGRAM);
 	int channel = param;
 	UINT16 data = 0;  // data to transfer
 
@@ -134,7 +134,7 @@ static TIMER_CALLBACK(dma_transfer_timer)
 		case 0x04:  // I/O -> memory
 			if(dmac->intf->dma_read[channel])
 				data = dmac->intf->dma_read[channel](device->machine());
-			space->write_byte(dmac->reg.address_current[channel],data & 0xff);
+			space.write_byte(dmac->reg.address_current[channel],data & 0xff);
 			if(dmac->reg.mode_control[channel] & 0x20)  // Address direction
 				dmac->reg.address_current[channel]--;
 			else
@@ -152,7 +152,7 @@ static TIMER_CALLBACK(dma_transfer_timer)
 				dmac->reg.count_current[channel]--;
 			break;
 		case 0x08:  // memory -> I/O
-			data = space->read_byte(dmac->reg.address_current[channel]);
+			data = space.read_byte(dmac->reg.address_current[channel]);
 			if(dmac->intf->dma_read[channel])
 				dmac->intf->dma_write[channel](device->machine(),data);
 			if(dmac->reg.mode_control[channel] & 0x20)  // Address direction

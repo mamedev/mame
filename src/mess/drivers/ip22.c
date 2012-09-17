@@ -270,9 +270,9 @@ READ32_MEMBER(ip22_state::hpc3_pbus6_r)
 		//verboselog(( machine, 2, "Serial 2 Command Transfer Read, 0x1fbd9838: %02x\n", 0x04 );
 		return 0x00000004;
 	case 0x40/4:
-		return kbdc8042_8_r(&space, 0);
+		return kbdc8042_8_r(space, 0);
 	case 0x44/4:
-		return kbdc8042_8_r(&space, 4);
+		return kbdc8042_8_r(space, 4);
 	case 0x58/4:
 		return 0x20;	// chip rev 1, board rev 0, "Guinness" (Indy) => 0x01 for "Full House" (Indigo2)
 	case 0x80/4:
@@ -355,10 +355,10 @@ WRITE32_MEMBER(ip22_state::hpc3_pbus6_w)
 		}
 		break;
 	case 0x40/4:
-		kbdc8042_8_w(&space, 0, data);
+		kbdc8042_8_w(space, 0, data);
 		break;
 	case 0x44/4:
-		kbdc8042_8_w(&space, 4, data);
+		kbdc8042_8_w(space, 4, data);
 		break;
 	case 0x80/4:
 	case 0x84/4:
@@ -895,14 +895,14 @@ WRITE32_MEMBER(ip22_state::rtc_w)
 WRITE32_MEMBER(ip22_state::ip22_write_ram)
 {
 	// if banks 2 or 3 are enabled, do nothing, we don't support that much memory
-	if (sgi_mc_r(&space, 0xc8/4, 0xffffffff) & 0x10001000)
+	if (sgi_mc_r(space, 0xc8/4, 0xffffffff) & 0x10001000)
 	{
 		// a random perturbation so the memory test fails
 		data ^= 0xffffffff;
 	}
 
 	// if banks 0 or 1 have 2 membanks, also kill it, we only want 128 MB
-	if (sgi_mc_r(&space, 0xc0/4, 0xffffffff) & 0x40004000)
+	if (sgi_mc_r(space, 0xc0/4, 0xffffffff) & 0x40004000)
 	{
 		// a random perturbation so the memory test fails
 		data ^= 0xffffffff;
@@ -1239,14 +1239,14 @@ void ip22_state::machine_reset()
 	mips3drc_set_options(machine().device("maincpu"), MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
 }
 
-static void dump_chain(address_space *space, UINT32 ch_base)
+static void dump_chain(address_space &space, UINT32 ch_base)
 {
 
-	printf("node: %08x %08x %08x (len = %x)\n", space->read_dword(ch_base), space->read_dword(ch_base+4), space->read_dword(ch_base+8), space->read_dword(ch_base+4) & 0x3fff);
+	printf("node: %08x %08x %08x (len = %x)\n", space.read_dword(ch_base), space.read_dword(ch_base+4), space.read_dword(ch_base+8), space.read_dword(ch_base+4) & 0x3fff);
 
-	if ((space->read_dword(ch_base+8) != 0) && !(space->read_dword(ch_base+4) & 0x80000000))
+	if ((space.read_dword(ch_base+8) != 0) && !(space.read_dword(ch_base+4) & 0x80000000))
 	{
-		dump_chain(space, space->read_dword(ch_base+8));
+		dump_chain(space, space.read_dword(ch_base+8));
 	}
 }
 
@@ -1260,7 +1260,7 @@ static void dump_chain(address_space *space, UINT32 ch_base)
 static void scsi_irq(running_machine &machine, int state)
 {
 	ip22_state *drvstate = machine.driver_data<ip22_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (state)
 	{
@@ -1281,7 +1281,7 @@ static void scsi_irq(running_machine &machine, int state)
 				words = drvstate->m_wd33c93->get_dma_count();
 				words /= 4;
 
-				wptr = space->read_dword(drvstate->m_HPC3.nSCSI0Descriptor);
+				wptr = space.read_dword(drvstate->m_HPC3.nSCSI0Descriptor);
 				drvstate->m_HPC3.nSCSI0Descriptor += words*4;
 				dptr = 0;
 
@@ -1296,7 +1296,7 @@ static void scsi_irq(running_machine &machine, int state)
 
 					while (words)
 					{
-						tmpword = space->read_dword(wptr);
+						tmpword = space.read_dword(wptr);
 
 						if (drvstate->m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_ENDIAN)
 						{
@@ -1332,7 +1332,7 @@ static void scsi_irq(running_machine &machine, int state)
 
 						while (twords)
 						{
-							tmpword = space->read_dword(wptr);
+							tmpword = space.read_dword(wptr);
 
 							if (drvstate->m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_ENDIAN)
 							{
@@ -1364,8 +1364,8 @@ static void scsi_irq(running_machine &machine, int state)
 				drvstate->m_wd33c93->clear_dma();
 #if 0
 				UINT32 dptr, tmpword;
-				UINT32 bc = space->read_dword(drvstate->m_HPC3.nSCSI0Descriptor + 4);
-				UINT32 rptr = space->read_dword(drvstate->m_HPC3.nSCSI0Descriptor);
+				UINT32 bc = space.read_dword(drvstate->m_HPC3.nSCSI0Descriptor + 4);
+				UINT32 rptr = space.read_dword(drvstate->m_HPC3.nSCSI0Descriptor);
 				int length = bc & 0x3fff;
 				int xie = (bc & 0x20000000) ? 1 : 0;
 				int eox = (bc & 0x80000000) ? 1 : 0;
@@ -1380,7 +1380,7 @@ static void scsi_irq(running_machine &machine, int state)
 					dptr = 0;
 					while (length > 0)
 					{
-						tmpword = space->read_dword(rptr);
+						tmpword = space.read_dword(rptr);
 						if (drvstate->m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_ENDIAN)
 						{
 							drvstate->m_dma_buffer[dptr+3] = (tmpword>>24)&0xff;
@@ -1401,7 +1401,7 @@ static void scsi_irq(running_machine &machine, int state)
 						length -= 4;
 					}
 
-					length = space->read_dword(drvstate->m_HPC3.nSCSI0Descriptor+4) & 0x3fff;
+					length = space.read_dword(drvstate->m_HPC3.nSCSI0Descriptor+4) & 0x3fff;
 					drvstate->m_wd33c93->write_data(length, drvstate->m_dma_buffer);
 
 					// clear DMA on the controller too
@@ -1423,7 +1423,7 @@ static void scsi_irq(running_machine &machine, int state)
 				words = drvstate->m_wd33c93->get_dma_count();
 				words /= 4;
 
-				wptr = space->read_dword(drvstate->m_HPC3.nSCSI0Descriptor);
+				wptr = space.read_dword(drvstate->m_HPC3.nSCSI0Descriptor);
 				sptr = 0;
 
 //              mame_printf_info("DMA from device: %d words @ %x\n", words, wptr);
@@ -1446,7 +1446,7 @@ static void scsi_irq(running_machine &machine, int state)
 							tmpword = drvstate->m_dma_buffer[sptr]<<24 | drvstate->m_dma_buffer[sptr+1]<<16 | drvstate->m_dma_buffer[sptr+2]<<8 | drvstate->m_dma_buffer[sptr+3];
 						}
 
-						space->write_dword(wptr, tmpword);
+						space.write_dword(wptr, tmpword);
 						wptr += 4;
 						sptr += 4;
 						words--;
@@ -1470,7 +1470,7 @@ static void scsi_irq(running_machine &machine, int state)
 							{
 								tmpword = drvstate->m_dma_buffer[sptr]<<24 | drvstate->m_dma_buffer[sptr+1]<<16 | drvstate->m_dma_buffer[sptr+2]<<8 | drvstate->m_dma_buffer[sptr+3];
 							}
-							space->write_dword(wptr, tmpword);
+							space.write_dword(wptr, tmpword);
 
 							wptr += 4;
 							sptr += 4;

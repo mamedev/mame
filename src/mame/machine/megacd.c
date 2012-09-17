@@ -886,7 +886,7 @@ void CDC_End_Transfer(running_machine& machine)
 
 void CDC_Do_DMA(running_machine& machine, int rate)
 {
-	address_space* space = machine.device(":segacd:segacd_68k")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device(":segacd:segacd_68k")->memory().space(AS_PROGRAM);
 
 	UINT32 dstoffset, length;
 	UINT8 *dest;
@@ -949,8 +949,8 @@ void CDC_Do_DMA(running_machine& machine, int rate)
 
 		if (PCM_DMA)
 		{
-			space->write_byte(0xff2000+(((dstoffset*2)+1)&0x1fff),data >> 8);
-			space->write_byte(0xff2000+(((dstoffset*2)+3)&0x1fff),data & 0xff);
+			space.write_byte(0xff2000+(((dstoffset*2)+1)&0x1fff),data >> 8);
+			space.write_byte(0xff2000+(((dstoffset*2)+3)&0x1fff),data & 0xff);
 		//  printf("PCM_DMA writing %04x %04x\n",0xff2000+(dstoffset*2), data);
 		}
 		else
@@ -967,7 +967,7 @@ void CDC_Do_DMA(running_machine& machine, int rate)
 						dest[dstoffset+1] = data >>8;
 						dest[dstoffset+0] = data&0xff;
 
-						segacd_mark_tiles_dirty(space->machine(), dstoffset/2);
+						segacd_mark_tiles_dirty(space.machine(), dstoffset/2);
 					}
 					else
 					{
@@ -975,11 +975,11 @@ void CDC_Do_DMA(running_machine& machine, int rate)
 
 						if (!(scd_rammode & 1))
 						{
-							segacd_1meg_mode_word_write(space->machine(),(dstoffset+0x20000)/2, data, 0xffff, 0);
+							segacd_1meg_mode_word_write(space.machine(),(dstoffset+0x20000)/2, data, 0xffff, 0);
 						}
 						else
 						{
-							segacd_1meg_mode_word_write(space->machine(),(dstoffset+0x00000)/2, data, 0xffff, 0);
+							segacd_1meg_mode_word_write(space.machine(),(dstoffset+0x00000)/2, data, 0xffff, 0);
 						}
 					}
 
@@ -1233,7 +1233,7 @@ static tilemap_t    *segacd_stampmap[4];
 
 static WRITE16_HANDLER( scd_a12000_halt_reset_w )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 
 	UINT16 old_halt = a12000_halt_reset_reg;
 
@@ -1244,24 +1244,24 @@ static WRITE16_HANDLER( scd_a12000_halt_reset_w )
 		// reset line
 		if (a12000_halt_reset_reg&0x0001)
 		{
-			space->machine().device(":segacd:segacd_68k")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			space.machine().device(":segacd:segacd_68k")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 			if (!(old_halt&0x0001)) printf("clear reset slave\n");
 		}
 		else
 		{
-			space->machine().device(":segacd:segacd_68k")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			space.machine().device(":segacd:segacd_68k")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 			if ((old_halt&0x0001)) printf("assert reset slave\n");
 		}
 
 		// request BUS
 		if (a12000_halt_reset_reg&0x0002)
 		{
-			space->machine().device(":segacd:segacd_68k")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+			space.machine().device(":segacd:segacd_68k")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 			if (!(old_halt&0x0002)) printf("halt slave\n");
 		}
 		else
 		{
-			space->machine().device(":segacd:segacd_68k")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+			space.machine().device(":segacd:segacd_68k")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			if ((old_halt&0x0002)) printf("resume slave\n");
 		}
 	}
@@ -1270,7 +1270,7 @@ static WRITE16_HANDLER( scd_a12000_halt_reset_w )
 	{
 		if (a12000_halt_reset_reg&0x0100)
 		{
-			running_machine& machine = space->machine();
+			running_machine& machine = space.machine();
 			CHECK_SCD_LV2_INTERRUPT
 		}
 
@@ -1286,7 +1286,7 @@ static WRITE16_HANDLER( scd_a12000_halt_reset_w )
 
 static READ16_HANDLER( scd_a12000_halt_reset_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 
 	return a12000_halt_reset_reg;
 }
@@ -1305,7 +1305,7 @@ static READ16_HANDLER( scd_a12000_halt_reset_r )
 
 static READ16_HANDLER( scd_a12002_memory_mode_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 
 	int temp = scd_rammode;
 	int temp2 = 0;
@@ -1343,7 +1343,7 @@ static WRITE8_HANDLER( scd_a12002_memory_mode_w_8_15 )
 
 static WRITE8_HANDLER( scd_a12002_memory_mode_w_0_7 )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 
 
 	//printf("scd_a12002_memory_mode_w_0_7 %04x\n",data);
@@ -1369,7 +1369,7 @@ static WRITE8_HANDLER( scd_a12002_memory_mode_w_0_7 )
 
 static WRITE16_HANDLER( scd_a12002_memory_mode_w )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 
 	if (ACCESSING_BITS_8_15)
 		scd_a12002_memory_mode_w_8_15(space, 0, data>>8);
@@ -1383,7 +1383,7 @@ static WRITE16_HANDLER( scd_a12002_memory_mode_w )
 
 static READ16_HANDLER( segacd_sub_memory_mode_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 
 	int temp = scd_rammode;
 	int temp2 = 0;
@@ -1405,7 +1405,7 @@ WRITE8_HANDLER( segacd_sub_memory_mode_w_8_15 )
 
 WRITE8_HANDLER( segacd_sub_memory_mode_w_0_7 )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 
 
 	segacd_memory_priority_mode = (data&0x0018)>>3;
@@ -1465,7 +1465,7 @@ WRITE8_HANDLER( segacd_sub_memory_mode_w_0_7 )
 static WRITE16_HANDLER( segacd_sub_memory_mode_w )
 {
 	//printf("segacd_sub_memory_mode_w %04x %04x\n", data, mem_mask);
-	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 
 	if (ACCESSING_BITS_8_15)
 		segacd_sub_memory_mode_w_8_15(space, 0, data>>8);
@@ -1488,13 +1488,13 @@ static UINT16 segacd_comms_flags = 0x0000;
 
 static READ16_HANDLER( segacd_comms_flags_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 	return segacd_comms_flags;
 }
 
 static WRITE16_HANDLER( segacd_comms_flags_subcpu_w )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 
 	if (ACCESSING_BITS_8_15) // Dragon's Lair
 	{
@@ -1510,7 +1510,7 @@ static WRITE16_HANDLER( segacd_comms_flags_subcpu_w )
 
 static WRITE16_HANDLER( segacd_comms_flags_maincpu_w )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -1561,19 +1561,19 @@ UINT16 segacd_comms_part2[0x8];
 
 static READ16_HANDLER( segacd_comms_main_part1_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 	return segacd_comms_part1[offset];
 }
 
 static WRITE16_HANDLER( segacd_comms_main_part1_w )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 	COMBINE_DATA(&segacd_comms_part1[offset]);
 }
 
 static READ16_HANDLER( segacd_comms_main_part2_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 	return segacd_comms_part2[offset];
 }
 
@@ -1585,7 +1585,7 @@ static WRITE16_HANDLER( segacd_comms_main_part2_w )
 
 static READ16_HANDLER( segacd_comms_sub_part1_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 	return segacd_comms_part1[offset];
 }
 
@@ -1596,13 +1596,13 @@ static WRITE16_HANDLER( segacd_comms_sub_part1_w )
 
 static READ16_HANDLER( segacd_comms_sub_part2_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 	return segacd_comms_part2[offset];
 }
 
 static WRITE16_HANDLER( segacd_comms_sub_part2_w )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 	COMBINE_DATA(&segacd_comms_part2[offset]);
 }
 
@@ -1720,7 +1720,7 @@ static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 		if (!(scd_rammode&1))
 		{
 			COMBINE_DATA(&segacd_dataram[offset]);
-			segacd_mark_tiles_dirty(space->machine(), offset);
+			segacd_mark_tiles_dirty(space.machine(), offset);
 		}
 		else
 		{
@@ -1738,11 +1738,11 @@ static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 			// ret bit set by sub cpu determines which half of WorkRAM we have access to?
 			if (scd_rammode&1)
 			{
-				segacd_1meg_mode_word_write(space->machine(), offset+0x20000/2, data, mem_mask, 0);
+				segacd_1meg_mode_word_write(space.machine(), offset+0x20000/2, data, mem_mask, 0);
 			}
 			else
 			{
-				segacd_1meg_mode_word_write(space->machine(), offset+0x00000/2, data, mem_mask, 0);
+				segacd_1meg_mode_word_write(space.machine(), offset+0x00000/2, data, mem_mask, 0);
 			}
 		}
 		else
@@ -1771,13 +1771,13 @@ static READ16_HANDLER( scd_hint_vector_r )
 
 static READ16_HANDLER( scd_a12006_hint_register_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 	return segacd_hint_register;
 }
 
 static WRITE16_HANDLER( scd_a12006_hint_register_w )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 	COMBINE_DATA(&segacd_hint_register);
 }
 
@@ -2275,12 +2275,12 @@ static TIMER_CALLBACK( segacd_access_timer_callback )
 
 READ16_HANDLER( cdc_data_sub_r )
 {
-	return CDC_Host_r(space->machine(), READ_SUB);
+	return CDC_Host_r(space.machine(), READ_SUB);
 }
 
 READ16_HANDLER( cdc_data_main_r )
 {
-	return CDC_Host_r(space->machine(), READ_MAIN);
+	return CDC_Host_r(space.machine(), READ_MAIN);
 }
 
 
@@ -2304,7 +2304,7 @@ READ16_HANDLER( segacd_stopwatch_timer_r )
 /* main CPU map set up in INIT */
 void segacd_init_main_cpu( running_machine& machine )
 {
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	segacd_font_bits = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:segacd_font")->ptr());
 	segacd_backupram = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:backupram")->ptr());
@@ -2315,36 +2315,36 @@ void segacd_init_main_cpu( running_machine& machine )
 	segacd_4meg_prgbank = 0;
 
 
-	space->unmap_readwrite        (0x020000,0x3fffff);
+	space.unmap_readwrite        (0x020000,0x3fffff);
 
-//  space->install_read_bank(0x0020000, 0x003ffff, "scd_4m_prgbank");
-//  space->machine().root_device().membank("scd_4m_prgbank")->set_base(segacd_4meg_prgram + segacd_4meg_prgbank * 0x20000 );
-	space->install_legacy_read_handler (0x0020000, 0x003ffff, FUNC(scd_4m_prgbank_ram_r) );
-	space->install_legacy_write_handler (0x0020000, 0x003ffff, FUNC(scd_4m_prgbank_ram_w) );
+//  space.install_read_bank(0x0020000, 0x003ffff, "scd_4m_prgbank");
+//  space.machine().root_device().membank("scd_4m_prgbank")->set_base(segacd_4meg_prgram + segacd_4meg_prgbank * 0x20000 );
+	space.install_legacy_read_handler (0x0020000, 0x003ffff, FUNC(scd_4m_prgbank_ram_r) );
+	space.install_legacy_write_handler (0x0020000, 0x003ffff, FUNC(scd_4m_prgbank_ram_w) );
 	segacd_wordram_mapped = 1;
 
 
-	space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x200000, 0x23ffff, FUNC(segacd_main_dataram_part1_r), FUNC(segacd_main_dataram_part1_w)); // RAM shared with sub
+	space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x200000, 0x23ffff, FUNC(segacd_main_dataram_part1_r), FUNC(segacd_main_dataram_part1_w)); // RAM shared with sub
 
-	space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12000, 0xa12001, FUNC(scd_a12000_halt_reset_r), FUNC(scd_a12000_halt_reset_w)); // sub-cpu control
-	space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12002, 0xa12003, FUNC(scd_a12002_memory_mode_r), FUNC(scd_a12002_memory_mode_w)); // memory mode / write protect
-	//space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12004, 0xa12005, FUNC(segacd_cdc_mode_address_r), FUNC(segacd_cdc_mode_address_w));
-	space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12006, 0xa12007, FUNC(scd_a12006_hint_register_r), FUNC(scd_a12006_hint_register_w)); // where HINT points on main CPU
-	//space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler     (0xa12008, 0xa12009, FUNC(cdc_data_main_r));
+	space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12000, 0xa12001, FUNC(scd_a12000_halt_reset_r), FUNC(scd_a12000_halt_reset_w)); // sub-cpu control
+	space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12002, 0xa12003, FUNC(scd_a12002_memory_mode_r), FUNC(scd_a12002_memory_mode_w)); // memory mode / write protect
+	//space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12004, 0xa12005, FUNC(segacd_cdc_mode_address_r), FUNC(segacd_cdc_mode_address_w));
+	space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12006, 0xa12007, FUNC(scd_a12006_hint_register_r), FUNC(scd_a12006_hint_register_w)); // where HINT points on main CPU
+	//space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler     (0xa12008, 0xa12009, FUNC(cdc_data_main_r));
 
 
-	space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa1200c, 0xa1200d, FUNC(segacd_stopwatch_timer_r), FUNC(segacd_stopwatch_timer_w)); // starblad
+	space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa1200c, 0xa1200d, FUNC(segacd_stopwatch_timer_r), FUNC(segacd_stopwatch_timer_w)); // starblad
 
-	space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa1200e, 0xa1200f, FUNC(segacd_comms_flags_r), FUNC(segacd_comms_flags_maincpu_w)); // communication flags block
+	space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa1200e, 0xa1200f, FUNC(segacd_comms_flags_r), FUNC(segacd_comms_flags_maincpu_w)); // communication flags block
 
-	space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12010, 0xa1201f, FUNC(segacd_comms_main_part1_r), FUNC(segacd_comms_main_part1_w));
-	space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12020, 0xa1202f, FUNC(segacd_comms_main_part2_r), FUNC(segacd_comms_main_part2_w));
+	space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12010, 0xa1201f, FUNC(segacd_comms_main_part1_r), FUNC(segacd_comms_main_part1_w));
+	space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12020, 0xa1202f, FUNC(segacd_comms_main_part2_r), FUNC(segacd_comms_main_part2_w));
 
 
 
 	machine.device(":segacd:segacd_68k")->execute().set_irq_acknowledge_callback(segacd_sub_int_callback);
 
-	space->install_legacy_read_handler (0x0000070, 0x0000073, FUNC(scd_hint_vector_r) );
+	space.install_legacy_read_handler (0x0000070, 0x0000073, FUNC(scd_hint_vector_r) );
 
 	segacd_gfx_conversion_timer = machine.scheduler().timer_alloc(FUNC(segacd_gfx_conversion_timer_callback));
 	segacd_gfx_conversion_timer->adjust(attotime::never);
@@ -2551,7 +2551,7 @@ static WRITE16_HANDLER( segacd_sub_dataram_part1_w )
 		if (scd_rammode&1)
 		{
 			COMBINE_DATA(&segacd_dataram[offset]);
-			segacd_mark_tiles_dirty(space->machine(), offset);
+			segacd_mark_tiles_dirty(space.machine(), offset);
 		}
 		else
 		{
@@ -2578,11 +2578,11 @@ static WRITE16_HANDLER( segacd_sub_dataram_part1_w )
 
 		if (scd_rammode&1)
 		{
-			segacd_1meg_mode_word_write(space->machine(), offset/2+0x00000/2, data , mem_mask, 1);
+			segacd_1meg_mode_word_write(space.machine(), offset/2+0x00000/2, data , mem_mask, 1);
 		}
 		else
 		{
-			segacd_1meg_mode_word_write(space->machine(), offset/2+0x20000/2, data, mem_mask, 1);
+			segacd_1meg_mode_word_write(space.machine(), offset/2+0x20000/2, data, mem_mask, 1);
 		}
 
 	//  printf("Unspported: segacd_sub_dataram_part1_w in mode 1 (Word RAM Expander - 1 Byte Per Pixel) %04x\n", data);
@@ -2626,11 +2626,11 @@ static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
 		// ret bit set by sub cpu determines which half of WorkRAM we have access to?
 		if (scd_rammode&1)
 		{
-			segacd_1meg_mode_word_write(space->machine(),offset+0x00000/2, data, mem_mask, 0);
+			segacd_1meg_mode_word_write(space.machine(),offset+0x00000/2, data, mem_mask, 0);
 		}
 		else
 		{
-			segacd_1meg_mode_word_write(space->machine(),offset+0x20000/2, data, mem_mask, 0);
+			segacd_1meg_mode_word_write(space.machine(),offset+0x20000/2, data, mem_mask, 0);
 		}
 
 	}
@@ -2640,7 +2640,7 @@ static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
 
 static READ16_HANDLER( segacd_irq_mask_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 	return segacd_irq_mask;
 }
 
@@ -2649,7 +2649,7 @@ static WRITE16_HANDLER( segacd_irq_mask_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		UINT16 control = CDD_CONTROL;
-		if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+		if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 	//  printf("segacd_irq_mask_w %04x %04x (CDD control is %04x)\n",data, mem_mask, control);
 
 		if (data & 0x10)
@@ -2659,7 +2659,7 @@ static WRITE16_HANDLER( segacd_irq_mask_w )
 				if (!(segacd_irq_mask & 0x10))
 				{
 					segacd_irq_mask = data & 0x7e;
-					CDD_Process(space->machine(), 0);
+					CDD_Process(space.machine(), 0);
 					return;
 				}
 			}
@@ -2677,7 +2677,7 @@ static WRITE16_HANDLER( segacd_irq_mask_w )
 
 static READ16_HANDLER( segacd_cdd_ctrl_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 	return CDD_CONTROL;
 }
 
@@ -2687,7 +2687,7 @@ static WRITE16_HANDLER( segacd_cdd_ctrl_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		UINT16 control = CDD_CONTROL;
-		if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
+		if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 
 		//printf("segacd_cdd_ctrl_w %04x %04x (control %04x irq %04x\n", data, mem_mask, control, segacd_irq_mask);
 
@@ -2699,7 +2699,7 @@ static WRITE16_HANDLER( segacd_cdd_ctrl_w )
 			{
 				if (segacd_irq_mask&0x10)
 				{
-					CDD_Process(space->machine(), 1);
+					CDD_Process(space.machine(), 1);
 				}
 			}
 		}
@@ -2725,7 +2725,7 @@ static WRITE8_HANDLER( segacd_cdd_tx_w )
 
 	if(offset == 9)
 	{
-		CDD_Import(space->machine());
+		CDD_Import(space.machine());
 	}
 }
 
@@ -2858,7 +2858,7 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 				//int i;
 				UINT8 pix = 0x0;
 
-				pix = read_pixel_from_stampmap(space->machine(), srcbitmap, xbase>>(3+8), ybase>>(3+8));
+				pix = read_pixel_from_stampmap(space.machine(), srcbitmap, xbase>>(3+8), ybase>>(3+8));
 
 				xbase += deltax;
 				ybase += deltay;
@@ -2878,10 +2878,10 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 
 				offset+=countx & 0x7;
 
-				write_pixel( space->machine(), pix, offset );
+				write_pixel( space.machine(), pix, offset );
 
-				segacd_mark_tiles_dirty(space->machine(), (offset>>3));
-				segacd_mark_tiles_dirty(space->machine(), (offset>>3)+1);
+				segacd_mark_tiles_dirty(space.machine(), (offset>>3));
+				segacd_mark_tiles_dirty(space.machine(), (offset>>3)+1);
 
 			}
 
@@ -3032,12 +3032,12 @@ WRITE16_HANDLER( segacd_cdfader_w )
 
 	//printf("%f\n",cdfader_vol);
 
-	cdda_set_volume(space->machine().device(":segacd:cdda"), cdfader_vol);
+	cdda_set_volume(space.machine().device(":segacd:cdda"), cdfader_vol);
 }
 
 READ16_HANDLER( segacd_backupram_r )
 {
-	if(ACCESSING_BITS_8_15 && !(space->debugger_access()))
+	if(ACCESSING_BITS_8_15 && !(space.debugger_access()))
 		printf("Warning: read to backupram even bytes! [%04x]\n",offset);
 
 	return segacd_backupram[offset] & 0xff;
@@ -3048,7 +3048,7 @@ WRITE16_HANDLER( segacd_backupram_w )
 	if(ACCESSING_BITS_0_7)
 		segacd_backupram[offset] = data;
 
-	if(ACCESSING_BITS_8_15 && !(space->debugger_access()))
+	if(ACCESSING_BITS_8_15 && !(space.debugger_access()))
 		printf("Warning: write to backupram even bytes! [%04x] %02x\n",offset,data);
 }
 

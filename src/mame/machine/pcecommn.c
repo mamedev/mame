@@ -27,7 +27,7 @@ MACHINE_RESET( pce ) {
 /* todo: how many input ports does the PCE have? */
 WRITE8_HANDLER ( pce_joystick_w )
 {
-	h6280io_set_buffer(&space->device(), data);
+	h6280io_set_buffer(&space.device(), data);
     /* bump counter on a low-to-high transition of bit 1 */
     if((!joystick_data_select) && (data & JOY_CLOCK))
     {
@@ -51,11 +51,11 @@ READ8_HANDLER ( pce_joystick_r )
 
 	if ( pce_joystick_readinputport_callback != NULL )
 	{
-		data = pce_joystick_readinputport_callback(space->machine());
+		data = pce_joystick_readinputport_callback(space.machine());
 	}
 	else
 	{
-		data = space->machine().root_device().ioport("JOY")->read();
+		data = space.machine().root_device().ioport("JOY")->read();
 	}
 	if(joystick_data_select) data >>= 4;
 	ret = (data & 0x0F) | pce.io_port_options;

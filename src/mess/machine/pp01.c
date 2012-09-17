@@ -85,7 +85,7 @@ static void pp01_set_memory(running_machine &machine,UINT8 block, UINT8 data)
 {
 	pp01_state *state = machine.driver_data<pp01_state>();
 	UINT8 *mem = state->memregion("maincpu")->base();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 startaddr = block*0x1000;
 	UINT16 endaddr   = ((block+1)*0x1000)-1;
 	UINT8  blocknum  = block + 1;
@@ -93,40 +93,40 @@ static void pp01_set_memory(running_machine &machine,UINT8 block, UINT8 data)
 	sprintf(bank,"bank%d",blocknum);
 	if (data>=0xE0 && data<=0xEF) {
 		// This is RAM
-		space->install_read_bank (startaddr, endaddr, bank);
+		space.install_read_bank (startaddr, endaddr, bank);
 		switch(data) {
 			case 0xe6 :
-					space->install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_r_1_w),state));
+					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_r_1_w),state));
 					break;
 			case 0xe7 :
-					space->install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_r_2_w),state));
+					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_r_2_w),state));
 					break;
 			case 0xea :
-					space->install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_g_1_w),state));
+					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_g_1_w),state));
 					break;
 			case 0xeb :
-					space->install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_g_2_w),state));
+					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_g_2_w),state));
 					break;
 			case 0xee :
-					space->install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_b_1_w),state));
+					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_b_1_w),state));
 					break;
 			case 0xef :
-					space->install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_b_2_w),state));
+					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_b_2_w),state));
 					break;
 
 			default :
-					space->install_write_bank(startaddr, endaddr, bank);
+					space.install_write_bank(startaddr, endaddr, bank);
 					break;
 		}
 
 		state->membank(bank)->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + (data & 0x0F)* 0x1000);
 	} else if (data>=0xF8) {
-		space->install_read_bank (startaddr, endaddr, bank);
-		space->unmap_write(startaddr, endaddr);
+		space.install_read_bank (startaddr, endaddr, bank);
+		space.unmap_write(startaddr, endaddr);
 		state->membank(bank)->set_base(mem + ((data & 0x0F)-8)* 0x1000+0x10000);
 	} else {
 		logerror("%02x %02x\n",block,data);
-		space->unmap_readwrite (startaddr, endaddr);
+		space.unmap_readwrite (startaddr, endaddr);
 	}
 }
 

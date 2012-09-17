@@ -515,7 +515,7 @@ DRIVER_INIT_MEMBER(microtan_state,microtan)
 {
     UINT8 *dst = memregion("gfx2")->base();
     int i;
-    address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
     for (i = 0; i < 256; i++)
     {
@@ -556,14 +556,14 @@ DRIVER_INIT_MEMBER(microtan_state,microtan)
     switch (read_dsw(machine()) & 3)
     {
         case 0:  // 1K only :)
-            space->nop_readwrite(0x0400, 0xbbff);
+            space.nop_readwrite(0x0400, 0xbbff);
             break;
         case 1:  // +7K TANEX
-            space->install_ram(0x0400, 0x1fff,NULL);
-            space->nop_readwrite(0x2000, 0xbbff);
+            space.install_ram(0x0400, 0x1fff,NULL);
+            space.nop_readwrite(0x2000, 0xbbff);
             break;
         default: // +7K TANEX + 40K TANRAM
-            space->install_ram(0x0400, 0xbbff, NULL);
+            space.install_ram(0x0400, 0xbbff, NULL);
             break;
     }
 

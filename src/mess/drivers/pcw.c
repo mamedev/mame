@@ -234,7 +234,7 @@ READ8_MEMBER(pcw_state::pcw_keyboard_data_r)
 static void pcw_update_read_memory_block(running_machine &machine, int block, int bank)
 {
 	pcw_state *state = machine.driver_data<pcw_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	char block_name[10];
 
 	sprintf(block_name,"bank%d",block+1);
@@ -243,14 +243,14 @@ static void pcw_update_read_memory_block(running_machine &machine, int block, in
 	{
 		/* when upper 16 bytes are accessed use keyboard read
            handler */
-		space->install_read_handler(
+		space.install_read_handler(
 			block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, read8_delegate(FUNC(pcw_state::pcw_keyboard_data_r),state));
 //      LOG(("MEM: read block %i -> bank %i\n",block,bank));
 	}
 	else
 	{
 		/* restore bank handler across entire block */
-		space->install_read_bank(block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff,block_name);
+		space.install_read_bank(block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff,block_name);
 //      LOG(("MEM: read block %i -> bank %i\n",block,bank));
 	}
 	state->membank(block_name)->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + ((bank * 0x4000) % machine.device<ram_device>(RAM_TAG)->size()));

@@ -152,7 +152,7 @@ static void acitya_decrypt_rom_B(running_machine &machine)
 
 READ8_HANDLER( acitya_decrypt_rom )
 {
-	pacman_state *state = space->machine().driver_data<pacman_state>();
+	pacman_state *state = space.machine().driver_data<pacman_state>();
 	if (offset & 0x01)
 	{
 		state->m_counter = (state->m_counter - 1) & 0x0F;

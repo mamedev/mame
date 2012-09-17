@@ -334,7 +334,7 @@ MACHINE_RESET_MEMBER(midxunit_state,midxunit)
 
 READ16_MEMBER(midxunit_state::midxunit_security_r)
 {
-	return midway_serial_pic_r(&space);
+	return midway_serial_pic_r(space);
 }
 
 WRITE16_MEMBER(midxunit_state::midxunit_security_w)
@@ -347,7 +347,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_security_w)
 WRITE16_MEMBER(midxunit_state::midxunit_security_clock_w)
 {
 	if (offset == 0 && ACCESSING_BITS_0_7)
-		midway_serial_pic_w(&space, ((~data & 2) << 3) | m_security_bits);
+		midway_serial_pic_w(space, ((~data & 2) << 3) | m_security_bits);
 }
 
 

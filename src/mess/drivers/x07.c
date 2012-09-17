@@ -1042,7 +1042,7 @@ static DEVICE_IMAGE_LOAD( x07_card )
 {
 	running_machine &machine = image.device().machine();
 	x07_state *state = machine.driver_data<x07_state>();
-	address_space *space = state->m_maincpu->space( AS_PROGRAM );
+	address_space &space = *state->m_maincpu->space( AS_PROGRAM );
 	UINT16 ram_size = state->m_ram->size();
 
 	if (image.software_entry() == NULL)
@@ -1050,8 +1050,8 @@ static DEVICE_IMAGE_LOAD( x07_card )
 		UINT8 *rom = machine.memory().region_alloc( "card", image.length(), 1, ENDIANNESS_LITTLE )->base();
 		image.fread(rom, image.length());
 
-		space->install_ram(ram_size, ram_size + 0xfff);
-		space->install_rom(0x6000, 0x7fff, rom);
+		space.install_ram(ram_size, ram_size + 0xfff);
+		space.install_rom(0x6000, 0x7fff, rom);
 	}
 	else
 	{
@@ -1061,8 +1061,8 @@ static DEVICE_IMAGE_LOAD( x07_card )
 		{
 			// 0x4000 - 0x4fff   4KB RAM
 			// 0x6000 - 0x7fff   8KB ROM
-			space->install_ram(ram_size, ram_size + 0xfff);
-			space->install_rom(0x6000, 0x7fff, image.get_software_region("rom"));
+			space.install_ram(ram_size, ram_size + 0xfff);
+			space.install_rom(0x6000, 0x7fff, image.get_software_region("rom"));
 		}
 		else
 		{

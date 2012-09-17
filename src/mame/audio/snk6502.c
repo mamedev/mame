@@ -676,7 +676,7 @@ int snk6502_music0_playing(running_machine &machine)
 
 WRITE8_HANDLER( sasuke_sound_w )
 {
-	device_t *device = space->machine().device("snk6502");
+	device_t *device = space.machine().device("snk6502");
 	snk6502_sound_state *state = get_safe_token(device);
 	samples_device *samples = state->m_samples;
 	TONE *tone_channels = state->m_tone_channels;
@@ -746,7 +746,7 @@ WRITE8_HANDLER( sasuke_sound_w )
 
 WRITE8_HANDLER( satansat_sound_w )
 {
-	device_t *device = space->machine().device("snk6502");
+	device_t *device = space.machine().device("snk6502");
 	snk6502_sound_state *state = get_safe_token(device);
 	samples_device *samples = state->m_samples;
 	TONE *tone_channels = state->m_tone_channels;
@@ -813,7 +813,7 @@ WRITE8_HANDLER( satansat_sound_w )
 
 WRITE8_HANDLER( vanguard_sound_w )
 {
-	device_t *device = space->machine().device("snk6502");
+	device_t *device = space.machine().device("snk6502");
 	snk6502_sound_state *state = get_safe_token(device);
 	samples_device *samples = state->m_samples;
 	TONE *tone_channels = state->m_tone_channels;
@@ -863,7 +863,7 @@ WRITE8_HANDLER( vanguard_sound_w )
 		}
 
 		/* SHOT B */
-		sn76477_enable_w(space->machine().device("sn76477.2"), (data & 0x40) ? 0 : 1);
+		sn76477_enable_w(space.machine().device("sn76477.2"), (data & 0x40) ? 0 : 1);
 
 		state->m_LastPort1 = data;
 		break;
@@ -914,7 +914,7 @@ WRITE8_HANDLER( vanguard_sound_w )
 
 WRITE8_HANDLER( fantasy_sound_w )
 {
-	device_t *device = space->machine().device("snk6502");
+	device_t *device = space.machine().device("snk6502");
 	snk6502_sound_state *state = get_safe_token(device);
 	TONE *tone_channels = state->m_tone_channels;
 
@@ -957,7 +957,7 @@ WRITE8_HANDLER( fantasy_sound_w )
 		}
 
 		/* BOMB */
-		discrete_sound_w(space->machine().device("discrete"), *space, FANTASY_BOMB_EN, data & 0x80);
+		discrete_sound_w(space.machine().device("discrete"), space, FANTASY_BOMB_EN, data & 0x80);
 
 		state->m_LastPort1 = data;
 		break;
@@ -1021,8 +1021,8 @@ WRITE8_HANDLER( fantasy_sound_w )
 		/* select tune in ROM based on sound command byte */
 		tone_channels[2].base = 0x1000 + ((data & 0x70) << 4);
 		tone_channels[2].mask = 0xff;
-		snk6502_state *state = space->machine().driver_data<snk6502_state>();
-		state->snk6502_flipscreen_w(*space, 0, data);
+		snk6502_state *state = space.machine().driver_data<snk6502_state>();
+		state->snk6502_flipscreen_w(space, 0, data);
 		break;
 	}
 }
@@ -1220,7 +1220,7 @@ WRITE8_HANDLER( vanguard_speech_w )
 		0x054ce
 	};
 
-	snk6502_speech_w(space->machine(), data, vanguard_table, 2);
+	snk6502_speech_w(space.machine(), data, vanguard_table, 2);
 }
 
 WRITE8_HANDLER( fantasy_speech_w )
@@ -1245,7 +1245,7 @@ WRITE8_HANDLER( fantasy_speech_w )
 		0
 	};
 
-	snk6502_speech_w(space->machine(), data, fantasy_table, 0);
+	snk6502_speech_w(space.machine(), data, fantasy_table, 0);
 }
 
 

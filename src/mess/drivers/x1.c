@@ -1631,7 +1631,7 @@ READ8_MEMBER( x1_state::x1_io_r )
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return m_gfx_bitmap_ram[offset-0x4000+(m_scrn_reg.gfx_bank*0xc000)]; }
 	else
 	{
-		//logerror("(PC=%06x) Read i/o address %04x\n",space->device().safe_pc(),offset);
+		//logerror("(PC=%06x) Read i/o address %04x\n",space.device().safe_pc(),offset);
 	}
 	return 0xff;
 }
@@ -1674,7 +1674,7 @@ WRITE8_MEMBER( x1_state::x1_io_w )
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ m_gfx_bitmap_ram[offset-0x4000+(m_scrn_reg.gfx_bank*0xc000)] = data; }
 	else
 	{
-		//logerror("(PC=%06x) Write %02x at i/o address %04x\n",space->device().safe_pc(),data,offset);
+		//logerror("(PC=%06x) Write %02x at i/o address %04x\n",space.device().safe_pc(),data,offset);
 	}
 }
 
@@ -1721,7 +1721,7 @@ READ8_MEMBER( x1_state::x1turbo_io_r )
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return m_gfx_bitmap_ram[offset-0x4000+(m_scrn_reg.gfx_bank*0xc000)]; }
 	else
 	{
-		//logerror("(PC=%06x) Read i/o address %04x\n",space->device().safe_pc(),offset);
+		//logerror("(PC=%06x) Read i/o address %04x\n",space.device().safe_pc(),offset);
 	}
 	return 0xff;
 }
@@ -1777,7 +1777,7 @@ WRITE8_MEMBER( x1_state::x1turbo_io_w )
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ m_gfx_bitmap_ram[offset-0x4000+(m_scrn_reg.gfx_bank*0xc000)] = data; }
 	else
 	{
-		//logerror("(PC=%06x) Write %02x at i/o address %04x\n",space->device().safe_pc(),data,offset);
+		//logerror("(PC=%06x) Write %02x at i/o address %04x\n",space.device().safe_pc(),data,offset);
 	}
 }
 
@@ -1916,8 +1916,8 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
-static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
-static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
+static UINT8 memory_read_byte(address_space &space, offs_t address) { return space.read_byte(address); }
+static void memory_write_byte(address_space &space, offs_t address, UINT8 data) { space.write_byte(address, data); }
 
 static Z80DMA_INTERFACE( x1_dma )
 {
@@ -1938,7 +1938,7 @@ static Z80DMA_INTERFACE( x1_dma )
 
 static INPUT_CHANGED( ipl_reset )
 {
-	//address_space *space = field.machine().device("x1_cpu")->memory().space(AS_PROGRAM);
+	//address_space &space = *field.machine().device("x1_cpu")->memory().space(AS_PROGRAM);
 	x1_state *state = field.machine().driver_data<x1_state>();
 
 	state->m_x1_cpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
@@ -2407,7 +2407,7 @@ static IRQ_CALLBACK(x1_irq_callback)
 TIMER_DEVICE_CALLBACK(x1_keyboard_callback)
 {
 	x1_state *state = timer.machine().driver_data<x1_state>();
-	address_space *space = timer.machine().device("x1_cpu")->memory().space(AS_PROGRAM);
+	address_space &space = *timer.machine().device("x1_cpu")->memory().space(AS_PROGRAM);
 	UINT32 key1 = timer.machine().root_device().ioport("key1")->read();
 	UINT32 key2 = timer.machine().root_device().ioport("key2")->read();
 	UINT32 key3 = timer.machine().root_device().ioport("key3")->read();
@@ -2422,7 +2422,7 @@ TIMER_DEVICE_CALLBACK(x1_keyboard_callback)
 		if((key1 != state->m_old_key1) || (key2 != state->m_old_key2) || (key3 != state->m_old_key3) || (key4 != state->m_old_key4) || (f_key != state->m_old_fkey))
 		{
 			// generate keyboard IRQ
-			state->x1_sub_io_w(*space,0,0xe6);
+			state->x1_sub_io_w(space,0,0xe6);
 			state->m_irq_vector = state->m_key_irq_vector;
 			state->m_key_irq_flag = 1;
 			timer.machine().device("x1_cpu")->execute().set_input_line(0,ASSERT_LINE);

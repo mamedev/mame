@@ -983,7 +983,7 @@ static void tlcs900_input_level_change( tlcs900_state *cpustate, int input, int 
 
 static READ8_HANDLER( tlcs900_internal_r )
 {
-	tlcs900_state *cpustate = get_safe_token( &space->device() );
+	tlcs900_state *cpustate = get_safe_token( &space.device() );
 
 	return cpustate->reg[ offset ];
 }
@@ -991,7 +991,7 @@ static READ8_HANDLER( tlcs900_internal_r )
 
 static WRITE8_HANDLER( tlcs900_internal_w )
 {
-	tlcs900_state *cpustate = get_safe_token( &space->device() );
+	tlcs900_state *cpustate = get_safe_token( &space.device() );
 
 	switch ( offset )
 	{
@@ -1767,7 +1767,7 @@ static CPU_RESET( tmp95c063 )
 
 static READ8_HANDLER( tmp95c063_internal_r )
 {
-	tlcs900_state *cpustate = get_safe_token( &space->device() );
+	tlcs900_state *cpustate = get_safe_token( &space.device() );
 
 	if (!cpustate->port_read.isnull())
 	{
@@ -1794,7 +1794,7 @@ static READ8_HANDLER( tmp95c063_internal_r )
 
 static WRITE8_HANDLER( tmp95c063_internal_w )
 {
-	tlcs900_state *cpustate = get_safe_token( &space->device() );
+	tlcs900_state *cpustate = get_safe_token( &space.device() );
 
 	switch ( offset )
 	{

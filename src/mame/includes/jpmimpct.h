@@ -114,8 +114,8 @@ public:
 /*----------- defined in video/jpmimpct.c -----------*/
 
 
-void jpmimpct_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg);
-void jpmimpct_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg);
+void jpmimpct_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
+void jpmimpct_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
 void jpmimpct_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params);
 
 

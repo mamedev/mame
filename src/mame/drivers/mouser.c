@@ -289,12 +289,12 @@ DRIVER_INIT_MEMBER(mouser_state,mouser)
 	/* Decode the opcodes */
 
 	offs_t i;
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x6000);
 	UINT8 *table = machine().root_device().memregion("user1")->base();
 
-	space->set_decrypted_region(0x0000, 0x5fff, decrypted);
+	space.set_decrypted_region(0x0000, 0x5fff, decrypted);
 
 	for (i = 0; i < 0x6000; i++)
 	{

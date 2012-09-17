@@ -66,7 +66,7 @@ public:
 	static ioport_port *resolve_port(const char *tag, device_t &current);
 	static device_t *resolve_device(int index, const char *tag, device_t &current);
 	static device_execute_interface *resolve_execute_interface(const char *tag, device_t &current);
-	static address_space *resolve_space(int index, const char *tag, device_t &current);
+	static address_space &resolve_space(int index, const char *tag, device_t &current);
 };
 
 
@@ -131,7 +131,7 @@ device_execute_interface *devcb_resolver::resolve_execute_interface(const char *
 //  given a device tag and a space index
 //-------------------------------------------------
 
-address_space *devcb_resolver::resolve_space(int index, const char *tag, device_t &current)
+address_space &devcb_resolver::resolve_space(int index, const char *tag, device_t &current)
 {
 	// find our target device
 	device_t *targetdev = current.siblingdevice(tag);
@@ -148,7 +148,7 @@ address_space *devcb_resolver::resolve_space(int index, const char *tag, device_
 	if (result == NULL)
 		throw emu_fatalerror("Unable to find device '%s' space %d (requested by %s '%s')", tag, index, current.name(), current.tag());
 
-	return result;
+	return *result;
 }
 
 
@@ -201,7 +201,7 @@ void devcb_resolved_read_line::resolve(const devcb_read_line &desc, device_t &de
 			break;
 
 		case DEVCB_TYPE_LEGACY_SPACE:
-			m_object.space = devcb_resolver::resolve_space(desc.index, desc.tag, device);
+			m_object.space = &devcb_resolver::resolve_space(desc.index, desc.tag, device);
 			m_helper.read8_space = desc.readspace;
 			*static_cast<devcb_read_line_delegate *>(this) = devcb_read_line_delegate(&devcb_resolved_read_line::from_read8, desc.name, this);
 			break;
@@ -295,7 +295,7 @@ void devcb_resolved_write_line::resolve(const devcb_write_line &desc, device_t &
 			break;
 
 		case DEVCB_TYPE_LEGACY_SPACE:
-			m_object.space = devcb_resolver::resolve_space(desc.index, desc.tag, device);
+			m_object.space = &devcb_resolver::resolve_space(desc.index, desc.tag, device);
 			m_helper.write8_space = desc.writespace;
 			*static_cast<devcb_write_line_delegate *>(this) = devcb_write_line_delegate(&devcb_resolved_write_line::to_write8, desc.name, this);
 			break;
@@ -403,7 +403,7 @@ void devcb_resolved_read8::resolve(const devcb_read8 &desc, device_t &device)
 			break;
 
 		case DEVCB_TYPE_LEGACY_SPACE:
-			m_object.space = devcb_resolver::resolve_space(desc.index, desc.tag, device);
+			m_object.space = &devcb_resolver::resolve_space(desc.index, desc.tag, device);
 			*static_cast<devcb_read8_delegate *>(this) = devcb_read8_delegate(desc.readspace, desc.name, m_object.space);
 			break;
 
@@ -510,7 +510,7 @@ void devcb_resolved_write8::resolve(const devcb_write8 &desc, device_t &device)
 			break;
 
 		case DEVCB_TYPE_LEGACY_SPACE:
-			m_object.space = devcb_resolver::resolve_space(desc.index, desc.tag, device);
+			m_object.space = &devcb_resolver::resolve_space(desc.index, desc.tag, device);
 			*static_cast<devcb_write8_delegate *>(this) = devcb_write8_delegate(desc.writespace, desc.name, m_object.space);
 			break;
 
@@ -628,7 +628,7 @@ void devcb_resolved_read16::resolve(const devcb_read16 &desc, device_t &device)
 			break;
 
 		case DEVCB_TYPE_LEGACY_SPACE:
-			m_object.space = devcb_resolver::resolve_space(desc.index, desc.tag, device);
+			m_object.space = &devcb_resolver::resolve_space(desc.index, desc.tag, device);
 			*static_cast<devcb_read16_delegate *>(this) = devcb_read16_delegate(desc.readspace, desc.name, m_object.space);
 			break;
 
@@ -735,7 +735,7 @@ void devcb_resolved_write16::resolve(const devcb_write16 &desc, device_t &device
 			break;
 
 		case DEVCB_TYPE_LEGACY_SPACE:
-			m_object.space = devcb_resolver::resolve_space(desc.index, desc.tag, device);
+			m_object.space = &devcb_resolver::resolve_space(desc.index, desc.tag, device);
 			*static_cast<devcb_write16_delegate *>(this) = devcb_write16_delegate(desc.writespace, desc.name, m_object.space);
 			break;
 

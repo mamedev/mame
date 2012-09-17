@@ -707,22 +707,22 @@ static void GCU_w(running_machine &machine, int chip, UINT32 offset, UINT32 data
 
 static READ32_HANDLER(gcu0_r)
 {
-	return GCU_r(space->machine(), 0, offset, mem_mask);
+	return GCU_r(space.machine(), 0, offset, mem_mask);
 }
 
 static WRITE32_HANDLER(gcu0_w)
 {
-	GCU_w(space->machine(), 0, offset, data, mem_mask);
+	GCU_w(space.machine(), 0, offset, data, mem_mask);
 }
 
 static READ32_HANDLER(gcu1_r)
 {
-	return GCU_r(space->machine(), 1, offset, mem_mask);
+	return GCU_r(space.machine(), 1, offset, mem_mask);
 }
 
 static WRITE32_HANDLER(gcu1_w)
 {
-	GCU_w(space->machine(), 1, offset, data, mem_mask);
+	GCU_w(space.machine(), 1, offset, data, mem_mask);
 }
 
 /*****************************************************************************/
@@ -733,15 +733,15 @@ static READ32_HANDLER(input_r)
 
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= (space->machine().root_device().ioport("IN0")->read() & 0xff) << 24;
+		r |= (space.machine().root_device().ioport("IN0")->read() & 0xff) << 24;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= (space->machine().root_device().ioport("IN1")->read() & 0xff) << 8;
+		r |= (space.machine().root_device().ioport("IN1")->read() & 0xff) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= (space->machine().root_device().ioport("IN2")->read() & 0xff);
+		r |= (space.machine().root_device().ioport("IN2")->read() & 0xff);
 	}
 
 	return r;
@@ -751,17 +751,17 @@ static READ32_HANDLER( sensor_r )
 {
 	if (offset == 0)
 	{
-		return space->machine().root_device().ioport("SENSOR1")->read() | 0x01000100;
+		return space.machine().root_device().ioport("SENSOR1")->read() | 0x01000100;
 	}
 	else
 	{
-		return space->machine().root_device().ioport("SENSOR2")->read() | 0x01000100;
+		return space.machine().root_device().ioport("SENSOR2")->read() | 0x01000100;
 	}
 }
 
 static READ32_HANDLER(flashram_r)
 {
-	firebeat_state *state = space->machine().driver_data<firebeat_state>();
+	firebeat_state *state = space.machine().driver_data<firebeat_state>();
 	UINT32 r = 0;
 	if (ACCESSING_BITS_24_31)
 	{
@@ -784,7 +784,7 @@ static READ32_HANDLER(flashram_r)
 
 static WRITE32_HANDLER(flashram_w)
 {
-	firebeat_state *state = space->machine().driver_data<firebeat_state>();
+	firebeat_state *state = space.machine().driver_data<firebeat_state>();
 	if (ACCESSING_BITS_24_31)
 	{
 		state->m_flash[0]->write((offset*4)+0, (data >> 24) & 0xff);
@@ -805,7 +805,7 @@ static WRITE32_HANDLER(flashram_w)
 
 static READ32_HANDLER(soundflash_r)
 {
-	firebeat_state *state = space->machine().driver_data<firebeat_state>();
+	firebeat_state *state = space.machine().driver_data<firebeat_state>();
 	UINT32 r = 0;
 	fujitsu_29f016a_device *chip;
 	if (offset >= 0 && offset < 0x200000/4)
@@ -840,7 +840,7 @@ static READ32_HANDLER(soundflash_r)
 
 static WRITE32_HANDLER(soundflash_w)
 {
-	firebeat_state *state = space->machine().driver_data<firebeat_state>();
+	firebeat_state *state = space.machine().driver_data<firebeat_state>();
 	fujitsu_29f016a_device *chip;
 	if (offset >= 0 && offset < 0x200000/4)
 	{
@@ -1220,12 +1220,12 @@ static READ32_HANDLER( atapi_command_r )
 //  printf("atapi_command_r: %08X, %08X\n", offset, mem_mask);
 	if (ACCESSING_BITS_16_31)
 	{
-		r = atapi_command_reg_r(space->machine(), offset*2);
+		r = atapi_command_reg_r(space.machine(), offset*2);
 		return ATAPI_ENDIAN(r) << 16;
 	}
 	else
 	{
-		r = atapi_command_reg_r(space->machine(), (offset*2) + 1);
+		r = atapi_command_reg_r(space.machine(), (offset*2) + 1);
 		return ATAPI_ENDIAN(r) << 0;
 	}
 }
@@ -1236,11 +1236,11 @@ static WRITE32_HANDLER( atapi_command_w )
 
 	if (ACCESSING_BITS_16_31)
 	{
-		atapi_command_reg_w(space->machine(), offset*2, ATAPI_ENDIAN((data >> 16) & 0xffff));
+		atapi_command_reg_w(space.machine(), offset*2, ATAPI_ENDIAN((data >> 16) & 0xffff));
 	}
 	else
 	{
-		atapi_command_reg_w(space->machine(), (offset*2) + 1, ATAPI_ENDIAN((data >> 0) & 0xffff));
+		atapi_command_reg_w(space.machine(), (offset*2) + 1, ATAPI_ENDIAN((data >> 0) & 0xffff));
 	}
 }
 
@@ -1252,12 +1252,12 @@ static READ32_HANDLER( atapi_control_r )
 
 	if (ACCESSING_BITS_16_31)
 	{
-		r = atapi_control_reg_r(space->machine(), offset*2);
+		r = atapi_control_reg_r(space.machine(), offset*2);
 		return ATAPI_ENDIAN(r) << 16;
 	}
 	else
 	{
-		r = atapi_control_reg_r(space->machine(), (offset*2) + 1);
+		r = atapi_control_reg_r(space.machine(), (offset*2) + 1);
 		return ATAPI_ENDIAN(r) << 0;
 	}
 }
@@ -1266,11 +1266,11 @@ static WRITE32_HANDLER( atapi_control_w )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		atapi_control_reg_w(space->machine(), offset*2, ATAPI_ENDIAN(data >> 16) & 0xff);
+		atapi_control_reg_w(space.machine(), offset*2, ATAPI_ENDIAN(data >> 16) & 0xff);
 	}
 	else
 	{
-		atapi_control_reg_w(space->machine(), (offset*2) + 1, ATAPI_ENDIAN(data >> 0) & 0xff);
+		atapi_control_reg_w(space.machine(), (offset*2) + 1, ATAPI_ENDIAN(data >> 0) & 0xff);
 	}
 }
 
@@ -1335,7 +1335,7 @@ static const int ppd_cab_data[2] = { 0x1, 0x9 };
 
 static READ32_HANDLER( cabinet_r )
 {
-	firebeat_state *state = space->machine().driver_data<firebeat_state>();
+	firebeat_state *state = space.machine().driver_data<firebeat_state>();
 	UINT32 r = 0;
 
 //  printf("cabinet_r: %08X, %08X\n", offset, mem_mask);
@@ -1361,11 +1361,11 @@ static READ32_HANDLER( keyboard_wheel_r )
 {
 	if (offset == 0)		// Keyboard Wheel (P1)
 	{
-		return space->machine().root_device().ioport("WHEEL_P1")->read() << 24;
+		return space.machine().root_device().ioport("WHEEL_P1")->read() << 24;
 	}
 	else if (offset == 2)	// Keyboard Wheel (P2)
 	{
-		return space->machine().root_device().ioport("WHEEL_P2")->read() << 24;
+		return space.machine().root_device().ioport("WHEEL_P2")->read() << 24;
 	}
 
 	return 0;
@@ -1500,7 +1500,7 @@ static TIMER_CALLBACK( keyboard_timer_callback )
 
 static READ32_HANDLER( extend_board_irq_r)
 {
-	firebeat_state *state = space->machine().driver_data<firebeat_state>();
+	firebeat_state *state = space.machine().driver_data<firebeat_state>();
 	UINT32 r = 0;
 
 	if (ACCESSING_BITS_24_31)
@@ -1513,7 +1513,7 @@ static READ32_HANDLER( extend_board_irq_r)
 
 static WRITE32_HANDLER( extend_board_irq_w )
 {
-	firebeat_state *state = space->machine().driver_data<firebeat_state>();
+	firebeat_state *state = space.machine().driver_data<firebeat_state>();
 //  printf("extend_board_irq_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 
 	if (ACCESSING_BITS_24_31)
@@ -1667,7 +1667,7 @@ static WRITE32_HANDLER( lamp_output3_ppp_w )
 
 static READ32_HANDLER(ppc_spu_share_r)
 {
-	firebeat_state *state = space->machine().driver_data<firebeat_state>();
+	firebeat_state *state = space.machine().driver_data<firebeat_state>();
 	UINT32 r = 0;
 
 	if (ACCESSING_BITS_24_31)
@@ -1692,7 +1692,7 @@ static READ32_HANDLER(ppc_spu_share_r)
 
 static WRITE32_HANDLER(ppc_spu_share_w)
 {
-	firebeat_state *state = space->machine().driver_data<firebeat_state>();
+	firebeat_state *state = space.machine().driver_data<firebeat_state>();
 	if (ACCESSING_BITS_24_31)
 	{
 		state->m_spu_shared_ram[(offset * 4) + 0] = (data >> 24) & 0xff;
@@ -1714,13 +1714,13 @@ static WRITE32_HANDLER(ppc_spu_share_w)
 #ifdef UNUSED_FUNCTION
 static READ16_HANDLER(m68k_spu_share_r)
 {
-	firebeat_state *state = space->machine().driver_data<firebeat_state>();
+	firebeat_state *state = space.machine().driver_data<firebeat_state>();
 	return state->m_spu_shared_ram[offset] << 8;
 }
 
 static WRITE16_HANDLER(m68k_spu_share_w)
 {
-	firebeat_state *state = space->machine().driver_data<firebeat_state>();
+	firebeat_state *state = space.machine().driver_data<firebeat_state>();
 	state->m_spu_shared_ram[offset] = (data >> 8) & 0xff;
 }
 #endif

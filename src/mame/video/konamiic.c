@@ -1400,9 +1400,9 @@ WRITE32_HANDLER( K053247_long_w )
 // in this window, +0 = 32 bits from one set of ROMs, and +8 = 32 bits from another set
 READ16_HANDLER( K055673_rom_word_r )	// 5bpp
 {
-	UINT8 *ROM8 = (UINT8 *)space->machine().root_device().memregion(K053247_memory_region)->base();
-	UINT16 *ROM = (UINT16 *)space->machine().root_device().memregion(K053247_memory_region)->base();
-	int size4 = (space->machine().root_device().memregion(K053247_memory_region)->bytes()/(1024*1024))/5;
+	UINT8 *ROM8 = (UINT8 *)space.machine().root_device().memregion(K053247_memory_region)->base();
+	UINT16 *ROM = (UINT16 *)space.machine().root_device().memregion(K053247_memory_region)->base();
+	int size4 = (space.machine().root_device().memregion(K053247_memory_region)->bytes()/(1024*1024))/5;
 	int romofs;
 
 	size4 *= 4*1024*1024;	// get offset to 5th bit
@@ -1438,7 +1438,7 @@ READ16_HANDLER( K055673_rom_word_r )	// 5bpp
 
 READ16_HANDLER( K055673_GX6bpp_rom_word_r )
 {
-	UINT16 *ROM = (UINT16 *)space->machine().root_device().memregion(K053247_memory_region)->base();
+	UINT16 *ROM = (UINT16 *)space.machine().root_device().memregion(K053247_memory_region)->base();
 	int romofs;
 
 	romofs = K053246_regs[6]<<16 | K053246_regs[7]<<8 | K053246_regs[4];
@@ -1463,7 +1463,7 @@ READ16_HANDLER( K055673_GX6bpp_rom_word_r )
 		case 7:
 			return ROM[romofs+2];
 		default:
-			LOG(("55673_rom_word_r: Unknown read offset %x (PC=%x)\n", offset, space->device().safe_pc()));
+			LOG(("55673_rom_word_r: Unknown read offset %x (PC=%x)\n", offset, space.device().safe_pc()));
 			break;
 	}
 
@@ -1666,7 +1666,7 @@ static UINT8 K054000_ram[0x20];
 
 static WRITE8_HANDLER( K054000_w )
 {
-//logerror("%04x: write %02x to 054000 address %02x\n",space->device().safe_pc(),data,offset);
+//logerror("%04x: write %02x to 054000 address %02x\n",space.device().safe_pc(),data,offset);
 
 	K054000_ram[offset] = data;
 }
@@ -1676,7 +1676,7 @@ static READ8_HANDLER( K054000_r )
 	int Acx,Acy,Aax,Aay;
 	int Bcx,Bcy,Bax,Bay;
 
-//logerror("%04x: read 054000 address %02x\n",space->device().safe_pc(),offset);
+//logerror("%04x: read 054000 address %02x\n",space.device().safe_pc(),offset);
 
 	if (offset != 0x18) return 0;
 
@@ -2249,23 +2249,23 @@ READ32_HANDLER( K056832_5bpp_rom_long_r )
 {
 	if (mem_mask == 0xff000000)
 	{
-		return K056832_rom_read_b(space->machine(), offset*4, 4, 5, 0)<<24;
+		return K056832_rom_read_b(space.machine(), offset*4, 4, 5, 0)<<24;
 	}
 	else if (mem_mask == 0x00ff0000)
 	{
-		return K056832_rom_read_b(space->machine(), offset*4+1, 4, 5, 0)<<16;
+		return K056832_rom_read_b(space.machine(), offset*4+1, 4, 5, 0)<<16;
 	}
 	else if (mem_mask == 0x0000ff00)
 	{
-		return K056832_rom_read_b(space->machine(), offset*4+2, 4, 5, 0)<<8;
+		return K056832_rom_read_b(space.machine(), offset*4+2, 4, 5, 0)<<8;
 	}
 	else if (mem_mask == 0x000000ff)
 	{
-		return K056832_rom_read_b(space->machine(), offset*4+3, 4, 5, 1);
+		return K056832_rom_read_b(space.machine(), offset*4+3, 4, 5, 1);
 	}
 	else
 	{
-		LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", space->device().safe_pc(), mem_mask));
+		LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", space.device().safe_pc(), mem_mask));
 	}
 	return 0;
 }
@@ -2274,23 +2274,23 @@ READ32_HANDLER( K056832_6bpp_rom_long_r )
 {
 	if (mem_mask == 0xff000000)
 	{
-		return K056832_rom_read_b(space->machine(), offset*4, 4, 6, 0)<<24;
+		return K056832_rom_read_b(space.machine(), offset*4, 4, 6, 0)<<24;
 	}
 	else if (mem_mask == 0x00ff0000)
 	{
-		return K056832_rom_read_b(space->machine(), offset*4+1, 4, 6, 0)<<16;
+		return K056832_rom_read_b(space.machine(), offset*4+1, 4, 6, 0)<<16;
 	}
 	else if (mem_mask == 0x0000ff00)
 	{
-		return K056832_rom_read_b(space->machine(), offset*4+2, 4, 6, 0)<<8;
+		return K056832_rom_read_b(space.machine(), offset*4+2, 4, 6, 0)<<8;
 	}
 	else if (mem_mask == 0x000000ff)
 	{
-		return K056832_rom_read_b(space->machine(), offset*4+3, 4, 6, 0);
+		return K056832_rom_read_b(space.machine(), offset*4+3, 4, 6, 0);
 	}
 	else
 	{
-		LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", space->device().safe_pc(), mem_mask));
+		LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", space.device().safe_pc(), mem_mask));
 	}
 	return 0;
 }
@@ -2305,7 +2305,7 @@ READ16_HANDLER( K056832_mw_rom_word_r )
 
 	if (!K056832_rombase)
 	{
-		K056832_rombase = space->machine().root_device().memregion(K056832_memory_region)->base();
+		K056832_rombase = space.machine().root_device().memregion(K056832_memory_region)->base();
 	}
 
 	if (K056832_regsb[2] & 0x8)

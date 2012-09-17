@@ -102,7 +102,7 @@ READ16_MEMBER(cabal_state::track_r)
 
 WRITE16_MEMBER(cabal_state::cabal_sound_irq_trigger_word_w)
 {
-	seibu_main_word_w(&space,4,data,mem_mask);
+	seibu_main_word_w(space,4,data,mem_mask);
 
 	/* spin for a while to let the Z80 read the command, otherwise coins "stick" */
 	space.device().execute().spin_until_time(attotime::from_usec(50));
@@ -848,11 +848,11 @@ ROM_END
 
 static void seibu_sound_bootleg(running_machine &machine,const char *cpu,int length)
 {
-	address_space *space = machine.device(cpu)->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device(cpu)->memory().space(AS_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length);
 	UINT8 *rom = machine.root_device().memregion(cpu)->base();
 
-	space->set_decrypted_region(0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
+	space.set_decrypted_region(0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
 
 	memcpy(decrypt, rom+length, length);
 

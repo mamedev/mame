@@ -530,7 +530,7 @@ ROM_END
 
 QUICKLOAD_LOAD(vc4000)
 {
-	address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 	int quick_addr = 0x08c0;
 	int exec_addr;
@@ -567,12 +567,12 @@ QUICKLOAD_LOAD(vc4000)
 		quick_addr = quick_data[1] * 256 + quick_data[2];
 		exec_addr = quick_data[3] * 256 + quick_data[4];
 
-		space->write_byte(0x08be, quick_data[3]);
-		space->write_byte(0x08bf, quick_data[4]);
+		space.write_byte(0x08be, quick_data[3]);
+		space.write_byte(0x08bf, quick_data[4]);
 
 		for (i = 0; i < quick_length - 5; i++)
 			if ((quick_addr + i) < 0x1600)
-				space->write_byte(i + quick_addr, quick_data[i+5]);
+				space.write_byte(i + quick_addr, quick_data[i+5]);
 
 		/* display a message about the loaded quickload */
 		image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length-5,quick_addr,quick_addr+quick_length-5,exec_addr);
@@ -617,7 +617,7 @@ QUICKLOAD_LOAD(vc4000)
 
 		for (i = quick_addr; i < quick_length; i++)
 			if (i < 0x1600)
-				space->write_byte(i, quick_data[i]);
+				space.write_byte(i, quick_data[i]);
 
 		/* display a message about the loaded quickload */
 		image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);

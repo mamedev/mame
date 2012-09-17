@@ -457,11 +457,11 @@ INLINE UINT8* blitter_get_addr(running_machine &machine, UINT32 addr)
     The Flare One blitter is a simpler design with slightly different parameters
     and will require hardware tests to figure everything out correctly.
 */
-static void RunBlit(address_space *space)
+static void RunBlit(address_space &space)
 {
-#define BLITPRG_READ(x)		blitter.x = *(blitter_get_addr(space->machine(), blitter.program.addr++))
+#define BLITPRG_READ(x)		blitter.x = *(blitter_get_addr(space.machine(), blitter.program.addr++))
 
-	bfcobra_state *state = space->machine().driver_data<bfcobra_state>();
+	bfcobra_state *state = space.machine().driver_data<bfcobra_state>();
 	struct blitter_t &blitter = state->m_blitter;
 	int cycles_used = 0;
 
@@ -571,7 +571,7 @@ static void RunBlit(address_space *space)
 						blitter.source.addr0 -=blitter.step;
 					}
 
-					*blitter_get_addr(space->machine(), blitter.dest.addr) = blitter.pattern;
+					*blitter_get_addr(space.machine(), blitter.dest.addr) = blitter.pattern;
 					cycles_used++;
 
 				} while (--innercnt);
@@ -585,7 +585,7 @@ static void RunBlit(address_space *space)
 
 				if (LOOPTYPE == 3 && innercnt == blitter.innercnt)
 				{
-					srcdata = *(blitter_get_addr(space->machine(), blitter.source.addr & 0xfffff));
+					srcdata = *(blitter_get_addr(space.machine(), blitter.source.addr & 0xfffff));
 					blitter.source.loword++;
 					cycles_used++;
 				}
@@ -595,7 +595,7 @@ static void RunBlit(address_space *space)
 				{
 					if (LOOPTYPE == 0 || LOOPTYPE == 1)
 					{
-						srcdata = *(blitter_get_addr(space->machine(), blitter.source.addr & 0xfffff));
+						srcdata = *(blitter_get_addr(space.machine(), blitter.source.addr & 0xfffff));
 						cycles_used++;
 
 						if (blitter.modectl & MODE_SSIGN)
@@ -610,7 +610,7 @@ static void RunBlit(address_space *space)
 				/* Read destination pixel? */
 				if (LOOPTYPE == 0)
 				{
-					dstdata = *blitter_get_addr(space->machine(), blitter.dest.addr & 0xfffff);
+					dstdata = *blitter_get_addr(space.machine(), blitter.dest.addr & 0xfffff);
 					cycles_used++;
 				}
 
@@ -679,10 +679,10 @@ static void RunBlit(address_space *space)
                             The existing destination pixel is used as a lookup
                             into the table and the colours is replaced.
                         */
-						UINT8 dest = *blitter_get_addr(space->machine(), blitter.dest.addr);
-						UINT8 newcol = *(blitter_get_addr(space->machine(), (blitter.source.addr + dest) & 0xfffff));
+						UINT8 dest = *blitter_get_addr(space.machine(), blitter.dest.addr);
+						UINT8 newcol = *(blitter_get_addr(space.machine(), (blitter.source.addr + dest) & 0xfffff));
 
-						*blitter_get_addr(space->machine(), blitter.dest.addr) = newcol;
+						*blitter_get_addr(space.machine(), blitter.dest.addr) = newcol;
 						cycles_used += 3;
 					}
 					else
@@ -701,7 +701,7 @@ static void RunBlit(address_space *space)
 						if (blitter.compfunc & CMPFUNC_LOG0)
 							final_result |= ~result & ~dstdata;
 
-						*blitter_get_addr(space->machine(), blitter.dest.addr) = final_result;
+						*blitter_get_addr(space.machine(), blitter.dest.addr) = final_result;
 						cycles_used++;
 					}
 				}
@@ -741,7 +741,7 @@ static void RunBlit(address_space *space)
 	} while (blitter.command  & CMD_RUN);
 
 	/* Burn Z80 cycles while blitter is in operation */
-	space->device().execute().spin_until_time(attotime::from_nsec( (1000000000 / Z80_XTAL)*cycles_used * 2 ) );
+	space.device().execute().spin_until_time(attotime::from_nsec( (1000000000 / Z80_XTAL)*cycles_used * 2 ) );
 }
 
 
@@ -1008,7 +1008,7 @@ WRITE8_MEMBER(bfcobra_state::chipset_w)
 			m_blitter.command = data;
 
 			if (data & CMD_RUN)
-				RunBlit(&space);
+				RunBlit(space);
 			else
 				mame_printf_debug("Blitter stopped by IO.\n");
 

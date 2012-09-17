@@ -127,7 +127,7 @@ WRITE32_MEMBER(vegaeo_state::vega_misc_w)
 
 READ32_MEMBER(vegaeo_state::vegaeo_custom_read)
 {
-	eolith_speedup_read(&space);
+	eolith_speedup_read(space);
 	return ioport("SYSTEM")->read();
 }
 

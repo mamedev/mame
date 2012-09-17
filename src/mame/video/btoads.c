@@ -257,7 +257,7 @@ void btoads_state::render_sprite_row(UINT16 *sprite_source, UINT32 address)
  *
  *************************************/
 
-void btoads_state::to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
+void btoads_state::to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
 	address &= ~0x40000000;
 
@@ -284,7 +284,7 @@ void btoads_state::to_shiftreg(address_space *space, UINT32 address, UINT16 *shi
 }
 
 
-void btoads_state::from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
+void btoads_state::from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
 	address &= ~0x40000000;
 

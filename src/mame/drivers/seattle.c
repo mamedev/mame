@@ -506,7 +506,7 @@ static void vblank_assert(device_t *device, int state);
 static void update_vblank_irq(running_machine &machine);
 static void galileo_reset(running_machine &machine);
 static TIMER_CALLBACK( galileo_timer_callback );
-static void galileo_perform_dma(address_space *space, int which);
+static void galileo_perform_dma(address_space &space, int which);
 static void voodoo_stall(device_t *device, int stall);
 static void widget_reset(running_machine &machine);
 static void update_widget_irq(running_machine &machine);
@@ -798,9 +798,9 @@ static void vblank_assert(device_t *device, int state)
  *
  *************************************/
 
-static UINT32 pci_bridge_r(address_space *space, UINT8 reg, UINT8 type)
+static UINT32 pci_bridge_r(address_space &space, UINT8 reg, UINT8 type)
 {
-	seattle_state *state = space->machine().driver_data<seattle_state>();
+	seattle_state *state = space.machine().driver_data<seattle_state>();
 	UINT32 result = state->m_galileo.pci_bridge_regs[reg];
 
 	switch (reg)
@@ -815,17 +815,17 @@ static UINT32 pci_bridge_r(address_space *space, UINT8 reg, UINT8 type)
 	}
 
 	if (LOG_PCI)
-		logerror("%08X:PCI bridge read: reg %d type %d = %08X\n", space->device().safe_pc(), reg, type, result);
+		logerror("%08X:PCI bridge read: reg %d type %d = %08X\n", space.device().safe_pc(), reg, type, result);
 	return result;
 }
 
 
-static void pci_bridge_w(address_space *space, UINT8 reg, UINT8 type, UINT32 data)
+static void pci_bridge_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data)
 {
-	seattle_state *state = space->machine().driver_data<seattle_state>();
+	seattle_state *state = space.machine().driver_data<seattle_state>();
 	state->m_galileo.pci_bridge_regs[reg] = data;
 	if (LOG_PCI)
-		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", space->device().safe_pc(), reg, type, data);
+		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", space.device().safe_pc(), reg, type, data);
 }
 
 
@@ -836,9 +836,9 @@ static void pci_bridge_w(address_space *space, UINT8 reg, UINT8 type, UINT32 dat
  *
  *************************************/
 
-static UINT32 pci_3dfx_r(address_space *space, UINT8 reg, UINT8 type)
+static UINT32 pci_3dfx_r(address_space &space, UINT8 reg, UINT8 type)
 {
-	seattle_state *state = space->machine().driver_data<seattle_state>();
+	seattle_state *state = space.machine().driver_data<seattle_state>();
 	UINT32 result = state->m_galileo.pci_3dfx_regs[reg];
 
 	switch (reg)
@@ -853,14 +853,14 @@ static UINT32 pci_3dfx_r(address_space *space, UINT8 reg, UINT8 type)
 	}
 
 	if (LOG_PCI)
-		logerror("%08X:PCI 3dfx read: reg %d type %d = %08X\n", space->device().safe_pc(), reg, type, result);
+		logerror("%08X:PCI 3dfx read: reg %d type %d = %08X\n", space.device().safe_pc(), reg, type, result);
 	return result;
 }
 
 
-static void pci_3dfx_w(address_space *space, UINT8 reg, UINT8 type, UINT32 data)
+static void pci_3dfx_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data)
 {
-	seattle_state *state = space->machine().driver_data<seattle_state>();
+	seattle_state *state = space.machine().driver_data<seattle_state>();
 	state->m_galileo.pci_3dfx_regs[reg] = data;
 
 	switch (reg)
@@ -876,7 +876,7 @@ static void pci_3dfx_w(address_space *space, UINT8 reg, UINT8 type, UINT32 data)
 			break;
 	}
 	if (LOG_PCI)
-		logerror("%08X:PCI 3dfx write: reg %d type %d = %08X\n", space->device().safe_pc(), reg, type, data);
+		logerror("%08X:PCI 3dfx write: reg %d type %d = %08X\n", space.device().safe_pc(), reg, type, data);
 }
 
 
@@ -887,9 +887,9 @@ static void pci_3dfx_w(address_space *space, UINT8 reg, UINT8 type, UINT32 data)
  *
  *************************************/
 
-static UINT32 pci_ide_r(address_space *space, UINT8 reg, UINT8 type)
+static UINT32 pci_ide_r(address_space &space, UINT8 reg, UINT8 type)
 {
-	seattle_state *state = space->machine().driver_data<seattle_state>();
+	seattle_state *state = space.machine().driver_data<seattle_state>();
 	UINT32 result = state->m_galileo.pci_ide_regs[reg];
 
 	switch (reg)
@@ -904,17 +904,17 @@ static UINT32 pci_ide_r(address_space *space, UINT8 reg, UINT8 type)
 	}
 
 	if (LOG_PCI)
-		logerror("%08X:PCI IDE read: reg %d type %d = %08X\n", space->device().safe_pc(), reg, type, result);
+		logerror("%08X:PCI IDE read: reg %d type %d = %08X\n", space.device().safe_pc(), reg, type, result);
 	return result;
 }
 
 
-static void pci_ide_w(address_space *space, UINT8 reg, UINT8 type, UINT32 data)
+static void pci_ide_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data)
 {
-	seattle_state *state = space->machine().driver_data<seattle_state>();
+	seattle_state *state = space.machine().driver_data<seattle_state>();
 	state->m_galileo.pci_ide_regs[reg] = data;
 	if (LOG_PCI)
-		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", space->device().safe_pc(), reg, type, data);
+		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", space.device().safe_pc(), reg, type, data);
 }
 
 
@@ -973,9 +973,9 @@ static TIMER_CALLBACK( galileo_timer_callback )
  *
  *************************************/
 
-static int galileo_dma_fetch_next(address_space *space, int which)
+static int galileo_dma_fetch_next(address_space &space, int which)
 {
-	seattle_state *state = space->machine().driver_data<seattle_state>();
+	seattle_state *state = space.machine().driver_data<seattle_state>();
 	galileo_data &galileo = state->m_galileo;
 	offs_t address = 0;
 	UINT32 data;
@@ -990,34 +990,34 @@ static int galileo_dma_fetch_next(address_space *space, int which)
 		if (galileo.reg[GREG_DMA0_CONTROL + which] & 0x400)
 		{
 			galileo.reg[GREG_INT_STATE] |= 1 << (GINT_DMA0COMP_SHIFT + which);
-			update_galileo_irqs(space->machine());
+			update_galileo_irqs(space.machine());
 		}
 		galileo.reg[GREG_DMA0_CONTROL + which] &= ~0x5000;
 		return 0;
 	}
 
 	/* fetch the byte count */
-	data = space->read_dword(address); address += 4;
+	data = space.read_dword(address); address += 4;
 	galileo.reg[GREG_DMA0_COUNT + which] = data;
 
 	/* fetch the source address */
-	data = space->read_dword(address); address += 4;
+	data = space.read_dword(address); address += 4;
 	galileo.reg[GREG_DMA0_SOURCE + which] = data;
 
 	/* fetch the dest address */
-	data = space->read_dword(address); address += 4;
+	data = space.read_dword(address); address += 4;
 	galileo.reg[GREG_DMA0_DEST + which] = data;
 
 	/* fetch the next record address */
-	data = space->read_dword(address); address += 4;
+	data = space.read_dword(address); address += 4;
 	galileo.reg[GREG_DMA0_NEXT + which] = data;
 	return 1;
 }
 
 
-static void galileo_perform_dma(address_space *space, int which)
+static void galileo_perform_dma(address_space &space, int which)
 {
-	seattle_state *state = space->machine().driver_data<seattle_state>();
+	seattle_state *state = space.machine().driver_data<seattle_state>();
 	galileo_data &galileo = state->m_galileo;
 	do
 	{
@@ -1068,7 +1068,7 @@ static void galileo_perform_dma(address_space *space, int which)
 				}
 
 				/* write the data and advance */
-				voodoo_w(state->m_voodoo, *space, (dstaddr & 0xffffff) / 4, space->read_dword(srcaddr), 0xffffffff);
+				voodoo_w(state->m_voodoo, space, (dstaddr & 0xffffff) / 4, space.read_dword(srcaddr), 0xffffffff);
 				srcaddr += srcinc;
 				dstaddr += dstinc;
 				bytesleft -= 4;
@@ -1080,7 +1080,7 @@ static void galileo_perform_dma(address_space *space, int which)
 		{
 			while (bytesleft > 0)
 			{
-				space->write_byte(dstaddr, space->read_byte(srcaddr));
+				space.write_byte(dstaddr, space.read_byte(srcaddr));
 				srcaddr += srcinc;
 				dstaddr += dstinc;
 				bytesleft--;
@@ -1101,7 +1101,7 @@ static void galileo_perform_dma(address_space *space, int which)
 		if (!(galileo.reg[GREG_DMA0_CONTROL + which] & 0x400))
 		{
 			galileo.reg[GREG_INT_STATE] |= 1 << (GINT_DMA0COMP_SHIFT + which);
-			update_galileo_irqs(space->machine());
+			update_galileo_irqs(space.machine());
 		}
 	} while (galileo_dma_fetch_next(space, which));
 
@@ -1169,15 +1169,15 @@ READ32_MEMBER(seattle_state::galileo_r)
 
 			/* unit 0 is the PCI bridge */
 			if (unit == 0 && func == 0)
-				result = pci_bridge_r(&space, reg, type);
+				result = pci_bridge_r(space, reg, type);
 
 			/* unit 8 is the 3dfx card */
 			else if (unit == 8 && func == 0)
-				result = pci_3dfx_r(&space, reg, type);
+				result = pci_3dfx_r(space, reg, type);
 
 			/* unit 9 is the IDE controller */
 			else if (unit == 9 && func == 0)
-				result = pci_ide_r(&space, reg, type);
+				result = pci_ide_r(space, reg, type);
 
 			/* anything else, just log */
 			else
@@ -1230,12 +1230,12 @@ WRITE32_MEMBER(seattle_state::galileo_w)
 
 			/* fetch next record */
 			if (data & 0x2000)
-				galileo_dma_fetch_next(&space, which);
+				galileo_dma_fetch_next(space, which);
 			galileo.reg[offset] &= ~0x2000;
 
 			/* if enabling, start the DMA */
 			if (!(oldata & 0x1000) && (data & 0x1000))
-				galileo_perform_dma(&space, which);
+				galileo_perform_dma(space, which);
 			break;
 		}
 
@@ -1308,15 +1308,15 @@ WRITE32_MEMBER(seattle_state::galileo_w)
 
 			/* unit 0 is the PCI bridge */
 			if (unit == 0 && func == 0)
-				pci_bridge_w(&space, reg, type, data);
+				pci_bridge_w(space, reg, type, data);
 
 			/* unit 8 is the 3dfx card */
 			else if (unit == 8 && func == 0)
-				pci_3dfx_w(&space, reg, type, data);
+				pci_3dfx_w(space, reg, type, data);
 
 			/* unit 9 is the IDE controller */
 			else if (unit == 9 && func == 0)
-				pci_ide_w(&space, reg, type, data);
+				pci_ide_w(space, reg, type, data);
 
 			/* anything else, just log */
 			else
@@ -1403,7 +1403,7 @@ static void voodoo_stall(device_t *device, int stall)
 		for (which = 0; which < 4; which++)
 			if (state->m_galileo.dma_stalled_on_voodoo[which])
 			{
-				address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
+				address_space &space = *device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 				if (LOG_DMA) logerror("Resuming DMA%d on voodoo\n", which);
 
 				/* mark this DMA as no longer stalled */

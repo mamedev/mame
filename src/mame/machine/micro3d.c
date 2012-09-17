@@ -605,7 +605,7 @@ WRITE32_MEMBER(micro3d_state::drmath_intr2_ack)
 
 DRIVER_INIT_MEMBER(micro3d_state,micro3d)
 {
-	address_space *space = machine().device("drmath")->memory().space(AS_DATA);
+	address_space &space = *machine().device("drmath")->memory().space(AS_DATA);
 
 	i8051_set_serial_tx_callback(machine().device("audiocpu"), data_from_i8031);
 	i8051_set_serial_rx_callback(machine().device("audiocpu"), data_to_i8031);
@@ -614,7 +614,7 @@ DRIVER_INIT_MEMBER(micro3d_state,micro3d)
 
 	/* The Am29000 program seems to rely on RAM from 0x00470000 onwards being
     non-zero on a reset, otherwise the 3D object data doesn't get uploaded! */
-	space->write_dword(0x00470000, 0xa5a5a5a5);
+	space.write_dword(0x00470000, 0xa5a5a5a5);
 
 	/* TODO? BOTSS crashes when starting the final stage because the 68000
     overwrites memory in use by the Am29000. Slowing down the 68000 slightly
@@ -624,11 +624,11 @@ DRIVER_INIT_MEMBER(micro3d_state,micro3d)
 
 DRIVER_INIT_MEMBER(micro3d_state,botss)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Required to pass the hardware version check */
-	space->install_read_handler(0x140000, 0x140001, read16_delegate(FUNC(micro3d_state::botss_140000_r),this));
-	space->install_read_handler(0x180000, 0x180001, read16_delegate(FUNC(micro3d_state::botss_180000_r),this));
+	space.install_read_handler(0x140000, 0x140001, read16_delegate(FUNC(micro3d_state::botss_140000_r),this));
+	space.install_read_handler(0x180000, 0x180001, read16_delegate(FUNC(micro3d_state::botss_180000_r),this));
 
 	DRIVER_INIT_CALL(micro3d);
 }

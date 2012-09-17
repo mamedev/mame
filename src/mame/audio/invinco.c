@@ -65,7 +65,7 @@ enum
 WRITE8_HANDLER( invinco_audio_w )
 {
 	static int port2State = 0;
-	samples_device *samples = space->machine().device<samples_device>("samples");
+	samples_device *samples = space.machine().device<samples_device>("samples");
 	int bitsChanged;
 	//int bitsGoneHigh;
 	int bitsGoneLow;
@@ -108,6 +108,6 @@ WRITE8_HANDLER( invinco_audio_w )
 	}
 
 #if 0
-	logerror("Went LO: %02X  %04X\n", bitsGoneLow, space->device().safe_pc());
+	logerror("Went LO: %02X  %04X\n", bitsGoneLow, space.device().safe_pc());
 #endif
 }

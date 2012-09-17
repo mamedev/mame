@@ -112,8 +112,8 @@ static void amiga_ar1_nmi( running_machine &machine )
 
 static WRITE16_HANDLER( amiga_ar1_chipmem_w )
 {
-	amiga_state *state = space->machine().driver_data<amiga_state>();
-	int pc = space->device().safe_pc();
+	amiga_state *state = space.machine().driver_data<amiga_state>();
+	int pc = space.device().safe_pc();
 
 	/* see if we're inside the AR1 rom */
 	if ( ((pc >> 16) & 0xff ) != 0xf0 )
@@ -124,7 +124,7 @@ static WRITE16_HANDLER( amiga_ar1_chipmem_w )
 		{
 			/* trigger an NMI or spurious irq */
 			amigacrt.ar1_spurious = (offset == 0x60/2) ? 0 : 1;
-			space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(28), FUNC(amiga_ar1_delayed_nmi));
+			space.machine().scheduler().timer_set(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(28), FUNC(amiga_ar1_delayed_nmi));
 		}
 	}
 
@@ -192,11 +192,11 @@ static void amiga_ar23_freeze( running_machine &machine );
 
 static READ16_HANDLER( amiga_ar23_cia_r )
 {
-	int pc = space->device().safe_pc();
+	int pc = space.device().safe_pc();
 
 	if ( ACCESSING_BITS_0_7 && offset == 2048 && pc >= 0x40 && pc < 0x120 )
 	{
-		amiga_ar23_freeze(space->machine());
+		amiga_ar23_freeze(space.machine());
 	}
 
 	return amiga_cia_r( space, offset, mem_mask );
@@ -206,11 +206,11 @@ static WRITE16_HANDLER( amiga_ar23_mode_w )
 {
 	if ( data & 2 )
 	{
-		space->install_legacy_read_handler(0xbfd000, 0xbfefff, FUNC(amiga_ar23_cia_r));
+		space.install_legacy_read_handler(0xbfd000, 0xbfefff, FUNC(amiga_ar23_cia_r));
 	}
 	else
 	{
-		space->install_legacy_read_handler(0xbfd000, 0xbfefff, FUNC(amiga_cia_r));
+		space.install_legacy_read_handler(0xbfd000, 0xbfefff, FUNC(amiga_cia_r));
 	}
 
 	amigacrt.ar23_mode = (data&0x3);
@@ -221,7 +221,7 @@ static WRITE16_HANDLER( amiga_ar23_mode_w )
 
 static READ16_HANDLER( amiga_ar23_mode_r )
 {
-	amiga_state *state = space->machine().driver_data<amiga_state>();
+	amiga_state *state = space.machine().driver_data<amiga_state>();
 	UINT16 *mem = (UINT16 *)(*state->memregion( "user2" ));
 
 	if ( ACCESSING_BITS_0_7 )
@@ -241,7 +241,7 @@ static READ16_HANDLER( amiga_ar23_mode_r )
 			}
 
 			/* overlay disabled, map RAM on 0x000000 */
-			space->install_write_bank(0x000000, state->m_chip_ram.bytes() - 1, 0, mirror_mask, "bank1");
+			space.install_write_bank(0x000000, state->m_chip_ram.bytes() - 1, 0, mirror_mask, "bank1");
 		}
 	}
 
@@ -250,11 +250,11 @@ static READ16_HANDLER( amiga_ar23_mode_r )
 
 static WRITE16_HANDLER( amiga_ar23_chipmem_w )
 {
-	amiga_state *state = space->machine().driver_data<amiga_state>();
+	amiga_state *state = space.machine().driver_data<amiga_state>();
 	if ( offset == (0x08/2) )
 	{
 		if ( amigacrt.ar23_mode & 1 )
-			amiga_ar23_freeze(space->machine());
+			amiga_ar23_freeze(space.machine());
 	}
 
 	(*state->m_chip_ram_w)(state,  offset * 2, data );
@@ -299,7 +299,7 @@ static void amiga_ar23_nmi( running_machine &machine )
 #if 0
 static WRITE16_HANDLER( amiga_ar23_custom_w )
 {
-	int pc = space->device().safe_pc();
+	int pc = space.device().safe_pc();
 
 	/* see if we're inside the AR2 rom */
 	if ( ((pc >> 16) & 0xfe ) != 0x40 )
@@ -320,7 +320,7 @@ static READ16_HANDLER( amiga_ar23_custom_r )
 {
 	UINT16 data = amiga_custom_r( offset, mem_mask );
 
-	int pc = space->device().safe_pc();
+	int pc = space.device().safe_pc();
 
 	/* see if we're inside the AR2 rom */
 	if ( ((pc >> 16) & 0xfe ) != 0x40 )

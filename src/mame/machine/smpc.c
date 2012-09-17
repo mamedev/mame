@@ -627,57 +627,57 @@ static void smpc_nmi_set(running_machine &machine,UINT8 cmd)
  *
  *******************************************/
 
-static void smpc_comreg_exec(address_space *space, UINT8 data, UINT8 is_stv)
+static void smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_stv)
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
 	switch (data)
 	{
 		case 0x00:
 			if(LOG_SMPC) printf ("SMPC: Master ON\n");
-			smpc_master_on(space->machine());
+			smpc_master_on(space.machine());
 			break;
 		//case 0x01: Master OFF?
 		case 0x02:
 		case 0x03:
 			if(LOG_SMPC) printf ("SMPC: Slave %s\n",(data & 1) ? "off" : "on");
-			space->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_slave_enable),data & 1);
+			space.machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_slave_enable),data & 1);
 			break;
 		case 0x06:
 		case 0x07:
 			if(LOG_SMPC) printf ("SMPC: Sound %s\n",(data & 1) ? "off" : "on");
 
 			if(!is_stv)
-				space->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_sound_enable),data & 1);
+				space.machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_sound_enable),data & 1);
 			break;
 		/*CD (SH-1) ON/OFF */
 		//case 0x08:
 		//case 0x09:
 		case 0x0d:
 			if(LOG_SMPC) printf ("SMPC: System Reset\n");
-			smpc_system_reset(space->machine());
+			smpc_system_reset(space.machine());
 			break;
 		case 0x0e:
 		case 0x0f:
-			if(LOG_SMPC) printf ("SMPC: Change Clock to %s (%d %d)\n",data & 1 ? "320" : "352",space->machine().primary_screen->hpos(),space->machine().primary_screen->vpos());
+			if(LOG_SMPC) printf ("SMPC: Change Clock to %s (%d %d)\n",data & 1 ? "320" : "352",space.machine().primary_screen->hpos(),space.machine().primary_screen->vpos());
 
 			/* on ST-V timing of this is pretty fussy, you get 2 credits at start-up otherwise
                sokyugurentai threshold is 74 lines
                shanhigw threshold is 90 lines
                I assume that it needs ~100 lines, so 6666,(6) usecs. Obviously needs HW tests ... */
 
-			space->machine().scheduler().timer_set(attotime::from_usec(6666), FUNC(smpc_change_clock),data & 1);
+			space.machine().scheduler().timer_set(attotime::from_usec(6666), FUNC(smpc_change_clock),data & 1);
 			break;
 		/*"Interrupt Back"*/
 		case 0x10:
 			if(0)
 			{
-				saturn_state *state = space->machine().driver_data<saturn_state>();
-				printf ("SMPC: Status Acquire %02x %02x %02x %d\n",state->m_smpc.IREG[0],state->m_smpc.IREG[1],state->m_smpc.IREG[2],space->machine().primary_screen->vpos());
+				saturn_state *state = space.machine().driver_data<saturn_state>();
+				printf ("SMPC: Status Acquire %02x %02x %02x %d\n",state->m_smpc.IREG[0],state->m_smpc.IREG[1],state->m_smpc.IREG[2],space.machine().primary_screen->vpos());
 			}
 
 			if(is_stv)
-				space->machine().scheduler().timer_set(attotime::from_usec(700), FUNC(stv_smpc_intback),0); //TODO: variable time
+				space.machine().scheduler().timer_set(attotime::from_usec(700), FUNC(stv_smpc_intback),0); //TODO: variable time
 			else
 			{
 				int timing;
@@ -692,31 +692,31 @@ static void smpc_comreg_exec(address_space *space, UINT8 data, UINT8 is_stv)
 
 				/* TODO: check if IREG[2] is setted to 0xf0 */
 
-				if(LOG_PAD_CMD) printf("INTBACK %02x %02x %d %d\n",state->m_smpc.IREG[0],state->m_smpc.IREG[1],space->machine().primary_screen->vpos(),(int)space->machine().primary_screen->frame_number());
-				space->machine().scheduler().timer_set(attotime::from_usec(timing), FUNC(saturn_smpc_intback),0); //TODO: is variable time correct?
+				if(LOG_PAD_CMD) printf("INTBACK %02x %02x %d %d\n",state->m_smpc.IREG[0],state->m_smpc.IREG[1],space.machine().primary_screen->vpos(),(int)space.machine().primary_screen->frame_number());
+				space.machine().scheduler().timer_set(attotime::from_usec(timing), FUNC(saturn_smpc_intback),0); //TODO: is variable time correct?
 			}
 			break;
 		/* RTC write*/
 		case 0x16:
 			if(LOG_SMPC) printf("SMPC: RTC write\n");
-			smpc_rtc_write(space->machine());
+			smpc_rtc_write(space.machine());
 			break;
 		/* SMPC memory setting*/
 		case 0x17:
 			if(LOG_SMPC) printf ("SMPC: memory setting\n");
-			smpc_memory_setting(space->machine());
+			smpc_memory_setting(space.machine());
 			break;
 		case 0x18:
 			if(LOG_SMPC) printf ("SMPC: NMI request\n");
-			smpc_nmi_req(space->machine());
+			smpc_nmi_req(space.machine());
 			break;
 		case 0x19:
 		case 0x1a:
 			if(LOG_SMPC) printf ("SMPC: NMI %sable\n",data & 1 ? "Dis" : "En");
-			smpc_nmi_set(space->machine(),data & 1);
+			smpc_nmi_set(space.machine(),data & 1);
 			break;
 		default:
-			printf ("cpu '%s' (PC=%08X) SMPC: undocumented Command %02x\n", space->device().tag(), space->device().safe_pc(), data);
+			printf ("cpu '%s' (PC=%08X) SMPC: undocumented Command %02x\n", space.device().tag(), space.device().safe_pc(), data);
 	}
 }
 
@@ -728,7 +728,7 @@ static void smpc_comreg_exec(address_space *space, UINT8 data, UINT8 is_stv)
 
 READ8_HANDLER( stv_SMPC_r )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 	int return_data = 0;
 
 	if(!(offset & 1))
@@ -747,14 +747,14 @@ READ8_HANDLER( stv_SMPC_r )
 		return_data = state->ioport("DSW1")->read();
 
 	if (offset == 0x77)//PDR2 read
-		return_data = (0xfe | space->machine().device<eeprom_device>("eeprom")->read_bit());
+		return_data = (0xfe | space.machine().device<eeprom_device>("eeprom")->read_bit());
 
 	return return_data;
 }
 
 WRITE8_HANDLER( stv_SMPC_w )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
 	if (!(offset & 1)) // avoid writing to even bytes
 		return;
@@ -789,13 +789,13 @@ WRITE8_HANDLER( stv_SMPC_w )
         ---- -x-- EEPROM CS line
         ---- --xx A-Bus bank bits
         */
-		eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
+		eeprom_device *eeprom = space.machine().device<eeprom_device>("eeprom");
 		eeprom->set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 		eeprom->write_bit(data & 0x10);
 		eeprom->set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 		state->m_stv_multi_bank = data & 3;
 
-		stv_select_game(space->machine(), state->m_stv_multi_bank);
+		stv_select_game(space.machine(), state->m_stv_multi_bank);
 
 		state->m_smpc.PDR1 = (data & 0x60);
 	}
@@ -809,7 +809,7 @@ WRITE8_HANDLER( stv_SMPC_w )
 		//popmessage("PDR2 = %02x",state->m_smpc_ram[0x77]);
 
 		if(LOG_SMPC) printf("SMPC: M68k %s\n",(data & 0x10) ? "off" : "on");
-		//space->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_sound_enable),(state->m_smpc_ram[0x77] & 0x10) >> 4);
+		//space.machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_sound_enable),(state->m_smpc_ram[0x77] & 0x10) >> 4);
 		state->m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 		state->m_en_68k = ((data & 0x10) >> 4) ^ 1;
 
@@ -843,7 +843,7 @@ WRITE8_HANDLER( stv_SMPC_w )
 
 READ8_HANDLER( saturn_SMPC_r )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 	UINT8 return_data = 0;
 
 	if (!(offset & 1)) // avoid reading to even bytes (TODO: is it 0s or 1s?)
@@ -866,7 +866,7 @@ READ8_HANDLER( saturn_SMPC_r )
 			const int shift_bit[4] = { 4, 12, 8, 0 };
 			const char *const padnames[] = { "JOY1", "JOY2" };
 
-			if(space->machine().root_device().ioport("INPUT_TYPE")->read() && !(space->debugger_access()))
+			if(space.machine().root_device().ioport("INPUT_TYPE")->read() && !(space.debugger_access()))
 			{
 				popmessage("Warning: read with SH-2 direct mode with a non-pad device");
 				return 0;
@@ -879,11 +879,11 @@ READ8_HANDLER( saturn_SMPC_r )
 
 			if (LOG_SMPC) logerror("SMPC: SH-2 direct mode, returning data for phase %d\n", hshake);
 
-			return_data = 0x80 | 0x10 | ((space->machine().root_device().ioport(padnames[offset == 0x77])->read()>>shift_bit[hshake]) & 0xf);
+			return_data = 0x80 | 0x10 | ((space.machine().root_device().ioport(padnames[offset == 0x77])->read()>>shift_bit[hshake]) & 0xf);
 		}
 	}
 
-	if (LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", space->device().tag(), space->device().safe_pc(), offset, offset>>1, return_data);
+	if (LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", space.device().tag(), space.device().safe_pc(), offset, offset>>1, return_data);
 
 
 	return return_data;
@@ -891,7 +891,7 @@ READ8_HANDLER( saturn_SMPC_r )
 
 WRITE8_HANDLER( saturn_SMPC_w )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
 	if (LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x (reg %d) with Data %02x\n", offset, offset>>1, data);
 
@@ -914,7 +914,7 @@ WRITE8_HANDLER( saturn_SMPC_w )
 			else if(data & 0x80)
 			{
 				if(LOG_PAD_CMD) printf("SMPC: CONTINUE request\n");
-				space->machine().scheduler().timer_set(attotime::from_usec(700), FUNC(intback_peripheral),0); /* TODO: is timing correct? */
+				space.machine().scheduler().timer_set(attotime::from_usec(700), FUNC(intback_peripheral),0); /* TODO: is timing correct? */
 				state->m_smpc.OREG[31] = 0x10;
 				state->m_smpc.SF = 0x01; //TODO: set hand-shake flag?
 			}

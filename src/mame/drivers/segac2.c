@@ -201,7 +201,7 @@ static WRITE16_DEVICE_HANDLER( segac2_upd7759_w )
 /* handle reads from the paletteram */
 static READ16_HANDLER( palette_r )
 {
-	segac2_state *state = space->machine().driver_data<segac2_state>();
+	segac2_state *state = space.machine().driver_data<segac2_state>();
 	offset &= 0x1ff;
 	if (state->m_segac2_alt_palette_mode)
 		offset = ((offset << 1) & 0x100) | ((offset << 2) & 0x80) | ((~offset >> 2) & 0x40) | ((offset >> 1) & 0x20) | (offset & 0x1f);
@@ -212,7 +212,7 @@ static READ16_HANDLER( palette_r )
 /* handle writes to the paletteram */
 static WRITE16_HANDLER( palette_w )
 {
-	segac2_state *state = space->machine().driver_data<segac2_state>();
+	segac2_state *state = space.machine().driver_data<segac2_state>();
 	int r, g, b, newword;
 	int tmpr, tmpg, tmpb;
 
@@ -232,7 +232,7 @@ static WRITE16_HANDLER( palette_w )
 	b = ((newword >> 7) & 0x1e) | ((newword >> 14) & 0x01);
 
 	/* set the color */
-	palette_set_color_rgb(space->machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(space.machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
 
 //  megadrive_vdp_palette_lookup[offset] = (b) | (g << 5) | (r << 10);
 //  megadrive_vdp_palette_lookup_sprite[offset] = (b) | (g << 5) | (r << 10);
@@ -240,13 +240,13 @@ static WRITE16_HANDLER( palette_w )
 	tmpr = r >> 1;
 	tmpg = g >> 1;
 	tmpb = b >> 1;
-	palette_set_color_rgb(space->machine(), offset + 0x800, pal5bit(tmpr), pal5bit(tmpg), pal5bit(tmpb));
+	palette_set_color_rgb(space.machine(), offset + 0x800, pal5bit(tmpr), pal5bit(tmpg), pal5bit(tmpb));
 
 	// how is it calculated on c2?
 	tmpr = tmpr | 0x10;
 	tmpg = tmpg | 0x10;
 	tmpb = tmpb | 0x10;
-	palette_set_color_rgb(space->machine(), offset + 0x1000, pal5bit(tmpr), pal5bit(tmpg), pal5bit(tmpb));
+	palette_set_color_rgb(space.machine(), offset + 0x1000, pal5bit(tmpr), pal5bit(tmpg), pal5bit(tmpb));
 }
 
 
@@ -319,7 +319,7 @@ static void recompute_palette_tables( running_machine &machine )
 
 static READ16_HANDLER( io_chip_r )
 {
-	segac2_state *state = space->machine().driver_data<segac2_state>();
+	segac2_state *state = space.machine().driver_data<segac2_state>();
 	static const char *const portnames[] = { "P1", "P2", "PORTC", "PORTD", "SERVICE", "COINAGE", "DSW", "PORTH" };
 	offset &= 0x1f/2;
 
@@ -340,8 +340,8 @@ static READ16_HANDLER( io_chip_r )
 
 			/* otherwise, return an input port */
 			if (offset == 0x04/2 && state->m_sound_banks)
-				return (space->machine().root_device().ioport(portnames[offset])->read() & 0xbf) | (upd7759_busy_r(space->machine().device("upd")) << 6);
-			return space->machine().root_device().ioport(portnames[offset])->read();
+				return (space.machine().root_device().ioport(portnames[offset])->read() & 0xbf) | (upd7759_busy_r(space.machine().device("upd")) << 6);
+			return space.machine().root_device().ioport(portnames[offset])->read();
 
 		/* 'SEGA' protection */
 		case 0x10/2:
@@ -369,7 +369,7 @@ static READ16_HANDLER( io_chip_r )
 
 static WRITE16_HANDLER( io_chip_w )
 {
-	segac2_state *state = space->machine().driver_data<segac2_state>();
+	segac2_state *state = space.machine().driver_data<segac2_state>();
 	UINT8 newbank;
 //  UINT8 old;
 
@@ -401,10 +401,10 @@ static WRITE16_HANDLER( io_chip_w )
              D1 : To CN1 pin J. (Coin meter 2)
              D0 : To CN1 pin 8. (Coin meter 1)
             */
-/*          coin_lockout_w(space->machine(), 1, data & 0x08);
-            coin_lockout_w(space->machine(), 0, data & 0x04); */
-			coin_counter_w(space->machine(), 1, data & 0x02);
-			coin_counter_w(space->machine(), 0, data & 0x01);
+/*          coin_lockout_w(space.machine(), 1, data & 0x08);
+            coin_lockout_w(space.machine(), 0, data & 0x04); */
+			coin_counter_w(space.machine(), 1, data & 0x02);
+			coin_counter_w(space.machine(), 0, data & 0x01);
 			break;
 
 		/* banking */
@@ -422,13 +422,13 @@ static WRITE16_HANDLER( io_chip_w )
 			newbank = data & 3;
 			if (newbank != state->m_palbank)
 			{
-				//space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos() + 1);
+				//space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos() + 1);
 				state->m_palbank = newbank;
-				recompute_palette_tables(space->machine());
+				recompute_palette_tables(space.machine());
 			}
 			if (state->m_sound_banks > 1)
 			{
-				device_t *upd = space->machine().device("upd");
+				device_t *upd = space.machine().device("upd");
 				newbank = (data >> 2) & (state->m_sound_banks - 1);
 				upd7759_set_bank_base(upd, newbank * 0x20000);
 			}
@@ -438,7 +438,7 @@ static WRITE16_HANDLER( io_chip_w )
 		case 0x1c/2:
 			if (state->m_sound_banks > 1)
 			{
-				device_t *upd = space->machine().device("upd");
+				device_t *upd = space.machine().device("upd");
 				upd7759_reset_w(upd, (data >> 1) & 1);
 			}
 			break;
@@ -458,14 +458,14 @@ static WRITE16_HANDLER( io_chip_w )
 
 static WRITE16_HANDLER( control_w )
 {
-	segac2_state *state = space->machine().driver_data<segac2_state>();
+	segac2_state *state = space.machine().driver_data<segac2_state>();
 	/* skip if not LSB */
 	if (!ACCESSING_BITS_0_7)
 		return;
 	data &= 0x0f;
 
 	/* bit 0 controls display enable */
-	//segac2_enable_display(space->machine(), ~data & 1);
+	//segac2_enable_display(space.machine(), ~data & 1);
 	state->m_segac2_enable_display = ~data & 1;
 
 	/* bit 1 resets the protection */
@@ -474,7 +474,7 @@ static WRITE16_HANDLER( control_w )
 
 	/* bit 2 controls palette shuffling; only ribbit and twinsqua use this feature */
 	state->m_segac2_alt_palette_mode = ((~data & 4) >> 2);
-	recompute_palette_tables(space->machine());
+	recompute_palette_tables(space.machine());
 }
 
 
@@ -494,8 +494,8 @@ static WRITE16_HANDLER( control_w )
 /* protection chip reads */
 static READ16_HANDLER( prot_r )
 {
-	segac2_state *state = space->machine().driver_data<segac2_state>();
-	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", space->device().safe_pcbase(), state->m_prot_func ? state->m_prot_read_buf : 0xff);
+	segac2_state *state = space.machine().driver_data<segac2_state>();
+	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", space.device().safe_pcbase(), state->m_prot_func ? state->m_prot_read_buf : 0xff);
 	return state->m_prot_read_buf | 0xf0;
 }
 
@@ -503,7 +503,7 @@ static READ16_HANDLER( prot_r )
 /* protection chip writes */
 static WRITE16_HANDLER( prot_w )
 {
-	segac2_state *state = space->machine().driver_data<segac2_state>();
+	segac2_state *state = space.machine().driver_data<segac2_state>();
 	int new_sp_palbase = (data >> 2) & 3;
 	int new_bg_palbase = data & 3;
 	int table_index;
@@ -521,16 +521,16 @@ static WRITE16_HANDLER( prot_w )
 	/* determine the value to return, should a read occur */
 	if (state->m_prot_func)
 		state->m_prot_read_buf = state->m_prot_func(table_index);
-	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", space->device().safe_pcbase(), data & 0x0f, state->m_prot_read_buf);
+	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", space.device().safe_pcbase(), data & 0x0f, state->m_prot_read_buf);
 
 	/* if the palette changed, force an update */
 	if (new_sp_palbase != state->m_sp_palbase || new_bg_palbase != state->m_bg_palbase)
 	{
-		//space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos() + 1);
+		//space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos() + 1);
 		state->m_sp_palbase = new_sp_palbase;
 		state->m_bg_palbase = new_bg_palbase;
-		recompute_palette_tables(space->machine());
-		if (LOG_PALETTE) logerror("Set palbank: %d/%d (scan=%d)\n", state->m_bg_palbase, state->m_sp_palbase, space->machine().primary_screen->vpos());
+		recompute_palette_tables(space.machine());
+		if (LOG_PALETTE) logerror("Set palbank: %d/%d (scan=%d)\n", state->m_bg_palbase, state->m_sp_palbase, space.machine().primary_screen->vpos());
 	}
 }
 
@@ -565,8 +565,8 @@ static WRITE16_HANDLER( counter_timer_w )
 				break;
 
 			case 0x10:	/* coin counter */
-//              coin_counter_w(space->machine(), 0,1);
-//              coin_counter_w(space->machine(), 0,0);
+//              coin_counter_w(space.machine(), 0,1);
+//              coin_counter_w(space.machine(), 0,0);
 				break;
 
 			case 0x12:	/* set coinage info -- followed by two 4-bit values */
@@ -596,13 +596,13 @@ static WRITE16_HANDLER( counter_timer_w )
 
 static READ16_HANDLER( printer_r )
 {
-	segac2_state *state = space->machine().driver_data<segac2_state>();
+	segac2_state *state = space.machine().driver_data<segac2_state>();
 	return state->m_cam_data;
 }
 
 static WRITE16_HANDLER( print_club_camera_w )
 {
-	segac2_state *state = space->machine().driver_data<segac2_state>();
+	segac2_state *state = space.machine().driver_data<segac2_state>();
 	state->m_cam_data = data;
 }
 

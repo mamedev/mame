@@ -196,15 +196,15 @@ READ32_HANDLER( mboard_read_board_32 )
 
 WRITE8_HANDLER( mboard_write_board_8 )
 {
-	write_board(space->machine(),data);
+	write_board(space.machine(),data);
 	logerror("Write Board Port  Data = %02x\n",data);
 }
 
 WRITE16_HANDLER( mboard_write_board_16 )
 {
-	if (data & 0xff) write_board(space->machine(),data);
+	if (data & 0xff) write_board(space.machine(),data);
 	logerror("write board 16 %08x\n",data);
-	write_board(space->machine(),data>>8);
+	write_board(space.machine(),data>>8);
 }
 
 WRITE32_HANDLER( mboard_write_board_32 )
@@ -212,20 +212,20 @@ WRITE32_HANDLER( mboard_write_board_32 )
 //  data |= data << 24;
 //printf("write board %08x %08x\n",offset,data);
 	logerror("write board 32 o: %08x d: %08x\n",offset,data);
-	if (offset) write_board(space->machine(),data);
-	else write_board(space->machine(),data>>24);
+	if (offset) write_board(space.machine(),data);
+	else write_board(space.machine(),data>>24);
 }
 
 WRITE8_HANDLER( mboard_write_LED_8 )
 {
 	write_LED(data);
-	space->device().execute().spin_until_time(attotime::from_usec(7));
+	space.device().execute().spin_until_time(attotime::from_usec(7));
 }
 
 WRITE16_HANDLER( mboard_write_LED_16 )
 {
 	 write_LED(data >> 8);
-	 space->device().execute().spin_until_time(attotime::from_usec(9));
+	 space.device().execute().spin_until_time(attotime::from_usec(9));
 }
 
 WRITE32_HANDLER( mboard_write_LED_32 )
@@ -235,7 +235,7 @@ WRITE32_HANDLER( mboard_write_LED_32 )
 	if (offset) write_LED(data);
 	else write_LED(data >> 24);
 	logerror("write LED   32 o: %08x d: %08x\n",offset,data);
-//  space->device().execute().spin_until_time(ATTOTIME_IN_USEC(20));
+//  space.device().execute().spin_until_time(ATTOTIME_IN_USEC(20));
 }
 
 

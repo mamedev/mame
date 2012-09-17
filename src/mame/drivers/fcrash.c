@@ -42,18 +42,18 @@ from 2.bin to 9.bin program eproms
 
 static WRITE16_HANDLER( fcrash_soundlatch_w )
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
+	cps_state *state = space.machine().driver_data<cps_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->soundlatch_byte_w(*space, 0, data & 0xff);
+		state->soundlatch_byte_w(space, 0, data & 0xff);
 		state->m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
 static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
+	cps_state *state = space.machine().driver_data<cps_state>();
 
 	state->m_msm_1->set_output_gain(0, (data & 0x08) ? 0.0 : 1.0);
 	state->m_msm_2->set_output_gain(0, (data & 0x10) ? 0.0 : 1.0);
@@ -84,13 +84,13 @@ static void m5205_int2( device_t *device )
 
 static WRITE8_HANDLER( fcrash_msm5205_0_data_w )
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
+	cps_state *state = space.machine().driver_data<cps_state>();
 	state->m_sample_buffer1 = data;
 }
 
 static WRITE8_HANDLER( fcrash_msm5205_1_data_w )
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
+	cps_state *state = space.machine().driver_data<cps_state>();
 	state->m_sample_buffer2 = data;
 }
 

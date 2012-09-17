@@ -219,17 +219,17 @@ static TIMER_CALLBACK( setirq_callback )
 
 WRITE8_HANDLER( t5182_sound_irq_w )
 {
-	space->machine().scheduler().synchronize(FUNC(setirq_callback), CPU_ASSERT);
+	space.machine().scheduler().synchronize(FUNC(setirq_callback), CPU_ASSERT);
 }
 
 static WRITE8_HANDLER( t5182_ym2151_irq_ack_w )
 {
-	space->machine().scheduler().synchronize(FUNC(setirq_callback), YM2151_ACK);
+	space.machine().scheduler().synchronize(FUNC(setirq_callback), YM2151_ACK);
 }
 
 static WRITE8_HANDLER( t5182_cpu_irq_ack_w )
 {
-	space->machine().scheduler().synchronize(FUNC(setirq_callback), CPU_CLEAR);
+	space.machine().scheduler().synchronize(FUNC(setirq_callback), CPU_CLEAR);
 }
 
 static void t5182_ym2151_irq_handler(device_t *device, int irq)

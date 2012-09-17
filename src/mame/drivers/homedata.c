@@ -1212,10 +1212,10 @@ MACHINE_RESET_MEMBER(homedata_state,homedata)
 
 MACHINE_RESET_MEMBER(homedata_state,pteacher)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
-	pteacher_upd7807_portc_w(*space, 0, 0xff);
+	pteacher_upd7807_portc_w(space, 0, 0xff);
 
 	MACHINE_RESET_CALL_MEMBER(homedata);
 
@@ -1228,10 +1228,10 @@ MACHINE_RESET_MEMBER(homedata_state,pteacher)
 
 MACHINE_RESET_MEMBER(homedata_state,reikaids)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
-	reikaids_upd7807_portc_w(*space, 0, 0xff);
+	reikaids_upd7807_portc_w(space, 0, 0xff);
 
 	MACHINE_RESET_CALL_MEMBER(homedata);
 

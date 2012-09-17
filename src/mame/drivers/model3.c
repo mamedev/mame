@@ -1059,9 +1059,9 @@ WRITE64_MEMBER(model3_state::scsi_w)
 
 static UINT32 scsi_fetch(running_machine &machine, UINT32 dsp)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT32 result;
-	result = space->read_dword(dsp);
+	result = space.read_dword(dsp);
 	return FLIPENDIAN_INT32(result);
 }
 
@@ -1159,7 +1159,7 @@ WRITE64_MEMBER(model3_state::real3d_dma_w)
 
 static void real3d_dma_callback(running_machine &machine, UINT32 src, UINT32 dst, int length, int byteswap)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	switch(dst >> 24)
 	{
 		case 0x88:		/* Display List End Trigger */

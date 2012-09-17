@@ -97,7 +97,7 @@ static void pxa255_set_irq_line(running_machine& machine, UINT32 line, int state
 
 
 
-static void pxa255_lcd_load_dma_descriptor(address_space* space, UINT32 address, int channel);
+static void pxa255_lcd_load_dma_descriptor(address_space & space, UINT32 address, int channel);
 static void pxa255_lcd_irq_check(running_machine& machine);
 static void pxa255_lcd_dma_kickoff(running_machine& machine, int channel);
 static void pxa255_lcd_check_load_next_branch(running_machine& machine, int channel);
@@ -278,11 +278,11 @@ static void pxa255_dma_load_descriptor_and_start(running_machine& machine, int c
 
 	// Load the next descriptor
 
-	address_space *space = machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
-	dma_regs->dsadr[channel] = space->read_dword(dma_regs->ddadr[channel] + 0x4);
-	dma_regs->dtadr[channel] = space->read_dword(dma_regs->ddadr[channel] + 0x8);
-	dma_regs->dcmd[channel]  = space->read_dword(dma_regs->ddadr[channel] + 0xc);
-	dma_regs->ddadr[channel] = space->read_dword(dma_regs->ddadr[channel]);
+	address_space &space = *machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
+	dma_regs->dsadr[channel] = space.read_dword(dma_regs->ddadr[channel] + 0x4);
+	dma_regs->dtadr[channel] = space.read_dword(dma_regs->ddadr[channel] + 0x8);
+	dma_regs->dcmd[channel]  = space.read_dword(dma_regs->ddadr[channel] + 0xc);
+	dma_regs->ddadr[channel] = space.read_dword(dma_regs->ddadr[channel]);
 
 	// Start our end-of-transfer timer
 	switch(channel)
@@ -318,13 +318,13 @@ static TIMER_CALLBACK( pxa255_dma_dma_end )
 	UINT16 temp16;
 	UINT32 temp32;
 
-	address_space *space = machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
+	address_space &space = *machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
 	switch(param)
 	{
 		case 3:
 			for(index = 0; index < count; index += 4)
 			{
-				state->m_words[index >> 2] = space->read_dword(sadr);
+				state->m_words[index >> 2] = space.read_dword(sadr);
 				state->m_samples[(index >> 1) + 0] = (INT16)(state->m_words[index >> 2] >> 16);
 				state->m_samples[(index >> 1) + 1] = (INT16)(state->m_words[index >> 2] & 0xffff);
 				sadr += 4;
@@ -337,18 +337,18 @@ static TIMER_CALLBACK( pxa255_dma_dma_end )
 				switch(dma_regs->dcmd[param] & PXA255_DCMD_SIZE)
 				{
 					case PXA255_DCMD_SIZE_8:
-						temp8 = space->read_byte(sadr);
-						space->write_byte(tadr, temp8);
+						temp8 = space.read_byte(sadr);
+						space.write_byte(tadr, temp8);
 						index++;
 						break;
 					case PXA255_DCMD_SIZE_16:
-						temp16 = space->read_word(sadr);
-						space->write_word(tadr, temp16);
+						temp16 = space.read_word(sadr);
+						space.write_word(tadr, temp16);
 						index += 2;
 						break;
 					case PXA255_DCMD_SIZE_32:
-						temp32 = space->read_dword(sadr);
-						space->write_dword(tadr, temp32);
+						temp32 = space.read_dword(sadr);
+						space.write_dword(tadr, temp32);
 						index += 4;
 						break;
 					default:
@@ -1058,20 +1058,20 @@ WRITE32_MEMBER(_39in1_state::pxa255_gpio_w)
 
 */
 
-static void pxa255_lcd_load_dma_descriptor(address_space* space, UINT32 address, int channel)
+static void pxa255_lcd_load_dma_descriptor(address_space & space, UINT32 address, int channel)
 {
-	_39in1_state *state = space->machine().driver_data<_39in1_state>();
+	_39in1_state *state = space.machine().driver_data<_39in1_state>();
 	PXA255_LCD_Regs *lcd_regs = &state->m_lcd_regs;
 
-	lcd_regs->dma[channel].fdadr = space->read_dword(address);
-	lcd_regs->dma[channel].fsadr = space->read_dword(address + 0x04);
-	lcd_regs->dma[channel].fidr  = space->read_dword(address + 0x08);
-	lcd_regs->dma[channel].ldcmd = space->read_dword(address + 0x0c);
-	verboselog( space->machine(), 4, "pxa255_lcd_load_dma_descriptor, address = %08x, channel = %d\n", address, channel);
-	verboselog( space->machine(), 4, "    DMA Frame Descriptor: %08x\n", lcd_regs->dma[channel].fdadr );
-	verboselog( space->machine(), 4, "    DMA Frame Source Address: %08x\n", lcd_regs->dma[channel].fsadr );
-	verboselog( space->machine(), 4, "    DMA Frame ID: %08x\n", lcd_regs->dma[channel].fidr );
-	verboselog( space->machine(), 4, "    DMA Command: %08x\n", lcd_regs->dma[channel].ldcmd );
+	lcd_regs->dma[channel].fdadr = space.read_dword(address);
+	lcd_regs->dma[channel].fsadr = space.read_dword(address + 0x04);
+	lcd_regs->dma[channel].fidr  = space.read_dword(address + 0x08);
+	lcd_regs->dma[channel].ldcmd = space.read_dword(address + 0x0c);
+	verboselog( space.machine(), 4, "pxa255_lcd_load_dma_descriptor, address = %08x, channel = %d\n", address, channel);
+	verboselog( space.machine(), 4, "    DMA Frame Descriptor: %08x\n", lcd_regs->dma[channel].fdadr );
+	verboselog( space.machine(), 4, "    DMA Frame Source Address: %08x\n", lcd_regs->dma[channel].fsadr );
+	verboselog( space.machine(), 4, "    DMA Frame ID: %08x\n", lcd_regs->dma[channel].fidr );
+	verboselog( space.machine(), 4, "    DMA Command: %08x\n", lcd_regs->dma[channel].ldcmd );
 }
 
 static void pxa255_lcd_irq_check(running_machine& machine)
@@ -1111,24 +1111,24 @@ static void pxa255_lcd_dma_kickoff(running_machine& machine, int channel)
 
 		if(lcd_regs->dma[channel].ldcmd & PXA255_LDCMD_PAL)
 		{
-			address_space *space = machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
+			address_space &space = *machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
 			int length = lcd_regs->dma[channel].ldcmd & 0x000fffff;
 			int index = 0;
 			for(index = 0; index < length; index += 2)
 			{
-				UINT16 color = space->read_word((lcd_regs->dma[channel].fsadr &~ 1) + index);
+				UINT16 color = space.read_word((lcd_regs->dma[channel].fsadr &~ 1) + index);
 				state->m_pxa255_lcd_palette[index >> 1] = (((((color >> 11) & 0x1f) << 3) | (color >> 13)) << 16) | (((((color >> 5) & 0x3f) << 2) | ((color >> 9) & 0x3)) << 8) | (((color & 0x1f) << 3) | ((color >> 2) & 0x7));
 				palette_set_color_rgb(machine, index >> 1, (((color >> 11) & 0x1f) << 3) | (color >> 13), (((color >> 5) & 0x3f) << 2) | ((color >> 9) & 0x3), ((color & 0x1f) << 3) | ((color >> 2) & 0x7));
 			}
 		}
 		else
 		{
-			address_space *space = machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
+			address_space &space = *machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
 			int length = lcd_regs->dma[channel].ldcmd & 0x000fffff;
 			int index = 0;
 			for(index = 0; index < length; index++)
 			{
-				state->m_pxa255_lcd_framebuffer[index] = space->read_byte(lcd_regs->dma[channel].fsadr + index);
+				state->m_pxa255_lcd_framebuffer[index] = space.read_byte(lcd_regs->dma[channel].fsadr + index);
 			}
 		}
 	}
@@ -1143,11 +1143,11 @@ static void pxa255_lcd_check_load_next_branch(running_machine& machine, int chan
 	{
 		verboselog( machine, 4, "pxa255_lcd_check_load_next_branch: Taking branch\n" );
 		lcd_regs->fbr[channel] &= ~1;
-		address_space *space = machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
-		//lcd_regs->fbr[channel] = (space->read_dword(lcd_regs->fbr[channel] & 0xfffffff0) & 0xfffffff0) | (lcd_regs->fbr[channel] & 0x00000003);
+		address_space &space = *machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
+		//lcd_regs->fbr[channel] = (space.read_dword(lcd_regs->fbr[channel] & 0xfffffff0) & 0xfffffff0) | (lcd_regs->fbr[channel] & 0x00000003);
 		//printf( "%08x\n", lcd_regs->fbr[channel] );
 		pxa255_lcd_load_dma_descriptor(space, lcd_regs->fbr[channel] & 0xfffffff0, 0);
-		lcd_regs->fbr[channel] = (space->read_dword(lcd_regs->fbr[channel] & 0xfffffff0) & 0xfffffff0) | (lcd_regs->fbr[channel] & 0x00000003);
+		lcd_regs->fbr[channel] = (space.read_dword(lcd_regs->fbr[channel] & 0xfffffff0) & 0xfffffff0) | (lcd_regs->fbr[channel] & 0x00000003);
 		pxa255_lcd_dma_kickoff(machine, 0);
 		if(lcd_regs->fbr[channel] & 2)
 		{
@@ -1308,7 +1308,7 @@ WRITE32_MEMBER(_39in1_state::pxa255_lcd_w)
 			verboselog( machine(), 4, "pxa255_lcd_w: LCD DMA Frame Descriptor Address Register 0: %08x & %08x\n", data, mem_mask );
 			if(!lcd_regs->dma[0].eof->enabled())
 			{
-				pxa255_lcd_load_dma_descriptor(&space, data & 0xfffffff0, 0);
+				pxa255_lcd_load_dma_descriptor(space, data & 0xfffffff0, 0);
 			}
 			else
 			{
@@ -1329,7 +1329,7 @@ WRITE32_MEMBER(_39in1_state::pxa255_lcd_w)
 			verboselog( machine(), 4, "pxa255_lcd_w: LCD DMA Frame Descriptor Address Register 1: %08x & %08x\n", data, mem_mask );
 			if(!lcd_regs->dma[1].eof->enabled())
 			{
-				pxa255_lcd_load_dma_descriptor(&space, data & 0xfffffff0, 1);
+				pxa255_lcd_load_dma_descriptor(space, data & 0xfffffff0, 1);
 			}
 			else
 			{
@@ -1464,8 +1464,8 @@ DRIVER_INIT_MEMBER(_39in1_state,39in1)
 	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
 	m_eeprom = machine().device<eeprom_device>("eeprom");
 
-	address_space *space = machine().device<pxa255_device>("maincpu")->space(AS_PROGRAM);
-	space->install_read_handler (0xa0151648, 0xa015164b, read32_delegate(FUNC(_39in1_state::prot_cheater_r), this));
+	address_space &space = *machine().device<pxa255_device>("maincpu")->space(AS_PROGRAM);
+	space.install_read_handler (0xa0151648, 0xa015164b, read32_delegate(FUNC(_39in1_state::prot_cheater_r), this));
 }
 
 static ADDRESS_MAP_START( 39in1_map, AS_PROGRAM, 32, _39in1_state )

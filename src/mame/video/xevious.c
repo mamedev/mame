@@ -240,7 +240,7 @@ VIDEO_START_MEMBER(xevious_state,xevious)
 
 WRITE8_HANDLER( xevious_fg_videoram_w )
 {
-	xevious_state *state =  space->machine().driver_data<xevious_state>();
+	xevious_state *state =  space.machine().driver_data<xevious_state>();
 
 	state->m_xevious_fg_videoram[offset] = data;
 	state->m_fg_tilemap->mark_tile_dirty(offset);
@@ -248,7 +248,7 @@ WRITE8_HANDLER( xevious_fg_videoram_w )
 
 WRITE8_HANDLER( xevious_fg_colorram_w )
 {
-	xevious_state *state =  space->machine().driver_data<xevious_state>();
+	xevious_state *state =  space.machine().driver_data<xevious_state>();
 
 	state->m_xevious_fg_colorram[offset] = data;
 	state->m_fg_tilemap->mark_tile_dirty(offset);
@@ -256,7 +256,7 @@ WRITE8_HANDLER( xevious_fg_colorram_w )
 
 WRITE8_HANDLER( xevious_bg_videoram_w )
 {
-	xevious_state *state =  space->machine().driver_data<xevious_state>();
+	xevious_state *state =  space.machine().driver_data<xevious_state>();
 
 	state->m_xevious_bg_videoram[offset] = data;
 	state->m_bg_tilemap->mark_tile_dirty(offset);
@@ -264,7 +264,7 @@ WRITE8_HANDLER( xevious_bg_videoram_w )
 
 WRITE8_HANDLER( xevious_bg_colorram_w )
 {
-	xevious_state *state =  space->machine().driver_data<xevious_state>();
+	xevious_state *state =  space.machine().driver_data<xevious_state>();
 
 	state->m_xevious_bg_colorram[offset] = data;
 	state->m_bg_tilemap->mark_tile_dirty(offset);
@@ -272,7 +272,7 @@ WRITE8_HANDLER( xevious_bg_colorram_w )
 
 WRITE8_HANDLER( xevious_vh_latch_w )
 {
-	xevious_state *state =  space->machine().driver_data<xevious_state>();
+	xevious_state *state =  space.machine().driver_data<xevious_state>();
 
 	int reg;
 	int scroll = data + ((offset&0x01)<<8);   /* A0 -> D8 */
@@ -306,14 +306,14 @@ WRITE8_HANDLER( xevious_vh_latch_w )
 /* emulation for schematic 9B */
 WRITE8_HANDLER( xevious_bs_w )
 {
-	xevious_state *state =  space->machine().driver_data<xevious_state>();
+	xevious_state *state =  space.machine().driver_data<xevious_state>();
 
 	state->m_xevious_bs[offset & 1] = data;
 }
 
 READ8_HANDLER( xevious_bb_r )
 {
-	xevious_state *state =  space->machine().driver_data<xevious_state>();
+	xevious_state *state =  space.machine().driver_data<xevious_state>();
 
 	UINT8 *rom2a = state->memregion("gfx4")->base();
 	UINT8 *rom2b = rom2a+0x1000;

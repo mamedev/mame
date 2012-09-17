@@ -147,7 +147,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 
 static READ32_HANDLER( atapi_r )
 {
-	running_machine &machine = space->machine();
+	running_machine &machine = space.machine();
 	int reg, data;
 
 	if (mem_mask == 0x0000ffff)	// word-wide command read
@@ -261,7 +261,7 @@ static READ32_HANDLER( atapi_r )
 		}
 		#endif
 
-		mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, space->device().safe_pc());
+		mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, space.device().safe_pc());
 	}
 
 //  printf( "atapi_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
@@ -270,7 +270,7 @@ static READ32_HANDLER( atapi_r )
 
 static WRITE32_HANDLER( atapi_w )
 {
-	running_machine &machine = space->machine();
+	running_machine &machine = space.machine();
 	int reg;
 
 //  printf( "atapi_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
@@ -369,7 +369,7 @@ static WRITE32_HANDLER( atapi_w )
 
 					case 0x45: // PLAY
 						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY;
-						atapi_timer->adjust( downcast<cpu_device *>(&space->device())->cycles_to_attotime(ATAPI_CYCLES_PER_SECTOR ) );
+						atapi_timer->adjust( downcast<cpu_device *>(&space.device())->cycles_to_attotime(ATAPI_CYCLES_PER_SECTOR ) );
 						break;
 				}
 
@@ -420,11 +420,11 @@ static WRITE32_HANDLER( atapi_w )
 		}
 #endif
 		atapi_regs[reg] = data;
-//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, space->device().safe_pc());
+//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, space.device().safe_pc());
 
 		if (reg == ATAPI_REG_CMDSTATUS)
 		{
-			printf("ATAPI command %x issued! (PC=%x)\n", data, space->device().safe_pc());
+			printf("ATAPI command %x issued! (PC=%x)\n", data, space.device().safe_pc());
 
 			switch (data)
 			{
@@ -491,7 +491,7 @@ static WRITE32_HANDLER( atapi_w )
 					atapi_regs[ATAPI_REG_COUNTLOW] = 0;
 					atapi_regs[ATAPI_REG_COUNTHIGH] = 2;
 
-					gdrom_raise_irq(space->machine());
+					gdrom_raise_irq(space.machine());
 					break;
 
 				case 0xef:	// SET FEATURES
@@ -512,7 +512,7 @@ static WRITE32_HANDLER( atapi_w )
 					atapi_data_ptr = 0;
 					atapi_data_len = 0;
 
-					gdrom_raise_irq(space->machine());
+					gdrom_raise_irq(space.machine());
 					break;
 
 				default:
@@ -603,7 +603,7 @@ READ64_HANDLER( dc_mess_gdrom_r )
 		off=offset << 1;
 	}
 
-//  printf("gdrom_r: @ %x (off %x), mask %llx (PC %x)\n", offset, off, mem_mask, space->device().safe_pc());
+//  printf("gdrom_r: @ %x (off %x), mask %llx (PC %x)\n", offset, off, mem_mask, space.device().safe_pc());
 
 	if (offset == 3)
 	{
@@ -632,7 +632,7 @@ WRITE64_HANDLER( dc_mess_gdrom_w )
 		off=offset << 1;
 	}
 
-//  printf("GDROM: [%08x=%x]write %llx to %x, mask %llx (PC %x)\n", 0x5f7000+off*4, dat, data, offset, mem_mask, space->device().safe_pc());
+//  printf("GDROM: [%08x=%x]write %llx to %x, mask %llx (PC %x)\n", 0x5f7000+off*4, dat, data, offset, mem_mask, space.device().safe_pc());
 
 	if (off >= 0x20)
 	{
@@ -667,23 +667,23 @@ INLINE int decode_reg32_64(running_machine &machine, UINT32 offset, UINT64 mem_m
 
 READ64_HANDLER( dc_mess_g1_ctrl_r )
 {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
+	reg = decode_reg32_64(space.machine(), offset, mem_mask, &shift);
 	mame_printf_verbose("G1CTRL:  Unmapped read %08x\n", 0x5f7400+reg*4);
 	return (UINT64)state->g1bus_regs[reg] << shift;
 }
 
 WRITE64_HANDLER( dc_mess_g1_ctrl_w )
 {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 	UINT32 dat; //, old
 
-	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
+	reg = decode_reg32_64(space.machine(), offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 //  old = state->g1bus_regs[reg];
 
@@ -701,7 +701,7 @@ WRITE64_HANDLER( dc_mess_g1_ctrl_w )
 			}
 
 			atapi_xferbase = state->g1bus_regs[SB_GDSTAR];
-			atapi_timer->adjust(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))));
+			atapi_timer->adjust(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))));
 		}
 		break;
 	}

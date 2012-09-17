@@ -189,7 +189,7 @@ DRIVER_INIT_MEMBER(tcl_state,tcl)
 {
 	/* only the first part is decrypted (and verified)*/
 
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *dest = machine().root_device().memregion("maincpu")->base();
 	int len = machine().root_device().memregion("maincpu")->bytes();
 	UINT8 *src = auto_alloc_array(machine(), UINT8, len);
@@ -215,7 +215,7 @@ DRIVER_INIT_MEMBER(tcl_state,tcl)
 	}
 	auto_free(machine(), src);
 
-	space->set_decrypted_region(0x0000, 0x7fff, dest+0x10000);
+	space.set_decrypted_region(0x0000, 0x7fff, dest+0x10000);
 }
 
 GAME( 1995, tcl,  0,       tcl,  tcl, tcl_state,  tcl, ROT0, "Uniwang", "Taiwan Chess Legend", GAME_NOT_WORKING )

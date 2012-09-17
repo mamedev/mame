@@ -270,7 +270,7 @@ WRITE8_MEMBER(towns_state::towns_system_w)
 	switch(offset)
 	{
 		case 0x00:  // bit 7 = NMI vector protect, bit 6 = power off, bit 0 = software reset, bit 3 = A20 line?
-//          space->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_A20,(data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+//          space.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_A20,(data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 			logerror("SYS: port 0x20 write %02x\n",data);
 			break;
 		case 0x02:

@@ -184,28 +184,28 @@ void segag80v_state::machine_start()
  *
  *************************************/
 
-static offs_t decrypt_offset(address_space *space, offs_t offset)
+static offs_t decrypt_offset(address_space &space, offs_t offset)
 {
-	segag80v_state *state = space->machine().driver_data<segag80v_state>();
+	segag80v_state *state = space.machine().driver_data<segag80v_state>();
 
 	/* ignore anything but accesses via opcode $32 (LD $(XXYY),A) */
-	offs_t pc = space->device().safe_pcbase();
-	if ((UINT16)pc == 0xffff || space->read_byte(pc) != 0x32)
+	offs_t pc = space.device().safe_pcbase();
+	if ((UINT16)pc == 0xffff || space.read_byte(pc) != 0x32)
 		return offset;
 
 	/* fetch the low byte of the address and munge it */
-	return (offset & 0xff00) | (*state->m_decrypt)(pc, space->read_byte(pc + 1));
+	return (offset & 0xff00) | (*state->m_decrypt)(pc, space.read_byte(pc + 1));
 }
 
 WRITE8_MEMBER(segag80v_state::mainram_w)
 {
-	m_mainram[decrypt_offset(&space, offset)] = data;
+	m_mainram[decrypt_offset(space, offset)] = data;
 }
 
-WRITE8_MEMBER(segag80v_state::usb_ram_w){ sega_usb_ram_w(m_usb, space, decrypt_offset(machine().device("maincpu")->memory().space(AS_PROGRAM), offset), data); }
+WRITE8_MEMBER(segag80v_state::usb_ram_w){ sega_usb_ram_w(m_usb, space, decrypt_offset(*machine().device("maincpu")->memory().space(AS_PROGRAM), offset), data); }
 WRITE8_MEMBER(segag80v_state::vectorram_w)
 {
-	m_vectorram[decrypt_offset(&space, offset)] = data;
+	m_vectorram[decrypt_offset(space, offset)] = data;
 }
 
 

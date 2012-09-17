@@ -168,7 +168,7 @@ public:
 	void render_scanline();
 	void update_scanline();
 
-	void spriteram_dma(address_space *space, const UINT8 page );
+	void spriteram_dma(address_space &space, const UINT8 page );
 	void render( bitmap_ind16 &bitmap, int flipx, int flipy, int sx, int sy );
 	int get_pixel( int x, int y );
 

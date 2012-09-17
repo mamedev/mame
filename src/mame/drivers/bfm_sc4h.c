@@ -344,7 +344,7 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 							break;
 
 						case 0x1330:
-							bfm_sc4_reel4_w(&space,0,data&0xf);
+							bfm_sc4_reel4_w(space,0,data&0xf);
 							//m_meterstatus = (m_meterstatus&0x3f) | ((data & 0x30) << 2);
 							sec.write_data_line(~data&0x10);
 							break;
@@ -504,9 +504,9 @@ void bfm_sc4_write_serial_vfd(running_machine &machine, bool cs, bool clock, boo
 }
 
 
-void bfm_sc4_68307_porta_w(address_space *space, bool dedicated, UINT8 data, UINT8 line_mask)
+void bfm_sc4_68307_porta_w(address_space &space, bool dedicated, UINT8 data, UINT8 line_mask)
 {
-	sc4_state *state = space->machine().driver_data<sc4_state>();
+	sc4_state *state = space.machine().driver_data<sc4_state>();
 
 	state->m_reel12_latch = data;
 
@@ -524,7 +524,7 @@ void bfm_sc4_68307_porta_w(address_space *space, bool dedicated, UINT8 data, UIN
 
 static WRITE8_HANDLER( bfm_sc4_reel3_w )
 {
-	sc4_state *state = space->machine().driver_data<sc4_state>();
+	sc4_state *state = space.machine().driver_data<sc4_state>();
 
 	state->m_reel3_latch = data;
 
@@ -538,7 +538,7 @@ static WRITE8_HANDLER( bfm_sc4_reel3_w )
 
 static WRITE8_HANDLER( bfm_sc4_reel4_w )
 {
-	sc4_state *state = space->machine().driver_data<sc4_state>();
+	sc4_state *state = space.machine().driver_data<sc4_state>();
 
 	state->m_reel4_latch = data;
 
@@ -550,29 +550,29 @@ static WRITE8_HANDLER( bfm_sc4_reel4_w )
 	awp_draw_reel(3);
 }
 
-void bfm_sc4_68307_portb_w(address_space *space, bool dedicated, UINT16 data, UINT16 line_mask)
+void bfm_sc4_68307_portb_w(address_space &space, bool dedicated, UINT16 data, UINT16 line_mask)
 {
 //  if (dedicated == false)
 	{
-		int pc = space->device().safe_pc();
-		//m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+		int pc = space.device().safe_pc();
+		//m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
 		// serial output to the VFD at least..
 		logerror("%08x bfm_sc4_68307_portb_w %04x %04x\n", pc, data, line_mask);
 
-		bfm_sc4_write_serial_vfd(space->machine(), (data & 0x4000)?1:0, (data & 0x1000)?1:0, !(data & 0x2000)?1:0);
+		bfm_sc4_write_serial_vfd(space.machine(), (data & 0x4000)?1:0, (data & 0x1000)?1:0, !(data & 0x2000)?1:0);
 
 		bfm_sc4_reel3_w(space, 0, (data&0x0f00)>>8);
 	}
 
 }
-UINT8 bfm_sc4_68307_porta_r(address_space *space, bool dedicated, UINT8 line_mask)
+UINT8 bfm_sc4_68307_porta_r(address_space &space, bool dedicated, UINT8 line_mask)
 {
-	int pc = space->device().safe_pc();
+	int pc = space.device().safe_pc();
 	logerror("%08x bfm_sc4_68307_porta_r\n", pc);
-	return space->machine().rand();
+	return space.machine().rand();
 }
 
-UINT16 bfm_sc4_68307_portb_r(address_space *space, bool dedicated, UINT16 line_mask)
+UINT16 bfm_sc4_68307_portb_r(address_space &space, bool dedicated, UINT16 line_mask)
 {
 	if (dedicated==false)
 	{

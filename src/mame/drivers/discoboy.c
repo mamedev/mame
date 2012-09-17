@@ -206,7 +206,7 @@ void discoboy_setrombank( running_machine &machine, UINT8 data )
 {
 	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	data &= 0x2f;
-	space->machine().root_device().membank("bank1")->set_base(&ROM[0x6000 + (data * 0x1000)] );
+	space.machine().root_device().membank("bank1")->set_base(&ROM[0x6000 + (data * 0x1000)] );
 }
 #endif
 

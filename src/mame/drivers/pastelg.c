@@ -47,7 +47,7 @@ READ8_MEMBER(pastelg_state::pastelg_sndrom_r)
 {
 	UINT8 *ROM = memregion("voice")->base();
 
-	return ROM[pastelg_blitter_src_addr_r(&space) & 0x7fff];
+	return ROM[pastelg_blitter_src_addr_r(space) & 0x7fff];
 }
 
 static ADDRESS_MAP_START( pastelg_map, AS_PROGRAM, 8, pastelg_state )

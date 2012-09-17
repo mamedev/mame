@@ -741,13 +741,13 @@ Notes:
 
 /********************************************************************/
 
-static UINT8 z80_fifoout_pop(address_space *space)
+static UINT8 z80_fifoout_pop(address_space &space)
 {
-	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
+	seibuspi_state *state = space.machine().driver_data<seibuspi_state>();
 	UINT8 r;
 	if (state->m_fifoout_wpos == state->m_fifoout_rpos)
 	{
-		logerror("Sound FIFOOUT underflow at %08X\n", space->device().safe_pc());
+		logerror("Sound FIFOOUT underflow at %08X\n", space.device().safe_pc());
 	}
 	r = state->m_fifoout_data[state->m_fifoout_rpos++];
 	if(state->m_fifoout_rpos == FIFO_SIZE)
@@ -763,9 +763,9 @@ static UINT8 z80_fifoout_pop(address_space *space)
 	return r;
 }
 
-static void z80_fifoout_push(address_space *space, UINT8 data)
+static void z80_fifoout_push(address_space &space, UINT8 data)
 {
-	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
+	seibuspi_state *state = space.machine().driver_data<seibuspi_state>();
 	state->m_fifoout_data[state->m_fifoout_wpos++] = data;
 	if (state->m_fifoout_wpos == FIFO_SIZE)
 	{
@@ -773,19 +773,19 @@ static void z80_fifoout_push(address_space *space, UINT8 data)
 	}
 	if(state->m_fifoout_wpos == state->m_fifoout_rpos)
 	{
-		fatalerror("Sound FIFOOUT overflow at %08X\n", space->device().safe_pc());
+		fatalerror("Sound FIFOOUT overflow at %08X\n", space.device().safe_pc());
 	}
 
 	state->m_fifoout_read_request = 1;
 }
 
-static UINT8 z80_fifoin_pop(address_space *space)
+static UINT8 z80_fifoin_pop(address_space &space)
 {
-	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
+	seibuspi_state *state = space.machine().driver_data<seibuspi_state>();
 	UINT8 r;
 	if (state->m_fifoin_wpos == state->m_fifoin_rpos)
 	{
-		fatalerror("Sound FIFOIN underflow at %08X\n", space->device().safe_pc());
+		fatalerror("Sound FIFOIN underflow at %08X\n", space.device().safe_pc());
 	}
 	r = state->m_fifoin_data[state->m_fifoin_rpos++];
 	if(state->m_fifoin_rpos == FIFO_SIZE)
@@ -801,9 +801,9 @@ static UINT8 z80_fifoin_pop(address_space *space)
 	return r;
 }
 
-static void z80_fifoin_push(address_space *space, UINT8 data)
+static void z80_fifoin_push(address_space &space, UINT8 data)
 {
-	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
+	seibuspi_state *state = space.machine().driver_data<seibuspi_state>();
 	state->m_fifoin_data[state->m_fifoin_wpos++] = data;
 	if(state->m_fifoin_wpos == FIFO_SIZE)
 	{
@@ -811,7 +811,7 @@ static void z80_fifoin_push(address_space *space, UINT8 data)
 	}
 	if(state->m_fifoin_wpos == state->m_fifoin_rpos)
 	{
-		fatalerror("Sound FIFOIN overflow at %08X\n", space->device().safe_pc());
+		fatalerror("Sound FIFOIN overflow at %08X\n", space.device().safe_pc());
 	}
 
 	state->m_fifoin_read_request = 1;
@@ -835,7 +835,7 @@ WRITE8_MEMBER(seibuspi_state::sb_coin_w)
 
 READ32_MEMBER(seibuspi_state::sound_fifo_r)
 {
-	UINT8 r = z80_fifoout_pop(&space);
+	UINT8 r = z80_fifoout_pop(space);
 
 	return r;
 }
@@ -843,7 +843,7 @@ READ32_MEMBER(seibuspi_state::sound_fifo_r)
 WRITE32_MEMBER(seibuspi_state::sound_fifo_w)
 {
 	if( ACCESSING_BITS_0_7 ) {
-		z80_fifoin_push(&space, data & 0xff);
+		z80_fifoin_push(space, data & 0xff);
 	}
 }
 
@@ -955,14 +955,14 @@ CUSTOM_INPUT_MEMBER(seibuspi_state::ejsakura_keyboard_r)
 
 READ8_MEMBER(seibuspi_state::z80_soundfifo_r)
 {
-	UINT8 r = z80_fifoin_pop(&space);
+	UINT8 r = z80_fifoin_pop(space);
 
 	return r;
 }
 
 WRITE8_MEMBER(seibuspi_state::z80_soundfifo_w)
 {
-	z80_fifoout_push(&space, data);
+	z80_fifoout_push(space, data);
 }
 
 READ8_MEMBER(seibuspi_state::z80_soundfifo_status_r)

@@ -327,15 +327,15 @@ void isa8_device::install_device(offs_t start, offs_t end, offs_t mask, offs_t m
 
 void isa8_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
 {
-	address_space *space = m_maincpu->space(AS_PROGRAM);
-	space->install_readwrite_bank(start, end, mask, mirror, tag );
+	address_space &space = *m_maincpu->space(AS_PROGRAM);
+	space.install_readwrite_bank(start, end, mask, mirror, tag );
 	machine().root_device().membank(tag)->set_base(data);
 }
 
 void isa8_device::unmap_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror)
 {
-	address_space *space = m_maincpu->space(AS_PROGRAM);
-	space->unmap_readwrite(start, end, mask, mirror);
+	address_space &space = *m_maincpu->space(AS_PROGRAM);
+	space.unmap_readwrite(start, end, mask, mirror);
 }
 
 void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region)
@@ -346,25 +346,25 @@ void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t ma
 		UINT8 *dest = machine().root_device().memregion("isa")->base() + start - 0xc0000;
 		memcpy(dest,src, end - start + 1);
 	} else {
-		address_space *space = m_maincpu->space(AS_PROGRAM);
-		space->install_read_bank(start, end, mask, mirror, tag);
-		space->unmap_write(start, end, mask, mirror);
+		address_space &space = *m_maincpu->space(AS_PROGRAM);
+		space.install_read_bank(start, end, mask, mirror, tag);
+		space.unmap_write(start, end, mask, mirror);
 		machine().root_device().membank(tag)->set_base(machine().root_device().memregion(dev->subtag(tempstring, region))->base());
 	}
 }
 
 void isa8_device::unmap_rom(offs_t start, offs_t end, offs_t mask, offs_t mirror)
 {
-	address_space *space = m_maincpu->space(AS_PROGRAM);
-	space->unmap_read(start, end, mask, mirror);
+	address_space &space = *m_maincpu->space(AS_PROGRAM);
+	space.unmap_read(start, end, mask, mirror);
 }
 
 bool isa8_device::is_option_rom_space_available(offs_t start, int size)
 {
 	m_maincpu = machine().device<cpu_device>(m_cputag);
-	address_space *space = m_maincpu->space(AS_PROGRAM);
+	address_space &space = *m_maincpu->space(AS_PROGRAM);
 	for(int i = 0; i < size; i += 4096) // 4KB granularity should be enough
-		if(space->get_read_ptr(start + i)) return false;
+		if(space.get_read_ptr(start + i)) return false;
 	return true;
 }
 

@@ -876,12 +876,12 @@ WRITE8_MEMBER(bzone_state::analog_select_w)
 
 DRIVER_INIT_MEMBER(bzone_state,bradley)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	space->install_ram(0x400, 0x7ff);
-	space->install_read_port(0x1808, 0x1808, "1808");
-	space->install_read_port(0x1809, 0x1809, "1809");
-	space->install_read_handler(0x180a, 0x180a, read8_delegate(FUNC(bzone_state::analog_data_r),this));
-	space->install_write_handler(0x1848, 0x1850, write8_delegate(FUNC(bzone_state::analog_select_w),this));
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	space.install_ram(0x400, 0x7ff);
+	space.install_read_port(0x1808, 0x1808, "1808");
+	space.install_read_port(0x1809, 0x1809, "1809");
+	space.install_read_handler(0x180a, 0x180a, read8_delegate(FUNC(bzone_state::analog_data_r),this));
+	space.install_write_handler(0x1848, 0x1850, write8_delegate(FUNC(bzone_state::analog_select_w),this));
 }
 
 

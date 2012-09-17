@@ -5744,13 +5744,13 @@ ROM_END
 static void maketrax_rom_decode(running_machine &machine)
 {
 	pacman_state *state = machine.driver_data<pacman_state>();
-	address_space *space = state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = *state->m_maincpu->space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
 	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
-	space->set_decrypted_region(0x0000, 0x3fff, decrypted);
+	space.set_decrypted_region(0x0000, 0x3fff, decrypted);
 
 	memcpy(decrypted,rom,0x4000);
 
@@ -5777,13 +5777,13 @@ DRIVER_INIT_MEMBER(pacman_state,maketrax)
 static void korosuke_rom_decode(running_machine &machine)
 {
 	pacman_state *state = machine.driver_data<pacman_state>();
-	address_space *space = state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = *state->m_maincpu->space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
 	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
-	space->set_decrypted_region(0x0000, 0x3fff, decrypted);
+	space.set_decrypted_region(0x0000, 0x3fff, decrypted);
 
 	memcpy(decrypted,rom,0x4000);
 

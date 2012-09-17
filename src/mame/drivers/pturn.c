@@ -479,8 +479,8 @@ static INTERRUPT_GEN( pturn_main_intgen )
 
 void pturn_state::machine_reset()
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	soundlatch_clear_byte_w(*space,0,0);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	soundlatch_clear_byte_w(space,0,0);
 }
 
 static MACHINE_CONFIG_START( pturn, pturn_state )

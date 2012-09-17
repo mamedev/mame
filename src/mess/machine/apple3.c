@@ -327,7 +327,7 @@ static void apple3_update_memory(running_machine &machine)
 	apple3_state *state = machine.driver_data<apple3_state>();
 	UINT16 bank;
 	UINT8 page;
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (LOG_MEMORY)
 	{
@@ -374,71 +374,71 @@ static void apple3_update_memory(running_machine &machine)
 	/* install bank 8 (C000-CFFF) */
 	if (state->m_via_0_a & 0x40)
 	{
-		space->install_read_handler(0xC000, 0xC0FF, read8_delegate(FUNC(apple3_state::apple3_c0xx_r),state));
-		space->install_write_handler(0xC000, 0xC0FF, write8_delegate(FUNC(apple3_state::apple3_c0xx_w),state));
+		space.install_read_handler(0xC000, 0xC0FF, read8_delegate(FUNC(apple3_state::apple3_c0xx_r),state));
+		space.install_write_handler(0xC000, 0xC0FF, write8_delegate(FUNC(apple3_state::apple3_c0xx_w),state));
 	}
 	else
 	{
-		space->install_read_bank(0xC000, 0xC0FF, "bank8");
+		space.install_read_bank(0xC000, 0xC0FF, "bank8");
 		if (state->m_via_0_a & 0x08)
-			space->unmap_write(0xC000, 0xC0FF);
+			space.unmap_write(0xC000, 0xC0FF);
 		else
-			space->install_write_bank(0xC000, 0xC0FF, "bank8");
+			space.install_write_bank(0xC000, 0xC0FF, "bank8");
 		apple3_setbank(machine,"bank8", ~0, 0x4000);
 	}
 
 	/* install bank 9 (C100-C4FF) */
 	if (state->m_via_0_a & 0x40)
 	{
-		space->nop_readwrite(0xC100, 0xC4FF);
+		space.nop_readwrite(0xC100, 0xC4FF);
 	}
 	else
 	{
-		space->install_read_bank(0xC100, 0xC4FF, "bank9");
+		space.install_read_bank(0xC100, 0xC4FF, "bank9");
 		if (state->m_via_0_a & 0x08)
-			space->unmap_write(0xC100, 0xC4FF);
+			space.unmap_write(0xC100, 0xC4FF);
 		else
-			space->install_write_bank(0xC100, 0xC4FF, "bank9");
+			space.install_write_bank(0xC100, 0xC4FF, "bank9");
 		apple3_setbank(machine,"bank9", ~0, 0x4100);
 	}
 
 	/* install bank 10 (C500-C7FF) */
-	space->install_read_bank(0xC500, 0xC7FF, "bank10");
+	space.install_read_bank(0xC500, 0xC7FF, "bank10");
 	if (state->m_via_0_a & 0x08)
-		space->unmap_write(0xC500, 0xC7FF);
+		space.unmap_write(0xC500, 0xC7FF);
 	else
-		space->install_write_bank(0xC500, 0xC7FF, "bank10");
+		space.install_write_bank(0xC500, 0xC7FF, "bank10");
 	apple3_setbank(machine,"bank10", ~0, 0x4500);
 
 	/* install bank 11 (C800-CFFF) */
 	if (state->m_via_0_a & 0x40)
 	{
-		space->nop_readwrite(0xC800, 0xCFFF);
+		space.nop_readwrite(0xC800, 0xCFFF);
 	}
 	else
 	{
-		space->install_read_bank(0xC800, 0xCFFF, "bank11");
+		space.install_read_bank(0xC800, 0xCFFF, "bank11");
 		if (state->m_via_0_a & 0x08)
-			space->unmap_write(0xC800, 0xCFFF);
+			space.unmap_write(0xC800, 0xCFFF);
 		else
-			space->install_write_bank(0xC800, 0xCFFF, "bank11");
+			space.install_write_bank(0xC800, 0xCFFF, "bank11");
 		apple3_setbank(machine,"bank11", ~0, 0x4800);
 	}
 
 	/* install bank 6 (D000-EFFF) */
-	space->install_read_bank(0xD000, 0xEFFF, "bank6");
+	space.install_read_bank(0xD000, 0xEFFF, "bank6");
 	if (state->m_via_0_a & 0x08)
-		space->unmap_write(0xD000, 0xEFFF);
+		space.unmap_write(0xD000, 0xEFFF);
 	else
-		space->install_write_bank(0xD000, 0xEFFF, "bank6");
+		space.install_write_bank(0xD000, 0xEFFF, "bank6");
 	apple3_setbank(machine,"bank6", ~0, 0x5000);
 
 	/* install bank 7 (F000-FFFF) */
-	space->install_read_bank(0xF000, 0xFFFF, "bank7");
+	space.install_read_bank(0xF000, 0xFFFF, "bank7");
 	if (state->m_via_0_a & 0x09)
-		space->unmap_write(0xF000, 0xFFFF);
+		space.unmap_write(0xF000, 0xFFFF);
 	else
-		space->install_write_bank(0xF000, 0xFFFF, "bank7");
+		space.install_write_bank(0xF000, 0xFFFF, "bank7");
 	if (state->m_via_0_a & 0x01)
 		state->membank("bank7")->set_base(machine.root_device().memregion("maincpu")->base());
 	else
@@ -446,11 +446,11 @@ static void apple3_update_memory(running_machine &machine)
 
 	/* reinstall VIA handlers */
 	{
-		via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
-		via6522_device *via_1 = space->machine().device<via6522_device>("via6522_1");
+		via6522_device *via_0 = space.machine().device<via6522_device>("via6522_0");
+		via6522_device *via_1 = space.machine().device<via6522_device>("via6522_1");
 
-		space->install_readwrite_handler(0xFFD0, 0xFFDF, 0, 0, read8_delegate(FUNC(via6522_device::read),via_0), write8_delegate(FUNC(via6522_device::write),via_0));
-		space->install_readwrite_handler(0xFFE0, 0xFFEF, 0, 0, read8_delegate(FUNC(via6522_device::read),via_1), write8_delegate(FUNC(via6522_device::write),via_1));
+		space.install_readwrite_handler(0xFFD0, 0xFFDF, 0, 0, read8_delegate(FUNC(via6522_device::read),via_0), write8_delegate(FUNC(via6522_device::write),via_0));
+		space.install_readwrite_handler(0xFFE0, 0xFFEF, 0, 0, read8_delegate(FUNC(via6522_device::read),via_1), write8_delegate(FUNC(via6522_device::write),via_1));
 	}
 }
 

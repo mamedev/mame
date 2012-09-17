@@ -95,9 +95,9 @@ READ16_MEMBER(exterm_state::exterm_host_data_r)
  *
  *************************************/
 
-static UINT16 exterm_trackball_port_r(address_space *space, int which, UINT16 mem_mask)
+static UINT16 exterm_trackball_port_r(address_space &space, int which, UINT16 mem_mask)
 {
-	exterm_state *state = space->machine().driver_data<exterm_state>();
+	exterm_state *state = space.machine().driver_data<exterm_state>();
 	UINT16 port;
 
 	/* Read the fake input port */
@@ -125,13 +125,13 @@ static UINT16 exterm_trackball_port_r(address_space *space, int which, UINT16 me
 
 READ16_MEMBER(exterm_state::exterm_input_port_0_r)
 {
-	return exterm_trackball_port_r(&space, 0, mem_mask);
+	return exterm_trackball_port_r(space, 0, mem_mask);
 }
 
 
 READ16_MEMBER(exterm_state::exterm_input_port_1_r)
 {
-	return exterm_trackball_port_r(&space, 1, mem_mask);
+	return exterm_trackball_port_r(space, 1, mem_mask);
 }
 
 

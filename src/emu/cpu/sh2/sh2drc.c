@@ -149,7 +149,7 @@ INLINE sh2_state *get_safe_token(device_t *device)
 INLINE UINT16 RW(sh2_state *sh2, offs_t A)
 {
 	if (A >= 0xe0000000)
-		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffff << (((~A) & 2)*8)) >> (((~A) & 2)*8);
+		return sh2_internal_r(*sh2->internal, (A & 0x1fc)>>2, 0xffff << (((~A) & 2)*8)) >> (((~A) & 2)*8);
 
 	if (A >= 0xc0000000)
 		return sh2->program->read_word(A);
@@ -160,7 +160,7 @@ INLINE UINT16 RW(sh2_state *sh2, offs_t A)
 INLINE UINT32 RL(sh2_state *sh2, offs_t A)
 {
 	if (A >= 0xe0000000)
-		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffffffff);
+		return sh2_internal_r(*sh2->internal, (A & 0x1fc)>>2, 0xffffffff);
 
 	if (A >= 0xc0000000)
 		return sh2->program->read_dword(A);

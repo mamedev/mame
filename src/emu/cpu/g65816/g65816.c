@@ -585,14 +585,14 @@ Triforce pieces in Zelda 3 intro) */
 
 static WRITE8_HANDLER( wrmpya_w )
 {
-	g65816i_cpu_struct *cpustate = get_safe_token(&space->device());
+	g65816i_cpu_struct *cpustate = get_safe_token(&space.device());
 
 	cpustate->wrmpya = data;
 }
 
 static WRITE8_HANDLER( wrmpyb_w )
 {
-	g65816i_cpu_struct *cpustate = get_safe_token(&space->device());
+	g65816i_cpu_struct *cpustate = get_safe_token(&space.device());
 
 	cpustate->wrmpyb = data;
 	cpustate->rdmpy = cpustate->wrmpya * cpustate->wrmpyb;
@@ -601,21 +601,21 @@ static WRITE8_HANDLER( wrmpyb_w )
 
 static WRITE8_HANDLER( wrdivl_w )
 {
-	g65816i_cpu_struct *cpustate = get_safe_token(&space->device());
+	g65816i_cpu_struct *cpustate = get_safe_token(&space.device());
 
 	cpustate->wrdiv = (data) | (cpustate->wrdiv & 0xff00);
 }
 
 static WRITE8_HANDLER( wrdivh_w )
 {
-	g65816i_cpu_struct *cpustate = get_safe_token(&space->device());
+	g65816i_cpu_struct *cpustate = get_safe_token(&space.device());
 
 	cpustate->wrdiv = (data << 8) | (cpustate->wrdiv & 0xff);
 }
 
 static WRITE8_HANDLER( wrdvdd_w )
 {
-	g65816i_cpu_struct *cpustate = get_safe_token(&space->device());
+	g65816i_cpu_struct *cpustate = get_safe_token(&space.device());
 	UINT16 quotient, remainder;
 
 	cpustate->dvdd = data;
@@ -629,31 +629,31 @@ static WRITE8_HANDLER( wrdvdd_w )
 
 static WRITE8_HANDLER( memsel_w )
 {
-	g65816i_cpu_struct *cpustate = get_safe_token(&space->device());
+	g65816i_cpu_struct *cpustate = get_safe_token(&space.device());
 	cpustate->fastROM = data & 1;
 }
 
 static READ8_HANDLER( rddivl_r )
 {
-	g65816i_cpu_struct *cpustate = get_safe_token(&space->device());
+	g65816i_cpu_struct *cpustate = get_safe_token(&space.device());
 	return cpustate->rddiv & 0xff;
 }
 
 static READ8_HANDLER( rddivh_r )
 {
-	g65816i_cpu_struct *cpustate = get_safe_token(&space->device());
+	g65816i_cpu_struct *cpustate = get_safe_token(&space.device());
 	return cpustate->rddiv >> 8;
 }
 
 static READ8_HANDLER( rdmpyl_r )
 {
-	g65816i_cpu_struct *cpustate = get_safe_token(&space->device());
+	g65816i_cpu_struct *cpustate = get_safe_token(&space.device());
 	return cpustate->rdmpy & 0xff;
 }
 
 static READ8_HANDLER( rdmpyh_r )
 {
-	g65816i_cpu_struct *cpustate = get_safe_token(&space->device());
+	g65816i_cpu_struct *cpustate = get_safe_token(&space.device());
 	return cpustate->rdmpy >> 8;
 }
 

@@ -109,7 +109,7 @@ VIDEO_START_MEMBER(toobin_state,toobin)
 
 WRITE16_HANDLER( toobin_paletteram_w )
 {
-	toobin_state *state = space->machine().driver_data<toobin_state>();
+	toobin_state *state = space.machine().driver_data<toobin_state>();
 	int newword;
 
 	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
@@ -124,18 +124,18 @@ WRITE16_HANDLER( toobin_paletteram_w )
 		if (green) green += 38;
 		if (blue) blue += 38;
 
-		palette_set_color(space->machine(), offset & 0x3ff, MAKE_RGB(red, green, blue));
+		palette_set_color(space.machine(), offset & 0x3ff, MAKE_RGB(red, green, blue));
 		if (!(newword & 0x8000))
-			palette_set_pen_contrast(space->machine(), offset & 0x3ff, state->m_brightness);
+			palette_set_pen_contrast(space.machine(), offset & 0x3ff, state->m_brightness);
 		else
-			palette_set_pen_contrast(space->machine(), offset & 0x3ff, 1.0);
+			palette_set_pen_contrast(space.machine(), offset & 0x3ff, 1.0);
 	}
 }
 
 
 WRITE16_HANDLER( toobin_intensity_w )
 {
-	toobin_state *state = space->machine().driver_data<toobin_state>();
+	toobin_state *state = space.machine().driver_data<toobin_state>();
 	int i;
 
 	if (ACCESSING_BITS_0_7)
@@ -144,7 +144,7 @@ WRITE16_HANDLER( toobin_intensity_w )
 
 		for (i = 0; i < 0x400; i++)
 			if (!(state->m_generic_paletteram_16[i] & 0x8000))
-				palette_set_pen_contrast(space->machine(), i, state->m_brightness);
+				palette_set_pen_contrast(space.machine(), i, state->m_brightness);
 	}
 }
 
@@ -158,14 +158,14 @@ WRITE16_HANDLER( toobin_intensity_w )
 
 WRITE16_HANDLER( toobin_xscroll_w )
 {
-	toobin_state *state = space->machine().driver_data<toobin_state>();
+	toobin_state *state = space.machine().driver_data<toobin_state>();
 	UINT16 oldscroll = *state->m_xscroll;
 	UINT16 newscroll = oldscroll;
 	COMBINE_DATA(&newscroll);
 
 	/* if anything has changed, force a partial update */
 	if (newscroll != oldscroll)
-		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+		space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
 
 	/* update the playfield scrolling - hscroll is clocked on the following scanline */
 	state->m_playfield_tilemap->set_scrollx(0, newscroll >> 6);
@@ -178,14 +178,14 @@ WRITE16_HANDLER( toobin_xscroll_w )
 
 WRITE16_HANDLER( toobin_yscroll_w )
 {
-	toobin_state *state = space->machine().driver_data<toobin_state>();
+	toobin_state *state = space.machine().driver_data<toobin_state>();
 	UINT16 oldscroll = *state->m_yscroll;
 	UINT16 newscroll = oldscroll;
 	COMBINE_DATA(&newscroll);
 
 	/* if anything has changed, force a partial update */
 	if (newscroll != oldscroll)
-		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+		space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
 
 	/* if bit 4 is zero, the scroll value is clocked in right away */
 	state->m_playfield_tilemap->set_scrolly(0, newscroll >> 6);
@@ -211,7 +211,7 @@ WRITE16_HANDLER( toobin_slip_w )
 
 	/* if the SLIP is changing, force a partial update first */
 	if (oldslip != newslip)
-		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+		space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
 
 	/* update the data */
 	atarimo_0_slipram_w(space, offset, data, mem_mask);

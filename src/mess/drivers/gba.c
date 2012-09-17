@@ -154,7 +154,7 @@ static void dma_exec(running_machine &machine, FPTR ch)
 	int ctrl;
 	int srcadd, dstadd;
 	UINT32 src, dst;
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	gba_state *state = machine.driver_data<gba_state>();
 
 	src = state->m_dma_src[ch];
@@ -207,7 +207,7 @@ static void dma_exec(running_machine &machine, FPTR ch)
 			dst &= 0xfffffffc;
 
 			// 32-bit
-			space->write_dword(dst, space->read_dword(src));
+			space.write_dword(dst, space.read_dword(src));
 			switch (dstadd)
 			{
 				case 0:	// increment
@@ -242,7 +242,7 @@ static void dma_exec(running_machine &machine, FPTR ch)
 			dst &= 0xfffffffe;
 
 			// 16-bit
-			space->write_word(dst, space->read_word(src));
+			space.write_word(dst, space.read_word(src));
 			switch (dstadd)
 			{
 				case 0:	// increment

@@ -78,50 +78,50 @@ static TIMER_CALLBACK( namco_52xx_latch_callback )
 
 static READ8_HANDLER( namco_52xx_K_r )
 {
-	namco_52xx_state *state = get_safe_token(space->device().owner());
+	namco_52xx_state *state = get_safe_token(space.device().owner());
 	return state->m_latched_cmd & 0x0f;
 }
 
 static READ8_HANDLER( namco_52xx_SI_r )
 {
-	namco_52xx_state *state = get_safe_token(space->device().owner());
+	namco_52xx_state *state = get_safe_token(space.device().owner());
 	return state->m_si(0) ? 1 : 0;
 }
 
 static READ8_HANDLER( namco_52xx_R0_r )
 {
-	namco_52xx_state *state = get_safe_token(space->device().owner());
+	namco_52xx_state *state = get_safe_token(space.device().owner());
 	return state->m_romread(state->m_address) & 0x0f;
 }
 
 static READ8_HANDLER( namco_52xx_R1_r )
 {
-	namco_52xx_state *state = get_safe_token(space->device().owner());
+	namco_52xx_state *state = get_safe_token(space.device().owner());
 	return state->m_romread(state->m_address) >> 4;
 }
 
 
 static WRITE8_HANDLER( namco_52xx_P_w )
 {
-	namco_52xx_state *state = get_safe_token(space->device().owner());
-	discrete_sound_w(state->m_discrete, *space, NAMCO_52XX_P_DATA(state->m_basenode), data & 0x0f);
+	namco_52xx_state *state = get_safe_token(space.device().owner());
+	discrete_sound_w(state->m_discrete, space, NAMCO_52XX_P_DATA(state->m_basenode), data & 0x0f);
 }
 
 static WRITE8_HANDLER( namco_52xx_R2_w )
 {
-	namco_52xx_state *state = get_safe_token(space->device().owner());
+	namco_52xx_state *state = get_safe_token(space.device().owner());
 	state->m_address = (state->m_address & 0xfff0) | ((data & 0xf) << 0);
 }
 
 static WRITE8_HANDLER( namco_52xx_R3_w )
 {
-	namco_52xx_state *state = get_safe_token(space->device().owner());
+	namco_52xx_state *state = get_safe_token(space.device().owner());
 	state->m_address = (state->m_address & 0xff0f) | ((data & 0xf) << 4);
 }
 
 static WRITE8_HANDLER( namco_52xx_O_w )
 {
-	namco_52xx_state *state = get_safe_token(space->device().owner());
+	namco_52xx_state *state = get_safe_token(space.device().owner());
 	if (data & 0x10)
 		state->m_address = (state->m_address & 0x0fff) | ((data & 0xf) << 12);
 	else

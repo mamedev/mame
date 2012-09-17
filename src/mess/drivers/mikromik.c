@@ -537,8 +537,8 @@ WRITE_LINE_MEMBER( mm1_state::dack3_w )
 	}
 }
 
-static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
-static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
+static UINT8 memory_read_byte(address_space &space, offs_t address) { return space.read_byte(address); }
+static void memory_write_byte(address_space &space, offs_t address, UINT8 data) { space.write_byte(address, data); }
 
 static I8237_INTERFACE( dmac_intf )
 {

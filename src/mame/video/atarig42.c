@@ -99,9 +99,9 @@ VIDEO_START_MEMBER(atarig42_state,atarig42)
 
 WRITE16_HANDLER( atarig42_mo_control_w )
 {
-	atarig42_state *state = space->machine().driver_data<atarig42_state>();
+	atarig42_state *state = space.machine().driver_data<atarig42_state>();
 
-	logerror("MOCONT = %d (scan = %d)\n", data, space->machine().primary_screen->vpos());
+	logerror("MOCONT = %d (scan = %d)\n", data, space.machine().primary_screen->vpos());
 
 	/* set the control value */
 	COMBINE_DATA(&state->m_current_control);

@@ -144,7 +144,7 @@ static WRITE8_DEVICE_HANDLER( timeplt_filter_w )
 
 WRITE8_HANDLER( timeplt_sh_irqtrigger_w )
 {
-	device_t *audio = space->machine().device("timeplt_audio");
+	device_t *audio = space.machine().device("timeplt_audio");
 	timeplt_audio_state *state = get_safe_token(audio);
 
 	if (state->m_last_irq_state == 0 && data)

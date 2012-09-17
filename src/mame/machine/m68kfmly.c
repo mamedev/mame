@@ -148,70 +148,70 @@ static UINT16 tmp68301_timer[0x50];
 
 READ16_HANDLER( tmp68301_address_decoder_r )
 {
-	LOG(("PC %08X: TMP68301_address_decoder_r (%08X)\n", space->device().safe_pc(), (0xfffc00 + (offset * 2))));
+	LOG(("PC %08X: TMP68301_address_decoder_r (%08X)\n", space.device().safe_pc(), (0xfffc00 + (offset * 2))));
 
 	return tmp68301_address_decoder[offset];
 }
 
 WRITE16_HANDLER( tmp68301_address_decoder_w )
 {
-	LOG(("PC %08X: TMP68301_address_decoder_w (%08X = %04X)\n", space->device().safe_pc(), (0xfffc00 + (offset * 2)), data));
+	LOG(("PC %08X: TMP68301_address_decoder_w (%08X = %04X)\n", space.device().safe_pc(), (0xfffc00 + (offset * 2)), data));
 
 	tmp68301_address_decoder[offset] = data;
 }
 
 READ16_HANDLER( tmp68301_interrupt_controller_r )
 {
-	LOG(("PC %08X: TMP68301_interrupt_controller_r (%08X)\n", space->device().safe_pc(), (0xfffc80 + (offset * 2))));
+	LOG(("PC %08X: TMP68301_interrupt_controller_r (%08X)\n", space.device().safe_pc(), (0xfffc80 + (offset * 2))));
 
 	return tmp68301_interrupt_controller[offset];
 }
 
 WRITE16_HANDLER( tmp68301_interrupt_controller_w )
 {
-	LOG(("PC %08X: TMP68301_interrupt_controller_w (%08X = %04X)\n", space->device().safe_pc(), (0xfffc80 + (offset * 2)), data));
+	LOG(("PC %08X: TMP68301_interrupt_controller_w (%08X = %04X)\n", space.device().safe_pc(), (0xfffc80 + (offset * 2)), data));
 
 	tmp68301_interrupt_controller[offset] = data;
 }
 
 READ16_HANDLER( tmp68301_parallel_interface_r )
 {
-	LOG(("PC %08X: TMP68301_parallel_interface_r (%08X)\n", space->device().safe_pc(), (0xfffd00 + (offset * 2))));
+	LOG(("PC %08X: TMP68301_parallel_interface_r (%08X)\n", space.device().safe_pc(), (0xfffd00 + (offset * 2))));
 
 	return tmp68301_parallel_interface[offset];
 }
 
 WRITE16_HANDLER( tmp68301_parallel_interface_w )
 {
-	LOG(("PC %08X: TMP68301_parallel_interface_w (%08X = %04X)\n", space->device().safe_pc(), (0xfffd00 + (offset * 2)), data));
+	LOG(("PC %08X: TMP68301_parallel_interface_w (%08X = %04X)\n", space.device().safe_pc(), (0xfffd00 + (offset * 2)), data));
 
 	tmp68301_parallel_interface[offset] = data;
 }
 
 READ16_HANDLER( tmp68301_serial_interface_r )
 {
-	LOG(("PC %08X: TMP68301_serial_interface_r (%08X)\n", space->device().safe_pc(), (0xfffd80 + (offset * 2))));
+	LOG(("PC %08X: TMP68301_serial_interface_r (%08X)\n", space.device().safe_pc(), (0xfffd80 + (offset * 2))));
 
 	return tmp68301_serial_interface[offset];
 }
 
 WRITE16_HANDLER( tmp68301_serial_interface_w )
 {
-	LOG(("PC %08X: TMP68301_serial_interface_w (%08X = %04X)\n", space->device().safe_pc(), (0xfffd80 + (offset * 2)), data));
+	LOG(("PC %08X: TMP68301_serial_interface_w (%08X = %04X)\n", space.device().safe_pc(), (0xfffd80 + (offset * 2)), data));
 
 	tmp68301_serial_interface[offset] = data;
 }
 
 READ16_HANDLER( tmp68301_timer_r )
 {
-	LOG(("PC %08X: TMP68301_timer_r (%08X)\n", space->device().safe_pc(), (0xfffe00 + (offset * 2))));
+	LOG(("PC %08X: TMP68301_timer_r (%08X)\n", space.device().safe_pc(), (0xfffe00 + (offset * 2))));
 
 	return tmp68301_timer[offset];
 }
 
 WRITE16_HANDLER( tmp68301_timer_w )
 {
-	LOG(("PC %08X: TMP68301_timer_w (%08X = %04X)\n", space->device().safe_pc(), (0xfffe00 + (offset * 2)), data));
+	LOG(("PC %08X: TMP68301_timer_w (%08X = %04X)\n", space.device().safe_pc(), (0xfffe00 + (offset * 2)), data));
 
 	tmp68301_timer[offset] = data;
 }

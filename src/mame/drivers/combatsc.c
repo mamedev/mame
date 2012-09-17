@@ -707,7 +707,7 @@ MACHINE_START_MEMBER(combatsc_state,combatscb)
 
 void combatsc_state::machine_reset()
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	memset(m_io_ram,  0x00, 0x4000);
@@ -726,7 +726,7 @@ void combatsc_state::machine_reset()
 		m_sign[i] = 0;
 	}
 
-	combatsc_bankselect_w(*space, 0, 0);
+	combatsc_bankselect_w(space, 0, 0);
 }
 
 /* combat school (original) */

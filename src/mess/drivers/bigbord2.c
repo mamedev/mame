@@ -207,8 +207,8 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 /* Z80 DMA */
 
 
-static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
-static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
+static UINT8 memory_read_byte(address_space &space, offs_t address) { return space.read_byte(address); }
+static void memory_write_byte(address_space &space, offs_t address, UINT8 data) { space.write_byte(address, data); }
 
 static Z80DMA_INTERFACE( dma_intf )
 {
@@ -415,11 +415,11 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 
 WRITE_LINE_MEMBER( bigbord2_state::frame )
 {
-	address_space *space = m_maincpu->space(AS_PROGRAM);
+	address_space &space = *m_maincpu->space(AS_PROGRAM);
 	static UINT8 framecnt;
 	framecnt++;
 
-	if ((space->read_byte(0xf13d) == 0x4d) & (framecnt > 3))
+	if ((space.read_byte(0xf13d) == 0x4d) & (framecnt > 3))
 	{
 		framecnt = 0;
 		// simulate interrupt by saving current pc on
@@ -427,9 +427,9 @@ WRITE_LINE_MEMBER( bigbord2_state::frame )
 		UINT16 spreg = m_maincpu->state_int(Z80_SP);
 		UINT16 pcreg = m_maincpu->state_int(Z80_PC);
 		spreg--;
-		space->write_byte(spreg, pcreg >> 8);
+		space.write_byte(spreg, pcreg >> 8);
 		spreg--;
-		space->write_byte(spreg, pcreg);
+		space.write_byte(spreg, pcreg);
 		m_maincpu->set_state_int(Z80_SP, spreg);
 		m_maincpu->set_state_int(Z80_PC, 0xF18E);
 	}

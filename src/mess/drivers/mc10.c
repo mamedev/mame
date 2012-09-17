@@ -236,7 +236,7 @@ static TIMER_DEVICE_CALLBACK( alice32_scanline )
 
 DRIVER_INIT_MEMBER(mc10_state,mc10)
 {
-	address_space *prg = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &prg = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* initialize keyboard strobe */
 	m_keyboard_strobe = 0x00;
@@ -254,7 +254,7 @@ DRIVER_INIT_MEMBER(mc10_state,mc10)
 	else if (m_ram_size == 24*1024)
 		membank("bank2")->set_base(m_ram_base + 0x2000);
 	else  if (m_ram_size != 32*1024)		//ensure that is not alice90
-		prg->nop_readwrite(0x5000, 0x8fff);
+		prg.nop_readwrite(0x5000, 0x8fff);
 
 	/* register for state saving */
 	state_save_register_global(machine(), m_keyboard_strobe);

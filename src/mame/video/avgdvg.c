@@ -1258,7 +1258,7 @@ WRITE8_HANDLER( avgdvg_go_w )
          */
 		vector_clear_list();
 	}
-	vg_flush(space->machine());
+	vg_flush(space.machine());
 
 	vg_set_halt(0);
 	vg_run_timer->adjust(attotime::zero);
@@ -1289,7 +1289,7 @@ WRITE16_HANDLER( avgdvg_reset_word_w )
 
 MACHINE_RESET( avgdvg )
 {
-	avgdvg_reset_w (machine.device("maincpu")->memory().space(AS_PROGRAM),0,0);
+	avgdvg_reset_w (*machine.device("maincpu")->memory().space(AS_PROGRAM),0,0);
 }
 
 

@@ -312,7 +312,7 @@ static void execute_fdcset(running_machine &machine, int ref, int params, const 
 static void execute_fdclist(running_machine &machine, int ref, int params, const char **param);
 static void execute_fdcsearch(running_machine &machine, int ref, int params, const char **param);
 
-static fd1094_possibility *try_all_possibilities(address_space *space, int basepc, int offset, int length, UINT8 *instrbuffer, UINT8 *keybuffer, fd1094_possibility *possdata);
+static fd1094_possibility *try_all_possibilities(address_space &space, int basepc, int offset, int length, UINT8 *instrbuffer, UINT8 *keybuffer, fd1094_possibility *possdata);
 static void tag_possibility(running_machine &machine, fd1094_possibility *possdata, UINT8 status);
 
 static void perform_constrained_search(running_machine &machine);
@@ -322,8 +322,8 @@ static int does_key_work_for_constraints(const UINT16 *base, UINT8 *key);
 static UINT32 reconstruct_base_seed(int keybaseaddr, UINT32 startseed);
 
 static void build_optable(running_machine &machine);
-static int validate_ea(address_space *space, UINT32 pc, UINT8 modereg, const UINT8 *parambase, UINT32 flags);
-static int validate_opcode(address_space *space, UINT32 pc, const UINT8 *opdata, int maxwords);
+static int validate_ea(address_space &space, UINT32 pc, UINT8 modereg, const UINT8 *parambase, UINT32 flags);
+static int validate_opcode(address_space &space, UINT32 pc, const UINT8 *opdata, int maxwords);
 
 
 
@@ -464,14 +464,14 @@ INLINE void print_possibilities(running_machine &machine)
     0=no, 1=yes, 2=unlikely
 -----------------------------------------------*/
 
-INLINE int pc_is_valid(address_space *space, UINT32 pc, UINT32 flags)
+INLINE int pc_is_valid(address_space &space, UINT32 pc, UINT32 flags)
 {
 	/* if we're odd or out of range, fail */
 	if ((pc & 1) == 1)
 		return 0;
 	if (pc & 0xff000000)
 		return 0;
-	if (space->direct().read_decrypted_ptr(pc) == NULL)
+	if (space.direct().read_decrypted_ptr(pc) == NULL)
 		return 0;
 	return 1;
 }
@@ -482,7 +482,7 @@ INLINE int pc_is_valid(address_space *space, UINT32 pc, UINT32 flags)
     valid? 0=no, 1=yes, 2=unlikely
 -----------------------------------------------*/
 
-INLINE int addr_is_valid(address_space *space, UINT32 addr, UINT32 flags)
+INLINE int addr_is_valid(address_space &space, UINT32 addr, UINT32 flags)
 {
 	/* if this a JMP, the address is a PC */
 	if (flags & OF_JMP)
@@ -495,7 +495,7 @@ INLINE int addr_is_valid(address_space *space, UINT32 addr, UINT32 flags)
 		return 0;
 
 	/* if we're invalid, fail */
-	if (strcmp(const_cast<address_space *>(space)->get_handler_string(ROW_READ, addr), "segaic16_memory_mapper_lsb_r") == 0)
+	if (strcmp(const_cast<address_space &>(space)->get_handler_string(ROW_READ, addr), "segaic16_memory_mapper_lsb_r") == 0)
 		return 2;
 
 	return 1;
@@ -747,7 +747,7 @@ static int instruction_hook(device_t &device, offs_t curpc)
 	}
 
 	/* try all possible decodings at the current pc */
-	posscount = try_all_possibilities(device.memory().space(AS_PROGRAM), curpc, 0, 0, instrbuffer, keybuffer, posslist) - posslist;
+	posscount = try_all_possibilities(*device.memory().space(AS_PROGRAM), curpc, 0, 0, instrbuffer, keybuffer, posslist) - posslist;
 	if (keydirty)
 		fd1094_regenerate_key(device.machine());
 
@@ -1075,8 +1075,8 @@ static void execute_fdpc(running_machine &machine, int ref, int params, const ch
 
 static void execute_fdsearch(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space *space = debug_cpu_get_visible_cpu(machine)->memory().space(AS_PROGRAM);
-	int pc = space->device().safe_pc();
+	address_space &space = *debug_cpu_get_visible_cpu(machine)->memory().space(AS_PROGRAM);
+	int pc = space.device().safe_pc();
 	int length, first = TRUE;
 	UINT8 instrdata[2];
 	UINT16 decoded;
@@ -1114,8 +1114,8 @@ static void execute_fdsearch(running_machine &machine, int ref, int params, cons
 			}
 
 			/* set this as our current PC and run the instruction hook */
-			space->device().state().set_pc(pc);
-			if (instruction_hook(space->device(), pc))
+			space.device().state().set_pc(pc);
+			if (instruction_hook(space.device(), pc))
 				break;
 		}
 		keystatus[pc/2] |= SEARCH_MASK;
@@ -1201,7 +1201,7 @@ static void execute_fdsearch(running_machine &machine, int ref, int params, cons
 
 static void execute_fddasm(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space *space = debug_cpu_get_visible_cpu(machine)->memory().space(AS_PROGRAM);
+	address_space &space = *debug_cpu_get_visible_cpu(machine)->memory().space(AS_PROGRAM);
 	int origstate = fd1094_set_state(keyregion, -1);
 	const char *filename;
 	int skipped = FALSE;
@@ -1406,7 +1406,7 @@ static void execute_fdcsearch(running_machine &machine, int ref, int params, con
     length
 -----------------------------------------------*/
 
-static fd1094_possibility *try_all_possibilities(address_space *space, int basepc, int offset, int length, UINT8 *instrbuffer, UINT8 *keybuffer, fd1094_possibility *possdata)
+static fd1094_possibility *try_all_possibilities(address_space &space, int basepc, int offset, int length, UINT8 *instrbuffer, UINT8 *keybuffer, fd1094_possibility *possdata)
 {
 	UINT8 keymask, keystat;
 	UINT16 possvalue[4];
@@ -2249,7 +2249,7 @@ static void build_optable(running_machine &machine)
     valid or not, and return the length
 -----------------------------------------------*/
 
-static int validate_ea(address_space *space, UINT32 pc, UINT8 modereg, const UINT8 *parambase, UINT32 flags)
+static int validate_ea(address_space &space, UINT32 pc, UINT8 modereg, const UINT8 *parambase, UINT32 flags)
 {
 	UINT32 addr;
 	int valid;
@@ -2319,7 +2319,7 @@ static int validate_ea(address_space *space, UINT32 pc, UINT8 modereg, const UIN
     the length specified
 -----------------------------------------------*/
 
-static int validate_opcode(address_space *space, UINT32 pc, const UINT8 *opdata, int maxwords)
+static int validate_opcode(address_space &space, UINT32 pc, const UINT8 *opdata, int maxwords)
 {
 	UINT32 immvalue = 0;
 	int iffy = FALSE;

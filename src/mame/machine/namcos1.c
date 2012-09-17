@@ -12,9 +12,9 @@
 
 /* hardware elements of 1Mbytes physical memory space */
 
-INLINE UINT8 bank_r(address_space *space, offs_t offset, int bank)
+INLINE UINT8 bank_r(address_space &space, offs_t offset, int bank)
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
+	namcos1_state *state = space.machine().driver_data<namcos1_state>();
 	return (*state->m_active_bank[bank].bank_handler_r )(space, offset + state->m_active_bank[bank].bank_offset);
 }
 
@@ -35,9 +35,9 @@ static READ8_HANDLER( bank14_r ) { return bank_r(space, offset, 13); }
 static READ8_HANDLER( bank15_r ) { return bank_r(space, offset, 14); }
 static READ8_HANDLER( bank16_r ) { return bank_r(space, offset, 15); }
 
-INLINE void bank_w(address_space *space, offs_t offset, UINT8 data, int bank)
+INLINE void bank_w(address_space &space, offs_t offset, UINT8 data, int bank)
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
+	namcos1_state *state = space.machine().driver_data<namcos1_state>();
 	(*state->m_active_bank[bank].bank_handler_w )(space, offset + state->m_active_bank[bank].bank_offset, data);
 }
 
@@ -88,13 +88,13 @@ static READ8_HANDLER( faceoff_inputs_r );
 
 static READ8_HANDLER( no_key_r )
 {
-	popmessage("CPU %s PC %08x: keychip read %04x\n", space->device().tag(), space->device().safe_pc(), offset);
+	popmessage("CPU %s PC %08x: keychip read %04x\n", space.device().tag(), space.device().safe_pc(), offset);
 	return 0;
 }
 
 static WRITE8_HANDLER( no_key_w )
 {
-	popmessage("CPU %s PC %08x: keychip write %04x=%02x\n", space->device().tag(), space->device().safe_pc(), offset, data);
+	popmessage("CPU %s PC %08x: keychip write %04x=%02x\n", space.device().tag(), space.device().safe_pc(), offset, data);
 }
 
 
@@ -199,8 +199,8 @@ CPU #0 PC e3d4: keychip read 0003     [AND #$37 = key no.]
 */
 static READ8_HANDLER( key_type1_r )
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
-//  logerror("CPU %s PC %04x: keychip read %04x\n", space->device().tag(), space->device().safe_pc(), offset);
+	namcos1_state *state = space.machine().driver_data<namcos1_state>();
+//  logerror("CPU %s PC %04x: keychip read %04x\n", space.device().tag(), space.device().safe_pc(), offset);
 
 	if (offset < 3)
 	{
@@ -231,8 +231,8 @@ static READ8_HANDLER( key_type1_r )
 
 static WRITE8_HANDLER( key_type1_w )
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
-//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space->device().tag(), space->device().safe_pc(), offset, data);
+	namcos1_state *state = space.machine().driver_data<namcos1_state>();
+//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space.device().tag(), space.device().safe_pc(), offset, data);
 
 	if (offset < 4)
 		state->m_key[offset] = data;
@@ -384,8 +384,8 @@ CPU #0 PC e574: keychip read 0001
 
 static READ8_HANDLER( key_type2_r )
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
-//  logerror("CPU %s PC %04x: keychip read %04x\n", space->device().tag(), space->device().safe_pc(), offset);
+	namcos1_state *state = space.machine().driver_data<namcos1_state>();
+//  logerror("CPU %s PC %04x: keychip read %04x\n", space.device().tag(), space.device().safe_pc(), offset);
 
 	state->m_key_numerator_high_word = 0;
 
@@ -404,8 +404,8 @@ static READ8_HANDLER( key_type2_r )
 
 static WRITE8_HANDLER( key_type2_w )
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
-//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space->device().tag(), space->device().safe_pc(), offset, data);
+	namcos1_state *state = space.machine().driver_data<namcos1_state>();
+//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space.device().tag(), space.device().safe_pc(), offset, data);
 
 	if (offset < 5)
 	{
@@ -512,10 +512,10 @@ CPU #0 PC e45a: keychip read 0030     [discarded]
 
 static READ8_HANDLER( key_type3_r )
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
+	namcos1_state *state = space.machine().driver_data<namcos1_state>();
 	int op;
 
-//  logerror("CPU %s PC %04x: keychip read %04x\n", space->device().tag(), space->device().safe_pc(), offset);
+//  logerror("CPU %s PC %04x: keychip read %04x\n", space.device().tag(), space.device().safe_pc(), offset);
 
 	/* I need to handle blastoff's read from 0858. The game previously writes to 0858,
        using it as temporary storage, so maybe it expects to act as RAM, however
@@ -526,20 +526,20 @@ static READ8_HANDLER( key_type3_r )
 	op = (offset & 0x70) >> 4;
 
 	if (op == state->m_key_reg)		return state->m_key_id;
-	if (op == state->m_key_rng)		return space->machine().rand();
+	if (op == state->m_key_rng)		return space.machine().rand();
 	if (op == state->m_key_swap4)	return (state->m_key[state->m_key_swap4_arg] << 4) | (state->m_key[state->m_key_swap4_arg] >> 4);
 	if (op == state->m_key_bottom4)	return (offset << 4) | (state->m_key[state->m_key_swap4_arg] & 0x0f);
 	if (op == state->m_key_top4)		return (offset << 4) | (state->m_key[state->m_key_swap4_arg] >> 4);
 
-	popmessage("CPU %s PC %08x: keychip read %04x", space->device().tag(), space->device().safe_pc(), offset);
+	popmessage("CPU %s PC %08x: keychip read %04x", space.device().tag(), space.device().safe_pc(), offset);
 
 	return 0;
 }
 
 static WRITE8_HANDLER( key_type3_w )
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
-//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space->device().tag(), space->device().safe_pc(), offset, data);
+	namcos1_state *state = space.machine().driver_data<namcos1_state>();
+//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space.device().tag(), space.device().safe_pc(), offset, data);
 
 	state->m_key[(offset & 0x70) >> 4] = data;
 }
@@ -605,13 +605,13 @@ WRITE8_MEMBER(namcos1_state::namcos1_watchdog_w)
 
 static READ8_HANDLER( soundram_r )
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
+	namcos1_state *state = space.machine().driver_data<namcos1_state>();
 	if (offset < 0x1000)
 	{
 		offset &= 0x3ff;
 
 		/* CUS 30 */
-		return namcos1_cus30_r(space->machine().device("namco"),*space,offset);
+		return namcos1_cus30_r(space.machine().device("namco"),space,offset);
 	}
 	else
 	{
@@ -624,13 +624,13 @@ static READ8_HANDLER( soundram_r )
 
 static WRITE8_HANDLER( soundram_w )
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
+	namcos1_state *state = space.machine().driver_data<namcos1_state>();
 	if (offset < 0x1000)
 	{
 		offset &= 0x3ff;
 
 		/* CUS 30 */
-		namcos1_cus30_w(space->machine().device("namco"),*space,offset,data);
+		namcos1_cus30_w(space.machine().device("namco"),space,offset,data);
 	}
 	else
 	{
@@ -646,21 +646,21 @@ static WRITE8_HANDLER( soundram_w )
 
 static WRITE8_HANDLER( rom_w )
 {
-	logerror("CPU %s PC %04x: warning - write %02x to rom address %04x\n", space->device().tag(), space->device().safe_pc(), data, offset);
+	logerror("CPU %s PC %04x: warning - write %02x to rom address %04x\n", space.device().tag(), space.device().safe_pc(), data, offset);
 }
 
 /* error handlers */
 static READ8_HANDLER( unknown_r )
 {
-	logerror("CPU %s PC %04x: warning - read from unknown chip\n", space->device().tag(), space->device().safe_pc() );
-//  popmessage("CPU %s PC %04x: read from unknown chip", space->device().tag(), space->device().safe_pc() );
+	logerror("CPU %s PC %04x: warning - read from unknown chip\n", space.device().tag(), space.device().safe_pc() );
+//  popmessage("CPU %s PC %04x: read from unknown chip", space.device().tag(), space.device().safe_pc() );
 	return 0;
 }
 
 static WRITE8_HANDLER( unknown_w )
 {
-	logerror("CPU %s PC %04x: warning - wrote to unknown chip\n", space->device().tag(), space->device().safe_pc() );
-//  popmessage("CPU %s PC %04x: wrote to unknown chip", space->device().tag(), space->device().safe_pc() );
+	logerror("CPU %s PC %04x: warning - wrote to unknown chip\n", space.device().tag(), space.device().safe_pc() );
+//  popmessage("CPU %s PC %04x: wrote to unknown chip", space.device().tag(), space.device().safe_pc() );
 }
 
 /* Main bankswitching routine */
@@ -672,7 +672,7 @@ static void set_bank(running_machine &machine, int banknum, const bankhandler *h
 		"bank9", "bank10", "bank11", "bank12", "bank13", "bank14", "bank15", "bank16"
 	};
 	static const char *const cputags[] = { "maincpu", "sub" };
-	address_space *space = machine.device(cputags[(banknum >> 3) & 1])->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device(cputags[(banknum >> 3) & 1])->memory().space(AS_PROGRAM);
 	int bankstart = (banknum & 7) * 0x2000;
 
 	/* for BANK handlers , memory direct and OP-code base */
@@ -683,12 +683,12 @@ static void set_bank(running_machine &machine, int banknum, const bankhandler *h
 	if (!handler->bank_handler_r)
 	{
 		if (state->m_active_bank[banknum].bank_handler_r)
-			space->install_read_bank(bankstart, bankstart + 0x1fff, banktags[banknum]);
+			space.install_read_bank(bankstart, bankstart + 0x1fff, banktags[banknum]);
 	}
 	else
 	{
 		if (!state->m_active_bank[banknum].bank_handler_r)
-			space->install_legacy_read_handler(bankstart, bankstart + 0x1fff, io_bank_handler_r[banknum].func, io_bank_handler_r[banknum].name);
+			space.install_legacy_read_handler(bankstart, bankstart + 0x1fff, io_bank_handler_r[banknum].func, io_bank_handler_r[banknum].name);
 	}
 
 	/* write handlers (except for the 0xe000-0xffff range) */
@@ -697,12 +697,12 @@ static void set_bank(running_machine &machine, int banknum, const bankhandler *h
 		if (!handler->bank_handler_w)
 		{
 			if (state->m_active_bank[banknum].bank_handler_w)
-				space->install_write_bank(bankstart, bankstart + 0x1fff, banktags[banknum]);
+				space.install_write_bank(bankstart, bankstart + 0x1fff, banktags[banknum]);
 		}
 		else
 		{
 			if (!state->m_active_bank[banknum].bank_handler_r)
-				space->install_legacy_write_handler(bankstart, bankstart + 0x1fff, io_bank_handler_w[banknum].func, io_bank_handler_w[banknum].name);
+				space.install_legacy_write_handler(bankstart, bankstart + 0x1fff, io_bank_handler_w[banknum].func, io_bank_handler_w[banknum].name);
 		}
 	}
 
@@ -1281,9 +1281,9 @@ static READ8_HANDLER( quester_paddle_r )
 		int ret;
 
 		if (!qnum)
-			ret = (space->machine().root_device().ioport("CONTROL0")->read()&0x90) | qstrobe | (space->machine().root_device().ioport("PADDLE0")->read()&0x0f);
+			ret = (space.machine().root_device().ioport("CONTROL0")->read()&0x90) | qstrobe | (space.machine().root_device().ioport("PADDLE0")->read()&0x0f);
 		else
-			ret = (space->machine().root_device().ioport("CONTROL0")->read()&0x90) | qstrobe | (space->machine().root_device().ioport("PADDLE1")->read()&0x0f);
+			ret = (space.machine().root_device().ioport("CONTROL0")->read()&0x90) | qstrobe | (space.machine().root_device().ioport("PADDLE1")->read()&0x0f);
 
 		qstrobe ^= 0x40;
 
@@ -1294,9 +1294,9 @@ static READ8_HANDLER( quester_paddle_r )
 		int ret;
 
 		if (!qnum)
-			ret = (space->machine().root_device().ioport("CONTROL1")->read()&0x90) | qnum | (space->machine().root_device().ioport("PADDLE0")->read()>>4);
+			ret = (space.machine().root_device().ioport("CONTROL1")->read()&0x90) | qnum | (space.machine().root_device().ioport("PADDLE0")->read()>>4);
 		else
-			ret = (space->machine().root_device().ioport("CONTROL1")->read()&0x90) | qnum | (space->machine().root_device().ioport("PADDLE1")->read()>>4);
+			ret = (space.machine().root_device().ioport("CONTROL1")->read()&0x90) | qnum | (space.machine().root_device().ioport("PADDLE1")->read()>>4);
 
 		if (!qstrobe) qnum ^= 0x20;
 
@@ -1326,7 +1326,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 	{
 		int inp = input_count;
 
-		if (inp == 4) res = space->machine().root_device().ioport("CONTROL0")->read();
+		if (inp == 4) res = space.machine().root_device().ioport("CONTROL0")->read();
 		else
 		{
 			char portname[40];
@@ -1335,7 +1335,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 			static int counter[4];
 
 			sprintf(portname,"IN%d",inp);	/* IN0-IN3 */
-			res = space->machine().root_device().ioport(portname)->read();
+			res = space.machine().root_device().ioport(portname)->read();
 			if (res & 0x80)
 			{
 				if (counter[inp] >= 0)
@@ -1359,7 +1359,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 				counter[inp] = -1;
 #else
 			sprintf(portname,"IN%d",inp);	/* IN0-IN3 */
-			res = space->machine().root_device().ioport(portname)->read();
+			res = space.machine().root_device().ioport(portname)->read();
 			if (res & 1) res = 0x7f;		/* weak */
 			else if (res & 2) res = 0x48;	/* medium */
 			else if (res & 4) res = 0x40;	/* strong */
@@ -1370,7 +1370,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 	}
 	else
 	{
-		res = space->machine().root_device().ioport("CONTROL1")->read() & 0x8f;
+		res = space.machine().root_device().ioport("CONTROL1")->read() & 0x8f;
 
 		/* the strobe cannot happen too often, otherwise the MCU will waste too
            much time reading the inputs and won't have enough cycles to play two
@@ -1412,13 +1412,13 @@ static READ8_HANDLER( faceoff_inputs_r )
 
 	if (offset == 0)
 	{
-		res = (space->machine().root_device().ioport("CONTROL0")->read() & 0x80) | stored_input[0];
+		res = (space.machine().root_device().ioport("CONTROL0")->read() & 0x80) | stored_input[0];
 
 		return res;
 	}
 	else
 	{
-		res = space->machine().root_device().ioport("CONTROL1")->read() & 0x80;
+		res = space.machine().root_device().ioport("CONTROL1")->read() & 0x80;
 
 		/* the strobe cannot happen too often, otherwise the MCU will waste too
            much time reading the inputs and won't have enough cycles to play two
@@ -1433,17 +1433,17 @@ static READ8_HANDLER( faceoff_inputs_r )
 			switch (input_count)
 			{
 				case 0:
-					stored_input[0] = space->machine().root_device().ioport("IN0")->read() & 0x1f;
-					stored_input[1] = (space->machine().root_device().ioport("IN3")->read() & 0x07) << 3;
+					stored_input[0] = space.machine().root_device().ioport("IN0")->read() & 0x1f;
+					stored_input[1] = (space.machine().root_device().ioport("IN3")->read() & 0x07) << 3;
 					break;
 
 				case 3:
-					stored_input[0] = space->machine().root_device().ioport("IN2")->read() & 0x1f;
+					stored_input[0] = space.machine().root_device().ioport("IN2")->read() & 0x1f;
 					break;
 
 				case 4:
-					stored_input[0] = space->machine().root_device().ioport("IN1")->read() & 0x1f;
-					stored_input[1] = space->machine().root_device().ioport("IN3")->read() & 0x18;
+					stored_input[0] = space.machine().root_device().ioport("IN1")->read() & 0x1f;
+					stored_input[1] = space.machine().root_device().ioport("IN3")->read() & 0x18;
 					break;
 
 				default:

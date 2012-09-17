@@ -1493,12 +1493,12 @@ DRIVER_INIT_MEMBER(exidy_state,pepper2)
 
 DRIVER_INIT_MEMBER(exidy_state,fax)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	exidy_video_config(machine(), 0x04, 0x04, TRUE);
 
 	/* reset the ROM bank */
-	fax_bank_select_w(*space,0,0);
+	fax_bank_select_w(space,0,0);
 }
 
 

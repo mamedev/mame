@@ -53,7 +53,7 @@
 #include "includes/fm7.h"
 
 
-static void fm7_mmr_refresh(address_space*);
+static void fm7_mmr_refresh(address_space&);
 
 
 
@@ -352,7 +352,7 @@ READ8_MEMBER(fm7_state::fm7_rom_en_r)
 		membank("bank1")->set_base(RAM+0x38000);
 	}
 	else
-		fm7_mmr_refresh(&space);
+		fm7_mmr_refresh(space);
 	logerror("BASIC ROM enabled\n");
 	return 0x00;
 }
@@ -368,7 +368,7 @@ WRITE8_MEMBER(fm7_state::fm7_rom_en_w)
 		membank("bank1")->set_base(RAM+0x8000);
 	}
 	else
-		fm7_mmr_refresh(&space);
+		fm7_mmr_refresh(space);
 	logerror("BASIC ROM disabled\n");
 }
 
@@ -383,12 +383,12 @@ WRITE8_MEMBER(fm7_state::fm7_init_en_w)
 	if(data & 0x02)
 	{
 		m_init_rom_en = 0;
-		fm7_mmr_refresh(&space);
+		fm7_mmr_refresh(space);
 	}
 	else
 	{
 		m_init_rom_en = 1;
-		fm7_mmr_refresh(&space);
+		fm7_mmr_refresh(space);
 	}
 }
 
@@ -985,9 +985,9 @@ READ8_MEMBER(fm7_state::fm7_mmr_r)
 	return 0xff;
 }
 
-static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
+static void fm7_update_bank(address_space & space, int bank, UINT8 physical)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
+	fm7_state *state = space.machine().driver_data<fm7_state>();
 	UINT8* RAM = state->memregion("maincpu")->base();
 	UINT16 size = 0xfff;
 	char bank_name[10];
@@ -1002,40 +1002,40 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 		switch(physical)
 		{
 			case 0x10:
-				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram0_r),state),write8_delegate(FUNC(fm7_state::fm7_vram0_w),state));
+				space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram0_r),state),write8_delegate(FUNC(fm7_state::fm7_vram0_w),state));
 				break;
 			case 0x11:
-				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram1_r),state),write8_delegate(FUNC(fm7_state::fm7_vram1_w),state));
+				space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram1_r),state),write8_delegate(FUNC(fm7_state::fm7_vram1_w),state));
 				break;
 			case 0x12:
-				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram2_r),state),write8_delegate(FUNC(fm7_state::fm7_vram2_w),state));
+				space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram2_r),state),write8_delegate(FUNC(fm7_state::fm7_vram2_w),state));
 				break;
 			case 0x13:
-				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram3_r),state),write8_delegate(FUNC(fm7_state::fm7_vram3_w),state));
+				space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram3_r),state),write8_delegate(FUNC(fm7_state::fm7_vram3_w),state));
 				break;
 			case 0x14:
-				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram4_r),state),write8_delegate(FUNC(fm7_state::fm7_vram4_w),state));
+				space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram4_r),state),write8_delegate(FUNC(fm7_state::fm7_vram4_w),state));
 				break;
 			case 0x15:
-				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram5_r),state),write8_delegate(FUNC(fm7_state::fm7_vram5_w),state));
+				space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram5_r),state),write8_delegate(FUNC(fm7_state::fm7_vram5_w),state));
 				break;
 			case 0x16:
-				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram6_r),state),write8_delegate(FUNC(fm7_state::fm7_vram6_w),state));
+				space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram6_r),state),write8_delegate(FUNC(fm7_state::fm7_vram6_w),state));
 				break;
 			case 0x17:
-				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram7_r),state),write8_delegate(FUNC(fm7_state::fm7_vram7_w),state));
+				space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram7_r),state),write8_delegate(FUNC(fm7_state::fm7_vram7_w),state));
 				break;
 			case 0x18:
-				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram8_r),state),write8_delegate(FUNC(fm7_state::fm7_vram8_w),state));
+				space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram8_r),state),write8_delegate(FUNC(fm7_state::fm7_vram8_w),state));
 				break;
 			case 0x19:
-				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram9_r),state),write8_delegate(FUNC(fm7_state::fm7_vram9_w),state));
+				space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram9_r),state),write8_delegate(FUNC(fm7_state::fm7_vram9_w),state));
 				break;
 			case 0x1a:
-				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vramA_r),state),write8_delegate(FUNC(fm7_state::fm7_vramA_w),state));
+				space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vramA_r),state),write8_delegate(FUNC(fm7_state::fm7_vramA_w),state));
 				break;
 			case 0x1b:
-				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vramB_r),state),write8_delegate(FUNC(fm7_state::fm7_vramB_w),state));
+				space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vramB_r),state),write8_delegate(FUNC(fm7_state::fm7_vramB_w),state));
 				break;
 		}
 //      state->membank(bank+1)->set_base(RAM+(physical<<12)-0x10000);
@@ -1043,21 +1043,21 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 	}
 	if(physical == 0x1c)
 	{
-		space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_console_ram_banked_r),state),write8_delegate(FUNC(fm7_state::fm7_console_ram_banked_w),state));
+		space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_console_ram_banked_r),state),write8_delegate(FUNC(fm7_state::fm7_console_ram_banked_w),state));
 		return;
 	}
 	if(physical == 0x1d)
 	{
-		space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_sub_ram_ports_banked_r),state),write8_delegate(FUNC(fm7_state::fm7_sub_ram_ports_banked_w),state));
+		space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_sub_ram_ports_banked_r),state),write8_delegate(FUNC(fm7_state::fm7_sub_ram_ports_banked_w),state));
 		return;
 	}
 	if(physical == 0x35)
 	{
 		if(state->m_init_rom_en && (state->m_type == SYS_FM11 || state->m_type == SYS_FM16))
 		{
-			RAM = space->machine().root_device().memregion("init")->base();
-			space->install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
-			space->nop_write(bank*0x1000,(bank*0x1000)+size);
+			RAM = space.machine().root_device().memregion("init")->base();
+			space.install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
+			space.nop_write(bank*0x1000,(bank*0x1000)+size);
 			state->membank(bank_name)->set_base(RAM+(physical<<12)-0x35000);
 			return;
 		}
@@ -1066,9 +1066,9 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 	{
 		if(state->m_init_rom_en && (state->m_type != SYS_FM11 && state->m_type != SYS_FM16))
 		{
-			RAM = space->machine().root_device().memregion("init")->base();
-			space->install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
-			space->nop_write(bank*0x1000,(bank*0x1000)+size);
+			RAM = space.machine().root_device().memregion("init")->base();
+			space.install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
+			space.nop_write(bank*0x1000,(bank*0x1000)+size);
 			state->membank(bank_name)->set_base(RAM+(physical<<12)-0x36000);
 			return;
 		}
@@ -1077,20 +1077,20 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 	{
 		if(state->m_basic_rom_en && (state->m_type != SYS_FM11 && state->m_type != SYS_FM16))
 		{
-			RAM = space->machine().root_device().memregion("fbasic")->base();
-			space->install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
-			space->nop_write(bank*0x1000,(bank*0x1000)+size);
+			RAM = space.machine().root_device().memregion("fbasic")->base();
+			space.install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
+			space.nop_write(bank*0x1000,(bank*0x1000)+size);
 			state->membank(bank_name)->set_base(RAM+(physical<<12)-0x38000);
 			return;
 		}
 	}
-	space->install_readwrite_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
+	space.install_readwrite_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
 	state->membank(bank_name)->set_base(RAM+(physical<<12));
 }
 
-static void fm7_mmr_refresh(address_space* space)
+static void fm7_mmr_refresh(address_space& space)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
+	fm7_state *state = space.machine().driver_data<fm7_state>();
 	int x;
 	UINT16 window_addr;
 	UINT8* RAM = state->memregion("maincpu")->base();
@@ -1115,7 +1115,7 @@ static void fm7_mmr_refresh(address_space* space)
 		window_addr = ((state->m_mmr.window_offset << 8) + 0x7c00) & 0xffff;
 //      if(window_addr < 0xfc00)
 		{
-			space->install_readwrite_bank(0x7c00,0x7fff,"bank24");
+			space.install_readwrite_bank(0x7c00,0x7fff,"bank24");
 			state->membank("bank24")->set_base(RAM+window_addr);
 		}
 	}
@@ -1127,7 +1127,7 @@ WRITE8_MEMBER(fm7_state::fm7_mmr_w)
 	{
 		m_mmr.bank_addr[m_mmr.segment][offset] = data;
 		if(m_mmr.enabled)
-			fm7_update_bank(&space,offset,data);
+			fm7_update_bank(space,offset,data);
 		logerror("MMR: Segment %i, bank %i, set to  0x%02x\n",m_mmr.segment,offset,data);
 		return;
 	}
@@ -1135,18 +1135,18 @@ WRITE8_MEMBER(fm7_state::fm7_mmr_w)
 	{
 		case 0x10:
 			m_mmr.segment = data & 0x07;
-			fm7_mmr_refresh(&space);
+			fm7_mmr_refresh(space);
 			logerror("MMR: Active segment set to %i\n",m_mmr.segment);
 			break;
 		case 0x12:
 			m_mmr.window_offset = data;
-			fm7_mmr_refresh(&space);
+			fm7_mmr_refresh(space);
 			logerror("MMR: Window offset set to %02x\n",data);
 			break;
 		case 0x13:
 			m_mmr.mode = data;
 			m_mmr.enabled = data & 0x80;
-			fm7_mmr_refresh(&space);
+			fm7_mmr_refresh(space);
 			logerror("MMR: Mode register set to %02x\n",data);
 			break;
 	}
@@ -1963,7 +1963,7 @@ void fm7_state::machine_reset()
 	}
 	if(m_type == SYS_FM77AV || m_type == SYS_FM77AV40EX || m_type == SYS_FM11)
 	{
-		fm7_mmr_refresh(machine().device("maincpu")->memory().space(AS_PROGRAM));
+		fm7_mmr_refresh(*machine().device("maincpu")->memory().space(AS_PROGRAM));
 	}
 	if(m_type == SYS_FM11)
 	{

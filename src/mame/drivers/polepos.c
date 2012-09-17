@@ -463,12 +463,12 @@ static TIMER_DEVICE_CALLBACK( polepos_scanline )
 
 MACHINE_RESET_MEMBER(polepos_state,polepos)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
 	for (i = 0; i < 8; i++)
-		polepos_latch_w(*space, i, 0);
+		polepos_latch_w(space, i, 0);
 
 	/* set the interrupt vectors (this shouldn't be needed) */
 	machine().device("sub")->execute().set_input_line_vector(0, Z8000_NVI);

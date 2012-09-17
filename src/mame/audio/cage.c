@@ -204,11 +204,11 @@ void cage_set_irq_handler(void (*irqhandler)(running_machine &, int))
 }
 
 
-void cage_reset_w(address_space *space, int state)
+void cage_reset_w(address_space &space, int state)
 {
 	cage_t *sndstate = &cage;
 	if (state)
-		cage_control_w(space->machine(), 0);
+		cage_control_w(space.machine(), 0);
 	sndstate->cpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -246,7 +246,7 @@ static TIMER_DEVICE_CALLBACK( dma_timer_callback )
 }
 
 
-static void update_dma_state(address_space *space)
+static void update_dma_state(address_space &space)
 {
 	cage_t *state = &cage;
 	UINT32 *tms32031_io_regs = state->tms32031_io_regs;
@@ -272,7 +272,7 @@ static void update_dma_state(address_space *space)
 		inc = (tms32031_io_regs[DMA_GLOBAL_CTL] >> 4) & 1;
 		for (i = 0; i < tms32031_io_regs[DMA_TRANSFER_COUNT]; i++)
 		{
-			sound_data[i % STACK_SOUND_BUFSIZE] = space->read_dword(addr * 4);
+			sound_data[i % STACK_SOUND_BUFSIZE] = space.read_dword(addr * 4);
 			addr += inc;
 			if (i % STACK_SOUND_BUFSIZE == STACK_SOUND_BUFSIZE - 1)
 				dmadac_transfer(&state->dmadac[0], DAC_BUFFER_CHANNELS, 1, DAC_BUFFER_CHANNELS, STACK_SOUND_BUFSIZE / DAC_BUFFER_CHANNELS, sound_data);
@@ -410,7 +410,7 @@ static READ32_HANDLER( tms32031_io_r )
 	}
 
 	if (LOG_32031_IOPORTS)
-		logerror("CAGE:%06X:%s read -> %08X\n", space->device().safe_pc(), register_names[offset & 0x7f], result);
+		logerror("CAGE:%06X:%s read -> %08X\n", space.device().safe_pc(), register_names[offset & 0x7f], result);
 	return result;
 }
 
@@ -423,7 +423,7 @@ static WRITE32_HANDLER( tms32031_io_w )
 	COMBINE_DATA(&tms32031_io_regs[offset]);
 
 	if (LOG_32031_IOPORTS)
-		logerror("CAGE:%06X:%s write = %08X\n", space->device().safe_pc(), register_names[offset & 0x7f], tms32031_io_regs[offset]);
+		logerror("CAGE:%06X:%s write = %08X\n", space.device().safe_pc(), register_names[offset & 0x7f], tms32031_io_regs[offset]);
 
 	switch (offset)
 	{
@@ -462,7 +462,7 @@ static WRITE32_HANDLER( tms32031_io_w )
 		case SPORT_GLOBAL_CTL:
 		case SPORT_TIMER_CTL:
 		case SPORT_TIMER_PERIOD:
-			update_serial(space->machine());
+			update_serial(space.machine());
 			break;
 	}
 }
@@ -506,9 +506,9 @@ static READ32_HANDLER( cage_from_main_r )
 {
 	cage_t *state = &cage;
 	if (LOG_COMM)
-		logerror("%06X:CAGE read command = %04X\n", space->device().safe_pc(), state->from_main);
+		logerror("%06X:CAGE read command = %04X\n", space.device().safe_pc(), state->from_main);
 	state->cpu_to_cage_ready = 0;
-	update_control_lines(space->machine());
+	update_control_lines(space.machine());
 	state->cpu->set_input_line(TMS3203X_IRQ0, CLEAR_LINE);
 	return state->from_main;
 }
@@ -519,7 +519,7 @@ static WRITE32_HANDLER( cage_from_main_ack_w )
 	if (LOG_COMM)
 	{
 		cage_t *state = &cage;
-		logerror("%06X:CAGE ack command = %04X\n", space->device().safe_pc(), state->from_main);
+		logerror("%06X:CAGE ack command = %04X\n", space.device().safe_pc(), state->from_main);
 	}
 }
 
@@ -528,11 +528,11 @@ static WRITE32_HANDLER( cage_to_main_w )
 {
 	cage_t *state = &cage;
 	if (LOG_COMM)
-		logerror("%06X:Data from CAGE = %04X\n", space->device().safe_pc(), data);
-	driver_device *drvstate = space->machine().driver_data<driver_device>();
-	drvstate->soundlatch_word_w(*space, 0, data, mem_mask);
+		logerror("%06X:Data from CAGE = %04X\n", space.device().safe_pc(), data);
+	driver_device *drvstate = space.machine().driver_data<driver_device>();
+	drvstate->soundlatch_word_w(space, 0, data, mem_mask);
 	state->cage_to_cpu_ready = 1;
-	update_control_lines(space->machine());
+	update_control_lines(space.machine());
 }
 
 
@@ -548,15 +548,15 @@ static READ32_HANDLER( cage_io_status_r )
 }
 
 
-UINT16 cage_main_r(address_space *space)
+UINT16 cage_main_r(address_space &space)
 {
 	cage_t *state = &cage;
-	driver_device *drvstate = space->machine().driver_data<driver_device>();
+	driver_device *drvstate = space.machine().driver_data<driver_device>();
 	if (LOG_COMM)
-		logerror("%s:main read data = %04X\n", space->machine().describe_context(), drvstate->soundlatch_word_r(*space, 0, 0));
+		logerror("%s:main read data = %04X\n", space.machine().describe_context(), drvstate->soundlatch_word_r(space, 0, 0));
 	state->cage_to_cpu_ready = 0;
-	update_control_lines(space->machine());
-	return drvstate->soundlatch_word_r(*space, 0, 0xffff);
+	update_control_lines(space.machine());
+	return drvstate->soundlatch_word_r(space, 0, 0xffff);
 }
 
 
@@ -570,11 +570,11 @@ static TIMER_CALLBACK( cage_deferred_w )
 }
 
 
-void cage_main_w(address_space *space, UINT16 data)
+void cage_main_w(address_space &space, UINT16 data)
 {
 	if (LOG_COMM)
-		logerror("%s:Command to CAGE = %04X\n", space->machine().describe_context(), data);
-	space->machine().scheduler().synchronize(FUNC(cage_deferred_w), data);
+		logerror("%s:Command to CAGE = %04X\n", space.machine().describe_context(), data);
+	space.machine().scheduler().synchronize(FUNC(cage_deferred_w), data);
 }
 
 
@@ -637,7 +637,7 @@ static WRITE32_HANDLER( speedup_w )
 {
 	cage_t *state = &cage;
 
-	space->device().execute().eat_cycles(100);
+	space.device().execute().eat_cycles(100);
 	COMBINE_DATA(&state->speedup_ram[offset]);
 }
 

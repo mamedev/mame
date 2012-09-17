@@ -335,7 +335,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_oki_0_bank_w)
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base(0x40000 * (data & 0xf) );
-//      logerror("CPU #0 PC %06X : OKI0  bank %08X\n",space->device().safe_pc(),data);
+//      logerror("CPU #0 PC %06X : OKI0  bank %08X\n",space.device().safe_pc(),data);
 	}
 }
 
@@ -346,7 +346,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_oki_1_bank_w)
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base(0x40000 * data );
-//      logerror("CPU #0 PC %06X : OKI1  bank %08X\n",space->device().safe_pc(),data);
+//      logerror("CPU #0 PC %06X : OKI1  bank %08X\n",space.device().safe_pc(),data);
 	}
 }
 
@@ -476,7 +476,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::gtmr_oki_0_bank_w)
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base( 0x40000 * (data & 0xF) );
-//      logerror("CPU #0 PC %06X : OKI0 bank %08X\n",space->device().safe_pc(),data);
+//      logerror("CPU #0 PC %06X : OKI0 bank %08X\n",space.device().safe_pc(),data);
 	}
 }
 
@@ -487,7 +487,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::gtmr_oki_1_bank_w)
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base( 0x40000 * (data & 0x1) );
-//      logerror("CPU #0 PC %06X : OKI1 bank %08X\n",space->device().safe_pc(),data);
+//      logerror("CPU #0 PC %06X : OKI1 bank %08X\n",space.device().safe_pc(),data);
 	}
 }
 

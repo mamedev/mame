@@ -164,9 +164,9 @@ WRITE8_MEMBER(foodf_state::digital_w)
 	m_nvram->store(data & 0x02);
 
 	if (!(data & 0x04))
-		atarigen_scanline_int_ack_w(&space,0,0,0xffff);
+		atarigen_scanline_int_ack_w(space,0,0,0xffff);
 	if (!(data & 0x08))
-		atarigen_video_int_ack_w(&space,0,0,0xffff);
+		atarigen_video_int_ack_w(space,0,0,0xffff);
 
 	output_set_led_value(0, (data >> 4) & 1);
 	output_set_led_value(1, (data >> 5) & 1);

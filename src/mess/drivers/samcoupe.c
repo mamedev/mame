@@ -167,7 +167,7 @@ READ8_MEMBER(samcoupe_state::samcoupe_lmpr_r)
 
 WRITE8_MEMBER(samcoupe_state::samcoupe_lmpr_w)
 {
-	address_space *space_program = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space_program = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	m_lmpr = data;
 	samcoupe_update_memory(space_program);
@@ -180,7 +180,7 @@ READ8_MEMBER(samcoupe_state::samcoupe_hmpr_r)
 
 WRITE8_MEMBER(samcoupe_state::samcoupe_hmpr_w)
 {
-	address_space *space_program = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space_program = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	m_hmpr = data;
 	samcoupe_update_memory(space_program);
@@ -193,7 +193,7 @@ READ8_MEMBER(samcoupe_state::samcoupe_vmpr_r)
 
 WRITE8_MEMBER(samcoupe_state::samcoupe_vmpr_w)
 {
-	address_space *space_program = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space_program = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	m_vmpr = data;
 	samcoupe_update_memory(space_program);

@@ -101,7 +101,7 @@ WRITE8_MEMBER( psion_state::hd63701_int_reg_w )
 		break;
 	}
 
-	m6801_io_w(&space, offset, data);
+	m6801_io_w(space, offset, data);
 }
 
 READ8_MEMBER( psion_state::hd63701_int_reg_r )
@@ -112,7 +112,7 @@ READ8_MEMBER( psion_state::hd63701_int_reg_r )
 		/* datapack i/o data bus */
 		return (m_pack1->data_r() | m_pack2->data_r()) & (~m_port2_ddr);
 	case 0x14:
-		return (m6801_io_r(&space, offset)&0x7f) | (m_stby_pwr<<7);
+		return (m6801_io_r(space, offset)&0x7f) | (m_stby_pwr<<7);
 	case 0x15:
 		/*
         x--- ---- ON key active high
@@ -125,9 +125,9 @@ READ8_MEMBER( psion_state::hd63701_int_reg_r )
 		/* datapack control lines */
 		return (m_pack1->control_r() | (m_pack2->control_r() & 0x8f)) | ((m_pack2->control_r() & 0x10)<<1);
 	case 0x08:
-		m6801_io_w(&space, offset, m_tcsr_value);
+		m6801_io_w(space, offset, m_tcsr_value);
 	default:
-		return m6801_io_r(&space, offset);
+		return m6801_io_r(space, offset);
 	}
 }
 

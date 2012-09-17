@@ -165,15 +165,15 @@ static SCREEN_UPDATE_IND16( skimaxx )
  *************************************/
 
 // TODO: Might not be used
-static void skimaxx_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
+static void skimaxx_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
-	skimaxx_state *state = space->machine().driver_data<skimaxx_state>();
+	skimaxx_state *state = space.machine().driver_data<skimaxx_state>();
 	memcpy(shiftreg, &state->m_fg_buffer[TOWORD(address)], 512 * sizeof(UINT16));
 }
 
-static void skimaxx_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
+static void skimaxx_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
-	skimaxx_state *state = space->machine().driver_data<skimaxx_state>();
+	skimaxx_state *state = space.machine().driver_data<skimaxx_state>();
 	memcpy(&state->m_fg_buffer[TOWORD(address)], shiftreg, 512 * sizeof(UINT16));
 }
 

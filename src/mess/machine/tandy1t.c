@@ -165,9 +165,9 @@ static struct
 
 WRITE8_HANDLER ( pc_t1t_p37x_w )
 {
-//  DBG_LOG(2,"T1T_p37x_w",("%.5x #%d $%02x\n", space->device().safe_pc( ),offset, data));
+//  DBG_LOG(2,"T1T_p37x_w",("%.5x #%d $%02x\n", space.device().safe_pc( ),offset, data));
 	if (offset!=4)
-		logerror("T1T_p37x_w %.5x #%d $%02x\n", space->device().safe_pc( ),offset, data);
+		logerror("T1T_p37x_w %.5x #%d $%02x\n", space.device().safe_pc( ),offset, data);
 	tandy.data[offset]=data;
 	switch( offset )
 	{
@@ -180,7 +180,7 @@ WRITE8_HANDLER ( pc_t1t_p37x_w )
  READ8_HANDLER ( pc_t1t_p37x_r )
 {
 	int data = tandy.data[offset];
-//  DBG_LOG(1,"T1T_p37x_r",("%.5x #%d $%02x\n", space->device().safe_pc( ), offset, data));
+//  DBG_LOG(1,"T1T_p37x_r",("%.5x #%d $%02x\n", space.device().safe_pc( ), offset, data));
     return data;
 }
 
@@ -203,8 +203,8 @@ WRITE8_HANDLER ( tandy1000_pio_w )
 	{
 	case 1:
 		tandy_ppi.portb = data;
-		pit8253_gate2_w(space->machine().device("pit8253"), BIT(data, 0));
-		pc_speaker_set_spkrdata( space->machine(), data & 0x02 );
+		pit8253_gate2_w(space.machine().device("pit8253"), BIT(data, 0));
+		pc_speaker_set_spkrdata( space.machine(), data & 0x02 );
 		pc_keyb_set_clock(data&0x40);
 		if ( data & 0x80 )
 		{
@@ -214,9 +214,9 @@ WRITE8_HANDLER ( tandy1000_pio_w )
 	case 2:
 		tandy_ppi.portc = data;
 		if (data & 8)
-			space->machine().device("maincpu")->set_clock_scale(1);
+			space.machine().device("maincpu")->set_clock_scale(1);
 		else
-			space->machine().device("maincpu")->set_clock_scale(4.77/8);
+			space.machine().device("maincpu")->set_clock_scale(4.77/8);
 		break;
 	}
 }
@@ -261,7 +261,7 @@ READ8_HANDLER( tandy1000_bank_r )
 {
 	UINT8 data = 0xFF;
 
-	logerror( "%s: tandy1000_bank_r: offset = %x\n", space->machine().describe_context(), offset );
+	logerror( "%s: tandy1000_bank_r: offset = %x\n", space.machine().describe_context(), offset );
 
 	switch( offset )
 	{
@@ -276,13 +276,13 @@ READ8_HANDLER( tandy1000_bank_r )
 
 WRITE8_HANDLER( tandy1000_bank_w )
 {
-	logerror( "%s: tandy1000_bank_w: offset = %x, data = %02x\n", space->machine().describe_context(), offset, data );
+	logerror( "%s: tandy1000_bank_w: offset = %x, data = %02x\n", space.machine().describe_context(), offset, data );
 
 	switch( offset )
 	{
 	case 0x00:	/* FFEA */
 		tandy.bios_bank = data;
-		tandy1000_set_bios_bank(space->machine());
+		tandy1000_set_bios_bank(space.machine());
 		break;
 	}
 }

@@ -504,7 +504,7 @@ static UINT32 snes_find_hilo_mode( device_image_interface &image, UINT8 *buffer,
 static int snes_find_addon_chip( running_machine &machine )
 {
 	snes_state *state = machine.driver_data<snes_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int supported_type = 1;
 	int dsp_prg_offset = 0;
 
@@ -686,7 +686,7 @@ static int snes_find_addon_chip( running_machine &machine )
 static void snes_cart_log_info( running_machine &machine, int total_blocks, int supported )
 {
 	snes_state *state = machine.driver_data<snes_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	char title[21], rom_id[4], company_id[2];
 	int i, company, has_ram = 0, has_sram = 0;
 
@@ -763,7 +763,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	int supported_type = 1;
 	running_machine &machine = image.device().machine();
 	snes_state *state = machine.driver_data<snes_state>();
-	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
+	address_space &space = *machine.device( "maincpu")->memory().space( AS_PROGRAM );
 	int total_blocks, read_blocks, has_bsx_slot = 0, st_bios = 0;
 	UINT32 offset, int_header_offs;
 	UINT8 *ROM = state->memregion("cart")->base();

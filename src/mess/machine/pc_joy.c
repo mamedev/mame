@@ -17,8 +17,8 @@ READ8_HANDLER ( pc_JOY_r )
 {
 	UINT8 data = 0xf;
 	int delta;
-	attotime new_time = space->machine().time();
-	ioport_port *joystick_port = space->machine().root_device().ioport("pc_joy");
+	attotime new_time = space.machine().time();
+	ioport_port *joystick_port = space.machine().root_device().ioport("pc_joy");
 	delta = ((new_time - JOY_time) * 256 * 1000).seconds;
 
 	if (joystick_port != NULL)
@@ -32,10 +32,10 @@ READ8_HANDLER ( pc_JOY_r )
 		//}
 		//else
 		{
-			if (space->machine().root_device().ioport("pc_joy_1")->read() < delta) data &= ~0x01;
-			if (space->machine().root_device().ioport("pc_joy_2")->read() < delta) data &= ~0x02;
-			if (space->machine().root_device().ioport("pc_joy_3")->read() < delta) data &= ~0x04;
-			if (space->machine().root_device().ioport("pc_joy_4")->read() < delta) data &= ~0x08;
+			if (space.machine().root_device().ioport("pc_joy_1")->read() < delta) data &= ~0x01;
+			if (space.machine().root_device().ioport("pc_joy_2")->read() < delta) data &= ~0x02;
+			if (space.machine().root_device().ioport("pc_joy_3")->read() < delta) data &= ~0x04;
+			if (space.machine().root_device().ioport("pc_joy_4")->read() < delta) data &= ~0x08;
 		}
 	}
 	else
@@ -50,7 +50,7 @@ READ8_HANDLER ( pc_JOY_r )
 
 WRITE8_HANDLER ( pc_JOY_w )
 {
-	JOY_time = space->machine().time();
+	JOY_time = space.machine().time();
 }
 
 INPUT_PORTS_START( pc_joystick_none )

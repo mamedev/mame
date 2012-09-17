@@ -3177,8 +3177,8 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(seta_state,calibr50)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	sub_bankswitch_w(*space, 0, 0);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	sub_bankswitch_w(space, 0, 0);
 }
 
 WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)

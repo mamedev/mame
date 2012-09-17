@@ -94,11 +94,11 @@ void mpc105_device::update_memory()
 
 	if (m_bank_base > 0)
 	{
-		address_space *space = m_maincpu->space(AS_PROGRAM);
+		address_space &space = *m_maincpu->space(AS_PROGRAM);
 
 		/* first clear everything out */
-		space->nop_read(0x00000000, 0x3FFFFFFF);
-		space->nop_read(0x00000000, 0x3FFFFFFF);
+		space.nop_read(0x00000000, 0x3FFFFFFF);
+		space.nop_read(0x00000000, 0x3FFFFFFF);
 	}
 
 	for (bank = 0; bank < MPC105_MEMORYBANK_COUNT; bank++)

@@ -150,7 +150,7 @@ void ti85_state::video_start()
 SCREEN_UPDATE_IND16( ti85 )
 {
 	ti85_state *state = screen.machine().driver_data<ti85_state>();
-	address_space *space = state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = *state->m_maincpu->space(AS_PROGRAM);
 	int x,y,b;
 	int brightnes;
 	int lcdmem;
@@ -170,7 +170,7 @@ SCREEN_UPDATE_IND16( ti85 )
 
         for (y=0; y<state->m_ti_screen_y_size; y++)
 		for (x=0; x<state->m_ti_screen_x_size; x++)
-			*(state->m_frames+(state->m_ti_number_of_frames-1)*state->m_ti_video_memory_size+y*state->m_ti_screen_x_size+x) = space->read_byte(lcdmem+y*state->m_ti_screen_x_size+x);
+			*(state->m_frames+(state->m_ti_number_of_frames-1)*state->m_ti_video_memory_size+y*state->m_ti_screen_x_size+x) = space.read_byte(lcdmem+y*state->m_ti_screen_x_size+x);
 
     	for (y=0; y<state->m_ti_screen_y_size; y++)
 		for (x=0; x<state->m_ti_screen_x_size; x++)

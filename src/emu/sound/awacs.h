@@ -43,7 +43,7 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-    void set_dma_base(address_space *space, int offset0, int offset1);
+    void set_dma_base(address_space &space, int offset0, int offset1);
 
 	sound_stream *m_stream;
 

@@ -378,7 +378,7 @@ ROM_END
 DRIVER_INIT_MEMBER(photoply_state,photoply)
 {
 	pc_vga_init(machine(), vga_setting, NULL);
-	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
+	pc_vga_io_init(machine(), *machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, *machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
 GAME( 199?, photoply,  0,   photoply, photoply, photoply_state, photoply, ROT0, "Funworld", "Photo Play 2000 (v2.01)", GAME_NOT_WORKING|GAME_NO_SOUND )

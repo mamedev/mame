@@ -89,27 +89,27 @@ static void xtheball_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap
  *
  *************************************/
 
-static void xtheball_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
+static void xtheball_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
-	xtheball_state *state = space->machine().driver_data<xtheball_state>();
+	xtheball_state *state = space.machine().driver_data<xtheball_state>();
 	if (address >= 0x01000000 && address <= 0x010fffff)
 		memcpy(shiftreg, &state->m_vram_bg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
 	else if (address >= 0x02000000 && address <= 0x020fffff)
 		memcpy(shiftreg, &state->m_vram_fg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
 	else
-		logerror("%s:xtheball_to_shiftreg(%08X)\n", space->machine().describe_context(), address);
+		logerror("%s:xtheball_to_shiftreg(%08X)\n", space.machine().describe_context(), address);
 }
 
 
-static void xtheball_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
+static void xtheball_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
-	xtheball_state *state = space->machine().driver_data<xtheball_state>();
+	xtheball_state *state = space.machine().driver_data<xtheball_state>();
 	if (address >= 0x01000000 && address <= 0x010fffff)
 		memcpy(&state->m_vram_bg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
 	else if (address >= 0x02000000 && address <= 0x020fffff)
 		memcpy(&state->m_vram_fg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
 	else
-		logerror("%s:xtheball_from_shiftreg(%08X)\n", space->machine().describe_context(), address);
+		logerror("%s:xtheball_from_shiftreg(%08X)\n", space.machine().describe_context(), address);
 }
 
 

@@ -29,13 +29,13 @@ void ac1_state::video_start()
 SCREEN_UPDATE_IND16( ac1 )
 {
 	int x,y;
-	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	for(y = 0; y < 16; y++ )
 	{
 		for(x = 0; x < 64; x++ )
 		{
-			int code = space->read_byte(AC1_VIDEO_MEMORY + x + y*64);
+			int code = space.read_byte(AC1_VIDEO_MEMORY + x + y*64);
 			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0],  code , 0, 0,0, 63*6-x*6,15*8-y*8);
 		}
 	}
@@ -45,13 +45,13 @@ SCREEN_UPDATE_IND16( ac1 )
 SCREEN_UPDATE_IND16( ac1_32 )
 {
 	int x,y;
-	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	for(y = 0; y < 32; y++ )
 	{
 		for(x = 0; x < 64; x++ )
 		{
-			int code = space->read_byte(AC1_VIDEO_MEMORY + x + y*64);
+			int code = space.read_byte(AC1_VIDEO_MEMORY + x + y*64);
 			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0],  code , 0, 0,0, 63*6-x*6,31*8-y*8);
 		}
 	}

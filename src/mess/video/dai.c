@@ -58,7 +58,7 @@ void dai_state::video_start()
 SCREEN_UPDATE_IND16( dai )
 {
 	dai_state *state = screen.machine().driver_data<dai_state>();
-	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i, j, k, l;
 
 	UINT8* char_rom = state->memregion("gfx1")->base();
@@ -102,8 +102,8 @@ SCREEN_UPDATE_IND16( dai )
 
 	while (current_scan_line < dai_scan_lines)
 	{
-		mode = space->read_byte(current_video_memory_address--);
-		colour = space->read_byte(current_video_memory_address--);
+		mode = space.read_byte(current_video_memory_address--);
+		colour = space.read_byte(current_video_memory_address--);
 		line_repeat_count = mode & 0x0f;
 		horizontal_resolution = (mode & 0x30) >> 4;
 		display_mode = (mode & 0xc0) >> 6;
@@ -123,8 +123,8 @@ SCREEN_UPDATE_IND16( dai )
 				switch (unit_mode)
 				{
 				case 0:
-					current_data_1 = space->read_byte(current_video_memory_address--);
-					current_data_2 = space->read_byte(current_video_memory_address--);
+					current_data_1 = space.read_byte(current_video_memory_address--);
+					current_data_2 = space.read_byte(current_video_memory_address--);
 
 					for (i=0; i<11; i++)
 					{
@@ -143,8 +143,8 @@ SCREEN_UPDATE_IND16( dai )
 				case 1:
 					for (i=0; i<11; i++)
 					{
-						current_data_1 = space->read_byte(current_video_memory_address--);
-						current_data_2 = space->read_byte(current_video_memory_address--);
+						current_data_1 = space.read_byte(current_video_memory_address--);
+						current_data_2 = space.read_byte(current_video_memory_address--);
 						for (j=0; j<=line_repeat_count; j++)
 						{
 							for (k=0; k<8; k++)
@@ -163,8 +163,8 @@ SCREEN_UPDATE_IND16( dai )
 				switch (unit_mode)
 				{
 				case 0:
-					current_data_1 = space->read_byte(current_video_memory_address--);
-					current_data_2 = space->read_byte(current_video_memory_address--);
+					current_data_1 = space.read_byte(current_video_memory_address--);
+					current_data_2 = space.read_byte(current_video_memory_address--);
 					for (i=0; i<22; i++)
 					{
 						for (j=0; j<=line_repeat_count; j++)
@@ -182,8 +182,8 @@ SCREEN_UPDATE_IND16( dai )
 				case 1:
 					for (i=0; i<22; i++)
 					{
-						current_data_1 = space->read_byte(current_video_memory_address--);
-						current_data_2 = space->read_byte(current_video_memory_address--);
+						current_data_1 = space.read_byte(current_video_memory_address--);
+						current_data_2 = space.read_byte(current_video_memory_address--);
 						for (j=0; j<=line_repeat_count; j++)
 						{
 							for (k=0; k<8; k++)
@@ -202,8 +202,8 @@ SCREEN_UPDATE_IND16( dai )
 				switch (unit_mode)
 				{
 				case 0:
-					current_data_1 = space->read_byte(current_video_memory_address--);
-					current_data_2 = space->read_byte(current_video_memory_address--);
+					current_data_1 = space.read_byte(current_video_memory_address--);
+					current_data_2 = space.read_byte(current_video_memory_address--);
 					for (i=0; i<44; i++)
 					{
 						for (j=0; j<=line_repeat_count; j++)
@@ -220,8 +220,8 @@ SCREEN_UPDATE_IND16( dai )
 				case 1:
 					for (i=0; i<44; i++)
 					{
-						current_data_1 = space->read_byte(current_video_memory_address--);
-						current_data_2 = space->read_byte(current_video_memory_address--);
+						current_data_1 = space.read_byte(current_video_memory_address--);
+						current_data_2 = space.read_byte(current_video_memory_address--);
 						for (j=0; j<=line_repeat_count; j++)
 						{
 							for (k=0; k<8; k++)
@@ -240,8 +240,8 @@ SCREEN_UPDATE_IND16( dai )
 				switch (unit_mode)
 				{
 				case 0:
-					current_data_1 = space->read_byte(current_video_memory_address--);
-					current_data_2 = space->read_byte(current_video_memory_address--);
+					current_data_1 = space.read_byte(current_video_memory_address--);
+					current_data_2 = space.read_byte(current_video_memory_address--);
 					for (i=0; i<66; i++)
 					{
 						for (j=0; j<=line_repeat_count; j++)
@@ -258,8 +258,8 @@ SCREEN_UPDATE_IND16( dai )
 				case 1:
 					for (i=0; i<66; i++)
 					{
-						current_data_1 = space->read_byte(current_video_memory_address--);
-						current_data_2 = space->read_byte(current_video_memory_address--);
+						current_data_1 = space.read_byte(current_video_memory_address--);
+						current_data_2 = space.read_byte(current_video_memory_address--);
 						for (j=0; j<=line_repeat_count; j++)
 						{
 							for (k=0; k<8; k++)
@@ -284,8 +284,8 @@ SCREEN_UPDATE_IND16( dai )
 				switch (unit_mode)
 				{
 				case 0:
-					current_data_1 = space->read_byte(current_video_memory_address);
-					current_data_2 = space->read_byte(current_video_memory_address-1);
+					current_data_1 = space.read_byte(current_video_memory_address);
+					current_data_2 = space.read_byte(current_video_memory_address-1);
 					current_video_memory_address-=2;
 					for (i=0; i<11; i++)
 					{
@@ -304,8 +304,8 @@ SCREEN_UPDATE_IND16( dai )
 				case 1:
 					for (i=0; i<11; i++)
 					{
-						current_data_1 = space->read_byte(current_video_memory_address);
-						current_data_2 = space->read_byte(current_video_memory_address-1);
+						current_data_1 = space.read_byte(current_video_memory_address);
+						current_data_2 = space.read_byte(current_video_memory_address-1);
 						current_video_memory_address-=2;
 						for (j=0; j<=line_repeat_count; j++)
 						{
@@ -325,8 +325,8 @@ SCREEN_UPDATE_IND16( dai )
 				switch (unit_mode)
 				{
 				case 0:
-					current_data_1 = space->read_byte(current_video_memory_address);
-					current_data_2 = space->read_byte(current_video_memory_address-1);
+					current_data_1 = space.read_byte(current_video_memory_address);
+					current_data_2 = space.read_byte(current_video_memory_address-1);
 					current_video_memory_address-=2;
 					for (i=0; i<22; i++)
 					{
@@ -345,8 +345,8 @@ SCREEN_UPDATE_IND16( dai )
 				case 1:
 					for (i=0; i<22; i++)
 					{
-						current_data_1 = space->read_byte(current_video_memory_address);
-						current_data_2 = space->read_byte(current_video_memory_address-1);
+						current_data_1 = space.read_byte(current_video_memory_address);
+						current_data_2 = space.read_byte(current_video_memory_address-1);
 						current_video_memory_address-=2;
 						for (j=0; j<=line_repeat_count; j++)
 						{
@@ -366,8 +366,8 @@ SCREEN_UPDATE_IND16( dai )
 				switch (unit_mode)
 				{
 				case 0:
-					current_data_1 = space->read_byte(current_video_memory_address);
-					current_data_2 = space->read_byte(current_video_memory_address-1);
+					current_data_1 = space.read_byte(current_video_memory_address);
+					current_data_2 = space.read_byte(current_video_memory_address-1);
 					current_video_memory_address-=2;
 					for (i=0; i<44; i++)
 					{
@@ -385,8 +385,8 @@ SCREEN_UPDATE_IND16( dai )
 				case 1:
 					for (i=0; i<44; i++)
 					{
-						current_data_1 = space->read_byte(current_video_memory_address);
-						current_data_2 = space->read_byte(current_video_memory_address-1);
+						current_data_1 = space.read_byte(current_video_memory_address);
+						current_data_2 = space.read_byte(current_video_memory_address-1);
 						current_video_memory_address-=2;
 						for (j=0; j<=line_repeat_count; j++)
 						{
@@ -405,8 +405,8 @@ SCREEN_UPDATE_IND16( dai )
 				switch (unit_mode)
 				{
 				case 0:
-					current_data_1 = space->read_byte(current_video_memory_address);
-					current_data_2 = space->read_byte(current_video_memory_address-1);
+					current_data_1 = space.read_byte(current_video_memory_address);
+					current_data_2 = space.read_byte(current_video_memory_address-1);
 					current_video_memory_address-=2;
 					for (i=0; i<66; i++)
 					{
@@ -424,8 +424,8 @@ SCREEN_UPDATE_IND16( dai )
 				case 1:
 					for (i=0; i<66; i++)
 					{
-						current_data_1 = space->read_byte(current_video_memory_address);
-						current_data_2 = space->read_byte(current_video_memory_address-1);
+						current_data_1 = space.read_byte(current_video_memory_address);
+						current_data_2 = space.read_byte(current_video_memory_address-1);
 						current_video_memory_address-=2;
 						for (j=0; j<=line_repeat_count; j++)
 						{
@@ -450,8 +450,8 @@ SCREEN_UPDATE_IND16( dai )
 				switch (unit_mode)
 				{
 				case 0:
-					current_data_1 = space->read_byte(current_video_memory_address--);
-					current_data_2 = space->read_byte(current_video_memory_address--);
+					current_data_1 = space.read_byte(current_video_memory_address--);
+					current_data_2 = space.read_byte(current_video_memory_address--);
 
 					for (i=0; i<11; i++)
 					{
@@ -470,8 +470,8 @@ SCREEN_UPDATE_IND16( dai )
 				case 1:
 					for (i=0; i<11; i++)
 					{
-						current_data_1 = space->read_byte(current_video_memory_address--);
-						current_data_2 = space->read_byte(current_video_memory_address--);
+						current_data_1 = space.read_byte(current_video_memory_address--);
+						current_data_2 = space.read_byte(current_video_memory_address--);
 						for (j=0; j<=line_repeat_count; j++)
 						{
 							for (k=0; k<8; k++)
@@ -490,8 +490,8 @@ SCREEN_UPDATE_IND16( dai )
 				switch (unit_mode)
 				{
 				case 0:
-					current_data_1 = space->read_byte(current_video_memory_address--);
-					current_data_2 = space->read_byte(current_video_memory_address--);
+					current_data_1 = space.read_byte(current_video_memory_address--);
+					current_data_2 = space.read_byte(current_video_memory_address--);
 					for (i=0; i<22; i++)
 					{
 						for (j=0; j<=line_repeat_count; j++)
@@ -509,8 +509,8 @@ SCREEN_UPDATE_IND16( dai )
 				case 1:
 					for (i=0; i<22; i++)
 					{
-						current_data_1 = space->read_byte(current_video_memory_address--);
-						current_data_2 = space->read_byte(current_video_memory_address--);
+						current_data_1 = space.read_byte(current_video_memory_address--);
+						current_data_2 = space.read_byte(current_video_memory_address--);
 						for (j=0; j<=line_repeat_count; j++)
 						{
 							for (k=0; k<8; k++)
@@ -529,8 +529,8 @@ SCREEN_UPDATE_IND16( dai )
 				switch (unit_mode)
 				{
 				case 0:
-					current_data_1 = space->read_byte(current_video_memory_address--);
-					current_data_2 = space->read_byte(current_video_memory_address--);
+					current_data_1 = space.read_byte(current_video_memory_address--);
+					current_data_2 = space.read_byte(current_video_memory_address--);
 					for (i=0; i<44; i++)
 					{
 						for (j=0; j<=line_repeat_count; j++)
@@ -547,8 +547,8 @@ SCREEN_UPDATE_IND16( dai )
 				case 1:
 					for (i=0; i<44; i++)
 					{
-						current_data_1 = space->read_byte(current_video_memory_address--);
-						current_data_2 = space->read_byte(current_video_memory_address--);
+						current_data_1 = space.read_byte(current_video_memory_address--);
+						current_data_2 = space.read_byte(current_video_memory_address--);
 						for (j=0; j<=line_repeat_count; j++)
 						{
 							for (k=0; k<8; k++)
@@ -567,8 +567,8 @@ SCREEN_UPDATE_IND16( dai )
 				switch (unit_mode)
 				{
 				case 0:
-					current_data_1 = space->read_byte(current_video_memory_address--);
-					current_data_2 = space->read_byte(current_video_memory_address--);
+					current_data_1 = space.read_byte(current_video_memory_address--);
+					current_data_2 = space.read_byte(current_video_memory_address--);
 					for (i=0; i<66; i++)
 					{
 						for (j=0; j<=line_repeat_count; j++)
@@ -585,8 +585,8 @@ SCREEN_UPDATE_IND16( dai )
 				case 1:
 					for (i=0; i<66; i++)
 					{
-						current_data_1 = space->read_byte(current_video_memory_address--);
-						current_data_2 = space->read_byte(current_video_memory_address--);
+						current_data_1 = space.read_byte(current_video_memory_address--);
+						current_data_2 = space.read_byte(current_video_memory_address--);
 						for (j=0; j<=line_repeat_count; j++)
 						{
 							for (k=0; k<8; k++)
@@ -610,8 +610,8 @@ SCREEN_UPDATE_IND16( dai )
 				switch (unit_mode)
 				{
 				case 0:
-					current_data_1 = space->read_byte(current_video_memory_address--);
-					current_data_2 = space->read_byte(current_video_memory_address--);
+					current_data_1 = space.read_byte(current_video_memory_address--);
+					current_data_2 = space.read_byte(current_video_memory_address--);
 					for (i=0; i<11; i++)
 					{
 						for (j=0; j<=line_repeat_count; j++)
@@ -629,8 +629,8 @@ SCREEN_UPDATE_IND16( dai )
 				case 1:
 					for (i=0; i<11; i++)
 					{
-						current_data_1 = space->read_byte(current_video_memory_address--);
-						current_data_2 = space->read_byte(current_video_memory_address--);
+						current_data_1 = space.read_byte(current_video_memory_address--);
+						current_data_2 = space.read_byte(current_video_memory_address--);
 						for (j=0; j<=line_repeat_count; j++)
 						{
 							for (k=0; k<8; k++)
@@ -649,8 +649,8 @@ SCREEN_UPDATE_IND16( dai )
 				switch (unit_mode)
 				{
 				case 0:
-					current_data_1 = space->read_byte(current_video_memory_address--);
-					current_data_2 = space->read_byte(current_video_memory_address--);
+					current_data_1 = space.read_byte(current_video_memory_address--);
+					current_data_2 = space.read_byte(current_video_memory_address--);
 					for (i=0; i<22; i++)
 					{
 						for (j=0; j<=line_repeat_count; j++)
@@ -668,8 +668,8 @@ SCREEN_UPDATE_IND16( dai )
 				case 1:
 					for (i=0; i<22; i++)
 					{
-						current_data_1 = space->read_byte(current_video_memory_address--);
-						current_data_2 = space->read_byte(current_video_memory_address--);
+						current_data_1 = space.read_byte(current_video_memory_address--);
+						current_data_2 = space.read_byte(current_video_memory_address--);
 						for (j=0; j<=line_repeat_count; j++)
 						{
 							for (k=0; k<8; k++)
@@ -688,8 +688,8 @@ SCREEN_UPDATE_IND16( dai )
 				switch (unit_mode)
 				{
 				case 0:
-					current_data_1 = space->read_byte(current_video_memory_address--);
-					current_data_2 = space->read_byte(current_video_memory_address--);
+					current_data_1 = space.read_byte(current_video_memory_address--);
+					current_data_2 = space.read_byte(current_video_memory_address--);
 					for (i=0; i<44; i++)
 					{
 						for (j=0; j<=line_repeat_count; j++)
@@ -706,8 +706,8 @@ SCREEN_UPDATE_IND16( dai )
 				case 1:
 					for (i=0; i<44; i++)
 					{
-						current_data_1 = space->read_byte(current_video_memory_address--);
-						current_data_2 = space->read_byte(current_video_memory_address--);
+						current_data_1 = space.read_byte(current_video_memory_address--);
+						current_data_2 = space.read_byte(current_video_memory_address--);
 						for (j=0; j<=line_repeat_count; j++)
 						{
 							for (k=0; k<8; k++)
@@ -725,8 +725,8 @@ SCREEN_UPDATE_IND16( dai )
 				switch (unit_mode)
 				{
 				case 0:
-					current_data_1 = space->read_byte(current_video_memory_address--);
-					current_data_2 = space->read_byte(current_video_memory_address--);
+					current_data_1 = space.read_byte(current_video_memory_address--);
+					current_data_2 = space.read_byte(current_video_memory_address--);
 					for (i=0; i<66; i++)
 					{
 						for (j=0; j<=line_repeat_count; j++)
@@ -743,8 +743,8 @@ SCREEN_UPDATE_IND16( dai )
 				case 1:
 					for (i=0; i<66; i++)
 					{
-						current_data_1 = space->read_byte(current_video_memory_address--);
-						current_data_2 = space->read_byte(current_video_memory_address--);
+						current_data_1 = space.read_byte(current_video_memory_address--);
+						current_data_2 = space.read_byte(current_video_memory_address--);
 						for (j=0; j<=line_repeat_count; j++)
 						{
 							for (k=0; k<8; k++)

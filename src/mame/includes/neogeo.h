@@ -213,10 +213,10 @@ public:
 /*----------- defined in drivers/neogeo.c -----------*/
 
 void neogeo_set_display_position_interrupt_control(running_machine &machine, UINT16 data);
-void neogeo_set_display_counter_msb(address_space *space, UINT16 data);
-void neogeo_set_display_counter_lsb(address_space *space, UINT16 data);
+void neogeo_set_display_counter_msb(address_space &space, UINT16 data);
+void neogeo_set_display_counter_lsb(address_space &space, UINT16 data);
 void neogeo_acknowledge_interrupt(running_machine &machine, UINT16 data);
-void neogeo_set_main_cpu_bank_address(address_space *space, UINT32 bank_address);
+void neogeo_set_main_cpu_bank_address(address_space &space, UINT32 bank_address);
 DEVICE_IMAGE_LOAD( neo_cartridge );
 
 

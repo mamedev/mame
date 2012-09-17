@@ -1655,7 +1655,7 @@ static TIMER_CALLBACK(lynx_uart_timer)
 
 static  READ8_HANDLER(lynx_uart_r)
 {
-	lynx_state *state = space->machine().driver_data<lynx_state>();
+	lynx_state *state = space.machine().driver_data<lynx_state>();
 	UINT8 value = 0x00;
 	switch (offset)
 	{
@@ -1769,7 +1769,7 @@ READ8_MEMBER(lynx_state::mikey_read)
 
 	case 0x8c:
 	case 0x8d:
-		value = lynx_uart_r(&space, offset);
+		value = lynx_uart_r(space, offset);
 		break;
 
 	default:

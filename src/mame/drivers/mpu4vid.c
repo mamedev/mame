@@ -525,20 +525,20 @@ static SCREEN_UPDATE_RGB32(mpu4_vid)
 
 static READ16_HANDLER( mpu4_vid_vidram_r )
 {
-	mpu4vid_state *state = space->machine().driver_data<mpu4vid_state>();
+	mpu4vid_state *state = space.machine().driver_data<mpu4vid_state>();
 	return state->m_vid_vidram[offset];
 }
 
 
 static WRITE16_HANDLER( mpu4_vid_vidram_w )
 {
-	mpu4vid_state *state = space->machine().driver_data<mpu4vid_state>();
+	mpu4vid_state *state = space.machine().driver_data<mpu4vid_state>();
 	COMBINE_DATA(&state->m_vid_vidram[offset]);
 	offset <<= 1;
-	space->machine().gfx[state->m_gfx_index+0]->mark_dirty(offset/0x20);
-	space->machine().gfx[state->m_gfx_index+1]->mark_dirty(offset/0x20);
-	space->machine().gfx[state->m_gfx_index+2]->mark_dirty(offset/0x20);
-	space->machine().gfx[state->m_gfx_index+3]->mark_dirty(offset/0x20);
+	space.machine().gfx[state->m_gfx_index+0]->mark_dirty(offset/0x20);
+	space.machine().gfx[state->m_gfx_index+1]->mark_dirty(offset/0x20);
+	space.machine().gfx[state->m_gfx_index+2]->mark_dirty(offset/0x20);
+	space.machine().gfx[state->m_gfx_index+3]->mark_dirty(offset/0x20);
 }
 
 
@@ -581,7 +581,7 @@ VIDEO_START_MEMBER(mpu4vid_state,mpu4_vid)
 
 static WRITE16_HANDLER( ef9369_w )
 {
-	mpu4vid_state *state = space->machine().driver_data<mpu4vid_state>();
+	mpu4vid_state *state = space.machine().driver_data<mpu4vid_state>();
 	struct ef9369_t &pal = state->m_pal;
 	data &= 0x00ff;
 
@@ -611,7 +611,7 @@ static WRITE16_HANDLER( ef9369_w )
 			col = pal.clut[entry] & 0xfff;
 
 			/* Update the MAME palette */
-			palette_set_color_rgb(space->machine(), entry, pal4bit(col >> 8), pal4bit(col >> 4), pal4bit(col >> 0));
+			palette_set_color_rgb(space.machine(), entry, pal4bit(col >> 8), pal4bit(col >> 4), pal4bit(col >> 0));
 		}
 
 			/* Address register auto-increment */
@@ -623,7 +623,7 @@ static WRITE16_HANDLER( ef9369_w )
 
 static READ16_HANDLER( ef9369_r )
 {
-	mpu4vid_state *state = space->machine().driver_data<mpu4vid_state>();
+	mpu4vid_state *state = space.machine().driver_data<mpu4vid_state>();
 	struct ef9369_t &pal = state->m_pal;
 	if ((offset & 1) == 0)
 	{
@@ -660,7 +660,7 @@ static READ16_HANDLER( ef9369_r )
 
 WRITE16_HANDLER( bt471_w )
 {
-	mpu4vid_state *state = space->machine().driver_data<mpu4vid_state>();
+	mpu4vid_state *state = space.machine().driver_data<mpu4vid_state>();
 	struct bt471_t &bt471 = state->m_bt471;
 	UINT8 val = data & 0xff;
 		{
@@ -684,7 +684,7 @@ WRITE16_HANDLER( bt471_w )
 
 			if (++*addr_cnt == 3)
 			{
-				palette_set_color(space->machine(), bt471.address, MAKE_RGB(color[0], color[1], color[2]));
+				palette_set_color(space.machine(), bt471.address, MAKE_RGB(color[0], color[1], color[2]));
 				*addr_cnt = 0;
 
 				/* Address register increments */
@@ -1597,14 +1597,14 @@ Characteriser (CHR)
 
 static WRITE16_HANDLER( characteriser16_w )
 {
-	mpu4_state *state = space->machine().driver_data<mpu4_state>();
+	mpu4_state *state = space.machine().driver_data<mpu4_state>();
 	int x;
 	int call=data;
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", space->device().safe_pcbase(),offset,data));
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", space.device().safe_pcbase(),offset,data));
 
 	if (!state->m_current_chr_table)
 	{
-		logerror("No Characteriser Table @ %04x\n", space->device().safe_pcbase());
+		logerror("No Characteriser Table @ %04x\n", space.device().safe_pcbase());
 		return;
 	}
 
@@ -1629,20 +1629,20 @@ static WRITE16_HANDLER( characteriser16_w )
 
 static READ16_HANDLER( characteriser16_r )
 {
-	mpu4_state *state = space->machine().driver_data<mpu4_state>();
-	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", space->device().safe_pcbase(),offset,state->m_current_chr_table[state->m_prot_col].response));
+	mpu4_state *state = space.machine().driver_data<mpu4_state>();
+	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", space.device().safe_pcbase(),offset,state->m_current_chr_table[state->m_prot_col].response));
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 	LOG_CHR(("Characteriser read data %02X \n",state->m_current_chr_table[state->m_prot_col].response));
 
 	if (!state->m_current_chr_table)
 	{
-		logerror("No Characteriser Table @ %04x\n", space->device().safe_pcbase());
+		logerror("No Characteriser Table @ %04x\n", space.device().safe_pcbase());
 		return 0x00;
 	}
 
 
 	/* hack for 'invalid questions' error on time machine.. I guess it wants them to decode properly for startup check? */
-	if (space->device().safe_pcbase()==0x283a)
+	if (space.device().safe_pcbase()==0x283a)
 	{
 		return 0x00;
 	}
@@ -1669,13 +1669,13 @@ Precedent suggests this is not that dangerous an assumption to make.
 
 static WRITE16_HANDLER( bwb_characteriser16_w )
 {
-	mpu4_state *state = space->machine().driver_data<mpu4_state>();
+	mpu4_state *state = space.machine().driver_data<mpu4_state>();
 	int x;
 	int call=data &0xff;
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", space->device().safe_pcbase(),offset,data));
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", space.device().safe_pcbase(),offset,data));
 	if (!state->m_current_chr_table)
 	{
-		logerror("No Characteriser Table @ %04x\n", space->device().safe_pcbase());
+		logerror("No Characteriser Table @ %04x\n", space.device().safe_pcbase());
 		return;
 	}
 
@@ -1695,7 +1695,7 @@ static WRITE16_HANDLER( bwb_characteriser16_w )
 			state->m_init_col =0;
 		}
 	}
-	state->m_chr_value = space->machine().rand();
+	state->m_chr_value = space.machine().rand();
 	for (x = 0; x < 4; x++)
 	{
 		if	(state->m_current_chr_table[(x)].call == call)
@@ -1713,7 +1713,7 @@ static WRITE16_HANDLER( bwb_characteriser16_w )
 
 static READ16_HANDLER( bwb_characteriser16_r )
 {
-	mpu4_state *state = space->machine().driver_data<mpu4_state>();
+	mpu4_state *state = space.machine().driver_data<mpu4_state>();
 
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 

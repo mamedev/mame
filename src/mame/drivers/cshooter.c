@@ -287,12 +287,12 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(cshooter_state::seibu_sound_comms_r)
 {
-	return seibu_main_word_r(&space,offset,0x00ff);
+	return seibu_main_word_r(space,offset,0x00ff);
 }
 
 WRITE8_MEMBER(cshooter_state::seibu_sound_comms_w)
 {
-	seibu_main_word_w(&space,offset,data,0x00ff);
+	seibu_main_word_w(space,offset,data,0x00ff);
 }
 
 static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, cshooter_state )
@@ -676,12 +676,12 @@ DRIVER_INIT_MEMBER(cshooter_state,cshooter)
 
 DRIVER_INIT_MEMBER(cshooter_state,cshootere)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int A;
 	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
 
-	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
+	space.set_decrypted_region(0x0000, 0x7fff, decrypt);
 
 	for (A = 0x0000;A < 0x8000;A++)
 	{

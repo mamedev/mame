@@ -43,27 +43,27 @@
 static WRITE32_HANDLER( svg_arm7_ram_sel_w )
 {
 //  printf("svg_arm7_ram_sel_w %08x\n", data);
-	space->machine().scheduler().synchronize(); // force resync
+	space.machine().scheduler().synchronize(); // force resync
 
-	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
+	pgm_arm_type3_state *state = space.machine().driver_data<pgm_arm_type3_state>();
 	state->m_svg_ram_sel = data & 1;
 }
 
 static READ32_HANDLER( svg_arm7_shareram_r )
 {
-	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
+	pgm_arm_type3_state *state = space.machine().driver_data<pgm_arm_type3_state>();
 	return state->m_svg_shareram[state->m_svg_ram_sel & 1][offset];
 }
 
 static WRITE32_HANDLER( svg_arm7_shareram_w )
 {
-	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
+	pgm_arm_type3_state *state = space.machine().driver_data<pgm_arm_type3_state>();
 	COMBINE_DATA(&state->m_svg_shareram[state->m_svg_ram_sel & 1][offset]);
 }
 
 static READ16_HANDLER( svg_m68k_ram_r )
 {
-	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
+	pgm_arm_type3_state *state = space.machine().driver_data<pgm_arm_type3_state>();
 	int ram_sel = (state->m_svg_ram_sel & 1) ^ 1;
 	UINT16 *share16 = (UINT16 *)(state->m_svg_shareram[ram_sel & 1]);
 
@@ -72,7 +72,7 @@ static READ16_HANDLER( svg_m68k_ram_r )
 
 static WRITE16_HANDLER( svg_m68k_ram_w )
 {
-	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
+	pgm_arm_type3_state *state = space.machine().driver_data<pgm_arm_type3_state>();
 	int ram_sel = (state->m_svg_ram_sel & 1) ^ 1;
 	UINT16 *share16 = (UINT16 *)(state->m_svg_shareram[ram_sel & 1]);
 
@@ -86,25 +86,25 @@ static READ16_HANDLER( svg_68k_nmi_r )
 
 static WRITE16_HANDLER( svg_68k_nmi_w )
 {
-	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
+	pgm_arm_type3_state *state = space.machine().driver_data<pgm_arm_type3_state>();
 	generic_pulse_irq_line(state->m_prot, ARM7_FIRQ_LINE, 1);
 }
 
 static WRITE16_HANDLER( svg_latch_68k_w )
 {
-	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
+	pgm_arm_type3_state *state = space.machine().driver_data<pgm_arm_type3_state>();
 	if (PGMARM7LOGERROR)
-		logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, space->device().safe_pc());
+		logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, space.device().safe_pc());
 	COMBINE_DATA(&state->m_svg_latchdata_68k_w);
 }
 
 
 static READ16_HANDLER( svg_latch_68k_r )
 {
-	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
+	pgm_arm_type3_state *state = space.machine().driver_data<pgm_arm_type3_state>();
 
 	if (PGMARM7LOGERROR)
-		logerror("M68K: Latch read: %04x (%04x) (%06x)\n", state->m_svg_latchdata_arm_w & 0x0000ffff, mem_mask, space->device().safe_pc());
+		logerror("M68K: Latch read: %04x (%04x) (%06x)\n", state->m_svg_latchdata_arm_w & 0x0000ffff, mem_mask, space.device().safe_pc());
 	return state->m_svg_latchdata_arm_w;
 }
 
@@ -112,19 +112,19 @@ static READ16_HANDLER( svg_latch_68k_r )
 
 static READ32_HANDLER( svg_latch_arm_r )
 {
-	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
+	pgm_arm_type3_state *state = space.machine().driver_data<pgm_arm_type3_state>();
 
 	if (PGMARM7LOGERROR)
-		logerror("ARM7: Latch read: %08x (%08x) (%06x)\n", state->m_svg_latchdata_68k_w, mem_mask, space->device().safe_pc());
+		logerror("ARM7: Latch read: %08x (%08x) (%06x)\n", state->m_svg_latchdata_68k_w, mem_mask, space.device().safe_pc());
 	return state->m_svg_latchdata_68k_w;
 }
 
 static WRITE32_HANDLER( svg_latch_arm_w )
 {
-	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
+	pgm_arm_type3_state *state = space.machine().driver_data<pgm_arm_type3_state>();
 
 	if (PGMARM7LOGERROR)
-		logerror("ARM7: Latch write: %08x (%08x) (%06x)\n", data, mem_mask, space->device().safe_pc());
+		logerror("ARM7: Latch write: %08x (%08x) (%06x)\n", data, mem_mask, space.device().safe_pc());
 
 	COMBINE_DATA(&state->m_svg_latchdata_arm_w);
 }
@@ -267,20 +267,20 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,killbldp)
 
 static READ32_HANDLER( dmnfrnt_speedup_r )
 {
-	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
-	int pc = space->device().safe_pc();
-	if (pc == 0x8000fea) space->device().execute().eat_cycles(500);
+	pgm_arm_type3_state *state = space.machine().driver_data<pgm_arm_type3_state>();
+	int pc = space.device().safe_pc();
+	if (pc == 0x8000fea) space.device().execute().eat_cycles(500);
 //  else printf("dmn_speedup_r %08x\n", pc);
 	return state->m_arm_ram[0x000444/4];
 }
 
 static READ16_HANDLER( dmnfrnt_main_speedup_r )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_state *state = space.machine().driver_data<pgm_state>();
 	UINT16 data = state->m_mainram[0xa03c/2];
-	int pc = space->device().safe_pc();
-	if (pc == 0x10193a) space->device().execute().spin_until_interrupt();
-	else if (pc == 0x1019a4) space->device().execute().spin_until_interrupt();
+	int pc = space.device().safe_pc();
+	if (pc == 0x10193a) space.device().execute().spin_until_interrupt();
+	else if (pc == 0x1019a4) space.device().execute().spin_until_interrupt();
 	return data;
 }
 

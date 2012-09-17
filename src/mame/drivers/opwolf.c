@@ -499,7 +499,7 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_b_w)
 		msm5205_reset_w(device, 0);
 	}
 
-//  logerror("CPU #1     b00%i-data=%2x   pc=%4x\n",offset,data,space->device().safe_pc() );
+//  logerror("CPU #1     b00%i-data=%2x   pc=%4x\n",offset,data,space.device().safe_pc() );
 }
 
 
@@ -522,7 +522,7 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_c_w)
 		msm5205_reset_w(device, 0);
 	}
 
-//  logerror("CPU #1     c00%i-data=%2x   pc=%4x\n",offset,data,space->device().safe_pc() );
+//  logerror("CPU #1     c00%i-data=%2x   pc=%4x\n",offset,data,space.device().safe_pc() );
 }
 
 

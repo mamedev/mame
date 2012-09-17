@@ -27,10 +27,10 @@ static void hitice_clear_pixel_bitmap( running_machine &machine )
 {
 	int i;
 	taitob_state *state = machine.driver_data<taitob_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	for (i = 0; i < 0x40000; i++)
-		state->hitice_pixelram_w(*space, i, 0, 0xffff);
+		state->hitice_pixelram_w(space, i, 0, 0xffff);
 }
 
 WRITE16_MEMBER(taitob_state::realpunc_video_ctrl_w)

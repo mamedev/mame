@@ -622,10 +622,10 @@ static UINT8 vdc_r( running_machine &machine, int which, offs_t offset )
 	return (temp);
 }
 
-WRITE8_HANDLER( vdc_0_w ) {	vdc_w( space->machine(), 0, offset, data ); }
-WRITE8_HANDLER( vdc_1_w ) {	vdc_w( space->machine(), 1, offset, data ); }
-READ8_HANDLER( vdc_0_r ) {	return vdc_r( space->machine(), 0, offset ); }
-READ8_HANDLER( vdc_1_r ) {	return vdc_r( space->machine(), 1, offset ); }
+WRITE8_HANDLER( vdc_0_w ) {	vdc_w( space.machine(), 0, offset, data ); }
+WRITE8_HANDLER( vdc_1_w ) {	vdc_w( space.machine(), 1, offset, data ); }
+READ8_HANDLER( vdc_0_r ) {	return vdc_r( space.machine(), 0, offset ); }
+READ8_HANDLER( vdc_1_r ) {	return vdc_r( space.machine(), 1, offset ); }
 
 PALETTE_INIT( vce )
 {
@@ -1185,7 +1185,7 @@ READ8_HANDLER( vpc_r )
 
 static void vpc_init( running_machine &machine )
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	vpc_w( space, 0, 0x11 );
 	vpc_w( space, 1, 0x11 );
 	vpc.window1.w = 0;

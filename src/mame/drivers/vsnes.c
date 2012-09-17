@@ -153,14 +153,14 @@ WRITE8_MEMBER(vsnes_state::sprite_dma_0_w)
 {
 	int source = ( data & 7 );
 	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu1");
-	ppu->spriteram_dma( &space, source );
+	ppu->spriteram_dma( space, source );
 }
 
 WRITE8_MEMBER(vsnes_state::sprite_dma_1_w)
 {
 	int source = ( data & 7 );
 	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu2");
-	ppu->spriteram_dma( &space, source );
+	ppu->spriteram_dma( space, source );
 }
 
 WRITE8_MEMBER(vsnes_state::vsnes_coin_counter_w)

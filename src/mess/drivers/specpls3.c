@@ -183,35 +183,35 @@ static const int spectrum_plus3_memory_selections[]=
 
 static WRITE8_HANDLER(spectrum_plus3_port_3ffd_w)
 {
-	spectrum_state *state = space->machine().driver_data<spectrum_state>();
+	spectrum_state *state = space.machine().driver_data<spectrum_state>();
 	if (state->m_floppy==1)
-		upd765_data_w(space->machine().device("upd765"), *space, 0,data);
+		upd765_data_w(space.machine().device("upd765"), space, 0,data);
 }
 
 static  READ8_HANDLER(spectrum_plus3_port_3ffd_r)
 {
-	spectrum_state *state = space->machine().driver_data<spectrum_state>();
+	spectrum_state *state = space.machine().driver_data<spectrum_state>();
 	if (state->m_floppy==0)
 		return 0xff;
 	else
-		return upd765_data_r(space->machine().device("upd765"), *space, 0);
+		return upd765_data_r(space.machine().device("upd765"), space, 0);
 }
 
 
 static  READ8_HANDLER(spectrum_plus3_port_2ffd_r)
 {
-	spectrum_state *state = space->machine().driver_data<spectrum_state>();
+	spectrum_state *state = space.machine().driver_data<spectrum_state>();
 	if (state->m_floppy==0)
 			return 0xff;
 	else
-			return upd765_status_r(space->machine().device("upd765"), *space, 0);
+			return upd765_status_r(space.machine().device("upd765"), space, 0);
 }
 
 
 void spectrum_plus3_update_memory(running_machine &machine)
 {
 	spectrum_state *state = machine.driver_data<spectrum_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	if (state->m_port_7ffd_data & 8)
@@ -258,7 +258,7 @@ void spectrum_plus3_update_memory(running_machine &machine)
 			ChosenROM = machine.root_device().memregion("maincpu")->base() + 0x010000 + (ROMSelection << 14);
 
 			state->membank("bank1")->set_base(ChosenROM);
-			space->unmap_write(0x0000, 0x3fff);
+			space.unmap_write(0x0000, 0x3fff);
 
 			logerror("rom switch: %02x\n", ROMSelection);
 	}
@@ -277,7 +277,7 @@ void spectrum_plus3_update_memory(running_machine &machine)
 			ram_data = messram + (memory_selection[0] << 14);
 			state->membank("bank1")->set_base(ram_data);
 			/* allow writes to 0x0000-0x03fff */
-			space->install_write_bank(0x0000, 0x3fff, "bank1");
+			space.install_write_bank(0x0000, 0x3fff, "bank1");
 
 			ram_data = messram + (memory_selection[1] << 14);
 			state->membank("bank2")->set_base(ram_data);
@@ -301,7 +301,7 @@ static WRITE8_HANDLER(spectrum_plus3_port_7ffd_w)
 	   /* D4 - ROM select - which rom paged into 0x0000-0x03fff */
 	   /* D5 - Disable paging */
 
-	spectrum_state *state = space->machine().driver_data<spectrum_state>();
+	spectrum_state *state = space.machine().driver_data<spectrum_state>();
 
 	/* disable paging? */
 	if (state->m_port_7ffd_data & 0x20)
@@ -311,7 +311,7 @@ static WRITE8_HANDLER(spectrum_plus3_port_7ffd_w)
 	state->m_port_7ffd_data = data;
 
 	/* update memory */
-	spectrum_plus3_update_memory(space->machine());
+	spectrum_plus3_update_memory(space.machine());
 }
 
 static WRITE8_HANDLER(spectrum_plus3_port_1ffd_w)
@@ -321,12 +321,12 @@ static WRITE8_HANDLER(spectrum_plus3_port_1ffd_w)
 	/* D3 - Disk motor on/off */
 	/* D4 - parallel port strobe */
 
-	spectrum_state *state = space->machine().driver_data<spectrum_state>();
+	spectrum_state *state = space.machine().driver_data<spectrum_state>();
 
-	floppy_mon_w(floppy_get_device(space->machine(), 0), !BIT(data, 3));
-	floppy_mon_w(floppy_get_device(space->machine(), 1), !BIT(data, 3));
-	floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0), 1, 1);
-	floppy_drive_set_ready_state(floppy_get_device(space->machine(), 1), 1, 1);
+	floppy_mon_w(floppy_get_device(space.machine(), 0), !BIT(data, 3));
+	floppy_mon_w(floppy_get_device(space.machine(), 1), !BIT(data, 3));
+	floppy_drive_set_ready_state(floppy_get_device(space.machine(), 0), 1, 1);
+	floppy_drive_set_ready_state(floppy_get_device(space.machine(), 1), 1, 1);
 
 	state->m_port_1ffd_data = data;
 
@@ -334,7 +334,7 @@ static WRITE8_HANDLER(spectrum_plus3_port_1ffd_w)
 	if ((state->m_port_7ffd_data & 0x20)==0)
 	{
 			/* no */
-			spectrum_plus3_update_memory(space->machine());
+			spectrum_plus3_update_memory(space.machine());
 	}
 }
 

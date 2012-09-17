@@ -71,8 +71,8 @@ static TIMER_DEVICE_CALLBACK( serial_clock )
 /* a read from this location disables the rom */
 static READ8_HANDLER( tf20_rom_disable )
 {
-	tf20_state *tf20 = get_safe_token(space->device().owner());
-	address_space *prg = space->device().memory().space(AS_PROGRAM);
+	tf20_state *tf20 = get_safe_token(space.device().owner());
+	address_space *prg = space.device().memory().space(AS_PROGRAM);
 
 	/* switch in ram */
 	prg->install_ram(0x0000, 0x7fff, tf20->ram->pointer());
@@ -82,9 +82,9 @@ static READ8_HANDLER( tf20_rom_disable )
 
 static READ8_HANDLER( tf20_dip_r )
 {
-	logerror("%s: tf20_dip_r\n", space->machine().describe_context());
+	logerror("%s: tf20_dip_r\n", space.machine().describe_context());
 
-	return space->machine().root_device().ioport("tf20_dip")->read();
+	return space.machine().root_device().ioport("tf20_dip")->read();
 }
 
 static TIMER_CALLBACK( tf20_upd765_tc_reset )
@@ -105,8 +105,8 @@ static READ8_DEVICE_HANDLER( tf20_upd765_tc_r )
 
 static WRITE8_HANDLER( tf20_fdc_control_w )
 {
-	tf20_state *tf20 = get_safe_token(space->device().owner());
-	logerror("%s: tf20_fdc_control_w %02x\n", space->machine().describe_context(), data);
+	tf20_state *tf20 = get_safe_token(space.device().owner());
+	logerror("%s: tf20_fdc_control_w %02x\n", space.machine().describe_context(), data);
 
 	/* bit 0, motor on signal */
 	floppy_mon_w(tf20->floppy_0, !BIT(data, 0));

@@ -166,7 +166,7 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 
 QUICKLOAD_LOAD( cd2650 )
 {
-	address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 	int quick_addr = 0x440;
 	int exec_addr;
@@ -226,7 +226,7 @@ QUICKLOAD_LOAD( cd2650 )
 		read_ = quick_length;
 
 	for (i = quick_addr; i < read_; i++)
-		space->write_byte(i, quick_data[i]);
+		space.write_byte(i, quick_data[i]);
 
 	read_ = 0x1780;
 	if (quick_length < 0x1780)
@@ -234,11 +234,11 @@ QUICKLOAD_LOAD( cd2650 )
 
 	if (quick_length > 0x157f)
 		for (i = 0x1580; i < read_; i++)
-			space->write_byte(i, quick_data[i]);
+			space.write_byte(i, quick_data[i]);
 
 	if (quick_length > 0x17ff)
 		for (i = 0x1800; i < quick_length; i++)
-			space->write_byte(i, quick_data[i]);
+			space.write_byte(i, quick_data[i]);
 
 	/* display a message about the loaded quickload */
 	image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);

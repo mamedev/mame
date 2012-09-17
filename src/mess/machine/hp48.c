@@ -368,9 +368,9 @@ static void hp48_update_annunciators(hp48_state *state)
 
 static WRITE8_HANDLER ( hp48_io_w )
 {
-	hp48_state *state = space->machine().driver_data<hp48_state>();
+	hp48_state *state = space.machine().driver_data<hp48_state>();
 	LOG(( "%05x %f hp48_io_w: off=%02x data=%x\n",
-	      space->device().safe_pcbase(), space->machine().time().as_double(), offset, data ));
+	      space.device().safe_pcbase(), space.machine().time().as_double(), offset, data ));
 
 	switch( offset )
 	{
@@ -413,14 +413,14 @@ static WRITE8_HANDLER ( hp48_io_w )
 
 	/* cards */
 	case 0x0e:
-		LOG(( "%05x: card control write %02x\n", space->device().safe_pcbase(), data ));
+		LOG(( "%05x: card control write %02x\n", space.device().safe_pcbase(), data ));
 
 		/* bit 0: software interrupt */
 		if ( data & 1 )
 		{
 			LOG(( "%f hp48_io_w: software interrupt requested\n",
-			      space->machine().time().as_double() ));
-			hp48_pulse_irq( space->machine(), SATURN_IRQ_LINE );
+			      space.machine().time().as_double() ));
+			hp48_pulse_irq( space.machine(), SATURN_IRQ_LINE );
 			data &= ~1;
 		}
 
@@ -432,7 +432,7 @@ static WRITE8_HANDLER ( hp48_io_w )
 		break;
 
 	case 0x0f:
-		LOG(( "%05x: card info write %02x\n", space->device().safe_pcbase(), data ));
+		LOG(( "%05x: card info write %02x\n", space.device().safe_pcbase(), data ));
 		state->m_io[0x0f] = data;
 		break;
 
@@ -447,7 +447,7 @@ static WRITE8_HANDLER ( hp48_io_w )
 	case 0x17:
 		/* second nibble of sent data */
 		state->m_io[offset] = data;
-		hp48_rs232_send_byte(space->machine());
+		hp48_rs232_send_byte(space.machine());
 		break;
 
 	/* XXX not implemented:
@@ -483,7 +483,7 @@ static WRITE8_HANDLER ( hp48_io_w )
 
 static READ8_HANDLER ( hp48_io_r )
 {
-	hp48_state *state = space->machine().driver_data<hp48_state>();
+	hp48_state *state = space.machine().driver_data<hp48_state>();
 	UINT8 data = 0;
 
 	switch( offset )
@@ -517,7 +517,7 @@ static READ8_HANDLER ( hp48_io_r )
 	case 0x29:
 	{
 		int last_line = HP48_IO_8(0x28) & 0x3f; /* last line of main bitmap before menu */
-		int cur_line = space->machine().primary_screen->vpos();
+		int cur_line = space.machine().primary_screen->vpos();
 		if ( last_line <= 1 ) last_line = 0x3f;
 		data = ( cur_line >= 0 && cur_line <= last_line ) ? last_line - cur_line : 0;
 		if ( offset == 0x29 )
@@ -548,8 +548,8 @@ static READ8_HANDLER ( hp48_io_r )
 	{
 		/* second nibble of received data */
 
-		//device_image_interface *xmodem = dynamic_cast<device_image_interface *>(space->machine().device("rs232_x"));
-		//device_image_interface *kermit = dynamic_cast<device_image_interface *>(space->machine().device("rs232_k"));
+		//device_image_interface *xmodem = dynamic_cast<device_image_interface *>(space.machine().device("rs232_x"));
+		//device_image_interface *kermit = dynamic_cast<device_image_interface *>(space.machine().device("rs232_k"));
 
 		state->m_io[0x11] &= ~1;  /* clear byte received */
 		data = state->m_io[offset];
@@ -563,7 +563,7 @@ static READ8_HANDLER ( hp48_io_r )
 	/* cards */
 	case 0x0e: /* detection */
 		data = state->m_io[0x0e];
-		LOG(( "%05x: card control read %02x\n", space->device().safe_pcbase(), data ));
+		LOG(( "%05x: card control read %02x\n", space.device().safe_pcbase(), data ));
 		break;
 	case 0x0f: /* card info */
 		data = 0;
@@ -581,7 +581,7 @@ static READ8_HANDLER ( hp48_io_r )
 			if ( state->m_port_size[0] && state->m_port_write[0] ) data |= 4;
 			if ( state->m_port_size[1] && state->m_port_write[1] ) data |= 8;
 		}
-		LOG(( "%05x: card info read %02x\n", space->device().safe_pcbase(), data ));
+		LOG(( "%05x: card info read %02x\n", space.device().safe_pcbase(), data ));
 		break;
 
 
@@ -589,7 +589,7 @@ static READ8_HANDLER ( hp48_io_r )
 	}
 
 	LOG(( "%05x %f hp48_io_r: off=%02x data=%x\n",
-	      space->device().safe_pcbase(), space->machine().time().as_double(), offset, data ));
+	      space.device().safe_pcbase(), space.machine().time().as_double(), offset, data ));
 	return data;
 }
 
@@ -598,12 +598,12 @@ static READ8_HANDLER ( hp48_io_r )
 
 static READ8_HANDLER ( hp48_bank_r )
 {
-	hp48_state *state = space->machine().driver_data<hp48_state>();
+	hp48_state *state = space.machine().driver_data<hp48_state>();
 	/* bit 0: ignored, bits 2-5: bank number, bit 6: enable */
 	offset &= 0x7e;
 	if ( state->m_bank_switch != offset )
 	{
-		LOG(( "%05x %f hp48_bank_r: off=%03x\n", space->device().safe_pcbase(), space->machine().time().as_double(), offset ));
+		LOG(( "%05x %f hp48_bank_r: off=%03x\n", space.device().safe_pcbase(), space.machine().time().as_double(), offset ));
 		state->m_bank_switch = offset;
 		hp48_apply_modules(state);
 	}
@@ -709,7 +709,7 @@ static void hp48_apply_modules(hp48_state *state)
 {
 	int i;
 	int nce2_enable = 1;
-	address_space* space = state->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *state->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->m_io_addr = 0x100000;
 
@@ -772,23 +772,23 @@ static void hp48_apply_modules(hp48_state *state)
 		}
 
 		if (state->m_modules[i].data)
-			space->install_read_bank( base, end, 0, mirror, bank );
+			space.install_read_bank( base, end, 0, mirror, bank );
 		else
 		{
 			if (state->m_modules[i].read != NULL)
-				space->install_legacy_read_handler( base, end, 0, mirror, state->m_modules[i].read, state->m_modules[i].read_name);
+				space.install_legacy_read_handler( base, end, 0, mirror, state->m_modules[i].read, state->m_modules[i].read_name);
 		}
 
 		if (state->m_modules[i].isnop)
-			space->nop_write(base, end, 0, mirror);
+			space.nop_write(base, end, 0, mirror);
 		else
 		{
 			if (state->m_modules[i].data)
-				space->install_write_bank( base, end, 0, mirror, bank );
+				space.install_write_bank( base, end, 0, mirror, bank );
 			else
 			{
 				if (state->m_modules[i].write != NULL)
-					space->install_legacy_write_handler( base, end, 0, mirror, state->m_modules[i].write, state->m_modules[i].write_name );
+					space.install_legacy_write_handler( base, end, 0, mirror, state->m_modules[i].write, state->m_modules[i].write_name );
 			}
 		}
 

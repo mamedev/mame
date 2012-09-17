@@ -31,9 +31,9 @@
     MEMORY / I/O
 ***************************************************************************/
 
-static void enterprise_update_memory_page(address_space *space, offs_t page, int index)
+static void enterprise_update_memory_page(address_space &space, offs_t page, int index)
 {
-	ep_state *state = space->machine().driver_data<ep_state>();
+	ep_state *state = space.machine().driver_data<ep_state>();
 	int start = (page - 1) * 0x4000;
 	int end = (page - 1) * 0x4000 + 0x3fff;
 	char page_num[10];
@@ -45,24 +45,24 @@ static void enterprise_update_memory_page(address_space *space, offs_t page, int
 	case 0x01:
 	case 0x02:
 	case 0x03:
-		space->install_read_bank(start, end, page_num);
-		space->nop_write(start, end);
-		state->membank(page_num)->set_base(space->machine().root_device().memregion("exos")->base() + (index * 0x4000));
+		space.install_read_bank(start, end, page_num);
+		space.nop_write(start, end);
+		state->membank(page_num)->set_base(space.machine().root_device().memregion("exos")->base() + (index * 0x4000));
 		break;
 
 	case 0x04:
 	case 0x05:
 	case 0x06:
 	case 0x07:
-		space->install_read_bank(start, end, page_num);
-		space->nop_write(start, end);
-		state->membank(page_num)->set_base(space->machine().root_device().memregion("cartridges")->base() + ((index - 0x04) * 0x4000));
+		space.install_read_bank(start, end, page_num);
+		space.nop_write(start, end);
+		state->membank(page_num)->set_base(space.machine().root_device().memregion("cartridges")->base() + ((index - 0x04) * 0x4000));
 		break;
 
 	case 0x20:
 	case 0x21:
-		space->install_read_bank(start, end, page_num);
-		space->nop_write(start, end);
+		space.install_read_bank(start, end, page_num);
+		space.nop_write(start, end);
 		state->membank(page_num)->set_base(state->memregion("exdos")->base() + ((index - 0x20) * 0x4000));
 		break;
 
@@ -71,14 +71,14 @@ static void enterprise_update_memory_page(address_space *space, offs_t page, int
 	case 0xfa:
 	case 0xfb:
 		/* additional 64k ram */
-		if (space->machine().device<ram_device>(RAM_TAG)->size() == 128*1024)
+		if (space.machine().device<ram_device>(RAM_TAG)->size() == 128*1024)
 		{
-			space->install_readwrite_bank(start, end, page_num);
-			state->membank(page_num)->set_base(space->machine().device<ram_device>(RAM_TAG)->pointer() + (index - 0xf4) * 0x4000);
+			space.install_readwrite_bank(start, end, page_num);
+			state->membank(page_num)->set_base(space.machine().device<ram_device>(RAM_TAG)->pointer() + (index - 0xf4) * 0x4000);
 		}
 		else
 		{
-			space->unmap_readwrite(start, end);
+			space.unmap_readwrite(start, end);
 		}
 		break;
 
@@ -87,12 +87,12 @@ static void enterprise_update_memory_page(address_space *space, offs_t page, int
 	case 0xfe:
 	case 0xff:
 		/* basic 64k ram */
-		space->install_readwrite_bank(start, end, page_num);
-		state->membank(page_num)->set_base(space->machine().device<ram_device>(RAM_TAG)->pointer() + (index - 0xfc) * 0x4000);
+		space.install_readwrite_bank(start, end, page_num);
+		state->membank(page_num)->set_base(space.machine().device<ram_device>(RAM_TAG)->pointer() + (index - 0xfc) * 0x4000);
 		break;
 
 	default:
-		space->unmap_readwrite(start, end);
+		space.unmap_readwrite(start, end);
 	}
 }
 
@@ -108,7 +108,7 @@ static WRITE8_DEVICE_HANDLER( enterprise_dave_reg_write )
 	case 0x11:
 	case 0x12:
 	case 0x13:
-		enterprise_update_memory_page(device->machine().device("maincpu")->memory().space(AS_PROGRAM), offset - 0x0f, data);
+		enterprise_update_memory_page(*device->machine().device("maincpu")->memory().space(AS_PROGRAM), offset - 0x0f, data);
 		break;
 
 	case 0x15:

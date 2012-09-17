@@ -419,7 +419,7 @@ if (screen.machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmes
 READ32_HANDLER( zeus2_r )
 {
 	int logit = (offset != 0x00 && offset != 0x01 && offset != 0x54 && offset != 0x48 && offset != 0x49 && offset != 0x58 && offset != 0x59 && offset != 0x5a);
-	midzeus_state *state = space->machine().driver_data<midzeus_state>();
+	midzeus_state *state = space.machine().driver_data<midzeus_state>();
 	UINT32 result = state->m_zeusbase[offset];
 
 #if TRACK_REG_USAGE
@@ -427,7 +427,7 @@ READ32_HANDLER( zeus2_r )
 #endif
 
 	if (logit)
-		logerror("%06X:zeus2_r(%02X)\n", space->device().safe_pc(), offset);
+		logerror("%06X:zeus2_r(%02X)\n", space.device().safe_pc(), offset);
 
 	switch (offset)
 	{
@@ -440,7 +440,7 @@ READ32_HANDLER( zeus2_r )
 			/* bits $00080000 is tested in a loop until 0 */
 			/* bit  $00000004 is tested for toggling; probably VBLANK */
 			result = 0x00;
-			if (space->machine().primary_screen->vblank())
+			if (space.machine().primary_screen->vblank())
 				result |= 0x04;
 			break;
 
@@ -451,7 +451,7 @@ READ32_HANDLER( zeus2_r )
 
 		case 0x54:
 			/* both upper 16 bits and lower 16 bits seem to be used as vertical counters */
-			result = (space->machine().primary_screen->vpos() << 16) | space->machine().primary_screen->vpos();
+			result = (space.machine().primary_screen->vpos() << 16) | space.machine().primary_screen->vpos();
 			break;
 	}
 
@@ -473,8 +473,8 @@ WRITE32_HANDLER( zeus2_w )
 				 offset != 0x40 && offset != 0x41 && offset != 0x48 && offset != 0x49 && offset != 0x4e &&
 				 offset != 0x50 && offset != 0x51 && offset != 0x57 && offset != 0x58 && offset != 0x59 && offset != 0x5a && offset != 0x5e);
 	if (logit)
-		logerror("%06X:zeus2_w", space->device().safe_pc());
-	zeus_register32_w(space->machine(), offset, data, logit);
+		logerror("%06X:zeus2_w", space.device().safe_pc());
+	zeus_register32_w(space.machine(), offset, data, logit);
 }
 
 

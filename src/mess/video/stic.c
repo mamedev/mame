@@ -6,7 +6,7 @@
 
 READ16_MEMBER( intv_state::intv_stic_r )
 {
-//  intv_state *state = space->machine().driver_data<intv_state>();
+//  intv_state *state = space.machine().driver_data<intv_state>();
 	//logerror("%x = stic_r(%x)\n",0,offset);
 	if (m_bus_copy_mode || !m_stic_handshake)
 	{
@@ -75,7 +75,7 @@ READ16_MEMBER( intv_state::intv_stic_r )
 
 WRITE16_MEMBER( intv_state::intv_stic_w )
 {
-	//intv_state *state = space->machine().driver_data<intv_state>();
+	//intv_state *state = space.machine().driver_data<intv_state>();
 	intv_sprite_type *s;
 
 	//logerror("stic_w(%x) = %x\n",offset,data);

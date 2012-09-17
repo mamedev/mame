@@ -43,7 +43,7 @@ Notes:
 
 static READ8_HANDLER( trvquest_question_r )
 {
-	gameplan_state *state = space->machine().driver_data<gameplan_state>();
+	gameplan_state *state = space.machine().driver_data<gameplan_state>();
 
 	return state->memregion("questions")->base()[*state->m_trvquest_question * 0x2000 + offset];
 }

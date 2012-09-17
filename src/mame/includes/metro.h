@@ -132,7 +132,7 @@ public:
 	DECLARE_WRITE16_MEMBER(metro_vram_1_w);
 	DECLARE_WRITE16_MEMBER(metro_vram_2_w);
 	DECLARE_WRITE16_MEMBER(metro_window_w);
-	void blt_write( address_space *space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask );
+	void blt_write( address_space &space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask );
 	DECLARE_CUSTOM_INPUT_MEMBER(custom_soundstatus_r);
 	DECLARE_WRITE16_MEMBER(gakusai_oki_bank_hi_w);
 	DECLARE_WRITE16_MEMBER(gakusai_oki_bank_lo_w);

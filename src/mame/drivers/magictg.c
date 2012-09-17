@@ -334,7 +334,7 @@ static void voodoo_0_pci_w(device_t *busdevice, device_t *device, int function, 
 #if defined(USE_TWO_3DFX)
 static UINT32 voodoo_1_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
 {
-	magictg_state* state = space->machine().driver_data<magictg_state>();
+	magictg_state* state = space.machine().driver_data<magictg_state>();
 	UINT32 val = 0;
 
 	switch (reg)
@@ -356,7 +356,7 @@ static UINT32 voodoo_1_pci_r(device_t *busdevice, device_t *device, int function
 
 static void voodoo_1_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
-	magictg_state* state = space->machine().driver_data<magictg_state>();
+	magictg_state* state = space.machine().driver_data<magictg_state>();
 
 	switch (reg)
 	{
@@ -473,7 +473,7 @@ READ32_MEMBER( magictg_state::zr36120_r )
 	else
 	{
 		/* Post office */
-		res = 0;//mame_rand(space->machine);//m_zr36120.as_regs[0x48/4];
+		res = 0;//mame_rand(space.machine);//m_zr36120.as_regs[0x48/4];
 	}
 	mame_printf_debug("PINKEYE_R[%x]\n", offset);
 	return res;

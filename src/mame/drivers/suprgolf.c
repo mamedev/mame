@@ -270,7 +270,7 @@ WRITE8_MEMBER(suprgolf_state::rom_bank_select_w)
 
 	//popmessage("%08x %02x",((data & 0x3f) * 0x4000),data);
 
-//  mame_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,space->device().safe_pcbase());
+//  mame_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,space.device().safe_pcbase());
 	membank("bank2")->set_base(region_base + (data&0x3f ) * 0x4000);
 
 	m_msm_nmi_mask = data & 0x40;

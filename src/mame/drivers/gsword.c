@@ -191,13 +191,13 @@ static READ8_HANDLER( gsword_8741_2_r )
 	switch (offset)
 	{
 	case 0x01: /* start button , coins */
-		return space->machine().root_device().ioport("IN0")->read();
+		return space.machine().root_device().ioport("IN0")->read();
 	case 0x02: /* Player 1 Controller */
-		return space->machine().root_device().ioport("IN1")->read();
+		return space.machine().root_device().ioport("IN1")->read();
 	case 0x04: /* Player 2 Controller */
-		return space->machine().root_device().ioport("IN3")->read();
+		return space.machine().root_device().ioport("IN3")->read();
 //  default:
-//      logerror("8741-2 unknown read %d PC=%04x\n",offset,space->device().safe_pc());
+//      logerror("8741-2 unknown read %d PC=%04x\n",offset,space.device().safe_pc());
 	}
 	/* unknown */
 	return 0;
@@ -208,14 +208,14 @@ static READ8_HANDLER( gsword_8741_3_r )
 	switch (offset)
 	{
 	case 0x01: /* start button  */
-		return space->machine().root_device().ioport("IN2")->read();
+		return space.machine().root_device().ioport("IN2")->read();
 	case 0x02: /* Player 1 Controller? */
-		return space->machine().root_device().ioport("IN1")->read();
+		return space.machine().root_device().ioport("IN1")->read();
 	case 0x04: /* Player 2 Controller? */
-		return space->machine().root_device().ioport("IN3")->read();
+		return space.machine().root_device().ioport("IN3")->read();
 	}
 	/* unknown */
-//  logerror("8741-3 unknown read %d PC=%04x\n",offset,space->device().safe_pc());
+//  logerror("8741-3 unknown read %d PC=%04x\n",offset,space.device().safe_pc());
 	return 0;
 }
 

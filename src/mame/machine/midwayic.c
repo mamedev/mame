@@ -205,17 +205,17 @@ UINT8 midway_serial_pic_status_r(void)
 }
 
 
-UINT8 midway_serial_pic_r(address_space *space)
+UINT8 midway_serial_pic_r(address_space &space)
 {
-	logerror("%s:security R = %04X\n", space->machine().describe_context(), serial.buffer);
+	logerror("%s:security R = %04X\n", space.machine().describe_context(), serial.buffer);
 	serial.status = 1;
 	return serial.buffer;
 }
 
 
-void midway_serial_pic_w(address_space *space, UINT8 data)
+void midway_serial_pic_w(address_space &space, UINT8 data)
 {
-	logerror("%s:security W = %04X\n", space->machine().describe_context(), data);
+	logerror("%s:security W = %04X\n", space.machine().describe_context(), data);
 
 	/* status seems to reflect the clock bit */
 	serial.status = (data >> 4) & 1;
@@ -292,31 +292,31 @@ void midway_serial_pic2_set_default_nvram(const UINT8 *nvram)
 }
 
 
-UINT8 midway_serial_pic2_status_r(address_space *space)
+UINT8 midway_serial_pic2_status_r(address_space &space)
 {
 	UINT8 result = 0;
 
 	/* if we're still holding the data ready bit high, do it */
 	if (pic.latch & 0xf00)
 	{
-		if (space->machine().time() > pic.latch_expire_time)
+		if (space.machine().time() > pic.latch_expire_time)
 			pic.latch &= 0xff;
 		else
 			pic.latch -= 0x100;
 		result = 1;
 	}
 
-	logerror("%s:PIC status %d\n", space->machine().describe_context(), result);
+	logerror("%s:PIC status %d\n", space.machine().describe_context(), result);
 	return result;
 }
 
 
-UINT8 midway_serial_pic2_r(address_space *space)
+UINT8 midway_serial_pic2_r(address_space &space)
 {
 	UINT8 result = 0;
 
 	/* PIC data register */
-	logerror("%s:PIC data read (index=%d total=%d latch=%03X) =", space->machine().describe_context(), pic.index, pic.total, pic.latch);
+	logerror("%s:PIC data read (index=%d total=%d latch=%03X) =", space.machine().describe_context(), pic.index, pic.total, pic.latch);
 
 	/* return the current result */
 	if (pic.latch & 0xf00)
@@ -331,9 +331,9 @@ UINT8 midway_serial_pic2_r(address_space *space)
 }
 
 
-void midway_serial_pic2_w(address_space *space, UINT8 data)
+void midway_serial_pic2_w(address_space &space, UINT8 data)
 {
-	running_machine &machine = space->machine();
+	running_machine &machine = space.machine();
 	static FILE *nvramlog;
 	if (LOG_NVRAM && !nvramlog)
 		nvramlog = fopen("nvram.log", "w");
@@ -862,7 +862,7 @@ READ32_HANDLER( midway_ioasic_r )
 	switch (offset)
 	{
 		case IOASIC_PORT0:
-			result = space->machine().root_device().ioport("DIPS")->read();
+			result = space.machine().root_device().ioport("DIPS")->read();
 			/* bit 0 seems to be a ready flag before shuffling happens */
 			if (!ioasic.shuffle_active)
 			{
@@ -874,15 +874,15 @@ READ32_HANDLER( midway_ioasic_r )
 			break;
 
 		case IOASIC_PORT1:
-			result = space->machine().root_device().ioport("SYSTEM")->read();
+			result = space.machine().root_device().ioport("SYSTEM")->read();
 			break;
 
 		case IOASIC_PORT2:
-			result = space->machine().root_device().ioport("IN1")->read();
+			result = space.machine().root_device().ioport("IN1")->read();
 			break;
 
 		case IOASIC_PORT3:
-			result = space->machine().root_device().ioport("IN2")->read();
+			result = space.machine().root_device().ioport("IN2")->read();
 			break;
 
 		case IOASIC_UARTIN:
@@ -894,13 +894,13 @@ READ32_HANDLER( midway_ioasic_r )
 			result = 0;
 			if (ioasic.has_dcs)
 			{
-				result |= ((dcs_control_r(space->machine()) >> 4) ^ 0x40) & 0x00c0;
-				result |= ioasic_fifo_status_r(&space->device()) & 0x0038;
-				result |= dcs_data2_r(space->machine()) & 0xff00;
+				result |= ((dcs_control_r(space.machine()) >> 4) ^ 0x40) & 0x00c0;
+				result |= ioasic_fifo_status_r(&space.device()) & 0x0038;
+				result |= dcs_data2_r(space.machine()) & 0xff00;
 			}
 			else if (ioasic.has_cage)
 			{
-				result |= (cage_control_r(space->machine()) << 6) ^ 0x80;
+				result |= (cage_control_r(space.machine()) << 6) ^ 0x80;
 			}
 			else
 				result |= 0x48;
@@ -910,9 +910,9 @@ READ32_HANDLER( midway_ioasic_r )
 			result = 0;
 			if (ioasic.has_dcs)
 			{
-				result = dcs_data_r(space->machine());
+				result = dcs_data_r(space.machine());
 				if (ioasic.auto_ack)
-					dcs_ack_w(space->machine());
+					dcs_ack_w(space.machine());
 			}
 			else if (ioasic.has_cage)
 				result = cage_main_r(space);
@@ -932,7 +932,7 @@ READ32_HANDLER( midway_ioasic_r )
 	}
 
 	if (LOG_IOASIC && offset != IOASIC_SOUNDSTAT && offset != IOASIC_SOUNDIN)
-		logerror("%06X:ioasic_r(%d) = %08X\n", space->device().safe_pc(), offset, result);
+		logerror("%06X:ioasic_r(%d) = %08X\n", space.device().safe_pc(), offset, result);
 
 	return result;
 }
@@ -957,7 +957,7 @@ WRITE32_HANDLER( midway_ioasic_w )
 	newreg = ioasic.reg[offset];
 
 	if (LOG_IOASIC && offset != IOASIC_SOUNDOUT)
-		logerror("%06X:ioasic_w(%d) = %08X\n", space->device().safe_pc(), offset, data);
+		logerror("%06X:ioasic_w(%d) = %08X\n", space.device().safe_pc(), offset, data);
 
 	switch (offset)
 	{
@@ -984,7 +984,7 @@ WRITE32_HANDLER( midway_ioasic_w )
 			{
 				/* we're in loopback mode -- copy to the input */
 				ioasic.reg[IOASIC_UARTIN] = (newreg & 0x00ff) | 0x1000;
-				update_ioasic_irq(space->machine());
+				update_ioasic_irq(space.machine());
 			}
 			else if (PRINTF_DEBUG)
 				mame_printf_debug("%c", data & 0xff);
@@ -994,31 +994,31 @@ WRITE32_HANDLER( midway_ioasic_w )
 			/* sound reset? */
 			if (ioasic.has_dcs)
 			{
-				dcs_reset_w(space->machine(), ~newreg & 1);
+				dcs_reset_w(space.machine(), ~newreg & 1);
 			}
 			else if (ioasic.has_cage)
 			{
 				if ((oldreg ^ newreg) & 1)
 				{
-					cage_control_w(space->machine(), 0);
+					cage_control_w(space.machine(), 0);
 					if (!(~newreg & 1))
-						cage_control_w(space->machine(), 3);
+						cage_control_w(space.machine(), 3);
 				}
 			}
 
 			/* FIFO reset? */
-			midway_ioasic_fifo_reset_w(space->machine(), ~newreg & 4);
+			midway_ioasic_fifo_reset_w(space.machine(), ~newreg & 4);
 			break;
 
 		case IOASIC_SOUNDOUT:
 			if (ioasic.has_dcs)
-				dcs_data_w(space->machine(), newreg);
+				dcs_data_w(space.machine(), newreg);
 			else if (ioasic.has_cage)
 				cage_main_w(space, newreg);
 			break;
 
 		case IOASIC_SOUNDIN:
-			dcs_ack_w(space->machine());
+			dcs_ack_w(space.machine());
 			/* acknowledge data read */
 			break;
 
@@ -1040,7 +1040,7 @@ WRITE32_HANDLER( midway_ioasic_w )
 			/* bit 14 = LED? */
 			if ((oldreg ^ newreg) & 0x3ff6)
 				logerror("IOASIC int control = %04X\n", data);
-			update_ioasic_irq(space->machine());
+			update_ioasic_irq(space.machine());
 			break;
 
 		default:

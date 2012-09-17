@@ -112,16 +112,16 @@ MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 {
 	UINT8 *messram = machine().device<ram_device>(RAM_TAG)->pointer();
 	device_t *beta = machine().device(BETA_DISK_TAG);
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	space->install_read_bank(0x0000, 0x3fff, "bank1");
-	space->unmap_write(0x0000, 0x3fff);
+	space.install_read_bank(0x0000, 0x3fff, "bank1");
+	space.unmap_write(0x0000, 0x3fff);
 
 	if (beta->started())  {
 		betadisk_enable(beta);
 		betadisk_clear_status(beta);
 	}
-	space->set_direct_update_handler(direct_update_delegate(FUNC(pentagon_state::pentagon_direct), this));
+	space.set_direct_update_handler(direct_update_delegate(FUNC(pentagon_state::pentagon_direct), this));
 
 	memset(messram,0,128*1024);
 

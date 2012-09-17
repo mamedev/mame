@@ -12,7 +12,7 @@
 #include "video/cgapal.h"
 
 
-#define CGA_MONITOR		(space->machine().root_device().ioport("VIDEO")->read() & 0x1C)
+#define CGA_MONITOR		(space.machine().root_device().ioport("VIDEO")->read() & 0x1C)
 #define CGA_MONITOR_RGB			0x00	/* Colour RGB */
 #define CGA_MONITOR_MONO		0x04	/* Greyscale RGB */
 #define CGA_MONITOR_COMPOSITE	0x08	/* Colour composite */
@@ -496,17 +496,17 @@ static READ8_HANDLER ( pc_aga_mda_r )
 	UINT8 data = 0xFF;
 
 	if ( aga.mode == AGA_MONO ) {
-		mc6845_device *mc6845 = space->machine().device<mc6845_device>(AGA_MC6845_NAME);
+		mc6845_device *mc6845 = space.machine().device<mc6845_device>(AGA_MC6845_NAME);
 		switch( offset )
 		{
 		case 0: case 2: case 4: case 6:
 			/* return last written mc6845 address value here? */
 			break;
 		case 1: case 3: case 5: case 7:
-			data = mc6845->register_r(*space, offset);
+			data = mc6845->register_r(space, offset);
 			break;
 		case 10:
-			data = (space->machine().root_device().ioport("IN0")->read() & 0x80 ) | 0x08 | aga.mda_status;
+			data = (space.machine().root_device().ioport("IN0")->read() & 0x80 ) | 0x08 | aga.mda_status;
 			aga.mda_status ^= 0x01;
 			break;
 		/* 12, 13, 14  are the LPT1 ports */
@@ -518,14 +518,14 @@ static READ8_HANDLER ( pc_aga_mda_r )
 static WRITE8_HANDLER ( pc_aga_mda_w )
 {
 	if ( aga.mode == AGA_MONO ) {
-		mc6845_device *mc6845 = space->machine().device<mc6845_device>(AGA_MC6845_NAME);
+		mc6845_device *mc6845 = space.machine().device<mc6845_device>(AGA_MC6845_NAME);
 		switch( offset )
 		{
 			case 0: case 2: case 4: case 6:
-				mc6845->address_w( *space, offset, data );
+				mc6845->address_w( space, offset, data );
 				break;
 			case 1: case 3: case 5: case 7:
-				mc6845->register_w( *space, offset, data );
+				mc6845->register_w( space, offset, data );
 				break;
 			case 8:
 				aga.mda_mode_control = data;
@@ -551,13 +551,13 @@ static READ8_HANDLER ( pc_aga_cga_r )
 	UINT8 data = 0xFF;
 
 	if ( aga.mode == AGA_COLOR ) {
-		mc6845_device *mc6845 = space->machine().device<mc6845_device>(AGA_MC6845_NAME);
+		mc6845_device *mc6845 = space.machine().device<mc6845_device>(AGA_MC6845_NAME);
 		switch( offset ) {
 		case 0: case 2: case 4: case 6:
 			/* return last written mc6845 address value here? */
 			break;
 		case 1: case 3: case 5: case 7:
-			data = mc6845->register_r( *space, offset);
+			data = mc6845->register_r( space, offset);
 			break;
 		case 10:
 			data = aga.vsync | ( ( data & 0x40 ) >> 4 ) | aga.hsync;
@@ -597,14 +597,14 @@ static void pc_aga_set_palette_luts(void) {
 static WRITE8_HANDLER ( pc_aga_cga_w )
 {
 	if ( aga.mode == AGA_COLOR ) {
-		mc6845_device *mc6845 = space->machine().device<mc6845_device>(AGA_MC6845_NAME);
+		mc6845_device *mc6845 = space.machine().device<mc6845_device>(AGA_MC6845_NAME);
 
 		switch(offset) {
 		case 0: case 2: case 4: case 6:
-			mc6845->address_w( *space, offset, data );
+			mc6845->address_w( space, offset, data );
 			break;
 		case 1: case 3: case 5: case 7:
-			mc6845->register_w( *space, offset, data );
+			mc6845->register_w( space, offset, data );
 			break;
 		case 8:
 			aga.cga_mode_control = data;
@@ -689,19 +689,19 @@ void pc_aga_set_mode(running_machine &machine, AGA_MODE mode)
 
 VIDEO_START( pc_aga )
 {
-	address_space *space = machine.firstcpu->space(AS_PROGRAM);
+	address_space &space = *machine.firstcpu->space(AS_PROGRAM);
 	address_space *spaceio = machine.firstcpu->space(AS_IO);
 	int buswidth = machine.firstcpu->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
-			space->install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc200_videoram_r), FUNC(pc200_videoram_w) );
+			space.install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc200_videoram_r), FUNC(pc200_videoram_w) );
 			spaceio->install_legacy_readwrite_handler(0x3b0, 0x3bf, FUNC(pc_aga_mda_r), FUNC(pc_aga_mda_w) );
 			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_aga_cga_r), FUNC(pc_aga_cga_w) );
 			break;
 
 		case 16:
-			space->install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc200_videoram_r), FUNC(pc200_videoram_w), 0xffff );
+			space.install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc200_videoram_r), FUNC(pc200_videoram_w), 0xffff );
 			spaceio->install_legacy_readwrite_handler(0x3b0, 0x3bf, FUNC(pc_aga_mda_r), FUNC(pc_aga_mda_w), 0xffff );
 			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_aga_cga_r), FUNC(pc_aga_cga_w), 0xffff );
 			break;
@@ -720,19 +720,19 @@ VIDEO_START( pc_aga )
 
 VIDEO_START( pc200 )
 {
-	address_space *space = machine.firstcpu->space(AS_PROGRAM);
+	address_space &space = *machine.firstcpu->space(AS_PROGRAM);
 	address_space *spaceio = machine.firstcpu->space(AS_IO);
 	int buswidth = machine.firstcpu->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
-			space->install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc_aga_videoram_r), FUNC(pc_aga_videoram_w) );
+			space.install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc_aga_videoram_r), FUNC(pc_aga_videoram_w) );
 			spaceio->install_legacy_readwrite_handler(0x3b0, 0x3bf, FUNC(pc_aga_mda_r), FUNC(pc_aga_mda_w) );
 			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc200_cga_r),  FUNC(pc200_cga_w) );
 			break;
 
 		case 16:
-			space->install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc_aga_videoram_r), FUNC(pc_aga_videoram_w), 0xffff );
+			space.install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc_aga_videoram_r), FUNC(pc_aga_videoram_w), 0xffff );
 			spaceio->install_legacy_readwrite_handler(0x3b0, 0x3bf, FUNC(pc_aga_mda_r), FUNC(pc_aga_mda_w), 0xffff );
 			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc200_cga_r),  FUNC(pc200_cga_w), 0xffff );
 			break;
@@ -836,11 +836,11 @@ WRITE8_HANDLER( pc200_cga_w )
 		if ((pc200.porte & 7) != (data & 7))
 		{
 			if (data & 4)
-				pc_aga_set_mode(space->machine(), AGA_OFF);
+				pc_aga_set_mode(space.machine(), AGA_OFF);
 			else if (data & 2)
-				pc_aga_set_mode(space->machine(), AGA_MONO);
+				pc_aga_set_mode(space.machine(), AGA_MONO);
 			else
-				pc_aga_set_mode(space->machine(), AGA_COLOR);
+				pc_aga_set_mode(space.machine(), AGA_COLOR);
 		}
 		pc200.porte = data;
 		break;
@@ -868,7 +868,7 @@ READ8_HANDLER ( pc200_cga_r )
 	case 0xe:
 		// 0x20 low cga
 		// 0x10 low special
-		result = space->machine().root_device().ioport("DSW0")->read() & 0x38;
+		result = space.machine().root_device().ioport("DSW0")->read() & 0x38;
 		break;
 
 	default:

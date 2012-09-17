@@ -119,7 +119,7 @@ static WRITE8_HANDLER( control_w )
 		if ( data & 8 )	  dm01.busy = 0;
 		else			  dm01.busy = 1;
 
-		dm01.intf->busy_func(space->machine(),dm01.busy);
+		dm01.intf->busy_func(space.machine(),dm01.busy);
 	}
 }
 
@@ -209,7 +209,7 @@ static READ8_HANDLER( unknown_r )
 
 static WRITE8_HANDLER( unknown_w )
 {
-	space->machine().device("matrix")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE ); //?
+	space.machine().device("matrix")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE ); //?
 }
 
 ///////////////////////////////////////////////////////////////////////////

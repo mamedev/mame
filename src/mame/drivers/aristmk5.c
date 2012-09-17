@@ -209,7 +209,7 @@ READ32_MEMBER(aristmk5_state::mk5_ioc_r)
 		return (m_flyback) | (ioc_regs[CONTROL] & 0x7c) | (1<<1) | 1;
 	}
 
-	return archimedes_ioc_r(&space,offset,mem_mask);
+	return archimedes_ioc_r(space,offset,mem_mask);
 }
 
 WRITE32_MEMBER(aristmk5_state::mk5_ioc_w)
@@ -228,7 +228,7 @@ WRITE32_MEMBER(aristmk5_state::mk5_ioc_w)
 			return;
 		}
 		else
-			archimedes_ioc_w(&space,offset,data,mem_mask);
+			archimedes_ioc_w(space,offset,data,mem_mask);
 	}
 }
 

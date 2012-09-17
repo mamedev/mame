@@ -1346,10 +1346,10 @@ static void nimbus_debug(running_machine &machine, int ref, int params, const ch
 static int instruction_hook(device_t &device, offs_t curpc)
 {
 	rmnimbus_state	*state = device.machine().driver_data<rmnimbus_state>();
-    address_space	*space = device.memory().space(AS_PROGRAM);
+    address_space	&space = *device.memory().space(AS_PROGRAM);
     UINT8           *addr_ptr;
 
-    addr_ptr = (UINT8*)space->get_read_ptr(curpc);
+    addr_ptr = (UINT8*)space.get_read_ptr(curpc);
 
 	if ((addr_ptr !=NULL) && (addr_ptr[0]==0xCD))
 	{
@@ -1713,19 +1713,19 @@ static void decode_subbios(device_t *device,offs_t pc, UINT8 raw_flag)
 	}
 }
 
-static void *get_dssi_ptr(address_space *space, UINT16   ds, UINT16 si)
+static void *get_dssi_ptr(address_space &space, UINT16   ds, UINT16 si)
 {
     int             addr;
 
     addr=((ds<<4)+si);
 //    OUTPUT_SEGOFS("DS:SI",ds,si);
 
-    return space->get_read_ptr(addr);
+    return space.get_read_ptr(addr);
 }
 
 static void decode_dssi_generic(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
-	address_space *space = device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+	address_space &space = *device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
     UINT16  *params;
 	int		count;
 
@@ -1743,7 +1743,7 @@ static void decode_dssi_generic(device_t *device,UINT16  ds, UINT16 si, UINT8 ra
 
 static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
-    address_space *space = device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+    address_space &space = *device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
 
     UINT16          *addr_ptr;
     t_area_params   *area_params;
@@ -1755,7 +1755,7 @@ static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si, UINT
     if (!raw_flag)
 		OUTPUT_SEGOFS("SegBrush:OfsBrush",area_params->seg_brush,area_params->ofs_brush);
 
-	brush=(t_nimbus_brush  *)space->get_read_ptr(LINEAR_ADDR(area_params->seg_brush,area_params->ofs_brush));
+	brush=(t_nimbus_brush  *)space.get_read_ptr(LINEAR_ADDR(area_params->seg_brush,area_params->ofs_brush));
 
     if(raw_flag)
 	{
@@ -1776,7 +1776,7 @@ static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si, UINT
 		OUTPUT_SEGOFS("SegData:OfsData",area_params->seg_data,area_params->ofs_data);
 	}
 
-    addr_ptr = (UINT16 *)space->get_read_ptr(LINEAR_ADDR(area_params->seg_data,area_params->ofs_data));
+    addr_ptr = (UINT16 *)space.get_read_ptr(LINEAR_ADDR(area_params->seg_data,area_params->ofs_data));
     for(cocount=0; cocount < area_params->count; cocount++)
     {
 		if(raw_flag)
@@ -1796,7 +1796,7 @@ static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si, UINT
 
 static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
-    address_space *space = device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+    address_space &space = *device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
 
     UINT8       			*char_ptr;
     t_plot_string_params	*plot_string_params;
@@ -1812,7 +1812,7 @@ static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UIN
 
     logerror("x=%d, y=%d, length=%d\n",plot_string_params->x,plot_string_params->y,plot_string_params->length);
 
-    char_ptr=(UINT8*)space->get_read_ptr(LINEAR_ADDR(plot_string_params->seg_data,plot_string_params->ofs_data));
+    char_ptr=(UINT8*)space.get_read_ptr(LINEAR_ADDR(plot_string_params->seg_data,plot_string_params->ofs_data));
 
     if (plot_string_params->length==0xFFFF)
         logerror("%s",char_ptr);
@@ -1825,7 +1825,7 @@ static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UIN
 
 static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
-    address_space *space = device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+    address_space &space = *device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
     UINT16  *new_colours;
     int     colour;
     new_colours=(UINT16  *)get_dssi_ptr(space,ds,si);
@@ -1842,7 +1842,7 @@ static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si, UI
 
 static void decode_dssi_f_plonk_char(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
-    address_space *space = device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+    address_space &space = *device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
     UINT16  *params;
     params=(UINT16  *)get_dssi_ptr(space,ds,si);
 
@@ -1856,7 +1856,7 @@ static void decode_dssi_f_plonk_char(device_t *device,UINT16  ds, UINT16 si, UIN
 
 static void decode_dssi_f_rw_sectors(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
-    address_space *space = device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+    address_space &space = *device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
     UINT16  *params;
     int     param_no;
 
@@ -1992,7 +1992,7 @@ static const nimbus_blocks ramblocks[] =
 static void nimbus_bank_memory(running_machine &machine)
 {
 	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-    address_space *space = machine.device( MAINCPU_TAG)->memory().space( AS_PROGRAM );
+    address_space &space = *machine.device( MAINCPU_TAG)->memory().space( AS_PROGRAM );
     int     ramsize = machine.device<ram_device>(RAM_TAG)->size();
     int     ramblock = 0;
     int     blockno;
@@ -2049,12 +2049,12 @@ static void nimbus_bank_memory(running_machine &machine)
             map_base=(ramsel==0x07) ? map_blocks[map_blockno] : &map_blocks[map_blockno][block_ofs*1024];
 
             state->membank(bank)->set_base(map_base);
-            space->install_readwrite_bank(memmap[blockno].start, memmap[blockno].end, bank);
+            space.install_readwrite_bank(memmap[blockno].start, memmap[blockno].end, bank);
             //if(LOG_RAM) logerror(", base=%X\n",(int)map_base);
         }
         else
         {
-            space->nop_readwrite(memmap[blockno].start, memmap[blockno].end);
+            space.nop_readwrite(memmap[blockno].start, memmap[blockno].end);
             if(LOG_RAM) logerror("NOP\n");
         }
     }

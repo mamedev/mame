@@ -125,7 +125,7 @@ READ32_MEMBER(eolith_state::eolith_custom_r)
         bit 8 = ???
         bit 9 = ???
     */
-	eolith_speedup_read(&space);
+	eolith_speedup_read(space);
 
 	return (ioport("IN0")->read() & ~0x300) | (machine().rand() & 0x300);
 }

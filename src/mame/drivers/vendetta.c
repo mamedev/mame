@@ -164,19 +164,19 @@ WRITE8_MEMBER(vendetta_state::vendetta_K052109_w)
 static void vendetta_video_banking( running_machine &machine, int select )
 {
 	vendetta_state *state = machine.driver_data<vendetta_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (select & 1)
 	{
-		space->install_read_bank(state->m_video_banking_base + 0x2000, state->m_video_banking_base + 0x2fff, "bank4" );
-		space->install_write_handler(state->m_video_banking_base + 0x2000, state->m_video_banking_base + 0x2fff, write8_delegate(FUNC(vendetta_state::paletteram_xBBBBBGGGGGRRRRR_byte_be_w), state) );
-		space->install_legacy_readwrite_handler(*state->m_k053246, state->m_video_banking_base + 0x0000, state->m_video_banking_base + 0x0fff, FUNC(k053247_r), FUNC(k053247_w) );
+		space.install_read_bank(state->m_video_banking_base + 0x2000, state->m_video_banking_base + 0x2fff, "bank4" );
+		space.install_write_handler(state->m_video_banking_base + 0x2000, state->m_video_banking_base + 0x2fff, write8_delegate(FUNC(vendetta_state::paletteram_xBBBBBGGGGGRRRRR_byte_be_w), state) );
+		space.install_legacy_readwrite_handler(*state->m_k053246, state->m_video_banking_base + 0x0000, state->m_video_banking_base + 0x0fff, FUNC(k053247_r), FUNC(k053247_w) );
 		state->membank("bank4")->set_base(state->m_generic_paletteram_8);
 	}
 	else
 	{
-		space->install_readwrite_handler(state->m_video_banking_base + 0x2000, state->m_video_banking_base + 0x2fff, read8_delegate(FUNC(vendetta_state::vendetta_K052109_r),state), write8_delegate(FUNC(vendetta_state::vendetta_K052109_w),state) );
-		space->install_legacy_readwrite_handler(*state->m_k052109, state->m_video_banking_base + 0x0000, state->m_video_banking_base + 0x0fff, FUNC(k052109_r), FUNC(k052109_w) );
+		space.install_readwrite_handler(state->m_video_banking_base + 0x2000, state->m_video_banking_base + 0x2fff, read8_delegate(FUNC(vendetta_state::vendetta_K052109_r),state), write8_delegate(FUNC(vendetta_state::vendetta_K052109_w),state) );
+		space.install_legacy_readwrite_handler(*state->m_k052109, state->m_video_banking_base + 0x0000, state->m_video_banking_base + 0x0fff, FUNC(k052109_r), FUNC(k052109_w) );
 	}
 }
 

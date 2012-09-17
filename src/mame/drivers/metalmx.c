@@ -352,7 +352,7 @@ READ32_MEMBER(metalmx_state::sound_data_r)
 	if (ACCESSING_BITS_0_15)
 		result |= cage_control_r(machine());
 	if (ACCESSING_BITS_16_31)
-		result |= cage_main_r(&space) << 16;
+		result |= cage_main_r(space) << 16;
 	return result;
 }
 
@@ -361,7 +361,7 @@ WRITE32_MEMBER(metalmx_state::sound_data_w)
 	if (ACCESSING_BITS_0_15)
 		cage_control_w(machine(), data);
 	if (ACCESSING_BITS_16_31)
-		cage_main_w(&space, data >> 16);
+		cage_main_w(space, data >> 16);
 }
 
 static void cage_irq_callback(running_machine &machine, int reason)

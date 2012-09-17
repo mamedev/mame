@@ -405,44 +405,44 @@ const via6522_interface pet_via =
 
 static WRITE8_HANDLER( cbm8096_io_w )
 {
-	via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
-	pia6821_device *pia_0 = space->machine().device<pia6821_device>("pia_0");
-	pia6821_device *pia_1 = space->machine().device<pia6821_device>("pia_1");
-	mc6845_device *mc6845 = space->machine().device<mc6845_device>("crtc");
+	via6522_device *via_0 = space.machine().device<via6522_device>("via6522_0");
+	pia6821_device *pia_0 = space.machine().device<pia6821_device>("pia_0");
+	pia6821_device *pia_1 = space.machine().device<pia6821_device>("pia_1");
+	mc6845_device *mc6845 = space.machine().device<mc6845_device>("crtc");
 
 	if (offset < 0x10) ;
-	else if (offset < 0x14) pia_0->write(*space, offset & 3, data);
+	else if (offset < 0x14) pia_0->write(space, offset & 3, data);
 	else if (offset < 0x20) ;
-	else if (offset < 0x24) pia_1->write(*space, offset & 3, data);
+	else if (offset < 0x24) pia_1->write(space, offset & 3, data);
 	else if (offset < 0x40) ;
-	else if (offset < 0x50) via_0->write(*space, offset & 0xf, data);
+	else if (offset < 0x50) via_0->write(space, offset & 0xf, data);
 	else if (offset < 0x80) ;
-	else if (offset == 0x80) mc6845->address_w(*space, 0, data);
-	else if (offset == 0x81) mc6845->register_w(*space, 0, data);
+	else if (offset == 0x80) mc6845->address_w(space, 0, data);
+	else if (offset == 0x81) mc6845->register_w(space, 0, data);
 }
 
 static READ8_HANDLER( cbm8096_io_r )
 {
-	via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
-	pia6821_device *pia_0 = space->machine().device<pia6821_device>("pia_0");
-	pia6821_device *pia_1 = space->machine().device<pia6821_device>("pia_1");
-	mc6845_device *mc6845 = space->machine().device<mc6845_device>("crtc");
+	via6522_device *via_0 = space.machine().device<via6522_device>("via6522_0");
+	pia6821_device *pia_0 = space.machine().device<pia6821_device>("pia_0");
+	pia6821_device *pia_1 = space.machine().device<pia6821_device>("pia_1");
+	mc6845_device *mc6845 = space.machine().device<mc6845_device>("crtc");
 
 	int data = 0xff;
 	if (offset < 0x10) ;
-	else if (offset < 0x14) data = pia_0->read(*space, offset & 3);
+	else if (offset < 0x14) data = pia_0->read(space, offset & 3);
 	else if (offset < 0x20) ;
-	else if (offset < 0x24) data = pia_1->read(*space, offset & 3);
+	else if (offset < 0x24) data = pia_1->read(space, offset & 3);
 	else if (offset < 0x40) ;
-	else if (offset < 0x50) data = via_0->read(*space, offset & 0xf);
+	else if (offset < 0x50) data = via_0->read(space, offset & 0xf);
 	else if (offset < 0x80) ;
-	else if (offset == 0x81) data = mc6845->register_r(*space, 0);
+	else if (offset == 0x81) data = mc6845->register_r(space, 0);
 	return data;
 }
 
 static WRITE8_HANDLER( pet80_bank1_w )
 {
-	pet_state *state = space->machine().driver_data<pet_state>();
+	pet_state *state = space.machine().driver_data<pet_state>();
 	state->m_pet80_bank1_base[offset] = data;
 }
 
@@ -459,56 +459,56 @@ static WRITE8_HANDLER( pet80_bank1_w )
 */
 WRITE8_HANDLER( cbm8096_w )
 {
-	pet_state *state = space->machine().driver_data<pet_state>();
+	pet_state *state = space.machine().driver_data<pet_state>();
 	if (data & 0x80)
 	{
 		if (data & 0x40)
 		{
-			space->install_legacy_read_handler(0xe800, 0xefff, FUNC(cbm8096_io_r));
-			space->install_legacy_write_handler(0xe800, 0xefff, FUNC(cbm8096_io_w));
+			space.install_legacy_read_handler(0xe800, 0xefff, FUNC(cbm8096_io_r));
+			space.install_legacy_write_handler(0xe800, 0xefff, FUNC(cbm8096_io_w));
 		}
 		else
 		{
-			space->install_read_bank(0xe800, 0xefff, "bank7");
+			space.install_read_bank(0xe800, 0xefff, "bank7");
 			if (!(data & 2))
-				space->install_write_bank(0xe800, 0xefff, "bank7");
+				space.install_write_bank(0xe800, 0xefff, "bank7");
 			else
-				space->nop_write(0xe800, 0xefff);
+				space.nop_write(0xe800, 0xefff);
 		}
 
 
 		if ((data & 2) == 0) {
-			space->install_write_bank(0xc000, 0xe7ff, "bank6");
-			space->install_write_bank(0xf000, 0xffef, "bank8");
-			space->install_write_bank(0xfff1, 0xffff, "bank9");
+			space.install_write_bank(0xc000, 0xe7ff, "bank6");
+			space.install_write_bank(0xf000, 0xffef, "bank8");
+			space.install_write_bank(0xfff1, 0xffff, "bank9");
 		} else {
-			space->nop_write(0xc000, 0xe7ff);
-			space->nop_write(0xf000, 0xffef);
-			space->nop_write(0xfff1, 0xffff);
+			space.nop_write(0xc000, 0xe7ff);
+			space.nop_write(0xf000, 0xffef);
+			space.nop_write(0xfff1, 0xffff);
 		}
 
 		if (data & 0x20)
 		{
 			state->m_pet80_bank1_base = state->m_memory + 0x8000;
 			state->membank("bank1")->set_base(state->m_pet80_bank1_base);
-			space->install_legacy_write_handler(0x8000, 0x8fff, FUNC(pet80_bank1_w));
+			space.install_legacy_write_handler(0x8000, 0x8fff, FUNC(pet80_bank1_w));
 		}
 		else
 		{
 			if (!(data & 1))
-				space->install_write_bank(0x8000, 0x8fff, "bank1");
+				space.install_write_bank(0x8000, 0x8fff, "bank1");
 			else
-				space->nop_write(0x8000, 0x8fff);
+				space.nop_write(0x8000, 0x8fff);
 		}
 
 		if ((data & 1) == 0 ){
-			space->install_write_bank(0x9000, 0x9fff, "bank2");
-			space->install_write_bank(0xa000, 0xafff, "bank3");
-			space->install_write_bank(0xb000, 0xbfff, "bank4");
+			space.install_write_bank(0x9000, 0x9fff, "bank2");
+			space.install_write_bank(0xa000, 0xafff, "bank3");
+			space.install_write_bank(0xb000, 0xbfff, "bank4");
 		} else {
-			space->nop_write(0x9000, 0x9fff);
-			space->nop_write(0xa000, 0xafff);
-			space->nop_write(0xb000, 0xbfff);
+			space.nop_write(0x9000, 0x9fff);
+			space.nop_write(0xa000, 0xafff);
+			space.nop_write(0xb000, 0xbfff);
 		}
 
 		if (data & 4)
@@ -559,28 +559,28 @@ WRITE8_HANDLER( cbm8096_w )
 	{
 		state->m_pet80_bank1_base = state->m_memory + 0x8000;
 		state->membank("bank1")->set_base(state->m_pet80_bank1_base );
-		space->install_legacy_write_handler(0x8000, 0x8fff, FUNC(pet80_bank1_w));
+		space.install_legacy_write_handler(0x8000, 0x8fff, FUNC(pet80_bank1_w));
 
 		state->membank("bank2")->set_base(state->m_memory + 0x9000);
-		space->unmap_write(0x9000, 0x9fff);
+		space.unmap_write(0x9000, 0x9fff);
 
 		state->membank("bank3")->set_base(state->m_memory + 0xa000);
-		space->unmap_write(0xa000, 0xafff);
+		space.unmap_write(0xa000, 0xafff);
 
 		state->membank("bank4")->set_base(state->m_memory + 0xb000);
-		space->unmap_write(0xb000, 0xbfff);
+		space.unmap_write(0xb000, 0xbfff);
 
 		state->membank("bank6")->set_base(state->m_memory + 0xc000);
-		space->unmap_write(0xc000, 0xe7ff);
+		space.unmap_write(0xc000, 0xe7ff);
 
-		space->install_legacy_read_handler(0xe800, 0xefff, FUNC(cbm8096_io_r));
-		space->install_legacy_write_handler(0xe800, 0xefff, FUNC(cbm8096_io_w));
+		space.install_legacy_read_handler(0xe800, 0xefff, FUNC(cbm8096_io_r));
+		space.install_legacy_write_handler(0xe800, 0xefff, FUNC(cbm8096_io_w));
 
 		state->membank("bank8")->set_base(state->m_memory + 0xf000);
-		space->unmap_write(0xf000, 0xffef);
+		space.unmap_write(0xf000, 0xffef);
 
 		state->membank("bank9")->set_base(state->m_memory + 0xfff1);
-		space->unmap_write(0xfff1, 0xffff);
+		space.unmap_write(0xfff1, 0xffff);
 	}
 }
 
@@ -591,7 +591,7 @@ READ8_HANDLER( superpet_r )
 
 WRITE8_HANDLER( superpet_w )
 {
-	pet_state *state = space->machine().driver_data<pet_state>();
+	pet_state *state = space.machine().driver_data<pet_state>();
 	switch (offset)
 	{
 		case 0:
@@ -749,7 +749,7 @@ void pet_state::machine_reset()
 		{
 			machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xfff0, 0xfff0);
 		}
-		cbm8096_w(machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
+		cbm8096_w(*machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
 	}
 
 //removed   cbm_drive_0_config (machine().root_device().ioport("CFG")->read() & 2 ? IEEE : 0, 8);

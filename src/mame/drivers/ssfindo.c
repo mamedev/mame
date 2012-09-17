@@ -350,23 +350,23 @@ static void PS7500_reset(running_machine &machine)
 		state->m_PS7500timer1->adjust( attotime::never);
 }
 
-typedef void (*ssfindo_speedup_func)(address_space *space);
+typedef void (*ssfindo_speedup_func)(address_space &space);
 ssfindo_speedup_func ssfindo_speedup;
 
-static void ssfindo_speedups(address_space* space)
+static void ssfindo_speedups(address_space& space)
 {
-	if (space->device().safe_pc()==0x2d6c8) // ssfindo
-		space->device().execute().spin_until_time(attotime::from_usec(20));
-	else if (space->device().safe_pc()==0x2d6bc) // ssfindo
-		space->device().execute().spin_until_time(attotime::from_usec(20));
+	if (space.device().safe_pc()==0x2d6c8) // ssfindo
+		space.device().execute().spin_until_time(attotime::from_usec(20));
+	else if (space.device().safe_pc()==0x2d6bc) // ssfindo
+		space.device().execute().spin_until_time(attotime::from_usec(20));
 }
 
-static void ppcar_speedups(address_space* space)
+static void ppcar_speedups(address_space& space)
 {
-	if (space->device().safe_pc()==0x000bc8) // ppcar
-		space->device().execute().spin_until_time(attotime::from_usec(20));
-	else if (space->device().safe_pc()==0x000bbc) // ppcar
-		space->device().execute().spin_until_time(attotime::from_usec(20));
+	if (space.device().safe_pc()==0x000bc8) // ppcar
+		space.device().execute().spin_until_time(attotime::from_usec(20));
+	else if (space.device().safe_pc()==0x000bbc) // ppcar
+		space.device().execute().spin_until_time(attotime::from_usec(20));
 }
 
 
@@ -394,7 +394,7 @@ READ32_MEMBER(ssfindo_state::PS7500_IO_r)
 			return (m_PS7500_IO[IRQSTA] & m_PS7500_IO[IRQMSKA]) | 0x80;
 
 		case IOCR: //TODO: nINT1, OD[n] p.81
-			if (ssfindo_speedup) ssfindo_speedup(&space);
+			if (ssfindo_speedup) ssfindo_speedup(space);
 
 			if( m_iocr_hack)
 			{

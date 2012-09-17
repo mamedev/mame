@@ -37,8 +37,8 @@
 #include "formats/pc_dsk.h"
 #include "machine/ram.h"
 
-static READ8_HANDLER(at_dma8237_1_r)  { return i8237_r(space->machine().device("dma8237_2"), *space, offset / 2); }
-static WRITE8_HANDLER(at_dma8237_1_w) { i8237_w(space->machine().device("dma8237_2"), *space, offset / 2, data); }
+static READ8_HANDLER(at_dma8237_1_r)  { return i8237_r(space.machine().device("dma8237_2"), space, offset / 2); }
+static WRITE8_HANDLER(at_dma8237_1_w) { i8237_w(space.machine().device("dma8237_2"), space, offset / 2, data); }
 
 static ADDRESS_MAP_START( bebox_mem, AS_PROGRAM, 64, bebox_state )
 	AM_RANGE(0x7FFFF0F0, 0x7FFFF0F7) AM_READWRITE_LEGACY(bebox_cpu0_imask_r, bebox_cpu0_imask_w )
@@ -76,15 +76,15 @@ ADDRESS_MAP_END
 
 static READ64_HANDLER(bb_slave_64be_r)
 {
-	pci_bus_device *device = space->machine().device<pci_bus_device>("pcibus");
+	pci_bus_device *device = space.machine().device<pci_bus_device>("pcibus");
 
 	// 2e94 is the real address, 2e84 is where the PC appears to be under full DRC
-	if ((space->device().safe_pc() == 0xfff02e94) || (space->device().safe_pc() == 0xfff02e84))
+	if ((space.device().safe_pc() == 0xfff02e94) || (space.device().safe_pc() == 0xfff02e84))
 	{
 		return 0x108000ff;	// indicate slave CPU
 	}
 
-	return device->read_64be(*space, offset, mem_mask);
+	return device->read_64be(space, offset, mem_mask);
 }
 
 static ADDRESS_MAP_START( bebox_slave_mem, AS_PROGRAM, 64, bebox_state )

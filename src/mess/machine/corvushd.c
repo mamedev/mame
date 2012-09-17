@@ -1622,14 +1622,14 @@ READ8_HANDLER ( corvus_hdc_data_r ) {
 		c->xmit_bytes = 0;		// We don't have anything more to say
 		c->recv_bytes = 0;		// No active commands
 
-		space->machine().scheduler().timer_set((attotime::from_usec(INTERBYTE_DELAY)), FUNC(corvus_hdc_callback), CALLBACK_HTC_MODE);
+		space.machine().scheduler().timer_set((attotime::from_usec(INTERBYTE_DELAY)), FUNC(corvus_hdc_callback), CALLBACK_HTC_MODE);
 
 //      c->status &= ~(CONTROLLER_DIRECTION | CONTROLLER_BUSY); // Put us in Idle, Host-to-Controller mode
 	} else {
 		//
 		// Not finished with this packet.  Insert an interbyte delay and then let the host continue
 		//
-		space->machine().scheduler().timer_set((attotime::from_usec(INTERBYTE_DELAY)), FUNC(corvus_hdc_callback), CALLBACK_SAME_MODE);
+		space.machine().scheduler().timer_set((attotime::from_usec(INTERBYTE_DELAY)), FUNC(corvus_hdc_callback), CALLBACK_SAME_MODE);
 	}
 
 	return result;
@@ -1692,7 +1692,7 @@ WRITE8_HANDLER ( corvus_hdc_data_w ) {
 	// to the user with us Ready for more data and in Host-to-Controller mode.
 	//
 	if(c->offset == c->recv_bytes) {						// We've received enough data to process
-		corvus_process_command_packet(space->machine(), c->invalid_command_flag);
+		corvus_process_command_packet(space.machine(), c->invalid_command_flag);
 	} else {
 		//
 		// Reset the four-second timer since we received some data
@@ -1703,6 +1703,6 @@ WRITE8_HANDLER ( corvus_hdc_data_w ) {
 		// Make the controller busy for a few microseconds while the command is processed
 		//
 		c->status |= CONTROLLER_BUSY;
-		space->machine().scheduler().timer_set((attotime::from_usec(INTERBYTE_DELAY)), FUNC(corvus_hdc_callback), CALLBACK_SAME_MODE);
+		space.machine().scheduler().timer_set((attotime::from_usec(INTERBYTE_DELAY)), FUNC(corvus_hdc_callback), CALLBACK_SAME_MODE);
 	}
 }

@@ -356,8 +356,8 @@ DECLARE_WRITE16_DEVICE_HANDLER( hdsnddsp_dac_w );
 /*----------- defined in video/harddriv.c -----------*/
 
 
-void hdgsp_write_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg);
-void hdgsp_read_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg);
+void hdgsp_write_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
+void hdgsp_read_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
 
 READ16_HANDLER( hdgsp_control_lo_r );
 WRITE16_HANDLER( hdgsp_control_lo_w );

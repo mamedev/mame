@@ -6,13 +6,13 @@
 
 READ16_HANDLER( m68307_internal_timer_r )
 {
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
 	m68307_timer* timer = m68k->m68307TIMER;
 	assert(timer != NULL);
 
 	if (timer)
 	{
-		int pc = space->device().safe_pc();
+		int pc = space.device().safe_pc();
 		int which = offset & 0x8;
 
 		switch (offset&0x7)
@@ -34,13 +34,13 @@ READ16_HANDLER( m68307_internal_timer_r )
 
 WRITE16_HANDLER( m68307_internal_timer_w )
 {
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
 	m68307_timer* timer = m68k->m68307TIMER;
 	assert(timer != NULL);
 
 	if (timer)
 	{
-		int pc = space->device().safe_pc();
+		int pc = space.device().safe_pc();
 		int which = offset & 0x8;
 
 		switch (offset&0x7)

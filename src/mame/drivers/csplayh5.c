@@ -585,14 +585,14 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 void csplayh5_state::machine_reset()
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	// initialize TMPZ84C011 PIO
 	for (i = 0; i < 5; i++)
 	{
 		m_pio_dir[i] = m_pio_latch[i] = 0;
-		tmpz84c011_pio_w(*space, i, 0);
+		tmpz84c011_pio_w(space, i, 0);
 	}
 }
 

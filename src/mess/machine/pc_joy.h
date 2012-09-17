@@ -26,8 +26,8 @@ public:
 	pc_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ioport_constructor device_input_ports() const;
 
-	DECLARE_READ8_MEMBER(joy_port_r) { return pc_JOY_r(&space, offset); }
-	DECLARE_WRITE8_MEMBER(joy_port_w) { pc_JOY_w(&space, offset, data); }
+	DECLARE_READ8_MEMBER(joy_port_r) { return pc_JOY_r(space, offset); }
+	DECLARE_WRITE8_MEMBER(joy_port_w) { pc_JOY_w(space, offset, data); }
 protected:
 	virtual void device_start() {}
 };

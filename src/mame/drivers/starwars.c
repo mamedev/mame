@@ -48,7 +48,7 @@ void starwars_state::machine_reset()
 	/* ESB-specific */
 	if (m_is_esb)
 	{
-		address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		/* reset the slapstic */
 		slapstic_reset();
@@ -56,7 +56,7 @@ void starwars_state::machine_reset()
 		memcpy(m_slapstic_base, &m_slapstic_source[m_slapstic_current_bank * 0x2000], 0x2000);
 
 		/* reset all the banks */
-		starwars_out_w(*space, 4, 0);
+		starwars_out_w(space, 4, 0);
 	}
 
 	/* reset the matrix processor */
@@ -84,9 +84,9 @@ WRITE8_MEMBER(starwars_state::irq_ack_w)
  *
  *************************************/
 
-static void esb_slapstic_tweak(address_space *space, offs_t offset)
+static void esb_slapstic_tweak(address_space &space, offs_t offset)
 {
-	starwars_state *state = space->machine().driver_data<starwars_state>();
+	starwars_state *state = space.machine().driver_data<starwars_state>();
 	int new_bank = slapstic_tweak(space, offset);
 
 	/* update for the new bank */
@@ -101,14 +101,14 @@ static void esb_slapstic_tweak(address_space *space, offs_t offset)
 READ8_MEMBER(starwars_state::esb_slapstic_r)
 {
 	int result = m_slapstic_base[offset];
-	esb_slapstic_tweak(&space, offset);
+	esb_slapstic_tweak(space, offset);
 	return result;
 }
 
 
 WRITE8_MEMBER(starwars_state::esb_slapstic_w)
 {
-	esb_slapstic_tweak(&space, offset);
+	esb_slapstic_tweak(space, offset);
 }
 
 
@@ -135,7 +135,7 @@ DIRECT_UPDATE_MEMBER(starwars_state::esb_setdirect)
 		{
 			m_slapstic_last_pc = pc;
 			m_slapstic_last_address = address;
-			esb_slapstic_tweak(&direct.space(), address & 0x1fff);
+			esb_slapstic_tweak(direct.space(), address & 0x1fff);
 		}
 		return ~0;
 	}
@@ -514,8 +514,8 @@ DRIVER_INIT_MEMBER(starwars_state,esb)
 	m_slapstic_base = &rom[0x08000];
 
 	/* install an opcode base handler */
-	address_space *space = machine().device<m6809_device>("maincpu")->space(AS_PROGRAM);
-	space->set_direct_update_handler(direct_update_delegate(FUNC(starwars_state::esb_setdirect), this));
+	address_space &space = *machine().device<m6809_device>("maincpu")->space(AS_PROGRAM);
+	space.set_direct_update_handler(direct_update_delegate(FUNC(starwars_state::esb_setdirect), this));
 
 	/* install read/write handlers for it */
 	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x8000, 0x9fff, read8_delegate(FUNC(starwars_state::esb_slapstic_r),this), write8_delegate(FUNC(starwars_state::esb_slapstic_w),this));

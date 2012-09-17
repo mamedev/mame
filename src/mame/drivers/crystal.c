@@ -195,13 +195,13 @@ public:
 static void IntReq( running_machine &machine, int num )
 {
 	crystal_state *state = machine.driver_data<crystal_state>();
-	address_space *space = state->m_maincpu->space(AS_PROGRAM);
-	UINT32 IntEn = space->read_dword(0x01800c08);
-	UINT32 IntPend = space->read_dword(0x01800c0c);
+	address_space &space = *state->m_maincpu->space(AS_PROGRAM);
+	UINT32 IntEn = space.read_dword(0x01800c08);
+	UINT32 IntPend = space.read_dword(0x01800c0c);
 	if (IntEn & (1 << num))
 	{
 		IntPend |= (1 << num);
-		space->write_dword(0x01800c0c, IntPend);
+		space.write_dword(0x01800c0c, IntPend);
 		state->m_maincpu->set_input_line(SE3208_INT, ASSERT_LINE);
 	}
 #ifdef IDLE_LOOP_SPEEDUP
@@ -273,8 +273,8 @@ WRITE32_MEMBER(crystal_state::IntAck_w)
 static IRQ_CALLBACK( icallback )
 {
 	crystal_state *state = device->machine().driver_data<crystal_state>();
-	address_space *space = device->memory().space(AS_PROGRAM);
-	UINT32 IntPend = space->read_dword(0x01800c0c);
+	address_space &space = *device->memory().space(AS_PROGRAM);
+	UINT32 IntPend = space.read_dword(0x01800c0c);
 	int i;
 
 	for (i = 0; i < 32; ++i)
@@ -309,14 +309,14 @@ static TIMER_CALLBACK( Timercb )
 	IntReq(machine, num[which]);
 }
 
-INLINE void Timer_w( address_space *space, int which, UINT32 data, UINT32 mem_mask )
+INLINE void Timer_w( address_space &space, int which, UINT32 data, UINT32 mem_mask )
 {
-	crystal_state *state = space->machine().driver_data<crystal_state>();
+	crystal_state *state = space.machine().driver_data<crystal_state>();
 
 	if (((data ^ state->m_Timerctrl[which]) & 1) && (data & 1))	//Timer activate
 	{
 		int PD = (data >> 8) & 0xff;
-		int TCV = space->read_dword(0x01801404 + which * 8);
+		int TCV = space.read_dword(0x01801404 + which * 8);
 		attotime period = attotime::from_hz(43000000) * ((PD + 1) * (TCV + 1));
 
 		if (state->m_Timerctrl[which] & 2)
@@ -329,7 +329,7 @@ INLINE void Timer_w( address_space *space, int which, UINT32 data, UINT32 mem_ma
 
 WRITE32_MEMBER(crystal_state::Timer0_w)
 {
-	Timer_w(&space, 0, data, mem_mask);
+	Timer_w(space, 0, data, mem_mask);
 }
 
 READ32_MEMBER(crystal_state::Timer0_r)
@@ -339,7 +339,7 @@ READ32_MEMBER(crystal_state::Timer0_r)
 
 WRITE32_MEMBER(crystal_state::Timer1_w)
 {
-	Timer_w(&space, 1, data, mem_mask);
+	Timer_w(space, 1, data, mem_mask);
 }
 
 READ32_MEMBER(crystal_state::Timer1_r)
@@ -349,7 +349,7 @@ READ32_MEMBER(crystal_state::Timer1_r)
 
 WRITE32_MEMBER(crystal_state::Timer2_w)
 {
-	Timer_w(&space, 2, data, mem_mask);
+	Timer_w(space, 2, data, mem_mask);
 }
 
 READ32_MEMBER(crystal_state::Timer2_r)
@@ -359,7 +359,7 @@ READ32_MEMBER(crystal_state::Timer2_r)
 
 WRITE32_MEMBER(crystal_state::Timer3_w)
 {
-	Timer_w(&space, 3, data, mem_mask);
+	Timer_w(space, 3, data, mem_mask);
 }
 
 READ32_MEMBER(crystal_state::Timer3_r)
@@ -418,45 +418,45 @@ WRITE32_MEMBER(crystal_state::PIO_w)
 	COMBINE_DATA(&m_PIO);
 }
 
-INLINE void DMA_w( address_space *space, int which, UINT32 data, UINT32 mem_mask )
+INLINE void DMA_w( address_space &space, int which, UINT32 data, UINT32 mem_mask )
 {
-	crystal_state *state = space->machine().driver_data<crystal_state>();
+	crystal_state *state = space.machine().driver_data<crystal_state>();
 
 	if (((data ^ state->m_DMActrl[which]) & (1 << 10)) && (data & (1 << 10)))	//DMAOn
 	{
 		UINT32 CTR = data;
-		UINT32 SRC = space->read_dword(0x01800804 + which * 0x10);
-		UINT32 DST = space->read_dword(0x01800808 + which * 0x10);
-		UINT32 CNT = space->read_dword(0x0180080C + which * 0x10);
+		UINT32 SRC = space.read_dword(0x01800804 + which * 0x10);
+		UINT32 DST = space.read_dword(0x01800808 + which * 0x10);
+		UINT32 CNT = space.read_dword(0x0180080C + which * 0x10);
 		int i;
 
 		if (CTR & 0x2)	//32 bits
 		{
 			for (i = 0; i < CNT; ++i)
 			{
-				UINT32 v = space->read_dword(SRC + i * 4);
-				space->write_dword(DST + i * 4, v);
+				UINT32 v = space.read_dword(SRC + i * 4);
+				space.write_dword(DST + i * 4, v);
 			}
 		}
 		else if (CTR & 0x1)	//16 bits
 		{
 			for (i = 0; i < CNT; ++i)
 			{
-				UINT16 v = space->read_word(SRC + i * 2);
-				space->write_word(DST + i * 2, v);
+				UINT16 v = space.read_word(SRC + i * 2);
+				space.write_word(DST + i * 2, v);
 			}
 		}
 		else	//8 bits
 		{
 			for (i = 0; i < CNT; ++i)
 			{
-				UINT8 v = space->read_byte(SRC + i);
-				space->write_byte(DST + i, v);
+				UINT8 v = space.read_byte(SRC + i);
+				space.write_byte(DST + i, v);
 			}
 		}
 		data &= ~(1 << 10);
-		space->write_dword(0x0180080C + which * 0x10, 0);
-		IntReq(space->machine(), 7 + which);
+		space.write_dword(0x0180080C + which * 0x10, 0);
+		IntReq(space.machine(), 7 + which);
 	}
 	COMBINE_DATA(&state->m_DMActrl[which]);
 }
@@ -468,7 +468,7 @@ READ32_MEMBER(crystal_state::DMA0_r)
 
 WRITE32_MEMBER(crystal_state::DMA0_w)
 {
-	DMA_w(&space, 0, data, mem_mask);
+	DMA_w(space, 0, data, mem_mask);
 }
 
 READ32_MEMBER(crystal_state::DMA1_r)
@@ -478,7 +478,7 @@ READ32_MEMBER(crystal_state::DMA1_r)
 
 WRITE32_MEMBER(crystal_state::DMA1_w)
 {
-	DMA_w(&space, 1, data, mem_mask);
+	DMA_w(space, 1, data, mem_mask);
 }
 
 
@@ -636,21 +636,21 @@ void crystal_state::machine_reset()
 	PatchReset(machine());
 }
 
-static UINT16 GetVidReg( address_space *space, UINT16 reg )
+static UINT16 GetVidReg( address_space &space, UINT16 reg )
 {
-	return space->read_word(0x03000000 + reg);
+	return space.read_word(0x03000000 + reg);
 }
 
-static void SetVidReg( address_space *space, UINT16 reg, UINT16 val )
+static void SetVidReg( address_space &space, UINT16 reg, UINT16 val )
 {
-	space->write_word(0x03000000 + reg, val);
+	space.write_word(0x03000000 + reg, val);
 }
 
 
 static SCREEN_UPDATE_IND16( crystal )
 {
 	crystal_state *state = screen.machine().driver_data<crystal_state>();
-	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int DoFlip;
 
 	UINT32 B0 = 0x0;
@@ -716,7 +716,7 @@ static SCREEN_VBLANK(crystal)
 	if (vblank_on)
 	{
 		crystal_state *state = screen.machine().driver_data<crystal_state>();
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 		UINT16 head, tail;
 		int DoFlip = 0;
 
@@ -724,7 +724,7 @@ static SCREEN_VBLANK(crystal)
 		tail = GetVidReg(space, 0x80);
 		while ((head & 0x7ff) != (tail & 0x7ff))
 		{
-			UINT16 Packet0 = space->read_word(0x03800000 + head * 64);
+			UINT16 Packet0 = space.read_word(0x03800000 + head * 64);
 			if (Packet0 & 0x81)
 				DoFlip = 1;
 			head++;

@@ -166,7 +166,7 @@ WRITE16_HANDLER( tmp68301_regs_w )
 
 	if (!ACCESSING_BITS_0_7)	return;
 
-//  logerror("CPU #0 PC %06X: TMP68301 Reg %04X<-%04X & %04X\n",space->device().safe_pc(),offset*2,data,mem_mask^0xffff);
+//  logerror("CPU #0 PC %06X: TMP68301 Reg %04X<-%04X & %04X\n",space.device().safe_pc(),offset*2,data,mem_mask^0xffff);
 
 	switch( offset * 2 )
 	{
@@ -177,7 +177,7 @@ WRITE16_HANDLER( tmp68301_regs_w )
 		{
 			int i = ((offset*2) >> 5) & 3;
 
-			tmp68301_update_timer( space->machine(), i );
+			tmp68301_update_timer( space.machine(), i );
 		}
 		break;
 	}

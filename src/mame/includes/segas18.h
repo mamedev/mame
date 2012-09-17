@@ -113,9 +113,9 @@ public:
 
 	// wrappers for legacy functions (to be removed)
 	template<read16_space_func _Legacy>
-	READ16_MEMBER( legacy_wrapper_r ) { return _Legacy(&space, offset, mem_mask); }
+	READ16_MEMBER( legacy_wrapper_r ) { return _Legacy(space, offset, mem_mask); }
 	template<write16_space_func _Legacy>
-	WRITE16_MEMBER( legacy_wrapper ) { _Legacy(&space, offset, data, mem_mask); }
+	WRITE16_MEMBER( legacy_wrapper ) { _Legacy(space, offset, data, mem_mask); }
 
 protected:
 	// timer IDs

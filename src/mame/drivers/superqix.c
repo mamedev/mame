@@ -172,13 +172,13 @@ The MCU acts this way:
 
 READ8_MEMBER(superqix_state::in4_mcu_r)
 {
-//  logerror("%04x: in4_mcu_r\n",space->device().safe_pc());
+//  logerror("%04x: in4_mcu_r\n",space.device().safe_pc());
 	return ioport("P2")->read() | (m_from_mcu_pending << 6) | (m_from_z80_pending << 7);
 }
 
 READ8_MEMBER(superqix_state::sqix_from_mcu_r)
 {
-//  logerror("%04x: read mcu answer (%02x)\n",space->device().safe_pc(),m_from_mcu);
+//  logerror("%04x: read mcu answer (%02x)\n",space.device().safe_pc(),m_from_mcu);
 	return m_from_mcu;
 }
 
@@ -198,7 +198,7 @@ READ8_MEMBER(superqix_state::mcu_acknowledge_r)
 
 WRITE8_MEMBER(superqix_state::sqix_z80_mcu_w)
 {
-//  logerror("%04x: sqix_z80_mcu_w %02x\n",space->device().safe_pc(),data);
+//  logerror("%04x: sqix_z80_mcu_w %02x\n",space.device().safe_pc(),data);
 	m_portb = data;
 }
 
@@ -473,7 +473,7 @@ READ8_MEMBER(superqix_state::hotsmash_from_mcu_r)
 
 READ8_MEMBER(superqix_state::hotsmash_ay_port_a_r)
 {
-//  logerror("%04x: ay_port_a_r and mcu_pending is %d\n",space->device().safe_pc(),m_from_mcu_pending);
+//  logerror("%04x: ay_port_a_r and mcu_pending is %d\n",space.device().safe_pc(),m_from_mcu_pending);
 	return ioport("SYSTEM")->read() | 0x40 | ((m_from_mcu_pending^1) << 7);
 }
 
@@ -515,7 +515,7 @@ READ8_MEMBER(superqix_state::pbillian_from_mcu_r)
 
 READ8_MEMBER(superqix_state::pbillian_ay_port_a_r)
 {
-//  logerror("%04x: ay_port_a_r\n",space->device().safe_pc());
+//  logerror("%04x: ay_port_a_r\n",space.device().safe_pc());
 	/* bits 76------  MCU status bits */
 	return (machine().rand() & 0xc0) | machine().root_device().ioport("BUTTONS")->read();
 }

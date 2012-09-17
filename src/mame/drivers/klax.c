@@ -48,8 +48,8 @@ static void scanline_update(screen_device &screen, int scanline)
 
 WRITE16_MEMBER(klax_state::interrupt_ack_w)
 {
-	atarigen_scanline_int_ack_w(&space, offset, data, mem_mask);
-	atarigen_video_int_ack_w(&space, offset, data, mem_mask);
+	atarigen_scanline_int_ack_w(space, offset, data, mem_mask);
+	atarigen_video_int_ack_w(space, offset, data, mem_mask);
 }
 
 

@@ -86,15 +86,15 @@ READ16_MEMBER(jpmimpct_state::jpmimpct_bt477_r)
  *
  *************************************/
 
-void jpmimpct_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
+void jpmimpct_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
-	jpmimpct_state *state = space->machine().driver_data<jpmimpct_state>();
+	jpmimpct_state *state = space.machine().driver_data<jpmimpct_state>();
 	memcpy(shiftreg, &state->m_vram[TOWORD(address)], 512 * sizeof(UINT16));
 }
 
-void jpmimpct_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
+void jpmimpct_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
-	jpmimpct_state *state = space->machine().driver_data<jpmimpct_state>();
+	jpmimpct_state *state = space.machine().driver_data<jpmimpct_state>();
 	memcpy(&state->m_vram[TOWORD(address)], shiftreg, 512 * sizeof(UINT16));
 }
 

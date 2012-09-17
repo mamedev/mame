@@ -120,11 +120,11 @@ static int decrypt(int const param1, int const param2, int const enc_prev_word, 
 
 
 
-UINT16 gaelco_decrypt(address_space *space, int offset, int data, int param1, int param2)
+UINT16 gaelco_decrypt(address_space &space, int offset, int data, int param1, int param2)
 {
 	static int lastpc, lastoffset, lastencword, lastdecword;
 
-	int thispc = space->device().safe_pc();
+	int thispc = space.device().safe_pc();
 //  int savedata = data;
 
 	/* check if 2nd half of 32 bit */
@@ -146,7 +146,7 @@ UINT16 gaelco_decrypt(address_space *space, int offset, int data, int param1, in
 
 		lastdecword = data;
 
-//      logerror("%s : data1 = %4x > %4x @ %8x\n",space->machine().describe_context(),savedata,data,lastoffset);
+//      logerror("%s : data1 = %4x > %4x @ %8x\n",space.machine().describe_context(),savedata,data,lastoffset);
 	}
 	return data;
 }

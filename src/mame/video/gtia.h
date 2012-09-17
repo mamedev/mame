@@ -15,8 +15,8 @@
 
 struct gtia_interface
 {
-	UINT8 (*console_read)(address_space *space);
-	void (*console_write)(address_space *space, UINT8 data);
+	UINT8 (*console_read)(address_space &space);
+	void (*console_write)(address_space &space, UINT8 data);
 };
 
 

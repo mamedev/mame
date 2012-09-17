@@ -92,7 +92,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(galivan_state::blit_trigger_w)
 {
 
-	nb_1414m4_exec(&space,(m_videoram[0] << 8) | (m_videoram[1] & 0xff),m_videoram,m_scrollx,m_scrolly,m_tx_tilemap);
+	nb_1414m4_exec(space,(m_videoram[0] << 8) | (m_videoram[1] & 0xff),m_videoram,m_scrollx,m_scrolly,m_tx_tilemap);
 }
 
 static ADDRESS_MAP_START( ninjemak_io_map, AS_IO, 8, galivan_state )

@@ -165,14 +165,14 @@ void hector_disc2_reset(running_machine &machine)
 /*****************************************************************************/
 READ8_HANDLER( hector_disc2_io00_port_r)
 {
-	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
+	hec2hrp_state *state = space.machine().driver_data<hec2hrp_state>();
 	/* Switch Disc 2 to RAM to let full RAM acces */
 	state->membank("bank3")->set_entry(DISCII_BANK_RAM);
 	return 0;
 }
 WRITE8_HANDLER( hector_disc2_io00_port_w)
 {
-	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
+	hec2hrp_state *state = space.machine().driver_data<hec2hrp_state>();
 	/* Switch Disc 2 to RAM to let full RAM acces */
 	state->membank("bank3")->set_entry(DISCII_BANK_RAM);
 }
@@ -187,7 +187,7 @@ WRITE8_HANDLER( hector_disc2_io20_port_w)
 }
 READ8_HANDLER( hector_disc2_io30_port_r)
 {
-	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
+	hec2hrp_state *state = space.machine().driver_data<hec2hrp_state>();
 	return state->m_hector_disc2_data_r_ready;
 }
 WRITE8_HANDLER( hector_disc2_io30_port_w)
@@ -197,7 +197,7 @@ WRITE8_HANDLER( hector_disc2_io30_port_w)
 
 READ8_HANDLER( hector_disc2_io40_port_r)
 {
-	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
+	hec2hrp_state *state = space.machine().driver_data<hec2hrp_state>();
 	/* Read data send by Hector, by Disc2*/
 	state->m_hector_disc2_data_r_ready = 0x00;	/* Clear memory info read ready*/
 	return state->m_hector_disc2_data_read;		/* send the data !*/
@@ -205,27 +205,27 @@ READ8_HANDLER( hector_disc2_io40_port_r)
 
 WRITE8_HANDLER( hector_disc2_io40_port_w)	/* Write data send by Disc2, to Hector*/
 {
-	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
+	hec2hrp_state *state = space.machine().driver_data<hec2hrp_state>();
 	state->m_hector_disc2_data_write = data;		/* Memorization data*/
 	state->m_hector_disc2_data_w_ready = 0x80;	/* Memorization data write ready in D7*/
 }
 
 READ8_HANDLER( hector_disc2_io50_port_r)	/*Read memory info write ready*/
 {
-	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
+	hec2hrp_state *state = space.machine().driver_data<hec2hrp_state>();
 	return state->m_hector_disc2_data_w_ready;
 }
 
 WRITE8_HANDLER( hector_disc2_io50_port_w) /* I/O Port to the stuff of Disc2*/
 {
-	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
-	device_t *fdc = space->machine().device("upd765");
+	hec2hrp_state *state = space.machine().driver_data<hec2hrp_state>();
+	device_t *fdc = space.machine().device("upd765");
 
 	/* FDC Motor Control - Bit 0/1 defines the state of the FDD 0/1 motor */
-	floppy_mon_w(floppy_get_device(space->machine(), 0), BIT(data, 0));	// Moteur floppy A:
-	floppy_mon_w(floppy_get_device(space->machine(), 1), BIT(data, 1));	// Moteur floppy B:
-	floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0), FLOPPY_DRIVE_READY,!BIT(data, 0));
-	floppy_drive_set_ready_state(floppy_get_device(space->machine(), 1), FLOPPY_DRIVE_READY,!BIT(data, 1));
+	floppy_mon_w(floppy_get_device(space.machine(), 0), BIT(data, 0));	// Moteur floppy A:
+	floppy_mon_w(floppy_get_device(space.machine(), 1), BIT(data, 1));	// Moteur floppy B:
+	floppy_drive_set_ready_state(floppy_get_device(space.machine(), 0), FLOPPY_DRIVE_READY,!BIT(data, 0));
+	floppy_drive_set_ready_state(floppy_get_device(space.machine(), 1), FLOPPY_DRIVE_READY,!BIT(data, 1));
 
 	/* Write bit TC uPD765 on D4 of port I/O 50 */
 	upd765_tc_w(fdc, BIT(data, 4));  // Seems not used...
@@ -236,7 +236,7 @@ WRITE8_HANDLER( hector_disc2_io50_port_w) /* I/O Port to the stuff of Disc2*/
 
 	/* if RNMI is OK, try to lauch an NMI*/
 	if (state->m_hector_disc2_RNMI)
-		valid_interrupt(space->machine());
+		valid_interrupt(space.machine());
 }
 
 //Here we must take the exchange with uPD against AM_DEVREADWRITE
@@ -245,10 +245,10 @@ WRITE8_HANDLER( hector_disc2_io50_port_w) /* I/O Port to the stuff of Disc2*/
 //  AM_RANGE(0x061,0x061) AM_DEVREADWRITE("upd765",upd765_data_r,upd765_data_w)
 READ8_HANDLER( hector_disc2_io61_port_r)
 {
-	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
+	hec2hrp_state *state = space.machine().driver_data<hec2hrp_state>();
 	UINT8 data;
-	device_t *fdc = space->machine().device("upd765");
-	data = upd765_data_r(fdc,*space, 0); //Get the result
+	device_t *fdc = space.machine().device("upd765");
+	data = upd765_data_r(fdc,space, 0); //Get the result
 
 // if ST0 == 0x28 (drive A:) or 0x29 (drive B:) => add 0x40
 // and correct the ST1 and ST2 (patch)
@@ -280,7 +280,7 @@ READ8_HANDLER( hector_disc2_io61_port_r)
 }
 WRITE8_HANDLER( hector_disc2_io61_port_w)
 {
-	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
+	hec2hrp_state *state = space.machine().driver_data<hec2hrp_state>();
 	/* Data useful to patch the RESULT in case of write command */
 	state->m_hector_cmd[9]=state->m_hector_cmd[8];  //hector_cmd_8 = Cde number when state->m_hector_nb_cde = 9
 	state->m_hector_cmd[8]=state->m_hector_cmd[7];  //hector_cmd_7 = Drive
@@ -308,20 +308,20 @@ WRITE8_HANDLER( hector_disc2_io61_port_w)
 		state->m_print=0;
 #endif
 
-	device_t *fdc = space->machine().device("upd765");
-	upd765_data_w(fdc,*space, 0, data);
+	device_t *fdc = space.machine().device("upd765");
+	upd765_data_w(fdc,space, 0, data);
 }
 
 //  AM_RANGE(0x070,0x07f) AM_DEVREADWRITE("upd765",upd765_dack_r,upd765_dack_w)
 READ8_HANDLER( hector_disc2_io70_port_r) // Gestion du DMA
 {
 	UINT8 data;
-	device_t *fdc = space->machine().device("upd765");
-	data = upd765_dack_r(fdc,*space, 0);
+	device_t *fdc = space.machine().device("upd765");
+	data = upd765_dack_r(fdc,space, 0);
 	return data;
 }
 WRITE8_HANDLER( hector_disc2_io70_port_w)
 {
-	device_t *fdc = space->machine().device("upd765");
-	upd765_dack_w(fdc,*space, 0, data);
+	device_t *fdc = space.machine().device("upd765");
+	upd765_dack_w(fdc,space, 0, data);
 }

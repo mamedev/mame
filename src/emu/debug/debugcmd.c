@@ -159,9 +159,9 @@ static void execute_unmount(running_machine &machine, int ref, int params, const
     given address is valid for cheating
 -------------------------------------------------*/
 
-INLINE int cheat_address_is_valid(address_space *space, offs_t address)
+INLINE int cheat_address_is_valid(address_space &space, offs_t address)
 {
-	return debug_cpu_translate(space, TRANSLATE_READ, &address) && (space->get_write_ptr(address) != NULL);
+	return debug_cpu_translate(space, TRANSLATE_READ, &address) && (space.get_write_ptr(address) != NULL);
 }
 
 
@@ -208,7 +208,7 @@ INLINE UINT64 cheat_byte_swap(const cheat_system *cheatsys, UINT64 value)
     and swapping if necessary
 -------------------------------------------------*/
 
-INLINE UINT64 cheat_read_extended(const cheat_system *cheatsys, address_space *space, offs_t address)
+INLINE UINT64 cheat_read_extended(const cheat_system *cheatsys, address_space &space, offs_t address)
 {
 	return cheat_sign_extend(cheatsys, cheat_byte_swap(cheatsys, debug_read_memory(space, address, cheatsys->width, TRUE)));
 }
@@ -557,7 +557,7 @@ int debug_command_parameter_cpu(running_machine &machine, const char *param, dev
     address space
 -------------------------------------------------*/
 
-int debug_command_parameter_cpu_space(running_machine &machine, const char *param, int spacenum, address_space **result)
+int debug_command_parameter_cpu_space(running_machine &machine, const char *param, int spacenum, address_space *&result)
 {
 	device_t *cpu;
 
@@ -566,8 +566,8 @@ int debug_command_parameter_cpu_space(running_machine &machine, const char *para
 		return FALSE;
 
 	/* fetch the space pointer */
-	*result = cpu->memory().space(spacenum);
-	if (*result == NULL)
+	result = cpu->memory().space(spacenum);
+	if (result == NULL)
 	{
 		debug_console_printf(machine, "No matching memory space found for CPU '%s'\n", cpu->tag());
 		return FALSE;
@@ -1321,7 +1321,7 @@ static void execute_wpset(running_machine &machine, int ref, int params, const c
 	int wpnum;
 
 	/* CPU is implicit */
-	if (!debug_command_parameter_cpu_space(machine, NULL, ref, &space))
+	if (!debug_command_parameter_cpu_space(machine, NULL, ref, space))
 		return;
 
 	/* param 1 is the address */
@@ -1536,7 +1536,7 @@ static void execute_save(running_machine &machine, int ref, int params, const ch
 		return;
 	if (!debug_command_parameter_number(machine, param[2], &length))
 		return;
-	if (!debug_command_parameter_cpu_space(machine, (params > 3) ? param[3] : NULL, ref, &space))
+	if (!debug_command_parameter_cpu_space(machine, (params > 3) ? param[3] : NULL, ref, space))
 		return;
 
 	/* determine the addresses to write */
@@ -1554,7 +1554,7 @@ static void execute_save(running_machine &machine, int ref, int params, const ch
 	/* now write the data out */
 	for (i = offset; i <= endoffset; i++)
 	{
-		UINT8 byte = debug_read_byte(space, i, TRUE);
+		UINT8 byte = debug_read_byte(*space, i, TRUE);
 		fwrite(&byte, 1, 1, f);
 	}
 
@@ -1580,7 +1580,7 @@ static void execute_load(running_machine &machine, int ref, int params, const ch
 		return;
 	if (!debug_command_parameter_number(machine, param[2], &length))
 		return;
-	if (!debug_command_parameter_cpu_space(machine, (params > 3) ? param[3] : NULL, ref, &space))
+	if (!debug_command_parameter_cpu_space(machine, (params > 3) ? param[3] : NULL, ref, space))
 		return;
 
 	/* determine the addresses to read */
@@ -1603,7 +1603,7 @@ static void execute_load(running_machine &machine, int ref, int params, const ch
 		/* check if end of file has been reached and stop loading if it has */
 		if (feof(f))
 			break;
-		debug_write_byte(space, i, byte, TRUE);
+		debug_write_byte(*space, i, byte, TRUE);
 	}
 	/* close the file */
 	fclose(f);
@@ -1634,7 +1634,7 @@ static void execute_dump(running_machine &machine, int ref, int params, const ch
 		return;
 	if (!debug_command_parameter_number(machine, param[4], &ascii))
 		return;
-	if (!debug_command_parameter_cpu_space(machine, (params > 5) ? param[5] : NULL, ref, &space))
+	if (!debug_command_parameter_cpu_space(machine, (params > 5) ? param[5] : NULL, ref, space))
 		return;
 
 	/* further validation */
@@ -1673,9 +1673,9 @@ static void execute_dump(running_machine &machine, int ref, int params, const ch
 			if (i + j <= endoffset)
 			{
 				offs_t curaddr = i + j;
-				if (debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &curaddr))
+				if (debug_cpu_translate(*space, TRANSLATE_READ_DEBUG, &curaddr))
 				{
-					UINT64 value = debug_read_memory(space, i + j, width, TRUE);
+					UINT64 value = debug_read_memory(*space, i + j, width, TRUE);
 					outdex += sprintf(&output[outdex], " %s", core_i64_hex_format(value, width * 2));
 				}
 				else
@@ -1692,9 +1692,9 @@ static void execute_dump(running_machine &machine, int ref, int params, const ch
 			for (j = 0; j < 16 && (i + j) <= endoffset; j++)
 			{
 				offs_t curaddr = i + j;
-				if (debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &curaddr))
+				if (debug_cpu_translate(*space, TRANSLATE_READ_DEBUG, &curaddr))
 				{
-					UINT8 byte = debug_read_byte(space, i + j, TRUE);
+					UINT8 byte = debug_read_byte(*space, i + j, TRUE);
 					outdex += sprintf(&output[outdex], "%c", (byte >= 32 && byte < 127) ? byte : '.');
 				}
 				else
@@ -1730,7 +1730,7 @@ static void execute_cheatinit(running_machine &machine, int ref, int params, con
 	memset(cheat_region, 0, sizeof(cheat_region));
 
 	/* validate parameters */
-	if (!debug_command_parameter_cpu_space(machine, (params > 3) ? param[3] : NULL, AS_PROGRAM, &space))
+	if (!debug_command_parameter_cpu_space(machine, (params > 3) ? param[3] : NULL, AS_PROGRAM, space))
 		return;
 
 	if (ref == 0)
@@ -1815,7 +1815,7 @@ static void execute_cheatinit(running_machine &machine, int ref, int params, con
 	for (i = 0; i <= region_count; i++)
 		if (!cheat_region[i].disabled)
 			for (curaddr = cheat_region[i].offset; curaddr <= cheat_region[i].endoffset; curaddr += cheat.width)
-				if (cheat_address_is_valid(space, curaddr))
+				if (cheat_address_is_valid(*space, curaddr))
 					real_length++;
 
 	if (real_length == 0)
@@ -1844,7 +1844,7 @@ static void execute_cheatinit(running_machine &machine, int ref, int params, con
 			return;
 		}
 
-		if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, AS_PROGRAM, &space))
+		if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, AS_PROGRAM, space))
 			return;
 
 		cheat_map *newmap = auto_alloc_array(machine, cheat_map, cheat.length + real_length);
@@ -1861,9 +1861,9 @@ static void execute_cheatinit(running_machine &machine, int ref, int params, con
 	for (i = 0; i < region_count; i++)
 		if (!cheat_region[i].disabled)
 			for (curaddr = cheat_region[i].offset; curaddr <= cheat_region[i].endoffset; curaddr += cheat.width)
-				if (cheat_address_is_valid(space, curaddr))
+				if (cheat_address_is_valid(*space, curaddr))
 				{
-					cheat.cheatmap[active_cheat].previous_value = cheat_read_extended(&cheat, space, curaddr);
+					cheat.cheatmap[active_cheat].previous_value = cheat_read_extended(&cheat, *space, curaddr);
 					cheat.cheatmap[active_cheat].first_value = cheat.cheatmap[active_cheat].previous_value;
 					cheat.cheatmap[active_cheat].offset = curaddr;
 					cheat.cheatmap[active_cheat].state = 1;
@@ -1911,7 +1911,7 @@ static void execute_cheatnext(running_machine &machine, int ref, int params, con
 		return;
 	}
 
-	if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, AS_PROGRAM, &space))
+	if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, AS_PROGRAM, space))
 		return;
 
 	if (params > 1 && !debug_command_parameter_number(machine, param[1], &comp_value))
@@ -1951,7 +1951,7 @@ static void execute_cheatnext(running_machine &machine, int ref, int params, con
 	for (cheatindex = 0; cheatindex < cheat.length; cheatindex += 1)
 		if (cheat.cheatmap[cheatindex].state == 1)
 		{
-			UINT64 cheat_value = cheat_read_extended(&cheat, space, cheat.cheatmap[cheatindex].offset);
+			UINT64 cheat_value = cheat_read_extended(&cheat, *space, cheat.cheatmap[cheatindex].offset);
 			UINT64 comp_byte = (ref == 0) ? cheat.cheatmap[cheatindex].previous_value : cheat.cheatmap[cheatindex].first_value;
 			UINT8 disable_byte = FALSE;
 
@@ -2066,7 +2066,7 @@ static void execute_cheatlist(running_machine &machine, int ref, int params, con
 	UINT64 sizemask;
 	FILE *f = NULL;
 
-	if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, AS_PROGRAM, &space))
+	if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, AS_PROGRAM, space))
 		return;
 
 	if (!debug_command_parameter_cpu(machine, &cheat.cpu, &cpu))
@@ -2097,7 +2097,7 @@ static void execute_cheatlist(running_machine &machine, int ref, int params, con
 	{
 		if (cheat.cheatmap[cheatindex].state == 1)
 		{
-			UINT64 value = cheat_byte_swap(&cheat, cheat_read_extended(&cheat, space, cheat.cheatmap[cheatindex].offset)) & sizemask;
+			UINT64 value = cheat_byte_swap(&cheat, cheat_read_extended(&cheat, *space, cheat.cheatmap[cheatindex].offset)) & sizemask;
 			offs_t address = space->byte_to_address(cheat.cheatmap[cheatindex].offset);
 
 			if (params > 0)
@@ -2167,7 +2167,7 @@ static void execute_find(running_machine &machine, int ref, int params, const ch
 		return;
 	if (!debug_command_parameter_number(machine, param[1], &length))
 		return;
-	if (!debug_command_parameter_cpu_space(machine, NULL, ref, &space))
+	if (!debug_command_parameter_cpu_space(machine, NULL, ref, space))
 		return;
 
 	/* further validation */
@@ -2223,10 +2223,10 @@ static void execute_find(running_machine &machine, int ref, int params, const ch
 		{
 			switch (data_size[j])
 			{
-				case 1:	match = ((UINT8)debug_read_byte(space, i + suboffset, TRUE) == (UINT8)data_to_find[j]);	break;
-				case 2:	match = ((UINT16)debug_read_word(space, i + suboffset, TRUE) == (UINT16)data_to_find[j]);	break;
-				case 4:	match = ((UINT32)debug_read_dword(space, i + suboffset, TRUE) == (UINT32)data_to_find[j]);	break;
-				case 8:	match = ((UINT64)debug_read_qword(space, i + suboffset, TRUE) == (UINT64)data_to_find[j]);	break;
+				case 1:	match = ((UINT8)debug_read_byte(*space, i + suboffset, TRUE) == (UINT8)data_to_find[j]);	break;
+				case 2:	match = ((UINT16)debug_read_word(*space, i + suboffset, TRUE) == (UINT16)data_to_find[j]);	break;
+				case 4:	match = ((UINT32)debug_read_dword(*space, i + suboffset, TRUE) == (UINT32)data_to_find[j]);	break;
+				case 8:	match = ((UINT64)debug_read_qword(*space, i + suboffset, TRUE) == (UINT64)data_to_find[j]);	break;
 				default:	/* all other cases are wildcards */		break;
 			}
 			suboffset += data_size[j] & 0x0f;
@@ -2265,7 +2265,7 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 		return;
 	if (!debug_command_parameter_number(machine, param[3], &bytes))
 		return;
-	if (!debug_command_parameter_cpu_space(machine, (params > 4) ? param[4] : NULL, AS_PROGRAM, &space))
+	if (!debug_command_parameter_cpu_space(machine, (params > 4) ? param[4] : NULL, AS_PROGRAM, space))
 		return;
 
 	/* determine the width of the bytes */
@@ -2302,15 +2302,15 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 
 		/* make sure we can translate the address */
 		tempaddr = pcbyte;
-		if (debug_cpu_translate(space, TRANSLATE_FETCH_DEBUG, &tempaddr))
+		if (debug_cpu_translate(*space, TRANSLATE_FETCH_DEBUG, &tempaddr))
 		{
 			UINT8 opbuf[64], argbuf[64];
 
 			/* fetch the bytes up to the maximum */
 			for (numbytes = 0; numbytes < maxbytes; numbytes++)
 			{
-				opbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, FALSE);
-				argbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, TRUE);
+				opbuf[numbytes] = debug_read_opcode(*space, pcbyte + numbytes, 1, FALSE);
+				argbuf[numbytes] = debug_read_opcode(*space, pcbyte + numbytes, 1, TRUE);
 			}
 
 			/* disassemble the result */
@@ -2323,7 +2323,7 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 			int startdex = outdex;
 			numbytes = space->address_to_byte(numbytes);
 			for (j = 0; j < numbytes; j += minbytes)
-				outdex += sprintf(&output[outdex], "%s ", core_i64_hex_format(debug_read_opcode(space, pcbyte + j, minbytes, FALSE), minbytes * 2));
+				outdex += sprintf(&output[outdex], "%s ", core_i64_hex_format(debug_read_opcode(*space, pcbyte + j, minbytes, FALSE), minbytes * 2));
 			if (outdex - startdex < byteswidth)
 				outdex += sprintf(&output[outdex], "%*s", byteswidth - (outdex - startdex), "");
 			outdex += sprintf(&output[outdex], "  ");
@@ -2449,7 +2449,7 @@ static void execute_history(running_machine &machine, int ref, int params, const
 {
 	/* validate parameters */
 	address_space *space;
-	if (!debug_command_parameter_cpu_space(machine, (params > 0) ? param[0] : NULL, AS_PROGRAM, &space))
+	if (!debug_command_parameter_cpu_space(machine, (params > 0) ? param[0] : NULL, AS_PROGRAM, space))
 		return;
 
 	UINT64 count = device_debug::HISTORY_SIZE;
@@ -2473,8 +2473,8 @@ static void execute_history(running_machine &machine, int ref, int params, const
 		UINT8 opbuf[64], argbuf[64];
 		for (int numbytes = 0; numbytes < maxbytes; numbytes++)
 		{
-			opbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, false);
-			argbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, true);
+			opbuf[numbytes] = debug_read_opcode(*space, pcbyte + numbytes, 1, false);
+			argbuf[numbytes] = debug_read_opcode(*space, pcbyte + numbytes, 1, true);
 		}
 
 		char buffer[200];
@@ -2557,7 +2557,7 @@ static void execute_map(running_machine &machine, int ref, int params, const cha
 		return;
 
 	/* CPU is implicit */
-	if (!debug_command_parameter_cpu_space(machine, NULL, ref, &space))
+	if (!debug_command_parameter_cpu_space(machine, NULL, ref, space))
 		return;
 
 	/* do the translation first */
@@ -2565,9 +2565,9 @@ static void execute_map(running_machine &machine, int ref, int params, const cha
 	{
 		static const char *const intnames[] = { "Read", "Write", "Fetch" };
 		taddress = space->address_to_byte(address) & space->bytemask();
-		if (debug_cpu_translate(space, intention, &taddress))
+		if (debug_cpu_translate(*space, intention, &taddress))
 		{
-			const char *mapname = const_cast<address_space *>(space)->get_handler_string((intention == TRANSLATE_WRITE_DEBUG) ? ROW_WRITE : ROW_READ, taddress);
+			const char *mapname = space->get_handler_string((intention == TRANSLATE_WRITE_DEBUG) ? ROW_WRITE : ROW_READ, taddress);
 			debug_console_printf(machine, "%7s: %s logical == %s physical -> %s\n", intnames[intention & 3], core_i64_hex_format(address, space->logaddrchars()), core_i64_hex_format(space->byte_to_address(taddress), space->addrchars()), mapname);
 		}
 		else

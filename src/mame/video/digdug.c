@@ -165,7 +165,7 @@ VIDEO_START_MEMBER(digdug_state,digdug)
 
 WRITE8_HANDLER( digdug_videoram_w )
 {
-	digdug_state *state =  space->machine().driver_data<digdug_state>();
+	digdug_state *state =  space.machine().driver_data<digdug_state>();
 
 	state->m_videoram[offset] = data;
 	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
@@ -173,7 +173,7 @@ WRITE8_HANDLER( digdug_videoram_w )
 
 WRITE8_HANDLER( digdug_PORT_w )
 {
-	digdug_state *state =  space->machine().driver_data<digdug_state>();
+	digdug_state *state =  space.machine().driver_data<digdug_state>();
 
 	switch (offset)
 	{

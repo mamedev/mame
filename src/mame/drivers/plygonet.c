@@ -738,8 +738,8 @@ DRIVER_INIT_MEMBER(polygonet_state,polygonet)
 	memset(m_dsp56k_bank04_ram, 0, sizeof(m_dsp56k_bank04_ram));
 
 	/* The dsp56k occasionally executes out of mapped memory */
-	address_space *space = machine().device<dsp56k_device>("dsp")->space(AS_PROGRAM);
-	m_dsp56k_update_handler = space->set_direct_update_handler(direct_update_delegate(FUNC(polygonet_state::plygonet_dsp56k_direct_handler), this));
+	address_space &space = *machine().device<dsp56k_device>("dsp")->space(AS_PROGRAM);
+	m_dsp56k_update_handler = space.set_direct_update_handler(direct_update_delegate(FUNC(polygonet_state::plygonet_dsp56k_direct_handler), this));
 
     /* save states */
 	save_item(NAME(m_dsp56k_bank00_ram));

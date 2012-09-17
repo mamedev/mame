@@ -2283,7 +2283,7 @@ FFED    BX      R/W     Reset   Description
 
 static READ8_HANDLER( t90_internal_registers_r )
 {
-	t90_Regs *cpustate = get_safe_token(&space->device());
+	t90_Regs *cpustate = get_safe_token(&space.device());
 
 	#define RIO		cpustate->io->read_byte( T90_IOBASE+offset )
 
@@ -2498,7 +2498,7 @@ static WRITE8_HANDLER( t90_internal_registers_w )
 {
 	#define WIO		cpustate->io->write_byte( T90_IOBASE+offset, data )
 
-	t90_Regs *cpustate = get_safe_token(&space->device());
+	t90_Regs *cpustate = get_safe_token(&space.device());
 	UINT8 out_mask;
 	UINT8 old = cpustate->internal_registers[offset];
 	switch ( T90_IOBASE + offset )

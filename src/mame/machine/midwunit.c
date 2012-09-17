@@ -360,14 +360,14 @@ MACHINE_RESET_MEMBER(midwunit_state,midwunit)
 
 READ16_MEMBER(midwunit_state::midwunit_security_r)
 {
-	return midway_serial_pic_r(&space);
+	return midway_serial_pic_r(space);
 }
 
 
 WRITE16_MEMBER(midwunit_state::midwunit_security_w)
 {
 	if (offset == 0 && ACCESSING_BITS_0_7)
-		midway_serial_pic_w(&space, data);
+		midway_serial_pic_w(space, data);
 }
 
 

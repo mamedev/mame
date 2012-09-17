@@ -114,15 +114,15 @@ WRITE8_HANDLER ( europc_jim_w )
 		}
 //      mode= data&0x10?AGA_COLOR:AGA_MONO;
 //      mode= data&0x10?AGA_COLOR:AGA_OFF;
-		pc_aga_set_mode(space->machine(), europc_jim.mode);
+		pc_aga_set_mode(space.machine(), europc_jim.mode);
 		if (data & 0x80) europc_jim.state = 0;
 		break;
 	case 4:
 		switch(data & 0xc0)
 		{
-		case 0x00: space->machine().device("maincpu")->set_clock_scale(1.0 / 2); break;
-		case 0x40: space->machine().device("maincpu")->set_clock_scale(3.0 / 4); break;
-		default: space->machine().device("maincpu")->set_clock_scale(1); break;
+		case 0x00: space.machine().device("maincpu")->set_clock_scale(1.0 / 2); break;
+		case 0x40: space.machine().device("maincpu")->set_clock_scale(3.0 / 4); break;
+		default: space.machine().device("maincpu")->set_clock_scale(1); break;
 		}
 		break;
 	case 0xa:
@@ -178,8 +178,8 @@ WRITE8_HANDLER( europc_pio_w )
 		europc_pio.port61=data;
 //      if (data == 0x30) pc1640.port62 = (pc1640.port65 & 0x10) >> 4;
 //      else if (data == 0x34) pc1640.port62 = pc1640.port65 & 0xf;
-		pit8253_gate2_w(space->machine().device("pit8253"), BIT(data, 0));
-		pc_speaker_set_spkrdata(space->machine(), BIT(data, 1));
+		pit8253_gate2_w(space.machine().device("pit8253"), BIT(data, 0));
+		pc_speaker_set_spkrdata(space.machine(), BIT(data, 1));
 		pc_keyb_set_clock(BIT(data, 6));
 		break;
 	}
@@ -201,7 +201,7 @@ WRITE8_HANDLER( europc_pio_w )
 		data = europc_pio.port61;
 		break;
 	case 2:
-		if (pit8253_get_output(space->machine().device("pit8253"), 2))
+		if (pit8253_get_output(space.machine().device("pit8253"), 2))
 			data |= 0x20;
 		break;
 	}

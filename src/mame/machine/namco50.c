@@ -170,19 +170,19 @@ static TIMER_CALLBACK( namco_50xx_readrequest_callback )
 
 static READ8_HANDLER( namco_50xx_K_r )
 {
-	namco_50xx_state *state = get_safe_token(space->device().owner());
+	namco_50xx_state *state = get_safe_token(space.device().owner());
 	return state->m_latched_cmd >> 4;
 }
 
 static READ8_HANDLER( namco_50xx_R0_r )
 {
-	namco_50xx_state *state = get_safe_token(space->device().owner());
+	namco_50xx_state *state = get_safe_token(space.device().owner());
 	return state->m_latched_cmd & 0x0f;
 }
 
 static READ8_HANDLER( namco_50xx_R2_r )
 {
-	namco_50xx_state *state = get_safe_token(space->device().owner());
+	namco_50xx_state *state = get_safe_token(space.device().owner());
 	return state->m_latched_rw & 1;
 }
 
@@ -190,7 +190,7 @@ static READ8_HANDLER( namco_50xx_R2_r )
 
 static WRITE8_HANDLER( namco_50xx_O_w )
 {
-	namco_50xx_state *state = get_safe_token(space->device().owner());
+	namco_50xx_state *state = get_safe_token(space.device().owner());
 	UINT8 out = (data & 0x0f);
 	if (data & 0x10)
 		state->m_portO = (state->m_portO & 0x0f) | (out << 4);

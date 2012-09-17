@@ -260,7 +260,7 @@ static IRQ_CALLBACK( pc_irq_callback )
 
 void su2000_state::machine_start()
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	m_pit8254 = machine().device("pit8254");
 	m_pic8259_1 = machine().device("pic8259_1");
@@ -276,8 +276,8 @@ void su2000_state::machine_start()
 
 	/* HMA */
 	offs_t ram_limit = 0x100000 + PC_RAM_SIZE - 0x0a0000;
-	space->install_read_bank(0x100000, ram_limit - 1, "hma_bank");
-	space->install_write_bank(0x100000, ram_limit - 1, "hma_bank");
+	space.install_read_bank(0x100000, ram_limit - 1, "hma_bank");
+	space.install_write_bank(0x100000, ram_limit - 1, "hma_bank");
 	membank("hma_bank")->set_base(m_pc_ram + 0xa0000);
 
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(pc_irq_callback);
@@ -287,7 +287,7 @@ void su2000_state::machine_start()
 	kbdc8042_init(machine(), &at8042);
 
 	pc_vga_init(machine(), vga_setting, NULL);
-	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
+	pc_vga_io_init(machine(), *machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, *machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
 void su2000_state::machine_reset()

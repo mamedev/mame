@@ -933,11 +933,11 @@ static const mpu3_chr_table hprvpr_data[64] = {
 
 DRIVER_INIT_MEMBER(mpu3_state,m3hprvpr)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	m_disp_func=METER_PORT;
 	m_current_chr_table = hprvpr_data;
-	space->install_readwrite_handler(0xc000, 0xc000 , read8_delegate(FUNC(mpu3_state::characteriser_r), this),write8_delegate(FUNC(mpu3_state::characteriser_w), this));
+	space.install_readwrite_handler(0xc000, 0xc000 , read8_delegate(FUNC(mpu3_state::characteriser_r), this),write8_delegate(FUNC(mpu3_state::characteriser_w), this));
 
 }
 

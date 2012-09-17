@@ -9834,7 +9834,7 @@ DRIVER_INIT_MEMBER(neogeo_state,lans2004)
 
 static READ16_HANDLER( sbp_lowerrom_r )
 {
-	UINT16* rom = (UINT16*)space->machine().root_device().memregion("maincpu")->base();
+	UINT16* rom = (UINT16*)space.machine().root_device().memregion("maincpu")->base();
 	UINT16 origdata = rom[(offset+(0x200/2))];
 	UINT16 data =  BITSWAP16(origdata, 11,10,9,8,15,14,13,12,3,2,1,0,7,6,5,4);
 	int realoffset = 0x200+(offset*2);

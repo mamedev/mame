@@ -1935,7 +1935,7 @@ WRITE32_HANDLER( stvcd_w )
 		case 0x90022:
 		case 0x90024:
 		case 0x90026:
-			cd_writeWord(space->machine(), offset, data>>16);
+			cd_writeWord(space.machine(), offset, data>>16);
 			break;
 
 		default:

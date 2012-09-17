@@ -565,14 +565,14 @@ INTERRUPT_GEN( mbee_interrupt )
 #if 0
 	mbee_state *state = device->machine().driver_data<mbee_state>();
 
-	//address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	//address_space &space = *device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/* The printer status connects to the pio ASTB pin, and the printer changing to not
         busy should signal an interrupt routine at B61C, (next line) but this doesn't work.
         The line below does what the interrupt should be doing. */
 	/* But it would break any program loaded to that area of memory, such as CP/M programs */
 
 	//state->m_z80pio->strobe_a(centronics_busy_r(state->m_printer)); /* signal int when not busy (L->H) */
-	//space->write_byte(0x109, centronics_busy_r(state->m_printer));
+	//space.write_byte(0x109, centronics_busy_r(state->m_printer));
 
 
 	/* once per frame, pulse the PIO B bit 7 - it is in the schematic as an option,
@@ -754,7 +754,7 @@ QUICKLOAD_LOAD( mbee )
 {
 	mbee_state *state = image.device().machine().driver_data<mbee_state>();
 	device_t *cpu = image.device().machine().device("maincpu");
-	address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 i, j;
 	UINT8 data, sw = image.device().machine().root_device().ioport("CONFIG")->read() & 1;	/* reading the dipswitch: 1 = autorun */
 
@@ -772,7 +772,7 @@ QUICKLOAD_LOAD( mbee )
 			}
 
 			if ((j < state->m_size) || (j > 0xefff))
-				space->write_byte(j, data);
+				space.write_byte(j, data);
 			else
 			{
 				image.message("Not enough memory in this microbee");
@@ -782,11 +782,11 @@ QUICKLOAD_LOAD( mbee )
 
 		if (sw)
 		{
-			space->write_word(0xa2,0x801e);	/* fix warm-start vector to get around some copy-protections */
+			space.write_word(0xa2,0x801e);	/* fix warm-start vector to get around some copy-protections */
 			cpu->state().set_pc(0x801e);
 		}
 		else
-			space->write_word(0xa2,0x8517);
+			space.write_word(0xa2,0x8517);
 	}
 	else if (!mame_stricmp(image.filetype(), "com"))
 	{
@@ -802,7 +802,7 @@ QUICKLOAD_LOAD( mbee )
 			}
 
 			if ((j < state->m_size) || (j > 0xefff))
-				space->write_byte(j, data);
+				space.write_byte(j, data);
 			else
 			{
 				image.message("Not enough memory in this microbee");

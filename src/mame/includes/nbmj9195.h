@@ -122,5 +122,5 @@ SCREEN_UPDATE_IND16( nbmj9195 );
 
 
 
-void nbmj9195_clutsel_w(address_space *space, int data);
-void nbmj9195_gfxflag2_w(address_space *space, int data);
+void nbmj9195_clutsel_w(address_space &space, int data);
+void nbmj9195_gfxflag2_w(address_space &space, int data);

@@ -209,7 +209,7 @@ INPUT_PORTS_END
 /* MEGATECH specific */
 static READ8_HANDLER( megatech_cart_select_r )
 {
-	mtech_state *state = space->machine().driver_data<mtech_state>();
+	mtech_state *state = space.machine().driver_data<mtech_state>();
 	return state->m_mt_cart_select_reg;
 }
 
@@ -292,16 +292,16 @@ static WRITE8_HANDLER( megatech_cart_select_w )
       but it stores something in (banked?) ram
       because it always seems to show the
       same instructions ... */
-	mtech_state *state = space->machine().driver_data<mtech_state>();
+	mtech_state *state = space.machine().driver_data<mtech_state>();
 	state->m_mt_cart_select_reg = data;
 
-	megatech_select_game(space->machine(), state->m_mt_cart_select_reg);
+	megatech_select_game(space.machine(), state->m_mt_cart_select_reg);
 }
 
 
 static READ8_HANDLER( bios_ctrl_r )
 {
-	mtech_state *state = space->machine().driver_data<mtech_state>();
+	mtech_state *state = space.machine().driver_data<mtech_state>();
 
 	if (offset == 0)
 		return 0;
@@ -313,7 +313,7 @@ static READ8_HANDLER( bios_ctrl_r )
 
 static WRITE8_HANDLER( bios_ctrl_w )
 {
-	mtech_state *state = space->machine().driver_data<mtech_state>();
+	mtech_state *state = space.machine().driver_data<mtech_state>();
 
 	if (offset == 1)
 	{
@@ -333,16 +333,16 @@ static WRITE8_HANDLER( bios_ctrl_w )
 
 static READ8_HANDLER( megatech_z80_read_68k_banked_data )
 {
-	mtech_state *state = space->machine().driver_data<mtech_state>();
-	address_space *space68k = space->machine().device<legacy_cpu_device>("maincpu")->space();
+	mtech_state *state = space.machine().driver_data<mtech_state>();
+	address_space *space68k = space.machine().device<legacy_cpu_device>("maincpu")->space();
 	UINT8 ret = space68k->read_byte(state->m_mt_bank_addr + offset);
 	return ret;
 }
 
 static WRITE8_HANDLER( megatech_z80_write_68k_banked_data )
 {
-	mtech_state *state = space->machine().driver_data<mtech_state>();
-	address_space *space68k = space->machine().device<legacy_cpu_device>("maincpu")->space();
+	mtech_state *state = space.machine().driver_data<mtech_state>();
+	address_space *space68k = space.machine().device<legacy_cpu_device>("maincpu")->space();
 	space68k->write_byte(state->m_mt_bank_addr + offset,data);
 }
 
@@ -354,18 +354,18 @@ static void megatech_z80_bank_w(running_machine &machine, UINT16 data)
 
 static WRITE8_HANDLER( mt_z80_bank_w )
 {
-	megatech_z80_bank_w(space->machine(), data & 1);
+	megatech_z80_bank_w(space.machine(), data & 1);
 }
 
 static READ8_HANDLER( megatech_banked_ram_r )
 {
-	mtech_state *state = space->machine().driver_data<mtech_state>();
+	mtech_state *state = space.machine().driver_data<mtech_state>();
 	return state->m_megatech_banked_ram[offset + 0x1000 * (state->m_mt_cart_select_reg & 0x07)];
 }
 
 static WRITE8_HANDLER( megatech_banked_ram_w )
 {
-	mtech_state *state = space->machine().driver_data<mtech_state>();
+	mtech_state *state = space.machine().driver_data<mtech_state>();
 	state->m_megatech_banked_ram[offset + 0x1000 * (state->m_mt_cart_select_reg & 0x07)] = data;
 }
 
@@ -391,14 +391,14 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( megatech_bios_port_ctrl_w )
 {
-	mtech_state *state = space->machine().driver_data<mtech_state>();
+	mtech_state *state = space.machine().driver_data<mtech_state>();
 	state->m_bios_port_ctrl = data;
 }
 
 static READ8_HANDLER( megatech_bios_joypad_r )
 {
-	mtech_state *state = space->machine().driver_data<mtech_state>();
-	return megatech_bios_port_cc_dc_r(space->machine(), offset, state->m_bios_port_ctrl);
+	mtech_state *state = space.machine().driver_data<mtech_state>();
+	return megatech_bios_port_cc_dc_r(space.machine(), offset, state->m_bios_port_ctrl);
 }
 
 static WRITE8_HANDLER (megatech_bios_port_7f_w)

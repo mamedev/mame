@@ -95,9 +95,9 @@ VIDEO_START_MEMBER(harddriv_state,harddriv)
  *
  *************************************/
 
-void hdgsp_write_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
+void hdgsp_write_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
-	harddriv_state *state = space->machine().driver_data<harddriv_state>();
+	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 
 	/* access to the 1bpp/2bpp area */
 	if (address >= 0x02000000 && address <= 0x020fffff)
@@ -123,9 +123,9 @@ void hdgsp_write_to_shiftreg(address_space *space, UINT32 address, UINT16 *shift
 }
 
 
-void hdgsp_read_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
+void hdgsp_read_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
-	harddriv_state *state = space->machine().driver_data<harddriv_state>();
+	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 
 	if (!state->m_shiftreg_enable)
 		return;
@@ -178,14 +178,14 @@ static void update_palette_bank(running_machine &machine, int newbank)
 
 READ16_HANDLER( hdgsp_control_lo_r )
 {
-	harddriv_state *state = space->machine().driver_data<harddriv_state>();
+	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 	return state->m_gsp_control_lo[offset];
 }
 
 
 WRITE16_HANDLER( hdgsp_control_lo_w )
 {
-	harddriv_state *state = space->machine().driver_data<harddriv_state>();
+	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 	int oldword = state->m_gsp_control_lo[offset];
 	int newword;
 
@@ -206,14 +206,14 @@ WRITE16_HANDLER( hdgsp_control_lo_w )
 
 READ16_HANDLER( hdgsp_control_hi_r )
 {
-	harddriv_state *state = space->machine().driver_data<harddriv_state>();
+	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 	return state->m_gsp_control_hi[offset];
 }
 
 
 WRITE16_HANDLER( hdgsp_control_hi_w )
 {
-	harddriv_state *state = space->machine().driver_data<harddriv_state>();
+	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 	int val = (offset >> 3) & 1;
 
 	int oldword = state->m_gsp_control_hi[offset];
@@ -230,21 +230,21 @@ WRITE16_HANDLER( hdgsp_control_hi_w )
 
 		case 0x01:
 			data = data & (15 >> state->m_gsp_multisync);
-			space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos() - 1);
+			space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos() - 1);
 			state->m_gfx_finescroll = data;
 			break;
 
 		case 0x02:
-			update_palette_bank(space->machine(), (state->m_gfx_palettebank & ~1) | val);
+			update_palette_bank(space.machine(), (state->m_gfx_palettebank & ~1) | val);
 			break;
 
 		case 0x03:
-			update_palette_bank(space->machine(), (state->m_gfx_palettebank & ~2) | (val << 1));
+			update_palette_bank(space.machine(), (state->m_gfx_palettebank & ~2) | (val << 1));
 			break;
 
 		case 0x04:
-			if (space->machine().total_colors() >= 256 * 8)
-				update_palette_bank(space->machine(), (state->m_gfx_palettebank & ~4) | (val << 2));
+			if (space.machine().total_colors() >= 256 * 8)
+				update_palette_bank(space.machine(), (state->m_gfx_palettebank & ~4) | (val << 2));
 			break;
 
 		case 0x07:
@@ -274,7 +274,7 @@ READ16_HANDLER( hdgsp_vram_2bpp_r )
 
 WRITE16_HANDLER( hdgsp_vram_1bpp_w )
 {
-	harddriv_state *state = space->machine().driver_data<harddriv_state>();
+	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 	UINT32 *dest = (UINT32 *)&state->m_gsp_vram[offset * 16];
 	UINT32 *mask = &state->m_mask_table[data * 4];
 	UINT32 color = state->m_gsp_control_lo[0] & 0xff;
@@ -303,7 +303,7 @@ WRITE16_HANDLER( hdgsp_vram_1bpp_w )
 
 WRITE16_HANDLER( hdgsp_vram_2bpp_w )
 {
-	harddriv_state *state = space->machine().driver_data<harddriv_state>();
+	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 	UINT32 *dest = (UINT32 *)&state->m_gsp_vram[offset * 8];
 	UINT32 *mask = &state->m_mask_table[data * 2];
 	UINT32 color = state->m_gsp_control_lo[0];
@@ -340,7 +340,7 @@ INLINE void gsp_palette_change(running_machine &machine, int offset)
 
 READ16_HANDLER( hdgsp_paletteram_lo_r )
 {
-	harddriv_state *state = space->machine().driver_data<harddriv_state>();
+	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 
 	/* note that the palette is only accessed via the first 256 entries */
 	/* others are selected via the palette bank */
@@ -352,14 +352,14 @@ READ16_HANDLER( hdgsp_paletteram_lo_r )
 
 WRITE16_HANDLER( hdgsp_paletteram_lo_w )
 {
-	harddriv_state *state = space->machine().driver_data<harddriv_state>();
+	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 
 	/* note that the palette is only accessed via the first 256 entries */
 	/* others are selected via the palette bank */
 	offset = state->m_gfx_palettebank * 0x100 + (offset & 0xff);
 
 	COMBINE_DATA(&state->m_gsp_paletteram_lo[offset]);
-	gsp_palette_change(space->machine(), offset);
+	gsp_palette_change(space.machine(), offset);
 }
 
 
@@ -372,7 +372,7 @@ WRITE16_HANDLER( hdgsp_paletteram_lo_w )
 
 READ16_HANDLER( hdgsp_paletteram_hi_r )
 {
-	harddriv_state *state = space->machine().driver_data<harddriv_state>();
+	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 
 	/* note that the palette is only accessed via the first 256 entries */
 	/* others are selected via the palette bank */
@@ -384,14 +384,14 @@ READ16_HANDLER( hdgsp_paletteram_hi_r )
 
 WRITE16_HANDLER( hdgsp_paletteram_hi_w )
 {
-	harddriv_state *state = space->machine().driver_data<harddriv_state>();
+	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 
 	/* note that the palette is only accessed via the first 256 entries */
 	/* others are selected via the palette bank */
 	offset = state->m_gfx_palettebank * 0x100 + (offset & 0xff);
 
 	COMBINE_DATA(&state->m_gsp_paletteram_hi[offset]);
-	gsp_palette_change(space->machine(), offset);
+	gsp_palette_change(space.machine(), offset);
 }
 
 

@@ -35,7 +35,7 @@ void psx_driver_init( running_machine &machine )
 
 WRITE32_HANDLER( psx_com_delay_w )
 {
-	psx_state *p_psx = space->machine().driver_data<psx_state>();
+	psx_state *p_psx = space.machine().driver_data<psx_state>();
 
 	COMBINE_DATA( &p_psx->n_com_delay );
 	verboselog( p_psx, 1, "psx_com_delay_w( %08x %08x )\n", data, mem_mask );
@@ -43,7 +43,7 @@ WRITE32_HANDLER( psx_com_delay_w )
 
 READ32_HANDLER( psx_com_delay_r )
 {
-	psx_state *p_psx = space->machine().driver_data<psx_state>();
+	psx_state *p_psx = space.machine().driver_data<psx_state>();
 
 	verboselog( p_psx, 1, "psx_com_delay_r( %08x )\n", mem_mask );
 	return p_psx->n_com_delay;
@@ -72,14 +72,14 @@ void psx_sio_input( running_machine &machine, int n_port, int n_mask, int n_data
 
 READ32_HANDLER( psx_gpu_r )
 {
-	psxgpu_device *gpu = downcast<psxgpu_device *>( space->machine().device("gpu") );
-	return gpu->read( *space, offset, mem_mask );
+	psxgpu_device *gpu = downcast<psxgpu_device *>( space.machine().device("gpu") );
+	return gpu->read( space, offset, mem_mask );
 }
 
 WRITE32_HANDLER( psx_gpu_w )
 {
-	psxgpu_device *gpu = downcast<psxgpu_device *>( space->machine().device("gpu") );
-	gpu->write( *space, offset, data, mem_mask );
+	psxgpu_device *gpu = downcast<psxgpu_device *>( space.machine().device("gpu") );
+	gpu->write( space, offset, data, mem_mask );
 }
 
 void psx_lightgun_set( running_machine &machine, int n_x, int n_y )

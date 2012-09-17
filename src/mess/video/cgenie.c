@@ -58,7 +58,7 @@ static void cgenie_offset_xy(cgenie_state *state)
 ***************************************************************************/
 WRITE8_HANDLER ( cgenie_register_w )
 {
-	cgenie_state *state = space->machine().driver_data<cgenie_state>();
+	cgenie_state *state = space.machine().driver_data<cgenie_state>();
 	//int addr;
 
 	switch (state->m_crt.idx)
@@ -160,7 +160,7 @@ WRITE8_HANDLER ( cgenie_register_w )
 ***************************************************************************/
 WRITE8_HANDLER ( cgenie_index_w )
 {
-	cgenie_state *state = space->machine().driver_data<cgenie_state>();
+	cgenie_state *state = space.machine().driver_data<cgenie_state>();
 	state->m_crt.idx = data & 15;
 }
 
@@ -169,8 +169,8 @@ WRITE8_HANDLER ( cgenie_index_w )
 ***************************************************************************/
  READ8_HANDLER ( cgenie_register_r )
 {
-	cgenie_state *state = space->machine().driver_data<cgenie_state>();
-	return cgenie_get_register(space->machine(), state->m_crt.idx);
+	cgenie_state *state = space.machine().driver_data<cgenie_state>();
+	return cgenie_get_register(space.machine(), state->m_crt.idx);
 }
 
 /***************************************************************************
@@ -222,7 +222,7 @@ int cgenie_get_register(running_machine &machine, int indx)
 ***************************************************************************/
  READ8_HANDLER ( cgenie_index_r )
 {
-	cgenie_state *state = space->machine().driver_data<cgenie_state>();
+	cgenie_state *state = space.machine().driver_data<cgenie_state>();
 	return state->m_crt.idx;
 }
 

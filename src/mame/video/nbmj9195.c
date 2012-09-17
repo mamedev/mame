@@ -68,9 +68,9 @@ WRITE8_MEMBER(nbmj9195_state::nbmj9195_nb22090_palette_w)
 
 
 ******************************************************************************/
-static int nbmj9195_blitter_r(address_space *space, int offset, int vram)
+static int nbmj9195_blitter_r(address_space &space, int offset, int vram)
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
+	nbmj9195_state *state = space.machine().driver_data<nbmj9195_state>();
 	int ret;
 	UINT8 *GFXROM = state->memregion("gfx1")->base();
 
@@ -84,9 +84,9 @@ static int nbmj9195_blitter_r(address_space *space, int offset, int vram)
 	return ret;
 }
 
-static void nbmj9195_blitter_w(address_space *space, int offset, int data, int vram)
+static void nbmj9195_blitter_w(address_space &space, int offset, int data, int vram)
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
+	nbmj9195_state *state = space.machine().driver_data<nbmj9195_state>();
 	int new_line;
 
 	switch (offset)
@@ -99,11 +99,11 @@ static void nbmj9195_blitter_w(address_space *space, int offset, int data, int v
 				//  if (data & 0x20) popmessage("Unknown GFX Flag!! (0x20)");
 					state->m_flipscreen[vram] = (data & 0x40) ? 0 : 1;
 					state->m_dispflag[vram] = (data & 0x80) ? 1 : 0;
-					nbmj9195_vramflip(space->machine(), vram);
+					nbmj9195_vramflip(space.machine(), vram);
 					break;
 		case 0x01:	state->m_scrollx[vram] = (state->m_scrollx[vram] & 0x0100) | data; break;
 		case 0x02:	state->m_scrollx[vram] = (state->m_scrollx[vram] & 0x00ff) | ((data << 8) & 0x0100);
-					new_line = space->machine().primary_screen->vpos();
+					new_line = space.machine().primary_screen->vpos();
 					if (state->m_flipscreen[vram])
 					{
 						for ( ; state->m_scanline[vram] < new_line; state->m_scanline[vram]++)
@@ -126,27 +126,27 @@ static void nbmj9195_blitter_w(address_space *space, int offset, int data, int v
 		case 0x0b:	state->m_blitter_destx[vram] = (state->m_blitter_destx[vram]  & 0x00ff) | (data << 8); break;
 		case 0x0c:	state->m_blitter_desty[vram] = (state->m_blitter_desty[vram]  & 0xff00) | data; break;
 		case 0x0d:	state->m_blitter_desty[vram] = (state->m_blitter_desty[vram]  & 0x00ff) | (data << 8);
-					nbmj9195_gfxdraw(space->machine(), vram);
+					nbmj9195_gfxdraw(space.machine(), vram);
 					break;
 		default:	break;
 	}
 }
 
-void nbmj9195_clutsel_w(address_space *space, int data)
+void nbmj9195_clutsel_w(address_space &space, int data)
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
+	nbmj9195_state *state = space.machine().driver_data<nbmj9195_state>();
 	state->m_clutsel = data;
 }
 
-static void nbmj9195_clut_w(address_space *space, int offset, int data, int vram)
+static void nbmj9195_clut_w(address_space &space, int offset, int data, int vram)
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
+	nbmj9195_state *state = space.machine().driver_data<nbmj9195_state>();
 	state->m_clut[vram][((state->m_clutsel & 0xff) * 0x10) + (offset & 0x0f)] = data;
 }
 
-void nbmj9195_gfxflag2_w(address_space *space, int data)
+void nbmj9195_gfxflag2_w(address_space &space, int data)
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
+	nbmj9195_state *state = space.machine().driver_data<nbmj9195_state>();
 	state->m_gfxflag2 = data;
 }
 
@@ -371,14 +371,14 @@ static void nbmj9195_gfxdraw(running_machine &machine, int vram)
 
 
 ******************************************************************************/
-WRITE8_MEMBER(nbmj9195_state::nbmj9195_blitter_0_w){ nbmj9195_blitter_w(&space, offset, data, 0); }
-WRITE8_MEMBER(nbmj9195_state::nbmj9195_blitter_1_w){ nbmj9195_blitter_w(&space, offset, data, 1); }
+WRITE8_MEMBER(nbmj9195_state::nbmj9195_blitter_0_w){ nbmj9195_blitter_w(space, offset, data, 0); }
+WRITE8_MEMBER(nbmj9195_state::nbmj9195_blitter_1_w){ nbmj9195_blitter_w(space, offset, data, 1); }
 
-READ8_MEMBER(nbmj9195_state::nbmj9195_blitter_0_r){ return nbmj9195_blitter_r(&space, offset, 0); }
-READ8_MEMBER(nbmj9195_state::nbmj9195_blitter_1_r){ return nbmj9195_blitter_r(&space, offset, 1); }
+READ8_MEMBER(nbmj9195_state::nbmj9195_blitter_0_r){ return nbmj9195_blitter_r(space, offset, 0); }
+READ8_MEMBER(nbmj9195_state::nbmj9195_blitter_1_r){ return nbmj9195_blitter_r(space, offset, 1); }
 
-WRITE8_MEMBER(nbmj9195_state::nbmj9195_clut_0_w){ nbmj9195_clut_w(&space, offset, data, 0); }
-WRITE8_MEMBER(nbmj9195_state::nbmj9195_clut_1_w){ nbmj9195_clut_w(&space, offset, data, 1); }
+WRITE8_MEMBER(nbmj9195_state::nbmj9195_clut_0_w){ nbmj9195_clut_w(space, offset, data, 0); }
+WRITE8_MEMBER(nbmj9195_state::nbmj9195_clut_1_w){ nbmj9195_clut_w(space, offset, data, 1); }
 
 /******************************************************************************
 

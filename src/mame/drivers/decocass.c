@@ -57,42 +57,42 @@ INLINE int swap_bits_5_6(int data)
 
 static WRITE8_HANDLER( ram_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	state->m_decrypted[0x0000 + offset] = swap_bits_5_6(data);
 	state->m_rambase[0x0000 + offset] = data;
 }
 
 static WRITE8_HANDLER( charram_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	state->m_decrypted[0x6000 + offset] = swap_bits_5_6(data);
 	decocass_charram_w(space, offset, data);
 }
 
 static WRITE8_HANDLER( fgvideoram_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	state->m_decrypted[0xc000 + offset] = swap_bits_5_6(data);
 	decocass_fgvideoram_w(space, offset, data);
 }
 
 static WRITE8_HANDLER( fgcolorram_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	state->m_decrypted[0xc400 + offset] = swap_bits_5_6(data);
 	decocass_colorram_w(space, offset, data);
 }
 
 static WRITE8_HANDLER( tileram_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	state->m_decrypted[0xd000 + offset] = swap_bits_5_6(data);
 	decocass_tileram_w(space, offset, data);
 }
 
 static WRITE8_HANDLER( objectram_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	state->m_decrypted[0xd800 + offset] = swap_bits_5_6(data);
 	decocass_objectram_w(space, offset, data);
 }
@@ -102,14 +102,14 @@ static WRITE8_HANDLER( mirrorcolorram_w ) { offset = ((offset >> 5) & 0x1f) | ((
 
 static READ8_HANDLER( mirrorvideoram_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5);
 	return state->m_fgvideoram[offset];
 }
 
 static READ8_HANDLER( mirrorcolorram_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5);
 	return state->m_colorram[offset];
 }
@@ -1600,15 +1600,15 @@ ROM_END
 
 DRIVER_INIT_MEMBER(decocass_state,decocass)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = memregion("maincpu")->base();
 	int A;
 
 	/* allocate memory and mark all RAM regions with their decrypted pointers */
 	m_decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
-	space->set_decrypted_region(0x0000, 0xc7ff, &m_decrypted[0x0000]);
-	space->set_decrypted_region(0xd000, 0xdbff, &m_decrypted[0xd000]);
-	space->set_decrypted_region(0xf000, 0xffff, &m_decrypted[0xf000]);
+	space.set_decrypted_region(0x0000, 0xc7ff, &m_decrypted[0x0000]);
+	space.set_decrypted_region(0xd000, 0xdbff, &m_decrypted[0xd000]);
+	space.set_decrypted_region(0xf000, 0xffff, &m_decrypted[0xf000]);
 
 	/* Swap bits 5 & 6 for opcodes */
 	for (A = 0xf000; A < 0x10000; A++)
@@ -1654,7 +1654,7 @@ DRIVER_INIT_MEMBER(decocass_state,decocrom)
 
 static READ8_HANDLER( cdsteljn_input_r )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 	UINT8 res;
 	static const char *const portnames[2][4] = {
 		{"P1_MP0", "P1_MP1", "P1_MP2", "P1_MP3"},
@@ -1663,14 +1663,14 @@ static READ8_HANDLER( cdsteljn_input_r )
 	if(offset & 6)
 		return decocass_input_r(space,offset);
 
-	res = space->machine().root_device().ioport(portnames[offset & 1][state->m_mux_data])->read();
+	res = space.machine().root_device().ioport(portnames[offset & 1][state->m_mux_data])->read();
 
 	return res;
 }
 
 static WRITE8_HANDLER( cdsteljn_mux_w )
 {
-	decocass_state *state = space->machine().driver_data<decocass_state>();
+	decocass_state *state = space.machine().driver_data<decocass_state>();
 
 	state->m_mux_data = (data & 0xc) >> 2;
 	/* bit 0 and 1 are p1/p2 lamps */

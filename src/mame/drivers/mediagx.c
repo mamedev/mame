@@ -1259,14 +1259,14 @@ static void init_mediagx(running_machine &machine)
 
 #if SPEEDUP_HACKS
 
-INLINE UINT32 generic_speedup(address_space *space, int idx)
+INLINE UINT32 generic_speedup(address_space &space, int idx)
 {
-	mediagx_state *state = space->machine().driver_data<mediagx_state>();
+	mediagx_state *state = space.machine().driver_data<mediagx_state>();
 
-	if (space->device().safe_pc() == state->m_speedup_table[idx].pc)
+	if (space.device().safe_pc() == state->m_speedup_table[idx].pc)
 	{
 		state->m_speedup_hits[idx]++;
-		space->device().execute().spin_until_interrupt();
+		space.device().execute().spin_until_interrupt();
 	}
 	return state->m_main_ram[state->m_speedup_table[idx].offset/4];
 }

@@ -31,19 +31,19 @@ static const UINT8 laser_fdc_wrprot[2] = {0x80, 0x80};
 static void mwa_bank(running_machine &machine, int bank, int offs, int data);
 
 /* wrappers for bank #1 to #4 */
-static WRITE8_HANDLER ( mwa_bank1 ) { mwa_bank(space->machine(), 0,offset,data); }
-static WRITE8_HANDLER ( mwa_bank2 ) { mwa_bank(space->machine(), 1,offset,data); }
-static WRITE8_HANDLER ( mwa_bank3 ) { mwa_bank(space->machine(), 2,offset,data); }
-static WRITE8_HANDLER ( mwa_bank4 ) { mwa_bank(space->machine(), 3,offset,data); }
+static WRITE8_HANDLER ( mwa_bank1 ) { mwa_bank(space.machine(), 0,offset,data); }
+static WRITE8_HANDLER ( mwa_bank2 ) { mwa_bank(space.machine(), 1,offset,data); }
+static WRITE8_HANDLER ( mwa_bank3 ) { mwa_bank(space.machine(), 2,offset,data); }
+static WRITE8_HANDLER ( mwa_bank4 ) { mwa_bank(space.machine(), 3,offset,data); }
 
 /* read from banked memory (handle memory mapped i/o) */
 static int mra_bank(running_machine &machine, int bank, int offs);
 
 /* wrappers for bank #1 to #4 */
-static READ8_HANDLER ( mra_bank1 ) { return mra_bank(space->machine(),0,offset); }
-static READ8_HANDLER ( mra_bank2 ) { return mra_bank(space->machine(),1,offset); }
-static READ8_HANDLER ( mra_bank3 ) { return mra_bank(space->machine(),2,offset); }
-static READ8_HANDLER ( mra_bank4 ) { return mra_bank(space->machine(),3,offset); }
+static READ8_HANDLER ( mra_bank1 ) { return mra_bank(space.machine(),0,offset); }
+static READ8_HANDLER ( mra_bank2 ) { return mra_bank(space.machine(),1,offset); }
+static READ8_HANDLER ( mra_bank3 ) { return mra_bank(space.machine(),2,offset); }
+static READ8_HANDLER ( mra_bank4 ) { return mra_bank(space.machine(),3,offset); }
 
 /* read banked memory (handle memory mapped i/o) */
 static const struct { read8_space_func func; const char *name; }  mra_bank_soft[4] =

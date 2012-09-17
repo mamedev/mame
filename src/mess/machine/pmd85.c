@@ -28,20 +28,20 @@ enum {PMD85_1, PMD85_2, PMD85_2A, PMD85_2B, PMD85_3, ALFA, MATO, C2717};
 static void pmd851_update_memory(running_machine &machine)
 {
 	pmd85_state *state = machine.driver_data<pmd85_state>();
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	if (state->m_startup_mem_map)
 	{
 		UINT8 *mem = state->memregion("maincpu")->base();
 
-		space->unmap_write(0x0000, 0x0fff);
-		space->nop_write(0x1000, 0x1fff);
-		space->unmap_write(0x2000, 0x2fff);
-		space->nop_write(0x3000, 0x3fff);
+		space.unmap_write(0x0000, 0x0fff);
+		space.nop_write(0x1000, 0x1fff);
+		space.unmap_write(0x2000, 0x2fff);
+		space.nop_write(0x3000, 0x3fff);
 
-		space->nop_read(0x1000, 0x1fff);
-		space->nop_read(0x3000, 0x3fff);
+		space.nop_read(0x1000, 0x1fff);
+		space.nop_read(0x3000, 0x3fff);
 
 		state->membank("bank1")->set_base(mem + 0x010000);
 		state->membank("bank3")->set_base(mem + 0x010000);
@@ -53,14 +53,14 @@ static void pmd851_update_memory(running_machine &machine)
 	}
 	else
 	{
-		space->install_write_bank(0x0000, 0x0fff, "bank1");
-		space->install_write_bank(0x1000, 0x1fff, "bank2");
-		space->install_write_bank(0x2000, 0x2fff, "bank3");
-		space->install_write_bank(0x3000, 0x3fff, "bank4");
-		space->install_write_bank(0x4000, 0x7fff, "bank5");
+		space.install_write_bank(0x0000, 0x0fff, "bank1");
+		space.install_write_bank(0x1000, 0x1fff, "bank2");
+		space.install_write_bank(0x2000, 0x2fff, "bank3");
+		space.install_write_bank(0x3000, 0x3fff, "bank4");
+		space.install_write_bank(0x4000, 0x7fff, "bank5");
 
-		space->install_read_bank(0x1000, 0x1fff, "bank2");
-		space->install_read_bank(0x3000, 0x3fff, "bank4");
+		space.install_read_bank(0x1000, 0x1fff, "bank2");
+		space.install_read_bank(0x3000, 0x3fff, "bank4");
 
 		state->membank("bank1")->set_base(ram);
 		state->membank("bank2")->set_base(ram + 0x1000);
@@ -73,15 +73,15 @@ static void pmd851_update_memory(running_machine &machine)
 static void pmd852a_update_memory(running_machine &machine)
 {
 	pmd85_state *state = machine.driver_data<pmd85_state>();
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	if (state->m_startup_mem_map)
 	{
 		UINT8 *mem = state->memregion("maincpu")->base();
 
-		space->unmap_write(0x0000, 0x0fff);
-		space->unmap_write(0x2000, 0x2fff);
+		space.unmap_write(0x0000, 0x0fff);
+		space.unmap_write(0x2000, 0x2fff);
 
 		state->membank("bank1")->set_base(mem + 0x010000);
 		state->membank("bank2")->set_base(ram + 0x9000);
@@ -97,8 +97,8 @@ static void pmd852a_update_memory(running_machine &machine)
 	}
 	else
 	{
-		space->install_write_bank(0x0000, 0x0fff, "bank1");
-		space->install_write_bank(0x2000, 0x2fff, "bank3");
+		space.install_write_bank(0x0000, 0x0fff, "bank1");
+		space.install_write_bank(0x2000, 0x2fff, "bank3");
 
 		state->membank("bank1")->set_base(ram);
 		state->membank("bank2")->set_base(ram + 0x1000);
@@ -149,16 +149,16 @@ static void pmd853_update_memory(running_machine &machine)
 static void alfa_update_memory(running_machine &machine)
 {
 	pmd85_state *state = machine.driver_data<pmd85_state>();
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	if (state->m_startup_mem_map)
 	{
 		UINT8 *mem = state->memregion("maincpu")->base();
 
-		space->unmap_write(0x0000, 0x0fff);
-		space->unmap_write(0x1000, 0x33ff);
-		space->nop_write(0x3400, 0x3fff);
+		space.unmap_write(0x0000, 0x0fff);
+		space.unmap_write(0x1000, 0x33ff);
+		space.nop_write(0x3400, 0x3fff);
 
 		state->membank("bank1")->set_base(mem + 0x010000);
 		state->membank("bank2")->set_base(mem + 0x011000);
@@ -169,9 +169,9 @@ static void alfa_update_memory(running_machine &machine)
 	}
 	else
 	{
-		space->install_write_bank(0x0000, 0x0fff, "bank1");
-		space->install_write_bank(0x1000, 0x33ff, "bank2");
-		space->install_write_bank(0x3400, 0x3fff, "bank3");
+		space.install_write_bank(0x0000, 0x0fff, "bank1");
+		space.install_write_bank(0x1000, 0x33ff, "bank2");
+		space.install_write_bank(0x3400, 0x3fff, "bank3");
 
 		state->membank("bank1")->set_base(ram);
 		state->membank("bank2")->set_base(ram + 0x1000);
@@ -183,14 +183,14 @@ static void alfa_update_memory(running_machine &machine)
 static void mato_update_memory(running_machine &machine)
 {
 	pmd85_state *state = machine.driver_data<pmd85_state>();
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	if (state->m_startup_mem_map)
 	{
 		UINT8 *mem = state->memregion("maincpu")->base();
 
-		space->unmap_write(0x0000, 0x3fff);
+		space.unmap_write(0x0000, 0x3fff);
 
 		state->membank("bank1")->set_base(mem + 0x010000);
 		state->membank("bank2")->set_base(ram + 0xc000);
@@ -199,7 +199,7 @@ static void mato_update_memory(running_machine &machine)
 	}
 	else
 	{
-		space->install_write_bank(0x0000, 0x3fff, "bank1");
+		space.install_write_bank(0x0000, 0x3fff, "bank1");
 
 		state->membank("bank1")->set_base(ram);
 		state->membank("bank2")->set_base(ram + 0x4000);
@@ -209,13 +209,13 @@ static void mato_update_memory(running_machine &machine)
 static void c2717_update_memory(running_machine &machine)
 {
 	pmd85_state *state = machine.driver_data<pmd85_state>();
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *mem = state->memregion("maincpu")->base();
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	if (state->m_startup_mem_map)
 	{
-		space->unmap_write(0x0000, 0x3fff);
+		space.unmap_write(0x0000, 0x3fff);
 
 		state->membank("bank1")->set_base(mem + 0x010000);
 		state->membank("bank2")->set_base(ram + 0x4000);
@@ -224,7 +224,7 @@ static void c2717_update_memory(running_machine &machine)
 	}
 	else
 	{
-		space->install_write_bank(0x0000, 0x3fff, "bank1");
+		space.install_write_bank(0x0000, 0x3fff, "bank1");
 		state->membank("bank1")->set_base(ram);
 		state->membank("bank2")->set_base(ram + 0x4000);
 	}

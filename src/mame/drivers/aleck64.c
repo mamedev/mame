@@ -188,7 +188,7 @@ static WRITE32_HANDLER( aleck_dips_w )
 			break;
 
 		default:
-			logerror("Unknown aleck_dips_w(0x%08x, 0x%08x, %08x) @ 0x%08x PC=%08x\n", offset, data, mem_mask, 0xc0800000 + offset*4, space->device().safe_pc());
+			logerror("Unknown aleck_dips_w(0x%08x, 0x%08x, %08x) @ 0x%08x PC=%08x\n", offset, data, mem_mask, 0xc0800000 + offset*4, space.device().safe_pc());
 	}
 }
 
@@ -199,12 +199,12 @@ static READ32_HANDLER( aleck_dips_r )
 	switch( offset )
 	{
 		case 0:
-			return (space->machine().root_device().ioport("IN0")->read());	/* mtetrisc has regular inputs here */
+			return (space.machine().root_device().ioport("IN0")->read());	/* mtetrisc has regular inputs here */
 		case 1:
-			return (space->machine().root_device().ioport("IN1")->read());
+			return (space.machine().root_device().ioport("IN1")->read());
 		case 2:
 		{
-			UINT32 val = space->machine().root_device().ioport("INMJ")->read();
+			UINT32 val = space.machine().root_device().ioport("INMJ")->read();
 
 			switch( dip_read_offset >> 8 & 0xff )
 			{
@@ -227,7 +227,7 @@ static READ32_HANDLER( aleck_dips_r )
 		}
 		default:
 		{
-			logerror("Unknown aleck_dips_r(0x%08x, 0x%08x) @ 0x%08x PC=%08x\n", offset, 0xc0800000 + offset*4, mem_mask, space->device().safe_pc());
+			logerror("Unknown aleck_dips_r(0x%08x, 0x%08x) @ 0x%08x PC=%08x\n", offset, 0xc0800000 + offset*4, mem_mask, space.device().safe_pc());
 			return 0;
 		}
 	}

@@ -339,13 +339,11 @@ void atvtrack_state::machine_start()
 
 void atvtrack_state::machine_reset()
 {
-	address_space *as;
-
 	// Probably just after reset the cpu executes some bootsrtap routine from a memory inside the fpga.
 	// The routine initializes the cpu, copies the boot program from the flash memories into the cpu sdram
 	// and finally executes it.
 	// Here there is the setup of the cpu, the boot program is copied in machine_start
-	as = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &as = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	// set cpu PC register to 0x0c7f0000
 	machine().device("maincpu")->state().set_pc(0x0c7f0000);
 	// set BCR2 to 1

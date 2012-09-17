@@ -644,7 +644,7 @@ WRITE8_MEMBER(polgar_state::academy_write_board)
 
 	latch_data = data;
 //    logerror("acad_write_latch %02x\n",data);
-	if (data != 0xff) mboard_write_board_8(&space,0, data);
+	if (data != 0xff) mboard_write_board_8(space,0, data);
 }
 
 WRITE8_MEMBER(polgar_state::milano_write_board)
@@ -754,7 +754,7 @@ READ8_MEMBER(polgar_state::read_keys_board_monteciv)
 	UINT8 data = 0;
 
 	if (monteciv_select[0] == 0xff && monteciv_select[1] == 0xff) {
-			data = mboard_read_board_8(&space,0);
+			data = mboard_read_board_8(space,0);
 	} else {
 		if (monteciv_select[0] == 0x0) {
 			data = ioport("BUTTONS_MONTE2")->read();
@@ -792,14 +792,14 @@ READ8_MEMBER(polgar_state::read_keys_board_academy)
 		data = ioport("BUTTONS_ACAD")->read();
 	} else {
 //      if (latch_data & 0x7f) {
-		data = mboard_read_board_8(&space,0);
+		data = mboard_read_board_8(space,0);
 //      data = milano_read_board(space,0);
 
 //          logerror("ReadingBoard %02x\n",latch_data);
 //          line = get_first_cleared_bit(latch_data);
 //          tmp = machine.root_device().ioport(board_lines[line])->read();
-//          mboard_write_board_8(&space,0, latch_data);
-//          data = mboard_read_board_8(&space,0);
+//          mboard_write_board_8(space,0, latch_data);
+//          data = mboard_read_board_8(space,0);
 //          logerror("BoardRead Port Offset = %d data %02x Latch %02x\n", offset,data,latch_data);
 //          printf  ("BoardRead Port Offset = %d data %02x Latch %02x\n", offset,data,latch_data);
 //      } else {
@@ -885,10 +885,10 @@ WRITE16_MEMBER(polgar_state::write_LCD_data)
 
 }
 
-static void write_IOenable(unsigned char data,address_space *space) {
+static void write_IOenable(unsigned char data,address_space &space) {
 
-	hd44780_device * hd44780 = space->machine().device<hd44780_device>("hd44780");
-	device_t *speaker = space->machine().device("beep");
+	hd44780_device * hd44780 = space.machine().device<hd44780_device>("hd44780");
+	device_t *speaker = space.machine().device("beep");
 
 	if (BIT(data,5) && BIT(data,4)) {
 		if (BIT(data,1)) {
@@ -899,15 +899,15 @@ static void write_IOenable(unsigned char data,address_space *space) {
 			// MAME core does not appear to have this opcode timed right.
 			// This also allows 'fake' clocks to test ELO at impossibly high speeds on real hardware
 			// The original programmer says RAM is 2x as fast as the ROM on the 030 machines, maybe waitstates can be put in MAME core someday
-//          cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));
+//          cpu_spinuntil_time(space.cpu, ATTOTIME_IN_USEC(50));
 			if (BIT(data,0)) {
 				logerror("Write LCD_DATA [%02x] [%c]\n",lcd32_char,lcd32_char);
 //              printf("Write LCD_DATA [%02x] [%c]\n",lcd32_char,lcd32_char);
-				hd44780->data_write(*space, 128, lcd32_char);
+				hd44780->data_write(space, 128, lcd32_char);
 			} else {
 				logerror("Write LCD_CTRL [%02x] [%c]\n",lcd32_char,lcd32_char);
 //              printf("Write LCD_CTRL [%02x] [%c]\n",lcd32_char,lcd32_char);
-				hd44780->control_write(*space, 128, lcd32_char);
+				hd44780->control_write(space, 128, lcd32_char);
 			}
 		}
 
@@ -920,12 +920,12 @@ static void write_IOenable(unsigned char data,address_space *space) {
 
 WRITE32_MEMBER(polgar_state::write_IOenables_32){
 
-	write_IOenable(data>>24,&space);
+	write_IOenable(data>>24,space);
 }
 
 WRITE16_MEMBER(polgar_state::write_IOenables)
 {
-	write_IOenable(data>>8,&space);
+	write_IOenable(data>>8,space);
 }
 
 /* Unknown read/write */

@@ -137,7 +137,7 @@ void balsente_state::machine_start()
 
 void balsente_state::machine_reset()
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int numbanks;
 
 	/* reset counters; counter 2's gate is tied high */
@@ -163,8 +163,8 @@ void balsente_state::machine_reset()
 	m_grudge_steering_result = 0;
 
 	/* reset the 6850 chips */
-	balsente_m6850_w(*space, 0, 3);
-	balsente_m6850_sound_w(*space, 0, 3);
+	balsente_m6850_w(space, 0, 3);
+	balsente_m6850_sound_w(space, 0, 3);
 
 	/* reset the noise generator */
 	memset(m_noise_position, 0, sizeof(m_noise_position));

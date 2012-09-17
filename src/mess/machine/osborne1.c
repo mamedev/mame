@@ -426,9 +426,9 @@ static void osborne1_load_proc(device_image_interface &image)
 void osborne1_state::machine_reset()
 {
 	int drive;
-	address_space* space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/* Initialize memory configuration */
-	osborne1_bankswitch_w( *space, 0x00, 0 );
+	osborne1_bankswitch_w( space, 0x00, 0 );
 
 	m_pia_0_irq_state = FALSE;
 	m_pia_1_irq_state = FALSE;
@@ -441,7 +441,7 @@ void osborne1_state::machine_reset()
 	for(drive=0;drive<2;drive++)
 		floppy_install_load_proc(floppy_get_device(machine(), drive), osborne1_load_proc);
 
-	space->set_direct_update_handler(direct_update_delegate(FUNC(osborne1_state::osborne1_opbase), this));
+	space.set_direct_update_handler(direct_update_delegate(FUNC(osborne1_state::osborne1_opbase), this));
 }
 
 
@@ -524,9 +524,9 @@ int osborne1_daisy_device::z80daisy_irq_ack()
 	osborne1_state *state = machine().driver_data<osborne1_state>();
 	/* Enable ROM and I/O when IRQ is acknowledged */
 	UINT8 old_bankswitch = state->m_bankswitch;
-	address_space* space = device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	state->osborne1_bankswitch_w( *space, 0, 0 );
+	state->osborne1_bankswitch_w( space, 0, 0 );
 	state->m_bankswitch = old_bankswitch;
 	state->m_in_irq_handler = 1;
 	return 0xF8;

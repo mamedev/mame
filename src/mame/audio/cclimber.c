@@ -74,7 +74,7 @@ WRITE8_HANDLER( cclimber_sample_trigger_w )
 	if (data == 0)
 		return;
 
-	cclimber_play_sample(space->machine(), 32 * sample_num,sample_freq,sample_volume);
+	cclimber_play_sample(space.machine(), 32 * sample_num,sample_freq,sample_volume);
 }
 
 

@@ -413,7 +413,7 @@ static CPU_EXECUTE( tms )
 
 static READ16_HANDLER( cpuregs_r )
 {
-	tms32051_state *cpustate = get_safe_token(&space->device());
+	tms32051_state *cpustate = get_safe_token(&space.device());
 
 	switch (offset)
 	{
@@ -458,7 +458,7 @@ static READ16_HANDLER( cpuregs_r )
 
 		case 0x28:	return 0;	// PDWSR
 		default:
-		if(!space->debugger_access())
+		if(!space.debugger_access())
 			fatalerror("32051: cpuregs_r: unimplemented memory-mapped register %02X at %04X\n", offset, cpustate->pc-1);
 	}
 
@@ -467,7 +467,7 @@ static READ16_HANDLER( cpuregs_r )
 
 static WRITE16_HANDLER( cpuregs_w )
 {
-	tms32051_state *cpustate = get_safe_token(&space->device());
+	tms32051_state *cpustate = get_safe_token(&space.device());
 
 	switch (offset)
 	{
@@ -536,7 +536,7 @@ static WRITE16_HANDLER( cpuregs_w )
 
 		case 0x28:	break;		// PDWSR
 		default:
-		if(!space->debugger_access())
+		if(!space.debugger_access())
 			fatalerror("32051: cpuregs_w: unimplemented memory-mapped register %02X, data %04X at %04X\n", offset, data, cpustate->pc-1);
 	}
 }

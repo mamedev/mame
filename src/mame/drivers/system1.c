@@ -4704,7 +4704,7 @@ READ8_MEMBER(system1_state::nob_start_r)
 
 DRIVER_INIT_MEMBER(system1_state,nob)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	address_space *iospace = machine().device("maincpu")->memory().space(AS_IO);
 
 	DRIVER_INIT_CALL(bank44);
@@ -4712,7 +4712,7 @@ DRIVER_INIT_MEMBER(system1_state,nob)
 	/* hack to fix incorrect JMP at start, which should obviously be to $0080 */
 	/* patching the ROM causes errors in the self-test */
 	/* in real-life, it could be some behavior dependent upon M1 */
-	space->install_read_handler(0x0001, 0x0001, read8_delegate(FUNC(system1_state::nob_start_r),this));
+	space.install_read_handler(0x0001, 0x0001, read8_delegate(FUNC(system1_state::nob_start_r),this));
 
 	/* install MCU communications */
 	iospace->install_readwrite_handler(0x18, 0x18, 0x00, 0x00, read8_delegate(FUNC(system1_state::nob_maincpu_latch_r),this), write8_delegate(FUNC(system1_state::nob_maincpu_latch_w),this));
@@ -4752,16 +4752,16 @@ DRIVER_INIT_MEMBER(system1_state,nobb)
 
 DRIVER_INIT_MEMBER(system1_state,bootleg)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, machine().root_device().memregion("maincpu")->base() + 0x10000);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	space.set_decrypted_region(0x0000, 0x7fff, machine().root_device().memregion("maincpu")->base() + 0x10000);
 	DRIVER_INIT_CALL(bank00);
 }
 
 
 DRIVER_INIT_MEMBER(system1_state,bootsys2)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, machine().root_device().memregion("maincpu")->base() + 0x20000);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	space.set_decrypted_region(0x0000, 0x7fff, machine().root_device().memregion("maincpu")->base() + 0x20000);
 	machine().root_device().membank("bank1")->configure_decrypted_entries(0, 4, machine().root_device().memregion("maincpu")->base() + 0x30000, 0x4000);
 	DRIVER_INIT_CALL(bank0c);
 }

@@ -829,8 +829,8 @@ WRITE16_MEMBER(neogeo_state::neogeo_video_register_w)
 		case 0x01: set_videoram_data(machine(), data); break;
 		case 0x02: set_videoram_modulo(machine(), data); break;
 		case 0x03: set_video_control(machine(), data); break;
-		case 0x04: neogeo_set_display_counter_msb(&space, data); break;
-		case 0x05: neogeo_set_display_counter_lsb(&space, data); break;
+		case 0x04: neogeo_set_display_counter_msb(space, data); break;
+		case 0x05: neogeo_set_display_counter_lsb(space, data); break;
 		case 0x06: neogeo_acknowledge_interrupt(machine(), data); break;
 		case 0x07: break; /* unknown, see get_video_control */
 		}

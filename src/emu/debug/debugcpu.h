@@ -422,40 +422,40 @@ bool debug_comment_load(running_machine &machine);
 /* ----- debugger memory accessors ----- */
 
 /* return the physical address corresponding to the given logical address */
-int debug_cpu_translate(address_space *space, int intention, offs_t *address);
+int debug_cpu_translate(address_space &space, int intention, offs_t *address);
 
 /* return a byte from the the specified memory space */
-UINT8 debug_read_byte(address_space *space, offs_t address, int apply_translation);
+UINT8 debug_read_byte(address_space &space, offs_t address, int apply_translation);
 
 /* return a word from the the specified memory space */
-UINT16 debug_read_word(address_space *space, offs_t address, int apply_translation);
+UINT16 debug_read_word(address_space &space, offs_t address, int apply_translation);
 
 /* return a dword from the the specified memory space */
-UINT32 debug_read_dword(address_space *space, offs_t address, int apply_translation);
+UINT32 debug_read_dword(address_space &space, offs_t address, int apply_translation);
 
 /* return a qword from the the specified memory space */
-UINT64 debug_read_qword(address_space *space, offs_t address, int apply_translation);
+UINT64 debug_read_qword(address_space &space, offs_t address, int apply_translation);
 
 /* return 1,2,4 or 8 bytes from the specified memory space */
-UINT64 debug_read_memory(address_space *space, offs_t address, int size, int apply_translation);
+UINT64 debug_read_memory(address_space &space, offs_t address, int size, int apply_translation);
 
 /* write a byte to the specified memory space */
-void debug_write_byte(address_space *space, offs_t address, UINT8 data, int apply_translation);
+void debug_write_byte(address_space &space, offs_t address, UINT8 data, int apply_translation);
 
 /* write a word to the specified memory space */
-void debug_write_word(address_space *space, offs_t address, UINT16 data, int apply_translation);
+void debug_write_word(address_space &space, offs_t address, UINT16 data, int apply_translation);
 
 /* write a dword to the specified memory space */
-void debug_write_dword(address_space *space, offs_t address, UINT32 data, int apply_translation);
+void debug_write_dword(address_space &space, offs_t address, UINT32 data, int apply_translation);
 
 /* write a qword to the specified memory space */
-void debug_write_qword(address_space *space, offs_t address, UINT64 data, int apply_translation);
+void debug_write_qword(address_space &space, offs_t address, UINT64 data, int apply_translation);
 
 /* write 1,2,4 or 8 bytes to the specified memory space */
-void debug_write_memory(address_space *space, offs_t address, UINT64 data, int size, int apply_translation);
+void debug_write_memory(address_space &space, offs_t address, UINT64 data, int size, int apply_translation);
 
 /* read 1,2,4 or 8 bytes at the given offset from opcode space */
-UINT64 debug_read_opcode(address_space *space, offs_t offset, int size, int arg);
+UINT64 debug_read_opcode(address_space &space, offs_t offset, int size, int arg);
 
 
 #endif

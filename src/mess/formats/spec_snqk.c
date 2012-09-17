@@ -320,7 +320,7 @@ void spectrum_setup_sp(running_machine &machine, UINT8 *snapdata, UINT32 snapsiz
     UINT16 start, size, data, status;
     spectrum_state *state = machine.driver_data<spectrum_state>();
     device_t *cpu = machine.device("maincpu");
-    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
     if (snapsize == SP_NEW_SIZE_16K || snapsize == SP_NEW_SIZE_48K)
     {
@@ -415,7 +415,7 @@ void spectrum_setup_sp(running_machine &machine, UINT8 *snapdata, UINT32 snapsiz
     /* Memory dump */
     logerror("Loading %04X bytes of RAM at %04X\n", size, start);
     for (i = 0; i < size; i++)
-        space->write_byte(start + i, snapdata[SP_OFFSET + SP_NEW_HDR + i]);
+        space.write_byte(start + i, snapdata[SP_OFFSET + SP_NEW_HDR + i]);
 
     /* Set border color */
     data = snapdata[SP_OFFSET + 34] & 0x07;
@@ -520,7 +520,7 @@ void spectrum_setup_sna(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     UINT16 data, addr;
     spectrum_state *state = machine.driver_data<spectrum_state>();
     device_t *cpu = machine.device("maincpu");
-    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
     if ((snapsize != SNA48_SIZE) && (state->m_port_7ffd_data == -1))
     {
@@ -606,7 +606,7 @@ void spectrum_setup_sna(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
         /* Memory dump */
         logerror("Loading %04X bytes of RAM at %04X\n", 3*SPECTRUM_BANK, BASE_RAM);
         for (i = 0; i < 3*SPECTRUM_BANK; i++)
-          space->write_byte(BASE_RAM + i, snapdata[SNA48_HDR + i]);
+          space.write_byte(BASE_RAM + i, snapdata[SNA48_HDR + i]);
 
         /* Get PC from stack */
         addr = cpu->state().state_int(Z80_SP);
@@ -616,12 +616,12 @@ void spectrum_setup_sna(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
         else
           logerror("Fetching PC from the stack at SP:%04X\n", addr);
 
-        data = (space->read_byte(addr + 1) << 8) | space->read_byte(addr + 0);
+        data = (space.read_byte(addr + 1) << 8) | space.read_byte(addr + 0);
         LOAD_REG(cpu, Z80_PC, data);
 
 #if 0
-        space->write_byte(addr + 0, 0); // It's been reported that zeroing these locations fixes the loading
-        space->write_byte(addr + 1, 0); // of a few images that were snapshot at a "wrong" instant
+        space.write_byte(addr + 0, 0); // It's been reported that zeroing these locations fixes the loading
+        space.write_byte(addr + 1, 0); // of a few images that were snapshot at a "wrong" instant
 #endif
 
         addr += 2;
@@ -651,7 +651,7 @@ void spectrum_setup_sna(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
         logerror("Loading bank 2 from offset:0401B\n");
         logerror("Loading bank %d from offset:0801B\n", snapdata[SNA128_OFFSET + 2] & 0x07);
         for (i = 0; i < 3*SPECTRUM_BANK; i++)
-          space->write_byte(BASE_RAM + i, snapdata[SNA48_HDR + i]);
+          space.write_byte(BASE_RAM + i, snapdata[SNA48_HDR + i]);
 
         bank_offset = SNA48_SIZE + SNA128_HDR;
         for (i = 0; i < 8; i++)
@@ -663,7 +663,7 @@ void spectrum_setup_sna(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
                 state->m_port_7ffd_data += i;
                 spectrum_update_paging(machine);
                 for (j = 0; j < SPECTRUM_BANK; j++)
-                    space->write_byte(j + 3*SPECTRUM_BANK, snapdata[bank_offset + j]);
+                    space.write_byte(j + 3*SPECTRUM_BANK, snapdata[bank_offset + j]);
                 bank_offset += SPECTRUM_BANK;
             }
         }
@@ -739,7 +739,7 @@ void spectrum_setup_ach(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     UINT16 data;
     spectrum_state *state = machine.driver_data<spectrum_state>();
     device_t *cpu = machine.device("maincpu");
-    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
     data = (snapdata[ACH_OFFSET +   0] << 8) | snapdata[ACH_OFFSET +   4];
     LOAD_REG(cpu, Z80_AF, data);
@@ -804,7 +804,7 @@ void spectrum_setup_ach(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     /* Memory dump */
     logerror("Loading %04X bytes of RAM at %04X\n", 3*SPECTRUM_BANK, BASE_RAM);
     for (i = 0; i < 3*SPECTRUM_BANK; i++)
-        space->write_byte(BASE_RAM + i, snapdata[ACH_HDR + SPECTRUM_BANK + i]);
+        space.write_byte(BASE_RAM + i, snapdata[ACH_HDR + SPECTRUM_BANK + i]);
 
     /* Set border color */
     data = snapdata[ACH_OFFSET + 156] & 0x07;
@@ -872,7 +872,7 @@ void spectrum_setup_prg(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     UINT16 addr, data;
     spectrum_state *state = machine.driver_data<spectrum_state>();
     device_t *cpu = machine.device("maincpu");
-    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
     data = snapdata[PRG_OFFSET +   0];
     if (data != 0x05)
@@ -915,7 +915,7 @@ void spectrum_setup_prg(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     /* Memory dump */
     logerror("Loading %04X bytes of RAM at %04X\n", 3*SPECTRUM_BANK, BASE_RAM);
     for (i = 0; i < 3*SPECTRUM_BANK; i++)
-        space->write_byte(BASE_RAM + i, snapdata[PRG_HDR + i]);
+        space.write_byte(BASE_RAM + i, snapdata[PRG_HDR + i]);
 
     addr = (snapdata[PRG_OFFSET + 241] << 8) | snapdata[PRG_OFFSET + 240];
     if (addr < BASE_RAM || addr > 4*SPECTRUM_BANK - 6)
@@ -923,7 +923,7 @@ void spectrum_setup_prg(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     else
       logerror("Fetching registers IFF1/2, R, AF and PC from the stack at SP:%04X\n", addr);
 
-    data = space->read_byte(addr + 0); // IFF1/2: (bit 2, 0=DI/1=EI)
+    data = space.read_byte(addr + 0); // IFF1/2: (bit 2, 0=DI/1=EI)
     LOAD_REG(cpu, Z80_IFF1, BIT(data, 2));
     LOAD_REG(cpu, Z80_IFF2, BIT(data, 2));
 
@@ -931,22 +931,22 @@ void spectrum_setup_prg(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, intr);
     machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
-    data = space->read_byte(addr + 1);
+    data = space.read_byte(addr + 1);
     LOAD_REG(cpu, Z80_R, data);
 
-    data = (space->read_byte(addr + 3) << 8) | space->read_byte(addr + 2);
+    data = (space.read_byte(addr + 3) << 8) | space.read_byte(addr + 2);
     LOAD_REG(cpu, Z80_AF, data);
 
-    data = (space->read_byte(addr + 5) << 8) | space->read_byte(addr + 4);
+    data = (space.read_byte(addr + 5) << 8) | space.read_byte(addr + 4);
     LOAD_REG(cpu, Z80_PC, data);
 
 #if 0
-    space->write_byte(addr + 0, 0); // It's been reported that zeroing these locations fixes the loading
-    space->write_byte(addr + 1, 0); // of a few images that were snapshot at a "wrong" instant
-    space->write_byte(addr + 2, 0);
-    space->write_byte(addr + 3, 0);
-    space->write_byte(addr + 4, 0);
-    space->write_byte(addr + 5, 0);
+    space.write_byte(addr + 0, 0); // It's been reported that zeroing these locations fixes the loading
+    space.write_byte(addr + 1, 0); // of a few images that were snapshot at a "wrong" instant
+    space.write_byte(addr + 2, 0);
+    space.write_byte(addr + 3, 0);
+    space.write_byte(addr + 4, 0);
+    space.write_byte(addr + 5, 0);
 #endif
 
     addr += 6;
@@ -954,7 +954,7 @@ void spectrum_setup_prg(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     cpu->state().set_state_int(Z80_SP, addr);
 
     /* Set border color */
-    data = (space->read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
+    data = (space.read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
     state->m_port_fe_data = (state->m_port_fe_data & 0xf8) | data;
     spectrum_border_update(machine, data);
     logerror("Border color:%02X\n", data);
@@ -1042,7 +1042,7 @@ void spectrum_setup_plusd(running_machine &machine, UINT8 *snapdata, UINT32 snap
     UINT16 addr = 0, data;
     spectrum_state *state = machine.driver_data<spectrum_state>();
     device_t *cpu = machine.device("maincpu");
-    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
     data = (snapdata[PLUSD_OFFSET + 15] << 8) | snapdata[PLUSD_OFFSET + 14];
     LOAD_REG(cpu, Z80_BC, data);
@@ -1085,7 +1085,7 @@ void spectrum_setup_plusd(running_machine &machine, UINT8 *snapdata, UINT32 snap
         /* Memory dump */
         logerror("Loading %04X bytes of RAM at %04X\n", 3*SPECTRUM_BANK, BASE_RAM);
         for (i = 0; i < 3*SPECTRUM_BANK; i++)
-            space->write_byte(BASE_RAM + i, snapdata[PLUSD48_HDR + i]);
+            space.write_byte(BASE_RAM + i, snapdata[PLUSD48_HDR + i]);
     }
     else
     {
@@ -1111,7 +1111,7 @@ void spectrum_setup_plusd(running_machine &machine, UINT8 *snapdata, UINT32 snap
             };
             logerror("Loading bank %d from offset:%05X\n", i, PLUSD128_HDR + i*SPECTRUM_BANK);
             for (j = 0; j < SPECTRUM_BANK; j++)
-                space->write_byte(j + addr, snapdata[j + PLUSD128_HDR + i*SPECTRUM_BANK]);
+                space.write_byte(j + addr, snapdata[j + PLUSD128_HDR + i*SPECTRUM_BANK]);
         }
         state->m_port_7ffd_data = snapdata[PLUSD_OFFSET + 22];
         logerror ("Port 7FFD:%02X\n", state->m_port_7ffd_data);
@@ -1125,7 +1125,7 @@ void spectrum_setup_plusd(running_machine &machine, UINT8 *snapdata, UINT32 snap
     else
       logerror("Fetching registers IFF1/2, R, AF and PC from the stack at SP:%04X\n", addr);
 
-    data = space->read_byte(addr + 0); // IFF1/2: (bit 2, 0=DI/1=EI)
+    data = space.read_byte(addr + 0); // IFF1/2: (bit 2, 0=DI/1=EI)
     LOAD_REG(cpu, Z80_IFF1, BIT(data, 2));
     LOAD_REG(cpu, Z80_IFF2, BIT(data, 2));
 
@@ -1133,22 +1133,22 @@ void spectrum_setup_plusd(running_machine &machine, UINT8 *snapdata, UINT32 snap
     machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, intr);
     machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
-    data = space->read_byte(addr + 1);
+    data = space.read_byte(addr + 1);
     LOAD_REG(cpu, Z80_R, data);
 
-    data = (space->read_byte(addr + 3) << 8) | space->read_byte(addr + 2);
+    data = (space.read_byte(addr + 3) << 8) | space.read_byte(addr + 2);
     LOAD_REG(cpu, Z80_AF, data);
 
-    data = (space->read_byte(addr + 5) << 8) | space->read_byte(addr + 4);
+    data = (space.read_byte(addr + 5) << 8) | space.read_byte(addr + 4);
     LOAD_REG(cpu, Z80_PC, data);
 
 #if 0
-    space->write_byte(addr + 0, 0); // It's been reported that zeroing these locations fixes the loading
-    space->write_byte(addr + 1, 0); // of a few images that were snapshot at a "wrong" instant
-    space->write_byte(addr + 2, 0);
-    space->write_byte(addr + 3, 0);
-    space->write_byte(addr + 4, 0);
-    space->write_byte(addr + 5, 0);
+    space.write_byte(addr + 0, 0); // It's been reported that zeroing these locations fixes the loading
+    space.write_byte(addr + 1, 0); // of a few images that were snapshot at a "wrong" instant
+    space.write_byte(addr + 2, 0);
+    space.write_byte(addr + 3, 0);
+    space.write_byte(addr + 4, 0);
+    space.write_byte(addr + 5, 0);
 #endif
 
     addr += 6;
@@ -1156,7 +1156,7 @@ void spectrum_setup_plusd(running_machine &machine, UINT8 *snapdata, UINT32 snap
     cpu->state().set_state_int(Z80_SP, addr);
 
     /* Set border color */
-    data = (space->read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
+    data = (space.read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
     state->m_port_fe_data = (state->m_port_fe_data & 0xf8) | data;
     spectrum_border_update(machine, data);
     logerror("Border color:%02X\n", data);
@@ -1210,7 +1210,7 @@ void spectrum_setup_sem(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     UINT16 data;
     spectrum_state *state = machine.driver_data<spectrum_state>();
     device_t *cpu = machine.device("maincpu");
-    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
     data = (snapdata[SEM_OFFSET +  1] << 8) | snapdata[SEM_OFFSET +  0];
     LOAD_REG(cpu, Z80_AF, data);
@@ -1273,10 +1273,10 @@ void spectrum_setup_sem(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     /* Memory dump */
     logerror("Loading %04X bytes of RAM at %04X\n", 3*SPECTRUM_BANK, BASE_RAM);
     for (i = 0; i < 3*SPECTRUM_BANK; i++)
-        space->write_byte(BASE_RAM + i, snapdata[SEM_SIGNATURE + i]);
+        space.write_byte(BASE_RAM + i, snapdata[SEM_SIGNATURE + i]);
 
     /* Set border color */
-    data = (space->read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
+    data = (space.read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
     state->m_port_fe_data = (state->m_port_fe_data & 0xf8) | data;
     spectrum_border_update(machine, data);
     logerror("Border color:%02X\n", data);
@@ -1329,7 +1329,7 @@ void spectrum_setup_sit(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     UINT16 data;
     spectrum_state *state = machine.driver_data<spectrum_state>();
     device_t *cpu = machine.device("maincpu");
-    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
     data = (snapdata[SIT_OFFSET +  7] << 8) | snapdata[SIT_OFFSET +  6];
     LOAD_REG(cpu, Z80_AF, data);
@@ -1392,7 +1392,7 @@ void spectrum_setup_sit(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     logerror("Skipping the 16K ROM dump at offset:%04X\n", SIT_OFFSET + 28);
     logerror("Loading %04X bytes of RAM at %04X\n", 3*SPECTRUM_BANK, BASE_RAM);
     for (i = 0; i < 3*SPECTRUM_BANK; i++)
-        space->write_byte(BASE_RAM + i, snapdata[SIT_HDR + SPECTRUM_BANK + i]);
+        space.write_byte(BASE_RAM + i, snapdata[SIT_HDR + SPECTRUM_BANK + i]);
 
     /* Set border color */
     data = snapdata[SIT_OFFSET + 27] & 0x07;
@@ -1459,7 +1459,7 @@ void spectrum_setup_zx(running_machine &machine, UINT8 *snapdata, UINT32 snapsiz
     UINT16 data, mode;
     spectrum_state *state = machine.driver_data<spectrum_state>();
     device_t *cpu = machine.device("maincpu");
-    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
     logerror("Skipping last 132 bytes of the 16K ROM dump at offset:0000\n");
 
@@ -1536,10 +1536,10 @@ void spectrum_setup_zx(running_machine &machine, UINT8 *snapdata, UINT32 snapsiz
     /* Memory dump */
     logerror("Loading %04X bytes of RAM at %04X\n", 3*SPECTRUM_BANK, BASE_RAM);
     for (i = 0; i < 3*SPECTRUM_BANK; i++)
-        space->write_byte(BASE_RAM + i, snapdata[132 + i]);
+        space.write_byte(BASE_RAM + i, snapdata[132 + i]);
 
     /* Set border color */
-    data = (space->read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
+    data = (space.read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
     state->m_port_fe_data = (state->m_port_fe_data & 0xf8) | data;
     spectrum_border_update(machine, data);
     logerror("Border color:%02X\n", data);
@@ -1591,7 +1591,7 @@ void spectrum_setup_snp(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     UINT16 data;
     spectrum_state *state = machine.driver_data<spectrum_state>();
     device_t *cpu = machine.device("maincpu");
-    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
     data = (snapdata[SNP_OFFSET +  1] << 8) | snapdata[SNP_OFFSET +  0];
     LOAD_REG(cpu, Z80_AF, data);
@@ -1654,7 +1654,7 @@ void spectrum_setup_snp(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     /* Memory dump */
     logerror("Loading %04X bytes of RAM at %04X\n", 3*SPECTRUM_BANK, BASE_RAM);
     for (i = 0; i < 3*SPECTRUM_BANK; i++)
-        space->write_byte(BASE_RAM + i, snapdata[i]);
+        space.write_byte(BASE_RAM + i, snapdata[i]);
 
     /* Set border color */
     data = snapdata[SNP_OFFSET +  2] & 0x07;
@@ -1768,7 +1768,7 @@ static void spectrum_snx_decompress_block(running_machine &machine, UINT8 *sourc
 {
     UINT8 counthi, countlo, compress, fill;
     UINT16 block = 0, count, i, j, numbytes;
-    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
     i = SNX_HDR - 1;
     numbytes = 0;
@@ -1798,7 +1798,7 @@ static void spectrum_snx_decompress_block(running_machine &machine, UINT8 *sourc
             fill = source[++i];
             logerror("Dest:%04X  Filler:%02X\n", BASE_RAM + numbytes, fill);
             for(j = 0; j < count; j++)
-                space->write_byte(BASE_RAM + numbytes + j, fill);
+                space.write_byte(BASE_RAM + numbytes + j, fill);
             numbytes += count;
         }
         else
@@ -1806,7 +1806,7 @@ static void spectrum_snx_decompress_block(running_machine &machine, UINT8 *sourc
             logerror("Dest:%04X\n", BASE_RAM + numbytes);
             j = 0;
             while (j < count)
-                space->write_byte(BASE_RAM + numbytes + j++, source[++i]);
+                space.write_byte(BASE_RAM + numbytes + j++, source[++i]);
             numbytes += count;
         }
     }
@@ -1818,7 +1818,7 @@ void spectrum_setup_snx(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     UINT16 data, addr;
     spectrum_state *state = machine.driver_data<spectrum_state>();
     device_t *cpu = machine.device("maincpu");
-    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
     data = (snapdata[SNX_OFFSET +  4] << 8) | snapdata[SNX_OFFSET +  5];
     if (data != 0x25)
@@ -1893,11 +1893,11 @@ void spectrum_setup_snx(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     else
       logerror("Fetching PC from the stack at SP:%04X\n", addr);
 
-    LOAD_REG(cpu, Z80_PC, (space->read_byte(addr + 1) << 8) | space->read_byte(addr + 0));
+    LOAD_REG(cpu, Z80_PC, (space.read_byte(addr + 1) << 8) | space.read_byte(addr + 0));
 
 #if 0
-    space->write_byte(addr + 0, 0); // It's been reported that zeroing these locations fixes the loading
-    space->write_byte(addr + 1, 0); // of a few images that were snapshot at a "wrong" instant
+    space.write_byte(addr + 0, 0); // It's been reported that zeroing these locations fixes the loading
+    space.write_byte(addr + 1, 0); // of a few images that were snapshot at a "wrong" instant
 #endif
 
     addr += 2;
@@ -1972,7 +1972,7 @@ void spectrum_setup_frz(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     UINT16 addr, data;
     spectrum_state *state = machine.driver_data<spectrum_state>();
     device_t *cpu = machine.device("maincpu");
-    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
     if (state->m_port_7ffd_data == -1)
     {
@@ -2063,7 +2063,7 @@ void spectrum_setup_frz(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
         };
         logerror("Loading bank %d from offset:%05X\n", banks[i], FRZ_HDR + i*SPECTRUM_BANK);
         for (j = 0; j < SPECTRUM_BANK; j++)
-            space->write_byte(j + addr, snapdata[j + FRZ_HDR + i*SPECTRUM_BANK]);
+            space.write_byte(j + addr, snapdata[j + FRZ_HDR + i*SPECTRUM_BANK]);
     }
     state->m_port_7ffd_data = snapdata[FRZ_OFFSET +  1];
     logerror ("Port 7FFD:%02X\n", state->m_port_7ffd_data);
@@ -2071,7 +2071,7 @@ void spectrum_setup_frz(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     spectrum_update_paging(machine);
 
     /* Set border color */
-    data = (space->read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
+    data = (space.read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
     state->m_port_fe_data = (state->m_port_fe_data & 0xf8) | data;
     spectrum_border_update(machine, data);
     logerror("Border color:%02X\n", data);
@@ -2083,7 +2083,7 @@ static void spectrum_z80_decompress_block(running_machine &machine,UINT8 *source
 {
     UINT8 ch;
     int i;
-    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
     do
     {
@@ -2115,14 +2115,14 @@ static void spectrum_z80_decompress_block(running_machine &machine,UINT8 *source
 
                 for (i = 0; i < count; i++)
                 {
-                    space->write_byte(dest, data);
+                    space.write_byte(dest, data);
                     dest++;
                 }
             }
             else
             {
                 /* single 0x0ed */
-                space->write_byte(dest, ch);
+                space.write_byte(dest, ch);
                 dest++;
                 source++;
                 size--;
@@ -2131,7 +2131,7 @@ static void spectrum_z80_decompress_block(running_machine &machine,UINT8 *source
         else
         {
             /* not 0x0ed */
-            space->write_byte(dest, ch);
+            space.write_byte(dest, ch);
             dest++;
             source++;
             size--;
@@ -2194,7 +2194,7 @@ void spectrum_setup_z80(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     int i;
     UINT8 lo, hi, data;
     SPECTRUM_Z80_SNAPSHOT_TYPE z80_type;
-    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
     z80_type = spectrum_identify_z80(snapdata, snapsize);
 
@@ -2331,7 +2331,7 @@ void spectrum_setup_z80(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
         {
             logerror("Not compressed\n");   /* not compressed */
             for (i = 0; i < 49152; i++)
-                space->write_byte(i + 16384, snapdata[30 + i]);
+                space.write_byte(i + 16384, snapdata[30 + i]);
         }
         else
         {
@@ -2412,7 +2412,7 @@ void spectrum_setup_z80(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
 
                     /* not compressed */
                     for (i = 0; i < 16384; i++)
-                        space->write_byte(i + Dest, pSource[i]);
+                        space.write_byte(i + Dest, pSource[i]);
                 }
                 else
                 {
@@ -2520,10 +2520,10 @@ error:
 void spectrum_setup_scr(running_machine &machine, UINT8 *quickdata, UINT32 quicksize)
 {
     int i;
-    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
     for (i = 0; i < quicksize; i++)
-        space->write_byte(i + BASE_RAM, quickdata[i]);
+        space.write_byte(i + BASE_RAM, quickdata[i]);
 
     log_quickload(quicksize == SCR_SIZE ? "SCREEN$" : "SCREEN$ (Mono)", BASE_RAM, quicksize, 0, EXEC_NA);
 }
@@ -2560,16 +2560,16 @@ void spectrum_setup_raw(running_machine &machine, UINT8 *quickdata, UINT32 quick
 	UINT8 data;
     UINT16 start, len;
     spectrum_state *state = machine.driver_data<spectrum_state>();
-    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
     start = (quickdata[RAW_OFFSET + 4] << 8) | quickdata[RAW_OFFSET + 3];
     len   = (quickdata[RAW_OFFSET + 2] << 8) | quickdata[RAW_OFFSET + 1];
 
     for (i = 0; i < len; i++)
-        space->write_byte(i + start, quickdata[i + RAW_HDR]);
+        space.write_byte(i + start, quickdata[i + RAW_HDR]);
 
     /* Set border color */
-    data = (space->read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
+    data = (space.read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
     state->m_port_fe_data = (state->m_port_fe_data & 0xf8) | data;
     spectrum_border_update(machine, data);
     logerror("Border color:%02X\n", data);

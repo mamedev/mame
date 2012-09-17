@@ -136,7 +136,7 @@ void esq5505_state::machine_reset()
 
 READ16_MEMBER(esq5505_state::es5510_dsp_r)
 {
-//  logerror("%06x: DSP read offset %04x (data is %04x)\n",space->device().safe_pc(),offset,es5510_dsp_ram[offset]);
+//  logerror("%06x: DSP read offset %04x (data is %04x)\n",space.device().safe_pc(),offset,es5510_dsp_ram[offset]);
 
 	switch(offset)
 	{

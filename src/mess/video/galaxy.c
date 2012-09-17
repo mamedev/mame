@@ -16,7 +16,7 @@
 static TIMER_CALLBACK( gal_video )
 {
 	galaxy_state *state = machine.driver_data<galaxy_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int y, x;
 	if (state->m_interrupts_enabled == TRUE)
 	{
@@ -39,7 +39,7 @@ static TIMER_CALLBACK( gal_video )
 				}
 				else
 				{
-					state->m_code = space->read_byte(addr) & 0xbf;
+					state->m_code = space.read_byte(addr) & 0xbf;
 					state->m_code += (state->m_code & 0x80) >> 1;
 					state->m_code = gfx[(state->m_code & 0x7f) +(dat << 7 )] ^ 0xff;
 					state->m_first = 0;
@@ -68,7 +68,7 @@ static TIMER_CALLBACK( gal_video )
 				}
 				else
 				{
-					state->m_code = space->read_byte(addr) ^ 0xff;
+					state->m_code = space.read_byte(addr) ^ 0xff;
 					state->m_first = 0;
 				}
 				y = state->m_gal_cnt / 48 - 2;
@@ -81,7 +81,7 @@ static TIMER_CALLBACK( gal_video )
 				}
 				if ((x / 8 >= 11) && (x / 8 < 44))
 				{
-					state->m_code = space->read_byte(state->m_start_addr + y * 32 + (state->m_gal_cnt % 48) - 11) ^ 0xff;
+					state->m_code = space.read_byte(state->m_start_addr + y * 32 + (state->m_gal_cnt % 48) - 11) ^ 0xff;
 				}
 				else
 				{

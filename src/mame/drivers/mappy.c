@@ -717,32 +717,32 @@ WRITE8_MEMBER(mappy_state::mappy_latch_w)
 
 MACHINE_RESET_MEMBER(mappy_state,superpac)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
 	for (i = 0; i < 0x10; i += 2)
-		superpac_latch_w(*space,i,0);
+		superpac_latch_w(space,i,0);
 }
 
 MACHINE_RESET_MEMBER(mappy_state,phozon)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
 	for (i = 0; i < 0x10; i += 2)
-		phozon_latch_w(*space, i, 0);
+		phozon_latch_w(space, i, 0);
 }
 
 MACHINE_RESET_MEMBER(mappy_state,mappy)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
 	for (i = 0; i < 0x10; i += 2)
-		mappy_latch_w(*space, i, 0);
+		mappy_latch_w(space, i, 0);
 }
 
 /* different games need different interrupt generators & timers because they use different Namco I/O devices */

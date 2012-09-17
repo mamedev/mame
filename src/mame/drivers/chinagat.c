@@ -135,12 +135,12 @@ static TIMER_DEVICE_CALLBACK( chinagat_scanline )
 
 static WRITE8_HANDLER( chinagat_interrupt_w )
 {
-	ddragon_state *state = space->machine().driver_data<ddragon_state>();
+	ddragon_state *state = space.machine().driver_data<ddragon_state>();
 
 	switch (offset)
 	{
 		case 0: /* 3e00 - SND irq */
-			state->soundlatch_byte_w(*space, 0, data);
+			state->soundlatch_byte_w(space, 0, data);
 			state->m_snd_cpu->execute().set_input_line(state->m_sound_irq, (state->m_sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 			break;
 
@@ -170,7 +170,7 @@ static WRITE8_HANDLER( chinagat_video_ctrl_w )
     ---- -x--   Flip screen
     --x- ----   Enable video ???
     ****************************/
-	ddragon_state *state = space->machine().driver_data<ddragon_state>();
+	ddragon_state *state = space.machine().driver_data<ddragon_state>();
 
 	state->m_scrolly_hi = ((data & 0x02) >> 1);
 	state->m_scrollx_hi = data & 0x01;
@@ -180,21 +180,21 @@ static WRITE8_HANDLER( chinagat_video_ctrl_w )
 
 static WRITE8_HANDLER( chinagat_bankswitch_w )
 {
-	space->machine().root_device().membank("bank1")->set_entry(data & 0x07);	// shall we check (data & 7) < 6 (# of banks)?
+	space.machine().root_device().membank("bank1")->set_entry(data & 0x07);	// shall we check (data & 7) < 6 (# of banks)?
 }
 
 static WRITE8_HANDLER( chinagat_sub_bankswitch_w )
 {
-	space->machine().root_device().membank("bank4")->set_entry(data & 0x07);	// shall we check (data & 7) < 6 (# of banks)?
+	space.machine().root_device().membank("bank4")->set_entry(data & 0x07);	// shall we check (data & 7) < 6 (# of banks)?
 }
 
 static READ8_HANDLER( saiyugoub1_mcu_command_r )
 {
-	ddragon_state *state = space->machine().driver_data<ddragon_state>();
+	ddragon_state *state = space.machine().driver_data<ddragon_state>();
 #if 0
 	if (state->m_mcu_command == 0x78)
 	{
-		space->machine().device<cpu_device>("mcu")->suspend(SUSPEND_REASON_HALT, 1);	/* Suspend (speed up) */
+		space.machine().device<cpu_device>("mcu")->suspend(SUSPEND_REASON_HALT, 1);	/* Suspend (speed up) */
 	}
 #endif
 	return state->m_mcu_command;
@@ -202,19 +202,19 @@ static READ8_HANDLER( saiyugoub1_mcu_command_r )
 
 static WRITE8_HANDLER( saiyugoub1_mcu_command_w )
 {
-	ddragon_state *state = space->machine().driver_data<ddragon_state>();
+	ddragon_state *state = space.machine().driver_data<ddragon_state>();
 	state->m_mcu_command = data;
 #if 0
 	if (data != 0x78)
 	{
-		space->machine().device<cpu_device>("mcu")->resume(SUSPEND_REASON_HALT);	/* Wake up */
+		space.machine().device<cpu_device>("mcu")->resume(SUSPEND_REASON_HALT);	/* Wake up */
 	}
 #endif
 }
 
 static WRITE8_HANDLER( saiyugoub1_adpcm_rom_addr_w )
 {
-	ddragon_state *state = space->machine().driver_data<ddragon_state>();
+	ddragon_state *state = space.machine().driver_data<ddragon_state>();
 	/* i8748 Port 1 write */
 	state->m_i8748_P1 = data;
 }
@@ -290,7 +290,7 @@ static WRITE8_DEVICE_HANDLER( saiyugoub1_m5205_clk_w )
 
 static READ8_HANDLER( saiyugoub1_m5205_irq_r )
 {
-	ddragon_state *state = space->machine().driver_data<ddragon_state>();
+	ddragon_state *state = space.machine().driver_data<ddragon_state>();
 	if (state->m_adpcm_sound_irq)
 	{
 		state->m_adpcm_sound_irq = 0;

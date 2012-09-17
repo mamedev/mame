@@ -456,8 +456,8 @@ TIMER_DEVICE_CALLBACK( williams2_endscreen_callback )
 static void williams2_postload(running_machine &machine)
 {
 	williams_state *state = machine.driver_data<williams_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	state->williams2_bank_select_w(*space, 0, state->m_vram_bank);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	state->williams2_bank_select_w(space, 0, state->m_vram_bank);
 }
 
 
@@ -475,10 +475,10 @@ MACHINE_START_MEMBER(williams_state,williams2)
 
 MACHINE_RESET_MEMBER(williams_state,williams2)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* make sure our banking is reset */
-	williams2_bank_select_w(*space, 0, 0);
+	williams2_bank_select_w(space, 0, 0);
 
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
 	timer_device *scan_timer = machine().device<timer_device>("scan_timer");
@@ -759,8 +759,8 @@ WRITE8_MEMBER(williams_state::williams2_7segment_w)
 static void defender_postload(running_machine &machine)
 {
 	williams_state *state = machine.driver_data<williams_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	state->defender_bank_select_w(*space, 0, state->m_vram_bank);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	state->defender_bank_select_w(space, 0, state->m_vram_bank);
 }
 
 
@@ -777,11 +777,11 @@ MACHINE_START_MEMBER(williams_state,defender)
 
 MACHINE_RESET_MEMBER(williams_state,defender)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	MACHINE_RESET_CALL_MEMBER(williams_common);
 
-	defender_bank_select_w(*space, 0, 0);
+	defender_bank_select_w(space, 0, 0);
 }
 
 
@@ -800,7 +800,7 @@ WRITE8_MEMBER(williams_state::defender_bank_select_w)
 	{
 		/* page 0 is I/O &space */
 		case 0:
-			defender_install_io_space(&space);
+			defender_install_io_space(space);
 			break;
 
 		/* pages 1-9 map to ROM banks */

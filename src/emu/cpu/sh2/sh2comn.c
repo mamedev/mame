@@ -27,7 +27,7 @@ static const int div_tab[4] = { 3, 5, 7, 0 };
 INLINE UINT32 RL(sh2_state *sh2, offs_t A)
 {
 	if (A >= 0xe0000000)
-		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffffffff);
+		return sh2_internal_r(*sh2->internal, (A & 0x1fc)>>2, 0xffffffff);
 
 	if (A >= 0xc0000000)
 		return sh2->program->read_dword(A);
@@ -42,7 +42,7 @@ INLINE void WL(sh2_state *sh2, offs_t A, UINT32 V)
 {
 	if (A >= 0xe0000000)
 	{
-		sh2_internal_w(sh2->internal, (A & 0x1fc)>>2, V, 0xffffffff);
+		sh2_internal_w(*sh2->internal, (A & 0x1fc)>>2, V, 0xffffffff);
 		return;
 	}
 
@@ -508,7 +508,7 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 
 WRITE32_HANDLER( sh2_internal_w )
 {
-	sh2_state *sh2 = GET_SH2(&space->device());
+	sh2_state *sh2 = GET_SH2(&space.device());
 	UINT32 old;
 
 #ifdef USE_SH2DRC
@@ -522,7 +522,7 @@ WRITE32_HANDLER( sh2_internal_w )
 	//      logerror("sh2_internal_w:  Write %08x (%x), %08x @ %08x\n", 0xfffffe00+offset*4, offset, data, mem_mask);
 
 //    if(offset != 0x20)
-//        printf("sh2_internal_w:  Write %08x (%x), %08x @ %08x (PC %x)\n", 0xfffffe00+offset*4, offset, data, mem_mask, space->device().safe_pc());
+//        printf("sh2_internal_w:  Write %08x (%x), %08x @ %08x (PC %x)\n", 0xfffffe00+offset*4, offset, data, mem_mask, space.device().safe_pc());
 
 	switch( offset )
 	{
@@ -688,7 +688,7 @@ WRITE32_HANDLER( sh2_internal_w )
 
 READ32_HANDLER( sh2_internal_r )
 {
-	sh2_state *sh2 = GET_SH2(&space->device());
+	sh2_state *sh2 = GET_SH2(&space.device());
 
 #ifdef USE_SH2DRC
 	offset &= 0x7f;

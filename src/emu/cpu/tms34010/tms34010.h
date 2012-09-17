@@ -197,8 +197,8 @@ struct tms34010_config
 	void	(*scanline_callback_ind16)(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);
 	void	(*scanline_callback_rgb32)(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params);
 	void	(*output_int)(device_t *device, int state);			/* output interrupt callback */
-	void	(*to_shiftreg)(address_space *space, offs_t, UINT16 *);	/* shift register write */
-	void	(*from_shiftreg)(address_space *space, offs_t, UINT16 *);	/* shift register read */
+	void	(*to_shiftreg)(address_space &space, offs_t, UINT16 *);	/* shift register write */
+	void	(*from_shiftreg)(address_space &space, offs_t, UINT16 *);	/* shift register read */
 };
 
 

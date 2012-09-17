@@ -1159,12 +1159,12 @@ MACHINE_RESET_MEMBER(raiden2_state,xsedae)
 
 READ16_MEMBER(raiden2_state::raiden2_sound_comms_r)
 {
-	return seibu_main_word_r(&space,(offset >> 1) & 7,0xffff);
+	return seibu_main_word_r(space,(offset >> 1) & 7,0xffff);
 }
 
 WRITE16_MEMBER(raiden2_state::raiden2_sound_comms_w)
 {
-	seibu_main_word_w(&space,(offset >> 1) & 7,data,0x00ff);
+	seibu_main_word_w(space,(offset >> 1) & 7,data,0x00ff);
 }
 
 WRITE16_MEMBER(raiden2_state::raiden2_bank_w)

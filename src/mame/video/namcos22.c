@@ -47,7 +47,7 @@
 #define ALLOW_MEMDUMP	0
 
 #if ALLOW_MEMDUMP
-static void Dump( address_space *space, FILE *f, unsigned addr1, unsigned addr2, const char *name )
+static void Dump( address_space &space, FILE *f, unsigned addr1, unsigned addr2, const char *name )
 {
 	unsigned addr;
 	fprintf( f, "%s:\n", name );
@@ -58,7 +58,7 @@ static void Dump( address_space *space, FILE *f, unsigned addr1, unsigned addr2,
 		int i;
 		for( i=0; i<16; i++ )
 		{
-			data[i] = space->read_byte(addr+i );
+			data[i] = space.read_byte(addr+i );
 			if( data[i] )
 			{
 				bHasNonZero = 1;
@@ -2814,7 +2814,7 @@ SCREEN_UPDATE_RGB32( namcos22s )
 		FILE *f = fopen( "dump.txt", "wb" );
 		if( f )
 		{
-			address_space *space = state->m_maincpu->space(AS_PROGRAM);
+			address_space &space = *state->m_maincpu->space(AS_PROGRAM);
 
 			if (1) // czram
 			{
@@ -2879,7 +2879,7 @@ SCREEN_UPDATE_RGB32( namcos22 )
 		FILE *f = fopen( "dump.txt", "wb" );
 		if( f )
 		{
-			address_space *space = state->m_maincpu->space(AS_PROGRAM);
+			address_space &space = *state->m_maincpu->space(AS_PROGRAM);
 
 			//Dump(space, f,0x90000000, 0x90000003, "led?" );
 			Dump(space, f,0x90010000, 0x90017fff, "cz_ram");

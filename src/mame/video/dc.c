@@ -129,7 +129,7 @@ static UINT32 dilated0[15][1024];
 static UINT32 dilated1[15][1024];
 static int dilatechose[64];
 static float wbuffer[480][640];
-static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,int y);
+static void pvr_accumulationbuffer_to_framebuffer(address_space &space, int x,int y);
 
 // the real accumulation buffer is a 32x32x8bpp buffer into which tiles get rendered before they get copied to the framebuffer
 //  our implementation is not currently tile based, and thus the accumulation buffer is screen sized
@@ -981,7 +981,7 @@ INLINE int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 
 READ64_HANDLER( pvr_ta_r )
 {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 
@@ -993,19 +993,19 @@ READ64_HANDLER( pvr_ta_r )
 		{
 			UINT8 fieldnum,vsync,hsync,blank;
 
-			fieldnum = (space->machine().primary_screen->frame_number() & 1) ? 1 : 0;
+			fieldnum = (space.machine().primary_screen->frame_number() & 1) ? 1 : 0;
 
-			vsync = space->machine().primary_screen->vblank() ? 1 : 0;
+			vsync = space.machine().primary_screen->vblank() ? 1 : 0;
 			if(spg_vsync_pol) { vsync^=1; }
 
-			hsync = space->machine().primary_screen->hblank() ? 1 : 0;
+			hsync = space.machine().primary_screen->hblank() ? 1 : 0;
 			if(spg_hsync_pol) { hsync^=1; }
 
 			/* FIXME: following is just a wild guess */
-			blank = (space->machine().primary_screen->vblank() | space->machine().primary_screen->hblank()) ? 0 : 1;
+			blank = (space.machine().primary_screen->vblank() | space.machine().primary_screen->hblank()) ? 0 : 1;
 			if(spg_blank_pol) { blank^=1; }
 
-			state->pvrta_regs[reg] = (vsync << 13) | (hsync << 12) | (blank << 11) | (fieldnum << 10) | (space->machine().primary_screen->vpos() & 0x3ff);
+			state->pvrta_regs[reg] = (vsync << 13) | (hsync << 12) | (blank << 11) | (fieldnum << 10) | (space.machine().primary_screen->vpos() & 0x3ff);
 			break;
 		}
 	case SPG_TRIGGER_POS:
@@ -1017,14 +1017,14 @@ READ64_HANDLER( pvr_ta_r )
 
 	#if DEBUG_PVRTA_REGS
 	if (reg != 0x43)
-		mame_printf_verbose("PVRTA: [%08x] read %x @ %x (reg %x), mask %" I64FMT "x (PC=%x)\n", 0x5f8000+reg*4, state->pvrta_regs[reg], offset, reg, mem_mask, space->device().safe_pc());
+		mame_printf_verbose("PVRTA: [%08x] read %x @ %x (reg %x), mask %" I64FMT "x (PC=%x)\n", 0x5f8000+reg*4, state->pvrta_regs[reg], offset, reg, mem_mask, space.device().safe_pc());
 	#endif
 	return (UINT64)state->pvrta_regs[reg] << shift;
 }
 
 WRITE64_HANDLER( pvr_ta_w )
 {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 	UINT32 dat;
@@ -1099,7 +1099,7 @@ WRITE64_HANDLER( pvr_ta_w )
 
 				// we've got a request to draw, so, draw to the accumulation buffer!
 				// this should really be done for each tile!
-				render_to_accumulation_buffer(space->machine(),*fake_accumulationbuffer_bitmap,clip);
+				render_to_accumulation_buffer(space.machine(),*fake_accumulationbuffer_bitmap,clip);
 
 				state->endofrender_timer_isp->adjust(attotime::from_usec(4000) ); // hack, make sure render takes some amount of time
 
@@ -1118,15 +1118,15 @@ WRITE64_HANDLER( pvr_ta_w )
 				{
 					UINT32 st[6];
 
-					st[0]=space->read_dword((0x05000000+offsetra));
-					st[1]=space->read_dword((0x05000004+offsetra)); // Opaque List Pointer
-					st[2]=space->read_dword((0x05000008+offsetra)); // Opaque Modifier Volume List Pointer
-					st[3]=space->read_dword((0x0500000c+offsetra)); // Translucent List Pointer
-					st[4]=space->read_dword((0x05000010+offsetra)); // Translucent Modifier Volume List Pointer
+					st[0]=space.read_dword((0x05000000+offsetra));
+					st[1]=space.read_dword((0x05000004+offsetra)); // Opaque List Pointer
+					st[2]=space.read_dword((0x05000008+offsetra)); // Opaque Modifier Volume List Pointer
+					st[3]=space.read_dword((0x0500000c+offsetra)); // Translucent List Pointer
+					st[4]=space.read_dword((0x05000010+offsetra)); // Translucent Modifier Volume List Pointer
 
 					if (sizera == 6)
 					{
-						st[5] = space->read_dword((0x05000014+offsetra)); // Punch Through List Pointer
+						st[5] = space.read_dword((0x05000014+offsetra)); // Punch Through List Pointer
 						offsetra+=0x18;
 					}
 					else
@@ -1241,7 +1241,7 @@ WRITE64_HANDLER( pvr_ta_w )
 
 		// hack, this interrupt is generated after transfering a set amount of data
 		//state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_YUV;
-		//dc_update_interrupt_status(space->machine());
+		//dc_update_interrupt_status(space.machine());
 
 		break;
 	case TA_YUV_TEX_CTRL:
@@ -1253,8 +1253,8 @@ WRITE64_HANDLER( pvr_ta_w )
 		state->vbin_timer->adjust(attotime::never);
 		state->vbout_timer->adjust(attotime::never);
 
-		state->vbin_timer->adjust(space->machine().primary_screen->time_until_pos(spg_vblank_in_irq_line_num));
-		state->vbout_timer->adjust(space->machine().primary_screen->time_until_pos(spg_vblank_out_irq_line_num));
+		state->vbin_timer->adjust(space.machine().primary_screen->time_until_pos(spg_vblank_in_irq_line_num));
+		state->vbout_timer->adjust(space.machine().primary_screen->time_until_pos(spg_vblank_out_irq_line_num));
 		break;
 	/* TODO: timer adjust for SPG_HBLANK_INT too */
 	case TA_LIST_CONT:
@@ -1273,7 +1273,7 @@ WRITE64_HANDLER( pvr_ta_w )
 	case VO_STARTX:
 	case VO_STARTY:
 		{
-			rectangle visarea = space->machine().primary_screen->visible_area();
+			rectangle visarea = space.machine().primary_screen->visible_area();
 			/* FIXME: right visible area calculations aren't known yet*/
 			visarea.min_x = 0;
 			visarea.max_x = ((spg_hbstart - spg_hbend - vo_horz_start_pos) <= 0x180 ? 320 : 640) - 1;
@@ -1281,7 +1281,7 @@ WRITE64_HANDLER( pvr_ta_w )
 			visarea.max_y = ((spg_vbstart - spg_vbend - vo_vert_start_pos_f1) <= 0x100 ? 240 : 480) - 1;
 
 
-			space->machine().primary_screen->configure(spg_hbstart, spg_vbstart, visarea, space->machine().primary_screen->frame_period().attoseconds );
+			space.machine().primary_screen->configure(spg_hbstart, spg_vbstart, visarea, space.machine().primary_screen->frame_period().attoseconds );
 		}
 		break;
 	}
@@ -1628,7 +1628,7 @@ static void process_ta_fifo(running_machine& machine)
 
 WRITE64_HANDLER( ta_fifo_poly_w )
 {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 
 	if (mem_mask == U64(0xffffffffffffffff))	// 64 bit
 	{
@@ -1648,13 +1648,13 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 
 	// if the command is complete, process it
 	if (state_ta.tafifo_pos == 0)
-		process_ta_fifo(space->machine());
+		process_ta_fifo(space.machine());
 
 }
 
 WRITE64_HANDLER( ta_fifo_yuv_w )
 {
-	//dc_state *state = space->machine().driver_data<dc_state>();
+	//dc_state *state = space.machine().driver_data<dc_state>();
 
 //  int reg;
 //  UINT64 shift;
@@ -1975,7 +1975,7 @@ static void render_tri(running_machine &machine, bitmap_rgb32 &bitmap, texinfo *
 static void render_to_accumulation_buffer(running_machine &machine,bitmap_rgb32 &bitmap,const rectangle &cliprect)
 {
 	dc_state *state = machine.driver_data<dc_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int cs,rs,ns;
 	UINT32 c;
 #if 0
@@ -1992,7 +1992,7 @@ static void render_to_accumulation_buffer(running_machine &machine,bitmap_rgb32 
 
 	rs=state_ta.renderselect;
 	c=state->pvrta_regs[ISP_BACKGND_T];
-	c=space->read_dword(0x05000000+((c&0xfffff8)>>1)+(3+3)*4);
+	c=space.read_dword(0x05000000+((c&0xfffff8)>>1)+(3+3)*4);
 	bitmap.fill(c, cliprect);
 
 
@@ -2045,9 +2045,9 @@ static void render_to_accumulation_buffer(running_machine &machine,bitmap_rgb32 
 
 */
 
-static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,int y)
+static void pvr_accumulationbuffer_to_framebuffer(address_space &space, int x,int y)
 {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 
 	// the accumulation buffer is always 8888
 	//
@@ -2083,7 +2083,7 @@ static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,in
 					                ((((data & 0x0000f800) >> 11)) << 5)  |
 									((((data & 0x00f80000) >> 19)) << 10);
 
-					space->write_word(realwriteoffs+xcnt*2, newdat);
+					space.write_word(realwriteoffs+xcnt*2, newdat);
 				}
 			}
 		}
@@ -2107,7 +2107,7 @@ static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,in
 					                ((((data & 0x0000fc00) >> 10)) << 5)  |
 									((((data & 0x00f80000) >> 19)) << 11);
 
-					space->write_word(realwriteoffs+xcnt*2, newdat);
+					space.write_word(realwriteoffs+xcnt*2, newdat);
 				}
 			}
 		}
@@ -2135,7 +2135,7 @@ static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,in
 									((((data & 0x00f80000) >> 19)) << 10);
 					// alpha?
 
-					space->write_word(realwriteoffs+xcnt*2, newdat);
+					space.write_word(realwriteoffs+xcnt*2, newdat);
 				}
 			}
 		}
@@ -2159,7 +2159,7 @@ static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,in
 					                ((((data & 0x0000fc00) >> 10)) << 5)  |
 									((((data & 0x00f80000) >> 19)) << 11);
 
-					space->write_word(realwriteoffs+xcnt*2, newdat);
+					space.write_word(realwriteoffs+xcnt*2, newdat);
 				}
 			}
 		}
@@ -2186,7 +2186,7 @@ static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,in
 					                ((((data & 0x0000fc00) >> 10)) << 5)  |
 									((((data & 0x00f80000) >> 19)) << 11);
 
-					space->write_word(realwriteoffs+xcnt*2, newdat);
+					space.write_word(realwriteoffs+xcnt*2, newdat);
 				}
 			}
 		}
@@ -2741,7 +2741,7 @@ READ32_HANDLER( elan_regs_r )
 		case 0x78/4: // IRQ MASK
 			return 0;
 		default:
-			printf("%08x %08x\n",space->device().safe_pc(),offset*4);
+			printf("%08x %08x\n",space.device().safe_pc(),offset*4);
 			break;
 	}
 
@@ -2753,7 +2753,7 @@ WRITE32_HANDLER( elan_regs_w )
 	switch(offset)
 	{
 		default:
-			printf("%08x %08x %08x W\n",space->device().safe_pc(),offset*4,data);
+			printf("%08x %08x %08x W\n",space.device().safe_pc(),offset*4,data);
 			break;
 	}
 }

@@ -82,19 +82,19 @@ INLINE namco_53xx_state *get_safe_token(device_t *device)
 
 static READ8_HANDLER( namco_53xx_K_r )
 {
-	namco_53xx_state *state = get_safe_token(space->device().owner());
+	namco_53xx_state *state = get_safe_token(space.device().owner());
 	return state->m_k(0);
 }
 
 static READ8_HANDLER( namco_53xx_Rx_r )
 {
-	namco_53xx_state *state = get_safe_token(space->device().owner());
+	namco_53xx_state *state = get_safe_token(space.device().owner());
 	return state->m_in[offset](0);
 }
 
 static WRITE8_HANDLER( namco_53xx_O_w )
 {
-	namco_53xx_state *state = get_safe_token(space->device().owner());
+	namco_53xx_state *state = get_safe_token(space.device().owner());
 	UINT8 out = (data & 0x0f);
 	if (data & 0x10)
 		state->m_portO = (state->m_portO & 0x0f) | (out << 4);
@@ -104,7 +104,7 @@ static WRITE8_HANDLER( namco_53xx_O_w )
 
 static WRITE8_HANDLER( namco_53xx_P_w )
 {
-	namco_53xx_state *state = get_safe_token(space->device().owner());
+	namco_53xx_state *state = get_safe_token(space.device().owner());
 	state->m_p(0, data);
 }
 

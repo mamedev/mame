@@ -2075,9 +2075,9 @@ static CPU_INIT( m68307 )
 
 static READ16_HANDLER( m68307_internal_base_r )
 {
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
 
-	int pc = space->device().safe_pc();
+	int pc = space.device().safe_pc();
 	logerror("%08x m68307_internal_base_r %08x, (%04x)\n", pc, offset*2,mem_mask);
 
 	switch (offset<<1)
@@ -2094,9 +2094,9 @@ static READ16_HANDLER( m68307_internal_base_r )
 
 static WRITE16_HANDLER( m68307_internal_base_w )
 {
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
 
-	int pc = space->device().safe_pc();
+	int pc = space.device().safe_pc();
 	logerror("%08x m68307_internal_base_w %08x, %04x (%04x)\n", pc, offset*2,data,mem_mask);
 	int base = 0;
 	//int mask = 0;
@@ -2763,17 +2763,17 @@ CPU_GET_INFO( scc68070 )
 
 static READ32_HANDLER( m68340_internal_base_r )
 {
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
-	int pc = space->device().safe_pc();
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
+	int pc = space.device().safe_pc();
 	logerror("%08x m68340_internal_base_r %08x, (%08x)\n", pc, offset*4,mem_mask);
 	return m68k->m68340_base;
 }
 
 static WRITE32_HANDLER( m68340_internal_base_w )
 {
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
 
-	int pc = space->device().safe_pc();
+	int pc = space.device().safe_pc();
 	logerror("%08x m68340_internal_base_w %08x, %08x (%08x)\n", pc, offset*4,data,mem_mask);
 
 	// other conditions?

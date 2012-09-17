@@ -98,13 +98,13 @@ CPU_DISASSEMBLE( r3000le );
 #define SETPC(R,x)		do { (R)->nextpc = (x); } while (0)
 #define SETPCL(R,x,l)	do { (R)->nextpc = (x); (R)->r[l] = (R)->pc + 4; } while (0)
 
-#define RBYTE(R,x)		(*(R)->cur.read_byte)((R)->program, x)
-#define RWORD(R,x)		(*(R)->cur.read_word)((R)->program, x)
-#define RLONG(R,x)		(*(R)->cur.read_dword)((R)->program, x)
+#define RBYTE(R,x)		(*(R)->cur.read_byte)(*(R)->program, x)
+#define RWORD(R,x)		(*(R)->cur.read_word)(*(R)->program, x)
+#define RLONG(R,x)		(*(R)->cur.read_dword)(*(R)->program, x)
 
-#define WBYTE(R,x,v)	(*(R)->cur.write_byte)((R)->program, x, v)
-#define WWORD(R,x,v)	(*(R)->cur.write_word)((R)->program, x, v)
-#define WLONG(R,x,v)	(*(R)->cur.write_dword)((R)->program, x, v)
+#define WBYTE(R,x,v)	(*(R)->cur.write_byte)(*(R)->program, x, v)
+#define WWORD(R,x,v)	(*(R)->cur.write_word)(*(R)->program, x, v)
+#define WLONG(R,x,v)	(*(R)->cur.write_dword)(*(R)->program, x, v)
 
 #define SR				cpr[0][COP0_Status]
 #define CAUSE			cpr[0][COP0_Cause]
@@ -187,19 +187,19 @@ static void lwr_le(r3000_state *r3000, UINT32 op);
 static void swl_le(r3000_state *r3000, UINT32 op);
 static void swr_le(r3000_state *r3000, UINT32 op);
 
-static UINT8 readcache_be(address_space *space, offs_t offset);
-static UINT16 readcache_be_word(address_space *space, offs_t offset);
-static UINT32 readcache_be_dword(address_space *space, offs_t offset);
-static void writecache_be(address_space *space, offs_t offset, UINT8 data);
-static void writecache_be_word(address_space *space, offs_t offset, UINT16 data);
-static void writecache_be_dword(address_space *space, offs_t offset, UINT32 data);
+static UINT8 readcache_be(address_space &space, offs_t offset);
+static UINT16 readcache_be_word(address_space &space, offs_t offset);
+static UINT32 readcache_be_dword(address_space &space, offs_t offset);
+static void writecache_be(address_space &space, offs_t offset, UINT8 data);
+static void writecache_be_word(address_space &space, offs_t offset, UINT16 data);
+static void writecache_be_dword(address_space &space, offs_t offset, UINT32 data);
 
-static UINT8 readcache_le(address_space *space, offs_t offset);
-static UINT16 readcache_le_word(address_space *space, offs_t offset);
-static UINT32 readcache_le_dword(address_space *space, offs_t offset);
-static void writecache_le(address_space *space, offs_t offset, UINT8 data);
-static void writecache_le_word(address_space *space, offs_t offset, UINT16 data);
-static void writecache_le_dword(address_space *space, offs_t offset, UINT32 data);
+static UINT8 readcache_le(address_space &space, offs_t offset);
+static UINT16 readcache_le_word(address_space &space, offs_t offset);
+static UINT32 readcache_le_dword(address_space &space, offs_t offset);
+static void writecache_le(address_space &space, offs_t offset, UINT8 data);
+static void writecache_le_word(address_space &space, offs_t offset, UINT16 data);
+static void writecache_le_dword(address_space &space, offs_t offset, UINT32 data);
 
 
 
@@ -892,86 +892,86 @@ static CPU_EXECUTE( r3000 )
     CACHE I/O
 ***************************************************************************/
 
-static UINT8 readcache_be(address_space *space, offs_t offset)
+static UINT8 readcache_be(address_space &space, offs_t offset)
 {
-	r3000_state *r3000 = get_safe_token(&space->device());
+	r3000_state *r3000 = get_safe_token(&space.device());
 	offset &= 0x1fffffff;
 	return (offset * 4 < r3000->cache_size) ? r3000->cache[BYTE4_XOR_BE(offset)] : 0xff;
 }
 
-static UINT16 readcache_be_word(address_space *space, offs_t offset)
+static UINT16 readcache_be_word(address_space &space, offs_t offset)
 {
-	r3000_state *r3000 = get_safe_token(&space->device());
+	r3000_state *r3000 = get_safe_token(&space.device());
 	offset &= 0x1fffffff;
 	return (offset * 4 < r3000->cache_size) ? *(UINT16 *)&r3000->cache[WORD_XOR_BE(offset)] : 0xffff;
 }
 
-static UINT32 readcache_be_dword(address_space *space, offs_t offset)
+static UINT32 readcache_be_dword(address_space &space, offs_t offset)
 {
-	r3000_state *r3000 = get_safe_token(&space->device());
+	r3000_state *r3000 = get_safe_token(&space.device());
 	offset &= 0x1fffffff;
 	return (offset * 4 < r3000->cache_size) ? *(UINT32 *)&r3000->cache[offset] : 0xffffffff;
 }
 
-static void writecache_be(address_space *space, offs_t offset, UINT8 data)
+static void writecache_be(address_space &space, offs_t offset, UINT8 data)
 {
-	r3000_state *r3000 = get_safe_token(&space->device());
+	r3000_state *r3000 = get_safe_token(&space.device());
 	offset &= 0x1fffffff;
 	if (offset * 4 < r3000->cache_size) r3000->cache[BYTE4_XOR_BE(offset)] = data;
 }
 
-static void writecache_be_word(address_space *space, offs_t offset, UINT16 data)
+static void writecache_be_word(address_space &space, offs_t offset, UINT16 data)
 {
-	r3000_state *r3000 = get_safe_token(&space->device());
+	r3000_state *r3000 = get_safe_token(&space.device());
 	offset &= 0x1fffffff;
 	if (offset * 4 < r3000->cache_size) *(UINT16 *)&r3000->cache[WORD_XOR_BE(offset)] = data;
 }
 
-static void writecache_be_dword(address_space *space, offs_t offset, UINT32 data)
+static void writecache_be_dword(address_space &space, offs_t offset, UINT32 data)
 {
-	r3000_state *r3000 = get_safe_token(&space->device());
+	r3000_state *r3000 = get_safe_token(&space.device());
 	offset &= 0x1fffffff;
 	if (offset * 4 < r3000->cache_size) *(UINT32 *)&r3000->cache[offset] = data;
 }
 
-static UINT8 readcache_le(address_space *space, offs_t offset)
+static UINT8 readcache_le(address_space &space, offs_t offset)
 {
-	r3000_state *r3000 = get_safe_token(&space->device());
+	r3000_state *r3000 = get_safe_token(&space.device());
 	offset &= 0x1fffffff;
 	return (offset * 4 < r3000->cache_size) ? r3000->cache[BYTE4_XOR_LE(offset)] : 0xff;
 }
 
-static UINT16 readcache_le_word(address_space *space, offs_t offset)
+static UINT16 readcache_le_word(address_space &space, offs_t offset)
 {
-	r3000_state *r3000 = get_safe_token(&space->device());
+	r3000_state *r3000 = get_safe_token(&space.device());
 	offset &= 0x1fffffff;
 	return (offset * 4 < r3000->cache_size) ? *(UINT16 *)&r3000->cache[WORD_XOR_LE(offset)] : 0xffff;
 }
 
-static UINT32 readcache_le_dword(address_space *space, offs_t offset)
+static UINT32 readcache_le_dword(address_space &space, offs_t offset)
 {
-	r3000_state *r3000 = get_safe_token(&space->device());
+	r3000_state *r3000 = get_safe_token(&space.device());
 	offset &= 0x1fffffff;
 	return (offset * 4 < r3000->cache_size) ? *(UINT32 *)&r3000->cache[offset] : 0xffffffff;
 }
 
-static void writecache_le(address_space *space, offs_t offset, UINT8 data)
+static void writecache_le(address_space &space, offs_t offset, UINT8 data)
 {
-	r3000_state *r3000 = get_safe_token(&space->device());
+	r3000_state *r3000 = get_safe_token(&space.device());
 	offset &= 0x1fffffff;
 	if (offset * 4 < r3000->cache_size) r3000->cache[BYTE4_XOR_LE(offset)] = data;
 }
 
-static void writecache_le_word(address_space *space, offs_t offset, UINT16 data)
+static void writecache_le_word(address_space &space, offs_t offset, UINT16 data)
 {
-	r3000_state *r3000 = get_safe_token(&space->device());
+	r3000_state *r3000 = get_safe_token(&space.device());
 	offset &= 0x1fffffff;
 	if (offset * 4 < r3000->cache_size) *(UINT16 *)&r3000->cache[WORD_XOR_LE(offset)] = data;
 }
 
-static void writecache_le_dword(address_space *space, offs_t offset, UINT32 data)
+static void writecache_le_dword(address_space &space, offs_t offset, UINT32 data)
 {
-	r3000_state *r3000 = get_safe_token(&space->device());
+	r3000_state *r3000 = get_safe_token(&space.device());
 	offset &= 0x1fffffff;
 	if (offset * 4 < r3000->cache_size) *(UINT32 *)&r3000->cache[offset] = data;
 }

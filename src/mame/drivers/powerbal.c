@@ -47,7 +47,7 @@ static WRITE16_DEVICE_HANDLER( magicstk_coin_eeprom_w )
 
 static WRITE16_HANDLER( magicstk_bgvideoram_w )
 {
-	playmark_state *state = space->machine().driver_data<playmark_state>();
+	playmark_state *state = space.machine().driver_data<playmark_state>();
 
 	COMBINE_DATA(&state->m_videoram1[offset]);
 	state->m_bg_tilemap->mark_tile_dirty(offset);
@@ -55,7 +55,7 @@ static WRITE16_HANDLER( magicstk_bgvideoram_w )
 
 static WRITE16_HANDLER( tile_banking_w )
 {
-	playmark_state *state = space->machine().driver_data<playmark_state>();
+	playmark_state *state = space.machine().driver_data<playmark_state>();
 
 	if (((data >> 12) & 0x0f) != state->m_tilebank)
 	{

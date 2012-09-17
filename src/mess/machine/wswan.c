@@ -223,7 +223,7 @@ MACHINE_START_MEMBER(wswan_state,wscolor)
 
 void wswan_state::machine_reset()
 {
-	address_space *space = machine().device( "maincpu")->memory().space( AS_PROGRAM );
+	address_space &space = *machine().device( "maincpu")->memory().space( AS_PROGRAM );
 
 	/* Intialize ports */
 	memcpy( m_ws_portram, ws_portram_init, 256 );
@@ -231,8 +231,8 @@ void wswan_state::machine_reset()
 	/* Initialize VDP */
 	memset( &m_vdp, 0, sizeof( m_vdp ) );
 
-	m_vdp.vram = (UINT8*)space->get_read_ptr(0);
-	m_vdp.palette_vram = (UINT8*)space->get_read_ptr(( m_system_type == TYPE_WSC ) ? 0xFE00 : 0 );
+	m_vdp.vram = (UINT8*)space.get_read_ptr(0);
+	m_vdp.palette_vram = (UINT8*)space.get_read_ptr(( m_system_type == TYPE_WSC ) ? 0xFE00 : 0 );
 	m_vdp.current_line = 145;  /* Randomly chosen, beginning of VBlank period to give cart some time to boot up */
 	m_vdp.color_mode = 0;
 	m_vdp.colors_16 = 0;
@@ -1459,9 +1459,9 @@ static TIMER_CALLBACK(wswan_scanline_interrupt)
 	/* Handle Sound DMA */
 	if ( ( state->m_sound_dma.enable & 0x88 ) == 0x80 )
 	{
-		address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM );
+		address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM );
 		/* TODO: Output sound DMA byte */
-		state->wswan_port_w( *space, 0x89, space->read_byte(state->m_sound_dma.source ) );
+		state->wswan_port_w( space, 0x89, space.read_byte(state->m_sound_dma.source ) );
 		state->m_sound_dma.size--;
 		state->m_sound_dma.source = ( state->m_sound_dma.source + 1 ) & 0x0FFFFF;
 		if ( state->m_sound_dma.size == 0 )

@@ -36,10 +36,10 @@ void taitosj_state::machine_start()
 
 void taitosj_state::machine_reset()
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/* set the default ROM bank (many games only have one bank and */
 	/* never write to the bank selector register) */
-	taitosj_bankswitch_w(*space, 0, 0);
+	taitosj_bankswitch_w(space, 0, 0);
 
 
 	m_zaccept = 1;

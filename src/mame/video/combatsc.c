@@ -508,10 +508,10 @@ byte #4:
 
 static void bootleg_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *source, int circuit )
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	gfx_element *gfx = machine.gfx[circuit + 2];
 
-	int limit = circuit ? (space->read_byte(0xc2) * 256 + space->read_byte(0xc3)) : (space->read_byte(0xc0) * 256 + space->read_byte(0xc1));
+	int limit = circuit ? (space.read_byte(0xc2) * 256 + space.read_byte(0xc3)) : (space.read_byte(0xc0) * 256 + space.read_byte(0xc1));
 	const UINT8 *finish;
 
 	source += 0x1000;

@@ -713,12 +713,12 @@ ROM_END
 
 static UINT8 *decrypt_code(running_machine &machine)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	int A;
 
-	space->set_decrypted_region(0x0000, 0xffff, decrypted);
+	space.set_decrypted_region(0x0000, 0xffff, decrypted);
 
 	for (A = 0; A < 0x10000; A++)
 		decrypted[A] = (rom[A] & 0x55) | ((rom[A] & 0x88) >> 2) | ((rom[A] & 0x22) << 2);

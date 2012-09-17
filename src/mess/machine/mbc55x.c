@@ -339,7 +339,7 @@ WRITE8_MEMBER(mbc55x_state::mbc55x_kb_usart_w)
 static void set_ram_size(running_machine &machine)
 {
 	mbc55x_state	*state		= machine.driver_data<mbc55x_state>();
-	address_space	*space		= machine.device( MAINCPU_TAG)->memory().space( AS_PROGRAM );
+	address_space	&space		= *machine.device( MAINCPU_TAG)->memory().space( AS_PROGRAM );
 	int 			ramsize 	= state->m_ram->size();
 	int 			nobanks		= ramsize / RAM_BANK_SIZE;
 	char			bank[10];
@@ -363,21 +363,21 @@ static void set_ram_size(running_machine &machine)
 		if(bankno<nobanks)
 		{
 			state->membank(bank)->set_base(map_base);
-			space->install_readwrite_bank(bank_base, bank_base+(RAM_BANK_SIZE-1), bank);
+			space.install_readwrite_bank(bank_base, bank_base+(RAM_BANK_SIZE-1), bank);
 			logerror("Mapping bank %d at %05X to RAM\n",bankno,bank_base);
 		}
 		else
 		{
-			space->nop_readwrite(bank_base, bank_base+(RAM_BANK_SIZE-1));
+			space.nop_readwrite(bank_base, bank_base+(RAM_BANK_SIZE-1));
 			logerror("Mapping bank %d at %05X to NOP\n",bankno,bank_base);
 		}
 	}
 
 	// Graphics red and blue plane memory mapping, green is in main memory
 	state->membank(RED_PLANE_TAG)->set_base(&state->m_video_mem[RED_PLANE_OFFSET]);
-	space->install_readwrite_bank(RED_PLANE_MEMBASE, RED_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), RED_PLANE_TAG);
+	space.install_readwrite_bank(RED_PLANE_MEMBASE, RED_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), RED_PLANE_TAG);
 	state->membank(BLUE_PLANE_TAG)->set_base(&state->m_video_mem[BLUE_PLANE_OFFSET]);
-	space->install_readwrite_bank(BLUE_PLANE_MEMBASE, BLUE_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), BLUE_PLANE_TAG);
+	space.install_readwrite_bank(BLUE_PLANE_MEMBASE, BLUE_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), BLUE_PLANE_TAG);
 }
 
 DRIVER_INIT_MEMBER(mbc55x_state,mbc55x)
@@ -434,10 +434,10 @@ static void mbc55x_debug(running_machine &machine, int ref, int params, const ch
 static int instruction_hook(device_t &device, offs_t curpc)
 {
 	mbc55x_state	*state = device.machine().driver_data<mbc55x_state>();
-	address_space	*space = device.memory().space(AS_PROGRAM);
+	address_space	&space = *device.memory().space(AS_PROGRAM);
 	UINT8		   *addr_ptr;
 
-	addr_ptr = (UINT8*)space->get_read_ptr(curpc);
+	addr_ptr = (UINT8*)space.get_read_ptr(curpc);
 
 	if ((addr_ptr !=NULL) && (addr_ptr[0]==0xCD))
 	{

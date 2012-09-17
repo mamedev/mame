@@ -377,7 +377,7 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
  */
 WRITE16_HANDLER( x68k_crtc_w )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	COMBINE_DATA(state->m_crtc.reg+offset);
 	switch(offset)
 	{
@@ -390,12 +390,12 @@ WRITE16_HANDLER( x68k_crtc_w )
 	case 6:
 	case 7:
 	case 8:
-		x68k_crtc_refresh_mode(space->machine());
+		x68k_crtc_refresh_mode(space.machine());
 		break;
 	case 9:  // CRTC raster IRQ (GPIP6)
 		{
 			attotime irq_time;
-			irq_time = space->machine().primary_screen->time_until_pos((data) / state->m_crtc.vmultiple,2);
+			irq_time = space.machine().primary_screen->time_until_pos((data) / state->m_crtc.vmultiple,2);
 
 			if(irq_time.as_double() > 0)
 				state->m_raster_irq->adjust(irq_time, (data) / state->m_crtc.vmultiple);
@@ -442,14 +442,14 @@ WRITE16_HANDLER( x68k_crtc_w )
             if(data & 0x0400)
                 state->m_crtc.interlace = 1;
         }*/
-		x68k_crtc_refresh_mode(space->machine());
+		x68k_crtc_refresh_mode(space.machine());
 		break;
 	case 576:  // operation register
 		state->m_crtc.operation = data;
 		if(data & 0x08)  // text screen raster copy
 		{
 			x68k_crtc_text_copy(state, (state->m_crtc.reg[22] & 0xff00) >> 8,(state->m_crtc.reg[22] & 0x00ff));
-			space->machine().scheduler().timer_set(attotime::from_msec(1), FUNC(x68k_crtc_operation_end), 0x02);  // time taken to do operation is a complete guess.
+			space.machine().scheduler().timer_set(attotime::from_msec(1), FUNC(x68k_crtc_operation_end), 0x02);  // time taken to do operation is a complete guess.
 		}
 		if(data & 0x02)  // high-speed graphic screen clear
 		{
@@ -457,16 +457,16 @@ WRITE16_HANDLER( x68k_crtc_w )
 				memset(state->m_gvram32,0,0x40000);
 			else
 				memset(state->m_gvram16,0,0x40000);
-			space->machine().scheduler().timer_set(attotime::from_msec(10), FUNC(x68k_crtc_operation_end), 0x02);  // time taken to do operation is a complete guess.
+			space.machine().scheduler().timer_set(attotime::from_msec(10), FUNC(x68k_crtc_operation_end), 0x02);  // time taken to do operation is a complete guess.
 		}
 		break;
 	}
-//  logerror("CRTC: [%08x] Wrote %04x to CRTC register %i\n",space->machine().device("maincpu")->safe_pc(),data,offset);
+//  logerror("CRTC: [%08x] Wrote %04x to CRTC register %i\n",space.machine().device("maincpu")->safe_pc(),data,offset);
 }
 
 READ16_HANDLER( x68k_crtc_r )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 #if 0
 	switch(offset)
 	{
@@ -478,7 +478,7 @@ READ16_HANDLER( x68k_crtc_r )
 
 	if(offset < 24)
 	{
-//      logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",space->machine().device("maincpu")->safe_pc(),state->m_crtc.reg[offset],offset);
+//      logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",space.machine().device("maincpu")->safe_pc(),state->m_crtc.reg[offset],offset);
 		switch(offset)
 		{
 		case 9:
@@ -507,7 +507,7 @@ READ16_HANDLER( x68k_crtc_r )
 
 WRITE16_HANDLER( x68k_gvram_w )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	UINT16* gvram;
 //  int xloc,yloc,pageoffset;
 	/*
@@ -580,7 +580,7 @@ WRITE16_HANDLER( x68k_gvram_w )
 
 WRITE16_HANDLER( x68k_tvram_w )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	UINT16* tvram;
 	UINT16 text_mask;
 
@@ -617,7 +617,7 @@ WRITE16_HANDLER( x68k_tvram_w )
 
 READ16_HANDLER( x68k_gvram_r )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	const UINT16* gvram;
 	UINT16 ret = 0;
 
@@ -665,7 +665,7 @@ READ16_HANDLER( x68k_gvram_r )
 
 READ16_HANDLER( x68k_tvram_r )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	const UINT16* tvram;
 
 	if(state->m_is_32bit)
@@ -726,7 +726,7 @@ WRITE32_HANDLER( x68k_gvram32_w )
 
 WRITE16_HANDLER( x68k_spritereg_w )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	COMBINE_DATA(state->m_spritereg+offset);
 	switch(offset)
 	{
@@ -775,7 +775,7 @@ WRITE16_HANDLER( x68k_spritereg_w )
 
 READ16_HANDLER( x68k_spritereg_r )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	if(offset >= 0x400 && offset < 0x404)
 		return state->m_spritereg[offset] & 0x3ff;
 	return state->m_spritereg[offset];
@@ -783,7 +783,7 @@ READ16_HANDLER( x68k_spritereg_r )
 
 WRITE16_HANDLER( x68k_spriteram_w )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	COMBINE_DATA(state->m_spriteram+offset);
 	state->m_video.tile8_dirty[offset / 16] = 1;
 	state->m_video.tile16_dirty[offset / 64] = 1;
@@ -808,7 +808,7 @@ WRITE16_HANDLER( x68k_spriteram_w )
 
 READ16_HANDLER( x68k_spriteram_r )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	return state->m_spriteram[offset];
 }
 

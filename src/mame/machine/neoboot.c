@@ -139,7 +139,7 @@ void kog_px_decrypt( running_machine &machine )
 
 static UINT16 kof10thExtraRAMB[0x01000];
 
-static void kof10thBankswitch(address_space *space, UINT16 nBank)
+static void kof10thBankswitch(address_space &space, UINT16 nBank)
 {
 	UINT32 bank = 0x100000 + ((nBank & 7) << 20);
 	if (bank >= 0x700000)
@@ -155,10 +155,10 @@ static READ16_HANDLER( kof10th_RAMB_r )
 static WRITE16_HANDLER( kof10th_custom_w )
 {
 	if (!kof10thExtraRAMB[0xFFE]) { // Write to RAM bank A
-		UINT16 *prom = (UINT16*)space->machine().root_device().memregion( "maincpu" )->base();
+		UINT16 *prom = (UINT16*)space.machine().root_device().memregion( "maincpu" )->base();
 		COMBINE_DATA(&prom[(0xE0000/2) + (offset & 0xFFFF)]);
 	} else { // Write S data on-the-fly
-		UINT8 *srom = space->machine().root_device().memregion( "fixed" )->base();
+		UINT8 *srom = space.machine().root_device().memregion( "fixed" )->base();
 		srom[offset] = BITSWAP8(data,7,6,0,4,3,2,1,5);
 	}
 }
@@ -169,7 +169,7 @@ static WRITE16_HANDLER( kof10th_bankswitch_w )
 		if (offset == 0x5FFF8) { // Standard bankswitch
 			kof10thBankswitch(space, data);
 		} else if (offset == 0x5FFFC && kof10thExtraRAMB[0xFFC] != data) { // Special bankswitch
-			UINT8 *src = space->machine().root_device().memregion( "maincpu" )->base();
+			UINT8 *src = space.machine().root_device().memregion( "maincpu" )->base();
 			memcpy (src + 0x10000,  src + ((data & 1) ? 0x810000 : 0x710000), 0xcffff);
 		}
 		COMBINE_DATA(&kof10thExtraRAMB[offset & 0xFFF]);
@@ -702,19 +702,19 @@ void lans2004_decrypt_68k( running_machine &machine )
 
 static READ16_HANDLER( mslug5_prot_r )
 {
-	logerror("PC %06x: access protected\n",space->device().safe_pc());
+	logerror("PC %06x: access protected\n",space.device().safe_pc());
 	return 0xa0;
 }
 
 static WRITE16_HANDLER ( ms5plus_bankswitch_w )
 {
 	int bankaddress;
-	logerror("offset: %06x PC %06x: set banking %04x\n",offset,space->device().safe_pc(),data);
+	logerror("offset: %06x PC %06x: set banking %04x\n",offset,space.device().safe_pc(),data);
 	if ((offset == 0)&&(data == 0xa0))
 	{
 		bankaddress=0xa0;
 		neogeo_set_main_cpu_bank_address(space, bankaddress);
-		logerror("offset: %06x PC %06x: set banking %04x\n\n",offset,space->device().safe_pc(),bankaddress);
+		logerror("offset: %06x PC %06x: set banking %04x\n\n",offset,space.device().safe_pc(),bankaddress);
 	}
 	else if(offset == 2)
 	{
@@ -722,7 +722,7 @@ static WRITE16_HANDLER ( ms5plus_bankswitch_w )
 		//data=data&7;
 		bankaddress=data*0x100000;
 		neogeo_set_main_cpu_bank_address(space, bankaddress);
-		logerror("offset: %06x PC %06x: set banking %04x\n\n",offset,space->device().safe_pc(),bankaddress);
+		logerror("offset: %06x PC %06x: set banking %04x\n\n",offset,space.device().safe_pc(),bankaddress);
 	}
 }
 
@@ -924,7 +924,7 @@ static WRITE16_HANDLER( kof2003_w )
 		UINT8* cr = (UINT8 *)kof2003_tbl;
 		UINT32 address = (cr[BYTE_XOR_LE(0x1ff3)]<<16)|(cr[BYTE_XOR_LE(0x1ff2)]<<8)|cr[BYTE_XOR_LE(0x1ff1)];
 		UINT8 prt = cr[BYTE_XOR_LE(0x1ff2)];
-		UINT8* mem = (UINT8 *)space->machine().root_device().memregion("maincpu")->base();
+		UINT8* mem = (UINT8 *)space.machine().root_device().memregion("maincpu")->base();
 
 		cr[BYTE_XOR_LE(0x1ff0)] =  0xa0;
 		cr[BYTE_XOR_LE(0x1ff1)] &= 0xfe;
@@ -942,7 +942,7 @@ static WRITE16_HANDLER( kof2003p_w )
 		UINT8* cr = (UINT8 *)kof2003_tbl;
 		UINT32 address = (cr[BYTE_XOR_LE(0x1ff3)]<<16)|(cr[BYTE_XOR_LE(0x1ff2)]<<8)|cr[BYTE_XOR_LE(0x1ff0)];
 		UINT8 prt = cr[BYTE_XOR_LE(0x1ff2)];
-		UINT8* mem = (UINT8 *)space->machine().root_device().memregion("maincpu")->base();
+		UINT8* mem = (UINT8 *)space.machine().root_device().memregion("maincpu")->base();
 
 		cr[BYTE_XOR_LE(0x1ff0)] &= 0xfe;
 		cr[BYTE_XOR_LE(0x1ff3)] &= 0x7f;

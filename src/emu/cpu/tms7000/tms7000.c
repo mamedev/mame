@@ -557,7 +557,7 @@ static void tms7000_service_timer1( device_t *device )
 
 static WRITE8_HANDLER( tms70x0_pf_w )	/* Perpherial file write */
 {
-	tms7000_state *cpustate = get_safe_token(&space->device());
+	tms7000_state *cpustate = get_safe_token(&space.device());
 	UINT8	temp1, temp2, temp3;
 
 	switch( offset )
@@ -626,7 +626,7 @@ static WRITE8_HANDLER( tms70x0_pf_w )	/* Perpherial file write */
 
 static READ8_HANDLER( tms70x0_pf_r )	/* Perpherial file read */
 {
-	tms7000_state *cpustate = get_safe_token(&space->device());
+	tms7000_state *cpustate = get_safe_token(&space.device());
 	UINT8 result;
 	UINT8	temp1, temp2, temp3;
 
@@ -719,12 +719,12 @@ static UINT16 bcd_sub( UINT16 a, UINT16 b)
 }
 
 static WRITE8_HANDLER( tms7000_internal_w ) {
-	tms7000_state *cpustate = get_safe_token(&space->device());
+	tms7000_state *cpustate = get_safe_token(&space.device());
 	cpustate->rf[ offset ] = data;
 }
 
 static READ8_HANDLER( tms7000_internal_r ) {
-	tms7000_state *cpustate = get_safe_token(&space->device());
+	tms7000_state *cpustate = get_safe_token(&space.device());
 	return cpustate->rf[ offset ];
 }
 

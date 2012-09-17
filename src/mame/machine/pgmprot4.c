@@ -111,7 +111,7 @@ static void IGS022_do_dma(running_machine& machine, UINT16 src, UINT16 dst, UINT
 
 		for (x = 0; x < size; x++)
 		{
-			//UINT16 *RAMDUMP = (UINT16*)space->machine().root_device().memregion("user2")->base();
+			//UINT16 *RAMDUMP = (UINT16*)space.machine().root_device().memregion("user2")->base();
 			//UINT16 dat = RAMDUMP[dst + x];
 
 			UINT16 dat2 = PROTROM[src + x];
@@ -279,21 +279,21 @@ static WRITE16_HANDLER( killbld_igs025_prot_w )
 {
 //  mame_printf_debug("killbrd prot r\n");
 //  return 0;
-	pgm_022_025_state *state = space->machine().driver_data<pgm_022_025_state>();
+	pgm_022_025_state *state = space.machine().driver_data<pgm_022_025_state>();
 	offset &= 0xf;
 
 	if (offset == 0)
 		state->m_kb_cmd = data;
 	else //offset==2
 	{
-		logerror("%06X: ASIC25 W CMD %X  VAL %X\n", space->device().safe_pc(), state->m_kb_cmd, data);
+		logerror("%06X: ASIC25 W CMD %X  VAL %X\n", space.device().safe_pc(), state->m_kb_cmd, data);
 		if (state->m_kb_cmd == 0)
 			state->m_kb_reg = data;
 		else if (state->m_kb_cmd == 2)
 		{
 			if (data == 1)	//Execute cmd
 			{
-				IGS022_handle_command(space->machine());
+				IGS022_handle_command(space.machine());
 				state->m_kb_reg++;
 			}
 		}
@@ -307,7 +307,7 @@ static WRITE16_HANDLER( killbld_igs025_prot_w )
 static READ16_HANDLER( killbld_igs025_prot_r )
 {
 //  mame_printf_debug("killbld prot w\n");
-	pgm_022_025_state *state = space->machine().driver_data<pgm_022_025_state>();
+	pgm_022_025_state *state = space.machine().driver_data<pgm_022_025_state>();
 	UINT16 res ;
 
 	offset &= 0xf;
@@ -334,7 +334,7 @@ static READ16_HANDLER( killbld_igs025_prot_r )
 			}
 			else
 			{
-				UINT32 protvalue = 0x89911400 | space->machine().root_device().ioport("Region")->read();
+				UINT32 protvalue = 0x89911400 | space.machine().root_device().ioport("Region")->read();
 				ret = (protvalue >> (8 * (state->m_kb_ptr - 1))) & 0xff;
 			}
 
@@ -342,7 +342,7 @@ static READ16_HANDLER( killbld_igs025_prot_r )
 
 		}
 	}
-	logerror("%06X: ASIC25 R CMD %X  VAL %X\n", space->device().safe_pc(), state->m_kb_cmd, res);
+	logerror("%06X: ASIC25 R CMD %X  VAL %X\n", space.device().safe_pc(), state->m_kb_cmd, res);
 	return res;
 }
 
@@ -451,7 +451,7 @@ static int ptr=0;
 static UINT8 dw3_swap;
 static WRITE16_HANDLER( drgw3_igs025_prot_w )
 {
-	pgm_022_025_state *state = space->machine().driver_data<pgm_022_025_state>();
+	pgm_022_025_state *state = space.machine().driver_data<pgm_022_025_state>();
 
 	offset&=0xf;
 
@@ -459,7 +459,7 @@ static WRITE16_HANDLER( drgw3_igs025_prot_w )
 		state->m_kb_cmd=data;
 	else //offset==2
 	{
-		printf("%06X: ASIC25 W CMD %X  VAL %X\n",space->device().safe_pc(),state->m_kb_cmd,data);
+		printf("%06X: ASIC25 W CMD %X  VAL %X\n",space.device().safe_pc(),state->m_kb_cmd,data);
 		if(state->m_kb_cmd==0)
 			reg=data;
 		else if(state->m_kb_cmd==3)	//??????????
@@ -478,7 +478,7 @@ static WRITE16_HANDLER( drgw3_igs025_prot_w )
 static READ16_HANDLER( drgw3_igs025_prot_r )
 {
 //  mame_printf_debug("killbld prot w\n");
-	pgm_022_025_state *state = space->machine().driver_data<pgm_022_025_state>();
+	pgm_022_025_state *state = space.machine().driver_data<pgm_022_025_state>();
 
 	UINT16 res ;
 
@@ -510,13 +510,13 @@ static READ16_HANDLER( drgw3_igs025_prot_r )
 		else if(state->m_kb_cmd==5)
 		{
 			UINT32 protvalue;
-			protvalue = 0x60000|space->machine().root_device().ioport("Region")->read();
+			protvalue = 0x60000|space.machine().root_device().ioport("Region")->read();
 			res=(protvalue>>(8*(ptr-1)))&0xff;
 
 
 		}
 	}
-	logerror("%06X: ASIC25 R CMD %X  VAL %X\n",space->device().safe_pc(),state->m_kb_cmd,res);
+	logerror("%06X: ASIC25 R CMD %X  VAL %X\n",space.device().safe_pc(),state->m_kb_cmd,res);
 	return res;
 }
 

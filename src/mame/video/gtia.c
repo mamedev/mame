@@ -157,7 +157,7 @@ static int is_ntsc(running_machine &machine)
 static void gtia_reset(running_machine &machine)
 {
 	int i;
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* reset the GTIA read/write/helper registers */
 	for (i = 0; i < 32; i++)

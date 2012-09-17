@@ -422,35 +422,35 @@ READ16_MEMBER(dec0_state::slyspy_state_r)
 void slyspy_set_protection_map(running_machine& machine, int type)
 {
 	dec0_state *state = machine.driver_data<dec0_state>();
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	deco_bac06_device *tilegen1 = (deco_bac06_device*)state->m_tilegen1;
 	deco_bac06_device *tilegen2 = (deco_bac06_device*)state->m_tilegen2;
 
-	space->install_write_handler( 0x240000, 0x24ffff, write16_delegate(FUNC(dec0_state::unmapped_w),state));
+	space.install_write_handler( 0x240000, 0x24ffff, write16_delegate(FUNC(dec0_state::unmapped_w),state));
 
-	space->install_write_handler( 0x24a000, 0x24a001, write16_delegate(FUNC(dec0_state::slyspy_state_w),state));
-	space->install_read_handler( 0x244000, 0x244001, read16_delegate(FUNC(dec0_state::slyspy_state_r),state));
+	space.install_write_handler( 0x24a000, 0x24a001, write16_delegate(FUNC(dec0_state::slyspy_state_w),state));
+	space.install_read_handler( 0x244000, 0x244001, read16_delegate(FUNC(dec0_state::slyspy_state_r),state));
 
 	switch (type)
 	{
 
 		case 0:
-			space->install_legacy_write_handler( *tilegen2, 0x240000, 0x240007, FUNC(deco_bac06_pf_control_0_w));
-			space->install_legacy_write_handler( *tilegen2, 0x240010, 0x240017, FUNC(deco_bac06_pf_control_1_w));
+			space.install_legacy_write_handler( *tilegen2, 0x240000, 0x240007, FUNC(deco_bac06_pf_control_0_w));
+			space.install_legacy_write_handler( *tilegen2, 0x240010, 0x240017, FUNC(deco_bac06_pf_control_1_w));
 
-			space->install_legacy_write_handler( *tilegen2, 0x242000, 0x24207f, FUNC(deco_bac06_pf_colscroll_w));
-			space->install_legacy_write_handler( *tilegen2, 0x242400, 0x2427ff, FUNC(deco_bac06_pf_rowscroll_w));
+			space.install_legacy_write_handler( *tilegen2, 0x242000, 0x24207f, FUNC(deco_bac06_pf_colscroll_w));
+			space.install_legacy_write_handler( *tilegen2, 0x242400, 0x2427ff, FUNC(deco_bac06_pf_rowscroll_w));
 
-			space->install_legacy_write_handler( *tilegen2, 0x246000, 0x247fff, FUNC(deco_bac06_pf_data_w));
+			space.install_legacy_write_handler( *tilegen2, 0x246000, 0x247fff, FUNC(deco_bac06_pf_data_w));
 
-			space->install_legacy_write_handler( *tilegen1, 0x248000, 0x280007, FUNC(deco_bac06_pf_control_0_w));
-			space->install_legacy_write_handler( *tilegen1, 0x248010, 0x280017, FUNC(deco_bac06_pf_control_1_w));
+			space.install_legacy_write_handler( *tilegen1, 0x248000, 0x280007, FUNC(deco_bac06_pf_control_0_w));
+			space.install_legacy_write_handler( *tilegen1, 0x248010, 0x280017, FUNC(deco_bac06_pf_control_1_w));
 
-			space->install_legacy_write_handler( *tilegen1, 0x24c000, 0x24c07f, FUNC(deco_bac06_pf_colscroll_w));
-			space->install_legacy_write_handler( *tilegen1, 0x24c400, 0x24c7ff, FUNC(deco_bac06_pf_rowscroll_w));
+			space.install_legacy_write_handler( *tilegen1, 0x24c000, 0x24c07f, FUNC(deco_bac06_pf_colscroll_w));
+			space.install_legacy_write_handler( *tilegen1, 0x24c400, 0x24c7ff, FUNC(deco_bac06_pf_rowscroll_w));
 
-			space->install_legacy_write_handler( *tilegen1, 0x24e000, 0x24ffff, FUNC(deco_bac06_pf_data_w));
+			space.install_legacy_write_handler( *tilegen1, 0x24e000, 0x24ffff, FUNC(deco_bac06_pf_data_w));
 
 			break;
 
@@ -458,26 +458,26 @@ void slyspy_set_protection_map(running_machine& machine, int type)
 			// 0x240000 - 0x241fff not mapped
 			// 0x242000 - 0x243fff not mapped
 			// 0x246000 - 0x247fff not mapped
-			space->install_legacy_write_handler( *tilegen1, 0x248000, 0x249fff, FUNC(deco_bac06_pf_data_w));
-			space->install_legacy_write_handler( *tilegen2, 0x24c000, 0x24dfff, FUNC(deco_bac06_pf_data_w));
+			space.install_legacy_write_handler( *tilegen1, 0x248000, 0x249fff, FUNC(deco_bac06_pf_data_w));
+			space.install_legacy_write_handler( *tilegen2, 0x24c000, 0x24dfff, FUNC(deco_bac06_pf_data_w));
 			// 0x24e000 - 0x24ffff not mapped
 			break;
 
 		case 2:
-			space->install_legacy_write_handler( *tilegen2, 0x240000, 0x241fff, FUNC(deco_bac06_pf_data_w));
-			space->install_legacy_write_handler( *tilegen1, 0x242000, 0x243fff, FUNC(deco_bac06_pf_data_w));
+			space.install_legacy_write_handler( *tilegen2, 0x240000, 0x241fff, FUNC(deco_bac06_pf_data_w));
+			space.install_legacy_write_handler( *tilegen1, 0x242000, 0x243fff, FUNC(deco_bac06_pf_data_w));
 			// 0x242000 - 0x243fff not mapped
 			// 0x246000 - 0x247fff not mapped
 			// 0x248000 - 0x249fff not mapped
 			// 0x24c000 - 0x24dfff not mapped
-			space->install_legacy_write_handler( *tilegen1, 0x24e000, 0x24ffff, FUNC(deco_bac06_pf_data_w));
+			space.install_legacy_write_handler( *tilegen1, 0x24e000, 0x24ffff, FUNC(deco_bac06_pf_data_w));
 			break;
 
 		case 3:
-			space->install_legacy_write_handler( *tilegen1, 0x240000, 0x241fff, FUNC(deco_bac06_pf_data_w));
+			space.install_legacy_write_handler( *tilegen1, 0x240000, 0x241fff, FUNC(deco_bac06_pf_data_w));
 			// 0x242000 - 0x243fff not mapped
 			// 0x246000 - 0x247fff not mapped
-			space->install_legacy_write_handler( *tilegen2, 0x248000, 0x249fff, FUNC(deco_bac06_pf_data_w));
+			space.install_legacy_write_handler( *tilegen2, 0x248000, 0x249fff, FUNC(deco_bac06_pf_data_w));
 			// 0x24c000 - 0x24dfff not mapped
 			// 0x24e000 - 0x24ffff not mapped
 			break;

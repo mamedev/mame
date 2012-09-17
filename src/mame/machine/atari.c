@@ -275,15 +275,15 @@ static void pokey_reset(running_machine &machine)
 }
 
 
-static UINT8 console_read(address_space *space)
+static UINT8 console_read(address_space &space)
 {
-	return space->machine().root_device().ioport("console")->read();
+	return space.machine().root_device().ioport("console")->read();
 }
 
 
-static void console_write(address_space *space, UINT8 data)
+static void console_write(address_space &space, UINT8 data)
 {
-	dac_device *dac = space->machine().device<dac_device>("dac");
+	dac_device *dac = space.machine().device<dac_device>("dac");
 	if (data & 0x08)
 		dac->write_unsigned8((UINT8)-120);
 	else

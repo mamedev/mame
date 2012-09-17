@@ -199,9 +199,9 @@ INLINE UINT8 swap_bits_5_6(UINT8 data)
 }
 
 
-static void btime_decrypt( address_space *space )
+static void btime_decrypt( address_space &space )
 {
-	btime_state *state = space->machine().driver_data<btime_state>();
+	btime_state *state = space.machine().driver_data<btime_state>();
 	UINT8 *src, *src1;
 	int addr, addr1;
 
@@ -211,11 +211,11 @@ static void btime_decrypt( address_space *space )
 	/* xxxx xxx1 xxxx x1xx are encrypted. */
 
 	/* get the address of the next opcode */
-	addr = space->device().safe_pc();
+	addr = space.device().safe_pc();
 
 	/* however if the previous instruction was JSR (which caused a write to */
 	/* the stack), fetch the address of the next instruction. */
-	addr1 = space->device().safe_pcbase();
+	addr1 = space.device().safe_pcbase();
 	src1 = (addr1 < 0x9000) ? state->m_rambase : state->memregion("maincpu")->base();
 	if (decrypted[addr1] == 0x20)	/* JSR $xxxx */
 		addr = src1[addr1 + 1] + 256 * src1[addr1 + 2];
@@ -280,7 +280,7 @@ WRITE8_MEMBER(btime_state::btime_w)
 
 	m_rambase[offset] = data;
 
-	btime_decrypt(&space);
+	btime_decrypt(space);
 }
 
 WRITE8_MEMBER(btime_state::tisland_w)
@@ -299,7 +299,7 @@ WRITE8_MEMBER(btime_state::tisland_w)
 
 	m_rambase[offset] = data;
 
-	btime_decrypt(&space);
+	btime_decrypt(space);
 }
 
 WRITE8_MEMBER(btime_state::zoar_w)
@@ -317,7 +317,7 @@ WRITE8_MEMBER(btime_state::zoar_w)
 
 	m_rambase[offset] = data;
 
-	btime_decrypt(&space);
+	btime_decrypt(space);
 }
 
 WRITE8_MEMBER(btime_state::disco_w)
@@ -331,7 +331,7 @@ WRITE8_MEMBER(btime_state::disco_w)
 
 	m_rambase[offset] = data;
 
-	btime_decrypt(&space);
+	btime_decrypt(space);
 }
 
 
@@ -2038,18 +2038,18 @@ ROM_END
 
 static void decrypt_C10707_cpu(running_machine &machine, const char *cputag)
 {
-	address_space *space = machine.device(cputag)->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device(cputag)->memory().space(AS_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8 *rom = machine.root_device().memregion(cputag)->base();
 	offs_t addr;
 
-	space->set_decrypted_region(0x0000, 0xffff, decrypt);
+	space.set_decrypted_region(0x0000, 0xffff, decrypt);
 
 	/* Swap bits 5 & 6 for opcodes */
 	for (addr = 0; addr < 0x10000; addr++)
 		decrypt[addr] = swap_bits_5_6(rom[addr]);
 
-	if (&space->device() == machine.device("maincpu"))
+	if (&space.device() == machine.device("maincpu"))
 		decrypted = decrypt;
 }
 
@@ -2068,11 +2068,11 @@ READ8_MEMBER(btime_state::wtennis_reset_hack_r)
 
 static void init_rom1(running_machine &machine)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	decrypted = auto_alloc_array(machine, UINT8, 0x10000);
-	space->set_decrypted_region(0x0000, 0xffff, decrypted);
+	space.set_decrypted_region(0x0000, 0xffff, decrypted);
 
 	/* For now, just copy the RAM array over to ROM. Decryption will happen */
 	/* at run time, since the CPU applies the decryption only if the previous */

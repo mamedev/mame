@@ -18,21 +18,21 @@
 #define TVC_INSTALL_ROM_BANK(_bank,_tag,_start,_end) \
 	if (m_bank_type[_bank] != TVC_ROM_BANK) \
 	{ \
-		space->install_read_bank(_start, _end, _tag); \
-		space->unmap_write(_start, _end); \
+		space.install_read_bank(_start, _end, _tag); \
+		space.unmap_write(_start, _end); \
 		m_bank_type[_bank] = TVC_ROM_BANK; \
 	} \
 
 #define TVC_INSTALL_RAM_BANK(_bank,_tag,_start,_end) \
 	if (m_bank_type[_bank] != TVC_RAM_BANK) \
 	{ \
-		space->install_readwrite_bank(_start, _end, _tag); \
+		space.install_readwrite_bank(_start, _end, _tag); \
 		m_bank_type[_bank] = TVC_RAM_BANK; \
 	} \
 
 void tvc_state::tvc_set_mem_page(UINT8 data)
 {
-	address_space *space = m_maincpu->space(AS_PROGRAM);
+	address_space &space = *m_maincpu->space(AS_PROGRAM);
 	switch(data & 0x18)
 	{
 		case 0x00 : // system ROM selected
@@ -56,7 +56,7 @@ void tvc_state::tvc_set_mem_page(UINT8 data)
 			}
 			else
 			{
-				space->unmap_readwrite(0x0000, 0x3fff);
+				space.unmap_readwrite(0x0000, 0x3fff);
 				m_bank_type[0] = -1;
 			}
 			break;
@@ -76,7 +76,7 @@ void tvc_state::tvc_set_mem_page(UINT8 data)
 		}
 		else
 		{
-			space->unmap_readwrite(0x8000, 0xbfff);
+			space.unmap_readwrite(0x8000, 0xbfff);
 			m_bank_type[2] = -1;
 		}
 	}
@@ -99,14 +99,14 @@ void tvc_state::tvc_set_mem_page(UINT8 data)
 			}
 			else
 			{
-				space->unmap_readwrite(0xc000, 0xffff);
+				space.unmap_readwrite(0xc000, 0xffff);
 				m_bank_type[3] = -1;
 			}
 			break;
 		case 0xc0 : // External ROM selected
 			TVC_INSTALL_ROM_BANK(3, "bank4", 0xc000, 0xffff);
 			membank("bank4")->set_base(memregion("ext")->base());
-			space->install_readwrite_handler (0xc000, 0xdfff, 0, 0, read8_delegate(FUNC(tvc_state::tvc_expansion_r), this), write8_delegate(FUNC(tvc_state::tvc_expansion_w), this), 0);
+			space.install_readwrite_handler (0xc000, 0xdfff, 0, 0, read8_delegate(FUNC(tvc_state::tvc_expansion_r), this), write8_delegate(FUNC(tvc_state::tvc_expansion_w), this), 0);
 			m_bank_type[3] = -1;
 			break;
 	}

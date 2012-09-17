@@ -42,20 +42,20 @@ extern WRITE64_HANDLER( dc_mess_g1_ctrl_w );
 
 static READ64_HANDLER( dcus_idle_skip_r )
 {
-	if (space->device().safe_pc()==0xc0ba52a)
-		space->device().execute().spin_until_time(attotime::from_usec(2500));
-	//  device_spinuntil_int(&space->device());
+	if (space.device().safe_pc()==0xc0ba52a)
+		space.device().execute().spin_until_time(attotime::from_usec(2500));
+	//  device_spinuntil_int(&space.device());
 
-	return space->machine().driver_data<dc_state>()->dc_ram[0x2303b0/8];
+	return space.machine().driver_data<dc_state>()->dc_ram[0x2303b0/8];
 }
 
 static READ64_HANDLER( dcjp_idle_skip_r )
 {
-	if (space->device().safe_pc()==0xc0bac62)
-		space->device().execute().spin_until_time(attotime::from_usec(2500));
-	//  device_spinuntil_int(&space->device());
+	if (space.device().safe_pc()==0xc0bac62)
+		space.device().execute().spin_until_time(attotime::from_usec(2500));
+	//  device_spinuntil_int(&space.device());
 
-	return space->machine().driver_data<dc_state>()->dc_ram[0x2302f8/8];
+	return space.machine().driver_data<dc_state>()->dc_ram[0x2302f8/8];
 }
 
 DRIVER_INIT_MEMBER(dc_state,dc)
@@ -110,14 +110,14 @@ static WRITE64_HANDLER( dc_pdtra_w )
 
 static READ64_HANDLER( dc_arm_r )
 {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 
 	return *((UINT64 *)state->dc_sound_ram.target()+offset);
 }
 
 static WRITE64_HANDLER( dc_arm_w )
 {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 
 	COMBINE_DATA((UINT64 *)state->dc_sound_ram.target() + offset);
 }
@@ -126,7 +126,7 @@ static WRITE64_HANDLER( dc_arm_w )
  // SB_LMMODE0
  static WRITE64_HANDLER( ta_texture_directpath0_w )
  {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 
 	int mode = state->pvrctrl_regs[SB_LMMODE0]&1;
 	if (mode&1)
@@ -143,7 +143,7 @@ static WRITE64_HANDLER( dc_arm_w )
  // SB_LMMODE1
  static WRITE64_HANDLER( ta_texture_directpath1_w )
  {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 
 	int mode = state->pvrctrl_regs[SB_LMMODE1]&1;
 	if (mode&1)

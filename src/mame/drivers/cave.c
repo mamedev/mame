@@ -809,9 +809,9 @@ READ16_MEMBER(cave_state::pwrinst2_eeprom_r)
 	return ~8 + ((eeprom->read_bit() & 1) ? 8 : 0);
 }
 
-INLINE void vctrl_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int GFX)
+INLINE void vctrl_w(address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask, int GFX)
 {
-	cave_state *state = space->machine().driver_data<cave_state>();
+	cave_state *state = space.machine().driver_data<cave_state>();
 	UINT16 *VCTRL = state->m_vctrl[GFX];
 	if (offset == 4 / 2)
 	{
@@ -826,10 +826,10 @@ INLINE void vctrl_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem
 	}
 	COMBINE_DATA(&VCTRL[offset]);
 }
-WRITE16_MEMBER(cave_state::pwrinst2_vctrl_0_w){ vctrl_w(&space, offset, data, mem_mask, 0); }
-WRITE16_MEMBER(cave_state::pwrinst2_vctrl_1_w){ vctrl_w(&space, offset, data, mem_mask, 1); }
-WRITE16_MEMBER(cave_state::pwrinst2_vctrl_2_w){ vctrl_w(&space, offset, data, mem_mask, 2); }
-WRITE16_MEMBER(cave_state::pwrinst2_vctrl_3_w){ vctrl_w(&space, offset, data, mem_mask, 3); }
+WRITE16_MEMBER(cave_state::pwrinst2_vctrl_0_w){ vctrl_w(space, offset, data, mem_mask, 0); }
+WRITE16_MEMBER(cave_state::pwrinst2_vctrl_1_w){ vctrl_w(space, offset, data, mem_mask, 1); }
+WRITE16_MEMBER(cave_state::pwrinst2_vctrl_2_w){ vctrl_w(space, offset, data, mem_mask, 2); }
+WRITE16_MEMBER(cave_state::pwrinst2_vctrl_3_w){ vctrl_w(space, offset, data, mem_mask, 3); }
 
 static ADDRESS_MAP_START( pwrinst2_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM																		// ROM

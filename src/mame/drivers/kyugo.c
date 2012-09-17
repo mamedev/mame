@@ -510,10 +510,10 @@ void kyugo_state::machine_start()
 
 void kyugo_state::machine_reset()
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	// must start with interrupts and sub CPU disabled
 	m_nmi_mask = 0;
-	kyugo_sub_cpu_control_w(*space, 0, 0);
+	kyugo_sub_cpu_control_w(space, 0, 0);
 
 	m_scroll_x_lo = 0;
 	m_scroll_x_hi = 0;

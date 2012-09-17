@@ -771,12 +771,12 @@ WRITE8_HANDLER ( pc_T1T_w )
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
-			mc6845 = space->machine().device<mc6845_device>(T1000_MC6845_NAME);
-			mc6845->address_w( *space, offset, data );
+			mc6845 = space.machine().device<mc6845_device>(T1000_MC6845_NAME);
+			mc6845->address_w( space, offset, data );
 			break;
 		case 1: case 3: case 5: case 7:
-			mc6845 = space->machine().device<mc6845_device>(T1000_MC6845_NAME);
-			mc6845->register_w( *space, offset, data );
+			mc6845 = space.machine().device<mc6845_device>(T1000_MC6845_NAME);
+			mc6845->register_w( space, offset, data );
 			break;
 		case 8:
 			pc_t1t_mode_control_w(data);
@@ -798,7 +798,7 @@ WRITE8_HANDLER ( pc_T1T_w )
 			pc_t1t_vga_data_w(data);
 			break;
 		case 15:
-			pc_t1t_bank_w(space->machine(), data);
+			pc_t1t_bank_w(space.machine(), data);
 			break;
     }
 }
@@ -811,17 +811,17 @@ WRITE8_HANDLER( pc_pcjr_w )
 	switch( offset )
 	{
 		case 0: case 4:
-			mc6845 = space->machine().device<mc6845_device>(T1000_MC6845_NAME);
-			mc6845->address_w( *space, offset, data );
+			mc6845 = space.machine().device<mc6845_device>(T1000_MC6845_NAME);
+			mc6845->address_w( space, offset, data );
 			break;
 		case 1: case 5:
-			mc6845 = space->machine().device<mc6845_device>(T1000_MC6845_NAME);
-			mc6845->register_w( *space, offset, data );
+			mc6845 = space.machine().device<mc6845_device>(T1000_MC6845_NAME);
+			mc6845->register_w( space, offset, data );
 			break;
 		case 10:
 			if ( pcjr.address_data_ff & 0x01 )
 			{
-				pc_pcjr_vga_data_w( space->machine(), data );
+				pc_pcjr_vga_data_w( space.machine(), data );
 			}
 			else
 			{
@@ -835,7 +835,7 @@ WRITE8_HANDLER( pc_pcjr_w )
 		case 12:
 			break;
 		case 15:
-			pc_pcjr_bank_w(space->machine(), data);
+			pc_pcjr_bank_w(space.machine(), data);
 			break;
 
 		default:
@@ -856,8 +856,8 @@ WRITE8_HANDLER( pc_pcjr_w )
 			break;
 
 		case 1: case 3: case 5: case 7:
-			mc6845 = space->machine().device<mc6845_device>(T1000_MC6845_NAME);
-			data = mc6845->register_r( *space, offset );
+			mc6845 = space.machine().device<mc6845_device>(T1000_MC6845_NAME);
+			data = mc6845->register_r( space, offset );
 			break;
 
 		case 8:
@@ -922,7 +922,7 @@ static WRITE_LINE_DEVICE_HANDLER( pcjr_vsync_changed )
 static VIDEO_START( pc_t1t )
 {
 	int buswidth;
-	address_space *space = machine.firstcpu->space(AS_PROGRAM);
+	address_space &space = *machine.firstcpu->space(AS_PROGRAM);
 	address_space *spaceio = machine.firstcpu->space(AS_IO);
 
 	pcjr.chr_gen = machine.root_device().memregion("gfx1")->base();
@@ -934,12 +934,12 @@ static VIDEO_START( pc_t1t )
 	switch(buswidth)
 	{
 		case 8:
-			space->install_legacy_readwrite_handler(0xb8000, 0xbffff, FUNC(pc_t1t_videoram_r), FUNC(pc_t1t_videoram_w) );
+			space.install_legacy_readwrite_handler(0xb8000, 0xbffff, FUNC(pc_t1t_videoram_r), FUNC(pc_t1t_videoram_w) );
 			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_T1T_r),FUNC(pc_T1T_w) );
 			break;
 
 		case 16:
-			space->install_legacy_readwrite_handler(0xb8000, 0xbffff, FUNC(pc_t1t_videoram_r), FUNC(pc_t1t_videoram_w), 0xffff );
+			space.install_legacy_readwrite_handler(0xb8000, 0xbffff, FUNC(pc_t1t_videoram_r), FUNC(pc_t1t_videoram_w), 0xffff );
 			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_T1T_r),FUNC(pc_T1T_w), 0xffff );
 			break;
 

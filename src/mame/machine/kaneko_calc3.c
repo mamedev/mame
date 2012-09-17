@@ -1243,7 +1243,7 @@ UINT8 kaneko_calc3_device::shift_bits(UINT8 dat, int bits)
 int kaneko_calc3_device::calc3_decompress_table(running_machine& machine, int tabnum, UINT8* dstram, int dstoffset)
 {
 	calc3_t &calc3 = m_calc3;
-	address_space *space = machine.device(":maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device(":maincpu")->memory().space(AS_PROGRAM);
 	UINT8* datarom = memregion(":calc3_rom")->base();
 
 	UINT8 numregions;
@@ -1344,11 +1344,11 @@ int kaneko_calc3_device::calc3_decompress_table(running_machine& machine, int ta
 					//printf("save to eeprom\n");
 
 					{
-						address_space *eeprom_space = space->machine().device<eeprom_device>(":eeprom")->space();
+						address_space *eeprom_space = space.machine().device<eeprom_device>(":eeprom")->space();
 
 						for (i=0;i<0x80;i++)
 						{
-							eeprom_space->write_byte(i, space->read_byte(calc3.eeprom_addr+0x200000+i));
+							eeprom_space->write_byte(i, space.read_byte(calc3.eeprom_addr+0x200000+i));
 						}
 
 					}
@@ -1446,10 +1446,7 @@ int kaneko_calc3_device::calc3_decompress_table(running_machine& machine, int ta
 
 					if(local_counter>1)
 					{
-						if (space)
-						{
-							space->write_byte(dstoffset+i, dat);
-						}
+						space.write_byte(dstoffset+i, dat);
 
 						// debug, used to output tables at the start
 						if (dstram)
@@ -1520,10 +1517,7 @@ int kaneko_calc3_device::calc3_decompress_table(running_machine& machine, int ta
 
 					if(local_counter>1)
 					{
-						if (space)
-						{
-							space->write_byte(dstoffset+i, dat);
-						}
+						space.write_byte(dstoffset+i, dat);
 
 						// debug, used to output tables at the start
 						if (dstram)
@@ -1639,11 +1633,11 @@ void kaneko_calc3_device::calc3_mcu_run(running_machine &machine)
 	calc3_t &calc3 = m_calc3;
 	UINT16 mcu_command;
 	int i;
-	address_space *space = machine.device(":maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device(":maincpu")->memory().space(AS_PROGRAM);
 
 	if ( calc3.mcu_status != (1|2|4|8) )	return;
 
-	if (calc3.dsw_addr) space->write_byte(calc3.dsw_addr+0x200000, ( ~ioport(":DSW1")->read())&0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
+	if (calc3.dsw_addr) space.write_byte(calc3.dsw_addr+0x200000, ( ~ioport(":DSW1")->read())&0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
 
 
 	//calc3.mcu_status = 0;
@@ -1684,7 +1678,7 @@ void kaneko_calc3_device::calc3_mcu_run(running_machine &machine)
 			printf("Calc 3 Init Command - %04x ROM Checksum Address\n",  calc3.checksumaddress);
 			printf("Calc 3 Init Command - %08x Data Write Address\n",  calc3.writeaddress);
 #endif
-	//      space->write_byte(calc3.dsw_addr+0x200000, ( ~ioport("DSW1")->read())&0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
+	//      space.write_byte(calc3.dsw_addr+0x200000, ( ~ioport("DSW1")->read())&0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
 
 			m_calc3_mcuram[calc3.checksumaddress / 2] = calc3.mcu_crc;				// MCU Rom Checksum!
 
@@ -1695,11 +1689,11 @@ void kaneko_calc3_device::calc3_mcu_run(running_machine &machine)
 			}
 #endif
 			{
-				address_space *eeprom_space = space->machine().device<eeprom_device>(":eeprom")->space();
+				address_space *eeprom_space = space.machine().device<eeprom_device>(":eeprom")->space();
 
 				for (i=0;i<0x80;i++)
 				{
-					space->write_byte(calc3.eeprom_addr+0x200000+i, eeprom_space->read_byte(i));
+					space.write_byte(calc3.eeprom_addr+0x200000+i, eeprom_space->read_byte(i));
 				}
 
 			}
@@ -1738,12 +1732,12 @@ void kaneko_calc3_device::calc3_mcu_run(running_machine &machine)
 						printf("writing back address %08x to %08x %08x\n", calc3.writeaddress_current, commandaddr,write);
 #endif
 
-						space->write_byte(write+0x200000, calc3.data_header[0]);
-						space->write_byte(write+0x200001, calc3.data_header[1]);
+						space.write_byte(write+0x200000, calc3.data_header[0]);
+						space.write_byte(write+0x200001, calc3.data_header[1]);
 
 						write=commandaddr+(char)commandunk;
-						space->write_word(write+0x200000, (calc3.writeaddress_current>>16)&0xffff);
-						space->write_word(write+0x200002,  (calc3.writeaddress_current&0xffff));
+						space.write_word(write+0x200000, (calc3.writeaddress_current>>16)&0xffff);
+						space.write_word(write+0x200002,  (calc3.writeaddress_current&0xffff));
 
 						calc3.writeaddress_current += ((length+3)&(~1));
 					}

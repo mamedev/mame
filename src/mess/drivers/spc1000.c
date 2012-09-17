@@ -224,15 +224,15 @@ INPUT_PORTS_END
 
 void spc1000_state::machine_reset()
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *mem = memregion("maincpu")->base();
 	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
-	space->install_read_bank(0x0000, 0x7fff, "bank1");
-	space->install_read_bank(0x8000, 0xffff, "bank3");
+	space.install_read_bank(0x0000, 0x7fff, "bank1");
+	space.install_read_bank(0x8000, 0xffff, "bank3");
 
-	space->install_write_bank(0x0000, 0x7fff, "bank2");
-	space->install_write_bank(0x8000, 0xffff, "bank4");
+	space.install_write_bank(0x0000, 0x7fff, "bank2");
+	space.install_write_bank(0x8000, 0xffff, "bank4");
 
 	membank("bank1")->set_base(mem);
 	membank("bank2")->set_base(ram);

@@ -142,7 +142,7 @@ WRITE8_MEMBER(cham24_state::sprite_dma_w)
 {
 	int source = (data & 7);
 	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
-	ppu->spriteram_dma(&space, source);
+	ppu->spriteram_dma(space, source);
 }
 
 READ8_MEMBER(cham24_state::psg_4015_r)

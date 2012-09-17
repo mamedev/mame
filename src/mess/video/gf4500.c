@@ -94,7 +94,7 @@ READ32_HANDLER( gf4500_r )
 	}
 	if ((offset < (GF4500_FRAMEBUF_OFFSET / 4)) || (offset >= ((GF4500_FRAMEBUF_OFFSET + (321 * 240 * 2)) / 4)))
 	{
-		verboselog( space->machine(), 9, "(GFO) %08X -> %08X\n", 0x34000000 + (offset << 2), data);
+		verboselog( space.machine(), 9, "(GFO) %08X -> %08X\n", 0x34000000 + (offset << 2), data);
 	}
 	return data;
 }
@@ -104,7 +104,7 @@ WRITE32_HANDLER( gf4500_w )
 	COMBINE_DATA(&gf4500.data[offset]);
 	if ((offset < (GF4500_FRAMEBUF_OFFSET / 4)) || (offset >= ((GF4500_FRAMEBUF_OFFSET + (321 * 240 * 2)) / 4)))
 	{
-		verboselog( space->machine(), 9, "(GFO) %08X <- %08X\n", 0x34000000 + (offset << 2), data);
+		verboselog( space.machine(), 9, "(GFO) %08X <- %08X\n", 0x34000000 + (offset << 2), data);
 	}
 	switch (offset)
 	{

@@ -218,7 +218,7 @@ void instruct_state::machine_reset()
 
 QUICKLOAD_LOAD( instruct )
 {
-	address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 	int quick_addr = 0x0100;
 	int exec_addr;
@@ -275,7 +275,7 @@ QUICKLOAD_LOAD( instruct )
 
 	for (i = quick_addr; i < quick_length; i++)
 	{
-		space->write_byte(i, quick_data[i]);
+		space.write_byte(i, quick_data[i]);
 	}
 
 	/* display a message about the loaded quickload */

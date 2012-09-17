@@ -72,8 +72,8 @@ static SCREEN_VBLANK( dec8 )
 	// rising edge
 	if (vblank_on)
 	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-		state->dec8_mxc06_karn_buffer_spriteram_w(*space, 0, 0);
+		address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+		state->dec8_mxc06_karn_buffer_spriteram_w(space, 0, 0);
 	}
 }
 
@@ -3527,7 +3527,7 @@ DRIVER_INIT_MEMBER(dec8_state,dec8)
 /* Ghostbusters, Darwin, Oscar use a "Deco 222" custom 6502 for sound. */
 DRIVER_INIT_MEMBER(dec8_state,deco222)
 {
-	address_space *space = machine().device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("audiocpu")->memory().space(AS_PROGRAM);
 	int A;
 	UINT8 *decrypt;
 	UINT8 *rom;
@@ -3536,7 +3536,7 @@ DRIVER_INIT_MEMBER(dec8_state,deco222)
 	rom = memregion("audiocpu")->base();
 	decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
 
-	space->set_decrypted_region(0x8000, 0xffff, decrypt);
+	space.set_decrypted_region(0x8000, 0xffff, decrypt);
 
 	for (A = 0x8000; A < 0x10000; A++)
 		decrypt[A - 0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x20) << 1) | ((rom[A] & 0x40) >> 1);

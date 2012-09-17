@@ -166,9 +166,9 @@ WRITE8_MEMBER( awacs_device::write )
     m_regs[offset] = data;
 }
 
-void awacs_device::set_dma_base(address_space *space, int offset0, int offset1)
+void awacs_device::set_dma_base(address_space &space, int offset0, int offset1)
 {
-    m_dma_space = space;
+    m_dma_space = &space;
     m_dma_offset_0 = offset0;
     m_dma_offset_1 = offset1;
 }

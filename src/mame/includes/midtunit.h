@@ -87,8 +87,8 @@ extern UINT8 midtunit_gfx_rom_large;
 
 
 
-void midtunit_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg);
-void midtunit_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg);
+void midtunit_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
+void midtunit_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
 
 
 

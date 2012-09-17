@@ -366,7 +366,7 @@ static void SetDefaultTask(running_machine &machine)
 // Return the value of a page register
 READ8_HANDLER( dgn_beta_page_r )
 {
-	dgn_beta_state *state = space->machine().driver_data<dgn_beta_state>();
+	dgn_beta_state *state = space.machine().driver_data<dgn_beta_state>();
 	return state->m_PageRegs[state->m_PIATaskReg][offset].value;
 }
 
@@ -376,16 +376,16 @@ READ8_HANDLER( dgn_beta_page_r )
 
 WRITE8_HANDLER( dgn_beta_page_w )
 {
-	dgn_beta_state *state = space->machine().driver_data<dgn_beta_state>();
+	dgn_beta_state *state = space.machine().driver_data<dgn_beta_state>();
 	state->m_PageRegs[state->m_PIATaskReg][offset].value=data;
 
 	LOG_PAGE_WRITE(("PageRegWrite : task=$%X  offset=$%X value=$%X\n",state->m_PIATaskReg,offset,data));
 
 	if (state->m_EnableMapRegs)
 	{
-		UpdateBanks(space->machine(), offset,offset);
+		UpdateBanks(space.machine(), offset,offset);
 		if (offset==15)
-			UpdateBanks(space->machine(), offset+1,offset+1);
+			UpdateBanks(space.machine(), offset+1,offset+1);
 	}
 }
 
@@ -399,87 +399,87 @@ static void dgn_beta_bank_memory(running_machine &machine, int offset, int data,
 
 static WRITE8_HANDLER( dgnbeta_ram_b0_w )
 {
-	dgn_beta_bank_memory(space->machine(),offset,data,0);
+	dgn_beta_bank_memory(space.machine(),offset,data,0);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_b1_w )
 {
-	dgn_beta_bank_memory(space->machine(),offset,data,1);
+	dgn_beta_bank_memory(space.machine(),offset,data,1);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_b2_w )
 {
-	dgn_beta_bank_memory(space->machine(),offset,data,2);
+	dgn_beta_bank_memory(space.machine(),offset,data,2);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_b3_w )
 {
-	dgn_beta_bank_memory(space->machine(),offset,data,3);
+	dgn_beta_bank_memory(space.machine(),offset,data,3);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_b4_w )
 {
-	dgn_beta_bank_memory(space->machine(),offset,data,4);
+	dgn_beta_bank_memory(space.machine(),offset,data,4);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_b5_w )
 {
-	dgn_beta_bank_memory(space->machine(),offset,data,5);
+	dgn_beta_bank_memory(space.machine(),offset,data,5);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_b6_w )
 {
-	dgn_beta_bank_memory(space->machine(),offset,data,6);
+	dgn_beta_bank_memory(space.machine(),offset,data,6);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_b7_w )
 {
-	dgn_beta_bank_memory(space->machine(),offset,data,7);
+	dgn_beta_bank_memory(space.machine(),offset,data,7);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_b8_w )
 {
-	dgn_beta_bank_memory(space->machine(),offset,data,8);
+	dgn_beta_bank_memory(space.machine(),offset,data,8);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_b9_w )
 {
-	dgn_beta_bank_memory(space->machine(),offset,data,9);
+	dgn_beta_bank_memory(space.machine(),offset,data,9);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_bA_w )
 {
-	dgn_beta_bank_memory(space->machine(),offset,data,10);
+	dgn_beta_bank_memory(space.machine(),offset,data,10);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_bB_w )
 {
-	dgn_beta_bank_memory(space->machine(),offset,data,11);
+	dgn_beta_bank_memory(space.machine(),offset,data,11);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_bC_w )
 {
-	dgn_beta_bank_memory(space->machine(),offset,data,12);
+	dgn_beta_bank_memory(space.machine(),offset,data,12);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_bD_w )
 {
-	dgn_beta_bank_memory(space->machine(),offset,data,13);
+	dgn_beta_bank_memory(space.machine(),offset,data,13);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_bE_w )
 {
-	dgn_beta_bank_memory(space->machine(),offset,data,14);
+	dgn_beta_bank_memory(space.machine(),offset,data,14);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_bF_w )
 {
-	dgn_beta_bank_memory(space->machine(),offset,data,15);
+	dgn_beta_bank_memory(space.machine(),offset,data,15);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_bG_w )
 {
-	dgn_beta_bank_memory(space->machine(),offset,data,16);
+	dgn_beta_bank_memory(space.machine(),offset,data,16);
 }
 
 /*
@@ -934,22 +934,22 @@ const wd17xx_interface dgnbeta_wd17xx_interface =
 READ8_HANDLER(dgnbeta_wd2797_r)
 {
 	int result = 0;
-	device_t *fdc = space->machine().device(FDC_TAG);
+	device_t *fdc = space.machine().device(FDC_TAG);
 
 	switch(offset & 0x03)
 	{
 		case 0:
-			result = wd17xx_status_r(fdc, *space, 0);
+			result = wd17xx_status_r(fdc, space, 0);
 			LOG_DISK(("Disk status=%2.2X\n",result));
 			break;
 		case 1:
-			result = wd17xx_track_r(fdc, *space, 0);
+			result = wd17xx_track_r(fdc, space, 0);
 			break;
 		case 2:
-			result = wd17xx_sector_r(fdc, *space, 0);
+			result = wd17xx_sector_r(fdc, space, 0);
 			break;
 		case 3:
-			result = wd17xx_data_r(fdc, *space, 0);
+			result = wd17xx_data_r(fdc, space, 0);
 			break;
 		default:
 			break;
@@ -960,8 +960,8 @@ READ8_HANDLER(dgnbeta_wd2797_r)
 
 WRITE8_HANDLER(dgnbeta_wd2797_w)
 {
-	dgn_beta_state *state = space->machine().driver_data<dgn_beta_state>();
-	device_t *fdc = space->machine().device(FDC_TAG);
+	dgn_beta_state *state = space.machine().driver_data<dgn_beta_state>();
+	device_t *fdc = space.machine().device(FDC_TAG);
 
     state->m_wd2797_written=1;
 
@@ -972,16 +972,16 @@ WRITE8_HANDLER(dgnbeta_wd2797_w)
 			/* But only for Type 3/4 commands */
 			if(data & 0x80)
 				wd17xx_set_side(fdc,(data & 0x02) ? 1 : 0);
-			wd17xx_command_w(fdc, *space, 0, data);
+			wd17xx_command_w(fdc, space, 0, data);
 			break;
 		case 1:
-			wd17xx_track_w(fdc, *space, 0, data);
+			wd17xx_track_w(fdc, space, 0, data);
 			break;
 		case 2:
-			wd17xx_sector_w(fdc, *space, 0, data);
+			wd17xx_sector_w(fdc, space, 0, data);
 			break;
 		case 3:
-			wd17xx_data_w(fdc, *space, 0, data);
+			wd17xx_data_w(fdc, space, 0, data);
 			break;
 	};
 }

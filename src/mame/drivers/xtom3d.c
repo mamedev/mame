@@ -664,7 +664,7 @@ void xtom3d_state::machine_start()
 
 	kbdc8042_init(machine(), &at8042);
 	pc_vga_init(machine(), vga_setting, NULL);
-	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
+	pc_vga_io_init(machine(), *machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, *machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
 void xtom3d_state::machine_reset()

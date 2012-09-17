@@ -57,9 +57,9 @@ WRITE8_MEMBER(pastelg_state::pastelg_clut_w)
 
 
 ******************************************************************************/
-int pastelg_blitter_src_addr_r(address_space *space)
+int pastelg_blitter_src_addr_r(address_space &space)
 {
-	pastelg_state *state = space->machine().driver_data<pastelg_state>();
+	pastelg_state *state = space.machine().driver_data<pastelg_state>();
 	return state->m_blitter_src_addr;
 }
 
@@ -111,7 +111,7 @@ WRITE8_MEMBER(pastelg_state::pastelg_romsel_w)
 	int gfxlen = memregion("gfx1")->bytes();
 	m_gfxrom = ((data & 0xc0) >> 6);
 	m_palbank = ((data & 0x10) >> 4);
-	nb1413m3_sndrombank1_w(&space, 0, data);
+	nb1413m3_sndrombank1_w(space, 0, data);
 
 	if ((m_gfxrom << 16) > (gfxlen - 1))
 	{

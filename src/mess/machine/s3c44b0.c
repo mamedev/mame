@@ -2001,10 +2001,10 @@ SCREEN_UPDATE_RGB32( s3c44b0 )
 DEVICE_START( s3c44b0 )
 {
 	running_machine &machine = device->machine();
-	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM);
+	address_space &space = *machine.device( "maincpu")->memory().space( AS_PROGRAM);
 	s3c44b0_t *s3c44b0 = get_token( device);
 	s3c44b0->iface = (const s3c44b0_interface *)device->static_config();
-	s3c44b0->space = space;
+	s3c44b0->space = &space;
 	s3c44b0->cpu = downcast<cpu_device *>(device->machine().device( "maincpu"));
 	for (int i = 0; i < 6; i++) s3c44b0->pwm.timer[i] = machine.scheduler().timer_alloc(FUNC(s3c44b0_pwm_timer_exp), (void*)device);
 	for (int i = 0; i < 2; i++) s3c44b0->uart[i].timer = machine.scheduler().timer_alloc(FUNC(s3c44b0_uart_timer_exp), (void*)device);
@@ -2016,23 +2016,23 @@ DEVICE_START( s3c44b0 )
 	s3c44b0->adc.timer = machine.scheduler().timer_alloc(FUNC(s3c44b0_adc_timer_exp), (void*)device);
 	s3c44b0->iic.timer = machine.scheduler().timer_alloc(FUNC(s3c44b0_iic_timer_exp), (void*)device);
 	s3c44b0->iis.timer = machine.scheduler().timer_alloc(FUNC(s3c44b0_iis_timer_exp), (void*)device);
-	space->install_legacy_readwrite_handler( *device, 0x01c00000, 0x01c0000b, 0, 0, FUNC(s3c44b0_cpuwrap_r), FUNC(s3c44b0_cpuwrap_w));
-	space->install_legacy_readwrite_handler( *device, 0x01d00000, 0x01d0002b, 0, 0, FUNC(s3c44b0_uart_0_r), FUNC(s3c44b0_uart_0_w));
-	space->install_legacy_readwrite_handler( *device, 0x01d04000, 0x01d0402b, 0, 0, FUNC(s3c44b0_uart_1_r), FUNC(s3c44b0_uart_1_w));
-	space->install_legacy_readwrite_handler( *device, 0x01d14000, 0x01d14013, 0, 0, FUNC(s3c44b0_sio_r), FUNC(s3c44b0_sio_w));
-	space->install_legacy_readwrite_handler( *device, 0x01d18000, 0x01d18013, 0, 0, FUNC(s3c44b0_iis_r), FUNC(s3c44b0_iis_w));
-	space->install_legacy_readwrite_handler( *device, 0x01d20000, 0x01d20057, 0, 0, FUNC(s3c44b0_gpio_r), FUNC(s3c44b0_gpio_w));
-	space->install_legacy_readwrite_handler( *device, 0x01d30000, 0x01d3000b, 0, 0, FUNC(s3c44b0_wdt_r), FUNC(s3c44b0_wdt_w));
-	space->install_legacy_readwrite_handler( *device, 0x01d40000, 0x01d4000b, 0, 0, FUNC(s3c44b0_adc_r), FUNC(s3c44b0_adc_w));
-	space->install_legacy_readwrite_handler( *device, 0x01d50000, 0x01d5004f, 0, 0, FUNC(s3c44b0_pwm_r), FUNC(s3c44b0_pwm_w));
-	space->install_legacy_readwrite_handler( *device, 0x01d60000, 0x01d6000f, 0, 0, FUNC(s3c44b0_iic_r), FUNC(s3c44b0_iic_w));
-	space->install_legacy_readwrite_handler( *device, 0x01d80000, 0x01d8000f, 0, 0, FUNC(s3c44b0_clkpow_r), FUNC(s3c44b0_clkpow_w));
-	space->install_legacy_readwrite_handler( *device, 0x01e00000, 0x01e0003f, 0, 0, FUNC(s3c44b0_irq_r), FUNC(s3c44b0_irq_w));
-	space->install_legacy_readwrite_handler( *device, 0x01e80000, 0x01e8001b, 0, 0, FUNC(s3c44b0_zdma_0_r), FUNC(s3c44b0_zdma_0_w));
-	space->install_legacy_readwrite_handler( *device, 0x01e80020, 0x01e8003b, 0, 0, FUNC(s3c44b0_zdma_1_r), FUNC(s3c44b0_zdma_1_w));
-	space->install_legacy_readwrite_handler( *device, 0x01f00000, 0x01f00047, 0, 0, FUNC(s3c44b0_lcd_r), FUNC(s3c44b0_lcd_w));
-	space->install_legacy_readwrite_handler( *device, 0x01f80000, 0x01f8001b, 0, 0, FUNC(s3c44b0_bdma_0_r), FUNC(s3c44b0_bdma_0_w));
-	space->install_legacy_readwrite_handler( *device, 0x01f80020, 0x01f8003b, 0, 0, FUNC(s3c44b0_bdma_1_r), FUNC(s3c44b0_bdma_1_w));
+	space.install_legacy_readwrite_handler( *device, 0x01c00000, 0x01c0000b, 0, 0, FUNC(s3c44b0_cpuwrap_r), FUNC(s3c44b0_cpuwrap_w));
+	space.install_legacy_readwrite_handler( *device, 0x01d00000, 0x01d0002b, 0, 0, FUNC(s3c44b0_uart_0_r), FUNC(s3c44b0_uart_0_w));
+	space.install_legacy_readwrite_handler( *device, 0x01d04000, 0x01d0402b, 0, 0, FUNC(s3c44b0_uart_1_r), FUNC(s3c44b0_uart_1_w));
+	space.install_legacy_readwrite_handler( *device, 0x01d14000, 0x01d14013, 0, 0, FUNC(s3c44b0_sio_r), FUNC(s3c44b0_sio_w));
+	space.install_legacy_readwrite_handler( *device, 0x01d18000, 0x01d18013, 0, 0, FUNC(s3c44b0_iis_r), FUNC(s3c44b0_iis_w));
+	space.install_legacy_readwrite_handler( *device, 0x01d20000, 0x01d20057, 0, 0, FUNC(s3c44b0_gpio_r), FUNC(s3c44b0_gpio_w));
+	space.install_legacy_readwrite_handler( *device, 0x01d30000, 0x01d3000b, 0, 0, FUNC(s3c44b0_wdt_r), FUNC(s3c44b0_wdt_w));
+	space.install_legacy_readwrite_handler( *device, 0x01d40000, 0x01d4000b, 0, 0, FUNC(s3c44b0_adc_r), FUNC(s3c44b0_adc_w));
+	space.install_legacy_readwrite_handler( *device, 0x01d50000, 0x01d5004f, 0, 0, FUNC(s3c44b0_pwm_r), FUNC(s3c44b0_pwm_w));
+	space.install_legacy_readwrite_handler( *device, 0x01d60000, 0x01d6000f, 0, 0, FUNC(s3c44b0_iic_r), FUNC(s3c44b0_iic_w));
+	space.install_legacy_readwrite_handler( *device, 0x01d80000, 0x01d8000f, 0, 0, FUNC(s3c44b0_clkpow_r), FUNC(s3c44b0_clkpow_w));
+	space.install_legacy_readwrite_handler( *device, 0x01e00000, 0x01e0003f, 0, 0, FUNC(s3c44b0_irq_r), FUNC(s3c44b0_irq_w));
+	space.install_legacy_readwrite_handler( *device, 0x01e80000, 0x01e8001b, 0, 0, FUNC(s3c44b0_zdma_0_r), FUNC(s3c44b0_zdma_0_w));
+	space.install_legacy_readwrite_handler( *device, 0x01e80020, 0x01e8003b, 0, 0, FUNC(s3c44b0_zdma_1_r), FUNC(s3c44b0_zdma_1_w));
+	space.install_legacy_readwrite_handler( *device, 0x01f00000, 0x01f00047, 0, 0, FUNC(s3c44b0_lcd_r), FUNC(s3c44b0_lcd_w));
+	space.install_legacy_readwrite_handler( *device, 0x01f80000, 0x01f8001b, 0, 0, FUNC(s3c44b0_bdma_0_r), FUNC(s3c44b0_bdma_0_w));
+	space.install_legacy_readwrite_handler( *device, 0x01f80020, 0x01f8003b, 0, 0, FUNC(s3c44b0_bdma_1_r), FUNC(s3c44b0_bdma_1_w));
 }
 
 const device_type S3C44B0 = &device_creator<s3c44b0_device>;

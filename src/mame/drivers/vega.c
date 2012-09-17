@@ -297,7 +297,7 @@ READ8_MEMBER(vega_state::extern_r)
 		{
 			/* AY 3-8910 */
 			ay8910_data_w(m_ay8910, space, 0, offset);
-			return 0xff;//mame_rand(space->machine);
+			return 0xff;//mame_rand(space.machine);
 
 		}
 		break;

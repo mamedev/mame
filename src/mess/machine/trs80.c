@@ -892,9 +892,9 @@ MACHINE_RESET_MEMBER(trs80_state,trs80m4)
 
 MACHINE_RESET_MEMBER(trs80_state,lnw80)
 {
-	address_space *space = m_maincpu->space(AS_PROGRAM);
+	address_space &space = *m_maincpu->space(AS_PROGRAM);
 	m_cassette_data = 0;
 	m_reg_load = 1;
-	lnw80_fe_w(*space, 0, 0);
+	lnw80_fe_w(space, 0, 0);
 }
 

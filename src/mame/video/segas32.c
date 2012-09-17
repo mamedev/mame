@@ -370,9 +370,9 @@ INLINE void update_color(running_machine &machine, int offset, UINT16 data)
 }
 
 
-INLINE UINT16 common_paletteram_r(address_space *space, int which, offs_t offset)
+INLINE UINT16 common_paletteram_r(address_space &space, int which, offs_t offset)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
+	segas32_state *state = space.machine().driver_data<segas32_state>();
 	int convert;
 
 	/* the lower half of palette RAM is formatted xBBBBBGGGGGRRRRR */
@@ -389,9 +389,9 @@ INLINE UINT16 common_paletteram_r(address_space *space, int which, offs_t offset
 }
 
 
-static void common_paletteram_w(address_space *space, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
+static void common_paletteram_w(address_space &space, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
+	segas32_state *state = space.machine().driver_data<segas32_state>();
 	UINT16 value;
 	int convert;
 
@@ -408,7 +408,7 @@ static void common_paletteram_w(address_space *space, int which, offs_t offset, 
 	COMBINE_DATA(&value);
 	if (convert) value = xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(value);
 	state->m_system32_paletteram[which][offset] = value;
-	update_color(space->machine(), 0x4000*which + offset, value);
+	update_color(space.machine(), 0x4000*which + offset, value);
 
 	/* if blending is enabled, writes go to both halves of palette RAM */
 	if (state->m_mixer_control[which][0x4e/2] & 0x0880)
@@ -421,7 +421,7 @@ static void common_paletteram_w(address_space *space, int which, offs_t offset, 
 		COMBINE_DATA(&value);
 		if (convert) value = xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(value);
 		state->m_system32_paletteram[which][offset] = value;
-		update_color(space->machine(), 0x4000*which + offset, value);
+		update_color(space.machine(), 0x4000*which + offset, value);
 	}
 }
 
@@ -435,45 +435,45 @@ static void common_paletteram_w(address_space *space, int which, offs_t offset, 
 
 READ16_MEMBER(segas32_state::system32_paletteram_r)
 {
-	return common_paletteram_r(&space, 0, offset);
+	return common_paletteram_r(space, 0, offset);
 }
 
 
 WRITE16_MEMBER(segas32_state::system32_paletteram_w)
 {
-	common_paletteram_w(&space, 0, offset, data, mem_mask);
+	common_paletteram_w(space, 0, offset, data, mem_mask);
 }
 
 
 READ32_MEMBER(segas32_state::multi32_paletteram_0_r)
 {
-	return common_paletteram_r(&space, 0, offset*2+0) |
-	      (common_paletteram_r(&space, 0, offset*2+1) << 16);
+	return common_paletteram_r(space, 0, offset*2+0) |
+	      (common_paletteram_r(space, 0, offset*2+1) << 16);
 }
 
 
 WRITE32_MEMBER(segas32_state::multi32_paletteram_0_w)
 {
 	if (ACCESSING_BITS_0_15)
-		common_paletteram_w(&space, 0, offset*2+0, data, mem_mask);
+		common_paletteram_w(space, 0, offset*2+0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		common_paletteram_w(&space, 0, offset*2+1, data >> 16, mem_mask >> 16);
+		common_paletteram_w(space, 0, offset*2+1, data >> 16, mem_mask >> 16);
 }
 
 
 READ32_MEMBER(segas32_state::multi32_paletteram_1_r)
 {
-	return common_paletteram_r(&space, 1, offset*2+0) |
-	      (common_paletteram_r(&space, 1, offset*2+1) << 16);
+	return common_paletteram_r(space, 1, offset*2+0) |
+	      (common_paletteram_r(space, 1, offset*2+1) << 16);
 }
 
 
 WRITE32_MEMBER(segas32_state::multi32_paletteram_1_w)
 {
 	if (ACCESSING_BITS_0_15)
-		common_paletteram_w(&space, 1, offset*2+0, data, mem_mask);
+		common_paletteram_w(space, 1, offset*2+0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		common_paletteram_w(&space, 1, offset*2+1, data >> 16, mem_mask >> 16);
+		common_paletteram_w(space, 1, offset*2+1, data >> 16, mem_mask >> 16);
 }
 
 

@@ -114,15 +114,15 @@ static UINT8 char_offset; //helper to jump the decoding of the NULL chars.
 
 static READ32_HANDLER( twcup98_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)space->machine().root_device().memregion("abus")->base();
+	UINT32 *ROM = (UINT32 *)space.machine().root_device().memregion("abus")->base();
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
 		if(offset == 3)
 		{
-			logerror("A-Bus control protection read at %06x with data = %08x\n",space->device().safe_pc(),a_bus[3]);
+			logerror("A-Bus control protection read at %06x with data = %08x\n",space.device().safe_pc(),a_bus[3]);
 			#ifdef MAME_DEBUG
-			popmessage("Prot read at %06x with data = %08x",space->device().safe_pc(),a_bus[3]);
+			popmessage("Prot read at %06x with data = %08x",space.device().safe_pc(),a_bus[3]);
 			#endif
 			switch(a_bus[3])
 			{
@@ -141,7 +141,7 @@ static READ32_HANDLER( twcup98_prot_r )
 static WRITE32_HANDLER ( twcup98_prot_w )
 {
 	COMBINE_DATA(&a_bus[offset]);
-	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space->device().safe_pc(),offset,data);
+	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space.device().safe_pc(),offset,data);
 	if(offset == 3)
 	{
 		logerror("MAIN : %08x  DATA : %08x\n",a_bus[3],a_bus[2]);
@@ -173,15 +173,15 @@ void install_twcup98_protection(running_machine &machine)
 
 static READ32_HANDLER( sss_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)space->machine().root_device().memregion("abus")->base();
+	UINT32 *ROM = (UINT32 *)space.machine().root_device().memregion("abus")->base();
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
 		if(offset == 3)
 		{
-			logerror("A-Bus control protection read at %06x with data = %08x\n",space->device().safe_pc(),a_bus[3]);
+			logerror("A-Bus control protection read at %06x with data = %08x\n",space.device().safe_pc(),a_bus[3]);
 			#ifdef MAME_DEBUG
-			popmessage("Prot read at %06x with data = %08x",space->device().safe_pc(),a_bus[3]);
+			popmessage("Prot read at %06x with data = %08x",space.device().safe_pc(),a_bus[3]);
 			#endif
 			switch(a_bus[3])
 			{
@@ -208,7 +208,7 @@ static READ32_HANDLER( sss_prot_r )
 static WRITE32_HANDLER ( sss_prot_w )
 {
 	COMBINE_DATA(&a_bus[offset]);
-	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space->device().safe_pc(),offset,data);
+	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space.device().safe_pc(),offset,data);
 	if(offset == 3)
 	{
 		//logerror("MAIN : %08x  DATA : %08x\n",a_bus[3],a_bus[2]);
@@ -238,15 +238,15 @@ void install_sss_protection(running_machine &machine)
 
 static READ32_HANDLER( rsgun_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)space->machine().root_device().memregion("abus")->base();
+	UINT32 *ROM = (UINT32 *)space.machine().root_device().memregion("abus")->base();
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
 		if(offset == 3)
 		{
-			logerror("A-Bus control protection read at %06x with data = %08x\n",space->device().safe_pc(),a_bus[3]);
+			logerror("A-Bus control protection read at %06x with data = %08x\n",space.device().safe_pc(),a_bus[3]);
 			#ifdef MAME_DEBUG
-			popmessage("Prot read at %06x with data = %08x",space->device().safe_pc(),a_bus[3]);
+			popmessage("Prot read at %06x with data = %08x",space.device().safe_pc(),a_bus[3]);
 			#endif
 			switch(a_bus[3])
 			{
@@ -278,7 +278,7 @@ static READ32_HANDLER( rsgun_prot_r )
 static WRITE32_HANDLER ( rsgun_prot_w )
 {
 	COMBINE_DATA(&a_bus[offset]);
-	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space->device().safe_pc(),offset,data);
+	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space.device().safe_pc(),offset,data);
 	if(offset == 3)
 	{
 		//logerror("MAIN : %08x  DATA : %08x\n",a_bus[3],a_bus[2]);
@@ -313,15 +313,15 @@ void install_rsgun_protection(running_machine &machine)
 
 static READ32_HANDLER( elandore_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)space->machine().root_device().memregion("abus")->base();
+	UINT32 *ROM = (UINT32 *)space.machine().root_device().memregion("abus")->base();
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
 		if(offset == 3)
 		{
-			logerror("A-Bus control protection read at %06x with data = %08x\n",space->device().safe_pc(),a_bus[3]);
+			logerror("A-Bus control protection read at %06x with data = %08x\n",space.device().safe_pc(),a_bus[3]);
 			#ifdef MAME_DEBUG
-			popmessage("Prot read at %06x with data = %08x",space->device().safe_pc(),a_bus[3]);
+			popmessage("Prot read at %06x with data = %08x",space.device().safe_pc(),a_bus[3]);
 			#endif
 			switch(a_bus[3])
 			{
@@ -349,7 +349,7 @@ static READ32_HANDLER( elandore_prot_r )
 static WRITE32_HANDLER ( elandore_prot_w )
 {
 	COMBINE_DATA(&a_bus[offset]);
-	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space->device().safe_pc(),offset,data);
+	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space.device().safe_pc(),offset,data);
 	if(offset == 3)
 	{
 		/* a bus value 2 seed is used too here. */
@@ -420,15 +420,15 @@ static const UINT32 vector_prot[] = { 0x0603B1B2,0x234 };
 
 static READ32_HANDLER( ffreveng_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)space->machine().root_device().memregion("abus")->base();
+	UINT32 *ROM = (UINT32 *)space.machine().root_device().memregion("abus")->base();
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
 		if(offset == 3)
 		{
-			logerror("A-Bus control protection read at %06x with data = %08x\n",space->device().safe_pc(),a_bus[3]);
+			logerror("A-Bus control protection read at %06x with data = %08x\n",space.device().safe_pc(),a_bus[3]);
 			#ifdef MAME_DEBUG
-			popmessage("Prot read at %06x with data = %08x",space->device().safe_pc(),a_bus[3]);
+			popmessage("Prot read at %06x with data = %08x",space.device().safe_pc(),a_bus[3]);
 			#endif
 			switch(a_bus[3])
 			{
@@ -455,7 +455,7 @@ static READ32_HANDLER( ffreveng_prot_r )
 static WRITE32_HANDLER ( ffreveng_prot_w )
 {
 	COMBINE_DATA(&a_bus[offset]);
-	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space->device().safe_pc(),offset,data);
+	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space.device().safe_pc(),offset,data);
 	if(offset == 3)
 	{
 		//logerror("MAIN : %08x  DATA : %08x\n",a_bus[3],a_bus[2]);
@@ -485,11 +485,11 @@ static READ32_HANDLER(astrass_prot_r)
 	if ( offset == 3 && ctrl_index != -1 )
 	{
 		UINT32 data = 0;
-		UINT32 *prot_data = (UINT32 *)space->machine().root_device().memregion("user2")->base();
+		UINT32 *prot_data = (UINT32 *)space.machine().root_device().memregion("user2")->base();
 
 		data = prot_data[ctrl_index++];
 
-		if ( ctrl_index >= space->machine().root_device().memregion("user2")->bytes()/4 )
+		if ( ctrl_index >= space.machine().root_device().memregion("user2")->bytes()/4 )
 		{
 			ctrl_index = -1;
 		}
@@ -533,7 +533,7 @@ static READ32_HANDLER( decathlt_prot_r )
 {
 	// the offsets written to the protection device definitely only refer to 2 of the roms
 	//  it's a fair assumption to say that only those 2 are connected to the protection device
-	UINT8 *ROM = (UINT8 *)space->machine().root_device().memregion("abus")->base()+0x1000000;
+	UINT8 *ROM = (UINT8 *)space.machine().root_device().memregion("abus")->base()+0x1000000;
 
 	if (offset==2)
 	{
@@ -554,7 +554,7 @@ static READ32_HANDLER( decathlt_prot_r )
 	}
 	else
 	{
-		logerror("%06x Decathlete prot R offset %04x mask %08x regs %08x, %08x, %08x, %08x\n",space->device().safe_pc(), offset, mem_mask, decathlt_protregs[0], decathlt_protregs[1], decathlt_protregs[2], decathlt_protregs[3]);
+		logerror("%06x Decathlete prot R offset %04x mask %08x regs %08x, %08x, %08x, %08x\n",space.device().safe_pc(), offset, mem_mask, decathlt_protregs[0], decathlt_protregs[1], decathlt_protregs[2], decathlt_protregs[3]);
 	}
 
 	return decathlt_protregs[offset];

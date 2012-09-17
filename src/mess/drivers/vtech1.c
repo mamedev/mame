@@ -209,7 +209,7 @@ public:
 static SNAPSHOT_LOAD( vtech1 )
 {
 	vtech1_state *vtech1 = image.device().machine().driver_data<vtech1_state>();
-	address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 i, header[24];
 	UINT16 start, end, size;
 	char pgmname[18];
@@ -241,20 +241,20 @@ static SNAPSHOT_LOAD( vtech1 )
 	switch (header[21])
 	{
 	case VZ_BASIC:		/* 0xF0 */
-		space->write_byte(0x78a4, start % 256); /* start of basic program */
-		space->write_byte(0x78a5, start / 256);
-		space->write_byte(0x78f9, end % 256); /* end of basic program */
-		space->write_byte(0x78fa, end / 256);
-		space->write_byte(0x78fb, end % 256); /* start variable table */
-		space->write_byte(0x78fc, end / 256);
-		space->write_byte(0x78fd, end % 256); /* start free mem, end variable table */
-		space->write_byte(0x78fe, end / 256);
+		space.write_byte(0x78a4, start % 256); /* start of basic program */
+		space.write_byte(0x78a5, start / 256);
+		space.write_byte(0x78f9, end % 256); /* end of basic program */
+		space.write_byte(0x78fa, end / 256);
+		space.write_byte(0x78fb, end % 256); /* start variable table */
+		space.write_byte(0x78fc, end / 256);
+		space.write_byte(0x78fd, end % 256); /* start free mem, end variable table */
+		space.write_byte(0x78fe, end / 256);
 		image.message(" %s (B)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
 		break;
 
 	case VZ_MCODE:		/* 0xF1 */
-		space->write_byte(0x788e, start % 256); /* usr subroutine address */
-		space->write_byte(0x788f, start / 256);
+		space.write_byte(0x788e, start % 256); /* usr subroutine address */
+		space.write_byte(0x788f, start / 256);
 		image.message(" %s (M)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
 		image.device().machine().device("maincpu")->state().set_pc(start);				/* start program */
 		break;

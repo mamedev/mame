@@ -1386,10 +1386,10 @@ READ32_MEMBER(namcos12_state::tektagt_protection_3_r)
 
 MACHINE_RESET_MEMBER(namcos12_state,namcos12)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	bankoffset_w(*space,0,0,0xffffffff);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	bankoffset_w(space,0,0,0xffffffff);
 
-	space->install_write_handler(0x1f801000, 0x1f801003, write32_delegate(FUNC(namcos12_state::s12_dma_bias_w),this));
+	space.install_write_handler(0x1f801000, 0x1f801003, write32_delegate(FUNC(namcos12_state::s12_dma_bias_w),this));
 
 	m_has_tektagt_dma = 0;
 
@@ -1402,9 +1402,9 @@ MACHINE_RESET_MEMBER(namcos12_state,namcos12)
 		strcmp( machine().system().name, "tektagtja" ) == 0 )
 	{
 		m_has_tektagt_dma = 1;
-		space->install_readwrite_handler(0x1fb00000, 0x1fb00003, read32_delegate(FUNC(namcos12_state::tektagt_protection_1_r),this), write32_delegate(FUNC(namcos12_state::tektagt_protection_1_w),this));
-		space->install_readwrite_handler(0x1fb80000, 0x1fb80003, read32_delegate(FUNC(namcos12_state::tektagt_protection_2_r),this), write32_delegate(FUNC(namcos12_state::tektagt_protection_2_w),this));
-		space->install_read_handler(0x1f700000, 0x1f700003, read32_delegate(FUNC(namcos12_state::tektagt_protection_3_r),this));
+		space.install_readwrite_handler(0x1fb00000, 0x1fb00003, read32_delegate(FUNC(namcos12_state::tektagt_protection_1_r),this), write32_delegate(FUNC(namcos12_state::tektagt_protection_1_w),this));
+		space.install_readwrite_handler(0x1fb80000, 0x1fb80003, read32_delegate(FUNC(namcos12_state::tektagt_protection_2_r),this), write32_delegate(FUNC(namcos12_state::tektagt_protection_2_w),this));
+		space.install_read_handler(0x1f700000, 0x1f700003, read32_delegate(FUNC(namcos12_state::tektagt_protection_3_r),this));
 	}
 
 	if( strcmp( machine().system().name, "tektagt" ) == 0 ||
@@ -1430,9 +1430,9 @@ MACHINE_RESET_MEMBER(namcos12_state,namcos12)
 		strcmp( machine().system().name, "ghlpanic" ) == 0 )
 	{
 		/* this is based on guesswork, it might not even be keycus. */
-		space->install_read_bank (0x1fc20280, 0x1fc2028b, "bank2" );
-		space->install_write_handler(0x1f008000, 0x1f008003, write32_delegate(FUNC(namcos12_state::kcon_w),this));
-		space->install_write_handler(0x1f018000, 0x1f018003, write32_delegate(FUNC(namcos12_state::kcoff_w),this));
+		space.install_read_bank (0x1fc20280, 0x1fc2028b, "bank2" );
+		space.install_write_handler(0x1f008000, 0x1f008003, write32_delegate(FUNC(namcos12_state::kcon_w),this));
+		space.install_write_handler(0x1f018000, 0x1f018003, write32_delegate(FUNC(namcos12_state::kcoff_w),this));
 
 		memset( m_kcram, 0, sizeof( m_kcram ) );
 		membank( "bank2" )->set_base( m_kcram );

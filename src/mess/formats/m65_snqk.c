@@ -219,7 +219,7 @@ static void microtan_snapshot_copy(running_machine &machine, UINT8 *snapshot_buf
 {
 	microtan_state *state = machine.driver_data<microtan_state>();
     UINT8 *RAM = state->memregion("maincpu")->base();
-    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
     via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
     via6522_device *via_1 = machine.device<via6522_device>("via6522_1");
     device_t *ay8910 = machine.device("ay8910.1");
@@ -278,21 +278,21 @@ static void microtan_snapshot_copy(running_machine &machine, UINT8 *snapshot_buf
 
         /* first set of VIA6522 registers */
         for (i = 0; i < 16; i++ )
-            via_0->write(*space, i, snapshot_buff[base++]);
+            via_0->write(space, i, snapshot_buff[base++]);
 
         /* second set of VIA6522 registers */
         for (i = 0; i < 16; i++ )
-            via_1->write(*space, i, snapshot_buff[base++]);
+            via_1->write(space, i, snapshot_buff[base++]);
 
         /* microtan IO bff0-bfff */
         for (i = 0; i < 16; i++ )
         {
             RAM[0xbff0+i] = snapshot_buff[base++];
             if (i < 4)
-                state->microtan_bffx_w(*space, i, RAM[0xbff0+i]);
+                state->microtan_bffx_w(space, i, RAM[0xbff0+i]);
         }
 
-        state->microtan_sound_w(*space, 0, snapshot_buff[base++]);
+        state->microtan_sound_w(space, 0, snapshot_buff[base++]);
         state->m_chunky_graphics = snapshot_buff[base++];
 
         /* first set of AY8910 registers */

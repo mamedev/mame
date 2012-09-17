@@ -129,8 +129,8 @@ public:
 
 
 
-void midyunit_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg);
-void midyunit_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg);
+void midyunit_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
+void midyunit_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
 
 
 

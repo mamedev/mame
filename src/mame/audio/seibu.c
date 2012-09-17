@@ -104,12 +104,12 @@ static UINT8 decrypt_opcode(int a,int src)
 
 void seibu_sound_decrypt(running_machine &machine,const char *cpu,int length)
 {
-	address_space *space = machine.device(cpu)->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device(cpu)->memory().space(AS_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length);
 	UINT8 *rom = machine.root_device().memregion(cpu)->base();
 	int i;
 
-	space->set_decrypted_region(0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
+	space.set_decrypted_region(0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
 
 	for (i = 0;i < length;i++)
 	{
@@ -296,7 +296,7 @@ static void update_irq_lines(running_machine &machine, int param)
 WRITE8_HANDLER( seibu_irq_clear_w )
 {
 	/* Denjin Makai and SD Gundam doesn't like this, it's tied to the rst18 ack ONLY so it could be related to it. */
-	//update_irq_lines(space->machine(), VECTOR_INIT);
+	//update_irq_lines(space.machine(), VECTOR_INIT);
 }
 
 WRITE8_HANDLER( seibu_rst10_ack_w )
@@ -306,7 +306,7 @@ WRITE8_HANDLER( seibu_rst10_ack_w )
 
 WRITE8_HANDLER( seibu_rst18_ack_w )
 {
-	update_irq_lines(space->machine(), RST18_CLEAR);
+	update_irq_lines(space.machine(), RST18_CLEAR);
 }
 
 void seibu_ym3812_irqhandler(device_t *device, int linestate)
@@ -349,13 +349,13 @@ static int main2sub_pending,sub2main_pending;
 
 WRITE8_HANDLER( seibu_bank_w )
 {
-	space->machine().root_device().membank("bank1")->set_entry(data & 1);
+	space.machine().root_device().membank("bank1")->set_entry(data & 1);
 }
 
 WRITE8_HANDLER( seibu_coin_w )
 {
-	coin_counter_w(space->machine(), 0,data & 1);
-	coin_counter_w(space->machine(), 1,data & 2);
+	coin_counter_w(space.machine(), 0,data & 1);
+	coin_counter_w(space.machine(), 1,data & 2);
 }
 
 READ8_HANDLER( seibu_soundlatch_r )
@@ -382,7 +382,7 @@ static WRITE8_HANDLER( seibu_pending_w )
 
 READ16_HANDLER( seibu_main_word_r )
 {
-	//logerror("%06x: seibu_main_word_r(%x)\n",space->device().safe_pc(),offset);
+	//logerror("%06x: seibu_main_word_r(%x)\n",space.device().safe_pc(),offset);
 	switch (offset)
 	{
 		case 2:
@@ -391,14 +391,14 @@ READ16_HANDLER( seibu_main_word_r )
 		case 5:
 			return main2sub_pending ? 1 : 0;
 		default:
-			//logerror("%06x: seibu_main_word_r(%x)\n",space->device().safe_pc(),offset);
+			//logerror("%06x: seibu_main_word_r(%x)\n",space.device().safe_pc(),offset);
 			return 0xffff;
 	}
 }
 
 WRITE16_HANDLER( seibu_main_word_w )
 {
-	//printf("%06x: seibu_main_word_w(%x,%02x)\n",space->device().safe_pc(),offset,data);
+	//printf("%06x: seibu_main_word_w(%x,%02x)\n",space.device().safe_pc(),offset,data);
 	if (ACCESSING_BITS_0_7)
 	{
 		switch (offset)
@@ -408,7 +408,7 @@ WRITE16_HANDLER( seibu_main_word_w )
 				main2sub[offset] = data;
 				break;
 			case 4:
-				update_irq_lines(space->machine(), RST18_ASSERT);
+				update_irq_lines(space.machine(), RST18_ASSERT);
 				break;
 			case 2: //Sengoku Mahjong writes here
 			case 6:
@@ -417,7 +417,7 @@ WRITE16_HANDLER( seibu_main_word_w )
 				main2sub_pending = 1;
 				break;
 			default:
-				//logerror("%06x: seibu_main_word_w(%x,%02x)\n",space->device().safe_pc(),offset,data);
+				//logerror("%06x: seibu_main_word_w(%x,%02x)\n",space.device().safe_pc(),offset,data);
 				break;
 		}
 	}
@@ -440,7 +440,7 @@ WRITE16_HANDLER( seibu_main_mustb_w )
 
 //  logerror("seibu_main_mustb_w: %x -> %x %x\n", data, main2sub[0], main2sub[1]);
 
-	update_irq_lines(space->machine(), RST18_ASSERT);
+	update_irq_lines(space.machine(), RST18_ASSERT);
 }
 
 /***************************************************************************/

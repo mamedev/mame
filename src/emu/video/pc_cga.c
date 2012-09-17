@@ -329,10 +329,10 @@ static int internal_pc_cga_video_start(running_machine &machine)
 static VIDEO_START( pc_cga )
 {
 	int buswidth;
-	address_space *space = machine.firstcpu->space(AS_PROGRAM);
+	address_space &space = *machine.firstcpu->space(AS_PROGRAM);
 	address_space *spaceio = machine.firstcpu->space(AS_IO);
 
-	space->install_readwrite_bank(0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
+	space.install_readwrite_bank(0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
 	buswidth = machine.firstcpu->space_config(AS_PROGRAM)->m_databus_width;
 	UINT64 mask = 0;
 	switch(buswidth)
@@ -370,11 +370,11 @@ static VIDEO_START( pc_cga )
 static VIDEO_START( pc_cga32k )
 {
 	int buswidth;
-	address_space *space = machine.firstcpu->space(AS_PROGRAM);
+	address_space &space = *machine.firstcpu->space(AS_PROGRAM);
 	address_space *spaceio = machine.firstcpu->space(AS_IO);
 
 
-	space->install_readwrite_bank(0xb8000, 0xbffff, "bank11" );
+	space.install_readwrite_bank(0xb8000, 0xbffff, "bank11" );
 	buswidth = machine.firstcpu->space_config(AS_PROGRAM)->m_databus_width;
 	UINT64 mask = 0;
 	switch(buswidth)
@@ -1136,7 +1136,7 @@ static void pc_cga_plantronics_w(running_machine &machine, int data)
 
 static WRITE8_HANDLER ( char_ram_w )
 {
-	UINT8 *gfx = space->machine().root_device().memregion("gfx1")->base();
+	UINT8 *gfx = space.machine().root_device().memregion("gfx1")->base();
 	offset ^= BIT(offset, 12);
 	logerror("write char ram %04x %02x\n",offset,data);
 	gfx[offset + 0x0000] = data;
@@ -1147,14 +1147,14 @@ static WRITE8_HANDLER ( char_ram_w )
 
 static READ8_HANDLER ( char_ram_r )
 {
-	UINT8 *gfx = space->machine().root_device().memregion("gfx1")->base();
+	UINT8 *gfx = space.machine().root_device().memregion("gfx1")->base();
 	offset ^= BIT(offset, 12);
 	return gfx[offset];
 }
 
 static READ8_HANDLER( pc_cga8_r )
 {
-	mc6845_device *mc6845 = space->machine().device<mc6845_device>(CGA_MC6845_NAME);
+	mc6845_device *mc6845 = space.machine().device<mc6845_device>(CGA_MC6845_NAME);
 	int data = 0xff;
 	switch( offset )
 	{
@@ -1162,7 +1162,7 @@ static READ8_HANDLER( pc_cga8_r )
 			/* return last written mc6845 address value here? */
 			break;
 		case 1: case 3: case 5: case 7:
-			data = mc6845->register_r( *space, offset );
+			data = mc6845->register_r( space, offset );
 			break;
 		case 10:
 			data = cga.vsync | ( ( data & 0x40 ) >> 4 ) | cga.hsync;
@@ -1182,27 +1182,27 @@ static WRITE8_HANDLER( pc_cga8_w )
 
 	switch(offset) {
 	case 0: case 2: case 4: case 6:
-		mc6845 = space->machine().device<mc6845_device>(CGA_MC6845_NAME);
-		mc6845->address_w( *space, offset, data );
+		mc6845 = space.machine().device<mc6845_device>(CGA_MC6845_NAME);
+		mc6845->address_w( space, offset, data );
 		break;
 	case 1: case 3: case 5: case 7:
-		mc6845 = space->machine().device<mc6845_device>(CGA_MC6845_NAME);
-		mc6845->register_w( *space, offset, data );
+		mc6845 = space.machine().device<mc6845_device>(CGA_MC6845_NAME);
+		mc6845->register_w( space, offset, data );
 		break;
 	case 8:
-		pc_cga_mode_control_w(space->machine(), data);
+		pc_cga_mode_control_w(space.machine(), data);
 		break;
 	case 9:
-		pc_cga_color_select_w(space->machine(), data);
+		pc_cga_color_select_w(space.machine(), data);
 		break;
 	case 0x0d:
-		pc_cga_plantronics_w(space->machine(), data);
+		pc_cga_plantronics_w(space.machine(), data);
 		break;
 	case 0x0f:
 		// Not sure if some all CGA cards have ability to upload char definition
 		// The original CGA card had a char rom
-		UINT8 buswidth = space->machine().firstcpu->space_config(AS_PROGRAM)->m_databus_width;
-		address_space *space_prg = space->machine().firstcpu->space(AS_PROGRAM);
+		UINT8 buswidth = space.machine().firstcpu->space_config(AS_PROGRAM)->m_databus_width;
+		address_space *space_prg = space.machine().firstcpu->space(AS_PROGRAM);
 		cga.p3df = data;
 		if (data & 1) {
 			UINT64 mask = 0;
@@ -1485,20 +1485,20 @@ static MC6845_UPDATE_ROW( pc1512_gfx_4bpp_update_row )
 static WRITE8_HANDLER ( pc1512_w )
 {
 	UINT8 *videoram = cga.videoram;
-	mc6845_device *mc6845 = space->machine().device<mc6845_device>(CGA_MC6845_NAME);
+	mc6845_device *mc6845 = space.machine().device<mc6845_device>(CGA_MC6845_NAME);
 
 	switch (offset)
 	{
 	case 0: case 2: case 4: case 6:
 		data &= 0x1F;
-		mc6845->address_w( *space, offset, data );
+		mc6845->address_w( space, offset, data );
 		pc1512.mc6845_address = data;
 		break;
 
 	case 1: case 3: case 5: case 7:
 		if ( ! pc1512.mc6845_locked_register[pc1512.mc6845_address] )
 		{
-			mc6845->register_w( *space, offset, data );
+			mc6845->register_w( space, offset, data );
 			if ( mc6845_writeonce_register[pc1512.mc6845_address] )
 			{
 				pc1512.mc6845_locked_register[pc1512.mc6845_address] = 1;
@@ -1514,7 +1514,7 @@ static WRITE8_HANDLER ( pc1512_w )
 		}
 		else
 		{
-			space->machine().root_device().membank("bank1")->set_base(videoram + videoram_offset[0]);
+			space.machine().root_device().membank("bank1")->set_base(videoram + videoram_offset[0]);
 		}
 		cga.mode_control = data;
 		switch( cga.mode_control & 0x3F )
@@ -1572,7 +1572,7 @@ static WRITE8_HANDLER ( pc1512_w )
 		pc1512.read = data;
 		if ( ( cga.mode_control & 0x12 ) == 0x12 )
 		{
-			space->machine().root_device().membank("bank1")->set_base(videoram + videoram_offset[data & 3]);
+			space.machine().root_device().membank("bank1")->set_base(videoram + videoram_offset[data & 3]);
 		}
 		break;
 
@@ -1635,12 +1635,12 @@ static VIDEO_START( pc1512 )
 	cga.videoram_size = 0x10000;
 	cga.videoram = auto_alloc_array(machine, UINT8, 0x10000 );
 
-	address_space *space = machine.firstcpu->space( AS_PROGRAM );
+	address_space &space = *machine.firstcpu->space( AS_PROGRAM );
 	address_space *io_space = machine.firstcpu->space( AS_IO );
 
-	space->install_read_bank( 0xb8000, 0xbbfff, 0, 0x0C000, "bank1" );
+	space.install_read_bank( 0xb8000, 0xbbfff, 0, 0x0C000, "bank1" );
 	machine.root_device().membank("bank1")->set_base(cga.videoram + videoram_offset[0]);
-	space->install_legacy_write_handler( 0xb8000, 0xbbfff, 0, 0x0C000, FUNC(pc1512_videoram_w), 0xffff);
+	space.install_legacy_write_handler( 0xb8000, 0xbbfff, 0, 0x0C000, FUNC(pc1512_videoram_w), 0xffff);
 
 	io_space->install_legacy_readwrite_handler( 0x3d0, 0x3df, FUNC(pc1512_r), FUNC(pc1512_w), 0xffff);
 

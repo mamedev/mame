@@ -59,7 +59,7 @@ void apple2_setup_memory(running_machine &machine, const apple2_memmap_config *c
 void apple2_update_memory(running_machine &machine)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int i, bank;
 	char rbank[10], wbank[10];
 	int full_update = 0;
@@ -166,15 +166,15 @@ void apple2_update_memory(running_machine &machine)
 			/* install the actual handlers */
 			if (begin <= end_r) {
 				if (rh) {
-					space->install_read_handler(begin, end_r, *rh);
+					space.install_read_handler(begin, end_r, *rh);
 				} else {
-					space->install_read_bank(begin, end_r, rbank);
+					space.install_read_bank(begin, end_r, rbank);
 				}
 			}
 
 			/* did we 'go past the end?' */
 			if (end_r < state->m_mem_config.memmap[i].end)
-				space->nop_read(end_r + 1, state->m_mem_config.memmap[i].end);
+				space.nop_read(end_r + 1, state->m_mem_config.memmap[i].end);
 
 			/* set the memory bank */
 			if (rbase)
@@ -254,19 +254,19 @@ void apple2_update_memory(running_machine &machine)
 			/* install the actual handlers */
 			if (begin <= end_w) {
 				if (wh) {
-					space->install_write_handler(begin, end_w, *wh);
+					space.install_write_handler(begin, end_w, *wh);
 				} else {
 					if (wh_nop) {
-						space->nop_write(begin, end_w);
+						space.nop_write(begin, end_w);
 					} else {
-						space->install_write_bank(begin, end_w, wbank);
+						space.install_write_bank(begin, end_w, wbank);
 					}
 				}
 			}
 
 			/* did we 'go past the end?' */
 			if (end_w < state->m_mem_config.memmap[i].end)
-				space->nop_write(end_w + 1, state->m_mem_config.memmap[i].end);
+				space.nop_write(end_w + 1, state->m_mem_config.memmap[i].end);
 
 			/* set the memory bank */
 			if (wbase)

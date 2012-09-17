@@ -85,7 +85,7 @@ INLINE uint g65816i_read_8_direct(g65816i_cpu_struct *cpustate, uint address)
 INLINE uint g65816i_read_8_vector(g65816i_cpu_struct *cpustate, uint address)
 {
 	if (READ_VECTOR)
-		return READ_VECTOR(cpustate->program, address);
+		return READ_VECTOR(*cpustate->program, address);
 	else
 		return g65816i_read_8_normal(cpustate, address);
 }

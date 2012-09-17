@@ -27,34 +27,34 @@ UINT16 actel_id;
 
 static READ64_HANDLER( naomi_biose_idle_skip_r )
 {
-	if (space->device().safe_pc()==0xc04173c)
-		space->device().execute().spin_until_time(attotime::from_usec(500));
-		//space->device().execute().spin_until_interrupt();
+	if (space.device().safe_pc()==0xc04173c)
+		space.device().execute().spin_until_time(attotime::from_usec(500));
+		//space.device().execute().spin_until_interrupt();
 //  else
-//      printf("%08x\n", space->device().safe_pc());
+//      printf("%08x\n", space.device().safe_pc());
 
-	return space->machine().driver_data<dc_state>()->dc_ram[0x2ad238/8];
+	return space.machine().driver_data<dc_state>()->dc_ram[0x2ad238/8];
 }
 
 static READ64_HANDLER( naomi_biosh_idle_skip_r )
 {
-	if (space->device().safe_pc()==0xc045ffc)
-		space->device().execute().spin_until_time(attotime::from_usec(500));
+	if (space.device().safe_pc()==0xc045ffc)
+		space.device().execute().spin_until_time(attotime::from_usec(500));
 
-//   printf("%08x\n", space->device().safe_pc());
+//   printf("%08x\n", space.device().safe_pc());
 
-	return space->machine().driver_data<dc_state>()->dc_ram[0x2b0600/8];
+	return space.machine().driver_data<dc_state>()->dc_ram[0x2b0600/8];
 }
 
 static READ64_HANDLER( naomi2_biose_idle_skip_r )
 {
-	if (space->device().safe_pc()==0xc04637c)
-		space->device().execute().spin_until_time(attotime::from_usec(500));
-		//space->device().execute().spin_until_interrupt();
+	if (space.device().safe_pc()==0xc04637c)
+		space.device().execute().spin_until_time(attotime::from_usec(500));
+		//space.device().execute().spin_until_interrupt();
 //  else
-//      printf("%08x\n", space->device().safe_pc());
+//      printf("%08x\n", space.device().safe_pc());
 
-	return space->machine().driver_data<dc_state>()->dc_ram[0x2b0600/8];
+	return space.machine().driver_data<dc_state>()->dc_ram[0x2b0600/8];
 }
 
 static UINT8 asciihex_to_dec(UINT8 in)
@@ -242,10 +242,10 @@ DRIVER_INIT_MEMBER(dc_state,naomigd_mp)
 
 static READ64_HANDLER( naomigd_ggxxsla_idle_skip_r )
 {
-	if (space->device().safe_pc()==0x0c0c9adc)
-		space->device().execute().spin_until_time(attotime::from_usec(500));
+	if (space.device().safe_pc()==0x0c0c9adc)
+		space.device().execute().spin_until_time(attotime::from_usec(500));
 
-	return space->machine().driver_data<dc_state>()->dc_ram[0x1aae18/8];
+	return space.machine().driver_data<dc_state>()->dc_ram[0x1aae18/8];
 }
 
 DRIVER_INIT_MEMBER(dc_state,ggxxsla)
@@ -256,10 +256,10 @@ DRIVER_INIT_MEMBER(dc_state,ggxxsla)
 
 static READ64_HANDLER( naomigd_ggxx_idle_skip_r )
 {
-	if (space->device().safe_pc()==0xc0b5c3c) // or 0xc0bab0c
-		space->device().execute().spin_until_time(attotime::from_usec(500));
+	if (space.device().safe_pc()==0xc0b5c3c) // or 0xc0bab0c
+		space.device().execute().spin_until_time(attotime::from_usec(500));
 
-	return space->machine().driver_data<dc_state>()->dc_ram[0x1837b8/8];
+	return space.machine().driver_data<dc_state>()->dc_ram[0x1837b8/8];
 }
 
 
@@ -271,12 +271,12 @@ DRIVER_INIT_MEMBER(dc_state,ggxx)
 
 static READ64_HANDLER( naomigd_ggxxrl_idle_skip_r )
 {
-	if (space->device().safe_pc()==0xc0b84bc) // or 0xc0bab0c
-		space->device().execute().spin_until_time(attotime::from_usec(500));
+	if (space.device().safe_pc()==0xc0b84bc) // or 0xc0bab0c
+		space.device().execute().spin_until_time(attotime::from_usec(500));
 
-	//printf("%08x\n", space->device().safe_pc());
+	//printf("%08x\n", space.device().safe_pc());
 
-	return space->machine().driver_data<dc_state>()->dc_ram[0x18d6c8/8];
+	return space.machine().driver_data<dc_state>()->dc_ram[0x18d6c8/8];
 }
 
 DRIVER_INIT_MEMBER(dc_state,ggxxrl)
@@ -288,10 +288,10 @@ DRIVER_INIT_MEMBER(dc_state,ggxxrl)
 /* at least speeds up the annoying copyright screens ;-) */
 static READ64_HANDLER( naomigd_sfz3ugd_idle_skip_r )
 {
-	if (space->device().safe_pc()==0xc36a2dc)
-		space->device().execute().spin_until_time(attotime::from_usec(500));
+	if (space.device().safe_pc()==0xc36a2dc)
+		space.device().execute().spin_until_time(attotime::from_usec(500));
 
-	return space->machine().driver_data<dc_state>()->dc_ram[0x5dc900/8];
+	return space.machine().driver_data<dc_state>()->dc_ram[0x5dc900/8];
 }
 
 DRIVER_INIT_MEMBER(dc_state,sfz3ugd)
@@ -333,13 +333,13 @@ DRIVER_INIT_MEMBER(dc_state,kick4csh)
 
 static READ64_HANDLER( hotd2_idle_skip_r )
 {
-	if (space->device().safe_pc()==0xc0cfcbc)
-		space->device().execute().spin_until_time(attotime::from_usec(500));
-		//space->device().execute().spin_until_interrupt();
+	if (space.device().safe_pc()==0xc0cfcbc)
+		space.device().execute().spin_until_time(attotime::from_usec(500));
+		//space.device().execute().spin_until_interrupt();
 //  else
-//  printf("%08x\n", space->device().safe_pc());
+//  printf("%08x\n", space.device().safe_pc());
 
-	return space->machine().driver_data<dc_state>()->dc_ram[0xa25fb8/8];
+	return space.machine().driver_data<dc_state>()->dc_ram[0xa25fb8/8];
 }
 
 DRIVER_INIT_MEMBER(dc_state,hotd2)

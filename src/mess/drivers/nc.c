@@ -321,7 +321,7 @@ static const char *const nc_bankhandler_w[]={
 static void nc_refresh_memory_bank_config(running_machine &machine, int bank)
 {
 	nc_state *state = machine.driver_data<nc_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int mem_type;
 	int mem_bank;
 	char bank1[10];
@@ -332,7 +332,7 @@ static void nc_refresh_memory_bank_config(running_machine &machine, int bank)
 	mem_type = (state->m_memory_config[bank]>>6) & 0x03;
 	mem_bank = state->m_memory_config[bank] & 0x03f;
 
-	space->install_read_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, nc_bankhandler_r[bank]);
+	space.install_read_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, nc_bankhandler_r[bank]);
 
 	switch (mem_type)
 	{
@@ -348,7 +348,7 @@ static void nc_refresh_memory_bank_config(running_machine &machine, int bank)
 
 			state->membank(bank1)->set_base(addr);
 
-			space->nop_write((bank * 0x4000), (bank * 0x4000) + 0x3fff);
+			space.nop_write((bank * 0x4000), (bank * 0x4000) + 0x3fff);
 			LOG(("BANK %d: ROM %d\n",bank,mem_bank));
 		}
 		break;
@@ -365,7 +365,7 @@ static void nc_refresh_memory_bank_config(running_machine &machine, int bank)
 			state->membank(bank1)->set_base(addr);
 			state->membank(bank5)->set_base(addr);
 
-			space->install_write_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, nc_bankhandler_w[bank]);
+			space.install_write_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, nc_bankhandler_w[bank]);
 			LOG(("BANK %d: RAM\n",bank));
 		}
 		break;
@@ -389,12 +389,12 @@ static void nc_refresh_memory_bank_config(running_machine &machine, int bank)
 					/* yes */
 					state->membank(bank5)->set_base(addr);
 
-					space->install_write_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, nc_bankhandler_w[bank]);
+					space.install_write_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, nc_bankhandler_w[bank]);
 				}
 				else
 				{
 					/* no */
-					space->nop_write((bank * 0x4000), (bank * 0x4000) + 0x3fff);
+					space.nop_write((bank * 0x4000), (bank * 0x4000) + 0x3fff);
 				}
 
 				LOG(("BANK %d: CARD-RAM\n",bank));
@@ -402,7 +402,7 @@ static void nc_refresh_memory_bank_config(running_machine &machine, int bank)
 			else
 			{
 				/* if no card connected, then writes fail */
-				space->nop_readwrite((bank * 0x4000), (bank * 0x4000) + 0x3fff);
+				space.nop_readwrite((bank * 0x4000), (bank * 0x4000) + 0x3fff);
 			}
 		}
 		break;

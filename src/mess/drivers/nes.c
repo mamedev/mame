@@ -38,7 +38,7 @@ static WRITE8_DEVICE_HANDLER( psg_4017_w )
 
 WRITE8_MEMBER(nes_state::nes_vh_sprite_dma_w)
 {
-	m_ppu->spriteram_dma(&space, data);
+	m_ppu->spriteram_dma(space, data);
 }
 
 static ADDRESS_MAP_START( nes_map, AS_PROGRAM, 8, nes_state )

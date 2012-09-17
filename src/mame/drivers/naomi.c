@@ -1416,14 +1416,14 @@ static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,
 
 static READ64_HANDLER( naomi_arm_r )
 {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 
 	return *(reinterpret_cast<UINT64 *>(state->dc_sound_ram.target())+offset);
 }
 
 static WRITE64_HANDLER( naomi_arm_w )
 {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 
 	COMBINE_DATA(reinterpret_cast<UINT64 *>(state->dc_sound_ram.target()) + offset);
 }
@@ -1517,7 +1517,7 @@ static WRITE64_DEVICE_HANDLER( eeprom_93c46a_w )
  // SB_LMMODE0
  static WRITE64_HANDLER( ta_texture_directpath0_w )
  {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 
 	int mode = state->pvrctrl_regs[SB_LMMODE0]&1;
 	if (mode&1)
@@ -1534,7 +1534,7 @@ static WRITE64_DEVICE_HANDLER( eeprom_93c46a_w )
  // SB_LMMODE1
  static WRITE64_HANDLER( ta_texture_directpath1_w )
  {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 
 	int mode = state->pvrctrl_regs[SB_LMMODE1]&1;
 	if (mode&1)
@@ -1724,11 +1724,11 @@ static READ64_HANDLER( aw_modem_r )
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
+	reg = decode_reg32_64(space.machine(), offset, mem_mask, &shift);
 
 	if (reg == 0x280/4)
 	{
-		UINT32 coins = space->machine().root_device().ioport("COINS")->read();
+		UINT32 coins = space.machine().root_device().ioport("COINS")->read();
 
 		if (coins & 0x01)
 		{
@@ -1752,7 +1752,7 @@ static WRITE64_HANDLER( aw_modem_w )
 	UINT64 shift;
 	UINT32 dat;
 
-	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
+	reg = decode_reg32_64(space.machine(), offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 	mame_printf_verbose("MODEM: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
 }

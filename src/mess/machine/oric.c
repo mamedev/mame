@@ -427,17 +427,17 @@ static void oric_install_apple2_interface(running_machine &machine)
 {
 	oric_state *state = machine.driver_data<oric_state>();
 	device_t *fdc = machine.device("fdc");
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (state->m_is_telestrat)
 		return;
 
-	space->install_read_handler(0x0300, 0x030f, read8_delegate(FUNC(oric_state::oric_IO_r),state));
-	space->install_legacy_read_handler(*fdc, 0x0310, 0x031f, FUNC(applefdc_r));
-	space->install_read_bank(0x0320, 0x03ff, "bank4");
+	space.install_read_handler(0x0300, 0x030f, read8_delegate(FUNC(oric_state::oric_IO_r),state));
+	space.install_legacy_read_handler(*fdc, 0x0310, 0x031f, FUNC(applefdc_r));
+	space.install_read_bank(0x0320, 0x03ff, "bank4");
 
-	space->install_write_handler(0x0300, 0x030f, write8_delegate(FUNC(oric_state::oric_IO_w),state));
-	space->install_legacy_write_handler(*fdc, 0x0310, 0x031f, FUNC(applefdc_w));
+	space.install_write_handler(0x0300, 0x030f, write8_delegate(FUNC(oric_state::oric_IO_w),state));
+	space.install_legacy_write_handler(*fdc, 0x0310, 0x031f, FUNC(applefdc_w));
 	state->membank("bank4")->set_base(	state->memregion("maincpu")->base() + 0x014000 + 0x020);
 }
 
@@ -446,7 +446,7 @@ static void oric_enable_memory(running_machine &machine, int low, int high, int 
 {
 	oric_state *state = machine.driver_data<oric_state>();
 	int i;
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (state->m_is_telestrat)
 		return;
@@ -455,33 +455,33 @@ static void oric_enable_memory(running_machine &machine, int low, int high, int 
 		switch(i) {
 		case 1:
 			if (rd) {
-				space->install_read_bank(0xc000, 0xdfff, "bank1");
+				space.install_read_bank(0xc000, 0xdfff, "bank1");
 			} else {
-				space->nop_read(0xc000, 0xdfff);
+				space.nop_read(0xc000, 0xdfff);
 			}
 			if (wr) {
-				space->install_write_bank(0xc000, 0xdfff, "bank5");
+				space.install_write_bank(0xc000, 0xdfff, "bank5");
 			} else {
-				space->unmap_write(0xc000, 0xdfff);
+				space.unmap_write(0xc000, 0xdfff);
 			}
 			break;
 		case 2:
 			if (rd) {
-				space->install_read_bank(0xe000, 0xf7ff, "bank2");
+				space.install_read_bank(0xe000, 0xf7ff, "bank2");
 			} else {
-				space->nop_read(0xe000, 0xf7ff);
+				space.nop_read(0xe000, 0xf7ff);
 			}
 			if (wr) {
-				space->install_write_bank(0xe000, 0xf7ff, "bank6");
+				space.install_write_bank(0xe000, 0xf7ff, "bank6");
 			} else {
-				space->unmap_write(0xe000, 0xf7ff);
+				space.unmap_write(0xe000, 0xf7ff);
 			}
 			break;
 		case 3:
 			if (rd) {
-				space->install_read_bank(0xf800, 0xffff, "bank3");
+				space.install_read_bank(0xf800, 0xffff, "bank3");
 			} else {
-				space->nop_read(0xf800, 0xffff);
+				space.nop_read(0xf800, 0xffff);
 			}
 			break;
 		}
@@ -551,17 +551,17 @@ static void oric_install_apple2_v2_interface(running_machine &machine)
 {
 	oric_state *state = machine.driver_data<oric_state>();
 	device_t *fdc = machine.device("fdc");
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	space->install_read_handler(0x0300, 0x030f, read8_delegate(FUNC(oric_state::oric_IO_r),state));
-	space->install_legacy_read_handler(*fdc, 0x0310, 0x031f, FUNC(applefdc_r));
-	space->install_read_bank(0x0320, 0x03ff, "bank4");
+	space.install_read_handler(0x0300, 0x030f, read8_delegate(FUNC(oric_state::oric_IO_r),state));
+	space.install_legacy_read_handler(*fdc, 0x0310, 0x031f, FUNC(applefdc_r));
+	space.install_read_bank(0x0320, 0x03ff, "bank4");
 
-	space->install_write_handler(0x0300, 0x030f, write8_delegate(FUNC(oric_state::oric_IO_w),state));
-	space->install_legacy_write_handler(*fdc, 0x0310, 0x031f, FUNC(applefdc_w));
-	space->install_write_handler(0x0380, 0x0383, write8_delegate(FUNC(oric_state::apple2_v2_interface_w),state));
+	space.install_write_handler(0x0300, 0x030f, write8_delegate(FUNC(oric_state::oric_IO_w),state));
+	space.install_legacy_write_handler(*fdc, 0x0310, 0x031f, FUNC(applefdc_w));
+	space.install_write_handler(0x0380, 0x0383, write8_delegate(FUNC(oric_state::apple2_v2_interface_w),state));
 
-	state->apple2_v2_interface_w(*space, 0, 0);
+	state->apple2_v2_interface_w(space, 0, 0);
 }
 
 /********************/
@@ -755,16 +755,16 @@ WRITE8_MEMBER(oric_state::oric_jasmin_w)
 static void oric_install_jasmin_interface(running_machine &machine)
 {
 	oric_state *state = machine.driver_data<oric_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	/* romdis */
 	state->m_port_3fb_w = 1;
 	oric_jasmin_set_mem_0x0c000(machine);
 
-	space->install_read_handler(0x0300, 0x03ef, read8_delegate(FUNC(oric_state::oric_IO_r),state));
-	space->install_read_handler(0x03f0, 0x03ff, read8_delegate(FUNC(oric_state::oric_jasmin_r),state));
+	space.install_read_handler(0x0300, 0x03ef, read8_delegate(FUNC(oric_state::oric_IO_r),state));
+	space.install_read_handler(0x03f0, 0x03ff, read8_delegate(FUNC(oric_state::oric_jasmin_r),state));
 
-	space->install_write_handler(0x0300, 0x03ef, write8_delegate(FUNC(oric_state::oric_IO_w),state));
-	space->install_write_handler(0x03f0, 0x03ff, write8_delegate(FUNC(oric_state::oric_jasmin_w),state));
+	space.install_write_handler(0x0300, 0x03ef, write8_delegate(FUNC(oric_state::oric_IO_w),state));
+	space.install_write_handler(0x03f0, 0x03ff, write8_delegate(FUNC(oric_state::oric_jasmin_w),state));
 }
 
 /*********************************/
@@ -978,15 +978,15 @@ WRITE8_MEMBER(oric_state::oric_microdisc_w)
 static void oric_install_microdisc_interface(running_machine &machine)
 {
 	oric_state *state = machine.driver_data<oric_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	space->install_read_handler(0x0300, 0x030f, read8_delegate(FUNC(oric_state::oric_IO_r),state));
-	space->install_read_handler(0x0310, 0x031f, read8_delegate(FUNC(oric_state::oric_microdisc_r),state));
-	space->install_read_handler(0x0320, 0x03ff, read8_delegate(FUNC(oric_state::oric_IO_r),state));
+	space.install_read_handler(0x0300, 0x030f, read8_delegate(FUNC(oric_state::oric_IO_r),state));
+	space.install_read_handler(0x0310, 0x031f, read8_delegate(FUNC(oric_state::oric_microdisc_r),state));
+	space.install_read_handler(0x0320, 0x03ff, read8_delegate(FUNC(oric_state::oric_IO_r),state));
 
-	space->install_write_handler(0x0300, 0x030f, write8_delegate(FUNC(oric_state::oric_IO_w),state));
-	space->install_write_handler(0x0310, 0x031f, write8_delegate(FUNC(oric_state::oric_microdisc_w),state));
-	space->install_write_handler(0x0320, 0x03ff, write8_delegate(FUNC(oric_state::oric_IO_w),state));
+	space.install_write_handler(0x0300, 0x030f, write8_delegate(FUNC(oric_state::oric_IO_w),state));
+	space.install_write_handler(0x0310, 0x031f, write8_delegate(FUNC(oric_state::oric_microdisc_w),state));
+	space.install_write_handler(0x0320, 0x03ff, write8_delegate(FUNC(oric_state::oric_IO_w),state));
 
 	/* disable os rom, enable microdisc rom */
 	/* 0x0c000-0x0dfff will be ram, 0x0e000-0x0ffff will be microdisc rom */
@@ -1064,7 +1064,7 @@ void oric_state::machine_start()
 void oric_state::machine_reset()
 {
 	int disc_interface_id = machine().root_device().ioport("FLOPPY")->read() & 0x07;
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	if (m_is_telestrat)
 		return;
 
@@ -1095,8 +1095,8 @@ void oric_state::machine_reset()
 			}
 			else
 			{
-				space->install_read_handler(0x0300, 0x03ff, read8_delegate(FUNC(oric_state::oric_IO_r),this));
-				space->install_write_handler(0x0300, 0x03ff, write8_delegate(FUNC(oric_state::oric_IO_w),this));
+				space.install_read_handler(0x0300, 0x03ff, read8_delegate(FUNC(oric_state::oric_IO_r),this));
+				space.install_write_handler(0x0300, 0x03ff, write8_delegate(FUNC(oric_state::oric_IO_w),this));
 			}
 		}
 		break;
@@ -1246,7 +1246,7 @@ CB2
 static void telestrat_refresh_mem(running_machine &machine)
 {
 	oric_state *state = machine.driver_data<oric_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	telestrat_mem_block *mem_block = &state->m_telestrat_blocks[state->m_telestrat_bank_selection];
 
@@ -1256,23 +1256,23 @@ static void telestrat_refresh_mem(running_machine &machine)
 		{
 			state->membank("bank1")->set_base(mem_block->ptr);
 			state->membank("bank2")->set_base(mem_block->ptr);
-			space->install_read_bank(0xc000, 0xffff, "bank1");
-			space->install_write_bank(0xc000, 0xffff, "bank2");
+			space.install_read_bank(0xc000, 0xffff, "bank1");
+			space.install_write_bank(0xc000, 0xffff, "bank2");
 		}
 		break;
 
 		case TELESTRAT_MEM_BLOCK_ROM:
 		{
 			state->membank("bank1")->set_base(mem_block->ptr);
-			space->install_read_bank(0xc000, 0xffff, "bank1");
-			space->nop_write(0xc000, 0xffff);
+			space.install_read_bank(0xc000, 0xffff, "bank1");
+			space.nop_write(0xc000, 0xffff);
 		}
 		break;
 
 		default:
 		case TELESTRAT_MEM_BLOCK_UNDEFINED:
 		{
-			space->nop_readwrite(0xc000, 0xffff);
+			space.nop_readwrite(0xc000, 0xffff);
 		}
 		break;
 	}

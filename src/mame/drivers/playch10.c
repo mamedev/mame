@@ -332,7 +332,7 @@ WRITE8_MEMBER(playch10_state::sprite_dma_w)
 {
 	int source = ( data & 7 );
 	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
-	ppu->spriteram_dma(&space, source);
+	ppu->spriteram_dma(space, source);
 }
 
 /* Only used in single monitor bios */

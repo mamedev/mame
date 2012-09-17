@@ -708,7 +708,7 @@ static void s3c240x_dma_trigger( running_machine &machine, int dma)
 	gp32_state *state = machine.driver_data<gp32_state>();
 	UINT32 *regs = &state->m_s3c240x_dma_regs[dma<<3];
 	UINT32 curr_tc, curr_src, curr_dst;
-	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM);
+	address_space &space = *machine.device( "maincpu")->memory().space( AS_PROGRAM);
 	int dsz, inc_src, inc_dst, servmode;
 	static const UINT32 ch_int[] = { INT_DMA0, INT_DMA1, INT_DMA2, INT_DMA3 };
 	verboselog( machine, 5, "DMA %d trigger\n", dma);
@@ -725,9 +725,9 @@ static void s3c240x_dma_trigger( running_machine &machine, int dma)
 		curr_tc--;
 		switch (dsz)
 		{
-			case 0 : space->write_byte( curr_dst, space->read_byte( curr_src)); break;
-			case 1 : space->write_word( curr_dst, space->read_word( curr_src)); break;
-			case 2 : space->write_dword( curr_dst, space->read_dword( curr_src)); break;
+			case 0 : space.write_byte( curr_dst, space.read_byte( curr_src)); break;
+			case 1 : space.write_word( curr_dst, space.read_word( curr_src)); break;
+			case 2 : space.write_dword( curr_dst, space.read_dword( curr_src)); break;
 		}
 		if (inc_src == 0) curr_src += (1 << dsz);
 		if (inc_dst == 0) curr_dst += (1 << dsz);

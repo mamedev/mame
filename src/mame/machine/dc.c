@@ -128,9 +128,9 @@ static TIMER_CALLBACK( yuv_fifo_irq )
 	dc_update_interrupt_status(machine);
 }
 
-static void wave_dma_execute(address_space *space)
+static void wave_dma_execute(address_space &space)
 {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 
 	UINT32 src,dst,size;
 	dst = state->m_wave_dma.aica_addr;
@@ -144,7 +144,7 @@ static void wave_dma_execute(address_space *space)
 	{
 		for(;size<state->m_wave_dma.size;size+=4)
 		{
-			space->write_dword(dst,space->read_dword(src));
+			space.write_dword(dst,space.read_dword(src));
 			src+=4;
 			dst+=4;
 		}
@@ -153,7 +153,7 @@ static void wave_dma_execute(address_space *space)
 	{
 		for(;size<state->m_wave_dma.size;size+=4)
 		{
-			space->write_dword(src,space->read_dword(dst));
+			space.write_dword(src,space.read_dword(dst));
 			src+=4;
 			dst+=4;
 		}
@@ -166,12 +166,12 @@ static void wave_dma_execute(address_space *space)
 	state->m_wave_dma.flag = (state->m_wave_dma.indirect & 1) ? 1 : 0;
 	/* Note: if you trigger an instant DMA IRQ trigger, sfz3upper doesn't play any bgm. */
 	/* TODO: timing of this */
-	space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(aica_dma_irq));
+	space.machine().scheduler().timer_set(attotime::from_usec(300), FUNC(aica_dma_irq));
 }
 
-static void pvr_dma_execute(address_space *space)
+static void pvr_dma_execute(address_space &space)
 {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 
 	UINT32 src,dst,size;
 	dst = state->m_pvr_dma.pvr_addr;
@@ -190,7 +190,7 @@ static void pvr_dma_execute(address_space *space)
 	{
 		for(;size<state->m_pvr_dma.size;size+=4)
 		{
-			space->write_dword(dst,space->read_dword(src));
+			space.write_dword(dst,space.read_dword(src));
 			src+=4;
 			dst+=4;
 		}
@@ -199,14 +199,14 @@ static void pvr_dma_execute(address_space *space)
 	{
 		for(;size<state->m_pvr_dma.size;size+=4)
 		{
-			space->write_dword(src,space->read_dword(dst));
+			space.write_dword(src,space.read_dword(dst));
 			src+=4;
 			dst+=4;
 		}
 	}
 	/* Note: do not update the params, since this DMA type doesn't support it. */
 	/* TODO: timing of this */
-	space->machine().scheduler().timer_set(attotime::from_usec(250), FUNC(pvr_dma_irq));
+	space.machine().scheduler().timer_set(attotime::from_usec(250), FUNC(pvr_dma_irq));
 }
 
 // register decode helpers
@@ -321,7 +321,7 @@ void dc_update_interrupt_status(running_machine &machine)
 	{
 		if((state->dc_sysctrl_regs[SB_G2DTNRM] & state->dc_sysctrl_regs[SB_ISTNRM]) || (state->dc_sysctrl_regs[SB_G2DTEXT] & state->dc_sysctrl_regs[SB_ISTEXT]))
 		{
-			address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+			address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 			printf("Wave DMA HW trigger\n");
 			wave_dma_execute(space);
@@ -333,7 +333,7 @@ void dc_update_interrupt_status(running_machine &machine)
 	{
 		if((state->dc_sysctrl_regs[SB_PDTNRM] & state->dc_sysctrl_regs[SB_ISTNRM]) || (state->dc_sysctrl_regs[SB_PDTEXT] & state->dc_sysctrl_regs[SB_ISTEXT]))
 		{
-			address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+			address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 			printf("PVR-DMA HW trigger\n");
 			pvr_dma_execute(space);
@@ -343,17 +343,17 @@ void dc_update_interrupt_status(running_machine &machine)
 
 READ64_HANDLER( dc_sysctrl_r )
 {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
+	reg = decode_reg32_64(space.machine(), offset, mem_mask, &shift);
 
 	#if DEBUG_SYSCTRL
 	if ((reg != 0x40) && (reg != 0x41) && (reg != 0x42) && (reg != 0x23) && (reg > 2))	// filter out IRQ status reads
 	{
-		mame_printf_verbose("SYSCTRL: [%08x] read %x @ %x (reg %x: %s), mask %" I64FMT "x (PC=%x)\n", 0x5f6800+reg*4, state->dc_sysctrl_regs[reg], offset, reg, sysctrl_names[reg], mem_mask, space->device().safe_pc());
+		mame_printf_verbose("SYSCTRL: [%08x] read %x @ %x (reg %x: %s), mask %" I64FMT "x (PC=%x)\n", 0x5f6800+reg*4, state->dc_sysctrl_regs[reg], offset, reg, sysctrl_names[reg], mem_mask, space.device().safe_pc());
 	}
 	#endif
 
@@ -362,7 +362,7 @@ READ64_HANDLER( dc_sysctrl_r )
 
 WRITE64_HANDLER( dc_sysctrl_w )
 {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 
 	int reg;
 	UINT64 shift;
@@ -370,7 +370,7 @@ WRITE64_HANDLER( dc_sysctrl_w )
 	UINT32 address;
 	struct sh4_ddt_dma ddtdata;
 
-	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
+	reg = decode_reg32_64(space.machine(), offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 	old = state->dc_sysctrl_regs[reg];
 	state->dc_sysctrl_regs[reg] = dat; // 5f6800+off*4=dat
@@ -393,7 +393,7 @@ WRITE64_HANDLER( dc_sysctrl_w )
 				ddtdata.direction=0;
 				ddtdata.channel=2;
 				ddtdata.mode=25; //011001
-				sh4_dma_ddt(space->machine().device("maincpu"),&ddtdata);
+				sh4_dma_ddt(space.machine().device("maincpu"),&ddtdata);
 				#if DEBUG_SYSCTRL
 				if ((address >= 0x11000000) && (address <= 0x11FFFFFF))
 					if (state->dc_sysctrl_regs[SB_LMMODE0])
@@ -419,26 +419,26 @@ WRITE64_HANDLER( dc_sysctrl_w )
 					state->dc_sysctrl_regs[SB_C2DSTAT]=address+ddtdata.length;
 
 				/* 200 usecs breaks sfz3upper */
-				space->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(ch2_dma_irq));
+				space.machine().scheduler().timer_set(attotime::from_usec(50), FUNC(ch2_dma_irq));
 				/* simulate YUV FIFO processing here */
 				if((address & 0x1800000) == 0x0800000)
-					space->machine().scheduler().timer_set(attotime::from_usec(500), FUNC(yuv_fifo_irq));
+					space.machine().scheduler().timer_set(attotime::from_usec(500), FUNC(yuv_fifo_irq));
 			}
 			break;
 
 		case SB_ISTNRM:
 			state->dc_sysctrl_regs[SB_ISTNRM] = old & ~(dat | 0xC0000000); // bits 31,30 ro
-			dc_update_interrupt_status(space->machine());
+			dc_update_interrupt_status(space.machine());
 			break;
 
 		case SB_ISTEXT:
 			state->dc_sysctrl_regs[SB_ISTEXT] = old;
-			dc_update_interrupt_status(space->machine());
+			dc_update_interrupt_status(space.machine());
 			break;
 
 		case SB_ISTERR:
 			state->dc_sysctrl_regs[SB_ISTERR] = old & ~dat;
-			dc_update_interrupt_status(space->machine());
+			dc_update_interrupt_status(space.machine());
 			break;
 		case SB_SDST:
 			if(dat & 1)
@@ -448,7 +448,7 @@ WRITE64_HANDLER( dc_sysctrl_w )
 
 				state->dc_sysctrl_regs[SB_SDST] = 0;
 				state->dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_SORT;
-				dc_update_interrupt_status(space->machine());
+				dc_update_interrupt_status(space.machine());
 			}
 			break;
 	}
@@ -463,7 +463,7 @@ WRITE64_HANDLER( dc_sysctrl_w )
 
 READ64_HANDLER( dc_gdrom_r )
 {
-//  dc_state *state = space->machine().driver_data<dc_state>();
+//  dc_state *state = space.machine().driver_data<dc_state>();
 
 	UINT32 off;
 
@@ -486,7 +486,7 @@ READ64_HANDLER( dc_gdrom_r )
 
 WRITE64_HANDLER( dc_gdrom_w )
 {
-//  dc_state *state = space->machine().driver_data<dc_state>();
+//  dc_state *state = space.machine().driver_data<dc_state>();
 	UINT32 dat,off;
 
 	if ((int)~mem_mask & 1)
@@ -505,24 +505,24 @@ WRITE64_HANDLER( dc_gdrom_w )
 
 READ64_HANDLER( dc_g2_ctrl_r )
 {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
+	reg = decode_reg32_64(space.machine(), offset, mem_mask, &shift);
 	mame_printf_verbose("G2CTRL:  Unmapped read %08x\n", 0x5f7800+reg*4);
 	return (UINT64)state->g2bus_regs[reg] << shift;
 }
 
 WRITE64_HANDLER( dc_g2_ctrl_w )
 {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 	UINT32 dat;
 	UINT8 old;
 
-	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
+	reg = decode_reg32_64(space.machine(), offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 
 	state->g2bus_regs[reg] = dat; // 5f7800+reg*4=dat
@@ -608,14 +608,14 @@ INLINE int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 
 READ64_HANDLER( pvr_ctrl_r )
 {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 
 	reg = decode_reg_64(offset, mem_mask, &shift);
 
 	#if DEBUG_PVRCTRL
-	mame_printf_verbose("PVRCTRL: [%08x] read %x @ %x (reg %x), mask %" I64FMT "x (PC=%x)\n", 0x5f7c00+reg*4, state->pvrctrl_regs[reg], offset, reg, mem_mask, space->device().safe_pc());
+	mame_printf_verbose("PVRCTRL: [%08x] read %x @ %x (reg %x), mask %" I64FMT "x (PC=%x)\n", 0x5f7c00+reg*4, state->pvrctrl_regs[reg], offset, reg, mem_mask, space.device().safe_pc());
 	#endif
 
 	return (UINT64)state->pvrctrl_regs[reg] << shift;
@@ -623,7 +623,7 @@ READ64_HANDLER( pvr_ctrl_r )
 
 WRITE64_HANDLER( pvr_ctrl_w )
 {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 	UINT32 dat;
@@ -664,11 +664,11 @@ WRITE64_HANDLER( pvr_ctrl_w )
 
 READ64_HANDLER( dc_modem_r )
 {
-//  dc_state *state = space->machine().driver_data<dc_state>();
+//  dc_state *state = space.machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
+	reg = decode_reg32_64(space.machine(), offset, mem_mask, &shift);
 
 	// from ElSemi: this makes Atomiswave do it's "verbose boot" with a Sammy logo and diagnostics instead of just running the cart.
 	// our PVR emulation is apparently not good enough for that to work yet though.
@@ -683,23 +683,23 @@ READ64_HANDLER( dc_modem_r )
 
 WRITE64_HANDLER( dc_modem_w )
 {
-//  dc_state *state = space->machine().driver_data<dc_state>();
+//  dc_state *state = space.machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 	UINT32 dat;
 
-	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
+	reg = decode_reg32_64(space.machine(), offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 	mame_printf_verbose("MODEM: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
 }
 
 READ64_HANDLER( dc_rtc_r )
 {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg3216_64(space->machine(), offset, mem_mask, &shift);
+	reg = decode_reg3216_64(space.machine(), offset, mem_mask, &shift);
 	mame_printf_verbose("RTC:  Unmapped read %08x\n", 0x710000+reg*4);
 
 	return (UINT64)state->dc_rtcregister[reg] << shift;
@@ -707,12 +707,12 @@ READ64_HANDLER( dc_rtc_r )
 
 WRITE64_HANDLER( dc_rtc_w )
 {
-	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space.machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 	UINT32 old,dat;
 
-	reg = decode_reg3216_64(space->machine(), offset, mem_mask, &shift);
+	reg = decode_reg3216_64(space.machine(), offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 	old = state->dc_rtcregister[reg];
 	state->dc_rtcregister[reg] = dat & 0xFFFF; // 5f6c00+off*4=dat

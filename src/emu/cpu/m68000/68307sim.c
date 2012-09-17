@@ -6,11 +6,11 @@
 
 READ16_HANDLER( m68307_internal_sim_r )
 {
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
 	m68307_sim* sim = m68k->m68307SIM;
 	assert(sim != NULL);
 
-	int pc = space->device().safe_pc();
+	int pc = space.device().safe_pc();
 
 	if (sim)
 	{
@@ -43,11 +43,11 @@ READ16_HANDLER( m68307_internal_sim_r )
 
 WRITE16_HANDLER( m68307_internal_sim_w )
 {
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
 	m68307_sim* sim = m68k->m68307SIM;
 	assert(sim != NULL);
 
-	int pc = space->device().safe_pc();
+	int pc = space.device().safe_pc();
 
 	if (sim)
 	{
@@ -150,10 +150,10 @@ void m68307_sim::write_paddr(UINT16 data, UINT16 mem_mask)
 }
 
 
-UINT16 m68307_sim::read_padat(address_space *space, UINT16 mem_mask)
+UINT16 m68307_sim::read_padat(address_space &space, UINT16 mem_mask)
 {
-	int pc = space->device().safe_pc();
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+	int pc = space.device().safe_pc();
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
 
 	if (m68k->m_m68307_porta_r)
 	{
@@ -177,10 +177,10 @@ UINT16 m68307_sim::read_padat(address_space *space, UINT16 mem_mask)
 }
 
 
-void m68307_sim::write_padat(address_space *space, UINT16 data, UINT16 mem_mask)
+void m68307_sim::write_padat(address_space &space, UINT16 data, UINT16 mem_mask)
 {
-	int pc = space->device().safe_pc();
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+	int pc = space.device().safe_pc();
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
 	COMBINE_DATA(&m_padat);
 
 	if (m68k->m_m68307_porta_w)
@@ -203,10 +203,10 @@ void m68307_sim::write_pbddr(UINT16 data, UINT16 mem_mask)
 	COMBINE_DATA(&m_pbddr);
 }
 
-UINT16 m68307_sim::read_pbdat(address_space *space, UINT16 mem_mask)
+UINT16 m68307_sim::read_pbdat(address_space &space, UINT16 mem_mask)
 {
-	int pc = space->device().safe_pc();
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+	int pc = space.device().safe_pc();
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
 
 	if (m68k->m_m68307_portb_r)
 	{
@@ -230,10 +230,10 @@ UINT16 m68307_sim::read_pbdat(address_space *space, UINT16 mem_mask)
 }
 
 
-void m68307_sim::write_pbdat(address_space *space, UINT16 data, UINT16 mem_mask)
+void m68307_sim::write_pbdat(address_space &space, UINT16 data, UINT16 mem_mask)
 {
-	int pc = space->device().safe_pc();
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+	int pc = space.device().safe_pc();
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
 	COMBINE_DATA(&m_pbdat);
 
 	if (m68k->m_m68307_portb_w)

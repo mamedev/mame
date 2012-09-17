@@ -311,7 +311,7 @@ WRITE8_MEMBER(panicr_state::panicr_output_w)
 READ8_MEMBER(panicr_state::t5182shared_r)
 {
 	if ((offset & 1) == 0)
-		return t5182_sharedram_r(&space, offset/2);
+		return t5182_sharedram_r(space, offset/2);
 	else
 		return 0;
 }
@@ -319,7 +319,7 @@ READ8_MEMBER(panicr_state::t5182shared_r)
 WRITE8_MEMBER(panicr_state::t5182shared_w)
 {
 	if ((offset & 1) == 0)
-		t5182_sharedram_w(&space, offset/2, data);
+		t5182_sharedram_w(space, offset/2, data);
 }
 
 

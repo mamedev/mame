@@ -268,15 +268,15 @@ INLINE int blt_read( const UINT8 *ROM, const int offs )
 	return ROM[offs];
 }
 
-void hyprduel_state::blt_write( address_space *space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask )
+void hyprduel_state::blt_write( address_space &space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask )
 {
 	switch( tmap )
 	{
-		case 1:	hyprduel_vram_0_w(*space, offs,data,mask);	break;
-		case 2:	hyprduel_vram_1_w(*space, offs, data, mask);	break;
-		case 3:	hyprduel_vram_2_w(*space, offs, data, mask);	break;
+		case 1:	hyprduel_vram_0_w(space, offs,data,mask);	break;
+		case 2:	hyprduel_vram_1_w(space, offs, data, mask);	break;
+		case 3:	hyprduel_vram_2_w(space, offs, data, mask);	break;
 	}
-//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", space->machine().describe_context(), tmap, offs, data, mask);
+//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", space.machine().describe_context(), tmap, offs, data, mask);
 }
 
 
@@ -344,7 +344,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_blitter_w)
 						src_offs++;
 
 						dst_offs &= 0xffff;
-						blt_write(&space, tmap, dst_offs, b2, mask);
+						blt_write(space, tmap, dst_offs, b2, mask);
 						dst_offs = ((dst_offs + 1) & (0x100 - 1)) | (dst_offs & (~(0x100 - 1)));
 					}
 					break;
@@ -360,7 +360,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_blitter_w)
 					while (count--)
 					{
 						dst_offs &= 0xffff;
-						blt_write(&space, tmap, dst_offs, b2 << shift, mask);
+						blt_write(space, tmap, dst_offs, b2 << shift, mask);
 						dst_offs = ((dst_offs + 1) & (0x100 - 1)) | (dst_offs & (~(0x100 - 1)));
 						b2++;
 					}
@@ -377,7 +377,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_blitter_w)
 					while (count--)
 					{
 						dst_offs &= 0xffff;
-						blt_write(&space, tmap, dst_offs, b2, mask);
+						blt_write(space, tmap, dst_offs, b2, mask);
 						dst_offs = ((dst_offs + 1) & (0x100 - 1)) | (dst_offs & (~(0x100 - 1)));
 					}
 					break;

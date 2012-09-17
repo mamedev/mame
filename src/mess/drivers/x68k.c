@@ -346,14 +346,14 @@ static TIMER_CALLBACK( x68k_led_callback )
 // 4 channel DMA controller (Hitachi HD63450)
 static WRITE16_HANDLER( x68k_dmac_w )
 {
-	device_t* device = space->machine().device("hd63450");
-	hd63450_w(device, *space, offset, data, mem_mask);
+	device_t* device = space.machine().device("hd63450");
+	hd63450_w(device, space, offset, data, mem_mask);
 }
 
 static READ16_HANDLER( x68k_dmac_r )
 {
-	device_t* device = space->machine().device("hd63450");
-	return hd63450_r(device, *space, offset, mem_mask);
+	device_t* device = space.machine().device("hd63450");
+	return hd63450_r(device, space, offset, mem_mask);
 }
 
 static void x68k_keyboard_ctrl_w(x68k_state *state, int data)
@@ -583,18 +583,18 @@ static int x68k_read_mouse(running_machine &machine)
 */
 static READ16_HANDLER( x68k_scc_r )
 {
-	scc8530_t *scc = space->machine().device<scc8530_t>("scc");
+	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
 	offset %= 4;
 	switch(offset)
 	{
 	case 0:
-		return scc->reg_r(*space, 0);
+		return scc->reg_r(space, 0);
 	case 1:
-		return x68k_read_mouse(space->machine());
+		return x68k_read_mouse(space.machine());
 	case 2:
-		return scc->reg_r(*space, 1);
+		return scc->reg_r(space, 1);
 	case 3:
-		return scc->reg_r(*space, 3);
+		return scc->reg_r(space, 3);
 	default:
 		return 0xff;
 	}
@@ -602,14 +602,14 @@ static READ16_HANDLER( x68k_scc_r )
 
 static WRITE16_HANDLER( x68k_scc_w )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
-	scc8530_t *scc = space->machine().device<scc8530_t>("scc");
+	x68k_state *state = space.machine().driver_data<x68k_state>();
+	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
 	offset %= 4;
 
 	switch(offset)
 	{
 	case 0:
-		scc->reg_w(*space, 0,(UINT8)data);
+		scc->reg_w(space, 0,(UINT8)data);
 		if((scc->get_reg_b(5) & 0x02) != state->m_scc_prev)
 		{
 			if(scc->get_reg_b(5) & 0x02)  // Request to Send
@@ -622,13 +622,13 @@ static WRITE16_HANDLER( x68k_scc_w )
 		}
 		break;
 	case 1:
-		scc->reg_w(*space, 2,(UINT8)data);
+		scc->reg_w(space, 2,(UINT8)data);
 		break;
 	case 2:
-		scc->reg_w(*space, 1,(UINT8)data);
+		scc->reg_w(space, 1,(UINT8)data);
 		break;
 	case 3:
-		scc->reg_w(*space, 3,(UINT8)data);
+		scc->reg_w(space, 3,(UINT8)data);
 		break;
 	}
 	state->m_scc_prev = scc->get_reg_b(5) & 0x02;
@@ -967,14 +967,14 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 // NEC uPD72065 at 0xe94000
 static WRITE16_HANDLER( x68k_fdc_w )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
-	device_t *fdc = space->machine().device("upd72065");
+	x68k_state *state = space.machine().driver_data<x68k_state>();
+	device_t *fdc = space.machine().device("upd72065");
 	unsigned int drive, x;
 	switch(offset)
 	{
 	case 0x00:
 	case 0x01:
-		upd765_data_w(fdc, *space, 0,data);
+		upd765_data_w(fdc, space, 0,data);
 		break;
 	case 0x02:  // drive option signal control
 		x = data & 0x0f;
@@ -989,8 +989,8 @@ static WRITE16_HANDLER( x68k_fdc_w )
 					output_set_indexed_value("eject_drv",drive,(data & 0x40) ? 1 : 0);
 					if(data & 0x20)  // ejects disk
 					{
-						(dynamic_cast<device_image_interface *>(floppy_get_device(space->machine(), drive)))->unload();
-						floppy_mon_w(floppy_get_device(space->machine(), drive), ASSERT_LINE);
+						(dynamic_cast<device_image_interface *>(floppy_get_device(space.machine(), drive)))->unload();
+						floppy_mon_w(floppy_get_device(space.machine(), drive), ASSERT_LINE);
 					}
 				}
 			}
@@ -1001,14 +1001,14 @@ static WRITE16_HANDLER( x68k_fdc_w )
 	case 0x03:
 		state->m_fdc.media_density[data & 0x03] = data & 0x10;
 		state->m_fdc.motor[data & 0x03] = data & 0x80;
-		floppy_mon_w(floppy_get_device(space->machine(), data & 0x03), !BIT(data, 7));
+		floppy_mon_w(floppy_get_device(space.machine(), data & 0x03), !BIT(data, 7));
 		if(data & 0x80)
 		{
 			for(drive=0;drive<4;drive++) // enable motor for this drive
 			{
 				if(drive == (data & 0x03))
 				{
-					floppy_mon_w(floppy_get_device(space->machine(), drive), CLEAR_LINE);
+					floppy_mon_w(floppy_get_device(space.machine(), drive), CLEAR_LINE);
 					output_set_indexed_value("access_drv",drive,0);
 				}
 				else
@@ -1019,14 +1019,14 @@ static WRITE16_HANDLER( x68k_fdc_w )
 		{
 			for(drive=0;drive<4;drive++)
 			{
-				floppy_mon_w(floppy_get_device(space->machine(), drive), ASSERT_LINE);
+				floppy_mon_w(floppy_get_device(space.machine(), drive), ASSERT_LINE);
 				output_set_indexed_value("access_drv",drive,1);
 			}
 		}
-		floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0),1,1);
-		floppy_drive_set_ready_state(floppy_get_device(space->machine(), 1),1,1);
-		floppy_drive_set_ready_state(floppy_get_device(space->machine(), 2),1,1);
-		floppy_drive_set_ready_state(floppy_get_device(space->machine(), 3),1,1);
+		floppy_drive_set_ready_state(floppy_get_device(space.machine(), 0),1,1);
+		floppy_drive_set_ready_state(floppy_get_device(space.machine(), 1),1,1);
+		floppy_drive_set_ready_state(floppy_get_device(space.machine(), 2),1,1);
+		floppy_drive_set_ready_state(floppy_get_device(space.machine(), 3),1,1);
 #if 0
 		for(drive=0;drive<4;drive++)
 		{
@@ -1039,24 +1039,24 @@ static WRITE16_HANDLER( x68k_fdc_w )
 		logerror("FDC: Drive #%i: Drive selection set to %02x\n",data & 0x03,data);
 		break;
 	default:
-//      logerror("FDC: [%08x] Wrote %04x to invalid FDC port %04x\n",space->device().safe_pc(),data,offset);
+//      logerror("FDC: [%08x] Wrote %04x to invalid FDC port %04x\n",space.device().safe_pc(),data,offset);
 		break;
 	}
 }
 
 static READ16_HANDLER( x68k_fdc_r )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	unsigned int ret;
 	int x;
-	device_t *fdc = space->machine().device("upd72065");
+	device_t *fdc = space.machine().device("upd72065");
 
 	switch(offset)
 	{
 	case 0x00:
-		return upd765_status_r(fdc, *space, 0);
+		return upd765_status_r(fdc, space, 0);
 	case 0x01:
-		return upd765_data_r(fdc, *space, 0);
+		return upd765_data_r(fdc, space, 0);
 	case 0x02:
 		ret = 0x00;
 		for(x=0;x<4;x++)
@@ -1126,7 +1126,7 @@ static WRITE16_HANDLER( x68k_fm_w )
 	{
 	case 0x00:
 	case 0x01:
-		ym2151_w(space->machine().device("ym2151"), *space, offset, data);
+		ym2151_w(space.machine().device("ym2151"), space, offset, data);
 		break;
 	}
 }
@@ -1134,7 +1134,7 @@ static WRITE16_HANDLER( x68k_fm_w )
 static READ16_HANDLER( x68k_fm_r )
 {
 	if(offset == 0x01)
-		return ym2151_r(space->machine().device("ym2151"), *space, 1);
+		return ym2151_r(space.machine().device("ym2151"), space, 1);
 
 	return 0xffff;
 }
@@ -1172,7 +1172,7 @@ static WRITE8_DEVICE_HANDLER( x68k_ct_w )
 */
 static WRITE16_HANDLER( x68k_ioc_w )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	switch(offset)
 	{
 	case 0x00:
@@ -1205,7 +1205,7 @@ static WRITE16_HANDLER( x68k_ioc_w )
 
 static READ16_HANDLER( x68k_ioc_r )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	switch(offset)
 	{
 	case 0x00:
@@ -1238,7 +1238,7 @@ static READ16_HANDLER( x68k_ioc_r )
 */
 static WRITE16_HANDLER( x68k_sysport_w )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	switch(offset)
 	{
 	case 0x00:
@@ -1255,14 +1255,14 @@ static WRITE16_HANDLER( x68k_sysport_w )
 		state->m_sysport.sram_writeprotect = data;
 		break;
 	default:
-//      logerror("SYS: [%08x] Wrote %04x to invalid or unimplemented system port %04x\n",space->device().safe_pc(),data,offset);
+//      logerror("SYS: [%08x] Wrote %04x to invalid or unimplemented system port %04x\n",space.device().safe_pc(),data,offset);
 		break;
 	}
 }
 
 static READ16_HANDLER( x68k_sysport_r )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	int ret = 0;
 	switch(offset)
 	{
@@ -1284,7 +1284,7 @@ static READ16_HANDLER( x68k_sysport_r )
 #ifdef UNUSED_FUNCTION
 static READ16_HANDLER( x68k_mfp_r )
 {
-	device_t *x68k_mfp = space->machine().device(MC68901_TAG);
+	device_t *x68k_mfp = space.machine().device(MC68901_TAG);
 
 	return mc68901_register_r(x68k_mfp, offset);
 }
@@ -1292,11 +1292,11 @@ static READ16_HANDLER( x68k_mfp_r )
 
 static READ16_HANDLER( x68k_mfp_r )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 
 	// Initial settings indicate that IRQs are generated for FM (YM2151), Receive buffer error or full,
     // MFP Timer C, and the power switch
-//  logerror("MFP: [%08x] Reading offset %i\n",space->device().safe_pc(),offset);
+//  logerror("MFP: [%08x] Reading offset %i\n",space.device().safe_pc(),offset);
     switch(offset)
     {
 #if 0
@@ -1310,7 +1310,7 @@ static READ16_HANDLER( x68k_mfp_r )
 //          ret |= 0x08;  // FM IRQ signal
         if(machine.primary_screen->hpos() > state->m_crtc.width - 32)
             ret |= 0x80;  // Hsync signal
-//      logerror("MFP: [%08x] Reading offset %i (ret=%02x)\n",space->device().safe_pc(),offset,ret);
+//      logerror("MFP: [%08x] Reading offset %i (ret=%02x)\n",space.device().safe_pc(),offset,ret);
         return ret;  // bit 5 is always 1
     case 3:
         return state->m_mfp.iera;
@@ -1350,14 +1350,14 @@ static READ16_HANDLER( x68k_mfp_r )
     case 23:
         return x68k_keyboard_pop_scancode(state);
     default:
-		if (ACCESSING_BITS_0_7) return state->m_mfpdev->read(*space, offset);
+		if (ACCESSING_BITS_0_7) return state->m_mfpdev->read(space, offset);
     }
     return 0xffff;
 }
 
 static WRITE16_HANDLER( x68k_mfp_w )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 
 	/* For the Interrupt registers, the bits are set out as such:
        Reg A - bit 7: GPIP7 (HSync)
@@ -1477,11 +1477,11 @@ static WRITE16_HANDLER( x68k_mfp_w )
 			// Keyboard control command.
 			state->m_mfp.usart.send_buffer = data;
 			x68k_keyboard_ctrl_w(state, data);
-//          logerror("MFP: [%08x] USART Sent data %04x\n",space->device().safe_pc(),data);
+//          logerror("MFP: [%08x] USART Sent data %04x\n",space.device().safe_pc(),data);
 		}
 		break;
 	default:
-		if (ACCESSING_BITS_0_7) state->m_mfpdev->write(*space, offset, data & 0xff);
+		if (ACCESSING_BITS_0_7) state->m_mfpdev->write(space, offset, data & 0xff);
 		return;
 	}
 }
@@ -1489,28 +1489,28 @@ static WRITE16_HANDLER( x68k_mfp_w )
 
 static WRITE16_HANDLER( x68k_ppi_w )
 {
-	i8255_device *ppi = space->machine().device<i8255_device>("ppi8255");
-	ppi->write(*space,offset & 0x03,data);
+	i8255_device *ppi = space.machine().device<i8255_device>("ppi8255");
+	ppi->write(space,offset & 0x03,data);
 }
 
 static READ16_HANDLER( x68k_ppi_r )
 {
-	i8255_device *ppi = space->machine().device<i8255_device>("ppi8255");
-	return ppi->read(*space,offset & 0x03);
+	i8255_device *ppi = space.machine().device<i8255_device>("ppi8255");
+	return ppi->read(space,offset & 0x03);
 }
 
 static READ16_HANDLER( x68k_rtc_r )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 
-	return state->m_rtc->read(*space, offset);
+	return state->m_rtc->read(space, offset);
 }
 
 static WRITE16_HANDLER( x68k_rtc_w )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 
-	state->m_rtc->write(*space, offset, data);
+	state->m_rtc->write(space, offset, data);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( x68k_rtc_alarm_irq )
@@ -1540,7 +1540,7 @@ static WRITE_LINE_DEVICE_HANDLER( x68k_rtc_alarm_irq )
 
 static WRITE16_HANDLER( x68k_sram_w )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 
 	if(state->m_sysport.sram_writeprotect == 0x31)
 	{
@@ -1550,12 +1550,12 @@ static WRITE16_HANDLER( x68k_sram_w )
 
 static READ16_HANDLER( x68k_sram_r )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	// HACKS!
 //  if(offset == 0x5a/2)  // 0x5a should be 0 if no SASI HDs are present.
 //      return 0x0000;
 	if(offset == 0x08/2)
-		return space->machine().device<ram_device>(RAM_TAG)->size() >> 16;  // RAM size
+		return space.machine().device<ram_device>(RAM_TAG)->size() >> 16;  // RAM size
 #if 0
 	if(offset == 0x46/2)
 		return 0x0024;
@@ -1569,9 +1569,9 @@ static READ16_HANDLER( x68k_sram_r )
 
 static READ32_HANDLER( x68k_sram32_r )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	if(offset == 0x08/4)
-		return (space->machine().device<ram_device>(RAM_TAG)->size() & 0xffff0000);  // RAM size
+		return (space.machine().device<ram_device>(RAM_TAG)->size() & 0xffff0000);  // RAM size
 #if 0
 	if(offset == 0x46/2)
 		return 0x0024;
@@ -1585,7 +1585,7 @@ static READ32_HANDLER( x68k_sram32_r )
 
 static WRITE32_HANDLER( x68k_sram32_w )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	if(state->m_sysport.sram_writeprotect == 0x31)
 	{
 		COMBINE_DATA(state->m_nvram32 + offset);
@@ -1594,13 +1594,13 @@ static WRITE32_HANDLER( x68k_sram32_w )
 
 static WRITE16_HANDLER( x68k_vid_w )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	int val;
 	if(offset < 0x100)  // Graphic layer palette
 	{
 		COMBINE_DATA(state->m_video.gfx_pal+offset);
 		val = state->m_video.gfx_pal[offset];
-		palette_set_color_rgb(space->machine(),offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
+		palette_set_color_rgb(space.machine(),offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
 		return;
 	}
 
@@ -1608,7 +1608,7 @@ static WRITE16_HANDLER( x68k_vid_w )
 	{
 		COMBINE_DATA(state->m_video.text_pal+(offset-0x100));
 		val = state->m_video.text_pal[offset-0x100];
-		palette_set_color_rgb(space->machine(),offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
+		palette_set_color_rgb(space.machine(),offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
 		return;
 	}
 
@@ -1649,7 +1649,7 @@ static WRITE16_HANDLER( x68k_vid_w )
 
 static READ16_HANDLER( x68k_vid_r )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	if(offset < 0x100)
 		return state->m_video.gfx_pal[offset];
 
@@ -1709,77 +1709,77 @@ static TIMER_CALLBACK(x68k_bus_error)
 
 static READ16_HANDLER( x68k_rom0_r )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
        then access causes a bus error */
 	state->m_current_vector[2] = 0x02;  // bus error
 	state->m_current_irq_line = 2;
-//  space->machine().device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
+//  space.machine().device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
 	if(state->ioport("options")->read() & 0x02)
 	{
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_bus_error), 0xbffffc+offset);
+		space.machine().scheduler().timer_set(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_bus_error), 0xbffffc+offset);
 	}
 	return 0xff;
 }
 
 static WRITE16_HANDLER( x68k_rom0_w )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
        then access causes a bus error */
 	state->m_current_vector[2] = 0x02;  // bus error
 	state->m_current_irq_line = 2;
-//  space->machine().device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
+//  space.machine().device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
 	if(state->ioport("options")->read() & 0x02)
 	{
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_bus_error), 0xbffffc+offset);
+		space.machine().scheduler().timer_set(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_bus_error), 0xbffffc+offset);
 	}
 }
 
 static READ16_HANDLER( x68k_emptyram_r )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	/* this location is unused RAM, access here causes a bus error
        Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
 	state->m_current_vector[2] = 0x02;  // bus error
 	state->m_current_irq_line = 2;
-//  space->machine().device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
+//  space.machine().device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
 	if(state->ioport("options")->read() & 0x02)
 	{
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_bus_error), offset);
+		space.machine().scheduler().timer_set(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_bus_error), offset);
 	}
 	return 0xff;
 }
 
 static WRITE16_HANDLER( x68k_emptyram_w )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	/* this location is unused RAM, access here causes a bus error
        Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
 	state->m_current_vector[2] = 0x02;  // bus error
 	state->m_current_irq_line = 2;
-//  space->machine().device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
+//  space.machine().device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
 	if(state->ioport("options")->read() & 0x02)
 	{
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_bus_error), offset);
+		space.machine().scheduler().timer_set(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_bus_error), offset);
 	}
 }
 
 static READ16_HANDLER( x68k_exp_r )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	/* These are expansion devices, if not present, they cause a bus error */
 	if(state->ioport("options")->read() & 0x02)
 	{
@@ -1788,7 +1788,7 @@ static READ16_HANDLER( x68k_exp_r )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(16), FUNC(x68k_bus_error), 0xeafa00+offset);
+		space.machine().scheduler().timer_set(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(16), FUNC(x68k_bus_error), 0xeafa00+offset);
 //      machine.device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
 	}
 	return 0xffff;
@@ -1796,7 +1796,7 @@ static READ16_HANDLER( x68k_exp_r )
 
 static WRITE16_HANDLER( x68k_exp_w )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	/* These are expansion devices, if not present, they cause a bus error */
 	if(state->ioport("options")->read() & 0x02)
 	{
@@ -1805,7 +1805,7 @@ static WRITE16_HANDLER( x68k_exp_w )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(16), FUNC(x68k_bus_error), 0xeafa00+offset);
+		space.machine().scheduler().timer_set(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(16), FUNC(x68k_bus_error), 0xeafa00+offset);
 //      machine.device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
 	}
 }
@@ -2622,21 +2622,21 @@ MACHINE_RESET_MEMBER(x68k_state,x68000)
 
 MACHINE_START_MEMBER(x68k_state,x68000)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/*  Install RAM handlers  */
 	m_spriteram = (UINT16*)(*memregion("user1"));
-	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_emptyram_r));
-	space->install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_emptyram_w));
-	space->install_readwrite_bank(0x000000,machine().device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,"bank1");
+	space.install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_emptyram_r));
+	space.install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_emptyram_w));
+	space.install_readwrite_bank(0x000000,machine().device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,"bank1");
 	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
-	space->install_legacy_read_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram_r));
-	space->install_legacy_write_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram_w));
+	space.install_legacy_read_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram_r));
+	space.install_legacy_write_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram_w));
 	membank("bank2")->set_base(m_gvram16);  // so that code in VRAM is executable - needed for Terra Cresta
-	space->install_legacy_read_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram_r));
-	space->install_legacy_write_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram_w));
+	space.install_legacy_read_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram_r));
+	space.install_legacy_write_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram_w));
 	membank("bank3")->set_base(m_tvram16);  // so that code in VRAM is executable - needed for Terra Cresta
-	space->install_legacy_read_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram_r));
-	space->install_legacy_write_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram_w));
+	space.install_legacy_read_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram_r));
+	space.install_legacy_write_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram_w));
 	membank("bank4")->set_base(m_nvram16);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
@@ -2652,21 +2652,21 @@ MACHINE_START_MEMBER(x68k_state,x68000)
 
 MACHINE_START_MEMBER(x68k_state,x68030)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/*  Install RAM handlers  */
 	m_spriteram = (UINT16*)(*memregion("user1"));
-	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_rom0_r),0xffffffff);
-	space->install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_rom0_w),0xffffffff);
-	space->install_readwrite_bank(0x000000,machine().device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,"bank1");
+	space.install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_rom0_r),0xffffffff);
+	space.install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_rom0_w),0xffffffff);
+	space.install_readwrite_bank(0x000000,machine().device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,"bank1");
 	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
-	space->install_legacy_read_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram32_r));
-	space->install_legacy_write_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram32_w));
+	space.install_legacy_read_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram32_r));
+	space.install_legacy_write_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram32_w));
 	membank("bank2")->set_base(m_gvram32);  // so that code in VRAM is executable - needed for Terra Cresta
-	space->install_legacy_read_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram32_r));
-	space->install_legacy_write_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram32_w));
+	space.install_legacy_read_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram32_r));
+	space.install_legacy_write_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram32_w));
 	membank("bank3")->set_base(m_tvram32);  // so that code in VRAM is executable - needed for Terra Cresta
-	space->install_legacy_read_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram32_r));
-	space->install_legacy_write_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram32_w));
+	space.install_legacy_read_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram32_r));
+	space.install_legacy_write_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram32_w));
 	membank("bank4")->set_base(m_nvram32);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer

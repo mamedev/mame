@@ -1346,7 +1346,7 @@ ROM_END
 
 static void sound_cpu_decrypt(running_machine &machine)
 {
-	address_space *space = machine.device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("audiocpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
 	UINT8 *rom = machine.root_device().memregion("audiocpu")->base();
 	int i;
@@ -1355,7 +1355,7 @@ static void sound_cpu_decrypt(running_machine &machine)
 	for (i = 0xc000; i < 0x10000; i++)
 		decrypted[i - 0xc000] = ((rom[i] & 0x20) << 1) | ((rom[i] & 0x40) >> 1) | (rom[i] & 0x9f);
 
-	space->set_decrypted_region(0xc000, 0xffff, decrypted);
+	space.set_decrypted_region(0xc000, 0xffff, decrypted);
 }
 
 DRIVER_INIT_MEMBER(liberate_state,prosport)
@@ -1380,11 +1380,11 @@ DRIVER_INIT_MEMBER(liberate_state,yellowcb)
 DRIVER_INIT_MEMBER(liberate_state,liberate)
 {
 	int A;
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
 	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
-	space->set_decrypted_region(0x0000, 0xffff, decrypted);
+	space.set_decrypted_region(0x0000, 0xffff, decrypted);
 
 	/* Swap bits for opcodes only, not data */
 	for (A = 0; A < 0x10000; A++) {

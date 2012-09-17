@@ -247,7 +247,7 @@ WRITE32_MEMBER( nubus_cb264_device::cb264_w )
 			break;
 
 		default:
-//          printf("cb264_w: %x to reg %x (mask %x PC %x)\n", data, offset*4, mem_mask, space->device().safe_pc());
+//          printf("cb264_w: %x to reg %x (mask %x PC %x)\n", data, offset*4, mem_mask, space.device().safe_pc());
 			break;
 	}
 }

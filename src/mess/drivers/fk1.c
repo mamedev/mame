@@ -423,10 +423,10 @@ static TIMER_DEVICE_CALLBACK( vsync_callback )
 
 void fk1_state::machine_reset()
 {
-	address_space *space = m_maincpu->space(AS_PROGRAM);
+	address_space &space = *m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
-	space->unmap_write(0x0000, 0x3fff);
+	space.unmap_write(0x0000, 0x3fff);
 	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base()); // ROM
 	membank("bank2")->set_base(ram + 0x10000); // VRAM
 	membank("bank3")->set_base(ram + 0x8000);

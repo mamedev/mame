@@ -316,7 +316,7 @@ static UINT32 read_pixel_32(tms34010_state *tms, offs_t offset)
 static UINT32 read_pixel_shiftreg(tms34010_state *tms, offs_t offset)
 {
 	if (tms->config->to_shiftreg)
-		tms->config->to_shiftreg(tms->program, offset, &tms->shiftreg[0]);
+		tms->config->to_shiftreg(*tms->program, offset, &tms->shiftreg[0]);
 	else
 		fatalerror("To ShiftReg function not set. PC = %08X\n", tms->pc);
 	return tms->shiftreg[0];
@@ -460,7 +460,7 @@ static void write_pixel_r_t_32(tms34010_state *tms, offs_t offset, UINT32 data)
 static void write_pixel_shiftreg(tms34010_state *tms, offs_t offset, UINT32 data)
 {
 	if (tms->config->from_shiftreg)
-		tms->config->from_shiftreg(tms->program, offset, &tms->shiftreg[0]);
+		tms->config->from_shiftreg(*tms->program, offset, &tms->shiftreg[0]);
 	else
 		fatalerror("From ShiftReg function not set. PC = %08X\n", tms->pc);
 }
@@ -699,7 +699,7 @@ static CPU_RESET( tms34010 )
 	/* the first time we are run */
 	tms->reset_deferred = tms->config->halt_on_reset;
 	if (tms->config->halt_on_reset)
-		tms34010_io_register_w(device->space(AS_PROGRAM), REG_HSTCTLH, 0x8000, 0xffff);
+		tms34010_io_register_w(*device->space(AS_PROGRAM), REG_HSTCTLH, 0x8000, 0xffff);
 }
 
 
@@ -1193,7 +1193,7 @@ static const char *const ioreg_name[] =
 
 WRITE16_HANDLER( tms34010_io_register_w )
 {
-	tms34010_state *tms = get_safe_token(&space->device());
+	tms34010_state *tms = get_safe_token(&space.device());
 	int oldreg, newreg;
 
 	/* Set register */
@@ -1222,7 +1222,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 			break;
 
 		case REG_PMASK:
-			if (data) logerror("Plane masking not supported. PC=%08X\n", space->device().safe_pc());
+			if (data) logerror("Plane masking not supported. PC=%08X\n", space.device().safe_pc());
 			break;
 
 		case REG_DPYCTL:
@@ -1262,12 +1262,12 @@ WRITE16_HANDLER( tms34010_io_register_w )
 			if (!(oldreg & 0x0080) && (newreg & 0x0080))
 			{
 				if (tms->config->output_int)
-					(*tms->config->output_int)(&space->device(), 1);
+					(*tms->config->output_int)(&space.device(), 1);
 			}
 			else if ((oldreg & 0x0080) && !(newreg & 0x0080))
 			{
 				if (tms->config->output_int)
-					(*tms->config->output_int)(&space->device(), 0);
+					(*tms->config->output_int)(&space.device(), 0);
 			}
 
 			/* input interrupt? (should really be state-based, but the functions don't exist!) */
@@ -1336,7 +1336,7 @@ static const char *const ioreg020_name[] =
 
 WRITE16_HANDLER( tms34020_io_register_w )
 {
-	tms34010_state *tms = get_safe_token(&space->device());
+	tms34010_state *tms = get_safe_token(&space.device());
 	int oldreg, newreg;
 
 	/* Set register */
@@ -1373,7 +1373,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 		case REG020_PMASKL:
 		case REG020_PMASKH:
-			if (data) logerror("Plane masking not supported. PC=%08X\n", space->device().safe_pc());
+			if (data) logerror("Plane masking not supported. PC=%08X\n", space.device().safe_pc());
 			break;
 
 		case REG020_DPYCTL:
@@ -1413,12 +1413,12 @@ WRITE16_HANDLER( tms34020_io_register_w )
 			if (!(oldreg & 0x0080) && (newreg & 0x0080))
 			{
 				if (tms->config->output_int)
-					(*tms->config->output_int)(&space->device(), 1);
+					(*tms->config->output_int)(&space.device(), 1);
 			}
 			else if ((oldreg & 0x0080) && !(newreg & 0x0080))
 			{
 				if (tms->config->output_int)
-					(*tms->config->output_int)(&space->device(), 0);
+					(*tms->config->output_int)(&space.device(), 0);
 			}
 
 			/* input interrupt? (should really be state-based, but the functions don't exist!) */
@@ -1499,7 +1499,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 READ16_HANDLER( tms34010_io_register_r )
 {
-	tms34010_state *tms = get_safe_token(&space->device());
+	tms34010_state *tms = get_safe_token(&space.device());
 	int result, total;
 
 //  if (LOG_CONTROL_REGS)
@@ -1542,7 +1542,7 @@ READ16_HANDLER( tms34010_io_register_r )
 
 READ16_HANDLER( tms34020_io_register_r )
 {
-	tms34010_state *tms = get_safe_token(&space->device());
+	tms34010_state *tms = get_safe_token(&space.device());
 	int result, total;
 
 //  if (LOG_CONTROL_REGS)
@@ -1595,7 +1595,6 @@ static void tms34010_state_postload(tms34010_state *tms)
 
 void tms34010_host_w(device_t *cpu, int reg, int data)
 {
-	address_space *space;
 	tms34010_state *tms = get_safe_token(cpu);
 	unsigned int addr;
 
@@ -1629,12 +1628,14 @@ void tms34010_host_w(device_t *cpu, int reg, int data)
 
 		/* control register */
 		case TMS34010_HOST_CONTROL:
+		{
 			tms->external_host_access = TRUE;
-			space = tms->device->space(AS_PROGRAM);
+			address_space &space = *tms->device->space(AS_PROGRAM);
 			tms34010_io_register_w(space, REG_HSTCTLH, data & 0xff00, 0xffff);
 			tms34010_io_register_w(space, REG_HSTCTLL, data & 0x00ff, 0xffff);
 			tms->external_host_access = FALSE;
 			break;
+		}
 
 		/* error case */
 		default:

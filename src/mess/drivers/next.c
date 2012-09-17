@@ -304,7 +304,7 @@ void next_state::dma_drq_w(int slot, bool state)
 	dma_slot &ds = dma_slots[slot];
 	ds.drq = state;
 	if(state && (ds.state & DMA_ENABLE)) {
-		address_space *space = maincpu->space(AS_PROGRAM);
+		address_space &space = *maincpu->space(AS_PROGRAM);
 		if(ds.state & DMA_READ) {
 			while(ds.drq) {
 				dma_check_update(slot);
@@ -317,7 +317,7 @@ void next_state::dma_drq_w(int slot, bool state)
 					logerror("DMA: bus error on read slot %d\n", slot);
 					return;
 				}
-				space->write_byte(ds.current++, val);
+				space.write_byte(ds.current++, val);
 				dma_check_end(slot, eof);
 				if(!(ds.state & DMA_ENABLE))
 					return;
@@ -325,7 +325,7 @@ void next_state::dma_drq_w(int slot, bool state)
 		} else {
 			while(ds.drq) {
 				dma_check_update(slot);
-				UINT8 val = space->read_byte(ds.current++);
+				UINT8 val = space.read_byte(ds.current++);
 				bool eof = ds.current == (ds.limit & 0x7fffffff) && (ds.limit & 0x80000000);
 				bool err;
 				dma_write(slot, val, eof, err);

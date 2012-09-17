@@ -826,20 +826,20 @@ WRITE8_DEVICE_HANDLER(apollo_ptm_w) {
  ***************************************************************************/
 
 static DEVICE_RESET( apollo_rtc ) {
-	address_space *space = device->machine().device(MAINCPU)->memory().space(AS_PROGRAM);
+	address_space &space = *device->machine().device(MAINCPU)->memory().space(AS_PROGRAM);
 	apollo_state *state = device->machine().driver_data<apollo_state>();
-	UINT8 year = state->apollo_rtc_r(*space, 9);
+	UINT8 year = state->apollo_rtc_r(space, 9);
 
 	// change year according to configuration settings
 	if (year < 20 && apollo_config(APOLLO_CONF_DATE_1990))
 	{
 		year+=80;
-		state->apollo_rtc_w(*space, 9, year);
+		state->apollo_rtc_w(space, 9, year);
 	}
 	else if (year >= 80 && !apollo_config(APOLLO_CONF_DATE_1990))
 	{
 		year -=80;
-		state->apollo_rtc_w(*space, 9, year);
+		state->apollo_rtc_w(space, 9, year);
 	}
 
 	//SLOG1(("reset apollo_rtc year=%d", year));
@@ -872,13 +872,13 @@ READ8_MEMBER(apollo_state::apollo_rtc_r)
 static TIMER_CALLBACK( apollo_rtc_timer )
 {
 	apollo_state *state = machine.driver_data<apollo_state>();
-	address_space *space = machine.device(MAINCPU)->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device(MAINCPU)->memory().space(AS_PROGRAM);
 
 	// FIXME: reading register 0x0c will clear all interrupt flags
-	if ((state->apollo_rtc_r(*space, 0x0c) & 0x80))
+	if ((state->apollo_rtc_r(space, 0x0c) & 0x80))
 	{
 		//SLOG2(("apollo_rtc_timer - set_irq_line %d", APOLLO_IRQ_RTC));
-		apollo_pic_set_irq_line(&space->device(), APOLLO_IRQ_RTC, 1);
+		apollo_pic_set_irq_line(&space.device(), APOLLO_IRQ_RTC, 1);
 	}
 }
 
@@ -1343,11 +1343,11 @@ static DEVICE_RESET( apollo_fdc ) {
 
 WRITE8_MEMBER(apollo_state::apollo_fdc_w){
 	SLOG1(("writing FDC upd765 at offset %X = %02x", offset, data));
-	pc_fdc_w(&space, offset, data);
+	pc_fdc_w(space, offset, data);
 }
 
 READ8_MEMBER(apollo_state::apollo_fdc_r){
-	UINT8 data = pc_fdc_r(&space, offset);
+	UINT8 data = pc_fdc_r(space, offset);
 	SLOG1(("reading FDC upd765 at offset %X = %02x", offset, data));
 	return data;
 }

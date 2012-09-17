@@ -200,11 +200,11 @@ void quizpun2_state::machine_reset()
 	prot.addr = 0;
 }
 
-static void log_protection( address_space *space, const char *warning )
+static void log_protection( address_space &space, const char *warning )
 {
-	quizpun2_state *state = space->machine().driver_data<quizpun2_state>();
+	quizpun2_state *state = space.machine().driver_data<quizpun2_state>();
 	struct prot_t &prot = state->m_prot;
-	logerror("%04x: protection - %s (state %x, wait %x, param %02x, cmd %02x, addr %02x)\n", space->device().safe_pc(), warning,
+	logerror("%04x: protection - %s (state %x, wait %x, param %02x, cmd %02x, addr %02x)\n", space.device().safe_pc(), warning,
 		prot.state,
 		prot.wait_param,
 		prot.param,
@@ -242,7 +242,7 @@ READ8_MEMBER(quizpun2_state::quizpun2_protection_r)
 					break;
 
 				default:
-					log_protection(&space, "unknown address");
+					log_protection(space, "unknown address");
 					ret = 0x2e59 >> ((prot.addr & 1) ? 0 : 8);	// return the address of: XOR A, RET
 			}
 			break;
@@ -255,12 +255,12 @@ READ8_MEMBER(quizpun2_state::quizpun2_protection_r)
 		}
 
 		default:
-			log_protection(&space, "unknown read");
+			log_protection(space, "unknown read");
 			ret = 0x00;
 	}
 
 #if VERBOSE_PROTECTION_LOG
-	log_protection(&space, "info READ");
+	log_protection(space, "info READ");
 #endif
 
 	prot.addr++;
@@ -305,7 +305,7 @@ WRITE8_MEMBER(quizpun2_state::quizpun2_protection_w)
 						prot.addr = 0;
 					}
 					else
-						log_protection(&space, "unknown command");
+						log_protection(space, "unknown command");
 				}
 				else if (prot.cmd >= 0x00 && prot.cmd <= 0x0f )
 				{
@@ -320,7 +320,7 @@ WRITE8_MEMBER(quizpun2_state::quizpun2_protection_w)
 				else
 				{
 					prot.state = STATE_IDLE;
-					log_protection(&space, "unknown command");
+					log_protection(space, "unknown command");
 				}
 			}
 			else
@@ -332,7 +332,7 @@ WRITE8_MEMBER(quizpun2_state::quizpun2_protection_w)
 	}
 
 #if VERBOSE_PROTECTION_LOG
-	log_protection(&space, "info WRITE");
+	log_protection(space, "info WRITE");
 #endif
 }
 

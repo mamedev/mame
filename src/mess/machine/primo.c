@@ -47,23 +47,23 @@ INTERRUPT_GEN( primo_vblank_interrupt )
 static void primo_update_memory(running_machine &machine)
 {
 	primo_state *state = machine.driver_data<primo_state>();
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	switch (state->m_port_FD & 0x03)
 	{
 		case 0x00:	/* Original ROM */
-			space->unmap_write(0x0000, 0x3fff);
+			space.unmap_write(0x0000, 0x3fff);
 			state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base()+0x10000);
 			break;
 		case 0x01:	/* EPROM extension 1 */
-			space->unmap_write(0x0000, 0x3fff);
+			space.unmap_write(0x0000, 0x3fff);
 			state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base()+0x14000);
 			break;
 		case 0x02:	/* RAM */
-			space->install_write_bank(0x0000, 0x3fff, "bank1");
+			space.install_write_bank(0x0000, 0x3fff, "bank1");
 			state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base());
 			break;
 		case 0x03:	/* EPROM extension 2 */
-			space->unmap_write(0x0000, 0x3fff);
+			space.unmap_write(0x0000, 0x3fff);
 			state->membank("bank1")->set_base(state->memregion("maincpu")->base()+0x18000);
 			break;
 	}

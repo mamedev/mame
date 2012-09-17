@@ -399,7 +399,7 @@ static void akiko_set_cd_status(akiko_state *state, UINT32 status)
 	if ( state->m_cdrom_status[0] & state->m_cdrom_status[1] )
 	{
 		if (LOG_AKIKO_CD) logerror( "Akiko CD IRQ\n" );
-		amiga_custom_w(state->m_space, REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
+		amiga_custom_w(*state->m_space, REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
 	}
 }
 

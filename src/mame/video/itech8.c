@@ -280,9 +280,9 @@ INLINE void consume_rle(itech8_state *state, int count)
  *
  *************************************/
 
-static void perform_blit(address_space *space)
+static void perform_blit(address_space &space)
 {
-	itech8_state *state = space->machine().driver_data<itech8_state>();
+	itech8_state *state = space.machine().driver_data<itech8_state>();
 	struct tms34061_display &tms_state = state->m_tms_state;
 	UINT8 *blitter_data = state->m_blitter_data;
 	offs_t addr = state->m_tms_state.regs[TMS34061_XYADDRESS] | ((tms_state.regs[TMS34061_XYOFFSET] & 0x300) << 8);
@@ -303,7 +303,7 @@ static void perform_blit(address_space *space)
 	/* debugging */
 	if (FULL_LOGGING)
 		logerror("Blit: scan=%d  src=%06x @ (%05x) for %dx%d ... flags=%02x\n",
-				space->machine().primary_screen->vpos(),
+				space.machine().primary_screen->vpos(),
 				(state->m_grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO,
 				tms_state.regs[TMS34061_XYADDRESS] | ((tms_state.regs[TMS34061_XYOFFSET] & 0x300) << 8),
 				BLITTER_WIDTH, BLITTER_HEIGHT, BLITTER_FLAGS);
@@ -498,7 +498,7 @@ WRITE8_MEMBER(itech8_state::itech8_blitter_w)
 		}
 
 		/* perform the blit */
-		perform_blit(&space);
+		perform_blit(space);
 		m_blit_in_progress = 1;
 
 		/* set a timer to go off when we're done */
@@ -528,7 +528,7 @@ WRITE8_MEMBER(itech8_state::itech8_tms34061_w)
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	tms34061_w(&space, col, 0xff, func, data);
+	tms34061_w(space, col, 0xff, func, data);
 }
 
 
@@ -543,7 +543,7 @@ READ8_MEMBER(itech8_state::itech8_tms34061_r)
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	return tms34061_r(&space, col, 0xff, func);
+	return tms34061_r(space, col, 0xff, func);
 }
 
 

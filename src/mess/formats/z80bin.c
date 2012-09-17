@@ -122,18 +122,18 @@ QUICKLOAD_LOAD( mbee_z80bin )
 		autorun = image.device().machine().root_device().ioport("CONFIG")->read_safe(0xFF) & 1;
 
 		device_t *cpu = image.device().machine().device("maincpu");
-		address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = *image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-		space->write_word(0xa6, execute_address);			/* fix the EXEC command */
+		space.write_word(0xa6, execute_address);			/* fix the EXEC command */
 
 		if (autorun)
 		{
-			space->write_word(0xa2, execute_address);		/* fix warm-start vector to get around some copy-protections */
+			space.write_word(0xa2, execute_address);		/* fix warm-start vector to get around some copy-protections */
 			cpu->state().set_pc(execute_address);
 		}
 		else
 		{
-			space->write_word(0xa2, 0x8517);
+			space.write_word(0xa2, 0x8517);
 		}
 	}
 
@@ -158,9 +158,9 @@ QUICKLOAD_LOAD( sorcerer )
 		/* check to see if autorun is on (I hate how this works) */
 		autorun = image.device().machine().root_device().ioport("CONFIG")->read_safe(0xFF) & 1;
 
-		address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = *image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-		if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (space->read_byte(0xdffa) != 0xc3))
+		if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (space.read_byte(0xdffa) != 0xc3))
 			return IMAGE_INIT_FAIL;		/* can't run a program if the cartridge isn't in */
 
 		/* Since Exidy Basic is by Microsoft, it needs some preprocessing before it can be run.
@@ -182,17 +182,17 @@ QUICKLOAD_LOAD( sorcerer )
 			};
 
 			for (i = 0; i < ARRAY_LENGTH(data); i++)
-				space->write_byte(0xf01f + i, data[i]);
+				space.write_byte(0xf01f + i, data[i]);
 
 			if (!autorun)
-				space->write_word(0xf028,0xc3dd);
+				space.write_word(0xf028,0xc3dd);
 
 			/* tell BASIC where program ends */
-			space->write_byte(0x1b7, end_address & 0xff);
-			space->write_byte(0x1b8, (end_address >> 8) & 0xff);
+			space.write_byte(0x1b7, end_address & 0xff);
+			space.write_byte(0x1b8, (end_address >> 8) & 0xff);
 
 			if ((execute_address != 0xc858) && autorun)
-				space->write_word(0xf028, execute_address);
+				space.write_word(0xf028, execute_address);
 
 			image.device().machine().device("maincpu")->state().set_pc(0xf01f);
 		}

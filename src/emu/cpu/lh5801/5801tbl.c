@@ -35,10 +35,10 @@ INLINE void lh5801_adc(lh5801_state *cpustate, UINT8 data)
 	cpustate->a=lh5801_add_generic(cpustate,cpustate->a,data,cpustate->t&C);
 }
 
-INLINE void lh5801_add_mem(lh5801_state *cpustate, address_space *space, int addr, UINT8 data)
+INLINE void lh5801_add_mem(lh5801_state *cpustate, address_space &space, int addr, UINT8 data)
 {
-	int v=lh5801_add_generic(cpustate, space->read_byte(addr),data,0);
-	space->write_byte(addr,v);
+	int v=lh5801_add_generic(cpustate, space.read_byte(addr),data,0);
+	space.write_byte(addr,v);
 }
 
 INLINE void lh5801_adr(lh5801_state *cpustate, PAIR *reg)
@@ -95,12 +95,12 @@ INLINE void lh5801_and(lh5801_state *cpustate, UINT8 data)
 	if (!cpustate->a) cpustate->t|=Z;
 }
 
-INLINE void lh5801_and_mem(lh5801_state *cpustate, address_space *space, int addr, UINT8 data)
+INLINE void lh5801_and_mem(lh5801_state *cpustate, address_space &space, int addr, UINT8 data)
 {
-	data&=space->read_byte(addr);
+	data&=space.read_byte(addr);
 	cpustate->t&=~Z;
 	if (!data) cpustate->t|=Z;
-	space->write_byte(addr,data);
+	space.write_byte(addr,data);
 }
 
 INLINE void lh5801_bit(lh5801_state *cpustate, UINT8 a, UINT8 b)
@@ -123,12 +123,12 @@ INLINE void lh5801_ora(lh5801_state *cpustate, UINT8 data)
 	if (!cpustate->a) cpustate->t|=Z;
 }
 
-INLINE void lh5801_ora_mem(lh5801_state *cpustate, address_space *space, int addr, UINT8 data)
+INLINE void lh5801_ora_mem(lh5801_state *cpustate, address_space &space, int addr, UINT8 data)
 {
-	data|=space->read_byte(addr);
+	data|=space.read_byte(addr);
 	cpustate->t&=~Z;
 	if (!data) cpustate->t|=Z;
-	space->write_byte(addr,data);
+	space.write_byte(addr,data);
 }
 
 INLINE void lh5801_lda(lh5801_state *cpustate, UINT8 data)
@@ -270,20 +270,20 @@ INLINE void lh5801_aex(lh5801_state *cpustate)
 	// flags?
 }
 
-INLINE void lh5801_drl(lh5801_state *cpustate, address_space *space, int adr)
+INLINE void lh5801_drl(lh5801_state *cpustate, address_space &space, int adr)
 {
-	UINT16 t=cpustate->a|(space->read_byte(adr)<<8);
+	UINT16 t=cpustate->a|(space.read_byte(adr)<<8);
 
 	cpustate->a=t>>8;
-	space->write_byte(adr,t>>4);
+	space.write_byte(adr,t>>4);
 }
 
-INLINE void lh5801_drr(lh5801_state *cpustate, address_space *space, int adr)
+INLINE void lh5801_drr(lh5801_state *cpustate, address_space &space, int adr)
 {
-	UINT16 t=space->read_byte(adr)|(cpustate->a<<8);
+	UINT16 t=space.read_byte(adr)|(cpustate->a<<8);
 
 	cpustate->a=t;
-	space->write_byte(adr,t>>4);
+	space.write_byte(adr,t>>4);
 }
 
 INLINE void lh5801_rol(lh5801_state *cpustate)
@@ -398,29 +398,29 @@ static void lh5801_instruction_fd(lh5801_state *cpustate)
 	case 0x40: lh5801_inc(cpustate,&XH);cpustate->icount-=9;break;
 	case 0x42: lh5801_dec(cpustate,&XH);cpustate->icount-=9;break;
 	case 0x48: X=S;cpustate->icount-=11;break;
-	case 0x49: lh5801_and_mem(cpustate, cpustate->io, X, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=17;break;
+	case 0x49: lh5801_and_mem(cpustate, *cpustate->io, X, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=17;break;
 	case 0x4a: X=X;cpustate->icount-=11;break; //!!!
-	case 0x4b: lh5801_ora_mem(cpustate, cpustate->io, X, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=17;break;
+	case 0x4b: lh5801_ora_mem(cpustate, *cpustate->io, X, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=17;break;
 	case 0x4c: cpustate->bf=0;/*off !*/ cpustate->icount-=8;break;
 	case 0x4d: lh5801_bit(cpustate,cpustate->io->read_byte(X), cpustate->direct->read_decrypted_byte(P++));cpustate->icount-=14;break;
 	case 0x4e: S=X;cpustate->icount-=11;break;
-	case 0x4f: lh5801_add_mem(cpustate, cpustate->io, X, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=17;break;
+	case 0x4f: lh5801_add_mem(cpustate, *cpustate->io, X, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=17;break;
 	case 0x50: lh5801_inc(cpustate,&YH);cpustate->icount-=9;break;
 	case 0x52: lh5801_dec(cpustate,&YH);cpustate->icount-=9;break;
 	case 0x58: X=P;cpustate->icount-=11;break;
-	case 0x59: lh5801_and_mem(cpustate, cpustate->io, Y, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=17;break;
+	case 0x59: lh5801_and_mem(cpustate, *cpustate->io, Y, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=17;break;
 	case 0x5a: Y=X;cpustate->icount-=11;break;
-	case 0x5b: lh5801_ora_mem(cpustate, cpustate->io, Y, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=17;break;
+	case 0x5b: lh5801_ora_mem(cpustate, *cpustate->io, Y, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=17;break;
 	case 0x5d: lh5801_bit(cpustate,cpustate->io->read_byte(Y), cpustate->direct->read_decrypted_byte(P++));cpustate->icount-=14;break;
 	case 0x5e: lh5801_jmp(cpustate,X);cpustate->icount-=11;break; // P=X
-	case 0x5f: lh5801_add_mem(cpustate, cpustate->io, Y, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=17;break;
+	case 0x5f: lh5801_add_mem(cpustate, *cpustate->io, Y, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=17;break;
 	case 0x60: lh5801_inc(cpustate,&UH);cpustate->icount-=9;break;
 	case 0x62: lh5801_dec(cpustate,&UH);cpustate->icount-=9;break;
-	case 0x69: lh5801_and_mem(cpustate, cpustate->io, U, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=17;break;
+	case 0x69: lh5801_and_mem(cpustate, *cpustate->io, U, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=17;break;
 	case 0x6a: U=X;cpustate->icount-=11;break;
-	case 0x6b: lh5801_ora_mem(cpustate, cpustate->io, U, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=17;break;
+	case 0x6b: lh5801_ora_mem(cpustate, *cpustate->io, U, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=17;break;
 	case 0x6d: lh5801_bit(cpustate,cpustate->io->read_byte(X), cpustate->direct->read_decrypted_byte(P++));cpustate->icount-=14;break;
-	case 0x6f: lh5801_add_mem(cpustate, cpustate->io, U, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=17;break;
+	case 0x6f: lh5801_add_mem(cpustate, *cpustate->io, U, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=17;break;
 	case 0x81: cpustate->t|=IE; /*sie !*/cpustate->icount-=8;break;
 	case 0x88: lh5801_push_word(cpustate,X); cpustate->icount-=14;break;
 	case 0x8a: lh5801_pop(cpustate); cpustate->icount-=12; break;
@@ -449,18 +449,18 @@ static void lh5801_instruction_fd(lh5801_state *cpustate)
 	case 0xca: lh5801_adr(cpustate,&cpustate->x);cpustate->icount-=11;break;
 	case 0xcc: /*atp sends a to data bus*/cpustate->icount-=9;break;
 	case 0xce: lh5801_am(cpustate,cpustate->a); cpustate->icount-=9; break;
-	case 0xd3: lh5801_drr(cpustate, cpustate->io, X); cpustate->icount-=16; break;
-	case 0xd7: lh5801_drl(cpustate, cpustate->io, X); cpustate->icount-=16; break;
+	case 0xd3: lh5801_drr(cpustate, *cpustate->io, X); cpustate->icount-=16; break;
+	case 0xd7: lh5801_drl(cpustate, *cpustate->io, X); cpustate->icount-=16; break;
 	case 0xda: lh5801_adr(cpustate,&cpustate->y);cpustate->icount-=11;break;
 	case 0xde: lh5801_am(cpustate,cpustate->a|0x100); cpustate->icount-=9; break;
 	case 0xea: lh5801_adr(cpustate,&cpustate->u);cpustate->icount-=11;break;
 	case 0xe9:
 		adr=lh5801_readop_word(cpustate);
-		lh5801_and_mem(cpustate, cpustate->io, adr, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=23;
+		lh5801_and_mem(cpustate, *cpustate->io, adr, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=23;
 		break;
 	case 0xeb:
 		adr=lh5801_readop_word(cpustate);
-		lh5801_ora_mem(cpustate, cpustate->io, adr, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=23;
+		lh5801_ora_mem(cpustate, *cpustate->io, adr, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=23;
 		break;
 	case 0xec: cpustate->t=cpustate->a; cpustate->icount-=9;break;
 	case 0xed:
@@ -469,7 +469,7 @@ static void lh5801_instruction_fd(lh5801_state *cpustate)
 		cpustate->icount-=20;break;
 	case 0xef:
 		adr=lh5801_readop_word(cpustate);
-		lh5801_add_mem(cpustate, cpustate->io, adr, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=23;
+		lh5801_add_mem(cpustate, *cpustate->io, adr, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=23;
 		break;
 
 	default:
@@ -542,13 +542,13 @@ static void lh5801_instruction(lh5801_state *cpustate)
 	case 0x46: X--;cpustate->icount-=5;break;
 	case 0x47: lh5801_lde(cpustate,&cpustate->x);cpustate->icount-=6;break;
 	case 0x48: XH=cpustate->direct->read_decrypted_byte(P++);cpustate->icount-=6;break;
-	case 0x49: lh5801_and_mem(cpustate, cpustate->program, X, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=13;break;
+	case 0x49: lh5801_and_mem(cpustate, *cpustate->program, X, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=13;break;
 	case 0x4a: XL=cpustate->direct->read_decrypted_byte(P++);cpustate->icount-=6;break;
-	case 0x4b: lh5801_ora_mem(cpustate, cpustate->program, X, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=13;break;
+	case 0x4b: lh5801_ora_mem(cpustate, *cpustate->program, X, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=13;break;
 	case 0x4c: lh5801_cpa(cpustate,XH, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=7;break;
 	case 0x4d: lh5801_bit(cpustate,cpustate->program->read_byte(X), cpustate->direct->read_decrypted_byte(P++));cpustate->icount-=10;break;
 	case 0x4e: lh5801_cpa(cpustate,XL, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=7;break;
-	case 0x4f: lh5801_add_mem(cpustate, cpustate->program, X, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=13;break;
+	case 0x4f: lh5801_add_mem(cpustate, *cpustate->program, X, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=13;break;
 	case 0x50: lh5801_inc(cpustate,&YL);cpustate->icount-=5;break;
 	case 0x51: lh5801_sin(cpustate,&cpustate->y); cpustate->icount-=6;break;
 	case 0x52: lh5801_dec(cpustate,&YL);cpustate->icount-=5;break;
@@ -558,13 +558,13 @@ static void lh5801_instruction(lh5801_state *cpustate)
 	case 0x56: Y--;cpustate->icount-=5;break;
 	case 0x57: lh5801_lde(cpustate,&cpustate->y);cpustate->icount-=6;break;
 	case 0x58: YH=cpustate->direct->read_decrypted_byte(P++);cpustate->icount-=6;break;
-	case 0x59: lh5801_and_mem(cpustate, cpustate->program, Y, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=13;break;
+	case 0x59: lh5801_and_mem(cpustate, *cpustate->program, Y, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=13;break;
 	case 0x5a: YL=cpustate->direct->read_decrypted_byte(P++);cpustate->icount-=6;break;
-	case 0x5b: lh5801_ora_mem(cpustate, cpustate->program, Y, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=13;break;
+	case 0x5b: lh5801_ora_mem(cpustate, *cpustate->program, Y, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=13;break;
 	case 0x5c: lh5801_cpa(cpustate,YH, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=7;break;
 	case 0x5d: lh5801_bit(cpustate,cpustate->program->read_byte(Y), cpustate->direct->read_decrypted_byte(P++));cpustate->icount-=10;break;
 	case 0x5e: lh5801_cpa(cpustate,YL, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=7;break;
-	case 0x5f: lh5801_add_mem(cpustate, cpustate->program, Y, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=13;break;
+	case 0x5f: lh5801_add_mem(cpustate, *cpustate->program, Y, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=13;break;
 	case 0x60: lh5801_inc(cpustate,&UL);cpustate->icount-=5;break;
 	case 0x61: lh5801_sin(cpustate,&cpustate->u); cpustate->icount-=6;break;
 	case 0x62: lh5801_dec(cpustate,&UL);cpustate->icount-=5;break;
@@ -574,13 +574,13 @@ static void lh5801_instruction(lh5801_state *cpustate)
 	case 0x66: U--;cpustate->icount-=5;break;
 	case 0x67: lh5801_lde(cpustate,&cpustate->u);cpustate->icount-=6;break;
 	case 0x68: UH=cpustate->direct->read_decrypted_byte(P++);cpustate->icount-=6;break;
-	case 0x69: lh5801_and_mem(cpustate, cpustate->program, U, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=13;break;
+	case 0x69: lh5801_and_mem(cpustate, *cpustate->program, U, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=13;break;
 	case 0x6a: UL=cpustate->direct->read_decrypted_byte(P++);cpustate->icount-=6;break;
-	case 0x6b: lh5801_ora_mem(cpustate, cpustate->program, U, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=13;break;
+	case 0x6b: lh5801_ora_mem(cpustate, *cpustate->program, U, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=13;break;
 	case 0x6c: lh5801_cpa(cpustate,UH, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=7;break;
 	case 0x6d: lh5801_bit(cpustate,cpustate->program->read_byte(U), cpustate->direct->read_decrypted_byte(P++));cpustate->icount-=10;break;
 	case 0x6e: lh5801_cpa(cpustate,UL, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=7;break;
-	case 0x6f: lh5801_add_mem(cpustate, cpustate->program, U, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=13;break;
+	case 0x6f: lh5801_add_mem(cpustate, *cpustate->program, U, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=13;break;
 	case 0x80: lh5801_sbc(cpustate,XH); cpustate->icount-=6;break;
 	case 0x81: lh5801_branch_plus(cpustate,!(cpustate->t&C)); cpustate->icount-=8; break;
 	case 0x82: lh5801_adc(cpustate,XH); cpustate->icount-=6;break;
@@ -648,9 +648,9 @@ static void lh5801_instruction(lh5801_state *cpustate)
 	case 0xcd: lh5801_vector(cpustate,1, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=7;break;
 	case 0xcf: lh5801_vector(cpustate,cpustate->t&V, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=8;break;
 	case 0xd1: lh5801_ror(cpustate); cpustate->icount-=6; break;
-	case 0xd3: lh5801_drr(cpustate, cpustate->program, X); cpustate->icount-=12; break;
+	case 0xd3: lh5801_drr(cpustate, *cpustate->program, X); cpustate->icount-=12; break;
 	case 0xd5: lh5801_shr(cpustate); cpustate->icount-=6; break;
-	case 0xd7: lh5801_drl(cpustate, cpustate->program, X); cpustate->icount-=12; break;
+	case 0xd7: lh5801_drl(cpustate, *cpustate->program, X); cpustate->icount-=12; break;
 	case 0xd9: lh5801_shl(cpustate); cpustate->icount-=6; break;
 	case 0xdb: lh5801_rol(cpustate); cpustate->icount-=6; break;
 	case 0xdd: lh5801_inc(cpustate,&cpustate->a);cpustate->icount-=5;break;
@@ -658,17 +658,17 @@ static void lh5801_instruction(lh5801_state *cpustate)
 	case 0xe1: cpustate->pu=1;/*spu!*/ cpustate->icount-=4; break;
 	case 0xe3: cpustate->pu=0;/*rpu!*/ cpustate->icount-=4; break;
 	case 0xe9:
-		adr=lh5801_readop_word(cpustate);lh5801_and_mem(cpustate, cpustate->program, adr, cpustate->direct->read_decrypted_byte(P++));
+		adr=lh5801_readop_word(cpustate);lh5801_and_mem(cpustate, *cpustate->program, adr, cpustate->direct->read_decrypted_byte(P++));
 		cpustate->icount-=19;break;
 	case 0xeb:
-		adr=lh5801_readop_word(cpustate);lh5801_ora_mem(cpustate, cpustate->program, adr, cpustate->direct->read_decrypted_byte(P++));
+		adr=lh5801_readop_word(cpustate);lh5801_ora_mem(cpustate, *cpustate->program, adr, cpustate->direct->read_decrypted_byte(P++));
 		cpustate->icount-=19;break;
 	case 0xed:
 		adr=lh5801_readop_word(cpustate);lh5801_bit(cpustate,cpustate->program->read_byte(adr), cpustate->direct->read_decrypted_byte(P++));
 		cpustate->icount-=16;break;
 	case 0xef:
 		adr=lh5801_readop_word(cpustate);
-		lh5801_add_mem(cpustate, cpustate->program, adr, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=19;
+		lh5801_add_mem(cpustate, *cpustate->program, adr, cpustate->direct->read_decrypted_byte(P++)); cpustate->icount-=19;
 		break;
 	case 0xf1: lh5801_aex(cpustate); cpustate->icount-=6; break;
 	case 0xf5: cpustate->program->write_byte(Y++, cpustate->program->read_byte(X++)); cpustate->icount-=7; break; //tin

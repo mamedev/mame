@@ -201,28 +201,28 @@ static int compute_pixblt_b_cycles(int left_partials, int right_partials, int fu
 
 
 /* Shift register handling */
-static void memory_w(address_space *space, offs_t offset,UINT16 data)
+static void memory_w(address_space &space, offs_t offset,UINT16 data)
 {
-	space->write_word(offset, data);
+	space.write_word(offset, data);
 }
 
-static UINT16 memory_r(address_space *space, offs_t offset)
+static UINT16 memory_r(address_space &space, offs_t offset)
 {
-	return space->read_word(offset);
+	return space.read_word(offset);
 }
 
-static void shiftreg_w(address_space *space, offs_t offset,UINT16 data)
+static void shiftreg_w(address_space &space, offs_t offset,UINT16 data)
 {
-	tms34010_state *tms = get_safe_token(&space->device());
+	tms34010_state *tms = get_safe_token(&space.device());
 	if (tms->config->from_shiftreg)
 		(*tms->config->from_shiftreg)(space, (UINT32)(offset << 3) & ~15, &tms->shiftreg[0]);
 	else
 		logerror("From ShiftReg function not set. PC = %08X\n", tms->pc);
 }
 
-static UINT16 shiftreg_r(address_space *space, offs_t offset)
+static UINT16 shiftreg_r(address_space &space, offs_t offset)
 {
-	tms34010_state *tms = get_safe_token(&space->device());
+	tms34010_state *tms = get_safe_token(&space.device());
 	if (tms->config->to_shiftreg)
 		(*tms->config->to_shiftreg)(space, (UINT32)(offset << 3) & ~15, &tms->shiftreg[0]);
 	else
@@ -230,9 +230,9 @@ static UINT16 shiftreg_r(address_space *space, offs_t offset)
 	return tms->shiftreg[0];
 }
 
-static UINT16 dummy_shiftreg_r(address_space *space, offs_t offset)
+static UINT16 dummy_shiftreg_r(address_space &space, offs_t offset)
 {
-	tms34010_state *tms = get_safe_token(&space->device());
+	tms34010_state *tms = get_safe_token(&space.device());
 	return tms->shiftreg[0];
 }
 
@@ -1038,8 +1038,8 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 	if (!P_FLAG(tms))
 	{
 		int dx, dy, x, y, /*words,*/ yreverse;
-		void (*word_write)(address_space *space,offs_t address,UINT16 data);
-		UINT16 (*word_read)(address_space *space,offs_t address);
+		void (*word_write)(address_space &space,offs_t address,UINT16 data);
+		UINT16 (*word_read)(address_space &space,offs_t address);
 		UINT32 readwrites = 0;
 		UINT32 saddr, daddr;
 		XY dstxy = { 0 };
@@ -1113,13 +1113,13 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 			UINT32 srcword, dstword = 0;
 
 			/* fetch the initial source word */
-			srcword = (*word_read)(tms->program, srcwordaddr++ << 1);
+			srcword = (*word_read)(*tms->program, srcwordaddr++ << 1);
 			readwrites++;
 
 			/* fetch the initial dest word */
 			if (PIXEL_OP_REQUIRES_SOURCE || TRANSPARENCY || (daddr & 0x0f) != 0)
 			{
-				dstword = (*word_read)(tms->program, dstwordaddr << 1);
+				dstword = (*word_read)(*tms->program, dstwordaddr << 1);
 				readwrites++;
 			}
 
@@ -1132,7 +1132,7 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 				/* fetch more words if necessary */
 				if (srcbit + BITS_PER_PIXEL > 16)
 				{
-					srcword |= (*word_read)(tms->program, srcwordaddr++ << 1) << 16;
+					srcword |= (*word_read)(*tms->program, srcwordaddr++ << 1) << 16;
 					readwrites++;
 				}
 
@@ -1149,7 +1149,7 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 				if (PIXEL_OP_REQUIRES_SOURCE || TRANSPARENCY)
 					if (dstbit + BITS_PER_PIXEL > 16)
 					{
-						dstword |= (*word_read)(tms->program, (dstwordaddr + 1) << 1) << 16;
+						dstword |= (*word_read)(*tms->program, (dstwordaddr + 1) << 1) << 16;
 						readwrites++;
 					}
 
@@ -1164,7 +1164,7 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 				dstbit += BITS_PER_PIXEL;
 				if (dstbit > 16)
 				{
-					(*word_write)(tms->program, dstwordaddr++ << 1, dstword);
+					(*word_write)(*tms->program, dstwordaddr++ << 1, dstword);
 					readwrites++;
 					dstbit -= 16;
 					dstword >>= 16;
@@ -1177,13 +1177,13 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 				/* if we're right-partial, read and mask the remaining bits */
 				if (dstbit != 16)
 				{
-					UINT16 origdst = (*word_read)(tms->program, dstwordaddr << 1);
+					UINT16 origdst = (*word_read)(*tms->program, dstwordaddr << 1);
 					UINT16 mask = 0xffff << dstbit;
 					dstword = (dstword & ~mask) | (origdst & mask);
 					readwrites++;
 				}
 
-				(*word_write)(tms->program, dstwordaddr++ << 1, dstword);
+				(*word_write)(*tms->program, dstwordaddr++ << 1, dstword);
 				readwrites++;
 			}
 
@@ -1215,14 +1215,14 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 			dwordaddr = daddr >> 4;
 
 			/* fetch the initial source word */
-			srcword = (*word_read)(tms->program, swordaddr++ << 1);
+			srcword = (*word_read)(*tms->program, swordaddr++ << 1);
 			srcmask = PIXEL_MASK << (saddr & 15);
 
 			/* handle the left partial word */
 			if (left_partials != 0)
 			{
 				/* fetch the destination word */
-				dstword = (*word_read)(tms->program, dwordaddr << 1);
+				dstword = (*word_read)(*tms->program, dwordaddr << 1);
 				dstmask = PIXEL_MASK << (daddr & 15);
 
 				/* loop over partials */
@@ -1231,7 +1231,7 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 					/* fetch another word if necessary */
 					if (srcmask == 0)
 					{
-						srcword = (*word_read)(tms->program, swordaddr++ << 1);
+						srcword = (*word_read)(*tms->program, swordaddr++ << 1);
 						srcmask = PIXEL_MASK;
 					}
 
@@ -1253,7 +1253,7 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 				}
 
 				/* write the result */
-				(*word_write)(tms->program, dwordaddr++ << 1, dstword);
+				(*word_write)(*tms->program, dwordaddr++ << 1, dstword);
 			}
 
 			/* loop over full words */
@@ -1261,7 +1261,7 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 			{
 				/* fetch the destination word (if necessary) */
 				if (PIXEL_OP_REQUIRES_SOURCE || TRANSPARENCY)
-					dstword = (*word_read)(tms->program, dwordaddr << 1);
+					dstword = (*word_read)(*tms->program, dwordaddr << 1);
 				else
 					dstword = 0;
 				dstmask = PIXEL_MASK;
@@ -1272,7 +1272,7 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 					/* fetch another word if necessary */
 					if (srcmask == 0)
 					{
-						srcword = (*word_read)(tms->program, swordaddr++ << 1);
+						srcword = (*word_read)(*tms->program, swordaddr++ << 1);
 						srcmask = PIXEL_MASK;
 					}
 
@@ -1294,14 +1294,14 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 				}
 
 				/* write the result */
-				(*word_write)(tms->program, dwordaddr++ << 1, dstword);
+				(*word_write)(*tms->program, dwordaddr++ << 1, dstword);
 			}
 
 			/* handle the right partial word */
 			if (right_partials != 0)
 			{
 				/* fetch the destination word */
-				dstword = (*word_read)(tms->program, dwordaddr << 1);
+				dstword = (*word_read)(*tms->program, dwordaddr << 1);
 				dstmask = PIXEL_MASK;
 
 				/* loop over partials */
@@ -1311,7 +1311,7 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 					if (srcmask == 0)
 					{
 		LOGGFX(("  right fetch @ %08x\n", swordaddr));
-						srcword = (*word_read)(tms->program, swordaddr++ << 1);
+						srcword = (*word_read)(*tms->program, swordaddr++ << 1);
 						srcmask = PIXEL_MASK;
 					}
 
@@ -1333,7 +1333,7 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 				}
 
 				/* write the result */
-				(*word_write)(tms->program, dwordaddr++ << 1, dstword);
+				(*word_write)(*tms->program, dwordaddr++ << 1, dstword);
 			}
 #endif
 
@@ -1385,8 +1385,8 @@ static void FUNCTION_NAME(pixblt_r)(tms34010_state *tms, int src_is_linear, int 
 	if (!P_FLAG(tms))
 	{
 		int dx, dy, x, y, words, yreverse;
-		void (*word_write)(address_space *space,offs_t address,UINT16 data);
-		UINT16 (*word_read)(address_space *space,offs_t address);
+		void (*word_write)(address_space &space,offs_t address,UINT16 data);
+		UINT16 (*word_read)(address_space &space,offs_t address);
 		UINT32 saddr, daddr;
 		XY dstxy = { 0 };
 
@@ -1484,14 +1484,14 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) mame_printf_debug("PIXBLT_R%d with odd 
 			dwordaddr = (daddr + 15) >> 4;
 
 			/* fetch the initial source word */
-			srcword = (*word_read)(tms->program, --swordaddr << 1);
+			srcword = (*word_read)(*tms->program, --swordaddr << 1);
 			srcmask = PIXEL_MASK << ((saddr - BITS_PER_PIXEL) & 15);
 
 			/* handle the right partial word */
 			if (right_partials != 0)
 			{
 				/* fetch the destination word */
-				dstword = (*word_read)(tms->program, --dwordaddr << 1);
+				dstword = (*word_read)(*tms->program, --dwordaddr << 1);
 				dstmask = PIXEL_MASK << ((daddr - BITS_PER_PIXEL) & 15);
 
 				/* loop over partials */
@@ -1500,7 +1500,7 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) mame_printf_debug("PIXBLT_R%d with odd 
 					/* fetch source pixel if necessary */
 					if (srcmask == 0)
 					{
-						srcword = (*word_read)(tms->program, --swordaddr << 1);
+						srcword = (*word_read)(*tms->program, --swordaddr << 1);
 						srcmask = PIXEL_MASK << (16 - BITS_PER_PIXEL);
 					}
 
@@ -1522,7 +1522,7 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) mame_printf_debug("PIXBLT_R%d with odd 
 				}
 
 				/* write the result */
-				(*word_write)(tms->program, dwordaddr << 1, dstword);
+				(*word_write)(*tms->program, dwordaddr << 1, dstword);
 			}
 
 			/* loop over full words */
@@ -1531,7 +1531,7 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) mame_printf_debug("PIXBLT_R%d with odd 
 				/* fetch the destination word (if necessary) */
 				dwordaddr--;
 				if (PIXEL_OP_REQUIRES_SOURCE || TRANSPARENCY)
-					dstword = (*word_read)(tms->program, dwordaddr << 1);
+					dstword = (*word_read)(*tms->program, dwordaddr << 1);
 				else
 					dstword = 0;
 				dstmask = PIXEL_MASK << (16 - BITS_PER_PIXEL);
@@ -1542,7 +1542,7 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) mame_printf_debug("PIXBLT_R%d with odd 
 					/* fetch source pixel if necessary */
 					if (srcmask == 0)
 					{
-						srcword = (*word_read)(tms->program, --swordaddr << 1);
+						srcword = (*word_read)(*tms->program, --swordaddr << 1);
 						srcmask = PIXEL_MASK << (16 - BITS_PER_PIXEL);
 					}
 
@@ -1564,14 +1564,14 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) mame_printf_debug("PIXBLT_R%d with odd 
 				}
 
 				/* write the result */
-				(*word_write)(tms->program, dwordaddr << 1, dstword);
+				(*word_write)(*tms->program, dwordaddr << 1, dstword);
 			}
 
 			/* handle the left partial word */
 			if (left_partials != 0)
 			{
 				/* fetch the destination word */
-				dstword = (*word_read)(tms->program, --dwordaddr << 1);
+				dstword = (*word_read)(*tms->program, --dwordaddr << 1);
 				dstmask = PIXEL_MASK << (16 - BITS_PER_PIXEL);
 
 				/* loop over partials */
@@ -1580,7 +1580,7 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) mame_printf_debug("PIXBLT_R%d with odd 
 					/* fetch the source pixel if necessary */
 					if (srcmask == 0)
 					{
-						srcword = (*word_read)(tms->program, --swordaddr << 1);
+						srcword = (*word_read)(*tms->program, --swordaddr << 1);
 						srcmask = PIXEL_MASK << (16 - BITS_PER_PIXEL);
 					}
 
@@ -1602,7 +1602,7 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) mame_printf_debug("PIXBLT_R%d with odd 
 				}
 
 				/* write the result */
-				(*word_write)(tms->program, dwordaddr << 1, dstword);
+				(*word_write)(*tms->program, dwordaddr << 1, dstword);
 			}
 
 			/* update for next row */
@@ -1650,8 +1650,8 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 	if (!P_FLAG(tms))
 	{
 		int dx, dy, x, y, words, left_partials, right_partials, full_words;
-		void (*word_write)(address_space *space,offs_t address,UINT16 data);
-		UINT16 (*word_read)(address_space *space,offs_t address);
+		void (*word_write)(address_space &space,offs_t address,UINT16 data);
+		UINT16 (*word_read)(address_space &space,offs_t address);
 		UINT32 saddr, daddr;
 		XY dstxy = { 0 };
 
@@ -1727,14 +1727,14 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 			dwordaddr = daddr >> 4;
 
 			/* fetch the initial source word */
-			srcword = (*word_read)(tms->program, swordaddr++ << 1);
+			srcword = (*word_read)(*tms->program, swordaddr++ << 1);
 			srcmask = 1 << (saddr & 15);
 
 			/* handle the left partial word */
 			if (left_partials != 0)
 			{
 				/* fetch the destination word */
-				dstword = (*word_read)(tms->program, dwordaddr << 1);
+				dstword = (*word_read)(*tms->program, dwordaddr << 1);
 				dstmask = PIXEL_MASK << (daddr & 15);
 
 				/* loop over partials */
@@ -1751,7 +1751,7 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 					srcmask <<= 1;
 					if (srcmask == 0)
 					{
-						srcword = (*word_read)(tms->program, swordaddr++ << 1);
+						srcword = (*word_read)(*tms->program, swordaddr++ << 1);
 						srcmask = 0x0001;
 					}
 
@@ -1760,7 +1760,7 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 				}
 
 				/* write the result */
-				(*word_write)(tms->program, dwordaddr++ << 1, dstword);
+				(*word_write)(*tms->program, dwordaddr++ << 1, dstword);
 			}
 
 			/* loop over full words */
@@ -1768,7 +1768,7 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 			{
 				/* fetch the destination word (if necessary) */
 				if (PIXEL_OP_REQUIRES_SOURCE || TRANSPARENCY)
-					dstword = (*word_read)(tms->program, dwordaddr << 1);
+					dstword = (*word_read)(*tms->program, dwordaddr << 1);
 				else
 					dstword = 0;
 				dstmask = PIXEL_MASK;
@@ -1787,7 +1787,7 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 					srcmask <<= 1;
 					if (srcmask == 0)
 					{
-						srcword = (*word_read)(tms->program, swordaddr++ << 1);
+						srcword = (*word_read)(*tms->program, swordaddr++ << 1);
 						srcmask = 0x0001;
 					}
 
@@ -1796,14 +1796,14 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 				}
 
 				/* write the result */
-				(*word_write)(tms->program, dwordaddr++ << 1, dstword);
+				(*word_write)(*tms->program, dwordaddr++ << 1, dstword);
 			}
 
 			/* handle the right partial word */
 			if (right_partials != 0)
 			{
 				/* fetch the destination word */
-				dstword = (*word_read)(tms->program, dwordaddr << 1);
+				dstword = (*word_read)(*tms->program, dwordaddr << 1);
 				dstmask = PIXEL_MASK;
 
 				/* loop over partials */
@@ -1820,7 +1820,7 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 					srcmask <<= 1;
 					if (srcmask == 0)
 					{
-						srcword = (*word_read)(tms->program, swordaddr++ << 1);
+						srcword = (*word_read)(*tms->program, swordaddr++ << 1);
 						srcmask = 0x0001;
 					}
 
@@ -1829,7 +1829,7 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 				}
 
 				/* write the result */
-				(*word_write)(tms->program, dwordaddr++ << 1, dstword);
+				(*word_write)(*tms->program, dwordaddr++ << 1, dstword);
 			}
 
 			/* update for next row */
@@ -1864,8 +1864,8 @@ static void FUNCTION_NAME(fill)(tms34010_state *tms, int dst_is_linear)
 	if (!P_FLAG(tms))
 	{
 		int dx, dy, x, y, words, left_partials, right_partials, full_words;
-		void (*word_write)(address_space *space,offs_t address,UINT16 data);
-		UINT16 (*word_read)(address_space *space,offs_t address);
+		void (*word_write)(address_space &space,offs_t address,UINT16 data);
+		UINT16 (*word_read)(address_space &space,offs_t address);
 		UINT32 daddr;
 		XY dstxy = { 0 };
 
@@ -1943,7 +1943,7 @@ static void FUNCTION_NAME(fill)(tms34010_state *tms, int dst_is_linear)
 			if (left_partials != 0)
 			{
 				/* fetch the destination word */
-				dstword = (*word_read)(tms->program, dwordaddr << 1);
+				dstword = (*word_read)(*tms->program, dwordaddr << 1);
 				dstmask = PIXEL_MASK << (daddr & 15);
 
 				/* loop over partials */
@@ -1960,7 +1960,7 @@ static void FUNCTION_NAME(fill)(tms34010_state *tms, int dst_is_linear)
 				}
 
 				/* write the result */
-				(*word_write)(tms->program, dwordaddr++ << 1, dstword);
+				(*word_write)(*tms->program, dwordaddr++ << 1, dstword);
 			}
 
 			/* loop over full words */
@@ -1968,7 +1968,7 @@ static void FUNCTION_NAME(fill)(tms34010_state *tms, int dst_is_linear)
 			{
 				/* fetch the destination word (if necessary) */
 				if (PIXEL_OP_REQUIRES_SOURCE || TRANSPARENCY)
-					dstword = (*word_read)(tms->program, dwordaddr << 1);
+					dstword = (*word_read)(*tms->program, dwordaddr << 1);
 				else
 					dstword = 0;
 				dstmask = PIXEL_MASK;
@@ -1987,14 +1987,14 @@ static void FUNCTION_NAME(fill)(tms34010_state *tms, int dst_is_linear)
 				}
 
 				/* write the result */
-				(*word_write)(tms->program, dwordaddr++ << 1, dstword);
+				(*word_write)(*tms->program, dwordaddr++ << 1, dstword);
 			}
 
 			/* handle the right partial word */
 			if (right_partials != 0)
 			{
 				/* fetch the destination word */
-				dstword = (*word_read)(tms->program, dwordaddr << 1);
+				dstword = (*word_read)(*tms->program, dwordaddr << 1);
 				dstmask = PIXEL_MASK;
 
 				/* loop over partials */
@@ -2011,7 +2011,7 @@ static void FUNCTION_NAME(fill)(tms34010_state *tms, int dst_is_linear)
 				}
 
 				/* write the result */
-				(*word_write)(tms->program, dwordaddr++ << 1, dstword);
+				(*word_write)(*tms->program, dwordaddr++ << 1, dstword);
 			}
 
 			/* update for next row */

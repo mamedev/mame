@@ -87,7 +87,7 @@ static int port1State = 0;
 
 WRITE8_HANDLER( pulsar_audio_1_w )
 {
-	samples_device *samples = space->machine().device<samples_device>("samples");
+	samples_device *samples = space.machine().device<samples_device>("samples");
 	int bitsChanged;
 	//int bitsGoneHigh;
 	int bitsGoneLow;
@@ -138,7 +138,7 @@ WRITE8_HANDLER( pulsar_audio_1_w )
 
 WRITE8_HANDLER( pulsar_audio_2_w )
 {
-	samples_device *samples = space->machine().device<samples_device>("samples");
+	samples_device *samples = space.machine().device<samples_device>("samples");
 	static int port2State = 0;
 	int bitsChanged;
 	int bitsGoneHigh;

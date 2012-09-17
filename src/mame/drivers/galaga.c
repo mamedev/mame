@@ -889,12 +889,12 @@ MACHINE_START_MEMBER(galaga_state,galaga)
 static void bosco_latch_reset(running_machine &machine)
 {
 	galaga_state *state = machine.driver_data<galaga_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
 	for (i = 0;i < 8;i++)
-		state->bosco_latch_w(*space,i,0);
+		state->bosco_latch_w(space,i,0);
 }
 
 MACHINE_RESET_MEMBER(galaga_state,galaga)

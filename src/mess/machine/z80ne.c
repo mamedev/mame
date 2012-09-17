@@ -184,12 +184,12 @@ DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_nmi_delay_count)
  */
 DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_reset_delay_count)
 {
-	address_space *space = machine().device("z80ne")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("z80ne")->memory().space(AS_PROGRAM);
 	/*
      * TODO: when debugger is active, his memory access causes this callback
      *
      */
-	if(!space->debugger_access())
+	if(!space.debugger_access())
 		m_reset_delay_counter--;
 
 	if (!m_reset_delay_counter)
@@ -213,7 +213,7 @@ static void reset_lx388(running_machine &machine)
 static void reset_lx382_banking(running_machine &machine)
 {
 	z80ne_state *state = machine.driver_data<z80ne_state>();
-	address_space *space = machine.device("z80ne")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("z80ne")->memory().space(AS_PROGRAM);
 
 	/* switch to ROM bank at address 0x0000 */
     state->membank("bank1")->set_entry(1);
@@ -221,13 +221,13 @@ static void reset_lx382_banking(running_machine &machine)
 
 	/* after the first 3 bytes have been read from ROM, switch the RAM back in */
 	state->m_reset_delay_counter = 2;
-	space->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_reset_delay_count), state));
+	space.set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_reset_delay_count), state));
 }
 
 static void reset_lx390_banking(running_machine &machine)
 {
 	z80ne_state *state = machine.driver_data<z80ne_state>();
-	address_space *space = machine.device("z80ne")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("z80ne")->memory().space(AS_PROGRAM);
 	state->m_reset_delay_counter = 0;
 
 	switch (machine.root_device().ioport("CONFIG")->read() & 0x07) {
@@ -240,7 +240,7 @@ static void reset_lx390_banking(running_machine &machine)
 	    state->membank("bank4")->set_entry(0);  /* RAM   at 0xF000 */
 		/* after the first 3 bytes have been read from ROM, switch the RAM back in */
 		state->m_reset_delay_counter = 2;
-		space->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_reset_delay_count), state));
+		space.set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_reset_delay_count), state));
 	    break;
 	case 0x02: /* EP548  16k BASIC */
 		if (VERBOSE)
@@ -288,7 +288,7 @@ static void reset_lx390_banking(running_machine &machine)
 MACHINE_RESET_MEMBER(z80ne_state,z80ne_base)
 {
 	int i;
-	address_space *space = machine().device("z80ne")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("z80ne")->memory().space(AS_PROGRAM);
 
 	LOG(("In MACHINE_RESET z80ne_base\n"));
 
@@ -336,7 +336,7 @@ MACHINE_RESET_MEMBER(z80ne_state,z80ne_base)
 	ay31015_set_transmitter_clock( m_ay31015, m_cass_data.speed * 16.0);
 
 	m_nmi_delay_counter = 0;
-	lx385_ctrl_w(*space, 0, 0);
+	lx385_ctrl_w(space, 0, 0);
 
 }
 

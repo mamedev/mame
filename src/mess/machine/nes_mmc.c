@@ -167,7 +167,7 @@ static WRITE8_HANDLER( mapper17_l_w );
 
 WRITE8_HANDLER( nes_chr_w )
 {
-	nes_state *state = space->machine().driver_data<nes_state>();
+	nes_state *state = space.machine().driver_data<nes_state>();
 	int bank = offset >> 10;
 
 	if (state->m_chr_map[bank].source == CHRRAM)
@@ -178,7 +178,7 @@ WRITE8_HANDLER( nes_chr_w )
 
 READ8_HANDLER( nes_chr_r )
 {
-	nes_state *state = space->machine().driver_data<nes_state>();
+	nes_state *state = space.machine().driver_data<nes_state>();
 	int bank = offset >> 10;
 
 	// a few CNROM boards contained copy protection schemes through
@@ -193,7 +193,7 @@ READ8_HANDLER( nes_chr_r )
 
 WRITE8_HANDLER( nes_nt_w )
 {
-	nes_state *state = space->machine().driver_data<nes_state>();
+	nes_state *state = space.machine().driver_data<nes_state>();
 	int page = ((offset & 0xc00) >> 10);
 
 	if (state->m_nt_page[page].writable == 0)
@@ -204,7 +204,7 @@ WRITE8_HANDLER( nes_nt_w )
 
 READ8_HANDLER( nes_nt_r )
 {
-	nes_state *state = space->machine().driver_data<nes_state>();
+	nes_state *state = space.machine().driver_data<nes_state>();
 	int page = ((offset & 0xc00) >> 10);
 
 	if (state->m_nt_page[page].source == MMC5FILL)
@@ -219,7 +219,7 @@ READ8_HANDLER( nes_nt_r )
 
 WRITE8_HANDLER( nes_low_mapper_w )
 {
-	nes_state *state = space->machine().driver_data<nes_state>();
+	nes_state *state = space.machine().driver_data<nes_state>();
 
 	if (state->m_mmc_write_low)
 		(*state->m_mmc_write_low)(space, offset, data);
@@ -229,7 +229,7 @@ WRITE8_HANDLER( nes_low_mapper_w )
 
 READ8_HANDLER( nes_low_mapper_r )
 {
-	nes_state *state = space->machine().driver_data<nes_state>();
+	nes_state *state = space.machine().driver_data<nes_state>();
 
 	if (state->m_mmc_read_low)
 		return (*state->m_mmc_read_low)(space, offset);

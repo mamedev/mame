@@ -619,7 +619,7 @@ READ16_MEMBER( segaxbd_state::rascot_excs_r )
 	logerror("%06X:rascot_excs_r(%04X)\n", m_maincpu->pc(), offset*2);
 
 	// probably receives commands from the server here
-	//return space->machine().rand() & 0xff;
+	//return space.machine().rand() & 0xff;
 
 	return 0xff;
 }

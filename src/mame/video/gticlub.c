@@ -168,7 +168,7 @@ static void K001006_w(int chip, int offset, UINT32 data, UINT32 mem_mask)
 
 READ32_HANDLER(K001006_0_r)
 {
-	return K001006_r(space->machine(), 0, offset, mem_mask);
+	return K001006_r(space.machine(), 0, offset, mem_mask);
 }
 
 WRITE32_HANDLER(K001006_0_w)
@@ -178,7 +178,7 @@ WRITE32_HANDLER(K001006_0_w)
 
 READ32_HANDLER(K001006_1_r)
 {
-	return K001006_r(space->machine(), 1, offset, mem_mask);
+	return K001006_r(space.machine(), 1, offset, mem_mask);
 }
 
 WRITE32_HANDLER(K001006_1_w)
@@ -357,19 +357,19 @@ READ32_HANDLER( K001005_r )
 			{
 				if (K001005_fifo_read_ptr < 0x3ff)
 				{
-					//space->machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
-					sharc_set_flag_input(space->machine().device("dsp"), 1, CLEAR_LINE);
+					//space.machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
+					sharc_set_flag_input(space.machine().device("dsp"), 1, CLEAR_LINE);
 				}
 				else
 				{
-					//space->machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
-					sharc_set_flag_input(space->machine().device("dsp"), 1, ASSERT_LINE);
+					//space.machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
+					sharc_set_flag_input(space.machine().device("dsp"), 1, ASSERT_LINE);
 				}
 			}
 			else
 			{
-				//space->machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
-				sharc_set_flag_input(space->machine().device("dsp"), 1, ASSERT_LINE);
+				//space.machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
+				sharc_set_flag_input(space.machine().device("dsp"), 1, ASSERT_LINE);
 			}
 
 			K001005_fifo_read_ptr++;
@@ -394,7 +394,7 @@ READ32_HANDLER( K001005_r )
 			}
 
 		default:
-			mame_printf_debug("K001005_r: %08X, %08X at %08X\n", offset, mem_mask, space->device().safe_pc());
+			mame_printf_debug("K001005_r: %08X, %08X at %08X\n", offset, mem_mask, space.device().safe_pc());
 			break;
 	}
 	return 0;
@@ -410,22 +410,22 @@ WRITE32_HANDLER( K001005_w )
 			{
 				if (K001005_fifo_write_ptr < 0x400)
 				{
-					//space->machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
-					sharc_set_flag_input(space->machine().device("dsp"), 1, ASSERT_LINE);
+					//space.machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
+					sharc_set_flag_input(space.machine().device("dsp"), 1, ASSERT_LINE);
 				}
 				else
 				{
-					//space->machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
-					sharc_set_flag_input(space->machine().device("dsp"), 1, CLEAR_LINE);
+					//space.machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
+					sharc_set_flag_input(space.machine().device("dsp"), 1, CLEAR_LINE);
 				}
 			}
 			else
 			{
-				//space->machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
-				sharc_set_flag_input(space->machine().device("dsp"), 1, ASSERT_LINE);
+				//space.machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
+				sharc_set_flag_input(space.machine().device("dsp"), 1, ASSERT_LINE);
 			}
 
-	    //  mame_printf_debug("K001005 FIFO write: %08X at %08X\n", data, space->device().safe_pc());
+	    //  mame_printf_debug("K001005 FIFO write: %08X at %08X\n", data, space.device().safe_pc());
 			K001005_fifo[K001005_fifo_write_ptr] = data;
 			K001005_fifo_write_ptr++;
 			K001005_fifo_write_ptr &= 0x7ff;
@@ -433,7 +433,7 @@ WRITE32_HANDLER( K001005_w )
 			// process the current vertex data if a sync command is being sent (usually means the global registers are being changed)
 			if (data == 0x80000000)
 			{
-				render_polygons(space->machine());
+				render_polygons(space.machine());
 				K001005_3d_fifo_ptr = 0;
 			}
 
@@ -450,16 +450,16 @@ WRITE32_HANDLER( K001005_w )
 #endif
 
 			// !!! HACK to get past the FIFO B test (GTI Club & Thunder Hurricane) !!!
-			if (space->device().safe_pc() == 0x201ee)
+			if (space.device().safe_pc() == 0x201ee)
 			{
 				// This is used to make the SHARC timeout
-				space->device().execute().spin_until_trigger(10000);
+				space.device().execute().spin_until_trigger(10000);
 			}
 			// !!! HACK to get past the FIFO B test (Winding Heat & Midnight Run) !!!
-			if (space->device().safe_pc() == 0x201e6)
+			if (space.device().safe_pc() == 0x201e6)
 			{
 				// This is used to make the SHARC timeout
-				space->device().execute().spin_until_trigger(10000);
+				space.device().execute().spin_until_trigger(10000);
 			}
 
 			break;
@@ -514,7 +514,7 @@ WRITE32_HANDLER( K001005_w )
 
 			if (data == 2 && K001005_3d_fifo_ptr > 0)
 			{
-				render_polygons(space->machine());
+				render_polygons(space.machine());
 				poly_wait(poly, "render_polygons");
 
 #if LOG_POLY_FIFO
@@ -524,7 +524,7 @@ WRITE32_HANDLER( K001005_w )
 #endif
 
 				K001005_3d_fifo_ptr = 0;
-				K001005_swap_buffers(space->machine());
+				K001005_swap_buffers(space.machine());
 			}
 			break;
 
@@ -549,7 +549,7 @@ WRITE32_HANDLER( K001005_w )
 			break;
 
 		default:
-			//mame_printf_debug("K001005_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space->device().safe_pc());
+			//mame_printf_debug("K001005_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
 			break;
 	}
 

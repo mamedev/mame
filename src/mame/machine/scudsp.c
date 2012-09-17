@@ -275,9 +275,9 @@ static void dsp_set_dest_mem_reg_2( UINT32 mode, UINT32 value )
 	}
 }
 
-static UINT32 dsp_compute_condition( address_space *space, UINT32 condition )
+static UINT32 dsp_compute_condition( address_space &space, UINT32 condition )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 	UINT32 result = 0;
 
 	switch( condition & 0xf )
@@ -333,16 +333,16 @@ static UINT32 dsp_get_mem_source_dma( UINT32 memcode, UINT32 counter )
 	return 0;
 }
 
-UINT32 dsp_prg_ctrl_r(address_space *space)
+UINT32 dsp_prg_ctrl_r(address_space &space)
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
 	return (state->m_scu_regs[0x80/4] & 0x06ff8000) | (dsp_reg.pc & 0xff);
 }
 
-void dsp_prg_ctrl_w(address_space *space, UINT32 data)
+void dsp_prg_ctrl_w(address_space &space, UINT32 data)
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
 	if(LEF) dsp_reg.pc = (data & 0xff);
 	if(EXF) dsp_execute_program(space);
@@ -394,9 +394,9 @@ UINT32 dsp_ram_addr_r()
 	return data;
 }
 
-static void dsp_operation(address_space *space)
+static void dsp_operation(address_space &space)
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 	INT64 i1,i2;
 	INT32 i3;
 	int update_ct[4] = {0,0,0,0};
@@ -597,7 +597,7 @@ static void dsp_operation(address_space *space)
 
 }
 
-static void dsp_move_immediate( address_space *space )
+static void dsp_move_immediate( address_space &space )
 {
 	UINT32 value;
 
@@ -619,9 +619,9 @@ static void dsp_move_immediate( address_space *space )
 }
 
 
-static void dsp_dma( address_space *space )
+static void dsp_dma( address_space &space )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
 	UINT8 hold = (opcode &  0x4000) >> 14;
 	UINT32 add = (opcode & 0x38000) >> 15;
@@ -681,11 +681,11 @@ static void dsp_dma( address_space *space )
 
 			if ( source >= 0x06000000 && source <= 0x060fffff )
 			{
-				data = space->read_dword(source );
+				data = space.read_dword(source );
 			}
 			else
 			{
-				data = (space->read_word(source)<<16) | space->read_word(source+2);
+				data = (space.read_word(source)<<16) | space.read_word(source+2);
 				//popmessage( "Bad DSP DMA mem read = %08X", source );
 #if DEBUG_DSP
 				//fprintf( log_file, "/*Bad DSP DMA mem read = %08X*/\n", source );
@@ -718,7 +718,7 @@ static void dsp_dma( address_space *space )
 #endif
 		for ( counter = 0; counter < transfer_cnt; counter++ )
 		{
-			space->write_dword(dest, dsp_get_mem_source_dma( dsp_mem, counter ) );
+			space.write_dword(dest, dsp_get_mem_source_dma( dsp_mem, counter ) );
 			dest += add;
 		}
 
@@ -732,7 +732,7 @@ static void dsp_dma( address_space *space )
 	T0F_0;
 }
 
-static void dsp_jump( address_space *space )
+static void dsp_jump( address_space &space )
 {
 	if ( opcode & 0x3f80000 )
 	{
@@ -761,14 +761,14 @@ static TIMER_CALLBACK( dsp_ended )
 	EF_1;
 }
 
-static void dsp_end( address_space *dmaspace )
+static void dsp_end( address_space &dmaspace )
 {
-	saturn_state *state = dmaspace->machine().driver_data<saturn_state>();
+	saturn_state *state = dmaspace.machine().driver_data<saturn_state>();
 
 	if(opcode & 0x08000000)
 	{
 		/*ENDI*/
-		dmaspace->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dsp_ended));
+		dmaspace.machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dsp_ended));
 	}
 
 	EXF_0; /* END / ENDI */
@@ -827,7 +827,7 @@ static void dsp_dump_mem( FILE *f )
 }
 #endif
 
-void dsp_execute_program(address_space *dmaspace)
+void dsp_execute_program(address_space &dmaspace)
 {
 	UINT32 cycles_run = 0;
 	UINT8 cont = 1;

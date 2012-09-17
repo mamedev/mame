@@ -233,7 +233,7 @@ SCREEN_UPDATE_RGB32( newport )
 
 static WRITE32_HANDLER( newport_cmap0_w )
 {
-	//running_machine &machine = space->machine();
+	//running_machine &machine = space.machine();
 
 	switch( pNVID->REX3.nDCBRegSelect )
 	{
@@ -253,7 +253,7 @@ static WRITE32_HANDLER( newport_cmap0_w )
 
 static READ32_HANDLER( newport_cmap0_r )
 {
-	//running_machine &machine = space->machine();
+	//running_machine &machine = space.machine();
 
 	switch( pNVID->REX3.nDCBRegSelect )
 	{
@@ -271,7 +271,7 @@ static READ32_HANDLER( newport_cmap0_r )
 
 static READ32_HANDLER( newport_cmap1_r )
 {
-	//running_machine &machine = space->machine();
+	//running_machine &machine = space.machine();
 
 	switch( pNVID->REX3.nDCBRegSelect )
 	{
@@ -290,7 +290,7 @@ static READ32_HANDLER( newport_cmap1_r )
 static READ32_HANDLER( newport_xmap0_r )
 {
 	UINT8 nModeIdx;
-	//running_machine &machine = space->machine();
+	//running_machine &machine = space.machine();
 
 	switch( pNVID->REX3.nDCBRegSelect )
 	{
@@ -339,7 +339,7 @@ static READ32_HANDLER( newport_xmap0_r )
 static WRITE32_HANDLER( newport_xmap0_w )
 {
 	UINT8 n8BitVal = data & 0x000000ff;
-	//running_machine &machine = space->machine();
+	//running_machine &machine = space.machine();
 
 	switch( pNVID->REX3.nDCBRegSelect )
 	{
@@ -378,7 +378,7 @@ static WRITE32_HANDLER( newport_xmap0_w )
 static READ32_HANDLER( newport_xmap1_r )
 {
 	UINT8 nModeIdx;
-	//running_machine &machine = space->machine();
+	//running_machine &machine = space.machine();
 
 	switch( pNVID->REX3.nDCBRegSelect )
 	{
@@ -427,7 +427,7 @@ static READ32_HANDLER( newport_xmap1_r )
 static WRITE32_HANDLER( newport_xmap1_w )
 {
 	UINT8 n8BitVal = data & 0x000000ff;
-	//running_machine &machine = space->machine();
+	//running_machine &machine = space.machine();
 
 	switch( pNVID->REX3.nDCBRegSelect )
 	{
@@ -466,7 +466,7 @@ static WRITE32_HANDLER( newport_xmap1_w )
 static READ32_HANDLER( newport_vc2_r )
 {
 	UINT16 ret16;
-	//running_machine &machine = space->machine();
+	//running_machine &machine = space.machine();
 
 	switch( pNVID->REX3.nDCBRegSelect )
 	{
@@ -491,7 +491,7 @@ static READ32_HANDLER( newport_vc2_r )
 
 static WRITE32_HANDLER( newport_vc2_w )
 {
-	//running_machine &machine = space->machine();
+	//running_machine &machine = space.machine();
 
 	switch( pNVID->REX3.nXFerWidth )
 	{
@@ -608,7 +608,7 @@ static WRITE32_HANDLER( newport_vc2_w )
 READ32_HANDLER( newport_rex3_r )
 {
 //  UINT32 nTemp;
-	//running_machine &machine = space->machine();
+	//running_machine &machine = space.machine();
 
 //  if( offset >= ( 0x0800 / 4 ) )
 //  {
@@ -984,7 +984,7 @@ static void DoREX3Command(running_machine &machine)
 WRITE32_HANDLER( newport_rex3_w )
 {
 	UINT32 nTemp=0;
-	running_machine &machine = space->machine();
+	running_machine &machine = space.machine();
 
 	if( offset & 0x00000200 )
 	{

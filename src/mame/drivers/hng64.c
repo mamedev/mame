@@ -563,9 +563,9 @@ READ32_MEMBER(hng64_state::hng64_sysregs_r)
 }
 
 /* preliminary dma code, dma is used to copy program code -> ram */
-static void hng64_do_dma(address_space *space)
+static void hng64_do_dma(address_space &space)
 {
-	hng64_state *state = space->machine().driver_data<hng64_state>();
+	hng64_state *state = space.machine().driver_data<hng64_state>();
 
 	//printf("Performing DMA Start %08x Len %08x Dst %08x\n", state->m_dma_start, state->m_dma_len, state->m_dma_dst);
 
@@ -573,8 +573,8 @@ static void hng64_do_dma(address_space *space)
 	{
 		UINT32 dat;
 
-		dat = space->read_dword(state->m_dma_start);
-		space->write_dword(state->m_dma_dst, dat);
+		dat = space.read_dword(state->m_dma_start);
+		space.write_dword(state->m_dma_dst, dat);
 		state->m_dma_start += 4;
 		state->m_dma_dst += 4;
 		state->m_dma_len--;
@@ -621,7 +621,7 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 		case 0x1214: m_dma_dst = m_sysregs[offset]; break;
 		case 0x1224:
 			m_dma_len = m_sysregs[offset];
-			hng64_do_dma(&space);
+			hng64_do_dma(space);
 			break;
 		//default:
 		//  printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], space.device().safe_pc());
@@ -1806,8 +1806,8 @@ void hng64_state::machine_reset()
 
 	KL5C80_virtual_mem_sync(this);
 
-	address_space *space = machine().device<z80_device>("comm")->space(AS_PROGRAM);
-	space->set_direct_update_handler(direct_update_delegate(FUNC(hng64_state::KL5C80_direct_handler), this));
+	address_space &space = *machine().device<z80_device>("comm")->space(AS_PROGRAM);
+	space.set_direct_update_handler(direct_update_delegate(FUNC(hng64_state::KL5C80_direct_handler), this));
 
 	machine().device("comm")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
 //  machine().device("comm")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...

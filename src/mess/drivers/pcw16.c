@@ -209,43 +209,43 @@ static int pcw16_flash1_bank_handler_r(running_machine &machine, int bank, int o
 /* flash 0 */
 static  READ8_HANDLER(pcw16_flash0_bank_handler0_r)
 {
-	return pcw16_flash0_bank_handler_r(space->machine(),0, offset);
+	return pcw16_flash0_bank_handler_r(space.machine(),0, offset);
 }
 
 static  READ8_HANDLER(pcw16_flash0_bank_handler1_r)
 {
-	return pcw16_flash0_bank_handler_r(space->machine(),1, offset);
+	return pcw16_flash0_bank_handler_r(space.machine(),1, offset);
 }
 
 static  READ8_HANDLER(pcw16_flash0_bank_handler2_r)
 {
-	return pcw16_flash0_bank_handler_r(space->machine(),2, offset);
+	return pcw16_flash0_bank_handler_r(space.machine(),2, offset);
 }
 
 static  READ8_HANDLER(pcw16_flash0_bank_handler3_r)
 {
-	return pcw16_flash0_bank_handler_r(space->machine(),3, offset);
+	return pcw16_flash0_bank_handler_r(space.machine(),3, offset);
 }
 
 /* flash 1 */
 static  READ8_HANDLER(pcw16_flash1_bank_handler0_r)
 {
-	return pcw16_flash1_bank_handler_r(space->machine(),0, offset);
+	return pcw16_flash1_bank_handler_r(space.machine(),0, offset);
 }
 
 static  READ8_HANDLER(pcw16_flash1_bank_handler1_r)
 {
-	return pcw16_flash1_bank_handler_r(space->machine(),1, offset);
+	return pcw16_flash1_bank_handler_r(space.machine(),1, offset);
 }
 
 static  READ8_HANDLER(pcw16_flash1_bank_handler2_r)
 {
-	return pcw16_flash1_bank_handler_r(space->machine(),2, offset);
+	return pcw16_flash1_bank_handler_r(space.machine(),2, offset);
 }
 
 static  READ8_HANDLER(pcw16_flash1_bank_handler3_r)
 {
-	return pcw16_flash1_bank_handler_r(space->machine(),3, offset);
+	return pcw16_flash1_bank_handler_r(space.machine(),3, offset);
 }
 
 static const struct { read8_space_func func; const char *name; } pcw16_flash0_bank_handlers_r[4] =
@@ -289,46 +289,46 @@ static void pcw16_flash1_bank_handler_w(running_machine &machine, int bank, int 
 /* flash 0 */
 static WRITE8_HANDLER(pcw16_flash0_bank_handler0_w)
 {
-	pcw16_flash0_bank_handler_w(space->machine(),0, offset, data);
+	pcw16_flash0_bank_handler_w(space.machine(),0, offset, data);
 }
 
 
 static WRITE8_HANDLER(pcw16_flash0_bank_handler1_w)
 {
-	pcw16_flash0_bank_handler_w(space->machine(),1, offset, data);
+	pcw16_flash0_bank_handler_w(space.machine(),1, offset, data);
 }
 
 static WRITE8_HANDLER(pcw16_flash0_bank_handler2_w)
 {
-	pcw16_flash0_bank_handler_w(space->machine(),2, offset, data);
+	pcw16_flash0_bank_handler_w(space.machine(),2, offset, data);
 }
 
 static WRITE8_HANDLER(pcw16_flash0_bank_handler3_w)
 {
-	pcw16_flash0_bank_handler_w(space->machine(),3, offset, data);
+	pcw16_flash0_bank_handler_w(space.machine(),3, offset, data);
 }
 
 
 /* flash 1 */
 static WRITE8_HANDLER(pcw16_flash1_bank_handler0_w)
 {
-	pcw16_flash1_bank_handler_w(space->machine(),0, offset, data);
+	pcw16_flash1_bank_handler_w(space.machine(),0, offset, data);
 }
 
 
 static WRITE8_HANDLER(pcw16_flash1_bank_handler1_w)
 {
-	pcw16_flash1_bank_handler_w(space->machine(),1, offset, data);
+	pcw16_flash1_bank_handler_w(space.machine(),1, offset, data);
 }
 
 static WRITE8_HANDLER(pcw16_flash1_bank_handler2_w)
 {
-	pcw16_flash1_bank_handler_w(space->machine(),2, offset, data);
+	pcw16_flash1_bank_handler_w(space.machine(),2, offset, data);
 }
 
 static WRITE8_HANDLER(pcw16_flash1_bank_handler3_w)
 {
-	pcw16_flash1_bank_handler_w(space->machine(),3, offset, data);
+	pcw16_flash1_bank_handler_w(space.machine(),3, offset, data);
 }
 
 static const struct { write8_space_func func; const char *name; } pcw16_flash0_bank_handlers_w[4] =
@@ -369,36 +369,36 @@ READ8_MEMBER(pcw16_state::pcw16_no_mem_r)
 /*
 static void pcw16_set_bank_handlers(running_machine &machine, int bank, PCW16_RAM_TYPE type)
 {
-    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
     pcw16_state *state = machine.driver_data<pcw16_state>();
     switch (type) {
     case PCW16_MEM_ROM:
         // rom
-        space->install_read_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_read_handler_dram[bank]);
-        space->nop_write((bank * 0x4000), (bank * 0x4000) + 0x3fff);
+        space.install_read_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_read_handler_dram[bank]);
+        space.nop_write((bank * 0x4000), (bank * 0x4000) + 0x3fff);
         break;
 
     case PCW16_MEM_FLASH_1:
         // sram
-        space->install_legacy_read_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_flash0_bank_handlers_r[bank].func, pcw16_flash0_bank_handlers_r[bank].name);
-        space->install_legacy_write_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_flash0_bank_handlers_w[bank].func, pcw16_flash0_bank_handlers_w[bank].name);
+        space.install_legacy_read_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_flash0_bank_handlers_r[bank].func, pcw16_flash0_bank_handlers_r[bank].name);
+        space.install_legacy_write_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_flash0_bank_handlers_w[bank].func, pcw16_flash0_bank_handlers_w[bank].name);
         break;
 
     case PCW16_MEM_FLASH_2:
-        space->install_legacy_read_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_flash1_bank_handlers_r[bank].func, pcw16_flash1_bank_handlers_r[bank].name);
-        space->install_legacy_write_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_flash1_bank_handlers_w[bank].func, pcw16_flash1_bank_handlers_w[bank].name);
+        space.install_legacy_read_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_flash1_bank_handlers_r[bank].func, pcw16_flash1_bank_handlers_r[bank].name);
+        space.install_legacy_write_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_flash1_bank_handlers_w[bank].func, pcw16_flash1_bank_handlers_w[bank].name);
         break;
 
     case PCW16_MEM_NONE:
-        space->install_read_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, read8_delegate(FUNC(pcw16_state::pcw16_no_mem_r),state));
-        space->nop_write((bank * 0x4000), (bank * 0x4000) + 0x3fff);
+        space.install_read_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, read8_delegate(FUNC(pcw16_state::pcw16_no_mem_r),state));
+        space.nop_write((bank * 0x4000), (bank * 0x4000) + 0x3fff);
         break;
 
     default:
     case PCW16_MEM_DRAM:
         // dram
-        space->install_read_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_read_handler_dram[bank]);
-        space->install_write_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_write_handler_dram[bank]);
+        space.install_read_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_read_handler_dram[bank]);
+        space.install_write_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_write_handler_dram[bank]);
         break;
     }
 
@@ -1254,36 +1254,36 @@ WRITE8_MEMBER(pcw16_state::pcw16_system_control_w)
 /* write to Super I/O chip. FDC Data Rate. */
 WRITE8_MEMBER(pcw16_state::pcw16_superio_fdc_datarate_w)
 {
-	pc_fdc_w(&space, PC_FDC_DATA_RATE_REGISTER,data);
+	pc_fdc_w(space, PC_FDC_DATA_RATE_REGISTER,data);
 }
 
 /* write to Super I/O chip. FDC Digital output register */
 WRITE8_MEMBER(pcw16_state::pcw16_superio_fdc_digital_output_register_w)
 {
-	pc_fdc_w(&space, PC_FDC_DIGITAL_OUTPUT_REGISTER, data);
+	pc_fdc_w(space, PC_FDC_DIGITAL_OUTPUT_REGISTER, data);
 }
 
 /* write to Super I/O chip. FDC Data Register */
 WRITE8_MEMBER(pcw16_state::pcw16_superio_fdc_data_w)
 {
-	pc_fdc_w(&space, PC_FDC_DATA_REGISTER, data);
+	pc_fdc_w(space, PC_FDC_DATA_REGISTER, data);
 }
 
 /* write to Super I/O chip. FDC Data Register */
 READ8_MEMBER(pcw16_state::pcw16_superio_fdc_data_r)
 {
-	return pc_fdc_r(&space, PC_FDC_DATA_REGISTER);
+	return pc_fdc_r(space, PC_FDC_DATA_REGISTER);
 }
 
 /* write to Super I/O chip. FDC Main Status Register */
 READ8_MEMBER(pcw16_state::pcw16_superio_fdc_main_status_register_r)
 {
-	return pc_fdc_r(&space, PC_FDC_MAIN_STATUS_REGISTER);
+	return pc_fdc_r(space, PC_FDC_MAIN_STATUS_REGISTER);
 }
 
 READ8_MEMBER(pcw16_state::pcw16_superio_fdc_digital_input_register_r)
 {
-	return pc_fdc_r(&space, PC_FDC_DIGITIAL_INPUT_REGISTER);
+	return pc_fdc_r(space, PC_FDC_DIGITIAL_INPUT_REGISTER);
 }
 
 static void pcw16_fdc_interrupt(running_machine &machine, int state)

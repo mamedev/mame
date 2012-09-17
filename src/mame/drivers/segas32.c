@@ -446,12 +446,12 @@ static TIMER_DEVICE_CALLBACK( signal_v60_irq_callback )
 }
 
 
-static void int_control_w(address_space *space, int offset, UINT8 data)
+static void int_control_w(address_space &space, int offset, UINT8 data)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
+	segas32_state *state = space.machine().driver_data<segas32_state>();
 	int duration;
 
-//  logerror("%06X:int_control_w(%X) = %02X\n", space->device().safe_pc(), offset, data);
+//  logerror("%06X:int_control_w(%X) = %02X\n", space.device().safe_pc(), offset, data);
 	switch (offset)
 	{
 		case 0:
@@ -468,12 +468,12 @@ static void int_control_w(address_space *space, int offset, UINT8 data)
 
 		case 6:			/* mask */
 			state->m_v60_irq_control[offset] = data;
-			update_irq_state(space->machine());
+			update_irq_state(space.machine());
 			break;
 
 		case 7:			/* acknowledge */
 			state->m_v60_irq_control[offset] &= data;
-			update_irq_state(space->machine());
+			update_irq_state(space.machine());
 			break;
 
 		case 8:
@@ -502,7 +502,7 @@ static void int_control_w(address_space *space, int offset, UINT8 data)
 		case 13:
 		case 14:
 		case 15:		/* signal IRQ to sound CPU */
-			signal_sound_irq(space->machine(), SOUND_IRQ_V60);
+			signal_sound_irq(space.machine(), SOUND_IRQ_V60);
 			break;
 	}
 }
@@ -529,9 +529,9 @@ READ16_MEMBER(segas32_state::interrupt_control_16_r)
 WRITE16_MEMBER(segas32_state::interrupt_control_16_w)
 {
 	if (ACCESSING_BITS_0_7)
-		int_control_w(&space, offset*2+0, data);
+		int_control_w(space, offset*2+0, data);
 	if (ACCESSING_BITS_8_15)
-		int_control_w(&space, offset*2+1, data >> 8);
+		int_control_w(space, offset*2+1, data >> 8);
 }
 
 
@@ -552,13 +552,13 @@ READ32_MEMBER(segas32_state::interrupt_control_32_r)
 WRITE32_MEMBER(segas32_state::interrupt_control_32_w)
 {
 	if (ACCESSING_BITS_0_7)
-		int_control_w(&space, offset*4+0, data);
+		int_control_w(space, offset*4+0, data);
 	if (ACCESSING_BITS_8_15)
-		int_control_w(&space, offset*4+1, data >> 8);
+		int_control_w(space, offset*4+1, data >> 8);
 	if (ACCESSING_BITS_16_23)
-		int_control_w(&space, offset*4+2, data >> 16);
+		int_control_w(space, offset*4+2, data >> 16);
 	if (ACCESSING_BITS_24_31)
-		int_control_w(&space, offset*4+3, data >> 24);
+		int_control_w(space, offset*4+3, data >> 24);
 }
 
 
@@ -587,9 +587,9 @@ static INTERRUPT_GEN( start_of_vblank_int )
  *
  *************************************/
 
-static UINT16 common_io_chip_r(address_space *space, int which, offs_t offset, UINT16 mem_mask)
+static UINT16 common_io_chip_r(address_space &space, int which, offs_t offset, UINT16 mem_mask)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
+	segas32_state *state = space.machine().driver_data<segas32_state>();
 	static const char *const portnames[2][8] =
 			{
 				{ "P1_A", "P2_A", "PORTC_A", "PORTD_A", "SERVICE12_A", "SERVICE34_A", "PORTG_A", "PORTH_A" },
@@ -639,9 +639,9 @@ static UINT16 common_io_chip_r(address_space *space, int which, offs_t offset, U
 }
 
 
-static void common_io_chip_w(address_space *space, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
+static void common_io_chip_w(address_space &space, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
+	segas32_state *state = space.machine().driver_data<segas32_state>();
 //  UINT8 old;
 
 	/* only LSB matters */
@@ -673,15 +673,15 @@ static void common_io_chip_w(address_space *space, int which, offs_t offset, UIN
 
 			if (which == 0)
 			{
-				eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
+				eeprom_device *eeprom = space.machine().device<eeprom_device>("eeprom");
 				eeprom->write_bit(data & 0x80);
 				eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 				eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			}
-/*            coin_lockout_w(space->machine(), 1 + 2*which, data & 0x08);
-            coin_lockout_w(space->machine(), 0 + 2*which, data & 0x04);*/
-			coin_counter_w(space->machine(), 1 + 2*which, data & 0x02);
-			coin_counter_w(space->machine(), 0 + 2*which, data & 0x01);
+/*            coin_lockout_w(space.machine(), 1 + 2*which, data & 0x08);
+            coin_lockout_w(space.machine(), 0 + 2*which, data & 0x04);*/
+			coin_counter_w(space.machine(), 1 + 2*which, data & 0x02);
+			coin_counter_w(space.machine(), 0 + 2*which, data & 0x01);
 			break;
 
 		/* tile banking */
@@ -691,7 +691,7 @@ static void common_io_chip_w(address_space *space, int which, offs_t offset, UIN
 			else
 			{
 				/* multi-32 EEPROM access */
-				eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
+				eeprom_device *eeprom = space.machine().device<eeprom_device>("eeprom");
 				eeprom->write_bit(data & 0x80);
 				eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 				eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
@@ -702,7 +702,7 @@ static void common_io_chip_w(address_space *space, int which, offs_t offset, UIN
 		case 0x1c/2:
 			state->m_system32_displayenable[which] = (data & 0x02);
 			if (which == 0)
-				space->machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+				space.machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 	}
 }
@@ -710,45 +710,45 @@ static void common_io_chip_w(address_space *space, int which, offs_t offset, UIN
 
 READ16_MEMBER(segas32_state::io_chip_r)
 {
-	return common_io_chip_r(&space, 0, offset, mem_mask);
+	return common_io_chip_r(space, 0, offset, mem_mask);
 }
 
 
 WRITE16_MEMBER(segas32_state::io_chip_w)
 {
-	common_io_chip_w(&space, 0, offset, data, mem_mask);
+	common_io_chip_w(space, 0, offset, data, mem_mask);
 }
 
 
 READ32_MEMBER(segas32_state::io_chip_0_r)
 {
-	return common_io_chip_r(&space, 0, offset*2+0, mem_mask) |
-	      (common_io_chip_r(&space, 0, offset*2+1, mem_mask >> 16) << 16);
+	return common_io_chip_r(space, 0, offset*2+0, mem_mask) |
+	      (common_io_chip_r(space, 0, offset*2+1, mem_mask >> 16) << 16);
 }
 
 
 WRITE32_MEMBER(segas32_state::io_chip_0_w)
 {
 	if (ACCESSING_BITS_0_15)
-		common_io_chip_w(&space, 0, offset*2+0, data, mem_mask);
+		common_io_chip_w(space, 0, offset*2+0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		common_io_chip_w(&space, 0, offset*2+1, data >> 16, mem_mask >> 16);
+		common_io_chip_w(space, 0, offset*2+1, data >> 16, mem_mask >> 16);
 }
 
 
 READ32_MEMBER(segas32_state::io_chip_1_r)
 {
-	return common_io_chip_r(&space, 1, offset*2+0, mem_mask) |
-	      (common_io_chip_r(&space, 1, offset*2+1, mem_mask >> 16) << 16);
+	return common_io_chip_r(space, 1, offset*2+0, mem_mask) |
+	      (common_io_chip_r(space, 1, offset*2+1, mem_mask >> 16) << 16);
 }
 
 
 WRITE32_MEMBER(segas32_state::io_chip_1_w)
 {
 	if (ACCESSING_BITS_0_15)
-		common_io_chip_w(&space, 1, offset*2+0, data, mem_mask);
+		common_io_chip_w(space, 1, offset*2+0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		common_io_chip_w(&space, 1, offset*2+1, data >> 16, mem_mask >> 16);
+		common_io_chip_w(space, 1, offset*2+1, data >> 16, mem_mask >> 16);
 }
 
 

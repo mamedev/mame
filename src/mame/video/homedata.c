@@ -32,9 +32,9 @@
 
 ***************************************************************************/
 
-static void mrokumei_handleblit( address_space *space, int rom_base )
+static void mrokumei_handleblit( address_space &space, int rom_base )
 {
-	homedata_state *state = space->machine().driver_data<homedata_state>();
+	homedata_state *state = space.machine().driver_data<homedata_state>();
 	int i;
 	int dest_param;
 	int source_addr;
@@ -99,7 +99,7 @@ static void mrokumei_handleblit( address_space *space, int rom_base )
 			} /* i!=0 */
 
 			if (data)	/* 00 is a nop */
-				state->mrokumei_videoram_w(*space, base_addr + dest_addr, data);
+				state->mrokumei_videoram_w(space, base_addr + dest_addr, data);
 
 			if (state->m_vreg[1] & 0x80)	/* flip screen */
 			{
@@ -119,9 +119,9 @@ finish:
 	state->m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-static void reikaids_handleblit( address_space *space, int rom_base )
+static void reikaids_handleblit( address_space &space, int rom_base )
 {
-	homedata_state *state = space->machine().driver_data<homedata_state>();
+	homedata_state *state = space.machine().driver_data<homedata_state>();
 	int i;
 	UINT16 dest_param;
 	int flipx;
@@ -202,7 +202,7 @@ static void reikaids_handleblit( address_space *space, int rom_base )
 						addr ^= 0x007c;
 					}
 
-					state->reikaids_videoram_w(*space, addr, dat);
+					state->reikaids_videoram_w(space, addr, dat);
 				}
 			}
 
@@ -217,9 +217,9 @@ finish:
 	state->m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-static void pteacher_handleblit( address_space *space, int rom_base )
+static void pteacher_handleblit( address_space &space, int rom_base )
 {
-	homedata_state *state = space->machine().driver_data<homedata_state>();
+	homedata_state *state = space.machine().driver_data<homedata_state>();
 	int i;
 	int dest_param;
 	int source_addr;
@@ -289,7 +289,7 @@ static void pteacher_handleblit( address_space *space, int rom_base )
 				if ((addr & 0x2080) == 0)
 				{
 					addr = ((addr & 0xc000) >> 2) | ((addr & 0x1f00) >> 1) | (addr & 0x7f);
-					state->mrokumei_videoram_w(*space, addr, data);
+					state->mrokumei_videoram_w(space, addr, data);
 				}
 			}
 
@@ -777,7 +777,7 @@ WRITE8_MEMBER(homedata_state::pteacher_blitter_bank_w)
 WRITE8_MEMBER(homedata_state::mrokumei_blitter_start_w)
 {
 	if (data & 0x80)
-		mrokumei_handleblit(&space, ((m_blitter_bank & 0x04) >> 2) * 0x10000);
+		mrokumei_handleblit(space, ((m_blitter_bank & 0x04) >> 2) * 0x10000);
 
 	/* bit 0 = bank switch; used by hourouki to access the
        optional service mode ROM (not available in current dump) */
@@ -785,12 +785,12 @@ WRITE8_MEMBER(homedata_state::mrokumei_blitter_start_w)
 
 WRITE8_MEMBER(homedata_state::reikaids_blitter_start_w)
 {
-	reikaids_handleblit(&space, (m_blitter_bank & 3) * 0x10000);
+	reikaids_handleblit(space, (m_blitter_bank & 3) * 0x10000);
 }
 
 WRITE8_MEMBER(homedata_state::pteacher_blitter_start_w)
 {
-	pteacher_handleblit(&space, (m_blitter_bank >> 5) * 0x10000 & (machine().root_device().memregion("user1")->bytes() - 1));
+	pteacher_handleblit(space, (m_blitter_bank >> 5) * 0x10000 & (machine().root_device().memregion("user1")->bytes() - 1));
 }
 
 

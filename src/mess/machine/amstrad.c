@@ -1196,21 +1196,21 @@ static void amstrad_setLowerRom(running_machine &machine)
 	}
 	else  // CPC+/GX4000
 	{
-		//address_space *space = state->m_maincpu->space(AS_PROGRAM);
+		//address_space &space = *state->m_maincpu->space(AS_PROGRAM);
 
 /*      if ( state->m_asic.enabled && ( state->m_asic.rmr2 & 0x18 ) == 0x18 )
         {
-            space->install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_r),state));
-            space->install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_r),state));
-            space->install_write_handler(0x4000, 0x5fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_w),state));
-            space->install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_w),state));
+            space.install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_r),state));
+            space.install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_r),state));
+            space.install_write_handler(0x4000, 0x5fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_w),state));
+            space.install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_w),state));
         }
         else
         {
-            space->install_read_bank(0x4000, 0x5fff, "bank3");
-            space->install_read_bank(0x6000, 0x7fff, "bank4");
-            space->install_write_bank(0x4000, 0x5fff, "bank11");
-            space->install_write_bank(0x6000, 0x7fff, "bank12");
+            space.install_read_bank(0x4000, 0x5fff, "bank3");
+            space.install_read_bank(0x6000, 0x7fff, "bank4");
+            space.install_write_bank(0x4000, 0x5fff, "bank11");
+            space.install_write_bank(0x6000, 0x7fff, "bank12");
         }
 */
 		if(state->m_AmstradCPC_RamBanks[0] != NULL)

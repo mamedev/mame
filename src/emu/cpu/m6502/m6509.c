@@ -102,21 +102,21 @@ INLINE m6509_Regs *get_safe_token(device_t *device)
 
 static READ8_HANDLER( m6509_read_00000 )
 {
-	m6509_Regs *cpustate = get_safe_token(&space->device());
+	m6509_Regs *cpustate = get_safe_token(&space.device());
 
 	return cpustate->pc_bank.b.h2;
 }
 
 static READ8_HANDLER( m6509_read_00001 )
 {
-	m6509_Regs *cpustate = get_safe_token(&space->device());
+	m6509_Regs *cpustate = get_safe_token(&space.device());
 
 	return cpustate->ind_bank.b.h2;
 }
 
 static WRITE8_HANDLER( m6509_write_00000 )
 {
-	m6509_Regs *cpustate = get_safe_token(&space->device());
+	m6509_Regs *cpustate = get_safe_token(&space.device());
 
 	cpustate->pc_bank.b.h2=data&0xf;
 	cpustate->pc.w.h=cpustate->pc_bank.w.h;
@@ -124,7 +124,7 @@ static WRITE8_HANDLER( m6509_write_00000 )
 
 static WRITE8_HANDLER( m6509_write_00001 )
 {
-	m6509_Regs *cpustate = get_safe_token(&space->device());
+	m6509_Regs *cpustate = get_safe_token(&space.device());
 
 	cpustate->ind_bank.b.h2=data&0xf;
 }

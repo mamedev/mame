@@ -455,7 +455,7 @@ DIRECT_UPDATE_MEMBER(psx1_state::psx_setopbase)
 static QUICKLOAD_LOAD( psx_exe_load )
 {
 	psx1_state *state = image.device().machine().driver_data<psx1_state>();
-	address_space *space = image.device().machine().device( "maincpu")->memory().space( AS_PROGRAM );
+	address_space &space = *image.device().machine().device( "maincpu")->memory().space( AS_PROGRAM );
 
 	state->m_exe_size = 0;
 	state->m_exe_buffer = (UINT8*)malloc( quickload_size );
@@ -470,7 +470,7 @@ static QUICKLOAD_LOAD( psx_exe_load )
 		return IMAGE_INIT_FAIL;
 	}
 	state->m_exe_size = quickload_size;
-	space->set_direct_update_handler(direct_update_delegate(FUNC(psx1_state::psx_setopbase), state));
+	space.set_direct_update_handler(direct_update_delegate(FUNC(psx1_state::psx_setopbase), state));
 
 	return IMAGE_INIT_PASS;
 }

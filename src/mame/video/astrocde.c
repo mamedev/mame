@@ -740,9 +740,9 @@ INLINE void increment_dest(astrocde_state *state, UINT8 curwidth)
 }
 
 
-static void execute_blit(address_space *space)
+static void execute_blit(address_space &space)
 {
-	astrocde_state *state = space->machine().driver_data<astrocde_state>();
+	astrocde_state *state = space.machine().driver_data<astrocde_state>();
 	/*
         state->m_pattern_source = counter set U7/U16/U25/U34
         state->m_pattern_dest = counter set U9/U18/U30/U39
@@ -795,7 +795,7 @@ static void execute_blit(address_space *space)
 			if (curwidth == 0 && (state->m_pattern_mode & 0x08) != 0)
 				busdata = 0;
 			else
-				busdata = space->read_byte(busaddr);
+				busdata = space.read_byte(busaddr);
 
 			/* increment the appropriate address */
 			if ((state->m_pattern_mode & 0x01) == 0)
@@ -807,7 +807,7 @@ static void execute_blit(address_space *space)
 
 			/* address is selected between source/dest based on mode.d0 */
 			busaddr = ((state->m_pattern_mode & 0x01) != 0) ? state->m_pattern_source : state->m_pattern_dest;
-			space->write_byte(busaddr, busdata);
+			space.write_byte(busaddr, busdata);
 
 			/* increment the appropriate address */
 			if ((state->m_pattern_mode & 0x01) == 0)
@@ -833,7 +833,7 @@ static void execute_blit(address_space *space)
 	} while (state->m_pattern_height-- != 0);
 
 	/* count cycles we ran the bus */
-	space->device().execute().adjust_icount(-cycles);
+	space.device().execute().adjust_icount(-cycles);
 }
 
 
@@ -868,7 +868,7 @@ WRITE8_MEMBER(astrocde_state::astrocade_pattern_board_w)
 
 		case 6:		/* height of blit and initiator */
 			m_pattern_height = data;
-			execute_blit(space.device().memory().space(AS_PROGRAM));
+			execute_blit(*space.device().memory().space(AS_PROGRAM));
 			break;
 	}
 }

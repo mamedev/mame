@@ -1353,7 +1353,7 @@ static void mcd212_draw_scanline(mcd212_regs_t *mcd212, int y)
 
 READ16_HANDLER( mcd212_r )
 {
-    cdi_state *state = space->machine().driver_data<cdi_state>();
+    cdi_state *state = space.machine().driver_data<cdi_state>();
     mcd212_regs_t *mcd212 = &state->m_mcd212_regs;
     UINT8 channel = 1 - (offset / 8);
 
@@ -1363,7 +1363,7 @@ READ16_HANDLER( mcd212_r )
         case 0x10/2:
             if(ACCESSING_BITS_0_7)
             {
-                verboselog(space->machine(), 12, "mcd212_r: Status Register %d: %02x & %04x\n", channel + 1, mcd212->channel[1 - (offset / 8)].csrr, mem_mask);
+                verboselog(space.machine(), 12, "mcd212_r: Status Register %d: %02x & %04x\n", channel + 1, mcd212->channel[1 - (offset / 8)].csrr, mem_mask);
                 if(channel == 0)
                 {
                     return mcd212->channel[0].csrr;
@@ -1376,38 +1376,38 @@ READ16_HANDLER( mcd212_r )
                     mcd212->channel[1].csrr &= ~(MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2);
                     if(interrupt1)
                     {
-                        space->machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (interrupt1 - 1), CLEAR_LINE);
+                        space.machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (interrupt1 - 1), CLEAR_LINE);
                     }
                     //if(interrupt2)
                     //{
-                    //  space->machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (interrupt2 - 1), CLEAR_LINE);
+                    //  space.machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (interrupt2 - 1), CLEAR_LINE);
                     //}
                     return old_csr;
                 }
             }
             else
             {
-                verboselog(space->machine(), 2, "mcd212_r: Unknown Register %d: %04x\n", channel + 1, mem_mask);
+                verboselog(space.machine(), 2, "mcd212_r: Unknown Register %d: %04x\n", channel + 1, mem_mask);
             }
             break;
         case 0x02/2:
         case 0x12/2:
-            verboselog(space->machine(), 2, "mcd212_r: Display Command Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212->channel[1 - (offset / 8)].dcr, mem_mask);
+            verboselog(space.machine(), 2, "mcd212_r: Display Command Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212->channel[1 - (offset / 8)].dcr, mem_mask);
             return mcd212->channel[1 - (offset / 8)].dcr;
         case 0x04/2:
         case 0x14/2:
-            verboselog(space->machine(), 2, "mcd212_r: Video Start Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212->channel[1 - (offset / 8)].vsr, mem_mask);
+            verboselog(space.machine(), 2, "mcd212_r: Video Start Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212->channel[1 - (offset / 8)].vsr, mem_mask);
             return mcd212->channel[1 - (offset / 8)].vsr;
         case 0x08/2:
         case 0x18/2:
-            verboselog(space->machine(), 2, "mcd212_r: Display Decoder Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212->channel[1 - (offset / 8)].ddr, mem_mask);
+            verboselog(space.machine(), 2, "mcd212_r: Display Decoder Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212->channel[1 - (offset / 8)].ddr, mem_mask);
             return mcd212->channel[1 - (offset / 8)].ddr;
         case 0x0a/2:
         case 0x1a/2:
-            verboselog(space->machine(), 2, "mcd212_r: DCA Pointer Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212->channel[1 - (offset / 8)].dcp, mem_mask);
+            verboselog(space.machine(), 2, "mcd212_r: DCA Pointer Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212->channel[1 - (offset / 8)].dcp, mem_mask);
             return mcd212->channel[1 - (offset / 8)].dcp;
         default:
-            verboselog(space->machine(), 2, "mcd212_r: Unknown Register %d & %04x\n", (1 - (offset / 8)) + 1, mem_mask);
+            verboselog(space.machine(), 2, "mcd212_r: Unknown Register %d & %04x\n", (1 - (offset / 8)) + 1, mem_mask);
             break;
     }
 
@@ -1416,40 +1416,40 @@ READ16_HANDLER( mcd212_r )
 
 WRITE16_HANDLER( mcd212_w )
 {
-    cdi_state *state = space->machine().driver_data<cdi_state>();
+    cdi_state *state = space.machine().driver_data<cdi_state>();
     mcd212_regs_t *mcd212 = &state->m_mcd212_regs;
 
     switch(offset)
     {
         case 0x00/2:
         case 0x10/2:
-            verboselog(space->machine(), 2, "mcd212_w: Status Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
+            verboselog(space.machine(), 2, "mcd212_w: Status Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
             COMBINE_DATA(&mcd212->channel[1 - (offset / 8)].csrw);
-            mcd212_update_visible_area(space->machine());
+            mcd212_update_visible_area(space.machine());
             break;
         case 0x02/2:
         case 0x12/2:
-            verboselog(space->machine(), 2, "mcd212_w: Display Command Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
+            verboselog(space.machine(), 2, "mcd212_w: Display Command Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
             COMBINE_DATA(&mcd212->channel[1 - (offset / 8)].dcr);
-            mcd212_update_visible_area(space->machine());
+            mcd212_update_visible_area(space.machine());
             break;
         case 0x04/2:
         case 0x14/2:
-            verboselog(space->machine(), 2, "mcd212_w: Video Start Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
+            verboselog(space.machine(), 2, "mcd212_w: Video Start Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
             COMBINE_DATA(&mcd212->channel[1 - (offset / 8)].vsr);
             break;
         case 0x08/2:
         case 0x18/2:
-            verboselog(space->machine(), 2, "mcd212_w: Display Decoder Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
+            verboselog(space.machine(), 2, "mcd212_w: Display Decoder Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
             COMBINE_DATA(&mcd212->channel[1 - (offset / 8)].ddr);
             break;
         case 0x0a/2:
         case 0x1a/2:
-            verboselog(space->machine(), 2, "mcd212_w: DCA Pointer Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
+            verboselog(space.machine(), 2, "mcd212_w: DCA Pointer Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
             COMBINE_DATA(&mcd212->channel[1 - (offset / 8)].dcp);
             break;
         default:
-            verboselog(space->machine(), 2, "mcd212_w: Unknown Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
+            verboselog(space.machine(), 2, "mcd212_w: Unknown Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
             break;
     }
 }

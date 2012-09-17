@@ -620,22 +620,22 @@ INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(spectrum_state,spectrum)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch (machine().device<ram_device>(RAM_TAG)->size())
 	{
 	    case 48*1024:
-		space->install_ram(0x8000, 0xffff, NULL); // Fall through
+		space.install_ram(0x8000, 0xffff, NULL); // Fall through
 	    case 16*1024:
-		space->install_ram(0x5b00, 0x7fff, NULL);
+		space.install_ram(0x5b00, 0x7fff, NULL);
 	}
 }
 
 MACHINE_RESET_MEMBER(spectrum_state,spectrum)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	space->set_direct_update_handler(direct_update_delegate(FUNC(spectrum_state::spectrum_direct), this));
+	space.set_direct_update_handler(direct_update_delegate(FUNC(spectrum_state::spectrum_direct), this));
 
 	m_port_7ffd_data = -1;
 	m_port_1ffd_data = -1;

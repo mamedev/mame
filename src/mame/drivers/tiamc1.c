@@ -120,8 +120,8 @@
 
 void tiamc1_state::machine_reset()
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	tiamc1_bankswitch_w(*space, 0, 0);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	tiamc1_bankswitch_w(space, 0, 0);
 }
 
 WRITE8_MEMBER(tiamc1_state::tiamc1_control_w)

@@ -171,13 +171,13 @@ void namcos1_state::video_start()
 
 READ8_HANDLER( namcos1_videoram_r )
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
+	namcos1_state *state = space.machine().driver_data<namcos1_state>();
 	return state->m_videoram[offset];
 }
 
 WRITE8_HANDLER( namcos1_videoram_w )
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
+	namcos1_state *state = space.machine().driver_data<namcos1_state>();
 	state->m_videoram[offset] = data;
 	if (offset < 0x7000)
 	{   /* background 0-3 */
@@ -197,7 +197,7 @@ WRITE8_HANDLER( namcos1_videoram_w )
 
 WRITE8_HANDLER( namcos1_paletteram_w )
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
+	namcos1_state *state = space.machine().driver_data<namcos1_state>();
 	if (state->m_paletteram[offset] == data)
 		return;
 
@@ -212,7 +212,7 @@ WRITE8_HANDLER( namcos1_paletteram_w )
 		r = state->m_paletteram[offset];
 		g = state->m_paletteram[offset + 0x0800];
 		b = state->m_paletteram[offset + 0x1000];
-		palette_set_color(space->machine(),color,MAKE_RGB(r,g,b));
+		palette_set_color(space.machine(),color,MAKE_RGB(r,g,b));
 	}
 	else
 	{
@@ -235,7 +235,7 @@ WRITE8_HANDLER( namcos1_paletteram_w )
 
 READ8_HANDLER( namcos1_spriteram_r )
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
+	namcos1_state *state = space.machine().driver_data<namcos1_state>();
 	/* 0000-07ff work ram */
 	/* 0800-0fff sprite ram */
 	if (offset < 0x1000)
@@ -247,7 +247,7 @@ READ8_HANDLER( namcos1_spriteram_r )
 
 WRITE8_HANDLER( namcos1_spriteram_w )
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
+	namcos1_state *state = space.machine().driver_data<namcos1_state>();
 	/* 0000-07ff work ram */
 	/* 0800-0fff sprite ram */
 	if (offset < 0x1000)

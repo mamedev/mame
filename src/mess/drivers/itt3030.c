@@ -57,13 +57,13 @@ READ8_MEMBER(itt3030_state::unk2_r)
 
 UINT32 itt3030_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	for(int y = 0; y < 24; y++ )
 	{
 		for(int x = 0; x < 80; x++ )
 		{
-			UINT8 code = space->read_byte(0x3000 + x + y*128);
+			UINT8 code = space.read_byte(0x3000 + x + y*128);
 			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0],  code , 0, 0,0, x*8,y*16);
 		}
 	}

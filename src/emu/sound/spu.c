@@ -3106,7 +3106,7 @@ void spu_device::dma_write( UINT32 n_address, INT32 n_size )
 
 READ16_HANDLER( spu_r )
 {
-	spu_device *spu = space->machine().device<spu_device>("spu");
+	spu_device *spu = space.machine().device<spu_device>("spu");
 
 	if (spu == NULL )
 	{
@@ -3118,7 +3118,7 @@ READ16_HANDLER( spu_r )
 
 WRITE16_HANDLER( spu_w )
 {
-	spu_device *spu = space->machine().device<spu_device>("spu");
+	spu_device *spu = space.machine().device<spu_device>("spu");
 
 	if (spu == NULL)
 	{

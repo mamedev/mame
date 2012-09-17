@@ -688,9 +688,9 @@ INLINE void log_blit( running_machine &machine, int data )
 #endif
 }
 
-static void blitter_w( address_space *space, int blitter, offs_t offset, UINT8 data, int irq_vector )
+static void blitter_w( address_space &space, int blitter, offs_t offset, UINT8 data, int irq_vector )
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
+	dynax_state *state = space.machine().driver_data<dynax_state>();
 	int hi_bits;
 
 g_profiler.start(PROFILER_VIDEO);
@@ -720,7 +720,7 @@ g_profiler.start(PROFILER_VIDEO);
 			break;
 
 		case 0x03:
-			ddenlovr_blit_flip_w(space->machine(), data);
+			ddenlovr_blit_flip_w(space.machine(), data);
 			break;
 
 		case 0x04:
@@ -789,57 +789,57 @@ g_profiler.start(PROFILER_VIDEO);
 
 		case 0x24:
 
-			log_blit(space->machine(), data);
+			log_blit(space.machine(), data);
 
 			switch (data)
 			{
-				case 0x04:	blit_fill_xy(space->machine(), 0, 0);
+				case 0x04:	blit_fill_xy(space.machine(), 0, 0);
 							break;
-				case 0x14:	blit_fill_xy(space->machine(), state->m_ddenlovr_blit_x, state->m_ddenlovr_blit_y);
-							break;
-
-				case 0x10:	state->m_ddenlovr_blit_address = blit_draw(space->machine(), state->m_ddenlovr_blit_address, state->m_ddenlovr_blit_x);
+				case 0x14:	blit_fill_xy(space.machine(), state->m_ddenlovr_blit_x, state->m_ddenlovr_blit_y);
 							break;
 
-				case 0x13:	blit_horiz_line(space->machine());
-							break;
-				case 0x1b:	blit_vert_line(space->machine());
+				case 0x10:	state->m_ddenlovr_blit_address = blit_draw(space.machine(), state->m_ddenlovr_blit_address, state->m_ddenlovr_blit_x);
 							break;
 
-				case 0x1c:	blit_rect_xywh(space->machine());
+				case 0x13:	blit_horiz_line(space.machine());
+							break;
+				case 0x1b:	blit_vert_line(space.machine());
+							break;
+
+				case 0x1c:	blit_rect_xywh(space.machine());
 							break;
 
 				// These two are issued one after the other (43 then 8c)
 				// 8c is issued immediately after 43 has finished, without
 				// changing any argument
 				case 0x43:	break;
-				case 0x8c:	blit_rect_yh(space->machine());
+				case 0x8c:	blit_rect_yh(space.machine());
 							break;
 
 				default:
 							;
 				#ifdef MAME_DEBUG
 					popmessage("unknown blitter command %02x", data);
-					logerror("%06x: unknown blitter command %02x\n", space->device().safe_pc(), data);
+					logerror("%06x: unknown blitter command %02x\n", space.device().safe_pc(), data);
 				#endif
 			}
 
 			if (irq_vector)
 				/* quizchq */
-				space->device().execute().set_input_line_and_vector(0, HOLD_LINE, irq_vector);
+				space.device().execute().set_input_line_and_vector(0, HOLD_LINE, irq_vector);
 			else
 			{
 				/* ddenlovr */
 				if (state->m_ddenlovr_blitter_irq_enable)
 				{
 					state->m_ddenlovr_blitter_irq_flag = 1;
-					space->device().execute().set_input_line(1, HOLD_LINE);
+					space.device().execute().set_input_line(1, HOLD_LINE);
 				}
 			}
 			break;
 
 		default:
-			logerror("%06x: Blitter %d reg %02x = %02x\n", space->device().safe_pc(), blitter, state->m_ddenlovr_blit_regs[blitter], data);
+			logerror("%06x: Blitter %d reg %02x = %02x\n", space.device().safe_pc(), blitter, state->m_ddenlovr_blit_regs[blitter], data);
 			break;
 		}
 	}
@@ -1205,13 +1205,13 @@ g_profiler.stop();
 
 WRITE8_MEMBER(dynax_state::rongrong_blitter_w)
 {
-	blitter_w(&space, 0, offset, data, 0xf8);
+	blitter_w(space, 0, offset, data, 0xf8);
 }
 
 WRITE16_MEMBER(dynax_state::ddenlovr_blitter_w)
 {
 	if (ACCESSING_BITS_0_7)
-		blitter_w(&space, 0, offset, data & 0xff, 0);
+		blitter_w(space, 0, offset, data & 0xff, 0);
 }
 
 
@@ -2080,11 +2080,11 @@ WRITE8_MEMBER(dynax_state::mmpanic_soundlatch_w)
 
 WRITE8_MEMBER(dynax_state::mmpanic_blitter_w)
 {
-	blitter_w(&space, 0, offset, data, 0xdf);	// RST 18
+	blitter_w(space, 0, offset, data, 0xdf);	// RST 18
 }
 WRITE8_MEMBER(dynax_state::mmpanic_blitter2_w)
 {
-	blitter_w(&space, 1, offset, data, 0xdf);	// RST 18
+	blitter_w(space, 1, offset, data, 0xdf);	// RST 18
 }
 
 static void mmpanic_update_leds(running_machine &machine)
@@ -2750,7 +2750,7 @@ WRITE8_MEMBER(dynax_state::mjmyster_coincounter_w)
 
 WRITE8_MEMBER(dynax_state::mjmyster_blitter_w)
 {
-	blitter_w(&space, 0, offset, data, 0xfc);
+	blitter_w(space, 0, offset, data, 0xfc);
 }
 
 static ADDRESS_MAP_START( mjmyster_portmap, AS_IO, 8, dynax_state )
@@ -2922,7 +2922,7 @@ WRITE8_MEMBER(dynax_state::hginga_blitter_w)
 				break;
 		}
 	}
-	blitter_w(&space, 0, offset, data, 0xfc);
+	blitter_w(space, 0, offset, data, 0xfc);
 }
 
 static ADDRESS_MAP_START( hginga_portmap, AS_IO, 8, dynax_state )
@@ -2956,10 +2956,10 @@ ADDRESS_MAP_END
                              Hanafuda Hana Gokou
 ***************************************************************************/
 
-static UINT8 hgokou_player_r( address_space *space, int player )
+static UINT8 hgokou_player_r( address_space &space, int player )
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
-	UINT8 hopper_bit = ((state->m_hopper && !(space->machine().primary_screen->frame_number() % 10)) ? 0 : (1 << 6));
+	dynax_state *state = space.machine().driver_data<dynax_state>();
+	UINT8 hopper_bit = ((state->m_hopper && !(space.machine().primary_screen->frame_number() % 10)) ? 0 : (1 << 6));
 
 	if (!BIT(state->m_input_sel, 0))   return state->ioport(player ? "KEY5" : "KEY0")->read() | hopper_bit;
 	if (!BIT(state->m_input_sel, 1))   return state->ioport(player ? "KEY6" : "KEY1")->read() | hopper_bit;
@@ -2980,8 +2980,8 @@ READ8_MEMBER(dynax_state::hgokou_input_r)
 	switch (m_dsw_sel)
 	{
 		case 0x20:	return ioport("SYSTEM")->read();
-		case 0x21:	return hgokou_player_r(&space, 1);
-		case 0x22:	return hgokou_player_r(&space, 0);
+		case 0x21:	return hgokou_player_r(space, 1);
+		case 0x22:	return hgokou_player_r(space, 0);
 		case 0x23:	return m_coins;
 	}
 	logerror("%06x: warning, unknown bits read, dsw_sel = %02x\n", space.device().safe_pc(), m_dsw_sel);
@@ -3077,12 +3077,12 @@ READ8_MEMBER(dynax_state::hgokbang_input_r)
 				m_input_sel = 0xfe;
 			return 0;	// discarded
 		case 0xa1:
-			ret = hgokou_player_r(&space, 1);
+			ret = hgokou_player_r(space, 1);
 			m_input_sel <<= 1;		// auto-increment input_sel
 			m_input_sel |= 1;
 			return ret;
 		case 0xa2:
-			ret = hgokou_player_r(&space, 0);
+			ret = hgokou_player_r(space, 0);
 			m_input_sel <<= 1;		// auto-increment input_sel
 			m_input_sel |= 1;
 			return ret;
@@ -3389,7 +3389,7 @@ CUSTOM_INPUT_MEMBER(dynax_state::mjflove_blitter_r)
 
 WRITE8_MEMBER(dynax_state::mjflove_blitter_w)
 {
-	blitter_w(&space, 0, offset, data, 0);
+	blitter_w(space, 0, offset, data, 0);
 }
 
 WRITE8_MEMBER(dynax_state::mjflove_coincounter_w)

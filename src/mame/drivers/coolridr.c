@@ -593,9 +593,9 @@ WRITE32_MEMBER(coolridr_state::sysh1_pal_w)
 
 
 /* FIXME: this seems to do a hell lot of stuff, it's not ST-V SCU but still somewhat complex :/ */
-static void sysh1_dma_transfer( address_space *space, UINT16 dma_index )
+static void sysh1_dma_transfer( address_space &space, UINT16 dma_index )
 {
-	coolridr_state *state = space->machine().driver_data<coolridr_state>();
+	coolridr_state *state = space.machine().driver_data<coolridr_state>();
 	UINT32 src,dst,size,type,s_i;
 	UINT8 end_dma_mark;
 
@@ -644,14 +644,14 @@ static void sysh1_dma_transfer( address_space *space, UINT16 dma_index )
 			//size/=2;
 			if((src & 0xff00000) == 0x3e00000)
 				return; //FIXME: kludge to avoid palette corruption
-			//debugger_break(space->machine());
+			//debugger_break(space.machine());
 		}
 
 		if(type == 0xc || type == 0xd || type == 0xe)
 		{
 			for(s_i=0;s_i<size;s_i+=4)
 			{
-				space->write_dword(dst,space->read_dword(src));
+				space.write_dword(dst,space.read_dword(src));
 				dst+=4;
 				src+=4;
 			}
@@ -676,7 +676,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_dma_w)
 	if(offset*4 == 0x000)
 	{
 		if((m_framebuffer_vram[offset] & 0xff00000) == 0xfe00000)
-			sysh1_dma_transfer(&space, m_framebuffer_vram[offset] & 0xffff);
+			sysh1_dma_transfer(space, m_framebuffer_vram[offset] & 0xffff);
 	}
 }
 

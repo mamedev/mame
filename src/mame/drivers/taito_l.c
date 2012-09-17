@@ -433,36 +433,36 @@ READ8_MEMBER(taitol_state::rambankswitch_r)
 	return m_cur_rambank[offset];
 }
 
-static void bank_w(address_space *space, offs_t offset, UINT8 data, int banknum )
+static void bank_w(address_space &space, offs_t offset, UINT8 data, int banknum )
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
+	taitol_state *state = space.machine().driver_data<taitol_state>();
 
 	if (state->m_current_base[banknum][offset] != data)
 	{
 		state->m_current_base[banknum][offset] = data;
 		if (state->m_current_notifier[banknum])
-			state->m_current_notifier[banknum](space->machine(), offset);
+			state->m_current_notifier[banknum](space.machine(), offset);
 	}
 }
 
 WRITE8_MEMBER(taitol_state::bank0_w)
 {
-	bank_w(&space, offset, data, 0);
+	bank_w(space, offset, data, 0);
 }
 
 WRITE8_MEMBER(taitol_state::bank1_w)
 {
-	bank_w(&space, offset, data, 1);
+	bank_w(space, offset, data, 1);
 }
 
 WRITE8_MEMBER(taitol_state::bank2_w)
 {
-	bank_w(&space, offset, data, 2);
+	bank_w(space, offset, data, 2);
 }
 
 WRITE8_MEMBER(taitol_state::bank3_w)
 {
-	bank_w(&space, offset, data, 3);
+	bank_w(space, offset, data, 3);
 }
 
 WRITE8_MEMBER(taitol_state::control2_w)
@@ -1777,7 +1777,7 @@ WRITE8_MEMBER(taitol_state::portA_w)
 		m_cur_bank = data & 0x03;
 		bankaddress = m_cur_bank * 0x4000;
 		membank("bank7")->set_base(&RAM[bankaddress]);
-		//logerror ("YM2203 bank change val=%02x  pc=%04x\n", m_cur_bank, space->device().safe_pc() );
+		//logerror ("YM2203 bank change val=%02x  pc=%04x\n", m_cur_bank, space.device().safe_pc() );
 	}
 }
 

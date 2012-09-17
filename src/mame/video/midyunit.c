@@ -171,16 +171,16 @@ READ16_MEMBER(midyunit_state::midyunit_vram_r)
  *
  *************************************/
 
-void midyunit_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
+void midyunit_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
-	midyunit_state *state = space->machine().driver_data<midyunit_state>();
+	midyunit_state *state = space.machine().driver_data<midyunit_state>();
 	memcpy(shiftreg, &state->m_local_videoram[address >> 3], 2 * 512 * sizeof(UINT16));
 }
 
 
-void midyunit_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
+void midyunit_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
-	midyunit_state *state = space->machine().driver_data<midyunit_state>();
+	midyunit_state *state = space.machine().driver_data<midyunit_state>();
 	memcpy(&state->m_local_videoram[address >> 3], shiftreg, 2 * 512 * sizeof(UINT16));
 }
 

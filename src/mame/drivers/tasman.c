@@ -137,13 +137,13 @@ WRITE32_MEMBER(kongambl_state::eeprom_w)
 
 static READ32_HANDLER( test_r )
 {
-	return -1;//space->machine().rand();
+	return -1;//space.machine().rand();
 }
 
 /*
  static READ32_HANDLER( rng_r )
 {
-    return space->machine().rand();
+    return space.machine().rand();
 }
 */
 

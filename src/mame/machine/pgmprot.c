@@ -54,7 +54,7 @@ static void asic3_compute_hold(running_machine &machine)
 
 READ16_HANDLER( pgm_asic3_r )
 {
-	pgm_asic3_state *state = space->machine().driver_data<pgm_asic3_state>();
+	pgm_asic3_state *state = space.machine().driver_data<pgm_asic3_state>();
 	UINT8 res = 0;
 	/* region is supplied by the protection device */
 
@@ -98,7 +98,7 @@ READ16_HANDLER( pgm_asic3_r )
 
 WRITE16_HANDLER( pgm_asic3_w )
 {
-	pgm_asic3_state *state = space->machine().driver_data<pgm_asic3_state>();
+	pgm_asic3_state *state = space.machine().driver_data<pgm_asic3_state>();
 
 	if(ACCESSING_BITS_0_7)
 	{
@@ -127,14 +127,14 @@ WRITE16_HANDLER( pgm_asic3_w )
 		{
 			state->m_asic3_y = state->m_asic3_reg & 7;
 			state->m_asic3_z = data;
-			asic3_compute_hold(space->machine());
+			asic3_compute_hold(space.machine());
 		}
 	}
 }
 
 WRITE16_HANDLER( pgm_asic3_reg_w )
 {
-	pgm_asic3_state *state = space->machine().driver_data<pgm_asic3_state>();
+	pgm_asic3_state *state = space.machine().driver_data<pgm_asic3_state>();
 
 	if(ACCESSING_BITS_0_7)
 		state->m_asic3_reg = data & 0xff;

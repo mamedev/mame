@@ -288,7 +288,7 @@ static void set_irq_line(h6280_Regs* cpustate, int irqline, int state)
 READ8_HANDLER( h6280_irq_status_r )
 {
 	int status;
-	h6280_Regs *cpustate = get_safe_token(&space->device());
+	h6280_Regs *cpustate = get_safe_token(&space.device());
 
 	switch (offset&3)
 	{
@@ -307,7 +307,7 @@ READ8_HANDLER( h6280_irq_status_r )
 
 WRITE8_HANDLER( h6280_irq_status_w )
 {
-	h6280_Regs *cpustate = get_safe_token(&space->device());
+	h6280_Regs *cpustate = get_safe_token(&space.device());
 	cpustate->io_buffer=data;
 	switch (offset&3)
 	{
@@ -326,13 +326,13 @@ WRITE8_HANDLER( h6280_irq_status_w )
 READ8_HANDLER( h6280_timer_r )
 {
 	/* only returns countdown */
-	h6280_Regs *cpustate = get_safe_token(&space->device());
+	h6280_Regs *cpustate = get_safe_token(&space.device());
 	return ((cpustate->timer_value >> 10)&0x7F)|(cpustate->io_buffer&0x80);
 }
 
 WRITE8_HANDLER( h6280_timer_w )
 {
-	h6280_Regs *cpustate = get_safe_token(&space->device());
+	h6280_Regs *cpustate = get_safe_token(&space.device());
 	cpustate->io_buffer=data;
 	switch (offset & 1) {
 		case 0: /* Counter preload */

@@ -529,7 +529,7 @@ static void reset_decrementer(tms99xx_state *cpustate);
 READ16_HANDLER(ti990_10_internal_r)
 {
 	//return cpustate->ROM[offset];
-	return space->read_word(0x1ffc00+offset);
+	return space.read_word(0x1ffc00+offset);
 }
 
 #endif
@@ -541,13 +541,13 @@ READ16_HANDLER(ti990_10_internal_r)
 */
 READ8_HANDLER(tms9995_internal1_r)
 {
-	tms99xx_state *cpustate = get_safe_token(&space->device());
+	tms99xx_state *cpustate = get_safe_token(&space.device());
 	return cpustate->RAM[offset];
 }
 
 WRITE8_HANDLER(tms9995_internal1_w)
 {
-	tms99xx_state *cpustate = get_safe_token(&space->device());
+	tms99xx_state *cpustate = get_safe_token(&space.device());
 	cpustate->RAM[offset]=data;
 }
 
@@ -556,13 +556,13 @@ WRITE8_HANDLER(tms9995_internal1_w)
 */
 READ8_HANDLER(tms9995_internal2_r)
 {
-	tms99xx_state *cpustate = get_safe_token(&space->device());
+	tms99xx_state *cpustate = get_safe_token(&space.device());
 	return cpustate->RAM[offset+0xfc];
 }
 
 WRITE8_HANDLER(tms9995_internal2_w)
 {
-	tms99xx_state *cpustate = get_safe_token(&space->device());
+	tms99xx_state *cpustate = get_safe_token(&space.device());
 	cpustate->RAM[offset+0xfc]=data;
 }
 
@@ -1076,7 +1076,7 @@ INLINE void WRITEREG_DEBUG(tms99xx_state *cpustate, int reg, UINT16 data)
 #if (TMS99XX_MODEL == TI990_10_ID)
 	READ8_HANDLER(ti990_10_mapper_cru_r)
 	{
-		tms99xx_state *cpustate = get_safe_token(&space->device());
+		tms99xx_state *cpustate = get_safe_token(&space.device());
 		int reply = 0;
 
 		switch(cpustate->mapper_cru_read_register)
@@ -1115,7 +1115,7 @@ INLINE void WRITEREG_DEBUG(tms99xx_state *cpustate, int reg, UINT16 data)
 
 	WRITE8_HANDLER(ti990_10_mapper_cru_w)
 	{
-		tms99xx_state *cpustate = get_safe_token(&space->device());
+		tms99xx_state *cpustate = get_safe_token(&space.device());
 		switch (offset)
 		{
 		case 0:
@@ -1157,13 +1157,13 @@ INLINE void WRITEREG_DEBUG(tms99xx_state *cpustate, int reg, UINT16 data)
 
 	READ8_HANDLER(ti990_10_eir_cru_r)
 	{
-		tms99xx_state *cpustate = get_safe_token(&space->device());
+		tms99xx_state *cpustate = get_safe_token(&space.device());
 		return (offset == 1) ? (cpustate->error_interrupt_register & 0xff) : 0;
 	}
 
 	WRITE8_HANDLER(ti990_10_eir_cru_w)
 	{
-		tms99xx_state *cpustate = get_safe_token(&space->device());
+		tms99xx_state *cpustate = get_safe_token(&space.device());
 		if (offset < 4)	/* does not work for EIR_MAPERR */
 		{
 			cpustate->error_interrupt_register &= ~ (1 << offset);

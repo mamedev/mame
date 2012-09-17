@@ -141,7 +141,7 @@ public:
 
 	// wrappers for legacy functions (to be removed)
 	template<write16_space_func _Legacy>
-	WRITE16_MEMBER( legacy_wrapper ) { _Legacy(&space, offset, data, mem_mask); }
+	WRITE16_MEMBER( legacy_wrapper ) { _Legacy(space, offset, data, mem_mask); }
 
 protected:
 	// internal types

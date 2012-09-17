@@ -210,7 +210,7 @@ WRITE8_MEMBER(subsino2_state::ss9601_byte_lo2_w)
 }
 
 
-INLINE void ss9601_videoram_w(layer_t *l, vram_t vram, address_space *space, offs_t offset, UINT8 data)
+INLINE void ss9601_videoram_w(layer_t *l, vram_t vram, address_space &space, offs_t offset, UINT8 data)
 {
 	l->videorams[vram][offset] = data;
 
@@ -239,24 +239,24 @@ INLINE void ss9601_videoram_w(layer_t *l, vram_t vram, address_space *space, off
 // Layer 0
 WRITE8_MEMBER(subsino2_state::ss9601_videoram_0_hi_w)
 {
-	ss9601_videoram_w(&m_layers[0], VRAM_HI, &space, offset, data);
+	ss9601_videoram_w(&m_layers[0], VRAM_HI, space, offset, data);
 }
 
 WRITE8_MEMBER(subsino2_state::ss9601_videoram_0_lo_w)
 {
-	ss9601_videoram_w(&m_layers[0], VRAM_LO, &space, offset, data);
+	ss9601_videoram_w(&m_layers[0], VRAM_LO, space, offset, data);
 }
 
 WRITE8_MEMBER(subsino2_state::ss9601_videoram_0_hi_lo_w)
 {
-	ss9601_videoram_w(&m_layers[0], VRAM_HI, &space, offset, data);
-	ss9601_videoram_w(&m_layers[0], VRAM_LO, &space, offset, m_ss9601_byte_lo);
+	ss9601_videoram_w(&m_layers[0], VRAM_HI, space, offset, data);
+	ss9601_videoram_w(&m_layers[0], VRAM_LO, space, offset, m_ss9601_byte_lo);
 }
 
 WRITE8_MEMBER(subsino2_state::ss9601_videoram_0_hi_lo2_w)
 {
-	ss9601_videoram_w(&m_layers[0], VRAM_HI, &space, offset, data);
-	ss9601_videoram_w(&m_layers[0], VRAM_LO, &space, offset, m_ss9601_byte_lo2);
+	ss9601_videoram_w(&m_layers[0], VRAM_HI, space, offset, data);
+	ss9601_videoram_w(&m_layers[0], VRAM_LO, space, offset, m_ss9601_byte_lo2);
 }
 
 READ8_MEMBER(subsino2_state::ss9601_videoram_0_hi_r)
@@ -272,24 +272,24 @@ READ8_MEMBER(subsino2_state::ss9601_videoram_0_lo_r)
 // Layer 1
 WRITE8_MEMBER(subsino2_state::ss9601_videoram_1_hi_w)
 {
-	ss9601_videoram_w(&m_layers[1], VRAM_HI, &space, offset, data);
+	ss9601_videoram_w(&m_layers[1], VRAM_HI, space, offset, data);
 }
 
 WRITE8_MEMBER(subsino2_state::ss9601_videoram_1_lo_w)
 {
-	ss9601_videoram_w(&m_layers[1], VRAM_LO, &space, offset, data);
+	ss9601_videoram_w(&m_layers[1], VRAM_LO, space, offset, data);
 }
 
 WRITE8_MEMBER(subsino2_state::ss9601_videoram_1_hi_lo_w)
 {
-	ss9601_videoram_w(&m_layers[1], VRAM_HI, &space, offset, data);
-	ss9601_videoram_w(&m_layers[1], VRAM_LO, &space, offset, m_ss9601_byte_lo);
+	ss9601_videoram_w(&m_layers[1], VRAM_HI, space, offset, data);
+	ss9601_videoram_w(&m_layers[1], VRAM_LO, space, offset, m_ss9601_byte_lo);
 }
 
 WRITE8_MEMBER(subsino2_state::ss9601_videoram_1_hi_lo2_w)
 {
-	ss9601_videoram_w(&m_layers[1], VRAM_HI, &space, offset, data);
-	ss9601_videoram_w(&m_layers[1], VRAM_LO, &space, offset, m_ss9601_byte_lo2);
+	ss9601_videoram_w(&m_layers[1], VRAM_HI, space, offset, data);
+	ss9601_videoram_w(&m_layers[1], VRAM_LO, space, offset, m_ss9601_byte_lo2);
 }
 
 READ8_MEMBER(subsino2_state::ss9601_videoram_1_hi_r)
@@ -1084,11 +1084,11 @@ WRITE8_MEMBER(subsino2_state::mtrain_videoram_w)
 	vram_t vram = (m_ss9601_byte_lo & 0x08) ? VRAM_HI : VRAM_LO;
 	switch (m_ss9601_byte_lo & (~0x08))
 	{
-		case 0x00:	ss9601_videoram_w(&m_layers[1], vram, &space, offset,        data);
-					ss9601_videoram_w(&m_layers[1], vram, &space, offset+0x1000, data);	break;
+		case 0x00:	ss9601_videoram_w(&m_layers[1], vram, space, offset,        data);
+					ss9601_videoram_w(&m_layers[1], vram, space, offset+0x1000, data);	break;
 
-		case 0x04:	ss9601_videoram_w(&m_layers[0], vram, &space, offset,        data);
-					ss9601_videoram_w(&m_layers[0], vram, &space, offset+0x1000, data);	break;
+		case 0x04:	ss9601_videoram_w(&m_layers[0], vram, space, offset,        data);
+					ss9601_videoram_w(&m_layers[0], vram, space, offset+0x1000, data);	break;
 
 		case 0x06:	m_ss9601_reelrams[vram][offset] = data;	break;
 	}

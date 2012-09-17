@@ -2207,9 +2207,9 @@ ROM_START( boonggab )
 	ROM_COPY( "user2", 0x0e0000, 0x1e0000, 0x020000)
 ROM_END
 
-static int irq_active(address_space *space)
+static int irq_active(address_space &space)
 {
-	UINT32 FCR = space->device().state().state_int(27);
+	UINT32 FCR = space.device().state().state_int(27);
 	if( !(FCR&(1<<29)) ) // int 2 (irq 4)
 		return 1;
 	else
@@ -2220,7 +2220,7 @@ READ16_MEMBER(vamphalf_state::vamphalf_speedup_r)
 {
 	if(space.device().safe_pc() == 0x82de)
 	{
-		if(irq_active(&space))
+		if(irq_active(space))
 			space.device().execute().spin_until_interrupt();
 		else
 			space.device().execute().eat_cycles(50);
@@ -2233,7 +2233,7 @@ READ16_MEMBER(vamphalf_state::vamphafk_speedup_r)
 {
 	if(space.device().safe_pc() == 0x82de)
 	{
-		if(irq_active(&space))
+		if(irq_active(space))
 			space.device().execute().spin_until_interrupt();
 		else
 			space.device().execute().eat_cycles(50);
@@ -2246,7 +2246,7 @@ READ16_MEMBER(vamphalf_state::misncrft_speedup_r)
 {
 	if(space.device().safe_pc() == 0xecc8)
 	{
-		if(irq_active(&space))
+		if(irq_active(space))
 			space.device().execute().spin_until_interrupt();
 		else
 			space.device().execute().eat_cycles(50);
@@ -2259,7 +2259,7 @@ READ16_MEMBER(vamphalf_state::coolmini_speedup_r)
 {
 	if(space.device().safe_pc() == 0x75f7a)
 	{
-		if(irq_active(&space))
+		if(irq_active(space))
 			space.device().execute().spin_until_interrupt();
 		else
 			space.device().execute().eat_cycles(50);
@@ -2272,7 +2272,7 @@ READ16_MEMBER(vamphalf_state::suplup_speedup_r)
 {
 	if(space.device().safe_pc() == 0xaf18a )
 	{
-		if(irq_active(&space))
+		if(irq_active(space))
 			space.device().execute().spin_until_interrupt();
 		else
 			space.device().execute().eat_cycles(50);
@@ -2285,7 +2285,7 @@ READ16_MEMBER(vamphalf_state::luplup_speedup_r)
 {
 	if(space.device().safe_pc() == 0xaefac )
 	{
-		if(irq_active(&space))
+		if(irq_active(space))
 			space.device().execute().spin_until_interrupt();
 		else
 			space.device().execute().eat_cycles(50);
@@ -2298,7 +2298,7 @@ READ16_MEMBER(vamphalf_state::luplup29_speedup_r)
 {
 	if(space.device().safe_pc() == 0xae6c0 )
 	{
-		if(irq_active(&space))
+		if(irq_active(space))
 			space.device().execute().spin_until_interrupt();
 		else
 			space.device().execute().eat_cycles(50);
@@ -2311,7 +2311,7 @@ READ16_MEMBER(vamphalf_state::puzlbang_speedup_r)
 {
 	if(space.device().safe_pc() == 0xae6d2 )
 	{
-		if(irq_active(&space))
+		if(irq_active(space))
 			space.device().execute().spin_until_interrupt();
 		else
 			space.device().execute().eat_cycles(50);
@@ -2326,7 +2326,7 @@ READ32_MEMBER(vamphalf_state::wyvernwg_speedup_r)
 
 	if(pc == 0x10758)
 	{
-		if(irq_active(&space))
+		if(irq_active(space))
 			space.device().execute().spin_until_interrupt();
 		else
 			space.device().execute().eat_cycles(50);
@@ -2341,7 +2341,7 @@ READ32_MEMBER(vamphalf_state::wyvernwga_speedup_r)
 
 	if(pc == 0x10758)
 	{
-		if(irq_active(&space))
+		if(irq_active(space))
 			space.device().execute().spin_until_interrupt();
 		else
 			space.device().execute().eat_cycles(50);
@@ -2356,7 +2356,7 @@ READ32_MEMBER(vamphalf_state::finalgdr_speedup_r)
 {
 	if(space.device().safe_pc() == 0x1c212)
 	{
-		if(irq_active(&space))
+		if(irq_active(space))
 			space.device().execute().spin_until_interrupt();
 		else
 			space.device().execute().eat_cycles(50);
@@ -2370,7 +2370,7 @@ READ32_MEMBER(vamphalf_state::mrkicker_speedup_r)
 	UINT32 pc = space.device().safe_pc();
 	if(pc == 0x469de || pc == 0x46a36)
 	{
-//      if(irq_active(&space))
+//      if(irq_active(space))
 //          space.device().execute().spin_until_interrupt();
 //      else
 			space.device().execute().eat_cycles(50);
@@ -2384,7 +2384,7 @@ READ16_MEMBER(vamphalf_state::dquizgo2_speedup_r)
 {
 	if(space.device().safe_pc() == 0xaa622)
 	{
-		if(irq_active(&space))
+		if(irq_active(space))
 			space.device().execute().spin_until_interrupt();
 		else
 			space.device().execute().eat_cycles(50);
@@ -2412,7 +2412,7 @@ READ16_MEMBER(vamphalf_state::jmpbreak_speedup_r)
 {
 	if(space.device().safe_pc() == 0x983c)
 	{
-		if(irq_active(&space))
+		if(irq_active(space))
 			space.device().execute().spin_until_interrupt();
 		else
 			space.device().execute().eat_cycles(50);
@@ -2425,7 +2425,7 @@ READ16_MEMBER(vamphalf_state::mrdig_speedup_r)
 {
 	if(space.device().safe_pc() == 0x1710)
 	{
-		if(irq_active(&space))
+		if(irq_active(space))
 			space.device().execute().spin_until_interrupt();
 		else
 			space.device().execute().eat_cycles(50);
@@ -2460,7 +2460,7 @@ READ16_MEMBER(vamphalf_state::boonggab_speedup_r)
 {
 	if(space.device().safe_pc() == 0x13198)
 	{
-		if(irq_active(&space))
+		if(irq_active(space))
 			space.device().execute().spin_until_interrupt();
 	}
 

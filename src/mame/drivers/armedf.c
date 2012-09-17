@@ -317,7 +317,7 @@ WRITE16_MEMBER(armedf_state::terraf_io_w)
 {
 
 	if(data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
-		nb_1414m4_exec(&space,(m_text_videoram[0] << 8) | (m_text_videoram[1] & 0xff),m_text_videoram,m_fg_scrollx,m_fg_scrolly,m_tx_tilemap);
+		nb_1414m4_exec(space,(m_text_videoram[0] << 8) | (m_text_videoram[1] & 0xff),m_text_videoram,m_fg_scrollx,m_fg_scrolly,m_tx_tilemap);
 
 
 	COMBINE_DATA(&m_vreg);

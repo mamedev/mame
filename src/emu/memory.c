@@ -1022,20 +1022,20 @@ public:
 	// generate accessor table
 	virtual void accessors(data_accessors &accessors) const
 	{
-		accessors.read_byte = reinterpret_cast<UINT8 (*)(address_space *, offs_t)>(&read_byte_static);
-		accessors.read_word = reinterpret_cast<UINT16 (*)(address_space *, offs_t)>(&read_word_static);
-		accessors.read_word_masked = reinterpret_cast<UINT16 (*)(address_space *, offs_t, UINT16)>(&read_word_masked_static);
-		accessors.read_dword = reinterpret_cast<UINT32 (*)(address_space *, offs_t)>(&read_dword_static);
-		accessors.read_dword_masked = reinterpret_cast<UINT32 (*)(address_space *, offs_t, UINT32)>(&read_dword_masked_static);
-		accessors.read_qword = reinterpret_cast<UINT64 (*)(address_space *, offs_t)>(&read_qword_static);
-		accessors.read_qword_masked = reinterpret_cast<UINT64 (*)(address_space *, offs_t, UINT64)>(&read_qword_masked_static);
-		accessors.write_byte = reinterpret_cast<void (*)(address_space *, offs_t, UINT8)>(&write_byte_static);
-		accessors.write_word = reinterpret_cast<void (*)(address_space *, offs_t, UINT16)>(&write_word_static);
-		accessors.write_word_masked = reinterpret_cast<void (*)(address_space *, offs_t, UINT16, UINT16)>(&write_word_masked_static);
-		accessors.write_dword = reinterpret_cast<void (*)(address_space *, offs_t, UINT32)>(&write_dword_static);
-		accessors.write_dword_masked = reinterpret_cast<void (*)(address_space *, offs_t, UINT32, UINT32)>(&write_dword_masked_static);
-		accessors.write_qword = reinterpret_cast<void (*)(address_space *, offs_t, UINT64)>(&write_qword_static);
-		accessors.write_qword_masked = reinterpret_cast<void (*)(address_space *, offs_t, UINT64, UINT64)>(&write_qword_masked_static);
+		accessors.read_byte = reinterpret_cast<UINT8 (*)(address_space &, offs_t)>(&read_byte_static);
+		accessors.read_word = reinterpret_cast<UINT16 (*)(address_space &, offs_t)>(&read_word_static);
+		accessors.read_word_masked = reinterpret_cast<UINT16 (*)(address_space &, offs_t, UINT16)>(&read_word_masked_static);
+		accessors.read_dword = reinterpret_cast<UINT32 (*)(address_space &, offs_t)>(&read_dword_static);
+		accessors.read_dword_masked = reinterpret_cast<UINT32 (*)(address_space &, offs_t, UINT32)>(&read_dword_masked_static);
+		accessors.read_qword = reinterpret_cast<UINT64 (*)(address_space &, offs_t)>(&read_qword_static);
+		accessors.read_qword_masked = reinterpret_cast<UINT64 (*)(address_space &, offs_t, UINT64)>(&read_qword_masked_static);
+		accessors.write_byte = reinterpret_cast<void (*)(address_space &, offs_t, UINT8)>(&write_byte_static);
+		accessors.write_word = reinterpret_cast<void (*)(address_space &, offs_t, UINT16)>(&write_word_static);
+		accessors.write_word_masked = reinterpret_cast<void (*)(address_space &, offs_t, UINT16, UINT16)>(&write_word_masked_static);
+		accessors.write_dword = reinterpret_cast<void (*)(address_space &, offs_t, UINT32)>(&write_dword_static);
+		accessors.write_dword_masked = reinterpret_cast<void (*)(address_space &, offs_t, UINT32, UINT32)>(&write_dword_masked_static);
+		accessors.write_qword = reinterpret_cast<void (*)(address_space &, offs_t, UINT64)>(&write_qword_static);
+		accessors.write_qword_masked = reinterpret_cast<void (*)(address_space &, offs_t, UINT64, UINT64)>(&write_qword_masked_static);
 	}
 
 	// return a pointer to the read bank, or NULL if none
@@ -1441,20 +1441,20 @@ public:
 	void write_qword_unaligned(offs_t address, UINT64 data, UINT64 mask) { write_direct<UINT64, false>(address, data, mask); }
 
 	// static access to these functions
-	static UINT8 read_byte_static(this_type *space, offs_t address) { return (NATIVE_BITS == 8) ? space->read_native(address & ~NATIVE_MASK) : space->read_direct<UINT8, true>(address, 0xff); }
-	static UINT16 read_word_static(this_type *space, offs_t address) { return (NATIVE_BITS == 16) ? space->read_native(address & ~NATIVE_MASK) : space->read_direct<UINT16, true>(address, 0xffff); }
-	static UINT16 read_word_masked_static(this_type *space, offs_t address, UINT16 mask) { return space->read_direct<UINT16, true>(address, mask); }
-	static UINT32 read_dword_static(this_type *space, offs_t address) { return (NATIVE_BITS == 32) ? space->read_native(address & ~NATIVE_MASK) : space->read_direct<UINT32, true>(address, 0xffffffff); }
-	static UINT32 read_dword_masked_static(this_type *space, offs_t address, UINT32 mask) { return space->read_direct<UINT32, true>(address, mask); }
-	static UINT64 read_qword_static(this_type *space, offs_t address) { return (NATIVE_BITS == 64) ? space->read_native(address & ~NATIVE_MASK) : space->read_direct<UINT64, true>(address, U64(0xffffffffffffffff)); }
-	static UINT64 read_qword_masked_static(this_type *space, offs_t address, UINT64 mask) { return space->read_direct<UINT64, true>(address, mask); }
-	static void write_byte_static(this_type *space, offs_t address, UINT8 data) { if (NATIVE_BITS == 8) space->write_native(address & ~NATIVE_MASK, data); else space->write_direct<UINT8, true>(address, data, 0xff); }
-	static void write_word_static(this_type *space, offs_t address, UINT16 data) { if (NATIVE_BITS == 16) space->write_native(address & ~NATIVE_MASK, data); else space->write_direct<UINT16, true>(address, data, 0xffff); }
-	static void write_word_masked_static(this_type *space, offs_t address, UINT16 data, UINT16 mask) { space->write_direct<UINT16, true>(address, data, mask); }
-	static void write_dword_static(this_type *space, offs_t address, UINT32 data) { if (NATIVE_BITS == 32) space->write_native(address & ~NATIVE_MASK, data); else space->write_direct<UINT32, true>(address, data, 0xffffffff); }
-	static void write_dword_masked_static(this_type *space, offs_t address, UINT32 data, UINT32 mask) { space->write_direct<UINT32, true>(address, data, mask); }
-	static void write_qword_static(this_type *space, offs_t address, UINT64 data) { if (NATIVE_BITS == 64) space->write_native(address & ~NATIVE_MASK, data); else space->write_direct<UINT64, true>(address, data, U64(0xffffffffffffffff)); }
-	static void write_qword_masked_static(this_type *space, offs_t address, UINT64 data, UINT64 mask) { space->write_direct<UINT64, true>(address, data, mask); }
+	static UINT8 read_byte_static(this_type &space, offs_t address) { return (NATIVE_BITS == 8) ? space.read_native(address & ~NATIVE_MASK) : space.read_direct<UINT8, true>(address, 0xff); }
+	static UINT16 read_word_static(this_type &space, offs_t address) { return (NATIVE_BITS == 16) ? space.read_native(address & ~NATIVE_MASK) : space.read_direct<UINT16, true>(address, 0xffff); }
+	static UINT16 read_word_masked_static(this_type &space, offs_t address, UINT16 mask) { return space.read_direct<UINT16, true>(address, mask); }
+	static UINT32 read_dword_static(this_type &space, offs_t address) { return (NATIVE_BITS == 32) ? space.read_native(address & ~NATIVE_MASK) : space.read_direct<UINT32, true>(address, 0xffffffff); }
+	static UINT32 read_dword_masked_static(this_type &space, offs_t address, UINT32 mask) { return space.read_direct<UINT32, true>(address, mask); }
+	static UINT64 read_qword_static(this_type &space, offs_t address) { return (NATIVE_BITS == 64) ? space.read_native(address & ~NATIVE_MASK) : space.read_direct<UINT64, true>(address, U64(0xffffffffffffffff)); }
+	static UINT64 read_qword_masked_static(this_type &space, offs_t address, UINT64 mask) { return space.read_direct<UINT64, true>(address, mask); }
+	static void write_byte_static(this_type &space, offs_t address, UINT8 data) { if (NATIVE_BITS == 8) space.write_native(address & ~NATIVE_MASK, data); else space.write_direct<UINT8, true>(address, data, 0xff); }
+	static void write_word_static(this_type &space, offs_t address, UINT16 data) { if (NATIVE_BITS == 16) space.write_native(address & ~NATIVE_MASK, data); else space.write_direct<UINT16, true>(address, data, 0xffff); }
+	static void write_word_masked_static(this_type &space, offs_t address, UINT16 data, UINT16 mask) { space.write_direct<UINT16, true>(address, data, mask); }
+	static void write_dword_static(this_type &space, offs_t address, UINT32 data) { if (NATIVE_BITS == 32) space.write_native(address & ~NATIVE_MASK, data); else space.write_direct<UINT32, true>(address, data, 0xffffffff); }
+	static void write_dword_masked_static(this_type &space, offs_t address, UINT32 data, UINT32 mask) { space.write_direct<UINT32, true>(address, data, mask); }
+	static void write_qword_static(this_type &space, offs_t address, UINT64 data) { if (NATIVE_BITS == 64) space.write_native(address & ~NATIVE_MASK, data); else space.write_direct<UINT64, true>(address, data, U64(0xffffffffffffffff)); }
+	static void write_qword_masked_static(this_type &space, offs_t address, UINT64 data, UINT64 mask) { space.write_direct<UINT64, true>(address, data, mask); }
 
 	address_table_read		m_read;				// memory read lookup table
 	address_table_write		m_write;			// memory write lookup table
@@ -4984,7 +4984,7 @@ UINT16 handler_entry_read::read_stub_16(address_space &space, offs_t offset, UIN
 			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
 			UINT8 val;
 			if (m_sub_is_legacy[index])
-				val = m_sublegacy_info[index].handler.space8(m_sublegacy_info[index].object.space, aoffset);
+				val = m_sublegacy_info[index].handler.space8(*m_sublegacy_info[index].object.space, aoffset);
 			else
 				val = m_subread[index].r8(space, aoffset, submask);
 			result |= val << si.m_shift;
@@ -5015,10 +5015,10 @@ UINT32 handler_entry_read::read_stub_32(address_space &space, offs_t offset, UIN
 				switch (si.m_size)
 				{
 				case 8:
-					val = m_sublegacy_info[index].handler.space8(m_sublegacy_info[index].object.space, aoffset);
+					val = m_sublegacy_info[index].handler.space8(*m_sublegacy_info[index].object.space, aoffset);
 					break;
 				case 16:
-					val = m_sublegacy_info[index].handler.space16(m_sublegacy_info[index].object.space, aoffset, submask);
+					val = m_sublegacy_info[index].handler.space16(*m_sublegacy_info[index].object.space, aoffset, submask);
 					break;
 				}
 			}
@@ -5062,13 +5062,13 @@ UINT64 handler_entry_read::read_stub_64(address_space &space, offs_t offset, UIN
 				switch (si.m_size)
 				{
 				case 8:
-					val = m_sublegacy_info[index].handler.space8(m_sublegacy_info[index].object.space, aoffset);
+					val = m_sublegacy_info[index].handler.space8(*m_sublegacy_info[index].object.space, aoffset);
 					break;
 				case 16:
-					val = m_sublegacy_info[index].handler.space16(m_sublegacy_info[index].object.space, aoffset, submask);
+					val = m_sublegacy_info[index].handler.space16(*m_sublegacy_info[index].object.space, aoffset, submask);
 					break;
 				case 32:
-					val = m_sublegacy_info[index].handler.space32(m_sublegacy_info[index].object.space, aoffset, submask);
+					val = m_sublegacy_info[index].handler.space32(*m_sublegacy_info[index].object.space, aoffset, submask);
 					break;
 				}
 			}
@@ -5101,22 +5101,22 @@ UINT64 handler_entry_read::read_stub_64(address_space &space, offs_t offset, UIN
 
 UINT8 handler_entry_read::read_stub_legacy(address_space &space, offs_t offset, UINT8 mask)
 {
-	return m_legacy_info.handler.space8(m_legacy_info.object.space, offset);
+	return m_legacy_info.handler.space8(*m_legacy_info.object.space, offset);
 }
 
 UINT16 handler_entry_read::read_stub_legacy(address_space &space, offs_t offset, UINT16 mask)
 {
-	return m_legacy_info.handler.space16(m_legacy_info.object.space, offset, mask);
+	return m_legacy_info.handler.space16(*m_legacy_info.object.space, offset, mask);
 }
 
 UINT32 handler_entry_read::read_stub_legacy(address_space &space, offs_t offset, UINT32 mask)
 {
-	return m_legacy_info.handler.space32(m_legacy_info.object.space, offset, mask);
+	return m_legacy_info.handler.space32(*m_legacy_info.object.space, offset, mask);
 }
 
 UINT64 handler_entry_read::read_stub_legacy(address_space &space, offs_t offset, UINT64 mask)
 {
-	return m_legacy_info.handler.space64(m_legacy_info.object.space, offset, mask);
+	return m_legacy_info.handler.space64(*m_legacy_info.object.space, offset, mask);
 }
 
 
@@ -5438,7 +5438,7 @@ void handler_entry_write::write_stub_16(address_space &space, offs_t offset, UIN
 			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
 			UINT8 adata = data >> si.m_shift;
 			if (m_sub_is_legacy[index])
-				m_sublegacy_info[index].handler.space8(m_sublegacy_info[index].object.space, aoffset, adata);
+				m_sublegacy_info[index].handler.space8(*m_sublegacy_info[index].object.space, aoffset, adata);
 			else
 				m_subwrite[index].w8(space, aoffset, adata, submask);
 		}
@@ -5466,10 +5466,10 @@ void handler_entry_write::write_stub_32(address_space &space, offs_t offset, UIN
 				switch (si.m_size)
 				{
 				case 8:
-					m_sublegacy_info[index].handler.space8(m_sublegacy_info[index].object.space, aoffset, adata);
+					m_sublegacy_info[index].handler.space8(*m_sublegacy_info[index].object.space, aoffset, adata);
 					break;
 				case 16:
-					m_sublegacy_info[index].handler.space16(m_sublegacy_info[index].object.space, aoffset, adata, submask);
+					m_sublegacy_info[index].handler.space16(*m_sublegacy_info[index].object.space, aoffset, adata, submask);
 					break;
 				}
 			}
@@ -5510,13 +5510,13 @@ void handler_entry_write::write_stub_64(address_space &space, offs_t offset, UIN
 				switch (si.m_size)
 				{
 				case 8:
-					m_sublegacy_info[index].handler.space8(m_sublegacy_info[index].object.space, aoffset, adata);
+					m_sublegacy_info[index].handler.space8(*m_sublegacy_info[index].object.space, aoffset, adata);
 					break;
 				case 16:
-					m_sublegacy_info[index].handler.space16(m_sublegacy_info[index].object.space, aoffset, adata, submask);
+					m_sublegacy_info[index].handler.space16(*m_sublegacy_info[index].object.space, aoffset, adata, submask);
 					break;
 				case 32:
-					m_sublegacy_info[index].handler.space32(m_sublegacy_info[index].object.space, aoffset, adata, submask);
+					m_sublegacy_info[index].handler.space32(*m_sublegacy_info[index].object.space, aoffset, adata, submask);
 					break;
 				}
 			}
@@ -5547,20 +5547,20 @@ void handler_entry_write::write_stub_64(address_space &space, offs_t offset, UIN
 
 void handler_entry_write::write_stub_legacy(address_space &space, offs_t offset, UINT8 data, UINT8 mask)
 {
-	m_legacy_info.handler.space8(m_legacy_info.object.space, offset, data);
+	m_legacy_info.handler.space8(*m_legacy_info.object.space, offset, data);
 }
 
 void handler_entry_write::write_stub_legacy(address_space &space, offs_t offset, UINT16 data, UINT16 mask)
 {
-	m_legacy_info.handler.space16(m_legacy_info.object.space, offset, data, mask);
+	m_legacy_info.handler.space16(*m_legacy_info.object.space, offset, data, mask);
 }
 
 void handler_entry_write::write_stub_legacy(address_space &space, offs_t offset, UINT32 data, UINT32 mask)
 {
-	m_legacy_info.handler.space32(m_legacy_info.object.space, offset, data, mask);
+	m_legacy_info.handler.space32(*m_legacy_info.object.space, offset, data, mask);
 }
 
 void handler_entry_write::write_stub_legacy(address_space &space, offs_t offset, UINT64 data, UINT64 mask)
 {
-	m_legacy_info.handler.space64(m_legacy_info.object.space, offset, data, mask);
+	m_legacy_info.handler.space64(*m_legacy_info.object.space, offset, data, mask);
 }

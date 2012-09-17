@@ -112,7 +112,7 @@ WRITE8_DEVICE_HANDLER( turbo_sound_a_w )
 #else
 
 	if (((data ^ state->m_last_sound_a) & 0x1e) && (state->m_last_sound_a & 0x1e) != 0x1e)
-		space->machine().scheduler().timer_set(attotime::from_hz(20000), FUNC(update_sound_a), data);
+		space.machine().scheduler().timer_set(attotime::from_hz(20000), FUNC(update_sound_a), data);
 	else
 		update_sound_a(data);
 

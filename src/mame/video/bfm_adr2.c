@@ -280,7 +280,7 @@ static WRITE8_HANDLER( screen_ram_w )
 		r = ((data & 0x18)>>3) *  85;  // 00011000b = 0x18
 		g = ((data & 0x06)>>1) *  85;  // 00000110b = 0x06
 		b = ((data & 0x01)   ) * 255;
-		palette_set_color(space->machine(), pal, MAKE_RGB(r,g,b));
+		palette_set_color(space.machine(), pal, MAKE_RGB(r,g,b));
 	}
 
 	if ( adder2_screen_page_reg & SL_ACCESS )
@@ -314,7 +314,7 @@ static WRITE8_HANDLER( normal_ram_w )
 
 static WRITE8_HANDLER( adder2_rom_page_w )
 {
-	space->machine().root_device().membank("bank2")->set_entry(data&0x03);
+	space.machine().root_device().membank("bank2")->set_entry(data&0x03);
 }
 
 ///////////////////////////////////////////////////////////////////////////

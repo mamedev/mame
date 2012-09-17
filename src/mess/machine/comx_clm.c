@@ -251,7 +251,7 @@ void comx_clm_device::comx_ds_w(int state)
 
 UINT8 comx_clm_device::comx_mrd_r(offs_t offset, int *extrom)
 {
-	address_space *space = machine().firstcpu->space(AS_PROGRAM);
+	address_space &space = *machine().firstcpu->space(AS_PROGRAM);
 
 	UINT8 data = 0xff;
 
@@ -265,7 +265,7 @@ UINT8 comx_clm_device::comx_mrd_r(offs_t offset, int *extrom)
 	}
 	else if (offset == 0xd801)
 	{
-		data = m_crtc->register_r(*space, 0);
+		data = m_crtc->register_r(space, 0);
 	}
 
 	return data;
@@ -278,7 +278,7 @@ UINT8 comx_clm_device::comx_mrd_r(offs_t offset, int *extrom)
 
 void comx_clm_device::comx_mwr_w(offs_t offset, UINT8 data)
 {
-	address_space *space = machine().firstcpu->space(AS_PROGRAM);
+	address_space &space = *machine().firstcpu->space(AS_PROGRAM);
 
 	if (offset >= 0xd000 && offset < 0xd800)
 	{
@@ -286,10 +286,10 @@ void comx_clm_device::comx_mwr_w(offs_t offset, UINT8 data)
 	}
 	else if (offset == 0xd800)
 	{
-		m_crtc->address_w(*space, 0, data);
+		m_crtc->address_w(space, 0, data);
 	}
 	else if (offset == 0xd801)
 	{
-		m_crtc->register_w(*space, 0, data);
+		m_crtc->register_w(space, 0, data);
 	}
 }

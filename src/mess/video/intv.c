@@ -729,7 +729,7 @@ void intv_stic_screenrefresh(running_machine &machine)
 
  READ8_MEMBER( intv_state::intvkbd_tms9927_r )
 {
-	//intv_state *state = space->machine().driver_data<intv_state>();
+	//intv_state *state = space.machine().driver_data<intv_state>();
 	UINT8 rv;
 	switch (offset)
 	{
@@ -752,7 +752,7 @@ void intv_stic_screenrefresh(running_machine &machine)
 
 WRITE8_MEMBER( intv_state::intvkbd_tms9927_w )
 {
-	//intv_state *state = space->machine().driver_data<intv_state>();
+	//intv_state *state = space.machine().driver_data<intv_state>();
 	switch (offset)
 	{
 		case 3:

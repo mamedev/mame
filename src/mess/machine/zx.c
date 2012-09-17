@@ -13,9 +13,9 @@
 #define	DEBUG_ZX81_PORTS	1
 #define DEBUG_ZX81_VSYNC	1
 
-#define LOG_ZX81_IOR(_comment) do { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOR: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, space->machine().primary_screen->vpos(), _comment); } while (0)
-#define LOG_ZX81_IOW(_comment) do { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOW: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, space->machine().primary_screen->vpos(), _comment); } while (0)
-#define LOG_ZX81_VSYNC do { if (DEBUG_ZX81_VSYNC) logerror("VSYNC starts in scanline: %d\n", space->machine().primary_screen->vpos()); } while (0)
+#define LOG_ZX81_IOR(_comment) do { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOR: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, space.machine().primary_screen->vpos(), _comment); } while (0)
+#define LOG_ZX81_IOW(_comment) do { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOW: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, space.machine().primary_screen->vpos(), _comment); } while (0)
+#define LOG_ZX81_VSYNC do { if (DEBUG_ZX81_VSYNC) logerror("VSYNC starts in scanline: %d\n", space.machine().primary_screen->vpos()); } while (0)
 
 
 WRITE8_MEMBER(zx_state::zx_ram_w)
@@ -44,10 +44,10 @@ READ8_MEMBER( zx_state::zx_ram_r )
 
 DRIVER_INIT_MEMBER(zx_state,zx)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	space->install_read_bank(0x4000, 0x4000 + machine().device<ram_device>(RAM_TAG)->size() - 1, "bank1");
-	space->install_write_handler(0x4000, 0x4000 + machine().device<ram_device>(RAM_TAG)->size() - 1, write8_delegate(FUNC(zx_state::zx_ram_w),this));
+	space.install_read_bank(0x4000, 0x4000 + machine().device<ram_device>(RAM_TAG)->size() - 1, "bank1");
+	space.install_write_handler(0x4000, 0x4000 + machine().device<ram_device>(RAM_TAG)->size() - 1, write8_delegate(FUNC(zx_state::zx_ram_w),this));
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x4000);
 }
 

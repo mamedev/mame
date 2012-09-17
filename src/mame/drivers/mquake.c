@@ -87,8 +87,8 @@ static WRITE8_DEVICE_HANDLER( mquake_cia_0_portb_w )
 
 static READ8_HANDLER( es5503_sample_r )
 {
-	UINT8 *rom = space->machine().root_device().memregion("es5503")->base();
-	es5503_device *es5503 = space->machine().device<es5503_device>("es5503");
+	UINT8 *rom = space.machine().root_device().memregion("es5503")->base();
+	es5503_device *es5503 = space.machine().device<es5503_device>("es5503");
 
 	return rom[offset + (es5503->get_channel_strobe() * 0x10000)];
 }
@@ -100,21 +100,21 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( output_w )
 {
 	if (ACCESSING_BITS_0_7)
-		logerror("%06x:output_w(%x) = %02x\n", space->device().safe_pc(), offset, data);
+		logerror("%06x:output_w(%x) = %02x\n", space.device().safe_pc(), offset, data);
 }
 
 
 static READ16_HANDLER( coin_chip_r )
 {
 	if (offset == 1)
-		return space->machine().root_device().ioport("COINCHIP")->read();
-	logerror("%06x:coin_chip_r(%02x) & %04x\n", space->device().safe_pc(), offset, mem_mask);
+		return space.machine().root_device().ioport("COINCHIP")->read();
+	logerror("%06x:coin_chip_r(%02x) & %04x\n", space.device().safe_pc(), offset, mem_mask);
 	return 0xffff;
 }
 
 static WRITE16_HANDLER( coin_chip_w )
 {
-	logerror("%06x:coin_chip_w(%02x) = %04x & %04x\n", space->device().safe_pc(), offset, data, mem_mask);
+	logerror("%06x:coin_chip_w(%02x) = %04x & %04x\n", space.device().safe_pc(), offset, data, mem_mask);
 }
 
 // inputs at 282000, 282002 (full word)

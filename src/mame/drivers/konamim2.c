@@ -818,9 +818,9 @@ static void cde_handle_reports(running_machine &machine)
 	}
 }
 
-static void cde_dma_transfer(address_space *space, int channel, int next)
+static void cde_dma_transfer(address_space &space, int channel, int next)
 {
-	konamim2_state *state = space->machine().driver_data<konamim2_state>();
+	konamim2_state *state = space.machine().driver_data<konamim2_state>();
 	UINT32 address;
 	//int length;
 	int i;
@@ -838,7 +838,7 @@ static void cde_dma_transfer(address_space *space, int channel, int next)
 
 	for (i=0; i < state->m_cde_dma[channel].next_length; i++)
 	{
-		space->write_byte(address, 0xff);		// TODO: do the real transfer...
+		space.write_byte(address, 0xff);		// TODO: do the real transfer...
 		address++;
 	}
 }
@@ -976,13 +976,13 @@ WRITE64_MEMBER(konamim2_state::cde_w)
 			{
 				m_cde_dma[0].dma_done = 1;
 
-				cde_dma_transfer(&space, 0, 0);
+				cde_dma_transfer(space, 0, 0);
 			}
 			if (d & 0x40)
 			{
 				m_cde_dma[0].dma_done = 1;
 
-				cde_dma_transfer(&space, 0, 1);
+				cde_dma_transfer(space, 0, 1);
 			}
 			break;
 		}

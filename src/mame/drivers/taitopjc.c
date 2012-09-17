@@ -130,7 +130,7 @@ static SCREEN_UPDATE_RGB32( taitopjc )
 
 static UINT32 video_address;
 
-static UINT32 videochip_r(address_space *space, offs_t address)
+static UINT32 videochip_r(address_space &space, offs_t address)
 {
 	UINT32 r = 0;
 
@@ -142,14 +142,14 @@ static UINT32 videochip_r(address_space *space, offs_t address)
 	return r;
 }
 
-static void videochip_w(address_space *space, offs_t address, UINT32 data)
+static void videochip_w(address_space &space, offs_t address, UINT32 data)
 {
 	if (address >= 0x20000000 && address < 0x20008000)
 	{
 		//UINT32 r = (data >> 16) & 0xff;
 		//UINT32 g = (data >> 8) & 0xff;
 		//UINT32 b = (data >> 0) & 0xff;
-		//palette_set_color_rgb(space->machine, address & 0x7fff, r, g, b);
+		//palette_set_color_rgb(space.machine, address & 0x7fff, r, g, b);
 	}
 	else if (address >= 0x1003d000 && address < 0x1003f000)
 	{
@@ -177,7 +177,7 @@ READ64_MEMBER(taitopjc_state::video_r)
 	{
 		if (ACCESSING_BITS_32_63)
 		{
-			r |= (UINT64)(videochip_r(&space, video_address)) << 32;
+			r |= (UINT64)(videochip_r(space, video_address)) << 32;
 		}
 	}
 
@@ -191,7 +191,7 @@ WRITE64_MEMBER(taitopjc_state::video_w)
 		if (ACCESSING_BITS_32_63)
 		{
 			//printf("Address %08X = %08X\n", video_address, (UINT32)(data >> 32));
-			videochip_w(&space, video_address, (UINT32)(data >> 32));
+			videochip_w(space, video_address, (UINT32)(data >> 32));
 		}
 	}
 	if (offset == 1)

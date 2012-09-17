@@ -109,7 +109,7 @@ WRITE8_DEVICE_HANDLER( tc0140syt_comm_w )
 			break;
 
 		case 0x04:		// port status
-			//logerror("taitosnd: Master issued control value %02x (PC = %08x) \n",data, space->device().safe_pc() );
+			//logerror("taitosnd: Master issued control value %02x (PC = %08x) \n",data, space.device().safe_pc() );
 			/* this does a hi-lo transition to reset the sound cpu */
 			if (data)
 				tc0140syt->slavecpu->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -240,7 +240,7 @@ READ8_DEVICE_HANDLER( tc0140syt_slave_comm_r )
 			break;
 
 		case 0x01:		// mode #1
-			//logerror("taitosnd: Slave cpu receives 0/1 : %01x%01x PC=%4x\n", tc0140syt->slavedata[1] , tc0140syt->slavedata[0],space->device().safe_pc());
+			//logerror("taitosnd: Slave cpu receives 0/1 : %01x%01x PC=%4x\n", tc0140syt->slavedata[1] , tc0140syt->slavedata[0],space.device().safe_pc());
 			tc0140syt->status &= ~TC0140SYT_PORT01_FULL;
 			res = tc0140syt->slavedata[tc0140syt->submode ++];
 			break;

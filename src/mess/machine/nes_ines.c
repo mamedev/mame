@@ -47,17 +47,17 @@ static void ffe_irq( device_t *device, int scanline, int vblank, int blanked )
 
 static WRITE8_HANDLER( mapper6_l_w )
 {
-	nes_state *state = space->machine().driver_data<nes_state>();
+	nes_state *state = space.machine().driver_data<nes_state>();
 	LOG_MMC(("mapper6_l_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset)
 	{
 		case 0x1fe:
 			state->m_mmc_latch1 = data & 0x80;
-			set_nt_mirroring(space->machine(), BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+			set_nt_mirroring(space.machine(), BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 			break;
 		case 0x1ff:
-			set_nt_mirroring(space->machine(), BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(space.machine(), BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x401:
@@ -75,19 +75,19 @@ static WRITE8_HANDLER( mapper6_l_w )
 
 static WRITE8_HANDLER( mapper6_w )
 {
-	nes_state *state = space->machine().driver_data<nes_state>();
+	nes_state *state = space.machine().driver_data<nes_state>();
 	LOG_MMC(("mapper6_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (!state->m_mmc_latch1)	// when in "FFE mode" we are forced to use CHRRAM/EXRAM bank?
 	{
-		prg16_89ab(space->machine(), data >> 2);
-		// chr8(space->machine(), data & 0x03, ???);
+		prg16_89ab(space.machine(), data >> 2);
+		// chr8(space.machine(), data & 0x03, ???);
 		// due to lack of info on the exact behavior, we simply act as if mmc_latch1=1
 		if (state->m_mmc_chr_source == CHRROM)
-			chr8(space->machine(), data & 0x03, CHRROM);
+			chr8(space.machine(), data & 0x03, CHRROM);
 	}
 	else if (state->m_mmc_chr_source == CHRROM)			// otherwise, we can use CHRROM (when present)
-		chr8(space->machine(), data, CHRROM);
+		chr8(space.machine(), data, CHRROM);
 }
 
 /*************************************************************
@@ -105,8 +105,8 @@ static WRITE8_HANDLER( mapper8_w )
 {
 	LOG_MMC(("mapper8_w, offset: %04x, data: %02x\n", offset, data));
 
-	chr8(space->machine(), data & 0x07, CHRROM);
-	prg16_89ab(space->machine(), data >> 3);
+	chr8(space.machine(), data & 0x07, CHRROM);
+	prg16_89ab(space.machine(), data >> 3);
 }
 
 /*************************************************************
@@ -123,16 +123,16 @@ static WRITE8_HANDLER( mapper8_w )
 
 static WRITE8_HANDLER( mapper17_l_w )
 {
-	nes_state *state = space->machine().driver_data<nes_state>();
+	nes_state *state = space.machine().driver_data<nes_state>();
 	LOG_MMC(("mapper17_l_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset)
 	{
 		case 0x1fe:
-			set_nt_mirroring(space->machine(), BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+			set_nt_mirroring(space.machine(), BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 			break;
 		case 0x1ff:
-			set_nt_mirroring(space->machine(), BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(space.machine(), BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x401:
@@ -147,16 +147,16 @@ static WRITE8_HANDLER( mapper17_l_w )
 			break;
 
 		case 0x404:
-			prg8_89(space->machine(), data);
+			prg8_89(space.machine(), data);
 			break;
 		case 0x405:
-			prg8_ab(space->machine(), data);
+			prg8_ab(space.machine(), data);
 			break;
 		case 0x406:
-			prg8_cd(space->machine(), data);
+			prg8_cd(space.machine(), data);
 			break;
 		case 0x407:
-			prg8_ef(space->machine(), data);
+			prg8_ef(space.machine(), data);
 			break;
 
 		case 0x410:
@@ -167,7 +167,7 @@ static WRITE8_HANDLER( mapper17_l_w )
 		case 0x415:
 		case 0x416:
 		case 0x417:
-			chr1_x(space->machine(), offset & 7, data, CHRROM);
+			chr1_x(space.machine(), offset & 7, data, CHRROM);
 			break;
 	}
 }

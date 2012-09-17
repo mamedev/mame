@@ -286,17 +286,17 @@ static void toaplan1_set_scrolls(running_machine &machine)
 static void rallybik_flipscreen(running_machine &machine)
 {
 	toaplan1_state *state = machine.driver_data<toaplan1_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	state->rallybik_bcu_flipscreen_w(*space, 0, state->m_bcu_flipscreen, 0xffff);
+	state->rallybik_bcu_flipscreen_w(space, 0, state->m_bcu_flipscreen, 0xffff);
 }
 
 static void toaplan1_flipscreen(running_machine &machine)
 {
 	toaplan1_state *state = machine.driver_data<toaplan1_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	state->toaplan1_bcu_flipscreen_w(*space, 0, state->m_bcu_flipscreen, 0xffff);
+	state->toaplan1_bcu_flipscreen_w(space, 0, state->m_bcu_flipscreen, 0xffff);
 }
 
 static void register_common(running_machine &machine)

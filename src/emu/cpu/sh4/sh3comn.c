@@ -12,7 +12,7 @@
 
 WRITE32_HANDLER( sh3_internal_high_w )
 {
-	sh4_state *sh4 = get_safe_token(&space->device());
+	sh4_state *sh4 = get_safe_token(&space.device());
 	COMBINE_DATA(&sh4->m_sh3internal_upper[offset]);
 
 	switch (offset)
@@ -75,7 +75,7 @@ WRITE32_HANDLER( sh3_internal_high_w )
 
 READ32_HANDLER( sh3_internal_high_r )
 {
-	sh4_state *sh4 = get_safe_token(&space->device());
+	sh4_state *sh4 = get_safe_token(&space.device());
 
 	UINT32 ret = 0;
 
@@ -140,7 +140,7 @@ READ32_HANDLER( sh3_internal_high_r )
 
 READ32_HANDLER( sh3_internal_r )
 {
-	sh4_state *sh4 = get_safe_token(&space->device());
+	sh4_state *sh4 = get_safe_token(&space.device());
 
 	if (offset<0x1000)
 	{
@@ -385,7 +385,7 @@ READ32_HANDLER( sh3_internal_r )
 
 WRITE32_HANDLER( sh3_internal_w )
 {
-	sh4_state *sh4 = get_safe_token(&space->device());
+	sh4_state *sh4 = get_safe_token(&space.device());
 
 
 

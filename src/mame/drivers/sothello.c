@@ -206,27 +206,27 @@ ADDRESS_MAP_END
 
 /* sub 6809 */
 
-static void unlock_shared_ram(address_space *space)
+static void unlock_shared_ram(address_space &space)
 {
-	sothello_state *state = space->machine().driver_data<sothello_state>();
-    if(!space->machine().device<cpu_device>("sub")->suspended(SUSPEND_REASON_HALT))
+	sothello_state *state = space.machine().driver_data<sothello_state>();
+    if(!space.machine().device<cpu_device>("sub")->suspended(SUSPEND_REASON_HALT))
     {
         state->m_subcpu_status|=1;
     }
     else
     {
-        logerror("Sub cpu active! @%x\n",space->device().safe_pc());
+        logerror("Sub cpu active! @%x\n",space.device().safe_pc());
     }
 }
 
 WRITE8_MEMBER(sothello_state::subcpu_status_w)
 {
-    unlock_shared_ram(&space);
+    unlock_shared_ram(space);
 }
 
 READ8_MEMBER(sothello_state::subcpu_status_r)
 {
-    unlock_shared_ram(&space);
+    unlock_shared_ram(space);
     return 0;
 }
 

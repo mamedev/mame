@@ -697,7 +697,7 @@ INTERRUPT_GEN( intv_interrupt )
 }
 
 /* hand 0 == left, 1 == right, 2 == ECS hand controller 1, 3 == ECS hand controller 2 */
-UINT8 intv_control_r(address_space *space, int hand)
+UINT8 intv_control_r(address_space &space, int hand)
 {
 	static const char* const keypad_name[] = { "KEYPAD1", "KEYPAD2", "KEYPAD3", "KEYPAD4" };
 	static const UINT8 keypad_table[] =
@@ -728,7 +728,7 @@ UINT8 intv_control_r(address_space *space, int hand)
 	UINT8 rv = 0xFF;
 
 	/* keypad */
-	x = space->machine().root_device().ioport(keypad_name[hand])->read();
+	x = space.machine().root_device().ioport(keypad_name[hand])->read();
 	for (y = 0; y < 16; y++)
 	{
 		if (x & (1 << y))
@@ -737,12 +737,12 @@ UINT8 intv_control_r(address_space *space, int hand)
 		}
 	}
 
-	switch ((space->machine().root_device().ioport("OPTIONS")->read() >> hand) & 1)
+	switch ((space.machine().root_device().ioport("OPTIONS")->read() >> hand) & 1)
 	{
 		case 0: /* disc == digital */
 		default:
 
-			x = space->machine().root_device().ioport(disc_name[hand])->read();
+			x = space.machine().root_device().ioport(disc_name[hand])->read();
 			for (y = 0; y < 16; y++)
 			{
 				if (x & (1 << y))
@@ -754,8 +754,8 @@ UINT8 intv_control_r(address_space *space, int hand)
 
 		case 1: /* disc == _fake_ analog */
 
-			x = space->machine().root_device().ioport(discx_name[hand])->read();
-			y = space->machine().root_device().ioport(discy_name[hand])->read();
+			x = space.machine().root_device().ioport(discx_name[hand])->read();
+			y = space.machine().root_device().ioport(discy_name[hand])->read();
 			rv &= discyx_table[y / 32][x / 32];
 	}
 
@@ -764,18 +764,18 @@ UINT8 intv_control_r(address_space *space, int hand)
 
 READ8_MEMBER( intv_state::intv_left_control_r )
 {
-	return intv_control_r(&space, 0);
+	return intv_control_r(space, 0);
 }
 
 READ8_MEMBER( intv_state::intv_right_control_r )
 {
-	return intv_control_r(&space, 1);
+	return intv_control_r(space, 1);
 }
 
 READ8_MEMBER( intv_state::intv_ecs_porta_r )
 {
 	if (ioport("ECS_CNTRLSEL")->read() == 0)
-		return intv_control_r(&space, 2);
+		return intv_control_r(space, 2);
 	else
 		return 0xff; // not sure what to return here, maybe it should be last output?
 }
@@ -786,7 +786,7 @@ READ8_MEMBER( intv_state::intv_ecs_portb_r )
 	{
 		case 0x00: // hand controller
 		{
-			return intv_control_r(&space, 3);
+			return intv_control_r(space, 3);
 		}
 		case 0x01: // synthesizer keyboard
 		{

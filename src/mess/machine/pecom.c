@@ -27,15 +27,15 @@ void pecom_state::machine_start()
 void pecom_state::machine_reset()
 {
 	UINT8 *rom = machine().root_device().memregion(CDP1802_TAG)->base();
-	address_space *space = machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM);
 
 
-	space->unmap_write(0x0000, 0x3fff);
-	space->install_write_bank(0x4000, 0x7fff, "bank2");
-	space->unmap_write(0xf000, 0xf7ff);
-	space->unmap_write(0xf800, 0xffff);
-	space->install_read_bank (0xf000, 0xf7ff, "bank3");
-	space->install_read_bank (0xf800, 0xffff, "bank4");
+	space.unmap_write(0x0000, 0x3fff);
+	space.install_write_bank(0x4000, 0x7fff, "bank2");
+	space.unmap_write(0xf000, 0xf7ff);
+	space.unmap_write(0xf800, 0xffff);
+	space.install_read_bank (0xf000, 0xf7ff, "bank3");
+	space.install_read_bank (0xf800, 0xffff, "bank4");
 	membank("bank1")->set_base(rom + 0x8000);
 	membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x4000);
 	membank("bank3")->set_base(rom + 0xf000);

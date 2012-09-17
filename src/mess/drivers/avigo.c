@@ -158,7 +158,7 @@ static RP5C01_INTERFACE( rtc_intf )
 
 void avigo_state::refresh_memory(UINT8 bank, UINT8 chip_select)
 {
-	address_space* space = m_maincpu->space(AS_PROGRAM);
+	address_space& space = *m_maincpu->space(AS_PROGRAM);
 	int &active_flash = (bank == 1 ? m_flash_at_0x4000 : m_flash_at_0x8000);
 	char bank_tag[6];
 
@@ -167,14 +167,14 @@ void avigo_state::refresh_memory(UINT8 bank, UINT8 chip_select)
 	switch (chip_select)
 	{
 		case 0x06:	// videoram
-			space->install_readwrite_handler(bank * 0x4000, bank * 0x4000 + 0x3fff, read8_delegate(FUNC(avigo_state::vid_memory_r), this), write8_delegate(FUNC(avigo_state::vid_memory_w), this));
+			space.install_readwrite_handler(bank * 0x4000, bank * 0x4000 + 0x3fff, read8_delegate(FUNC(avigo_state::vid_memory_r), this), write8_delegate(FUNC(avigo_state::vid_memory_w), this));
 			active_flash = -1;
 			break;
 
 		case 0x01: // banked RAM
 			sprintf(bank_tag,"bank%d", bank);
 			membank(bank_tag)->set_base(m_ram_base + (((bank == 1 ? m_bank1_l : m_bank2_l) & 0x07)<<14));
-			space->install_readwrite_bank (bank * 0x4000, bank * 0x4000 + 0x3fff, bank_tag);
+			space.install_readwrite_bank (bank * 0x4000, bank * 0x4000 + 0x3fff, bank_tag);
 			active_flash = -1;
 			break;
 
@@ -185,9 +185,9 @@ void avigo_state::refresh_memory(UINT8 bank, UINT8 chip_select)
 			if (active_flash < 0)	// to avoid useless calls to install_readwrite_handler that cause slowdowns
 			{
 				if (bank == 1)
-					space->install_readwrite_handler(0x4000, 0x7fff, read8_delegate(FUNC(avigo_state::flash_0x4000_read_handler), this), write8_delegate(FUNC(avigo_state::flash_0x4000_write_handler), this));
+					space.install_readwrite_handler(0x4000, 0x7fff, read8_delegate(FUNC(avigo_state::flash_0x4000_read_handler), this), write8_delegate(FUNC(avigo_state::flash_0x4000_write_handler), this));
 				else
-					space->install_readwrite_handler(0x8000, 0xbfff, read8_delegate(FUNC(avigo_state::flash_0x8000_read_handler), this), write8_delegate(FUNC(avigo_state::flash_0x8000_write_handler), this));
+					space.install_readwrite_handler(0x8000, 0xbfff, read8_delegate(FUNC(avigo_state::flash_0x8000_read_handler), this), write8_delegate(FUNC(avigo_state::flash_0x8000_write_handler), this));
 			}
 
 			switch (chip_select)
@@ -201,7 +201,7 @@ void avigo_state::refresh_memory(UINT8 bank, UINT8 chip_select)
 
 		default:
 			logerror("Unknown chip %02x mapped at %04x - %04x\n", chip_select, bank * 0x4000, bank * 0x4000 + 0x3fff);
-			space->unmap_readwrite(bank * 0x4000, bank * 0x4000 + 0x3fff);
+			space.unmap_readwrite(bank * 0x4000, bank * 0x4000 + 0x3fff);
 			active_flash = -1;
 			break;
 	}

@@ -106,7 +106,7 @@
 static void blitter_init(running_machine &machine, int blitter_config, const UINT8 *remap_prom);
 static void create_palette_lookup(running_machine &machine);
 
-static int blitter_core(address_space *space, int sstart, int dstart, int w, int h, int data);
+static int blitter_core(address_space &space, int sstart, int dstart, int w, int h, int data);
 
 
 
@@ -531,7 +531,7 @@ WRITE8_MEMBER(williams_state::williams_blitter_w)
 	if (h == 255) h = 256;
 
 	/* do the actual blit */
-	accesses = blitter_core(&space, sstart, dstart, w, h, data);
+	accesses = blitter_core(space, sstart, dstart, w, h, data);
 
 	/* based on the number of memory accesses needed to do the blit, compute how long the blit will take */
 	/* this is just a guess */
@@ -562,11 +562,11 @@ WRITE8_MEMBER(williams_state::williams2_blit_window_enable_w)
  *
  *************************************/
 
-INLINE void blit_pixel(address_space *space, int offset, int srcdata, int data, int mask, int solid)
+INLINE void blit_pixel(address_space &space, int offset, int srcdata, int data, int mask, int solid)
 {
-	williams_state *state = space->machine().driver_data<williams_state>();
+	williams_state *state = space.machine().driver_data<williams_state>();
 	/* always read from video RAM regardless of the bank setting */
-	int pix = (offset < 0xc000) ? state->m_videoram[offset] : space->read_byte(offset);
+	int pix = (offset < 0xc000) ? state->m_videoram[offset] : space.read_byte(offset);
 
 	/* handle transparency */
 	if (data & 0x08)
@@ -586,13 +586,13 @@ INLINE void blit_pixel(address_space *space, int offset, int srcdata, int data, 
 	/* note that we have to allow blits to non-video RAM (e.g. tileram) because those */
 	/* are not blocked by the window enable */
 	if (!state->m_blitter_window_enable || offset < state->m_blitter_clip_address || offset >= 0xc000)
-		space->write_byte(offset, pix);
+		space.write_byte(offset, pix);
 }
 
 
-static int blitter_core(address_space *space, int sstart, int dstart, int w, int h, int data)
+static int blitter_core(address_space &space, int sstart, int dstart, int w, int h, int data)
 {
-	williams_state *state = space->machine().driver_data<williams_state>();
+	williams_state *state = space.machine().driver_data<williams_state>();
 	int source, sxadv, syadv;
 	int dest, dxadv, dyadv;
 	int i, j, solid;
@@ -627,7 +627,7 @@ static int blitter_core(address_space *space, int sstart, int dstart, int w, int
 			/* loop over the width */
 			for (j = w; j > 0; j--)
 			{
-				blit_pixel(space, dest, state->m_blitter_remap[space->read_byte(source)], data, keepmask, solid);
+				blit_pixel(space, dest, state->m_blitter_remap[space.read_byte(source)], data, keepmask, solid);
 				accesses += 2;
 
 				/* advance */
@@ -661,7 +661,7 @@ static int blitter_core(address_space *space, int sstart, int dstart, int w, int
 			dest = dstart & 0xffff;
 
 			/* left edge case */
-			pixdata = state->m_blitter_remap[space->read_byte(source)];
+			pixdata = state->m_blitter_remap[space.read_byte(source)];
 			blit_pixel(space, dest, (pixdata >> 4) & 0x0f, data, keepmask | 0xf0, solid);
 			accesses += 2;
 
@@ -671,7 +671,7 @@ static int blitter_core(address_space *space, int sstart, int dstart, int w, int
 			/* loop over the width */
 			for (j = w - 1; j > 0; j--)
 			{
-				pixdata = (pixdata << 8) | state->m_blitter_remap[space->read_byte(source)];
+				pixdata = (pixdata << 8) | state->m_blitter_remap[space.read_byte(source)];
 				blit_pixel(space, dest, (pixdata >> 4) & 0xff, data, keepmask, solid);
 				accesses += 2;
 

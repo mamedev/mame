@@ -361,8 +361,8 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(suna16_state,uballoon)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	uballoon_pcm_1_bankswitch_w(*space, 0, 0);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	uballoon_pcm_1_bankswitch_w(space, 0, 0);
 }
 
 

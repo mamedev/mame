@@ -55,7 +55,7 @@
 #endif
 
 static void Mise_A_Jour_Etat(running_machine &machine, int Adresse, int Value );
-static void Update_Sound(address_space *space, UINT8 data);
+static void Update_Sound(address_space &space, UINT8 data);
 
 static cassette_image_device *cassette_device_image(running_machine &machine);
 
@@ -115,7 +115,7 @@ void hector_minidisc_init(running_machine &machine)
 
 	/* FDC Motor Control - Bit 0/1 defines the state of the FDD 0/1 motor */
 	floppy_mon_w(floppy_get_device(machine, 0), 0);	// Moteur floppy A:
-	//floppy_mon_w(floppy_get_device(space->machine(), 1), BIT(data, 7));   // Moteur floppy B:, not implanted on the real machine
+	//floppy_mon_w(floppy_get_device(space.machine(), 1), BIT(data, 7));   // Moteur floppy B:, not implanted on the real machine
 
 	//Set the drive ready !
 	floppy_drive_set_ready_state(floppy_get_device(machine, 0), FLOPPY_DRIVE_READY, 0);// Disc 0 ready !
@@ -307,12 +307,12 @@ READ8_MEMBER(hec2hrp_state::hector_keyboard_r)
 WRITE8_MEMBER(hec2hrp_state::hector_sn_2000_w)
 {
 	Mise_A_Jour_Etat(machine(), 0x2000+ offset, data);
-	Update_Sound(&space, data);
+	Update_Sound(space, data);
 }
 WRITE8_MEMBER(hec2hrp_state::hector_sn_2800_w)
 {
 	Mise_A_Jour_Etat(machine(), 0x2800+ offset, data);
-	Update_Sound(&space, data);
+	Update_Sound(space, data);
 }
 READ8_MEMBER(hec2hrp_state::hector_cassette_r)
 {
@@ -364,7 +364,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_sn_3000_w)
 	{
 		/* Update sn76477 only when necessary!*/
 		Mise_A_Jour_Etat( machine(), 0x3000, data & 7 );
-		Update_Sound(&space, data & 7);
+		Update_Sound(space, data & 7);
 	}
 	m_oldstate3000 = data & 7;
 }
@@ -790,11 +790,11 @@ static void Init_Value_SN76477_Hector(running_machine &machine)
 	state->m_ValMixer = 0;
 }
 
-static void Update_Sound(address_space *space, UINT8 data)
+static void Update_Sound(address_space &space, UINT8 data)
 {
-	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
+	hec2hrp_state *state = space.machine().driver_data<hec2hrp_state>();
 	/* keep device*/
-	device_t *sn76477 = space->machine().device("sn76477");
+	device_t *sn76477 = space.machine().device("sn76477");
 
 	/* MIXER*/
 	sn76477_mixer_a_w(sn76477, ((state->m_ValMixer & 0x04)==4) ? 1 : 0);

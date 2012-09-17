@@ -232,19 +232,19 @@ I8255A_INTERFACE( lviv_ppi8255_interface_1 )
 
 void lviv_state::machine_reset()
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *mem;
 
-	space->set_direct_update_handler(direct_update_delegate(FUNC(lviv_state::lviv_directoverride), this));
+	space.set_direct_update_handler(direct_update_delegate(FUNC(lviv_state::lviv_directoverride), this));
 
 	m_video_ram = machine().device<ram_device>(RAM_TAG)->pointer() + 0xc000;
 
 	m_startup_mem_map = 1;
 
-	space->unmap_write(0x0000, 0x3fff);
-	space->unmap_write(0x4000, 0x7fff);
-	space->unmap_write(0x8000, 0xbfff);
-	space->unmap_write(0xC000, 0xffff);
+	space.unmap_write(0x0000, 0x3fff);
+	space.unmap_write(0x4000, 0x7fff);
+	space.unmap_write(0x8000, 0xbfff);
+	space.unmap_write(0xC000, 0xffff);
 
 	mem = memregion("maincpu")->base();
 	membank("bank1")->set_base(mem + 0x010000);

@@ -1264,7 +1264,7 @@ WRITE16_HANDLER( segaic16_textram_0_w )
 {
 	/* certain ranges need immediate updates */
 	if (offset >= 0xe80/2)
-		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+		space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
 
 	COMBINE_DATA(&segaic16_textram_0[offset]);
 	bg_tilemap[0].textmap->mark_tile_dirty(offset);

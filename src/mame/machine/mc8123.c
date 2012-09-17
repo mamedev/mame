@@ -377,7 +377,7 @@ static UINT8 mc8123_decrypt(offs_t addr,UINT8 val,const UINT8 *key,int opcode)
 
 void mc8123_decrypt_rom(running_machine &machine, const char *cpu, const char *keyrgn, const char *bankname, int numbanks)
 {
-	address_space *space = machine.device(cpu)->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device(cpu)->memory().space(AS_PROGRAM);
 	int fixed_length = numbanks == 1 ? 0xc000 : 0x8000;
 	UINT8 *decrypted1 = auto_alloc_array(machine, UINT8, fixed_length);
 	UINT8 *decrypted2 = numbanks > 1 ? auto_alloc_array(machine, UINT8, 0x4000 * numbanks) : 0;
@@ -385,7 +385,7 @@ void mc8123_decrypt_rom(running_machine &machine, const char *cpu, const char *k
 	UINT8 *key = machine.root_device().memregion(keyrgn)->base();
 	int A, bank;
 
-	space->set_decrypted_region(0x0000, fixed_length-1, decrypted1);
+	space.set_decrypted_region(0x0000, fixed_length-1, decrypted1);
 
 	for (A = 0x0000;A < fixed_length;A++)
 	{

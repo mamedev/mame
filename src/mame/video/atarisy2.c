@@ -126,14 +126,14 @@ VIDEO_START_MEMBER(atarisy2_state,atarisy2)
 
 WRITE16_HANDLER( atarisy2_xscroll_w )
 {
-	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
+	atarisy2_state *state = space.machine().driver_data<atarisy2_state>();
 	UINT16 oldscroll = *state->m_xscroll;
 	UINT16 newscroll = oldscroll;
 	COMBINE_DATA(&newscroll);
 
 	/* if anything has changed, force a partial update */
 	if (newscroll != oldscroll)
-		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+		space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
 
 	/* update the playfield scrolling - hscroll is clocked on the following scanline */
 	state->m_playfield_tilemap->set_scrollx(0, newscroll >> 6);
@@ -159,20 +159,20 @@ static TIMER_CALLBACK( reset_yscroll_callback )
 
 WRITE16_HANDLER( atarisy2_yscroll_w )
 {
-	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
+	atarisy2_state *state = space.machine().driver_data<atarisy2_state>();
 	UINT16 oldscroll = *state->m_yscroll;
 	UINT16 newscroll = oldscroll;
 	COMBINE_DATA(&newscroll);
 
 	/* if anything has changed, force a partial update */
 	if (newscroll != oldscroll)
-		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+		space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
 
 	/* if bit 4 is zero, the scroll value is clocked in right away */
 	if (!(newscroll & 0x10))
-		state->m_playfield_tilemap->set_scrolly(0, (newscroll >> 6) - space->machine().primary_screen->vpos());
+		state->m_playfield_tilemap->set_scrolly(0, (newscroll >> 6) - space.machine().primary_screen->vpos());
 	else
-		state->m_yscroll_reset_timer->adjust(space->machine().primary_screen->time_until_pos(0), newscroll >> 6);
+		state->m_yscroll_reset_timer->adjust(space.machine().primary_screen->time_until_pos(0), newscroll >> 6);
 
 	/* update the playfield banking */
 	if (state->m_playfield_tile_bank[1] != (newscroll & 0x0f) * 0x400)
@@ -210,7 +210,7 @@ WRITE16_HANDLER( atarisy2_paletteram_w )
 
 	int newword, inten, red, green, blue;
 
-	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
+	atarisy2_state *state = space.machine().driver_data<atarisy2_state>();
 	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
 	newword = state->m_generic_paletteram_16[offset];
 
@@ -218,7 +218,7 @@ WRITE16_HANDLER( atarisy2_paletteram_w )
 	red = (color_table[(newword >> 12) & 15] * inten) >> 4;
 	green = (color_table[(newword >> 8) & 15] * inten) >> 4;
 	blue = (color_table[(newword >> 4) & 15] * inten) >> 4;
-	palette_set_color(space->machine(), offset, MAKE_RGB(red, green, blue));
+	palette_set_color(space.machine(), offset, MAKE_RGB(red, green, blue));
 }
 
 
@@ -231,7 +231,7 @@ WRITE16_HANDLER( atarisy2_paletteram_w )
 
 READ16_HANDLER( atarisy2_slapstic_r )
 {
-	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
+	atarisy2_state *state = space.machine().driver_data<atarisy2_state>();
 	int result = state->m_slapstic_base[offset];
 	slapstic_tweak(space, offset);
 
@@ -243,7 +243,7 @@ READ16_HANDLER( atarisy2_slapstic_r )
 
 WRITE16_HANDLER( atarisy2_slapstic_w )
 {
-	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
+	atarisy2_state *state = space.machine().driver_data<atarisy2_state>();
 
 	slapstic_tweak(space, offset);
 
@@ -261,7 +261,7 @@ WRITE16_HANDLER( atarisy2_slapstic_w )
 
 READ16_HANDLER( atarisy2_videoram_r )
 {
-	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
+	atarisy2_state *state = space.machine().driver_data<atarisy2_state>();
 	int offs = offset | state->m_videobank;
 	if (offs >= 0xc00 && offs < 0x1000)
 	{
@@ -274,7 +274,7 @@ READ16_HANDLER( atarisy2_videoram_r )
 
 WRITE16_HANDLER( atarisy2_videoram_w )
 {
-	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
+	atarisy2_state *state = space.machine().driver_data<atarisy2_state>();
 	int offs = offset | state->m_videobank;
 
 	/* alpharam? */
@@ -289,7 +289,7 @@ WRITE16_HANDLER( atarisy2_videoram_w )
 	{
 		/* force an update if the link of object 0 is about to change */
 		if (offs == 0x0c03)
-			space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+			space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
 		atarimo_0_spriteram_w(space, offs - 0x0c00, data, mem_mask);
 	}
 

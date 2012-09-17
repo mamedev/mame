@@ -1025,11 +1025,11 @@ WRITE16_HANDLER(ti990_hdc_w)
 			hdc.w[offset] = (hdc.w[offset] & ((~w_mask[offset]) | mem_mask)) | (data & w_mask[offset] & ~mem_mask);
 
 			if ((offset == 0) || (offset == 7))
-				update_interrupt(space->machine());
+				update_interrupt(space.machine());
 
 			if ((offset == 7) && (old_data & w7_idle) && ! (data & w7_idle))
 			{	/* idle has been cleared: start command execution */
-				execute_command(space->machine());
+				execute_command(space.machine());
 			}
 		}
 	}

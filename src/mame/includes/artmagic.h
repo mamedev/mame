@@ -56,8 +56,8 @@ public:
 
 
 
-void artmagic_to_shiftreg(address_space *space, offs_t address, UINT16 *data);
-void artmagic_from_shiftreg(address_space *space, offs_t address, UINT16 *data);
+void artmagic_to_shiftreg(address_space &space, offs_t address, UINT16 *data);
+void artmagic_from_shiftreg(address_space &space, offs_t address, UINT16 *data);
 
 
 void artmagic_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params);

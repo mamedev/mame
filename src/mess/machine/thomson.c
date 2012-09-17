@@ -447,14 +447,14 @@ DEVICE_IMAGE_LOAD( to7_cartridge )
 
 static void to7_update_cart_bank(running_machine &machine)
 {
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int bank = 0;
 	if ( thom_cart_nb_banks )
 	{
 		bank = thom_cart_bank % thom_cart_nb_banks;
 		if ( bank != old_cart_bank && old_cart_bank < 0 )
                 {
-                        space->install_legacy_read_handler(0x0000, 0x0003, FUNC(to7_cartridge_r) );
+                        space.install_legacy_read_handler(0x0000, 0x0003, FUNC(to7_cartridge_r) );
                 }
 	}
 	if ( bank != old_cart_bank )
@@ -481,7 +481,7 @@ WRITE8_HANDLER ( to7_cartridge_w )
 		return;
 
 	thom_cart_bank = offset & 3;
-	to7_update_cart_bank(space->machine());
+	to7_update_cart_bank(space.machine());
 }
 
 
@@ -489,12 +489,12 @@ WRITE8_HANDLER ( to7_cartridge_w )
 /* read signal to 0000-0003 generates a bank switch */
 READ8_HANDLER ( to7_cartridge_r )
 {
-	UINT8* pos = space->machine().root_device().memregion( "maincpu" )->base() + 0x10000;
+	UINT8* pos = space.machine().root_device().memregion( "maincpu" )->base() + 0x10000;
 	UINT8 data = pos[offset + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
-	if ( !space->debugger_access() )
+	if ( !space.debugger_access() )
         {
 		thom_cart_bank = offset & 3;
-		to7_update_cart_bank(space->machine());
+		to7_update_cart_bank(space.machine());
 	}
 	return data;
 }
@@ -939,22 +939,22 @@ const mea8000_interface to7_speech = { "speech", DEVCB_NULL };
 
 READ8_HANDLER ( to7_modem_mea8000_r )
 {
-	if ( space->debugger_access() )
+	if ( space.debugger_access() )
         {
 		return 0;
         }
 
-	if ( space->machine().root_device().ioport("mconfig")->read() & 1 )
+	if ( space.machine().root_device().ioport("mconfig")->read() & 1 )
 	{
-		device_t* device = space->machine().device("mea8000" );
-		return mea8000_r( device, *space, offset );
+		device_t* device = space.machine().device("mea8000" );
+		return mea8000_r( device, space, offset );
 	}
 	else
 	{
-		acia6850_device* acia = space->machine().device<acia6850_device>("acia6850" );
+		acia6850_device* acia = space.machine().device<acia6850_device>("acia6850" );
 		switch (offset) {
-		case 0: return acia->status_read(*space, offset );
-		case 1: return acia->data_read(*space, offset );
+		case 0: return acia->status_read(space, offset );
+		case 1: return acia->data_read(space, offset );
 		default: return 0;
 		}
 	}
@@ -964,17 +964,17 @@ READ8_HANDLER ( to7_modem_mea8000_r )
 
 WRITE8_HANDLER ( to7_modem_mea8000_w )
 {
-	if ( space->machine().root_device().ioport("mconfig")->read() & 1 )
+	if ( space.machine().root_device().ioport("mconfig")->read() & 1 )
 	{
-		device_t* device = space->machine().device("mea8000" );
-		mea8000_w( device, *space, offset, data );
+		device_t* device = space.machine().device("mea8000" );
+		mea8000_w( device, space, offset, data );
 	}
 	else
 	{
-		acia6850_device* acia = space->machine().device<acia6850_device>("acia6850" );
+		acia6850_device* acia = space.machine().device<acia6850_device>("acia6850" );
 		switch (offset) {
-		case 0: acia->control_write( *space, offset, data );
-		case 1: acia->data_write( *space, offset, data );
+		case 0: acia->control_write( space, offset, data );
+		case 1: acia->data_write( space, offset, data );
 		}
 	}
 }
@@ -1283,7 +1283,7 @@ READ8_HANDLER ( to7_midi_r )
 		/* bit 6:     parity error (ignored) */
 		/* bit 7:     interrupt */
 		LOG_MIDI(( "$%04x %f to7_midi_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, irq=%i)\n",
-			  space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(), to7_midi_status,
+			  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), to7_midi_status,
 			  (to7_midi_status & ACIA_6850_RDRF) ? 1 : 0,
 			  (to7_midi_status & ACIA_6850_TDRE) ? 1 : 0,
 			  (to7_midi_status & ACIA_6850_OVRN) ? 1 : 0,
@@ -1294,7 +1294,7 @@ READ8_HANDLER ( to7_midi_r )
 	case 1: /* get input data */
 	{
                 UINT8 data = chardev_in( to7_midi_chardev );
-                if ( !space->debugger_access() )
+                if ( !space.debugger_access() )
                 {
                         to7_midi_status &= ~(ACIA_6850_irq | ACIA_6850_RDRF);
                         if ( to7_midi_overrun )
@@ -1303,8 +1303,8 @@ READ8_HANDLER ( to7_midi_r )
                                 to7_midi_status &= ~ACIA_6850_OVRN;
                         to7_midi_overrun = 0;
                         LOG_MIDI(( "$%04x %f to7_midi_r: read data $%02X\n",
-                                   space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(), data ));
-                        to7_midi_update_irq( space->machine() );
+                                   space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data ));
+                        to7_midi_update_irq( space.machine() );
                 }
                 return data;
 	}
@@ -1312,7 +1312,7 @@ READ8_HANDLER ( to7_midi_r )
 
 	default:
 		logerror( "$%04x to7_midi_r: invalid offset %i\n",
-			  space->machine().device("maincpu")->safe_pcbase(),  offset );
+			  space.machine().device("maincpu")->safe_pcbase(),  offset );
 		return 0;
 	}
 }
@@ -1331,7 +1331,7 @@ WRITE8_HANDLER ( to7_midi_w )
 		if ( (data & 3) == 3 )
 		{
 			/* reset */
-			LOG_MIDI(( "$%04x %f to7_midi_w: reset (data=$%02X)\n", space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(), data ));
+			LOG_MIDI(( "$%04x %f to7_midi_w: reset (data=$%02X)\n", space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data ));
 			to7_midi_overrun = 0;
 			to7_midi_status = 2;
 			to7_midi_intr = 0;
@@ -1348,7 +1348,7 @@ WRITE8_HANDLER ( to7_midi_w )
 				static const int stop[8] = { 2,2,1,1,2,1,1,1 };
 				static const char parity[8] = { 'e','o','e','o','-','-','e','o' };
 				LOG_MIDI(( "$%04x %f to7_midi_w: set control to $%02X (bits=%i, stop=%i, parity=%c, intr in=%i out=%i)\n",
-					  space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(),
+					  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
 					  data,
 					  bits[ (data >> 2) & 7 ],
 					  stop[ (data >> 2) & 7 ],
@@ -1357,12 +1357,12 @@ WRITE8_HANDLER ( to7_midi_w )
 					  (to7_midi_intr & 3) ? 1 : 0));
 			}
 		}
-		to7_midi_update_irq( space->machine() );
+		to7_midi_update_irq( space.machine() );
 		break;
 
 
 	case 1: /* output data */
-		LOG_MIDI(( "$%04x %f to7_midi_w: write data $%02X\n", space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(), data ));
+		LOG_MIDI(( "$%04x %f to7_midi_w: write data $%02X\n", space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data ));
 		if ( data == 0x55 )
 			/* cable-detect: shortcut */
 			chardev_fake_in( to7_midi_chardev, 0x55 );
@@ -1376,7 +1376,7 @@ WRITE8_HANDLER ( to7_midi_w )
 
 
 	default:
-		logerror( "$%04x to7_midi_w: invalid offset %i (data=$%02X) \n", space->machine().device("maincpu")->safe_pcbase(), offset, data );
+		logerror( "$%04x to7_midi_w: invalid offset %i (data=$%02X) \n", space.machine().device("maincpu")->safe_pcbase(), offset, data );
 	}
 }
 
@@ -1487,7 +1487,7 @@ MACHINE_RESET ( to7 )
 
 MACHINE_START ( to7 )
 {
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8* mem = machine.root_device().memregion("maincpu")->base();
 	UINT8* ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
@@ -1515,8 +1515,8 @@ MACHINE_START ( to7 )
 		/* install 16 KB or 16 KB + 8 KB memory extensions */
 		/* BASIC instruction to see free memory: ?FRE(0) */
 		int extram = machine.device<ram_device>(RAM_TAG)->size() - 24*1024;
-		space->install_write_bank(0x8000, 0x8000 + extram - 1, THOM_RAM_BANK);
-		space->install_read_bank(0x8000, 0x8000 + extram - 1, THOM_RAM_BANK );
+		space.install_write_bank(0x8000, 0x8000 + extram - 1, THOM_RAM_BANK);
+		space.install_read_bank(0x8000, 0x8000 + extram - 1, THOM_RAM_BANK );
 		machine.root_device().membank( THOM_RAM_BANK )->configure_entry( 0, ram + 0x6000);
 		machine.root_device().membank( THOM_RAM_BANK )->set_entry( 0 );
 	}
@@ -1568,7 +1568,7 @@ static READ8_DEVICE_HANDLER ( to770_sys_porta_in )
 static void to770_update_ram_bank(running_machine &machine)
 {
 	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 portb = sys_pia->port_b_z_mask();
 	int bank;
 
@@ -1602,7 +1602,7 @@ static void to770_update_ram_bank(running_machine &machine)
                 {
 			/* RAM size is 48 KB only and unavailable bank
              * requested */
-			space->nop_readwrite(0xa000, 0xdfff);
+			space.nop_readwrite(0xa000, 0xdfff);
 		}
 		old_ram_bank = bank;
 		LOG_BANK(( "to770_update_ram_bank: RAM bank change %i\n", bank ));
@@ -1675,8 +1675,8 @@ const mc6846_interface to770_timer =
 
 READ8_HANDLER ( to770_gatearray_r )
 {
-	struct thom_vsignal v = thom_get_vsignal(space->machine());
-	struct thom_vsignal l = thom_get_lightpen_vsignal( space->machine(), TO7_LIGHTPEN_DECAL, to7_lightpen_step - 1, 0 );
+	struct thom_vsignal v = thom_get_vsignal(space.machine());
+	struct thom_vsignal l = thom_get_lightpen_vsignal( space.machine(), TO7_LIGHTPEN_DECAL, to7_lightpen_step - 1, 0 );
 	int count, inil, init, lt3;
 	count = to7_lightpen ? l.count : v.count;
 	inil  = to7_lightpen ? l.inil  : v.inil;
@@ -1690,7 +1690,7 @@ READ8_HANDLER ( to770_gatearray_r )
 	case 2: return (lt3 << 7) | (inil << 6);
 	case 3: return (init << 7);
 	default:
-		logerror( "$%04x to770_gatearray_r: invalid offset %i\n", space->machine().device("maincpu")->safe_pcbase(), offset );
+		logerror( "$%04x to770_gatearray_r: invalid offset %i\n", space.machine().device("maincpu")->safe_pcbase(), offset );
 		return 0;
 	}
 }
@@ -1907,8 +1907,8 @@ const pia6821_interface mo5_pia6821_sys =
 
 READ8_HANDLER ( mo5_gatearray_r )
 {
-	struct thom_vsignal v = thom_get_vsignal(space->machine());
-	struct thom_vsignal l = thom_get_lightpen_vsignal( space->machine(), MO5_LIGHTPEN_DECAL, to7_lightpen_step - 1, 0 );
+	struct thom_vsignal v = thom_get_vsignal(space.machine());
+	struct thom_vsignal l = thom_get_lightpen_vsignal( space.machine(), MO5_LIGHTPEN_DECAL, to7_lightpen_step - 1, 0 );
 	int count, inil, init, lt3;
 	count = to7_lightpen ? l.count : v.count;
 	inil  = to7_lightpen ? l.inil  : v.inil;
@@ -1921,7 +1921,7 @@ READ8_HANDLER ( mo5_gatearray_r )
 	case 2: return (lt3 << 7) | (inil << 6);
 	case 3: return (init << 7);
 	default:
-		logerror( "$%04x mo5_gatearray_r: invalid offset %i\n",  space->machine().device("maincpu")->safe_pcbase(), offset );
+		logerror( "$%04x mo5_gatearray_r: invalid offset %i\n",  space.machine().device("maincpu")->safe_pcbase(), offset );
 		return 0;
 	}
 }
@@ -1992,7 +1992,7 @@ DEVICE_IMAGE_LOAD( mo5_cartridge )
 
 static void mo5_update_cart_bank(running_machine &machine)
 {
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int rom_is_ram = mo5_reg_cart & 4;
 	int bank = 0;
 	int bank_is_read_only = 0;
@@ -2006,8 +2006,8 @@ static void mo5_update_cart_bank(running_machine &machine)
                 {
 			if ( old_cart_bank < 0 || old_cart_bank > 3 )
                         {
-				space->install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
-				space->nop_write( 0xb000, 0xefff);
+				space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
+				space.nop_write( 0xb000, 0xefff);
 			}
 			LOG_BANK(( "mo5_update_cart_bank: CART is cartridge bank %i (A7CB style)\n", bank ));
 		}
@@ -2022,12 +2022,12 @@ static void mo5_update_cart_bank(running_machine &machine)
                 {
                         if ( bank_is_read_only )
                         {
-                                space->install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
-                                space->nop_write( 0xb000, 0xefff );
+                                space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
+                                space.nop_write( 0xb000, 0xefff );
                         }
                         else
                         {
-                                space->install_readwrite_bank( 0xb000, 0xefff, THOM_CART_BANK);
+                                space.install_readwrite_bank( 0xb000, 0xefff, THOM_CART_BANK);
                         }
                         LOG_BANK(( "mo5_update_cart_bank: CART is nanonetwork RAM bank %i (%s)\n",
                                    mo5_reg_cart & 3,
@@ -2045,9 +2045,9 @@ static void mo5_update_cart_bank(running_machine &machine)
                         {
 				if ( old_cart_bank < 0 )
                                 {
-					space->install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
-					space->install_legacy_write_handler( 0xb000, 0xefff, FUNC(mo5_cartridge_w) );
-					space->install_legacy_read_handler( 0xbffc, 0xbfff, FUNC(mo5_cartridge_r) );
+					space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
+					space.install_legacy_write_handler( 0xb000, 0xefff, FUNC(mo5_cartridge_w) );
+					space.install_legacy_read_handler( 0xbffc, 0xbfff, FUNC(mo5_cartridge_r) );
 				}
 				LOG_BANK(( "mo5_update_cart_bank: CART is cartridge bank %i\n", bank ));
 			}
@@ -2055,8 +2055,8 @@ static void mo5_update_cart_bank(running_machine &machine)
 			/* internal ROM */
 			if ( old_cart_bank != 0 )
                         {
-				space->install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
-				space->install_legacy_write_handler( 0xb000, 0xefff, FUNC(mo5_cartridge_w) );
+				space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
+				space.install_legacy_write_handler( 0xb000, 0xefff, FUNC(mo5_cartridge_w) );
 				LOG_BANK(( "mo5_update_cart_bank: CART is internal\n"));
 			}
 	}
@@ -2083,7 +2083,7 @@ WRITE8_HANDLER ( mo5_cartridge_w )
 		return;
 
 	thom_cart_bank = offset & 3;
-	mo5_update_cart_bank(space->machine());
+	mo5_update_cart_bank(space.machine());
 }
 
 
@@ -2091,12 +2091,12 @@ WRITE8_HANDLER ( mo5_cartridge_w )
 /* read signal to bffc-bfff generates a bank switch */
 READ8_HANDLER ( mo5_cartridge_r )
 {
-	UINT8* pos = space->machine().root_device().memregion( "maincpu" )->base() + 0x10000;
+	UINT8* pos = space.machine().root_device().memregion( "maincpu" )->base() + 0x10000;
 	UINT8 data = pos[offset + 0xbffc + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
-	if ( !space->debugger_access() )
+	if ( !space.debugger_access() )
         {
 		thom_cart_bank = offset & 3;
-		mo5_update_cart_bank(space->machine());
+		mo5_update_cart_bank(space.machine());
 	}
 	return data;
 }
@@ -2107,7 +2107,7 @@ READ8_HANDLER ( mo5_cartridge_r )
 WRITE8_HANDLER ( mo5_ext_w )
 {
 	mo5_reg_cart = data;
-	mo5_update_cart_bank(space->machine());
+	mo5_update_cart_bank(space.machine());
 }
 
 
@@ -2203,14 +2203,14 @@ MACHINE_START ( mo5 )
 
 WRITE8_HANDLER ( to9_ieee_w )
 {
-	logerror( "$%04x %f to9_ieee_w: unhandled write $%02X to register %i\n", space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(), data, offset );
+	logerror( "$%04x %f to9_ieee_w: unhandled write $%02X to register %i\n", space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data, offset );
 }
 
 
 
 READ8_HANDLER  ( to9_ieee_r )
 {
-	logerror( "$%04x %f to9_ieee_r: unhandled read from register %i\n", space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(), offset );
+	logerror( "$%04x %f to9_ieee_r: unhandled read from register %i\n", space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), offset );
 	return 0;
 }
 
@@ -2226,8 +2226,8 @@ READ8_HANDLER  ( to9_ieee_r )
 
 READ8_HANDLER ( to9_gatearray_r )
 {
-	struct thom_vsignal v = thom_get_vsignal(space->machine());
-	struct thom_vsignal l = thom_get_lightpen_vsignal( space->machine(), TO9_LIGHTPEN_DECAL, to7_lightpen_step - 1, 0 );
+	struct thom_vsignal v = thom_get_vsignal(space.machine());
+	struct thom_vsignal l = thom_get_lightpen_vsignal( space.machine(), TO9_LIGHTPEN_DECAL, to7_lightpen_step - 1, 0 );
 	int count, inil, init, lt3;
 	count = to7_lightpen ? l.count : v.count;
 	inil  = to7_lightpen ? l.inil  : v.inil;
@@ -2241,7 +2241,7 @@ READ8_HANDLER ( to9_gatearray_r )
 	case 2: return (lt3 << 7) | (inil << 6);
 	case 3: return (v.init << 7) | (init << 6); /* != TO7/70 */
 	default:
-		logerror( "$%04x to9_gatearray_r: invalid offset %i\n", space->machine().device("maincpu")->safe_pcbase(), offset );
+		logerror( "$%04x to9_gatearray_r: invalid offset %i\n", space.machine().device("maincpu")->safe_pcbase(), offset );
 		return 0;
 	}
 }
@@ -2315,7 +2315,7 @@ READ8_HANDLER  ( to9_vreg_r )
 	case 0: /* palette data */
 	{
 		UINT8 c =  to9_palette_data[ to9_palette_idx ];
-		if ( !space->debugger_access() )
+		if ( !space.debugger_access() )
                 {
 			to9_palette_idx = ( to9_palette_idx + 1 ) & 31;
                 }
@@ -2339,7 +2339,7 @@ READ8_HANDLER  ( to9_vreg_r )
 
 WRITE8_HANDLER ( to9_vreg_w )
 {
-	LOG_VIDEO(( "$%04x %f to9_vreg_w: off=%i ($%04X) data=$%02X\n", space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(), offset, 0xe7da + offset, data ));
+	LOG_VIDEO(( "$%04x %f to9_vreg_w: off=%i ($%04X) data=$%02X\n", space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), offset, 0xe7da + offset, data ));
 
 	switch ( offset )
 	{
@@ -2351,7 +2351,7 @@ WRITE8_HANDLER ( to9_vreg_w )
 		idx = to9_palette_idx / 2;
 		color = to9_palette_data[ 2 * idx + 1 ];
 		color = to9_palette_data[ 2 * idx ] | (color << 8);
-		thom_set_palette( space->machine(), idx ^ 8, color & 0x1fff );
+		thom_set_palette( space.machine(), idx ^ 8, color & 0x1fff );
 
 		to9_palette_idx = ( to9_palette_idx + 1 ) & 31;
 	}
@@ -2362,11 +2362,11 @@ WRITE8_HANDLER ( to9_vreg_w )
 		break;
 
 	case 2: /* video mode */
-		to9_set_video_mode( space->machine(), data, 0 );
+		to9_set_video_mode( space.machine(), data, 0 );
 		break;
 
 	case 3: /* border color */
-		thom_set_border_color( space->machine(), data & 15 );
+		thom_set_border_color( space.machine(), data & 15 );
 		break;
 
 	default:
@@ -2394,7 +2394,7 @@ static UINT8 to9_soft_bank;
 
 static void to9_update_cart_bank(running_machine &machine)
 {
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int bank = 0;
 	int slot = ( mc6846_get_output_port(machine.device("mc6846")) >> 4 ) & 3; /* bits 4-5: ROM bank */
 
@@ -2407,7 +2407,7 @@ static void to9_update_cart_bank(running_machine &machine)
                 {
 			if ( old_cart_bank < 4)
                         {
-				space->install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
+				space.install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
                         }
 			LOG_BANK(( "to9_update_cart_bank: CART is BASIC bank %i\n", to9_soft_bank ));
 		}
@@ -2419,7 +2419,7 @@ static void to9_update_cart_bank(running_machine &machine)
                 {
 			if ( old_cart_bank < 4)
                         {
-				space->install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
+				space.install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
                         }
 			LOG_BANK(( "to9_update_cart_bank: CART is software 1 bank %i\n", to9_soft_bank ));
 		}
@@ -2431,7 +2431,7 @@ static void to9_update_cart_bank(running_machine &machine)
                 {
 			if ( old_cart_bank < 4)
                         {
-				space->install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
+				space.install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
                         }
 			LOG_BANK(( "to9_update_cart_bank: CART is software 2 bank %i\n", to9_soft_bank ));
 		}
@@ -2445,16 +2445,16 @@ static void to9_update_cart_bank(running_machine &machine)
                         {
 				if ( old_cart_bank < 0 || old_cart_bank > 3 )
                                 {
-					space->install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
-					space->install_legacy_write_handler( 0x0000, 0x3fff, FUNC(to9_cartridge_w) );
-					space->install_legacy_read_handler( 0x0000, 0x0003, FUNC(to9_cartridge_r) );
+					space.install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
+					space.install_legacy_write_handler( 0x0000, 0x3fff, FUNC(to9_cartridge_w) );
+					space.install_legacy_read_handler( 0x0000, 0x0003, FUNC(to9_cartridge_r) );
 				}
 				LOG_BANK(( "to9_update_cart_bank: CART is cartridge bank %i\n",  thom_cart_bank ));
 			}
 		} else
 			if ( old_cart_bank != 0 )
                         {
-				space->nop_read( 0x0000, 0x3fff);
+				space.nop_read( 0x0000, 0x3fff);
 				LOG_BANK(( "to9_update_cart_bank: CART is unmapped\n"));
 			}
 		break;
@@ -2478,7 +2478,7 @@ static void to9_update_cart_bank_postload(running_machine *machine)
 /* write signal to 0000-1fff generates a bank switch */
 WRITE8_HANDLER ( to9_cartridge_w )
 {
-	int slot = ( mc6846_get_output_port(space->machine().device("mc6846")) >> 4 ) & 3; /* bits 4-5: ROM bank */
+	int slot = ( mc6846_get_output_port(space.machine().device("mc6846")) >> 4 ) & 3; /* bits 4-5: ROM bank */
 
 	if ( offset >= 0x2000 )
 		return;
@@ -2487,7 +2487,7 @@ WRITE8_HANDLER ( to9_cartridge_w )
 		thom_cart_bank = offset & 3;
 	else
 		to9_soft_bank = offset & 3;
-	to9_update_cart_bank(space->machine());
+	to9_update_cart_bank(space.machine());
 }
 
 
@@ -2495,12 +2495,12 @@ WRITE8_HANDLER ( to9_cartridge_w )
 /* read signal to 0000-0003 generates a bank switch */
 READ8_HANDLER ( to9_cartridge_r )
 {
-	UINT8* pos = space->machine().root_device().memregion( "maincpu" )->base() + 0x10000;
+	UINT8* pos = space.machine().root_device().memregion( "maincpu" )->base() + 0x10000;
 	UINT8 data = pos[offset + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
-	if ( !space->debugger_access() )
+	if ( !space.debugger_access() )
         {
 		thom_cart_bank = offset & 3;
-		to9_update_cart_bank(space->machine());
+		to9_update_cart_bank(space.machine());
 	}
 	return data;
 }
@@ -2510,7 +2510,7 @@ READ8_HANDLER ( to9_cartridge_r )
 static void to9_update_ram_bank (running_machine &machine)
 {
 	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 port = mc6846_get_output_port(machine.device("mc6846"));
 	UINT8 portb = sys_pia->port_b_z_mask();
 	UINT8 disk = ((port >> 2) & 1) | ((port >> 5) & 2); /* bits 6,2: RAM bank */
@@ -2545,7 +2545,7 @@ static void to9_update_ram_bank (running_machine &machine)
                 }
 		else
                 {
-			space->nop_readwrite( 0xa000, 0xdfff);
+			space.nop_readwrite( 0xa000, 0xdfff);
                 }
 		old_ram_bank = bank;
 		LOG_BANK(( "to9_update_ram_bank: bank %i selected (pia=$%02X disk=%i)\n", bank, portb & 0xf8, disk ));
@@ -2668,7 +2668,7 @@ READ8_HANDLER ( to9_kbd_r )
 		/* bit 7:     interrupt */
 
 		LOG_KBD(( "$%04x %f to9_kbd_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, pe=%i, irq=%i)\n",
-			  space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(), to9_kbd_status,
+			  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), to9_kbd_status,
 			  (to9_kbd_status & ACIA_6850_RDRF) ? 1 : 0,
 			  (to9_kbd_status & ACIA_6850_TDRE) ? 1 : 0,
 			  (to9_kbd_status & ACIA_6850_OVRN) ? 1 : 0,
@@ -2677,7 +2677,7 @@ READ8_HANDLER ( to9_kbd_r )
 		return to9_kbd_status;
 
 	case 1: /* get input data */
-		if ( !space->debugger_access() )
+		if ( !space.debugger_access() )
 		{
 			to9_kbd_status &= ~(ACIA_6850_irq | ACIA_6850_PE);
 			if ( to9_kbd_overrun )
@@ -2685,13 +2685,13 @@ READ8_HANDLER ( to9_kbd_r )
 			else
 				to9_kbd_status &= ~(ACIA_6850_OVRN | ACIA_6850_RDRF);
 			to9_kbd_overrun = 0;
-			LOG_KBD(( "$%04x %f to9_kbd_r: read data $%02X\n", space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(), to9_kbd_in ));
-			to9_kbd_update_irq(space->machine());
+			LOG_KBD(( "$%04x %f to9_kbd_r: read data $%02X\n", space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), to9_kbd_in ));
+			to9_kbd_update_irq(space.machine());
 		}
 		return to9_kbd_in;
 
 	default:
-		logerror( "$%04x to9_kbd_r: invalid offset %i\n", space->machine().device("maincpu")->safe_pcbase(),  offset );
+		logerror( "$%04x to9_kbd_r: invalid offset %i\n", space.machine().device("maincpu")->safe_pcbase(),  offset );
 		return 0;
 	}
 }
@@ -2713,7 +2713,7 @@ WRITE8_HANDLER ( to9_kbd_w )
 			to9_kbd_overrun = 0;
 			to9_kbd_status = ACIA_6850_TDRE;
 			to9_kbd_intr = 0;
-			LOG_KBD(( "$%04x %f to9_kbd_w: reset (data=$%02X)\n", space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(), data ));
+			LOG_KBD(( "$%04x %f to9_kbd_w: reset (data=$%02X)\n", space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data ));
 		}
 		else
 		{
@@ -2727,19 +2727,19 @@ WRITE8_HANDLER ( to9_kbd_w )
 			to9_kbd_intr = data >> 5;
 
 			LOG_KBD(( "$%04x %f to9_kbd_w: set control to $%02X (parity=%i, intr in=%i out=%i)\n",
-				  space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(),
+				  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
 				  data, to9_kbd_parity, to9_kbd_intr >> 2,
 				  (to9_kbd_intr & 3) ? 1 : 0 ));
 		}
-		to9_kbd_update_irq(space->machine());
+		to9_kbd_update_irq(space.machine());
 		break;
 
 	case 1: /* output data */
 		to9_kbd_status &= ~(ACIA_6850_irq | ACIA_6850_TDRE);
-		to9_kbd_update_irq(space->machine());
+		to9_kbd_update_irq(space.machine());
 		/* TODO: 1 ms delay here ? */
 		to9_kbd_status |= ACIA_6850_TDRE; /* data transmit ready again */
-		to9_kbd_update_irq(space->machine());
+		to9_kbd_update_irq(space.machine());
 
 		switch ( data )
 		{
@@ -2758,19 +2758,19 @@ WRITE8_HANDLER ( to9_kbd_w )
 		case 0xFE: to9_kbd_periph = 0; break;
 
 		default:
-			logerror( "$%04x %f to9_kbd_w: unknown kbd command %02X\n", space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(), data );
+			logerror( "$%04x %f to9_kbd_w: unknown kbd command %02X\n", space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data );
 		}
 
-		thom_set_caps_led( space->machine(), !to9_kbd_caps );
+		thom_set_caps_led( space.machine(), !to9_kbd_caps );
 
 		LOG(( "$%04x %f to9_kbd_w: kbd command %02X (caps=%i, pad=%i, periph=%i)\n",
-		      space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(), data,
+		      space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data,
 		      to9_kbd_caps, to9_kbd_pad, to9_kbd_periph ));
 
 		break;
 
 	default:
-		logerror( "$%04x to9_kbd_w: invalid offset %i (data=$%02X) \n", space->machine().device("maincpu")->safe_pcbase(), offset, data );
+		logerror( "$%04x to9_kbd_w: invalid offset %i (data=$%02X) \n", space.machine().device("maincpu")->safe_pcbase(), offset, data );
 	}
 }
 
@@ -3573,7 +3573,7 @@ static void to8_update_floppy_bank_postload(running_machine *machine)
 static void to8_update_ram_bank (running_machine &machine)
 {
 	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 bank = 0;
 
 	if ( to8_reg_sys1 & 0x10 )
@@ -3617,8 +3617,8 @@ static void to8_update_ram_bank (running_machine &machine)
                 {
 			/* RAM size is 256 KB only and unavailable
              * bank requested */
-			space->nop_readwrite( 0xa000, 0xbfff);
-			space->nop_readwrite( 0xc000, 0xdfff);
+			space.nop_readwrite( 0xa000, 0xbfff);
+			space.nop_readwrite( 0xc000, 0xdfff);
 		}
 		to8_data_vpage = bank;
 		old_ram_bank = bank;
@@ -3637,7 +3637,7 @@ static void to8_update_ram_bank_postload(running_machine *machine)
 
 static void to8_update_cart_bank (running_machine &machine)
 {
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int bank = 0;
 	int bank_is_read_only = 0;
 
@@ -3656,14 +3656,14 @@ static void to8_update_cart_bank (running_machine &machine)
                                 {
 					if (old_cart_bank < 8 || old_cart_bank > 11)
                                         {
-						space->install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
+						space.install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
 						if ( bank_is_read_only )
                                                 {
-							space->nop_write( 0x0000, 0x3fff);
+							space.nop_write( 0x0000, 0x3fff);
                                                 }
 						else
                                                 {
-							space->install_legacy_write_handler( 0x0000, 0x3fff, FUNC(to8_vcart_w));
+							space.install_legacy_write_handler( 0x0000, 0x3fff, FUNC(to8_vcart_w));
                                                 }
 					}
 				}
@@ -3673,12 +3673,12 @@ static void to8_update_cart_bank (running_machine &machine)
                                         {
 						if ( bank_is_read_only )
                                                 {
-							space->install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
-							space->nop_write( 0x0000, 0x3fff);
+							space.install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
+							space.nop_write( 0x0000, 0x3fff);
 						}
                                                 else
                                                 {
-							space->install_readwrite_bank( 0x0000, 0x3fff,THOM_CART_BANK);
+							space.install_readwrite_bank( 0x0000, 0x3fff,THOM_CART_BANK);
                                                 }
                                         }
                                 }
@@ -3687,7 +3687,7 @@ static void to8_update_cart_bank (running_machine &machine)
                         {
 				/* RAM size is 256 KB only and unavailable
                  * bank requested */
-				space->nop_readwrite( 0x0000, 0x3fff);
+				space.nop_readwrite( 0x0000, 0x3fff);
                         }
 			LOG_BANK(( "to8_update_cart_bank: CART is RAM bank %i (%s)\n",
                                    to8_cart_vpage,
@@ -3699,17 +3699,17 @@ static void to8_update_cart_bank (running_machine &machine)
                         {
                                 if ( bank_is_read_only )
                                 {
-                                        space->nop_write( 0x0000, 0x3fff);
+                                        space.nop_write( 0x0000, 0x3fff);
                                 }
                                 else
                                 {
                                         if (to8_cart_vpage < 4)
                                         {
-                                                space->install_legacy_write_handler( 0x0000, 0x3fff, FUNC(to8_vcart_w));
+                                                space.install_legacy_write_handler( 0x0000, 0x3fff, FUNC(to8_vcart_w));
                                         }
                                         else
                                         {
-                                                space->install_readwrite_bank( 0x0000, 0x3fff, THOM_CART_BANK );
+                                                space.install_readwrite_bank( 0x0000, 0x3fff, THOM_CART_BANK );
                                         }
                                 }
                                 LOG_BANK(( "to8_update_cart_bank: update CART bank %i write status to %s\n",
@@ -3729,8 +3729,8 @@ static void to8_update_cart_bank (running_machine &machine)
                         {
 				if ( old_cart_bank < 4 || old_cart_bank > 7 )
                                 {
-					space->install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
-					space->install_legacy_write_handler( 0x0000, 0x3fff, FUNC(to8_cartridge_w) );
+					space.install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
+					space.install_legacy_write_handler( 0x0000, 0x3fff, FUNC(to8_cartridge_w) );
 				}
 				LOG_BANK(( "to8_update_cart_bank: CART is internal bank %i\n", to8_soft_bank ));
 			}
@@ -3745,9 +3745,9 @@ static void to8_update_cart_bank (running_machine &machine)
                                 {
 					if ( old_cart_bank < 0 || old_cart_bank > 3 )
                                         {
-						space->install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
-						space->install_legacy_write_handler( 0x0000, 0x3fff, FUNC(to8_cartridge_w) );
-						space->install_legacy_read_handler( 0x0000, 0x0003, FUNC(to8_cartridge_r) );
+						space.install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
+						space.install_legacy_write_handler( 0x0000, 0x3fff, FUNC(to8_cartridge_w) );
+						space.install_legacy_read_handler( 0x0000, 0x0003, FUNC(to8_cartridge_r) );
 					}
 					LOG_BANK(( "to8_update_cart_bank: CART is external cartridge bank %i\n", bank ));
 				}
@@ -3756,7 +3756,7 @@ static void to8_update_cart_bank (running_machine &machine)
                         {
 				if ( old_cart_bank != 0 )
                                 {
-					space->nop_read( 0x0000, 0x3fff);
+					space.nop_read( 0x0000, 0x3fff);
 					LOG_BANK(( "to8_update_cart_bank: CART is unmapped\n"));
 				}
                         }
@@ -3789,7 +3789,7 @@ WRITE8_HANDLER ( to8_cartridge_w )
 	else
 		thom_cart_bank = offset & 3;
 
-	to8_update_cart_bank(space->machine());
+	to8_update_cart_bank(space.machine());
 }
 
 
@@ -3797,12 +3797,12 @@ WRITE8_HANDLER ( to8_cartridge_w )
 /* read signal to 0000-0003 generates a bank switch */
 READ8_HANDLER ( to8_cartridge_r )
 {
-	UINT8* pos = space->machine().root_device().memregion( "maincpu" )->base() + 0x10000;
+	UINT8* pos = space.machine().root_device().memregion( "maincpu" )->base() + 0x10000;
 	UINT8 data = pos[offset + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
-	if ( !space->debugger_access() )
+	if ( !space.debugger_access() )
         {
 		thom_cart_bank = offset & 3;
-		to8_update_cart_bank(space->machine());
+		to8_update_cart_bank(space.machine());
 	}
 	return data;
 }
@@ -3833,7 +3833,7 @@ static void to8_floppy_reset( running_machine &machine )
 
 READ8_HANDLER ( to8_floppy_r )
 {
-	if ( space->debugger_access() )
+	if ( space.debugger_access() )
 		return 0;
 
 	if ( (to8_reg_sys1 & 0x80) && THOM_FLOPPY_EXT )
@@ -3871,8 +3871,8 @@ WRITE8_HANDLER ( to8_floppy_w )
 
 READ8_HANDLER ( to8_gatearray_r )
 {
-	struct thom_vsignal v = thom_get_vsignal(space->machine());
-	struct thom_vsignal l = thom_get_lightpen_vsignal( space->machine(), TO8_LIGHTPEN_DECAL, to7_lightpen_step - 1, 6 );
+	struct thom_vsignal v = thom_get_vsignal(space.machine());
+	struct thom_vsignal l = thom_get_lightpen_vsignal( space.machine(), TO8_LIGHTPEN_DECAL, to7_lightpen_step - 1, 6 );
 	int count, inil, init, lt3;
 	UINT8 res;
 	count = to7_lightpen ? l.count : v.count;
@@ -3893,9 +3893,9 @@ READ8_HANDLER ( to8_gatearray_r )
 	case 1: /* ram register / lightpen register 2 */
 		if ( to7_lightpen )
 		{
-			if ( !space->debugger_access() )
+			if ( !space.debugger_access() )
 			{
-				thom_firq_2( space->machine(), 0 );
+				thom_firq_2( space.machine(), 0 );
 				to8_lightpen_intr = 0;
 			}
 			res = count & 0xff;
@@ -3916,12 +3916,12 @@ READ8_HANDLER ( to8_gatearray_r )
 		break;
 
 	default:
-		logerror( "$%04x to8_gatearray_r: invalid offset %i\n", space->machine().device("maincpu")->safe_pcbase(), offset );
+		logerror( "$%04x to8_gatearray_r: invalid offset %i\n", space.machine().device("maincpu")->safe_pcbase(), offset );
 		res = 0;
 	}
 
 	LOG_VIDEO(( "$%04x %f to8_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n",
-		  space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(),
+		  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
 		  offset, 0xe7e4 + offset, res, to7_lightpen ));
 
 	return res;
@@ -3932,7 +3932,7 @@ READ8_HANDLER ( to8_gatearray_r )
 WRITE8_HANDLER ( to8_gatearray_w )
 {
 	LOG_VIDEO(( "$%04x %f to8_gatearray_w: off=%i ($%04X) data=$%02X\n",
-		  space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(),
+		  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
 		  offset, 0xe7e4 + offset, data ));
 
 	switch ( offset )
@@ -3946,25 +3946,25 @@ WRITE8_HANDLER ( to8_gatearray_w )
 		if ( to8_reg_sys1 & 0x10 )
 		{
 			to8_reg_ram = data;
-			to8_update_ram_bank(space->machine());
+			to8_update_ram_bank(space.machine());
 		}
 		break;
 
 	case 2: /* cartridge register */
 		to8_reg_cart = data;
-		to8_update_cart_bank(space->machine());
+		to8_update_cart_bank(space.machine());
 		break;
 
 	case 3: /* system register 1 */
 		to8_reg_sys1 = data;
-		to8_update_floppy_bank(space->machine());
-		to8_update_ram_bank(space->machine());
-		to8_update_cart_bank(space->machine());
+		to8_update_floppy_bank(space.machine());
+		to8_update_ram_bank(space.machine());
+		to8_update_cart_bank(space.machine());
 		break;
 
 	default:
 		logerror( "$%04x to8_gatearray_w: invalid offset %i (data=$%02X)\n",
-			  space->machine().device("maincpu")->safe_pcbase(), offset, data );
+			  space.machine().device("maincpu")->safe_pcbase(), offset, data );
 	}
 }
 
@@ -3979,7 +3979,7 @@ READ8_HANDLER  ( to8_vreg_r )
 	/* 0xe7dc from external floppy drive aliases the video gate-array */
 	if ( ( offset == 3 ) && ( to8_reg_ram & 0x80 ) && ( to8_reg_sys1 & 0x80 ) )
 	{
-		if ( space->debugger_access() )
+		if ( space.debugger_access() )
 			return 0;
 
 		if ( THOM_FLOPPY_EXT )
@@ -3994,7 +3994,7 @@ READ8_HANDLER  ( to8_vreg_r )
 	case 0: /* palette data */
 	{
 		UINT8 c =  to9_palette_data[ to9_palette_idx ];
-		if ( !space->debugger_access() )
+		if ( !space.debugger_access() )
                 {
 			to9_palette_idx = ( to9_palette_idx + 1 ) & 31;
                 }
@@ -4019,7 +4019,7 @@ READ8_HANDLER  ( to8_vreg_r )
 WRITE8_HANDLER ( to8_vreg_w )
 {
 	LOG_VIDEO(( "$%04x %f to8_vreg_w: off=%i ($%04X) data=$%02X\n",
-		  space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(),
+		  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
 		  offset, 0xe7da + offset, data ));
 
 	switch ( offset )
@@ -4032,7 +4032,7 @@ WRITE8_HANDLER ( to8_vreg_w )
 		idx = to9_palette_idx / 2;
 		color = to9_palette_data[ 2 * idx + 1 ];
 		color = to9_palette_data[ 2 * idx ] | (color << 8);
-		thom_set_palette( space->machine(), idx, color & 0x1fff );
+		thom_set_palette( space.machine(), idx, color & 0x1fff );
 		to9_palette_idx = ( to9_palette_idx + 1 ) & 31;
 	}
 	break;
@@ -4042,7 +4042,7 @@ WRITE8_HANDLER ( to8_vreg_w )
 		break;
 
 	case 2: /* display register */
-		to9_set_video_mode( space->machine(), data, 1 );
+		to9_set_video_mode( space.machine(), data, 1 );
 		break;
 
 	case 3: /* system register 2 */
@@ -4055,8 +4055,8 @@ WRITE8_HANDLER ( to8_vreg_w )
 		else
 		{
 			to8_reg_sys2 = data;
-			thom_set_video_page( space->machine(), data >> 6 );
-			thom_set_border_color( space->machine(), data & 15 );
+			thom_set_video_page( space.machine(), data >> 6 );
+			thom_set_border_color( space.machine(), data & 15 );
 		}
 		break;
 
@@ -4498,12 +4498,12 @@ static void mo6_update_ram_bank_postload(running_machine *machine)
 static void mo6_update_cart_bank (running_machine &machine)
 {
 	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int b = (sys_pia->a_output() >> 5) & 1;
 	int bank = 0;
 	int bank_is_read_only = 0;
 
-	// space->install_read_bank( 0xb000, 0xefff, THOM_CART_BANK );
+	// space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK );
 
 	if ( ( ( to8_reg_sys1 & 0x40 ) && ( to8_reg_cart & 0x20 ) ) || ( ! ( to8_reg_sys1 & 0x40 ) && ( mo5_reg_cart & 4 ) ) )
 	{
@@ -4520,14 +4520,14 @@ static void mo6_update_cart_bank (running_machine &machine)
                                 {
 					if (old_cart_bank < 8 || old_cart_bank > 11)
                                         {
-						space->install_read_bank( 0xb000, 0xefff, THOM_CART_BANK );
+						space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK );
 						if ( bank_is_read_only )
                                                 {
-							space->nop_write( 0xb000, 0xefff);
+							space.nop_write( 0xb000, 0xefff);
                                                 }
 						else
                                                 {
-							space->install_legacy_write_handler( 0xb000, 0xefff, FUNC(to8_vcart_w));
+							space.install_legacy_write_handler( 0xb000, 0xefff, FUNC(to8_vcart_w));
                                                 }
 					}
 				}
@@ -4538,12 +4538,12 @@ static void mo6_update_cart_bank (running_machine &machine)
                                         {
 						if ( bank_is_read_only )
                                                 {
-							space->install_read_bank( 0xb000, 0xefff, THOM_CART_BANK );
-							space->nop_write( 0xb000, 0xefff);
+							space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK );
+							space.nop_write( 0xb000, 0xefff);
 						}
                                                 else
                                                 {
-							space->install_readwrite_bank( 0xb000, 0xefff,THOM_CART_BANK);
+							space.install_readwrite_bank( 0xb000, 0xefff,THOM_CART_BANK);
                                                 }
                                         }
                                 }
@@ -4555,17 +4555,17 @@ static void mo6_update_cart_bank (running_machine &machine)
                         {
 				if ( bank_is_read_only )
                                 {
-					space->nop_write( 0xb000, 0xefff);
+					space.nop_write( 0xb000, 0xefff);
                                 }
 				else
                                 {
 					if (to8_cart_vpage < 4)
                                         {
-						space->install_legacy_write_handler( 0xb000, 0xefff, FUNC(to8_vcart_w));
+						space.install_legacy_write_handler( 0xb000, 0xefff, FUNC(to8_vcart_w));
                                         }
 					else
                                         {
-						space->install_readwrite_bank( 0xb000, 0xefff, THOM_CART_BANK );
+						space.install_readwrite_bank( 0xb000, 0xefff, THOM_CART_BANK );
                                         }
                                 }
 				LOG_BANK(( "mo6_update_cart_bank: update CART bank %i write status to %s\n",
@@ -4582,8 +4582,8 @@ static void mo6_update_cart_bank (running_machine &machine)
                         {
 				if ( old_cart_bank < 0 || old_cart_bank > 3 )
                                 {
-					space->install_read_bank( 0xb000, 0xefff, THOM_CART_BANK );
-					space->nop_write( 0xb000, 0xefff);
+					space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK );
+					space.nop_write( 0xb000, 0xefff);
 				}
 				LOG_BANK(( "mo6_update_cart_bank: CART is external cartridge bank %i (A7CB style)\n", bank ));
 			}
@@ -4600,11 +4600,11 @@ static void mo6_update_cart_bank (running_machine &machine)
                                 {
 					if ( bank_is_read_only )
                                         {
-						space->install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
-						space->nop_write( 0xb000, 0xefff);
+						space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
+						space.nop_write( 0xb000, 0xefff);
 					} else
                                         {
-						space->install_readwrite_bank( 0xb000, 0xefff, THOM_CART_BANK);
+						space.install_readwrite_bank( 0xb000, 0xefff, THOM_CART_BANK);
                                         }
 				}
 				LOG_BANK(( "mo6_update_cart_bank: CART is RAM bank %i (MO5 compat.) (%s)\n",
@@ -4615,12 +4615,12 @@ static void mo6_update_cart_bank (running_machine &machine)
                         {
 				if ( bank_is_read_only )
                                 {
-					space->install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
-					space->nop_write( 0xb000, 0xefff);
+					space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
+					space.nop_write( 0xb000, 0xefff);
 				}
                                 else
                                 {
-					space->install_readwrite_bank( 0xb000, 0xefff, THOM_CART_BANK);
+					space.install_readwrite_bank( 0xb000, 0xefff, THOM_CART_BANK);
                                 }
 				LOG_BANK(( "mo5_update_cart_bank: update CART bank %i write status to %s\n",
                                            to8_cart_vpage,
@@ -4647,8 +4647,8 @@ static void mo6_update_cart_bank (running_machine &machine)
                         {
 				if ( old_cart_bank < 4 || old_cart_bank > 7 )
                                 {
-					space->install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
-					space->install_legacy_write_handler( 0xb000, 0xefff, FUNC(mo6_cartridge_w) );
+					space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
+					space.install_legacy_write_handler( 0xb000, 0xefff, FUNC(mo6_cartridge_w) );
 				}
 				LOG_BANK(( "mo6_update_cart_bank: CART is internal ROM bank %i\n", b ));
 			}
@@ -4663,9 +4663,9 @@ static void mo6_update_cart_bank (running_machine &machine)
                                 {
 					if ( old_cart_bank < 0 || old_cart_bank > 3 )
                                         {
-						space->install_read_bank( 0xb000, 0xefff, THOM_CART_BANK );
-						space->install_legacy_write_handler( 0xb000, 0xefff, FUNC(mo6_cartridge_w) );
-						space->install_legacy_read_handler( 0xbffc, 0xbfff, FUNC(mo6_cartridge_r) );
+						space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK );
+						space.install_legacy_write_handler( 0xb000, 0xefff, FUNC(mo6_cartridge_w) );
+						space.install_legacy_read_handler( 0xbffc, 0xbfff, FUNC(mo6_cartridge_r) );
 					}
 					LOG_BANK(( "mo6_update_cart_bank: CART is external cartridge bank %i\n", bank ));
 				}
@@ -4674,7 +4674,7 @@ static void mo6_update_cart_bank (running_machine &machine)
                         {
 				if ( old_cart_bank != 0 )
                                 {
-					space->nop_read( 0xb000, 0xefff );
+					space.nop_read( 0xb000, 0xefff );
 					LOG_BANK(( "mo6_update_cart_bank: CART is unmapped\n"));
 				}
                         }
@@ -4704,7 +4704,7 @@ WRITE8_HANDLER ( mo6_cartridge_w )
 		return;
 
 	thom_cart_bank = offset & 3;
-	mo6_update_cart_bank(space->machine());
+	mo6_update_cart_bank(space.machine());
 }
 
 
@@ -4712,12 +4712,12 @@ WRITE8_HANDLER ( mo6_cartridge_w )
 /* read signal generates a bank switch */
 READ8_HANDLER ( mo6_cartridge_r )
 {
-	UINT8* pos = space->machine().root_device().memregion( "maincpu" )->base() + 0x10000;
+	UINT8* pos = space.machine().root_device().memregion( "maincpu" )->base() + 0x10000;
 	UINT8 data = pos[offset + 0xbffc + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
-	if ( !space->debugger_access() )
+	if ( !space.debugger_access() )
         {
 		thom_cart_bank = offset & 3;
-		mo6_update_cart_bank(space->machine());
+		mo6_update_cart_bank(space.machine());
 	}
 	return data;
 }
@@ -4728,7 +4728,7 @@ WRITE8_HANDLER ( mo6_ext_w )
 {
 	/* MO5 network extension compatible */
 	mo5_reg_cart = data;
-	mo6_update_cart_bank(space->machine());
+	mo6_update_cart_bank(space.machine());
 }
 
 
@@ -4930,8 +4930,8 @@ const pia6821_interface mo6_pia6821_sys =
 
 READ8_HANDLER ( mo6_gatearray_r )
 {
-	struct thom_vsignal v = thom_get_vsignal(space->machine());
-	struct thom_vsignal l = thom_get_lightpen_vsignal( space->machine(), MO6_LIGHTPEN_DECAL, to7_lightpen_step - 1, 6 );
+	struct thom_vsignal v = thom_get_vsignal(space.machine());
+	struct thom_vsignal l = thom_get_lightpen_vsignal( space.machine(), MO6_LIGHTPEN_DECAL, to7_lightpen_step - 1, 6 );
 	int count, inil, init, lt3;
 	UINT8 res;
 	count = to7_lightpen ? l.count : v.count;
@@ -4952,9 +4952,9 @@ READ8_HANDLER ( mo6_gatearray_r )
 	case 1: /* ram register / lightpen register 2 */
 		if ( to7_lightpen )
 		{
-			if ( !space->debugger_access() )
+			if ( !space.debugger_access() )
 			{
-				thom_firq_2( space->machine(), 0 );
+				thom_firq_2( space.machine(), 0 );
 				to8_lightpen_intr = 0;
 			}
 			res =  count & 0xff;
@@ -4975,12 +4975,12 @@ READ8_HANDLER ( mo6_gatearray_r )
 		break;
 
 	default:
-		logerror( "$%04x mo6_gatearray_r: invalid offset %i\n", space->machine().device("maincpu")->safe_pcbase(), offset );
+		logerror( "$%04x mo6_gatearray_r: invalid offset %i\n", space.machine().device("maincpu")->safe_pcbase(), offset );
 		res = 0;
 	}
 
 	LOG_VIDEO(( "$%04x %f mo6_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n",
-		  space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(),
+		  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
 		  offset, 0xa7e4 + offset, res, to7_lightpen ));
 
 	return res;
@@ -4991,7 +4991,7 @@ READ8_HANDLER ( mo6_gatearray_r )
 WRITE8_HANDLER ( mo6_gatearray_w )
 {
 	LOG_VIDEO(( "$%04x %f mo6_gatearray_w: off=%i ($%04X) data=$%02X\n",
-		  space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(),
+		  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
 		  offset, 0xa7e4 + offset, data ));
 
 	switch ( offset )
@@ -5005,23 +5005,23 @@ WRITE8_HANDLER ( mo6_gatearray_w )
 		if ( to8_reg_sys1 & 0x10 )
 		{
 			to8_reg_ram = data;
-			mo6_update_ram_bank(space->machine());
+			mo6_update_ram_bank(space.machine());
 		}
 		break;
 
 	case 2: /* cartridge register */
 		to8_reg_cart = data;
-		mo6_update_cart_bank(space->machine());
+		mo6_update_cart_bank(space.machine());
 		break;
 
 	case 3: /* system register 1 */
 		to8_reg_sys1 = data;
-		mo6_update_ram_bank(space->machine());
-		mo6_update_cart_bank(space->machine());
+		mo6_update_ram_bank(space.machine());
+		mo6_update_cart_bank(space.machine());
 		break;
 
 	default:
-		logerror( "$%04x mo6_gatearray_w: invalid offset %i (data=$%02X)\n", space->machine().device("maincpu")->safe_pcbase(), offset, data );
+		logerror( "$%04x mo6_gatearray_w: invalid offset %i (data=$%02X)\n", space.machine().device("maincpu")->safe_pcbase(), offset, data );
 	}
 }
 
@@ -5035,7 +5035,7 @@ READ8_HANDLER ( mo6_vreg_r )
 	/* 0xa7dc from external floppy drive aliases the video gate-array */
 	if ( ( offset == 3 ) && ( to8_reg_ram & 0x80 ) )
         {
-		if ( !space->debugger_access() )
+		if ( !space.debugger_access() )
 			return to7_floppy_r( space, 0xc );
         }
 
@@ -5061,7 +5061,7 @@ READ8_HANDLER ( mo6_vreg_r )
 WRITE8_HANDLER ( mo6_vreg_w )
 {
 	LOG_VIDEO(( "$%04x %f mo6_vreg_w: off=%i ($%04X) data=$%02X\n",
-		  space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(),
+		  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
 		  offset, 0xa7da + offset, data ));
 
 	switch ( offset )
@@ -5076,7 +5076,7 @@ WRITE8_HANDLER ( mo6_vreg_w )
 		if ( ( to8_reg_sys1 & 0x80 ) && ( to8_reg_ram & 0x80 ) )
 			to7_floppy_w( space, 0xc, data );
 		else
-			to9_set_video_mode( space->machine(), data, 2 );
+			to9_set_video_mode( space.machine(), data, 2 );
 		break;
 
 	case 3: /* system register 2 */
@@ -5086,9 +5086,9 @@ WRITE8_HANDLER ( mo6_vreg_w )
 		else
 		{
 			to8_reg_sys2 = data;
-			thom_set_video_page( space->machine(), data >> 6 );
-			thom_set_border_color( space->machine(), data & 15 );
-			mo6_update_cart_bank(space->machine());
+			thom_set_video_page( space.machine(), data >> 6 );
+			thom_set_border_color( space.machine(), data & 15 );
+			mo6_update_cart_bank(space.machine());
 		}
 		break;
 
@@ -5213,13 +5213,13 @@ MACHINE_START ( mo6 )
 
 READ8_HANDLER ( mo5nr_net_r )
 {
-	if ( space->debugger_access() )
+	if ( space.debugger_access() )
 		return 0;
 
 	if ( to7_controller_type )
 		return to7_floppy_r ( space, offset );
 
-	logerror( "$%04x %f mo5nr_net_r: read from reg %i\n", space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(), offset );
+	logerror( "$%04x %f mo5nr_net_r: read from reg %i\n", space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), offset );
 
 	return 0;
 }
@@ -5232,7 +5232,7 @@ WRITE8_HANDLER ( mo5nr_net_w )
 		to7_floppy_w ( space, offset, data );
 	else
 		logerror( "$%04x %f mo5nr_net_w: write $%02X to reg %i\n",
-			  space->machine().device("maincpu")->safe_pcbase(), space->machine().time().as_double(), data, offset );
+			  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data, offset );
 }
 
 
@@ -5245,7 +5245,7 @@ WRITE8_HANDLER ( mo5nr_net_w )
 
 READ8_HANDLER( mo5nr_prn_r )
 {
-	centronics_device *printer = space->machine().device<centronics_device>("centronics");
+	centronics_device *printer = space.machine().device<centronics_device>("centronics");
 	UINT8 result = 0;
 
 	result |= !printer->busy_r() << 7;
@@ -5256,7 +5256,7 @@ READ8_HANDLER( mo5nr_prn_r )
 
 WRITE8_HANDLER( mo5nr_prn_w )
 {
-	centronics_device *printer = space->machine().device<centronics_device>("centronics");
+	centronics_device *printer = space.machine().device<centronics_device>("centronics");
 
 	/* TODO: understand other bits */
 	printer->strobe_w(BIT(data, 3));

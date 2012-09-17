@@ -1132,11 +1132,11 @@ WRITE32_MEMBER(viper_state::epic_w)
 /*
 READ64_MEMBER(viper_state::epic_64be_r)
 {
-    return read64be_with_32le_handler(epic_r, &space, offset, mem_mask);
+    return read64be_with_32le_handler(epic_r, space, offset, mem_mask);
 }
 WRITE64_MEMBER(viper_state::epic_64be_w)
 {
-    write64be_with_32le_handler(epic_w, &space, offset, data, mem_mask);
+    write64be_with_32le_handler(epic_w, space, offset, data, mem_mask);
 }
 */
 

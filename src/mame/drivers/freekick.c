@@ -1125,8 +1125,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(freekick_state,gigasb)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	space->set_decrypted_region(0x0000, 0xbfff, machine().root_device().memregion("maincpu")->base() + 0x10000);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	space.set_decrypted_region(0x0000, 0xbfff, machine().root_device().memregion("maincpu")->base() + 0x10000);
 }
 
 

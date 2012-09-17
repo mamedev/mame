@@ -258,7 +258,7 @@ WRITE8_MEMBER(poly88_state::poly88_intr_w)
 
 SNAPSHOT_LOAD( poly88 )
 {
-	address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8* data= auto_alloc_array(image.device().machine(), UINT8, snapshot_size);
 	UINT16 recordNum;
 	UINT16 recordLen;
@@ -290,7 +290,7 @@ SNAPSHOT_LOAD( poly88 )
 		switch(recordType) {
 			case 0 :
 					/* 00 Absolute */
-					memcpy(space->get_read_ptr(address ), data + pos ,recordLen);
+					memcpy(space.get_read_ptr(address ), data + pos ,recordLen);
 					break;
 			case 1 :
 					/* 01 Comment */

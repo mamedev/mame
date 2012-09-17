@@ -63,11 +63,11 @@ static DEVICE_START( irem_audio )
 
 WRITE8_HANDLER( irem_sound_cmd_w )
 {
-	driver_device *drvstate = space->machine().driver_data<driver_device>();
+	driver_device *drvstate = space.machine().driver_data<driver_device>();
 	if ((data & 0x80) == 0)
-		drvstate->soundlatch_byte_w(*space, 0, data & 0x7f);
+		drvstate->soundlatch_byte_w(space, 0, data & 0x7f);
 	else
-		space->machine().device("iremsound")->execute().set_input_line(0, ASSERT_LINE);
+		space.machine().device("iremsound")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -181,7 +181,7 @@ static WRITE8_DEVICE_HANDLER( ay8910_1_porta_w )
 
 static WRITE8_HANDLER( sound_irq_ack_w )
 {
-	space->machine().device("iremsound")->execute().set_input_line(0, CLEAR_LINE);
+	space.machine().device("iremsound")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 

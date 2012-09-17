@@ -611,12 +611,12 @@ WRITE8_MEMBER(bbc_state::bbc_6845_w)
  READ8_HANDLER (bbc_6845_r)
 {
 
-    mc6845_device *mc6845 = space->machine().device<mc6845_device>("mc6845");
+    mc6845_device *mc6845 = space.machine().device<mc6845_device>("mc6845");
 
     switch (offset&1)
     {
-        case 0: return mc6845->status_r(*space,0); break;
-        case 1: return mc6845->register_r(*space,0); break;
+        case 0: return mc6845->status_r(space,0); break;
+        case 1: return mc6845->register_r(space,0); break;
     }
     return 0;
 

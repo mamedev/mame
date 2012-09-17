@@ -439,17 +439,17 @@ void nanos_state::machine_start()
 
 void nanos_state::machine_reset()
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	space->install_write_bank(0x0000, 0x0fff, "bank3");
-	space->install_write_bank(0x1000, 0xffff, "bank2");
+	space.install_write_bank(0x0000, 0x0fff, "bank3");
+	space.install_write_bank(0x1000, 0xffff, "bank2");
 
 	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
 	membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x1000);
 	membank("bank3")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 
-	floppy_mon_w(floppy_get_device(space->machine(), 0), CLEAR_LINE);
-	floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0), 1,1);
+	floppy_mon_w(floppy_get_device(space.machine(), 0), CLEAR_LINE);
+	floppy_drive_set_ready_state(floppy_get_device(space.machine(), 0), 1,1);
 }
 
 static Z80PIO_INTERFACE( nanos_z80pio_intf )

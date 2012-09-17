@@ -61,11 +61,11 @@ static void adjust_sample(samples_device *samples, UINT8 freq)
 
 WRITE8_HANDLER( targ_audio_1_w )
 {
-	samples_device *samples = space->machine().device<samples_device>("samples");
+	samples_device *samples = space.machine().device<samples_device>("samples");
 
 	/* CPU music */
 	if ((data & 0x01) != (port_1_last & 0x01))
-		space->machine().device<dac_device>("dac")->write_unsigned8((data & 0x01) * 0xff);
+		space.machine().device<dac_device>("dac")->write_unsigned8((data & 0x01) * 0xff);
 
 	/* shot */
 	if (FALLING_EDGE(0x02) && !samples->playing(0))  samples->start(0,1);
@@ -114,8 +114,8 @@ WRITE8_HANDLER( targ_audio_2_w )
 {
 	if ((data & 0x01) && !(port_2_last & 0x01))
 	{
-		samples_device *samples = space->machine().device<samples_device>("samples");
-		UINT8 *prom = space->machine().root_device().memregion("targ")->base();
+		samples_device *samples = space.machine().device<samples_device>("samples");
+		UINT8 *prom = space.machine().root_device().memregion("targ")->base();
 
 		tone_pointer = (tone_pointer + 1) & 0x0f;
 
@@ -128,7 +128,7 @@ WRITE8_HANDLER( targ_audio_2_w )
 
 WRITE8_HANDLER( spectar_audio_2_w )
 {
-	samples_device *samples = space->machine().device<samples_device>("samples");
+	samples_device *samples = space.machine().device<samples_device>("samples");
 	adjust_sample(samples, data);
 }
 

@@ -38,8 +38,8 @@ public:
 
 	required_shared_ptr<UINT32> m_mo_command;
 
-	void			(*m_protection_w)(address_space *space, offs_t offset, UINT16 data);
-	void			(*m_protection_r)(address_space *space, offs_t offset, UINT16 *data);
+	void			(*m_protection_w)(address_space &space, offs_t offset, UINT16 data);
+	void			(*m_protection_r)(address_space &space, offs_t offset, UINT16 *data);
 
 	UINT8			m_ignore_writes;
 	offs_t			m_protaddr[ADDRSEQ_COUNT];

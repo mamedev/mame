@@ -53,10 +53,10 @@ WRITE16_MEMBER(sf_state::soundcmd_w)
 /* The protection of the Japanese (and alt US) version */
 /* I'd love to see someone dump the 68705 / i8751 roms */
 
-static void write_dword( address_space *space, offs_t offset, UINT32 data )
+static void write_dword( address_space &space, offs_t offset, UINT32 data )
 {
-	space->write_word(offset, data >> 16);
-	space->write_word(offset + 2, data);
+	space.write_word(offset, data >> 16);
+	space.write_word(offset + 2, data);
 }
 
 WRITE16_MEMBER(sf_state::protection_w)
@@ -81,21 +81,21 @@ WRITE16_MEMBER(sf_state::protection_w)
 
 			base = 0x1b6e8 + 0x300e * map;
 
-			write_dword(&space, 0xffc01c, 0x16bfc + 0x270 * map);
-			write_dword(&space, 0xffc020, base + 0x80);
-			write_dword(&space, 0xffc024, base);
-			write_dword(&space, 0xffc028, base + 0x86);
-			write_dword(&space, 0xffc02c, base + 0x8e);
-			write_dword(&space, 0xffc030, base + 0x20e);
-			write_dword(&space, 0xffc034, base + 0x30e);
-			write_dword(&space, 0xffc038, base + 0x38e);
-			write_dword(&space, 0xffc03c, base + 0x40e);
-			write_dword(&space, 0xffc040, base + 0x80e);
-			write_dword(&space, 0xffc044, base + 0xc0e);
-			write_dword(&space, 0xffc048, base + 0x180e);
-			write_dword(&space, 0xffc04c, base + 0x240e);
-			write_dword(&space, 0xffc050, 0x19548 + 0x60 * map);
-			write_dword(&space, 0xffc054, 0x19578 + 0x60 * map);
+			write_dword(space, 0xffc01c, 0x16bfc + 0x270 * map);
+			write_dword(space, 0xffc020, base + 0x80);
+			write_dword(space, 0xffc024, base);
+			write_dword(space, 0xffc028, base + 0x86);
+			write_dword(space, 0xffc02c, base + 0x8e);
+			write_dword(space, 0xffc030, base + 0x20e);
+			write_dword(space, 0xffc034, base + 0x30e);
+			write_dword(space, 0xffc038, base + 0x38e);
+			write_dword(space, 0xffc03c, base + 0x40e);
+			write_dword(space, 0xffc040, base + 0x80e);
+			write_dword(space, 0xffc044, base + 0xc0e);
+			write_dword(space, 0xffc048, base + 0x180e);
+			write_dword(space, 0xffc04c, base + 0x240e);
+			write_dword(space, 0xffc050, 0x19548 + 0x60 * map);
+			write_dword(space, 0xffc054, 0x19578 + 0x60 * map);
 			break;
 		}
 	case 2:

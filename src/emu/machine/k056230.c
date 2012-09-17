@@ -82,7 +82,7 @@ READ8_DEVICE_HANDLER_TRAMPOLINE(k056230, k056230_r)
 		}
 	}
 
-//  mame_printf_debug("k056230_r: %d at %08X\n", offset, space->device().safe_pc());
+//  mame_printf_debug("k056230_r: %d at %08X\n", offset, space.device().safe_pc());
 
 	return 0;
 }
@@ -132,17 +132,17 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(k056230, k056230_w)
 			break;
 		}
 	}
-//  mame_printf_debug("k056230_w: %d, %02X at %08X\n", offset, data, space->device().safe_pc());
+//  mame_printf_debug("k056230_w: %d, %02X at %08X\n", offset, data, space.device().safe_pc());
 }
 
 READ32_DEVICE_HANDLER_TRAMPOLINE(k056230, lanc_ram_r)
 {
-	//mame_printf_debug("LANC_RAM_r: %08X, %08X at %08X\n", offset, mem_mask, space->device().safe_pc());
+	//mame_printf_debug("LANC_RAM_r: %08X, %08X at %08X\n", offset, mem_mask, space.device().safe_pc());
 	return m_ram[offset & 0x7ff];
 }
 
 WRITE32_DEVICE_HANDLER_TRAMPOLINE(k056230, lanc_ram_w)
 {
-	//mame_printf_debug("LANC_RAM_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space->device().safe_pc());
+	//mame_printf_debug("LANC_RAM_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
 	COMBINE_DATA(m_ram + (offset & 0x7ff));
 }

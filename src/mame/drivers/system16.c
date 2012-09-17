@@ -3294,7 +3294,7 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,goldnaxeb1)
 	int i;
 	UINT8 *ROM = memregion("maincpu")->base();
 	UINT8 *KEY = memregion("decryption")->base();
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 data[0x1000];
 
 	// the decryption key is in a rom (part of an MSDOS executable...)
@@ -3313,7 +3313,7 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,goldnaxeb1)
 		m_decrypted_region[i] = ROM[i] ^ data[(i & 0xfff) ^ 1];
 	}
 
-	space->set_decrypted_region(0x00000, 0xbffff, m_decrypted_region);
+	space.set_decrypted_region(0x00000, 0xbffff, m_decrypted_region);
 
 	DRIVER_INIT_CALL(common);
 

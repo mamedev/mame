@@ -276,7 +276,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 			{
 				int slot = ((offset >> 4) & 7) - 1;
 				if (m_expansion_slots[slot].reg_read)
-					return m_expansion_slots[slot].reg_read(&space, offset & 0xf);
+					return m_expansion_slots[slot].reg_read(space, offset & 0xf);
 			}
 			break;
 
@@ -299,7 +299,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 			int slot = ((offset >> 8) & 7) - 1;
 			LOG(("concept_io_r: Slot ROM memory accessed for slot %d at address 0x03%4.4x\n", slot, offset << 1));
 			if (m_expansion_slots[slot].rom_read)
-				return m_expansion_slots[slot].rom_read(&space, offset & 0xff);
+				return m_expansion_slots[slot].rom_read(space, offset & 0xff);
 		}
 		break;
 
@@ -418,7 +418,7 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 				LOG(("concept_io_w: Slot I/O register written for slot %d at address 0x03%4.4x, data: 0x%4.4x\n",
 					slot, offset << 1, data));
 				if (m_expansion_slots[slot].reg_write)
-					m_expansion_slots[slot].reg_write(&space, offset & 0xf, data);
+					m_expansion_slots[slot].reg_write(space, offset & 0xf, data);
 			}
 			break;
 
@@ -441,7 +441,7 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 			int slot = ((offset >> 8) & 7) - 1;
 			LOG(("concept_io_w: Slot ROM memory written to for slot %d at address 0x03%4.4x, data: 0x%4.4x\n", slot, offset << 1, data));
 			if (m_expansion_slots[slot].rom_write)
-				m_expansion_slots[slot].rom_write(&space, offset & 0xff, data);
+				m_expansion_slots[slot].rom_write(space, offset & 0xff, data);
 		}
 		break;
 
@@ -589,8 +589,8 @@ const wd17xx_interface concept_wd17xx_interface =
 
 static  READ8_HANDLER(concept_fdc_reg_r)
 {
-	concept_state *state = space->machine().driver_data<concept_state>();
-	device_t *fdc = space->machine().device("wd179x");
+	concept_state *state = space.machine().driver_data<concept_state>();
+	device_t *fdc = space.machine().device("wd179x");
 	switch (offset)
 	{
 	case 0:
@@ -599,19 +599,19 @@ static  READ8_HANDLER(concept_fdc_reg_r)
 
 	case 8:
 		/* FDC STATUS REG */
-		return wd17xx_status_r(fdc, *space, offset);
+		return wd17xx_status_r(fdc, space, offset);
 
 	case 9:
 		/* FDC TRACK REG */
-		return wd17xx_track_r(fdc, *space, offset);
+		return wd17xx_track_r(fdc, space, offset);
 
 	case 10:
 		/* FDC SECTOR REG */
-		return wd17xx_sector_r(fdc, *space, offset);
+		return wd17xx_sector_r(fdc, space, offset);
 
 	case 11:
 		/* FDC DATA REG */
-		return wd17xx_data_r(fdc, *space, offset);
+		return wd17xx_data_r(fdc, space, offset);
 	}
 
 	return 0;
@@ -619,9 +619,9 @@ static  READ8_HANDLER(concept_fdc_reg_r)
 
 static WRITE8_HANDLER(concept_fdc_reg_w)
 {
-	concept_state *state = space->machine().driver_data<concept_state>();
+	concept_state *state = space.machine().driver_data<concept_state>();
 	int current_drive;
-	device_t *fdc = space->machine().device("wd179x");
+	device_t *fdc = space.machine().device("wd179x");
 	switch (offset)
 	{
 	case 0:
@@ -635,27 +635,27 @@ static WRITE8_HANDLER(concept_fdc_reg_w)
 		// floppy_drive_set_motor_state(floppy_get_device(machine,  current_drive), (data & LC_MOTOROF_mask) == 0 ? 1 : 0);
 		/*flp_8in = (data & LC_FLP8IN_mask) != 0;*/
 		wd17xx_dden_w(fdc, BIT(data, 7));
-		floppy_drive_set_ready_state(floppy_get_device(space->machine(), current_drive), 1, 0);
+		floppy_drive_set_ready_state(floppy_get_device(space.machine(), current_drive), 1, 0);
 		break;
 
 	case 8:
 		/* FDC COMMAMD REG */
-		wd17xx_command_w(fdc, *space, offset, data);
+		wd17xx_command_w(fdc, space, offset, data);
 		break;
 
 	case 9:
 		/* FDC TRACK REG */
-		wd17xx_track_w(fdc, *space, offset, data);
+		wd17xx_track_w(fdc, space, offset, data);
 		break;
 
 	case 10:
 		/* FDC SECTOR REG */
-		wd17xx_sector_w(fdc, *space, offset, data);
+		wd17xx_sector_w(fdc, space, offset, data);
 		break;
 
 	case 11:
 		/* FDC DATA REG */
-		wd17xx_data_w(fdc, *space, offset, data);
+		wd17xx_data_w(fdc, space, offset, data);
 		break;
 	}
 }

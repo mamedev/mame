@@ -397,7 +397,7 @@ INPUT_PORTS_END
 static INTERRUPT_GEN( apexc_interrupt )
 {
 	apexc_state *state = device->machine().driver_data<apexc_state>();
-	address_space* space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT32 edit_keys;
 	int control_keys;
 
@@ -478,11 +478,11 @@ static INTERRUPT_GEN( apexc_interrupt )
 
 		if (control_keys & panel_write) {
 			/* write memory */
-			space->write_dword(device->state().state_int(APEXC_ML_FULL)<<2, state->m_panel_data_reg);
+			space.write_dword(device->state().state_int(APEXC_ML_FULL)<<2, state->m_panel_data_reg);
 		}
 		else {
 			/* read memory */
-			state->m_panel_data_reg = space->read_dword(device->state().state_int(APEXC_ML_FULL)<<2);
+			state->m_panel_data_reg = space.read_dword(device->state().state_int(APEXC_ML_FULL)<<2);
 		}
 	}
 

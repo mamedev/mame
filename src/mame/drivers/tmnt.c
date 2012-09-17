@@ -773,9 +773,9 @@ INLINE UINT32 tmnt2_get_word( running_machine &machine, UINT32 addr )
 	return 0;
 }
 
-static void tmnt2_put_word( address_space *space, UINT32 addr, UINT16 data )
+static void tmnt2_put_word( address_space &space, UINT32 addr, UINT16 data )
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
+	tmnt_state *state = space.machine().driver_data<tmnt_state>();
 
 	UINT32 offs;
 	if (addr >= 0x180000 / 2 && addr <= 0x183fff / 2)
@@ -785,7 +785,7 @@ static void tmnt2_put_word( address_space *space, UINT32 addr, UINT16 data )
 		if (!(offs & 0x0031))
 		{
 			offs = ((offs & 0x000e) >> 1) | ((offs & 0x1fc0) >> 3);
-			k053245_word_w(state->m_k053245, *space, offs, data, 0xffff);
+			k053245_word_w(state->m_k053245, space, offs, data, 0xffff);
 		}
 	}
 	else if (addr >= 0x104000 / 2 && addr <= 0x107fff / 2)
@@ -905,11 +905,11 @@ WRITE16_MEMBER(tmnt_state::tmnt2_1c0800_w)
 	xoffs += xmod;
 	yoffs += ymod;
 
-	tmnt2_put_word(&space, dst_addr +  0, attr1);
-	tmnt2_put_word(&space, dst_addr +  2, code);
-	tmnt2_put_word(&space, dst_addr +  4, (UINT32)yoffs);
-	tmnt2_put_word(&space, dst_addr +  6, (UINT32)xoffs);
-	tmnt2_put_word(&space, dst_addr + 12, attr2 | color);
+	tmnt2_put_word(space, dst_addr +  0, attr1);
+	tmnt2_put_word(space, dst_addr +  2, code);
+	tmnt2_put_word(space, dst_addr +  4, (UINT32)yoffs);
+	tmnt2_put_word(space, dst_addr +  6, (UINT32)xoffs);
+	tmnt2_put_word(space, dst_addr + 12, attr2 | color);
 }
 #else // for reference; do not remove
 WRITE16_MEMBER(tmnt_state::tmnt2_1c0800_w)

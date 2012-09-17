@@ -175,7 +175,7 @@ Added Multiple Coin Feature:
 
 static WRITE8_HANDLER( pipedrm_bankswitch_w )
 {
-	fromance_state *state = space->machine().driver_data<fromance_state>();
+	fromance_state *state = space.machine().driver_data<fromance_state>();
 	/*
         Bit layout:
 
@@ -191,14 +191,14 @@ static WRITE8_HANDLER( pipedrm_bankswitch_w )
 	state->membank("bank1")->set_entry(data & 0x7);
 
 	/* map to the fromance gfx register */
-	state->fromance_gfxreg_w(*space, offset, ((data >> 6) & 0x01) | 	/* flipscreen */
+	state->fromance_gfxreg_w(space, offset, ((data >> 6) & 0x01) | 	/* flipscreen */
 							  ((~data >> 2) & 0x02));	/* videoram select */
 }
 
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	space->machine().root_device().membank("bank2")->set_entry(data & 0x01);
+	space.machine().root_device().membank("bank2")->set_entry(data & 0x01);
 }
 
 
@@ -225,19 +225,19 @@ static TIMER_CALLBACK( delayed_command_w	)
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	space->machine().scheduler().synchronize(FUNC(delayed_command_w), data | 0x100);
+	space.machine().scheduler().synchronize(FUNC(delayed_command_w), data | 0x100);
 }
 
 
 static WRITE8_HANDLER( sound_command_nonmi_w )
 {
-	space->machine().scheduler().synchronize(FUNC(delayed_command_w), data);
+	space.machine().scheduler().synchronize(FUNC(delayed_command_w), data);
 }
 
 
 static WRITE8_HANDLER( pending_command_clear_w )
 {
-	fromance_state *state = space->machine().driver_data<fromance_state>();
+	fromance_state *state = space.machine().driver_data<fromance_state>();
 	state->m_pending_command = 0;
 	state->m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
@@ -245,14 +245,14 @@ static WRITE8_HANDLER( pending_command_clear_w )
 
 static READ8_HANDLER( pending_command_r )
 {
-	fromance_state *state = space->machine().driver_data<fromance_state>();
+	fromance_state *state = space.machine().driver_data<fromance_state>();
 	return state->m_pending_command;
 }
 
 
 static READ8_HANDLER( sound_command_r )
 {
-	fromance_state *state = space->machine().driver_data<fromance_state>();
+	fromance_state *state = space.machine().driver_data<fromance_state>();
 	return state->m_sound_command;
 }
 

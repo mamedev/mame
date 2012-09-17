@@ -7,29 +7,29 @@
 
 READ8_HANDLER( m68307_internal_mbus_r )
 {
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
 	m68307_mbus* mbus = m68k->m68307MBUS;
 	assert(mbus != NULL);
 	UINT8 retval;
 
 	if (mbus)
 	{
-		int pc = space->device().safe_pc();
+		int pc = space.device().safe_pc();
 
 
 		switch (offset)
 		{
 			case m68307BUS_MADR:
 				logerror("%08x m68307_internal_mbus_r %08x (MADR - M-Bus Address Register)\n", pc, offset);
-				return space->machine().rand();
+				return space.machine().rand();
 
 			case m68307BUS_MFDR:
 				logerror("%08x m68307_internal_mbus_r %08x (MFDR - M-Bus Frequency Divider Register)\n", pc, offset);
-				return space->machine().rand();
+				return space.machine().rand();
 
 			case m68307BUS_MBCR:
 				logerror("%08x m68307_internal_mbus_r %08x (MFCR - M-Bus Control Register)\n", pc, offset);
-				return mbus->m_MFCR;//space->machine().rand();
+				return mbus->m_MFCR;//space.machine().rand();
 
 			case m68307BUS_MBSR:
 				logerror("%08x m68307_internal_mbus_r %08x (MBSR - M-Bus Status Register)\n", pc, offset);
@@ -42,7 +42,7 @@ READ8_HANDLER( m68307_internal_mbus_r )
 			case m68307BUS_MBDR:
 				logerror("%08x m68307_internal_mbus_r %08x (MBDR - M-Bus Data I/O Register)\n", pc, offset);
 				mbus->m_intpend = true;
-				return 0xff;//space->machine().rand();
+				return 0xff;//space.machine().rand();
 
 			default:
 				logerror("%08x m68307_internal_mbus_r %08x (UNKNOWN / ILLEGAL)\n", pc, offset);
@@ -55,13 +55,13 @@ READ8_HANDLER( m68307_internal_mbus_r )
 
 WRITE8_HANDLER( m68307_internal_mbus_w )
 {
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
 	m68307_mbus* mbus = m68k->m68307MBUS;
 	assert(mbus != NULL);
 
 	if (mbus)
 	{
-		int pc = space->device().safe_pc();
+		int pc = space.device().safe_pc();
 
 		switch (offset)
 		{

@@ -326,15 +326,15 @@ MACHINE_RESET_MEMBER(scorpion_state,scorpion)
 {
 	UINT8 *messram = machine().device<ram_device>(RAM_TAG)->pointer();
 	device_t *beta = machine().device(BETA_DISK_TAG);
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	m_ram_0000 = NULL;
-	space->install_read_bank(0x0000, 0x3fff, "bank1");
-	space->install_write_handler(0x0000, 0x3fff, write8_delegate(FUNC(scorpion_state::scorpion_0000_w),this));
+	space.install_read_bank(0x0000, 0x3fff, "bank1");
+	space.install_write_handler(0x0000, 0x3fff, write8_delegate(FUNC(scorpion_state::scorpion_0000_w),this));
 
 	betadisk_disable(beta);
 	betadisk_clear_status(beta);
-	space->set_direct_update_handler(direct_update_delegate(FUNC(scorpion_state::scorpion_direct), this));
+	space.set_direct_update_handler(direct_update_delegate(FUNC(scorpion_state::scorpion_direct), this));
 
 	memset(messram,0,256*1024);
 

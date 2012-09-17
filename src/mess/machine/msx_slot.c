@@ -353,13 +353,13 @@ static READ8_HANDLER (konami_scc_bank5)
 	{
 		if ((offset & 0xff) >= 0xe0)
 		{
-			return k051649_test_r (space->machine().device("k051649"), *space, offset & 0xff);
+			return k051649_test_r (space.machine().device("k051649"), space, offset & 0xff);
 		}
 		return 0xff;
 	}
 	else
 	{
-		return k051649_waveform_r (space->machine().device("k051649"), *space, offset & 0x7f);
+		return k051649_waveform_r (space.machine().device("k051649"), space, offset & 0x7f);
 	}
 }
 
@@ -1234,14 +1234,14 @@ MSX_SLOT_RESET(diskrom)
 
 static READ8_HANDLER (msx_diskrom_page1_r)
 {
-	msx_state *state = space->machine().driver_data<msx_state>();
-	device_t *fdc = space->machine().device("wd179x");
+	msx_state *state = space.machine().driver_data<msx_state>();
+	device_t *fdc = space.machine().device("wd179x");
 	switch (offset)
 	{
-	case 0: return wd17xx_status_r (fdc, *space, 0);
-	case 1: return wd17xx_track_r (fdc, *space, 0);
-	case 2: return wd17xx_sector_r (fdc, *space, 0);
-	case 3: return wd17xx_data_r (fdc, *space, 0);
+	case 0: return wd17xx_status_r (fdc, space, 0);
+	case 1: return wd17xx_track_r (fdc, space, 0);
+	case 2: return wd17xx_sector_r (fdc, space, 0);
+	case 3: return wd17xx_data_r (fdc, space, 0);
 	case 7: return state->m_dsk_stat;
 	default:
 		return state->m_state[1]->m_mem[offset + 0x3ff8];
@@ -1250,20 +1250,20 @@ static READ8_HANDLER (msx_diskrom_page1_r)
 
 static READ8_HANDLER (msx_diskrom_page2_r)
 {
-	msx_state *state = space->machine().driver_data<msx_state>();
-	device_t *fdc = space->machine().device("wd179x");
+	msx_state *state = space.machine().driver_data<msx_state>();
+	device_t *fdc = space.machine().device("wd179x");
 	if (offset >= 0x7f8)
 	{
 		switch (offset)
 		{
 		case 0x7f8:
-			return wd17xx_status_r (fdc, *space, 0);
+			return wd17xx_status_r (fdc, space, 0);
 		case 0x7f9:
-			return wd17xx_track_r (fdc, *space, 0);
+			return wd17xx_track_r (fdc, space, 0);
 		case 0x7fa:
-			return wd17xx_sector_r (fdc, *space, 0);
+			return wd17xx_sector_r (fdc, space, 0);
 		case 0x7fb:
-			return wd17xx_data_r (fdc, *space, 0);
+			return wd17xx_data_r (fdc, space, 0);
 		case 0x7ff:
 			return state->m_dsk_stat;
 		default:
@@ -1363,14 +1363,14 @@ MSX_SLOT_RESET(diskrom2)
 
 static READ8_HANDLER (msx_diskrom2_page1_r)
 {
-	msx_state *state = space->machine().driver_data<msx_state>();
-	device_t *fdc = space->machine().device("wd179x");
+	msx_state *state = space.machine().driver_data<msx_state>();
+	device_t *fdc = space.machine().device("wd179x");
 	switch (offset)
 	{
-	case 0: return wd17xx_status_r(fdc, *space, 0);
-	case 1: return wd17xx_track_r(fdc, *space, 0);
-	case 2: return wd17xx_sector_r(fdc, *space, 0);
-	case 3: return wd17xx_data_r(fdc, *space, 0);
+	case 0: return wd17xx_status_r(fdc, space, 0);
+	case 1: return wd17xx_track_r(fdc, space, 0);
+	case 2: return wd17xx_sector_r(fdc, space, 0);
+	case 3: return wd17xx_data_r(fdc, space, 0);
 	case 4: return state->m_dsk_stat;
 	default:
 		return state->m_state[1]->m_mem[offset + 0x3ff8];
@@ -1379,20 +1379,20 @@ static READ8_HANDLER (msx_diskrom2_page1_r)
 
 static  READ8_HANDLER (msx_diskrom2_page2_r)
 {
-	msx_state *state = space->machine().driver_data<msx_state>();
-	device_t *fdc = space->machine().device("wd179x");
+	msx_state *state = space.machine().driver_data<msx_state>();
+	device_t *fdc = space.machine().device("wd179x");
 	if (offset >= 0x7b8)
 	{
 		switch (offset)
 		{
 		case 0x7b8:
-			return wd17xx_status_r (fdc, *space, 0);
+			return wd17xx_status_r (fdc, space, 0);
 		case 0x7b9:
-			return wd17xx_track_r (fdc, *space, 0);
+			return wd17xx_track_r (fdc, space, 0);
 		case 0x7ba:
-			return wd17xx_sector_r (fdc, *space, 0);
+			return wd17xx_sector_r (fdc, space, 0);
 		case 0x7bb:
-			return wd17xx_data_r (fdc, *space, 0);
+			return wd17xx_data_r (fdc, space, 0);
 		case 0x7bc:
 			return state->m_dsk_stat;
 		default:
@@ -2184,7 +2184,7 @@ MSX_SLOT_RESET(soundcartridge)
 
 static  READ8_HANDLER (soundcartridge_scc)
 {
-	msx_state *state = space->machine().driver_data<msx_state>();
+	msx_state *state = space.machine().driver_data<msx_state>();
 	int reg;
 
 
@@ -2198,7 +2198,7 @@ static  READ8_HANDLER (soundcartridge_scc)
 
 	if (reg < 0x80)
 	{
-		return k051649_waveform_r (space->machine().device("k051649"), *space, reg);
+		return k051649_waveform_r (space.machine().device("k051649"), space, reg);
 	}
 	else if (reg < 0xa0)
 	{
@@ -2207,11 +2207,11 @@ static  READ8_HANDLER (soundcartridge_scc)
 	else if (reg < 0xc0)
 	{
 		/* read wave 5 */
-		return k051649_waveform_r (space->machine().device("k051649"), *space, 0x80 + (reg & 0x1f));
+		return k051649_waveform_r (space.machine().device("k051649"), space, 0x80 + (reg & 0x1f));
 	}
 	else if (reg < 0xe0)
 	{
-		return k051649_test_r (space->machine().device("k051649"), *space, reg);
+		return k051649_test_r (space.machine().device("k051649"), space, reg);
 	}
 
 	return 0xff;
@@ -2219,7 +2219,7 @@ static  READ8_HANDLER (soundcartridge_scc)
 
 static  READ8_HANDLER (soundcartridge_sccp)
 {
-	msx_state *state = space->machine().driver_data<msx_state>();
+	msx_state *state = space.machine().driver_data<msx_state>();
 	int reg;
 
 	if (offset >= 0x7e0)
@@ -2232,11 +2232,11 @@ static  READ8_HANDLER (soundcartridge_sccp)
 
 	if (reg < 0xa0)
 	{
-		return k052539_waveform_r (space->machine().device("k051649"), *space, reg);
+		return k052539_waveform_r (space.machine().device("k051649"), space, reg);
 	}
 	else if (reg >= 0xc0 && reg < 0xe0)
 	{
-		return k051649_test_r (space->machine().device("k051649"), *space, reg);
+		return k051649_test_r (space.machine().device("k051649"), space, reg);
 	}
 
 	return 0xff;

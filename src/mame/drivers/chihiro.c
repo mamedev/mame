@@ -619,7 +619,7 @@ St.     Instr.       Comment
 */
 
 /* jamtable disassembler */
-static void jamtable_disasm(running_machine &machine, address_space *space,UINT32 address,UINT32 size) // 0xff000080 == fff00080
+static void jamtable_disasm(running_machine &machine, address_space &space,UINT32 address,UINT32 size) // 0xff000080 == fff00080
 {
 	offs_t base,addr;
 	UINT32 opcode,op1,op2;
@@ -636,11 +636,11 @@ static void jamtable_disasm(running_machine &machine, address_space *space,UINT3
 	while (1)
 	{
 		base=addr;
-		opcode=space->read_byte(addr);
+		opcode=space.read_byte(addr);
 		addr++;
-		op1=space->read_dword_unaligned(addr);
+		op1=space.read_dword_unaligned(addr);
 		addr+=4;
-		op2=space->read_dword_unaligned(addr);
+		op2=space.read_dword_unaligned(addr);
 		addr+=4;
 		if (opcode == 0xe1)
 		{
@@ -717,7 +717,7 @@ static void jamtable_disasm(running_machine &machine, address_space *space,UINT3
 
 static void jamtable_disasm_command(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space *space=machine.firstcpu->space();
+	address_space &space=*machine.firstcpu->space();
 	UINT64	addr,size;
 
 	if (params < 2)
@@ -731,7 +731,7 @@ static void jamtable_disasm_command(running_machine &machine, int ref, int param
 
 static void dump_string_command(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space *space=machine.firstcpu->space();
+	address_space &space=*machine.firstcpu->space();
 	UINT64	addr;
 	offs_t address;
 	UINT32 length,maximumlength;
@@ -747,9 +747,9 @@ static void dump_string_command(running_machine &machine, int ref, int params, c
 		debug_console_printf(machine,"Address is unmapped.\n");
 		return;
 	}
-	length=space->read_word_unaligned(address);
-	maximumlength=space->read_word_unaligned(address+2);
-	buffer=space->read_dword_unaligned(address+4);
+	length=space.read_word_unaligned(address);
+	maximumlength=space.read_word_unaligned(address+2);
+	buffer=space.read_dword_unaligned(address+4);
 	debug_console_printf(machine,"Length %d word\n",length);
 	debug_console_printf(machine,"MaximumLength %d word\n",maximumlength);
 	debug_console_printf(machine,"Buffer %08X byte* ",buffer);
@@ -762,7 +762,7 @@ static void dump_string_command(running_machine &machine, int ref, int params, c
 		length=256;
 	for (int a=0;a < length;a++)
 	{
-		UINT8 c=space->read_byte(buffer+a);
+		UINT8 c=space.read_byte(buffer+a);
 		debug_console_printf(machine,"%c",c);
 	}
 	debug_console_printf(machine,"\n");
@@ -770,7 +770,7 @@ static void dump_string_command(running_machine &machine, int ref, int params, c
 
 static void dump_process_command(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space *space=machine.firstcpu->space();
+	address_space &space=*machine.firstcpu->space();
 	UINT64 addr;
 	offs_t address;
 
@@ -784,19 +784,19 @@ static void dump_process_command(running_machine &machine, int ref, int params, 
 		debug_console_printf(machine,"Address is unmapped.\n");
 		return;
 	}
-	debug_console_printf(machine,"ReadyListHead {%08X,%08X} _LIST_ENTRY\n",space->read_dword_unaligned(address),space->read_dword_unaligned(address+4));
-	debug_console_printf(machine,"ThreadListHead {%08X,%08X} _LIST_ENTRY\n",space->read_dword_unaligned(address+8),space->read_dword_unaligned(address+12));
-	debug_console_printf(machine,"StackCount %d dword\n",space->read_dword_unaligned(address+16));
-	debug_console_printf(machine,"ThreadQuantum %d dword\n",space->read_dword_unaligned(address+20));
-	debug_console_printf(machine,"BasePriority %d byte\n",space->read_byte(address+24));
-	debug_console_printf(machine,"DisableBoost %d byte\n",space->read_byte(address+25));
-	debug_console_printf(machine,"DisableQuantum %d byte\n",space->read_byte(address+26));
-	debug_console_printf(machine,"_padding %d byte\n",space->read_byte(address+27));
+	debug_console_printf(machine,"ReadyListHead {%08X,%08X} _LIST_ENTRY\n",space.read_dword_unaligned(address),space.read_dword_unaligned(address+4));
+	debug_console_printf(machine,"ThreadListHead {%08X,%08X} _LIST_ENTRY\n",space.read_dword_unaligned(address+8),space.read_dword_unaligned(address+12));
+	debug_console_printf(machine,"StackCount %d dword\n",space.read_dword_unaligned(address+16));
+	debug_console_printf(machine,"ThreadQuantum %d dword\n",space.read_dword_unaligned(address+20));
+	debug_console_printf(machine,"BasePriority %d byte\n",space.read_byte(address+24));
+	debug_console_printf(machine,"DisableBoost %d byte\n",space.read_byte(address+25));
+	debug_console_printf(machine,"DisableQuantum %d byte\n",space.read_byte(address+26));
+	debug_console_printf(machine,"_padding %d byte\n",space.read_byte(address+27));
 }
 
 static void dump_list_command(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space *space=machine.firstcpu->space();
+	address_space &space=*machine.firstcpu->space();
 	UINT64 addr,offs,start,old;
 	offs_t address,offset;
 
@@ -830,7 +830,7 @@ static void dump_list_command(running_machine &machine, int ref, int params, con
 		else
 			debug_console_printf(machine,"%08X\n",(UINT32)addr);
 		old=addr;
-		addr=space->read_dword_unaligned(address);
+		addr=space.read_dword_unaligned(address);
 		if (addr == start)
 			break;
 		if (addr == old)

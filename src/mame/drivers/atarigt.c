@@ -80,7 +80,7 @@ MACHINE_RESET_MEMBER(atarigt_state,atarigt)
 
 static void cage_irq_callback(running_machine &machine, int reason)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (reason)
 		atarigen_sound_int_gen(machine.device("maincpu"));
@@ -201,7 +201,7 @@ WRITE32_MEMBER(atarigt_state::latch_w)
 
 	if (ACCESSING_BITS_16_23)
 	{
-		//cage_reset_w(&space, data & 0x00100000);
+		//cage_reset_w(space, data & 0x00100000);
 		coin_counter_w(machine(), 0, data & 0x00080000);
 		coin_counter_w(machine(), 1, data & 0x00010000);
 	}
@@ -236,7 +236,7 @@ READ32_MEMBER(atarigt_state::sound_data_r)
 	if (ACCESSING_BITS_0_15)
 		result |= cage_control_r(machine());
 	if (ACCESSING_BITS_16_31)
-		result |= cage_main_r(&space) << 16;
+		result |= cage_main_r(space) << 16;
 	return result;
 }
 
@@ -246,7 +246,7 @@ WRITE32_MEMBER(atarigt_state::sound_data_w)
 	if (ACCESSING_BITS_0_15)
 		cage_control_w(machine(), data);
 	if (ACCESSING_BITS_16_31)
-		cage_main_w(&space, data >> 16);
+		cage_main_w(space, data >> 16);
 }
 
 
@@ -271,9 +271,9 @@ static void tmek_update_mode(atarigt_state *state, offs_t offset)
 }
 
 
-static void tmek_protection_w(address_space *space, offs_t offset, UINT16 data)
+static void tmek_protection_w(address_space &space, offs_t offset, UINT16 data)
 {
-	atarigt_state *state = space->machine().driver_data<atarigt_state>();
+	atarigt_state *state = space.machine().driver_data<atarigt_state>();
 /*
     T-Mek init:
         ($387C0) = $0001
@@ -282,7 +282,7 @@ static void tmek_protection_w(address_space *space, offs_t offset, UINT16 data)
         Read ($38488)
 */
 
-	if (LOG_PROTECTION) logerror("%06X:Protection W@%06X = %04X\n", space->device().safe_pcbase(), offset, data);
+	if (LOG_PROTECTION) logerror("%06X:Protection W@%06X = %04X\n", space.device().safe_pcbase(), offset, data);
 
 	/* track accesses */
 	tmek_update_mode(state, offset);
@@ -295,10 +295,10 @@ static void tmek_protection_w(address_space *space, offs_t offset, UINT16 data)
 	}
 }
 
-static void tmek_protection_r(address_space *space, offs_t offset, UINT16 *data)
+static void tmek_protection_r(address_space &space, offs_t offset, UINT16 *data)
 {
-	atarigt_state *state = space->machine().driver_data<atarigt_state>();
-	if (LOG_PROTECTION) logerror("%06X:Protection R@%06X\n", space->device().safe_pcbase(), offset);
+	atarigt_state *state = space.machine().driver_data<atarigt_state>();
+	if (LOG_PROTECTION) logerror("%06X:Protection R@%06X\n", space.device().safe_pcbase(), offset);
 
 	/* track accesses */
 	tmek_update_mode(state, offset);
@@ -362,12 +362,12 @@ static void primage_update_mode(atarigt_state *state, offs_t offset)
 
 
 
-static void primrage_protection_w(address_space *space, offs_t offset, UINT16 data)
+static void primrage_protection_w(address_space &space, offs_t offset, UINT16 data)
 {
-	atarigt_state *state = space->machine().driver_data<atarigt_state>();
+	atarigt_state *state = space.machine().driver_data<atarigt_state>();
 	if (LOG_PROTECTION)
 	{
-	UINT32 pc = space->device().safe_pcbase();
+	UINT32 pc = space.device().safe_pcbase();
 	switch (pc)
 	{
 		/* protection code from 20f90 - 21000 */
@@ -400,7 +400,7 @@ static void primrage_protection_w(address_space *space, offs_t offset, UINT16 da
 
 		/* catch anything else */
 		default:
-			logerror("%06X:Unknown protection W@%06X = %04X\n", space->device().safe_pcbase(), offset, data);
+			logerror("%06X:Unknown protection W@%06X = %04X\n", space.device().safe_pcbase(), offset, data);
 			break;
 	}
 	}
@@ -433,15 +433,15 @@ static void primrage_protection_w(address_space *space, offs_t offset, UINT16 da
 
 
 
-static void primrage_protection_r(address_space *space, offs_t offset, UINT16 *data)
+static void primrage_protection_r(address_space &space, offs_t offset, UINT16 *data)
 {
-	atarigt_state *state = space->machine().driver_data<atarigt_state>();
+	atarigt_state *state = space.machine().driver_data<atarigt_state>();
 	/* track accesses */
 	primage_update_mode(state, offset);
 
 if (LOG_PROTECTION)
 {
-	UINT32 pc = space->device().safe_pcbase();
+	UINT32 pc = space.device().safe_pcbase();
 	UINT32 p1, p2, a6;
 	switch (pc)
 	{
@@ -461,9 +461,9 @@ if (LOG_PROTECTION)
 		case 0x275bc:
 			break;
 		case 0x275cc:
-			a6 = space->device().state().state_int(M68K_A6);
-			p1 = (space->read_word(a6+8) << 16) | space->read_word(a6+10);
-			p2 = (space->read_word(a6+12) << 16) | space->read_word(a6+14);
+			a6 = space.device().state().state_int(M68K_A6);
+			p1 = (space.read_word(a6+8) << 16) | space.read_word(a6+10);
+			p2 = (space.read_word(a6+12) << 16) | space.read_word(a6+14);
 			logerror("Known Protection @ 275BC(%08X, %08X): R@%06X ", p1, p2, offset);
 			break;
 		case 0x275d2:
@@ -479,8 +479,8 @@ if (LOG_PROTECTION)
 
 		/* protection code from 3d8dc - 3d95a */
 		case 0x3d8f4:
-			a6 = space->device().state().state_int(M68K_A6);
-			p1 = (space->read_word(a6+12) << 16) | space->read_word(a6+14);
+			a6 = space.device().state().state_int(M68K_A6);
+			p1 = (space.read_word(a6+12) << 16) | space.read_word(a6+14);
 			logerror("Known Protection @ 3D8F4(%08X): R@%06X ", p1, offset);
 			break;
 		case 0x3d8fa:
@@ -490,8 +490,8 @@ if (LOG_PROTECTION)
 
 		/* protection code from 437fa - 43860 */
 		case 0x43814:
-			a6 = space->device().state().state_int(M68K_A6);
-			p1 = space->read_dword(a6+14) & 0xffffff;
+			a6 = space.device().state().state_int(M68K_A6);
+			p1 = space.read_dword(a6+14) & 0xffffff;
 			logerror("Known Protection @ 43814(%08X): R@%06X ", p1, offset);
 			break;
 		case 0x4381c:
@@ -504,7 +504,7 @@ if (LOG_PROTECTION)
 
 		/* catch anything else */
 		default:
-			logerror("%06X:Unknown protection R@%06X\n", space->device().safe_pcbase(), offset);
+			logerror("%06X:Unknown protection R@%06X\n", space.device().safe_pcbase(), offset);
 			break;
 	}
 }
@@ -557,13 +557,13 @@ READ32_MEMBER(atarigt_state::colorram_protection_r)
 	if (ACCESSING_BITS_16_31)
 	{
 		result = atarigt_colorram_r(address);
-		(*m_protection_r)(&space, address, &result);
+		(*m_protection_r)(space, address, &result);
 		result32 |= result << 16;
 	}
 	if (ACCESSING_BITS_0_15)
 	{
 		result = atarigt_colorram_r(address + 2);
-		(*m_protection_r)(&space, address + 2, &result);
+		(*m_protection_r)(space, address + 2, &result);
 		result32 |= result;
 	}
 
@@ -579,13 +579,13 @@ WRITE32_MEMBER(atarigt_state::colorram_protection_w)
 	{
 		if (!m_ignore_writes)
 			atarigt_colorram_w(address, data >> 16, mem_mask >> 16);
-		(*m_protection_w)(&space, address, data >> 16);
+		(*m_protection_w)(space, address, data >> 16);
 	}
 	if (ACCESSING_BITS_0_15)
 	{
 		if (!m_ignore_writes)
 			atarigt_colorram_w(address + 2, data, mem_mask);
-		(*m_protection_w)(&space, address + 2, data);
+		(*m_protection_w)(space, address + 2, data);
 	}
 }
 
@@ -1257,7 +1257,7 @@ WRITE32_MEMBER(atarigt_state::tmek_pf_w)
 	if (pc == 0x25834 || pc == 0x25860)
 		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", space.device().safe_pc(), 0xd72000 + offset*4, data, mem_mask, (UINT32)space.device().state().state_int(M68K_A3) - 2);
 
-	atarigen_playfield32_w(&space, offset, data, mem_mask);
+	atarigen_playfield32_w(space, offset, data, mem_mask);
 }
 
 DRIVER_INIT_MEMBER(atarigt_state,tmek)

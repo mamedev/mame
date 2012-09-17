@@ -316,7 +316,7 @@ WRITE8_MEMBER( at_state::at_portb_w )
 static void init_at_common(running_machine &machine)
 {
 	at_state *state = machine.driver_data<at_state>();
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	// The CS4031 chipset does this itself
 	if (machine.device("cs4031") == NULL)
@@ -327,8 +327,8 @@ static void init_at_common(running_machine &machine)
 		if (machine.device<ram_device>(RAM_TAG)->size() > 0x0a0000)
 		{
 			offs_t ram_limit = 0x100000 + machine.device<ram_device>(RAM_TAG)->size() - 0x0a0000;
-			space->install_read_bank(0x100000,  ram_limit - 1, "bank1");
-			space->install_write_bank(0x100000,  ram_limit - 1, "bank1");
+			space.install_read_bank(0x100000,  ram_limit - 1, "bank1");
+			space.install_write_bank(0x100000,  ram_limit - 1, "bank1");
 			state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0xa0000);
 		}
 	}

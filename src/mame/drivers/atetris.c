@@ -139,7 +139,7 @@ void atetris_state::machine_reset()
 READ8_MEMBER(atetris_state::atetris_slapstic_r)
 {
 	int result = m_slapstic_base[0x2000 + offset];
-	int new_bank = slapstic_tweak(&space, offset) & 1;
+	int new_bank = slapstic_tweak(space, offset) & 1;
 
 	/* update for the new bank */
 	if (new_bank != m_current_bank)

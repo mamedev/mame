@@ -628,9 +628,9 @@ READ32_MEMBER(namcos11_state::keycus_c443_r)
 	return data;
 }
 
-INLINE void bankswitch_rom8( address_space *space, const char *bank, int n_data )
+INLINE void bankswitch_rom8( address_space &space, const char *bank, int n_data )
 {
-	space->machine().root_device().membank( bank )->set_entry( ( ( n_data & 0xc0 ) >> 4 ) + ( n_data & 0x03 ) );
+	space.machine().root_device().membank( bank )->set_entry( ( ( n_data & 0xc0 ) >> 4 ) + ( n_data & 0x03 ) );
 }
 
 static const char * const bankname[] = { "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8" };
@@ -641,11 +641,11 @@ WRITE32_MEMBER(namcos11_state::bankswitch_rom32_w)
 
 	if( ACCESSING_BITS_0_15 )
 	{
-		bankswitch_rom8( &space, bankname[offset * 2], data & 0xffff );
+		bankswitch_rom8( space, bankname[offset * 2], data & 0xffff );
 	}
 	if( ACCESSING_BITS_16_31 )
 	{
-		bankswitch_rom8( &space, bankname[offset * 2 + 1], data >> 16 );
+		bankswitch_rom8( space, bankname[offset * 2 + 1], data >> 16 );
 	}
 }
 
@@ -664,9 +664,9 @@ WRITE32_MEMBER(namcos11_state::bankswitch_rom64_upper_w)
 	}
 }
 
-INLINE void bankswitch_rom64( address_space *space, const char *bank, int n_data )
+INLINE void bankswitch_rom64( address_space &space, const char *bank, int n_data )
 {
-	namcos11_state *state = space->machine().driver_data<namcos11_state>();
+	namcos11_state *state = space.machine().driver_data<namcos11_state>();
 
 	/* todo: verify behaviour */
 	state->membank( bank )->set_entry( ( ( ( ( n_data & 0xc0 ) >> 3 ) + ( n_data & 0x07 ) ) ^ state->m_n_bankoffset ) );
@@ -678,11 +678,11 @@ WRITE32_MEMBER(namcos11_state::bankswitch_rom64_w)
 
 	if( ACCESSING_BITS_0_15 )
 	{
-		bankswitch_rom64( &space, bankname[offset * 2], data & 0xffff );
+		bankswitch_rom64( space, bankname[offset * 2], data & 0xffff );
 	}
 	if( ACCESSING_BITS_16_31 )
 	{
-		bankswitch_rom64( &space, bankname[offset * 2 + 1], data >> 16 );
+		bankswitch_rom64( space, bankname[offset * 2 + 1], data >> 16 );
 	}
 }
 

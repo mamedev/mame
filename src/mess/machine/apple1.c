@@ -143,9 +143,9 @@ static const UINT8 apple1_control_keymap[] =
 
 DRIVER_INIT_MEMBER(apple1_state,apple1)
 {
-	address_space* space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/* Set up the handlers for MESS's dynamically-sized RAM. */
-	space->install_readwrite_bank(0x0000, machine().device<ram_device>(RAM_TAG)->size() - 1, "bank1");
+	space.install_readwrite_bank(0x0000, machine().device<ram_device>(RAM_TAG)->size() - 1, "bank1");
 	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 
 	/* Poll the keyboard input ports periodically.  These include both

@@ -519,23 +519,23 @@ static ADDRESS_MAP_START( defender_map, AS_PROGRAM, 8, williams_state )
 ADDRESS_MAP_END
 
 
-void defender_install_io_space(address_space *space)
+void defender_install_io_space(address_space &space)
 {
-	williams_state *state = space->machine().driver_data<williams_state>();
-	pia6821_device *pia_0 = space->machine().device<pia6821_device>("pia_0");
-	pia6821_device *pia_1 = space->machine().device<pia6821_device>("pia_1");
+	williams_state *state = space.machine().driver_data<williams_state>();
+	pia6821_device *pia_0 = space.machine().device<pia6821_device>("pia_0");
+	pia6821_device *pia_1 = space.machine().device<pia6821_device>("pia_1");
 
 	/* this routine dynamically installs the memory mapped above from c000-cfff */
-	space->install_write_bank    (0xc000, 0xc00f, 0, 0x03e0, "bank4");
-	space->install_write_handler    (0xc010, 0xc01f, 0, 0x03e0, write8_delegate(FUNC(williams_state::defender_video_control_w),state));
-	space->install_write_handler    (0xc3ff, 0xc3ff, write8_delegate(FUNC(williams_state::williams_watchdog_reset_w),state));
-	space->install_read_bank(0xc400, 0xc4ff, 0, 0x0300, "bank3");
-	space->install_write_handler(0xc400, 0xc4ff, 0, 0x0300, write8_delegate(FUNC(williams_state::williams_cmos_w),state));
-	space->install_read_handler     (0xc800, 0xcbff, 0, 0x03e0, read8_delegate(FUNC(williams_state::williams_video_counter_r),state));
-	space->install_readwrite_handler(0xcc00, 0xcc03, 0, 0x03e0, read8_delegate(FUNC(pia6821_device::read), pia_1), write8_delegate(FUNC(pia6821_device::write), pia_1));
-	space->install_readwrite_handler(0xcc04, 0xcc07, 0, 0x03e0, read8_delegate(FUNC(pia6821_device::read), pia_0), write8_delegate(FUNC(pia6821_device::write), pia_0));
-	state->membank("bank3")->set_base(space->machine().driver_data<williams_state>()->m_nvram);
-	state->membank("bank4")->set_base(space->machine().driver_data<williams_state>()->m_generic_paletteram_8);
+	space.install_write_bank    (0xc000, 0xc00f, 0, 0x03e0, "bank4");
+	space.install_write_handler    (0xc010, 0xc01f, 0, 0x03e0, write8_delegate(FUNC(williams_state::defender_video_control_w),state));
+	space.install_write_handler    (0xc3ff, 0xc3ff, write8_delegate(FUNC(williams_state::williams_watchdog_reset_w),state));
+	space.install_read_bank(0xc400, 0xc4ff, 0, 0x0300, "bank3");
+	space.install_write_handler(0xc400, 0xc4ff, 0, 0x0300, write8_delegate(FUNC(williams_state::williams_cmos_w),state));
+	space.install_read_handler     (0xc800, 0xcbff, 0, 0x03e0, read8_delegate(FUNC(williams_state::williams_video_counter_r),state));
+	space.install_readwrite_handler(0xcc00, 0xcc03, 0, 0x03e0, read8_delegate(FUNC(pia6821_device::read), pia_1), write8_delegate(FUNC(pia6821_device::write), pia_1));
+	space.install_readwrite_handler(0xcc04, 0xcc07, 0, 0x03e0, read8_delegate(FUNC(pia6821_device::read), pia_0), write8_delegate(FUNC(pia6821_device::write), pia_0));
+	state->membank("bank3")->set_base(space.machine().driver_data<williams_state>()->m_nvram);
+	state->membank("bank4")->set_base(space.machine().driver_data<williams_state>()->m_generic_paletteram_8);
 }
 
 

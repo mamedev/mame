@@ -454,8 +454,8 @@ INPUT_PORTS_END
 
 void a5105_state::machine_reset()
 {
-	address_space *space = m_maincpu->space(AS_PROGRAM);
-	a5105_ab_w(*space, 0, 9); // turn motor off
+	address_space &space = *m_maincpu->space(AS_PROGRAM);
+	a5105_ab_w(space, 0, 9); // turn motor off
 	beep_set_frequency(m_beep, 500);
 
 	m_ram_base = (UINT8*)machine().device<ram_device>(RAM_TAG)->pointer();

@@ -1211,7 +1211,7 @@ WRITE16_HANDLER( ygv608_w )
 			if (++p3_state == 3)
 			{
 				p3_state = 0;
-				palette_set_color_rgb(space->machine(),ygv608.regs.s.cc,
+				palette_set_color_rgb(space.machine(),ygv608.regs.s.cc,
 			    	pal6bit(ygv608.colour_palette[ygv608.regs.s.cc][0]),
 			    	pal6bit(ygv608.colour_palette[ygv608.regs.s.cc][1]),
 			    	pal6bit(ygv608.colour_palette[ygv608.regs.s.cc][2]) );
@@ -1228,7 +1228,7 @@ WRITE16_HANDLER( ygv608_w )
 #endif
 			SetPreShortcuts (regNum, data);
 			ygv608.regs.b[regNum] = data;
-			SetPostShortcuts (space->machine(), regNum);
+			SetPostShortcuts (space.machine(), regNum);
 			if (ygv608.ports.s.p5 & p5_rwai)
 			{
 				regNum ++;
@@ -1255,9 +1255,9 @@ WRITE16_HANDLER( ygv608_w )
 		case 0x07: /* P#7 - system control port */
 			ygv608.ports.b[7] = data;
 			if (ygv608.ports.b[7] & 0x3e)
-				HandleRomTransfers(space->machine());
+				HandleRomTransfers(space.machine());
 			if (ygv608.ports.b[7] & 0x01)
-				HandleYGV608Reset(space->machine());
+				HandleYGV608Reset(space.machine());
 			break;
 
 		default:

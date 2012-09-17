@@ -495,7 +495,7 @@ static int transfer_dword( running_machine &machine, UINT32 dest, UINT32 source 
 {
 	namcona1_state *state = machine.driver_data<namcona1_state>();
 	UINT16 data;
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if( source>=0x400000 && source<0xc00000 )
 	{
@@ -516,15 +516,15 @@ static int transfer_dword( running_machine &machine, UINT32 dest, UINT32 source 
 	}
 	if( dest>=0xf00000 && dest<0xf02000 )
 	{
-		state->namcona1_paletteram_w(*space, (dest-0xf00000)/2, data, 0xffff );
+		state->namcona1_paletteram_w(space, (dest-0xf00000)/2, data, 0xffff );
 	}
 	else if( dest>=0xf40000 && dest<0xf80000 )
 	{
-		state->namcona1_gfxram_w(*space, (dest-0xf40000)/2, data, 0xffff );
+		state->namcona1_gfxram_w(space, (dest-0xf40000)/2, data, 0xffff );
 	}
 	else if( dest>=0xff0000 && dest<0xffc000 )
 	{
-		state->namcona1_videoram_w(*space, (dest-0xff0000)/2, data, 0xffff );
+		state->namcona1_videoram_w(space, (dest-0xff0000)/2, data, 0xffff );
 	}
 	else if( dest>=0xfff000 && dest<0x1000000 )
 	{

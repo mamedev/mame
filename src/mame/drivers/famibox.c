@@ -174,7 +174,7 @@ WRITE8_MEMBER(famibox_state::sprite_dma_w)
 {
 	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
 	int source = (data & 7);
-	ppu->spriteram_dma(&space, source);
+	ppu->spriteram_dma(space, source);
 }
 
 READ8_MEMBER(famibox_state::psg_4015_r)

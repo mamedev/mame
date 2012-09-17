@@ -19,14 +19,14 @@
 
  READ8_HANDLER(pc1401_lcd_read)
 {
-	pc1401_state *state = space->machine().driver_data<pc1401_state>();
+	pc1401_state *state = space.machine().driver_data<pc1401_state>();
 	offset&=0xff;
 	return state->m_reg[offset];
 }
 
 WRITE8_HANDLER(pc1401_lcd_write)
 {
-	pc1401_state *state = space->machine().driver_data<pc1401_state>();
+	pc1401_state *state = space.machine().driver_data<pc1401_state>();
 	offset&=0xff;
 	state->m_reg[offset]=data;
 }

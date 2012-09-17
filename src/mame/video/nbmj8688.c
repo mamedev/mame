@@ -594,15 +594,15 @@ Hitachi HD61830B LCD controller.
 
 ******************************************************************************/
 
-static void nbmj8688_HD61830B_instr_w(address_space *space,int offset,int data,int chip)
+static void nbmj8688_HD61830B_instr_w(address_space &space,int offset,int data,int chip)
 {
-	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
+	nbmj8688_state *state = space.machine().driver_data<nbmj8688_state>();
 	state->m_HD61830B_instr[chip] = data;
 }
 
-static void nbmj8688_HD61830B_data_w(address_space *space,int offset,int data,int chip)
+static void nbmj8688_HD61830B_data_w(address_space &space,int offset,int data,int chip)
 {
-	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
+	nbmj8688_state *state = space.machine().driver_data<nbmj8688_state>();
 	switch (state->m_HD61830B_instr[chip])
 	{
 		case 0x0a:	// set cursor address (low order)
@@ -622,34 +622,34 @@ logerror("HD61830B unsupported instruction %02x %02x\n",state->m_HD61830B_instr[
 
 WRITE8_MEMBER(nbmj8688_state::nbmj8688_HD61830B_0_instr_w)
 {
-	nbmj8688_HD61830B_instr_w(&space,offset,data,0);
+	nbmj8688_HD61830B_instr_w(space,offset,data,0);
 }
 
 WRITE8_MEMBER(nbmj8688_state::nbmj8688_HD61830B_1_instr_w)
 {
-	nbmj8688_HD61830B_instr_w(&space,offset,data,1);
+	nbmj8688_HD61830B_instr_w(space,offset,data,1);
 }
 
 WRITE8_MEMBER(nbmj8688_state::nbmj8688_HD61830B_both_instr_w)
 {
-	nbmj8688_HD61830B_instr_w(&space,offset,data,0);
-	nbmj8688_HD61830B_instr_w(&space,offset,data,1);
+	nbmj8688_HD61830B_instr_w(space,offset,data,0);
+	nbmj8688_HD61830B_instr_w(space,offset,data,1);
 }
 
 WRITE8_MEMBER(nbmj8688_state::nbmj8688_HD61830B_0_data_w)
 {
-	nbmj8688_HD61830B_data_w(&space,offset,data,0);
+	nbmj8688_HD61830B_data_w(space,offset,data,0);
 }
 
 WRITE8_MEMBER(nbmj8688_state::nbmj8688_HD61830B_1_data_w)
 {
-	nbmj8688_HD61830B_data_w(&space,offset,data,1);
+	nbmj8688_HD61830B_data_w(space,offset,data,1);
 }
 
 WRITE8_MEMBER(nbmj8688_state::nbmj8688_HD61830B_both_data_w)
 {
-	nbmj8688_HD61830B_data_w(&space,offset,data,0);
-	nbmj8688_HD61830B_data_w(&space,offset,data,1);
+	nbmj8688_HD61830B_data_w(space,offset,data,0);
+	nbmj8688_HD61830B_data_w(space,offset,data,1);
 }
 
 

@@ -455,9 +455,9 @@ WRITE8_MEMBER(astrocde_state::profpac_banksw_w)
 static void profbank_banksw_restore(running_machine &machine)
 {
 	astrocde_state *state = machine.driver_data<astrocde_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_IO);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_IO);
 
-	state->profpac_banksw_w(*space, 0, state->m_profpac_bank);
+	state->profpac_banksw_w(space, 0, state->m_profpac_bank);
 }
 
 

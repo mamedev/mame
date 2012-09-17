@@ -11,12 +11,12 @@
 #define TGP_FUNCTION(name) void name(running_machine &machine)
 
 
-static UINT32 fifoout_pop(address_space *space)
+static UINT32 fifoout_pop(address_space &space)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
+	model1_state *state = space.machine().driver_data<model1_state>();
 	UINT32 v;
 	if(state->m_fifoout_wpos == state->m_fifoout_rpos) {
-		fatalerror("TGP FIFOOUT underflow (%x)\n", space->device().safe_pc());
+		fatalerror("TGP FIFOOUT underflow (%x)\n", space.device().safe_pc());
 	}
 	v = state->m_fifoout_data[state->m_fifoout_rpos++];
 	if(state->m_fifoout_rpos == FIFO_SIZE)
@@ -57,10 +57,10 @@ static UINT32 fifoin_pop(model1_state *state)
 	return v;
 }
 
-static void fifoin_push(address_space *space, UINT32 data)
+static void fifoin_push(address_space &space, UINT32 data)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
-	//  logerror("TGP FIFOIN write %08x (%x)\n", data, space->device().safe_pc());
+	model1_state *state = space.machine().driver_data<model1_state>();
+	//  logerror("TGP FIFOIN write %08x (%x)\n", data, space.device().safe_pc());
 	state->m_fifoin_data[state->m_fifoin_wpos++] = data;
 	if(state->m_fifoin_wpos == FIFO_SIZE)
 		state->m_fifoin_wpos = 0;
@@ -68,7 +68,7 @@ static void fifoin_push(address_space *space, UINT32 data)
 		logerror("TGP FIFOIN overflow\n");
 	state->m_fifoin_cbcount--;
 	if(!state->m_fifoin_cbcount)
-		state->m_fifoin_cb(space->machine());
+		state->m_fifoin_cb(space.machine());
 }
 
 static float fifoin_pop_f(model1_state *state)
@@ -1938,7 +1938,7 @@ static TGP_FUNCTION( function_get_swa )
 READ16_MEMBER(model1_state::model1_tgp_copro_r)
 {
 	if(!offset) {
-		m_copro_r = fifoout_pop(&space);
+		m_copro_r = fifoout_pop(space);
 		return m_copro_r;
 	} else
 		return m_copro_r >> 16;
@@ -1949,7 +1949,7 @@ WRITE16_MEMBER(model1_state::model1_tgp_copro_w)
 	if(offset) {
 		m_copro_w = (m_copro_w & 0x0000ffff) | (data << 16);
 		m_pushpc = space.device().safe_pc();
-		fifoin_push(&space, m_copro_w);
+		fifoin_push(space, m_copro_w);
 	} else
 		m_copro_w = (m_copro_w & 0xffff0000) | data;
 }
@@ -2071,12 +2071,12 @@ static int copro_fifoin_pop(device_t *device, UINT32 *result)
 	return 1;
 }
 
-static void copro_fifoin_push(address_space *space, UINT32 data)
+static void copro_fifoin_push(address_space &space, UINT32 data)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
+	model1_state *state = space.machine().driver_data<model1_state>();
 	if (state->m_copro_fifoin_num == FIFO_SIZE)
 	{
-		fatalerror("Copro FIFOIN overflow (at %08X)\n", space->device().safe_pc());
+		fatalerror("Copro FIFOIN overflow (at %08X)\n", space.device().safe_pc());
 		return;
 	}
 
@@ -2090,17 +2090,17 @@ static void copro_fifoin_push(address_space *space, UINT32 data)
 	state->m_copro_fifoin_num++;
 }
 
-static UINT32 copro_fifoout_pop(address_space *space)
+static UINT32 copro_fifoout_pop(address_space &space)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
+	model1_state *state = space.machine().driver_data<model1_state>();
 	UINT32 r;
 
 	if (state->m_copro_fifoout_num == 0)
 	{
 		// Reading from empty FIFO causes the v60 to enter wait state
-		v60_stall(space->machine().device("maincpu"));
+		v60_stall(space.machine().device("maincpu"));
 
-		space->machine().scheduler().synchronize();
+		space.machine().scheduler().synchronize();
 
 		return 0;
 	}
@@ -2204,7 +2204,7 @@ READ16_MEMBER(model1_state::model1_vr_tgp_r)
 {
 	if (!offset)
 	{
-		m_vr_r = copro_fifoout_pop(&space);
+		m_vr_r = copro_fifoout_pop(space);
 		return m_vr_r;
 	}
 	else
@@ -2216,7 +2216,7 @@ WRITE16_MEMBER(model1_state::model1_vr_tgp_w)
 	if (offset)
 	{
 		m_vr_w = (m_vr_w & 0x0000ffff) | (data << 16);
-		copro_fifoin_push(&space, m_vr_w);
+		copro_fifoin_push(space, m_vr_w);
 	}
 	else
 		m_vr_w = (m_vr_w & 0xffff0000) | data;

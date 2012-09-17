@@ -210,15 +210,15 @@ UINT8 line;
 
 MACHINE_RESET_MEMBER(bagman_state,bagman)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	bagman_pal16r6_w(*space, 0, 1);	/*pin 2*/
-	bagman_pal16r6_w(*space, 1, 1);	/*pin 3*/
-	bagman_pal16r6_w(*space, 2, 1);	/*pin 4*/
-	bagman_pal16r6_w(*space, 3, 1);	/*pin 5*/
-	bagman_pal16r6_w(*space, 4, 1);	/*pin 6*/
-	bagman_pal16r6_w(*space, 5, 1);	/*pin 7*/
-	bagman_pal16r6_w(*space, 6, 1);	/*pin 8*/
-	bagman_pal16r6_w(*space, 7, 1);	/*pin 9*/
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	bagman_pal16r6_w(space, 0, 1);	/*pin 2*/
+	bagman_pal16r6_w(space, 1, 1);	/*pin 3*/
+	bagman_pal16r6_w(space, 2, 1);	/*pin 4*/
+	bagman_pal16r6_w(space, 3, 1);	/*pin 5*/
+	bagman_pal16r6_w(space, 4, 1);	/*pin 6*/
+	bagman_pal16r6_w(space, 5, 1);	/*pin 7*/
+	bagman_pal16r6_w(space, 6, 1);	/*pin 8*/
+	bagman_pal16r6_w(space, 7, 1);	/*pin 9*/
 	update_pal();
 }
 

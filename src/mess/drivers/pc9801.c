@@ -2611,7 +2611,7 @@ static INTERRUPT_GEN(pc9801_vrtc_irq)
 {
 	pc9801_state *state = device->machine().driver_data<pc9801_state>();
 	#if 0
-	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	static UINT8 test;
 
 	if(device->machine().input().code_pressed_once(JOYCODE_BUTTON1))
@@ -2620,7 +2620,7 @@ static INTERRUPT_GEN(pc9801_vrtc_irq)
 	if(test)
 	{
 		popmessage("Go hack go");
-		space->write_word(0x55e,space->machine().rand());
+		space.write_word(0x55e,space.machine().rand());
 	}
 	#endif
 

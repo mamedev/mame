@@ -99,32 +99,32 @@ static TIMER_CALLBACK(pc1350_power_up)
 MACHINE_START( pc1350 )
 {
 	pc1350_state *state = machine.driver_data<pc1350_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->m_power = 1;
 	machine.scheduler().timer_set(attotime::from_seconds(1), FUNC(pc1350_power_up));
 
-	space->install_readwrite_bank(0x6000, 0x6fff, "bank1");
+	space.install_readwrite_bank(0x6000, 0x6fff, "bank1");
 	state->membank("bank1")->set_base(&machine.device<ram_device>(RAM_TAG)->pointer()[0x0000]);
 
 	if (machine.device<ram_device>(RAM_TAG)->size() >= 0x3000)
 	{
-		space->install_readwrite_bank(0x4000, 0x5fff, "bank2");
+		space.install_readwrite_bank(0x4000, 0x5fff, "bank2");
 		state->membank("bank2")->set_base(&machine.device<ram_device>(RAM_TAG)->pointer()[0x1000]);
 	}
 	else
 	{
-		space->nop_readwrite(0x4000, 0x5fff);
+		space.nop_readwrite(0x4000, 0x5fff);
 	}
 
 	if (machine.device<ram_device>(RAM_TAG)->size() >= 0x5000)
 	{
-		space->install_readwrite_bank(0x2000, 0x3fff, "bank3");
+		space.install_readwrite_bank(0x2000, 0x3fff, "bank3");
 		state->membank("bank3")->set_base(&machine.device<ram_device>(RAM_TAG)->pointer()[0x3000]);
 	}
 	else
 	{
-		space->nop_readwrite(0x2000, 0x3fff);
+		space.nop_readwrite(0x2000, 0x3fff);
 	}
 
 	device_t *main_cpu = machine.device("maincpu");

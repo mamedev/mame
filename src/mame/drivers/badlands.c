@@ -187,7 +187,7 @@ static void update_interrupts(running_machine &machine)
 
 static void scanline_update(screen_device &screen, int scanline)
 {
-	address_space *space = screen.machine().device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &space = *screen.machine().device("audiocpu")->memory().space(AS_PROGRAM);
 
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
@@ -290,7 +290,7 @@ READ8_MEMBER(badlands_state::audio_io_r)
 			break;
 
 		case 0x002:		/* /RDP */
-			result = atarigen_6502_sound_r(&space, offset);
+			result = atarigen_6502_sound_r(space, offset);
 			break;
 
 		case 0x004:		/* /RDIO */
@@ -312,7 +312,7 @@ READ8_MEMBER(badlands_state::audio_io_r)
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(&space, 0);
+			atarigen_6502_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:		/* /VOICE */
@@ -339,7 +339,7 @@ WRITE8_MEMBER(badlands_state::audio_io_w)
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(&space, 0);
+			atarigen_6502_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:		/* n/c */
@@ -347,7 +347,7 @@ WRITE8_MEMBER(badlands_state::audio_io_w)
 			break;
 
 		case 0x202:		/* /WRP */
-			atarigen_6502_sound_w(&space, offset, data);
+			atarigen_6502_sound_w(space, offset, data);
 			break;
 
 		case 0x204:		/* WRIO */

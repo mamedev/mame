@@ -485,20 +485,20 @@ void dsp56k_io_reset(dsp56k_core* cpustate)
 
 READ16_HANDLER( program_r )
 {
-	dsp56k_core* cpustate = get_safe_token(&space->device());
+	dsp56k_core* cpustate = get_safe_token(&space.device());
 	return cpustate->program_ram[offset];
 }
 
 WRITE16_HANDLER( program_w )
 {
-	dsp56k_core* cpustate = get_safe_token(&space->device());
+	dsp56k_core* cpustate = get_safe_token(&space.device());
 	cpustate->program_ram[offset] = data;
 }
 
 /* Work */
 READ16_HANDLER( peripheral_register_r )
 {
-	dsp56k_core* cpustate = get_safe_token(&space->device());
+	dsp56k_core* cpustate = get_safe_token(&space.device());
 	// (printf) logerror("Peripheral read 0x%04x\n", O2A(offset));
 
 	switch (O2A(offset))
@@ -633,7 +633,7 @@ READ16_HANDLER( peripheral_register_r )
 
 WRITE16_HANDLER( peripheral_register_w )
 {
-	dsp56k_core* cpustate = get_safe_token(&space->device());
+	dsp56k_core* cpustate = get_safe_token(&space.device());
 
 	// Its primary behavior is RAM
 	// COMBINE_DATA(&cpustate->peripheral_ram[offset]);

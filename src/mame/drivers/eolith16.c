@@ -61,7 +61,7 @@ WRITE16_MEMBER(eolith16_state::eeprom_w)
 
 READ16_MEMBER(eolith16_state::eolith16_custom_r)
 {
-	eolith_speedup_read(&space);
+	eolith_speedup_read(space);
 	return ioport("SPECIAL")->read();
 }
 

@@ -79,12 +79,12 @@ static const int f1dream_2450_lookup[32] = {
 0x0003, 0x0080, 0x0006, 0x0060, 0x0000, 0x00e0, 0x000a, 0x00c0, 0x0003, 0x0080, 0x0006, 0x0060, 0x0000, 0x00e0, 0x000a, 0x00c0,
 0x0003, 0x0080, 0x0006, 0x0060, 0x0000, 0x00e0, 0x000a, 0x00c0, 0x0003, 0x0080, 0x0006, 0x0060, 0x0000, 0x00e0, 0x000a, 0x00c0 };
 
-static void f1dream_protection_w(address_space *space)
+static void f1dream_protection_w(address_space &space)
 {
-	tigeroad_state *state = space->machine().driver_data<tigeroad_state>();
+	tigeroad_state *state = space.machine().driver_data<tigeroad_state>();
 	int indx;
 	int value = 255;
-	int prevpc = space->device().safe_pcbase();
+	int prevpc = space.device().safe_pcbase();
 
 	if (prevpc == 0x244c)
 	{
@@ -139,14 +139,14 @@ static void f1dream_protection_w(address_space *space)
 	else if ((prevpc == 0x27f8) || (prevpc == 0x511a) || (prevpc == 0x5142) || (prevpc == 0x516a))
 	{
 		/* The main CPU stuffs the byte for the soundlatch into 0xfffffd.*/
-		state->soundlatch_byte_w(*space,2,state->m_ram16[0x3ffc/2]);
+		state->soundlatch_byte_w(space,2,state->m_ram16[0x3ffc/2]);
 	}
 }
 
 WRITE16_MEMBER(tigeroad_state::f1dream_control_w)
 {
 	logerror("protection write, PC: %04x  FFE1 Value:%01x\n",space.device().safe_pc(), m_ram16[0x3fe0/2]);
-	f1dream_protection_w(&space);
+	f1dream_protection_w(space);
 }
 
 WRITE16_MEMBER(tigeroad_state::tigeroad_soundcmd_w)

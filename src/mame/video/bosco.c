@@ -155,7 +155,7 @@ VIDEO_START_MEMBER(bosco_state,bosco)
 
 WRITE8_HANDLER( bosco_videoram_w )
 {
-	bosco_state *state =  space->machine().driver_data<bosco_state>();
+	bosco_state *state =  space.machine().driver_data<bosco_state>();
 
 	state->m_videoram[offset] = data;
 	if (offset & 0x400)
@@ -166,14 +166,14 @@ WRITE8_HANDLER( bosco_videoram_w )
 
 WRITE8_HANDLER( bosco_scrollx_w )
 {
-	bosco_state *state =  space->machine().driver_data<bosco_state>();
+	bosco_state *state =  space.machine().driver_data<bosco_state>();
 
 	state->m_bg_tilemap->set_scrollx(0,data);
 }
 
 WRITE8_HANDLER( bosco_scrolly_w )
 {
-	bosco_state *state =  space->machine().driver_data<bosco_state>();
+	bosco_state *state =  space.machine().driver_data<bosco_state>();
 	state->m_bg_tilemap->set_scrolly(0,data);
 }
 

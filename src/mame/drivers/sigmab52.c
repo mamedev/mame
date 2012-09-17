@@ -283,7 +283,7 @@ READ8_MEMBER(sigmab52_state::acrtc_r)
 
 	else
 	{
-		return 0x7b; //fake status read (instead HD63484_status_r(&space, 0, 0xff); )
+		return 0x7b; //fake status read (instead HD63484_status_r(space, 0, 0xff); )
 	}
 }
 

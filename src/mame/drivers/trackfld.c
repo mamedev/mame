@@ -1447,7 +1447,7 @@ DRIVER_INIT_MEMBER(trackfld_state,trackfld)
 
 DRIVER_INIT_MEMBER(trackfld_state,atlantol)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	UINT8 *decrypt;
 	int A;
@@ -1459,16 +1459,16 @@ DRIVER_INIT_MEMBER(trackfld_state,atlantol)
 	for (A = 0; A < 0x6000; A++)
 		decrypt[A] = rom[A];
 
-	space->set_decrypted_region(0x0000, 0xffff, decrypt);
+	space.set_decrypted_region(0x0000, 0xffff, decrypt);
 
-	space->install_write_handler(0x0800, 0x0800, write8_delegate(FUNC(trackfld_state::atlantol_gfxbank_w),this));
-	space->nop_write(0x1000, 0x1000);
+	space.install_write_handler(0x0800, 0x0800, write8_delegate(FUNC(trackfld_state::atlantol_gfxbank_w),this));
+	space.nop_write(0x1000, 0x1000);
 
 	/* unmapped areas read as ROM */
-	space->install_read_bank(0x0000, 0x11ff, "bank10");
-	space->install_read_bank(0x1380, 0x17ff, "bank11");
-	space->install_read_bank(0x2000, 0x27ff, "bank12");
-	space->install_read_bank(0x4000, 0x5fff, "bank13");
+	space.install_read_bank(0x0000, 0x11ff, "bank10");
+	space.install_read_bank(0x1380, 0x17ff, "bank11");
+	space.install_read_bank(0x2000, 0x27ff, "bank12");
+	space.install_read_bank(0x4000, 0x5fff, "bank13");
 	membank("bank10")->set_base(&rom[0x0000]);
 	membank("bank11")->set_base(&rom[0x1380]);
 	membank("bank12")->set_base(&rom[0x2000]);

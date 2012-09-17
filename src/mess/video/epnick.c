@@ -968,7 +968,7 @@ READ8_HANDLER( nick_reg_r )
 
 WRITE8_HANDLER( epnick_reg_w )
 {
-	ep_state *state = space->machine().driver_data<ep_state>();
+	ep_state *state = space.machine().driver_data<ep_state>();
 	NICK_STATE *nick = state->nick;
 	//mame_printf_info("Nick write %02x %02x\r\n",offset, data);
 

@@ -669,7 +669,7 @@ void sh4_handler_ipra_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
 
 WRITE32_HANDLER( sh4_internal_w )
 {
-	sh4_state *sh4 = get_safe_token(&space->device());
+	sh4_state *sh4 = get_safe_token(&space.device());
 	int a;
 	UINT32 addr = (offset << 2) + 0xfe000000;
 	offset = ((addr & 0xfc) >> 2) | ((addr & 0x1fe0000) >> 11);
@@ -897,7 +897,7 @@ WRITE32_HANDLER( sh4_internal_w )
 
 READ32_HANDLER( sh4_internal_r )
 {
-	sh4_state *sh4 = get_safe_token(&space->device());
+	sh4_state *sh4 = get_safe_token(&space.device());
 
 	if (sh4->cpu_type != CPU_TYPE_SH4)
 		fatalerror("sh4_internal_r uses sh4->m[] with SH3\n");
@@ -1247,7 +1247,7 @@ UINT32 sh4_getsqremap(sh4_state *sh4, UINT32 address)
 
 READ64_HANDLER( sh4_tlb_r )
 {
-	sh4_state *sh4 = get_safe_token(&space->device());
+	sh4_state *sh4 = get_safe_token(&space.device());
 
 	int offs = offset*8;
 
@@ -1265,7 +1265,7 @@ READ64_HANDLER( sh4_tlb_r )
 
 WRITE64_HANDLER( sh4_tlb_w )
 {
-	sh4_state *sh4 = get_safe_token(&space->device());
+	sh4_state *sh4 = get_safe_token(&space.device());
 
 	int offs = offset*8;
 

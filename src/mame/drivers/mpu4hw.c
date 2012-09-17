@@ -2303,28 +2303,28 @@ READ8_MEMBER(mpu4_state::mpu4_ym2413_r)
 }
 
 
-void mpu4_install_mod4yam_space(address_space *space)
+void mpu4_install_mod4yam_space(address_space &space)
 {
-	mpu4_state *state = space->machine().driver_data<mpu4_state>();
-	space->install_read_handler(0x0880, 0x0882, read8_delegate(FUNC(mpu4_state::mpu4_ym2413_r),state));
-	space->install_write_handler(0x0880, 0x0881, write8_delegate(FUNC(mpu4_state::mpu4_ym2413_w),state));
+	mpu4_state *state = space.machine().driver_data<mpu4_state>();
+	space.install_read_handler(0x0880, 0x0882, read8_delegate(FUNC(mpu4_state::mpu4_ym2413_r),state));
+	space.install_write_handler(0x0880, 0x0881, write8_delegate(FUNC(mpu4_state::mpu4_ym2413_w),state));
 }
 
-void mpu4_install_mod4oki_space(address_space *space)
+void mpu4_install_mod4oki_space(address_space &space)
 {
-	mpu4_state *state = space->machine().driver_data<mpu4_state>();
-	pia6821_device *pia_ic4ss = space->machine().device<pia6821_device>("pia_ic4ss");
-	ptm6840_device *ptm_ic3ss = space->machine().device<ptm6840_device>("ptm_ic3ss");
+	mpu4_state *state = space.machine().driver_data<mpu4_state>();
+	pia6821_device *pia_ic4ss = space.machine().device<pia6821_device>("pia_ic4ss");
+	ptm6840_device *ptm_ic3ss = space.machine().device<ptm6840_device>("ptm_ic3ss");
 
-	space->install_readwrite_handler(0x0880, 0x0883, 0, 0, read8_delegate(FUNC(pia6821_device::read), pia_ic4ss), write8_delegate(FUNC(pia6821_device::write), pia_ic4ss));
-	space->install_read_handler(0x08c0, 0x08c7, 0, 0, read8_delegate(FUNC(ptm6840_device::read), ptm_ic3ss));
-	space->install_write_handler(0x08c0, 0x08c7, 0, 0, write8_delegate(FUNC(mpu4_state::ic3ss_w),state));
+	space.install_readwrite_handler(0x0880, 0x0883, 0, 0, read8_delegate(FUNC(pia6821_device::read), pia_ic4ss), write8_delegate(FUNC(pia6821_device::write), pia_ic4ss));
+	space.install_read_handler(0x08c0, 0x08c7, 0, 0, read8_delegate(FUNC(ptm6840_device::read), ptm_ic3ss));
+	space.install_write_handler(0x08c0, 0x08c7, 0, 0, write8_delegate(FUNC(mpu4_state::ic3ss_w),state));
 }
 
-void mpu4_install_mod4bwb_space(address_space *space)
+void mpu4_install_mod4bwb_space(address_space &space)
 {
-	mpu4_state *state = space->machine().driver_data<mpu4_state>();
-	space->install_readwrite_handler(0x0810, 0x0810, 0, 0, read8_delegate(FUNC(mpu4_state::bwb_characteriser_r),state),write8_delegate(FUNC(mpu4_state::bwb_characteriser_w),state));
+	mpu4_state *state = space.machine().driver_data<mpu4_state>();
+	space.install_readwrite_handler(0x0810, 0x0810, 0, 0, read8_delegate(FUNC(mpu4_state::bwb_characteriser_r),state),write8_delegate(FUNC(mpu4_state::bwb_characteriser_w),state));
 	mpu4_install_mod4oki_space(space);
 }
 
@@ -2359,7 +2359,7 @@ MACHINE_START_MEMBER(mpu4_state,mod2)
 
 MACHINE_START_MEMBER(mpu4_state,mpu4yam)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	mpu4_config_common(machine());
 
 	m_link7a_connected=0;
@@ -2369,7 +2369,7 @@ MACHINE_START_MEMBER(mpu4_state,mpu4yam)
 
 MACHINE_START_MEMBER(mpu4_state,mpu4oki)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	mpu4_config_common(machine());
 
 	m_link7a_connected=0;
@@ -2379,7 +2379,7 @@ MACHINE_START_MEMBER(mpu4_state,mpu4oki)
 
 MACHINE_START_MEMBER(mpu4_state,mpu4bwb)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	mpu4_config_common(machine());
 
 	m_link7a_connected=0;
@@ -2588,7 +2588,7 @@ DRIVER_INIT_MEMBER(mpu4_state,m4default_alt)
 
 DRIVER_INIT_MEMBER(mpu4_state,m4default_big)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	DRIVER_INIT_CALL(m4default);
 
 	int size = machine().root_device().memregion( "maincpu" )->bytes();
@@ -2599,8 +2599,8 @@ DRIVER_INIT_MEMBER(mpu4_state,m4default_big)
 	else
 	{
 		m_bwb_bank=1;
-		space->install_write_handler(0x0858, 0x0858, 0, 0, write8_delegate(FUNC(mpu4_state::bankswitch_w),this));
-		space->install_write_handler(0x0878, 0x0878, 0, 0, write8_delegate(FUNC(mpu4_state::bankset_w),this));
+		space.install_write_handler(0x0858, 0x0858, 0, 0, write8_delegate(FUNC(mpu4_state::bankswitch_w),this));
+		space.install_write_handler(0x0878, 0x0878, 0, 0, write8_delegate(FUNC(mpu4_state::bankset_w),this));
 	}
 }
 
@@ -2620,10 +2620,10 @@ WRITE8_MEMBER(mpu4_state::crystal_sound_w)
 
 DRIVER_INIT_MEMBER(mpu4_state,m_frkstn)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	DRIVER_INIT_CALL(m4default_big);
-	space->install_read_handler(0x0880, 0x0880, 0, 0, read8_delegate(FUNC(mpu4_state::crystal_sound_r),this));
-	space->install_write_handler(0x0881, 0x0881, 0, 0, write8_delegate(FUNC(mpu4_state::crystal_sound_w),this));
+	space.install_read_handler(0x0880, 0x0880, 0, 0, read8_delegate(FUNC(mpu4_state::crystal_sound_r),this));
+	space.install_write_handler(0x0881, 0x0881, 0, 0, write8_delegate(FUNC(mpu4_state::crystal_sound_w),this));
 }
 
 // thanks to Project Amber for descramble information

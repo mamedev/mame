@@ -103,7 +103,7 @@ VIDEO_START_MEMBER(skullxbo_state,skullxbo)
 
 WRITE16_HANDLER( skullxbo_xscroll_w )
 {
-	skullxbo_state *state = space->machine().driver_data<skullxbo_state>();
+	skullxbo_state *state = space.machine().driver_data<skullxbo_state>();
 
 	/* combine data */
 	UINT16 oldscroll = *state->m_xscroll;
@@ -112,7 +112,7 @@ WRITE16_HANDLER( skullxbo_xscroll_w )
 
 	/* if something changed, force an update */
 	if (oldscroll != newscroll)
-		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+		space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
 
 	/* adjust the actual scrolls */
 	state->m_playfield_tilemap->set_scrollx(0, 2 * (newscroll >> 7));
@@ -125,10 +125,10 @@ WRITE16_HANDLER( skullxbo_xscroll_w )
 
 WRITE16_HANDLER( skullxbo_yscroll_w )
 {
-	skullxbo_state *state = space->machine().driver_data<skullxbo_state>();
+	skullxbo_state *state = space.machine().driver_data<skullxbo_state>();
 
 	/* combine data */
-	int scanline = space->machine().primary_screen->vpos();
+	int scanline = space.machine().primary_screen->vpos();
 	UINT16 oldscroll = *state->m_yscroll;
 	UINT16 newscroll = oldscroll;
 	UINT16 effscroll;
@@ -136,10 +136,10 @@ WRITE16_HANDLER( skullxbo_yscroll_w )
 
 	/* if something changed, force an update */
 	if (oldscroll != newscroll)
-		space->machine().primary_screen->update_partial(scanline);
+		space.machine().primary_screen->update_partial(scanline);
 
 	/* adjust the effective scroll for the current scanline */
-	if (scanline > space->machine().primary_screen->visible_area().max_y)
+	if (scanline > space.machine().primary_screen->visible_area().max_y)
 		scanline = 0;
 	effscroll = (newscroll >> 7) - scanline;
 
@@ -161,7 +161,7 @@ WRITE16_HANDLER( skullxbo_yscroll_w )
 
 WRITE16_HANDLER( skullxbo_mobmsb_w )
 {
-	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+	space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
 	atarimo_set_bank(0, (offset >> 9) & 1);
 }
 
@@ -175,7 +175,7 @@ WRITE16_HANDLER( skullxbo_mobmsb_w )
 
 WRITE16_HANDLER( skullxbo_playfieldlatch_w )
 {
-	skullxbo_state *state = space->machine().driver_data<skullxbo_state>();
+	skullxbo_state *state = space.machine().driver_data<skullxbo_state>();
 	atarigen_set_playfield_latch(state, data);
 }
 

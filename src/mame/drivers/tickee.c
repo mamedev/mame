@@ -250,17 +250,17 @@ READ16_MEMBER(tickee_state::rapidfir_transparent_r)
 }
 
 
-static void rapidfir_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
+static void rapidfir_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
-	tickee_state *state = space->machine().driver_data<tickee_state>();
+	tickee_state *state = space.machine().driver_data<tickee_state>();
 	if (address < 0x800000)
 		memcpy(shiftreg, &state->m_vram[TOWORD(address)], TOBYTE(0x2000));
 }
 
 
-static void rapidfir_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
+static void rapidfir_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
-	tickee_state *state = space->machine().driver_data<tickee_state>();
+	tickee_state *state = space.machine().driver_data<tickee_state>();
 	if (address < 0x800000)
 		memcpy(&state->m_vram[TOWORD(address)], shiftreg, TOBYTE(0x2000));
 }

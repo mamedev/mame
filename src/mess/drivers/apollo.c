@@ -483,7 +483,7 @@ WRITE32_MEMBER(apollo_state::ram_with_parity_w){
 			// no more than 192 read/write handlers may be used
 			// see table_assign_handler in memory.c
 			if (parity_error_handler_install_counter < 40) {
-				//memory_install_read32_handler(&space, ram_base_address+offset*4, ram_base_address+offset*4+3, 0xffffffff, 0, ram_with_parity_r);
+				//memory_install_read32_handler(space, ram_base_address+offset*4, ram_base_address+offset*4+3, 0xffffffff, 0, ram_with_parity_r);
 				space.install_read_handler(ram_base_address+offset*4, ram_base_address+offset*4+3, 0xffffffff,0,read32_delegate(FUNC(apollo_state::ram_with_parity_r),this));
 				parity_error_handler_is_installed = 1;
 				parity_error_handler_install_counter++;
@@ -495,7 +495,7 @@ WRITE32_MEMBER(apollo_state::ram_with_parity_w){
 
 		// uninstall not supported, reinstall previous read handler instead
 
-		// memory_install_rom(&space, ram_base_address, ram_end_address, 0xffffffff, 0, messram_ptr.v);
+		// memory_install_rom(space, ram_base_address, ram_end_address, 0xffffffff, 0, messram_ptr.v);
 		space.install_rom(ram_base_address,ram_end_address,0xffffffff,0,&m_messram_ptr[0]);
 
 		parity_error_handler_is_installed = 0;

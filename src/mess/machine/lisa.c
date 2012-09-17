@@ -237,13 +237,13 @@ INLINE void COPS_send_data_if_possible(running_machine &machine)
 {
 	lisa_state *state = machine.driver_data<lisa_state>();
 	via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if ((! state->m_hold_COPS_data) && state->m_fifo_size && (! state->m_COPS_Ready))
 	{
 //        printf("COPsim: sending %02x to VIA\n", state->m_fifo_data[state->m_fifo_head]);
 
-		via_0->write_porta(*space, 0, state->m_fifo_data[state->m_fifo_head]);	/* output data */
+		via_0->write_porta(space, 0, state->m_fifo_data[state->m_fifo_head]);	/* output data */
 		if (state->m_fifo_head == state->m_mouse_data_offset)
 			state->m_mouse_data_offset = -1;	/* we just phased out the mouse data in buffer */
 		state->m_fifo_head = (state->m_fifo_head+1) & 0x7;
@@ -427,7 +427,7 @@ static TIMER_CALLBACK(read_COPS_command)
 	lisa_state *state = machine.driver_data<lisa_state>();
 	int command;
 	via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->m_COPS_Ready = 0;
 
@@ -435,7 +435,7 @@ static TIMER_CALLBACK(read_COPS_command)
 	COPS_send_data_if_possible(machine);
 
 	/* some pull-ups allow the COPS to read 1s when the VIA port is not set as output */
-	command = (state->m_COPS_command | (~ via_0->read(*space, VIA_DDRA))) & 0xff;
+	command = (state->m_COPS_command | (~ via_0->read(space, VIA_DDRA))) & 0xff;
 
 //    printf("Dropping Ready, command = %02x\n", command);
 

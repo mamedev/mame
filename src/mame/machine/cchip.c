@@ -83,14 +83,14 @@ WRITE16_HANDLER( cchip1_ram_w )
 	{
 		cc_port = data;
 
-		coin_lockout_w(space->machine(), 1, data & 0x08);
-		coin_lockout_w(space->machine(), 0, data & 0x04);
-		coin_counter_w(space->machine(), 1, data & 0x02);
-		coin_counter_w(space->machine(), 0, data & 0x01);
+		coin_lockout_w(space.machine(), 1, data & 0x08);
+		coin_lockout_w(space.machine(), 0, data & 0x04);
+		coin_counter_w(space.machine(), 1, data & 0x02);
+		coin_counter_w(space.machine(), 0, data & 0x01);
 	}
 	else
 	{
-logerror("cchip1_w pc: %06x bank %02x offset %04x: %02x\n",space->device().safe_pc(),current_bank,offset,data);
+logerror("cchip1_w pc: %06x bank %02x offset %04x: %02x\n",space.device().safe_pc(),current_bank,offset,data);
 	}
 }
 
@@ -117,9 +117,9 @@ READ16_HANDLER( cchip1_ram_r )
 	{
 		switch (offset)
 		{
-		case 0x00: return space->machine().root_device().ioport("IN0")->read();    /* Player 1 controls + START1 */
-		case 0x01: return space->machine().root_device().ioport("IN1")->read();    /* Player 2 controls + START2 */
-		case 0x02: return space->machine().root_device().ioport("IN2")->read();    /* COINn + SERVICE1 + TILT */
+		case 0x00: return space.machine().root_device().ioport("IN0")->read();    /* Player 1 controls + START1 */
+		case 0x01: return space.machine().root_device().ioport("IN1")->read();    /* Player 2 controls + START2 */
+		case 0x02: return space.machine().root_device().ioport("IN2")->read();    /* COINn + SERVICE1 + TILT */
 		case 0x03: return cc_port;
 		}
 	}

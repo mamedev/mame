@@ -5361,7 +5361,7 @@ static void stv_vdp2_draw_back(running_machine &machine, bitmap_rgb32 &bitmap, c
 
 WRITE32_HANDLER ( saturn_vdp2_vram_w )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 	UINT8* gfxdata = state->m_vdp2.gfx_decode;
 
 	COMBINE_DATA(&state->m_vdp2_vram[offset]);
@@ -5373,16 +5373,16 @@ WRITE32_HANDLER ( saturn_vdp2_vram_w )
 	gfxdata[offset*4+2] = (data & 0x0000ff00) >> 8;
 	gfxdata[offset*4+3] = (data & 0x000000ff) >> 0;
 
-	space->machine().gfx[0]->mark_dirty(offset/8);
-	space->machine().gfx[1]->mark_dirty(offset/8);
-	space->machine().gfx[2]->mark_dirty(offset/8);
-	space->machine().gfx[3]->mark_dirty(offset/8);
+	space.machine().gfx[0]->mark_dirty(offset/8);
+	space.machine().gfx[1]->mark_dirty(offset/8);
+	space.machine().gfx[2]->mark_dirty(offset/8);
+	space.machine().gfx[3]->mark_dirty(offset/8);
 
 	/* 8-bit tiles overlap, so this affects the previous one as well */
 	if (offset/8 != 0)
 	{
-		space->machine().gfx[2]->mark_dirty(offset/8 - 1);
-		space->machine().gfx[3]->mark_dirty(offset/8 - 1);
+		space.machine().gfx[2]->mark_dirty(offset/8 - 1);
+		space.machine().gfx[3]->mark_dirty(offset/8 - 1);
 	}
 
 	if ( stv_rbg_cache_data.watch_vdp2_vram_writes )
@@ -5418,7 +5418,7 @@ WRITE32_HANDLER ( saturn_vdp2_vram_w )
 
 READ16_HANDLER ( saturn_vdp2_regs_r )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
 	switch(offset)
 	{
@@ -5428,10 +5428,10 @@ READ16_HANDLER ( saturn_vdp2_regs_r )
 			if(!STV_VDP2_EXLTEN)
 			{
 				/* TODO: handle various h/v settings. */
-				if(!space->debugger_access())
+				if(!space.debugger_access())
 				{
-					state->m_vdp2.h_count = space->machine().primary_screen->hpos() & 0x3ff;
-					state->m_vdp2.v_count = space->machine().primary_screen->vpos() & (STV_VDP2_LSMD == 3 ? 0x7ff : 0x3ff);
+					state->m_vdp2.h_count = space.machine().primary_screen->hpos() & 0x3ff;
+					state->m_vdp2.v_count = space.machine().primary_screen->vpos() & (STV_VDP2_LSMD == 3 ? 0x7ff : 0x3ff);
 					/* latch flag */
 					state->m_vdp2.exltfg |= 1;
 				}
@@ -5445,9 +5445,9 @@ READ16_HANDLER ( saturn_vdp2_regs_r )
 								       /*VBLANK              HBLANK            ODD               PAL    */
 			state->m_vdp2_regs[offset] = (state->m_vdp2.exltfg<<9) |
 										 (state->m_vdp2.exsyfg<<8) |
-										 (get_vblank(space->machine()) << 3) |
-										 (get_hblank(space->machine()) << 2) |
-										 (get_odd_bit(space->machine()) << 1) |
+										 (get_vblank(space.machine()) << 3) |
+										 (get_hblank(space.machine()) << 2) |
+										 (get_odd_bit(space.machine()) << 1) |
 										 (state->m_vdp2.pal << 0);
 
 			/* vblank bit is always 1 if DISP bit is disabled */
@@ -5455,7 +5455,7 @@ READ16_HANDLER ( saturn_vdp2_regs_r )
 				state->m_vdp2_regs[offset] |= 1 << 3;
 
 			/* HV latches clears if this register is read */
-			if(!space->debugger_access())
+			if(!space.debugger_access())
 			{
 				state->m_vdp2.exltfg &= ~1;
 				state->m_vdp2.exsyfg &= ~1;
@@ -5467,7 +5467,7 @@ READ16_HANDLER ( saturn_vdp2_regs_r )
 			state->m_vdp2_regs[offset] = (STV_VDP2_VRAMSZ << 15) |
 										 ((0 << 0) & 0xf); // VDP2 version
 
-			if(!space->debugger_access())
+			if(!space.debugger_access())
 				printf("Warning: VDP2 version read\n");
 			break;
 		}
@@ -5487,7 +5487,7 @@ READ16_HANDLER ( saturn_vdp2_regs_r )
 		}
 
 		default:
-			//if(!space->debugger_access())
+			//if(!space.debugger_access())
 			//  printf("VDP2: read from register %08x %08x\n",offset*4,mem_mask);
 			break;
 	}
@@ -5497,7 +5497,7 @@ READ16_HANDLER ( saturn_vdp2_regs_r )
 
 READ32_HANDLER ( saturn_vdp2_cram_r )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
 	offset &= (0xfff) >> (2);
 
@@ -5507,14 +5507,14 @@ READ32_HANDLER ( saturn_vdp2_cram_r )
 
 READ32_HANDLER ( saturn_vdp2_vram_r )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
 	return state->m_vdp2_vram[offset];
 }
 
 WRITE32_HANDLER ( saturn_vdp2_cram_w )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 	int r,g,b;
 	UINT8 cmode0;
 
@@ -5534,8 +5534,8 @@ WRITE32_HANDLER ( saturn_vdp2_cram_w )
 			b = ((state->m_vdp2_cram[offset] & 0x00ff0000) >> 16);
 			g = ((state->m_vdp2_cram[offset] & 0x0000ff00) >> 8);
 			r = ((state->m_vdp2_cram[offset] & 0x000000ff) >> 0);
-			palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
-			palette_set_color(space->machine(),offset^0x400,MAKE_RGB(r,g,b));
+			palette_set_color(space.machine(),offset,MAKE_RGB(r,g,b));
+			palette_set_color(space.machine(),offset^0x400,MAKE_RGB(r,g,b));
 		}
 		break;
 		/*Mode 0*/
@@ -5547,16 +5547,16 @@ WRITE32_HANDLER ( saturn_vdp2_cram_w )
 			b = ((state->m_vdp2_cram[offset] & 0x00007c00) >> 10);
 			g = ((state->m_vdp2_cram[offset] & 0x000003e0) >> 5);
 			r = ((state->m_vdp2_cram[offset] & 0x0000001f) >> 0);
-			palette_set_color_rgb(space->machine(),(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
+			palette_set_color_rgb(space.machine(),(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
 			if(cmode0)
-				palette_set_color_rgb(space->machine(),((offset*2)+1)^0x400,pal5bit(r),pal5bit(g),pal5bit(b));
+				palette_set_color_rgb(space.machine(),((offset*2)+1)^0x400,pal5bit(r),pal5bit(g),pal5bit(b));
 
 			b = ((state->m_vdp2_cram[offset] & 0x7c000000) >> 26);
 			g = ((state->m_vdp2_cram[offset] & 0x03e00000) >> 21);
 			r = ((state->m_vdp2_cram[offset] & 0x001f0000) >> 16);
-			palette_set_color_rgb(space->machine(),offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
+			palette_set_color_rgb(space.machine(),offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
 			if(cmode0)
-				palette_set_color_rgb(space->machine(),(offset*2)^0x400,pal5bit(r),pal5bit(g),pal5bit(b));
+				palette_set_color_rgb(space.machine(),(offset*2)^0x400,pal5bit(r),pal5bit(g),pal5bit(b));
 		}
 		break;
 	}
@@ -5623,25 +5623,25 @@ static void refresh_palette_data(running_machine &machine)
 
 WRITE16_HANDLER ( saturn_vdp2_regs_w )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 	COMBINE_DATA(&state->m_vdp2_regs[offset]);
 
 	if(state->m_vdp2.old_crmd != STV_VDP2_CRMD)
 	{
 		state->m_vdp2.old_crmd = STV_VDP2_CRMD;
-		refresh_palette_data(space->machine());
+		refresh_palette_data(space.machine());
 	}
 	if(state->m_vdp2.old_tvmd != STV_VDP2_TVMD)
 	{
 		state->m_vdp2.old_tvmd = STV_VDP2_TVMD;
-		stv_vdp2_dynamic_res_change(space->machine());
+		stv_vdp2_dynamic_res_change(space.machine());
 	}
 
 	if(STV_VDP2_VRAMSZ)
 		printf("VDP2 sets up 8 Mbit VRAM!\n");
 
 	#if NEW_VIDEO_CODE
-	saturn_vdp2_assign_variables(space->machine(),offset,state->m_vdp2_regs[offset]);
+	saturn_vdp2_assign_variables(space.machine(),offset,state->m_vdp2_regs[offset]);
 	#endif
 }
 

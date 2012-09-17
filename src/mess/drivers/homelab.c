@@ -646,7 +646,7 @@ static const mea8000_interface brailab4_speech_intf = { "speech", DEVCB_NULL };
 
 static QUICKLOAD_LOAD(homelab)
 {
-	address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i=0;
 	UINT8 ch;
 	UINT16 quick_addr;
@@ -730,7 +730,7 @@ static QUICKLOAD_LOAD(homelab)
 			image.message("%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
 			return IMAGE_INIT_FAIL;
 		}
-		space->write_byte(j, ch);
+		space.write_byte(j, ch);
 	}
 
 	return IMAGE_INIT_PASS;

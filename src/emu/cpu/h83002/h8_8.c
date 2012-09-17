@@ -515,7 +515,7 @@ static READ8_HANDLER( h8330_itu_r )
 	UINT8 reg;
 	UINT64 frc;
 	static const UINT64 divider[4] = { 2, 8, 32, 1 };
-	h83xx_state *h8 = get_safe_token(&space->device());
+	h83xx_state *h8 = get_safe_token(&space.device());
 
 	reg = (offset + 0x88) & 0xff;
 
@@ -603,7 +603,7 @@ static READ8_HANDLER( h8330_itu_r )
 static WRITE8_HANDLER( h8330_itu_w )
 {
 	UINT8 reg;
-	h83xx_state *h8 = get_safe_token(&space->device());
+	h83xx_state *h8 = get_safe_token(&space.device());
 
 	reg = (offset + 0x88) & 0xff;
 

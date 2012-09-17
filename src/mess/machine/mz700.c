@@ -627,7 +627,7 @@ WRITE8_MEMBER(mz_state::mz800_display_mode_w)
 //  {
 //      logerror("mz800_display_mode_w: switching mode to %s\n", (BIT(data, 3) ? "mz700" : "mz800"));
 //      m_mz700_mode = BIT(data, 3);
-//      mz700_bank_4_w(machine().device("maincpu")->memory().&space(AS_PROGRAM), 0, 0);
+//      mz700_bank_4_w(*machine().device("maincpu")->memory().&space(AS_PROGRAM), 0, 0);
 //  }
 }
 

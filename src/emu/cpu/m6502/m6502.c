@@ -374,7 +374,7 @@ UINT8 m6510_get_port(legacy_cpu_device *device)
 
 static READ8_HANDLER( m6510_read_0000 )
 {
-	m6502_Regs *cpustate = get_safe_token(&space->device());
+	m6502_Regs *cpustate = get_safe_token(&space.device());
 	UINT8 result = 0x00;
 
 	switch(offset)
@@ -400,7 +400,7 @@ static READ8_HANDLER( m6510_read_0000 )
 
 static WRITE8_HANDLER( m6510_write_0000 )
 {
-	m6502_Regs *cpustate = get_safe_token(&space->device());
+	m6502_Regs *cpustate = get_safe_token(&space.device());
 
 	switch(offset)
 	{

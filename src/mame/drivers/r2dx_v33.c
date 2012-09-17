@@ -231,7 +231,7 @@ static SCREEN_UPDATE_IND16( rdx_v33 )
 	{
 		static UINT32 src_addr = 0x100000;
 		static int frame;
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		//if(screen.machine().input().code_pressed_once(KEYCODE_A))
 		//  src_addr+=0x800;
@@ -247,14 +247,14 @@ static SCREEN_UPDATE_IND16( rdx_v33 )
 		if(frame == 5)
 		{
 			int i,data;
-			static UINT8 *rom = space->machine().root_device().memregion("mainprg")->base();
+			static UINT8 *rom = space.machine().root_device().memregion("mainprg")->base();
 
 			for(i=0;i<0x800;i+=2)
 			{
 				data = rom[src_addr+i+0];
-				space->write_byte(i+0xd000+0, data);
+				space.write_byte(i+0xd000+0, data);
 				data = rom[src_addr+i+1];
-				space->write_byte(i+0xd000+1, data);
+				space.write_byte(i+0xd000+1, data);
 			}
 
 			popmessage("%08x 1",src_addr);
@@ -440,9 +440,9 @@ READ16_MEMBER(r2dx_v33_state::nzerotea_sound_comms_r)
 {
 	switch(offset+0x780)
 	{
-		case (0x788/2):	return seibu_main_word_r(&space,2,0xffff);
-		case (0x78c/2):	return seibu_main_word_r(&space,3,0xffff);
-		case (0x794/2): return seibu_main_word_r(&space,5,0xffff);
+		case (0x788/2):	return seibu_main_word_r(space,2,0xffff);
+		case (0x78c/2):	return seibu_main_word_r(space,3,0xffff);
+		case (0x794/2): return seibu_main_word_r(space,5,0xffff);
 	}
 
 	return 0xffff;
@@ -453,11 +453,11 @@ WRITE16_MEMBER(r2dx_v33_state::nzerotea_sound_comms_w)
 {
 	switch(offset+0x780)
 	{
-		case (0x780/2): { seibu_main_word_w(&space,0,data,0x00ff); break; }
-		case (0x784/2): { seibu_main_word_w(&space,1,data,0x00ff); break; }
-		//case (0x790/2): { seibu_main_word_w(&space,4,data,0x00ff); break; }
-		case (0x794/2): { seibu_main_word_w(&space,4,data,0x00ff); break; }
-		case (0x798/2): { seibu_main_word_w(&space,6,data,0x00ff); break; }
+		case (0x780/2): { seibu_main_word_w(space,0,data,0x00ff); break; }
+		case (0x784/2): { seibu_main_word_w(space,1,data,0x00ff); break; }
+		//case (0x790/2): { seibu_main_word_w(space,4,data,0x00ff); break; }
+		case (0x794/2): { seibu_main_word_w(space,4,data,0x00ff); break; }
+		case (0x798/2): { seibu_main_word_w(space,6,data,0x00ff); break; }
 	}
 }
 

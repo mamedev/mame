@@ -212,7 +212,7 @@ static void mac_install_memory(running_machine &machine, offs_t memory_begin, of
 	offs_t memory_size, void *memory_data, int is_rom, const char *bank)
 {
 	mac_state *state = machine.driver_data<mac_state>();
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	offs_t memory_mask;
 
 	memory_size = MIN(memory_size, (memory_end + 1 - memory_begin));
@@ -220,12 +220,12 @@ static void mac_install_memory(running_machine &machine, offs_t memory_begin, of
 
 	if (!is_rom)
 	{
-		space->install_readwrite_bank(memory_begin, memory_end, memory_mask, 0, bank);
+		space.install_readwrite_bank(memory_begin, memory_end, memory_mask, 0, bank);
 	}
 	else
 	{
-		space->unmap_write(memory_begin, memory_end, memory_mask, 0);
-		space->install_read_bank(memory_begin, memory_end, memory_mask, 0, bank);
+		space.unmap_write(memory_begin, memory_end, memory_mask, 0);
+		space.install_read_bank(memory_begin, memory_end, memory_mask, 0, bank);
 	}
 
 	state->membank(bank)->set_base(memory_data);
@@ -410,12 +410,12 @@ void mac_state::v8_resize()
 	}
 	else
 	{
-		address_space* space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space& space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 		UINT32 onboard_amt, simm_amt, simm_size;
 		static const UINT32 simm_sizes[4] = { 0, 2*1024*1024, 4*1024*1024, 8*1024*1024 };
 
 		// force unmap of entire RAM region
-		space->unmap_write(0, 0x9fffff, 0x9fffff, 0);
+		space.unmap_write(0, 0x9fffff, 0x9fffff, 0);
 
 		// LC and Classic II have 2 MB built-in, all other V8-style machines have 4 MB
 		// we reserve the first 2 or 4 MB of mess_ram for the onboard,
@@ -501,14 +501,14 @@ void mac_state::set_memory_overlay(int overlay)
 		}
 		else if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100) || (m_model == MODEL_MAC_IIVX) || (m_model == MODEL_MAC_IIFX))
 		{
-			address_space* space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-			space->unmap_write(0x000000, 0x9fffff, 0x9fffff, 0);
+			address_space& space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+			space.unmap_write(0x000000, 0x9fffff, 0x9fffff, 0);
 			mac_install_memory(machine(), 0x000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
 		else if ((m_model == MODEL_MAC_PB140) || (m_model == MODEL_MAC_PB160) || ((m_model >= MODEL_MAC_PBDUO_210) && (m_model <= MODEL_MAC_PBDUO_270c)))
 		{
-			address_space* space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-			space->unmap_write(0x000000, 0xffffff, 0xffffff, 0);
+			address_space& space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+			space.unmap_write(0x000000, 0xffffff, 0xffffff, 0);
 			mac_install_memory(machine(), 0x000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
 		else if ((m_model >= MODEL_MAC_II) && (m_model <= MODEL_MAC_SE30))
@@ -1049,7 +1049,7 @@ WRITE16_MEMBER ( mac_state::macii_scsi_w )
 {
 	int reg = (offset>>3) & 0xf;
 
-//  logerror("macplus_scsi_w: data %x offset %x mask %x (PC=%x)\n", data, offset, mem_mask, space->device().safe_pc());
+//  logerror("macplus_scsi_w: data %x offset %x mask %x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
 
 	if ((reg == 0) && (offset == 0x100))
 	{
@@ -1814,7 +1814,7 @@ void mac_state::machine_reset()
 
 	if (m_model >= MODEL_MAC_POWERMAC_6100 && m_model <= MODEL_MAC_POWERMAC_8100)
 	{
-		m_awacs->set_dma_base(m_maincpu->space(AS_PROGRAM), 0x10000, 0x12000);
+		m_awacs->set_dma_base(*m_maincpu->space(AS_PROGRAM), 0x10000, 0x12000);
 	}
 
 	// start 60.15 Hz timer for most systems

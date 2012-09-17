@@ -161,10 +161,10 @@ WRITE16_MEMBER(jpmsys5_state::sys5_tms34061_w)
 	}
 
 	if (ACCESSING_BITS_8_15)
-		tms34061_w(&space, col, row, func, data >> 8);
+		tms34061_w(space, col, row, func, data >> 8);
 
 	if (ACCESSING_BITS_0_7)
-		tms34061_w(&space, col | 1, row, func, data & 0xff);
+		tms34061_w(space, col | 1, row, func, data & 0xff);
 }
 
 READ16_MEMBER(jpmsys5_state::sys5_tms34061_r)
@@ -185,10 +185,10 @@ READ16_MEMBER(jpmsys5_state::sys5_tms34061_r)
 	}
 
 	if (ACCESSING_BITS_8_15)
-		data |= tms34061_r(&space, col, row, func) << 8;
+		data |= tms34061_r(space, col, row, func) << 8;
 
 	if (ACCESSING_BITS_0_7)
-		data |= tms34061_r(&space, col | 1, row, func);
+		data |= tms34061_r(space, col | 1, row, func);
 
 	return data;
 }

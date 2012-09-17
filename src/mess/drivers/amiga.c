@@ -58,15 +58,15 @@ static DECLARE_WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w );
 
 static READ16_HANDLER( amiga_clock_r )
 {
-	msm6242_device *rtc = space->machine().device<msm6242_device>("rtc");
-	return rtc->read(*space,offset / 2);
+	msm6242_device *rtc = space.machine().device<msm6242_device>("rtc");
+	return rtc->read(space,offset / 2);
 }
 
 
 static WRITE16_HANDLER( amiga_clock_w )
 {
-	msm6242_device *rtc = space->machine().device<msm6242_device>("rtc");
-	rtc->write(*space,offset / 2, data);
+	msm6242_device *rtc = space.machine().device<msm6242_device>("rtc");
+	rtc->write(space,offset / 2, data);
 }
 
 

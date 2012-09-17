@@ -860,14 +860,14 @@ DRIVER_INIT_MEMBER(toki_state,jujuba)
 
 	/* Decrypt data for z80 program */
 	{
-		address_space *space = machine().device("audiocpu")->memory().space(AS_PROGRAM);
+		address_space &space = *machine().device("audiocpu")->memory().space(AS_PROGRAM);
 		UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x20000);
 		UINT8 *rom = machine().root_device().memregion("audiocpu")->base();
 		int i;
 
 		memcpy(decrypt,rom,0x20000);
 
-		space->set_decrypted_region(0x0000, 0x1fff, decrypt);
+		space.set_decrypted_region(0x0000, 0x1fff, decrypt);
 
 		for (i = 0;i < 0x2000;i++)
 		{

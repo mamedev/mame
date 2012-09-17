@@ -101,10 +101,10 @@ typedef void (*m68k_cmpild_func)(device_t *device, UINT32 data, UINT8 reg);
 typedef void (*m68k_rte_func)(device_t *device);
 typedef int (*m68k_tas_func)(device_t *device);
 
-typedef UINT8 (*m68307_porta_read_callback)(address_space *space, bool dedicated, UINT8 line_mask);
-typedef void (*m68307_porta_write_callback)(address_space *space, bool dedicated, UINT8 data, UINT8 line_mask);
-typedef UINT16 (*m68307_portb_read_callback)(address_space *space, bool dedicated, UINT16 line_mask);
-typedef void (*m68307_portb_write_callback)(address_space *space, bool dedicated, UINT16 data, UINT16 line_mask);
+typedef UINT8 (*m68307_porta_read_callback)(address_space &space, bool dedicated, UINT8 line_mask);
+typedef void (*m68307_porta_write_callback)(address_space &space, bool dedicated, UINT8 data, UINT8 line_mask);
+typedef UINT16 (*m68307_portb_read_callback)(address_space &space, bool dedicated, UINT16 line_mask);
+typedef void (*m68307_portb_write_callback)(address_space &space, bool dedicated, UINT16 data, UINT16 line_mask);
 
 
 

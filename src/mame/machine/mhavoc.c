@@ -82,7 +82,7 @@ void mhavoc_state::machine_start()
 
 void mhavoc_state::machine_reset()
 {
-	address_space *space = machine().device("alpha")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("alpha")->memory().space(AS_PROGRAM);
 	m_has_gamma_cpu = (machine().device("gamma") != NULL);
 
 	membank("bank1")->configure_entry(0, m_zram0);
@@ -90,8 +90,8 @@ void mhavoc_state::machine_reset()
 	membank("bank2")->configure_entries(0, 4, memregion("alpha")->base() + 0x10000, 0x2000);
 
 	/* reset RAM/ROM banks to 0 */
-	mhavoc_ram_banksel_w(*space, 0, 0);
-	mhavoc_rom_banksel_w(*space, 0, 0);
+	mhavoc_ram_banksel_w(space, 0, 0);
+	mhavoc_rom_banksel_w(space, 0, 0);
 
 	/* reset alpha comm status */
 	m_alpha_data = 0;

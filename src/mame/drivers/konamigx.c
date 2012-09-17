@@ -179,7 +179,7 @@ static struct sprite_entry {
 	UINT32 adr;
 } sprites[0x100];
 
-static void generate_sprites(address_space *space, UINT32 src, UINT32 spr, int count)
+static void generate_sprites(address_space &space, UINT32 src, UINT32 spr, int count)
 {
 	int i;
 	int scount;
@@ -190,9 +190,9 @@ static void generate_sprites(address_space *space, UINT32 src, UINT32 spr, int c
 	for(i=0; i<count; i++) {
 		UINT32 adr = src + 0x100*i;
 		int pri;
-		if(!space->read_word(adr+2))
+		if(!space.read_word(adr+2))
 			continue;
-		pri = space->read_word(adr+28);
+		pri = space.read_word(adr+28);
 
 		if(pri < 256) {
 			sprites[ecount].pri = pri;
@@ -205,39 +205,39 @@ static void generate_sprites(address_space *space, UINT32 src, UINT32 spr, int c
 	for(i=0; i<ecount; i++) {
 		UINT32 adr = sprites[i].adr;
 		if(adr) {
-			UINT32 set =(space->read_word(adr) << 16)|space->read_word(adr+2);
-			UINT16 glob_x = space->read_word(adr+4);
-			UINT16 glob_y = space->read_word(adr+8);
-			UINT16 flip_x = space->read_word(adr+12) ? 0x1000 : 0x0000;
-			UINT16 flip_y = space->read_word(adr+14) ? 0x2000 : 0x0000;
+			UINT32 set =(space.read_word(adr) << 16)|space.read_word(adr+2);
+			UINT16 glob_x = space.read_word(adr+4);
+			UINT16 glob_y = space.read_word(adr+8);
+			UINT16 flip_x = space.read_word(adr+12) ? 0x1000 : 0x0000;
+			UINT16 flip_y = space.read_word(adr+14) ? 0x2000 : 0x0000;
 			UINT16 glob_f = flip_x | (flip_y ^ 0x2000);
-			UINT16 zoom_x = space->read_word(adr+20);
-			UINT16 zoom_y = space->read_word(adr+22);
+			UINT16 zoom_x = space.read_word(adr+20);
+			UINT16 zoom_y = space.read_word(adr+22);
 			UINT16 color_val    = 0x0000;
 			UINT16 color_mask   = 0xffff;
 			UINT16 color_set    = 0x0000;
 			UINT16 color_rotate = 0x0000;
 			UINT16 v;
 
-			v = space->read_word(adr+24);
+			v = space.read_word(adr+24);
 			if(v & 0x8000) {
 				color_mask = 0xf3ff;
 				color_val |= (v & 3) << 10;
 			}
 
-			v = space->read_word(adr+26);
+			v = space.read_word(adr+26);
 			if(v & 0x8000) {
 				color_mask &= 0xfcff;
 				color_val  |= (v & 3) << 8;
 			}
 
-			v = space->read_word(adr+18);
+			v = space.read_word(adr+18);
 			if(v & 0x8000) {
 				color_mask &= 0xff1f;
 				color_val  |= v & 0xe0;
 			}
 
-			v = space->read_word(adr+16);
+			v = space.read_word(adr+16);
 			if(v & 0x8000)
 				color_set = v & 0x1f;
 			if(v & 0x4000)
@@ -250,14 +250,14 @@ static void generate_sprites(address_space *space, UINT32 src, UINT32 spr, int c
 
 			if(set >= 0x200000 && set < 0xd00000)
 			{
-				UINT16 count2 = space->read_word(set);
+				UINT16 count2 = space.read_word(set);
 				set += 2;
 				while(count2) {
-					UINT16 idx  = space->read_word(set);
-					UINT16 flip = space->read_word(set+2);
-					UINT16 col  = space->read_word(set+4);
-					short y = space->read_word(set+6);
-					short x = space->read_word(set+8);
+					UINT16 idx  = space.read_word(set);
+					UINT16 flip = space.read_word(set+2);
+					UINT16 col  = space.read_word(set+4);
+					short y = space.read_word(set+6);
+					short x = space.read_word(set+8);
 
 					if(idx == 0xffff) {
 						set = (flip<<16) | col;
@@ -292,13 +292,13 @@ static void generate_sprites(address_space *space, UINT32 src, UINT32 spr, int c
 					if(color_rotate)
 						col = (col & 0xffe0) | ((col + color_rotate) & 0x1f);
 
-					space->write_word(spr   , (flip ^ glob_f) | sprites[i].pri);
-					space->write_word(spr+ 2, idx);
-					space->write_word(spr+ 4, y);
-					space->write_word(spr+ 6, x);
-					space->write_word(spr+ 8, zoom_y);
-					space->write_word(spr+10, zoom_x);
-					space->write_word(spr+12, col);
+					space.write_word(spr   , (flip ^ glob_f) | sprites[i].pri);
+					space.write_word(spr+ 2, idx);
+					space.write_word(spr+ 4, y);
+					space.write_word(spr+ 6, x);
+					space.write_word(spr+ 8, zoom_y);
+					space.write_word(spr+10, zoom_x);
+					space.write_word(spr+12, col);
 					spr += 16;
 					scount++;
 					if(scount == 256)
@@ -311,45 +311,45 @@ static void generate_sprites(address_space *space, UINT32 src, UINT32 spr, int c
 		}
 	}
 	while(scount < 256) {
-		space->write_word(spr, scount);
+		space.write_word(spr, scount);
 		scount++;
 		spr += 16;
 	}
 }
 
-static void tkmmpzdm_esc(address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void tkmmpzdm_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
-	konamigx_esc_alert(space->machine().driver_data<konamigx_state>()->m_workram, 0x0142, 0x100, 0);
+	konamigx_esc_alert(space.machine().driver_data<konamigx_state>()->m_workram, 0x0142, 0x100, 0);
 }
 
-static void dragoonj_esc(address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void dragoonj_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
-	konamigx_esc_alert(space->machine().driver_data<konamigx_state>()->m_workram, 0x5c00, 0x100, 0);
+	konamigx_esc_alert(space.machine().driver_data<konamigx_state>()->m_workram, 0x5c00, 0x100, 0);
 }
 
-static void sal2_esc(address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void sal2_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
-	konamigx_esc_alert(space->machine().driver_data<konamigx_state>()->m_workram, 0x1c8c, 0x172, 1);
+	konamigx_esc_alert(space.machine().driver_data<konamigx_state>()->m_workram, 0x1c8c, 0x172, 1);
 }
 
-static void sexyparo_esc(address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void sexyparo_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
 	// The d20000 should probably be p3
 	generate_sprites(space, 0xc00604, 0xd20000, 0xfc);
 }
 
-static void tbyahhoo_esc(address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void tbyahhoo_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
 	generate_sprites(space, 0xc00000, 0xd20000, 0x100);
 }
 
-static void daiskiss_esc(address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void daiskiss_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
 	generate_sprites(space, 0xc00000, 0xd20000, 0x100);
 }
 
 static UINT8 esc_program[4096];
-static void (*esc_cb)(address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
+static void (*esc_cb)(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
 
 WRITE32_MEMBER(konamigx_state::esc_w)
 {
@@ -404,7 +404,7 @@ WRITE32_MEMBER(konamigx_state::esc_w)
 				UINT32 p2 = (space.read_word(params+4)<<16) | space.read_word(params+6);
 				UINT32 p3 = (space.read_word(params+8)<<16) | space.read_word(params+10);
 				UINT32 p4 = (space.read_word(params+12)<<16) | space.read_word(params+14);
-				esc_cb(&space, p1, p2, p3, p4);
+				esc_cb(space, p1, p2, p3, p4);
 			}
 			break;
 		default:
@@ -531,7 +531,7 @@ WRITE32_MEMBER(konamigx_state::control_w)
   waitskip.data = DATA;      \
   waitskip.mask = MASK;      \
   resume_trigger= 1000;      \
-  space->install_legacy_read_handler \
+  space.install_legacy_read_handler \
   ((BASE+START)&~3, (BASE+END)|3, FUNC(waitskip_r));}
 
 static int suspension_active, resume_trigger;
@@ -909,12 +909,12 @@ READ32_MEMBER(konamigx_state::le2_gun_V_r)
 
 READ32_MEMBER(konamigx_state::gx5bppspr_r)
 {
-	return (K055673_rom_word_r(&space, offset*2+1, 0xffff) | K055673_rom_word_r(&space, offset*2, 0xffff)<<16);
+	return (K055673_rom_word_r(space, offset*2+1, 0xffff) | K055673_rom_word_r(space, offset*2, 0xffff)<<16);
 }
 
 READ32_MEMBER(konamigx_state::gx6bppspr_r)
 {
-	return (K055673_GX6bpp_rom_word_r(&space, offset*2+1, 0xffff) | K055673_GX6bpp_rom_word_r(&space, offset*2, 0xffff)<<16);
+	return (K055673_GX6bpp_rom_word_r(space, offset*2+1, 0xffff) | K055673_GX6bpp_rom_word_r(space, offset*2, 0xffff)<<16);
 }
 
 READ32_MEMBER(konamigx_state::type1_roz_r1)

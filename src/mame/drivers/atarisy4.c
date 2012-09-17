@@ -804,7 +804,7 @@ INLINE UINT8 hex_to_ascii(UINT8 in)
 		return in;
 }
 
-void load_ldafile(address_space *space, const UINT8 *file)
+void load_ldafile(address_space &space, const UINT8 *file)
 {
 #define READ_CHAR()		file[i++]
 	int i = 0;
@@ -847,7 +847,7 @@ void load_ldafile(address_space *space, const UINT8 *file)
 		{
 			UINT8 data = READ_CHAR();
 			sum += data;
-			space->write_byte(addr++, data);
+			space.write_byte(addr++, data);
 		} while (--len);
 
 		sum += READ_CHAR();
@@ -858,7 +858,7 @@ void load_ldafile(address_space *space, const UINT8 *file)
 }
 
 /* Load memory space with data from a Tektronix-Extended HEX file */
-void load_hexfile(address_space *space, const UINT8 *file)
+void load_hexfile(address_space &space, const UINT8 *file)
 {
 #define READ_HEX_CHAR()		hex_to_ascii(file[i++])
 
@@ -942,7 +942,7 @@ void load_hexfile(address_space *space, const UINT8 *file)
 			sum += data & 0xf;
 
 			if (record == 6)
-				space->write_byte(addr++, data);
+				space.write_byte(addr++, data);
 
 			len -= 2;
 		}
@@ -963,7 +963,7 @@ next_line:
 
 DRIVER_INIT_MEMBER(atarisy4_state,laststar)
 {
-	address_space *main = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &main = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Allocate 16kB of shared RAM */
 	m_shared_ram[0] = auto_alloc_array_clear(machine(), UINT16, 0x2000);
@@ -975,7 +975,7 @@ DRIVER_INIT_MEMBER(atarisy4_state,laststar)
 	/* Set up the DSP */
 	membank("dsp0_bank0")->set_base(m_shared_ram[0]);
 	membank("dsp0_bank1")->set_base(&m_shared_ram[0][0x800]);
-	load_ldafile(machine().device("dsp0")->memory().space(AS_PROGRAM), memregion("dsp")->base());
+	load_ldafile(*machine().device("dsp0")->memory().space(AS_PROGRAM), memregion("dsp")->base());
 }
 
 DRIVER_INIT_MEMBER(atarisy4_state,airrace)
@@ -985,17 +985,17 @@ DRIVER_INIT_MEMBER(atarisy4_state,airrace)
 	m_shared_ram[1] = auto_alloc_array_clear(machine(), UINT16, 0x4000);
 
 	/* Populate RAM with data from the HEX files */
-	load_hexfile(machine().device("maincpu")->memory().space(AS_PROGRAM), memregion("code")->base());
+	load_hexfile(*machine().device("maincpu")->memory().space(AS_PROGRAM), memregion("code")->base());
 
 	/* Set up the first DSP */
 	membank("dsp0_bank0")->set_base(m_shared_ram[0]);
 	membank("dsp0_bank1")->set_base(&m_shared_ram[0][0x800]);
-	load_ldafile(machine().device("dsp0")->memory().space(AS_PROGRAM), memregion("dsp")->base());
+	load_ldafile(*machine().device("dsp0")->memory().space(AS_PROGRAM), memregion("dsp")->base());
 
 	/* Set up the second DSP */
 	membank("dsp1_bank0")->set_base(m_shared_ram[1]);
 	membank("dsp1_bank1")->set_base(&m_shared_ram[1][0x800]);
-	load_ldafile(machine().device("dsp1")->memory().space(AS_PROGRAM), memregion("dsp")->base());
+	load_ldafile(*machine().device("dsp1")->memory().space(AS_PROGRAM), memregion("dsp")->base());
 }
 
 void atarisy4_state::machine_reset()

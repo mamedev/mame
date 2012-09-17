@@ -66,29 +66,29 @@ INLINE void WRITE64(UINT32 a, UINT64 d)
 
 /***********************************************************************/
 
-static UINT16 ppc_read16_unaligned(address_space *space, UINT32 a)
+static UINT16 ppc_read16_unaligned(address_space &space, UINT32 a)
 {
 	return ((UINT16)ppc.read8(space, a+0) << 8) | ((UINT16)ppc.read8(space, a+1) << 0);
 }
 
-static UINT32 ppc_read32_unaligned(address_space *space, UINT32 a)
+static UINT32 ppc_read32_unaligned(address_space &space, UINT32 a)
 {
 	return ((UINT32)ppc.read8(space, a+0) << 24) | ((UINT32)ppc.read8(space, a+1) << 16) |
 				   ((UINT32)ppc.read8(space, a+2) << 8) | ((UINT32)ppc.read8(space, a+3) << 0);
 }
 
-static UINT64 ppc_read64_unaligned(address_space *space, UINT32 a)
+static UINT64 ppc_read64_unaligned(address_space &space, UINT32 a)
 {
 	return ((UINT64)READ32(space, a+0) << 32) | (UINT64)(READ32(space, a+4));
 }
 
-static void ppc_write16_unaligned(address_space *space, UINT32 a, UINT16 d)
+static void ppc_write16_unaligned(address_space &space, UINT32 a, UINT16 d)
 {
 	ppc.write8(space, a+0, (UINT8)(d >> 8));
 	ppc.write8(space, a+1, (UINT8)(d));
 }
 
-static void ppc_write32_unaligned(address_space *space, UINT32 a, UINT32 d)
+static void ppc_write32_unaligned(address_space &space, UINT32 a, UINT32 d)
 {
 	ppc.write8(space, a+0, (UINT8)(d >> 24));
 	ppc.write8(space, a+1, (UINT8)(d >> 16));
@@ -96,7 +96,7 @@ static void ppc_write32_unaligned(address_space *space, UINT32 a, UINT32 d)
 	ppc.write8(space, a+3, (UINT8)(d >> 0));
 }
 
-static void ppc_write64_unaligned(address_space *space, UINT32 a, UINT64 d)
+static void ppc_write64_unaligned(address_space &space, UINT32 a, UINT64 d)
 {
 	ppc.write32(space, a+0, (UINT32)(d >> 32));
 	ppc.write32(space, a+4, (UINT32)(d));
@@ -289,59 +289,59 @@ static int ppc_translate_address_cb(address_spacenum space, offs_t *addr)
 	return success;
 }
 
-static UINT8 ppc_read8_translated(address_space *space, offs_t address)
+static UINT8 ppc_read8_translated(address_space &space, offs_t address)
 {
 	ppc_translate_address(&address, PPC_TRANSLATE_DATA | PPC_TRANSLATE_READ);
-	return space->read_byte(address);
+	return space.read_byte(address);
 }
 
-static UINT16 ppc_read16_translated(address_space *space, offs_t address)
+static UINT16 ppc_read16_translated(address_space &space, offs_t address)
 {
 	ppc_translate_address(&address, PPC_TRANSLATE_DATA | PPC_TRANSLATE_READ);
-	return space->read_word(address);
+	return space.read_word(address);
 }
 
-static UINT32 ppc_read32_translated(address_space *space, offs_t address)
+static UINT32 ppc_read32_translated(address_space &space, offs_t address)
 {
 	ppc_translate_address(&address, PPC_TRANSLATE_DATA | PPC_TRANSLATE_READ);
-	return space->read_dword(address);
+	return space.read_dword(address);
 }
 
-static UINT64 ppc_read64_translated(address_space *space, offs_t address)
+static UINT64 ppc_read64_translated(address_space &space, offs_t address)
 {
 	ppc_translate_address(&address, PPC_TRANSLATE_DATA | PPC_TRANSLATE_READ);
-	return space->read_qword(address);
+	return space.read_qword(address);
 }
 
-static void ppc_write8_translated(address_space *space, offs_t address, UINT8 data)
+static void ppc_write8_translated(address_space &space, offs_t address, UINT8 data)
 {
 	ppc_translate_address(&address, PPC_TRANSLATE_DATA | PPC_TRANSLATE_WRITE);
-	space->write_byte(address, data);
+	space.write_byte(address, data);
 }
 
-static void ppc_write16_translated(address_space *space, offs_t address, UINT16 data)
+static void ppc_write16_translated(address_space &space, offs_t address, UINT16 data)
 {
 	ppc_translate_address(&address, PPC_TRANSLATE_DATA | PPC_TRANSLATE_WRITE);
-	space->write_word(address, data);
+	space.write_word(address, data);
 }
 
-static void ppc_write32_translated(address_space *space, offs_t address, UINT32 data)
+static void ppc_write32_translated(address_space &space, offs_t address, UINT32 data)
 {
 	ppc_translate_address(&address, PPC_TRANSLATE_DATA | PPC_TRANSLATE_WRITE);
-	space->write_dword(address, data);
+	space.write_dword(address, data);
 }
 
-static void ppc_write64_translated(address_space *space, offs_t address, UINT64 data)
+static void ppc_write64_translated(address_space &space, offs_t address, UINT64 data)
 {
 	ppc_translate_address(&address, PPC_TRANSLATE_DATA | PPC_TRANSLATE_WRITE);
-	space->write_qword(address, data);
+	space.write_qword(address, data);
 }
 
 #ifndef PPC_DRC
-static UINT32 ppc_readop_translated(address_space *space, offs_t address)
+static UINT32 ppc_readop_translated(address_space &space, offs_t address)
 {
 	ppc_translate_address(&address, PPC_TRANSLATE_CODE | PPC_TRANSLATE_READ);
-	return space->read_dword(address);
+	return space.read_dword(address);
 }
 #endif
 

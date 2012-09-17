@@ -122,8 +122,8 @@ static int DectoBCD(int num)
 }
 
 static void scu_do_transfer(running_machine &machine,UINT8 event);
-static void scu_dma_direct(address_space *space, UINT8 dma_ch);	/*DMA level 0 direct transfer function*/
-static void scu_dma_indirect(address_space *space, UINT8 dma_ch); /*DMA level 0 indirect transfer function*/
+static void scu_dma_direct(address_space &space, UINT8 dma_ch);	/*DMA level 0 direct transfer function*/
+static void scu_dma_indirect(address_space &space, UINT8 dma_ch); /*DMA level 0 indirect transfer function*/
 
 /**************************************************************************************/
 
@@ -239,7 +239,7 @@ DMA TODO:
 static void scu_do_transfer(running_machine &machine,UINT8 event)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	for(i=0;i<3;i++)
@@ -282,7 +282,7 @@ static void scu_test_pending_irq(running_machine &machine)
 
 static READ32_HANDLER( saturn_scu_r )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 	UINT32 res;
 
 	/*TODO: write only registers must return 0 or open bus */
@@ -290,11 +290,11 @@ static READ32_HANDLER( saturn_scu_r )
 	{
 		case 0x5c/4:
 		//  Super Major League and Shin Megami Tensei - Akuma Zensho reads from there (undocumented), DMA status mirror?
-			if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",space->device().safe_pc());
+			if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",space.device().safe_pc());
 			res = state->m_scu_regs[0x7c/4];
 			break;
 		case 0x7c/4:
-			if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",space->device().safe_pc());
+			if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",space.device().safe_pc());
 			res = state->m_scu_regs[offset];
 			break;
 		case 0x80/4:
@@ -305,19 +305,19 @@ static READ32_HANDLER( saturn_scu_r )
         	res = dsp_ram_addr_r();
         	break;
         case 0xa0/4:
-    		if(LOG_SCU) logerror("(PC=%08x) IRQ mask reg read %08x MASK=%08x\n",space->device().safe_pc(),mem_mask,state->m_scu_regs[0xa0/4]);
+    		if(LOG_SCU) logerror("(PC=%08x) IRQ mask reg read %08x MASK=%08x\n",space.device().safe_pc(),mem_mask,state->m_scu_regs[0xa0/4]);
     		res = state->m_scu.ism;
     		break;
     	case 0xa4/4:
-    		if(LOG_SCU) logerror("(PC=%08x) IRQ status reg read %08x MASK=%08x\n",space->device().safe_pc(),mem_mask,state->m_scu_regs[0xa0/4]);
+    		if(LOG_SCU) logerror("(PC=%08x) IRQ status reg read %08x MASK=%08x\n",space.device().safe_pc(),mem_mask,state->m_scu_regs[0xa0/4]);
 			res = state->m_scu.ist;
 			break;
 		case 0xc8/4:
-			logerror("(PC=%08x) SCU version reg read\n",space->device().safe_pc());
+			logerror("(PC=%08x) SCU version reg read\n",space.device().safe_pc());
 			res = 0x00000004;/*SCU Version 4, OK? */
 			break;
 		default:
-	    	if(LOG_SCU) logerror("(PC=%08x) SCU reg read at %d = %08x\n",space->device().safe_pc(),offset,state->m_scu_regs[offset]);
+	    	if(LOG_SCU) logerror("(PC=%08x) SCU reg read at %d = %08x\n",space.device().safe_pc(),offset,state->m_scu_regs[offset]);
 	    	res = state->m_scu_regs[offset];
 			break;
 	}
@@ -329,7 +329,7 @@ static READ32_HANDLER( saturn_scu_r )
 
 static WRITE32_HANDLER( saturn_scu_w )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
 	COMBINE_DATA(&state->m_scu_regs[offset]);
 
@@ -390,10 +390,10 @@ static WRITE32_HANDLER( saturn_scu_w )
 		case 0x98/4: /*if(LOG_SCU) logerror("timer 1 mode data = %08x\n",state->m_scu_regs[38]);*/ break;
 		case 0xa0/4: /* IRQ mask */
 			state->m_scu.ism = state->m_scu_regs[0xa0/4];
-			scu_test_pending_irq(space->machine());
+			scu_test_pending_irq(space.machine());
 			break;
 		case 0xa4/4: /* IRQ control */
-			if(LOG_SCU) logerror("PC=%08x IRQ status reg set:%08x %08x\n",space->device().safe_pc(),state->m_scu_regs[41],mem_mask);
+			if(LOG_SCU) logerror("PC=%08x IRQ status reg set:%08x %08x\n",space.device().safe_pc(),state->m_scu_regs[41],mem_mask);
 			state->m_scu.ist &= state->m_scu_regs[offset];
 			break;
 		case 0xa8/4: if(LOG_SCU) logerror("A-Bus IRQ ACK %08x\n",state->m_scu_regs[42]); break;
@@ -441,28 +441,28 @@ static TIMER_CALLBACK( dma_lv2_ended )
 	DnMV_0(2);
 }
 
-static void scu_single_transfer(address_space *space, UINT32 src, UINT32 dst,UINT8 *src_shift)
+static void scu_single_transfer(address_space &space, UINT32 src, UINT32 dst,UINT8 *src_shift)
 {
 	UINT32 src_data;
 
 	if(src & 1)
 	{
 		/* Road Blaster does a work ram h to color ram with offsetted source address, do some data rotation */
-		src_data = ((space->read_dword(src & 0x07fffffc) & 0x00ffffff)<<8);
-		src_data |= ((space->read_dword((src & 0x07fffffc)+4) & 0xff000000) >> 24);
+		src_data = ((space.read_dword(src & 0x07fffffc) & 0x00ffffff)<<8);
+		src_data |= ((space.read_dword((src & 0x07fffffc)+4) & 0xff000000) >> 24);
 		src_data >>= (*src_shift)*16;
 	}
 	else
-		src_data = space->read_dword(src & 0x07fffffc) >> (*src_shift)*16;
+		src_data = space.read_dword(src & 0x07fffffc) >> (*src_shift)*16;
 
-	space->write_word(dst,src_data);
+	space.write_word(dst,src_data);
 
 	*src_shift ^= 1;
 }
 
-static void scu_dma_direct(address_space *space, UINT8 dma_ch)
+static void scu_dma_direct(address_space &space, UINT8 dma_ch)
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 	UINT32 tmp_src,tmp_dst,tmp_size;
 	UINT8 cd_transfer_flag;
 
@@ -501,9 +501,9 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 
 		for (i = 0; i < state->m_scu.size[dma_ch];i+=state->m_scu.dst_add[dma_ch])
 		{
-			space->write_dword(state->m_scu.dst[dma_ch],space->read_dword(state->m_scu.src[dma_ch]));
+			space.write_dword(state->m_scu.dst[dma_ch],space.read_dword(state->m_scu.src[dma_ch]));
 			if(state->m_scu.dst_add[dma_ch] == 8)
-				space->write_dword(state->m_scu.dst[dma_ch]+4,space->read_dword(state->m_scu.src[dma_ch]));
+				space.write_dword(state->m_scu.dst[dma_ch]+4,space.read_dword(state->m_scu.src[dma_ch]));
 
 			state->m_scu.src[dma_ch]+=state->m_scu.src_add[dma_ch];
 			state->m_scu.dst[dma_ch]+=state->m_scu.dst_add[dma_ch];
@@ -536,16 +536,16 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 		/*TODO: this is completely wrong HW-wise ...  */
 		switch(dma_ch)
 		{
-			case 0: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended)); break;
-			case 1: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended)); break;
-			case 2: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended)); break;
+			case 0: space.machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended)); break;
+			case 1: space.machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended)); break;
+			case 2: space.machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended)); break;
 		}
 	}
 }
 
-static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
+static void scu_dma_indirect(address_space &space,UINT8 dma_ch)
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
 	/*Helper to get out of the cycle*/
 	UINT8 job_done = 0;
@@ -561,9 +561,9 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 	do{
 		tmp_src = state->m_scu.index[dma_ch];
 
-		indirect_size = space->read_dword(state->m_scu.index[dma_ch]);
-		indirect_src  = space->read_dword(state->m_scu.index[dma_ch]+8);
-		indirect_dst  = space->read_dword(state->m_scu.index[dma_ch]+4);
+		indirect_size = space.read_dword(state->m_scu.index[dma_ch]);
+		indirect_src  = space.read_dword(state->m_scu.index[dma_ch]+8);
+		indirect_dst  = space.read_dword(state->m_scu.index[dma_ch]+4);
 
 		/*Indirect Mode end factor*/
 		if(indirect_src & 0x80000000)
@@ -599,8 +599,8 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 			}
 		}
 
-		//if(DRUP(0))   space->write_dword(tmp_src+8,state->m_scu.src[0]|job_done ? 0x80000000 : 0);
-		//if(DWUP(0)) space->write_dword(tmp_src+4,state->m_scu.dst[0]);
+		//if(DRUP(0))   space.write_dword(tmp_src+8,state->m_scu.src[0]|job_done ? 0x80000000 : 0);
+		//if(DWUP(0)) space.write_dword(tmp_src+4,state->m_scu.dst[0]);
 
 		state->m_scu.index[dma_ch] = tmp_src+0xc;
 
@@ -610,9 +610,9 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 		/*TODO: this is completely wrong HW-wise ...  */
 		switch(dma_ch)
 		{
-			case 0: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended)); break;
-			case 1: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended)); break;
-			case 2: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended)); break;
+			case 0: space.machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended)); break;
+			case 1: space.machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended)); break;
+			case 2: space.machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended)); break;
 		}
 	}
 }
@@ -622,18 +622,18 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 
 static WRITE16_HANDLER( saturn_soundram_w )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
-	//space->machine().scheduler().synchronize(); // force resync
+	//space.machine().scheduler().synchronize(); // force resync
 
 	COMBINE_DATA(&state->m_sound_ram[offset]);
 }
 
 static READ16_HANDLER( saturn_soundram_r )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
-	//space->machine().scheduler().synchronize(); // force resync
+	//space.machine().scheduler().synchronize(); // force resync
 
 	return state->m_sound_ram[offset];
 }
@@ -641,26 +641,26 @@ static READ16_HANDLER( saturn_soundram_r )
 /* communication,SLAVE CPU acquires data from the MASTER CPU and triggers an irq.  */
 static WRITE32_HANDLER( minit_w )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
-	//logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space->device().tag(), space->device().safe_pc(),data);
-	space->machine().scheduler().boost_interleave(state->m_minit_boost_timeslice, attotime::from_usec(state->m_minit_boost));
-	space->machine().scheduler().trigger(1000);
+	//logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space.device().tag(), space.device().safe_pc(),data);
+	space.machine().scheduler().boost_interleave(state->m_minit_boost_timeslice, attotime::from_usec(state->m_minit_boost));
+	space.machine().scheduler().trigger(1000);
 	sh2_set_frt_input(state->m_slave, PULSE_LINE);
 }
 
 static WRITE32_HANDLER( sinit_w )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
-	//logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space->device().tag(), space->device().safe_pc(),data);
-	space->machine().scheduler().boost_interleave(state->m_sinit_boost_timeslice, attotime::from_usec(state->m_sinit_boost));
+	//logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space.device().tag(), space.device().safe_pc(),data);
+	space.machine().scheduler().boost_interleave(state->m_sinit_boost_timeslice, attotime::from_usec(state->m_sinit_boost));
 	sh2_set_frt_input(state->m_maincpu, PULSE_LINE);
 }
 
 static READ8_HANDLER(saturn_backupram_r)
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
 	if(!(offset & 1))
 		return 0; // yes, it makes sure the "holes" are there.
@@ -670,7 +670,7 @@ static READ8_HANDLER(saturn_backupram_r)
 
 static WRITE8_HANDLER(saturn_backupram_w)
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
 	if(!(offset & 1))
 		return;
@@ -743,7 +743,7 @@ static NVRAM_HANDLER(saturn)
 
 static READ8_HANDLER( saturn_cart_type_r )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 	const int cart_ram_header[7] = { 0xff, 0x21, 0x22, 0x23, 0x24, 0x5a, 0x5c };
 
 	return cart_ram_header[state->m_cart_type];
@@ -1981,35 +1981,35 @@ static WRITE32_HANDLER( saturn_null_ram_w )
 
 static READ32_HANDLER( saturn_cart_dram0_r )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
 	return state->m_cart_dram[offset];
 }
 
 static WRITE32_HANDLER( saturn_cart_dram0_w )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
 	COMBINE_DATA(&state->m_cart_dram[offset]);
 }
 
 static READ32_HANDLER( saturn_cart_dram1_r )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
 	return state->m_cart_dram[offset+0x200000/4];
 }
 
 static WRITE32_HANDLER( saturn_cart_dram1_w )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
 	COMBINE_DATA(&state->m_cart_dram[offset+0x200000/4]);
 }
 
 static READ32_HANDLER( saturn_cs1_r )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 	UINT32 res;
 
 	res = 0;
@@ -2023,7 +2023,7 @@ static READ32_HANDLER( saturn_cs1_r )
 
 static WRITE32_HANDLER( saturn_cs1_w )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
+	saturn_state *state = space.machine().driver_data<saturn_state>();
 
 	if(ACCESSING_BITS_16_23)
 		state->m_cart_backupram[offset*2+0] = (data & 0x00ff0000) >> 16;

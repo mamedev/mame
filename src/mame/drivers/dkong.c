@@ -347,8 +347,8 @@ Donkey Kong Junior Notes
  *
  *************************************/
 
-static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
-static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
+static UINT8 memory_read_byte(address_space &space, offs_t address) { return space.read_byte(address); }
+static void memory_write_byte(address_space &space, offs_t address, UINT8 data) { space.write_byte(address, data); }
 
 static Z80DMA_INTERFACE( dk3_dma )
 {
@@ -3139,17 +3139,17 @@ DRIVER_INIT_MEMBER(dkong_state,strtheat)
 DRIVER_INIT_MEMBER(dkong_state,dkongx)
 {
 	UINT8 *decrypted;
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x5fff, "bank1" );
     machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0xffff, "bank2" );
 
-	space->install_write_handler(0xe000, 0xe000, write8_delegate(FUNC(dkong_state::braze_a15_w),this));
+	space.install_write_handler(0xe000, 0xe000, write8_delegate(FUNC(dkong_state::braze_a15_w),this));
 
-	space->install_read_handler(0xc800, 0xc800, read8_delegate(FUNC(dkong_state::braze_eeprom_r),this));
-	space->install_write_handler(0xc800, 0xc800, write8_delegate(FUNC(dkong_state::braze_eeprom_w),this));
+	space.install_read_handler(0xc800, 0xc800, read8_delegate(FUNC(dkong_state::braze_eeprom_r),this));
+	space.install_write_handler(0xc800, 0xc800, write8_delegate(FUNC(dkong_state::braze_eeprom_w),this));
 
 	braze_decrypt_rom(machine(), decrypted);
 

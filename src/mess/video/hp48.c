@@ -123,14 +123,14 @@ void hp48_state::palette_init()
 	data >>= 1
 
 #define draw_quart					\
-	UINT8 data = space->read_byte( addr );	\
+	UINT8 data = space.read_byte( addr );	\
 	draw_pixel; draw_pixel; draw_pixel; draw_pixel;
 
 
 SCREEN_UPDATE_IND16 ( hp48 )
 {
 	hp48_state *state = screen.machine().driver_data<hp48_state>();
-	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int x, y, xp, i, addr;
 	int display       = HP48_IO_4(0) >> 3;           /* 1=on, 0=off */
 	int left_margin   = HP48_IO_4(0) & 7;            /* 0..7 pixels for main bitmap */

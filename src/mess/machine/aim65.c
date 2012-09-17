@@ -141,10 +141,10 @@ WRITE8_MEMBER( aim65_state::aim65_riot_a_w )
 void aim65_state::machine_start()
 {
 	ram_device *ram = machine().device<ram_device>(RAM_TAG);
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Init RAM */
-	space->install_ram(0x0000, ram->size() - 1, ram->pointer());
+	space.install_ram(0x0000, ram->size() - 1, ram->pointer());
 
 	m_pb_save = 0;
 }

@@ -25,14 +25,14 @@
 
 
 #ifdef UNUSED_DEFINITION
-INLINE UINT16 galpani2_bg8_regs_r(address_space *space, offs_t offset, int n)
+INLINE UINT16 galpani2_bg8_regs_r(address_space &space, offs_t offset, int n)
 {
-	galpani2_state *state = space->machine().driver_data<galpani2_state>();
+	galpani2_state *state = space.machine().driver_data<galpani2_state>();
 	switch (offset * 2)
 	{
-		case 0x16:	return space->machine().rand() & 1;
+		case 0x16:	return space.machine().rand() & 1;
 		default:
-			logerror("CPU #0 PC %06X : Warning, bg8 #%d screen reg %04X read\n",space->cpu->safe_pc(),_n_,offset*2);
+			logerror("CPU #0 PC %06X : Warning, bg8 #%d screen reg %04X read\n",space.cpu->safe_pc(),_n_,offset*2);
 	}
 	return state->m_bg8_regs[_n_][offset];
 }
@@ -44,9 +44,9 @@ INLINE UINT16 galpani2_bg8_regs_r(address_space *space, offs_t offset, int n)
     c04         0003 flip, 0300 flip?
     c1c/e       01ff scroll, 3000 ?
 */
-INLINE void galpani2_bg8_regs_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int _n_)
+INLINE void galpani2_bg8_regs_w(address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask, int _n_)
 {
-	galpani2_state *state = space->machine().driver_data<galpani2_state>();
+	galpani2_state *state = space.machine().driver_data<galpani2_state>();
 	COMBINE_DATA(&state->m_bg8_regs[_n_][offset]);
 }
 
@@ -57,9 +57,9 @@ WRITE16_HANDLER( galpani2_bg8_regs_0_w ) { galpani2_bg8_regs_w(space, offset, da
 WRITE16_HANDLER( galpani2_bg8_regs_1_w ) { galpani2_bg8_regs_w(space, offset, data, mem_mask, 1); }
 #endif
 
-INLINE void galpani2_bg8_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int _n_)
+INLINE void galpani2_bg8_w(address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask, int _n_)
 {
-	galpani2_state *state = space->machine().driver_data<galpani2_state>();
+	galpani2_state *state = space.machine().driver_data<galpani2_state>();
 	int x,y,pen;
 	UINT16 newword = COMBINE_DATA(&state->m_bg8[_n_][offset]);
 	pen	=	newword & 0xff;
@@ -71,11 +71,11 @@ INLINE void galpani2_bg8_w(address_space *space, offs_t offset, UINT16 data, UIN
 WRITE16_HANDLER( galpani2_bg8_0_w ) { galpani2_bg8_w(space, offset, data, mem_mask, 0); }
 WRITE16_HANDLER( galpani2_bg8_1_w ) { galpani2_bg8_w(space, offset, data, mem_mask, 1); }
 
-INLINE void galpani2_palette_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int _n_)
+INLINE void galpani2_palette_w(address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask, int _n_)
 {
-	galpani2_state *state = space->machine().driver_data<galpani2_state>();
+	galpani2_state *state = space.machine().driver_data<galpani2_state>();
 	UINT16 newword = COMBINE_DATA(&state->m_palette[_n_][offset]);
-	palette_set_color_rgb( space->machine(), offset + 0x4000 + _n_ * 0x100, pal5bit(newword >> 5), pal5bit(newword >> 10), pal5bit(newword >> 0) );
+	palette_set_color_rgb( space.machine(), offset + 0x4000 + _n_ * 0x100, pal5bit(newword >> 5), pal5bit(newword >> 10), pal5bit(newword >> 0) );
 }
 
 WRITE16_HANDLER( galpani2_palette_0_w ) { galpani2_palette_w(space, offset, data, mem_mask, 0); }
@@ -93,7 +93,7 @@ WRITE16_HANDLER( galpani2_palette_1_w ) { galpani2_palette_w(space, offset, data
 /* 8 horizontal pages of 256x256 pixels? */
 WRITE16_HANDLER( galpani2_bg15_w )
 {
-	galpani2_state *state = space->machine().driver_data<galpani2_state>();
+	galpani2_state *state = space.machine().driver_data<galpani2_state>();
 	UINT16 newword = COMBINE_DATA(&state->m_bg15[offset]);
 
 	int x = (offset % 256) + (offset / (256*256)) * 256 ;

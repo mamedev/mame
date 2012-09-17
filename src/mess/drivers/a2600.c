@@ -1142,12 +1142,12 @@ DIRECT_UPDATE_MEMBER(a2600_state::modeFE_opbase_handler)
 static void modeFE_switch(running_machine &machine,UINT16 offset, UINT8 data)
 {
 	a2600_state *state = machine.driver_data<a2600_state>();
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 	/* Retrieve last byte read by the cpu (for this mapping scheme this
        should be the last byte that was on the data bus
     */
 	state->m_FETimer = 1;
-	state->m_FE_old_opbase_handler = space->set_direct_update_handler(direct_update_delegate(FUNC(a2600_state::modeFE_opbase_handler), state));
+	state->m_FE_old_opbase_handler = space.set_direct_update_handler(direct_update_delegate(FUNC(a2600_state::modeFE_opbase_handler), state));
 }
 
 READ8_MEMBER(a2600_state::modeFE_switch_r)
@@ -1732,7 +1732,7 @@ static void set_controller( running_machine &machine, const char *controller, un
 
 void a2600_state::machine_reset()
 {
-	address_space* space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int chip = 0xFF;
 	static const unsigned char snowwhite[] = { 0x10, 0xd0, 0xff, 0xff }; // Snow White Proto
 
@@ -1911,7 +1911,7 @@ void a2600_state::machine_reset()
 
 	if (m_banking_mode == modeDC)
 	{
-		space->install_read_handler(0x1fec, 0x1fec, read8_delegate(FUNC(a2600_state::current_bank_r),this));
+		space.install_read_handler(0x1fec, 0x1fec, read8_delegate(FUNC(a2600_state::current_bank_r),this));
 	}
 
 	/* set up bank switch registers */
@@ -1919,89 +1919,89 @@ void a2600_state::machine_reset()
 	switch (m_banking_mode)
 	{
 	case modeF8:
-		space->install_write_handler(0x1ff8, 0x1ff9, write8_delegate(FUNC(a2600_state::modeF8_switch_w),this));
-		space->install_read_handler(0x1ff8, 0x1ff9, read8_delegate(FUNC(a2600_state::modeF8_switch_r),this));
+		space.install_write_handler(0x1ff8, 0x1ff9, write8_delegate(FUNC(a2600_state::modeF8_switch_w),this));
+		space.install_read_handler(0x1ff8, 0x1ff9, read8_delegate(FUNC(a2600_state::modeF8_switch_r),this));
 		break;
 
 	case modeFA:
-		space->install_write_handler(0x1ff8, 0x1ffa, write8_delegate(FUNC(a2600_state::modeFA_switch_w),this));
-		space->install_read_handler(0x1ff8, 0x1ffa, read8_delegate(FUNC(a2600_state::modeFA_switch_r),this));
+		space.install_write_handler(0x1ff8, 0x1ffa, write8_delegate(FUNC(a2600_state::modeFA_switch_w),this));
+		space.install_read_handler(0x1ff8, 0x1ffa, read8_delegate(FUNC(a2600_state::modeFA_switch_r),this));
 		break;
 
 	case modeF6:
-		space->install_write_handler(0x1ff6, 0x1ff9, write8_delegate(FUNC(a2600_state::modeF6_switch_w),this));
-		space->install_read_handler(0x1ff6, 0x1ff9, read8_delegate(FUNC(a2600_state::modeF6_switch_r),this));
-		space->set_direct_update_handler(direct_update_delegate(FUNC(a2600_state::modeF6_opbase), this));
+		space.install_write_handler(0x1ff6, 0x1ff9, write8_delegate(FUNC(a2600_state::modeF6_switch_w),this));
+		space.install_read_handler(0x1ff6, 0x1ff9, read8_delegate(FUNC(a2600_state::modeF6_switch_r),this));
+		space.set_direct_update_handler(direct_update_delegate(FUNC(a2600_state::modeF6_opbase), this));
 		break;
 
 	case modeF4:
-		space->install_write_handler(0x1ff4, 0x1ffb, write8_delegate(FUNC(a2600_state::modeF4_switch_w),this));
-		space->install_read_handler(0x1ff4, 0x1ffb, read8_delegate(FUNC(a2600_state::modeF4_switch_r),this));
+		space.install_write_handler(0x1ff4, 0x1ffb, write8_delegate(FUNC(a2600_state::modeF4_switch_w),this));
+		space.install_read_handler(0x1ff4, 0x1ffb, read8_delegate(FUNC(a2600_state::modeF4_switch_r),this));
 		break;
 
 	case modeE0:
-		space->install_write_handler(0x1fe0, 0x1ff8, write8_delegate(FUNC(a2600_state::modeE0_switch_w),this));
-		space->install_read_handler(0x1fe0, 0x1ff8, read8_delegate(FUNC(a2600_state::modeE0_switch_r),this));
+		space.install_write_handler(0x1fe0, 0x1ff8, write8_delegate(FUNC(a2600_state::modeE0_switch_w),this));
+		space.install_read_handler(0x1fe0, 0x1ff8, read8_delegate(FUNC(a2600_state::modeE0_switch_r),this));
 		break;
 
 	case mode3F:
-		space->install_write_handler(0x00, 0x3f, write8_delegate(FUNC(a2600_state::mode3F_switch_w),this));
+		space.install_write_handler(0x00, 0x3f, write8_delegate(FUNC(a2600_state::mode3F_switch_w),this));
 		break;
 
 	case modeUA:
-		space->install_write_handler(0x200, 0x27f, write8_delegate(FUNC(a2600_state::modeUA_switch_w),this));
-		space->install_read_handler(0x200, 0x27f, read8_delegate(FUNC(a2600_state::modeUA_switch_r),this));
+		space.install_write_handler(0x200, 0x27f, write8_delegate(FUNC(a2600_state::modeUA_switch_w),this));
+		space.install_read_handler(0x200, 0x27f, read8_delegate(FUNC(a2600_state::modeUA_switch_r),this));
 		break;
 
 	case modeE7:
-		space->install_write_handler(0x1fe0, 0x1fe7, write8_delegate(FUNC(a2600_state::modeE7_switch_w),this));
-		space->install_read_handler(0x1fe0, 0x1fe7, read8_delegate(FUNC(a2600_state::modeE7_switch_r),this));
-		space->install_write_handler(0x1fe8, 0x1feb, write8_delegate(FUNC(a2600_state::modeE7_RAM_switch_w),this));
-		space->install_read_handler(0x1fe8, 0x1feb, read8_delegate(FUNC(a2600_state::modeE7_RAM_switch_r),this));
-		space->install_readwrite_bank(0x1800, 0x18ff, "bank9");
+		space.install_write_handler(0x1fe0, 0x1fe7, write8_delegate(FUNC(a2600_state::modeE7_switch_w),this));
+		space.install_read_handler(0x1fe0, 0x1fe7, read8_delegate(FUNC(a2600_state::modeE7_switch_r),this));
+		space.install_write_handler(0x1fe8, 0x1feb, write8_delegate(FUNC(a2600_state::modeE7_RAM_switch_w),this));
+		space.install_read_handler(0x1fe8, 0x1feb, read8_delegate(FUNC(a2600_state::modeE7_RAM_switch_r),this));
+		space.install_readwrite_bank(0x1800, 0x18ff, "bank9");
 		membank("bank9")->set_base(m_extra_RAM->base() + 4 * 256 );
 		break;
 
 	case modeDC:
-		space->install_write_handler(0x1ff0, 0x1ff0, write8_delegate(FUNC(a2600_state::modeDC_switch_w),this));
-		space->install_read_handler(0x1ff0, 0x1ff0, read8_delegate(FUNC(a2600_state::modeDC_switch_r),this));
+		space.install_write_handler(0x1ff0, 0x1ff0, write8_delegate(FUNC(a2600_state::modeDC_switch_w),this));
+		space.install_read_handler(0x1ff0, 0x1ff0, read8_delegate(FUNC(a2600_state::modeDC_switch_r),this));
 		break;
 
 	case modeFE:
-		space->install_write_handler(0x01fe, 0x01fe, write8_delegate(FUNC(a2600_state::modeFE_switch_w),this));
-		space->install_read_handler(0x01fe, 0x01fe, read8_delegate(FUNC(a2600_state::modeFE_switch_r),this));
+		space.install_write_handler(0x01fe, 0x01fe, write8_delegate(FUNC(a2600_state::modeFE_switch_w),this));
+		space.install_read_handler(0x01fe, 0x01fe, read8_delegate(FUNC(a2600_state::modeFE_switch_r),this));
 		break;
 
 	case mode3E:
-		space->install_write_handler(0x3e, 0x3e, write8_delegate(FUNC(a2600_state::mode3E_RAM_switch_w),this));
-		space->install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(a2600_state::mode3E_switch_w),this));
-		space->install_write_handler(0x1400, 0x15ff, write8_delegate(FUNC(a2600_state::mode3E_RAM_w),this));
+		space.install_write_handler(0x3e, 0x3e, write8_delegate(FUNC(a2600_state::mode3E_RAM_switch_w),this));
+		space.install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(a2600_state::mode3E_switch_w),this));
+		space.install_write_handler(0x1400, 0x15ff, write8_delegate(FUNC(a2600_state::mode3E_RAM_w),this));
 		break;
 
 	case modeSS:
-		space->install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(a2600_state::modeSS_r),this));
+		space.install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(a2600_state::modeSS_r),this));
 		m_bank_base[1] = m_extra_RAM->base() + 2 * 0x800;
 		m_bank_base[2] = CART_MEMBER;
 		membank("bank1")->set_base(m_bank_base[1] );
 		membank("bank2")->set_base(m_bank_base[2] );
 		m_modeSS_write_enabled = 0;
 		m_modeSS_byte_started = 0;
-		space->set_direct_update_handler(direct_update_delegate(FUNC(a2600_state::modeSS_opbase), this));
+		space.set_direct_update_handler(direct_update_delegate(FUNC(a2600_state::modeSS_opbase), this));
 		/* The Supercharger has no motor control so just enable it */
 		machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MOTOR_DISABLED );
 		break;
 
 	case modeFV:
-		space->install_write_handler(0x1fd0, 0x1fd0, write8_delegate(FUNC(a2600_state::modeFV_switch_w),this));
-		space->install_read_handler(0x1fd0, 0x1fd0, read8_delegate(FUNC(a2600_state::modeFV_switch_r),this));
+		space.install_write_handler(0x1fd0, 0x1fd0, write8_delegate(FUNC(a2600_state::modeFV_switch_w),this));
+		space.install_read_handler(0x1fd0, 0x1fd0, read8_delegate(FUNC(a2600_state::modeFV_switch_r),this));
 		break;
 
 	case modeDPC:
-		space->install_read_handler(0x1000, 0x103f, read8_delegate(FUNC(a2600_state::modeDPC_r),this));
-		space->install_write_handler(0x1040, 0x107f, write8_delegate(FUNC(a2600_state::modeDPC_w),this));
-		space->install_write_handler(0x1ff8, 0x1ff9, write8_delegate(FUNC(a2600_state::modeF8_switch_w),this));
-		space->install_read_handler(0x1ff8, 0x1ff9, read8_delegate(FUNC(a2600_state::modeF8_switch_r),this));
-		space->set_direct_update_handler(direct_update_delegate(FUNC(a2600_state::modeDPC_opbase_handler), this));
+		space.install_read_handler(0x1000, 0x103f, read8_delegate(FUNC(a2600_state::modeDPC_r),this));
+		space.install_write_handler(0x1040, 0x107f, write8_delegate(FUNC(a2600_state::modeDPC_w),this));
+		space.install_write_handler(0x1ff8, 0x1ff9, write8_delegate(FUNC(a2600_state::modeF8_switch_w),this));
+		space.install_read_handler(0x1ff8, 0x1ff9, read8_delegate(FUNC(a2600_state::modeF8_switch_r),this));
+		space.set_direct_update_handler(direct_update_delegate(FUNC(a2600_state::modeDPC_opbase_handler), this));
 		{
 			int	data_fetcher;
 			for( data_fetcher = 0; data_fetcher < 8; data_fetcher++ )
@@ -2020,8 +2020,8 @@ void a2600_state::machine_reset()
 		break;
 
 	case modeJVP:
-		space->install_read_handler(0x0FA0, 0x0FC0, read8_delegate(FUNC(a2600_state::modeJVP_switch_r),this));
-		space->install_write_handler(0x0FA0, 0x0FC0, write8_delegate(FUNC(a2600_state::modeJVP_switch_w),this));
+		space.install_read_handler(0x0FA0, 0x0FC0, read8_delegate(FUNC(a2600_state::modeJVP_switch_r),this));
+		space.install_write_handler(0x0FA0, 0x0FC0, write8_delegate(FUNC(a2600_state::modeJVP_switch_w),this));
 		break;
 	}
 
@@ -2029,24 +2029,24 @@ void a2600_state::machine_reset()
 
 	if (m_banking_mode == modeFA)
 	{
-		space->install_write_bank(0x1000, 0x10ff, "bank9");
-		space->install_read_bank(0x1100, 0x11ff, "bank9");
+		space.install_write_bank(0x1000, 0x10ff, "bank9");
+		space.install_read_bank(0x1100, 0x11ff, "bank9");
 
 		membank("bank9")->set_base(m_extra_RAM->base());
 	}
 
 	if (m_banking_mode == modeCV)
 	{
-		space->install_write_bank(0x1400, 0x17ff, "bank9");
-		space->install_read_bank(0x1000, 0x13ff, "bank9");
+		space.install_write_bank(0x1400, 0x17ff, "bank9");
+		space.install_read_bank(0x1000, 0x13ff, "bank9");
 
 		membank("bank9")->set_base(m_extra_RAM->base());
 	}
 
 	if (chip)
 	{
-		space->install_write_bank(0x1000, 0x107f, "bank9");
-		space->install_read_bank(0x1080, 0x10ff, "bank9");
+		space.install_write_bank(0x1000, 0x107f, "bank9");
+		space.install_read_bank(0x1080, 0x10ff, "bank9");
 
 		membank("bank9")->set_base(m_extra_RAM->base());
 	}

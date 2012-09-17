@@ -38,12 +38,12 @@ Encryption PAL 16R4 on CPU board
 
 DRIVER_INIT_MEMBER(stfight_state,empcity)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = memregion("maincpu")->base();
 	int A;
 
 	m_decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
-	space->set_decrypted_region(0x0000, 0x7fff, m_decrypt);
+	space.set_decrypted_region(0x0000, 0x7fff, m_decrypt);
 
 	for (A = 0;A < 0x8000;A++)
 	{
@@ -82,7 +82,7 @@ DRIVER_INIT_MEMBER(stfight_state,stfight)
 
 void stfight_state::machine_reset()
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	m_adpcm_data_offs = m_adpcm_data_end = 0;
 	m_toggle = 0;
 	m_fm_data = 0;
@@ -93,7 +93,7 @@ void stfight_state::machine_reset()
 	m_coin_mech_query = 0;
 
     // initialise rom bank
-    stfight_bank_w(*space, 0, 0 );
+    stfight_bank_w(space, 0, 0 );
 }
 
 // It's entirely possible that this bank is never switched out

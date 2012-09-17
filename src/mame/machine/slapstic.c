@@ -864,7 +864,7 @@ int slapstic_bank(void)
  *
  *************************************/
 
-static int alt2_kludge(address_space *space, offs_t offset)
+static int alt2_kludge(address_space &space, offs_t offset)
 {
 	/* Of the 3 alternate addresses, only the middle one needs to actually hit
        in the slapstic region; the first and third ones can be anywhere in the
@@ -876,15 +876,15 @@ static int alt2_kludge(address_space *space, offs_t offset)
 	if (access_68k)
 	{
 		/* first verify that the prefetched PC matches the first alternate */
-		if (MATCHES_MASK_VALUE(space->device().safe_pc() >> 1, slapstic.alt1))
+		if (MATCHES_MASK_VALUE(space.device().safe_pc() >> 1, slapstic.alt1))
 		{
 			/* now look for a move.w (An),(An) or cmpm.w (An)+,(An)+ */
-			UINT16 opcode = space->direct().read_decrypted_word(space->device().safe_pcbase() & 0xffffff);
+			UINT16 opcode = space.direct().read_decrypted_word(space.device().safe_pcbase() & 0xffffff);
 			if ((opcode & 0xf1f8) == 0x3090 || (opcode & 0xf1f8) == 0xb148)
 			{
 				/* fetch the value of the register for the second operand, and see */
 				/* if it matches the third alternate */
-				UINT32 regval = space->device().state().state_int(M68K_A0 + ((opcode >> 9) & 7)) >> 1;
+				UINT32 regval = space.device().state().state_int(M68K_A0 + ((opcode >> 9) & 7)) >> 1;
 				if (MATCHES_MASK_VALUE(regval, slapstic.alt3))
 				{
 					alt_bank = (regval >> slapstic.altshift) & 3;
@@ -911,7 +911,7 @@ static int alt2_kludge(address_space *space, offs_t offset)
  *
  *************************************/
 
-int slapstic_tweak(address_space *space, offs_t offset)
+int slapstic_tweak(address_space &space, offs_t offset)
 {
 	/* reset is universal */
 	if (offset == 0x0000)
@@ -1121,7 +1121,7 @@ int slapstic_tweak(address_space *space, offs_t offset)
 
 	/* log this access */
 	if (LOG_SLAPSTIC)
-		slapstic_log(space->machine(), offset);
+		slapstic_log(space.machine(), offset);
 
 	/* return the active bank */
 	return current_bank;

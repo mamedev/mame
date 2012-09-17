@@ -207,17 +207,17 @@ WRITE16_MEMBER(segas32_state::brival_protection_w)
 
 void darkedge_fd1149_vblank(device_t *device)
 {
-	address_space *space = device->memory().space(AS_PROGRAM);
+	address_space &space = *device->memory().space(AS_PROGRAM);
 
-	space->write_word(0x20f072, 0);
-	space->write_word(0x20f082, 0);
+	space.write_word(0x20f072, 0);
+	space.write_word(0x20f082, 0);
 
-	if( space->read_byte(0x20a12c) != 0 )
+	if( space.read_byte(0x20a12c) != 0 )
 	{
-		space->write_byte(0x20a12c, space->read_byte(0x20a12c)-1 );
+		space.write_byte(0x20a12c, space.read_byte(0x20a12c)-1 );
 
-		if( space->read_byte(0x20a12c) == 0 )
-			space->write_byte(0x20a12e, 1);
+		if( space.read_byte(0x20a12c) == 0 )
+			space.write_byte(0x20a12e, 1);
 	}
 }
 
@@ -243,13 +243,13 @@ READ16_MEMBER(segas32_state::darkedge_protection_r)
 
 void f1lap_fd1149_vblank(device_t *device)
 {
-	address_space *space = device->memory().space(AS_PROGRAM);
+	address_space &space = *device->memory().space(AS_PROGRAM);
 
-	space->write_byte(0x20F7C6, 0);
+	space.write_byte(0x20F7C6, 0);
 
 	// needed to start a game
-	UINT8 val = space->read_byte(0x20EE81);
-	if (val == 0xff)  space->write_byte(0x20EE81,0);
+	UINT8 val = space.read_byte(0x20EE81);
+	if (val == 0xff)  space.write_byte(0x20EE81,0);
 
 }
 

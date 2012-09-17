@@ -184,9 +184,9 @@ TILE_GET_INFO_MEMBER(ojankohs_state::ojankoy_get_tile_info)
 
 ******************************************************************************/
 
-void ojankoc_flipscreen( address_space *space, int data )
+void ojankoc_flipscreen( address_space &space, int data )
 {
-	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
+	ojankohs_state *state = space.machine().driver_data<ojankohs_state>();
 	int x, y;
 	UINT8 color1, color2;
 
@@ -201,13 +201,13 @@ void ojankoc_flipscreen( address_space *space, int data )
 		{
 			color1 = state->m_videoram[0x0000 + ((y * 256) + x)];
 			color2 = state->m_videoram[0x3fff - ((y * 256) + x)];
-			state->ojankoc_videoram_w(*space, 0x0000 + ((y * 256) + x), color2);
-			state->ojankoc_videoram_w(*space, 0x3fff - ((y * 256) + x), color1);
+			state->ojankoc_videoram_w(space, 0x0000 + ((y * 256) + x), color2);
+			state->ojankoc_videoram_w(space, 0x3fff - ((y * 256) + x), color1);
 
 			color1 = state->m_videoram[0x4000 + ((y * 256) + x)];
 			color2 = state->m_videoram[0x7fff - ((y * 256) + x)];
-			state->ojankoc_videoram_w(*space, 0x4000 + ((y * 256) + x), color2);
-			state->ojankoc_videoram_w(*space, 0x7fff - ((y * 256) + x), color1);
+			state->ojankoc_videoram_w(space, 0x4000 + ((y * 256) + x), color2);
+			state->ojankoc_videoram_w(space, 0x7fff - ((y * 256) + x), color1);
 		}
 	}
 
@@ -309,12 +309,12 @@ SCREEN_UPDATE_IND16( ojankoc )
 
 	if (state->m_screen_refresh)
 	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		/* redraw bitmap */
 		for (offs = 0; offs < 0x8000; offs++)
 		{
-			state->ojankoc_videoram_w(*space, offs, state->m_videoram[offs]);
+			state->ojankoc_videoram_w(space, offs, state->m_videoram[offs]);
 		}
 		state->m_screen_refresh = 0;
 	}

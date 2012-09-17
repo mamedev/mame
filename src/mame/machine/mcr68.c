@@ -289,8 +289,8 @@ WRITE8_DEVICE_HANDLER( zwackery_pia1_w )
 WRITE_LINE_DEVICE_HANDLER( zwackery_ca2_w )
 {
 	mcr68_state *drvstate = device->machine().driver_data<mcr68_state>();
-	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	drvstate->m_chip_squeak_deluxe->write(*space, 0, (state << 4) | drvstate->m_zwackery_sound_data);
+	address_space &space = *device->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	drvstate->m_chip_squeak_deluxe->write(space, 0, (state << 4) | drvstate->m_zwackery_sound_data);
 }
 
 

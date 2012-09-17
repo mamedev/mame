@@ -273,7 +273,7 @@ WRITE8_MEMBER(rallyx_state::locomotn_latch_w)
 	switch (offset)
 	{
 		case 0x00:	/* SOUNDON */
-			timeplt_sh_irqtrigger_w(&space,0,bit);
+			timeplt_sh_irqtrigger_w(space,0,bit);
 			break;
 
 		case 0x01:	/* INTST */

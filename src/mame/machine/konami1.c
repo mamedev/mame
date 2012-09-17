@@ -42,13 +42,13 @@ static UINT8 konami1_decodebyte( UINT8 opcode, UINT16 address )
 
 UINT8 *konami1_decode(running_machine &machine, const char *cpu)
 {
-	address_space *space = machine.device(cpu)->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device(cpu)->memory().space(AS_PROGRAM);
 	const UINT8 *rom = machine.root_device().memregion(cpu)->base();
 	int size = machine.root_device().memregion(cpu)->bytes();
 	int A;
 
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, size);
-	space->set_decrypted_region(0x0000, 0xffff, decrypted);
+	space.set_decrypted_region(0x0000, 0xffff, decrypted);
 
 	for (A = 0;A < size;A++)
 	{

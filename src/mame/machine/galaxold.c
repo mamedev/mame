@@ -319,11 +319,11 @@ DRIVER_INIT_MEMBER(galaxold_state,mooncrgx)
 DRIVER_INIT_MEMBER(galaxold_state,moonqsr)
 {
 	offs_t i;
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
 
-	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
+	space.set_decrypted_region(0x0000, 0x7fff, decrypt);
 
 	for (i = 0;i < 0x8000;i++)
 		decrypt[i] = decode_mooncrst(rom[i],i);
@@ -397,7 +397,7 @@ Pin layout is such that links can replace the PAL if encryption is not used.
 
 DRIVER_INIT_MEMBER(galaxold_state,4in1)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	offs_t i, len = memregion("maincpu")->bytes();
 	UINT8 *RAM = memregion("maincpu")->base();
 
@@ -408,7 +408,7 @@ DRIVER_INIT_MEMBER(galaxold_state,4in1)
 	/* games are banked at 0x0000 - 0x3fff */
 	membank("bank1")->configure_entries(0, 4, &RAM[0x10000], 0x4000);
 
-	_4in1_bank_w(*space, 0, 0); /* set the initial CPU bank */
+	_4in1_bank_w(space, 0, 0); /* set the initial CPU bank */
 
 	state_save_register_global(machine(), m__4in1_bank);
 }

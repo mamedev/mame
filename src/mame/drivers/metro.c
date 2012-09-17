@@ -133,10 +133,10 @@ READ16_MEMBER(metro_state::metro_irq_cause_r)
 static void update_irq_state( running_machine &machine )
 {
 	metro_state *state = machine.driver_data<metro_state>();
-	address_space *space = state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = *state->m_maincpu->space(AS_PROGRAM);
 
 	/*  Get the pending IRQs (only the enabled ones, e.g. where irq_enable is *0*)  */
-	UINT16 irq = state->metro_irq_cause_r(*space, 0, 0xffff) & ~*state->m_irq_enable;
+	UINT16 irq = state->metro_irq_cause_r(space, 0, 0xffff) & ~*state->m_irq_enable;
 
 	if (state->m_irq_line == -1)	/* mouja, gakusai, gakusai2, dokyusei, dokyusp */
 	{
@@ -266,15 +266,15 @@ static void ymf278b_interrupt( device_t *device, int active )
 static int metro_io_callback( device_t *device, int ioline, int state )
 {
 	metro_state *driver_state = device->machine().driver_data<metro_state>();
-	address_space *space = driver_state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = *driver_state->m_maincpu->space(AS_PROGRAM);
 	UINT8 data = 0;
 
 	switch (ioline)
 	{
 		case UPD7810_RXD:	/* read the RxD line */
-			data = driver_state->soundlatch_byte_r(*space, 0);
+			data = driver_state->soundlatch_byte_r(space, 0);
 			state = data & 1;
-			driver_state->soundlatch_byte_w(*space, 0, data >> 1);
+			driver_state->soundlatch_byte_w(space, 0, data >> 1);
 			break;
 		default:
 			logerror("upd7810 ioline %d not handled\n", ioline);
@@ -580,15 +580,15 @@ INLINE int blt_read( const UINT8 *ROM, const int offs )
 	return ROM[offs];
 }
 
-void metro_state::blt_write( address_space *space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask )
+void metro_state::blt_write( address_space &space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask )
 {
 	switch(tmap)
 	{
-		case 1:	metro_vram_0_w(*space, offs, data, mask);	break;
-		case 2:	metro_vram_1_w(*space, offs, data, mask);	break;
-		case 3:	metro_vram_2_w(*space, offs, data, mask);	break;
+		case 1:	metro_vram_0_w(space, offs, data, mask);	break;
+		case 2:	metro_vram_1_w(space, offs, data, mask);	break;
+		case 3:	metro_vram_2_w(space, offs, data, mask);	break;
 	}
-//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", space->machine().describe_context(), tmap, offs, data, mask);
+//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", space.machine().describe_context(), tmap, offs, data, mask);
 }
 
 
@@ -655,7 +655,7 @@ WRITE16_MEMBER(metro_state::metro_blitter_w)
 					src_offs++;
 
 					dst_offs &= 0xffff;
-					blt_write(&space, tmap, dst_offs, b2, mask);
+					blt_write(space, tmap, dst_offs, b2, mask);
 					dst_offs = ((dst_offs + 1) & (0x100 - 1)) | (dst_offs & (~(0x100 - 1)));
 				}
 				break;
@@ -669,7 +669,7 @@ WRITE16_MEMBER(metro_state::metro_blitter_w)
 				while (count--)
 				{
 					dst_offs &= 0xffff;
-					blt_write(&space, tmap, dst_offs, b2 << shift, mask);
+					blt_write(space, tmap, dst_offs, b2 << shift, mask);
 					dst_offs = ((dst_offs + 1) & (0x100 - 1)) | (dst_offs & (~(0x100 - 1)));
 					b2++;
 				}
@@ -684,7 +684,7 @@ WRITE16_MEMBER(metro_state::metro_blitter_w)
 				while (count--)
 				{
 					dst_offs &= 0xffff;
-					blt_write(&space, tmap, dst_offs, b2, mask);
+					blt_write(space, tmap, dst_offs, b2, mask);
 					dst_offs = ((dst_offs + 1) & (0x100 - 1)) | (dst_offs & (~(0x100 - 1)));
 				}
 				break;
@@ -5945,14 +5945,14 @@ static void metro_common( running_machine &machine )
 
 DRIVER_INIT_MEMBER(metro_state,metro)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	metro_common(machine());
 
 	m_porta = 0x00;
 	m_portb = 0x00;
 	m_busy_sndcpu = 0;
-	metro_sound_rombank_w(*space, 0, 0x00);
+	metro_sound_rombank_w(space, 0, 0x00);
 }
 
 DRIVER_INIT_MEMBER(metro_state,karatour)
@@ -5972,14 +5972,14 @@ DRIVER_INIT_MEMBER(metro_state,karatour)
 
 DRIVER_INIT_MEMBER(metro_state,daitorid)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	metro_common(machine());
 
 	m_porta = 0x00;
 	m_portb = 0x00;
 	m_busy_sndcpu = 0;
-	daitorid_sound_rombank_w(*space, 0, 0x00);
+	daitorid_sound_rombank_w(space, 0, 0x00);
 }
 
 

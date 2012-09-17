@@ -233,8 +233,8 @@ void nubus_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mi
 {
 //  printf("install_bank: %s @ %x->%x mask %x mirror %x\n", tag, start, end, mask, mirror);
 	m_maincpu = machine().device<cpu_device>(m_cputag);
-	address_space *space = m_maincpu->space(AS_PROGRAM);
-	space->install_readwrite_bank(start, end, mask, mirror, tag );
+	address_space &space = *m_maincpu->space(AS_PROGRAM);
+	space.install_readwrite_bank(start, end, mask, mirror, tag );
 	machine().root_device().membank(tag)->set_base(data);
 }
 

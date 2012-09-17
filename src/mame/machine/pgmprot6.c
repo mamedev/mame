@@ -106,7 +106,7 @@ MACHINE_RESET_MEMBER(pgm_028_025_state,olds)
 
 static READ16_HANDLER( olds_r )
 {
-	pgm_028_025_state *state = space->machine().driver_data<pgm_028_025_state>();
+	pgm_028_025_state *state = space.machine().driver_data<pgm_028_025_state>();
 	UINT16 res = 0;
 
 	if (offset == 1)
@@ -124,18 +124,18 @@ static READ16_HANDLER( olds_r )
 
 		}
 	}
-	logerror("%06X: ASIC25 R CMD %X  VAL %X\n", space->device().safe_pc(), state->m_kb_cmd, res);
+	logerror("%06X: ASIC25 R CMD %X  VAL %X\n", space.device().safe_pc(), state->m_kb_cmd, res);
 	return res;
 }
 
 static WRITE16_HANDLER( olds_w )
 {
-	pgm_028_025_state *state = space->machine().driver_data<pgm_028_025_state>();
+	pgm_028_025_state *state = space.machine().driver_data<pgm_028_025_state>();
 	if (offset == 0)
 		state->m_kb_cmd = data;
 	else //offset==2
 	{
-		logerror("%06X: ASIC25 W CMD %X  VAL %X\n",space->device().safe_pc(), state->m_kb_cmd, data);
+		logerror("%06X: ASIC25 W CMD %X  VAL %X\n",space.device().safe_pc(), state->m_kb_cmd, data);
 		if (state->m_kb_cmd == 0)
 			state->m_kb_reg = data;
 		else if(state->m_kb_cmd == 2)	//a bitswap=
@@ -165,7 +165,7 @@ static WRITE16_HANDLER( olds_w )
 						UINT16 val0 = state->m_sharedprotram[0x3050 / 2];	//CMD_FORMAT
 						{
 							if ((cmd0 & 0xff) == 0x2)
-								olds_write_reg(space->machine(), val0, olds_read_reg(space->machine(), val0) + 0x10000);
+								olds_write_reg(space.machine(), val0, olds_read_reg(space.machine(), val0) + 0x10000);
 						}
 						break;
 					}
@@ -184,8 +184,8 @@ static WRITE16_HANDLER( olds_w )
 
 static READ16_HANDLER( olds_prot_swap_r )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	if (space->device().safe_pc() < 0x100000)		//bios
+	pgm_state *state = space.machine().driver_data<pgm_state>();
+	if (space.device().safe_pc() < 0x100000)		//bios
 		return state->m_mainram[0x178f4 / 2];
 	else						//game
 		return state->m_mainram[0x178d8 / 2];

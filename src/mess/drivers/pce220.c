@@ -873,8 +873,8 @@ void pcg850v_state::machine_start()
 
 void pce220_state::machine_reset()
 {
-	address_space *space = m_maincpu->space(AS_PROGRAM);
-	space->unmap_write(0x0000, 0x3fff);
+	address_space &space = *m_maincpu->space(AS_PROGRAM);
+	space.unmap_write(0x0000, 0x3fff);
 
 	// install the boot code into the first bank
 	membank("bank1")->set_base(machine().root_device().memregion("user1")->base() + 0x0000);

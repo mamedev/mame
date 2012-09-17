@@ -64,7 +64,7 @@ static WRITE16_HANDLER( en_68000_share_w )
 
 static WRITE16_HANDLER( en_es5505_bank_w )
 {
-	UINT32 max_banks_this_game = (space->machine().root_device().memregion("ensoniq.0")->bytes()/0x200000)-1;
+	UINT32 max_banks_this_game = (space.machine().root_device().memregion("ensoniq.0")->bytes()/0x200000)-1;
 
 #if 0
 {
@@ -76,13 +76,13 @@ static WRITE16_HANDLER( en_es5505_bank_w )
 
 	/* mask out unused bits */
 	data &= max_banks_this_game;
-	es5505_voice_bank_w(space->machine().device("ensoniq"),offset,data<<20);
+	es5505_voice_bank_w(space.machine().device("ensoniq"),offset,data<<20);
 }
 
 static WRITE16_HANDLER( en_volume_w )
 {
 	if (ACCESSING_BITS_8_15)
-		mb87078_data_w(space->machine().device("mb87078"), data >> 8, offset ^ 1);
+		mb87078_data_w(space.machine().device("mb87078"), data >> 8, offset ^ 1);
 }
 
 
@@ -94,7 +94,7 @@ static WRITE16_HANDLER( en_volume_w )
 
 static READ16_HANDLER( es5510_dsp_r )
 {
-//  logerror("%06x: DSP read offset %04x (data is %04x)\n",space->device().safe_pc(),offset,es5510_dsp_ram[offset]);
+//  logerror("%06x: DSP read offset %04x (data is %04x)\n",space.device().safe_pc(),offset,es5510_dsp_ram[offset]);
 //  if (es_tmp) return es5510_dsp_ram[offset];
 /*
     switch (offset) {
@@ -106,7 +106,7 @@ static READ16_HANDLER( es5510_dsp_r )
 */
 //  offset<<=1;
 
-//if (offset<7 && es5510_dsp_ram[0]!=0xff) return space->machine().rand()%0xffff;
+//if (offset<7 && es5510_dsp_ram[0]!=0xff) return space.machine().rand()%0xffff;
 
 	switch(offset)
 	{
@@ -125,10 +125,10 @@ static READ16_HANDLER( es5510_dsp_r )
 
 static WRITE16_HANDLER( es5510_dsp_w )
 {
-	UINT8 *snd_mem = (UINT8 *)space->machine().root_device().memregion("ensoniq.0")->base();
+	UINT8 *snd_mem = (UINT8 *)space.machine().root_device().memregion("ensoniq.0")->base();
 
 //  if (offset>4 && offset!=0x80  && offset!=0xa0  && offset!=0xc0  && offset!=0xe0)
-//      logerror("%06x: DSP write offset %04x %04x\n",space->device().safe_pc(),offset,data);
+//      logerror("%06x: DSP write offset %04x %04x\n",space.device().safe_pc(),offset,data);
 
 	COMBINE_DATA(&es5510_dsp_ram[offset]);
 

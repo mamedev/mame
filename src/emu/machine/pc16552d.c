@@ -420,20 +420,20 @@ void pc16552d_rx_data(running_machine &machine, int chip, int channel, UINT8 dat
 
 READ8_HANDLER(pc16552d_0_r)
 {
-	return duart_r(space->machine(), 0, offset);
+	return duart_r(space.machine(), 0, offset);
 }
 
 WRITE8_HANDLER(pc16552d_0_w)
 {
-	duart_w(space->machine(), 0, offset, data);
+	duart_w(space.machine(), 0, offset, data);
 }
 
 READ8_HANDLER(pc16552d_1_r)
 {
-	return duart_r(space->machine(), 1, offset);
+	return duart_r(space.machine(), 1, offset);
 }
 
 WRITE8_HANDLER(pc16552d_1_w)
 {
-	duart_w(space->machine(), 1, offset, data);
+	duart_w(space.machine(), 1, offset, data);
 }

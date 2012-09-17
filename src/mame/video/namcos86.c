@@ -187,9 +187,9 @@ WRITE8_MEMBER(namcos86_state::rthunder_tilebank_select_w)
 	}
 }
 
-static void scroll_w(address_space *space, int offset, int data, int layer)
+static void scroll_w(address_space &space, int offset, int data, int layer)
 {
-	namcos86_state *state = space->machine().driver_data<namcos86_state>();
+	namcos86_state *state = space.machine().driver_data<namcos86_state>();
 	switch (offset)
 	{
 		case 0:
@@ -206,19 +206,19 @@ static void scroll_w(address_space *space, int offset, int data, int layer)
 
 WRITE8_MEMBER(namcos86_state::rthunder_scroll0_w)
 {
-	scroll_w(&space,offset,data,0);
+	scroll_w(space,offset,data,0);
 }
 WRITE8_MEMBER(namcos86_state::rthunder_scroll1_w)
 {
-	scroll_w(&space,offset,data,1);
+	scroll_w(space,offset,data,1);
 }
 WRITE8_MEMBER(namcos86_state::rthunder_scroll2_w)
 {
-	scroll_w(&space,offset,data,2);
+	scroll_w(space,offset,data,2);
 }
 WRITE8_MEMBER(namcos86_state::rthunder_scroll3_w)
 {
-	scroll_w(&space,offset,data,3);
+	scroll_w(space,offset,data,3);
 }
 
 WRITE8_MEMBER(namcos86_state::rthunder_backcolor_w)

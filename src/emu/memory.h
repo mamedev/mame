@@ -112,14 +112,14 @@ typedef delegate<void (address_map &, const device_t &)> address_map_delegate;
 
 
 // legacy space read/write handlers
-typedef UINT8	(*read8_space_func)  (ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset);
-typedef void	(*write8_space_func) (ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data);
-typedef UINT16	(*read16_space_func) (ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask);
-typedef void	(*write16_space_func)(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask);
-typedef UINT32	(*read32_space_func) (ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask);
-typedef void	(*write32_space_func)(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask);
-typedef UINT64	(*read64_space_func) (ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask);
-typedef void	(*write64_space_func)(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask);
+typedef UINT8	(*read8_space_func)  (ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset);
+typedef void	(*write8_space_func) (ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data);
+typedef UINT16	(*read16_space_func) (ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask);
+typedef void	(*write16_space_func)(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask);
+typedef UINT32	(*read32_space_func) (ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask);
+typedef void	(*write32_space_func)(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask);
+typedef UINT64	(*read64_space_func) (ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask);
+typedef void	(*write64_space_func)(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask);
 
 // legacy device read/write handlers
 typedef UINT8	(*read8_device_func)  (ATTR_UNUSED device_t *device, ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 mem_mask);
@@ -135,21 +135,21 @@ typedef void	(*write64_device_func)(ATTR_UNUSED device_t *device, ATTR_UNUSED ad
 // struct with function pointers for accessors; use is generally discouraged unless necessary
 struct data_accessors
 {
-	UINT8		(*read_byte)(address_space *space, offs_t byteaddress);
-	UINT16		(*read_word)(address_space *space, offs_t byteaddress);
-	UINT16		(*read_word_masked)(address_space *space, offs_t byteaddress, UINT16 mask);
-	UINT32		(*read_dword)(address_space *space, offs_t byteaddress);
-	UINT32		(*read_dword_masked)(address_space *space, offs_t byteaddress, UINT32 mask);
-	UINT64		(*read_qword)(address_space *space, offs_t byteaddress);
-	UINT64		(*read_qword_masked)(address_space *space, offs_t byteaddress, UINT64 mask);
+	UINT8		(*read_byte)(address_space &space, offs_t byteaddress);
+	UINT16		(*read_word)(address_space &space, offs_t byteaddress);
+	UINT16		(*read_word_masked)(address_space &space, offs_t byteaddress, UINT16 mask);
+	UINT32		(*read_dword)(address_space &space, offs_t byteaddress);
+	UINT32		(*read_dword_masked)(address_space &space, offs_t byteaddress, UINT32 mask);
+	UINT64		(*read_qword)(address_space &space, offs_t byteaddress);
+	UINT64		(*read_qword_masked)(address_space &space, offs_t byteaddress, UINT64 mask);
 
-	void		(*write_byte)(address_space *space, offs_t byteaddress, UINT8 data);
-	void		(*write_word)(address_space *space, offs_t byteaddress, UINT16 data);
-	void		(*write_word_masked)(address_space *space, offs_t byteaddress, UINT16 data, UINT16 mask);
-	void		(*write_dword)(address_space *space, offs_t byteaddress, UINT32 data);
-	void		(*write_dword_masked)(address_space *space, offs_t byteaddress, UINT32 data, UINT32 mask);
-	void		(*write_qword)(address_space *space, offs_t byteaddress, UINT64 data);
-	void		(*write_qword_masked)(address_space *space, offs_t byteaddress, UINT64 data, UINT64 mask);
+	void		(*write_byte)(address_space &space, offs_t byteaddress, UINT8 data);
+	void		(*write_word)(address_space &space, offs_t byteaddress, UINT16 data);
+	void		(*write_word_masked)(address_space &space, offs_t byteaddress, UINT16 data, UINT16 mask);
+	void		(*write_dword)(address_space &space, offs_t byteaddress, UINT32 data);
+	void		(*write_dword_masked)(address_space &space, offs_t byteaddress, UINT32 data, UINT32 mask);
+	void		(*write_qword)(address_space &space, offs_t byteaddress, UINT64 data);
+	void		(*write_qword_masked)(address_space &space, offs_t byteaddress, UINT64 data, UINT64 mask);
 };
 
 
@@ -876,14 +876,14 @@ private:
 
 
 // space read/write handler function macros
-#define READ8_HANDLER(name) 			UINT8  name(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset)
-#define WRITE8_HANDLER(name)			void   name(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
-#define READ16_HANDLER(name)			UINT16 name(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask)
-#define WRITE16_HANDLER(name)			void   name(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
-#define READ32_HANDLER(name)			UINT32 name(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask)
-#define WRITE32_HANDLER(name)			void   name(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask)
-#define READ64_HANDLER(name)			UINT64 name(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask)
-#define WRITE64_HANDLER(name)			void   name(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask)
+#define READ8_HANDLER(name) 			UINT8  name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset)
+#define WRITE8_HANDLER(name)			void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
+#define READ16_HANDLER(name)			UINT16 name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask)
+#define WRITE16_HANDLER(name)			void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
+#define READ32_HANDLER(name)			UINT32 name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask)
+#define WRITE32_HANDLER(name)			void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask)
+#define READ64_HANDLER(name)			UINT64 name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask)
+#define WRITE64_HANDLER(name)			void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask)
 
 
 // device read/write handler function macros

@@ -192,7 +192,7 @@ WRITE16_MEMBER(astrocorp_state::astrocorp_sound_bank_w)
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base(0x40000 * ((data >> 8) & 1));
-//      logerror("CPU #0 PC %06X: OKI bank %08X\n", space->device().safe_pc(), data);
+//      logerror("CPU #0 PC %06X: OKI bank %08X\n", space.device().safe_pc(), data);
 	}
 }
 
@@ -203,7 +203,7 @@ WRITE16_MEMBER(astrocorp_state::skilldrp_sound_bank_w)
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base(0x40000 * (data & 1));
-//      logerror("CPU #0 PC %06X: OKI bank %08X\n", space->device().safe_pc(), data);
+//      logerror("CPU #0 PC %06X: OKI bank %08X\n", space.device().safe_pc(), data);
 	}
 }
 

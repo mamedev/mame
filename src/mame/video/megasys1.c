@@ -290,9 +290,9 @@ VIDEO_START_MEMBER(megasys1_state,megasys1)
 #define TILES_PER_PAGE_Y (0x20)
 #define TILES_PER_PAGE (TILES_PER_PAGE_X * TILES_PER_PAGE_Y)
 
-INLINE void scrollram_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int which)
+INLINE void scrollram_w(address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask, int which)
 {
-	megasys1_state *state = space->machine().driver_data<megasys1_state>();
+	megasys1_state *state = space.machine().driver_data<megasys1_state>();
 	COMBINE_DATA(&state->m_scrollram[which][offset]);
 	if (offset < 0x40000/2 && state->m_tmap[which])
 	{
@@ -310,9 +310,9 @@ INLINE void scrollram_w(address_space *space, offs_t offset, UINT16 data, UINT16
 	}
 }
 
-WRITE16_MEMBER(megasys1_state::megasys1_scrollram_0_w){ scrollram_w(&space, offset, data, mem_mask, 0); }
-WRITE16_MEMBER(megasys1_state::megasys1_scrollram_1_w){ scrollram_w(&space, offset, data, mem_mask, 1); }
-WRITE16_MEMBER(megasys1_state::megasys1_scrollram_2_w){ scrollram_w(&space, offset, data, mem_mask, 2); }
+WRITE16_MEMBER(megasys1_state::megasys1_scrollram_0_w){ scrollram_w(space, offset, data, mem_mask, 0); }
+WRITE16_MEMBER(megasys1_state::megasys1_scrollram_1_w){ scrollram_w(space, offset, data, mem_mask, 1); }
+WRITE16_MEMBER(megasys1_state::megasys1_scrollram_2_w){ scrollram_w(space, offset, data, mem_mask, 2); }
 
 
 

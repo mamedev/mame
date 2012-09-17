@@ -209,7 +209,7 @@ READ8_HANDLER( nb1413m3_sndrom_r )
 	int rombank;
 
 	/* get top 8 bits of the I/O port address */
-	offset = (offset << 8) | (space->device().state().state_int(Z80_BC) >> 8);
+	offset = (offset << 8) | (space.device().state().state_int(Z80_BC) >> 8);
 
 	switch (nb1413m3_type)
 	{
@@ -296,8 +296,8 @@ READ8_HANDLER( nb1413m3_sndrom_r )
 	popmessage("Sound ROM %02X:%05X [B1:%02X B2:%02X]", rombank, offset, nb1413m3_sndrombank1, nb1413m3_sndrombank2);
 #endif
 
-	if (offset < space->machine().root_device().memregion(nb1413m3_sndromrgntag)->bytes())
-		return space->machine().root_device().memregion(nb1413m3_sndromrgntag)->base()[offset];
+	if (offset < space.machine().root_device().memregion(nb1413m3_sndromrgntag)->bytes())
+		return space.machine().root_device().memregion(nb1413m3_sndromrgntag)->base()[offset];
 	else
 	{
 		popmessage("read past sound ROM length (%05x[%02X])",offset, rombank);
@@ -320,7 +320,7 @@ WRITE8_HANDLER( nb1413m3_sndrombank2_w )
 
 READ8_HANDLER( nb1413m3_gfxrom_r )
 {
-	UINT8 *GFXROM = space->machine().root_device().memregion("gfx1")->base();
+	UINT8 *GFXROM = space.machine().root_device().memregion("gfx1")->base();
 
 	return GFXROM[(0x20000 * (nb1413m3_gfxrombank | ((nb1413m3_sndrombank1 & 0x02) << 3))) + ((0x0200 * nb1413m3_gfxradr_h) + (0x0002 * nb1413m3_gfxradr_l)) + (offset & 0x01)];
 }
@@ -363,12 +363,12 @@ CUSTOM_INPUT( nb1413m3_outcoin_flag_r )
 
 READ8_HANDLER( nb1413m3_inputport0_r )
 {
-	return ((space->machine().root_device().ioport("SYSTEM")->read() & 0xfd) | ((nb1413m3_outcoin_flag & 0x01) << 1));
+	return ((space.machine().root_device().ioport("SYSTEM")->read() & 0xfd) | ((nb1413m3_outcoin_flag & 0x01) << 1));
 }
 
 READ8_HANDLER( nb1413m3_inputport1_r )
 {
-	device_t &root = space->machine().root_device();
+	device_t &root = space.machine().root_device();
 	switch (nb1413m3_type)
 	{
 		case NB1413M3_HYHOO:
@@ -420,7 +420,7 @@ READ8_HANDLER( nb1413m3_inputport1_r )
 
 READ8_HANDLER( nb1413m3_inputport2_r )
 {
-	device_t &root = space->machine().root_device();
+	device_t &root = space.machine().root_device();
 	switch (nb1413m3_type)
 	{
 		case NB1413M3_HYHOO:
@@ -495,7 +495,7 @@ READ8_HANDLER( nb1413m3_inputport3_r )
 
 READ8_HANDLER( nb1413m3_dipsw1_r )
 {
-	device_t &root = space->machine().root_device();
+	device_t &root = space.machine().root_device();
 	switch (nb1413m3_type)
 	{
 		case NB1413M3_KANATUEN:
@@ -533,13 +533,13 @@ READ8_HANDLER( nb1413m3_dipsw1_r )
 			        ((root.ioport("DSWA")->read() & 0x01) << 4) | ((root.ioport("DSWA")->read() & 0x04) << 3) |
 			        ((root.ioport("DSWA")->read() & 0x10) << 2) | ((root.ioport("DSWA")->read() & 0x40) << 1));
 		default:
-			return space->machine().root_device().ioport("DSWA")->read();
+			return space.machine().root_device().ioport("DSWA")->read();
 	}
 }
 
 READ8_HANDLER( nb1413m3_dipsw2_r )
 {
-	device_t &root = space->machine().root_device();
+	device_t &root = space.machine().root_device();
 	switch (nb1413m3_type)
 	{
 		case NB1413M3_KANATUEN:
@@ -577,18 +577,18 @@ READ8_HANDLER( nb1413m3_dipsw2_r )
 			        ((root.ioport("DSWA")->read() & 0x02) << 3) | ((root.ioport("DSWA")->read() & 0x08) << 2) |
 			        ((root.ioport("DSWA")->read() & 0x20) << 1) | ((root.ioport("DSWA")->read() & 0x80) << 0));
 		default:
-			return space->machine().root_device().ioport("DSWB")->read();
+			return space.machine().root_device().ioport("DSWB")->read();
 	}
 }
 
 READ8_HANDLER( nb1413m3_dipsw3_l_r )
 {
-	return ((space->machine().root_device().ioport("DSWC")->read() & 0xf0) >> 4);
+	return ((space.machine().root_device().ioport("DSWC")->read() & 0xf0) >> 4);
 }
 
 READ8_HANDLER( nb1413m3_dipsw3_h_r )
 {
-	return ((space->machine().root_device().ioport("DSWC")->read() & 0x0f) >> 0);
+	return ((space.machine().root_device().ioport("DSWC")->read() & 0x0f) >> 0);
 }
 
 WRITE8_HANDLER( nb1413m3_outcoin_w )
@@ -629,7 +629,7 @@ WRITE8_HANDLER( nb1413m3_outcoin_w )
 			break;
 	}
 
-	set_led_status(space->machine(), 2, nb1413m3_outcoin_flag);		// out coin
+	set_led_status(space.machine(), 2, nb1413m3_outcoin_flag);		// out coin
 }
 
 WRITE8_HANDLER( nb1413m3_vcrctrl_w )
@@ -637,11 +637,11 @@ WRITE8_HANDLER( nb1413m3_vcrctrl_w )
 	if (data & 0x08)
 	{
 		popmessage(" ** VCR CONTROL ** ");
-		set_led_status(space->machine(), 2, 1);
+		set_led_status(space.machine(), 2, 1);
 	}
 	else
 	{
-		set_led_status(space->machine(), 2, 0);
+		set_led_status(space.machine(), 2, 0);
 	}
 }
 

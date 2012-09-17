@@ -129,9 +129,9 @@ static void prepare_shadows(cischeat_state *state)
 #define TILES_PER_PAGE_Y (0x20)
 #define TILES_PER_PAGE (TILES_PER_PAGE_X * TILES_PER_PAGE_Y)
 
-INLINE void scrollram_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int which)
+INLINE void scrollram_w(address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask, int which)
 {
-	cischeat_state *state = space->machine().driver_data<cischeat_state>();
+	cischeat_state *state = space.machine().driver_data<cischeat_state>();
 	COMBINE_DATA(&state->m_scrollram[which][offset]);
 	if (offset < 0x40000/2 && state->m_tmap[which])
 	{
@@ -149,9 +149,9 @@ INLINE void scrollram_w(address_space *space, offs_t offset, UINT16 data, UINT16
 	}
 }
 
-WRITE16_MEMBER(cischeat_state::cischeat_scrollram_0_w){ scrollram_w(&space, offset, data, mem_mask, 0); }
-WRITE16_MEMBER(cischeat_state::cischeat_scrollram_1_w){ scrollram_w(&space, offset, data, mem_mask, 1); }
-WRITE16_MEMBER(cischeat_state::cischeat_scrollram_2_w){ scrollram_w(&space, offset, data, mem_mask, 2); }
+WRITE16_MEMBER(cischeat_state::cischeat_scrollram_0_w){ scrollram_w(space, offset, data, mem_mask, 0); }
+WRITE16_MEMBER(cischeat_state::cischeat_scrollram_1_w){ scrollram_w(space, offset, data, mem_mask, 1); }
+WRITE16_MEMBER(cischeat_state::cischeat_scrollram_2_w){ scrollram_w(space, offset, data, mem_mask, 2); }
 
 TILEMAP_MAPPER_MEMBER(cischeat_state::cischeat_scan_8x8)
 {
@@ -1423,13 +1423,13 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input(
 	if (msk != 0) state->m_active_layers &= msk;
 #if 1
 	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		popmessage("Cmd: %04X Pos:%04X Lim:%04X Inp:%04X",
 							state->m_scudhamm_motor_command,
-							state->scudhamm_motor_pos_r(*space,0,0xffff),
-							state->scudhamm_motor_status_r(*space,0,0xffff),
-							state->scudhamm_analog_r(*space,0,0xffff) );
+							state->scudhamm_motor_pos_r(space,0,0xffff),
+							state->scudhamm_motor_status_r(space,0,0xffff),
+							state->scudhamm_analog_r(space,0,0xffff) );
 	}
 #endif
 
