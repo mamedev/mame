@@ -105,9 +105,8 @@ VIDEO_START_MEMBER(relief_state,relief)
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( relief )
+UINT32 relief_state::screen_update_relief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	relief_state *state = screen.machine().driver_data<relief_state>();
 	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
 	atarimo_rect_list rectlist;
 	bitmap_ind16 *mobitmap;
@@ -115,8 +114,8 @@ SCREEN_UPDATE_IND16( relief )
 
 	/* draw the playfield */
 	priority_bitmap.fill(0, cliprect);
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_playfield2_tilemap->draw(bitmap, cliprect, 0, 1);
+	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_playfield2_tilemap->draw(bitmap, cliprect, 0, 1);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);

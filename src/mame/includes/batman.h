@@ -26,12 +26,13 @@ public:
 	DECLARE_MACHINE_START(batman);
 	DECLARE_MACHINE_RESET(batman);
 	DECLARE_VIDEO_START(batman);
+	UINT32 screen_update_batman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/batman.c -----------*/
 
 
-SCREEN_UPDATE_IND16( batman );
+
 
 void batman_scanline_update(screen_device &screen, int scanline);

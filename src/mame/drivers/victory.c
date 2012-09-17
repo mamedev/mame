@@ -224,7 +224,7 @@ static MACHINE_CONFIG_START( victory, victory_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* using the standard Exidy video parameters for now, needs to be confirmed */
 	MCFG_SCREEN_RAW_PARAMS(VICTORY_PIXEL_CLOCK, VICTORY_HTOTAL, VICTORY_HBEND, VICTORY_HBSTART, VICTORY_VTOTAL, VICTORY_VBEND, VICTORY_VBSTART)
-	MCFG_SCREEN_UPDATE_STATIC(victory)
+	MCFG_SCREEN_UPDATE_DRIVER(victory_state, screen_update_victory)
 
 	MCFG_PALETTE_LENGTH(64)
 

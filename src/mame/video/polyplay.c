@@ -45,10 +45,9 @@ void polyplay_state::video_start()
 }
 
 
-SCREEN_UPDATE_IND16( polyplay )
+UINT32 polyplay_state::screen_update_polyplay(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	polyplay_state *state = screen.machine().driver_data<polyplay_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	offs_t offs;
 
 

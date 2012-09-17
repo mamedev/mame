@@ -127,6 +127,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_socrates(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -608,9 +609,8 @@ void socrates_state::video_start()
 	m_scroll_offset = 0;
 }
 
-static SCREEN_UPDATE_IND16( socrates )
+UINT32 socrates_state::screen_update_socrates(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	socrates_state *state = screen.machine().driver_data<socrates_state>();
 	static const UINT8 fixedcolors[8] =
 	{
 	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0xF7
@@ -619,24 +619,24 @@ static SCREEN_UPDATE_IND16( socrates )
 	int lineoffset = 0; // if display ever tries to display data at 0xfxxx, offset line displayed by 0x1000
 	for (y = 0; y < 228; y++)
 	{
-		if ((((y+state->m_scroll_offset)*128)&0xffff) >= 0xf000) lineoffset = 0x1000; // see comment above
+		if ((((y+m_scroll_offset)*128)&0xffff) >= 0xf000) lineoffset = 0x1000; // see comment above
 		for (x = 0; x < 264; x++)
 		{
 			if (x < 256)
 			{
-				colidx = state->m_videoram[(((y+state->m_scroll_offset)*128)+(x>>1)+lineoffset)&0xffff];
+				colidx = m_videoram[(((y+m_scroll_offset)*128)+(x>>1)+lineoffset)&0xffff];
 				if (x&1) colidx >>=4;
 				colidx &= 0xF;
-				if (colidx > 7) color=state->m_videoram[0xF000+(colidx<<8)+((y+state->m_scroll_offset)&0xFF)];
+				if (colidx > 7) color=m_videoram[0xF000+(colidx<<8)+((y+m_scroll_offset)&0xFF)];
 				else color=fixedcolors[colidx];
 				bitmap.pix16(y, x) = color;
 			}
 			else
 			{
-				colidx = state->m_videoram[(((y+state->m_scroll_offset)*128)+(127)+lineoffset)&0xffff];
+				colidx = m_videoram[(((y+m_scroll_offset)*128)+(127)+lineoffset)&0xffff];
 				colidx >>=4;
 				colidx &= 0xF;
-				if (colidx > 7) color=state->m_videoram[0xF000+(colidx<<8)+((y+state->m_scroll_offset)&0xFF)];
+				if (colidx > 7) color=m_videoram[0xF000+(colidx<<8)+((y+m_scroll_offset)&0xFF)];
 				else color=fixedcolors[colidx];
 				bitmap.pix16(y, x) = color;
 			}
@@ -934,7 +934,7 @@ static MACHINE_CONFIG_START( socrates, socrates_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(264, 228) // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
 	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 219) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
-	MCFG_SCREEN_UPDATE_STATIC(socrates)
+	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
 
 	MCFG_PALETTE_LENGTH(256)
 

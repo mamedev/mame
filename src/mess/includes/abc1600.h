@@ -244,6 +244,7 @@ public:
 	int m_rmc;					// row match count
 	int m_cmc;					// column match count
 	int m_amm;					// active mover mask
+	UINT32 screen_update_abc1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 

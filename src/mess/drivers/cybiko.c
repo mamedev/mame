@@ -299,7 +299,7 @@ void cybiko_state::palette_init()
 // SCREEN UPDATE  //
 ////////////////////
 
-static SCREEN_UPDATE_IND16( cybiko )
+UINT32 cybiko_state::screen_update_cybiko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	hd66421_device *hd66421 = screen.machine().device<hd66421_device>( "hd66421" );
 	hd66421->update_screen(bitmap, cliprect);
@@ -321,7 +321,7 @@ static MACHINE_CONFIG_START( cybikov1, cybiko_state )
 	MCFG_SCREEN_REFRESH_RATE( 60 )
 	MCFG_SCREEN_SIZE( HD66421_WIDTH, HD66421_HEIGHT )
 	MCFG_SCREEN_VISIBLE_AREA( 0, HD66421_WIDTH - 1, 0, HD66421_HEIGHT - 1 )
-	MCFG_SCREEN_UPDATE_STATIC(cybiko)
+	MCFG_SCREEN_UPDATE_DRIVER(cybiko_state, screen_update_cybiko)
 
 	// video
 	MCFG_HD66421_ADD("hd66421")

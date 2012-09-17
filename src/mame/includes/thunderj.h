@@ -24,10 +24,11 @@ public:
 	DECLARE_MACHINE_START(thunderj);
 	DECLARE_MACHINE_RESET(thunderj);
 	DECLARE_VIDEO_START(thunderj);
+	UINT32 screen_update_thunderj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/thunderj.c -----------*/
 
 
-SCREEN_UPDATE_IND16( thunderj );
+

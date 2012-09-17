@@ -54,6 +54,7 @@ public:
 	virtual void palette_init();
 	DECLARE_MACHINE_RESET(laser500);
 	DECLARE_MACHINE_RESET(laser700);
+	UINT32 screen_update_laser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 

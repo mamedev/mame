@@ -156,19 +156,18 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 #undef DRAW_SPRITE
 
-SCREEN_UPDATE_IND16( vb )
+UINT32 vball_state::screen_update_vb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	vball_state *state = screen.machine().driver_data<vball_state>();
 	int i;
 
-	state->m_bg_tilemap->set_scrolly(0,state->m_vb_scrolly_hi + *state->m_vb_scrolly_lo);
+	m_bg_tilemap->set_scrolly(0,m_vb_scrolly_hi + *m_vb_scrolly_lo);
 
 	/*To get linescrolling to work properly, we must ignore the 1st two scroll values, no idea why! -SJE */
 	for (i = 2; i < 256; i++) {
-		state->m_bg_tilemap->set_scrollx(i,state->m_vb_scrollx[i-2]);
-		//logerror("scrollx[%d] = %d\n",i,state->m_vb_scrollx[i]);
+		m_bg_tilemap->set_scrollx(i,m_vb_scrollx[i-2]);
+		//logerror("scrollx[%d] = %d\n",i,m_vb_scrollx[i]);
 	}
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect);
 	return 0;
 }

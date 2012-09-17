@@ -143,6 +143,9 @@ public:
 	DECLARE_VIDEO_START(darkhors);
 	DECLARE_VIDEO_START(jclub2);
 	DECLARE_VIDEO_START(jclub2o);
+	UINT32 screen_update_darkhors(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_jclub2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_jclub2o(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -157,7 +160,7 @@ public:
 ***************************************************************************/
 
 
-static SCREEN_UPDATE_IND16( darkhors );
+
 
 
 TILE_GET_INFO_MEMBER(darkhors_state::get_tile_info_0)
@@ -230,9 +233,8 @@ VIDEO_START_MEMBER(darkhors_state,darkhors)
 	machine().gfx[0]->set_granularity(64); /* 256 colour sprites with palette selectable on 64 colour boundaries */
 }
 
-static SCREEN_UPDATE_IND16( darkhors )
+UINT32 darkhors_state::screen_update_darkhors(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	darkhors_state *state = screen.machine().driver_data<darkhors_state>();
 	int layers_ctrl = -1;
 
 #if DARKHORS_DEBUG
@@ -248,25 +250,25 @@ static SCREEN_UPDATE_IND16( darkhors )
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	state->m_tmap->set_scrollx(0, (state->m_tmapscroll[0] >> 16) - 5);
-	state->m_tmap->set_scrolly(0, (state->m_tmapscroll[0] & 0xffff) - 0xff );
-	if (layers_ctrl & 1)	state->m_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tmap->set_scrollx(0, (m_tmapscroll[0] >> 16) - 5);
+	m_tmap->set_scrolly(0, (m_tmapscroll[0] & 0xffff) - 0xff );
+	if (layers_ctrl & 1)	m_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
-	state->m_tmap2->set_scrollx(0, (state->m_tmapscroll2[0] >> 16) - 5);
-	state->m_tmap2->set_scrolly(0, (state->m_tmapscroll2[0] & 0xffff) - 0xff );
-	if (layers_ctrl & 2)	state->m_tmap2->draw(bitmap, cliprect, 0, 0);
+	m_tmap2->set_scrollx(0, (m_tmapscroll2[0] >> 16) - 5);
+	m_tmap2->set_scrolly(0, (m_tmapscroll2[0] & 0xffff) - 0xff );
+	if (layers_ctrl & 2)	m_tmap2->draw(bitmap, cliprect, 0, 0);
 
 	if (layers_ctrl & 4)	draw_sprites(screen.machine(),bitmap,cliprect);
 
 #if DARKHORS_DEBUG
 #if 0
 	popmessage("%04X-%04X %04X-%04X %04X-%04X %04X-%04X %04X-%04X %04X-%04X",
-		state->m_tmapscroll[0] >> 16, state->m_tmapscroll[0] & 0xffff,
-		state->m_tmapscroll[1] >> 16, state->m_tmapscroll[1] & 0xffff,
-		state->m_tmapscroll[2] >> 16, state->m_tmapscroll[2] & 0xffff,
-		state->m_tmapscroll[3] >> 16, state->m_tmapscroll[3] & 0xffff,
-		state->m_tmapscroll[4] >> 16, state->m_tmapscroll[4] & 0xffff,
-		state->m_tmapscroll[5] >> 16, state->m_tmapscroll[5] & 0xffff
+		m_tmapscroll[0] >> 16, m_tmapscroll[0] & 0xffff,
+		m_tmapscroll[1] >> 16, m_tmapscroll[1] & 0xffff,
+		m_tmapscroll[2] >> 16, m_tmapscroll[2] & 0xffff,
+		m_tmapscroll[3] >> 16, m_tmapscroll[3] & 0xffff,
+		m_tmapscroll[4] >> 16, m_tmapscroll[4] & 0xffff,
+		m_tmapscroll[5] >> 16, m_tmapscroll[5] & 0xffff
 	);
 #endif
 #endif
@@ -698,7 +700,7 @@ static MACHINE_CONFIG_START( darkhors, darkhors_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(0x190, 0x100+16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
-	MCFG_SCREEN_UPDATE_STATIC(darkhors)
+	MCFG_SCREEN_UPDATE_DRIVER(darkhors_state, screen_update_darkhors)
 
 	MCFG_GFXDECODE(darkhors)
 	MCFG_PALETTE_LENGTH(0x10000)
@@ -719,12 +721,11 @@ VIDEO_START_MEMBER(darkhors_state,jclub2)
 
 }
 
-static SCREEN_UPDATE_IND16(jclub2)
+UINT32 darkhors_state::screen_update_jclub2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	darkhors_state *state = screen.machine().driver_data<darkhors_state>();
 
 	// this isn't an st0020..
-	state->m_gdfs_st0020->st0020_draw_all(screen.machine(), bitmap, cliprect);
+	m_gdfs_st0020->st0020_draw_all(screen.machine(), bitmap, cliprect);
 
 	return 0;
 }
@@ -742,7 +743,7 @@ static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(0x190, 0x100+16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
-	MCFG_SCREEN_UPDATE_STATIC(jclub2)
+	MCFG_SCREEN_UPDATE_DRIVER(darkhors_state, screen_update_jclub2)
 
 	// NOT an ST0020 but instead ST0032, ram format isn't compatible at least
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
@@ -785,10 +786,9 @@ VIDEO_START_MEMBER(darkhors_state,jclub2o)
 
 }
 
-static SCREEN_UPDATE_IND16(jclub2o)
+UINT32 darkhors_state::screen_update_jclub2o(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	darkhors_state *state = screen.machine().driver_data<darkhors_state>();
-	state->m_gdfs_st0020->st0020_draw_all(screen.machine(), bitmap, cliprect);
+	m_gdfs_st0020->st0020_draw_all(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -810,7 +810,7 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(0x190, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
-	MCFG_SCREEN_UPDATE_STATIC(jclub2o)
+	MCFG_SCREEN_UPDATE_DRIVER(darkhors_state, screen_update_jclub2o)
 
 	MCFG_PALETTE_LENGTH(0x10000)
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)

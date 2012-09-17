@@ -140,12 +140,11 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 }
 
 
-SCREEN_UPDATE_IND16( cabal )
+UINT32 cabal_state::screen_update_cabal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cabal_state *state = screen.machine().driver_data<cabal_state>();
-	state->m_background_layer->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+	m_background_layer->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 	draw_sprites(screen.machine(),bitmap,cliprect);
-	state->m_text_layer->draw(bitmap, cliprect, 0,0);
+	m_text_layer->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 

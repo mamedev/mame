@@ -114,13 +114,12 @@ INLINE int get_sprite_y(UINT8 *video_ram, int n)
 }
 
 
-SCREEN_UPDATE_IND16( sprint2 )
+UINT32 sprint2_state::screen_update_sprint2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sprint2_state *state = screen.machine().driver_data<sprint2_state>();
-	UINT8 *video_ram = state->m_video_ram;
+	UINT8 *video_ram = m_video_ram;
 	int i;
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 
@@ -137,13 +136,12 @@ SCREEN_UPDATE_IND16( sprint2 )
 }
 
 
-SCREEN_VBLANK( sprint2 )
+void sprint2_state::screen_eof_sprint2(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		sprint2_state *state = screen.machine().driver_data<sprint2_state>();
-		UINT8 *video_ram = state->m_video_ram;
+		UINT8 *video_ram = m_video_ram;
 		int i;
 		int j;
 		const rectangle &visarea = screen.machine().primary_screen->visible_area();
@@ -151,8 +149,8 @@ SCREEN_VBLANK( sprint2 )
 		/*
          * Collisions are detected for both player cars:
          *
-         * D7 => state->m_collision w/ white playfield
-         * D6 => state->m_collision w/ black playfield or another car
+         * D7 => m_collision w/ white playfield
+         * D6 => m_collision w/ black playfield or another car
          *
          */
 
@@ -169,23 +167,23 @@ SCREEN_VBLANK( sprint2 )
 
 			/* check for sprite-tilemap collisions */
 
-			state->m_bg_tilemap->draw(state->m_helper, rect, 0, 0);
+			m_bg_tilemap->draw(m_helper, rect, 0, 0);
 
-			drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
+			drawgfx_transpen(m_helper, rect, screen.machine().gfx[1],
 				get_sprite_code(video_ram, i),
 				0,
 				0, 0,
 				get_sprite_x(video_ram, i),
 				get_sprite_y(video_ram, i), 1);
 
-			state->m_collision[i] |= collision_check(state, screen.machine().colortable, rect);
+			m_collision[i] |= collision_check(this, screen.machine().colortable, rect);
 
 			/* check for sprite-sprite collisions */
 
 			for (j = 0; j < 4; j++)
 				if (j != i)
 				{
-					drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
+					drawgfx_transpen(m_helper, rect, screen.machine().gfx[1],
 						get_sprite_code(video_ram, j),
 						1,
 						0, 0,
@@ -193,14 +191,14 @@ SCREEN_VBLANK( sprint2 )
 						get_sprite_y(video_ram, j), 0);
 				}
 
-			drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
+			drawgfx_transpen(m_helper, rect, screen.machine().gfx[1],
 				get_sprite_code(video_ram, i),
 				0,
 				0, 0,
 				get_sprite_x(video_ram, i),
 				get_sprite_y(video_ram, i), 1);
 
-			state->m_collision[i] |= collision_check(state, screen.machine().colortable, rect);
+			m_collision[i] |= collision_check(this, screen.machine().colortable, rect);
 		}
 	}
 }

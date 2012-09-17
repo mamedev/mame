@@ -113,7 +113,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const r
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( darius_left ) { return update_screen(screen, bitmap, cliprect, 36 * 8 * 0); }
-SCREEN_UPDATE_IND16( darius_middle ) { return update_screen(screen, bitmap, cliprect, 36 * 8 * 1); }
-SCREEN_UPDATE_IND16( darius_right ) { return update_screen(screen, bitmap, cliprect, 36 * 8 * 2); }
+UINT32 darius_state::screen_update_darius_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8 * 0); }
+UINT32 darius_state::screen_update_darius_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8 * 1); }
+UINT32 darius_state::screen_update_darius_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8 * 2); }
 

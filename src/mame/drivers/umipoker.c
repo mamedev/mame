@@ -67,6 +67,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_umipoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_0)
@@ -132,21 +133,20 @@ void umipoker_state::video_start()
 
 }
 
-static SCREEN_UPDATE_IND16( umipoker )
+UINT32 umipoker_state::screen_update_umipoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	umipoker_state *state = screen.machine().driver_data<umipoker_state>();
 
-	state->m_tilemap_0->set_scrolly(0, state->m_umipoker_scrolly[0]);
-	state->m_tilemap_1->set_scrolly(0, state->m_umipoker_scrolly[1]);
-	state->m_tilemap_2->set_scrolly(0, state->m_umipoker_scrolly[2]);
-	state->m_tilemap_3->set_scrolly(0, state->m_umipoker_scrolly[3]);
+	m_tilemap_0->set_scrolly(0, m_umipoker_scrolly[0]);
+	m_tilemap_1->set_scrolly(0, m_umipoker_scrolly[1]);
+	m_tilemap_2->set_scrolly(0, m_umipoker_scrolly[2]);
+	m_tilemap_3->set_scrolly(0, m_umipoker_scrolly[3]);
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	state->m_tilemap_0->draw(bitmap, cliprect, 0,0);
-	state->m_tilemap_1->draw(bitmap, cliprect, 0,0);
-	state->m_tilemap_2->draw(bitmap, cliprect, 0,0);
-	state->m_tilemap_3->draw(bitmap, cliprect, 0,0);
+	m_tilemap_0->draw(bitmap, cliprect, 0,0);
+	m_tilemap_1->draw(bitmap, cliprect, 0,0);
+	m_tilemap_2->draw(bitmap, cliprect, 0,0);
+	m_tilemap_3->draw(bitmap, cliprect, 0,0);
 
 	return 0;
 }
@@ -678,7 +678,7 @@ static MACHINE_CONFIG_START( umipoker, umipoker_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(umipoker)
+	MCFG_SCREEN_UPDATE_DRIVER(umipoker_state, screen_update_umipoker)
 
 	MCFG_GFXDECODE(umipoker)
 

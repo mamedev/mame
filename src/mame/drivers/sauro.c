@@ -407,7 +407,7 @@ static MACHINE_CONFIG_DERIVED( trckydoc, tecfri )
 
 	MCFG_VIDEO_START_OVERRIDE(sauro_state,trckydoc)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(trckydoc)
+	MCFG_SCREEN_UPDATE_DRIVER(sauro_state, screen_update_trckydoc)
 
 MACHINE_CONFIG_END
 
@@ -425,7 +425,7 @@ static MACHINE_CONFIG_DERIVED( sauro, tecfri )
 
 	MCFG_VIDEO_START_OVERRIDE(sauro_state,sauro)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(sauro)
+	MCFG_SCREEN_UPDATE_DRIVER(sauro_state, screen_update_sauro)
 
 	MCFG_SOUND_ADD("speech", SP0256, 3120000)
 	MCFG_SOUND_CONFIG(sauro_sp256)

@@ -493,6 +493,7 @@ public:
 	DECLARE_DRIVER_INIT(blitz99);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_seattle(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -519,10 +520,9 @@ static void update_widget_irq(running_machine &machine);
  *
  *************************************/
 
-static SCREEN_UPDATE_RGB32( seattle )
+UINT32 seattle_state::screen_update_seattle(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	seattle_state *state = screen.machine().driver_data<seattle_state>();
-	return voodoo_update(state->m_voodoo, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return voodoo_update(m_voodoo, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 
@@ -2559,7 +2559,7 @@ static MACHINE_CONFIG_START( seattle_common, seattle_state )
 	MCFG_SCREEN_REFRESH_RATE(57)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_STATIC(seattle)
+	MCFG_SCREEN_UPDATE_DRIVER(seattle_state, screen_update_seattle)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

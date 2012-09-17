@@ -531,7 +531,7 @@ static void m92_draw_tiles(running_machine &machine, bitmap_ind16 &bitmap,const 
 }
 
 
-SCREEN_UPDATE_IND16( m92 )
+UINT32 m92_state::screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
@@ -541,15 +541,14 @@ SCREEN_UPDATE_IND16( m92 )
 	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
-	m92_state *state = screen.machine().driver_data<m92_state>();
 	if (screen.machine().root_device().ioport("DSW")->read() & 0x100)
-		state->flip_screen_set(0);
+		flip_screen_set(0);
 	else
-		state->flip_screen_set(1);
+		flip_screen_set(1);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( ppan )
+UINT32 m92_state::screen_update_ppan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
@@ -559,10 +558,9 @@ SCREEN_UPDATE_IND16( ppan )
 	ppan_draw_sprites(screen.machine(), bitmap, cliprect);
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
-	m92_state *state = screen.machine().driver_data<m92_state>();
 	if (screen.machine().root_device().ioport("DSW")->read() & 0x100)
-		state->flip_screen_set(0);
+		flip_screen_set(0);
 	else
-		state->flip_screen_set(1);
+		flip_screen_set(1);
 	return 0;
 }

@@ -36,6 +36,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kongambl_ff_w);
 	DECLARE_DRIVER_INIT(kingtut);
 	DECLARE_VIDEO_START(kongambl);
+	UINT32 screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -54,10 +55,9 @@ VIDEO_START_MEMBER(kongambl_state,kongambl)
 	#endif
 }
 
-static SCREEN_UPDATE_IND16(kongambl)
+UINT32 kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	#if CUSTOM_DRAW
-	kongambl_state *state = screen.machine().driver_data<kongambl_state>();
 	gfx_element *gfx = screen.machine().gfx[0];
 	UINT32 count;
 
@@ -67,7 +67,7 @@ static SCREEN_UPDATE_IND16(kongambl)
 	{
 		for (int x=0;x<128;x++)
 		{
-			UINT32 tile = state->m_vram[count] & 0xffff;
+			UINT32 tile = m_vram[count] & 0xffff;
 
 			if(screen.machine().primary_screen->visible_area().contains(x*8, y*8))
 				drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8);
@@ -82,7 +82,7 @@ static SCREEN_UPDATE_IND16(kongambl)
 	{
 		for (int x=0;x<128;x++)
 		{
-			UINT32 tile = state->m_vram[count] & 0xffff;
+			UINT32 tile = m_vram[count] & 0xffff;
 
 			if(screen.machine().primary_screen->visible_area().contains(x*8, y*8))
 				drawgfx_transpen(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8,0);
@@ -607,7 +607,7 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(96*8, 64*8+16)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 80*8-1, 0*8, 64*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(kongambl)
+	MCFG_SCREEN_UPDATE_DRIVER(kongambl_state, screen_update_kongambl)
 
 	MCFG_PALETTE_LENGTH(0x8000)
 

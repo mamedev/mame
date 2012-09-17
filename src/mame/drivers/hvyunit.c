@@ -126,6 +126,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_hvyunit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_hvyunit(screen_device &screen, bool state);
 };
 
 
@@ -177,28 +179,26 @@ void hvyunit_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(hvyunit_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 }
 
-static SCREEN_UPDATE_IND16( hvyunit )
+UINT32 hvyunit_state::screen_update_hvyunit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 #define SX_POS	96
 #define SY_POS	0
-	hvyunit_state *state = screen.machine().driver_data<hvyunit_state>();
 
-	state->m_bg_tilemap->set_scrollx(0, ((state->m_port0_data & 0x40) << 2) + state->m_scrollx + SX_POS); // TODO
-	state->m_bg_tilemap->set_scrolly(0, ((state->m_port0_data & 0x80) << 1) + state->m_scrolly + SY_POS); // TODO
+	m_bg_tilemap->set_scrollx(0, ((m_port0_data & 0x40) << 2) + m_scrollx + SX_POS); // TODO
+	m_bg_tilemap->set_scrolly(0, ((m_port0_data & 0x80) << 1) + m_scrolly + SY_POS); // TODO
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	pandora_update(state->m_pandora, bitmap, cliprect);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	pandora_update(m_pandora, bitmap, cliprect);
 
 	return 0;
 }
 
-static SCREEN_VBLANK( hvyunit )
+void hvyunit_state::screen_eof_hvyunit(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		hvyunit_state *state = screen.machine().driver_data<hvyunit_state>();
-		pandora_eof(state->m_pandora);
+		pandora_eof(m_pandora);
 	}
 }
 
@@ -679,8 +679,8 @@ static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_STATIC(hvyunit)
-	MCFG_SCREEN_VBLANK_STATIC(hvyunit)
+	MCFG_SCREEN_UPDATE_DRIVER(hvyunit_state, screen_update_hvyunit)
+	MCFG_SCREEN_VBLANK_DRIVER(hvyunit_state, screen_eof_hvyunit)
 
 	MCFG_GFXDECODE(hvyunit)
 	MCFG_PALETTE_LENGTH(0x800)

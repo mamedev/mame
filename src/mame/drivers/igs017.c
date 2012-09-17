@@ -155,6 +155,7 @@ public:
 	DECLARE_MACHINE_RESET(iqblocka);
 	DECLARE_MACHINE_RESET(mgcs);
 	DECLARE_MACHINE_RESET(lhzb2a);
+	UINT32 screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -409,9 +410,8 @@ static int debug_viewer(running_machine &machine, bitmap_ind16 &bitmap,const rec
 	return 0;
 }
 
-static SCREEN_UPDATE_IND16( igs017 )
+UINT32 igs017_state::screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	igs017_state *state = screen.machine().driver_data<igs017_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
@@ -430,14 +430,14 @@ static SCREEN_UPDATE_IND16( igs017 )
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if (state->m_video_disable)
+	if (m_video_disable)
 		return 0;
 
-	if (layers_ctrl & 1)	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	if (layers_ctrl & 1)	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	if (layers_ctrl & 4)	draw_sprites(screen.machine(), bitmap, cliprect);
 
-	if (layers_ctrl & 2)	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 2)	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -3269,7 +3269,7 @@ static MACHINE_CONFIG_START( iqblocka, igs017_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_STATIC(igs017)
+	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
 	MCFG_GFXDECODE(igs017)
 	MCFG_PALETTE_LENGTH(0x100*2)
@@ -3334,7 +3334,7 @@ static MACHINE_CONFIG_START( mgcs, igs017_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_STATIC(igs017)
+	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
 	MCFG_GFXDECODE(igs017_flipped)
 	MCFG_PALETTE_LENGTH(0x100*2)
@@ -3374,7 +3374,7 @@ static MACHINE_CONFIG_START( lhzb2, igs017_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_STATIC(igs017)
+	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
 	MCFG_GFXDECODE(igs017_swapped)
 	MCFG_PALETTE_LENGTH(0x100*2)
@@ -3411,7 +3411,7 @@ static MACHINE_CONFIG_START( lhzb2a, igs017_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(igs017)
+	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
 	MCFG_GFXDECODE(igs017_swapped)
 	MCFG_PALETTE_LENGTH(0x100*2)
@@ -3442,7 +3442,7 @@ static MACHINE_CONFIG_START( slqz2, igs017_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_STATIC(igs017)
+	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
 	MCFG_GFXDECODE(igs017)
 	MCFG_PALETTE_LENGTH(0x100*2)
@@ -3482,7 +3482,7 @@ static MACHINE_CONFIG_START( sdmg2, igs017_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(igs017)
+	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
 	MCFG_GFXDECODE(igs017)
 	MCFG_PALETTE_LENGTH(0x100*2)
@@ -3534,7 +3534,7 @@ static MACHINE_CONFIG_START( mgdha, igs017_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(igs017)
+	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
 	MCFG_GFXDECODE(igs017_swapped)
 	MCFG_PALETTE_LENGTH(0x100*2)
@@ -3565,7 +3565,7 @@ static MACHINE_CONFIG_START( tjsb, igs017_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_STATIC(igs017)
+	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
 	MCFG_GFXDECODE(igs017)
 	MCFG_PALETTE_LENGTH(0x100*2)

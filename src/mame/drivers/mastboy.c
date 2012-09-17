@@ -478,6 +478,7 @@ public:
 	DECLARE_DRIVER_INIT(mastboy);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_mastboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -488,15 +489,14 @@ void mastboy_state::video_start()
 	machine().gfx[0]->set_source(m_vram);
 }
 
-static SCREEN_UPDATE_IND16(mastboy)
+UINT32 mastboy_state::screen_update_mastboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mastboy_state *state = screen.machine().driver_data<mastboy_state>();
 	int y,x,i;
 	int count = 0x000;
 
 	for (i=0;i<0x200;i+=2)
 	{
-		int coldat = state->m_colram[i+1] |  (state->m_colram[i+0]<<8);
+		int coldat = m_colram[i+1] |  (m_colram[i+0]<<8);
 
 		palette_set_color_rgb(screen.machine(),i/2,pal4bit(coldat>>8),pal4bit(coldat>>12),pal4bit(coldat>>4));
 	}
@@ -506,8 +506,8 @@ static SCREEN_UPDATE_IND16(mastboy)
 		for (x=0;x<32;x++)
 		{
 			/* bytes 0 and 3 seem to be unused for rendering , they appear to contain data the game uses internally */
-			int tileno = (state->m_tileram[count+1]|(state->m_tileram[count+2]<<8))&0xfff;
-			int attr = (state->m_tileram[count+2]&0xf0)>>4;
+			int tileno = (m_tileram[count+1]|(m_tileram[count+2]<<8))&0xfff;
+			int attr = (m_tileram[count+2]&0xf0)>>4;
 			gfx_element *gfx;
 
 			if (tileno&0x800)
@@ -899,7 +899,7 @@ static MACHINE_CONFIG_START( mastboy, mastboy_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(mastboy)
+	MCFG_SCREEN_UPDATE_DRIVER(mastboy_state, screen_update_mastboy)
 
 	MCFG_GFXDECODE(mastboy)
 	MCFG_PALETTE_LENGTH(0x100)

@@ -383,13 +383,12 @@ VIDEO_START_MEMBER(mbee_state,mbeeppc)
 	m_is_premium = 1;
 }
 
-SCREEN_UPDATE_RGB32( mbee )
+UINT32 mbee_state::screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	mbee_state *state = screen.machine().driver_data<mbee_state>();
-	state->m_framecnt++;
-	state->m_speed = state->m_sy6545_reg[10]&0x20, state->m_flash = state->m_sy6545_reg[10]&0x40;			// cursor modes
-	state->m_cursor = (state->m_sy6545_reg[14]<<8) | state->m_sy6545_reg[15];					// get cursor position
-	state->m_crtc->screen_update(screen, bitmap, cliprect);
+	m_framecnt++;
+	m_speed = m_sy6545_reg[10]&0x20, m_flash = m_sy6545_reg[10]&0x40;			// cursor modes
+	m_cursor = (m_sy6545_reg[14]<<8) | m_sy6545_reg[15];					// get cursor position
+	m_crtc->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
 

@@ -73,6 +73,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_koikoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -142,10 +143,9 @@ void koikoi_state::video_start()
 	m_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(koikoi_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-static SCREEN_UPDATE_IND16(koikoi)
+UINT32 koikoi_state::screen_update_koikoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	koikoi_state *state = screen.machine().driver_data<koikoi_state>();
-	state->m_tmap->draw(bitmap, cliprect, 0, 0);
+	m_tmap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -374,7 +374,7 @@ static MACHINE_CONFIG_START( koikoi, koikoi_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(koikoi)
+	MCFG_SCREEN_UPDATE_DRIVER(koikoi_state, screen_update_koikoi)
 
 	MCFG_GFXDECODE(koikoi)
 	MCFG_PALETTE_LENGTH(8*32)

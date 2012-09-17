@@ -48,10 +48,10 @@ VO_BORDER_COL
 ---- ---- ---- ---- xxxx xxxx ---- ---- Green
 ---- ---- ---- ---- ---- ---- xxxx xxxx Blue
 */
-#define vo_border_K ((state->pvrta_regs[VO_BORDER_COL] & 0x01000000) >> 24)
-#define vo_border_R ((state->pvrta_regs[VO_BORDER_COL] & 0x00ff0000) >> 16)
-#define vo_border_G ((state->pvrta_regs[VO_BORDER_COL] & 0x0000ff00) >> 8)
-#define vo_border_B ((state->pvrta_regs[VO_BORDER_COL] & 0x000000ff) >> 0)
+#define vo_border_K ((pvrta_regs[VO_BORDER_COL] & 0x01000000) >> 24)
+#define vo_border_R ((pvrta_regs[VO_BORDER_COL] & 0x00ff0000) >> 16)
+#define vo_border_G ((pvrta_regs[VO_BORDER_COL] & 0x0000ff00) >> 8)
+#define vo_border_B ((pvrta_regs[VO_BORDER_COL] & 0x000000ff) >> 0)
 
 /*
 SPG_HBLANK
@@ -92,7 +92,7 @@ VO_CONTROL
 #define spg_pclk_delay   ((state->pvrta_regs[VO_CONTROL] & 0x003f0000) >> 16)
 #define spg_pixel_double ((state->pvrta_regs[VO_CONTROL] & 0x00000100) >> 8)
 #define spg_field_mode   ((state->pvrta_regs[VO_CONTROL] & 0x000000f0) >> 4)
-#define spg_blank_video  ((state->pvrta_regs[VO_CONTROL] & 0x00000008) >> 3)
+#define spg_blank_video  ((pvrta_regs[VO_CONTROL] & 0x00000008) >> 3)
 #define spg_blank_pol    ((state->pvrta_regs[VO_CONTROL] & 0x00000004) >> 2)
 #define spg_vsync_pol    ((state->pvrta_regs[VO_CONTROL] & 0x00000002) >> 1)
 #define spg_hsync_pol    ((state->pvrta_regs[VO_CONTROL] & 0x00000001) >> 0)
@@ -2637,9 +2637,8 @@ void dc_state::video_start()
 
 }
 
-SCREEN_UPDATE_RGB32(dc)
+UINT32 dc_state::screen_update_dc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	dc_state *state = screen.machine().driver_data<dc_state>();
 
 	/******************
       MAME note
@@ -2681,7 +2680,7 @@ SCREEN_UPDATE_RGB32(dc)
 		pvr_drawframebuffer(screen.machine(),bitmap,cliprect);
 
 	// update this here so we only do string lookup once per frame
-	state->debug_dip_status = screen.machine().root_device().ioport("MAMEDEBUG")->read();
+	debug_dip_status = screen.machine().root_device().ioport("MAMEDEBUG")->read();
 
 	return 0;
 }

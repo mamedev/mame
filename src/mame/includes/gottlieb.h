@@ -301,6 +301,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_VIDEO_START(screwloo);
+	UINT32 screen_update_gottlieb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -309,7 +310,7 @@ public:
 
 
 
-SCREEN_UPDATE_RGB32( gottlieb );
+
 
 #if USE_FAKE_VOTRAX
 MACHINE_CONFIG_EXTERN( reactor_samples );

@@ -37,11 +37,10 @@ WRITE8_MEMBER(subs_state::subs_invert2_w)
 }
 
 
-SCREEN_UPDATE_IND16( subs_left )
+UINT32 subs_state::screen_update_subs_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	subs_state *state = screen.machine().driver_data<subs_state>();
-	UINT8 *videoram = state->m_videoram;
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *videoram = m_videoram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
 	device_t *discrete = screen.machine().device("discrete");
@@ -120,11 +119,10 @@ SCREEN_UPDATE_IND16( subs_left )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( subs_right )
+UINT32 subs_state::screen_update_subs_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	subs_state *state = screen.machine().driver_data<subs_state>();
-	UINT8 *videoram = state->m_videoram;
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *videoram = m_videoram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
 	/* for every character in the Video RAM, check if it has been modified */

@@ -359,7 +359,7 @@ static MACHINE_CONFIG_START( runaway, runaway_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(256, 263)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(runaway)
+	MCFG_SCREEN_UPDATE_DRIVER(runaway_state, screen_update_runaway)
 
 	MCFG_GFXDECODE(runaway)
 	MCFG_PALETTE_LENGTH(16)
@@ -387,7 +387,7 @@ static MACHINE_CONFIG_DERIVED( qwak, runaway )
 
 	MCFG_VIDEO_START_OVERRIDE(runaway_state,qwak)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(qwak)
+	MCFG_SCREEN_UPDATE_DRIVER(runaway_state, screen_update_qwak)
 
 MACHINE_CONFIG_END
 

@@ -6636,13 +6636,13 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 	stv_sprite_priorities_usage_valid = 1;
 }
 
-SCREEN_UPDATE_RGB32( stv_vdp2 )
+UINT32 saturn_state::screen_update_stv_vdp2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	saturn_state *state = screen.machine().driver_data<saturn_state>();
 
 	stv_vdp2_fade_effects(screen.machine());
 
-	stv_vdp2_draw_back(screen.machine(), state->m_tmpbitmap,cliprect);
+	stv_vdp2_draw_back(screen.machine(), m_tmpbitmap,cliprect);
 
 	#if DEBUG_MODE
 	if(screen.machine().input().code_pressed_once(KEYCODE_T))
@@ -6688,12 +6688,12 @@ SCREEN_UPDATE_RGB32( stv_vdp2 )
 		/*If a plane has a priority value of zero it isn't shown at all.*/
 		for(pri=1;pri<8;pri++)
 		{
-			if (vdpdebug.l_en & 1)    { if(pri==STV_VDP2_N3PRIN) stv_vdp2_draw_NBG3(screen.machine(), state->m_tmpbitmap,cliprect); }
-			if (vdpdebug.l_en & 2)    { if(pri==STV_VDP2_N2PRIN) stv_vdp2_draw_NBG2(screen.machine(), state->m_tmpbitmap,cliprect); }
-			if (vdpdebug.l_en & 4)    { if(pri==STV_VDP2_N1PRIN) stv_vdp2_draw_NBG1(screen.machine(), state->m_tmpbitmap,cliprect); }
-			if (vdpdebug.l_en & 8)    { if(pri==STV_VDP2_N0PRIN) stv_vdp2_draw_NBG0(screen.machine(), state->m_tmpbitmap,cliprect); }
-			if (vdpdebug.l_en & 0x10) { if(pri==STV_VDP2_R0PRIN) stv_vdp2_draw_RBG0(screen.machine(), state->m_tmpbitmap,cliprect); }
-			if (vdpdebug.l_en & 0x20) { draw_sprites(screen.machine(),state->m_tmpbitmap,cliprect,pri); }
+			if (vdpdebug.l_en & 1)    { if(pri==STV_VDP2_N3PRIN) stv_vdp2_draw_NBG3(screen.machine(), m_tmpbitmap,cliprect); }
+			if (vdpdebug.l_en & 2)    { if(pri==STV_VDP2_N2PRIN) stv_vdp2_draw_NBG2(screen.machine(), m_tmpbitmap,cliprect); }
+			if (vdpdebug.l_en & 4)    { if(pri==STV_VDP2_N1PRIN) stv_vdp2_draw_NBG1(screen.machine(), m_tmpbitmap,cliprect); }
+			if (vdpdebug.l_en & 8)    { if(pri==STV_VDP2_N0PRIN) stv_vdp2_draw_NBG0(screen.machine(), m_tmpbitmap,cliprect); }
+			if (vdpdebug.l_en & 0x10) { if(pri==STV_VDP2_R0PRIN) stv_vdp2_draw_RBG0(screen.machine(), m_tmpbitmap,cliprect); }
+			if (vdpdebug.l_en & 0x20) { draw_sprites(screen.machine(),m_tmpbitmap,cliprect,pri); }
 		}
 	}
 
@@ -6755,7 +6755,7 @@ SCREEN_UPDATE_RGB32( stv_vdp2 )
 		fp=fopen("mamevdp1", "w+b");
 		if (fp)
 		{
-			fwrite(state->m_vdp1_vram, 0x80000, 1, fp);
+			fwrite(m_vdp1_vram, 0x80000, 1, fp);
 			fclose(fp);
 		}
 	}
@@ -6767,14 +6767,14 @@ SCREEN_UPDATE_RGB32( stv_vdp2 )
 		fp=fopen("vdp1_vram.bin", "r+b");
 		if (fp)
 		{
-			fread(state->m_vdp1_vram, 0x80000, 1, fp);
+			fread(m_vdp1_vram, 0x80000, 1, fp);
 			fclose(fp);
 		}
 	}
 
 #endif
 
-	copybitmap(bitmap, state->m_tmpbitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_tmpbitmap, 0, 0, 0, 0, cliprect);
 
 	return 0;
 }
@@ -7188,7 +7188,7 @@ static void vdp2_palette_entry(running_machine &machine, int *r, int *g, int *b,
 	}
 }
 
-SCREEN_UPDATE_RGB32( saturn )
+UINT32 saturn_state::screen_update_saturn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	saturn_state *state = screen.machine().driver_data<saturn_state>();
 	static UINT8 disclaimer;

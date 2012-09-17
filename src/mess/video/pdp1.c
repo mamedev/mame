@@ -59,14 +59,13 @@ void pdp1_state::video_start()
 }
 
 
-SCREEN_VBLANK( pdp1 )
+void pdp1_state::screen_eof_pdp1(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		pdp1_state *state = screen.machine().driver_data<pdp1_state>();
 
-		crt_eof(state->m_crt);
+		crt_eof(m_crt);
 	}
 }
 
@@ -86,17 +85,16 @@ void pdp1_plot(running_machine &machine, int x, int y)
 /*
     video_update_pdp1: effectively redraw the screen
 */
-SCREEN_UPDATE_IND16( pdp1 )
+UINT32 pdp1_state::screen_update_pdp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pdp1_state *state = screen.machine().driver_data<pdp1_state>();
-	pdp1_erase_lightpen(state, bitmap);
-	crt_update(state->m_crt, bitmap);
-	pdp1_draw_lightpen(state, bitmap);
+	pdp1_erase_lightpen(this, bitmap);
+	crt_update(m_crt, bitmap);
+	pdp1_draw_lightpen(this, bitmap);
 
-	pdp1_draw_panel(screen.machine(), state->m_panel_bitmap);
-	copybitmap(bitmap, state->m_panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, cliprect);
+	pdp1_draw_panel(screen.machine(), m_panel_bitmap);
+	copybitmap(bitmap, m_panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, cliprect);
 
-	copybitmap(bitmap, state->m_typewriter_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, cliprect);
+	copybitmap(bitmap, m_typewriter_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, cliprect);
 	return 0;
 }
 

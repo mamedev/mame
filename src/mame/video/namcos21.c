@@ -165,44 +165,43 @@ update_palette( running_machine &machine )
 } /* update_palette */
 
 
-SCREEN_UPDATE_IND16( namcos21 )
+UINT32 namcos21_state::screen_update_namcos21(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	namcos21_state *state = screen.machine().driver_data<namcos21_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int pivot = 3;
 	int pri;
 	update_palette(screen.machine());
 	bitmap.fill(0xff, cliprect );
 
-	if( state->m_gametype != NAMCOS21_WINRUN91 )
+	if( m_gametype != NAMCOS21_WINRUN91 )
 	{ /* draw low priority 2d sprites */
-		state->c355_obj_draw(bitmap, cliprect, 2 );
-		state->c355_obj_draw(bitmap, cliprect, 14 );	//driver's eyes
+		c355_obj_draw(bitmap, cliprect, 2 );
+		c355_obj_draw(bitmap, cliprect, 14 );	//driver's eyes
 	}
 
 	CopyVisiblePolyFrameBuffer( screen.machine(), bitmap, cliprect, 0x7fc0, 0x7ffe );
 
-	if( state->m_gametype != NAMCOS21_WINRUN91 )
+	if( m_gametype != NAMCOS21_WINRUN91 )
 	{ /* draw low priority 2d sprites */
-		state->c355_obj_draw(bitmap, cliprect, 0 );
-		state->c355_obj_draw(bitmap, cliprect, 1 );
+		c355_obj_draw(bitmap, cliprect, 0 );
+		c355_obj_draw(bitmap, cliprect, 1 );
 	}
 
 	CopyVisiblePolyFrameBuffer( screen.machine(), bitmap, cliprect, 0, 0x7fbf );
 
 
-	if( state->m_gametype != NAMCOS21_WINRUN91 )
+	if( m_gametype != NAMCOS21_WINRUN91 )
 	{ /* draw high priority 2d sprites */
 		for( pri=pivot; pri<8; pri++ )
 		{
-			state->c355_obj_draw(bitmap, cliprect, pri );
+			c355_obj_draw(bitmap, cliprect, pri );
 		}
-			state->c355_obj_draw(bitmap, cliprect, 15 );	//driver's eyes
+			c355_obj_draw(bitmap, cliprect, 15 );	//driver's eyes
 	}
 	else
 	{ /* winrun bitmap layer */
-		int yscroll = -cliprect.min_y+(INT16)state->m_winrun_gpu_register[0x2/2];
-		int base = 0x1000+0x100*(state->m_winrun_color&0xf);
+		int yscroll = -cliprect.min_y+(INT16)m_winrun_gpu_register[0x2/2];
+		int base = 0x1000+0x100*(m_winrun_color&0xf);
 		int sx,sy;
 		for( sy=cliprect.min_y; sy<=cliprect.max_y; sy++ )
 		{

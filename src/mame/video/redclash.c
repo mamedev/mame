@@ -417,21 +417,20 @@ void redclash_draw_stars( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_VBLANK( redclash )
+void ladybug_state::screen_eof_redclash(screen_device &screen, bool state)
 {
 	// falling edge
-	if (!vblank_on)
+	if (!state)
 		redclash_update_stars_state(screen.machine());
 }
 
-SCREEN_UPDATE_IND16( redclash )
+UINT32 ladybug_state::screen_update_redclash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ladybug_state *state = screen.machine().driver_data<ladybug_state>();
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	redclash_draw_stars(screen.machine(), bitmap, cliprect, 0x60, 0, 0x00, 0xff);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	draw_bullets(screen.machine(), bitmap, cliprect);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

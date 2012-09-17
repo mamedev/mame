@@ -83,6 +83,7 @@ public:
 	DECLARE_WRITE8_MEMBER(taitopjc_tlcs900_to1);
 	DECLARE_WRITE8_MEMBER(taitopjc_tlcs900_to3);
 	virtual void video_start();
+	UINT32 screen_update_taitopjc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 void taitopjc_state::video_start()
@@ -90,7 +91,7 @@ void taitopjc_state::video_start()
 
 }
 
-static SCREEN_UPDATE_RGB32( taitopjc )
+UINT32 taitopjc_state::screen_update_taitopjc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	{
 		UINT8 *s = (UINT8*)jc_char_ram;
@@ -432,7 +433,7 @@ static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(640, 768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 767)
-	MCFG_SCREEN_UPDATE_STATIC(taitopjc)
+	MCFG_SCREEN_UPDATE_DRIVER(taitopjc_state, screen_update_taitopjc)
 
 MACHINE_CONFIG_END
 

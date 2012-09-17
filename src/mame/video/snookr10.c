@@ -183,9 +183,8 @@ VIDEO_START_MEMBER(snookr10_state,apple10)
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snookr10_state::apple10_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
 }
 
-SCREEN_UPDATE_IND16( snookr10 )
+UINT32 snookr10_state::screen_update_snookr10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	snookr10_state *state = screen.machine().driver_data<snookr10_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

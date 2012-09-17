@@ -176,21 +176,20 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 }
 
 
-SCREEN_UPDATE_IND16( perfrman )
+UINT32 slapfght_state::screen_update_perfrman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	slapfght_state *state = screen.machine().driver_data<slapfght_state>();
-	state->m_pf1_tilemap->set_flip(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	state->m_pf1_tilemap ->set_scrolly(0 , 0 );
-	if (state->m_flipscreen) {
-		state->m_pf1_tilemap ->set_scrollx(0 , 264 );
+	m_pf1_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_pf1_tilemap ->set_scrolly(0 , 0 );
+	if (m_flipscreen) {
+		m_pf1_tilemap ->set_scrollx(0 , 264 );
 	}
 	else {
-		state->m_pf1_tilemap ->set_scrollx(0 , -16 );
+		m_pf1_tilemap ->set_scrollx(0 , -16 );
 	}
 
-	state->m_pf1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+	m_pf1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 	draw_sprites(screen.machine(), bitmap,cliprect,0);
-	state->m_pf1_tilemap->draw(bitmap, cliprect, 0,0);
+	m_pf1_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect,0x80);
 
 	slapfght_log_vram(screen.machine());
@@ -198,32 +197,31 @@ SCREEN_UPDATE_IND16( perfrman )
 }
 
 
-SCREEN_UPDATE_IND16( slapfight )
+UINT32 slapfght_state::screen_update_slapfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	slapfght_state *state = screen.machine().driver_data<slapfght_state>();
-	UINT8 *buffered_spriteram = state->m_spriteram->buffer();
+	UINT8 *buffered_spriteram = m_spriteram->buffer();
 	int offs;
 
-	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	if (state->m_flipscreen) {
-		state->m_fix_tilemap->set_scrollx(0,296);
-		state->m_pf1_tilemap->set_scrollx(0,(*state->m_slapfight_scrollx_lo + 256 * *state->m_slapfight_scrollx_hi)+296 );
-		state->m_pf1_tilemap->set_scrolly(0, (*state->m_slapfight_scrolly)+15 );
-		state->m_fix_tilemap->set_scrolly(0, -1 ); /* Glitch in Tiger Heli otherwise */
+	screen.machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	if (m_flipscreen) {
+		m_fix_tilemap->set_scrollx(0,296);
+		m_pf1_tilemap->set_scrollx(0,(*m_slapfight_scrollx_lo + 256 * *m_slapfight_scrollx_hi)+296 );
+		m_pf1_tilemap->set_scrolly(0, (*m_slapfight_scrolly)+15 );
+		m_fix_tilemap->set_scrolly(0, -1 ); /* Glitch in Tiger Heli otherwise */
 	}
 	else {
-		state->m_fix_tilemap->set_scrollx(0,0);
-		state->m_pf1_tilemap->set_scrollx(0,(*state->m_slapfight_scrollx_lo + 256 * *state->m_slapfight_scrollx_hi) );
-		state->m_pf1_tilemap->set_scrolly(0, (*state->m_slapfight_scrolly)-1 );
-		state->m_fix_tilemap->set_scrolly(0, -1 ); /* Glitch in Tiger Heli otherwise */
+		m_fix_tilemap->set_scrollx(0,0);
+		m_pf1_tilemap->set_scrollx(0,(*m_slapfight_scrollx_lo + 256 * *m_slapfight_scrollx_hi) );
+		m_pf1_tilemap->set_scrolly(0, (*m_slapfight_scrolly)-1 );
+		m_fix_tilemap->set_scrolly(0, -1 ); /* Glitch in Tiger Heli otherwise */
 	}
 
-	state->m_pf1_tilemap->draw(bitmap, cliprect, 0,0);
+	m_pf1_tilemap->draw(bitmap, cliprect, 0,0);
 
 	/* Draw the sprites */
-	for (offs = 0;offs < state->m_spriteram->bytes();offs += 4)
+	for (offs = 0;offs < m_spriteram->bytes();offs += 4)
 	{
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[2],
 				buffered_spriteram[offs] + ((buffered_spriteram[offs+2] & 0xc0) << 2),
 				(buffered_spriteram[offs+2] & 0x1e) >> 1,
@@ -237,7 +235,7 @@ SCREEN_UPDATE_IND16( slapfight )
 				(buffered_spriteram[offs+1] + ((buffered_spriteram[offs+2] & 0x01) << 8)) - 13,buffered_spriteram[offs+3],0);
 	}
 
-	state->m_fix_tilemap->draw(bitmap, cliprect, 0,0);
+	m_fix_tilemap->draw(bitmap, cliprect, 0,0);
 
 	slapfght_log_vram(screen.machine());
 	return 0;

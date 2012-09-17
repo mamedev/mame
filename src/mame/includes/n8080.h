@@ -77,6 +77,10 @@ public:
 	DECLARE_MACHINE_RESET(helifire_sound);
 	DECLARE_MACHINE_START(n8080);
 	DECLARE_MACHINE_RESET(n8080);
+	UINT32 screen_update_spacefev(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_sheriff(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_helifire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_helifire(screen_device &screen, bool state);
 };
 
 
@@ -90,10 +94,10 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( spacefev );
-SCREEN_UPDATE_IND16( sheriff );
-SCREEN_UPDATE_IND16( helifire );
-SCREEN_VBLANK( helifire );
+
+
+
+
 
 void spacefev_start_red_cannon(running_machine &machine);
 

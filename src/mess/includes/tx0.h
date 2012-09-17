@@ -150,14 +150,16 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_tx0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_tx0(screen_device &screen, bool state);
 };
 
 
 /*----------- defined in video/tx0.c -----------*/
 
 
-SCREEN_VBLANK( tx0 );
-SCREEN_UPDATE_IND16( tx0 );
+
+
 
 void tx0_plot(running_machine &machine, int x, int y);
 void tx0_typewriter_drawchar(running_machine &machine, int character);

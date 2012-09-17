@@ -45,6 +45,8 @@ public:
 	DECLARE_VIDEO_RESET(psychic5);
 	DECLARE_VIDEO_START(bombsa);
 	DECLARE_VIDEO_RESET(bombsa);
+	UINT32 screen_update_psychic5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_bombsa(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -54,9 +56,9 @@ public:
 
 
 
-SCREEN_UPDATE_RGB32( psychic5 );
 
 
 
 
-SCREEN_UPDATE_RGB32( bombsa );
+
+

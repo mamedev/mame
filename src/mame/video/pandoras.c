@@ -172,11 +172,10 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( pandoras )
+UINT32 pandoras_state::screen_update_pandoras(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pandoras_state *state = screen.machine().driver_data<pandoras_state>();
-	state->m_layer0->draw(bitmap, cliprect, 1 ,0);
-	draw_sprites(screen.machine(), bitmap, cliprect, &state->m_spriteram[0x800] );
-	state->m_layer0->draw(bitmap, cliprect, 0 ,0);
+	m_layer0->draw(bitmap, cliprect, 1 ,0);
+	draw_sprites(screen.machine(), bitmap, cliprect, &m_spriteram[0x800] );
+	m_layer0->draw(bitmap, cliprect, 0 ,0);
 	return 0;
 }

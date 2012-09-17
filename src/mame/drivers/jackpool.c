@@ -37,6 +37,7 @@ public:
 	DECLARE_WRITE16_MEMBER(jackpool_io_w);
 	DECLARE_DRIVER_INIT(jackpool);
 	virtual void video_start();
+	UINT32 screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -44,39 +45,38 @@ void jackpool_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16(jackpool)
+UINT32 jackpool_state::screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	jackpool_state *state = screen.machine().driver_data<jackpool_state>();
 	gfx_element *gfx = screen.machine().gfx[0];
 	int count;// = 0x00000/2;
 
 	int y,x;
 
 	{
-		count = state->m_map_vreg*(0x4000/2);
+		count = m_map_vreg*(0x4000/2);
 		for (y=0;y<32;y++)
 		{
 			for (x=0;x<64;x++)
 			{
-				int tile = (state->m_vram[count+(0x2000/2)] & 0x7fff);
-				int attr = (state->m_vram[count+(0x2000/2)+0x800] & 0x1f00)>>8;
+				int tile = (m_vram[count+(0x2000/2)] & 0x7fff);
+				int attr = (m_vram[count+(0x2000/2)+0x800] & 0x1f00)>>8;
 
 				drawgfx_opaque(bitmap,cliprect,gfx,tile,attr,0,0,x*8,y*8);
 				count++;
 			}
 		}
 
-		count = state->m_map_vreg*(0x4000/2);
+		count = m_map_vreg*(0x4000/2);
 		for (y=0;y<32;y++)
 		{
 			for (x=0;x<64;x++)
 			{
-				int tile = (state->m_vram[count] & 0x7fff);
+				int tile = (m_vram[count] & 0x7fff);
 
 				if(tile != 0)
 				{
-					int attr = (state->m_vram[count+0x800] & 0x1f00)>>8;
-					int t_pen = (state->m_vram[count+0x800] & 0x1000);
+					int attr = (m_vram[count+0x800] & 0x1f00)>>8;
+					int t_pen = (m_vram[count+0x800] & 0x1000);
 
 					drawgfx_transpen(bitmap,cliprect,gfx,tile,attr,0,0,x*8,y*8,(t_pen) ? 0 : -1);
 				}
@@ -266,7 +266,7 @@ static MACHINE_CONFIG_START( jackpool, jackpool_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(jackpool)
+	MCFG_SCREEN_UPDATE_DRIVER(jackpool_state, screen_update_jackpool)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 

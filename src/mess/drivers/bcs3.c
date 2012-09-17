@@ -31,6 +31,10 @@ public:
 	DECLARE_READ8_MEMBER(bcs3_keyboard_r);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_bcs3b(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_bcs3c(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 READ8_MEMBER( bcs3_state::bcs3_keyboard_r )
@@ -216,9 +220,8 @@ void bcs3_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-static SCREEN_UPDATE_IND16( bcs3 )
+UINT32 bcs3_state::screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bcs3_state *state = screen.machine().driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=0,x;
 
@@ -233,10 +236,10 @@ static SCREEN_UPDATE_IND16( bcs3 )
 			{
 				if (ra < 8)
 				{
-					chr = state->m_p_videoram[x] & 0x7f;
+					chr = m_p_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = state->m_p_chargen[(chr<<3) | rat ] ^ 0xff;
+					gfx = m_p_chargen[(chr<<3) | rat ] ^ 0xff;
 				}
 				else
 					gfx = 0xff;
@@ -259,12 +262,11 @@ static SCREEN_UPDATE_IND16( bcs3 )
 
 /* This has 100 lines of screen data. I'm assuming that it only shows a portion of this,
     with the cursor always in sight. */
-static SCREEN_UPDATE_IND16( bcs3a )
+UINT32 bcs3_state::screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bcs3_state *state = screen.machine().driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=128,x;
-	UINT16 cursor = (state->m_p_videoram[0x7a] | (state->m_p_videoram[0x7b] << 8)) - 0x3c80;	// get cursor relative position
+	UINT16 cursor = (m_p_videoram[0x7a] | (m_p_videoram[0x7b] << 8)) - 0x3c80;	// get cursor relative position
 	rat = cursor / 30;
 	if (rat > 11) ma = (rat-11) * 30 + 128;
 
@@ -279,10 +281,10 @@ static SCREEN_UPDATE_IND16( bcs3a )
 			{
 				if (ra < 8)
 				{
-					chr = state->m_p_videoram[x] & 0x7f;
+					chr = m_p_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = state->m_p_chargen[(chr<<3) | rat ] ^ 0xff;
+					gfx = m_p_chargen[(chr<<3) | rat ] ^ 0xff;
 				}
 				else
 					gfx = 0xff;
@@ -303,12 +305,11 @@ static SCREEN_UPDATE_IND16( bcs3a )
 	return 0;
 }
 
-static SCREEN_UPDATE_IND16( bcs3b )
+UINT32 bcs3_state::screen_update_bcs3b(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bcs3_state *state = screen.machine().driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=128,x;
-	UINT16 cursor = (state->m_p_videoram[0x7a] | (state->m_p_videoram[0x7b] << 8)) - 0x3c80;	// get cursor relative position
+	UINT16 cursor = (m_p_videoram[0x7a] | (m_p_videoram[0x7b] << 8)) - 0x3c80;	// get cursor relative position
 	rat = cursor / 41;
 	if (rat > 23) ma = (rat-23) * 41 + 128;
 
@@ -323,10 +324,10 @@ static SCREEN_UPDATE_IND16( bcs3b )
 			{
 				if (ra < 8)
 				{
-					chr = state->m_p_videoram[x] & 0x7f;
+					chr = m_p_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = state->m_p_chargen[(chr<<3) | rat ] ^ 0xff;
+					gfx = m_p_chargen[(chr<<3) | rat ] ^ 0xff;
 				}
 				else
 					gfx = 0xff;
@@ -347,12 +348,11 @@ static SCREEN_UPDATE_IND16( bcs3b )
 	return 0;
 }
 
-static SCREEN_UPDATE_IND16( bcs3c )
+UINT32 bcs3_state::screen_update_bcs3c(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bcs3_state *state = screen.machine().driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=0xb4,x;
-	UINT16 cursor = (state->m_p_videoram[0x08] | (state->m_p_videoram[0x09] << 8)) - 0x3c80;	// get cursor relative position
+	UINT16 cursor = (m_p_videoram[0x08] | (m_p_videoram[0x09] << 8)) - 0x3c80;	// get cursor relative position
 	rat = cursor / 30;
 	if (rat > 11) ma = (rat-11) * 30 + 0xb4;
 
@@ -367,10 +367,10 @@ static SCREEN_UPDATE_IND16( bcs3c )
 			{
 				if (ra < 8)
 				{
-					chr = state->m_p_videoram[x] & 0x7f;
+					chr = m_p_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = state->m_p_chargen[(chr<<3) | rat ] ^ 0xff;
+					gfx = m_p_chargen[(chr<<3) | rat ] ^ 0xff;
 				}
 				else
 					gfx = 0xff;
@@ -423,7 +423,7 @@ static MACHINE_CONFIG_START( bcs3, bcs3_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(28*8, 12*10)
 	MCFG_SCREEN_VISIBLE_AREA(0,28*8-1,0,12*10-1)
-	MCFG_SCREEN_UPDATE_STATIC(bcs3)
+	MCFG_SCREEN_UPDATE_DRIVER(bcs3_state, screen_update_bcs3)
 	MCFG_GFXDECODE(bcs3)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
@@ -437,7 +437,7 @@ static MACHINE_CONFIG_DERIVED( bcs3a, bcs3 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(29*8, 12*10)
 	MCFG_SCREEN_VISIBLE_AREA(0,29*8-1,0,12*10-1)
-	MCFG_SCREEN_UPDATE_STATIC(bcs3a)
+	MCFG_SCREEN_UPDATE_DRIVER(bcs3_state, screen_update_bcs3a)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bcs3b, bcs3 )
@@ -448,7 +448,7 @@ static MACHINE_CONFIG_DERIVED( bcs3b, bcs3 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(40*8, 24*10)
 	MCFG_SCREEN_VISIBLE_AREA(0,40*8-1,0,24*10-1)
-	MCFG_SCREEN_UPDATE_STATIC(bcs3b)
+	MCFG_SCREEN_UPDATE_DRIVER(bcs3_state, screen_update_bcs3b)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bcs3c, bcs3 )
@@ -459,7 +459,7 @@ static MACHINE_CONFIG_DERIVED( bcs3c, bcs3 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(29*8, 12*10)
 	MCFG_SCREEN_VISIBLE_AREA(0,29*8-1,0,12*10-1)
-	MCFG_SCREEN_UPDATE_STATIC(bcs3c)
+	MCFG_SCREEN_UPDATE_DRIVER(bcs3_state, screen_update_bcs3c)
 MACHINE_CONFIG_END
 
 /* ROM definition */

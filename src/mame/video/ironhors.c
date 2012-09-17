@@ -234,15 +234,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( ironhors )
+UINT32 ironhors_state::screen_update_ironhors(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ironhors_state *state = screen.machine().driver_data<ironhors_state>();
 	int row;
 
 	for (row = 0; row < 32; row++)
-		state->m_bg_tilemap->set_scrollx(row, state->m_scroll[row]);
+		m_bg_tilemap->set_scrollx(row, m_scroll[row]);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
@@ -345,15 +344,14 @@ static void farwest_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 	}
 }
 
-SCREEN_UPDATE_IND16( farwest)
+UINT32 ironhors_state::screen_update_farwest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ironhors_state *state = screen.machine().driver_data<ironhors_state>();
 	int row;
 
 	for (row = 0; row < 32; row++)
-		state->m_bg_tilemap->set_scrollx(row, state->m_scroll[row]);
+		m_bg_tilemap->set_scrollx(row, m_scroll[row]);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	farwest_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

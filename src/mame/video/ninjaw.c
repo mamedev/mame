@@ -127,6 +127,6 @@ static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const r
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( ninjaw_left ) { return update_screen(screen, bitmap, cliprect, 36 * 8 * 0, screen.machine().driver_data<ninjaw_state>()->m_tc0100scn_1); }
-SCREEN_UPDATE_IND16( ninjaw_middle ) { return update_screen(screen, bitmap, cliprect, 36 * 8 * 1, screen.machine().driver_data<ninjaw_state>()->m_tc0100scn_2); }
-SCREEN_UPDATE_IND16( ninjaw_right ) { return update_screen(screen, bitmap, cliprect, 36 * 8 * 2, screen.machine().driver_data<ninjaw_state>()->m_tc0100scn_3); }
+UINT32 ninjaw_state::screen_update_ninjaw_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8 * 0, screen.machine().driver_data<ninjaw_state>()->m_tc0100scn_1); }
+UINT32 ninjaw_state::screen_update_ninjaw_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8 * 1, screen.machine().driver_data<ninjaw_state>()->m_tc0100scn_2); }
+UINT32 ninjaw_state::screen_update_ninjaw_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8 * 2, screen.machine().driver_data<ninjaw_state>()->m_tc0100scn_3); }

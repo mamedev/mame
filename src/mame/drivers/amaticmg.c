@@ -452,6 +452,8 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	DECLARE_PALETTE_INIT(amaticmg2);
+	UINT32 screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -463,9 +465,8 @@ void amaticmg_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( amaticmg )
+UINT32 amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	amaticmg_state *state = screen.machine().driver_data<amaticmg_state>();
 	gfx_element *gfx = screen.machine().gfx[0];
 	int y,x;
 	int count = 0;
@@ -474,12 +475,12 @@ static SCREEN_UPDATE_IND16( amaticmg )
 	{
 		for (x=0;x<96;x++)
 		{
-			UINT16 tile = state->m_vram[count];
+			UINT16 tile = m_vram[count];
 			UINT8 color;
 
-			tile += ((state->m_attr[count]&0x0f)<<8);
+			tile += ((m_attr[count]&0x0f)<<8);
 			/* TODO: this looks so out of place ... */
-			color = (state->m_attr[count]&0xf0)>>3;
+			color = (m_attr[count]&0xf0)>>3;
 
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*4,y*8);
 			count++;
@@ -489,9 +490,8 @@ static SCREEN_UPDATE_IND16( amaticmg )
 	return 0;
 }
 
-static SCREEN_UPDATE_IND16( amaticmg2 )
+UINT32 amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	amaticmg_state *state = screen.machine().driver_data<amaticmg_state>();
 	gfx_element *gfx = screen.machine().gfx[0];
 	int y,x;
 	int count = 16;
@@ -500,10 +500,10 @@ static SCREEN_UPDATE_IND16( amaticmg2 )
 	{
 		for (x=0;x<96;x++)
 		{
-			UINT16 tile = state->m_vram[count];
+			UINT16 tile = m_vram[count];
 			UINT8 color;
 
-			tile += ((state->m_attr[count]&0xff)<<8);
+			tile += ((m_attr[count]&0xff)<<8);
 			color = 0;
 
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*4,y*8);
@@ -881,7 +881,7 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(amaticmg)
+	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg)
 
 	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
 
@@ -919,7 +919,7 @@ static MACHINE_CONFIG_DERIVED( amaticmg2, amaticmg )
 	MCFG_CPU_VBLANK_INT("screen", amaticmg2_irq)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(amaticmg2)
+	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
 
 	MCFG_GFXDECODE(amaticmg2)
 	MCFG_PALETTE_INIT_OVERRIDE(amaticmg_state,amaticmg2)

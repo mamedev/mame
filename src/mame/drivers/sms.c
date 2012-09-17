@@ -245,6 +245,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	DECLARE_MACHINE_START(sureshot);
+	UINT32 screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -480,10 +481,9 @@ void smsmfg_state::video_start()
 	state_save_register_global_bitmap(machine(), &m_bitmap);
 }
 
-static SCREEN_UPDATE_IND16( sms )
+UINT32 smsmfg_state::screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	smsmfg_state *state = screen.machine().driver_data<smsmfg_state>();
-	copybitmap(bitmap, state->m_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
@@ -578,7 +578,7 @@ static MACHINE_CONFIG_START( sms, smsmfg_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(0x1b0, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x1af, 0, 0xff)
-	MCFG_SCREEN_UPDATE_STATIC(sms)
+	MCFG_SCREEN_UPDATE_DRIVER(smsmfg_state, screen_update_sms)
 
 	MCFG_PALETTE_LENGTH(8)
 

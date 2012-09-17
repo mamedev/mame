@@ -23,6 +23,8 @@ public:
 	virtual void video_start();
 	DECLARE_MACHINE_RESET(a5130);
 	DECLARE_VIDEO_START(a5130);
+	UINT32 screen_update_a5120(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_a5130(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -62,7 +64,7 @@ void a51xx_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( a5120 )
+UINT32 a51xx_state::screen_update_a5120(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -81,7 +83,7 @@ VIDEO_START_MEMBER(a51xx_state,a5130)
 {
 }
 
-static SCREEN_UPDATE_IND16( a5130 )
+UINT32 a51xx_state::screen_update_a5130(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -117,7 +119,7 @@ static MACHINE_CONFIG_START( a5120, a51xx_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_STATIC(a5120)
+	MCFG_SCREEN_UPDATE_DRIVER(a51xx_state, screen_update_a5120)
 
 	MCFG_GFXDECODE(a51xx)
 	MCFG_PALETTE_LENGTH(2)
@@ -135,7 +137,7 @@ static MACHINE_CONFIG_DERIVED( a5130, a5120 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(a5130)
+	MCFG_SCREEN_UPDATE_DRIVER(a51xx_state, screen_update_a5130)
 
 	MCFG_VIDEO_START_OVERRIDE(a51xx_state,a5130)
 MACHINE_CONFIG_END

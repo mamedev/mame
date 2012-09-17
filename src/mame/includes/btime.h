@@ -107,6 +107,13 @@ public:
 	DECLARE_MACHINE_START(mmonkey);
 	DECLARE_MACHINE_RESET(mmonkey);
 	DECLARE_VIDEO_START(bnj);
+	UINT32 screen_update_btime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_cookrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_lnc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_eggs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_bnj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_zoar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_disco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -122,11 +129,11 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( btime );
-SCREEN_UPDATE_IND16( cookrace );
-SCREEN_UPDATE_IND16( bnj );
-SCREEN_UPDATE_IND16( lnc );
-SCREEN_UPDATE_IND16( zoar );
-SCREEN_UPDATE_IND16( disco );
-SCREEN_UPDATE_IND16( eggs );
+
+
+
+
+
+
+
 

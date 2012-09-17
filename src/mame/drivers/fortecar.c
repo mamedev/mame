@@ -343,6 +343,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_fortecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -350,9 +351,8 @@ void fortecar_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16(fortecar)
+UINT32 fortecar_state::screen_update_fortecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	fortecar_state *state = screen.machine().driver_data<fortecar_state>();
 	int x,y,count;
 	count = 0;
 
@@ -362,9 +362,9 @@ static SCREEN_UPDATE_IND16(fortecar)
 		{
 			int tile,color,bpp;
 
-			tile = (state->m_vram[(count*4)+1] | (state->m_vram[(count*4)+2]<<8)) & 0xfff;
-			color = state->m_vram[(count*4)+3] & 0x1f;
-			bpp = (state->m_vram[(count*4)+3] & 0x20) >> 5;
+			tile = (m_vram[(count*4)+1] | (m_vram[(count*4)+2]<<8)) & 0xfff;
+			color = m_vram[(count*4)+3] & 0x1f;
+			bpp = (m_vram[(count*4)+3] & 0x20) >> 5;
 
 			if(bpp)
 				color&=0x3;
@@ -701,7 +701,7 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(640, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 600-1, 0, 240-1)	/* driven by CRTC */
-	MCFG_SCREEN_UPDATE_STATIC(fortecar)
+	MCFG_SCREEN_UPDATE_DRIVER(fortecar_state, screen_update_fortecar)
 
 
 	MCFG_EEPROM_ADD("eeprom", forte_eeprom_intf)

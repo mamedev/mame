@@ -23,6 +23,7 @@ public:
 	DECLARE_MACHINE_START(lvpoker);
 	DECLARE_MACHINE_RESET(lvpoker);
 	DECLARE_PALETTE_INIT(ponttehk);
+	UINT32 screen_update_lvcards(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -32,4 +33,4 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( lvcards );
+

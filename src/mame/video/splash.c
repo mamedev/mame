@@ -254,35 +254,33 @@ static void funystrp_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( splash )
+UINT32 splash_state::screen_update_splash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	splash_state *state = screen.machine().driver_data<splash_state>();
 
 	/* set scroll registers */
-	state->m_bg_tilemap[0]->set_scrolly(0, state->m_vregs[0]);
-	state->m_bg_tilemap[1]->set_scrolly(0, state->m_vregs[1]);
+	m_bg_tilemap[0]->set_scrolly(0, m_vregs[0]);
+	m_bg_tilemap[1]->set_scrolly(0, m_vregs[1]);
 
 	draw_bitmap(screen.machine(), bitmap, cliprect);
 
-	state->m_bg_tilemap[1]->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap[1]->draw(bitmap, cliprect, 0, 0);
 	splash_draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_bg_tilemap[0]->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap[0]->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( funystrp )
+UINT32 splash_state::screen_update_funystrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	splash_state *state = screen.machine().driver_data<splash_state>();
 
 	/* set scroll registers */
-	state->m_bg_tilemap[0]->set_scrolly(0, state->m_vregs[0]);
-	state->m_bg_tilemap[1]->set_scrolly(0, state->m_vregs[1]);
+	m_bg_tilemap[0]->set_scrolly(0, m_vregs[0]);
+	m_bg_tilemap[1]->set_scrolly(0, m_vregs[1]);
 
 	draw_bitmap(screen.machine(), bitmap, cliprect);
 
-	state->m_bg_tilemap[1]->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap[1]->draw(bitmap, cliprect, 0, 0);
 	/*Sprite chip is similar but not the same*/
 	funystrp_draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_bg_tilemap[0]->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap[0]->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

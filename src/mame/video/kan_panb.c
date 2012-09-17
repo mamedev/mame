@@ -4,10 +4,9 @@
 #include "kan_panb.h"
 #include "includes/snowbros.h"
 
-SCREEN_UPDATE_IND16( honeydol )
+UINT32 snowbros_state::screen_update_honeydol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	snowbros_state *state = screen.machine().driver_data<snowbros_state>();
-	UINT16 *spriteram16 = state->m_bootleg_spriteram16;
+	UINT16 *spriteram16 = m_bootleg_spriteram16;
 	int sx=0, sy=0, x=0, y=0, offs;
 	/* sprites clip on left / right edges when scrolling, but it seems correct,
        no extra sprite attribute bits are set during this time, the sprite co-ordinates
@@ -33,7 +32,7 @@ SCREEN_UPDATE_IND16( honeydol )
 		x = dx;
 		y = dy;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - x;
 			sy = 240 - y;
@@ -64,7 +63,7 @@ SCREEN_UPDATE_IND16( honeydol )
 		x = dx;
 		y = dy;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - x;
 			sy = 240 - y;
@@ -90,10 +89,9 @@ SCREEN_UPDATE_IND16( honeydol )
 }
 
 
-SCREEN_UPDATE_IND16( twinadv )
+UINT32 snowbros_state::screen_update_twinadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	snowbros_state *state = screen.machine().driver_data<snowbros_state>();
-	UINT16 *spriteram16 = state->m_bootleg_spriteram16;
+	UINT16 *spriteram16 = m_bootleg_spriteram16;
 	int sx=0, sy=0, x=0, y=0, offs;
 	/* sprites clip on left / right edges when scrolling, but it seems correct,
        no extra sprite attribute bits are set during this time, the sprite co-ordinates
@@ -120,7 +118,7 @@ SCREEN_UPDATE_IND16( twinadv )
 		x = dx;
 		y = dy;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - x;
 			sy = 240 - y;
@@ -146,15 +144,14 @@ SCREEN_UPDATE_IND16( twinadv )
 }
 
 
-SCREEN_UPDATE_IND16( wintbob )
+UINT32 snowbros_state::screen_update_wintbob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	snowbros_state *state = screen.machine().driver_data<snowbros_state>();
-	UINT16 *spriteram16 = state->m_bootleg_spriteram16;
+	UINT16 *spriteram16 = m_bootleg_spriteram16;
 	int offs;
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	for (offs = 0;offs < state->m_bootleg_spriteram16.bytes()/2;offs += 8)
+	for (offs = 0;offs < m_bootleg_spriteram16.bytes()/2;offs += 8)
 	{
 		int xpos  = spriteram16[offs] & 0xff;
 		int ypos  = spriteram16[offs+4] & 0xff;
@@ -169,7 +166,7 @@ SCREEN_UPDATE_IND16( wintbob )
 
 		if (wrapr == 8) xpos -= 256;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			xpos = 240 - xpos;
 			ypos = 240 - ypos;
@@ -190,10 +187,9 @@ SCREEN_UPDATE_IND16( wintbob )
 }
 
 
-SCREEN_UPDATE_IND16( snowbro3 )
+UINT32 snowbros_state::screen_update_snowbro3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	snowbros_state *state = screen.machine().driver_data<snowbros_state>();
-	UINT16 *spriteram16 = state->m_bootleg_spriteram16;
+	UINT16 *spriteram16 = m_bootleg_spriteram16;
 	int sx=0, sy=0, x=0, y=0, offs;
 
 	/*
@@ -222,7 +218,7 @@ SCREEN_UPDATE_IND16( snowbro3 )
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	for (offs = 0;offs < state->m_bootleg_spriteram16.bytes()/2;offs += 8)
+	for (offs = 0;offs < m_bootleg_spriteram16.bytes()/2;offs += 8)
 	{
 		gfx_element *gfx = screen.machine().gfx[0];
 		int dx = spriteram16[offs+4] & 0xff;
@@ -249,7 +245,7 @@ SCREEN_UPDATE_IND16( snowbro3 )
 		if (x > 511) x &= 0x1ff;
 		if (y > 511) y &= 0x1ff;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - x;
 			sy = 240 - y;

@@ -86,6 +86,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_trvmadns(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -291,9 +292,8 @@ void trvmadns_state::video_start()
 	machine().gfx[0]->set_source(m_gfxram);
 }
 
-static SCREEN_UPDATE_IND16( trvmadns )
+UINT32 trvmadns_state::screen_update_trvmadns(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	trvmadns_state *state = screen.machine().driver_data<trvmadns_state>();
 	int x,y,count;
 	gfx_element *gfx = screen.machine().gfx[0];
 
@@ -305,8 +305,8 @@ static SCREEN_UPDATE_IND16( trvmadns )
 	{
 		for (x=0;x<32;x++)
 		{
-			int attr = state->m_tileram[count*2+0];
-			int tile = state->m_tileram[count*2+1] | ((attr & 0x01) << 8);
+			int attr = m_tileram[count*2+0];
+			int tile = m_tileram[count*2+1] | ((attr & 0x01) << 8);
 			int color = (attr & 0x18) >> 3;
 			int flipx = attr & 4;
 			int flipy = attr & 2;
@@ -323,8 +323,8 @@ static SCREEN_UPDATE_IND16( trvmadns )
 	{
 		for (x=0;x<32;x++)
 		{
-			int attr = state->m_tileram[count*2+0];
-			int tile = state->m_tileram[count*2+1] | ((attr & 0x01) << 8);
+			int attr = m_tileram[count*2+0];
+			int tile = m_tileram[count*2+1] | ((attr & 0x01) << 8);
 			int color = (attr & 0x18) >> 3;
 			int flipx = attr & 4;
 			int flipy = attr & 2;
@@ -356,7 +356,7 @@ static MACHINE_CONFIG_START( trvmadns, trvmadns_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(trvmadns)
+	MCFG_SCREEN_UPDATE_DRIVER(trvmadns_state, screen_update_trvmadns)
 
 	MCFG_GFXDECODE(trvmadns)
 	MCFG_PALETTE_LENGTH(16)

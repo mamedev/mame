@@ -785,7 +785,7 @@ static MACHINE_CONFIG_START( atarisy1, atarisy1_state )
 	/* note: these parameters are from published specs, not derived */
 	/* video timing comes from an 82S163 (H) and an 82S129 (V) */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_STATIC(atarisy1)
+	MCFG_SCREEN_UPDATE_DRIVER(atarisy1_state, screen_update_atarisy1)
 
 	MCFG_VIDEO_START_OVERRIDE(atarisy1_state,atarisy1)
 

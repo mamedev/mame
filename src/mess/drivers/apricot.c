@@ -64,6 +64,7 @@ public:
 	required_shared_ptr<UINT16> m_screen_buffer;
 	DECLARE_DRIVER_INIT(apricot);
 	virtual void palette_init();
+	UINT32 screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -183,12 +184,11 @@ static const wd17xx_interface apricot_wd17xx_intf =
     VIDEO EMULATION
 ***************************************************************************/
 
-static SCREEN_UPDATE_RGB32( apricot )
+UINT32 apricot_state::screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	apricot_state *state = screen.machine().driver_data<apricot_state>();
 
-	if (!state->m_display_on)
-		state->m_crtc->screen_update( screen, bitmap, cliprect);
+	if (!m_display_on)
+		m_crtc->screen_update( screen, bitmap, cliprect);
 	else
 		bitmap.fill(0, cliprect);
 
@@ -376,7 +376,7 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_SCREEN_SIZE(800, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 400-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
-	MCFG_SCREEN_UPDATE_STATIC(apricot)
+	MCFG_SCREEN_UPDATE_DRIVER(apricot_state, screen_update_apricot)
 	MCFG_PALETTE_LENGTH(3)
 
 	/* sound hardware */

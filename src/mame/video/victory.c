@@ -1086,10 +1086,9 @@ static TIMER_CALLBACK( bgcoll_irq_callback )
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( victory )
+UINT32 victory_state::screen_update_victory(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	victory_state *state = screen.machine().driver_data<victory_state>();
-	int bgcollmask = (state->m_video_control & 4) ? 4 : 7;
+	int bgcollmask = (m_video_control & 4) ? 4 : 7;
 	int count = 0;
 	int x, y;
 
@@ -1104,15 +1103,15 @@ SCREEN_UPDATE_IND16( victory )
 	for (y = 0; y < 256; y++)
 	{
 		UINT16 *scanline = &bitmap.pix16(y);
-		UINT8 sy = state->m_scrolly + y;
-		UINT8 *fg = &state->m_fgbitmap[y * 256];
-		UINT8 *bg = &state->m_bgbitmap[sy * 256];
+		UINT8 sy = m_scrolly + y;
+		UINT8 *fg = &m_fgbitmap[y * 256];
+		UINT8 *bg = &m_bgbitmap[sy * 256];
 
 		/* do the blending */
 		for (x = 0; x < 256; x++)
 		{
 			int fpix = *fg++;
-			int bpix = bg[(x + state->m_scrollx) & 255];
+			int bpix = bg[(x + m_scrollx) & 255];
 			scanline[x] = bpix | (fpix << 3);
 			if (fpix && (bpix & bgcollmask) && count++ < 128)
 				screen.machine().scheduler().timer_set(screen.time_until_pos(y, x), FUNC(bgcoll_irq_callback), x | (y << 8));

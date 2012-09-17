@@ -69,6 +69,8 @@ public:
 	DECLARE_MACHINE_RESET(funcube);
 	DECLARE_VIDEO_START(seta2_yoffset);
 	DECLARE_VIDEO_START(seta2_xoffset);
+	UINT32 screen_update_seta2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_seta2(screen_device &screen, bool state);
 };
 
 /*----------- defined in video/seta2.c -----------*/
@@ -77,5 +79,5 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( seta2 );
-SCREEN_VBLANK( seta2 );
+
+

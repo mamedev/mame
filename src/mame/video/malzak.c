@@ -17,35 +17,34 @@
 #include "video/saa5050.h"
 #include "includes/malzak.h"
 
-SCREEN_UPDATE_RGB32( malzak )
+UINT32 malzak_state::screen_update_malzak(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-	malzak_state *state = screen.machine().driver_data<malzak_state>();
 	int sx, sy;
 	int x,y;
 
 	bitmap.fill(RGB_BLACK);
 
-	state->m_trom->screen_update(screen, bitmap, cliprect);
+	m_trom->screen_update(screen, bitmap, cliprect);
 
 	// playfield - not sure exactly how this works...
 	for (x = 0; x < 16; x++)
 		for (y = 0; y < 16; y++)
 		{
-			sx = ((x * 16 - 48) - state->m_malzak_x) * 2;
-			sy = ((y * 16) - state->m_malzak_y) * 2;
+			sx = ((x * 16 - 48) - m_malzak_x) * 2;
+			sy = ((y * 16) - m_malzak_y) * 2;
 
 			if (sx < -271*2)
 				sx += 512*2;
 			if (sx < -15*2)
 				sx += 256*2;
 
-			drawgfxzoom_transpen(bitmap,cliprect, screen.machine().gfx[0], state->m_playfield_code[x * 16 + y], 2, 0, 0, sx, sy, 0x20000, 0x20000, 0);
+			drawgfxzoom_transpen(bitmap,cliprect, screen.machine().gfx[0], m_playfield_code[x * 16 + y], 2, 0, 0, sx, sy, 0x20000, 0x20000, 0);
 		}
 
 	/* update the S2636 chips */
-	bitmap_ind16 &s2636_0_bitmap = s2636_update(state->m_s2636_0, cliprect);
-	bitmap_ind16 &s2636_1_bitmap = s2636_update(state->m_s2636_1, cliprect);
+	bitmap_ind16 &s2636_0_bitmap = s2636_update(m_s2636_0, cliprect);
+	bitmap_ind16 &s2636_1_bitmap = s2636_update(m_s2636_1, cliprect);
 
 	/* copy the S2636 images into the main bitmap */
 	{

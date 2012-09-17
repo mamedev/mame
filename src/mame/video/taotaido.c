@@ -192,11 +192,10 @@ void taotaido_state::video_start()
 }
 
 
-SCREEN_UPDATE_IND16(taotaido)
+UINT32 taotaido_state::screen_update_taotaido(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	taotaido_state *state = screen.machine().driver_data<taotaido_state>();
-//  state->m_bg_tilemap->set_scrollx(0,(state->m_scrollram[0x380/2]>>4)); // the values put here end up being wrong every other frame
-//  state->m_bg_tilemap->set_scrolly(0,(state->m_scrollram[0x382/2]>>4)); // the values put here end up being wrong every other frame
+//  m_bg_tilemap->set_scrollx(0,(m_scrollram[0x380/2]>>4)); // the values put here end up being wrong every other frame
+//  m_bg_tilemap->set_scrolly(0,(m_scrollram[0x382/2]>>4)); // the values put here end up being wrong every other frame
 
 	/* not amazingly efficient however it should be functional for row select and linescroll */
 	int line;
@@ -209,28 +208,27 @@ SCREEN_UPDATE_IND16(taotaido)
 	{
 		clip.min_y = clip.max_y = line;
 
-		state->m_bg_tilemap->set_scrollx(0,((state->m_scrollram[(0x00+4*line)/2])>>4)+30);
-		state->m_bg_tilemap->set_scrolly(0,((state->m_scrollram[(0x02+4*line)/2])>>4)-line);
+		m_bg_tilemap->set_scrollx(0,((m_scrollram[(0x00+4*line)/2])>>4)+30);
+		m_bg_tilemap->set_scrolly(0,((m_scrollram[(0x02+4*line)/2])>>4)-line);
 
-		state->m_bg_tilemap->draw(bitmap, clip, 0,0);
+		m_bg_tilemap->draw(bitmap, clip, 0,0);
 	}
 
 	draw_sprites(screen.machine(), bitmap,cliprect);
 	return 0;
 }
 
-SCREEN_VBLANK( taotaido )
+void taotaido_state::screen_eof_taotaido(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		taotaido_state *state = screen.machine().driver_data<taotaido_state>();
 		/* sprites need to be delayed by 2 frames? */
 
-		memcpy(state->m_spriteram2_older,state->m_spriteram2_old,0x10000);
-		memcpy(state->m_spriteram2_old,state->m_spriteram2,0x10000);
+		memcpy(m_spriteram2_older,m_spriteram2_old,0x10000);
+		memcpy(m_spriteram2_old,m_spriteram2,0x10000);
 
-		memcpy(state->m_spriteram_older,state->m_spriteram_old,0x2000);
-		memcpy(state->m_spriteram_old,state->m_spriteram,0x2000);
+		memcpy(m_spriteram_older,m_spriteram_old,0x2000);
+		memcpy(m_spriteram_old,m_spriteram,0x2000);
 	}
 }

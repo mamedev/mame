@@ -334,7 +334,7 @@ void segag80v_state::video_start()
 }
 
 
-SCREEN_UPDATE_RGB32( segag80v )
+UINT32 segag80v_state::screen_update_segag80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	sega_generate_vector_list(screen.machine());
 	SCREEN_UPDATE32_CALL(vector);

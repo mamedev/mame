@@ -40,6 +40,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_suprridr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -51,4 +52,4 @@ public:
 int suprridr_is_screen_flipped(running_machine &machine);
 
 
-SCREEN_UPDATE_IND16( suprridr );
+

@@ -227,36 +227,35 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	}
 }
 
-SCREEN_UPDATE_IND16( tryout )
+UINT32 tryout_state::screen_update_tryout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tryout_state *state = screen.machine().driver_data<tryout_state>();
 	int scrollx = 0;
 
-	if (!state->flip_screen())
-		state->m_fg_tilemap->set_scrollx(0, 16); /* Assumed hard-wired */
+	if (!flip_screen())
+		m_fg_tilemap->set_scrollx(0, 16); /* Assumed hard-wired */
 	else
-		state->m_fg_tilemap->set_scrollx(0, -8); /* Assumed hard-wired */
+		m_fg_tilemap->set_scrollx(0, -8); /* Assumed hard-wired */
 
-	scrollx = state->m_gfx_control[1] + ((state->m_gfx_control[0]&1)<<8) + ((state->m_gfx_control[0]&4)<<7) - ((state->m_gfx_control[0] & 2) ? 0 : 0x100);
+	scrollx = m_gfx_control[1] + ((m_gfx_control[0]&1)<<8) + ((m_gfx_control[0]&4)<<7) - ((m_gfx_control[0] & 2) ? 0 : 0x100);
 
 	/* wrap-around */
-	if(state->m_gfx_control[1] == 0) { scrollx+=0x100; }
+	if(m_gfx_control[1] == 0) { scrollx+=0x100; }
 
-	state->m_bg_tilemap->set_scrollx(0, scrollx+2); /* why +2? hard-wired? */
-	state->m_bg_tilemap->set_scrolly(0, -state->m_gfx_control[2]);
+	m_bg_tilemap->set_scrollx(0, scrollx+2); /* why +2? hard-wired? */
+	m_bg_tilemap->set_scrolly(0, -m_gfx_control[2]);
 
-	if(!(state->m_gfx_control[0] & 0x8)) // screen disable
+	if(!(m_gfx_control[0] & 0x8)) // screen disable
 	{
 		/* TODO: Color might be different, needs a video from an original pcb. */
 		bitmap.fill(screen.machine().pens[0x10], cliprect);
 	}
 	else
 	{
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+		m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+		m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
 	}
 
-//  popmessage("%02x %02x %02x %02x",state->m_gfx_control[0],state->m_gfx_control[1],state->m_gfx_control[2],scrollx);
+//  popmessage("%02x %02x %02x %02x",m_gfx_control[0],m_gfx_control[1],m_gfx_control[2],scrollx);
 	return 0;
 }

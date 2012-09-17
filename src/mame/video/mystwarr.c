@@ -321,63 +321,60 @@ VIDEO_START_MEMBER(mystwarr_state,martchmp)
 
 
 
-SCREEN_UPDATE_RGB32(mystwarr)
+UINT32 mystwarr_state::screen_update_mystwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	mystwarr_state *state = screen.machine().driver_data<mystwarr_state>();
 	int i, old, blendmode=0;
 
-	if (state->m_cbparam<0) state->m_cbparam=0; else if (state->m_cbparam>=32) blendmode=(1<<16|GXMIX_BLEND_FORCE)<<2; //* water hack (TEMPORARY)
+	if (m_cbparam<0) m_cbparam=0; else if (m_cbparam>=32) blendmode=(1<<16|GXMIX_BLEND_FORCE)<<2; //* water hack (TEMPORARY)
 
 	for (i = 0; i < 4; i++)
 	{
-		old = state->m_layer_colorbase[i];
-		state->m_layer_colorbase[i] = K055555_get_palette_index(i)<<4;
-		if( old != state->m_layer_colorbase[i] ) K056832_mark_plane_dirty(i);
+		old = m_layer_colorbase[i];
+		m_layer_colorbase[i] = K055555_get_palette_index(i)<<4;
+		if( old != m_layer_colorbase[i] ) K056832_mark_plane_dirty(i);
 	}
 
-	state->m_sprite_colorbase = K055555_get_palette_index(4)<<5;
+	m_sprite_colorbase = K055555_get_palette_index(4)<<5;
 
 	konamigx_mixer(screen.machine(), bitmap, cliprect, 0, 0, 0, 0, blendmode, 0, 0);
 	return 0;
 }
 
-SCREEN_UPDATE_RGB32(metamrph)
+UINT32 mystwarr_state::screen_update_metamrph(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	mystwarr_state *state = screen.machine().driver_data<mystwarr_state>();
 	int i, old;
 
 	for (i = 0; i < 4; i++)
 	{
-		old = state->m_layer_colorbase[i];
-		state->m_layer_colorbase[i] = K055555_get_palette_index(i)<<4;
-		if (old != state->m_layer_colorbase[i]) K056832_mark_plane_dirty(i);
+		old = m_layer_colorbase[i];
+		m_layer_colorbase[i] = K055555_get_palette_index(i)<<4;
+		if (old != m_layer_colorbase[i]) K056832_mark_plane_dirty(i);
 	}
 
-	state->m_sprite_colorbase = K055555_get_palette_index(4)<<4;
+	m_sprite_colorbase = K055555_get_palette_index(4)<<4;
 
 	konamigx_mixer(screen.machine(), bitmap, cliprect, 0, GXSUB_K053250 | GXSUB_4BPP, 0, 0, 0, 0, 0);
 	return 0;
 }
 
-SCREEN_UPDATE_RGB32(martchmp)
+UINT32 mystwarr_state::screen_update_martchmp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	mystwarr_state *state = screen.machine().driver_data<mystwarr_state>();
 	int i, old, blendmode;
 
 	for (i = 0; i < 4; i++)
 	{
-		old = state->m_layer_colorbase[i];
-		state->m_layer_colorbase[i] = K055555_get_palette_index(i)<<4;
-		if (old != state->m_layer_colorbase[i]) K056832_mark_plane_dirty(i);
+		old = m_layer_colorbase[i];
+		m_layer_colorbase[i] = K055555_get_palette_index(i)<<4;
+		if (old != m_layer_colorbase[i]) K056832_mark_plane_dirty(i);
 	}
 
-	state->m_sprite_colorbase = K055555_get_palette_index(4)<<5;
+	m_sprite_colorbase = K055555_get_palette_index(4)<<5;
 
-	state->m_cbparam = K055555_read_register(K55_PRIINP_8);
-	state->m_oinprion = K055555_read_register(K55_OINPRI_ON);
+	m_cbparam = K055555_read_register(K55_PRIINP_8);
+	m_oinprion = K055555_read_register(K55_OINPRI_ON);
 
 	// not quite right
-	blendmode = (state->m_oinprion==0xef && K054338_read_register(K338_REG_PBLEND)) ? ((1<<16|GXMIX_BLEND_FORCE)<<2) : 0;
+	blendmode = (m_oinprion==0xef && K054338_read_register(K338_REG_PBLEND)) ? ((1<<16|GXMIX_BLEND_FORCE)<<2) : 0;
 
 	konamigx_mixer(screen.machine(), bitmap, cliprect, 0, 0, 0, 0, blendmode, 0, 0);
 	return 0;
@@ -487,19 +484,18 @@ READ16_MEMBER(mystwarr_state::ddd_053936_tilerom_2_r)
 	return ROM[offset]<<8;
 }
 
-SCREEN_UPDATE_RGB32(dadandrn) /* and gaiapols */
+UINT32 mystwarr_state::screen_update_dadandrn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)/* and gaiapols */
 {
-	mystwarr_state *state = screen.machine().driver_data<mystwarr_state>();
 	int i, newbase, dirty, rozmode;
 
-	if (state->m_gametype == 0)
+	if (m_gametype == 0)
 	{
-		state->m_sprite_colorbase = (K055555_get_palette_index(4)<<4)&0x7f;
+		m_sprite_colorbase = (K055555_get_palette_index(4)<<4)&0x7f;
 		rozmode = GXSUB_4BPP;
 	}
 	else
 	{
-		state->m_sprite_colorbase = (K055555_get_palette_index(4)<<3)&0x7f;
+		m_sprite_colorbase = (K055555_get_palette_index(4)<<3)&0x7f;
 		rozmode = GXSUB_8BPP;
 	}
 
@@ -508,9 +504,9 @@ SCREEN_UPDATE_RGB32(dadandrn) /* and gaiapols */
 		for (i=0; i<4; i++)
 		{
 			newbase = K055555_get_palette_index(i)<<4;
-			if (state->m_layer_colorbase[i] != newbase)
+			if (m_layer_colorbase[i] != newbase)
 			{
-				state->m_layer_colorbase[i] = newbase;
+				m_layer_colorbase[i] = newbase;
 				K056832_mark_plane_dirty(i);
 			}
 		}
@@ -520,9 +516,9 @@ SCREEN_UPDATE_RGB32(dadandrn) /* and gaiapols */
 		for (dirty=0, i=0; i<4; i++)
 		{
 			newbase = K055555_get_palette_index(i)<<4;
-			if (state->m_layer_colorbase[i] != newbase)
+			if (m_layer_colorbase[i] != newbase)
 			{
-				state->m_layer_colorbase[i] = newbase;
+				m_layer_colorbase[i] = newbase;
 				dirty = 1;
 			}
 		}
@@ -530,17 +526,17 @@ SCREEN_UPDATE_RGB32(dadandrn) /* and gaiapols */
 
 	}
 
-	state->m_last_psac_colorbase = state->m_sub1_colorbase;
-	state->m_sub1_colorbase = K055555_get_palette_index(5);
+	m_last_psac_colorbase = m_sub1_colorbase;
+	m_sub1_colorbase = K055555_get_palette_index(5);
 
-	if (state->m_last_psac_colorbase != state->m_sub1_colorbase)
+	if (m_last_psac_colorbase != m_sub1_colorbase)
 	{
-		state->m_ult_936_tilemap->mark_all_dirty();
+		m_ult_936_tilemap->mark_all_dirty();
 
 		if (MW_VERBOSE)
 			popmessage("K053936: PSAC colorbase changed");
 	}
 
-	konamigx_mixer(screen.machine(), bitmap, cliprect, (state->m_roz_enable) ? state->m_ult_936_tilemap : 0, rozmode, 0, 0, 0, 0, 0);
+	konamigx_mixer(screen.machine(), bitmap, cliprect, (m_roz_enable) ? m_ult_936_tilemap : 0, rozmode, 0, 0, 0, 0, 0);
 	return 0;
 }

@@ -413,7 +413,7 @@ static void video_update_common( running_machine &machine, bitmap_rgb32 &bitmap,
 }
 
 
-static SCREEN_UPDATE_RGB32( astrof )
+UINT32 astrof_state::screen_update_astrof(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t pens[ASTROF_NUM_PENS];
 
@@ -425,7 +425,7 @@ static SCREEN_UPDATE_RGB32( astrof )
 }
 
 
-static SCREEN_UPDATE_RGB32( tomahawk )
+UINT32 astrof_state::screen_update_tomahawk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t pens[TOMAHAWK_NUM_PENS];
 
@@ -962,7 +962,7 @@ static MACHINE_CONFIG_DERIVED( astrof, base )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(astrof)
+	MCFG_SCREEN_UPDATE_DRIVER(astrof_state, screen_update_astrof)
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(astrof_audio)
@@ -988,7 +988,7 @@ static MACHINE_CONFIG_DERIVED( spfghmk2, base )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(astrof)
+	MCFG_SCREEN_UPDATE_DRIVER(astrof_state, screen_update_astrof)
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(spfghmk2_audio)
@@ -1005,7 +1005,7 @@ static MACHINE_CONFIG_DERIVED( tomahawk, base )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(tomahawk)
+	MCFG_SCREEN_UPDATE_DRIVER(astrof_state, screen_update_tomahawk)
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(tomahawk_audio)

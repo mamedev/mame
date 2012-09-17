@@ -47,6 +47,7 @@ public:
 	TILE_GET_INFO_MEMBER(terminal_gettileinfo);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_apple1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -62,7 +63,7 @@ SNAPSHOT_LOAD( apple1 );
 /*----------- defined in video/apple1.c -----------*/
 
 
-SCREEN_UPDATE_IND16( apple1 );
+
 
 void apple1_vh_dsp_w (running_machine &machine, int data);
 void apple1_vh_dsp_clr (running_machine &machine);

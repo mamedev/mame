@@ -130,6 +130,8 @@ private:
 
     void update_kbd_irq();
 	virtual void machine_reset();
+public:	
+	UINT32 screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 void rainbow_state::machine_start()
@@ -203,7 +205,7 @@ void rainbow_state::machine_reset()
     m_kbd8251->input_callback(SERIAL_STATE_CTS); // raise clear to send
 }
 
-static SCREEN_UPDATE_IND16( rainbow )
+UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	device_t *devconf = screen.machine().device("vt100_video");
 	rainbow_video_update( devconf, bitmap, cliprect);
@@ -474,7 +476,7 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(80*10, 25*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*10-1, 0, 25*10-1)
-	MCFG_SCREEN_UPDATE_STATIC(rainbow)
+	MCFG_SCREEN_UPDATE_DRIVER(rainbow_state, screen_update_rainbow)
 	MCFG_GFXDECODE(rainbow)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)

@@ -124,16 +124,15 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-SCREEN_UPDATE_IND16( deadang )
+UINT32 deadang_state::screen_update_deadang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	deadang_state *state = screen.machine().driver_data<deadang_state>();
 	/* Setup the tilemaps */
-	state->m_pf3_layer->set_scrolly(0, ((state->m_scroll_ram[0x01]&0xf0)<<4)+((state->m_scroll_ram[0x02]&0x7f)<<1)+((state->m_scroll_ram[0x02]&0x80)>>7) );
-	state->m_pf3_layer->set_scrollx(0, ((state->m_scroll_ram[0x09]&0xf0)<<4)+((state->m_scroll_ram[0x0a]&0x7f)<<1)+((state->m_scroll_ram[0x0a]&0x80)>>7) );
-	state->m_pf1_layer->set_scrolly(0, ((state->m_scroll_ram[0x11]&0x10)<<4)+((state->m_scroll_ram[0x12]&0x7f)<<1)+((state->m_scroll_ram[0x12]&0x80)>>7) );
-	state->m_pf1_layer->set_scrollx(0, ((state->m_scroll_ram[0x19]&0x10)<<4)+((state->m_scroll_ram[0x1a]&0x7f)<<1)+((state->m_scroll_ram[0x1a]&0x80)>>7) );
-	state->m_pf2_layer->set_scrolly(0, ((state->m_scroll_ram[0x21]&0xf0)<<4)+((state->m_scroll_ram[0x22]&0x7f)<<1)+((state->m_scroll_ram[0x22]&0x80)>>7) );
-	state->m_pf2_layer->set_scrollx(0, ((state->m_scroll_ram[0x29]&0xf0)<<4)+((state->m_scroll_ram[0x2a]&0x7f)<<1)+((state->m_scroll_ram[0x2a]&0x80)>>7) );
+	m_pf3_layer->set_scrolly(0, ((m_scroll_ram[0x01]&0xf0)<<4)+((m_scroll_ram[0x02]&0x7f)<<1)+((m_scroll_ram[0x02]&0x80)>>7) );
+	m_pf3_layer->set_scrollx(0, ((m_scroll_ram[0x09]&0xf0)<<4)+((m_scroll_ram[0x0a]&0x7f)<<1)+((m_scroll_ram[0x0a]&0x80)>>7) );
+	m_pf1_layer->set_scrolly(0, ((m_scroll_ram[0x11]&0x10)<<4)+((m_scroll_ram[0x12]&0x7f)<<1)+((m_scroll_ram[0x12]&0x80)>>7) );
+	m_pf1_layer->set_scrollx(0, ((m_scroll_ram[0x19]&0x10)<<4)+((m_scroll_ram[0x1a]&0x7f)<<1)+((m_scroll_ram[0x1a]&0x80)>>7) );
+	m_pf2_layer->set_scrolly(0, ((m_scroll_ram[0x21]&0xf0)<<4)+((m_scroll_ram[0x22]&0x7f)<<1)+((m_scroll_ram[0x22]&0x80)>>7) );
+	m_pf2_layer->set_scrollx(0, ((m_scroll_ram[0x29]&0xf0)<<4)+((m_scroll_ram[0x2a]&0x7f)<<1)+((m_scroll_ram[0x2a]&0x80)>>7) );
 
 	/* Control byte:
         0x01: Background playfield disable
@@ -145,17 +144,17 @@ SCREEN_UPDATE_IND16( deadang )
         0x40: Flipscreen
         0x80: Always set?
     */
-	state->m_pf3_layer->enable(!(state->m_scroll_ram[0x34]&1));
-	state->m_pf1_layer->enable(!(state->m_scroll_ram[0x34]&2));
-	state->m_pf2_layer->enable(!(state->m_scroll_ram[0x34]&4));
-	state->flip_screen_set(state->m_scroll_ram[0x34]&0x40 );
+	m_pf3_layer->enable(!(m_scroll_ram[0x34]&1));
+	m_pf1_layer->enable(!(m_scroll_ram[0x34]&2));
+	m_pf2_layer->enable(!(m_scroll_ram[0x34]&4));
+	flip_screen_set(m_scroll_ram[0x34]&0x40 );
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
-	state->m_pf3_layer->draw(bitmap, cliprect, 0,1);
-	state->m_pf1_layer->draw(bitmap, cliprect, 0,2);
-	state->m_pf2_layer->draw(bitmap, cliprect, 0,4);
-	if (!(state->m_scroll_ram[0x34]&0x10)) draw_sprites(screen.machine(),bitmap,cliprect);
-	state->m_text_layer->draw(bitmap, cliprect, 0,0);
+	m_pf3_layer->draw(bitmap, cliprect, 0,1);
+	m_pf1_layer->draw(bitmap, cliprect, 0,2);
+	m_pf2_layer->draw(bitmap, cliprect, 0,4);
+	if (!(m_scroll_ram[0x34]&0x10)) draw_sprites(screen.machine(),bitmap,cliprect);
+	m_text_layer->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

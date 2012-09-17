@@ -101,6 +101,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_pc88va(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -402,35 +403,34 @@ static void draw_text(running_machine &machine, bitmap_rgb32 &bitmap, const rect
 	}
 }
 
-static SCREEN_UPDATE_RGB32( pc88va )
+UINT32 pc88va_state::screen_update_pc88va(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	pc88va_state *state = screen.machine().driver_data<pc88va_state>();
 	UINT8 pri,cur_pri_lv;
 	UINT32 screen_pri;
 	bitmap.fill(0, cliprect);
 
-	if(state->m_tsp.disp_on == 0) // don't bother if we are under DSPOFF command
+	if(m_tsp.disp_on == 0) // don't bother if we are under DSPOFF command
 		return 0;
 
 	/*
-    state->m_video_pri_reg[0]
+    m_video_pri_reg[0]
     xxxx ---- ---- ---- priority 3
     ---- xxxx ---- ---- priority 2
     ---- ---- xxxx ---- priority 1
     ---- ---- ---- xxxx priority 0
-    state->m_video_pri_reg[1]
+    m_video_pri_reg[1]
     ---- ---- xxxx ---- priority 5
     ---- ---- ---- xxxx priority 4
 
     Note that orthogonality level is actually REVERSED than the level number it indicates, so we have to play a little with the data for an easier usage ...
     */
 
-	screen_pri = (state->m_video_pri_reg[1] & 0x00f0) >> 4; // priority 5
-	screen_pri|= (state->m_video_pri_reg[1] & 0x000f) << 4; // priority 4
-	screen_pri|= (state->m_video_pri_reg[0] & 0xf000) >> 4; // priority 3
-	screen_pri|= (state->m_video_pri_reg[0] & 0x0f00) << 4; // priority 2
-	screen_pri|= (state->m_video_pri_reg[0] & 0x00f0) << 12; // priority 1
-	screen_pri|= (state->m_video_pri_reg[0] & 0x000f) << 20; // priority 0
+	screen_pri = (m_video_pri_reg[1] & 0x00f0) >> 4; // priority 5
+	screen_pri|= (m_video_pri_reg[1] & 0x000f) << 4; // priority 4
+	screen_pri|= (m_video_pri_reg[0] & 0xf000) >> 4; // priority 3
+	screen_pri|= (m_video_pri_reg[0] & 0x0f00) << 4; // priority 2
+	screen_pri|= (m_video_pri_reg[0] & 0x00f0) << 12; // priority 1
+	screen_pri|= (m_video_pri_reg[0] & 0x000f) << 20; // priority 0
 
 	for(pri=0;pri<6;pri++)
 	{
@@ -448,7 +448,7 @@ static SCREEN_UPDATE_RGB32( pc88va )
 				switch(cur_pri_lv & 3) // (palette color mode)
 				{
 					case 0: draw_text(screen.machine(),bitmap,cliprect); break;
-					case 1: if(state->m_tsp.spr_on) { draw_sprites(screen.machine(),bitmap,cliprect); } break;
+					case 1: if(m_tsp.spr_on) { draw_sprites(screen.machine(),bitmap,cliprect); } break;
 					case 2: /* A = graphic 0 */ break;
 					case 3: /* B = graphic 1 */ break;
 				}
@@ -1669,7 +1669,7 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_STATIC( pc88va )
+	MCFG_SCREEN_UPDATE_DRIVER(pc88va_state, screen_update_pc88va)
 
 	MCFG_PALETTE_LENGTH(32)
 //  MCFG_PALETTE_INIT_OVERRIDE(pc88va_state, pc8801 )

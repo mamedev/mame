@@ -1273,17 +1273,16 @@ VIDEO_START_MEMBER(segac2_state,segac2_new)
 
 // C2 doesn't use the internal VDP CRAM, instead it uses the digital output of the chip
 //  and applies it's own external colour circuity
-static SCREEN_UPDATE_RGB32(segac2_new)
+UINT32 segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *paldata = screen.machine().pens;
-	segac2_state *state = screen.machine().driver_data<segac2_state>();
-	if (!state->m_segac2_enable_display)
+	if (!m_segac2_enable_display)
 	{
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 
-	sega_genesis_vdp_device *vdp = state->m_vdp;
+	sega_genesis_vdp_device *vdp = m_vdp;
 
 	/* Copy our screen buffer here */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -1394,7 +1393,7 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(segac2_new)
+	MCFG_SCREEN_UPDATE_DRIVER(segac2_state, screen_update_segac2_new)
 	MCFG_SCREEN_VBLANK_STATIC( megadriv )
 
 	MCFG_PALETTE_LENGTH(2048*3)

@@ -67,6 +67,7 @@ public:
 	DECLARE_WRITE8_MEMBER(dai3wksi_audio_3_w);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_dai3wksi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -128,31 +129,30 @@ static void dai3wksi_get_pens(pen_t *pens)
 }
 
 
-static SCREEN_UPDATE_RGB32( dai3wksi )
+UINT32 dai3wksi_state::screen_update_dai3wksi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	dai3wksi_state *state = screen.machine().driver_data<dai3wksi_state>();
 	offs_t offs;
 	pen_t pens[8];
 
 	dai3wksi_get_pens(pens);
 
-	for (offs = 0; offs < state->m_dai3wksi_videoram.bytes(); offs++)
+	for (offs = 0; offs < m_dai3wksi_videoram.bytes(); offs++)
 	{
 		offs_t i;
 
 		UINT8 x = offs << 2;
 		UINT8 y = offs >> 6;
-		UINT8 data = state->m_dai3wksi_videoram[offs];
+		UINT8 data = m_dai3wksi_videoram[offs];
 		UINT8 color;
-		int value = (x >> 2) + ((y >> 5) << 6) + 64 * 8 * (state->m_dai3wksi_redterop ? 1 : 0);
+		int value = (x >> 2) + ((y >> 5) << 6) + 64 * 8 * (m_dai3wksi_redterop ? 1 : 0);
 
-		if (state->m_dai3wksi_redscreen)
+		if (m_dai3wksi_redscreen)
 		{
 			color = 0x02;
 		}
 		else
 		{
-			if (state->ioport("IN2")->read() & 0x03)
+			if (ioport("IN2")->read() & 0x03)
 				color = vr_prom2[value];
 			else
 				color = vr_prom1[value];
@@ -162,7 +162,7 @@ static SCREEN_UPDATE_RGB32( dai3wksi )
 		{
 			pen_t pen = (data & (1 << i)) ? pens[color] : pens[0];
 
-			if (state->m_dai3wksi_flipscreen)
+			if (m_dai3wksi_flipscreen)
 				bitmap.pix32(255-y, 255-x) = pen;
 			else
 				bitmap.pix32(y, x) = pen;
@@ -599,7 +599,7 @@ static MACHINE_CONFIG_START( dai3wksi, dai3wksi_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(4, 251, 8, 247)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_STATIC(dai3wksi)
+	MCFG_SCREEN_UPDATE_DRIVER(dai3wksi_state, screen_update_dai3wksi)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

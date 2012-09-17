@@ -49,10 +49,11 @@ public:
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 	virtual void machine_start();
 	virtual void video_start();
+	UINT32 screen_update_m107(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/m107.c -----------*/
 
-SCREEN_UPDATE_IND16( m107 );
+
 

@@ -89,6 +89,9 @@ public:
 	virtual void machine_reset();
 	DECLARE_VIDEO_START(sngkace);
 	DECLARE_VIDEO_START(psikyo);
+	UINT32 screen_update_psikyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_psikyo_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_psikyo(screen_device &screen, bool state);
 };
 
 
@@ -99,6 +102,6 @@ void psikyo_switch_banks(running_machine &machine, int tmap, int bank);
 
 
 
-SCREEN_UPDATE_IND16( psikyo );
-SCREEN_UPDATE_IND16( psikyo_bootleg );
-SCREEN_VBLANK( psikyo );
+
+
+

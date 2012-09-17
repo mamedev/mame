@@ -248,7 +248,7 @@ static MACHINE_CONFIG_START( astrocde, astrocde_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(ASTROCADE_CLOCK, 455, 0, 352, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_STATIC(astrocde)
+	MCFG_SCREEN_UPDATE_DRIVER(astrocde_state, screen_update_astrocde)
 
 	MCFG_PALETTE_LENGTH(512)
 

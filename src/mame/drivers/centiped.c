@@ -1766,7 +1766,7 @@ static MACHINE_CONFIG_START( centiped_base, centiped_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(centiped)
+	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_centiped)
 
 	MCFG_GFXDECODE(centiped)
 	MCFG_PALETTE_LENGTH(4+4*4*4*4)
@@ -1846,7 +1846,7 @@ static MACHINE_CONFIG_DERIVED( milliped, centiped )
 
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,milliped)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(milliped)
+	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_milliped)
 
 	/* sound hardware */
 	MCFG_POKEY_REPLACE("pokey", 12096000/8)
@@ -1883,7 +1883,7 @@ static MACHINE_CONFIG_DERIVED( warlords, centiped )
 	MCFG_PALETTE_INIT_OVERRIDE(centiped_state,warlords)
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,warlords)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(warlords)
+	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_warlords)
 
 	/* sound hardware */
 	MCFG_POKEY_REPLACE("pokey", 12096000/8)
@@ -1898,7 +1898,7 @@ static MACHINE_CONFIG_DERIVED( mazeinv, milliped )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mazeinv_map)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(centiped)
+	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_centiped)
 MACHINE_CONFIG_END
 
 
@@ -1916,7 +1916,7 @@ static MACHINE_CONFIG_START( bullsdrt, centiped_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(bullsdrt)
+	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_bullsdrt)
 
 	MCFG_GFXDECODE(centiped)
 	MCFG_PALETTE_LENGTH(4+4*4*4*4)

@@ -56,19 +56,21 @@ public:
 	DECLARE_MACHINE_RESET(midzeus);
 	DECLARE_VIDEO_START(midzeus);
 	DECLARE_VIDEO_START(midzeus2);
+	UINT32 screen_update_midzeus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_midzeus2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/midzeus.c -----------*/
 
 
-SCREEN_UPDATE_IND16( midzeus );
+
 
 
 /*----------- defined in video/midzeus2.c -----------*/
 
 
-SCREEN_UPDATE_RGB32( midzeus2 );
+
 
 DECLARE_READ32_HANDLER( zeus2_r );
 DECLARE_WRITE32_HANDLER( zeus2_w );

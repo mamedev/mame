@@ -89,6 +89,7 @@ public:
 	DECLARE_MACHINE_RESET(jngolady);
 	DECLARE_MACHINE_START(common);
 	DECLARE_MACHINE_RESET(common);
+	UINT32 screen_update_jangou(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -145,14 +146,13 @@ void jangou_state::video_start()
 	save_item(NAME(m_blit_buffer));
 }
 
-static SCREEN_UPDATE_IND16( jangou )
+UINT32 jangou_state::screen_update_jangou(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	jangou_state *state = screen.machine().driver_data<jangou_state>();
 	int x, y;
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT8 *src = &state->m_blit_buffer[y * 512 / 2 + cliprect.min_x];
+		UINT8 *src = &m_blit_buffer[y * 512 / 2 + cliprect.min_x];
 		UINT16 *dst = &bitmap.pix16(y, cliprect.min_x);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
@@ -1005,7 +1005,7 @@ static MACHINE_CONFIG_START( jangou, jangou_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_STATIC(jangou)
+	MCFG_SCREEN_UPDATE_DRIVER(jangou_state, screen_update_jangou)
 
 	MCFG_PALETTE_LENGTH(32)
 

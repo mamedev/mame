@@ -1792,7 +1792,7 @@ static MACHINE_CONFIG_DERIVED( wfortune, itech8_core_hi )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(itech8_2layer)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2layer)
 MACHINE_CONFIG_END
 
 
@@ -1804,7 +1804,7 @@ static MACHINE_CONFIG_DERIVED( grmatch, itech8_core_hi )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(itech8_grmatch)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_grmatch)
 
 	/* palette updater */
 	MCFG_TIMER_ADD_SCANLINE("palette", grmatch_palette_update, "screen", 0, 0)
@@ -1819,7 +1819,7 @@ static MACHINE_CONFIG_DERIVED( stratab_hi, itech8_core_hi )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(itech8_2layer)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2layer)
 MACHINE_CONFIG_END
 
 
@@ -1831,7 +1831,7 @@ static MACHINE_CONFIG_DERIVED( stratab_lo, itech8_core_lo )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(itech8_2layer)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2layer)
 MACHINE_CONFIG_END
 
 
@@ -1847,7 +1847,7 @@ static MACHINE_CONFIG_DERIVED( slikshot_hi, itech8_core_hi )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(slikshot)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_slikshot)
 	MCFG_VIDEO_START_OVERRIDE(itech8_state,slikshot)
 MACHINE_CONFIG_END
 
@@ -1864,7 +1864,7 @@ static MACHINE_CONFIG_DERIVED( slikshot_lo, itech8_core_lo )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(slikshot)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_slikshot)
 	MCFG_VIDEO_START_OVERRIDE(itech8_state,slikshot)
 MACHINE_CONFIG_END
 
@@ -1877,7 +1877,7 @@ static MACHINE_CONFIG_DERIVED( slikshot_lo_noz80, itech8_core_lo )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(itech8_2page)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2page)
 MACHINE_CONFIG_END
 
 
@@ -1897,7 +1897,7 @@ static MACHINE_CONFIG_DERIVED( hstennis_hi, itech8_core_hi )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(itech8_2page_large)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2page_large)
 MACHINE_CONFIG_END
 
 
@@ -1909,7 +1909,7 @@ static MACHINE_CONFIG_DERIVED( hstennis_lo, itech8_core_lo )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(itech8_2page_large)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2page_large)
 MACHINE_CONFIG_END
 
 
@@ -1925,7 +1925,7 @@ static MACHINE_CONFIG_DERIVED( rimrockn, itech8_core_hi )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(24, 375, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(itech8_2page_large)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2page_large)
 MACHINE_CONFIG_END
 
 
@@ -1941,7 +1941,7 @@ static MACHINE_CONFIG_DERIVED( ninclown, itech8_core_hi )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(64, 423, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(itech8_2page_large)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2page_large)
 MACHINE_CONFIG_END
 
 
@@ -1956,7 +1956,7 @@ static MACHINE_CONFIG_DERIVED( gtg2, itech8_core_lo )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(itech8_2layer)
+	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2layer)
 MACHINE_CONFIG_END
 
 

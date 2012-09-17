@@ -65,9 +65,8 @@ VIDEO_START_MEMBER(hitme_state,barricad)
 }
 
 
-static SCREEN_UPDATE_IND16( hitme )
+UINT32 hitme_state::screen_update_hitme(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	hitme_state *state = screen.machine().driver_data<hitme_state>();
 	/* the card width resistor comes from an input port, scaled to the range 0-25 kOhms */
 	double width_resist = screen.machine().root_device().ioport("WIDTH")->read() * 25000 / 100;
 	/* this triggers a oneshot for the following length of time */
@@ -80,7 +79,7 @@ static SCREEN_UPDATE_IND16( hitme )
 	offs_t offs = 0;
 
 	/* start by drawing the tilemap */
-	state->m_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* now loop over and invert anything */
 	for (y = 0; y < 19; y++)
@@ -89,7 +88,7 @@ static SCREEN_UPDATE_IND16( hitme )
 		for (inv = x = 0; x < 40; x++, offs++)
 		{
 			/* if the high bit is set, reset the oneshot */
-			if (state->m_videoram[y * 40 + x] & 0x80)
+			if (m_videoram[y * 40 + x] & 0x80)
 				inv = width_pixels;
 
 			/* invert pixels until we run out */
@@ -113,10 +112,9 @@ static SCREEN_UPDATE_IND16( hitme )
 }
 
 
-static SCREEN_UPDATE_IND16( barricad )
+UINT32 hitme_state::screen_update_barricad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	hitme_state *state = screen.machine().driver_data<hitme_state>();
-	state->m_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -326,7 +324,7 @@ static MACHINE_CONFIG_START( hitme, hitme_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 19*10)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 19*10-1)
-	MCFG_SCREEN_UPDATE_STATIC(hitme)
+	MCFG_SCREEN_UPDATE_DRIVER(hitme_state, screen_update_hitme)
 
 	MCFG_GFXDECODE(hitme)
 	MCFG_PALETTE_LENGTH(2)
@@ -355,7 +353,7 @@ static MACHINE_CONFIG_DERIVED( barricad, hitme )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(32*8, 24*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(barricad)
+	MCFG_SCREEN_UPDATE_DRIVER(hitme_state, screen_update_barricad)
 
 	MCFG_GFXDECODE(barricad)
 

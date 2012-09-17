@@ -232,7 +232,7 @@ static CBM_IEC_INTERFACE( cbm_iec_intf )
  *
  *************************************/
 
-static SCREEN_UPDATE_IND16( c65 )
+UINT32 c65_state::screen_update_c65(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	device_t *vic3 = screen.machine().device("vic3");
 
@@ -317,7 +317,7 @@ static MACHINE_CONFIG_START( c65, c65_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(525 * 2, 520 * 2)
 	MCFG_SCREEN_VISIBLE_AREA(VIC6567_STARTVISIBLECOLUMNS ,(VIC6567_STARTVISIBLECOLUMNS + VIC6567_VISIBLECOLUMNS - 1) * 2, VIC6567_STARTVISIBLELINES, VIC6567_STARTVISIBLELINES + VIC6567_VISIBLELINES - 1)
-	MCFG_SCREEN_UPDATE_STATIC( c65 )
+	MCFG_SCREEN_UPDATE_DRIVER(c65_state, screen_update_c65)
 
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_PALETTE_INIT_OVERRIDE(c65_state, c65 )

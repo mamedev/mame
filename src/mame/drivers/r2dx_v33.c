@@ -70,6 +70,7 @@ public:
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_tx_tilemap;
 	virtual void video_start();
+	UINT32 screen_update_rdx_v33(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -213,18 +214,17 @@ void r2dx_v33_state::video_start()
 	m_tx_tilemap->set_transparent_pen(15);
 }
 
-static SCREEN_UPDATE_IND16( rdx_v33 )
+UINT32 r2dx_v33_state::screen_update_rdx_v33(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	r2dx_v33_state *state = screen.machine().driver_data<r2dx_v33_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_md_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_md_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(screen.machine(),bitmap,cliprect,0);
 
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* debug DMA processing */
 	if(0)
@@ -258,7 +258,7 @@ static SCREEN_UPDATE_IND16( rdx_v33 )
 			}
 
 			popmessage("%08x 1",src_addr);
-			state->m_bg_tilemap->mark_all_dirty();
+			m_bg_tilemap->mark_all_dirty();
 			frame = 0;
 			src_addr+=0x800;
 		}
@@ -704,7 +704,7 @@ static MACHINE_CONFIG_START( rdx_v33, r2dx_v33_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(rdx_v33)
+	MCFG_SCREEN_UPDATE_DRIVER(r2dx_v33_state, screen_update_rdx_v33)
 
 	MCFG_GFXDECODE(rdx_v33)
 	MCFG_PALETTE_LENGTH(2048)
@@ -737,7 +737,7 @@ static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate *//2)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(rdx_v33)
+	MCFG_SCREEN_UPDATE_DRIVER(r2dx_v33_state, screen_update_rdx_v33)
 	MCFG_GFXDECODE(rdx_v33)
 	MCFG_PALETTE_LENGTH(2048)
 

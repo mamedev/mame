@@ -288,7 +288,7 @@ static MACHINE_CONFIG_START( nascom1, nascom1_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(48 * 8, 16 * 16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 48 * 8 - 1, 0, 16 * 16 - 1)
-	MCFG_SCREEN_UPDATE_STATIC(nascom1)
+	MCFG_SCREEN_UPDATE_DRIVER(nascom1_state, screen_update_nascom1)
 
 	MCFG_GFXDECODE(nascom1)
 	MCFG_PALETTE_LENGTH(2)
@@ -345,7 +345,7 @@ static MACHINE_CONFIG_DERIVED( nascom2, nascom1 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(48 * 8, 16 * 14)
 	MCFG_SCREEN_VISIBLE_AREA(0, 48 * 8 - 1, 0, 16 * 14 - 1)
-	MCFG_SCREEN_UPDATE_STATIC(nascom2)
+	MCFG_SCREEN_UPDATE_DRIVER(nascom1_state, screen_update_nascom2)
 
 	MCFG_GFXDECODE(nascom2)
 

@@ -101,7 +101,7 @@ static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, con
 	}
 }
 
-SCREEN_UPDATE_IND16( mrflea )
+UINT32 mrflea_state::screen_update_mrflea(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_background(screen.machine(), bitmap, cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect);

@@ -23,6 +23,8 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	virtual void video_start();
+	UINT32 screen_update_ddz(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_eof_ddz(screen_device &screen, bool state);
 };
 
 
@@ -35,12 +37,12 @@ void ddz_state::video_start()
 }
 
 
-static SCREEN_UPDATE_RGB32(ddz)
+UINT32 ddz_state::screen_update_ddz(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-static SCREEN_VBLANK(ddz)
+void ddz_state::screen_eof_ddz(screen_device &screen, bool state)
 {
 
 }
@@ -75,8 +77,8 @@ static MACHINE_CONFIG_START( ddz, ddz_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(ddz)
-	MCFG_SCREEN_VBLANK_STATIC(ddz)
+	MCFG_SCREEN_UPDATE_DRIVER(ddz_state, screen_update_ddz)
+	MCFG_SCREEN_VBLANK_DRIVER(ddz_state, screen_eof_ddz)
 
 	MCFG_PALETTE_LENGTH(8192)
 

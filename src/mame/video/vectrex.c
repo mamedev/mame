@@ -158,27 +158,26 @@ static TIMER_CALLBACK(vectrex_refresh)
 }
 
 
-SCREEN_UPDATE_RGB32(vectrex)
+UINT32 vectrex_state::screen_update_vectrex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	vectrex_state *state = screen.machine().driver_data<vectrex_state>();
 	int i;
 
 	vectrex_configuration(screen.machine());
 
 	/* start black */
 	vector_add_point(screen.machine(),
-					 state->m_points[state->m_display_start].x,
-					 state->m_points[state->m_display_start].y,
-					 state->m_points[state->m_display_start].col,
+					 m_points[m_display_start].x,
+					 m_points[m_display_start].y,
+					 m_points[m_display_start].col,
 					 0);
 
-	for (i = state->m_display_start; i != state->m_display_end; i = (i + 1) % NVECT)
+	for (i = m_display_start; i != m_display_end; i = (i + 1) % NVECT)
 	{
 		vector_add_point(screen.machine(),
-						 state->m_points[i].x,
-						 state->m_points[i].y,
-						 state->m_points[i].col,
-						 state->m_points[i].intensity);
+						 m_points[i].x,
+						 m_points[i].y,
+						 m_points[i].col,
+						 m_points[i].intensity);
 	}
 
 	SCREEN_UPDATE32_CALL(vector);

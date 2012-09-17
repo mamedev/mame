@@ -101,6 +101,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_pipeline(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -135,11 +136,10 @@ void pipeline_state::video_start()
 	m_tilemap2->set_transparent_pen(0);
 }
 
-static SCREEN_UPDATE_IND16( pipeline )
+UINT32 pipeline_state::screen_update_pipeline(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pipeline_state *state = screen.machine().driver_data<pipeline_state>();
-	state->m_tilemap1->draw(bitmap, cliprect, 0,0);
-	state->m_tilemap2->draw(bitmap, cliprect, 0,0);
+	m_tilemap1->draw(bitmap, cliprect, 0,0);
+	m_tilemap2->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -413,7 +413,7 @@ static MACHINE_CONFIG_START( pipeline, pipeline_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 16, 239)
-	MCFG_SCREEN_UPDATE_STATIC(pipeline)
+	MCFG_SCREEN_UPDATE_DRIVER(pipeline_state, screen_update_pipeline)
 
 	MCFG_GFXDECODE(pipeline)
 

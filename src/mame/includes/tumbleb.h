@@ -91,18 +91,28 @@ public:
 	DECLARE_VIDEO_START(suprtrio);
 	DECLARE_VIDEO_START(pangpang);
 	DECLARE_VIDEO_START(sdfight);
+	UINT32 screen_update_tumblepb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_jumpkids(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_fncywld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_semicom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_suprtrio(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_pangpang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_semicom_altoffsets(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_bcstory(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_semibase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_sdfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/tumbleb.c -----------*/
 
-SCREEN_UPDATE_IND16( tumblepb );
-SCREEN_UPDATE_IND16( jumpkids );
-SCREEN_UPDATE_IND16( fncywld );
-SCREEN_UPDATE_IND16( semicom );
-SCREEN_UPDATE_IND16( semicom_altoffsets );
-SCREEN_UPDATE_IND16( bcstory );
-SCREEN_UPDATE_IND16( semibase );
-SCREEN_UPDATE_IND16( suprtrio );
-SCREEN_UPDATE_IND16( pangpang );
-SCREEN_UPDATE_IND16( sdfight );
+
+
+
+
+
+
+
+
+
+

@@ -228,11 +228,10 @@ void hyhoo_state::video_start()
 }
 
 
-SCREEN_UPDATE_RGB32( hyhoo )
+UINT32 hyhoo_state::screen_update_hyhoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	hyhoo_state *state = screen.machine().driver_data<hyhoo_state>();
-	if (state->m_dispflag)
-		copybitmap(bitmap, state->m_tmpbitmap, state->m_flipscreen, state->m_flipscreen, 0, 0, cliprect);
+	if (m_dispflag)
+		copybitmap(bitmap, m_tmpbitmap, m_flipscreen, m_flipscreen, 0, 0, cliprect);
 	else
 		bitmap.fill(RGB_BLACK, cliprect);
 

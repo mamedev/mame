@@ -117,6 +117,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_jokrwild(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -160,10 +161,9 @@ void jokrwild_state::video_start()
 }
 
 
-static SCREEN_UPDATE_IND16( jokrwild )
+UINT32 jokrwild_state::screen_update_jokrwild(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	jokrwild_state *state = screen.machine().driver_data<jokrwild_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -493,7 +493,7 @@ static MACHINE_CONFIG_START( jokrwild, jokrwild_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE((32+1)*8, (32+1)*8)                  /* From MC6845, registers 00 & 04. (value-1) */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*8-1, 0*8, 26*8-1)    /* From MC6845, registers 01 & 06 */
-	MCFG_SCREEN_UPDATE_STATIC(jokrwild)
+	MCFG_SCREEN_UPDATE_DRIVER(jokrwild_state, screen_update_jokrwild)
 
 	MCFG_GFXDECODE(jokrwild)
 	MCFG_PALETTE_LENGTH(512)

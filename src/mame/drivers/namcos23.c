@@ -1434,6 +1434,7 @@ public:
 	DECLARE_MACHINE_START(s23);
 	DECLARE_VIDEO_START(ss23);
 	DECLARE_MACHINE_RESET(gmen);
+	UINT32 screen_update_ss23(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -2418,9 +2419,8 @@ VIDEO_START_MEMBER(namcos23_state,ss23)
 	m_render.polymgr = poly_alloc(machine(), 10000, sizeof(namcos23_render_data), 0);
 }
 
-static SCREEN_UPDATE_RGB32( ss23 )
+UINT32 namcos23_state::screen_update_ss23(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	namcos23_state *state = screen.machine().driver_data<namcos23_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	render_run( screen.machine(), bitmap );
@@ -2428,7 +2428,7 @@ static SCREEN_UPDATE_RGB32( ss23 )
 	gfx_element *gfx = screen.machine().gfx[0];
 	gfx->mark_all_dirty();
 
-	state->m_bgtilemap->draw(bitmap, cliprect, 0/*flags*/, 0/*priority*/ ); /* opaque */
+	m_bgtilemap->draw(bitmap, cliprect, 0/*flags*/, 0/*priority*/ ); /* opaque */
 	return 0;
 }
 
@@ -3166,7 +3166,7 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_STATIC(ss23)
+	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update_ss23)
 
 	MCFG_PALETTE_LENGTH(0x8000)
 
@@ -3211,7 +3211,7 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_STATIC(ss23)
+	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update_ss23)
 
 	MCFG_PALETTE_LENGTH(0x8000)
 
@@ -3252,7 +3252,7 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_STATIC(ss23)
+	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update_ss23)
 
 	MCFG_PALETTE_LENGTH(0x8000)
 

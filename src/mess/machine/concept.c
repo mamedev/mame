@@ -99,11 +99,10 @@ void concept_state::video_start()
 {
 }
 
-SCREEN_UPDATE_IND16(concept)
+UINT32 concept_state::screen_update_concept(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* resolution is 720*560 */
-	concept_state *state = screen.machine().driver_data<concept_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	int x, y;
 	UINT16 *line;
 

@@ -1128,7 +1128,7 @@ static MACHINE_CONFIG_START( mgakuen, mitchell_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_UPDATE_STATIC(pang)
+	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 
 	MCFG_GFXDECODE(mgakuen)
 	MCFG_PALETTE_LENGTH(1024)	/* less colors than the others */
@@ -1171,7 +1171,7 @@ static MACHINE_CONFIG_START( pang, mitchell_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
-	MCFG_SCREEN_UPDATE_STATIC(pang)
+	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1271,7 +1271,7 @@ static MACHINE_CONFIG_START( mstworld, mitchell_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
-	MCFG_SCREEN_UPDATE_STATIC(pang)
+	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1303,7 +1303,7 @@ static MACHINE_CONFIG_START( marukin, mitchell_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
-	MCFG_SCREEN_UPDATE_STATIC(pang)
+	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1355,7 +1355,7 @@ static MACHINE_CONFIG_START( pkladiesbl, mitchell_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
-	MCFG_SCREEN_UPDATE_STATIC(pang)
+	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

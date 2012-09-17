@@ -367,41 +367,40 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( armedf )
+UINT32 armedf_state::screen_update_armedf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	armedf_state *state = screen.machine().driver_data<armedf_state>();
-	int sprite_enable = state->m_vreg & 0x200;
+	int sprite_enable = m_vreg & 0x200;
 
-	state->m_bg_tilemap->enable(state->m_vreg & 0x800);
-	state->m_fg_tilemap->enable(state->m_vreg & 0x400);
-	state->m_tx_tilemap->enable(state->m_vreg & 0x100);
+	m_bg_tilemap->enable(m_vreg & 0x800);
+	m_fg_tilemap->enable(m_vreg & 0x400);
+	m_tx_tilemap->enable(m_vreg & 0x100);
 
-	switch (state->m_scroll_type)
+	switch (m_scroll_type)
 	{
 		case 0:	/* terra force, kozure ookami */
 		case 2: /* legion */
 		case 3:	/* crazy climber */
-			state->m_fg_tilemap->set_scrollx(0, (state->m_fg_scrollx & 0x3ff));
-			state->m_fg_tilemap->set_scrolly(0, (state->m_fg_scrolly & 0x3ff));
+			m_fg_tilemap->set_scrollx(0, (m_fg_scrollx & 0x3ff));
+			m_fg_tilemap->set_scrolly(0, (m_fg_scrolly & 0x3ff));
 			break;
 
 		case 1: /* armed formation */
-			state->m_fg_tilemap->set_scrollx(0, state->m_fg_scrollx);
-			state->m_fg_tilemap->set_scrolly(0, state->m_fg_scrolly);
+			m_fg_tilemap->set_scrollx(0, m_fg_scrollx);
+			m_fg_tilemap->set_scrolly(0, m_fg_scrolly);
 			break;
 
 	}
 
 	bitmap.fill(0xff, cliprect );
 
-	state->m_tx_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
+	m_tx_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (sprite_enable)
 		draw_sprites(screen.machine(), bitmap, cliprect, 2);
 
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (sprite_enable)
 		draw_sprites(screen.machine(), bitmap, cliprect, 1);
@@ -409,7 +408,7 @@ SCREEN_UPDATE_IND16( armedf )
 	if (sprite_enable)
 		draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
-	state->m_tx_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
+	m_tx_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
 
 	return 0;
 }

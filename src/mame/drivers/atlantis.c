@@ -48,6 +48,7 @@ public:
 	DECLARE_DRIVER_INIT(mwskins);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_mwskins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -85,7 +86,7 @@ void atlantis_state::machine_reset()
  *
  *************************************/
 
-static SCREEN_UPDATE_IND16( mwskins )
+UINT32 atlantis_state::screen_update_mwskins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -166,7 +167,7 @@ static MACHINE_CONFIG_START( mwskins, atlantis_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(mwskins)
+	MCFG_SCREEN_UPDATE_DRIVER(atlantis_state, screen_update_mwskins)
 
 	MCFG_PALETTE_INIT(BBBBB_GGGGG_RRRRR)
 	MCFG_PALETTE_LENGTH(32768)

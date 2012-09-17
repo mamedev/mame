@@ -348,21 +348,20 @@ static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, con
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( exerion )
+UINT32 exerion_state::screen_update_exerion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	exerion_state *state = screen.machine().driver_data<exerion_state>();
 	int sx, sy, offs, i;
 
 	/* draw background */
 	draw_background(screen.machine(), bitmap, cliprect);
 
 	/* draw sprites */
-	for (i = 0; i < state->m_spriteram.bytes(); i += 4)
+	for (i = 0; i < m_spriteram.bytes(); i += 4)
 	{
-		int flags = state->m_spriteram[i + 0];
-		int y = state->m_spriteram[i + 1] ^ 255;
-		int code = state->m_spriteram[i + 2];
-		int x = state->m_spriteram[i + 3] * 2 + 72;
+		int flags = m_spriteram[i + 0];
+		int y = m_spriteram[i + 1] ^ 255;
+		int code = m_spriteram[i + 2];
+		int x = m_spriteram[i + 3] * 2 + 72;
 
 		int xflip = flags & 0x80;
 		int yflip = flags & 0x40;
@@ -370,10 +369,10 @@ SCREEN_UPDATE_IND16( exerion )
 		int wide = flags & 0x08;
 		int code2 = code;
 
-		int color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (state->m_sprite_palette * 16);
+		int color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (m_sprite_palette * 16);
 		gfx_element *gfx = doubled ? screen.machine().gfx[2] : screen.machine().gfx[1];
 
-		if (state->m_cocktail_flip)
+		if (m_cocktail_flip)
 		{
 			x = 64*8 - gfx->width() - x;
 			y = 32*8 - gfx->height() - y;
@@ -403,14 +402,14 @@ SCREEN_UPDATE_IND16( exerion )
 	for (sy = cliprect.min_y/8; sy <= cliprect.max_y/8; sy++)
 		for (sx = VISIBLE_X_MIN/8; sx < VISIBLE_X_MAX/8; sx++)
 		{
-			int x = state->m_cocktail_flip ? (63*8 - 8*sx) : 8*sx;
-			int y = state->m_cocktail_flip ? (31*8 - 8*sy) : 8*sy;
+			int x = m_cocktail_flip ? (63*8 - 8*sx) : 8*sx;
+			int y = m_cocktail_flip ? (31*8 - 8*sy) : 8*sy;
 
 			offs = sx + sy * 64;
 			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0],
-				state->m_videoram[offs] + 256 * state->m_char_bank,
-				((state->m_videoram[offs] & 0xf0) >> 4) + state->m_char_palette * 16,
-				state->m_cocktail_flip, state->m_cocktail_flip, x, y, 0);
+				m_videoram[offs] + 256 * m_char_bank,
+				((m_videoram[offs] & 0xf0) >> 4) + m_char_palette * 16,
+				m_cocktail_flip, m_cocktail_flip, x, y, 0);
 		}
 
 	return 0;

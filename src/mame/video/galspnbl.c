@@ -101,9 +101,8 @@ static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, con
 }
 
 
-SCREEN_UPDATE_IND16( galspnbl )
+UINT32 galspnbl_state::screen_update_galspnbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galspnbl_state *state = screen.machine().driver_data<galspnbl_state>();
 	int offs;
 
 	draw_background(screen.machine(), bitmap, cliprect);
@@ -114,8 +113,8 @@ SCREEN_UPDATE_IND16( galspnbl )
 	{
 		int sx, sy, code, attr, color;
 
-		code = state->m_videoram[offs];
-		attr = state->m_colorram[offs];
+		code = m_videoram[offs];
+		attr = m_colorram[offs];
 		color = (attr & 0x00f0) >> 4;
 		sx = offs % 64;
 		sy = offs / 64;

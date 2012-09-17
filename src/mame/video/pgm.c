@@ -637,44 +637,42 @@ VIDEO_START_MEMBER(pgm_state,pgm)
 	save_pointer(NAME(m_spritebufferram), 0xa00/2);
 }
 
-SCREEN_UPDATE_IND16( pgm )
+UINT32 pgm_state::screen_update_pgm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pgm_state *state = screen.machine().driver_data<pgm_state>();
 	int y;
 
 	bitmap.fill(0x3ff, cliprect); // ddp2 igs logo needs 0x3ff
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_bg_tilemap->set_scrolly(0, state->m_videoregs[0x2000/2]);
+	m_bg_tilemap->set_scrolly(0, m_videoregs[0x2000/2]);
 
 	for (y = 0; y < 224; y++)
-		state->m_bg_tilemap->set_scrollx((y + state->m_videoregs[0x2000 / 2]) & 0x1ff, state->m_videoregs[0x3000 / 2] + state->m_rowscrollram[y]);
+		m_bg_tilemap->set_scrollx((y + m_videoregs[0x2000 / 2]) & 0x1ff, m_videoregs[0x3000 / 2] + m_rowscrollram[y]);
 
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 2);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 2);
 
-	draw_sprites(state, screen.machine(), bitmap, state->m_spritebufferram, screen.machine().priority_bitmap);
+	draw_sprites(this, screen.machine(), bitmap, m_spritebufferram, screen.machine().priority_bitmap);
 
-	state->m_tx_tilemap->set_scrolly(0, state->m_videoregs[0x5000/2]);
-	state->m_tx_tilemap->set_scrollx(0, state->m_videoregs[0x6000/2]); // Check
+	m_tx_tilemap->set_scrolly(0, m_videoregs[0x5000/2]);
+	m_tx_tilemap->set_scrollx(0, m_videoregs[0x6000/2]); // Check
 
 
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
 
 	return 0;
 
 }
 
-SCREEN_VBLANK( pgm )
+void pgm_state::screen_eof_pgm(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		pgm_state *state = screen.machine().driver_data<pgm_state>();
 
 		/* first 0xa00 of main ram = sprites, seems to be buffered, DMA? */
-		memcpy(state->m_spritebufferram, state->m_mainram, 0xa00);
+		memcpy(m_spritebufferram, m_mainram, 0xa00);
 	}
 }

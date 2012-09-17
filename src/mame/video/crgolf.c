@@ -108,10 +108,9 @@ VIDEO_START_MEMBER(crgolf_state,crgolf)
  *
  *************************************/
 
-static SCREEN_UPDATE_RGB32( crgolf )
+UINT32 crgolf_state::screen_update_crgolf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	crgolf_state *state = screen.machine().driver_data<crgolf_state>();
-	int flip = *state->m_screen_flip & 1;
+	int flip = *m_screen_flip & 1;
 
 	offs_t offs;
 	pen_t pens[NUM_PENS];
@@ -126,12 +125,12 @@ static SCREEN_UPDATE_RGB32( crgolf )
 		UINT8 y = (offs & 0x1fe0) >> 5;
 		UINT8 x = (offs & 0x001f) << 3;
 
-		UINT8 data_a0 = state->m_videoram_a[0x2000 | offs];
-		UINT8 data_a1 = state->m_videoram_a[0x0000 | offs];
-		UINT8 data_a2 = state->m_videoram_a[0x4000 | offs];
-		UINT8 data_b0 = state->m_videoram_b[0x2000 | offs];
-		UINT8 data_b1 = state->m_videoram_b[0x0000 | offs];
-		UINT8 data_b2 = state->m_videoram_b[0x4000 | offs];
+		UINT8 data_a0 = m_videoram_a[0x2000 | offs];
+		UINT8 data_a1 = m_videoram_a[0x0000 | offs];
+		UINT8 data_a2 = m_videoram_a[0x4000 | offs];
+		UINT8 data_b0 = m_videoram_b[0x2000 | offs];
+		UINT8 data_b1 = m_videoram_b[0x0000 | offs];
+		UINT8 data_b2 = m_videoram_b[0x4000 | offs];
 
 		if (flip)
 		{
@@ -146,10 +145,10 @@ static SCREEN_UPDATE_RGB32( crgolf )
 			UINT8 data_b = 0;
 			UINT8 data_a = 0;
 
-			if (~*state->m_screena_enable & 1)
+			if (~*m_screena_enable & 1)
 				data_a = ((data_a0 & 0x80) >> 7) | ((data_a1 & 0x80) >> 6) | ((data_a2 & 0x80) >> 5);
 
-			if (~*state->m_screenb_enable & 1)
+			if (~*m_screenb_enable & 1)
 				data_b = ((data_b0 & 0x80) >> 7) | ((data_b1 & 0x80) >> 6) | ((data_b2 & 0x80) >> 5);
 
 			/* screen A has priority over B */
@@ -159,7 +158,7 @@ static SCREEN_UPDATE_RGB32( crgolf )
 				color = data_b | 0x08;
 
 			/* add HI bit if enabled */
-			if (*state->m_color_select)
+			if (*m_color_select)
 				color = color | 0x10;
 
 			bitmap.pix32(y, x) = pens[color];
@@ -197,5 +196,5 @@ MACHINE_CONFIG_FRAGMENT( crgolf_video )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 247)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_UPDATE_STATIC(crgolf)
+	MCFG_SCREEN_UPDATE_DRIVER(crgolf_state, screen_update_crgolf)
 MACHINE_CONFIG_END

@@ -156,6 +156,7 @@ public:
 	virtual void video_start();
 	virtual void video_reset();
 	virtual void palette_init();
+	void screen_eof_mbc55x(screen_device &screen, bool state);
 };
 
 /* IO chips */
@@ -221,7 +222,7 @@ DECLARE_READ16_HANDLER (mbc55x_video_io_r);
 DECLARE_WRITE16_HANDLER (mbc55x_video_io_w);
 
 
-SCREEN_VBLANK( mbc55x );
+
 
 
 #define RED                     0

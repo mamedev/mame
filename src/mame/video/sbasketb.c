@@ -168,15 +168,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( sbasketb )
+UINT32 sbasketb_state::screen_update_sbasketb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sbasketb_state *state = screen.machine().driver_data<sbasketb_state>();
 	int col;
 
 	for (col = 6; col < 32; col++)
-		state->m_bg_tilemap->set_scrolly(col, *state->m_scroll);
+		m_bg_tilemap->set_scrolly(col, *m_scroll);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

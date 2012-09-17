@@ -92,6 +92,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -206,14 +207,13 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-static SCREEN_UPDATE_IND16( chanbara )
+UINT32 chanbara_state::screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	chanbara_state *state = screen.machine().driver_data<chanbara_state>();
 
-	state->m_bg2_tilemap->set_scrolly(0, state->m_scroll | (state->m_scrollhi << 8));
-	state->m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg2_tilemap->set_scrolly(0, m_scroll | (m_scrollhi << 8));
+	m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -415,7 +415,7 @@ static MACHINE_CONFIG_START( chanbara, chanbara_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(chanbara)
+	MCFG_SCREEN_UPDATE_DRIVER(chanbara_state, screen_update_chanbara)
 
 	MCFG_GFXDECODE(chanbara)
 	MCFG_PALETTE_LENGTH(256)

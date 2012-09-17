@@ -78,6 +78,7 @@ public:
 	DECLARE_MACHINE_START(atarisy2);
 	DECLARE_MACHINE_RESET(atarisy2);
 	DECLARE_VIDEO_START(atarisy2);
+	UINT32 screen_update_atarisy2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -93,4 +94,4 @@ DECLARE_WRITE16_HANDLER( atarisy2_videoram_w );
 DECLARE_WRITE16_HANDLER( atarisy2_paletteram_w );
 
 
-SCREEN_UPDATE_IND16( atarisy2 );
+

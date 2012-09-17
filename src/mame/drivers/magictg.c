@@ -212,6 +212,8 @@ protected:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+public:	
+	UINT32 screen_update_magictg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -259,10 +261,9 @@ void magictg_state::video_start()
 
 }
 
-static SCREEN_UPDATE_RGB32( magictg )
+UINT32 magictg_state::screen_update_magictg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	magictg_state* state = screen.machine().driver_data<magictg_state>();
-	return voodoo_update(state->m_voodoo[0], bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return voodoo_update(m_voodoo[0], bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 
@@ -964,7 +965,7 @@ static MACHINE_CONFIG_START( magictg, magictg_state )
 	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 447)
 
-	MCFG_SCREEN_UPDATE_STATIC(magictg)
+	MCFG_SCREEN_UPDATE_DRIVER(magictg_state, screen_update_magictg)
 MACHINE_CONFIG_END
 
 

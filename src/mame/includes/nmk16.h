@@ -127,6 +127,21 @@ public:
 	DECLARE_VIDEO_START(afega);
 	DECLARE_VIDEO_START(firehawk);
 	DECLARE_VIDEO_START(grdnstrm);
+	UINT32 screen_update_tharrier(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_manybloc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_macross(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_bioship(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_strahl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_gunnail(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_tdragon2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_afega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_firehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_redhawki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_redhawkb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_bubl2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_nmk(screen_device &screen, bool state);
+	void screen_eof_strahl(screen_device &screen, bool state);
 };
 
 
@@ -141,22 +156,22 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( macross );
-SCREEN_UPDATE_IND16( manybloc );
-SCREEN_UPDATE_IND16( tharrier );
-SCREEN_UPDATE_IND16( tdragon2 );
-SCREEN_UPDATE_IND16( gunnail );
-SCREEN_UPDATE_IND16( bioship );
-SCREEN_UPDATE_IND16( strahl );
-SCREEN_UPDATE_IND16( bjtwin );
-SCREEN_VBLANK( nmk );
-SCREEN_VBLANK( strahl );
 
 
 
 
-SCREEN_UPDATE_IND16( afega );
-SCREEN_UPDATE_IND16( redhawkb );
-SCREEN_UPDATE_IND16(redhawki );
-SCREEN_UPDATE_IND16( bubl2000 );
-SCREEN_UPDATE_IND16( firehawk );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

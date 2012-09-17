@@ -630,42 +630,41 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 	}
 } /* draw_background */
 
-SCREEN_UPDATE_IND16( namcona1 )
+UINT32 namcona1_state::screen_update_namcona1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	namcona1_state *state = screen.machine().driver_data<namcona1_state>();
 	int which;
 	int priority;
 
-	/* int flipscreen = state->m_vreg[0x98/2]; (TBA) */
+	/* int flipscreen = m_vreg[0x98/2]; (TBA) */
 
-	if( state->m_vreg[0x8e/2] )
+	if( m_vreg[0x8e/2] )
 	{ /* gfx enabled */
-		if( state->m_palette_is_dirty )
+		if( m_palette_is_dirty )
 		{
 			/* palette updates are delayed when graphics are disabled */
 			for( which=0; which<0x1000; which++ )
 			{
 				UpdatePalette(screen.machine(), which );
 			}
-			state->m_palette_is_dirty = 0;
+			m_palette_is_dirty = 0;
 		}
 		UpdateGfx(screen.machine());
 		for( which=0; which<NAMCONA1_NUM_TILEMAPS; which++ )
 		{
-			int tilemap_color = state->m_vreg[0xb0/2+(which&3)]&0xf;
-			if( tilemap_color!=state->m_tilemap_palette_bank[which] )
+			int tilemap_color = m_vreg[0xb0/2+(which&3)]&0xf;
+			if( tilemap_color!=m_tilemap_palette_bank[which] )
 			{
-				state->m_bg_tilemap[which] ->mark_all_dirty();
-				state->m_tilemap_palette_bank[which] = tilemap_color;
+				m_bg_tilemap[which] ->mark_all_dirty();
+				m_tilemap_palette_bank[which] = tilemap_color;
 			}
 		} /* next tilemap */
 
 		{ /* ROZ tilemap */
-			int color = state->m_vreg[0xba/2]&0xf;
-			if( color != state->m_roz_palette )
+			int color = m_vreg[0xba/2]&0xf;
+			if( color != m_roz_palette )
 			{
-				state->m_roz_tilemap ->mark_all_dirty();
-				state->m_roz_palette = color;
+				m_roz_tilemap ->mark_all_dirty();
+				m_roz_palette = color;
 			}
 		}
 
@@ -680,11 +679,11 @@ SCREEN_UPDATE_IND16( namcona1 )
 				int pri;
 				if( which==4 )
 				{
-					pri = state->m_vreg[0xa0/2+5]&0x7;
+					pri = m_vreg[0xa0/2+5]&0x7;
 				}
 				else
 				{
-					pri = state->m_vreg[0xa0/2+which]&0x7;
+					pri = m_vreg[0xa0/2+which]&0x7;
 				}
 				if( pri == priority )
 				{

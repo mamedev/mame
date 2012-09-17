@@ -109,6 +109,7 @@ public:
 	DECLARE_VIDEO_START(pasopia7);
 	DECLARE_PALETTE_INIT(p7_raster);
 	DECLARE_PALETTE_INIT(p7_lcd);
+	UINT32 screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 #define VDP_CLOCK XTAL_3_579545MHz/4
@@ -304,16 +305,15 @@ static void draw_mixed_screen(running_machine &machine, bitmap_ind16 &bitmap,con
 	}
 }
 
-static SCREEN_UPDATE_IND16( pasopia7 )
+UINT32 pasopia7_state::screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pasopia7_state *state = screen.machine().driver_data<pasopia7_state>();
 	int width;
 
 	bitmap.fill(screen.machine().pens[0], cliprect);
 
-	width = state->m_x_width ? 80 : 40;
+	width = m_x_width ? 80 : 40;
 
-	if(state->m_gfx_mode)
+	if(m_gfx_mode)
 		draw_mixed_screen(screen.machine(),bitmap,cliprect,width);
 	else
 	{
@@ -1042,7 +1042,7 @@ static MACHINE_CONFIG_DERIVED( p7_raster, p7_base )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 32-1)
 	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
-	MCFG_SCREEN_UPDATE_STATIC(pasopia7)
+	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT_OVERRIDE(pasopia7_state,p7_raster)
 	MCFG_GFXDECODE( pasopia7 )
@@ -1058,7 +1058,7 @@ static MACHINE_CONFIG_DERIVED( p7_lcd, p7_base )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
-	MCFG_SCREEN_UPDATE_STATIC(pasopia7)
+	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT_OVERRIDE(pasopia7_state,p7_lcd)
 	MCFG_GFXDECODE( pasopia7 )

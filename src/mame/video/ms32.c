@@ -348,9 +348,8 @@ static void draw_roz(running_machine &machine, bitmap_ind16 &bitmap, const recta
 
 
 
-SCREEN_UPDATE_RGB32( ms32 )
+UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	ms32_state *state = screen.machine().driver_data<ms32_state>();
 	int scrollx,scrolly;
 	int asc_pri;
 	int scr_pri;
@@ -369,17 +368,17 @@ SCREEN_UPDATE_RGB32( ms32 )
 	for (i = 0;i < 0x10000;i++)	// colors 0x3000-0x3fff are not used
 		update_color(screen.machine(), i);
 
-	scrollx = state->m_tx_scroll[0x00/4] + state->m_tx_scroll[0x08/4] + 0x18;
-	scrolly = state->m_tx_scroll[0x0c/4] + state->m_tx_scroll[0x14/4];
-	state->m_tx_tilemap->set_scrollx(0, scrollx);
-	state->m_tx_tilemap->set_scrolly(0, scrolly);
+	scrollx = m_tx_scroll[0x00/4] + m_tx_scroll[0x08/4] + 0x18;
+	scrolly = m_tx_scroll[0x0c/4] + m_tx_scroll[0x14/4];
+	m_tx_tilemap->set_scrollx(0, scrollx);
+	m_tx_tilemap->set_scrolly(0, scrolly);
 
-	scrollx = state->m_bg_scroll[0x00/4] + state->m_bg_scroll[0x08/4] + 0x10;
-	scrolly = state->m_bg_scroll[0x0c/4] + state->m_bg_scroll[0x14/4];
-	state->m_bg_tilemap->set_scrollx(0, scrollx);
-	state->m_bg_tilemap->set_scrolly(0, scrolly);
-	state->m_bg_tilemap_alt->set_scrollx(0, scrollx);
-	state->m_bg_tilemap_alt->set_scrolly(0, scrolly);
+	scrollx = m_bg_scroll[0x00/4] + m_bg_scroll[0x08/4] + 0x10;
+	scrolly = m_bg_scroll[0x0c/4] + m_bg_scroll[0x14/4];
+	m_bg_tilemap->set_scrollx(0, scrollx);
+	m_bg_tilemap->set_scrolly(0, scrolly);
+	m_bg_tilemap_alt->set_scrollx(0, scrollx);
+	m_bg_tilemap_alt->set_scrolly(0, scrolly);
 
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
@@ -388,75 +387,75 @@ SCREEN_UPDATE_RGB32( ms32 )
 
 	/* TODO: 0 is correct for gametngk, but break f1superb scrolling grid (text at
        top and bottom of the screen becomes black on black) */
-	state->m_temp_bitmap_tilemaps.fill(0, cliprect);	/* bg color */
+	m_temp_bitmap_tilemaps.fill(0, cliprect);	/* bg color */
 
 	/* clear our sprite bitmaps */
-	state->m_temp_bitmap_sprites.fill(0, cliprect);
-	state->m_temp_bitmap_sprites_pri.fill(0, cliprect);
+	m_temp_bitmap_sprites.fill(0, cliprect);
+	m_temp_bitmap_sprites_pri.fill(0, cliprect);
 
-	draw_sprites(screen.machine(), state->m_temp_bitmap_sprites, state->m_temp_bitmap_sprites_pri, cliprect, state->m_sprram_16, 0x20000, 0, state->m_reverse_sprite_order);
+	draw_sprites(screen.machine(), m_temp_bitmap_sprites, m_temp_bitmap_sprites_pri, cliprect, m_sprram_16, 0x20000, 0, m_reverse_sprite_order);
 
 
 
 
 	asc_pri = scr_pri = rot_pri = 0;
 
-	if((state->m_priram_8[0x2b00 / 2] & 0x00ff) == 0x0034)
+	if((m_priram_8[0x2b00 / 2] & 0x00ff) == 0x0034)
 		asc_pri++;
 	else
 		rot_pri++;
 
-	if((state->m_priram_8[0x2e00 / 2] & 0x00ff) == 0x0034)
+	if((m_priram_8[0x2e00 / 2] & 0x00ff) == 0x0034)
 		asc_pri++;
 	else
 		scr_pri++;
 
-	if((state->m_priram_8[0x3a00 / 2] & 0x00ff) == 0x000c)
+	if((m_priram_8[0x3a00 / 2] & 0x00ff) == 0x000c)
 		scr_pri++;
 	else
 		rot_pri++;
 
 	if (rot_pri == 0)
-		draw_roz(screen.machine(), state->m_temp_bitmap_tilemaps, cliprect, 1 << 1);
+		draw_roz(screen.machine(), m_temp_bitmap_tilemaps, cliprect, 1 << 1);
 	else if (scr_pri == 0)
-		if (state->m_tilemaplayoutcontrol&1)
+		if (m_tilemaplayoutcontrol&1)
 		{
-			state->m_bg_tilemap_alt->draw(state->m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
+			m_bg_tilemap_alt->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
 		}
 		else
 		{
-			state->m_bg_tilemap->draw(state->m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
+			m_bg_tilemap->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
 		}
 	else if (asc_pri == 0)
-		state->m_tx_tilemap->draw(state->m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
+		m_tx_tilemap->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
 
 	if (rot_pri == 1)
-		draw_roz(screen.machine(), state->m_temp_bitmap_tilemaps, cliprect, 1 << 1);
+		draw_roz(screen.machine(), m_temp_bitmap_tilemaps, cliprect, 1 << 1);
 	else if (scr_pri == 1)
-		if (state->m_tilemaplayoutcontrol&1)
+		if (m_tilemaplayoutcontrol&1)
 		{
-			state->m_bg_tilemap_alt->draw(state->m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
+			m_bg_tilemap_alt->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
 		}
 		else
 		{
-			state->m_bg_tilemap->draw(state->m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
+			m_bg_tilemap->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
 		}
 	else if (asc_pri == 1)
-		state->m_tx_tilemap->draw(state->m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
+		m_tx_tilemap->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
 
 	if (rot_pri == 2)
-		draw_roz(screen.machine(), state->m_temp_bitmap_tilemaps, cliprect, 1 << 1);
+		draw_roz(screen.machine(), m_temp_bitmap_tilemaps, cliprect, 1 << 1);
 	else if (scr_pri == 2)
-		if (state->m_tilemaplayoutcontrol&1)
+		if (m_tilemaplayoutcontrol&1)
 		{
-			state->m_bg_tilemap_alt->draw(state->m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
+			m_bg_tilemap_alt->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
 		}
 		else
 		{
-			state->m_bg_tilemap->draw(state->m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
+			m_bg_tilemap->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
 		}
 	else if (asc_pri == 2)
-		state->m_tx_tilemap->draw(state->m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
+		m_tx_tilemap->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
 
 	/* MIX it! */
 	/* this mixing isn't 100% accurate, it should be using ALL the data in
@@ -479,10 +478,10 @@ SCREEN_UPDATE_RGB32( ms32 )
 
 		for (yy=0;yy<height;yy++)
 		{
-			srcptr_tile =     &state->m_temp_bitmap_tilemaps.pix16(yy);
+			srcptr_tile =     &m_temp_bitmap_tilemaps.pix16(yy);
 			srcptr_tilepri =  &screen.machine().priority_bitmap.pix8(yy);
-			srcptr_spri =     &state->m_temp_bitmap_sprites.pix16(yy);
-			//srcptr_spripri =  &state->m_temp_bitmap_sprites_pri.pix8(yy);
+			srcptr_spri =     &m_temp_bitmap_sprites.pix16(yy);
+			//srcptr_spripri =  &m_temp_bitmap_sprites_pri.pix8(yy);
 			dstptr_bitmap  =  &bitmap.pix32(yy);
 			for (xx=0;xx<width;xx++)
 			{
@@ -495,14 +494,14 @@ SCREEN_UPDATE_RGB32( ms32 )
 				int primask = 0;
 
 				// get sprite priority value back out of bitmap/colour data (this is done in draw_sprite for standalone hw)
-				if (state->m_priram_8[(spritepri | 0x0a00 | 0x1500) / 2] & 0x38) primask |= 1 << 0;
-				if (state->m_priram_8[(spritepri | 0x0a00 | 0x1400) / 2] & 0x38) primask |= 1 << 1;
-				if (state->m_priram_8[(spritepri | 0x0a00 | 0x1100) / 2] & 0x38) primask |= 1 << 2;
-				if (state->m_priram_8[(spritepri | 0x0a00 | 0x1000) / 2] & 0x38) primask |= 1 << 3;
-				if (state->m_priram_8[(spritepri | 0x0a00 | 0x0500) / 2] & 0x38) primask |= 1 << 4;
-				if (state->m_priram_8[(spritepri | 0x0a00 | 0x0400) / 2] & 0x38) primask |= 1 << 5;
-				if (state->m_priram_8[(spritepri | 0x0a00 | 0x0100) / 2] & 0x38) primask |= 1 << 6;
-				if (state->m_priram_8[(spritepri | 0x0a00 | 0x0000) / 2] & 0x38) primask |= 1 << 7;
+				if (m_priram_8[(spritepri | 0x0a00 | 0x1500) / 2] & 0x38) primask |= 1 << 0;
+				if (m_priram_8[(spritepri | 0x0a00 | 0x1400) / 2] & 0x38) primask |= 1 << 1;
+				if (m_priram_8[(spritepri | 0x0a00 | 0x1100) / 2] & 0x38) primask |= 1 << 2;
+				if (m_priram_8[(spritepri | 0x0a00 | 0x1000) / 2] & 0x38) primask |= 1 << 3;
+				if (m_priram_8[(spritepri | 0x0a00 | 0x0500) / 2] & 0x38) primask |= 1 << 4;
+				if (m_priram_8[(spritepri | 0x0a00 | 0x0400) / 2] & 0x38) primask |= 1 << 5;
+				if (m_priram_8[(spritepri | 0x0a00 | 0x0100) / 2] & 0x38) primask |= 1 << 6;
+				if (m_priram_8[(spritepri | 0x0a00 | 0x0000) / 2] & 0x38) primask |= 1 << 7;
 
 
 				if (primask == 0x00)

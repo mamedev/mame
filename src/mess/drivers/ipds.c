@@ -32,6 +32,7 @@ public:
 	bitmap_ind16 m_bitmap;
 	virtual void video_start();
 	virtual void machine_reset();
+	UINT32 screen_update_ipds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 READ8_MEMBER( ipds_state::ipds_b0_r )
@@ -114,12 +115,11 @@ const i8275_interface ipds_i8275_interface =
 	ipds_display_pixels
 };
 
-static SCREEN_UPDATE_IND16( ipds )
+UINT32 ipds_state::screen_update_ipds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ipds_state *state = screen.machine().driver_data<ipds_state>();
 	device_t *devconf = screen.machine().device("i8275");
 	i8275_update( devconf, bitmap, cliprect);
-	copybitmap(bitmap, state->m_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
@@ -165,7 +165,7 @@ static MACHINE_CONFIG_START( ipds, ipds_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_STATIC(ipds)
+	MCFG_SCREEN_UPDATE_DRIVER(ipds_state, screen_update_ipds)
 	MCFG_GFXDECODE(ipds)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)

@@ -159,6 +159,8 @@ public:
 	TILE_GET_INFO_MEMBER(taitojc_tile_info);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_taitojc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_dendego(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -168,8 +170,8 @@ void taitojc_clear_frame(running_machine &machine);
 void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int length);
 
 
-SCREEN_UPDATE_IND16(taitojc);
-SCREEN_UPDATE_IND16(dendego);
+
+
 
 // lookup tables for densha de go analog controls/meters
 const int dendego_odometer_table[0x100] =

@@ -417,18 +417,17 @@ WRITE8_MEMBER(centiped_state::mazeinv_paletteram_w)
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( centiped )
+UINT32 centiped_state::screen_update_centiped(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	centiped_state *state = screen.machine().driver_data<centiped_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	rectangle spriteclip = cliprect;
 	int offs;
 
 	/* draw the background */
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* apply the sprite clip */
-	if (state->m_flipscreen)
+	if (m_flipscreen)
 		spriteclip.min_x += 8;
 	else
 		spriteclip.max_x -= 8;
@@ -443,29 +442,28 @@ SCREEN_UPDATE_IND16( centiped )
 		int x = spriteram[offs + 0x20];
 		int y = 240 - spriteram[offs + 0x10];
 
-		drawgfx_transmask(bitmap, spriteclip, screen.machine().gfx[1], code, color, flipx, flipy, x, y, state->m_penmask[color & 0x3f]);
+		drawgfx_transmask(bitmap, spriteclip, screen.machine().gfx[1], code, color, flipx, flipy, x, y, m_penmask[color & 0x3f]);
 	}
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( warlords )
+UINT32 centiped_state::screen_update_warlords(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	centiped_state *state = screen.machine().driver_data<centiped_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int upright_mode = screen.machine().root_device().ioport("IN0")->read() & 0x80;
 	int offs;
 
 	/* if the cocktail/upright switch flipped, force refresh */
-	if (state->m_flipscreen != upright_mode)
+	if (m_flipscreen != upright_mode)
 	{
-		state->m_flipscreen = upright_mode;
-		state->m_bg_tilemap->set_flip(upright_mode ? TILEMAP_FLIPX : 0);
-		state->m_bg_tilemap->mark_all_dirty();
+		m_flipscreen = upright_mode;
+		m_bg_tilemap->set_flip(upright_mode ? TILEMAP_FLIPX : 0);
+		m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* draw the background */
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	for (offs = 0; offs < 0x10; offs++)
@@ -495,19 +493,18 @@ SCREEN_UPDATE_IND16( warlords )
 }
 
 
-SCREEN_UPDATE_IND16( bullsdrt )
+UINT32 centiped_state::screen_update_bullsdrt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	centiped_state *state = screen.machine().driver_data<centiped_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	rectangle spriteclip = cliprect;
 
 	int offs;
 
 	/* draw the background */
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* apply the sprite clip */
-	if (state->m_flipscreen)
+	if (m_flipscreen)
 		spriteclip.min_x += 8;
 	else
 		spriteclip.max_x -= 8;
@@ -515,7 +512,7 @@ SCREEN_UPDATE_IND16( bullsdrt )
 	/* draw the sprites */
 	for (offs = 0; offs < 0x10; offs++)
 	{
-		int code = ((spriteram[offs] & 0x3e) >> 1) | ((spriteram[offs] & 0x01) << 6) | (state->m_bullsdrt_sprites_bank * 0x20);
+		int code = ((spriteram[offs] & 0x3e) >> 1) | ((spriteram[offs] & 0x01) << 6) | (m_bullsdrt_sprites_bank * 0x20);
 		int color = spriteram[offs + 0x30];
 		int flipy = (spriteram[offs] >> 7) & 1;
 		int x = spriteram[offs + 0x20];
@@ -530,18 +527,17 @@ SCREEN_UPDATE_IND16( bullsdrt )
  * This varies from Centipede, in that flipx is not in
  * the data, but is determined by VIDROT value at 0x2506.
  */
-SCREEN_UPDATE_IND16( milliped )
+UINT32 centiped_state::screen_update_milliped(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	centiped_state *state = screen.machine().driver_data<centiped_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	rectangle spriteclip = cliprect;
 	int offs;
 
 	/* draw the background */
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* apply the sprite clip */
-	if (state->m_flipscreen)
+	if (m_flipscreen)
 		spriteclip.min_x += 8;
 	else
 		spriteclip.max_x -= 8;
@@ -549,9 +545,9 @@ SCREEN_UPDATE_IND16( milliped )
 	/* draw the sprites */
 	for (offs = 0; offs < 0x10; offs++)
 	{
-		int code = ((spriteram[offs] & 0x3e) >> 1) | ((spriteram[offs] & 0x01) << 6) | (state->m_gfx_bank << 7);
+		int code = ((spriteram[offs] & 0x3e) >> 1) | ((spriteram[offs] & 0x01) << 6) | (m_gfx_bank << 7);
 		int color = spriteram[offs + 0x30];
-		int flipx = state->m_flipscreen;
+		int flipx = m_flipscreen;
 		int flipy = (spriteram[offs] & 0x80);
 		int x = spriteram[offs + 0x20];
 		int y = 240 - spriteram[offs + 0x10];
@@ -559,7 +555,7 @@ SCREEN_UPDATE_IND16( milliped )
 			flipy = !flipy;
 		}
 
-		drawgfx_transmask(bitmap, spriteclip, screen.machine().gfx[1], code, color, flipx, flipy, x, y, state->m_penmask[color & 0x3f]);
+		drawgfx_transmask(bitmap, spriteclip, screen.machine().gfx[1], code, color, flipx, flipy, x, y, m_penmask[color & 0x3f]);
 	}
 	return 0;
 }

@@ -26,6 +26,7 @@ public:
 
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_mk90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -56,7 +57,7 @@ void mk90_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( mk90 )
+UINT32 mk90_state::screen_update_mk90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -79,7 +80,7 @@ static MACHINE_CONFIG_START( mk90, mk90_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_STATIC(mk90)
+	MCFG_SCREEN_UPDATE_DRIVER(mk90_state, screen_update_mk90)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 MACHINE_CONFIG_END

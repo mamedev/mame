@@ -546,7 +546,7 @@ static void nomnlnd_draw_background( screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-SCREEN_UPDATE_IND16( cosmicg )
+UINT32 cosmic_state::screen_update_cosmicg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	draw_bitmap(screen.machine(), bitmap, cliprect);
@@ -554,7 +554,7 @@ SCREEN_UPDATE_IND16( cosmicg )
 }
 
 
-SCREEN_UPDATE_IND16( panic )
+UINT32 cosmic_state::screen_update_panic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	draw_bitmap(screen.machine(), bitmap, cliprect);
@@ -563,7 +563,7 @@ SCREEN_UPDATE_IND16( panic )
 }
 
 
-SCREEN_UPDATE_IND16( cosmica )
+UINT32 cosmic_state::screen_update_cosmica(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	cosmica_draw_starfield(screen, bitmap, cliprect);
@@ -573,7 +573,7 @@ SCREEN_UPDATE_IND16( cosmica )
 }
 
 
-SCREEN_UPDATE_IND16( magspot )
+UINT32 cosmic_state::screen_update_magspot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	draw_bitmap(screen.machine(), bitmap, cliprect);
@@ -582,13 +582,12 @@ SCREEN_UPDATE_IND16( magspot )
 }
 
 
-SCREEN_UPDATE_IND16( devzone )
+UINT32 cosmic_state::screen_update_devzone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cosmic_state *state = screen.machine().driver_data<cosmic_state>();
 
 	bitmap.fill(0, cliprect);
 
-	if (state->m_background_enable)
+	if (m_background_enable)
 		devzone_draw_grid(screen.machine(), bitmap, cliprect);
 
 	draw_bitmap(screen.machine(), bitmap, cliprect);
@@ -597,9 +596,8 @@ SCREEN_UPDATE_IND16( devzone )
 }
 
 
-SCREEN_UPDATE_IND16( nomnlnd )
+UINT32 cosmic_state::screen_update_nomnlnd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cosmic_state *state = screen.machine().driver_data<cosmic_state>();
 
 	/* according to the video summation logic on pg4, the trees and river
        have the highest priority */
@@ -608,7 +606,7 @@ SCREEN_UPDATE_IND16( nomnlnd )
 	draw_bitmap(screen.machine(), bitmap, cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x07, 0);
 
-	if (state->m_background_enable)
+	if (m_background_enable)
 		nomnlnd_draw_background(screen, bitmap, cliprect);
 
 	return 0;

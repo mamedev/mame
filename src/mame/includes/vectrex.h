@@ -69,6 +69,7 @@ public:
 	DECLARE_DRIVER_INIT(vectrex);
 	virtual void video_start();
 	DECLARE_VIDEO_START(raaspec);
+	UINT32 screen_update_vectrex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -94,7 +95,7 @@ extern const via6522_interface vectrex_via6522_interface;
 extern const via6522_interface spectrum1_via6522_interface;
 
 
-SCREEN_UPDATE_RGB32( vectrex );
+
 
 
 

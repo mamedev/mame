@@ -693,7 +693,7 @@ static MACHINE_CONFIG_START( grchamp, grchamp_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_STATIC(grchamp)
+	MCFG_SCREEN_UPDATE_DRIVER(grchamp_state, screen_update_grchamp)
 
 
 	/* sound hardware */

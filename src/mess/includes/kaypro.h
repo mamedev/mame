@@ -75,6 +75,9 @@ public:
 	DECLARE_MACHINE_RESET(kaypro2x);
 	DECLARE_PALETTE_INIT(kaypro);
 	DECLARE_MACHINE_RESET(kay_kbd);
+	UINT32 screen_update_kayproii(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_kaypro2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_omni2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -111,6 +114,6 @@ QUICKLOAD_LOAD( kaypro2x );
 MC6845_UPDATE_ROW( kaypro2x_update_row );
 
 
-SCREEN_UPDATE_IND16( kayproii );
-SCREEN_UPDATE_IND16( omni2 );
-SCREEN_UPDATE_RGB32( kaypro2x );
+
+
+

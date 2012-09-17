@@ -2184,37 +2184,36 @@ VIDEO_START_MEMBER(sms_state,sms1)
 	save_item(NAME(m_prevright_bitmap));
 }
 
-SCREEN_UPDATE_RGB32( sms1 )
+UINT32 sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	sms_state *state = screen.machine().driver_data<sms_state>();
 	UINT8 sscope = 0;
 	UINT8 sscope_binocular_hack;
 	UINT8 occluded_view = 0;
 
-	if (&screen != state->m_main_scr)
+	if (&screen != m_main_scr)
 	{
 		sscope = screen.machine().root_device().ioport("SEGASCOPE")->read_safe(0x00);
 		if (!sscope)
 		{
 			occluded_view = 1;
 		}
-		else if (&screen == state->m_left_lcd)
+		else if (&screen == m_left_lcd)
 		{
 			// with SegaScope, sscope_state 0 = left screen OFF, right screen ON
-			if (!(state->m_sscope_state & 0x01))
+			if (!(m_sscope_state & 0x01))
 				occluded_view = 1;
 		}
 		else // it's right LCD
 		{
 			// with SegaScope, sscope_state 1 = left screen ON, right screen OFF
-			if (state->m_sscope_state & 0x01)
+			if (m_sscope_state & 0x01)
 				occluded_view = 1;
 		}
 	}
 
 	if (!occluded_view)
 	{
-		state->m_vdp->screen_update(screen, bitmap, cliprect);
+		m_vdp->screen_update(screen, bitmap, cliprect);
 
 		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
 		// save a copy of current bitmap for the binocular hack
@@ -2222,15 +2221,15 @@ SCREEN_UPDATE_RGB32( sms1 )
 		{
 			sscope_binocular_hack = screen.machine().root_device().ioport("SSCOPE_BINOCULAR")->read_safe(0x00);
 
-			if (&screen == state->m_left_lcd)
+			if (&screen == m_left_lcd)
 			{
 				if (sscope_binocular_hack & 0x01)
-					copybitmap(state->m_prevleft_bitmap, bitmap, 0, 0, 0, 0, cliprect);
+					copybitmap(m_prevleft_bitmap, bitmap, 0, 0, 0, 0, cliprect);
 			}
 			else // it's right LCD
 			{
 				if (sscope_binocular_hack & 0x02)
-					copybitmap(state->m_prevright_bitmap, bitmap, 0, 0, 0, 0, cliprect);
+					copybitmap(m_prevright_bitmap, bitmap, 0, 0, 0, 0, cliprect);
 			}
 		}
 	}
@@ -2242,11 +2241,11 @@ SCREEN_UPDATE_RGB32( sms1 )
 		{
 			sscope_binocular_hack = screen.machine().root_device().ioport("SSCOPE_BINOCULAR")->read_safe(0x00);
 
-			if (&screen == state->m_left_lcd)
+			if (&screen == m_left_lcd)
 			{
 				if (sscope_binocular_hack & 0x01)
 				{
-					copybitmap(bitmap, state->m_prevleft_bitmap, 0, 0, 0, 0, cliprect);
+					copybitmap(bitmap, m_prevleft_bitmap, 0, 0, 0, 0, cliprect);
 					return 0;
 				}
 			}
@@ -2254,7 +2253,7 @@ SCREEN_UPDATE_RGB32( sms1 )
 			{
 				if (sscope_binocular_hack & 0x02)
 				{
-					copybitmap(bitmap, state->m_prevright_bitmap, 0, 0, 0, 0, cliprect);
+					copybitmap(bitmap, m_prevright_bitmap, 0, 0, 0, 0, cliprect);
 					return 0;
 				}
 			}
@@ -2265,10 +2264,9 @@ SCREEN_UPDATE_RGB32( sms1 )
 	return 0;
 }
 
-SCREEN_UPDATE_RGB32( sms )
+UINT32 sms_state::screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	sms_state *state = screen.machine().driver_data<sms_state>();
-	state->m_vdp->screen_update(screen, bitmap, cliprect);
+	m_vdp->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -2280,14 +2278,13 @@ VIDEO_START_MEMBER(sms_state,gamegear)
 	save_item(NAME(m_prev_bitmap));
 }
 
-SCREEN_UPDATE_RGB32( gamegear )
+UINT32 sms_state::screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	sms_state *state = screen.machine().driver_data<sms_state>();
 	int width = screen.width();
 	int height = screen.height();
 	int x, y;
 
-	bitmap_rgb32 &vdp_bitmap = state->m_vdp->get_bitmap();
+	bitmap_rgb32 &vdp_bitmap = m_vdp->get_bitmap();
 
 	// HACK: fake LCD persistence effect
 	// (it would be better to generalize this in the core, to be used for all LCD systems)
@@ -2295,7 +2292,7 @@ SCREEN_UPDATE_RGB32( gamegear )
 	{
 		UINT32 *linedst = &bitmap.pix32(y);
 		UINT32 *line0 = &vdp_bitmap.pix32(y);
-		UINT32 *line1 = &state->m_prev_bitmap.pix32(y);
+		UINT32 *line1 = &m_prev_bitmap.pix32(y);
 		for (x = 0; x < width; x++)
 		{
 			UINT32 color0 = line0[x];
@@ -2312,7 +2309,7 @@ SCREEN_UPDATE_RGB32( gamegear )
 			linedst[x] = (r << 16) | (g << 8) | b;
 		}
 	}
-	copybitmap(state->m_prev_bitmap, vdp_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(m_prev_bitmap, vdp_bitmap, 0, 0, 0, 0, cliprect);
 
 	return 0;
 }

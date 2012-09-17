@@ -83,12 +83,11 @@ WRITE8_MEMBER(iqblock_state::iqblock_fgscroll_w)
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( iqblock )
+UINT32 iqblock_state::screen_update_iqblock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	iqblock_state *state = screen.machine().driver_data<iqblock_state>();
-	if (!state->m_videoenable) return 0;
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	if (!m_videoenable) return 0;
+	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 
 	return 0;
 }

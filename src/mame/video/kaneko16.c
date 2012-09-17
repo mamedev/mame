@@ -44,20 +44,19 @@ static void kaneko16_fill_bitmap(running_machine &machine, bitmap_ind16 &bitmap,
 
 }
 
-static SCREEN_UPDATE_IND16( common )
+UINT32 kaneko16_state::screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
-	kaneko16_state *state = screen.machine().driver_data<kaneko16_state>();
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	if (state->m_view2_0) state->m_view2_0->kaneko16_prepare(bitmap, cliprect);
-	if (state->m_view2_1) state->m_view2_1->kaneko16_prepare(bitmap, cliprect);
+	if (m_view2_0) m_view2_0->kaneko16_prepare(bitmap, cliprect);
+	if (m_view2_1) m_view2_1->kaneko16_prepare(bitmap, cliprect);
 
 	for ( i = 0; i < 8; i++ )
 	{
-		if (state->m_view2_0) state->m_view2_0->render_tilemap_chip(bitmap,cliprect,i);
-		if (state->m_view2_1) state->m_view2_1->render_tilemap_chip_alt(bitmap,cliprect,i, state->VIEW2_2_pri);
+		if (m_view2_0) m_view2_0->render_tilemap_chip(bitmap,cliprect,i);
+		if (m_view2_1) m_view2_1->render_tilemap_chip_alt(bitmap,cliprect,i, VIEW2_2_pri);
 	}
 
 	return 0;
@@ -67,16 +66,15 @@ static SCREEN_UPDATE_IND16( common )
 
 
 
-SCREEN_UPDATE_IND16( kaneko16 )
+UINT32 kaneko16_state::screen_update_kaneko16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	kaneko16_state *state = screen.machine().driver_data<kaneko16_state>();
 	kaneko16_fill_bitmap(screen.machine(),bitmap,cliprect);
 
 	// if the display is disabled, do nothing?
-	if (!state->m_disp_enable) return 0;
+	if (!m_disp_enable) return 0;
 
-	SCREEN_UPDATE16_CALL(common);
-	state->m_kaneko_spr->kaneko16_render_sprites(screen.machine(),bitmap,cliprect, state->m_spriteram, state->m_spriteram.bytes());
+	SCREEN_UPDATE16_CALL_MEMBER(common);
+	m_kaneko_spr->kaneko16_render_sprites(screen.machine(),bitmap,cliprect, m_spriteram, m_spriteram.bytes());
 	return 0;
 }
 
@@ -191,16 +189,15 @@ static void kaneko16_render_15bpp_bitmap(running_machine &machine, bitmap_ind16 
 //      flag = 0;
 	}
 }
-SCREEN_UPDATE_IND16(berlwall)
+UINT32 kaneko16_berlwall_state::screen_update_berlwall(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	kaneko16_state *state = screen.machine().driver_data<kaneko16_state>();
 	// berlwall uses a 15bpp bitmap as a bg, not a solid fill
 	kaneko16_render_15bpp_bitmap(screen.machine(),bitmap,cliprect);
 
 	// if the display is disabled, do nothing?
-	if (!state->m_disp_enable) return 0;
+	if (!m_disp_enable) return 0;
 
-	SCREEN_UPDATE16_CALL(common);
-	state->m_kaneko_spr->kaneko16_render_sprites(screen.machine(),bitmap,cliprect, state->m_spriteram, state->m_spriteram.bytes());
+	SCREEN_UPDATE16_CALL_MEMBER(common);
+	m_kaneko_spr->kaneko16_render_sprites(screen.machine(),bitmap,cliprect, m_spriteram, m_spriteram.bytes());
 	return 0;
 }

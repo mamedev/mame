@@ -16,18 +16,17 @@ VIDEO_START_MEMBER(orion_state,orion128)
 {
 }
 
-SCREEN_UPDATE_IND16( orion128 )
+UINT32 orion_state::screen_update_orion128(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	orion_state *state = screen.machine().driver_data<orion_state>();
 	UINT8 code1,code2,code3,code4,color,val;
 	int y, x,b;
-	int orionproshift = (state->m_orion128_video_mode & 0x10) ? 1 : 0;
-	int part1addr = (3-((state->m_orion128_video_page & 3) | orionproshift)) * 0x4000;
+	int orionproshift = (m_orion128_video_mode & 0x10) ? 1 : 0;
+	int part1addr = (3-((m_orion128_video_page & 3) | orionproshift)) * 0x4000;
 	int part2addr = part1addr + 0x10000;
-	int video_mode = state->m_orion128_video_mode & state->m_video_mode_mask;
+	int video_mode = m_orion128_video_mode & m_video_mode_mask;
 	UINT8 *ram = screen.machine().device<ram_device>(RAM_TAG)->pointer();
 
-	for (x = 0; x < state->m_orion128_video_width; x++)
+	for (x = 0; x < m_orion128_video_width; x++)
 	{
 		for (y = 0; y < 256; y++)
 		{
@@ -36,12 +35,12 @@ SCREEN_UPDATE_IND16( orion128 )
 			code3 = ram[part1addr + y + x*256 + 0x4000];
 			code4 = ram[part2addr + y + x*256 + 0x4000];
 			if ((video_mode==14) || (video_mode==15)) {
-				code2 = state->m_orionpro_pseudo_color;
+				code2 = m_orionpro_pseudo_color;
 			}
 			color = 0;
 			for (b = 7; b >= 0; b--)
 			{
-				switch(state->m_orion128_video_mode & state->m_video_mode_mask) {
+				switch(m_orion128_video_mode & m_video_mode_mask) {
 					case 0 : color = ((code1 >> b) & 0x01) ? 10 : 0; break;
 					case 1 : color = ((code1 >> b) & 0x01) ? 17 : 16; break;
 					case 4 : val = (((code1 >> b) & 0x01) << 1) + ((code2 >> b) & 0x01);
@@ -67,7 +66,7 @@ SCREEN_UPDATE_IND16( orion128 )
 							 color = ((code1 >> b) & 0x01) ? (code2 & 0x0f) : (code2 >> 4); break;
 
 					default:
-						switch(state->m_orion128_video_mode & state->m_video_mode_mask & 20) {
+						switch(m_orion128_video_mode & m_video_mode_mask & 20) {
 							case 16 :
 									 color = (((code1 >> b) & 0x01) << 2) + (((code3 >> b) & 0x01) << 1) + ((code2 >> b) & 0x01);
 									 break;

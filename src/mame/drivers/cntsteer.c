@@ -90,6 +90,8 @@ public:
 	DECLARE_MACHINE_RESET(zerotrgt);
 	DECLARE_VIDEO_START(zerotrgt);
 	DECLARE_PALETTE_INIT(zerotrgt);
+	UINT32 screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -278,19 +280,18 @@ static void cntsteer_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	}
 }
 
-static SCREEN_UPDATE_IND16( zerotrgt )
+UINT32 cntsteer_state::screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cntsteer_state *state = screen.machine().driver_data<cntsteer_state>();
 
-	if (state->m_disable_roz)
-		bitmap.fill(screen.machine().pens[8 * state->m_bg_color_bank], cliprect);
+	if (m_disable_roz)
+		bitmap.fill(screen.machine().pens[8 * m_bg_color_bank], cliprect);
 	else
 	{
 		int p1, p2, p3, p4;
 		int rot_val, x, y;
-		rot_val = state->m_rotation_sign ? (-state->m_rotation_x) : (state->m_rotation_x);
+		rot_val = m_rotation_sign ? (-m_rotation_x) : (m_rotation_x);
 
-//      popmessage("%d %02x %02x", rot_val, state->m_rotation_sign, state->m_rotation_x);
+//      popmessage("%d %02x %02x", rot_val, m_rotation_sign, m_rotation_x);
 
 		if (rot_val > 90) { rot_val = 90; }
 		if (rot_val < -90) { rot_val = -90; }
@@ -312,10 +313,10 @@ static SCREEN_UPDATE_IND16( zerotrgt )
 		p3 = 65536 * 1 * sin(2 * M_PI * (rot_val) / 1024);
 		p4 = -65536 * 1 * cos(2 * M_PI * (rot_val) / 1024);
 
-		x = -256 - (state->m_scrollx | state->m_scrollx_hi);
-		y = 256 + (state->m_scrolly | state->m_scrolly_hi);
+		x = -256 - (m_scrollx | m_scrollx_hi);
+		y = 256 + (m_scrolly | m_scrolly_hi);
 
-		state->m_bg_tilemap->draw_roz(bitmap, cliprect,
+		m_bg_tilemap->draw_roz(bitmap, cliprect,
 						(x << 16), (y << 16),
 						p1, p2,
 						p3, p4,
@@ -324,25 +325,24 @@ static SCREEN_UPDATE_IND16( zerotrgt )
 	}
 
 	zerotrgt_draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
-static SCREEN_UPDATE_IND16( cntsteer )
+UINT32 cntsteer_state::screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cntsteer_state *state = screen.machine().driver_data<cntsteer_state>();
 
-	if (state->m_disable_roz)
-		bitmap.fill(screen.machine().pens[8 * state->m_bg_color_bank], cliprect);
+	if (m_disable_roz)
+		bitmap.fill(screen.machine().pens[8 * m_bg_color_bank], cliprect);
 	else
 	{
 		int p1, p2, p3, p4;
 		int rot_val, x, y;
 
-		rot_val = (state->m_rotation_x) | ((state->m_rotation_sign & 3) << 8);
-		rot_val = (state->m_rotation_sign & 4) ? (rot_val) : (-rot_val);
-//      popmessage("%d %02x %02x", rot_val, state->m_rotation_sign, state->m_rotation_x);
+		rot_val = (m_rotation_x) | ((m_rotation_sign & 3) << 8);
+		rot_val = (m_rotation_sign & 4) ? (rot_val) : (-rot_val);
+//      popmessage("%d %02x %02x", rot_val, m_rotation_sign, m_rotation_x);
 
 		/*
         (u, v) = (a + cx + dy, b - dx + cy) when (x, y)=screen and (u, v) = tilemap
@@ -361,10 +361,10 @@ static SCREEN_UPDATE_IND16( cntsteer )
 		p3 = 65536 * 1 * sin(2 * M_PI * (rot_val) / 1024);
 		p4 = -65536 * 1 * cos(2 * M_PI * (rot_val) / 1024);
 
-		x = 256 + (state->m_scrollx | state->m_scrollx_hi);
-		y = 256 - (state->m_scrolly | state->m_scrolly_hi);
+		x = 256 + (m_scrollx | m_scrollx_hi);
+		y = 256 - (m_scrolly | m_scrolly_hi);
 
-		state->m_bg_tilemap->draw_roz(bitmap, cliprect,
+		m_bg_tilemap->draw_roz(bitmap, cliprect,
 						(x << 16), (y << 16),
 						p1, p2,
 						p3, p4,
@@ -373,7 +373,7 @@ static SCREEN_UPDATE_IND16( cntsteer )
 	}
 
 	cntsteer_draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -902,7 +902,7 @@ static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(cntsteer)
+	MCFG_SCREEN_UPDATE_DRIVER(cntsteer_state, screen_update_cntsteer)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -951,7 +951,7 @@ static MACHINE_CONFIG_START( zerotrgt, cntsteer_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(zerotrgt)
+	MCFG_SCREEN_UPDATE_DRIVER(cntsteer_state, screen_update_zerotrgt)
 
 	MCFG_GFXDECODE(zerotrgt)
 	MCFG_PALETTE_LENGTH(256)

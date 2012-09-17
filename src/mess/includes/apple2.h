@@ -241,6 +241,7 @@ public:
 	DECLARE_MACHINE_START(tk2000);
 	DECLARE_MACHINE_START(laser128);
 	DECLARE_MACHINE_START(space84);
+	UINT32 screen_update_apple2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -288,6 +289,6 @@ void apple2_video_start(running_machine &machine, const UINT8 *vram, size_t vram
 
 
 
-SCREEN_UPDATE_IND16( apple2 );
+
 
 #endif /* APPLE2_H_ */

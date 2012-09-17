@@ -717,7 +717,7 @@ static MACHINE_CONFIG_START( paradise, paradise_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */	/* we're using PORT_VBLANK */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-1-16)
-	MCFG_SCREEN_UPDATE_STATIC(paradise)
+	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_paradise)
 
 	MCFG_GFXDECODE(paradise)
 	MCFG_PALETTE_LENGTH(0x800 + 16)
@@ -749,7 +749,7 @@ static MACHINE_CONFIG_DERIVED( torus, paradise )
 
 	MCFG_GFXDECODE(torus)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(torus)
+	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_torus)
 
 	MCFG_DEVICE_REMOVE("oki2")
 MACHINE_CONFIG_END
@@ -764,7 +764,7 @@ static MACHINE_CONFIG_DERIVED( madball, paradise )
 	MCFG_GFXDECODE(madball)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(madball)
+	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_madball)
 
 	MCFG_DEVICE_REMOVE("oki2")
 MACHINE_CONFIG_END

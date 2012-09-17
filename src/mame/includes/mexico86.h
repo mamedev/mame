@@ -53,6 +53,8 @@ public:
 	DECLARE_READ8_MEMBER(kiki_ym2203_r);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_mexico86(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_kikikai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -65,5 +67,5 @@ INTERRUPT_GEN( mexico86_m68705_interrupt );
 /*----------- defined in video/mexico86.c -----------*/
 
 
-SCREEN_UPDATE_IND16( mexico86 );
-SCREEN_UPDATE_IND16( kikikai );
+
+

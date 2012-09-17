@@ -409,28 +409,27 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 #define LAYER_DB 0
 
-SCREEN_UPDATE_IND16( legionna )
+UINT32 legionna_state::screen_update_legionna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	legionna_state *state = screen.machine().driver_data<legionna_state>();
 	/* Setup the tilemaps */
-	state->m_background_layer->set_scrollx(0, state->m_scrollram16[0] );
-	state->m_background_layer->set_scrolly(0, state->m_scrollram16[1] );
-	state->m_midground_layer->set_scrollx(0, state->m_scrollram16[2] );
-	state->m_midground_layer->set_scrolly(0, state->m_scrollram16[3] );
-	state->m_foreground_layer->set_scrollx(0, state->m_scrollram16[4] );
-	state->m_foreground_layer->set_scrolly(0, state->m_scrollram16[5] );
-	state->m_text_layer->set_scrollx(0,  0/*state->m_scrollram16[6]*/ );
-	state->m_text_layer->set_scrolly(0,  0/*state->m_scrollram16[7]*/ );
+	m_background_layer->set_scrollx(0, m_scrollram16[0] );
+	m_background_layer->set_scrolly(0, m_scrollram16[1] );
+	m_midground_layer->set_scrollx(0, m_scrollram16[2] );
+	m_midground_layer->set_scrolly(0, m_scrollram16[3] );
+	m_foreground_layer->set_scrollx(0, m_scrollram16[4] );
+	m_foreground_layer->set_scrolly(0, m_scrollram16[5] );
+	m_text_layer->set_scrollx(0,  0/*m_scrollram16[6]*/ );
+	m_text_layer->set_scrolly(0,  0/*m_scrollram16[7]*/ );
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);	/* wrong color? */
 
-	/* state->m_layer_disable is a guess based on 'stage 1' screen in heatbrl  */
+	/* m_layer_disable is a guess based on 'stage 1' screen in heatbrl  */
 
-	if (!(state->m_layer_disable&0x0020)) state->m_foreground_layer->draw(bitmap, cliprect, 0, 0);
-	if (!(state->m_layer_disable&0x0010)) state->m_midground_layer->draw(bitmap, cliprect, 0, 0);
-	if (!(state->m_layer_disable&0x0002)) state->m_background_layer->draw(bitmap, cliprect, 0, 1);
-	if (!(state->m_layer_disable&0x0001)) state->m_text_layer->draw(bitmap, cliprect, 0, 2);
+	if (!(m_layer_disable&0x0020)) m_foreground_layer->draw(bitmap, cliprect, 0, 0);
+	if (!(m_layer_disable&0x0010)) m_midground_layer->draw(bitmap, cliprect, 0, 0);
+	if (!(m_layer_disable&0x0002)) m_background_layer->draw(bitmap, cliprect, 0, 1);
+	if (!(m_layer_disable&0x0001)) m_text_layer->draw(bitmap, cliprect, 0, 2);
 
 	draw_sprites(screen.machine(),bitmap,cliprect);
 
@@ -439,62 +438,60 @@ SCREEN_UPDATE_IND16( legionna )
 }
 
 
-SCREEN_UPDATE_IND16( godzilla )
+UINT32 legionna_state::screen_update_godzilla(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	legionna_state *state = screen.machine().driver_data<legionna_state>();
-//  state->m_text_layer->set_scrollx(0, 0 );
-//  state->m_text_layer->set_scrolly(0, 112 );
+//  m_text_layer->set_scrollx(0, 0 );
+//  m_text_layer->set_scrolly(0, 112 );
 	/* Setup the tilemaps */
-	state->m_background_layer->set_scrollx(0, state->m_scrollram16[0] );
-	state->m_background_layer->set_scrolly(0, state->m_scrollram16[1] );
-	state->m_midground_layer->set_scrollx(0, state->m_scrollram16[2] );
-	state->m_midground_layer->set_scrolly(0, state->m_scrollram16[3] );
-	state->m_foreground_layer->set_scrollx(0, state->m_scrollram16[4] );
-	state->m_foreground_layer->set_scrolly(0, state->m_scrollram16[5] );
-	state->m_text_layer->set_scrollx(0,  0/*state->m_scrollram16[6]*/ );
-	state->m_text_layer->set_scrolly(0,  0/*state->m_scrollram16[7]*/ );
+	m_background_layer->set_scrollx(0, m_scrollram16[0] );
+	m_background_layer->set_scrolly(0, m_scrollram16[1] );
+	m_midground_layer->set_scrollx(0, m_scrollram16[2] );
+	m_midground_layer->set_scrolly(0, m_scrollram16[3] );
+	m_foreground_layer->set_scrollx(0, m_scrollram16[4] );
+	m_foreground_layer->set_scrolly(0, m_scrollram16[5] );
+	m_text_layer->set_scrollx(0,  0/*m_scrollram16[6]*/ );
+	m_text_layer->set_scrolly(0,  0/*m_scrollram16[7]*/ );
 
 
 	bitmap.fill(0x0200, cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	if (!(state->m_layer_disable&0x0001)) state->m_background_layer->draw(bitmap, cliprect, 0,0);
-	if (!(state->m_layer_disable&0x0002)) state->m_midground_layer->draw(bitmap, cliprect, 0,0);
-	if (!(state->m_layer_disable&0x0004)) state->m_foreground_layer->draw(bitmap, cliprect, 0,1);
-	if (!(state->m_layer_disable&0x0008)) state->m_text_layer->draw(bitmap, cliprect, 0,2);
+	if (!(m_layer_disable&0x0001)) m_background_layer->draw(bitmap, cliprect, 0,0);
+	if (!(m_layer_disable&0x0002)) m_midground_layer->draw(bitmap, cliprect, 0,0);
+	if (!(m_layer_disable&0x0004)) m_foreground_layer->draw(bitmap, cliprect, 0,1);
+	if (!(m_layer_disable&0x0008)) m_text_layer->draw(bitmap, cliprect, 0,2);
 
 	draw_sprites(screen.machine(),bitmap,cliprect);
 
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( grainbow )
+UINT32 legionna_state::screen_update_grainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	legionna_state *state = screen.machine().driver_data<legionna_state>();
 	/* Setup the tilemaps */
-	state->m_background_layer->set_scrollx(0, state->m_scrollram16[0] );
-	state->m_background_layer->set_scrolly(0, state->m_scrollram16[1] );
-	state->m_midground_layer->set_scrollx(0, state->m_scrollram16[2] );
-	state->m_midground_layer->set_scrolly(0, state->m_scrollram16[3] );
-	state->m_foreground_layer->set_scrollx(0, state->m_scrollram16[4] );
-	state->m_foreground_layer->set_scrolly(0, state->m_scrollram16[5] );
-	state->m_text_layer->set_scrollx(0,  0/*state->m_scrollram16[6]*/ );
-	state->m_text_layer->set_scrolly(0,  0/*state->m_scrollram16[7]*/ );
+	m_background_layer->set_scrollx(0, m_scrollram16[0] );
+	m_background_layer->set_scrolly(0, m_scrollram16[1] );
+	m_midground_layer->set_scrollx(0, m_scrollram16[2] );
+	m_midground_layer->set_scrolly(0, m_scrollram16[3] );
+	m_foreground_layer->set_scrollx(0, m_scrollram16[4] );
+	m_foreground_layer->set_scrolly(0, m_scrollram16[5] );
+	m_text_layer->set_scrollx(0,  0/*m_scrollram16[6]*/ );
+	m_text_layer->set_scrolly(0,  0/*m_scrollram16[7]*/ );
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	if(!(state->m_layer_disable & 1))
-		state->m_background_layer->draw(bitmap, cliprect, 0,1);
+	if(!(m_layer_disable & 1))
+		m_background_layer->draw(bitmap, cliprect, 0,1);
 
-	if(!(state->m_layer_disable & 2))
-		state->m_midground_layer->draw(bitmap, cliprect, 0,2);
+	if(!(m_layer_disable & 2))
+		m_midground_layer->draw(bitmap, cliprect, 0,2);
 
-	if(!(state->m_layer_disable & 4))
-		state->m_foreground_layer->draw(bitmap, cliprect, 0,4);
+	if(!(m_layer_disable & 4))
+		m_foreground_layer->draw(bitmap, cliprect, 0,4);
 
-	if(!(state->m_layer_disable & 8))
-		state->m_text_layer->draw(bitmap, cliprect, 0,8);
+	if(!(m_layer_disable & 8))
+		m_text_layer->draw(bitmap, cliprect, 0,8);
 
 	draw_sprites(screen.machine(),bitmap,cliprect);
 

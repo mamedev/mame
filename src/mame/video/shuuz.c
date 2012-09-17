@@ -87,15 +87,14 @@ VIDEO_START_MEMBER(shuuz_state,shuuz)
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( shuuz )
+UINT32 shuuz_state::screen_update_shuuz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	shuuz_state *state = screen.machine().driver_data<shuuz_state>();
 	atarimo_rect_list rectlist;
 	bitmap_ind16 *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);

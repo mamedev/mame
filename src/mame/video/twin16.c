@@ -514,43 +514,41 @@ VIDEO_START_MEMBER(twin16_state,twin16)
 	state_save_register_global(machine(), m_sprite_busy);
 }
 
-SCREEN_UPDATE_IND16( twin16 )
+UINT32 twin16_state::screen_update_twin16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	twin16_state *state = screen.machine().driver_data<twin16_state>();
 	int text_flip=0;
-	if (state->m_video_register&TWIN16_SCREEN_FLIPX) text_flip|=TILEMAP_FLIPX;
-	if (state->m_video_register&TWIN16_SCREEN_FLIPY) text_flip|=TILEMAP_FLIPY;
+	if (m_video_register&TWIN16_SCREEN_FLIPX) text_flip|=TILEMAP_FLIPX;
+	if (m_video_register&TWIN16_SCREEN_FLIPY) text_flip|=TILEMAP_FLIPY;
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	draw_layer( screen.machine(), bitmap, 1 );
 	draw_layer( screen.machine(), bitmap, 0 );
 	draw_sprites( screen.machine(), bitmap );
 
-	if (text_flip) state->m_text_tilemap->set_flip(text_flip);
-	state->m_text_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (text_flip) m_text_tilemap->set_flip(text_flip);
+	m_text_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-SCREEN_VBLANK( twin16 )
+void twin16_state::screen_eof_twin16(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		twin16_state *state = screen.machine().driver_data<twin16_state>();
 		twin16_set_sprite_timer(screen.machine());
 
 		if (twin16_spriteram_process_enable(screen.machine())) {
-			if (state->m_need_process_spriteram) twin16_spriteram_process(screen.machine());
-			state->m_need_process_spriteram = 1;
+			if (m_need_process_spriteram) twin16_spriteram_process(screen.machine());
+			m_need_process_spriteram = 1;
 
 			/* if the sprite preprocessor is used, sprite ram is copied to an external buffer first,
             as evidenced by 1-frame sprite lag in gradius2 and devilw otherwise, though there's probably
             more to it than that */
-			memcpy(&state->m_spriteram->buffer()[0x1800],state->m_sprite_buffer,0x800*sizeof(UINT16));
-			memcpy(state->m_sprite_buffer,&state->m_spriteram->live()[0x1800],0x800*sizeof(UINT16));
+			memcpy(&m_spriteram->buffer()[0x1800],m_sprite_buffer,0x800*sizeof(UINT16));
+			memcpy(m_sprite_buffer,&m_spriteram->live()[0x1800],0x800*sizeof(UINT16));
 		}
 		else {
-			state->m_spriteram->copy();
+			m_spriteram->copy();
 		}
 	}
 }

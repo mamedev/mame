@@ -191,7 +191,7 @@ static MACHINE_CONFIG_START( mrdo, mrdo_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/4, 312, 8, 248, 262, 32, 224)
-	MCFG_SCREEN_UPDATE_STATIC(mrdo)
+	MCFG_SCREEN_UPDATE_DRIVER(mrdo_state, screen_update_mrdo)
 
 	MCFG_GFXDECODE(mrdo)
 	MCFG_PALETTE_LENGTH(64*4+16*4)

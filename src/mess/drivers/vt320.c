@@ -19,6 +19,7 @@ public:
 
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_vt320(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*
@@ -68,7 +69,7 @@ void vt320_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( vt320 )
+UINT32 vt320_state::screen_update_vt320(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -87,7 +88,7 @@ static MACHINE_CONFIG_START( vt320, vt320_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_STATIC(vt320)
+	MCFG_SCREEN_UPDATE_DRIVER(vt320_state, screen_update_vt320)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 

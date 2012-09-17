@@ -31,10 +31,9 @@ void truco_state::palette_init()
 	}
 }
 
-SCREEN_UPDATE_IND16( truco )
+UINT32 truco_state::screen_update_truco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	truco_state *state = screen.machine().driver_data<truco_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	UINT8		*vid = videoram;
 	int x, y;
 

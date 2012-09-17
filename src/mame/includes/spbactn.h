@@ -15,10 +15,11 @@ public:
 	bitmap_ind16 m_tile_bitmap_fg;
 	DECLARE_WRITE16_MEMBER(soundcommand_w);
 	virtual void video_start();
+	UINT32 screen_update_spbactn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/spbactn.c -----------*/
 
 
-SCREEN_UPDATE_RGB32( spbactn );
+

@@ -2404,19 +2404,18 @@ static void print_mixer_data(segas32_state *state, int which)
 	}
 }
 
-SCREEN_UPDATE_RGB32( system32 )
+UINT32 segas32_state::screen_update_system32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	segas32_state *state = screen.machine().driver_data<segas32_state>();
 	UINT8 enablemask;
 
 	/* update the visible area */
-	if (state->m_system32_videoram[0x1ff00/2] & 0x8000)
+	if (m_system32_videoram[0x1ff00/2] & 0x8000)
 		screen.set_visible_area(0, 52*8-1, 0, 28*8-1);
 	else
 		screen.set_visible_area(0, 40*8-1, 0, 28*8-1);
 
 	/* if the display is off, punt */
-	if (!state->m_system32_displayenable[0])
+	if (!m_system32_displayenable[0])
 	{
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
@@ -2439,7 +2438,7 @@ SCREEN_UPDATE_RGB32( system32 )
 
 	/* do the mixing */
 	g_profiler.start(PROFILER_USER3);
-	mix_all_layers(state, 0, 0, bitmap, cliprect, enablemask);
+	mix_all_layers(this, 0, 0, bitmap, cliprect, enablemask);
 	g_profiler.stop();
 
 	if (LOG_SPRITES && screen.machine().input().code_pressed(KEYCODE_L))
@@ -2450,7 +2449,7 @@ SCREEN_UPDATE_RGB32( system32 )
 
 		for (y = visarea.min_y; y <= visarea.max_y; y++)
 		{
-			UINT16 *src = get_layer_scanline(state, MIXER_LAYER_SPRITES, y);
+			UINT16 *src = get_layer_scanline(this, MIXER_LAYER_SPRITES, y);
 			for (x = visarea.min_x; x <= visarea.max_x; x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
@@ -2460,7 +2459,7 @@ SCREEN_UPDATE_RGB32( system32 )
 		f = fopen("nbg0.txt", "w");
 		for (y = visarea.min_y; y <= visarea.max_y; y++)
 		{
-			UINT16 *src = get_layer_scanline(state, MIXER_LAYER_NBG0, y);
+			UINT16 *src = get_layer_scanline(this, MIXER_LAYER_NBG0, y);
 			for (x = visarea.min_x; x <= visarea.max_x; x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
@@ -2470,7 +2469,7 @@ SCREEN_UPDATE_RGB32( system32 )
 		f = fopen("nbg1.txt", "w");
 		for (y = visarea.min_y; y <= visarea.max_y; y++)
 		{
-			UINT16 *src = get_layer_scanline(state, MIXER_LAYER_NBG1, y);
+			UINT16 *src = get_layer_scanline(this, MIXER_LAYER_NBG1, y);
 			for (x = visarea.min_x; x <= visarea.max_x; x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
@@ -2480,7 +2479,7 @@ SCREEN_UPDATE_RGB32( system32 )
 		f = fopen("nbg2.txt", "w");
 		for (y = visarea.min_y; y <= visarea.max_y; y++)
 		{
-			UINT16 *src = get_layer_scanline(state, MIXER_LAYER_NBG2, y);
+			UINT16 *src = get_layer_scanline(this, MIXER_LAYER_NBG2, y);
 			for (x = visarea.min_x; x <= visarea.max_x; x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
@@ -2490,7 +2489,7 @@ SCREEN_UPDATE_RGB32( system32 )
 		f = fopen("nbg3.txt", "w");
 		for (y = visarea.min_y; y <= visarea.max_y; y++)
 		{
-			UINT16 *src = get_layer_scanline(state, MIXER_LAYER_NBG3, y);
+			UINT16 *src = get_layer_scanline(this, MIXER_LAYER_NBG3, y);
 			for (x = visarea.min_x; x <= visarea.max_x; x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
@@ -2503,10 +2502,10 @@ SCREEN_UPDATE_RGB32( system32 )
 	static const char *const layername[] = { "TEXT ", "NBG0 ", "NBG1 ", "NBG2 ", "NBG3 ", "BITMAP " };
 	char temp[100];
 	int count = 0, i;
-	sprintf(temp, "ALPHA(%d):", (state->m_mixer_control[which][0x4e/2] >> 8) & 7);
+	sprintf(temp, "ALPHA(%d):", (m_mixer_control[which][0x4e/2] >> 8) & 7);
 	for (i = 0; i < 6; i++)
 		if (enablemask & (1 << i))
-			if ((state->m_mixer_control[which][0x30/2 + i] & 0x1010) == 0x1010)
+			if ((m_mixer_control[which][0x30/2 + i] & 0x1010) == 0x1010)
 			{
 				count++;
 				strcat(temp, layername[i]);
@@ -2578,7 +2577,7 @@ for (showclip = 0; showclip < 4; showclip++)
 }
 #endif
 
-	if (PRINTF_MIXER_DATA) print_mixer_data(state, 0);
+	if (PRINTF_MIXER_DATA) print_mixer_data(this, 0);
 	return 0;
 }
 
@@ -2645,8 +2644,8 @@ if (PRINTF_MIXER_DATA)
 	return 0;
 }
 
-SCREEN_UPDATE_RGB32( multi32_left ) { return multi32_update(screen, bitmap, cliprect, 0); }
-SCREEN_UPDATE_RGB32( multi32_right ) { return multi32_update(screen, bitmap, cliprect, 1); }
+UINT32 segas32_state::screen_update_multi32_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect){ return multi32_update(screen, bitmap, cliprect, 0); }
+UINT32 segas32_state::screen_update_multi32_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect){ return multi32_update(screen, bitmap, cliprect, 1); }
 
 /*
 

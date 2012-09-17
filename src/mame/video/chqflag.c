@@ -68,16 +68,15 @@ void chqflag_state::video_start()
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( chqflag )
+UINT32 chqflag_state::screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	chqflag_state *state = screen.machine().driver_data<chqflag_state>();
 
 	bitmap.fill(0, cliprect);
 
-	k051316_zoom_draw(state->m_k051316_2, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	k051960_sprites_draw(state->m_k051960, bitmap, cliprect, 0, 0);
-	k051316_zoom_draw(state->m_k051316_2, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
-	k051960_sprites_draw(state->m_k051960, bitmap, cliprect, 1, 1);
-	k051316_zoom_draw(state->m_k051316_1, bitmap, cliprect, 0, 0);
+	k051316_zoom_draw(m_k051316_2, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	k051960_sprites_draw(m_k051960, bitmap, cliprect, 0, 0);
+	k051316_zoom_draw(m_k051316_2, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	k051960_sprites_draw(m_k051960, bitmap, cliprect, 1, 1);
+	k051316_zoom_draw(m_k051316_1, bitmap, cliprect, 0, 0);
 	return 0;
 }

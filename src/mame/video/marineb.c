@@ -169,13 +169,12 @@ static void set_tilemap_scrolly( running_machine &machine, int cols )
 }
 
 
-SCREEN_UPDATE_IND16( marineb )
+UINT32 marineb_state::screen_update_marineb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	marineb_state *state = screen.machine().driver_data<marineb_state>();
 	int offs;
 
 	set_tilemap_scrolly(screen.machine(), 24);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	for (offs = 0x0f; offs >= 0; offs--)
@@ -190,10 +189,10 @@ SCREEN_UPDATE_IND16( marineb )
 		else
 			offs2 = 0x03d8 - 8 + offs;
 
-		code = state->m_videoram[offs2];
-		sx = state->m_videoram[offs2 + 0x20];
-		sy = state->m_colorram[offs2];
-		col = (state->m_colorram[offs2 + 0x20] & 0x0f) + 16 * state->m_palette_bank;
+		code = m_videoram[offs2];
+		sx = m_videoram[offs2 + 0x20];
+		sy = m_colorram[offs2];
+		col = (m_colorram[offs2 + 0x20] & 0x0f) + 16 * m_palette_bank;
 		flipx = code & 0x02;
 		flipy = !(code & 0x01);
 
@@ -210,13 +209,13 @@ SCREEN_UPDATE_IND16( marineb )
 			code >>= 2;
 		}
 
-		if (!state->m_flipscreen_y)
+		if (!m_flipscreen_y)
 		{
 			sy = 256 - screen.machine().gfx[gfx]->width() - sy;
 			flipy = !flipy;
 		}
 
-		if (state->m_flipscreen_x)
+		if (m_flipscreen_x)
 		{
 			sx++;
 		}
@@ -231,13 +230,12 @@ SCREEN_UPDATE_IND16( marineb )
 }
 
 
-SCREEN_UPDATE_IND16( changes )
+UINT32 marineb_state::screen_update_changes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	marineb_state *state = screen.machine().driver_data<marineb_state>();
 	int offs, sx, sy, code, col, flipx, flipy;
 
 	set_tilemap_scrolly(screen.machine(), 26);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the small sprites */
 	for (offs = 0x05; offs >= 0; offs--)
@@ -246,20 +244,20 @@ SCREEN_UPDATE_IND16( changes )
 
 		offs2 = 0x001a + offs;
 
-		code = state->m_videoram[offs2];
-		sx = state->m_videoram[offs2 + 0x20];
-		sy = state->m_colorram[offs2];
-		col = (state->m_colorram[offs2 + 0x20] & 0x0f) + 16 * state->m_palette_bank;
+		code = m_videoram[offs2];
+		sx = m_videoram[offs2 + 0x20];
+		sy = m_colorram[offs2];
+		col = (m_colorram[offs2 + 0x20] & 0x0f) + 16 * m_palette_bank;
 		flipx = code & 0x02;
 		flipy = !(code & 0x01);
 
-		if (!state->m_flipscreen_y)
+		if (!m_flipscreen_y)
 		{
 			sy = 256 - screen.machine().gfx[1]->width() - sy;
 			flipy = !flipy;
 		}
 
-		if (state->m_flipscreen_x)
+		if (m_flipscreen_x)
 		{
 			sx++;
 		}
@@ -273,20 +271,20 @@ SCREEN_UPDATE_IND16( changes )
 
 	/* draw the big sprite */
 
-	code = state->m_videoram[0x3df];
-	sx = state->m_videoram[0x3ff];
-	sy = state->m_colorram[0x3df];
-	col = state->m_colorram[0x3ff];
+	code = m_videoram[0x3df];
+	sx = m_videoram[0x3ff];
+	sy = m_colorram[0x3df];
+	col = m_colorram[0x3ff];
 	flipx = code & 0x02;
 	flipy = !(code & 0x01);
 
-	if (!state->m_flipscreen_y)
+	if (!m_flipscreen_y)
 	{
 		sy = 256 - screen.machine().gfx[2]->width() - sy;
 		flipy = !flipy;
 	}
 
-	if (state->m_flipscreen_x)
+	if (m_flipscreen_x)
 	{
 		sx++;
 	}
@@ -310,13 +308,12 @@ SCREEN_UPDATE_IND16( changes )
 }
 
 
-SCREEN_UPDATE_IND16( springer )
+UINT32 marineb_state::screen_update_springer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	marineb_state *state = screen.machine().driver_data<marineb_state>();
 	int offs;
 
 	set_tilemap_scrolly(screen.machine(), 0);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	for (offs = 0x0f; offs >= 0; offs--)
@@ -328,10 +325,10 @@ SCREEN_UPDATE_IND16( springer )
 
 		offs2 = 0x0010 + offs;
 
-		code = state->m_videoram[offs2];
-		sx = 240 - state->m_videoram[offs2 + 0x20];
-		sy = state->m_colorram[offs2];
-		col = (state->m_colorram[offs2 + 0x20] & 0x0f) + 16 * state->m_palette_bank;
+		code = m_videoram[offs2];
+		sx = 240 - m_videoram[offs2 + 0x20];
+		sy = m_colorram[offs2];
+		col = (m_colorram[offs2 + 0x20] & 0x0f) + 16 * m_palette_bank;
 		flipx = !(code & 0x02);
 		flipy = !(code & 0x01);
 
@@ -349,13 +346,13 @@ SCREEN_UPDATE_IND16( springer )
 			code >>= 2;
 		}
 
-		if (!state->m_flipscreen_y)
+		if (!m_flipscreen_y)
 		{
 			sy = 256 - screen.machine().gfx[gfx]->width() - sy;
 			flipy = !flipy;
 		}
 
-		if (!state->m_flipscreen_x)
+		if (!m_flipscreen_x)
 		{
 			sx--;
 		}
@@ -370,13 +367,12 @@ SCREEN_UPDATE_IND16( springer )
 }
 
 
-SCREEN_UPDATE_IND16( hoccer )
+UINT32 marineb_state::screen_update_hoccer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	marineb_state *state = screen.machine().driver_data<marineb_state>();
 	int offs;
 
 	set_tilemap_scrolly(screen.machine(), 0);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	for (offs = 0x07; offs >= 0; offs--)
@@ -385,20 +381,20 @@ SCREEN_UPDATE_IND16( hoccer )
 
 		offs2 = 0x0018 + offs;
 
-		code = state->m_spriteram[offs2];
-		sx = state->m_spriteram[offs2 + 0x20];
-		sy = state->m_colorram[offs2];
-		col = state->m_colorram[offs2 + 0x20];
+		code = m_spriteram[offs2];
+		sx = m_spriteram[offs2 + 0x20];
+		sy = m_colorram[offs2];
+		col = m_colorram[offs2 + 0x20];
 		flipx = code & 0x02;
 		flipy = !(code & 0x01);
 
-		if (!state->m_flipscreen_y)
+		if (!m_flipscreen_y)
 		{
 			sy = 256 - screen.machine().gfx[1]->width() - sy;
 			flipy = !flipy;
 		}
 
-		if (state->m_flipscreen_x)
+		if (m_flipscreen_x)
 		{
 			sx = 256 - screen.machine().gfx[1]->width() - sx;
 			flipx = !flipx;
@@ -414,13 +410,12 @@ SCREEN_UPDATE_IND16( hoccer )
 }
 
 
-SCREEN_UPDATE_IND16( hopprobo )
+UINT32 marineb_state::screen_update_hopprobo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	marineb_state *state = screen.machine().driver_data<marineb_state>();
 	int offs;
 
 	set_tilemap_scrolly(screen.machine(), 0);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	for (offs = 0x0f; offs >= 0; offs--)
@@ -432,10 +427,10 @@ SCREEN_UPDATE_IND16( hopprobo )
 
 		offs2 = 0x0010 + offs;
 
-		code = state->m_videoram[offs2];
-		sx = state->m_videoram[offs2 + 0x20];
-		sy = state->m_colorram[offs2];
-		col = (state->m_colorram[offs2 + 0x20] & 0x0f) + 16 * state->m_palette_bank;
+		code = m_videoram[offs2];
+		sx = m_videoram[offs2 + 0x20];
+		sy = m_colorram[offs2];
+		col = (m_colorram[offs2 + 0x20] & 0x0f) + 16 * m_palette_bank;
 		flipx = code & 0x02;
 		flipy = !(code & 0x01);
 
@@ -452,13 +447,13 @@ SCREEN_UPDATE_IND16( hopprobo )
 			code >>= 2;
 		}
 
-		if (!state->m_flipscreen_y)
+		if (!m_flipscreen_y)
 		{
 			sy = 256 - screen.machine().gfx[gfx]->width() - sy;
 			flipy = !flipy;
 		}
 
-		if (!state->m_flipscreen_x)
+		if (!m_flipscreen_x)
 		{
 			sx--;
 		}

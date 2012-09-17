@@ -639,45 +639,44 @@ static void wgp_piv_layer_draw( running_machine &machine, bitmap_ind16 &bitmap, 
                         SCREEN REFRESH
 **************************************************************/
 
-SCREEN_UPDATE_IND16( wgp )
+UINT32 wgp_state::screen_update_wgp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	wgp_state *state = screen.machine().driver_data<wgp_state>();
 	int i;
 	UINT8 layer[3];
 
 #ifdef MAME_DEBUG
 	if (screen.machine().input().code_pressed_once (KEYCODE_V))
 	{
-		state->m_dislayer[0] ^= 1;
-		popmessage("piv0: %01x",state->m_dislayer[0]);
+		m_dislayer[0] ^= 1;
+		popmessage("piv0: %01x",m_dislayer[0]);
 	}
 
 	if (screen.machine().input().code_pressed_once (KEYCODE_B))
 	{
-		state->m_dislayer[1] ^= 1;
-		popmessage("piv1: %01x",state->m_dislayer[1]);
+		m_dislayer[1] ^= 1;
+		popmessage("piv1: %01x",m_dislayer[1]);
 	}
 
 	if (screen.machine().input().code_pressed_once (KEYCODE_N))
 	{
-		state->m_dislayer[2] ^= 1;
-		popmessage("piv2: %01x",state->m_dislayer[2]);
+		m_dislayer[2] ^= 1;
+		popmessage("piv2: %01x",m_dislayer[2]);
 	}
 
 	if (screen.machine().input().code_pressed_once (KEYCODE_M))
 	{
-		state->m_dislayer[3] ^= 1;
-		popmessage("TC0100SCN top bg layer: %01x",state->m_dislayer[3]);
+		m_dislayer[3] ^= 1;
+		popmessage("TC0100SCN top bg layer: %01x",m_dislayer[3]);
 	}
 #endif
 
 	for (i = 0; i < 3; i++)
 	{
-		state->m_piv_tilemap[i]->set_scrollx(0, state->m_piv_scrollx[i]);
-		state->m_piv_tilemap[i]->set_scrolly(0, state->m_piv_scrolly[i]);
+		m_piv_tilemap[i]->set_scrollx(0, m_piv_scrollx[i]);
+		m_piv_tilemap[i]->set_scrolly(0, m_piv_scrolly[i]);
 	}
 
-	tc0100scn_tilemap_update(state->m_tc0100scn);
+	tc0100scn_tilemap_update(m_tc0100scn);
 
 	bitmap.fill(0, cliprect);
 
@@ -685,7 +684,7 @@ SCREEN_UPDATE_IND16( wgp )
 	layer[1] = 1;
 	layer[2] = 2;
 
-	if (state->m_piv_ctrl_reg == 0x2d)
+	if (m_piv_ctrl_reg == 0x2d)
 	{
 		layer[1] = 2;
 		layer[2] = 1;
@@ -694,40 +693,40 @@ SCREEN_UPDATE_IND16( wgp )
 /* We should draw the following on a 1024x1024 bitmap... */
 
 #ifdef MAME_DEBUG
-	if (state->m_dislayer[layer[0]] == 0)
+	if (m_dislayer[layer[0]] == 0)
 #endif
 	wgp_piv_layer_draw(screen.machine(), bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 
 #ifdef MAME_DEBUG
-	if (state->m_dislayer[layer[1]] == 0)
+	if (m_dislayer[layer[1]] == 0)
 #endif
 	wgp_piv_layer_draw(screen.machine(), bitmap, cliprect, layer[1], 0, 2);
 
 #ifdef MAME_DEBUG
-	if (state->m_dislayer[layer[2]] == 0)
+	if (m_dislayer[layer[2]] == 0)
 #endif
 	wgp_piv_layer_draw(screen.machine(), bitmap, cliprect, layer[2], 0, 4);
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 16);
 
 /* ... then here we should apply rotation from wgp_sate_ctrl[] to the bitmap before we draw the TC0100SCN layers on it */
-	layer[0] = tc0100scn_bottomlayer(state->m_tc0100scn);
+	layer[0] = tc0100scn_bottomlayer(m_tc0100scn);
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[0], 0, 0);
+	tc0100scn_tilemap_draw(m_tc0100scn, bitmap, cliprect, layer[0], 0, 0);
 
 #ifdef MAME_DEBUG
-	if (state->m_dislayer[3] == 0)
+	if (m_dislayer[3] == 0)
 #endif
-	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[1], 0, 0);
-	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[2], 0, 0);
+	tc0100scn_tilemap_draw(m_tc0100scn, bitmap, cliprect, layer[1], 0, 0);
+	tc0100scn_tilemap_draw(m_tc0100scn, bitmap, cliprect, layer[2], 0, 0);
 
 #if 0
 	{
 		char buf[80];
-		sprintf(buf,"wgp_piv_ctrl_reg: %04x y zoom: %04x %04x %04x",state->m_piv_ctrl_reg,
-						state->m_piv_zoom[0],state->m_piv_zoom[1],state->m_piv_zoom[2]);
+		sprintf(buf,"wgp_piv_ctrl_reg: %04x y zoom: %04x %04x %04x",m_piv_ctrl_reg,
+						m_piv_zoom[0],m_piv_zoom[1],m_piv_zoom[2]);
 		popmessage(buf);
 	}
 #endif

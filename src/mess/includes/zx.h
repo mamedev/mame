@@ -57,6 +57,7 @@ public:
 	DECLARE_PALETTE_INIT(ts1000);
 	DECLARE_MACHINE_RESET(pc8300);
 	DECLARE_MACHINE_RESET(pow3000);
+	void screen_eof_zx(screen_device &screen, bool state);
 };
 
 
@@ -69,7 +70,7 @@ public:
 /*----------- defined in video/zx.c -----------*/
 
 
-SCREEN_VBLANK( zx );
+
 
 void zx_ula_bkgnd(running_machine &machine, int color);
 void zx_ula_r(running_machine &machine, int offs, const char *region, const UINT8 param);

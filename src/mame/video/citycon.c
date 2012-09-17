@@ -135,15 +135,14 @@ INLINE void changecolor_RRRRGGGGBBBBxxxx( running_machine &machine, int color, i
 	palette_set_color_rgb(machine, color, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
 }
 
-SCREEN_UPDATE_IND16( citycon )
+UINT32 citycon_state::screen_update_citycon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	citycon_state *state = screen.machine().driver_data<citycon_state>();
 	int offs, scroll;
 
 	/* Update the virtual palette to support text color code changing on every scanline. */
 	for (offs = 0; offs < 256; offs++)
 	{
-		int indx = state->m_linecolor[offs];
+		int indx = m_linecolor[offs];
 		int i;
 
 		for (i = 0; i < 4; i++)
@@ -151,13 +150,13 @@ SCREEN_UPDATE_IND16( citycon )
 	}
 
 
-	scroll = state->m_scroll[0] * 256 + state->m_scroll[1];
-	state->m_bg_tilemap->set_scrollx(0, scroll >> 1);
+	scroll = m_scroll[0] * 256 + m_scroll[1];
+	m_bg_tilemap->set_scrollx(0, scroll >> 1);
 	for (offs = 6; offs < 32; offs++)
-		state->m_fg_tilemap->set_scrollx(offs, scroll);
+		m_fg_tilemap->set_scrollx(offs, scroll);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

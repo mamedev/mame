@@ -2779,9 +2779,8 @@ VIDEO_START_MEMBER(namcos22_state,namcos22s)
 	VIDEO_START_CALL_MEMBER(common);
 }
 
-SCREEN_UPDATE_RGB32( namcos22s )
+UINT32 namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	namcos22_state *state = screen.machine().driver_data<namcos22_state>();
 	UpdateVideoMixer(screen.machine());
 	UpdatePalette(screen.machine());
 	namcos22s_recalc_czram(screen.machine());
@@ -2789,7 +2788,7 @@ SCREEN_UPDATE_RGB32( namcos22s )
 
 	// background color
 	rgbint bg_color;
-	rgb_comp_to_rgbint(&bg_color, nthbyte(state->m_gamma,0x08), nthbyte(state->m_gamma,0x09), nthbyte(state->m_gamma,0x0a));
+	rgb_comp_to_rgbint(&bg_color, nthbyte(m_gamma,0x08), nthbyte(m_gamma,0x09), nthbyte(m_gamma,0x0a));
 	if (mixer.flags&1 && mixer.fadeFactor)
 	{
 		rgbint fade_color;
@@ -2799,7 +2798,7 @@ SCREEN_UPDATE_RGB32( namcos22s )
 	bitmap.fill(rgbint_to_rgb(&bg_color), cliprect);
 
 	// layers
-	UINT8 layer = nthbyte(state->m_gamma,0x1f);
+	UINT8 layer = nthbyte(m_gamma,0x1f);
 	if (layer&4) DrawCharacterLayer(screen.machine(), bitmap, cliprect);
 	if (layer&2) DrawSprites(screen.machine(), bitmap, cliprect);
 	if (layer&1) DrawPolygons(screen.machine(), bitmap);
@@ -2814,7 +2813,7 @@ SCREEN_UPDATE_RGB32( namcos22s )
 		FILE *f = fopen( "dump.txt", "wb" );
 		if( f )
 		{
-			address_space &space = *state->m_maincpu->space(AS_PROGRAM);
+			address_space &space = *m_maincpu->space(AS_PROGRAM);
 
 			if (1) // czram
 			{
@@ -2824,7 +2823,7 @@ SCREEN_UPDATE_RGB32( namcos22s )
 					fprintf( f, "czram[%d] =", bank );
 					for( i=0; i<256; i++ )
 					{
-						fprintf( f, " %04x", state->m_banked_czram[bank][i] );
+						fprintf( f, " %04x", m_banked_czram[bank][i] );
 					}
 					fprintf( f, "\n" );
 				}
@@ -2837,7 +2836,7 @@ SCREEN_UPDATE_RGB32( namcos22s )
 				fprintf(f, "spotram:\n");
 				for (i=0; i<256; i++)
 				{
-					fprintf(f, "%02X: %04X %04X %04X %04X\n", i, state->m_spotram[i*4+0], state->m_spotram[i*4+1], state->m_spotram[i*4+2], state->m_spotram[i*4+3]);
+					fprintf(f, "%02X: %04X %04X %04X %04X\n", i, m_spotram[i*4+0], m_spotram[i*4+1], m_spotram[i*4+2], m_spotram[i*4+3]);
 				}
 				fprintf(f, "\n");
 			}
@@ -2857,12 +2856,12 @@ SCREEN_UPDATE_RGB32( namcos22s )
 	}
 #endif
 
-//  popmessage("%08X %08X %08X %08X",state->m_czattr[0],state->m_czattr[1],state->m_czattr[2],state->m_czattr[3]);
+//  popmessage("%08X %08X %08X %08X",m_czattr[0],m_czattr[1],m_czattr[2],m_czattr[3]);
 
 	return 0;
 }
 
-SCREEN_UPDATE_RGB32( namcos22 )
+UINT32 namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UpdateVideoMixer(screen.machine());
 	UpdatePalette(screen.machine());
@@ -2879,7 +2878,7 @@ SCREEN_UPDATE_RGB32( namcos22 )
 		FILE *f = fopen( "dump.txt", "wb" );
 		if( f )
 		{
-			address_space &space = *state->m_maincpu->space(AS_PROGRAM);
+			address_space &space = *m_maincpu->space(AS_PROGRAM);
 
 			//Dump(space, f,0x90000000, 0x90000003, "led?" );
 			Dump(space, f,0x90010000, 0x90017fff, "cz_ram");

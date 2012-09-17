@@ -182,17 +182,16 @@ static void shangkid_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	}
 }
 
-SCREEN_UPDATE_IND16( shangkid )
+UINT32 shangkid_state::screen_update_shangkid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	shangkid_state *state = screen.machine().driver_data<shangkid_state>();
-	int flipscreen = state->m_videoreg[1]&0x80;
-	state->m_background->set_flip(flipscreen?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
-	state->m_background->set_scrollx(0,state->m_videoreg[0]-40 );
-	state->m_background->set_scrolly(0,state->m_videoreg[2]+0x10 );
+	int flipscreen = m_videoreg[1]&0x80;
+	m_background->set_flip(flipscreen?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
+	m_background->set_scrollx(0,m_videoreg[0]-40 );
+	m_background->set_scrolly(0,m_videoreg[2]+0x10 );
 
-	state->m_background->draw(bitmap, cliprect, 0,0 );
+	m_background->draw(bitmap, cliprect, 0,0 );
 	shangkid_draw_sprites(screen.machine(), bitmap,cliprect );
-	state->m_background->draw(bitmap, cliprect, 1,0 ); /* high priority tiles */
+	m_background->draw(bitmap, cliprect, 1,0 ); /* high priority tiles */
 	return 0;
 }
 
@@ -319,7 +318,7 @@ static void dynamski_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	}
 }
 
-SCREEN_UPDATE_IND16( dynamski )
+UINT32 shangkid_state::screen_update_dynamski(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	dynamski_draw_background(screen.machine(), bitmap,cliprect, 0 );
 	dynamski_draw_sprites(screen.machine(), bitmap,cliprect );

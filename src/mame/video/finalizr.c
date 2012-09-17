@@ -82,26 +82,25 @@ WRITE8_MEMBER(finalizr_state::finalizr_videoctrl_w)
 
 
 
-SCREEN_UPDATE_IND16( finalizr )
+UINT32 finalizr_state::screen_update_finalizr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	finalizr_state *state = screen.machine().driver_data<finalizr_state>();
 	int offs;
 
-	state->m_bg_tilemap->mark_all_dirty();
-	state->m_fg_tilemap->mark_all_dirty();
+	m_bg_tilemap->mark_all_dirty();
+	m_fg_tilemap->mark_all_dirty();
 
-	state->m_bg_tilemap->set_scrollx(0, *state->m_scroll - 32);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->set_scrollx(0, *m_scroll - 32);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* Draw the sprites. */
 	{
 		gfx_element *gfx1 = screen.machine().gfx[1];
 		gfx_element *gfx2 = screen.machine().gfx[2];
 
-		UINT8 *sr = state->m_spriterambank ? state->m_spriteram_2 : state->m_spriteram;
+		UINT8 *sr = m_spriterambank ? m_spriteram_2 : m_spriteram;
 
 
-		for (offs = 0; offs <= state->m_spriteram.bytes() - 5; offs += 5)
+		for (offs = 0; offs <= m_spriteram.bytes() - 5; offs += 5)
 		{
 			int sx, sy, flipx, flipy, code, color, size;
 
@@ -119,7 +118,7 @@ SCREEN_UPDATE_IND16( finalizr )
 
 			if (size >= 0x10)	/* 32x32 */
 			{
-				if (state->flip_screen())
+				if (flip_screen())
 				{
 					sx = 256 - sx;
 					sy = 224 - sy;
@@ -150,7 +149,7 @@ SCREEN_UPDATE_IND16( finalizr )
 			}
 			else
 			{
-				if (state->flip_screen())
+				if (flip_screen())
 				{
 					sx = ((size & 0x08) ? 280:272) - sx;
 					sy = ((size & 0x04) ? 248:240) - sy;
@@ -216,8 +215,8 @@ SCREEN_UPDATE_IND16( finalizr )
 		/* draw top status region */
 		clip.min_x = visarea.min_x;
 		clip.max_x = visarea.min_x + 31;
-		state->m_fg_tilemap->set_scrolldx(0,-32);
-		state->m_fg_tilemap->draw(bitmap, clip, 0, 0);
+		m_fg_tilemap->set_scrolldx(0,-32);
+		m_fg_tilemap->draw(bitmap, clip, 0, 0);
 	}
 	return 0;
 }

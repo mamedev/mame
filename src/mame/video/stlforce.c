@@ -123,56 +123,55 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-SCREEN_UPDATE_IND16( stlforce )
+UINT32 stlforce_state::screen_update_stlforce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	stlforce_state *state = screen.machine().driver_data<stlforce_state>();
 	int i;
 
-	if (state->m_vidattrram[6] & 1)
+	if (m_vidattrram[6] & 1)
 	{
 		for(i=0;i<256;i++)
-			state->m_bg_tilemap->set_scrollx(i, state->m_bg_scrollram[i]+9); //+9 for twinbrat
+			m_bg_tilemap->set_scrollx(i, m_bg_scrollram[i]+9); //+9 for twinbrat
 	}
 	else
 	{
 		for(i=0;i<256;i++)
-			state->m_bg_tilemap->set_scrollx(i, state->m_bg_scrollram[0]+9); //+9 for twinbrat
+			m_bg_tilemap->set_scrollx(i, m_bg_scrollram[0]+9); //+9 for twinbrat
 	}
 
-	if (state->m_vidattrram[6] & 4)
+	if (m_vidattrram[6] & 4)
 	{
 		for(i=0;i<256;i++)
-			state->m_mlow_tilemap->set_scrollx(i, state->m_mlow_scrollram[i]+8);
+			m_mlow_tilemap->set_scrollx(i, m_mlow_scrollram[i]+8);
 	}
 	else
 	{
 		for(i=0;i<256;i++)
-			state->m_mlow_tilemap->set_scrollx(i, state->m_mlow_scrollram[0]+8);
+			m_mlow_tilemap->set_scrollx(i, m_mlow_scrollram[0]+8);
 	}
 
-	if (state->m_vidattrram[6] & 0x10)
+	if (m_vidattrram[6] & 0x10)
 	{
 		for(i=0;i<256;i++)
-			state->m_mhigh_tilemap->set_scrollx(i, state->m_mhigh_scrollram[i]+8);
+			m_mhigh_tilemap->set_scrollx(i, m_mhigh_scrollram[i]+8);
 	}
 	else
 	{
 		for(i=0;i<256;i++)
-			state->m_mhigh_tilemap->set_scrollx(i, state->m_mhigh_scrollram[0]+8);
+			m_mhigh_tilemap->set_scrollx(i, m_mhigh_scrollram[0]+8);
 	}
 
-	state->m_bg_tilemap->set_scrolly(0, state->m_vidattrram[1]);
-	state->m_mlow_tilemap->set_scrolly(0, state->m_vidattrram[2]);
-	state->m_mhigh_tilemap->set_scrolly(0, state->m_vidattrram[3]);
+	m_bg_tilemap->set_scrolly(0, m_vidattrram[1]);
+	m_mlow_tilemap->set_scrolly(0, m_vidattrram[2]);
+	m_mhigh_tilemap->set_scrolly(0, m_vidattrram[3]);
 
-	state->m_tx_tilemap->set_scrollx(0, state->m_vidattrram[0]+8);
-	state->m_tx_tilemap->set_scrolly(0,state->m_vidattrram[4]);
+	m_tx_tilemap->set_scrollx(0, m_vidattrram[0]+8);
+	m_tx_tilemap->set_scrolly(0,m_vidattrram[4]);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_mlow_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_mhigh_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_mlow_tilemap->draw(bitmap, cliprect, 0,0);
+	m_mhigh_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 

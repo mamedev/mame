@@ -120,6 +120,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_vmetal_mid1tilemap_tile_info);
 	TILE_GET_INFO_MEMBER(get_vmetal_mid2tilemap_tile_info);
 	DECLARE_VIDEO_START(varia);
+	UINT32 screen_update_varia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -456,25 +457,24 @@ VIDEO_START_MEMBER(vmetal_state,varia)
 	expand_gfx1(machine());
 }
 
-static SCREEN_UPDATE_IND16(varia)
+UINT32 vmetal_state::screen_update_varia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	vmetal_state *state = screen.machine().driver_data<vmetal_state>();
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_mid2tilemap->set_scrollx(0, state->m_vmetal_videoregs[0x06a/2]-64 /*+ state->m_vmetal_videoregs[0x066/2]*/);
-	state->m_mid1tilemap->set_scrollx(0, state->m_vmetal_videoregs[0x07a/2]-64 /*+ state->m_vmetal_videoregs[0x076/2]*/);
-	state->m_texttilemap->set_scrollx(0, -64 /*+ state->m_vmetal_videoregs[0x076/2]*/);
+	m_mid2tilemap->set_scrollx(0, m_vmetal_videoregs[0x06a/2]-64 /*+ m_vmetal_videoregs[0x066/2]*/);
+	m_mid1tilemap->set_scrollx(0, m_vmetal_videoregs[0x07a/2]-64 /*+ m_vmetal_videoregs[0x076/2]*/);
+	m_texttilemap->set_scrollx(0, -64 /*+ m_vmetal_videoregs[0x076/2]*/);
 
-	state->m_mid2tilemap->set_scrolly(0, -64);
-	state->m_mid1tilemap->set_scrolly(0, -64);
-	state->m_texttilemap->set_scrolly(0, -64);
+	m_mid2tilemap->set_scrolly(0, -64);
+	m_mid1tilemap->set_scrolly(0, -64);
+	m_texttilemap->set_scrolly(0, -64);
 
-	state->m_mid1tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_mid2tilemap->draw(bitmap, cliprect, 0, 0);
+	m_mid1tilemap->draw(bitmap, cliprect, 0, 0);
+	m_mid2tilemap->draw(bitmap, cliprect, 0, 0);
 	metro_draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_texttilemap->draw(bitmap, cliprect, 0, 0);
+	m_texttilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -492,7 +492,7 @@ static MACHINE_CONFIG_START( varia, vmetal_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(2048, 2048)
 	MCFG_SCREEN_VISIBLE_AREA(0+64, 319+64, 0+64, 223+64)
-	MCFG_SCREEN_UPDATE_STATIC(varia)
+	MCFG_SCREEN_UPDATE_DRIVER(vmetal_state, screen_update_varia)
 
 	MCFG_GFXDECODE(vmetal)
 	MCFG_PALETTE_LENGTH(0x4000)

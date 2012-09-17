@@ -953,7 +953,7 @@ static MACHINE_CONFIG_START( hp48_common, hp48_state )
 	MCFG_SCREEN_VBLANK_TIME(0)
 	MCFG_SCREEN_SIZE ( 131, 64 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 130, 0, 63 )
-	MCFG_SCREEN_UPDATE_STATIC( hp48 )
+	MCFG_SCREEN_UPDATE_DRIVER(hp48_state, screen_update_hp48)
 
 	MCFG_PALETTE_LENGTH( 256 ) /* monochrome, but with varying contrast and grayscale */
 

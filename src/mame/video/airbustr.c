@@ -125,28 +125,26 @@ void airbustr_state::video_start()
 }
 
 
-SCREEN_UPDATE_IND16( airbustr )
+UINT32 airbustr_state::screen_update_airbustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	airbustr_state *state = screen.machine().driver_data<airbustr_state>();
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	// copy the sprite bitmap to the screen
-	pandora_update(state->m_pandora, bitmap, cliprect);
+	pandora_update(m_pandora, bitmap, cliprect);
 
 	return 0;
 }
 
-SCREEN_VBLANK( airbustr )
+void airbustr_state::screen_eof_airbustr(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		airbustr_state *state = screen.machine().driver_data<airbustr_state>();
 
 		// update the sprite bitmap
-		pandora_eof(state->m_pandora);
+		pandora_eof(m_pandora);
 	}
 }
 

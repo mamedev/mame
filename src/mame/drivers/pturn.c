@@ -117,6 +117,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_pturn_bg_tile_info);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_pturn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -163,16 +164,15 @@ void pturn_state::video_start()
 	m_bgmap->set_transparent_pen(0);
 }
 
-static SCREEN_UPDATE_IND16(pturn)
+UINT32 pturn_state::screen_update_pturn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pturn_state *state = screen.machine().driver_data<pturn_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 	int sx, sy;
 	int flipx, flipy;
 
-	bitmap.fill(state->m_bgcolor, cliprect);
-	state->m_bgmap->draw(bitmap, cliprect, 0,0);
+	bitmap.fill(m_bgcolor, cliprect);
+	m_bgmap->draw(bitmap, cliprect, 0,0);
 	for ( offs = 0x80-4 ; offs >=0 ; offs -= 4)
 	{
 		sy=256-spriteram[offs]-16 ;
@@ -182,13 +182,13 @@ static SCREEN_UPDATE_IND16(pturn)
 		flipy=spriteram[offs+1]&0x80;
 
 
-		if (state->flip_screen_x())
+		if (flip_screen_x())
 		{
 			sx = 224 - sx;
 			flipx ^= 0x40;
 		}
 
-		if (state->flip_screen_y())
+		if (flip_screen_y())
 		{
 			flipy ^= 0x80;
 			sy = 224 - sy;
@@ -203,7 +203,7 @@ static SCREEN_UPDATE_IND16(pturn)
 			sx,sy,0);
 		}
 	}
-	state->m_fgmap->draw(bitmap, cliprect, 0,0);
+	m_fgmap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -498,7 +498,7 @@ static MACHINE_CONFIG_START( pturn, pturn_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(pturn)
+	MCFG_SCREEN_UPDATE_DRIVER(pturn_state, screen_update_pturn)
 
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)

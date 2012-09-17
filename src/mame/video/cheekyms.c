@@ -145,24 +145,23 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 }
 
 
-SCREEN_UPDATE_IND16( cheekyms )
+UINT32 cheekyms_state::screen_update_cheekyms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cheekyms_state *state = screen.machine().driver_data<cheekyms_state>();
 	int y, x;
-	int scrolly = ((*state->m_port_80 >> 3) & 0x07);
-	int flip = *state->m_port_80 & 0x80;
+	int scrolly = ((*m_port_80 >> 3) & 0x07);
+	int flip = *m_port_80 & 0x80;
 
 	screen.machine().tilemap().mark_all_dirty();
 	screen.machine().tilemap().set_flip_all(flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	bitmap.fill(0, cliprect);
-	state->m_bitmap_buffer->fill(0, cliprect);
+	m_bitmap_buffer->fill(0, cliprect);
 
 	/* sprites go under the playfield */
 	draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().gfx[1], flip);
 
 	/* draw the tilemap to a temp bitmap */
-	state->m_cm_tilemap->draw(*state->m_bitmap_buffer, cliprect, 0, 0);
+	m_cm_tilemap->draw(*m_bitmap_buffer, cliprect, 0, 0);
 
 	/* draw the tilemap to the final bitmap applying the scroll to the man character */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -182,13 +181,13 @@ SCREEN_UPDATE_IND16( cheekyms )
 
 			if (in_man_area)
 			{
-				if ((y + scrolly) < 27 * 8 && state->m_bitmap_buffer->pix16(y + scrolly, x) != 0)
-					bitmap.pix16(y, x) = state->m_bitmap_buffer->pix16(y + scrolly, x);
+				if ((y + scrolly) < 27 * 8 && m_bitmap_buffer->pix16(y + scrolly, x) != 0)
+					bitmap.pix16(y, x) = m_bitmap_buffer->pix16(y + scrolly, x);
 			}
 			else
 			{
-				if(state->m_bitmap_buffer->pix16(y, x) != 0)
-					bitmap.pix16(y, x) = state->m_bitmap_buffer->pix16(y, x);
+				if(m_bitmap_buffer->pix16(y, x) != 0)
+					bitmap.pix16(y, x) = m_bitmap_buffer->pix16(y, x);
 			}
 		}
 	}

@@ -134,34 +134,33 @@ void silkroad_state::video_start()
 	m_fg3_tilemap->set_transparent_pen(0);
 }
 
-SCREEN_UPDATE_IND16(silkroad)
+UINT32 silkroad_state::screen_update_silkroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	silkroad_state *state = screen.machine().driver_data<silkroad_state>();
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0x7c0, cliprect);
 
-	state->m_fg_tilemap->set_scrollx(0, ((state->m_regs[0] & 0xffff0000) >> 16) );
-	state->m_fg_tilemap->set_scrolly(0, (state->m_regs[0] & 0x0000ffff) >> 0 );
+	m_fg_tilemap->set_scrollx(0, ((m_regs[0] & 0xffff0000) >> 16) );
+	m_fg_tilemap->set_scrolly(0, (m_regs[0] & 0x0000ffff) >> 0 );
 
-	state->m_fg3_tilemap->set_scrolly(0, (state->m_regs[1] & 0xffff0000) >> 16 );
-	state->m_fg3_tilemap->set_scrollx(0, (state->m_regs[2] & 0xffff0000) >> 16 );
+	m_fg3_tilemap->set_scrolly(0, (m_regs[1] & 0xffff0000) >> 16 );
+	m_fg3_tilemap->set_scrollx(0, (m_regs[2] & 0xffff0000) >> 16 );
 
-	state->m_fg2_tilemap->set_scrolly(0, ((state->m_regs[5] & 0xffff0000) >> 16));
-	state->m_fg2_tilemap->set_scrollx(0, (state->m_regs[2] & 0x0000ffff) >> 0 );
+	m_fg2_tilemap->set_scrolly(0, ((m_regs[5] & 0xffff0000) >> 16));
+	m_fg2_tilemap->set_scrollx(0, (m_regs[2] & 0x0000ffff) >> 0 );
 
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_fg2_tilemap->draw(bitmap, cliprect, 0,1);
-	state->m_fg3_tilemap->draw(bitmap, cliprect, 0,2);
+	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_fg2_tilemap->draw(bitmap, cliprect, 0,1);
+	m_fg3_tilemap->draw(bitmap, cliprect, 0,2);
 	draw_sprites(screen.machine(),bitmap,cliprect);
 
 	if (0)
 	{
 	    popmessage ("Regs %08x %08x %08x %08x %08x",
-		state->m_regs[0],
-		state->m_regs[1],
-		state->m_regs[2],
-		state->m_regs[4],
-		state->m_regs[5]);
+		m_regs[0],
+		m_regs[1],
+		m_regs[2],
+		m_regs[4],
+		m_regs[5]);
 	}
 
 	return 0;

@@ -77,6 +77,14 @@ public:
 	DECLARE_MACHINE_RESET(taitoz);
 	DECLARE_VIDEO_START(taitoz);
 	DECLARE_MACHINE_START(bshark);
+	UINT32 screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_chasehq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_bshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_sci(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_aquajack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_spacegun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_racingb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/taito_z.c -----------*/
@@ -84,11 +92,11 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( contcirc );
-SCREEN_UPDATE_IND16( chasehq );
-SCREEN_UPDATE_IND16( bshark );
-SCREEN_UPDATE_IND16( sci );
-SCREEN_UPDATE_IND16( aquajack );
-SCREEN_UPDATE_IND16( spacegun );
-SCREEN_UPDATE_IND16( dblaxle );
-SCREEN_UPDATE_IND16( racingb );
+
+
+
+
+
+
+
+

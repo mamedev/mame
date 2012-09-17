@@ -37,10 +37,9 @@ void gumbo_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0xff);
 }
 
-SCREEN_UPDATE_IND16( gumbo )
+UINT32 gumbo_state::screen_update_gumbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gumbo_state *state = screen.machine().driver_data<gumbo_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

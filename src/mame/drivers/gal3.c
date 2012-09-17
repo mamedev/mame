@@ -159,6 +159,7 @@ public:
 	DECLARE_READ32_MEMBER(rso_r);
 	DECLARE_WRITE32_MEMBER(rso_w);
 	DECLARE_VIDEO_START(gal3);
+	UINT32 screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -193,9 +194,8 @@ static void update_palette( running_machine &machine )
 	}
 } /* update_palette */
 
-static SCREEN_UPDATE_RGB32(gal3)
+UINT32 gal3_state::screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	gal3_state *state = screen.machine().driver_data<gal3_state>();
 	int i;
 	char mst[18], slv[18];
 	static int pivot = 15;
@@ -208,19 +208,19 @@ static SCREEN_UPDATE_RGB32(gal3)
 
 	for( pri=0; pri<pivot; pri++ )
 	{
-		state->c355_obj_draw(bitmap, cliprect, pri);
+		c355_obj_draw(bitmap, cliprect, pri);
 	}
 
 /*  CopyVisiblePolyFrameBuffer( bitmap, cliprect,0,0x7fbf );
 
     for( pri=pivot; pri<15; pri++ )
     {
-        state->c355_obj_draw(bitmap, cliprect, pri);
+        c355_obj_draw(bitmap, cliprect, pri);
     }*/
 
 	// CPU Diag LEDs
 	mst[17]='\0', slv[17]='\0';
-/// printf("mst=0x%x\tslv=0x%x\n", state->m_led_mst, state->m_led_slv);
+/// printf("mst=0x%x\tslv=0x%x\n", m_led_mst, m_led_slv);
 	for(i=16;i<32;i++)
 	{
 		int t;
@@ -230,12 +230,12 @@ static SCREEN_UPDATE_RGB32(gal3)
 			t=i+1;
 		mst[8]=' '; slv[8]=' ';
 
-		if(state->m_led_mst&(1<<i))
+		if(m_led_mst&(1<<i))
 			mst[t-16]='*';
 		else
 			mst[t-16]='O';
 
-		if(state->m_led_slv&(1<<i))
+		if(m_led_slv&(1<<i))
 			slv[t-16]='*';
 		else
 			slv[t-16]='O';
@@ -658,14 +658,14 @@ static MACHINE_CONFIG_START( gal3, gal3_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
-	MCFG_SCREEN_UPDATE_STATIC(gal3)
+	MCFG_SCREEN_UPDATE_DRIVER(gal3_state, screen_update_gal3)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
-	MCFG_SCREEN_UPDATE_STATIC(gal3)
+	MCFG_SCREEN_UPDATE_DRIVER(gal3_state, screen_update_gal3)
 
 	MCFG_GFXDECODE(namcos21)
 	MCFG_PALETTE_LENGTH(NAMCOS21_NUM_COLORS)

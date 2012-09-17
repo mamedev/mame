@@ -20,6 +20,7 @@ public:
 	DECLARE_MACHINE_START(skullxbo);
 	DECLARE_MACHINE_RESET(skullxbo);
 	DECLARE_VIDEO_START(skullxbo);
+	UINT32 screen_update_skullxbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -31,6 +32,6 @@ DECLARE_WRITE16_HANDLER( skullxbo_yscroll_w );
 DECLARE_WRITE16_HANDLER( skullxbo_mobmsb_w );
 
 
-SCREEN_UPDATE_IND16( skullxbo );
+
 
 void skullxbo_scanline_update(running_machine &machine, int param);

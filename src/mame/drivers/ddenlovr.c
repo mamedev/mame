@@ -1289,9 +1289,8 @@ static void copylayer(running_machine &machine, bitmap_ind16 &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE_IND16(ddenlovr)
+UINT32 dynax_state::screen_update_ddenlovr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dynax_state *state = screen.machine().driver_data<dynax_state>();
 
 	static const int order[24][4] =
 	{
@@ -1303,22 +1302,22 @@ SCREEN_UPDATE_IND16(ddenlovr)
 
 	int pri;
 
-	int enab = state->m_ddenlovr_layer_enable;
-	int enab2 = state->m_ddenlovr_layer_enable2;
+	int enab = m_ddenlovr_layer_enable;
+	int enab2 = m_ddenlovr_layer_enable2;
 
 #if 0
 	static int base = 0x0;
 	const UINT8 *gfx = screen.machine().root_device().memregion("blitter")->base();
 	int next;
-	memset(state->m_ddenlovr_pixmap[0], 0, 512 * 512);
-	memset(state->m_ddenlovr_pixmap[1], 0, 512 * 512);
-	memset(state->m_ddenlovr_pixmap[2], 0, 512 * 512);
-	memset(state->m_ddenlovr_pixmap[3], 0, 512 * 512);
-	state->m_ddenlovr_dest_layer = 8;
-	state->m_ddenlovr_blit_pen = 0;
-	state->m_ddenlovr_blit_pen_mode = 0;
-	state->m_ddenlovr_blit_y = 5;
-	state->m_ddenlovr_clip_ctrl = 0x0f;
+	memset(m_ddenlovr_pixmap[0], 0, 512 * 512);
+	memset(m_ddenlovr_pixmap[1], 0, 512 * 512);
+	memset(m_ddenlovr_pixmap[2], 0, 512 * 512);
+	memset(m_ddenlovr_pixmap[3], 0, 512 * 512);
+	m_ddenlovr_dest_layer = 8;
+	m_ddenlovr_blit_pen = 0;
+	m_ddenlovr_blit_pen_mode = 0;
+	m_ddenlovr_blit_y = 5;
+	m_ddenlovr_clip_ctrl = 0x0f;
 	next = blit_draw(screen.machine(), base, 0);
 	popmessage("GFX %06x", base);
 	if (screen.machine().input().code_pressed(KEYCODE_S)) base = next;
@@ -1329,7 +1328,7 @@ SCREEN_UPDATE_IND16(ddenlovr)
 	if (screen.machine().input().code_pressed_once(KEYCODE_F)) { base++; while ((gfx[base] & 0xf0) != 0x30) base++; }
 #endif
 
-	bitmap.fill(state->m_ddenlovr_bgcolor, cliprect);
+	bitmap.fill(m_ddenlovr_bgcolor, cliprect);
 
 #ifdef MAME_DEBUG
 	if (screen.machine().input().code_pressed(KEYCODE_Z))
@@ -1345,7 +1344,7 @@ SCREEN_UPDATE_IND16(ddenlovr)
 
 		mask2 = 0;
 
-		if (state->m_extra_layers)
+		if (m_extra_layers)
 		{
 			if (screen.machine().input().code_pressed(KEYCODE_A))	mask2 |= 1;
 			if (screen.machine().input().code_pressed(KEYCODE_S))	mask2 |= 2;
@@ -1355,13 +1354,13 @@ SCREEN_UPDATE_IND16(ddenlovr)
 
 		if (mask || mask2)
 		{
-			state->m_ddenlovr_layer_enable &= mask;
-			state->m_ddenlovr_layer_enable2 &= mask2;
+			m_ddenlovr_layer_enable &= mask;
+			m_ddenlovr_layer_enable2 &= mask2;
 		}
 	}
 #endif
 
-	pri = state->m_ddenlovr_priority;
+	pri = m_ddenlovr_priority;
 
 	if (pri >= 24)
 	{
@@ -1374,9 +1373,9 @@ SCREEN_UPDATE_IND16(ddenlovr)
 	copylayer(screen.machine(), bitmap, cliprect, order[pri][2]);
 	copylayer(screen.machine(), bitmap, cliprect, order[pri][3]);
 
-	if (state->m_extra_layers)
+	if (m_extra_layers)
 	{
-		pri = state->m_ddenlovr_priority2;
+		pri = m_ddenlovr_priority2;
 
 		if (pri >= 24)
 		{
@@ -1390,8 +1389,8 @@ SCREEN_UPDATE_IND16(ddenlovr)
 		copylayer(screen.machine(), bitmap, cliprect, order[pri][3] + 4);
 	}
 
-	state->m_ddenlovr_layer_enable = enab;
-	state->m_ddenlovr_layer_enable2 = enab2;
+	m_ddenlovr_layer_enable = enab;
+	m_ddenlovr_layer_enable2 = enab2;
 
 	return 0;
 }
@@ -8513,7 +8512,7 @@ static MACHINE_CONFIG_START( ddenlovr, dynax_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(336, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-16+5-1)
-	MCFG_SCREEN_UPDATE_STATIC(ddenlovr)
+	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_ddenlovr)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
@@ -8637,7 +8636,7 @@ static MACHINE_CONFIG_START( quizchq, dynax_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(336, 256+22)
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-16+5-1)
-	MCFG_SCREEN_UPDATE_STATIC(ddenlovr)
+	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_ddenlovr)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
@@ -8728,7 +8727,7 @@ static MACHINE_CONFIG_START( mmpanic, dynax_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(336, 256+22)
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-16+5-1)
-	MCFG_SCREEN_UPDATE_STATIC(ddenlovr)
+	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_ddenlovr)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
@@ -8812,7 +8811,7 @@ static MACHINE_CONFIG_START( hanakanz, dynax_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(336, 256+22)
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-11-1)
-	MCFG_SCREEN_UPDATE_STATIC(ddenlovr)
+	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_ddenlovr)
 
 	MCFG_PALETTE_LENGTH(0x200)
 
@@ -9228,7 +9227,7 @@ static MACHINE_CONFIG_START( jongtei, dynax_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(336, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-11-1)
-	MCFG_SCREEN_UPDATE_STATIC(ddenlovr)
+	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_ddenlovr)
 
 	MCFG_PALETTE_LENGTH(0x200)
 
@@ -9269,7 +9268,7 @@ static MACHINE_CONFIG_START( sryudens, dynax_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(336, 256+22)
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 0+5, 256-12-1)
-	MCFG_SCREEN_UPDATE_STATIC(ddenlovr)
+	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_ddenlovr)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
@@ -9314,7 +9313,7 @@ static MACHINE_CONFIG_START( janshinp, dynax_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(336, 256+22)
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 0+5, 256-12-1)
-	MCFG_SCREEN_UPDATE_STATIC(ddenlovr)
+	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_ddenlovr)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
@@ -9388,7 +9387,7 @@ static MACHINE_CONFIG_START( seljan2, dynax_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(336, 256+22)
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 0+5, 256-12-1)
-	MCFG_SCREEN_UPDATE_STATIC(ddenlovr)
+	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_ddenlovr)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
@@ -9435,7 +9434,7 @@ static MACHINE_CONFIG_START( daimyojn, dynax_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(336, 256+22)
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1-1, 1, 256-15-1)
-	MCFG_SCREEN_UPDATE_STATIC(ddenlovr)
+	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_ddenlovr)
 
 	MCFG_PALETTE_LENGTH(0x200)
 

@@ -134,6 +134,8 @@ public:
 	DECLARE_MACHINE_RESET(sknsu);
 	DECLARE_MACHINE_RESET(sknse);
 	DECLARE_MACHINE_RESET(sknsk);
+	UINT32 screen_update_skns(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_eof_skns(screen_device &screen, bool state);
 };
 
 
@@ -148,5 +150,5 @@ void skns_draw_sprites(
 
 
 
-SCREEN_VBLANK(skns);
-SCREEN_UPDATE_RGB32(skns);
+
+

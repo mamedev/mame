@@ -15,9 +15,8 @@ void llc_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-SCREEN_UPDATE_IND16( llc1 )
+UINT32 llc_state::screen_update_llc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	llc_state *state = screen.machine().driver_data<llc_state>();
 	UINT8 y,ra,chr,gfx,inv;
 	UINT16 sy=0,ma=0,x;
 
@@ -29,11 +28,11 @@ SCREEN_UPDATE_IND16( llc1 )
 
 			for (x = ma; x < ma + 64; x++)
 			{
-				inv = (state->m_p_videoram[x] & 0x80) ? 0xff : 0;
-				chr = state->m_p_videoram[x] & 0x7f;
+				inv = (m_p_videoram[x] & 0x80) ? 0xff : 0;
+				chr = m_p_videoram[x] & 0x7f;
 
 				/* get pattern of pixels for that character scanline */
-				gfx = state->m_p_chargen[ chr | (ra << 7) ] ^ inv;
+				gfx = m_p_chargen[ chr | (ra << 7) ] ^ inv;
 
 				/* Display a scanline of a character (8 pixels) */
 				*p++ = BIT(gfx, 7);
@@ -51,10 +50,9 @@ SCREEN_UPDATE_IND16( llc1 )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( llc2 )
+UINT32 llc_state::screen_update_llc2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	llc_state *state = screen.machine().driver_data<llc_state>();
-	UINT8 y,ra,chr,gfx,inv, inv1=state->m_rv ? 0xff : 0;
+	UINT8 y,ra,chr,gfx,inv, inv1=m_rv ? 0xff : 0;
 	UINT16 sy=0,ma=0,x;
 
 	for (y = 0; y < 32; y++)
@@ -66,7 +64,7 @@ SCREEN_UPDATE_IND16( llc2 )
 
 			for (x = ma; x < ma + 64; x++)
 			{
-				chr = state->m_p_videoram[x];
+				chr = m_p_videoram[x];
 				if (chr==0x11) // inverse on
 				{
 					inv=0xff;
@@ -77,7 +75,7 @@ SCREEN_UPDATE_IND16( llc2 )
 					inv=0;
 
 				/* get pattern of pixels for that character scanline */
-				gfx = state->m_p_chargen[ (chr << 3) | ra ] ^ inv ^ inv1;
+				gfx = m_p_chargen[ (chr << 3) | ra ] ^ inv ^ inv1;
 
 				/* Display a scanline of a character (8 pixels) */
 				*p++ = BIT(gfx, 7);

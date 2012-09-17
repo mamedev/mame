@@ -29,6 +29,7 @@ public:
 	DECLARE_WRITE8_MEMBER(input_select_w);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_embargo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -38,18 +39,17 @@ public:
  *
  *************************************/
 
-static SCREEN_UPDATE_RGB32( embargo )
+UINT32 embargo_state::screen_update_embargo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	embargo_state *state = screen.machine().driver_data<embargo_state>();
 	offs_t offs;
 
-	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
+	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{
 		int i;
 
 		UINT8 x = offs << 3;
 		UINT8 y = offs >> 5;
-		UINT8 data = state->m_videoram[offs];
+		UINT8 data = m_videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
@@ -265,7 +265,7 @@ static MACHINE_CONFIG_START( embargo, embargo_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_STATIC(embargo)
+	MCFG_SCREEN_UPDATE_DRIVER(embargo_state, screen_update_embargo)
 
 MACHINE_CONFIG_END
 

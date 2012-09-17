@@ -101,6 +101,7 @@ public:
 	DECLARE_PALETTE_INIT(ti82);
 	DECLARE_MACHINE_START(ti86);
 	DECLARE_MACHINE_START(ti83p);
+	UINT32 screen_update_ti85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -120,7 +121,7 @@ SNAPSHOT_LOAD( ti8x );
 /*----------- defined in video/ti85.c -----------*/
 
 
-SCREEN_UPDATE_IND16( ti85 );
+
 
 
 

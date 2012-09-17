@@ -429,32 +429,31 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( gaelco2 )
+UINT32 gaelco2_state::screen_update_gaelco2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gaelco2_state *state = screen.machine().driver_data<gaelco2_state>();
 	int i;
 
 	/* read scroll values */
-	int scroll0x = state->m_videoram[0x2802/2] + 0x14;
-	int scroll1x = state->m_videoram[0x2806/2] + 0x10;
-	int scroll0y = state->m_videoram[0x2800/2] + 0x01;
-	int scroll1y = state->m_videoram[0x2804/2] + 0x01;
+	int scroll0x = m_videoram[0x2802/2] + 0x14;
+	int scroll1x = m_videoram[0x2806/2] + 0x10;
+	int scroll0y = m_videoram[0x2800/2] + 0x01;
+	int scroll1y = m_videoram[0x2804/2] + 0x01;
 
 	/* set y scroll registers */
-	state->m_pant[0]->set_scrolly(0, scroll0y & 0x1ff);
-	state->m_pant[1]->set_scrolly(0, scroll1y & 0x1ff);
+	m_pant[0]->set_scrolly(0, scroll0y & 0x1ff);
+	m_pant[1]->set_scrolly(0, scroll1y & 0x1ff);
 
 	/* set x linescroll registers */
 	for (i = 0; i < 512; i++){
-		state->m_pant[0]->set_scrollx(i & 0x1ff, (state->m_vregs[0] & 0x8000) ? (state->m_videoram[(0x2000/2) + i] + 0x14) & 0x3ff : scroll0x & 0x3ff);
-		state->m_pant[1]->set_scrollx(i & 0x1ff, (state->m_vregs[1] & 0x8000) ? (state->m_videoram[(0x2400/2) + i] + 0x10) & 0x3ff : scroll1x & 0x3ff);
+		m_pant[0]->set_scrollx(i & 0x1ff, (m_vregs[0] & 0x8000) ? (m_videoram[(0x2000/2) + i] + 0x14) & 0x3ff : scroll0x & 0x3ff);
+		m_pant[1]->set_scrollx(i & 0x1ff, (m_vregs[1] & 0x8000) ? (m_videoram[(0x2400/2) + i] + 0x10) & 0x3ff : scroll1x & 0x3ff);
 	}
 
 	/* draw screen */
 	bitmap.fill(0, cliprect);
 
-	state->m_pant[1]->draw(bitmap, cliprect, 0, 0);
-	state->m_pant[0]->draw(bitmap, cliprect, 0, 0);
+	m_pant[1]->draw(bitmap, cliprect, 0, 0);
+	m_pant[0]->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -489,5 +488,5 @@ static UINT32 dual_update(screen_device &screen, bitmap_ind16 &bitmap, const rec
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( gaelco2_left ) { return dual_update(screen, bitmap, cliprect, 0); }
-SCREEN_UPDATE_IND16( gaelco2_right ) { return dual_update(screen, bitmap, cliprect, 1); }
+UINT32 gaelco2_state::screen_update_gaelco2_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return dual_update(screen, bitmap, cliprect, 0); }
+UINT32 gaelco2_state::screen_update_gaelco2_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return dual_update(screen, bitmap, cliprect, 1); }

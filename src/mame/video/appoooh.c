@@ -265,62 +265,60 @@ static void robowres_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &clip
 }
 
 
-SCREEN_UPDATE_IND16( appoooh )
+UINT32 appoooh_state::screen_update_appoooh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	appoooh_state *state = screen.machine().driver_data<appoooh_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	if (state->m_priority == 0)	/* fg behind sprites */
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (m_priority == 0)	/* fg behind sprites */
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw sprites */
-	if (state->m_priority == 1)
+	if (m_priority == 1)
 	{
 		/* sprite set #1 */
-		appoooh_draw_sprites(bitmap, cliprect, screen.machine().gfx[2], state->m_spriteram);
+		appoooh_draw_sprites(bitmap, cliprect, screen.machine().gfx[2], m_spriteram);
 		/* sprite set #2 */
-		appoooh_draw_sprites(bitmap, cliprect, screen.machine().gfx[3], state->m_spriteram_2);
+		appoooh_draw_sprites(bitmap, cliprect, screen.machine().gfx[3], m_spriteram_2);
 	}
 	else
 	{
 		/* sprite set #2 */
-		appoooh_draw_sprites(bitmap, cliprect, screen.machine().gfx[3], state->m_spriteram_2);
+		appoooh_draw_sprites(bitmap, cliprect, screen.machine().gfx[3], m_spriteram_2);
 		/* sprite set #1 */
-		appoooh_draw_sprites(bitmap, cliprect, screen.machine().gfx[2], state->m_spriteram);
+		appoooh_draw_sprites(bitmap, cliprect, screen.machine().gfx[2], m_spriteram);
 	}
 
-	if (state->m_priority != 0)	/* fg in front of sprites */
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (m_priority != 0)	/* fg in front of sprites */
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( robowres )
+UINT32 appoooh_state::screen_update_robowres(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	appoooh_state *state = screen.machine().driver_data<appoooh_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	if (state->m_priority == 0)	/* fg behind sprites */
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (m_priority == 0)	/* fg behind sprites */
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw sprites */
-	if (state->m_priority == 1)
+	if (m_priority == 1)
 	{
 		/* sprite set #1 */
-		robowres_draw_sprites(bitmap, cliprect, screen.machine().gfx[2], state->m_spriteram);
+		robowres_draw_sprites(bitmap, cliprect, screen.machine().gfx[2], m_spriteram);
 		/* sprite set #2 */
-		robowres_draw_sprites(bitmap, cliprect, screen.machine().gfx[3], state->m_spriteram_2);
+		robowres_draw_sprites(bitmap, cliprect, screen.machine().gfx[3], m_spriteram_2);
 	}
 	else
 	{
 		/* sprite set #2 */
-		robowres_draw_sprites(bitmap, cliprect, screen.machine().gfx[3], state->m_spriteram_2);
+		robowres_draw_sprites(bitmap, cliprect, screen.machine().gfx[3], m_spriteram_2);
 		/* sprite set #1 */
-		robowres_draw_sprites(bitmap, cliprect, screen.machine().gfx[2], state->m_spriteram);
+		robowres_draw_sprites(bitmap, cliprect, screen.machine().gfx[2], m_spriteram);
 	}
 
-	if (state->m_priority != 0)	/* fg in front of sprites */
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (m_priority != 0)	/* fg in front of sprites */
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

@@ -112,6 +112,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_quizpun2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -155,9 +156,8 @@ void quizpun2_state::video_start()
 	m_fg_tmap->set_transparent_pen(0);
 }
 
-static SCREEN_UPDATE_IND16(quizpun2)
+UINT32 quizpun2_state::screen_update_quizpun2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	quizpun2_state *state = screen.machine().driver_data<quizpun2_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
@@ -170,11 +170,11 @@ static SCREEN_UPDATE_IND16(quizpun2)
 	}
 #endif
 
-	if (layers_ctrl & 1)	state->m_bg_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	if (layers_ctrl & 1)	m_bg_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	else					bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	if (layers_ctrl & 2)	state->m_fg_tmap->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 2)	m_fg_tmap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -503,7 +503,7 @@ static MACHINE_CONFIG_START( quizpun2, quizpun2_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(quizpun2)
+	MCFG_SCREEN_UPDATE_DRIVER(quizpun2_state, screen_update_quizpun2)
 
 	MCFG_GFXDECODE(quizpun2)
 	MCFG_PALETTE_LENGTH(0x200)

@@ -68,6 +68,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -89,10 +90,9 @@ void caswin_state::video_start()
 	m_sc0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(caswin_state::get_sc0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 }
 
-static SCREEN_UPDATE_IND16(vvillage)
+UINT32 caswin_state::screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	caswin_state *state = screen.machine().driver_data<caswin_state>();
-	state->m_sc0_tilemap->draw(bitmap, cliprect, 0,0);
+	m_sc0_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -313,7 +313,7 @@ static MACHINE_CONFIG_START( vvillage, caswin_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(vvillage)
+	MCFG_SCREEN_UPDATE_DRIVER(caswin_state, screen_update_vvillage)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

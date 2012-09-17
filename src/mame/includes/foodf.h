@@ -35,10 +35,11 @@ public:
 	DECLARE_MACHINE_START(foodf);
 	DECLARE_MACHINE_RESET(foodf);
 	DECLARE_VIDEO_START(foodf);
+	UINT32 screen_update_foodf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/foodf.c -----------*/
 
 
-SCREEN_UPDATE_IND16( foodf );
+

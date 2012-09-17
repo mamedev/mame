@@ -118,15 +118,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( goindol )
+UINT32 goindol_state::screen_update_goindol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	goindol_state *state = screen.machine().driver_data<goindol_state>();
-	state->m_fg_tilemap->set_scrollx(0, *state->m_fg_scrollx);
-	state->m_fg_tilemap->set_scrolly(0, *state->m_fg_scrolly);
+	m_fg_tilemap->set_scrollx(0, *m_fg_scrollx);
+	m_fg_tilemap->set_scrolly(0, *m_fg_scrolly);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect, 1, state->m_spriteram);
-	draw_sprites(screen.machine(), bitmap, cliprect, 0, state->m_spriteram2);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	draw_sprites(screen.machine(), bitmap, cliprect, 1, m_spriteram);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0, m_spriteram2);
 	return 0;
 }

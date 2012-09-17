@@ -36,6 +36,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 	DECLARE_VIDEO_START(trckydoc);
 	DECLARE_VIDEO_START(sauro);
+	UINT32 screen_update_trckydoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_sauro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -45,5 +47,5 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( sauro );
-SCREEN_UPDATE_IND16( trckydoc );
+
+

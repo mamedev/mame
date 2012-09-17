@@ -201,7 +201,7 @@ static MACHINE_CONFIG_START( yard, m58_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 256, 282, 42, 266)
-	MCFG_SCREEN_UPDATE_STATIC(yard)
+	MCFG_SCREEN_UPDATE_DRIVER(m58_state, screen_update_yard)
 
 
 	/* sound hardware */

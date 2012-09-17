@@ -236,6 +236,7 @@ public:
 	DECLARE_DRIVER_INIT(cmrltv75);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_coinmvga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -249,9 +250,8 @@ void coinmvga_state::video_start()
 }
 
 
-static SCREEN_UPDATE_IND16( coinmvga )
+UINT32 coinmvga_state::screen_update_coinmvga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	coinmvga_state *state = screen.machine().driver_data<coinmvga_state>();
 	gfx_element *gfx = screen.machine().gfx[0];
 	int count = 0x04000/2;
 
@@ -262,7 +262,7 @@ static SCREEN_UPDATE_IND16( coinmvga )
 	{
 		for (x=0;x<128;x++)
 		{
-			int tile = state->m_vram[count];
+			int tile = m_vram[count];
 			//int colour = tile>>12;
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8);
 
@@ -683,7 +683,7 @@ static MACHINE_CONFIG_START( coinmvga, coinmvga_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(640,480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_STATIC(coinmvga)
+	MCFG_SCREEN_UPDATE_DRIVER(coinmvga_state, screen_update_coinmvga)
 
 	MCFG_GFXDECODE(coinmvga)
 

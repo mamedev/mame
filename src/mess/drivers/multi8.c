@@ -68,24 +68,25 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_multi8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-#define mc6845_h_char_total 	(state->m_crtc_vreg[0])
-#define mc6845_h_display		(state->m_crtc_vreg[1])
-#define mc6845_h_sync_pos		(state->m_crtc_vreg[2])
-#define mc6845_sync_width		(state->m_crtc_vreg[3])
-#define mc6845_v_char_total		(state->m_crtc_vreg[4])
-#define mc6845_v_total_adj		(state->m_crtc_vreg[5])
-#define mc6845_v_display		(state->m_crtc_vreg[6])
-#define mc6845_v_sync_pos		(state->m_crtc_vreg[7])
-#define mc6845_mode_ctrl		(state->m_crtc_vreg[8])
-#define mc6845_tile_height		(state->m_crtc_vreg[9]+1)
-#define mc6845_cursor_y_start	(state->m_crtc_vreg[0x0a])
-#define mc6845_cursor_y_end 	(state->m_crtc_vreg[0x0b])
-#define mc6845_start_addr		(((state->m_crtc_vreg[0x0c]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0d] & 0xff))
-#define mc6845_cursor_addr  	(((state->m_crtc_vreg[0x0e]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0f] & 0xff))
-#define mc6845_light_pen_addr	(((state->m_crtc_vreg[0x10]<<8) & 0x3f00) | (state->m_crtc_vreg[0x11] & 0xff))
-#define mc6845_update_addr  	(((state->m_crtc_vreg[0x12]<<8) & 0x3f00) | (state->m_crtc_vreg[0x13] & 0xff))
+#define mc6845_h_char_total 	(m_crtc_vreg[0])
+#define mc6845_h_display		(m_crtc_vreg[1])
+#define mc6845_h_sync_pos		(m_crtc_vreg[2])
+#define mc6845_sync_width		(m_crtc_vreg[3])
+#define mc6845_v_char_total		(m_crtc_vreg[4])
+#define mc6845_v_total_adj		(m_crtc_vreg[5])
+#define mc6845_v_display		(m_crtc_vreg[6])
+#define mc6845_v_sync_pos		(m_crtc_vreg[7])
+#define mc6845_mode_ctrl		(m_crtc_vreg[8])
+#define mc6845_tile_height		(m_crtc_vreg[9]+1)
+#define mc6845_cursor_y_start	(m_crtc_vreg[0x0a])
+#define mc6845_cursor_y_end 	(m_crtc_vreg[0x0b])
+#define mc6845_start_addr		(((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))
+#define mc6845_cursor_addr  	(((m_crtc_vreg[0x0e]<<8) & 0x3f00) | (m_crtc_vreg[0x0f] & 0xff))
+#define mc6845_light_pen_addr	(((m_crtc_vreg[0x10]<<8) & 0x3f00) | (m_crtc_vreg[0x11] & 0xff))
+#define mc6845_update_addr  	(((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
 
 void multi8_state::video_start()
 {
@@ -114,16 +115,15 @@ static void multi8_draw_pixel(running_machine &machine, bitmap_ind16 &bitmap,int
 		bitmap.pix16(y, x) = pen;
 }
 
-static SCREEN_UPDATE_IND16( multi8 )
+UINT32 multi8_state::screen_update_multi8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	multi8_state *state = screen.machine().driver_data<multi8_state>();
 	int x,y,count;
 	UINT8 x_width;
 	UINT8 xi,yi;
 
 	count = 0x0000;
 
-	x_width = (state->m_display_reg & 0x40) ? 80 : 40;
+	x_width = (m_display_reg & 0x40) ? 80 : 40;
 
 	for(y=0; y<200; y++)
 	{
@@ -133,22 +133,22 @@ static SCREEN_UPDATE_IND16( multi8 )
 			{
 				int pen_r,pen_g,pen_b,color;
 
-				pen_b = (state->m_p_vram[count | 0x0000] >> (7-xi)) & 1;
-				pen_r = (state->m_p_vram[count | 0x4000] >> (7-xi)) & 1;
-				pen_g = (state->m_p_vram[count | 0x8000] >> (7-xi)) & 1;
+				pen_b = (m_p_vram[count | 0x0000] >> (7-xi)) & 1;
+				pen_r = (m_p_vram[count | 0x4000] >> (7-xi)) & 1;
+				pen_g = (m_p_vram[count | 0x8000] >> (7-xi)) & 1;
 
-				if (state->m_bw_mode)
+				if (m_bw_mode)
 				{
-					pen_b = (state->m_display_reg & 1) ? pen_b : 0;
-					pen_r = (state->m_display_reg & 2) ? pen_r : 0;
-					pen_g = (state->m_display_reg & 4) ? pen_g : 0;
+					pen_b = (m_display_reg & 1) ? pen_b : 0;
+					pen_r = (m_display_reg & 2) ? pen_r : 0;
+					pen_g = (m_display_reg & 4) ? pen_g : 0;
 
 					color = ((pen_b) | (pen_r) | (pen_g)) ? 7 : 0;
 				}
 				else
 					color = (pen_b) | (pen_r << 1) | (pen_g << 2);
 
-				multi8_draw_pixel(screen.machine(),bitmap, y, x*8+xi,state->m_pen_clut[color], 0);
+				multi8_draw_pixel(screen.machine(),bitmap, y, x*8+xi,m_pen_clut[color], 0);
 			}
 			count++;
 		}
@@ -160,9 +160,9 @@ static SCREEN_UPDATE_IND16( multi8 )
 	{
 		for(x=0; x<x_width; x++)
 		{
-			int tile = state->m_p_vram[count];
-			int attr = state->m_p_vram[count+0x800];
-			int color = (state->m_display_reg & 0x80) ? 7 : (attr & 0x07);
+			int tile = m_p_vram[count];
+			int attr = m_p_vram[count+0x800];
+			int color = (m_display_reg & 0x80) ? 7 : (attr & 0x07);
 
 			for (yi=0; yi<8; yi++)
 			{
@@ -171,12 +171,12 @@ static SCREEN_UPDATE_IND16( multi8 )
 					int pen;
 
 					if(attr & 0x20)
-						pen = (state->m_p_chargen[tile*8+yi] >> (7-xi) & 1) ? 0 : color;
+						pen = (m_p_chargen[tile*8+yi] >> (7-xi) & 1) ? 0 : color;
 					else
-						pen = (state->m_p_chargen[tile*8+yi] >> (7-xi) & 1) ? color : 0;
+						pen = (m_p_chargen[tile*8+yi] >> (7-xi) & 1) ? color : 0;
 
 					if(pen)
-						multi8_draw_pixel(screen.machine(),bitmap, y*mc6845_tile_height+yi, x*8+xi, pen, (state->m_display_reg & 0x40) == 0x00);
+						multi8_draw_pixel(screen.machine(),bitmap, y*mc6845_tile_height+yi, x*8+xi, pen, (m_display_reg & 0x40) == 0x00);
 				}
 			}
 
@@ -201,13 +201,13 @@ static SCREEN_UPDATE_IND16( multi8 )
 					for (yc=0; yc<(mc6845_tile_height-(mc6845_cursor_y_start & 7)); yc++)
 					{
 						for (xc=0; xc<8; xc++)
-							multi8_draw_pixel(screen.machine(),bitmap, y*mc6845_tile_height+yc, x*8+xc,0x07,(state->m_display_reg & 0x40) == 0x00);
+							multi8_draw_pixel(screen.machine(),bitmap, y*mc6845_tile_height+yc, x*8+xc,0x07,(m_display_reg & 0x40) == 0x00);
 
 					}
 				}
 			}
 
-			(state->m_display_reg & 0x40) ? count++ : count+=2;
+			(m_display_reg & 0x40) ? count++ : count+=2;
 		}
 	}
 	return 0;
@@ -671,7 +671,7 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_STATIC(multi8)
+	MCFG_SCREEN_UPDATE_DRIVER(multi8_state, screen_update_multi8)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_GFXDECODE(multi8)
 

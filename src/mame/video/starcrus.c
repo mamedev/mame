@@ -400,77 +400,76 @@ static int collision_check_s2p1p2(running_machine &machine)
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( starcrus )
+UINT32 starcrus_state::screen_update_starcrus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	starcrus_state *state = screen.machine().driver_data<starcrus_state>();
 
 	bitmap.fill(0, cliprect);
 
 	/* Draw ship 1 */
 	drawgfx_transpen(bitmap,
 			cliprect,
-			screen.machine().gfx[8+((state->m_s1_sprite&0x04)>>2)],
-			(state->m_s1_sprite&0x03)^0x03,
+			screen.machine().gfx[8+((m_s1_sprite&0x04)>>2)],
+			(m_s1_sprite&0x03)^0x03,
 			0,
-			(state->m_s1_sprite&0x08)>>3, (state->m_s1_sprite&0x10)>>4,
-			state->m_s1_x, state->m_s1_y,
+			(m_s1_sprite&0x08)>>3, (m_s1_sprite&0x10)>>4,
+			m_s1_x, m_s1_y,
 			0);
 
 	/* Draw ship 2 */
 	drawgfx_transpen(bitmap,
 			cliprect,
-			screen.machine().gfx[10+((state->m_s2_sprite&0x04)>>2)],
-			(state->m_s2_sprite&0x03)^0x03,
+			screen.machine().gfx[10+((m_s2_sprite&0x04)>>2)],
+			(m_s2_sprite&0x03)^0x03,
 			0,
-			(state->m_s2_sprite&0x08)>>3, (state->m_s2_sprite&0x10)>>4,
-			state->m_s2_x, state->m_s2_y,
+			(m_s2_sprite&0x08)>>3, (m_s2_sprite&0x10)>>4,
+			m_s2_x, m_s2_y,
 			0);
 
 	/* Draw score/projectile 1 */
 	drawgfx_transpen(bitmap,
 			cliprect,
-			screen.machine().gfx[(state->m_p1_sprite&0x0c)>>2],
-			(state->m_p1_sprite&0x03)^0x03,
+			screen.machine().gfx[(m_p1_sprite&0x0c)>>2],
+			(m_p1_sprite&0x03)^0x03,
 			0,
 			0,0,
-			state->m_p1_x, state->m_p1_y,
+			m_p1_x, m_p1_y,
 			0);
 
 	/* Draw score/projectile 2 */
 	drawgfx_transpen(bitmap,
 			cliprect,
-			screen.machine().gfx[4+((state->m_p2_sprite&0x0c)>>2)],
-			(state->m_p2_sprite&0x03)^0x03,
+			screen.machine().gfx[4+((m_p2_sprite&0x0c)>>2)],
+			(m_p2_sprite&0x03)^0x03,
 			0,
 			0,0,
-			state->m_p2_x, state->m_p2_y,
+			m_p2_x, m_p2_y,
 			0);
 
 	/* Collision detection */
 	if (cliprect.max_y == screen.visible_area().max_y)
 	{
-		state->m_collision_reg = 0x00;
+		m_collision_reg = 0x00;
 
 		/* Check for collisions between ship1 and ship2 */
 		if (collision_check_s1s2(screen.machine()))
 		{
-			state->m_collision_reg |= 0x08;
+			m_collision_reg |= 0x08;
 		}
 		/* Check for collisions between ship1 and projectiles */
 		if (collision_check_s1p1p2(screen.machine()))
 		{
-			state->m_collision_reg |= 0x02;
+			m_collision_reg |= 0x02;
 		}
 		/* Check for collisions between ship1 and projectiles */
 		if (collision_check_s2p1p2(screen.machine()))
 		{
-			state->m_collision_reg |= 0x01;
+			m_collision_reg |= 0x01;
 		}
 		/* Check for collisions between ship1 and projectiles */
 		/* Note: I don't think this is used by the game */
 		if (collision_check_p1p2(screen.machine()))
 		{
-			state->m_collision_reg |= 0x04;
+			m_collision_reg |= 0x04;
 		}
 	}
 

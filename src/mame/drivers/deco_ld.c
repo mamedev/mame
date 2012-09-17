@@ -146,6 +146,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(begas_vblank_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	virtual void machine_start();
+	UINT32 screen_update_rblaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 *spriteram, UINT16 tile_bank )
@@ -193,23 +194,22 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 	}
 }
 
-static SCREEN_UPDATE_RGB32( rblaster )
+UINT32 deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	deco_ld_state *state = screen.machine().driver_data<deco_ld_state>();
 	gfx_element *gfx = screen.machine().gfx[0];
 	int y,x;
 
 	bitmap.fill(0, cliprect);
 
-	draw_sprites(screen.machine(), bitmap,cliprect,state->m_vram1,0x000);
-	draw_sprites(screen.machine(), bitmap,cliprect,state->m_vram0,0x100);
+	draw_sprites(screen.machine(), bitmap,cliprect,m_vram1,0x000);
+	draw_sprites(screen.machine(), bitmap,cliprect,m_vram0,0x100);
 
 	for (y=0;y<32;y++)
 	{
 		for (x=0;x<32;x++)
 		{
-			int attr = state->m_attr0[x+y*32];
-			int tile = state->m_vram0[x+y*32] | ((attr & 3) << 8);
+			int attr = m_attr0[x+y*32];
+			int tile = m_vram0[x+y*32] | ((attr & 3) << 8);
 			int colour = (6 & 0x7); /* TODO */
 
 			drawgfx_transpen(bitmap,cliprect,gfx,tile|0x400,colour,0,0,x*8,y*8,0);
@@ -220,8 +220,8 @@ static SCREEN_UPDATE_RGB32( rblaster )
 	{
 		for (x=0;x<32;x++)
 		{
-			int attr = state->m_attr1[x+y*32];
-			int tile = state->m_vram1[x+y*32] | ((attr & 3) << 8);
+			int attr = m_attr1[x+y*32];
+			int tile = m_vram1[x+y*32] | ((attr & 3) << 8);
 			int colour = (6 & 0x7); /* TODO */
 
 			drawgfx_transpen(bitmap,cliprect,gfx,tile,colour,0,0,x*8,y*8,0);
@@ -468,7 +468,7 @@ static MACHINE_CONFIG_START( rblaster, deco_ld_state )
 //  MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc") //Sony LDP-1000A, is it truly compatible with the Pioneer?
-	MCFG_LASERDISC_OVERLAY_STATIC(256, 256, rblaster)
+	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, deco_ld_state, screen_update_rblaster)
 	MCFG_LASERDISC_OVERLAY_CLIP(0, 256-1, 8, 240-1)
 
 	/* video hardware */

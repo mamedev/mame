@@ -27,7 +27,7 @@ void kramermc_state::video_start()
 {
 }
 
-SCREEN_UPDATE_IND16( kramermc )
+UINT32 kramermc_state::screen_update_kramermc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);

@@ -46,34 +46,33 @@ void surpratk_sprite_callback( running_machine &machine, int *code, int *color, 
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( surpratk )
+UINT32 surpratk_state::screen_update_surpratk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	surpratk_state *state = screen.machine().driver_data<surpratk_state>();
 	int layer[3], bg_colorbase;
 
-	bg_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI0);
-	state->m_sprite_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI1);
-	state->m_layer_colorbase[0] = k053251_get_palette_index(state->m_k053251, K053251_CI2);
-	state->m_layer_colorbase[1] = k053251_get_palette_index(state->m_k053251, K053251_CI4);
-	state->m_layer_colorbase[2] = k053251_get_palette_index(state->m_k053251, K053251_CI3);
+	bg_colorbase = k053251_get_palette_index(m_k053251, K053251_CI0);
+	m_sprite_colorbase = k053251_get_palette_index(m_k053251, K053251_CI1);
+	m_layer_colorbase[0] = k053251_get_palette_index(m_k053251, K053251_CI2);
+	m_layer_colorbase[1] = k053251_get_palette_index(m_k053251, K053251_CI4);
+	m_layer_colorbase[2] = k053251_get_palette_index(m_k053251, K053251_CI3);
 
-	k052109_tilemap_update(state->m_k052109);
+	k052109_tilemap_update(m_k052109);
 
 	layer[0] = 0;
-	state->m_layerpri[0] = k053251_get_priority(state->m_k053251, K053251_CI2);
+	m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI2);
 	layer[1] = 1;
-	state->m_layerpri[1] = k053251_get_priority(state->m_k053251, K053251_CI4);
+	m_layerpri[1] = k053251_get_priority(m_k053251, K053251_CI4);
 	layer[2] = 2;
-	state->m_layerpri[2] = k053251_get_priority(state->m_k053251, K053251_CI3);
+	m_layerpri[2] = k053251_get_priority(m_k053251, K053251_CI3);
 
-	konami_sortlayers3(layer, state->m_layerpri);
+	konami_sortlayers3(layer, m_layerpri);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[0], 0, 1);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[1], 0, 2);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[2], 0, 4);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, layer[0], 0, 1);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, layer[1], 0, 2);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, layer[2], 0, 4);
 
-	k053245_sprites_draw(state->m_k053244, bitmap, cliprect);
+	k053245_sprites_draw(m_k053244, bitmap, cliprect);
 	return 0;
 }

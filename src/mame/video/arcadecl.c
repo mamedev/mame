@@ -77,15 +77,14 @@ VIDEO_START_MEMBER(arcadecl_state,arcadecl)
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( arcadecl )
+UINT32 arcadecl_state::screen_update_arcadecl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	arcadecl_state *state = screen.machine().driver_data<arcadecl_state>();
 
 	/* draw the playfield */
 	arcadecl_bitmap_render(screen.machine(), bitmap, cliprect);
 
 	/* draw and merge the MO */
-	if (state->m_has_mo)
+	if (m_has_mo)
 	{
 		atarimo_rect_list rectlist;
 		bitmap_ind16 *mobitmap;

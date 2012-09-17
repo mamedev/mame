@@ -129,6 +129,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ay2_sel);
 	DECLARE_DRIVER_INIT(mirax);
 	virtual void palette_init();
+	UINT32 screen_update_mirax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -219,7 +220,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-static SCREEN_UPDATE_IND16(mirax)
+UINT32 mirax_state::screen_update_mirax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_tilemap(screen.machine(),bitmap,cliprect,1);
 	draw_sprites(screen.machine(),bitmap,cliprect);
@@ -465,7 +466,7 @@ static MACHINE_CONFIG_START( mirax, mirax_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(mirax)
+	MCFG_SCREEN_UPDATE_DRIVER(mirax_state, screen_update_mirax)
 
 	MCFG_PALETTE_LENGTH(0x40)
 	MCFG_GFXDECODE(mirax)

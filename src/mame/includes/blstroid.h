@@ -21,12 +21,13 @@ public:
 	DECLARE_MACHINE_START(blstroid);
 	DECLARE_MACHINE_RESET(blstroid);
 	DECLARE_VIDEO_START(blstroid);
+	UINT32 screen_update_blstroid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/blstroid.c -----------*/
 
 
-SCREEN_UPDATE_IND16( blstroid );
+
 
 void blstroid_scanline_update(screen_device &screen, int scanline);

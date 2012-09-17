@@ -460,45 +460,41 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( zaxxon )
+UINT32 zaxxon_state::screen_update_zaxxon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	zaxxon_state *state = screen.machine().driver_data<zaxxon_state>();
 
 	draw_background(screen.machine(), bitmap, cliprect, TRUE);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x140, 0x180);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( futspy )
+UINT32 zaxxon_state::screen_update_futspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	zaxxon_state *state = screen.machine().driver_data<zaxxon_state>();
 
 	draw_background(screen.machine(), bitmap, cliprect, TRUE);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x180, 0x180);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( razmataz )
+UINT32 zaxxon_state::screen_update_razmataz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	zaxxon_state *state = screen.machine().driver_data<zaxxon_state>();
 
 	draw_background(screen.machine(), bitmap, cliprect, FALSE);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x140, 0x180);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( congo )
+UINT32 zaxxon_state::screen_update_congo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	zaxxon_state *state = screen.machine().driver_data<zaxxon_state>();
 
 	draw_background(screen.machine(), bitmap, cliprect, TRUE);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x280, 0x180);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -237,34 +237,33 @@ static void draw_water(colortable_t *colortable, bitmap_ind16 &bitmap, const rec
 }
 
 
-SCREEN_UPDATE_IND16( wolfpack )
+UINT32 wolfpack_state::screen_update_wolfpack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	wolfpack_state *state = screen.machine().driver_data<wolfpack_state>();
 	int i;
 	int j;
 
 	UINT8 color = 0x48;
-	if (state->m_ship_size & 0x10) color += 0x13;
-	if (state->m_ship_size & 0x20) color += 0x22;
-	if (state->m_ship_size & 0x40) color += 0x3a;
-	if (state->m_ship_size & 0x80) color += 0x48;
+	if (m_ship_size & 0x10) color += 0x13;
+	if (m_ship_size & 0x20) color += 0x22;
+	if (m_ship_size & 0x40) color += 0x3a;
+	if (m_ship_size & 0x80) color += 0x48;
 
 	colortable_palette_set_color(screen.machine().colortable, 3, MAKE_RGB(color,color,color));
 	colortable_palette_set_color(screen.machine().colortable, 7, MAKE_RGB(color < 0xb8 ? color + 0x48 : 0xff,
 																		  color < 0xb8 ? color + 0x48 : 0xff,
 																		  color < 0xb8 ? color + 0x48 : 0xff));
 
-	bitmap.fill(state->m_video_invert, cliprect);
+	bitmap.fill(m_video_invert, cliprect);
 
 	for (i = 0; i < 8; i++)
 		for (j = 0; j < 32; j++)
 		{
-			int code = state->m_alpha_num_ram[32 * i + j];
+			int code = m_alpha_num_ram[32 * i + j];
 
 			drawgfx_opaque(bitmap, cliprect,
 				screen.machine().gfx[0],
 				code,
-				state->m_video_invert,
+				m_video_invert,
 				0, 0,
 				16 * j,
 				192 + 8 * i);
@@ -278,37 +277,36 @@ SCREEN_UPDATE_IND16( wolfpack )
 }
 
 
-SCREEN_VBLANK( wolfpack )
+void wolfpack_state::screen_eof_wolfpack(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		wolfpack_state *state = screen.machine().driver_data<wolfpack_state>();
 
 		int x;
 		int y;
 
-		state->m_helper.fill(0);
+		m_helper.fill(0);
 
-		draw_ship(screen.machine(), state->m_helper, state->m_helper.cliprect());
+		draw_ship(screen.machine(), m_helper, m_helper.cliprect());
 
-		for (y = 128; y < 224 - state->m_torpedo_v; y++)
+		for (y = 128; y < 224 - m_torpedo_v; y++)
 		{
-			int x1 = 248 - state->m_torpedo_h - 1;
-			int x2 = 248 - state->m_torpedo_h + 1;
+			int x1 = 248 - m_torpedo_h - 1;
+			int x2 = 248 - m_torpedo_h + 1;
 
 			for (x = 2 * x1; x < 2 * x2; x++)
 			{
-				if (x < 0 || x >= state->m_helper.width())
+				if (x < 0 || x >= m_helper.width())
 					continue;
-				if (y < 0 || y >= state->m_helper.height())
+				if (y < 0 || y >= m_helper.height())
 					continue;
 
-				if (state->m_helper.pix16(y, x))
-					state->m_collision = 1;
+				if (m_helper.pix16(y, x))
+					m_collision = 1;
 			}
 		}
 
-		state->m_current_index += 0x300 * 262;
+		m_current_index += 0x300 * 262;
 	}
 }

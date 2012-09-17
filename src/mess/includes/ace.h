@@ -57,6 +57,7 @@ public:
 
 	required_shared_ptr<UINT8> m_video_ram;
 	required_shared_ptr<UINT8> m_char_ram;
+	UINT32 screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 #endif /* ACE_H_ */

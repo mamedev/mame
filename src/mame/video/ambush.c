@@ -88,9 +88,8 @@ static void draw_chars( running_machine &machine, bitmap_ind16 &bitmap, const re
 }
 
 
-SCREEN_UPDATE_IND16( ambush )
+UINT32 ambush_state::screen_update_ambush(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ambush_state *state = screen.machine().driver_data<ambush_state>();
 	int offs;
 
 	bitmap.fill(0, cliprect);
@@ -99,28 +98,28 @@ SCREEN_UPDATE_IND16( ambush )
 	draw_chars(screen.machine(), bitmap, cliprect, 0x00);
 
 	/* Draw the sprites. */
-	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int code, col, sx, sy, flipx, flipy, gfx;
 
-		sy = state->m_spriteram[offs + 0];
-		sx = state->m_spriteram[offs + 3];
+		sy = m_spriteram[offs + 0];
+		sx = m_spriteram[offs + 3];
 
 		if ( (sy == 0) ||
 			 (sy == 0xff) ||
-			((sx <  0x40) && (  state->m_spriteram[offs + 2] & 0x10)) ||
-			((sx >= 0xc0) && (!(state->m_spriteram[offs + 2] & 0x10))))
+			((sx <  0x40) && (  m_spriteram[offs + 2] & 0x10)) ||
+			((sx >= 0xc0) && (!(m_spriteram[offs + 2] & 0x10))))
 			continue;  /* prevent wraparound */
 
 
-		code = (state->m_spriteram[offs + 1] & 0x3f) | ((state->m_spriteram[offs + 2] & 0x60) << 1);
+		code = (m_spriteram[offs + 1] & 0x3f) | ((m_spriteram[offs + 2] & 0x60) << 1);
 
-		if (state->m_spriteram[offs + 2] & 0x80)
+		if (m_spriteram[offs + 2] & 0x80)
 		{
 			/* 16x16 sprites */
 			gfx = 1;
 
-			if (!state->flip_screen())
+			if (!flip_screen())
 				sy = 240 - sy;
 			else
 				sx = 240 - sx;
@@ -131,24 +130,24 @@ SCREEN_UPDATE_IND16( ambush )
 			gfx = 0;
 			code <<= 2;
 
-			if (!state->flip_screen())
+			if (!flip_screen())
 				sy = 248 - sy;
 			else
 				sx = 248 - sx;
 		}
 
-		col   = state->m_spriteram[offs + 2] & 0x0f;
-		flipx = state->m_spriteram[offs + 1] & 0x40;
-		flipy = state->m_spriteram[offs + 1] & 0x80;
+		col   = m_spriteram[offs + 2] & 0x0f;
+		flipx = m_spriteram[offs + 1] & 0x40;
+		flipy = m_spriteram[offs + 1] & 0x80;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			flipx = !flipx;
 			flipy = !flipy;
 		}
 
 		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[gfx],
-				code, col | ((*state->m_colorbank & 0x03) << 4),
+				code, col | ((*m_colorbank & 0x03) << 4),
 				flipx, flipy,
 				sx,sy,0);
 	}

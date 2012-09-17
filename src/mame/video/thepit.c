@@ -276,32 +276,31 @@ static void draw_sprites(running_machine &machine,
 }
 
 
-SCREEN_UPDATE_IND16( thepit )
+UINT32 thepit_state::screen_update_thepit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	thepit_state *state = screen.machine().driver_data<thepit_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < 32; offs++)
 	{
-		int xshift = state->m_flip_screen_x ? 128 : 0;
-		int yshift = state->m_flip_screen_y ? -8 : 0;
+		int xshift = m_flip_screen_x ? 128 : 0;
+		int yshift = m_flip_screen_y ? -8 : 0;
 
-		state->m_tilemap->set_scrollx(offs, xshift);
-		state->m_solid_tilemap->set_scrollx(offs, xshift);
+		m_tilemap->set_scrollx(offs, xshift);
+		m_solid_tilemap->set_scrollx(offs, xshift);
 
-		state->m_tilemap->set_scrolly(offs, yshift + state->m_attributesram[offs << 1]);
-		state->m_solid_tilemap->set_scrolly(offs, yshift + state->m_attributesram[offs << 1]);
+		m_tilemap->set_scrolly(offs, yshift + m_attributesram[offs << 1]);
+		m_solid_tilemap->set_scrolly(offs, yshift + m_attributesram[offs << 1]);
 	}
 
 	/* low priority tiles */
-	state->m_solid_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_solid_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* low priority sprites */
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
 	/* high priority tiles */
-	state->m_solid_tilemap->draw(bitmap, cliprect, 1, 1);
+	m_solid_tilemap->draw(bitmap, cliprect, 1, 1);
 
 	/* high priority sprites */
 	draw_sprites(screen.machine(), bitmap, cliprect, 1);

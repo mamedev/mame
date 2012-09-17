@@ -295,11 +295,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 }
 
 
-SCREEN_UPDATE_IND16( fastfred )
+UINT32 fastfred_state::screen_update_fastfred(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	fastfred_state *state = screen.machine().driver_data<fastfred_state>();
-	bitmap.fill(*state->m_background_color, cliprect);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	bitmap.fill(*m_background_color, cliprect);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	return 0;
@@ -362,14 +361,13 @@ VIDEO_START_MEMBER(fastfred_state,imago)
 	palette_set_color(machine(),256+64+1,MAKE_RGB(0x00,0x00,0x00));
 }
 
-SCREEN_UPDATE_IND16( imago )
+UINT32 fastfred_state::screen_update_imago(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	fastfred_state *state = screen.machine().driver_data<fastfred_state>();
-	state->m_web_tilemap->draw(bitmap, cliprect, 0,0);
+	m_web_tilemap->draw(bitmap, cliprect, 0,0);
 	galaxold_draw_stars(screen.machine(), bitmap, cliprect);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 
 	return 0;
 }

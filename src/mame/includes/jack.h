@@ -55,6 +55,8 @@ public:
 	virtual void video_start();
 	DECLARE_VIDEO_START(joinem);
 	DECLARE_PALETTE_INIT(joinem);
+	UINT32 screen_update_jack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_joinem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -62,8 +64,8 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( jack );
 
 
 
-SCREEN_UPDATE_IND16( joinem );
+
+

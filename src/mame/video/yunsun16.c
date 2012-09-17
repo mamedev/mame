@@ -195,33 +195,32 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 ***************************************************************************/
 
 
-SCREEN_UPDATE_IND16( yunsun16 )
+UINT32 yunsun16_state::screen_update_yunsun16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	yunsun16_state *state = screen.machine().driver_data<yunsun16_state>();
 
-	state->m_tilemap_0->set_scrollx(0, state->m_scrollram_0[0]);
-	state->m_tilemap_0->set_scrolly(0, state->m_scrollram_0[1]);
+	m_tilemap_0->set_scrollx(0, m_scrollram_0[0]);
+	m_tilemap_0->set_scrolly(0, m_scrollram_0[1]);
 
-	state->m_tilemap_1->set_scrollx(0, state->m_scrollram_1[0]);
-	state->m_tilemap_1->set_scrolly(0, state->m_scrollram_1[1]);
+	m_tilemap_1->set_scrollx(0, m_scrollram_1[0]);
+	m_tilemap_1->set_scrolly(0, m_scrollram_1[1]);
 
-	//popmessage("%04X", *state->m_priorityram);
+	//popmessage("%04X", *m_priorityram);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	if ((*state->m_priorityram & 0x0c) == 4)
+	if ((*m_priorityram & 0x0c) == 4)
 	{
 		/* The color of the this layer's transparent pen goes below everything */
-		state->m_tilemap_0->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		state->m_tilemap_0->draw(bitmap, cliprect, 0, 1);
-		state->m_tilemap_1->draw(bitmap, cliprect, 0, 2);
+		m_tilemap_0->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_tilemap_0->draw(bitmap, cliprect, 0, 1);
+		m_tilemap_1->draw(bitmap, cliprect, 0, 2);
 	}
-	else if ((*state->m_priorityram & 0x0c) == 8)
+	else if ((*m_priorityram & 0x0c) == 8)
 	{
 		/* The color of the this layer's transparent pen goes below everything */
-		state->m_tilemap_1->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		state->m_tilemap_1->draw(bitmap, cliprect, 0, 1);
-		state->m_tilemap_0->draw(bitmap, cliprect, 0, 2);
+		m_tilemap_1->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_tilemap_1->draw(bitmap, cliprect, 0, 1);
+		m_tilemap_0->draw(bitmap, cliprect, 0, 2);
 	}
 
 	draw_sprites(screen.machine(), bitmap, cliprect);

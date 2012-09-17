@@ -164,6 +164,11 @@ public:
 	DECLARE_VIDEO_START(psychos);
 	DECLARE_VIDEO_START(snk_3bpp_shadow);
 	DECLARE_VIDEO_START(snk_4bpp_shadow);
+	UINT32 screen_update_marvins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_tnk3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_ikari(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_gwar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_tdfever(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 

@@ -122,6 +122,7 @@ public:
 	DECLARE_WRITE32_MEMBER(ps_dac_w);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_pockstat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -925,9 +926,8 @@ void pockstat_state::machine_reset()
 	m_ps_flash_write_count = 0;
 }
 
-static SCREEN_UPDATE_RGB32( pockstat )
+UINT32 pockstat_state::screen_update_pockstat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	pockstat_state *state = screen.machine().driver_data<pockstat_state>();
 	int x = 0;
 	int y = 0;
 	for(y = 0; y < 32; y++)
@@ -935,9 +935,9 @@ static SCREEN_UPDATE_RGB32( pockstat )
 		UINT32 *scanline = &bitmap.pix32(y);
 		for(x = 0; x < 32; x++)
 		{
-			if(state->m_lcd_control != 0) // Hack
+			if(m_lcd_control != 0) // Hack
 			{
-				if(state->m_lcd_buffer[y] & (1 << x))
+				if(m_lcd_buffer[y] & (1 << x))
 				{
 					scanline[x] = 0x00000000;
 				}
@@ -993,7 +993,7 @@ static MACHINE_CONFIG_START( pockstat, pockstat_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(32, 32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32-1, 0, 32-1)
-	MCFG_SCREEN_UPDATE_STATIC(pockstat)
+	MCFG_SCREEN_UPDATE_DRIVER(pockstat_state, screen_update_pockstat)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

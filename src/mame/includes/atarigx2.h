@@ -46,14 +46,16 @@ public:
 	DECLARE_MACHINE_START(atarigx2);
 	DECLARE_MACHINE_RESET(atarigx2);
 	DECLARE_VIDEO_START(atarigx2);
+	UINT32 screen_update_atarigx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_atarigx2(screen_device &screen, bool state);
 };
 
 
 /*----------- defined in video/atarigx2.c -----------*/
 
 
-SCREEN_VBLANK( atarigx2 );
-SCREEN_UPDATE_IND16( atarigx2 );
+
+
 
 DECLARE_WRITE16_HANDLER( atarigx2_mo_control_w );
 

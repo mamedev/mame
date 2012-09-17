@@ -291,34 +291,32 @@ VIDEO_START_MEMBER(ojankohs_state,ojankoc)
 
 ******************************************************************************/
 
-SCREEN_UPDATE_IND16( ojankohs )
+UINT32 ojankohs_state::screen_update_ojankohs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ojankohs_state *state = screen.machine().driver_data<ojankohs_state>();
 
-	state->m_tilemap->set_scrollx(0, state->m_scrollx);
-	state->m_tilemap->set_scrolly(0, state->m_scrolly);
+	m_tilemap->set_scrollx(0, m_scrollx);
+	m_tilemap->set_scrolly(0, m_scrolly);
 
-	state->m_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( ojankoc )
+UINT32 ojankohs_state::screen_update_ojankoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ojankohs_state *state = screen.machine().driver_data<ojankohs_state>();
 	int offs;
 
-	if (state->m_screen_refresh)
+	if (m_screen_refresh)
 	{
 		address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		/* redraw bitmap */
 		for (offs = 0; offs < 0x8000; offs++)
 		{
-			state->ojankoc_videoram_w(space, offs, state->m_videoram[offs]);
+			ojankoc_videoram_w(space, offs, m_videoram[offs]);
 		}
-		state->m_screen_refresh = 0;
+		m_screen_refresh = 0;
 	}
 
-	copybitmap(bitmap, state->m_tmpbitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_tmpbitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

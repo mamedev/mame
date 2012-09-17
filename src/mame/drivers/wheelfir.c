@@ -284,6 +284,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_wheelfir(screen_device &screen, bool state);
 };
 
 
@@ -574,30 +576,29 @@ void wheelfir_state::video_start()
 	m_tmp_bitmap[1] = auto_bitmap_ind16_alloc(machine(), 512, 512);
 }
 
-static SCREEN_UPDATE_IND16(wheelfir)
+UINT32 wheelfir_state::screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	wheelfir_state *state = screen.machine().driver_data<wheelfir_state>();
 
 	bitmap.fill(0, cliprect);
 
 	for(int y=0;y<NUM_SCANLINES;++y)
 	{
-		UINT16 *source = &state->m_tmp_bitmap[LAYER_BG]->pix16(( (state->m_scanlines[y].y)&511));
+		UINT16 *source = &m_tmp_bitmap[LAYER_BG]->pix16(( (m_scanlines[y].y)&511));
 		UINT16 *dest = &bitmap.pix16(y);
 
 		for (int x=0;x<336;x++)
 		{
 
-			dest[x] = source[ (x+(state->m_scanlines[y].x)) &511];
+			dest[x] = source[ (x+(m_scanlines[y].x)) &511];
 
 		}
 	}
 
-	copybitmap_trans(bitmap, *state->m_tmp_bitmap[LAYER_FG], 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, *m_tmp_bitmap[LAYER_FG], 0, 0, 0, 0, cliprect, 0);
 
 /*
     {
-        state->m_tmp_bitmap[LAYER_BG]->fill(0, screen.visible_area());
+        m_tmp_bitmap[LAYER_BG]->fill(0, screen.visible_area());
 
     }
 */
@@ -605,13 +606,12 @@ static SCREEN_UPDATE_IND16(wheelfir)
 	return 0;
 }
 
-static SCREEN_VBLANK( wheelfir )
+void wheelfir_state::screen_eof_wheelfir(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		wheelfir_state *state = screen.machine().driver_data<wheelfir_state>();
-		state->m_tmp_bitmap[LAYER_FG]->fill(0, screen.visible_area());
+		m_tmp_bitmap[LAYER_FG]->fill(0, screen.visible_area());
 	}
 }
 
@@ -828,8 +828,8 @@ static MACHINE_CONFIG_START( wheelfir, wheelfir_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(336, NUM_SCANLINES+NUM_VBLANK_LINES)
 	MCFG_SCREEN_VISIBLE_AREA(0,335, 0, NUM_SCANLINES-1)
-	MCFG_SCREEN_UPDATE_STATIC(wheelfir)
-	MCFG_SCREEN_VBLANK_STATIC(wheelfir)
+	MCFG_SCREEN_UPDATE_DRIVER(wheelfir_state, screen_update_wheelfir)
+	MCFG_SCREEN_VBLANK_DRIVER(wheelfir_state, screen_eof_wheelfir)
 
 	MCFG_PALETTE_LENGTH(NUM_COLORS)
 

@@ -207,24 +207,23 @@ void ashnojoe_state::video_start()
 	m_joetilemap5->set_transparent_pen(15);
 }
 
-SCREEN_UPDATE_IND16( ashnojoe )
+UINT32 ashnojoe_state::screen_update_ashnojoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ashnojoe_state *state = screen.machine().driver_data<ashnojoe_state>();
 
-	//state->m_tilemap_reg[0] & 0x10 // ?? on coin insertion
+	//m_tilemap_reg[0] & 0x10 // ?? on coin insertion
 
-	state->flip_screen_set(state->m_tilemap_reg[0] & 1);
+	flip_screen_set(m_tilemap_reg[0] & 1);
 
-	if(state->m_tilemap_reg[0] & 0x02)
-		state->m_joetilemap7->draw(bitmap, cliprect, 0, 0);
+	if(m_tilemap_reg[0] & 0x02)
+		m_joetilemap7->draw(bitmap, cliprect, 0, 0);
 	else
-		state->m_joetilemap6->draw(bitmap, cliprect, 0, 0);
+		m_joetilemap6->draw(bitmap, cliprect, 0, 0);
 
-	state->m_joetilemap4->draw(bitmap, cliprect, 0, 0);
-	state->m_joetilemap2->draw(bitmap, cliprect, 0, 0);
-	state->m_joetilemap5->draw(bitmap, cliprect, 0, 0);
-	state->m_joetilemap3->draw(bitmap, cliprect, 0, 0);
-	state->m_joetilemap->draw(bitmap, cliprect, 0, 0);
+	m_joetilemap4->draw(bitmap, cliprect, 0, 0);
+	m_joetilemap2->draw(bitmap, cliprect, 0, 0);
+	m_joetilemap5->draw(bitmap, cliprect, 0, 0);
+	m_joetilemap3->draw(bitmap, cliprect, 0, 0);
+	m_joetilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

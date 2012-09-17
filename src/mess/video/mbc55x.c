@@ -193,7 +193,7 @@ void mbc55x_state::video_reset()
 	logerror("Video reset\n");
 }
 
-SCREEN_VBLANK( mbc55x )
+void mbc55x_state::screen_eof_mbc55x(screen_device &screen, bool state)
 {
 //  logerror("SCREEN_VBLANK( mbc55x )\n");
 }

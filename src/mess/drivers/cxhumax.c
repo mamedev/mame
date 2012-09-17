@@ -890,17 +890,16 @@ INLINE UINT32 ycc_to_rgb(UINT32 ycc)
 	return MAKE_RGB(clamp16_shift8(r), clamp16_shift8(g), clamp16_shift8(b));
 }
 
-static SCREEN_UPDATE_RGB32( cxhumax )
+UINT32 cxhumax_state::screen_update_cxhumax(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int i, j;
 
-	cxhumax_state *state = screen.machine().driver_data<cxhumax_state>();
 
-	UINT32 osd_pointer = state->m_drm1_regs[DRM_OSD_PTR_REG];
+	UINT32 osd_pointer = m_drm1_regs[DRM_OSD_PTR_REG];
 
 	if(osd_pointer)
 	{
-		UINT32 *ram = state->m_ram;
+		UINT32 *ram = m_ram;
 		UINT32 *osd_header = &ram[osd_pointer/4];
 		UINT8  *vbuf = (UINT8*)(&ram[osd_header[3]/4]);
 		UINT32 *palette = &ram[osd_header[7]/4];
@@ -917,11 +916,11 @@ static SCREEN_UPDATE_RGB32( cxhumax )
 		UINT32 ydisp_last = (y_position_and_region_alpha >> 12) & 0x7ff;
 		UINT32 ydisp_start = y_position_and_region_alpha & 0x7ff;
 
-	/*  UINT32 first_x = state->m_drm0_regs[DRM_ACTIVE_X_REG] & 0xffff;
-        UINT32 last_x = (state->m_drm0_regs[DRM_ACTIVE_X_REG] >> 16) & 0xffff;
+	/*  UINT32 first_x = m_drm0_regs[DRM_ACTIVE_X_REG] & 0xffff;
+        UINT32 last_x = (m_drm0_regs[DRM_ACTIVE_X_REG] >> 16) & 0xffff;
 
-        UINT32 first_y = state->m_drm0_regs[DRM_ACTIVE_Y_REG] & 0xfff;
-        UINT32 last_y = (state->m_drm0_regs[DRM_ACTIVE_Y_REG] >> 16) & 0xfff;*/
+        UINT32 first_y = m_drm0_regs[DRM_ACTIVE_Y_REG] & 0xfff;
+        UINT32 last_y = (m_drm0_regs[DRM_ACTIVE_Y_REG] >> 16) & 0xfff;*/
 
 		for (j=ydisp_start; j <= ydisp_last; j++)
 		{
@@ -932,7 +931,7 @@ static SCREEN_UPDATE_RGB32( cxhumax )
 				if ((i <= (xdisp_start + ximg_width)) && (j <= (ydisp_start + yimg_height))) {
 					bmp[i] = palette[vbuf[i+((j-ydisp_start)*ximg_width)]];
 				} else {
-					bmp[i] = ycc_to_rgb(state->m_drm1_regs[DRM_BCKGND_REG]);
+					bmp[i] = ycc_to_rgb(m_drm1_regs[DRM_BCKGND_REG]);
 				}
 			}
 		}
@@ -1076,7 +1075,7 @@ static MACHINE_CONFIG_START( cxhumax, cxhumax_state )
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MCFG_SCREEN_SIZE(1920, 1080)
     MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 1080-1)
-    MCFG_SCREEN_UPDATE_STATIC(cxhumax)
+	MCFG_SCREEN_UPDATE_DRIVER(cxhumax_state, screen_update_cxhumax)
 
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)

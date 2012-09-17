@@ -46,6 +46,7 @@ public:
 	DECLARE_WRITE16_MEMBER(main_sound_latch_w);
 	DECLARE_WRITE8_MEMBER(bingoc_play_w);
 	virtual void video_start();
+	UINT32 screen_update_bingoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -56,7 +57,7 @@ void bingoc_state::video_start()
 
 }
 
-static SCREEN_UPDATE_IND16(bingoc)
+UINT32 bingoc_state::screen_update_bingoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -160,7 +161,7 @@ static MACHINE_CONFIG_START( bingoc, bingoc_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(bingoc)
+	MCFG_SCREEN_UPDATE_DRIVER(bingoc_state, screen_update_bingoc)
 
 	MCFG_PALETTE_LENGTH(0x100)
 

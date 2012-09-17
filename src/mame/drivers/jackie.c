@@ -110,6 +110,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_jackie_reel3_tile_info);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_jackie(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -197,9 +198,8 @@ void jackie_state::video_start()
 }
 
 
-static SCREEN_UPDATE_IND16(jackie)
+UINT32 jackie_state::screen_update_jackie(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	jackie_state *state = screen.machine().driver_data<jackie_state>();
 	int i,j;
 	int startclipmin = 0;
 	const rectangle &visarea = screen.visible_area();
@@ -208,30 +208,30 @@ static SCREEN_UPDATE_IND16(jackie)
 
 	for (i=0;i < 0x40;i++)
 	{
-		state->m_reel1_tilemap->set_scrolly(i, state->m_bg_scroll[i+0x000]);
-		state->m_reel2_tilemap->set_scrolly(i, state->m_bg_scroll[i+0x040]);
-		state->m_reel3_tilemap->set_scrolly(i, state->m_bg_scroll[i+0x080]);
+		m_reel1_tilemap->set_scrolly(i, m_bg_scroll[i+0x000]);
+		m_reel2_tilemap->set_scrolly(i, m_bg_scroll[i+0x040]);
+		m_reel3_tilemap->set_scrolly(i, m_bg_scroll[i+0x080]);
 	}
 
 	for (j=0; j < 0x100-1; j++)
 	{
 		rectangle clip;
-		int rowenable = state->m_bg_scroll2[j];
+		int rowenable = m_bg_scroll2[j];
 
 		/* draw top of screen */
 		clip.set(visarea.min_x, visarea.max_x, startclipmin, startclipmin+1);
 
 		if (rowenable==0)
 		{
-			state->m_reel1_tilemap->draw(bitmap, clip, 0,0);
+			m_reel1_tilemap->draw(bitmap, clip, 0,0);
 		}
 		else if (rowenable==1)
 		{
-			state->m_reel2_tilemap->draw(bitmap, clip, 0,0);
+			m_reel2_tilemap->draw(bitmap, clip, 0,0);
 		}
 		else if (rowenable==2)
 		{
-			state->m_reel3_tilemap->draw(bitmap, clip, 0,0);
+			m_reel3_tilemap->draw(bitmap, clip, 0,0);
 		}
 		else if (rowenable==3)
 		{
@@ -240,7 +240,7 @@ static SCREEN_UPDATE_IND16(jackie)
 		startclipmin+=1;
 	}
 
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -586,7 +586,7 @@ static MACHINE_CONFIG_START( jackie, jackie_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(jackie)
+	MCFG_SCREEN_UPDATE_DRIVER(jackie_state, screen_update_jackie)
 
 	MCFG_GFXDECODE(jackie)
 	MCFG_PALETTE_LENGTH(2048)

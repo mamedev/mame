@@ -101,6 +101,7 @@ public:
 	DECLARE_DRIVER_INIT(ti99_2_32);
 	virtual void machine_reset();
 	virtual void palette_init();
+	UINT32 screen_update_ti99_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -157,10 +158,9 @@ void ti99_2_state::palette_init()
 }
 
 
-static SCREEN_UPDATE_IND16(ti99_2)
+UINT32 ti99_2_state::screen_update_ti99_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ti99_2_state *state = screen.machine().driver_data<ti99_2_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int i, sx, sy;
 
 
@@ -390,7 +390,7 @@ static MACHINE_CONFIG_START( ti99_2, ti99_2_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(256, 192)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
-	MCFG_SCREEN_UPDATE_STATIC(ti99_2)
+	MCFG_SCREEN_UPDATE_DRIVER(ti99_2_state, screen_update_ti99_2)
 
 	MCFG_GFXDECODE(ti99_2)
 	MCFG_PALETTE_LENGTH(2)

@@ -120,6 +120,11 @@ public:
 	DECLARE_VIDEO_START(mirderby);
 	DECLARE_PALETTE_INIT(mirderby);
 	DECLARE_VIDEO_START(lemnangl);
+	UINT32 screen_update_mrokumei(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_reikaids(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_pteacher(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_mirderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_homedata(screen_device &screen, bool state);
 };
 
 
@@ -137,8 +142,8 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( mrokumei );
-SCREEN_UPDATE_IND16( reikaids );
-SCREEN_UPDATE_IND16( pteacher );
-SCREEN_UPDATE_IND16( mirderby );
-SCREEN_VBLANK( homedata );
+
+
+
+
+

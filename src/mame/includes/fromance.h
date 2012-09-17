@@ -84,6 +84,8 @@ public:
 	DECLARE_MACHINE_RESET(pipedrm);
 	DECLARE_VIDEO_START(pipedrm);
 	DECLARE_VIDEO_START(hatris);
+	UINT32 screen_update_fromance(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_pipedrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -93,8 +95,8 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( fromance );
-SCREEN_UPDATE_IND16( pipedrm );
+
+
 
 
 

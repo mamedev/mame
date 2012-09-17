@@ -870,13 +870,12 @@ void asuka_state::machine_reset()
 	memset(m_cval, 0, 26);
 }
 
-static SCREEN_VBLANK( asuka )
+void asuka_state::screen_eof_asuka(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		asuka_state *state = screen.machine().driver_data<asuka_state>();
-		pc090oj_eof_callback(state->m_pc090oj);
+		pc090oj_eof_callback(m_pc090oj);
 	}
 }
 
@@ -911,8 +910,8 @@ static MACHINE_CONFIG_START( bonzeadv, asuka_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 3*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(bonzeadv)
-	MCFG_SCREEN_VBLANK_STATIC(asuka)
+	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_bonzeadv)
+	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
 
 	MCFG_GFXDECODE(asuka)
 	MCFG_PALETTE_LENGTH(4096)
@@ -954,8 +953,8 @@ static MACHINE_CONFIG_START( asuka, asuka_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(asuka)
-	MCFG_SCREEN_VBLANK_STATIC(asuka)
+	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
+	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
 
 	MCFG_GFXDECODE(asuka)
 	MCFG_PALETTE_LENGTH(4096)
@@ -1004,8 +1003,8 @@ static MACHINE_CONFIG_START( cadash, asuka_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(bonzeadv)
-	MCFG_SCREEN_VBLANK_STATIC(asuka)
+	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_bonzeadv)
+	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
 
 	MCFG_GFXDECODE(asuka)
 	MCFG_PALETTE_LENGTH(4096)
@@ -1046,8 +1045,8 @@ static MACHINE_CONFIG_START( mofflott, asuka_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(asuka)
-	MCFG_SCREEN_VBLANK_STATIC(asuka)
+	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
+	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
 
 	MCFG_GFXDECODE(asuka)
 	MCFG_PALETTE_LENGTH(4096)	/* only Mofflott uses full palette space */
@@ -1092,8 +1091,8 @@ static MACHINE_CONFIG_START( galmedes, asuka_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(asuka)
-	MCFG_SCREEN_VBLANK_STATIC(asuka)
+	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
+	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
 
 	MCFG_GFXDECODE(asuka)
 	MCFG_PALETTE_LENGTH(4096)	/* only Mofflott uses full palette space */
@@ -1134,8 +1133,8 @@ static MACHINE_CONFIG_START( eto, asuka_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(asuka)
-	MCFG_SCREEN_VBLANK_STATIC(asuka)
+	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
+	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
 
 	MCFG_GFXDECODE(asuka)
 	MCFG_PALETTE_LENGTH(4096)

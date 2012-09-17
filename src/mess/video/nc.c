@@ -53,21 +53,20 @@ void nc200_video_set_backlight(running_machine &machine, int state)
   Do NOT call osd_update_display() from this function,
   it will be called by the main emulation engine.
 ***************************************************************************/
-SCREEN_UPDATE_IND16( nc )
+UINT32 nc_state::screen_update_nc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	nc_state *state = screen.machine().driver_data<nc_state>();
 	int y;
 	int b;
 	int x;
 	int height, width;
 	int pens[2];
 
-    if (state->m_type==NC_TYPE_200)
+    if (m_type==NC_TYPE_200)
     {
         height = NC200_SCREEN_HEIGHT;
         width = NC200_SCREEN_WIDTH;
 
-		if (state->m_nc200_backlight)
+		if (m_nc200_backlight)
 		{
 			pens[0] = 2;
 			pens[1] = 3;
@@ -91,7 +90,7 @@ SCREEN_UPDATE_IND16( nc )
     {
 		int by;
 		/* 64 bytes per line */
-		char *line_ptr = ((char*)screen.machine().device<ram_device>(RAM_TAG)->pointer()) + state->m_display_memory_start + (y<<6);
+		char *line_ptr = ((char*)screen.machine().device<ram_device>(RAM_TAG)->pointer()) + m_display_memory_start + (y<<6);
 
 		x = 0;
 		for (by=0; by<width>>3; by++)

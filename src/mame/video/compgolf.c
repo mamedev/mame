@@ -114,17 +114,16 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( compgolf )
+UINT32 compgolf_state::screen_update_compgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	compgolf_state *state = screen.machine().driver_data<compgolf_state>();
-	int scrollx = state->m_scrollx_hi + state->m_scrollx_lo;
-	int scrolly = state->m_scrolly_hi + state->m_scrolly_lo;
+	int scrollx = m_scrollx_hi + m_scrollx_lo;
+	int scrolly = m_scrolly_hi + m_scrolly_lo;
 
-	state->m_bg_tilemap->set_scrollx(0, scrollx);
-	state->m_bg_tilemap->set_scrolly(0, scrolly);
+	m_bg_tilemap->set_scrollx(0, scrollx);
+	m_bg_tilemap->set_scrolly(0, scrolly);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_text_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_text_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

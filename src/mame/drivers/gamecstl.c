@@ -119,6 +119,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_gamecstl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -162,12 +163,11 @@ static void draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_eleme
 	}
 }
 
-static SCREEN_UPDATE_IND16(gamecstl)
+UINT32 gamecstl_state::screen_update_gamecstl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gamecstl_state *state = screen.machine().driver_data<gamecstl_state>();
 	int i, j;
 	gfx_element *gfx = screen.machine().gfx[0];
-	UINT32 *cga = state->m_cga_ram;
+	UINT32 *cga = m_cga_ram;
 	int index = 0;
 
 	bitmap.fill(0, cliprect);
@@ -726,7 +726,7 @@ static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 199)
-	MCFG_SCREEN_UPDATE_STATIC(gamecstl)
+	MCFG_SCREEN_UPDATE_DRIVER(gamecstl_state, screen_update_gamecstl)
 
 	MCFG_GFXDECODE(CGA)
 	MCFG_PALETTE_LENGTH(16)

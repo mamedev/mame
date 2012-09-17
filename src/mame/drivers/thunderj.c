@@ -305,7 +305,7 @@ static MACHINE_CONFIG_START( thunderj, thunderj_state )
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a VAD chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_STATIC(thunderj)
+	MCFG_SCREEN_UPDATE_DRIVER(thunderj_state, screen_update_thunderj)
 
 	MCFG_VIDEO_START_OVERRIDE(thunderj_state,thunderj)
 

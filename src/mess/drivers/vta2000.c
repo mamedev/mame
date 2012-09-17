@@ -31,6 +31,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 static ADDRESS_MAP_START(vta2000_mem, AS_PROGRAM, 8, vta2000_state)
@@ -59,10 +60,9 @@ void vta2000_state::video_start()
 	m_p_videoram = memregion("maincpu")->base()+0x8000;
 }
 
-static SCREEN_UPDATE_IND16( vta2000 )
+UINT32 vta2000_state::screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 /* Cursor is missing. */
 {
-	vta2000_state *state = screen.machine().driver_data<vta2000_state>();
 	static UINT8 framecnt=0;
 	UINT8 y,ra,gfx,attr,fg,bg;
 	UINT16 sy=0,ma=0,x,xx=0,chr;
@@ -78,13 +78,13 @@ static SCREEN_UPDATE_IND16( vta2000 )
 			xx = ma << 1;
 			for (x = ma; x < ma + 80; x++)
 			{
-				chr = state->m_p_videoram[xx++];
-				attr = state->m_p_videoram[xx++];
+				chr = m_p_videoram[xx++];
+				attr = m_p_videoram[xx++];
 
 				if ((chr & 0x60)==0x60)
 					chr+=256;
 
-				gfx = state->m_p_chargen[(chr<<4) | ra ];
+				gfx = m_p_chargen[(chr<<4) | ra ];
 				bg = 0;
 
 				/* Process attributes */
@@ -163,7 +163,7 @@ static MACHINE_CONFIG_START( vta2000, vta2000_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(80*8, 25*12)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*12-1)
-	MCFG_SCREEN_UPDATE_STATIC(vta2000)
+	MCFG_SCREEN_UPDATE_DRIVER(vta2000_state, screen_update_vta2000)
 	MCFG_PALETTE_LENGTH(3)
 	MCFG_GFXDECODE(vta2000)
 MACHINE_CONFIG_END

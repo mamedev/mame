@@ -63,6 +63,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_quizshow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -106,10 +107,9 @@ void quizshow_state::video_start()
 	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(quizshow_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 16, 32, 16);
 }
 
-SCREEN_UPDATE_IND16( quizshow )
+UINT32 quizshow_state::screen_update_quizshow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	quizshow_state *state = screen.machine().driver_data<quizshow_state>();
-	state->m_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	return 0;
 }
 
@@ -382,7 +382,7 @@ static MACHINE_CONFIG_START( quizshow, quizshow_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
-	MCFG_SCREEN_UPDATE_STATIC(quizshow)
+	MCFG_SCREEN_UPDATE_DRIVER(quizshow_state, screen_update_quizshow)
 
 	MCFG_GFXDECODE(quizshow)
 	MCFG_PALETTE_LENGTH(8*2)

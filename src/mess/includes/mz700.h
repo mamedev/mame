@@ -79,6 +79,8 @@ public:
 	virtual void machine_start();
 	virtual void palette_init();
 	DECLARE_VIDEO_START(mz800);
+	UINT32 screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_mz800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -101,9 +103,9 @@ extern const z80pio_interface mz800_z80pio_config;
 /*----------- defined in video/mz700.c -----------*/
 
 
-SCREEN_UPDATE_IND16( mz700 );
 
-SCREEN_UPDATE_IND16( mz800 );
+
+
 
 
 #endif /* MZ700_H_ */

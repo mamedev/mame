@@ -232,7 +232,7 @@ static MACHINE_CONFIG_START( tutankhm, tutankhm_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)	/* not sure about the visible area */
-	MCFG_SCREEN_UPDATE_STATIC(tutankhm)
+	MCFG_SCREEN_UPDATE_DRIVER(tutankhm_state, screen_update_tutankhm)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(timeplt_sound)

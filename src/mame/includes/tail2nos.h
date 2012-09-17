@@ -38,6 +38,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_tail2nos(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -47,4 +48,4 @@ extern void tail2nos_zoom_callback(running_machine &machine, int *code,int *colo
 
 
 
-SCREEN_UPDATE_IND16( tail2nos );
+

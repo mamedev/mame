@@ -22,11 +22,12 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	virtual void video_start();
+	UINT32 screen_update_hexion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/hexion.c -----------*/
 
 
-SCREEN_UPDATE_IND16( hexion );
+
 

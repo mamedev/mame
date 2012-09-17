@@ -82,7 +82,7 @@ WRITE16_MEMBER(snowbros_state::snowbros_flipscreen_w)
 }
 
 
-static SCREEN_UPDATE_IND16( snowbros )
+UINT32 snowbros_state::screen_update_snowbros(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	device_t *pandora = screen.machine().device("pandora");
 
@@ -93,10 +93,10 @@ static SCREEN_UPDATE_IND16( snowbros )
 }
 
 
-static SCREEN_VBLANK( snowbros )
+void snowbros_state::screen_eof_snowbros(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
 		device_t *pandora = screen.machine().device("pandora");
 		pandora_eof(pandora);
@@ -1556,8 +1556,8 @@ static MACHINE_CONFIG_START( snowbros, snowbros_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(snowbros)
-	MCFG_SCREEN_VBLANK_STATIC(snowbros)
+	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_snowbros)
+	MCFG_SCREEN_VBLANK_DRIVER(snowbros_state, screen_eof_snowbros)
 
 	MCFG_GFXDECODE(snowbros)
 	MCFG_PALETTE_LENGTH(256)
@@ -1585,7 +1585,7 @@ static MACHINE_CONFIG_DERIVED( wintbob, snowbros )
 	/* video hardware */
 	MCFG_GFXDECODE(wb)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(wintbob)
+	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_wintbob)
 	MCFG_SCREEN_VBLANK_NONE()
 MACHINE_CONFIG_END
 
@@ -1666,7 +1666,7 @@ static MACHINE_CONFIG_START( honeydol, snowbros_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(honeydol)
+	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_honeydol)
 
 	MCFG_GFXDECODE(honeydol)
 	MCFG_PALETTE_LENGTH(0x800/2)
@@ -1703,7 +1703,7 @@ static MACHINE_CONFIG_START( twinadv, snowbros_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(twinadv)
+	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_twinadv)
 
 	MCFG_GFXDECODE(twinadv)
 	MCFG_PALETTE_LENGTH(0x100)
@@ -1775,7 +1775,7 @@ static MACHINE_CONFIG_START( snowbro3, snowbros_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(snowbro3)
+	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_snowbro3)
 
 	MCFG_GFXDECODE(sb3)
 	MCFG_PALETTE_LENGTH(512)

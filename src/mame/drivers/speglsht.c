@@ -133,6 +133,7 @@ public:
 	DECLARE_DRIVER_INIT(speglsht);
 	DECLARE_MACHINE_RESET(speglsht);
 	DECLARE_VIDEO_START(speglsht);
+	UINT32 screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -348,30 +349,29 @@ VIDEO_START_MEMBER(speglsht_state,speglsht)
 		bitmap.pix32(y, x) = (b) | ((g)<<8) | ((r)<<16); \
 }
 
-static SCREEN_UPDATE_RGB32(speglsht)
+UINT32 speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	speglsht_state *state = screen.machine().driver_data<speglsht_state>();
 	int x,y,dy;
 
-	dy=(state->m_videoreg&0x20)?(256*512):0; //visible frame
+	dy=(m_videoreg&0x20)?(256*512):0; //visible frame
 
 	for(y=0;y<256;y++)
 	{
 		for(x=0;x<512;x++)
 		{
 			int tmp=dy+y*512+x;
-			PLOT_PIXEL_RGB(x-67,y-5,(state->m_framebuffer[tmp]>>0)&0xff,(state->m_framebuffer[tmp]>>8)&0xff,(state->m_framebuffer[tmp]>>16)&0xff);
+			PLOT_PIXEL_RGB(x-67,y-5,(m_framebuffer[tmp]>>0)&0xff,(m_framebuffer[tmp]>>8)&0xff,(m_framebuffer[tmp]>>16)&0xff);
 		}
 	}
 
 	//draw st0016 gfx to temporary bitmap (indexed 16)
-	state->m_bitmap->fill(0);
-	st0016_draw_screen(screen, *state->m_bitmap, cliprect);
+	m_bitmap->fill(0);
+	st0016_draw_screen(screen, *m_bitmap, cliprect);
 
 	//copy temporary bitmap to rgb 32 bit bitmap
 	for(y=cliprect.min_y; y<cliprect.max_y;y++)
 	{
-		UINT16 *srcline = &state->m_bitmap->pix16(y);
+		UINT16 *srcline = &m_bitmap->pix16(y);
 		for(x=cliprect.min_x; x<cliprect.max_x;x++)
 		{
 			if(srcline[x])
@@ -407,7 +407,7 @@ static MACHINE_CONFIG_START( speglsht, speglsht_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 8, 239-8)
-	MCFG_SCREEN_UPDATE_STATIC(speglsht)
+	MCFG_SCREEN_UPDATE_DRIVER(speglsht_state, screen_update_speglsht)
 
 	MCFG_GFXDECODE(speglsht)
 	MCFG_PALETTE_LENGTH(16*16*4+1)

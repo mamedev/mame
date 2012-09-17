@@ -66,17 +66,16 @@ void superpet_vh_init (running_machine &machine)
 }
 
 //  commodore pet discrete video circuit
-SCREEN_UPDATE_IND16( pet )
+UINT32 pet_state::screen_update_pet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pet_state *state = screen.machine().driver_data<pet_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int x, y, i;
 
 	for (y=0, i=0; y<25;y++)
 	{
 		for (x=0;x<40;x++, i++)
 		{
-			drawgfx_opaque(bitmap, cliprect,screen.machine().gfx[state->m_font],
+			drawgfx_opaque(bitmap, cliprect,screen.machine().gfx[m_font],
 					videoram[i], 0, 0, 0, 8*x,8*y);
 		}
 	}

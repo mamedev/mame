@@ -89,6 +89,11 @@ public:
 	virtual void video_start();
 	DECLARE_VIDEO_START(slikshot);
 	DECLARE_MACHINE_START(sstrike);
+	UINT32 screen_update_itech8_2layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_itech8_grmatch(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_slikshot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_itech8_2page(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_itech8_2page_large(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -107,7 +112,7 @@ DECLARE_READ8_HANDLER( slikshot_z80_control_r );
 DECLARE_WRITE8_HANDLER( slikshot_z80_control_w );
 
 
-SCREEN_UPDATE_RGB32( slikshot );
+
 
 
 /*----------- defined in video/itech8.c -----------*/
@@ -120,7 +125,7 @@ SCREEN_UPDATE_RGB32( slikshot );
 
 TIMER_DEVICE_CALLBACK( grmatch_palette_update );
 
-SCREEN_UPDATE_RGB32( itech8_2layer );
-SCREEN_UPDATE_RGB32( itech8_grmatch );
-SCREEN_UPDATE_RGB32( itech8_2page );
-SCREEN_UPDATE_RGB32( itech8_2page_large );
+
+
+
+

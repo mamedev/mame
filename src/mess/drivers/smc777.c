@@ -86,6 +86,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -97,19 +98,18 @@ void smc777_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( smc777 )
+UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	smc777_state *state = screen.machine().driver_data<smc777_state>();
 	int x,y,yi;
 	UINT16 count;
 	UINT8 *vram = screen.machine().root_device().memregion("vram")->base();
 	UINT8 *attr = screen.machine().root_device().memregion("attr")->base();
-	UINT8 *gram = state->memregion("fbuf")->base();
+	UINT8 *gram = memregion("fbuf")->base();
 	int x_width;
 
-	bitmap.fill(screen.machine().pens[state->m_backdrop_pen], cliprect);
+	bitmap.fill(screen.machine().pens[m_backdrop_pen], cliprect);
 
-	x_width = (state->m_display_reg & 0x80) ? 2 : 4;
+	x_width = (m_display_reg & 0x80) ? 2 : 4;
 
 	count = 0x0000;
 
@@ -153,7 +153,7 @@ static SCREEN_UPDATE_IND16( smc777 )
 
 	count = 0x0000;
 
-	x_width = (state->m_display_reg & 0x80) ? 40 : 80;
+	x_width = (m_display_reg & 0x80) ? 40 : 80;
 
 	for(y=0;y<25;y++)
 	{
@@ -191,7 +191,7 @@ static SCREEN_UPDATE_IND16( smc777 )
 					UINT8 *gfx_data = screen.machine().root_device().memregion("pcg")->base();
 					int pen;
 
-					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? (color+state->m_pal_mode) : bk_pen;
+					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? (color+m_pal_mode) : bk_pen;
 
 					if(pen != -1)
 						bitmap.pix16(y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = screen.machine().pens[pen];
@@ -199,12 +199,12 @@ static SCREEN_UPDATE_IND16( smc777 )
 			}
 
 			// draw cursor
-			if(state->m_cursor_addr == count)
+			if(m_cursor_addr == count)
 			{
 				int xc,yc,cursor_on;
 
 				cursor_on = 0;
-				switch(state->m_cursor_raster & 0x60)
+				switch(m_cursor_raster & 0x60)
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
@@ -214,7 +214,7 @@ static SCREEN_UPDATE_IND16( smc777 )
 
 				if(cursor_on)
 				{
-					for(yc=0;yc<(8-(state->m_cursor_raster & 7));yc++)
+					for(yc=0;yc<(8-(m_cursor_raster & 7));yc++)
 					{
 						for(xc=0;xc<8;xc++)
 						{
@@ -224,7 +224,7 @@ static SCREEN_UPDATE_IND16( smc777 )
 				}
 			}
 
-			(state->m_display_reg & 0x80) ? count+=2 : count++;
+			(m_display_reg & 0x80) ? count+=2 : count++;
 		}
 	}
 
@@ -1088,7 +1088,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MCFG_SCREEN_SIZE(0x400, 400)
     MCFG_SCREEN_VISIBLE_AREA(0, 660-1, 0, 220-1) //normal 640 x 200 + 20 pixels for border color
-    MCFG_SCREEN_UPDATE_STATIC(smc777)
+	MCFG_SCREEN_UPDATE_DRIVER(smc777_state, screen_update_smc777)
 
     MCFG_PALETTE_LENGTH(0x10+8) //16 palette entries + 8 special colors
 	MCFG_GFXDECODE(smc777)

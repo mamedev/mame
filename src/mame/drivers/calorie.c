@@ -112,6 +112,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_calorie(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -150,19 +151,18 @@ void calorie_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-static SCREEN_UPDATE_IND16( calorie )
+UINT32 calorie_state::screen_update_calorie(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	calorie_state *state = screen.machine().driver_data<calorie_state>();
 	int x;
 
-	if (state->m_bg_bank & 0x10)
+	if (m_bg_bank & 0x10)
 	{
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 	{
-		state->m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	}
 
 
@@ -170,16 +170,16 @@ static SCREEN_UPDATE_IND16( calorie )
 	{
 		int xpos, ypos, tileno, color, flipx, flipy;
 
-		tileno = state->m_sprites[x + 0];
-		color = state->m_sprites[x + 1] & 0x0f;
-		flipx = state->m_sprites[x + 1] & 0x40;
+		tileno = m_sprites[x + 0];
+		color = m_sprites[x + 1] & 0x0f;
+		flipx = m_sprites[x + 1] & 0x40;
 		flipy = 0;
-		ypos = 0xff - state->m_sprites[x + 2];
-		xpos = state->m_sprites[x + 3];
+		ypos = 0xff - m_sprites[x + 2];
+		xpos = m_sprites[x + 3];
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
-			if (state->m_sprites[x + 1] & 0x10)
+			if (m_sprites[x + 1] & 0x10)
 				ypos = 0xff - ypos + 32;
 			else
 				ypos = 0xff - ypos + 16;
@@ -189,7 +189,7 @@ static SCREEN_UPDATE_IND16( calorie )
 			flipy = !flipy;
 		}
 
-		if (state->m_sprites[x + 1] & 0x10)
+		if (m_sprites[x + 1] & 0x10)
 		{
 			 /* 32x32 sprites */
 			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[3], tileno | 0x40, color, flipx, flipy, xpos, ypos - 31, 0);
@@ -456,7 +456,7 @@ static MACHINE_CONFIG_START( calorie, calorie_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(calorie)
+	MCFG_SCREEN_UPDATE_DRIVER(calorie_state, screen_update_calorie)
 
 	MCFG_GFXDECODE(calorie)
 	MCFG_PALETTE_LENGTH(0x100)

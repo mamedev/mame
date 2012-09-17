@@ -381,6 +381,7 @@ public:
 	DECLARE_DRIVER_INIT(suprmatk);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_missile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -666,10 +667,9 @@ static UINT8 read_vram(address_space &space, offs_t address)
  *
  *************************************/
 
-static SCREEN_UPDATE_IND16( missile )
+UINT32 missile_state::screen_update_missile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	missile_state *state = screen.machine().driver_data<missile_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int x, y;
 
 	/* draw the bitmap to the screen, looping over Y */
@@ -677,7 +677,7 @@ static SCREEN_UPDATE_IND16( missile )
 	{
 		UINT16 *dst = &bitmap.pix16(y);
 
-		int effy = state->m_flipscreen ? ((256+24 - y) & 0xff) : y;
+		int effy = m_flipscreen ? ((256+24 - y) & 0xff) : y;
 		UINT8 *src = &videoram[effy * 64];
 		UINT8 *src3 = NULL;
 
@@ -1044,7 +1044,7 @@ static MACHINE_CONFIG_START( missile, missile_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_STATIC(missile)
+	MCFG_SCREEN_UPDATE_DRIVER(missile_state, screen_update_missile)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

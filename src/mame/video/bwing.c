@@ -282,57 +282,56 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bmp, const rec
 }
 
 
-SCREEN_UPDATE_IND16( bwing )
+UINT32 bwing_state::screen_update_bwing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bwing_state *state = screen.machine().driver_data<bwing_state>();
 	unsigned x, y, shiftx;
 
-	if (state->m_mapmask & 0x20)
+	if (m_mapmask & 0x20)
 	{
-		state->m_mapflip = TILEMAP_FLIPX;
+		m_mapflip = TILEMAP_FLIPX;
 		shiftx = -8;
 	}
 	else
 	{
-		state->m_mapflip = TILEMAP_FLIPY;
+		m_mapflip = TILEMAP_FLIPY;
 		shiftx = 8;
 	}
 
 	// draw background
-	if (!(state->m_mapmask & 1))
+	if (!(m_mapmask & 1))
 	{
-		state->m_bgmap->set_flip(state->m_mapflip);
-		x = ((state->m_sreg[1]<<2 & 0x300) + state->m_sreg[2] + shiftx) & 0x3ff;
-		state->m_bgmap->set_scrollx(0, x);
-		y = (state->m_sreg[1]<<4 & 0x300) + state->m_sreg[3];
-		state->m_bgmap->set_scrolly(0, y);
-		state->m_bgmap->draw(bitmap, cliprect, 0, 0);
+		m_bgmap->set_flip(m_mapflip);
+		x = ((m_sreg[1]<<2 & 0x300) + m_sreg[2] + shiftx) & 0x3ff;
+		m_bgmap->set_scrollx(0, x);
+		y = (m_sreg[1]<<4 & 0x300) + m_sreg[3];
+		m_bgmap->set_scrolly(0, y);
+		m_bgmap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	// draw low priority sprites
-	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram, 0);
+	draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram, 0);
 
 	// draw foreground
-	if (!(state->m_mapmask & 2))
+	if (!(m_mapmask & 2))
 	{
-		state->m_fgmap->set_flip(state->m_mapflip);
-		x = ((state->m_sreg[1] << 6 & 0x300) + state->m_sreg[4] + shiftx) & 0x3ff;
-		state->m_fgmap->set_scrollx(0, x);
-		y = (state->m_sreg[1] << 8 & 0x300) + state->m_sreg[5];
-		state->m_fgmap->set_scrolly(0, y);
-		state->m_fgmap->draw(bitmap, cliprect, 0, 0);
+		m_fgmap->set_flip(m_mapflip);
+		x = ((m_sreg[1] << 6 & 0x300) + m_sreg[4] + shiftx) & 0x3ff;
+		m_fgmap->set_scrollx(0, x);
+		y = (m_sreg[1] << 8 & 0x300) + m_sreg[5];
+		m_fgmap->set_scrolly(0, y);
+		m_fgmap->draw(bitmap, cliprect, 0, 0);
 	}
 
 	// draw high priority sprites
-	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram, 1);
+	draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram, 1);
 
 	// draw text layer
-//  if (state->m_mapmask & 4)
+//  if (m_mapmask & 4)
 	{
-		state->m_charmap->set_flip(state->m_mapflip);
-		state->m_charmap->draw(bitmap, cliprect, 0, 0);
+		m_charmap->set_flip(m_mapflip);
+		m_charmap->draw(bitmap, cliprect, 0, 0);
 	}
 	return 0;
 }

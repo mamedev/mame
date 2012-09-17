@@ -36,10 +36,9 @@ void fgoal_state::video_start()
 }
 
 
-SCREEN_UPDATE_IND16( fgoal )
+UINT32 fgoal_state::screen_update_fgoal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	fgoal_state *state = screen.machine().driver_data<fgoal_state>();
-	const UINT8* VRAM = state->m_video_ram;
+	const UINT8* VRAM = m_video_ram;
 
 	int x;
 	int y;
@@ -47,16 +46,16 @@ SCREEN_UPDATE_IND16( fgoal )
 
 	/* draw color overlay foreground and background */
 
-	if (state->m_fgoal_player == 1 && (screen.machine().root_device().ioport("IN1")->read() & 0x40))
+	if (m_fgoal_player == 1 && (screen.machine().root_device().ioport("IN1")->read() & 0x40))
 	{
-		drawgfxzoom_opaque(state->m_fgbitmap, cliprect, screen.machine().gfx[0],
-			0, (state->m_fgoal_player << 2) | state->m_current_color,
+		drawgfxzoom_opaque(m_fgbitmap, cliprect, screen.machine().gfx[0],
+			0, (m_fgoal_player << 2) | m_current_color,
 			1, 1,
 			0, 16,
 			0x40000,
 			0x40000);
 
-		drawgfxzoom_opaque(state->m_bgbitmap, cliprect, screen.machine().gfx[1],
+		drawgfxzoom_opaque(m_bgbitmap, cliprect, screen.machine().gfx[1],
 			0, 0,
 			1, 1,
 			0, 16,
@@ -65,14 +64,14 @@ SCREEN_UPDATE_IND16( fgoal )
 	}
 	else
 	{
-		drawgfxzoom_opaque(state->m_fgbitmap, cliprect, screen.machine().gfx[0],
-			0, (state->m_fgoal_player << 2) | state->m_current_color,
+		drawgfxzoom_opaque(m_fgbitmap, cliprect, screen.machine().gfx[0],
+			0, (m_fgoal_player << 2) | m_current_color,
 			0, 0,
 			0, 0,
 			0x40000,
 			0x40000);
 
-		drawgfxzoom_opaque(state->m_bgbitmap, cliprect, screen.machine().gfx[1],
+		drawgfxzoom_opaque(m_bgbitmap, cliprect, screen.machine().gfx[1],
 			0, 0,
 			0, 0,
 			0, 0,
@@ -82,13 +81,13 @@ SCREEN_UPDATE_IND16( fgoal )
 
 	/* the ball has a fixed color */
 
-	for (y = state->m_ypos; y < state->m_ypos + 8; y++)
+	for (y = m_ypos; y < m_ypos + 8; y++)
 	{
-		for (x = state->m_xpos; x < state->m_xpos + 8; x++)
+		for (x = m_xpos; x < m_xpos + 8; x++)
 		{
 			if (y < 256 && x < 256)
 			{
-				state->m_fgbitmap.pix16(y, x) = 128 + 16;
+				m_fgbitmap.pix16(y, x) = 128 + 16;
 			}
 		}
 	}
@@ -99,8 +98,8 @@ SCREEN_UPDATE_IND16( fgoal )
 	{
 		UINT16* p = &bitmap.pix16(y);
 
-		const UINT16* FG = &state->m_fgbitmap.pix16(y);
-		const UINT16* BG = &state->m_bgbitmap.pix16(y);
+		const UINT16* FG = &m_fgbitmap.pix16(y);
+		const UINT16* BG = &m_bgbitmap.pix16(y);
 
 		for (x = 0; x < 256; x += 8)
 		{

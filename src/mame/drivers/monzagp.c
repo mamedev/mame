@@ -55,6 +55,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port3_w);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_monzagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -69,33 +70,32 @@ void monzagp_state::video_start()
 	m_vram = auto_alloc_array(machine(), UINT8, 0x10000);
 }
 
-static SCREEN_UPDATE_IND16(monzagp)
+UINT32 monzagp_state::screen_update_monzagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	monzagp_state *state = screen.machine().driver_data<monzagp_state>();
 	int x,y;
 
 	if(screen.machine().input().code_pressed_once(KEYCODE_Z))
-		state->m_bank--;
+		m_bank--;
 
 	if(screen.machine().input().code_pressed_once(KEYCODE_X))
-		state->m_bank++;
+		m_bank++;
 
 	if(screen.machine().input().code_pressed_once(KEYCODE_Q))
 	{
-		state->m_screenw--;
-		printf("%x\n",state->m_screenw);
+		m_screenw--;
+		printf("%x\n",m_screenw);
 	}
 
 	if(screen.machine().input().code_pressed_once(KEYCODE_W))
 	{
-		state->m_screenw++;
-		printf("%x\n",state->m_screenw);
+		m_screenw++;
+		printf("%x\n",m_screenw);
 	}
 
 	if(screen.machine().input().code_pressed_once(KEYCODE_A))
 	{
 		FILE * p=fopen("vram.bin","wb");
-		fwrite(&state->m_vram[0],1,0x10000,p);
+		fwrite(&m_vram[0],1,0x10000,p);
 		fclose(p);
 	}
 
@@ -104,9 +104,9 @@ static SCREEN_UPDATE_IND16(monzagp)
 	{
 		for(x=0;x<256;x++)
 		{
-			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[state->m_bank&1],
-				state->m_vram[y*state->m_screenw+x],
-				//(state->m_vram[y*state->m_screenw+x]&0x3f)+(state->m_bank>>1)*64,
+			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[m_bank&1],
+				m_vram[y*m_screenw+x],
+				//(m_vram[y*m_screenw+x]&0x3f)+(m_bank>>1)*64,
 				0,
 				0, 0,
 				x*8,y*8,
@@ -267,7 +267,7 @@ static MACHINE_CONFIG_START( monzagp, monzagp_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(monzagp)
+	MCFG_SCREEN_UPDATE_DRIVER(monzagp_state, screen_update_monzagp)
 
 	MCFG_PALETTE_LENGTH(0x200)
 

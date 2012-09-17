@@ -365,14 +365,13 @@ static void draw_fg(running_machine &machine, bitmap_ind16 &bitmap, const rectan
 }
 
 
-SCREEN_UPDATE_IND16( pacland )
+UINT32 pacland_state::screen_update_pacland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pacland_state *state = screen.machine().driver_data<pacland_state>();
 	int row;
 
 	for (row = 5; row < 29; row++)
-		state->m_fg_tilemap->set_scrollx(row, state->flip_screen() ? state->m_scroll0-7 : state->m_scroll0);
-	state->m_bg_tilemap->set_scrollx(0, state->flip_screen() ? state->m_scroll1-4 : state->m_scroll1-3);
+		m_fg_tilemap->set_scrollx(row, flip_screen() ? m_scroll0-7 : m_scroll0);
+	m_bg_tilemap->set_scrollx(0, flip_screen() ? m_scroll1-4 : m_scroll1-3);
 
 	/* draw high priority sprite pixels, setting priority bitmap to non-zero
        wherever there is a high-priority pixel; note that we draw to the bitmap
@@ -381,7 +380,7 @@ SCREEN_UPDATE_IND16( pacland )
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
 	/* draw background */
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw low priority fg tiles */
 	draw_fg(screen.machine(), bitmap, cliprect, 0);

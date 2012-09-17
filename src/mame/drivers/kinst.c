@@ -162,6 +162,7 @@ public:
 	DECLARE_DRIVER_INIT(kinst2);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_kinst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -242,15 +243,14 @@ void kinst_state::machine_reset()
  *
  *************************************/
 
-static SCREEN_UPDATE_IND16( kinst )
+UINT32 kinst_state::screen_update_kinst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	kinst_state *state = screen.machine().driver_data<kinst_state>();
 	int y;
 
 	/* loop over rows and copy to the destination */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT32 *src = &state->m_video_base[640/4 * y];
+		UINT32 *src = &m_video_base[640/4 * y];
 		UINT16 *dest = &bitmap.pix16(y, cliprect.min_x);
 		int x;
 
@@ -688,7 +688,7 @@ static MACHINE_CONFIG_START( kinst, kinst_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(kinst)
+	MCFG_SCREEN_UPDATE_DRIVER(kinst_state, screen_update_kinst)
 
 	MCFG_PALETTE_INIT(BBBBB_GGGGG_RRRRR)
 	MCFG_PALETTE_LENGTH(32768)

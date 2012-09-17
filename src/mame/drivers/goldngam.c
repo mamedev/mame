@@ -248,6 +248,7 @@ public:
 	DECLARE_READ16_MEMBER(unk_r);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -260,14 +261,13 @@ void goldngam_state::video_start()
 
 }
 
-static SCREEN_UPDATE_IND16( goldngam )
+UINT32 goldngam_state::screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	goldngam_state *state = screen.machine().driver_data<goldngam_state>();
 
 	int x, y;
 
 	// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
-	UINT8 *tmp = reinterpret_cast<UINT8 *>(state->m_videoram.target());
+	UINT8 *tmp = reinterpret_cast<UINT8 *>(m_videoram.target());
 	int index = 0;
 
 	for(y = 0; y < 512; ++y)
@@ -568,7 +568,7 @@ static MACHINE_CONFIG_START( swisspkr, goldngam_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 43*8-1, 1*8, 37*8-1)	// 312x288
-	MCFG_SCREEN_UPDATE_STATIC(goldngam)
+	MCFG_SCREEN_UPDATE_DRIVER(goldngam_state, screen_update_goldngam)
 
 	MCFG_GFXDECODE(goldngam)
 

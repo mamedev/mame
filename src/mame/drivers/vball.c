@@ -419,7 +419,7 @@ static MACHINE_CONFIG_START( vball, vball_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 8, 248)	/* based on ddragon driver */
-	MCFG_SCREEN_UPDATE_STATIC(vb)
+	MCFG_SCREEN_UPDATE_DRIVER(vball_state, screen_update_vb)
 
 	MCFG_GFXDECODE(vb)
 	MCFG_PALETTE_LENGTH(256)

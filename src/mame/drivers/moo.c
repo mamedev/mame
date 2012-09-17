@@ -535,7 +535,7 @@ static MACHINE_CONFIG_START( moo, moo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1200))	 // should give IRQ4 sufficient time to update scroll registers
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
-	MCFG_SCREEN_UPDATE_STATIC(moo)
+	MCFG_SCREEN_UPDATE_DRIVER(moo_state, screen_update_moo)
 
 	MCFG_PALETTE_LENGTH(2048)
 
@@ -578,7 +578,7 @@ static MACHINE_CONFIG_START( moobl, moo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1200)) // should give IRQ4 sufficient time to update scroll registers
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
-	MCFG_SCREEN_UPDATE_STATIC(moo)
+	MCFG_SCREEN_UPDATE_DRIVER(moo_state, screen_update_moo)
 
 	MCFG_PALETTE_LENGTH(2048)
 

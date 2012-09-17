@@ -59,6 +59,8 @@ protected:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+public:	
+	UINT32 screen_update_destiny(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -72,10 +74,9 @@ void destiny_state::video_start()
 	m_led_array[20] = 0;
 }
 
-static SCREEN_UPDATE_IND16( destiny )
+UINT32 destiny_state::screen_update_destiny(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	destiny_state *state = screen.machine().driver_data<destiny_state>();
-	popmessage("%s",state->m_led_array);
+	popmessage("%s",m_led_array);
 	return 0;
 }
 
@@ -268,7 +269,7 @@ static MACHINE_CONFIG_START( destiny, destiny_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(48*8, 16*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 16*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(destiny)
+	MCFG_SCREEN_UPDATE_DRIVER(destiny_state, screen_update_destiny)
 	MCFG_PALETTE_LENGTH(16)
 
 

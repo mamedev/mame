@@ -75,6 +75,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start();
 	virtual void video_start();
+	UINT32 screen_update_onetwo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -100,10 +101,9 @@ void onetwo_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(onetwo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
-static SCREEN_UPDATE_IND16( onetwo )
+UINT32 onetwo_state::screen_update_onetwo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	onetwo_state *state = screen.machine().driver_data<onetwo_state>();
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -375,7 +375,7 @@ static MACHINE_CONFIG_START( onetwo, onetwo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(16))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(onetwo)
+	MCFG_SCREEN_UPDATE_DRIVER(onetwo_state, screen_update_onetwo)
 
 	MCFG_GFXDECODE(onetwo)
 	MCFG_PALETTE_LENGTH(0x80)

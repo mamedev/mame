@@ -50,6 +50,7 @@ public:
 	UINT8 port_read_with_latch(UINT8 ext, UINT8 latch_state);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_channelf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -57,7 +58,7 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( channelf );
+
 
 
 /*----------- defined in audio/channelf.c -----------*/

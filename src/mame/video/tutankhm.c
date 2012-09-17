@@ -57,11 +57,10 @@ static void get_pens( running_machine &machine, pen_t *pens )
  *
  *************************************/
 
-SCREEN_UPDATE_RGB32( tutankhm )
+UINT32 tutankhm_state::screen_update_tutankhm(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	tutankhm_state *state = screen.machine().driver_data<tutankhm_state>();
-	int xorx = state->m_flip_x ? 255 : 0;
-	int xory = state->m_flip_y ? 255 : 0;
+	int xorx = m_flip_x ? 255 : 0;
+	int xory = m_flip_y ? 255 : 0;
 	pen_t pens[NUM_PENS];
 	int x, y;
 
@@ -74,9 +73,9 @@ SCREEN_UPDATE_RGB32( tutankhm )
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			UINT8 effx = x ^ xorx;
-			UINT8 yscroll = (effx < 192) ? *state->m_scroll : 0;
+			UINT8 yscroll = (effx < 192) ? *m_scroll : 0;
 			UINT8 effy = (y ^ xory) + yscroll;
-			UINT8 vrambyte = state->m_videoram[effy * 128 + effx / 2];
+			UINT8 vrambyte = m_videoram[effy * 128 + effx / 2];
 			UINT8 shifted = vrambyte >> (4 * (effx % 2));
 			dst[x] = pens[shifted & 0x0f];
 		}

@@ -349,6 +349,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_dwarfd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -847,7 +848,7 @@ static void drawCrt( running_machine &machine, bitmap_rgb32 &bitmap,const rectan
 }
 
 
-static SCREEN_UPDATE_RGB32( dwarfd )
+UINT32 dwarfd_state::screen_update_dwarfd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	drawCrt(screen.machine(), bitmap, cliprect);
@@ -1080,7 +1081,7 @@ static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(272*2, 200+4*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 272*2-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_STATIC(dwarfd)
+	MCFG_SCREEN_UPDATE_DRIVER(dwarfd_state, screen_update_dwarfd)
 
 	MCFG_GFXDECODE(dwarfd)
 	MCFG_PALETTE_LENGTH(0x100)

@@ -95,6 +95,17 @@ public:
 	DECLARE_PALETTE_INIT(spelunk2);
 	DECLARE_VIDEO_START(youjyudn);
 	DECLARE_VIDEO_START(horizon);
+	UINT32 screen_update_ldrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_kungfum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_battroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_ldrun3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_ldrun4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_lotlot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_kidniki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_spelunkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_spelunk2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_youjyudn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_horizon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -119,14 +130,14 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( battroad );
-SCREEN_UPDATE_IND16( horizon );
-SCREEN_UPDATE_IND16( kidniki );
-SCREEN_UPDATE_IND16( kungfum );
-SCREEN_UPDATE_IND16( ldrun );
-SCREEN_UPDATE_IND16( ldrun3 );
-SCREEN_UPDATE_IND16( ldrun4 );
-SCREEN_UPDATE_IND16( lotlot );
-SCREEN_UPDATE_IND16( spelunkr );
-SCREEN_UPDATE_IND16( spelunk2 );
-SCREEN_UPDATE_IND16( youjyudn );
+
+
+
+
+
+
+
+
+
+
+

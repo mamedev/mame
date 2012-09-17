@@ -347,6 +347,7 @@ public:
 	int m_last2;
 	int m_diff1;
 	int m_diff2;
+	UINT32 screen_update_systeme(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 class fantzn2_state : public systeme_state
@@ -1074,12 +1075,11 @@ static const sega315_5124_interface _315_5124_2_intf =
 };
 
 
-static SCREEN_UPDATE_RGB32( systeme )
+UINT32 systeme_state::screen_update_systeme(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	systeme_state *state = screen.machine().driver_data<systeme_state>();
-	bitmap_rgb32 &vdp1_bitmap = state->m_vdp1->get_bitmap();
-	bitmap_rgb32 &vdp2_bitmap = state->m_vdp2->get_bitmap();
-	bitmap_ind8 &vdp2_y1 = state->m_vdp2->get_y1_bitmap();
+	bitmap_rgb32 &vdp1_bitmap = m_vdp1->get_bitmap();
+	bitmap_rgb32 &vdp2_bitmap = m_vdp2->get_bitmap();
+	bitmap_ind8 &vdp2_y1 = m_vdp2->get_y1_bitmap();
 
 	for( int y = cliprect.min_y; y <= cliprect.max_y; y++ )
 	{
@@ -1118,7 +1118,7 @@ static MACHINE_CONFIG_START( systeme, systeme_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, \
 		SEGA315_5124_WIDTH , SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256, \
 		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_192_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_192_TBORDER_HEIGHT + 192)
-	MCFG_SCREEN_UPDATE_STATIC( systeme )	/* Combines and copies a bitmap */
+	MCFG_SCREEN_UPDATE_DRIVER(systeme_state, screen_update_systeme)
 
 	MCFG_PALETTE_LENGTH(SEGA315_5124_PALETTE_SIZE)
 	MCFG_PALETTE_INIT(sega315_5124)

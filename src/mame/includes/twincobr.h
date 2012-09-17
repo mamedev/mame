@@ -104,6 +104,7 @@ public:
 	DECLARE_MACHINE_RESET(twincobr);
 	DECLARE_VIDEO_START(toaplan0);
 	DECLARE_MACHINE_RESET(wardner);
+	UINT32 screen_update_toaplan0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -126,4 +127,4 @@ extern void twincobr_flipscreen(running_machine &machine, int flip);
 extern void twincobr_display(running_machine &machine, int enable);
 
 
-SCREEN_UPDATE_IND16( toaplan0 );
+

@@ -15,9 +15,8 @@ void b2m_state::video_start()
 {
 }
 
-SCREEN_UPDATE_IND16( b2m )
+UINT32 b2m_state::screen_update_b2m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	b2m_state *state = screen.machine().driver_data<b2m_state>();
 	UINT8 code1;
 	UINT8 code2;
 	UINT8 col;
@@ -28,12 +27,12 @@ SCREEN_UPDATE_IND16( b2m )
 	{
 		for (y = 0; y < 256; y++)
 		{
-			if (state->m_b2m_video_page==0) {
-				code1 = ram[0x11000 + x*256 + ((y + state->m_b2m_video_scroll) & 0xff)];
-				code2 = ram[0x15000 + x*256 + ((y + state->m_b2m_video_scroll) & 0xff)];
+			if (m_b2m_video_page==0) {
+				code1 = ram[0x11000 + x*256 + ((y + m_b2m_video_scroll) & 0xff)];
+				code2 = ram[0x15000 + x*256 + ((y + m_b2m_video_scroll) & 0xff)];
 			} else {
-				code1 = ram[0x19000 + x*256 + ((y + state->m_b2m_video_scroll) & 0xff)];
-				code2 = ram[0x1d000 + x*256 + ((y + state->m_b2m_video_scroll) & 0xff)];
+				code1 = ram[0x19000 + x*256 + ((y + m_b2m_video_scroll) & 0xff)];
+				code2 = ram[0x1d000 + x*256 + ((y + m_b2m_video_scroll) & 0xff)];
 			}
 			for (b = 7; b >= 0; b--)
 			{

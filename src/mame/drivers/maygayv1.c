@@ -241,6 +241,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_maygayv1(screen_device &screen, bool state);
 };
 
 
@@ -293,10 +295,9 @@ void maygayv1_state::video_start()
 }
 
 
-static SCREEN_UPDATE_IND16( maygayv1 )
+UINT32 maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	maygayv1_state *state = screen.machine().driver_data<maygayv1_state>();
-	i82716_t &i82716 = state->m_i82716;
+	i82716_t &i82716 = m_i82716;
 	UINT16 *atable = &i82716.dram[VREG(ATBA)];
 	UINT16 *otable = &i82716.dram[VREG(ODTBA) & 0xfc00];  // both must be bank 0
 
@@ -424,13 +425,12 @@ static SCREEN_UPDATE_IND16( maygayv1 )
 	return 0;
 }
 
-static SCREEN_VBLANK( maygayv1 )
+void maygayv1_state::screen_eof_maygayv1(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		maygayv1_state *state = screen.machine().driver_data<maygayv1_state>();
-		i82716_t &i82716 = state->m_i82716;
+		i82716_t &i82716 = m_i82716;
 		// UCF
 		if (VREG(VCR0) & VCR0_UCF)
 		{
@@ -1054,8 +1054,8 @@ static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(640, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 300 - 1)
-	MCFG_SCREEN_UPDATE_STATIC(maygayv1)
-	MCFG_SCREEN_VBLANK_STATIC(maygayv1)
+	MCFG_SCREEN_UPDATE_DRIVER(maygayv1_state, screen_update_maygayv1)
+	MCFG_SCREEN_VBLANK_DRIVER(maygayv1_state, screen_eof_maygayv1)
 
 	MCFG_PALETTE_LENGTH(16)
 

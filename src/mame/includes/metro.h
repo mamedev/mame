@@ -161,6 +161,7 @@ public:
 	DECLARE_VIDEO_START(metro_i4300);
 	DECLARE_VIDEO_START(blzntrnd);
 	DECLARE_VIDEO_START(gstrik2);
+	UINT32 screen_update_metro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -173,6 +174,6 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( metro );
+
 
 void metro_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);

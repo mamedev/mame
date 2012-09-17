@@ -98,6 +98,7 @@ public:
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	virtual void machine_start();
 	virtual void video_start();
+	UINT32 screen_update_segag80r(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -125,7 +126,7 @@ INTERRUPT_GEN( segag80r_vblank_start );
 
 
 
-SCREEN_UPDATE_IND16( segag80r );
+
 
 
 

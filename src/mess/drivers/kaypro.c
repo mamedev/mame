@@ -252,7 +252,7 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_SCREEN_SIZE(80*7, 24*10)
 	MCFG_SCREEN_VISIBLE_AREA(0,80*7-1,0,24*10-1)
 	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
-	MCFG_SCREEN_UPDATE_STATIC( kayproii )
+	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_kayproii)
 	MCFG_GFXDECODE(kayproii)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
@@ -296,7 +296,7 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_SCREEN_SIZE(80*8, 25*16)
 	MCFG_SCREEN_VISIBLE_AREA(0,80*8-1,0,25*16-1)
 	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
-	MCFG_SCREEN_UPDATE_STATIC( kaypro2x )
+	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_kaypro2x)
 	MCFG_GFXDECODE(kaypro2x)
 	MCFG_PALETTE_LENGTH(3)
 	MCFG_PALETTE_INIT_OVERRIDE(kaypro_state,kaypro)
@@ -320,7 +320,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( omni2, kaypro4 )
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC( omni2 )
+	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_omni2)
 MACHINE_CONFIG_END
 
 /***********************************************************

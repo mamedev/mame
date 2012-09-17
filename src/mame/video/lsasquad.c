@@ -198,20 +198,19 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( lsasquad )
+UINT32 lsasquad_state::screen_update_lsasquad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	lsasquad_state *state = screen.machine().driver_data<lsasquad_state>();
 	bitmap.fill(511, cliprect);
 
-	draw_layer(screen.machine(), bitmap, cliprect, state->m_scrollram + 0x000);
-	draw_layer(screen.machine(), bitmap, cliprect, state->m_scrollram + 0x080);
+	draw_layer(screen.machine(), bitmap, cliprect, m_scrollram + 0x000);
+	draw_layer(screen.machine(), bitmap, cliprect, m_scrollram + 0x080);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	draw_layer(screen.machine(), bitmap, cliprect, state->m_scrollram + 0x100);
+	draw_layer(screen.machine(), bitmap, cliprect, m_scrollram + 0x100);
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( daikaiju )
+UINT32 lsasquad_state::screen_update_daikaiju(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(511, cliprect);
 	drawbg(screen.machine(), bitmap, cliprect, 0); // bottom

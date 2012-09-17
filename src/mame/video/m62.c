@@ -463,21 +463,20 @@ VIDEO_START_MEMBER(m62_state,kungfum)
 	m62_start(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_kungfum_bg_tile_info),this), 32, 0, 8, 8, 64, 32);
 }
 
-SCREEN_UPDATE_IND16( kungfum )
+UINT32 m62_state::screen_update_kungfum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m62_state *state = screen.machine().driver_data<m62_state>();
 	int i;
 	for (i = 0; i < 6; i++)
 	{
-		state->m_bg_tilemap->set_scrollx(i, 0);
+		m_bg_tilemap->set_scrollx(i, 0);
 	}
 	for (i = 6; i < 32; i++)
 	{
-		state->m_bg_tilemap->set_scrollx(i, state->m_m62_background_hscroll);
+		m_bg_tilemap->set_scrollx(i, m_m62_background_hscroll);
 	}
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
 	return 0;
 }
 
@@ -510,15 +509,14 @@ void m62_state::video_start()
 	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
 }
 
-SCREEN_UPDATE_IND16( ldrun )
+UINT32 m62_state::screen_update_ldrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m62_state *state = screen.machine().driver_data<m62_state>();
-	state->m_bg_tilemap->set_scrollx(0, state->m_m62_background_hscroll);
-	state->m_bg_tilemap->set_scrolly(0, state->m_m62_background_vscroll);
+	m_bg_tilemap->set_scrollx(0, m_m62_background_hscroll);
+	m_bg_tilemap->set_scrolly(0, m_m62_background_vscroll);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x0f, 0x10, 0x00);
-	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x0f, 0x10, 0x10);
 	return 0;
 }
@@ -555,12 +553,11 @@ WRITE8_MEMBER(m62_state::ldrun3_topbottom_mask_w)
 	m_ldrun3_topbottom_mask = data & 1;
 }
 
-SCREEN_UPDATE_IND16( ldrun3 )
+UINT32 m62_state::screen_update_ldrun3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m62_state *state = screen.machine().driver_data<m62_state>();
-	SCREEN_UPDATE16_CALL(ldrun);
+	SCREEN_UPDATE16_CALL_MEMBER(ldrun);
 
-	if (state->m_ldrun3_topbottom_mask)
+	if (m_ldrun3_topbottom_mask)
 	{
 		rectangle my_cliprect = cliprect;
 
@@ -613,20 +610,19 @@ VIDEO_START_MEMBER(m62_state,battroad)
 	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
 }
 
-SCREEN_UPDATE_IND16( battroad )
+UINT32 m62_state::screen_update_battroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m62_state *state = screen.machine().driver_data<m62_state>();
-	state->m_bg_tilemap->set_scrollx(0, state->m_m62_background_hscroll);
-	state->m_bg_tilemap->set_scrolly(0, state->m_m62_background_vscroll);
-	state->m_fg_tilemap->set_scrollx(0, 128);
-	state->m_fg_tilemap->set_scrolly(0, 0);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scrollx(0, m_m62_background_hscroll);
+	m_bg_tilemap->set_scrolly(0, m_m62_background_vscroll);
+	m_fg_tilemap->set_scrollx(0, 128);
+	m_fg_tilemap->set_scrolly(0, 0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x0f, 0x10, 0x00);
-	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x0f, 0x10, 0x10);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -647,12 +643,11 @@ VIDEO_START_MEMBER(m62_state,ldrun4)
 	m62_start(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_ldrun4_bg_tile_info),this), 1, 0, 8, 8, 64, 32);
 }
 
-SCREEN_UPDATE_IND16( ldrun4 )
+UINT32 m62_state::screen_update_ldrun4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m62_state *state = screen.machine().driver_data<m62_state>();
-	state->m_bg_tilemap->set_scrollx(0, state->m_m62_background_hscroll - 2);
+	m_bg_tilemap->set_scrollx(0, m_m62_background_hscroll - 2);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
 	return 0;
 }
@@ -688,17 +683,16 @@ VIDEO_START_MEMBER(m62_state,lotlot)
 	m62_textlayer(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_lotlot_fg_tile_info),this), 1, 1, 12, 10, 32, 64);
 }
 
-SCREEN_UPDATE_IND16( lotlot )
+UINT32 m62_state::screen_update_lotlot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m62_state *state = screen.machine().driver_data<m62_state>();
-	state->m_bg_tilemap->set_scrollx(0, state->m_m62_background_hscroll - 64);
-	state->m_bg_tilemap->set_scrolly(0, state->m_m62_background_vscroll + 32);
-	state->m_fg_tilemap->set_scrollx(0, -64);
-	state->m_fg_tilemap->set_scrolly(0, 32);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scrollx(0, m_m62_background_hscroll - 64);
+	m_bg_tilemap->set_scrolly(0, m_m62_background_vscroll + 32);
+	m_fg_tilemap->set_scrollx(0, -64);
+	m_fg_tilemap->set_scrolly(0, 32);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
 	return 0;
 }
@@ -754,18 +748,17 @@ VIDEO_START_MEMBER(m62_state,kidniki)
 	m62_textlayer(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_kidniki_fg_tile_info),this), 1, 1, 12, 8, 32, 64);
 }
 
-SCREEN_UPDATE_IND16( kidniki )
+UINT32 m62_state::screen_update_kidniki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m62_state *state = screen.machine().driver_data<m62_state>();
-	state->m_bg_tilemap->set_scrollx(0, state->m_m62_background_hscroll);
-	state->m_fg_tilemap->set_scrollx(0, -64);
-	state->m_fg_tilemap->set_scrolly(0, state->m_kidniki_text_vscroll + 128);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scrollx(0, m_m62_background_hscroll);
+	m_fg_tilemap->set_scrollx(0, -64);
+	m_fg_tilemap->set_scrolly(0, m_kidniki_text_vscroll + 128);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
-	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -805,18 +798,17 @@ VIDEO_START_MEMBER(m62_state,spelunkr)
 	m62_textlayer(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_spelunkr_fg_tile_info),this), 1, 1, 12, 8, 32, 32);
 }
 
-SCREEN_UPDATE_IND16( spelunkr )
+UINT32 m62_state::screen_update_spelunkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m62_state *state = screen.machine().driver_data<m62_state>();
-	state->m_bg_tilemap->set_scrollx(0, state->m_m62_background_hscroll);
-	state->m_bg_tilemap->set_scrolly(0, state->m_m62_background_vscroll + 128);
-	state->m_fg_tilemap->set_scrollx(0, -64);
-	state->m_fg_tilemap->set_scrolly(0, 0);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scrollx(0, m_m62_background_hscroll);
+	m_bg_tilemap->set_scrolly(0, m_m62_background_vscroll + 128);
+	m_fg_tilemap->set_scrollx(0, -64);
+	m_fg_tilemap->set_scrolly(0, 0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -848,18 +840,17 @@ VIDEO_START_MEMBER(m62_state,spelunk2)
 	m62_textlayer(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_spelunkr_fg_tile_info),this), 1, 1, 12, 8, 32, 32);
 }
 
-SCREEN_UPDATE_IND16( spelunk2 )
+UINT32 m62_state::screen_update_spelunk2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m62_state *state = screen.machine().driver_data<m62_state>();
-	state->m_bg_tilemap->set_scrollx(0, state->m_m62_background_hscroll - 1);
-	state->m_bg_tilemap->set_scrolly(0, state->m_m62_background_vscroll + 128);
-	state->m_fg_tilemap->set_scrollx(0, -65);
-	state->m_fg_tilemap->set_scrolly(0, 0);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scrollx(0, m_m62_background_hscroll - 1);
+	m_bg_tilemap->set_scrolly(0, m_m62_background_vscroll + 128);
+	m_fg_tilemap->set_scrollx(0, -65);
+	m_fg_tilemap->set_scrolly(0, 0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -894,18 +885,17 @@ VIDEO_START_MEMBER(m62_state,youjyudn)
 	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
 }
 
-SCREEN_UPDATE_IND16( youjyudn )
+UINT32 m62_state::screen_update_youjyudn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m62_state *state = screen.machine().driver_data<m62_state>();
-	state->m_bg_tilemap->set_scrollx(0, state->m_m62_background_hscroll);
-	state->m_fg_tilemap->set_scrollx(0, -64);
-	state->m_fg_tilemap->set_scrolly(0, 0);
-	state->m_fg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scrollx(0, m_m62_background_hscroll);
+	m_fg_tilemap->set_scrollx(0, -64);
+	m_fg_tilemap->set_scrolly(0, 0);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
-	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -936,16 +926,15 @@ VIDEO_START_MEMBER(m62_state,horizon)
 	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
 }
 
-SCREEN_UPDATE_IND16( horizon )
+UINT32 m62_state::screen_update_horizon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m62_state *state = screen.machine().driver_data<m62_state>();
 	int i;
 	for (i = 0; i < 32; i++)
 	{
-		state->m_bg_tilemap->set_scrollx(i, state->m_scrollram[i << 1] | (state->m_scrollram[(i << 1) | 1] << 8));
+		m_bg_tilemap->set_scrollx(i, m_scrollram[i << 1] | (m_scrollram[(i << 1) | 1] << 8));
 	}
-	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
-	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

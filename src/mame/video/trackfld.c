@@ -243,19 +243,18 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 
 
-SCREEN_UPDATE_IND16( trackfld )
+UINT32 trackfld_state::screen_update_trackfld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	trackfld_state *state = screen.machine().driver_data<trackfld_state>();
 	int row, scrollx;
 
 	for (row = 0; row < 32; row++)
 	{
-		scrollx = state->m_scroll[row] + 256 * (state->m_scroll2[row] & 0x01);
-		if (state->flip_screen()) scrollx = -scrollx;
-		state->m_bg_tilemap->set_scrollx(row, scrollx);
+		scrollx = m_scroll[row] + 256 * (m_scroll2[row] & 0x01);
+		if (flip_screen()) scrollx = -scrollx;
+		m_bg_tilemap->set_scrollx(row, scrollx);
 	}
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

@@ -60,6 +60,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_mjsister(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -127,32 +128,31 @@ WRITE8_MEMBER(mjsister_state::mjsister_videoram_w)
 	}
 }
 
-static SCREEN_UPDATE_IND16( mjsister )
+UINT32 mjsister_state::screen_update_mjsister(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mjsister_state *state = screen.machine().driver_data<mjsister_state>();
-	int flip = state->m_flip_screen;
+	int flip = m_flip_screen;
 	int i, j;
 
-	if (state->m_screen_redraw)
+	if (m_screen_redraw)
 	{
 		int offs;
 
 		for (offs = 0; offs < 0x8000; offs++)
 		{
-			mjsister_plot0(screen.machine(), offs, state->m_videoram0[offs]);
-			mjsister_plot1(screen.machine(), offs, state->m_videoram1[offs]);
+			mjsister_plot0(screen.machine(), offs, m_videoram0[offs]);
+			mjsister_plot1(screen.machine(), offs, m_videoram1[offs]);
 		}
-		state->m_screen_redraw = 0;
+		m_screen_redraw = 0;
 	}
 
-	if (state->m_video_enable)
+	if (m_video_enable)
 	{
 		for (i = 0; i < 256; i++)
 			for (j = 0; j < 4; j++)
-				bitmap.pix16(i, 256 + j) = state->m_colorbank * 0x20;
+				bitmap.pix16(i, 256 + j) = m_colorbank * 0x20;
 
-		copybitmap(bitmap, *state->m_tmpbitmap0, flip, flip, 0, 0, cliprect);
-		copybitmap_trans(bitmap, *state->m_tmpbitmap1, flip, flip, 2, 0, cliprect, 0);
+		copybitmap(bitmap, *m_tmpbitmap0, flip, flip, 0, 0, cliprect);
+		copybitmap_trans(bitmap, *m_tmpbitmap1, flip, flip, 2, 0, cliprect, 0);
 	}
 	else
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
@@ -508,7 +508,7 @@ static MACHINE_CONFIG_START( mjsister, mjsister_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256+4, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255+4, 8, 247)
-	MCFG_SCREEN_UPDATE_STATIC(mjsister)
+	MCFG_SCREEN_UPDATE_DRIVER(mjsister_state, screen_update_mjsister)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_PALETTE_LENGTH(256)

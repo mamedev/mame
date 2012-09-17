@@ -52,14 +52,16 @@ public:
 	DECLARE_MACHINE_START(atarig42);
 	DECLARE_MACHINE_RESET(atarig42);
 	DECLARE_VIDEO_START(atarig42);
+	UINT32 screen_update_atarig42(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_atarig42(screen_device &screen, bool state);
 };
 
 
 /*----------- defined in video/atarig42.c -----------*/
 
 
-SCREEN_VBLANK( atarig42 );
-SCREEN_UPDATE_IND16( atarig42 );
+
+
 
 DECLARE_WRITE16_HANDLER( atarig42_mo_control_w );
 

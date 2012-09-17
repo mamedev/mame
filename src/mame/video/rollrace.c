@@ -95,23 +95,22 @@ WRITE8_MEMBER(rollrace_state::rollrace_flipx_w)
 	m_ra_flipx = data & 0x01;
 }
 
-SCREEN_UPDATE_IND16( rollrace )
+UINT32 rollrace_state::screen_update_rollrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	rollrace_state *state = screen.machine().driver_data<rollrace_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 	int sx, sy;
 	int scroll;
 	int col;
-	const UINT8 *mem = state->memregion("user1")->base();
+	const UINT8 *mem = memregion("user1")->base();
 
 	/* fill in background colour*/
-	bitmap.fill(state->m_ra_bkgpen, cliprect);
+	bitmap.fill(m_ra_bkgpen, cliprect);
 
 	/* draw road */
 	for (offs = 0x3ff; offs >= 0; offs--)
 		{
-			if(!(state->m_ra_bkgflip))
+			if(!(m_ra_bkgflip))
 				{
 				sy = ( 31 - offs / 32 ) ;
 				}
@@ -120,18 +119,18 @@ SCREEN_UPDATE_IND16( rollrace )
 
 			sx = ( offs%32 ) ;
 
-			if(state->m_ra_flipx)
+			if(m_ra_flipx)
 				sx = 31-sx ;
 
-			if(state->m_ra_flipy)
+			if(m_ra_flipy)
 				sy = 31-sy ;
 
 			drawgfx_transpen(bitmap,
 				cliprect,screen.machine().gfx[RA_BGCHAR_BASE],
-				mem[offs + ( state->m_ra_bkgpage * 1024 )]
-				+ ((( mem[offs + 0x4000 + ( state->m_ra_bkgpage * 1024 )] & 0xc0 ) >> 6 ) * 256 ) ,
-				state->m_ra_bkgcol,
-				state->m_ra_flipx,(state->m_ra_bkgflip^state->m_ra_flipy),
+				mem[offs + ( m_ra_bkgpage * 1024 )]
+				+ ((( mem[offs + 0x4000 + ( m_ra_bkgpage * 1024 )] & 0xc0 ) >> 6 ) * 256 ) ,
+				m_ra_bkgcol,
+				m_ra_flipx,(m_ra_bkgflip^m_ra_flipy),
 				sx*8,sy*8,0);
 
 
@@ -152,9 +151,9 @@ SCREEN_UPDATE_IND16( rollrace )
 		if(sx && sy)
 		{
 
-		if(state->m_ra_flipx)
+		if(m_ra_flipx)
 			sx = 224 - sx;
-		if(state->m_ra_flipy)
+		if(m_ra_flipy)
 			sy = 224 - sy;
 
 		if(spriteram[offs+1] & 0x80)
@@ -163,12 +162,12 @@ SCREEN_UPDATE_IND16( rollrace )
 		bank = (( spriteram[offs+1] & 0x40 ) >> 6 ) ;
 
 		if(bank)
-			bank += state->m_ra_spritebank;
+			bank += m_ra_spritebank;
 
 		drawgfx_transpen(bitmap, cliprect,screen.machine().gfx[ RA_SP_BASE + bank ],
 			spriteram[offs+1] & 0x3f ,
 			spriteram[offs+2] & 0x1f,
-			state->m_ra_flipx,!(s_flipy^state->m_ra_flipy),
+			m_ra_flipx,!(s_flipy^m_ra_flipy),
 			sx,sy,0);
 		}
 	}
@@ -183,20 +182,20 @@ SCREEN_UPDATE_IND16( rollrace )
 		sx =  offs % 32;
 		sy =  offs / 32;
 
-		scroll = ( 8 * sy + state->m_colorram[2 * sx] ) % 256;
-		col = state->m_colorram[ sx * 2 + 1 ]&0x1f;
+		scroll = ( 8 * sy + m_colorram[2 * sx] ) % 256;
+		col = m_colorram[ sx * 2 + 1 ]&0x1f;
 
-		if (!state->m_ra_flipy)
+		if (!m_ra_flipy)
 		{
 		   scroll = (248 - scroll) % 256;
 		}
 
-		if (state->m_ra_flipx) sx = 31 - sx;
+		if (m_ra_flipx) sx = 31 - sx;
 
-		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[RA_FGCHAR_BASE + state->m_ra_chrbank]  ,
-			state->m_videoram[ offs ]  ,
+		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[RA_FGCHAR_BASE + m_ra_chrbank]  ,
+			m_videoram[ offs ]  ,
 			col,
-			state->m_ra_flipx,state->m_ra_flipy,
+			m_ra_flipx,m_ra_flipy,
 			8*sx,scroll,0);
 
 	}

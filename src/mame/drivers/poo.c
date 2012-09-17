@@ -68,6 +68,7 @@ public:
 	DECLARE_READ8_MEMBER(timer_r);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_unclepoo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -75,9 +76,8 @@ void poo_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16(unclepoo)
+UINT32 poo_state::screen_update_unclepoo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	poo_state *state = screen.machine().driver_data<poo_state>();
 	int y,x;
 	int count;
 	gfx_element *gfx = screen.machine().gfx[0];
@@ -88,12 +88,12 @@ static SCREEN_UPDATE_IND16(unclepoo)
 	{
 		for (y=0;y<32;y++)
 		{
-			int tile = state->m_vram[count+0x000] | ((state->m_vram[count+0x400] & 3) <<8);
-			int color = (state->m_vram[count+0x400] & 0x38) >> 3;
-			int scrolly = (state->m_scrolly[x*4]);
+			int tile = m_vram[count+0x000] | ((m_vram[count+0x400] & 3) <<8);
+			int color = (m_vram[count+0x400] & 0x38) >> 3;
+			int scrolly = (m_scrolly[x*4]);
 
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color+state->m_vram_colbank,0,0,x*8,256-(y*8)+scrolly);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color+state->m_vram_colbank,0,0,x*8,0-(y*8)+scrolly);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color+m_vram_colbank,0,0,x*8,256-(y*8)+scrolly);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color+m_vram_colbank,0,0,x*8,0-(y*8)+scrolly);
 
 			count++;
 		}
@@ -104,10 +104,10 @@ static SCREEN_UPDATE_IND16(unclepoo)
 
 		for(i=0;i<0x80;i+=4)
 		{
-			spr_offs = state->m_sprites[i+2] | (state->m_sprites[i+3] & 3) << 8;
-			y = state->m_sprites[i+0]+8;
-			x = state->m_sprites[i+1];
-			col = (state->m_sprites[i+3] & 0xf8) >> 3;
+			spr_offs = m_sprites[i+2] | (m_sprites[i+3] & 3) << 8;
+			y = m_sprites[i+0]+8;
+			x = m_sprites[i+1];
+			col = (m_sprites[i+3] & 0xf8) >> 3;
 			fx = 0;
 			fy = 0;
 
@@ -353,7 +353,7 @@ static MACHINE_CONFIG_START( unclepoo, poo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(unclepoo)
+	MCFG_SCREEN_UPDATE_DRIVER(poo_state, screen_update_unclepoo)
 
 	MCFG_GFXDECODE(unclepoo)
 	MCFG_PALETTE_LENGTH(0x100)

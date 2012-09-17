@@ -199,14 +199,13 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
                 SCREEN REFRESH
 **************************************************************/
 
-SCREEN_UPDATE_IND16( othunder )
+UINT32 othunder_state::screen_update_othunder(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	othunder_state *state = screen.machine().driver_data<othunder_state>();
 	int layer[3];
 
-	tc0100scn_tilemap_update(state->m_tc0100scn);
+	tc0100scn_tilemap_update(m_tc0100scn);
 
-	layer[0] = tc0100scn_bottomlayer(state->m_tc0100scn);
+	layer[0] = tc0100scn_bottomlayer(m_tc0100scn);
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
@@ -215,9 +214,9 @@ SCREEN_UPDATE_IND16( othunder )
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap.fill(0, cliprect);
 
-	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
-	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[1], 0, 2);
-	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[2], 0, 4);
+	tc0100scn_tilemap_draw(m_tc0100scn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	tc0100scn_tilemap_draw(m_tc0100scn, bitmap, cliprect, layer[1], 0, 2);
+	tc0100scn_tilemap_draw(m_tc0100scn, bitmap, cliprect, layer[2], 0, 4);
 
 	/* Sprites can be under/over the layer below text layer */
 	{

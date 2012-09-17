@@ -303,12 +303,6 @@ static emu_timer *ds2430_timer;
 static timer_device *ds2430_bit_timer;
 
 
-static SCREEN_UPDATE_RGB32(viper)
-{
-	device_t *device = screen.machine().device("voodoo");
-	return voodoo_update(device, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
-}
-
 class viper_state : public driver_device
 {
 public:
@@ -352,7 +346,14 @@ public:
 	DECLARE_DRIVER_INIT(vipercf);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
+
+UINT32 viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	device_t *device = screen.machine().device("voodoo");
+	return voodoo_update(device, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+}
 
 UINT32 m_mpc8240_regs[256/4];
 
@@ -2010,7 +2011,7 @@ static MACHINE_CONFIG_START( viper, viper_state )
 
 	MCFG_PALETTE_LENGTH(65536)
 
-	MCFG_SCREEN_UPDATE_STATIC(viper)
+	MCFG_SCREEN_UPDATE_DRIVER(viper_state, screen_update_viper)
 
 	MCFG_TIMER_ADD("ds2430_timer2", NULL)
 

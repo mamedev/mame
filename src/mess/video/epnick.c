@@ -1034,10 +1034,9 @@ void ep_state::video_start()
 }
 
 
-SCREEN_UPDATE_IND16( epnick )
+UINT32 ep_state::screen_update_epnick(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ep_state *state = screen.machine().driver_data<ep_state>();
-	Nick_DoScreen(state->nick,state->m_bitmap);
-	copybitmap(bitmap, state->m_bitmap, 0, 0, 0, 0, cliprect);
+	Nick_DoScreen(nick,m_bitmap);
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

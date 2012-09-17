@@ -183,9 +183,8 @@ VIDEO_START_MEMBER(redalert_state,ww3)
  *
  *************************************/
 
-static SCREEN_UPDATE_RGB32( redalert )
+UINT32 redalert_state::screen_update_redalert(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	redalert_state *state = screen.machine().driver_data<redalert_state>();
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
 	offs_t offs;
 
@@ -200,22 +199,22 @@ static SCREEN_UPDATE_RGB32( redalert )
 		UINT8 y = offs & 0xff;
 		UINT8 x = (~offs >> 8) << 3;
 
-		UINT8 bitmap_data = state->m_bitmap_videoram[offs];
-		UINT8 bitmap_color = state->m_bitmap_colorram[offs >> 3];
+		UINT8 bitmap_data = m_bitmap_videoram[offs];
+		UINT8 bitmap_color = m_bitmap_colorram[offs >> 3];
 
-		UINT8 charmap_code = state->m_charmap_videoram[0x0000 | (offs >> 3)];
+		UINT8 charmap_code = m_charmap_videoram[0x0000 | (offs >> 3)];
 		offs_t charmap_data_base = ((charmap_code & 0x7f) << 3) | (offs & 0x07);
 
 		/* D7 of the char code selects the char set to use */
 		if (charmap_code & 0x80)
 		{
-			charmap_data_1 = state->m_charmap_videoram[0x0400 | charmap_data_base];
-			charmap_data_2 = state->m_charmap_videoram[0x0c00 | charmap_data_base];
+			charmap_data_1 = m_charmap_videoram[0x0400 | charmap_data_base];
+			charmap_data_2 = m_charmap_videoram[0x0c00 | charmap_data_base];
 		}
 		else
 		{
 			charmap_data_1 = 0; /* effectively disables A0 of the color PROM */
-			charmap_data_2 = state->m_charmap_videoram[0x0800 | charmap_data_base];
+			charmap_data_2 = m_charmap_videoram[0x0800 | charmap_data_base];
 		}
 
 		for (i = 0; i < 8; i++)
@@ -231,7 +230,7 @@ static SCREEN_UPDATE_RGB32( redalert )
 			else
 				pen = pens[((charmap_code & 0xfe) << 1) | color_prom_a0_a1];
 
-			if ((*state->m_video_control ^ state->m_control_xor) & 0x04)
+			if ((*m_video_control ^ m_control_xor) & 0x04)
 				bitmap.pix32(y, x) = pen;
 			else
 				bitmap.pix32(y ^ 0xff, x ^ 0xff) = pen;
@@ -256,9 +255,8 @@ static SCREEN_UPDATE_RGB32( redalert )
  *
  *************************************/
 
-static SCREEN_UPDATE_RGB32( demoneye )
+UINT32 redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	redalert_state *state = screen.machine().driver_data<redalert_state>();
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
 	offs_t offs;
 
@@ -273,27 +271,27 @@ static SCREEN_UPDATE_RGB32( demoneye )
 		UINT8 y = offs & 0xff;
 		UINT8 x = (~offs >> 8) << 3;
 
-		UINT8 bitmap_data = state->m_bitmap_videoram[offs];
-		UINT8 bitmap_color = state->m_bitmap_colorram[offs >> 3];
+		UINT8 bitmap_data = m_bitmap_videoram[offs];
+		UINT8 bitmap_color = m_bitmap_colorram[offs >> 3];
 
-		UINT8 charmap_code = state->m_charmap_videoram[0x1000 | (offs >> 3)];
+		UINT8 charmap_code = m_charmap_videoram[0x1000 | (offs >> 3)];
 		offs_t charmap_data_base = ((charmap_code & 0x7f) << 3) | (offs & 0x07);
 
 		/* D7 of the char code selects the char set to use */
 		if (charmap_code & 0x80)
 		{
-			charmap_data_1 = state->m_charmap_videoram[0x0400 | charmap_data_base];
-			charmap_data_2 = state->m_charmap_videoram[0x0c00 | charmap_data_base];
+			charmap_data_1 = m_charmap_videoram[0x0400 | charmap_data_base];
+			charmap_data_2 = m_charmap_videoram[0x0c00 | charmap_data_base];
 		}
 		else
 		{
-			charmap_data_1 = state->m_charmap_videoram[0x0000 | charmap_data_base];
-			charmap_data_2 = state->m_charmap_videoram[0x0800 | charmap_data_base];
+			charmap_data_1 = m_charmap_videoram[0x0000 | charmap_data_base];
+			charmap_data_2 = m_charmap_videoram[0x0800 | charmap_data_base];
 		}
 
 		/* this is the mapping of the 3rd char set */
-		//charmap_data_1 = state->m_charmap_videoram[0x1400 | charmap_data_base];
-		//charmap_data_2 = state->m_charmap_videoram[0x1c00 | charmap_data_base];
+		//charmap_data_1 = m_charmap_videoram[0x1400 | charmap_data_base];
+		//charmap_data_2 = m_charmap_videoram[0x1c00 | charmap_data_base];
 
 		for (i = 0; i < 8; i++)
 		{
@@ -308,7 +306,7 @@ static SCREEN_UPDATE_RGB32( demoneye )
 			else
 				pen = pens[((charmap_code & 0xfe) << 1) | color_prom_a0_a1];
 
-			if (*state->m_video_control & 0x04)
+			if (*m_video_control & 0x04)
 				bitmap.pix32(y ^ 0xff, x ^ 0xff) = pen;
 			else
 				bitmap.pix32(y, x) = pen;
@@ -331,9 +329,8 @@ static SCREEN_UPDATE_RGB32( demoneye )
  *
  *************************************/
 
-static SCREEN_UPDATE_RGB32( panther )
+UINT32 redalert_state::screen_update_panther(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	redalert_state *state = screen.machine().driver_data<redalert_state>();
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
 	offs_t offs;
 
@@ -348,22 +345,22 @@ static SCREEN_UPDATE_RGB32( panther )
 		UINT8 y = offs & 0xff;
 		UINT8 x = (~offs >> 8) << 3;
 
-		UINT8 bitmap_data = state->m_bitmap_videoram[offs];
-		UINT8 bitmap_color = state->m_bitmap_colorram[offs >> 3];
+		UINT8 bitmap_data = m_bitmap_videoram[offs];
+		UINT8 bitmap_color = m_bitmap_colorram[offs >> 3];
 
-		UINT8 charmap_code = state->m_charmap_videoram[0x0000 | (offs >> 3)];
+		UINT8 charmap_code = m_charmap_videoram[0x0000 | (offs >> 3)];
 		offs_t charmap_data_base = ((charmap_code & 0x7f) << 3) | (offs & 0x07);
 
 		/* D7 of the char code selects the char set to use */
 		if (charmap_code & 0x80)
 		{
-			charmap_data_1 = state->m_charmap_videoram[0x0400 | charmap_data_base];
-			charmap_data_2 = state->m_charmap_videoram[0x0c00 | charmap_data_base];
+			charmap_data_1 = m_charmap_videoram[0x0400 | charmap_data_base];
+			charmap_data_2 = m_charmap_videoram[0x0c00 | charmap_data_base];
 		}
 		else
 		{
 			charmap_data_1 = 0; /* effectively disables A0 of the color PROM */
-			charmap_data_2 = state->m_charmap_videoram[0x0800 | charmap_data_base];
+			charmap_data_2 = m_charmap_videoram[0x0800 | charmap_data_base];
 		}
 
 		for (i = 0; i < 8; i++)
@@ -379,7 +376,7 @@ static SCREEN_UPDATE_RGB32( panther )
 			else
 				pen = pens[((charmap_code & 0xfe) << 1) | color_prom_a0_a1];
 
-			if ((*state->m_video_control ^ state->m_control_xor) & 0x04)
+			if ((*m_video_control ^ m_control_xor) & 0x04)
 				bitmap.pix32(y, x) = pen;
 			else
 				bitmap.pix32(y ^ 0xff, x ^ 0xff) = pen;
@@ -409,7 +406,7 @@ static MACHINE_CONFIG_FRAGMENT( redalert_video_common )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(redalert)
+	MCFG_SCREEN_UPDATE_DRIVER(redalert_state, screen_update_redalert)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( redalert_video )
@@ -441,7 +438,7 @@ MACHINE_CONFIG_FRAGMENT( demoneye_video )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(demoneye)
+	MCFG_SCREEN_UPDATE_DRIVER(redalert_state, screen_update_demoneye)
 MACHINE_CONFIG_END
 
 
@@ -454,6 +451,6 @@ MACHINE_CONFIG_FRAGMENT( panther_video )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(panther)
+	MCFG_SCREEN_UPDATE_DRIVER(redalert_state, screen_update_panther)
 MACHINE_CONFIG_END
 

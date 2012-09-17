@@ -160,20 +160,19 @@ void flower_state::video_start()
 	m_text_right_tilemap->set_scrolly(0, 16);
 }
 
-SCREEN_UPDATE_IND16( flower )
+UINT32 flower_state::screen_update_flower(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	flower_state *state = screen.machine().driver_data<flower_state>();
 	rectangle myclip = cliprect;
 
-	state->m_bg0_tilemap->set_scrolly(0, state->m_bg0_scroll[0]+16);
-	state->m_bg1_tilemap->set_scrolly(0, state->m_bg1_scroll[0]+16);
+	m_bg0_tilemap->set_scrolly(0, m_bg0_scroll[0]+16);
+	m_bg1_tilemap->set_scrolly(0, m_bg1_scroll[0]+16);
 
-	state->m_bg0_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_bg1_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg0_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg1_tilemap->draw(bitmap, cliprect, 0,0);
 
 	draw_sprites(screen.machine(),bitmap,cliprect);
 
-	if(state->flip_screen())
+	if(flip_screen())
 	{
 		myclip.min_x = cliprect.min_x;
 		myclip.max_x = cliprect.min_x + 15;
@@ -184,8 +183,8 @@ SCREEN_UPDATE_IND16( flower )
 		myclip.max_x = cliprect.max_x;
 	}
 
-	state->m_text_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_text_right_tilemap->draw(bitmap, myclip, 0,0);
+	m_text_tilemap->draw(bitmap, cliprect, 0,0);
+	m_text_right_tilemap->draw(bitmap, myclip, 0,0);
 	return 0;
 }
 

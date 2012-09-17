@@ -142,6 +142,7 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_looping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -303,10 +304,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 }
 
 
-static SCREEN_UPDATE_IND16( looping )
+UINT32 looping_state::screen_update_looping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	looping_state *state = screen.machine().driver_data<looping_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
@@ -658,7 +658,7 @@ static MACHINE_CONFIG_START( looping, looping_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_STATIC(looping)
+	MCFG_SCREEN_UPDATE_DRIVER(looping_state, screen_update_looping)
 
 	MCFG_GFXDECODE(looping)
 	MCFG_PALETTE_LENGTH(32)

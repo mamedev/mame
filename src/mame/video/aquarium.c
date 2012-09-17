@@ -151,23 +151,22 @@ void aquarium_state::video_start()
 	m_mid_tilemap->set_transparent_pen(0);
 }
 
-SCREEN_UPDATE_IND16(aquarium)
+UINT32 aquarium_state::screen_update_aquarium(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	aquarium_state *state = screen.machine().driver_data<aquarium_state>();
-	state->m_mid_tilemap->set_scrollx(0, state->m_scroll[0]);
-	state->m_mid_tilemap->set_scrolly(0, state->m_scroll[1]);
-	state->m_bak_tilemap->set_scrollx(0, state->m_scroll[2]);
-	state->m_bak_tilemap->set_scrolly(0, state->m_scroll[3]);
-	state->m_txt_tilemap->set_scrollx(0, state->m_scroll[4]);
-	state->m_txt_tilemap->set_scrolly(0, state->m_scroll[5]);
+	m_mid_tilemap->set_scrollx(0, m_scroll[0]);
+	m_mid_tilemap->set_scrolly(0, m_scroll[1]);
+	m_bak_tilemap->set_scrollx(0, m_scroll[2]);
+	m_bak_tilemap->set_scrolly(0, m_scroll[3]);
+	m_txt_tilemap->set_scrollx(0, m_scroll[4]);
+	m_txt_tilemap->set_scrolly(0, m_scroll[5]);
 
-	state->m_bak_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_mid_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bak_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_mid_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 16);
 
-	state->m_bak_tilemap->draw(bitmap, cliprect, 1, 0);
-	state->m_mid_tilemap->draw(bitmap, cliprect, 1, 0);
-	state->m_txt_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bak_tilemap->draw(bitmap, cliprect, 1, 0);
+	m_mid_tilemap->draw(bitmap, cliprect, 1, 0);
+	m_txt_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

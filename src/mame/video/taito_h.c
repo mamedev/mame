@@ -394,30 +394,28 @@ static void taitoh_log_vram(running_machine &machine)
 
 /**************************************************************************/
 
-SCREEN_UPDATE_IND16( syvalion )
+UINT32 taitoh_state::screen_update_syvalion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	taitoh_state *state = screen.machine().driver_data<taitoh_state>();
 
-	tc0080vco_tilemap_update(state->m_tc0080vco);
+	tc0080vco_tilemap_update(m_tc0080vco);
 
 	taitoh_log_vram(screen.machine());
 
 	bitmap.fill(0, cliprect);
 
-	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
-	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 1, 0, 0);
+	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
+	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 1, 0, 0);
 	syvalion_draw_sprites(screen.machine(), bitmap,cliprect);
-	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 2, 0, 0);
+	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 2, 0, 0);
 
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( recordbr )
+UINT32 taitoh_state::screen_update_recordbr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	taitoh_state *state = screen.machine().driver_data<taitoh_state>();
 
-	tc0080vco_tilemap_update(state->m_tc0080vco);
+	tc0080vco_tilemap_update(m_tc0080vco);
 
 	taitoh_log_vram(screen.machine());
 
@@ -425,30 +423,29 @@ SCREEN_UPDATE_IND16( recordbr )
 
 #ifdef MAME_DEBUG
 	if (!screen.machine().input().code_pressed(KEYCODE_A))
-		tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
+		tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 	if (!screen.machine().input().code_pressed(KEYCODE_S))
 		recordbr_draw_sprites(screen.machine(), bitmap, cliprect, 0);
 	if (!screen.machine().input().code_pressed(KEYCODE_D))
-		tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 1, 0, 0);
+		tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 1, 0, 0);
 	if (!screen.machine().input().code_pressed(KEYCODE_F))
 		recordbr_draw_sprites(screen.machine(), bitmap, cliprect, 1);
 #else
-	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
+	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 	recordbr_draw_sprites(screen.machine(), bitmap, cliprect, 0);
-	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 1, 0, 0);
+	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 1, 0, 0);
 	recordbr_draw_sprites(screen.machine(), bitmap, cliprect, 1);
 #endif
 
-	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 2, 0, 0);
+	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 2, 0, 0);
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( dleague )
+UINT32 taitoh_state::screen_update_dleague(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	taitoh_state *state = screen.machine().driver_data<taitoh_state>();
 
-	tc0080vco_tilemap_update(state->m_tc0080vco);
+	tc0080vco_tilemap_update(m_tc0080vco);
 
 	taitoh_log_vram(screen.machine());
 
@@ -456,21 +453,21 @@ SCREEN_UPDATE_IND16( dleague )
 
 #ifdef MAME_DEBUG
 	if (!screen.machine().input().code_pressed(KEYCODE_A))
-		tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
+		tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 	if (!screen.machine().input().code_pressed(KEYCODE_S))
 		dleague_draw_sprites(screen.machine(), bitmap, cliprect, 0);
 	if (!screen.machine().input().code_pressed(KEYCODE_D))
-		tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 1, 0, 0);
+		tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 1, 0, 0);
 	if (!screen.machine().input().code_pressed(KEYCODE_F))
 		dleague_draw_sprites(screen.machine(), bitmap, cliprect, 1);
 #else
-	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
+	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 	dleague_draw_sprites (screen.machine(), bitmap, cliprect, 0);
-	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 1, 0, 0);
+	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 1, 0, 0);
 	dleague_draw_sprites (screen.machine(), bitmap, cliprect, 1);
 #endif
 
-	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 2, 0, 0);
+	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 2, 0, 0);
 	return 0;
 }
 

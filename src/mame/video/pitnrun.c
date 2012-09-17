@@ -207,16 +207,15 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-SCREEN_UPDATE_IND16( pitnrun )
+UINT32 pitnrun_state::screen_update_pitnrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pitnrun_state *state = screen.machine().driver_data<pitnrun_state>();
 	int dx=0,dy=0;
 	rectangle myclip=cliprect;
 
 #ifdef MAME_DEBUG
 	if (screen.machine().input().code_pressed_once(KEYCODE_Q))
 	{
-		UINT8 *ROM = state->memregion("maincpu")->base();
+		UINT8 *ROM = memregion("maincpu")->base();
 		ROM[0x84f6]=0; /* lap 0 - normal */
 	}
 
@@ -236,30 +235,30 @@ SCREEN_UPDATE_IND16( pitnrun )
 
 	bitmap.fill(0, cliprect);
 
-	if(!(state->m_ha&4))
-		state->m_bg->draw(bitmap, cliprect, 0,0);
+	if(!(m_ha&4))
+		m_bg->draw(bitmap, cliprect, 0,0);
 	else
 	{
-		dx=128-state->m_h_heed+((state->m_ha&8)<<5)+3;
-		dy=128-state->m_v_heed+((state->m_ha&0x10)<<4);
+		dx=128-m_h_heed+((m_ha&8)<<5)+3;
+		dy=128-m_v_heed+((m_ha&0x10)<<4);
 
-		if (state->flip_screen_x())
+		if (flip_screen_x())
 			dx=128-dx+16;
 
-		if (state->flip_screen_y())
+		if (flip_screen_y())
 			dy=128-dy;
 
 		myclip.set(dx, dx+127, dy, dy+127);
 		myclip &= cliprect;
 
-		state->m_bg->draw(bitmap, myclip, 0,0);
+		m_bg->draw(bitmap, myclip, 0,0);
 	}
 
 	draw_sprites(screen.machine(),bitmap,myclip);
 
-	if(state->m_ha&4)
-		copybitmap_trans(bitmap,*state->m_tmp_bitmap[state->m_ha&3],state->flip_screen_x(),state->flip_screen_y(),dx,dy,myclip, 1);
-	state->m_fg->draw(bitmap, cliprect, 0,0);
+	if(m_ha&4)
+		copybitmap_trans(bitmap,*m_tmp_bitmap[m_ha&3],flip_screen_x(),flip_screen_y(),dx,dy,myclip, 1);
+	m_fg->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 

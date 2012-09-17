@@ -119,21 +119,20 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( blueprnt )
+UINT32 blueprnt_state::screen_update_blueprnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	blueprnt_state *state = screen.machine().driver_data<blueprnt_state>();
 	int i;
 
-	if (state->flip_screen())
+	if (flip_screen())
 		for (i = 0; i < 32; i++)
-			state->m_bg_tilemap->set_scrolly(i, state->m_scrollram[32 - i]);
+			m_bg_tilemap->set_scrolly(i, m_scrollram[32 - i]);
 	else
 		for (i = 0; i < 32; i++)
-			state->m_bg_tilemap->set_scrolly(i, state->m_scrollram[30 - i]);
+			m_bg_tilemap->set_scrolly(i, m_scrollram[30 - i]);
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
 	return 0;
 }

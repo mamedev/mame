@@ -143,7 +143,7 @@ void djmain_state::video_start()
 	k056832_set_layer_offs(k056832, 1, -88, -27);
 }
 
-SCREEN_UPDATE_RGB32( djmain )
+UINT32 djmain_state::screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	device_t *k056832 = screen.machine().device("k056832");
 	device_t *k055555 = screen.machine().device("k055555");

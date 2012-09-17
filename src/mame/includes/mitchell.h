@@ -100,6 +100,7 @@ public:
 	DECLARE_MACHINE_START(mitchell);
 	DECLARE_MACHINE_RESET(mitchell);
 	DECLARE_VIDEO_START(pang);
+	UINT32 screen_update_pang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -109,4 +110,4 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( pang );
+

@@ -59,6 +59,8 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_tank8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_tank8(screen_device &screen, bool state);
 };
 
 
@@ -75,9 +77,9 @@ void tank8_set_collision(running_machine &machine, int index);
 /*----------- defined in video/tank8.c -----------*/
 
 
-SCREEN_VBLANK( tank8 );
 
-SCREEN_UPDATE_IND16( tank8 );
+
+
 
 
 

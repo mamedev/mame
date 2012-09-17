@@ -53,6 +53,9 @@ public:
 	DECLARE_VIDEO_START(cyberbal);
 	DECLARE_MACHINE_RESET(cyberbal2p);
 	DECLARE_VIDEO_START(cyberbal2p);
+	UINT32 screen_update_cyberbal_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_cyberbal_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_cyberbal2p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -75,8 +78,8 @@ DECLARE_WRITE16_HANDLER( cyberbal_paletteram_1_w );
 
 
 
-SCREEN_UPDATE_IND16( cyberbal_left );
-SCREEN_UPDATE_IND16( cyberbal_right );
-SCREEN_UPDATE_IND16( cyberbal2p );
+
+
+
 
 void cyberbal_scanline_update(screen_device &screen, int scanline);

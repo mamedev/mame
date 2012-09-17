@@ -443,10 +443,9 @@ READ_LINE_DEVICE_HANDLER( survival_sid_callback )
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( phoenix )
+UINT32 phoenix_state::screen_update_phoenix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	phoenix_state *state = screen.machine().driver_data<phoenix_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

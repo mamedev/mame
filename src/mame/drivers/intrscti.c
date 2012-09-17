@@ -26,15 +26,15 @@ public:
 //  DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_DRIVER_INIT(intrscti);
 	virtual void video_start();
+	UINT32 screen_update_intrscti(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 void intrscti_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16(intrscti)
+UINT32 intrscti_state::screen_update_intrscti(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	intrscti_state *state = screen.machine().driver_data<intrscti_state>();
 	int y,x;
 	int count;
 
@@ -46,7 +46,7 @@ static SCREEN_UPDATE_IND16(intrscti)
 		for (x=0;x<32;x++)
 		{
 			int dat;
-			dat = state->m_vram[count];
+			dat = m_vram[count];
 			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],dat/*+0x100*/,0,0,0,x*8,y*8,0);
 			count++;
 		}
@@ -58,7 +58,7 @@ static SCREEN_UPDATE_IND16(intrscti)
 		for (x=0;x<32;x++)
 		{
 			int dat;
-			dat = state->m_vram[count];
+			dat = m_vram[count];
 			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],dat+0x100,0,0,0,x*8,y*8,0);
 			count++;
 		}
@@ -171,7 +171,7 @@ static MACHINE_CONFIG_START( intrscti, intrscti_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(intrscti)
+	MCFG_SCREEN_UPDATE_DRIVER(intrscti_state, screen_update_intrscti)
 
 	MCFG_GFXDECODE(intrscti)
 	MCFG_PALETTE_LENGTH(0x100)

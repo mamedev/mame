@@ -29,12 +29,12 @@ public:
 	required_device<e132xn_device>	m_maincpu;
 	required_shared_ptr<UINT32> m_videoram;
 	DECLARE_READ32_MEMBER(f32_input_port_1_r);
+	UINT32 screen_update_mosaicf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
-static SCREEN_UPDATE_IND16( mosaicf2 )
+UINT32 mosaicf2_state::screen_update_mosaicf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mosaicf2_state *state = screen.machine().driver_data<mosaicf2_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < 0x10000; offs++)
@@ -44,8 +44,8 @@ static SCREEN_UPDATE_IND16( mosaicf2 )
 
 		if ((x < 0xa0) && (y < 0xe0))
 		{
-			bitmap.pix16(y, (x * 2) + 0) = (state->m_videoram[offs] >> 16) & 0x7fff;
-			bitmap.pix16(y, (x * 2) + 1) = (state->m_videoram[offs] >>  0) & 0x7fff;
+			bitmap.pix16(y, (x * 2) + 0) = (m_videoram[offs] >> 16) & 0x7fff;
+			bitmap.pix16(y, (x * 2) + 1) = (m_videoram[offs] >>  0) & 0x7fff;
 		}
 	}
 
@@ -147,7 +147,7 @@ static MACHINE_CONFIG_START( mosaicf2, mosaicf2_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
-	MCFG_SCREEN_UPDATE_STATIC(mosaicf2)
+	MCFG_SCREEN_UPDATE_DRIVER(mosaicf2_state, screen_update_mosaicf2)
 
 	MCFG_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
 	MCFG_PALETTE_LENGTH(32768)

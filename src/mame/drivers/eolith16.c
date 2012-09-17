@@ -33,6 +33,7 @@ public:
 	DECLARE_DRIVER_INIT(eolith16);
 	DECLARE_VIDEO_START(eolith16);
 	DECLARE_PALETTE_INIT(eolith16);
+	UINT32 screen_update_eolith16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -126,9 +127,8 @@ VIDEO_START_MEMBER(eolith16_state,eolith16)
 	m_vram = auto_alloc_array(machine(), UINT16, 0x10000);
 }
 
-static SCREEN_UPDATE_IND16( eolith16 )
+UINT32 eolith16_state::screen_update_eolith16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	eolith16_state *state = screen.machine().driver_data<eolith16_state>();
 	int x,y,count;
 	int color;
 
@@ -137,10 +137,10 @@ static SCREEN_UPDATE_IND16( eolith16 )
 	{
 		for (x=0;x < 320/2;x++)
 		{
-			color = state->m_vram[count + (0x10000/2) * (state->m_vbuffer ^ 1)] & 0xff;
+			color = m_vram[count + (0x10000/2) * (m_vbuffer ^ 1)] & 0xff;
 			bitmap.pix16(y, x*2 + 0) = color;
 
-			color = (state->m_vram[count + (0x10000/2) * (state->m_vbuffer ^ 1)] & 0xff00) >> 8;
+			color = (m_vram[count + (0x10000/2) * (m_vbuffer ^ 1)] & 0xff00) >> 8;
 			bitmap.pix16(y, x*2 + 1) = color;
 
 			count++;
@@ -189,7 +189,7 @@ static MACHINE_CONFIG_START( eolith16, eolith16_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 199)
-	MCFG_SCREEN_UPDATE_STATIC(eolith16)
+	MCFG_SCREEN_UPDATE_DRIVER(eolith16_state, screen_update_eolith16)
 
 	MCFG_PALETTE_LENGTH(256)
 

@@ -406,15 +406,14 @@ static void draw_stars(_20pacgal_state *state, bitmap_rgb32 &bitmap, const recta
  *
  *************************************/
 
-static SCREEN_UPDATE_RGB32( 20pacgal )
+UINT32 _20pacgal_state::screen_update_20pacgal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	_20pacgal_state *state = screen.machine().driver_data<_20pacgal_state>();
 
 	bitmap.fill(0, cliprect);
-	draw_stars(state, bitmap,cliprect);
-	draw_chars(state, bitmap);
-	draw_sprites(screen.machine(),state, bitmap);
-	do_pen_lookup(screen.machine(), state, bitmap, cliprect);
+	draw_stars(this, bitmap,cliprect);
+	draw_chars(this, bitmap);
+	draw_sprites(screen.machine(),this, bitmap);
+	do_pen_lookup(screen.machine(), this, bitmap, cliprect);
 
 	return 0;
 }
@@ -433,5 +432,5 @@ MACHINE_CONFIG_FRAGMENT( 20pacgal_video )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(SCREEN_WIDTH, SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, SCREEN_WIDTH - 1, 0, SCREEN_HEIGHT - 1)
-	MCFG_SCREEN_UPDATE_STATIC(20pacgal)
+	MCFG_SCREEN_UPDATE_DRIVER(_20pacgal_state, screen_update_20pacgal)
 MACHINE_CONFIG_END

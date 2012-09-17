@@ -172,16 +172,15 @@ void gmaster_state::palette_init()
 	}
 }
 
-static SCREEN_UPDATE_IND16( gmaster )
+UINT32 gmaster_state::screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gmaster_state *state = screen.machine().driver_data<gmaster_state>();
     int x,y;
 //  plot_box(bitmap, 0, 0, 64/*bitmap.width*/, bitmap.height, 0); //xmess rounds up to 64 pixel
-    for (y = 0; y < ARRAY_LENGTH(state->m_video.pixels); y++)
+    for (y = 0; y < ARRAY_LENGTH(m_video.pixels); y++)
 	{
-		for (x = 0; x < ARRAY_LENGTH(state->m_video.pixels[0]); x++)
+		for (x = 0; x < ARRAY_LENGTH(m_video.pixels[0]); x++)
 		{
-			UINT8 d = state->m_video.pixels[y][x];
+			UINT8 d = m_video.pixels[y][x];
 			UINT16 *line;
 
 			line = &bitmap.pix16((y * 8), x);
@@ -228,7 +227,7 @@ static MACHINE_CONFIG_START( gmaster, gmaster_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(64, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64-1-3, 0, 64-1)
-	MCFG_SCREEN_UPDATE_STATIC(gmaster)
+	MCFG_SCREEN_UPDATE_DRIVER(gmaster_state, screen_update_gmaster)
 
 	MCFG_PALETTE_LENGTH(sizeof(gmaster_palette)/sizeof(gmaster_palette[0]))
 	MCFG_DEFAULT_LAYOUT(layout_lcd)

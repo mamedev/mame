@@ -184,9 +184,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-SCREEN_UPDATE_IND16( portrait )
+UINT32 portrait_state::screen_update_portrait(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	portrait_state *state = screen.machine().driver_data<portrait_state>();
 	rectangle cliprect_scroll, cliprect_no_scroll;
 
 	cliprect_scroll = cliprect_no_scroll = cliprect;
@@ -194,15 +193,15 @@ SCREEN_UPDATE_IND16( portrait )
 	cliprect_no_scroll.min_x = cliprect_no_scroll.max_x - 111;
 	cliprect_scroll.max_x    = cliprect_scroll.min_x    + 319;
 
-	state->m_background->set_scrolly(0, 0);
-	state->m_foreground->set_scrolly(0, 0);
-	state->m_background->draw(bitmap, cliprect_no_scroll, 0, 0);
-	state->m_foreground->draw(bitmap, cliprect_no_scroll, 0, 0);
+	m_background->set_scrolly(0, 0);
+	m_foreground->set_scrolly(0, 0);
+	m_background->draw(bitmap, cliprect_no_scroll, 0, 0);
+	m_foreground->draw(bitmap, cliprect_no_scroll, 0, 0);
 
-	state->m_background->set_scrolly(0, state->m_scroll);
-	state->m_foreground->set_scrolly(0, state->m_scroll);
-	state->m_background->draw(bitmap, cliprect_scroll, 0, 0);
-	state->m_foreground->draw(bitmap, cliprect_scroll, 0, 0);
+	m_background->set_scrolly(0, m_scroll);
+	m_foreground->set_scrolly(0, m_scroll);
+	m_background->draw(bitmap, cliprect_scroll, 0, 0);
+	m_foreground->draw(bitmap, cliprect_scroll, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap,cliprect);
 	return 0;

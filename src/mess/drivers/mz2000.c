@@ -78,18 +78,18 @@ public:
 	DECLARE_WRITE8_MEMBER(mz2000_gvram_mask_w);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_mz2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 void mz2000_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( mz2000 )
+UINT32 mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mz2000_state *state = screen.machine().driver_data<mz2000_state>();
 	UINT8 *tvram = screen.machine().root_device().memregion("tvram")->base();
 	UINT8 *gvram = screen.machine().root_device().memregion("gvram")->base();
-	UINT8 *gfx_data = state->memregion("chargen")->base();
+	UINT8 *gfx_data = memregion("chargen")->base();
 	int x,y,xi,yi;
 	UINT8 x_size;
 	UINT32 count;
@@ -106,7 +106,7 @@ static SCREEN_UPDATE_IND16( mz2000 )
 				pen  = ((gvram[count+0x4000] >> (xi)) & 1) ? 1 : 0; //B
 				pen |= ((gvram[count+0x8000] >> (xi)) & 1) ? 2 : 0; //R
 				pen |= ((gvram[count+0xc000] >> (xi)) & 1) ? 4 : 0; //G
-				pen &= state->m_gvram_mask;
+				pen &= m_gvram_mask;
 
 				bitmap.pix16(y*2+0, x+xi) = screen.machine().pens[pen];
 				bitmap.pix16(y*2+1, x+xi) = screen.machine().pens[pen];
@@ -115,16 +115,16 @@ static SCREEN_UPDATE_IND16( mz2000 )
 		}
 	}
 
-	x_size = (state->m_width80+1)*40;
+	x_size = (m_width80+1)*40;
 
 	for(y=0;y<25;y++)
 	{
 		for(x=0;x<x_size;x++)
 		{
 			UINT8 tile = tvram[y*x_size+x];
-			UINT8 color = state->m_tvram_attr & 7;
+			UINT8 color = m_tvram_attr & 7;
 
-			for(yi=0;yi<8*(state->m_hi_mode+1);yi++)
+			for(yi=0;yi<8*(m_hi_mode+1);yi++)
 			{
 				for(xi=0;xi<8;xi++)
 				{
@@ -133,21 +133,21 @@ static SCREEN_UPDATE_IND16( mz2000 )
 					UINT16 tile_offset;
 
 					res_x = x * 8 + xi;
-					res_y = y * (8 *(state->m_hi_mode+1)) + yi;
+					res_y = y * (8 *(m_hi_mode+1)) + yi;
 
-					if(res_x > 640-1 || res_y > (200*(state->m_hi_mode+1))-1)
+					if(res_x > 640-1 || res_y > (200*(m_hi_mode+1))-1)
 						continue;
 
-					tile_offset = tile*(8*(state->m_hi_mode+1))+yi + (state->m_hi_mode * 0x800);
+					tile_offset = tile*(8*(m_hi_mode+1))+yi + (m_hi_mode * 0x800);
 
 					pen = ((gfx_data[tile_offset] >> (7-xi)) & 1) ? color : -1;
 
 					/* TODO: clean this up */
 					if(pen != -1)
 					{
-						if(state->m_hi_mode)
+						if(m_hi_mode)
 						{
-							if(state->m_width80 == 0)
+							if(m_width80 == 0)
 							{
 								bitmap.pix16(res_y, res_x*2+0) = screen.machine().pens[pen];
 								bitmap.pix16(res_y, res_x*2+1) = screen.machine().pens[pen];
@@ -159,7 +159,7 @@ static SCREEN_UPDATE_IND16( mz2000 )
 						}
 						else
 						{
-							if(state->m_width80 == 0)
+							if(m_width80 == 0)
 							{
 								bitmap.pix16(res_y*2+0, res_x*2+0) = screen.machine().pens[pen];
 								bitmap.pix16(res_y*2+0, res_x*2+1) = screen.machine().pens[pen];
@@ -853,7 +853,7 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	MCFG_GFXDECODE(mz2000)
 	MCFG_PALETTE_LENGTH(8)
 
-	MCFG_SCREEN_UPDATE_STATIC(mz2000)
+	MCFG_SCREEN_UPDATE_DRIVER(mz2000_state, screen_update_mz2000)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -173,7 +173,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 }
 
 
-SCREEN_UPDATE_IND16( atarifb )
+UINT32 atarifb_state::screen_update_atarifb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_playfield_and_alpha(screen.machine(), bitmap, cliprect, 0, 0);
 
@@ -183,7 +183,7 @@ SCREEN_UPDATE_IND16( atarifb )
 }
 
 
-SCREEN_UPDATE_IND16( abaseb )
+UINT32 atarifb_state::screen_update_abaseb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_playfield_and_alpha(screen.machine(), bitmap, cliprect, -8, 0);
 
@@ -193,7 +193,7 @@ SCREEN_UPDATE_IND16( abaseb )
 }
 
 
-SCREEN_UPDATE_IND16( soccer )
+UINT32 atarifb_state::screen_update_soccer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_playfield_and_alpha(screen.machine(), bitmap, cliprect, 0, 8);
 

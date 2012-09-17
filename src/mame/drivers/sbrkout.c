@@ -66,6 +66,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_sbrkout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -327,13 +328,12 @@ WRITE8_MEMBER(sbrkout_state::sbrkout_videoram_w)
  *
  *************************************/
 
-static SCREEN_UPDATE_IND16( sbrkout )
+UINT32 sbrkout_state::screen_update_sbrkout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sbrkout_state *state = screen.machine().driver_data<sbrkout_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int ball;
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	for (ball = 2; ball >= 0; ball--)
 	{
@@ -514,7 +514,7 @@ static MACHINE_CONFIG_START( sbrkout, sbrkout_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 384, 0, 256, 262, 0, 224)
-	MCFG_SCREEN_UPDATE_STATIC(sbrkout)
+	MCFG_SCREEN_UPDATE_DRIVER(sbrkout_state, screen_update_sbrkout)
 
 	MCFG_PALETTE_INIT(black_and_white)
 

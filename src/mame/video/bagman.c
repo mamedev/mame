@@ -142,14 +142,13 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-SCREEN_UPDATE_IND16( bagman )
+UINT32 bagman_state::screen_update_bagman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bagman_state *state = screen.machine().driver_data<bagman_state>();
 	bitmap.fill(0, cliprect);
-	if (*state->m_video_enable == 0)
+	if (*m_video_enable == 0)
 		return 0;
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

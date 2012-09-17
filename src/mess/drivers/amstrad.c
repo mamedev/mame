@@ -891,8 +891,8 @@ static MACHINE_CONFIG_START( amstrad, amstrad_state )
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( XTAL_16MHz, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
-	MCFG_SCREEN_UPDATE_STATIC(amstrad)
-	MCFG_SCREEN_VBLANK_STATIC(amstrad)
+	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
+	MCFG_SCREEN_VBLANK_DRIVER(amstrad_state, screen_eof_amstrad)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
@@ -957,8 +957,8 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( ( XTAL_40MHz * 2 ) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
-	MCFG_SCREEN_UPDATE_STATIC(amstrad)
-	MCFG_SCREEN_VBLANK_STATIC(amstrad)
+	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
+	MCFG_SCREEN_VBLANK_DRIVER(amstrad_state, screen_eof_amstrad)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
@@ -1015,8 +1015,8 @@ static MACHINE_CONFIG_START( gx4000, amstrad_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( ( XTAL_40MHz * 2 ) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
-	MCFG_SCREEN_UPDATE_STATIC(amstrad)
-	MCFG_SCREEN_VBLANK_STATIC(amstrad)
+	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
+	MCFG_SCREEN_VBLANK_DRIVER(amstrad_state, screen_eof_amstrad)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 

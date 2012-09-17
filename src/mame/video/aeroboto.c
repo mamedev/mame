@@ -149,19 +149,18 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 }
 
 
-SCREEN_UPDATE_IND16( aeroboto )
+UINT32 aeroboto_state::screen_update_aeroboto(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	aeroboto_state *state = screen.machine().driver_data<aeroboto_state>();
 
 	const rectangle splitrect1(0, 255, 0, 39);
 	const rectangle splitrect2(0, 255, 40, 255);
 	UINT8 *src_base, *src_colptr, *src_rowptr;
 	int src_offsx, src_colmask, sky_color, star_color, x, y, i, j, pen;
 
-	sky_color = star_color = *state->m_bgcolor << 2;
+	sky_color = star_color = *m_bgcolor << 2;
 
 	// the star field is supposed to be seen through tile pen 0 when active
-	if (!state->m_starsoff)
+	if (!m_starsoff)
 	{
 		if (star_color < 0xd0)
 		{
@@ -174,16 +173,16 @@ SCREEN_UPDATE_IND16( aeroboto )
 		bitmap.fill(sky_color, cliprect);
 
 		// actual scroll speed is unknown but it can be adjusted by changing the SCROLL_SPEED constant
-		state->m_sx += (char)(*state->m_starx - state->m_ox);
-		state->m_ox = *state->m_starx;
-		x = state->m_sx / SCROLL_SPEED;
+		m_sx += (char)(*m_starx - m_ox);
+		m_ox = *m_starx;
+		x = m_sx / SCROLL_SPEED;
 
-		if (*state->m_vscroll != 0xff)
-			state->m_sy += (char)(*state->m_stary - state->m_oy);
-		state->m_oy = *state->m_stary;
-		y = state->m_sy / SCROLL_SPEED;
+		if (*m_vscroll != 0xff)
+			m_sy += (char)(*m_stary - m_oy);
+		m_oy = *m_stary;
+		y = m_sy / SCROLL_SPEED;
 
-		src_base = state->m_stars_rom;
+		src_base = m_stars_rom;
 
 		for (i = 0; i < 256; i++)
 		{
@@ -203,22 +202,22 @@ SCREEN_UPDATE_IND16( aeroboto )
 	}
 	else
 	{
-		state->m_sx = state->m_ox = *state->m_starx;
-		state->m_sy = state->m_oy = *state->m_stary;
+		m_sx = m_ox = *m_starx;
+		m_sy = m_oy = *m_stary;
 		bitmap.fill(sky_color, cliprect);
 	}
 
 	for (y = 0; y < 64; y++)
-		state->m_bg_tilemap->set_scrollx(y, state->m_hscroll[y]);
+		m_bg_tilemap->set_scrollx(y, m_hscroll[y]);
 
 	// the playfield is part of a splitscreen and should not overlap with status display
-	state->m_bg_tilemap->set_scrolly(0, *state->m_vscroll);
-	state->m_bg_tilemap->draw(bitmap, splitrect2, 0, 0);
+	m_bg_tilemap->set_scrolly(0, *m_vscroll);
+	m_bg_tilemap->draw(bitmap, splitrect2, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	// the status display behaves more closely to a 40-line splitscreen than an overlay
-	state->m_bg_tilemap->set_scrolly(0, 0);
-	state->m_bg_tilemap->draw(bitmap, splitrect1, 0, 0);
+	m_bg_tilemap->set_scrolly(0, 0);
+	m_bg_tilemap->draw(bitmap, splitrect1, 0, 0);
 	return 0;
 }

@@ -1154,49 +1154,46 @@ static void butasan_log_vram(running_machine &machine)
 #endif
 }
 
-SCREEN_UPDATE_RGB32( argus )
+UINT32 argus_state::screen_update_argus(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	argus_state *state = screen.machine().driver_data<argus_state>();
 	bg_setting(screen.machine());
 
 	/* scroll BG0 and render tile at proper position */
 	argus_bg0_scroll_handle(screen.machine());
 
-	state->m_bg0_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg0_tilemap->draw(bitmap, cliprect, 0, 0);
 	argus_draw_sprites(screen.machine(), bitmap, cliprect, 0);
-	if (state->m_bg_status & 1)	/* Backgound enable */
-		state->m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (m_bg_status & 1)	/* Backgound enable */
+		m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
 	argus_draw_sprites(screen.machine(), bitmap, cliprect, 1);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-SCREEN_UPDATE_RGB32( valtric )
+UINT32 argus_state::screen_update_valtric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	argus_state *state = screen.machine().driver_data<argus_state>();
 	bg_setting(screen.machine());
 
-	if (state->m_bg_status & 1)	/* Backgound enable */
+	if (m_bg_status & 1)	/* Backgound enable */
 		valtric_draw_mosaic(screen, bitmap, cliprect);
 	else
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	valtric_draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-SCREEN_UPDATE_RGB32( butasan )
+UINT32 argus_state::screen_update_butasan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	argus_state *state = screen.machine().driver_data<argus_state>();
 	bg_setting(screen.machine());
 
-	if (state->m_bg_status & 1)	/* Backgound enable */
-		state->m_bg0_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (m_bg_status & 1)	/* Backgound enable */
+		m_bg0_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	if (state->m_butasan_bg1_status & 1) state->m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (m_butasan_bg1_status & 1) m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
 	butasan_draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	butasan_log_vram(screen.machine());
 	return 0;

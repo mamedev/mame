@@ -427,7 +427,7 @@ static void draw_text_sprites(running_machine &machine, bitmap_ind16 &bitmap,con
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( suna8 )
+UINT32 suna8_state::screen_update_suna8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* see hardhead, hardhea2 test mode (press button 2 for both players) */
 	bitmap.fill(0xff, cliprect);
@@ -436,28 +436,27 @@ SCREEN_UPDATE_IND16( suna8 )
 #if TILEMAPS
 	if (screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input().code_pressed(KEYCODE_X))
 	{
-		suna8_state *state = screen.machine().driver_data<suna8_state>();
-		int max_tiles = state->memregion("gfx1")->bytes() / (0x400 * 0x20);
+		int max_tiles = memregion("gfx1")->bytes() / (0x400 * 0x20);
 
-		if (screen.machine().input().code_pressed_once(KEYCODE_Q))	{ state->m_page--;	screen.machine().tilemap().mark_all_dirty();	}
-		if (screen.machine().input().code_pressed_once(KEYCODE_W))	{ state->m_page++;	screen.machine().tilemap().mark_all_dirty();	}
-		if (screen.machine().input().code_pressed_once(KEYCODE_E))	{ state->m_tiles--;	screen.machine().tilemap().mark_all_dirty();	}
-		if (screen.machine().input().code_pressed_once(KEYCODE_R))	{ state->m_tiles++;	screen.machine().tilemap().mark_all_dirty();	}
-		if (screen.machine().input().code_pressed_once(KEYCODE_A))	{ state->m_trombank--;	screen.machine().tilemap().mark_all_dirty();	}
-		if (screen.machine().input().code_pressed_once(KEYCODE_S))	{ state->m_trombank++;	screen.machine().tilemap().mark_all_dirty();	}
+		if (screen.machine().input().code_pressed_once(KEYCODE_Q))	{ m_page--;	screen.machine().tilemap().mark_all_dirty();	}
+		if (screen.machine().input().code_pressed_once(KEYCODE_W))	{ m_page++;	screen.machine().tilemap().mark_all_dirty();	}
+		if (screen.machine().input().code_pressed_once(KEYCODE_E))	{ m_tiles--;	screen.machine().tilemap().mark_all_dirty();	}
+		if (screen.machine().input().code_pressed_once(KEYCODE_R))	{ m_tiles++;	screen.machine().tilemap().mark_all_dirty();	}
+		if (screen.machine().input().code_pressed_once(KEYCODE_A))	{ m_trombank--;	screen.machine().tilemap().mark_all_dirty();	}
+		if (screen.machine().input().code_pressed_once(KEYCODE_S))	{ m_trombank++;	screen.machine().tilemap().mark_all_dirty();	}
 
-		state->m_rombank  &= 0xf;
-		state->m_page  &= (state->m_text_dim > 0)?3:7;
-		state->m_tiles %= max_tiles;
-		if (state->m_tiles < 0) state->m_tiles += max_tiles;
+		m_rombank  &= 0xf;
+		m_page  &= (m_text_dim > 0)?3:7;
+		m_tiles %= max_tiles;
+		if (m_tiles < 0) m_tiles += max_tiles;
 
-		state->m_bg_tilemap->set_scrollx(0, 0x100 * state->m_page);
-		state->m_bg_tilemap->set_scrolly(0, 0);
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->set_scrollx(0, 0x100 * m_page);
+		m_bg_tilemap->set_scrolly(0, 0);
+		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 #if 1
 	popmessage("%02X %02X %02X - p%2X g%02X r%02X",
-						state->m_rombank, state->m_palettebank, state->m_spritebank,
-						state->m_page, state->m_tiles, state->m_trombank);
+						m_rombank, m_palettebank, m_spritebank,
+						m_page, m_tiles, m_trombank);
 #endif
 	}
 	else

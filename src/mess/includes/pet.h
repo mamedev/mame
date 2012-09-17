@@ -55,6 +55,7 @@ public:
 	virtual void machine_reset();
 	virtual void palette_init();
 	DECLARE_VIDEO_START(pet_crtc);
+	UINT32 screen_update_pet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/pet.c -----------*/
@@ -63,7 +64,7 @@ public:
 void pet_vh_init (running_machine &machine);
 void pet80_vh_init (running_machine &machine);
 void superpet_vh_init (running_machine &machine);
-SCREEN_UPDATE_IND16( pet );
+
 MC6845_UPDATE_ROW( pet40_update_row );
 MC6845_UPDATE_ROW( pet80_update_row );
 WRITE_LINE_DEVICE_HANDLER( pet_display_enable_changed );

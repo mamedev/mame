@@ -129,10 +129,9 @@ WRITE8_MEMBER(gridlee_state::gridlee_palette_select_w)
 /* all the GRIDLEE_VBEND adjustments are needed because the hardware has a separate counting chain
    to address the video memory instead of using the video chain directly */
 
-SCREEN_UPDATE_IND16( gridlee )
+UINT32 gridlee_state::screen_update_gridlee(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gridlee_state *state = screen.machine().driver_data<gridlee_state>();
-	const pen_t *pens = &screen.machine().pens[state->m_palettebank_vis * 32];
+	const pen_t *pens = &screen.machine().pens[m_palettebank_vis * 32];
 	UINT8 *gfx;
 	int x, y, i;
 
@@ -140,8 +139,8 @@ SCREEN_UPDATE_IND16( gridlee )
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		/* non-flipped: draw directly from the bitmap */
-		if (!state->m_cocktail_flip)
-			draw_scanline8(bitmap, 0, y, 256, &state->m_local_videoram[(y - GRIDLEE_VBEND) * 256], pens + 16);
+		if (!m_cocktail_flip)
+			draw_scanline8(bitmap, 0, y, 256, &m_local_videoram[(y - GRIDLEE_VBEND) * 256], pens + 16);
 
 		/* flipped: x-flip the scanline into a temp buffer and draw that */
 		else
@@ -151,7 +150,7 @@ SCREEN_UPDATE_IND16( gridlee )
 			int xx;
 
 			for (xx = 0; xx < 256; xx++)
-				temp[xx] = state->m_local_videoram[srcy * 256 + 255 - xx];
+				temp[xx] = m_local_videoram[srcy * 256 + 255 - xx];
 			draw_scanline8(bitmap, 0, y, 256, temp, pens + 16);
 		}
 	}
@@ -160,7 +159,7 @@ SCREEN_UPDATE_IND16( gridlee )
 	gfx = screen.machine().root_device().memregion("gfx1")->base();
 	for (i = 0; i < 32; i++)
 	{
-		UINT8 *sprite = state->m_spriteram + i * 4;
+		UINT8 *sprite = m_spriteram + i * 4;
 		UINT8 *src;
 		int image = sprite[0];
 		int ypos = sprite[2] + 17 + GRIDLEE_VBEND;
@@ -175,7 +174,7 @@ SCREEN_UPDATE_IND16( gridlee )
 			int currxor = 0;
 
 			/* adjust for flip */
-			if (state->m_cocktail_flip)
+			if (m_cocktail_flip)
 			{
 				ypos = 271 - ypos;
 				currxor = 0xff;
@@ -207,7 +206,7 @@ SCREEN_UPDATE_IND16( gridlee )
 				src += 4;
 
 			/* de-adjust for flip */
-			if (state->m_cocktail_flip)
+			if (m_cocktail_flip)
 				ypos = 271 - ypos;
 		}
 	}

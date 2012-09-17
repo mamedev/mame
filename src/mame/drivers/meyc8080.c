@@ -84,6 +84,7 @@ public:
 	DECLARE_WRITE8_MEMBER(meyc8080_dac_2_w);
 	DECLARE_WRITE8_MEMBER(meyc8080_dac_3_w);
 	DECLARE_WRITE8_MEMBER(meyc8080_dac_4_w);
+	UINT32 screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -93,21 +94,20 @@ public:
  *
  *************************************/
 
-static SCREEN_UPDATE_RGB32( meyc8080 )
+UINT32 meyc8080_state::screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	meyc8080_state *state = screen.machine().driver_data<meyc8080_state>();
 	offs_t offs;
 
-	for (offs = 0; offs < state->m_videoram_0.bytes(); offs++)
+	for (offs = 0; offs < m_videoram_0.bytes(); offs++)
 	{
 		int i;
 
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
-		UINT8 data0 = state->m_videoram_0[offs];
-		UINT8 data1 = state->m_videoram_1[offs];
-		UINT8 data2 = state->m_videoram_2[offs];
+		UINT8 data0 = m_videoram_0[offs];
+		UINT8 data1 = m_videoram_1[offs];
+		UINT8 data2 = m_videoram_2[offs];
 
 		/* weird equations, but it matches every flyer screenshot -
            perhaphs they used a look-up PROM? */
@@ -588,7 +588,7 @@ static MACHINE_CONFIG_START( meyc8080, meyc8080_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_UPDATE_STATIC(meyc8080)
+	MCFG_SCREEN_UPDATE_DRIVER(meyc8080_state, screen_update_meyc8080)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

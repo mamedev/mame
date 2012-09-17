@@ -44,326 +44,317 @@ WRITE16_MEMBER(dec0_state::dec0_paletteram_b_w)
 /******************************************************************************/
 
 
-SCREEN_UPDATE_IND16( hbarrel )
+UINT32 dec0_state::screen_update_hbarrel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dec0_state *state = screen.machine().driver_data<dec0_state>();
 
-	state->flip_screen_set(state->m_tilegen1->get_flip_state());
+	flip_screen_set(m_tilegen1->get_flip_state());
 
-	state->m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, 0x08, 0x0f);
-	state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+	m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+	m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, m_buffered_spriteram, 0x08, 0x08, 0x0f);
+	m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 
 	/* HB always keeps pf2 on top of pf3, no need explicitly support priority register */
 
-	state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, 0x00, 0x0f);
-	state->m_tilegen1->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+	m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, m_buffered_spriteram, 0x08, 0x00, 0x0f);
+	m_tilegen1->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
 
 /******************************************************************************/
 
-SCREEN_UPDATE_IND16( baddudes )
+UINT32 dec0_state::screen_update_baddudes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dec0_state *state = screen.machine().driver_data<dec0_state>();
-	state->flip_screen_set(state->m_tilegen1->get_flip_state());
+	flip_screen_set(m_tilegen1->get_flip_state());
 
 	/* WARNING: inverted wrt Midnight Resistance */
-	if ((state->m_pri & 0x01) == 0)
+	if ((m_pri & 0x01) == 0)
 	{
-		state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-		state->m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+		m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+		m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 
-		if (state->m_pri & 2)
-			state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles /* Foreground pens only */
+		if (m_pri & 2)
+			m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles /* Foreground pens only */
 
-		state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
+		m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, m_buffered_spriteram, 0x00, 0x00, 0x0f);
 
-		if (state->m_pri & 4)
-			state->m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles /* Foreground pens only */
+		if (m_pri & 4)
+			m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles /* Foreground pens only */
 	}
 	else
 	{
-		state->m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-		state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+		m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+		m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 
-		if (state->m_pri & 2)
-			state->m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles /* Foreground pens only */
+		if (m_pri & 2)
+			m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles /* Foreground pens only */
 
-		state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
+		m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, m_buffered_spriteram, 0x00, 0x00, 0x0f);
 
-		if (state->m_pri & 4)
-			state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles /* Foreground pens only */
+		if (m_pri & 4)
+			m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles /* Foreground pens only */
 	}
 
-	state->m_tilegen1->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+	m_tilegen1->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
 
 /******************************************************************************/
 
-SCREEN_UPDATE_IND16( robocop )
+UINT32 dec0_state::screen_update_robocop(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dec0_state *state = screen.machine().driver_data<dec0_state>();
 	int trans;
 
-	state->flip_screen_set(state->m_tilegen1->get_flip_state());
+	flip_screen_set(m_tilegen1->get_flip_state());
 
-	if (state->m_pri & 0x04)
+	if (m_pri & 0x04)
 		trans = 0x08;
 	else
 		trans = 0x00;
 
-	if (state->m_pri & 0x01)
+	if (m_pri & 0x01)
 	{
 		/* WARNING: inverted wrt Midnight Resistance */
 		/* Robocop uses it only for the title screen, so this might be just */
 		/* completely wrong. The top 8 bits of the register might mean */
 		/* something (they are 0x80 in midres, 0x00 here) */
-		state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+		m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 
-		if (state->m_pri & 0x02)
-			state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, trans, 0x0f);
+		if (m_pri & 0x02)
+			m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, m_buffered_spriteram, 0x08, trans, 0x0f);
 
-		state->m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+		m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	}
 	else
 	{
-		state->m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+		m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 
-		if (state->m_pri & 0x02)
-			state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, trans, 0x0f);
+		if (m_pri & 0x02)
+			m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, m_buffered_spriteram, 0x08, trans, 0x0f);
 
-		state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+		m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	}
 
-	if (state->m_pri & 0x02)
-		state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, trans^0x08, 0x0f);
+	if (m_pri & 0x02)
+		m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, m_buffered_spriteram, 0x08, trans^0x08, 0x0f);
 	else
-		state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
+		m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, m_buffered_spriteram, 0x00, 0x00, 0x0f);
 
-	state->m_tilegen1->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+	m_tilegen1->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( automat )
+UINT32 dec0_automat_state::screen_update_automat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dec0_automat_state *state = screen.machine().driver_data<dec0_automat_state>();
 	int trans;
 
 	// layer enables seem different... where are they?
 
 	// the bootleg doesn't write these registers, I think they're hardcoded?, so fake them for compatibility with our implementation..
 	address_space &space = screen.machine().driver_data()->generic_space();
-	deco_bac06_pf_control_0_w(state->m_tilegen1,space,0,0x0003, 0x00ff); // 8x8
-	deco_bac06_pf_control_0_w(state->m_tilegen1,space,1,0x0003, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen1,space,2,0x0000, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen1,space,3,0x0001, 0x00ff); // dimensions
+	deco_bac06_pf_control_0_w(m_tilegen1,space,0,0x0003, 0x00ff); // 8x8
+	deco_bac06_pf_control_0_w(m_tilegen1,space,1,0x0003, 0x00ff);
+	deco_bac06_pf_control_0_w(m_tilegen1,space,2,0x0000, 0x00ff);
+	deco_bac06_pf_control_0_w(m_tilegen1,space,3,0x0001, 0x00ff); // dimensions
 
-	deco_bac06_pf_control_0_w(state->m_tilegen2,space,0,0x0082, 0x00ff); // 16x16
-	deco_bac06_pf_control_0_w(state->m_tilegen2,space,1,0x0000, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen2,space,2,0x0000, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen2,space,3,0x0001, 0x00ff); // dimensions
+	deco_bac06_pf_control_0_w(m_tilegen2,space,0,0x0082, 0x00ff); // 16x16
+	deco_bac06_pf_control_0_w(m_tilegen2,space,1,0x0000, 0x00ff);
+	deco_bac06_pf_control_0_w(m_tilegen2,space,2,0x0000, 0x00ff);
+	deco_bac06_pf_control_0_w(m_tilegen2,space,3,0x0001, 0x00ff); // dimensions
 
-	deco_bac06_pf_control_0_w(state->m_tilegen3,space,0,0x0082, 0x00ff); // 16x16
-	deco_bac06_pf_control_0_w(state->m_tilegen3,space,1,0x0003, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen3,space,2,0x0000, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen3,space,3,0x0001, 0x00ff); // dimensions
+	deco_bac06_pf_control_0_w(m_tilegen3,space,0,0x0082, 0x00ff); // 16x16
+	deco_bac06_pf_control_0_w(m_tilegen3,space,1,0x0003, 0x00ff);
+	deco_bac06_pf_control_0_w(m_tilegen3,space,2,0x0000, 0x00ff);
+	deco_bac06_pf_control_0_w(m_tilegen3,space,3,0x0001, 0x00ff); // dimensions
 
 	// scroll registers got written elsewhere, copy them across
-	deco_bac06_pf_control_1_w(state->m_tilegen1,space,0,0x0000, 0xffff); // no scroll?
-	deco_bac06_pf_control_1_w(state->m_tilegen1,space,1,0x0000, 0xffff); // no scroll?
+	deco_bac06_pf_control_1_w(m_tilegen1,space,0,0x0000, 0xffff); // no scroll?
+	deco_bac06_pf_control_1_w(m_tilegen1,space,1,0x0000, 0xffff); // no scroll?
 
-	deco_bac06_pf_control_1_w(state->m_tilegen2,space,0,state->m_automat_scroll_regs[3] - 0x010a, 0xffff);
-	deco_bac06_pf_control_1_w(state->m_tilegen2,space,1,state->m_automat_scroll_regs[2], 0xffff);
+	deco_bac06_pf_control_1_w(m_tilegen2,space,0,m_automat_scroll_regs[3] - 0x010a, 0xffff);
+	deco_bac06_pf_control_1_w(m_tilegen2,space,1,m_automat_scroll_regs[2], 0xffff);
 
-	deco_bac06_pf_control_1_w(state->m_tilegen3,space,0,state->m_automat_scroll_regs[1] - 0x0108, 0xffff);
-	deco_bac06_pf_control_1_w(state->m_tilegen3,space,1,state->m_automat_scroll_regs[0], 0xffff);
+	deco_bac06_pf_control_1_w(m_tilegen3,space,0,m_automat_scroll_regs[1] - 0x0108, 0xffff);
+	deco_bac06_pf_control_1_w(m_tilegen3,space,1,m_automat_scroll_regs[0], 0xffff);
 
 
-	state->flip_screen_set(state->m_tilegen1->get_flip_state());
+	flip_screen_set(m_tilegen1->get_flip_state());
 
-	if (state->m_pri & 0x04)
+	if (m_pri & 0x04)
 		trans = 0x08;
 	else
 		trans = 0x00;
 
-	if (state->m_pri & 0x01)
+	if (m_pri & 0x01)
 	{
-		state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+		m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 
-		if (state->m_pri & 0x02)
-			state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, trans, 0x0f);
+		if (m_pri & 0x02)
+			m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, m_buffered_spriteram, 0x08, trans, 0x0f);
 
-		state->m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+		m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	}
 	else
 	{
-		state->m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+		m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 
-		if (state->m_pri & 0x02)
-			state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, trans, 0x0f);
+		if (m_pri & 0x02)
+			m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, m_buffered_spriteram, 0x08, trans, 0x0f);
 
-		state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+		m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	}
 
-	if (state->m_pri & 0x02)
-		state->m_spritegen->draw_sprites_bootleg(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, trans^0x08, 0x0f);
+	if (m_pri & 0x02)
+		m_spritegen->draw_sprites_bootleg(screen.machine(), bitmap, cliprect, m_buffered_spriteram, 0x08, trans^0x08, 0x0f);
 	else
-		state->m_spritegen->draw_sprites_bootleg(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
+		m_spritegen->draw_sprites_bootleg(screen.machine(), bitmap, cliprect, m_buffered_spriteram, 0x00, 0x00, 0x0f);
 
-	state->m_tilegen1->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+	m_tilegen1->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( secretab )
+UINT32 dec0_automat_state::screen_update_secretab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dec0_automat_state *state = screen.machine().driver_data<dec0_automat_state>();
 
 	// layer enables seem different... where are they?
 
 	// the bootleg doesn't write these registers, I think they're hardcoded?, so fake them for compatibility with our implementation..
 	address_space &space = screen.machine().driver_data()->generic_space();
-	deco_bac06_pf_control_0_w(state->m_tilegen1,space,0,0x0003, 0x00ff); // 8x8
-	deco_bac06_pf_control_0_w(state->m_tilegen1,space,1,0x0003, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen1,space,2,0x0000, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen1,space,3,0x0001, 0x00ff); // dimensions
+	deco_bac06_pf_control_0_w(m_tilegen1,space,0,0x0003, 0x00ff); // 8x8
+	deco_bac06_pf_control_0_w(m_tilegen1,space,1,0x0003, 0x00ff);
+	deco_bac06_pf_control_0_w(m_tilegen1,space,2,0x0000, 0x00ff);
+	deco_bac06_pf_control_0_w(m_tilegen1,space,3,0x0001, 0x00ff); // dimensions
 
-	deco_bac06_pf_control_0_w(state->m_tilegen2,space,0,0x0082, 0x00ff); // 16x16
-	deco_bac06_pf_control_0_w(state->m_tilegen2,space,1,0x0000, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen2,space,2,0x0000, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen2,space,3,0x0001, 0x00ff); // dimensions
+	deco_bac06_pf_control_0_w(m_tilegen2,space,0,0x0082, 0x00ff); // 16x16
+	deco_bac06_pf_control_0_w(m_tilegen2,space,1,0x0000, 0x00ff);
+	deco_bac06_pf_control_0_w(m_tilegen2,space,2,0x0000, 0x00ff);
+	deco_bac06_pf_control_0_w(m_tilegen2,space,3,0x0001, 0x00ff); // dimensions
 
-	deco_bac06_pf_control_0_w(state->m_tilegen3,space,0,0x0082, 0x00ff); // 16x16
-	deco_bac06_pf_control_0_w(state->m_tilegen3,space,1,0x0003, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen3,space,2,0x0000, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen3,space,3,0x0001, 0x00ff); // dimensions
+	deco_bac06_pf_control_0_w(m_tilegen3,space,0,0x0082, 0x00ff); // 16x16
+	deco_bac06_pf_control_0_w(m_tilegen3,space,1,0x0003, 0x00ff);
+	deco_bac06_pf_control_0_w(m_tilegen3,space,2,0x0000, 0x00ff);
+	deco_bac06_pf_control_0_w(m_tilegen3,space,3,0x0001, 0x00ff); // dimensions
 
 	// scroll registers got written elsewhere, copy them across
-	deco_bac06_pf_control_1_w(state->m_tilegen1,space,0,0x0000, 0xffff); // no scroll?
-	deco_bac06_pf_control_1_w(state->m_tilegen1,space,1,0x0000, 0xffff); // no scroll?
+	deco_bac06_pf_control_1_w(m_tilegen1,space,0,0x0000, 0xffff); // no scroll?
+	deco_bac06_pf_control_1_w(m_tilegen1,space,1,0x0000, 0xffff); // no scroll?
 
-	deco_bac06_pf_control_1_w(state->m_tilegen2,space,0,state->m_automat_scroll_regs[3] - 0x010a, 0xffff);
-	deco_bac06_pf_control_1_w(state->m_tilegen2,space,1,state->m_automat_scroll_regs[2], 0xffff);
+	deco_bac06_pf_control_1_w(m_tilegen2,space,0,m_automat_scroll_regs[3] - 0x010a, 0xffff);
+	deco_bac06_pf_control_1_w(m_tilegen2,space,1,m_automat_scroll_regs[2], 0xffff);
 
-	deco_bac06_pf_control_1_w(state->m_tilegen3,space,0,state->m_automat_scroll_regs[1] - 0x0108, 0xffff);
-	deco_bac06_pf_control_1_w(state->m_tilegen3,space,1,state->m_automat_scroll_regs[0], 0xffff);
+	deco_bac06_pf_control_1_w(m_tilegen3,space,0,m_automat_scroll_regs[1] - 0x0108, 0xffff);
+	deco_bac06_pf_control_1_w(m_tilegen3,space,1,m_automat_scroll_regs[0], 0xffff);
 
-	state->flip_screen_set(state->m_tilegen1->get_flip_state());
+	flip_screen_set(m_tilegen1->get_flip_state());
 
-	state->m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+	m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+	m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 
-	state->m_spritegen->draw_sprites_bootleg(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
+	m_spritegen->draw_sprites_bootleg(screen.machine(), bitmap, cliprect, m_buffered_spriteram, 0x00, 0x00, 0x0f);
 
 	/* Redraw top 8 pens of top 8 palettes over sprites */
-	if (state->m_pri&0x80)
-		state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles
+	if (m_pri&0x80)
+		m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles
 
-	state->m_tilegen1->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+	m_tilegen1->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
 
 
 /******************************************************************************/
 
-SCREEN_UPDATE_IND16( birdtry )
+UINT32 dec0_state::screen_update_birdtry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dec0_state *state = screen.machine().driver_data<dec0_state>();
 
-	state->flip_screen_set(state->m_tilegen1->get_flip_state());
+	flip_screen_set(m_tilegen1->get_flip_state());
 
 	/* This game doesn't have the extra playfield chip on the game board, but
     the palette does show through. */
 	bitmap.fill(screen.machine().pens[768], cliprect);
-	state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
-	state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
-	state->m_tilegen1->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+	m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+	m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, m_buffered_spriteram, 0x00, 0x00, 0x0f);
+	m_tilegen1->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
 
 /******************************************************************************/
 
-SCREEN_UPDATE_IND16( hippodrm )
+UINT32 dec0_state::screen_update_hippodrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dec0_state *state = screen.machine().driver_data<dec0_state>();
-	state->flip_screen_set(state->m_tilegen1->get_flip_state());
+	flip_screen_set(m_tilegen1->get_flip_state());
 
-	if (state->m_pri & 0x01)
+	if (m_pri & 0x01)
 	{
-		state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-		state->m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+		m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+		m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	}
 	else
 	{
-		state->m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-		state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+		m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+		m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	}
 
-	state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
-	state->m_tilegen1->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+	m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, m_buffered_spriteram, 0x00, 0x00, 0x0f);
+	m_tilegen1->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
 
 /******************************************************************************/
 
-SCREEN_UPDATE_IND16( slyspy )
+UINT32 dec0_state::screen_update_slyspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dec0_state *state = screen.machine().driver_data<dec0_state>();
-	state->flip_screen_set(state->m_tilegen1->get_flip_state());
+	flip_screen_set(m_tilegen1->get_flip_state());
 
-	state->m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+	m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+	m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 
-	state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
+	m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, m_buffered_spriteram, 0x00, 0x00, 0x0f);
 
 	/* Redraw top 8 pens of top 8 palettes over sprites */
-	if (state->m_pri&0x80)
-		state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles
+	if (m_pri&0x80)
+		m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles
 
-	state->m_tilegen1->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+	m_tilegen1->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
 
 /******************************************************************************/
 
-SCREEN_UPDATE_IND16( midres )
+UINT32 dec0_state::screen_update_midres(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dec0_state *state = screen.machine().driver_data<dec0_state>();
 	int trans;
 
-	state->flip_screen_set(state->m_tilegen1->get_flip_state());
+	flip_screen_set(m_tilegen1->get_flip_state());
 
-	if (state->m_pri & 0x04)
+	if (m_pri & 0x04)
 		trans = 0x00;
 	else trans = 0x08;
 
-	if (state->m_pri & 0x01)
+	if (m_pri & 0x01)
 	{
-		state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+		m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 
-		if (state->m_pri & 0x02)
-			state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, trans, 0x0f);
+		if (m_pri & 0x02)
+			m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, m_buffered_spriteram, 0x08, trans, 0x0f);
 
-		state->m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+		m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	}
 	else
 	{
-		state->m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+		m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 
-		if (state->m_pri & 0x02)
-			state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, trans, 0x0f);
+		if (m_pri & 0x02)
+			m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, m_buffered_spriteram, 0x08, trans, 0x0f);
 
-		state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+		m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	}
 
-	if (state->m_pri & 0x02)
-		state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, trans ^ 0x08, 0x0f);
+	if (m_pri & 0x02)
+		m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, m_buffered_spriteram, 0x08, trans ^ 0x08, 0x0f);
 	else
-		state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
+		m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, m_buffered_spriteram, 0x00, 0x00, 0x0f);
 
-	state->m_tilegen1->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+	m_tilegen1->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
 

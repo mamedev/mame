@@ -107,9 +107,8 @@ VIDEO_START_MEMBER(galaxia_state,astrowar)
 
 /********************************************************************************/
 
-SCREEN_UPDATE_IND16( galaxia )
+UINT32 galaxia_state::screen_update_galaxia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galaxia_state *state = screen.machine().driver_data<galaxia_state>();
 	int x, y;
 
 	bitmap_ind16 &s2636_0_bitmap = s2636_update(screen.machine().device("s2636_0"), cliprect);
@@ -118,20 +117,20 @@ SCREEN_UPDATE_IND16( galaxia )
 
 	bitmap.fill(0, cliprect);
 	cvs_update_stars(screen.machine(), bitmap, cliprect, STAR_PEN, 1);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			bool bullet = state->m_bullet_ram[y] && x == (state->m_bullet_ram[y] ^ 0xff);
+			bool bullet = m_bullet_ram[y] && x == (m_bullet_ram[y] ^ 0xff);
 			bool background = (bitmap.pix16(y, x) & 3) != 0;
 
 			// draw bullets (guesswork)
 			if (bullet)
 			{
 				// background vs. bullet collision detection
-				if (background) state->m_collision_register |= 0x80;
+				if (background) m_collision_register |= 0x80;
 
 				// bullet size/color/priority is guessed
 				bitmap.pix16(y, x) = BULLET_PEN;
@@ -148,20 +147,20 @@ SCREEN_UPDATE_IND16( galaxia )
 			if (S2636_IS_PIXEL_DRAWN(pixel))
 			{
 				// S2636 vs. S2636 collision detection
-				if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel1)) state->m_collision_register |= 0x01;
-				if (S2636_IS_PIXEL_DRAWN(pixel1) && S2636_IS_PIXEL_DRAWN(pixel2)) state->m_collision_register |= 0x02;
-				if (S2636_IS_PIXEL_DRAWN(pixel2) && S2636_IS_PIXEL_DRAWN(pixel0)) state->m_collision_register |= 0x04;
+				if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel1)) m_collision_register |= 0x01;
+				if (S2636_IS_PIXEL_DRAWN(pixel1) && S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x02;
+				if (S2636_IS_PIXEL_DRAWN(pixel2) && S2636_IS_PIXEL_DRAWN(pixel0)) m_collision_register |= 0x04;
 
 				// S2636 vs. bullet collision detection
-				if (bullet) state->m_collision_register |= 0x08;
+				if (bullet) m_collision_register |= 0x08;
 
 				// S2636 vs. background collision detection
 				if (background)
 				{
 					/* bit4 causes problems on 2nd level
-                    if (S2636_IS_PIXEL_DRAWN(pixel0)) state->m_collision_register |= 0x10; */
-					if (S2636_IS_PIXEL_DRAWN(pixel1)) state->m_collision_register |= 0x20;
-					if (S2636_IS_PIXEL_DRAWN(pixel2)) state->m_collision_register |= 0x40;
+                    if (S2636_IS_PIXEL_DRAWN(pixel0)) m_collision_register |= 0x10; */
+					if (S2636_IS_PIXEL_DRAWN(pixel1)) m_collision_register |= 0x20;
+					if (S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x40;
 				}
 
 				bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel) | SPRITE_PEN_BASE;
@@ -173,29 +172,28 @@ SCREEN_UPDATE_IND16( galaxia )
 }
 
 
-SCREEN_UPDATE_IND16( astrowar )
+UINT32 galaxia_state::screen_update_astrowar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// astrowar has only one S2636
-	galaxia_state *state = screen.machine().driver_data<galaxia_state>();
 	int x, y;
 
 	bitmap_ind16 &s2636_0_bitmap = s2636_update(screen.machine().device("s2636_0"), cliprect);
 
 	bitmap.fill(0, cliprect);
 	cvs_update_stars(screen.machine(), bitmap, cliprect, STAR_PEN, 1);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	copybitmap(state->m_temp_bitmap, bitmap, 0, 0, 0, 0, cliprect);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	copybitmap(m_temp_bitmap, bitmap, 0, 0, 0, 0, cliprect);
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		// draw bullets (guesswork)
-		if (state->m_bullet_ram[y])
+		if (m_bullet_ram[y])
 		{
-			UINT8 pos = state->m_bullet_ram[y] ^ 0xff;
+			UINT8 pos = m_bullet_ram[y] ^ 0xff;
 
 			// background vs. bullet collision detection
-			if (state->m_temp_bitmap.pix16(y, pos) & 1)
-				state->m_collision_register |= 0x02;
+			if (m_temp_bitmap.pix16(y, pos) & 1)
+				m_collision_register |= 0x02;
 
 			// bullet size/color/priority is guessed
 			bitmap.pix16(y, pos) = BULLET_PEN;
@@ -218,8 +216,8 @@ SCREEN_UPDATE_IND16( astrowar )
 			if (S2636_IS_PIXEL_DRAWN(pixel))
 			{
 				// S2636 vs. background collision detection
-				if ((state->m_temp_bitmap.pix16(y, (int)(sx)) | state->m_temp_bitmap.pix16(y, (int)(sx + 0.5))) & 1)
-					state->m_collision_register |= 0x01;
+				if ((m_temp_bitmap.pix16(y, (int)(sx)) | m_temp_bitmap.pix16(y, (int)(sx + 0.5))) & 1)
+					m_collision_register |= 0x01;
 
 				bitmap.pix16(y, (int)(sx)) = S2636_PIXEL_COLOR(pixel) | SPRITE_PEN_BASE;
 				bitmap.pix16(y, (int)(sx + 0.5)) = S2636_PIXEL_COLOR(pixel) | SPRITE_PEN_BASE;

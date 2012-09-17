@@ -249,6 +249,7 @@ public:
 	DECLARE_READ64_MEMBER(cpu_r);
 	DECLARE_DRIVER_INIT(m2);
 	virtual void video_start();
+	UINT32 screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -256,20 +257,19 @@ void konamim2_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( m2 )
+UINT32 konamim2_state::screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	konamim2_state *state = screen.machine().driver_data<konamim2_state>();
 	int i, j;
 
 	UINT32 fb_start = 0xffffffff;
-	if (state->m_vdl0_address != 0)
+	if (m_vdl0_address != 0)
 	{
-		fb_start = *(UINT32*)&state->m_main_ram[(state->m_vdl0_address - 0x40000000) / 8] - 0x40000000;
+		fb_start = *(UINT32*)&m_main_ram[(m_vdl0_address - 0x40000000) / 8] - 0x40000000;
 	}
 
 	if (fb_start <= 0x800000)
 	{
-		UINT16 *frame = (UINT16*)&state->m_main_ram[fb_start/8];
+		UINT16 *frame = (UINT16*)&m_main_ram[fb_start/8];
 		for (j=0; j < 384; j++)
 		{
 			UINT16 *fb = &frame[(j*512)];
@@ -1184,7 +1184,7 @@ static MACHINE_CONFIG_START( m2, konamim2_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_STATIC(m2)
+	MCFG_SCREEN_UPDATE_DRIVER(konamim2_state, screen_update_m2)
 
 	MCFG_PALETTE_LENGTH(32768)
 	MCFG_PALETTE_INIT(RRRRR_GGGGG_BBBBB)

@@ -175,6 +175,8 @@ public:
 	DECLARE_DRIVER_INIT(ucytokyu);
 	DECLARE_DRIVER_INIT(haekaka);
 	DECLARE_MACHINE_RESET(sammymdl);
+	UINT32 screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_sammymdl(screen_device &screen, bool state);
 };
 
 
@@ -302,7 +304,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-static SCREEN_UPDATE_IND16(sigmab98)
+UINT32 sigmab98_state::screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 
@@ -680,13 +682,12 @@ WRITE8_MEMBER(sigmab98_state::vblank_w)
 	m_vblank = (m_vblank & ~0x03) | (data & 0x03);
 }
 
-static SCREEN_VBLANK( sammymdl )
+void sigmab98_state::screen_eof_sammymdl(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		sigmab98_state *state = screen.machine().driver_data<sigmab98_state>();
-		state->m_vblank &= ~0x01;
+		m_vblank &= ~0x01;
 	}
 }
 
@@ -1710,7 +1711,7 @@ static MACHINE_CONFIG_START( gegege, sigmab98_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// game reads vblank state
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0,0x140-1, 0,0xf0-1)
-	MCFG_SCREEN_UPDATE_STATIC(sigmab98)
+	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
 
 	MCFG_GFXDECODE(sigmab98)
 	MCFG_PALETTE_LENGTH(0x100)
@@ -1764,8 +1765,8 @@ static MACHINE_CONFIG_START( sammymdl, sigmab98_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(0x140, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xf0-1)
-	MCFG_SCREEN_UPDATE_STATIC(sigmab98)
-	MCFG_SCREEN_VBLANK_STATIC(sammymdl)
+	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
+	MCFG_SCREEN_VBLANK_DRIVER(sigmab98_state, screen_eof_sammymdl)
 
 	MCFG_GFXDECODE(sigmab98)
 	MCFG_PALETTE_LENGTH(0x100)

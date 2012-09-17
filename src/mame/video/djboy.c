@@ -52,7 +52,7 @@ WRITE8_MEMBER(djboy_state::djboy_paletteram_w)
 	palette_set_color_rgb(machine(), offset / 2, pal4bit(val >> 8), pal4bit(val >> 4), pal4bit(val >> 0));
 }
 
-SCREEN_UPDATE_IND16( djboy )
+UINT32 djboy_state::screen_update_djboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/**
      * xx------ msb x
@@ -60,27 +60,25 @@ SCREEN_UPDATE_IND16( djboy )
      * ---x---- flipscreen?
      * ----xxxx ROM bank
      */
-	djboy_state *state = screen.machine().driver_data<djboy_state>();
 	int scroll;
 
-	scroll = state->m_scrollx | ((state->m_videoreg & 0xc0) << 2);
-	state->m_background->set_scrollx(0, scroll - 0x391);
+	scroll = m_scrollx | ((m_videoreg & 0xc0) << 2);
+	m_background->set_scrollx(0, scroll - 0x391);
 
-	scroll = state->m_scrolly | ((state->m_videoreg & 0x20) << 3);
-	state->m_background->set_scrolly(0, scroll);
+	scroll = m_scrolly | ((m_videoreg & 0x20) << 3);
+	m_background->set_scrolly(0, scroll);
 
-	state->m_background->draw(bitmap, cliprect, 0, 0);
-	pandora_update(state->m_pandora, bitmap, cliprect);
+	m_background->draw(bitmap, cliprect, 0, 0);
+	pandora_update(m_pandora, bitmap, cliprect);
 
 	return 0;
 }
 
-SCREEN_VBLANK( djboy )
+void djboy_state::screen_eof_djboy(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		djboy_state *state = screen.machine().driver_data<djboy_state>();
-		pandora_eof(state->m_pandora);
+		pandora_eof(m_pandora);
 	}
 }

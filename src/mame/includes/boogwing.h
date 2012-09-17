@@ -47,11 +47,12 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_DRIVER_INIT(boogwing);
 	virtual void video_start();
+	UINT32 screen_update_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/boogwing.c -----------*/
 
 
-SCREEN_UPDATE_RGB32( boogwing );
+
 

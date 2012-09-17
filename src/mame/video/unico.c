@@ -337,19 +337,18 @@ static void zeropnt2_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( unico )
+UINT32 unico_state::screen_update_unico(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	unico_state *state = screen.machine().driver_data<unico_state>();
 	int layers_ctrl = -1;
 
-	state->m_tilemap[0]->set_scrollx(0, state->m_scroll[0x00]);
-	state->m_tilemap[0]->set_scrolly(0, state->m_scroll[0x01]);
+	m_tilemap[0]->set_scrollx(0, m_scroll[0x00]);
+	m_tilemap[0]->set_scrolly(0, m_scroll[0x01]);
 
-	state->m_tilemap[1]->set_scrollx(0, state->m_scroll[0x05]);
-	state->m_tilemap[1]->set_scrolly(0, state->m_scroll[0x0a]);
+	m_tilemap[1]->set_scrollx(0, m_scroll[0x05]);
+	m_tilemap[1]->set_scrolly(0, m_scroll[0x0a]);
 
-	state->m_tilemap[2]->set_scrollx(0, state->m_scroll[0x04]);
-	state->m_tilemap[2]->set_scrolly(0, state->m_scroll[0x02]);
+	m_tilemap[2]->set_scrollx(0, m_scroll[0x04]);
+	m_tilemap[2]->set_scrolly(0, m_scroll[0x02]);
 
 #ifdef MAME_DEBUG
 if ( screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input().code_pressed(KEYCODE_X) )
@@ -367,9 +366,9 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input(
 	bitmap.fill(0x1f00, cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	if (layers_ctrl & 1)	state->m_tilemap[0]->draw(bitmap, cliprect, 0,1);
-	if (layers_ctrl & 2)	state->m_tilemap[1]->draw(bitmap, cliprect, 0,2);
-	if (layers_ctrl & 4)	state->m_tilemap[2]->draw(bitmap, cliprect, 0,4);
+	if (layers_ctrl & 1)	m_tilemap[0]->draw(bitmap, cliprect, 0,1);
+	if (layers_ctrl & 2)	m_tilemap[1]->draw(bitmap, cliprect, 0,2);
+	if (layers_ctrl & 4)	m_tilemap[2]->draw(bitmap, cliprect, 0,4);
 
 	/* Sprites are drawn last, using pdrawgfx */
 	if (layers_ctrl & 8)	unico_draw_sprites(screen.machine(), bitmap,cliprect);
@@ -377,19 +376,18 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input(
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( zeropnt2 )
+UINT32 unico_state::screen_update_zeropnt2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	unico_state *state = screen.machine().driver_data<unico_state>();
 	int layers_ctrl = -1;
 
-	state->m_tilemap[0]->set_scrollx(0, state->m_scroll32[0] >> 16);
-	state->m_tilemap[0]->set_scrolly(0, state->m_scroll32[0] & 0xffff);
+	m_tilemap[0]->set_scrollx(0, m_scroll32[0] >> 16);
+	m_tilemap[0]->set_scrolly(0, m_scroll32[0] & 0xffff);
 
-	state->m_tilemap[1]->set_scrollx(0, state->m_scroll32[2] & 0xffff);
-	state->m_tilemap[1]->set_scrolly(0, state->m_scroll32[5] >> 16);
+	m_tilemap[1]->set_scrollx(0, m_scroll32[2] & 0xffff);
+	m_tilemap[1]->set_scrolly(0, m_scroll32[5] >> 16);
 
-	state->m_tilemap[2]->set_scrollx(0, state->m_scroll32[2] >> 16);
-	state->m_tilemap[2]->set_scrolly(0, state->m_scroll32[1] >> 16);
+	m_tilemap[2]->set_scrollx(0, m_scroll32[2] >> 16);
+	m_tilemap[2]->set_scrolly(0, m_scroll32[1] >> 16);
 
 #ifdef MAME_DEBUG
 if ( screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input().code_pressed(KEYCODE_X) )
@@ -407,9 +405,9 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input(
 	bitmap.fill(0x1f00, cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	if (layers_ctrl & 1)	state->m_tilemap[0]->draw(bitmap, cliprect, 0,1);
-	if (layers_ctrl & 2)	state->m_tilemap[1]->draw(bitmap, cliprect, 0,2);
-	if (layers_ctrl & 4)	state->m_tilemap[2]->draw(bitmap, cliprect, 0,4);
+	if (layers_ctrl & 1)	m_tilemap[0]->draw(bitmap, cliprect, 0,1);
+	if (layers_ctrl & 2)	m_tilemap[1]->draw(bitmap, cliprect, 0,2);
+	if (layers_ctrl & 4)	m_tilemap[2]->draw(bitmap, cliprect, 0,4);
 
 	/* Sprites are drawn last, using pdrawgfx */
 	if (layers_ctrl & 8)	zeropnt2_draw_sprites(screen.machine(), bitmap,cliprect);

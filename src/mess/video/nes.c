@@ -37,32 +37,31 @@ void nes_state::palette_init()
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( nes )
+UINT32 nes_state::screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	nes_state *state = screen.machine().driver_data<nes_state>();
 
 	/* render the ppu */
-	state->m_ppu->render(bitmap, 0, 0, 0, 0);
+	m_ppu->render(bitmap, 0, 0, 0, 0);
 
 	/* if this is a disk system game, check for the flip-disk key */
-	if (state->m_disk_expansion && state->m_pcb_id == NO_BOARD)
+	if (m_disk_expansion && m_pcb_id == NO_BOARD)
 	{
 		// latch this input so it doesn't go at warp speed
-		if ((screen.machine().root_device().ioport("FLIPDISK")->read() & 0x01) && (!state->m_last_frame_flip))
+		if ((screen.machine().root_device().ioport("FLIPDISK")->read() & 0x01) && (!m_last_frame_flip))
 		{
-			state->m_last_frame_flip = 1;
-			state->m_fds_current_side++;
-			if (state->m_fds_current_side > state->m_fds_sides)
-				state->m_fds_current_side = 0;
+			m_last_frame_flip = 1;
+			m_fds_current_side++;
+			if (m_fds_current_side > m_fds_sides)
+				m_fds_current_side = 0;
 
-			if (state->m_fds_current_side == 0)
+			if (m_fds_current_side == 0)
 				popmessage("No disk inserted.");
 			else
-				popmessage("Disk set to side %d", state->m_fds_current_side);
+				popmessage("Disk set to side %d", m_fds_current_side);
 		}
 
 		if (!(screen.machine().root_device().ioport("FLIPDISK")->read() & 0x01))
-			state->m_last_frame_flip = 0;
+			m_last_frame_flip = 0;
 	}
 	return 0;
 }

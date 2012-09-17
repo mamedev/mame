@@ -136,6 +136,7 @@ public:
 	DECLARE_MACHINE_RESET(hec2hrx);
 	DECLARE_MACHINE_START(hec2mdhrx);
 	DECLARE_MACHINE_RESET(hec2mdhrx);
+	UINT32 screen_update_hec2hrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in machine/hec2hrp.c -----------*/
@@ -154,7 +155,7 @@ DECLARE_READ8_HANDLER( hector_mx_io_port_r );
 void hector_80c(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram) ;
 void hector_hr(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram) ;
 
-SCREEN_UPDATE_IND16( hec2hrp );
+
 
 /* Sound function*/
 extern const sn76477_interface hector_sn76477_interface;

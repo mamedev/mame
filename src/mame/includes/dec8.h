@@ -121,20 +121,29 @@ public:
 	DECLARE_VIDEO_START(oscar);
 	DECLARE_VIDEO_START(srdarwin);
 	DECLARE_VIDEO_START(cobracom);
+	UINT32 screen_update_lastmisn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_shackled(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_gondo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_garyoret(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_ghostb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_oscar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_srdarwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_cobracom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_dec8(screen_device &screen, bool state);
 };
 
 /*----------- defined in video/dec8.c -----------*/
 
 
 
-SCREEN_UPDATE_IND16( cobracom );
-SCREEN_UPDATE_IND16( ghostb );
-SCREEN_UPDATE_IND16( srdarwin );
-SCREEN_UPDATE_IND16( gondo );
-SCREEN_UPDATE_IND16( garyoret );
-SCREEN_UPDATE_IND16( lastmisn );
-SCREEN_UPDATE_IND16( shackled );
-SCREEN_UPDATE_IND16( oscar );
+
+
+
+
+
+
+
+
 
 
 

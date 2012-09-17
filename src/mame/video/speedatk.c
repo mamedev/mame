@@ -85,9 +85,8 @@ WRITE8_MEMBER(speedatk_state::speedatk_6845_w)
 	}
 }
 
-SCREEN_UPDATE_IND16( speedatk )
+UINT32 speedatk_state::screen_update_speedatk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	speedatk_state *state = screen.machine().driver_data<speedatk_state>();
 	int x,y;
 	int count;
 	UINT16 tile;
@@ -95,21 +94,21 @@ SCREEN_UPDATE_IND16( speedatk )
 
 	bitmap.fill(0, cliprect);
 
-	count = (state->m_crtc_vreg[0x0c]<<8)|(state->m_crtc_vreg[0x0d] & 0xff);
+	count = (m_crtc_vreg[0x0c]<<8)|(m_crtc_vreg[0x0d] & 0xff);
 
-	if(state->m_flip_scr) { count = 0x3ff - count; }
+	if(m_flip_scr) { count = 0x3ff - count; }
 
-	for(y=0;y<state->m_crtc_vreg[6];y++)
+	for(y=0;y<m_crtc_vreg[6];y++)
 	{
-		for(x=0;x<state->m_crtc_vreg[1];x++)
+		for(x=0;x<m_crtc_vreg[1];x++)
 		{
-			tile = state->m_videoram[count] + ((state->m_colorram[count] & 0xe0) << 3);
-			color = state->m_colorram[count] & 0x1f;
-			region = (state->m_colorram[count] & 0x10) >> 4;
+			tile = m_videoram[count] + ((m_colorram[count] & 0xe0) << 3);
+			color = m_colorram[count] & 0x1f;
+			region = (m_colorram[count] & 0x10) >> 4;
 
-			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[region],tile,color,state->m_flip_scr,state->m_flip_scr,x*8,y*8);
+			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[region],tile,color,m_flip_scr,m_flip_scr,x*8,y*8);
 
-			count = (state->m_flip_scr) ? count-1 : count+1;
+			count = (m_flip_scr) ? count-1 : count+1;
 			count&=0x3ff;
 		}
 	}

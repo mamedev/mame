@@ -49,6 +49,7 @@ public:
 	UINT32 m_nand_stage;
 	UINT32 m_nand_ptr_temp;
 	UINT32 m_timer;
+	UINT32 screen_update_gp2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -140,24 +141,23 @@ static const char *const gp2x_regnames[0x200] =
 	"YUV Source region A H",
 };
 #endif
-static SCREEN_UPDATE_RGB32( gp2x )
+UINT32 gp2x_state::screen_update_gp2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	gp2x_state *state = screen.machine().driver_data<gp2x_state>();
 	// display enabled?
-	if (state->m_vidregs[0] & 1)
+	if (m_vidregs[0] & 1)
 	{
 		// only support RGB still image layer for now
-		if (state->m_vidregs[0x80/2] & 4)
+		if (m_vidregs[0x80/2] & 4)
 		{
 			int x, y;
-			UINT16 *vram = (UINT16 *)&state->m_ram[0x2100000/4];
+			UINT16 *vram = (UINT16 *)&m_ram[0x2100000/4];
 
 /*          printf("RGB still image 1 enabled, bpp %d, size is %d %d %d %d\n",
-                (state->m_vidregs[(0xda/2)]>>9)&3,
-                state->m_vidregs[(0xe2/2)],
-                state->m_vidregs[(0xe4/2)],
-                state->m_vidregs[(0xe6/2)],
-                state->m_vidregs[(0xe8/2)]);*/
+                (m_vidregs[(0xda/2)]>>9)&3,
+                m_vidregs[(0xe2/2)],
+                m_vidregs[(0xe4/2)],
+                m_vidregs[(0xe6/2)],
+                m_vidregs[(0xe8/2)]);*/
 
 
 			for (y = 0; y < 240; y++)
@@ -362,7 +362,7 @@ static MACHINE_CONFIG_START( gp2x, gp2x_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(gp2x)
+	MCFG_SCREEN_UPDATE_DRIVER(gp2x_state, screen_update_gp2x)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END

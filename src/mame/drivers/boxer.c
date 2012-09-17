@@ -49,6 +49,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void palette_init();
+	UINT32 screen_update_boxer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*************************************
@@ -170,9 +171,8 @@ static void draw_boxer( running_machine &machine, bitmap_ind16 &bitmap, const re
 }
 
 
-static SCREEN_UPDATE_IND16( boxer )
+UINT32 boxer_state::screen_update_boxer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	boxer_state *state = screen.machine().driver_data<boxer_state>();
 	int i, j;
 
 	bitmap.fill(1, cliprect);
@@ -181,7 +181,7 @@ static SCREEN_UPDATE_IND16( boxer )
 	{
 		for (j = 0; j < 32; j++)
 		{
-			UINT8 code = state->m_tile_ram[32 * i + j];
+			UINT8 code = m_tile_ram[32 * i + j];
 
 			drawgfx_transpen(bitmap, cliprect,
 				screen.machine().gfx[2],
@@ -455,7 +455,7 @@ static MACHINE_CONFIG_START( boxer, boxer_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(8, 247, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(boxer)
+	MCFG_SCREEN_UPDATE_DRIVER(boxer_state, screen_update_boxer)
 
 	MCFG_GFXDECODE(boxer)
 	MCFG_PALETTE_LENGTH(4)

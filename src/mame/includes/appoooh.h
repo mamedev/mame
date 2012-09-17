@@ -50,6 +50,8 @@ public:
 	DECLARE_VIDEO_START(appoooh);
 	DECLARE_PALETTE_INIT(appoooh);
 	DECLARE_PALETTE_INIT(robowres);
+	UINT32 screen_update_appoooh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_robowres(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 #define CHR1_OFST   0x00  /* palette page of char set #1 */
@@ -61,5 +63,5 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( appoooh );
-SCREEN_UPDATE_IND16( robowres );
+
+

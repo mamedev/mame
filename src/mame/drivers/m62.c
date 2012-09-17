@@ -966,7 +966,7 @@ static MACHINE_CONFIG_START( ldrun, m62_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790) /* frames per second and vblank duration from the Lode Runner manual */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA((64*8-384)/2, 64*8-(64*8-384)/2-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(ldrun)
+	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_ldrun)
 
 	MCFG_GFXDECODE(ldrun)
 	MCFG_PALETTE_LENGTH(512)
@@ -988,7 +988,7 @@ static MACHINE_CONFIG_DERIVED( kungfum, ldrun )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(kungfum)
+	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_kungfum)
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,kungfum)
 MACHINE_CONFIG_END
@@ -1005,7 +1005,7 @@ static MACHINE_CONFIG_DERIVED( battroad, ldrun )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(battroad)
+	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_battroad)
 	MCFG_GFXDECODE(battroad)
 	MCFG_PALETTE_LENGTH(544)
 
@@ -1023,7 +1023,7 @@ static MACHINE_CONFIG_DERIVED( ldrun2, ldrun )
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,ldrun2)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(ldrun)
+	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_ldrun)
 MACHINE_CONFIG_END
 
 
@@ -1038,7 +1038,7 @@ static MACHINE_CONFIG_DERIVED( ldrun3, ldrun )
 	MCFG_GFXDECODE(ldrun3)
 	MCFG_VIDEO_START_OVERRIDE(m62_state,ldrun2)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(ldrun3)
+	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_ldrun3)
 MACHINE_CONFIG_END
 
 
@@ -1053,7 +1053,7 @@ static MACHINE_CONFIG_DERIVED( ldrun4, ldrun )
 	MCFG_GFXDECODE(ldrun3)
 	MCFG_VIDEO_START_OVERRIDE(m62_state,ldrun4)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(ldrun4)
+	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_ldrun4)
 MACHINE_CONFIG_END
 
 
@@ -1070,7 +1070,7 @@ static MACHINE_CONFIG_DERIVED( lotlot, ldrun )
 	MCFG_PALETTE_INIT_OVERRIDE(m62_state,lotlot)
 	MCFG_VIDEO_START_OVERRIDE(m62_state,lotlot)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(lotlot)
+	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_lotlot)
 MACHINE_CONFIG_END
 
 
@@ -1086,7 +1086,7 @@ static MACHINE_CONFIG_DERIVED( kidniki, ldrun )
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,kidniki)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(kidniki)
+	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_kidniki)
 MACHINE_CONFIG_END
 
 
@@ -1101,7 +1101,7 @@ static MACHINE_CONFIG_DERIVED( spelunkr, ldrun )
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,spelunkr)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(spelunkr)
+	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_spelunkr)
 MACHINE_CONFIG_END
 
 
@@ -1118,7 +1118,7 @@ static MACHINE_CONFIG_DERIVED( spelunk2, ldrun )
 	MCFG_PALETTE_INIT_OVERRIDE(m62_state,spelunk2)
 	MCFG_VIDEO_START_OVERRIDE(m62_state,spelunk2)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(spelunk2)
+	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_spelunk2)
 MACHINE_CONFIG_END
 
 
@@ -1133,7 +1133,7 @@ static MACHINE_CONFIG_DERIVED( youjyudn, ldrun )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(youjyudn)
+	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_youjyudn)
 	MCFG_GFXDECODE(youjyudn)
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,youjyudn)
@@ -1149,7 +1149,7 @@ static MACHINE_CONFIG_DERIVED( horizon, ldrun )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(horizon)
+	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_horizon)
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,horizon)
 MACHINE_CONFIG_END

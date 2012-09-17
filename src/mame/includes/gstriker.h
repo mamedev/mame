@@ -104,13 +104,14 @@ public:
 	DECLARE_VIDEO_START(gstriker);
 	DECLARE_VIDEO_START(vgoalsoc);
 	DECLARE_VIDEO_START(twrldc94);
+	UINT32 screen_update_gstriker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/gstriker.c -----------*/
 
 
-SCREEN_UPDATE_IND16( gstriker );
+
 
 
 

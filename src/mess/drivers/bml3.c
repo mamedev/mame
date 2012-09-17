@@ -111,24 +111,26 @@ protected:
 	virtual void machine_start();
 	virtual void video_start();
 	virtual void palette_init();
+public:	
+	UINT32 screen_update_bml3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-#define mc6845_h_char_total 	(state->m_crtc_vreg[0])
-#define mc6845_h_display		(state->m_crtc_vreg[1])
-#define mc6845_h_sync_pos		(state->m_crtc_vreg[2])
-#define mc6845_sync_width		(state->m_crtc_vreg[3])
-#define mc6845_v_char_total		(state->m_crtc_vreg[4])
-#define mc6845_v_total_adj		(state->m_crtc_vreg[5])
-#define mc6845_v_display		(state->m_crtc_vreg[6])
-#define mc6845_v_sync_pos		(state->m_crtc_vreg[7])
-#define mc6845_mode_ctrl		(state->m_crtc_vreg[8])
-#define mc6845_tile_height		(state->m_crtc_vreg[9]+1)
-#define mc6845_cursor_y_start	(state->m_crtc_vreg[0x0a])
-#define mc6845_cursor_y_end 	(state->m_crtc_vreg[0x0b])
-#define mc6845_start_addr		(((state->m_crtc_vreg[0x0c]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0d] & 0xff))
-#define mc6845_cursor_addr  	(((state->m_crtc_vreg[0x0e]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0f] & 0xff))
-#define mc6845_light_pen_addr	(((state->m_crtc_vreg[0x10]<<8) & 0x3f00) | (state->m_crtc_vreg[0x11] & 0xff))
-#define mc6845_update_addr  	(((state->m_crtc_vreg[0x12]<<8) & 0x3f00) | (state->m_crtc_vreg[0x13] & 0xff))
+#define mc6845_h_char_total 	(m_crtc_vreg[0])
+#define mc6845_h_display		(m_crtc_vreg[1])
+#define mc6845_h_sync_pos		(m_crtc_vreg[2])
+#define mc6845_sync_width		(m_crtc_vreg[3])
+#define mc6845_v_char_total		(m_crtc_vreg[4])
+#define mc6845_v_total_adj		(m_crtc_vreg[5])
+#define mc6845_v_display		(m_crtc_vreg[6])
+#define mc6845_v_sync_pos		(m_crtc_vreg[7])
+#define mc6845_mode_ctrl		(m_crtc_vreg[8])
+#define mc6845_tile_height		(m_crtc_vreg[9]+1)
+#define mc6845_cursor_y_start	(m_crtc_vreg[0x0a])
+#define mc6845_cursor_y_end 	(m_crtc_vreg[0x0b])
+#define mc6845_start_addr		(((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))
+#define mc6845_cursor_addr  	(((m_crtc_vreg[0x0e]<<8) & 0x3f00) | (m_crtc_vreg[0x0f] & 0xff))
+#define mc6845_light_pen_addr	(((m_crtc_vreg[0x10]<<8) & 0x3f00) | (m_crtc_vreg[0x11] & 0xff))
+#define mc6845_update_addr  	(((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
 
 
 void bml3_state::video_start()
@@ -136,20 +138,19 @@ void bml3_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-static SCREEN_UPDATE_IND16( bml3 )
+UINT32 bml3_state::screen_update_bml3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bml3_state *state = screen.machine().driver_data<bml3_state>();
 	int x,y,count;
 	int xi,yi;
 	int width; //,height;
-	UINT8 *vram = state->memregion("vram")->base();
+	UINT8 *vram = memregion("vram")->base();
 
 	count = 0x0000;
 
-	width = (state->m_hres_reg & 0x80) ? 80 : 40;
-//  height = (state->m_vres_reg & 0x08) ? 1 : 0;
+	width = (m_hres_reg & 0x80) ? 80 : 40;
+//  height = (m_vres_reg & 0x08) ? 1 : 0;
 
-//  popmessage("%02x %02x",state->m_hres_reg,state->m_vres_reg);
+//  popmessage("%02x %02x",m_hres_reg,m_vres_reg);
 
 	for(y=0;y<25;y++)
 	{
@@ -168,9 +169,9 @@ static SCREEN_UPDATE_IND16( bml3 )
 					int pen;
 
 					if(reverse)
-						pen = (state->m_p_chargen[tile*16+yi*2+tile_bank] >> (7-xi) & 1) ? 0 : color;
+						pen = (m_p_chargen[tile*16+yi*2+tile_bank] >> (7-xi) & 1) ? 0 : color;
 					else
-						pen = (state->m_p_chargen[tile*16+yi*2+tile_bank] >> (7-xi) & 1) ? color : 0;
+						pen = (m_p_chargen[tile*16+yi*2+tile_bank] >> (7-xi) & 1) ? color : 0;
 
 					bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = pen;
 				}
@@ -899,7 +900,7 @@ static MACHINE_CONFIG_START( bml3, bml3_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_STATIC(bml3)
+	MCFG_SCREEN_UPDATE_DRIVER(bml3_state, screen_update_bml3)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_GFXDECODE(bml3)
 

@@ -79,6 +79,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start();
 	virtual void video_start();
+	UINT32 screen_update_tecmosys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -91,5 +92,5 @@ void tecmosys_prot_init(running_machine &machine, int which);
 /*----------- defined in video/tecmosys.c -----------*/
 
 
-SCREEN_UPDATE_RGB32(tecmosys);
+
 

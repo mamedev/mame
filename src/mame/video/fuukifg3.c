@@ -305,9 +305,8 @@ static void fuuki32_draw_layer( running_machine &machine, bitmap_ind16 &bitmap, 
 	}
 }
 
-SCREEN_UPDATE_IND16( fuuki32 )
+UINT32 fuuki32_state::screen_update_fuuki32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	fuuki32_state *state = screen.machine().driver_data<fuuki32_state>();
 	UINT16 layer0_scrollx, layer0_scrolly;
 	UINT16 layer1_scrollx, layer1_scrolly;
 	UINT16 layer2_scrollx, layer2_scrolly;
@@ -325,34 +324,34 @@ SCREEN_UPDATE_IND16( fuuki32 )
 		{ 2, 0, 1 }, // Title etc. - 0>1 (0,1,2 or 0,2,1 or 2,0,1)
 		{ 2, 1, 0 }}; // Char Select, prison stage 1>0 (leaves 1,2,0 or 2,1,0)
 
-	int tm_front  = pri_table[(state->m_priority[0] >> 16) & 0x0f][0];
-	int tm_middle = pri_table[(state->m_priority[0] >> 16) & 0x0f][1];
-	int tm_back   = pri_table[(state->m_priority[0] >> 16) & 0x0f][2];
+	int tm_front  = pri_table[(m_priority[0] >> 16) & 0x0f][0];
+	int tm_middle = pri_table[(m_priority[0] >> 16) & 0x0f][1];
+	int tm_back   = pri_table[(m_priority[0] >> 16) & 0x0f][2];
 
-	state->flip_screen_set((state->m_vregs[0x1e / 4] & 0x0000ffff) & 1);
+	flip_screen_set((m_vregs[0x1e / 4] & 0x0000ffff) & 1);
 
 	/* Layers scrolling */
 
-	scrolly_offs = ((state->m_vregs[0xc / 4] & 0xffff0000) >> 16) - (state->flip_screen() ? 0x103 : 0x1f3);
-	scrollx_offs =  (state->m_vregs[0xc / 4] & 0x0000ffff) - (state->flip_screen() ? 0x2c7 : 0x3f6);
+	scrolly_offs = ((m_vregs[0xc / 4] & 0xffff0000) >> 16) - (flip_screen() ? 0x103 : 0x1f3);
+	scrollx_offs =  (m_vregs[0xc / 4] & 0x0000ffff) - (flip_screen() ? 0x2c7 : 0x3f6);
 
-	layer0_scrolly = ((state->m_vregs[0x0 / 4] & 0xffff0000) >> 16) + scrolly_offs;
-	layer0_scrollx = ((state->m_vregs[0x0 / 4] & 0x0000ffff)) + scrollx_offs;
-	layer1_scrolly = ((state->m_vregs[0x4 / 4] & 0xffff0000) >> 16) + scrolly_offs;
-	layer1_scrollx = ((state->m_vregs[0x4 / 4] & 0x0000ffff)) + scrollx_offs;
+	layer0_scrolly = ((m_vregs[0x0 / 4] & 0xffff0000) >> 16) + scrolly_offs;
+	layer0_scrollx = ((m_vregs[0x0 / 4] & 0x0000ffff)) + scrollx_offs;
+	layer1_scrolly = ((m_vregs[0x4 / 4] & 0xffff0000) >> 16) + scrolly_offs;
+	layer1_scrollx = ((m_vregs[0x4 / 4] & 0x0000ffff)) + scrollx_offs;
 
-	layer2_scrolly = ((state->m_vregs[0x8 / 4] & 0xffff0000) >> 16);
-	layer2_scrollx = ((state->m_vregs[0x8 / 4] & 0x0000ffff));
+	layer2_scrolly = ((m_vregs[0x8 / 4] & 0xffff0000) >> 16);
+	layer2_scrollx = ((m_vregs[0x8 / 4] & 0x0000ffff));
 
-	state->m_tilemap[0]->set_scrollx(0, layer0_scrollx);
-	state->m_tilemap[0]->set_scrolly(0, layer0_scrolly);
-	state->m_tilemap[1]->set_scrollx(0, layer1_scrollx);
-	state->m_tilemap[1]->set_scrolly(0, layer1_scrolly);
+	m_tilemap[0]->set_scrollx(0, layer0_scrollx);
+	m_tilemap[0]->set_scrolly(0, layer0_scrolly);
+	m_tilemap[1]->set_scrollx(0, layer1_scrollx);
+	m_tilemap[1]->set_scrolly(0, layer1_scrolly);
 
-	state->m_tilemap[2]->set_scrollx(0, layer2_scrollx);
-	state->m_tilemap[2]->set_scrolly(0, layer2_scrolly);
-	state->m_tilemap[3]->set_scrollx(0, layer2_scrollx);
-	state->m_tilemap[3]->set_scrolly(0, layer2_scrolly);
+	m_tilemap[2]->set_scrollx(0, layer2_scrollx);
+	m_tilemap[2]->set_scrolly(0, layer2_scrolly);
+	m_tilemap[3]->set_scrollx(0, layer2_scrollx);
+	m_tilemap[3]->set_scrolly(0, layer2_scrolly);
 
 	/* The bg colour is the last pen i.e. 0x1fff */
 	bitmap.fill((0x800 * 4) - 1, cliprect);
@@ -366,17 +365,16 @@ SCREEN_UPDATE_IND16( fuuki32 )
 	return 0;
 }
 
-SCREEN_VBLANK( fuuki32 )
+void fuuki32_state::screen_eof_fuuki32(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		fuuki32_state *state = screen.machine().driver_data<fuuki32_state>();
 
 		/* Buffer sprites and tilebank by 2 frames */
-		state->m_spr_buffered_tilebank[1] = state->m_spr_buffered_tilebank[0];
-		state->m_spr_buffered_tilebank[0] = state->m_tilebank[0];
-		memcpy(state->m_buf_spriteram2, state->m_buf_spriteram, state->m_spriteram.bytes());
-		memcpy(state->m_buf_spriteram, state->m_spriteram, state->m_spriteram.bytes());
+		m_spr_buffered_tilebank[1] = m_spr_buffered_tilebank[0];
+		m_spr_buffered_tilebank[0] = m_tilebank[0];
+		memcpy(m_buf_spriteram2, m_buf_spriteram, m_spriteram.bytes());
+		memcpy(m_buf_spriteram, m_spriteram, m_spriteram.bytes());
 	}
 }

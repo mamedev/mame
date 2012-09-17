@@ -15,11 +15,10 @@ void pk8020_state::video_start()
 {
 }
 
-SCREEN_UPDATE_IND16( pk8020 )
+UINT32 pk8020_state::screen_update_pk8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pk8020_state *state = screen.machine().driver_data<pk8020_state>();
 	int y, x, b, j;
-	UINT8 *gfx = state->memregion("gfx1")->base();
+	UINT8 *gfx = memregion("gfx1")->base();
 	UINT8 *ram = screen.machine().device<ram_device>(RAM_TAG)->pointer();
 
 	for (y = 0; y < 16; y++)
@@ -29,11 +28,11 @@ SCREEN_UPDATE_IND16( pk8020 )
 			UINT8 chr = ram[x +(y*64) + 0x40000];
 			UINT8 attr= ram[x +(y*64) + 0x40400];
 			for (j = 0; j < 16; j++) {
-				UINT32 addr = 0x10000 + x + ((y*16+j)*64) + (state->m_video_page * 0xC000);
+				UINT32 addr = 0x10000 + x + ((y*16+j)*64) + (m_video_page * 0xC000);
 				UINT8 code1 = ram[addr];
 				UINT8 code2 = ram[addr + 0x4000];
 				UINT8 code3 = ram[addr + 0x8000];
-				UINT8 code4 = gfx[((chr<<4) + j) + (state->m_font*0x1000)];
+				UINT8 code4 = gfx[((chr<<4) + j) + (m_font*0x1000)];
 				if (attr) code4 ^= 0xff;
 				for (b = 0; b < 8; b++)
 				{

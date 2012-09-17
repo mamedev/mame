@@ -151,17 +151,16 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-SCREEN_UPDATE_IND16( shadfrce )
+UINT32 shadfrce_state::screen_update_shadfrce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	shadfrce_state *state = screen.machine().driver_data<shadfrce_state>();
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	if (state->m_video_enable)
+	if (m_video_enable)
 	{
-		state->m_bg1tilemap->draw(bitmap, cliprect, 0,0);
-		state->m_bg0tilemap->draw(bitmap, cliprect, 0,1);
+		m_bg1tilemap->draw(bitmap, cliprect, 0,0);
+		m_bg0tilemap->draw(bitmap, cliprect, 0,1);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		state->m_fgtilemap->draw(bitmap, cliprect, 0,0);
+		m_fgtilemap->draw(bitmap, cliprect, 0,0);
 	}
 	else
 	{
@@ -171,14 +170,13 @@ SCREEN_UPDATE_IND16( shadfrce )
 	return 0;
 }
 
-SCREEN_VBLANK( shadfrce )
+void shadfrce_state::screen_eof_shadfrce(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		shadfrce_state *state = screen.machine().driver_data<shadfrce_state>();
 
 		/* looks like sprites are *two* frames ahead */
-		memcpy(state->m_spvideoram_old, state->m_spvideoram, state->m_spvideoram.bytes());
+		memcpy(m_spvideoram_old, m_spvideoram, m_spvideoram.bytes());
 	}
 }

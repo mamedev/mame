@@ -1808,7 +1808,7 @@ static MACHINE_CONFIG_START( nomcu, taitosj_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(taitosj)
+	MCFG_SCREEN_UPDATE_DRIVER(taitosj_state, screen_update_taitosj)
 
 	MCFG_GFXDECODE(taitosj)
 	MCFG_PALETTE_LENGTH(64)
@@ -1859,7 +1859,7 @@ static MACHINE_CONFIG_DERIVED( kikstart, mcu )
 	MCFG_CPU_PROGRAM_MAP(kikstart_main_map)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(kikstart)
+	MCFG_SCREEN_UPDATE_DRIVER(taitosj_state, screen_update_kikstart)
 MACHINE_CONFIG_END
 
 

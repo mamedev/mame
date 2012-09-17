@@ -235,11 +235,10 @@ static void draw_ball(running_machine &machine, bitmap_ind16 &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE_IND16( geebee )
+UINT32 warpwarp_state::screen_update_geebee(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	warpwarp_state *state = screen.machine().driver_data<warpwarp_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 
-	draw_ball(screen.machine(), bitmap, cliprect, state->m_ball_pen);
+	draw_ball(screen.machine(), bitmap, cliprect, m_ball_pen);
 	return 0;
 }

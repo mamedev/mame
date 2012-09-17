@@ -350,13 +350,12 @@ static void draw_pixram( running_machine &machine, bitmap_ind16 &bitmap, const r
 		copybitmap(bitmap, *state->m_tmp_bitmap2, f, f, state->m_xoffset, 0, cliprect);
 }
 
-SCREEN_UPDATE_IND16( fortyl )
+UINT32 fortyl_state::screen_update_fortyl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	fortyl_state *state = screen.machine().driver_data<fortyl_state>();
 	draw_pixram(screen.machine(), bitmap, cliprect);
 
-	state->m_bg_tilemap->set_scrolldy(- state->m_video_ctrl[1] + 1, - state->m_video_ctrl[1] - 1 );
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->set_scrolldy(- m_video_ctrl[1] + 1, - m_video_ctrl[1] - 1 );
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;

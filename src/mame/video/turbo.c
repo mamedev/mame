@@ -397,12 +397,11 @@ static UINT32 turbo_get_sprite_bits(const UINT8 *sprite_gfxdata, UINT8 road, spr
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( turbo )
+UINT32 turbo_state::screen_update_turbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	turbo_state *state = screen.machine().driver_data<turbo_state>();
-	bitmap_ind16 &fgpixmap = state->m_fg_tilemap->pixmap();
+	bitmap_ind16 &fgpixmap = m_fg_tilemap->pixmap();
 	const UINT8 *road_gfxdata = screen.machine().root_device().memregion("gfx3")->base();
-	const UINT8 *prom_base = state->memregion("proms")->base();
+	const UINT8 *prom_base = memregion("proms")->base();
 	const UINT8 *pr1114 = prom_base + 0x000;
 	const UINT8 *pr1115 = prom_base + 0x020;
 	const UINT8 *pr1116 = prom_base + 0x040;
@@ -422,15 +421,15 @@ SCREEN_UPDATE_IND16( turbo )
 		sprite_info sprinfo;
 
 		/* compute the Y sum between opa and the current scanline (p. 141) */
-		int va = (y + state->m_turbo_opa) & 0xff;
+		int va = (y + m_turbo_opa) & 0xff;
 
 		/* the upper bit of OPC inverts the road (p. 141) */
-		if (!(state->m_turbo_opc & 0x80))
+		if (!(m_turbo_opc & 0x80))
 			va ^= 0xff;
 
 		/* compute the sprite information; we use y-1 since this info was computed during HBLANK */
 		/* on the previous scanline */
-		turbo_prepare_sprites(screen.machine(), state, y, &sprinfo);
+		turbo_prepare_sprites(screen.machine(), this, y, &sprinfo);
 
 		/* loop over columns */
 		for (x = 0; x <= cliprect.max_x; x += TURBO_X_SCALE)
@@ -442,25 +441,25 @@ SCREEN_UPDATE_IND16( turbo )
 			UINT16 he;
 
 			/* load the bitmask from the sprite position for both halves of the sprites (p. 139) */
-			he = state->m_sprite_position[xx] | (state->m_sprite_position[xx + 0x100] << 8);
+			he = m_sprite_position[xx] | (m_sprite_position[xx + 0x100] << 8);
 
 			/* the AND of the line enable and horizontal enable is clocked and held in LST0-7 (p. 143) */
 			he &= sprinfo.ve;
 			sprinfo.lst |= he | (he >> 8);
 
 			/* compute the X sum between opb and the current column; only the carry matters (p. 141) */
-			carry = (xx + state->m_turbo_opb) >> 8;
+			carry = (xx + m_turbo_opb) >> 8;
 
 			/* the carry selects which inputs to use (p. 141) */
 			if (carry)
 			{
-				sel	 = state->m_turbo_ipb;
-				coch = state->m_turbo_ipc >> 4;
+				sel	 = m_turbo_ipb;
+				coch = m_turbo_ipc >> 4;
 			}
 			else
 			{
-				sel	 = state->m_turbo_ipa;
-				coch = state->m_turbo_ipc & 15;
+				sel	 = m_turbo_ipa;
+				coch = m_turbo_ipc & 15;
 			}
 
 			/* look up AREA1 and AREA2 (p. 142) */
@@ -489,7 +488,7 @@ SCREEN_UPDATE_IND16( turbo )
 
 			/* look up AREA5 (p. 141) */
 			offs = (xx >> 3) |							/*  A0- A4 = H3-H7 */
-				   ((state->m_turbo_opc & 0x3f) << 5);	/*  A5-A10 = OPC0-5 */
+				   ((m_turbo_opc & 0x3f) << 5);	/*  A5-A10 = OPC0-5 */
 
 			areatmp = road_gfxdata[0x4000 | offs];
 			areatmp = (areatmp << (xx & 7)) & 0x80;
@@ -505,7 +504,7 @@ SCREEN_UPDATE_IND16( turbo )
 
 			/* also use the coch value to look up color info in IC13/PR1114 and IC21/PR1117 (p. 144) */
 			offs = (coch & 0x0f) |						/* A0-A3: CONT0-3 = COCH0-3 */
-				   ((state->m_turbo_fbcol & 0x01) << 4);	/*    A4: COL0 */
+				   ((m_turbo_fbcol & 0x01) << 4);	/*    A4: COL0 */
 			bacol = pr1114[offs] | (pr1117[offs] << 8);
 
 			/* at this point, do the character lookup; due to the shift register loading in */
@@ -526,14 +525,14 @@ SCREEN_UPDATE_IND16( turbo )
 				/*    CDG0-7 = D8 -D15 */
 				/*    CDR0-7 = D16-D23 */
 				/*    PLB0-7 = D24-D31 */
-				sprbits = turbo_get_sprite_bits(state->m_gfx1->base(), road, &sprinfo);
+				sprbits = turbo_get_sprite_bits(m_gfx1->base(), road, &sprinfo);
 
 				/* perform collision detection here via lookup in IC20/PR1116 (p. 144) */
-				state->m_turbo_collision |= pr1116[((sprbits >> 24) & 7) | (slipar_acciar >> 1)];
+				m_turbo_collision |= pr1116[((sprbits >> 24) & 7) | (slipar_acciar >> 1)];
 
 				/* look up the sprite priority in IC11/PR1122 (p. 144) */
 				priority = ((sprbits & 0xfe000000) >> 25) |		/* A0-A6: PLB1-7 */
-						   ((state->m_turbo_fbpla & 0x07) << 7);	/* A7-A9: PLA0-2 */
+						   ((m_turbo_fbpla & 0x07) << 7);	/* A7-A9: PLA0-2 */
 				priority = pr1122[priority];
 
 				/* use that to look up the overall priority in IC12/PR1123 (p. 144) */
@@ -542,7 +541,7 @@ SCREEN_UPDATE_IND16( turbo )
 					 ((foreraw & 0x80) >> 3) |				/*    A4: PLBE */
 					 ((forebits & 0x08) << 2) | 			/*    A5: PLBF */
 					 ((babit & 0x07) << 6) |				/* A6-A8: BABIT1-3 */
-					 ((state->m_turbo_fbpla & 0x08) << 6);	/*    A9: PLA3 */
+					 ((m_turbo_fbpla & 0x08) << 6);	/*    A9: PLA3 */
 				mx = pr1123[mx];
 
 				/* the MX output selects one of 16 inputs; build up a 16-bit pattern to match */
@@ -570,7 +569,7 @@ SCREEN_UPDATE_IND16( turbo )
 					   (((~red >> mx) & 1) << 4) |		/*    A4: CDR */
 					   (((~grn >> mx) & 1) << 5) |		/*    A5: CDG */
 					   (((~blu >> mx) & 1) << 6) |		/*    A6: CDB */
-					   ((state->m_turbo_fbcol & 6) << 6);	/* A7-A8: COL1-2 */
+					   ((m_turbo_fbcol & 6) << 6);	/* A7-A8: COL1-2 */
 				dest[x + ix] = pr1121[offs];
 			}
 		}
@@ -751,11 +750,10 @@ static UINT32 subroc3d_get_sprite_bits(const UINT8 *sprite_gfxdata, sprite_info 
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( subroc3d )
+UINT32 turbo_state::screen_update_subroc3d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	turbo_state *state = screen.machine().driver_data<turbo_state>();
-	bitmap_ind16 &fgpixmap = state->m_fg_tilemap->pixmap();
-	const UINT8 *prom_base = state->memregion("proms")->base();
+	bitmap_ind16 &fgpixmap = m_fg_tilemap->pixmap();
+	const UINT8 *prom_base = memregion("proms")->base();
 	const UINT8 *pr1419 = prom_base + 0x000;
 	const UINT8 *pr1620 = prom_base + 0x200;
 	const UINT8 *pr1450 = prom_base + 0x500;
@@ -771,7 +769,7 @@ SCREEN_UPDATE_IND16( subroc3d )
 
 		/* compute the sprite information; we use y-1 since this info was computed during HBLANK */
 		/* on the previous scanline */
-		subroc3d_prepare_sprites(screen.machine(), state, y, &sprinfo);
+		subroc3d_prepare_sprites(screen.machine(), this, y, &sprinfo);
 
 		/* loop over columns */
 		for (x = 0; x <= cliprect.max_x; x += TURBO_X_SCALE)
@@ -783,14 +781,14 @@ SCREEN_UPDATE_IND16( subroc3d )
 			UINT32 sprbits;
 
 			/* load the bitmask from the sprite position for both halves of the sprites (p. 143) */
-			he = state->m_sprite_position[xx * 2] | (state->m_sprite_position[xx * 2 + 1] << 8);
+			he = m_sprite_position[xx * 2] | (m_sprite_position[xx * 2 + 1] << 8);
 
 			/* the AND of the line enable and horizontal enable is clocked and held in LST0-7 (p. 143) */
 			he &= sprinfo.ve;
 			sprinfo.lst |= he | (he >> 8);
 
 			/* at this point, do the character lookup */
-			if (!state->m_subroc3d_flip)
+			if (!m_subroc3d_flip)
 				foreraw = fore[xx];
 			else
 				foreraw = fore[(pr1454[(xx >> 3) & 0x1f] << 3) | (xx & 0x07)];
@@ -811,15 +809,15 @@ SCREEN_UPDATE_IND16( subroc3d )
 				/*    CDB0-7 = D8 -D15 */
 				/*    CDC0-7 = D16-D23 */
 				/*    CDD0-7 = D24-D31 */
-				sprbits = subroc3d_get_sprite_bits(state->m_gfx1->base(), &sprinfo, &plb);
+				sprbits = subroc3d_get_sprite_bits(m_gfx1->base(), &sprinfo, &plb);
 
 				/* MUX0-3 is selected by PLY0-3 and the sprite enable bits, and is the output */
 				/* of IC21/PR1450 (p. 141), unless MPLB = 0, in which case the values are grounded (p. 141) */
 				if (mplb)
 				{
 					offs = (plb ^ 0xff) |						/* A0-A7: /PLB0-7 */
-						   ((state->m_subroc3d_ply & 0x02) << 7);	/*    A8: PLY1 */
-					mux = pr1450[offs] >> ((state->m_subroc3d_ply & 0x01) * 4);
+						   ((m_subroc3d_ply & 0x02) << 7);	/*    A8: PLY1 */
+					mux = pr1450[offs] >> ((m_subroc3d_ply & 0x01) * 4);
 				}
 				else
 					mux = 0;
@@ -837,7 +835,7 @@ SCREEN_UPDATE_IND16( subroc3d )
 				/* we then go through a muxer to select one of the 16 outputs computed above (p. 141) */
 				offs = (finalbits & 0x0f) | 				/* A0-A3: CD0-CD3 */
 					   ((mux & 0x08) << 1) |				/*    A4: MUX3 */
-					   (state->m_subroc3d_col << 5);			/* A5-A8: COL0-COL3 */
+					   (m_subroc3d_col << 5);			/* A5-A8: COL0-COL3 */
 				dest[x + ix] = pr1419[offs];
 			}
 		}
@@ -970,12 +968,11 @@ static UINT32 buckrog_get_sprite_bits(const UINT8 *sprite_gfxdata, sprite_info *
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( buckrog )
+UINT32 turbo_state::screen_update_buckrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	turbo_state *state = screen.machine().driver_data<turbo_state>();
-	bitmap_ind16 &fgpixmap = state->m_fg_tilemap->pixmap();
+	bitmap_ind16 &fgpixmap = m_fg_tilemap->pixmap();
 	const UINT8 *bgcolor = screen.machine().root_device().memregion("gfx3")->base();
-	const UINT8 *prom_base = state->memregion("proms")->base();
+	const UINT8 *prom_base = memregion("proms")->base();
 	const UINT8 *pr5194 = prom_base + 0x000;
 	const UINT8 *pr5198 = prom_base + 0x500;
 	const UINT8 *pr5199 = prom_base + 0x700;
@@ -990,7 +987,7 @@ SCREEN_UPDATE_IND16( buckrog )
 
 		/* compute the sprite information; we use y-1 since this info was computed during HBLANK */
 		/* on the previous scanline */
-		buckrog_prepare_sprites(screen.machine(), state, y, &sprinfo);
+		buckrog_prepare_sprites(screen.machine(), this, y, &sprinfo);
 
 		/* loop over columns */
 		for (x = 0; x <= cliprect.max_x; x += TURBO_X_SCALE)
@@ -1002,7 +999,7 @@ SCREEN_UPDATE_IND16( buckrog )
 			int palbits, offs, ix;
 
 			/* load the bitmask from the sprite position for both halves of the sprites (p. 143) */
-			he = state->m_sprite_position[xx * 2] | (state->m_sprite_position[xx * 2 + 1] << 8);
+			he = m_sprite_position[xx * 2] | (m_sprite_position[xx * 2 + 1] << 8);
 
 			/* the AND of the line enable and horizontal enable is clocked and held in LST0-7 (p. 143) */
 			he &= sprinfo.ve;
@@ -1012,11 +1009,11 @@ SCREEN_UPDATE_IND16( buckrog )
 			foreraw = fore[(pr5194[((xx >> 3) - 1) & 0x1f] << 3) | (xx & 0x07)];
 			offs = ((foreraw & 0x03) << 0) |			/* A0-A1: BIT0-1 */
 				   ((foreraw & 0xf8) >> 1) |			/* A2-A6: BANK3-7 */
-				   ((state->m_buckrog_fchg & 0x03) << 7);	/* A7-A9: FCHG0-2 */
+				   ((m_buckrog_fchg & 0x03) << 7);	/* A7-A9: FCHG0-2 */
 			forebits = pr5198[offs];
 
 			/* fetch the STAR bit */
-			star = state->m_buckrog_bitmap_ram[y * 256 + xx];
+			star = m_buckrog_bitmap_ram[y * 256 + xx];
 
 			/* now that we have done all the per-5MHz pixel work, mix the sprites at the scale factor */
 			for (ix = 0; ix < TURBO_X_SCALE; ix++)
@@ -1027,7 +1024,7 @@ SCREEN_UPDATE_IND16( buckrog )
 				/*    CDB0-7 = D8 -D15 */
 				/*    CDC0-7 = D16-D23 */
 				/*    CDD0-7 = D24-D31 */
-				sprbits = buckrog_get_sprite_bits(state->m_gfx1->base(), &sprinfo, &plb);
+				sprbits = buckrog_get_sprite_bits(m_gfx1->base(), &sprinfo, &plb);
 
 				/* the PLB bits go into an LS148 8-to-1 decoder and become MUX0-3 (PROM board SH 2/10) */
 				if (plb == 0)
@@ -1061,7 +1058,7 @@ SCREEN_UPDATE_IND16( buckrog )
 				{
 					offs = (cd & 0x0f) |						/* A0-A3: CD0-3 */
 						   ((mux & 0x07) << 4) |				/* A4-A6: MUX0-2 */
-						   ((state->m_buckrog_obch & 0x07) << 7);	/* A7-A9: OBCH0-2 */
+						   ((m_buckrog_obch & 0x07) << 7);	/* A7-A9: OBCH0-2 */
 					palbits = pr5199[offs];
 				}
 
@@ -1082,7 +1079,7 @@ SCREEN_UPDATE_IND16( buckrog )
 				/* otherwise, CHNG = 3 */
 				else
 				{
-					palbits = bgcolor[y | ((state->m_buckrog_mov & 0x1f) << 8)];
+					palbits = bgcolor[y | ((m_buckrog_mov & 0x1f) << 8)];
 					palbits = (palbits & 0xc0) | ((palbits & 0x30) << 4) | ((palbits & 0x0f) << 2);
 				}
 

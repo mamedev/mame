@@ -238,6 +238,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_gfx0a_tile_info);
 	TILE_GET_INFO_MEMBER(get_gfx1_tile_info);
 	virtual void video_start();
+	UINT32 screen_update_witch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -764,18 +765,17 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 }
 
-static SCREEN_UPDATE_IND16(witch)
+UINT32 witch_state::screen_update_witch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	witch_state *state = screen.machine().driver_data<witch_state>();
-	state->m_gfx1_tilemap->set_scrollx(0, state->m_scrollx-7 ); //offset to have it aligned with the sprites
-	state->m_gfx1_tilemap->set_scrolly(0, state->m_scrolly+8 );
+	m_gfx1_tilemap->set_scrollx(0, m_scrollx-7 ); //offset to have it aligned with the sprites
+	m_gfx1_tilemap->set_scrolly(0, m_scrolly+8 );
 
 
 
-	state->m_gfx1_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_gfx0a_tilemap->draw(bitmap, cliprect, 0,0);
+	m_gfx1_tilemap->draw(bitmap, cliprect, 0,0);
+	m_gfx0a_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_gfx0b_tilemap->draw(bitmap, cliprect, 0,0);
+	m_gfx0b_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -808,7 +808,7 @@ static MACHINE_CONFIG_START( witch, witch_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(8, 256-1-8, 8*4, 256-8*4-1)
-	MCFG_SCREEN_UPDATE_STATIC(witch)
+	MCFG_SCREEN_UPDATE_DRIVER(witch_state, screen_update_witch)
 
 	MCFG_GFXDECODE(witch)
 	MCFG_PALETTE_LENGTH(0x800)

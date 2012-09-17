@@ -168,6 +168,15 @@ public:
 	DECLARE_VIDEO_START(buggyboy);
 	DECLARE_PALETTE_INIT(buggyboy);
 	DECLARE_VIDEO_START(buggybjr);
+	UINT32 screen_update_tx1_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_tx1_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_tx1_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_buggyboy_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_buggyboy_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_buggyboy_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_buggybjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_tx1(screen_device &screen, bool state);
+	void screen_eof_buggyboy(screen_device &screen, bool state);
 };
 
 
@@ -237,17 +246,17 @@ extern const device_type BUGGYBOY;
 
 
 
-SCREEN_UPDATE_IND16( tx1_left );
-SCREEN_UPDATE_IND16( tx1_middle );
-SCREEN_UPDATE_IND16( tx1_right );
-SCREEN_VBLANK( tx1 );
 
 
 
-SCREEN_UPDATE_IND16( buggyboy_left );
-SCREEN_UPDATE_IND16( buggyboy_middle );
-SCREEN_UPDATE_IND16( buggyboy_right );
-SCREEN_VBLANK( buggyboy );
 
 
-SCREEN_UPDATE_IND16( buggybjr );
+
+
+
+
+
+
+
+
+

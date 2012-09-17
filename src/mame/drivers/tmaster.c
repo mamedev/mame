@@ -183,6 +183,7 @@ public:
 	DECLARE_VIDEO_START(tmaster);
 	DECLARE_MACHINE_RESET(galgames);
 	DECLARE_VIDEO_START(galgames);
+	UINT32 screen_update_tmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -357,9 +358,8 @@ VIDEO_START_MEMBER(tmaster_state,galgames)
 	m_compute_addr = galgames_compute_addr;
 }
 
-static SCREEN_UPDATE_IND16( tmaster )
+UINT32 tmaster_state::screen_update_tmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tmaster_state *state = screen.machine().driver_data<tmaster_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
@@ -375,8 +375,8 @@ static SCREEN_UPDATE_IND16( tmaster )
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if (layers_ctrl & 1)	copybitmap_trans(bitmap, state->m_bitmap[0][(state->m_regs[0x02/2]>>8)&1], 0,0,0,0, cliprect, 0xff);
-	if (layers_ctrl & 2)	copybitmap_trans(bitmap, state->m_bitmap[1][(state->m_regs[0x02/2]>>9)&1], 0,0,0,0, cliprect, 0xff);
+	if (layers_ctrl & 1)	copybitmap_trans(bitmap, m_bitmap[0][(m_regs[0x02/2]>>8)&1], 0,0,0,0, cliprect, 0xff);
+	if (layers_ctrl & 2)	copybitmap_trans(bitmap, m_bitmap[1][(m_regs[0x02/2]>>9)&1], 0,0,0,0, cliprect, 0xff);
 
 	return 0;
 }
@@ -941,7 +941,7 @@ static MACHINE_CONFIG_START( tm3k, tmaster_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(400, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(tmaster)
+	MCFG_SCREEN_UPDATE_DRIVER(tmaster_state, screen_update_tmaster)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -998,7 +998,7 @@ static MACHINE_CONFIG_START( galgames, tmaster_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(400, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(tmaster)
+	MCFG_SCREEN_UPDATE_DRIVER(tmaster_state, screen_update_tmaster)
 
 	MCFG_PALETTE_LENGTH(0x1000)	// only 0x100 used
 

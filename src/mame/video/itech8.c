@@ -602,10 +602,9 @@ TIMER_DEVICE_CALLBACK( grmatch_palette_update )
  *
  *************************************/
 
-SCREEN_UPDATE_RGB32( itech8_2layer )
+UINT32 itech8_state::screen_update_itech8_2layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	itech8_state *state = screen.machine().driver_data<itech8_state>();
-	struct tms34061_display &tms_state = state->m_tms_state;
+	struct tms34061_display &tms_state = m_tms_state;
 	UINT32 page_offset;
 	int x, y;
 	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
@@ -640,10 +639,9 @@ SCREEN_UPDATE_RGB32( itech8_2layer )
 }
 
 
-SCREEN_UPDATE_RGB32( itech8_grmatch )
+UINT32 itech8_state::screen_update_itech8_grmatch(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	itech8_state *state = screen.machine().driver_data<itech8_state>();
-	struct tms34061_display &tms_state = state->m_tms_state;
+	struct tms34061_display &tms_state = m_tms_state;
 	UINT32 page_offset;
 	int x, y;
 
@@ -662,7 +660,7 @@ SCREEN_UPDATE_RGB32( itech8_grmatch )
 	/* bottom layer @ 0x20000 is 4bpp, colors come from TMS34070, enabled via palette control */
 	/* 4bpp pixels are packed 2 to a byte */
 	/* xscroll is set via a separate register */
-	page_offset = (tms_state.dispstart & 0x0ffff) | state->m_grmatch_xscroll;
+	page_offset = (tms_state.dispstart & 0x0ffff) | m_grmatch_xscroll;
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT8 *base0 = &tms_state.vram[0x00000 + ((page_offset + y * 256) & 0xffff)];
@@ -675,24 +673,23 @@ SCREEN_UPDATE_RGB32( itech8_grmatch )
 			UINT8 pix2 = base2[x / 2];
 
 			if ((pix0 & 0xf0) != 0)
-				dest[x] = state->m_grmatch_palette[0][pix0 >> 4];
+				dest[x] = m_grmatch_palette[0][pix0 >> 4];
 			else
-				dest[x] = state->m_grmatch_palette[1][pix2 >> 4];
+				dest[x] = m_grmatch_palette[1][pix2 >> 4];
 
 			if ((pix0 & 0x0f) != 0)
-				dest[x + 1] = state->m_grmatch_palette[0][pix0 & 0x0f];
+				dest[x + 1] = m_grmatch_palette[0][pix0 & 0x0f];
 			else
-				dest[x + 1] = state->m_grmatch_palette[1][pix2 & 0x0f];
+				dest[x + 1] = m_grmatch_palette[1][pix2 & 0x0f];
 		}
 	}
 	return 0;
 }
 
 
-SCREEN_UPDATE_RGB32( itech8_2page )
+UINT32 itech8_state::screen_update_itech8_2page(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	itech8_state *state = screen.machine().driver_data<itech8_state>();
-	struct tms34061_display &tms_state = state->m_tms_state;
+	struct tms34061_display &tms_state = m_tms_state;
 	UINT32 page_offset;
 	int x, y;
 	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
@@ -709,7 +706,7 @@ SCREEN_UPDATE_RGB32( itech8_2page )
 
 	/* there are two pages, each of which is a full 8bpp */
 	/* page index is selected by the top bit of the page_select register */
-	page_offset = ((state->m_page_select & 0x80) << 10) | (tms_state.dispstart & 0x0ffff);
+	page_offset = ((m_page_select & 0x80) << 10) | (tms_state.dispstart & 0x0ffff);
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT8 *base = &tms_state.vram[(page_offset + y * 256) & 0x3ffff];
@@ -722,10 +719,9 @@ SCREEN_UPDATE_RGB32( itech8_2page )
 }
 
 
-SCREEN_UPDATE_RGB32( itech8_2page_large )
+UINT32 itech8_state::screen_update_itech8_2page_large(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	itech8_state *state = screen.machine().driver_data<itech8_state>();
-	struct tms34061_display &tms_state = state->m_tms_state;
+	struct tms34061_display &tms_state = m_tms_state;
 	UINT32 page_offset;
 	int x, y;
 	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
@@ -744,7 +740,7 @@ SCREEN_UPDATE_RGB32( itech8_2page_large )
 	/* the low 4 bits come from the bitmap directly */
 	/* the upper 4 bits were latched on each write into a separate bitmap */
 	/* page index is selected by the top bit of the page_select register */
-	page_offset = ((~state->m_page_select & 0x80) << 10) | (tms_state.dispstart & 0x0ffff);
+	page_offset = ((~m_page_select & 0x80) << 10) | (tms_state.dispstart & 0x0ffff);
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT8 *base = &tms_state.vram[(page_offset + y * 256) & 0x3ffff];

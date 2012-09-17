@@ -426,11 +426,10 @@ VIDEO_START_MEMBER(playmark_state,powerbal)
 	m_bg_tilemap->set_scrolly(0, m_bg_yoffset);
 }
 
-static SCREEN_UPDATE_IND16( powerbal )
+UINT32 playmark_state::screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	playmark_state *state = screen.machine().driver_data<playmark_state>();
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
@@ -496,7 +495,7 @@ static MACHINE_CONFIG_START( powerbal, playmark_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(128*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(powerbal)
+	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_powerbal)
 
 	MCFG_GFXDECODE(powerbal)
 	MCFG_PALETTE_LENGTH(512)
@@ -529,7 +528,7 @@ static MACHINE_CONFIG_START( magicstk, playmark_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(128*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(powerbal)
+	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_powerbal)
 
 	MCFG_GFXDECODE(powerbal)
 	MCFG_PALETTE_LENGTH(512)

@@ -68,6 +68,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_suprgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
@@ -94,9 +95,8 @@ void suprgolf_state::video_start()
 	m_tilemap->set_transparent_pen(15);
 }
 
-static SCREEN_UPDATE_IND16( suprgolf )
+UINT32 suprgolf_state::screen_update_suprgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	suprgolf_state *state = screen.machine().driver_data<suprgolf_state>();
 	int x,y,count,color;
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
@@ -107,7 +107,7 @@ static SCREEN_UPDATE_IND16( suprgolf )
 		{
 			for(x=0;x<512;x++)
 			{
-				color = state->m_bg_fb[count];
+				color = m_bg_fb[count];
 
 				if(x <= cliprect.max_x && y <= cliprect.max_y)
 					bitmap.pix16(y, x) = screen.machine().pens[(color & 0x7ff)];
@@ -124,9 +124,9 @@ static SCREEN_UPDATE_IND16( suprgolf )
 		{
 			for(x=0;x<512;x++)
 			{
-				color = state->m_fg_fb[count];
+				color = m_fg_fb[count];
 
-				if(((state->m_fg_fb[count] & 0x0f) != 0x0f) && (x <= cliprect.max_x && y <= cliprect.max_y))
+				if(((m_fg_fb[count] & 0x0f) != 0x0f) && (x <= cliprect.max_x && y <= cliprect.max_y))
 					bitmap.pix16(y, x) = screen.machine().pens[(color & 0x7ff)];
 
 				count++;
@@ -134,7 +134,7 @@ static SCREEN_UPDATE_IND16( suprgolf )
 		}
 	}
 
-	state->m_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tilemap->draw(bitmap, cliprect, 0,0);
 
 	return 0;
 }
@@ -528,7 +528,7 @@ static MACHINE_CONFIG_START( suprgolf, suprgolf_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
-	MCFG_SCREEN_UPDATE_STATIC(suprgolf)
+	MCFG_SCREEN_UPDATE_DRIVER(suprgolf_state, screen_update_suprgolf)
 
 	MCFG_GFXDECODE(suprgolf)
 	MCFG_PALETTE_LENGTH(0x800)

@@ -183,6 +183,7 @@ public:
 	DECLARE_MACHINE_RESET(m63);
 	DECLARE_VIDEO_START(m63);
 	DECLARE_PALETTE_INIT(m63);
+	UINT32 screen_update_m63(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -359,18 +360,17 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-static SCREEN_UPDATE_IND16( m63 )
+UINT32 m63_state::screen_update_m63(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m63_state *state = screen.machine().driver_data<m63_state>();
 
 	int col;
 
 	for (col = 0; col < 32; col++)
-		state->m_bg_tilemap->set_scrolly(col, state->m_scrollram[col * 8]);
+		m_bg_tilemap->set_scrolly(col, m_scrollram[col * 8]);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -784,7 +784,7 @@ static MACHINE_CONFIG_START( m63, m63_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(m63)
+	MCFG_SCREEN_UPDATE_DRIVER(m63_state, screen_update_m63)
 
 	MCFG_GFXDECODE(m63)
 	MCFG_PALETTE_LENGTH(256+4)
@@ -828,7 +828,7 @@ static MACHINE_CONFIG_START( fghtbskt, m63_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(m63)
+	MCFG_SCREEN_UPDATE_DRIVER(m63_state, screen_update_m63)
 
 	MCFG_GFXDECODE(fghtbskt)
 	MCFG_PALETTE_LENGTH(256)

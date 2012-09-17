@@ -286,21 +286,20 @@ WRITE16_MEMBER(toaplan2_state::batrider_objectbank_w)
 }
 
 // Dogyuun doesn't appear to require fancy mixing?
-SCREEN_UPDATE_IND16( toaplan2_dual )
+UINT32 toaplan2_state::screen_update_toaplan2_dual(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	toaplan2_state *state = screen.machine().driver_data<toaplan2_state>();
 
-	if (state->m_vdp1)
+	if (m_vdp1)
 	{
 		bitmap.fill(0, cliprect);
-		state->m_custom_priority_bitmap.fill(0, cliprect);
-		state->m_vdp1->gp9001_render_vdp(screen.machine(), bitmap, cliprect);
+		m_custom_priority_bitmap.fill(0, cliprect);
+		m_vdp1->gp9001_render_vdp(screen.machine(), bitmap, cliprect);
 	}
-	if (state->m_vdp0)
+	if (m_vdp0)
 	{
 	//  bitmap.fill(0, cliprect);
-		state->m_custom_priority_bitmap.fill(0, cliprect);
-		state->m_vdp0->gp9001_render_vdp(screen.machine(), bitmap, cliprect);
+		m_custom_priority_bitmap.fill(0, cliprect);
+		m_vdp0->gp9001_render_vdp(screen.machine(), bitmap, cliprect);
 	}
 
 
@@ -309,24 +308,23 @@ SCREEN_UPDATE_IND16( toaplan2_dual )
 
 
 // renders to 2 bitmaps, and mixes output
-SCREEN_UPDATE_IND16( toaplan2_mixed )
+UINT32 toaplan2_state::screen_update_toaplan2_mixed(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	toaplan2_state *state = screen.machine().driver_data<toaplan2_state>();
 
 //  bitmap.fill(0, cliprect);
 //  gp9001_custom_priority_bitmap->fill(0, cliprect);
 
-	if (state->m_vdp0)
+	if (m_vdp0)
 	{
 		bitmap.fill(0, cliprect);
-		state->m_custom_priority_bitmap.fill(0, cliprect);
-		state->m_vdp0->gp9001_render_vdp(screen.machine(), bitmap, cliprect);
+		m_custom_priority_bitmap.fill(0, cliprect);
+		m_vdp0->gp9001_render_vdp(screen.machine(), bitmap, cliprect);
 	}
-	if (state->m_vdp1)
+	if (m_vdp1)
 	{
-		state->m_secondary_render_bitmap.fill(0, cliprect);
-		state->m_custom_priority_bitmap.fill(0, cliprect);
-		state->m_vdp1->gp9001_render_vdp(screen.machine(), state->m_secondary_render_bitmap, cliprect);
+		m_secondary_render_bitmap.fill(0, cliprect);
+		m_custom_priority_bitmap.fill(0, cliprect);
+		m_vdp1->gp9001_render_vdp(screen.machine(), m_secondary_render_bitmap, cliprect);
 	}
 
 
@@ -341,7 +339,7 @@ SCREEN_UPDATE_IND16( toaplan2_mixed )
 	// on that do.
 	//
 
-	if (state->m_vdp0 && state->m_vdp1)
+	if (m_vdp0 && m_vdp1)
 	{
 		int width = screen.width();
 		int height = screen.height();
@@ -352,7 +350,7 @@ SCREEN_UPDATE_IND16( toaplan2_mixed )
 		for (y=0;y<height;y++)
 		{
 			src_vdp0 = &bitmap.pix16(y);
-			src_vdp1 = &state->m_secondary_render_bitmap.pix16(y);
+			src_vdp1 = &m_secondary_render_bitmap.pix16(y);
 
 			for (x=0;x<width;x++)
 			{
@@ -409,35 +407,32 @@ SCREEN_UPDATE_IND16( toaplan2_mixed )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( toaplan2 )
+UINT32 toaplan2_state::screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	toaplan2_state *state = screen.machine().driver_data<toaplan2_state>();
 
-	if (state->m_vdp0)
+	if (m_vdp0)
 	{
 		bitmap.fill(0, cliprect);
-		state->m_custom_priority_bitmap.fill(0, cliprect);
-		state->m_vdp0->gp9001_render_vdp(screen.machine(), bitmap, cliprect);
+		m_custom_priority_bitmap.fill(0, cliprect);
+		m_vdp0->gp9001_render_vdp(screen.machine(), bitmap, cliprect);
 	}
 
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( truxton2 )
+UINT32 toaplan2_state::screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	toaplan2_state *state = screen.machine().driver_data<toaplan2_state>();
 
-	SCREEN_UPDATE16_CALL(toaplan2);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	SCREEN_UPDATE16_CALL_MEMBER(toaplan2);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( batrider )
+UINT32 toaplan2_state::screen_update_batrider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	toaplan2_state *state = screen.machine().driver_data<toaplan2_state>();
 
-	SCREEN_UPDATE16_CALL( toaplan2 );
+	SCREEN_UPDATE16_CALL_MEMBER( toaplan2 );
 
 	int line;
 	rectangle clip;
@@ -448,42 +443,41 @@ SCREEN_UPDATE_IND16( batrider )
 	/* used for 'for use in' and '8ing' screen on bbakraid, raizing on batrider */
 	for (line = 0; line < 256;line++)
 	{
-		if (state->m_tx_flip)
+		if (m_tx_flip)
 		{
 			clip.min_y = clip.max_y = 256 - line;
-			state->m_tx_tilemap->set_scrolly(0, 256 - line + state->m_txvideoram16_offs[256 - line]);
+			m_tx_tilemap->set_scrolly(0, 256 - line + m_txvideoram16_offs[256 - line]);
 		}
 		else
 		{
 			clip.min_y = clip.max_y = line;
-			state->m_tx_tilemap->set_scrolly(0,     - line + state->m_txvideoram16_offs[      line]);
+			m_tx_tilemap->set_scrolly(0,     - line + m_txvideoram16_offs[      line]);
 		}
-		state->m_tx_tilemap->draw(bitmap, clip, 0, 0);
+		m_tx_tilemap->draw(bitmap, clip, 0, 0);
 	}
 	return 0;
 }
 
 
 
-SCREEN_UPDATE_IND16( dogyuun )
+UINT32 toaplan2_state::screen_update_dogyuun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	SCREEN_UPDATE16_CALL( toaplan2_dual );
+	SCREEN_UPDATE16_CALL_MEMBER( toaplan2_dual );
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( batsugun )
+UINT32 toaplan2_state::screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	SCREEN_UPDATE16_CALL( toaplan2_mixed );
+	SCREEN_UPDATE16_CALL_MEMBER( toaplan2_mixed );
 	return 0;
 }
 
-SCREEN_VBLANK( toaplan2 )
+void toaplan2_state::screen_eof_toaplan2(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		toaplan2_state *state = screen.machine().driver_data<toaplan2_state>();
-		if (state->m_vdp0) state->m_vdp0->gp9001_screen_eof();
-		if (state->m_vdp1) state->m_vdp1->gp9001_screen_eof();
+		if (m_vdp0) m_vdp0->gp9001_screen_eof();
+		if (m_vdp1) m_vdp1->gp9001_screen_eof();
 	}
 }

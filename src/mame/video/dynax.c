@@ -1238,10 +1238,9 @@ static int debug_viewer( running_machine &machine, bitmap_ind16 &bitmap, const r
 
 
 
-SCREEN_UPDATE_IND16( hanamai )
+UINT32 dynax_state::screen_update_hanamai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dynax_state *state = screen.machine().driver_data<dynax_state>();
-	int layers_ctrl = ~state->m_layer_enable;
+	int layers_ctrl = ~m_layer_enable;
 	int lay[4];
 
 	if (debug_viewer(screen.machine(), bitmap, cliprect))
@@ -1249,15 +1248,15 @@ SCREEN_UPDATE_IND16( hanamai )
 
 	layers_ctrl &= debug_mask(screen.machine());
 
-	bitmap.fill((state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 1) * 256, cliprect);
+	bitmap.fill((m_blit_backpen & 0xff) + (m_blit_palbank & 1) * 256, cliprect);
 
 	/* bit 4 = display enable? */
-	if (!(state->m_hanamai_priority & 0x10))
+	if (!(m_hanamai_priority & 0x10))
 		return 0;
 
-	switch (state->m_hanamai_priority)
+	switch (m_hanamai_priority)
 	{
-		default:	popmessage("unknown priority %02x", state->m_hanamai_priority);
+		default:	popmessage("unknown priority %02x", m_hanamai_priority);
 		case 0x10:	lay[0] = 0; lay[1] = 1; lay[2] = 2; lay[3] = 3; break;
 		case 0x11:	lay[0] = 0; lay[1] = 3; lay[2] = 2; lay[3] = 1; break;
 		case 0x12:	lay[0] = 0; lay[1] = 1; lay[2] = 3; lay[3] = 2; break;
@@ -1274,10 +1273,9 @@ SCREEN_UPDATE_IND16( hanamai )
 }
 
 
-SCREEN_UPDATE_IND16( hnoridur )
+UINT32 dynax_state::screen_update_hnoridur(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dynax_state *state = screen.machine().driver_data<dynax_state>();
-	int layers_ctrl = ~BITSWAP8(state->m_hanamai_priority, 7, 6, 5, 4, 0, 1, 2, 3);
+	int layers_ctrl = ~BITSWAP8(m_hanamai_priority, 7, 6, 5, 4, 0, 1, 2, 3);
 	int lay[4];
 	int pri;
 
@@ -1286,17 +1284,17 @@ SCREEN_UPDATE_IND16( hnoridur )
 
 	layers_ctrl &= debug_mask(screen.machine());
 
-	bitmap.fill((state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 0x0f) * 256, cliprect);
+	bitmap.fill((m_blit_backpen & 0xff) + (m_blit_palbank & 0x0f) * 256, cliprect);
 
-	pri = state->m_hanamai_priority >> 4;
+	pri = m_hanamai_priority >> 4;
 
 	if (pri > 7)
 	{
-		popmessage("unknown priority %02x", state->m_hanamai_priority);
+		popmessage("unknown priority %02x", m_hanamai_priority);
 		pri = 0;
 	}
 
-	pri = state->m_priority_table[pri];
+	pri = m_priority_table[pri];
 	lay[0] = (pri >> 12) & 3;
 	lay[1] = (pri >>  8) & 3;
 	lay[2] = (pri >>  4) & 3;
@@ -1311,17 +1309,16 @@ SCREEN_UPDATE_IND16( hnoridur )
 }
 
 
-SCREEN_UPDATE_IND16( sprtmtch )
+UINT32 dynax_state::screen_update_sprtmtch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dynax_state *state = screen.machine().driver_data<dynax_state>();
-	int layers_ctrl = ~state->m_layer_enable;
+	int layers_ctrl = ~m_layer_enable;
 
 	if (debug_viewer(screen.machine(),bitmap,cliprect))
 		return 0;
 
 	layers_ctrl &= debug_mask(screen.machine());
 
-	bitmap.fill((state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 1) * 256, cliprect);
+	bitmap.fill((m_blit_backpen & 0xff) + (m_blit_palbank & 1) * 256, cliprect);
 
 	if (BIT(layers_ctrl, 0))   hanamai_copylayer(screen.machine(), bitmap, cliprect, 0);
 	if (BIT(layers_ctrl, 1))   hanamai_copylayer(screen.machine(), bitmap, cliprect, 1);
@@ -1329,17 +1326,16 @@ SCREEN_UPDATE_IND16( sprtmtch )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( jantouki_top )
+UINT32 dynax_state::screen_update_jantouki_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dynax_state *state = screen.machine().driver_data<dynax_state>();
-	int layers_ctrl = state->m_layer_enable;
+	int layers_ctrl = m_layer_enable;
 
 	if (debug_viewer(screen.machine(), bitmap, cliprect))
 		return 0;
 
 	layers_ctrl &= debug_mask(screen.machine());
 
-	bitmap.fill((state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 1) * 256, cliprect);
+	bitmap.fill((m_blit_backpen & 0xff) + (m_blit_palbank & 1) * 256, cliprect);
 
 //  if (BIT(layers_ctrl, 0))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 3, 0);
 	if (BIT(layers_ctrl, 1))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 2, 0);
@@ -1348,17 +1344,16 @@ SCREEN_UPDATE_IND16( jantouki_top )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( jantouki_bottom )
+UINT32 dynax_state::screen_update_jantouki_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dynax_state *state = screen.machine().driver_data<dynax_state>();
-	int layers_ctrl = state->m_layer_enable;
+	int layers_ctrl = m_layer_enable;
 
 	if (debug_viewer(screen.machine(), bitmap, cliprect))
 		return 0;
 
 	layers_ctrl &= debug_mask(screen.machine());
 
-	bitmap.fill((state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 1) * 256, cliprect);
+	bitmap.fill((m_blit_backpen & 0xff) + (m_blit_palbank & 1) * 256, cliprect);
 
 	if (BIT(layers_ctrl, 0))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 3, 0);
 	if (BIT(layers_ctrl, 4))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 7, 0);
@@ -1369,17 +1364,16 @@ SCREEN_UPDATE_IND16( jantouki_bottom )
 }
 
 
-SCREEN_UPDATE_IND16( mjdialq2 )
+UINT32 dynax_state::screen_update_mjdialq2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dynax_state *state = screen.machine().driver_data<dynax_state>();
-	int layers_ctrl = ~state->m_layer_enable;
+	int layers_ctrl = ~m_layer_enable;
 
 	if (debug_viewer(screen.machine(), bitmap, cliprect))
 		return 0;
 
 	layers_ctrl &= debug_mask(screen.machine());
 
-	bitmap.fill((state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 1) * 256, cliprect);
+	bitmap.fill((m_blit_backpen & 0xff) + (m_blit_palbank & 1) * 256, cliprect);
 
 	if (BIT(layers_ctrl, 0))   mjdialq2_copylayer(screen.machine(), bitmap, cliprect, 0);
 	if (BIT(layers_ctrl, 1))   mjdialq2_copylayer(screen.machine(), bitmap, cliprect, 1);
@@ -1394,9 +1388,8 @@ VIDEO_START_MEMBER(dynax_state,htengoku)
 	VIDEO_START_CALL_MEMBER(hnoridur);
 }
 
-SCREEN_UPDATE_IND16(htengoku)
+UINT32 dynax_state::screen_update_htengoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dynax_state *state = screen.machine().driver_data<dynax_state>();
 	int layer, x, y;
 
 	// render the layers, one by one, "dynax.c" style. Then convert the pixmaps to "ddenlovr.c"
@@ -1408,8 +1401,8 @@ SCREEN_UPDATE_IND16(htengoku)
 
 		for (y = 0; y < 256; y++)
 			for (x = 0; x < 512; x++)
-				state->m_ddenlovr_pixmap[3 - layer][y * 512 + x] = (UINT8)(bitmap.pix16(y, x));
+				m_ddenlovr_pixmap[3 - layer][y * 512 + x] = (UINT8)(bitmap.pix16(y, x));
 	}
 
-	return SCREEN_UPDATE16_CALL(ddenlovr);
+	return SCREEN_UPDATE16_CALL_MEMBER(ddenlovr);
 }

@@ -96,6 +96,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_meijinsn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -290,9 +291,8 @@ void meijinsn_state::palette_init()
 }
 
 
-static SCREEN_UPDATE_IND16(meijinsn)
+UINT32 meijinsn_state::screen_update_meijinsn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	meijinsn_state *state = screen.machine().driver_data<meijinsn_state>();
 	int offs;
 
 	for (offs = 0; offs < 0x4000; offs++)
@@ -302,8 +302,8 @@ static SCREEN_UPDATE_IND16(meijinsn)
 		sx = offs >> 8;
 		sy = offs & 0xff;
 
-		data1 = state->m_videoram[offs] >> 8;
-		data2 = state->m_videoram[offs] & 0xff;
+		data1 = m_videoram[offs] >> 8;
+		data2 = m_videoram[offs] & 0xff;
 
 		for (x = 0; x < 4; x++)
 		{
@@ -371,7 +371,7 @@ static MACHINE_CONFIG_START( meijinsn, meijinsn_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12, 243, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(meijinsn)
+	MCFG_SCREEN_UPDATE_DRIVER(meijinsn_state, screen_update_meijinsn)
 
 	MCFG_PALETTE_LENGTH(32)
 

@@ -34,6 +34,7 @@ public:
 	DECLARE_DRIVER_INIT(mv4in1);
 	TILE_GET_INFO_MEMBER(get_ltcasino_tile_info);
 	virtual void video_start();
+	UINT32 screen_update_ltcasino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -635,10 +636,9 @@ static GFXDECODE_START( ltcasino )
 GFXDECODE_END
 
 
-static SCREEN_UPDATE_IND16(ltcasino)
+UINT32 ltcasino_state::screen_update_ltcasino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ltcasino_state *state = screen.machine().driver_data<ltcasino_state>();
-	state->m_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -655,7 +655,7 @@ static MACHINE_CONFIG_START( ltcasino, ltcasino_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(6*8, 58*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(ltcasino)
+	MCFG_SCREEN_UPDATE_DRIVER(ltcasino_state, screen_update_ltcasino)
 
 	MCFG_GFXDECODE(ltcasino)
 	MCFG_PALETTE_LENGTH(0x100)

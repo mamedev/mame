@@ -1409,20 +1409,19 @@ READ32_MEMBER(itech32_state::itech020_video_r)
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( itech32 )
+UINT32 itech32_state::screen_update_itech32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	itech32_state *state = screen.machine().driver_data<itech32_state>();
 	int y;
 
 	/* loop over height */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *src1 = &state->m_videoplane[0][compute_safe_address(state, state->VIDEO_DISPLAY_XORIGIN1, state->VIDEO_DISPLAY_YORIGIN1 + y)];
+		UINT16 *src1 = &m_videoplane[0][compute_safe_address(this, VIDEO_DISPLAY_XORIGIN1, VIDEO_DISPLAY_YORIGIN1 + y)];
 
 		/* handle multi-plane case */
-		if (state->m_planes > 1)
+		if (m_planes > 1)
 		{
-			UINT16 *src2 = &state->m_videoplane[1][compute_safe_address(state, state->VIDEO_DISPLAY_XORIGIN2 + state->VIDEO_DISPLAY_XSCROLL2, state->VIDEO_DISPLAY_YORIGIN2 + state->VIDEO_DISPLAY_YSCROLL2 + y)];
+			UINT16 *src2 = &m_videoplane[1][compute_safe_address(this, VIDEO_DISPLAY_XORIGIN2 + VIDEO_DISPLAY_XSCROLL2, VIDEO_DISPLAY_YORIGIN2 + VIDEO_DISPLAY_YSCROLL2 + y)];
 			UINT16 scanline[384];
 			int x;
 

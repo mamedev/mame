@@ -45,6 +45,7 @@ public:
 	DECLARE_PALETTE_INIT(gsword);
 	DECLARE_MACHINE_RESET(josvolly);
 	DECLARE_PALETTE_INIT(josvolly);
+	UINT32 screen_update_gsword(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -54,4 +55,4 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( gsword );
+

@@ -920,12 +920,11 @@ void lockon_state::video_start()
 	save_pointer(NAME(m_obj_pal_ram), 2048);
 }
 
-SCREEN_UPDATE_IND16( lockon )
+UINT32 lockon_state::screen_update_lockon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	lockon_state *state = screen.machine().driver_data<lockon_state>();
 
 	/* If screen output is disabled, fill with black */
-	if (!BIT(state->m_ctrl_reg, 7))
+	if (!BIT(m_ctrl_reg, 7))
 	{
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
@@ -935,7 +934,7 @@ SCREEN_UPDATE_IND16( lockon )
 	rotate_draw(screen.machine(), bitmap, cliprect);
 
 	/* Draw the character tilemap */
-	state->m_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* Draw the HUD */
 	hud_draw(screen.machine(), bitmap, cliprect);
@@ -943,17 +942,16 @@ SCREEN_UPDATE_IND16( lockon )
 	return 0;
 }
 
-SCREEN_VBLANK( lockon )
+void lockon_state::screen_eof_lockon(screen_device &screen, bool state)
 {
 	// on falling edge
-	if (!vblank_on)
+	if (!state)
 	{
-		lockon_state *state = screen.machine().driver_data<lockon_state>();
 
 		/* Swap the frame buffers */
-		bitmap_ind16 *tmp = state->m_front_buffer;
-		state->m_front_buffer = state->m_back_buffer;
-		state->m_back_buffer = tmp;
+		bitmap_ind16 *tmp = m_front_buffer;
+		m_front_buffer = m_back_buffer;
+		m_back_buffer = tmp;
 
 		/* Draw the frame buffer layers */
 		scene_draw(screen.machine());

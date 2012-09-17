@@ -24,6 +24,8 @@ public:
 	UINT8 m_flip_screen;
 	UINT8 *m_proms;
 	DECLARE_WRITE8_MEMBER(port_w);
+	UINT32 screen_update_sstrangr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_sstrngr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -34,9 +36,8 @@ public:
  *
  *************************************/
 
-static SCREEN_UPDATE_RGB32( sstrangr )
+UINT32 sstrangr_state::screen_update_sstrangr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	sstrangr_state *state = screen.machine().driver_data<sstrangr_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < 0x2000; offs++)
@@ -45,13 +46,13 @@ static SCREEN_UPDATE_RGB32( sstrangr )
 
 		UINT8 x = offs << 3;
 		int y = offs >> 5;
-		UINT8 data = state->m_ram[offs];
+		UINT8 data = m_ram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
 			pen_t pen;
 
-			if (state->m_flip_screen)
+			if (m_flip_screen)
 			{
 				pen = (data & 0x80) ? RGB_WHITE : RGB_BLACK;
 				data = data << 1;
@@ -83,16 +84,15 @@ static void get_pens(pen_t *pens)
 }
 
 
-static SCREEN_UPDATE_RGB32( sstrngr2 )
+UINT32 sstrangr_state::screen_update_sstrngr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	sstrangr_state *state = screen.machine().driver_data<sstrangr_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	UINT8 *color_map_base;
 
 	get_pens(pens);
 
-	color_map_base = &state->memregion("proms")->base()[state->m_flip_screen ? 0x0000 : 0x0200];
+	color_map_base = &memregion("proms")->base()[m_flip_screen ? 0x0000 : 0x0200];
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{
@@ -103,14 +103,14 @@ static SCREEN_UPDATE_RGB32( sstrngr2 )
 
 		offs_t color_address = (offs >> 9 << 5) | (offs & 0x1f);
 
-		UINT8 data = state->m_ram[offs];
+		UINT8 data = m_ram[offs];
 		UINT8 fore_color = color_map_base[color_address] & 0x07;
 
 		for (i = 0; i < 8; i++)
 		{
 			UINT8 color;
 
-			if (state->m_flip_screen)
+			if (m_flip_screen)
 			{
 				color = (data & 0x80) ? fore_color : 0;
 				data = data << 1;
@@ -204,7 +204,7 @@ static MACHINE_CONFIG_START( sstrangr, sstrangr_state )
 	MCFG_SCREEN_SIZE(32*8, 262)		/* vert size is a guess, taken from mw8080bw */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_STATIC(sstrangr)
+	MCFG_SCREEN_UPDATE_DRIVER(sstrangr_state, screen_update_sstrangr)
 
 	/* sound hardware */
 
@@ -267,7 +267,7 @@ static MACHINE_CONFIG_DERIVED( sstrngr2, sstrangr )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(sstrngr2)
+	MCFG_SCREEN_UPDATE_DRIVER(sstrangr_state, screen_update_sstrngr2)
 
 MACHINE_CONFIG_END
 

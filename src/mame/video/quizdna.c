@@ -184,14 +184,13 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-SCREEN_UPDATE_IND16( quizdna )
+UINT32 quizdna_state::screen_update_quizdna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	quizdna_state *state = screen.machine().driver_data<quizdna_state>();
-	if (state->m_video_enable)
+	if (m_video_enable)
 	{
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect);
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);

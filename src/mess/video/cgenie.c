@@ -410,10 +410,9 @@ static void cgenie_refresh_tv_set(running_machine &machine, bitmap_ind16 &bitmap
 /***************************************************************************
   Draw the game screen in the given bitmap_ind16.
 ***************************************************************************/
-SCREEN_UPDATE_IND16( cgenie )
+UINT32 cgenie_state::screen_update_cgenie(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cgenie_state *state = screen.machine().driver_data<cgenie_state>();
-    if( state->m_tv_mode )
+    if( m_tv_mode )
 		cgenie_refresh_tv_set(screen.machine(), bitmap, cliprect);
 	else
 		cgenie_refresh_monitor(screen.machine(), bitmap, cliprect);

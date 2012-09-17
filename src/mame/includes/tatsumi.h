@@ -120,6 +120,10 @@ public:
 	DECLARE_VIDEO_START(roundup5);
 	DECLARE_VIDEO_START(cyclwarr);
 	DECLARE_VIDEO_START(bigfight);
+	UINT32 screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_roundup5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_cyclwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_bigfight(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -141,8 +145,8 @@ void tatsumi_reset(running_machine &machine);
 
 
 
-SCREEN_UPDATE_RGB32( roundup5 );
-SCREEN_UPDATE_RGB32( apache3 );
-SCREEN_UPDATE_RGB32( cyclwarr );
-SCREEN_UPDATE_RGB32( bigfight );
+
+
+
+
 

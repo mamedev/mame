@@ -25,10 +25,11 @@ public:
 	device_t *m_deco_tilegen1;
 	DECLARE_DRIVER_INIT(dietgo);
 	virtual void machine_start();
+	UINT32 screen_update_dietgo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 
 /*----------- defined in video/dietgo.c -----------*/
 
-SCREEN_UPDATE_IND16( dietgo );
+

@@ -141,6 +141,12 @@ public:
 	DECLARE_VIDEO_START(magical);
 	DECLARE_PALETTE_INIT(magodds);
 	DECLARE_VIDEO_START(unkch);
+	UINT32 screen_update_goldstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_cmast91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_bingowng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_magical(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_amcoe1a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_unkch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -154,9 +160,9 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( goldstar );
-SCREEN_UPDATE_IND16( bingowng );
-SCREEN_UPDATE_IND16( cmast91 );
-SCREEN_UPDATE_IND16( amcoe1a );
-SCREEN_UPDATE_IND16( unkch );
-SCREEN_UPDATE_IND16( magical );
+
+
+
+
+
+

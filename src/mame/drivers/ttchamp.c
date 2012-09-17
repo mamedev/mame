@@ -84,6 +84,7 @@ public:
 
 
 	virtual void video_start();
+	UINT32 screen_update_ttchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -97,9 +98,8 @@ void ttchamp_state::video_start()
 
 }
 
-static SCREEN_UPDATE_IND16(ttchamp)
+UINT32 ttchamp_state::screen_update_ttchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ttchamp_state *state = screen.machine().driver_data<ttchamp_state>();
 	int y,x,count;
 //  int i;
 	static const int xxx=320,yyy=204;
@@ -114,11 +114,11 @@ static SCREEN_UPDATE_IND16(ttchamp)
 //      b = (dat>>10)&0x1f;
 //      g = (dat>>5)&0x1f;
 //      r = (dat>>0)&0x1f;
-//      palette_set_color_rgb(machine,i,pal5bit(r),pal5bit(g),pal5bit(b));
+//      palette_set_color_rgb(machine(),i,pal5bit(r),pal5bit(g),pal5bit(b));
 //  }
 
 	count=0;
-	UINT8 *videoram = (UINT8*)state->m_peno_vram;
+	UINT8 *videoram = (UINT8*)m_peno_vram;
 	for (y=0;y<yyy;y++)
 	{
 		for(x=0;x<xxx;x++)
@@ -287,7 +287,7 @@ static MACHINE_CONFIG_START( ttchamp, ttchamp_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(1024,1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_STATIC(ttchamp)
+	MCFG_SCREEN_UPDATE_DRIVER(ttchamp_state, screen_update_ttchamp)
 
 	MCFG_PALETTE_LENGTH(0x8000)
 

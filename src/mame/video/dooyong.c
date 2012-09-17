@@ -498,121 +498,113 @@ static void rshark_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, 
 }
 
 
-SCREEN_UPDATE_IND16( lastday )
+UINT32 dooyong_state::screen_update_lastday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
-	if (!state->m_sprites_disabled)
+	if (!m_sprites_disabled)
 		draw_sprites(screen.machine(), bitmap, cliprect, 0);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( gulfstrm )
+UINT32 dooyong_state::screen_update_gulfstrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 1);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( pollux )
+UINT32 dooyong_state::screen_update_pollux(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 2);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( flytiger )
+UINT32 dooyong_state::screen_update_flytiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	if (state->m_flytiger_pri)
+	if (m_flytiger_pri)
 	{
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 1);
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 2);
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 1);
+		m_bg_tilemap->draw(bitmap, cliprect, 0, 2);
 	}
 	else
 	{
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
+		m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
 	}
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 4);
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( bluehawk )
+UINT32 dooyong_state::screen_update_bluehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
-	state->m_fg2_tilemap->draw(bitmap, cliprect, 0, 4);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
+	m_fg2_tilemap->draw(bitmap, cliprect, 0, 4);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 3);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( primella )
+UINT32 dooyong_state::screen_update_primella(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	if (state->m_tx_pri) state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	if (!state->m_tx_pri) state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (m_tx_pri) m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (!m_tx_pri) m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( rshark )
+UINT32 dooyong_state::screen_update_rshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
-	state->m_bg2_tilemap->draw(bitmap, cliprect, 0, (state->m_rshark_pri ? 2 : 1));
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
-	state->m_fg2_tilemap->draw(bitmap, cliprect, 0, 2);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
+	m_bg2_tilemap->draw(bitmap, cliprect, 0, (m_rshark_pri ? 2 : 1));
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
+	m_fg2_tilemap->draw(bitmap, cliprect, 0, 2);
 
 	rshark_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( popbingo )
+UINT32 dooyong_state::screen_update_popbingo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
 
 	rshark_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;

@@ -67,6 +67,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hotblock_port0_w);
 	DECLARE_WRITE8_MEMBER(hotblock_video_write);
 	virtual void video_start();
+	UINT32 screen_update_hotblock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -142,9 +143,8 @@ void hotblock_state::video_start()
 	save_item(NAME(m_pal));
 }
 
-static SCREEN_UPDATE_IND16(hotblock)
+UINT32 hotblock_state::screen_update_hotblock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	hotblock_state *state = screen.machine().driver_data<hotblock_state>();
 	int y, x, count;
 	int i;
 	static const int xxx = 320, yyy = 204;
@@ -153,7 +153,7 @@ static SCREEN_UPDATE_IND16(hotblock)
 
 	for (i = 0; i < 256; i++)
 	{
-		int dat = (state->m_pal[i * 2 + 1] << 8) | state->m_pal[i * 2];
+		int dat = (m_pal[i * 2 + 1] << 8) | m_pal[i * 2];
 		palette_set_color_rgb(screen.machine(), i, pal5bit(dat >> 0), pal5bit(dat >> 5), pal5bit(dat >> 10));
 	}
 
@@ -162,8 +162,8 @@ static SCREEN_UPDATE_IND16(hotblock)
 	{
 		for(x = 0; x < xxx; x++)
 		{
-			if (state->m_port0 & 0x40)
-				bitmap.pix16(y, x) = state->m_vram[count];
+			if (m_port0 & 0x40)
+				bitmap.pix16(y, x) = m_vram[count];
 			count++;
 		}
 	}
@@ -225,7 +225,7 @@ static MACHINE_CONFIG_START( hotblock, hotblock_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(1024,1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_STATIC(hotblock)
+	MCFG_SCREEN_UPDATE_DRIVER(hotblock_state, screen_update_hotblock)
 
 	MCFG_PALETTE_LENGTH(256)
 

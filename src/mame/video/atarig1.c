@@ -148,28 +148,26 @@ void atarig1_scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( atarig1 )
+UINT32 atarig1_state::screen_update_atarig1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	atarig1_state *state = screen.machine().driver_data<atarig1_state>();
 
 	/* draw the playfield */
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* copy the motion objects on top */
-	copybitmap_trans(bitmap, *atarirle_get_vram(state->m_rle, 0), 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, *atarirle_get_vram(m_rle, 0), 0, 0, 0, 0, cliprect, 0);
 
 	/* add the alpha on top */
-	state->m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-SCREEN_VBLANK( atarig1 )
+void atarig1_state::screen_eof_atarig1(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		atarig1_state *state = screen.machine().driver_data<atarig1_state>();
 
-		atarirle_eof(state->m_rle);
+		atarirle_eof(m_rle);
 	}
 }

@@ -47,6 +47,9 @@ public:
 	DECLARE_WRITE8_MEMBER(asuka_msm5205_stop_w);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_bonzeadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_asuka(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_asuka(screen_device &screen, bool state);
 };
 
 
@@ -63,5 +66,5 @@ DECLARE_WRITE16_HANDLER( bonzeadv_cchip_ram_w );
 /*----------- defined in video/asuka.c -----------*/
 
 
-SCREEN_UPDATE_IND16( asuka );
-SCREEN_UPDATE_IND16( bonzeadv );
+
+

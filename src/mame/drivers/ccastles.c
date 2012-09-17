@@ -484,7 +484,7 @@ static MACHINE_CONFIG_START( ccastles, ccastles_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, HTOTAL - 1, VTOTAL, 0, VTOTAL - 1)	/* will be adjusted later */
-	MCFG_SCREEN_UPDATE_STATIC(ccastles)
+	MCFG_SCREEN_UPDATE_DRIVER(ccastles_state, screen_update_ccastles)
 
 
 	/* sound hardware */

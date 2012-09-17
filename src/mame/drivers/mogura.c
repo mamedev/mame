@@ -31,6 +31,7 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_mogura(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -86,21 +87,20 @@ void mogura_state::video_start()
 	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mogura_state::get_mogura_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
-static SCREEN_UPDATE_IND16( mogura )
+UINT32 mogura_state::screen_update_mogura(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mogura_state *state = screen.machine().driver_data<mogura_state>();
 	const rectangle &visarea = screen.visible_area();
 
 	/* tilemap layout is a bit strange ... */
 	rectangle clip = visarea;
 	clip.max_x = 256 - 1;
-	state->m_tilemap->set_scrollx(0, 256);
-	state->m_tilemap->draw(bitmap, clip, 0, 0);
+	m_tilemap->set_scrollx(0, 256);
+	m_tilemap->draw(bitmap, clip, 0, 0);
 
 	clip.min_x = 256;
 	clip.max_x = 512 - 1;
-	state->m_tilemap->set_scrollx(0, -128);
-	state->m_tilemap->draw(bitmap, clip, 0, 0);
+	m_tilemap->set_scrollx(0, -128);
+	m_tilemap->draw(bitmap, clip, 0, 0);
 
 	return 0;
 }
@@ -215,7 +215,7 @@ static MACHINE_CONFIG_START( mogura, mogura_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(mogura)
+	MCFG_SCREEN_UPDATE_DRIVER(mogura_state, screen_update_mogura)
 
 	MCFG_PALETTE_LENGTH(32)
 

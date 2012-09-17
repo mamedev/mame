@@ -124,20 +124,18 @@ static void kchampvs_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 }
 
 
-SCREEN_UPDATE_IND16( kchamp )
+UINT32 kchamp_state::screen_update_kchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	kchamp_state *state = screen.machine().driver_data<kchamp_state>();
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	kchamp_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( kchampvs )
+UINT32 kchamp_state::screen_update_kchampvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	kchamp_state *state = screen.machine().driver_data<kchamp_state>();
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	kchampvs_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

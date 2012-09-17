@@ -291,12 +291,10 @@ void gp32_state::video_start()
 	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }
 
-static SCREEN_UPDATE_RGB32( gp32 )
+UINT32 gp32_state::screen_update_gp32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	gp32_state *state = screen.machine().driver_data<gp32_state>();
-	running_machine &machine = screen.machine();
-	copybitmap(bitmap, state->m_bitmap, 0, 0, 0, 0, cliprect);
-	s3c240x_lcd_dma_init( machine);
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+	s3c240x_lcd_dma_init( machine());
 	return 0;
 }
 
@@ -1746,7 +1744,7 @@ static MACHINE_CONFIG_START( gp32, gp32_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(240, 320)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 319)
-	MCFG_SCREEN_UPDATE_STATIC(gp32)
+	MCFG_SCREEN_UPDATE_DRIVER(gp32_state, screen_update_gp32)
 
 	/* 320x240 is 4:3 but ROT270 causes an aspect ratio of 3:4 by default */
 	MCFG_DEFAULT_LAYOUT(layout_lcd_rot)

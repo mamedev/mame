@@ -54,13 +54,14 @@ public:
 
 	DECLARE_DRIVER_INIT(tcl);
 	virtual void video_start();
+	UINT32 screen_update_tcl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 void tcl_state::video_start()
 {
 }
-static SCREEN_UPDATE_IND16( tcl )
+UINT32 tcl_state::screen_update_tcl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -135,7 +136,7 @@ static MACHINE_CONFIG_START( tcl, tcl_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(tcl)
+	MCFG_SCREEN_UPDATE_DRIVER(tcl_state, screen_update_tcl)
 
 	MCFG_GFXDECODE(tcl)
 	MCFG_PALETTE_LENGTH(16*16)

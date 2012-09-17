@@ -113,45 +113,43 @@ VIDEO_START_MEMBER(playch10_state,playch10_hboard)
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( playch10_single )
+UINT32 playch10_state::screen_update_playch10_single(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	playch10_state *state = screen.machine().driver_data<playch10_state>();
 	ppu2c0x_device *ppu = screen.machine().device<ppu2c0x_device>("ppu");
 
 	rectangle top_monitor = screen.visible_area();
 
 	top_monitor.max_y = ( top_monitor.max_y - top_monitor.min_y ) / 2;
 
-	if(state->m_pc10_dispmask_old != state->m_pc10_dispmask)
+	if(m_pc10_dispmask_old != m_pc10_dispmask)
 	{
-		state->m_pc10_dispmask_old = state->m_pc10_dispmask;
+		m_pc10_dispmask_old = m_pc10_dispmask;
 
-		if(state->m_pc10_dispmask)
-			state->m_pc10_game_mode ^= 1;
+		if(m_pc10_dispmask)
+			m_pc10_game_mode ^= 1;
 	}
 
-	if ( state->m_pc10_game_mode )
+	if ( m_pc10_game_mode )
 		/* render the ppu */
 		ppu->render(bitmap, 0, 0, 0, 0 );
 	else
 	{
 		/* When the bios is accessing vram, the video circuitry can't access it */
-		if ( !state->m_pc10_sdcs )
-			state->m_bg_tilemap->draw(bitmap, top_monitor, 0, 0);
+		if ( !m_pc10_sdcs )
+			m_bg_tilemap->draw(bitmap, top_monitor, 0, 0);
 	}
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( playch10_top )
+UINT32 playch10_state::screen_update_playch10_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	playch10_state *state = screen.machine().driver_data<playch10_state>();
 	ppu2c0x_device *ppu = screen.machine().device<ppu2c0x_device>("ppu");
 
 	/* Single Monitor version */
-	if (state->m_pc10_bios != 1)
-		return SCREEN_UPDATE16_CALL(playch10_single);
+	if (m_pc10_bios != 1)
+		return SCREEN_UPDATE16_CALL_MEMBER(playch10_single);
 
-	if (!state->m_pc10_dispmask)
+	if (!m_pc10_dispmask)
 		/* render the ppu */
 		ppu->render(bitmap, 0, 0, 0, 0);
 	else
@@ -160,18 +158,17 @@ SCREEN_UPDATE_IND16( playch10_top )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( playch10_bottom )
+UINT32 playch10_state::screen_update_playch10_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	playch10_state *state = screen.machine().driver_data<playch10_state>();
 
 	/* Single Monitor version */
-	if (state->m_pc10_bios != 1)
-		return SCREEN_UPDATE16_CALL(playch10_single);
+	if (m_pc10_bios != 1)
+		return SCREEN_UPDATE16_CALL_MEMBER(playch10_single);
 
 	/* When the bios is accessing vram, the video circuitry can't access it */
 
-	if ( !state->m_pc10_sdcs )
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if ( !m_pc10_sdcs )
+		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(0, cliprect);
 

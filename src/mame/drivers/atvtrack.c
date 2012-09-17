@@ -85,6 +85,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_atvtrack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 static void logbinary(UINT32 data,int high=31,int low=0)
@@ -318,7 +319,7 @@ void atvtrack_state::video_start()
 {
 }
 
-SCREEN_UPDATE_RGB32(atvtrack)
+UINT32 atvtrack_state::screen_update_atvtrack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -401,7 +402,7 @@ static MACHINE_CONFIG_START( atvtrack, atvtrack_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_STATIC(atvtrack)
+	MCFG_SCREEN_UPDATE_DRIVER(atvtrack_state, screen_update_atvtrack)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 

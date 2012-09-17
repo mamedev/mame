@@ -29,12 +29,13 @@ public:
 	DECLARE_READ8_MEMBER( port_b_r );
 	DECLARE_WRITE8_MEMBER( port_b_w );
 	DECLARE_READ8_MEMBER( port_c_r );
+	UINT32 screen_update_gamepock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in machine/gamepock.c -----------*/
 
-SCREEN_UPDATE_IND16( gamepock );
+
 
 int gamepock_io_callback( device_t *device, int ioline, int state );
 

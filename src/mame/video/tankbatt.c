@@ -99,10 +99,9 @@ static void draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-SCREEN_UPDATE_IND16( tankbatt )
+UINT32 tankbatt_state::screen_update_tankbatt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tankbatt_state *state = screen.machine().driver_data<tankbatt_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_bullets(screen.machine(), bitmap, cliprect);
 	return 0;
 }

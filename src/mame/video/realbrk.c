@@ -483,16 +483,15 @@ WRITE16_MEMBER(realbrk_state::realbrk_vregs_w)
 	}
 }
 
-SCREEN_UPDATE_IND16(realbrk)
+UINT32 realbrk_state::screen_update_realbrk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	realbrk_state *state = screen.machine().driver_data<realbrk_state>();
 	int layers_ctrl = -1;
 
-	state->m_tilemap_0->set_scrolly(0, state->m_vregs[0x0/2]);
-	state->m_tilemap_0->set_scrollx(0, state->m_vregs[0x2/2]);
+	m_tilemap_0->set_scrolly(0, m_vregs[0x0/2]);
+	m_tilemap_0->set_scrollx(0, m_vregs[0x2/2]);
 
-	state->m_tilemap_1->set_scrolly(0, state->m_vregs[0x4/2]);
-	state->m_tilemap_1->set_scrollx(0, state->m_vregs[0x6/2]);
+	m_tilemap_1->set_scrolly(0, m_vregs[0x4/2]);
+	m_tilemap_1->set_scrollx(0, m_vregs[0x6/2]);
 
 #ifdef MAME_DEBUG
 if ( screen.machine().input().code_pressed(KEYCODE_Z) )
@@ -506,64 +505,63 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) )
 }
 #endif
 
-	if (state->m_disable_video)
+	if (m_disable_video)
 	{
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 	else
-		bitmap.fill(state->m_vregs[0xc/2] & 0x7fff, cliprect);
+		bitmap.fill(m_vregs[0xc/2] & 0x7fff, cliprect);
 
-	if (layers_ctrl & 2)	state->m_tilemap_1->draw(bitmap, cliprect, 0,0);
-	if (layers_ctrl & 1)	state->m_tilemap_0->draw(bitmap, cliprect, 0,0);
+	if (layers_ctrl & 2)	m_tilemap_1->draw(bitmap, cliprect, 0,0);
+	if (layers_ctrl & 1)	m_tilemap_0->draw(bitmap, cliprect, 0,0);
 
 	if (layers_ctrl & 8)	draw_sprites(screen.machine(),bitmap,cliprect);
 
-	if (layers_ctrl & 4)	state->m_tilemap_2->draw(bitmap, cliprect, 0,0);
+	if (layers_ctrl & 4)	m_tilemap_2->draw(bitmap, cliprect, 0,0);
 
-//  popmessage("%04x",state->m_vregs[0x8/2]);
+//  popmessage("%04x",m_vregs[0x8/2]);
 	return 0;
 }
 
 /* DaiDaiKakumei */
-SCREEN_UPDATE_IND16(dai2kaku)
+UINT32 realbrk_state::screen_update_dai2kaku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	realbrk_state *state = screen.machine().driver_data<realbrk_state>();
 	int layers_ctrl = -1;
 	int offs, bgx0, bgy0, bgx1, bgy1;
 
-	bgy0 = state->m_vregs[0x0/2];
-	bgx0 = state->m_vregs[0x2/2];
-	bgy1 = state->m_vregs[0x4/2];
-	bgx1 = state->m_vregs[0x6/2];
+	bgy0 = m_vregs[0x0/2];
+	bgx0 = m_vregs[0x2/2];
+	bgy1 = m_vregs[0x4/2];
+	bgx1 = m_vregs[0x6/2];
 
 	// bg0
-	state->m_tilemap_0->set_scroll_rows(512);
-	state->m_tilemap_0->set_scroll_cols(1);
-	if( state->m_vregs[8/2] & (0x0100)){
+	m_tilemap_0->set_scroll_rows(512);
+	m_tilemap_0->set_scroll_cols(1);
+	if( m_vregs[8/2] & (0x0100)){
 		for(offs=0; offs<(512); offs++) {
-			state->m_tilemap_0->set_scrollx(offs, bgx0 - (state->m_vram_1ras[offs]&0x3ff) );
+			m_tilemap_0->set_scrollx(offs, bgx0 - (m_vram_1ras[offs]&0x3ff) );
 		}
 	} else {
 		for(offs=0; offs<(512); offs++) {
-			state->m_tilemap_0->set_scrollx(offs, bgx0 );
+			m_tilemap_0->set_scrollx(offs, bgx0 );
 		}
 	}
-	state->m_tilemap_0->set_scrolly(0, bgy0 );
+	m_tilemap_0->set_scrolly(0, bgy0 );
 
 	// bg1
-	state->m_tilemap_1->set_scroll_rows(512);
-	state->m_tilemap_1->set_scroll_cols(1);
-	if( state->m_vregs[8/2] & (0x0001)){
+	m_tilemap_1->set_scroll_rows(512);
+	m_tilemap_1->set_scroll_cols(1);
+	if( m_vregs[8/2] & (0x0001)){
 		for(offs=0; offs<(512); offs++) {
-			state->m_tilemap_1->set_scrollx(offs, bgx1 - (state->m_vram_1ras[offs]&0x3ff) );
+			m_tilemap_1->set_scrollx(offs, bgx1 - (m_vram_1ras[offs]&0x3ff) );
 		}
 	} else {
 		for(offs=0; offs<(512); offs++) {
-			state->m_tilemap_1->set_scrollx(offs, bgx1 );
+			m_tilemap_1->set_scrollx(offs, bgx1 );
 		}
 	}
-	state->m_tilemap_1->set_scrolly(0, bgy1 );
+	m_tilemap_1->set_scrolly(0, bgy1 );
 
 #ifdef MAME_DEBUG
 if ( screen.machine().input().code_pressed(KEYCODE_Z) )
@@ -577,13 +575,13 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) )
 }
 #endif
 
-	if (state->m_disable_video)
+	if (m_disable_video)
 	{
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 	else
-		bitmap.fill(state->m_vregs[0xc/2] & 0x7fff, cliprect);
+		bitmap.fill(m_vregs[0xc/2] & 0x7fff, cliprect);
 
 
 
@@ -591,28 +589,28 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) )
 	if (layers_ctrl & 8)	dai2kaku_draw_sprites(screen.machine(),bitmap,cliprect,2);
 
 	// bglow
-	if( state->m_vregs[8/2] & (0x8000)){
-		if (layers_ctrl & 1)	state->m_tilemap_0->draw(bitmap, cliprect, 0,0);
+	if( m_vregs[8/2] & (0x8000)){
+		if (layers_ctrl & 1)	m_tilemap_0->draw(bitmap, cliprect, 0,0);
 	} else {
-		if (layers_ctrl & 2)	state->m_tilemap_1->draw(bitmap, cliprect, 0,0);
+		if (layers_ctrl & 2)	m_tilemap_1->draw(bitmap, cliprect, 0,0);
 	}
 
 	// spr 1
 	if (layers_ctrl & 8)	dai2kaku_draw_sprites(screen.machine(),bitmap,cliprect,1);
 
 	// bghigh
-	if( state->m_vregs[8/2] & (0x8000)){
-		if (layers_ctrl & 2)	state->m_tilemap_1->draw(bitmap, cliprect, 0,0);
+	if( m_vregs[8/2] & (0x8000)){
+		if (layers_ctrl & 2)	m_tilemap_1->draw(bitmap, cliprect, 0,0);
 	} else {
-		if (layers_ctrl & 1)	state->m_tilemap_0->draw(bitmap, cliprect, 0,0);
+		if (layers_ctrl & 1)	m_tilemap_0->draw(bitmap, cliprect, 0,0);
 	}
 
 	// spr 2
 	if (layers_ctrl & 8)	dai2kaku_draw_sprites(screen.machine(),bitmap,cliprect,0);
 
 	// fix
-	if (layers_ctrl & 4)	state->m_tilemap_2->draw(bitmap, cliprect, 0,0);
+	if (layers_ctrl & 4)	m_tilemap_2->draw(bitmap, cliprect, 0,0);
 
-//  usrintf_showmessage("%04x",state->m_vregs[0x8/2]);
+//  usrintf_showmessage("%04x",m_vregs[0x8/2]);
 	return 0;
 }

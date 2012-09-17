@@ -253,6 +253,9 @@ public:
 	DECLARE_MACHINE_START(s2650);
 	DECLARE_MACHINE_RESET(strtheat);
 	DECLARE_MACHINE_RESET(drakton);
+	UINT32 screen_update_dkong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_pestplce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_spclforc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/dkong.c -----------*/
@@ -265,9 +268,9 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( dkong );
-SCREEN_UPDATE_IND16( pestplce );
-SCREEN_UPDATE_IND16( spclforc );
+
+
+
 
 /*----------- defined in audio/dkong.c -----------*/
 

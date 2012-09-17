@@ -258,9 +258,8 @@ void angelkds_state::video_start()
 
 /* enable bits are uncertain */
 
-SCREEN_UPDATE_IND16( angelkds )
+UINT32 angelkds_state::screen_update_angelkds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	angelkds_state *state = screen.machine().driver_data<angelkds_state>();
 	const rectangle &visarea = screen.visible_area();
 	rectangle clip;
 
@@ -269,24 +268,24 @@ SCREEN_UPDATE_IND16( angelkds )
 	/* draw top of screen */
 	clip.set(8*0, 8*16-1, visarea.min_y, visarea.max_y);
 
-	if ((state->m_layer_ctrl & 0x80) == 0x00)
-		state->m_bgtop_tilemap->draw(bitmap, clip, 0, 0);
+	if ((m_layer_ctrl & 0x80) == 0x00)
+		m_bgtop_tilemap->draw(bitmap, clip, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, clip, 0x80);
 
-	if ((state->m_layer_ctrl & 0x20) == 0x00)
-		state->m_tx_tilemap->draw(bitmap, clip, 0, 0);
+	if ((m_layer_ctrl & 0x20) == 0x00)
+		m_tx_tilemap->draw(bitmap, clip, 0, 0);
 
 	/* draw bottom of screen */
 	clip.set(8*16, 8*32-1, visarea.min_y, visarea.max_y);
 
-	if ((state->m_layer_ctrl & 0x40) == 0x00)
-		state->m_bgbot_tilemap->draw(bitmap, clip, 0, 0);
+	if ((m_layer_ctrl & 0x40) == 0x00)
+		m_bgbot_tilemap->draw(bitmap, clip, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, clip, 0x40);
 
-	if ((state->m_layer_ctrl & 0x20) == 0x00)
-		state->m_tx_tilemap->draw(bitmap, clip, 0, 0);
+	if ((m_layer_ctrl & 0x20) == 0x00)
+		m_tx_tilemap->draw(bitmap, clip, 0, 0);
 
 	return 0;
 }

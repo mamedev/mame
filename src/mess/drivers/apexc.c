@@ -31,6 +31,7 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -591,18 +592,17 @@ static void apexc_draw_string(running_machine &machine, bitmap_ind16 &bitmap, co
 }
 
 
-static SCREEN_UPDATE_IND16( apexc )
+UINT32 apexc_state::screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	apexc_state *state = screen.machine().driver_data<apexc_state>();
 	int i;
 	char the_char;
 
-	bitmap.fill(0, /*machine.visible_area*/panel_window);
+	bitmap.fill(0, /*machine().visible_area*/panel_window);
 	apexc_draw_string(screen.machine(), bitmap, "power", 8, 0, 0);
 	apexc_draw_string(screen.machine(), bitmap, "running", 8, 8, 0);
 	apexc_draw_string(screen.machine(), bitmap, "data :", 0, 24, 0);
 
-	copybitmap(bitmap, *state->m_bitmap, 0, 0, 0, 0, teletyper_window);
+	copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, teletyper_window);
 
 
 	apexc_draw_led(bitmap, 0, 0, 1);
@@ -611,7 +611,7 @@ static SCREEN_UPDATE_IND16( apexc )
 
 	for (i=0; i<32; i++)
 	{
-		apexc_draw_led(bitmap, i*8, 32, (state->m_panel_data_reg << i) & 0x80000000UL);
+		apexc_draw_led(bitmap, i*8, 32, (m_panel_data_reg << i) & 0x80000000UL);
 		the_char = '0' + ((i + 1) % 10);
 		apexc_draw_char(screen.machine(), bitmap, the_char, i*8, 40, 0);
 		if (((i + 1) % 10) == 0)
@@ -879,7 +879,7 @@ static MACHINE_CONFIG_START( apexc, apexc_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(256, 192)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
-	MCFG_SCREEN_UPDATE_STATIC(apexc)
+	MCFG_SCREEN_UPDATE_DRIVER(apexc_state, screen_update_apexc)
 
 	MCFG_GFXDECODE(apexc)
 	MCFG_PALETTE_LENGTH(APEXC_PALETTE_SIZE)

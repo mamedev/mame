@@ -201,10 +201,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 //  if(SpriteCollision(machine, 2,4)) state->m_CollisionSprite |= 0x01;   /* Not Used */
 }
 
-SCREEN_UPDATE_IND16( tinvader )
+UINT32 zac2650_state::screen_update_tinvader(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	zac2650_state *state = screen.machine().driver_data<zac2650_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

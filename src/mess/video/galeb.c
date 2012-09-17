@@ -27,16 +27,15 @@ void galeb_state::video_start()
 {
 }
 
-SCREEN_UPDATE_IND16( galeb )
+UINT32 galeb_state::screen_update_galeb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galeb_state *state = screen.machine().driver_data<galeb_state>();
 	int x,y;
 
 	for(y = 0; y < 16; y++ )
 	{
 		for(x = 0; x < 48; x++ )
 		{
-			int code = state->m_video_ram[15 + x + y*64];
+			int code = m_video_ram[15 + x + y*64];
 			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0],  code , 0, 0,0, x*8,y*8);
 		}
 	}

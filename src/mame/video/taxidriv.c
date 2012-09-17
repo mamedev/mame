@@ -9,21 +9,20 @@ WRITE8_MEMBER(taxidriv_state::taxidriv_spritectrl_w)
 
 
 
-SCREEN_UPDATE_IND16( taxidriv )
+UINT32 taxidriv_state::screen_update_taxidriv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	taxidriv_state *state = screen.machine().driver_data<taxidriv_state>();
 	int offs;
 	int sx,sy;
 
 
-	if (state->m_bghide)
+	if (m_bghide)
 	{
 		bitmap.fill(0, cliprect);
 
 
 		/* kludge to fix scroll after death */
-		state->m_scroll[0] = state->m_scroll[1] = state->m_scroll[2] = state->m_scroll[3] = 0;
-		state->m_spritectrl[2] = state->m_spritectrl[5] = state->m_spritectrl[8] = 0;
+		m_scroll[0] = m_scroll[1] = m_scroll[2] = m_scroll[3] = 0;
+		m_spritectrl[2] = m_spritectrl[5] = m_spritectrl[8] = 0;
 	}
 	else
 	{
@@ -33,10 +32,10 @@ SCREEN_UPDATE_IND16( taxidriv )
 			sy = offs / 32;
 
 			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[3],
-					state->m_vram3[offs],
+					m_vram3[offs],
 					0,
 					0,0,
-					(sx*8-state->m_scroll[0])&0xff,(sy*8-state->m_scroll[1])&0xff);
+					(sx*8-m_scroll[0])&0xff,(sy*8-m_scroll[1])&0xff);
 		}
 
 		for (offs = 0;offs < 0x400;offs++)
@@ -45,22 +44,22 @@ SCREEN_UPDATE_IND16( taxidriv )
 			sy = offs / 32;
 
 			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[2],
-					state->m_vram2[offs]+256*state->m_vram2[offs+0x400],
+					m_vram2[offs]+256*m_vram2[offs+0x400],
 					0,
 					0,0,
-					(sx*8-state->m_scroll[2])&0xff,(sy*8-state->m_scroll[3])&0xff,0);
+					(sx*8-m_scroll[2])&0xff,(sy*8-m_scroll[3])&0xff,0);
 		}
 
-		if (state->m_spritectrl[2] & 4)
+		if (m_spritectrl[2] & 4)
 		{
 			for (offs = 0;offs < 0x1000;offs++)
 			{
 				int color;
 
-				sx = ((offs/2) % 64-state->m_spritectrl[0]-256*(state->m_spritectrl[2]&1))&0x1ff;
-				sy = ((offs/2) / 64-state->m_spritectrl[1]-128*(state->m_spritectrl[2]&2))&0x1ff;
+				sx = ((offs/2) % 64-m_spritectrl[0]-256*(m_spritectrl[2]&1))&0x1ff;
+				sy = ((offs/2) / 64-m_spritectrl[1]-128*(m_spritectrl[2]&2))&0x1ff;
 
-				color = (state->m_vram5[offs/4]>>(2*(offs&3)))&0x03;
+				color = (m_vram5[offs/4]>>(2*(offs&3)))&0x03;
 				if (color)
 				{
 					if (sx > 0 && sx < 256 && sy > 0 && sy < 256)
@@ -69,16 +68,16 @@ SCREEN_UPDATE_IND16( taxidriv )
 			}
 		}
 
-		if (state->m_spritectrl[5] & 4)
+		if (m_spritectrl[5] & 4)
 		{
 			for (offs = 0;offs < 0x1000;offs++)
 			{
 				int color;
 
-				sx = ((offs/2) % 64-state->m_spritectrl[3]-256*(state->m_spritectrl[5]&1))&0x1ff;
-				sy = ((offs/2) / 64-state->m_spritectrl[4]-128*(state->m_spritectrl[5]&2))&0x1ff;
+				sx = ((offs/2) % 64-m_spritectrl[3]-256*(m_spritectrl[5]&1))&0x1ff;
+				sy = ((offs/2) / 64-m_spritectrl[4]-128*(m_spritectrl[5]&2))&0x1ff;
 
-				color = (state->m_vram6[offs/4]>>(2*(offs&3)))&0x03;
+				color = (m_vram6[offs/4]>>(2*(offs&3)))&0x03;
 				if (color)
 				{
 					if (sx > 0 && sx < 256 && sy > 0 && sy < 256)
@@ -87,16 +86,16 @@ SCREEN_UPDATE_IND16( taxidriv )
 			}
 		}
 
-		if (state->m_spritectrl[8] & 4)
+		if (m_spritectrl[8] & 4)
 		{
 			for (offs = 0;offs < 0x1000;offs++)
 			{
 				int color;
 
-				sx = ((offs/2) % 64-state->m_spritectrl[6]-256*(state->m_spritectrl[8]&1))&0x1ff;
-				sy = ((offs/2) / 64-state->m_spritectrl[7]-128*(state->m_spritectrl[8]&2))&0x1ff;
+				sx = ((offs/2) % 64-m_spritectrl[6]-256*(m_spritectrl[8]&1))&0x1ff;
+				sy = ((offs/2) / 64-m_spritectrl[7]-128*(m_spritectrl[8]&2))&0x1ff;
 
-				color = (state->m_vram7[offs/4]>>(2*(offs&3)))&0x03;
+				color = (m_vram7[offs/4]>>(2*(offs&3)))&0x03;
 				if (color)
 				{
 					if (sx > 0 && sx < 256 && sy > 0 && sy < 256)
@@ -111,7 +110,7 @@ SCREEN_UPDATE_IND16( taxidriv )
 			sy = offs / 32;
 
 			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],
-					state->m_vram1[offs],
+					m_vram1[offs],
 					0,
 					0,0,
 					sx*8,sy*8,0);
@@ -124,7 +123,7 @@ SCREEN_UPDATE_IND16( taxidriv )
 			sx = (offs/2) % 64;
 			sy = (offs/2) / 64;
 
-			color = (state->m_vram4[offs/4]>>(2*(offs&3)))&0x03;
+			color = (m_vram4[offs/4]>>(2*(offs&3)))&0x03;
 			if (color)
 			{
 				bitmap.pix16(sy, sx) = 2 * color;
@@ -138,7 +137,7 @@ SCREEN_UPDATE_IND16( taxidriv )
 		sy = offs / 32;
 
 		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
-				state->m_vram0[offs],
+				m_vram0[offs],
 				0,
 				0,0,
 				sx*8,sy*8,0);

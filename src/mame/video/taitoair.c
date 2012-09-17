@@ -563,11 +563,10 @@ void taitoair_state::video_start()
 	//m_buffer3d = auto_bitmap_ind16_alloc(machine(), width, height);
 }
 
-SCREEN_UPDATE_IND16( taitoair )
+UINT32 taitoair_state::screen_update_taitoair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	taitoair_state *state = screen.machine().driver_data<taitoair_state>();
 
-	tc0080vco_tilemap_update(state->m_tc0080vco);
+	tc0080vco_tilemap_update(m_tc0080vco);
 
 	bitmap.fill(0, cliprect);
 
@@ -600,21 +599,21 @@ SCREEN_UPDATE_IND16( taitoair )
 		#endif
 	}
 
-	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 0, 0, 0);
+	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 0, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
-	copybitmap_trans(bitmap, *state->m_framebuffer[1], 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, *m_framebuffer[1], 0, 0, 0, 0, cliprect, 0);
 
-	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 1, 0, 0);
+	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 1, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 1);
 
-	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 2, 0, 0);
+	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 2, 0, 0);
 
 	/* Hacky 3d bitmap */
-	//copybitmap_trans(bitmap, state->m_buffer3d, 0, 0, 0, 0, cliprect, 0);
-	//state->m_buffer3d->fill(0, cliprect);
+	//copybitmap_trans(bitmap, m_buffer3d, 0, 0, 0, 0, cliprect, 0);
+	//m_buffer3d->fill(0, cliprect);
 
 	return 0;
 }

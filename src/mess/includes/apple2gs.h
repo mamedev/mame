@@ -141,6 +141,7 @@ public:
 	DECLARE_PALETTE_INIT(apple2gs);
 	DECLARE_MACHINE_START(apple2gsr1);
 	DECLARE_MACHINE_START(apple2gscommon);
+	UINT32 screen_update_apple2gs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -156,7 +157,7 @@ void apple2gs_doc_irq(device_t *device, int state);
 /*----------- defined in video/apple2gs.c -----------*/
 
 
-SCREEN_UPDATE_IND16( apple2gs );
+
 
 
 #endif /* APPLE2GS_H_ */

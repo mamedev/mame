@@ -185,6 +185,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_mediagx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 // Display controller registers
@@ -379,14 +380,13 @@ static void draw_cga(running_machine &machine, bitmap_rgb32 &bitmap, const recta
 	}
 }
 
-static SCREEN_UPDATE_RGB32(mediagx)
+UINT32 mediagx_state::screen_update_mediagx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	mediagx_state *state = screen.machine().driver_data<mediagx_state>();
 	bitmap.fill(0, cliprect);
 
 	draw_framebuffer(screen.machine(), bitmap, cliprect);
 
-	if (state->m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)	// don't show MDA text screen on 16-bit mode. this is basically a hack
+	if (m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)	// don't show MDA text screen on 16-bit mode. this is basically a hack
 	{
 		draw_cga(screen.machine(), bitmap, cliprect);
 	}
@@ -1192,7 +1192,7 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(mediagx)
+	MCFG_SCREEN_UPDATE_DRIVER(mediagx_state, screen_update_mediagx)
 
 	MCFG_GFXDECODE(CGA)
 	MCFG_PALETTE_LENGTH(256)

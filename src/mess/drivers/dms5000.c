@@ -18,6 +18,7 @@ public:
 
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_dms5000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -44,7 +45,7 @@ void dms5000_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( dms5000 )
+UINT32 dms5000_state::screen_update_dms5000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -62,7 +63,7 @@ static MACHINE_CONFIG_START( dms5000, dms5000_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_STATIC(dms5000)
+	MCFG_SCREEN_UPDATE_DRIVER(dms5000_state, screen_update_dms5000)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 MACHINE_CONFIG_END

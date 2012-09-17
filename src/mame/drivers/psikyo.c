@@ -1062,8 +1062,8 @@ static MACHINE_CONFIG_START( sngkace, psikyo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using PORT_VBLANK
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
-	MCFG_SCREEN_UPDATE_STATIC(psikyo)
-	MCFG_SCREEN_VBLANK_STATIC(psikyo)
+	MCFG_SCREEN_UPDATE_DRIVER(psikyo_state, screen_update_psikyo)
+	MCFG_SCREEN_VBLANK_DRIVER(psikyo_state, screen_eof_psikyo)
 
 	MCFG_GFXDECODE(psikyo)
 	MCFG_PALETTE_LENGTH(0x1000)
@@ -1111,8 +1111,8 @@ static MACHINE_CONFIG_START( gunbird, psikyo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using PORT_VBLANK
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
-	MCFG_SCREEN_UPDATE_STATIC(psikyo)
-	MCFG_SCREEN_VBLANK_STATIC(psikyo)
+	MCFG_SCREEN_UPDATE_DRIVER(psikyo_state, screen_update_psikyo)
+	MCFG_SCREEN_VBLANK_DRIVER(psikyo_state, screen_eof_psikyo)
 
 	MCFG_GFXDECODE(psikyo)
 	MCFG_PALETTE_LENGTH(0x1000)
@@ -1144,8 +1144,8 @@ static MACHINE_CONFIG_START( s1945bl, psikyo_state ) /* Bootleg hardware based o
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using PORT_VBLANK
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
-	MCFG_SCREEN_UPDATE_STATIC(psikyo_bootleg)
-	MCFG_SCREEN_VBLANK_STATIC(psikyo)
+	MCFG_SCREEN_UPDATE_DRIVER(psikyo_state, screen_update_psikyo_bootleg)
+	MCFG_SCREEN_VBLANK_DRIVER(psikyo_state, screen_eof_psikyo)
 
 	MCFG_GFXDECODE(psikyo)
 	MCFG_PALETTE_LENGTH(0x1000)
@@ -1198,8 +1198,8 @@ static MACHINE_CONFIG_START( s1945, psikyo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using PORT_VBLANK
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
-	MCFG_SCREEN_UPDATE_STATIC(psikyo)
-	MCFG_SCREEN_VBLANK_STATIC(psikyo)
+	MCFG_SCREEN_UPDATE_DRIVER(psikyo_state, screen_update_psikyo)
+	MCFG_SCREEN_VBLANK_DRIVER(psikyo_state, screen_eof_psikyo)
 
 	MCFG_GFXDECODE(psikyo)
 	MCFG_PALETTE_LENGTH(0x1000)

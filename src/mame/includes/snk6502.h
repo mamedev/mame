@@ -60,6 +60,7 @@ public:
 	DECLARE_MACHINE_RESET(satansat);
 	DECLARE_MACHINE_RESET(pballoon);
 	DECLARE_VIDEO_START(pballoon);
+	UINT32 screen_update_snk6502(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -119,7 +120,7 @@ DISCRETE_SOUND_EXTERN( fantasy );
 
 
 
-SCREEN_UPDATE_IND16( snk6502 );
+
 
 
 

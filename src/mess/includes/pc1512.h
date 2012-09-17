@@ -210,6 +210,7 @@ public:
 
 	// sound state
 	int m_speaker_drive;
+	UINT32 screen_update_pc1512(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 class pc1640_state : public pc1512_state

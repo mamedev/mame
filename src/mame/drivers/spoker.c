@@ -58,6 +58,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_spoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 WRITE8_MEMBER(spoker_state::bg_tile_w)
@@ -101,13 +102,12 @@ void spoker_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-static SCREEN_UPDATE_IND16(spoker)
+UINT32 spoker_state::screen_update_spoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	spoker_state *state = screen.machine().driver_data<spoker_state>();
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -543,7 +543,7 @@ static MACHINE_CONFIG_START( spoker, spoker_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(spoker)
+	MCFG_SCREEN_UPDATE_DRIVER(spoker_state, screen_update_spoker)
 
 	MCFG_GFXDECODE(spoker)
 	MCFG_PALETTE_LENGTH(0x400)

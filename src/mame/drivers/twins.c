@@ -71,6 +71,8 @@ public:
 	DECLARE_READ16_MEMBER(twinsa_unk_r);
 	DECLARE_VIDEO_START(twins);
 	DECLARE_VIDEO_START(twinsa);
+	UINT32 screen_update_twins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_twinsa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -116,9 +118,8 @@ VIDEO_START_MEMBER(twins_state,twins)
 	m_pal = auto_alloc_array(machine(), UINT16, 0x100);
 }
 
-static SCREEN_UPDATE_IND16(twins)
+UINT32 twins_state::screen_update_twins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	twins_state *state = screen.machine().driver_data<twins_state>();
 	int y,x,count;
 	int i;
 	static const int xxx=320,yyy=204;
@@ -128,7 +129,7 @@ static SCREEN_UPDATE_IND16(twins)
 	for (i=0;i<0x100;i++)
 	{
 		int dat,r,g,b;
-		dat = state->m_pal[i];
+		dat = m_pal[i];
 
 		r = dat & 0x1f;
 		r = BITSWAP8(r,7,6,5,0,1,2,3,4);
@@ -143,7 +144,7 @@ static SCREEN_UPDATE_IND16(twins)
 	}
 
 	count=0;
-	UINT8 *videoram = reinterpret_cast<UINT8 *>(state->m_videoram.target());
+	UINT8 *videoram = reinterpret_cast<UINT8 *>(m_videoram.target());
 	for (y=0;y<yyy;y++)
 	{
 		for(x=0;x<xxx;x++)
@@ -200,7 +201,7 @@ static MACHINE_CONFIG_START( twins, twins_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_STATIC(twins)
+	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_twins)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
@@ -222,9 +223,8 @@ VIDEO_START_MEMBER(twins_state,twinsa)
 	m_pal = auto_alloc_array(machine(), UINT16, 0x1000);
 }
 
-static SCREEN_UPDATE_IND16(twinsa)
+UINT32 twins_state::screen_update_twinsa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	twins_state *state = screen.machine().driver_data<twins_state>();
 	int y,x,count;
 	int i;
 	static const int xxx=320,yyy=204;
@@ -234,15 +234,15 @@ static SCREEN_UPDATE_IND16(twinsa)
 	for (i=0;i<0x1000-3;i+=3)
 	{
 		int r,g,b;
-		r = state->m_pal[i];
-		g = state->m_pal[i+1];
-		b = state->m_pal[i+2];
+		r = m_pal[i];
+		g = m_pal[i+1];
+		b = m_pal[i+2];
 
 		palette_set_color_rgb(screen.machine(),i/3, pal6bit(r), pal6bit(g), pal6bit(b));
 	}
 
 	count=0;
-	UINT8 *videoram = reinterpret_cast<UINT8 *>(state->m_videoram.target());
+	UINT8 *videoram = reinterpret_cast<UINT8 *>(m_videoram.target());
 	for (y=0;y<yyy;y++)
 	{
 		for(x=0;x<xxx;x++)
@@ -289,7 +289,7 @@ static MACHINE_CONFIG_START( twinsa, twins_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_STATIC(twinsa)
+	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_twinsa)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 

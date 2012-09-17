@@ -273,27 +273,25 @@ void ssrj_state::palette_init()
 			palette_set_color_rgb(machine(), i*8+j, fakecols[i][j][0], fakecols[i][j][1], fakecols[i][j][2]);
 }
 
-SCREEN_UPDATE_IND16( ssrj )
+UINT32 ssrj_state::screen_update_ssrj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ssrj_state *state = screen.machine().driver_data<ssrj_state>();
 
-	state->m_tilemap1->set_scrollx(0, 0xff-state->m_scrollram[2] );
-	state->m_tilemap1->set_scrolly(0, state->m_scrollram[0] );
-	state->m_tilemap1->draw(bitmap, cliprect, 0, 0);
+	m_tilemap1->set_scrollx(0, 0xff-m_scrollram[2] );
+	m_tilemap1->set_scrolly(0, m_scrollram[0] );
+	m_tilemap1->draw(bitmap, cliprect, 0, 0);
 	draw_objects(screen.machine(), bitmap, cliprect);
-	state->m_tilemap2->draw(bitmap, cliprect, 0, 0);
+	m_tilemap2->draw(bitmap, cliprect, 0, 0);
 
-	if (state->m_scrollram[0x101] == 0xb) state->m_tilemap4->draw(bitmap, cliprect, 0, 0);/* hack to display 4th tilemap */
+	if (m_scrollram[0x101] == 0xb) m_tilemap4->draw(bitmap, cliprect, 0, 0);/* hack to display 4th tilemap */
 	return 0;
 }
 
-SCREEN_VBLANK( ssrj )
+void ssrj_state::screen_eof_ssrj(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		ssrj_state *state = screen.machine().driver_data<ssrj_state>();
 
-		memcpy(state->m_buffer_spriteram, state->m_scrollram, 0x800);
+		memcpy(m_buffer_spriteram, m_scrollram, 0x800);
 	}
 }

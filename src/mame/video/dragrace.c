@@ -45,29 +45,28 @@ void dragrace_state::video_start()
 }
 
 
-SCREEN_UPDATE_IND16( dragrace )
+UINT32 dragrace_state::screen_update_dragrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dragrace_state *state = screen.machine().driver_data<dragrace_state>();
 	int y;
 
-	state->m_bg_tilemap->mark_all_dirty();
+	m_bg_tilemap->mark_all_dirty();
 
 	for (y = 0; y < 256; y += 4)
 	{
 		rectangle rect = cliprect;
 
-		int xl = state->m_position_ram[y + 0] & 15;
-		int xh = state->m_position_ram[y + 1] & 15;
-		int yl = state->m_position_ram[y + 2] & 15;
-		int yh = state->m_position_ram[y + 3] & 15;
+		int xl = m_position_ram[y + 0] & 15;
+		int xh = m_position_ram[y + 1] & 15;
+		int yl = m_position_ram[y + 2] & 15;
+		int yh = m_position_ram[y + 3] & 15;
 
-		state->m_bg_tilemap->set_scrollx(0, 16 * xh + xl - 8);
-		state->m_bg_tilemap->set_scrolly(0, 16 * yh + yl);
+		m_bg_tilemap->set_scrollx(0, 16 * xh + xl - 8);
+		m_bg_tilemap->set_scrolly(0, 16 * yh + yl);
 
 		if (rect.min_y < y + 0) rect.min_y = y + 0;
 		if (rect.max_y > y + 3) rect.max_y = y + 3;
 
-		state->m_bg_tilemap->draw(bitmap, rect, 0, 0);
+		m_bg_tilemap->draw(bitmap, rect, 0, 0);
 	}
 	return 0;
 }

@@ -88,6 +88,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_cham24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -302,7 +303,7 @@ void cham24_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( cham24 )
+UINT32 cham24_state::screen_update_cham24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* render the ppu */
 	ppu2c0x_device *ppu = screen.machine().device<ppu2c0x_device>("ppu");
@@ -354,7 +355,7 @@ static MACHINE_CONFIG_START( cham24, cham24_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(cham24)
+	MCFG_SCREEN_UPDATE_DRIVER(cham24_state, screen_update_cham24)
 
 	MCFG_GFXDECODE(cham24)
 	MCFG_PALETTE_LENGTH(8*4*16)

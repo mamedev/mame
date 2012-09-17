@@ -33,6 +33,7 @@ public:
 	DECLARE_DRIVER_INIT(poly88);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_poly88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 

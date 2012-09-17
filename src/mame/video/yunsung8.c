@@ -188,10 +188,9 @@ void yunsung8_state::video_start()
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( yunsung8 )
+UINT32 yunsung8_state::screen_update_yunsung8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	yunsung8_state *state = screen.machine().driver_data<yunsung8_state>();
-	int layers_ctrl = (~state->m_layers_ctrl) >> 4;
+	int layers_ctrl = (~m_layers_ctrl) >> 4;
 
 #ifdef MAME_DEBUG
 if (screen.machine().input().code_pressed(KEYCODE_Z))
@@ -204,12 +203,12 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 #endif
 
 	if (layers_ctrl & 1)
-		state->m_tilemap_0->draw(bitmap, cliprect, 0, 0);
+		m_tilemap_0->draw(bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(0, cliprect);
 
 	if (layers_ctrl & 2)
-		state->m_tilemap_1->draw(bitmap, cliprect, 0, 0);
+		m_tilemap_1->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

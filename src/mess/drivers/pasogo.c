@@ -69,6 +69,7 @@ public:
 	DECLARE_DRIVER_INIT(pasogo);
 	virtual void machine_reset();
 	virtual void palette_init();
+	UINT32 screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -390,7 +391,7 @@ void pasogo_state::palette_init()
 	}
 }
 
-static SCREEN_UPDATE_IND16( pasogo )
+UINT32 pasogo_state::screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//static int width=-1,height=-1;
 	UINT8 *rom = screen.machine().root_device().memregion("maincpu")->base()+0xb8000;
@@ -441,7 +442,7 @@ static SCREEN_UPDATE_IND16( pasogo )
 	if (w!=width || h!=height)
 	{
 		width=w; height=h;
-//      machine.primary_screen->set_visible_area(0, width-1, 0, height-1);
+//      machine().primary_screen->set_visible_area(0, width-1, 0, height-1);
 		screen.set_visible_area(0, width-1, 0, height-1);
 	}
 #endif
@@ -514,7 +515,7 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	MCFG_SCREEN_UPDATE_STATIC(pasogo)
+	MCFG_SCREEN_UPDATE_DRIVER(pasogo_state, screen_update_pasogo)
 
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(pasogo_palette))
 #if 0

@@ -120,6 +120,7 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	DECLARE_WRITE8_MEMBER(outport_w);
 	virtual void palette_init();
+	UINT32 screen_update_murogem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -202,9 +203,8 @@ GFXDECODE_END
 void murogem_state::palette_init()
 {}
 
-static SCREEN_UPDATE_IND16(murogem)
+UINT32 murogem_state::screen_update_murogem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	murogem_state *state = screen.machine().driver_data<murogem_state>();
 	int xx,yy,count;
 	count = 0x000;
 
@@ -214,8 +214,8 @@ static SCREEN_UPDATE_IND16(murogem)
 	{
 		for(xx=0;xx<32;xx++)
 		{
-			int tileno = state->m_videoram[count]&0x3f;
-			int attr = state->m_videoram[count+0x400]&0x0f;
+			int tileno = m_videoram[count]&0x3f;
+			int attr = m_videoram[count+0x400]&0x0f;
 
 			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],tileno,attr,0,0,xx*8,yy*8,0);
 
@@ -255,7 +255,7 @@ static MACHINE_CONFIG_START( murogem, murogem_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE((39+1)*8, (38+1)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(murogem)
+	MCFG_SCREEN_UPDATE_DRIVER(murogem_state, screen_update_murogem)
 
 	MCFG_GFXDECODE(murogem)
 	MCFG_PALETTE_LENGTH(0x100)

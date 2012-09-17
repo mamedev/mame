@@ -382,19 +382,18 @@ void niyanpai_state::video_start()
 
 
 ******************************************************************************/
-SCREEN_UPDATE_IND16( niyanpai )
+UINT32 niyanpai_state::screen_update_niyanpai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	niyanpai_state *state = screen.machine().driver_data<niyanpai_state>();
 	int i;
 	int x, y;
 	int scrollx[3], scrolly[3];
 
-	if (state->m_screen_refresh)
+	if (m_screen_refresh)
 	{
 		int width = screen.width();
 		int height = screen.height();
 
-		state->m_screen_refresh = 0;
+		m_screen_refresh = 0;
 
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
@@ -407,28 +406,28 @@ SCREEN_UPDATE_IND16( niyanpai )
 
 	for (i = 0; i < 3; i++)
 	{
-		if (state->m_flipscreen[i])
+		if (m_flipscreen[i])
 		{
-			scrollx[i] = (((-state->m_scrollx[i]) - 0x4e)  & 0x1ff) << 1;
-			scrolly[i] = (-state->m_scrolly[i]) & 0x1ff;
+			scrollx[i] = (((-m_scrollx[i]) - 0x4e)  & 0x1ff) << 1;
+			scrolly[i] = (-m_scrolly[i]) & 0x1ff;
 		}
 		else
 		{
-			scrollx[i] = (((-state->m_scrollx[i]) - 0x4e)  & 0x1ff) << 1;
-			scrolly[i] = state->m_scrolly[i] & 0x1ff;
+			scrollx[i] = (((-m_scrollx[i]) - 0x4e)  & 0x1ff) << 1;
+			scrolly[i] = m_scrolly[i] & 0x1ff;
 		}
 	}
 
-	if (state->m_dispflag[0])
-		copyscrollbitmap(bitmap, state->m_tmpbitmap[0], 1, &scrollx[0], 1, &scrolly[0], cliprect);
+	if (m_dispflag[0])
+		copyscrollbitmap(bitmap, m_tmpbitmap[0], 1, &scrollx[0], 1, &scrolly[0], cliprect);
 	else
 		bitmap.fill(0x00ff);
 
-	if (state->m_dispflag[1])
-		copyscrollbitmap_trans(bitmap, state->m_tmpbitmap[1], 1, &scrollx[1], 1, &scrolly[1], cliprect, 0x01ff);
+	if (m_dispflag[1])
+		copyscrollbitmap_trans(bitmap, m_tmpbitmap[1], 1, &scrollx[1], 1, &scrolly[1], cliprect, 0x01ff);
 
-	if (state->m_dispflag[2])
-		copyscrollbitmap_trans(bitmap, state->m_tmpbitmap[2], 1, &scrollx[2], 1, &scrolly[2], cliprect, 0x02ff);
+	if (m_dispflag[2])
+		copyscrollbitmap_trans(bitmap, m_tmpbitmap[2], 1, &scrollx[2], 1, &scrolly[2], cliprect, 0x02ff);
 
 	return 0;
 }

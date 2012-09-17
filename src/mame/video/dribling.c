@@ -57,11 +57,10 @@ WRITE8_MEMBER(dribling_state::dribling_colorram_w)
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( dribling )
+UINT32 dribling_state::screen_update_dribling(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dribling_state *state = screen.machine().driver_data<dribling_state>();
 	UINT8 *prombase = screen.machine().root_device().memregion("proms")->base();
-	UINT8 *gfxbase = state->memregion("gfx1")->base();
+	UINT8 *gfxbase = memregion("gfx1")->base();
 	int x, y;
 
 	/* loop over rows */
@@ -73,11 +72,11 @@ SCREEN_UPDATE_IND16( dribling )
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int b7 = prombase[(x >> 3) | ((y >> 3) << 5)] & 1;
-			int b6 = state->m_abca;
+			int b6 = m_abca;
 			int b5 = (x >> 3) & 1;
 			int b4 = (gfxbase[(x >> 3) | (y << 5)] >> (x & 7)) & 1;
-			int b3 = (state->m_videoram[(x >> 3) | (y << 5)] >> (x & 7)) & 1;
-			int b2_0 = state->m_colorram[(x >> 3) | ((y >> 2) << 7)] & 7;
+			int b3 = (m_videoram[(x >> 3) | (y << 5)] >> (x & 7)) & 1;
+			int b2_0 = m_colorram[(x >> 3) | ((y >> 2) << 7)] & 7;
 
 			/* assemble the various bits into a palette PROM index */
 			dst[x] = (b7 << 7) | (b6 << 6) | (b5 << 5) | (b4 << 4) | (b3 << 3) | b2_0;

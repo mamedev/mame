@@ -962,14 +962,14 @@ static MACHINE_CONFIG_START( punchout, punchout_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(punchout_top)
+	MCFG_SCREEN_UPDATE_DRIVER(punchout_state, screen_update_punchout_top)
 
 	MCFG_SCREEN_ADD("bottom", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(punchout_bottom)
+	MCFG_SCREEN_UPDATE_DRIVER(punchout_state, screen_update_punchout_bottom)
 
 
 	/* sound hardware */
@@ -996,9 +996,9 @@ static MACHINE_CONFIG_DERIVED( armwrest, punchout )
 
 	MCFG_VIDEO_START_OVERRIDE(punchout_state,armwrest)
 	MCFG_SCREEN_MODIFY("top")
-	MCFG_SCREEN_UPDATE_STATIC(armwrest_top)
+	MCFG_SCREEN_UPDATE_DRIVER(punchout_state, screen_update_armwrest_top)
 	MCFG_SCREEN_MODIFY("bottom")
-	MCFG_SCREEN_UPDATE_STATIC(armwrest_bottom)
+	MCFG_SCREEN_UPDATE_DRIVER(punchout_state, screen_update_armwrest_bottom)
 MACHINE_CONFIG_END
 
 

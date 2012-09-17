@@ -76,6 +76,8 @@ public:
 	DECLARE_MACHINE_START(rjammer);
 	DECLARE_MACHINE_RESET(rjammer);
 	DECLARE_PALETTE_INIT(rjammer);
+	UINT32 screen_update_tubep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_rjammer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -83,9 +85,9 @@ public:
 
 void tubep_vblank_end(running_machine &machine);
 
-SCREEN_UPDATE_IND16( tubep );
 
-SCREEN_UPDATE_IND16( rjammer );
+
+
 
 
 

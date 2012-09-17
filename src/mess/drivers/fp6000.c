@@ -51,36 +51,36 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_fp6000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 void fp6000_state::video_start()
 {
 }
 
-#define mc6845_h_char_total 	(state->m_crtc_vreg[0])
-#define mc6845_h_display		(state->m_crtc_vreg[1])
-#define mc6845_h_sync_pos		(state->m_crtc_vreg[2])
-#define mc6845_sync_width		(state->m_crtc_vreg[3])
-#define mc6845_v_char_total		(state->m_crtc_vreg[4])
-#define mc6845_v_total_adj		(state->m_crtc_vreg[5])
-#define mc6845_v_display		(state->m_crtc_vreg[6])
-#define mc6845_v_sync_pos		(state->m_crtc_vreg[7])
-#define mc6845_mode_ctrl		(state->m_crtc_vreg[8])
-#define mc6845_tile_height		(state->m_crtc_vreg[9]+1)
-#define mc6845_cursor_y_start	(state->m_crtc_vreg[0x0a])
-#define mc6845_cursor_y_end 	(state->m_crtc_vreg[0x0b])
-#define mc6845_start_addr		(((state->m_crtc_vreg[0x0c]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0d] & 0xff))
-#define mc6845_cursor_addr  	(((state->m_crtc_vreg[0x0e]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0f] & 0xff))
-#define mc6845_light_pen_addr	(((state->m_crtc_vreg[0x10]<<8) & 0x3f00) | (state->m_crtc_vreg[0x11] & 0xff))
-#define mc6845_update_addr  	(((state->m_crtc_vreg[0x12]<<8) & 0x3f00) | (state->m_crtc_vreg[0x13] & 0xff))
+#define mc6845_h_char_total 	(m_crtc_vreg[0])
+#define mc6845_h_display		(m_crtc_vreg[1])
+#define mc6845_h_sync_pos		(m_crtc_vreg[2])
+#define mc6845_sync_width		(m_crtc_vreg[3])
+#define mc6845_v_char_total		(m_crtc_vreg[4])
+#define mc6845_v_total_adj		(m_crtc_vreg[5])
+#define mc6845_v_display		(m_crtc_vreg[6])
+#define mc6845_v_sync_pos		(m_crtc_vreg[7])
+#define mc6845_mode_ctrl		(m_crtc_vreg[8])
+#define mc6845_tile_height		(m_crtc_vreg[9]+1)
+#define mc6845_cursor_y_start	(m_crtc_vreg[0x0a])
+#define mc6845_cursor_y_end 	(m_crtc_vreg[0x0b])
+#define mc6845_start_addr		(((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))
+#define mc6845_cursor_addr  	(((m_crtc_vreg[0x0e]<<8) & 0x3f00) | (m_crtc_vreg[0x0f] & 0xff))
+#define mc6845_light_pen_addr	(((m_crtc_vreg[0x10]<<8) & 0x3f00) | (m_crtc_vreg[0x11] & 0xff))
+#define mc6845_update_addr  	(((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
 
 
-static SCREEN_UPDATE_IND16( fp6000 )
+UINT32 fp6000_state::screen_update_fp6000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	fp6000_state *state = screen.machine().driver_data<fp6000_state>();
 	int x,y;
 	int xi,yi;
-	UINT8 *gfx_rom = state->memregion("pcg")->base();
+	UINT8 *gfx_rom = memregion("pcg")->base();
 	UINT32 count;
 
 	count = 0;
@@ -91,7 +91,7 @@ static SCREEN_UPDATE_IND16( fp6000 )
 		{
 			for(xi=0;xi<4;xi++)
 			{
-				int dot = (state->m_gvram[count] >> (12-xi*4)) & 0xf;
+				int dot = (m_gvram[count] >> (12-xi*4)) & 0xf;
 
 				if(y < 400 && x*4+xi < 640) /* TODO: safety check */
 					bitmap.pix16(y, x*4+xi) = screen.machine().pens[dot];
@@ -105,8 +105,8 @@ static SCREEN_UPDATE_IND16( fp6000 )
 	{
 		for(x=0;x<mc6845_h_display;x++)
 		{
-			int tile = state->m_vram[x+y*mc6845_h_display] & 0xff;
-			int color = (state->m_vram[x+y*mc6845_h_display] & 0x700) >> 8;
+			int tile = m_vram[x+y*mc6845_h_display] & 0xff;
+			int color = (m_vram[x+y*mc6845_h_display] & 0x700) >> 8;
 			int pen;
 
 			for(yi=0;yi<mc6845_tile_height;yi++)
@@ -314,7 +314,7 @@ static MACHINE_CONFIG_START( fp6000, fp6000_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_STATIC(fp6000)
+	MCFG_SCREEN_UPDATE_DRIVER(fp6000_state, screen_update_fp6000)
 
 	MCFG_MC6845_ADD("crtc", H46505, 16000000/5, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 

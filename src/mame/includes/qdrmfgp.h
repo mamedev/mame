@@ -38,13 +38,14 @@ public:
 	DECLARE_VIDEO_START(qdrmfgp);
 	DECLARE_MACHINE_START(qdrmfgp2);
 	DECLARE_VIDEO_START(qdrmfgp2);
+	UINT32 screen_update_qdrmfgp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/qdrmfgp.c -----------*/
 
 
 
-SCREEN_UPDATE_IND16( qdrmfgp );
+
 
 void qdrmfgp_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
 void qdrmfgp2_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);

@@ -463,8 +463,8 @@ static MACHINE_CONFIG_START( atarig1, atarig1_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_STATIC(atarig1)
-	MCFG_SCREEN_VBLANK_STATIC(atarig1)
+	MCFG_SCREEN_UPDATE_DRIVER(atarig1_state, screen_update_atarig1)
+	MCFG_SCREEN_VBLANK_DRIVER(atarig1_state, screen_eof_atarig1)
 
 	MCFG_VIDEO_START_OVERRIDE(atarig1_state,atarig1)
 

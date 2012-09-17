@@ -281,15 +281,14 @@ static void draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rec
 }
 
 
-SCREEN_UPDATE_IND16( bosco )
+UINT32 bosco_state::screen_update_bosco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bosco_state *state =  screen.machine().driver_data<bosco_state>();
 
 	/* the radar tilemap is just 8x32. We rely on the tilemap code to repeat it across
        the screen, and clip it to only the position where it is supposed to be shown */
 	rectangle fg_clip = cliprect;
 	rectangle bg_clip = cliprect;
-	if (state->flip_screen())
+	if (flip_screen())
 	{
 		bg_clip.min_x = 20*8;
 		fg_clip.max_x = 20*8-1;
@@ -301,16 +300,16 @@ SCREEN_UPDATE_IND16( bosco )
 	}
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	draw_stars(screen.machine(),bitmap,cliprect,state->flip_screen());
+	draw_stars(screen.machine(),bitmap,cliprect,flip_screen());
 
-	state->m_bg_tilemap->draw(bitmap, bg_clip, 0,0);
-	state->m_fg_tilemap->draw(bitmap, fg_clip, 0,0);
+	m_bg_tilemap->draw(bitmap, bg_clip, 0,0);
+	m_fg_tilemap->draw(bitmap, fg_clip, 0,0);
 
 	draw_sprites(screen.machine(), bitmap,cliprect);
 
 	/* draw the high priority characters */
-	state->m_bg_tilemap->draw(bitmap, bg_clip, 1,0);
-	state->m_fg_tilemap->draw(bitmap, fg_clip, 1,0);
+	m_bg_tilemap->draw(bitmap, bg_clip, 1,0);
+	m_fg_tilemap->draw(bitmap, fg_clip, 1,0);
 
 	draw_bullets(screen.machine(), bitmap,cliprect);
 
@@ -318,16 +317,15 @@ SCREEN_UPDATE_IND16( bosco )
 }
 
 
-SCREEN_VBLANK( bosco )
+void bosco_state::screen_eof_bosco(screen_device &screen, bool state)
 {
 	// falling edge
-	if (!vblank_on)
+	if (!state)
 	{
-		bosco_state *state =  screen.machine().driver_data<bosco_state>();
 		static const int speedsx[8] = { -1, -2, -3, 0, 3, 2, 1, 0 };
 		static const int speedsy[8] = { 0, -1, -2, -3, 0, 3, 2, 1 };
 
-		state->m_stars_scrollx += speedsx[state->m_bosco_starcontrol[0] & 0x07];
-		state->m_stars_scrolly += speedsy[(state->m_bosco_starcontrol[0] & 0x38) >> 3];
+		m_stars_scrollx += speedsx[m_bosco_starcontrol[0] & 0x07];
+		m_stars_scrolly += speedsy[(m_bosco_starcontrol[0] & 0x38) >> 3];
 	}
 }

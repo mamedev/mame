@@ -199,42 +199,40 @@ void tbowl_state::video_start()
 }
 
 
-SCREEN_UPDATE_IND16( tbowl_left )
+UINT32 tbowl_state::screen_update_tbowl_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tbowl_state *state = screen.machine().driver_data<tbowl_state>();
 
-	state->m_bg_tilemap->set_scrollx(0, state->m_xscroll );
-	state->m_bg_tilemap->set_scrolly(0, state->m_yscroll );
-	state->m_bg2_tilemap->set_scrollx(0, state->m_bg2xscroll );
-	state->m_bg2_tilemap->set_scrolly(0, state->m_bg2yscroll );
-	state->m_tx_tilemap->set_scrollx(0, 0 );
-	state->m_tx_tilemap->set_scrolly(0, 0 );
+	m_bg_tilemap->set_scrollx(0, m_xscroll );
+	m_bg_tilemap->set_scrolly(0, m_yscroll );
+	m_bg2_tilemap->set_scrollx(0, m_bg2xscroll );
+	m_bg2_tilemap->set_scrolly(0, m_bg2yscroll );
+	m_tx_tilemap->set_scrollx(0, 0 );
+	m_tx_tilemap->set_scrolly(0, 0 );
 
 	bitmap.fill(0x100, cliprect); /* is there a register controling the colour? looks odd when screen is blank */
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect, 0);
-	state->m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( tbowl_right )
+UINT32 tbowl_state::screen_update_tbowl_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tbowl_state *state = screen.machine().driver_data<tbowl_state>();
 
-	state->m_bg_tilemap->set_scrollx(0, state->m_xscroll+32*8 );
-	state->m_bg_tilemap->set_scrolly(0, state->m_yscroll );
-	state->m_bg2_tilemap->set_scrollx(0, state->m_bg2xscroll+32*8 );
-	state->m_bg2_tilemap->set_scrolly(0, state->m_bg2yscroll );
-	state->m_tx_tilemap->set_scrollx(0, 32*8 );
-	state->m_tx_tilemap->set_scrolly(0, 0 );
+	m_bg_tilemap->set_scrollx(0, m_xscroll+32*8 );
+	m_bg_tilemap->set_scrolly(0, m_yscroll );
+	m_bg2_tilemap->set_scrollx(0, m_bg2xscroll+32*8 );
+	m_bg2_tilemap->set_scrolly(0, m_bg2yscroll );
+	m_tx_tilemap->set_scrollx(0, 32*8 );
+	m_tx_tilemap->set_scrolly(0, 0 );
 
 	bitmap.fill(0x100, cliprect); /* is there a register controling the colour? looks odd when screen is blank */
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect, 32*8);
-	state->m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 
 	return 0;
 }

@@ -135,16 +135,15 @@ VIDEO_START_MEMBER(n8080_state,helifire)
 }
 
 
-SCREEN_UPDATE_IND16( spacefev )
+UINT32 n8080_state::screen_update_spacefev(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	n8080_state *state = screen.machine().driver_data<n8080_state>();
-	UINT8 mask = state->flip_screen() ? 0xff : 0x00;
+	UINT8 mask = flip_screen() ? 0xff : 0x00;
 
 	int x;
 	int y;
 
-	const UINT8* pRAM = state->m_videoram;
-	const UINT8* pPROM = state->memregion("proms")->base();
+	const UINT8* pRAM = m_videoram;
+	const UINT8* pPROM = memregion("proms")->base();
 
 	for (y = 0; y < 256; y++)
 	{
@@ -156,7 +155,7 @@ SCREEN_UPDATE_IND16( spacefev )
 
 			UINT8 color = 0;
 
-			if (state->m_spacefev_red_screen)
+			if (m_spacefev_red_screen)
 				color = 1;
 			else
 			{
@@ -164,7 +163,7 @@ SCREEN_UPDATE_IND16( spacefev )
 
 				if ((x >> 3) == 0x06)
 				{
-					color = state->m_spacefev_red_cannon ? 1 : 7;
+					color = m_spacefev_red_cannon ? 1 : 7;
 				}
 
 				if ((x >> 3) == 0x1b)
@@ -205,17 +204,16 @@ SCREEN_UPDATE_IND16( spacefev )
 }
 
 
-SCREEN_UPDATE_IND16( sheriff )
+UINT32 n8080_state::screen_update_sheriff(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	n8080_state *state = screen.machine().driver_data<n8080_state>();
-	UINT8 mask = state->flip_screen() ? 0xff : 0x00;
+	UINT8 mask = flip_screen() ? 0xff : 0x00;
 
-	const UINT8* pPROM = state->memregion("proms")->base();
+	const UINT8* pPROM = memregion("proms")->base();
 
 	int x;
 	int y;
 
-	const UINT8* pRAM = state->m_videoram;
+	const UINT8* pRAM = m_videoram;
 
 	for (y = 0; y < 256; y++)
 	{
@@ -227,13 +225,13 @@ SCREEN_UPDATE_IND16( sheriff )
 
 			UINT8 color = pPROM[32 * (y >> 3) + (x >> 3)];
 
-			if (state->m_sheriff_color_mode == 1 && !(color & 8))
-				color = state->m_sheriff_color_data ^ 7;
+			if (m_sheriff_color_mode == 1 && !(color & 8))
+				color = m_sheriff_color_data ^ 7;
 
-			if (state->m_sheriff_color_mode == 2)
-				color = state->m_sheriff_color_data ^ 7;
+			if (m_sheriff_color_mode == 2)
+				color = m_sheriff_color_data ^ 7;
 
-			if (state->m_sheriff_color_mode == 3)
+			if (m_sheriff_color_mode == 3)
 				color = 7;
 
 			for (n = 0; n < 8; n++)
@@ -248,16 +246,15 @@ SCREEN_UPDATE_IND16( sheriff )
 }
 
 
-SCREEN_UPDATE_IND16( helifire )
+UINT32 n8080_state::screen_update_helifire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	n8080_state *state = screen.machine().driver_data<n8080_state>();
 	int SUN_BRIGHTNESS = screen.machine().root_device().ioport("POT0")->read();
 	int SEA_BRIGHTNESS = screen.machine().root_device().ioport("POT1")->read();
 
 	static const int wave[8] = { 0, 1, 2, 2, 2, 1, 0, 0 };
 
-	unsigned saved_mv = state->m_helifire_mv;
-	unsigned saved_sc = state->m_helifire_sc;
+	unsigned saved_mv = m_helifire_mv;
+	unsigned saved_sc = m_helifire_sc;
 
 	int x;
 	int y;
@@ -266,7 +263,7 @@ SCREEN_UPDATE_IND16( helifire )
 	{
 		UINT16* pLine = &bitmap.pix16(y);
 
-		int level = 120 + wave[state->m_helifire_mv & 7];
+		int level = 120 + wave[m_helifire_mv & 7];
 
 		/* draw sky */
 
@@ -277,28 +274,28 @@ SCREEN_UPDATE_IND16( helifire )
 
 		/* draw stars */
 
-		if (state->m_helifire_mv % 8 == 4) /* upper half */
+		if (m_helifire_mv % 8 == 4) /* upper half */
 		{
-			int step = (320 * (state->m_helifire_mv - 0)) % sizeof state->m_helifire_LSFR;
+			int step = (320 * (m_helifire_mv - 0)) % sizeof m_helifire_LSFR;
 
 			int data =
-				((state->m_helifire_LSFR[step] & 1) << 6) |
-				((state->m_helifire_LSFR[step] & 2) << 4) |
-				((state->m_helifire_LSFR[step] & 4) << 2) |
-				((state->m_helifire_LSFR[step] & 8) << 0);
+				((m_helifire_LSFR[step] & 1) << 6) |
+				((m_helifire_LSFR[step] & 2) << 4) |
+				((m_helifire_LSFR[step] & 4) << 2) |
+				((m_helifire_LSFR[step] & 8) << 0);
 
 			pLine[0x80 + data] |= 0x100;
 		}
 
-		if (state->m_helifire_mv % 8 == 5) /* lower half */
+		if (m_helifire_mv % 8 == 5) /* lower half */
 		{
-			int step = (320 * (state->m_helifire_mv - 1)) % sizeof state->m_helifire_LSFR;
+			int step = (320 * (m_helifire_mv - 1)) % sizeof m_helifire_LSFR;
 
 			int data =
-				((state->m_helifire_LSFR[step] & 1) << 6) |
-				((state->m_helifire_LSFR[step] & 2) << 4) |
-				((state->m_helifire_LSFR[step] & 4) << 2) |
-				((state->m_helifire_LSFR[step] & 8) << 0);
+				((m_helifire_LSFR[step] & 1) << 6) |
+				((m_helifire_LSFR[step] & 2) << 4) |
+				((m_helifire_LSFR[step] & 4) << 2) |
+				((m_helifire_LSFR[step] & 8) << 0);
 
 			pLine[0x00 + data] |= 0x100;
 		}
@@ -320,18 +317,18 @@ SCREEN_UPDATE_IND16( helifire )
 
 			for (n = 0; n < 8; n++)
 			{
-				if (state->flip_screen())
+				if (flip_screen())
 				{
-					if ((state->m_videoram[offset ^ 0x1fff] << n) & 0x80)
+					if ((m_videoram[offset ^ 0x1fff] << n) & 0x80)
 					{
-						pLine[x + n] = state->m_colorram[offset ^ 0x1fff] & 7;
+						pLine[x + n] = m_colorram[offset ^ 0x1fff] & 7;
 					}
 				}
 				else
 				{
-					if ((state->m_videoram[offset] >> n) & 1)
+					if ((m_videoram[offset] >> n) & 1)
 					{
-						pLine[x + n] = state->m_colorram[offset] & 7;
+						pLine[x + n] = m_colorram[offset] & 7;
 					}
 				}
 			}
@@ -342,19 +339,18 @@ SCREEN_UPDATE_IND16( helifire )
 		helifire_next_line(screen.machine());
 	}
 
-	state->m_helifire_mv = saved_mv;
-	state->m_helifire_sc = saved_sc;
+	m_helifire_mv = saved_mv;
+	m_helifire_sc = saved_sc;
 	return 0;
 }
 
 
-SCREEN_VBLANK( helifire )
+void n8080_state::screen_eof_helifire(screen_device &screen, bool state)
 {
 	// falling edge
-	if (!vblank_on)
+	if (!state)
 	{
-		n8080_state *state = screen.machine().driver_data<n8080_state>();
-		int n = (screen.machine().primary_screen->frame_number() >> 1) % sizeof state->m_helifire_LSFR;
+		int n = (screen.machine().primary_screen->frame_number() >> 1) % sizeof m_helifire_LSFR;
 
 		int i;
 
@@ -364,9 +360,9 @@ SCREEN_VBLANK( helifire )
 			int G = (i & 2);
 			int B = (i & 4);
 
-			if (state->m_helifire_flash)
+			if (m_helifire_flash)
 			{
-				if (state->m_helifire_LSFR[n] & 0x20)
+				if (m_helifire_LSFR[n] & 0x20)
 				{
 					G |= B;
 				}

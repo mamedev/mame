@@ -78,16 +78,15 @@ VIDEO_START_MEMBER(mac_state,mac)
 #define MAC_MAIN_SCREEN_BUF_OFFSET	0x5900
 #define MAC_ALT_SCREEN_BUF_OFFSET	0xD900
 
-SCREEN_UPDATE_IND16( mac )
+UINT32 mac_state::screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT32 video_base;
 	const UINT16 *video_ram;
 	UINT16 word;
 	UINT16 *line;
 	int y, x, b;
-	mac_state *state = screen.machine().driver_data<mac_state>();
 
-	video_base = screen.machine().device<ram_device>(RAM_TAG)->size() - (state->m_screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
+	video_base = screen.machine().device<ram_device>(RAM_TAG)->size() - (m_screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
 	video_ram = (const UINT16 *) (screen.machine().device<ram_device>(RAM_TAG)->pointer() + video_base);
 
 	for (y = 0; y < MAC_V_VIS; y++)
@@ -106,17 +105,16 @@ SCREEN_UPDATE_IND16( mac )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( macse30 )
+UINT32 mac_state::screen_update_macse30(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT32 video_base;
 	const UINT16 *video_ram;
 	UINT16 word;
 	UINT16 *line;
 	int y, x, b;
-	mac_state *state = screen.machine().driver_data<mac_state>();
 
-	video_base = state->m_screen_buffer ? 0x8000 : 0;
-	video_ram = (const UINT16 *) &state->m_vram[video_base/4];
+	video_base = m_screen_buffer ? 0x8000 : 0;
+	video_ram = (const UINT16 *) &m_vram[video_base/4];
 
 	for (y = 0; y < MAC_V_VIS; y++)
 	{
@@ -134,15 +132,14 @@ SCREEN_UPDATE_IND16( macse30 )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( macprtb )
+UINT32 mac_state::screen_update_macprtb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const UINT16 *video_ram;
 	UINT16 word;
 	UINT16 *line;
 	int y, x, b;
-	mac_state *state = screen.machine().driver_data<mac_state>();
 
-	video_ram = (const UINT16 *) state->m_vram16.target();
+	video_ram = (const UINT16 *) m_vram16.target();
 
 	for (y = 0; y < 400; y++)
 	{
@@ -160,15 +157,14 @@ SCREEN_UPDATE_IND16( macprtb )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( macpb140 )
+UINT32 mac_state::screen_update_macpb140(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const UINT16 *video_ram;
 	UINT16 word;
 	UINT16 *line;
 	int y, x, b;
-	mac_state *state = screen.machine().driver_data<mac_state>();
 
-	video_ram = (const UINT16 *) state->m_vram.target();
+	video_ram = (const UINT16 *) m_vram.target();
 
 	for (y = 0; y < 400; y++)
 	{
@@ -186,13 +182,12 @@ SCREEN_UPDATE_IND16( macpb140 )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( macpb160 )
+UINT32 mac_state::screen_update_macpb160(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT16 *line;
 	int y, x;
 	UINT8 pixels;
-	mac_state *state = screen.machine().driver_data<mac_state>();
-	UINT8 *vram8 = (UINT8 *)state->m_vram.target();
+	UINT8 *vram8 = (UINT8 *)m_vram.target();
 
 	for (y = 0; y < 400; y++)
 	{
@@ -374,14 +369,13 @@ VIDEO_START_MEMBER(mac_state,macv8)
 	m_rbv_type = RBV_TYPE_V8;
 }
 
-SCREEN_UPDATE_RGB32( macrbv )
+UINT32 mac_state::screen_update_macrbv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 *scanline;
 	int x, y, hres, vres;
-	mac_state *mac = screen.machine().driver_data<mac_state>();
 	UINT8 *vram8 = (UINT8 *)screen.machine().device<ram_device>(RAM_TAG)->pointer();
 
-	switch (mac->m_rbv_montype)
+	switch (m_rbv_montype)
 	{
 		case 32: // classic II built-in display
 			hres = MAC_H_VIS;
@@ -406,7 +400,7 @@ SCREEN_UPDATE_RGB32( macrbv )
 			break;
 	}
 
-	switch (mac->m_rbv_regs[0x10] & 7)
+	switch (m_rbv_regs[0x10] & 7)
 	{
 		case 0:	// 1bpp
 		{
@@ -419,14 +413,14 @@ SCREEN_UPDATE_RGB32( macrbv )
 				{
 					pixels = vram8[(y * (hres/8)) + ((x/8)^3)];
 
-					*scanline++ = mac->m_rbv_palette[0xfe|(pixels>>7)];
-					*scanline++ = mac->m_rbv_palette[0xfe|((pixels>>6)&1)];
-					*scanline++ = mac->m_rbv_palette[0xfe|((pixels>>5)&1)];
-					*scanline++ = mac->m_rbv_palette[0xfe|((pixels>>4)&1)];
-					*scanline++ = mac->m_rbv_palette[0xfe|((pixels>>3)&1)];
-					*scanline++ = mac->m_rbv_palette[0xfe|((pixels>>2)&1)];
-					*scanline++ = mac->m_rbv_palette[0xfe|((pixels>>1)&1)];
-					*scanline++ = mac->m_rbv_palette[0xfe|(pixels&1)];
+					*scanline++ = m_rbv_palette[0xfe|(pixels>>7)];
+					*scanline++ = m_rbv_palette[0xfe|((pixels>>6)&1)];
+					*scanline++ = m_rbv_palette[0xfe|((pixels>>5)&1)];
+					*scanline++ = m_rbv_palette[0xfe|((pixels>>4)&1)];
+					*scanline++ = m_rbv_palette[0xfe|((pixels>>3)&1)];
+					*scanline++ = m_rbv_palette[0xfe|((pixels>>2)&1)];
+					*scanline++ = m_rbv_palette[0xfe|((pixels>>1)&1)];
+					*scanline++ = m_rbv_palette[0xfe|(pixels&1)];
 				}
 			}
 		}
@@ -443,10 +437,10 @@ SCREEN_UPDATE_RGB32( macrbv )
 				{
 					pixels = vram8[(y * (hres/4)) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = mac->m_rbv_palette[0xfc|((pixels>>6)&3)];
-					*scanline++ = mac->m_rbv_palette[0xfc|((pixels>>4)&3)];
-					*scanline++ = mac->m_rbv_palette[0xfc|((pixels>>2)&3)];
-					*scanline++ = mac->m_rbv_palette[0xfc|(pixels&3)];
+					*scanline++ = m_rbv_palette[0xfc|((pixels>>6)&3)];
+					*scanline++ = m_rbv_palette[0xfc|((pixels>>4)&3)];
+					*scanline++ = m_rbv_palette[0xfc|((pixels>>2)&3)];
+					*scanline++ = m_rbv_palette[0xfc|(pixels&3)];
 				}
 			}
 		}
@@ -464,8 +458,8 @@ SCREEN_UPDATE_RGB32( macrbv )
 				{
 					pixels = vram8[(y * (hres/2)) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = mac->m_rbv_palette[0xf0|(pixels>>4)];
-					*scanline++ = mac->m_rbv_palette[0xf0|(pixels&0xf)];
+					*scanline++ = m_rbv_palette[0xf0|(pixels>>4)];
+					*scanline++ = m_rbv_palette[0xf0|(pixels&0xf)];
 				}
 			}
 		}
@@ -482,7 +476,7 @@ SCREEN_UPDATE_RGB32( macrbv )
 				for (x = 0; x < hres; x++)
 				{
 					pixels = vram8[(y * hres) + (BYTE4_XOR_BE(x))];
-					*scanline++ = mac->m_rbv_palette[pixels];
+					*scanline++ = m_rbv_palette[pixels];
 				}
 			}
 		}
@@ -491,25 +485,24 @@ SCREEN_UPDATE_RGB32( macrbv )
 	return 0;
 }
 
-SCREEN_UPDATE_RGB32( macrbvvram )
+UINT32 mac_state::screen_update_macrbvvram(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 *scanline;
 	int x, y;
-	mac_state *mac = screen.machine().driver_data<mac_state>();
 	UINT8 mode = 0;
 
-	switch (mac->m_rbv_type)
+	switch (m_rbv_type)
 	{
 		case RBV_TYPE_RBV:
 		case RBV_TYPE_V8:
-			mode = mac->m_rbv_regs[0x10] & 7;
+			mode = m_rbv_regs[0x10] & 7;
 			break;
 
 		case RBV_TYPE_SONORA:
-			mode = mac->m_sonora_vctl[1] & 7;
+			mode = m_sonora_vctl[1] & 7;
 
 			// forced blank?
-			if (mac->m_sonora_vctl[0] & 0x80)
+			if (m_sonora_vctl[0] & 0x80)
 			{
 				return 0;
 			}
@@ -520,10 +513,10 @@ SCREEN_UPDATE_RGB32( macrbvvram )
 	{
 		case 0:	// 1bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
+			UINT8 *vram8 = (UINT8 *)m_vram.target();
 			UINT8 pixels;
 
-			if (mac->m_rbv_type == RBV_TYPE_SONORA)
+			if (m_rbv_type == RBV_TYPE_SONORA)
 			{
 				for (y = 0; y < 480; y++)
 				{
@@ -532,14 +525,14 @@ SCREEN_UPDATE_RGB32( macrbvvram )
 					{
 						pixels = vram8[(y * 80) + ((x/8)^3)];
 
-						*scanline++ = mac->m_rbv_palette[0x7f|(pixels&0x80)];
-						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<1)&0x80)];
-						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<2)&0x80)];
-						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<3)&0x80)];
-						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<4)&0x80)];
-						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<5)&0x80)];
-						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<6)&0x80)];
-						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<7)&0x80)];
+						*scanline++ = m_rbv_palette[0x7f|(pixels&0x80)];
+						*scanline++ = m_rbv_palette[0x7f|((pixels<<1)&0x80)];
+						*scanline++ = m_rbv_palette[0x7f|((pixels<<2)&0x80)];
+						*scanline++ = m_rbv_palette[0x7f|((pixels<<3)&0x80)];
+						*scanline++ = m_rbv_palette[0x7f|((pixels<<4)&0x80)];
+						*scanline++ = m_rbv_palette[0x7f|((pixels<<5)&0x80)];
+						*scanline++ = m_rbv_palette[0x7f|((pixels<<6)&0x80)];
+						*scanline++ = m_rbv_palette[0x7f|((pixels<<7)&0x80)];
 					}
 				}
 			}
@@ -552,14 +545,14 @@ SCREEN_UPDATE_RGB32( macrbvvram )
 					{
 						pixels = vram8[(y * 0x400) + ((x/8)^3)];
 
-						*scanline++ = mac->m_rbv_palette[0x7f|(pixels&0x80)];
-						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<1)&0x80)];
-						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<2)&0x80)];
-						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<3)&0x80)];
-						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<4)&0x80)];
-						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<5)&0x80)];
-						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<6)&0x80)];
-						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<7)&0x80)];
+						*scanline++ = m_rbv_palette[0x7f|(pixels&0x80)];
+						*scanline++ = m_rbv_palette[0x7f|((pixels<<1)&0x80)];
+						*scanline++ = m_rbv_palette[0x7f|((pixels<<2)&0x80)];
+						*scanline++ = m_rbv_palette[0x7f|((pixels<<3)&0x80)];
+						*scanline++ = m_rbv_palette[0x7f|((pixels<<4)&0x80)];
+						*scanline++ = m_rbv_palette[0x7f|((pixels<<5)&0x80)];
+						*scanline++ = m_rbv_palette[0x7f|((pixels<<6)&0x80)];
+						*scanline++ = m_rbv_palette[0x7f|((pixels<<7)&0x80)];
 					}
 				}
 			}
@@ -568,7 +561,7 @@ SCREEN_UPDATE_RGB32( macrbvvram )
 
 		case 1:	// 2bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
+			UINT8 *vram8 = (UINT8 *)m_vram.target();
 			UINT8 pixels;
 
 			for (y = 0; y < 480; y++)
@@ -578,10 +571,10 @@ SCREEN_UPDATE_RGB32( macrbvvram )
 				{
 					pixels = vram8[(y * 160) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = mac->m_rbv_palette[0xfc|((pixels>>6)&3)];
-					*scanline++ = mac->m_rbv_palette[0xfc|((pixels>>4)&3)];
-					*scanline++ = mac->m_rbv_palette[0xfc|((pixels>>2)&3)];
-					*scanline++ = mac->m_rbv_palette[0xfc|(pixels&3)];
+					*scanline++ = m_rbv_palette[0xfc|((pixels>>6)&3)];
+					*scanline++ = m_rbv_palette[0xfc|((pixels>>4)&3)];
+					*scanline++ = m_rbv_palette[0xfc|((pixels>>2)&3)];
+					*scanline++ = m_rbv_palette[0xfc|(pixels&3)];
 				}
 			}
 		}
@@ -589,7 +582,7 @@ SCREEN_UPDATE_RGB32( macrbvvram )
 
 		case 2: // 4bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
+			UINT8 *vram8 = (UINT8 *)m_vram.target();
 			UINT8 pixels;
 
 			for (y = 0; y < 480; y++)
@@ -600,8 +593,8 @@ SCREEN_UPDATE_RGB32( macrbvvram )
 				{
 					pixels = vram8[(y * 320) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = mac->m_rbv_palette[0xf0|(pixels>>4)];
-					*scanline++ = mac->m_rbv_palette[0xf0|(pixels&0xf)];
+					*scanline++ = m_rbv_palette[0xf0|(pixels>>4)];
+					*scanline++ = m_rbv_palette[0xf0|(pixels&0xf)];
 				}
 			}
 		}
@@ -609,10 +602,10 @@ SCREEN_UPDATE_RGB32( macrbvvram )
 
 		case 3: // 8bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
+			UINT8 *vram8 = (UINT8 *)m_vram.target();
 			UINT8 pixels;
 
-			if (mac->m_rbv_type == RBV_TYPE_SONORA)
+			if (m_rbv_type == RBV_TYPE_SONORA)
 			{
 				for (y = 0; y < 480; y++)
 				{
@@ -621,7 +614,7 @@ SCREEN_UPDATE_RGB32( macrbvvram )
 					for (x = 0; x < 640; x++)
 					{
 						pixels = vram8[(y * 0x280) + (BYTE4_XOR_BE(x))];
-						*scanline++ = mac->m_rbv_palette[pixels];
+						*scanline++ = m_rbv_palette[pixels];
 					}
 				}
 			}
@@ -634,7 +627,7 @@ SCREEN_UPDATE_RGB32( macrbvvram )
 					for (x = 0; x < 640; x++)
 					{
 						pixels = vram8[(y * 2048) + (BYTE4_XOR_BE(x))];
-						*scanline++ = mac->m_rbv_palette[pixels];
+						*scanline++ = m_rbv_palette[pixels];
 					}
 				}
 			}
@@ -855,35 +848,34 @@ WRITE32_MEMBER(mac_state::dafb_dac_w)
 	}
 }
 
-SCREEN_UPDATE_RGB32( macdafb )
+UINT32 mac_state::screen_update_macdafb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 *scanline;
 	int x, y;
-	mac_state *mac = screen.machine().driver_data<mac_state>();
 
-	switch (mac->m_dafb_mode)
+	switch (m_dafb_mode)
 	{
 		case 0:	// 1bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
+			UINT8 *vram8 = (UINT8 *)m_vram.target();
 			UINT8 pixels;
-			vram8 += mac->m_dafb_base;
+			vram8 += m_dafb_base;
 
 			for (y = 0; y < 870; y++)
 			{
 				scanline = &bitmap.pix32(y);
 				for (x = 0; x < 1152; x+=8)
 				{
-					pixels = vram8[(y * mac->m_dafb_stride) + ((x/8)^3)];
+					pixels = vram8[(y * m_dafb_stride) + ((x/8)^3)];
 
-					*scanline++ = mac->m_rbv_palette[(pixels>>7)&1];
-					*scanline++ = mac->m_rbv_palette[(pixels>>6)&1];
-					*scanline++ = mac->m_rbv_palette[(pixels>>5)&1];
-					*scanline++ = mac->m_rbv_palette[(pixels>>4)&1];
-					*scanline++ = mac->m_rbv_palette[(pixels>>3)&1];
-					*scanline++ = mac->m_rbv_palette[(pixels>>2)&1];
-					*scanline++ = mac->m_rbv_palette[(pixels>>1)&1];
-					*scanline++ = mac->m_rbv_palette[(pixels&1)];
+					*scanline++ = m_rbv_palette[(pixels>>7)&1];
+					*scanline++ = m_rbv_palette[(pixels>>6)&1];
+					*scanline++ = m_rbv_palette[(pixels>>5)&1];
+					*scanline++ = m_rbv_palette[(pixels>>4)&1];
+					*scanline++ = m_rbv_palette[(pixels>>3)&1];
+					*scanline++ = m_rbv_palette[(pixels>>2)&1];
+					*scanline++ = m_rbv_palette[(pixels>>1)&1];
+					*scanline++ = m_rbv_palette[(pixels&1)];
 				}
 			}
 		}
@@ -891,21 +883,21 @@ SCREEN_UPDATE_RGB32( macdafb )
 
 		case 1:	// 2bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
+			UINT8 *vram8 = (UINT8 *)m_vram.target();
 			UINT8 pixels;
-			vram8 += mac->m_dafb_base;
+			vram8 += m_dafb_base;
 
 			for (y = 0; y < 870; y++)
 			{
 				scanline = &bitmap.pix32(y);
 				for (x = 0; x < 1152/4; x++)
 				{
-					pixels = vram8[(y * mac->m_dafb_stride) + (BYTE4_XOR_BE(x))];
+					pixels = vram8[(y * m_dafb_stride) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = mac->m_rbv_palette[((pixels>>6)&3)];
-					*scanline++ = mac->m_rbv_palette[((pixels>>4)&3)];
-					*scanline++ = mac->m_rbv_palette[((pixels>>2)&3)];
-					*scanline++ = mac->m_rbv_palette[(pixels&3)];
+					*scanline++ = m_rbv_palette[((pixels>>6)&3)];
+					*scanline++ = m_rbv_palette[((pixels>>4)&3)];
+					*scanline++ = m_rbv_palette[((pixels>>2)&3)];
+					*scanline++ = m_rbv_palette[(pixels&3)];
 				}
 			}
 		}
@@ -913,9 +905,9 @@ SCREEN_UPDATE_RGB32( macdafb )
 
 		case 2: // 4bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
+			UINT8 *vram8 = (UINT8 *)m_vram.target();
 			UINT8 pixels;
-			vram8 += mac->m_dafb_base;
+			vram8 += m_dafb_base;
 
 			for (y = 0; y < 870; y++)
 			{
@@ -923,10 +915,10 @@ SCREEN_UPDATE_RGB32( macdafb )
 
 				for (x = 0; x < 1152/2; x++)
 				{
-					pixels = vram8[(y * mac->m_dafb_stride) + (BYTE4_XOR_BE(x))];
+					pixels = vram8[(y * m_dafb_stride) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = mac->m_rbv_palette[(pixels>>4)];
-					*scanline++ = mac->m_rbv_palette[(pixels&0xf)];
+					*scanline++ = m_rbv_palette[(pixels>>4)];
+					*scanline++ = m_rbv_palette[(pixels&0xf)];
 				}
 			}
 		}
@@ -934,9 +926,9 @@ SCREEN_UPDATE_RGB32( macdafb )
 
 		case 3: // 8bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
+			UINT8 *vram8 = (UINT8 *)m_vram.target();
 			UINT8 pixels;
-			vram8 += mac->m_dafb_base;
+			vram8 += m_dafb_base;
 
 			for (y = 0; y < 870; y++)
 			{
@@ -944,8 +936,8 @@ SCREEN_UPDATE_RGB32( macdafb )
 
 				for (x = 0; x < 1152; x++)
 				{
-					pixels = vram8[(y * mac->m_dafb_stride) + (BYTE4_XOR_BE(x))];
-					*scanline++ = mac->m_rbv_palette[pixels];
+					pixels = vram8[(y * m_dafb_stride) + (BYTE4_XOR_BE(x))];
+					*scanline++ = m_rbv_palette[pixels];
 				}
 			}
 		}
@@ -957,7 +949,7 @@ SCREEN_UPDATE_RGB32( macdafb )
 				UINT32 *base;
 
 				scanline = &bitmap.pix32(y);
-				base = (UINT32 *)&mac->m_vram[(y * (mac->m_dafb_stride/4)) + (mac->m_dafb_base/4)];
+				base = (UINT32 *)&m_vram[(y * (m_dafb_stride/4)) + (m_dafb_base/4)];
 				for (x = 0; x < 640; x++)
 				{
 					*scanline++ = *base++;
@@ -969,12 +961,11 @@ SCREEN_UPDATE_RGB32( macdafb )
 	return 0;
 }
 
-SCREEN_UPDATE_RGB32( macpbwd )    /* Color PowerBooks using an off-the-shelf WD video chipset */
+UINT32 mac_state::screen_update_macpbwd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)/* Color PowerBooks using an off-the-shelf WD video chipset */
 {
 	UINT32 *scanline;
 	int x, y;
-	mac_state *mac = screen.machine().driver_data<mac_state>();
-    UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
+    UINT8 *vram8 = (UINT8 *)m_vram.target();
     UINT8 pixels;
 
 //    vram8 += 0x40000;
@@ -985,7 +976,7 @@ SCREEN_UPDATE_RGB32( macpbwd )    /* Color PowerBooks using an off-the-shelf WD 
         for (x = 0; x < 640; x++)
         {
             pixels = vram8[(y * 640) + (BYTE4_XOR_BE(x))];
-            *scanline++ = mac->m_rbv_palette[pixels];
+            *scanline++ = m_rbv_palette[pixels];
         }
     }
 

@@ -106,6 +106,10 @@ public:
 	DECLARE_VIDEO_START(nndmseal);
 	DECLARE_VIDEO_START(rockntread);
 	DECLARE_VIDEO_START(rocknms);
+	UINT32 screen_update_tetrisp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_rockntread(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_rocknms_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_rocknms_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 class stepstag_state : public tetrisp2_state
@@ -125,6 +129,9 @@ public:
 	DECLARE_WRITE16_MEMBER( stepstag_palette_w );
 	DECLARE_DRIVER_INIT(stepstag);
 	DECLARE_VIDEO_START(stepstag);
+	UINT32 screen_update_stepstag_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_stepstag_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_stepstag_mid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/tetrisp2.c -----------*/
@@ -133,18 +140,18 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( tetrisp2 );
-
-
-SCREEN_UPDATE_IND16( rockntread );
-
-
-SCREEN_UPDATE_RGB32( rocknms_left );
-SCREEN_UPDATE_RGB32( rocknms_right );
 
 
 
 
-SCREEN_UPDATE_IND16( stepstag_left );
-SCREEN_UPDATE_IND16( stepstag_mid );
-SCREEN_UPDATE_IND16( stepstag_right );
+
+
+
+
+
+
+
+
+
+
+

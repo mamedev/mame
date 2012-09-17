@@ -205,25 +205,24 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( thedeep )
+UINT32 thedeep_state::screen_update_thedeep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	thedeep_state *state = screen.machine().driver_data<thedeep_state>();
-	int scrollx = state->m_scroll[0] + (state->m_scroll[1]<<8);
-	int scrolly = state->m_scroll[2] + (state->m_scroll[3]<<8);
+	int scrollx = m_scroll[0] + (m_scroll[1]<<8);
+	int scrolly = m_scroll[2] + (m_scroll[3]<<8);
 	int x;
 
-	state->m_tilemap_0->set_scrollx(0, scrollx);
+	m_tilemap_0->set_scrollx(0, scrollx);
 
 	for (x = 0; x < 0x20; x++)
 	{
-		int y = state->m_scroll2[x*2+0] + (state->m_scroll2[x*2+1]<<8);
-		state->m_tilemap_0->set_scrolly(x, y + scrolly);
+		int y = m_scroll2[x*2+0] + (m_scroll2[x*2+1]<<8);
+		m_tilemap_0->set_scrolly(x, y + scrolly);
 	}
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	state->m_tilemap_0->draw(bitmap, cliprect, 0,0);
+	m_tilemap_0->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect);
-	state->m_tilemap_1->draw(bitmap, cliprect, 0,0);
+	m_tilemap_1->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

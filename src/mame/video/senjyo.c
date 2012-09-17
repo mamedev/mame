@@ -276,9 +276,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	}
 }
 
-SCREEN_UPDATE_IND16( senjyo )
+UINT32 senjyo_state::screen_update_senjyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	senjyo_state *state = screen.machine().driver_data<senjyo_state>();
 	int i;
 
 
@@ -287,54 +286,54 @@ SCREEN_UPDATE_IND16( senjyo )
 	palette_set_color(screen.machine(),513,MAKE_RGB(0xff,0xff,0x00));	/* yellow for player */
 
 	{
-		int flip = state->flip_screen();
+		int flip = flip_screen();
 		int scrollx,scrolly;
 
 		for (i = 0;i < 32;i++)
-			state->m_fg_tilemap->set_scrolly(i, state->m_fgscroll[i]);
+			m_fg_tilemap->set_scrolly(i, m_fgscroll[i]);
 
-		scrollx = state->m_scrollx1[0];
-		scrolly = state->m_scrolly1[0] + 256 * state->m_scrolly1[1];
+		scrollx = m_scrollx1[0];
+		scrolly = m_scrolly1[0] + 256 * m_scrolly1[1];
 		if (flip)
 			scrollx = -scrollx;
-		state->m_bg1_tilemap->set_scrollx(0, scrollx);
-		state->m_bg1_tilemap->set_scrolly(0, scrolly);
+		m_bg1_tilemap->set_scrollx(0, scrollx);
+		m_bg1_tilemap->set_scrolly(0, scrolly);
 
-		scrollx = state->m_scrollx2[0];
-		scrolly = state->m_scrolly2[0] + 256 * state->m_scrolly2[1];
-		if (state->m_scrollhack)	/* Star Force, but NOT the encrypted version */
+		scrollx = m_scrollx2[0];
+		scrolly = m_scrolly2[0] + 256 * m_scrolly2[1];
+		if (m_scrollhack)	/* Star Force, but NOT the encrypted version */
 		{
-			scrollx = state->m_scrollx1[0];
-			scrolly = state->m_scrolly1[0] + 256 * state->m_scrolly1[1];
+			scrollx = m_scrollx1[0];
+			scrolly = m_scrolly1[0] + 256 * m_scrolly1[1];
 		}
 		if (flip)
 			scrollx = -scrollx;
-		state->m_bg2_tilemap->set_scrollx(0, scrollx);
-		state->m_bg2_tilemap->set_scrolly(0, scrolly);
+		m_bg2_tilemap->set_scrollx(0, scrollx);
+		m_bg2_tilemap->set_scrolly(0, scrolly);
 
-		scrollx = state->m_scrollx3[0];
-		scrolly = state->m_scrolly3[0] + 256 * state->m_scrolly3[1];
+		scrollx = m_scrollx3[0];
+		scrolly = m_scrolly3[0] + 256 * m_scrolly3[1];
 		if (flip)
 			scrollx = -scrollx;
-		state->m_bg3_tilemap->set_scrollx(0, scrollx);
-		state->m_bg3_tilemap->set_scrolly(0, scrolly);
+		m_bg3_tilemap->set_scrollx(0, scrollx);
+		m_bg3_tilemap->set_scrolly(0, scrolly);
 	}
 
 	draw_bgbitmap(screen.machine(), bitmap, cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
-	state->m_bg3_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg3_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 1);
-	state->m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 2);
-	state->m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 3);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_radar(screen.machine(), bitmap, cliprect);
 
 #if 0
 {
 	char baf[80];
-	UINT8 *senjyo_scrolly3 = state->m_scrolly3;
+	UINT8 *senjyo_scrolly3 = m_scrolly3;
 
 	sprintf(baf,"%02x %02x %02x %02x %02x %02x %02x %02x",
 		senjyo_scrolly3[0x00],

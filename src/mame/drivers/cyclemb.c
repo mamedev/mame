@@ -119,6 +119,8 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_cyclemb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_skydest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -357,14 +359,14 @@ static void skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	}
 }
 
-static SCREEN_UPDATE_IND16( cyclemb )
+UINT32 cyclemb_state::screen_update_cyclemb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	cyclemb_draw_tilemap(screen,bitmap,cliprect);
 	cyclemb_draw_sprites(screen,bitmap,cliprect);
 	return 0;
 }
 
-static SCREEN_UPDATE_IND16( skydest )
+UINT32 cyclemb_state::screen_update_skydest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -917,7 +919,7 @@ static MACHINE_CONFIG_START( cyclemb, cyclemb_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(cyclemb)
+	MCFG_SCREEN_UPDATE_DRIVER(cyclemb_state, screen_update_cyclemb)
 
 	MCFG_GFXDECODE(cyclemb)
 	MCFG_PALETTE_LENGTH(256)
@@ -938,7 +940,7 @@ static MACHINE_CONFIG_DERIVED( skydest, cyclemb )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 34*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(skydest)
+	MCFG_SCREEN_UPDATE_DRIVER(cyclemb_state, screen_update_skydest)
 
 //  MCFG_PALETTE_INIT_OVERRIDE(cyclemb_state,skydest)
 MACHINE_CONFIG_END

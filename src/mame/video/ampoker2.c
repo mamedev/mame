@@ -157,9 +157,8 @@ VIDEO_START_MEMBER(ampoker2_state,sigma2k)
 		 8, 8, 64, 32);
 }
 
-SCREEN_UPDATE_IND16(ampoker2)
+UINT32 ampoker2_state::screen_update_ampoker2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ampoker2_state *state = screen.machine().driver_data<ampoker2_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -33,6 +33,7 @@ public:
 	UINT8 m_sysreg;
 	int m_blink;
 	virtual void palette_init();
+	UINT32 screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 static ADDRESS_MAP_START(ms0515_mem, AS_PROGRAM, 16, ms0515_state)
@@ -165,19 +166,18 @@ static const floppy_interface ms0515_floppy_interface =
 	NULL
 };
 
-static SCREEN_UPDATE_IND16( ms0515 )
+UINT32 ms0515_state::screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ms0515_state *state = screen.machine().driver_data<ms0515_state>();
 	int y, x, b;
 	int addr = 0;
-	if (BIT(state->m_sysreg,3))  {
+	if (BIT(m_sysreg,3))  {
 		for (y = 0; y < 200; y++)
 		{
 			int horpos = 0;
 			for (x = 0; x < 40; x++)
 			{
-				UINT16 code = (state->m_video_ram[addr++] << 8);
-				code += state->m_video_ram[addr++];
+				UINT16 code = (m_video_ram[addr++] << 8);
+				code += m_video_ram[addr++];
 				for (b = 0; b < 16; b++)
 				{
 					// In lower res mode we will just double pixels
@@ -191,14 +191,14 @@ static SCREEN_UPDATE_IND16( ms0515 )
 			int horpos = 0;
 			for (x = 0; x < 40; x++)
 			{
-				UINT8 code = state->m_video_ram[addr++];
-				UINT8 attr = state->m_video_ram[addr++];
+				UINT8 code = m_video_ram[addr++];
+				UINT8 attr = m_video_ram[addr++];
 				UINT8 fg = (attr & 7) + BIT(attr,6)*8;
 				UINT8 bg = ((attr >> 3) & 7) + BIT(attr,6)*8;
-				if (BIT(attr,7) && (state->m_blink == 20)) {
+				if (BIT(attr,7) && (m_blink == 20)) {
 					UINT8 tmp = fg;
 					fg = bg; bg = tmp;
-					state->m_blink = -1;
+					m_blink = -1;
 				}
 				for (b = 0; b < 8; b++)
 				{
@@ -209,7 +209,7 @@ static SCREEN_UPDATE_IND16( ms0515 )
 			}
 		}
 	}
-	state->m_blink++;
+	m_blink++;
 	return 0;
 }
 
@@ -265,7 +265,7 @@ static MACHINE_CONFIG_START( ms0515, ms0515_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-    MCFG_SCREEN_UPDATE_STATIC(ms0515)
+	MCFG_SCREEN_UPDATE_DRIVER(ms0515_state, screen_update_ms0515)
 
 	MCFG_PALETTE_LENGTH(16)
 

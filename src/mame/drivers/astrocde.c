@@ -1298,7 +1298,7 @@ static MACHINE_CONFIG_START( astrocade_base, astrocde_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(ASTROCADE_CLOCK, 455, 0, 352, 262, 0, 240)
 	MCFG_SCREEN_DEFAULT_POSITION(1.1, 0.0, 1.18, -0.018)	/* clip out borders */
-	MCFG_SCREEN_UPDATE_STATIC(astrocde)
+	MCFG_SCREEN_UPDATE_DRIVER(astrocde_state, screen_update_astrocde)
 
 MACHINE_CONFIG_END
 
@@ -1315,7 +1315,7 @@ static MACHINE_CONFIG_DERIVED( astrocade_16color_base, astrocade_base )
 	MCFG_VIDEO_START_OVERRIDE(astrocde_state,profpac)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(profpac)
+	MCFG_SCREEN_UPDATE_DRIVER(astrocde_state, screen_update_profpac)
 MACHINE_CONFIG_END
 
 

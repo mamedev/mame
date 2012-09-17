@@ -74,6 +74,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_mole(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -122,11 +123,10 @@ WRITE8_MEMBER(mole_state::mole_flipscreen_w)
 	flip_screen_set(data & 0x01);
 }
 
-static SCREEN_UPDATE_IND16( mole )
+UINT32 mole_state::screen_update_mole(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mole_state *state = screen.machine().driver_data<mole_state>();
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -325,7 +325,7 @@ static MACHINE_CONFIG_START( mole, mole_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 25*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(mole)
+	MCFG_SCREEN_UPDATE_DRIVER(mole_state, screen_update_mole)
 
 	MCFG_GFXDECODE(mole)
 	MCFG_PALETTE_LENGTH(8)

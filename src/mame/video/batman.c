@@ -190,9 +190,8 @@ void batman_scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( batman )
+UINT32 batman_state::screen_update_batman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	batman_state *state = screen.machine().driver_data<batman_state>();
 	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
 	atarimo_rect_list rectlist;
 	bitmap_ind16 *mobitmap;
@@ -200,14 +199,14 @@ SCREEN_UPDATE_IND16( batman )
 
 	/* draw the playfield */
 	priority_bitmap.fill(0, cliprect);
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0x00);
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 1, 0x01);
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 2, 0x02);
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 3, 0x03);
-	state->m_playfield2_tilemap->draw(bitmap, cliprect, 0, 0x80);
-	state->m_playfield2_tilemap->draw(bitmap, cliprect, 1, 0x84);
-	state->m_playfield2_tilemap->draw(bitmap, cliprect, 2, 0x88);
-	state->m_playfield2_tilemap->draw(bitmap, cliprect, 3, 0x8c);
+	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0x00);
+	m_playfield_tilemap->draw(bitmap, cliprect, 1, 0x01);
+	m_playfield_tilemap->draw(bitmap, cliprect, 2, 0x02);
+	m_playfield_tilemap->draw(bitmap, cliprect, 3, 0x03);
+	m_playfield2_tilemap->draw(bitmap, cliprect, 0, 0x80);
+	m_playfield2_tilemap->draw(bitmap, cliprect, 1, 0x84);
+	m_playfield2_tilemap->draw(bitmap, cliprect, 2, 0x88);
+	m_playfield2_tilemap->draw(bitmap, cliprect, 3, 0x8c);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -280,7 +279,7 @@ SCREEN_UPDATE_IND16( batman )
 		}
 
 	/* add the alpha on top */
-	state->m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* now go back and process the upper bit of MO priority */
 	rectlist.rect -= rectlist.numrects;

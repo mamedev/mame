@@ -113,6 +113,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(oki_setbank);
 	virtual void video_start();
+	UINT32 screen_update_sliver(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 static void plot_pixel_rgb(sliver_state *state, int x, int y, UINT32 r, UINT32 g, UINT32 b)
@@ -373,12 +374,11 @@ void sliver_state::video_start()
 	machine().primary_screen->register_screen_bitmap(m_bitmap_fg);
 }
 
-static SCREEN_UPDATE_RGB32(sliver)
+UINT32 sliver_state::screen_update_sliver(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	sliver_state *state = screen.machine().driver_data<sliver_state>();
 
-	copybitmap      (bitmap, state->m_bitmap_bg, 0, 0, 0, 0, cliprect);
-	copybitmap_trans(bitmap, state->m_bitmap_fg, 0, 0, 0, 0, cliprect, 0);
+	copybitmap      (bitmap, m_bitmap_bg, 0, 0, 0, 0, cliprect);
+	copybitmap_trans(bitmap, m_bitmap_fg, 0, 0, 0, 0, cliprect, 0);
 	return 0;
 }
 
@@ -486,7 +486,7 @@ static MACHINE_CONFIG_START( sliver, sliver_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 384-1-16, 0*8, 240-1)
-	MCFG_SCREEN_UPDATE_STATIC(sliver)
+	MCFG_SCREEN_UPDATE_DRIVER(sliver_state, screen_update_sliver)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 

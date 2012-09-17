@@ -243,9 +243,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
                         SCREEN REFRESH
 **************************************************************/
 
-SCREEN_UPDATE_IND16( gcpinbal )
+UINT32 gcpinbal_state::screen_update_gcpinbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gcpinbal_state *state = screen.machine().driver_data<gcpinbal_state>();
 	int i;
 	UINT16 tile_sets = 0;
 	UINT8 layer[3];
@@ -253,38 +252,38 @@ SCREEN_UPDATE_IND16( gcpinbal )
 #ifdef MAME_DEBUG
 	if (screen.machine().input().code_pressed_once(KEYCODE_V))
 	{
-		state->m_dislayer[0] ^= 1;
-		popmessage("bg0: %01x", state->m_dislayer[0]);
+		m_dislayer[0] ^= 1;
+		popmessage("bg0: %01x", m_dislayer[0]);
 	}
 
 	if (screen.machine().input().code_pressed_once(KEYCODE_B))
 	{
-		state->m_dislayer[1] ^= 1;
-		popmessage("bg1: %01x", state->m_dislayer[1]);
+		m_dislayer[1] ^= 1;
+		popmessage("bg1: %01x", m_dislayer[1]);
 	}
 
 	if (screen.machine().input().code_pressed_once(KEYCODE_N))
 	{
-		state->m_dislayer[2] ^= 1;
-		popmessage("fg: %01x", state->m_dislayer[2]);
+		m_dislayer[2] ^= 1;
+		popmessage("fg: %01x", m_dislayer[2]);
 	}
 #endif
 
-	state->m_scrollx[0] =  state->m_ioc_ram[0x14 / 2];
-	state->m_scrolly[0] =  state->m_ioc_ram[0x16 / 2];
-	state->m_scrollx[1] =  state->m_ioc_ram[0x18 / 2];
-	state->m_scrolly[1] =  state->m_ioc_ram[0x1a / 2];
-	state->m_scrollx[2] =  state->m_ioc_ram[0x1c / 2];
-	state->m_scrolly[2] =  state->m_ioc_ram[0x1e / 2];
+	m_scrollx[0] =  m_ioc_ram[0x14 / 2];
+	m_scrolly[0] =  m_ioc_ram[0x16 / 2];
+	m_scrollx[1] =  m_ioc_ram[0x18 / 2];
+	m_scrolly[1] =  m_ioc_ram[0x1a / 2];
+	m_scrollx[2] =  m_ioc_ram[0x1c / 2];
+	m_scrolly[2] =  m_ioc_ram[0x1e / 2];
 
-	tile_sets = state->m_ioc_ram[0x88 / 2];
-	state->m_bg0_gfxset = (tile_sets & 0x400) ? 0x1000 : 0;
-	state->m_bg1_gfxset = (tile_sets & 0x800) ? 0x1000 : 0;
+	tile_sets = m_ioc_ram[0x88 / 2];
+	m_bg0_gfxset = (tile_sets & 0x400) ? 0x1000 : 0;
+	m_bg1_gfxset = (tile_sets & 0x800) ? 0x1000 : 0;
 
 	for (i = 0; i < 3; i++)
 	{
-		state->m_tilemap[i]->set_scrollx(0, state->m_scrollx[i]);
-		state->m_tilemap[i]->set_scrolly(0, state->m_scrolly[i]);
+		m_tilemap[i]->set_scrollx(0, m_scrollx[i]);
+		m_tilemap[i]->set_scrolly(0, m_scrolly[i]);
 	}
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
@@ -296,19 +295,19 @@ SCREEN_UPDATE_IND16( gcpinbal )
 
 
 #ifdef MAME_DEBUG
-	if (state->m_dislayer[layer[0]] == 0)
+	if (m_dislayer[layer[0]] == 0)
 #endif
-	state->m_tilemap[layer[0]]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+	m_tilemap[layer[0]]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
 
 #ifdef MAME_DEBUG
-	if (state->m_dislayer[layer[1]] == 0)
+	if (m_dislayer[layer[1]] == 0)
 #endif
-	state->m_tilemap[layer[1]]->draw(bitmap, cliprect, 0, 2);
+	m_tilemap[layer[1]]->draw(bitmap, cliprect, 0, 2);
 
 #ifdef MAME_DEBUG
-	if (state->m_dislayer[layer[2]] == 0)
+	if (m_dislayer[layer[2]] == 0)
 #endif
-	state->m_tilemap[layer[2]]->draw(bitmap, cliprect, 0, 4);
+	m_tilemap[layer[2]]->draw(bitmap, cliprect, 0, 4);
 
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 16);
@@ -316,7 +315,7 @@ SCREEN_UPDATE_IND16( gcpinbal )
 #if 0
 	{
 //      char buf[80];
-		sprintf(buf,"bg0_gfx: %04x bg1_gfx: %04x ", state->m_bg0_gfxset, state->m_bg1_gfxset);
+		sprintf(buf,"bg0_gfx: %04x bg1_gfx: %04x ", m_bg0_gfxset, m_bg1_gfxset);
 		popmessage(buf);
 	}
 #endif

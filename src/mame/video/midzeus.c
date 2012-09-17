@@ -329,7 +329,7 @@ static void exit_handler(running_machine &machine)
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( midzeus )
+UINT32 midzeus_state::screen_update_midzeus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 
@@ -338,8 +338,7 @@ SCREEN_UPDATE_IND16( midzeus )
 	/* normal update case */
 	if (!screen.machine().input().code_pressed(KEYCODE_W))
 	{
-		midzeus_state *state = screen.machine().driver_data<midzeus_state>();
-		const void *base = waveram1_ptr_from_expanded_addr(state->m_zeusbase[0xcc]);
+		const void *base = waveram1_ptr_from_expanded_addr(m_zeusbase[0xcc]);
 		int xoffs = screen.visible_area().min_x;
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{

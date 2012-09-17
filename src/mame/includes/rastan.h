@@ -33,10 +33,11 @@ public:
 	DECLARE_WRITE8_MEMBER(rastan_msm5205_stop_w);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_rastan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/rastan.c -----------*/
 
 
-SCREEN_UPDATE_IND16( rastan );
+

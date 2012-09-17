@@ -621,15 +621,14 @@ static void locomotn_draw_bullets( running_machine &machine, bitmap_ind16 &bitma
 }
 
 
-SCREEN_UPDATE_IND16( rallyx )
+UINT32 rallyx_state::screen_update_rallyx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	rallyx_state *state = screen.machine().driver_data<rallyx_state>();
 	/* the radar tilemap is just 8x32. We rely on the tilemap code to repeat it across
        the screen, and clip it to only the position where it is supposed to be shown */
 	rectangle fg_clip = cliprect;
 	rectangle bg_clip = cliprect;
 
-	if (state->flip_screen())
+	if (flip_screen())
 	{
 		bg_clip.min_x = 8 * 8;
 		fg_clip.max_x = 8 * 8 - 1;
@@ -642,10 +641,10 @@ SCREEN_UPDATE_IND16( rallyx )
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_bg_tilemap->draw(bitmap, bg_clip, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, fg_clip, 0, 0);
-	state->m_bg_tilemap->draw(bitmap, bg_clip, 1, 1);
-	state->m_fg_tilemap->draw(bitmap, fg_clip, 1, 1);
+	m_bg_tilemap->draw(bitmap, bg_clip, 0, 0);
+	m_fg_tilemap->draw(bitmap, fg_clip, 0, 0);
+	m_bg_tilemap->draw(bitmap, bg_clip, 1, 1);
+	m_fg_tilemap->draw(bitmap, fg_clip, 1, 1);
 
 	rallyx_draw_bullets(screen.machine(), bitmap, cliprect, TRUE);
 	rallyx_draw_sprites(screen.machine(), bitmap, cliprect, 1);
@@ -655,15 +654,14 @@ SCREEN_UPDATE_IND16( rallyx )
 }
 
 
-SCREEN_UPDATE_IND16( jungler )
+UINT32 rallyx_state::screen_update_jungler(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	rallyx_state *state = screen.machine().driver_data<rallyx_state>();
 	/* the radar tilemap is just 8x32. We rely on the tilemap code to repeat it across
        the screen, and clip it to only the position where it is supposed to be shown */
 	rectangle fg_clip = cliprect;
 	rectangle bg_clip = cliprect;
 
-	if (state->flip_screen())
+	if (flip_screen())
 	{
 		bg_clip.min_x = 8 * 8;
 		fg_clip.max_x = 8 * 8 - 1;
@@ -677,31 +675,30 @@ SCREEN_UPDATE_IND16( jungler )
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	/* tile priority doesn't seem to be supported in Jungler */
-	state->m_bg_tilemap->draw(bitmap, bg_clip, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, fg_clip, 0, 0);
-	state->m_bg_tilemap->draw(bitmap, bg_clip, 1, 0);
-	state->m_fg_tilemap->draw(bitmap, fg_clip, 1, 0);
+	m_bg_tilemap->draw(bitmap, bg_clip, 0, 0);
+	m_fg_tilemap->draw(bitmap, fg_clip, 0, 0);
+	m_bg_tilemap->draw(bitmap, bg_clip, 1, 0);
+	m_fg_tilemap->draw(bitmap, fg_clip, 1, 0);
 
 	jungler_draw_bullets(screen.machine(), bitmap, cliprect, TRUE);
 	rallyx_draw_sprites(screen.machine(), bitmap, cliprect, 0);
 	jungler_draw_bullets(screen.machine(), bitmap, cliprect, FALSE);
 
-	if (state->m_stars_enable)
+	if (m_stars_enable)
 		draw_stars(screen.machine(), bitmap, cliprect);
 
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( locomotn )
+UINT32 rallyx_state::screen_update_locomotn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	rallyx_state *state = screen.machine().driver_data<rallyx_state>();
 	/* the radar tilemap is just 8x32. We rely on the tilemap code to repeat it across
        the screen, and clip it to only the position where it is supposed to be shown */
 	rectangle fg_clip = cliprect;
 	rectangle bg_clip = cliprect;
 
-	if (state->flip_screen())
+	if (flip_screen())
 	{
 		/* handle reduced visible area in some games */
 		if (screen.visible_area().max_x == 32 * 8 - 1)
@@ -723,16 +720,16 @@ SCREEN_UPDATE_IND16( locomotn )
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_bg_tilemap->draw(bitmap, bg_clip, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, fg_clip, 0, 0);
-	state->m_bg_tilemap->draw(bitmap, bg_clip, 1, 1);
-	state->m_fg_tilemap->draw(bitmap, fg_clip, 1, 1);
+	m_bg_tilemap->draw(bitmap, bg_clip, 0, 0);
+	m_fg_tilemap->draw(bitmap, fg_clip, 0, 0);
+	m_bg_tilemap->draw(bitmap, bg_clip, 1, 1);
+	m_fg_tilemap->draw(bitmap, fg_clip, 1, 1);
 
 	locomotn_draw_bullets(screen.machine(), bitmap, cliprect, TRUE);
 	locomotn_draw_sprites(screen.machine(), bitmap, cliprect, 0);
 	locomotn_draw_bullets(screen.machine(), bitmap, cliprect, FALSE);
 
-	if (state->m_stars_enable)
+	if (m_stars_enable)
 		draw_stars(screen.machine(), bitmap, cliprect);
 
 	return 0;

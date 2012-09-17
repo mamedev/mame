@@ -59,6 +59,7 @@ public:
 	DECLARE_DRIVER_INIT(apple3);
 	DECLARE_MACHINE_RESET(apple3);
 	DECLARE_VIDEO_START(apple3);
+	UINT32 screen_update_apple3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -77,7 +78,7 @@ INTERRUPT_GEN( apple3_interrupt );
 /*----------- defined in video/apple3.c -----------*/
 
 
-SCREEN_UPDATE_IND16( apple3 );
+
 void apple3_write_charmem(running_machine &machine);
 
 

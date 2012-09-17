@@ -908,7 +908,7 @@ static MACHINE_CONFIG_START( polepos, polepos_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16)
-	MCFG_SCREEN_UPDATE_STATIC(polepos)
+	MCFG_SCREEN_UPDATE_DRIVER(polepos_state, screen_update_polepos)
 
 	MCFG_GFXDECODE(polepos)
 	MCFG_PALETTE_LENGTH(0x0f00)
@@ -987,7 +987,7 @@ static MACHINE_CONFIG_START( topracern, polepos_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16)
-	MCFG_SCREEN_UPDATE_STATIC(polepos)
+	MCFG_SCREEN_UPDATE_DRIVER(polepos_state, screen_update_polepos)
 
 	MCFG_GFXDECODE(polepos)
 	MCFG_PALETTE_LENGTH(0x0f00)

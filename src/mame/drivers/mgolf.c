@@ -38,6 +38,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_mgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -62,30 +63,29 @@ void mgolf_state::video_start()
 }
 
 
-static SCREEN_UPDATE_IND16( mgolf )
+UINT32 mgolf_state::screen_update_mgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mgolf_state *state = screen.machine().driver_data<mgolf_state>();
 	int i;
 
 	/* draw playfield */
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw sprites */
 	for (i = 0; i < 2; i++)
 	{
 		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
-			state->m_video_ram[0x399 + 4 * i],
+			m_video_ram[0x399 + 4 * i],
 			i,
 			0, 0,
-			state->m_video_ram[0x390 + 2 * i] - 7,
-			state->m_video_ram[0x398 + 4 * i] - 16, 0);
+			m_video_ram[0x390 + 2 * i] - 7,
+			m_video_ram[0x398 + 4 * i] - 16, 0);
 
 		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
-			state->m_video_ram[0x39b + 4 * i],
+			m_video_ram[0x39b + 4 * i],
 			i,
 			0, 0,
-			state->m_video_ram[0x390 + 2 * i] - 15,
-			state->m_video_ram[0x39a + 4 * i] - 16, 0);
+			m_video_ram[0x390 + 2 * i] - 15,
+			m_video_ram[0x39a + 4 * i] - 16, 0);
 	}
 	return 0;
 }
@@ -335,7 +335,7 @@ static MACHINE_CONFIG_START( mgolf, mgolf_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
-	MCFG_SCREEN_UPDATE_STATIC(mgolf)
+	MCFG_SCREEN_UPDATE_DRIVER(mgolf_state, screen_update_mgolf)
 
 	MCFG_GFXDECODE(mgolf)
 	MCFG_PALETTE_LENGTH(4)

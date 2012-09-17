@@ -197,15 +197,14 @@ void zx_state::video_start()
 	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }
 
-SCREEN_VBLANK( zx )
+void zx_state::screen_eof_zx(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		zx_state *state = screen.machine().driver_data<zx_state>();
 		/* decrement video synchronization counter */
-		if (state->m_ula_frame_vsync)
-			--state->m_ula_frame_vsync;
+		if (m_ula_frame_vsync)
+			--m_ula_frame_vsync;
 	}
 }
 

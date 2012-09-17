@@ -268,6 +268,7 @@ public:
 	DECLARE_MACHINE_START(mpu4_vid);
 	DECLARE_MACHINE_RESET(mpu4_vid);
 	DECLARE_VIDEO_START(mpu4_vid);
+	UINT32 screen_update_mpu4_vid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -511,13 +512,12 @@ static const gfx_layout mpu4_vid_char_16x16_layout =
 
 
 
-static SCREEN_UPDATE_RGB32(mpu4_vid)
+UINT32 mpu4vid_state::screen_update_mpu4_vid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	mpu4vid_state *state = screen.machine().driver_data<mpu4vid_state>();
 
 	bitmap.fill(0, cliprect);
 
-	state->m_scn2674->scn2574_draw(screen.machine(), bitmap, cliprect, state->m_vid_mainram );
+	m_scn2674->scn2574_draw(screen.machine(), bitmap, cliprect, m_vid_mainram );
 
 	return 0;
 }
@@ -1518,7 +1518,7 @@ static MACHINE_CONFIG_START( mpu4_vid, mpu4vid_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, (63*8)+(0)-1, 0, (37*8)+0-1)
 
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_STATIC(mpu4_vid)
+	MCFG_SCREEN_UPDATE_DRIVER(mpu4vid_state, screen_update_mpu4_vid)
 
 	MCFG_DEVICE_ADD("scn2674_vid", SCN2674_VIDEO, 0)
 	scn2674_device::set_irq_update_callback(*device, update_mpu68_interrupts);

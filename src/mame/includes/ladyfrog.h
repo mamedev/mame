@@ -58,6 +58,7 @@ public:
 	virtual void video_start();
 	DECLARE_VIDEO_START(toucheme);
 	DECLARE_VIDEO_START(ladyfrog_common);
+	UINT32 screen_update_ladyfrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -67,4 +68,4 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( ladyfrog );
+

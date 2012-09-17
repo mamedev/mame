@@ -1535,8 +1535,8 @@ static MACHINE_CONFIG_START( model1, model1_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/)
-	MCFG_SCREEN_UPDATE_STATIC(model1)
-	MCFG_SCREEN_VBLANK_STATIC(model1)
+	MCFG_SCREEN_UPDATE_DRIVER(model1_state, screen_update_model1)
+	MCFG_SCREEN_VBLANK_DRIVER(model1_state, screen_eof_model1)
 
 	MCFG_PALETTE_LENGTH(8192)
 
@@ -1584,8 +1584,8 @@ static MACHINE_CONFIG_START( model1_vr, model1_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/)
-	MCFG_SCREEN_UPDATE_STATIC(model1)
-	MCFG_SCREEN_VBLANK_STATIC(model1)
+	MCFG_SCREEN_UPDATE_DRIVER(model1_state, screen_update_model1)
+	MCFG_SCREEN_VBLANK_DRIVER(model1_state, screen_eof_model1)
 
 	MCFG_PALETTE_LENGTH(8192)
 

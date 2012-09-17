@@ -56,6 +56,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -110,9 +111,8 @@ WRITE16_MEMBER(cubeqst_state::palette_w)
 }
 
 /* TODO: This is a simplified version of what actually happens */
-static SCREEN_UPDATE_RGB32( cubeqst )
+UINT32 cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	cubeqst_state *state = screen.machine().driver_data<cubeqst_state>();
 	int y;
 
 	/*
@@ -121,7 +121,7 @@ static SCREEN_UPDATE_RGB32( cubeqst )
     */
 
 	/* Bit 3 selects LD/#GRAPHICS */
-	bitmap.fill(state->m_colormap[255], cliprect);
+	bitmap.fill(m_colormap[255], cliprect);
 
 	/* TODO: Add 1 for linebuffering? */
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
@@ -133,7 +133,7 @@ static SCREEN_UPDATE_RGB32( cubeqst )
 		UINT32 pen;
 
 		/* Zap the depth buffer */
-		memset(state->m_depth_buffer, 0xff, 512);
+		memset(m_depth_buffer, 0xff, 512);
 
 		/* Process all the spans on this scanline */
 		if (y < 256)
@@ -170,13 +170,13 @@ static SCREEN_UPDATE_RGB32( cubeqst )
 				}
 
 				/* Draw the span, testing for depth */
-				pen = state->m_colormap[state->m_generic_paletteram_16[color]];
+				pen = m_colormap[m_generic_paletteram_16[color]];
 				for (x = h1; x <= h2; ++x)
 				{
-					if (!(state->m_depth_buffer[x] < depth))
+					if (!(m_depth_buffer[x] < depth))
 					{
 						dest[x] = pen;
-						state->m_depth_buffer[x] = depth;
+						m_depth_buffer[x] = depth;
 					}
 				}
 			}
@@ -532,7 +532,7 @@ static MACHINE_CONFIG_START( cubeqst, cubeqst_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_LASERDISC_SIMUTREK_ADD("laserdisc")
-	MCFG_LASERDISC_OVERLAY_STATIC(CUBEQST_HBLANK, CUBEQST_VCOUNT, cubeqst)
+	MCFG_LASERDISC_OVERLAY_DRIVER(CUBEQST_HBLANK, CUBEQST_VCOUNT, cubeqst_state, screen_update_cubeqst)
 	MCFG_LASERDISC_OVERLAY_CLIP(0, 320-1, 0, 256-8)
 	MCFG_LASERDISC_OVERLAY_POSITION(0.002f, -0.018f)
 	MCFG_LASERDISC_OVERLAY_SCALE(1.0f, 1.030f)

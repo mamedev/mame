@@ -350,13 +350,13 @@ PALETTE_INIT_MEMBER(svision_state,svisionp)
 	}
 }
 
-static SCREEN_UPDATE_IND16( svision )
+UINT32 svision_state::screen_update_svision(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	svision_state *state = screen.machine().driver_data<svision_state>();
 	int x, y, i, j=XPOS/4+YPOS*0x30;
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 
-	if (state->BANK&8)
+	if (BANK&8)
 	{
 		for (y=0; y<160; y++)
 		{
@@ -382,13 +382,13 @@ static SCREEN_UPDATE_IND16( svision )
 	return 0;
 }
 
-static SCREEN_UPDATE_RGB32( tvlink )
+UINT32 svision_state::screen_update_tvlink(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	svision_state *state = screen.machine().driver_data<svision_state>();
 	int x, y, i, j = XPOS/4+YPOS*0x30;
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 
-	if (state->BANK & 8)
+	if (BANK & 8)
 	{
 		for (y = 0; y < 160; y++)
 		{
@@ -396,10 +396,10 @@ static SCREEN_UPDATE_RGB32( tvlink )
 			for (x = 3 - (XPOS & 3), i = 0; x < 160 + 3 && x < XSIZE + 3; x += 4, i++)
 			{
 				UINT8 b=videoram[j+i];
-				line[3]=state->m_tvlink.palette[(b>>6)&3];
-				line[2]=state->m_tvlink.palette[(b>>4)&3];
-				line[1]=state->m_tvlink.palette[(b>>2)&3];
-				line[0]=state->m_tvlink.palette[(b>>0)&3];
+				line[3]=m_tvlink.palette[(b>>6)&3];
+				line[2]=m_tvlink.palette[(b>>4)&3];
+				line[1]=m_tvlink.palette[(b>>2)&3];
+				line[0]=m_tvlink.palette[(b>>0)&3];
 				line+=4;
 			}
 			j += 0x30;
@@ -522,7 +522,7 @@ static MACHINE_CONFIG_START( svision, svision_state )
 	MCFG_SCREEN_REFRESH_RATE(61)
 	MCFG_SCREEN_SIZE(3+160+3, 160)
 	MCFG_SCREEN_VISIBLE_AREA(3+0, 3+160-1, 0, 160-1)
-	MCFG_SCREEN_UPDATE_STATIC( svision )
+	MCFG_SCREEN_UPDATE_DRIVER(svision_state, screen_update_svision)
 
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(svision_palette) * 3)
 
@@ -572,7 +572,7 @@ static MACHINE_CONFIG_DERIVED( tvlinkp, svisionp )
 	MCFG_MACHINE_RESET_OVERRIDE(svision_state, tvlink )
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC( tvlink )
+	MCFG_SCREEN_UPDATE_DRIVER(svision_state, screen_update_tvlink)
 
 MACHINE_CONFIG_END
 

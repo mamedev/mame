@@ -15,9 +15,8 @@ void pp01_state::video_start()
 {
 }
 
-SCREEN_UPDATE_IND16( pp01 )
+UINT32 pp01_state::screen_update_pp01(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pp01_state *state = screen.machine().driver_data<pp01_state>();
 	UINT8 code_r,code_g,code_b;
 	UINT8 col;
 	int y, x, b;
@@ -27,9 +26,9 @@ SCREEN_UPDATE_IND16( pp01 )
 	{
 		for (x = 0; x < 32; x++)
 		{
-			code_r = ram[0x6000 + ((y+state->m_video_scroll)&0xff)*32 + x];
-			code_g = ram[0xa000 + ((y+state->m_video_scroll)&0xff)*32 + x];
-			code_b = ram[0xe000 + ((y+state->m_video_scroll)&0xff)*32 + x];
+			code_r = ram[0x6000 + ((y+m_video_scroll)&0xff)*32 + x];
+			code_g = ram[0xa000 + ((y+m_video_scroll)&0xff)*32 + x];
+			code_b = ram[0xe000 + ((y+m_video_scroll)&0xff)*32 + x];
 			for (b = 0; b < 8; b++)
 			{
 				col = (((code_r >> b) & 0x01) ? 4 : 0) + (((code_g >> b) & 0x01) ? 2 : 0) + (((code_b >> b) & 0x01) ? 1 : 0);

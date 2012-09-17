@@ -174,11 +174,10 @@ static TIMER_CALLBACK( tank8_collision_callback )
 }
 
 
-SCREEN_UPDATE_IND16( tank8 )
+UINT32 tank8_state::screen_update_tank8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tank8_state *state = screen.machine().driver_data<tank8_state>();
-	set_pens(state, screen.machine().colortable);
-	state->m_tilemap->draw(bitmap, cliprect, 0, 0);
+	set_pens(this, screen.machine().colortable);
+	m_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	draw_bullets(screen.machine(), bitmap, cliprect);
@@ -186,31 +185,30 @@ SCREEN_UPDATE_IND16( tank8 )
 }
 
 
-SCREEN_VBLANK( tank8 )
+void tank8_state::screen_eof_tank8(screen_device &screen, bool state)
 {
 	// on falling edge
-	if (!vblank_on)
+	if (!state)
 	{
-		tank8_state *state = screen.machine().driver_data<tank8_state>();
 		int x;
 		int y;
 		const rectangle &visarea = screen.machine().primary_screen->visible_area();
 
-		state->m_tilemap->draw(state->m_helper1, visarea, 0, 0);
+		m_tilemap->draw(m_helper1, visarea, 0, 0);
 
-		state->m_helper2.fill(8, visarea);
-		state->m_helper3.fill(8, visarea);
+		m_helper2.fill(8, visarea);
+		m_helper3.fill(8, visarea);
 
-		draw_sprites(screen.machine(), state->m_helper2, visarea);
-		draw_bullets(screen.machine(), state->m_helper3, visarea);
+		draw_sprites(screen.machine(), m_helper2, visarea);
+		draw_bullets(screen.machine(), m_helper3, visarea);
 
 		for (y = visarea.min_y; y <= visarea.max_y; y++)
 		{
 			int _state = 0;
 
-			const UINT16* p1 = &state->m_helper1.pix16(y);
-			const UINT16* p2 = &state->m_helper2.pix16(y);
-			const UINT16* p3 = &state->m_helper3.pix16(y);
+			const UINT16* p1 = &m_helper1.pix16(y);
+			const UINT16* p2 = &m_helper2.pix16(y);
+			const UINT16* p3 = &m_helper3.pix16(y);
 
 			if (y % 2 != screen.machine().primary_screen->frame_number() % 2)
 				continue; /* video display is interlaced */
@@ -264,10 +262,10 @@ SCREEN_VBLANK( tank8 )
 					if (p1[x] == 0x11)
 						index |= 0x20;
 
-					if (y - get_y_pos(state, sprite_num) >= 8)
+					if (y - get_y_pos(this, sprite_num) >= 8)
 						index |= 0x40; /* collision on bottom side */
 
-					if (x - get_x_pos(state, sprite_num) >= 8)
+					if (x - get_x_pos(this, sprite_num) >= 8)
 						index |= 0x80; /* collision on right side */
 				}
 

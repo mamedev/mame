@@ -75,6 +75,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(samurai_protection_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed);
 	DECLARE_MACHINE_START(frogs_audio);
+	UINT32 screen_update_vicdual_bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_vicdual_bw_or_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_vicdual_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -86,9 +89,9 @@ int vicdual_is_cabinet_color(running_machine &machine);
 /*----------- defined in video/vicdual.c -----------*/
 
 
-SCREEN_UPDATE_RGB32( vicdual_bw );
-SCREEN_UPDATE_RGB32( vicdual_color );
-SCREEN_UPDATE_RGB32( vicdual_bw_or_color );
+
+
+
 
 
 /*----------- defined in audio/vicdual.c -----------*/

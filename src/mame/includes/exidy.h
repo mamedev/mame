@@ -67,6 +67,7 @@ public:
 	DECLARE_DRIVER_INIT(phantoma);
 	virtual void video_start();
 	DECLARE_MACHINE_START(teetert);
+	UINT32 screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -74,7 +75,7 @@ public:
 
 void exidy_video_config(running_machine &machine, UINT8 _collision_mask, UINT8 _collision_invert, int _is_2bpp);
 
-SCREEN_UPDATE_IND16( exidy );
+
 
 INTERRUPT_GEN( exidy_vblank_interrupt );
 

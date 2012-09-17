@@ -62,6 +62,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_FG);
 	DECLARE_VIDEO_START(madalien);
 	DECLARE_PALETTE_INIT(madalien);
+	UINT32 screen_update_madalien(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 

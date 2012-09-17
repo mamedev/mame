@@ -97,18 +97,17 @@ void rungun_state::video_start()
 	m_sprite_colorbase = 0x20;
 }
 
-SCREEN_UPDATE_IND16(rng)
+UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	rungun_state *state = screen.machine().driver_data<rungun_state>();
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	k053936_zoom_draw(state->m_k053936, bitmap, cliprect, state->m_936_tilemap, 0, 0, 1);
+	k053936_zoom_draw(m_k053936, bitmap, cliprect, m_936_tilemap, 0, 0, 1);
 
-	k053247_sprites_draw(state->m_k055673, bitmap, cliprect);
+	k053247_sprites_draw(m_k055673, bitmap, cliprect);
 
-	state->m_ttl_tilemap->mark_all_dirty();
-	state->m_ttl_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_ttl_tilemap->mark_all_dirty();
+	m_ttl_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -252,7 +252,7 @@ static MACHINE_CONFIG_START( comquest, comquest_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(64*4, 128)	/* 160 x 102 */
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*4-1, 0, 128-1)
-	MCFG_SCREEN_UPDATE_STATIC( comquest )
+	MCFG_SCREEN_UPDATE_DRIVER(comquest_state, screen_update_comquest)
 
 	MCFG_GFXDECODE( comquest )
 	MCFG_PALETTE_LENGTH(2)

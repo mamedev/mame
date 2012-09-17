@@ -77,6 +77,8 @@ public:
 	DECLARE_MACHINE_START(arkanoid);
 	DECLARE_MACHINE_RESET(arkanoid);
 	DECLARE_VIDEO_START(arkanoid);
+	UINT32 screen_update_arkanoid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_hexa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 

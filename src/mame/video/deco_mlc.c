@@ -493,22 +493,21 @@ static void draw_sprites(running_machine& machine, bitmap_rgb32 &bitmap,const re
 	}
 }
 
-SCREEN_VBLANK( mlc )
+void deco_mlc_state::screen_eof_mlc(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		deco_mlc_state *state = screen.machine().driver_data<deco_mlc_state>();
 		/* Spriteram is definitely double buffered, as the vram lookup tables
         are often updated a frame after spriteram is setup to point to a new
         lookup table.  Without buffering incorrect one frame glitches are seen
         in several places, especially in Hoops.
         */
-		memcpy(state->m_mlc_buffered_spriteram, state->m_spriteram, 0x3000);
+		memcpy(m_mlc_buffered_spriteram, m_spriteram, 0x3000);
 	}
 }
 
-SCREEN_UPDATE_RGB32( mlc )
+UINT32 deco_mlc_state::screen_update_mlc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 //  temp_bitmap->fill(0, cliprect);
 	bitmap.fill(screen.machine().pens[0], cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */

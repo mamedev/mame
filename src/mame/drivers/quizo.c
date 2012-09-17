@@ -42,6 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port60_w);
 	DECLARE_DRIVER_INIT(quizo);
 	virtual void palette_init();
+	UINT32 screen_update_quizo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -79,10 +80,9 @@ void quizo_state::palette_init()
 	}
 }
 
-static SCREEN_UPDATE_IND16( quizo )
+UINT32 quizo_state::screen_update_quizo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	quizo_state *state = screen.machine().driver_data<quizo_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int x,y;
 	for(y=0;y<200;y++)
 	{
@@ -216,7 +216,7 @@ static MACHINE_CONFIG_START( quizo, quizo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 320-1, 0*8, 200-1)
-	MCFG_SCREEN_UPDATE_STATIC(quizo)
+	MCFG_SCREEN_UPDATE_DRIVER(quizo_state, screen_update_quizo)
 
 	MCFG_PALETTE_LENGTH(16)
 

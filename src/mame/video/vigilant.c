@@ -261,10 +261,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	}
 }
 
-SCREEN_UPDATE_IND16( kikcubic )
+UINT32 vigilant_state::screen_update_kikcubic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	vigilant_state *state = screen.machine().driver_data<vigilant_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int offs;
 
 	for (offs = 0; offs < 0x1000; offs += 2)
@@ -286,9 +285,8 @@ SCREEN_UPDATE_IND16( kikcubic )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( vigilant )
+UINT32 vigilant_state::screen_update_vigilant(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	vigilant_state *state = screen.machine().driver_data<vigilant_state>();
 	int i;
 
 	/* copy the background palette */
@@ -297,20 +295,20 @@ SCREEN_UPDATE_IND16( vigilant )
 		int r,g,b;
 
 
-		r = (state->m_generic_paletteram_8[0x400 + 16 * state->m_rear_color + i] << 3) & 0xFF;
-		g = (state->m_generic_paletteram_8[0x500 + 16 * state->m_rear_color + i] << 3) & 0xFF;
-		b = (state->m_generic_paletteram_8[0x600 + 16 * state->m_rear_color + i] << 3) & 0xFF;
+		r = (m_generic_paletteram_8[0x400 + 16 * m_rear_color + i] << 3) & 0xFF;
+		g = (m_generic_paletteram_8[0x500 + 16 * m_rear_color + i] << 3) & 0xFF;
+		b = (m_generic_paletteram_8[0x600 + 16 * m_rear_color + i] << 3) & 0xFF;
 
 		palette_set_color(screen.machine(),512 + i,MAKE_RGB(r,g,b));
 
-		r = (state->m_generic_paletteram_8[0x400 + 16 * state->m_rear_color + 32 + i] << 3) & 0xFF;
-		g = (state->m_generic_paletteram_8[0x500 + 16 * state->m_rear_color + 32 + i] << 3) & 0xFF;
-		b = (state->m_generic_paletteram_8[0x600 + 16 * state->m_rear_color + 32 + i] << 3) & 0xFF;
+		r = (m_generic_paletteram_8[0x400 + 16 * m_rear_color + 32 + i] << 3) & 0xFF;
+		g = (m_generic_paletteram_8[0x500 + 16 * m_rear_color + 32 + i] << 3) & 0xFF;
+		b = (m_generic_paletteram_8[0x600 + 16 * m_rear_color + 32 + i] << 3) & 0xFF;
 
 		palette_set_color(screen.machine(),512 + 16 + i,MAKE_RGB(r,g,b));
 	}
 
-	if (state->m_rear_disable)	 /* opaque foreground */
+	if (m_rear_disable)	 /* opaque foreground */
 	{
 		draw_foreground(screen.machine(),bitmap,cliprect,0,1);
 		draw_sprites(screen.machine(),bitmap,bottomvisiblearea);

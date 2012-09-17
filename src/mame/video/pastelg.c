@@ -296,10 +296,9 @@ void pastelg_state::video_start()
 
 
 ******************************************************************************/
-SCREEN_UPDATE_IND16( pastelg )
+UINT32 pastelg_state::screen_update_pastelg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pastelg_state *state = screen.machine().driver_data<pastelg_state>();
-	if (state->m_dispflag)
+	if (m_dispflag)
 	{
 		int x, y;
 		int width = screen.width();
@@ -307,7 +306,7 @@ SCREEN_UPDATE_IND16( pastelg )
 
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
-				bitmap.pix16(y, x) = state->m_videoram[(y * width) + x];
+				bitmap.pix16(y, x) = m_videoram[(y * width) + x];
 	}
 	else
 		bitmap.fill(0, cliprect);

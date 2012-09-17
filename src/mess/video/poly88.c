@@ -26,9 +26,8 @@ void poly88_state::video_start()
 	m_FNT = memregion("chargen")->base();
 }
 
-SCREEN_UPDATE_IND16( poly88 )
+UINT32 poly88_state::screen_update_poly88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	poly88_state *state = screen.machine().driver_data<poly88_state>();
 	int x,y,j,b;
 	UINT16 addr;
 	int xpos;
@@ -40,7 +39,7 @@ SCREEN_UPDATE_IND16( poly88 )
 		xpos = 0;
 		for(x = 0; x < 64; x++ )
 		{
-			UINT8 code = state->m_video_ram[addr + x];
+			UINT8 code = m_video_ram[addr + x];
 			if ((code & 0x80)==0)
 			{
 				for(j = 0; j < 15; j++ )
@@ -78,12 +77,12 @@ SCREEN_UPDATE_IND16( poly88 )
 					if (mcm6571a_shift[code]==0)
 					{
 						if (j < 9)
-							l = state->m_FNT[code*16 + j];
+							l = m_FNT[code*16 + j];
 					}
 					else
 					{
 						if ((j > 2) && (j < 12))
-							l = state->m_FNT[code*16 + j - 3];
+							l = m_FNT[code*16 + j - 3];
 					}
 
 					for(b = 0; b < 7; b++ )

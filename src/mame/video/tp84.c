@@ -172,9 +172,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 }
 
 
-SCREEN_UPDATE_IND16( tp84 )
+UINT32 tp84_state::screen_update_tp84(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tp84_state *state = screen.machine().driver_data<tp84_state>();
 	rectangle clip = cliprect;
 	const rectangle &visarea = screen.visible_area();
 
@@ -182,25 +181,25 @@ SCREEN_UPDATE_IND16( tp84 )
 	{
 		screen.machine().tilemap().mark_all_dirty();
 
-		state->m_bg_tilemap->set_scrollx(0, *state->m_scroll_x);
-		state->m_bg_tilemap->set_scrolly(0, *state->m_scroll_y);
+		m_bg_tilemap->set_scrollx(0, *m_scroll_x);
+		m_bg_tilemap->set_scrolly(0, *m_scroll_y);
 
-		screen.machine().tilemap().set_flip_all(((*state->m_flipscreen_x & 0x01) ? TILEMAP_FLIPX : 0) |
-									   ((*state->m_flipscreen_y & 0x01) ? TILEMAP_FLIPY : 0));
+		screen.machine().tilemap().set_flip_all(((*m_flipscreen_x & 0x01) ? TILEMAP_FLIPX : 0) |
+									   ((*m_flipscreen_y & 0x01) ? TILEMAP_FLIPY : 0));
 	}
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	/* draw top status region */
 	clip.min_x = visarea.min_x;
 	clip.max_x = visarea.min_x + 15;
-	state->m_fg_tilemap->draw(bitmap, clip, 0, 0);
+	m_fg_tilemap->draw(bitmap, clip, 0, 0);
 
 	/* draw bottom status region */
 	clip.min_x = visarea.max_x - 15;
 	clip.max_x = visarea.max_x;
-	state->m_fg_tilemap->draw(bitmap, clip, 0, 0);
+	m_fg_tilemap->draw(bitmap, clip, 0, 0);
 
 	return 0;
 }

@@ -192,12 +192,11 @@ VIDEO_START_MEMBER(snk6502_state,pballoon)
 }
 
 
-SCREEN_UPDATE_IND16( snk6502 )
+UINT32 snk6502_state::screen_update_snk6502(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	snk6502_state *state = screen.machine().driver_data<snk6502_state>();
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

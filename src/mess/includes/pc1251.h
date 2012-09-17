@@ -26,6 +26,7 @@ public:
 	UINT8 m_reg[0x100];
 
 	DECLARE_DRIVER_INIT(pc1251);
+	UINT32 screen_update_pc1251(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -47,7 +48,7 @@ MACHINE_START( pc1251 );
 
 DECLARE_READ8_HANDLER(pc1251_lcd_read);
 DECLARE_WRITE8_HANDLER(pc1251_lcd_write);
-SCREEN_UPDATE_IND16( pc1251 );
+
 
 
 #endif /* PC1251_H_ */

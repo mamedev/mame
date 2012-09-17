@@ -493,6 +493,7 @@ public:
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	virtual void video_start();
+	UINT32 screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -536,9 +537,8 @@ void majorpkr_state::video_start()
 }
 
 
-static SCREEN_UPDATE_IND16(majorpkr)
+UINT32 majorpkr_state::screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	majorpkr_state *state = screen.machine().driver_data<majorpkr_state>();
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
@@ -550,13 +550,13 @@ static SCREEN_UPDATE_IND16(majorpkr)
 	custom_clip = cliprect;
 	custom_clip.max_x -= 16;
 
-	state->m_bg_tilemap->draw(bitmap, custom_clip, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, custom_clip, 0, 0);
+	m_bg_tilemap->draw(bitmap, custom_clip, 0, 0);
+	m_fg_tilemap->draw(bitmap, custom_clip, 0, 0);
 
-	if (state->m_flip_state == 1)
+	if (m_flip_state == 1)
 	{
-		state->m_bg_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
-		state->m_fg_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
+		m_bg_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
+		m_fg_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
 	}
 
 	return 0;
@@ -1046,7 +1046,7 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 	MCFG_GFXDECODE(majorpkr)
 	MCFG_PALETTE_LENGTH(0x100 * 16)
 
-	MCFG_SCREEN_UPDATE_STATIC(majorpkr)
+	MCFG_SCREEN_UPDATE_DRIVER(majorpkr_state, screen_update_majorpkr)
 
 	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf) /* verified */
 

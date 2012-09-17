@@ -499,28 +499,26 @@ static void prosoccr_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 
 /***************************************************************************/
 
-SCREEN_UPDATE_IND16( prosoccr )
+UINT32 liberate_state::screen_update_prosoccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	liberate_state *state = screen.machine().driver_data<liberate_state>();
-	state->m_back_tilemap->set_scrolly(0,  state->m_io_ram[1]);
-	state->m_back_tilemap->set_scrollx(0, -state->m_io_ram[0]);
+	m_back_tilemap->set_scrolly(0,  m_io_ram[1]);
+	m_back_tilemap->set_scrollx(0, -m_io_ram[0]);
 
-	if (state->m_background_disable)
+	if (m_background_disable)
 		bitmap.fill(32, cliprect);
 	else
-		state->m_back_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_back_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	state->m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
 	prosoccr_draw_sprites(screen.machine(), bitmap, cliprect);
 
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( prosport )
+UINT32 liberate_state::screen_update_prosport(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	liberate_state *state = screen.machine().driver_data<liberate_state>();
-	UINT8 *videoram = state->m_videoram;
-	UINT8 *colorram = state->m_colorram;
+	UINT8 *videoram = m_videoram;
+	UINT8 *colorram = m_colorram;
 	int mx, my, tile, offs, gfx_region;
 	int scrollx, scrolly;
 
@@ -528,13 +526,13 @@ SCREEN_UPDATE_IND16( prosport )
 
 	offs = 0;
 	/* TODO: what's bits 0 and 2 for? Internal scrolling state? */
-	scrolly = ((state->m_io_ram[0] & 0x8) << 5);
-	scrollx = ((state->m_io_ram[0] & 0x2) << 7) | (state->m_io_ram[1]);
+	scrolly = ((m_io_ram[0] & 0x8) << 5);
+	scrollx = ((m_io_ram[0] & 0x2) << 7) | (m_io_ram[1]);
 
-	state->m_back_tilemap->set_scrolly(0, scrolly);
-	state->m_back_tilemap->set_scrollx(0, -scrollx);
+	m_back_tilemap->set_scrolly(0, scrolly);
+	m_back_tilemap->set_scrollx(0, -scrollx);
 
-	state->m_back_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_back_tilemap->draw(bitmap, cliprect, 0, 0);
 
 //  popmessage("%d %02x %02x %02x %02x %02x %02x %02x %02x",scrollx,deco16_io_ram[0],deco16_io_ram[1],deco16_io_ram[2],deco16_io_ram[3]
 //  ,deco16_io_ram[4],deco16_io_ram[5],deco16_io_ram[6],deco16_io_ram[7]);
@@ -543,10 +541,10 @@ SCREEN_UPDATE_IND16( prosport )
 	{
 		tile = videoram[offs] + ((colorram[offs] & 0x3) << 8);
 
-		if(state->m_io_ram[0] & 0x40) //dynamic ram-based gfxs for Pro Golf
+		if(m_io_ram[0] & 0x40) //dynamic ram-based gfxs for Pro Golf
 			gfx_region = 3;
 		else
-			gfx_region = ((state->m_io_ram[0] & 0x30) >> 4);
+			gfx_region = ((m_io_ram[0] & 0x30) >> 4);
 
 		my = (offs) % 32;
 		mx = (offs) / 32;
@@ -560,38 +558,36 @@ SCREEN_UPDATE_IND16( prosport )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( boomrang )
+UINT32 liberate_state::screen_update_boomrang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	liberate_state *state = screen.machine().driver_data<liberate_state>();
-	state->m_back_tilemap->set_scrolly(0,  state->m_io_ram[1]);
-	state->m_back_tilemap->set_scrollx(0, -state->m_io_ram[0]);
+	m_back_tilemap->set_scrolly(0,  m_io_ram[1]);
+	m_back_tilemap->set_scrollx(0, -m_io_ram[0]);
 
-	if (state->m_background_disable)
+	if (m_background_disable)
 		bitmap.fill(32, cliprect);
 	else
-		state->m_back_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+		m_back_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 
 	boomrang_draw_sprites(screen.machine(),bitmap,cliprect,8);
-	if (!state->m_background_disable)
-		state->m_back_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	if (!m_background_disable)
+		m_back_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 
 	boomrang_draw_sprites(screen.machine(), bitmap, cliprect, 0);
-	state->m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( liberate )
+UINT32 liberate_state::screen_update_liberate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	liberate_state *state = screen.machine().driver_data<liberate_state>();
-	state->m_back_tilemap->set_scrolly(0,  state->m_io_ram[1]);
-	state->m_back_tilemap->set_scrollx(0, -state->m_io_ram[0]);
+	m_back_tilemap->set_scrolly(0,  m_io_ram[1]);
+	m_back_tilemap->set_scrollx(0, -m_io_ram[0]);
 
-	if (state->m_background_disable)
+	if (m_background_disable)
 		bitmap.fill(32, cliprect);
 	else
-		state->m_back_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_back_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	liberate_draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

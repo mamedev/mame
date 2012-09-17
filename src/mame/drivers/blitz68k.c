@@ -173,6 +173,8 @@ public:
 	DECLARE_DRIVER_INIT(dualgame);
 	DECLARE_VIDEO_START(blitz68k);
 	DECLARE_VIDEO_START(blitz68k_addr_factor1);
+	UINT32 screen_update_blitz68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 /*************************************************************************************************************
@@ -206,12 +208,11 @@ VIDEO_START_MEMBER(blitz68k_state,blitz68k_addr_factor1)
 	blit.addr_factor = 1;
 }
 
-static SCREEN_UPDATE_RGB32(blitz68k)
+UINT32 blitz68k_state::screen_update_blitz68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	blitz68k_state *state = screen.machine().driver_data<blitz68k_state>();
 	int x,y;
 
-	UINT8 *src = state->m_blit_buffer;
+	UINT8 *src = m_blit_buffer;
 
 	for(y = 0; y < 256; y++)
 	{
@@ -227,12 +228,11 @@ static SCREEN_UPDATE_RGB32(blitz68k)
 // Blitter-less board (SPI-68K)
 
 
-static SCREEN_UPDATE_RGB32(blitz68k_noblit)
+UINT32 blitz68k_state::screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	blitz68k_state *state = screen.machine().driver_data<blitz68k_state>();
 	int x,y;
 
-	UINT16 *src = state->m_frame_buffer;
+	UINT16 *src = m_frame_buffer;
 
 	for(y = 0; y < 256; y++)
 	{
@@ -1722,7 +1722,7 @@ static MACHINE_CONFIG_START( ilpag, blitz68k_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(blitz68k)
+	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1797,7 +1797,7 @@ static MACHINE_CONFIG_START( cjffruit, blitz68k_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-8-1)
-	MCFG_SCREEN_UPDATE_STATIC(blitz68k)
+	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
 	MCFG_MC6845_ADD("crtc", R6545_1, XTAL_22_1184MHz/8, mc6845_intf_irq1)
 
@@ -1829,7 +1829,7 @@ static MACHINE_CONFIG_START( bankrob, blitz68k_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
-	MCFG_SCREEN_UPDATE_STATIC(blitz68k)
+	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
 	MCFG_MC6845_ADD("crtc", H46505, XTAL_11_0592MHz/4, mc6845_intf_irq3)
 
@@ -1859,7 +1859,7 @@ static MACHINE_CONFIG_START( bankroba, blitz68k_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+7, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(blitz68k)
+	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
 	MCFG_MC6845_ADD("crtc", H46505, XTAL_11_0592MHz/4, mc6845_intf_irq5)
 
@@ -1888,7 +1888,7 @@ static MACHINE_CONFIG_START( deucesw2, blitz68k_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(blitz68k)
+	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
 	MCFG_MC6845_ADD("crtc", R6545_1, XTAL_22_1184MHz/8, mc6845_intf_irq3)
 
@@ -1919,7 +1919,7 @@ static MACHINE_CONFIG_START( dualgame, blitz68k_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
-	MCFG_SCREEN_UPDATE_STATIC(blitz68k)
+	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
 	MCFG_MC6845_ADD("crtc", H46505, XTAL_11_0592MHz/4, mc6845_intf_irq3)
 
@@ -1948,7 +1948,7 @@ static MACHINE_CONFIG_START( hermit, blitz68k_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
-	MCFG_SCREEN_UPDATE_STATIC(blitz68k)
+	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
 	MCFG_MC6845_ADD("crtc", H46505, XTAL_22_1184MHz/8, mc6845_intf_irq1)
 
@@ -1982,7 +1982,7 @@ static MACHINE_CONFIG_START( maxidbl, blitz68k_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(blitz68k_noblit)
+	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k_noblit)
 
 	MCFG_MC6845_ADD("crtc", H46505, XTAL_11_0592MHz/4, mc6845_intf_irq3)
 

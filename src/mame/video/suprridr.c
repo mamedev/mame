@@ -157,35 +157,34 @@ WRITE8_MEMBER(suprridr_state::suprridr_fgram_w)
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( suprridr )
+UINT32 suprridr_state::screen_update_suprridr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	suprridr_state *state = screen.machine().driver_data<suprridr_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	rectangle subclip;
 	int i;
 	const rectangle &visarea = screen.visible_area();
 
 	/* render left 4 columns with no scroll */
 	subclip = visarea;;
-	subclip.max_x = subclip.min_x + (state->m_flipx ? 1*8 : 4*8) - 1;
+	subclip.max_x = subclip.min_x + (m_flipx ? 1*8 : 4*8) - 1;
 	subclip &= cliprect;
-	state->m_bg_tilemap_noscroll->draw(bitmap, subclip, 0, 0);
+	m_bg_tilemap_noscroll->draw(bitmap, subclip, 0, 0);
 
 	/* render right 1 column with no scroll */
 	subclip = visarea;;
-	subclip.min_x = subclip.max_x - (state->m_flipx ? 4*8 : 1*8) + 1;
+	subclip.min_x = subclip.max_x - (m_flipx ? 4*8 : 1*8) + 1;
 	subclip &= cliprect;
-	state->m_bg_tilemap_noscroll->draw(bitmap, subclip, 0, 0);
+	m_bg_tilemap_noscroll->draw(bitmap, subclip, 0, 0);
 
 	/* render the middle columns normally */
 	subclip = visarea;;
-	subclip.min_x += state->m_flipx ? 1*8 : 4*8;
-	subclip.max_x -= state->m_flipx ? 4*8 : 1*8;
+	subclip.min_x += m_flipx ? 1*8 : 4*8;
+	subclip.max_x -= m_flipx ? 4*8 : 1*8;
 	subclip &= cliprect;
-	state->m_bg_tilemap->draw(bitmap, subclip, 0, 0);
+	m_bg_tilemap->draw(bitmap, subclip, 0, 0);
 
 	/* render the top layer */
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	for (i = 0; i < 48; i++)
@@ -197,12 +196,12 @@ SCREEN_UPDATE_IND16( suprridr )
 		int x = spriteram[i*4+3];
 		int y = 240 - spriteram[i*4+0];
 
-		if (state->m_flipx)
+		if (m_flipx)
 		{
 			fx = !fx;
 			x = 240 - x;
 		}
-		if (state->m_flipy)
+		if (m_flipy)
 		{
 			fy = !fy;
 			y = 240 - y;

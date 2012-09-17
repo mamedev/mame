@@ -165,40 +165,39 @@ void bankp_state::video_start()
 	save_item(NAME(m_priority));
 }
 
-SCREEN_UPDATE_IND16( bankp )
+UINT32 bankp_state::screen_update_bankp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bankp_state *state = screen.machine().driver_data<bankp_state>();
 
-	if (state->flip_screen())
+	if (flip_screen())
 	{
-		state->m_fg_tilemap->set_scrollx(0, -state->m_scroll_x);
-		state->m_bg_tilemap->set_scrollx(0, 0);
+		m_fg_tilemap->set_scrollx(0, -m_scroll_x);
+		m_bg_tilemap->set_scrollx(0, 0);
 	}
 	else
 	{
-		state->m_fg_tilemap->set_scrollx(0, state->m_scroll_x);
-		state->m_bg_tilemap->set_scrollx(0, 0);
+		m_fg_tilemap->set_scrollx(0, m_scroll_x);
+		m_bg_tilemap->set_scrollx(0, 0);
 	}
 
 
 	// only one bit matters?
-	switch (state->m_priority)
+	switch (m_priority)
 	{
 	case 0: // combat hawk uses this
-		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 		break;
 	case 1:
-		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 		break;
 	case 2:
-		state->m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 		break;
 	case 3:
-		state->m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0); // just a guess
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0); // just a guess
+		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 		break;
 	}
 	return 0;

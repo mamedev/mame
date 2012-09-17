@@ -66,14 +66,13 @@ WRITE8_MEMBER(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)
 }
 
 /* Only used by ghostb, gondo, garyoret, other games can control buffering */
-static SCREEN_VBLANK( dec8 )
+void dec8_state::screen_eof_dec8(screen_device &screen, bool state)
 {
-	dec8_state *state = screen.machine().driver_data<dec8_state>();
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
 		address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-		state->dec8_mxc06_karn_buffer_spriteram_w(space, 0, 0);
+		dec8_mxc06_karn_buffer_spriteram_w(space, 0, 0);
 	}
 }
 
@@ -2056,7 +2055,7 @@ static MACHINE_CONFIG_START( lastmisn, dec8_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(lastmisn)
+	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_lastmisn)
 
 	MCFG_GFXDECODE(shackled)
 	MCFG_PALETTE_LENGTH(1024)
@@ -2103,7 +2102,7 @@ static MACHINE_CONFIG_START( shackled, dec8_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(shackled)
+	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_shackled)
 
 	MCFG_GFXDECODE(shackled)
 	MCFG_PALETTE_LENGTH(1024)
@@ -2150,8 +2149,8 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(gondo)
-	MCFG_SCREEN_VBLANK_STATIC(dec8)
+	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_gondo)
+	MCFG_SCREEN_VBLANK_DRIVER(dec8_state, screen_eof_dec8)
 
 	MCFG_GFXDECODE(gondo)
 	MCFG_PALETTE_LENGTH(1024)
@@ -2198,8 +2197,8 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(garyoret)
-	MCFG_SCREEN_VBLANK_STATIC(dec8)
+	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_garyoret)
+	MCFG_SCREEN_VBLANK_DRIVER(dec8_state, screen_eof_dec8)
 
 	MCFG_GFXDECODE(gondo)
 	MCFG_PALETTE_LENGTH(1024)
@@ -2249,8 +2248,8 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(ghostb)
-	MCFG_SCREEN_VBLANK_STATIC(dec8)
+	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_ghostb)
+	MCFG_SCREEN_VBLANK_DRIVER(dec8_state, screen_eof_dec8)
 
 	MCFG_GFXDECODE(ghostb)
 	MCFG_PALETTE_LENGTH(1024)
@@ -2299,7 +2298,7 @@ static MACHINE_CONFIG_START( csilver, dec8_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(lastmisn)
+	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_lastmisn)
 
 	MCFG_GFXDECODE(shackled)
 	MCFG_PALETTE_LENGTH(1024)
@@ -2354,7 +2353,7 @@ static MACHINE_CONFIG_START( oscar, dec8_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(oscar)
+	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_oscar)
 
 	MCFG_GFXDECODE(oscar)
 	MCFG_PALETTE_LENGTH(512)
@@ -2395,7 +2394,7 @@ static MACHINE_CONFIG_START( srdarwin, dec8_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(srdarwin)
+	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_srdarwin)
 
 	MCFG_GFXDECODE(srdarwin)
 	MCFG_PALETTE_LENGTH(144)
@@ -2445,7 +2444,7 @@ static MACHINE_CONFIG_START( cobracom, dec8_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(cobracom)
+	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_cobracom)
 
 	MCFG_GFXDECODE(cobracom)
 	MCFG_PALETTE_LENGTH(256)

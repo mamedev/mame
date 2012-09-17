@@ -351,38 +351,37 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( m52 )
+UINT32 m52_state::screen_update_m52(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m52_state *state = screen.machine().driver_data<m52_state>();
 	int offs;
 
 	bitmap.fill(0, cliprect);
 
-	if (!(state->m_bgcontrol & 0x20))
+	if (!(m_bgcontrol & 0x20))
 	{
-		if (!(state->m_bgcontrol & 0x10))
-			draw_background(screen.machine(), bitmap, cliprect, state->m_bg2xpos, state->m_bg2ypos, 2); /* distant mountains */
+		if (!(m_bgcontrol & 0x10))
+			draw_background(screen.machine(), bitmap, cliprect, m_bg2xpos, m_bg2ypos, 2); /* distant mountains */
 
-		if (!(state->m_bgcontrol & 0x02))
-			draw_background(screen.machine(), bitmap, cliprect, state->m_bg1xpos, state->m_bg1ypos, 3); /* hills */
+		if (!(m_bgcontrol & 0x02))
+			draw_background(screen.machine(), bitmap, cliprect, m_bg1xpos, m_bg1ypos, 3); /* hills */
 
-		if (!(state->m_bgcontrol & 0x04))
-			draw_background(screen.machine(), bitmap, cliprect, state->m_bg1xpos, state->m_bg1ypos, 4); /* cityscape */
+		if (!(m_bgcontrol & 0x04))
+			draw_background(screen.machine(), bitmap, cliprect, m_bg1xpos, m_bg1ypos, 4); /* cityscape */
 	}
 
-	state->m_bg_tilemap->set_flip(state->flip_screen() ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_bg_tilemap->set_flip(flip_screen() ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	for (offs = 0xfc; offs >= 0; offs -= 4)
 	{
-		int sy = 257 - state->m_spriteram[offs];
-		int color = state->m_spriteram[offs + 1] & 0x3f;
-		int flipx = state->m_spriteram[offs + 1] & 0x40;
-		int flipy = state->m_spriteram[offs + 1] & 0x80;
-		int code = state->m_spriteram[offs + 2];
-		int sx = state->m_spriteram[offs + 3];
+		int sy = 257 - m_spriteram[offs];
+		int color = m_spriteram[offs + 1] & 0x3f;
+		int flipx = m_spriteram[offs + 1] & 0x40;
+		int flipy = m_spriteram[offs + 1] & 0x80;
+		int code = m_spriteram[offs + 2];
+		int sx = m_spriteram[offs + 3];
 		rectangle clip;
 
 		/* sprites from offsets $00-$7F are processed in the upper half of the frame */
@@ -394,7 +393,7 @@ SCREEN_UPDATE_IND16( m52 )
 			clip.min_y = 128, clip.max_y = 255;
 
 		/* adjust for flipping */
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			int temp = clip.min_y;
 			clip.min_y = 255 - clip.max_y;

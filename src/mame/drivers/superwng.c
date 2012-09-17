@@ -73,6 +73,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 TILE_GET_INFO_MEMBER(superwng_state::get_bg_tile_info)
@@ -112,22 +113,21 @@ void superwng_state::video_start()
 	m_bg_tilemap->set_scrollx(0, 64);
 }
 
-static SCREEN_UPDATE_IND16( superwng )
+UINT32 superwng_state::screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	superwng_state *state = screen.machine().driver_data<superwng_state>();
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	rectangle tmp = cliprect;
 
-	if (state->flip_screen())
+	if (flip_screen())
 	{
 		tmp.min_x += 32;
-		state->m_fg_tilemap->draw(bitmap, tmp, 0, 0);
+		m_fg_tilemap->draw(bitmap, tmp, 0, 0);
 	}
 	else
 	{
 		tmp.max_x -= 32;
-		state->m_fg_tilemap->draw(bitmap, tmp, 0, 0);
+		m_fg_tilemap->draw(bitmap, tmp, 0, 0);
 	}
 
 	//sprites
@@ -143,14 +143,14 @@ static SCREEN_UPDATE_IND16( superwng )
                    x      ?
                     xxxx  color
         */
-		if (~state->m_videoram_bg[i] & 1)
+		if (~m_videoram_bg[i] & 1)
 			continue;
 
-		int code = (state->m_videoram_bg[i] >> 2) | 0x40;
-		int flip = ~state->m_videoram_bg[i] >> 1 & 1;
-		int sx = 240 - state->m_videoram_bg[i + 1];
-		int sy = state->m_colorram_bg[i];
-		int color = state->m_colorram_bg[i + 1] & 0xf;
+		int code = (m_videoram_bg[i] >> 2) | 0x40;
+		int flip = ~m_videoram_bg[i] >> 1 & 1;
+		int sx = 240 - m_videoram_bg[i + 1];
+		int sy = m_colorram_bg[i];
+		int color = m_colorram_bg[i + 1] & 0xf;
 
 		drawgfx_transpen(bitmap, cliprect,screen.machine().gfx[1],
 						code,
@@ -483,7 +483,7 @@ static MACHINE_CONFIG_START( superwng, superwng_state )
 	MCFG_GFXDECODE(superwng)
 
 	MCFG_PALETTE_LENGTH(0x40)
-	MCFG_SCREEN_UPDATE_STATIC(superwng)
+	MCFG_SCREEN_UPDATE_DRIVER(superwng_state, screen_update_superwng)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

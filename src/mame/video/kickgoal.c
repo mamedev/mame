@@ -160,25 +160,24 @@ VIDEO_START_MEMBER(kickgoal_state,actionhw)
 
 
 
-SCREEN_UPDATE_IND16( kickgoal )
+UINT32 kickgoal_state::screen_update_kickgoal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	kickgoal_state *state = screen.machine().driver_data<kickgoal_state>();
 
 	/* set scroll */
-	state->m_fgtm->set_scrollx(0, state->m_scrram[0]);
-	state->m_fgtm->set_scrolly(0, state->m_scrram[1]);
-	state->m_bgtm->set_scrollx(0, state->m_scrram[2]);
-	state->m_bgtm->set_scrolly(0, state->m_scrram[3]);
-	state->m_bg2tm->set_scrollx(0, state->m_scrram[4]);
-	state->m_bg2tm->set_scrolly(0, state->m_scrram[5]);
+	m_fgtm->set_scrollx(0, m_scrram[0]);
+	m_fgtm->set_scrolly(0, m_scrram[1]);
+	m_bgtm->set_scrollx(0, m_scrram[2]);
+	m_bgtm->set_scrolly(0, m_scrram[3]);
+	m_bg2tm->set_scrollx(0, m_scrram[4]);
+	m_bg2tm->set_scrolly(0, m_scrram[5]);
 
 	/* draw */
-	state->m_bg2tm->draw(bitmap, cliprect, 0, 0);
-	state->m_bgtm->draw(bitmap, cliprect, 0, 0);
+	m_bg2tm->draw(bitmap, cliprect, 0, 0);
+	m_bgtm->draw(bitmap, cliprect, 0, 0);
 
 	kickgoal_draw_sprites(screen.machine(), bitmap, cliprect);
 
-	state->m_fgtm->draw(bitmap, cliprect, 0, 0);
+	m_fgtm->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

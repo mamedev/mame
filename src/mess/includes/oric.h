@@ -107,6 +107,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	DECLARE_MACHINE_START(telestrat);
+	UINT32 screen_update_oric(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -127,7 +128,7 @@ extern const wd17xx_interface oric_wd17xx_interface;
 /*----------- defined in video/oric.c -----------*/
 
 
-SCREEN_UPDATE_IND16( oric );
+
 
 
 #endif /* ORIC_H_ */

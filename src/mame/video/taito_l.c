@@ -275,41 +275,40 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 }
 
 
-SCREEN_UPDATE_IND16( taitol )
+UINT32 taitol_state::screen_update_taitol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	taitol_state *state = screen.machine().driver_data<taitol_state>();
 	int dx, dy;
 
-	dx = state->m_rambanks[0xb3f4] | (state->m_rambanks[0xb3f5] << 8);
-	if (state->m_flipscreen)
+	dx = m_rambanks[0xb3f4] | (m_rambanks[0xb3f5] << 8);
+	if (m_flipscreen)
 		dx = ((dx & 0xfffc) | ((dx - 3) & 0x0003)) ^ 0xf;
-	dy = state->m_rambanks[0xb3f6];
+	dy = m_rambanks[0xb3f6];
 
-	state->m_bg18_tilemap->set_scrollx(0, -dx);
-	state->m_bg18_tilemap->set_scrolly(0, -dy);
+	m_bg18_tilemap->set_scrollx(0, -dx);
+	m_bg18_tilemap->set_scrolly(0, -dy);
 
-	dx = state->m_rambanks[0xb3fc] | (state->m_rambanks[0xb3fd] << 8);
-	if (state->m_flipscreen)
+	dx = m_rambanks[0xb3fc] | (m_rambanks[0xb3fd] << 8);
+	if (m_flipscreen)
 		dx = ((dx & 0xfffc) | ((dx - 3) & 0x0003)) ^ 0xf;
-	dy = state->m_rambanks[0xb3fe];
+	dy = m_rambanks[0xb3fe];
 
-	state->m_bg19_tilemap->set_scrollx(0, -dx);
-	state->m_bg19_tilemap->set_scrolly(0, -dy);
+	m_bg19_tilemap->set_scrollx(0, -dx);
+	m_bg19_tilemap->set_scrolly(0, -dy);
 
-	if (state->m_cur_ctrl & 0x20)	/* display enable */
+	if (m_cur_ctrl & 0x20)	/* display enable */
 	{
 		screen.machine().priority_bitmap.fill(0, cliprect);
 
-		state->m_bg19_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg19_tilemap->draw(bitmap, cliprect, 0, 0);
 
-		if (state->m_cur_ctrl & 0x08)	/* sprites always over BG1 */
-			state->m_bg18_tilemap->draw(bitmap, cliprect, 0, 0);
+		if (m_cur_ctrl & 0x08)	/* sprites always over BG1 */
+			m_bg18_tilemap->draw(bitmap, cliprect, 0, 0);
 		else					/* split priority */
-			state->m_bg18_tilemap->draw(bitmap, cliprect, 0,1);
+			m_bg18_tilemap->draw(bitmap, cliprect, 0,1);
 
 		draw_sprites(screen.machine(), bitmap, cliprect);
 
-		state->m_ch1a_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_ch1a_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 		bitmap.fill(screen.machine().pens[0], cliprect);
@@ -318,14 +317,13 @@ SCREEN_UPDATE_IND16( taitol )
 
 
 
-SCREEN_VBLANK( taitol )
+void taitol_state::screen_eof_taitol(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		taitol_state *state = screen.machine().driver_data<taitol_state>();
-		UINT8 *spriteram = state->m_rambanks + 0xb000;
+		UINT8 *spriteram = m_rambanks + 0xb000;
 
-		memcpy(state->m_buff_spriteram, spriteram, TAITOL_SPRITERAM_SIZE);
+		memcpy(m_buff_spriteram, spriteram, TAITOL_SPRITERAM_SIZE);
 	}
 }

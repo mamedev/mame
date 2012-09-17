@@ -124,6 +124,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_lastfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -143,9 +144,8 @@ void lastfght_state::video_start()
 }
 
 
-static SCREEN_UPDATE_IND16( lastfght )
+UINT32 lastfght_state::screen_update_lastfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	lastfght_state *state = screen.machine().driver_data<lastfght_state>();
 
 #ifdef MAME_DEBUG
 #if 1
@@ -154,14 +154,14 @@ static SCREEN_UPDATE_IND16( lastfght )
 	UINT8 *gfxdata = screen.machine().root_device().memregion("gfx1")->base();
 	UINT8 data;
 
-	if (screen.machine().input().code_pressed_once(KEYCODE_ENTER))	state->m_view_roms ^= 1;
-	if (state->m_view_roms)
+	if (screen.machine().input().code_pressed_once(KEYCODE_ENTER))	m_view_roms ^= 1;
+	if (m_view_roms)
 	{
-		if (screen.machine().input().code_pressed_once(KEYCODE_PGDN))	state->m_base += 512 * 256;
-		if (screen.machine().input().code_pressed_once(KEYCODE_PGUP))	state->m_base -= 512 * 256;
-		state->m_base %= state->memregion("gfx1")->bytes();
+		if (screen.machine().input().code_pressed_once(KEYCODE_PGDN))	m_base += 512 * 256;
+		if (screen.machine().input().code_pressed_once(KEYCODE_PGUP))	m_base -= 512 * 256;
+		m_base %= memregion("gfx1")->bytes();
 
-		count = state->m_base;
+		count = m_base;
 
 		bitmap.fill(get_black_pen(screen.machine()), cliprect );
 		for (y = 0 ; y < 256; y++)
@@ -173,13 +173,13 @@ static SCREEN_UPDATE_IND16( lastfght )
 				count++;
 			}
 		}
-		popmessage("%x", state->m_base);
+		popmessage("%x", m_base);
 		return 0;
 	}
 #endif
 #endif
 
-	copybitmap(bitmap, state->m_bitmap[state->m_dest ^ 1], 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_bitmap[m_dest ^ 1], 0, 0, 0, 0, cliprect);
 
 	return 0;
 }
@@ -594,7 +594,7 @@ static MACHINE_CONFIG_START( lastfght, lastfght_state )
 	MCFG_SCREEN_SIZE( 512, 256 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
 	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_UPDATE_STATIC( lastfght )
+	MCFG_SCREEN_UPDATE_DRIVER(lastfght_state, screen_update_lastfght)
 
 MACHINE_CONFIG_END
 

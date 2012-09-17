@@ -104,6 +104,9 @@ public:
 	DECLARE_VIDEO_START(blaster);
 	DECLARE_MACHINE_START(williams_common);
 	DECLARE_MACHINE_RESET(williams_common);
+	UINT32 screen_update_williams(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_williams2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_blaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -195,8 +198,8 @@ TIMER_DEVICE_CALLBACK( williams2_endscreen_callback );
 
 
 
-SCREEN_UPDATE_RGB32( williams );
-SCREEN_UPDATE_RGB32( blaster );
-SCREEN_UPDATE_RGB32( williams2 );
+
+
+
 
 

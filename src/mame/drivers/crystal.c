@@ -190,6 +190,8 @@ public:
 	DECLARE_DRIVER_INIT(evosocc);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_crystal(screen_device &screen, bool state);
 };
 
 static void IntReq( running_machine &machine, int num )
@@ -647,9 +649,8 @@ static void SetVidReg( address_space &space, UINT16 reg, UINT16 val )
 }
 
 
-static SCREEN_UPDATE_IND16( crystal )
+UINT32 crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	crystal_state *state = screen.machine().driver_data<crystal_state>();
 	address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int DoFlip;
 
@@ -664,18 +665,18 @@ static SCREEN_UPDATE_IND16( crystal )
 
 	if (GetVidReg(space, 0x8e) & 1)
 	{
-		Front = (UINT16*) (state->m_frameram + B1 / 4);
-		Back  = (UINT16*) (state->m_frameram + B0 / 4);
+		Front = (UINT16*) (m_frameram + B1 / 4);
+		Back  = (UINT16*) (m_frameram + B0 / 4);
 	}
 	else
 	{
-		Front = (UINT16*) (state->m_frameram + B0 / 4);
-		Back  = (UINT16*) (state->m_frameram + B1 / 4);
+		Front = (UINT16*) (m_frameram + B0 / 4);
+		Back  = (UINT16*) (m_frameram + B1 / 4);
 	}
 
 	Visible  = (UINT16*) Front;
 	// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
-	DrawDest = reinterpret_cast<UINT16 *>(state->m_frameram.target());
+	DrawDest = reinterpret_cast<UINT16 *>(m_frameram.target());
 
 
 	if (GetVidReg(space, 0x8c) & 0x80)
@@ -693,7 +694,7 @@ static SCREEN_UPDATE_IND16( crystal )
 	while ((head & 0x7ff) != (tail & 0x7ff))
 	{
 		// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
-		DoFlip = vrender0_ProcessPacket(state->m_vr0video, 0x03800000 + head * 64, DrawDest, reinterpret_cast<UINT8*>(state->m_textureram.target()));
+		DoFlip = vrender0_ProcessPacket(m_vr0video, 0x03800000 + head * 64, DrawDest, reinterpret_cast<UINT8*>(m_textureram.target()));
 		head++;
 		head &= 0x7ff;
 		if (DoFlip)
@@ -710,12 +711,11 @@ static SCREEN_UPDATE_IND16( crystal )
 	return 0;
 }
 
-static SCREEN_VBLANK(crystal)
+void crystal_state::screen_eof_crystal(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		crystal_state *state = screen.machine().driver_data<crystal_state>();
 		address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 		UINT16 head, tail;
 		int DoFlip = 0;
@@ -735,8 +735,8 @@ static SCREEN_VBLANK(crystal)
 		SetVidReg(space, 0x82, head);
 		if (DoFlip)
 		{
-			if (state->m_FlipCount)
-				state->m_FlipCount--;
+			if (m_FlipCount)
+				m_FlipCount--;
 
 		}
 	}
@@ -851,8 +851,8 @@ static MACHINE_CONFIG_START( crystal, crystal_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(crystal)
-	MCFG_SCREEN_VBLANK_STATIC(crystal)
+	MCFG_SCREEN_UPDATE_DRIVER(crystal_state, screen_update_crystal)
+	MCFG_SCREEN_VBLANK_DRIVER(crystal_state, screen_eof_crystal)
 
 	MCFG_VIDEO_VRENDER0_ADD("vr0", vr0video_config)
 

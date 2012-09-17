@@ -444,31 +444,30 @@ static void supernova_draw_b( running_machine &machine, bitmap_ind16 &bitmap, bi
 	}
 }
 
-SCREEN_UPDATE_RGB32(skns)
+UINT32 skns_state::screen_update_skns(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	skns_state *state = screen.machine().driver_data<skns_state>();
 
 	palette_update(screen.machine());
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	state->m_tilemap_bitmap_lower.fill(0);
-	state->m_tilemap_bitmapflags_lower.fill(0);
-	state->m_tilemap_bitmap_higher.fill(0);
-	state->m_tilemap_bitmapflags_higher.fill(0);
+	m_tilemap_bitmap_lower.fill(0);
+	m_tilemap_bitmapflags_lower.fill(0);
+	m_tilemap_bitmap_higher.fill(0);
+	m_tilemap_bitmapflags_higher.fill(0);
 
 	{
 		int supernova_pri_a;
 		int supernova_pri_b;
 		int tran = 0;
 
-		supernova_pri_a = (state->m_v3_regs[0x10/4] & 0x0002)>>1;
-		supernova_pri_b = (state->m_v3_regs[0x34/4] & 0x0002)>>1;
+		supernova_pri_a = (m_v3_regs[0x10/4] & 0x0002)>>1;
+		supernova_pri_b = (m_v3_regs[0x34/4] & 0x0002)>>1;
 
 		//popmessage("pri %d %d\n", supernova_pri_a, supernova_pri_b);
 
 		/*if (!supernova_pri_b) { */
-		supernova_draw_b(screen.machine(), state->m_tilemap_bitmap_lower, state->m_tilemap_bitmapflags_lower, cliprect,tran);// tran = 1;
-		supernova_draw_a(screen.machine(), state->m_tilemap_bitmap_higher,state->m_tilemap_bitmapflags_higher,cliprect,tran);// tran = 1;
+		supernova_draw_b(screen.machine(), m_tilemap_bitmap_lower, m_tilemap_bitmapflags_lower, cliprect,tran);// tran = 1;
+		supernova_draw_a(screen.machine(), m_tilemap_bitmap_higher,m_tilemap_bitmapflags_higher,cliprect,tran);// tran = 1;
 
 		{
 			int x,y;
@@ -483,13 +482,13 @@ SCREEN_UPDATE_RGB32(skns)
 
 			for (y=0;y<240;y++)
 			{
-				src = &state->m_tilemap_bitmap_lower.pix16(y);
-				srcflags = &state->m_tilemap_bitmapflags_lower.pix8(y);
+				src = &m_tilemap_bitmap_lower.pix16(y);
+				srcflags = &m_tilemap_bitmapflags_lower.pix8(y);
 
-				src2 = &state->m_tilemap_bitmap_higher.pix16(y);
-				src2flags = &state->m_tilemap_bitmapflags_higher.pix8(y);
+				src2 = &m_tilemap_bitmap_higher.pix16(y);
+				src2flags = &m_tilemap_bitmapflags_higher.pix8(y);
 
-				src3 = &state->m_sprite_bitmap.pix16(y);
+				src3 = &m_sprite_bitmap.pix16(y);
 
 				dst = &bitmap.pix32(y);
 
@@ -558,7 +557,7 @@ SCREEN_UPDATE_RGB32(skns)
 						if (pendata3&0xff)
 						{
 
-							UINT16 palvalue = state->m_palette_ram[pendata3];
+							UINT16 palvalue = m_palette_ram[pendata3];
 
 							coldat = clut[pendata3];
 
@@ -578,9 +577,9 @@ SCREEN_UPDATE_RGB32(skns)
 								g2 = (dstcolour & 0x0000ff00)>> 8;
 								b2 = (dstcolour & 0x00ff0000)>> 16;
 
-								r2 = (r2 * state->m_bright_spc_r_trans) >> 8;
-								g2 = (g2 * state->m_bright_spc_g_trans) >> 8;
-								b2 = (b2 * state->m_bright_spc_b_trans) >> 8;
+								r2 = (r2 * m_bright_spc_r_trans) >> 8;
+								g2 = (g2 * m_bright_spc_g_trans) >> 8;
+								b2 = (b2 * m_bright_spc_b_trans) >> 8;
 
 								r = (r+r2);
 								if (r>255) r = 255;
@@ -619,16 +618,16 @@ SCREEN_UPDATE_RGB32(skns)
 		}
 	}
 
-	state->m_sprite_bitmap.fill(0x0000, cliprect);
+	m_sprite_bitmap.fill(0x0000, cliprect);
 
-	if (state->m_alt_enable_sprites)
-		state->m_spritegen->skns_draw_sprites(screen.machine(), state->m_sprite_bitmap, cliprect, state->m_spriteram, state->m_spriteram.bytes(), screen.machine().root_device().memregion("gfx1")->base(), screen.machine().root_device().memregion ("gfx1")->bytes(), state->m_spc_regs );
+	if (m_alt_enable_sprites)
+		m_spritegen->skns_draw_sprites(screen.machine(), m_sprite_bitmap, cliprect, m_spriteram, m_spriteram.bytes(), screen.machine().root_device().memregion("gfx1")->base(), screen.machine().root_device().memregion ("gfx1")->bytes(), m_spc_regs );
 
 
 	return 0;
 }
 
-SCREEN_VBLANK(skns)
+void skns_state::screen_eof_skns(screen_device &screen, bool state)
 {
 
 }

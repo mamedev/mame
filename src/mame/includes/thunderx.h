@@ -50,6 +50,7 @@ public:
 	DECLARE_MACHINE_RESET(scontra);
 	DECLARE_MACHINE_START(thunderx);
 	DECLARE_MACHINE_RESET(thunderx);
+	UINT32 screen_update_scontra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -59,4 +60,4 @@ extern void thunderx_tile_callback(running_machine &machine, int layer,int bank,
 extern void thunderx_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask,int *shadow);
 
 
-SCREEN_UPDATE_IND16( scontra );
+

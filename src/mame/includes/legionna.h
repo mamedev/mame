@@ -49,6 +49,9 @@ public:
 	DECLARE_VIDEO_START(denjinmk);
 	DECLARE_VIDEO_START(grainbow);
 	DECLARE_VIDEO_START(cupsoc);
+	UINT32 screen_update_legionna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_godzilla(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_grainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -57,6 +60,6 @@ public:
 void heatbrl_setgfxbank(running_machine &machine, UINT16 data);
 void denjinmk_setgfxbank(running_machine &machine, UINT16 data);
 
-SCREEN_UPDATE_IND16( legionna );
-SCREEN_UPDATE_IND16( godzilla );
-SCREEN_UPDATE_IND16( grainbow );
+
+
+

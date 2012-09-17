@@ -324,20 +324,19 @@ static void draw_sprites(running_machine &machine, jedi_state *state, bitmap_rgb
  *
  *************************************/
 
-static SCREEN_UPDATE_RGB32( jedi )
+UINT32 jedi_state::screen_update_jedi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	jedi_state *state = screen.machine().driver_data<jedi_state>();
 
 	/* if no video, clear it all to black */
-	if (*state->m_video_off & 0x01)
+	if (*m_video_off & 0x01)
 		bitmap.fill(RGB_BLACK, cliprect);
 	else
 	{
 		/* draw the background/text layers, followed by the sprites
            - it needs to be done in this order*/
-		draw_background_and_text(screen.machine(), state, bitmap, cliprect);
-		draw_sprites(screen.machine(), state, bitmap, cliprect);
-		do_pen_lookup(state, bitmap, cliprect);
+		draw_background_and_text(screen.machine(), this, bitmap, cliprect);
+		draw_sprites(screen.machine(), this, bitmap, cliprect);
+		do_pen_lookup(this, bitmap, cliprect);
 	}
 
 	return 0;
@@ -356,7 +355,7 @@ MACHINE_CONFIG_FRAGMENT( jedi_video )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(64*8, 262) /* verify vert size */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(jedi)
+	MCFG_SCREEN_UPDATE_DRIVER(jedi_state, screen_update_jedi)
 
 	MCFG_VIDEO_START_OVERRIDE(jedi_state,jedi)
 MACHINE_CONFIG_END

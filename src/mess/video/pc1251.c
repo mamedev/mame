@@ -114,9 +114,8 @@ WRITE8_HANDLER(pc1251_lcd_write)
 #define DOWN 62
 #define RIGHT 68
 
-SCREEN_UPDATE_IND16( pc1251 )
+UINT32 pc1251_state::screen_update_pc1251(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pc1251_state *state = screen.machine().driver_data<pc1251_state>();
 	int x, y, i, j;
 	int color[2];
 	running_machine &machine = screen.machine();
@@ -130,34 +129,34 @@ SCREEN_UPDATE_IND16( pc1251 )
 	for (x=RIGHT,y=DOWN, i=0; i<60; x+=3)
 	{
 		for (j=0; j<5; j++, i++, x+=3)
-			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], state->m_reg[i],
+			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], m_reg[i],
 					PC1251_CONTRAST,0,0,
 					x,y);
 	}
 	for (i=0x7b; i>=0x40; x+=3)
 	{
 		for (j=0; j<5; j++, i--, x+=3)
-			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], state->m_reg[i],
+			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], m_reg[i],
 					PC1251_CONTRAST,0,0,
 					x,y);
 	}
 
 	pocketc_draw_special(bitmap, RIGHT+134, DOWN-10, de,
-						state->m_reg[0x3c] & 0x08 ? color[1] : color[0]);
+						m_reg[0x3c] & 0x08 ? color[1] : color[0]);
 	pocketc_draw_special(bitmap, RIGHT+142, DOWN-10, g,
-						state->m_reg[0x3c] & 0x04 ? color[1] : color[0]);
+						m_reg[0x3c] & 0x04 ? color[1] : color[0]);
 	pocketc_draw_special(bitmap, RIGHT+146, DOWN-10, rad,
-						state->m_reg[0x3d] & 0x04 ? color[1] : color[0]);
+						m_reg[0x3d] & 0x04 ? color[1] : color[0]);
 	pocketc_draw_special(bitmap, RIGHT+18, DOWN-10, def,
-						state->m_reg[0x3c] & 0x01 ? color[1] : color[0]);
+						m_reg[0x3c] & 0x01 ? color[1] : color[0]);
 	pocketc_draw_special(bitmap, RIGHT, DOWN-10, shift,
-						state->m_reg[0x3d] & 0x02 ? color[1] : color[0]);
+						m_reg[0x3d] & 0x02 ? color[1] : color[0]);
 	pocketc_draw_special(bitmap, RIGHT+38, DOWN-10, pro,
-						state->m_reg[0x3e] & 0x01 ? color[1] : color[0]);
+						m_reg[0x3e] & 0x01 ? color[1] : color[0]);
 	pocketc_draw_special(bitmap, RIGHT+53, DOWN-10, run,
-						state->m_reg[0x3e] & 0x02 ? color[1] : color[0]);
+						m_reg[0x3e] & 0x02 ? color[1] : color[0]);
 	pocketc_draw_special(bitmap, RIGHT+68, DOWN-10, rsv,
-						state->m_reg[0x3e] & 0x04 ? color[1] : color[0]);
+						m_reg[0x3e] & 0x04 ? color[1] : color[0]);
 
 	/* 0x3c 1 def?, 4 g, 8 de
        0x3d 2 shift, 4 rad, 8 error

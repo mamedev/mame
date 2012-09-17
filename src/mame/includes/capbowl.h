@@ -40,11 +40,12 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_capbowl(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/capbowl.c -----------*/
 
 
-SCREEN_UPDATE_RGB32( capbowl );
+
 
 

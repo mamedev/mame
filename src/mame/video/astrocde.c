@@ -247,20 +247,19 @@ static void init_savestate(running_machine &machine)
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( astrocde )
+UINT32 astrocde_state::screen_update_astrocde(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	astrocde_state *state = screen.machine().driver_data<astrocde_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	UINT32 sparklebase = 0;
-	const int colormask = (state->m_video_config & AC_MONITOR_BW) ? 0 : 0x1f0;
-	int xystep = 2 - state->m_video_mode;
+	const int colormask = (m_video_config & AC_MONITOR_BW) ? 0 : 0x1f0;
+	int xystep = 2 - m_video_mode;
 	int y;
 
 	/* compute the starting point of sparkle for the current frame */
 	int width = screen.width();
 	int height = screen.height();
 
-	if (state->m_video_config & AC_STARS)
+	if (m_video_config & AC_STARS)
 		sparklebase = (screen.frame_number() * (UINT64)(width * height)) % RNG_PERIOD;
 
 	/* iterate over scanlines */
@@ -273,7 +272,7 @@ SCREEN_UPDATE_IND16( astrocde )
 		int x;
 
 		/* compute the star and sparkle offset at the start of this line */
-		if (state->m_video_config & AC_STARS)
+		if (m_video_config & AC_STARS)
 		{
 			staroffs = ((effy < 0) ? (effy + 262) : effy) * width;
 			sparkleoffs = sparklebase + y * width;
@@ -285,12 +284,12 @@ SCREEN_UPDATE_IND16( astrocde )
 		for (x = 0; x < 456/4; x += xystep)
 		{
 			int effx = x - HORZ_OFFSET/4;
-			const UINT8 *colorbase = &state->m_colors[(effx < state->m_colorsplit) ? 4 : 0];
+			const UINT8 *colorbase = &m_colors[(effx < m_colorsplit) ? 4 : 0];
 			UINT8 data;
 			int xx;
 
 			/* select either video data or background data */
-			data = (effx >= 0 && effx < 80 && effy >= 0 && effy < state->m_vblank) ? videoram[offset++] : state->m_bgdata;
+			data = (effx >= 0 && effx < 80 && effy >= 0 && effy < m_vblank) ? videoram[offset++] : m_bgdata;
 
 			/* iterate over the 4 pixels */
 			for (xx = 0; xx < 4; xx++)
@@ -301,14 +300,14 @@ SCREEN_UPDATE_IND16( astrocde )
 				rgb_t color;
 
 				/* handle stars/sparkle */
-				if (state->m_video_config & AC_STARS)
+				if (m_video_config & AC_STARS)
 				{
 					/* if sparkle is enabled for this pixel index and either it is non-zero or a star */
 					/* then adjust the intensity */
-					if (state->m_sparkle[pixdata] == 0)
+					if (m_sparkle[pixdata] == 0)
 					{
-						if (pixdata != 0 || (state->m_sparklestar[staroffs] & 0x10))
-							luma = state->m_sparklestar[sparkleoffs] & 0x0f;
+						if (pixdata != 0 || (m_sparklestar[staroffs] & 0x10))
+							luma = m_sparklestar[sparkleoffs] & 0x0f;
 						else if (pixdata == 0)
 							colordata = luma = 0;
 					}
@@ -333,9 +332,8 @@ SCREEN_UPDATE_IND16( astrocde )
 }
 
 
-SCREEN_UPDATE_IND16( profpac )
+UINT32 astrocde_state::screen_update_profpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	astrocde_state *state = screen.machine().driver_data<astrocde_state>();
 	int y;
 
 	/* iterate over scanlines */
@@ -343,7 +341,7 @@ SCREEN_UPDATE_IND16( profpac )
 	{
 		int effy = mame_vpos_to_astrocade_vpos(y);
 		UINT16 *dest = &bitmap.pix16(y);
-		UINT16 offset = state->m_profpac_vispage * 0x4000 + effy * 80;
+		UINT16 offset = m_profpac_vispage * 0x4000 + effy * 80;
 		int x;
 
 		/* star with black */
@@ -354,13 +352,13 @@ SCREEN_UPDATE_IND16( profpac )
 			int effx = x - HORZ_OFFSET/4;
 
 			/* select either video data or background data */
-			UINT16 data = (effx >= 0 && effx < 80 && effy >= 0 && effy < state->m_vblank) ? state->m_profpac_videoram[offset++] : 0;
+			UINT16 data = (effx >= 0 && effx < 80 && effy >= 0 && effy < m_vblank) ? m_profpac_videoram[offset++] : 0;
 
 			/* iterate over the 4 pixels */
-			*dest++ = state->m_profpac_palette[(data >> 12) & 0x0f];
-			*dest++ = state->m_profpac_palette[(data >> 8) & 0x0f];
-			*dest++ = state->m_profpac_palette[(data >> 4) & 0x0f];
-			*dest++ = state->m_profpac_palette[(data >> 0) & 0x0f];
+			*dest++ = m_profpac_palette[(data >> 12) & 0x0f];
+			*dest++ = m_profpac_palette[(data >> 8) & 0x0f];
+			*dest++ = m_profpac_palette[(data >> 4) & 0x0f];
+			*dest++ = m_profpac_palette[(data >> 0) & 0x0f];
 		}
 	}
 

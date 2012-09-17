@@ -70,19 +70,18 @@ PALETTE_INIT_MEMBER(super80_state,super80m)
 
 
 
-SCREEN_VBLANK( super80m )
+void super80_state::screen_eof_super80m(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		super80_state *state = screen.machine().driver_data<super80_state>();
 		/* if we chose another palette or colour mode, enable it */
 		UINT8 chosen_palette = (screen.machine().root_device().ioport("CONFIG")->read() & 0x60)>>5;				// read colour dipswitches
 
-		if (chosen_palette != state->m_current_palette)						// any changes?
+		if (chosen_palette != m_current_palette)						// any changes?
 		{
-			state->m_current_palette = chosen_palette;					// save new palette
-			if (!state->m_current_palette)
+			m_current_palette = chosen_palette;					// save new palette
+			if (!m_current_palette)
 				palette_set_colors_rgb(screen.machine(), super80_comp_palette);		// composite colour
 			else
 				palette_set_colors_rgb(screen.machine(), super80_rgb_palette);		// rgb and b&w
@@ -90,16 +89,15 @@ SCREEN_VBLANK( super80m )
 	}
 }
 
-SCREEN_UPDATE_IND16( super80 )
+UINT32 super80_state::screen_update_super80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	super80_state *state = screen.machine().driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
-	UINT16 sy=0,ma=state->m_vidpg,x;
-	UINT8 *RAM = state->memregion("maincpu")->base();
+	UINT16 sy=0,ma=m_vidpg,x;
+	UINT8 *RAM = memregion("maincpu")->base();
 
-	output_set_value("cass_led",(state->m_shared & 0x20) ? 1 : 0);
+	output_set_value("cass_led",(m_shared & 0x20) ? 1 : 0);
 
-	if ((state->m_shared & 4) || (!(screen.machine().root_device().ioport("CONFIG")->read() & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((m_shared & 4) || (!(screen.machine().root_device().ioport("CONFIG")->read() & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	for (y = 0; y < 16; y++)
@@ -114,7 +112,7 @@ SCREEN_UPDATE_IND16( super80 )
 					chr = RAM[ma | x] & 0x3f;
 
 				/* get pattern of pixels for that character scanline */
-				gfx = state->m_p_chargen[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
+				gfx = m_p_chargen[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7);
@@ -132,16 +130,15 @@ SCREEN_UPDATE_IND16( super80 )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( super80d )
+UINT32 super80_state::screen_update_super80d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	super80_state *state = screen.machine().driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
-	UINT16 sy=0,ma=state->m_vidpg,x;
-	UINT8 *RAM = state->memregion("maincpu")->base();
+	UINT16 sy=0,ma=m_vidpg,x;
+	UINT8 *RAM = memregion("maincpu")->base();
 
-	output_set_value("cass_led",(state->m_shared & 0x20) ? 1 : 0);
+	output_set_value("cass_led",(m_shared & 0x20) ? 1 : 0);
 
-	if ((state->m_shared & 4) || (!(screen.machine().root_device().ioport("CONFIG")->read() & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((m_shared & 4) || (!(screen.machine().root_device().ioport("CONFIG")->read() & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	for (y = 0; y < 16; y++)
@@ -156,7 +153,7 @@ SCREEN_UPDATE_IND16( super80d )
 					chr = RAM[ma | x];
 
 				/* get pattern of pixels for that character scanline */
-				gfx = state->m_p_chargen[((chr & 0x7f)<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)] ^ ((chr & 0x80) ? 0xff : 0);
+				gfx = m_p_chargen[((chr & 0x7f)<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)] ^ ((chr & 0x80) ? 0xff : 0);
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7);
@@ -174,16 +171,15 @@ SCREEN_UPDATE_IND16( super80d )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( super80e )
+UINT32 super80_state::screen_update_super80e(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	super80_state *state = screen.machine().driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
-	UINT16 sy=0,ma=state->m_vidpg,x;
-	UINT8 *RAM = state->memregion("maincpu")->base();
+	UINT16 sy=0,ma=m_vidpg,x;
+	UINT8 *RAM = memregion("maincpu")->base();
 
-	output_set_value("cass_led",(state->m_shared & 0x20) ? 1 : 0);
+	output_set_value("cass_led",(m_shared & 0x20) ? 1 : 0);
 
-	if ((state->m_shared & 4) || (!(screen.machine().root_device().ioport("CONFIG")->read() & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((m_shared & 4) || (!(screen.machine().root_device().ioport("CONFIG")->read() & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	for (y = 0; y < 16; y++)
@@ -198,7 +194,7 @@ SCREEN_UPDATE_IND16( super80e )
 					chr = RAM[ma | x];
 
 				/* get pattern of pixels for that character scanline */
-				gfx = state->m_p_chargen[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
+				gfx = m_p_chargen[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7);
@@ -216,20 +212,19 @@ SCREEN_UPDATE_IND16( super80e )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( super80m )
+UINT32 super80_state::screen_update_super80m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	super80_state *state = screen.machine().driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
-	UINT16 sy=0,ma=state->m_vidpg,x;
+	UINT16 sy=0,ma=m_vidpg,x;
 	UINT8 col, bg=0, fg=0, options=screen.machine().root_device().ioport("CONFIG")->read();
-	UINT8 *RAM = state->memregion("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 
 	/* get selected character generator */
-	UINT8 cgen = state->m_current_charset ^ ((options & 0x10)>>4);	/* bit 0 of port F1 and cgen config switch */
+	UINT8 cgen = m_current_charset ^ ((options & 0x10)>>4);	/* bit 0 of port F1 and cgen config switch */
 
-	output_set_value("cass_led",(state->m_shared & 0x20) ? 1 : 0);
+	output_set_value("cass_led",(m_shared & 0x20) ? 1 : 0);
 
-	if ((state->m_shared & 4) || (!(options & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((m_shared & 4) || (!(options & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	if (screen_on)
@@ -260,9 +255,9 @@ SCREEN_UPDATE_IND16( super80m )
 
 				/* get pattern of pixels for that character scanline */
 				if (cgen)
-					gfx = state->m_p_chargen[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
+					gfx = m_p_chargen[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
 				else
-					gfx = state->m_p_chargen[0x1000 | ((chr & 0x7f)<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)] ^ ((chr & 0x80) ? 0xff : 0);
+					gfx = m_p_chargen[0x1000 | ((chr & 0x7f)<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)] ^ ((chr & 0x80) ? 0xff : 0);
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7) ? fg : bg;
@@ -384,15 +379,14 @@ VIDEO_START_MEMBER(super80_state,super80v)
 	m_p_colorram = memregion("colorram")->base();
 }
 
-SCREEN_UPDATE_RGB32( super80v )
+UINT32 super80_state::screen_update_super80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	super80_state *state = screen.machine().driver_data<super80_state>();
-	state->m_framecnt++;
-	state->m_speed = state->m_mc6845_reg[10]&0x20, state->m_flash = state->m_mc6845_reg[10]&0x40; // cursor modes
-	state->m_cursor = (state->m_mc6845_reg[14]<<8) | state->m_mc6845_reg[15]; // get cursor position
-	state->m_s_options=screen.machine().root_device().ioport("CONFIG")->read();
-	output_set_value("cass_led",(state->m_shared & 0x20) ? 1 : 0);
-	state->m_6845->screen_update(screen, bitmap, cliprect);
+	m_framecnt++;
+	m_speed = m_mc6845_reg[10]&0x20, m_flash = m_mc6845_reg[10]&0x40; // cursor modes
+	m_cursor = (m_mc6845_reg[14]<<8) | m_mc6845_reg[15]; // get cursor position
+	m_s_options=screen.machine().root_device().ioport("CONFIG")->read();
+	output_set_value("cass_led",(m_shared & 0x20) ? 1 : 0);
+	m_6845->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
 

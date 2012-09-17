@@ -58,6 +58,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_jongkyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -72,9 +73,8 @@ void jongkyo_state::video_start()
 
 }
 
-static SCREEN_UPDATE_IND16( jongkyo )
+UINT32 jongkyo_state::screen_update_jongkyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	jongkyo_state *state = screen.machine().driver_data<jongkyo_state>();
 	int y;
 
 	for (y = 0; y < 256; ++y)
@@ -88,7 +88,7 @@ static SCREEN_UPDATE_IND16( jongkyo )
 			UINT8 data2;
 			UINT8 data3;
 
-	//      data3 = state->m_videoram2[x/4 + y*64]; // wrong
+	//      data3 = m_videoram2[x/4 + y*64]; // wrong
 
 	// good mahjong tiles
 	      data3 = 0x0f; // we're missing 2 bits.. there must be another piece of video ram somewhere or we can't use all the colours (6bpp).. banked somehow?
@@ -97,8 +97,8 @@ static SCREEN_UPDATE_IND16( jongkyo )
 
 
 
-			data1 = state->m_videoram[0x4000 + x / 4 + y * 64];
-			data2 = state->m_videoram[x / 4 + y * 64];
+			data1 = m_videoram[0x4000 + x / 4 + y * 64];
+			data2 = m_videoram[x / 4 + y * 64];
 
 			for (b = 0; b < 4; ++b)
 			{
@@ -503,7 +503,7 @@ static MACHINE_CONFIG_START( jongkyo, jongkyo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 8, 256-8-1)
-	MCFG_SCREEN_UPDATE_STATIC(jongkyo)
+	MCFG_SCREEN_UPDATE_DRIVER(jongkyo_state, screen_update_jongkyo)
 
 	MCFG_PALETTE_LENGTH(0x100)
 

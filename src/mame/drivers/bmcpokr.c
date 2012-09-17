@@ -60,6 +60,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_videoram;
 	virtual void video_start();
+	UINT32 screen_update_bmcpokr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -198,9 +199,8 @@ static GFXDECODE_START( bmcpokr )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-SCREEN_UPDATE_IND16( bmcpokr )
+UINT32 bmcpokr_state::screen_update_bmcpokr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bmcpokr_state *state = screen.machine().driver_data<bmcpokr_state>();
 	gfx_element *gfx = screen.machine().gfx[0];
 
 	int count = 0;
@@ -208,7 +208,7 @@ SCREEN_UPDATE_IND16( bmcpokr )
 	{
 		for (int x=0;x<64;x++)
 		{
-			UINT16 data = state->m_videoram[count];
+			UINT16 data = m_videoram[count];
 			count++;
 
 			drawgfx_opaque(bitmap,cliprect,gfx,data,0,0,0,x*8,y*8);
@@ -235,7 +235,7 @@ static MACHINE_CONFIG_START( bmcpokr, bmcpokr_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_STATIC(bmcpokr)
+	MCFG_SCREEN_UPDATE_DRIVER(bmcpokr_state, screen_update_bmcpokr)
 
 	MCFG_GFXDECODE(bmcpokr)
 

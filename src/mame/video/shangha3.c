@@ -254,10 +254,9 @@ else
 }
 
 
-SCREEN_UPDATE_IND16( shangha3 )
+UINT32 shangha3_state::screen_update_shangha3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	shangha3_state *state = screen.machine().driver_data<shangha3_state>();
 
-	copybitmap(bitmap, state->m_rawbitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_rawbitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

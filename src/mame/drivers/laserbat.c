@@ -494,17 +494,16 @@ void laserbat_state::video_start()
 	save_item(NAME(m_colorram));
 }
 
-static SCREEN_UPDATE_IND16( laserbat )
+UINT32 laserbat_state::screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	laserbat_state *state = screen.machine().driver_data<laserbat_state>();
 	int y;
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* update the S2636 chips */
-	bitmap_ind16 &s2636_1_bitmap = s2636_update(state->m_s2636_1, cliprect);
-	bitmap_ind16 &s2636_2_bitmap = s2636_update(state->m_s2636_2, cliprect);
-	bitmap_ind16 &s2636_3_bitmap = s2636_update(state->m_s2636_3, cliprect);
+	bitmap_ind16 &s2636_1_bitmap = s2636_update(m_s2636_1, cliprect);
+	bitmap_ind16 &s2636_2_bitmap = s2636_update(m_s2636_2, cliprect);
+	bitmap_ind16 &s2636_3_bitmap = s2636_update(m_s2636_3, cliprect);
 
 	/* copy the S2636 images into the main bitmap */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -528,12 +527,12 @@ static SCREEN_UPDATE_IND16( laserbat )
 		}
 	}
 
-	if (state->m_sprite_enable)
+	if (m_sprite_enable)
 		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],
-		        state->m_sprite_code,
-				state->m_sprite_color,
+		        m_sprite_code,
+				m_sprite_color,
 				0,0,
-				state->m_sprite_x - 6,state->m_sprite_y,0);
+				m_sprite_x - 6,m_sprite_y,0);
 
 	return 0;
 }
@@ -760,7 +759,7 @@ static MACHINE_CONFIG_START( laserbat, laserbat_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 29*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(laserbat)
+	MCFG_SCREEN_UPDATE_DRIVER(laserbat_state, screen_update_laserbat)
 
 	MCFG_GFXDECODE(laserbat)
 	MCFG_PALETTE_LENGTH(1024)
@@ -804,7 +803,7 @@ static MACHINE_CONFIG_START( catnmous, laserbat_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(laserbat)
+	MCFG_SCREEN_UPDATE_DRIVER(laserbat_state, screen_update_laserbat)
 
 	MCFG_GFXDECODE(laserbat)
 	MCFG_PALETTE_LENGTH(1024)

@@ -1527,28 +1527,27 @@ INLINE void cave_tilemap_draw(
 }
 
 
-SCREEN_UPDATE_IND16( cave )
+UINT32 cave_state::screen_update_cave(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cave_state *state = screen.machine().driver_data<cave_state>();
 	int pri, pri2, GFX;
 	int layers_ctrl = -1;
 
 	set_pens(screen.machine());
 
-	state->m_blit.baseaddr = reinterpret_cast<UINT8 *>(bitmap.raw_pixptr(0));
-	state->m_blit.line_offset = bitmap.rowbytes();
-	state->m_blit.baseaddr_zbuf = reinterpret_cast<UINT8 *>(state->m_sprite_zbuf.raw_pixptr(0));
-	state->m_blit.line_offset_zbuf = state->m_sprite_zbuf.rowbytes();
+	m_blit.baseaddr = reinterpret_cast<UINT8 *>(bitmap.raw_pixptr(0));
+	m_blit.line_offset = bitmap.rowbytes();
+	m_blit.baseaddr_zbuf = reinterpret_cast<UINT8 *>(m_sprite_zbuf.raw_pixptr(0));
+	m_blit.line_offset_zbuf = m_sprite_zbuf.rowbytes();
 
 	/* Choose the tilemap to display (8x8 tiles or 16x16 tiles) */
 	for (GFX = 0; GFX < 4; GFX++)
 	{
-		if (state->m_tilemap[GFX])
+		if (m_tilemap[GFX])
 		{
-			state->m_tiledim[GFX] = state->m_vctrl[GFX][1] & 0x2000;
-			if (state->m_tiledim[GFX] != state->m_old_tiledim[GFX])
-				state->m_tilemap[GFX]->mark_all_dirty();
-			state->m_old_tiledim[GFX] = state->m_tiledim[GFX];
+			m_tiledim[GFX] = m_vctrl[GFX][1] & 0x2000;
+			if (m_tiledim[GFX] != m_old_tiledim[GFX])
+				m_tilemap[GFX]->mark_all_dirty();
+			m_old_tiledim[GFX] = m_tiledim[GFX];
 		}
 	}
 
@@ -1575,42 +1574,42 @@ SCREEN_UPDATE_IND16( cave )
 #if 1
 		/* Show the video registers (cave_videoregs) */
 		popmessage("%04X %04X %04X %04X %04X %04X %04X %04X",
-			state->m_videoregs[0], state->m_videoregs[1], state->m_videoregs[2], state->m_videoregs[3],
-			state->m_videoregs[4], state->m_videoregs[5], state->m_videoregs[6], state->m_videoregs[7] );
+			m_videoregs[0], m_videoregs[1], m_videoregs[2], m_videoregs[3],
+			m_videoregs[4], m_videoregs[5], m_videoregs[6], m_videoregs[7] );
 #endif
 		/* Show the scroll / flags registers of the selected layer */
-		if ((state->m_tilemap[0]) && (msk & 0x000f))	popmessage("x:%04X y:%04X f:%04X", state->m_vctrl[0][0],state->m_vctrl[0][1],state->m_vctrl[0][2]);
-		if ((state->m_tilemap[1]) && (msk & 0x00f0))	popmessage("x:%04X y:%04X f:%04X", state->m_vctrl[1][0],state->m_vctrl[1][1],state->m_vctrl[1][2]);
-		if ((state->m_tilemap[2]) && (msk & 0x0f00))	popmessage("x:%04X y:%04X f:%04X", state->m_vctrl[2][0],state->m_vctrl[2][1],state->m_vctrl[2][2]);
-		if ((state->m_tilemap[3]) && (msk & 0xf000))	popmessage("x:%04X y:%04X f:%04X", state->m_vctrl[3][0],state->m_vctrl[3][1],state->m_vctrl[3][2]);
+		if ((m_tilemap[0]) && (msk & 0x000f))	popmessage("x:%04X y:%04X f:%04X", m_vctrl[0][0],m_vctrl[0][1],m_vctrl[0][2]);
+		if ((m_tilemap[1]) && (msk & 0x00f0))	popmessage("x:%04X y:%04X f:%04X", m_vctrl[1][0],m_vctrl[1][1],m_vctrl[1][2]);
+		if ((m_tilemap[2]) && (msk & 0x0f00))	popmessage("x:%04X y:%04X f:%04X", m_vctrl[2][0],m_vctrl[2][1],m_vctrl[2][2]);
+		if ((m_tilemap[3]) && (msk & 0xf000))	popmessage("x:%04X y:%04X f:%04X", m_vctrl[3][0],m_vctrl[3][1],m_vctrl[3][2]);
 	}
 
 	/* Show the row / "column" scroll enable flags, when they change state */
-	state->m_rasflag = 0;
+	m_rasflag = 0;
 	for (GFX = 0; GFX < 4; GFX++)
 	{
-		if (state->m_tilemap[GFX])
+		if (m_tilemap[GFX])
 		{
-			state->m_rasflag |= (state->m_vctrl[GFX][0] & 0x4000) ? 0x0001 << (4*GFX) : 0;
-			state->m_rasflag |= (state->m_vctrl[GFX][1] & 0x4000) ? 0x0002 << (4*GFX) : 0;
+			m_rasflag |= (m_vctrl[GFX][0] & 0x4000) ? 0x0001 << (4*GFX) : 0;
+			m_rasflag |= (m_vctrl[GFX][1] & 0x4000) ? 0x0002 << (4*GFX) : 0;
 		}
 	}
 
-	if (state->m_rasflag != state->m_old_rasflag)
+	if (m_rasflag != m_old_rasflag)
 	{
 		popmessage("Line Effect: 0:%c%c 1:%c%c 2:%c%c 3:%c%c",
-			(state->m_rasflag & 0x0001) ? 'x' : ' ', (state->m_rasflag & 0x0002) ? 'y' : ' ',
-			(state->m_rasflag & 0x0010) ? 'x' : ' ', (state->m_rasflag & 0x0020) ? 'y' : ' ',
-			(state->m_rasflag & 0x0100) ? 'x' : ' ', (state->m_rasflag & 0x0200) ? 'y' : ' ',
-			(state->m_rasflag & 0x1000) ? 'x' : ' ', (state->m_rasflag & 0x2000) ? 'y' : ' ' );
-		state->m_old_rasflag = state->m_rasflag;
+			(m_rasflag & 0x0001) ? 'x' : ' ', (m_rasflag & 0x0002) ? 'y' : ' ',
+			(m_rasflag & 0x0010) ? 'x' : ' ', (m_rasflag & 0x0020) ? 'y' : ' ',
+			(m_rasflag & 0x0100) ? 'x' : ' ', (m_rasflag & 0x0200) ? 'y' : ' ',
+			(m_rasflag & 0x1000) ? 'x' : ' ', (m_rasflag & 0x2000) ? 'y' : ' ' );
+		m_old_rasflag = m_rasflag;
 	}
 }
 #endif
 
 	cave_sprite_check(screen, cliprect);
 
-	bitmap.fill(state->m_background_color, cliprect);
+	bitmap.fill(m_background_color, cliprect);
 
 	/*
         Tiles and sprites are ordered by priority (0 back, 3 front) with
@@ -1626,7 +1625,7 @@ SCREEN_UPDATE_IND16( cave )
     */
 	for (pri = 0; pri <= 3; pri++)	// tile / sprite priority
 	{
-		if (layers_ctrl & (1 << (pri + 16)))	(*state->m_sprite_draw)(screen.machine(), pri);
+		if (layers_ctrl & (1 << (pri + 16)))	(*m_sprite_draw)(screen.machine(), pri);
 
 		for (pri2 = 0; pri2 <= 3; pri2++)	// priority of the whole layer
 		{

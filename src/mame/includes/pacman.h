@@ -134,6 +134,8 @@ public:
 	DECLARE_MACHINE_RESET(superabc);
 	DECLARE_VIDEO_START(pengo);
 	DECLARE_VIDEO_START(jrpacman);
+	UINT32 screen_update_pacman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_s2650games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -141,12 +143,12 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( pacman );
 
 
 
 
-SCREEN_UPDATE_IND16( s2650games );
+
+
 
 
 

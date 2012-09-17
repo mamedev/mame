@@ -23,6 +23,7 @@ public:
 	DECLARE_READ8_MEMBER(test_r);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_buster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -30,9 +31,8 @@ void buster_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16(buster)
+UINT32 buster_state::screen_update_buster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	buster_state *state = screen.machine().driver_data<buster_state>();
 	gfx_element *gfx = screen.machine().gfx[0];
 	int count = 0x0000;
 
@@ -43,7 +43,7 @@ static SCREEN_UPDATE_IND16(buster)
 	{
 		for (x=0;x<32;x++)
 		{
-			int tile = (state->m_vram[count+1])|(state->m_vram[count]<<8);
+			int tile = (m_vram[count+1])|(m_vram[count]<<8);
 			//int colour = tile>>12;
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*4);
 
@@ -341,7 +341,7 @@ static MACHINE_CONFIG_START( buster, buster_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(buster)
+	MCFG_SCREEN_UPDATE_DRIVER(buster_state, screen_update_buster)
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_3_579545MHz/4, mc6845_intf) //unknown clock / type
 
 	MCFG_GFXDECODE(buster)

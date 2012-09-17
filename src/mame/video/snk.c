@@ -940,89 +940,84 @@ static void tdfever_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 
 /**************************************************************/
 
-SCREEN_UPDATE_IND16( marvins )
+UINT32 snk_state::screen_update_marvins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	snk_state *state = screen.machine().driver_data<snk_state>();
 
-	state->m_bg_tilemap->set_scrollx(0, state->m_bg_scrollx);
-	state->m_bg_tilemap->set_scrolly(0, state->m_bg_scrolly);
-	state->m_fg_tilemap->set_scrollx(0, state->m_fg_scrollx);
-	state->m_fg_tilemap->set_scrolly(0, state->m_fg_scrolly);
+	m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
+	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
+	m_fg_tilemap->set_scrollx(0, m_fg_scrollx);
+	m_fg_tilemap->set_scrolly(0, m_fg_scrolly);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	marvins_draw_sprites(screen.machine(), bitmap, cliprect, state->m_sp16_scrollx, state->m_sp16_scrolly, 0, state->m_sprite_split_point>>2);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	marvins_draw_sprites(screen.machine(), bitmap, cliprect, state->m_sp16_scrollx, state->m_sp16_scrolly, state->m_sprite_split_point>>2, 25);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	marvins_draw_sprites(screen.machine(), bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly, 0, m_sprite_split_point>>2);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	marvins_draw_sprites(screen.machine(), bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly, m_sprite_split_point>>2, 25);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( tnk3 )
+UINT32 snk_state::screen_update_tnk3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	snk_state *state = screen.machine().driver_data<snk_state>();
 
-	state->m_bg_tilemap->set_scrollx(0, state->m_bg_scrollx);
-	state->m_bg_tilemap->set_scrolly(0, state->m_bg_scrolly);
+	m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
+	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	tnk3_draw_sprites(screen.machine(), bitmap, cliprect, state->m_sp16_scrollx, state->m_sp16_scrolly);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	tnk3_draw_sprites(screen.machine(), bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( ikari )
+UINT32 snk_state::screen_update_ikari(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	snk_state *state = screen.machine().driver_data<snk_state>();
 
-	state->m_bg_tilemap->set_scrollx(0, state->m_bg_scrollx);
-	state->m_bg_tilemap->set_scrolly(0, state->m_bg_scrolly);
+	m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
+	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	ikari_draw_sprites(screen.machine(), bitmap, cliprect,  0, state->m_sp16_scrollx, state->m_sp16_scrolly, state->m_spriteram + 0x800, 2 );
-	ikari_draw_sprites(screen.machine(), bitmap, cliprect,  0, state->m_sp32_scrollx, state->m_sp32_scrolly, state->m_spriteram,         3 );
-	ikari_draw_sprites(screen.machine(), bitmap, cliprect, 25, state->m_sp16_scrollx, state->m_sp16_scrolly, state->m_spriteram + 0x800, 2 );
+	ikari_draw_sprites(screen.machine(), bitmap, cliprect,  0, m_sp16_scrollx, m_sp16_scrolly, m_spriteram + 0x800, 2 );
+	ikari_draw_sprites(screen.machine(), bitmap, cliprect,  0, m_sp32_scrollx, m_sp32_scrolly, m_spriteram,         3 );
+	ikari_draw_sprites(screen.machine(), bitmap, cliprect, 25, m_sp16_scrollx, m_sp16_scrolly, m_spriteram + 0x800, 2 );
 
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( gwar )
+UINT32 snk_state::screen_update_gwar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	snk_state *state = screen.machine().driver_data<snk_state>();
 
-	state->m_bg_tilemap->set_scrollx(0, state->m_bg_scrollx);
-	state->m_bg_tilemap->set_scrolly(0, state->m_bg_scrolly);
+	m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
+	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	tdfever_draw_sprites(screen.machine(), bitmap, cliprect, state->m_sp16_scrollx, state->m_sp16_scrolly, state->m_spriteram + 0x800, 2, 0, 0, state->m_sprite_split_point );
-	tdfever_draw_sprites(screen.machine(), bitmap, cliprect, state->m_sp32_scrollx, state->m_sp32_scrolly, state->m_spriteram,         3, 0, 0, 32 );
-	tdfever_draw_sprites(screen.machine(), bitmap, cliprect, state->m_sp16_scrollx, state->m_sp16_scrolly, state->m_spriteram + 0x800, 2, 0, state->m_sprite_split_point, 64 );
+	tdfever_draw_sprites(screen.machine(), bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly, m_spriteram + 0x800, 2, 0, 0, m_sprite_split_point );
+	tdfever_draw_sprites(screen.machine(), bitmap, cliprect, m_sp32_scrollx, m_sp32_scrolly, m_spriteram,         3, 0, 0, 32 );
+	tdfever_draw_sprites(screen.machine(), bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly, m_spriteram + 0x800, 2, 0, m_sprite_split_point, 64 );
 
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( tdfever )
+UINT32 snk_state::screen_update_tdfever(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	snk_state *state = screen.machine().driver_data<snk_state>();
 
-	state->m_bg_tilemap->set_scrollx(0, state->m_bg_scrollx);
-	state->m_bg_tilemap->set_scrolly(0, state->m_bg_scrolly);
+	m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
+	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	tdfever_draw_sprites(screen.machine(), bitmap, cliprect, state->m_sp32_scrollx, state->m_sp32_scrolly, state->m_spriteram, 2, 1, 0, 32 );
+	tdfever_draw_sprites(screen.machine(), bitmap, cliprect, m_sp32_scrollx, m_sp32_scrolly, m_spriteram, 2, 1, 0, 32 );
 
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

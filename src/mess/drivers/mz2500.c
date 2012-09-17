@@ -163,6 +163,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_mz2500(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -631,16 +632,15 @@ static void draw_cg_screen(running_machine &machine, bitmap_ind16 &bitmap,const 
 	}
 }
 
-static SCREEN_UPDATE_IND16( mz2500 )
+UINT32 mz2500_state::screen_update_mz2500(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	//mz2500_state *state = screen.machine().driver_data<mz2500_state>();
 	bitmap.fill(screen.machine().pens[0], cliprect); //TODO: correct?
 
 	draw_cg_screen(screen.machine(),bitmap,cliprect,0);
 	draw_tv_screen(screen.machine(),bitmap,cliprect);
 	draw_cg_screen(screen.machine(),bitmap,cliprect,1);
-	//  popmessage("%02x (%02x %02x) (%02x %02x) (%02x %02x) (%02x %02x)",state->m_cg_reg[0x0f],state->m_cg_reg[0x10],state->m_cg_reg[0x11],state->m_cg_reg[0x12],state->m_cg_reg[0x13],state->m_cg_reg[0x14],state->m_cg_reg[0x15],state->m_cg_reg[0x16],state->m_cg_reg[0x17]);
-	//  popmessage("%02x",state->m_text_reg[0x0f]);
+	//  popmessage("%02x (%02x %02x) (%02x %02x) (%02x %02x) (%02x %02x)",m_cg_reg[0x0f],m_cg_reg[0x10],m_cg_reg[0x11],m_cg_reg[0x12],m_cg_reg[0x13],m_cg_reg[0x14],m_cg_reg[0x15],m_cg_reg[0x16],m_cg_reg[0x17]);
+	//  popmessage("%02x",m_text_reg[0x0f]);
 
 
     return 0;
@@ -2113,7 +2113,7 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_21_4772MHz, 640+108, 0, 640, 480, 0, 200) //unknown clock / divider
-    MCFG_SCREEN_UPDATE_STATIC(mz2500)
+	MCFG_SCREEN_UPDATE_DRIVER(mz2500_state, screen_update_mz2500)
 
 	MCFG_PALETTE_LENGTH(0x200)
 

@@ -239,6 +239,7 @@ public:
 	DECLARE_MACHINE_START(meritm_crt250_crt252_crt258);
 	DECLARE_MACHINE_START(meritm_crt260);
 	DECLARE_MACHINE_START(merit_common);
+	UINT32 screen_update_meritm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -461,30 +462,29 @@ void meritm_state::video_start()
 	state_save_register_global(machine(), m_interrupt_vdp1_state);
 }
 
-static SCREEN_UPDATE_IND16( meritm )
+UINT32 meritm_state::screen_update_meritm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	meritm_state *state = screen.machine().driver_data<meritm_state>();
 	if(screen.machine().input().code_pressed_once(KEYCODE_Q))
 	{
-		state->m_layer0_enabled^=1;
-		popmessage("Layer 0 %sabled",state->m_layer0_enabled ? "en" : "dis");
+		m_layer0_enabled^=1;
+		popmessage("Layer 0 %sabled",m_layer0_enabled ? "en" : "dis");
 	}
 	if(screen.machine().input().code_pressed_once(KEYCODE_W))
 	{
-		state->m_layer1_enabled^=1;
-		popmessage("Layer 1 %sabled",state->m_layer1_enabled ? "en" : "dis");
+		m_layer1_enabled^=1;
+		popmessage("Layer 1 %sabled",m_layer1_enabled ? "en" : "dis");
 	}
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if ( state->m_layer0_enabled )
+	if ( m_layer0_enabled )
 	{
-		copybitmap(bitmap, state->m_v9938_0->get_bitmap(), 0, 0, 0, 0, cliprect);
+		copybitmap(bitmap, m_v9938_0->get_bitmap(), 0, 0, 0, 0, cliprect);
 	}
 
-	if ( state->m_layer1_enabled )
+	if ( m_layer1_enabled )
 	{
-		copybitmap_trans(bitmap, state->m_v9938_1->get_bitmap(), 0, 0, -6, -12, cliprect, state->m_v9938_1->get_transpen());
+		copybitmap_trans(bitmap, m_v9938_1->get_bitmap(), 0, 0, -6, -12, cliprect, m_v9938_1->get_transpen());
 	}
 	return 0;
 }
@@ -1198,7 +1198,7 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 
 	MCFG_SCREEN_SIZE(MSX2_TOTAL_XRES_PIXELS, 262*2)
 	MCFG_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)
-	MCFG_SCREEN_UPDATE_STATIC(meritm)
+	MCFG_SCREEN_UPDATE_DRIVER(meritm_state, screen_update_meritm)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_PALETTE_INIT( v9938 )

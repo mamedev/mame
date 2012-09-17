@@ -209,6 +209,10 @@ public:
 	DECLARE_MACHINE_START(qsound);
 	DECLARE_MACHINE_RESET(cps);
 	DECLARE_VIDEO_START(cps);
+	UINT32 screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_kodb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_cps1(screen_device &screen, bool state);
 };
 
 /*----------- defined in drivers/cps1.c -----------*/
@@ -227,8 +231,8 @@ GFXDECODE_EXTERN( cps1 );
 
 
 
-SCREEN_UPDATE_IND16( cps1 );
-SCREEN_VBLANK( cps1 );
+
+
 
 void cps1_get_video_base(running_machine &machine);
 void cps2_set_sprite_priorities(running_machine &machine);

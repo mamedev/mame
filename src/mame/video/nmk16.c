@@ -782,28 +782,27 @@ int nmk16_complexbg_sprswap_tx_update(screen_device &screen, bitmap_ind16 &bitma
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( macross )
+UINT32 nmk16_state::screen_update_macross(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
   return nmk16_bg_spr_tx_update(screen, bitmap, cliprect);
 }
 
-SCREEN_UPDATE_IND16( manybloc )
+UINT32 nmk16_state::screen_update_manybloc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
   return nmk16_bg_sprflip_tx_update(screen, bitmap, cliprect);
 }
 
-SCREEN_UPDATE_IND16( tharrier )
+UINT32 nmk16_state::screen_update_tharrier(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 	/* I think the protection device probably copies this to the regs... */
-	UINT16 tharrier_scroll = state->m_mainram[0x9f00/2];
+	UINT16 tharrier_scroll = m_mainram[0x9f00/2];
 
-	state->m_bg_tilemap0->set_scrollx(0,tharrier_scroll);
+	m_bg_tilemap0->set_scrollx(0,tharrier_scroll);
 
   return nmk16_bg_sprflip_tx_update(screen, bitmap, cliprect);
 }
 
-SCREEN_UPDATE_IND16( tdragon2 )
+UINT32 nmk16_state::screen_update_tdragon2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static int bittbl[8] = {
     4, 6, 5, 7, 3, 2, 1, 0
@@ -812,7 +811,7 @@ SCREEN_UPDATE_IND16( tdragon2 )
   return nmk16_complexbg_sprswap_tx_update(screen, bitmap, cliprect, bittbl);
 }
 
-SCREEN_UPDATE_IND16( gunnail )
+UINT32 nmk16_state::screen_update_gunnail(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static int bittbl[8] = {
     7, 6, 5, 4, 3, 2, 1, 0
@@ -821,44 +820,42 @@ SCREEN_UPDATE_IND16( gunnail )
   return nmk16_complexbg_sprswap_tx_update(screen, bitmap, cliprect, bittbl);
 }
 
-SCREEN_UPDATE_IND16( bioship )
+UINT32 nmk16_state::screen_update_bioship(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
   return nmk16_bioshipbg_sprflip_tx_update(screen, bitmap, cliprect);
 }
 
-SCREEN_UPDATE_IND16( strahl )
+UINT32 nmk16_state::screen_update_strahl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
   return nmk16_bg_fg_spr_tx_update(screen, bitmap, cliprect);
 }
 
-SCREEN_UPDATE_IND16( bjtwin )
+UINT32 nmk16_state::screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
   return nmk16_bg_spr_update(screen, bitmap, cliprect);
 }
 
-SCREEN_VBLANK( nmk )
+void nmk16_state::screen_eof_nmk(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 		/* sprites are DMA'd from Main RAM to a private buffer automatically
            (or at least this is how I interpret the datasheet) */
 
 		/* -- I actually see little evidence to support this, sprite lag
               in some games should be checked on real boards */
 
-	//  memcpy(state->m_spriteram_old2,state->m_spriteram_old,0x1000);
-		memcpy(state->m_spriteram_old2,state->m_mainram+0x8000/2,0x1000);
+	//  memcpy(m_spriteram_old2,m_spriteram_old,0x1000);
+		memcpy(m_spriteram_old2,m_mainram+0x8000/2,0x1000);
 	}
 }
 
-SCREEN_VBLANK( strahl )
+void nmk16_state::screen_eof_strahl(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 		/* sprites are DMA'd from Main RAM to a private buffer automatically
            (or at least this is how I interpret the datasheet) */
 
@@ -867,7 +864,7 @@ SCREEN_VBLANK( strahl )
 
 		/* strahl sprites are allocated in memory range FF000-FFFFF */
 
-		memcpy(state->m_spriteram_old2,state->m_mainram+0xF000/2,0x1000);
+		memcpy(m_spriteram_old2,m_mainram+0xF000/2,0x1000);
 	}
 }
 
@@ -993,25 +990,24 @@ static void redhawki_video_update(running_machine &machine, bitmap_ind16 &bitmap
 	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,0);
 }
 
-SCREEN_UPDATE_IND16( afega )		{	video_update(screen.machine(),bitmap,cliprect, 1, -0x100,+0x000, 0x0001);	return 0; }
-SCREEN_UPDATE_IND16( bubl2000 )	{	video_update(screen.machine(),bitmap,cliprect, 0, -0x100,+0x000, 0x0001);	return 0; }	// no flipscreen support, I really would confirmation from the schematics
-SCREEN_UPDATE_IND16( redhawkb )	{	video_update(screen.machine(),bitmap,cliprect, 0, +0x000,+0x100, 0x0001);	return 0; }
-SCREEN_UPDATE_IND16( redhawki )	{	redhawki_video_update(screen.machine(),bitmap,cliprect); return 0;} // strange scroll regs
+UINT32 nmk16_state::screen_update_afega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){	video_update(screen.machine(),bitmap,cliprect, 1, -0x100,+0x000, 0x0001);	return 0; }
+UINT32 nmk16_state::screen_update_bubl2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){	video_update(screen.machine(),bitmap,cliprect, 0, -0x100,+0x000, 0x0001);	return 0; }	// no flipscreen support, I really would confirmation from the schematics
+UINT32 nmk16_state::screen_update_redhawkb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){	video_update(screen.machine(),bitmap,cliprect, 0, +0x000,+0x100, 0x0001);	return 0; }
+UINT32 nmk16_state::screen_update_redhawki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){	redhawki_video_update(screen.machine(),bitmap,cliprect); return 0;} // strange scroll regs
 
-SCREEN_UPDATE_IND16( firehawk )
+UINT32 nmk16_state::screen_update_firehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
-	state->m_bg_tilemap0->set_scrolly(0, state->m_afega_scroll_1[1] + 0x100);
-	state->m_bg_tilemap0->set_scrollx(0, state->m_afega_scroll_1[0]);
+	m_bg_tilemap0->set_scrolly(0, m_afega_scroll_1[1] + 0x100);
+	m_bg_tilemap0->set_scrollx(0, m_afega_scroll_1[0]);
 
-	state->m_bg_tilemap0->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap0->draw(bitmap, cliprect, 0,0);
 
 	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,3);
 	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,2);
 	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,1);
 	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,0);
 
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 

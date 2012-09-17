@@ -48,6 +48,8 @@ public:
 	virtual void palette_init();
 	DECLARE_MACHINE_START(kchampvs);
 	DECLARE_MACHINE_START(kchamp);
+	UINT32 screen_update_kchampvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_kchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -56,5 +58,5 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( kchamp );
-SCREEN_UPDATE_IND16( kchampvs );
+
+

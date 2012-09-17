@@ -56,6 +56,8 @@ public:
 	DECLARE_MACHINE_RESET(galaga);
 	DECLARE_VIDEO_START(galaga);
 	DECLARE_PALETTE_INIT(galaga);
+	UINT32 screen_update_galaga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_galaga(screen_device &screen, bool state);
 };
 
 class xevious_state : public galaga_state
@@ -90,6 +92,7 @@ public:
 	DECLARE_MACHINE_RESET(xevios);
 	DECLARE_PALETTE_INIT(battles);
 	DECLARE_MACHINE_RESET(battles);
+	UINT32 screen_update_xevious(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -119,6 +122,8 @@ public:
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	DECLARE_VIDEO_START(bosco);
 	DECLARE_PALETTE_INIT(bosco);
+	UINT32 screen_update_bosco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_bosco(screen_device &screen, bool state);
 };
 
 class digdug_state : public galaga_state
@@ -144,6 +149,7 @@ public:
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
 	DECLARE_VIDEO_START(digdug);
 	DECLARE_PALETTE_INIT(digdug);
+	UINT32 screen_update_digdug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -154,10 +160,6 @@ DECLARE_WRITE8_HANDLER( bosco_videoram_w );
 DECLARE_WRITE8_HANDLER( bosco_scrollx_w );
 DECLARE_WRITE8_HANDLER( bosco_scrolly_w );
 DECLARE_WRITE8_HANDLER( bosco_starclr_w );
-
-SCREEN_UPDATE_IND16( bosco );
-
-SCREEN_VBLANK( bosco );	/* update starfield */
 
 /*----------- defined in audio/galaga.c -----------*/
 
@@ -175,11 +177,6 @@ struct star
 
 extern const struct star star_seed_tab[];
 
-
-
-SCREEN_UPDATE_IND16( galaga );
-SCREEN_VBLANK( galaga );	/* update starfield */
-
 /*----------- defined in video/xevious.c -----------*/
 
 DECLARE_WRITE8_HANDLER( xevious_fg_videoram_w );
@@ -191,7 +188,7 @@ DECLARE_WRITE8_HANDLER( xevious_bs_w );
 DECLARE_READ8_HANDLER( xevious_bb_r );
 
 
-SCREEN_UPDATE_IND16( xevious );
+
 
 
 
@@ -220,5 +217,5 @@ INTERRUPT_GEN( battles_interrupt_4 );
 DECLARE_WRITE8_HANDLER( digdug_videoram_w );
 DECLARE_WRITE8_HANDLER( digdug_PORT_w );
 
-SCREEN_UPDATE_IND16( digdug );
+
 

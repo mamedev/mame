@@ -395,7 +395,7 @@ static void render_sprites_91464(running_machine &machine, bitmap_ind16 &bitmap,
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( mcr )
+UINT32 mcr_state::screen_update_mcr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* update the flip state */
 	bg_tilemap->set_flip(mcr_cocktail_flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);

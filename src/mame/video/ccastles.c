@@ -257,16 +257,15 @@ WRITE8_MEMBER(ccastles_state::ccastles_bitmode_addr_w)
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( ccastles )
+UINT32 ccastles_state::screen_update_ccastles(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ccastles_state *state = screen.machine().driver_data<ccastles_state>();
-	UINT8 *spriteaddr = &state->m_spriteram[state->m_video_control[7] * 0x100];	/* BUF1/BUF2 */
-	int flip = state->m_video_control[4] ? 0xff : 0x00;	/* PLAYER2 */
+	UINT8 *spriteaddr = &m_spriteram[m_video_control[7] * 0x100];	/* BUF1/BUF2 */
+	int flip = m_video_control[4] ? 0xff : 0x00;	/* PLAYER2 */
 	pen_t black = get_black_pen(screen.machine());
 	int x, y, offs;
 
 	/* draw the sprites */
-	state->m_spritebitmap.fill(0x0f, cliprect);
+	m_spritebitmap.fill(0x0f, cliprect);
 	for (offs = 0; offs < 320/2; offs += 4)
 	{
 		int x = spriteaddr[offs + 3];
@@ -274,7 +273,7 @@ SCREEN_UPDATE_IND16( ccastles )
 		int which = spriteaddr[offs];
 		int color = spriteaddr[offs + 2] >> 7;
 
-		drawgfx_transpen(state->m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, flip, flip, x, y, 7);
+		drawgfx_transpen(m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, flip, flip, x, y, 7);
 	}
 
 	/* draw the bitmap to the screen, looping over Y */
@@ -283,7 +282,7 @@ SCREEN_UPDATE_IND16( ccastles )
 		UINT16 *dst = &bitmap.pix16(y);
 
 		/* if we're in the VBLANK region, just fill with black */
-		if (state->m_syncprom[y] & 1)
+		if (m_syncprom[y] & 1)
 		{
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 				dst[x] = black;
@@ -292,14 +291,14 @@ SCREEN_UPDATE_IND16( ccastles )
 		/* non-VBLANK region: merge the sprites and the bitmap */
 		else
 		{
-			UINT16 *mosrc = &state->m_spritebitmap.pix16(y);
-			int effy = (((y - state->m_vblank_end) + (flip ? 0 : state->m_vscroll)) ^ flip) & 0xff;
+			UINT16 *mosrc = &m_spritebitmap.pix16(y);
+			int effy = (((y - m_vblank_end) + (flip ? 0 : m_vscroll)) ^ flip) & 0xff;
 			UINT8 *src;
 
 			/* the "POTATO" chip does some magic here; this is just a guess */
 			if (effy < 24)
 				effy = 24;
-			src = &state->m_videoram[effy * 128];
+			src = &m_videoram[effy * 128];
 
 			/* loop over X */
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
@@ -311,7 +310,7 @@ SCREEN_UPDATE_IND16( ccastles )
 				/* otherwise, process normally */
 				else
 				{
-					int effx = (state->m_hscroll + (x ^ flip)) & 255;
+					int effx = (m_hscroll + (x ^ flip)) & 255;
 
 					/* low 4 bits = left pixel, high 4 bits = right pixel */
 					UINT8 pix = (src[effx / 2] >> ((effx & 1) * 4)) & 0x0f;
@@ -333,7 +332,7 @@ SCREEN_UPDATE_IND16( ccastles )
 					prindex |= (mopix & 7) << 2;
 					prindex |= (mopix & 8) >> 2;
 					prindex |= (pix & 8) >> 3;
-					prvalue = state->m_priprom[prindex];
+					prvalue = m_priprom[prindex];
 
 					/* Bit 1 of prvalue selects the low 4 bits of the final pixel */
 					if (prvalue & 2)

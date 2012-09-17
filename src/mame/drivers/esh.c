@@ -49,6 +49,7 @@ public:
 	DECLARE_DRIVER_INIT(esh);
 	virtual void machine_start();
 	virtual void palette_init();
+	UINT32 screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -57,9 +58,8 @@ public:
 
 
 /* VIDEO GOODS */
-static SCREEN_UPDATE_RGB32( esh )
+UINT32 esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	esh_state *state = screen.machine().driver_data<esh_state>();
 	int charx, chary;
 
 	/* clear */
@@ -72,13 +72,13 @@ static SCREEN_UPDATE_RGB32( esh )
 		{
 			int current_screen_character = (chary*32) + charx;
 
-			int palIndex  = (state->m_tile_control_ram[current_screen_character] & 0x0f);
-			int tileOffs  = (state->m_tile_control_ram[current_screen_character] & 0x10) >> 4;
-			//int blinkLine = (state->m_tile_control_ram[current_screen_character] & 0x40) >> 6;
-			//int blinkChar = (state->m_tile_control_ram[current_screen_character] & 0x80) >> 7;
+			int palIndex  = (m_tile_control_ram[current_screen_character] & 0x0f);
+			int tileOffs  = (m_tile_control_ram[current_screen_character] & 0x10) >> 4;
+			//int blinkLine = (m_tile_control_ram[current_screen_character] & 0x40) >> 6;
+			//int blinkChar = (m_tile_control_ram[current_screen_character] & 0x80) >> 7;
 
 			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0],
-					state->m_tile_ram[current_screen_character] + (0x100 * tileOffs),
+					m_tile_ram[current_screen_character] + (0x100 * tileOffs),
 					palIndex,
 					0, 0, charx*8, chary*8, 0);
 		}
@@ -308,7 +308,7 @@ static MACHINE_CONFIG_START( esh, esh_state )
 
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
-	MCFG_LASERDISC_OVERLAY_STATIC(256, 256, esh)
+	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, esh_state, screen_update_esh)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")

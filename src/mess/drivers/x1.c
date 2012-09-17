@@ -542,15 +542,14 @@ static void draw_gfxbitmap(running_machine &machine, bitmap_rgb32 &bitmap,const 
 	}
 }
 
-SCREEN_UPDATE_RGB32( x1 )
+UINT32 x1_state::screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	x1_state *state = screen.machine().driver_data<x1_state>();
 
 	bitmap.fill(MAKE_ARGB(0xff,0x00,0x00,0x00), cliprect);
 
-	draw_gfxbitmap(screen.machine(),bitmap,cliprect,state->m_scrn_reg.disp_bank,state->m_scrn_reg.pri);
+	draw_gfxbitmap(screen.machine(),bitmap,cliprect,m_scrn_reg.disp_bank,m_scrn_reg.pri);
 	draw_fgtilemap(screen.machine(),bitmap,cliprect);
-	draw_gfxbitmap(screen.machine(),bitmap,cliprect,state->m_scrn_reg.disp_bank,state->m_scrn_reg.pri^0xff);
+	draw_gfxbitmap(screen.machine(),bitmap,cliprect,m_scrn_reg.disp_bank,m_scrn_reg.pri^0xff);
 
 	return 0;
 }
@@ -2589,7 +2588,7 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_STATIC(x1)
+	MCFG_SCREEN_UPDATE_DRIVER(x1_state, screen_update_x1)
 
 	MCFG_MC6845_ADD("crtc", H46505, (VDP_CLOCK/48), mc6845_intf) //unknown divider
 	MCFG_PALETTE_LENGTH(0x10+0x1000)

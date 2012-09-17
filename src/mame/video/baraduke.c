@@ -303,43 +303,41 @@ static void set_scroll(running_machine &machine, int layer)
 }
 
 
-SCREEN_UPDATE_IND16( baraduke )
+UINT32 baraduke_state::screen_update_baraduke(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	baraduke_state *state = screen.machine().driver_data<baraduke_state>();
-	UINT8 *spriteram = state->m_spriteram + 0x1800;
+	UINT8 *spriteram = m_spriteram + 0x1800;
 	int back;
 
 	/* flip screen is embedded in the sprite control registers */
-	/* can't use state->flip_screen_set() because the visible area is asymmetrical */
-	state->flip_screen_set_no_update(spriteram[0x07f6] & 0x01);
-	screen.machine().tilemap().set_flip_all(state->flip_screen() ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	/* can't use flip_screen_set() because the visible area is asymmetrical */
+	flip_screen_set_no_update(spriteram[0x07f6] & 0x01);
+	screen.machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	set_scroll(screen.machine(), 0);
 	set_scroll(screen.machine(), 1);
 
-	if (((state->m_xscroll[0] & 0x0e00) >> 9) == 6)
+	if (((m_xscroll[0] & 0x0e00) >> 9) == 6)
 		back = 1;
 	else
 		back = 0;
 
-	state->m_bg_tilemap[back]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+	m_bg_tilemap[back]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 	draw_sprites(screen.machine(), bitmap,cliprect,0);
-	state->m_bg_tilemap[back ^ 1]->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap[back ^ 1]->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect,1);
 
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
 
-SCREEN_VBLANK( baraduke )
+void baraduke_state::screen_eof_baraduke(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		baraduke_state *state = screen.machine().driver_data<baraduke_state>();
-		if (state->m_copy_sprites)
+		if (m_copy_sprites)
 		{
-			UINT8 *spriteram = state->m_spriteram + 0x1800;
+			UINT8 *spriteram = m_spriteram + 0x1800;
 			int i,j;
 
 			for (i = 0;i < 0x800;i += 16)
@@ -348,7 +346,7 @@ SCREEN_VBLANK( baraduke )
 					spriteram[i+j] = spriteram[i+j - 6];
 			}
 
-			state->m_copy_sprites = 0;
+			m_copy_sprites = 0;
 		}
 	}
 }

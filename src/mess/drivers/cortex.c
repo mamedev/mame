@@ -29,6 +29,7 @@ public:
 
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_cortex(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 static ADDRESS_MAP_START( cortex_mem, AS_PROGRAM, 8, cortex_state )
@@ -54,7 +55,7 @@ void cortex_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( cortex )
+UINT32 cortex_state::screen_update_cortex(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -82,7 +83,7 @@ static MACHINE_CONFIG_START( cortex, cortex_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_STATIC(cortex)
+	MCFG_SCREEN_UPDATE_DRIVER(cortex_state, screen_update_cortex)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 MACHINE_CONFIG_END

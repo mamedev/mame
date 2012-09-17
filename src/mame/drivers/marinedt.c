@@ -152,6 +152,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_marinedt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -515,104 +516,103 @@ void marinedt_state::video_start()
 #define OBJ_COLOR(a)	((a) & 0x03)
 #define OBJ_X(x)	(256 - 32 - (x))
 #define OBJ_Y(y)	(256 - 1 - (y))
-#define OBJ_FLIPX(a)	((state->m_pf & 0x02) == 0)
+#define OBJ_FLIPX(a)	((m_pf & 0x02) == 0)
 #define OBJ_FLIPY(a)	((a) & 0x80)
 
-static SCREEN_UPDATE_IND16( marinedt )
+UINT32 marinedt_state::screen_update_marinedt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	marinedt_state *state = screen.machine().driver_data<marinedt_state>();
 	int sx, sy;
 
-	state->m_tile->fill(0);
-	state->m_tx_tilemap->draw(*state->m_tile, cliprect, 0, 0);
+	m_tile->fill(0);
+	m_tx_tilemap->draw(*m_tile, cliprect, 0, 0);
 
-	state->m_obj1->fill(0);
-	drawgfx_transpen(*state->m_obj1, state->m_obj1->cliprect(), screen.machine().gfx[1],
-			OBJ_CODE(state->m_obj1_a),
-			OBJ_COLOR(state->m_obj1_a),
-			OBJ_FLIPX(state->m_obj1_a), OBJ_FLIPY(state->m_obj1_a),
+	m_obj1->fill(0);
+	drawgfx_transpen(*m_obj1, m_obj1->cliprect(), screen.machine().gfx[1],
+			OBJ_CODE(m_obj1_a),
+			OBJ_COLOR(m_obj1_a),
+			OBJ_FLIPX(m_obj1_a), OBJ_FLIPY(m_obj1_a),
 			0, 0, 0);
 
-	state->m_obj2->fill(0);
-	drawgfx_transpen(*state->m_obj2, state->m_obj2->cliprect(), screen.machine().gfx[2],
-			OBJ_CODE(state->m_obj2_a),
-			OBJ_COLOR(state->m_obj2_a),
-			OBJ_FLIPX(state->m_obj2_a), OBJ_FLIPY(state->m_obj2_a),
+	m_obj2->fill(0);
+	drawgfx_transpen(*m_obj2, m_obj2->cliprect(), screen.machine().gfx[2],
+			OBJ_CODE(m_obj2_a),
+			OBJ_COLOR(m_obj2_a),
+			OBJ_FLIPX(m_obj2_a), OBJ_FLIPY(m_obj2_a),
 			0, 0, 0);
 
 	bitmap.fill(0);
 
-	if (state->m_pd & 0x02)
-		copybitmap_trans(bitmap, *state->m_obj2, 0, 0, OBJ_X(state->m_obj2_x), OBJ_Y(state->m_obj2_y), cliprect, 0);
+	if (m_pd & 0x02)
+		copybitmap_trans(bitmap, *m_obj2, 0, 0, OBJ_X(m_obj2_x), OBJ_Y(m_obj2_y), cliprect, 0);
 
-	if (state->m_pd & 0x01)
-		copybitmap_trans(bitmap, *state->m_obj1, 0, 0, OBJ_X(state->m_obj1_x), OBJ_Y(state->m_obj1_y), cliprect, 0);
+	if (m_pd & 0x01)
+		copybitmap_trans(bitmap, *m_obj1, 0, 0, OBJ_X(m_obj1_x), OBJ_Y(m_obj1_y), cliprect, 0);
 
-	copybitmap_trans(bitmap, *state->m_tile, 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, *m_tile, 0, 0, 0, 0, cliprect, 0);
 
-	state->m_coll = state->m_cx = state->m_cyr = state->m_cyq = 0;
-	if (state->m_pd & 0x01)
+	m_coll = m_cx = m_cyr = m_cyq = 0;
+	if (m_pd & 0x01)
 	{
 		for (sx = 0; sx < 32; sx++)
 			for (sy = 0; sy < 32; sy++)
 			{
-				int x = OBJ_X(state->m_obj1_x) + sx;
-				int y = OBJ_Y(state->m_obj1_y) + sy;
+				int x = OBJ_X(m_obj1_x) + sx;
+				int y = OBJ_Y(m_obj1_y) + sy;
 
 				if (!cliprect.contains(x, y))
 					continue;
 
-				if (state->m_obj1->pix16(sy, sx) == 0)
+				if (m_obj1->pix16(sy, sx) == 0)
 					continue;
 
-				if (state->m_tile->pix16(y, x) != 0)
+				if (m_tile->pix16(y, x) != 0)
 				{
-					state->m_coll = 0x08;
+					m_coll = 0x08;
 
-					state->m_cx = (x % 128) / 8;
-					state->m_cx &= 0x0f;
+					m_cx = (x % 128) / 8;
+					m_cx &= 0x0f;
 
-					state->m_cyr = ((y % 64) / 8) * 2 + (x > 127 ? 1 : 0);
-					state->m_cyr &= 0x0f;
+					m_cyr = ((y % 64) / 8) * 2 + (x > 127 ? 1 : 0);
+					m_cyr &= 0x0f;
 
-					state->m_cyq = y / 64;
-					state->m_cyq &= 0x0f;
+					m_cyq = y / 64;
+					m_cyq &= 0x0f;
 
 					break;
 				}
 			}
 	}
 
-	state->m_collh = state->m_cxh = state->m_cyrh = state->m_cyqh = 0;
-	if ((state->m_pd & 0x03) == 0x03)
+	m_collh = m_cxh = m_cyrh = m_cyqh = 0;
+	if ((m_pd & 0x03) == 0x03)
 	{
 		for (sx = 0; sx < 32; sx++)
 			for (sy = 0; sy < 32; sy++)
 			{
-				int x = OBJ_X(state->m_obj1_x + sx);
-				int y = OBJ_Y(state->m_obj1_y + sy);
+				int x = OBJ_X(m_obj1_x + sx);
+				int y = OBJ_Y(m_obj1_y + sy);
 
-				int xx = OBJ_X(state->m_obj2_x) - x;
-				int yy = OBJ_Y(state->m_obj2_y) - y;
+				int xx = OBJ_X(m_obj2_x) - x;
+				int yy = OBJ_Y(m_obj2_y) - y;
 
 				if (xx < 0 || xx >= 32 || yy < 0 || yy >= 32)
 					continue;
 
-				if (state->m_obj1->pix16(sy, sx) == 0)
+				if (m_obj1->pix16(sy, sx) == 0)
 					continue;
 
-				if (state->m_obj2->pix16(yy, xx) != 0)
+				if (m_obj2->pix16(yy, xx) != 0)
 				{
-					state->m_collh = 0x80;
+					m_collh = 0x80;
 
-					state->m_cxh = (x % 128) / 8;
-					state->m_cxh &= 0x0f;
+					m_cxh = (x % 128) / 8;
+					m_cxh &= 0x0f;
 
-					state->m_cyrh = ((y % 64) / 8) * 2 + (x > 127 ? 1 : 0);
-					state->m_cyrh &= 0x0f;
+					m_cyrh = ((y % 64) / 8) * 2 + (x > 127 ? 1 : 0);
+					m_cyrh &= 0x0f;
 
-					state->m_cyqh= y / 64;
-					state->m_cyqh &= 0x0f;
+					m_cyqh= y / 64;
+					m_cyqh &= 0x0f;
 
 					break;
 				}
@@ -682,7 +682,7 @@ static MACHINE_CONFIG_START( marinedt, marinedt_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(4*8+32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(marinedt)
+	MCFG_SCREEN_UPDATE_DRIVER(marinedt_state, screen_update_marinedt)
 
 	MCFG_GFXDECODE(marinedt)
 	MCFG_PALETTE_LENGTH(64)

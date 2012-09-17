@@ -36,11 +36,13 @@ public:
 	DECLARE_DRIVER_INIT(avengrgs);
 	DECLARE_MACHINE_RESET(mlc);
 	DECLARE_VIDEO_START(mlc);
+	UINT32 screen_update_mlc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_eof_mlc(screen_device &screen, bool state);
 };
 
 
 /*----------- defined in video/deco_mlc.c -----------*/
 
 
-SCREEN_UPDATE_RGB32( mlc );
-SCREEN_VBLANK( mlc );
+
+

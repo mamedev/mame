@@ -80,6 +80,10 @@ public:
 	DECLARE_VIDEO_START(bigrun);
 	DECLARE_VIDEO_START(f1gpstar);
 	DECLARE_VIDEO_START(cischeat);
+	UINT32 screen_update_bigrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_scudhamm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_cischeat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_f1gpstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -92,7 +96,7 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( bigrun );
-SCREEN_UPDATE_IND16( cischeat );
-SCREEN_UPDATE_IND16( f1gpstar );
-SCREEN_UPDATE_IND16( scudhamm );
+
+
+
+

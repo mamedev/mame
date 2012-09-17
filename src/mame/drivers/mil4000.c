@@ -122,6 +122,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_sc2_tile_info);
 	TILE_GET_INFO_MEMBER(get_sc3_tile_info);
 	virtual void video_start();
+	UINT32 screen_update_mil4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -189,13 +190,12 @@ void mil4000_state::video_start()
 	m_sc3_tilemap->set_transparent_pen(0);
 }
 
-static SCREEN_UPDATE_IND16(mil4000)
+UINT32 mil4000_state::screen_update_mil4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mil4000_state *state = screen.machine().driver_data<mil4000_state>();
-	state->m_sc0_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_sc1_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_sc2_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_sc3_tilemap->draw(bitmap, cliprect, 0,0);
+	m_sc0_tilemap->draw(bitmap, cliprect, 0,0);
+	m_sc1_tilemap->draw(bitmap, cliprect, 0,0);
+	m_sc2_tilemap->draw(bitmap, cliprect, 0,0);
+	m_sc3_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -381,7 +381,7 @@ static MACHINE_CONFIG_START( mil4000, mil4000_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_STATIC(mil4000)
+	MCFG_SCREEN_UPDATE_DRIVER(mil4000_state, screen_update_mil4000)
 
 	MCFG_PALETTE_LENGTH(0x800)
 	MCFG_PALETTE_INIT(all_black)

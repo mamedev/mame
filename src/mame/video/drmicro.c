@@ -113,15 +113,14 @@ void drmicro_state::video_start()
 	m_bg2->set_transparent_pen(0);
 }
 
-SCREEN_UPDATE_IND16( drmicro )
+UINT32 drmicro_state::screen_update_drmicro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	drmicro_state *state = screen.machine().driver_data<drmicro_state>();
 	int offs, adr, g;
 	int chr, col, attr;
 	int x, y, fx, fy;
 
-	state->m_bg1->draw(bitmap, cliprect, 0, 0);
-	state->m_bg2->draw(bitmap, cliprect, 0, 0);
+	m_bg1->draw(bitmap, cliprect, 0, 0);
+	m_bg2->draw(bitmap, cliprect, 0, 0);
 
 	/* draw sprites */
 	for (g = 0; g < 2; g++)
@@ -130,19 +129,19 @@ SCREEN_UPDATE_IND16( drmicro )
 
 		for (offs = 0x00; offs < 0x20; offs += 4)
 		{
-			x = state->m_videoram[offs + adr + 3];
-			y = state->m_videoram[offs + adr + 0];
-			attr = state->m_videoram[offs + adr + 2];
-			chr = state->m_videoram[offs + adr + 1];
+			x = m_videoram[offs + adr + 3];
+			y = m_videoram[offs + adr + 0];
+			attr = m_videoram[offs + adr + 2];
+			chr = m_videoram[offs + adr + 1];
 
-			fx = (chr & 0x01) ^ state->m_flipscreen;
-			fy = ((chr & 0x02) >> 1) ^ state->m_flipscreen;
+			fx = (chr & 0x01) ^ m_flipscreen;
+			fy = ((chr & 0x02) >> 1) ^ m_flipscreen;
 
 			chr = (chr >> 2) | (attr & 0xc0);
 
 			col = (attr & 0x0f) + 0x00;
 
-			if (!state->m_flipscreen)
+			if (!m_flipscreen)
 				y = (240 - y) & 0xff;
 			else
 				x = (240 - x) & 0xff;

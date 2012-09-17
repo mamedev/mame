@@ -9,10 +9,9 @@
 #include "emu.h"
 #include "includes/nascom1.h"
 
-SCREEN_UPDATE_IND16( nascom1 )
+UINT32 nascom1_state::screen_update_nascom1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	nascom1_state *state = screen.machine().driver_data<nascom1_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int	sy, sx;
 
 	for (sx = 0; sx < 48; sx++)
@@ -34,10 +33,9 @@ SCREEN_UPDATE_IND16( nascom1 )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( nascom2 )
+UINT32 nascom1_state::screen_update_nascom2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	nascom1_state *state = screen.machine().driver_data<nascom1_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int	sy, sx;
 
 	for (sx = 0; sx < 48; sx++)

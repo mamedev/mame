@@ -125,6 +125,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_vpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -133,10 +134,9 @@ void vpoker_state::video_start()
 	m_videoram = auto_alloc_array(machine(), UINT8, 0x200);
 }
 
-static SCREEN_UPDATE_IND16( vpoker )
+UINT32 vpoker_state::screen_update_vpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	vpoker_state *state = screen.machine().driver_data<vpoker_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	gfx_element *gfx = screen.machine().gfx[0];
 	int count = 0x0000;
 
@@ -665,7 +665,7 @@ static MACHINE_CONFIG_START( vpoker, vpoker_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 480-1, 0*8, 240-1)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(vpoker)
+	MCFG_SCREEN_UPDATE_DRIVER(vpoker_state, screen_update_vpoker)
 
 	MCFG_GFXDECODE(vpoker)
 	MCFG_PALETTE_LENGTH(8)

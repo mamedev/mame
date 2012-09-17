@@ -176,6 +176,8 @@ public:
 	DECLARE_VIDEO_START(scorpion);
 	DECLARE_VIDEO_START(ad2083);
 	DECLARE_VIDEO_START(dambustr);
+	UINT32 screen_update_galaxold(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_dambustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -222,8 +224,8 @@ public:
 void galaxold_init_stars(running_machine &machine, int colors_offset);
 void galaxold_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-SCREEN_UPDATE_IND16( galaxold );
-SCREEN_UPDATE_IND16( dambustr );
+
+
 
 
 

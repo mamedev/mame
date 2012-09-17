@@ -77,6 +77,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_k3_bg_tile_info);
 	virtual void machine_start();
 	virtual void video_start();
+	UINT32 screen_update_k3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -123,10 +124,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-static SCREEN_UPDATE_IND16(k3)
+UINT32 k3_state::screen_update_k3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	k3_state *state = screen.machine().driver_data<k3_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
@@ -267,7 +267,7 @@ static MACHINE_CONFIG_START( k3, k3_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(k3)
+	MCFG_SCREEN_UPDATE_DRIVER(k3_state, screen_update_k3)
 
 	MCFG_PALETTE_LENGTH(0x800)
 

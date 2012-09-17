@@ -130,6 +130,8 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	DECLARE_MACHINE_RESET(intvecs);
+	UINT32 screen_update_intv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_intvkbd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/intv.c -----------*/

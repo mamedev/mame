@@ -244,23 +244,22 @@ static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const 
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( ddribble )
+UINT32 ddribble_state::screen_update_ddribble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ddribble_state *state = screen.machine().driver_data<ddribble_state>();
 	set_pens(screen.machine());
 
-	state->m_fg_tilemap->set_flip((state->m_vregs[0][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	state->m_bg_tilemap->set_flip((state->m_vregs[1][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_fg_tilemap->set_flip((m_vregs[0][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_bg_tilemap->set_flip((m_vregs[1][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* set scroll registers */
-	state->m_fg_tilemap->set_scrollx(0, state->m_vregs[0][1] | ((state->m_vregs[0][2] & 0x01) << 8));
-	state->m_bg_tilemap->set_scrollx(0, state->m_vregs[1][1] | ((state->m_vregs[1][2] & 0x01) << 8));
-	state->m_fg_tilemap->set_scrolly(0, state->m_vregs[0][0]);
-	state->m_bg_tilemap->set_scrolly(0, state->m_vregs[1][0]);
+	m_fg_tilemap->set_scrollx(0, m_vregs[0][1] | ((m_vregs[0][2] & 0x01) << 8));
+	m_bg_tilemap->set_scrollx(0, m_vregs[1][1] | ((m_vregs[1][2] & 0x01) << 8));
+	m_fg_tilemap->set_scrolly(0, m_vregs[0][0]);
+	m_bg_tilemap->set_scrolly(0, m_vregs[1][0]);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram_1, 0x07d, 2, state->m_vregs[0][4] & 0x08);
-	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram_2, 0x140, 3, state->m_vregs[1][4] & 0x08);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram_1, 0x07d, 2, m_vregs[0][4] & 0x08);
+	draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram_2, 0x140, 3, m_vregs[1][4] & 0x08);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

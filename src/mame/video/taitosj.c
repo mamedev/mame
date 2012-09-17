@@ -742,13 +742,13 @@ static int video_update_common(running_machine &machine, bitmap_ind16 &bitmap,
 }
 
 
-SCREEN_UPDATE_IND16( taitosj )
+UINT32 taitosj_state::screen_update_taitosj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return video_update_common(screen.machine(), bitmap, cliprect, taitosj_copy_layer);
 }
 
 
-SCREEN_UPDATE_IND16( kikstart )
+UINT32 taitosj_state::screen_update_kikstart(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return video_update_common(screen.machine(), bitmap, cliprect, kikstart_copy_layer);
 }

@@ -61,6 +61,8 @@ public:
 	DECLARE_PALETTE_INIT(fastfred);
 	DECLARE_MACHINE_START(imago);
 	DECLARE_VIDEO_START(imago);
+	UINT32 screen_update_fastfred(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_imago(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -76,9 +78,9 @@ DECLARE_WRITE8_HANDLER( fastfred_colorbank1_w );
 DECLARE_WRITE8_HANDLER( fastfred_colorbank2_w );
 DECLARE_WRITE8_HANDLER( fastfred_flip_screen_x_w );
 DECLARE_WRITE8_HANDLER( fastfred_flip_screen_y_w );
-SCREEN_UPDATE_IND16( fastfred );
 
 
-SCREEN_UPDATE_IND16( imago );
+
+
 DECLARE_WRITE8_HANDLER( imago_fg_videoram_w );
 DECLARE_WRITE8_HANDLER( imago_charbank_w );

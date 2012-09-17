@@ -99,7 +99,7 @@ static MACHINE_CONFIG_START( beezer, beezer_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(384, 256)
 	MCFG_SCREEN_VISIBLE_AREA(16, 304-1, 0, 240-1) // 288 x 240, correct?
-	MCFG_SCREEN_UPDATE_STATIC(beezer)
+	MCFG_SCREEN_UPDATE_DRIVER(beezer_state, screen_update_beezer)
 
 	MCFG_PALETTE_LENGTH(16)
 

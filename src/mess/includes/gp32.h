@@ -163,6 +163,7 @@ public:
 	DECLARE_WRITE32_MEMBER(s3c240x_mmc_w);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_gp32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 

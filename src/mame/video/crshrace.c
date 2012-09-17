@@ -178,11 +178,10 @@ static void draw_fg(running_machine &machine, bitmap_ind16 &bitmap, const rectan
 }
 
 
-SCREEN_UPDATE_IND16( crshrace )
+UINT32 crshrace_state::screen_update_crshrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	crshrace_state *state = screen.machine().driver_data<crshrace_state>();
 
-	if (state->m_gfxctrl & 0x04)	/* display disable? */
+	if (m_gfxctrl & 0x04)	/* display disable? */
 	{
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
@@ -190,7 +189,7 @@ SCREEN_UPDATE_IND16( crshrace )
 
 	bitmap.fill(0x1ff, cliprect);
 
-	switch (state->m_gfxctrl & 0xfb)
+	switch (m_gfxctrl & 0xfb)
 	{
 		case 0x00:	/* high score screen */
 			draw_sprites(screen.machine(), bitmap, cliprect);
@@ -204,15 +203,14 @@ SCREEN_UPDATE_IND16( crshrace )
 			draw_sprites(screen.machine(), bitmap, cliprect);
 			break;
 		default:
-			popmessage("gfxctrl = %02x", state->m_gfxctrl);
+			popmessage("gfxctrl = %02x", m_gfxctrl);
 			break;
 	}
 	return 0;
 }
 
-SCREEN_VBLANK( crshrace )
+void crshrace_state::screen_eof_crshrace(screen_device &screen, bool state)
 {
-	crshrace_state *state = screen.machine().driver_data<crshrace_state>();
-	state->m_spriteram->vblank_copy_rising(screen, vblank_on);
-	state->m_spriteram2->vblank_copy_rising(screen, vblank_on);
+	m_spriteram->vblank_copy_rising(screen, state);
+	m_spriteram2->vblank_copy_rising(screen, state);
 }

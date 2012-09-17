@@ -120,29 +120,28 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-SCREEN_UPDATE_IND16( strnskil )
+UINT32 strnskil_state::screen_update_strnskil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	strnskil_state *state = screen.machine().driver_data<strnskil_state>();
 	int row;
-	const UINT8 *usr1 = state->memregion("user1")->base();
+	const UINT8 *usr1 = memregion("user1")->base();
 
 	for (row = 0; row < 32; row++)
 	{
-		if (state->m_scrl_ctrl != 0x07)
+		if (m_scrl_ctrl != 0x07)
 		{
-			switch (usr1[state->m_scrl_ctrl * 32 + row])
+			switch (usr1[m_scrl_ctrl * 32 + row])
 			{
 			case 2:
-				state->m_bg_tilemap->set_scrollx(row, -~state->m_xscroll[1]);
+				m_bg_tilemap->set_scrollx(row, -~m_xscroll[1]);
 				break;
 			case 4:
-				state->m_bg_tilemap->set_scrollx(row, -~state->m_xscroll[0]);
+				m_bg_tilemap->set_scrollx(row, -~m_xscroll[0]);
 				break;
 			}
 		}
 	}
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

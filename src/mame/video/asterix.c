@@ -45,67 +45,66 @@ void asterix_tile_callback( running_machine &machine, int layer, int *code, int 
 	*code = (*code & 0x03ff) | state->m_tilebanks[(*code >> 10) & 3];
 }
 
-SCREEN_UPDATE_IND16( asterix )
+UINT32 asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	asterix_state *state = screen.machine().driver_data<asterix_state>();
 	static const int K053251_CI[4] = { K053251_CI0, K053251_CI2, K053251_CI3, K053251_CI4 };
 	int layer[3], plane, new_colorbase;
 
 	/* Layer offsets are different if horizontally flipped */
-	if (k056832_read_register(state->m_k056832, 0x0) & 0x10)
+	if (k056832_read_register(m_k056832, 0x0) & 0x10)
 	{
-		k056832_set_layer_offs(state->m_k056832, 0, 89 - 176, 0);
-		k056832_set_layer_offs(state->m_k056832, 1, 91 - 176, 0);
-		k056832_set_layer_offs(state->m_k056832, 2, 89 - 176, 0);
-		k056832_set_layer_offs(state->m_k056832, 3, 95 - 176, 0);
+		k056832_set_layer_offs(m_k056832, 0, 89 - 176, 0);
+		k056832_set_layer_offs(m_k056832, 1, 91 - 176, 0);
+		k056832_set_layer_offs(m_k056832, 2, 89 - 176, 0);
+		k056832_set_layer_offs(m_k056832, 3, 95 - 176, 0);
 	}
 	else
 	{
-		k056832_set_layer_offs(state->m_k056832, 0, 89, 0);
-		k056832_set_layer_offs(state->m_k056832, 1, 91, 0);
-		k056832_set_layer_offs(state->m_k056832, 2, 89, 0);
-		k056832_set_layer_offs(state->m_k056832, 3, 95, 0);
+		k056832_set_layer_offs(m_k056832, 0, 89, 0);
+		k056832_set_layer_offs(m_k056832, 1, 91, 0);
+		k056832_set_layer_offs(m_k056832, 2, 89, 0);
+		k056832_set_layer_offs(m_k056832, 3, 95, 0);
 	}
 
 
-	state->m_tilebanks[0] = (k056832_get_lookup(state->m_k056832, 0) << 10);
-	state->m_tilebanks[1] = (k056832_get_lookup(state->m_k056832, 1) << 10);
-	state->m_tilebanks[2] = (k056832_get_lookup(state->m_k056832, 2) << 10);
-	state->m_tilebanks[3] = (k056832_get_lookup(state->m_k056832, 3) << 10);
+	m_tilebanks[0] = (k056832_get_lookup(m_k056832, 0) << 10);
+	m_tilebanks[1] = (k056832_get_lookup(m_k056832, 1) << 10);
+	m_tilebanks[2] = (k056832_get_lookup(m_k056832, 2) << 10);
+	m_tilebanks[3] = (k056832_get_lookup(m_k056832, 3) << 10);
 
 	// update color info and refresh tilemaps
-	state->m_sprite_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI1);
+	m_sprite_colorbase = k053251_get_palette_index(m_k053251, K053251_CI1);
 
 	for (plane = 0; plane < 4; plane++)
 	{
-		new_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI[plane]);
-		if (state->m_layer_colorbase[plane] != new_colorbase)
+		new_colorbase = k053251_get_palette_index(m_k053251, K053251_CI[plane]);
+		if (m_layer_colorbase[plane] != new_colorbase)
 		{
-			state->m_layer_colorbase[plane] = new_colorbase;
-			k056832_mark_plane_dirty(state->m_k056832, plane);
+			m_layer_colorbase[plane] = new_colorbase;
+			k056832_mark_plane_dirty(m_k056832, plane);
 		}
 	}
 
 	layer[0] = 0;
-	state->m_layerpri[0] = k053251_get_priority(state->m_k053251, K053251_CI0);
+	m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI0);
 	layer[1] = 1;
-	state->m_layerpri[1] = k053251_get_priority(state->m_k053251, K053251_CI2);
+	m_layerpri[1] = k053251_get_priority(m_k053251, K053251_CI2);
 	layer[2] = 3;
-	state->m_layerpri[2] = k053251_get_priority(state->m_k053251, K053251_CI4);
+	m_layerpri[2] = k053251_get_priority(m_k053251, K053251_CI4);
 
-	konami_sortlayers3(layer, state->m_layerpri);
+	konami_sortlayers3(layer, m_layerpri);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
-	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, layer[0], K056832_DRAW_FLAG_MIRROR, 1);
-	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, layer[1], K056832_DRAW_FLAG_MIRROR, 2);
-	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, layer[2], K056832_DRAW_FLAG_MIRROR, 4);
+	k056832_tilemap_draw(m_k056832, bitmap, cliprect, layer[0], K056832_DRAW_FLAG_MIRROR, 1);
+	k056832_tilemap_draw(m_k056832, bitmap, cliprect, layer[1], K056832_DRAW_FLAG_MIRROR, 2);
+	k056832_tilemap_draw(m_k056832, bitmap, cliprect, layer[2], K056832_DRAW_FLAG_MIRROR, 4);
 
 /* this isn't supported anymore and it is unsure if still needed; keeping here for reference
     pdrawgfx_shadow_lowpri = 1; fix shadows in front of feet */
-	k053245_sprites_draw(state->m_k053244, bitmap, cliprect);
+	k053245_sprites_draw(m_k053244, bitmap, cliprect);
 
-	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 0);
+	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 0);
 	return 0;
 }

@@ -67,6 +67,8 @@ public:
 	DECLARE_WRITE32_MEMBER(tmmjprd_brt_2_w);
 	DECLARE_WRITE32_MEMBER(tmmjprd_eeprom_write);
 	virtual void video_start();
+	UINT32 screen_update_tmmjprd_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_tmmjprd_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -289,51 +291,49 @@ static void ttmjprd_draw_tilemap(running_machine &machine, bitmap_ind16 &bitmap,
 
 }
 
-static SCREEN_UPDATE_IND16( tmmjprd_left )
+UINT32 tmmjprd_state::screen_update_tmmjprd_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tmmjprd_state *state = screen.machine().driver_data<tmmjprd_state>();
-	UINT8* gfxroms = state->memregion("gfx2")->base();
+	UINT8* gfxroms = memregion("gfx2")->base();
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	ttmjprd_draw_tilemap( screen.machine(), bitmap, cliprect, state->m_tilemap_ram[3], state->m_tilemap_regs[3], gfxroms );
+	ttmjprd_draw_tilemap( screen.machine(), bitmap, cliprect, m_tilemap_ram[3], m_tilemap_regs[3], gfxroms );
 	draw_sprites(screen.machine(),bitmap,cliprect, 1);
-	ttmjprd_draw_tilemap( screen.machine(), bitmap, cliprect, state->m_tilemap_ram[2], state->m_tilemap_regs[2], gfxroms );
+	ttmjprd_draw_tilemap( screen.machine(), bitmap, cliprect, m_tilemap_ram[2], m_tilemap_regs[2], gfxroms );
 
 	/*
     popmessage("%08x %08x %08x %08x %08x %08x",
-    state->m_tilemap_regs[2][0],
-    state->m_tilemap_regs[2][1],
-    state->m_tilemap_regs[2][2],
-    state->m_tilemap_regs[2][3],
-    state->m_tilemap_regs[2][4],
-    state->m_tilemap_regs[2][5]);
+    m_tilemap_regs[2][0],
+    m_tilemap_regs[2][1],
+    m_tilemap_regs[2][2],
+    m_tilemap_regs[2][3],
+    m_tilemap_regs[2][4],
+    m_tilemap_regs[2][5]);
     */
 
 /*
     popmessage("%08x %08x %08x %08x %08x %08x %08x",
-    state->m_spriteregs[0],
-    state->m_spriteregs[1],
-    state->m_spriteregs[2],
-    state->m_spriteregs[3],
-    state->m_spriteregs[4],
-    state->m_spriteregs[5],
-    state->m_spriteregs[6]);
+    m_spriteregs[0],
+    m_spriteregs[1],
+    m_spriteregs[2],
+    m_spriteregs[3],
+    m_spriteregs[4],
+    m_spriteregs[5],
+    m_spriteregs[6]);
 */
 
 	return 0;
 }
 
-static SCREEN_UPDATE_IND16( tmmjprd_right )
+UINT32 tmmjprd_state::screen_update_tmmjprd_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tmmjprd_state *state = screen.machine().driver_data<tmmjprd_state>();
-	UINT8* gfxroms = state->memregion("gfx2")->base();
+	UINT8* gfxroms = memregion("gfx2")->base();
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	ttmjprd_draw_tilemap( screen.machine(), bitmap, cliprect, state->m_tilemap_ram[1], state->m_tilemap_regs[1], gfxroms );
+	ttmjprd_draw_tilemap( screen.machine(), bitmap, cliprect, m_tilemap_ram[1], m_tilemap_regs[1], gfxroms );
 	draw_sprites(screen.machine(),bitmap,cliprect, 0);
-	ttmjprd_draw_tilemap( screen.machine(), bitmap, cliprect, state->m_tilemap_ram[0], state->m_tilemap_regs[0], gfxroms );
+	ttmjprd_draw_tilemap( screen.machine(), bitmap, cliprect, m_tilemap_ram[0], m_tilemap_regs[0], gfxroms );
 
 	return 0;
 }
@@ -770,7 +770,7 @@ static MACHINE_CONFIG_START( tmmjprd, tmmjprd_state )
 	MCFG_SCREEN_SIZE(64*16, 64*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
-	MCFG_SCREEN_UPDATE_STATIC(tmmjprd_left)
+	MCFG_SCREEN_UPDATE_DRIVER(tmmjprd_state, screen_update_tmmjprd_left)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -778,7 +778,7 @@ static MACHINE_CONFIG_START( tmmjprd, tmmjprd_state )
 	MCFG_SCREEN_SIZE(64*16, 64*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
-	MCFG_SCREEN_UPDATE_STATIC(tmmjprd_right)
+	MCFG_SCREEN_UPDATE_DRIVER(tmmjprd_state, screen_update_tmmjprd_right)
 
 
 	/* sound hardware */

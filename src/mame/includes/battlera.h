@@ -40,12 +40,13 @@ public:
 	DECLARE_WRITE8_MEMBER(HuC6270_data_w);
 	DECLARE_WRITE8_MEMBER(battlera_adpcm_reset_w);
 	virtual void video_start();
+	UINT32 screen_update_battlera(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/battlera.c -----------*/
 
-SCREEN_UPDATE_IND16( battlera );
+
 
 TIMER_DEVICE_CALLBACK( battlera_irq );
 

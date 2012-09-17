@@ -223,7 +223,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	draw_sprites_region(machine, bitmap, cliprect, sr, 0x500, 1);
 }
 
-SCREEN_UPDATE_IND16( jackal )
+UINT32 jackal_state::screen_update_jackal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	set_pens(screen.machine());
 	draw_background(screen.machine(), bitmap, cliprect);

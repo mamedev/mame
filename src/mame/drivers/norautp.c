@@ -563,9 +563,8 @@ void norautp_state::video_start()
 }
 
 
-static SCREEN_UPDATE_IND16( norautp )
+UINT32 norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	norautp_state *state = screen.machine().driver_data<norautp_state>();
 	int x, y, count;
 
 	count = 0;
@@ -579,8 +578,8 @@ static SCREEN_UPDATE_IND16( norautp )
 		{
 			for(x = 0; x < 16; x++)
 			{
-				int tile = state->m_np_vram[count] & 0x3f;
-				int colour = (state->m_np_vram[count] & 0xc0) >> 6;
+				int tile = m_np_vram[count] & 0x3f;
+				int colour = (m_np_vram[count] & 0xc0) >> 6;
 
 				drawgfx_opaque(bitmap,cliprect, screen.machine().gfx[1], tile, colour, 0, 0, (x * 32) + 8, y * 32);
 
@@ -591,8 +590,8 @@ static SCREEN_UPDATE_IND16( norautp )
 		{
 			for(x = 0; x < 32; x++)
 			{
-				int tile = state->m_np_vram[count] & 0x3f;
-				int colour = (state->m_np_vram[count] & 0xc0) >> 6;
+				int tile = m_np_vram[count] & 0x3f;
+				int colour = (m_np_vram[count] & 0xc0) >> 6;
 
 				drawgfx_opaque(bitmap,cliprect, screen.machine().gfx[0], tile, colour, 0, 0, x * 16, y * 32);
 
@@ -1265,7 +1264,7 @@ static MACHINE_CONFIG_START( noraut_base, norautp_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(2*16, 31*16-1, (0*16) + 8, 16*16-1)	/* the hardware clips the top 8 pixels */
-	MCFG_SCREEN_UPDATE_STATIC(norautp)
+	MCFG_SCREEN_UPDATE_DRIVER(norautp_state, screen_update_norautp)
 
 	MCFG_GFXDECODE(norautp)
 

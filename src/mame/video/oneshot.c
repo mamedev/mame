@@ -149,36 +149,34 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 }
 
-SCREEN_UPDATE_IND16( oneshot )
+UINT32 oneshot_state::screen_update_oneshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	oneshot_state *state = screen.machine().driver_data<oneshot_state>();
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	state->m_mid_tilemap->set_scrollx(0, state->m_scroll[0] - 0x1f5);
-	state->m_mid_tilemap->set_scrolly(0, state->m_scroll[1]);
+	m_mid_tilemap->set_scrollx(0, m_scroll[0] - 0x1f5);
+	m_mid_tilemap->set_scrolly(0, m_scroll[1]);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_mid_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_mid_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_crosshairs(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( maddonna )
+UINT32 oneshot_state::screen_update_maddonna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	oneshot_state *state = screen.machine().driver_data<oneshot_state>();
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	state->m_mid_tilemap->set_scrolly(0, state->m_scroll[1]); // other registers aren't used so we don't know which layers they relate to
+	m_mid_tilemap->set_scrolly(0, m_scroll[1]); // other registers aren't used so we don't know which layers they relate to
 
-	state->m_mid_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_mid_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 
-//  popmessage ("%04x %04x %04x %04x %04x %04x %04x %04x", state->m_scroll[0], state->m_scroll[1], state->m_scroll[2], state->m_scroll[3], state->m_scroll[4], state->m_scroll[5], state->m_scroll[6], state->m_scroll[7]);
+//  popmessage ("%04x %04x %04x %04x %04x %04x %04x %04x", m_scroll[0], m_scroll[1], m_scroll[2], m_scroll[3], m_scroll[4], m_scroll[5], m_scroll[6], m_scroll[7]);
 	return 0;
 }

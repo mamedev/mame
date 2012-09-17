@@ -335,22 +335,21 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 #undef WC90_DRAW_SPRITE
 
 
-SCREEN_UPDATE_IND16( wc90 )
+UINT32 wc90_state::screen_update_wc90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	wc90_state *state = screen.machine().driver_data<wc90_state>();
-	state->m_bg_tilemap->set_scrollx(0,state->m_scroll2xlo[0] + 256 * state->m_scroll2xhi[0]);
-	state->m_bg_tilemap->set_scrolly(0,state->m_scroll2ylo[0] + 256 * state->m_scroll2yhi[0]);
-	state->m_fg_tilemap->set_scrollx(0,state->m_scroll1xlo[0] + 256 * state->m_scroll1xhi[0]);
-	state->m_fg_tilemap->set_scrolly(0,state->m_scroll1ylo[0] + 256 * state->m_scroll1yhi[0]);
-	state->m_tx_tilemap->set_scrollx(0,state->m_scroll0xlo[0] + 256 * state->m_scroll0xhi[0]);
-	state->m_tx_tilemap->set_scrolly(0,state->m_scroll0ylo[0] + 256 * state->m_scroll0yhi[0]);
+	m_bg_tilemap->set_scrollx(0,m_scroll2xlo[0] + 256 * m_scroll2xhi[0]);
+	m_bg_tilemap->set_scrolly(0,m_scroll2ylo[0] + 256 * m_scroll2yhi[0]);
+	m_fg_tilemap->set_scrollx(0,m_scroll1xlo[0] + 256 * m_scroll1xhi[0]);
+	m_fg_tilemap->set_scrolly(0,m_scroll1ylo[0] + 256 * m_scroll1yhi[0]);
+	m_tx_tilemap->set_scrollx(0,m_scroll0xlo[0] + 256 * m_scroll0xhi[0]);
+	m_tx_tilemap->set_scrolly(0,m_scroll0ylo[0] + 256 * m_scroll0yhi[0]);
 
 //  draw_sprites(screen.machine(), bitmap,cliprect, 3 );
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect, 2 );
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect, 1 );
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect, 0 );
 	return 0;
 }

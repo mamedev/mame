@@ -199,6 +199,7 @@ public:
 	DECLARE_VIDEO_START(x1);
 	DECLARE_PALETTE_INIT(x1);
 	DECLARE_MACHINE_RESET(x1turbo);
+	UINT32 screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -206,7 +207,7 @@ public:
 /*----------- shared with x1twin.c -----------*/
 
 
-SCREEN_UPDATE_RGB32( x1 );
+
 
 TIMER_DEVICE_CALLBACK(x1_keyboard_callback);
 TIMER_CALLBACK(x1_rtc_increment);

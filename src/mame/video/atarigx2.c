@@ -175,25 +175,24 @@ void atarigx2_scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( atarigx2 )
+UINT32 atarigx2_state::screen_update_atarigx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	atarigx2_state *state = screen.machine().driver_data<atarigx2_state>();
 	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
 
 	/* draw the playfield */
 	priority_bitmap.fill(0, cliprect);
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 1, 1);
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 2, 2);
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 3, 3);
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 4, 4);
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 5, 5);
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 6, 6);
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 7, 7);
+	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_playfield_tilemap->draw(bitmap, cliprect, 1, 1);
+	m_playfield_tilemap->draw(bitmap, cliprect, 2, 2);
+	m_playfield_tilemap->draw(bitmap, cliprect, 3, 3);
+	m_playfield_tilemap->draw(bitmap, cliprect, 4, 4);
+	m_playfield_tilemap->draw(bitmap, cliprect, 5, 5);
+	m_playfield_tilemap->draw(bitmap, cliprect, 6, 6);
+	m_playfield_tilemap->draw(bitmap, cliprect, 7, 7);
 
 	/* copy the motion objects on top */
 	{
-		bitmap_ind16 *mo_bitmap = atarirle_get_vram(state->m_rle, 0);
+		bitmap_ind16 *mo_bitmap = atarirle_get_vram(m_rle, 0);
 		int left	= cliprect.min_x;
 		int top		= cliprect.min_y;
 		int right	= cliprect.max_x + 1;
@@ -213,17 +212,16 @@ SCREEN_UPDATE_IND16( atarigx2 )
 	}
 
 	/* add the alpha on top */
-	state->m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-SCREEN_VBLANK( atarigx2 )
+void atarigx2_state::screen_eof_atarigx2(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		atarigx2_state *state = screen.machine().driver_data<atarigx2_state>();
 
-		atarirle_eof(state->m_rle);
+		atarirle_eof(m_rle);
 	}
 }

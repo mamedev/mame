@@ -90,6 +90,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_supdrapo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -102,9 +103,8 @@ void supdrapo_state::video_start()
 }
 
 
-static SCREEN_UPDATE_IND16( supdrapo )
+UINT32 supdrapo_state::screen_update_supdrapo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	supdrapo_state *state = screen.machine().driver_data<supdrapo_state>();
 	int x, y;
 	int count;
 	int color;
@@ -115,9 +115,9 @@ static SCREEN_UPDATE_IND16( supdrapo )
 	{
 		for(x = 0; x < 32; x++)
 		{
-			int tile = state->m_videoram[count] + state->m_char_bank[count] * 0x100;
+			int tile = m_videoram[count] + m_char_bank[count] * 0x100;
 			/* Global Column Coloring, GUESS! */
-			color = state->m_col_line[(x*2) + 1] ? (state->m_col_line[(x*2) + 1] - 1) & 7 : 0;
+			color = m_col_line[(x*2) + 1] ? (m_col_line[(x*2) + 1] - 1) & 7 : 0;
 
 			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], tile,color, 0, 0, x*8, y*8);
 
@@ -456,7 +456,7 @@ static MACHINE_CONFIG_START( supdrapo, supdrapo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(supdrapo)
+	MCFG_SCREEN_UPDATE_DRIVER(supdrapo_state, screen_update_supdrapo)
 
 	MCFG_GFXDECODE(supdrapo)
 	MCFG_PALETTE_LENGTH(0x100)

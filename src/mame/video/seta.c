@@ -824,7 +824,7 @@ static void draw_tilemap_palette_effect(running_machine &machine, bitmap_ind16 &
 
 
 /* For games without tilemaps */
-SCREEN_UPDATE_IND16( seta_no_layers )
+UINT32 seta_state::screen_update_seta_no_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	set_pens(screen.machine());
 	bitmap.fill(0x1f0, cliprect);
@@ -1042,14 +1042,14 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 }
 
-static SCREEN_UPDATE_IND16( seta_layers )
+UINT32 seta_state::screen_update_seta_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	seta_layers_update(screen, bitmap, cliprect, 0x1000, 1 );
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( setaroul )
+UINT32 seta_state::screen_update_setaroul(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x0, cliprect);
 
@@ -1061,31 +1061,31 @@ SCREEN_UPDATE_IND16( setaroul )
 	return 0;
 }
 
-SCREEN_VBLANK( setaroul )
+void seta_state::screen_eof_setaroul(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 		screen.machine().device<seta001_device>("spritegen")->tnzs_eof();
 }
 
 
 
-SCREEN_UPDATE_IND16( seta )
+UINT32 seta_state::screen_update_seta(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	set_pens(screen.machine());
-	return SCREEN_UPDATE16_CALL(seta_layers);
+	return SCREEN_UPDATE16_CALL_MEMBER(seta_layers);
 }
 
 
-SCREEN_UPDATE_IND16( usclssic )
+UINT32 seta_state::screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	usclssic_set_pens(screen.machine());
-	return SCREEN_UPDATE16_CALL(seta_layers);
+	return SCREEN_UPDATE16_CALL_MEMBER(seta_layers);
 }
 
 
-SCREEN_UPDATE_IND16( inttoote )
+UINT32 seta_state::screen_update_inttoote(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* no palette to set */
-	return SCREEN_UPDATE16_CALL(seta_layers);
+	return SCREEN_UPDATE16_CALL_MEMBER(seta_layers);
 }

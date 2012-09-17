@@ -46,13 +46,16 @@ public:
 	DECLARE_MACHINE_START(srmp3);
 	DECLARE_PALETTE_INIT(srmp3);
 	DECLARE_MACHINE_START(rmgoldyh);
+	UINT32 screen_update_srmp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_srmp3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_mjyuugi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/srmp2.c -----------*/
 
 
-SCREEN_UPDATE_IND16( srmp2 );
 
-SCREEN_UPDATE_IND16( srmp3 );
-SCREEN_UPDATE_IND16( mjyuugi );
+
+
+

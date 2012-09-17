@@ -125,51 +125,50 @@ void matmania_state::video_start()
 
 
 
-SCREEN_UPDATE_IND16( matmania )
+UINT32 matmania_state::screen_update_matmania(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	matmania_state *state = screen.machine().driver_data<matmania_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
 
 	/* Update the tiles in the left tile ram bank */
-	for (offs = state->m_videoram.bytes() - 1; offs >= 0; offs--)
+	for (offs = m_videoram.bytes() - 1; offs >= 0; offs--)
 	{
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
 
-		drawgfx_opaque(*state->m_tmpbitmap, state->m_tmpbitmap->cliprect(), screen.machine().gfx[1],
-				state->m_videoram[offs] + ((state->m_colorram[offs] & 0x08) << 5),
-				(state->m_colorram[offs] & 0x30) >> 4,
+		drawgfx_opaque(*m_tmpbitmap, m_tmpbitmap->cliprect(), screen.machine().gfx[1],
+				m_videoram[offs] + ((m_colorram[offs] & 0x08) << 5),
+				(m_colorram[offs] & 0x30) >> 4,
 				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
 				16 * sx, 16 * sy);
 	}
 
 	/* Update the tiles in the right tile ram bank */
-	for (offs = state->m_videoram3.bytes() - 1; offs >= 0; offs--)
+	for (offs = m_videoram3.bytes() - 1; offs >= 0; offs--)
 	{
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
 
-		drawgfx_opaque(*state->m_tmpbitmap2, state->m_tmpbitmap2->cliprect(), screen.machine().gfx[1],
-				state->m_videoram3[offs] + ((state->m_colorram3[offs] & 0x08) << 5),
-				(state->m_colorram3[offs] & 0x30) >> 4,
+		drawgfx_opaque(*m_tmpbitmap2, m_tmpbitmap2->cliprect(), screen.machine().gfx[1],
+				m_videoram3[offs] + ((m_colorram3[offs] & 0x08) << 5),
+				(m_colorram3[offs] & 0x30) >> 4,
 				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
 				16*sx,16*sy);
 	}
 
 	/* copy the temporary bitmap to the screen */
 	{
-		int scrolly = -*state->m_scroll;
-		if (state->m_pageselect[0] & 0x01) // maniach sets 0x20 sometimes, which must have a different meaning
-			copyscrollbitmap(bitmap, *state->m_tmpbitmap2, 0, 0, 1, &scrolly, cliprect);
+		int scrolly = -*m_scroll;
+		if (m_pageselect[0] & 0x01) // maniach sets 0x20 sometimes, which must have a different meaning
+			copyscrollbitmap(bitmap, *m_tmpbitmap2, 0, 0, 1, &scrolly, cliprect);
 		else
-			copyscrollbitmap(bitmap, *state->m_tmpbitmap, 0, 0, 1, &scrolly, cliprect);
+			copyscrollbitmap(bitmap, *m_tmpbitmap, 0, 0, 1, &scrolly, cliprect);
 	}
 
 
 	/* Draw the sprites */
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		if (spriteram[offs] & 0x01)
 		{
@@ -183,49 +182,48 @@ SCREEN_UPDATE_IND16( matmania )
 
 
 	/* draw the frontmost playfield. They are characters, but draw them as sprites */
-	for (offs = state->m_videoram2.bytes() - 1; offs >= 0; offs--)
+	for (offs = m_videoram2.bytes() - 1; offs >= 0; offs--)
 	{
 		int sx = 31 - offs / 32;
 		int sy = offs % 32;
 
 		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
-				state->m_videoram2[offs] + 256 * (state->m_colorram2[offs] & 0x07),
-				(state->m_colorram2[offs] & 0x30) >> 4,
+				m_videoram2[offs] + 256 * (m_colorram2[offs] & 0x07),
+				(m_colorram2[offs] & 0x30) >> 4,
 				0,0,
 				8*sx,8*sy,0);
 	}
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( maniach )
+UINT32 matmania_state::screen_update_maniach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	matmania_state *state = screen.machine().driver_data<matmania_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
 
 	/* Update the tiles in the left tile ram bank */
-	for (offs = state->m_videoram.bytes() - 1; offs >= 0; offs--)
+	for (offs = m_videoram.bytes() - 1; offs >= 0; offs--)
 	{
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
 
-		drawgfx_opaque(*state->m_tmpbitmap, state->m_tmpbitmap->cliprect(), screen.machine().gfx[1],
-				state->m_videoram[offs] + ((state->m_colorram[offs] & 0x03) << 8),
-				(state->m_colorram[offs] & 0x30) >> 4,
+		drawgfx_opaque(*m_tmpbitmap, m_tmpbitmap->cliprect(), screen.machine().gfx[1],
+				m_videoram[offs] + ((m_colorram[offs] & 0x03) << 8),
+				(m_colorram[offs] & 0x30) >> 4,
 				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
 				16*sx,16*sy);
 	}
 
 	/* Update the tiles in the right tile ram bank */
-	for (offs = state->m_videoram3.bytes() - 1; offs >= 0; offs--)
+	for (offs = m_videoram3.bytes() - 1; offs >= 0; offs--)
 	{
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
 
-		drawgfx_opaque(*state->m_tmpbitmap2, state->m_tmpbitmap2->cliprect(), screen.machine().gfx[1],
-				state->m_videoram3[offs] + ((state->m_colorram3[offs] & 0x03) << 8),
-				(state->m_colorram3[offs] & 0x30) >> 4,
+		drawgfx_opaque(*m_tmpbitmap2, m_tmpbitmap2->cliprect(), screen.machine().gfx[1],
+				m_videoram3[offs] + ((m_colorram3[offs] & 0x03) << 8),
+				(m_colorram3[offs] & 0x30) >> 4,
 				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
 				16*sx,16*sy);
 	}
@@ -233,17 +231,17 @@ SCREEN_UPDATE_IND16( maniach )
 
 	/* copy the temporary bitmap to the screen */
 	{
-		int scrolly = -*state->m_scroll;
+		int scrolly = -*m_scroll;
 
-		if (state->m_pageselect[0] & 0x01) // this sets 0x20 sometimes, which must have a different meaning
-			copyscrollbitmap(bitmap, *state->m_tmpbitmap2, 0, 0, 1, &scrolly, cliprect);
+		if (m_pageselect[0] & 0x01) // this sets 0x20 sometimes, which must have a different meaning
+			copyscrollbitmap(bitmap, *m_tmpbitmap2, 0, 0, 1, &scrolly, cliprect);
 		else
-			copyscrollbitmap(bitmap, *state->m_tmpbitmap, 0, 0, 1, &scrolly, cliprect);
+			copyscrollbitmap(bitmap, *m_tmpbitmap, 0, 0, 1, &scrolly, cliprect);
 	}
 
 
 	/* Draw the sprites */
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		if (spriteram[offs] & 0x01)
 		{
@@ -257,14 +255,14 @@ SCREEN_UPDATE_IND16( maniach )
 
 
 	/* draw the frontmost playfield. They are characters, but draw them as sprites */
-	for (offs = state->m_videoram2.bytes() - 1; offs >= 0; offs--)
+	for (offs = m_videoram2.bytes() - 1; offs >= 0; offs--)
 	{
 		int sx = 31 - offs / 32;
 		int sy = offs % 32;
 
 		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
-				state->m_videoram2[offs] + 256 * (state->m_colorram2[offs] & 0x07),
-				(state->m_colorram2[offs] & 0x30) >> 4,
+				m_videoram2[offs] + 256 * (m_colorram2[offs] & 0x07),
+				(m_colorram2[offs] & 0x30) >> 4,
 				0,0,
 				8*sx,8*sy,0);
 	}

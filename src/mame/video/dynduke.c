@@ -219,14 +219,13 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 	}
 }
 
-SCREEN_UPDATE_IND16( dynduke )
+UINT32 dynduke_state::screen_update_dynduke(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dynduke_state *state = screen.machine().driver_data<dynduke_state>();
 	/* Setup the tilemaps */
-	state->m_fg_layer->set_scrolly(0, ((state->m_scroll_ram[0x11]&0x30)<<4)+((state->m_scroll_ram[0x12]&0x7f)<<1)+((state->m_scroll_ram[0x12]&0x80)>>7) );
-	state->m_fg_layer->set_scrollx(0, ((state->m_scroll_ram[0x19]&0x30)<<4)+((state->m_scroll_ram[0x1a]&0x7f)<<1)+((state->m_scroll_ram[0x1a]&0x80)>>7) );
-	state->m_fg_layer->enable(state->m_fore_enable);
-	state->m_tx_layer->enable(state->m_txt_enable);
+	m_fg_layer->set_scrolly(0, ((m_scroll_ram[0x11]&0x30)<<4)+((m_scroll_ram[0x12]&0x7f)<<1)+((m_scroll_ram[0x12]&0x80)>>7) );
+	m_fg_layer->set_scrollx(0, ((m_scroll_ram[0x19]&0x30)<<4)+((m_scroll_ram[0x1a]&0x7f)<<1)+((m_scroll_ram[0x1a]&0x80)>>7) );
+	m_fg_layer->enable(m_fore_enable);
+	m_tx_layer->enable(m_txt_enable);
 
 
 	draw_background(screen.machine(), bitmap, cliprect,0x00);
@@ -235,9 +234,9 @@ SCREEN_UPDATE_IND16( dynduke )
 	draw_background(screen.machine(), bitmap, cliprect,0x20);
 
 	draw_sprites(screen.machine(),bitmap,cliprect,2);
-	state->m_fg_layer->draw(bitmap, cliprect, 0,0);
+	m_fg_layer->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect,3);
-	state->m_tx_layer->draw(bitmap, cliprect, 0,0);
+	m_tx_layer->draw(bitmap, cliprect, 0,0);
 
 	return 0;
 }

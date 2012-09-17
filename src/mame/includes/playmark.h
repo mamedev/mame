@@ -99,6 +99,12 @@ public:
 	DECLARE_MACHINE_START(powerbal);
 	DECLARE_MACHINE_RESET(powerbal);
 	DECLARE_VIDEO_START(powerbal);
+	UINT32 screen_update_bigtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_bigtwinb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_wbeachvl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_excelsr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_hrdtimes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/playmark.c -----------*/
@@ -111,8 +117,8 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( bigtwin );
-SCREEN_UPDATE_IND16( bigtwinb );
-SCREEN_UPDATE_IND16( wbeachvl );
-SCREEN_UPDATE_IND16( excelsr );
-SCREEN_UPDATE_IND16( hrdtimes );
+
+
+
+
+

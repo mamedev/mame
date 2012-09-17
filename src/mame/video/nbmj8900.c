@@ -385,26 +385,25 @@ void nbmj8900_state::video_start()
 
 
 ******************************************************************************/
-SCREEN_UPDATE_IND16( nbmj8900 )
+UINT32 nbmj8900_state::screen_update_nbmj8900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	nbmj8900_state *state = screen.machine().driver_data<nbmj8900_state>();
 	int x, y;
 
-	if (state->m_screen_refresh)
+	if (m_screen_refresh)
 	{
-		state->m_screen_refresh = 0;
-		for (y = 0; y < state->m_screen_height; y++)
+		m_screen_refresh = 0;
+		for (y = 0; y < m_screen_height; y++)
 		{
-			for (x = 0; x < state->m_screen_width; x++)
+			for (x = 0; x < m_screen_width; x++)
 			{
 				update_pixel0(screen.machine(), x, y);
 			}
 		}
-		if (state->m_gfxdraw_mode)
+		if (m_gfxdraw_mode)
 		{
-			for (y = 0; y < state->m_screen_height; y++)
+			for (y = 0; y < m_screen_height; y++)
 			{
-				for (x = 0; x < state->m_screen_width; x++)
+				for (x = 0; x < m_screen_width; x++)
 				{
 					update_pixel1(screen.machine(), x, y);
 				}
@@ -412,20 +411,20 @@ SCREEN_UPDATE_IND16( nbmj8900 )
 		}
 	}
 
-	if (state->m_dispflag)
+	if (m_dispflag)
 	{
 		int scrolly;
-		if (!state->m_flipscreen) scrolly =   state->m_scrolly;
-		else                      scrolly = (-state->m_scrolly) & 0xff;
+		if (!m_flipscreen) scrolly =   m_scrolly;
+		else                      scrolly = (-m_scrolly) & 0xff;
 
-		if (state->m_gfxdraw_mode)
+		if (m_gfxdraw_mode)
 		{
-			copyscrollbitmap(bitmap, state->m_tmpbitmap0, 0, 0, 0, 0, cliprect);
-			copyscrollbitmap_trans(bitmap, state->m_tmpbitmap1, 0, 0, 1, &scrolly, cliprect, 0xff);
+			copyscrollbitmap(bitmap, m_tmpbitmap0, 0, 0, 0, 0, cliprect);
+			copyscrollbitmap_trans(bitmap, m_tmpbitmap1, 0, 0, 1, &scrolly, cliprect, 0xff);
 		}
 		else
 		{
-			copyscrollbitmap(bitmap, state->m_tmpbitmap0, 0, 0, 1, &scrolly, cliprect);
+			copyscrollbitmap(bitmap, m_tmpbitmap0, 0, 0, 1, &scrolly, cliprect);
 		}
 	}
 	else

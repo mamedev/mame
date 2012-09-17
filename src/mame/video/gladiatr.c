@@ -240,10 +240,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 
 
-SCREEN_UPDATE_IND16( ppking )
+UINT32 gladiatr_state::screen_update_ppking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gladiatr_state *state = screen.machine().driver_data<gladiatr_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect);
 
 	/* the fg layer just selects the upper palette bank on underlying pixels */
@@ -251,13 +250,13 @@ SCREEN_UPDATE_IND16( ppking )
 		int sx = cliprect.min_x;
 		int sy = cliprect.min_y;
 
-		state->m_fg_tilemap ->pixmap();
-		bitmap_ind8 &flagsbitmap = state->m_fg_tilemap ->flagsmap();
+		m_fg_tilemap ->pixmap();
+		bitmap_ind8 &flagsbitmap = m_fg_tilemap ->flagsmap();
 
 		while( sy <= cliprect.max_y )
 		{
 			int x = sx;
-			int y = (sy + state->m_fg_scrolly) & 0x1ff;
+			int y = (sy + m_fg_scrolly) & 0x1ff;
 
 			UINT16 *dest = &bitmap.pix16(sy, sx);
 			while( x <= cliprect.max_x )
@@ -275,25 +274,24 @@ SCREEN_UPDATE_IND16( ppking )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( gladiatr )
+UINT32 gladiatr_state::screen_update_gladiatr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gladiatr_state *state = screen.machine().driver_data<gladiatr_state>();
-	if (state->m_video_attributes & 0x20)
+	if (m_video_attributes & 0x20)
 	{
 		int scroll;
 
-		scroll = state->m_bg_scrollx + ((state->m_video_attributes & 0x04) << 6);
-		state->m_bg_tilemap->set_scrollx(0, scroll ^ (state->flip_screen() ? 0x0f : 0));
-		scroll = state->m_fg_scrollx + ((state->m_video_attributes & 0x08) << 5);
-		state->m_fg_tilemap->set_scrollx(0, scroll ^ (state->flip_screen() ? 0x0f : 0));
+		scroll = m_bg_scrollx + ((m_video_attributes & 0x04) << 6);
+		m_bg_tilemap->set_scrollx(0, scroll ^ (flip_screen() ? 0x0f : 0));
+		scroll = m_fg_scrollx + ((m_video_attributes & 0x08) << 5);
+		m_fg_tilemap->set_scrollx(0, scroll ^ (flip_screen() ? 0x0f : 0));
 
 		// always 0 anyway
-		state->m_bg_tilemap->set_scrolly(0, state->m_bg_scrolly);
-		state->m_fg_tilemap->set_scrolly(0, state->m_fg_scrolly);
+		m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
+		m_fg_tilemap->set_scrolly(0, m_fg_scrolly);
 
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+		m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+		m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	}
 	else
 		bitmap.fill(get_black_pen(screen.machine()), cliprect );

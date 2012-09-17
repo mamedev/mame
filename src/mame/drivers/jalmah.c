@@ -204,6 +204,8 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_VIDEO_START(urashima);
+	UINT32 screen_update_jalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -436,80 +438,78 @@ static void draw_sc3_layer(running_machine &machine, bitmap_ind16 &bitmap, const
 	}
 }
 
-static SCREEN_UPDATE_IND16( jalmah )
+UINT32 jalmah_state::screen_update_jalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	jalmah_state *state = screen.machine().driver_data<jalmah_state>();
-	UINT16 *jm_scrollram = state->m_jm_scrollram;
+	UINT16 *jm_scrollram = m_jm_scrollram;
 	UINT8 cur_prin;
 	jalmah_priority_system(screen.machine());
 
-	state->m_sc0_tilemap_0->set_scrollx(0, jm_scrollram[0] & 0xfff);
-	state->m_sc0_tilemap_1->set_scrollx(0, jm_scrollram[0] & 0x7ff);
-	state->m_sc0_tilemap_2->set_scrollx(0, jm_scrollram[0] & 0x3ff);
-	state->m_sc0_tilemap_3->set_scrollx(0, jm_scrollram[0] & 0x1ff);
+	m_sc0_tilemap_0->set_scrollx(0, jm_scrollram[0] & 0xfff);
+	m_sc0_tilemap_1->set_scrollx(0, jm_scrollram[0] & 0x7ff);
+	m_sc0_tilemap_2->set_scrollx(0, jm_scrollram[0] & 0x3ff);
+	m_sc0_tilemap_3->set_scrollx(0, jm_scrollram[0] & 0x1ff);
 
-	state->m_sc1_tilemap_0->set_scrollx(0, jm_scrollram[1] & 0xfff);
-	state->m_sc1_tilemap_1->set_scrollx(0, jm_scrollram[1] & 0x7ff);
-	state->m_sc1_tilemap_2->set_scrollx(0, jm_scrollram[1] & 0x3ff);
-	state->m_sc1_tilemap_3->set_scrollx(0, jm_scrollram[1] & 0x1ff);
+	m_sc1_tilemap_0->set_scrollx(0, jm_scrollram[1] & 0xfff);
+	m_sc1_tilemap_1->set_scrollx(0, jm_scrollram[1] & 0x7ff);
+	m_sc1_tilemap_2->set_scrollx(0, jm_scrollram[1] & 0x3ff);
+	m_sc1_tilemap_3->set_scrollx(0, jm_scrollram[1] & 0x1ff);
 
-	state->m_sc2_tilemap_0->set_scrollx(0, jm_scrollram[2] & 0xfff);
-	state->m_sc2_tilemap_1->set_scrollx(0, jm_scrollram[2] & 0x7ff);
-	state->m_sc2_tilemap_2->set_scrollx(0, jm_scrollram[2] & 0x3ff);
-	state->m_sc2_tilemap_3->set_scrollx(0, jm_scrollram[2] & 0x1ff);
+	m_sc2_tilemap_0->set_scrollx(0, jm_scrollram[2] & 0xfff);
+	m_sc2_tilemap_1->set_scrollx(0, jm_scrollram[2] & 0x7ff);
+	m_sc2_tilemap_2->set_scrollx(0, jm_scrollram[2] & 0x3ff);
+	m_sc2_tilemap_3->set_scrollx(0, jm_scrollram[2] & 0x1ff);
 
-	state->m_sc3_tilemap_0->set_scrollx(0, jm_scrollram[3] & 0x7ff);
+	m_sc3_tilemap_0->set_scrollx(0, jm_scrollram[3] & 0x7ff);
 //  empty
-	state->m_sc3_tilemap_2->set_scrollx(0, jm_scrollram[3] & 0x3ff);
-	state->m_sc3_tilemap_3->set_scrollx(0, jm_scrollram[3] & 0x1ff);
+	m_sc3_tilemap_2->set_scrollx(0, jm_scrollram[3] & 0x3ff);
+	m_sc3_tilemap_3->set_scrollx(0, jm_scrollram[3] & 0x1ff);
 
 
-	state->m_sc0_tilemap_0->set_scrolly(0, jm_scrollram[4] & 0x1ff);
-	state->m_sc0_tilemap_1->set_scrolly(0, jm_scrollram[4] & 0x3ff);
-	state->m_sc0_tilemap_2->set_scrolly(0, jm_scrollram[4] & 0x7ff);
-	state->m_sc0_tilemap_3->set_scrolly(0, jm_scrollram[4] & 0xfff);
+	m_sc0_tilemap_0->set_scrolly(0, jm_scrollram[4] & 0x1ff);
+	m_sc0_tilemap_1->set_scrolly(0, jm_scrollram[4] & 0x3ff);
+	m_sc0_tilemap_2->set_scrolly(0, jm_scrollram[4] & 0x7ff);
+	m_sc0_tilemap_3->set_scrolly(0, jm_scrollram[4] & 0xfff);
 
-	state->m_sc1_tilemap_0->set_scrolly(0, jm_scrollram[5] & 0x1ff);
-	state->m_sc1_tilemap_1->set_scrolly(0, jm_scrollram[5] & 0x3ff);
-	state->m_sc1_tilemap_2->set_scrolly(0, jm_scrollram[5] & 0x7ff);
-	state->m_sc1_tilemap_3->set_scrolly(0, jm_scrollram[5] & 0xfff);
+	m_sc1_tilemap_0->set_scrolly(0, jm_scrollram[5] & 0x1ff);
+	m_sc1_tilemap_1->set_scrolly(0, jm_scrollram[5] & 0x3ff);
+	m_sc1_tilemap_2->set_scrolly(0, jm_scrollram[5] & 0x7ff);
+	m_sc1_tilemap_3->set_scrolly(0, jm_scrollram[5] & 0xfff);
 
-	state->m_sc2_tilemap_0->set_scrolly(0, jm_scrollram[6] & 0x1ff);
-	state->m_sc2_tilemap_1->set_scrolly(0, jm_scrollram[6] & 0x3ff);
-	state->m_sc2_tilemap_2->set_scrolly(0, jm_scrollram[6] & 0x7ff);
-	state->m_sc2_tilemap_3->set_scrolly(0, jm_scrollram[6] & 0xfff);
+	m_sc2_tilemap_0->set_scrolly(0, jm_scrollram[6] & 0x1ff);
+	m_sc2_tilemap_1->set_scrolly(0, jm_scrollram[6] & 0x3ff);
+	m_sc2_tilemap_2->set_scrolly(0, jm_scrollram[6] & 0x7ff);
+	m_sc2_tilemap_3->set_scrolly(0, jm_scrollram[6] & 0xfff);
 
-	state->m_sc3_tilemap_0->set_scrolly(0, jm_scrollram[7] & 0xff);
+	m_sc3_tilemap_0->set_scrolly(0, jm_scrollram[7] & 0xff);
 //  empty
-	state->m_sc3_tilemap_2->set_scrolly(0, jm_scrollram[7] & 0x1ff);
-	state->m_sc3_tilemap_3->set_scrolly(0, jm_scrollram[7] & 0x3ff);
+	m_sc3_tilemap_2->set_scrolly(0, jm_scrollram[7] & 0x1ff);
+	m_sc3_tilemap_3->set_scrolly(0, jm_scrollram[7] & 0x3ff);
 
 	bitmap.fill(screen.machine().pens[0xff], cliprect); //selectable by a ram address?
 
 	for(cur_prin=1;cur_prin<=0x8;cur_prin<<=1)
 	{
-		if(cur_prin==state->m_sc0_prin) { draw_sc0_layer(screen.machine(),bitmap,cliprect); }
-		if(cur_prin==state->m_sc1_prin) { draw_sc1_layer(screen.machine(),bitmap,cliprect); }
-		if(cur_prin==state->m_sc2_prin) { draw_sc2_layer(screen.machine(),bitmap,cliprect); }
-		if(cur_prin==state->m_sc3_prin) { draw_sc3_layer(screen.machine(),bitmap,cliprect); }
+		if(cur_prin==m_sc0_prin) { draw_sc0_layer(screen.machine(),bitmap,cliprect); }
+		if(cur_prin==m_sc1_prin) { draw_sc1_layer(screen.machine(),bitmap,cliprect); }
+		if(cur_prin==m_sc2_prin) { draw_sc2_layer(screen.machine(),bitmap,cliprect); }
+		if(cur_prin==m_sc3_prin) { draw_sc3_layer(screen.machine(),bitmap,cliprect); }
 	}
 
 	return 0;
 }
 
-static SCREEN_UPDATE_IND16( urashima )
+UINT32 jalmah_state::screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	jalmah_state *state = screen.machine().driver_data<jalmah_state>();
-	UINT16 *jm_scrollram = state->m_jm_scrollram;
+	UINT16 *jm_scrollram = m_jm_scrollram;
 	/*this game doesn't use the RANGE register at all.*/
-	state->m_sc0_tilemap_0->set_scrollx(0, jm_scrollram[0]);
-	state->m_sc3_tilemap_0->set_scrollx(0, jm_scrollram[3]);
-	state->m_sc0_tilemap_0->set_scrolly(0, jm_scrollram[4]);
-	state->m_sc3_tilemap_0->set_scrolly(0, jm_scrollram[7]);
+	m_sc0_tilemap_0->set_scrollx(0, jm_scrollram[0]);
+	m_sc3_tilemap_0->set_scrollx(0, jm_scrollram[3]);
+	m_sc0_tilemap_0->set_scrolly(0, jm_scrollram[4]);
+	m_sc3_tilemap_0->set_scrolly(0, jm_scrollram[7]);
 
 	bitmap.fill(screen.machine().pens[0x1ff], cliprect);//selectable by a ram address?
-	if(state->m_jm_vregs[0] & 1) { state->m_sc0_tilemap_0->draw(bitmap, cliprect, 0,0); }
-	if(state->m_jm_vregs[3] & 1) { state->m_sc3_tilemap_0->draw(bitmap, cliprect, 0,0); }
+	if(m_jm_vregs[0] & 1) { m_sc0_tilemap_0->draw(bitmap, cliprect, 0,0); }
+	if(m_jm_vregs[3] & 1) { m_sc3_tilemap_0->draw(bitmap, cliprect, 0,0); }
 	return 0;
 }
 
@@ -1417,7 +1417,7 @@ static MACHINE_CONFIG_START( jalmah, jalmah_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(jalmah)
+	MCFG_SCREEN_UPDATE_DRIVER(jalmah_state, screen_update_jalmah)
 
 	MCFG_PALETTE_LENGTH(0x400)
 
@@ -1438,7 +1438,7 @@ static MACHINE_CONFIG_DERIVED( urashima, jalmah )
 
 	MCFG_VIDEO_START_OVERRIDE(jalmah_state,urashima)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(urashima)
+	MCFG_SCREEN_UPDATE_DRIVER(jalmah_state, screen_update_urashima)
 MACHINE_CONFIG_END
 
 /*

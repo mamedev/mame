@@ -86,10 +86,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 }
 
 
-SCREEN_UPDATE_IND16(speedspn)
+UINT32 speedspn_state::screen_update_speedspn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	speedspn_state *state = screen.machine().driver_data<speedspn_state>();
-	if (state->m_display_disable)
+	if (m_display_disable)
 	{
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
@@ -99,12 +98,12 @@ SCREEN_UPDATE_IND16(speedspn)
 	{
 		FILE* f;
 		f = fopen("vidram.bin","wb");
-		fwrite(state->m_vidram, 1, 0x1000 * 2, f);
+		fwrite(m_vidram, 1, 0x1000 * 2, f);
 		fclose(f);
 	}
 #endif
-	state->m_tilemap->set_scrollx(0, 0x100); // verify
-	state->m_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tilemap->set_scrollx(0, 0x100); // verify
+	m_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect);
 	return 0;
 }

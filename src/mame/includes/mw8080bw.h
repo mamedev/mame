@@ -139,6 +139,11 @@ public:
 	DECLARE_MACHINE_START(spcenctr);
 	DECLARE_MACHINE_START(phantom2);
 	DECLARE_MACHINE_START(invaders);
+	UINT32 screen_update_mw8080bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_spcenctr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_phantom2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_invaders(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_eof_phantom2(screen_device &screen, bool state);
 };
 
 
@@ -271,11 +276,11 @@ DECLARE_WRITE8_DEVICE_HANDLER( invad2ct_audio_4_w );
 
 /*----------- defined in video/mw8080bw.c -----------*/
 
-SCREEN_UPDATE_RGB32( mw8080bw );
 
-SCREEN_UPDATE_RGB32( spcenctr );
 
-SCREEN_UPDATE_RGB32( phantom2 );
-SCREEN_VBLANK( phantom2 );
 
-SCREEN_UPDATE_RGB32( invaders );
+
+
+
+
+

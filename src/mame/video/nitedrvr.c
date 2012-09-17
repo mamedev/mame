@@ -69,11 +69,10 @@ static void draw_roadway( running_machine &machine, bitmap_ind16 &bitmap )
 	}
 }
 
-SCREEN_UPDATE_IND16( nitedrvr )
+UINT32 nitedrvr_state::screen_update_nitedrvr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	nitedrvr_state *state = screen.machine().driver_data<nitedrvr_state>();
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_roadway(screen.machine(), bitmap);
 	return 0;
 }

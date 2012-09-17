@@ -85,6 +85,7 @@ public:
 	DECLARE_MACHINE_START(tk80bs);
 	DECLARE_MACHINE_RESET(tk80bs);
 	DECLARE_VIDEO_START(tk80bs);
+	UINT32 screen_update_tk80bs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /************************************************* TK80 ******************************************/
@@ -259,9 +260,8 @@ VIDEO_START_MEMBER(tk80bs_state,tk80bs)
 {
 }
 
-static SCREEN_UPDATE_IND16( tk80bs )
+UINT32 tk80bs_state::screen_update_tk80bs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tk80bs_state *state = screen.machine().driver_data<tk80bs_state>();
 	int x,y;
 	int count;
 
@@ -271,7 +271,7 @@ static SCREEN_UPDATE_IND16( tk80bs )
 	{
 		for(x=0;x<32;x++)
 		{
-			int tile = state->m_p_videoram[count++];
+			int tile = m_p_videoram[count++];
 
 			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], tile, 0, 0, 0, x*8, y*8);
 		}
@@ -408,7 +408,7 @@ static MACHINE_CONFIG_START( tk80bs, tk80bs_state )
 	MCFG_SCREEN_SIZE(256, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 128-1)
 	MCFG_VIDEO_START_OVERRIDE(tk80bs_state,tk80bs)
-	MCFG_SCREEN_UPDATE_STATIC(tk80bs)
+	MCFG_SCREEN_UPDATE_DRIVER(tk80bs_state, screen_update_tk80bs)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 	MCFG_GFXDECODE(tk80bs)

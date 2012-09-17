@@ -603,10 +603,9 @@ void odyssey2_state::video_start()
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( odyssey2 )
+UINT32 odyssey2_state::screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	odyssey2_state *state = screen.machine().driver_data<odyssey2_state>();
-	copybitmap( bitmap, state->m_tmp_bitmap, 0, 0, 0, 0, cliprect );
+	copybitmap( bitmap, m_tmp_bitmap, 0, 0, 0, 0, cliprect );
 
 	return 0;
 }

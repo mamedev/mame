@@ -63,9 +63,8 @@ void lviv_state::video_start()
 {
 }
 
-SCREEN_UPDATE_IND16( lviv )
+UINT32 lviv_state::screen_update_lviv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	lviv_state *state = screen.machine().driver_data<lviv_state>();
 	int x,y;
 	int pen;
 	UINT8 data;
@@ -73,18 +72,18 @@ SCREEN_UPDATE_IND16( lviv )
 	for (y=0; y<256; y++)
 		for (x=0; x<256; x+=4)
 		{
-			data = state->m_video_ram[y*64+x/4];
+			data = m_video_ram[y*64+x/4];
 
-			pen = state->m_colortable[0][((data & 0x08) >> 3) | ((data & 0x80) >> (3+3))];
+			pen = m_colortable[0][((data & 0x08) >> 3) | ((data & 0x80) >> (3+3))];
 			bitmap.pix16(y, x + 0) = pen;
 
-			pen = state->m_colortable[0][((data & 0x04) >> 2) | ((data & 0x40) >> (2+3))];
+			pen = m_colortable[0][((data & 0x04) >> 2) | ((data & 0x40) >> (2+3))];
 			bitmap.pix16(y, x + 1) = pen;
 
-			pen = state->m_colortable[0][((data & 0x02) >> 1) | ((data & 0x20) >> (1+3))];
+			pen = m_colortable[0][((data & 0x02) >> 1) | ((data & 0x20) >> (1+3))];
 			bitmap.pix16(y, x + 2) = pen;
 
-			pen = state->m_colortable[0][((data & 0x01) >> 0) | ((data & 0x10) >> (0+3))];
+			pen = m_colortable[0][((data & 0x01) >> 0) | ((data & 0x10) >> (0+3))];
 			bitmap.pix16(y, x + 3) = pen;
 		}
 	return 0;

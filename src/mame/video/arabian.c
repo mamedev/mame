@@ -365,18 +365,17 @@ WRITE8_MEMBER(arabian_state::arabian_videoram_w)
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( arabian )
+UINT32 arabian_state::screen_update_arabian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	arabian_state *state = screen.machine().driver_data<arabian_state>();
-	const pen_t *pens = &screen.machine().pens[(state->m_video_control >> 3) << 8];
+	const pen_t *pens = &screen.machine().pens[(m_video_control >> 3) << 8];
 	int y;
 
 	/* render the screen from the bitmap */
 	for (y = 0; y < BITMAP_HEIGHT; y++)
 	{
 		/* non-flipped case */
-		if (!state->m_flip_screen)
-			draw_scanline8(bitmap, 0, y, BITMAP_WIDTH, &state->m_main_bitmap[y * BITMAP_WIDTH], pens);
+		if (!m_flip_screen)
+			draw_scanline8(bitmap, 0, y, BITMAP_WIDTH, &m_main_bitmap[y * BITMAP_WIDTH], pens);
 
 		/* flipped case */
 		else
@@ -384,7 +383,7 @@ SCREEN_UPDATE_IND16( arabian )
 			UINT8 scanline[BITMAP_WIDTH];
 			int x;
 			for (x = 0; x < BITMAP_WIDTH; x++)
-				scanline[BITMAP_WIDTH - 1 - x] = state->m_main_bitmap[y * BITMAP_WIDTH + x];
+				scanline[BITMAP_WIDTH - 1 - x] = m_main_bitmap[y * BITMAP_WIDTH + x];
 			draw_scanline8(bitmap, 0, BITMAP_HEIGHT - 1 - y, BITMAP_WIDTH, scanline, pens);
 		}
 	}

@@ -96,6 +96,8 @@ public:
 	DECLARE_MACHINE_START(mcr68);
 	DECLARE_MACHINE_RESET(mcr68);
 	DECLARE_VIDEO_START(mcr68);
+	UINT32 screen_update_zwackery(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_mcr68(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in machine/mcr68.c -----------*/
@@ -118,8 +120,8 @@ INTERRUPT_GEN( mcr68_interrupt );
 
 
 
-SCREEN_UPDATE_IND16( mcr68 );
 
 
 
-SCREEN_UPDATE_IND16( zwackery );
+
+

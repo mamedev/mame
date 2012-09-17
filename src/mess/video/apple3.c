@@ -363,10 +363,9 @@ static void apple3_video_graphics_chires(running_machine &machine,bitmap_ind16 &
 
 
 
-SCREEN_UPDATE_IND16( apple3 )
+UINT32 apple3_state::screen_update_apple3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	apple3_state *state = screen.machine().driver_data<apple3_state>();
-	switch(state->m_flags & (VAR_VM3|VAR_VM1|VAR_VM0))
+	switch(m_flags & (VAR_VM3|VAR_VM1|VAR_VM0))
 	{
 		case 0:
 		case VAR_VM0:

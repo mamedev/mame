@@ -385,16 +385,15 @@ READ8_MEMBER(leland_state::ataxx_svram_port_r)
  *
  *************************************/
 
-static SCREEN_UPDATE_IND16( leland )
+UINT32 leland_state::screen_update_leland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	leland_state *state = screen.machine().driver_data<leland_state>();
 	int y;
 
 	const UINT8 *bg_prom = screen.machine().root_device().memregion("user1")->base();
 	const UINT8 *bg_gfx = screen.machine().root_device().memregion("gfx1")->base();
-	offs_t bg_gfx_bank_page_size = state->memregion("gfx1")->bytes() / 3;
-	offs_t char_bank = (((state->m_gfxbank >> 4) & 0x03) * 0x2000) & (bg_gfx_bank_page_size - 1);
-	offs_t prom_bank = ((state->m_gfxbank >> 3) & 0x01) * 0x2000;
+	offs_t bg_gfx_bank_page_size = memregion("gfx1")->bytes() / 3;
+	offs_t char_bank = (((m_gfxbank >> 4) & 0x03) * 0x2000) & (bg_gfx_bank_page_size - 1);
+	offs_t prom_bank = ((m_gfxbank >> 3) & 0x01) * 0x2000;
 
 	/* for each scanline in the visible region */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -403,14 +402,14 @@ static SCREEN_UPDATE_IND16( leland )
 		UINT8 fg_data = 0;
 
 		UINT16 *dst = &bitmap.pix16(y);
-		UINT8 *fg_src = &state->m_video_ram[y << 8];
+		UINT8 *fg_src = &m_video_ram[y << 8];
 
 		/* for each pixel on the scanline */
 		for (x = 0; x < VIDEO_WIDTH; x++)
 		{
 			/* compute the effective scrolled pixel coordinates */
-			UINT16 sx = (x + state->m_xscroll) & 0x07ff;
-			UINT16 sy = (y + state->m_yscroll) & 0x07ff;
+			UINT16 sx = (x + m_xscroll) & 0x07ff;
+			UINT16 sy = (y + m_yscroll) & 0x07ff;
 
 			/* get the byte address this background pixel comes from */
 			offs_t bg_prom_offs = (sx >> 3) |
@@ -454,13 +453,12 @@ static SCREEN_UPDATE_IND16( leland )
  *
  *************************************/
 
-static SCREEN_UPDATE_IND16( ataxx )
+UINT32 leland_state::screen_update_ataxx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	leland_state *state = screen.machine().driver_data<leland_state>();
 	int y;
 
 	const UINT8 *bg_gfx = screen.machine().root_device().memregion("gfx1")->base();
-	offs_t bg_gfx_bank_page_size = state->memregion("gfx1")->bytes() / 6;
+	offs_t bg_gfx_bank_page_size = memregion("gfx1")->bytes() / 6;
 	offs_t bg_gfx_offs_mask = bg_gfx_bank_page_size - 1;
 
 	/* for each scanline in the visible region */
@@ -470,14 +468,14 @@ static SCREEN_UPDATE_IND16( ataxx )
 		UINT8 fg_data = 0;
 
 		UINT16 *dst = &bitmap.pix16(y);
-		UINT8 *fg_src = &state->m_video_ram[y << 8];
+		UINT8 *fg_src = &m_video_ram[y << 8];
 
 		/* for each pixel on the scanline */
 		for (x = 0; x < VIDEO_WIDTH; x++)
 		{
 			/* compute the effective scrolled pixel coordinates */
-			UINT16 sx = (x + state->m_xscroll) & 0x07ff;
-			UINT16 sy = (y + state->m_yscroll) & 0x07ff;
+			UINT16 sx = (x + m_xscroll) & 0x07ff;
+			UINT16 sy = (y + m_yscroll) & 0x07ff;
 
 			/* get the byte address this background pixel comes from */
 			offs_t qram_offs = (sx >> 3) |
@@ -485,8 +483,8 @@ static SCREEN_UPDATE_IND16( ataxx )
 							   ((sy << 6) & 0x8000);
 
 			offs_t bg_gfx_offs = ((sy & 0x07) |
-								  (state->m_ataxx_qram[qram_offs] << 3) |
-								  ((state->m_ataxx_qram[0x4000 | qram_offs] & 0x7f) << 11)) & bg_gfx_offs_mask;
+								  (m_ataxx_qram[qram_offs] << 3) |
+								  ((m_ataxx_qram[0x4000 | qram_offs] & 0x7f) << 11)) & bg_gfx_offs_mask;
 
 			/* build the pen, background is d0-d5 */
 			pen_t pen = (((bg_gfx[bg_gfx_offs + (0 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 7) |	/* d0 */
@@ -531,12 +529,12 @@ MACHINE_CONFIG_FRAGMENT( leland_video )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_STATIC(leland)
+	MCFG_SCREEN_UPDATE_DRIVER(leland_state, screen_update_leland)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_DERIVED( ataxx_video, leland_video )
 	MCFG_VIDEO_START_OVERRIDE(leland_state,ataxx)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(ataxx)
+	MCFG_SCREEN_UPDATE_DRIVER(leland_state, screen_update_ataxx)
 MACHINE_CONFIG_END

@@ -57,6 +57,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sn2_ca2_u2_u3_w);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -79,18 +80,17 @@ WRITE_LINE_MEMBER(toratora_state::cb2_u3_w)
  *
  *************************************/
 
-static SCREEN_UPDATE_RGB32( toratora )
+UINT32 toratora_state::screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	toratora_state *state = screen.machine().driver_data<toratora_state>();
 	offs_t offs;
 
-	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
+	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{
 		int i;
 
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
-		UINT8 data = state->m_videoram[offs];
+		UINT8 data = m_videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
@@ -102,11 +102,11 @@ static SCREEN_UPDATE_RGB32( toratora )
 		}
 
 		/* the video system clears as it writes out the pixels */
-		if (state->m_clear_tv)
-			state->m_videoram[offs] = 0;
+		if (m_clear_tv)
+			m_videoram[offs] = 0;
 	}
 
-	state->m_clear_tv = 0;
+	m_clear_tv = 0;
 
 	return 0;
 }
@@ -462,7 +462,7 @@ static MACHINE_CONFIG_START( toratora, toratora_state )
 	MCFG_SCREEN_VISIBLE_AREA(0,256-1,8,248-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_STATIC(toratora)
+	MCFG_SCREEN_UPDATE_DRIVER(toratora_state, screen_update_toratora)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

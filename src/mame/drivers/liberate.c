@@ -840,7 +840,7 @@ static MACHINE_CONFIG_START( liberate, liberate_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 529ms Vblank duration?? */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(liberate)
+	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_liberate)
 
 	MCFG_GFXDECODE(liberate)
 	MCFG_PALETTE_LENGTH(33)
@@ -870,7 +870,7 @@ static MACHINE_CONFIG_DERIVED( boomrang, liberate )
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,boomrang)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(boomrang)
+	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_boomrang)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( prosoccr, liberate )
@@ -889,7 +889,7 @@ static MACHINE_CONFIG_DERIVED( prosoccr, liberate )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(prosoccr)
+	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_prosoccr)
 
 	MCFG_GFXDECODE(prosoccr)
 
@@ -919,7 +919,7 @@ static MACHINE_CONFIG_START( prosport, liberate_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1529) /* 529ms Vblank duration?? */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(prosport)
+	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_prosport)
 
 	MCFG_GFXDECODE(prosport)
 	MCFG_PALETTE_LENGTH(256)

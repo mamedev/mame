@@ -197,6 +197,7 @@ public:
 	DECLARE_MACHINE_RESET(model3_20);
 	DECLARE_MACHINE_START(model3_21);
 	DECLARE_MACHINE_RESET(model3_21);
+	UINT32 screen_update_model3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -217,7 +218,7 @@ void model3_tap_reset(running_machine &machine);
 
 
 
-SCREEN_UPDATE_IND16(model3);
+
 
 void real3d_display_list_end(running_machine &machine);
 void real3d_display_list1_dma(address_space &space, UINT32 src, UINT32 dst, int length, int byteswap);

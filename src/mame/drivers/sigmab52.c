@@ -149,6 +149,7 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_jwildb52(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -165,7 +166,7 @@ void sigmab52_state::video_start()
 }
 
 
-static SCREEN_UPDATE_IND16( jwildb52 )
+UINT32 sigmab52_state::screen_update_jwildb52(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	device_t *hd63484 = screen.machine().device("hd63484");
 
@@ -605,7 +606,7 @@ static MACHINE_CONFIG_START( jwildb52, sigmab52_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 384-1)
-	MCFG_SCREEN_UPDATE_STATIC(jwildb52)
+	MCFG_SCREEN_UPDATE_DRIVER(sigmab52_state, screen_update_jwildb52)
 
 	MCFG_HD63484_ADD("hd63484", jwildb52_hd63484_intf)
 

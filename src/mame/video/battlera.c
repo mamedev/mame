@@ -299,16 +299,15 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 /******************************************************************************/
 
-SCREEN_UPDATE_IND16( battlera )
+UINT32 battlera_state::screen_update_battlera(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	battlera_state *state = screen.machine().driver_data<battlera_state>();
 	int offs,code,scrollx,scrolly,mx,my;
 
 	/* if any tiles changed, redraw the VRAM */
-	if (screen.machine().gfx[0]->dirtyseq() != state->m_tile_dirtyseq)
+	if (screen.machine().gfx[0]->dirtyseq() != m_tile_dirtyseq)
 	{
-		state->m_tile_dirtyseq = screen.machine().gfx[0]->dirtyseq();
-		memset(state->m_vram_dirty, 1, 0x1000);
+		m_tile_dirtyseq = screen.machine().gfx[0]->dirtyseq();
+		memset(m_vram_dirty, 1, 0x1000);
 	}
 
 	mx=-1;
@@ -317,45 +316,45 @@ SCREEN_UPDATE_IND16( battlera )
 	{
 		mx++;
 		if (mx==64) {mx=0; my++;}
-		code=state->m_HuC6270_vram[offs+1] + ((state->m_HuC6270_vram[offs] & 0x0f) << 8);
+		code=m_HuC6270_vram[offs+1] + ((m_HuC6270_vram[offs] & 0x0f) << 8);
 
 		/* If this tile was changed OR tilemap was changed, redraw */
-		if (state->m_vram_dirty[offs/2]) {
-			state->m_vram_dirty[offs/2]=0;
-			drawgfx_opaque(*state->m_tile_bitmap,state->m_tile_bitmap->cliprect(),screen.machine().gfx[0],
+		if (m_vram_dirty[offs/2]) {
+			m_vram_dirty[offs/2]=0;
+			drawgfx_opaque(*m_tile_bitmap,m_tile_bitmap->cliprect(),screen.machine().gfx[0],
 					code,
-					state->m_HuC6270_vram[offs] >> 4,
+					m_HuC6270_vram[offs] >> 4,
 					0,0,
 					8*mx,8*my);
-			drawgfx_opaque(*state->m_front_bitmap,state->m_tile_bitmap->cliprect(),screen.machine().gfx[2],
+			drawgfx_opaque(*m_front_bitmap,m_tile_bitmap->cliprect(),screen.machine().gfx[2],
 					0,
 					0,	/* fill the spot with pen 256 */
 					0,0,
 					8*mx,8*my);
-			drawgfx_transmask(*state->m_front_bitmap,state->m_tile_bitmap->cliprect(),screen.machine().gfx[0],
+			drawgfx_transmask(*m_front_bitmap,m_tile_bitmap->cliprect(),screen.machine().gfx[0],
 					code,
-					state->m_HuC6270_vram[offs] >> 4,
+					m_HuC6270_vram[offs] >> 4,
 					0,0,
 					8*mx,8*my,0x1);
 		}
 	}
 
 	/* Render bitmap */
-	scrollx=-state->m_HuC6270_registers[7];
-	scrolly=-state->m_HuC6270_registers[8]+cliprect.min_y-1;
+	scrollx=-m_HuC6270_registers[7];
+	scrolly=-m_HuC6270_registers[8]+cliprect.min_y-1;
 
-	copyscrollbitmap(bitmap,*state->m_tile_bitmap,1,&scrollx,1,&scrolly,cliprect);
+	copyscrollbitmap(bitmap,*m_tile_bitmap,1,&scrollx,1,&scrolly,cliprect);
 
 	/* Todo:  Background enable (not used anyway) */
 
 	/* Render low priority sprites, if enabled */
-	if (state->m_sb_enable) draw_sprites(screen.machine(),bitmap,cliprect,0);
+	if (m_sb_enable) draw_sprites(screen.machine(),bitmap,cliprect,0);
 
 	/* Render background over sprites */
-	copyscrollbitmap_trans(bitmap,*state->m_front_bitmap,1,&scrollx,1,&scrolly,cliprect,256);
+	copyscrollbitmap_trans(bitmap,*m_front_bitmap,1,&scrollx,1,&scrolly,cliprect,256);
 
 	/* Render high priority sprites, if enabled */
-	if (state->m_sb_enable) draw_sprites(screen.machine(),bitmap,cliprect,1);
+	if (m_sb_enable) draw_sprites(screen.machine(),bitmap,cliprect,1);
 
 	return 0;
 }

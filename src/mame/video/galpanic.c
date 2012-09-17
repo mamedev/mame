@@ -100,13 +100,12 @@ static void draw_fgbitmap(running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( galpanic )
+UINT32 galpanic_state::screen_update_galpanic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galpanic_state *state = screen.machine().driver_data<galpanic_state>();
 	device_t *pandora = screen.machine().device("pandora");
 
 	/* copy the temporary bitmap to the screen */
-	copybitmap(bitmap,state->m_bitmap,0,0,0,0,cliprect);
+	copybitmap(bitmap,m_bitmap,0,0,0,0,cliprect);
 
 	draw_fgbitmap(screen.machine(), bitmap, cliprect);
 
@@ -115,25 +114,24 @@ SCREEN_UPDATE_IND16( galpanic )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( comad )
+UINT32 galpanic_state::screen_update_comad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galpanic_state *state = screen.machine().driver_data<galpanic_state>();
 	/* copy the temporary bitmap to the screen */
-	copybitmap(bitmap,state->m_bitmap,0,0,0,0,cliprect);
+	copybitmap(bitmap,m_bitmap,0,0,0,0,cliprect);
 
 	draw_fgbitmap(screen.machine(), bitmap, cliprect);
 
 
 //  if(galpanic_clear_sprites)
 	{
-		state->m_sprites_bitmap.fill(0, cliprect);
+		m_sprites_bitmap.fill(0, cliprect);
 		comad_draw_sprites(screen.machine(),bitmap,cliprect);
 	}
 //  else
 //  {
 //      /* keep sprites on the bitmap without clearing them */
-//      comad_draw_sprites(screen.machine(),state->m_sprites_bitmap,0);
-//      copybitmap_trans(bitmap,state->m_sprites_bitmap,0,0,0,0,cliprect,0);
+//      comad_draw_sprites(screen.machine(),m_sprites_bitmap,0);
+//      copybitmap_trans(bitmap,m_sprites_bitmap,0,0,0,0,cliprect,0);
 //  }
 	return 0;
 }

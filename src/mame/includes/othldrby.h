@@ -41,6 +41,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_othldrby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_othldrby(screen_device &screen, bool state);
 };
 
 
@@ -48,5 +50,5 @@ public:
 
 
 
-SCREEN_VBLANK( othldrby );
-SCREEN_UPDATE_IND16( othldrby );
+
+

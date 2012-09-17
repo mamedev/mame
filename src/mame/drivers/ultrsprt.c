@@ -35,17 +35,17 @@ public:
 	DECLARE_WRITE16_MEMBER(K056800_68k_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(analog_ctrl_r);
 	virtual void machine_start();
+	UINT32 screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 
 
-static SCREEN_UPDATE_IND16( ultrsprt )
+UINT32 ultrsprt_state::screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ultrsprt_state *state = screen.machine().driver_data<ultrsprt_state>();
 	int i, j;
 
-	UINT8 *ram = reinterpret_cast<UINT8 *>(state->m_vram.target());
+	UINT8 *ram = reinterpret_cast<UINT8 *>(m_vram.target());
 
 	for (j=0; j < 400; j++)
 	{
@@ -243,7 +243,7 @@ static MACHINE_CONFIG_START( ultrsprt, ultrsprt_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 399)
-	MCFG_SCREEN_UPDATE_STATIC(ultrsprt)
+	MCFG_SCREEN_UPDATE_DRIVER(ultrsprt_state, screen_update_ultrsprt)
 
 	MCFG_PALETTE_LENGTH(8192)
 

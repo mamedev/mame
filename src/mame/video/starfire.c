@@ -263,10 +263,9 @@ static TIMER_CALLBACK( starfire_scanline_callback )
 	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(y), y);
 }
 
-SCREEN_UPDATE_RGB32( starfire )
+UINT32 starfire_state::screen_update_starfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	starfire_state *state = screen.machine().driver_data<starfire_state>();
-    copybitmap(bitmap, state->m_starfire_screen, 0, 0, 0, 0, cliprect);
+    copybitmap(bitmap, m_starfire_screen, 0, 0, 0, 0, cliprect);
 
 	return 0;
 }

@@ -52,6 +52,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -61,12 +62,11 @@ void bmjr_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-static SCREEN_UPDATE_IND16( bmjr )
+UINT32 bmjr_state::screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bmjr_state *state = screen.machine().driver_data<bmjr_state>();
 	UINT8 y,ra,chr,gfx,fg=4;
 	UINT16 sy=0,ma=0x100,x;
-	UINT8 inv = (state->m_xor_display) ? 0xff : 0;
+	UINT8 inv = (m_xor_display) ? 0xff : 0;
 
 	for(y = 0; y < 24; y++ )
 	{
@@ -76,8 +76,8 @@ static SCREEN_UPDATE_IND16( bmjr )
 
 			for (x = ma; x < ma + 32; x++)
 			{
-				chr = state->m_p_wram[x];
-				gfx = state->m_p_chargen[(chr<<3) | ra] ^ inv;
+				chr = m_p_wram[x];
+				gfx = m_p_chargen[(chr<<3) | ra] ^ inv;
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7) ? fg : 0;
@@ -356,7 +356,7 @@ static MACHINE_CONFIG_START( bmjr, bmjr_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(256, 192)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
-	MCFG_SCREEN_UPDATE_STATIC(bmjr)
+	MCFG_SCREEN_UPDATE_DRIVER(bmjr_state, screen_update_bmjr)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_GFXDECODE(bmjr)
 

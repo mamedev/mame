@@ -343,7 +343,7 @@ static void draw_objects(running_machine &machine, grchamp_state *state, int y, 
 }
 
 
-SCREEN_UPDATE_RGB32( grchamp )
+UINT32 grchamp_state::screen_update_grchamp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	static const rgb_t objpix_lookup[8] =
 	{
@@ -357,17 +357,16 @@ SCREEN_UPDATE_RGB32( grchamp )
 		MAKE_RGB(RGB_MAX,RGB_MAX,RGB_MAX)
 	};
 
-	grchamp_state *state = screen.machine().driver_data<grchamp_state>();
 	const UINT8 *amedata = screen.machine().root_device().memregion("gfx5")->base();
 	const UINT8 *headdata = screen.machine().root_device().memregion("gfx6")->base();
-	const UINT8 *pldata = state->memregion("gfx7")->base();
-	bitmap_ind16 &lpixmap = state->m_left_tilemap->pixmap();
-	bitmap_ind16 &rpixmap = state->m_right_tilemap->pixmap();
-	bitmap_ind16 &cpixmap = state->m_center_tilemap->pixmap();
+	const UINT8 *pldata = memregion("gfx7")->base();
+	bitmap_ind16 &lpixmap = m_left_tilemap->pixmap();
+	bitmap_ind16 &rpixmap = m_right_tilemap->pixmap();
+	bitmap_ind16 &cpixmap = m_center_tilemap->pixmap();
 	int lrxscroll, cxscroll, lyscroll, ryscroll, cyscroll;
-	int bgcolor = state->m_cpu1_out[3] & 0x10;
-	int amebase = state->m_cpu0_out[4] >> 4;
-	int plbase = state->m_cpu0_out[4] & 0x0f;
+	int bgcolor = m_cpu1_out[3] & 0x10;
+	int amebase = m_cpu0_out[4] >> 4;
+	int plbase = m_cpu0_out[4] & 0x0f;
 	int cxmask;
 	int x, y;
 
@@ -376,14 +375,14 @@ SCREEN_UPDATE_RGB32( grchamp )
 	assert(lpixmap.height() == rpixmap.height() && lpixmap.height() == cpixmap.height());
 
 	/* extract background scroll values; left and right share the same X scroll */
-	lrxscroll = state->m_cpu1_out[0] + (state->m_cpu1_out[1] & 1) * 256;
-	lyscroll = state->m_cpu1_out[2];
-	ryscroll = state->m_cpu1_out[7];
-	cxscroll = state->m_cpu1_out[9] + (state->m_cpu1_out[10] & 1) * 256;
-	cyscroll = state->m_cpu1_out[11];
+	lrxscroll = m_cpu1_out[0] + (m_cpu1_out[1] & 1) * 256;
+	lyscroll = m_cpu1_out[2];
+	ryscroll = m_cpu1_out[7];
+	cxscroll = m_cpu1_out[9] + (m_cpu1_out[10] & 1) * 256;
+	cyscroll = m_cpu1_out[11];
 
 	/* determine the center background mask, controlled by attribute bit 0x20 */
-	cxmask = (state->m_cpu1_out[3] & 0x20) ? 0xff : 0x1ff;
+	cxmask = (m_cpu1_out[3] & 0x20) ? 0xff : 0x1ff;
 
 	/* iterate over scanlines */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -400,7 +399,7 @@ SCREEN_UPDATE_RGB32( grchamp )
 		UINT8 objdata[256];
 
 		/* draw the objects for this scanline */
-		draw_objects(screen.machine(), state, y, objdata);
+		draw_objects(screen.machine(), this, y, objdata);
 
 		/* iterate over columns */
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
@@ -423,20 +422,20 @@ SCREEN_UPDATE_RGB32( grchamp )
 			objpix = objdata[x];
 
 			/* if the headlamp is visible, determine that now */
-			mydh = (state->m_cpu0_out[2] - x) & 0xff;
-			mydv = (state->m_cpu0_out[3] - (y - 16)) & 0xff;
-			if ((state->m_cpu0_out[0] & 0x10) && (mydh & 0xc0) == 0xc0 && ((mydv ^ (mydv >> 1)) & 0x40) == 0)
+			mydh = (m_cpu0_out[2] - x) & 0xff;
+			mydv = (m_cpu0_out[3] - (y - 16)) & 0xff;
+			if ((m_cpu0_out[0] & 0x10) && (mydh & 0xc0) == 0xc0 && ((mydv ^ (mydv >> 1)) & 0x40) == 0)
 			{
 				int bits = headdata[((mydh & 0x38) >> 3) |
 									((mydv & 0x3f) << 3) |
 									((~mydv & 0x40) << 3) |
-									((state->m_cpu0_out[0] & 0x10) << 6)];
+									((m_cpu0_out[0] & 0x10) << 6)];
 				headbit = (bits >> (~mydh & 0x07)) & 0x01;
 			}
 
 			/* if the headlamp is on and we're not in the headlamp area, */
 			/* and this isn't a character pixel, the /KILL switch is set */
-			if ((state->m_cpu0_out[0] & 0x10) && !headbit && !(objpix & 0x10))
+			if ((m_cpu0_out[0] & 0x10) && !headbit && !(objpix & 0x10))
 			{
 				kill = 1;
 				objpix &= ~7;
@@ -454,17 +453,17 @@ SCREEN_UPDATE_RGB32( grchamp )
 					/* handle collision detection between MYCARRED and MVID/OBJECT */
 
 					/* skip if the state is being held clear, or if we already have a collision */
-					if ((state->m_cpu0_out[0] & 0x02) && !(state->m_collide & 0x1000))
+					if ((m_cpu0_out[0] & 0x02) && !(m_collide & 0x1000))
 					{
 						if (objpix & 0x08)
 						{
 							mame_printf_debug("Collide car/object @ (%d,%d)\n", x, y);
-							state->m_collide = 0x1000 | 0x2000/* guess */ | ((~y & 0x80) << 3) | ((~y & 0xf8) << 2) | ((~x & 0xf8) >> 3);
+							m_collide = 0x1000 | 0x2000/* guess */ | ((~y & 0x80) << 3) | ((~y & 0xf8) << 2) | ((~x & 0xf8) >> 3);
 						}
 						else if ((mvid & 0x0f) != 0)
 						{
 							mame_printf_debug("Collide car/bg @ (%d,%d)\n", x, y);
-							state->m_collide = 0x1000 | 0x4000/* guess */ | ((~y & 0x80) << 3) | ((~y & 0xf8) << 2) | ((~x & 0xf8) >> 3);
+							m_collide = 0x1000 | 0x4000/* guess */ | ((~y & 0x80) << 3) | ((~y & 0xf8) << 2) | ((~x & 0xf8) >> 3);
 						}
 					}
 				}
@@ -475,24 +474,24 @@ SCREEN_UPDATE_RGB32( grchamp )
 			/* if rain is enabled, it ORs against the bits */
 			if (amebase != 0)
 			{
-				int effx = (state->m_cpu0_out[8] + x) & 0x0f;
-				int effy = (state->m_cpu0_out[7] - y) & 0x0f;
+				int effx = (m_cpu0_out[8] + x) & 0x0f;
+				int effy = (m_cpu0_out[7] - y) & 0x0f;
 				if ((amedata[(amebase << 5) | (effy << 1) | (effx >> 3)] >> (effx & 0x07)) & 0x01)
 					objpix |= 7;
 			}
 
 			/* if the radar is on, it ORs against the bits */
-			if (y >= 192 && (state->m_cpu0_out[0] & 0x80))
+			if (y >= 192 && (m_cpu0_out[0] & 0x80))
 			{
-				if ((state->m_radarram[((~y & 0x3e) << 4) | ((~x & 0xf8) >> 3)] >> (x & 0x07)) & 0x01)
+				if ((m_radarram[((~y & 0x3e) << 4) | ((~x & 0xf8) >> 3)] >> (x & 0x07)) & 0x01)
 					objpix |= 7;
 			}
 
 			/* handle collision detection between MVID and OBJECT */
-			if (!(state->m_collide & 0x1000) && (objpix & 0x08) && (mvid & 0x0f) != 0)
+			if (!(m_collide & 0x1000) && (objpix & 0x08) && (mvid & 0x0f) != 0)
 			{
 mame_printf_debug("Collide bg/object @ (%d,%d)\n", x, y);
-				state->m_collide = 0x1000 | 0x8000 | ((~y & 0x80) << 3) | ((~y & 0xf8) << 2) | ((~x & 0xf8) >> 3);
+				m_collide = 0x1000 | 0x8000 | ((~y & 0x80) << 3) | ((~y & 0xf8) << 2) | ((~x & 0xf8) >> 3);
 			}
 
 	/*
@@ -521,7 +520,7 @@ mame_printf_debug("Collide bg/object @ (%d,%d)\n", x, y);
 
 			/* otherwise, it's the background, unless it's been KILL'ed */
 			else if (!kill)
-				finalpix = state->m_bgcolor[mvid | bgcolor];
+				finalpix = m_bgcolor[mvid | bgcolor];
 
 			/* in which case it's black */
 			else

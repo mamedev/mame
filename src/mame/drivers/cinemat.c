@@ -999,7 +999,7 @@ static MACHINE_CONFIG_START( cinemat_nojmi_4k, cinemat_state )
 	MCFG_SCREEN_REFRESH_RATE(MASTER_CLOCK/4/16/16/16/16/2)
 	MCFG_SCREEN_SIZE(1024, 768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1023, 0, 767)
-	MCFG_SCREEN_UPDATE_STATIC(cinemat)
+	MCFG_SCREEN_UPDATE_DRIVER(cinemat_state, screen_update_cinemat)
 
 MACHINE_CONFIG_END
 
@@ -1045,7 +1045,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( spacewar, cinemat_nojmi_4k )
 	MCFG_FRAGMENT_ADD(spacewar_sound)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(spacewar)
+	MCFG_SCREEN_UPDATE_DRIVER(cinemat_state, screen_update_spacewar)
 MACHINE_CONFIG_END
 
 

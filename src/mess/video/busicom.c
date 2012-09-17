@@ -1816,17 +1816,16 @@ void busicom_state::video_start()
 {
 }
 
-SCREEN_UPDATE_IND16( busicom )
+UINT32 busicom_state::screen_update_busicom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	busicom_state *state = screen.machine().driver_data<busicom_state>();
 	int y, x, b, j;
 	//34x44
 	for (y = 0; y < 11; y++)
 	{
-		UINT8 col = 8 * state->m_printer_line_color[y];
+		UINT8 col = 8 * m_printer_line_color[y];
 		for (x = 0; x < 17; x++)
 		{
-			UINT8 chr = state->m_printer_line[y][x];
+			UINT8 chr = m_printer_line[y][x];
 			for (j = 0; j < 44; j++) {
 				for (b = 0; b < 34; b++)
 				{

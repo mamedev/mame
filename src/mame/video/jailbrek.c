@@ -92,33 +92,32 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( jailbrek )
+UINT32 jailbrek_state::screen_update_jailbrek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	jailbrek_state *state = screen.machine().driver_data<jailbrek_state>();
 	int i;
 
 	// added support for vertical scrolling (credits).  23/1/2002  -BR
 	// bit 2 appears to be horizontal/vertical scroll control
-	if (state->m_scroll_dir[0] & 0x04)
+	if (m_scroll_dir[0] & 0x04)
 	{
-		state->m_bg_tilemap->set_scroll_cols(32);
-		state->m_bg_tilemap->set_scroll_rows(1);
-		state->m_bg_tilemap->set_scrollx(0, 0);
+		m_bg_tilemap->set_scroll_cols(32);
+		m_bg_tilemap->set_scroll_rows(1);
+		m_bg_tilemap->set_scrollx(0, 0);
 
 		for (i = 0; i < 32; i++)
-			state->m_bg_tilemap->set_scrolly(i, ((state->m_scroll_x[i + 32] << 8) + state->m_scroll_x[i]));
+			m_bg_tilemap->set_scrolly(i, ((m_scroll_x[i + 32] << 8) + m_scroll_x[i]));
 	}
 	else
 	{
-		state->m_bg_tilemap->set_scroll_rows(32);
-		state->m_bg_tilemap->set_scroll_cols(1);
-		state->m_bg_tilemap->set_scrolly(0, 0);
+		m_bg_tilemap->set_scroll_rows(32);
+		m_bg_tilemap->set_scroll_cols(1);
+		m_bg_tilemap->set_scrolly(0, 0);
 
 		for (i = 0; i < 32; i++)
-			state->m_bg_tilemap->set_scrollx(i, ((state->m_scroll_x[i + 32] << 8) + state->m_scroll_x[i]));
+			m_bg_tilemap->set_scrollx(i, ((m_scroll_x[i + 32] << 8) + m_scroll_x[i]));
 	}
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

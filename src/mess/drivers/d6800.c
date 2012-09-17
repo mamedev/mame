@@ -78,6 +78,8 @@ private:
 	UINT8 m_portb;
 	virtual void machine_start();
 	virtual void machine_reset();
+public:	
+	UINT32 screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -152,9 +154,8 @@ INPUT_PORTS_END
 
 /* Video */
 
-static SCREEN_UPDATE_IND16( d6800 )
+UINT32 d6800_state::screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	d6800_state *state = screen.machine().driver_data<d6800_state>();
 	UINT8 x,y,gfx=0;
 
 	for (y = 0; y < 32; y++)
@@ -163,8 +164,8 @@ static SCREEN_UPDATE_IND16( d6800 )
 
 		for (x = 0; x < 8; x++)
 		{
-			if (state->m_screen_on)
-				gfx = state->m_videoram[ x | (y<<3)];
+			if (m_screen_on)
+				gfx = m_videoram[ x | (y<<3)];
 
 			*p++ = BIT(gfx, 7);
 			*p++ = BIT(gfx, 6);
@@ -367,7 +368,7 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(64, 32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 63, 0, 31)
-	MCFG_SCREEN_UPDATE_STATIC(d6800)
+	MCFG_SCREEN_UPDATE_DRIVER(d6800_state, screen_update_d6800)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

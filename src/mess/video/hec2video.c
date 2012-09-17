@@ -116,14 +116,13 @@ VIDEO_START_MEMBER(hec2hrp_state,hec2hrp)
 	Init_Hector_Palette(machine());
 }
 
-SCREEN_UPDATE_IND16( hec2hrp )
+UINT32 hec2hrp_state::screen_update_hec2hrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	hec2hrp_state *state = screen.machine().driver_data<hec2hrp_state>();
-	UINT8 *videoram = state->m_videoram;
-	UINT8 *videoram_HR = state->m_hector_videoram;
-	if (state->m_hector_flag_hr==1)
+	UINT8 *videoram = m_videoram;
+	UINT8 *videoram_HR = m_hector_videoram;
+	if (m_hector_flag_hr==1)
 		{
-		if (state->m_hector_flag_80c==0)
+		if (m_hector_flag_80c==0)
 			{
 				screen.set_visible_area(0, 243, 0, 227);
 				hector_hr( screen.machine(), bitmap , &videoram_HR[0], 227, 64);

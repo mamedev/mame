@@ -359,48 +359,45 @@ static void draw_lasso( running_machine &machine, bitmap_ind16 &bitmap, const re
 }
 
 
-SCREEN_UPDATE_IND16( lasso )
+UINT32 lasso_state::screen_update_lasso(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	lasso_state *state = screen.machine().driver_data<lasso_state>();
-	palette_set_color(screen.machine(), 0, get_color(*state->m_back_color));
+	palette_set_color(screen.machine(), 0, get_color(*m_back_color));
 	bitmap.fill(0, cliprect);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_lasso(screen.machine(), bitmap, cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( chameleo )
+UINT32 lasso_state::screen_update_chameleo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	lasso_state *state = screen.machine().driver_data<lasso_state>();
-	palette_set_color(screen.machine(), 0, get_color(*state->m_back_color));
+	palette_set_color(screen.machine(), 0, get_color(*m_back_color));
 	bitmap.fill(0, cliprect);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( wwjgtin )
+UINT32 lasso_state::screen_update_wwjgtin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	lasso_state *state = screen.machine().driver_data<lasso_state>();
-	colortable_palette_set_color(screen.machine().colortable, 0, get_color(*state->m_back_color));
+	colortable_palette_set_color(screen.machine().colortable, 0, get_color(*m_back_color));
 	wwjgtin_set_last_four_colors(screen.machine(), screen.machine().colortable);
 
-	state->m_track_tilemap->set_scrollx(0, state->m_track_scroll[0] + state->m_track_scroll[1] * 256);
-	state->m_track_tilemap->set_scrolly(0, state->m_track_scroll[2] + state->m_track_scroll[3] * 256);
+	m_track_tilemap->set_scrollx(0, m_track_scroll[0] + m_track_scroll[1] * 256);
+	m_track_tilemap->set_scrolly(0, m_track_scroll[2] + m_track_scroll[3] * 256);
 
-	if (state->m_track_enable)
-		state->m_track_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (m_track_enable)
+		m_track_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 1);	// reverse order
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

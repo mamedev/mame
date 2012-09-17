@@ -33,6 +33,7 @@ public:
 	DECLARE_MACHINE_RESET(actfancr);
 	DECLARE_MACHINE_START(triothep);
 	DECLARE_MACHINE_RESET(triothep);
+	UINT32 screen_update_actfancr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -46,5 +47,5 @@ DECLARE_READ8_HANDLER( actfancr_pf2_data_r );
 DECLARE_WRITE8_HANDLER( actfancr_pf2_control_w );
 
 
-SCREEN_UPDATE_IND16( actfancr );
+
 

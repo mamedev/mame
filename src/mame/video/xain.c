@@ -212,58 +212,57 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	}
 }
 
-SCREEN_UPDATE_IND16( xain )
+UINT32 xain_state::screen_update_xain(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	xain_state *state = screen.machine().driver_data<xain_state>();
-	switch (state->m_pri&0x7)
+	switch (m_pri&0x7)
 	{
 	case 0:
-		state->m_bgram0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		state->m_bgram1_tilemap->draw(bitmap, cliprect, 0,0);
+		m_bgram0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_bgram1_tilemap->draw(bitmap, cliprect, 0,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		state->m_char_tilemap->draw(bitmap, cliprect, 0,0);
+		m_char_tilemap->draw(bitmap, cliprect, 0,0);
 		break;
 	case 1:
-		state->m_bgram1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		state->m_bgram0_tilemap->draw(bitmap, cliprect, 0,0);
+		m_bgram1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_bgram0_tilemap->draw(bitmap, cliprect, 0,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		state->m_char_tilemap->draw(bitmap, cliprect, 0,0);
+		m_char_tilemap->draw(bitmap, cliprect, 0,0);
 		break;
 	case 2:
-		state->m_char_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		state->m_bgram0_tilemap->draw(bitmap, cliprect, 0,0);
+		m_char_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_bgram0_tilemap->draw(bitmap, cliprect, 0,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		state->m_bgram1_tilemap->draw(bitmap, cliprect, 0,0);
+		m_bgram1_tilemap->draw(bitmap, cliprect, 0,0);
 		break;
 	case 3:
-		state->m_char_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		state->m_bgram1_tilemap->draw(bitmap, cliprect, 0,0);
+		m_char_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_bgram1_tilemap->draw(bitmap, cliprect, 0,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		state->m_bgram0_tilemap->draw(bitmap, cliprect, 0,0);
+		m_bgram0_tilemap->draw(bitmap, cliprect, 0,0);
 		break;
 	case 4:
-		state->m_bgram0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		state->m_char_tilemap->draw(bitmap, cliprect, 0,0);
+		m_bgram0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_char_tilemap->draw(bitmap, cliprect, 0,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		state->m_bgram1_tilemap->draw(bitmap, cliprect, 0,0);
+		m_bgram1_tilemap->draw(bitmap, cliprect, 0,0);
 		break;
 	case 5:
-		state->m_bgram1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		state->m_char_tilemap->draw(bitmap, cliprect, 0,0);
+		m_bgram1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_char_tilemap->draw(bitmap, cliprect, 0,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		state->m_bgram0_tilemap->draw(bitmap, cliprect, 0,0);
+		m_bgram0_tilemap->draw(bitmap, cliprect, 0,0);
 		break;
 	case 6:
-		state->m_bgram0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_bgram0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		state->m_bgram1_tilemap->draw(bitmap, cliprect, 0,0);
-		state->m_char_tilemap->draw(bitmap, cliprect, 0,0);
+		m_bgram1_tilemap->draw(bitmap, cliprect, 0,0);
+		m_char_tilemap->draw(bitmap, cliprect, 0,0);
 		break;
 	case 7:
-		state->m_bgram1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_bgram1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		state->m_bgram0_tilemap->draw(bitmap, cliprect, 0,0);
-		state->m_char_tilemap->draw(bitmap, cliprect, 0,0);
+		m_bgram0_tilemap->draw(bitmap, cliprect, 0,0);
+		m_char_tilemap->draw(bitmap, cliprect, 0,0);
 		break;
 	}
 	return 0;

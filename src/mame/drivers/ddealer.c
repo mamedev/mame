@@ -156,6 +156,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_ddealer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -264,12 +265,11 @@ static void ddealer_draw_video_layer( running_machine &machine, UINT16* vreg_bas
 }
 
 
-static SCREEN_UPDATE_IND16( ddealer )
+UINT32 ddealer_state::screen_update_ddealer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ddealer_state *state = screen.machine().driver_data<ddealer_state>();
-	state->m_back_tilemap->set_scrollx(0, state->m_flipscreen ? -192 : -64);
-	state->m_back_tilemap->set_flip(state->m_flipscreen ? TILEMAP_FLIPY | TILEMAP_FLIPX : 0);
-	state->m_back_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_back_tilemap->set_scrollx(0, m_flipscreen ? -192 : -64);
+	m_back_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPY | TILEMAP_FLIPX : 0);
+	m_back_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* the fg tilemap handling is a little hacky right now,
        i'm not sure if it should be a single tilemap with
@@ -277,28 +277,28 @@ static SCREEN_UPDATE_IND16( ddealer )
        combined, the flipscreen case makes things more
        difficult to understand */
 
-	if (!state->m_flipscreen)
+	if (!m_flipscreen)
 	{
-		if (state->m_vregs[0xcc / 2] & 0x80)
+		if (m_vregs[0xcc / 2] & 0x80)
 		{
-			ddealer_draw_video_layer(screen.machine(), &state->m_vregs[0x1e0 / 2], state->m_left_fg_vram_top, state->m_left_fg_vram_bottom, bitmap, cliprect, state->m_flipscreen);
-			ddealer_draw_video_layer(screen.machine(), &state->m_vregs[0xcc / 2], state->m_right_fg_vram_top, state->m_right_fg_vram_bottom, bitmap, cliprect, state->m_flipscreen);
+			ddealer_draw_video_layer(screen.machine(), &m_vregs[0x1e0 / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
+			ddealer_draw_video_layer(screen.machine(), &m_vregs[0xcc / 2], m_right_fg_vram_top, m_right_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
 		}
 		else
 		{
-			ddealer_draw_video_layer(screen.machine(), &state->m_vregs[0x1e0 / 2], state->m_left_fg_vram_top, state->m_left_fg_vram_bottom, bitmap, cliprect, state->m_flipscreen);
+			ddealer_draw_video_layer(screen.machine(), &m_vregs[0x1e0 / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
 		}
 	}
 	else
 	{
-		if (state->m_vregs[0xcc / 2] & 0x80)
+		if (m_vregs[0xcc / 2] & 0x80)
 		{
-			ddealer_draw_video_layer(screen.machine(), &state->m_vregs[0xcc / 2], state->m_left_fg_vram_top, state->m_left_fg_vram_bottom, bitmap, cliprect, state->m_flipscreen);
-			ddealer_draw_video_layer(screen.machine(), &state->m_vregs[0x1e0 / 2], state->m_right_fg_vram_top, state->m_right_fg_vram_bottom, bitmap, cliprect, state->m_flipscreen);
+			ddealer_draw_video_layer(screen.machine(), &m_vregs[0xcc / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
+			ddealer_draw_video_layer(screen.machine(), &m_vregs[0x1e0 / 2], m_right_fg_vram_top, m_right_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
 		}
 		else
 		{
-			ddealer_draw_video_layer(screen.machine(), &state->m_vregs[0x1e0 / 2], state->m_left_fg_vram_top, state->m_left_fg_vram_bottom, bitmap, cliprect, state->m_flipscreen);
+			ddealer_draw_video_layer(screen.machine(), &m_vregs[0x1e0 / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
 		}
 
 	}
@@ -640,7 +640,7 @@ static MACHINE_CONFIG_START( ddealer, ddealer_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(ddealer)
+	MCFG_SCREEN_UPDATE_DRIVER(ddealer_state, screen_update_ddealer)
 
 	MCFG_PALETTE_LENGTH(0x400)
 

@@ -110,9 +110,8 @@ void lvcards_state::video_start()
 		 8, 8, 32, 32);
 }
 
-SCREEN_UPDATE_IND16( lvcards )
+UINT32 lvcards_state::screen_update_lvcards(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	lvcards_state *state = screen.machine().driver_data<lvcards_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

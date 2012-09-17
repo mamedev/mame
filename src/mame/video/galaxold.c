@@ -1753,77 +1753,75 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *
 }
 
 
-SCREEN_UPDATE_IND16( galaxold )
+UINT32 galaxold_state::screen_update_galaxold(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galaxold_state *state = screen.machine().driver_data<galaxold_state>();
 
-	(*state->m_draw_background)(screen.machine(), bitmap, cliprect);
+	(*m_draw_background)(screen.machine(), bitmap, cliprect);
 
-	if (state->m_stars_on)
+	if (m_stars_on)
 	{
-		(*state->m_draw_stars)(screen.machine(), bitmap, cliprect);
+		(*m_draw_stars)(screen.machine(), bitmap, cliprect);
 	}
 
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	if (state->m_draw_bullets)
+	if (m_draw_bullets)
 	{
 		draw_bullets_common(screen.machine(), bitmap, cliprect);
 	}
 
 
-	draw_sprites(screen.machine(), bitmap, state->m_spriteram, state->m_spriteram.bytes());
+	draw_sprites(screen.machine(), bitmap, m_spriteram, m_spriteram.bytes());
 
-	if (state->m_spriteram2_present)
+	if (m_spriteram2_present)
 	{
-		draw_sprites(screen.machine(), bitmap, state->m_spriteram2, state->m_spriteram2.bytes());
+		draw_sprites(screen.machine(), bitmap, m_spriteram2, m_spriteram2.bytes());
 	}
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( dambustr )
+UINT32 galaxold_state::screen_update_dambustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galaxold_state *state = screen.machine().driver_data<galaxold_state>();
 	int i, j;
 	UINT8 color;
 
-	(*state->m_draw_background)(screen.machine(), bitmap, cliprect);
+	(*m_draw_background)(screen.machine(), bitmap, cliprect);
 
-	if (state->m_stars_on)
+	if (m_stars_on)
 	{
-		(*state->m_draw_stars)(screen.machine(), bitmap, cliprect);
+		(*m_draw_stars)(screen.machine(), bitmap, cliprect);
 	}
 
 	/* save the background for drawing it again later, if background has priority over characters */
-	copybitmap(*state->m_dambustr_tmpbitmap, bitmap, 0, 0, 0, 0, state->m_dambustr_tmpbitmap->cliprect());
+	copybitmap(*m_dambustr_tmpbitmap, bitmap, 0, 0, 0, 0, m_dambustr_tmpbitmap->cliprect());
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	if (state->m_draw_bullets)
+	if (m_draw_bullets)
 	{
 		draw_bullets_common(screen.machine(), bitmap, cliprect);
 	}
 
-	draw_sprites(screen.machine(), bitmap, state->m_spriteram, state->m_spriteram.bytes());
+	draw_sprites(screen.machine(), bitmap, m_spriteram, m_spriteram.bytes());
 
-	if (state->m_dambustr_bg_priority)
+	if (m_dambustr_bg_priority)
 	{
 		/* draw the upper part of the background, as it has priority */
 		dambustr_draw_upper_background(screen.machine(), bitmap, cliprect);
 
 		/* only rows with color code > 3 are stronger than the background */
-		memset(state->m_dambustr_videoram2, 0x20, 0x0400);
+		memset(m_dambustr_videoram2, 0x20, 0x0400);
 		for (i=0; i<32; i++) {
-			color = state->m_attributesram[(i << 1) | 1] & state->m_color_mask;
+			color = m_attributesram[(i << 1) | 1] & m_color_mask;
 			if (color > 3) {
 				for (j=0; j<32; j++)
-					state->m_dambustr_videoram2[32*j+i] = state->m_videoram[32*j+i];
+					m_dambustr_videoram2[32*j+i] = m_videoram[32*j+i];
 			};
 		};
-		state->m_dambustr_tilemap2->mark_all_dirty();
-		state->m_dambustr_tilemap2->draw(bitmap, cliprect, 0, 0);
+		m_dambustr_tilemap2->mark_all_dirty();
+		m_dambustr_tilemap2->draw(bitmap, cliprect, 0, 0);
 	};
 
 	return 0;

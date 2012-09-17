@@ -69,6 +69,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_itgambl2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -84,45 +85,44 @@ void itgambl2_state::video_start()
 }
 
 /* (dirty) debug code for looking 8bpps blitter-based gfxs */
-static SCREEN_UPDATE_RGB32( itgambl2 )
+UINT32 itgambl2_state::screen_update_itgambl2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	itgambl2_state *state = screen.machine().driver_data<itgambl2_state>();
 	int x,y,count;
-	const UINT8 *blit_ram = state->memregion("gfx1")->base();
+	const UINT8 *blit_ram = memregion("gfx1")->base();
 
 	if(screen.machine().input().code_pressed(KEYCODE_Z))
-		state->m_test_x++;
+		m_test_x++;
 
 	if(screen.machine().input().code_pressed(KEYCODE_X))
-		state->m_test_x--;
+		m_test_x--;
 
 	if(screen.machine().input().code_pressed(KEYCODE_A))
-		state->m_test_y++;
+		m_test_y++;
 
 	if(screen.machine().input().code_pressed(KEYCODE_S))
-		state->m_test_y--;
+		m_test_y--;
 
 	if(screen.machine().input().code_pressed(KEYCODE_Q))
-		state->m_start_offs+=0x200;
+		m_start_offs+=0x200;
 
 	if(screen.machine().input().code_pressed(KEYCODE_W))
-		state->m_start_offs-=0x200;
+		m_start_offs-=0x200;
 
 	if(screen.machine().input().code_pressed(KEYCODE_E))
-		state->m_start_offs++;
+		m_start_offs++;
 
 	if(screen.machine().input().code_pressed(KEYCODE_R))
-		state->m_start_offs--;
+		m_start_offs--;
 
-	popmessage("%d %d %04x",state->m_test_x,state->m_test_y,state->m_start_offs);
+	popmessage("%d %d %04x",m_test_x,m_test_y,m_start_offs);
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	count = (state->m_start_offs);
+	count = (m_start_offs);
 
-	for(y=0;y<state->m_test_y;y++)
+	for(y=0;y<m_test_y;y++)
 	{
-		for(x=0;x<state->m_test_x;x++)
+		for(x=0;x<m_test_x;x++)
 		{
 			UINT32 color;
 
@@ -273,7 +273,7 @@ static MACHINE_CONFIG_START( itgambl2, itgambl2_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC( itgambl2 )
+	MCFG_SCREEN_UPDATE_DRIVER(itgambl2_state, screen_update_itgambl2)
 
 
 	MCFG_GFXDECODE(itgambl2)

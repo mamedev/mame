@@ -254,6 +254,7 @@ public:
 	DECLARE_DRIVER_INIT(nwktr);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -273,9 +274,8 @@ static void voodoo_vblank_0(device_t *device, int param)
 }
 
 
-static SCREEN_UPDATE_RGB32( nwktr )
+UINT32 nwktr_state::screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	nwktr_state *state = screen.machine().driver_data<nwktr_state>();
 	device_t *voodoo = screen.machine().device("voodoo");
 	device_t *k001604 = screen.machine().device("k001604");
 
@@ -288,8 +288,8 @@ static SCREEN_UPDATE_RGB32( nwktr )
 
 	k001604_draw_front_layer(k001604, bitmap, tilemap_rect);
 
-	draw_7segment_led(bitmap, 3, 3, state->m_led_reg0);
-	draw_7segment_led(bitmap, 9, 3, state->m_led_reg1);
+	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
+	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 	return 0;
 }
 
@@ -745,7 +745,7 @@ static MACHINE_CONFIG_START( nwktr, nwktr_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_STATIC(nwktr)
+	MCFG_SCREEN_UPDATE_DRIVER(nwktr_state, screen_update_nwktr)
 
 	MCFG_PALETTE_LENGTH(65536)
 

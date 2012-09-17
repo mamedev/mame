@@ -74,6 +74,7 @@ public:
 	virtual void machine_reset();
 	DECLARE_VIDEO_START(kickgoal);
 	DECLARE_VIDEO_START(actionhw);
+	UINT32 screen_update_kickgoal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -81,5 +82,5 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( kickgoal );
+
 

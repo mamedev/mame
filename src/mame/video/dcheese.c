@@ -115,16 +115,15 @@ void dcheese_state::video_start()
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( dcheese )
+UINT32 dcheese_state::screen_update_dcheese(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dcheese_state *state = screen.machine().driver_data<dcheese_state>();
 	int x, y;
 
 	/* update the pixels */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT16 *dest = &bitmap.pix16(y);
-		UINT16 *src = &state->m_dstbitmap->pix16((y + state->m_blitter_vidparam[0x28/2]) % DSTBITMAP_HEIGHT);
+		UINT16 *src = &m_dstbitmap->pix16((y + m_blitter_vidparam[0x28/2]) % DSTBITMAP_HEIGHT);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			dest[x] = src[x];

@@ -202,22 +202,21 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-SCREEN_UPDATE_IND16( mario )
+UINT32 mario_state::screen_update_mario(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mario_state	*state = screen.machine().driver_data<mario_state>();
 	int t;
 
 	t = screen.machine().root_device().ioport("MONITOR")->read();
-	if (t != state->m_monitor)
+	if (t != m_monitor)
 	{
-		state->m_monitor = t;
+		m_monitor = t;
 		screen.machine().tilemap().mark_all_dirty();
 	}
 
-	state->m_bg_tilemap->set_scrollx(0, state->m_flip ? (HTOTAL-HBSTART) : 0);
-	state->m_bg_tilemap->set_scrolly(0, state->m_gfx_scroll - (state->m_flip ? 8 : 0));
+	m_bg_tilemap->set_scrollx(0, m_flip ? (HTOTAL-HBSTART) : 0);
+	m_bg_tilemap->set_scrolly(0, m_gfx_scroll - (m_flip ? 8 : 0));
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	return 0;

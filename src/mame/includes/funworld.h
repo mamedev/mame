@@ -29,6 +29,7 @@ public:
 	DECLARE_VIDEO_START(funworld);
 	DECLARE_PALETTE_INIT(funworld);
 	DECLARE_VIDEO_START(magicrd2);
+	UINT32 screen_update_funworld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -37,4 +38,4 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( funworld );
+

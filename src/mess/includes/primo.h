@@ -33,6 +33,7 @@ public:
 	DECLARE_DRIVER_INIT(primo32);
 	virtual void machine_reset();
 	DECLARE_MACHINE_RESET(primob);
+	UINT32 screen_update_primo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 

@@ -183,27 +183,26 @@ static void ssystem3_draw_led(bitmap_ind16 &bitmap,INT16 color, int x, int y, in
 	}
 }
 
-SCREEN_UPDATE_IND16( ssystem3 )
+UINT32 ssystem3_state::screen_update_ssystem3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ssystem3_state *state = screen.machine().driver_data<ssystem3_state>();
 	int i;
 
 	for (i=0; i<4; i++) {
-		ssystem3_draw_7segment(bitmap, state->m_lcd.data[1+i], ssystem3_led_pos[i].x, ssystem3_led_pos[i].y);
+		ssystem3_draw_7segment(bitmap, m_lcd.data[1+i], ssystem3_led_pos[i].x, ssystem3_led_pos[i].y);
 	}
 
-	ssystem3_draw_led(bitmap, state->m_lcd.data[0]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '0'); //?
-	ssystem3_draw_led(bitmap, state->m_lcd.data[0]&2?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '5');
-	ssystem3_draw_led(bitmap, state->m_lcd.data[0]&4?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '7');
-	ssystem3_draw_led(bitmap, state->m_lcd.data[0]&8?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, 'b');
-	ssystem3_draw_led(bitmap, state->m_lcd.data[0]&0x10?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '9');
-	ssystem3_draw_led(bitmap, state->m_lcd.data[0]&0x20?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '8');
-	ssystem3_draw_led(bitmap, state->m_lcd.data[0]&0x40?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, 'c');
-	ssystem3_draw_led(bitmap, state->m_lcd.data[0]&0x80?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '6');
-	ssystem3_draw_led(bitmap, state->m_lcd.data[1]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '2');
-	ssystem3_draw_led(bitmap, state->m_lcd.data[2]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '1'); //?
-	ssystem3_draw_led(bitmap, state->m_lcd.data[3]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '3');
-	ssystem3_draw_led(bitmap, state->m_lcd.data[4]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '4');
+	ssystem3_draw_led(bitmap, m_lcd.data[0]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '0'); //?
+	ssystem3_draw_led(bitmap, m_lcd.data[0]&2?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '5');
+	ssystem3_draw_led(bitmap, m_lcd.data[0]&4?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '7');
+	ssystem3_draw_led(bitmap, m_lcd.data[0]&8?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, 'b');
+	ssystem3_draw_led(bitmap, m_lcd.data[0]&0x10?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '9');
+	ssystem3_draw_led(bitmap, m_lcd.data[0]&0x20?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '8');
+	ssystem3_draw_led(bitmap, m_lcd.data[0]&0x40?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, 'c');
+	ssystem3_draw_led(bitmap, m_lcd.data[0]&0x80?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '6');
+	ssystem3_draw_led(bitmap, m_lcd.data[1]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '2');
+	ssystem3_draw_led(bitmap, m_lcd.data[2]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '1'); //?
+	ssystem3_draw_led(bitmap, m_lcd.data[3]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '3');
+	ssystem3_draw_led(bitmap, m_lcd.data[4]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '4');
 
 	if (screen.machine().root_device().ioport("Configuration")->read()&1) { // playfield(optional device)
 		static const int lcd_signs_on[]={

@@ -147,17 +147,16 @@ void suprslam_state::video_start()
 	m_screen_tilemap->set_transparent_pen(15);
 }
 
-SCREEN_UPDATE_IND16( suprslam )
+UINT32 suprslam_state::screen_update_suprslam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	suprslam_state *state = screen.machine().driver_data<suprslam_state>();
-	state->m_screen_tilemap->set_scrollx(0, state->m_screen_vregs[0x04/2] );
+	m_screen_tilemap->set_scrollx(0, m_screen_vregs[0x04/2] );
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	k053936_zoom_draw(state->m_k053936, bitmap, cliprect, state->m_bg_tilemap, 0, 0, 1);
-	if(!(state->m_spr_ctrl[0] & 8))
+	k053936_zoom_draw(m_k053936, bitmap, cliprect, m_bg_tilemap, 0, 0, 1);
+	if(!(m_spr_ctrl[0] & 8))
 		draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_screen_tilemap->draw(bitmap, cliprect, 0, 0);
-	if(state->m_spr_ctrl[0] & 8)
+	m_screen_tilemap->draw(bitmap, cliprect, 0, 0);
+	if(m_spr_ctrl[0] & 8)
 		draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

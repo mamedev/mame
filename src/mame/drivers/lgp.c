@@ -86,6 +86,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ldp_write);
 	DECLARE_DRIVER_INIT(lgp);
 	virtual void machine_start();
+	UINT32 screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -95,9 +96,8 @@ public:
 
 
 /* VIDEO GOODS */
-static SCREEN_UPDATE_RGB32( lgp )
+UINT32 lgp_state::screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	lgp_state *state = screen.machine().driver_data<lgp_state>();
 	int charx, chary;
 
 	/* make color 0 transparent */
@@ -116,7 +116,7 @@ static SCREEN_UPDATE_RGB32( lgp )
 			/* Somewhere there's a flag that offsets the tilemap by 0x100*x */
 			/* Palette is likely set somewhere as well (tile_control_ram?) */
 			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0],
-					state->m_tile_ram[current_screen_character],
+					m_tile_ram[current_screen_character],
 					0,
 					0, 0, charx*8, chary*8, 0);
 		}
@@ -369,7 +369,7 @@ static MACHINE_CONFIG_START( lgp, lgp_state )
 
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
-	MCFG_LASERDISC_OVERLAY_STATIC(256, 256, lgp)
+	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, lgp_state, screen_update_lgp)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")

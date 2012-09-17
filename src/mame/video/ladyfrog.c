@@ -157,11 +157,10 @@ VIDEO_START_MEMBER(ladyfrog_state,toucheme)
 }
 
 
-SCREEN_UPDATE_IND16( ladyfrog )
+UINT32 ladyfrog_state::screen_update_ladyfrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ladyfrog_state *state = screen.machine().driver_data<ladyfrog_state>();
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

@@ -673,9 +673,8 @@ READ8_MEMBER( arcadia_state::arcadia_vsync_r )
 	return m_line>=216 ? 0x80 : 0 ;
 }
 
-SCREEN_UPDATE_IND16( arcadia )
+UINT32 arcadia_state::screen_update_arcadia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	arcadia_state *state = screen.machine().driver_data<arcadia_state>();
-	copybitmap(bitmap, *state->m_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

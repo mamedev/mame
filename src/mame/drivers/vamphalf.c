@@ -164,6 +164,8 @@ public:
 	DECLARE_DRIVER_INIT(vamphalf);
 	DECLARE_DRIVER_INIT(wyvernwg);
 	DECLARE_DRIVER_INIT(luplup);
+	UINT32 screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 READ16_MEMBER(vamphalf_state::eeprom_r)
@@ -752,7 +754,7 @@ void vamphalf_handle_flipped_visible_area( screen_device &screen )
 }
 
 
-static SCREEN_UPDATE_IND16( common )
+UINT32 vamphalf_state::screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	vamphalf_handle_flipped_visible_area(screen);
 	bitmap.fill(0, cliprect);
@@ -760,7 +762,7 @@ static SCREEN_UPDATE_IND16( common )
 	return 0;
 }
 
-static SCREEN_UPDATE_IND16( aoh )
+UINT32 vamphalf_state::screen_update_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 //  vamphalf_handle_flipped_visible_area(screen); // not on this?
 	bitmap.fill(0, cliprect);
@@ -993,7 +995,7 @@ static MACHINE_CONFIG_START( common, vamphalf_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(31, 350, 16, 251)
-	MCFG_SCREEN_UPDATE_STATIC(common)
+	MCFG_SCREEN_UPDATE_DRIVER(vamphalf_state, screen_update_common)
 
 	MCFG_PALETTE_LENGTH(0x8000)
 	MCFG_GFXDECODE(vamphalf)
@@ -1124,7 +1126,7 @@ static MACHINE_CONFIG_START( aoh, vamphalf_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(64, 511-64, 16, 255-16)
-	MCFG_SCREEN_UPDATE_STATIC(aoh)
+	MCFG_SCREEN_UPDATE_DRIVER(vamphalf_state, screen_update_aoh)
 
 	MCFG_PALETTE_LENGTH(0x8000)
 	MCFG_GFXDECODE(vamphalf)

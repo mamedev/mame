@@ -90,12 +90,11 @@ void kopunch_state::video_start()
 	m_bg_tilemap->set_scrolldx(16, 16);
 }
 
-SCREEN_UPDATE_IND16( kopunch )
+UINT32 kopunch_state::screen_update_kopunch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	kopunch_state *state = screen.machine().driver_data<kopunch_state>();
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

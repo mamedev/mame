@@ -35,6 +35,8 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_spectrum(screen_device &screen, bool state);
 };
 
 
@@ -106,17 +108,16 @@ INLINE unsigned char get_display_color (unsigned char color, int invert)
 
 /* Code to change the FLASH status every 25 frames. Note this must be
    independent of frame skip etc. */
-static SCREEN_VBLANK( spectrum )
+void photon2_state::screen_eof_spectrum(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		photon2_state *state = screen.machine().driver_data<photon2_state>();
-	    state->m_spectrum_frame_number++;
-	    if (state->m_spectrum_frame_number >= 25)
+	    m_spectrum_frame_number++;
+	    if (m_spectrum_frame_number >= 25)
 	    {
-	        state->m_spectrum_frame_number = 0;
-	        state->m_spectrum_flash_invert = !state->m_spectrum_flash_invert;
+	        m_spectrum_frame_number = 0;
+	        m_spectrum_flash_invert = !m_spectrum_flash_invert;
 	    }
 	}
 }
@@ -126,29 +127,28 @@ INLINE void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color
 	bitmap.pix16(y, x) = (UINT16)color;
 }
 
-static SCREEN_UPDATE_IND16( spectrum )
+UINT32 photon2_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	photon2_state *state = screen.machine().driver_data<photon2_state>();
     /* for now do a full-refresh */
     int x, y, b, scrx, scry;
     unsigned short ink, pap;
     unsigned char *attr, *scr;
 //  int full_refresh = 1;
 
-    scr=state->m_spectrum_video_ram;
+    scr=m_spectrum_video_ram;
 
-	bitmap.fill(state->m_spectrum_port_fe & 0x07, cliprect);
+	bitmap.fill(m_spectrum_port_fe & 0x07, cliprect);
 
     for (y=0; y<192; y++)
     {
         scrx=SPEC_LEFT_BORDER;
         scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
-        attr=state->m_spectrum_video_ram + ((scry>>3)*32) + 0x1800;
+        attr=m_spectrum_video_ram + ((scry>>3)*32) + 0x1800;
 
         for (x=0;x<32;x++)
         {
 				/* Get ink and paper colour with bright */
-                if (state->m_spectrum_flash_invert && (*attr & 0x80))
+                if (m_spectrum_flash_invert && (*attr & 0x80))
                 {
                         ink=((*attr)>>3) & 0x0f;
                         pap=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
@@ -331,8 +331,8 @@ static MACHINE_CONFIG_START( photon2, photon2_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
-	MCFG_SCREEN_UPDATE_STATIC( spectrum )
-	MCFG_SCREEN_VBLANK_STATIC( spectrum )
+	MCFG_SCREEN_UPDATE_DRIVER(photon2_state, screen_update_spectrum)
+	MCFG_SCREEN_VBLANK_DRIVER(photon2_state, screen_eof_spectrum)
 
 	MCFG_PALETTE_LENGTH(16)
 

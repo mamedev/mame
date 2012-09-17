@@ -2366,7 +2366,7 @@ static MACHINE_CONFIG_START( fw1stpal, funworld_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE((124+1)*4, (30+1)*8)				/* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
 	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)	/* Taken from MC6845 init, registers 01 & 06 */
-	MCFG_SCREEN_UPDATE_STATIC(funworld)
+	MCFG_SCREEN_UPDATE_DRIVER(funworld_state, screen_update_funworld)
 
 	MCFG_GFXDECODE(fw1stpal)
 

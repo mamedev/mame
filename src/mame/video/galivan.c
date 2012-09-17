@@ -337,47 +337,45 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 }
 
 
-SCREEN_UPDATE_IND16( galivan )
+UINT32 galivan_state::screen_update_galivan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galivan_state *state = screen.machine().driver_data<galivan_state>();
-	state->m_bg_tilemap->set_scrollx(0, state->m_galivan_scrollx[0] + 256 * (state->m_galivan_scrollx[1] & 0x07));
-	state->m_bg_tilemap->set_scrolly(0, state->m_galivan_scrolly[0] + 256 * (state->m_galivan_scrolly[1] & 0x07));
+	m_bg_tilemap->set_scrollx(0, m_galivan_scrollx[0] + 256 * (m_galivan_scrollx[1] & 0x07));
+	m_bg_tilemap->set_scrolly(0, m_galivan_scrolly[0] + 256 * (m_galivan_scrolly[1] & 0x07));
 
-	if (state->m_layers & 0x40)
+	if (m_layers & 0x40)
 		bitmap.fill(0, cliprect);
 	else
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	if (state->m_layers & 0x20)
+	if (m_layers & 0x20)
 	{
-		state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
-		state->m_tx_tilemap->draw(bitmap, cliprect, 1, 0);
+		m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_tx_tilemap->draw(bitmap, cliprect, 1, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect);
 	}
 	else
 	{
 		draw_sprites(screen.machine(), bitmap, cliprect);
-		state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
-		state->m_tx_tilemap->draw(bitmap, cliprect, 1, 0);
+		m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_tx_tilemap->draw(bitmap, cliprect, 1, 0);
 	}
 
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( ninjemak )
+UINT32 galivan_state::screen_update_ninjemak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galivan_state *state = screen.machine().driver_data<galivan_state>();
 
 	/* (scrollx[1] & 0x40) does something */
-	state->m_bg_tilemap->set_scrollx(0, state->m_scrollx);
-	state->m_bg_tilemap->set_scrolly(0, state->m_scrolly);
+	m_bg_tilemap->set_scrollx(0, m_scrollx);
+	m_bg_tilemap->set_scrolly(0, m_scrolly);
 
-	if (state->m_ninjemak_dispdisable)
+	if (m_ninjemak_dispdisable)
 		bitmap.fill(0, cliprect);
 	else
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

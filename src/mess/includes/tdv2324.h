@@ -79,6 +79,7 @@ public:
 
 	// video state
 	required_shared_ptr<UINT8> m_video_ram;
+	UINT32 screen_update_tdv2324(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 

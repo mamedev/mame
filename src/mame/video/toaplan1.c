@@ -1130,33 +1130,31 @@ static void rallybik_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
     Draw the game screen in the given bitmap_ind16.
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( rallybik )
+UINT32 toaplan1_state::screen_update_rallybik(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
 	int priority;
 
 	toaplan1_log_vram(screen.machine());
 
 	bitmap.fill(0x120, cliprect);
 
-	state->m_pf1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 0, 0);
-	state->m_pf1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 0);
+	m_pf1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 0, 0);
+	m_pf1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 0);
 
 	for (priority = 1; priority < 16; priority++)
 	{
-		state->m_pf4_tilemap->draw(bitmap, cliprect, priority, 0);
-		state->m_pf3_tilemap->draw(bitmap, cliprect, priority, 0);
-		state->m_pf2_tilemap->draw(bitmap, cliprect, priority, 0);
-		state->m_pf1_tilemap->draw(bitmap, cliprect, priority, 0);
+		m_pf4_tilemap->draw(bitmap, cliprect, priority, 0);
+		m_pf3_tilemap->draw(bitmap, cliprect, priority, 0);
+		m_pf2_tilemap->draw(bitmap, cliprect, priority, 0);
+		m_pf1_tilemap->draw(bitmap, cliprect, priority, 0);
 		rallybik_draw_sprites(screen.machine(), bitmap,cliprect,priority << 8);
 	}
 
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( toaplan1 )
+UINT32 toaplan1_state::screen_update_toaplan1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
 	int priority;
 
 	toaplan1_log_vram(screen.machine());
@@ -1165,15 +1163,15 @@ SCREEN_UPDATE_IND16( toaplan1 )
 	bitmap.fill(0x120, cliprect);
 
 // it's really correct?
-	state->m_pf1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 0, 0);
-	state->m_pf1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 0);
+	m_pf1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 0, 0);
+	m_pf1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 0);
 
 	for (priority = 1; priority < 16; priority++)
 	{
-		state->m_pf4_tilemap->draw(bitmap, cliprect, priority, priority, 0);
-		state->m_pf3_tilemap->draw(bitmap, cliprect, priority, priority, 0);
-		state->m_pf2_tilemap->draw(bitmap, cliprect, priority, priority, 0);
-		state->m_pf1_tilemap->draw(bitmap, cliprect, priority, priority, 0);
+		m_pf4_tilemap->draw(bitmap, cliprect, priority, priority, 0);
+		m_pf3_tilemap->draw(bitmap, cliprect, priority, priority, 0);
+		m_pf2_tilemap->draw(bitmap, cliprect, priority, priority, 0);
+		m_pf1_tilemap->draw(bitmap, cliprect, priority, priority, 0);
 	}
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
@@ -1186,38 +1184,35 @@ SCREEN_UPDATE_IND16( toaplan1 )
     assume it happens automatically every frame, at the end of vblank
 ****************************************************************************/
 
-SCREEN_VBLANK( rallybik )
+void toaplan1_state::screen_eof_rallybik(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
 
-		memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram.bytes());
+		memcpy(m_buffered_spriteram, m_spriteram, m_spriteram.bytes());
 	}
 }
 
-SCREEN_VBLANK( toaplan1 )
+void toaplan1_state::screen_eof_toaplan1(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
 
-		memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram.bytes());
-		memcpy(state->m_buffered_spritesizeram16, state->m_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
+		memcpy(m_buffered_spriteram, m_spriteram, m_spriteram.bytes());
+		memcpy(m_buffered_spritesizeram16, m_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
 	}
 }
 
-SCREEN_VBLANK( samesame )
+void toaplan1_state::screen_eof_samesame(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
 
-		memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram.bytes());
-		memcpy(state->m_buffered_spritesizeram16, state->m_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
+		memcpy(m_buffered_spriteram, m_spriteram, m_spriteram.bytes());
+		memcpy(m_buffered_spritesizeram16, m_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
 		screen.machine().device("maincpu")->execute().set_input_line(M68K_IRQ_2, HOLD_LINE);	/* Frame done */
 	}
 }

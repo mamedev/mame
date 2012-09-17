@@ -421,6 +421,7 @@ public:
 	DECLARE_WRITE64_MEMBER(gc_exi_w);
 	virtual void machine_start();
 	virtual void video_start();
+	UINT32 screen_update_triforce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 READ64_MEMBER(triforce_state::gc_pi_r)
@@ -456,7 +457,7 @@ void triforce_state::video_start()
 
 }
 
-static SCREEN_UPDATE_RGB32(triforce)
+UINT32 triforce_state::screen_update_triforce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -541,7 +542,7 @@ static MACHINE_CONFIG_START( triforce_base, triforce_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_STATIC(triforce)
+	MCFG_SCREEN_UPDATE_DRIVER(triforce_state, screen_update_triforce)
 
 	MCFG_PALETTE_LENGTH(65536)
 

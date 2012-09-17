@@ -47,6 +47,7 @@ public:
 	DECLARE_DRIVER_INIT(galaxygame);
 	virtual void machine_reset();
 	virtual void palette_init();
+	UINT32 screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*************************************
@@ -168,13 +169,12 @@ WRITE16_MEMBER(galaxygame_state::ke_w)
  *
  *************************************/
 
-static SCREEN_UPDATE_IND16( galaxygame )
+UINT32 galaxygame_state::screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galaxygame_state *state = screen.machine().driver_data<galaxygame_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	for (int i = 0; i < state->m_point_display_list_index; i++ )
+	for (int i = 0; i < m_point_display_list_index; i++ )
 	{
-		bitmap.pix16(state->m_point_display_list[i].x >> 7, state->m_point_display_list[i].y >> 7) = 1;
+		bitmap.pix16(m_point_display_list[i].x >> 7, m_point_display_list[i].y >> 7) = 1;
 	}
 	return 0;
 }
@@ -339,7 +339,7 @@ static MACHINE_CONFIG_START( galaxygame, galaxygame_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 511)
-	MCFG_SCREEN_UPDATE_STATIC(galaxygame)
+	MCFG_SCREEN_UPDATE_DRIVER(galaxygame_state, screen_update_galaxygame)
 
 	MCFG_PALETTE_LENGTH(2)
 

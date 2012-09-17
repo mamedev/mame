@@ -17,10 +17,9 @@ VIDEO_START_MEMBER(p2000t_state,p2000m)
 }
 
 
-SCREEN_UPDATE_IND16( p2000m )
+UINT32 p2000t_state::screen_update_p2000m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	p2000t_state *state = screen.machine().driver_data<p2000t_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int offs, sx, sy, code, loop;
 
 	for (offs = 0; offs < 80 * 24; offs++)
@@ -28,7 +27,7 @@ SCREEN_UPDATE_IND16( p2000m )
 		sy = (offs / 80) * 20;
 		sx = (offs % 80) * 12;
 
-		if ((state->m_frame_count > 25) && (videoram[offs + 2048] & 0x40))
+		if ((m_frame_count > 25) && (videoram[offs + 2048] & 0x40))
 			code = 32;
 		else
 		{

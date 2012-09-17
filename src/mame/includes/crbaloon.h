@@ -36,6 +36,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_crbaloon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -55,7 +56,7 @@ MACHINE_CONFIG_EXTERN( crbaloon_audio );
 
 
 
-SCREEN_UPDATE_IND16( crbaloon );
+
 
 
 UINT16 crbaloon_get_collision_address(running_machine &machine);

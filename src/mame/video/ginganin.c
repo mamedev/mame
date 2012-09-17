@@ -239,10 +239,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const r
 }
 
 
-SCREEN_UPDATE_IND16( ginganin )
+UINT32 ginganin_state::screen_update_ginganin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ginganin_state *state = screen.machine().driver_data<ginganin_state>();
-	int layers_ctrl1 = state->m_layers_ctrl;
+	int layers_ctrl1 = m_layers_ctrl;
 
 #ifdef MAME_DEBUG
 if (screen.machine().input().code_pressed(KEYCODE_Z))
@@ -256,33 +255,33 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 	if (msk != 0) layers_ctrl1 &= msk;
 
 #define SETSCROLL \
-	state->m_bg_tilemap->set_scrollx(0, state->m_posx); \
-	state->m_bg_tilemap->set_scrolly(0, state->m_posy); \
-	state->m_fg_tilemap->set_scrollx(0, state->m_posx); \
-	state->m_fg_tilemap->set_scrolly(0, state->m_posy); \
-	popmessage("B>%04X:%04X F>%04X:%04X",state->m_posx%(BG_NX*16),state->m_posy%(BG_NY*16),state->m_posx%(FG_NX*16),state->m_posy%(FG_NY*16));
+	m_bg_tilemap->set_scrollx(0, m_posx); \
+	m_bg_tilemap->set_scrolly(0, m_posy); \
+	m_fg_tilemap->set_scrollx(0, m_posx); \
+	m_fg_tilemap->set_scrolly(0, m_posy); \
+	popmessage("B>%04X:%04X F>%04X:%04X",m_posx%(BG_NX*16),m_posy%(BG_NY*16),m_posx%(FG_NX*16),m_posy%(FG_NY*16));
 
-	if (screen.machine().input().code_pressed(KEYCODE_L))	{ state->m_posx +=8; SETSCROLL }
-	if (screen.machine().input().code_pressed(KEYCODE_J))	{ state->m_posx -=8; SETSCROLL }
-	if (screen.machine().input().code_pressed(KEYCODE_K))	{ state->m_posy +=8; SETSCROLL }
-	if (screen.machine().input().code_pressed(KEYCODE_I))	{ state->m_posy -=8; SETSCROLL }
-	if (screen.machine().input().code_pressed(KEYCODE_H))	{ state->m_posx = state->m_posy = 0;	SETSCROLL }
+	if (screen.machine().input().code_pressed(KEYCODE_L))	{ m_posx +=8; SETSCROLL }
+	if (screen.machine().input().code_pressed(KEYCODE_J))	{ m_posx -=8; SETSCROLL }
+	if (screen.machine().input().code_pressed(KEYCODE_K))	{ m_posy +=8; SETSCROLL }
+	if (screen.machine().input().code_pressed(KEYCODE_I))	{ m_posy -=8; SETSCROLL }
+	if (screen.machine().input().code_pressed(KEYCODE_H))	{ m_posx = m_posy = 0;	SETSCROLL }
 
 }
 #endif
 
 
 	if (layers_ctrl1 & 1)
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(0, cliprect);
 
 	if (layers_ctrl1 & 2)
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	if (layers_ctrl1 & 8)
 		draw_sprites(screen.machine(), bitmap, cliprect);
 	if (layers_ctrl1 & 4)
-		state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

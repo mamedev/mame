@@ -47,9 +47,10 @@ public:
 	DECLARE_MACHINE_RESET(fantland);
 	DECLARE_MACHINE_START(borntofi);
 	DECLARE_MACHINE_RESET(borntofi);
+	UINT32 screen_update_fantland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/fantland.c -----------*/
 
-SCREEN_UPDATE_IND16( fantland );
+

@@ -104,6 +104,9 @@ public:
 	virtual void video_start();
 	DECLARE_MACHINE_START(system2);
 	DECLARE_VIDEO_START(system2);
+	UINT32 screen_update_system1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_system2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_system2_rowscroll(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -117,6 +120,6 @@ DECLARE_WRITE8_DEVICE_HANDLER( system1_videoram_bank_w );
 
 
 
-SCREEN_UPDATE_IND16( system1 );
-SCREEN_UPDATE_IND16( system2 );
-SCREEN_UPDATE_IND16( system2_rowscroll );
+
+
+

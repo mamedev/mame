@@ -200,6 +200,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_supracan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -763,9 +764,8 @@ static void supracan_suprnova_draw_roz(running_machine &machine, bitmap_ind16 &b
 // Sango Fighter Intro: 03c8: 0000 0011 1100 1000   ----: ---- ---- ---- ----   6c20        4620        ----        0x01
 // Sango Fighter Game:  03ce: 0000 0011 1100 1110   0622: 0000 0110 0010 0010   2620        4620        ----        0x01
 
-static SCREEN_UPDATE_IND16( supracan )
+UINT32 supracan_state::screen_update_supracan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	supracan_state *state = (supracan_state *)screen.machine().driver_data<supracan_state>();
 
 
 
@@ -777,19 +777,19 @@ static SCREEN_UPDATE_IND16( supracan )
 		{
 			const rectangle &visarea = screen.visible_area();
 
-			state->m_sprite_final_bitmap.fill(0x00, visarea);
+			m_sprite_final_bitmap.fill(0x00, visarea);
 			bitmap.fill(0x80, visarea);
 
-			draw_sprites(screen.machine(), state->m_sprite_final_bitmap, visarea);
+			draw_sprites(screen.machine(), m_sprite_final_bitmap, visarea);
 		}
 	}
 	else
 	{
 
-		state->m_sprite_final_bitmap.fill(0x00, cliprect);
+		m_sprite_final_bitmap.fill(0x00, cliprect);
 		bitmap.fill(0x80, cliprect);
 
-		draw_sprites(screen.machine(), state->m_sprite_final_bitmap, cliprect);
+		draw_sprites(screen.machine(), m_sprite_final_bitmap, cliprect);
 	}
 
 
@@ -806,31 +806,31 @@ static SCREEN_UPDATE_IND16( supracan )
 
 		for (int layer = 3; layer >=0; layer--)
 		{
-		//  popmessage("%04x\n",state->m_video_flags);
+		//  popmessage("%04x\n",m_video_flags);
 			int enabled = 0;
 
-			if(state->m_video_flags & 0x04)
+			if(m_video_flags & 0x04)
 				if (layer==3) enabled = 1;
 
-			if(state->m_video_flags & 0x80)
+			if(m_video_flags & 0x80)
 				if (layer==0) enabled = 1;
 
-			if(state->m_video_flags & 0x40)
+			if(m_video_flags & 0x40)
 				if (layer==1) enabled = 1;
 
-			if(state->m_video_flags & 0x20)
+			if(m_video_flags & 0x20)
 				if (layer==2) enabled = 1;
 
 
-			if (layer==3) priority = ((state->m_roz_mode >> 13) & 7); // roz case
-			else priority = ((state->m_tilemap_flags[layer] >> 13) & 7); // normal cases
+			if (layer==3) priority = ((m_roz_mode >> 13) & 7); // roz case
+			else priority = ((m_tilemap_flags[layer] >> 13) & 7); // normal cases
 
 
 			if (priority==pri)
 			{
 //            tilemap_num = layer;
 				which_tilemap_size = get_tilemap_dimensions(screen.machine(), xsize, ysize, layer);
-				bitmap_ind16 &src_bitmap = state->m_tilemap_sizes[layer][which_tilemap_size]->pixmap();
+				bitmap_ind16 &src_bitmap = m_tilemap_sizes[layer][which_tilemap_size]->pixmap();
 				int gfx_region = supracan_tilemap_get_region(screen.machine(), layer);
 				int transmask = 0xff;
 
@@ -848,15 +848,15 @@ static SCREEN_UPDATE_IND16( supracan )
 					if (layer != 3) // standard layers, NOT roz
 					{
 
-						int wrap = (state->m_tilemap_flags[layer] & 0x20);
+						int wrap = (m_tilemap_flags[layer] & 0x20);
 
-						int scrollx = state->m_tilemap_scrollx[layer];
-						int scrolly = state->m_tilemap_scrolly[layer];
+						int scrollx = m_tilemap_scrollx[layer];
+						int scrolly = m_tilemap_scrolly[layer];
 
 						if (scrollx&0x8000) scrollx-= 0x10000;
 						if (scrolly&0x8000) scrolly-= 0x10000;
 
-						int mosaic_count = (state->m_tilemap_flags[layer] & 0x001c) >> 2;
+						int mosaic_count = (m_tilemap_flags[layer] & 0x001c) >> 2;
 						int mosaic_mask = 0xffffffff << mosaic_count;
 
 						int y,x;
@@ -896,16 +896,16 @@ static SCREEN_UPDATE_IND16( supracan )
 					}
 					else
 					{
-						int wrap = state->m_roz_mode & 0x20;
+						int wrap = m_roz_mode & 0x20;
 
-						int incxx = (state->m_roz_coeffa);
-						int incyy = (state->m_roz_coeffd);
+						int incxx = (m_roz_coeffa);
+						int incyy = (m_roz_coeffd);
 
-						int incxy = (state->m_roz_coeffc);
-						int incyx = (state->m_roz_coeffb);
+						int incxy = (m_roz_coeffc);
+						int incyx = (m_roz_coeffb);
 
-						int scrollx = (state->m_roz_scrollx);
-						int scrolly = (state->m_roz_scrolly);
+						int scrollx = (m_roz_scrollx);
+						int scrolly = (m_roz_scrolly);
 
 
 
@@ -918,7 +918,7 @@ static SCREEN_UPDATE_IND16( supracan )
 						if (incyy & 0x8000) incyy -= 0x10000;
 						if (incxx & 0x8000) incxx -= 0x10000;
 
-						//popmessage("%04x %04x\n",state->m_video_flags, state->m_roz_mode);
+						//popmessage("%04x %04x\n",m_video_flags, m_roz_mode);
 
 						// roz mode..
 						//4020 = enabled speedyd
@@ -930,35 +930,35 @@ static SCREEN_UPDATE_IND16( supracan )
 						// or is it always enabled, and only corrupt because we don't clear ram properly?
 						// (probably not this register?)
 
-						if (!(state->m_roz_mode & 0x0200) && (state->m_roz_mode&0xf000) ) // HACK - Not Trusted, Acan Logo, Speedy Dragon Intro ,Speed Dragon Bonus stage need it.  Monopoly and JTT *don't* causes graphical issues
+						if (!(m_roz_mode & 0x0200) && (m_roz_mode&0xf000) ) // HACK - Not Trusted, Acan Logo, Speedy Dragon Intro ,Speed Dragon Bonus stage need it.  Monopoly and JTT *don't* causes graphical issues
 						{
 							// NOT accurate, causes issues when the attract mode loops and the logo is shown the 2nd time in some games - investigate
 							for (int y=cliprect.min_y;y<=cliprect.max_y;y++)
 							{
 								rectangle clip(cliprect.min_x, cliprect.max_x, y, y);
 
-								scrollx = (state->m_roz_scrollx);
-								scrolly = (state->m_roz_scrolly);
-								incxx = (state->m_roz_coeffa);
+								scrollx = (m_roz_scrollx);
+								scrolly = (m_roz_scrolly);
+								incxx = (m_roz_coeffa);
 
-								incxx += state->m_vram[state->m_roz_unk_base0/2 + y];
+								incxx += m_vram[m_roz_unk_base0/2 + y];
 
-								scrollx += state->m_vram[state->m_roz_unk_base1/2 + y*2] << 16;
-								scrollx += state->m_vram[state->m_roz_unk_base1/2 + y*2 + 1];
+								scrollx += m_vram[m_roz_unk_base1/2 + y*2] << 16;
+								scrollx += m_vram[m_roz_unk_base1/2 + y*2 + 1];
 
-								scrolly += state->m_vram[state->m_roz_unk_base2/2 + y*2] << 16;
-								scrolly += state->m_vram[state->m_roz_unk_base2/2 + y*2 + 1];
+								scrolly += m_vram[m_roz_unk_base2/2 + y*2] << 16;
+								scrolly += m_vram[m_roz_unk_base2/2 + y*2 + 1];
 
 								if (incxx & 0x8000) incxx -= 0x10000;
 
 
-								if (state->m_vram[state->m_roz_unk_base0/2 + y]) // incxx = 0, no draw?
-									supracan_suprnova_draw_roz(screen.machine(), bitmap, clip, state->m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
+								if (m_vram[m_roz_unk_base0/2 + y]) // incxx = 0, no draw?
+									supracan_suprnova_draw_roz(screen.machine(), bitmap, clip, m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
 							}
 						}
 						else
 						{
-							supracan_suprnova_draw_roz(screen.machine(), bitmap, cliprect, state->m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
+							supracan_suprnova_draw_roz(screen.machine(), bitmap, cliprect, m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
 						}
 					}
 				}
@@ -968,11 +968,11 @@ static SCREEN_UPDATE_IND16( supracan )
 
 
 	// just draw the sprites on top for now
-	if(state->m_video_flags & 0x08)
+	if(m_video_flags & 0x08)
 	{
 		for (int y=cliprect.min_y;y<=cliprect.max_y;y++)
 		{
-			UINT16* src = &state->m_sprite_final_bitmap.pix16(y);
+			UINT16* src = &m_sprite_final_bitmap.pix16(y);
 			UINT16* dst = &bitmap.pix16(y);
 
 			for (int x=cliprect.min_x;x<=cliprect.max_x;x++)
@@ -1916,7 +1916,7 @@ static MACHINE_CONFIG_START( supracan, supracan_state )
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, 348, 0, 256, 256, 0, 240 )	/* No idea if this is correct */
-	MCFG_SCREEN_UPDATE_STATIC( supracan )
+	MCFG_SCREEN_UPDATE_DRIVER(supracan_state, screen_update_supracan)
 	MCFG_PALETTE_LENGTH( 32768 )
 	MCFG_GFXDECODE(supracan)
 

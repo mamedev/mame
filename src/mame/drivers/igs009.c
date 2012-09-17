@@ -89,6 +89,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_VIDEO_START(gp98);
+	UINT32 screen_update_jingbell(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -281,10 +282,9 @@ VIDEO_START_MEMBER(igs009_state,gp98)
 }
 
 
-static SCREEN_UPDATE_IND16(jingbell)
+UINT32 igs009_state::screen_update_jingbell(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	igs009_state *state = screen.machine().driver_data<igs009_state>();
-	int layers_ctrl = state->m_video_enable ? -1 : 0;
+	int layers_ctrl = m_video_enable ? -1 : 0;
 
 #ifdef MAME_DEBUG
 	if (screen.machine().input().code_pressed(KEYCODE_Z))
@@ -306,10 +306,10 @@ static SCREEN_UPDATE_IND16(jingbell)
 
 		for (i= 0;i < 0x80;i++)
 		{
-			state->m_gp98_reel1_tilemap->set_scrolly(i, state->m_bg_scroll[i]*2);
-			state->m_gp98_reel2_tilemap->set_scrolly(i, state->m_bg_scroll[i+0x80]*2);
-			state->m_gp98_reel3_tilemap->set_scrolly(i, state->m_bg_scroll[i+0x100]*2);
-			state->m_gp98_reel4_tilemap->set_scrolly(i, state->m_bg_scroll[i+0x180]*2);
+			m_gp98_reel1_tilemap->set_scrolly(i, m_bg_scroll[i]*2);
+			m_gp98_reel2_tilemap->set_scrolly(i, m_bg_scroll[i+0x80]*2);
+			m_gp98_reel3_tilemap->set_scrolly(i, m_bg_scroll[i+0x100]*2);
+			m_gp98_reel4_tilemap->set_scrolly(i, m_bg_scroll[i+0x180]*2);
 		}
 
 
@@ -318,7 +318,7 @@ static SCREEN_UPDATE_IND16(jingbell)
 		for (zz=0;zz<0x80-8;zz++) // -8 because of visible area (2*8 = 16)
 		{
 			rectangle clip;
-			int rowenable = state->m_bg_scroll2[zz];
+			int rowenable = m_bg_scroll2[zz];
 
 			/* draw top of screen */
 			clip.set(visarea.min_x, visarea.max_x, startclipmin, startclipmin+2);
@@ -327,19 +327,19 @@ static SCREEN_UPDATE_IND16(jingbell)
 
 			if (rowenable==0)
 			{ // 0 and 1 are the same? or is there a global switchoff?
-				state->m_gp98_reel1_tilemap->draw(bitmap, clip, 0,0);
+				m_gp98_reel1_tilemap->draw(bitmap, clip, 0,0);
 			}
 			else if (rowenable==1)
 			{
-				state->m_gp98_reel2_tilemap->draw(bitmap, clip, 0,0);
+				m_gp98_reel2_tilemap->draw(bitmap, clip, 0,0);
 			}
 			else if (rowenable==2)
 			{
-				state->m_gp98_reel3_tilemap->draw(bitmap, clip, 0,0);
+				m_gp98_reel3_tilemap->draw(bitmap, clip, 0,0);
 			}
 			else if (rowenable==3)
 			{
-				state->m_gp98_reel4_tilemap->draw(bitmap, clip, 0,0);
+				m_gp98_reel4_tilemap->draw(bitmap, clip, 0,0);
 			}
 
 
@@ -350,7 +350,7 @@ static SCREEN_UPDATE_IND16(jingbell)
 	else					bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 
-	if (layers_ctrl & 2)	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 2)	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -756,7 +756,7 @@ static MACHINE_CONFIG_START( jingbell, igs009_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(jingbell)
+	MCFG_SCREEN_UPDATE_DRIVER(igs009_state, screen_update_jingbell)
 
 	MCFG_GFXDECODE(jingbell)
 	MCFG_PALETTE_LENGTH(0x400)

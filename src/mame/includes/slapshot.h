@@ -64,11 +64,13 @@ public:
 	DECLARE_DRIVER_INIT(slapshot);
 	virtual void machine_start();
 	virtual void video_start();
+	UINT32 screen_update_slapshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_taito_no_buffer(screen_device &screen, bool state);
 };
 
 
 /*----------- defined in video/slapshot.c -----------*/
 
 
-SCREEN_UPDATE_IND16( slapshot );
-SCREEN_VBLANK( taito_no_buffer );
+
+

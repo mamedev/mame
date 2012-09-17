@@ -207,7 +207,7 @@ VIDEO_START_MEMBER(cinemat_state,cinemat_qb3color)
  *
  *************************************/
 
-SCREEN_UPDATE_RGB32( cinemat )
+UINT32 cinemat_state::screen_update_cinemat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	SCREEN_UPDATE32_CALL(vector);
 	vector_clear_list();
@@ -225,11 +225,11 @@ SCREEN_UPDATE_RGB32( cinemat )
  *
  *************************************/
 
-SCREEN_UPDATE_RGB32( spacewar )
+UINT32 cinemat_state::screen_update_spacewar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int sw_option = screen.machine().root_device().ioport("INPUTS")->read();
 
-	SCREEN_UPDATE32_CALL(cinemat);
+	SCREEN_UPDATE32_CALL_MEMBER(cinemat);
 
 	/* set the state of the artwork */
 	output_set_value("pressed3", (~sw_option >> 0) & 1);

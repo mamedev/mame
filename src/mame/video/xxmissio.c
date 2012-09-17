@@ -130,18 +130,17 @@ static void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_el
 }
 
 
-SCREEN_UPDATE_IND16( xxmissio )
+UINT32 xxmissio_state::screen_update_xxmissio(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	xxmissio_state *state = screen.machine().driver_data<xxmissio_state>();
 	screen.machine().tilemap().mark_all_dirty();
-	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	screen.machine().tilemap().set_flip_all(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
-	state->m_bg_tilemap->set_scrollx(0, state->m_xscroll * 2);
-	state->m_bg_tilemap->set_scrolly(0, state->m_yscroll);
+	m_bg_tilemap->set_scrollx(0, m_xscroll * 2);
+	m_bg_tilemap->set_scrolly(0, m_yscroll);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect, screen.machine().gfx[1]);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

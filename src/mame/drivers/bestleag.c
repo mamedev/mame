@@ -51,6 +51,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(bsb_bg_scan);
 	virtual void video_start();
+	UINT32 screen_update_bestleag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_bestleaw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -172,37 +174,35 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-static SCREEN_UPDATE_IND16(bestleag)
+UINT32 bestleag_state::screen_update_bestleag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bestleag_state *state = screen.machine().driver_data<bestleag_state>();
-	state->m_bg_tilemap->set_scrollx(0,(state->m_vregs[0x00/2] & 0xfff) + (state->m_vregs[0x08/2] & 0x7) - 3);
-	state->m_bg_tilemap->set_scrolly(0,state->m_vregs[0x02/2]);
-	state->m_tx_tilemap->set_scrollx(0,state->m_vregs[0x04/2]);
-	state->m_tx_tilemap->set_scrolly(0,state->m_vregs[0x06/2]);
-	state->m_fg_tilemap->set_scrollx(0,state->m_vregs[0x08/2] & 0xfff8);
-	state->m_fg_tilemap->set_scrolly(0,state->m_vregs[0x0a/2]);
+	m_bg_tilemap->set_scrollx(0,(m_vregs[0x00/2] & 0xfff) + (m_vregs[0x08/2] & 0x7) - 3);
+	m_bg_tilemap->set_scrolly(0,m_vregs[0x02/2]);
+	m_tx_tilemap->set_scrollx(0,m_vregs[0x04/2]);
+	m_tx_tilemap->set_scrolly(0,m_vregs[0x06/2]);
+	m_fg_tilemap->set_scrollx(0,m_vregs[0x08/2] & 0xfff8);
+	m_fg_tilemap->set_scrolly(0,m_vregs[0x0a/2]);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
-static SCREEN_UPDATE_IND16(bestleaw)
+UINT32 bestleag_state::screen_update_bestleaw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bestleag_state *state = screen.machine().driver_data<bestleag_state>();
-	state->m_bg_tilemap->set_scrollx(0,state->m_vregs[0x08/2]);
-	state->m_bg_tilemap->set_scrolly(0,state->m_vregs[0x0a/2]);
-	state->m_tx_tilemap->set_scrollx(0,state->m_vregs[0x00/2]);
-	state->m_tx_tilemap->set_scrolly(0,state->m_vregs[0x02/2]);
-	state->m_fg_tilemap->set_scrollx(0,state->m_vregs[0x04/2]);
-	state->m_fg_tilemap->set_scrolly(0,state->m_vregs[0x06/2]);
+	m_bg_tilemap->set_scrollx(0,m_vregs[0x08/2]);
+	m_bg_tilemap->set_scrolly(0,m_vregs[0x0a/2]);
+	m_tx_tilemap->set_scrollx(0,m_vregs[0x00/2]);
+	m_tx_tilemap->set_scrolly(0,m_vregs[0x02/2]);
+	m_fg_tilemap->set_scrollx(0,m_vregs[0x04/2]);
+	m_fg_tilemap->set_scrolly(0,m_vregs[0x06/2]);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -372,7 +372,7 @@ static MACHINE_CONFIG_START( bestleag, bestleag_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(bestleag)
+	MCFG_SCREEN_UPDATE_DRIVER(bestleag_state, screen_update_bestleag)
 
 	MCFG_GFXDECODE(bestleag)
 	MCFG_PALETTE_LENGTH(0x800)
@@ -387,7 +387,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bestleaw, bestleag )
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(bestleaw)
+	MCFG_SCREEN_UPDATE_DRIVER(bestleag_state, screen_update_bestleaw)
 MACHINE_CONFIG_END
 
 

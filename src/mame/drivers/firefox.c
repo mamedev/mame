@@ -98,6 +98,7 @@ public:
 	TILE_GET_INFO_MEMBER(bgtile_get_info);
 	virtual void machine_start();
 	virtual void video_start();
+	UINT32 screen_update_firefox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -214,9 +215,8 @@ void firefox_state::video_start()
 }
 
 
-static SCREEN_UPDATE_RGB32( firefox )
+UINT32 firefox_state::screen_update_firefox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	firefox_state *state = screen.machine().driver_data<firefox_state>();
 	int sprite;
 	int gfxtop = screen.visible_area().min_y;
 
@@ -224,7 +224,7 @@ static SCREEN_UPDATE_RGB32( firefox )
 
 	for( sprite = 0; sprite < 32; sprite++ )
 	{
-		UINT8 *sprite_data = state->m_spriteram + ( 0x200 * state->m_sprite_bank ) + ( sprite * 16 );
+		UINT8 *sprite_data = m_spriteram + ( 0x200 * m_sprite_bank ) + ( sprite * 16 );
 		int flags = sprite_data[ 0 ];
 		int y = sprite_data[ 1 ] + ( 256 * ( ( flags >> 0 ) & 1 ) );
 		int x = sprite_data[ 2 ] + ( 256 * ( ( flags >> 1 ) & 1 ) );
@@ -245,7 +245,7 @@ static SCREEN_UPDATE_RGB32( firefox )
 		}
 	}
 
-	state->m_bgtiles->draw(bitmap, cliprect, 0, 0 );
+	m_bgtiles->draw(bitmap, cliprect, 0, 0 );
 
 	return 0;
 }
@@ -716,7 +716,7 @@ static MACHINE_CONFIG_START( firefox, firefox_state )
 
 
 	MCFG_LASERDISC_22VP931_ADD("laserdisc")
-	MCFG_LASERDISC_OVERLAY_STATIC(64*8, 525, firefox)
+	MCFG_LASERDISC_OVERLAY_DRIVER(64*8, 525, firefox_state, screen_update_firefox)
 	MCFG_LASERDISC_OVERLAY_CLIP(7*8, 53*8-1, 44, 480+44)
 
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")

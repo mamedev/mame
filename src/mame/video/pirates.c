@@ -100,14 +100,13 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-SCREEN_UPDATE_IND16(pirates)
+UINT32 pirates_state::screen_update_pirates(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pirates_state *state = screen.machine().driver_data<pirates_state>();
-	state->m_bg_tilemap->set_scrollx(0,state->m_scroll[0]);
-	state->m_fg_tilemap->set_scrollx(0,state->m_scroll[0]);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->set_scrollx(0,m_scroll[0]);
+	m_fg_tilemap->set_scrollx(0,m_scroll[0]);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

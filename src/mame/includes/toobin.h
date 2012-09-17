@@ -25,6 +25,7 @@ public:
 	DECLARE_MACHINE_START(toobin);
 	DECLARE_MACHINE_RESET(toobin);
 	DECLARE_VIDEO_START(toobin);
+	UINT32 screen_update_toobin(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -37,4 +38,4 @@ DECLARE_WRITE16_HANDLER( toobin_yscroll_w );
 DECLARE_WRITE16_HANDLER( toobin_slip_w );
 
 
-SCREEN_UPDATE_RGB32( toobin );
+

@@ -73,6 +73,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_sb_tile_info);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_sbowling(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 TILE_GET_INFO_MEMBER(sbowling_state::get_sb_tile_info)
@@ -116,13 +117,12 @@ WRITE8_MEMBER(sbowling_state::sbw_videoram_w)
 	}
 }
 
-static SCREEN_UPDATE_IND16(sbowling)
+UINT32 sbowling_state::screen_update_sbowling(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sbowling_state *state = screen.machine().driver_data<sbowling_state>();
 
 	bitmap.fill(0x18, cliprect);
-	state->m_sb_tilemap->draw(bitmap, cliprect, 0, 0);
-	copybitmap_trans(bitmap, *state->m_tmpbitmap, 0, 0, 0, 0, cliprect, state->m_color_prom_address);
+	m_sb_tilemap->draw(bitmap, cliprect, 0, 0);
+	copybitmap_trans(bitmap, *m_tmpbitmap, 0, 0, 0, 0, cliprect, m_color_prom_address);
 	return 0;
 }
 
@@ -392,7 +392,7 @@ static MACHINE_CONFIG_START( sbowling, sbowling_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8, 262)		/* vert size taken from mw8080bw */
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(sbowling)
+	MCFG_SCREEN_UPDATE_DRIVER(sbowling_state, screen_update_sbowling)
 
 	MCFG_GFXDECODE(sbowling)
 

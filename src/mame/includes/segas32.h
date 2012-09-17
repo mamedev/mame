@@ -174,6 +174,9 @@ public:
 	DECLARE_MACHINE_RESET(system32);
 	DECLARE_VIDEO_START(system32);
 	DECLARE_VIDEO_START(multi32);
+	UINT32 screen_update_system32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_multi32_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_multi32_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -195,9 +198,9 @@ void decrypt_ga2_protrom(running_machine &machine);
 
 
 
-SCREEN_UPDATE_RGB32(system32);
-SCREEN_UPDATE_RGB32(multi32_left);
-SCREEN_UPDATE_RGB32(multi32_right);
+
+
+
 void system32_set_vblank(running_machine &machine, int state);
 
 

@@ -774,28 +774,26 @@ WRITE8_MEMBER( intv_state::intvkbd_tms9927_w )
 	}
 }
 
-SCREEN_UPDATE_IND16( intv )
+UINT32 intv_state::screen_update_intv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	intv_state *state = screen.machine().driver_data<intv_state>();
-	copybitmap(bitmap, state->m_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( intvkbd )
+UINT32 intv_state::screen_update_intvkbd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	intv_state *state = screen.machine().driver_data<intv_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int x,y,offs;
 	int current_row;
 //  char c;
 
 	/* Draw the underlying INTV screen first */
-	copybitmap(bitmap, state->m_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 
 	/* if the intvkbd text is not blanked, overlay it */
-	if (!state->m_intvkbd_text_blanked)
+	if (!m_intvkbd_text_blanked)
 	{
-		current_row = (state->m_tms9927_last_row + 1) % state->m_tms9927_num_rows;
+		current_row = (m_tms9927_last_row + 1) % m_tms9927_num_rows;
 		for(y=0;y<24;y++)
 		{
 			for(x=0;x<40;x++)
@@ -808,7 +806,7 @@ SCREEN_UPDATE_IND16( intvkbd )
 					0,0,
 					x<<3,y<<3, 0);
 			}
-			if (current_row == state->m_tms9927_cursor_row)
+			if (current_row == m_tms9927_cursor_row)
 			{
 				/* draw the cursor as a solid white block */
 				/* (should use a filled rect here!) */
@@ -817,35 +815,35 @@ SCREEN_UPDATE_IND16( intvkbd )
 					191, /* a block */
 					7,   /* white   */
 					0,0,
-					(state->m_tms9927_cursor_col-1)<<3,y<<3, 0);
+					(m_tms9927_cursor_col-1)<<3,y<<3, 0);
 			}
-			current_row = (current_row + 1) % state->m_tms9927_num_rows;
+			current_row = (current_row + 1) % m_tms9927_num_rows;
 		}
 	}
 
 #if 0
 	// debugging
-	c = tape_motor_mode_desc[state->m_tape_motor_mode][0];
-	drawgfx_transpen(bitmap,&machine.screen[0].visarea, machine.gfx[1],
+	c = tape_motor_mode_desc[m_tape_motor_mode][0];
+	drawgfx_transpen(bitmap,&machine().screen[0].visarea, machine().gfx[1],
 		c,
 		1,
 		0,0,
 		0*8,0*8, 0);
 	for(y=0;y<5;y++)
 	{
-		drawgfx_transpen(bitmap,&machine.screen[0].visarea, machine.gfx[1],
-			state->m_tape_unknown_write[y]+'0',
+		drawgfx_transpen(bitmap,&machine().screen[0].visarea, machine().gfx[1],
+			m_tape_unknown_write[y]+'0',
 			1,
 			0,0,
 			0*8,(y+2)*8, 0);
 	}
-	drawgfx_transpen(bitmap,&machine.screen[0].visarea, machine.gfx[1],
-			state->m_tape_unknown_write[5]+'0',
+	drawgfx_transpen(bitmap,&machine().screen[0].visarea, machine().gfx[1],
+			m_tape_unknown_write[5]+'0',
 			1,
 			0,0,
 			0*8,8*8, 0);
-	drawgfx_transpen(bitmap,&machine.screen[0].visarea, machine.gfx[1],
-			state->m_tape_interrupts_enabled+'0',
+	drawgfx_transpen(bitmap,&machine().screen[0].visarea, machine().gfx[1],
+			m_tape_interrupts_enabled+'0',
 			1,
 			0,0,
 			0*8,10*8, 0);

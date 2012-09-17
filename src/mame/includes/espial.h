@@ -51,6 +51,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	DECLARE_VIDEO_START(netwars);
+	UINT32 screen_update_espial(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/espial.c -----------*/
@@ -58,4 +59,4 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( espial );
+

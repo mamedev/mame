@@ -39,6 +39,7 @@ public:
 	DECLARE_DRIVER_INIT(sidewndr);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -89,9 +90,8 @@ static INTERRUPT_GEN( acefruit_vblank )
 	state->m_refresh_timer->adjust( attotime::zero );
 }
 
-static SCREEN_UPDATE_IND16( acefruit )
+UINT32 acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	acefruit_state *state = screen.machine().driver_data<acefruit_state>();
 	int startrow = cliprect.min_y / 8;
 	int endrow = cliprect.max_y / 8;
 	int row;
@@ -106,8 +106,8 @@ static SCREEN_UPDATE_IND16( acefruit )
 		for( col = 0; col < 32; col++ )
 		{
 			int tile_index = ( col * 32 ) + row;
-			int code = state->m_videoram[ tile_index ];
-			int color = state->m_colorram[ tile_index ];
+			int code = m_videoram[ tile_index ];
+			int color = m_colorram[ tile_index ];
 
 			if( color < 0x4 )
 			{
@@ -123,7 +123,7 @@ static SCREEN_UPDATE_IND16( acefruit )
 
 				for( x = 0; x < 16; x++ )
 				{
-					int sprite = ( state->m_spriteram[ ( spriteindex / 64 ) % 6 ] & 0xf ) ^ 0xf;
+					int sprite = ( m_spriteram[ ( spriteindex / 64 ) % 6 ] & 0xf ) ^ 0xf;
 					const UINT8 *gfxdata = gfx->get_data(sprite);
 
 					for( y = 0; y < 8; y++ )
@@ -592,7 +592,7 @@ static MACHINE_CONFIG_START( acefruit, acefruit_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
-	MCFG_SCREEN_UPDATE_STATIC(acefruit)
+	MCFG_SCREEN_UPDATE_DRIVER(acefruit_state, screen_update_acefruit)
 
 	MCFG_PALETTE_LENGTH(16)
 

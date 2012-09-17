@@ -221,27 +221,26 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 }
 
 
-SCREEN_UPDATE_IND16( tankbust )
+UINT32 tankbust_state::screen_update_tankbust(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tankbust_state *state = screen.machine().driver_data<tankbust_state>();
 #if 0
 	int i;
 
 	for (i=0; i<0x800; i++)
 	{
-		int tile_attrib = state->m_colorram[i];
+		int tile_attrib = m_colorram[i];
 
 		if ( (tile_attrib&8) || (tile_attrib&0x80) )
 		{
-			state->m_bg_tilemap->mark_tile_dirty(i);
+			m_bg_tilemap->mark_tile_dirty(i);
 		}
 	}
 #endif
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
 
-	state->m_txt_tilemap->draw(bitmap, cliprect, 0,0);
+	m_txt_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

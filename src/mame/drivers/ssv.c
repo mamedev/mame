@@ -2610,7 +2610,7 @@ static MACHINE_CONFIG_START( ssv, ssv_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(0x1c6, 0x106)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
-	MCFG_SCREEN_UPDATE_STATIC(ssv)
+	MCFG_SCREEN_UPDATE_DRIVER(ssv_state, screen_update_ssv)
 
 	MCFG_GFXDECODE(ssv)
 	MCFG_PALETTE_LENGTH(0x8000)
@@ -2658,7 +2658,7 @@ static MACHINE_CONFIG_DERIVED( gdfs, ssv )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xd5-0x2c)*2-1, 0, (0x102-0x12)-1)
-	MCFG_SCREEN_UPDATE_STATIC(gdfs)
+	MCFG_SCREEN_UPDATE_DRIVER(ssv_state, screen_update_gdfs)
 
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
 
@@ -2838,7 +2838,7 @@ static MACHINE_CONFIG_DERIVED( eaglshot, ssv )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xca - 0x2a)*2-1, 0, (0xf6 - 0x16)-1)
-	MCFG_SCREEN_UPDATE_STATIC(eaglshot)
+	MCFG_SCREEN_UPDATE_DRIVER(ssv_state, screen_update_eaglshot)
 
 	MCFG_GFXDECODE(eaglshot)
 	MCFG_VIDEO_START_OVERRIDE(ssv_state,eaglshot)

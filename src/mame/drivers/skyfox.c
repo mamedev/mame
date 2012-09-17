@@ -252,7 +252,7 @@ static MACHINE_CONFIG_START( skyfox, skyfox_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using PORT_VBLANK
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0+0x60, 320-1+0x60, 0+16, 256-1-16)	// from $30*2 to $CC*2+8
-	MCFG_SCREEN_UPDATE_STATIC(skyfox)
+	MCFG_SCREEN_UPDATE_DRIVER(skyfox_state, screen_update_skyfox)
 
 	MCFG_GFXDECODE(skyfox)
 	MCFG_PALETTE_LENGTH(256+256)	/* 256 static colors (+256 for the background??) */

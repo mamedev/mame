@@ -346,11 +346,10 @@ void irobot_run_video(running_machine &machine)
 
 
 
-SCREEN_UPDATE_IND16( irobot )
+UINT32 irobot_state::screen_update_irobot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	irobot_state *state = screen.machine().driver_data<irobot_state>();
-	UINT8 *videoram = state->m_videoram;
-	UINT8 *bitmap_base = state->m_bufsel ? state->m_polybitmap1 : state->m_polybitmap2;
+	UINT8 *videoram = m_videoram;
+	UINT8 *bitmap_base = m_bufsel ? m_polybitmap1 : m_polybitmap2;
 	int x, y, offs;
 
 	/* copy the polygon bitmap */
@@ -362,7 +361,7 @@ SCREEN_UPDATE_IND16( irobot )
 		for (x = 0; x < 32; x++, offs++)
 		{
 			int code = videoram[offs] & 0x3f;
-			int color = ((videoram[offs] & 0xc0) >> 6) | (state->m_alphamap >> 3);
+			int color = ((videoram[offs] & 0xc0) >> 6) | (m_alphamap >> 3);
 
 			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
 					code, color,

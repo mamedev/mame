@@ -148,6 +148,8 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_vboy_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_vboy_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -484,18 +486,17 @@ UINT8 vboy_state::display_world(int num, bitmap_ind16 &bitmap, bool right, int &
 	return 0;
 }
 
-static SCREEN_UPDATE_IND16( vboy_left )
+UINT32 vboy_state::screen_update_vboy_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	vboy_state *state = screen.machine().driver_data<vboy_state>();
-	bitmap.fill(screen.machine().pens[state->m_vip_regs.BKCOL], cliprect);
+	bitmap.fill(screen.machine().pens[m_vip_regs.BKCOL], cliprect);
 	int cur_spt;
 
-	if(!(state->m_vip_regs.DPCTRL & 2)) /* Don't bother if screen is off */
+	if(!(m_vip_regs.DPCTRL & 2)) /* Don't bother if screen is off */
 		return 0;
 
 	cur_spt = 3;
 	for(int i=31; i>=0; i--)
-		if (state->display_world(i, bitmap, false, cur_spt)) break;
+		if (display_world(i, bitmap, false, cur_spt)) break;
 
 	if(0)
 	{
@@ -509,7 +510,7 @@ static SCREEN_UPDATE_IND16( vboy_left )
 				UINT8 pix;
 				int yi;
 
-				pen = state->m_l_frame_1[(x*0x40)+(y >> 2)];
+				pen = m_l_frame_1[(x*0x40)+(y >> 2)];
 				yi = ((y & 0x3)*2);
 				pix = (pen >> yi) & 3;
 
@@ -521,18 +522,17 @@ static SCREEN_UPDATE_IND16( vboy_left )
 	return 0;
 }
 
-static SCREEN_UPDATE_IND16( vboy_right )
+UINT32 vboy_state::screen_update_vboy_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	vboy_state *state = screen.machine().driver_data<vboy_state>();
-	bitmap.fill(screen.machine().pens[state->m_vip_regs.BKCOL], cliprect);
+	bitmap.fill(screen.machine().pens[m_vip_regs.BKCOL], cliprect);
 	int cur_spt;
 
-	if(!(state->m_vip_regs.DPCTRL & 2)) /* Don't bother if screen is off */
+	if(!(m_vip_regs.DPCTRL & 2)) /* Don't bother if screen is off */
 		return 0;
 
 	cur_spt = 3;
 	for(int i=31; i>=0; i--)
-		if (state->display_world(i, bitmap, true, cur_spt)) break;
+		if (display_world(i, bitmap, true, cur_spt)) break;
 
 	return 0;
 }
@@ -1442,12 +1442,12 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	/* Left screen */
 	MCFG_SCREEN_ADD("3dleft", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz/2,757,0,384,264,0,224)
-	MCFG_SCREEN_UPDATE_STATIC(vboy_left)
+	MCFG_SCREEN_UPDATE_DRIVER(vboy_state, screen_update_vboy_left)
 
 	/* Right screen */
 	MCFG_SCREEN_ADD("3dright", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz/2,757,0,384,264,0,224)
-	MCFG_SCREEN_UPDATE_STATIC(vboy_right)
+	MCFG_SCREEN_UPDATE_DRIVER(vboy_state, screen_update_vboy_right)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

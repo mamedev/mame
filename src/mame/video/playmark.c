@@ -493,92 +493,87 @@ static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-SCREEN_UPDATE_IND16( bigtwin )
+UINT32 playmark_state::screen_update_bigtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	playmark_state *state = screen.machine().driver_data<playmark_state>();
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	if (state->m_bg_enable)
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (m_bg_enable)
 		draw_bitmap(screen.machine(), bitmap, cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect, 4);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( bigtwinb )
+UINT32 playmark_state::screen_update_bigtwinb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	playmark_state *state = screen.machine().driver_data<playmark_state>();
 
 	// video enabled
-	if (state->m_scroll[6] & 1)
+	if (m_scroll[6] & 1)
 	{
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 		bigtwinb_draw_sprites(screen.machine(), bitmap, cliprect, 4);
-		state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( excelsr )
+UINT32 playmark_state::screen_update_excelsr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	playmark_state *state = screen.machine().driver_data<playmark_state>();
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 1);
-	if (state->m_bg_enable)
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 1);
+	if (m_bg_enable)
 		draw_bitmap(screen.machine(), bitmap, cliprect);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 	draw_sprites(screen.machine(), bitmap, cliprect, 2);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( wbeachvl )
+UINT32 playmark_state::screen_update_wbeachvl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	playmark_state *state = screen.machine().driver_data<playmark_state>();
 
-	if (state->m_fg_rowscroll_enable)
+	if (m_fg_rowscroll_enable)
 	{
 		int i;
 
-		state->m_fg_tilemap->set_scroll_rows(512);
+		m_fg_tilemap->set_scroll_rows(512);
 		for (i = 0; i < 256; i++)
-			state->m_fg_tilemap->set_scrollx(i + 1, state->m_rowscroll[8 * i]);
+			m_fg_tilemap->set_scrollx(i + 1, m_rowscroll[8 * i]);
 	}
 	else
 	{
-		state->m_fg_tilemap->set_scroll_rows(1);
-		state->m_fg_tilemap->set_scrollx(0, state->m_fgscrollx);
+		m_fg_tilemap->set_scroll_rows(1);
+		m_fg_tilemap->set_scrollx(0, m_fgscrollx);
 	}
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( hrdtimes )
+UINT32 playmark_state::screen_update_hrdtimes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	playmark_state *state = screen.machine().driver_data<playmark_state>();
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	// video enabled
-	if (state->m_scroll[6] & 1)
+	if (m_scroll[6] & 1)
 	{
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
+		m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
 		draw_sprites(screen.machine(), bitmap, cliprect, 2);
-		state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);

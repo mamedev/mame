@@ -87,6 +87,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_VIDEO_START(f1superb);
+	UINT32 screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -98,4 +99,4 @@ public:
 
 
 
-SCREEN_UPDATE_RGB32( ms32 );
+

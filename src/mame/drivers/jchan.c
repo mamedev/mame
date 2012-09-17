@@ -224,6 +224,7 @@ public:
 
 	DECLARE_DRIVER_INIT(jchan);
 	virtual void video_start();
+	UINT32 screen_update_jchan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -295,9 +296,8 @@ void jchan_state::video_start()
 
 
 
-static SCREEN_UPDATE_IND16(jchan)
+UINT32 jchan_state::screen_update_jchan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	jchan_state *state = screen.machine().driver_data<jchan_state>();
 	int x,y;
 	UINT16* src1;
 	UINT16* src2;
@@ -309,24 +309,24 @@ static SCREEN_UPDATE_IND16(jchan)
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_view2_0->kaneko16_prepare(bitmap, cliprect);
+	m_view2_0->kaneko16_prepare(bitmap, cliprect);
 
 	for ( int i = 0; i < 8; i++ )
 	{
-		state->m_view2_0->render_tilemap_chip(bitmap,cliprect,i);
+		m_view2_0->render_tilemap_chip(bitmap,cliprect,i);
 	}
 
-	state->m_sprite_bitmap_1->fill(0x0000, cliprect);
-	state->m_sprite_bitmap_2->fill(0x0000, cliprect);
+	m_sprite_bitmap_1->fill(0x0000, cliprect);
+	m_sprite_bitmap_2->fill(0x0000, cliprect);
 
-	state->m_spritegen1->skns_draw_sprites(screen.machine(), *state->m_sprite_bitmap_1, cliprect, state->m_sprite_ram32_1, 0x4000, screen.machine().root_device().memregion("gfx1")->base(), screen.machine().root_device().memregion ("gfx1")->bytes(), state->m_sprite_regs32_1 );
-	state->m_spritegen2->skns_draw_sprites(screen.machine(), *state->m_sprite_bitmap_2, cliprect, state->m_sprite_ram32_2, 0x4000, screen.machine().root_device().memregion("gfx2")->base(), state->memregion ("gfx2")->bytes(), state->m_sprite_regs32_2 );
+	m_spritegen1->skns_draw_sprites(screen.machine(), *m_sprite_bitmap_1, cliprect, m_sprite_ram32_1, 0x4000, screen.machine().root_device().memregion("gfx1")->base(), screen.machine().root_device().memregion ("gfx1")->bytes(), m_sprite_regs32_1 );
+	m_spritegen2->skns_draw_sprites(screen.machine(), *m_sprite_bitmap_2, cliprect, m_sprite_ram32_2, 0x4000, screen.machine().root_device().memregion("gfx2")->base(), memregion ("gfx2")->bytes(), m_sprite_regs32_2 );
 
 	// ignoring priority bits for now - might use alpha too, check 0x8000 of palette writes
 	for (y=0;y<240;y++)
 	{
-		src1 = &state->m_sprite_bitmap_1->pix16(y);
-		src2 = &state->m_sprite_bitmap_2->pix16(y);
+		src1 = &m_sprite_bitmap_1->pix16(y);
+		src2 = &m_sprite_bitmap_2->pix16(y);
 		dst =  &bitmap.pix16(y);
 
 		for (x=0;x<320;x++)
@@ -612,7 +612,7 @@ static MACHINE_CONFIG_START( jchan, jchan_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(jchan)
+	MCFG_SCREEN_UPDATE_DRIVER(jchan_state, screen_update_jchan)
 
 	MCFG_PALETTE_LENGTH(0x10000)
 

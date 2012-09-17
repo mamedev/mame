@@ -167,60 +167,59 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( lkage )
+UINT32 lkage_state::screen_update_lkage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	lkage_state *state = screen.machine().driver_data<lkage_state>();
 	int bank;
 
-	state->flip_screen_x_set(~state->m_vreg[2] & 0x01);
-	state->flip_screen_y_set(~state->m_vreg[2] & 0x02);
+	flip_screen_x_set(~m_vreg[2] & 0x01);
+	flip_screen_y_set(~m_vreg[2] & 0x02);
 
-	bank = state->m_vreg[1] & 0x08;
+	bank = m_vreg[1] & 0x08;
 
-	if (state->m_bg_tile_bank != bank)
+	if (m_bg_tile_bank != bank)
 	{
-		state->m_bg_tile_bank = bank;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_bg_tile_bank = bank;
+		m_bg_tilemap->mark_all_dirty();
 	}
 
-	bank = state->m_vreg[0]&0x04;
-	if (state->m_fg_tile_bank != bank)
+	bank = m_vreg[0]&0x04;
+	if (m_fg_tile_bank != bank)
 	{
-		state->m_fg_tile_bank = bank;
-		state->m_fg_tilemap->mark_all_dirty();
+		m_fg_tile_bank = bank;
+		m_fg_tilemap->mark_all_dirty();
 	}
 
-	bank = state->m_vreg[0]&0x02;
-	if (state->m_tx_tile_bank != bank)
+	bank = m_vreg[0]&0x02;
+	if (m_tx_tile_bank != bank)
 	{
-		state->m_tx_tile_bank = bank;
-		state->m_tx_tilemap->mark_all_dirty();
+		m_tx_tile_bank = bank;
+		m_tx_tilemap->mark_all_dirty();
 	}
 
-	state->m_bg_tilemap->set_palette_offset(0x300 + (state->m_vreg[1] & 0xf0));
-	state->m_fg_tilemap->set_palette_offset(0x200 + (state->m_vreg[1] & 0xf0));
-	state->m_tx_tilemap->set_palette_offset(0x110);
+	m_bg_tilemap->set_palette_offset(0x300 + (m_vreg[1] & 0xf0));
+	m_fg_tilemap->set_palette_offset(0x200 + (m_vreg[1] & 0xf0));
+	m_tx_tilemap->set_palette_offset(0x110);
 
-	state->m_tx_tilemap->set_scrollx(0, state->m_scroll[0]);
-	state->m_tx_tilemap->set_scrolly(0, state->m_scroll[1]);
+	m_tx_tilemap->set_scrollx(0, m_scroll[0]);
+	m_tx_tilemap->set_scrolly(0, m_scroll[1]);
 
-	state->m_fg_tilemap->set_scrollx(0, state->m_scroll[2]);
-	state->m_fg_tilemap->set_scrolly(0, state->m_scroll[3]);
+	m_fg_tilemap->set_scrollx(0, m_scroll[2]);
+	m_fg_tilemap->set_scrolly(0, m_scroll[3]);
 
-	state->m_bg_tilemap->set_scrollx(0, state->m_scroll[4]);
-	state->m_bg_tilemap->set_scrolly(0, state->m_scroll[5]);
+	m_bg_tilemap->set_scrollx(0, m_scroll[4]);
+	m_bg_tilemap->set_scrolly(0, m_scroll[5]);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
-	if ((state->m_vreg[2] & 0xf0) == 0xf0)
+	if ((m_vreg[2] & 0xf0) == 0xf0)
 	{
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, (state->m_vreg[1] & 2) ? 2 : 4);
-		state->m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
+		m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
+		m_fg_tilemap->draw(bitmap, cliprect, 0, (m_vreg[1] & 2) ? 2 : 4);
+		m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 		draw_sprites(screen.machine(), bitmap, cliprect);
 	}
 	else
 	{
-		state->m_tx_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_tx_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	}
 
 	return 0;

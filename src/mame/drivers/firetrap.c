@@ -657,7 +657,7 @@ static MACHINE_CONFIG_START( firetrap, firetrap_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(firetrap)
+	MCFG_SCREEN_UPDATE_DRIVER(firetrap_state, screen_update_firetrap)
 
 	MCFG_GFXDECODE(firetrap)
 	MCFG_PALETTE_LENGTH(256)
@@ -697,7 +697,7 @@ static MACHINE_CONFIG_START( firetrapbl, firetrap_state )
 	MCFG_GFXDECODE(firetrap)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_SCREEN_UPDATE_STATIC(firetrap)
+	MCFG_SCREEN_UPDATE_DRIVER(firetrap_state, screen_update_firetrap)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

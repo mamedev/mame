@@ -43,6 +43,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_volfied(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -57,5 +58,5 @@ void volfied_cchip_reset(running_machine &machine);
 
 
 
-SCREEN_UPDATE_IND16( volfied );
+
 

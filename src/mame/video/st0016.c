@@ -584,14 +584,14 @@ static void draw_bgmap(running_machine &machine, bitmap_ind16 &bitmap,const rect
 }
 
 
-void st0016_draw_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void st0016_state::st0016_draw_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_bgmap(screen.machine(), bitmap,cliprect,0);
 	draw_sprites(screen.machine(), bitmap,cliprect);
 	draw_bgmap(screen.machine(), bitmap,cliprect,1);
 }
 
-SCREEN_UPDATE_IND16( st0016 )
+UINT32 st0016_state::screen_update_st0016(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
 #ifdef MAME_DEBUG

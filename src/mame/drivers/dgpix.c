@@ -77,6 +77,7 @@ public:
 	DECLARE_DRIVER_INIT(kdynastg);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_dgpix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -291,15 +292,14 @@ void dgpix_state::video_start()
 	m_vram = auto_alloc_array(machine(), UINT32, 0x40000*2/4);
 }
 
-static SCREEN_UPDATE_IND16( dgpix )
+UINT32 dgpix_state::screen_update_dgpix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dgpix_state *state = screen.machine().driver_data<dgpix_state>();
 	int y;
 
 	for (y = 0; y < 240; y++)
 	{
 		int x;
-		UINT32 *src = &state->m_vram[(state->m_vbuffer ? 0 : 0x10000) | (y << 8)];
+		UINT32 *src = &m_vram[(m_vbuffer ? 0 : 0x10000) | (y << 8)];
 		UINT16 *dest = &bitmap.pix16(y);
 
 		for (x = 0; x < 320; x += 2)
@@ -342,7 +342,7 @@ static MACHINE_CONFIG_START( dgpix, dgpix_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(dgpix)
+	MCFG_SCREEN_UPDATE_DRIVER(dgpix_state, screen_update_dgpix)
 
 	MCFG_PALETTE_INIT(BBBBB_GGGGG_RRRRR)
 	MCFG_PALETTE_LENGTH(32768)

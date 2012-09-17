@@ -73,15 +73,14 @@ void quizpani_state::video_start()
 	m_txt_tilemap->set_transparent_pen(15);
 }
 
-SCREEN_UPDATE_IND16( quizpani )
+UINT32 quizpani_state::screen_update_quizpani(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	quizpani_state *state = screen.machine().driver_data<quizpani_state>();
-	state->m_bg_tilemap->set_scrollx(0, state->m_scrollreg[0] - 64);
-	state->m_bg_tilemap->set_scrolly(0, state->m_scrollreg[1] + 16);
-	state->m_txt_tilemap->set_scrollx(0, state->m_scrollreg[2] - 64);
-	state->m_txt_tilemap->set_scrolly(0, state->m_scrollreg[3] + 16);
+	m_bg_tilemap->set_scrollx(0, m_scrollreg[0] - 64);
+	m_bg_tilemap->set_scrolly(0, m_scrollreg[1] + 16);
+	m_txt_tilemap->set_scrollx(0, m_scrollreg[2] - 64);
+	m_txt_tilemap->set_scrolly(0, m_scrollreg[3] + 16);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_txt_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_txt_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

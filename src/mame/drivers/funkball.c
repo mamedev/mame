@@ -164,6 +164,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(funkball_pic8259_1_set_int_line);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_funkball(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 void funkball_state::video_start()
@@ -1134,7 +1135,7 @@ void funkball_state::machine_reset()
 	m_voodoo_pci_regs.base_addr = 0xff000000;
 }
 
-SCREEN_UPDATE_RGB32( funkball )
+UINT32 funkball_state::screen_update_funkball(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	voodoo_update(screen.machine().device("voodoo_0"), bitmap, cliprect);
 	return 0;

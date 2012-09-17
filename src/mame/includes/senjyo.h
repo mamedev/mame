@@ -81,6 +81,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_senjyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -95,4 +96,4 @@ extern const z80ctc_interface senjyo_ctc_intf;
 
 
 
-SCREEN_UPDATE_IND16( senjyo );
+

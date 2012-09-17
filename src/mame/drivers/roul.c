@@ -82,6 +82,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ball_w);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_roul(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -214,13 +215,12 @@ void roul_state::video_start()
 	m_videobuf = auto_alloc_array_clear(machine(), UINT8, VIDEOBUF_SIZE);
 }
 
-static SCREEN_UPDATE_IND16(roul)
+UINT32 roul_state::screen_update_roul(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	roul_state *state = screen.machine().driver_data<roul_state>();
 	int i,j;
 	for (i = 0; i < 256; i++)
 		for (j = 0; j < 256; j++)
-			bitmap.pix16(j, i) = state->m_videobuf[j * 256 + 255 - i];
+			bitmap.pix16(j, i) = m_videobuf[j * 256 + 255 - i];
 	return 0;
 }
 
@@ -294,7 +294,7 @@ static MACHINE_CONFIG_START( roul, roul_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(roul)
+	MCFG_SCREEN_UPDATE_DRIVER(roul_state, screen_update_roul)
 
 	MCFG_PALETTE_LENGTH(0x100)
 

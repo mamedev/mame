@@ -60,6 +60,10 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_tceptor_2d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_tceptor_3d_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_tceptor_3d_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_tceptor(screen_device &screen, bool state);
 };
 
 
@@ -67,9 +71,9 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( tceptor_2d );
-SCREEN_UPDATE_IND16( tceptor_3d_left );
-SCREEN_UPDATE_IND16( tceptor_3d_right );
-SCREEN_VBLANK( tceptor );
+
+
+
+
 
 

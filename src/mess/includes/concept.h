@@ -55,6 +55,7 @@ public:
 	DECLARE_WRITE8_MEMBER(concept_hdc_reg_w);
 	virtual void machine_start();
 	virtual void video_start();
+	UINT32 screen_update_concept(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -65,7 +66,7 @@ extern const wd17xx_interface concept_wd17xx_interface;
 
 
 
-SCREEN_UPDATE_IND16(concept);
+
 INTERRUPT_GEN( concept_interrupt );
 
 

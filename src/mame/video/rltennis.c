@@ -228,10 +228,9 @@ void rltennis_state::video_start()
 	m_tmp_bitmap[BITMAP_FG_DISPLAY] = auto_bitmap_ind16_alloc(machine(), 512, 256);
 }
 
-SCREEN_UPDATE_IND16( rltennis )
+UINT32 rltennis_state::screen_update_rltennis(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	rltennis_state *state = screen.machine().driver_data<rltennis_state>();
-	copybitmap(bitmap, *state->m_tmp_bitmap[BITMAP_BG], 0, 0, 0, 0, cliprect);
-	copybitmap_trans(bitmap, *state->m_tmp_bitmap[BITMAP_FG_DISPLAY], 0, 0, 0, 0, cliprect, 0);
+	copybitmap(bitmap, *m_tmp_bitmap[BITMAP_BG], 0, 0, 0, 0, cliprect);
+	copybitmap_trans(bitmap, *m_tmp_bitmap[BITMAP_FG_DISPLAY], 0, 0, 0, 0, cliprect, 0);
 	return 0;
 }

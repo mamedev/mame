@@ -125,6 +125,8 @@ public:
 	DECLARE_DRIVER_INIT(fashion);
 	DECLARE_DRIVER_INIT(ciclone);
 	DECLARE_VIDEO_START(tourvisn);
+	UINT32 screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_brasil(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -135,9 +137,8 @@ VIDEO_START_MEMBER(highvdeo_state,tourvisn)
 
 }
 
-static SCREEN_UPDATE_RGB32(tourvisn)
+UINT32 highvdeo_state::screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	highvdeo_state *state = screen.machine().driver_data<highvdeo_state>();
 	int x,y,count;
 
 	count = (0/2);
@@ -148,12 +149,12 @@ static SCREEN_UPDATE_RGB32(tourvisn)
 		{
 			UINT32 color;
 
-			color = ((state->m_blit_ram[count]) & 0x00ff)>>0;
+			color = ((m_blit_ram[count]) & 0x00ff)>>0;
 
 			if(cliprect.contains((x*2)+0, y))
 				bitmap.pix32(y, (x*2)+0) = screen.machine().pens[color];
 
-			color = ((state->m_blit_ram[count]) & 0xff00)>>8;
+			color = ((m_blit_ram[count]) & 0xff00)>>8;
 
 			if(cliprect.contains((x*2)+1, y))
 				bitmap.pix32(y, (x*2)+1) = screen.machine().pens[color];
@@ -166,9 +167,8 @@ static SCREEN_UPDATE_RGB32(tourvisn)
 }
 
 /*Later HW, RGB565 instead of RAM-based pens (+ ramdac).*/
-static SCREEN_UPDATE_RGB32(brasil)
+UINT32 highvdeo_state::screen_update_brasil(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	highvdeo_state *state = screen.machine().driver_data<highvdeo_state>();
 	int x,y,count;
 
 	count = (0/2);
@@ -182,7 +182,7 @@ static SCREEN_UPDATE_RGB32(brasil)
 			UINT32 g;
 			UINT32 r;
 
-			color = (state->m_blit_ram[count]) & 0xffff;
+			color = (m_blit_ram[count]) & 0xffff;
 
 			b = (color & 0x001f) << 3;
 			g = (color & 0x07e0) >> 3;
@@ -938,7 +938,7 @@ static MACHINE_CONFIG_START( tv_vcf, highvdeo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_STATIC(tourvisn)
+	MCFG_SCREEN_UPDATE_DRIVER(highvdeo_state, screen_update_tourvisn)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
@@ -1004,7 +1004,7 @@ static MACHINE_CONFIG_START( brasil, highvdeo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
-	MCFG_SCREEN_UPDATE_STATIC(brasil)
+	MCFG_SCREEN_UPDATE_DRIVER(highvdeo_state, screen_update_brasil)
 
 	MCFG_PALETTE_LENGTH(0x100)
 

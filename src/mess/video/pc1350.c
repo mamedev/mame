@@ -129,9 +129,8 @@ static const int pc1350_addr[4]={ 0, 0x40, 0x1e, 0x5e };
 #define DOWN 45
 #define RIGHT 76
 
-SCREEN_UPDATE_IND16( pc1350 )
+UINT32 pc1350_state::screen_update_pc1350(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pc1350_state *state = screen.machine().driver_data<pc1350_state>();	/* The contrast colours need some work done - select contrast level 7 for now */
 	int x, y=DOWN, i, j, k=0, b;
 	int color[4];
 	running_machine &machine = screen.machine();
@@ -148,23 +147,23 @@ SCREEN_UPDATE_IND16( pc1350 )
 		for (x=RIGHT, i=pc1350_addr[k]; i<0xa00; i+=0x200)
 			for (j=0; j<=0x1d; j++, x+=2)
 				for (b = 0; b < 8; b++)
-					bitmap.plot_box(x, y + b * 2, 2, 2, color[(state->m_reg[j+i] >> b) & 1]);
+					bitmap.plot_box(x, y + b * 2, 2, 2, color[(m_reg[j+i] >> b) & 1]);
 
 
 	/* 783c: 0 SHIFT 1 DEF 4 RUN 5 PRO 6 JAPAN 7 SML */
 	/* I don't know how they really look like in the lcd */
 	pocketc_draw_special(bitmap, RIGHT-30, DOWN+45, shift,
-						state->m_reg[0x83c] & 0x01 ? color[2] : color[3]);
+						m_reg[0x83c] & 0x01 ? color[2] : color[3]);
 	pocketc_draw_special(bitmap, RIGHT-30, DOWN+55, def,
-						state->m_reg[0x83c] & 0x02 ? color[2] : color[3]);
+						m_reg[0x83c] & 0x02 ? color[2] : color[3]);
 	pocketc_draw_special(bitmap, RIGHT-30, DOWN+5, run,
-						state->m_reg[0x83c] & 0x10 ? color[2] : color[3]);
+						m_reg[0x83c] & 0x10 ? color[2] : color[3]);
 	pocketc_draw_special(bitmap, RIGHT-30, DOWN+15, pro,
-						state->m_reg[0x83c] & 0x20 ? color[2] : color[3]);
+						m_reg[0x83c] & 0x20 ? color[2] : color[3]);
 	pocketc_draw_special(bitmap, RIGHT-30, DOWN+25, japan,
-						state->m_reg[0x83c] & 0x40 ? color[2] : color[3]);
+						m_reg[0x83c] & 0x40 ? color[2] : color[3]);
 	pocketc_draw_special(bitmap, RIGHT-30, DOWN+35, sml,
-						state->m_reg[0x83c] & 0x80 ? color[2] : color[3]);
+						m_reg[0x83c] & 0x80 ? color[2] : color[3]);
 
 	return 0;
 }

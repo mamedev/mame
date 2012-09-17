@@ -216,21 +216,19 @@ static void superqix_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	}
 }
 
-SCREEN_UPDATE_IND16( pbillian )
+UINT32 superqix_state::screen_update_pbillian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	superqix_state *state = screen.machine().driver_data<superqix_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	pbillian_draw_sprites(screen.machine(), bitmap,cliprect);
 
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( superqix )
+UINT32 superqix_state::screen_update_superqix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	superqix_state *state = screen.machine().driver_data<superqix_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	copybitmap_trans(bitmap,*state->m_fg_bitmap[state->m_show_bitmap],state->flip_screen(),state->flip_screen(),0,0,cliprect,0);
+	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	copybitmap_trans(bitmap,*m_fg_bitmap[m_show_bitmap],flip_screen(),flip_screen(),0,0,cliprect,0);
 	superqix_draw_sprites(screen.machine(), bitmap,cliprect);
-	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

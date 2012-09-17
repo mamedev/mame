@@ -45,6 +45,8 @@ public:
 	DECLARE_MACHINE_RESET(quizrr40);
 	DECLARE_MACHINE_RESET(quizrr41);
 	DECLARE_MACHINE_RESET(quizrr42);
+	UINT32 screen_update_cdimono1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- debug defines -----------*/

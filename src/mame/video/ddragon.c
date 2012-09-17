@@ -233,18 +233,17 @@ static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap,const r
 #undef DRAW_SPRITE
 
 
-SCREEN_UPDATE_IND16( ddragon )
+UINT32 ddragon_state::screen_update_ddragon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ddragon_state *state = screen.machine().driver_data<ddragon_state>();
 
-	int scrollx = (state->m_scrollx_hi << 8) | *state->m_scrollx_lo;
-	int scrolly = (state->m_scrolly_hi << 8) | *state->m_scrolly_lo;
+	int scrollx = (m_scrollx_hi << 8) | *m_scrollx_lo;
+	int scrolly = (m_scrolly_hi << 8) | *m_scrolly_lo;
 
-	state->m_bg_tilemap->set_scrollx(0, scrollx);
-	state->m_bg_tilemap->set_scrolly(0, scrolly);
+	m_bg_tilemap->set_scrollx(0, scrollx);
+	m_bg_tilemap->set_scrolly(0, scrolly);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

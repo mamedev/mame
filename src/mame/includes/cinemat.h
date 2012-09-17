@@ -64,6 +64,8 @@ public:
 	DECLARE_VIDEO_START(cinemat_64level);
 	DECLARE_VIDEO_START(cinemat_color);
 	DECLARE_VIDEO_START(cinemat_qb3color);
+	UINT32 screen_update_cinemat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_spacewar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -97,6 +99,6 @@ void cinemat_vector_callback(device_t *device, INT16 sx, INT16 sy, INT16 ex, INT
 
 
 
-SCREEN_UPDATE_RGB32( cinemat );
 
-SCREEN_UPDATE_RGB32( spacewar );
+
+

@@ -225,31 +225,30 @@ void inufuku_state::video_start()
 
 ******************************************************************************/
 
-SCREEN_UPDATE_IND16( inufuku )
+UINT32 inufuku_state::screen_update_inufuku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	inufuku_state *state = screen.machine().driver_data<inufuku_state>();
 	int i;
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0);
 
-	if (state->m_bg_raster)
+	if (m_bg_raster)
 	{
-		state->m_bg_tilemap->set_scroll_rows(512);
+		m_bg_tilemap->set_scroll_rows(512);
 		for (i = 0; i < 256; i++)
-			state->m_bg_tilemap->set_scrollx((state->m_bg_scrolly + i) & 0x1ff, state->m_bg_rasterram[i]);
+			m_bg_tilemap->set_scrollx((m_bg_scrolly + i) & 0x1ff, m_bg_rasterram[i]);
 	}
 	else
 	{
-		state->m_bg_tilemap->set_scroll_rows(1);
-		state->m_bg_tilemap->set_scrollx(0, state->m_bg_scrollx);
+		m_bg_tilemap->set_scroll_rows(1);
+		m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
 	}
-	state->m_bg_tilemap->set_scrolly(0, state->m_bg_scrolly);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	state->m_tx_tilemap->set_scrollx(0, state->m_tx_scrollx);
-	state->m_tx_tilemap->set_scrolly(0, state->m_tx_scrolly);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
+	m_tx_tilemap->set_scrollx(0, m_tx_scrollx);
+	m_tx_tilemap->set_scrolly(0, m_tx_scrolly);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;

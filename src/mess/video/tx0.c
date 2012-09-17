@@ -45,14 +45,13 @@ void tx0_state::video_start()
 }
 
 
-SCREEN_VBLANK( tx0 )
+void tx0_state::screen_eof_tx0(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		tx0_state *state = screen.machine().driver_data<tx0_state>();
 
-		crt_eof(state->m_crt);
+		crt_eof(m_crt);
 	}
 }
 
@@ -74,15 +73,14 @@ void tx0_plot(running_machine &machine, int x, int y)
 /*
     SCREEN_UPDATE_IND16( tx0 ): effectively redraw the screen
 */
-SCREEN_UPDATE_IND16( tx0 )
+UINT32 tx0_state::screen_update_tx0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tx0_state *state = screen.machine().driver_data<tx0_state>();
-	crt_update(state->m_crt, bitmap);
+	crt_update(m_crt, bitmap);
 
-	tx0_draw_panel(screen.machine(), state->m_panel_bitmap);
-	copybitmap(bitmap, state->m_panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, cliprect);
+	tx0_draw_panel(screen.machine(), m_panel_bitmap);
+	copybitmap(bitmap, m_panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, cliprect);
 
-	copybitmap(bitmap, state->m_typewriter_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, cliprect);
+	copybitmap(bitmap, m_typewriter_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, cliprect);
 	return 0;
 }
 

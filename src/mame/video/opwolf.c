@@ -35,25 +35,24 @@ WRITE16_MEMBER(opwolf_state::opwolf_spritectrl_w)
 
 /***************************************************************************/
 
-SCREEN_UPDATE_IND16( opwolf )
+UINT32 opwolf_state::screen_update_opwolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	opwolf_state *state = screen.machine().driver_data<opwolf_state>();
 	int layer[2];
 
-	pc080sn_tilemap_update(state->m_pc080sn);
+	pc080sn_tilemap_update(m_pc080sn);
 
 	layer[0] = 0;
 	layer[1] = 1;
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	pc080sn_tilemap_draw(state->m_pc080sn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
-	pc080sn_tilemap_draw(state->m_pc080sn, bitmap, cliprect, layer[1], 0, 2);
+	pc080sn_tilemap_draw(m_pc080sn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	pc080sn_tilemap_draw(m_pc080sn, bitmap, cliprect, layer[1], 0, 2);
 
-	pc090oj_draw_sprites(state->m_pc090oj, bitmap, cliprect, 1);
+	pc090oj_draw_sprites(m_pc090oj, bitmap, cliprect, 1);
 
-//  if (state->ioport("P1X")->read())
-//  popmessage("%d %d", machine, "P1X"), state->ioport("P1Y")->read());
+//  if (ioport("P1X")->read())
+//  popmessage("%d %d", machine(), "P1X"), ioport("P1Y")->read());
 
 	return 0;
 }

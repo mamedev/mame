@@ -457,77 +457,73 @@ static void update_sprites(running_machine& machine)
 	////// The glitch is correct behavior.
 
 
-SCREEN_UPDATE_IND16( ninjakd2 )
+UINT32 ninjakd2_state::screen_update_ninjakd2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ninjakd2_state *state = screen.machine().driver_data<ninjakd2_state>();
 	// updating sprites here instead than in screen_eof avoids a palette glitch
 	// at the end of the "rainbow sky" screens.
 	update_sprites(screen.machine());
-	state->m_sprites_updated = 1;
+	m_sprites_updated = 1;
 
 	bitmap.fill(0, cliprect);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	copybitmap_trans(bitmap, state->m_sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENTCODE);
+	copybitmap_trans(bitmap, m_sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENTCODE);
 
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( robokid )
+UINT32 ninjakd2_state::screen_update_robokid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ninjakd2_state *state = screen.machine().driver_data<ninjakd2_state>();
 	update_sprites(screen.machine());
-	state->m_sprites_updated = 1;
+	m_sprites_updated = 1;
 
 	bitmap.fill(0, cliprect);
 
-	state->m_bg0_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg0_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	state->m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	copybitmap_trans(bitmap, state->m_sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENTCODE);
+	copybitmap_trans(bitmap, m_sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENTCODE);
 
-	state->m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( omegaf )
+UINT32 ninjakd2_state::screen_update_omegaf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ninjakd2_state *state = screen.machine().driver_data<ninjakd2_state>();
 	update_sprites(screen.machine());
-	state->m_sprites_updated = 1;
+	m_sprites_updated = 1;
 
 	bitmap.fill(0, cliprect);
 
-	state->m_bg0_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg0_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	state->m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	state->m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	copybitmap_trans(bitmap, state->m_sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENTCODE);
+	copybitmap_trans(bitmap, m_sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENTCODE);
 
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
 
-SCREEN_VBLANK( ninjakd2 )
+void ninjakd2_state::screen_eof_ninjakd2(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		ninjakd2_state *state = screen.machine().driver_data<ninjakd2_state>();
-		if (!state->m_sprites_updated)
+		if (!m_sprites_updated)
 			update_sprites(screen.machine());
 
-		state->m_sprites_updated = 0;
+		m_sprites_updated = 0;
 	}
 }

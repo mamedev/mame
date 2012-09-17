@@ -22,10 +22,11 @@ public:
 	DECLARE_MACHINE_START(shuuz);
 	DECLARE_MACHINE_RESET(shuuz);
 	DECLARE_VIDEO_START(shuuz);
+	UINT32 screen_update_shuuz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/shuuz.c -----------*/
 
 
-SCREEN_UPDATE_IND16( shuuz );
+

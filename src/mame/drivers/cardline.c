@@ -41,20 +41,20 @@ public:
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(lamps_w);
 	virtual void palette_init();
+	UINT32 screen_update_cardline(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 
 #define DRAW_TILE(machine, offset, transparency) drawgfx_transpen(bitmap, cliprect, (machine).gfx[0],\
-					(state->m_videoram[index+offset] | (state->m_colorram[index+offset]<<8))&0x3fff,\
-					(state->m_colorram[index+offset]&0x80)>>7,\
+					(m_videoram[index+offset] | (m_colorram[index+offset]<<8))&0x3fff,\
+					(m_colorram[index+offset]&0x80)>>7,\
 					0,0,\
 					x<<3, y<<3,\
 					transparency?transparency:(UINT32)-1);
 
-static SCREEN_UPDATE_IND16( cardline )
+UINT32 cardline_state::screen_update_cardline(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cardline_state *state = screen.machine().driver_data<cardline_state>();
 	int x,y;
 	bitmap.fill(0, cliprect);
 	for(y=0;y<32;y++)
@@ -62,13 +62,13 @@ static SCREEN_UPDATE_IND16( cardline )
 		for(x=0;x<64;x++)
 		{
 			int index=y*64+x;
-			if(state->m_video&1)
+			if(m_video&1)
 			{
 				DRAW_TILE(screen.machine(),0,0);
 				DRAW_TILE(screen.machine(),0x800,1);
 			}
 
-			if(state->m_video&2)
+			if(m_video&2)
 			{
 				DRAW_TILE(screen.machine(),0x1000,0);
 				DRAW_TILE(screen.machine(),0x1800,1);
@@ -226,7 +226,7 @@ static MACHINE_CONFIG_START( cardline, cardline_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 35*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(cardline)
+	MCFG_SCREEN_UPDATE_DRIVER(cardline_state, screen_update_cardline)
 
 	MCFG_GFXDECODE(cardline)
 	MCFG_PALETTE_LENGTH(512)

@@ -71,23 +71,22 @@ WRITE8_MEMBER(epos_state::epos_port_1_w)
 }
 
 
-SCREEN_UPDATE_RGB32( epos )
+UINT32 epos_state::screen_update_epos(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	epos_state *state = screen.machine().driver_data<epos_state>();
 	pen_t pens[0x20];
 	offs_t offs;
 
 	get_pens(screen.machine(), pens);
 
-	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
+	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		UINT8 data = state->m_videoram[offs];
+		UINT8 data = m_videoram[offs];
 
 		int x = (offs % 136) * 2;
 		int y = (offs / 136);
 
-		bitmap.pix32(y, x + 0) = pens[(state->m_palette << 4) | (data & 0x0f)];
-		bitmap.pix32(y, x + 1) = pens[(state->m_palette << 4) | (data >> 4)];
+		bitmap.pix32(y, x + 0) = pens[(m_palette << 4) | (data & 0x0f)];
+		bitmap.pix32(y, x + 1) = pens[(m_palette << 4) | (data >> 4)];
 	}
 
 	return 0;

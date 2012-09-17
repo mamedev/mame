@@ -83,6 +83,9 @@ public:
 	DECLARE_VIDEO_START(drgnbowl);
 	DECLARE_VIDEO_START(mastninj);
 	DECLARE_VIDEO_START(raiga);
+	UINT32 screen_update_gaiden(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_drgnbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_raiga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -93,8 +96,8 @@ public:
 
 
 
-SCREEN_UPDATE_RGB32( gaiden );
-SCREEN_UPDATE_RGB32( raiga );
-SCREEN_UPDATE_IND16( drgnbowl );
+
+
+
 
 

@@ -61,6 +61,8 @@ public:
 	DECLARE_MACHINE_START(twin16);
 	DECLARE_MACHINE_RESET(twin16);
 	DECLARE_VIDEO_START(twin16);
+	UINT32 screen_update_twin16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_twin16(screen_device &screen, bool state);
 };
 
 
@@ -73,7 +75,7 @@ int twin16_spriteram_process_enable( running_machine &machine );
 
 
 
-SCREEN_UPDATE_IND16( twin16 );
-SCREEN_VBLANK( twin16 );
+
+
 
 void twin16_spriteram_process( running_machine &machine );

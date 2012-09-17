@@ -99,11 +99,10 @@ void thief_state::video_start(){
 	m_coprocessor.context_ram = auto_alloc_array(machine(), UINT8, 0x400 );
 }
 
-SCREEN_UPDATE_IND16( thief ){
-	thief_state *state = screen.machine().driver_data<thief_state>();
-	UINT8 *videoram = state->m_videoram;
+UINT32 thief_state::screen_update_thief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){
+	UINT8 *videoram = m_videoram;
 	UINT32 offs;
-	int flipscreen = state->m_video_control&1;
+	int flipscreen = m_video_control&1;
 	const UINT8 *source = videoram;
 
 	if (tms9927_screen_reset(screen.machine().device("tms")))
@@ -112,7 +111,7 @@ SCREEN_UPDATE_IND16( thief ){
 		return 0;
 	}
 
-	if( state->m_video_control&4 ) /* visible page */
+	if( m_video_control&4 ) /* visible page */
 		source += 0x2000*4;
 
 	for( offs=0; offs<0x2000; offs++ ){

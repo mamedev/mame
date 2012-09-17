@@ -143,6 +143,8 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_mazerbla(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_test_vcu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -203,40 +205,39 @@ void mazerbla_state::video_start()
 
 #ifdef UNUSED_DEFINITION
 
-SCREEN_UPDATE_IND16( test_vcu )
+UINT32 mazerbla_state::screen_update_test_vcu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mazerbla_state *state = screen.machine().driver_data<mazerbla_state>();
-	int *planes_enabled = state->m_planes_enabled;
+	int *planes_enabled = m_planes_enabled;
 	char buf[128];
 
 	UINT32 color_base = 0;
 
-	if (state->m_game_id == MAZERBLA)
+	if (m_game_id == MAZERBLA)
 		color_base = 0x80;	/* 0x80 constant: matches Mazer Blazer movie */
 
-	if (state->m_game_id == GREATGUN)
+	if (m_game_id == GREATGUN)
 		color_base = 0x00;
 
 	bitmap.fill(0);
 //  logerror("-->frame\n");
 
 	if (planes_enabled[3])
-		copybitmap(bitmap, state->m_tmpbitmaps[3], 0, 0, 0, 0, cliprect);
+		copybitmap(bitmap, m_tmpbitmaps[3], 0, 0, 0, 0, cliprect);
 
 	if (planes_enabled[2])
-		copybitmap_trans(bitmap, state->m_tmpbitmaps[2], 0, 0, 0, 0,cliprect, color_base);
+		copybitmap_trans(bitmap, m_tmpbitmaps[2], 0, 0, 0, 0,cliprect, color_base);
 
-	state->m_tmpbitmaps[2].fill(color_base);
+	m_tmpbitmaps[2].fill(color_base);
 
 	if (planes_enabled[1])
-		copybitmap_trans(bitmap, state->m_tmpbitmaps[1], 0, 0, 0, 0,cliprect, color_base);
+		copybitmap_trans(bitmap, m_tmpbitmaps[1], 0, 0, 0, 0,cliprect, color_base);
 
-	state->m_tmpbitmaps[1].fill(color_base);
+	m_tmpbitmaps[1].fill(color_base);
 
 	if (planes_enabled[0])
-		copybitmap_trans(bitmap, state->m_tmpbitmaps[0], 0, 0, 0, 0,cliprect, color_base);
+		copybitmap_trans(bitmap, m_tmpbitmaps[0], 0, 0, 0, 0,cliprect, color_base);
 
-	state->m_tmpbitmaps[0].fill(color_base);
+	m_tmpbitmaps[0].fill(color_base);
 
 	if (screen.machine().input().code_pressed_once(KEYCODE_1))	/* plane 1 */
 		planes_enabled[0] ^= 1;
@@ -251,27 +252,27 @@ SCREEN_UPDATE_IND16( test_vcu )
 		planes_enabled[3] ^= 1;
 
 	if (screen.machine().input().code_pressed_once(KEYCODE_I))	/* show/hide debug info */
-		state->m_dbg_info = !state->m_dbg_info;
+		m_dbg_info = !m_dbg_info;
 
 	if (screen.machine().input().code_pressed_once(KEYCODE_G))	/* enable gfx area handling */
-		state->m_dbg_gfx_e = !state->m_dbg_gfx_e;
+		m_dbg_gfx_e = !m_dbg_gfx_e;
 
 	if (screen.machine().input().code_pressed_once(KEYCODE_C))	/* enable color area handling */
-		state->m_dbg_clr_e = !state->m_dbg_clr_e;
+		m_dbg_clr_e = !m_dbg_clr_e;
 
 	if (screen.machine().input().code_pressed_once(KEYCODE_V))	/* draw only when vbank==dbg_vbank */
-		state->m_dbg_vbank ^= 1;
+		m_dbg_vbank ^= 1;
 
 	if (screen.machine().input().code_pressed_once(KEYCODE_L))	/* showlookup ram */
-		state->m_dbg_lookup = (state->m_dbg_lookup + 1) % 5;	//0,1,2,3, 4-off
+		m_dbg_lookup = (m_dbg_lookup + 1) % 5;	//0,1,2,3, 4-off
 
 
-	if (state->m_dbg_info)
+	if (m_dbg_info)
 	{
 		sprintf(buf,"I-info, G-gfx, C-color, V-vbank, 1-4 enable planes");
 		ui_draw_text(buf, 10, 0 * ui_get_line_height(screen.machine()));
 
-		sprintf(buf,"g:%1i c:%1i v:%1i vbk=%1i  planes=%1i%1i%1i%1i  ", state->m_dbg_gfx_e&1, state->m_dbg_clr_e&1, state->m_dbg_vbank, vbank&1,
+		sprintf(buf,"g:%1i c:%1i v:%1i vbk=%1i  planes=%1i%1i%1i%1i  ", m_dbg_gfx_e&1, m_dbg_clr_e&1, m_dbg_vbank, vbank&1,
 			planes_enabled[0],
 			planes_enabled[1],
 			planes_enabled[2],
@@ -279,9 +280,9 @@ SCREEN_UPDATE_IND16( test_vcu )
 
 		ui_draw_text(buf, 10, 1 * ui_get_line_height(screen.machine()));
 
-		if (state->m_dbg_lookup!=4)
+		if (m_dbg_lookup!=4)
 		{
-			int lookup_offs = (state->m_dbg_lookup)*256; //=0,1,2,3*256
+			int lookup_offs = (m_dbg_lookup)*256; //=0,1,2,3*256
 			int y, x;
 
 			for (y = 0; y < 16; y++)
@@ -302,23 +303,22 @@ SCREEN_UPDATE_IND16( test_vcu )
 #endif
 
 
-static SCREEN_UPDATE_IND16( mazerbla )
+UINT32 mazerbla_state::screen_update_mazerbla(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mazerbla_state *state = screen.machine().driver_data<mazerbla_state>();
 //  UINT32 color_base = 0;
 
-	if (state->m_game_id == MAZERBLA)
+	if (m_game_id == MAZERBLA)
 //      color_base = 0x80;  /* 0x80 constant: matches Mazer Blazer movie */
 
-//  if (state->m_game_id == GREATGUN)
+//  if (m_game_id == GREATGUN)
 //      color_base = 0x00;
 
 	//  bitmap.fill(0);
 
-	copybitmap(bitmap, state->m_tmpbitmaps[3], 0, 0, 0, 0, cliprect);
-	copybitmap_trans(bitmap, state->m_tmpbitmaps[2], 0, 0, 0, 0, cliprect, 0);
-	copybitmap_trans(bitmap, state->m_tmpbitmaps[1], 0, 0, 0, 0, cliprect, 0);
-	copybitmap_trans(bitmap, state->m_tmpbitmaps[0], 0, 0, 0, 0, cliprect, 0);
+	copybitmap(bitmap, m_tmpbitmaps[3], 0, 0, 0, 0, cliprect);
+	copybitmap_trans(bitmap, m_tmpbitmaps[2], 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, m_tmpbitmaps[1], 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, m_tmpbitmaps[0], 0, 0, 0, 0, cliprect, 0);
 	return 0;
 }
 
@@ -1535,7 +1535,7 @@ static MACHINE_CONFIG_START( mazerbla, mazerbla_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(mazerbla)
+	MCFG_SCREEN_UPDATE_DRIVER(mazerbla_state, screen_update_mazerbla)
 
 	MCFG_PALETTE_LENGTH(256)
 
@@ -1571,7 +1571,7 @@ static MACHINE_CONFIG_START( greatgun, mazerbla_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(mazerbla)
+	MCFG_SCREEN_UPDATE_DRIVER(mazerbla_state, screen_update_mazerbla)
 
 	MCFG_PALETTE_LENGTH(256)
 

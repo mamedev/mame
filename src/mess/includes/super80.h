@@ -80,20 +80,26 @@ public:
 	DECLARE_VIDEO_START(super80);
 	DECLARE_VIDEO_START(super80v);
 	DECLARE_PALETTE_INIT(super80m);
+	UINT32 screen_update_super80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_super80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_super80d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_super80e(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_super80m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_super80m(screen_device &screen, bool state);
 };
 
 
 /*----------- defined in video/super80.c -----------*/
 
 
-SCREEN_UPDATE_IND16( super80 );
-SCREEN_UPDATE_IND16( super80d );
-SCREEN_UPDATE_IND16( super80e );
-SCREEN_UPDATE_IND16( super80m );
 
-SCREEN_VBLANK( super80m );
 
-SCREEN_UPDATE_RGB32( super80v );
+
+
+
+
+
+
 MC6845_UPDATE_ROW( super80v_update_row );
 
 /*----------- defined in machine/super80.c -----------*/

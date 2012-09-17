@@ -102,22 +102,22 @@ public:
 	DECLARE_READ8_MEMBER(cmd2_r);
 	DECLARE_READ8_MEMBER(cmd_stat8_r);
 	DECLARE_DRIVER_INIT(srmp5);
+	UINT32 screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
-static SCREEN_UPDATE_RGB32( srmp5 )
+UINT32 srmp5_state::screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	srmp5_state *state = screen.machine().driver_data<srmp5_state>();
 	int x,y,address,xs,xs2,ys,ys2,height,width,xw,yw,xb,yb,sizex,sizey;
-	UINT16 *sprite_list=state->m_sprram;
-	UINT16 *sprite_list_end=&state->m_sprram[0x4000]; //guess
-	UINT8 *pixels=(UINT8 *)state->m_tileram;
+	UINT16 *sprite_list=m_sprram;
+	UINT16 *sprite_list_end=&m_sprram[0x4000]; //guess
+	UINT8 *pixels=(UINT8 *)m_tileram;
 
 //Table surface seems to be tiles, but display corrupts when switching the scene if always ON.
 //Currently the tiles are OFF.
 #ifdef BG_ENABLE
-	UINT8 tile_width  = (state->m_vidregs[2] >> 0) & 0xFF;
-	UINT8 tile_height = (state->m_vidregs[2] >> 8) & 0xFF;
+	UINT8 tile_width  = (m_vidregs[2] >> 0) & 0xFF;
+	UINT8 tile_height = (m_vidregs[2] >> 8) & 0xFF;
 	if(tile_width && tile_height)
 	{
 		// 16x16 tile
@@ -137,7 +137,7 @@ static SCREEN_UPDATE_RGB32( srmp5 )
 						UINT8 pen = pixels[address];
 						if(pen)
 						{
-							UINT16 pixdata=state->m_palram[pen];
+							UINT16 pixdata=m_palram[pen];
 							bitmap.pix32(yw * 16 + y, xw * 16 + x) = ((pixdata&0x7c00)>>7) | ((pixdata&0x3e0)<<6) | ((pixdata&0x1f)<<19);
 						}
 						address++;
@@ -152,7 +152,7 @@ static SCREEN_UPDATE_RGB32( srmp5 )
 
 	while((sprite_list[SUBLIST_OFFSET]&SPRITE_LIST_END_MARKER)==0 && sprite_list<sprite_list_end)
 	{
-		UINT16 *sprite_sublist=&state->m_sprram[sprite_list[SUBLIST_OFFSET]<<SUBLIST_OFFSET_SHIFT];
+		UINT16 *sprite_sublist=&m_sprram[sprite_list[SUBLIST_OFFSET]<<SUBLIST_OFFSET_SHIFT];
 		UINT16 sublist_length=sprite_list[SUBLIST_LENGTH];
 		INT16 global_x,global_y;
 
@@ -189,7 +189,7 @@ static SCREEN_UPDATE_RGB32( srmp5 )
 								{
 									if(cliprect.contains(xb+xs2, yb+ys2))
 									{
-										UINT16 pixdata=state->m_palram[pen+((sprite_sublist[SPRITE_PALETTE]&0xff)<<8)];
+										UINT16 pixdata=m_palram[pen+((sprite_sublist[SPRITE_PALETTE]&0xff)<<8)];
 										bitmap.pix32(yb+ys2, xb+xs2) = ((pixdata&0x7c00)>>7) | ((pixdata&0x3e0)<<6) | ((pixdata&0x1f)<<19);
 									}
 								}
@@ -210,10 +210,10 @@ static SCREEN_UPDATE_RGB32( srmp5 )
 		int i;
 		for(i = 0; i < 0x2000; i++)
 		{
-			if (state->m_tileduty[i] == 1)
+			if (m_tileduty[i] == 1)
 			{
 				screen.machine().gfx[0]->decode(i);
-				state->m_tileduty[i] = 0;
+				m_tileduty[i] = 0;
 			}
 		}
 	}
@@ -573,7 +573,7 @@ static MACHINE_CONFIG_START( srmp5, srmp5_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(96*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(srmp5)
+	MCFG_SCREEN_UPDATE_DRIVER(srmp5_state, screen_update_srmp5)
 
 	MCFG_PALETTE_LENGTH(0x1800)
 #ifdef DEBUG_CHAR

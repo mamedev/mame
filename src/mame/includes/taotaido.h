@@ -30,11 +30,13 @@ public:
 	TILE_GET_INFO_MEMBER(taotaido_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(taotaido_tilemap_scan_rows);
 	virtual void video_start();
+	UINT32 screen_update_taotaido(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_taotaido(screen_device &screen, bool state);
 };
 
 
 /*----------- defined in video/taotaido.c -----------*/
 
 
-SCREEN_UPDATE_IND16( taotaido );
-SCREEN_VBLANK( taotaido );
+
+

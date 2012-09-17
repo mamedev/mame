@@ -96,6 +96,8 @@ public:
 	DECLARE_PALETTE_INIT(arknoid2);
 	DECLARE_MACHINE_START(jpopnics);
 	DECLARE_MACHINE_RESET(jpopnics);
+	UINT32 screen_update_tnzs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_tnzs(screen_device &screen, bool state);
 };
 
 
@@ -113,5 +115,5 @@ INTERRUPT_GEN( arknoid2_interrupt );
 /*----------- defined in video/tnzs.c -----------*/
 
 
-SCREEN_UPDATE_IND16( tnzs );
-SCREEN_VBLANK( tnzs );
+
+

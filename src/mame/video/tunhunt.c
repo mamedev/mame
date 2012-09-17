@@ -374,9 +374,8 @@ static void draw_shell(running_machine &machine,
 			255-hposition-16,vstart-32,0 );
 }
 
-SCREEN_UPDATE_IND16( tunhunt )
+UINT32 tunhunt_state::screen_update_tunhunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tunhunt_state *state = screen.machine().driver_data<tunhunt_state>();
 	set_pens(screen.machine());
 
 	draw_box(screen.machine(), bitmap, cliprect);
@@ -384,21 +383,21 @@ SCREEN_UPDATE_IND16( tunhunt )
 	draw_motion_object(screen.machine(), bitmap, cliprect);
 
 	draw_shell(screen.machine(), bitmap, cliprect,
-		state->m_workram[SHL0PC],	/* picture code */
-		state->m_workram[SHEL0H],	/* hposition */
-		state->m_workram[SHL0V],	/* vstart */
-		state->m_workram[SHL0VS],	/* vstop */
-		state->m_workram[SHL0ST],	/* vstretch */
-		state->m_control&0x08 ); /* hstretch */
+		m_workram[SHL0PC],	/* picture code */
+		m_workram[SHEL0H],	/* hposition */
+		m_workram[SHL0V],	/* vstart */
+		m_workram[SHL0VS],	/* vstop */
+		m_workram[SHL0ST],	/* vstretch */
+		m_control&0x08 ); /* hstretch */
 
 	draw_shell(screen.machine(), bitmap, cliprect,
-		state->m_workram[SHL1PC],	/* picture code */
-		state->m_workram[SHEL1H],	/* hposition */
-		state->m_workram[SHL1V],	/* vstart */
-		state->m_workram[SHL1VS],	/* vstop */
-		state->m_workram[SHL1ST],	/* vstretch */
-		state->m_control&0x10 ); /* hstretch */
+		m_workram[SHL1PC],	/* picture code */
+		m_workram[SHEL1H],	/* hposition */
+		m_workram[SHL1V],	/* vstart */
+		m_workram[SHL1VS],	/* vstop */
+		m_workram[SHL1ST],	/* vstretch */
+		m_control&0x10 ); /* hstretch */
 
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

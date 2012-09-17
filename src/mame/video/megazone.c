@@ -110,23 +110,22 @@ void megazone_state::video_start()
 }
 
 
-SCREEN_UPDATE_IND16( megazone )
+UINT32 megazone_state::screen_update_megazone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	megazone_state *state = screen.machine().driver_data<megazone_state>();
 	int offs;
 	int x, y;
 
 	/* for every character in the Video RAM */
-	for (offs = state->m_videoram.bytes() - 1; offs >= 0; offs--)
+	for (offs = m_videoram.bytes() - 1; offs >= 0; offs--)
 	{
 		int sx, sy, flipx, flipy;
 
 		sx = offs % 32;
 		sy = offs / 32;
-		flipx = state->m_colorram[offs] & (1 << 6);
-		flipy = state->m_colorram[offs] & (1 << 5);
+		flipx = m_colorram[offs] & (1 << 6);
+		flipy = m_colorram[offs] & (1 << 5);
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 		{
 			sx = 31 - sx;
 			sy = 31 - sy;
@@ -134,9 +133,9 @@ SCREEN_UPDATE_IND16( megazone )
 			flipy = !flipy;
 		}
 
-		drawgfx_opaque(*state->m_tmpbitmap, state->m_tmpbitmap->cliprect(), screen.machine().gfx[1],
-				((int)state->m_videoram[offs]) + ((state->m_colorram[offs] & (1 << 7) ? 256 : 0) ),
-				(state->m_colorram[offs] & 0x0f) + 0x10,
+		drawgfx_opaque(*m_tmpbitmap, m_tmpbitmap->cliprect(), screen.machine().gfx[1],
+				((int)m_videoram[offs]) + ((m_colorram[offs] & (1 << 7) ? 256 : 0) ),
+				(m_colorram[offs] & 0x0f) + 0x10,
 				flipx,flipy,
 				8*sx,8*sy);
 	}
@@ -146,26 +145,26 @@ SCREEN_UPDATE_IND16( megazone )
 		int scrollx;
 		int scrolly;
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 		{
-			scrollx = *state->m_scrolly;
-			scrolly = *state->m_scrollx;
+			scrollx = *m_scrolly;
+			scrolly = *m_scrollx;
 		}
 		else
 		{
-			scrollx = - *state->m_scrolly + 4 * 8; // leave space for credit&score overlay
-			scrolly = - *state->m_scrollx;
+			scrollx = - *m_scrolly + 4 * 8; // leave space for credit&score overlay
+			scrolly = - *m_scrollx;
 		}
 
 
-		copyscrollbitmap(bitmap, *state->m_tmpbitmap, 1, &scrollx, 1, &scrolly, cliprect);
+		copyscrollbitmap(bitmap, *m_tmpbitmap, 1, &scrollx, 1, &scrolly, cliprect);
 	}
 
 
 	/* Draw the sprites. */
 	{
-		UINT8 *spriteram = state->m_spriteram;
-		for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+		UINT8 *spriteram = m_spriteram;
+		for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 		{
 			int sx = spriteram[offs + 3];
 			int sy = 255 - ((spriteram[offs + 1] + 16) & 0xff);
@@ -173,7 +172,7 @@ SCREEN_UPDATE_IND16( megazone )
 			int flipx = ~spriteram[offs + 0] & 0x40;
 			int flipy =  spriteram[offs + 0] & 0x80;
 
-			if (state->m_flipscreen)
+			if (m_flipscreen)
 			{
 				sx = sx - 11;
 				sy = sy + 2;
@@ -200,10 +199,10 @@ SCREEN_UPDATE_IND16( megazone )
 			sx = x;
 			sy = y;
 
-			flipx = state->m_colorram2[offs] & (1 << 6);
-			flipy = state->m_colorram2[offs] & (1 << 5);
+			flipx = m_colorram2[offs] & (1 << 6);
+			flipy = m_colorram2[offs] & (1 << 5);
 
-			if (state->m_flipscreen)
+			if (m_flipscreen)
 			{
 				sx = 35 - sx;
 				sy = 31 - sy;
@@ -215,8 +214,8 @@ SCREEN_UPDATE_IND16( megazone )
 
 
 			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[1],
-					((int)state->m_videoram2[offs]) + ((state->m_colorram2[offs] & (1 << 7) ? 256 : 0) ),
-					(state->m_colorram2[offs] & 0x0f) + 0x10,
+					((int)m_videoram2[offs]) + ((m_colorram2[offs] & (1 << 7) ? 256 : 0) ),
+					(m_colorram2[offs] & 0x0f) + 0x10,
 					flipx,flipy,
 					8*sx,8*sy);
 			offs++;

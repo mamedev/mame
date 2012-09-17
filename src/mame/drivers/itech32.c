@@ -1686,7 +1686,7 @@ static MACHINE_CONFIG_START( timekill, itech32_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 508, 0, 384, 262, 0, 256)
-	MCFG_SCREEN_UPDATE_STATIC(itech32)
+	MCFG_SCREEN_UPDATE_DRIVER(itech32_state, screen_update_itech32)
 
 
 	/* sound hardware */

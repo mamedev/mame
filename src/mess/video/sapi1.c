@@ -89,9 +89,8 @@ VIDEO_START_MEMBER(sapi1_state,sapi1)
 	m_refresh_counter = 0;
 }
 
-SCREEN_UPDATE_IND16( sapi1 )
+UINT32 sapi1_state::screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sapi1_state *state = screen.machine().driver_data<sapi1_state>();
 	int x,y,j,b;
 	UINT16 addr;
 	int xpos;
@@ -102,7 +101,7 @@ SCREEN_UPDATE_IND16( sapi1 )
 		xpos = 0;
 		for(x = 0; x < 40; x++ )
 		{
-			UINT8 code = state->m_sapi_video_ram[addr + x];
+			UINT8 code = m_sapi_video_ram[addr + x];
 			UINT8 attr = (code >> 6) & 3;
 			code &= 0x3f;
 			for(j = 0; j < 9; j++ )
@@ -112,14 +111,14 @@ SCREEN_UPDATE_IND16( sapi1 )
 					UINT8 val;
 					if (j==8) {
 						if (attr==2) {
-							val = (state->m_refresh_counter & 0x20) ? 1 : 0;
+							val = (m_refresh_counter & 0x20) ? 1 : 0;
 						} else {
 							val = 0;
 						}
 					} else {
 						val = (MHB2501[code*8 + j] >> (5-b)) & 1;
 						if (attr==1) {
-							val = (state->m_refresh_counter & 0x20) ? val : 0;
+							val = (m_refresh_counter & 0x20) ? val : 0;
 						}
 					}
 					if(attr==3) {
@@ -134,7 +133,7 @@ SCREEN_UPDATE_IND16( sapi1 )
 			if (xpos>=6*40) break;
 		}
 	}
-	state->m_refresh_counter++;
+	m_refresh_counter++;
 	return 0;
 }
 
@@ -143,7 +142,7 @@ VIDEO_START_MEMBER(sapi1_state,sapizps3)
 {
 }
 
-SCREEN_UPDATE_IND16( sapizps3 )
+UINT32 sapi1_state::screen_update_sapizps3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

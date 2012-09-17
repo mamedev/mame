@@ -106,7 +106,7 @@ static MACHINE_CONFIG_START( vectrex, vectrex_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 299)
-	MCFG_SCREEN_UPDATE_STATIC(vectrex)
+	MCFG_SCREEN_UPDATE_DRIVER(vectrex_state, screen_update_vectrex)
 
 
 	/* sound hardware */

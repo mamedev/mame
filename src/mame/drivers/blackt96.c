@@ -131,6 +131,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg6_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg7_tile_info);
 	virtual void video_start();
+	UINT32 screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 #define GET_INFO( ram ) \
@@ -227,9 +228,8 @@ static void draw_strip(running_machine &machine, bitmap_ind16 &bitmap, const rec
 }
 
 
-static SCREEN_UPDATE_IND16( blackt96 )
+UINT32 blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	blackt96_state *state = screen.machine().driver_data<blackt96_state>();
 	int count;
 	int x,y;
 	gfx_element *gfx = screen.machine().gfx[2];
@@ -263,7 +263,7 @@ static SCREEN_UPDATE_IND16( blackt96 )
 	{
 		for (y=0;y<32;y++)
 		{
-			UINT16 tile = (state->m_tilemapram[count*2]&0x7ff)+0x800; // +0xc00 for korean text
+			UINT16 tile = (m_tilemapram[count*2]&0x7ff)+0x800; // +0xc00 for korean text
 			drawgfx_transpen(bitmap,cliprect,gfx,tile,0,0,0,x*8,-16+y*8,0);
 			count++;
 		}
@@ -621,7 +621,7 @@ static MACHINE_CONFIG_START( blackt96, blackt96_state )
 	MCFG_SCREEN_SIZE(256, 256)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 16*32-1, 0*8, 16*32-1)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 256-1, 0*8, 208-1)
-	MCFG_SCREEN_UPDATE_STATIC(blackt96)
+	MCFG_SCREEN_UPDATE_DRIVER(blackt96_state, screen_update_blackt96)
 
 	MCFG_PALETTE_LENGTH(0x800)
 

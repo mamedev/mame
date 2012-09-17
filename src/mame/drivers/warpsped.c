@@ -106,6 +106,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_warpspeed_starfield_tile_info);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_warpspeed(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 WRITE8_MEMBER(warpspeed_state::warpspeed_hardware_w)
@@ -208,13 +209,12 @@ static void warpspeed_draw_circles(bitmap_ind16 &bitmap, warpspeed_state *state)
 	}
 }
 
-static SCREEN_UPDATE_IND16( warpspeed )
+UINT32 warpspeed_state::screen_update_warpspeed(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	warpspeed_state *state = screen.machine().driver_data<warpspeed_state>();
 
-	state->m_starfield_tilemap->draw(bitmap, cliprect, 0, 0);
-	warpspeed_draw_circles(bitmap, state);
-	state->m_text_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_starfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	warpspeed_draw_circles(bitmap, this);
+	m_text_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -318,7 +318,7 @@ static MACHINE_CONFIG_START( warpspeed, warpspeed_state )
 	MCFG_SCREEN_SIZE((32)*8, (32)*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 32*8-1, 8*8, 32*8-1)
 
-	MCFG_SCREEN_UPDATE_STATIC(warpspeed)
+	MCFG_SCREEN_UPDATE_DRIVER(warpspeed_state, screen_update_warpspeed)
 
 	MCFG_GFXDECODE(warpspeed)
 	MCFG_PALETTE_LENGTH(2+8)

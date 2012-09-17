@@ -131,26 +131,23 @@ static void freekick_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	}
 }
 
-SCREEN_UPDATE_IND16( gigas )
+UINT32 freekick_state::screen_update_gigas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	freekick_state *state = screen.machine().driver_data<freekick_state>();
-	state->m_freek_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_freek_tilemap->draw(bitmap, cliprect, 0, 0);
 	gigas_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( pbillrd )
+UINT32 freekick_state::screen_update_pbillrd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	freekick_state *state = screen.machine().driver_data<freekick_state>();
-	state->m_freek_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_freek_tilemap->draw(bitmap, cliprect, 0, 0);
 	pbillrd_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( freekick )
+UINT32 freekick_state::screen_update_freekick(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	freekick_state *state = screen.machine().driver_data<freekick_state>();
-	state->m_freek_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_freek_tilemap->draw(bitmap, cliprect, 0, 0);
 	freekick_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

@@ -391,10 +391,9 @@ static void apple1_vh_cursor_blink (running_machine &machine)
 	}
 }
 
-SCREEN_UPDATE_IND16( apple1 )
+UINT32 apple1_state::screen_update_apple1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	apple1_state *state = screen.machine().driver_data<apple1_state>();
 	apple1_vh_cursor_blink(screen.machine());
-	terminal_draw(screen.machine(), bitmap, cliprect, state->m_terminal);
+	terminal_draw(screen.machine(), bitmap, cliprect, m_terminal);
 	return 0;
 }

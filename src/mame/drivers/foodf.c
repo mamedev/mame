@@ -371,7 +371,7 @@ static MACHINE_CONFIG_START( foodf, foodf_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 0, 256, 259, 0, 224)
-	MCFG_SCREEN_UPDATE_STATIC(foodf)
+	MCFG_SCREEN_UPDATE_DRIVER(foodf_state, screen_update_foodf)
 
 	MCFG_VIDEO_START_OVERRIDE(foodf_state,foodf)
 

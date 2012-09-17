@@ -71,6 +71,7 @@ public:
 	DECLARE_WRITE8_MEMBER(palette_write);
 	DECLARE_DRIVER_INIT(gpworld);
 	virtual void machine_start();
+	UINT32 screen_update_gpworld(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -223,7 +224,7 @@ static void gpworld_draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap,
 }
 
 
-static SCREEN_UPDATE_RGB32( gpworld )
+UINT32 gpworld_state::screen_update_gpworld(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -470,7 +471,7 @@ static MACHINE_CONFIG_START( gpworld, gpworld_state )
 
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
-	MCFG_LASERDISC_OVERLAY_STATIC(512, 256, gpworld)
+	MCFG_LASERDISC_OVERLAY_DRIVER(512, 256, gpworld_state, screen_update_gpworld)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")

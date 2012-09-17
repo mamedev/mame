@@ -1014,9 +1014,8 @@ VIDEO_START_MEMBER(wecleman_state,hotchase)
                             Video Updates
 ***************************************************************************/
 
-SCREEN_UPDATE_RGB32( wecleman )
+UINT32 wecleman_state::screen_update_wecleman(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	wecleman_state *state = screen.machine().driver_data<wecleman_state>();
 	const pen_t *mrct;
 	int video_on;
 	int fg_x, bg_x, fg_y, bg_y;
@@ -1025,29 +1024,29 @@ SCREEN_UPDATE_RGB32( wecleman )
 
 	mrct = screen.machine().pens;
 
-	video_on = state->m_irqctrl & 0x40;
+	video_on = m_irqctrl & 0x40;
 
-	set_led_status(screen.machine(), 0, state->m_selected_ip & 0x04);	// Start lamp
+	set_led_status(screen.machine(), 0, m_selected_ip & 0x04);	// Start lamp
 
-	fg_y = (state->m_txtram[0x0f24>>1] & (TILEMAP_DIMY - 1));
-	bg_y = (state->m_txtram[0x0f26>>1] & (TILEMAP_DIMY - 1));
+	fg_y = (m_txtram[0x0f24>>1] & (TILEMAP_DIMY - 1));
+	bg_y = (m_txtram[0x0f26>>1] & (TILEMAP_DIMY - 1));
 
-	cloud_sx = state->m_txtram[0xfee>>1] + 0xb0;
+	cloud_sx = m_txtram[0xfee>>1] + 0xb0;
 	cloud_sy = bg_y;
 
-	state->m_bg_tilemap->set_scrolly(0, bg_y -BMP_PAD);
-	state->m_fg_tilemap->set_scrolly(0, fg_y -BMP_PAD);
+	m_bg_tilemap->set_scrolly(0, bg_y -BMP_PAD);
+	m_fg_tilemap->set_scrolly(0, fg_y -BMP_PAD);
 
 	for (i=0; i<(28<<2); i+=4)
 	{
-		fg_x = state->m_txtram[(i+0xf80)>>1] + (0xb0 -BMP_PAD);
-		bg_x = state->m_txtram[(i+0xf82)>>1] + (0xb0 -BMP_PAD);
+		fg_x = m_txtram[(i+0xf80)>>1] + (0xb0 -BMP_PAD);
+		bg_x = m_txtram[(i+0xf82)>>1] + (0xb0 -BMP_PAD);
 
 		k = i<<1;
 		for (j=0; j<8; j++)
 		{
-			state->m_fg_tilemap->set_scrollx((fg_y + k + j) & (TILEMAP_DIMY - 1), fg_x);
-			state->m_bg_tilemap->set_scrollx((bg_y + k + j) & (TILEMAP_DIMY - 1), bg_x);
+			m_fg_tilemap->set_scrollx((fg_y + k + j) & (TILEMAP_DIMY - 1), fg_x);
+			m_bg_tilemap->set_scrollx((bg_y + k + j) & (TILEMAP_DIMY - 1), bg_x);
 		}
 	}
 
@@ -1057,16 +1056,16 @@ SCREEN_UPDATE_RGB32( wecleman )
 
 	get_sprite_info(screen.machine());
 
-	bitmap.fill(state->m_black_pen, cliprect);
+	bitmap.fill(m_black_pen, cliprect);
 
 	/* Draw the road (lines which have priority 0x02) */
 	if (video_on) wecleman_draw_road(screen.machine(), bitmap, cliprect, 0x02);
 
 	/* Draw the background */
-	if (video_on) state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (video_on) m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	// draws the cloud layer; needs work
-	if (state->m_cloud_visible)
+	if (m_cloud_visible)
 	{
 		/* palette hacks! */
 		((pen_t *)mrct)[0] = ((pen_t *)mrct)[0x40] = ((pen_t *)mrct)[0x200] = ((pen_t *)mrct)[0x205];
@@ -1075,23 +1074,23 @@ SCREEN_UPDATE_RGB32( wecleman )
 			draw_cloud(
 			bitmap,
 			screen.machine().gfx[0],
-			state->m_pageram+0x1800,
+			m_pageram+0x1800,
 			BMP_PAD, BMP_PAD,
 			41, 20,
 			cloud_sx, cloud_sy,
 			6, 5,
-			state->m_cloud_blend/BLEND_STEPS, 0);
+			m_cloud_blend/BLEND_STEPS, 0);
 
-		state->m_cloud_blend += state->m_cloud_ds;
+		m_cloud_blend += m_cloud_ds;
 
-		if (state->m_cloud_blend < BLEND_MIN)
-			{ state->m_cloud_blend = BLEND_MIN; state->m_cloud_ds = 0; *state->m_videostatus |= 1; }
-		else if (state->m_cloud_blend > BLEND_MAX)
-			{ state->m_cloud_blend = BLEND_MAX; state->m_cloud_ds = 0; state->m_cloud_visible = 0; }
+		if (m_cloud_blend < BLEND_MIN)
+			{ m_cloud_blend = BLEND_MIN; m_cloud_ds = 0; *m_videostatus |= 1; }
+		else if (m_cloud_blend > BLEND_MAX)
+			{ m_cloud_blend = BLEND_MAX; m_cloud_ds = 0; m_cloud_visible = 0; }
 	}
 
 	/* Draw the foreground */
-	if (video_on) state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (video_on) m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* Draw the road (lines which have priority 0x04) */
 	if (video_on) wecleman_draw_road(screen.machine(), bitmap,cliprect, 0x04);
@@ -1100,7 +1099,7 @@ SCREEN_UPDATE_RGB32( wecleman )
 	if (video_on) sprite_draw(screen.machine(), bitmap,cliprect);
 
 	/* Draw the text layer */
-	if (video_on) state->m_txt_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (video_on) m_txt_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -1108,20 +1107,19 @@ SCREEN_UPDATE_RGB32( wecleman )
                                 Hot Chase
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( hotchase )
+UINT32 wecleman_state::screen_update_hotchase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	wecleman_state *state = screen.machine().driver_data<wecleman_state>();
 	device_t *k051316_1 = screen.machine().device("k051316_1");
 	device_t *k051316_2 = screen.machine().device("k051316_2");
 	int video_on;
 
-	video_on = state->m_irqctrl & 0x40;
+	video_on = m_irqctrl & 0x40;
 
-	set_led_status(screen.machine(), 0, state->m_selected_ip & 0x04);	// Start lamp
+	set_led_status(screen.machine(), 0, m_selected_ip & 0x04);	// Start lamp
 
 	get_sprite_info(screen.machine());
 
-	bitmap.fill(state->m_black_pen, cliprect);
+	bitmap.fill(m_black_pen, cliprect);
 
 	/* Draw the background */
 	if (video_on)

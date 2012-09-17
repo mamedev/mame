@@ -1073,10 +1073,9 @@ VIDEO_START_MEMBER(amstrad_state,amstrad)
 }
 
 
-SCREEN_UPDATE_IND16( amstrad )
+UINT32 amstrad_state::screen_update_amstrad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	amstrad_state *state = screen.machine().driver_data<amstrad_state>();
-	copybitmap( bitmap, *state->m_gate_array.bitmap, 0, 0, 0, 0, cliprect );
+	copybitmap( bitmap, *m_gate_array.bitmap, 0, 0, 0, 0, cliprect );
 	return 0;
 }
 
@@ -2418,10 +2417,10 @@ static void kccomp_reset_machine(running_machine &machine)
 }
 
 
-SCREEN_VBLANK( amstrad )
+void amstrad_state::screen_eof_amstrad(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
 		cpc_multiface2_device* mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(screen.machine(),"multiface2"));
 

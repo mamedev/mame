@@ -299,6 +299,7 @@ public:
 	DECLARE_DRIVER_INIT(bfcobra);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_bfcobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -366,9 +367,8 @@ void bfcobra_state::video_start()
 	}
 }
 
-static SCREEN_UPDATE_RGB32( bfcobra )
+UINT32 bfcobra_state::screen_update_bfcobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bfcobra_state *state = screen.machine().driver_data<bfcobra_state>();
 	int x, y;
 	UINT8  *src;
 	UINT32 *dest;
@@ -378,39 +378,39 @@ static SCREEN_UPDATE_RGB32( bfcobra )
 
 	/* Select screen has to be programmed into two registers */
 	/* No idea what happens if the registers are different */
-	if (state->m_flip_8 & 0x40 && state->m_flip_22 & 0x40)
+	if (m_flip_8 & 0x40 && m_flip_22 & 0x40)
 		offset = 0x10000;
 	else
 		offset = 0;
 
-	if(state->m_videomode & 0x20)
+	if(m_videomode & 0x20)
 	{
-		hirescol = state->m_col3bit;
-		lorescol = state->m_col7bit;
+		hirescol = m_col3bit;
+		lorescol = m_col7bit;
 	}
-	else if(state->m_videomode & 0x40)
+	else if(m_videomode & 0x40)
 	{
-		hirescol = state->m_col4bit;
-		lorescol = state->m_col6bit;
+		hirescol = m_col4bit;
+		lorescol = m_col6bit;
 	}
 	else
 	{
-		hirescol = state->m_col4bit;
-		lorescol = state->m_col8bit;
+		hirescol = m_col4bit;
+		lorescol = m_col8bit;
 	}
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT16 y_offset = (y + state->m_v_scroll) * 256;
-		src = &state->m_video_ram[offset + y_offset];
+		UINT16 y_offset = (y + m_v_scroll) * 256;
+		src = &m_video_ram[offset + y_offset];
 		dest = &bitmap.pix32(y);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x / 2; ++x)
 		{
-			UINT8 x_offset = x + state->m_h_scroll;
+			UINT8 x_offset = x + m_h_scroll;
 			UINT8 pen = *(src + x_offset);
 
-			if ( ( state->m_videomode & 0x81 ) == 1 || (state->m_videomode & 0x80 && pen & 0x80) )
+			if ( ( m_videomode & 0x81 ) == 1 || (m_videomode & 0x80 && pen & 0x80) )
 			{
 				*dest++ = screen.machine().pens[hirescol[pen & 0x0f]];
 				*dest++ = screen.machine().pens[hirescol[(pen >> 4) & 0x0f]];
@@ -1794,7 +1794,7 @@ static MACHINE_CONFIG_START( bfcobra, bfcobra_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 - 1, 0, 256 - 1)
-	MCFG_SCREEN_UPDATE_STATIC(bfcobra)
+	MCFG_SCREEN_UPDATE_DRIVER(bfcobra_state, screen_update_bfcobra)
 
 	MCFG_PALETTE_LENGTH(256)
 

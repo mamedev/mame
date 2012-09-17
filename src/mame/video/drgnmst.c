@@ -132,65 +132,64 @@ void drgnmst_state::video_start()
 	m_md_tilemap->set_scroll_rows(1024);
 }
 
-SCREEN_UPDATE_IND16(drgnmst)
+UINT32 drgnmst_state::screen_update_drgnmst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	drgnmst_state *state = screen.machine().driver_data<drgnmst_state>();
 	int y, rowscroll_bank;
 
-	state->m_bg_tilemap->set_scrollx(0, state->m_vidregs[10] - 18); // verify
-	state->m_bg_tilemap->set_scrolly(0, state->m_vidregs[11]); // verify
+	m_bg_tilemap->set_scrollx(0, m_vidregs[10] - 18); // verify
+	m_bg_tilemap->set_scrolly(0, m_vidregs[11]); // verify
 
-//  state->m_md_tilemap->set_scrollx(0, state->m_vidregs[8] - 16); // rowscrolled
-	state->m_md_tilemap->set_scrolly(0, state->m_vidregs[9]); // verify
+//  m_md_tilemap->set_scrollx(0, m_vidregs[8] - 16); // rowscrolled
+	m_md_tilemap->set_scrolly(0, m_vidregs[9]); // verify
 
-	state->m_fg_tilemap->set_scrollx(0, state->m_vidregs[6] - 18); // verify (test mode colour test needs it)
-	state->m_fg_tilemap->set_scrolly(0, state->m_vidregs[7]); // verify
+	m_fg_tilemap->set_scrollx(0, m_vidregs[6] - 18); // verify (test mode colour test needs it)
+	m_fg_tilemap->set_scrolly(0, m_vidregs[7]); // verify
 
-	rowscroll_bank = (state->m_vidregs[4] & 0x30) >> 4;
+	rowscroll_bank = (m_vidregs[4] & 0x30) >> 4;
 
 	for (y = 0; y < 1024; y++)
-		state->m_md_tilemap->set_scrollx(y, state->m_vidregs[8] - 16 + state->m_rowscrollram[y + 0x800 * rowscroll_bank]);
+		m_md_tilemap->set_scrollx(y, m_vidregs[8] - 16 + m_rowscrollram[y + 0x800 * rowscroll_bank]);
 
 	// todo: figure out which bits relate to the order
-	switch (state->m_vidregs2[0])
+	switch (m_vidregs2[0])
 	{
 		case 0x2451: // fg unsure
 		case 0x2d9a: // fg unsure
 		case 0x2440: // all ok
 		case 0x245a: // fg unsure, title screen
-			state->m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-			state->m_md_tilemap->draw(bitmap, cliprect, 0, 0);
-			state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+			m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			m_md_tilemap->draw(bitmap, cliprect, 0, 0);
+			m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 			break;
 		case 0x23c0: // all ok
-			state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-			state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-			state->m_md_tilemap->draw(bitmap, cliprect, 0, 0);
+			m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+			m_md_tilemap->draw(bitmap, cliprect, 0, 0);
 			break;
 		case 0x38da: // fg unsure
 		case 0x215a: // fg unsure
 		case 0x2140: // all ok
-			state->m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-			state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-			state->m_md_tilemap->draw(bitmap, cliprect, 0, 0);
+			m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+			m_md_tilemap->draw(bitmap, cliprect, 0, 0);
 			break;
 		case 0x2d80: // all ok
-			state->m_md_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-			state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-			state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+			m_md_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+			m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 			break;
 		default:
-			state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-			state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-			state->m_md_tilemap->draw(bitmap, cliprect, 0, 0);
-			logerror ("unknown video priority regs %04x\n", state->m_vidregs2[0]);
+			m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+			m_md_tilemap->draw(bitmap, cliprect, 0, 0);
+			logerror ("unknown video priority regs %04x\n", m_vidregs2[0]);
 
 	}
 
 	draw_sprites(screen.machine(),bitmap,cliprect);
 
-//  popmessage ("x %04x x %04x x %04x x %04x x %04x", state->m_vidregs2[0], state->m_vidregs[12], state->m_vidregs[13], state->m_vidregs[14], state->m_vidregs[15]);
-//  popmessage ("x %04x x %04x y %04x y %04x z %04x z %04x",state->m_vidregs[0],state->m_vidregs[1],state->m_vidregs[2],state->m_vidregs[3],state->m_vidregs[4],state->m_vidregs[5]);
+//  popmessage ("x %04x x %04x x %04x x %04x x %04x", m_vidregs2[0], m_vidregs[12], m_vidregs[13], m_vidregs[14], m_vidregs[15]);
+//  popmessage ("x %04x x %04x y %04x y %04x z %04x z %04x",m_vidregs[0],m_vidregs[1],m_vidregs[2],m_vidregs[3],m_vidregs[4],m_vidregs[5]);
 
 	return 0;
 }

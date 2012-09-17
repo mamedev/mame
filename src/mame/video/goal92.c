@@ -143,48 +143,46 @@ void goal92_state::video_start()
 	m_tx_layer->set_transparent_pen(15);
 }
 
-SCREEN_UPDATE_IND16( goal92 )
+UINT32 goal92_state::screen_update_goal92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	goal92_state *state = screen.machine().driver_data<goal92_state>();
-	state->m_bg_layer->set_scrollx(0, state->m_scrollram[0] + 60);
-	state->m_bg_layer->set_scrolly(0, state->m_scrollram[1] + 8);
+	m_bg_layer->set_scrollx(0, m_scrollram[0] + 60);
+	m_bg_layer->set_scrolly(0, m_scrollram[1] + 8);
 
-	if (state->m_fg_bank & 0xff)
+	if (m_fg_bank & 0xff)
 	{
-		state->m_fg_layer->set_scrollx(0, state->m_scrollram[0] + 60);
-		state->m_fg_layer->set_scrolly(0, state->m_scrollram[1] + 8);
+		m_fg_layer->set_scrollx(0, m_scrollram[0] + 60);
+		m_fg_layer->set_scrolly(0, m_scrollram[1] + 8);
 	}
 	else
 	{
-		state->m_fg_layer->set_scrollx(0, state->m_scrollram[2] + 60);
-		state->m_fg_layer->set_scrolly(0, state->m_scrollram[3] + 8);
+		m_fg_layer->set_scrollx(0, m_scrollram[2] + 60);
+		m_fg_layer->set_scrolly(0, m_scrollram[3] + 8);
 	}
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	state->m_bg_layer->draw(bitmap, cliprect, 0, 0);
+	m_bg_layer->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 2);
 
-	if (!(state->m_fg_bank & 0xff))
+	if (!(m_fg_bank & 0xff))
 		draw_sprites(screen.machine(), bitmap, cliprect, 1);
 
-	state->m_fg_layer->draw(bitmap, cliprect, 0, 0);
+	m_fg_layer->draw(bitmap, cliprect, 0, 0);
 
-	if(state->m_fg_bank & 0xff)
+	if(m_fg_bank & 0xff)
 		draw_sprites(screen.machine(), bitmap, cliprect, 1);
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 3);
-	state->m_tx_layer->draw(bitmap, cliprect, 0, 0);
+	m_tx_layer->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-SCREEN_VBLANK( goal92 )
+void goal92_state::screen_eof_goal92(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		goal92_state *state = screen.machine().driver_data<goal92_state>();
-		memcpy(state->m_buffered_spriteram, state->m_spriteram, 0x400 * 2);
+		memcpy(m_buffered_spriteram, m_spriteram, 0x400 * 2);
 	}
 }

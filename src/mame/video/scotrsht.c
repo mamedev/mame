@@ -133,15 +133,14 @@ void scotrsht_state::video_start()
 	m_bg_tilemap->set_scroll_cols(64);
 }
 
-SCREEN_UPDATE_IND16( scotrsht )
+UINT32 scotrsht_state::screen_update_scotrsht(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	scotrsht_state *state = screen.machine().driver_data<scotrsht_state>();
 	int col;
 
 	for (col = 0; col < 32; col++)
-		state->m_bg_tilemap->set_scrolly(col, state->m_scroll[col]);
+		m_bg_tilemap->set_scrolly(col, m_scroll[col]);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

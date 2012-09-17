@@ -792,12 +792,11 @@ static void draw_background_full_scroll(running_machine &machine, bitmap_ind16 &
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( segag80r )
+UINT32 segag80r_state::screen_update_segag80r(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	segag80r_state *state = screen.machine().driver_data<segag80r_state>();
 	UINT8 transparent_pens[16];
 
-	switch (state->m_background_pcb)
+	switch (m_background_pcb)
 	{
 		/* foreground: opaque */
 		/* background: none */

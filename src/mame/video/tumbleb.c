@@ -322,20 +322,19 @@ void tumbleb_draw_common(running_machine &machine, bitmap_ind16 &bitmap, const r
 	machine.device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram.bytes()/2);
 }
 
-SCREEN_UPDATE_IND16( tumblepb )
+UINT32 tumbleb_state::screen_update_tumblepb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
 
-	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_flipscreen = m_control_0[0] & 0x80;
+	screen.machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	if (state->m_flipscreen)
+	if (m_flipscreen)
 		offs = 1;
 	else
 		offs = -1;
 
-	if (state->m_flipscreen)
+	if (m_flipscreen)
 		offs2 = -3;
 	else
 		offs2 = -5;
@@ -345,20 +344,19 @@ SCREEN_UPDATE_IND16( tumblepb )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( jumpkids )
+UINT32 tumbleb_state::screen_update_jumpkids(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
 
-	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_flipscreen = m_control_0[0] & 0x80;
+	screen.machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	if (state->m_flipscreen)
+	if (m_flipscreen)
 		offs = 1;
 	else
 		offs = -1;
 
-	if (state->m_flipscreen)
+	if (m_flipscreen)
 		offs2 = -3;
 	else
 		offs2 = -5;
@@ -367,20 +365,19 @@ SCREEN_UPDATE_IND16( jumpkids )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( semicom )
+UINT32 tumbleb_state::screen_update_semicom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
 
-	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_flipscreen = m_control_0[0] & 0x80;
+	screen.machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	if (state->m_flipscreen)
+	if (m_flipscreen)
 		offs = 1;
 	else
 		offs = -1;
 
-	if (state->m_flipscreen)
+	if (m_flipscreen)
 		offs2 = -3;
 	else
 		offs2 = -5;
@@ -389,12 +386,11 @@ SCREEN_UPDATE_IND16( semicom )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( semicom_altoffsets )
+UINT32 tumbleb_state::screen_update_semicom_altoffsets(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offsx, offsy, offsx2;
 
-	state->m_flipscreen = state->m_control_0[0] & 0x80;
+	m_flipscreen = m_control_0[0] & 0x80;
 
 	offsx = -1;
 	offsy = 2;
@@ -405,22 +401,21 @@ SCREEN_UPDATE_IND16( semicom_altoffsets )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( bcstory )
+UINT32 tumbleb_state::screen_update_bcstory(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
 
-	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_flipscreen = m_control_0[0] & 0x80;
+	screen.machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* not sure of this */
-	if (state->m_flipscreen)
+	if (m_flipscreen)
 		offs = 1;
 	else
 		offs = 8;
 
 	/* not sure of this */
-	if (state->m_flipscreen)
+	if (m_flipscreen)
 		offs2 = -3;
 	else
 		offs2 = 8;
@@ -429,13 +424,12 @@ SCREEN_UPDATE_IND16( bcstory )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( semibase )
+UINT32 tumbleb_state::screen_update_semibase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
 
-	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_flipscreen = m_control_0[0] & 0x80;
+	screen.machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	offs = -1;
 	offs2 = -2;
 
@@ -444,36 +438,34 @@ SCREEN_UPDATE_IND16( semibase )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( sdfight )
+UINT32 tumbleb_state::screen_update_sdfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
 
-	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_flipscreen = m_control_0[0] & 0x80;
+	screen.machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	offs = -1;
 	offs2 = -5; // foreground scroll..
 
 	tumbleb_draw_common(screen.machine(),bitmap,cliprect, offs2, -16, offs, 0);
 
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram.bytes()/2);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( fncywld )
+UINT32 tumbleb_state::screen_update_fncywld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
 
-	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_flipscreen = m_control_0[0] & 0x80;
+	screen.machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	if (state->m_flipscreen)
+	if (m_flipscreen)
 		offs = 1;
 	else
 		offs = -1;
 
-	if (state->m_flipscreen)
+	if (m_flipscreen)
 		offs2 = -3;
 	else
 		offs2 = -5;
@@ -483,20 +475,19 @@ SCREEN_UPDATE_IND16( fncywld )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( pangpang )
+UINT32 tumbleb_state::screen_update_pangpang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
 
-	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_flipscreen = m_control_0[0] & 0x80;
+	screen.machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	if (state->m_flipscreen)
+	if (m_flipscreen)
 		offs = 1;
 	else
 		offs = -1;
 
-	if (state->m_flipscreen)
+	if (m_flipscreen)
 		offs2 = -3;
 	else
 		offs2 = -5;
@@ -507,19 +498,18 @@ SCREEN_UPDATE_IND16( pangpang )
 
 
 
-SCREEN_UPDATE_IND16( suprtrio )
+UINT32 tumbleb_state::screen_update_suprtrio(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 
-	state->m_pf1_alt_tilemap->set_scrollx(0, -state->m_control[1] - 6);
-	state->m_pf1_alt_tilemap->set_scrolly(0, -state->m_control[2]);
-	state->m_pf2_tilemap->set_scrollx(0, -state->m_control[3] - 2);
-	state->m_pf2_tilemap->set_scrolly(0, -state->m_control[4]);
+	m_pf1_alt_tilemap->set_scrollx(0, -m_control[1] - 6);
+	m_pf1_alt_tilemap->set_scrolly(0, -m_control[2]);
+	m_pf2_tilemap->set_scrollx(0, -m_control[3] - 2);
+	m_pf2_tilemap->set_scrolly(0, -m_control[4]);
 
-	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram.bytes()/2);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2);
 	return 0;
 }
 

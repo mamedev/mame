@@ -1465,10 +1465,9 @@ VIDEO_START_MEMBER(model1_state,model1)
 	state_save_register_global_array(machine(), m_listctl);
 }
 
-SCREEN_UPDATE_RGB32(model1)
+UINT32 model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	model1_state *state = screen.machine().driver_data<model1_state>();
-	struct view *view = state->m_view;
+	struct view *view = m_view;
 #if 0
 	{
 		int mod = 0;
@@ -1534,10 +1533,10 @@ SCREEN_UPDATE_RGB32(model1)
 	return 0;
 }
 
-SCREEN_VBLANK(model1)
+void model1_state::screen_eof_model1(screen_device &screen, bool state)
 {
 	// on rising edge
-	if (vblank_on)
+	if (state)
 	{
 		tgp_scan(screen.machine());
 		end_frame(screen.machine());

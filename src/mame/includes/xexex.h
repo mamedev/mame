@@ -64,6 +64,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_xexex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -73,4 +74,4 @@ extern void xexex_sprite_callback(running_machine &machine, int *code, int *colo
 extern void xexex_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
 
 
-SCREEN_UPDATE_RGB32( xexex );
+

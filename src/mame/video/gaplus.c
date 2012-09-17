@@ -303,47 +303,45 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-SCREEN_UPDATE_IND16( gaplus )
+UINT32 gaplus_state::screen_update_gaplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gaplus_state *state = screen.machine().driver_data<gaplus_state>();
 	/* flip screen control is embedded in RAM */
-	state->flip_screen_set(state->m_spriteram[0x1f7f-0x800] & 1);
+	flip_screen_set(m_spriteram[0x1f7f-0x800] & 1);
 
 	bitmap.fill(0, cliprect);
 
 	starfield_render(screen.machine(), bitmap);
 
 	/* draw the low priority characters */
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	/* draw the high priority characters */
 	/* (I don't know if this feature is used by Gaplus, but it's shown in the schematics) */
-	state->m_bg_tilemap->draw(bitmap, cliprect, 1,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 1,0);
 	return 0;
 }
 
 
-SCREEN_VBLANK( gaplus )	/* update starfields */
+void gaplus_state::screen_eof_gaplus(screen_device &screen, bool state)/* update starfields */
 {
 	// falling edge
-	if (!vblank_on)
+	if (!state)
 	{
-		gaplus_state *state = screen.machine().driver_data<gaplus_state>();
-		struct star *stars = state->m_stars;
+		struct star *stars = m_stars;
 		int i;
 
 		int width = screen.machine().primary_screen->width();
 		int height = screen.machine().primary_screen->height();
 
 		/* check if we're running */
-		if ( ( state->m_starfield_control[0] & 1 ) == 0 )
+		if ( ( m_starfield_control[0] & 1 ) == 0 )
 			return;
 
 		/* update the starfields */
-		for ( i = 0; i < state->m_total_stars; i++ ) {
-			switch( state->m_starfield_control[stars[i].set + 1] ) {
+		for ( i = 0; i < m_total_stars; i++ ) {
+			switch( m_starfield_control[stars[i].set + 1] ) {
 				case 0x87:
 					/* stand still */
 				break;

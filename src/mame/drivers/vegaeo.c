@@ -41,6 +41,7 @@ public:
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 	DECLARE_DRIVER_INIT(vegaeo);
 	DECLARE_VIDEO_START(vega);
+	UINT32 screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 READ8_MEMBER( vegaeo_state::qs1000_p1_r )
@@ -194,9 +195,8 @@ VIDEO_START_MEMBER(vegaeo_state,vega)
 	m_vega_vram = auto_alloc_array(machine(), UINT32, 0x14000*2/4);
 }
 
-static SCREEN_UPDATE_IND16( vega )
+UINT32 vegaeo_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	vegaeo_state *state = screen.machine().driver_data<vegaeo_state>();
 	int x,y,count;
 	int color;
 
@@ -205,16 +205,16 @@ static SCREEN_UPDATE_IND16( vega )
 	{
 		for (x=0;x < 320/4;x++)
 		{
-			color = state->m_vega_vram[count + (0x14000/4) * (state->m_vega_vbuffer ^ 1)] & 0xff;
+			color = m_vega_vram[count + (0x14000/4) * (m_vega_vbuffer ^ 1)] & 0xff;
 			bitmap.pix16(y, x*4 + 3) = color;
 
-			color = (state->m_vega_vram[count + (0x14000/4) * (state->m_vega_vbuffer ^ 1)] & 0xff00) >> 8;
+			color = (m_vega_vram[count + (0x14000/4) * (m_vega_vbuffer ^ 1)] & 0xff00) >> 8;
 			bitmap.pix16(y, x*4 + 2) = color;
 
-			color = (state->m_vega_vram[count + (0x14000/4) * (state->m_vega_vbuffer ^ 1)] & 0xff0000) >> 16;
+			color = (m_vega_vram[count + (0x14000/4) * (m_vega_vbuffer ^ 1)] & 0xff0000) >> 16;
 			bitmap.pix16(y, x*4 + 1) = color;
 
-			color = (state->m_vega_vram[count + (0x14000/4) * (state->m_vega_vbuffer ^ 1)] & 0xff000000) >> 24;
+			color = (m_vega_vram[count + (0x14000/4) * (m_vega_vbuffer ^ 1)] & 0xff000000) >> 24;
 			bitmap.pix16(y, x*4 + 0) = color;
 
 			count++;
@@ -261,7 +261,7 @@ static MACHINE_CONFIG_START( vega, vegaeo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(vega)
+	MCFG_SCREEN_UPDATE_DRIVER(vegaeo_state, screen_update_vega)
 
 	MCFG_PALETTE_LENGTH(256)
 

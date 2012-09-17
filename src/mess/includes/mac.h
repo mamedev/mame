@@ -162,15 +162,15 @@ NVRAM_HANDLER( mac );
 
 
 
-SCREEN_UPDATE_IND16( mac );
-SCREEN_UPDATE_IND16( macse30 );
-SCREEN_UPDATE_IND16( macprtb );
-SCREEN_UPDATE_IND16( macpb140 );
-SCREEN_UPDATE_IND16( macpb160 );
-SCREEN_UPDATE_RGB32( macrbv );
-SCREEN_UPDATE_RGB32( macrbvvram );
-SCREEN_UPDATE_RGB32( macdafb );
-SCREEN_UPDATE_RGB32( macpbwd );
+
+
+
+
+
+
+
+
+
 
 
 
@@ -513,6 +513,15 @@ public:
 	DECLARE_VIDEO_RESET(macsonora);
 	DECLARE_VIDEO_RESET(maceagle);
 	DECLARE_VIDEO_START(macrbv);
+	UINT32 screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_macprtb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_macse30(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_macpb140(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_macpb160(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_macrbv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_macdafb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_macrbvvram(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_macpbwd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 #endif /* MAC_H_ */

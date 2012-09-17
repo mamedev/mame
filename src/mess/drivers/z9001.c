@@ -64,6 +64,7 @@ public:
 	virtual void machine_reset();
 	//virtual void machine_start();
 	virtual void video_start();
+	UINT32 screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 static ADDRESS_MAP_START(z9001_mem, AS_PROGRAM, 8, z9001_state)
@@ -158,12 +159,11 @@ void z9001_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-static SCREEN_UPDATE_IND16( z9001 )
+UINT32 z9001_state::screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	z9001_state *state = screen.machine().driver_data<z9001_state>();
 	UINT8 y,ra,chr,gfx,col,fg,bg;
 	UINT16 sy=0,ma=0,x;
-	state->m_framecnt++;
+	m_framecnt++;
 
 	for(y = 0; y < 24; y++ )
 	{
@@ -173,14 +173,14 @@ static SCREEN_UPDATE_IND16( z9001 )
 
 			for (x = ma; x < ma + 40; x++)
 			{
-				chr = state->m_p_videoram[x]; // get char in videoram
-				gfx = state->m_p_chargen[(chr<<3) | ra]; // get dot pattern in chargen
-				col = state->m_p_colorram[x];
+				chr = m_p_videoram[x]; // get char in videoram
+				gfx = m_p_chargen[(chr<<3) | ra]; // get dot pattern in chargen
+				col = m_p_colorram[x];
 				fg = col>>4;
 				bg = col&15;
 
 				/* Check for flashing - swap bg & fg */
-				if ((BIT(col, 7)) && (state->m_framecnt & 0x10))
+				if ((BIT(col, 7)) && (m_framecnt & 0x10))
 				{
 					bg = fg;
 					fg = col&15;
@@ -244,7 +244,7 @@ static MACHINE_CONFIG_START( z9001, z9001_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(40*8, 24*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 24*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(z9001)
+	MCFG_SCREEN_UPDATE_DRIVER(z9001_state, screen_update_z9001)
 	MCFG_GFXDECODE(z9001)
 	MCFG_PALETTE_LENGTH(16)
 

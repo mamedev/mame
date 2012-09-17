@@ -55,6 +55,8 @@ public:
 	DECLARE_DRIVER_INIT(nprsp);
 	virtual void video_start();
 	DECLARE_MACHINE_RESET(nprsp);
+	UINT32 screen_update_neoprint(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_nprsp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -109,7 +111,7 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rect
 	}
 }
 
-SCREEN_UPDATE_IND16(neoprint)
+UINT32 neoprint_state::screen_update_neoprint(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -119,7 +121,7 @@ SCREEN_UPDATE_IND16(neoprint)
 	return 0;
 }
 
-SCREEN_UPDATE_IND16(nprsp)
+UINT32 neoprint_state::screen_update_nprsp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -479,7 +481,7 @@ static MACHINE_CONFIG_START( neoprint, neoprint_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(neoprint)
+	MCFG_SCREEN_UPDATE_DRIVER(neoprint_state, screen_update_neoprint)
 
 	MCFG_PALETTE_LENGTH(0x10000)
 
@@ -519,7 +521,7 @@ static MACHINE_CONFIG_START( nprsp, neoprint_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(nprsp)
+	MCFG_SCREEN_UPDATE_DRIVER(neoprint_state, screen_update_nprsp)
 
 	MCFG_MACHINE_RESET_OVERRIDE(neoprint_state,nprsp)
 

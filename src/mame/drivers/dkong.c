@@ -1661,7 +1661,7 @@ static MACHINE_CONFIG_START( dkong_base, dkong_state )
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-    MCFG_SCREEN_UPDATE_STATIC(dkong)
+	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_dkong)
 
     MCFG_GFXDECODE(dkong)
     MCFG_PALETTE_LENGTH(DK2B_PALETTE_LENGTH)
@@ -1724,7 +1724,7 @@ static MACHINE_CONFIG_START( dkong3, dkong_state )
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-    MCFG_SCREEN_UPDATE_STATIC(dkong)
+	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_dkong)
 
     MCFG_GFXDECODE(dkong)
     MCFG_PALETTE_LENGTH(DK3_PALETTE_LENGTH)
@@ -1752,7 +1752,7 @@ static MACHINE_CONFIG_DERIVED( pestplce, dkongjr )
     MCFG_PALETTE_LENGTH(DK2B_PALETTE_LENGTH)
     MCFG_PALETTE_INIT_OVERRIDE(dkong_state,dkong2b)  /* wrong! */
 	MCFG_SCREEN_MODIFY("screen")
-    MCFG_SCREEN_UPDATE_STATIC(pestplce)
+	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_pestplce)
 
 MACHINE_CONFIG_END
 
@@ -1790,7 +1790,7 @@ static MACHINE_CONFIG_DERIVED( spclforc, s2650 )
 
     /* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-    MCFG_SCREEN_UPDATE_STATIC(spclforc)
+	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_spclforc)
 
 MACHINE_CONFIG_END
 

@@ -144,6 +144,7 @@ public:
 	DECLARE_MACHINE_START(multigm3);
 	DECLARE_MACHINE_RESET(multigm3);
 	DECLARE_MACHINE_START(supergm3);
+	UINT32 screen_update_multigam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -1114,7 +1115,7 @@ void multigam_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( multigam )
+UINT32 multigam_state::screen_update_multigam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* render the ppu */
 	ppu2c0x_device *ppu = screen.machine().device<ppu2c0x_device>("ppu");
@@ -1203,7 +1204,7 @@ static MACHINE_CONFIG_START( multigam, multigam_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(multigam)
+	MCFG_SCREEN_UPDATE_DRIVER(multigam_state, screen_update_multigam)
 
 	MCFG_GFXDECODE(multigam)
 	MCFG_PALETTE_LENGTH(8*4*16)

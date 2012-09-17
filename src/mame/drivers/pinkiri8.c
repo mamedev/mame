@@ -76,6 +76,7 @@ public:
 	DECLARE_READ8_MEMBER(ronjan_patched_prot_r);
 	DECLARE_DRIVER_INIT(ronjan);
 	virtual void video_start();
+	UINT32 screen_update_pinkiri8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -201,16 +202,15 @@ ronjan
 
 */
 
-static SCREEN_UPDATE_IND16( pinkiri8 )
+UINT32 pinkiri8_state::screen_update_pinkiri8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pinkiri8_state *state = screen.machine().driver_data<pinkiri8_state>();
 	int col_bank;
 	gfx_element *gfx = screen.machine().gfx[0];
 
 	/* update palette */
 	for (int pen = 0; pen < 0x800 ; pen++)
 	{
-		UINT16 val = (state->m_janshi_paletteram[pen]) | (state->m_janshi_paletteram2[pen]<<8);
+		UINT16 val = (m_janshi_paletteram[pen]) | (m_janshi_paletteram2[pen]<<8);
 		int r = (val & 0x001f) >> 0;
 		int g = (val & 0x03e0) >> 5;
 		int b = (val & 0x7c00) >> 10;
@@ -230,7 +230,7 @@ static SCREEN_UPDATE_IND16( pinkiri8 )
 		for (i=0x00;i<0x40;i+=2)
 		{
 
-			printf("%02x, ", state->m_janshi_widthflags[i+1]);
+			printf("%02x, ", m_janshi_widthflags[i+1]);
 
 			count2++;
 
@@ -248,8 +248,8 @@ static SCREEN_UPDATE_IND16( pinkiri8 )
 
 
 
-	//popmessage("%02x",state->m_janshi_crtc_regs[0x0a]);
-	col_bank = (state->m_janshi_crtc_regs[0x0a] & 0x40) >> 6;
+	//popmessage("%02x",m_janshi_crtc_regs[0x0a]);
+	col_bank = (m_janshi_crtc_regs[0x0a] & 0x40) >> 6;
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
@@ -263,8 +263,8 @@ static SCREEN_UPDATE_IND16( pinkiri8 )
 		{
 			for(x=0;x<32;x++)
 			{
-				tile = state->m_janshi_back_vram[count+1]<<8 | state->m_janshi_back_vram[count+0];
-				attr = state->m_janshi_back_vram[count+2] ^ 0xf0;
+				tile = m_janshi_back_vram[count+1]<<8 | m_janshi_back_vram[count+0];
+				attr = m_janshi_back_vram[count+2] ^ 0xf0;
 				col = (attr >> 4) | 0x10;
 
 				drawgfx_transpen(bitmap,cliprect,gfx,tile,col,0,0,x*16,y*8,0);
@@ -300,15 +300,15 @@ static SCREEN_UPDATE_IND16( pinkiri8 )
 
           */
 
-			spr_offs = ((state->m_janshi_vram1[(i*4)+0] & 0xff) | (state->m_janshi_vram1[(i*4)+1]<<8)) & 0xffff;
-			col = (state->m_janshi_vram1[(i*4)+2] & 0xf8) >> 3;
-			x =   state->m_janshi_vram1[(i*4)+3];
+			spr_offs = ((m_janshi_vram1[(i*4)+0] & 0xff) | (m_janshi_vram1[(i*4)+1]<<8)) & 0xffff;
+			col = (m_janshi_vram1[(i*4)+2] & 0xf8) >> 3;
+			x =   m_janshi_vram1[(i*4)+3];
 
 			x &= 0xff;
 			x *= 2;
 
-//          unk2 = state->m_janshi_vram2[(i*2)+1];
-			y = (state->m_janshi_vram2[(i*2)+0]);
+//          unk2 = m_janshi_vram2[(i*2)+1];
+			y = (m_janshi_vram2[(i*2)+0]);
 
 			y = 0x100-y;
 
@@ -321,7 +321,7 @@ static SCREEN_UPDATE_IND16( pinkiri8 )
 
 
 			// these bits seem to somehow determine the sprite height / widths for the sprite ram region?
-			int bit = state->m_janshi_widthflags[(i/0x20)*2 + 1];
+			int bit = m_janshi_widthflags[(i/0x20)*2 + 1];
 
 			if (bit)
 			{
@@ -1139,7 +1139,7 @@ static MACHINE_CONFIG_START( pinkiri8, pinkiri8_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 64*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(pinkiri8)
+	MCFG_SCREEN_UPDATE_DRIVER(pinkiri8_state, screen_update_pinkiri8)
 
 	MCFG_GFXDECODE(pinkiri8)
 	MCFG_PALETTE_LENGTH(0x2000)

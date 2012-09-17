@@ -714,18 +714,17 @@ static void draw_layers( running_machine &machine, bitmap_ind16 &bitmap, const r
 
 
 
-SCREEN_UPDATE_IND16( metro )
+UINT32 metro_state::screen_update_metro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	metro_state *state = screen.machine().driver_data<metro_state>();
 	int pri, layers_ctrl = -1;
-	UINT16 screenctrl = *state->m_screenctrl;
+	UINT16 screenctrl = *m_screenctrl;
 
-	state->m_sprite_xoffs = state->m_videoregs[0x06 / 2] - screen.width()  / 2;
-	state->m_sprite_yoffs = state->m_videoregs[0x04 / 2] - screen.height() / 2;
+	m_sprite_xoffs = m_videoregs[0x06 / 2] - screen.width()  / 2;
+	m_sprite_yoffs = m_videoregs[0x04 / 2] - screen.height() / 2;
 
 	/* The background color is selected by a register */
 	screen.machine().priority_bitmap.fill(0, cliprect);
-	bitmap.fill((state->m_videoregs[0x12/2] & 0x0fff) + 0x1000, cliprect);
+	bitmap.fill((m_videoregs[0x12/2] & 0x0fff) + 0x1000, cliprect);
 
 	/*  Screen Control Register:
 
@@ -741,13 +740,13 @@ SCREEN_UPDATE_IND16( metro )
 	if (screenctrl & 2)
 		return 0;
 
-	//state->flip_screen_set(screenctrl & 1);
-	state->m_flip_screen = screenctrl & 1;
+	//flip_screen_set(screenctrl & 1);
+	m_flip_screen = screenctrl & 1;
 
 	/* If the game supports 16x16 tiles, make sure that the
        16x16 and 8x8 tilemaps of a given layer are not simultaneously
        enabled! */
-	if (state->m_support_16x16)
+	if (m_support_16x16)
 	{
 		int layer;
 
@@ -755,8 +754,8 @@ SCREEN_UPDATE_IND16( metro )
 		{
 			int big = screenctrl & (0x0020 << layer);
 
-			state->m_bg_tilemap_enable[layer] = !big;
-			state->m_bg_tilemap_enable16[layer] = big;
+			m_bg_tilemap_enable[layer] = !big;
+			m_bg_tilemap_enable16[layer] = big;
 		}
 	}
 
@@ -776,14 +775,14 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 	}
 
 	popmessage("l %x-%x-%x r %04x %04x %04x",
-				(state->m_videoregs[0x10/2] & 0x30) >> 4, (state->m_videoregs[0x10/2] & 0xc) >> 2, state->m_videoregs[0x10/2] & 3,
-				state->m_videoregs[0x02/2], state->m_videoregs[0x12/2],
-				*state->m_screenctrl);
+				(m_videoregs[0x10/2] & 0x30) >> 4, (m_videoregs[0x10/2] & 0xc) >> 2, m_videoregs[0x10/2] & 3,
+				m_videoregs[0x02/2], m_videoregs[0x12/2],
+				*m_screenctrl);
 }
 #endif
 
-	if (state->m_has_zoom)
-		k053936_zoom_draw(state->m_k053936, bitmap, cliprect, state->m_k053936_tilemap, 0, 0, 1);
+	if (m_has_zoom)
+		k053936_zoom_draw(m_k053936, bitmap, cliprect, m_k053936_tilemap, 0, 0, 1);
 
 	for (pri = 3; pri >= 0; pri--)
 		draw_layers(screen.machine(), bitmap, cliprect, pri, layers_ctrl);

@@ -26,7 +26,7 @@ void ac1_state::video_start()
 {
 }
 
-SCREEN_UPDATE_IND16( ac1 )
+UINT32 ac1_state::screen_update_ac1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
@@ -42,7 +42,7 @@ SCREEN_UPDATE_IND16( ac1 )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( ac1_32 )
+UINT32 ac1_state::screen_update_ac1_32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);

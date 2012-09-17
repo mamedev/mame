@@ -94,6 +94,7 @@ private:
 public:
 	DECLARE_DRIVER_INIT(m20);
 	virtual void video_start();
+	UINT32 screen_update_m20(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -105,9 +106,8 @@ void m20_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_RGB32( m20 )
+UINT32 m20_state::screen_update_m20(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m20_state *state = screen.machine().driver_data<m20_state>();
 	int x,y,i;
 	UINT8 pen;
 	UINT32 count;
@@ -122,7 +122,7 @@ static SCREEN_UPDATE_RGB32( m20 )
 		{
 			for (i = 0; i < 16; i++)
 			{
-				pen = (state->m_p_videoram[count]) >> (15 - i) & 1;
+				pen = (m_p_videoram[count]) >> (15 - i) & 1;
 
 				if (screen.visible_area().contains(x + i, y))
 					bitmap.pix32(y, x + i) = screen.machine().pens[pen];
@@ -546,7 +546,7 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(m20)
+	MCFG_SCREEN_UPDATE_DRIVER(m20_state, screen_update_m20)
 	MCFG_PALETTE_LENGTH(4)
 
 	/* Devices */

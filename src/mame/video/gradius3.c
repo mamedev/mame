@@ -121,31 +121,30 @@ WRITE16_MEMBER(gradius3_state::gradius3_gfxram_w)
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( gradius3 )
+UINT32 gradius3_state::screen_update_gradius3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gradius3_state *state = screen.machine().driver_data<gradius3_state>();
 
 	/* TODO: this kludge enforces the char banks. For some reason, they don't work otherwise. */
 	address_space &space = screen.machine().driver_data()->generic_space();
-	k052109_w(state->m_k052109, space, 0x1d80, 0x10);
-	k052109_w(state->m_k052109, space, 0x1f00, 0x32);
+	k052109_w(m_k052109, space, 0x1d80, 0x10);
+	k052109_w(m_k052109, space, 0x1f00, 0x32);
 
-	k052109_tilemap_update(state->m_k052109);
+	k052109_tilemap_update(m_k052109);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
-	if (state->m_priority == 0)
+	if (m_priority == 0)
 	{
-		k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 2);
-		k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 2, 0, 4);
-		k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 0, 0, 1);
+		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 2);
+		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, 0, 4);
+		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 0, 0, 1);
 	}
 	else
 	{
-		k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 1);
-		k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 1, 0, 2);
-		k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 2, 0, 4);
+		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 1);
+		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, 0, 2);
+		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, 0, 4);
 	}
 
-	k051960_sprites_draw(state->m_k051960, bitmap, cliprect, -1, -1);
+	k051960_sprites_draw(m_k051960, bitmap, cliprect, -1, -1);
 	return 0;
 }

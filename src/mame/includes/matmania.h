@@ -59,6 +59,8 @@ public:
 	DECLARE_MACHINE_START(matmania);
 	DECLARE_MACHINE_START(maniach);
 	DECLARE_MACHINE_RESET(maniach);
+	UINT32 screen_update_matmania(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_maniach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in machine/maniach.c -----------*/
@@ -80,6 +82,6 @@ DECLARE_READ8_HANDLER( maniach_mcu_status_r );
 /*----------- defined in video/matmania.c -----------*/
 
 
-SCREEN_UPDATE_IND16( maniach );
 
-SCREEN_UPDATE_IND16( matmania );
+
+

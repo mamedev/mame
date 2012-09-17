@@ -217,16 +217,15 @@ static void fcrash_build_palette( running_machine &machine )
 	}
 }
 
-static SCREEN_UPDATE_IND16( fcrash )
+UINT32 cps_state::screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cps_state *state = screen.machine().driver_data<cps_state>();
 	int layercontrol, l0, l1, l2, l3;
-	int videocontrol = state->m_cps_a_regs[0x22 / 2];
+	int videocontrol = m_cps_a_regs[0x22 / 2];
 
 
-	state->flip_screen_set(videocontrol & 0x8000);
+	flip_screen_set(videocontrol & 0x8000);
 
-	layercontrol = state->m_cps_b_regs[0x20 / 2];
+	layercontrol = m_cps_b_regs[0x20 / 2];
 
 	/* Get video memory base registers */
 	cps1_get_video_base(screen.machine());
@@ -236,37 +235,37 @@ static SCREEN_UPDATE_IND16( fcrash )
 
 	fcrash_update_transmasks(screen.machine());
 
-	state->m_bg_tilemap[0]->set_scrollx(0, state->m_scroll1x - 62);
-	state->m_bg_tilemap[0]->set_scrolly(0, state->m_scroll1y);
+	m_bg_tilemap[0]->set_scrollx(0, m_scroll1x - 62);
+	m_bg_tilemap[0]->set_scrolly(0, m_scroll1y);
 
 	if (videocontrol & 0x01)	/* linescroll enable */
 	{
-		int scrly = -state->m_scroll2y;
+		int scrly = -m_scroll2y;
 		int i;
 		int otheroffs;
 
-		state->m_bg_tilemap[1]->set_scroll_rows(1024);
+		m_bg_tilemap[1]->set_scroll_rows(1024);
 
-		otheroffs = state->m_cps_a_regs[CPS1_ROWSCROLL_OFFS];
+		otheroffs = m_cps_a_regs[CPS1_ROWSCROLL_OFFS];
 
 		for (i = 0; i < 256; i++)
-			state->m_bg_tilemap[1]->set_scrollx((i - scrly) & 0x3ff, state->m_scroll2x + state->m_other[(i + otheroffs) & 0x3ff]);
+			m_bg_tilemap[1]->set_scrollx((i - scrly) & 0x3ff, m_scroll2x + m_other[(i + otheroffs) & 0x3ff]);
 	}
 	else
 	{
-		state->m_bg_tilemap[1]->set_scroll_rows(1);
-		state->m_bg_tilemap[1]->set_scrollx(0, state->m_scroll2x - 60);
+		m_bg_tilemap[1]->set_scroll_rows(1);
+		m_bg_tilemap[1]->set_scrollx(0, m_scroll2x - 60);
 	}
-	state->m_bg_tilemap[1]->set_scrolly(0, state->m_scroll2y);
-	state->m_bg_tilemap[2]->set_scrollx(0, state->m_scroll3x - 64);
-	state->m_bg_tilemap[2]->set_scrolly(0, state->m_scroll3y);
+	m_bg_tilemap[1]->set_scrolly(0, m_scroll2y);
+	m_bg_tilemap[2]->set_scrollx(0, m_scroll3x - 64);
+	m_bg_tilemap[2]->set_scrolly(0, m_scroll3y);
 
 
 	/* turn all tilemaps on regardless of settings in get_video_base() */
 	/* write a custom get_video_base for this bootleg hardware? */
-	state->m_bg_tilemap[0]->enable(1);
-	state->m_bg_tilemap[1]->enable(1);
-	state->m_bg_tilemap[2]->enable(1);
+	m_bg_tilemap[0]->enable(1);
+	m_bg_tilemap[1]->enable(1);
+	m_bg_tilemap[2]->enable(1);
 
 	/* Blank screen */
 	bitmap.fill(0xbff, cliprect);
@@ -298,15 +297,14 @@ static SCREEN_UPDATE_IND16( fcrash )
 }
 
 // doesn't have the scroll offsets like fcrash
-static SCREEN_UPDATE_IND16( kodb )
+UINT32 cps_state::screen_update_kodb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cps_state *state = screen.machine().driver_data<cps_state>();
 	int layercontrol, l0, l1, l2, l3;
-	int videocontrol = state->m_cps_a_regs[0x22 / 2];
+	int videocontrol = m_cps_a_regs[0x22 / 2];
 
-	state->flip_screen_set(videocontrol & 0x8000);
+	flip_screen_set(videocontrol & 0x8000);
 
-	layercontrol = state->m_cps_b_regs[0x20 / 2];
+	layercontrol = m_cps_b_regs[0x20 / 2];
 
 	/* Get video memory base registers */
 	cps1_get_video_base(screen.machine());
@@ -316,38 +314,38 @@ static SCREEN_UPDATE_IND16( kodb )
 
 	fcrash_update_transmasks(screen.machine());
 
-	state->m_bg_tilemap[0]->set_scrollx(0, state->m_scroll1x);
-	state->m_bg_tilemap[0]->set_scrolly(0, state->m_scroll1y);
+	m_bg_tilemap[0]->set_scrollx(0, m_scroll1x);
+	m_bg_tilemap[0]->set_scrolly(0, m_scroll1y);
 
 	if (videocontrol & 0x01)	/* linescroll enable */
 	{
-		int scrly= -state->m_scroll2y;
+		int scrly= -m_scroll2y;
 		int i;
 		int otheroffs;
 
-		state->m_bg_tilemap[1]->set_scroll_rows(1024);
+		m_bg_tilemap[1]->set_scroll_rows(1024);
 
-		otheroffs = state->m_cps_a_regs[CPS1_ROWSCROLL_OFFS];
+		otheroffs = m_cps_a_regs[CPS1_ROWSCROLL_OFFS];
 
 		for (i = 0; i < 256; i++)
-			state->m_bg_tilemap[1]->set_scrollx((i - scrly) & 0x3ff, state->m_scroll2x + state->m_other[(i + otheroffs) & 0x3ff]);
+			m_bg_tilemap[1]->set_scrollx((i - scrly) & 0x3ff, m_scroll2x + m_other[(i + otheroffs) & 0x3ff]);
 	}
 	else
 	{
-		state->m_bg_tilemap[1]->set_scroll_rows(1);
-		state->m_bg_tilemap[1]->set_scrollx(0, state->m_scroll2x);
+		m_bg_tilemap[1]->set_scroll_rows(1);
+		m_bg_tilemap[1]->set_scrollx(0, m_scroll2x);
 	}
 
-	state->m_bg_tilemap[1]->set_scrolly(0, state->m_scroll2y);
-	state->m_bg_tilemap[2]->set_scrollx(0, state->m_scroll3x);
-	state->m_bg_tilemap[2]->set_scrolly(0, state->m_scroll3y);
+	m_bg_tilemap[1]->set_scrolly(0, m_scroll2y);
+	m_bg_tilemap[2]->set_scrollx(0, m_scroll3x);
+	m_bg_tilemap[2]->set_scrolly(0, m_scroll3y);
 
 
 	/* turn all tilemaps on regardless of settings in get_video_base() */
 	/* write a custom get_video_base for this bootleg hardware? */
-	state->m_bg_tilemap[0]->enable(1);
-	state->m_bg_tilemap[1]->enable(1);
-	state->m_bg_tilemap[2]->enable(1);
+	m_bg_tilemap[0]->enable(1);
+	m_bg_tilemap[1]->enable(1);
+	m_bg_tilemap[2]->enable(1);
 
 	/* Blank screen */
 	bitmap.fill(0xbff, cliprect);
@@ -742,8 +740,8 @@ static MACHINE_CONFIG_START( fcrash, cps_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_STATIC(fcrash)
-	MCFG_SCREEN_VBLANK_STATIC(cps1)
+	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_fcrash)
+	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 
 	MCFG_GFXDECODE(cps1)
 	MCFG_PALETTE_LENGTH(4096)
@@ -792,8 +790,8 @@ static MACHINE_CONFIG_START( kodb, cps_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_STATIC(kodb)
-	MCFG_SCREEN_VBLANK_STATIC(cps1)
+	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_kodb)
+	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 
 	MCFG_GFXDECODE(cps1)
 	MCFG_PALETTE_LENGTH(0xc00)
@@ -948,8 +946,8 @@ static MACHINE_CONFIG_START( sgyxz, cps_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_STATIC(kodb)
-	MCFG_SCREEN_VBLANK_STATIC(cps1)
+	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_kodb)
+	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 
 	MCFG_GFXDECODE(cps1)
 	MCFG_PALETTE_LENGTH(0xc00)

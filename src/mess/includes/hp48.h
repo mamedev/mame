@@ -75,6 +75,7 @@ public:
 	DECLARE_MACHINE_START(hp48gp);
 	DECLARE_MACHINE_START(hp48sx);
 	DECLARE_MACHINE_START(hp48s);
+	UINT32 screen_update_hp48(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -183,20 +184,3 @@ extern const device_type HP48_PORT;
 	MCFG_DEVICE_ADD(_tag, HP48_PORT, 0) \
 	MCFG_DEVICE_CONFIG(_intrf)
 
-/****************************** machine ******************************/
-
-
-extern MACHINE_START( hp48s  );
-extern MACHINE_START( hp48sx );
-extern MACHINE_START( hp48g  );
-extern MACHINE_START( hp48gx );
-extern MACHINE_START( hp48gp );
-
-extern MACHINE_RESET( hp48 );
-
-/*----------- defined in video/hp48.c -----------*/
-
-/****************************** video ********************************/
-
-extern SCREEN_UPDATE_IND16 ( hp48 );
-extern PALETTE_INIT ( hp48 );

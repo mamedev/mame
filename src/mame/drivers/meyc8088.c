@@ -63,6 +63,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(meyc8088_sound_out);
 	virtual void palette_init();
+	UINT32 screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_meyc8088(screen_device &screen, bool state);
 };
 
 
@@ -122,13 +124,12 @@ void meyc8088_state::palette_init()
 	auto_free(machine(), rgb);
 }
 
-static SCREEN_UPDATE_IND16( meyc8088 )
+UINT32 meyc8088_state::screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	meyc8088_state *state = screen.machine().driver_data<meyc8088_state>();
 	UINT8 v[5];
-	v[4] = state->m_status << 2 & 0x10; // video5: color prom d4
+	v[4] = m_status << 2 & 0x10; // video5: color prom d4
 
-	if (~state->m_status & 2)
+	if (~m_status & 2)
 	{
 		// screen off
 		bitmap.fill(v[4]);
@@ -140,10 +141,10 @@ static SCREEN_UPDATE_IND16( meyc8088 )
 		UINT8 y = (offs-0x800) >> 6;
 		UINT8 x = (offs-0x800) << 2;
 
-		v[0] = state->m_vram[offs|0x0000]; // video1: color prom d0
-		v[1] = state->m_vram[offs|0x0001]; // video2: color prom d1
-		v[2] = state->m_vram[offs|0x4000]; // video3: color prom d2
-		v[3] = state->m_vram[offs|0x4001]; // video4: color prom d3
+		v[0] = m_vram[offs|0x0000]; // video1: color prom d0
+		v[1] = m_vram[offs|0x0001]; // video2: color prom d1
+		v[2] = m_vram[offs|0x4000]; // video3: color prom d2
+		v[3] = m_vram[offs|0x4001]; // video4: color prom d3
 
 		for (int i = 0; i < 8; i++)
 			bitmap.pix16(y, x | i) = ((v[0] << i) >> 7 & 1) | ((v[1] << i) >> 6 & 2) | ((v[2] << i) >> 5 & 4) | ((v[3] << i) >> 4 & 8) | v[4];
@@ -152,12 +153,12 @@ static SCREEN_UPDATE_IND16( meyc8088 )
 	return 0;
 }
 
-static SCREEN_VBLANK( meyc8088 )
+void meyc8088_state::screen_eof_meyc8088(screen_device &screen, bool state)
 {
-	meyc8088_state *state = screen.machine().driver_data<meyc8088_state>();
-
+	device_execute_interface *intf;
+	m_maincpu->interface(intf);
 	// INTR on LC255 (pulses at start and end of vblank), INTA hardwired to $20
-	generic_pulse_irq_line_and_vector(state->m_maincpu, 0, 0x20, 1);
+	generic_pulse_irq_line_and_vector(*intf, 0, 0x20, 1);
 }
 
 
@@ -386,8 +387,8 @@ static MACHINE_CONFIG_START( meyc8088, meyc8088_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_15MHz/3, 320, 0, 256, 261, 0, 224)
-	MCFG_SCREEN_UPDATE_STATIC(meyc8088)
-	MCFG_SCREEN_VBLANK_STATIC(meyc8088)
+	MCFG_SCREEN_UPDATE_DRIVER(meyc8088_state, screen_update_meyc8088)
+	MCFG_SCREEN_VBLANK_DRIVER(meyc8088_state, screen_eof_meyc8088)
 
 	MCFG_PALETTE_LENGTH(32)
 

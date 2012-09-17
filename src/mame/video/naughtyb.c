@@ -180,15 +180,14 @@ WRITE8_MEMBER(naughtyb_state::popflame_videoreg_w)
 
 
 ***************************************************************************/
-SCREEN_UPDATE_IND16( naughtyb )
+UINT32 naughtyb_state::screen_update_naughtyb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const rectangle scrollvisiblearea(2*8, 34*8-1, 0*8, 28*8-1);
 	const rectangle leftvisiblearea(0*8, 2*8-1, 0*8, 28*8-1);
 	const rectangle rightvisiblearea(34*8, 36*8-1, 0*8, 28*8-1);
 
-	naughtyb_state *state = screen.machine().driver_data<naughtyb_state>();
-	UINT8 *videoram = state->m_videoram;
-	bitmap_ind16 &tmpbitmap = state->m_tmpbitmap;
+	UINT8 *videoram = m_videoram;
+	bitmap_ind16 &tmpbitmap = m_tmpbitmap;
 	int offs;
 
 	// for every character in the Video RAM
@@ -197,7 +196,7 @@ SCREEN_UPDATE_IND16( naughtyb )
 	{
 		int sx,sy;
 
-		if ( state->m_cocktail )
+		if ( m_cocktail )
 		{
 			if (offs < 0x700)
 			{
@@ -225,15 +224,15 @@ SCREEN_UPDATE_IND16( naughtyb )
 		}
 
 		drawgfx_opaque(tmpbitmap,tmpbitmap.cliprect(),screen.machine().gfx[0],
-				state->m_videoram2[offs] + 256 * state->m_bankreg,
-				(state->m_videoram2[offs] >> 5) + 8 * state->m_palreg,
-				state->m_cocktail,state->m_cocktail,
+				m_videoram2[offs] + 256 * m_bankreg,
+				(m_videoram2[offs] >> 5) + 8 * m_palreg,
+				m_cocktail,m_cocktail,
 				8*sx,8*sy);
 
 		drawgfx_transpen(tmpbitmap,tmpbitmap.cliprect(),screen.machine().gfx[1],
-				videoram[offs] + 256*state->m_bankreg,
-				(videoram[offs] >> 5) + 8 * state->m_palreg,
-				state->m_cocktail,state->m_cocktail,
+				videoram[offs] + 256*m_bankreg,
+				(videoram[offs] >> 5) + 8 * m_palreg,
+				m_cocktail,m_cocktail,
 				8*sx,8*sy,0);
 	}
 
@@ -244,7 +243,7 @@ SCREEN_UPDATE_IND16( naughtyb )
 		copybitmap(bitmap,tmpbitmap,0,0,-66*8,0,leftvisiblearea);
 		copybitmap(bitmap,tmpbitmap,0,0,-30*8,0,rightvisiblearea);
 
-		scrollx = ( state->m_cocktail ) ? *state->m_scrollreg - 239 : -*state->m_scrollreg + 16;
+		scrollx = ( m_cocktail ) ? *m_scrollreg - 239 : -*m_scrollreg + 16;
 		copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,0,0,scrollvisiblearea);
 	}
 	return 0;

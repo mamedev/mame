@@ -122,15 +122,14 @@ void ikki_state::video_start()
 }
 
 
-SCREEN_UPDATE_IND16( ikki )
+UINT32 ikki_state::screen_update_ikki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ikki_state *state = screen.machine().driver_data<ikki_state>();
 	offs_t offs;
-	UINT8 *VIDEOATTR = state->memregion("user1")->base();
+	UINT8 *VIDEOATTR = memregion("user1")->base();
 
 	/* draw bg layer */
 
-	for (offs = 0; offs < (state->m_videoram.bytes() / 2); offs++)
+	for (offs = 0; offs < (m_videoram.bytes() / 2); offs++)
 	{
 		int color, bank;
 
@@ -144,10 +143,10 @@ SCREEN_UPDATE_IND16( ikki )
 		switch (d)
 		{
 			case 0x02: /* scroll area */
-				x = sx * 8 - state->m_scroll[1];
+				x = sx * 8 - m_scroll[1];
 				if (x < 0)
 					x += 8 * 22;
-				y = (sy * 8 + ~state->m_scroll[0]) & 0xff;
+				y = (sy * 8 + ~m_scroll[0]) & 0xff;
 				break;
 
 			case 0x03: /* non-scroll area */
@@ -166,20 +165,20 @@ SCREEN_UPDATE_IND16( ikki )
 				break;
 		}
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 		{
 			x = 248 - x;
 			y = 248 - y;
 		}
 
-		color = state->m_videoram[offs * 2];
+		color = m_videoram[offs * 2];
 		bank = (color & 0xe0) << 3;
 		color = ((color & 0x1f)<<0) | ((color & 0x80) >> 2);
 
 		drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],
-			state->m_videoram[offs * 2 + 1] + bank,
+			m_videoram[offs * 2 + 1] + bank,
 			color,
-			state->m_flipscreen,state->m_flipscreen,
+			m_flipscreen,m_flipscreen,
 			x,y);
 	}
 
@@ -187,7 +186,7 @@ SCREEN_UPDATE_IND16( ikki )
 
 	/* mask sprites */
 
-	for (offs = 0; offs < (state->m_videoram.bytes() / 2); offs++)
+	for (offs = 0; offs < (m_videoram.bytes() / 2); offs++)
 	{
 		int sx = offs / 32;
 		int sy = offs % 32;
@@ -201,20 +200,20 @@ SCREEN_UPDATE_IND16( ikki )
 			int y = sy * 8;
 			int x = sx * 8;
 
-			if (state->m_flipscreen)
+			if (m_flipscreen)
 			{
 				x = 248 - x;
 				y = 248 - y;
 			}
 
-			color = state->m_videoram[offs * 2];
+			color = m_videoram[offs * 2];
 			bank = (color & 0xe0) << 3;
 			color = ((color & 0x1f)<<0) | ((color & 0x80) >> 2);
 
 			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],
-				state->m_videoram[offs * 2 + 1] + bank,
+				m_videoram[offs * 2 + 1] + bank,
 				color,
-				state->m_flipscreen,state->m_flipscreen,
+				m_flipscreen,m_flipscreen,
 				x,y);
 		}
 	}

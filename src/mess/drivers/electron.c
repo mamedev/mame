@@ -185,7 +185,7 @@ static MACHINE_CONFIG_START( electron, electron_state )
 	MCFG_SCREEN_REFRESH_RATE( 50.08 )
 	MCFG_SCREEN_SIZE( 640, 312 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 640-1, 0, 256-1 )
-	MCFG_SCREEN_UPDATE_STATIC(electron)
+	MCFG_SCREEN_UPDATE_DRIVER(electron_state, screen_update_electron)
 
 	MCFG_PALETTE_LENGTH( 16 )
 

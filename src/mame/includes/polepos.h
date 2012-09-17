@@ -79,6 +79,7 @@ public:
 	DECLARE_MACHINE_RESET(polepos);
 	DECLARE_VIDEO_START(polepos);
 	DECLARE_PALETTE_INIT(polepos);
+	UINT32 screen_update_polepos(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -119,6 +120,6 @@ DISCRETE_SOUND_EXTERN( polepos );
 
 
 
-SCREEN_UPDATE_IND16( polepos );
+
 
 

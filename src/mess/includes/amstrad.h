@@ -167,6 +167,8 @@ public:
 	DECLARE_MACHINE_START(aleste);
 	DECLARE_MACHINE_RESET(aleste);
 	DECLARE_PALETTE_INIT(aleste);
+	UINT32 screen_update_amstrad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_amstrad(screen_device &screen, bool state);
 };
 
 
@@ -205,8 +207,8 @@ extern const mc6845_interface amstrad_mc6845_intf;
 extern const mc6845_interface amstrad_plus_mc6845_intf;
 
 
-SCREEN_UPDATE_IND16( amstrad );
-SCREEN_VBLANK( amstrad );
+
+
 
 
 SLOT_INTERFACE_START(cpc_exp_cards)

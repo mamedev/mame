@@ -417,7 +417,7 @@ static MACHINE_CONFIG_START( offtwall, offtwall_state )
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a VAD chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_STATIC(offtwall)
+	MCFG_SCREEN_UPDATE_DRIVER(offtwall_state, screen_update_offtwall)
 
 	MCFG_VIDEO_START_OVERRIDE(offtwall_state,offtwall)
 

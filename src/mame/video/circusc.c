@@ -195,19 +195,18 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( circusc )
+UINT32 circusc_state::screen_update_circusc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	circusc_state *state = screen.machine().driver_data<circusc_state>();
 	int i;
 
 	for (i = 0; i < 10; i++)
-		state->m_bg_tilemap->set_scrolly(i, 0);
+		m_bg_tilemap->set_scrolly(i, 0);
 	for (i = 10; i < 32; i++)
-		state->m_bg_tilemap->set_scrolly(i, *state->m_scroll);
+		m_bg_tilemap->set_scrolly(i, *m_scroll);
 
 	bitmap.fill(0, cliprect);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

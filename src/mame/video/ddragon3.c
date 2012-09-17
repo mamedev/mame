@@ -155,55 +155,53 @@ static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( ddragon3 )
+UINT32 ddragon3_state::screen_update_ddragon3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ddragon3_state *state = screen.machine().driver_data<ddragon3_state>();
 
-	state->m_bg_tilemap->set_scrollx(0, state->m_bg_scrollx);
-	state->m_bg_tilemap->set_scrolly(0, state->m_bg_scrolly);
-	state->m_fg_tilemap->set_scrollx(0, state->m_fg_scrollx);
-	state->m_fg_tilemap->set_scrolly(0, state->m_fg_scrolly);
+	m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
+	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
+	m_fg_tilemap->set_scrollx(0, m_fg_scrollx);
+	m_fg_tilemap->set_scrolly(0, m_fg_scrolly);
 
-	if ((state->m_vreg & 0x60) == 0x40)
+	if ((m_vreg & 0x60) == 0x40)
 	{
-		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect);
 	}
-	else if ((state->m_vreg & 0x60) == 0x60)
+	else if ((m_vreg & 0x60) == 0x60)
 	{
-		state->m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect);
 	}
 	else
 	{
-		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect);
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( ctribe )
+UINT32 ddragon3_state::screen_update_ctribe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ddragon3_state *state = screen.machine().driver_data<ddragon3_state>();
 
-	state->m_bg_tilemap->set_scrollx(0, state->m_bg_scrollx);
-	state->m_bg_tilemap->set_scrolly(0, state->m_bg_scrolly);
-	state->m_fg_tilemap->set_scrollx(0, state->m_fg_scrollx);
-	state->m_fg_tilemap->set_scrolly(0, state->m_fg_scrolly);
+	m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
+	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
+	m_fg_tilemap->set_scrollx(0, m_fg_scrollx);
+	m_fg_tilemap->set_scrolly(0, m_fg_scrolly);
 
-	if(state->m_vreg & 8)
+	if(m_vreg & 8)
 	{
-		state->m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect);
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 	{
-		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect);
 	}
 	return 0;

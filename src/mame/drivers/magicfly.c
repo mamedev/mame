@@ -438,6 +438,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	DECLARE_VIDEO_START(7mezzo);
+	UINT32 screen_update_magicfly(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -518,10 +519,9 @@ VIDEO_START_MEMBER(magicfly_state,7mezzo)
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(magicfly_state::get_7mezzo_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
 }
 
-static SCREEN_UPDATE_IND16( magicfly )
+UINT32 magicfly_state::screen_update_magicfly(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	magicfly_state *state = screen.machine().driver_data<magicfly_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -814,7 +814,7 @@ static MACHINE_CONFIG_START( magicfly, magicfly_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)				/* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1). */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)	/* Taken from MC6845 init, registers 01 & 06. */
-	MCFG_SCREEN_UPDATE_STATIC(magicfly)
+	MCFG_SCREEN_UPDATE_DRIVER(magicfly_state, screen_update_magicfly)
 
 	MCFG_GFXDECODE(magicfly)
 	MCFG_PALETTE_LENGTH(32)

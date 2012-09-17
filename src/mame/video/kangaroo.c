@@ -133,19 +133,18 @@ static void blitter_execute( running_machine &machine )
  *
  *************************************/
 
-SCREEN_UPDATE_RGB32( kangaroo )
+UINT32 kangaroo_state::screen_update_kangaroo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	kangaroo_state *state = screen.machine().driver_data<kangaroo_state>();
-	UINT8 scrolly = state->m_video_control[6];
-	UINT8 scrollx = state->m_video_control[7];
-	UINT8 maska = (state->m_video_control[10] & 0x28) >> 3;
-	UINT8 maskb = (state->m_video_control[10] & 0x07) >> 0;
-	UINT8 xora = (state->m_video_control[9] & 0x20) ? 0xff : 0x00;
-	UINT8 xorb = (state->m_video_control[9] & 0x10) ? 0xff : 0x00;
-	UINT8 enaa = (state->m_video_control[9] & 0x08);
-	UINT8 enab = (state->m_video_control[9] & 0x04);
-	UINT8 pria = (~state->m_video_control[9] & 0x02);
-	UINT8 prib = (~state->m_video_control[9] & 0x01);
+	UINT8 scrolly = m_video_control[6];
+	UINT8 scrollx = m_video_control[7];
+	UINT8 maska = (m_video_control[10] & 0x28) >> 3;
+	UINT8 maskb = (m_video_control[10] & 0x07) >> 0;
+	UINT8 xora = (m_video_control[9] & 0x20) ? 0xff : 0x00;
+	UINT8 xorb = (m_video_control[9] & 0x10) ? 0xff : 0x00;
+	UINT8 enaa = (m_video_control[9] & 0x08);
+	UINT8 enab = (m_video_control[9] & 0x04);
+	UINT8 pria = (~m_video_control[9] & 0x02);
+	UINT8 prib = (~m_video_control[9] & 0x01);
 	rgb_t pens[8];
 	int x, y;
 
@@ -164,8 +163,8 @@ SCREEN_UPDATE_RGB32( kangaroo )
 			UINT8 effya = scrolly + (y ^ xora);
 			UINT8 effxb = (x / 2) ^ xorb;
 			UINT8 effyb = y ^ xorb;
-			UINT8 pixa = (state->m_videoram[effya + 256 * (effxa / 4)] >> (8 * (effxa % 4) + 0)) & 0x0f;
-			UINT8 pixb = (state->m_videoram[effyb + 256 * (effxb / 4)] >> (8 * (effxb % 4) + 4)) & 0x0f;
+			UINT8 pixa = (m_videoram[effya + 256 * (effxa / 4)] >> (8 * (effxa % 4) + 0)) & 0x0f;
+			UINT8 pixb = (m_videoram[effyb + 256 * (effxb / 4)] >> (8 * (effxb % 4) + 4)) & 0x0f;
 			UINT8 finalpens;
 
 			/* for each layer, contribute bits if (a) enabled, and (b) either has priority or the opposite plane is 0 */

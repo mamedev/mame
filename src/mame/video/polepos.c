@@ -498,14 +498,13 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 }
 
 
-SCREEN_UPDATE_IND16( polepos )
+UINT32 polepos_state::screen_update_polepos(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	polepos_state *state = screen.machine().driver_data<polepos_state>();
 	rectangle clip = cliprect;
 	clip.max_y = 127;
-	state->m_bg_tilemap->draw(bitmap, clip, 0,0);
+	m_bg_tilemap->draw(bitmap, clip, 0,0);
 	draw_road(screen.machine(), bitmap);
 	draw_sprites(screen.machine(), bitmap,cliprect);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

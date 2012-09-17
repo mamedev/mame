@@ -183,7 +183,7 @@ static MACHINE_CONFIG_START( odyssey2, odyssey2_state )
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( XTAL_7_15909MHz/2, I824X_LINE_CLOCKS, I824X_START_ACTIVE_SCAN, I824X_END_ACTIVE_SCAN, 262, I824X_START_Y, I824X_START_Y + I824X_SCREEN_HEIGHT )
-	MCFG_SCREEN_UPDATE_STATIC( odyssey2 )
+	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 
 	MCFG_GFXDECODE( odyssey2 )
 	MCFG_PALETTE_LENGTH(24)
@@ -213,7 +213,7 @@ static MACHINE_CONFIG_START( videopac, odyssey2_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( XTAL_17_73447MHz/5, I824X_LINE_CLOCKS, I824X_START_ACTIVE_SCAN, I824X_END_ACTIVE_SCAN, 312, I824X_START_Y, I824X_START_Y + I824X_SCREEN_HEIGHT )
-	MCFG_SCREEN_UPDATE_STATIC( odyssey2 )
+	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 
 	MCFG_GFXDECODE( odyssey2 )
 	MCFG_PALETTE_LENGTH(24)
@@ -242,7 +242,7 @@ static MACHINE_CONFIG_START( g7400, odyssey2_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( 3547000*2, 448, 96, 416, 312, 39, 289 )	/* EF9340 doubles the input clock into dot clocks internally */
-    MCFG_SCREEN_UPDATE_STATIC( odyssey2 )
+	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 
 	MCFG_GFXDECODE( odyssey2 )
 	MCFG_PALETTE_LENGTH(24)

@@ -612,7 +612,7 @@ static MACHINE_CONFIG_START( route16, route16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_REFRESH_RATE(57)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	/* frames per second, vblank duration */
-	MCFG_SCREEN_UPDATE_STATIC(route16)
+	MCFG_SCREEN_UPDATE_DRIVER(route16_state, screen_update_route16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -640,7 +640,7 @@ static MACHINE_CONFIG_DERIVED( stratvox, route16 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(stratvox)
+	MCFG_SCREEN_UPDATE_DRIVER(route16_state, screen_update_stratvox)
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("ay8910")
@@ -678,7 +678,7 @@ static MACHINE_CONFIG_DERIVED( ttmahjng, route16 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(ttmahjng)
+	MCFG_SCREEN_UPDATE_DRIVER(route16_state, screen_update_ttmahjng)
 MACHINE_CONFIG_END
 
 

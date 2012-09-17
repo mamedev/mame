@@ -58,6 +58,7 @@ public:
 	UINT8 m_cursor_row;
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_unior(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 READ8_MEMBER( unior_state::unior_4c_r )
@@ -249,13 +250,12 @@ void unior_state::video_start()
 	m_p_vram = memregion("vram")->base();
 }
 
-static SCREEN_UPDATE_IND16( unior )
+UINT32 unior_state::screen_update_unior(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	unior_state *state = screen.machine().driver_data<unior_state>();
 	UINT8 y,ra,gfx;
 	UINT16 sy=0,ma=0,x,chr;
 	UINT8 *videoram;
-	videoram = state->m_p_videoram;
+	videoram = m_p_videoram;
 	static UINT8 framecnt=0;
 
 	framecnt++;
@@ -270,10 +270,10 @@ static SCREEN_UPDATE_IND16( unior )
 			{
 				chr = videoram[x+ma];
 
-				gfx = state->m_p_chargen[(chr<<3) | ra ];
+				gfx = m_p_chargen[(chr<<3) | ra ];
 
 				/* cursor */
-				if ((y == state->m_cursor_row) && (x == state->m_cursor_col) && (ra > 6) & BIT(framecnt, 3))
+				if ((y == m_cursor_row) && (x == m_cursor_col) && (ra > 6) & BIT(framecnt, 3))
 					gfx ^= 0xff;
 
 				/* Display a scanline of a character */
@@ -290,7 +290,7 @@ static SCREEN_UPDATE_IND16( unior )
 		if (y)
 			ma+=80;
 		else
-			videoram = state->m_p_vram;
+			videoram = m_p_vram;
 	}
 	return 0;
 }
@@ -326,7 +326,7 @@ static MACHINE_CONFIG_START( unior, unior_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_STATIC(unior)
+	MCFG_SCREEN_UPDATE_DRIVER(unior_state, screen_update_unior)
 	MCFG_GFXDECODE(unior)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

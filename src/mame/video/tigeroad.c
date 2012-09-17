@@ -155,13 +155,12 @@ void tigeroad_state::video_start()
 	m_fg_tilemap->set_transparent_pen(3);
 }
 
-SCREEN_UPDATE_IND16( tigeroad )
+UINT32 tigeroad_state::screen_update_tigeroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tigeroad_state *state = screen.machine().driver_data<tigeroad_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
-	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
+	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
 	//draw_sprites(screen.machine(), bitmap, cliprect, 1); draw priority sprites?
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
 	return 0;
 }

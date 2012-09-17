@@ -145,12 +145,11 @@ void mugsmash_state::video_start()
 	m_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mugsmash_state::get_mugsmash_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 }
 
-SCREEN_UPDATE_IND16( mugsmash )
+UINT32 mugsmash_state::screen_update_mugsmash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mugsmash_state *state = screen.machine().driver_data<mugsmash_state>();
 
-	state->m_tilemap2->draw(bitmap, cliprect, 0, 0);
-	state->m_tilemap1->draw(bitmap, cliprect, 0, 0);
+	m_tilemap2->draw(bitmap, cliprect, 0, 0);
+	m_tilemap1->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

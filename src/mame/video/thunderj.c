@@ -118,9 +118,8 @@ VIDEO_START_MEMBER(thunderj_state,thunderj)
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( thunderj )
+UINT32 thunderj_state::screen_update_thunderj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	thunderj_state *state = screen.machine().driver_data<thunderj_state>();
 	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
 	atarimo_rect_list rectlist;
 	bitmap_ind16 *mobitmap;
@@ -128,14 +127,14 @@ SCREEN_UPDATE_IND16( thunderj )
 
 	/* draw the playfield */
 	priority_bitmap.fill(0, cliprect);
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0x00);
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 1, 0x01);
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 2, 0x02);
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 3, 0x03);
-	state->m_playfield2_tilemap->draw(bitmap, cliprect, 0, 0x80);
-	state->m_playfield2_tilemap->draw(bitmap, cliprect, 1, 0x84);
-	state->m_playfield2_tilemap->draw(bitmap, cliprect, 2, 0x88);
-	state->m_playfield2_tilemap->draw(bitmap, cliprect, 3, 0x8c);
+	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0x00);
+	m_playfield_tilemap->draw(bitmap, cliprect, 1, 0x01);
+	m_playfield_tilemap->draw(bitmap, cliprect, 2, 0x02);
+	m_playfield_tilemap->draw(bitmap, cliprect, 3, 0x03);
+	m_playfield2_tilemap->draw(bitmap, cliprect, 0, 0x80);
+	m_playfield2_tilemap->draw(bitmap, cliprect, 1, 0x84);
+	m_playfield2_tilemap->draw(bitmap, cliprect, 2, 0x88);
+	m_playfield2_tilemap->draw(bitmap, cliprect, 3, 0x8c);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -234,7 +233,7 @@ SCREEN_UPDATE_IND16( thunderj )
 		}
 
 	/* add the alpha on top */
-	state->m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* now go back and process the upper bit of MO priority */
 	rectlist.rect -= rectlist.numrects;

@@ -2094,7 +2094,7 @@ static MACHINE_CONFIG_START( galaxian_base, galaxian_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND, GALAXIAN_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART)
-	MCFG_SCREEN_UPDATE_STATIC(galaxian)
+	MCFG_SCREEN_UPDATE_DRIVER(galaxian_state, screen_update_galaxian)
 
 
 	/* blinking frequency is determined by 555 counter with Ra=100k, Rb=10k, C=10uF */

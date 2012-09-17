@@ -105,6 +105,7 @@ public:
 	DECLARE_DRIVER_INIT(sfiii2);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 

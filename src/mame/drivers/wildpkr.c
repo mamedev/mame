@@ -176,6 +176,7 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_wildpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -187,9 +188,8 @@ void wildpkr_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( wildpkr )
+UINT32 wildpkr_state::screen_update_wildpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//  wildpkr_state *state = screen.machine().driver_data<wildpkr_state>();
 	return 0;
 }
 
@@ -284,7 +284,7 @@ static MACHINE_CONFIG_START( wildpkr, wildpkr_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 512-1)
-	MCFG_SCREEN_UPDATE_STATIC(wildpkr)
+	MCFG_SCREEN_UPDATE_DRIVER(wildpkr_state, screen_update_wildpkr)
 
 //  MCFG_HD63484_ADD("hd63484", wildpkr_hd63484_intf)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)

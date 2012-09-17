@@ -194,15 +194,14 @@ void terracre_state::video_start()
 	state_save_register_global(machine(), m_yscroll);
 }
 
-SCREEN_UPDATE_IND16( amazon )
+UINT32 terracre_state::screen_update_amazon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	terracre_state *state = screen.machine().driver_data<terracre_state>();
-	if( state->m_xscroll&0x2000 )
+	if( m_xscroll&0x2000 )
 		bitmap.fill(get_black_pen(screen.machine()), cliprect );
 	else
-		state->m_background->draw(bitmap, cliprect, 0, 0 );
+		m_background->draw(bitmap, cliprect, 0, 0 );
 
 	draw_sprites(screen.machine(), bitmap,cliprect );
-	state->m_foreground->draw(bitmap, cliprect, 0, 0 );
+	m_foreground->draw(bitmap, cliprect, 0, 0 );
 	return 0;
 }

@@ -140,6 +140,7 @@ public:
 	DECLARE_MACHINE_RESET(mbee128);
 	DECLARE_MACHINE_RESET(mbee256);
 	DECLARE_MACHINE_RESET(mbeett);
+	UINT32 screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -167,11 +168,11 @@ MC6845_ON_UPDATE_ADDR_CHANGED( mbee_update_addr );
 MC6845_ON_UPDATE_ADDR_CHANGED( mbee256_update_addr );
 
 
-SCREEN_UPDATE_RGB32( mbee );
 
-SCREEN_UPDATE_RGB32( mbeeic );
 
-SCREEN_UPDATE_RGB32( mbeeppc );
+
+
+
 
 
 

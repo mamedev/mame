@@ -75,11 +75,10 @@ WRITE8_MEMBER(mosaic_state::mosaic_bgvideoram_w)
 
 
 
-SCREEN_UPDATE_IND16( mosaic )
+UINT32 mosaic_state::screen_update_mosaic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mosaic_state *state = screen.machine().driver_data<mosaic_state>();
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

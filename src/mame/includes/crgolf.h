@@ -53,6 +53,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_VIDEO_START(crgolf);
+	UINT32 screen_update_crgolf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/crgolf.c -----------*/

@@ -45,40 +45,39 @@ void xexex_state::video_start()
 	k056832_set_layer_offs(m_k056832, 3,  6, 16);
 }
 
-SCREEN_UPDATE_RGB32( xexex )
+UINT32 xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	static const int K053251_CI[4] = { K053251_CI1, K053251_CI2, K053251_CI3, K053251_CI4 };
-	xexex_state *state = screen.machine().driver_data<xexex_state>();
 	int layer[4];
 	int bg_colorbase, new_colorbase, plane, alpha;
 
-	state->m_sprite_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI0);
-	bg_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI1);
-	state->m_layer_colorbase[0] = 0x70;
+	m_sprite_colorbase = k053251_get_palette_index(m_k053251, K053251_CI0);
+	bg_colorbase = k053251_get_palette_index(m_k053251, K053251_CI1);
+	m_layer_colorbase[0] = 0x70;
 
 	for (plane = 1; plane < 4; plane++)
 	{
-		new_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI[plane]);
-		if (state->m_layer_colorbase[plane] != new_colorbase)
+		new_colorbase = k053251_get_palette_index(m_k053251, K053251_CI[plane]);
+		if (m_layer_colorbase[plane] != new_colorbase)
 		{
-			state->m_layer_colorbase[plane] = new_colorbase;
-			k056832_mark_plane_dirty(state->m_k056832, plane);
+			m_layer_colorbase[plane] = new_colorbase;
+			k056832_mark_plane_dirty(m_k056832, plane);
 		}
 	}
 
 	layer[0] = 1;
-	state->m_layerpri[0] = k053251_get_priority(state->m_k053251, K053251_CI2);
+	m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI2);
 	layer[1] = 2;
-	state->m_layerpri[1] = k053251_get_priority(state->m_k053251, K053251_CI3);
+	m_layerpri[1] = k053251_get_priority(m_k053251, K053251_CI3);
 	layer[2] = 3;
-	state->m_layerpri[2] = k053251_get_priority(state->m_k053251, K053251_CI4);
+	m_layerpri[2] = k053251_get_priority(m_k053251, K053251_CI4);
 	layer[3] = -1;
-	state->m_layerpri[3] = k053251_get_priority(state->m_k053251, K053251_CI1);
+	m_layerpri[3] = k053251_get_priority(m_k053251, K053251_CI1);
 
-	konami_sortlayers4(layer, state->m_layerpri);
+	konami_sortlayers4(layer, m_layerpri);
 
-	k054338_update_all_shadows(state->m_k054338, 0);
-	k054338_fill_backcolor(state->m_k054338, bitmap, 0);
+	k054338_update_all_shadows(m_k054338, 0);
+	k054338_fill_backcolor(m_k054338, bitmap, 0);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
@@ -86,26 +85,26 @@ SCREEN_UPDATE_RGB32( xexex )
 	{
 		if (layer[plane] < 0)
 		{
-			state->m_k053250->draw(bitmap, cliprect, bg_colorbase, 0, 1 << plane);
+			m_k053250->draw(bitmap, cliprect, bg_colorbase, 0, 1 << plane);
 		}
-		else if (!state->m_cur_alpha || layer[plane] != 1)
+		else if (!m_cur_alpha || layer[plane] != 1)
 		{
-			k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, layer[plane], 0, 1 << plane);
+			k056832_tilemap_draw(m_k056832, bitmap, cliprect, layer[plane], 0, 1 << plane);
 		}
 	}
 
-	k053247_sprites_draw(state->m_k053246, bitmap, cliprect);
+	k053247_sprites_draw(m_k053246, bitmap, cliprect);
 
-	if (state->m_cur_alpha)
+	if (m_cur_alpha)
 	{
-		alpha = k054338_set_alpha_level(state->m_k054338, 1);
+		alpha = k054338_set_alpha_level(m_k054338, 1);
 
 		if (alpha > 0)
 		{
-			k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 1, TILEMAP_DRAW_ALPHA(alpha), 0);
+			k056832_tilemap_draw(m_k056832, bitmap, cliprect, 1, TILEMAP_DRAW_ALPHA(alpha), 0);
 		}
 	}
 
-	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 0, 0, 0);
+	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 0, 0, 0);
 	return 0;
 }

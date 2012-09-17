@@ -59,6 +59,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_laserbas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -69,23 +70,22 @@ void laserbas_state::video_start()
 	save_item(NAME(m_vram2));
 }
 
-static SCREEN_UPDATE_IND16(laserbas)
+UINT32 laserbas_state::screen_update_laserbas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	laserbas_state *state = screen.machine().driver_data<laserbas_state>();
 	int x, y;
 
 	for (y = 0; y < 256; y++)
 		for(x = 0; x < 128; x++)
 		{
-			if (state->m_vram2[y * 128 + x] & 0xf)
-				bitmap.pix16(y, x * 2) = (state->m_vram2[y * 128 + x] & 0xf);
+			if (m_vram2[y * 128 + x] & 0xf)
+				bitmap.pix16(y, x * 2) = (m_vram2[y * 128 + x] & 0xf);
 			else
-				bitmap.pix16(y, x * 2) = (state->m_vram1[y * 128 + x] & 0xf) + 16;
+				bitmap.pix16(y, x * 2) = (m_vram1[y * 128 + x] & 0xf) + 16;
 
-			if (state->m_vram2[y * 128 + x] >> 4)
-				bitmap.pix16(y, x * 2 + 1) = (state->m_vram2[y * 128 + x] >> 4);
+			if (m_vram2[y * 128 + x] >> 4)
+				bitmap.pix16(y, x * 2 + 1) = (m_vram2[y * 128 + x] >> 4);
 			else
-				bitmap.pix16(y, x * 2 + 1) = (state->m_vram1[y * 128 + x] >> 4) + 16;
+				bitmap.pix16(y, x * 2 + 1) = (m_vram1[y * 128 + x] >> 4) + 16;
 		}
 	return 0;
 }
@@ -319,7 +319,7 @@ static MACHINE_CONFIG_START( laserbas, laserbas_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(laserbas)
+	MCFG_SCREEN_UPDATE_DRIVER(laserbas_state, screen_update_laserbas)
 
 	MCFG_MC6845_ADD("crtc", H46505, 3000000/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 

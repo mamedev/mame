@@ -235,10 +235,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const r
 	}
 }
 
-SCREEN_UPDATE_IND16( popper )
+UINT32 popper_state::screen_update_popper(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	popper_state *state = screen.machine().driver_data<popper_state>();
-	rectangle finalclip = state->m_tilemap_clip;
+	rectangle finalclip = m_tilemap_clip;
 	finalclip &= cliprect;
 
 	//attribram
@@ -247,16 +246,16 @@ SCREEN_UPDATE_IND16( popper )
 	//-xxx---- colour for pen 0 (from second prom?)
 	//----xxxx colour for pens 1,2,3
 
-	state->m_p123_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	state->m_p0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	state->m_ol_p123_tilemap->draw(bitmap, finalclip, TILEMAP_DRAW_LAYER1, 0);
-	state->m_ol_p0_tilemap->draw(bitmap, finalclip, TILEMAP_DRAW_LAYER1, 0);
+	m_p123_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	m_p0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	m_ol_p123_tilemap->draw(bitmap, finalclip, TILEMAP_DRAW_LAYER1, 0);
+	m_ol_p0_tilemap->draw(bitmap, finalclip, TILEMAP_DRAW_LAYER1, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 
-	state->m_p123_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
-	state->m_p0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
-	state->m_ol_p123_tilemap->draw(bitmap, finalclip, TILEMAP_DRAW_LAYER0, 0);
-	state->m_ol_p0_tilemap->draw(bitmap, finalclip, TILEMAP_DRAW_LAYER0, 0);
+	m_p123_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	m_p0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	m_ol_p123_tilemap->draw(bitmap, finalclip, TILEMAP_DRAW_LAYER0, 0);
+	m_ol_p0_tilemap->draw(bitmap, finalclip, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

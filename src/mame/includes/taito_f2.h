@@ -129,6 +129,19 @@ public:
 	DECLARE_VIDEO_START(taitof2_deadconxj);
 	DECLARE_VIDEO_START(taitof2_dinorex);
 	DECLARE_VIDEO_START(taitof2_quiz);
+	UINT32 screen_update_taitof2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_taitof2_pri_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_taitof2_pri(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_taitof2_thundfox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_taitof2_ssi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_taitof2_deadconx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_taitof2_yesnoj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_taitof2_metalb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_taitof2_no_buffer(screen_device &screen, bool state);
+	void screen_eof_taitof2_partial_buffer_delayed(screen_device &screen, bool state);
+	void screen_eof_taitof2_partial_buffer_delayed_thundfox(screen_device &screen, bool state);
+	void screen_eof_taitof2_full_buffer_delayed(screen_device &screen, bool state);
+	void screen_eof_taitof2_partial_buffer_delayed_qzchikyu(screen_device &screen, bool state);
 };
 
 /*----------- defined in video/taito_f2.c -----------*/
@@ -157,18 +170,18 @@ public:
 
 
 
-SCREEN_VBLANK( taitof2_no_buffer );
-SCREEN_VBLANK( taitof2_full_buffer_delayed );
-SCREEN_VBLANK( taitof2_partial_buffer_delayed );
-SCREEN_VBLANK( taitof2_partial_buffer_delayed_thundfox );
-SCREEN_VBLANK( taitof2_partial_buffer_delayed_qzchikyu );
 
-SCREEN_UPDATE_IND16( taitof2 );
-SCREEN_UPDATE_IND16( taitof2_pri );
-SCREEN_UPDATE_IND16( taitof2_pri_roz );
-SCREEN_UPDATE_IND16( taitof2_ssi );
-SCREEN_UPDATE_IND16( taitof2_thundfox );
-SCREEN_UPDATE_IND16( taitof2_deadconx );
-SCREEN_UPDATE_IND16( taitof2_metalb );
-SCREEN_UPDATE_IND16( taitof2_yesnoj );
+
+
+
+
+
+
+
+
+
+
+
+
+
 

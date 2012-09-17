@@ -247,42 +247,41 @@ VIDEO_START_MEMBER(wwfwfest_state,wwfwfstb)
 	m_bg1_dx[1] = -2;
 }
 
-SCREEN_UPDATE_IND16( wwfwfest )
+UINT32 wwfwfest_state::screen_update_wwfwfest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	wwfwfest_state *state = screen.machine().driver_data<wwfwfest_state>();
-	if (state->m_pri == 0x0078) {
-		state->m_bg0_tilemap->set_scrolly(0, state->m_bg0_scrolly  );
-		state->m_bg0_tilemap->set_scrollx(0, state->m_bg0_scrollx  + state->m_bg0_dx);
-		state->m_bg1_tilemap->set_scrolly(0, state->m_bg1_scrolly  );
-		state->m_bg1_tilemap->set_scrollx(0, state->m_bg1_scrollx  + state->m_bg1_dx[0]);
+	if (m_pri == 0x0078) {
+		m_bg0_tilemap->set_scrolly(0, m_bg0_scrolly  );
+		m_bg0_tilemap->set_scrollx(0, m_bg0_scrollx  + m_bg0_dx);
+		m_bg1_tilemap->set_scrolly(0, m_bg1_scrolly  );
+		m_bg1_tilemap->set_scrollx(0, m_bg1_scrollx  + m_bg1_dx[0]);
 	} else {
-		state->m_bg1_tilemap->set_scrolly(0, state->m_bg0_scrolly  );
-		state->m_bg1_tilemap->set_scrollx(0, state->m_bg0_scrollx  + state->m_bg1_dx[1]);
-		state->m_bg0_tilemap->set_scrolly(0, state->m_bg1_scrolly  );
-		state->m_bg0_tilemap->set_scrollx(0, state->m_bg1_scrollx  + state->m_bg0_dx);
+		m_bg1_tilemap->set_scrolly(0, m_bg0_scrolly  );
+		m_bg1_tilemap->set_scrollx(0, m_bg0_scrollx  + m_bg1_dx[1]);
+		m_bg0_tilemap->set_scrolly(0, m_bg1_scrolly  );
+		m_bg0_tilemap->set_scrollx(0, m_bg1_scrollx  + m_bg0_dx);
 	}
 
 	/* todo : which bits of pri are significant to the order */
 
-	if (state->m_pri == 0x007b) {
-		state->m_bg0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		state->m_bg1_tilemap->draw(bitmap, cliprect, 0,0);
+	if (m_pri == 0x007b) {
+		m_bg0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_bg1_tilemap->draw(bitmap, cliprect, 0,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		state->m_fg0_tilemap->draw(bitmap, cliprect, 0,0);
+		m_fg0_tilemap->draw(bitmap, cliprect, 0,0);
 	}
 
-	if (state->m_pri == 0x007c) {
-		state->m_bg0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+	if (m_pri == 0x007c) {
+		m_bg0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		state->m_bg1_tilemap->draw(bitmap, cliprect, 0,0);
-		state->m_fg0_tilemap->draw(bitmap, cliprect, 0,0);
+		m_bg1_tilemap->draw(bitmap, cliprect, 0,0);
+		m_fg0_tilemap->draw(bitmap, cliprect, 0,0);
 	}
 
-	if (state->m_pri == 0x0078) {
-		state->m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		state->m_bg0_tilemap->draw(bitmap, cliprect, 0,0);
+	if (m_pri == 0x0078) {
+		m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_bg0_tilemap->draw(bitmap, cliprect, 0,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		state->m_fg0_tilemap->draw(bitmap, cliprect, 0,0);
+		m_fg0_tilemap->draw(bitmap, cliprect, 0,0);
 	}
 	return 0;
 }

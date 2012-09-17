@@ -171,6 +171,10 @@ public:
 	DECLARE_MACHINE_START(champbwl);
 	DECLARE_MACHINE_RESET(champbwl);
 	DECLARE_MACHINE_START(doraemon);
+	UINT32 screen_update_champbwl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_doraemon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_champbwl(screen_device &screen, bool state);
+	void screen_eof_doraemon(screen_device &screen, bool state);
 };
 
 
@@ -452,7 +456,7 @@ MACHINE_RESET_MEMBER(champbwl_state,champbwl)
 
 }
 
-SCREEN_UPDATE_IND16( champbwl )
+UINT32 champbwl_state::screen_update_champbwl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x1f0, cliprect);
 
@@ -463,10 +467,10 @@ SCREEN_UPDATE_IND16( champbwl )
 	return 0;
 }
 
-SCREEN_VBLANK( champbwl )
+void champbwl_state::screen_eof_champbwl(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 		screen.machine().device<seta001_device>("spritegen")->tnzs_eof();
 }
 
@@ -491,8 +495,8 @@ static MACHINE_CONFIG_START( champbwl, champbwl_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(champbwl)
-	MCFG_SCREEN_VBLANK_STATIC(champbwl)
+	MCFG_SCREEN_UPDATE_DRIVER(champbwl_state, screen_update_champbwl)
+	MCFG_SCREEN_VBLANK_DRIVER(champbwl_state, screen_eof_champbwl)
 
 	MCFG_GFXDECODE(champbwl)
 	MCFG_PALETTE_LENGTH(512)
@@ -511,7 +515,7 @@ MACHINE_CONFIG_END
 
 
 
-static SCREEN_UPDATE_IND16( doraemon )
+UINT32 champbwl_state::screen_update_doraemon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x1f0, cliprect);
 
@@ -522,10 +526,10 @@ static SCREEN_UPDATE_IND16( doraemon )
 	return 0;
 }
 
-static SCREEN_VBLANK( doraemon )
+void champbwl_state::screen_eof_doraemon(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 		screen.machine().device<seta001_device>("spritegen")->setac_eof();
 }
 
@@ -554,8 +558,8 @@ static MACHINE_CONFIG_START( doraemon, champbwl_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(doraemon)
-	MCFG_SCREEN_VBLANK_STATIC(doraemon)
+	MCFG_SCREEN_UPDATE_DRIVER(champbwl_state, screen_update_doraemon)
+	MCFG_SCREEN_VBLANK_DRIVER(champbwl_state, screen_eof_doraemon)
 
 	MCFG_GFXDECODE(champbwl)
 	MCFG_PALETTE_LENGTH(512)

@@ -28,12 +28,13 @@ public:
 	DECLARE_DRIVER_INIT(rackemup);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_battlnts(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/battlnts.c -----------*/
 
 
-SCREEN_UPDATE_IND16( battlnts );
+
 
 void battlnts_tile_callback(running_machine &machine, int layer, int bank, int *code, int *color, int *flags);
 void battlnts_sprite_callback(running_machine &machine, int *code, int *color);

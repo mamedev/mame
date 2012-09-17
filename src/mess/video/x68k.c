@@ -1160,9 +1160,8 @@ VIDEO_START_MEMBER(x68k_state,x68000)
 //  m_scanline_timer->adjust(attotime::zero, 0, attotime::from_hz(55.45)/568);
 }
 
-SCREEN_UPDATE_IND16( x68000 )
+UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	x68k_state *state = screen.machine().driver_data<x68k_state>();
 	rectangle rect(0,0,0,0);
 	int priority;
 	int xscr,yscr;
@@ -1171,29 +1170,29 @@ SCREEN_UPDATE_IND16( x68000 )
 	tilemap_t* x68k_bg1;
 	//UINT8 *rom;
 
-	if((state->m_spritereg[0x408] & 0x03) == 0x00)  // Sprite/BG H-Res 0=8x8, 1=16x16, 2 or 3 = undefined.
+	if((m_spritereg[0x408] & 0x03) == 0x00)  // Sprite/BG H-Res 0=8x8, 1=16x16, 2 or 3 = undefined.
 	{
-		x68k_bg0 = state->m_bg0_8;
-		x68k_bg1 = state->m_bg1_8;
+		x68k_bg0 = m_bg0_8;
+		x68k_bg1 = m_bg1_8;
 	}
 	else
 	{
-		x68k_bg0 = state->m_bg0_16;
-		x68k_bg1 = state->m_bg1_16;
+		x68k_bg0 = m_bg0_16;
+		x68k_bg1 = m_bg1_16;
 	}
-//  rect.max_x=state->m_crtc.width;
-//  rect.max_y=state->m_crtc.height;
+//  rect.max_x=m_crtc.width;
+//  rect.max_y=m_crtc.height;
 	bitmap.fill(0, cliprect);
 
-	if(state->m_sysport.contrast == 0)  // if monitor contrast is 0, then don't bother displaying anything
+	if(m_sysport.contrast == 0)  // if monitor contrast is 0, then don't bother displaying anything
 		return 0;
 
-	rect.min_x=state->m_crtc.hbegin;
-	rect.min_y=state->m_crtc.vbegin;
-//  rect.max_x=rect.min_x + state->m_crtc.visible_width-1;
-//  rect.max_y=rect.min_y + state->m_crtc.visible_height-1;
-	rect.max_x=state->m_crtc.hend;
-	rect.max_y=state->m_crtc.vend;
+	rect.min_x=m_crtc.hbegin;
+	rect.min_y=m_crtc.vbegin;
+//  rect.max_x=rect.min_x + m_crtc.visible_width-1;
+//  rect.max_y=rect.min_y + m_crtc.visible_height-1;
+	rect.max_x=m_crtc.hend;
+	rect.max_y=m_crtc.vend;
 
 	if(rect.min_y < cliprect.min_y)
 		rect.min_y = cliprect.min_y;
@@ -1204,56 +1203,56 @@ SCREEN_UPDATE_IND16( x68000 )
 	//rom = screen.machine().root_device().memregion("user1")->base();
 	for(x=0;x<256;x++)
 	{
-		if(state->m_video.tile16_dirty[x] != 0)
+		if(m_video.tile16_dirty[x] != 0)
 		{
 			screen.machine().gfx[1]->mark_dirty(x);
-			state->m_video.tile16_dirty[x] = 0;
+			m_video.tile16_dirty[x] = 0;
 		}
-		if(state->m_video.tile8_dirty[x] != 0)
+		if(m_video.tile8_dirty[x] != 0)
 		{
 			screen.machine().gfx[0]->mark_dirty(x);
-			state->m_video.tile8_dirty[x] = 0;
+			m_video.tile8_dirty[x] = 0;
 		}
 	}
 
 	for(priority=3;priority>=0;priority--)
 	{
 		// Graphics screen(s)
-		if(priority == state->m_video.gfx_pri)
+		if(priority == m_video.gfx_pri)
 			x68k_draw_gfx(screen.machine(),bitmap,rect);
 
 		// Sprite / BG Tiles
-		if(priority == state->m_video.sprite_pri /*&& (state->m_spritereg[0x404] & 0x0200)*/ && (state->m_video.reg[2] & 0x0040))
+		if(priority == m_video.sprite_pri /*&& (m_spritereg[0x404] & 0x0200)*/ && (m_video.reg[2] & 0x0040))
 		{
 			x68k_draw_sprites(screen.machine(), bitmap,1,rect);
-			if((state->m_spritereg[0x404] & 0x0008))
+			if((m_spritereg[0x404] & 0x0008))
 			{
-				if((state->m_spritereg[0x404] & 0x0030) == 0x10)  // BG1 TXSEL
+				if((m_spritereg[0x404] & 0x0030) == 0x10)  // BG1 TXSEL
 				{
-					x68k_bg0->set_scrollx(0,(state->m_spritereg[0x402] - state->m_crtc.hbegin - state->m_crtc.bg_hshift) & 0x3ff);
-					x68k_bg0->set_scrolly(0,(state->m_spritereg[0x403] - state->m_crtc.vbegin) & 0x3ff);
+					x68k_bg0->set_scrollx(0,(m_spritereg[0x402] - m_crtc.hbegin - m_crtc.bg_hshift) & 0x3ff);
+					x68k_bg0->set_scrolly(0,(m_spritereg[0x403] - m_crtc.vbegin) & 0x3ff);
 					x68k_bg0->draw(bitmap,rect,0,0);
 				}
 				else
 				{
-					x68k_bg1->set_scrollx(0,(state->m_spritereg[0x402] - state->m_crtc.hbegin - state->m_crtc.bg_hshift) & 0x3ff);
-					x68k_bg1->set_scrolly(0,(state->m_spritereg[0x403] - state->m_crtc.vbegin) & 0x3ff);
+					x68k_bg1->set_scrollx(0,(m_spritereg[0x402] - m_crtc.hbegin - m_crtc.bg_hshift) & 0x3ff);
+					x68k_bg1->set_scrolly(0,(m_spritereg[0x403] - m_crtc.vbegin) & 0x3ff);
 					x68k_bg1->draw(bitmap,rect,0,0);
 				}
 			}
 			x68k_draw_sprites(screen.machine(),bitmap,2,rect);
-			if((state->m_spritereg[0x404] & 0x0001))
+			if((m_spritereg[0x404] & 0x0001))
 			{
-				if((state->m_spritereg[0x404] & 0x0006) == 0x02)  // BG0 TXSEL
+				if((m_spritereg[0x404] & 0x0006) == 0x02)  // BG0 TXSEL
 				{
-					x68k_bg0->set_scrollx(0,(state->m_spritereg[0x400] - state->m_crtc.hbegin - state->m_crtc.bg_hshift) & 0x3ff);
-					x68k_bg0->set_scrolly(0,(state->m_spritereg[0x401] - state->m_crtc.vbegin) & 0x3ff);
+					x68k_bg0->set_scrollx(0,(m_spritereg[0x400] - m_crtc.hbegin - m_crtc.bg_hshift) & 0x3ff);
+					x68k_bg0->set_scrolly(0,(m_spritereg[0x401] - m_crtc.vbegin) & 0x3ff);
 					x68k_bg0->draw(bitmap,rect,0,0);
 				}
 				else
 				{
-					x68k_bg1->set_scrollx(0,(state->m_spritereg[0x400] - state->m_crtc.hbegin - state->m_crtc.bg_hshift) & 0x3ff);
-					x68k_bg1->set_scrolly(0,(state->m_spritereg[0x401] - state->m_crtc.vbegin) & 0x3ff);
+					x68k_bg1->set_scrollx(0,(m_spritereg[0x400] - m_crtc.hbegin - m_crtc.bg_hshift) & 0x3ff);
+					x68k_bg1->set_scrolly(0,(m_spritereg[0x401] - m_crtc.vbegin) & 0x3ff);
 					x68k_bg1->draw(bitmap,rect,0,0);
 				}
 			}
@@ -1261,11 +1260,11 @@ SCREEN_UPDATE_IND16( x68000 )
 		}
 
 		// Text screen
-		if(state->m_video.reg[2] & 0x0020 && priority == state->m_video.text_pri)
+		if(m_video.reg[2] & 0x0020 && priority == m_video.text_pri)
 		{
-			xscr = (state->m_crtc.reg[10] & 0x3ff);
-			yscr = (state->m_crtc.reg[11] & 0x3ff);
-			if(!(state->m_crtc.reg[20] & 0x1000))  // if text layer is set to buffer, then it's not visible
+			xscr = (m_crtc.reg[10] & 0x3ff);
+			yscr = (m_crtc.reg[11] & 0x3ff);
+			if(!(m_crtc.reg[20] & 0x1000))  // if text layer is set to buffer, then it's not visible
 				x68k_draw_text(screen.machine(),bitmap,xscr,yscr,rect);
 		}
 	}
@@ -1273,45 +1272,45 @@ SCREEN_UPDATE_IND16( x68000 )
 #ifdef MAME_DEBUG
 	if(screen.machine().input().code_pressed(KEYCODE_I))
 	{
-		state->m_mfp.isra = 0;
-		state->m_mfp.isrb = 0;
+		m_mfp.isra = 0;
+		m_mfp.isrb = 0;
 //      mfp_trigger_irq(MFP_IRQ_GPIP6);
-//      machine.device("maincpu")->execute().set_input_line_and_vector(6,ASSERT_LINE,0x43);
+//      machine().device("maincpu")->execute().set_input_line_and_vector(6,ASSERT_LINE,0x43);
 	}
 	if(screen.machine().input().code_pressed(KEYCODE_9))
 	{
-		state->m_sprite_shift--;
-		popmessage("Sprite shift = %i",state->m_sprite_shift);
+		m_sprite_shift--;
+		popmessage("Sprite shift = %i",m_sprite_shift);
 	}
 	if(screen.machine().input().code_pressed(KEYCODE_0))
 	{
-		state->m_sprite_shift++;
-		popmessage("Sprite shift = %i",state->m_sprite_shift);
+		m_sprite_shift++;
+		popmessage("Sprite shift = %i",m_sprite_shift);
 	}
 
 #endif
 
 #ifdef MAME_DEBUG
-//  popmessage("Layer priorities [%04x] - Txt: %i  Spr: %i  Gfx: %i  Layer Pri0-3: %i %i %i %i",state->m_video.reg[1],state->m_video.text_pri,state->m_video.sprite_pri,
-//      state->m_video.gfx_pri,state->m_video.gfxlayer_pri[0],state->m_video.gfxlayer_pri[1],state->m_video.gfxlayer_pri[2],state->m_video.gfxlayer_pri[3]);
-//  popmessage("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i",state->m_crtc.reg[0],state->m_crtc.reg[1],state->m_crtc.reg[2],state->m_crtc.reg[3],
-//      state->m_crtc.reg[4],state->m_crtc.reg[5],state->m_crtc.reg[6],state->m_crtc.reg[7],state->m_crtc.reg[8],state->m_crtc.reg[9]);
-//  popmessage("Visible resolution = %ix%i (%s) Screen size = %ix%i",state->m_crtc.visible_width,state->m_crtc.visible_height,state->m_crtc.interlace ? "Interlaced" : "Non-interlaced",state->m_crtc.video_width,state->m_crtc.video_height);
-//  popmessage("VBlank : scanline = %i",state->m_scanline);
-//  popmessage("CRTC/BG compare H-TOTAL %i/%i H-DISP %i/%i V-DISP %i/%i BG Res %02x",state->m_crtc.reg[0],state->m_spritereg[0x405],state->m_crtc.reg[2],state->m_spritereg[0x406],
-//      state->m_crtc.reg[6],state->m_spritereg[0x407],state->m_spritereg[0x408]);
-//  popmessage("IER %02x %02x  IPR %02x %02x  ISR %02x %02x  IMR %02x %02x", state->m_mfp.iera,state->m_mfp.ierb,state->m_mfp.ipra,state->m_mfp.iprb,
-//      state->m_mfp.isra,state->m_mfp.isrb,state->m_mfp.imra,state->m_mfp.imrb);
-//  popmessage("BG Scroll - BG0 X %i Y %i  BG1 X %i Y %i",state->m_spriteram[0x400],state->m_spriteram[0x401],state->m_spriteram[0x402],state->m_spriteram[0x403]);
-//  popmessage("Keyboard buffer position = %i",state->m_keyboard.headpos);
-//  popmessage("IERA = 0x%02x, IERB = 0x%02x",state->m_mfp.iera,state->m_mfp.ierb);
-//  popmessage("IPRA = 0x%02x, IPRB = 0x%02x",state->m_mfp.ipra,state->m_mfp.iprb);
-//  popmessage("uPD72065 status = %02x",upd765_status_r(machine, space, 0));
-//  popmessage("Layer enable - 0x%02x",state->m_video.reg[2] & 0xff);
+//  popmessage("Layer priorities [%04x] - Txt: %i  Spr: %i  Gfx: %i  Layer Pri0-3: %i %i %i %i",m_video.reg[1],m_video.text_pri,m_video.sprite_pri,
+//      m_video.gfx_pri,m_video.gfxlayer_pri[0],m_video.gfxlayer_pri[1],m_video.gfxlayer_pri[2],m_video.gfxlayer_pri[3]);
+//  popmessage("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i",m_crtc.reg[0],m_crtc.reg[1],m_crtc.reg[2],m_crtc.reg[3],
+//      m_crtc.reg[4],m_crtc.reg[5],m_crtc.reg[6],m_crtc.reg[7],m_crtc.reg[8],m_crtc.reg[9]);
+//  popmessage("Visible resolution = %ix%i (%s) Screen size = %ix%i",m_crtc.visible_width,m_crtc.visible_height,m_crtc.interlace ? "Interlaced" : "Non-interlaced",m_crtc.video_width,m_crtc.video_height);
+//  popmessage("VBlank : scanline = %i",m_scanline);
+//  popmessage("CRTC/BG compare H-TOTAL %i/%i H-DISP %i/%i V-DISP %i/%i BG Res %02x",m_crtc.reg[0],m_spritereg[0x405],m_crtc.reg[2],m_spritereg[0x406],
+//      m_crtc.reg[6],m_spritereg[0x407],m_spritereg[0x408]);
+//  popmessage("IER %02x %02x  IPR %02x %02x  ISR %02x %02x  IMR %02x %02x", m_mfp.iera,m_mfp.ierb,m_mfp.ipra,m_mfp.iprb,
+//      m_mfp.isra,m_mfp.isrb,m_mfp.imra,m_mfp.imrb);
+//  popmessage("BG Scroll - BG0 X %i Y %i  BG1 X %i Y %i",m_spriteram[0x400],m_spriteram[0x401],m_spriteram[0x402],m_spriteram[0x403]);
+//  popmessage("Keyboard buffer position = %i",m_keyboard.headpos);
+//  popmessage("IERA = 0x%02x, IERB = 0x%02x",m_mfp.iera,m_mfp.ierb);
+//  popmessage("IPRA = 0x%02x, IPRB = 0x%02x",m_mfp.ipra,m_mfp.iprb);
+//  popmessage("uPD72065 status = %02x",upd765_status_r(machine(), space, 0));
+//  popmessage("Layer enable - 0x%02x",m_video.reg[2] & 0xff);
 //  popmessage("Graphic layer scroll - %i, %i - %i, %i - %i, %i - %i, %i",
-//      state->m_crtc.reg[12],state->m_crtc.reg[13],state->m_crtc.reg[14],state->m_crtc.reg[15],state->m_crtc.reg[16],state->m_crtc.reg[17],state->m_crtc.reg[18],state->m_crtc.reg[19]);
-//  popmessage("IOC IRQ status - %02x",state->m_ioc.irqstatus);
-//  popmessage("RAM: mouse data - %02x %02x %02x %02x",machine.device<ram_device>(RAM_TAG)->pointer()[0x931],machine.device<ram_device>(RAM_TAG)->pointer()[0x930],machine.device<ram_device>(RAM_TAG)->pointer()[0x933],machine.device<ram_device>(RAM_TAG)->pointer()[0x932]);
+//      m_crtc.reg[12],m_crtc.reg[13],m_crtc.reg[14],m_crtc.reg[15],m_crtc.reg[16],m_crtc.reg[17],m_crtc.reg[18],m_crtc.reg[19]);
+//  popmessage("IOC IRQ status - %02x",m_ioc.irqstatus);
+//  popmessage("RAM: mouse data - %02x %02x %02x %02x",machine().device<ram_device>(RAM_TAG)->pointer()[0x931],machine().device<ram_device>(RAM_TAG)->pointer()[0x930],machine().device<ram_device>(RAM_TAG)->pointer()[0x933],machine().device<ram_device>(RAM_TAG)->pointer()[0x932]);
 #endif
 	return 0;
 }

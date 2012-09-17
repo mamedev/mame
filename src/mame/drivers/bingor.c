@@ -454,6 +454,7 @@ public:
 	DECLARE_READ16_MEMBER(test_r);
 	DECLARE_READ8_MEMBER(test8_r);
 	virtual void video_start();
+	UINT32 screen_update_bingor(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -461,9 +462,8 @@ void bingor_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_RGB32(bingor)
+UINT32 bingor_state::screen_update_bingor(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bingor_state *state = screen.machine().driver_data<bingor_state>();
 	int x,y,count;
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
@@ -476,22 +476,22 @@ static SCREEN_UPDATE_RGB32(bingor)
 		{
 			UINT32 color;
 
-			color = (state->m_blit_ram[count] & 0xf000)>>12;
+			color = (m_blit_ram[count] & 0xf000)>>12;
 
 			if(cliprect.contains(x+3, y))
 				bitmap.pix32(y, x+3) = screen.machine().pens[color];
 
-			color = (state->m_blit_ram[count] & 0x0f00)>>8;
+			color = (m_blit_ram[count] & 0x0f00)>>8;
 
 			if(cliprect.contains(x+2, y))
 				bitmap.pix32(y, x+2) = screen.machine().pens[color];
 
-			color = (state->m_blit_ram[count] & 0x00f0)>>4;
+			color = (m_blit_ram[count] & 0x00f0)>>4;
 
 			if(cliprect.contains(x+1, y))
 				bitmap.pix32(y, x+1) = screen.machine().pens[color];
 
-			color = (state->m_blit_ram[count] & 0x000f)>>0;
+			color = (m_blit_ram[count] & 0x000f)>>0;
 
 			if(cliprect.contains(x+0, y))
 				bitmap.pix32(y, x+0) = screen.machine().pens[color];
@@ -635,7 +635,7 @@ static MACHINE_CONFIG_START( bingor, bingor_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
-	MCFG_SCREEN_UPDATE_STATIC(bingor)
+	MCFG_SCREEN_UPDATE_DRIVER(bingor_state, screen_update_bingor)
 
 	MCFG_PALETTE_LENGTH(0x100)
 

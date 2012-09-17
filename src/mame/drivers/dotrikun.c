@@ -39,6 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(dotrikun_color_w);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_dotrikun(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -62,19 +63,18 @@ WRITE8_MEMBER(dotrikun_state::dotrikun_color_w)
 }
 
 
-static SCREEN_UPDATE_RGB32( dotrikun )
+UINT32 dotrikun_state::screen_update_dotrikun(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	dotrikun_state *state = screen.machine().driver_data<dotrikun_state>();
 	int x,y,i;
 
-	pen_t back_pen = MAKE_RGB(pal1bit(state->m_color >> 3), pal1bit(state->m_color >> 4), pal1bit(state->m_color >> 5));
-	pen_t fore_pen = MAKE_RGB(pal1bit(state->m_color >> 0), pal1bit(state->m_color >> 1), pal1bit(state->m_color >> 2));
+	pen_t back_pen = MAKE_RGB(pal1bit(m_color >> 3), pal1bit(m_color >> 4), pal1bit(m_color >> 5));
+	pen_t fore_pen = MAKE_RGB(pal1bit(m_color >> 0), pal1bit(m_color >> 1), pal1bit(m_color >> 2));
 
 	for(y = (cliprect.min_y & ~1); y < cliprect.max_y; y+=2)
 	{
 		for (x = 0; x < 256; x+=16)
 		{
-			UINT8 data = state->m_dotrikun_bitmap[((x/16)+((y/2)*16))];
+			UINT8 data = m_dotrikun_bitmap[((x/16)+((y/2)*16))];
 
 			for (i = 0; i < 8; i++)
 			{
@@ -161,7 +161,7 @@ static MACHINE_CONFIG_START( dotrikun, dotrikun_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 256+32, 0, 256, 192+32, 0, 192) // FIXME: h/v params of this are completely inaccurate, shows it especially under the "CRT test"
-	MCFG_SCREEN_UPDATE_STATIC(dotrikun)
+	MCFG_SCREEN_UPDATE_DRIVER(dotrikun_state, screen_update_dotrikun)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

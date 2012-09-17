@@ -142,15 +142,14 @@ void blstroid_scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( blstroid )
+UINT32 blstroid_state::screen_update_blstroid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	blstroid_state *state = screen.machine().driver_data<blstroid_state>();
 	atarimo_rect_list rectlist;
 	bitmap_ind16 *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -167,7 +166,7 @@ SCREEN_UPDATE_IND16( blstroid )
                         priority address = HPPPMMMM
                     */
 					int priaddr = ((pf[x] & 8) << 4) | (pf[x] & 0x70) | ((mo[x] & 0xf0) >> 4);
-					if (state->m_priorityram[priaddr] & 1)
+					if (m_priorityram[priaddr] & 1)
 						pf[x] = mo[x];
 
 					/* erase behind ourselves */

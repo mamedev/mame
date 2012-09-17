@@ -139,6 +139,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 enum
@@ -411,19 +412,18 @@ static void vii_blit_sprites(running_machine &machine, bitmap_rgb32 &bitmap, con
 	}
 }
 
-static SCREEN_UPDATE_RGB32( vii )
+UINT32 vii_state::screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	vii_state *state = screen.machine().driver_data<vii_state>();
 	int i, x, y;
 
 	bitmap.fill(0, cliprect);
 
-	memset(state->m_screen, 0, sizeof(state->m_screen));
+	memset(m_screen, 0, sizeof(m_screen));
 
 	for(i = 0; i < 4; i++)
 	{
-		vii_blit_page(screen.machine(), bitmap, cliprect, i, 0x40 * state->m_video_regs[0x20], state->m_video_regs + 0x10);
-		vii_blit_page(screen.machine(), bitmap, cliprect, i, 0x40 * state->m_video_regs[0x21], state->m_video_regs + 0x16);
+		vii_blit_page(screen.machine(), bitmap, cliprect, i, 0x40 * m_video_regs[0x20], m_video_regs + 0x10);
+		vii_blit_page(screen.machine(), bitmap, cliprect, i, 0x40 * m_video_regs[0x21], m_video_regs + 0x16);
 		vii_blit_sprites(screen.machine(), bitmap, cliprect, i);
 	}
 
@@ -431,7 +431,7 @@ static SCREEN_UPDATE_RGB32( vii )
 	{
 		for(x = 0; x < 320; x++)
 		{
-			bitmap.pix32(y, x) = (state->m_screen[x + 320*y].r << 16) | (state->m_screen[x + 320*y].g << 8) | state->m_screen[x + 320*y].b;
+			bitmap.pix32(y, x) = (m_screen[x + 320*y].r << 16) | (m_screen[x + 320*y].g << 8) | m_screen[x + 320*y].b;
 		}
 	}
 
@@ -1101,7 +1101,7 @@ static MACHINE_CONFIG_START( vii, vii_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_STATIC( vii )
+	MCFG_SCREEN_UPDATE_DRIVER(vii_state, screen_update_vii)
 	MCFG_PALETTE_LENGTH(32768)
 
 	MCFG_CARTSLOT_ADD( "cart" )
@@ -1123,7 +1123,7 @@ static MACHINE_CONFIG_START( vsmile, vii_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_STATIC( vii )
+	MCFG_SCREEN_UPDATE_DRIVER(vii_state, screen_update_vii)
 	MCFG_PALETTE_LENGTH(32768)
 
 	MCFG_CARTSLOT_ADD( "cart" )
@@ -1150,7 +1150,7 @@ static MACHINE_CONFIG_START( batman, vii_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_STATIC( vii )
+	MCFG_SCREEN_UPDATE_DRIVER(vii_state, screen_update_vii)
 	MCFG_PALETTE_LENGTH(32768)
 MACHINE_CONFIG_END
 

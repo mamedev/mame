@@ -87,6 +87,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void video_start();
+	UINT32 screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -514,31 +515,30 @@ void limenko_state::video_start()
 	m_sprites_bitmap_pri.allocate(384,240);
 }
 
-static SCREEN_UPDATE_IND16( limenko )
+UINT32 limenko_state::screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	limenko_state *state = screen.machine().driver_data<limenko_state>();
-	// state->m_videoreg[4] ???? It always has this value: 0xffeffff8 (2 signed bytes? values: -17 and -8 ?)
+	// m_videoreg[4] ???? It always has this value: 0xffeffff8 (2 signed bytes? values: -17 and -8 ?)
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_bg_tilemap->enable(state->m_videoreg[0] & 4);
-	state->m_md_tilemap->enable(state->m_videoreg[0] & 2);
-	state->m_fg_tilemap->enable(state->m_videoreg[0] & 1);
+	m_bg_tilemap->enable(m_videoreg[0] & 4);
+	m_md_tilemap->enable(m_videoreg[0] & 2);
+	m_fg_tilemap->enable(m_videoreg[0] & 1);
 
-	state->m_bg_tilemap->set_scrolly(0, state->m_videoreg[3] & 0xffff);
-	state->m_md_tilemap->set_scrolly(0, state->m_videoreg[2] & 0xffff);
-	state->m_fg_tilemap->set_scrolly(0, state->m_videoreg[1] & 0xffff);
+	m_bg_tilemap->set_scrolly(0, m_videoreg[3] & 0xffff);
+	m_md_tilemap->set_scrolly(0, m_videoreg[2] & 0xffff);
+	m_fg_tilemap->set_scrolly(0, m_videoreg[1] & 0xffff);
 
-	state->m_bg_tilemap->set_scrollx(0, (state->m_videoreg[3] & 0xffff0000) >> 16);
-	state->m_md_tilemap->set_scrollx(0, (state->m_videoreg[2] & 0xffff0000) >> 16);
-	state->m_fg_tilemap->set_scrollx(0, (state->m_videoreg[1] & 0xffff0000) >> 16);
+	m_bg_tilemap->set_scrollx(0, (m_videoreg[3] & 0xffff0000) >> 16);
+	m_md_tilemap->set_scrollx(0, (m_videoreg[2] & 0xffff0000) >> 16);
+	m_fg_tilemap->set_scrollx(0, (m_videoreg[1] & 0xffff0000) >> 16);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_md_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0,1);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_md_tilemap->draw(bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0,1);
 
-	if(state->m_videoreg[0] & 8)
-		copy_sprites(screen.machine(), bitmap, state->m_sprites_bitmap, screen.machine().priority_bitmap, cliprect);
+	if(m_videoreg[0] & 8)
+		copy_sprites(screen.machine(), bitmap, m_sprites_bitmap, screen.machine().priority_bitmap, cliprect);
 
 	return 0;
 }
@@ -762,7 +762,7 @@ static MACHINE_CONFIG_START( limenko, limenko_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(384, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(limenko)
+	MCFG_SCREEN_UPDATE_DRIVER(limenko_state, screen_update_limenko)
 
 	MCFG_GFXDECODE(limenko)
 	MCFG_PALETTE_LENGTH(0x1000)
@@ -793,7 +793,7 @@ static MACHINE_CONFIG_START( spotty, limenko_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(384, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(limenko)
+	MCFG_SCREEN_UPDATE_DRIVER(limenko_state, screen_update_limenko)
 
 	MCFG_GFXDECODE(limenko)
 	MCFG_PALETTE_LENGTH(0x1000)

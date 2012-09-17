@@ -409,26 +409,24 @@ static void draw_background(running_machine &machine, bitmap_rgb32 &bitmap, cons
 	state->m_bg_tilemap->draw(bitmap, clip, 0, 0);
 }
 
-SCREEN_UPDATE_RGB32( psychic5 )
+UINT32 psychic5_state::screen_update_psychic5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	psychic5_state *state = screen.machine().driver_data<psychic5_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	if (state->m_bg_status & 1)	/* Backgound enable */
+	if (m_bg_status & 1)	/* Backgound enable */
 		draw_background(screen.machine(), bitmap, cliprect);
-	if (!(state->m_title_screen & 1))
+	if (!(m_title_screen & 1))
 		draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-SCREEN_UPDATE_RGB32( bombsa )
+UINT32 psychic5_state::screen_update_bombsa(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	psychic5_state *state = screen.machine().driver_data<psychic5_state>();
-	if (state->m_bg_status & 1)	/* Backgound enable */
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (m_bg_status & 1)	/* Backgound enable */
+		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(screen.machine().pens[0x0ff], cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

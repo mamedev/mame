@@ -61,10 +61,9 @@ void atetris_state::video_start()
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( atetris )
+UINT32 atetris_state::screen_update_atetris(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	atetris_state *state = screen.machine().driver_data<atetris_state>();
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

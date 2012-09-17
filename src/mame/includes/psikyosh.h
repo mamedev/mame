@@ -65,10 +65,11 @@ public:
 	DECLARE_DRIVER_INIT(s1945ii);
 	virtual void machine_start();
 	virtual void video_start();
+	UINT32 screen_update_psikyosh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/psikyosh.c -----------*/
 
 
-SCREEN_UPDATE_RGB32( psikyosh );
-SCREEN_VBLANK( psikyosh );
+
+

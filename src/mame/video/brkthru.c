@@ -245,26 +245,25 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( brkthru )
+UINT32 brkthru_state::screen_update_brkthru(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	brkthru_state *state = screen.machine().driver_data<brkthru_state>();
 
-	state->m_bg_tilemap->set_scrollx(0, state->m_bgscroll);
-	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_bg_tilemap->set_scrollx(0, m_bgscroll);
+	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* low priority sprites */
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x01);
 
 	/* draw background over low priority sprites */
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* high priority sprites */
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x09);
 
 	/* fg layer */
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-/*  show_register(bitmap, 8, 8, (UINT32)state->m_flipscreen); */
+/*  show_register(bitmap, 8, 8, (UINT32)m_flipscreen); */
 
 	return 0;
 }

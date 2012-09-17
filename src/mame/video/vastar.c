@@ -187,44 +187,43 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	}
 }
 
-SCREEN_UPDATE_IND16( vastar )
+UINT32 vastar_state::screen_update_vastar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	vastar_state *state = screen.machine().driver_data<vastar_state>();
 	int i;
 
 
 	for (i = 0;i < 32;i++)
 	{
-		state->m_bg1_tilemap->set_scrolly(i,state->m_bg1_scroll[i]);
-		state->m_bg2_tilemap->set_scrolly(i,state->m_bg2_scroll[i]);
+		m_bg1_tilemap->set_scrolly(i,m_bg1_scroll[i]);
+		m_bg2_tilemap->set_scrolly(i,m_bg2_scroll[i]);
 	}
 
-	switch (*state->m_sprite_priority)
+	switch (*m_sprite_priority)
 	{
 	case 0:
-		state->m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		state->m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+		m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
+		m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 		break;
 
 	case 2:
-		state->m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		state->m_bg1_tilemap->draw(bitmap, cliprect, 0,0);
-		state->m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+		m_bg1_tilemap->draw(bitmap, cliprect, 0,0);
+		m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
+		m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 		break;
 
 	case 3:
-		state->m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		state->m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+		m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
+		m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
 		break;
 
 	default:
-		logerror("Unimplemented priority %X\n", *state->m_sprite_priority);
+		logerror("Unimplemented priority %X\n", *m_sprite_priority);
 		break;
 	}
 	return 0;

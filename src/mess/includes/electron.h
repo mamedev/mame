@@ -74,6 +74,7 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_electron(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -87,7 +88,7 @@ void electron_interrupt_handler(running_machine &machine, int mode, int interrup
 /*----------- defined in video/electron.c -----------*/
 
 
-SCREEN_UPDATE_IND16( electron );
+
 
 
 #endif /* ELECTRON_H_ */

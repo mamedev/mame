@@ -271,36 +271,34 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const U
 
 /******************************************************************************/
 
-SCREEN_UPDATE_IND16( bbuster )
+UINT32 bbusters_state::screen_update_bbuster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bbusters_state *state = screen.machine().driver_data<bbusters_state>();
 
-	state->m_pf1_tilemap->set_scrollx(0, state->m_pf1_scroll_data[0]);
-	state->m_pf1_tilemap->set_scrolly(0, state->m_pf1_scroll_data[1]);
-	state->m_pf2_tilemap->set_scrollx(0, state->m_pf2_scroll_data[0]);
-	state->m_pf2_tilemap->set_scrolly(0, state->m_pf2_scroll_data[1]);
+	m_pf1_tilemap->set_scrollx(0, m_pf1_scroll_data[0]);
+	m_pf1_tilemap->set_scrolly(0, m_pf1_scroll_data[1]);
+	m_pf2_tilemap->set_scrollx(0, m_pf2_scroll_data[0]);
+	m_pf2_tilemap->set_scrolly(0, m_pf2_scroll_data[1]);
 
-	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
-	//draw_sprites(screen.machine(), bitmap, state->m_spriteram2->buffer(), 2, 0x8, 0x8);
-	state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, state->m_spriteram2->buffer(), 2, 0, 0);
-	draw_sprites(screen.machine(), bitmap, state->m_spriteram->buffer(), 1, 0, 0);
-	state->m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
+	//draw_sprites(screen.machine(), bitmap, m_spriteram2->buffer(), 2, 0x8, 0x8);
+	m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
+	draw_sprites(screen.machine(), bitmap, m_spriteram2->buffer(), 2, 0, 0);
+	draw_sprites(screen.machine(), bitmap, m_spriteram->buffer(), 1, 0, 0);
+	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( mechatt )
+UINT32 bbusters_state::screen_update_mechatt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bbusters_state *state = screen.machine().driver_data<bbusters_state>();
 
-	state->m_pf1_tilemap->set_scrollx(0, state->m_pf1_scroll_data[0]);
-	state->m_pf1_tilemap->set_scrolly(0, state->m_pf1_scroll_data[1]);
-	state->m_pf2_tilemap->set_scrollx(0, state->m_pf2_scroll_data[0]);
-	state->m_pf2_tilemap->set_scrolly(0, state->m_pf2_scroll_data[1]);
+	m_pf1_tilemap->set_scrollx(0, m_pf1_scroll_data[0]);
+	m_pf1_tilemap->set_scrolly(0, m_pf1_scroll_data[1]);
+	m_pf2_tilemap->set_scrollx(0, m_pf2_scroll_data[0]);
+	m_pf2_tilemap->set_scrolly(0, m_pf2_scroll_data[1]);
 
-	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, state->m_spriteram->buffer(), 1, 0, 0);
-	state->m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
+	draw_sprites(screen.machine(), bitmap, m_spriteram->buffer(), 1, 0, 0);
+	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

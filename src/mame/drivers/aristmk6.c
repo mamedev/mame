@@ -18,6 +18,7 @@ public:
 	UINT8 m_type;
 	DECLARE_READ64_MEMBER(test_r);
 	virtual void video_start();
+	UINT32 screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -25,51 +26,50 @@ void aristmk6_state::video_start()
 {
 }
 
-SCREEN_UPDATE_RGB32(aristmk6)
+UINT32 aristmk6_state::screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	aristmk6_state *state = screen.machine().driver_data<aristmk6_state>();
 
 	int x,y,count;
-	const UINT8 *blit_ram = state->memregion("maincpu")->base();
+	const UINT8 *blit_ram = memregion("maincpu")->base();
 
 	if(screen.machine().input().code_pressed(KEYCODE_Z))
-		state->m_test_x++;
+		m_test_x++;
 
 	if(screen.machine().input().code_pressed(KEYCODE_X))
-		state->m_test_x--;
+		m_test_x--;
 
 	if(screen.machine().input().code_pressed(KEYCODE_A))
-		state->m_test_y++;
+		m_test_y++;
 
 	if(screen.machine().input().code_pressed(KEYCODE_S))
-		state->m_test_y--;
+		m_test_y--;
 
 	if(screen.machine().input().code_pressed(KEYCODE_Q))
-		state->m_start_offs+=0x2000;
+		m_start_offs+=0x2000;
 
 	if(screen.machine().input().code_pressed(KEYCODE_W))
-		state->m_start_offs-=0x2000;
+		m_start_offs-=0x2000;
 
 	if(screen.machine().input().code_pressed(KEYCODE_E))
-		state->m_start_offs++;
+		m_start_offs++;
 
 	if(screen.machine().input().code_pressed(KEYCODE_R))
-		state->m_start_offs--;
+		m_start_offs--;
 
 	if(screen.machine().input().code_pressed_once(KEYCODE_L))
-		state->m_type^=1;
+		m_type^=1;
 
-	popmessage("%d %d %04x %d",state->m_test_x,state->m_test_y,state->m_start_offs,state->m_type);
+	popmessage("%d %d %04x %d",m_test_x,m_test_y,m_start_offs,m_type);
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	count = (state->m_start_offs);
+	count = (m_start_offs);
 
-	for(y=0;y<state->m_test_y;y++)
+	for(y=0;y<m_test_y;y++)
 	{
-		for(x=0;x<state->m_test_x;x++)
+		for(x=0;x<m_test_x;x++)
 		{
-			if(state->m_type)
+			if(m_type)
 			{
 				UINT16 vram;
 				int r,g,b;
@@ -143,7 +143,7 @@ static MACHINE_CONFIG_START( aristmk6, aristmk6_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_STATIC(aristmk6)
+	MCFG_SCREEN_UPDATE_DRIVER(aristmk6_state, screen_update_aristmk6)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 

@@ -306,17 +306,16 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	k007121_sprites_draw(k007121, bitmap, cliprect, machine.gfx[bank], machine.colortable, source, base_color, 40, 0, (UINT32)-1);
 }
 
-SCREEN_UPDATE_IND16( contra )
+UINT32 contra_state::screen_update_contra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	contra_state *state = screen.machine().driver_data<contra_state>();
 	address_space &space = screen.machine().driver_data()->generic_space();
-	UINT8 ctrl_1_0 = k007121_ctrlram_r(state->m_k007121_1, space, 0);
-	UINT8 ctrl_1_2 = k007121_ctrlram_r(state->m_k007121_1, space, 2);
-	UINT8 ctrl_2_0 = k007121_ctrlram_r(state->m_k007121_2, space, 0);
-	UINT8 ctrl_2_2 = k007121_ctrlram_r(state->m_k007121_2, space, 2);
-	rectangle bg_finalclip = state->m_bg_clip;
-	rectangle fg_finalclip = state->m_fg_clip;
-	rectangle tx_finalclip = state->m_tx_clip;
+	UINT8 ctrl_1_0 = k007121_ctrlram_r(m_k007121_1, space, 0);
+	UINT8 ctrl_1_2 = k007121_ctrlram_r(m_k007121_1, space, 2);
+	UINT8 ctrl_2_0 = k007121_ctrlram_r(m_k007121_2, space, 0);
+	UINT8 ctrl_2_2 = k007121_ctrlram_r(m_k007121_2, space, 2);
+	rectangle bg_finalclip = m_bg_clip;
+	rectangle fg_finalclip = m_fg_clip;
+	rectangle tx_finalclip = m_tx_clip;
 
 	bg_finalclip &= cliprect;
 	fg_finalclip &= cliprect;
@@ -324,15 +323,15 @@ SCREEN_UPDATE_IND16( contra )
 
 	set_pens(screen.machine());
 
-	state->m_fg_tilemap->set_scrollx(0, ctrl_1_0 - 40);
-	state->m_fg_tilemap->set_scrolly(0, ctrl_1_2);
-	state->m_bg_tilemap->set_scrollx(0, ctrl_2_0 - 40);
-	state->m_bg_tilemap->set_scrolly(0, ctrl_2_2);
+	m_fg_tilemap->set_scrollx(0, ctrl_1_0 - 40);
+	m_fg_tilemap->set_scrolly(0, ctrl_1_2);
+	m_bg_tilemap->set_scrollx(0, ctrl_2_0 - 40);
+	m_bg_tilemap->set_scrolly(0, ctrl_2_2);
 
-	state->m_bg_tilemap->draw(bitmap, bg_finalclip, 0 ,0);
-	state->m_fg_tilemap->draw(bitmap, fg_finalclip, 0 ,0);
+	m_bg_tilemap->draw(bitmap, bg_finalclip, 0 ,0);
+	m_fg_tilemap->draw(bitmap, fg_finalclip, 0 ,0);
 	draw_sprites(screen.machine(),bitmap,cliprect, 0);
 	draw_sprites(screen.machine(),bitmap,cliprect, 1);
-	state->m_tx_tilemap->draw(bitmap, tx_finalclip, 0 ,0);
+	m_tx_tilemap->draw(bitmap, tx_finalclip, 0 ,0);
 	return 0;
 }

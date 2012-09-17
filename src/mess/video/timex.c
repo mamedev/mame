@@ -178,27 +178,26 @@ static void ts2068_lores_scanline(running_machine &machine,bitmap_ind16 &bitmap,
 	}
 }
 
-SCREEN_UPDATE_IND16( ts2068 )
+UINT32 spectrum_state::screen_update_ts2068(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* for now TS2068 will do a full-refresh */
-	spectrum_state *state = screen.machine().driver_data<spectrum_state>();
 	int count;
 	int full_refresh = 1;
 
-	if ((state->m_port_ff_data & 7) == 6)
+	if ((m_port_ff_data & 7) == 6)
 	{
 		/* 64 Column mode */
-		unsigned short inkcolor = (state->m_port_ff_data & 0x38) >> 3;
+		unsigned short inkcolor = (m_port_ff_data & 0x38) >> 3;
 		for (count = 0; count < 192; count++)
 			ts2068_64col_scanline(screen.machine(),bitmap, count, TS2068_TOP_BORDER, inkcolor);
 	}
-	else if ((state->m_port_ff_data & 7) == 2)
+	else if ((m_port_ff_data & 7) == 2)
 	{
 		/* Extended Color mode */
 		for (count = 0; count < 192; count++)
 			ts2068_hires_scanline(screen.machine(),bitmap, count, TS2068_TOP_BORDER);
 	}
-	else if ((state->m_port_ff_data & 7) == 1)
+	else if ((m_port_ff_data & 7) == 1)
 	{
 		/* Screen 6000-7aff */
 		for (count = 0; count < 192; count++)
@@ -219,27 +218,26 @@ SCREEN_UPDATE_IND16( ts2068 )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( tc2048 )
+UINT32 spectrum_state::screen_update_tc2048(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* for now TS2068 will do a full-refresh */
-	spectrum_state *state = screen.machine().driver_data<spectrum_state>();
 	int count;
 	int full_refresh = 1;
 
-	if ((state->m_port_ff_data & 7) == 6)
+	if ((m_port_ff_data & 7) == 6)
 	{
 		/* 64 Column mode */
-		unsigned short inkcolor = (state->m_port_ff_data & 0x38) >> 3;
+		unsigned short inkcolor = (m_port_ff_data & 0x38) >> 3;
 		for (count = 0; count < 192; count++)
 			ts2068_64col_scanline(screen.machine(),bitmap, count, SPEC_TOP_BORDER, inkcolor);
 	}
-	else if ((state->m_port_ff_data & 7) == 2)
+	else if ((m_port_ff_data & 7) == 2)
 	{
 		/* Extended Color mode */
 		for (count = 0; count < 192; count++)
 			ts2068_hires_scanline(screen.machine(),bitmap, count, SPEC_TOP_BORDER);
 	}
-	else if ((state->m_port_ff_data & 7) == 1)
+	else if ((m_port_ff_data & 7) == 1)
 	{
 		/* Screen 6000-7aff */
 		for (count = 0; count < 192; count++)

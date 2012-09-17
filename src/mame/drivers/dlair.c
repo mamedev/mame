@@ -113,6 +113,7 @@ public:
 	DECLARE_MACHINE_START(dlair);
 	DECLARE_MACHINE_RESET(dlair);
 	DECLARE_PALETTE_INIT(dleuro);
+	UINT32 screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -226,10 +227,9 @@ PALETTE_INIT_MEMBER(dlair_state,dleuro)
  *
  *************************************/
 
-static SCREEN_UPDATE_IND16( dleuro )
+UINT32 dlair_state::screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dlair_state *state = screen.machine().driver_data<dlair_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int x, y;
 
 	/* redraw the overlay */
@@ -772,7 +772,7 @@ static MACHINE_CONFIG_START( dleuro, dlair_state )
 	MCFG_MACHINE_RESET_OVERRIDE(dlair_state,dlair)
 
 	MCFG_LASERDISC_22VP932_ADD("ld_22vp932")
-	MCFG_LASERDISC_OVERLAY_STATIC(256, 256, dleuro)
+	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, dlair_state, screen_update_dleuro)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_PAL("screen", "ld_22vp932")

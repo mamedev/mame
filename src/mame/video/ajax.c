@@ -86,30 +86,29 @@ void ajax_state::video_start()
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( ajax )
+UINT32 ajax_state::screen_update_ajax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ajax_state *state = screen.machine().driver_data<ajax_state>();
 
-	k052109_tilemap_update(state->m_k052109);
+	k052109_tilemap_update(m_k052109);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 2, 0, 1);
-	if (state->m_priority)
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, 0, 1);
+	if (m_priority)
 	{
 		/* basic layer order is B, zoom, A, F */
-		k051316_zoom_draw(state->m_k051316, bitmap, cliprect, 0, 4);
-		k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 1, 0, 2);
+		k051316_zoom_draw(m_k051316, bitmap, cliprect, 0, 4);
+		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, 0, 2);
 	}
 	else
 	{
 		/* basic layer order is B, A, zoom, F */
-		k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 1, 0, 2);
-		k051316_zoom_draw(state->m_k051316, bitmap, cliprect, 0, 4);
+		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, 0, 2);
+		k051316_zoom_draw(m_k051316, bitmap, cliprect, 0, 4);
 	}
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 0, 0, 8);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 0, 0, 8);
 
-	k051960_sprites_draw(state->m_k051960, bitmap, cliprect, -1, -1);
+	k051960_sprites_draw(m_k051960, bitmap, cliprect, -1, -1);
 	return 0;
 }

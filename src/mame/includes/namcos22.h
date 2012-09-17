@@ -254,16 +254,18 @@ public:
 	DECLARE_VIDEO_START(namcos22s);
 	DECLARE_VIDEO_START(namcos22);
 	DECLARE_VIDEO_START(common);
+	UINT32 screen_update_namcos22s(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_namcos22(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/namcos22.c -----------*/
 
 
-SCREEN_UPDATE_RGB32( namcos22 );
 
 
-SCREEN_UPDATE_RGB32( namcos22s );
+
+
 
 void namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource );
 UINT32 namcos22_point_rom_r( running_machine &machine, offs_t offs );

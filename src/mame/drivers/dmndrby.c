@@ -80,6 +80,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_dmndrby_tile_info);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_dderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -345,9 +346,8 @@ void dmndrby_state::video_start()
 
 }
 
-static SCREEN_UPDATE_IND16(dderby)
+UINT32 dmndrby_state::screen_update_dderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dmndrby_state *state = screen.machine().driver_data<dmndrby_state>();
 	int x,y,count;
 	int off,scrolly;
 	gfx_element *gfx = screen.machine().gfx[0];
@@ -363,22 +363,22 @@ racetrack seems to be stored in 4th and 5th prom.
 can we draw it with the tilemap? maybe not, the layout is a litle strange
 
 */
-//  base = state->m_scroll_ram[0];
+//  base = m_scroll_ram[0];
 
-	off=0x1900-(state->m_bg*0x100)+(state->m_scroll_ram[1])*0x100;
-	scrolly = 0xff-(state->m_scroll_ram[0]);
-	if(state->m_scroll_ram[1]==0xff) off=0x1800;
+	off=0x1900-(m_bg*0x100)+(m_scroll_ram[1])*0x100;
+	scrolly = 0xff-(m_scroll_ram[0]);
+	if(m_scroll_ram[1]==0xff) off=0x1800;
 	for(x=0;x<16;x++) {
 		for(y=0;y<16;y++) {
-			int chr = state->m_racetrack_tilemap_rom[off];
-			int col = state->m_racetrack_tilemap_rom[off+0x2000]&0x1f;
-			int flipx = state->m_racetrack_tilemap_rom[off+0x2000]&0x40;
+			int chr = m_racetrack_tilemap_rom[off];
+			int col = m_racetrack_tilemap_rom[off+0x2000]&0x1f;
+			int flipx = m_racetrack_tilemap_rom[off+0x2000]&0x40;
 			drawgfx_opaque(bitmap,cliprect,track,chr,col,flipx,0,y*16+scrolly,x*16);
 			// draw another bit of track
 			// a rubbish way of doing it
-			chr = state->m_racetrack_tilemap_rom[off-0x100];
-			col = state->m_racetrack_tilemap_rom[off+0x1f00]&0x1f;
-			flipx = state->m_racetrack_tilemap_rom[off+0x1f00]&0x40;
+			chr = m_racetrack_tilemap_rom[off-0x100];
+			col = m_racetrack_tilemap_rom[off+0x1f00]&0x1f;
+			flipx = m_racetrack_tilemap_rom[off+0x1f00]&0x40;
 			drawgfx_opaque(bitmap,cliprect,track,chr,col,flipx,0,y*16-256+scrolly,x*16);
 			off++;
 		}
@@ -399,12 +399,12 @@ wouldnt like to say its the most effective way though...
 		int a=0;
 		int b=0;
 		int base = count*4;
-		int sprx=state->m_sprite_ram[base+3];
-		int spry=state->m_sprite_ram[base+2];
-		//state->m_sprite_ram[base+1];
-		int col = (state->m_sprite_ram[base+1]&0x1f);
-		int anim = (state->m_sprite_ram[base]&0x3)*0x40; // animation frame - probably wrong but seems right
-		int horse = (state->m_sprite_ram[base+1]&0x7)*8+7;  // horse label from 1 - 6
+		int sprx=m_sprite_ram[base+3];
+		int spry=m_sprite_ram[base+2];
+		//m_sprite_ram[base+1];
+		int col = (m_sprite_ram[base+1]&0x1f);
+		int anim = (m_sprite_ram[base]&0x3)*0x40; // animation frame - probably wrong but seems right
+		int horse = (m_sprite_ram[base+1]&0x7)*8+7;  // horse label from 1 - 6
 
 		for (a=0;a<8 ;a++)
 		{
@@ -427,10 +427,10 @@ wouldnt like to say its the most effective way though...
 		for(x=0;x<32;x++)
 		{
 			int tileno,bank,color;
-			tileno=state->m_dderby_vidchars[count];
-			bank=(state->m_dderby_vidattribs[count]&0x20)>>5;
+			tileno=m_dderby_vidchars[count];
+			bank=(m_dderby_vidattribs[count]&0x20)>>5;
 			tileno|=(bank<<8);
-			color=((state->m_dderby_vidattribs[count])&0x1f);
+			color=((m_dderby_vidattribs[count])&0x1f);
 
 			drawgfx_transpen(bitmap,cliprect,gfx,tileno,color,0,0,x*8,y*8,(tileno == 0x38) ? 0 : -1);
 
@@ -527,7 +527,7 @@ static MACHINE_CONFIG_START( dderby, dmndrby_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(dderby)
+	MCFG_SCREEN_UPDATE_DRIVER(dmndrby_state, screen_update_dderby)
 
 	MCFG_GFXDECODE(dmndrby)
 	MCFG_PALETTE_LENGTH(0x300)

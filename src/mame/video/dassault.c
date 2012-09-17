@@ -74,35 +74,34 @@ static void mixdassaultlayer(running_machine &machine, bitmap_rgb32 &bitmap, bit
 }
 
 /* are the priorities 100% correct? they're the same as they were before conversion to DECO52 sprite device, but if (for example) you walk to the side of the crates in the first part of the game you appear over them... */
-SCREEN_UPDATE_RGB32( dassault )
+UINT32 dassault_state::screen_update_dassault(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	dassault_state *state = screen.machine().driver_data<dassault_state>();
 	address_space &space = screen.machine().driver_data()->generic_space();
-	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, space, 0, 0xffff);
-	UINT16 priority = decocomn_priority_r(state->m_decocomn, space, 0, 0xffff);
+	UINT16 flip = deco16ic_pf_control_r(m_deco_tilegen1, space, 0, 0xffff);
+	UINT16 priority = decocomn_priority_r(m_decocomn, space, 0, 0xffff);
 
-	screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, state->m_spriteram2->buffer(), 0x400, false);
-	screen.machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, state->m_spriteram->buffer(), 0x400, false);
+	screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, false);
+	screen.machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, false);
 	bitmap_ind16* sprite_bitmap1 = &screen.machine().device<decospr_device>("spritegen1")->get_sprite_temp_bitmap();
 	bitmap_ind16* sprite_bitmap2 = &screen.machine().device<decospr_device>("spritegen2")->get_sprite_temp_bitmap();
 
 	/* Update tilemaps */
-	state->flip_screen_set(BIT(flip, 7));
-	deco16ic_pf_update(state->m_deco_tilegen1, 0, state->m_pf2_rowscroll);
-	deco16ic_pf_update(state->m_deco_tilegen2, 0, state->m_pf4_rowscroll);
+	flip_screen_set(BIT(flip, 7));
+	deco16ic_pf_update(m_deco_tilegen1, 0, m_pf2_rowscroll);
+	deco16ic_pf_update(m_deco_tilegen2, 0, m_pf4_rowscroll);
 
 	/* Draw playfields/update priority bitmap */
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(screen.machine().pens[3072], cliprect);
-	deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	deco16ic_tilemap_2_draw(m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* The middle playfields can be swapped priority-wise */
 	if ((priority & 3) == 0)
 	{
 		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0600, 0x0600,  0x400, 0xff); // 1
-		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 2); // 2
+		deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 2); // 2
 		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0400, 0x0600,  0x400, 0xff); // 8
-		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 16); // 16
+		deco16ic_tilemap_1_draw(m_deco_tilegen2, bitmap, cliprect, 0, 16); // 16
 		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0200, 0x0600,  0x400, 0xff); // 32
 		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap2, cliprect,  0x0000, 0x0000,  0x800, 0x80); // 64?
 		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0000, 0x0600,  0x400, 0xff); // 128
@@ -111,19 +110,19 @@ SCREEN_UPDATE_RGB32( dassault )
 	else if ((priority & 3) == 1)
 	{
 		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0600, 0x0600,  0x400, 0xff); // 1
-		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 2); // 2
+		deco16ic_tilemap_1_draw(m_deco_tilegen2, bitmap, cliprect, 0, 2); // 2
 		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0400, 0x0600,  0x400, 0xff); // 8
 		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap2, cliprect,  0x0000, 0x0000,  0x800, 0x80); // 16?
 		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0200, 0x0600,  0x400, 0xff); // 32
-		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 64); // 64
+		deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 64); // 64
 		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0000, 0x0600,  0x400, 0xff); // 128
 	}
 	else if ((priority & 3) == 3)
 	{
 		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0600, 0x0600,  0x400, 0xff); // 1
-		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 2); // 2
+		deco16ic_tilemap_1_draw(m_deco_tilegen2, bitmap, cliprect, 0, 2); // 2
 		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0400, 0x0600,  0x400, 0xff); // 8
-		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 16); // 16
+		deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 16); // 16
 		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0200, 0x0600,  0x400, 0xff); // 32
 		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap2, cliprect,  0x0000, 0x0000,  0x800, 0x80); // 64?
 		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0000, 0x0600,  0x400, 0xff); // 128
@@ -133,6 +132,6 @@ SCREEN_UPDATE_RGB32( dassault )
 		/* Unused */
 	}
 
-	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }

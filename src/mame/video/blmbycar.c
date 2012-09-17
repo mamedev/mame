@@ -213,16 +213,15 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( blmbycar )
+UINT32 blmbycar_state::screen_update_blmbycar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	blmbycar_state *state = screen.machine().driver_data<blmbycar_state>();
 	int i, layers_ctrl = -1;
 
-	state->m_tilemap_0->set_scrolly(0, state->m_scroll_0[0]);
-	state->m_tilemap_0->set_scrollx(0, state->m_scroll_0[1]);
+	m_tilemap_0->set_scrolly(0, m_scroll_0[0]);
+	m_tilemap_0->set_scrollx(0, m_scroll_0[1]);
 
-	state->m_tilemap_1->set_scrolly(0, state->m_scroll_1[0] + 1);
-	state->m_tilemap_1->set_scrollx(0, state->m_scroll_1[1] + 5);
+	m_tilemap_1->set_scrolly(0, m_scroll_1[0] + 1);
+	m_tilemap_1->set_scrollx(0, m_scroll_1[1] + 5);
 
 #ifdef MAME_DEBUG
 if (screen.machine().input().code_pressed(KEYCODE_Z))
@@ -241,13 +240,13 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 	if (layers_ctrl & 1)
 		for (i = 0; i <= 1; i++)
-			state->m_tilemap_0->draw(bitmap, cliprect, i, i);
+			m_tilemap_0->draw(bitmap, cliprect, i, i);
 	else
 		bitmap.fill(0, cliprect);
 
 	if (layers_ctrl & 2)
 		for (i = 0; i <= 1; i++)
-			state->m_tilemap_1->draw(bitmap, cliprect, i, i);
+			m_tilemap_1->draw(bitmap, cliprect, i, i);
 
 	if (layers_ctrl & 8)
 		draw_sprites(screen.machine(), bitmap, cliprect);

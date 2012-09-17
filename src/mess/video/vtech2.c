@@ -113,20 +113,19 @@ static const int offs_0[96] = {
 	0x26a0,0x2ea0,0x36a0,0x3ea0,0x27a0,0x2fa0,0x37a0,0x3fa0
 };
 
-SCREEN_UPDATE_IND16( laser )
+UINT32 vtech2_state::screen_update_laser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	vtech2_state *state = screen.machine().driver_data<vtech2_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int offs, x, y;
 	int full_refresh = 1;
 
 	if( full_refresh )
-		bitmap.fill(((state->m_laser_bg_mode >> 4) & 15)<<1, cliprect);
+		bitmap.fill(((m_laser_bg_mode >> 4) & 15)<<1, cliprect);
 
-	if (state->m_laser_latch & 0x08)
+	if (m_laser_latch & 0x08)
 	{
 		/* graphics modes */
-		switch (state->m_laser_bg_mode & 7)
+		switch (m_laser_bg_mode & 7)
         {
 		case  0:
 		case  1:
@@ -139,7 +138,7 @@ SCREEN_UPDATE_IND16( laser )
 				offs = offs_2[y];
 				for( x = 0; x < 80; x++, offs++ )
 				{
-					int sx, sy, code, color = state->m_laser_two_color;
+					int sx, sy, code, color = m_laser_two_color;
 					sy = BORDER_V/2 + y;
 					sx = BORDER_H/2 + x * 8;
 					code = videoram[offs];
@@ -217,7 +216,7 @@ SCREEN_UPDATE_IND16( laser )
 				offs = offs_1[y];
 				for( x = 0; x < 40; x++, offs++ )
 				{
-					int sx, sy, code, color = state->m_laser_two_color;
+					int sx, sy, code, color = m_laser_two_color;
 					sy = BORDER_V/2 + y;
 					sx = BORDER_H/2 + x * 16;
 					code = videoram[offs];
@@ -250,7 +249,7 @@ SCREEN_UPDATE_IND16( laser )
 	else
 	{
 		/* text modes */
-		if (state->m_laser_bg_mode & 1)
+		if (m_laser_bg_mode & 1)
 		{
 			/* 80 columns text mode */
 			for( y = 0; y < 24; y++ )
@@ -258,7 +257,7 @@ SCREEN_UPDATE_IND16( laser )
 				offs = ((y & 7) << 8) + ((y >> 3) * 80);
 				for( x = 0; x < 80; x++, offs++ )
 				{
-					int sx, sy, code, color = state->m_laser_two_color;
+					int sx, sy, code, color = m_laser_two_color;
 					sy = BORDER_V/2 + y * 8;
 					sx = BORDER_H/2 + x * 8;
 					code = videoram[0x3800+offs];
@@ -285,9 +284,9 @@ SCREEN_UPDATE_IND16( laser )
 		}
 	}
 
-	if( state->m_laser_frame_time > 0 )
+	if( m_laser_frame_time > 0 )
 	{
-		popmessage("%s", state->m_laser_frame_message);
+		popmessage("%s", m_laser_frame_message);
 	}
 	return 0;
 }

@@ -85,11 +85,10 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( bigevglf )
+UINT32 bigevglf_state::screen_update_bigevglf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bigevglf_state *state = screen.machine().driver_data<bigevglf_state>();
 
-	copybitmap(bitmap, state->m_tmp_bitmap[state->m_plane_visible], 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_tmp_bitmap[m_plane_visible], 0, 0, 0, 0, cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

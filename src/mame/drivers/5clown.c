@@ -486,6 +486,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fclown_tile_info);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -537,10 +538,9 @@ void _5clown_state::video_start()
 }
 
 
-static SCREEN_UPDATE_IND16( fclown )
+UINT32 _5clown_state::screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	_5clown_state *state = screen.machine().driver_data<_5clown_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -1081,7 +1081,7 @@ static MACHINE_CONFIG_START( fclown, _5clown_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(fclown)
+	MCFG_SCREEN_UPDATE_DRIVER(_5clown_state, screen_update_fclown)
 
 	MCFG_GFXDECODE(fclown)
 	MCFG_PALETTE_LENGTH(256)

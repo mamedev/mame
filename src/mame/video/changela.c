@@ -721,13 +721,12 @@ static TIMER_CALLBACK( changela_scanline_callback )
 	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(sy), sy);
 }
 
-SCREEN_UPDATE_IND16( changela )
+UINT32 changela_state::screen_update_changela(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	changela_state *state = screen.machine().driver_data<changela_state>();
-	copybitmap(bitmap, state->m_river_bitmap, 0, 0, 0, 0, cliprect);
-	copybitmap_trans(bitmap, state->m_obj0_bitmap,  0, 0, 0, 0, cliprect, 0);
-	copybitmap_trans(bitmap, state->m_tree0_bitmap, 0, 0, 0, 0, cliprect, 0);
-	copybitmap_trans(bitmap, state->m_tree1_bitmap, 0, 0, 0, 0, cliprect, 0);
+	copybitmap(bitmap, m_river_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap_trans(bitmap, m_obj0_bitmap,  0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, m_tree0_bitmap, 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, m_tree1_bitmap, 0, 0, 0, 0, cliprect, 0);
 	draw_obj1(screen.machine(), bitmap);
 
 	return 0;

@@ -2163,7 +2163,7 @@ static MACHINE_CONFIG_START( sys1ppi, system1_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 640, 0, 512, 260, 0, 224)
-	MCFG_SCREEN_UPDATE_STATIC(system1)
+	MCFG_SCREEN_UPDATE_DRIVER(system1_state, screen_update_system1)
 
 	MCFG_GFXDECODE(system1)
 	MCFG_PALETTE_LENGTH(2048)
@@ -2252,7 +2252,7 @@ static MACHINE_CONFIG_DERIVED( sys2, sys1ppi )
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(system1_state,system2)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(system2)
+	MCFG_SCREEN_UPDATE_DRIVER(system1_state, screen_update_system2)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sys2m, sys2 )
@@ -2264,7 +2264,7 @@ static MACHINE_CONFIG_DERIVED( sys2row, sys2 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(system2_rowscroll)
+	MCFG_SCREEN_UPDATE_DRIVER(system1_state, screen_update_system2_rowscroll)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sys2rowm, sys2row )

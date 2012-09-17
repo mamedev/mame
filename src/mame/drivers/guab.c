@@ -98,6 +98,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_guab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -258,7 +259,7 @@ void guab_state::video_start()
 }
 
 
-static SCREEN_UPDATE_IND16( guab )
+UINT32 guab_state::screen_update_guab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 	struct tms34061_display state;
@@ -824,7 +825,7 @@ static MACHINE_CONFIG_START( guab, guab_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(guab)
+	MCFG_SCREEN_UPDATE_DRIVER(guab_state, screen_update_guab)
 
 	MCFG_PALETTE_LENGTH(16)
 

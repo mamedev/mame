@@ -66,6 +66,7 @@ public:
 	DECLARE_READ8_MEMBER(kludge_r);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_cmmb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -74,10 +75,9 @@ void cmmb_state::video_start()
 
 }
 
-static SCREEN_UPDATE_IND16( cmmb )
+UINT32 cmmb_state::screen_update_cmmb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cmmb_state *state = screen.machine().driver_data<cmmb_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	gfx_element *gfx = screen.machine().gfx[0];
 	int count = 0x00000;
 
@@ -325,7 +325,7 @@ static MACHINE_CONFIG_START( cmmb, cmmb_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // unknown
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(cmmb)
+	MCFG_SCREEN_UPDATE_DRIVER(cmmb_state, screen_update_cmmb)
 
 	MCFG_GFXDECODE(cmmb)
 	MCFG_PALETTE_LENGTH(512)

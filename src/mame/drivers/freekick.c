@@ -642,7 +642,7 @@ static MACHINE_CONFIG_START( base, freekick_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(pbillrd)
+	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_pbillrd)
 
 	MCFG_PALETTE_LENGTH(0x200)
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
@@ -687,7 +687,7 @@ static MACHINE_CONFIG_DERIVED( freekickb, base )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(freekick)
+	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_freekick)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gigas, base )
@@ -700,7 +700,7 @@ static MACHINE_CONFIG_DERIVED( gigas, base )
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(gigas)
+	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_gigas)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( oigas, gigas )

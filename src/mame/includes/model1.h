@@ -134,6 +134,8 @@ public:
 	DECLARE_MACHINE_RESET(model1);
 	DECLARE_VIDEO_START(model1);
 	DECLARE_MACHINE_RESET(model1_vr);
+	UINT32 screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_eof_model1(screen_device &screen, bool state);
 };
 
 
@@ -154,6 +156,6 @@ void model1_tgp_reset(running_machine &machine, int swa);
 /*----------- defined in video/model1.c -----------*/
 
 
-SCREEN_UPDATE_RGB32(model1);
-SCREEN_VBLANK(model1);
+
+
 

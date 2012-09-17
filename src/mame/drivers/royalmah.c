@@ -196,6 +196,7 @@ public:
 	DECLARE_DRIVER_INIT(ippatsu);
 	virtual void palette_init();
 	DECLARE_PALETTE_INIT(mjderngr);
+	UINT32 screen_update_royalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -283,10 +284,9 @@ WRITE8_MEMBER(royalmah_state::mjderngr_palbank_w)
 }
 
 
-static SCREEN_UPDATE_IND16( royalmah )
+UINT32 royalmah_state::screen_update_royalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	royalmah_state *state = screen.machine().driver_data<royalmah_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 
 	offs_t offs;
 
@@ -304,7 +304,7 @@ static SCREEN_UPDATE_IND16( royalmah )
 		{
 			UINT8 pen = ((data2 >> 1) & 0x08) | ((data2 << 2) & 0x04) | ((data1 >> 3) & 0x02) | ((data1 >> 0) & 0x01);
 
-			bitmap.pix16(y, x) = (state->m_palette_base << 4) | pen;
+			bitmap.pix16(y, x) = (m_palette_base << 4) | pen;
 
 			x = x - 1;
 			data1 = data1 >> 1;
@@ -3181,7 +3181,7 @@ static MACHINE_CONFIG_START( royalmah, royalmah_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 247)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_UPDATE_STATIC(royalmah)
+	MCFG_SCREEN_UPDATE_DRIVER(royalmah_state, screen_update_royalmah)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

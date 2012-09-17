@@ -32,6 +32,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_cball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -56,20 +57,19 @@ void cball_state::video_start()
 }
 
 
-static SCREEN_UPDATE_IND16( cball )
+UINT32 cball_state::screen_update_cball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cball_state *state = screen.machine().driver_data<cball_state>();
 
 	/* draw playfield */
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw sprite */
 	drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
-		state->m_video_ram[0x399] >> 4,
+		m_video_ram[0x399] >> 4,
 		0,
 		0, 0,
-		240 - state->m_video_ram[0x390],
-		240 - state->m_video_ram[0x398], 0);
+		240 - m_video_ram[0x390],
+		240 - m_video_ram[0x398], 0);
 	return 0;
 }
 
@@ -236,7 +236,7 @@ static MACHINE_CONFIG_START( cball, cball_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
-	MCFG_SCREEN_UPDATE_STATIC(cball)
+	MCFG_SCREEN_UPDATE_DRIVER(cball_state, screen_update_cball)
 
 	MCFG_GFXDECODE(cball)
 	MCFG_PALETTE_LENGTH(6)

@@ -224,7 +224,7 @@ static MACHINE_CONFIG_START( busicom, busicom_state )
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MCFG_SCREEN_SIZE(40*17, 44*11)
     MCFG_SCREEN_VISIBLE_AREA(0, 40*17-1, 0, 44*11-1)
-	MCFG_SCREEN_UPDATE_STATIC(busicom)
+	MCFG_SCREEN_UPDATE_DRIVER(busicom_state, screen_update_busicom)
 
     MCFG_PALETTE_LENGTH(16)
 

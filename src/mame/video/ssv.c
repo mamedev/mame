@@ -970,23 +970,22 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( eaglshot )
+UINT32 ssv_state::screen_update_eaglshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return SCREEN_UPDATE16_CALL(ssv);
+	return SCREEN_UPDATE16_CALL_MEMBER(ssv);
 }
 
-SCREEN_UPDATE_IND16( gdfs )
+UINT32 ssv_state::screen_update_gdfs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ssv_state *state = screen.machine().driver_data<ssv_state>();
 
-	SCREEN_UPDATE16_CALL(ssv);
+	SCREEN_UPDATE16_CALL_MEMBER(ssv);
 
 	// draw zooming sprites
-	state->m_gdfs_st0020->st0020_draw_all(screen.machine(), bitmap, cliprect);
+	m_gdfs_st0020->st0020_draw_all(screen.machine(), bitmap, cliprect);
 
-	state->m_gdfs_tmap->set_scrollx(0, state->m_gdfs_tmapscroll[0x0c/2]);
-	state->m_gdfs_tmap->set_scrolly(0, state->m_gdfs_tmapscroll[0x10/2]);
-	state->m_gdfs_tmap->draw(bitmap, cliprect, 0, 0);
+	m_gdfs_tmap->set_scrollx(0, m_gdfs_tmapscroll[0x0c/2]);
+	m_gdfs_tmap->set_scrolly(0, m_gdfs_tmapscroll[0x10/2]);
+	m_gdfs_tmap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -998,33 +997,32 @@ void ssv_enable_video(running_machine &machine, int enable)
 	state->m_enable_video = enable;
 }
 
-SCREEN_UPDATE_IND16( ssv )
+UINT32 ssv_state::screen_update_ssv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle clip;
 
-	ssv_state *state = screen.machine().driver_data<ssv_state>();
 
 	// Shadow
-	if (state->m_scroll[0x76/2] & 0x0080)
+	if (m_scroll[0x76/2] & 0x0080)
 	{
 		// 4 bit shadows (mslider, stmblade)
-		state->m_shadow_pen_shift = 15-4;
+		m_shadow_pen_shift = 15-4;
 	}
 	else
 	{
 		// 2 bit shadows
-		state->m_shadow_pen_shift = 15-2;
+		m_shadow_pen_shift = 15-2;
 	}
-	state->m_shadow_pen_mask = (1 << state->m_shadow_pen_shift) - 1;
+	m_shadow_pen_mask = (1 << m_shadow_pen_shift) - 1;
 
 	/* The background color is the first one in the palette */
 	bitmap.fill(0, cliprect);
 
 	// used by twineag2 and ultrax
-	clip.min_x = (cliprect.max_x / 2 + state->m_scroll[0x62/2]) * 2 - state->m_scroll[0x64/2] * 2 + 2;
-	clip.max_x = (cliprect.max_x / 2 + state->m_scroll[0x62/2]) * 2 - state->m_scroll[0x62/2] * 2 + 1;
-	clip.min_y = (cliprect.max_y     + state->m_scroll[0x6a/2])     - state->m_scroll[0x6c/2]     + 1;
-	clip.max_y = (cliprect.max_y     + state->m_scroll[0x6a/2])     - state->m_scroll[0x6a/2]        ;
+	clip.min_x = (cliprect.max_x / 2 + m_scroll[0x62/2]) * 2 - m_scroll[0x64/2] * 2 + 2;
+	clip.max_x = (cliprect.max_x / 2 + m_scroll[0x62/2]) * 2 - m_scroll[0x62/2] * 2 + 1;
+	clip.min_y = (cliprect.max_y     + m_scroll[0x6a/2])     - m_scroll[0x6c/2]     + 1;
+	clip.max_y = (cliprect.max_y     + m_scroll[0x6a/2])     - m_scroll[0x6a/2]        ;
 
 //  printf("%04x %04x %04x %04x\n",clip.min_x, clip.max_x, clip.min_y, clip.max_y);
 
@@ -1038,7 +1036,7 @@ SCREEN_UPDATE_IND16( ssv )
 	if (clip.min_y > clip.max_y)
 		clip.min_y = clip.max_y;
 
-	if (!state->m_enable_video)
+	if (!m_enable_video)
 		return 0;
 
 	draw_layer(screen.machine(), bitmap, clip, 0);	// "background layer"

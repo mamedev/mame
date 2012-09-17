@@ -497,15 +497,14 @@ static void update_timers(running_machine &machine, int scanline)
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( atarisy1 )
+UINT32 atarisy1_state::screen_update_atarisy1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	atarisy1_state *state = screen.machine().driver_data<atarisy1_state>();
 	atarimo_rect_list rectlist;
 	bitmap_ind16 *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -529,7 +528,7 @@ SCREEN_UPDATE_IND16( atarisy1 )
 					else
 					{
 						/* priority pens for playfield color 0 */
-						if ((pf[x] & 0xf8) != 0 || !(state->m_playfield_priority_pens & (1 << (pf[x] & 0x07))))
+						if ((pf[x] & 0xf8) != 0 || !(m_playfield_priority_pens & (1 << (pf[x] & 0x07))))
 							pf[x] = mo[x];
 					}
 
@@ -539,7 +538,7 @@ SCREEN_UPDATE_IND16( atarisy1 )
 		}
 
 	/* add the alpha on top */
-	state->m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

@@ -115,20 +115,19 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( markham )
+UINT32 markham_state::screen_update_markham(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	markham_state *state = screen.machine().driver_data<markham_state>();
 	int i;
 
 	for (i = 0; i < 32; i++)
 	{
 		if ((i > 3) && (i < 16))
-			state->m_bg_tilemap->set_scrollx(i, state->m_xscroll[0]);
+			m_bg_tilemap->set_scrollx(i, m_xscroll[0]);
 		if (i >= 16)
-			state->m_bg_tilemap->set_scrollx(i, state->m_xscroll[1]);
+			m_bg_tilemap->set_scrollx(i, m_xscroll[1]);
 	}
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

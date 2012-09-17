@@ -66,6 +66,9 @@ public:
 	DECLARE_VIDEO_START(wwjgtin);
 	DECLARE_PALETTE_INIT(wwjgtin);
 	DECLARE_VIDEO_START(pinbo);
+	UINT32 screen_update_lasso(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_chameleo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_wwjgtin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -79,6 +82,6 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( lasso );
-SCREEN_UPDATE_IND16( chameleo );
-SCREEN_UPDATE_IND16( wwjgtin );
+
+
+

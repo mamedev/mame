@@ -111,6 +111,10 @@ SCREEN_UPDATE_IND16( vsnes );
 SCREEN_UPDATE_IND16( vsnes_bottom );
 
 
+
+
+
+
 extern const ppu2c0x_interface vsnes_ppu_interface_1;
 extern const ppu2c0x_interface vsnes_ppu_interface_2;
 

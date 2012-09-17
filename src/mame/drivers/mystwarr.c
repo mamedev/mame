@@ -1009,7 +1009,7 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(24, 24+288-1, 16, 16+224-1)
-	MCFG_SCREEN_UPDATE_STATIC(mystwarr)
+	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_mystwarr)
 
 	MCFG_PALETTE_LENGTH(2048)
 
@@ -1043,7 +1043,7 @@ static MACHINE_CONFIG_DERIVED( viostorm, mystwarr )
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,viostorm)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(metamrph)
+	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_metamrph)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(900))
@@ -1068,7 +1068,7 @@ static MACHINE_CONFIG_DERIVED( metamrph, mystwarr )
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,metamrph)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(metamrph)
+	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_metamrph)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(900))
@@ -1094,7 +1094,7 @@ static MACHINE_CONFIG_DERIVED( dadandrn, mystwarr )
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,dadandrn)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(dadandrn)
+	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_dadandrn)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
@@ -1123,7 +1123,7 @@ static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,gaiapols)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(dadandrn)
+	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_dadandrn)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
@@ -1150,7 +1150,7 @@ static MACHINE_CONFIG_DERIVED( martchmp, mystwarr )
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,martchmp)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(martchmp)
+	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_martchmp)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(32, 32+384-1, 16, 16+224-1)

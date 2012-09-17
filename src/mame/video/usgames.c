@@ -61,9 +61,8 @@ WRITE8_MEMBER(usgames_state::usgames_charram_w)
 }
 
 
-SCREEN_UPDATE_IND16(usgames)
+UINT32 usgames_state::screen_update_usgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	usgames_state *state = screen.machine().driver_data<usgames_state>();
-	state->m_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

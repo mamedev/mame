@@ -171,19 +171,18 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( hyperspt )
+UINT32 hyperspt_state::screen_update_hyperspt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	hyperspt_state *state = screen.machine().driver_data<hyperspt_state>();
 	int row;
 
 	for (row = 0; row < 32; row++)
 	{
-		int scrollx = state->m_scroll[row * 2] + (state->m_scroll[(row * 2) + 1] & 0x01) * 256;
-		if (state->flip_screen()) scrollx = -scrollx;
-		state->m_bg_tilemap->set_scrollx(row, scrollx);
+		int scrollx = m_scroll[row * 2] + (m_scroll[(row * 2) + 1] & 0x01) * 256;
+		if (flip_screen()) scrollx = -scrollx;
+		m_bg_tilemap->set_scrollx(row, scrollx);
 	}
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

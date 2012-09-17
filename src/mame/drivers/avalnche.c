@@ -44,24 +44,23 @@
  *
  *************************************/
 
-static SCREEN_UPDATE_RGB32( avalnche )
+UINT32 avalnche_state::screen_update_avalnche(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	avalnche_state *state = screen.machine().driver_data<avalnche_state>();
 	offs_t offs;
 
-	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
+	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{
 		int i;
 
 		UINT8 x = offs << 3;
 		int y = offs >> 5;
-		UINT8 data = state->m_videoram[offs];
+		UINT8 data = m_videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
 			pen_t pen;
 
-			if (state->m_avalance_video_inverted)
+			if (m_avalance_video_inverted)
 				pen = (data & 0x80) ? RGB_WHITE : RGB_BLACK;
 			else
 				pen = (data & 0x80) ? RGB_BLACK : RGB_WHITE;
@@ -258,7 +257,7 @@ static MACHINE_CONFIG_START( avalnche, avalnche_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(avalnche)
+	MCFG_SCREEN_UPDATE_DRIVER(avalnche_state, screen_update_avalnche)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

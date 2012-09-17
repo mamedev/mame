@@ -557,96 +557,92 @@ WRITE16_MEMBER(tmnt_state::tmnt_priority_w)
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( mia )
+UINT32 tmnt_state::screen_update_mia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 
-	k052109_tilemap_update(state->m_k052109);
+	k052109_tilemap_update(m_k052109);
 
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE,0);
-	if ((state->m_tmnt_priorityflag & 1) == 1) k051960_sprites_draw(state->m_k051960, bitmap, cliprect, 0, 0);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 1, 0, 0);
-	if ((state->m_tmnt_priorityflag & 1) == 0) k051960_sprites_draw(state->m_k051960, bitmap, cliprect, 0, 0);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 0, 0, 0);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE,0);
+	if ((m_tmnt_priorityflag & 1) == 1) k051960_sprites_draw(m_k051960, bitmap, cliprect, 0, 0);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, 0, 0);
+	if ((m_tmnt_priorityflag & 1) == 0) k051960_sprites_draw(m_k051960, bitmap, cliprect, 0, 0);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 0, 0, 0);
 
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( tmnt )
+UINT32 tmnt_state::screen_update_tmnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 
-	k052109_tilemap_update(state->m_k052109);
+	k052109_tilemap_update(m_k052109);
 
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE,0);
-	if ((state->m_tmnt_priorityflag & 1) == 1) k051960_sprites_draw(state->m_k051960, bitmap, cliprect, 0, 0);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 1, 0, 0);
-	if ((state->m_tmnt_priorityflag & 1) == 0) k051960_sprites_draw(state->m_k051960, bitmap, cliprect, 0, 0);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 0, 0, 0);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE,0);
+	if ((m_tmnt_priorityflag & 1) == 1) k051960_sprites_draw(m_k051960, bitmap, cliprect, 0, 0);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, 0, 0);
+	if ((m_tmnt_priorityflag & 1) == 0) k051960_sprites_draw(m_k051960, bitmap, cliprect, 0, 0);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 0, 0, 0);
 
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( punkshot )
+UINT32 tmnt_state::screen_update_punkshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 
-	state->m_sprite_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI1);
-	state->m_layer_colorbase[0] = k053251_get_palette_index(state->m_k053251, K053251_CI2);
-	state->m_layer_colorbase[1] = k053251_get_palette_index(state->m_k053251, K053251_CI4);
-	state->m_layer_colorbase[2] = k053251_get_palette_index(state->m_k053251, K053251_CI3);
+	m_sprite_colorbase = k053251_get_palette_index(m_k053251, K053251_CI1);
+	m_layer_colorbase[0] = k053251_get_palette_index(m_k053251, K053251_CI2);
+	m_layer_colorbase[1] = k053251_get_palette_index(m_k053251, K053251_CI4);
+	m_layer_colorbase[2] = k053251_get_palette_index(m_k053251, K053251_CI3);
 
-	k052109_tilemap_update(state->m_k052109);
+	k052109_tilemap_update(m_k052109);
 
-	state->m_sorted_layer[0] = 0;
-	state->m_layerpri[0] = k053251_get_priority(state->m_k053251, K053251_CI2);
-	state->m_sorted_layer[1] = 1;
-	state->m_layerpri[1] = k053251_get_priority(state->m_k053251, K053251_CI4);
-	state->m_sorted_layer[2] = 2;
-	state->m_layerpri[2] = k053251_get_priority(state->m_k053251, K053251_CI3);
+	m_sorted_layer[0] = 0;
+	m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI2);
+	m_sorted_layer[1] = 1;
+	m_layerpri[1] = k053251_get_priority(m_k053251, K053251_CI4);
+	m_sorted_layer[2] = 2;
+	m_layerpri[2] = k053251_get_priority(m_k053251, K053251_CI3);
 
-	konami_sortlayers3(state->m_sorted_layer, state->m_layerpri);
+	konami_sortlayers3(m_sorted_layer, m_layerpri);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[0], TILEMAP_DRAW_OPAQUE, 1);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[1], 0, 2);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[2], 0, 4);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[1], 0, 2);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[2], 0, 4);
 
-	k051960_sprites_draw(state->m_k051960, bitmap, cliprect, -1, -1);
+	k051960_sprites_draw(m_k051960, bitmap, cliprect, -1, -1);
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( lgtnfght )
+UINT32 tmnt_state::screen_update_lgtnfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 	int bg_colorbase;
 
-	bg_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI0);
-	state->m_sprite_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI1);
-	state->m_layer_colorbase[0] = k053251_get_palette_index(state->m_k053251, K053251_CI2);
-	state->m_layer_colorbase[1] = k053251_get_palette_index(state->m_k053251, K053251_CI4);
-	state->m_layer_colorbase[2] = k053251_get_palette_index(state->m_k053251, K053251_CI3);
+	bg_colorbase = k053251_get_palette_index(m_k053251, K053251_CI0);
+	m_sprite_colorbase = k053251_get_palette_index(m_k053251, K053251_CI1);
+	m_layer_colorbase[0] = k053251_get_palette_index(m_k053251, K053251_CI2);
+	m_layer_colorbase[1] = k053251_get_palette_index(m_k053251, K053251_CI4);
+	m_layer_colorbase[2] = k053251_get_palette_index(m_k053251, K053251_CI3);
 
-	k052109_tilemap_update(state->m_k052109);
+	k052109_tilemap_update(m_k052109);
 
-	state->m_sorted_layer[0] = 0;
-	state->m_layerpri[0] = k053251_get_priority(state->m_k053251, K053251_CI2);
-	state->m_sorted_layer[1] = 1;
-	state->m_layerpri[1] = k053251_get_priority(state->m_k053251, K053251_CI4);
-	state->m_sorted_layer[2] = 2;
-	state->m_layerpri[2] = k053251_get_priority(state->m_k053251, K053251_CI3);
+	m_sorted_layer[0] = 0;
+	m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI2);
+	m_sorted_layer[1] = 1;
+	m_layerpri[1] = k053251_get_priority(m_k053251, K053251_CI4);
+	m_sorted_layer[2] = 2;
+	m_layerpri[2] = k053251_get_priority(m_k053251, K053251_CI3);
 
-	konami_sortlayers3(state->m_sorted_layer, state->m_layerpri);
+	konami_sortlayers3(m_sorted_layer, m_layerpri);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[0], 0, 1);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[1], 0, 2);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[2], 0, 4);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[0], 0, 1);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[1], 0, 2);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[2], 0, 4);
 
-	k053245_sprites_draw(state->m_k053245, bitmap, cliprect);
+	k053245_sprites_draw(m_k053245, bitmap, cliprect);
 	return 0;
 }
 
@@ -664,76 +660,74 @@ popmessage("%04x", m_glfgreat_pixel);
 		return m_glfgreat_pixel & 0xff;
 }
 
-SCREEN_UPDATE_IND16( glfgreat )
+UINT32 tmnt_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 	int bg_colorbase;
 
-	bg_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI0);
-	state->m_sprite_colorbase  = k053251_get_palette_index(state->m_k053251, K053251_CI1);
-	state->m_layer_colorbase[0] = k053251_get_palette_index(state->m_k053251, K053251_CI2);
-	state->m_layer_colorbase[1] = k053251_get_palette_index(state->m_k053251, K053251_CI3) + 8;	/* weird... */
-	state->m_layer_colorbase[2] = k053251_get_palette_index(state->m_k053251, K053251_CI4);
+	bg_colorbase = k053251_get_palette_index(m_k053251, K053251_CI0);
+	m_sprite_colorbase  = k053251_get_palette_index(m_k053251, K053251_CI1);
+	m_layer_colorbase[0] = k053251_get_palette_index(m_k053251, K053251_CI2);
+	m_layer_colorbase[1] = k053251_get_palette_index(m_k053251, K053251_CI3) + 8;	/* weird... */
+	m_layer_colorbase[2] = k053251_get_palette_index(m_k053251, K053251_CI4);
 
-	k052109_tilemap_update(state->m_k052109);
+	k052109_tilemap_update(m_k052109);
 
-	state->m_sorted_layer[0] = 0;
-	state->m_layerpri[0] = k053251_get_priority(state->m_k053251, K053251_CI2);
-	state->m_sorted_layer[1] = 1;
-	state->m_layerpri[1] = k053251_get_priority(state->m_k053251, K053251_CI3);
-	state->m_sorted_layer[2] = 2;
-	state->m_layerpri[2] = k053251_get_priority(state->m_k053251, K053251_CI4);
+	m_sorted_layer[0] = 0;
+	m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI2);
+	m_sorted_layer[1] = 1;
+	m_layerpri[1] = k053251_get_priority(m_k053251, K053251_CI3);
+	m_sorted_layer[2] = 2;
+	m_layerpri[2] = k053251_get_priority(m_k053251, K053251_CI4);
 
-	konami_sortlayers3(state->m_sorted_layer, state->m_layerpri);
+	konami_sortlayers3(m_sorted_layer, m_layerpri);
 
 	/* not sure about the 053936 priority, but it seems to work */
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[0], 0, 1);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[0], 0, 1);
 
-	if (state->m_layerpri[0] >= 0x30 && state->m_layerpri[1] < 0x30)
+	if (m_layerpri[0] >= 0x30 && m_layerpri[1] < 0x30)
 	{
-		k053936_zoom_draw(state->m_k053936, bitmap, cliprect, state->m_roz_tilemap, 0, 1, 1);
-		state->m_glfgreat_pixel = bitmap.pix16(0x80, 0x105);
+		k053936_zoom_draw(m_k053936, bitmap, cliprect, m_roz_tilemap, 0, 1, 1);
+		m_glfgreat_pixel = bitmap.pix16(0x80, 0x105);
 	}
 
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[1], 0, 2);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[1], 0, 2);
 
-	if (state->m_layerpri[1] >= 0x30 && state->m_layerpri[2] < 0x30)
+	if (m_layerpri[1] >= 0x30 && m_layerpri[2] < 0x30)
 	{
-		k053936_zoom_draw(state->m_k053936, bitmap, cliprect, state->m_roz_tilemap, 0, 1, 1);
-		state->m_glfgreat_pixel = bitmap.pix16(0x80, 0x105);
+		k053936_zoom_draw(m_k053936, bitmap, cliprect, m_roz_tilemap, 0, 1, 1);
+		m_glfgreat_pixel = bitmap.pix16(0x80, 0x105);
 	}
 
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[2], 0, 4);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[2], 0, 4);
 
-	if (state->m_layerpri[2] >= 0x30)
+	if (m_layerpri[2] >= 0x30)
 	{
-		k053936_zoom_draw(state->m_k053936, bitmap, cliprect, state->m_roz_tilemap, 0, 1, 1);
-		state->m_glfgreat_pixel = bitmap.pix16(0x80, 0x105);
+		k053936_zoom_draw(m_k053936, bitmap, cliprect, m_roz_tilemap, 0, 1, 1);
+		m_glfgreat_pixel = bitmap.pix16(0x80, 0x105);
 	}
 
-	k053245_sprites_draw(state->m_k053245, bitmap, cliprect);
+	k053245_sprites_draw(m_k053245, bitmap, cliprect);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( tmnt2 )
+UINT32 tmnt_state::screen_update_tmnt2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 	double brt;
 	int i, newdim, newen, cb, ce;
 
-	newdim = state->m_dim_v | ((~state->m_dim_c & 0x10) >> 1);
-	newen  = (k053251_get_priority(state->m_k053251, 5) && k053251_get_priority(state->m_k053251, 5) != 0x3e);
+	newdim = m_dim_v | ((~m_dim_c & 0x10) >> 1);
+	newen  = (k053251_get_priority(m_k053251, 5) && k053251_get_priority(m_k053251, 5) != 0x3e);
 
-	if (newdim != state->m_lastdim || newen != state->m_lasten)
+	if (newdim != m_lastdim || newen != m_lasten)
 	{
 		brt = 1.0;
 		if (newen)
 			brt -= (1.0 - PALETTE_DEFAULT_SHADOW_FACTOR) * newdim / 8;
-		state->m_lastdim = newdim;
-		state->m_lasten = newen;
+		m_lastdim = newdim;
+		m_lasten = newen;
 
 		/*
             Only affect the background and sprites, not text layer.
@@ -744,7 +738,7 @@ SCREEN_UPDATE_IND16( tmnt2 )
         */
 
 		// find the text layer's palette range
-		cb = state->m_layer_colorbase[state->m_sorted_layer[2]] << 4;
+		cb = m_layer_colorbase[m_sorted_layer[2]] << 4;
 		ce = cb + 128;
 
 		// dim all colors before it
@@ -760,46 +754,45 @@ SCREEN_UPDATE_IND16( tmnt2 )
 			palette_set_pen_contrast(screen.machine(), i, brt);
 
 		// toggle shadow/highlight
-		if (~state->m_dim_c & 0x10)
+		if (~m_dim_c & 0x10)
 			palette_set_shadow_mode(screen.machine(), 1);
 		else
 			palette_set_shadow_mode(screen.machine(), 0);
 	}
 
-	SCREEN_UPDATE16_CALL(lgtnfght);
+	SCREEN_UPDATE16_CALL_MEMBER(lgtnfght);
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( thndrx2 )
+UINT32 tmnt_state::screen_update_thndrx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 	int bg_colorbase;
 
-	bg_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI0);
-	state->m_sprite_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI1);
-	state->m_layer_colorbase[0] = k053251_get_palette_index(state->m_k053251, K053251_CI2);
-	state->m_layer_colorbase[1] = k053251_get_palette_index(state->m_k053251, K053251_CI4);
-	state->m_layer_colorbase[2] = k053251_get_palette_index(state->m_k053251, K053251_CI3);
+	bg_colorbase = k053251_get_palette_index(m_k053251, K053251_CI0);
+	m_sprite_colorbase = k053251_get_palette_index(m_k053251, K053251_CI1);
+	m_layer_colorbase[0] = k053251_get_palette_index(m_k053251, K053251_CI2);
+	m_layer_colorbase[1] = k053251_get_palette_index(m_k053251, K053251_CI4);
+	m_layer_colorbase[2] = k053251_get_palette_index(m_k053251, K053251_CI3);
 
-	k052109_tilemap_update(state->m_k052109);
+	k052109_tilemap_update(m_k052109);
 
-	state->m_sorted_layer[0] = 0;
-	state->m_layerpri[0] = k053251_get_priority(state->m_k053251, K053251_CI2);
-	state->m_sorted_layer[1] = 1;
-	state->m_layerpri[1] = k053251_get_priority(state->m_k053251, K053251_CI4);
-	state->m_sorted_layer[2] = 2;
-	state->m_layerpri[2] = k053251_get_priority(state->m_k053251, K053251_CI3);
+	m_sorted_layer[0] = 0;
+	m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI2);
+	m_sorted_layer[1] = 1;
+	m_layerpri[1] = k053251_get_priority(m_k053251, K053251_CI4);
+	m_sorted_layer[2] = 2;
+	m_layerpri[2] = k053251_get_priority(m_k053251, K053251_CI3);
 
-	konami_sortlayers3(state->m_sorted_layer, state->m_layerpri);
+	konami_sortlayers3(m_sorted_layer, m_layerpri);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[0], 0, 1);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[1], 0, 2);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[2], 0, 4);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[0], 0, 1);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[1], 0, 2);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[2], 0, 4);
 
-	k051960_sprites_draw(state->m_k051960, bitmap, cliprect, -1, -1);
+	k051960_sprites_draw(m_k051960, bitmap, cliprect, -1, -1);
 	return 0;
 }
 
@@ -811,12 +804,11 @@ SCREEN_UPDATE_IND16( thndrx2 )
 
 ***************************************************************************/
 
-SCREEN_VBLANK( blswhstl )
+void tmnt_state::screen_eof_blswhstl(screen_device &screen, bool state)
 {
 	// on rising edge
-	if (vblank_on)
+	if (state)
 	{
-		tmnt_state *state = screen.machine().driver_data<tmnt_state>();
-		k053245_clear_buffer(state->m_k053245);
+		k053245_clear_buffer(m_k053245);
 	}
 }

@@ -438,66 +438,65 @@ VIDEO_START_MEMBER(nbmj9195_state,nbmj9195_nb22090)
 
 
 ******************************************************************************/
-SCREEN_UPDATE_IND16( nbmj9195 )
+UINT32 nbmj9195_state::screen_update_nbmj9195(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	nbmj9195_state *state = screen.machine().driver_data<nbmj9195_state>();
 	int i;
 	int x, y;
 	int scrolly[2];
 
-	if (state->m_screen_refresh)
+	if (m_screen_refresh)
 	{
 		int width = screen.width();
 		int height = screen.height();
 
-		state->m_screen_refresh = 0;
+		m_screen_refresh = 0;
 
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
 			{
 				update_pixel(screen.machine(), 0, x, y);
 
-				if (state->m_gfxdraw_mode)
+				if (m_gfxdraw_mode)
 					update_pixel(screen.machine(), 1, x, y);
 			}
 	}
 
 	for (i = 0; i < 2; i++)
 	{
-		if (state->m_flipscreen[i])
+		if (m_flipscreen[i])
 		{
-			for ( ; state->m_scanline[i] < SCANLINE_MAX; state->m_scanline[i]++)
+			for ( ; m_scanline[i] < SCANLINE_MAX; m_scanline[i]++)
 			{
-				state->m_scrollx_raster[i][state->m_scanline[i]] = (((-state->m_scrollx[i]) - 0x4e)  & 0x1ff) << 1;
+				m_scrollx_raster[i][m_scanline[i]] = (((-m_scrollx[i]) - 0x4e)  & 0x1ff) << 1;
 			}
-			scrolly[i] = (-state->m_scrolly[i]) & 0x1ff;
+			scrolly[i] = (-m_scrolly[i]) & 0x1ff;
 		}
 		else
 		{
-			for ( ; state->m_scanline[i] < SCANLINE_MAX; state->m_scanline[i]++)
+			for ( ; m_scanline[i] < SCANLINE_MAX; m_scanline[i]++)
 			{
-				state->m_scrollx_raster[i][(state->m_scanline[i] ^ 0x1ff)] = (((-state->m_scrollx[i]) - 0x4e)  & 0x1ff) << 1;
+				m_scrollx_raster[i][(m_scanline[i] ^ 0x1ff)] = (((-m_scrollx[i]) - 0x4e)  & 0x1ff) << 1;
 			}
-			scrolly[i] = state->m_scrolly[i] & 0x1ff;
+			scrolly[i] = m_scrolly[i] & 0x1ff;
 		}
-		state->m_scanline[i] = SCANLINE_MIN;
+		m_scanline[i] = SCANLINE_MIN;
 	}
 
-	if (state->m_dispflag[0])
+	if (m_dispflag[0])
 		// nbmj9195 1layer
-		copyscrollbitmap(bitmap, state->m_tmpbitmap[0], SCANLINE_MAX, state->m_scrollx_raster[0], 1, &scrolly[0], cliprect);
+		copyscrollbitmap(bitmap, m_tmpbitmap[0], SCANLINE_MAX, m_scrollx_raster[0], 1, &scrolly[0], cliprect);
 	else
 		bitmap.fill(0x0ff);
 
-	if (state->m_dispflag[1])
+	if (m_dispflag[1])
 	{
-		if (state->m_gfxdraw_mode == 1)
+		if (m_gfxdraw_mode == 1)
 			// nbmj9195 2layer
-			copyscrollbitmap_trans(bitmap, state->m_tmpbitmap[1], SCANLINE_MAX, state->m_scrollx_raster[1], 1, &scrolly[1], cliprect, 0x0ff);
+			copyscrollbitmap_trans(bitmap, m_tmpbitmap[1], SCANLINE_MAX, m_scrollx_raster[1], 1, &scrolly[1], cliprect, 0x0ff);
 
-		if (state->m_gfxdraw_mode == 2)
+		if (m_gfxdraw_mode == 2)
 			// nbmj9195 nb22090 2layer
-			copyscrollbitmap_trans(bitmap, state->m_tmpbitmap[1], SCANLINE_MAX, state->m_scrollx_raster[1], 1, &scrolly[1], cliprect, 0x1ff);
+			copyscrollbitmap_trans(bitmap, m_tmpbitmap[1], SCANLINE_MAX, m_scrollx_raster[1], 1, &scrolly[1], cliprect, 0x1ff);
 	}
 	return 0;
 }

@@ -348,6 +348,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ay_port_b_out);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -459,26 +461,24 @@ void corona_state::video_start()
 	m_videobuf = auto_alloc_array_clear(machine(), UINT8, VIDEOBUF_SIZE);
 }
 
-static SCREEN_UPDATE_IND16(winner)
+UINT32 corona_state::screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	corona_state *state = screen.machine().driver_data<corona_state>();
 	int x, y;
 
 	for (y = 0; y < 256; y++)
 		for (x = 0; x < 256; x++)
-			bitmap.pix16(y, x) = state->m_videobuf[y * 512 + x];
+			bitmap.pix16(y, x) = m_videobuf[y * 512 + x];
 
 	return 0;
 }
 
-static SCREEN_UPDATE_IND16(luckyrlt)
+UINT32 corona_state::screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	corona_state *state = screen.machine().driver_data<corona_state>();
 	int x, y;
 
 	for (y = 0; y < 256; y++)
 		for (x = 0; x < 256; x++)
-			bitmap.pix16(255 - y, x) = state->m_videobuf[y * 512 + x];
+			bitmap.pix16(255 - y, x) = m_videobuf[y * 512 + x];
 
 	return 0;
 }
@@ -1374,7 +1374,7 @@ static MACHINE_CONFIG_START( winner81, corona_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(winner)
+	MCFG_SCREEN_UPDATE_DRIVER(corona_state, screen_update_winner)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
@@ -1405,7 +1405,7 @@ static MACHINE_CONFIG_START( winner82, corona_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(winner)
+	MCFG_SCREEN_UPDATE_DRIVER(corona_state, screen_update_winner)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
@@ -1436,7 +1436,7 @@ static MACHINE_CONFIG_START( re800, corona_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(winner)
+	MCFG_SCREEN_UPDATE_DRIVER(corona_state, screen_update_winner)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
@@ -1466,7 +1466,7 @@ static MACHINE_CONFIG_START( rcirulet, corona_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(winner)
+	MCFG_SCREEN_UPDATE_DRIVER(corona_state, screen_update_winner)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
@@ -1497,7 +1497,7 @@ static MACHINE_CONFIG_START( luckyrlt, corona_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(luckyrlt)
+	MCFG_SCREEN_UPDATE_DRIVER(corona_state, screen_update_luckyrlt)
 
 	MCFG_PALETTE_LENGTH(0x100)
 

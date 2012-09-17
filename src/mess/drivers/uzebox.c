@@ -18,6 +18,7 @@ public:
 	}
 	DECLARE_DRIVER_INIT(uzebox);
 	virtual void machine_reset();
+	UINT32 screen_update_uzebox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 /****************************************************\
 * Address maps                                       *
@@ -43,7 +44,7 @@ INPUT_PORTS_END
 * Video hardware                                     *
 \****************************************************/
 
-static SCREEN_UPDATE_RGB32( uzebox )
+UINT32 uzebox_state::screen_update_uzebox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -74,7 +75,7 @@ static MACHINE_CONFIG_START( uzebox, uzebox_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1395))
 	MCFG_SCREEN_SIZE(634, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 633, 0, 479)
-	MCFG_SCREEN_UPDATE_STATIC(uzebox)
+	MCFG_SCREEN_UPDATE_DRIVER(uzebox_state, screen_update_uzebox)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 

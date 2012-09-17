@@ -1451,7 +1451,7 @@ static MACHINE_CONFIG_START( defender, williams_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 10, 304, 260, 7, 245)
-	MCFG_SCREEN_UPDATE_STATIC(williams)
+	MCFG_SCREEN_UPDATE_DRIVER(williams_state, screen_update_williams)
 
 	MCFG_VIDEO_START_OVERRIDE(williams_state,williams)
 
@@ -1590,7 +1590,7 @@ static MACHINE_CONFIG_DERIVED( blastkit, williams )
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(williams_state,blaster)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(blaster)
+	MCFG_SCREEN_UPDATE_DRIVER(williams_state, screen_update_blaster)
 
 	/* pia */
 	MCFG_PIA6821_MODIFY("pia_0", williams_49way_muxed_pia_0_intf)
@@ -1643,7 +1643,7 @@ static MACHINE_CONFIG_START( williams2, williams_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 8, 284, 260, 8, 248)
-	MCFG_SCREEN_UPDATE_STATIC(williams2)
+	MCFG_SCREEN_UPDATE_DRIVER(williams_state, screen_update_williams2)
 
 	MCFG_VIDEO_START_OVERRIDE(williams_state,williams2)
 

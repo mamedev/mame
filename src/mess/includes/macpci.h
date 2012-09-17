@@ -157,6 +157,7 @@ private:
 
 public:
 	emu_timer *m_scanline_timer;
+	UINT32 screen_update_pippin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 #endif /* PCIMAC_H_ */

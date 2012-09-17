@@ -480,11 +480,10 @@ MACHINE_START_MEMBER(einstein_state,einstein2)
     VIDEO EMULATION
 ***************************************************************************/
 
-static SCREEN_UPDATE_RGB32( einstein2 )
+UINT32 einstein_state::screen_update_einstein2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	einstein_state *einstein = screen.machine().driver_data<einstein_state>();
 
-	if (&screen == einstein->m_color_screen)
+	if (&screen == m_color_screen)
 	{
 		tms9929a_device *tms9929a = screen.machine().device<tms9929a_device>( "tms9929a" );
 		const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
@@ -493,8 +492,8 @@ static SCREEN_UPDATE_RGB32( einstein2 )
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 				bitmap.pix32(y, x) = palette[src.pix16(y, x)];
 	}
-	else if (&screen == einstein->m_crtc_screen)
-		einstein->m_mc6845->screen_update( screen, bitmap, cliprect);
+	else if (&screen == m_crtc_screen)
+		m_mc6845->screen_update( screen, bitmap, cliprect);
 	else
 		fatalerror("Unknown screen '%s'\n", screen.tag());
 
@@ -842,7 +841,7 @@ static MACHINE_CONFIG_DERIVED( einstei2, einstein )
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_STATIC(einstein2)
+	MCFG_SCREEN_UPDATE_DRIVER(einstein_state, screen_update_einstein2)
 	MCFG_GFXDECODE(einstei2)
 
 	/* 2 additional colors for the 80 column screen */

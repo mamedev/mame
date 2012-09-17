@@ -449,34 +449,32 @@ static void splndrbt_copy_bg( running_machine &machine, bitmap_ind16 &dst_bitmap
 
 
 
-SCREEN_UPDATE_IND16( equites )
+UINT32 equites_state::screen_update_equites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	equites_state *state = screen.machine().driver_data<equites_state>();
-	bitmap.fill(state->m_bgcolor, cliprect);
+	bitmap.fill(m_bgcolor, cliprect);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	equites_draw_sprites(screen.machine(), bitmap, cliprect);
 
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( splndrbt )
+UINT32 equites_state::screen_update_splndrbt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	equites_state *state = screen.machine().driver_data<equites_state>();
-	bitmap.fill(state->m_bgcolor, cliprect);
+	bitmap.fill(m_bgcolor, cliprect);
 
 	splndrbt_copy_bg(screen.machine(), bitmap, cliprect);
 
-	if (state->m_fg_char_bank)
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (m_fg_char_bank)
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	splndrbt_draw_sprites(screen.machine(), bitmap, cliprect);
 
-	if (!state->m_fg_char_bank)
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (!m_fg_char_bank)
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

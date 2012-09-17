@@ -82,11 +82,10 @@ void compis_state::palette_init()
 	palette_set_color(machine(), 2, MAKE_RGB(0x00, 0xff, 0x00)); // highlight
 }
 
-static SCREEN_UPDATE_IND16( compis2 ) // temporary
+UINT32 compis_state::screen_update_compis2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)// temporary
 {
-	compis_state *state = screen.machine().driver_data<compis_state>();
 	UINT8 *m_p_chargen;
-	m_p_chargen = state->memregion("maincpu")->base()+0xca70; //bios0
+	m_p_chargen = memregion("maincpu")->base()+0xca70; //bios0
 	if (m_p_chargen[0x214] != 0x08) m_p_chargen+= 0x10; //bios1
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
@@ -99,7 +98,7 @@ static SCREEN_UPDATE_IND16( compis2 ) // temporary
 
 			for (x = ma; x < ma + 240; x+=3)
 			{
-				chr = state->m_video_ram[x & 0x1ffff];
+				chr = m_video_ram[x & 0x1ffff];
 
 				if (chr < 0x20)
 					gfx = 0;
@@ -414,7 +413,7 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	MCFG_SCREEN_UPDATE_STATIC(compis2)
+	MCFG_SCREEN_UPDATE_DRIVER(compis_state, screen_update_compis2)
 	MCFG_PALETTE_LENGTH(3)
 
 	/* Devices */

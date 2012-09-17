@@ -52,18 +52,17 @@ void blockhl_state::video_start()
 	m_sprite_colorbase = 48;
 }
 
-SCREEN_UPDATE_IND16( blockhl )
+UINT32 blockhl_state::screen_update_blockhl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	blockhl_state *state = screen.machine().driver_data<blockhl_state>();
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	k052109_tilemap_update(state->m_k052109);
+	k052109_tilemap_update(m_k052109);
 
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE, 0);	// tile 2
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 1, 0, 1);	// tile 1
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 0, 0, 2);	// tile 0
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE, 0);	// tile 2
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, 0, 1);	// tile 1
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 0, 0, 2);	// tile 0
 
-	k051960_sprites_draw(state->m_k051960, bitmap, cliprect, 0, -1);
+	k051960_sprites_draw(m_k051960, bitmap, cliprect, 0, -1);
 	return 0;
 }

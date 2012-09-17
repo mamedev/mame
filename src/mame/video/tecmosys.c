@@ -285,45 +285,44 @@ static void tecmosys_do_final_mix(running_machine &machine, bitmap_rgb32 &bitmap
 }
 
 
-SCREEN_UPDATE_RGB32(tecmosys)
+UINT32 tecmosys_state::screen_update_tecmosys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	tecmosys_state *state = screen.machine().driver_data<tecmosys_state>();
 
 	bitmap.fill(screen.machine().pens[0x4000], cliprect);
 
 
-	state->m_bg0tilemap->set_scrolly(0, state->m_c80000regs[1]+16);
-	state->m_bg0tilemap->set_scrollx(0, state->m_c80000regs[0]+104);
+	m_bg0tilemap->set_scrolly(0, m_c80000regs[1]+16);
+	m_bg0tilemap->set_scrollx(0, m_c80000regs[0]+104);
 
-	state->m_bg1tilemap->set_scrolly(0, state->m_a80000regs[1]+17);
-	state->m_bg1tilemap->set_scrollx(0, state->m_a80000regs[0]+106);
+	m_bg1tilemap->set_scrolly(0, m_a80000regs[1]+17);
+	m_bg1tilemap->set_scrollx(0, m_a80000regs[0]+106);
 
-	state->m_bg2tilemap->set_scrolly(0, state->m_b00000regs[1]+17);
-	state->m_bg2tilemap->set_scrollx(0, state->m_b00000regs[0]+106);
+	m_bg2tilemap->set_scrolly(0, m_b00000regs[1]+17);
+	m_bg2tilemap->set_scrollx(0, m_b00000regs[0]+106);
 
-	state->m_tmp_tilemap_composebitmap.fill(0, cliprect);
+	m_tmp_tilemap_composebitmap.fill(0, cliprect);
 
-	state->m_tmp_tilemap_renderbitmap.fill(0, cliprect);
-	state->m_bg0tilemap->draw(state->m_tmp_tilemap_renderbitmap, cliprect, 0,0);
-	tecmosys_tilemap_copy_to_compose(state, 0x0000);
+	m_tmp_tilemap_renderbitmap.fill(0, cliprect);
+	m_bg0tilemap->draw(m_tmp_tilemap_renderbitmap, cliprect, 0,0);
+	tecmosys_tilemap_copy_to_compose(this, 0x0000);
 
-	state->m_tmp_tilemap_renderbitmap.fill(0, cliprect);
-	state->m_bg1tilemap->draw(state->m_tmp_tilemap_renderbitmap, cliprect, 0,0);
-	tecmosys_tilemap_copy_to_compose(state, 0x4000);
+	m_tmp_tilemap_renderbitmap.fill(0, cliprect);
+	m_bg1tilemap->draw(m_tmp_tilemap_renderbitmap, cliprect, 0,0);
+	tecmosys_tilemap_copy_to_compose(this, 0x4000);
 
-	state->m_tmp_tilemap_renderbitmap.fill(0, cliprect);
-	state->m_bg2tilemap->draw(state->m_tmp_tilemap_renderbitmap, cliprect, 0,0);
-	tecmosys_tilemap_copy_to_compose(state, 0x8000);
+	m_tmp_tilemap_renderbitmap.fill(0, cliprect);
+	m_bg2tilemap->draw(m_tmp_tilemap_renderbitmap, cliprect, 0,0);
+	tecmosys_tilemap_copy_to_compose(this, 0x8000);
 
-	state->m_tmp_tilemap_renderbitmap.fill(0, cliprect);
-	state->m_txt_tilemap->draw(state->m_tmp_tilemap_renderbitmap, cliprect, 0,0);
-	tecmosys_tilemap_copy_to_compose(state, 0xc000);
+	m_tmp_tilemap_renderbitmap.fill(0, cliprect);
+	m_txt_tilemap->draw(m_tmp_tilemap_renderbitmap, cliprect, 0,0);
+	tecmosys_tilemap_copy_to_compose(this, 0xc000);
 
 
 	tecmosys_do_final_mix(screen.machine(), bitmap);
 
 	// prepare sprites for NEXT frame - causes 1 frame palette errors, but prevents sprite lag in tkdensho, which is correct?
-	tecmosys_render_sprites_to_bitmap(screen.machine(), bitmap, state->m_880000regs[0x0], state->m_880000regs[0x1]);
+	tecmosys_render_sprites_to_bitmap(screen.machine(), bitmap, m_880000regs[0x0], m_880000regs[0x1]);
 
 	return 0;
 }

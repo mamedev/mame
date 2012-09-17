@@ -110,6 +110,7 @@ public:
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(kingdrby);
 	DECLARE_PALETTE_INIT(kingdrbb);
+	UINT32 screen_update_kingdrby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -227,25 +228,24 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-static SCREEN_UPDATE_IND16(kingdrby)
+UINT32 kingdrby_state::screen_update_kingdrby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	kingdrby_state *state = screen.machine().driver_data<kingdrby_state>();
 	const rectangle &visarea = screen.visible_area();
 	rectangle clip;
-	state->m_sc0_tilemap->set_scrollx(0, state->m_vram[0x342]);
-	state->m_sc0_tilemap->set_scrolly(0, state->m_vram[0x341]);
-	state->m_sc1_tilemap->set_scrollx(0, state->m_vram[0x342]);
-	state->m_sc1_tilemap->set_scrolly(0, state->m_vram[0x341]);
-	state->m_sc0w_tilemap->set_scrolly(0, 32);
+	m_sc0_tilemap->set_scrollx(0, m_vram[0x342]);
+	m_sc0_tilemap->set_scrolly(0, m_vram[0x341]);
+	m_sc1_tilemap->set_scrollx(0, m_vram[0x342]);
+	m_sc1_tilemap->set_scrolly(0, m_vram[0x341]);
+	m_sc0w_tilemap->set_scrolly(0, 32);
 
 	/* maybe it needs two window tilemaps? (one at the top, the other at the bottom)*/
 	clip.set(visarea.min_x, 256, 192, visarea.max_y);
 
 	/*TILEMAP_DRAW_CATEGORY + TILEMAP_DRAW_OPAQUE doesn't suit well?*/
-	state->m_sc0_tilemap->draw(bitmap, cliprect, 0,0);
+	m_sc0_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect);
-	state->m_sc1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1),0);
-	state->m_sc0w_tilemap->draw(bitmap, clip, 0,0);
+	m_sc1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1),0);
+	m_sc0w_tilemap->draw(bitmap, clip, 0,0);
 
 	return 0;
 }
@@ -1044,7 +1044,7 @@ static MACHINE_CONFIG_START( kingdrby, kingdrby_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)	/* controlled by CRTC */
-	MCFG_SCREEN_UPDATE_STATIC(kingdrby)
+	MCFG_SCREEN_UPDATE_DRIVER(kingdrby_state, screen_update_kingdrby)
 
 
 	MCFG_MC6845_ADD("crtc", MC6845, CLK_1/32, mc6845_intf)	/* 53.333 Hz. guess */

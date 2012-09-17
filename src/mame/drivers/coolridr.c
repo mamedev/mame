@@ -319,6 +319,7 @@ public:
 	DECLARE_DRIVER_INIT(coolridr);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_coolridr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -331,9 +332,8 @@ void coolridr_state::video_start()
 	m_test_offs = 0x2000;
 }
 
-static SCREEN_UPDATE_RGB32(coolridr)
+UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	coolridr_state *state = screen.machine().driver_data<coolridr_state>();
 	/* planes seems to basically be at 0x8000 and 0x28000... */
 	gfx_element *gfx = screen.machine().gfx[2];
 	UINT32 count;
@@ -341,35 +341,35 @@ static SCREEN_UPDATE_RGB32(coolridr)
 
 
 	if(screen.machine().input().code_pressed(KEYCODE_Z))
-		state->m_test_offs+=4;
+		m_test_offs+=4;
 
 	if(screen.machine().input().code_pressed(KEYCODE_X))
-		state->m_test_offs-=4;
+		m_test_offs-=4;
 
 	if(screen.machine().input().code_pressed(KEYCODE_C))
-		state->m_test_offs+=0x40;
+		m_test_offs+=0x40;
 
 	if(screen.machine().input().code_pressed(KEYCODE_V))
-		state->m_test_offs-=0x40;
+		m_test_offs-=0x40;
 
 	if(screen.machine().input().code_pressed(KEYCODE_B))
-		state->m_test_offs+=0x400;
+		m_test_offs+=0x400;
 
 	if(screen.machine().input().code_pressed(KEYCODE_N))
-		state->m_test_offs-=0x400;
+		m_test_offs-=0x400;
 
 	if(screen.machine().input().code_pressed_once(KEYCODE_A))
-		state->m_color++;
+		m_color++;
 
 	if(screen.machine().input().code_pressed_once(KEYCODE_S))
-		state->m_color--;
+		m_color--;
 
-	if(state->m_test_offs > 0x100000*4)
-		state->m_test_offs = 0;
+	if(m_test_offs > 0x100000*4)
+		m_test_offs = 0;
 
-	count = state->m_test_offs/4;
+	count = m_test_offs/4;
 
-	popmessage("%08x %04x",state->m_test_offs,state->m_color);
+	popmessage("%08x %04x",m_test_offs,m_color);
 
 	for (y=0;y<64;y++)
 	{
@@ -377,18 +377,18 @@ static SCREEN_UPDATE_RGB32(coolridr)
 		{
 			int tile;
 
-			tile = (state->m_h1_vram[count] & 0x0fff0000) >> 16;
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,state->m_color,0,0,(x+0)*16,y*16);
+			tile = (m_h1_vram[count] & 0x0fff0000) >> 16;
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,m_color,0,0,(x+0)*16,y*16);
 
-			tile = (state->m_h1_vram[count] & 0x00000fff) >> 0;
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,state->m_color,0,0,(x+1)*16,y*16);
+			tile = (m_h1_vram[count] & 0x00000fff) >> 0;
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,m_color,0,0,(x+1)*16,y*16);
 
 			count++;
 		}
 	}
 
-	copybitmap_trans(bitmap, state->m_temp_bitmap_sprites, 0, 0, 0, 0, cliprect, 0);
-	state->m_temp_bitmap_sprites.fill(0, cliprect);
+	copybitmap_trans(bitmap, m_temp_bitmap_sprites, 0, 0, 0, 0, cliprect, 0);
+	m_temp_bitmap_sprites.fill(0, cliprect);
 
 
 	return 0;
@@ -1181,7 +1181,7 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(128*8+22, 64*8+44)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 64*8-1) //TODO: these are just two different screens
-	MCFG_SCREEN_UPDATE_STATIC(coolridr)
+	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update_coolridr)
 
 	MCFG_PALETTE_LENGTH(0x10000)
 

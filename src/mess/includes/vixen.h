@@ -104,6 +104,7 @@ public:
 	const UINT8 *m_sync_rom;
 	const UINT8 *m_char_rom;
 	DECLARE_DRIVER_INIT(vixen);
+	UINT32 screen_update_vixen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 #endif

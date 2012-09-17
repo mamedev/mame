@@ -859,7 +859,7 @@ void amiga_aga_render_scanline(running_machine &machine, bitmap_rgb32 &bitmap, i
  *
  *************************************/
 
-SCREEN_UPDATE_RGB32( amiga_aga )
+UINT32 amiga_state::screen_update_amiga_aga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int y;
 

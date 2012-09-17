@@ -105,6 +105,10 @@ public:
 	DECLARE_VIDEO_START(captaven);
 	DECLARE_VIDEO_START(fghthist);
 	DECLARE_VIDEO_START(nslasher);
+	UINT32 screen_update_captaven(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_fghthist(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);	
+	void screen_eof_captaven(screen_device &screen, bool state);
 };
 
 class dragngun_state : public deco32_state
@@ -131,6 +135,8 @@ public:
 	DECLARE_DRIVER_INIT(lockload);
 	DECLARE_VIDEO_START(dragngun);
 	DECLARE_VIDEO_START(lockload);
+	UINT32 screen_update_dragngun(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_eof_dragngun(screen_device &screen, bool state);
 };
 
 
@@ -143,13 +149,13 @@ public:
 
 
 
-SCREEN_VBLANK( captaven );
-SCREEN_VBLANK( dragngun );
 
-SCREEN_UPDATE_IND16( captaven );
-SCREEN_UPDATE_RGB32( fghthist );
-SCREEN_UPDATE_RGB32( dragngun );
-SCREEN_UPDATE_RGB32( nslasher );
+
+
+
+
+
+
 
 
 DECLARE_WRITE32_HANDLER( deco32_pf1_data_w );

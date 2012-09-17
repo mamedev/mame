@@ -378,19 +378,18 @@ static void sortlayers(int *layer,int *pri)
 	SWAP(1,2)
 }
 
-SCREEN_UPDATE_RGB32( macrossp )
+UINT32 macrossp_state::screen_update_macrossp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	macrossp_state *state = screen.machine().driver_data<macrossp_state>();
 	int layers[3],layerpri[3];
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	layers[0] = 0;
-	layerpri[0] = (state->m_scra_videoregs[0] & 0x0000c000) >> 14;
+	layerpri[0] = (m_scra_videoregs[0] & 0x0000c000) >> 14;
 	layers[1] = 1;
-	layerpri[1] = (state->m_scrb_videoregs[0] & 0x0000c000) >> 14;
+	layerpri[1] = (m_scrb_videoregs[0] & 0x0000c000) >> 14;
 	layers[2] = 2;
-	layerpri[2] = (state->m_scrc_videoregs[0] & 0x0000c000) >> 14;
+	layerpri[2] = (m_scrc_videoregs[0] & 0x0000c000) >> 14;
 
 	sortlayers(layers, layerpri);
 
@@ -401,34 +400,33 @@ SCREEN_UPDATE_RGB32( macrossp )
 	draw_layer(screen.machine(), bitmap, cliprect, layers[2]);
 	draw_sprites(screen.machine(), bitmap, cliprect, 2);
 	draw_sprites(screen.machine(), bitmap, cliprect, 3);
-	state->m_text_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_text_tilemap->draw(bitmap, cliprect, 0, 0);
 
 #if 0
 popmessage	("scra - %08x %08x %08x\nscrb - %08x %08x %08x\nscrc - %08x %08x %08x",
-state->m_scra_videoregs[0]&0xffff33ff, // yyyyxxxx
-state->m_scra_videoregs[1], // ??? more scrolling?
-state->m_scra_videoregs[2], // 08 - 0b
+m_scra_videoregs[0]&0xffff33ff, // yyyyxxxx
+m_scra_videoregs[1], // ??? more scrolling?
+m_scra_videoregs[2], // 08 - 0b
 
-state->m_scrb_videoregs[0]&0xffff33ff, // 00 - 03
-state->m_scrb_videoregs[1], // 04 - 07
-state->m_scrb_videoregs[2], // 08 - 0b
+m_scrb_videoregs[0]&0xffff33ff, // 00 - 03
+m_scrb_videoregs[1], // 04 - 07
+m_scrb_videoregs[2], // 08 - 0b
 
-state->m_scrc_videoregs[0]&0xffff33ff, // 00 - 03
-state->m_scrc_videoregs[1], // 04 - 07
-state->m_scrc_videoregs[2]);// 08 - 0b
+m_scrc_videoregs[0]&0xffff33ff, // 00 - 03
+m_scrc_videoregs[1], // 04 - 07
+m_scrc_videoregs[2]);// 08 - 0b
 #endif
 	return 0;
 }
 
-SCREEN_VBLANK( macrossp )
+void macrossp_state::screen_eof_macrossp(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		macrossp_state *state = screen.machine().driver_data<macrossp_state>();
 
 		/* looks like sprites are *two* frames ahead, like nmk16 */
-		memcpy(state->m_spriteram_old2, state->m_spriteram_old, state->m_spriteram.bytes());
-		memcpy(state->m_spriteram_old, state->m_spriteram, state->m_spriteram.bytes());
+		memcpy(m_spriteram_old2, m_spriteram_old, m_spriteram.bytes());
+		memcpy(m_spriteram_old, m_spriteram, m_spriteram.bytes());
 	}
 }

@@ -32,6 +32,7 @@ public:
 	DECLARE_WRITE8_MEMBER(out_w);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_summit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -39,9 +40,8 @@ void summit_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16(summit)
+UINT32 summit_state::screen_update_summit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	summit_state *state = screen.machine().driver_data<summit_state>();
 	gfx_element *gfx = screen.machine().gfx[0];
 	int count = 0x0000;
 
@@ -52,7 +52,7 @@ static SCREEN_UPDATE_IND16(summit)
 	{
 		for (x=0;x<32;x++)
 		{
-			int tile = (state->m_vram[count] | ((state->m_attr[count]&1)<<8) );
+			int tile = (m_vram[count] | ((m_attr[count]&1)<<8) );
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8);
 
 			count++;
@@ -308,7 +308,7 @@ static MACHINE_CONFIG_START( summit, summit_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(summit)
+	MCFG_SCREEN_UPDATE_DRIVER(summit_state, screen_update_summit)
 
 	MCFG_GFXDECODE(summit)
 

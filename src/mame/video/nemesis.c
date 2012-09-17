@@ -412,9 +412,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 /******************************************************************************/
 
-SCREEN_UPDATE_IND16( nemesis )
+UINT32 nemesis_state::screen_update_nemesis(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	nemesis_state *state = screen.machine().driver_data<nemesis_state>();
 	int offs;
 	rectangle clip;
 
@@ -424,20 +423,20 @@ SCREEN_UPDATE_IND16( nemesis )
 	clip.min_x = 0;
 	clip.max_x = 255;
 
-	state->m_background->set_scroll_cols(64);
-	state->m_foreground->set_scroll_cols(64);
-	state->m_background->set_scroll_rows(1);
-	state->m_foreground->set_scroll_rows(1);
+	m_background->set_scroll_cols(64);
+	m_foreground->set_scroll_cols(64);
+	m_background->set_scroll_rows(1);
+	m_foreground->set_scroll_rows(1);
 
 	for (offs = 0; offs < 64; offs++)
 	{
 		int offset_x = offs;
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 			offset_x = (offs + 0x20) & 0x3f;
 
-		state->m_background->set_scrolly(offs, state->m_yscroll2[offset_x]);
-		state->m_foreground->set_scrolly(offs, state->m_yscroll1[offset_x]);
+		m_background->set_scrolly(offs, m_yscroll2[offset_x]);
+		m_foreground->set_scrolly(offs, m_yscroll1[offset_x]);
 	}
 
 	for (offs = cliprect.min_y; offs <= cliprect.max_y; offs++)
@@ -448,18 +447,18 @@ SCREEN_UPDATE_IND16( nemesis )
 		clip.min_y = offs;
 		clip.max_y = offs;
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 			offset_y = 255 - offs;
 
-		state->m_background->set_scrollx(0, (state->m_xscroll2[offset_y] & 0xff) + ((state->m_xscroll2[0x100 + offset_y] & 0x01) << 8) - (state->m_flipscreen ? 0x107 : 0));
-		state->m_foreground->set_scrollx(0, (state->m_xscroll1[offset_y] & 0xff) + ((state->m_xscroll1[0x100 + offset_y] & 0x01) << 8) - (state->m_flipscreen ? 0x107 : 0));
+		m_background->set_scrollx(0, (m_xscroll2[offset_y] & 0xff) + ((m_xscroll2[0x100 + offset_y] & 0x01) << 8) - (m_flipscreen ? 0x107 : 0));
+		m_foreground->set_scrollx(0, (m_xscroll1[offset_y] & 0xff) + ((m_xscroll1[0x100 + offset_y] & 0x01) << 8) - (m_flipscreen ? 0x107 : 0));
 
 		for (i = 0; i < 4; i += 2)
 		{
-			state->m_background->draw(bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 0), 1);
-			state->m_background->draw(bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 1), 2);
-			state->m_foreground->draw(bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 0), 1);
-			state->m_foreground->draw(bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 1), 2);
+			m_background->draw(bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 0), 1);
+			m_background->draw(bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 1), 2);
+			m_foreground->draw(bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 0), 1);
+			m_foreground->draw(bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 1), 2);
 		}
 	}
 

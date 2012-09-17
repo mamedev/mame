@@ -35,6 +35,8 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_sprint8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_sprint8(screen_device &screen, bool state);
 };
 
 
@@ -46,9 +48,9 @@ void sprint8_set_collision(running_machine &machine, int n);
 /*----------- defined in video/sprint8.c -----------*/
 
 
-SCREEN_VBLANK( sprint8 );
 
-SCREEN_UPDATE_IND16( sprint8 );
+
+
 
 
 

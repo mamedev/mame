@@ -45,6 +45,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_stfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -60,4 +61,4 @@ DECLARE_WRITE8_DEVICE_HANDLER( stfight_adpcm_control_w );
 
 
 
-SCREEN_UPDATE_IND16( stfight );
+

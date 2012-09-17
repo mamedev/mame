@@ -29,6 +29,7 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	virtual void video_start();
+	UINT32 screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -42,7 +43,7 @@ void hp16500_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_RGB32( hp16500 )
+UINT32 hp16500_state::screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -58,7 +59,7 @@ static MACHINE_CONFIG_START( hp16500, hp16500_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_SIZE(1024, 768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_STATIC(hp16500)
+	MCFG_SCREEN_UPDATE_DRIVER(hp16500_state, screen_update_hp16500)
 
 	MCFG_PALETTE_LENGTH(256)
 

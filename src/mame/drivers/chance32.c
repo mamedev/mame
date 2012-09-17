@@ -62,6 +62,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -101,18 +102,17 @@ void chance32_state::video_start()
 }
 
 
-SCREEN_UPDATE_IND16( chance32 )
+UINT32 chance32_state::screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	chance32_state *state = screen.machine().driver_data<chance32_state>();
 
 	/* TODO: wtf? */
-	state->m_bg_tilemap->set_scrollx(0, 352);
-	state->m_bg_tilemap->set_scrolly(0, 160);
-	state->m_fg_tilemap->set_scrollx(0, 352);
-	state->m_fg_tilemap->set_scrolly(0, 160);
+	m_bg_tilemap->set_scrollx(0, 352);
+	m_bg_tilemap->set_scrolly(0, 160);
+	m_fg_tilemap->set_scrollx(0, 352);
+	m_fg_tilemap->set_scrolly(0, 160);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -481,7 +481,7 @@ static MACHINE_CONFIG_START( chance32, chance32_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*16, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 35*16-1, 0, 29*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(chance32)
+	MCFG_SCREEN_UPDATE_DRIVER(chance32_state, screen_update_chance32)
 
 	MCFG_MC6845_ADD("crtc", H46505, 12000000/16, mc6845_intf)	/* 52.786 Hz (similar to Major Poker) */
 

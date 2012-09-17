@@ -1182,7 +1182,7 @@ static MACHINE_CONFIG_START( ampoker2, ampoker2_state )
     */
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(20*8, 56*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(ampoker2)
+	MCFG_SCREEN_UPDATE_DRIVER(ampoker2_state, screen_update_ampoker2)
 
 	MCFG_GFXDECODE(ampoker2)
 	MCFG_PALETTE_LENGTH(512)

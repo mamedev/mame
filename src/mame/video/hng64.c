@@ -1430,12 +1430,11 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_rgb32 &bitmap, co
 
 #define IMPORTANT_DIRTY_TILEFLAG_MASK (0x0600)
 
-SCREEN_UPDATE_RGB32( hng64 )
+UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	hng64_state *state = screen.machine().driver_data<hng64_state>();
-	UINT32 *hng64_videoregs = state->m_videoregs;
-	UINT32 *hng64_videoram = state->m_videoram;
-	UINT32 *hng64_tcram = state->m_tcram;
+	UINT32 *hng64_videoregs = m_videoregs;
+	UINT32 *hng64_videoram = m_videoram;
+	UINT32 *hng64_tcram = m_tcram;
 	UINT32 animmask;
 	UINT32 animbits;
 	UINT16 tileflags0, tileflags1;
@@ -1455,7 +1454,7 @@ SCREEN_UPDATE_RGB32( hng64 )
 	bitmap.fill(hng64_tcram[0x50/4] & 0x10000 ? get_black_pen(screen.machine()) : screen.machine().pens[0], cliprect); //FIXME: Is the register correct? check with HW tests
 	screen.machine().priority_bitmap.fill(0x00, cliprect);
 
-	if (state->m_screen_dis)
+	if (m_screen_dis)
 		return 0;
 
 	animmask = hng64_videoregs[0x0b];
@@ -1466,62 +1465,62 @@ SCREEN_UPDATE_RGB32( hng64 )
 	tileflags3 = hng64_videoregs[0x03]&0xffff;
 
 	/* if the auto-animation mask or bits have changed search for tiles using them and mark as dirty */
-	if ((state->m_old_animmask != animmask) || (state->m_old_animbits != animbits))
+	if ((m_old_animmask != animmask) || (m_old_animbits != animbits))
 	{
 		int tile_index;
 		for (tile_index=0;tile_index<128*128;tile_index++)
 		{
 			if (hng64_videoram[tile_index+(0x00000/4)]&0x200000)
 			{
-				hng64_mark_tile_dirty(state, 0, tile_index);
+				hng64_mark_tile_dirty(this, 0, tile_index);
 			}
 			if (hng64_videoram[tile_index+(0x10000/4)]&0x200000)
 			{
-				hng64_mark_tile_dirty(state, 1, tile_index);
+				hng64_mark_tile_dirty(this, 1, tile_index);
 			}
 			if (hng64_videoram[tile_index+(0x20000/4)]&0x200000)
 			{
-				hng64_mark_tile_dirty(state, 2, tile_index);
+				hng64_mark_tile_dirty(this, 2, tile_index);
 			}
 			if (hng64_videoram[tile_index+(0x30000/4)]&0x200000)
 			{
-				hng64_mark_tile_dirty(state, 3, tile_index);
+				hng64_mark_tile_dirty(this, 3, tile_index);
 			}
 		}
 
-		state->m_old_animmask = animmask;
-		state->m_old_animbits = animbits;
+		m_old_animmask = animmask;
+		m_old_animbits = animbits;
 	}
 
-	if ((state->m_old_tileflags0&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags0&IMPORTANT_DIRTY_TILEFLAG_MASK))
+	if ((m_old_tileflags0&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags0&IMPORTANT_DIRTY_TILEFLAG_MASK))
 	{
-		hng64_mark_all_tiles_dirty(state, 0);
-		state->m_old_tileflags0 = tileflags0;
+		hng64_mark_all_tiles_dirty(this, 0);
+		m_old_tileflags0 = tileflags0;
 	}
 
-	if ((state->m_old_tileflags1&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags1&IMPORTANT_DIRTY_TILEFLAG_MASK))
+	if ((m_old_tileflags1&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags1&IMPORTANT_DIRTY_TILEFLAG_MASK))
 	{
-		hng64_mark_all_tiles_dirty(state, 1);
-		state->m_old_tileflags1 = tileflags1;
+		hng64_mark_all_tiles_dirty(this, 1);
+		m_old_tileflags1 = tileflags1;
 	}
 
-	if ((state->m_old_tileflags2&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags2&IMPORTANT_DIRTY_TILEFLAG_MASK))
+	if ((m_old_tileflags2&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags2&IMPORTANT_DIRTY_TILEFLAG_MASK))
 	{
-		hng64_mark_all_tiles_dirty(state, 2);
-		state->m_old_tileflags2 = tileflags2;
+		hng64_mark_all_tiles_dirty(this, 2);
+		m_old_tileflags2 = tileflags2;
 	}
 
-	if ((state->m_old_tileflags3&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags3&IMPORTANT_DIRTY_TILEFLAG_MASK))
+	if ((m_old_tileflags3&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags3&IMPORTANT_DIRTY_TILEFLAG_MASK))
 	{
-		hng64_mark_all_tiles_dirty(state, 3);
-		state->m_old_tileflags3 = tileflags3;
+		hng64_mark_all_tiles_dirty(this, 3);
+		m_old_tileflags3 = tileflags3;
 	}
 
 	// mark all frames as dirty if for some reason we don't trust the above code
-	//hng64_mark_all_tiles_dirty(state, 0);
-	//hng64_mark_all_tiles_dirty(state, 1);
-	//hng64_mark_all_tiles_dirty(state, 2);
-	//hng64_mark_all_tiles_dirty(state, 3);
+	//hng64_mark_all_tiles_dirty(this, 0);
+	//hng64_mark_all_tiles_dirty(this, 1);
+	//hng64_mark_all_tiles_dirty(this, 2);
+	//hng64_mark_all_tiles_dirty(this, 3);
 
 	hng64_drawtilemap(screen.machine(),bitmap,cliprect, 3);
 	hng64_drawtilemap(screen.machine(),bitmap,cliprect, 2);
@@ -1535,7 +1534,7 @@ SCREEN_UPDATE_RGB32( hng64 )
 		// Blit the color buffer into the primary bitmap
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			UINT32 *src = &state->m_colorBuffer3d[y * cliprect.max_x];
+			UINT32 *src = &m_colorBuffer3d[y * cliprect.max_x];
 			UINT32 *dst = &bitmap.pix32(y, cliprect.min_x);
 
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
@@ -1556,7 +1555,7 @@ SCREEN_UPDATE_RGB32( hng64 )
 		transition_control(screen.machine(), bitmap, cliprect);
 
 	if (0)
-		popmessage("%08x %08x %08x %08x %08x", state->m_spriteregs[0], state->m_spriteregs[1], state->m_spriteregs[2], state->m_spriteregs[3], state->m_spriteregs[4]);
+		popmessage("%08x %08x %08x %08x %08x", m_spriteregs[0], m_spriteregs[1], m_spriteregs[2], m_spriteregs[3], m_spriteregs[4]);
 
 	if (0)
 	popmessage("%08x %08x TR(%04x %04x %04x %04x) SB(%04x %04x %04x %04x) %08x %08x %08x %08x %08x AA(%08x %08x) %08x %08x",
@@ -1582,9 +1581,9 @@ SCREEN_UPDATE_RGB32( hng64 )
 
 	if (0)
 	popmessage("3D: %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x",
-		state->m_3dregs[0x00/4], state->m_3dregs[0x04/4], state->m_3dregs[0x08/4], state->m_3dregs[0x0c/4],
-		state->m_3dregs[0x10/4], state->m_3dregs[0x14/4], state->m_3dregs[0x18/4], state->m_3dregs[0x1c/4],
-		state->m_3dregs[0x20/4], state->m_3dregs[0x24/4], state->m_3dregs[0x28/4], state->m_3dregs[0x2c/4]);
+		m_3dregs[0x00/4], m_3dregs[0x04/4], m_3dregs[0x08/4], m_3dregs[0x0c/4],
+		m_3dregs[0x10/4], m_3dregs[0x14/4], m_3dregs[0x18/4], m_3dregs[0x1c/4],
+		m_3dregs[0x20/4], m_3dregs[0x24/4], m_3dregs[0x28/4], m_3dregs[0x2c/4]);
 
 	if (0)
 		popmessage("TC: %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x",
@@ -1615,32 +1614,32 @@ SCREEN_UPDATE_RGB32( hng64 )
 
 	if ( screen.machine().input().code_pressed_once(KEYCODE_T) )
 	{
-		state->m_additive_tilemap_debug ^= 1;
-		popmessage("blend changed %02x", state->m_additive_tilemap_debug);
+		m_additive_tilemap_debug ^= 1;
+		popmessage("blend changed %02x", m_additive_tilemap_debug);
 	}
 	if ( screen.machine().input().code_pressed_once(KEYCODE_Y) )
 	{
-		state->m_additive_tilemap_debug ^= 2;
-		popmessage("blend changed %02x", state->m_additive_tilemap_debug);
+		m_additive_tilemap_debug ^= 2;
+		popmessage("blend changed %02x", m_additive_tilemap_debug);
 	}
 	if ( screen.machine().input().code_pressed_once(KEYCODE_U) )
 	{
-		state->m_additive_tilemap_debug ^= 4;
-		popmessage("blend changed %02x", state->m_additive_tilemap_debug);
+		m_additive_tilemap_debug ^= 4;
+		popmessage("blend changed %02x", m_additive_tilemap_debug);
 	}
 	if ( screen.machine().input().code_pressed_once(KEYCODE_I) )
 	{
-		state->m_additive_tilemap_debug ^= 8;
-		popmessage("blend changed %02x", state->m_additive_tilemap_debug);
+		m_additive_tilemap_debug ^= 8;
+		popmessage("blend changed %02x", m_additive_tilemap_debug);
 	}
 
 	return 0;
 }
 
-SCREEN_VBLANK( hng64 )
+void hng64_state::screen_eof_hng64(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 		clear3d(screen.machine());
 }
 

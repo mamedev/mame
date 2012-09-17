@@ -155,6 +155,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_ppmast93_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_ppmast93_fg_tile_info);
 	virtual void video_start();
+	UINT32 screen_update_ppmast93(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -353,11 +354,10 @@ void ppmast93_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-static SCREEN_UPDATE_IND16( ppmast93 )
+UINT32 ppmast93_state::screen_update_ppmast93(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ppmast93_state *state = screen.machine().driver_data<ppmast93_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -379,7 +379,7 @@ static MACHINE_CONFIG_START( ppmast93, ppmast93_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(ppmast93)
+	MCFG_SCREEN_UPDATE_DRIVER(ppmast93_state, screen_update_ppmast93)
 
 	MCFG_GFXDECODE(ppmast93)
 

@@ -202,6 +202,7 @@ public:
 		// edfc / fffc alternating (display double buffering?)
 	}
 	virtual void video_start();
+	UINT32 screen_update_littlerb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -554,13 +555,12 @@ INPUT_PORTS_END
 
 
 /* sprite format / offset could be completely wrong, this is just based on our (currently incorrect) vram access */
-static SCREEN_UPDATE_IND16(littlerb)
+UINT32 littlerb_state::screen_update_littlerb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	littlerb_state *state = screen.machine().driver_data<littlerb_state>();
 	bitmap.fill(0, cliprect);
 
-	copybitmap_trans(bitmap, *state->m_temp_bitmap_sprites_back, 0, 0, 0, 0, cliprect, 0);
-	copybitmap_trans(bitmap, *state->m_temp_bitmap_sprites, 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, *m_temp_bitmap_sprites_back, 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, *m_temp_bitmap_sprites, 0, 0, 0, 0, cliprect, 0);
 
 	return 0;
 }
@@ -834,7 +834,7 @@ static MACHINE_CONFIG_START( littlerb, littlerb_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(512+22, 312)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 336-1, 0*8, 288-1)
-	MCFG_SCREEN_UPDATE_STATIC(littlerb)
+	MCFG_SCREEN_UPDATE_DRIVER(littlerb_state, screen_update_littlerb)
 
 
 	MCFG_PALETTE_LENGTH(0x100)

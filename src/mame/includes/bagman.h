@@ -47,6 +47,7 @@ public:
 	DECLARE_MACHINE_RESET(bagman);
 	DECLARE_VIDEO_START(bagman);
 	DECLARE_PALETTE_INIT(bagman);
+	UINT32 screen_update_bagman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -80,4 +81,4 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( bagman );
+

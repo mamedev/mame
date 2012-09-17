@@ -116,6 +116,12 @@ public:
 	DECLARE_MACHINE_RESET(trs80m4);
 	DECLARE_MACHINE_RESET(lnw80);
 	DECLARE_PALETTE_INIT(lnw80);
+	UINT32 screen_update_trs80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_trs80m4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_ht1080z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_lnw80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_radionic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_meritum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -137,12 +143,12 @@ INTERRUPT_GEN( trs80_fdc_interrupt );
 /*----------- defined in video/trs80.c -----------*/
 
 
-SCREEN_UPDATE_IND16( trs80 );
-SCREEN_UPDATE_IND16( ht1080z );
-SCREEN_UPDATE_IND16( meritum );
-SCREEN_UPDATE_IND16( lnw80 );
-SCREEN_UPDATE_IND16( radionic );
-SCREEN_UPDATE_IND16( trs80m4 );
+
+
+
+
+
+
 
 
 

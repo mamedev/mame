@@ -99,6 +99,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -480,57 +481,56 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-static SCREEN_UPDATE_IND16( mwarr )
+UINT32 mwarr_state::screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mwarr_state *state = screen.machine().driver_data<mwarr_state>();
 	int i;
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	if (BIT(state->m_vidattrram[6], 0))
+	if (BIT(m_vidattrram[6], 0))
 	{
 		for (i = 0; i < 256; i++)
-			state->m_bg_tilemap->set_scrollx(i, state->m_bg_scrollram[i] + 20);
+			m_bg_tilemap->set_scrollx(i, m_bg_scrollram[i] + 20);
 	}
 	else
 	{
 		for (i = 0; i < 256; i++)
-			state->m_bg_tilemap->set_scrollx(i, state->m_bg_scrollram[0] + 19);
+			m_bg_tilemap->set_scrollx(i, m_bg_scrollram[0] + 19);
 	}
 
-	if (BIT(state->m_vidattrram[6], 2))
+	if (BIT(m_vidattrram[6], 2))
 	{
 		for (i = 0; i < 256; i++)
-			state->m_mlow_tilemap->set_scrollx(i, state->m_mlow_scrollram[i] + 19);
+			m_mlow_tilemap->set_scrollx(i, m_mlow_scrollram[i] + 19);
 	}
 	else
 	{
 		for (i = 0; i < 256; i++)
-			state->m_mlow_tilemap->set_scrollx(i, state->m_mlow_scrollram[0] + 19);
+			m_mlow_tilemap->set_scrollx(i, m_mlow_scrollram[0] + 19);
 	}
 
-	if (BIT(state->m_vidattrram[6], 4))
+	if (BIT(m_vidattrram[6], 4))
 	{
 		for (i = 0; i < 256; i++)
-			state->m_mhigh_tilemap->set_scrollx(i, state->m_mhigh_scrollram[i] + 19);
+			m_mhigh_tilemap->set_scrollx(i, m_mhigh_scrollram[i] + 19);
 	}
 	else
 	{
 		for (i = 0; i < 256; i++)
-			state->m_mhigh_tilemap->set_scrollx(i, state->m_mhigh_scrollram[0] + 19);
+			m_mhigh_tilemap->set_scrollx(i, m_mhigh_scrollram[0] + 19);
 	}
 
-	state->m_bg_tilemap->set_scrolly(0, state->m_vidattrram[1] + 1);
-	state->m_mlow_tilemap->set_scrolly(0, state->m_vidattrram[2] + 1);
-	state->m_mhigh_tilemap->set_scrolly(0, state->m_vidattrram[3] + 1);
+	m_bg_tilemap->set_scrolly(0, m_vidattrram[1] + 1);
+	m_mlow_tilemap->set_scrolly(0, m_vidattrram[2] + 1);
+	m_mhigh_tilemap->set_scrolly(0, m_vidattrram[3] + 1);
 
-	state->m_tx_tilemap->set_scrollx(0, state->m_vidattrram[0] + 16);
-	state->m_tx_tilemap->set_scrolly(0, state->m_vidattrram[4] + 1);
+	m_tx_tilemap->set_scrollx(0, m_vidattrram[0] + 16);
+	m_tx_tilemap->set_scrolly(0, m_vidattrram[4] + 1);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0x01);
-	state->m_mlow_tilemap->draw(bitmap, cliprect, 0, 0x02);
-	state->m_mhigh_tilemap->draw(bitmap, cliprect, 0, 0x04);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0x10);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0x01);
+	m_mlow_tilemap->draw(bitmap, cliprect, 0, 0x02);
+	m_mhigh_tilemap->draw(bitmap, cliprect, 0, 0x04);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 0x10);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
@@ -567,7 +567,7 @@ static MACHINE_CONFIG_START( mwarr, mwarr_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8+1, 48*8-1-8-1, 0, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(mwarr)
+	MCFG_SCREEN_UPDATE_DRIVER(mwarr_state, screen_update_mwarr)
 
 	MCFG_GFXDECODE(mwarr)
 	MCFG_PALETTE_LENGTH(0x800)

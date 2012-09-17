@@ -673,7 +673,7 @@ static MACHINE_CONFIG_START( lordgun, lordgun_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(0x200, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0,0x1c0-1, 0,0xe0-1)
-	MCFG_SCREEN_UPDATE_STATIC(lordgun)
+	MCFG_SCREEN_UPDATE_DRIVER(lordgun_state, screen_update_lordgun)
 
 	MCFG_GFXDECODE(lordgun)
 	MCFG_PALETTE_LENGTH(0x800 * 8)	// 0x800 real colors, repeated per priority level
@@ -715,7 +715,7 @@ static MACHINE_CONFIG_START( aliencha, lordgun_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(0x200, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0,0x1c0-1, 0,0xe0-1)
-	MCFG_SCREEN_UPDATE_STATIC(lordgun)
+	MCFG_SCREEN_UPDATE_DRIVER(lordgun_state, screen_update_lordgun)
 
 	MCFG_GFXDECODE(lordgun)
 	MCFG_PALETTE_LENGTH(0x800 * 8)	// 0x800 real colors, repeated per priority level

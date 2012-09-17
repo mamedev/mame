@@ -32,11 +32,13 @@ public:
 	DECLARE_WRITE16_MEMBER(pktgaldx_oki_bank_w);
 	DECLARE_DRIVER_INIT(pktgaldx);
 	virtual void machine_start();
+	UINT32 screen_update_pktgaldx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_pktgaldb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 
 /*----------- defined in video/pktgaldx.c -----------*/
 
-SCREEN_UPDATE_IND16( pktgaldx );
-SCREEN_UPDATE_IND16( pktgaldb );
+
+

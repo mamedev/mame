@@ -111,6 +111,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -148,13 +149,12 @@ void silvmil_state::video_start()
 	m_fg_layer->set_transparent_pen(0);
 }
 
-SCREEN_UPDATE_IND16( silvmil )
+UINT32 silvmil_state::screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	silvmil_state *state = screen.machine().driver_data<silvmil_state>();
 
-	state->m_bg_layer->draw(bitmap, cliprect, 0, 0);
-	state->m_fg_layer->draw(bitmap, cliprect, 0, 0);
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, 0x400);
+	m_bg_layer->draw(bitmap, cliprect, 0, 0);
+	m_fg_layer->draw(bitmap, cliprect, 0, 0);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	return 0;
 }
 
@@ -330,7 +330,7 @@ static MACHINE_CONFIG_START( silvmil, silvmil_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(silvmil)
+	MCFG_SCREEN_UPDATE_DRIVER(silvmil_state, screen_update_silvmil)
 
 	MCFG_PALETTE_LENGTH(0x300)
 	MCFG_GFXDECODE(silvmil)

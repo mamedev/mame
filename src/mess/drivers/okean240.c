@@ -79,6 +79,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_DRIVER_INIT(okean240);
+	UINT32 screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 // okean240 requires bit 4 to change
@@ -390,20 +391,19 @@ void okean240_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( okean240 )
+UINT32 okean240_state::screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	okean240_state *state = screen.machine().driver_data<okean240_state>();
 	UINT8 gfx,ma; // ma must be 8bit
 	UINT16 x,y;
 
 	for (y = 0; y < 256; y++)
 	{
-		ma = y + state->m_scroll;
+		ma = y + m_scroll;
 		UINT16 *p = &bitmap.pix16(y);
 
 		for (x = 0; x < 0x4000; x+=0x200)
 		{
-			gfx = state->m_p_videoram[x|ma] | state->m_p_videoram[x|ma|0x100];
+			gfx = m_p_videoram[x|ma] | m_p_videoram[x|ma|0x100];
 
 			/* Display a scanline of a character */
 			*p++ = BIT(gfx, 0);
@@ -457,7 +457,7 @@ static MACHINE_CONFIG_START( okean240t, okean240_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 255)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-	MCFG_SCREEN_UPDATE_STATIC(okean240)
+	MCFG_SCREEN_UPDATE_DRIVER(okean240_state, screen_update_okean240)
 
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END

@@ -163,20 +163,19 @@ static void oric_vh_render_6pixels(bitmap_ind16 &bitmap, int x, UINT8 y, UINT8 f
 /***************************************************************************
   oric_vh_screenrefresh
 ***************************************************************************/
-SCREEN_UPDATE_IND16( oric )
+UINT32 oric_state::screen_update_oric(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	oric_state *state = screen.machine().driver_data<oric_state>();
 	UINT8 *RAM, y;
 	offs_t byte_offset, read_addr_base;
 	bool hires_active;
 
-	RAM = state->m_ram;
+	RAM = m_ram;
 
 	/* set initial base */
-	read_addr_base = state->m_vh_state.read_addr;
+	read_addr_base = m_vh_state.read_addr;
 
 	/* is hires active? */
-	hires_active = BIT(state->m_vh_state.mode, 2);
+	hires_active = BIT(m_vh_state.mode, 2);
 
 	for (y = 0; y < 224; y++)
 	{
@@ -222,13 +221,13 @@ SCREEN_UPDATE_IND16( oric )
 				oric_vh_update_attribute(screen.machine(), c);
 
 				/* display background colour when attribute has been found */
-				oric_vh_render_6pixels(bitmap, x, y, state->m_vh_state.active_foreground_colour, state->m_vh_state.active_background_colour, 0, (c & 0x080));
+				oric_vh_render_6pixels(bitmap, x, y, m_vh_state.active_foreground_colour, m_vh_state.active_background_colour, 0, (c & 0x080));
 
 				if (y < 200)
 				{
 					/* is hires active? */
-					hires_active = BIT(state->m_vh_state.mode, 2);
-					read_addr_base = state->m_vh_state.read_addr;
+					hires_active = BIT(m_vh_state.mode, 2);
+					read_addr_base = m_vh_state.read_addr;
 				}
 			}
 			else
@@ -238,7 +237,7 @@ SCREEN_UPDATE_IND16( oric )
 				{
 					UINT8 pixel_data = c & 0x03f;
 					/* plot hires pixels */
-					oric_vh_render_6pixels(bitmap,x,y,state->m_vh_state.active_foreground_colour, state->m_vh_state.active_background_colour, pixel_data, BIT(c, 7));
+					oric_vh_render_6pixels(bitmap,x,y,m_vh_state.active_foreground_colour, m_vh_state.active_background_colour, pixel_data, BIT(c, 7));
 				}
 				else
 				{
@@ -249,7 +248,7 @@ SCREEN_UPDATE_IND16( oric )
 					ch_line = y & 7;
 
 					/* is double height set? */
-					if (BIT(state->m_vh_state.text_attributes, 1))
+					if (BIT(m_vh_state.text_attributes, 1))
 					{
 					/* if char line is even, top half of character is displayed else bottom half */
 						UINT8 double_height_flag = BIT(y, 3);
@@ -259,12 +258,12 @@ SCREEN_UPDATE_IND16( oric )
 					}
 
 					/* fetch pixel data for this char line */
-					char_data = state->m_vh_state.char_data[(char_index<<3) | ch_line] & 0x03f;
+					char_data = m_vh_state.char_data[(char_index<<3) | ch_line] & 0x03f;
 
 					/* draw! */
 					oric_vh_render_6pixels(bitmap,x,y,
-						state->m_vh_state.active_foreground_colour,
-						state->m_vh_state.active_background_colour, char_data, BIT(c, 7));
+						m_vh_state.active_foreground_colour,
+						m_vh_state.active_background_colour, char_data, BIT(c, 7));
 				}
 
 			}

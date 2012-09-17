@@ -651,26 +651,25 @@ void rmnimbus_state::video_reset()
     logerror("Video reset\n");
 }
 
-SCREEN_VBLANK( nimbus )
+void rmnimbus_state::screen_eof_nimbus(screen_device &screen, bool state)
 {
 
 //    logerror("SCREEN_VBLANK( nimbus )\n");
 }
 
-SCREEN_UPDATE_IND16( nimbus )
+UINT32 rmnimbus_state::screen_update_nimbus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	rmnimbus_state *state = screen.machine().driver_data<rmnimbus_state>();
     int     XCoord;
     int     YCoord = screen.vpos();
 
     for(XCoord=0;XCoord<SCREEN_WIDTH_PIXELS;XCoord++)
     {
-        bitmap.pix16(YCoord, XCoord)=state->m_video_mem[XCoord][YCoord];
+        bitmap.pix16(YCoord, XCoord)=m_video_mem[XCoord][YCoord];
     }
 
-    state->m_hs_count++;
-    if((state->m_hs_count & 0x000F)>0x0A)
-        state->m_hs_count&=0xFFF0;
+    m_hs_count++;
+    if((m_hs_count & 0x000F)>0x0A)
+        m_hs_count&=0xFFF0;
 
     return 0;
 }

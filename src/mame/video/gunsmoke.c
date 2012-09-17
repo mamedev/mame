@@ -169,22 +169,21 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( gunsmoke )
+UINT32 gunsmoke_state::screen_update_gunsmoke(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gunsmoke_state *state = screen.machine().driver_data<gunsmoke_state>();
-	state->m_bg_tilemap->set_scrollx(0, state->m_scrollx[0] + 256 * state->m_scrollx[1]);
-	state->m_bg_tilemap->set_scrolly(0, state->m_scrolly[0]);
+	m_bg_tilemap->set_scrollx(0, m_scrollx[0] + 256 * m_scrollx[1]);
+	m_bg_tilemap->set_scrolly(0, m_scrolly[0]);
 
-	if (state->m_bgon)
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (m_bgon)
+		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if (state->m_objon)
+	if (m_objon)
 		draw_sprites(screen.machine(), bitmap, cliprect);
 
-	if (state->m_chon)
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (m_chon)
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

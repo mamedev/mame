@@ -21,9 +21,10 @@ public:
 	DECLARE_MACHINE_START(arcadecl);
 	DECLARE_MACHINE_RESET(arcadecl);
 	DECLARE_VIDEO_START(arcadecl);
+	UINT32 screen_update_arcadecl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/arcadecl.c -----------*/
 
 
-SCREEN_UPDATE_IND16( arcadecl );
+

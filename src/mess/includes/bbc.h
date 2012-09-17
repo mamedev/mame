@@ -281,6 +281,7 @@ public:
 	DECLARE_MACHINE_START(bbcbp);
 	DECLARE_MACHINE_RESET(bbcbp);
 	DECLARE_VIDEO_START(bbcbp);
+	UINT32 screen_update_bbc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -336,7 +337,7 @@ extern const uPD7002_interface bbc_uPD7002;
 
 
 
-SCREEN_UPDATE_IND16( bbc );
+
 
 void bbc_set_video_memory_lookups(running_machine &machine, int ramsize);
 void bbc_setscreenstart(running_machine &machine, int b4, int b5);

@@ -83,6 +83,16 @@ public:
 	DECLARE_VIDEO_START(spinlbrk);
 	DECLARE_VIDEO_START(turbofrc);
 	DECLARE_VIDEO_START(wbbc97);
+	UINT32 screen_update_pspikes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_spikes91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_pspikesb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_karatblz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_spinlbrk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_turbofrc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_aerofgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_aerfboot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_aerfboo2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_wbbc97(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -95,13 +105,13 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( pspikes );
-SCREEN_UPDATE_IND16( pspikesb );
-SCREEN_UPDATE_IND16( spikes91 );
-SCREEN_UPDATE_IND16( karatblz );
-SCREEN_UPDATE_IND16( spinlbrk );
-SCREEN_UPDATE_IND16( turbofrc );
-SCREEN_UPDATE_IND16( aerofgt );
-SCREEN_UPDATE_IND16( aerfboot );
-SCREEN_UPDATE_IND16( aerfboo2 );
-SCREEN_UPDATE_RGB32( wbbc97 );
+
+
+
+
+
+
+
+
+
+

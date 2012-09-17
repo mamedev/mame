@@ -951,8 +951,8 @@ static MACHINE_CONFIG_START( ninjakd2, ninjakd2_state )
 	MCFG_SCREEN_REFRESH_RATE(59.61)    /* verified on pcb */
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(ninjakd2)
-	MCFG_SCREEN_VBLANK_STATIC(ninjakd2)
+	MCFG_SCREEN_UPDATE_DRIVER(ninjakd2_state, screen_update_ninjakd2)
+	MCFG_SCREEN_VBLANK_DRIVER(ninjakd2_state, screen_eof_ninjakd2)
 
 	MCFG_GFXDECODE(ninjakd2)
 	MCFG_PALETTE_LENGTH(0x300)
@@ -1021,7 +1021,7 @@ static MACHINE_CONFIG_DERIVED( robokid, mnight )
 
 	MCFG_VIDEO_START_OVERRIDE(ninjakd2_state,robokid)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(robokid)
+	MCFG_SCREEN_UPDATE_DRIVER(ninjakd2_state, screen_update_robokid)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( omegaf, robokid )
@@ -1036,7 +1036,7 @@ static MACHINE_CONFIG_DERIVED( omegaf, robokid )
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(ninjakd2_state,omegaf)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(omegaf)
+	MCFG_SCREEN_UPDATE_DRIVER(ninjakd2_state, screen_update_omegaf)
 MACHINE_CONFIG_END
 
 

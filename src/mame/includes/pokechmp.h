@@ -17,6 +17,7 @@ public:
 	DECLARE_DRIVER_INIT(pokechmp);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
+	UINT32 screen_update_pokechmp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -24,4 +25,4 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( pokechmp );
+

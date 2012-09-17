@@ -36,6 +36,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_pgm2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_pgm2(screen_device &screen, bool state);
 };
 
 static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
@@ -45,12 +47,12 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( pgm2 )
 INPUT_PORTS_END
 
-static SCREEN_UPDATE_IND16(pgm2)
+UINT32 pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-static SCREEN_VBLANK(pgm2)
+void pgm2_state::screen_eof_pgm2(screen_device &screen, bool state)
 {
 
 }
@@ -139,8 +141,8 @@ static MACHINE_CONFIG_START( pgm2, pgm2_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(pgm2)
-	MCFG_SCREEN_VBLANK_STATIC(pgm2)
+	MCFG_SCREEN_UPDATE_DRIVER(pgm2_state, screen_update_pgm2)
+	MCFG_SCREEN_VBLANK_DRIVER(pgm2_state, screen_eof_pgm2)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 

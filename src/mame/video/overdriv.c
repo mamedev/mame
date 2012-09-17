@@ -50,21 +50,20 @@ void overdriv_zoom_callback_1( running_machine &machine, int *code, int *color, 
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( overdriv )
+UINT32 overdriv_state::screen_update_overdriv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	overdriv_state *state = screen.machine().driver_data<overdriv_state>();
 
-	state->m_sprite_colorbase  = k053251_get_palette_index(state->m_k053251, K053251_CI0);
-	state->m_road_colorbase[1] = k053251_get_palette_index(state->m_k053251, K053251_CI1);
-	state->m_road_colorbase[0] = k053251_get_palette_index(state->m_k053251, K053251_CI2);
-	state->m_zoom_colorbase[1] = k053251_get_palette_index(state->m_k053251, K053251_CI3);
-	state->m_zoom_colorbase[0] = k053251_get_palette_index(state->m_k053251, K053251_CI4);
+	m_sprite_colorbase  = k053251_get_palette_index(m_k053251, K053251_CI0);
+	m_road_colorbase[1] = k053251_get_palette_index(m_k053251, K053251_CI1);
+	m_road_colorbase[0] = k053251_get_palette_index(m_k053251, K053251_CI2);
+	m_zoom_colorbase[1] = k053251_get_palette_index(m_k053251, K053251_CI3);
+	m_zoom_colorbase[0] = k053251_get_palette_index(m_k053251, K053251_CI4);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	k051316_zoom_draw(state->m_k051316_1, bitmap, cliprect, 0, 0);
-	k051316_zoom_draw(state->m_k051316_2, bitmap, cliprect, 0, 1);
+	k051316_zoom_draw(m_k051316_1, bitmap, cliprect, 0, 0);
+	k051316_zoom_draw(m_k051316_2, bitmap, cliprect, 0, 1);
 
-	k053247_sprites_draw(state->m_k053246, bitmap,cliprect);
+	k053247_sprites_draw(m_k053246, bitmap,cliprect);
 	return 0;
 }

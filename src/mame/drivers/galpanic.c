@@ -124,10 +124,10 @@ The current set of Super Model is an example of type C
 #include "includes/galpanic.h"
 #include "includes/galpnipt.h"
 
-static SCREEN_VBLANK( galpanic )
+void galpanic_state::screen_eof_galpanic(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
 		device_t *pandora = screen.machine().device("pandora");
 		pandora_eof(pandora);
@@ -567,8 +567,8 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* frames per second, vblank duration */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_STATIC(galpanic)
-	MCFG_SCREEN_VBLANK_STATIC( galpanic )
+	MCFG_SCREEN_UPDATE_DRIVER(galpanic_state, screen_update_galpanic)
+	MCFG_SCREEN_VBLANK_DRIVER(galpanic_state, screen_eof_galpanic)
 
 	MCFG_GFXDECODE(galpanic)
 	MCFG_PALETTE_LENGTH(1024 + 32768)
@@ -611,7 +611,7 @@ static MACHINE_CONFIG_DERIVED( comad, galpanic )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(comad)
+	MCFG_SCREEN_UPDATE_DRIVER(galpanic_state, screen_update_comad)
 	MCFG_SCREEN_VBLANK_NONE()
 MACHINE_CONFIG_END
 
@@ -625,7 +625,7 @@ static MACHINE_CONFIG_DERIVED( supmodel, comad )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(comad)
+	MCFG_SCREEN_UPDATE_DRIVER(galpanic_state, screen_update_comad)
 	MCFG_SCREEN_VBLANK_NONE()
 
 	/* sound hardware */
@@ -643,7 +643,7 @@ static MACHINE_CONFIG_DERIVED( fantsia2, comad )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(comad)
+	MCFG_SCREEN_UPDATE_DRIVER(galpanic_state, screen_update_comad)
 	MCFG_SCREEN_VBLANK_NONE()
 MACHINE_CONFIG_END
 
@@ -658,7 +658,7 @@ static MACHINE_CONFIG_DERIVED( galhustl, comad )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(comad)
+	MCFG_SCREEN_UPDATE_DRIVER(galpanic_state, screen_update_comad)
 	MCFG_SCREEN_VBLANK_NONE()
 
 	/* sound hardware */
@@ -677,7 +677,7 @@ static MACHINE_CONFIG_DERIVED( zipzap, comad )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(comad)
+	MCFG_SCREEN_UPDATE_DRIVER(galpanic_state, screen_update_comad)
 
 	/* sound hardware */
 	MCFG_OKIM6295_REPLACE("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified

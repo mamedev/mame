@@ -124,14 +124,14 @@ public:
 	DECLARE_DRIVER_INIT(tetriskr);
 	DECLARE_DRIVER_INIT(filetto);
 	virtual void machine_reset();
+	UINT32 screen_update_tetriskr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
-static SCREEN_UPDATE_RGB32( tetriskr )
+UINT32 pcxt_state::screen_update_tetriskr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	pcxt_state *state = screen.machine().driver_data<pcxt_state>();
 	int x,y;
 	int yi;
-	const UINT8 *bg_rom = state->memregion("gfx2")->base();
+	const UINT8 *bg_rom = memregion("gfx2")->base();
 
 	//popmessage("%04x",m_start_offs);
 
@@ -151,7 +151,7 @@ static SCREEN_UPDATE_RGB32( tetriskr )
 					color = 0;
 					/* TODO: first byte seems bogus? */
 					for(pen_i = 0;pen_i<4;pen_i++)
-						color |= ((bg_rom[y*320/8+x+(pen_i*0x20000)+yi*0x400+state->m_bg_bank*0x2000+1] >> (7-xi)) & 1) << pen_i;
+						color |= ((bg_rom[y*320/8+x+(pen_i*0x20000)+yi*0x400+m_bg_bank*0x2000+1] >> (7-xi)) & 1) << pen_i;
 
 					if(cliprect.contains(x*8+xi, y*8+yi))
 						bitmap.pix32(y*8+yi, x*8+xi) = screen.machine().pens[color];
@@ -766,7 +766,7 @@ static MACHINE_CONFIG_DERIVED( tetriskr, filetto )
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_VIDEO_START(pc_cga_superimpose)
-	MCFG_SCREEN_UPDATE_STATIC(tetriskr)
+	MCFG_SCREEN_UPDATE_DRIVER(pcxt_state, screen_update_tetriskr)
 
 	MCFG_DEVICE_REMOVE("voice")
 MACHINE_CONFIG_END

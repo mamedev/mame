@@ -475,27 +475,25 @@ VIDEO_START_MEMBER(seta2_state,seta2_yoffset)
 	m_yoffset = 0x10;
 }
 
-SCREEN_UPDATE_IND16( seta2 )
+UINT32 seta2_state::screen_update_seta2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	seta2_state *state = screen.machine().driver_data<seta2_state>();
 
 	// Black or pen 0?
 	bitmap.fill(screen.machine().pens[0], cliprect);
 
-	if ( (state->m_vregs[0x30/2] & 1) == 0 )	// 1 = BLANK SCREEN
+	if ( (m_vregs[0x30/2] & 1) == 0 )	// 1 = BLANK SCREEN
 		draw_sprites(screen.machine(), bitmap, cliprect);
 
 	return 0;
 }
 
-SCREEN_VBLANK( seta2 )
+void seta2_state::screen_eof_seta2(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		seta2_state *state = screen.machine().driver_data<seta2_state>();
 
 		// Buffer sprites by 1 frame
-		memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram.bytes());
+		memcpy(m_buffered_spriteram, m_spriteram, m_spriteram.bytes());
 	}
 }

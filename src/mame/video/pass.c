@@ -52,12 +52,11 @@ void pass_state::video_start()
 	m_fg_tilemap->set_transparent_pen(255);
 }
 
-SCREEN_UPDATE_IND16( pass )
+UINT32 pass_state::screen_update_pass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pass_state *state = screen.machine().driver_data<pass_state>();
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

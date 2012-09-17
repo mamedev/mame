@@ -31,6 +31,7 @@ public:
 	virtual void video_start();
 	DECLARE_MACHINE_RESET(galaxy);
 	DECLARE_MACHINE_RESET(galaxyp);
+	UINT32 screen_update_galaxy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -47,7 +48,7 @@ SNAPSHOT_LOAD( galaxy );
 /*----------- defined in video/galaxy.c -----------*/
 
 
-SCREEN_UPDATE_IND16( galaxy );
+
 
 void galaxy_set_timer(running_machine &machine);
 

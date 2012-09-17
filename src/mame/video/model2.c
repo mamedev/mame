@@ -2717,38 +2717,37 @@ VIDEO_START_MEMBER(model2_state,model2)
 	geo_init( machine(), (UINT32*)memregion("user2")->base() );
 }
 
-SCREEN_UPDATE_RGB32(model2)
+UINT32 model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	model2_state *state = screen.machine().driver_data<model2_state>();
 	logerror("--- frame ---\n");
 
 	bitmap.fill(screen.machine().pens[0], cliprect);
-	state->m_sys24_bitmap.fill(0, cliprect);
+	m_sys24_bitmap.fill(0, cliprect);
 
 	segas24_tile *tile = screen.machine().device<segas24_tile>("tile");
-	tile->draw(state->m_sys24_bitmap, cliprect, 7, 0, 0);
-	tile->draw(state->m_sys24_bitmap, cliprect, 6, 0, 0);
-	tile->draw(state->m_sys24_bitmap, cliprect, 5, 0, 0);
-	tile->draw(state->m_sys24_bitmap, cliprect, 4, 0, 0);
+	tile->draw(m_sys24_bitmap, cliprect, 7, 0, 0);
+	tile->draw(m_sys24_bitmap, cliprect, 6, 0, 0);
+	tile->draw(m_sys24_bitmap, cliprect, 5, 0, 0);
+	tile->draw(m_sys24_bitmap, cliprect, 4, 0, 0);
 
-	copybitmap_trans(bitmap, state->m_sys24_bitmap, 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, m_sys24_bitmap, 0, 0, 0, 0, cliprect, 0);
 
 	/* tell the rasterizer we're starting a frame */
-	model2_3d_frame_start(state);
+	model2_3d_frame_start(this);
 
 	/* let the geometry engine do it's thing */
-	geo_parse(state);
+	geo_parse(this);
 
 	/* have the rasterizer output the frame */
-	model2_3d_frame_end( state, bitmap, cliprect );
+	model2_3d_frame_end( this, bitmap, cliprect );
 
-	state->m_sys24_bitmap.fill(0, cliprect);
-	tile->draw(state->m_sys24_bitmap, cliprect, 3, 0, 0);
-	tile->draw(state->m_sys24_bitmap, cliprect, 2, 0, 0);
-	tile->draw(state->m_sys24_bitmap, cliprect, 1, 0, 0);
-	tile->draw(state->m_sys24_bitmap, cliprect, 0, 0, 0);
+	m_sys24_bitmap.fill(0, cliprect);
+	tile->draw(m_sys24_bitmap, cliprect, 3, 0, 0);
+	tile->draw(m_sys24_bitmap, cliprect, 2, 0, 0);
+	tile->draw(m_sys24_bitmap, cliprect, 1, 0, 0);
+	tile->draw(m_sys24_bitmap, cliprect, 0, 0, 0);
 
-	copybitmap_trans(bitmap, state->m_sys24_bitmap, 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, m_sys24_bitmap, 0, 0, 0, 0, cliprect, 0);
 
 	return 0;
 }

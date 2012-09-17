@@ -233,41 +233,39 @@ void bking_state::video_start()
 }
 
 
-SCREEN_UPDATE_IND16( bking )
+UINT32 bking_state::screen_update_bking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bking_state *state = screen.machine().driver_data<bking_state>();
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the balls */
 	drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2],
-		state->m_ball1_pic,
-		state->m_palette_bank,
+		m_ball1_pic,
+		m_palette_bank,
 		0, 0,
-		state->m_xld1, state->m_yld1, 0);
+		m_xld1, m_yld1, 0);
 
 	drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[3],
-		state->m_ball2_pic,
-		state->m_palette_bank,
+		m_ball2_pic,
+		m_palette_bank,
 		0, 0,
-		state->m_xld2, state->m_yld2, 0);
+		m_xld2, m_yld2, 0);
 
 	/* draw the crow */
 	drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
-		state->m_crow_pic,
-		state->m_palette_bank,
-		state->m_crow_flip, state->m_crow_flip,
-		state->m_crow_flip ? state->m_xld3 - 16 : 256 - state->m_xld3, state->m_crow_flip ? state->m_yld3 - 16 : 256 - state->m_yld3, 0);
+		m_crow_pic,
+		m_palette_bank,
+		m_crow_flip, m_crow_flip,
+		m_crow_flip ? m_xld3 - 16 : 256 - m_xld3, m_crow_flip ? m_yld3 - 16 : 256 - m_yld3, 0);
 	return 0;
 }
 
 
-SCREEN_VBLANK( bking )
+void bking_state::screen_eof_bking(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		bking_state *state = screen.machine().driver_data<bking_state>();
 		const rectangle rect(0, 7, 0, 15);
 
 		int xld = 0;
@@ -275,13 +273,13 @@ SCREEN_VBLANK( bking )
 
 		UINT32 latch = 0;
 
-		if (state->m_pc3259_mask == 6)	/* player 1 */
+		if (m_pc3259_mask == 6)	/* player 1 */
 		{
-			xld = state->m_xld1;
-			yld = state->m_yld1;
+			xld = m_xld1;
+			yld = m_yld1;
 
-			drawgfx_opaque(state->m_tmp_bitmap2, rect, screen.machine().gfx[2],
-				state->m_ball1_pic,
+			drawgfx_opaque(m_tmp_bitmap2, rect, screen.machine().gfx[2],
+				m_ball1_pic,
 				0,
 				0, 0,
 				0, 0);
@@ -289,13 +287,13 @@ SCREEN_VBLANK( bking )
 			latch = 0x0c00;
 		}
 
-		if (state->m_pc3259_mask == 3)	/* player 2 */
+		if (m_pc3259_mask == 3)	/* player 2 */
 		{
-			xld = state->m_xld2;
-			yld = state->m_yld2;
+			xld = m_xld2;
+			yld = m_yld2;
 
-			drawgfx_opaque(state->m_tmp_bitmap2, rect, screen.machine().gfx[3],
-				state->m_ball2_pic,
+			drawgfx_opaque(m_tmp_bitmap2, rect, screen.machine().gfx[3],
+				m_ball2_pic,
 				0,
 				0, 0,
 				0, 0);
@@ -303,25 +301,25 @@ SCREEN_VBLANK( bking )
 			latch = 0x0400;
 		}
 
-		state->m_bg_tilemap->set_scrollx(0, state->flip_screen() ? -xld : xld);
-		state->m_bg_tilemap->set_scrolly(0, state->flip_screen() ? -yld : yld);
+		m_bg_tilemap->set_scrollx(0, flip_screen() ? -xld : xld);
+		m_bg_tilemap->set_scrolly(0, flip_screen() ? -yld : yld);
 
-		state->m_bg_tilemap->draw(state->m_tmp_bitmap1, rect, 0, 0);
+		m_bg_tilemap->draw(m_tmp_bitmap1, rect, 0, 0);
 
-		state->m_bg_tilemap->set_scrollx(0, 0);
-		state->m_bg_tilemap->set_scrolly(0, 0);
+		m_bg_tilemap->set_scrollx(0, 0);
+		m_bg_tilemap->set_scrolly(0, 0);
 
 		if (latch != 0)
 		{
-			const UINT8* MASK = screen.machine().root_device().memregion("user1")->base() + 8 * state->m_hit;
+			const UINT8* MASK = screen.machine().root_device().memregion("user1")->base() + 8 * m_hit;
 
 			int x;
 			int y;
 
 			for (y = rect.min_y; y <= rect.max_y; y++)
 			{
-				const UINT16* p0 = &state->m_tmp_bitmap1.pix16(y);
-				const UINT16* p1 = &state->m_tmp_bitmap2.pix16(y);
+				const UINT16* p0 = &m_tmp_bitmap1.pix16(y);
+				const UINT16* p1 = &m_tmp_bitmap2.pix16(y);
 
 				for (x = rect.min_x; x <= rect.max_x; x++)
 				{
@@ -330,13 +328,13 @@ SCREEN_VBLANK( bking )
 						int col = (xld + x) / 8 + 1;
 						int row = (yld + y) / 8 + 0;
 
-						latch |= (state->flip_screen() ? 31 - col : col) << 0;
-						latch |= (state->flip_screen() ? 31 - row : row) << 5;
+						latch |= (flip_screen() ? 31 - col : col) << 0;
+						latch |= (flip_screen() ? 31 - row : row) << 5;
 
-						state->m_pc3259_output[0] = (latch >> 0x0) & 0xf;
-						state->m_pc3259_output[1] = (latch >> 0x4) & 0xf;
-						state->m_pc3259_output[2] = (latch >> 0x8) & 0xf;
-						state->m_pc3259_output[3] = (latch >> 0xc) & 0xf;
+						m_pc3259_output[0] = (latch >> 0x0) & 0xf;
+						m_pc3259_output[1] = (latch >> 0x4) & 0xf;
+						m_pc3259_output[2] = (latch >> 0x8) & 0xf;
+						m_pc3259_output[3] = (latch >> 0xc) & 0xf;
 
 						return;
 					}

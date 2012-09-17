@@ -163,6 +163,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_dreamwld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_dreamwld(screen_device &screen, bool state);
 };
 
 
@@ -284,35 +286,33 @@ void dreamwld_state::video_start()
 
 }
 
-SCREEN_VBLANK( dreamwld )
+void dreamwld_state::screen_eof_dreamwld(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		dreamwld_state *state = screen.machine().driver_data<dreamwld_state>();
-		memcpy(state->m_spritebuf2, state->m_spritebuf1, 0x2000);
-		memcpy(state->m_spritebuf1, state->m_spriteram, 0x2000);
+		memcpy(m_spritebuf2, m_spritebuf1, 0x2000);
+		memcpy(m_spritebuf1, m_spriteram, 0x2000);
 	}
 }
 
 
-static SCREEN_UPDATE_IND16( dreamwld )
+UINT32 dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dreamwld_state *state = screen.machine().driver_data<dreamwld_state>();
 //  int tm0size, tm1size;
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
-	tmptilemap0 = state->m_bg_tilemap;
-	tmptilemap1 = state->m_bg2_tilemap;
+	tmptilemap0 = m_bg_tilemap;
+	tmptilemap1 = m_bg2_tilemap;
 
-	int layer0_scrolly = state->m_vregs[(0x400 / 4)] + 32;
-	int layer1_scrolly = state->m_vregs[(0x400 / 4) + 2] + 32;
+	int layer0_scrolly = m_vregs[(0x400 / 4)] + 32;
+	int layer1_scrolly = m_vregs[(0x400 / 4) + 2] + 32;
 
-	int layer0_scrollx = state->m_vregs[(0x400 / 4) + 1] + 3;
-	int layer1_scrollx = state->m_vregs[(0x400 / 4) + 3] + 5;
-	UINT32 layer0_ctrl = state->m_vregs[0x412 / 4];
-	UINT32 layer1_ctrl = state->m_vregs[0x416 / 4];
+	int layer0_scrollx = m_vregs[(0x400 / 4) + 1] + 3;
+	int layer1_scrollx = m_vregs[(0x400 / 4) + 3] + 5;
+	UINT32 layer0_ctrl = m_vregs[0x412 / 4];
+	UINT32 layer1_ctrl = m_vregs[0x416 / 4];
 
 	tmptilemap0->set_scrolly(0, layer0_scrolly);
 	tmptilemap1->set_scrolly(0, layer1_scrolly);
@@ -342,7 +342,7 @@ static SCREEN_UPDATE_IND16( dreamwld )
 		int x0 = 0, x1 = 0;
 
 		/* layer 0 */
-		UINT16 *vregs = reinterpret_cast<UINT16 *>(state->m_vregs.target());
+		UINT16 *vregs = reinterpret_cast<UINT16 *>(m_vregs.target());
 		if (layer0_ctrl & 0x0300)
 		{
 			if (layer0_ctrl & 0x0200)
@@ -377,19 +377,19 @@ static SCREEN_UPDATE_IND16( dreamwld )
 	}
 
 
-	state->m_tilebank[0] = (state->m_vregs[(0x400 / 4) + 4] >> 6) & 1;
-	state->m_tilebank[1] = (state->m_vregs[(0x400 / 4) + 5] >> 6) & 1;
+	m_tilebank[0] = (m_vregs[(0x400 / 4) + 4] >> 6) & 1;
+	m_tilebank[1] = (m_vregs[(0x400 / 4) + 5] >> 6) & 1;
 
-	if (state->m_tilebank[0] != state->m_tilebankold[0])
+	if (m_tilebank[0] != m_tilebankold[0])
 	{
-		state->m_tilebankold[0] = state->m_tilebank[0];
-		state->m_bg_tilemap->mark_all_dirty();
+		m_tilebankold[0] = m_tilebank[0];
+		m_bg_tilemap->mark_all_dirty();
 	}
 
-	if (state->m_tilebank[1] != state->m_tilebankold[1])
+	if (m_tilebank[1] != m_tilebankold[1])
 	{
-		state->m_tilebankold[1] = state->m_tilebank[1];
-		state->m_bg2_tilemap->mark_all_dirty();
+		m_tilebankold[1] = m_tilebank[1];
+		m_bg2_tilemap->mark_all_dirty();
 	}
 
 	tmptilemap0->draw(bitmap, cliprect, 0, 0);
@@ -598,8 +598,8 @@ static MACHINE_CONFIG_START( baryon, dreamwld_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(512,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_STATIC(dreamwld)
-	MCFG_SCREEN_VBLANK_STATIC(dreamwld)
+	MCFG_SCREEN_UPDATE_DRIVER(dreamwld_state, screen_update_dreamwld)
+	MCFG_SCREEN_VBLANK_DRIVER(dreamwld_state, screen_eof_dreamwld)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 	MCFG_GFXDECODE(dreamwld)

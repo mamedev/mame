@@ -88,6 +88,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_taitosj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_kikstart(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -101,5 +103,5 @@ public:
 /*----------- defined in video/taitosj.c -----------*/
 
 
-SCREEN_UPDATE_IND16( taitosj );
-SCREEN_UPDATE_IND16( kikstart );
+
+

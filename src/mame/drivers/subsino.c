@@ -306,6 +306,9 @@ public:
 	DECLARE_PALETTE_INIT(subsino_3proms);
 	DECLARE_VIDEO_START(subsino_reels);
 	DECLARE_VIDEO_START(stisub);
+	UINT32 screen_update_subsino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_subsino_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_stisub_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -483,77 +486,74 @@ VIDEO_START_MEMBER(subsino_state,stisub)
 }
 
 
-static SCREEN_UPDATE_IND16( subsino )
+UINT32 subsino_state::screen_update_subsino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	subsino_state *state = screen.machine().driver_data<subsino_state>();
 	bitmap.fill(0, cliprect);
-	state->m_tmap->draw(bitmap, cliprect, 0, 0);
+	m_tmap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-static SCREEN_UPDATE_IND16( subsino_reels )
+UINT32 subsino_state::screen_update_subsino_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	subsino_state *state = screen.machine().driver_data<subsino_state>();
 	int i;
 	bitmap.fill(0, cliprect);
 
 	for (i= 0;i < 64;i++)
 	{
-		state->m_reel1_tilemap->set_scrolly(i, state->m_reel1_scroll[i]);
-		state->m_reel2_tilemap->set_scrolly(i, state->m_reel2_scroll[i]);
-		state->m_reel3_tilemap->set_scrolly(i, state->m_reel3_scroll[i]);
+		m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i]);
+		m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i]);
+		m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i]);
 	}
 
-	if (state->m_out_c&0x08)
+	if (m_out_c&0x08)
 	{
 		// are these hardcoded, or registers?
 		const rectangle visible1(0*8, (14+48)*8-1,  4*8,  (4+7)*8-1);
 		const rectangle visible2(0*8, (14+48)*8-1, 10*8, (10+7)*8-1);
 		const rectangle visible3(0*8, (14+48)*8-1, 18*8, (18+7)*8-1);
 
-		state->m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
-		state->m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
-		state->m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
+		m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
+		m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
+		m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
 	}
 
-	state->m_tmap->draw(bitmap, cliprect, 0, 0);
+	m_tmap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 
-static SCREEN_UPDATE_IND16( stisub_reels )
+UINT32 subsino_state::screen_update_stisub_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	subsino_state *state = screen.machine().driver_data<subsino_state>();
 	int i;
 	bitmap.fill(0, cliprect);
 
-	if (state->m_reel1_attr)
+	if (m_reel1_attr)
 	{
-		state->m_reel1_tilemap->mark_all_dirty();
-		state->m_reel2_tilemap->mark_all_dirty();
-		state->m_reel3_tilemap->mark_all_dirty();
+		m_reel1_tilemap->mark_all_dirty();
+		m_reel2_tilemap->mark_all_dirty();
+		m_reel3_tilemap->mark_all_dirty();
 	}
 
 	for (i= 0;i < 64;i++)
 	{
-		state->m_reel1_tilemap->set_scrolly(i, state->m_reel1_scroll[i]);
-		state->m_reel2_tilemap->set_scrolly(i, state->m_reel2_scroll[i]);
-		state->m_reel3_tilemap->set_scrolly(i, state->m_reel3_scroll[i]);
+		m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i]);
+		m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i]);
+		m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i]);
 	}
 
-	if (state->m_out_c&0x08)
+	if (m_out_c&0x08)
 	{
 		// areas based on d-up game in attract mode
 		const rectangle visible1(0, 511,  0,  87);
 		const rectangle visible2(0, 511,  88, 143);
 		const rectangle visible3(0, 511,  144, 223);
 
-		state->m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
-		state->m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
-		state->m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
+		m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
+		m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
+		m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
 	}
 
-	state->m_tmap->draw(bitmap, cliprect, 0, 0);
+	m_tmap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -2657,7 +2657,7 @@ static MACHINE_CONFIG_START( victor21, subsino_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(subsino)
+	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_subsino)
 
 	MCFG_GFXDECODE(subsino_depth3)
 
@@ -2697,7 +2697,7 @@ static MACHINE_CONFIG_START( crsbingo, subsino_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(subsino)
+	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_subsino)
 
 	MCFG_GFXDECODE(subsino_depth4)
 
@@ -2726,7 +2726,7 @@ static MACHINE_CONFIG_START( srider, subsino_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(subsino)
+	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_subsino)
 
 	MCFG_GFXDECODE(subsino_depth4)
 
@@ -2765,7 +2765,7 @@ static MACHINE_CONFIG_START( tisub, subsino_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(subsino_reels)
+	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_subsino_reels)
 
 	MCFG_GFXDECODE(subsino_depth4_reels)
 
@@ -2793,7 +2793,7 @@ static MACHINE_CONFIG_START( stisub, subsino_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(stisub_reels)
+	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_stisub_reels)
 
 	MCFG_GFXDECODE(subsino_stisub)
 

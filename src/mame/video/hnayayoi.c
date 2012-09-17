@@ -257,15 +257,14 @@ static void draw_layer_interleaved( running_machine &machine, bitmap_ind16 &bitm
 }
 
 
-SCREEN_UPDATE_IND16( hnayayoi )
+UINT32 hnayayoi_state::screen_update_hnayayoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	hnayayoi_state *state = screen.machine().driver_data<hnayayoi_state>();
-	int col0 = (state->m_palbank >>  0) & 0x0f;
-	int col1 = (state->m_palbank >>  4) & 0x0f;
-	int col2 = (state->m_palbank >>  8) & 0x0f;
-	int col3 = (state->m_palbank >> 12) & 0x0f;
+	int col0 = (m_palbank >>  0) & 0x0f;
+	int col1 = (m_palbank >>  4) & 0x0f;
+	int col2 = (m_palbank >>  8) & 0x0f;
+	int col3 = (m_palbank >> 12) & 0x0f;
 
-	if (state->m_total_pixmaps == 4)
+	if (m_total_pixmaps == 4)
 	{
 		draw_layer_interleaved(screen.machine(), bitmap, cliprect, 3, 2, col1, 0);
 		draw_layer_interleaved(screen.machine(), bitmap, cliprect, 1, 0, col0, 1);

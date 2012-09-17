@@ -76,6 +76,7 @@ public:
 	bool m_keyboard_part;
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -220,9 +221,8 @@ void z1013_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-SCREEN_UPDATE_IND16( z1013 )
+UINT32 z1013_state::screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	z1013_state *state = screen.machine().driver_data<z1013_state>();
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 
@@ -234,10 +234,10 @@ SCREEN_UPDATE_IND16( z1013 )
 
 			for (x = ma; x < ma+32; x++)
 			{
-				chr = state->m_p_videoram[x];
+				chr = m_p_videoram[x];
 
 				/* get pattern of pixels for that character scanline */
-				gfx = state->m_p_chargen[(chr<<3) | ra];
+				gfx = m_p_chargen[(chr<<3) | ra];
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7);
@@ -404,7 +404,7 @@ static MACHINE_CONFIG_START( z1013, z1013_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(z1013)
+	MCFG_SCREEN_UPDATE_DRIVER(z1013_state, screen_update_z1013)
 	MCFG_GFXDECODE(z1013)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

@@ -165,6 +165,7 @@ public:
 	virtual void palette_init();
 	DECLARE_MACHINE_START(px4_ramdisk);
 	DECLARE_PALETTE_INIT(px4p);
+	UINT32 screen_update_px4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -1026,22 +1027,21 @@ READ8_MEMBER(px4_state::px4_ramdisk_control_r)
     VIDEO EMULATION
 ***************************************************************************/
 
-static SCREEN_UPDATE_IND16( px4 )
+UINT32 px4_state::screen_update_px4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	px4_state *px4 = screen.machine().driver_data<px4_state>();
 
 	/* display enabled? */
-	if (BIT(px4->m_yoff, 7))
+	if (BIT(m_yoff, 7))
 	{
 		int y, x;
 
 		/* get vram start address */
-		UINT8 *vram = &px4->m_ram->pointer()[(px4->m_vadr & 0xf8) << 8];
+		UINT8 *vram = &m_ram->pointer()[(m_vadr & 0xf8) << 8];
 
 		for (y = 0; y < 64; y++)
 		{
 			/* adjust against y-offset */
-			UINT8 row = (y - (px4->m_yoff & 0x3f)) & 0x3f;
+			UINT8 row = (y - (m_yoff & 0x3f)) & 0x3f;
 
 			for (x = 0; x < 240/8; x++)
 			{
@@ -1369,7 +1369,7 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_SCREEN_REFRESH_RATE(72)
 	MCFG_SCREEN_SIZE(240, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 63)
-	MCFG_SCREEN_UPDATE_STATIC(px4)
+	MCFG_SCREEN_UPDATE_DRIVER(px4_state, screen_update_px4)
 
 	MCFG_DEFAULT_LAYOUT(layout_px4)
 

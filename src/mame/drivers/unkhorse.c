@@ -39,6 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(horse_output_w);
 	DECLARE_WRITE_LINE_MEMBER(horse_timer_out);
 	virtual void palette_init();
+	UINT32 screen_update_horse(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -55,16 +56,15 @@ void horse_state::palette_init()
 		palette_set_color_rgb(machine(), i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 }
 
-static SCREEN_UPDATE_IND16( horse )
+UINT32 horse_state::screen_update_horse(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	horse_state *state = screen.machine().driver_data<horse_state>();
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		for (int x = 0; x < 32; x++)
 		{
-			UINT8 data = state->m_video_ram[y << 5 | x];
-			UINT8 color = state->m_color_ram[(y << 3 & 0x780) | x] >> 4;
+			UINT8 data = m_video_ram[y << 5 | x];
+			UINT8 color = m_color_ram[(y << 3 & 0x780) | x] >> 4;
 
 			for (int i = 0; i < 8; i++)
 				bitmap.pix16(y, x << 3 | i) = (data >> i & 1) ? color : 0;
@@ -213,7 +213,7 @@ static MACHINE_CONFIG_START( horse, horse_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
-	MCFG_SCREEN_UPDATE_STATIC(horse)
+	MCFG_SCREEN_UPDATE_DRIVER(horse_state, screen_update_horse)
 
 	MCFG_PALETTE_LENGTH(8)
 

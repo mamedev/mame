@@ -43,6 +43,7 @@ public:
 
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_p112(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -70,7 +71,7 @@ void p112_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( p112 )
+UINT32 p112_state::screen_update_p112(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -88,7 +89,7 @@ static MACHINE_CONFIG_START( p112, p112_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(240, 320)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 320-1)
-	MCFG_SCREEN_UPDATE_STATIC(p112)
+	MCFG_SCREEN_UPDATE_DRIVER(p112_state, screen_update_p112)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

@@ -57,6 +57,9 @@ public:
 	DECLARE_VIDEO_START(rohga);
 	DECLARE_VIDEO_START(wizdfire);
 	DECLARE_VIDEO_START(schmeisr);
+	UINT32 screen_update_rohga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -69,9 +72,9 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( rohga );
-SCREEN_UPDATE_RGB32( wizdfire );
-SCREEN_UPDATE_RGB32( nitrobal );
+
+
+
 
 UINT16 rohga_pri_callback(UINT16 x);
 UINT16 schmeisr_col_callback(UINT16 x);

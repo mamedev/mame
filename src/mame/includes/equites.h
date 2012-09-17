@@ -104,6 +104,8 @@ public:
 	DECLARE_PALETTE_INIT(equites);
 	DECLARE_VIDEO_START(splndrbt);
 	DECLARE_PALETTE_INIT(splndrbt);
+	UINT32 screen_update_equites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_splndrbt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 

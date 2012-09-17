@@ -49,6 +49,10 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_VIDEO_START(xmen6p);
+	UINT32 screen_update_xmen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_xmen6p_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_xmen6p_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_xmen6p(screen_device &screen, bool state);
 };
 
 /*----------- defined in video/xmen.c -----------*/
@@ -57,7 +61,7 @@ void xmen_tile_callback(running_machine &machine, int layer,int bank,int *code,i
 void xmen_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);
 
 
-SCREEN_UPDATE_IND16( xmen );
-SCREEN_UPDATE_IND16( xmen6p_left );
-SCREEN_UPDATE_IND16( xmen6p_right );
-SCREEN_VBLANK( xmen6p );
+
+
+
+

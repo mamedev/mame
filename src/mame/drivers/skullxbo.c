@@ -272,7 +272,7 @@ static MACHINE_CONFIG_START( skullxbo, skullxbo_state )
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_STATIC(skullxbo)
+	MCFG_SCREEN_UPDATE_DRIVER(skullxbo_state, screen_update_skullxbo)
 
 	MCFG_VIDEO_START_OVERRIDE(skullxbo_state,skullxbo)
 

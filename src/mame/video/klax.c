@@ -99,15 +99,14 @@ WRITE16_HANDLER( klax_latch_w )
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( klax )
+UINT32 klax_state::screen_update_klax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	klax_state *state = screen.machine().driver_data<klax_state>();
 	atarimo_rect_list rectlist;
 	bitmap_ind16 *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);

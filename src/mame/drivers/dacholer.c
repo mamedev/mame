@@ -89,6 +89,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 TILE_GET_INFO_MEMBER(dacholer_state::get_bg_tile_info)
@@ -151,24 +152,23 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-static SCREEN_UPDATE_IND16(dacholer)
+UINT32 dacholer_state::screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dacholer_state *state = screen.machine().driver_data<dacholer_state>();
 
-	if (state->flip_screen())
+	if (flip_screen())
 	{
-		state->m_bg_tilemap->set_scrollx(0, 256 - state->m_scroll_x);
-		state->m_bg_tilemap->set_scrolly(0, 256 - state->m_scroll_y);
+		m_bg_tilemap->set_scrollx(0, 256 - m_scroll_x);
+		m_bg_tilemap->set_scrolly(0, 256 - m_scroll_y);
 	}
 	else
 	{
-		state->m_bg_tilemap->set_scrollx(0, state->m_scroll_x);
-		state->m_bg_tilemap->set_scrolly(0, state->m_scroll_y);
+		m_bg_tilemap->set_scrollx(0, m_scroll_x);
+		m_bg_tilemap->set_scrolly(0, m_scroll_y);
 	}
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -666,7 +666,7 @@ static MACHINE_CONFIG_START( dacholer, dacholer_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
-	MCFG_SCREEN_UPDATE_STATIC(dacholer)
+	MCFG_SCREEN_UPDATE_DRIVER(dacholer_state, screen_update_dacholer)
 
 	MCFG_PALETTE_LENGTH(32)
 	MCFG_GFXDECODE(dacholer)

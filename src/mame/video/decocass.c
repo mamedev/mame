@@ -516,77 +516,76 @@ void decocass_state::video_start()
 	machine().gfx[2]->decode(16);
 }
 
-SCREEN_UPDATE_IND16( decocass )
+UINT32 decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	decocass_state *state = screen.machine().driver_data<decocass_state>();
 	int scrollx, scrolly_l, scrolly_r;
 	rectangle clip;
 
 	if (0xc0 != (screen.machine().root_device().ioport("IN2")->read() & 0xc0))  /* coin slots assert an NMI */
-		state->m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
-	if (0 == (state->m_watchdog_flip & 0x04))
+	if (0 == (m_watchdog_flip & 0x04))
 		screen.machine().watchdog_reset();
-	else if (state->m_watchdog_count-- > 0)
+	else if (m_watchdog_count-- > 0)
 		screen.machine().watchdog_reset();
 
 #ifdef MAME_DEBUG
 	{
 		if (screen.machine().input().code_pressed_once(KEYCODE_I))
-			state->m_showmsg ^= 1;
-		if (state->m_showmsg)
+			m_showmsg ^= 1;
+		if (m_showmsg)
 			popmessage("mode:$%02x cm:$%02x ccb:$%02x h:$%02x vl:$%02x vr:$%02x ph:$%02x pv:$%02x ch:$%02x cv:$%02x",
-				state->m_mode_set,
-				state->m_color_missiles,
-				state->m_color_center_bot,
-				state->m_back_h_shift,
-				state->m_back_vl_shift,
-				state->m_back_vr_shift,
-				state->m_part_h_shift,
-				state->m_part_v_shift,
-				state->m_center_h_shift_space,
-				state->m_center_v_shift);
+				m_mode_set,
+				m_color_missiles,
+				m_color_center_bot,
+				m_back_h_shift,
+				m_back_vl_shift,
+				m_back_vr_shift,
+				m_part_h_shift,
+				m_part_v_shift,
+				m_center_h_shift_space,
+				m_center_v_shift);
 	}
 #endif
 
 	bitmap.fill(0, cliprect);
 
-	scrolly_l = state->m_back_vl_shift;
-	scrolly_r = 256 - state->m_back_vr_shift;
+	scrolly_l = m_back_vl_shift;
+	scrolly_r = 256 - m_back_vr_shift;
 
-	scrollx = 256 - state->m_back_h_shift;
-	if (0 == (state->m_mode_set & 0x02))
+	scrollx = 256 - m_back_h_shift;
+	if (0 == (m_mode_set & 0x02))
 		scrollx += 256;
 
 #if 0
 /* this is wrong */
-	if (0 != state->m_back_h_shift && 0 == ((state->m_mode_set ^ (state->m_mode_set >> 1)) & 1))
+	if (0 != m_back_h_shift && 0 == ((m_mode_set ^ (m_mode_set >> 1)) & 1))
 		scrollx += 256;
 #endif
 
-	if (0 == (state->m_mode_set & 0x04))
+	if (0 == (m_mode_set & 0x04))
 		scrolly_r += 256;
 	else
 		scrolly_l += 256;
 
-	state->m_bg_tilemap_l->set_scrollx(0, scrollx);
-	state->m_bg_tilemap_l->set_scrolly(0, scrolly_l);
+	m_bg_tilemap_l->set_scrollx(0, scrollx);
+	m_bg_tilemap_l->set_scrolly(0, scrolly_l);
 
-	state->m_bg_tilemap_r->set_scrollx(0, scrollx);
-	state->m_bg_tilemap_r->set_scrolly(0, scrolly_r);
+	m_bg_tilemap_r->set_scrollx(0, scrollx);
+	m_bg_tilemap_r->set_scrolly(0, scrolly_r);
 
-	if (state->m_mode_set & 0x08)	/* bkg_ena on ? */
+	if (m_mode_set & 0x08)	/* bkg_ena on ? */
 	{
-		clip = state->m_bg_tilemap_l_clip;
+		clip = m_bg_tilemap_l_clip;
 		clip &= cliprect;
-		state->m_bg_tilemap_l->draw(bitmap, clip, TILEMAP_DRAW_OPAQUE, 0);
+		m_bg_tilemap_l->draw(bitmap, clip, TILEMAP_DRAW_OPAQUE, 0);
 
-		clip = state->m_bg_tilemap_r_clip;
+		clip = m_bg_tilemap_r_clip;
 		clip &= cliprect;
-		state->m_bg_tilemap_r->draw(bitmap, clip, TILEMAP_DRAW_OPAQUE, 0);
+		m_bg_tilemap_r->draw(bitmap, clip, TILEMAP_DRAW_OPAQUE, 0);
 	}
 
-	if (state->m_mode_set & 0x20)
+	if (m_mode_set & 0x20)
 	{
 		draw_object(screen.machine(), bitmap, cliprect);
 		draw_center(screen.machine(), bitmap, cliprect);
@@ -595,19 +594,19 @@ SCREEN_UPDATE_IND16( decocass )
 	{
 		draw_object(screen.machine(), bitmap, cliprect);
 		draw_center(screen.machine(), bitmap, cliprect);
-		if (state->m_mode_set & 0x08)	/* bkg_ena on ? */
+		if (m_mode_set & 0x08)	/* bkg_ena on ? */
 		{
-			clip = state->m_bg_tilemap_l_clip;
+			clip = m_bg_tilemap_l_clip;
 			clip &= cliprect;
-			state->m_bg_tilemap_l->draw(bitmap, clip, 0, 0);
+			m_bg_tilemap_l->draw(bitmap, clip, 0, 0);
 
-			clip = state->m_bg_tilemap_r_clip;
+			clip = m_bg_tilemap_r_clip;
 			clip &= cliprect;
-			state->m_bg_tilemap_r->draw(bitmap, clip, 0, 0);
+			m_bg_tilemap_r->draw(bitmap, clip, 0, 0);
 		}
 	}
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect, (state->m_color_center_bot >> 1) & 1, 0, 0, state->m_fgvideoram, 0x20);
-	draw_missiles(screen.machine(), bitmap, cliprect, 1, 0, state->m_colorram, 0x20);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	draw_sprites(screen.machine(), bitmap, cliprect, (m_color_center_bot >> 1) & 1, 0, 0, m_fgvideoram, 0x20);
+	draw_missiles(screen.machine(), bitmap, cliprect, 1, 0, m_colorram, 0x20);
 	return 0;
 }

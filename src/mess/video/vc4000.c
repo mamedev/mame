@@ -646,9 +646,8 @@ INTERRUPT_GEN( vc4000_video_line )
 		}
 }
 
-SCREEN_UPDATE_IND16( vc4000 )
+UINT32 vc4000_state::screen_update_vc4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	vc4000_state *state = screen.machine().driver_data<vc4000_state>();
-	copybitmap(bitmap, *state->m_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

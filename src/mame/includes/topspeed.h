@@ -54,9 +54,10 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(topspeed_pedal_r);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_topspeed(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/topspeed.c -----------*/
 
-SCREEN_UPDATE_IND16( topspeed );
+

@@ -127,7 +127,7 @@ void hp48_state::palette_init()
 	draw_pixel; draw_pixel; draw_pixel; draw_pixel;
 
 
-SCREEN_UPDATE_IND16 ( hp48 )
+UINT32 hp48_state::screen_update_hp48(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	hp48_state *state = screen.machine().driver_data<hp48_state>();
 	address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
@@ -189,14 +189,14 @@ SCREEN_UPDATE_IND16 ( hp48 )
 			int acc = 0;
 			for ( i = 0; i < HP48_NB_SCREENS; i++ )
 			{
-				acc += state->m_screens[ i ][ y ][ x+8 ];
+				acc += m_screens[ i ][ y ][ x+8 ];
 			}
 			acc = (acc * 255) / (33 * HP48_NB_SCREENS);
 			bitmap.pix16(y, x ) = acc;
 		}
 	}
 
-	state->m_cur_screen = (state->m_cur_screen + 1) % HP48_NB_SCREENS;
+	m_cur_screen = (m_cur_screen + 1) % HP48_NB_SCREENS;
 
 	return 0;
 }

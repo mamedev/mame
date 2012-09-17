@@ -71,6 +71,8 @@ public:
 	DECLARE_VIDEO_START(homelab3);
 	DECLARE_MACHINE_RESET(brailab4);
 	DECLARE_VIDEO_START(brailab4);
+	UINT32 screen_update_homelab2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_homelab3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 static INTERRUPT_GEN( homelab_frame )
@@ -558,9 +560,8 @@ VIDEO_START_MEMBER(homelab_state,brailab4)
 	m_p_videoram = memregion("maincpu")->base()+0x17800;
 }
 
-static SCREEN_UPDATE_IND16( homelab2 )
+UINT32 homelab_state::screen_update_homelab2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	homelab_state *state = screen.machine().driver_data<homelab_state>();
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 
@@ -572,8 +573,8 @@ static SCREEN_UPDATE_IND16( homelab2 )
 
 			for (x = ma; x < ma + 40; x++)
 			{
-				chr = state->m_p_videoram[x]; // get char in videoram
-				gfx = state->m_p_chargen[chr | (ra<<8)]; // get dot pattern in chargen
+				chr = m_p_videoram[x]; // get char in videoram
+				gfx = m_p_chargen[chr | (ra<<8)]; // get dot pattern in chargen
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7);
@@ -591,9 +592,8 @@ static SCREEN_UPDATE_IND16( homelab2 )
 	return 0;
 }
 
-static SCREEN_UPDATE_IND16( homelab3 )
+UINT32 homelab_state::screen_update_homelab3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	homelab_state *state = screen.machine().driver_data<homelab_state>();
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 
@@ -605,8 +605,8 @@ static SCREEN_UPDATE_IND16( homelab3 )
 
 			for (x = ma; x < ma + 64; x++)
 			{
-				chr = state->m_p_videoram[x]; // get char in videoram
-				gfx = state->m_p_chargen[chr | (ra<<8)]; // get dot pattern in chargen
+				chr = m_p_videoram[x]; // get char in videoram
+				gfx = m_p_chargen[chr | (ra<<8)]; // get dot pattern in chargen
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7);
@@ -750,7 +750,7 @@ static MACHINE_CONFIG_START( homelab, homelab_state )
 	MCFG_SCREEN_SIZE(40*8, 25*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 25*8-1)
 	MCFG_VIDEO_START_OVERRIDE(homelab_state,homelab2)
-	MCFG_SCREEN_UPDATE_STATIC(homelab2)
+	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab2)
 	MCFG_GFXDECODE(homelab)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
@@ -780,7 +780,7 @@ static MACHINE_CONFIG_START( homelab3, homelab_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
 	MCFG_VIDEO_START_OVERRIDE(homelab_state,homelab3)
-	MCFG_SCREEN_UPDATE_STATIC(homelab3)
+	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab3)
 	MCFG_GFXDECODE(homelab)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
@@ -810,7 +810,7 @@ static MACHINE_CONFIG_START( brailab4, homelab_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
 	MCFG_VIDEO_START_OVERRIDE(homelab_state,brailab4)
-	MCFG_SCREEN_UPDATE_STATIC(homelab3)
+	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab3)
 	MCFG_GFXDECODE(homelab)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)

@@ -78,6 +78,7 @@ public:
 	DECLARE_WRITE32_MEMBER(output_w);
 	DECLARE_DRIVER_INIT(feversoc);
 	virtual void video_start();
+	UINT32 screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -88,10 +89,9 @@ void feversoc_state::video_start()
 
 }
 
-static SCREEN_UPDATE_IND16( feversoc )
+UINT32 feversoc_state::screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	feversoc_state *state = screen.machine().driver_data<feversoc_state>();
-	UINT32 *spriteram32 = state->m_spriteram;
+	UINT32 *spriteram32 = m_spriteram;
 	int offs,spr_offs,colour,sx,sy,h,w,dx,dy;
 
 	bitmap.fill(screen.machine().pens[0], cliprect); //black pen
@@ -264,7 +264,7 @@ static MACHINE_CONFIG_START( feversoc, feversoc_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1) //dynamic resolution?
-	MCFG_SCREEN_UPDATE_STATIC(feversoc)
+	MCFG_SCREEN_UPDATE_DRIVER(feversoc_state, screen_update_feversoc)
 
 	MCFG_GFXDECODE(feversoc)
 	MCFG_PALETTE_LENGTH(0x1000)

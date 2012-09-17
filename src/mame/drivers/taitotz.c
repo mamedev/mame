@@ -524,6 +524,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_taitotz(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -1279,16 +1280,15 @@ void taitotz_renderer::render_displaylist(running_machine &machine, const rectan
 	wait("render_polygons");
 }
 
-static SCREEN_UPDATE_RGB32( taitotz )
+UINT32 taitotz_state::screen_update_taitotz(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	taitotz_state *state = screen.machine().driver_data<taitotz_state>();
 
 	bitmap.fill(0x000000, cliprect);
-	state->m_renderer->set_fb(&bitmap);
-	state->m_renderer->render_displaylist(screen.machine(), cliprect);
+	m_renderer->set_fb(&bitmap);
+	m_renderer->render_displaylist(screen.machine(), cliprect);
 
 
-	UINT16 *screen_src = (UINT16*)&state->m_screen_ram[state->m_scr_base];
+	UINT16 *screen_src = (UINT16*)&m_screen_ram[m_scr_base];
 
 	for (int j=0; j < 384; j++)
 	{
@@ -2502,7 +2502,7 @@ static MACHINE_CONFIG_START( taitotz, taitotz_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_STATIC(taitotz)
+	MCFG_SCREEN_UPDATE_DRIVER(taitotz_state, screen_update_taitotz)
 
 MACHINE_CONFIG_END
 

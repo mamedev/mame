@@ -42,13 +42,14 @@ public:
 	DECLARE_DRIVER_INIT(asterix);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_asterix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 
 /*----------- defined in video/asterix.c -----------*/
 
-SCREEN_UPDATE_IND16( asterix );
+
 
 extern void asterix_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
 extern void asterix_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);

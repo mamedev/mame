@@ -321,19 +321,18 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( clshroad )
+UINT32 clshroad_state::screen_update_clshroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	clshroad_state *state = screen.machine().driver_data<clshroad_state>();
-	int scrollx  = state->m_vregs[ 0 ] + (state->m_vregs[ 1 ] << 8);
-//  int priority = state->m_vregs[ 2 ];
+	int scrollx  = m_vregs[ 0 ] + (m_vregs[ 1 ] << 8);
+//  int priority = m_vregs[ 2 ];
 
 	/* Only horizontal scrolling (these 2 layers use the same value) */
-	state->m_tilemap_0a->set_scrollx(0, scrollx);
-	state->m_tilemap_0b->set_scrollx(0, scrollx);
+	m_tilemap_0a->set_scrollx(0, scrollx);
+	m_tilemap_0b->set_scrollx(0, scrollx);
 
-	state->m_tilemap_0a->draw(bitmap, cliprect, 0,0);	// Opaque
-	state->m_tilemap_0b->draw(bitmap, cliprect, 0,0);
+	m_tilemap_0a->draw(bitmap, cliprect, 0,0);	// Opaque
+	m_tilemap_0b->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect);
-	state->m_tilemap_1->draw(bitmap, cliprect, 0,0);
+	m_tilemap_1->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

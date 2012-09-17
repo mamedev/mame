@@ -548,63 +548,62 @@ VIDEO_START_MEMBER(itech8_state,slikshot)
  *
  *************************************/
 
-SCREEN_UPDATE_RGB32( slikshot )
+UINT32 itech8_state::screen_update_slikshot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	itech8_state *state = screen.machine().driver_data<itech8_state>();
 	int totaldy, totaldx;
 	int temp, i;
 
 	/* draw the normal video first */
-	SCREEN_UPDATE32_CALL(itech8_2page);
+	SCREEN_UPDATE32_CALL_MEMBER(itech8_2page);
 
 	/* add the current X,Y positions to the list */
-	state->m_xbuffer[state->m_ybuffer_next % YBUFFER_COUNT] = state->ioport("FAKEX")->read_safe(0);
-	state->m_ybuffer[state->m_ybuffer_next % YBUFFER_COUNT] = state->ioport("FAKEY")->read_safe(0);
-	state->m_ybuffer_next++;
+	m_xbuffer[m_ybuffer_next % YBUFFER_COUNT] = ioport("FAKEX")->read_safe(0);
+	m_ybuffer[m_ybuffer_next % YBUFFER_COUNT] = ioport("FAKEY")->read_safe(0);
+	m_ybuffer_next++;
 
 	/* determine where to draw the starting point */
-	state->m_curxpos += state->m_xbuffer[(state->m_ybuffer_next + 1) % YBUFFER_COUNT];
-	if (state->m_curxpos < -0x80) state->m_curxpos = -0x80;
-	if (state->m_curxpos >  0x80) state->m_curxpos =  0x80;
+	m_curxpos += m_xbuffer[(m_ybuffer_next + 1) % YBUFFER_COUNT];
+	if (m_curxpos < -0x80) m_curxpos = -0x80;
+	if (m_curxpos >  0x80) m_curxpos =  0x80;
 
 	/* compute the total X/Y movement */
 	totaldx = totaldy = 0;
 	for (i = 0; i < YBUFFER_COUNT - 1; i++)
 	{
-		totaldx += state->m_xbuffer[(state->m_ybuffer_next + i + 1) % YBUFFER_COUNT];
-		totaldy += state->m_ybuffer[(state->m_ybuffer_next + i + 1) % YBUFFER_COUNT];
+		totaldx += m_xbuffer[(m_ybuffer_next + i + 1) % YBUFFER_COUNT];
+		totaldy += m_ybuffer[(m_ybuffer_next + i + 1) % YBUFFER_COUNT];
 	}
 
 	/* if the shoot button is pressed, fire away */
-	if (totaldy < state->m_last_ytotal && state->m_last_ytotal > 50 && state->m_crosshair_vis)
+	if (totaldy < m_last_ytotal && m_last_ytotal > 50 && m_crosshair_vis)
 	{
 		/* compute the updated values */
 		temp = totaldx;
 		if (temp <= -0x80) temp = -0x7f;
 		if (temp >=  0x80) temp =  0x7f;
-		state->m_curvx = temp;
+		m_curvx = temp;
 
-		temp = state->m_last_ytotal - 50;
+		temp = m_last_ytotal - 50;
 		if (temp <=  0x10) temp =  0x10;
 		if (temp >=  0x7f) temp =  0x7f;
-		state->m_curvy = temp;
+		m_curvy = temp;
 
-		temp = 0x60 + (state->m_curxpos * 0x30 / 0x80);
+		temp = 0x60 + (m_curxpos * 0x30 / 0x80);
 		if (temp <=  0x30) temp =  0x30;
 		if (temp >=  0x90) temp =  0x90;
-		state->m_curx = temp;
+		m_curx = temp;
 
 		compute_sensors(screen.machine());
-//      popmessage("V=%02x,%02x  X=%02x", state->m_curvx, state->m_curvy, state->m_curx);
-		state->m_crosshair_vis = 0;
+//      popmessage("V=%02x,%02x  X=%02x", m_curvx, m_curvy, m_curx);
+		m_crosshair_vis = 0;
 	}
-	state->m_last_ytotal = totaldy;
+	m_last_ytotal = totaldy;
 
 	/* clear the buffer while the crosshair is not visible */
-	if (!state->m_crosshair_vis)
+	if (!m_crosshair_vis)
 	{
-		memset(state->m_xbuffer, 0, sizeof(state->m_xbuffer));
-		memset(state->m_ybuffer, 0, sizeof(state->m_ybuffer));
+		memset(m_xbuffer, 0, sizeof(m_xbuffer));
+		memset(m_ybuffer, 0, sizeof(m_ybuffer));
 	}
 
 	return 0;

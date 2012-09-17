@@ -58,6 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(astron_io_bankswitch_w);
 	DECLARE_DRIVER_INIT(astron);
 	virtual void machine_start();
+	UINT32 screen_update_astron(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 /* VIDEO GOODS */
@@ -106,7 +107,7 @@ static void astron_draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, 
 }
 
 
-static SCREEN_UPDATE_RGB32( astron )
+UINT32 segald_state::screen_update_astron(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -376,7 +377,7 @@ static MACHINE_CONFIG_START( astron, segald_state )
 
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
-	MCFG_LASERDISC_OVERLAY_STATIC(256, 256, astron)
+	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, segald_state, screen_update_astron)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")

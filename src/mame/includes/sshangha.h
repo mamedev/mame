@@ -49,11 +49,12 @@ public:
 	DECLARE_DRIVER_INIT(sshangha);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_sshangha(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/sshangha.c -----------*/
 
 
-SCREEN_UPDATE_RGB32( sshangha );
+
 

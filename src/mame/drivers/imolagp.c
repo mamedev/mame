@@ -128,6 +128,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_imolagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -208,15 +209,14 @@ void imolagp_state::video_start()
 }
 
 
-static SCREEN_UPDATE_IND16( imolagp )
+UINT32 imolagp_state::screen_update_imolagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	imolagp_state *state = screen.machine().driver_data<imolagp_state>();
-	int scroll2 = state->m_scroll ^ 0x03;
+	int scroll2 = m_scroll ^ 0x03;
 	int pass;
 	for (pass = 0; pass < 2; pass++)
 	{
 		int i;
-		const UINT8 *source = state->m_videoram[pass * 2];
+		const UINT8 *source = m_videoram[pass * 2];
 
 		for (i = 0; i < 0x4000; i++)
 		{
@@ -574,7 +574,7 @@ static MACHINE_CONFIG_START( imolagp, imolagp_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256,256)
 	MCFG_SCREEN_VISIBLE_AREA(0+64-16,255,0+16,255)
-	MCFG_SCREEN_UPDATE_STATIC(imolagp)
+	MCFG_SCREEN_UPDATE_DRIVER(imolagp_state, screen_update_imolagp)
 
 	MCFG_PALETTE_LENGTH(0x20)
 	MCFG_SPEAKER_STANDARD_MONO("mono")

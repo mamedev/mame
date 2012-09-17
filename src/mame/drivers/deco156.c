@@ -54,6 +54,7 @@ public:
 	DECLARE_DRIVER_INIT(hvysmsh);
 	DECLARE_DRIVER_INIT(wcvol95);
 	virtual void video_start();
+	UINT32 screen_update_wcvol95(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -68,20 +69,19 @@ void deco156_state::video_start()
 }
 
 
-static SCREEN_UPDATE_RGB32( wcvol95 )
+UINT32 deco156_state::screen_update_wcvol95(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	//FIXME: flip_screen_x should not be written!
-	deco156_state *state = screen.machine().driver_data<deco156_state>();
-	state->flip_screen_set_no_update(1);
+	flip_screen_set_no_update(1);
 
 	screen.machine().priority_bitmap.fill(0);
 	bitmap.fill(0);
 
-	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
+	deco16ic_pf_update(m_deco_tilegen1, m_pf1_rowscroll, m_pf2_rowscroll);
 
-	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, 0x800);
-	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x800);
+	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -363,7 +363,7 @@ static MACHINE_CONFIG_START( hvysmsh, deco156_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(wcvol95)
+	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update_wcvol95)
 
 	MCFG_GFXDECODE(hvysmsh)
 	MCFG_PALETTE_LENGTH(1024)
@@ -400,7 +400,7 @@ static MACHINE_CONFIG_START( wcvol95, deco156_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(wcvol95)
+	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update_wcvol95)
 
 	MCFG_GFXDECODE(hvysmsh)
 	MCFG_PALETTE_LENGTH(1024)

@@ -71,6 +71,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_cb2001_reel3_tile_info);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -331,18 +332,17 @@ e3 -> c6
 */
 
 
-static SCREEN_UPDATE_RGB32(cb2001)
+UINT32 cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	cb2001_state *state = screen.machine().driver_data<cb2001_state>();
 	int count,x,y;
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	count = 0x0000;
 
 	// render bg as 8x8 tilemaps
-	if (state->m_other1 & 0x02)
+	if (m_other1 & 0x02)
 	{
-		if (!(state->m_other1 & 0x04))
+		if (!(m_other1 & 0x04))
 		{
 			for (y=0;y<32;y++)
 			{
@@ -351,9 +351,9 @@ static SCREEN_UPDATE_RGB32(cb2001)
 					int tile;
 					int colour;
 
-					tile = (state->m_vram_bg[count] & 0x0fff);
-					colour = (state->m_vram_bg[count] & 0xf000)>>12;
-					tile += state->m_videobank*0x2000;
+					tile = (m_vram_bg[count] & 0x0fff);
+					colour = (m_vram_bg[count] & 0xf000)>>12;
+					tile += m_videobank*0x2000;
 
 
 					drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],tile,colour,0,0,x*8,y*8);
@@ -370,26 +370,26 @@ static SCREEN_UPDATE_RGB32(cb2001)
 			{
 				UINT16 scroll;
 
-				scroll = state->m_vram_bg[0xa00/2 + i/2];
+				scroll = m_vram_bg[0xa00/2 + i/2];
 				if (i&1)
 					scroll >>=8;
 				scroll &=0xff;
 
-				state->m_reel2_tilemap->set_scrolly(i, scroll);
+				m_reel2_tilemap->set_scrolly(i, scroll);
 
-				scroll = state->m_vram_bg[0x800/2 + i/2];
+				scroll = m_vram_bg[0x800/2 + i/2];
 				if (i&1)
 					scroll >>=8;
 				scroll &=0xff;
 
-				state->m_reel1_tilemap->set_scrolly(i, scroll);
+				m_reel1_tilemap->set_scrolly(i, scroll);
 
-				scroll = state->m_vram_bg[0xc00/2 + i/2];
+				scroll = m_vram_bg[0xc00/2 + i/2];
 				if (i&1)
 					scroll >>=8;
 				scroll &=0xff;
 
-				state->m_reel3_tilemap->set_scrolly(i, scroll);
+				m_reel3_tilemap->set_scrolly(i, scroll);
 
 			}
 
@@ -398,9 +398,9 @@ static SCREEN_UPDATE_RGB32(cb2001)
 			const rectangle visible2(0*8, (14+48)*8-1, 10*8, (10+7)*8-1);
 			const rectangle visible3(0*8, (14+48)*8-1, 17*8, (17+7)*8-1);
 
-			state->m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
-			state->m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
-			state->m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
+			m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
+			m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
+			m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
 		}
 	}
 
@@ -413,11 +413,11 @@ static SCREEN_UPDATE_RGB32(cb2001)
 			int tile;
 			int colour;
 
-			tile = (state->m_vram_fg[count] & 0x0fff);
-			colour = (state->m_vram_fg[count] & 0xf000)>>12;
-			tile += state->m_videobank*0x2000;
+			tile = (m_vram_fg[count] & 0x0fff);
+			colour = (m_vram_fg[count] & 0xf000)>>12;
+			tile += m_videobank*0x2000;
 
-			if (state->m_other2 & 0x4)
+			if (m_other2 & 0x4)
 			{
 				tile += 0x1000;
 			}
@@ -427,7 +427,7 @@ static SCREEN_UPDATE_RGB32(cb2001)
 		}
 	}
 
-	popmessage("%02x %02x %02x %02x\n",state->m_videobank,state->m_videomode, state->m_other1, state->m_other2);
+	popmessage("%02x %02x %02x %02x\n",m_videobank,m_videomode, m_other1, m_other2);
 
 	return 0;
 }
@@ -849,7 +849,7 @@ static MACHINE_CONFIG_START( cb2001, cb2001_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(cb2001)
+	MCFG_SCREEN_UPDATE_DRIVER(cb2001_state, screen_update_cb2001)
 
 	MCFG_PALETTE_LENGTH(0x100)
 

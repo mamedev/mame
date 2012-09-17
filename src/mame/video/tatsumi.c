@@ -1062,87 +1062,83 @@ static void draw_ground(running_machine &machine, bitmap_rgb32 &dst, const recta
 #endif
 /**********************************************************************/
 
-SCREEN_UPDATE_RGB32( apache3 )
+UINT32 tatsumi_state::screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	tatsumi_state *state = screen.machine().driver_data<tatsumi_state>();
 	update_cluts(screen.machine(), 1024, 0, 2048);
 
-	state->m_tx_layer->set_scrollx(0,24);
+	m_tx_layer->set_scrollx(0,24);
 
 	bitmap.fill(screen.machine().pens[0], cliprect);
-	draw_sky(screen.machine(), bitmap, cliprect, 256, state->m_apache3_rotate_ctrl[1]);
+	draw_sky(screen.machine(), bitmap, cliprect, 256, m_apache3_rotate_ctrl[1]);
 //  draw_ground(screen.machine(), bitmap, cliprect);
-	draw_sprites(screen.machine(), bitmap,cliprect,0, (state->m_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
-	state->m_tx_layer->draw(bitmap, cliprect, 0,0);
+	draw_sprites(screen.machine(), bitmap,cliprect,0, (m_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
+	m_tx_layer->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
-SCREEN_UPDATE_RGB32( roundup5 )
+UINT32 tatsumi_state::screen_update_roundup5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	tatsumi_state *state = screen.machine().driver_data<tatsumi_state>();
-//  UINT16 bg_x_scroll=state->m_roundup5_unknown1[0];
-//  UINT16 bg_y_scroll=state->m_roundup5_unknown2[0];
+//  UINT16 bg_x_scroll=m_roundup5_unknown1[0];
+//  UINT16 bg_y_scroll=m_roundup5_unknown2[0];
 
 	update_cluts(screen.machine(), 1024, 512, 4096);
 
-	state->m_tx_layer->set_scrollx(0,24);
-	state->m_tx_layer->set_scrolly(0,0); //(((state->m_roundupt_crt_reg[0xe]<<8)|state->m_roundupt_crt_reg[0xf])>>5) + 96);
+	m_tx_layer->set_scrollx(0,24);
+	m_tx_layer->set_scrolly(0,0); //(((m_roundupt_crt_reg[0xe]<<8)|m_roundupt_crt_reg[0xf])>>5) + 96);
 
 	bitmap.fill(screen.machine().pens[384], cliprect); // todo
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	draw_sprites(screen.machine(), screen.machine().priority_bitmap,cliprect,1,(state->m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
+	draw_sprites(screen.machine(), screen.machine().priority_bitmap,cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
 	draw_road(screen.machine(), bitmap,cliprect,screen.machine().priority_bitmap);
-	draw_sprites(screen.machine(), bitmap,cliprect,0,(state->m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Full pass
-	state->m_tx_layer->draw(bitmap, cliprect, 0,0);
+	draw_sprites(screen.machine(), bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Full pass
+	m_tx_layer->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
-SCREEN_UPDATE_RGB32( cyclwarr )
+UINT32 tatsumi_state::screen_update_cyclwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	tatsumi_state *state = screen.machine().driver_data<tatsumi_state>();
-	state->m_bigfight_bank=state->m_bigfight_a40000[0];
-	if (state->m_bigfight_bank!=state->m_bigfight_last_bank)
+	m_bigfight_bank=m_bigfight_a40000[0];
+	if (m_bigfight_bank!=m_bigfight_last_bank)
 	{
-		state->m_layer0->mark_all_dirty();
-		state->m_layer1->mark_all_dirty();
-		state->m_layer2->mark_all_dirty();
-		state->m_layer3->mark_all_dirty();
-		state->m_bigfight_last_bank=state->m_bigfight_bank;
+		m_layer0->mark_all_dirty();
+		m_layer1->mark_all_dirty();
+		m_layer2->mark_all_dirty();
+		m_layer3->mark_all_dirty();
+		m_bigfight_last_bank=m_bigfight_bank;
 	}
 
 	bitmap.fill(screen.machine().pens[0], cliprect);
 
-	draw_bg(screen.machine(), bitmap, state->m_layer3, &state->m_cyclwarr_videoram1[0x000], &state->m_cyclwarr_videoram1[0x100], state->m_cyclwarr_videoram1, state->m_bigfight_a40000[0], 8, -0x80, 512, 4096);
-	draw_bg(screen.machine(), bitmap, state->m_layer2, &state->m_cyclwarr_videoram1[0x200], &state->m_cyclwarr_videoram1[0x300], state->m_cyclwarr_videoram1, state->m_bigfight_a40000[0], 8, -0x80, 512, 4096);
-	draw_bg(screen.machine(), bitmap, state->m_layer1, &state->m_cyclwarr_videoram0[0x000], &state->m_cyclwarr_videoram0[0x100], state->m_cyclwarr_videoram0, state->m_bigfight_a40000[0], 8, -0x40, 1024, 2048);
+	draw_bg(screen.machine(), bitmap, m_layer3, &m_cyclwarr_videoram1[0x000], &m_cyclwarr_videoram1[0x100], m_cyclwarr_videoram1, m_bigfight_a40000[0], 8, -0x80, 512, 4096);
+	draw_bg(screen.machine(), bitmap, m_layer2, &m_cyclwarr_videoram1[0x200], &m_cyclwarr_videoram1[0x300], m_cyclwarr_videoram1, m_bigfight_a40000[0], 8, -0x80, 512, 4096);
+	draw_bg(screen.machine(), bitmap, m_layer1, &m_cyclwarr_videoram0[0x000], &m_cyclwarr_videoram0[0x100], m_cyclwarr_videoram0, m_bigfight_a40000[0], 8, -0x40, 1024, 2048);
 	update_cluts(screen.machine(), 8192, 4096, 8192);
-	draw_sprites(screen.machine(), bitmap,cliprect,0,(state->m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
-	draw_bg(screen.machine(), bitmap, state->m_layer0, &state->m_cyclwarr_videoram0[0x200], &state->m_cyclwarr_videoram0[0x300], state->m_cyclwarr_videoram0, state->m_bigfight_a40000[0], 0x10, -0x80, 512, 4096);
+	draw_sprites(screen.machine(), bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
+	draw_bg(screen.machine(), bitmap, m_layer0, &m_cyclwarr_videoram0[0x200], &m_cyclwarr_videoram0[0x300], m_cyclwarr_videoram0, m_bigfight_a40000[0], 0x10, -0x80, 512, 4096);
 
 	return 0;
 }
 
-SCREEN_UPDATE_RGB32( bigfight )
+UINT32 tatsumi_state::screen_update_bigfight(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	tatsumi_state *state = screen.machine().driver_data<tatsumi_state>();
-	state->m_bigfight_bank=state->m_bigfight_a40000[0];
-	if (state->m_bigfight_bank!=state->m_bigfight_last_bank)
+	m_bigfight_bank=m_bigfight_a40000[0];
+	if (m_bigfight_bank!=m_bigfight_last_bank)
 	{
-		state->m_layer0->mark_all_dirty();
-		state->m_layer1->mark_all_dirty();
-		state->m_layer2->mark_all_dirty();
-		state->m_layer3->mark_all_dirty();
-		state->m_bigfight_last_bank=state->m_bigfight_bank;
+		m_layer0->mark_all_dirty();
+		m_layer1->mark_all_dirty();
+		m_layer2->mark_all_dirty();
+		m_layer3->mark_all_dirty();
+		m_bigfight_last_bank=m_bigfight_bank;
 	}
 
 	bitmap.fill(screen.machine().pens[0], cliprect);
-	draw_bg(screen.machine(), bitmap, state->m_layer3, &state->m_cyclwarr_videoram1[0x000], &state->m_cyclwarr_videoram1[0x100], state->m_cyclwarr_videoram1, state->m_bigfight_a40000[0], 8, -0x40, 1024, 2048);
-	draw_bg(screen.machine(), bitmap, state->m_layer2, &state->m_cyclwarr_videoram1[0x200], &state->m_cyclwarr_videoram1[0x300], state->m_cyclwarr_videoram1, state->m_bigfight_a40000[0], 8, -0x40, 1024, 2048);
-	draw_bg(screen.machine(), bitmap, state->m_layer1, &state->m_cyclwarr_videoram0[0x000], &state->m_cyclwarr_videoram0[0x100], state->m_cyclwarr_videoram0, state->m_bigfight_a40000[0], 8, -0x40, 1024, 2048);
+	draw_bg(screen.machine(), bitmap, m_layer3, &m_cyclwarr_videoram1[0x000], &m_cyclwarr_videoram1[0x100], m_cyclwarr_videoram1, m_bigfight_a40000[0], 8, -0x40, 1024, 2048);
+	draw_bg(screen.machine(), bitmap, m_layer2, &m_cyclwarr_videoram1[0x200], &m_cyclwarr_videoram1[0x300], m_cyclwarr_videoram1, m_bigfight_a40000[0], 8, -0x40, 1024, 2048);
+	draw_bg(screen.machine(), bitmap, m_layer1, &m_cyclwarr_videoram0[0x000], &m_cyclwarr_videoram0[0x100], m_cyclwarr_videoram0, m_bigfight_a40000[0], 8, -0x40, 1024, 2048);
 	update_cluts(screen.machine(), 8192, 4096, 8192);
-	draw_sprites(screen.machine(), bitmap,cliprect,0,(state->m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
-	draw_bg(screen.machine(), bitmap, state->m_layer0, &state->m_cyclwarr_videoram0[0x200], &state->m_cyclwarr_videoram0[0x300], state->m_cyclwarr_videoram0, state->m_bigfight_a40000[0], 0x10, -0x40, 1024, 2048);
+	draw_sprites(screen.machine(), bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
+	draw_bg(screen.machine(), bitmap, m_layer0, &m_cyclwarr_videoram0[0x200], &m_cyclwarr_videoram0[0x300], m_cyclwarr_videoram0, m_bigfight_a40000[0], 0x10, -0x40, 1024, 2048);
 
 	return 0;
 }

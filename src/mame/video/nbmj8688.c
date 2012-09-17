@@ -660,31 +660,30 @@ WRITE8_MEMBER(nbmj8688_state::nbmj8688_HD61830B_both_data_w)
 ******************************************************************************/
 
 
-SCREEN_UPDATE_IND16( mbmj8688 )
+UINT32 nbmj8688_state::screen_update_mbmj8688(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	nbmj8688_state *state = screen.machine().driver_data<nbmj8688_state>();
 	int x, y;
 
-	if (state->m_mjsikaku_screen_refresh)
+	if (m_mjsikaku_screen_refresh)
 	{
-		state->m_mjsikaku_screen_refresh = 0;
+		m_mjsikaku_screen_refresh = 0;
 		for (y = 0; y < 256; y++)
 		{
 			for (x = 0; x < 512; x++)
 			{
-				update_pixel(state, x, y);
+				update_pixel(this, x, y);
 			}
 		}
 	}
 
-	if (state->m_mjsikaku_dispflag)
+	if (m_mjsikaku_dispflag)
 	{
 		int scrolly;
-		if (state->m_mjsikaku_flipscreen) scrolly =   state->m_mjsikaku_scrolly;
-		else                     scrolly = (-state->m_mjsikaku_scrolly) & 0xff;
+		if (m_mjsikaku_flipscreen) scrolly =   m_mjsikaku_scrolly;
+		else                     scrolly = (-m_mjsikaku_scrolly) & 0xff;
 
-		copybitmap(bitmap, *state->m_mjsikaku_tmpbitmap, 0, 0, 0, scrolly,       cliprect);
-		copybitmap(bitmap, *state->m_mjsikaku_tmpbitmap, 0, 0, 0, scrolly - 256, cliprect);
+		copybitmap(bitmap, *m_mjsikaku_tmpbitmap, 0, 0, 0, scrolly,       cliprect);
+		copybitmap(bitmap, *m_mjsikaku_tmpbitmap, 0, 0, 0, scrolly - 256, cliprect);
 	}
 	else
 		bitmap.fill(0);
@@ -694,15 +693,14 @@ SCREEN_UPDATE_IND16( mbmj8688 )
 
 
 
-SCREEN_UPDATE_IND16( mbmj8688_lcd0 )
+UINT32 nbmj8688_state::screen_update_mbmj8688_lcd0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	nbmj8688_state *state = screen.machine().driver_data<nbmj8688_state>();
 	int x, y, b;
 
 	for (y = 0;y < 64;y++)
 		for (x = 0;x < 60;x++)
 		{
-			int data = state->m_HD61830B_ram[0][y * 60 + x];
+			int data = m_HD61830B_ram[0][y * 60 + x];
 
 			for (b = 0;b < 8;b++)
 				bitmap.pix16(y, (8*x+b)) = (data & (1<<b)) ? 0x0000 : 0x18ff;
@@ -710,15 +708,14 @@ SCREEN_UPDATE_IND16( mbmj8688_lcd0 )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( mbmj8688_lcd1 )
+UINT32 nbmj8688_state::screen_update_mbmj8688_lcd1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	nbmj8688_state *state = screen.machine().driver_data<nbmj8688_state>();
 	int x, y, b;
 
 	for (y = 0;y < 64;y++)
 		for (x = 0;x < 60;x++)
 		{
-			int data = state->m_HD61830B_ram[1][y * 60 + x];
+			int data = m_HD61830B_ram[1][y * 60 + x];
 
 			for (b = 0;b < 8;b++)
 				bitmap.pix16(y, (8*x+b)) = (data & (1<<b)) ? 0x0000 : 0x18ff;

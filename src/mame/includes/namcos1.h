@@ -93,6 +93,8 @@ public:
 	TILE_GET_INFO_MEMBER(fg_get_info5);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_namcos1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_namcos1(screen_device &screen, bool state);
 };
 
 
@@ -118,5 +120,5 @@ DECLARE_READ8_HANDLER( namcos1_spriteram_r );
 DECLARE_WRITE8_HANDLER( namcos1_spriteram_w );
 
 
-SCREEN_UPDATE_IND16( namcos1 );
-SCREEN_VBLANK( namcos1 );
+
+

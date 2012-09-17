@@ -246,6 +246,7 @@ public:
 	DECLARE_DRIVER_INIT(ppcar);
 	DECLARE_DRIVER_INIT(tetfight);
 	virtual void machine_reset();
+	UINT32 screen_update_ssfindo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -253,24 +254,23 @@ static void PS7500_startTimer0(running_machine &machine);
 static void PS7500_startTimer1(running_machine &machine);
 
 
-static SCREEN_UPDATE_IND16(ssfindo)
+UINT32 ssfindo_state::screen_update_ssfindo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ssfindo_state *state = screen.machine().driver_data<ssfindo_state>();
 	int s,x,y;
 
-	if( state->m_PS7500_IO[VIDCR]&0x20) //video DMA enabled
+	if( m_PS7500_IO[VIDCR]&0x20) //video DMA enabled
 	{
-		s=( (state->m_PS7500_IO[VIDINITA]&0x1fffffff)-0x10000000)/4;
+		s=( (m_PS7500_IO[VIDINITA]&0x1fffffff)-0x10000000)/4;
 
 		if(s>=0 && s<(0x10000000/4))
 		{
 			for(y=0;y<256;y++)
 				for(x=0;x<320;x+=4)
 				{
-					bitmap.pix16(y, x+0) = state->m_vram[s]&0xff;
-					bitmap.pix16(y, x+1) = (state->m_vram[s]>>8)&0xff;
-					bitmap.pix16(y, x+2) = (state->m_vram[s]>>16)&0xff;
-					bitmap.pix16(y, x+3) = (state->m_vram[s]>>24)&0xff;
+					bitmap.pix16(y, x+0) = m_vram[s]&0xff;
+					bitmap.pix16(y, x+1) = (m_vram[s]>>8)&0xff;
+					bitmap.pix16(y, x+2) = (m_vram[s]>>16)&0xff;
+					bitmap.pix16(y, x+3) = (m_vram[s]>>24)&0xff;
 					s++;
 				}
 		}
@@ -765,7 +765,7 @@ static MACHINE_CONFIG_START( ssfindo, ssfindo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(ssfindo)
+	MCFG_SCREEN_UPDATE_DRIVER(ssfindo_state, screen_update_ssfindo)
 
 	MCFG_PALETTE_LENGTH(256)
 MACHINE_CONFIG_END

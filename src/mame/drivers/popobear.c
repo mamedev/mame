@@ -95,6 +95,7 @@ public:
 	DECLARE_READ8_MEMBER(popo_620000_r);
 	DECLARE_WRITE8_MEMBER(popobear_irq_ack_w);
 	virtual void video_start();
+	UINT32 screen_update_popobear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 void popobear_state::video_start()
@@ -256,13 +257,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	}
 }
 
-SCREEN_UPDATE_IND16( popobear )
+UINT32 popobear_state::screen_update_popobear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//  popobear_state *state = screen.machine().driver_data<popobear_state>();
 
 	bitmap.fill(0, cliprect);
 
-	//popmessage("%04x",state->m_vregs[0/2]);
+	//popmessage("%04x",m_vregs[0/2]);
 
 	draw_layer(screen.machine(),bitmap,cliprect,3);
 	draw_layer(screen.machine(),bitmap,cliprect,2);
@@ -465,7 +465,7 @@ static MACHINE_CONFIG_START( popobear, popobear_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_STATIC(popobear)
+	MCFG_SCREEN_UPDATE_DRIVER(popobear_state, screen_update_popobear)
 
 //  MCFG_GFXDECODE(popobear)
 

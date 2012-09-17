@@ -52,6 +52,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_jr200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -117,19 +118,18 @@ void jr200_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( jr200 )
+UINT32 jr200_state::screen_update_jr200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	jr200_state *state = screen.machine().driver_data<jr200_state>();
 	int x,y,xi,yi,pen;
 
-	bitmap.fill(state->m_border_col, cliprect);
+	bitmap.fill(m_border_col, cliprect);
 
 	for (y = 0; y < 24; y++)
 	{
 		for (x = 0; x < 32; x++)
 		{
-			UINT8 tile = state->m_vram[x + y*32];
-			UINT8 attr = state->m_cram[x + y*32];
+			UINT8 tile = m_vram[x + y*32];
+			UINT8 attr = m_cram[x + y*32];
 
 			for(yi=0;yi<8;yi++)
 			{
@@ -516,7 +516,7 @@ static MACHINE_CONFIG_START( jr200, jr200_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(16 + 256 + 16, 16 + 192 + 16) /* border size not accurate */
 	MCFG_SCREEN_VISIBLE_AREA(0, 16 + 256 + 16 - 1, 0, 16 + 192 + 16 - 1)
-	MCFG_SCREEN_UPDATE_STATIC(jr200)
+	MCFG_SCREEN_UPDATE_DRIVER(jr200_state, screen_update_jr200)
 
 	MCFG_GFXDECODE(jr200)
 	MCFG_PALETTE_LENGTH(8)

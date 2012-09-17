@@ -20,6 +20,8 @@ public:
 	DECLARE_DRIVER_INIT(ac1);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_ac1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_ac1_32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -34,8 +36,8 @@ extern const z80pio_interface ac1_z80pio_intf;
 extern const gfx_layout ac1_charlayout;
 
 
-SCREEN_UPDATE_IND16( ac1 );
-SCREEN_UPDATE_IND16( ac1_32 );
+
+
 
 
 #endif /* AC1_h_ */

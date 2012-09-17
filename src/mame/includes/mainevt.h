@@ -43,6 +43,8 @@ public:
 	virtual void machine_reset();
 	DECLARE_VIDEO_START(mainevt);
 	DECLARE_VIDEO_START(dv);
+	UINT32 screen_update_mainevt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_dv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/mainevt.c -----------*/
@@ -55,5 +57,5 @@ extern void dv_sprite_callback(running_machine &machine, int *code,int *color,in
 
 
 
-SCREEN_UPDATE_IND16( mainevt );
-SCREEN_UPDATE_IND16( dv );
+
+

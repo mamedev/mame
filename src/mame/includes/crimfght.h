@@ -31,6 +31,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_crimfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/crimfght.c -----------*/
@@ -39,4 +40,4 @@ extern void crimfght_tile_callback(running_machine &machine, int layer,int bank,
 extern void crimfght_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);
 
 
-SCREEN_UPDATE_IND16( crimfght );
+

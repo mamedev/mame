@@ -180,6 +180,7 @@ public:
 	DECLARE_MACHINE_RESET(type4);
 	DECLARE_MACHINE_RESET(cbdash);
 	DECLARE_MACHINE_RESET(cflyball);
+	UINT32 screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -275,6 +276,6 @@ DECLARE_WRITE8_HANDLER( decocass_center_h_shift_space_w );
 DECLARE_WRITE8_HANDLER( decocass_center_v_shift_w );
 
 
-SCREEN_UPDATE_IND16( decocass );
+
 
 void decocass_video_state_save_init(running_machine &machine);

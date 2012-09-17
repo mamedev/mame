@@ -74,6 +74,17 @@ public:
 	DECLARE_MACHINE_START(extra_8080bw_vh);
 	DECLARE_MACHINE_START(schaser_sh);
 	DECLARE_MACHINE_RESET(schaser_sh);
+	UINT32 screen_update_invadpt2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_cosmo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_rollingc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_schaser(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_schasercv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_sflush(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_indianbt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_lupin3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_polaris(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_ballbomb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_shuttlei(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -101,15 +112,15 @@ DISCRETE_SOUND_EXTERN( schaser );
 
 
 
-SCREEN_UPDATE_RGB32( invadpt2 );
-SCREEN_UPDATE_RGB32( ballbomb );
-SCREEN_UPDATE_RGB32( schaser );
-SCREEN_UPDATE_RGB32( schasercv );
-SCREEN_UPDATE_RGB32( rollingc );
-SCREEN_UPDATE_RGB32( polaris );
-SCREEN_UPDATE_RGB32( lupin3 );
-SCREEN_UPDATE_RGB32( cosmo );
-SCREEN_UPDATE_RGB32( indianbt );
-SCREEN_UPDATE_RGB32( shuttlei );
-SCREEN_UPDATE_RGB32( sflush );
+
+
+
+
+
+
+
+
+
+
+
 

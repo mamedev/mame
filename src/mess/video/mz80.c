@@ -36,11 +36,10 @@ void mz80_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-SCREEN_UPDATE_IND16( mz80k )
+UINT32 mz80_state::screen_update_mz80k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mz80_state *state = screen.machine().driver_data<mz80_state>();
-	state->m_mz80k_vertical ^= 1;
-	state->m_mz80k_cursor_cnt++;
+	m_mz80k_vertical ^= 1;
+	m_mz80k_cursor_cnt++;
 	UINT8 y,ra,chr,gfx;
 	UINT16 x,sy=0,ma=0;
 
@@ -52,8 +51,8 @@ SCREEN_UPDATE_IND16( mz80k )
 
 			for (x = ma; x < ma + 40; x++)
 			{
-				chr = state->m_p_videoram[x];
-				gfx = state->m_p_chargen[(chr<<3) | ra];
+				chr = m_p_videoram[x];
+				gfx = m_p_chargen[(chr<<3) | ra];
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7);
@@ -72,11 +71,10 @@ SCREEN_UPDATE_IND16( mz80k )
 }
 
 // same as above except bits are in reverse order
-SCREEN_UPDATE_IND16( mz80kj )
+UINT32 mz80_state::screen_update_mz80kj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mz80_state *state = screen.machine().driver_data<mz80_state>();
-	state->m_mz80k_vertical ^= 1;
-	state->m_mz80k_cursor_cnt++;
+	m_mz80k_vertical ^= 1;
+	m_mz80k_cursor_cnt++;
 	UINT8 y,ra,chr,gfx;
 	UINT16 x,sy=0,ma=0;
 
@@ -88,8 +86,8 @@ SCREEN_UPDATE_IND16( mz80kj )
 
 			for (x = ma; x < ma + 40; x++)
 			{
-				chr = state->m_p_videoram[x];
-				gfx = state->m_p_chargen[(chr<<3) | ra];
+				chr = m_p_videoram[x];
+				gfx = m_p_chargen[(chr<<3) | ra];
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 0);
@@ -108,13 +106,12 @@ SCREEN_UPDATE_IND16( mz80kj )
 }
 
 // has twice as much video ram and uses a scroll register
-SCREEN_UPDATE_IND16( mz80a )
+UINT32 mz80_state::screen_update_mz80a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mz80_state *state = screen.machine().driver_data<mz80_state>();
-	state->m_mz80k_vertical ^= 1;
-	state->m_mz80k_cursor_cnt++;
+	m_mz80k_vertical ^= 1;
+	m_mz80k_cursor_cnt++;
 	UINT8 y,ra,chr,gfx;
-	UINT16 x,sy=0, ma=state->m_p_ram[0x17d] | (state->m_p_ram[0x17e] << 8);
+	UINT16 x,sy=0, ma=m_p_ram[0x17d] | (m_p_ram[0x17e] << 8);
 
 	for(y = 0; y < 25; y++ )
 	{
@@ -124,8 +121,8 @@ SCREEN_UPDATE_IND16( mz80a )
 
 			for (x = ma; x < ma + 40; x++)
 			{
-				chr = state->m_p_videoram[x&0x7ff];
-				gfx = state->m_p_chargen[(chr<<3) | ra];
+				chr = m_p_videoram[x&0x7ff];
+				gfx = m_p_chargen[(chr<<3) | ra];
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7);

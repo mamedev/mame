@@ -617,7 +617,7 @@ VIDEO_START_MEMBER(mplay_state,megplay)
 //  VIDEO_START_CALL_MEMBER(megaplay_normal);
 }
 
-static SCREEN_UPDATE_RGB32(megplay)
+UINT32 mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	//printf("megplay vu\n");
 	SCREEN_UPDATE32_CALL(megadriv);
@@ -637,8 +637,9 @@ MACHINE_RESET_MEMBER(mplay_state,megaplay)
 	MACHINE_RESET_CALL_LEGACY(megatech_bios);
 }
 
-static SCREEN_VBLANK( megaplay )
+void mplay_state::screen_eof_megaplay(screen_device &screen, bool state)
 {
+	bool vblank_on = state;
 	SCREEN_VBLANK_CALL(megadriv);
 	SCREEN_VBLANK_CALL(megatech_bios);
 }
@@ -664,8 +665,8 @@ static MACHINE_CONFIG_START( megaplay, mplay_state )
 	/* New update functions to handle the extra layer */
 	MCFG_VIDEO_START_OVERRIDE(mplay_state,megplay)
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_UPDATE_STATIC(megplay)
-	MCFG_SCREEN_VBLANK_STATIC( megaplay )
+	MCFG_SCREEN_UPDATE_DRIVER(mplay_state, screen_update_megplay)
+	MCFG_SCREEN_VBLANK_DRIVER(mplay_state, screen_eof_megaplay)
 MACHINE_CONFIG_END
 
 

@@ -230,6 +230,9 @@ public:
 	DECLARE_MACHINE_RESET(pc6001m2);
 	DECLARE_PALETTE_INIT(pc6001m2);
 	DECLARE_MACHINE_RESET(pc6001sr);
+	UINT32 screen_update_pc6001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_pc6001m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_pc6001sr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -503,20 +506,19 @@ static void pc6001_screen_draw(running_machine &machine, bitmap_ind16 &bitmap,co
 	}
 }
 
-static SCREEN_UPDATE_IND16( pc6001 )
+UINT32 pc6001_state::screen_update_pc6001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	pc6001_screen_draw(screen.machine(),bitmap,cliprect,1);
 
 	return 0;
 }
 
-static SCREEN_UPDATE_IND16( pc6001m2 )
+UINT32 pc6001_state::screen_update_pc6001m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pc6001_state *state = screen.machine().driver_data<pc6001_state>();
 	int x,y,tile,attr;
 
 	/* note: bitmap mode have priority over everything else, check American Truck */
-	if(state->m_exgfx_bitmap_mode)
+	if(m_exgfx_bitmap_mode)
 	{
 		int count,color,i;
 
@@ -539,8 +541,8 @@ static SCREEN_UPDATE_IND16( pc6001m2 )
 					color |= pal_num[(pen[0] & 3) | ((pen[1] & 3) << 2)];
 #endif
 
-					pen[0] = state->m_video_ram[count+0x0000] >> (6-i*2) & 3;
-					pen[1] = state->m_video_ram[count+0x2000] >> (6-i*2) & 3;
+					pen[0] = m_video_ram[count+0x0000] >> (6-i*2) & 3;
+					pen[1] = m_video_ram[count+0x2000] >> (6-i*2) & 3;
 
 					color = 0x10;
 					color |= ((pen[0] & 1) << 2);
@@ -558,7 +560,7 @@ static SCREEN_UPDATE_IND16( pc6001m2 )
 			}
 		}
 	}
-	else if(state->m_exgfx_2bpp_mode)
+	else if(m_exgfx_2bpp_mode)
 	{
 		int count,color,i;
 
@@ -578,22 +580,22 @@ static SCREEN_UPDATE_IND16( pc6001m2 )
 					color |= pal_num[(pen[0] & 1) | ((pen[1] & 1) << 1)];
 #endif
 
-					pen[0] = state->m_video_ram[count+0x0000] >> (7-i) & 1;
-					pen[1] = state->m_video_ram[count+0x2000] >> (7-i) & 1;
+					pen[0] = m_video_ram[count+0x0000] >> (7-i) & 1;
+					pen[1] = m_video_ram[count+0x2000] >> (7-i) & 1;
 
-					if(state->m_bgcol_bank & 4) //PC-6001 emulation mode
+					if(m_bgcol_bank & 4) //PC-6001 emulation mode
 					{
 						color = 0x08;
 						color |= (pen[0]) | (pen[1]<<1);
-						color |= (state->m_bgcol_bank & 1) << 2;
+						color |= (m_bgcol_bank & 1) << 2;
 					}
 					else //Mk-2 mode
 					{
 						color = 0x10;
 						color |= ((pen[0] & 1) << 2);
 						color |= ((pen[1] & 1) >> 0);
-						color |= ((state->m_bgcol_bank & 1) << 1);
-						color |= ((state->m_bgcol_bank & 2) << 2);
+						color |= ((m_bgcol_bank & 1) << 1);
+						color |= ((m_bgcol_bank & 2) << 2);
 					}
 
 					if (cliprect.contains(x+i, y))
@@ -605,7 +607,7 @@ static SCREEN_UPDATE_IND16( pc6001m2 )
 		}
 
 	}
-	else if(state->m_exgfx_text_mode)
+	else if(m_exgfx_text_mode)
 	{
 		int xi,yi,pen,fgcol,bgcol,color;
 		UINT8 *gfx_data = screen.machine().root_device().memregion("gfx1")->base();
@@ -621,8 +623,8 @@ static SCREEN_UPDATE_IND16( pc6001m2 )
                 ---- xxxx fg color
                 Note that the exgfx banks a different gfx ROM
                 */
-				tile = state->m_video_ram[(x+(y*40))+0x400] + 0x200;
-				attr = state->m_video_ram[(x+(y*40)) & 0x3ff];
+				tile = m_video_ram[(x+(y*40))+0x400] + 0x200;
+				attr = m_video_ram[(x+(y*40)) & 0x3ff];
 				tile+= ((attr & 0x80) << 1);
 
 				for(yi=0;yi<12;yi++)
@@ -632,7 +634,7 @@ static SCREEN_UPDATE_IND16( pc6001m2 )
 						pen = gfx_data[(tile*0x10)+yi]>>(7-xi) & 1;
 
 						fgcol = (attr & 0x0f) + 0x10;
-						bgcol = ((attr & 0x70) >> 4) + 0x10 + ((state->m_bgcol_bank & 2) << 2);
+						bgcol = ((attr & 0x70) >> 4) + 0x10 + ((m_bgcol_bank & 2) << 2);
 
 						color = pen ? fgcol : bgcol;
 
@@ -645,29 +647,28 @@ static SCREEN_UPDATE_IND16( pc6001m2 )
 	}
 	else
 	{
-		attr = state->m_video_ram[0];
+		attr = m_video_ram[0];
 		pc6001_screen_draw(screen.machine(),bitmap,cliprect,0);
 	}
 
 	return 0;
 }
 
-static SCREEN_UPDATE_IND16( pc6001sr )
+UINT32 pc6001_state::screen_update_pc6001sr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pc6001_state *state = screen.machine().driver_data<pc6001_state>();
 	int x,y,tile,attr;
 	int xi,yi,pen,fgcol,bgcol,color;
-	UINT8 *gfx_data = state->memregion("gfx1")->base();
+	UINT8 *gfx_data = memregion("gfx1")->base();
 
 
-	if(state->m_sr_video_mode & 8) // text mode
+	if(m_sr_video_mode & 8) // text mode
 	{
 		for(y=0;y<20;y++)
 		{
 			for(x=0;x<40;x++)
 			{
-				tile = state->m_video_ram[(x+(y*40))*2+0];
-				attr = state->m_video_ram[(x+(y*40))*2+1];
+				tile = m_video_ram[(x+(y*40))*2+0];
+				attr = m_video_ram[(x+(y*40))*2+1];
 				tile+= ((attr & 0x80) << 1);
 
 				for(yi=0;yi<12;yi++)
@@ -677,7 +678,7 @@ static SCREEN_UPDATE_IND16( pc6001sr )
 						pen = gfx_data[(tile*0x10)+yi]>>(7-xi) & 1;
 
 						fgcol = (attr & 0x0f) + 0x10;
-						bgcol = ((attr & 0x70) >> 4) + 0x10 + ((state->m_bgcol_bank & 2) << 2);
+						bgcol = ((attr & 0x70) >> 4) + 0x10 + ((m_bgcol_bank & 2) << 2);
 
 						color = pen ? fgcol : bgcol;
 
@@ -698,42 +699,42 @@ static SCREEN_UPDATE_IND16( pc6001sr )
 		{
 			for(x=0;x<320;x+=4)
 			{
-				color = state->m_video_ram[count] & 0x0f;
+				color = m_video_ram[count] & 0x0f;
 
 				if (cliprect.contains(x+0, y+0))
 					bitmap.pix16((y+0), (x+0)) = screen.machine().pens[color+0x10];
 
-				color = (state->m_video_ram[count] & 0xf0) >> 4;
+				color = (m_video_ram[count] & 0xf0) >> 4;
 
 				if (cliprect.contains(x+1, y+0))
 					bitmap.pix16((y+0), (x+1)) = screen.machine().pens[color+0x10];
 
-				color = state->m_video_ram[count+1] & 0x0f;
+				color = m_video_ram[count+1] & 0x0f;
 
 				if (cliprect.contains(x+2, y+0))
 					bitmap.pix16((y+0), (x+2)) = screen.machine().pens[color+0x10];
 
-				color = (state->m_video_ram[count+1] & 0xf0) >> 4;
+				color = (m_video_ram[count+1] & 0xf0) >> 4;
 
 				if (cliprect.contains(x+3, y+0))
 					bitmap.pix16((y+0), (x+3)) = screen.machine().pens[color+0x10];
 
-				color = state->m_video_ram[count+2] & 0x0f;
+				color = m_video_ram[count+2] & 0x0f;
 
 				if (cliprect.contains(x+0, y+1))
 					bitmap.pix16((y+1), (x+0)) = screen.machine().pens[color+0x10];
 
-				color = (state->m_video_ram[count+2] & 0xf0) >> 4;
+				color = (m_video_ram[count+2] & 0xf0) >> 4;
 
 				if (cliprect.contains(x+1, y+1))
 					bitmap.pix16((y+1), (x+1)) = screen.machine().pens[color+0x10];
 
-				color = state->m_video_ram[count+3] & 0x0f;
+				color = m_video_ram[count+3] & 0x0f;
 
 				if (cliprect.contains(x+2, y+1))
 					bitmap.pix16((y+1), (x+2)) = screen.machine().pens[color+0x10];
 
-				color = (state->m_video_ram[count+3] & 0xf0) >> 4;
+				color = (m_video_ram[count+3] & 0xf0) >> 4;
 
 				if (cliprect.contains(x+3, y+1))
 					bitmap.pix16((y+1), (x+3)) = screen.machine().pens[color+0x10];
@@ -2335,7 +2336,7 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_STATIC(pc6001)
+	MCFG_SCREEN_UPDATE_DRIVER(pc6001_state, screen_update_pc6001)
 //  MCFG_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
 //  MCFG_SCREEN_UPDATE_STATIC(m6847)
 	MCFG_SCREEN_SIZE(320, 25+192+26)
@@ -2378,7 +2379,7 @@ static MACHINE_CONFIG_DERIVED( pc6001m2, pc6001 )
 	MCFG_MACHINE_RESET_OVERRIDE(pc6001_state,pc6001m2)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(pc6001m2)
+	MCFG_SCREEN_UPDATE_DRIVER(pc6001_state, screen_update_pc6001m2)
 	MCFG_PALETTE_LENGTH(16+16)
 	MCFG_PALETTE_INIT_OVERRIDE(pc6001_state,pc6001m2)
 
@@ -2405,7 +2406,7 @@ static MACHINE_CONFIG_DERIVED( pc6001sr, pc6001m2 )
 	MCFG_MACHINE_RESET_OVERRIDE(pc6001_state,pc6001sr)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(pc6001sr)
+	MCFG_SCREEN_UPDATE_DRIVER(pc6001_state, screen_update_pc6001sr)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_3_579545MHz) //*Yes*, PC-6001 SR Z80 CPU is actually slower than older models

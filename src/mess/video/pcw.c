@@ -52,9 +52,8 @@ void pcw_state::palette_init()
   Do NOT call osd_update_display() from this function,
   it will be called by the main emulation engine.
 ***************************************************************************/
-SCREEN_UPDATE_IND16( pcw )
+UINT32 pcw_state::screen_update_pcw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pcw_state *state = screen.machine().driver_data<pcw_state>();
 	int x,y,b;
 	unsigned short roller_ram_offs;
 	unsigned char *roller_ram_ptr;
@@ -64,7 +63,7 @@ SCREEN_UPDATE_IND16( pcw )
 	pen1 = 1;
 
 	/* invert? */
-	if (state->m_vdu_video_control_register & (1<<7))
+	if (m_vdu_video_control_register & (1<<7))
 	{
 		/* yes */
 		pen1^=1;
@@ -72,7 +71,7 @@ SCREEN_UPDATE_IND16( pcw )
 	}
 
 	/* video enable? */
-	if ((state->m_vdu_video_control_register & (1<<6))!=0)
+	if ((m_vdu_video_control_register & (1<<6))!=0)
 	{
 		/* render top border */
 		rectangle rect(0, PCW_SCREEN_WIDTH, 0, PCW_BORDER_HEIGHT);
@@ -83,7 +82,7 @@ SCREEN_UPDATE_IND16( pcw )
 		bitmap.fill(pen0, rect);
 
 		/* offset to start in table */
-		roller_ram_offs = (state->m_roller_ram_offset<<1);
+		roller_ram_offs = (m_roller_ram_offset<<1);
 
 		for (y=0; y<256; y++)
 		{
@@ -93,7 +92,7 @@ SCREEN_UPDATE_IND16( pcw )
 
 			x = PCW_BORDER_WIDTH;
 
-			roller_ram_ptr = screen.machine().device<ram_device>(RAM_TAG)->pointer() + state->m_roller_ram_addr + roller_ram_offs;
+			roller_ram_ptr = screen.machine().device<ram_device>(RAM_TAG)->pointer() + m_roller_ram_addr + roller_ram_offs;
 
 			/* get line address */
 			/* b16-14 control which bank the line is to be found in, b13-3 the address in the bank (in 16-byte units), and b2-0 the offset. Thus a roller RAM address bbbxxxxxxxxxxxyyy indicates bank bbb, address 00xxxxxxxxxxx0yyy. */
@@ -166,22 +165,21 @@ SCREEN_UPDATE_IND16( pcw )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( pcw_printer )
+UINT32 pcw_state::screen_update_pcw_printer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pcw_state *state = screen.machine().driver_data<pcw_state>();
 
 	// printer output
 	INT32 feed;
 	rectangle rect(0, PCW_PRINTER_WIDTH - 1, 0, PCW_PRINTER_HEIGHT - 1);
-	feed = -(state->m_paper_feed / 2);
-	copyscrollbitmap(bitmap,*state->m_prn_output,0,NULL,1,&feed,rect);
-	bitmap.pix16(PCW_PRINTER_HEIGHT-1, state->m_printer_headpos) = 0;
-	bitmap.pix16(PCW_PRINTER_HEIGHT-2, state->m_printer_headpos) = 0;
-	bitmap.pix16(PCW_PRINTER_HEIGHT-3, state->m_printer_headpos) = 0;
-	bitmap.pix16(PCW_PRINTER_HEIGHT-1, state->m_printer_headpos-1) = 0;
-	bitmap.pix16(PCW_PRINTER_HEIGHT-2, state->m_printer_headpos-1) = 0;
-	bitmap.pix16(PCW_PRINTER_HEIGHT-1, state->m_printer_headpos+1) = 0;
-	bitmap.pix16(PCW_PRINTER_HEIGHT-2, state->m_printer_headpos+1) = 0;
+	feed = -(m_paper_feed / 2);
+	copyscrollbitmap(bitmap,*m_prn_output,0,NULL,1,&feed,rect);
+	bitmap.pix16(PCW_PRINTER_HEIGHT-1, m_printer_headpos) = 0;
+	bitmap.pix16(PCW_PRINTER_HEIGHT-2, m_printer_headpos) = 0;
+	bitmap.pix16(PCW_PRINTER_HEIGHT-3, m_printer_headpos) = 0;
+	bitmap.pix16(PCW_PRINTER_HEIGHT-1, m_printer_headpos-1) = 0;
+	bitmap.pix16(PCW_PRINTER_HEIGHT-2, m_printer_headpos-1) = 0;
+	bitmap.pix16(PCW_PRINTER_HEIGHT-1, m_printer_headpos+1) = 0;
+	bitmap.pix16(PCW_PRINTER_HEIGHT-2, m_printer_headpos+1) = 0;
 	return 0;
 }
 

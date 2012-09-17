@@ -428,11 +428,10 @@ TIMER_DEVICE_CALLBACK( a7800_interrupt )
 
 ***************************************************************************/
 /* This routine is called at the start of vblank to refresh the screen */
-SCREEN_UPDATE_IND16( a7800 )
+UINT32 a7800_state::screen_update_a7800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	a7800_state *state = screen.machine().driver_data<a7800_state>();
-	state->m_maria_scanline = 0;
-	copybitmap(bitmap, state->m_bitmap, 0, 0, 0, 0, cliprect);
+	m_maria_scanline = 0;
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 

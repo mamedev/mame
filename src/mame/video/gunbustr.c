@@ -201,7 +201,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
                 SCREEN REFRESH
 **************************************************************/
 
-SCREEN_UPDATE_IND16( gunbustr )
+UINT32 gunbustr_state::screen_update_gunbustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	device_t *tc0480scp = screen.machine().device("tc0480scp");
 	UINT8 layer[5];

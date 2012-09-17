@@ -453,6 +453,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_sfbonus_reel4_tile_info);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_sfbonus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -1059,13 +1060,12 @@ static void sfbonus_draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap,
 
 }
 
-static SCREEN_UPDATE_IND16(sfbonus)
+UINT32 sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sfbonus_state *state = screen.machine().driver_data<sfbonus_state>();
 
-	int globalyscroll = (state->m_vregs[2] | state->m_vregs[3]<<8);
-	int globalxscroll = (state->m_vregs[0] | state->m_vregs[1]<<8);
-	UINT8* front_rowscroll = &state->m_videoram[0x200];
+	int globalyscroll = (m_vregs[2] | m_vregs[3]<<8);
+	int globalxscroll = (m_vregs[0] | m_vregs[1]<<8);
+	UINT8* front_rowscroll = &m_videoram[0x200];
 	ioport_constructor ipt;
 	int i;
 
@@ -1074,10 +1074,10 @@ static SCREEN_UPDATE_IND16(sfbonus)
 	globalxscroll += 8;
 
 	bitmap.fill(screen.machine().pens[0], cliprect);
-	state->m_temp_reel_bitmap->fill(screen.machine().pens[0], cliprect);
+	m_temp_reel_bitmap->fill(screen.machine().pens[0], cliprect);
 
 	/* render reels to bitmap */
-	sfbonus_draw_reel_layer(screen,*state->m_temp_reel_bitmap,cliprect,0);
+	sfbonus_draw_reel_layer(screen,*m_temp_reel_bitmap,cliprect,0);
 
 	{
 		int y,x;
@@ -1086,7 +1086,7 @@ static SCREEN_UPDATE_IND16(sfbonus)
 		{
 			for (x=0;x<512;x++)
 			{
-				UINT16* src = &state->m_temp_reel_bitmap->pix16(y, x);
+				UINT16* src = &m_temp_reel_bitmap->pix16(y, x);
 				UINT16* dst = &bitmap.pix16(y, x);
 
 				if ((src[0]&0x100)==0x000)
@@ -1096,14 +1096,14 @@ static SCREEN_UPDATE_IND16(sfbonus)
 	}
 
 	/* Normal Tilemap */
-	state->m_tilemap->set_scrolly(0, globalyscroll );
+	m_tilemap->set_scrolly(0, globalyscroll );
 	for (i=0;i<64;i++)
 	{
 		int scroll;
 		scroll = front_rowscroll[(i*2)+0x000] | (front_rowscroll[(i*2)+0x001]<<8);
-		state->m_tilemap->set_scrollx(i, scroll+globalxscroll );
+		m_tilemap->set_scrollx(i, scroll+globalxscroll );
 	}
-	state->m_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tilemap->draw(bitmap, cliprect, 0,0);
 
 	{
 		int y,x;
@@ -1112,7 +1112,7 @@ static SCREEN_UPDATE_IND16(sfbonus)
 		{
 			for (x=0;x<512;x++)
 			{
-				UINT16* src = &state->m_temp_reel_bitmap->pix16(y, x);
+				UINT16* src = &m_temp_reel_bitmap->pix16(y, x);
 				UINT16* dst = &bitmap.pix16(y, x);
 
 				if ((src[0]&0x100)==0x100)
@@ -1122,52 +1122,52 @@ static SCREEN_UPDATE_IND16(sfbonus)
 	}
 #if 0
     popmessage("%02x %02x %02x %02x %02x %02x %02x %02x -- %02x -- %02x %02x -- %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x",
-    state->m_3800_regs[0],
-    state->m_3800_regs[1],
-    state->m_3800_regs[2],
-    state->m_3800_regs[3],
-    state->m_3800_regs[4],
-    state->m_3800_regs[5],
-    state->m_3800_regs[6],
-    state->m_3800_regs[7],
-    state->m_3000_regs[0],
-    state->m_2801_regs[0],
-    state->m_2c01_regs[0],
-    state->m_vregs[8],
-    state->m_vregs[0],
-    state->m_vregs[10],
-    state->m_vregs[11],
-    state->m_vregs[12],
-    state->m_vregs[13],
-    state->m_vregs[14],
-    state->m_vregs[15],
-    state->m_vregs[16],
-    state->m_vregs[17],
-    state->m_vregs[18],
-    state->m_vregs[19],
-    state->m_vregs[20],
-    state->m_vregs[21],
-    state->m_vregs[22],
-    state->m_vregs[23],
-    state->m_vregs[24],
-    state->m_vregs[25],
-    state->m_vregs[26],
-    state->m_vregs[27],
-    state->m_vregs[28],
-    state->m_vregs[29],
-    state->m_vregs[30],
-    state->m_vregs[31]
+    m_3800_regs[0],
+    m_3800_regs[1],
+    m_3800_regs[2],
+    m_3800_regs[3],
+    m_3800_regs[4],
+    m_3800_regs[5],
+    m_3800_regs[6],
+    m_3800_regs[7],
+    m_3000_regs[0],
+    m_2801_regs[0],
+    m_2c01_regs[0],
+    m_vregs[8],
+    m_vregs[0],
+    m_vregs[10],
+    m_vregs[11],
+    m_vregs[12],
+    m_vregs[13],
+    m_vregs[14],
+    m_vregs[15],
+    m_vregs[16],
+    m_vregs[17],
+    m_vregs[18],
+    m_vregs[19],
+    m_vregs[20],
+    m_vregs[21],
+    m_vregs[22],
+    m_vregs[23],
+    m_vregs[24],
+    m_vregs[25],
+    m_vregs[26],
+    m_vregs[27],
+    m_vregs[28],
+    m_vregs[29],
+    m_vregs[30],
+    m_vregs[31]
     );
 
     popmessage("-- %02x %02x %02x %02x %02x %02x %02x %02x",
-    state->m_1800_regs[0],
-    state->m_1800_regs[1],
-    state->m_1800_regs[2],
-    state->m_1800_regs[3],
-    state->m_1800_regs[4],
-    state->m_1800_regs[5],
-    state->m_1800_regs[6],
-    state->m_1800_regs[7]);
+    m_1800_regs[0],
+    m_1800_regs[1],
+    m_1800_regs[2],
+    m_1800_regs[3],
+    m_1800_regs[4],
+    m_1800_regs[5],
+    m_1800_regs[6],
+    m_1800_regs[7]);
 #endif
 
 	ipt = screen.machine().system().ipt;
@@ -1175,22 +1175,22 @@ static SCREEN_UPDATE_IND16(sfbonus)
 		|| (ipt == INPUT_PORTS_NAME(amcoe2_poker)))
 	{
 		// based on pirpok2
-		output_set_lamp_value(0, (state->m_1800_regs[6] & 0x1) >> 0);
-		output_set_lamp_value(1, (state->m_1800_regs[6] & 0x4) >> 2);
-		output_set_lamp_value(2, (state->m_1800_regs[5] & 0x4) >> 2);
-		output_set_lamp_value(3, (state->m_1800_regs[5] & 0x1) >> 0);
-		output_set_lamp_value(4, (state->m_1800_regs[4] & 0x4) >> 2);
-		output_set_lamp_value(5, (state->m_1800_regs[4] & 0x1) >> 0);
+		output_set_lamp_value(0, (m_1800_regs[6] & 0x1) >> 0);
+		output_set_lamp_value(1, (m_1800_regs[6] & 0x4) >> 2);
+		output_set_lamp_value(2, (m_1800_regs[5] & 0x4) >> 2);
+		output_set_lamp_value(3, (m_1800_regs[5] & 0x1) >> 0);
+		output_set_lamp_value(4, (m_1800_regs[4] & 0x4) >> 2);
+		output_set_lamp_value(5, (m_1800_regs[4] & 0x1) >> 0);
 	}
 	else if ((ipt == INPUT_PORTS_NAME(amcoe1_reels3)) || (ipt == INPUT_PORTS_NAME(amcoe1_reels4))
 		|| (ipt == INPUT_PORTS_NAME(amcoe1_poker)))
 	{
-		output_set_lamp_value(0, (state->m_1800_regs[0] & 0x2) >> 1);
-		output_set_lamp_value(1, (state->m_1800_regs[4] & 0x2) >> 1);
-		output_set_lamp_value(2, (state->m_1800_regs[3] & 0x2) >> 1);
-		output_set_lamp_value(3, (state->m_1800_regs[6] & 0x4) >> 2);
-		output_set_lamp_value(4, (state->m_1800_regs[4] & 0x4) >> 2);
-		output_set_lamp_value(5, (state->m_1800_regs[3] & 0x4) >> 2);
+		output_set_lamp_value(0, (m_1800_regs[0] & 0x2) >> 1);
+		output_set_lamp_value(1, (m_1800_regs[4] & 0x2) >> 1);
+		output_set_lamp_value(2, (m_1800_regs[3] & 0x2) >> 1);
+		output_set_lamp_value(3, (m_1800_regs[6] & 0x4) >> 2);
+		output_set_lamp_value(4, (m_1800_regs[4] & 0x4) >> 2);
+		output_set_lamp_value(5, (m_1800_regs[3] & 0x4) >> 2);
 	}
 
 	return 0;
@@ -1372,7 +1372,7 @@ static MACHINE_CONFIG_START( sfbonus, sfbonus_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(128*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 288-1)
-	MCFG_SCREEN_UPDATE_STATIC(sfbonus)
+	MCFG_SCREEN_UPDATE_DRIVER(sfbonus_state, screen_update_sfbonus)
 
 	MCFG_PALETTE_LENGTH(0x100*2) // *2 for priority workaraound / custom drawing
 

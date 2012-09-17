@@ -325,19 +325,18 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 ***************************************************************************/
 
 
-SCREEN_UPDATE_IND16( powerins )
+UINT32 powerins_state::screen_update_powerins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	powerins_state *state = screen.machine().driver_data<powerins_state>();
 	int layers_ctrl = -1;
 
-	int scrollx = (state->m_vctrl_0[2/2]&0xff) + (state->m_vctrl_0[0/2]&0xff)*256;
-	int scrolly = (state->m_vctrl_0[6/2]&0xff) + (state->m_vctrl_0[4/2]&0xff)*256;
+	int scrollx = (m_vctrl_0[2/2]&0xff) + (m_vctrl_0[0/2]&0xff)*256;
+	int scrolly = (m_vctrl_0[6/2]&0xff) + (m_vctrl_0[4/2]&0xff)*256;
 
-	state->m_tilemap_0->set_scrollx(0, scrollx - 0x20);
-	state->m_tilemap_0->set_scrolly(0, scrolly );
+	m_tilemap_0->set_scrollx(0, scrollx - 0x20);
+	m_tilemap_0->set_scrolly(0, scrolly );
 
-	state->m_tilemap_1->set_scrollx(0, -0x20);	// fixed offset
-	state->m_tilemap_1->set_scrolly(0,  0x00);
+	m_tilemap_1->set_scrollx(0, -0x20);	// fixed offset
+	m_tilemap_1->set_scrolly(0,  0x00);
 
 #ifdef MAME_DEBUG
 if (screen.machine().input().code_pressed(KEYCODE_Z))
@@ -352,9 +351,9 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 }
 #endif
 
-	if (layers_ctrl&1)		state->m_tilemap_0->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl&1)		m_tilemap_0->draw(bitmap, cliprect, 0, 0);
 	else					bitmap.fill(0, cliprect);
 	if (layers_ctrl&8)		draw_sprites(screen.machine(),bitmap,cliprect);
-	if (layers_ctrl&2)		state->m_tilemap_1->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl&2)		m_tilemap_1->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

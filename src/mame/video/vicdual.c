@@ -28,9 +28,8 @@ WRITE8_MEMBER(vicdual_state::vicdual_palette_bank_w)
 }
 
 
-SCREEN_UPDATE_RGB32( vicdual_bw )
+UINT32 vicdual_state::screen_update_vicdual_bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	vicdual_state *state = screen.machine().driver_data<vicdual_state>();
 	UINT8 x = 0;
 	UINT8 y = cliprect.min_y;
 	UINT8 video_data = 0;
@@ -46,11 +45,11 @@ SCREEN_UPDATE_RGB32( vicdual_bw )
 
 			/* read the character code */
 			offs = (y >> 3 << 5) | (x >> 3);
-			char_code = state->m_videoram[offs];
+			char_code = m_videoram[offs];
 
 			/* read the appropriate line of the character ram */
 			offs = (char_code << 3) | (y & 0x07);
-			video_data = state->m_characterram[offs];
+			video_data = m_characterram[offs];
 		}
 
 		/* plot the current pixel */
@@ -79,10 +78,9 @@ SCREEN_UPDATE_RGB32( vicdual_bw )
 }
 
 
-SCREEN_UPDATE_RGB32( vicdual_color )
+UINT32 vicdual_state::screen_update_vicdual_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	vicdual_state *state = screen.machine().driver_data<vicdual_state>();
-	UINT8 *color_prom = (UINT8 *)state->memregion("proms")->base();
+	UINT8 *color_prom = (UINT8 *)memregion("proms")->base();
 	UINT8 x = 0;
 	UINT8 y = cliprect.min_y;
 	UINT8 video_data = 0;
@@ -100,14 +98,14 @@ SCREEN_UPDATE_RGB32( vicdual_color )
 
 			/* read the character code */
 			offs = (y >> 3 << 5) | (x >> 3);
-			char_code = state->m_videoram[offs];
+			char_code = m_videoram[offs];
 
 			/* read the appropriate line of the character ram */
 			offs = (char_code << 3) | (y & 0x07);
-			video_data = state->m_characterram[offs];
+			video_data = m_characterram[offs];
 
 			/* get the foreground and background colors from the PROM */
-			offs = (char_code >> 5) | (state->m_palette_bank << 3);
+			offs = (char_code >> 5) | (m_palette_bank << 3);
 			back_pen = pens_from_color_prom[(color_prom[offs] >> 1) & 0x07];
 			fore_pen = pens_from_color_prom[(color_prom[offs] >> 5) & 0x07];
 		}
@@ -138,12 +136,12 @@ SCREEN_UPDATE_RGB32( vicdual_color )
 }
 
 
-SCREEN_UPDATE_RGB32( vicdual_bw_or_color )
+UINT32 vicdual_state::screen_update_vicdual_bw_or_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (vicdual_is_cabinet_color(screen.machine()))
-		SCREEN_UPDATE32_CALL(vicdual_color);
+		SCREEN_UPDATE32_CALL_MEMBER(vicdual_color);
 	else
-		SCREEN_UPDATE32_CALL(vicdual_bw);
+		SCREEN_UPDATE32_CALL_MEMBER(vicdual_bw);
 
 	return 0;
 }

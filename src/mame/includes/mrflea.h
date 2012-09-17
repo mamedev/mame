@@ -44,10 +44,11 @@ public:
 	DECLARE_WRITE8_MEMBER(mrflea_spriteram_w);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_mrflea(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/mrflea.c -----------*/
 
 
-SCREEN_UPDATE_IND16( mrflea );
+

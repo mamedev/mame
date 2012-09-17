@@ -106,19 +106,18 @@ WRITE16_MEMBER(blockout_state::blockout_videoram_w)
 
 
 
-SCREEN_UPDATE_IND16( blockout )
+UINT32 blockout_state::screen_update_blockout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	blockout_state *state = screen.machine().driver_data<blockout_state>();
 	int x, y;
 	pen_t color = 512;
 
-	copybitmap(bitmap, state->m_tmpbitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_tmpbitmap, 0, 0, 0, 0, cliprect);
 
 	for (y = 0; y < 256; y++)
 	{
 		for (x = 0; x < 320; x += 8)
 		{
-			int d = state->m_frontvideoram[y * 64 + (x / 8)];
+			int d = m_frontvideoram[y * 64 + (x / 8)];
 
 			if (d)
 			{

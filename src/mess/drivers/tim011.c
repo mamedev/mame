@@ -17,6 +17,7 @@ public:
 		: driver_device(mconfig, type, tag) { }
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_tim011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -45,7 +46,7 @@ void tim011_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( tim011 )
+UINT32 tim011_state::screen_update_tim011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -64,7 +65,7 @@ static MACHINE_CONFIG_START( tim011,tim011_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(tim011)
+	MCFG_SCREEN_UPDATE_DRIVER(tim011_state, screen_update_tim011)
 	MCFG_PALETTE_LENGTH(4)
 	MCFG_PALETTE_INIT(black_and_white)
 MACHINE_CONFIG_END

@@ -154,9 +154,8 @@ static void pcw16_vh_decode_mode2(pcw16_state *state, bitmap_ind16 &bitmap, int 
   Do NOT call osd_update_display() from this function,
   it will be called by the main emulation engine.
 ***************************************************************************/
-SCREEN_UPDATE_IND16( pcw16 )
+UINT32 pcw16_state::screen_update_pcw16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pcw16_state *state = screen.machine().driver_data<pcw16_state>();
 	UINT8 *ram = screen.machine().device<ram_device>(RAM_TAG)->pointer();
 	unsigned char *pScanLine = (unsigned char *)ram + 0x0fc00;	//0x03c00;  //0x020FC00;
 
@@ -165,19 +164,19 @@ SCREEN_UPDATE_IND16( pcw16 )
 
 	int border_colour;
 
-	border_colour = state->m_video_control & 31;
+	border_colour = m_video_control & 31;
 
 	/* reverse video? */
-	if (state->m_video_control & (1<<7))
+	if (m_video_control & (1<<7))
 	{
 		/* colour 0 and colour 1 need to be inverted? - what happens in mode 1 and 2 - ignored? or is bit 1 toggled,
         or is whole lot toggled? */
 
 		/* force border to be colour 1 */
-		border_colour = state->m_colour_palette[1];
+		border_colour = m_colour_palette[1];
 	}
 
-	if ((state->m_video_control & (1<<6))==0)
+	if ((m_video_control & (1<<6))==0)
 	{
 		/* blank */
 		rectangle rect(0, PCW16_SCREEN_WIDTH, 0, PCW16_SCREEN_HEIGHT);
@@ -234,20 +233,20 @@ SCREEN_UPDATE_IND16( pcw16 )
 				{
 					case 0:
 					{
-						pcw16_vh_decode_mode0(state, bitmap, x, y+PCW16_BORDER_HEIGHT, byte);
+						pcw16_vh_decode_mode0(this, bitmap, x, y+PCW16_BORDER_HEIGHT, byte);
 					}
 					break;
 
 					case 1:
 					{
-						pcw16_vh_decode_mode1(state, bitmap, x, y+PCW16_BORDER_HEIGHT, byte);
+						pcw16_vh_decode_mode1(this, bitmap, x, y+PCW16_BORDER_HEIGHT, byte);
 					}
 					break;
 
 					case 3:
 					case 2:
 					{
-						pcw16_vh_decode_mode2(state, bitmap, x, y+PCW16_BORDER_HEIGHT, byte);
+						pcw16_vh_decode_mode2(this, bitmap, x, y+PCW16_BORDER_HEIGHT, byte);
 					}
 					break;
 				}

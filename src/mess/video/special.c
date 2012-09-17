@@ -14,9 +14,8 @@ VIDEO_START_MEMBER(special_state,special)
 {
 }
 
-SCREEN_UPDATE_IND16( special )
+UINT32 special_state::screen_update_special(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	special_state *state = screen.machine().driver_data<special_state>();
 	UINT8 code;
 	int y, x, b;
 
@@ -24,7 +23,7 @@ SCREEN_UPDATE_IND16( special )
 	{
 		for (y = 0; y < 256; y++)
 		{
-			code = state->m_p_videoram[y + x*256];
+			code = m_p_videoram[y + x*256];
 			for (b = 7; b >= 0; b--)
 				bitmap.pix16(y, x*8+(7-b)) =  (code >> b) & 0x01;
 		}
@@ -35,9 +34,8 @@ VIDEO_START_MEMBER(special_state,specialp)
 {
 }
 
-SCREEN_UPDATE_IND16( specialp )
+UINT32 special_state::screen_update_specialp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	special_state *state = screen.machine().driver_data<special_state>();
 	UINT8 code;
 	int y, x, b;
 
@@ -45,7 +43,7 @@ SCREEN_UPDATE_IND16( specialp )
 	{
 		for (y = 0; y < 256; y++)
 		{
-			code = state->m_p_videoram[y + x*256];
+			code = m_p_videoram[y + x*256];
 			for (b = 7; b >= 0; b--)
 				bitmap.pix16(y, x*8+(7-b)) =  (code >> b) & 0x01;
 		}
@@ -85,9 +83,8 @@ VIDEO_START_MEMBER(special_state,specimx)
 	memset(m_specimx_colorram,0x70,0x3000);
 }
 
-SCREEN_UPDATE_IND16( specimx )
+UINT32 special_state::screen_update_specimx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	special_state *state = screen.machine().driver_data<special_state>();
 	UINT8 code, color;
 	int y, x, b;
 
@@ -95,8 +92,8 @@ SCREEN_UPDATE_IND16( specimx )
 	{
 		for (y = 0; y < 256; y++)
 		{
-			code = state->m_ram->pointer()[0x9000 + y + x*256];
-			color = state->m_specimx_colorram[y + x*256];
+			code = m_ram->pointer()[0x9000 + y + x*256];
+			color = m_specimx_colorram[y + x*256];
 			for (b = 7; b >= 0; b--)
 				bitmap.pix16(y, x*8+(7-b)) =  ((code >> b) & 0x01)==0 ? color & 0x0f : (color >> 4)& 0x0f ;
 		}
@@ -125,15 +122,14 @@ VIDEO_START_MEMBER(special_state,erik)
 {
 }
 
-SCREEN_UPDATE_IND16( erik )
+UINT32 special_state::screen_update_erik(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	special_state *state = screen.machine().driver_data<special_state>();
 	UINT8 code1, code2, color1, color2;
 	int y, x, b;
 	UINT8 *erik_video_ram_p1, *erik_video_ram_p2;
 
-	erik_video_ram_p1 = state->m_ram->pointer() + 0x9000;
-	erik_video_ram_p2 = state->m_ram->pointer() + 0xd000;
+	erik_video_ram_p1 = m_ram->pointer() + 0x9000;
+	erik_video_ram_p2 = m_ram->pointer() + 0xd000;
 
 	for (x = 0; x < 48; x++)
 	{
@@ -144,8 +140,8 @@ SCREEN_UPDATE_IND16( erik )
 
 			for (b = 7; b >= 0; b--)
 			{
-				color1 = ((code1 >> b) & 0x01)==0 ? state->m_erik_background : state->m_erik_color_1;
-				color2 = ((code2 >> b) & 0x01)==0 ? state->m_erik_background : state->m_erik_color_2;
+				color1 = ((code1 >> b) & 0x01)==0 ? m_erik_background : m_erik_color_1;
+				color2 = ((code2 >> b) & 0x01)==0 ? m_erik_background : m_erik_color_2;
 				bitmap.pix16(y, x*8+(7-b)) =  color1 | color2;
 			}
 		}

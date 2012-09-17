@@ -51,12 +51,12 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void palette_init();
+	UINT32 screen_update_destroyr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
-static SCREEN_UPDATE_IND16( destroyr )
+UINT32 destroyr_state::screen_update_destroyr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	destroyr_state *state = screen.machine().driver_data<destroyr_state>();
 	int i, j;
 
 	bitmap.fill(0, cliprect);
@@ -64,8 +64,8 @@ static SCREEN_UPDATE_IND16( destroyr )
 	/* draw major objects */
 	for (i = 0; i < 16; i++)
 	{
-		int attr = state->m_major_obj_ram[2 * i + 0] ^ 0xff;
-		int horz = state->m_major_obj_ram[2 * i + 1];
+		int attr = m_major_obj_ram[2 * i + 0] ^ 0xff;
+		int horz = m_major_obj_ram[2 * i + 1];
 
 		int num = attr & 3;
 		int scan = attr & 4;
@@ -90,7 +90,7 @@ static SCREEN_UPDATE_IND16( destroyr )
 	{
 		for (j = 0; j < 32; j++)
 		{
-			int num = state->m_alpha_num_ram[32 * i + j];
+			int num = m_alpha_num_ram[32 * i + j];
 
 			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0], num, 0, 0, 0, 8 * j, 8 * i, 0);
 		}
@@ -99,9 +99,9 @@ static SCREEN_UPDATE_IND16( destroyr )
 	/* draw minor objects */
 	for (i = 0; i < 2; i++)
 	{
-		int num = i << 4 | (state->m_minor_obj_ram[i + 0] & 0xf);
-		int horz = 256 - state->m_minor_obj_ram[i + 2];
-		int vert = 256 - state->m_minor_obj_ram[i + 4];
+		int num = i << 4 | (m_minor_obj_ram[i + 0] & 0xf);
+		int horz = 256 - m_minor_obj_ram[i + 2];
+		int vert = 256 - m_minor_obj_ram[i + 4];
 
 		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1], num, 0, 0, 0, horz, vert, 0);
 	}
@@ -109,14 +109,14 @@ static SCREEN_UPDATE_IND16( destroyr )
 	/* draw waves */
 	for (i = 0; i < 4; i++)
 	{
-		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[3], state->m_wavemod ? 1 : 0, 0, 0, 0, 64 * i, 0x4e, 0);
+		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[3], m_wavemod ? 1 : 0, 0, 0, 0, 64 * i, 0x4e, 0);
 	}
 
 	/* draw cursor */
 	for (i = 0; i < 256; i++)
 	{
 		if (i & 4)
-			bitmap.pix16(state->m_cursor ^ 0xff, i) = 7;
+			bitmap.pix16(m_cursor ^ 0xff, i) = 7;
 	}
 	return 0;
 }
@@ -460,7 +460,7 @@ static MACHINE_CONFIG_START( destroyr, destroyr_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_STATIC(destroyr)
+	MCFG_SCREEN_UPDATE_DRIVER(destroyr_state, screen_update_destroyr)
 
 	MCFG_GFXDECODE(destroyr)
 	MCFG_PALETTE_LENGTH(8)

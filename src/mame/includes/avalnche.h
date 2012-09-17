@@ -25,6 +25,7 @@ public:
 	DECLARE_WRITE8_MEMBER(avalance_start_lamp_w);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_avalnche(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in audio/avalnche.c -----------*/

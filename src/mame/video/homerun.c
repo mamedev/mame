@@ -134,14 +134,13 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16(homerun)
+UINT32 homerun_state::screen_update_homerun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	homerun_state *state = screen.machine().driver_data<homerun_state>();
 
-	state->m_tilemap->set_scrolly(0, state->m_scrolly);
-	state->m_tilemap->set_scrollx(0, state->m_scrollx);
+	m_tilemap->set_scrolly(0, m_scrolly);
+	m_tilemap->set_scrollx(0, m_scrollx);
 
-	state->m_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	return 0;

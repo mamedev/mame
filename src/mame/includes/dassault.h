@@ -59,6 +59,7 @@ public:
 	DECLARE_DRIVER_INIT(thndzone);
 	DECLARE_DRIVER_INIT(dassault);
 	virtual void video_start();
+	UINT32 screen_update_dassault(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -66,4 +67,4 @@ public:
 /*----------- defined in video/dassault.c -----------*/
 
 
-SCREEN_UPDATE_RGB32( dassault );
+

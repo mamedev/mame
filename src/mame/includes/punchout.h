@@ -63,6 +63,10 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_VIDEO_START(armwrest);
+	UINT32 screen_update_punchout_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_punchout_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_armwrest_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_armwrest_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -71,8 +75,8 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( punchout_top );
-SCREEN_UPDATE_IND16( punchout_bottom );
-SCREEN_UPDATE_IND16( armwrest_top );
-SCREEN_UPDATE_IND16( armwrest_bottom );
+
+
+
+
 

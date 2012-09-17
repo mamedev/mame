@@ -562,34 +562,32 @@ static void draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rec
 	}
 }
 
-SCREEN_UPDATE_IND16( galaga )
+UINT32 galaga_state::screen_update_galaga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galaga_state *state =  screen.machine().driver_data<galaga_state>();
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	draw_stars(screen.machine(),bitmap,cliprect);
 	draw_sprites(screen.machine(),bitmap,cliprect);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
 
 
-SCREEN_VBLANK( galaga )
+void galaga_state::screen_eof_galaga(screen_device &screen, bool state)
 {
 	// falling edge
-	if (!vblank_on)
+	if (!state)
 	{
-		galaga_state *state =  screen.machine().driver_data<galaga_state>();
 		/* this function is called by galaga_interrupt_1() */
 		int s0,s1,s2;
 		static const int speeds[8] = { -1, -2, -3, 0, 3, 2, 1, 0 };
 
-		s0 = (state->m_galaga_starcontrol[0] & 1);
-		s1 = (state->m_galaga_starcontrol[1] & 1);
-		s2 = (state->m_galaga_starcontrol[2] & 1);
+		s0 = (m_galaga_starcontrol[0] & 1);
+		s1 = (m_galaga_starcontrol[1] & 1);
+		s2 = (m_galaga_starcontrol[2] & 1);
 
-		state->m_stars_scrollx += speeds[s0 + s1*2 + s2*4];
+		m_stars_scrollx += speeds[s0 + s1*2 + s2*4];
 	}
 }
 

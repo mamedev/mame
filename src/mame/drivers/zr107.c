@@ -205,6 +205,8 @@ public:
 	virtual void machine_reset();
 	DECLARE_VIDEO_START(zr107);
 	DECLARE_VIDEO_START(jetwave);
+	UINT32 screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_jetwave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -218,9 +220,8 @@ VIDEO_START_MEMBER(zr107_state,jetwave)
 }
 
 
-static SCREEN_UPDATE_RGB32( jetwave )
+UINT32 zr107_state::screen_update_jetwave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	zr107_state *state = screen.machine().driver_data<zr107_state>();
 	device_t *k001604 = screen.machine().device("k001604");
 
 	bitmap.fill(screen.machine().pens[0], cliprect);
@@ -229,8 +230,8 @@ static SCREEN_UPDATE_RGB32( jetwave )
 
 	k001604_draw_front_layer(k001604, bitmap, cliprect);
 
-	draw_7segment_led(bitmap, 3, 3, state->m_led_reg0);
-	draw_7segment_led(bitmap, 9, 3, state->m_led_reg1);
+	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
+	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 
 	sharc_set_flag_input(screen.machine().device("dsp"), 1, ASSERT_LINE);
 	return 0;
@@ -271,9 +272,8 @@ VIDEO_START_MEMBER(zr107_state,zr107)
 	K001005_init(machine());
 }
 
-static SCREEN_UPDATE_RGB32( zr107 )
+UINT32 zr107_state::screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	zr107_state *state = screen.machine().driver_data<zr107_state>();
 	device_t *k056832 = screen.machine().device("k056832");
 	bitmap.fill(screen.machine().pens[0], cliprect);
 
@@ -281,8 +281,8 @@ static SCREEN_UPDATE_RGB32( zr107 )
 	K001005_draw(bitmap, cliprect);
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 0, 0, 0);
 
-	draw_7segment_led(bitmap, 3, 3, state->m_led_reg0);
-	draw_7segment_led(bitmap, 9, 3, state->m_led_reg1);
+	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
+	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 
 	sharc_set_flag_input(screen.machine().device("dsp"), 1, ASSERT_LINE);
 	return 0;
@@ -751,7 +751,7 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(64*8, 48*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(zr107)
+	MCFG_SCREEN_UPDATE_DRIVER(zr107_state, screen_update_zr107)
 
 	MCFG_PALETTE_LENGTH(65536)
 
@@ -807,7 +807,7 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(64*8, 48*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(jetwave)
+	MCFG_SCREEN_UPDATE_DRIVER(zr107_state, screen_update_jetwave)
 
 	MCFG_PALETTE_LENGTH(65536)
 

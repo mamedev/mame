@@ -212,20 +212,19 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const r
 }
 
 
-SCREEN_UPDATE_IND16( sf )
+UINT32 sf_state::screen_update_sf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sf_state *state = screen.machine().driver_data<sf_state>();
 
-	if (state->m_sf_active & 0x20)
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (m_sf_active & 0x20)
+		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(0, cliprect);
 
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	if (state->m_sf_active & 0x80)
+	if (m_sf_active & 0x80)
 		draw_sprites(screen.machine(), bitmap, cliprect);
 
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

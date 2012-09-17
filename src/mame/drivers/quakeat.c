@@ -76,6 +76,7 @@ public:
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	virtual void machine_start();
 	virtual void video_start();
+	UINT32 screen_update_quake(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -83,7 +84,7 @@ void quakeat_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16(quake)
+UINT32 quakeat_state::screen_update_quake(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -182,7 +183,7 @@ static MACHINE_CONFIG_START( quake, quakeat_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(quake)
+	MCFG_SCREEN_UPDATE_DRIVER(quakeat_state, screen_update_quake)
 
 	MCFG_PALETTE_LENGTH(0x100)
 

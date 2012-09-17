@@ -50,11 +50,10 @@ static void draw_sprites( running_machine &machine,  bitmap_ind16 &bitmap, const
 	}
 }
 
-SCREEN_UPDATE_IND16( bsktball )
+UINT32 bsktball_state::screen_update_bsktball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bsktball_state *state = screen.machine().driver_data<bsktball_state>();
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

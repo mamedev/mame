@@ -99,6 +99,7 @@ public:
 	DECLARE_MACHINE_START(ddragon);
 	DECLARE_MACHINE_RESET(ddragon);
 	DECLARE_VIDEO_START(ddragon);
+	UINT32 screen_update_ddragon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -107,5 +108,5 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( ddragon );
+
 

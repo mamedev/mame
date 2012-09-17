@@ -933,9 +933,8 @@ static void cps3_draw_tilemapsprite_line(running_machine &machine, int tmnum, in
 	}
 }
 
-static SCREEN_UPDATE_RGB32(cps3)
+UINT32 cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	cps3_state *state = screen.machine().driver_data<cps3_state>();
 	int y,x, count;
 	attoseconds_t period = screen.frame_period().attoseconds;
 	rectangle visarea = screen.visible_area();
@@ -951,27 +950,27 @@ static SCREEN_UPDATE_RGB32(cps3)
 	/* registers are normally 002a006f 01ef01c6
             widescreen mode = 00230076 026501c6
       only SFIII2 uses widescreen, I don't know exactly which register controls it */
-	if (((state->m_fullscreenzoom[1]&0xffff0000)>>16)==0x0265)
+	if (((m_fullscreenzoom[1]&0xffff0000)>>16)==0x0265)
 	{
-		if (state->m_screenwidth!=496)
+		if (m_screenwidth!=496)
 		{
-			state->m_screenwidth = 496;
+			m_screenwidth = 496;
 			visarea.set(0, 496-1, 0, 224-1);
 			screen.configure(496, 224, visarea, period);
 		}
 	}
 	else
 	{
-		if (state->m_screenwidth!=384)
+		if (m_screenwidth!=384)
 		{
-			state->m_screenwidth = 384;
+			m_screenwidth = 384;
 			visarea.set(0, 384-1, 0, 224-1);
 			screen.configure(384, 224, visarea, period);
 		}
 	}
 
-	fullscreenzoomx = state->m_fullscreenzoom[3] & 0x000000ff;
-	fullscreenzoomy = state->m_fullscreenzoom[3] & 0x000000ff;
+	fullscreenzoomx = m_fullscreenzoom[3] & 0x000000ff;
+	fullscreenzoomy = m_fullscreenzoom[3] & 0x000000ff;
 	/* clamp at 0x80, I don't know if this is accurate */
 	if (fullscreenzoomx>0x80) fullscreenzoomx = 0x80;
 	if (fullscreenzoomy>0x80) fullscreenzoomy = 0x80;
@@ -979,12 +978,12 @@ static SCREEN_UPDATE_RGB32(cps3)
 	fszx = (fullscreenzoomx<<16)/0x40;
 	fszy = (fullscreenzoomy<<16)/0x40;
 
-	state->m_renderbuffer_clip.min_x = 0;
-	state->m_renderbuffer_clip.max_x = ((state->m_screenwidth*fszx)>>16)-1;
-	state->m_renderbuffer_clip.min_y = 0;
-	state->m_renderbuffer_clip.max_y = ((224*fszx)>>16)-1;
+	m_renderbuffer_clip.min_x = 0;
+	m_renderbuffer_clip.max_x = ((m_screenwidth*fszx)>>16)-1;
+	m_renderbuffer_clip.min_y = 0;
+	m_renderbuffer_clip.max_y = ((224*fszx)>>16)-1;
 
-	state->m_renderbuffer_bitmap.fill(0, state->m_renderbuffer_clip);
+	m_renderbuffer_bitmap.fill(0, m_renderbuffer_clip);
 
 	/* Sprites */
 	{
@@ -993,37 +992,37 @@ static SCREEN_UPDATE_RGB32(cps3)
 		//printf("Spritelist start:\n");
 		for (i=0x00000/4;i<0x2000/4;i+=4)
 		{
-			int xpos =  	(state->m_spriteram[i+1]&0x03ff0000)>>16;
-			int ypos =  	state->m_spriteram[i+1]&0x000003ff;
+			int xpos =  	(m_spriteram[i+1]&0x03ff0000)>>16;
+			int ypos =  	m_spriteram[i+1]&0x000003ff;
 			int j;
-			int gscroll =      (state->m_spriteram[i+0]&0x70000000)>>28;
-			int length =    (state->m_spriteram[i+0]&0x01ff0000)>>16; // how many entries in the sprite table
-			UINT32 start  =    (state->m_spriteram[i+0]&0x00007ff0)>>4;
+			int gscroll =      (m_spriteram[i+0]&0x70000000)>>28;
+			int length =    (m_spriteram[i+0]&0x01ff0000)>>16; // how many entries in the sprite table
+			UINT32 start  =    (m_spriteram[i+0]&0x00007ff0)>>4;
 
-			int whichbpp =     (state->m_spriteram[i+2]&0x40000000)>>30; // not 100% sure if this is right, jojo title / characters
-			int whichpal =     (state->m_spriteram[i+2]&0x20000000)>>29;
-			int global_xflip = (state->m_spriteram[i+2]&0x10000000)>>28;
-			int global_yflip = (state->m_spriteram[i+2]&0x08000000)>>27;
-			int global_alpha = (state->m_spriteram[i+2]&0x04000000)>>26; // alpha / shadow? set on sfiii2 shadows, and big black image in jojo intro
-			int global_bpp =   (state->m_spriteram[i+2]&0x02000000)>>25;
-			int global_pal =   (state->m_spriteram[i+2]&0x01ff0000)>>16;
+			int whichbpp =     (m_spriteram[i+2]&0x40000000)>>30; // not 100% sure if this is right, jojo title / characters
+			int whichpal =     (m_spriteram[i+2]&0x20000000)>>29;
+			int global_xflip = (m_spriteram[i+2]&0x10000000)>>28;
+			int global_yflip = (m_spriteram[i+2]&0x08000000)>>27;
+			int global_alpha = (m_spriteram[i+2]&0x04000000)>>26; // alpha / shadow? set on sfiii2 shadows, and big black image in jojo intro
+			int global_bpp =   (m_spriteram[i+2]&0x02000000)>>25;
+			int global_pal =   (m_spriteram[i+2]&0x01ff0000)>>16;
 
-			int gscrollx = (state->m_unk_vidregs[gscroll]&0x03ff0000)>>16;
-			int gscrolly = (state->m_unk_vidregs[gscroll]&0x000003ff)>>0;
+			int gscrollx = (m_unk_vidregs[gscroll]&0x03ff0000)>>16;
+			int gscrolly = (m_unk_vidregs[gscroll]&0x000003ff)>>0;
 			start = (start * 0x100) >> 2;
 
-			if ((state->m_spriteram[i+0]&0xf0000000) == 0x80000000)
+			if ((m_spriteram[i+0]&0xf0000000) == 0x80000000)
 				break;
 
 			for (j=0;j<(length)*4;j+=4)
 			{
 
-				UINT32 value1 = 	(state->m_spriteram[start+j+0]);
-				UINT32 value2 = 	(state->m_spriteram[start+j+1]);
-				UINT32 value3 = 	(state->m_spriteram[start+j+2]);
+				UINT32 value1 = 	(m_spriteram[start+j+0]);
+				UINT32 value2 = 	(m_spriteram[start+j+1]);
+				UINT32 value3 = 	(m_spriteram[start+j+2]);
 
 
-				//UINT8* srcdata = (UINT8*)state->m_char_ram;
+				//UINT8* srcdata = (UINT8*)m_char_ram;
 				//UINT32 sourceoffset = (value1 >>14)&0x7fffff;
 				int count;
 
@@ -1061,7 +1060,7 @@ static SCREEN_UPDATE_RGB32(cps3)
 					//int endline;
 					//int height = (value3 & 0x7f000000)>>24;
 					int uu;
-//                  UINT32* tmapregs[4] = { state->m_tilemap20_regs_base, state->m_tilemap30_regs_base, state->m_tilemap40_regs_base, state->m_tilemap50_regs_base };
+//                  UINT32* tmapregs[4] = { m_tilemap20_regs_base, m_tilemap30_regs_base, m_tilemap40_regs_base, m_tilemap50_regs_base };
 //                  UINT32* regs;
 //                  regs = tmapregs[tilemapnum];
 					//endline = value2;
@@ -1083,7 +1082,7 @@ static SCREEN_UPDATE_RGB32(cps3)
 					{
 						for (uu=0;uu<1023;uu++)
 						{
-							cps3_draw_tilemapsprite_line(screen.machine(), tilemapnum, uu, state->m_renderbuffer_bitmap, state->m_renderbuffer_clip );
+							cps3_draw_tilemapsprite_line(screen.machine(), tilemapnum, uu, m_renderbuffer_bitmap, m_renderbuffer_clip );
 						}
 					}
 					bg_drawn[tilemapnum] = 1;
@@ -1141,7 +1140,7 @@ static SCREEN_UPDATE_RGB32(cps3)
 
 								if (current_ypos&0x200) current_ypos-=0x400;
 
-								//if ( (whichbpp) && (machine.primary_screen->frame_number() & 1)) continue;
+								//if ( (whichbpp) && (machine().primary_screen->frame_number() & 1)) continue;
 
 								/* use the palette value from the main list or the sublists? */
 								if (whichpal)
@@ -1170,11 +1169,11 @@ static SCREEN_UPDATE_RGB32(cps3)
 
 									if (global_alpha || alpha)
 									{
-										cps3_drawgfxzoom(state->m_renderbuffer_bitmap,state->m_renderbuffer_clip,screen.machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(m_renderbuffer_bitmap,m_renderbuffer_clip,screen.machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
 									}
 									else
 									{
-										cps3_drawgfxzoom(state->m_renderbuffer_bitmap,state->m_renderbuffer_clip,screen.machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(m_renderbuffer_bitmap,m_renderbuffer_clip,screen.machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, NULL, 0);
 									}
 									count++;
 								}
@@ -1201,12 +1200,12 @@ static SCREEN_UPDATE_RGB32(cps3)
 		for (rendery=0;rendery<224;rendery++)
 		{
 			dstbitmap = &bitmap.pix32(rendery);
-			srcbitmap = &state->m_renderbuffer_bitmap.pix32(srcy>>16);
+			srcbitmap = &m_renderbuffer_bitmap.pix32(srcy>>16);
 			srcx=0;
 
-			for (renderx=0;renderx<state->m_screenwidth;renderx++)
+			for (renderx=0;renderx<m_screenwidth;renderx++)
 			{
-				dstbitmap[renderx] = state->m_mame_colours[srcbitmap[srcx>>16]&0x1ffff];
+				dstbitmap[renderx] = m_mame_colours[srcbitmap[srcx>>16]&0x1ffff];
 				srcx += fszx;
 			}
 
@@ -1218,26 +1217,26 @@ static SCREEN_UPDATE_RGB32(cps3)
 	/* Copy the first 0x800 colours to be used for fg layer rendering */
 //  for (offset=0;offset<0x200;offset++)
 //  {
-//      int palreadbase = (state->m_ss_pal_base << 9);
-//      palette_set_color(machine,offset,state->m_mame_colours[palreadbase+offset]);
+//      int palreadbase = (m_ss_pal_base << 9);
+//      palette_set_color(machine(),offset,m_mame_colours[palreadbase+offset]);
 //  }
 
 	// fg layer
 	{
 		// bank select? (sfiii2 intro)
-		if (state->m_ss_bank_base & 0x01000000) count = 0x000;
+		if (m_ss_bank_base & 0x01000000) count = 0x000;
 		else count = 0x800;
 
 		for (y=0;y<32;y++)
 		{
 			for (x=0;x<64;x++)
 			{
-				UINT32 data = state->m_ss_ram[count]; // +0x800 = 2nd bank, used on sfiii2 intro..
+				UINT32 data = m_ss_ram[count]; // +0x800 = 2nd bank, used on sfiii2 intro..
 				UINT32 tile = (data >> 16) & 0x1ff;
 				int pal = (data&0x003f) >> 1;
 				int flipx = (data & 0x0080) >> 7;
 				int flipy = (data & 0x0040) >> 6;
-				pal += state->m_ss_pal_base << 5;
+				pal += m_ss_pal_base << 5;
 				tile+=0x200;
 
 				cps3_drawgfxzoom(bitmap, cliprect, screen.machine().gfx[0],tile,pal,flipx,flipy,x*8,y*8,CPS3_TRANSPARENCY_PEN,0,0x10000,0x10000,NULL,0);
@@ -2506,7 +2505,7 @@ static MACHINE_CONFIG_START( cps3, cps3_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_60MHz/8, 486, 0, 384, 259, 0, 224)
-	MCFG_SCREEN_UPDATE_STATIC(cps3)
+	MCFG_SCREEN_UPDATE_DRIVER(cps3_state, screen_update_cps3)
 /*
     Measured clocks:
         V = 59.5992Hz

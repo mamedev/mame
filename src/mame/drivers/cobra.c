@@ -720,6 +720,7 @@ public:
 	DECLARE_DRIVER_INIT(cobra);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_cobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 void cobra_renderer::render_color_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
@@ -994,11 +995,10 @@ void cobra_state::video_start()
 	m_renderer->gfx_init(machine());
 }
 
-SCREEN_UPDATE_RGB32( cobra )
+UINT32 cobra_state::screen_update_cobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	cobra_state *cobra = screen.machine().driver_data<cobra_state>();
 
-	if (cobra->m_has_psac)
+	if (m_has_psac)
 	{
 		device_t *k001604 = screen.machine().device("k001604");
 
@@ -1006,7 +1006,7 @@ SCREEN_UPDATE_RGB32( cobra )
 		k001604_draw_front_layer(k001604, bitmap, cliprect);
 	}
 
-	cobra->m_renderer->display(&bitmap, cliprect);
+	m_renderer->display(&bitmap, cliprect);
 	return 0;
 }
 
@@ -3260,7 +3260,7 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	MCFG_SCREEN_SIZE(512, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 399)
 	MCFG_PALETTE_LENGTH(65536)
-	MCFG_SCREEN_UPDATE_STATIC(cobra)
+	MCFG_SCREEN_UPDATE_DRIVER(cobra_state, screen_update_cobra)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

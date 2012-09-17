@@ -150,15 +150,14 @@ void esripsys_state::video_start()
 	state_save_register_global(machine(), m_12sel);
 }
 
-SCREEN_UPDATE_RGB32( esripsys )
+UINT32 esripsys_state::screen_update_esripsys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	esripsys_state *state = screen.machine().driver_data<esripsys_state>();
-	struct line_buffer_t *line_buffer = state->m_line_buffer;
+	struct line_buffer_t *line_buffer = m_line_buffer;
 	int x, y;
 
-	UINT8 *colour_buf = line_buffer[state->m_12sel ? 0 : 1].colour_buf;
-	UINT8 *intensity_buf = line_buffer[state->m_12sel ? 0 : 1].intensity_buf;
-	UINT8 *priority_buf = line_buffer[state->m_12sel ? 0 : 1].priority_buf;
+	UINT8 *colour_buf = line_buffer[m_12sel ? 0 : 1].colour_buf;
+	UINT8 *intensity_buf = line_buffer[m_12sel ? 0 : 1].intensity_buf;
+	UINT8 *priority_buf = line_buffer[m_12sel ? 0 : 1].priority_buf;
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
@@ -167,16 +166,16 @@ SCREEN_UPDATE_RGB32( esripsys )
 		for (x = 0; x < 512; ++x)
 		{
 			int idx = colour_buf[x];
-			int r = (state->m_pal_ram[idx] & 0xf);
-			int g = (state->m_pal_ram[256 + idx] & 0xf);
-			int b = (state->m_pal_ram[512 + idx] & 0xf);
+			int r = (m_pal_ram[idx] & 0xf);
+			int g = (m_pal_ram[256 + idx] & 0xf);
+			int b = (m_pal_ram[512 + idx] & 0xf);
 			int i = intensity_buf[x];
 
 			*dest++ = MAKE_RGB(r*i, g*i, b*i);
 
 			/* Clear the line buffer as we scan out */
 			colour_buf[x] = 0xff;
-			intensity_buf[x] = state->m_bg_intensity;
+			intensity_buf[x] = m_bg_intensity;
 			priority_buf[x] = 0;
 		}
 	}

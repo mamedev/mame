@@ -31,23 +31,22 @@ void videopin_state::video_start()
 }
 
 
-SCREEN_UPDATE_IND16( videopin )
+UINT32 videopin_state::screen_update_videopin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	videopin_state *state = screen.machine().driver_data<videopin_state>();
 	int col;
 	int row;
 
-	state->m_bg_tilemap->set_scrollx(0, -8);   /* account for delayed loading of shift reg C6 */
+	m_bg_tilemap->set_scrollx(0, -8);   /* account for delayed loading of shift reg C6 */
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	for (row = 0; row < 32; row++)
 	{
 		for (col = 0; col < 48; col++)
 		{
-			UINT32 offset = state->m_bg_tilemap->memory_index(col, row);
+			UINT32 offset = m_bg_tilemap->memory_index(col, row);
 
-			if (state->m_video_ram[offset] & 0x80)   /* ball bit found */
+			if (m_video_ram[offset] & 0x80)   /* ball bit found */
 			{
 				int x = 8 * col;
 				int y = 8 * row;
@@ -60,8 +59,8 @@ SCREEN_UPDATE_IND16( videopin )
 				rectangle rect(x, x + 15, y, y + 15);
 				rect &= cliprect;
 
-				x -= state->m_ball_x;
-				y -= state->m_ball_y;
+				x -= m_ball_x;
+				y -= m_ball_y;
 
 				/* ball placement is still 0.5 pixels off but don't tell anyone */
 

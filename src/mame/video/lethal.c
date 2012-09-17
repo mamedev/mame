@@ -100,21 +100,20 @@ WRITE8_MEMBER(lethal_state::lethalen_palette_control)
 	}
 }
 
-SCREEN_UPDATE_IND16(lethalen)
+UINT32 lethal_state::screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	lethal_state *state = screen.machine().driver_data<lethal_state>();
 
 	bitmap.fill(7168, cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 3, K056832_DRAW_FLAG_MIRROR, 1);
-	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 2);
-	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 1, K056832_DRAW_FLAG_MIRROR, 4);
+	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 3, K056832_DRAW_FLAG_MIRROR, 1);
+	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 2);
+	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 1, K056832_DRAW_FLAG_MIRROR, 4);
 
-	k053245_sprites_draw_lethal(state->m_k053244, bitmap, cliprect);
+	k053245_sprites_draw_lethal(m_k053244, bitmap, cliprect);
 
 	// force "A" layer over top of everything
-	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 0, K056832_DRAW_FLAG_MIRROR, 0);
+	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 0, K056832_DRAW_FLAG_MIRROR, 0);
 
 	return 0;
 }

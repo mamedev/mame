@@ -121,23 +121,22 @@ void bigstrkb_state::video_start()
 	m_tilemap3->set_transparent_pen(15);
 }
 
-SCREEN_UPDATE_IND16(bigstrkb)
+UINT32 bigstrkb_state::screen_update_bigstrkb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bigstrkb_state *state = screen.machine().driver_data<bigstrkb_state>();
 
 //  bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	state->m_tilemap2->set_scrollx(0, state->m_vidreg1[0]+(256-14));
-	state->m_tilemap2->set_scrolly(0, state->m_vidreg2[0]);
+	m_tilemap2->set_scrollx(0, m_vidreg1[0]+(256-14));
+	m_tilemap2->set_scrolly(0, m_vidreg2[0]);
 
-	state->m_tilemap3->set_scrollx(0, state->m_vidreg1[1]+(256-14));
-	state->m_tilemap3->set_scrolly(0, state->m_vidreg2[1]);
+	m_tilemap3->set_scrollx(0, m_vidreg1[1]+(256-14));
+	m_tilemap3->set_scrolly(0, m_vidreg2[1]);
 
-	state->m_tilemap2->draw(bitmap, cliprect, 0,0);
-	state->m_tilemap3->draw(bitmap, cliprect, 0,0);
+	m_tilemap2->draw(bitmap, cliprect, 0,0);
+	m_tilemap3->draw(bitmap, cliprect, 0,0);
 
 	draw_sprites(screen.machine(),bitmap,cliprect);
-	state->m_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tilemap->draw(bitmap, cliprect, 0,0);
 
 //  popmessage ("Regs %08x %08x %08x %08x",bsb_vidreg2[0],bsb_vidreg2[1],bsb_vidreg2[2],bsb_vidreg2[3]);
 	return 0;

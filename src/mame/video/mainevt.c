@@ -91,31 +91,29 @@ VIDEO_START_MEMBER(mainevt_state,dv)
 
 /*****************************************************************************/
 
-SCREEN_UPDATE_IND16( mainevt )
+UINT32 mainevt_state::screen_update_mainevt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mainevt_state *state = screen.machine().driver_data<mainevt_state>();
 
-	k052109_tilemap_update(state->m_k052109);
+	k052109_tilemap_update(m_k052109);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 1);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 2, 1, 2);	/* low priority part of layer */
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 2, 0, 4);	/* high priority part of layer */
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 0, 0, 8);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 1);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, 1, 2);	/* low priority part of layer */
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, 0, 4);	/* high priority part of layer */
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 0, 0, 8);
 
-	k051960_sprites_draw(state->m_k051960, bitmap, cliprect, -1, -1);
+	k051960_sprites_draw(m_k051960, bitmap, cliprect, -1, -1);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( dv )
+UINT32 mainevt_state::screen_update_dv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mainevt_state *state = screen.machine().driver_data<mainevt_state>();
 
-	k052109_tilemap_update(state->m_k052109);
+	k052109_tilemap_update(m_k052109);
 
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 0);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 2, 0, 0);
-	k051960_sprites_draw(state->m_k051960, bitmap, cliprect, 0, 0);
-	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 0, 0, 0);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 0);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, 0, 0);
+	k051960_sprites_draw(m_k051960, bitmap, cliprect, 0, 0);
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 0, 0, 0);
 	return 0;
 }

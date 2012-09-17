@@ -109,6 +109,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	DECLARE_VIDEO_START(vertical);
+	UINT32 screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -191,13 +192,12 @@ WRITE8_MEMBER(statriv2_state::statriv2_videoram_w)
  *
  *************************************/
 
-static SCREEN_UPDATE_IND16( statriv2 )
+UINT32 statriv2_state::screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	statriv2_state *state = screen.machine().driver_data<statriv2_state>();
 	if (tms9927_screen_reset(screen.machine().device("tms")))
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	else
-		state->m_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -612,7 +612,7 @@ static MACHINE_CONFIG_START( statriv2, statriv2_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 0, 320, 270, 0, 240)
-	MCFG_SCREEN_UPDATE_STATIC(statriv2)
+	MCFG_SCREEN_UPDATE_DRIVER(statriv2_state, screen_update_statriv2)
 
 	MCFG_TMS9927_ADD("tms", MASTER_CLOCK/2, tms9927_intf)
 

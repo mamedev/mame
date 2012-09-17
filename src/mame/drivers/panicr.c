@@ -98,6 +98,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_txttile_info);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_panicr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -247,15 +248,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	}
 }
 
-static SCREEN_UPDATE_IND16( panicr)
+UINT32 panicr_state::screen_update_panicr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	panicr_state *state = screen.machine().driver_data<panicr_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	state->m_txttilemap->mark_all_dirty();
-	state->m_bgtilemap->set_scrollx(0, state->m_scrollx);
-	state->m_bgtilemap->draw(bitmap, cliprect, 0,0);
+	m_txttilemap->mark_all_dirty();
+	m_bgtilemap->set_scrollx(0, m_scrollx);
+	m_bgtilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect);
-	state->m_txttilemap->draw(bitmap, cliprect, 0,0);
+	m_txttilemap->draw(bitmap, cliprect, 0,0);
 
 	return 0;
 }
@@ -515,7 +515,7 @@ static MACHINE_CONFIG_START( panicr, panicr_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(panicr)
+	MCFG_SCREEN_UPDATE_DRIVER(panicr_state, screen_update_panicr)
 
 	MCFG_GFXDECODE(panicr)
 	MCFG_PALETTE_LENGTH(256*3)

@@ -363,29 +363,28 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 
 
-SCREEN_UPDATE_IND16( namcos1 )
+UINT32 namcos1_state::screen_update_namcos1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	namcos1_state *state = screen.machine().driver_data<namcos1_state>();
 	int i, j, scrollx, scrolly, priority;
 	rectangle new_clip = cliprect;
 
 	/* flip screen is embedded in the sprite control registers */
-	/* can't use state->flip_screen_set() because the visible area is asymmetrical */
-	state->flip_screen_set_no_update(state->m_spriteram[0x0ff6] & 1);
-	screen.machine().tilemap().set_flip_all(state->flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	/* can't use flip_screen_set() because the visible area is asymmetrical */
+	flip_screen_set_no_update(m_spriteram[0x0ff6] & 1);
+	screen.machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 
 	/* background color */
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	/* berabohm uses asymmetrical visibility windows to iris on the character */
-	i = ((state->m_cus116[0] << 8) | state->m_cus116[1]) - 1;			// min x
+	i = ((m_cus116[0] << 8) | m_cus116[1]) - 1;			// min x
 	if (new_clip.min_x < i) new_clip.min_x = i;
-	i = ((state->m_cus116[2] << 8) | state->m_cus116[3]) - 1 - 1;		// max x
+	i = ((m_cus116[2] << 8) | m_cus116[3]) - 1 - 1;		// max x
 	if (new_clip.max_x > i) new_clip.max_x = i;
-	i = ((state->m_cus116[4] << 8) | state->m_cus116[5]) - 0x11;		// min y
+	i = ((m_cus116[4] << 8) | m_cus116[5]) - 0x11;		// min y
 	if (new_clip.min_y < i) new_clip.min_y = i;
-	i = ((state->m_cus116[6] << 8) | state->m_cus116[7]) - 0x11 - 1;	// max y
+	i = ((m_cus116[6] << 8) | m_cus116[7]) - 0x11 - 1;	// max y
 	if (new_clip.max_y > i) new_clip.max_y = i;
 
 	if (new_clip.empty())
@@ -394,24 +393,24 @@ SCREEN_UPDATE_IND16( namcos1 )
 
 	/* set palette base */
 	for (i = 0;i < 6;i++)
-		state->m_bg_tilemap[i]->set_palette_offset((state->m_playfield_control[i + 24] & 7) * 256);
+		m_bg_tilemap[i]->set_palette_offset((m_playfield_control[i + 24] & 7) * 256);
 
 	for (i = 0;i < 4;i++)
 	{
 		static const int disp_x[] = { 25, 27, 28, 29 };
 
 		j = i << 2;
-		scrollx = ( state->m_playfield_control[j+1] + (state->m_playfield_control[j+0]<<8) ) - disp_x[i];
-		scrolly = ( state->m_playfield_control[j+3] + (state->m_playfield_control[j+2]<<8) ) + 8;
+		scrollx = ( m_playfield_control[j+1] + (m_playfield_control[j+0]<<8) ) - disp_x[i];
+		scrolly = ( m_playfield_control[j+3] + (m_playfield_control[j+2]<<8) ) + 8;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			scrollx = -scrollx;
 			scrolly = -scrolly;
 		}
 
-		state->m_bg_tilemap[i]->set_scrollx(0,scrollx);
-		state->m_bg_tilemap[i]->set_scrolly(0,scrolly);
+		m_bg_tilemap[i]->set_scrollx(0,scrollx);
+		m_bg_tilemap[i]->set_scrolly(0,scrolly);
 	}
 
 
@@ -423,8 +422,8 @@ SCREEN_UPDATE_IND16( namcos1 )
 	{
 		for (i = 0;i < 6;i++)
 		{
-			if (state->m_playfield_control[16 + i] == priority)
-				state->m_bg_tilemap[i]->draw(bitmap, new_clip, 0,priority,0);
+			if (m_playfield_control[16 + i] == priority)
+				m_bg_tilemap[i]->draw(bitmap, new_clip, 0,priority,0);
 		}
 	}
 
@@ -433,15 +432,14 @@ SCREEN_UPDATE_IND16( namcos1 )
 }
 
 
-SCREEN_VBLANK( namcos1 )
+void namcos1_state::screen_eof_namcos1(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		namcos1_state *state = screen.machine().driver_data<namcos1_state>();
-		if (state->m_copy_sprites)
+		if (m_copy_sprites)
 		{
-			UINT8 *spriteram = state->m_spriteram + 0x800;
+			UINT8 *spriteram = m_spriteram + 0x800;
 			int i,j;
 
 			for (i = 0;i < 0x800;i += 16)
@@ -450,7 +448,7 @@ SCREEN_VBLANK( namcos1 )
 					spriteram[i+j] = spriteram[i+j - 6];
 			}
 
-			state->m_copy_sprites = 0;
+			m_copy_sprites = 0;
 		}
 	}
 }

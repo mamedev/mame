@@ -316,9 +316,8 @@ WRITE16_HANDLER( atarisy2_videoram_w )
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( atarisy2 )
+UINT32 atarisy2_state::screen_update_atarisy2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	atarisy2_state *state = screen.machine().driver_data<atarisy2_state>();
 	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
 	atarimo_rect_list rectlist;
 	bitmap_ind16 *mobitmap;
@@ -326,10 +325,10 @@ SCREEN_UPDATE_IND16( atarisy2 )
 
 	/* draw the playfield */
 	priority_bitmap.fill(0, cliprect);
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 1, 1);
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 2, 2);
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 3, 3);
+	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_playfield_tilemap->draw(bitmap, cliprect, 1, 1);
+	m_playfield_tilemap->draw(bitmap, cliprect, 2, 2);
+	m_playfield_tilemap->draw(bitmap, cliprect, 3, 3);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -362,6 +361,6 @@ SCREEN_UPDATE_IND16( atarisy2 )
 		}
 
 	/* add the alpha on top */
-	state->m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -83,24 +83,23 @@ VIDEO_START_MEMBER(runaway_state,qwak)
 
 
 
-SCREEN_UPDATE_IND16( runaway )
+UINT32 runaway_state::screen_update_runaway(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	runaway_state *state = screen.machine().driver_data<runaway_state>();
 	int i;
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	for (i = 0; i < 16; i++)
 	{
-		unsigned code = state->m_sprite_ram[i] & 0x3f;
+		unsigned code = m_sprite_ram[i] & 0x3f;
 
-		int x = state->m_sprite_ram[i + 0x20];
-		int y = state->m_sprite_ram[i + 0x10];
+		int x = m_sprite_ram[i + 0x20];
+		int y = m_sprite_ram[i + 0x10];
 
-		int flipx = state->m_sprite_ram[i] & 0x40;
-		int flipy = state->m_sprite_ram[i] & 0x80;
+		int flipx = m_sprite_ram[i] & 0x40;
+		int flipy = m_sprite_ram[i] & 0x80;
 
-		code |= (state->m_sprite_ram[i + 0x30] << 2) & 0x1c0;
+		code |= (m_sprite_ram[i + 0x30] << 2) & 0x1c0;
 
 		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
 			code,
@@ -118,24 +117,23 @@ SCREEN_UPDATE_IND16( runaway )
 }
 
 
-SCREEN_UPDATE_IND16( qwak )
+UINT32 runaway_state::screen_update_qwak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	runaway_state *state = screen.machine().driver_data<runaway_state>();
 	int i;
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	for (i = 0; i < 16; i++)
 	{
-		unsigned code = state->m_sprite_ram[i] & 0x7f;
+		unsigned code = m_sprite_ram[i] & 0x7f;
 
-		int x = state->m_sprite_ram[i + 0x20];
-		int y = state->m_sprite_ram[i + 0x10];
+		int x = m_sprite_ram[i + 0x20];
+		int y = m_sprite_ram[i + 0x10];
 
 		int flipx = 0;
-		int flipy = state->m_sprite_ram[i] & 0x80;
+		int flipy = m_sprite_ram[i] & 0x80;
 
-		code |= (state->m_sprite_ram[i + 0x30] << 2) & 0x1c0;
+		code |= (m_sprite_ram[i + 0x30] << 2) & 0x1c0;
 
 		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
 			code,

@@ -64,6 +64,7 @@ public:
 	DECLARE_MACHINE_START(atarisy1);
 	DECLARE_MACHINE_RESET(atarisy1);
 	DECLARE_VIDEO_START(atarisy1);
+	UINT32 screen_update_atarisy1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -82,4 +83,4 @@ DECLARE_WRITE16_HANDLER( atarisy1_yscroll_w );
 DECLARE_WRITE16_HANDLER( atarisy1_priority_w );
 
 
-SCREEN_UPDATE_IND16( atarisy1 );
+

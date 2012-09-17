@@ -107,59 +107,58 @@ void fitfight_state::video_start()
 	m_fof_txt_tilemap->set_transparent_pen(0);
 }
 
-SCREEN_UPDATE_IND16(fitfight)
+UINT32 fitfight_state::screen_update_fitfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	fitfight_state *state = screen.machine().driver_data<fitfight_state>();
 
 	/* scroll isn't right */
 
 	int vblank;
 	int scrollbak, scrollmid;
 
-	vblank = (state->m_fof_700000[0] & 0x8000);
+	vblank = (m_fof_700000[0] & 0x8000);
 
 	if (vblank > 0)
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	else {
 //      if (screen.machine().input().code_pressed(KEYCODE_Q))
-//          scrollbak = ((state->m_fof_a00000[0] & 0xff00) >> 5) - ((state->m_fof_700000[0] & 0x0038) >> 3);
+//          scrollbak = ((m_fof_a00000[0] & 0xff00) >> 5) - ((m_fof_700000[0] & 0x0038) >> 3);
 //      else if (screen.machine().input().code_pressed(KEYCODE_W))
-//          scrollbak = ((state->m_fof_a00000[0] & 0xff00) >> 5) + ((state->m_fof_700000[0] & 0x01c0) >> 6);
+//          scrollbak = ((m_fof_a00000[0] & 0xff00) >> 5) + ((m_fof_700000[0] & 0x01c0) >> 6);
 //      else if (screen.machine().input().code_pressed(KEYCODE_E))
-//          scrollbak = ((state->m_fof_a00000[0] & 0xff00) >> 5) - ((state->m_fof_700000[0] & 0x01c0) >> 6);
+//          scrollbak = ((m_fof_a00000[0] & 0xff00) >> 5) - ((m_fof_700000[0] & 0x01c0) >> 6);
 //      else if (screen.machine().input().code_pressed(KEYCODE_R))
-//          scrollbak = ((state->m_fof_a00000[0] & 0xff00) >> 5) + ((state->m_fof_700000[0] & 0x0038) >> 3);
+//          scrollbak = ((m_fof_a00000[0] & 0xff00) >> 5) + ((m_fof_700000[0] & 0x0038) >> 3);
 //      else
-		scrollbak = ((state->m_fof_a00000[0] & 0xffe0) >> 5);
-		state->m_fof_bak_tilemap->set_scrollx(0, scrollbak );
-		state->m_fof_bak_tilemap->set_scrolly(0, state->m_fof_a00000[0] & 0xff);
-		state->m_fof_bak_tilemap->draw(bitmap, cliprect, 0, 0);
+		scrollbak = ((m_fof_a00000[0] & 0xffe0) >> 5);
+		m_fof_bak_tilemap->set_scrollx(0, scrollbak );
+		m_fof_bak_tilemap->set_scrolly(0, m_fof_a00000[0] & 0xff);
+		m_fof_bak_tilemap->draw(bitmap, cliprect, 0, 0);
 
 		draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
 //      if (screen.machine().input().code_pressed(KEYCODE_A))
-//          scrollmid = ((state->m_fof_900000[0] & 0xff00) >> 5) - ((state->m_fof_700000[0] & 0x01c0) >> 6);
+//          scrollmid = ((m_fof_900000[0] & 0xff00) >> 5) - ((m_fof_700000[0] & 0x01c0) >> 6);
 //      else if (screen.machine().input().code_pressed(KEYCODE_S))
-//          scrollmid = ((state->m_fof_900000[0] & 0xff00) >> 5) + ((state->m_fof_700000[0] & 0x0038) >> 3);
+//          scrollmid = ((m_fof_900000[0] & 0xff00) >> 5) + ((m_fof_700000[0] & 0x0038) >> 3);
 //      else if (screen.machine().input().code_pressed(KEYCODE_D))
-//          scrollmid = ((state->m_fof_900000[0] & 0xff00) >> 5) - ((state->m_fof_700000[0] & 0x0038) >> 3);
+//          scrollmid = ((m_fof_900000[0] & 0xff00) >> 5) - ((m_fof_700000[0] & 0x0038) >> 3);
 //      else if (screen.machine().input().code_pressed(KEYCODE_F))
-//          scrollmid = ((state->m_fof_900000[0] & 0xff00) >> 5) + ((state->m_fof_700000[0] & 0x01c0) >> 6);
+//          scrollmid = ((m_fof_900000[0] & 0xff00) >> 5) + ((m_fof_700000[0] & 0x01c0) >> 6);
 //      else
-		scrollmid = ((state->m_fof_900000[0] & 0xffe0) >> 5);
-		state->m_fof_mid_tilemap->set_scrollx(0, scrollmid );
-		state->m_fof_mid_tilemap->set_scrolly(0, state->m_fof_900000[0] & 0xff);
+		scrollmid = ((m_fof_900000[0] & 0xffe0) >> 5);
+		m_fof_mid_tilemap->set_scrollx(0, scrollmid );
+		m_fof_mid_tilemap->set_scrolly(0, m_fof_900000[0] & 0xff);
 //      if (!screen.machine().input().code_pressed(KEYCODE_F))
-		state->m_fof_mid_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fof_mid_tilemap->draw(bitmap, cliprect, 0, 0);
 
 		draw_sprites(screen.machine(), bitmap, cliprect, 1);
 
-		state->m_fof_txt_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fof_txt_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 /*  popmessage ("Regs %04x %04x %04x %04x %04x %04x",
-            state->m_fof_100000[0], state->m_fof_600000[0], state->m_fof_700000[0],
-            state->m_fof_800000[0], state->m_fof_900000[0],
-            state->m_fof_a00000[0] );
+            m_fof_100000[0], m_fof_600000[0], m_fof_700000[0],
+            m_fof_800000[0], m_fof_900000[0],
+            m_fof_a00000[0] );
 */
 	return 0;
 }

@@ -46,6 +46,7 @@ public:
 	DECLARE_DRIVER_INIT(sys2900);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_sys2900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -90,7 +91,7 @@ void sys2900_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( sys2900 )
+UINT32 sys2900_state::screen_update_sys2900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -108,7 +109,7 @@ static MACHINE_CONFIG_START( sys2900, sys2900_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_STATIC(sys2900)
+	MCFG_SCREEN_UPDATE_DRIVER(sys2900_state, screen_update_sys2900)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

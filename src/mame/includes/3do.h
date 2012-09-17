@@ -187,6 +187,7 @@ public:
 	DECLARE_WRITE32_MEMBER(_3do_clio_w);
 	virtual void machine_reset();
 	DECLARE_VIDEO_START(_3do);
+	UINT32 screen_update__3do(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in machine/3do.c -----------*/
@@ -201,6 +202,6 @@ void _3do_clio_init( running_machine &machine, screen_device *screen );
 
 
 
-SCREEN_UPDATE_RGB32( _3do );
+
 
 #endif /* _3DO_H_ */

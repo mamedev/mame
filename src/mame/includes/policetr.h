@@ -46,6 +46,7 @@ public:
 	DECLARE_DRIVER_INIT(sshooter);
 	DECLARE_DRIVER_INIT(plctr13b);
 	virtual void video_start();
+	UINT32 screen_update_policetr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -54,4 +55,4 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( policetr );
+

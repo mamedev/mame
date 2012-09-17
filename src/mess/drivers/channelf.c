@@ -270,7 +270,7 @@ static MACHINE_CONFIG_START( channelf, channelf_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(128, 64)
 	MCFG_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
-	MCFG_SCREEN_UPDATE_STATIC( channelf )
+	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
 
 	MCFG_PALETTE_LENGTH(8)
 
@@ -296,7 +296,7 @@ static MACHINE_CONFIG_START( sabavdpl, channelf_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(PAL_VBLANK_TIME)) /* approximate */
 	MCFG_SCREEN_SIZE(128, 64)
 	MCFG_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
-	MCFG_SCREEN_UPDATE_STATIC( channelf )
+	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
 
 	MCFG_PALETTE_LENGTH(8)
 
@@ -323,7 +323,7 @@ static MACHINE_CONFIG_START( channlf2, channelf_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(128, 64)
 	MCFG_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
-	MCFG_SCREEN_UPDATE_STATIC( channelf )
+	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
 
 	MCFG_PALETTE_LENGTH(8)
 
@@ -350,7 +350,7 @@ static MACHINE_CONFIG_START( sabavpl2, channelf_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(PAL_VBLANK_TIME)) /* not accurate */
 	MCFG_SCREEN_SIZE(128, 64)
 	MCFG_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
-	MCFG_SCREEN_UPDATE_STATIC( channelf )
+	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
 
 	MCFG_PALETTE_LENGTH(8)
 

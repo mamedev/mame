@@ -144,12 +144,11 @@ static void sauro_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 	}
 }
 
-SCREEN_UPDATE_IND16( sauro )
+UINT32 sauro_state::screen_update_sauro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sauro_state *state = screen.machine().driver_data<sauro_state>();
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	sauro_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
@@ -219,10 +218,9 @@ static void trckydoc_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	}
 }
 
-SCREEN_UPDATE_IND16( trckydoc )
+UINT32 sauro_state::screen_update_trckydoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sauro_state *state = screen.machine().driver_data<sauro_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	trckydoc_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

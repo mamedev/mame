@@ -55,13 +55,12 @@ void dai_state::video_start()
 {
 }
 
-SCREEN_UPDATE_IND16( dai )
+UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dai_state *state = screen.machine().driver_data<dai_state>();
 	address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i, j, k, l;
 
-	UINT8* char_rom = state->memregion("gfx1")->base();
+	UINT8* char_rom = memregion("gfx1")->base();
 
 	UINT16 dai_video_memory_start = 0xbfff;
 	UINT16 dai_scan_lines = 604;	/* scan lines of PAL tv */
@@ -110,7 +109,7 @@ SCREEN_UPDATE_IND16( dai )
 		unit_mode = (colour & 0x40) >> 6;
 
 		if (colour & 0x80)
-			state->m_4_colours_palette[(colour & 0x30) >> 4] = colour & 0x0f;
+			m_4_colours_palette[(colour & 0x30) >> 4] = colour & 0x0f;
 
 		switch (display_mode)
 		{
@@ -132,7 +131,7 @@ SCREEN_UPDATE_IND16( dai )
 						{
 							for (k=0; k<8; k++)
 							{
-								current_colour = state->m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
+								current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
 								for (l=0; l<12; l++)
 									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*12+l) = current_colour;
 							}
@@ -149,7 +148,7 @@ SCREEN_UPDATE_IND16( dai )
 						{
 							for (k=0; k<8; k++)
 							{
-								current_colour = state->m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
+								current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
 								for (l=0; l<12; l++)
 									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*12+l) = current_colour;
 							}
@@ -171,7 +170,7 @@ SCREEN_UPDATE_IND16( dai )
 						{
 							for (k=0; k<8; k++)
 							{
-								current_colour = state->m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
+								current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
 								for (l=0; l<6; l++)
 									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*6+l) = current_colour;
 							}
@@ -188,7 +187,7 @@ SCREEN_UPDATE_IND16( dai )
 						{
 							for (k=0; k<8; k++)
 							{
-								current_colour = state->m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
+								current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
 								for (l=0; l<6; l++)
 									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*6+l) = current_colour;
 							}
@@ -210,7 +209,7 @@ SCREEN_UPDATE_IND16( dai )
 						{
 							for (k=0; k<8; k++)
 							{
-								current_colour = state->m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
+								current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
 								for (l=0; l<3; l++)
 									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*3+l) = current_colour;
 							}
@@ -226,7 +225,7 @@ SCREEN_UPDATE_IND16( dai )
 						{
 							for (k=0; k<8; k++)
 							{
-								current_colour = state->m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
+								current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
 								for (l=0; l<3; l++)
 									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*3+l) = current_colour;
 							}
@@ -248,7 +247,7 @@ SCREEN_UPDATE_IND16( dai )
 						{
 							for (k=0; k<8; k++)
 							{
-								current_colour = state->m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
+								current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
 								for (l=0; l<2; l++)
 									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*2+l) = current_colour;
 							}
@@ -264,7 +263,7 @@ SCREEN_UPDATE_IND16( dai )
 						{
 							for (k=0; k<8; k++)
 							{
-								current_colour = state->m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
+								current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
 								for (l=0; l<2; l++)
 									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*2+l) = current_colour;
 							}
@@ -293,7 +292,7 @@ SCREEN_UPDATE_IND16( dai )
 						{
 							for (k=0; k<8; k++)
 							{
-								current_colour = state->m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
+								current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
 								for (l=0; l<12; l++)
 									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*12+l) = current_colour;
 							}
@@ -311,7 +310,7 @@ SCREEN_UPDATE_IND16( dai )
 						{
 							for (k=0; k<8; k++)
 							{
-								current_colour = state->m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
+								current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
 								for (l=0; l<12; l++)
 									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*12+l) = current_colour;
 							}
@@ -334,7 +333,7 @@ SCREEN_UPDATE_IND16( dai )
 						{
 							for (k=0; k<8; k++)
 							{
-								current_colour = state->m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
+								current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
 								for (l=0; l<6; l++)
 									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*6+l) = current_colour;
 							}
@@ -352,7 +351,7 @@ SCREEN_UPDATE_IND16( dai )
 						{
 							for (k=0; k<8; k++)
 							{
-								current_colour = state->m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
+								current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
 								for (l=0; l<6; l++)
 									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*6+l) = current_colour;
 							}
@@ -375,7 +374,7 @@ SCREEN_UPDATE_IND16( dai )
 						{
 							for (k=0; k<8; k++)
 							{
-								current_colour = state->m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
+								current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
 								for (l=0; l<3; l++)
 									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*3+l) = current_colour;
 							}
@@ -392,7 +391,7 @@ SCREEN_UPDATE_IND16( dai )
 						{
 							for (k=0; k<8; k++)
 							{
-								current_colour = state->m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
+								current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
 								for (l=0; l<3; l++)
 									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*3+l) = current_colour;
 							}
@@ -414,7 +413,7 @@ SCREEN_UPDATE_IND16( dai )
 						{
 							for (k=0; k<8; k++)
 							{
-								current_colour = state->m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
+								current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
 								for (l=0; l<2; l++)
 									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*2+l) = current_colour;
 							}
@@ -431,7 +430,7 @@ SCREEN_UPDATE_IND16( dai )
 						{
 							for (k=0; k<8; k++)
 							{
-								current_colour = state->m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
+								current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
 								for (l=0; l<2; l++)
 									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*2+l) = current_colour;
 							}

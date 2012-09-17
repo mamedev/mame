@@ -217,19 +217,17 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( suna16 )
+UINT32 suna16_state::screen_update_suna16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	suna16_state *state = screen.machine().driver_data<suna16_state>();
 
 	/* Suna Quiz indicates the background is the last pen */
 	bitmap.fill(0xff, cliprect);
-	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram, 0);
+	draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram, 0);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( bestbest )
+UINT32 suna16_state::screen_update_bestbest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	suna16_state *state = screen.machine().driver_data<suna16_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
@@ -243,7 +241,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 	/* Suna Quiz indicates the background is the last pen */
 	bitmap.fill(0xff, cliprect);
-	if (layers_ctrl & 1)	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram,  0);
-	if (layers_ctrl & 2)	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram2, 1);
+	if (layers_ctrl & 1)	draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram,  0);
+	if (layers_ctrl & 2)	draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram2, 1);
 	return 0;
 }

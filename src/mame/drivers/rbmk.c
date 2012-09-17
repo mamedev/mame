@@ -78,6 +78,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_io_mux_w);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	virtual void video_start();
+	UINT32 screen_update_rbmk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -497,9 +498,8 @@ void rbmk_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16(rbmk)
+UINT32 rbmk_state::screen_update_rbmk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	rbmk_state *state = screen.machine().driver_data<rbmk_state>();
 	int x,y;
 	int count = 0;
 
@@ -507,8 +507,8 @@ static SCREEN_UPDATE_IND16(rbmk)
 	{
 		for (x=0;x<64;x++)
 		{
-			int tile = state->m_gms_vidram2[count+0x600];
-			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],(tile&0xfff)+((state->m_tilebank&0x10)>>4)*0x1000,tile>>12,0,0,x*8,y*32);
+			int tile = m_gms_vidram2[count+0x600];
+			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],(tile&0xfff)+((m_tilebank&0x10)>>4)*0x1000,tile>>12,0,0,x*8,y*32);
 			count++;
 		}
 	}
@@ -519,8 +519,8 @@ static SCREEN_UPDATE_IND16(rbmk)
 	{
 		for (x=0;x<64;x++)
 		{
-			int tile = state->m_gms_vidram[count];
-			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],(tile&0xfff)+((state->m_tilebank>>1)&3)*0x1000,tile>>12,0,0,x*8,y*8,0);
+			int tile = m_gms_vidram[count];
+			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],(tile&0xfff)+((m_tilebank>>1)&3)*0x1000,tile>>12,0,0,x*8,y*8,0);
 			count++;
 		}
 	}
@@ -550,7 +550,7 @@ static MACHINE_CONFIG_START( rbmk, rbmk_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(rbmk)
+	MCFG_SCREEN_UPDATE_DRIVER(rbmk_state, screen_update_rbmk)
 
 	MCFG_PALETTE_LENGTH(0x800)
 

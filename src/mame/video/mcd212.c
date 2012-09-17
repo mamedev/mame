@@ -1660,16 +1660,14 @@ void cdi_state::video_start()
     screen->register_screen_bitmap(m_lcdbitmap);
 }
 
-SCREEN_UPDATE_RGB32( cdimono1 )
+UINT32 cdi_state::screen_update_cdimono1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-    cdi_state *state = screen.machine().driver_data<cdi_state>();
-    copybitmap(bitmap, state->m_mcd212_regs.m_bitmap, 0, 0, 0, 0, cliprect);
+    copybitmap(bitmap, m_mcd212_regs.m_bitmap, 0, 0, 0, 0, cliprect);
     return 0;
 }
 
-SCREEN_UPDATE_RGB32( cdimono1_lcd )
+UINT32 cdi_state::screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-    cdi_state *state = screen.machine().driver_data<cdi_state>();
-    copybitmap(bitmap, state->m_lcdbitmap, 0, 0, 0, 0, cliprect);
+    copybitmap(bitmap, m_lcdbitmap, 0, 0, 0, 0, cliprect);
     return 0;
 }

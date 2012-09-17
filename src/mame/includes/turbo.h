@@ -128,6 +128,9 @@ public:
 	DECLARE_MACHINE_RESET(buckrog);
 	DECLARE_VIDEO_START(buckrog);
 	DECLARE_PALETTE_INIT(buckrog);
+	UINT32 screen_update_turbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_subroc3d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_buckrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -153,12 +156,12 @@ DECLARE_WRITE8_DEVICE_HANDLER( buckrog_sound_b_w );
 
 
 
-SCREEN_UPDATE_IND16( turbo );
-
-
-SCREEN_UPDATE_IND16( subroc3d );
 
 
 
-SCREEN_UPDATE_IND16( buckrog );
+
+
+
+
+
 

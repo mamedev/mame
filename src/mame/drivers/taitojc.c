@@ -1263,7 +1263,7 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(512, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 399)
-	MCFG_SCREEN_UPDATE_STATIC(taitojc)
+	MCFG_SCREEN_UPDATE_DRIVER(taitojc_state, screen_update_taitojc)
 
 	MCFG_PALETTE_LENGTH(32768)
 
@@ -1279,7 +1279,7 @@ static MACHINE_CONFIG_DERIVED( dendego, taitojc )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(dendego)
+	MCFG_SCREEN_UPDATE_DRIVER(taitojc_state, screen_update_dendego)
 
 	/* sound hardware */
 	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)

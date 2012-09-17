@@ -419,7 +419,7 @@ static MACHINE_CONFIG_START( nvram, seicross_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */	/* frames per second, vblank duration */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(seicross)
+	MCFG_SCREEN_UPDATE_DRIVER(seicross_state, screen_update_seicross)
 
 	MCFG_GFXDECODE(seicross)
 	MCFG_PALETTE_LENGTH(64)

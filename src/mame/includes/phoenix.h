@@ -35,6 +35,7 @@ public:
 	DECLARE_PALETTE_INIT(phoenix);
 	DECLARE_PALETTE_INIT(survival);
 	DECLARE_PALETTE_INIT(pleiads);
+	UINT32 screen_update_phoenix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -89,7 +90,7 @@ extern const device_type PHOENIX;
 
 
 
-SCREEN_UPDATE_IND16( phoenix );
+
 
 
 DECLARE_READ8_DEVICE_HANDLER( survival_protection_r );

@@ -278,13 +278,12 @@ void metalmx_state::video_start()
 
 }
 
-static SCREEN_UPDATE_IND16( metalmx )
+UINT32 metalmx_state::screen_update_metalmx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* TODO: TMS34020 should take care of this */
-	metalmx_state *state = screen.machine().driver_data<metalmx_state>();
 
 //  UINT32 *src_base = &gsp_vram[(vreg_base[0x40/4] & 0x40) ? 0x20000 : 0];
-	UINT16 *src_base = state->m_gsp_vram;
+	UINT16 *src_base = m_gsp_vram;
 	int y;
 
 	for (y = 0; y < 384; ++y)
@@ -756,7 +755,7 @@ static MACHINE_CONFIG_START( metalmx, metalmx_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_STATIC(metalmx)
+	MCFG_SCREEN_UPDATE_DRIVER(metalmx_state, screen_update_metalmx)
 
 	MCFG_PALETTE_LENGTH(65536)
 	MCFG_PALETTE_INIT(RRRRR_GGGGGG_BBBBB)

@@ -99,6 +99,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void palette_init();
+	UINT32 screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -265,20 +266,19 @@ static DEVICE_IMAGE_LOAD( pv1000_cart )
 }
 
 
-static SCREEN_UPDATE_IND16( pv1000 )
+UINT32 pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pv1000_state *state = screen.machine().driver_data<pv1000_state>();
 	int x, y;
 
 	for ( y = 0; y < 24; y++ )
 	{
 		for ( x = 0; x < 32; x++ )
 		{
-			UINT16 tile = state->m_p_videoram[ y * 32 + x ];
+			UINT16 tile = m_p_videoram[ y * 32 + x ];
 
 			if ( tile < 0xe0 )
 			{
-				tile += ( state->m_io_regs[7] * 8 );
+				tile += ( m_io_regs[7] * 8 );
 				drawgfx_opaque( bitmap, cliprect, screen.machine().gfx[0], tile, 0, 0, 0, x*8, y*8 );
 			}
 			else
@@ -418,7 +418,7 @@ static MACHINE_CONFIG_START( pv1000, pv1000_state )
 	/* D65010G031 - Video & sound chip */
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_RAW_PARAMS( 17897725/3, 380, 0, 256, 262, 0, 192 )
-	MCFG_SCREEN_UPDATE_STATIC( pv1000 )
+	MCFG_SCREEN_UPDATE_DRIVER(pv1000_state, screen_update_pv1000)
 
 	MCFG_PALETTE_LENGTH( 8 )
 	MCFG_GFXDECODE( pv1000 )

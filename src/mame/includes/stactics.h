@@ -59,6 +59,7 @@ public:
 	virtual void machine_start();
 	DECLARE_VIDEO_START(stactics);
 	DECLARE_PALETTE_INIT(stactics);
+	UINT32 screen_update_stactics(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 

@@ -936,39 +936,38 @@ VIDEO_START_MEMBER(raiden2_state,raiden2)
 
 /* SCREEN_UPDATE_IND16 (move to video file) */
 
-static SCREEN_UPDATE_IND16( raiden2 )
+UINT32 raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	raiden2_state *state = screen.machine().driver_data<raiden2_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	//if (!screen.machine().input().code_pressed(KEYCODE_Q))
 	{
-		if (!(state->raiden2_tilemap_enable & 1))
-			state->background_layer->draw(bitmap, cliprect, 0, 0);
+		if (!(raiden2_tilemap_enable & 1))
+			background_layer->draw(bitmap, cliprect, 0, 0);
 	}
 
 	//if (!screen.machine().input().code_pressed(KEYCODE_W))
 	{
-		if (!(state->raiden2_tilemap_enable & 2))
-			state->midground_layer->draw(bitmap, cliprect, 0, 0);
+		if (!(raiden2_tilemap_enable & 2))
+			midground_layer->draw(bitmap, cliprect, 0, 0);
 	}
 
 	//if (!screen.machine().input().code_pressed(KEYCODE_E))
 	{
-		if (!(state->raiden2_tilemap_enable & 4))
-			state->foreground_layer->draw(bitmap, cliprect, 0, 0);
+		if (!(raiden2_tilemap_enable & 4))
+			foreground_layer->draw(bitmap, cliprect, 0, 0);
 	}
 
 	//if (!screen.machine().input().code_pressed(KEYCODE_S))
 	{
 		//if (!(raiden2_tilemap_enable & 0x10))
-			state->draw_sprites(screen.machine(), bitmap, cliprect, 0);
+			draw_sprites(screen.machine(), bitmap, cliprect, 0);
 	}
 
 	//if (!screen.machine().input().code_pressed(KEYCODE_A))
 	{
-		if (!(state->raiden2_tilemap_enable & 8))
-			state->text_layer->draw(bitmap, cliprect, 0, 0);
+		if (!(raiden2_tilemap_enable & 8))
+			text_layer->draw(bitmap, cliprect, 0, 0);
 	}
 
 	return 0;
@@ -1816,7 +1815,7 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate *//2)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(raiden2)
+	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 	MCFG_GFXDECODE(raiden2)
 	MCFG_PALETTE_LENGTH(2048)
 
@@ -1872,7 +1871,7 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate *//2)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(raiden2)
+	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 	MCFG_GFXDECODE(raiden2)
 	MCFG_PALETTE_LENGTH(2048)
 

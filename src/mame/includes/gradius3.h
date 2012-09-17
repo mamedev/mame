@@ -48,6 +48,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_gradius3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/gradius3.c -----------*/
@@ -57,4 +58,4 @@ extern void gradius3_tile_callback(running_machine &machine, int layer,int bank,
 
 
 
-SCREEN_UPDATE_IND16( gradius3 );
+

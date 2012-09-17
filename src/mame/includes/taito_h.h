@@ -27,10 +27,13 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_syvalion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_recordbr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_dleague(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/taito_h.c -----------*/
 
-SCREEN_UPDATE_IND16( syvalion );
-SCREEN_UPDATE_IND16( recordbr );
-SCREEN_UPDATE_IND16( dleague );
+
+
+

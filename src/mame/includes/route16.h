@@ -28,11 +28,14 @@ public:
 	DECLARE_WRITE8_MEMBER(stratvox_sn76477_w);
 	DECLARE_DRIVER_INIT(route16);
 	DECLARE_DRIVER_INIT(route16a);
+	UINT32 screen_update_route16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_stratvox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_ttmahjng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/route16.c -----------*/
 
-SCREEN_UPDATE_RGB32( route16 );
-SCREEN_UPDATE_RGB32( stratvox );
-SCREEN_UPDATE_RGB32( ttmahjng );
+
+
+

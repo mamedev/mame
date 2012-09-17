@@ -186,16 +186,15 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-SCREEN_UPDATE_IND16( tsamurai )
+UINT32 tsamurai_state::screen_update_tsamurai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tsamurai_state *state = screen.machine().driver_data<tsamurai_state>();
 	int i;
 
 /* Do the column scroll used for the "660" logo on the title screen */
-	state->m_foreground->set_scroll_cols(32);
+	m_foreground->set_scroll_cols(32);
 	for (i = 0 ; i < 32 ; i++)
 	{
-		state->m_foreground->set_scrolly(i, state->m_colorram[i*2]);
+		m_foreground->set_scrolly(i, m_colorram[i*2]);
 	}
 /* end of column scroll code */
 
@@ -207,10 +206,10 @@ SCREEN_UPDATE_IND16( tsamurai )
         Note that the background color register isn't well understood
         (screenshots would be helpful)
     */
-	bitmap.fill(state->m_bgcolor, cliprect);
-	state->m_background->draw(bitmap, cliprect, 0,0);
+	bitmap.fill(m_bgcolor, cliprect);
+	m_background->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect);
-	state->m_foreground->draw(bitmap, cliprect, 0,0);
+	m_foreground->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -248,20 +247,19 @@ VIDEO_START_MEMBER(tsamurai_state,vsgongf)
 	m_foreground = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tsamurai_state::get_vsgongf_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 }
 
-SCREEN_UPDATE_IND16( vsgongf )
+UINT32 tsamurai_state::screen_update_vsgongf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tsamurai_state *state = screen.machine().driver_data<tsamurai_state>();
 	#ifdef MAME_DEBUG
 	if( screen.machine().input().code_pressed( KEYCODE_Q ) ){
 		while( screen.machine().input().code_pressed( KEYCODE_Q ) ){
-			state->m_key_count++;
-			state->m_vsgongf_color = state->m_key_count;
-			state->m_foreground ->mark_all_dirty();
+			m_key_count++;
+			m_vsgongf_color = m_key_count;
+			m_foreground ->mark_all_dirty();
 		}
 	}
 	#endif
 
-	state->m_foreground->draw(bitmap, cliprect, 0,0);
+	m_foreground->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect);
 	return 0;
 }

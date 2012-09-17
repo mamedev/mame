@@ -19,15 +19,14 @@
 
 /******************************************************************************/
 
-SCREEN_UPDATE_IND16( stadhero )
+UINT32 stadhero_state::screen_update_stadhero(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	stadhero_state *state = screen.machine().driver_data<stadhero_state>();
-//  screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+//  screen.machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	screen.machine().device<deco_bac06_device>("tilegen1")->set_bppmultmask(0x8, 0x7);
 	screen.machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	screen.machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram, 0x00, 0x00, 0x0f);
-	state->m_pf1_tilemap->draw(bitmap, cliprect, 0,0);
+	screen.machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram, 0x00, 0x00, 0x0f);
+	m_pf1_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 

@@ -1468,7 +1468,7 @@ static MACHINE_CONFIG_START( btime, btime_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(HCLK, 384, 8, 248, 272, 8, 248)
-	MCFG_SCREEN_UPDATE_STATIC(btime)
+	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_btime)
 
 	MCFG_MACHINE_START_OVERRIDE(btime_state,btime)
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,btime)
@@ -1514,7 +1514,7 @@ static MACHINE_CONFIG_DERIVED( cookrace, btime )
 	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(cookrace)
+	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_cookrace)
 MACHINE_CONFIG_END
 
 
@@ -1532,7 +1532,7 @@ static MACHINE_CONFIG_DERIVED( lnc, btime )
 
 	MCFG_PALETTE_INIT_OVERRIDE(btime_state,lnc)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(lnc)
+	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_lnc)
 MACHINE_CONFIG_END
 
 
@@ -1542,7 +1542,7 @@ static MACHINE_CONFIG_DERIVED( wtennis, lnc )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(eggs)
+	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_eggs)
 MACHINE_CONFIG_END
 
 
@@ -1569,7 +1569,7 @@ static MACHINE_CONFIG_DERIVED( sdtennis, btime )
 
 	MCFG_VIDEO_START_OVERRIDE(btime_state,bnj)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(bnj)
+	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_bnj)
 MACHINE_CONFIG_END
 
 
@@ -1597,7 +1597,7 @@ static MACHINE_CONFIG_DERIVED( zoar, btime )
 	MCFG_PALETTE_LENGTH(64)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(zoar)
+	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_zoar)
 
 	MCFG_SOUND_REPLACE("ay1", AY8910, HCLK1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
@@ -1623,7 +1623,7 @@ static MACHINE_CONFIG_DERIVED( disco, btime )
 	MCFG_PALETTE_LENGTH(32)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(disco)
+	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_disco)
 MACHINE_CONFIG_END
 
 

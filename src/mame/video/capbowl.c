@@ -161,7 +161,7 @@ INLINE rgb_t pen_for_pixel( UINT8 *src, UINT8 pix )
 }
 
 
-SCREEN_UPDATE_RGB32( capbowl )
+UINT32 capbowl_state::screen_update_capbowl(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	struct tms34061_display state;
 	int x, y;

@@ -394,6 +394,7 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 	virtual void video_start();
+	UINT32 screen_update_hikaru(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 void hikaru_state::video_start()
@@ -401,7 +402,7 @@ void hikaru_state::video_start()
 
 }
 
-static SCREEN_UPDATE_RGB32(hikaru)
+UINT32 hikaru_state::screen_update_hikaru(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -500,7 +501,7 @@ static MACHINE_CONFIG_START( hikaru, hikaru_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_STATIC(hikaru)
+	MCFG_SCREEN_UPDATE_DRIVER(hikaru_state, screen_update_hikaru)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 

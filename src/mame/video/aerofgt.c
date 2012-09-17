@@ -811,57 +811,54 @@ static void wbbc97_draw_bitmap( running_machine &machine, bitmap_rgb32 &bitmap )
 }
 
 
-SCREEN_UPDATE_IND16( pspikes )
+UINT32 aerofgt_state::screen_update_pspikes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	aerofgt_state *state = screen.machine().driver_data<aerofgt_state>();
 	int i, scrolly;
 
-	state->m_bg1_tilemap->set_scroll_rows(256);
-	scrolly = state->m_bg1scrolly;
+	m_bg1_tilemap->set_scroll_rows(256);
+	scrolly = m_bg1scrolly;
 	for (i = 0; i < 256; i++)
-		state->m_bg1_tilemap->set_scrollx((i + scrolly) & 0xff, state->m_rasterram[i]);
-	state->m_bg1_tilemap->set_scrolly(0, scrolly);
+		m_bg1_tilemap->set_scrollx((i + scrolly) & 0xff, m_rasterram[i]);
+	m_bg1_tilemap->set_scrolly(0, scrolly);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
 	turbofrc_draw_sprites(screen.machine(), bitmap, cliprect, 0, -1);
 	turbofrc_draw_sprites(screen.machine(), bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( pspikesb )
+UINT32 aerofgt_state::screen_update_pspikesb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	aerofgt_state *state = screen.machine().driver_data<aerofgt_state>();
 	int i, scrolly;
 
-	state->m_bg1_tilemap->set_scroll_rows(256);
-	scrolly = state->m_bg1scrolly;
+	m_bg1_tilemap->set_scroll_rows(256);
+	scrolly = m_bg1scrolly;
 	for (i = 0; i < 256; i++)
-		state->m_bg1_tilemap->set_scrollx((i + scrolly) & 0xff, state->m_rasterram[i] + 22);
-	state->m_bg1_tilemap->set_scrolly(0, scrolly);
+		m_bg1_tilemap->set_scrollx((i + scrolly) & 0xff, m_rasterram[i] + 22);
+	m_bg1_tilemap->set_scrolly(0, scrolly);
 
-	state->m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
 	pspikesb_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( spikes91 )
+UINT32 aerofgt_state::screen_update_spikes91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	aerofgt_state *state = screen.machine().driver_data<aerofgt_state>();
 	int i, scrolly;
 	int y, x;
 	int count;
 	gfx_element *gfx = screen.machine().gfx[0];
 
-	state->m_bg1_tilemap->set_scroll_rows(256);
-	scrolly = state->m_bg1scrolly;
+	m_bg1_tilemap->set_scroll_rows(256);
+	scrolly = m_bg1scrolly;
 
 	for (i = 0; i < 256; i++)
-		state->m_bg1_tilemap->set_scrollx((i + scrolly) & 0xff, state->m_rasterram[i + 0x01f0 / 2] + 0x96 + 0x16);
-	state->m_bg1_tilemap->set_scrolly(0, scrolly);
+		m_bg1_tilemap->set_scrollx((i + scrolly) & 0xff, m_rasterram[i + 0x01f0 / 2] + 0x96 + 0x16);
+	m_bg1_tilemap->set_scrolly(0, scrolly);
 
-	state->m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
 	spikes91_draw_sprites(screen.machine(), bitmap, cliprect);
 
 	/* we could use a tilemap, but it's easier to just do it here */
@@ -870,8 +867,8 @@ SCREEN_UPDATE_IND16( spikes91 )
 	{
 		for (x = 0; x < 64; x++)
 		{
-			UINT16 tileno = state->m_tx_tilemap_ram[count] & 0x1fff;
-			UINT16 colour = state->m_tx_tilemap_ram[count] & 0xe000;
+			UINT16 tileno = m_tx_tilemap_ram[count] & 0x1fff;
+			UINT16 colour = m_tx_tilemap_ram[count] & 0xe000;
 			drawgfx_transpen(bitmap,cliprect,gfx,
 					tileno,
 					colour>>13,
@@ -887,18 +884,17 @@ SCREEN_UPDATE_IND16( spikes91 )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( karatblz )
+UINT32 aerofgt_state::screen_update_karatblz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	aerofgt_state *state = screen.machine().driver_data<aerofgt_state>();
-	state->m_bg1_tilemap->set_scrollx(0, state->m_bg1scrollx - 8);
-	state->m_bg1_tilemap->set_scrolly(0, state->m_bg1scrolly);
-	state->m_bg2_tilemap->set_scrollx(0, state->m_bg2scrollx - 4);
-	state->m_bg2_tilemap->set_scrolly(0, state->m_bg2scrolly);
+	m_bg1_tilemap->set_scrollx(0, m_bg1scrollx - 8);
+	m_bg1_tilemap->set_scrolly(0, m_bg1scrolly);
+	m_bg2_tilemap->set_scrollx(0, m_bg2scrollx - 4);
+	m_bg2_tilemap->set_scrolly(0, m_bg2scrolly);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* we use the priority buffer so sprites are drawn front to back */
 	turbofrc_draw_sprites(screen.machine(), bitmap, cliprect, 1, -1);
@@ -908,23 +904,22 @@ SCREEN_UPDATE_IND16( karatblz )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( spinlbrk )
+UINT32 aerofgt_state::screen_update_spinlbrk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	aerofgt_state *state = screen.machine().driver_data<aerofgt_state>();
 	int i, scrolly;
 
-	state->m_bg1_tilemap->set_scroll_rows(512);
+	m_bg1_tilemap->set_scroll_rows(512);
 	scrolly = 0;
 	for (i = 0; i < 256; i++)
-		state->m_bg1_tilemap->set_scrollx((i + scrolly) & 0x1ff, state->m_rasterram[i] - 8);
-//  state->m_bg1_tilemap->set_scrolly(0, state->m_bg1scrolly);
-	state->m_bg2_tilemap->set_scrollx(0, state->m_bg2scrollx - 4);
-//  state->m_bg2_tilemap->set_scrolly(0, state->m_bg2scrolly);
+		m_bg1_tilemap->set_scrollx((i + scrolly) & 0x1ff, m_rasterram[i] - 8);
+//  m_bg1_tilemap->set_scrolly(0, m_bg1scrolly);
+	m_bg2_tilemap->set_scrollx(0, m_bg2scrollx - 4);
+//  m_bg2_tilemap->set_scrolly(0, m_bg2scrolly);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_bg2_tilemap->draw(bitmap, cliprect, 0, 1);
+	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg2_tilemap->draw(bitmap, cliprect, 0, 1);
 
 	/* we use the priority buffer so sprites are drawn front to back */
 	spinlbrk_draw_sprites(screen.machine(), bitmap, cliprect, 0, 0);
@@ -934,24 +929,23 @@ SCREEN_UPDATE_IND16( spinlbrk )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( turbofrc )
+UINT32 aerofgt_state::screen_update_turbofrc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	aerofgt_state *state = screen.machine().driver_data<aerofgt_state>();
 	int i, scrolly;
 
-	state->m_bg1_tilemap->set_scroll_rows(512);
-	scrolly = state->m_bg1scrolly + 2;
+	m_bg1_tilemap->set_scroll_rows(512);
+	scrolly = m_bg1scrolly + 2;
 	for (i = 0; i < 256; i++)
-//      state->m_bg1_tilemap->set_scrollx((i + scrolly) & 0x1ff, state->m_rasterram[i] - 11);
-		state->m_bg1_tilemap->set_scrollx((i + scrolly) & 0x1ff, state->m_rasterram[7] - 11);
-	state->m_bg1_tilemap->set_scrolly(0, scrolly);
-	state->m_bg2_tilemap->set_scrollx(0, state->m_bg2scrollx - 7);
-	state->m_bg2_tilemap->set_scrolly(0, state->m_bg2scrolly + 2);
+//      m_bg1_tilemap->set_scrollx((i + scrolly) & 0x1ff, m_rasterram[i] - 11);
+		m_bg1_tilemap->set_scrollx((i + scrolly) & 0x1ff, m_rasterram[7] - 11);
+	m_bg1_tilemap->set_scrolly(0, scrolly);
+	m_bg2_tilemap->set_scrollx(0, m_bg2scrollx - 7);
+	m_bg2_tilemap->set_scrolly(0, m_bg2scrolly + 2);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_bg2_tilemap->draw(bitmap, cliprect, 0, 1);
+	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg2_tilemap->draw(bitmap, cliprect, 0, 1);
 
 	/* we use the priority buffer so sprites are drawn front to back */
 	turbofrc_draw_sprites(screen.machine(), bitmap, cliprect, 1, -1); //ship
@@ -961,22 +955,21 @@ SCREEN_UPDATE_IND16( turbofrc )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( aerofgt )
+UINT32 aerofgt_state::screen_update_aerofgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	aerofgt_state *state = screen.machine().driver_data<aerofgt_state>();
-	state->m_bg1_tilemap->set_scrollx(0, state->m_rasterram[0x0000] - 18);
-	state->m_bg1_tilemap->set_scrolly(0, state->m_bg1scrolly);
-	state->m_bg2_tilemap->set_scrollx(0, state->m_rasterram[0x0200] - 20);
-	state->m_bg2_tilemap->set_scrolly(0, state->m_bg2scrolly);
+	m_bg1_tilemap->set_scrollx(0, m_rasterram[0x0000] - 18);
+	m_bg1_tilemap->set_scrolly(0, m_bg1scrolly);
+	m_bg2_tilemap->set_scrollx(0, m_rasterram[0x0200] - 20);
+	m_bg2_tilemap->set_scrolly(0, m_bg2scrolly);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	aerofgt_draw_sprites(screen.machine(), bitmap, cliprect, 0);
 	aerofgt_draw_sprites(screen.machine(), bitmap, cliprect, 1);
 
-	state->m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	aerofgt_draw_sprites(screen.machine(), bitmap, cliprect, 2);
 	aerofgt_draw_sprites(screen.machine(), bitmap, cliprect, 3);
@@ -984,47 +977,45 @@ SCREEN_UPDATE_IND16( aerofgt )
 }
 
 
-SCREEN_UPDATE_IND16( aerfboot )
+UINT32 aerofgt_state::screen_update_aerfboot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	aerofgt_state *state = screen.machine().driver_data<aerofgt_state>();
 	int i, scrolly;
 
-	state->m_bg1_tilemap->set_scroll_rows(512);
-	scrolly = state->m_bg1scrolly + 2;
+	m_bg1_tilemap->set_scroll_rows(512);
+	scrolly = m_bg1scrolly + 2;
 	for (i = 0; i < 256; i++)
-		state->m_bg1_tilemap->set_scrollx((i + scrolly) & 0x1ff, state->m_rasterram[7] + 174);
-	state->m_bg1_tilemap->set_scrolly(0, scrolly);
-	state->m_bg2_tilemap->set_scrollx(0, state->m_bg2scrollx + 172);
-	state->m_bg2_tilemap->set_scrolly(0, state->m_bg2scrolly + 2);
+		m_bg1_tilemap->set_scrollx((i + scrolly) & 0x1ff, m_rasterram[7] + 174);
+	m_bg1_tilemap->set_scrolly(0, scrolly);
+	m_bg2_tilemap->set_scrollx(0, m_bg2scrollx + 172);
+	m_bg2_tilemap->set_scrolly(0, m_bg2scrolly + 2);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_bg2_tilemap->draw(bitmap, cliprect, 0, 1);
+	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg2_tilemap->draw(bitmap, cliprect, 0, 1);
 
 	/* we use the priority buffer so sprites are drawn front to back */
 	aerfboot_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( aerfboo2 )
+UINT32 aerofgt_state::screen_update_aerfboo2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	aerofgt_state *state = screen.machine().driver_data<aerofgt_state>();
 	int i, scrolly;
 
-	state->m_bg1_tilemap->set_scroll_rows(512);
-	scrolly = state->m_bg1scrolly + 2;
+	m_bg1_tilemap->set_scroll_rows(512);
+	scrolly = m_bg1scrolly + 2;
 	for (i = 0; i < 256; i++)
-//      state->m_bg1_tilemap->set_scrollx((i + scrolly) & 0x1ff, state->m_rasterram[i] - 11);
-		state->m_bg1_tilemap->set_scrollx((i + scrolly) & 0x1ff, state->m_rasterram[7] - 11);
-	state->m_bg1_tilemap->set_scrolly(0, scrolly);
-	state->m_bg2_tilemap->set_scrollx(0, state->m_bg2scrollx - 7);
-	state->m_bg2_tilemap->set_scrolly(0, state->m_bg2scrolly + 2);
+//      m_bg1_tilemap->set_scrollx((i + scrolly) & 0x1ff, m_rasterram[i] - 11);
+		m_bg1_tilemap->set_scrollx((i + scrolly) & 0x1ff, m_rasterram[7] - 11);
+	m_bg1_tilemap->set_scrolly(0, scrolly);
+	m_bg2_tilemap->set_scrollx(0, m_bg2scrollx - 7);
+	m_bg2_tilemap->set_scrolly(0, m_bg2scrolly + 2);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_bg2_tilemap->draw(bitmap, cliprect, 0, 1);
+	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg2_tilemap->draw(bitmap, cliprect, 0, 1);
 
 	/* we use the priority buffer so sprites are drawn front to back */
 	aerfboo2_draw_sprites(screen.machine(), bitmap, cliprect, 1, -1); //ship
@@ -1034,27 +1025,26 @@ SCREEN_UPDATE_IND16( aerfboo2 )
 	return 0;
 }
 
-SCREEN_UPDATE_RGB32( wbbc97 )
+UINT32 aerofgt_state::screen_update_wbbc97(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	aerofgt_state *state = screen.machine().driver_data<aerofgt_state>();
 	int i, scrolly;
 
-	state->m_bg1_tilemap->set_scroll_rows(256);
-	scrolly = state->m_bg1scrolly;
+	m_bg1_tilemap->set_scroll_rows(256);
+	scrolly = m_bg1scrolly;
 	for (i = 0; i < 256; i++)
-		state->m_bg1_tilemap->set_scrollx((i + scrolly) & 0xff, state->m_rasterram[i]);
-	state->m_bg1_tilemap->set_scrolly(0, scrolly);
+		m_bg1_tilemap->set_scrollx((i + scrolly) & 0xff, m_rasterram[i]);
+	m_bg1_tilemap->set_scrolly(0, scrolly);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	if (state->m_wbbc97_bitmap_enable)
+	if (m_wbbc97_bitmap_enable)
 	{
 		wbbc97_draw_bitmap(screen.machine(), bitmap);
-		state->m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 	{
-		state->m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	}
 
 	turbofrc_draw_sprites(screen.machine(), bitmap, cliprect, 0, -1);

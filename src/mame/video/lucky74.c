@@ -235,11 +235,10 @@ void lucky74_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-SCREEN_UPDATE_IND16( lucky74 )
+UINT32 lucky74_state::screen_update_lucky74(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	lucky74_state *state = screen.machine().driver_data<lucky74_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

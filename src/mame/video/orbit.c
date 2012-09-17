@@ -76,13 +76,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 }
 
 
-SCREEN_UPDATE_IND16( orbit )
+UINT32 orbit_state::screen_update_orbit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	orbit_state *state = screen.machine().driver_data<orbit_state>();
 
-	state->m_flip_screen = screen.machine().root_device().ioport("DSW2")->read() & 8;
+	m_flip_screen = screen.machine().root_device().ioport("DSW2")->read() & 8;
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;

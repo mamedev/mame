@@ -140,6 +140,8 @@ public:
 	DECLARE_MACHINE_RESET(leland);
 	DECLARE_VIDEO_START(leland);
 	DECLARE_VIDEO_START(ataxx);
+	UINT32 screen_update_leland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_ataxx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 

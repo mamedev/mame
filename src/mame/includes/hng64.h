@@ -186,6 +186,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_hng64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_eof_hng64(screen_device &screen, bool state);
 };
 
 
@@ -194,5 +196,5 @@ public:
 void hng64_command3d(running_machine& machine, const UINT16* packet);
 
 
-SCREEN_UPDATE_RGB32( hng64 );
-SCREEN_VBLANK( hng64 );
+
+

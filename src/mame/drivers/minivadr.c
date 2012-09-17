@@ -23,6 +23,7 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
+	UINT32 screen_update_minivadr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 /*************************************
@@ -31,18 +32,17 @@ public:
  *
  *************************************/
 
-static SCREEN_UPDATE_RGB32( minivadr )
+UINT32 minivadr_state::screen_update_minivadr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	minivadr_state *state = screen.machine().driver_data<minivadr_state>();
 	offs_t offs;
 
-	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
+	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{
 		int i;
 
 		UINT8 x = offs << 3;
 		int y = offs >> 5;
-		UINT8 data = state->m_videoram[offs];
+		UINT8 data = m_videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
@@ -91,7 +91,7 @@ static MACHINE_CONFIG_START( minivadr, minivadr_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_STATIC(minivadr)
+	MCFG_SCREEN_UPDATE_DRIVER(minivadr_state, screen_update_minivadr)
 
 	/* the board has no sound hardware */
 MACHINE_CONFIG_END

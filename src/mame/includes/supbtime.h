@@ -28,10 +28,11 @@ public:
 	DECLARE_READ16_MEMBER(supbtime_controls_r);
 	DECLARE_WRITE16_MEMBER(sound_w);
 	virtual void machine_start();
+	UINT32 screen_update_supbtime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 
 /*----------- defined in video/supbtime.c -----------*/
 
-SCREEN_UPDATE_IND16( supbtime );
+

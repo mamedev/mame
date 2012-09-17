@@ -207,6 +207,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void video_reset();
+	UINT32 screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -308,7 +309,7 @@ void matrimbl_decrypt(running_machine &machine);
 
 
 
-SCREEN_UPDATE_RGB32( neogeo );
+
 
 
 void neogeo_set_palette_bank(running_machine &machine, UINT8 data);

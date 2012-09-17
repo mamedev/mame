@@ -164,6 +164,7 @@ public:
 	DECLARE_WRITE8_MEMBER( ngp_vblank_pin_w );
 	DECLARE_WRITE8_MEMBER( ngp_hblank_pin_w );
 	DECLARE_WRITE8_MEMBER( ngp_tlcs900_to3 );
+	UINT32 screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -622,11 +623,10 @@ void ngp_state::machine_reset()
 }
 
 
-static SCREEN_UPDATE_IND16( ngp )
+UINT32 ngp_state::screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ngp_state *state = screen.machine().driver_data<ngp_state>();
 
-	k1ge_update( state->m_k1ge, bitmap, cliprect );
+	k1ge_update( m_k1ge, bitmap, cliprect );
 	return 0;
 }
 
@@ -777,7 +777,7 @@ static MACHINE_CONFIG_START( ngp_common, ngp_state )
 
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_RAW_PARAMS( XTAL_6_144MHz, 515, 0, 160 /*480*/, 199, 0, 152 )
-	MCFG_SCREEN_UPDATE_STATIC( ngp )
+	MCFG_SCREEN_UPDATE_DRIVER(ngp_state, screen_update_ngp)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 

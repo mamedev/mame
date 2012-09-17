@@ -104,6 +104,7 @@ public:
 	DECLARE_MACHINE_RESET(cvs);
 	DECLARE_VIDEO_START(cvs);
 	DECLARE_PALETTE_INIT(cvs);
+	UINT32 screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -121,5 +122,5 @@ void cvs_scroll_stars( running_machine &machine );
 void cvs_update_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const pen_t star_pen, bool update_always);
 
 
-SCREEN_UPDATE_IND16( cvs );
+
 

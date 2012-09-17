@@ -255,7 +255,7 @@ static MACHINE_CONFIG_START( hyhoo, hyhoo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_STATIC(hyhoo)
+	MCFG_SCREEN_UPDATE_DRIVER(hyhoo_state, screen_update_hyhoo)
 
 
 	/* sound hardware */

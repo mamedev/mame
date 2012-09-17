@@ -48,6 +48,7 @@ public:
 	required_shared_ptr<UINT8> m_video;
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_murogmbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -94,9 +95,8 @@ void murogmbl_state::video_start()
 
 }
 
-static SCREEN_UPDATE_IND16(murogmbl)
+UINT32 murogmbl_state::screen_update_murogmbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	murogmbl_state *state = screen.machine().driver_data<murogmbl_state>();
 	gfx_element *gfx = screen.machine().gfx[0];
 	int count = 0;
 
@@ -106,7 +106,7 @@ static SCREEN_UPDATE_IND16(murogmbl)
 	{
 		for (x = 0; x < 32; x++)
 		{
-			int tile = state->m_video[count];
+			int tile = m_video[count];
 			drawgfx_opaque(bitmap, cliprect, gfx, tile, 0, 0, 0, x * 8, y * 8);
 
 			count++;
@@ -194,7 +194,7 @@ static MACHINE_CONFIG_START( murogmbl, murogmbl_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(murogmbl)
+	MCFG_SCREEN_UPDATE_DRIVER(murogmbl_state, screen_update_murogmbl)
 
 	MCFG_PALETTE_LENGTH(0x100)
 

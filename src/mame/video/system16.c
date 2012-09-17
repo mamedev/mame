@@ -604,9 +604,8 @@ VIDEO_START_MEMBER(segas1x_bootleg_state,s16a_bootleg_passsht)
 }
 
 // Passing Shot (2 player), Shinobi (Datsu), Wonderboy 3
-SCREEN_UPDATE_IND16( s16a_bootleg )
+UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	segas1x_bootleg_state *state = screen.machine().driver_data<segas1x_bootleg_state>();
 
 	// passing shot
 	int offset_txtx = 192;
@@ -619,48 +618,48 @@ SCREEN_UPDATE_IND16( s16a_bootleg )
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	// start the sprites drawing
-	state->m_sprites->draw_async(cliprect);
+	m_sprites->draw_async(cliprect);
 
 	// I can't bring myself to care about dirty tile marking on something which runs at a bazillion % speed anyway, clean code is better
-	state->m_bg_tilemaps[0]->mark_all_dirty();
-	state->m_bg_tilemaps[1]->mark_all_dirty();
-	state->m_text_tilemap->mark_all_dirty();
+	m_bg_tilemaps[0]->mark_all_dirty();
+	m_bg_tilemaps[1]->mark_all_dirty();
+	m_text_tilemap->mark_all_dirty();
 
-	state->m_text_tilemap->set_scrollx(0, offset_txtx);
-	state->m_text_tilemap->set_scrolly(0, offset_txty);
+	m_text_tilemap->set_scrollx(0, offset_txtx);
+	m_text_tilemap->set_scrolly(0, offset_txty);
 
-	if ((state->m_tilemapselect & 0xff) == 0x12)
+	if ((m_tilemapselect & 0xff) == 0x12)
 	{
-		state->m_bg_tilemaps[1]->set_scrollx(0, state->m_bg_scrollx + offset_bg1x);
-		state->m_bg_tilemaps[1]->set_scrolly(0, state->m_bg_scrolly + offset_bg1y + state->m_back_yscroll);
-		state->m_bg_tilemaps[0]->set_scrollx(0, state->m_fg_scrollx + offset_bg0x);
-		state->m_bg_tilemaps[0]->set_scrolly(0, state->m_fg_scrolly + offset_bg0y + state->m_fore_yscroll);
+		m_bg_tilemaps[1]->set_scrollx(0, m_bg_scrollx + offset_bg1x);
+		m_bg_tilemaps[1]->set_scrolly(0, m_bg_scrolly + offset_bg1y + m_back_yscroll);
+		m_bg_tilemaps[0]->set_scrollx(0, m_fg_scrollx + offset_bg0x);
+		m_bg_tilemaps[0]->set_scrolly(0, m_fg_scrolly + offset_bg0y + m_fore_yscroll);
 
-		state->m_bg_tilemaps[0]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		state->m_bg_tilemaps[1]->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemaps[0]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_bg_tilemaps[1]->draw(bitmap, cliprect, 0, 0);
 
-		state->m_text_tilemap->set_scrolly(0, state->m_text_yscroll);
+		m_text_tilemap->set_scrolly(0, m_text_yscroll);
 
-		state->m_text_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_text_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
-	else if ((state->m_tilemapselect & 0xff) == 0x21)
+	else if ((m_tilemapselect & 0xff) == 0x21)
 	{
-		state->m_bg_tilemaps[0]->set_scrollx(0, state->m_bg_scrollx + 187 );
-		state->m_bg_tilemaps[0]->set_scrolly(0, state->m_bg_scrolly + state->m_back_yscroll );
-		state->m_bg_tilemaps[1]->set_scrollx(0, state->m_fg_scrollx + 187 );
-		state->m_bg_tilemaps[1]->set_scrolly(0, state->m_fg_scrolly + 1 + state->m_fore_yscroll );
+		m_bg_tilemaps[0]->set_scrollx(0, m_bg_scrollx + 187 );
+		m_bg_tilemaps[0]->set_scrolly(0, m_bg_scrolly + m_back_yscroll );
+		m_bg_tilemaps[1]->set_scrollx(0, m_fg_scrollx + 187 );
+		m_bg_tilemaps[1]->set_scrolly(0, m_fg_scrolly + 1 + m_fore_yscroll );
 
-		state->m_bg_tilemaps[1]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		state->m_bg_tilemaps[0]->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemaps[1]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_bg_tilemaps[0]->draw(bitmap, cliprect, 0, 0);
 
-		state->m_text_tilemap->set_scrolly(0, state->m_text_yscroll);
+		m_text_tilemap->set_scrolly(0, m_text_yscroll);
 
-		state->m_text_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_text_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 
 	// mix in sprites
-	bitmap_ind16 &sprites = state->m_sprites->bitmap();
-	for (const sparse_dirty_rect *rect = state->m_sprites->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+	bitmap_ind16 &sprites = m_sprites->bitmap();
+	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
 			UINT16 *dest = &bitmap.pix(y);
@@ -678,7 +677,7 @@ SCREEN_UPDATE_IND16( s16a_bootleg )
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += (state->m_paletteram[dest[x]] & 0x8000) ? screen.machine().total_colors()*2 : screen.machine().total_colors();
+							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? screen.machine().total_colors()*2 : screen.machine().total_colors();
 
 						// otherwise, just add in sprite palette base
 						else
@@ -693,9 +692,8 @@ SCREEN_UPDATE_IND16( s16a_bootleg )
 }
 
 /* The Passing Shot 4 Player bootleg has weird scroll registers (different offsets, ^0x7 xor) */
-SCREEN_UPDATE_IND16( s16a_bootleg_passht4b )
+UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg_passht4b(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	segas1x_bootleg_state *state = screen.machine().driver_data<segas1x_bootleg_state>();
 
 	// passing shot
 	int offset_txtx = 192;
@@ -708,31 +706,31 @@ SCREEN_UPDATE_IND16( s16a_bootleg_passht4b )
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	// start the sprites drawing
-	state->m_sprites->draw_async(cliprect);
+	m_sprites->draw_async(cliprect);
 
 	// I can't bring myself to care about dirty tile marking on something which runs at a bazillion % speed anyway, clean code is better
-	state->m_bg_tilemaps[0]->mark_all_dirty();
-	state->m_bg_tilemaps[1]->mark_all_dirty();
-	state->m_text_tilemap->mark_all_dirty();
+	m_bg_tilemaps[0]->mark_all_dirty();
+	m_bg_tilemaps[1]->mark_all_dirty();
+	m_text_tilemap->mark_all_dirty();
 
-	state->m_text_tilemap->set_scrollx(0, offset_txtx);
-	state->m_text_tilemap->set_scrolly(0, offset_txty);
+	m_text_tilemap->set_scrollx(0, offset_txtx);
+	m_text_tilemap->set_scrolly(0, offset_txty);
 
-	if ((state->m_tilemapselect & 0xff) == 0x12)
+	if ((m_tilemapselect & 0xff) == 0x12)
 	{
-		state->m_bg_tilemaps[1]->set_scrollx(0, (state->m_bg_scrollx ^ 0x7) + offset_bg1x);
-		state->m_bg_tilemaps[1]->set_scrolly(0, state->m_bg_scrolly + offset_bg1y);
-		state->m_bg_tilemaps[0]->set_scrollx(0, (state->m_fg_scrollx ^ 0x7) + offset_bg0x);
-		state->m_bg_tilemaps[0]->set_scrolly(0, state->m_fg_scrolly + offset_bg0y);
+		m_bg_tilemaps[1]->set_scrollx(0, (m_bg_scrollx ^ 0x7) + offset_bg1x);
+		m_bg_tilemaps[1]->set_scrolly(0, m_bg_scrolly + offset_bg1y);
+		m_bg_tilemaps[0]->set_scrollx(0, (m_fg_scrollx ^ 0x7) + offset_bg0x);
+		m_bg_tilemaps[0]->set_scrolly(0, m_fg_scrolly + offset_bg0y);
 
-		state->m_bg_tilemaps[0]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		state->m_bg_tilemaps[1]->draw(bitmap, cliprect, 0, 0);
-		state->m_text_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemaps[0]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_bg_tilemaps[1]->draw(bitmap, cliprect, 0, 0);
+		m_text_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 
 	// mix in sprites
-	bitmap_ind16 &sprites = state->m_sprites->bitmap();
-	for (const sparse_dirty_rect *rect = state->m_sprites->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+	bitmap_ind16 &sprites = m_sprites->bitmap();
+	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
 			UINT16 *dest = &bitmap.pix(y);
@@ -750,7 +748,7 @@ SCREEN_UPDATE_IND16( s16a_bootleg_passht4b )
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += (state->m_paletteram[dest[x]] & 0x8000) ? screen.machine().total_colors()*2 : screen.machine().total_colors();
+							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? screen.machine().total_colors()*2 : screen.machine().total_colors();
 
 						// otherwise, just add in sprite palette base
 						else
@@ -767,53 +765,52 @@ SCREEN_UPDATE_IND16( s16a_bootleg_passht4b )
 
 /***************************************************************************/
 
-SCREEN_UPDATE_IND16( system16 )
+UINT32 segas1x_bootleg_state::screen_update_system16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	segas1x_bootleg_state *state = screen.machine().driver_data<segas1x_bootleg_state>();
 
-	if (!state->m_refreshenable)
+	if (!m_refreshenable)
 	{
 		bitmap.fill(0, cliprect);
 		return 0;
 	}
 
 	// start the sprites drawing
-	state->m_sprites->draw_async(cliprect);
+	m_sprites->draw_async(cliprect);
 
 	update_page(screen.machine());
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_background->set_scrollx(0, -320 - state->m_bg_scrollx);
-	state->m_background->set_scrolly(0, -256 + state->m_bg_scrolly + state->m_back_yscroll);
-	state->m_foreground->set_scrollx(0, -320 - state->m_fg_scrollx);
-	state->m_foreground->set_scrolly(0, -256 + state->m_fg_scrolly + state->m_fore_yscroll);
+	m_background->set_scrollx(0, -320 - m_bg_scrollx);
+	m_background->set_scrolly(0, -256 + m_bg_scrolly + m_back_yscroll);
+	m_foreground->set_scrollx(0, -320 - m_fg_scrollx);
+	m_foreground->set_scrolly(0, -256 + m_fg_scrolly + m_fore_yscroll);
 
-	state->m_text_layer->set_scrollx(0, 0);
-	state->m_text_layer->set_scrolly(0, 0 + state->m_text_yscroll);
+	m_text_layer->set_scrollx(0, 0);
+	m_text_layer->set_scrolly(0, 0 + m_text_yscroll);
 
 	/* Background */
-	state->m_background->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0x00);
+	m_background->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0x00);
 
 	/* Foreground */
-	state->m_foreground->draw(bitmap, cliprect, 0, 0x03);
-	state->m_foreground->draw(bitmap, cliprect, 1, 0x07);
+	m_foreground->draw(bitmap, cliprect, 0, 0x03);
+	m_foreground->draw(bitmap, cliprect, 1, 0x07);
 
 
 	/* Text Layer */
-	if (state->m_textlayer_lo_max != 0)
+	if (m_textlayer_lo_max != 0)
 	{
-		state->m_text_layer->draw(bitmap, cliprect, 1, 7);// needed for Body Slam
+		m_text_layer->draw(bitmap, cliprect, 1, 7);// needed for Body Slam
 	}
 
-	state->m_text_layer->draw(bitmap, cliprect, 0, 0xf);
+	m_text_layer->draw(bitmap, cliprect, 0, 0xf);
 
 	//draw_sprites(screen.machine(), bitmap, cliprect,0);
 
 
 	// mix in sprites
-	bitmap_ind16 &sprites = state->m_sprites->bitmap();
-	for (const sparse_dirty_rect *rect = state->m_sprites->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+	bitmap_ind16 &sprites = m_sprites->bitmap();
+	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
 			UINT16 *dest = &bitmap.pix(y);
@@ -831,7 +828,7 @@ SCREEN_UPDATE_IND16( system16 )
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += (state->m_paletteram[dest[x]] & 0x8000) ? screen.machine().total_colors()*2 : screen.machine().total_colors();
+							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? screen.machine().total_colors()*2 : screen.machine().total_colors();
 
 						// otherwise, just add in sprite palette base
 						else
@@ -845,18 +842,17 @@ SCREEN_UPDATE_IND16( system16 )
 }
 
 
-SCREEN_UPDATE_IND16( system18old )
+UINT32 segas1x_bootleg_state::screen_update_system18old(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	segas1x_bootleg_state *state = screen.machine().driver_data<segas1x_bootleg_state>();
 
-	if (!state->m_refreshenable)
+	if (!m_refreshenable)
 	{
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 
 	// start the sprites drawing
-	state->m_sprites->draw_async(cliprect);
+	m_sprites->draw_async(cliprect);
 
 	update_page(screen.machine());
 
@@ -864,21 +860,21 @@ SCREEN_UPDATE_IND16( system18old )
 
 	bitmap.fill(0, cliprect);
 
-	state->m_background->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	state->m_background->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 0);	//??
-	state->m_background->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 2, 0);	//??
-	state->m_background->draw(bitmap, cliprect, 1, 0x1);
-	state->m_background->draw(bitmap, cliprect, 2, 0x3);
+	m_background->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_background->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 0);	//??
+	m_background->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 2, 0);	//??
+	m_background->draw(bitmap, cliprect, 1, 0x1);
+	m_background->draw(bitmap, cliprect, 2, 0x3);
 
-	state->m_foreground->draw(bitmap, cliprect, 0, 0x3);
-	state->m_foreground->draw(bitmap, cliprect, 1, 0x7);
+	m_foreground->draw(bitmap, cliprect, 0, 0x3);
+	m_foreground->draw(bitmap, cliprect, 1, 0x7);
 
-	state->m_text_layer->draw(bitmap, cliprect, 1, 0x7);
-	state->m_text_layer->draw(bitmap, cliprect, 0, 0xf);
+	m_text_layer->draw(bitmap, cliprect, 1, 0x7);
+	m_text_layer->draw(bitmap, cliprect, 0, 0xf);
 
 	// mix in sprites
-	bitmap_ind16 &sprites = state->m_sprites->bitmap();
-	for (const sparse_dirty_rect *rect = state->m_sprites->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+	bitmap_ind16 &sprites = m_sprites->bitmap();
+	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
 			UINT16 *dest = &bitmap.pix(y);
@@ -896,7 +892,7 @@ SCREEN_UPDATE_IND16( system18old )
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += (state->m_paletteram[dest[x]] & 0x8000) ? screen.machine().total_colors()*2 : screen.machine().total_colors();
+							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? screen.machine().total_colors()*2 : screen.machine().total_colors();
 
 						// otherwise, just add in sprite palette base
 						else

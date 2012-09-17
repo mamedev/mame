@@ -101,6 +101,9 @@ public:
 	DECLARE_VIDEO_START(superbug);
 	DECLARE_VIDEO_START(montecar);
 	DECLARE_PALETTE_INIT(montecar);
+	UINT32 screen_update_firetrk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_superbug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_montecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -126,8 +129,8 @@ DISCRETE_SOUND_EXTERN( montecar );
 
 
 
-SCREEN_UPDATE_IND16( firetrk );
-SCREEN_UPDATE_IND16( superbug );
-SCREEN_UPDATE_IND16( montecar );
+
+
+
 
 

@@ -130,9 +130,8 @@ VIDEO_START_MEMBER(m10_state,m15)
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( m10 )
+UINT32 m10_state::screen_update_m10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m10_state *state = screen.machine().driver_data<m10_state>();
 	int offs;
 	static const int color[4]= { 3, 3, 5, 5 };
 	static const int xpos[4] = { 4*8, 26*8, 7*8, 6*8};
@@ -141,12 +140,12 @@ SCREEN_UPDATE_IND16( m10 )
 	bitmap.fill(0, cliprect);
 
 	for (i = 0; i < 4; i++)
-		if (state->m_flip)
-			drawgfx_opaque(bitmap, cliprect, state->m_back_gfx, i, color[i], 1, 1, 31 * 8 - xpos[i], 6);
+		if (m_flip)
+			drawgfx_opaque(bitmap, cliprect, m_back_gfx, i, color[i], 1, 1, 31 * 8 - xpos[i], 6);
 		else
-			drawgfx_opaque(bitmap, cliprect, state->m_back_gfx, i, color[i], 0, 0, xpos[i], 0);
+			drawgfx_opaque(bitmap, cliprect, m_back_gfx, i, color[i], 0, 0, xpos[i], 0);
 
-	if (state->m_bottomline)
+	if (m_bottomline)
 	{
 		int y;
 
@@ -154,11 +153,11 @@ SCREEN_UPDATE_IND16( m10 )
 			plot_pixel_m10(screen.machine(), bitmap, 16, y, 1);
 	}
 
-	for (offs = state->m_videoram.bytes() - 1; offs >= 0; offs--)
-		state->m_tx_tilemap->mark_tile_dirty(offs);
+	for (offs = m_videoram.bytes() - 1; offs >= 0; offs--)
+		m_tx_tilemap->mark_tile_dirty(offs);
 
-	state->m_tx_tilemap->set_flip(state->m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->set_flip(m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -170,17 +169,16 @@ SCREEN_UPDATE_IND16( m10 )
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( m15 )
+UINT32 m10_state::screen_update_m15(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m10_state *state = screen.machine().driver_data<m10_state>();
 	int offs;
 
-	for (offs = state->m_videoram.bytes() - 1; offs >= 0; offs--)
-		state->m_tx_tilemap->mark_tile_dirty(offs);
+	for (offs = m_videoram.bytes() - 1; offs >= 0; offs--)
+		m_tx_tilemap->mark_tile_dirty(offs);
 
-	//state->m_tx_tilemap->mark_all_dirty();
-	state->m_tx_tilemap->set_flip(state->m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	//m_tx_tilemap->mark_all_dirty();
+	m_tx_tilemap->set_flip(m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

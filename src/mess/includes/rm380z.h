@@ -124,6 +124,7 @@ public:
 	void config_memory_map();
 	int keyboard_decode();
 	void update_screen(bitmap_ind16 &bitmap);
+	UINT32 screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 

@@ -33,6 +33,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_poker72(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -40,9 +41,8 @@ void poker72_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16(poker72)
+UINT32 poker72_state::screen_update_poker72(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	poker72_state *state = screen.machine().driver_data<poker72_state>();
 	int x,y,count;
 
 	count = 0;
@@ -51,12 +51,12 @@ static SCREEN_UPDATE_IND16(poker72)
 	{
 		for (x=0;x<64;x++)
 		{
-			int tile = ((state->m_vram[count+1] & 0x0f) << 8 ) | (state->m_vram[count+0] & 0xff); //TODO: tile bank
-			int fx = (state->m_vram[count+1] & 0x10);
-			int fy = (state->m_vram[count+1] & 0x20);
-			int color = (state->m_vram[count+1] & 0xc0) >> 6;
+			int tile = ((m_vram[count+1] & 0x0f) << 8 ) | (m_vram[count+0] & 0xff); //TODO: tile bank
+			int fx = (m_vram[count+1] & 0x10);
+			int fy = (m_vram[count+1] & 0x20);
+			int color = (m_vram[count+1] & 0xc0) >> 6;
 
-			tile|= state->m_tile_bank << 12;
+			tile|= m_tile_bank << 12;
 
 			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],tile,color,fx,fy,x*8,y*8);
 
@@ -363,7 +363,7 @@ static MACHINE_CONFIG_START( poker72, poker72_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(poker72)
+	MCFG_SCREEN_UPDATE_DRIVER(poker72_state, screen_update_poker72)
 
 	MCFG_GFXDECODE(poker72)
 	MCFG_PALETTE_LENGTH(0xe00)

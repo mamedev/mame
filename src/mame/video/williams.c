@@ -168,20 +168,19 @@ VIDEO_START_MEMBER(williams_state,williams2)
  *
  *************************************/
 
-SCREEN_UPDATE_RGB32( williams )
+UINT32 williams_state::screen_update_williams(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	williams_state *state = screen.machine().driver_data<williams_state>();
 	rgb_t pens[16];
 	int x, y;
 
 	/* precompute the palette */
 	for (x = 0; x < 16; x++)
-		pens[x] = state->m_palette_lookup[state->m_generic_paletteram_8[x]];
+		pens[x] = m_palette_lookup[m_generic_paletteram_8[x]];
 
 	/* loop over rows */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT8 *source = &state->m_videoram[y];
+		UINT8 *source = &m_videoram[y];
 		UINT32 *dest = &bitmap.pix32(y);
 
 		/* loop over columns */
@@ -196,30 +195,29 @@ SCREEN_UPDATE_RGB32( williams )
 }
 
 
-SCREEN_UPDATE_RGB32( blaster )
+UINT32 williams_state::screen_update_blaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	williams_state *state = screen.machine().driver_data<williams_state>();
 	rgb_t pens[16];
 	int x, y;
 
 	/* precompute the palette */
 	for (x = 0; x < 16; x++)
-		pens[x] = state->m_palette_lookup[state->m_generic_paletteram_8[x]];
+		pens[x] = m_palette_lookup[m_generic_paletteram_8[x]];
 
 	/* if we're blitting from the top, start with a 0 for color 0 */
-	if (cliprect.min_y == screen.visible_area().min_y || !(state->m_blaster_video_control & 1))
-		state->m_blaster_color0 = state->m_palette_lookup[state->m_blaster_palette_0[0] ^ 0xff];
+	if (cliprect.min_y == screen.visible_area().min_y || !(m_blaster_video_control & 1))
+		m_blaster_color0 = m_palette_lookup[m_blaster_palette_0[0] ^ 0xff];
 
 	/* loop over rows */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		int erase_behind = state->m_blaster_video_control & state->m_blaster_scanline_control[y] & 2;
-		UINT8 *source = &state->m_videoram[y];
+		int erase_behind = m_blaster_video_control & m_blaster_scanline_control[y] & 2;
+		UINT8 *source = &m_videoram[y];
 		UINT32 *dest = &bitmap.pix32(y);
 
 		/* latch a new color0 pen? */
-		if (state->m_blaster_video_control & state->m_blaster_scanline_control[y] & 1)
-			state->m_blaster_color0 = state->m_palette_lookup[state->m_blaster_palette_0[y] ^ 0xff];
+		if (m_blaster_video_control & m_blaster_scanline_control[y] & 1)
+			m_blaster_color0 = m_palette_lookup[m_blaster_palette_0[y] ^ 0xff];
 
 		/* loop over columns */
 		for (x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
@@ -231,31 +229,30 @@ SCREEN_UPDATE_RGB32( blaster )
 				source[(x/2) * 256] = 0;
 
 			/* now draw */
-			dest[x+0] = (pix & 0xf0) ? pens[pix >> 4] : state->m_blaster_color0 | pens[0];
-			dest[x+1] = (pix & 0x0f) ? pens[pix & 0x0f] : state->m_blaster_color0 | pens[0];
+			dest[x+0] = (pix & 0xf0) ? pens[pix >> 4] : m_blaster_color0 | pens[0];
+			dest[x+1] = (pix & 0x0f) ? pens[pix & 0x0f] : m_blaster_color0 | pens[0];
 		}
 	}
 	return 0;
 }
 
 
-SCREEN_UPDATE_RGB32( williams2 )
+UINT32 williams_state::screen_update_williams2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	williams_state *state = screen.machine().driver_data<williams_state>();
 	rgb_t pens[16];
 	int x, y;
 
 	/* draw the background */
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* fetch the relevant pens */
 	for (x = 1; x < 16; x++)
-		pens[x] = palette_get_color(screen.machine(), state->m_williams2_fg_color * 16 + x);
+		pens[x] = palette_get_color(screen.machine(), m_williams2_fg_color * 16 + x);
 
 	/* loop over rows */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT8 *source = &state->m_videoram[y];
+		UINT8 *source = &m_videoram[y];
 		UINT32 *dest = &bitmap.pix32(y);
 
 		/* loop over columns */

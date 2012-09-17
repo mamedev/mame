@@ -42,6 +42,8 @@ public:
 	DECLARE_WRITE8_MEMBER(subs_invert2_w);
 	virtual void machine_reset();
 	virtual void palette_init();
+	UINT32 screen_update_subs_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_subs_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -64,6 +66,6 @@ DISCRETE_SOUND_EXTERN( subs );
 
 /*----------- defined in video/subs.c -----------*/
 
-SCREEN_UPDATE_IND16( subs_left );
-SCREEN_UPDATE_IND16( subs_right );
+
+
 

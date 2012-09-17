@@ -241,16 +241,15 @@ WRITE8_MEMBER(cloud9_state::cloud9_bitmode_addr_w)
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( cloud9 )
+UINT32 cloud9_state::screen_update_cloud9(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cloud9_state *state = screen.machine().driver_data<cloud9_state>();
-	UINT8 *spriteaddr = state->m_spriteram;
-	int flip = state->m_video_control[5] ? 0xff : 0x00;	/* PLAYER2 */
+	UINT8 *spriteaddr = m_spriteram;
+	int flip = m_video_control[5] ? 0xff : 0x00;	/* PLAYER2 */
 	pen_t black = get_black_pen(screen.machine());
 	int x, y, offs;
 
 	/* draw the sprites */
-	state->m_spritebitmap.fill(0x00, cliprect);
+	m_spritebitmap.fill(0x00, cliprect);
 	for (offs = 0; offs < 0x20; offs++)
 		if (spriteaddr[offs + 0x00] != 0)
 		{
@@ -261,9 +260,9 @@ SCREEN_UPDATE_IND16( cloud9 )
 			int which = spriteaddr[offs + 0x20];
 			int color = 0;
 
-			drawgfx_transpen(state->m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, xflip, yflip, x, y, 0);
+			drawgfx_transpen(m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, xflip, yflip, x, y, 0);
 			if (x >= 256 - 16)
-				drawgfx_transpen(state->m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, xflip, yflip, x - 256, y, 0);
+				drawgfx_transpen(m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, xflip, yflip, x - 256, y, 0);
 		}
 
 	/* draw the bitmap to the screen, looping over Y */
@@ -272,7 +271,7 @@ SCREEN_UPDATE_IND16( cloud9 )
 		UINT16 *dst = &bitmap.pix16(y);
 
 		/* if we're in the VBLANK region, just fill with black */
-		if (~state->m_syncprom[y] & 2)
+		if (~m_syncprom[y] & 2)
 		{
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 				dst[x] = black;
@@ -281,13 +280,13 @@ SCREEN_UPDATE_IND16( cloud9 )
 		/* non-VBLANK region: merge the sprites and the bitmap */
 		else
 		{
-			UINT16 *mosrc = &state->m_spritebitmap.pix16(y);
+			UINT16 *mosrc = &m_spritebitmap.pix16(y);
 			int effy = y ^ flip;
 			UINT8 *src[2];
 
 			/* two videoram arrays */
-			src[0] = &state->m_videoram[0x4000 | (effy * 64)];
-			src[1] = &state->m_videoram[0x0000 | (effy * 64)];
+			src[0] = &m_videoram[0x4000 | (effy * 64)];
+			src[1] = &m_videoram[0x0000 | (effy * 64)];
 
 			/* loop over X */
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
@@ -310,7 +309,7 @@ SCREEN_UPDATE_IND16( cloud9 )
 						pix = mopix | 0x10;
 
 					/* the high bit is the bank select */
-					pix |= state->m_video_control[7] << 5;
+					pix |= m_video_control[7] << 5;
 
 					/* store the pixel value and also a priority value based on the topmost bit */
 					dst[x] = pix;

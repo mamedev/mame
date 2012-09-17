@@ -157,6 +157,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_MACHINE_RESET(drivedge);
+	UINT32 screen_update_itech32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -176,4 +177,4 @@ void itech32_update_interrupts(running_machine &machine, int vint, int xint, int
 
 
 
-SCREEN_UPDATE_IND16( itech32 );
+

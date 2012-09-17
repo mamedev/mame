@@ -63,22 +63,22 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_pc100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 void pc100_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( pc100 )
+UINT32 pc100_state::screen_update_pc100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pc100_state *state = screen.machine().driver_data<pc100_state>();
 	int x,y;
 	int count;
 	int xi;
 	int dot;
 	int pen[4],pen_i;
 
-	count = ((state->m_crtc.vstart + 0x20) * 0x40);
+	count = ((m_crtc.vstart + 0x20) * 0x40);
 
 	for(y=0;y<512;y++)
 	{
@@ -89,7 +89,7 @@ static SCREEN_UPDATE_IND16( pc100 )
 			for(xi=0;xi<16;xi++)
 			{
 				for(pen_i=0;pen_i<4;pen_i++)
-					pen[pen_i] = (state->m_vram[count+pen_i*0x10000] >> xi) & 1;
+					pen[pen_i] = (m_vram[count+pen_i*0x10000] >> xi) & 1;
 
 				dot = 0;
 				for(pen_i=0;pen_i<4;pen_i++)
@@ -395,7 +395,7 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 512-1)
-	MCFG_SCREEN_UPDATE_STATIC(pc100)
+	MCFG_SCREEN_UPDATE_DRIVER(pc100_state, screen_update_pc100)
 	MCFG_GFXDECODE(pc100)
 	MCFG_PALETTE_LENGTH(16)
 //  MCFG_PALETTE_INIT(black_and_white)

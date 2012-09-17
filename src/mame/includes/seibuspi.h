@@ -113,6 +113,8 @@ public:
 	DECLARE_VIDEO_START(sys386f2);
 	DECLARE_MACHINE_START(sxx2f);
 	DECLARE_MACHINE_RESET(sxx2f);
+	UINT32 screen_update_spi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_sys386f2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -124,10 +126,10 @@ void seibuspi_sprite_decrypt(UINT8 *src, int romsize);
 /*----------- defined in video/seibuspi.c -----------*/
 
 
-SCREEN_UPDATE_RGB32( spi );
 
 
-SCREEN_UPDATE_RGB32( sys386f2 );
+
+
 
 
 void rf2_set_layer_banks(running_machine &machine, int banks);

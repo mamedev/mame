@@ -21,6 +21,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ioboard_data_w);
 	DECLARE_WRITE8_MEMBER(ioboard_reg_w);
 	virtual void video_start();
+	UINT32 screen_update_hotstuff(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -30,9 +31,8 @@ void hotstuff_state::video_start()
 
 /* the first 0x20 bytes in every 0x200 (each line) of video ram are the colour data, providing a palette of 16 RGB444 colours for that line */
 
-SCREEN_UPDATE_RGB32( hotstuff )
+UINT32 hotstuff_state::screen_update_hotstuff(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	hotstuff_state *state = screen.machine().driver_data<hotstuff_state>();
 	int count, y,yyy,x,xxx;
 	UINT16 row_palette_data[0x10];
 	rgb_t row_palette_data_as_rgb32_pen_data[0x10];
@@ -47,7 +47,7 @@ SCREEN_UPDATE_RGB32( hotstuff )
 
 		for (p=0;p<0x10;p++)
 		{
-			row_palette_data[p] = state->m_bitmapram[count+p];
+			row_palette_data[p] = m_bitmapram[count+p];
 
 			row_palette_data_as_rgb32_pen_data[p] = MAKE_RGB( (row_palette_data[p] & 0x0f00)>>4, (row_palette_data[p] & 0x00f0)>>0, (row_palette_data[p] & 0x000f)<<4  );
 
@@ -56,13 +56,13 @@ SCREEN_UPDATE_RGB32( hotstuff )
 		for(x = 0; x < xxx; x++)
 		{
 			{
-				bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(state->m_bitmapram[count] &0xf000)>>12];
+				bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(m_bitmapram[count] &0xf000)>>12];
 				x++;
-				bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(state->m_bitmapram[count] &0x0f00)>>8];
+				bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(m_bitmapram[count] &0x0f00)>>8];
 				x++;
-				bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(state->m_bitmapram[count] &0x00f0)>>4];
+				bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(m_bitmapram[count] &0x00f0)>>4];
 				x++;
-				bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(state->m_bitmapram[count] &0x000f)>>0];
+				bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(m_bitmapram[count] &0x000f)>>0];
 			}
 
 			count++;
@@ -133,7 +133,7 @@ static MACHINE_CONFIG_START( hotstuff, hotstuff_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(128*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA((0x10*4)+8, 101*8-1, 0*8, 33*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(hotstuff)
+	MCFG_SCREEN_UPDATE_DRIVER(hotstuff_state, screen_update_hotstuff)
 
 	MCFG_PALETTE_LENGTH(0x200)
 

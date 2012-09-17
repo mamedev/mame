@@ -135,10 +135,9 @@ static const floppy_interface rm380z_floppy_interface =
 	NULL
 };
 
-static SCREEN_UPDATE_IND16( rm380z )
+UINT32 rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	rm380z_state *state = screen.machine().driver_data<rm380z_state>();
-	state->update_screen(bitmap);
+	update_screen(bitmap);
 	return 0;
 }
 
@@ -157,7 +156,7 @@ static MACHINE_CONFIG_START( rm380z, rm380z_state )
 	MCFG_SCREEN_SIZE((RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1)), (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1)))
 	MCFG_SCREEN_VISIBLE_AREA(0, (RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1))-1, 0, (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1))-1)
 
-	MCFG_SCREEN_UPDATE_STATIC(rm380z)
+	MCFG_SCREEN_UPDATE_DRIVER(rm380z_state, screen_update_rm380z)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 

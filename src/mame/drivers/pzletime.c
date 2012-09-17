@@ -59,6 +59,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_pzletime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -91,21 +92,20 @@ void pzletime_state::video_start()
 	m_txt_tilemap->set_transparent_pen(0);
 }
 
-static SCREEN_UPDATE_IND16( pzletime )
+UINT32 pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pzletime_state *state = screen.machine().driver_data<pzletime_state>();
 	int count;
 	int y, x;
 
 	bitmap.fill(screen.machine().pens[0], cliprect); //bg pen
 
-	state->m_txt_tilemap->set_scrolly(0, state->m_tilemap_regs[0] - 3);
-	state->m_txt_tilemap->set_scrollx(0, state->m_tilemap_regs[1]);
+	m_txt_tilemap->set_scrolly(0, m_tilemap_regs[0] - 3);
+	m_txt_tilemap->set_scrollx(0, m_tilemap_regs[1]);
 
-	state->m_mid_tilemap->set_scrolly(0, state->m_tilemap_regs[2] - 3);
-	state->m_mid_tilemap->set_scrollx(0, state->m_tilemap_regs[3] - 7);
+	m_mid_tilemap->set_scrolly(0, m_tilemap_regs[2] - 3);
+	m_mid_tilemap->set_scrollx(0, m_tilemap_regs[3] - 7);
 
-	if (state->m_video_regs[2] & 1)
+	if (m_video_regs[2] & 1)
 	{
 		count = 0;
 
@@ -113,18 +113,18 @@ static SCREEN_UPDATE_IND16( pzletime )
 		{
 			for (x = 0; x < 512; x++)
 			{
-				if (state->m_bg_videoram[count] & 0x8000)
-					bitmap.pix16((y - 18) & 0xff, (x - 32) & 0x1ff) = 0x300 + (state->m_bg_videoram[count] & 0x7fff);
+				if (m_bg_videoram[count] & 0x8000)
+					bitmap.pix16((y - 18) & 0xff, (x - 32) & 0x1ff) = 0x300 + (m_bg_videoram[count] & 0x7fff);
 
 				count++;
 			}
 		}
 	}
 
-	state->m_mid_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_mid_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	{
-		UINT16 *spriteram = state->m_spriteram;
+		UINT16 *spriteram = m_spriteram;
 		int offs, spr_offs, colour, sx, sy;
 
 		for(offs = 0; offs < 0x2000 / 2; offs += 4)
@@ -143,9 +143,9 @@ static SCREEN_UPDATE_IND16( pzletime )
 		}
 	}
 
-	state->m_txt_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_txt_tilemap->draw(bitmap, cliprect, 0, 0);
 	if ((screen.frame_number() % 16) != 0)
-		state->m_txt_tilemap->draw(bitmap, cliprect, 1, 0);
+		m_txt_tilemap->draw(bitmap, cliprect, 1, 0);
 
 	return 0;
 }
@@ -333,7 +333,7 @@ static MACHINE_CONFIG_START( pzletime, pzletime_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(pzletime)
+	MCFG_SCREEN_UPDATE_DRIVER(pzletime_state, screen_update_pzletime)
 	MCFG_GFXDECODE(pzletime)
 	MCFG_PALETTE_LENGTH(0x300 + 32768)
 	MCFG_EEPROM_93C46_ADD("eeprom")

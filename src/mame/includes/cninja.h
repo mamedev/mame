@@ -65,6 +65,11 @@ public:
 	virtual void machine_reset();
 	DECLARE_VIDEO_START(stoneage);
 	DECLARE_VIDEO_START(mutantf);
+	UINT32 screen_update_cninja(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_cninjabl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_edrandy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_robocop2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_mutantf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/cninja.c -----------*/
@@ -72,8 +77,8 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( cninja );
-SCREEN_UPDATE_IND16( cninjabl );
-SCREEN_UPDATE_IND16( edrandy );
-SCREEN_UPDATE_IND16( robocop2 );
-SCREEN_UPDATE_RGB32( mutantf );
+
+
+
+
+

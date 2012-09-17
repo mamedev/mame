@@ -376,7 +376,7 @@ static MACHINE_CONFIG_START( capbowl, capbowl_state )
 	MCFG_SCREEN_SIZE(360, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 359, 0, 244)
 	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_UPDATE_STATIC(capbowl)
+	MCFG_SCREEN_UPDATE_DRIVER(capbowl_state, screen_update_capbowl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

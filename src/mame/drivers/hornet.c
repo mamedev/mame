@@ -369,6 +369,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_MACHINE_RESET(hornet_2board);
+	UINT32 screen_update_hornet(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_hornet_2board(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -420,9 +422,8 @@ static void voodoo_vblank_1(device_t *device, int param)
 {
 }
 
-static SCREEN_UPDATE_RGB32( hornet )
+UINT32 hornet_state::screen_update_hornet(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	hornet_state *state = screen.machine().driver_data<hornet_state>();
 	device_t *voodoo = screen.machine().device("voodoo0");
 	device_t *k037122 = screen.machine().device("k037122_1");
 
@@ -430,14 +431,13 @@ static SCREEN_UPDATE_RGB32( hornet )
 
 	k037122_tile_draw(k037122, bitmap, cliprect);
 
-	draw_7segment_led(bitmap, 3, 3, state->m_led_reg0);
-	draw_7segment_led(bitmap, 9, 3, state->m_led_reg1);
+	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
+	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 	return 0;
 }
 
-static SCREEN_UPDATE_RGB32( hornet_2board )
+UINT32 hornet_state::screen_update_hornet_2board(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	hornet_state *state = screen.machine().driver_data<hornet_state>();
 	if (strcmp(screen.tag(), ":lscreen") == 0)
 	{
 		device_t *k037122 = screen.machine().device("k037122_1");
@@ -457,8 +457,8 @@ static SCREEN_UPDATE_RGB32( hornet_2board )
 		k037122_tile_draw(k037122, bitmap, cliprect);
 	}
 
-	draw_7segment_led(bitmap, 3, 3, state->m_led_reg0);
-	draw_7segment_led(bitmap, 9, 3, state->m_led_reg1);
+	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
+	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 	return 0;
 }
 
@@ -1016,7 +1016,7 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(64*8, 48*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(hornet)
+	MCFG_SCREEN_UPDATE_DRIVER(hornet_state, screen_update_hornet)
 
 	MCFG_PALETTE_LENGTH(65536)
 
@@ -1106,13 +1106,13 @@ static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_STATIC(hornet_2board)
+	MCFG_SCREEN_UPDATE_DRIVER(hornet_state, screen_update_hornet_2board)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_STATIC(hornet_2board)
+	MCFG_SCREEN_UPDATE_DRIVER(hornet_state, screen_update_hornet_2board)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( terabrst, hornet_2board )

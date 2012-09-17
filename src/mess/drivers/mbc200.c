@@ -62,6 +62,7 @@ public:
 	required_shared_ptr<UINT8> m_vram;
 
 	virtual void video_start();
+	UINT32 screen_update_mbc200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -150,9 +151,8 @@ void mbc200_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( mbc200 )
+UINT32 mbc200_state::screen_update_mbc200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mbc200_state *state = screen.machine().driver_data<mbc200_state>();
 	int x,y,xi,yi;
 	int count;
 
@@ -167,7 +167,7 @@ static SCREEN_UPDATE_IND16( mbc200 )
 				for(xi=0;xi<8;xi++)
 				{
 					UINT8 dot;
-					dot = (state->m_vram[count] >> (7-xi)) & 1;
+					dot = (m_vram[count] >> (7-xi)) & 1;
 
 					if(y*4+yi < 400 && x*8+xi < 640) /* TODO: safety check */
 						bitmap.pix16(y*4+yi, x*8+xi) = screen.machine().pens[dot];
@@ -263,7 +263,7 @@ static MACHINE_CONFIG_START( mbc200, mbc200_state )
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MCFG_SCREEN_SIZE(640, 400)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-    MCFG_SCREEN_UPDATE_STATIC(mbc200)
+	MCFG_SCREEN_UPDATE_DRIVER(mbc200_state, screen_update_mbc200)
 	MCFG_GFXDECODE(mbc200)
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)

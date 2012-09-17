@@ -38,6 +38,7 @@ public:
 	DECLARE_READ16_MEMBER(kothello_hd63484_status_r);
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(shanghai);
+	UINT32 screen_update_shanghai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -75,7 +76,7 @@ void shanghai_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( shanghai )
+UINT32 shanghai_state::screen_update_shanghai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	device_t *hd63484 = screen.machine().device("hd63484");
 	int x, y, b, src;
@@ -452,7 +453,7 @@ static MACHINE_CONFIG_START( shanghai, shanghai_state )
 	MCFG_SCREEN_REFRESH_RATE(30)
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
-	MCFG_SCREEN_UPDATE_STATIC(shanghai)
+	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update_shanghai)
 
 	MCFG_PALETTE_LENGTH(256)
 
@@ -485,7 +486,7 @@ static MACHINE_CONFIG_START( shangha2, shanghai_state )
 	MCFG_SCREEN_REFRESH_RATE(30)
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
-	MCFG_SCREEN_UPDATE_STATIC(shanghai)
+	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update_shanghai)
 
 	MCFG_PALETTE_LENGTH(256)
 
@@ -522,7 +523,7 @@ static MACHINE_CONFIG_START( kothello, shanghai_state )
 	MCFG_SCREEN_REFRESH_RATE(30)
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(8, 384-1, 0, 250-1) // Base Screen is 376 pixel
-	MCFG_SCREEN_UPDATE_STATIC(shanghai)
+	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update_shanghai)
 
 	MCFG_PALETTE_LENGTH(256)
 

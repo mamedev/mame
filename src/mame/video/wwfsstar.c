@@ -215,16 +215,15 @@ void wwfsstar_state::video_start()
 	m_fg0_tilemap->set_transparent_pen(0);
 }
 
-SCREEN_UPDATE_IND16( wwfsstar )
+UINT32 wwfsstar_state::screen_update_wwfsstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	wwfsstar_state *state = screen.machine().driver_data<wwfsstar_state>();
 
-	state->m_bg0_tilemap->set_scrolly(0, state->m_scrolly  );
-	state->m_bg0_tilemap->set_scrollx(0, state->m_scrollx  );
+	m_bg0_tilemap->set_scrolly(0, m_scrolly  );
+	m_bg0_tilemap->set_scrollx(0, m_scrollx  );
 
-	state->m_bg0_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg0_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect );
-	state->m_fg0_tilemap->draw(bitmap, cliprect, 0,0);
+	m_fg0_tilemap->draw(bitmap, cliprect, 0,0);
 
 	return 0;
 }

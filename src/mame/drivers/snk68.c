@@ -605,7 +605,7 @@ static MACHINE_CONFIG_START( pow, snk68_state )
 	// give a theoretical refresh rate of 59.1856Hz while the measured
 	// rate on a SAR board is 59.16Hz.
 	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 384, 0, 256, 264, 16, 240)
-	MCFG_SCREEN_UPDATE_STATIC(pow)
+	MCFG_SCREEN_UPDATE_DRIVER(snk68_state, screen_update_pow)
 
 	MCFG_GFXDECODE(pow)
 	MCFG_PALETTE_LENGTH(0x800)

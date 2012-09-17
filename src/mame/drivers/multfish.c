@@ -239,6 +239,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_MACHINE_RESET(island2a);
+	UINT32 screen_update_multfish(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 TILE_GET_INFO_MEMBER(multfish_state::get_multfish_tile_info)
@@ -280,28 +281,27 @@ void multfish_state::video_start()
 	m_reel_tilemap->set_scroll_cols(64);
 }
 
-static SCREEN_UPDATE_IND16(multfish)
+UINT32 multfish_state::screen_update_multfish(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	multfish_state *state = screen.machine().driver_data<multfish_state>();
 	int i;
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if (!state->m_disp_enable) return 0;
+	if (!m_disp_enable) return 0;
 
 	/* Draw lower part of static tilemap (low pri tiles) */
-	state->m_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1),0);
+	m_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1),0);
 
 	/* Setup the column scroll and draw the reels */
 	for (i=0;i<64;i++)
 	{
-		int colscroll = (state->m_vid[i*2] | state->m_vid[i*2+1] << 8);
-		state->m_reel_tilemap->set_scrolly(i, colscroll );
+		int colscroll = (m_vid[i*2] | m_vid[i*2+1] << 8);
+		m_reel_tilemap->set_scrolly(i, colscroll );
 	}
-	state->m_reel_tilemap->draw(bitmap, cliprect, 0,0);
+	m_reel_tilemap->draw(bitmap, cliprect, 0,0);
 
 	/* Draw upper part of static tilemap (high pri tiles) */
-	state->m_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0),0);
+	m_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0),0);
 
 	return 0;
 }
@@ -1108,7 +1108,7 @@ static MACHINE_CONFIG_START( multfish, multfish_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(17*16, 1024-16*7-1, 1*16, 32*16-1*16-1)
-	MCFG_SCREEN_UPDATE_STATIC(multfish)
+	MCFG_SCREEN_UPDATE_DRIVER(multfish_state, screen_update_multfish)
 	MCFG_GFXDECODE(multfish)
 	MCFG_PALETTE_LENGTH(0x1000)
 

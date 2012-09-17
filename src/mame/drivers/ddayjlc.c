@@ -105,6 +105,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_ddayjlc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -388,18 +389,17 @@ void ddayjlc_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ddayjlc_state::get_tile_info_bg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-static SCREEN_UPDATE_IND16( ddayjlc )
+UINT32 ddayjlc_state::screen_update_ddayjlc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ddayjlc_state *state = screen.machine().driver_data<ddayjlc_state>();
 	UINT32 i;
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	for (i = 0; i < 0x400; i += 4)
 	{
-		UINT8  flags = state->m_spriteram[i + 2];
-		UINT8  y = 256 - state->m_spriteram[i + 0] - 8;
-		UINT16 code = state->m_spriteram[i + 1];
-		UINT8  x = state->m_spriteram[i + 3] - 16;
+		UINT8  flags = m_spriteram[i + 2];
+		UINT8  y = 256 - m_spriteram[i + 0] - 8;
+		UINT16 code = m_spriteram[i + 1];
+		UINT8  x = m_spriteram[i + 3] - 16;
 		UINT8  xflip = flags & 0x80;
 		UINT8  yflip = (code & 0x80);
 		UINT8  color = flags & 0xf;
@@ -415,11 +415,11 @@ static SCREEN_UPDATE_IND16( ddayjlc )
 		for (y = 0; y < 32; y++)
 			for (x = 0; x < 32; x++)
 			{
-				c = state->m_videoram[y * 32 + x];
+				c = m_videoram[y * 32 + x];
 				if (x > 1 && x < 30)
-					drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1], c + state->m_char_bank * 0x100, 2, 0, 0, x*8, y*8, 0);
+					drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1], c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8, 0);
 				else
-					drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[1], c + state->m_char_bank * 0x100, 2, 0, 0, x*8, y*8);
+					drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[1], c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8);
 			}
 	}
 	return 0;
@@ -533,7 +533,7 @@ static MACHINE_CONFIG_START( ddayjlc, ddayjlc_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(ddayjlc)
+	MCFG_SCREEN_UPDATE_DRIVER(ddayjlc_state, screen_update_ddayjlc)
 
 	MCFG_GFXDECODE(ddayjlc)
 	MCFG_PALETTE_LENGTH(0x200)

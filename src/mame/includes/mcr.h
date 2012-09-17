@@ -100,6 +100,7 @@ public:
 	DECLARE_MACHINE_RESET(mcr);
 	DECLARE_VIDEO_START(mcr);
 	DECLARE_MACHINE_START(nflfoot);
+	UINT32 screen_update_mcr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -143,4 +144,4 @@ extern INT8 mcr12_sprite_xoffs_flip;
 
 
 
-SCREEN_UPDATE_IND16( mcr );
+

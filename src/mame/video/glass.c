@@ -190,20 +190,19 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 ****************************************************************************/
 
-SCREEN_UPDATE_IND16( glass )
+UINT32 glass_state::screen_update_glass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	glass_state *state = screen.machine().driver_data<glass_state>();
 	/* set scroll registers */
-	state->m_pant[0]->set_scrolly(0, state->m_vregs[0]);
-	state->m_pant[0]->set_scrollx(0, state->m_vregs[1] + 0x04);
-	state->m_pant[1]->set_scrolly(0, state->m_vregs[2]);
-	state->m_pant[1]->set_scrollx(0, state->m_vregs[3]);
+	m_pant[0]->set_scrolly(0, m_vregs[0]);
+	m_pant[0]->set_scrollx(0, m_vregs[1] + 0x04);
+	m_pant[1]->set_scrolly(0, m_vregs[2]);
+	m_pant[1]->set_scrollx(0, m_vregs[3]);
 
 	/* draw layers + sprites */
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	copybitmap(bitmap, *state->m_screen_bitmap, 0, 0, 0x18, 0x24, cliprect);
-	state->m_pant[1]->draw(bitmap, cliprect, 0, 0);
-	state->m_pant[0]->draw(bitmap, cliprect, 0, 0);
+	copybitmap(bitmap, *m_screen_bitmap, 0, 0, 0x18, 0x24, cliprect);
+	m_pant[1]->draw(bitmap, cliprect, 0, 0);
+	m_pant[0]->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

@@ -171,11 +171,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-SCREEN_UPDATE_IND16( mikie )
+UINT32 mikie_state::screen_update_mikie(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mikie_state *state = screen.machine().driver_data<mikie_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
+	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
+	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
 	return 0;
 }

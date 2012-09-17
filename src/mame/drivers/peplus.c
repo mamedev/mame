@@ -266,6 +266,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_peplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 static const UINT8  id_022[8] = { 0x00, 0x01, 0x04, 0x09, 0x13, 0x16, 0x18, 0x00 };
@@ -968,10 +969,9 @@ void peplus_state::video_start()
 	memset(m_palette_ram2, 0, 0x3000);
 }
 
-static SCREEN_UPDATE_IND16( peplus )
+UINT32 peplus_state::screen_update_peplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	peplus_state *state = screen.machine().driver_data<peplus_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -1352,7 +1352,7 @@ static MACHINE_CONFIG_START( peplus, peplus_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE((52+1)*8, (31+1)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(peplus)
+	MCFG_SCREEN_UPDATE_DRIVER(peplus_state, screen_update_peplus)
 
 	MCFG_GFXDECODE(peplus)
 	MCFG_PALETTE_LENGTH(16*16*2)

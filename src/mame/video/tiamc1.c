@@ -176,29 +176,28 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-SCREEN_UPDATE_IND16( tiamc1 )
+UINT32 tiamc1_state::screen_update_tiamc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tiamc1_state *state = screen.machine().driver_data<tiamc1_state>();
 #if 0
 	int i;
 
 	for (i = 0; i < 32; i++)
 	{
-		state->m_bg_tilemap1->set_scrolly(i, state->m_bg_vshift ^ 0xff);
-		state->m_bg_tilemap2->set_scrolly(i, state->m_bg_vshift ^ 0xff);
+		m_bg_tilemap1->set_scrolly(i, m_bg_vshift ^ 0xff);
+		m_bg_tilemap2->set_scrolly(i, m_bg_vshift ^ 0xff);
 	}
 
 	for (i = 0; i < 32; i++)
 	{
-		state->m_bg_tilemap1->set_scrollx(i, state->m_bg_hshift ^ 0xff);
-		state->m_bg_tilemap2->set_scrollx(i, state->m_bg_hshift ^ 0xff);
+		m_bg_tilemap1->set_scrollx(i, m_bg_hshift ^ 0xff);
+		m_bg_tilemap2->set_scrollx(i, m_bg_hshift ^ 0xff);
 	}
 #endif
 
-	if (state->m_layers_ctrl & 0x80)
-		state->m_bg_tilemap2->draw(bitmap, cliprect, 0, 0);
+	if (m_layers_ctrl & 0x80)
+		m_bg_tilemap2->draw(bitmap, cliprect, 0, 0);
 	else
-		state->m_bg_tilemap1->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap1->draw(bitmap, cliprect, 0, 0);
 
 
 	draw_sprites(screen.machine(), bitmap, cliprect);

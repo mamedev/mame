@@ -314,7 +314,7 @@ static MACHINE_CONFIG_START( gunsmoke, gunsmoke_state )
 	MCFG_GFXDECODE(gunsmoke)
 	MCFG_PALETTE_LENGTH(32*4+16*16+16*16)
 
-	MCFG_SCREEN_UPDATE_STATIC(gunsmoke)
+	MCFG_SCREEN_UPDATE_DRIVER(gunsmoke_state, screen_update_gunsmoke)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

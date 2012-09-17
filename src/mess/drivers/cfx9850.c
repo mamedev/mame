@@ -37,6 +37,7 @@ public:
 	required_shared_ptr<UINT8> m_display_ram;
 	UINT16 m_ko;				/* KO lines KO1 - KO14 */
 	virtual void palette_init();
+	UINT32 screen_update_cfx9850(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -195,9 +196,8 @@ void cfx9850_state::palette_init()
 }
 
 
-static SCREEN_UPDATE_IND16( cfx9850 )
+UINT32 cfx9850_state::screen_update_cfx9850(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cfx9850_state *state = screen.machine().driver_data<cfx9850_state>();
 	UINT16 offset = 0;
 
 	for ( int i = 0; i < 16; i++ )
@@ -206,8 +206,8 @@ static SCREEN_UPDATE_IND16( cfx9850 )
 
 		for ( int j = 0; j < 64; j++ )
 		{
-			UINT8 data1 = state->m_display_ram[ offset ];
-			UINT8 data2 = state->m_display_ram[ offset + 0x400 ];
+			UINT8 data1 = m_display_ram[ offset ];
+			UINT8 data2 = m_display_ram[ offset + 0x400 ];
 
 			for ( int b = 0; b < 8; b++ )
 			{
@@ -233,7 +233,7 @@ static MACHINE_CONFIG_START( cfx9850, cfx9850_state )
 	MCFG_SCREEN_REFRESH_RATE( 60 )
 	MCFG_SCREEN_SIZE( 128, 64 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 127, 0, 63 )
-	MCFG_SCREEN_UPDATE_STATIC( cfx9850 )
+	MCFG_SCREEN_UPDATE_DRIVER(cfx9850_state, screen_update_cfx9850)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 

@@ -70,6 +70,7 @@ public:
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(cgenie);
 	DECLARE_PALETTE_INIT(cgenienz);
+	UINT32 screen_update_cgenie(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -124,7 +125,7 @@ DECLARE_WRITE8_HANDLER ( cgenie_videoram_w );
 /*----------- defined in video/cgenie.c -----------*/
 
 
-SCREEN_UPDATE_IND16( cgenie );
+
 
 DECLARE_READ8_HANDLER ( cgenie_index_r );
 DECLARE_READ8_HANDLER ( cgenie_register_r );

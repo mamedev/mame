@@ -78,11 +78,12 @@ public:
 	DECLARE_DRIVER_INIT(livequiz);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start();
+	UINT32 screen_update_midas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 
-static SCREEN_UPDATE_IND16( midas );
+
 
 
 TILE_GET_INFO_MEMBER(midas_state::get_tile_info)
@@ -184,16 +185,15 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-static SCREEN_UPDATE_IND16( midas )
+UINT32 midas_state::screen_update_midas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	midas_state *state = screen.machine().driver_data<midas_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
 	if ( screen.machine().input().code_pressed(KEYCODE_Z) )
 	{
 		int msk = 0;
-		if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1 << 0;	// for state->m_tmap
+		if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1 << 0;	// for m_tmap
 		if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 1 << 1;	// for sprites
 		if (msk != 0) layers_ctrl &= msk;
 	}
@@ -202,7 +202,7 @@ static SCREEN_UPDATE_IND16( midas )
 	bitmap.fill(4095, cliprect);
 
 	if (layers_ctrl & 2)	draw_sprites(screen.machine(), bitmap,cliprect);
-	if (layers_ctrl & 1)	state->m_tmap->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 1)	m_tmap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -711,7 +711,7 @@ static MACHINE_CONFIG_START( livequiz, midas_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(midas)
+	MCFG_SCREEN_UPDATE_DRIVER(midas_state, screen_update_midas)
 
 	MCFG_GFXDECODE(midas)
 	MCFG_PALETTE_LENGTH(0x10000)
@@ -744,7 +744,7 @@ static MACHINE_CONFIG_START( hammer, midas_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(midas)
+	MCFG_SCREEN_UPDATE_DRIVER(midas_state, screen_update_midas)
 
 	MCFG_GFXDECODE(midas)
 	MCFG_PALETTE_LENGTH(0x10000)

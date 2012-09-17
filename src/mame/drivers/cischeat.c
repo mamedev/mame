@@ -1584,7 +1584,7 @@ static MACHINE_CONFIG_START( bigrun, cischeat_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,	0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(bigrun)
+	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_bigrun)
 
 	MCFG_GFXDECODE(bigrun)
 	MCFG_PALETTE_LENGTH(16*16 * 3 + 64*16 * 2 + 64*16)	/* scroll 0,1,2; road 0,1; sprites */
@@ -1626,7 +1626,7 @@ static MACHINE_CONFIG_DERIVED( cischeat, bigrun )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,	0+16, 256-16-8-1)
-	MCFG_SCREEN_UPDATE_STATIC(cischeat)
+	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_cischeat)
 
 	MCFG_GFXDECODE(cischeat)
 	MCFG_PALETTE_LENGTH(32*16 * 3 + 64*16 * 2 + 128*16)	/* scroll 0,1,2; road 0,1; sprites */
@@ -1659,7 +1659,7 @@ static MACHINE_CONFIG_DERIVED( f1gpstar, bigrun )
 
 	MCFG_VIDEO_START_OVERRIDE(cischeat_state,f1gpstar)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(f1gpstar)
+	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_f1gpstar)
 MACHINE_CONFIG_END
 
 
@@ -1717,7 +1717,7 @@ static MACHINE_CONFIG_START( scudhamm, cischeat_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0 +16, 256-1 -16)
-	MCFG_SCREEN_UPDATE_STATIC(scudhamm)
+	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
 
 	MCFG_GFXDECODE(scudhamm)
 	MCFG_PALETTE_LENGTH(16*16+16*16+128*16)

@@ -44,6 +44,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_spy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -53,4 +54,4 @@ extern void spy_tile_callback(running_machine &machine, int layer,int bank,int *
 extern void spy_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask,int *shadow);
 
 
-SCREEN_UPDATE_IND16( spy );
+

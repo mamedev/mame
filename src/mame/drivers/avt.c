@@ -444,15 +444,16 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 #define mc6845_h_char_total 	(state->m_crtc_vreg[0])
-#define mc6845_h_display		(state->m_crtc_vreg[1])
+#define mc6845_h_display		(m_crtc_vreg[1])
 #define mc6845_h_sync_pos		(state->m_crtc_vreg[2])
 #define mc6845_sync_width		(state->m_crtc_vreg[3])
 #define mc6845_v_char_total		(state->m_crtc_vreg[4])
 #define mc6845_v_total_adj		(state->m_crtc_vreg[5])
-#define mc6845_v_display		(state->m_crtc_vreg[6])
+#define mc6845_v_display		(m_crtc_vreg[6])
 #define mc6845_v_sync_pos		(state->m_crtc_vreg[7])
 #define mc6845_mode_ctrl		(state->m_crtc_vreg[8])
 #define mc6845_tile_height		(state->m_crtc_vreg[9]+1)
@@ -504,9 +505,8 @@ void avt_state::video_start()
 }
 
 
-static SCREEN_UPDATE_IND16( avt )
+UINT32 avt_state::screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	avt_state *state = screen.machine().driver_data<avt_state>();
 	int x,y;
 	int count;
 	gfx_element *gfx = screen.machine().gfx[0];
@@ -517,15 +517,15 @@ static SCREEN_UPDATE_IND16( avt )
 	{
 		for(x=0;x<mc6845_h_display;x++)
 		{
-			UINT16 tile = state->m_videoram[count] | ((state->m_colorram[count] & 1) << 8);
-			UINT8 color = (state->m_colorram[count] & 0xf0) >> 4;
+			UINT16 tile = m_videoram[count] | ((m_colorram[count] & 1) << 8);
+			UINT8 color = (m_colorram[count] & 0xf0) >> 4;
 
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*8,(y*8));
 
 			count++;
 		}
 	}
-	//state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	//m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -902,7 +902,7 @@ static MACHINE_CONFIG_START( avt, avt_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)	/* 240x224 (through CRTC) */
-	MCFG_SCREEN_UPDATE_STATIC(avt)
+	MCFG_SCREEN_UPDATE_DRIVER(avt_state, screen_update_avt)
 
 	MCFG_GFXDECODE(avt)
 

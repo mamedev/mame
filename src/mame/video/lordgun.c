@@ -317,9 +317,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( lordgun )
+UINT32 lordgun_state::screen_update_lordgun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	lordgun_state *state = screen.machine().driver_data<lordgun_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
@@ -336,7 +335,7 @@ SCREEN_UPDATE_IND16( lordgun )
 	}
 #endif
 
-	if (state->m_whitescreen)
+	if (m_whitescreen)
 	{
 		bitmap.fill(get_white_pen(screen.machine()), cliprect);
 		return 0;
@@ -346,18 +345,18 @@ SCREEN_UPDATE_IND16( lordgun )
 
 	int x, y;
 
-	state->m_tilemap[0]->set_scrollx(0, *state->m_scroll_x[0] );
-	state->m_tilemap[0]->set_scrolly(0, *state->m_scroll_y[0] );
+	m_tilemap[0]->set_scrollx(0, *m_scroll_x[0] );
+	m_tilemap[0]->set_scrolly(0, *m_scroll_y[0] );
 
 	for (y = 0; y < 0x200; y++)
-		state->m_tilemap[1]->set_scrollx(y, (*state->m_scroll_x[1]) + state->m_scrollram[y * 4/2 + 2/2]);
-	state->m_tilemap[1]->set_scrolly(0, *state->m_scroll_y[1] );
+		m_tilemap[1]->set_scrollx(y, (*m_scroll_x[1]) + m_scrollram[y * 4/2 + 2/2]);
+	m_tilemap[1]->set_scrolly(0, *m_scroll_y[1] );
 
-	state->m_tilemap[2]->set_scrollx(0, *state->m_scroll_x[2] );
-	state->m_tilemap[2]->set_scrolly(0, *state->m_scroll_y[2] );
+	m_tilemap[2]->set_scrollx(0, *m_scroll_x[2] );
+	m_tilemap[2]->set_scrolly(0, *m_scroll_y[2] );
 
-	state->m_tilemap[3]->set_scrollx(0, *state->m_scroll_x[3] );
-	state->m_tilemap[3]->set_scrolly(0, *state->m_scroll_y[3] );
+	m_tilemap[3]->set_scrollx(0, *m_scroll_x[3] );
+	m_tilemap[3]->set_scrolly(0, *m_scroll_y[3] );
 
 	// Rendering:
 
@@ -368,13 +367,13 @@ SCREEN_UPDATE_IND16( lordgun )
 
 	int l;
 	for (l = 0; l < 5; l++)
-		state->m_bitmaps[l]->fill(trans_pen, cliprect);
+		m_bitmaps[l]->fill(trans_pen, cliprect);
 
-	if (layers_ctrl & 1)	state->m_tilemap[0]->draw(*state->m_bitmaps[0], cliprect, 0, 0);
-	if (layers_ctrl & 2)	state->m_tilemap[1]->draw(*state->m_bitmaps[1], cliprect, 0, 0);
-	if (layers_ctrl & 4)	state->m_tilemap[2]->draw(*state->m_bitmaps[2], cliprect, 0, 0);
-	if (layers_ctrl & 8)	state->m_tilemap[3]->draw(*state->m_bitmaps[3], cliprect, 0, 0);
-	if (layers_ctrl & 16)	draw_sprites(screen.machine(), *state->m_bitmaps[4], cliprect);
+	if (layers_ctrl & 1)	m_tilemap[0]->draw(*m_bitmaps[0], cliprect, 0, 0);
+	if (layers_ctrl & 2)	m_tilemap[1]->draw(*m_bitmaps[1], cliprect, 0, 0);
+	if (layers_ctrl & 4)	m_tilemap[2]->draw(*m_bitmaps[2], cliprect, 0, 0);
+	if (layers_ctrl & 8)	m_tilemap[3]->draw(*m_bitmaps[3], cliprect, 0, 0);
+	if (layers_ctrl & 16)	draw_sprites(screen.machine(), *m_bitmaps[4], cliprect);
 
 	// copy to screen bitmap
 
@@ -394,7 +393,7 @@ SCREEN_UPDATE_IND16( lordgun )
 			// bits 0-4: layer transparency
 			for (l = 0; l < 5; l++)
 			{
-				pens[l] = state->m_bitmaps[l]->pix16(y, x);
+				pens[l] = m_bitmaps[l]->pix16(y, x);
 				if (pens[l] == trans_pen)
 					pri_addr |= 1 << layer2bit[l];
 			}
@@ -410,7 +409,7 @@ SCREEN_UPDATE_IND16( lordgun )
 
 			pri_addr &= 0x7fff;
 
-			l	=	pri2layer[state->m_priority_ram[pri_addr] & 7];
+			l	=	pri2layer[m_priority_ram[pri_addr] & 7];
 
 			bitmap.pix16(y, x) = pens[l];
 		}

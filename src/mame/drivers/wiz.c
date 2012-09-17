@@ -735,7 +735,7 @@ static MACHINE_CONFIG_START( wiz, wiz_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */	/* frames per second, vblank duration */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(wiz)
+	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_wiz)
 
 	MCFG_GFXDECODE(wiz)
 	MCFG_PALETTE_LENGTH(256)
@@ -765,7 +765,7 @@ static MACHINE_CONFIG_DERIVED( stinger, wiz )
 	/* video hardware */
 	MCFG_GFXDECODE(stinger)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(stinger)
+	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_stinger)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("8910.3")
@@ -794,7 +794,7 @@ static MACHINE_CONFIG_DERIVED( kungfut, wiz )
 	/* video hardware */
 	MCFG_GFXDECODE(stinger)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(kungfut)
+	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_kungfut)
 
 MACHINE_CONFIG_END
 

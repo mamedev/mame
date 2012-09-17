@@ -501,6 +501,7 @@ public:
 	DECLARE_DRIVER_INIT(sf2049se);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_vegas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -523,10 +524,9 @@ static void remap_dynamic_addresses(running_machine &machine);
  *
  *************************************/
 
-static SCREEN_UPDATE_RGB32( vegas )
+UINT32 vegas_state::screen_update_vegas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	vegas_state *state = screen.machine().driver_data<vegas_state>();
-	return voodoo_update(state->m_voodoo, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return voodoo_update(m_voodoo, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 
@@ -2264,7 +2264,7 @@ static MACHINE_CONFIG_START( vegascore, vegas_state )
 	MCFG_SCREEN_REFRESH_RATE(57)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_STATIC(vegas)
+	MCFG_SCREEN_UPDATE_DRIVER(vegas_state, screen_update_vegas)
 MACHINE_CONFIG_END
 
 

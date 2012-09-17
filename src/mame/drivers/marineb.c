@@ -555,7 +555,7 @@ static MACHINE_CONFIG_START( marineb, marineb_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000)	/* frames per second, vblank duration */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(marineb)
+	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_marineb)
 
 	MCFG_GFXDECODE(marineb)
 	MCFG_PALETTE_LENGTH(256)
@@ -575,7 +575,7 @@ static MACHINE_CONFIG_DERIVED( changes, marineb )
 	/* video hardware */
 	MCFG_GFXDECODE(changes)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(changes)
+	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_changes)
 MACHINE_CONFIG_END
 
 
@@ -586,7 +586,7 @@ static MACHINE_CONFIG_DERIVED( springer, marineb )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(springer)
+	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_springer)
 MACHINE_CONFIG_END
 
 
@@ -597,7 +597,7 @@ static MACHINE_CONFIG_DERIVED( hoccer, marineb )
 	/* video hardware */
 	MCFG_GFXDECODE(hoccer)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(hoccer)
+	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_hoccer)
 MACHINE_CONFIG_END
 
 
@@ -611,7 +611,7 @@ static MACHINE_CONFIG_DERIVED( wanted, marineb )
 	/* video hardware */
 	MCFG_GFXDECODE(wanted)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(springer)
+	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_springer)
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("ay1", AY8910, 1500000)
@@ -629,7 +629,7 @@ static MACHINE_CONFIG_DERIVED( hopprobo, marineb )
 	/* video hardware */
 	MCFG_GFXDECODE(hopprobo)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(hopprobo)
+	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_hopprobo)
 MACHINE_CONFIG_END
 
 

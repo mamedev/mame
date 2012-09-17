@@ -69,40 +69,38 @@ static void leprechn_get_pens( pen_t *pens )
  *
  *************************************/
 
-static SCREEN_UPDATE_RGB32( gameplan )
+UINT32 gameplan_state::screen_update_gameplan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	gameplan_state *state = screen.machine().driver_data<gameplan_state>();
 	pen_t pens[GAMEPLAN_NUM_PENS];
 	offs_t offs;
 
 	gameplan_get_pens(pens);
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < m_videoram_size; offs++)
 	{
 		UINT8 y = offs >> 8;
 		UINT8 x = offs & 0xff;
 
-		bitmap.pix32(y, x) = pens[state->m_videoram[offs] & 0x07];
+		bitmap.pix32(y, x) = pens[m_videoram[offs] & 0x07];
 	}
 
 	return 0;
 }
 
 
-static SCREEN_UPDATE_RGB32( leprechn )
+UINT32 gameplan_state::screen_update_leprechn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	gameplan_state *state = screen.machine().driver_data<gameplan_state>();
 	pen_t pens[LEPRECHN_NUM_PENS];
 	offs_t offs;
 
 	leprechn_get_pens(pens);
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < m_videoram_size; offs++)
 	{
 		UINT8 y = offs >> 8;
 		UINT8 x = offs & 0xff;
 
-		bitmap.pix32(y, x) = pens[state->m_videoram[offs]];
+		bitmap.pix32(y, x) = pens[m_videoram[offs]];
 	}
 
 	return 0;
@@ -343,19 +341,19 @@ MACHINE_CONFIG_FRAGMENT( gameplan_video )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(GAMEPLAN_PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_STATIC(gameplan)
+	MCFG_SCREEN_UPDATE_DRIVER(gameplan_state, screen_update_gameplan)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_FRAGMENT( leprechn_video )
 	MCFG_VIDEO_START_OVERRIDE(gameplan_state,leprechn)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(leprechn)
+	MCFG_SCREEN_UPDATE_DRIVER(gameplan_state, screen_update_leprechn)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_DERIVED( trvquest_video, gameplan_video )
 	MCFG_VIDEO_START_OVERRIDE(gameplan_state,trvquest)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(gameplan)
+	MCFG_SCREEN_UPDATE_DRIVER(gameplan_state, screen_update_gameplan)
 MACHINE_CONFIG_END

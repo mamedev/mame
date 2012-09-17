@@ -101,25 +101,23 @@ void sderby_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-SCREEN_UPDATE_IND16( sderby )
+UINT32 sderby_state::screen_update_sderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sderby_state *state = screen.machine().driver_data<sderby_state>();
 
-	state->m_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect,0);
-	state->m_md_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_md_tilemap->draw(bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( pmroulet )
+UINT32 sderby_state::screen_update_pmroulet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sderby_state *state = screen.machine().driver_data<sderby_state>();
 
-	state->m_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_md_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tilemap->draw(bitmap, cliprect, 0,0);
+	m_md_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect,0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 

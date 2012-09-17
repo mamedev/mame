@@ -952,27 +952,26 @@ VIDEO_START_MEMBER(dkong_state,dkong)
 	}
 }
 
-SCREEN_UPDATE_IND16( dkong )
+UINT32 dkong_state::screen_update_dkong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dkong_state *state = screen.machine().driver_data<dkong_state>();
 
-	screen.machine().tilemap().set_flip_all(state->m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	state->m_bg_tilemap->set_scrollx(0, state->m_flip ?  0 : 0);
-	state->m_bg_tilemap->set_scrolly(0, state->m_flip ? -8 : 0);
+	screen.machine().tilemap().set_flip_all(m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_bg_tilemap->set_scrollx(0, m_flip ?  0 : 0);
+	m_bg_tilemap->set_scrolly(0, m_flip ? -8 : 0);
 
-	switch (state->m_hardware_type)
+	switch (m_hardware_type)
 	{
 		case HARDWARE_TKG02:
 		case HARDWARE_TKG04:
 			check_palette(screen.machine());
-			state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+			m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 			draw_sprites(screen.machine(), bitmap, cliprect, 0x40, 1);
 			break;
 		case HARDWARE_TRS01:
 		case HARDWARE_TRS02:
-			state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+			m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 			draw_sprites(screen.machine(), bitmap, cliprect, 0x40, 1);
-			radarscp_draw_background(screen.machine(), state, bitmap, cliprect);
+			radarscp_draw_background(screen.machine(), this, bitmap, cliprect);
 			break;
 		default:
 			fatalerror("Invalid hardware type in dkong_video_update\n");
@@ -980,33 +979,31 @@ SCREEN_UPDATE_IND16( dkong )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( pestplce )
+UINT32 dkong_state::screen_update_pestplce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dkong_state *state = screen.machine().driver_data<dkong_state>();
 	int offs;
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* Draw the sprites. */
-	for (offs = 0;offs < state->m_sprite_ram.bytes();offs += 4)
+	for (offs = 0;offs < m_sprite_ram.bytes();offs += 4)
 	{
-		if (state->m_sprite_ram[offs])
+		if (m_sprite_ram[offs])
 		{
 			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],
-					state->m_sprite_ram[offs + 2],
-					(state->m_sprite_ram[offs + 1] & 0x0f) + 16 * state->m_palette_bank,
-					state->m_sprite_ram[offs + 1] & 0x80,state->m_sprite_ram[offs + 1] & 0x40,
-					state->m_sprite_ram[offs + 3] - 8,240 - state->m_sprite_ram[offs] + 8,0);
+					m_sprite_ram[offs + 2],
+					(m_sprite_ram[offs + 1] & 0x0f) + 16 * m_palette_bank,
+					m_sprite_ram[offs + 1] & 0x80,m_sprite_ram[offs + 1] & 0x40,
+					m_sprite_ram[offs + 3] - 8,240 - m_sprite_ram[offs] + 8,0);
 		}
 	}
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( spclforc )
+UINT32 dkong_state::screen_update_spclforc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dkong_state *state = screen.machine().driver_data<dkong_state>();
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* it uses sprite_ram[offs + 2] & 0x10 for sprite bank */
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x10, 3);

@@ -144,12 +144,11 @@ void gomoku_state::video_start()
 
 ******************************************************************************/
 
-SCREEN_UPDATE_IND16( gomoku )
+UINT32 gomoku_state::screen_update_gomoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gomoku_state *state = screen.machine().driver_data<gomoku_state>();
 	UINT8 *GOMOKU_BG_X = screen.machine().root_device().memregion( "user1" )->base();
 	UINT8 *GOMOKU_BG_Y = screen.machine().root_device().memregion( "user2" )->base();
-	UINT8 *GOMOKU_BG_D = state->memregion( "user3" )->base();
+	UINT8 *GOMOKU_BG_D = memregion( "user3" )->base();
 	int x, y;
 	int bgram;
 	int bgoffs;
@@ -157,10 +156,10 @@ SCREEN_UPDATE_IND16( gomoku )
 	int color;
 
 	/* draw background layer */
-	if (state->m_bg_dispsw)
+	if (m_bg_dispsw)
 	{
 		/* copy bg bitmap */
-		copybitmap(bitmap, state->m_bg_bitmap, 0, 0, 0, 0, cliprect);
+		copybitmap(bitmap, m_bg_bitmap, 0, 0, 0, 0, cliprect);
 
 		// stone
 		for (y = 0; y < 256; y++)
@@ -170,7 +169,7 @@ SCREEN_UPDATE_IND16( gomoku )
 				bgoffs = ((((255 - x - 2) / 14) | (((255 - y - 10) / 14) << 4)) & 0xff);
 
 				bgdata = GOMOKU_BG_D[ GOMOKU_BG_X[x] + (GOMOKU_BG_Y[y] << 4) ];
-				bgram = state->m_bgram[bgoffs];
+				bgram = m_bgram[bgoffs];
 
 				if (bgdata & 0x04)
 				{
@@ -198,7 +197,7 @@ SCREEN_UPDATE_IND16( gomoku )
 				bgoffs = ((((255 - x - 2) / 14) | (((255 - y - 10) / 14) << 4)) & 0xff);
 
 				bgdata = GOMOKU_BG_D[ GOMOKU_BG_X[x] + (GOMOKU_BG_Y[y] << 4) ];
-				bgram = state->m_bgram[bgoffs];
+				bgram = m_bgram[bgoffs];
 
 				if (bgdata & 0x08)
 				{
@@ -223,6 +222,6 @@ SCREEN_UPDATE_IND16( gomoku )
 		bitmap.fill(0x20);
 	}
 
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -50,6 +50,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_powerbls_bg_tile_info);
 	DECLARE_VIDEO_START(sslam);
 	DECLARE_VIDEO_START(powerbls);
+	UINT32 screen_update_sslam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_powerbls(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -57,5 +59,5 @@ public:
 
 
 
-SCREEN_UPDATE_IND16(sslam);
-SCREEN_UPDATE_IND16(powerbls);
+
+

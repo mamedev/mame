@@ -42,6 +42,8 @@ public:
 	DECLARE_VIDEO_START(sapi1);
 	DECLARE_MACHINE_RESET(sapizps3);
 	DECLARE_VIDEO_START(sapizps3);
+	UINT32 screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_sapizps3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/sapi1.c -----------*/

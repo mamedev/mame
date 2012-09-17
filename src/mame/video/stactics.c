@@ -381,15 +381,14 @@ VIDEO_START_MEMBER(stactics_state,stactics)
  *
  *************************************/
 
-static SCREEN_UPDATE_IND16( stactics )
+UINT32 stactics_state::screen_update_stactics(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	stactics_state *state = screen.machine().driver_data<stactics_state>();
 
-	update_beam(state);
-	draw_background(state, bitmap, cliprect);
-	update_artwork(screen.machine(), state);
+	update_beam(this);
+	draw_background(this, bitmap, cliprect);
+	update_artwork(screen.machine(), this);
 
-	state->m_frame_count = (state->m_frame_count + 1) & 0x0f;
+	m_frame_count = (m_frame_count + 1) & 0x0f;
 
 	return 0;
 }
@@ -411,7 +410,7 @@ MACHINE_CONFIG_FRAGMENT( stactics_video )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(stactics)
+	MCFG_SCREEN_UPDATE_DRIVER(stactics_state, screen_update_stactics)
 
 	MCFG_PALETTE_LENGTH(0x400)
 

@@ -204,11 +204,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 #undef DRAW_SPRITE
 
 
-SCREEN_UPDATE_IND16( spdodgeb )
+UINT32 spdodgeb_state::screen_update_spdodgeb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	spdodgeb_state *state = screen.machine().driver_data<spdodgeb_state>();
-	state->m_bg_tilemap->set_scrollx(0,state->m_lastscroll+5);
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->set_scrollx(0,m_lastscroll+5);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect);
 	return 0;
 }

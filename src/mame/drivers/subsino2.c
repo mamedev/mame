@@ -165,6 +165,7 @@ public:
 	DECLARE_VIDEO_START(mtrain);
 	DECLARE_MACHINE_RESET(am188em);
 	DECLARE_VIDEO_START(xtrain);
+	UINT32 screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -631,10 +632,9 @@ VIDEO_START_MEMBER(subsino2_state,xtrain)
 	m_ss9601_reelrects[2].set(0, 0, 0x18*8, 256-16-1);
 }
 
-static SCREEN_UPDATE_IND16( subsino2 )
+UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	subsino2_state *state = screen.machine().driver_data<subsino2_state>();
-	int layers_ctrl = ~state->m_ss9601_disable;
+	int layers_ctrl = ~m_ss9601_disable;
 	int y;
 
 #ifdef MAME_DEBUG
@@ -650,7 +650,7 @@ static SCREEN_UPDATE_IND16( subsino2 )
 	// Line Scroll / Reel Control
 	int mask_y[2] = {0, 0};
 	bool l0_reel = false;
-	switch ( state->m_ss9601_scrollctrl )
+	switch ( m_ss9601_scrollctrl )
 	{
 		case 0xbf:
 			mask_y[0] = ~(32-1);
@@ -669,7 +669,7 @@ static SCREEN_UPDATE_IND16( subsino2 )
 	// Scroll
 	for (int i = 0; i < 2; i++)
 	{
-		layer_t *l = &state->m_layers[i];
+		layer_t *l = &m_layers[i];
 
 		l->tmap->set_scroll_cols(1);
 		l->tmap->set_scroll_rows(0x200);
@@ -691,7 +691,7 @@ static SCREEN_UPDATE_IND16( subsino2 )
 
 	if (layers_ctrl & 1)
 	{
-		layer_t *l = &state->m_layers[0];
+		layer_t *l = &m_layers[0];
 
 		if (l0_reel)
 		{
@@ -700,7 +700,7 @@ static SCREEN_UPDATE_IND16( subsino2 )
 
 			for (int r = 0; r < 3; r++)
 			{
-				rectangle visible = state->m_ss9601_reelrects[r];
+				rectangle visible = m_ss9601_reelrects[r];
 
 				for (int x = 0; x < 0x40; x++)
 				{
@@ -708,7 +708,7 @@ static SCREEN_UPDATE_IND16( subsino2 )
 					visible.max_x = 8 * (x+1) - 1;
 
 					int reeladdr = (visible.min_y / 0x10) * 0x80 + x;
-					UINT16 reelscroll = (state->m_ss9601_reelrams[VRAM_HI][reeladdr] << 8) + state->m_ss9601_reelrams[VRAM_LO][reeladdr];
+					UINT16 reelscroll = (m_ss9601_reelrams[VRAM_HI][reeladdr] << 8) + m_ss9601_reelrams[VRAM_LO][reeladdr];
 
 					l->tmap->set_scrollx(0, (reelscroll >> 9) * 8 + l->scroll_x - visible.min_x);
 
@@ -746,9 +746,9 @@ static SCREEN_UPDATE_IND16( subsino2 )
 		}
 	}
 
-	if (layers_ctrl & 2)	state->m_layers[1].tmap->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 2)	m_layers[1].tmap->draw(bitmap, cliprect, 0, 0);
 
-//  popmessage("scrl: %03x,%03x - %03x,%03x dis: %02x siz: %02x ctrl: %02x", state->m_layers[0].scroll_x,state->m_layers[0].scroll_y, state->m_layers[1].scroll_x,state->m_layers[1].scroll_y, state->m_ss9601_disable, state->m_ss9601_tilesize, state->m_ss9601_scrollctrl);
+//  popmessage("scrl: %03x,%03x - %03x,%03x dis: %02x siz: %02x ctrl: %02x", m_layers[0].scroll_x,m_layers[0].scroll_y, m_layers[1].scroll_x,m_layers[1].scroll_y, m_ss9601_disable, m_ss9601_tilesize, m_ss9601_scrollctrl);
 
 	return 0;
 }
@@ -2188,7 +2188,7 @@ static MACHINE_CONFIG_START( bishjan, subsino2_state )
 	MCFG_SCREEN_SIZE( 512, 256 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
 	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_UPDATE_STATIC( subsino2 )
+	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
 
 	MCFG_GFXDECODE( ss9601 )
 	MCFG_PALETTE_LENGTH( 256 )
@@ -2216,7 +2216,7 @@ static MACHINE_CONFIG_START( mtrain, subsino2_state )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-32-1 )
 	MCFG_SCREEN_REFRESH_RATE( 58.7270 )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// game reads vblank state
-	MCFG_SCREEN_UPDATE_STATIC( subsino2 )
+	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
 
 	MCFG_GFXDECODE( ss9601 )
 	MCFG_PALETTE_LENGTH( 256 )
@@ -2249,7 +2249,7 @@ static MACHINE_CONFIG_START( saklove, subsino2_state )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
 	MCFG_SCREEN_REFRESH_RATE( 58.7270 )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// game reads vblank state
-	MCFG_SCREEN_UPDATE_STATIC( subsino2 )
+	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
 
 	MCFG_GFXDECODE( ss9601 )
 	MCFG_PALETTE_LENGTH( 256 )
@@ -2286,7 +2286,7 @@ static MACHINE_CONFIG_START( xplan, subsino2_state )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
 	MCFG_SCREEN_REFRESH_RATE( 58.7270 )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// game reads vblank state
-	MCFG_SCREEN_UPDATE_STATIC( subsino2 )
+	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
 
 	MCFG_GFXDECODE( ss9601 )
 	MCFG_PALETTE_LENGTH( 256 )

@@ -587,7 +587,7 @@ static MACHINE_CONFIG_START( twincobr, twincobr_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz/4, 446, 0, 320, 286, 0, 240)
-	MCFG_SCREEN_UPDATE_STATIC(toaplan0)
+	MCFG_SCREEN_UPDATE_DRIVER(twincobr_state, screen_update_toaplan0)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram16", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(twincobr)

@@ -68,6 +68,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -91,9 +92,8 @@ void aceal_state::video_start()
 	machine().gfx[4]->set_source(m_scoreram);
 }
 
-static SCREEN_UPDATE_IND16( ace )
+UINT32 aceal_state::screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	aceal_state *state = screen.machine().driver_data<aceal_state>();
 	int offs;
 
 	/* first of all, fill the screen with the background color */
@@ -103,19 +103,19 @@ static SCREEN_UPDATE_IND16( ace )
 			0,
 			0,
 			0, 0,
-			state->m_objpos[0], state->m_objpos[1]);
+			m_objpos[0], m_objpos[1]);
 
 	drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[2],
 			0,
 			0,
 			0, 0,
-			state->m_objpos[2], state->m_objpos[3]);
+			m_objpos[2], m_objpos[3]);
 
 	drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[3],
 			0,
 			0,
 			0, 0,
-			state->m_objpos[4], state->m_objpos[5]);
+			m_objpos[4], m_objpos[5]);
 
 	for (offs = 0; offs < 8; offs++)
 	{
@@ -359,7 +359,7 @@ static MACHINE_CONFIG_START( ace, aceal_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 32*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(ace)
+	MCFG_SCREEN_UPDATE_DRIVER(aceal_state, screen_update_ace)
 
 	MCFG_GFXDECODE(ace)
 	MCFG_PALETTE_LENGTH(2)

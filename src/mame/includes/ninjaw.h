@@ -43,12 +43,15 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_ninjaw_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_ninjaw_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_ninjaw_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/ninjaw.c -----------*/
 
 
-SCREEN_UPDATE_IND16( ninjaw_left );
-SCREEN_UPDATE_IND16( ninjaw_middle );
-SCREEN_UPDATE_IND16( ninjaw_right );
+
+
+

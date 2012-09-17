@@ -49,6 +49,8 @@ public:
 	DECLARE_MACHINE_START(atarig1);
 	DECLARE_MACHINE_RESET(atarig1);
 	DECLARE_VIDEO_START(atarig1);
+	UINT32 screen_update_atarig1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_atarig1(screen_device &screen, bool state);
 };
 
 
@@ -56,7 +58,7 @@ public:
 
 
 
-SCREEN_VBLANK( atarig1 );
-SCREEN_UPDATE_IND16( atarig1 );
+
+
 
 void atarig1_scanline_update(screen_device &screen, int scanline);

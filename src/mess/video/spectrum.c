@@ -57,20 +57,19 @@ INLINE unsigned char get_display_color (unsigned char color, int invert)
 
 /* Code to change the FLASH status every 25 frames. Note this must be
    independent of frame skip etc. */
-SCREEN_VBLANK( spectrum )
+void spectrum_state::screen_eof_spectrum(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		spectrum_state *state = screen.machine().driver_data<spectrum_state>();
 		EVENT_LIST_ITEM *pItem;
 		int NumItems;
 
-		state->m_frame_number++;
-		if (state->m_frame_number >= state->m_frame_invert_count)
+		m_frame_number++;
+		if (m_frame_number >= m_frame_invert_count)
 		{
-			state->m_frame_number = 0;
-			state->m_flash_invert = !state->m_flash_invert;
+			m_frame_number = 0;
+			m_flash_invert = !m_flash_invert;
 		}
 
 		/* Empty event buffer for undisplayed frames noting the last border
@@ -117,27 +116,26 @@ INLINE void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color
 	bitmap.pix16(y, x) = (UINT16)color;
 }
 
-SCREEN_UPDATE_IND16( spectrum )
+UINT32 spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* for now do a full-refresh */
-	spectrum_state *state = screen.machine().driver_data<spectrum_state>();
 	int x, y, b, scrx, scry;
 	unsigned short ink, pap;
 	unsigned char *attr, *scr;
 		int full_refresh = 1;
 
-	scr=state->m_screen_location;
+	scr=m_screen_location;
 
 	for (y=0; y<192; y++)
 	{
 		scrx=SPEC_LEFT_BORDER;
 		scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
-		attr=state->m_screen_location + ((scry>>3)*32) + 0x1800;
+		attr=m_screen_location + ((scry>>3)*32) + 0x1800;
 
 		for (x=0;x<32;x++)
 		{
 			/* Get ink and paper colour with bright */
-			if (state->m_flash_invert && (*attr & 0x80))
+			if (m_flash_invert && (*attr & 0x80))
 			{
 				ink=((*attr)>>3) & 0x0f;
 				pap=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
@@ -165,7 +163,7 @@ SCREEN_UPDATE_IND16( spectrum )
 		SPEC_TOP_BORDER, SPEC_DISPLAY_YSIZE, SPEC_BOTTOM_BORDER,
 		SPEC_LEFT_BORDER, SPEC_DISPLAY_XSIZE, SPEC_RIGHT_BORDER,
 		SPEC_LEFT_BORDER_CYCLES, SPEC_DISPLAY_XSIZE_CYCLES,
-		SPEC_RIGHT_BORDER_CYCLES, state->m_retrace_cycles, 200, 0xfe);
+		SPEC_RIGHT_BORDER_CYCLES, m_retrace_cycles, 200, 0xfe);
 	return 0;
 }
 

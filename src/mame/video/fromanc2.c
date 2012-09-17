@@ -521,36 +521,34 @@ VIDEO_START_MEMBER(fromanc2_state,fromanc4)
 
 ******************************************************************************/
 
-SCREEN_UPDATE_IND16( fromanc2_left )
+UINT32 fromanc2_state::screen_update_fromanc2_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	fromanc2_state *state = screen.machine().driver_data<fromanc2_state>();
 	int i;
 
 	for (i = 0; i < 4; i++)
 	{
-		if (state->m_tilemap[0][i])
+		if (m_tilemap[0][i])
 		{
-			state->m_tilemap[0][i]->set_scrollx(0, -state->m_scrollx[0][i]);
-			state->m_tilemap[0][i]->set_scrolly(0, -state->m_scrolly[0][i]);
-			state->m_tilemap[0][i]->draw(bitmap, cliprect, 0, 0);
+			m_tilemap[0][i]->set_scrollx(0, -m_scrollx[0][i]);
+			m_tilemap[0][i]->set_scrolly(0, -m_scrolly[0][i]);
+			m_tilemap[0][i]->draw(bitmap, cliprect, 0, 0);
 		}
 	}
 
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( fromanc2_right )
+UINT32 fromanc2_state::screen_update_fromanc2_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	fromanc2_state *state = screen.machine().driver_data<fromanc2_state>();
 	int i;
 
 	for (i = 0; i < 4; i++)
 	{
-		if (state->m_tilemap[1][i])
+		if (m_tilemap[1][i])
 		{
-			state->m_tilemap[1][i]->set_scrollx(0, -state->m_scrollx[1][i]);
-			state->m_tilemap[1][i]->set_scrolly(0, -state->m_scrolly[1][i]);
-			state->m_tilemap[1][i]->draw(bitmap, cliprect, 0, 0);
+			m_tilemap[1][i]->set_scrollx(0, -m_scrollx[1][i]);
+			m_tilemap[1][i]->set_scrolly(0, -m_scrolly[1][i]);
+			m_tilemap[1][i]->draw(bitmap, cliprect, 0, 0);
 		}
 	}
 

@@ -119,6 +119,7 @@ public:
 	virtual void video_start();
 	DECLARE_MACHINE_RESET(cshooter);
 	DECLARE_MACHINE_RESET(airraid);
+	UINT32 screen_update_cshooter(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -150,17 +151,16 @@ void cshooter_state::video_start()
 	m_txtilemap->set_transparent_pen(3);
 }
 
-static SCREEN_UPDATE_IND16(cshooter)
+UINT32 cshooter_state::screen_update_cshooter(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cshooter_state *state = screen.machine().driver_data<cshooter_state>();
 	bitmap.fill(0/*get_black_pen(screen.screen.machine(, cliprect))*/);
-	state->m_txtilemap->mark_all_dirty();
+	m_txtilemap->mark_all_dirty();
 
 	//sprites
 	{
-		UINT8 *spriteram = state->m_spriteram;
+		UINT8 *spriteram = m_spriteram;
 		int i;
-		for(i=0;i<state->m_spriteram.bytes();i+=4)
+		for(i=0;i<m_spriteram.bytes();i+=4)
 		{
 			if(spriteram[i+3]!=0)
 			{
@@ -193,8 +193,8 @@ static SCREEN_UPDATE_IND16(cshooter)
 		}
 	}
 
-	state->m_txtilemap->mark_all_dirty();
-	state->m_txtilemap->draw(bitmap, cliprect, 0,0);
+	m_txtilemap->mark_all_dirty();
+	m_txtilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -452,7 +452,7 @@ static MACHINE_CONFIG_START( cshooter, cshooter_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
-	MCFG_SCREEN_UPDATE_STATIC(cshooter)
+	MCFG_SCREEN_UPDATE_DRIVER(cshooter_state, screen_update_cshooter)
 
 	MCFG_GFXDECODE(cshooter)
 	MCFG_PALETTE_LENGTH(0x1000)
@@ -478,7 +478,7 @@ static MACHINE_CONFIG_START( airraid, cshooter_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
-	MCFG_SCREEN_UPDATE_STATIC(cshooter)
+	MCFG_SCREEN_UPDATE_DRIVER(cshooter_state, screen_update_cshooter)
 
 	MCFG_GFXDECODE(cshooter)
 	MCFG_PALETTE_LENGTH(0x1000)

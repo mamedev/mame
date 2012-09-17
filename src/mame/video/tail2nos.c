@@ -171,15 +171,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( tail2nos )
+UINT32 tail2nos_state::screen_update_tail2nos(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tail2nos_state *state = screen.machine().driver_data<tail2nos_state>();
 
-	if (state->m_video_enable)
+	if (m_video_enable)
 	{
-		k051316_zoom_draw(state->m_k051316, bitmap, cliprect, 0, 0);
+		k051316_zoom_draw(m_k051316, bitmap, cliprect, 0, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect);
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 		bitmap.fill(0, cliprect);

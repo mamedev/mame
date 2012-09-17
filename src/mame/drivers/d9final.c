@@ -45,6 +45,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_d9final(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -66,10 +67,9 @@ void d9final_state::video_start()
 	m_sc0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(d9final_state::get_sc0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 }
 
-static SCREEN_UPDATE_IND16(d9final)
+UINT32 d9final_state::screen_update_d9final(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	d9final_state *state = screen.machine().driver_data<d9final_state>();
-	state->m_sc0_tilemap->draw(bitmap, cliprect, 0,0);
+	m_sc0_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -293,7 +293,7 @@ static MACHINE_CONFIG_START( d9final, d9final_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(d9final)
+	MCFG_SCREEN_UPDATE_DRIVER(d9final_state, screen_update_d9final)
 
 	MCFG_GFXDECODE(d9final)
 	MCFG_PALETTE_LENGTH(0x400)

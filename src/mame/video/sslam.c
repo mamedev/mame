@@ -181,60 +181,58 @@ VIDEO_START_MEMBER(sslam_state,powerbls)
 	save_item(NAME(m_sprites_x_offset));
 }
 
-SCREEN_UPDATE_IND16(sslam)
+UINT32 sslam_state::screen_update_sslam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sslam_state *state = screen.machine().driver_data<sslam_state>();
 
-	if (!(state->m_regs[6] & 1))
+	if (!(m_regs[6] & 1))
 	{
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 
-	state->m_tx_tilemap->set_scrollx(0, state->m_regs[0]+1);	/* +0 looks better, but the real board has the left most pixel at the left edge shifted off screen */
-	state->m_tx_tilemap->set_scrolly(0, (state->m_regs[1] & 0xff)+8);
-	state->m_md_tilemap->set_scrollx(0, state->m_regs[2]+2);
-	state->m_md_tilemap->set_scrolly(0, state->m_regs[3]+8);
-	state->m_bg_tilemap->set_scrollx(0, state->m_regs[4]+4);
-	state->m_bg_tilemap->set_scrolly(0, state->m_regs[5]+8);
+	m_tx_tilemap->set_scrollx(0, m_regs[0]+1);	/* +0 looks better, but the real board has the left most pixel at the left edge shifted off screen */
+	m_tx_tilemap->set_scrolly(0, (m_regs[1] & 0xff)+8);
+	m_md_tilemap->set_scrollx(0, m_regs[2]+2);
+	m_md_tilemap->set_scrolly(0, m_regs[3]+8);
+	m_bg_tilemap->set_scrollx(0, m_regs[4]+4);
+	m_bg_tilemap->set_scrolly(0, m_regs[5]+8);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 
 	/* remove wraparound from the tilemap (used on title screen) */
-	if (state->m_regs[2]+2 > 0x8c8)
+	if (m_regs[2]+2 > 0x8c8)
 	{
 		rectangle md_clip;
 		md_clip.min_x = cliprect.min_x;
-		md_clip.max_x = cliprect.max_x - (state->m_regs[2]+2 - 0x8c8);
+		md_clip.max_x = cliprect.max_x - (m_regs[2]+2 - 0x8c8);
 		md_clip.min_y = cliprect.min_y;
 		md_clip.max_y = cliprect.max_y;
 
-		state->m_md_tilemap->draw(bitmap, md_clip, 0,0);
+		m_md_tilemap->draw(bitmap, md_clip, 0,0);
 	}
 	else
 	{
-		state->m_md_tilemap->draw(bitmap, cliprect, 0,0);
+		m_md_tilemap->draw(bitmap, cliprect, 0,0);
 	}
 
 	draw_sprites(screen.machine(), bitmap,cliprect);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16(powerbls)
+UINT32 sslam_state::screen_update_powerbls(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sslam_state *state = screen.machine().driver_data<sslam_state>();
 
-	if (!(state->m_regs[6] & 1))
+	if (!(m_regs[6] & 1))
 	{
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 
-	state->m_bg_tilemap->set_scrollx(0, state->m_regs[0]+21);
-	state->m_bg_tilemap->set_scrolly(0, state->m_regs[1]-240);
+	m_bg_tilemap->set_scrollx(0, m_regs[0]+21);
+	m_bg_tilemap->set_scrolly(0, m_regs[1]-240);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect);
 	return 0;
 }

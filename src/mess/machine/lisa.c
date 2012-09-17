@@ -821,18 +821,17 @@ void lisa_state::video_start()
 /*
     Video update
 */
-SCREEN_UPDATE_IND16( lisa )
+UINT32 lisa_state::screen_update_lisa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	lisa_state *state = screen.machine().driver_data<lisa_state>();
 	UINT16 *v;
 	int x, y;
 	/* resolution is 720*364 on lisa, vs 608*431 on mac XL */
-	int resx = (state->m_features.has_mac_xl_video) ? 608 : 720;	/* width */
-	int resy = (state->m_features.has_mac_xl_video) ? 431 : 364;	/* height */
+	int resx = (m_features.has_mac_xl_video) ? 608 : 720;	/* width */
+	int resy = (m_features.has_mac_xl_video) ? 431 : 364;	/* height */
 
 	UINT8 line_buffer[720];
 
-	v = state->m_videoram_ptr;
+	v = m_videoram_ptr;
 
 	for (y = 0; y < resy; y++)
 	{

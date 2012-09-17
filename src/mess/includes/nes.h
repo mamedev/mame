@@ -259,6 +259,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -285,7 +286,7 @@ void nes_partialhash(hash_collection &dest, const unsigned char *data, unsigned 
 
 
 
-SCREEN_UPDATE_IND16( nes );
+
 
 
 #endif /* NES_H_ */

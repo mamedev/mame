@@ -168,19 +168,18 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( cbasebal )
+UINT32 cbasebal_state::screen_update_cbasebal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cbasebal_state *state = screen.machine().driver_data<cbasebal_state>();
 
-	if (state->m_bg_on)
-		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (m_bg_on)
+		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(768, cliprect);
 
-	if (state->m_obj_on)
+	if (m_obj_on)
 		draw_sprites(screen.machine(), bitmap, cliprect);
 
-	if (state->m_text_on)
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (m_text_on)
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

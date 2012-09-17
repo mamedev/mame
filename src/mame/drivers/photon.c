@@ -36,6 +36,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pk8000_84_portc_w);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_photon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -205,7 +206,7 @@ void photon_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( photon )
+UINT32 photon_state::screen_update_photon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return pk8000_video_update(screen, bitmap, cliprect, screen.machine().root_device().memregion("maincpu")->base());
 }
@@ -225,7 +226,7 @@ static MACHINE_CONFIG_START( photon, photon_state )
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MCFG_SCREEN_SIZE(256+32, 192+32)
     MCFG_SCREEN_VISIBLE_AREA(0, 256+32-1, 0, 192+32-1)
-    MCFG_SCREEN_UPDATE_STATIC(photon)
+	MCFG_SCREEN_UPDATE_DRIVER(photon_state, screen_update_photon)
     MCFG_PALETTE_LENGTH(16)
     MCFG_PALETTE_INIT(pk8000)
 

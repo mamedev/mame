@@ -42,6 +42,7 @@ public:
 	DECLARE_READ8_MEMBER(in_r);
 	DECLARE_READ8_MEMBER(ld_r);
 	virtual void video_start();
+	UINT32 screen_update_timetrv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -51,10 +52,9 @@ void timetrv_state::video_start()
 
 }
 
-static SCREEN_UPDATE_RGB32( timetrv )
+UINT32 timetrv_state::screen_update_timetrv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	timetrv_state *state = screen.machine().driver_data<timetrv_state>();
-	popmessage("%s%s",reinterpret_cast<char *>(state->m_led_vram_lo.target()),reinterpret_cast<char *>(state->m_led_vram_hi.target()));
+	popmessage("%s%s",reinterpret_cast<char *>(m_led_vram_lo.target()),reinterpret_cast<char *>(m_led_vram_hi.target()));
 	return 0;
 }
 
@@ -159,7 +159,7 @@ static MACHINE_CONFIG_START( timetrv, timetrv_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
-	MCFG_SCREEN_UPDATE_STATIC(timetrv)
+	MCFG_SCREEN_UPDATE_DRIVER(timetrv_state, screen_update_timetrv)
 
 	MCFG_PALETTE_LENGTH(512)
 

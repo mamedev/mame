@@ -182,6 +182,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_galsnew(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -196,9 +197,8 @@ void expro02_state::palette_init()
 		palette_set_color_rgb(machine(),2048 + i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
 }
 
-SCREEN_UPDATE_IND16( galsnew )
+UINT32 expro02_state::screen_update_galsnew(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	expro02_state *state = screen.machine().driver_data<expro02_state>();
 //  kaneko16_fill_bitmap(screen.machine(),bitmap,cliprect);
 	int y,x;
 	int count;
@@ -211,7 +211,7 @@ SCREEN_UPDATE_IND16( galsnew )
 
 		for (x=0;x<256;x++)
 		{
-			UINT16 dat = (state->m_galsnew_fg_pixram[count] & 0xfffe)>>1;
+			UINT16 dat = (m_galsnew_fg_pixram[count] & 0xfffe)>>1;
 			dat+=2048;
 			dest[x] = dat;
 			count++;
@@ -225,7 +225,7 @@ SCREEN_UPDATE_IND16( galsnew )
 
 		for (x=0;x<256;x++)
 		{
-			UINT16 dat = (state->m_galsnew_bg_pixram[count]);
+			UINT16 dat = (m_galsnew_bg_pixram[count]);
 			//dat &=0x3ff;
 			if (dat)
 				dest[x] = dat;
@@ -240,14 +240,14 @@ SCREEN_UPDATE_IND16( galsnew )
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_view2_0->kaneko16_prepare(bitmap, cliprect);
+	m_view2_0->kaneko16_prepare(bitmap, cliprect);
 
 	for ( i = 0; i < 8; i++ )
 	{
-		state->m_view2_0->render_tilemap_chip(bitmap,cliprect,i);
+		m_view2_0->render_tilemap_chip(bitmap,cliprect,i);
 	}
 
-	state->m_kaneko_spr->kaneko16_render_sprites(screen.machine(),bitmap,cliprect, state->m_spriteram, state->m_spriteram.bytes());
+	m_kaneko_spr->kaneko16_render_sprites(screen.machine(),bitmap,cliprect, m_spriteram, m_spriteram.bytes());
 	return 0;
 }
 
@@ -557,7 +557,7 @@ static MACHINE_CONFIG_START( galsnew, expro02_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-32-1)
-	MCFG_SCREEN_UPDATE_STATIC(galsnew)
+	MCFG_SCREEN_UPDATE_DRIVER(expro02_state, screen_update_galsnew)
 
 	MCFG_GFXDECODE(1x4bit_1x4bit)
 	MCFG_PALETTE_LENGTH(2048 + 32768)

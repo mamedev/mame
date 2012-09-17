@@ -56,6 +56,7 @@ public:
 	double m_recv_baud_rate;
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -316,7 +317,7 @@ static INPUT_PORTS_START( vt100 )
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED) // Always return 0x7f on last scan line
 INPUT_PORTS_END
 
-static SCREEN_UPDATE_IND16( vt100 )
+UINT32 vt100_state::screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	device_t *devconf = screen.machine().device("vt100_video");
 	vt_video_update( devconf, bitmap, cliprect);
@@ -420,7 +421,7 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(80*10, 25*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*10-1, 0, 25*10-1)
-	MCFG_SCREEN_UPDATE_STATIC(vt100)
+	MCFG_SCREEN_UPDATE_DRIVER(vt100_state, screen_update_vt100)
 
 	MCFG_GFXDECODE(vt100)
 	MCFG_PALETTE_LENGTH(2)

@@ -73,6 +73,7 @@ public:
 	DECLARE_WRITE8_MEMBER(avr8_write);
 	DECLARE_DRIVER_INIT(craft);
 	virtual void machine_reset();
+	UINT32 screen_update_craft(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 void craft_state::machine_start()
@@ -951,7 +952,7 @@ INPUT_PORTS_END
 * Video hardware                                     *
 \****************************************************/
 
-static SCREEN_UPDATE_RGB32( craft )
+UINT32 craft_state::screen_update_craft(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
     return 0;
 }
@@ -996,7 +997,7 @@ static MACHINE_CONFIG_START( craft, craft_state )
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1395)) /* accurate */
     MCFG_SCREEN_SIZE(634, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 633, 0, 479)
-    MCFG_SCREEN_UPDATE_STATIC(craft)
+	MCFG_SCREEN_UPDATE_DRIVER(craft_state, screen_update_craft)
 
     MCFG_PALETTE_LENGTH(0x1000)
 

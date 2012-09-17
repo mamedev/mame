@@ -16,9 +16,8 @@ PALETTE_INIT_MEMBER(kaypro_state,kaypro)
 	palette_set_color(machine(), 2, MAKE_RGB(0, 110, 0)); /* low intensity green */
 }
 
-SCREEN_UPDATE_IND16( kayproii )
+UINT32 kaypro_state::screen_update_kayproii(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	kaypro_state *state = screen.machine().driver_data<kaypro_state>();
 /* The display consists of 80 columns and 24 rows. Each row is allocated 128 bytes of ram,
     but only the first 80 are used. The total video ram therefore is 0x0c00 bytes.
     There is one video attribute: bit 7 causes blinking. The first half of the
@@ -29,7 +28,7 @@ SCREEN_UPDATE_IND16( kayproii )
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 
-	state->m_framecnt++;
+	m_framecnt++;
 
 	for (y = 0; y < 24; y++)
 	{
@@ -43,14 +42,14 @@ SCREEN_UPDATE_IND16( kayproii )
 
 				if (ra < 8)
 				{
-					chr = state->m_p_videoram[x]^0x80;
+					chr = m_p_videoram[x]^0x80;
 
 					/* Take care of flashing characters */
-					if ((chr < 0x80) && (state->m_framecnt & 0x08))
+					if ((chr < 0x80) && (m_framecnt & 0x08))
 						chr |= 0x80;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = state->m_p_chargen[(chr<<3) | ra ];
+					gfx = m_p_chargen[(chr<<3) | ra ];
 				}
 
 				/* Display a scanline of a character (7 pixels) */
@@ -68,13 +67,12 @@ SCREEN_UPDATE_IND16( kayproii )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( omni2 )
+UINT32 kaypro_state::screen_update_omni2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	kaypro_state *state = screen.machine().driver_data<kaypro_state>();
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 
-	state->m_framecnt++;
+	m_framecnt++;
 
 	for (y = 0; y < 24; y++)
 	{
@@ -88,14 +86,14 @@ SCREEN_UPDATE_IND16( omni2 )
 
 				if (ra < 8)
 				{
-					chr = state->m_p_videoram[x];
+					chr = m_p_videoram[x];
 
 					/* Take care of flashing characters */
-					if ((chr > 0x7f) && (state->m_framecnt & 0x08))
+					if ((chr > 0x7f) && (m_framecnt & 0x08))
 						chr |= 0x80;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = state->m_p_chargen[(chr<<3) | ra ];
+					gfx = m_p_chargen[(chr<<3) | ra ];
 				}
 
 				/* Display a scanline of a character (7 pixels) */
@@ -113,14 +111,13 @@ SCREEN_UPDATE_IND16( omni2 )
 	return 0;
 }
 
-SCREEN_UPDATE_RGB32( kaypro2x )
+UINT32 kaypro_state::screen_update_kaypro2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	kaypro_state *state = screen.machine().driver_data<kaypro_state>();
-	state->m_framecnt++;
-	state->m_speed = state->m_mc6845_reg[10]&0x20;
-	state->m_flash = state->m_mc6845_reg[10]&0x40;				// cursor modes
-	state->m_cursor = (state->m_mc6845_reg[14]<<8) | state->m_mc6845_reg[15];					// get cursor position
-	state->m_crtc->screen_update(screen, bitmap, cliprect);
+	m_framecnt++;
+	m_speed = m_mc6845_reg[10]&0x20;
+	m_flash = m_mc6845_reg[10]&0x40;				// cursor modes
+	m_cursor = (m_mc6845_reg[14]<<8) | m_mc6845_reg[15];					// get cursor position
+	m_crtc->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
 

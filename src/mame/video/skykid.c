@@ -229,40 +229,39 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 }
 
 
-SCREEN_UPDATE_IND16( skykid )
+UINT32 skykid_state::screen_update_skykid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	skykid_state *state = screen.machine().driver_data<skykid_state>();
-	if (state->flip_screen())
+	if (flip_screen())
 	{
-		state->m_bg_tilemap->set_scrollx(0, 189 - (state->m_scroll_x ^ 1));
-		state->m_bg_tilemap->set_scrolly(0, 7 - state->m_scroll_y);
+		m_bg_tilemap->set_scrollx(0, 189 - (m_scroll_x ^ 1));
+		m_bg_tilemap->set_scrolly(0, 7 - m_scroll_y);
 	}
 	else
 	{
-		state->m_bg_tilemap->set_scrollx(0, state->m_scroll_x + 35);
-		state->m_bg_tilemap->set_scrolly(0, state->m_scroll_y + 25);
+		m_bg_tilemap->set_scrollx(0, m_scroll_x + 35);
+		m_bg_tilemap->set_scrolly(0, m_scroll_y + 25);
 	}
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 
-	if (state->m_priority & 0x04)
+	if (m_priority & 0x04)
 	{
 		// textlayer priority enabled?
-		int cat, pri = state->m_priority >> 4;
+		int cat, pri = m_priority >> 4;
 
 		// draw low priority tiles
-		state->m_tx_tilemap->draw(bitmap, cliprect, pri, 0);
+		m_tx_tilemap->draw(bitmap, cliprect, pri, 0);
 
 		draw_sprites(screen.machine(), bitmap, cliprect);
 
 		// draw the other tiles
 		for (cat = 0; cat < 0xf; cat++)
-			if (cat != pri) state->m_tx_tilemap->draw(bitmap, cliprect, cat, 0);
+			if (cat != pri) m_tx_tilemap->draw(bitmap, cliprect, cat, 0);
 	}
 	else
 	{
 		draw_sprites(screen.machine(), bitmap, cliprect);
-		state->m_tx_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_ALL_CATEGORIES, 0);
+		m_tx_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_ALL_CATEGORIES, 0);
 	}
 
 	return 0;

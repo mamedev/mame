@@ -42,11 +42,13 @@ public:
 	TILE_GET_INFO_MEMBER(get_shadfrce_bg0tile_info);
 	TILE_GET_INFO_MEMBER(get_shadfrce_bg1tile_info);
 	virtual void video_start();
+	UINT32 screen_update_shadfrce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_shadfrce(screen_device &screen, bool state);
 };
 
 
 /*----------- defined in video/shadfrce.c -----------*/
 
 
-SCREEN_VBLANK(shadfrce);
-SCREEN_UPDATE_IND16( shadfrce );
+
+

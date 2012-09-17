@@ -62,6 +62,7 @@ public:
 	DECLARE_MACHINE_START(orionz80);
 	DECLARE_MACHINE_RESET(orionz80);
 	DECLARE_MACHINE_RESET(orionpro);
+	UINT32 screen_update_orion128(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 

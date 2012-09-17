@@ -434,7 +434,7 @@ static MACHINE_CONFIG_START( wwfsstar, wwfsstar_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 320, 0, 256, 272, 8, 248)	/* HTOTAL and VTOTAL are guessed */
-	MCFG_SCREEN_UPDATE_STATIC(wwfsstar)
+	MCFG_SCREEN_UPDATE_DRIVER(wwfsstar_state, screen_update_wwfsstar)
 
 	MCFG_GFXDECODE(wwfsstar)
 	MCFG_PALETTE_LENGTH(384)

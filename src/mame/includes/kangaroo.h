@@ -30,6 +30,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_MACHINE_START(kangaroo_mcu);
+	UINT32 screen_update_kangaroo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -38,5 +39,5 @@ public:
 /*----------- defined in video/kangaroo.c -----------*/
 
 
-SCREEN_UPDATE_RGB32( kangaroo );
+
 

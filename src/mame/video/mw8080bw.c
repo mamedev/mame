@@ -8,9 +8,8 @@
 #include "includes/mw8080bw.h"
 
 
-SCREEN_UPDATE_RGB32( mw8080bw )
+UINT32 mw8080bw_state::screen_update_mw8080bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	mw8080bw_state *state = screen.machine().driver_data<mw8080bw_state>();
 	UINT8 x = 0;
 	UINT8 y = MW8080BW_VCOUNTER_START_NO_VBLANK;
 	UINT8 video_data = 0;
@@ -51,7 +50,7 @@ SCREEN_UPDATE_RGB32( mw8080bw )
 		else if ((x & 0x07) == 0x04)
 		{
 			offs_t offs = ((offs_t)y << 5) | (x >> 3);
-			video_data = state->m_main_ram[offs];
+			video_data = m_main_ram[offs];
 		}
 	}
 
@@ -75,9 +74,8 @@ SCREEN_UPDATE_RGB32( mw8080bw )
 #define PHANTOM2_SIDE_TRENCH_LIGHT_RGB32_PEN     MAKE_RGB(0x72, 0x72, 0x72)
 
 
-SCREEN_UPDATE_RGB32( spcenctr )
+UINT32 mw8080bw_state::screen_update_spcenctr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	mw8080bw_state *state = screen.machine().driver_data<mw8080bw_state>();
 	UINT8 line_buf[256]; /* 256x1 bit RAM */
 
 	UINT8 x = 0;
@@ -86,9 +84,9 @@ SCREEN_UPDATE_RGB32( spcenctr )
 	UINT8 draw_line = 0;
 	UINT8 draw_trench = 0;
 	UINT8 draw_floor = 0;
-	UINT8 width = state->m_spcenctr_trench_width;
+	UINT8 width = m_spcenctr_trench_width;
 	UINT8 floor_width = width;
-	UINT8 center = state->m_spcenctr_trench_center;
+	UINT8 center = m_spcenctr_trench_center;
 
 	memset(line_buf, 0, 256);
 
@@ -150,7 +148,7 @@ SCREEN_UPDATE_RGB32( spcenctr )
 
 			/* update the trench control for the next line */
 			offs = ((offs_t)y << 5) | 0x1f;
-			trench_control = state->m_main_ram[offs];
+			trench_control = m_main_ram[offs];
 
 			if (trench_control & 0x40)
 				draw_trench = 1;
@@ -168,11 +166,11 @@ SCREEN_UPDATE_RGB32( spcenctr )
 
 			/* add the lower 2 bits stored in the slope array to width */
 			if (draw_trench)
-				width = width + (state->m_spcenctr_trench_slope[y & 0x0f] & 0x03);
+				width = width + (m_spcenctr_trench_slope[y & 0x0f] & 0x03);
 
 			/* add the higher 2 bits stored in the slope array to floor width */
 			if (draw_floor)
-				floor_width = floor_width + ((state->m_spcenctr_trench_slope[y & 0x0f] & 0x0c) >> 2);
+				floor_width = floor_width + ((m_spcenctr_trench_slope[y & 0x0f] & 0x0c) >> 2);
 
 			/* next row, video_data is now 0, so the next line will start
                with 4 blank pixels */
@@ -186,7 +184,7 @@ SCREEN_UPDATE_RGB32( spcenctr )
 		else if ((x & 0x07) == 0x04)
 		{
 			offs_t offs = ((offs_t)y << 5) | (x >> 3);
-			video_data = state->m_main_ram[offs];
+			video_data = m_main_ram[offs];
 		}
 	}
 
@@ -219,17 +217,16 @@ SCREEN_UPDATE_RGB32( spcenctr )
 #define PHANTOM2_RGB32_CLOUD_PEN          MAKE_RGB(0xc0, 0xc0, 0xc0)
 
 
-SCREEN_UPDATE_RGB32( phantom2 )
+UINT32 mw8080bw_state::screen_update_phantom2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	mw8080bw_state *state = screen.machine().driver_data<mw8080bw_state>();
 	UINT8 x = 0;
 	UINT8 y = MW8080BW_VCOUNTER_START_NO_VBLANK;
 	UINT8 video_data = 0;
 	UINT8 cloud_data = 0;
 
-	UINT16 cloud_counter = state->m_phantom2_cloud_counter;
+	UINT16 cloud_counter = m_phantom2_cloud_counter;
 
-	UINT8 *cloud_region = state->memregion("proms")->base();
+	UINT8 *cloud_region = memregion("proms")->base();
 
 	while (1)
 	{
@@ -303,7 +300,7 @@ SCREEN_UPDATE_RGB32( phantom2 )
 		else if ((x & 0x07) == 0x04)
 		{
 			offs_t offs = ((offs_t)y << 5) | (x >> 3);
-			video_data = state->m_main_ram[offs];
+			video_data = m_main_ram[offs];
 		}
 	}
 
@@ -311,17 +308,16 @@ SCREEN_UPDATE_RGB32( phantom2 )
 }
 
 
-SCREEN_VBLANK( phantom2 )
+void mw8080bw_state::screen_eof_phantom2(screen_device &screen, bool state)
 {
 	// falling edge
-	if (!vblank_on)
+	if (!state)
 	{
-		mw8080bw_state *state = screen.machine().driver_data<mw8080bw_state>();
 
-		state->m_phantom2_cloud_counter += MW8080BW_VTOTAL;
+		m_phantom2_cloud_counter += MW8080BW_VTOTAL;
 
-		if (state->m_phantom2_cloud_counter >= PHANTOM2_CLOUD_COUNTER_END)
-			state->m_phantom2_cloud_counter = PHANTOM2_CLOUD_COUNTER_START + (state->m_phantom2_cloud_counter - PHANTOM2_CLOUD_COUNTER_END);
+		if (m_phantom2_cloud_counter >= PHANTOM2_CLOUD_COUNTER_END)
+			m_phantom2_cloud_counter = PHANTOM2_CLOUD_COUNTER_START + (m_phantom2_cloud_counter - PHANTOM2_CLOUD_COUNTER_END);
 	}
 }
 
@@ -335,13 +331,12 @@ SCREEN_VBLANK( phantom2 )
 
 /* the flip screen circuit is just a couple of relays on the monitor PCB */
 
-SCREEN_UPDATE_RGB32( invaders )
+UINT32 mw8080bw_state::screen_update_invaders(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	mw8080bw_state *state = screen.machine().driver_data<mw8080bw_state>();
 	UINT8 x = 0;
 	UINT8 y = MW8080BW_VCOUNTER_START_NO_VBLANK;
 	UINT8 video_data = 0;
-	UINT8 flip = state->m_invaders_flip_screen;
+	UINT8 flip = m_invaders_flip_screen;
 
 	while (1)
 	{
@@ -387,7 +382,7 @@ SCREEN_UPDATE_RGB32( invaders )
 		else if ((x & 0x07) == 0x04)
 		{
 			offs_t offs = ((offs_t)y << 5) | (x >> 3);
-			video_data = state->m_main_ram[offs];
+			video_data = m_main_ram[offs];
 		}
 	}
 

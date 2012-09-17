@@ -2790,15 +2790,14 @@ static void cps1_render_high_layer( running_machine &machine, bitmap_ind16 &bitm
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( cps1 )
+UINT32 cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cps_state *state = screen.machine().driver_data<cps_state>();
 	int layercontrol, l0, l1, l2, l3;
-	int videocontrol = state->m_cps_a_regs[CPS1_VIDEOCONTROL];
+	int videocontrol = m_cps_a_regs[CPS1_VIDEOCONTROL];
 
-	state->flip_screen_set(videocontrol & 0x8000);
+	flip_screen_set(videocontrol & 0x8000);
 
-	layercontrol = state->m_cps_b_regs[state->m_game_config->layer_control / 2];
+	layercontrol = m_cps_b_regs[m_game_config->layer_control / 2];
 
 	/* Get video memory base registers */
 	cps1_get_video_base(screen.machine());
@@ -2806,41 +2805,41 @@ SCREEN_UPDATE_IND16( cps1 )
 	/* Find the offset of the last sprite in the sprite table */
 	cps1_find_last_sprite(screen.machine());
 
-	if (state->m_cps_version == 2)
+	if (m_cps_version == 2)
 	{
 		cps2_find_last_sprite(screen.machine());
 	}
 
 	cps1_update_transmasks(screen.machine());
 
-	state->m_bg_tilemap[0]->set_scrollx(0, state->m_scroll1x);
-	state->m_bg_tilemap[0]->set_scrolly(0, state->m_scroll1y);
+	m_bg_tilemap[0]->set_scrollx(0, m_scroll1x);
+	m_bg_tilemap[0]->set_scrolly(0, m_scroll1y);
 
 	if (videocontrol & 0x01)	/* linescroll enable */
 	{
-		int scrly = -state->m_scroll2y;
+		int scrly = -m_scroll2y;
 		int i;
 		int otheroffs;
 
-		state->m_bg_tilemap[1]->set_scroll_rows(1024);
+		m_bg_tilemap[1]->set_scroll_rows(1024);
 
-		otheroffs = state->m_cps_a_regs[CPS1_ROWSCROLL_OFFS];
+		otheroffs = m_cps_a_regs[CPS1_ROWSCROLL_OFFS];
 
 		for (i = 0; i < 256; i++)
-			state->m_bg_tilemap[1]->set_scrollx((i - scrly) & 0x3ff, state->m_scroll2x + state->m_other[(i + otheroffs) & 0x3ff]);
+			m_bg_tilemap[1]->set_scrollx((i - scrly) & 0x3ff, m_scroll2x + m_other[(i + otheroffs) & 0x3ff]);
 	}
 	else
 	{
-		state->m_bg_tilemap[1]->set_scroll_rows(1);
-		state->m_bg_tilemap[1]->set_scrollx(0, state->m_scroll2x);
+		m_bg_tilemap[1]->set_scroll_rows(1);
+		m_bg_tilemap[1]->set_scrollx(0, m_scroll2x);
 	}
-	state->m_bg_tilemap[1]->set_scrolly(0, state->m_scroll2y);
-	state->m_bg_tilemap[2]->set_scrollx(0, state->m_scroll3x);
-	state->m_bg_tilemap[2]->set_scrolly(0, state->m_scroll3y);
+	m_bg_tilemap[1]->set_scrolly(0, m_scroll2y);
+	m_bg_tilemap[2]->set_scrollx(0, m_scroll3x);
+	m_bg_tilemap[2]->set_scrolly(0, m_scroll3y);
 
 
 	/* Blank screen */
-	if (state->m_cps_version == 1)
+	if (m_cps_version == 1)
 	{
 		// CPS1 games use pen 0xbff as background color; this is used in 3wonders,
 		// mtwins (explosion during attract), mercs (intermission).
@@ -2865,7 +2864,7 @@ SCREEN_UPDATE_IND16( cps1 )
 	l3 = (layercontrol >> 0x0c) & 03;
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	if (state->m_cps_version == 1)
+	if (m_cps_version == 1)
 	{
 		cps1_render_layer(screen.machine(), bitmap, cliprect, l0, 0);
 
@@ -2888,10 +2887,10 @@ SCREEN_UPDATE_IND16( cps1 )
 	{
 		int l0pri, l1pri, l2pri, l3pri;
 		int primasks[8], i;
-		l0pri = (state->m_pri_ctrl >> 4 * l0) & 0x0f;
-		l1pri = (state->m_pri_ctrl >> 4 * l1) & 0x0f;
-		l2pri = (state->m_pri_ctrl >> 4 * l2) & 0x0f;
-		l3pri = (state->m_pri_ctrl >> 4 * l3) & 0x0f;
+		l0pri = (m_pri_ctrl >> 4 * l0) & 0x0f;
+		l1pri = (m_pri_ctrl >> 4 * l1) & 0x0f;
+		l2pri = (m_pri_ctrl >> 4 * l2) & 0x0f;
+		l3pri = (m_pri_ctrl >> 4 * l3) & 0x0f;
 
 #if 0
 if (	(cps2_port(screen.machine(), CPS2_OBJ_BASE) != 0x7080 && cps2_port(screen.machine(), CPS2_OBJ_BASE) != 0x7000) ||
@@ -2942,20 +2941,19 @@ if (0 && screen.machine().input().code_pressed(KEYCODE_Z))
 	return 0;
 }
 
-SCREEN_VBLANK( cps1 )
+void cps_state::screen_eof_cps1(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		cps_state *state = screen.machine().driver_data<cps_state>();
 
 		/* Get video memory base registers */
 		cps1_get_video_base(screen.machine());
 
-		if (state->m_cps_version == 1)
+		if (m_cps_version == 1)
 		{
 			/* CPS1 sprites have to be delayed one frame */
-			memcpy(state->m_buffered_obj, state->m_obj, state->m_obj_size);
+			memcpy(m_buffered_obj, m_obj, m_obj_size);
 		}
 	}
 }

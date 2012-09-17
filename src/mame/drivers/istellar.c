@@ -53,6 +53,7 @@ public:
 	DECLARE_DRIVER_INIT(istellar);
 	virtual void machine_start();
 	virtual void palette_init();
+	UINT32 screen_update_istellar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -61,9 +62,8 @@ public:
 
 
 /* VIDEO GOODS */
-static SCREEN_UPDATE_RGB32( istellar )
+UINT32 istellar_state::screen_update_istellar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	istellar_state *state = screen.machine().driver_data<istellar_state>();
 	int x, y;
 
 	/* clear */
@@ -74,8 +74,8 @@ static SCREEN_UPDATE_RGB32( istellar )
 	{
 		for (x = 0; x < 32; x++)
 		{
-			int tile = state->m_tile_ram[x+y*32];
-			int attr = state->m_tile_control_ram[x+y*32];
+			int tile = m_tile_ram[x+y*32];
+			int attr = m_tile_control_ram[x+y*32];
 
 			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0],tile,attr & 0x0f,0, 0, x*8, y*8, 0);
 		}
@@ -346,7 +346,7 @@ static MACHINE_CONFIG_START( istellar, istellar_state )
 
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
-	MCFG_LASERDISC_OVERLAY_STATIC(256, 256, istellar)
+	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, istellar_state, screen_update_istellar)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")

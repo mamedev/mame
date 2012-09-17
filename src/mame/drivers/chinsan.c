@@ -75,6 +75,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_chinsan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -97,9 +98,8 @@ void chinsan_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( chinsan )
+UINT32 chinsan_state::screen_update_chinsan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	chinsan_state *state = screen.machine().driver_data<chinsan_state>();
 	int y, x, count;
 	count = 0;
 	for (y = 0; y < 32; y++)
@@ -107,8 +107,8 @@ static SCREEN_UPDATE_IND16( chinsan )
 		for (x = 0; x < 64; x++)
 		{
 			int tileno, colour;
-			tileno = state->m_video[count] | (state->m_video[count + 0x800] << 8);
-			colour = state->m_video[count + 0x1000] >> 3;
+			tileno = m_video[count] | (m_video[count + 0x800] << 8);
+			colour = m_video[count + 0x1000] >> 3;
 			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],tileno,colour,0,0,x*8,y*8);
 			count++;
 		}
@@ -614,7 +614,7 @@ static MACHINE_CONFIG_START( chinsan, chinsan_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_VISIBLE_AREA(24, 512-24-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_STATIC(chinsan)
+	MCFG_SCREEN_UPDATE_DRIVER(chinsan_state, screen_update_chinsan)
 
 	MCFG_GFXDECODE(chinsan)
 	MCFG_PALETTE_LENGTH(0x100)

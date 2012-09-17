@@ -198,6 +198,8 @@ public:
 	DECLARE_VIDEO_START(stv_vdp2);
 	DECLARE_MACHINE_START(stv);
 	DECLARE_MACHINE_RESET(stv);
+	UINT32 screen_update_saturn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_stv_vdp2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 #define MASTER_CLOCK_352 57272720
@@ -262,7 +264,7 @@ DECLARE_WRITE32_HANDLER ( saturn_vdp2_cram_w );
 DECLARE_WRITE16_HANDLER ( saturn_vdp2_regs_w );
 
 
-SCREEN_UPDATE_RGB32( stv_vdp2 );
+
 #if NEW_VIDEO_CODE
-SCREEN_UPDATE_RGB32( saturn );
+
 #endif

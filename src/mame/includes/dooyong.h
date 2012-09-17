@@ -79,6 +79,14 @@ public:
 	DECLARE_VIDEO_START(primella);
 	DECLARE_VIDEO_START(rshark);
 	DECLARE_VIDEO_START(popbingo);
+	UINT32 screen_update_lastday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_gulfstrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_pollux(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_bluehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_flytiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_primella(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_rshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_popbingo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -88,14 +96,14 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( lastday );
-SCREEN_UPDATE_IND16( gulfstrm );
-SCREEN_UPDATE_IND16( pollux );
-SCREEN_UPDATE_IND16( bluehawk );
-SCREEN_UPDATE_IND16( flytiger );
-SCREEN_UPDATE_IND16( primella );
-SCREEN_UPDATE_IND16( rshark );
-SCREEN_UPDATE_IND16( popbingo );
+
+
+
+
+
+
+
+
 
 
 

@@ -48,9 +48,8 @@ void microtan_state::video_start()
 	m_chunky_graphics = 0;
 }
 
-SCREEN_UPDATE_IND16( microtan )
+UINT32 microtan_state::screen_update_microtan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	microtan_state *state = screen.machine().driver_data<microtan_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

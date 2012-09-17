@@ -196,6 +196,8 @@ public:
 	DECLARE_DRIVER_INIT(vbowlj);
 	DECLARE_DRIVER_INIT(ryukobou);
 	virtual void video_start();
+	UINT32 screen_update_igs011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_vbowl(screen_device &screen, bool state);
 };
 
 
@@ -243,9 +245,8 @@ void igs011_state::video_start()
 	m_lhb2_pen_hi = 0;
 }
 
-static SCREEN_UPDATE_IND16( igs011 )
+UINT32 igs011_state::screen_update_igs011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	igs011_state *state = screen.machine().driver_data<igs011_state>();
 #ifdef MAME_DEBUG
 	int layer_enable = -1;
 #endif
@@ -269,7 +270,7 @@ static SCREEN_UPDATE_IND16( igs011 )
 	}
 #endif
 
-	pri_ram = &state->m_priority_ram[(state->m_priority & 7) * 512/2];
+	pri_ram = &m_priority_ram[(m_priority & 7) * 512/2];
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -280,7 +281,7 @@ static SCREEN_UPDATE_IND16( igs011 )
 
 			for (l = 0; l < 8; l++)
 			{
-				if (	(state->m_layer[l][scr_addr] != 0xff)
+				if (	(m_layer[l][scr_addr] != 0xff)
 #ifdef MAME_DEBUG
 						&& (layer_enable & (1 << l))
 #endif
@@ -296,7 +297,7 @@ static SCREEN_UPDATE_IND16( igs011 )
 				bitmap.pix16(y, x) = get_black_pen(screen.machine());
 			else
 #endif
-				bitmap.pix16(y, x) = state->m_layer[l][scr_addr] | (l << 8);
+				bitmap.pix16(y, x) = m_layer[l][scr_addr] | (l << 8);
 		}
 	}
 	return 0;
@@ -2488,14 +2489,13 @@ READ16_MEMBER(igs011_state::vbowl_unk_r)
 	return 0xffff;
 }
 
-static SCREEN_VBLANK( vbowl )
+void igs011_state::screen_eof_vbowl(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		igs011_state *state = screen.machine().driver_data<igs011_state>();
-		state->m_vbowl_trackball[0] = state->m_vbowl_trackball[1];
-		state->m_vbowl_trackball[1] = (state->ioport("AN1")->read() << 8) | state->ioport("AN0")->read();
+		m_vbowl_trackball[0] = m_vbowl_trackball[1];
+		m_vbowl_trackball[1] = (ioport("AN1")->read() << 8) | ioport("AN0")->read();
 	}
 }
 
@@ -3809,7 +3809,7 @@ static MACHINE_CONFIG_START( igs011_base, igs011_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_STATIC( igs011 )
+	MCFG_SCREEN_UPDATE_DRIVER(igs011_state, screen_update_igs011)
 
 	MCFG_PALETTE_LENGTH(0x800)
 //  MCFG_GFXDECODE(igs011)
@@ -3944,7 +3944,7 @@ static MACHINE_CONFIG_DERIVED( vbowl, igs011_base )
 	// irq 4 points to an apparently unneeded routine
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_STATIC(vbowl)	// trackball
+	MCFG_SCREEN_VBLANK_DRIVER(igs011_state, screen_eof_vbowl)
 //  MCFG_GFXDECODE(igs011_hi)
 
 	MCFG_DEVICE_REMOVE("oki")

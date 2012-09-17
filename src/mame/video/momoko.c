@@ -101,27 +101,26 @@ static void momoko_draw_bg_pri( running_machine &machine, bitmap_ind16 &bitmap, 
 
 /****************************************************************************/
 
-SCREEN_UPDATE_IND16( momoko )
+UINT32 momoko_state::screen_update_momoko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	momoko_state *state = screen.machine().driver_data<momoko_state>();
 	int x, y, dx, dy, rx, ry, radr, chr, sy, fx, fy, px, py, offs, col, pri, flip ;
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 
 	UINT8 *BG_MAP     = screen.machine().root_device().memregion("user1")->base();
 	UINT8 *BG_COL_MAP = screen.machine().root_device().memregion("user2")->base();
 	UINT8 *FG_MAP     = screen.machine().root_device().memregion("user3")->base();
-	UINT8 *TEXT_COLOR = state->memregion("proms")->base();
+	UINT8 *TEXT_COLOR = memregion("proms")->base();
 
 
-	flip = state->m_flipscreen ^ (screen.machine().root_device().ioport("FAKE")->read() & 0x01);
+	flip = m_flipscreen ^ (screen.machine().root_device().ioport("FAKE")->read() & 0x01);
 
 	/* draw BG layer */
-	dx = (7 - state->m_bg_scrollx[0]) & 7;
-	dy = (7 - state->m_bg_scrolly[0]) & 7;
-	rx = (state->m_bg_scrollx[0] + state->m_bg_scrollx[1] * 256) >> 3;
-	ry = (state->m_bg_scrolly[0] + state->m_bg_scrolly[1] * 256) >> 3;
+	dx = (7 - m_bg_scrollx[0]) & 7;
+	dy = (7 - m_bg_scrolly[0]) & 7;
+	rx = (m_bg_scrollx[0] + m_bg_scrollx[1] * 256) >> 3;
+	ry = (m_bg_scrolly[0] + m_bg_scrolly[1] * 256) >> 3;
 
-	if (state->m_bg_mask == 0)
+	if (m_bg_mask == 0)
 	{
 		for (y = 0; y < 29; y++)
 		{
@@ -129,8 +128,8 @@ SCREEN_UPDATE_IND16( momoko )
 			{
 				radr = ((ry + y + 2) & 0x3ff) * 128 + ((rx + x) & 0x7f);
 				chr = BG_MAP[radr];
-				col = BG_COL_MAP[chr + state->m_bg_select * 512 + state->m_bg_priority * 256] & 0x0f;
-				chr = chr + state->m_bg_select * 512;
+				col = BG_COL_MAP[chr + m_bg_select * 512 + m_bg_priority * 256] & 0x0f;
+				chr = chr + m_bg_select * 512;
 
 				if (flip == 0)
 				{
@@ -186,7 +185,7 @@ SCREEN_UPDATE_IND16( momoko )
 
 
 	/* draw BG layer */
-	if (state->m_bg_mask ==0)
+	if (m_bg_mask ==0)
 	{
 		for (y = 0; y < 29; y++)
 		{
@@ -194,7 +193,7 @@ SCREEN_UPDATE_IND16( momoko )
 			{
 				radr = ((ry + y + 2) & 0x3ff) * 128 + ((rx + x) & 0x7f) ;
 				chr = BG_MAP[radr] ;
-				col = BG_COL_MAP[chr + state->m_bg_select * 512 + state->m_bg_priority * 256];
+				col = BG_COL_MAP[chr + m_bg_select * 512 + m_bg_priority * 256];
 				pri = (col & 0x10) >> 1;
 
 				if (flip == 0)
@@ -210,7 +209,7 @@ SCREEN_UPDATE_IND16( momoko )
 				if (pri != 0)
 				{
 					col = col & 0x0f;
-					chr = chr + state->m_bg_select * 512;
+					chr = chr + m_bg_select * 512;
 					momoko_draw_bg_pri(screen.machine(), bitmap, chr, col, flip, flip, px, py, pri);
 				}
 			}
@@ -219,7 +218,7 @@ SCREEN_UPDATE_IND16( momoko )
 
 
 	/* draw sprites (others) */
-	for (offs = 9 * 4; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 9 * 4; offs < m_spriteram.bytes(); offs += 4)
 	{
 		chr = spriteram[offs + 1] | ((spriteram[offs + 2] & 0x60) << 3);
 		chr = ((chr & 0x380) << 1) | (chr & 0x7f);
@@ -253,12 +252,12 @@ SCREEN_UPDATE_IND16( momoko )
 		for (x = 0; x < 32; x++)
 		{
 			sy = y;
-			if (state->m_text_mode == 0)
+			if (m_text_mode == 0)
 				col = TEXT_COLOR[(sy >> 3) + 0x100] & 0x0f;
 			else
 			{
 				if (TEXT_COLOR[y] < 0x08)
-					sy += state->m_text_scrolly;
+					sy += m_text_scrolly;
 				col = (TEXT_COLOR[y] & 0x07) + 0x10;
 			}
 			dy = sy & 7;
@@ -273,7 +272,7 @@ SCREEN_UPDATE_IND16( momoko )
 				py = 255 - y;
 			}
 			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
-				state->m_videoram[(sy >> 3) * 32 + x] * 8 + dy,
+				m_videoram[(sy >> 3) * 32 + x] * 8 + dy,
 				col,
 				flip,0,
 				px,py,0);
@@ -282,18 +281,18 @@ SCREEN_UPDATE_IND16( momoko )
 
 
 	/* draw FG layer */
-	if (state->m_fg_mask == 0)
+	if (m_fg_mask == 0)
 	{
-		dx = (7 - state->m_fg_scrollx) & 7;
-		dy = (7 - state->m_fg_scrolly) & 7;
-		rx = state->m_fg_scrollx >> 3;
-		ry = state->m_fg_scrolly >> 3;
+		dx = (7 - m_fg_scrollx) & 7;
+		dy = (7 - m_fg_scrolly) & 7;
+		rx = m_fg_scrollx >> 3;
+		ry = m_fg_scrolly >> 3;
 
 		for (y = 0; y < 29; y++)
 		{
 			for (x = 0; x < 32; x++)
 			{
-				radr = ((ry + y + 34) & 0x3f) * 0x20 + ((rx + x) & 0x1f) + (state->m_fg_select & 3) * 0x800;
+				radr = ((ry + y + 34) & 0x3f) * 0x20 + ((rx + x) & 0x1f) + (m_fg_select & 3) * 0x800;
 				chr = FG_MAP[radr] ;
 				if (flip == 0)
 				{

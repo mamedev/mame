@@ -72,9 +72,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 }
 
 
-SCREEN_UPDATE_IND16(funybubl)
+UINT32 funybubl_state::screen_update_funybubl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	funybubl_state *state = screen.machine().driver_data<funybubl_state>();
 	int x, y, offs;
 	offs = 0;
 
@@ -87,7 +86,7 @@ SCREEN_UPDATE_IND16(funybubl)
 		{
 			int data;
 
-			data = state->m_banked_vram[offs] | (state->m_banked_vram[offs + 1] << 8);
+			data = m_banked_vram[offs] | (m_banked_vram[offs + 1] << 8);
 			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0], data & 0x7fff, (data & 0x8000) ? 2 : 1, 0, 0, x*8, y*8, 0);
 			offs += 2;
 		}
@@ -103,7 +102,7 @@ SCREEN_UPDATE_IND16(funybubl)
 		fp = fopen("funnybubsprites", "w+b");
 		if (fp)
 		{
-			fwrite(&state->m_banked_vram[0x1000], 0x1000, 1, fp);
+			fwrite(&m_banked_vram[0x1000], 0x1000, 1, fp);
 			fclose(fp);
 		}
 	}

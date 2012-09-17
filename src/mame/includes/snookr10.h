@@ -28,6 +28,7 @@ public:
 	virtual void palette_init();
 	DECLARE_VIDEO_START(apple10);
 	DECLARE_PALETTE_INIT(apple10);
+	UINT32 screen_update_snookr10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -37,5 +38,5 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( snookr10 );
+
 

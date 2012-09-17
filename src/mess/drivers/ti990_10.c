@@ -88,6 +88,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_ti990_10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -153,10 +154,9 @@ void ti990_10_state::video_start()
 	m_terminal = machine().device("vdt911");
 }
 
-static SCREEN_UPDATE_IND16( ti990_10 )
+UINT32 ti990_10_state::screen_update_ti990_10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ti990_10_state *state = screen.machine().driver_data<ti990_10_state>();
-	vdt911_refresh(state->m_terminal, bitmap, cliprect, 0, 0);
+	vdt911_refresh(m_terminal, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -224,7 +224,7 @@ static MACHINE_CONFIG_START( ti990_10, ti990_10_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(560, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
-	MCFG_SCREEN_UPDATE_STATIC(ti990_10)
+	MCFG_SCREEN_UPDATE_DRIVER(ti990_10_state, screen_update_ti990_10)
 	/*MCFG_SCREEN_VBLANK_STATIC(name)*/
 
 	MCFG_GFXDECODE(vdt911)

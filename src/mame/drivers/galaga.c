@@ -1700,8 +1700,8 @@ static MACHINE_CONFIG_START( bosco, bosco_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 16, 224+16)
-	MCFG_SCREEN_UPDATE_STATIC(bosco)
-	MCFG_SCREEN_VBLANK_STATIC(bosco)
+	MCFG_SCREEN_UPDATE_DRIVER(bosco_state, screen_update_bosco)
+	MCFG_SCREEN_VBLANK_DRIVER(bosco_state, screen_eof_bosco)
 
 	MCFG_GFXDECODE(bosco)
 	MCFG_PALETTE_LENGTH(64*4+64*4+4+64)
@@ -1756,8 +1756,8 @@ static MACHINE_CONFIG_START( galaga, galaga_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224)
-	MCFG_SCREEN_UPDATE_STATIC(galaga)
-	MCFG_SCREEN_VBLANK_STATIC(galaga)
+	MCFG_SCREEN_UPDATE_DRIVER(bosco_state, screen_update_galaga)
+	MCFG_SCREEN_VBLANK_DRIVER(bosco_state, screen_eof_galaga)
 
 	MCFG_GFXDECODE(galaga)
 	MCFG_PALETTE_LENGTH(64*4+64*4+64)
@@ -1834,7 +1834,7 @@ static MACHINE_CONFIG_START( xevious, xevious_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224)
-	MCFG_SCREEN_UPDATE_STATIC(xevious)
+	MCFG_SCREEN_UPDATE_DRIVER(xevious_state, screen_update_xevious)
 
 	MCFG_GFXDECODE(xevious)
 	MCFG_PALETTE_LENGTH(128*4+64*8+64*2)
@@ -1923,7 +1923,7 @@ static MACHINE_CONFIG_START( digdug, digdug_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224)
-	MCFG_SCREEN_UPDATE_STATIC(digdug)
+	MCFG_SCREEN_UPDATE_DRIVER(digdug_state, screen_update_digdug)
 
 	MCFG_GFXDECODE(digdug)
 	MCFG_PALETTE_LENGTH(16*2+64*4+64*4)

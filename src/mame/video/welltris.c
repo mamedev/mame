@@ -233,14 +233,13 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 	}
 }
 
-SCREEN_UPDATE_IND16( welltris )
+UINT32 welltris_state::screen_update_welltris(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	welltris_state *state = screen.machine().driver_data<welltris_state>();
-	state->m_char_tilemap->set_scrollx(0, state->m_scrollx);
-	state->m_char_tilemap->set_scrolly(0, state->m_scrolly);
+	m_char_tilemap->set_scrollx(0, m_scrollx);
+	m_char_tilemap->set_scrolly(0, m_scrolly);
 
 	draw_background(screen.machine(), bitmap, cliprect);
-	state->m_char_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_char_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

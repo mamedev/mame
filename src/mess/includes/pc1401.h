@@ -26,6 +26,7 @@ public:
 	int m_power;
 	UINT8 m_reg[0x100];
 	DECLARE_DRIVER_INIT(pc1401);
+	UINT32 screen_update_pc1401(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -46,7 +47,7 @@ MACHINE_START( pc1401 );
 
 DECLARE_READ8_HANDLER(pc1401_lcd_read);
 DECLARE_WRITE8_HANDLER(pc1401_lcd_write);
-SCREEN_UPDATE_IND16( pc1401 );
+
 
 
 #endif /* PC1401_H_ */

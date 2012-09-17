@@ -35,6 +35,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sspeedr_track_ice_w);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_sspeedr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_sspeedr(screen_device &screen, bool state);
 };
 
 
@@ -44,5 +46,5 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( sspeedr );
-SCREEN_VBLANK( sspeedr );
+
+

@@ -503,39 +503,38 @@ PrimRage GALs:
 */
 
 
-SCREEN_UPDATE_RGB32( atarigt )
+UINT32 atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	atarigt_state *state = screen.machine().driver_data<atarigt_state>();
-	bitmap_ind16 *mo_bitmap = atarirle_get_vram(state->m_rle, 0);
-	bitmap_ind16 *tm_bitmap = atarirle_get_vram(state->m_rle, 1);
+	bitmap_ind16 *mo_bitmap = atarirle_get_vram(m_rle, 0);
+	bitmap_ind16 *tm_bitmap = atarirle_get_vram(m_rle, 1);
 	UINT16 *cram, *tram;
 	int color_latch;
 	UINT32 *mram;
 	int x, y;
 
 	/* draw the playfield */
-	state->m_playfield_tilemap->draw(*state->m_pf_bitmap, cliprect, 0, 0);
+	m_playfield_tilemap->draw(*m_pf_bitmap, cliprect, 0, 0);
 
 	/* draw the alpha layer */
-	state->m_alpha_tilemap->draw(*state->m_an_bitmap, cliprect, 0, 0);
+	m_alpha_tilemap->draw(*m_an_bitmap, cliprect, 0, 0);
 
 	/* cache pointers */
-	color_latch = state->m_colorram[0x30000/2];
-	cram = (UINT16 *)&state->m_colorram[0x00000/2] + 0x2000 * ((color_latch >> 3) & 1);
-	tram = (UINT16 *)&state->m_colorram[0x20000/2] + 0x1000 * ((color_latch >> 4) & 3);
-	mram = state->m_expanded_mram + 0x2000 * ((color_latch >> 6) & 3);
+	color_latch = m_colorram[0x30000/2];
+	cram = (UINT16 *)&m_colorram[0x00000/2] + 0x2000 * ((color_latch >> 3) & 1);
+	tram = (UINT16 *)&m_colorram[0x20000/2] + 0x1000 * ((color_latch >> 4) & 3);
+	mram = m_expanded_mram + 0x2000 * ((color_latch >> 6) & 3);
 
 	/* now do the nasty blend */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *an = &state->m_an_bitmap->pix16(y);
-		UINT16 *pf = &state->m_pf_bitmap->pix16(y);
+		UINT16 *an = &m_an_bitmap->pix16(y);
+		UINT16 *pf = &m_pf_bitmap->pix16(y);
 		UINT16 *mo = &mo_bitmap->pix16(y);
 		UINT16 *tm = &tm_bitmap->pix16(y);
 		UINT32 *dst = &bitmap.pix32(y);
 
 		/* Primal Rage: no TRAM, slightly different priorities */
-		if (state->m_is_primrage)
+		if (m_is_primrage)
 		{
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
@@ -629,13 +628,12 @@ SCREEN_UPDATE_RGB32( atarigt )
 	return 0;
 }
 
-SCREEN_VBLANK( atarigt )
+void atarigt_state::screen_eof_atarigt(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		atarigt_state *state = screen.machine().driver_data<atarigt_state>();
 
-		atarirle_eof(state->m_rle);
+		atarirle_eof(m_rle);
 	}
 }

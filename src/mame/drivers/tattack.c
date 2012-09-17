@@ -37,6 +37,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -58,11 +59,10 @@ TILE_GET_INFO_MEMBER(tattack_state::get_tile_info)
 		0);
 }
 
-static SCREEN_UPDATE_IND16( tattack )
+UINT32 tattack_state::screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tattack_state *state = screen.machine().driver_data<tattack_state>();
-	state->m_tmap->mark_all_dirty();
-	state->m_tmap->draw(bitmap, cliprect, 0,0);
+	m_tmap->mark_all_dirty();
+	m_tmap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -209,7 +209,7 @@ static MACHINE_CONFIG_START( tattack, tattack_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(tattack)
+	MCFG_SCREEN_UPDATE_DRIVER(tattack_state, screen_update_tattack)
 
 	MCFG_GFXDECODE(tattack)
 	MCFG_PALETTE_LENGTH(16)

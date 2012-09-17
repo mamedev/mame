@@ -52,6 +52,7 @@ public:
 	TILE_GET_INFO_MEMBER(track_get_fg_tile_info);
 	virtual void video_start();
 	DECLARE_VIDEO_START(wc90t);
+	UINT32 screen_update_wc90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -59,4 +60,4 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( wc90 );
+

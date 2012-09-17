@@ -240,15 +240,14 @@ void skullxbo_scanline_update(running_machine &machine, int scanline)
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( skullxbo )
+UINT32 skullxbo_state::screen_update_skullxbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	skullxbo_state *state = screen.machine().driver_data<skullxbo_state>();
 	atarimo_rect_list rectlist;
 	bitmap_ind16 *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -312,6 +311,6 @@ SCREEN_UPDATE_IND16( skullxbo )
 		}
 
 	/* add the alpha on top */
-	state->m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

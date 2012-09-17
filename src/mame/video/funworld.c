@@ -191,9 +191,8 @@ VIDEO_START_MEMBER(funworld_state,magicrd2)
 }
 
 
-SCREEN_UPDATE_IND16(funworld)
+UINT32 funworld_state::screen_update_funworld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	funworld_state *state = screen.machine().driver_data<funworld_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

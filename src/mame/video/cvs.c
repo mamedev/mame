@@ -138,9 +138,8 @@ VIDEO_START_MEMBER(cvs_state,cvs)
 }
 
 
-SCREEN_UPDATE_IND16( cvs )
+UINT32 cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cvs_state *state = screen.machine().driver_data<cvs_state>();
 	static const int ram_based_char_start_indices[] = { 0xe0, 0xc0, 0x100, 0x80 };
 	offs_t offs;
 	int scroll[8];
@@ -151,15 +150,15 @@ SCREEN_UPDATE_IND16( cvs )
 	for (offs = 0; offs < 0x0400; offs++)
 	{
 		int collision_color = 0x100;
-		UINT8 code = state->m_video_ram[offs];
-		UINT8 color = state->m_color_ram[offs];
+		UINT8 code = m_video_ram[offs];
+		UINT8 color = m_color_ram[offs];
 
 		UINT8 x = offs << 3;
 		UINT8 y = offs >> 5 << 3;
 
-		int gfxnum = (code < ram_based_char_start_indices[state->m_character_banking_mode]) ? 0 : 1;
+		int gfxnum = (code < ram_based_char_start_indices[m_character_banking_mode]) ? 0 : 1;
 
-		drawgfx_opaque(state->m_background_bitmap, state->m_background_bitmap.cliprect(), screen.machine().gfx[gfxnum],
+		drawgfx_opaque(m_background_bitmap, m_background_bitmap.cliprect(), screen.machine().gfx[gfxnum],
 				code, color,
 				0, 0,
 				x, y);
@@ -175,7 +174,7 @@ SCREEN_UPDATE_IND16( cvs )
 				collision_color = 0x102;
 		}
 
-		drawgfx_opaque(state->m_collision_background, state->m_collision_background.cliprect(), screen.machine().gfx[gfxnum],
+		drawgfx_opaque(m_collision_background, m_collision_background.cliprect(), screen.machine().gfx[gfxnum],
 				code, collision_color,
 				0, 0,
 				x, y);
@@ -184,41 +183,41 @@ SCREEN_UPDATE_IND16( cvs )
 
 	/* Update screen - 8 regions, fixed scrolling area */
 	scroll[0] = 0;
-	scroll[1] = state->m_scroll_reg;
-	scroll[2] = state->m_scroll_reg;
-	scroll[3] = state->m_scroll_reg;
-	scroll[4] = state->m_scroll_reg;
-	scroll[5] = state->m_scroll_reg;
+	scroll[1] = m_scroll_reg;
+	scroll[2] = m_scroll_reg;
+	scroll[3] = m_scroll_reg;
+	scroll[4] = m_scroll_reg;
+	scroll[5] = m_scroll_reg;
 	scroll[6] = 0;
 	scroll[7] = 0;
 
-	copyscrollbitmap(bitmap, state->m_background_bitmap, 0, 0, 8, scroll, cliprect);
-	copyscrollbitmap(state->m_scrolled_collision_background, state->m_collision_background, 0, 0, 8, scroll, cliprect);
+	copyscrollbitmap(bitmap, m_background_bitmap, 0, 0, 8, scroll, cliprect);
+	copyscrollbitmap(m_scrolled_collision_background, m_collision_background, 0, 0, 8, scroll, cliprect);
 
 	/* update the S2636 chips */
-	bitmap_ind16 &s2636_0_bitmap = s2636_update(state->m_s2636_0, cliprect);
-	bitmap_ind16 &s2636_1_bitmap = s2636_update(state->m_s2636_1, cliprect);
-	bitmap_ind16 &s2636_2_bitmap = s2636_update(state->m_s2636_2, cliprect);
+	bitmap_ind16 &s2636_0_bitmap = s2636_update(m_s2636_0, cliprect);
+	bitmap_ind16 &s2636_1_bitmap = s2636_update(m_s2636_1, cliprect);
+	bitmap_ind16 &s2636_2_bitmap = s2636_update(m_s2636_2, cliprect);
 
 	/* Bullet Hardware */
 	for (offs = 8; offs < 256; offs++ )
 	{
-		if (state->m_bullet_ram[offs] != 0)
+		if (m_bullet_ram[offs] != 0)
 		{
 			int ct;
 			for (ct = 0; ct < 4; ct++)
 			{
-				int bx = 255 - 7 - state->m_bullet_ram[offs] - ct;
+				int bx = 255 - 7 - m_bullet_ram[offs] - ct;
 
 				/* Bullet/Object Collision */
 				if ((s2636_0_bitmap.pix16(offs, bx) != 0) ||
 					(s2636_1_bitmap.pix16(offs, bx) != 0) ||
 					(s2636_2_bitmap.pix16(offs, bx) != 0))
-					state->m_collision_register |= 0x08;
+					m_collision_register |= 0x08;
 
 				/* Bullet/Background Collision */
-				if (colortable_entry_get_value(screen.machine().colortable, state->m_scrolled_collision_background.pix16(offs, bx)))
-					state->m_collision_register |= 0x80;
+				if (colortable_entry_get_value(screen.machine().colortable, m_scrolled_collision_background.pix16(offs, bx)))
+					m_collision_register |= 0x80;
 
 				bitmap.pix16(offs, bx) = BULLET_STAR_PEN;
 			}
@@ -247,16 +246,16 @@ SCREEN_UPDATE_IND16( cvs )
 					bitmap.pix16(y, x) = SPRITE_PEN_BASE + S2636_PIXEL_COLOR(pixel);
 
 					/* S2636 vs. S2636 collision detection */
-					if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel1)) state->m_collision_register |= 0x01;
-					if (S2636_IS_PIXEL_DRAWN(pixel1) && S2636_IS_PIXEL_DRAWN(pixel2)) state->m_collision_register |= 0x02;
-					if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel2)) state->m_collision_register |= 0x04;
+					if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel1)) m_collision_register |= 0x01;
+					if (S2636_IS_PIXEL_DRAWN(pixel1) && S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x02;
+					if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x04;
 
 					/* S2636 vs. background collision detection */
-					if (colortable_entry_get_value(screen.machine().colortable, state->m_scrolled_collision_background.pix16(y, x)))
+					if (colortable_entry_get_value(screen.machine().colortable, m_scrolled_collision_background.pix16(y, x)))
 					{
-						if (S2636_IS_PIXEL_DRAWN(pixel0)) state->m_collision_register |= 0x10;
-						if (S2636_IS_PIXEL_DRAWN(pixel1)) state->m_collision_register |= 0x20;
-						if (S2636_IS_PIXEL_DRAWN(pixel2)) state->m_collision_register |= 0x40;
+						if (S2636_IS_PIXEL_DRAWN(pixel0)) m_collision_register |= 0x10;
+						if (S2636_IS_PIXEL_DRAWN(pixel1)) m_collision_register |= 0x20;
+						if (S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x40;
 					}
 				}
 			}
@@ -264,7 +263,7 @@ SCREEN_UPDATE_IND16( cvs )
 	}
 
 	/* stars circuit */
-	if (state->m_stars_on)
+	if (m_stars_on)
 		cvs_update_stars(screen.machine(), bitmap, cliprect, BULLET_STAR_PEN, 0);
 
 	return 0;

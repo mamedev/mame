@@ -220,11 +220,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap)
 
 
 
-SCREEN_UPDATE_IND16( retofinv )
+UINT32 retofinv_state::screen_update_retofinv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	retofinv_state *state = screen.machine().driver_data<retofinv_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

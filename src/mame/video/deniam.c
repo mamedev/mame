@@ -362,41 +362,40 @@ static void set_fg_page( running_machine &machine, int page, int value )
 	}
 }
 
-SCREEN_UPDATE_IND16( deniam )
+UINT32 deniam_state::screen_update_deniam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	deniam_state *state = screen.machine().driver_data<deniam_state>();
 	int bg_scrollx, bg_scrolly, fg_scrollx, fg_scrolly;
 	int page;
 
-	if (!state->m_display_enable)
+	if (!m_display_enable)
 		return 0;	/* don't update (freeze display) */
 
-	bg_scrollx = state->m_textram[state->m_bg_scrollx_reg] - state->m_bg_scrollx_offs;
-	bg_scrolly = (state->m_textram[state->m_bg_scrolly_reg] & 0xff) - state->m_bg_scrolly_offs;
-	page = state->m_textram[state->m_bg_page_reg];
+	bg_scrollx = m_textram[m_bg_scrollx_reg] - m_bg_scrollx_offs;
+	bg_scrolly = (m_textram[m_bg_scrolly_reg] & 0xff) - m_bg_scrolly_offs;
+	page = m_textram[m_bg_page_reg];
 	set_bg_page(screen.machine(), 3, (page >>12) & 0x0f);
 	set_bg_page(screen.machine(), 2, (page >> 8) & 0x0f);
 	set_bg_page(screen.machine(), 1, (page >> 4) & 0x0f);
 	set_bg_page(screen.machine(), 0, (page >> 0) & 0x0f);
 
-	fg_scrollx = state->m_textram[state->m_fg_scrollx_reg] - state->m_fg_scrollx_offs;
-	fg_scrolly = (state->m_textram[state->m_fg_scrolly_reg] & 0xff) - state->m_fg_scrolly_offs;
-	page = state->m_textram[state->m_fg_page_reg];
+	fg_scrollx = m_textram[m_fg_scrollx_reg] - m_fg_scrollx_offs;
+	fg_scrolly = (m_textram[m_fg_scrolly_reg] & 0xff) - m_fg_scrolly_offs;
+	page = m_textram[m_fg_page_reg];
 	set_fg_page(screen.machine(), 3, (page >>12) & 0x0f);
 	set_fg_page(screen.machine(), 2, (page >> 8) & 0x0f);
 	set_fg_page(screen.machine(), 1, (page >> 4) & 0x0f);
 	set_fg_page(screen.machine(), 0, (page >> 0) & 0x0f);
 
-	state->m_bg_tilemap->set_scrollx(0, bg_scrollx & 0x1ff);
-	state->m_bg_tilemap->set_scrolly(0, bg_scrolly & 0x0ff);
-	state->m_fg_tilemap->set_scrollx(0, fg_scrollx & 0x1ff);
-	state->m_fg_tilemap->set_scrolly(0, fg_scrolly & 0x0ff);
+	m_bg_tilemap->set_scrollx(0, bg_scrollx & 0x1ff);
+	m_bg_tilemap->set_scrolly(0, bg_scrolly & 0x0ff);
+	m_fg_tilemap->set_scrollx(0, fg_scrollx & 0x1ff);
+	m_fg_tilemap->set_scrolly(0, fg_scrolly & 0x0ff);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;

@@ -363,6 +363,7 @@ public:
 	DECLARE_VIDEO_START(vidadcba);
 	DECLARE_PALETTE_INIT(babypkr);
 	DECLARE_PALETTE_INIT(fortune1);
+	UINT32 screen_update_videopkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -520,11 +521,10 @@ VIDEO_START_MEMBER(videopkr_state,vidadcba)
 }
 
 
-static SCREEN_UPDATE_IND16( videopkr )
+UINT32 videopkr_state::screen_update_videopkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	videopkr_state *state = screen.machine().driver_data<videopkr_state>();
-	state->m_bg_tilemap->mark_all_dirty();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->mark_all_dirty();
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -1254,7 +1254,7 @@ static MACHINE_CONFIG_START( videopkr, videopkr_state )
 
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(2080)
-	MCFG_SCREEN_UPDATE_STATIC(videopkr)
+	MCFG_SCREEN_UPDATE_DRIVER(videopkr_state, screen_update_videopkr)
 
 	MCFG_GFXDECODE(videopkr)
 	MCFG_PALETTE_LENGTH(256)

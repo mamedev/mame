@@ -312,7 +312,7 @@ static MACHINE_CONFIG_START( travrusa, travrusa_state )
 				/* talks about 55Hz and 1790ms vblank duration. */
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(travrusa)
+	MCFG_SCREEN_UPDATE_DRIVER(travrusa_state, screen_update_travrusa)
 
 	MCFG_GFXDECODE(travrusa)
 

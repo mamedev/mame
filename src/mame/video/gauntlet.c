@@ -173,15 +173,14 @@ WRITE16_HANDLER( gauntlet_yscroll_w )
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( gauntlet )
+UINT32 gauntlet_state::screen_update_gauntlet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gauntlet_state *state = screen.machine().driver_data<gauntlet_state>();
 	atarimo_rect_list rectlist;
 	bitmap_ind16 *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */
-	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -200,7 +199,7 @@ SCREEN_UPDATE_IND16( gauntlet )
 					if ((mo[x] & 0x0f) == 1)
 					{
 						/* Vindicators Part II has extra logic here for the bases */
-						if (!state->m_vindctr2_screen_refresh || (mo[x] & 0xf0) != 0)
+						if (!m_vindctr2_screen_refresh || (mo[x] & 0xf0) != 0)
 							pf[x] ^= 0x80;
 					}
 					else
@@ -212,6 +211,6 @@ SCREEN_UPDATE_IND16( gauntlet )
 		}
 
 	/* add the alpha on top */
-	state->m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

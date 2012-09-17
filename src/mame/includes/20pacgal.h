@@ -54,6 +54,7 @@ public:
 	DECLARE_DRIVER_INIT(20pacgal);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_20pacgal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 

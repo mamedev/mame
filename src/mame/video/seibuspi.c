@@ -591,47 +591,46 @@ static void combine_tilemap(running_machine &machine, bitmap_rgb32 &bitmap, cons
 
 
 
-SCREEN_UPDATE_RGB32( spi )
+UINT32 seibuspi_state::screen_update_spi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	seibuspi_state *state = screen.machine().driver_data<seibuspi_state>();
 	INT16 *back_rowscroll, *mid_rowscroll, *fore_rowscroll;
-	if( state->m_layer_bank & 0x80000000 ) {
-		back_rowscroll	= (INT16*)&state->m_tilemap_ram[0x200];
-		mid_rowscroll	= (INT16*)&state->m_tilemap_ram[0x600];
-		fore_rowscroll	= (INT16*)&state->m_tilemap_ram[0xa00];
+	if( m_layer_bank & 0x80000000 ) {
+		back_rowscroll	= (INT16*)&m_tilemap_ram[0x200];
+		mid_rowscroll	= (INT16*)&m_tilemap_ram[0x600];
+		fore_rowscroll	= (INT16*)&m_tilemap_ram[0xa00];
 	} else {
 		back_rowscroll	= NULL;
 		mid_rowscroll	= NULL;
 		fore_rowscroll	= NULL;
 	}
 
-	if( state->m_layer_enable & 0x1 )
+	if( m_layer_enable & 0x1 )
 		bitmap.fill(0, cliprect);
 
-	if (!(state->m_layer_enable & 0x1))
-		combine_tilemap(screen.machine(), bitmap, cliprect, state->m_back_layer, state->m_spi_scrollram[0] & 0xffff, (state->m_spi_scrollram[0] >> 16) & 0xffff, 1, back_rowscroll);
+	if (!(m_layer_enable & 0x1))
+		combine_tilemap(screen.machine(), bitmap, cliprect, m_back_layer, m_spi_scrollram[0] & 0xffff, (m_spi_scrollram[0] >> 16) & 0xffff, 1, back_rowscroll);
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
 	// if fore layer is enabled, draw priority 1 sprites behind mid layer
-	if (!(state->m_layer_enable & 0x4))
+	if (!(m_layer_enable & 0x4))
 		draw_sprites(screen.machine(), bitmap, cliprect, 1);
 
-	if (!(state->m_layer_enable & 0x2))
-		combine_tilemap(screen.machine(), bitmap, cliprect, state->m_mid_layer, state->m_spi_scrollram[1] & 0xffff, (state->m_spi_scrollram[1] >> 16) & 0xffff, 0, mid_rowscroll);
+	if (!(m_layer_enable & 0x2))
+		combine_tilemap(screen.machine(), bitmap, cliprect, m_mid_layer, m_spi_scrollram[1] & 0xffff, (m_spi_scrollram[1] >> 16) & 0xffff, 0, mid_rowscroll);
 
 	// if fore layer is disabled, draw priority 1 sprites above mid layer
-	if ((state->m_layer_enable & 0x4))
+	if ((m_layer_enable & 0x4))
 		draw_sprites(screen.machine(), bitmap, cliprect, 1);
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 2);
 
-	if (!(state->m_layer_enable & 0x4))
-		combine_tilemap(screen.machine(), bitmap, cliprect, state->m_fore_layer, state->m_spi_scrollram[2] & 0xffff, (state->m_spi_scrollram[2] >> 16) & 0xffff, 0, fore_rowscroll);
+	if (!(m_layer_enable & 0x4))
+		combine_tilemap(screen.machine(), bitmap, cliprect, m_fore_layer, m_spi_scrollram[2] & 0xffff, (m_spi_scrollram[2] >> 16) & 0xffff, 0, fore_rowscroll);
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 3);
 
-	combine_tilemap(screen.machine(), bitmap, cliprect, state->m_text_layer, 0, 0, 0, NULL);
+	combine_tilemap(screen.machine(), bitmap, cliprect, m_text_layer, 0, 0, 0, NULL);
 	return 0;
 }
 
@@ -653,7 +652,7 @@ VIDEO_START_MEMBER(seibuspi_state,sys386f2)
 	memset(m_alpha_table, 0, 8192 * sizeof(UINT8));
 }
 
-SCREEN_UPDATE_RGB32( sys386f2 )
+UINT32 seibuspi_state::screen_update_sys386f2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);

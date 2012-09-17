@@ -377,17 +377,17 @@ static UINT32 update_one_screen(screen_device &screen, bitmap_ind16 &bitmap, con
 }
 
 
-SCREEN_UPDATE_IND16( cyberbal_left )
+UINT32 cyberbal_state::screen_update_cyberbal_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return update_one_screen(screen, bitmap, cliprect, 0);
 }
 
-SCREEN_UPDATE_IND16( cyberbal_right )
+UINT32 cyberbal_state::screen_update_cyberbal_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return update_one_screen(screen, bitmap, cliprect, 1);
 }
 
-SCREEN_UPDATE_IND16( cyberbal2p )
+UINT32 cyberbal_state::screen_update_cyberbal2p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return update_one_screen(screen, bitmap, cliprect, 0);
 }

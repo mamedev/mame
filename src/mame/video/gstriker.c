@@ -525,9 +525,8 @@ WRITE16_MEMBER(gstriker_state::gsx_videoram3_w)
 #endif
 
 
-SCREEN_UPDATE_IND16(gstriker)
+UINT32 gstriker_state::screen_update_gstriker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gstriker_state *state = screen.machine().driver_data<gstriker_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	// Sandwitched screen/sprite0/score/sprite1. Surely wrong, probably
@@ -536,14 +535,14 @@ SCREEN_UPDATE_IND16(gstriker)
 
 	CG10103_draw(screen.machine(), 0, bitmap, cliprect, 0);
 
-	VS920A_draw(state, 0, bitmap, cliprect, 0);
+	VS920A_draw(this, 0, bitmap, cliprect, 0);
 
 	CG10103_draw(screen.machine(), 0, bitmap, cliprect, 1);
 
 #if 0
 	popmessage("%04x %04x %04x %04x %04x %04x %04x %04x",
-		(UINT16)state->m_MB60553[0].regs[0], (UINT16)state->m_MB60553[0].regs[1], (UINT16)state->m_MB60553[0].regs[2], (UINT16)state->m_MB60553[0].regs[3],
-		(UINT16)state->m_MB60553[0].regs[4], (UINT16)state->m_MB60553[0].regs[5], (UINT16)state->m_MB60553[0].regs[6], (UINT16)state->m_MB60553[0].regs[7]
+		(UINT16)m_MB60553[0].regs[0], (UINT16)m_MB60553[0].regs[1], (UINT16)m_MB60553[0].regs[2], (UINT16)m_MB60553[0].regs[3],
+		(UINT16)m_MB60553[0].regs[4], (UINT16)m_MB60553[0].regs[5], (UINT16)m_MB60553[0].regs[6], (UINT16)m_MB60553[0].regs[7]
 	);
 #endif
 

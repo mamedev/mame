@@ -326,7 +326,7 @@ static MACHINE_CONFIG_START( simpsons, simpsons_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_STATIC(simpsons)
+	MCFG_SCREEN_UPDATE_DRIVER(simpsons_state, screen_update_simpsons)
 
 	MCFG_PALETTE_LENGTH(2048)
 

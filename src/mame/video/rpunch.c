@@ -263,19 +263,18 @@ static void draw_bitmap(running_machine &machine, bitmap_ind16 &bitmap, const re
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( rpunch )
+UINT32 rpunch_state::screen_update_rpunch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	rpunch_state *state = screen.machine().driver_data<rpunch_state>();
 	int effbins;
 
 	/* this seems like the most plausible explanation */
-	effbins = (state->m_bins > state->m_gins) ? state->m_gins : state->m_bins;
+	effbins = (m_bins > m_gins) ? m_gins : m_bins;
 
-	state->m_background[0]->draw(bitmap, cliprect, 0,0);
+	m_background[0]->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0, effbins);
-	state->m_background[1]->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap, cliprect, effbins, state->m_gins);
-	if (state->m_bitmapram)
+	m_background[1]->draw(bitmap, cliprect, 0,0);
+	draw_sprites(screen.machine(), bitmap, cliprect, effbins, m_gins);
+	if (m_bitmapram)
 		draw_bitmap(screen.machine(), bitmap, cliprect);
 	return 0;
 }

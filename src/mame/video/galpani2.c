@@ -137,9 +137,8 @@ void galpani2_state::video_start()
 
 ***************************************************************************/
 
-SCREEN_UPDATE_IND16( galpani2 )
+UINT32 galpani2_state::screen_update_galpani2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galpani2_state *state = screen.machine().driver_data<galpani2_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
@@ -161,7 +160,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 	{
 		int x = 0;
 		int y = 0;
-		copyscrollbitmap_trans(bitmap, *state->m_bg15_bitmap,
+		copyscrollbitmap_trans(bitmap, *m_bg15_bitmap,
 							   1, &x, 1, &y,
 							   cliprect,0x4200 + 0);
 	}
@@ -174,22 +173,22 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 	if (layers_ctrl & 0x2)
 	{
-		int x = - ( *state->m_bg8_scrollx[0] + 0x200 - 0x0f5 );
-		int y = - ( *state->m_bg8_scrolly[0] + 0x200 - 0x1be );
-		copyscrollbitmap_trans(bitmap, *state->m_bg8_bitmap[0],
+		int x = - ( *m_bg8_scrollx[0] + 0x200 - 0x0f5 );
+		int y = - ( *m_bg8_scrolly[0] + 0x200 - 0x1be );
+		copyscrollbitmap_trans(bitmap, *m_bg8_bitmap[0],
 							   1, &x, 1, &y,
 							   cliprect,0x4000 + 0);
 	}
 
 	if (layers_ctrl & 0x4)
 	{
-		int x = - ( *state->m_bg8_scrollx[1] + 0x200 - 0x0f5 );
-		int y = - ( *state->m_bg8_scrolly[1] + 0x200 - 0x1be );
-		copyscrollbitmap_trans(bitmap, *state->m_bg8_bitmap[1],
+		int x = - ( *m_bg8_scrollx[1] + 0x200 - 0x0f5 );
+		int y = - ( *m_bg8_scrolly[1] + 0x200 - 0x1be );
+		copyscrollbitmap_trans(bitmap, *m_bg8_bitmap[1],
 							   1, &x, 1, &y,
 							   cliprect,0x4000 + 0);
 	}
 
-	if (layers_ctrl & 0x8) state->m_kaneko_spr->kaneko16_render_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram, state->m_spriteram.bytes());
+	if (layers_ctrl & 0x8) m_kaneko_spr->kaneko16_render_sprites(screen.machine(), bitmap, cliprect, m_spriteram, m_spriteram.bytes());
 	return 0;
 }

@@ -188,12 +188,11 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	}
 }
 
-SCREEN_UPDATE_IND16( sprcros2 )
+UINT32 sprcros2_state::screen_update_sprcros2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sprcros2_state *state = screen.machine().driver_data<sprcros2_state>();
 
-	state->m_bgtilemap->draw(bitmap, cliprect, 0, 0);
+	m_bgtilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	state->m_fgtilemap->draw(bitmap, cliprect, 0, 0);
+	m_fgtilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -127,29 +127,28 @@ void darkmist_state::video_start()
 	m_txtilemap->set_transparent_pen(0);
 }
 
-SCREEN_UPDATE_IND16( darkmist)
+UINT32 darkmist_state::screen_update_darkmist(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	darkmist_state *state = screen.machine().driver_data<darkmist_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 
-#define DM_GETSCROLL(n) (((state->m_scroll[(n)]<<1)&0xff) + ((state->m_scroll[(n)]&0x80)?1:0) +( ((state->m_scroll[(n)-1]<<4) | (state->m_scroll[(n)-1]<<12) )&0xff00))
+#define DM_GETSCROLL(n) (((m_scroll[(n)]<<1)&0xff) + ((m_scroll[(n)]&0x80)?1:0) +( ((m_scroll[(n)-1]<<4) | (m_scroll[(n)-1]<<12) )&0xff00))
 
 	set_pens(screen.machine());
 
-	state->m_bgtilemap->set_scrollx(0, DM_GETSCROLL(0x2));
-	state->m_bgtilemap->set_scrolly(0, DM_GETSCROLL(0x6));
-	state->m_fgtilemap->set_scrollx(0, DM_GETSCROLL(0xa));
-	state->m_fgtilemap->set_scrolly(0, DM_GETSCROLL(0xe));
+	m_bgtilemap->set_scrollx(0, DM_GETSCROLL(0x2));
+	m_bgtilemap->set_scrolly(0, DM_GETSCROLL(0x6));
+	m_fgtilemap->set_scrollx(0, DM_GETSCROLL(0xa));
+	m_fgtilemap->set_scrolly(0, DM_GETSCROLL(0xe));
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if(state->m_hw & DISPLAY_BG)
-		state->m_bgtilemap->draw(bitmap, cliprect, 0,0);
+	if(m_hw & DISPLAY_BG)
+		m_bgtilemap->draw(bitmap, cliprect, 0,0);
 
-	if(state->m_hw & DISPLAY_FG)
-		state->m_fgtilemap->draw(bitmap, cliprect, 0,0);
+	if(m_hw & DISPLAY_FG)
+		m_fgtilemap->draw(bitmap, cliprect, 0,0);
 
-	if(state->m_hw & DISPLAY_SPR)
+	if(m_hw & DISPLAY_SPR)
 	{
 /*
     Sprites
@@ -163,7 +162,7 @@ SCREEN_UPDATE_IND16( darkmist)
 
 */
 		int i,fx,fy,tile,palette;
-		for(i=0;i<state->m_spriteram.bytes();i+=32)
+		for(i=0;i<m_spriteram.bytes();i+=32)
 		{
 			fy=spriteram[i+1]&0x40;
 			fx=spriteram[i+1]&0x80;
@@ -171,7 +170,7 @@ SCREEN_UPDATE_IND16( darkmist)
 			tile=spriteram[i+0];
 
 			if(spriteram[i+1]&0x20)
-				tile += (*state->m_spritebank << 8);
+				tile += (*m_spritebank << 8);
 
 			palette=((spriteram[i+1])>>1)&0xf;
 
@@ -190,10 +189,10 @@ SCREEN_UPDATE_IND16( darkmist)
 		}
 	}
 
-	if(state->m_hw & DISPLAY_TXT)
+	if(m_hw & DISPLAY_TXT)
 	{
-		state->m_txtilemap->mark_all_dirty();
-		state->m_txtilemap->draw(bitmap, cliprect, 0,0);
+		m_txtilemap->mark_all_dirty();
+		m_txtilemap->draw(bitmap, cliprect, 0,0);
 	}
 
 

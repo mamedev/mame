@@ -40,6 +40,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_drtomy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -131,12 +132,11 @@ void drtomy_state::video_start()
 	m_tilemap_fg->set_transparent_pen(0);
 }
 
-static SCREEN_UPDATE_IND16( drtomy )
+UINT32 drtomy_state::screen_update_drtomy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	drtomy_state *state = screen.machine().driver_data<drtomy_state>();
 
-	state->m_tilemap_bg->draw(bitmap, cliprect, 0, 0);
-	state->m_tilemap_fg->draw(bitmap, cliprect, 0, 0);
+	m_tilemap_bg->draw(bitmap, cliprect, 0, 0);
+	m_tilemap_fg->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
@@ -309,7 +309,7 @@ static MACHINE_CONFIG_START( drtomy, drtomy_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(drtomy)
+	MCFG_SCREEN_UPDATE_DRIVER(drtomy_state, screen_update_drtomy)
 
 	MCFG_GFXDECODE(drtomy)
 	MCFG_PALETTE_LENGTH(1024)

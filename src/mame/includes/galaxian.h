@@ -223,6 +223,7 @@ public:
 	virtual void palette_init();
 	DECLARE_PALETTE_INIT(moonwar);
 	void tenspot_set_game_bank(running_machine& machine, int bank, int from_game);
+	UINT32 screen_update_galaxian(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -232,7 +233,7 @@ public:
 
 
 
-SCREEN_UPDATE_RGB32( galaxian );
+
 
 
 

@@ -281,7 +281,7 @@ static MACHINE_CONFIG_START( jailbrek, jailbrek_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 396, 8, 248, 256, 16, 240)
-	MCFG_SCREEN_UPDATE_STATIC(jailbrek)
+	MCFG_SCREEN_UPDATE_DRIVER(jailbrek_state, screen_update_jailbrek)
 
 
 	/* sound hardware */

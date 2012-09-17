@@ -266,6 +266,7 @@ public:
 	DECLARE_MACHINE_START(x68000);
 	DECLARE_VIDEO_START(x68000);
 	DECLARE_PALETTE_INIT(x68000);
+	UINT32 screen_update_x68000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -300,7 +301,7 @@ DECLARE_WRITE32_HANDLER( x68k_gvram32_w );
 DECLARE_READ32_HANDLER( x68k_gvram32_r );
 DECLARE_WRITE32_HANDLER( x68k_tvram32_w );
 DECLARE_READ32_HANDLER( x68k_tvram32_r );
-SCREEN_UPDATE_IND16( x68000 );
+
 
 
 

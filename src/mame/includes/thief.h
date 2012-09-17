@@ -33,6 +33,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tape_control_w);
 	DECLARE_DRIVER_INIT(thief);
 	virtual void video_start();
+	UINT32 screen_update_thief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -40,4 +41,4 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( thief );
+

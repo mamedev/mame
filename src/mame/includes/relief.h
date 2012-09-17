@@ -26,10 +26,11 @@ public:
 	DECLARE_MACHINE_START(relief);
 	DECLARE_MACHINE_RESET(relief);
 	DECLARE_VIDEO_START(relief);
+	UINT32 screen_update_relief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/relief.c -----------*/
 
 
-SCREEN_UPDATE_IND16( relief );
+

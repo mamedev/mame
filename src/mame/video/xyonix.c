@@ -54,10 +54,9 @@ void xyonix_state::video_start()
 	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(xyonix_state::get_xyonix_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 80, 32);
 }
 
-SCREEN_UPDATE_IND16(xyonix)
+UINT32 xyonix_state::screen_update_xyonix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	xyonix_state *state = screen.machine().driver_data<xyonix_state>();
 
-	state->m_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

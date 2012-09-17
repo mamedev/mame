@@ -23,6 +23,7 @@ public:
 	required_shared_ptr<UINT8> m_ram;
 	UINT8 m_color;
 	DECLARE_WRITE8_MEMBER(color_w);
+	UINT32 screen_update_tgtpanic(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -32,21 +33,20 @@ public:
  *
  *************************************/
 
-static SCREEN_UPDATE_RGB32( tgtpanic )
+UINT32 tgtpanic_state::screen_update_tgtpanic(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	tgtpanic_state *state = screen.machine().driver_data<tgtpanic_state>();
 	UINT32 colors[4];
 	UINT32 offs;
 	UINT32 x, y;
 
 	colors[0] = 0;
 	colors[1] = 0xffffffff;
-	colors[2] = MAKE_RGB(pal1bit(state->m_color >> 2), pal1bit(state->m_color >> 1), pal1bit(state->m_color >> 0));
-	colors[3] = MAKE_RGB(pal1bit(state->m_color >> 6), pal1bit(state->m_color >> 5), pal1bit(state->m_color >> 4));
+	colors[2] = MAKE_RGB(pal1bit(m_color >> 2), pal1bit(m_color >> 1), pal1bit(m_color >> 0));
+	colors[3] = MAKE_RGB(pal1bit(m_color >> 6), pal1bit(m_color >> 5), pal1bit(m_color >> 4));
 
 	for (offs = 0; offs < 0x2000; ++offs)
 	{
-		UINT8 val = state->m_ram[offs];
+		UINT8 val = m_ram[offs];
 
 		y = (offs & 0x7f) << 1;
 		x = (offs >> 7) << 2;
@@ -142,7 +142,7 @@ static MACHINE_CONFIG_START( tgtpanic, tgtpanic_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* Unverified */
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 192 - 1, 0, 192 - 1)
-	MCFG_SCREEN_UPDATE_STATIC(tgtpanic)
+	MCFG_SCREEN_UPDATE_DRIVER(tgtpanic_state, screen_update_tgtpanic)
 MACHINE_CONFIG_END
 
 

@@ -24,6 +24,7 @@ public:
 	required_shared_ptr<UINT16> m_p_ram;
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_pt68k4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 static ADDRESS_MAP_START(pt68k4_mem, AS_PROGRAM, 16, pt68k4_state)
@@ -51,7 +52,7 @@ void pt68k4_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( pt68k4 )
+UINT32 pt68k4_state::screen_update_pt68k4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -68,7 +69,7 @@ static MACHINE_CONFIG_START( pt68k4, pt68k4_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_STATIC(pt68k4)
+	MCFG_SCREEN_UPDATE_DRIVER(pt68k4_state, screen_update_pt68k4)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 MACHINE_CONFIG_END

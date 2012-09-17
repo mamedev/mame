@@ -249,10 +249,9 @@ WRITE8_MEMBER(madalien_state::madalien_charram_w)
 }
 
 
-static SCREEN_UPDATE_IND16( madalien )
+UINT32 madalien_state::screen_update_madalien(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	madalien_state *state = screen.machine().driver_data<madalien_state>();
-	int flip = BIT(screen.machine().root_device().ioport("DSW")->read(), 6) && BIT(*state->m_video_control, 0);
+	int flip = BIT(screen.machine().root_device().ioport("DSW")->read(), 6) && BIT(*m_video_control, 0);
 
 	// bits #0 and #1 define scrolling mode
 	//
@@ -261,7 +260,7 @@ static SCREEN_UPDATE_IND16( madalien )
 	//
 	// mode 2 - transition from B to A
 	// mode 3 - transition from A to B
-	int scroll_mode = *state->m_scroll & 3;
+	int scroll_mode = *m_scroll & 3;
 
 	bitmap.fill(0, cliprect);
 	draw_edges(screen.machine(), bitmap, cliprect, flip, scroll_mode);
@@ -272,7 +271,7 @@ static SCREEN_UPDATE_IND16( madalien )
      * combined with the headlight signal through NOR gate 1A,
      * which is used to light up the tunnel when an alien explodes
     */
-	if (scroll_mode != 1 || *state->m_video_flags & 2)
+	if (scroll_mode != 1 || *m_video_flags & 2)
 	{
 		int x;
 		int y;
@@ -280,10 +279,10 @@ static SCREEN_UPDATE_IND16( madalien )
 		int min_x = 0;
 		int max_x = 0xff;
 
-		if (!(*state->m_video_flags & 2))
+		if (!(*m_video_flags & 2))
 		{
-			if (scroll_mode == 2) min_x = (*state->m_scroll & 0xfc);
-			else if (scroll_mode == 3) max_x = (*state->m_scroll & 0xfc) - 1;
+			if (scroll_mode == 2) min_x = (*m_scroll & 0xfc);
+			else if (scroll_mode == 3) max_x = (*m_scroll & 0xfc) - 1;
 		}
 
 		if (flip)
@@ -396,7 +395,7 @@ static const mc6845_interface mc6845_intf =
 MACHINE_CONFIG_FRAGMENT( madalien_video )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256)
-	MCFG_SCREEN_UPDATE_STATIC(madalien)
+	MCFG_SCREEN_UPDATE_DRIVER(madalien_state, screen_update_madalien)
 
 	MCFG_GFXDECODE(madalien)
 	MCFG_PALETTE_LENGTH(0x30)

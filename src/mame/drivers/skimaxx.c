@@ -73,6 +73,7 @@ public:
 	DECLARE_READ32_MEMBER(skimaxx_analog_r);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_skimaxx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -149,9 +150,9 @@ void skimaxx_state::video_start()
 	membank("bank1")->configure_entry(1, m_bg_buffer_front);
 }
 
-static SCREEN_UPDATE_IND16( skimaxx )
+UINT32 skimaxx_state::screen_update_skimaxx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//  popmessage("%02x %02x", state->ioport("X")->read(), state->ioport("Y")->read() );
+//  popmessage("%02x %02x", ioport("X")->read(), ioport("Y")->read() );
 
 	SCREEN_UPDATE16_CALL(tms340x0_ind16);
 
@@ -542,7 +543,7 @@ static MACHINE_CONFIG_START( skimaxx, skimaxx_state )
 	MCFG_SCREEN_SIZE(0x400, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x280-1, 0, 0xf0-1)
 //  MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
-	MCFG_SCREEN_UPDATE_STATIC(skimaxx)
+	MCFG_SCREEN_UPDATE_DRIVER(skimaxx_state, screen_update_skimaxx)
 
 
 //  MCFG_GFXDECODE( skimaxx )

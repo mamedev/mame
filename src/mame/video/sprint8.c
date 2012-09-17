@@ -154,36 +154,34 @@ static TIMER_CALLBACK( sprint8_collision_callback )
 }
 
 
-SCREEN_UPDATE_IND16( sprint8 )
+UINT32 sprint8_state::screen_update_sprint8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sprint8_state *state = screen.machine().driver_data<sprint8_state>();
-	set_pens(state, screen.machine().colortable);
-	state->m_tilemap1->draw(bitmap, cliprect, 0, 0);
+	set_pens(this, screen.machine().colortable);
+	m_tilemap1->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
 
-SCREEN_VBLANK( sprint8 )
+void sprint8_state::screen_eof_sprint8(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		sprint8_state *state = screen.machine().driver_data<sprint8_state>();
 		int x;
 		int y;
 		const rectangle &visarea = screen.machine().primary_screen->visible_area();
 
-		state->m_tilemap2->draw(state->m_helper2, visarea, 0, 0);
+		m_tilemap2->draw(m_helper2, visarea, 0, 0);
 
-		state->m_helper1.fill(0x20, visarea);
+		m_helper1.fill(0x20, visarea);
 
-		draw_sprites(screen.machine(), state->m_helper1, visarea);
+		draw_sprites(screen.machine(), m_helper1, visarea);
 
 		for (y = visarea.min_y; y <= visarea.max_y; y++)
 		{
-			const UINT16* p1 = &state->m_helper1.pix16(y);
-			const UINT16* p2 = &state->m_helper2.pix16(y);
+			const UINT16* p1 = &m_helper1.pix16(y);
+			const UINT16* p2 = &m_helper2.pix16(y);
 
 			for (x = visarea.min_x; x <= visarea.max_x; x++)
 				if (p1[x] != 0x20 && p2[x] == 0x23)

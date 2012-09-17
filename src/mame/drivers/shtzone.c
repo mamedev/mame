@@ -58,6 +58,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_shtzone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 static ADDRESS_MAP_START( shtzone_map, AS_PROGRAM, 8, shtzone_state )
@@ -86,7 +87,7 @@ void shtzone_state::video_start()
 }
 
 
-SCREEN_UPDATE_IND16( shtzone )
+UINT32 shtzone_state::screen_update_shtzone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
 	return 0;
@@ -108,7 +109,7 @@ static MACHINE_CONFIG_START( shtzone, shtzone_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(shtzone)
+	MCFG_SCREEN_UPDATE_DRIVER(shtzone_state, screen_update_shtzone)
 
 	MCFG_PALETTE_LENGTH(0x100)
 

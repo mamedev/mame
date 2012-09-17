@@ -86,6 +86,8 @@ public:
 	DECLARE_VIDEO_START(m10);
 	DECLARE_PALETTE_INIT(m10);
 	DECLARE_VIDEO_START(m15);
+	UINT32 screen_update_m10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_m15(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -93,8 +95,8 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( m10 );
-SCREEN_UPDATE_IND16( m15 );
+
+
 
 
 

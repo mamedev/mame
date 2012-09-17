@@ -137,6 +137,7 @@ public:
 	DECLARE_DRIVER_INIT(bmcbowl);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -148,9 +149,8 @@ void bmcbowl_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( bmcbowl )
+UINT32 bmcbowl_state::screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bmcbowl_state *state = screen.machine().driver_data<bmcbowl_state>();
 /*
       280x230,4 bitmap layers, 8bpp,
         missing scroll and priorities   (maybe fixed ones)
@@ -164,28 +164,28 @@ static SCREEN_UPDATE_IND16( bmcbowl )
 	{
 		for (x=0;x<280;x+=2)
 		{
-			pixdat = state->m_vid2[0x8000+z];
+			pixdat = m_vid2[0x8000+z];
 
 			if(pixdat&0xff)
 				bitmap.pix16(y, x+1) = (pixdat&0xff);
 			if(pixdat>>8)
 				bitmap.pix16(y, x) = (pixdat>>8);
 
-			pixdat = state->m_vid2[z];
+			pixdat = m_vid2[z];
 
 			if(pixdat&0xff)
 				bitmap.pix16(y, x+1) = (pixdat&0xff);
 			if(pixdat>>8)
 				bitmap.pix16(y, x) = (pixdat>>8);
 
-			pixdat = state->m_vid1[0x8000+z];
+			pixdat = m_vid1[0x8000+z];
 
 			if(pixdat&0xff)
 				bitmap.pix16(y, x+1) = (pixdat&0xff);
 			if(pixdat>>8)
 				bitmap.pix16(y, x) = (pixdat>>8);
 
-			pixdat = state->m_vid1[z];
+			pixdat = m_vid1[z];
 
 			if(pixdat&0xff)
 				bitmap.pix16(y, x+1) = (pixdat&0xff);
@@ -510,7 +510,7 @@ static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(35*8, 30*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 0*8, 29*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(bmcbowl)
+	MCFG_SCREEN_UPDATE_DRIVER(bmcbowl_state, screen_update_bmcbowl)
 
 	MCFG_PALETTE_LENGTH(256)
 

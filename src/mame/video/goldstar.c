@@ -362,23 +362,22 @@ WRITE8_MEMBER(goldstar_state::cm_background_col_w)
 
 
 
-SCREEN_UPDATE_IND16( goldstar )
+UINT32 goldstar_state::screen_update_goldstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if (!(state->m_cm_enable_reg &0x01))
+	if (!(m_cm_enable_reg &0x01))
 		return 0;
 
-	if (state->m_cm_enable_reg &0x08)
+	if (m_cm_enable_reg &0x08)
 	{
 		for (i= 0;i < 64;i++)
 		{
-			state->m_reel1_tilemap->set_scrolly(i, state->m_reel1_scroll[i]);
-			state->m_reel2_tilemap->set_scrolly(i, state->m_reel2_scroll[i]);
-			state->m_reel3_tilemap->set_scrolly(i, state->m_reel3_scroll[i]);
+			m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i]);
+			m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i]);
+			m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i]);
 		}
 
 
@@ -387,112 +386,110 @@ SCREEN_UPDATE_IND16( goldstar )
 		const rectangle visible2(0*8, (14+48)*8-1, 12*8, (12+7)*8-1);
 		const rectangle visible3(0*8, (14+48)*8-1, 20*8, (20+7)*8-1);
 
-		state->m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
-		state->m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
-		state->m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
+		m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
+		m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
+		m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
 	}
 
-	if (state->m_cm_enable_reg &0x04)
+	if (m_cm_enable_reg &0x04)
 	{
 		if (screen.machine().root_device().memregion("user1")->base())
 		{
 			gfx_element *gfx = screen.machine().gfx[2];
-			int girlyscroll = (INT8)((state->m_cm_girl_scroll & 0xf0));
-			int girlxscroll = (INT8)((state->m_cm_girl_scroll & 0x0f)<<4);
+			int girlyscroll = (INT8)((m_cm_girl_scroll & 0xf0));
+			int girlxscroll = (INT8)((m_cm_girl_scroll & 0x0f)<<4);
 
-			drawgfxzoom_transpen(bitmap,cliprect,gfx,state->m_cmaster_girl_num,state->m_cmaster_girl_pal,0,0,-(girlxscroll*2),-(girlyscroll), 0x20000, 0x10000,0);
+			drawgfxzoom_transpen(bitmap,cliprect,gfx,m_cmaster_girl_num,m_cmaster_girl_pal,0,0,-(girlxscroll*2),-(girlyscroll), 0x20000, 0x10000,0);
 		}
 	}
 
-	if (state->m_cm_enable_reg &0x02)
+	if (m_cm_enable_reg &0x02)
 	{
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( bingowng )
+UINT32 goldstar_state::screen_update_bingowng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if (!(state->m_cm_enable_reg &0x01))
+	if (!(m_cm_enable_reg &0x01))
 		return 0;
 
-	if (state->m_cm_enable_reg &0x08)
+	if (m_cm_enable_reg &0x08)
 	{
 		for (i= 0;i < 64;i++)
 		{
-			state->m_reel1_tilemap->set_scrolly(i, state->m_reel1_scroll[i]);
+			m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i]);
 		}
 
 
 		const rectangle visible1(0*8, (14+48)*8-1,  3*8,  (4+7)*8-1);
-		state->m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
+		m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
 	}
 
-	if (state->m_cm_enable_reg &0x04)
+	if (m_cm_enable_reg &0x04)
 	{
 		if (screen.machine().root_device().memregion("user1")->base())
 		{
 			gfx_element *gfx = screen.machine().gfx[2];
-			int girlyscroll = (INT8)((state->m_cm_girl_scroll & 0xf0));
-			int girlxscroll = (INT8)((state->m_cm_girl_scroll & 0x0f)<<4);
+			int girlyscroll = (INT8)((m_cm_girl_scroll & 0xf0));
+			int girlxscroll = (INT8)((m_cm_girl_scroll & 0x0f)<<4);
 
-			drawgfxzoom_transpen(bitmap,cliprect,gfx,state->m_cmaster_girl_num,state->m_cmaster_girl_pal,0,0,-(girlxscroll*2),-(girlyscroll), 0x20000, 0x10000,0);
+			drawgfxzoom_transpen(bitmap,cliprect,gfx,m_cmaster_girl_num,m_cmaster_girl_pal,0,0,-(girlxscroll*2),-(girlyscroll), 0x20000, 0x10000,0);
 		}
 	}
 
-	if (state->m_cm_enable_reg &0x02)
+	if (m_cm_enable_reg &0x02)
 	{
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( magical )
+UINT32 goldstar_state::screen_update_magical(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if (!(state->m_cm_enable_reg &0x01))
+	if (!(m_cm_enable_reg &0x01))
 		return 0;
 
-	if (state->m_cm_enable_reg &0x08)
+	if (m_cm_enable_reg &0x08)
 	{
 		// guess, could be wrong, but different screens clearly need different reel layouts
-		if (state->m_unkch_vidreg & 2)
+		if (m_unkch_vidreg & 2)
 		{
 			for (i= 0;i < 32;i++)
 			{
-				state->m_reel1_tilemap->set_scrolly(i, state->m_reel1_scroll[i*2]);
-				state->m_reel2_tilemap->set_scrolly(i, state->m_reel2_scroll[i*2]);
-			//  state->m_reel3_tilemap->set_scrolly(i, state->m_reel3_scroll[i*2]);
+				m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i*2]);
+				m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i*2]);
+			//  m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i*2]);
 			}
 
 
 			const rectangle visible1alt(0*8, (16+48)*8-1,  4*8,  16*8-1);
 			const rectangle visible2alt(0*8, (16+48)*8-1, 16*8,  28*8-1);
 
-			state->m_reel1_tilemap->draw(bitmap, visible1alt, 0, 0);
-			state->m_reel2_tilemap->draw(bitmap, visible2alt, 0, 0);
-			//state->m_reel3_tilemap->draw(bitmap, &magical_visible3, 0, 0);
+			m_reel1_tilemap->draw(bitmap, visible1alt, 0, 0);
+			m_reel2_tilemap->draw(bitmap, visible2alt, 0, 0);
+			//m_reel3_tilemap->draw(bitmap, &magical_visible3, 0, 0);
 		}
 		else
 		{
 			for (i= 0;i < 32;i++)
 			{
-				state->m_reel1_tilemap->set_scrolly(i, state->m_reel1_scroll[i*2]);
-				state->m_reel2_tilemap->set_scrolly(i, state->m_reel2_scroll[i*2]);
-				state->m_reel3_tilemap->set_scrolly(i, state->m_reel3_scroll[i*2]);
+				m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i*2]);
+				m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i*2]);
+				m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i*2]);
 			}
 
 
@@ -500,45 +497,44 @@ SCREEN_UPDATE_IND16( magical )
 			const rectangle visible2(0*8, (14+48)*8-1, 12*8, (12+8)*8-1);
 			const rectangle visible3(0*8, (14+48)*8-1, 20*8, (20+8)*8-1);
 
-			state->m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
-			state->m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
-			state->m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
+			m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
+			m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
+			m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
 		}
 	}
 
-	if (state->m_cm_enable_reg &0x02)
+	if (m_cm_enable_reg &0x02)
 	{
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 
 	return 0;
 }
 
 
-SCREEN_UPDATE_IND16( unkch )
+UINT32 goldstar_state::screen_update_unkch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if (!(state->m_cm_enable_reg &0x01))
+	if (!(m_cm_enable_reg &0x01))
 		return 0;
 
-	if (state->m_cm_enable_reg &0x08)
+	if (m_cm_enable_reg &0x08)
 	{
 		// guess, this could be something else completely!!
 		// only draw the first 'reels' tilemap, but fullscreen, using alt registers? (or no scrolling at all? - doubtful, see girl)
-		if (state->m_unkch_vidreg & 0x40)
+		if (m_unkch_vidreg & 0x40)
 		{
 			for (i= 0;i < 32;i++)
 			{
-				state->m_reel1_tilemap->set_scrolly(i, -0x08/*state->m_reel1_scroll[(i*2)+1]*/);
-			//  state->m_reel2_tilemap->set_scrolly(i, state->m_reel2_scroll[(i*2)+1]);
-			//  state->m_reel3_tilemap->set_scrolly(i, state->m_reel3_scroll[(i*2)+1]);
+				m_reel1_tilemap->set_scrolly(i, -0x08/*m_reel1_scroll[(i*2)+1]*/);
+			//  m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[(i*2)+1]);
+			//  m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[(i*2)+1]);
 			}
 
-			state->m_reel1_tilemap->draw(bitmap, cliprect, 0, 0);
+			m_reel1_tilemap->draw(bitmap, cliprect, 0, 0);
 
 		}
 		// or draw the reels normally?
@@ -546,101 +542,99 @@ SCREEN_UPDATE_IND16( unkch )
 		{
 			for (i= 0;i < 32;i++)
 			{
-				state->m_reel1_tilemap->set_scrolly(i, state->m_reel1_scroll[i*2]);
-				state->m_reel2_tilemap->set_scrolly(i, state->m_reel2_scroll[i*2]);
-				state->m_reel3_tilemap->set_scrolly(i, state->m_reel3_scroll[i*2]);
+				m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i*2]);
+				m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i*2]);
+				m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i*2]);
 			}
 
 			const rectangle visible1(0*8, (14+48)*8-1,  3*8,  (3+7)*8-1);
 			const rectangle visible2(0*8, (14+48)*8-1, 10*8, (10+7)*8-1);
 			const rectangle visible3(0*8, (14+48)*8-1, 17*8, (17+7)*8-1);
 
-			state->m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
-			state->m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
-			state->m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
+			m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
+			m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
+			m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
 		}
 	}
 
-	if (state->m_cm_enable_reg &0x02)
+	if (m_cm_enable_reg &0x02)
 	{
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( cmast91 )
+UINT32 goldstar_state::screen_update_cmast91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if (!(state->m_cm_enable_reg &0x01))
+	if (!(m_cm_enable_reg &0x01))
 		return 0;
 
-	if (state->m_cm_enable_reg &0x08)
+	if (m_cm_enable_reg &0x08)
 	{
 		for (i= 0;i < 64;i++)
 		{
-			state->m_reel1_tilemap->set_scrolly(i, state->m_reel1_scroll[i]);
-			state->m_reel2_tilemap->set_scrolly(i, state->m_reel2_scroll[i]);
-			state->m_reel3_tilemap->set_scrolly(i, state->m_reel3_scroll[i]);
+			m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i]);
+			m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i]);
+			m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i]);
 		}
 
 		const rectangle visible1(0*8, (14+48)*8-1, 4*8,  (4+7)*8-1);	/* same start for reel1 */
 		const rectangle visible2(0*8, (14+48)*8-1, 11*8, (12+7)*8-1);	/* 4 pixels less for reel2 */
 		const rectangle visible3(0*8, (14+48)*8-1, 19*8, (19+7)*8-1);	/* 8 pixels less for reel3 */
 
-		state->m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
-		state->m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
-		state->m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
+		m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
+		m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
+		m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
 	}
 
-	if (state->m_cm_enable_reg &0x02)
+	if (m_cm_enable_reg &0x02)
 	{
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( amcoe1a )
+UINT32 goldstar_state::screen_update_amcoe1a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if (!(state->m_cm_enable_reg &0x01))
+	if (!(m_cm_enable_reg &0x01))
 		return 0;
 
-	if (state->m_cm_enable_reg &0x08)
+	if (m_cm_enable_reg &0x08)
 	{
 		for (i= 0;i < 64;i++)
 		{
-			state->m_reel1_tilemap->set_scrolly(i, state->m_reel1_scroll[i]);
-			state->m_reel2_tilemap->set_scrolly(i, state->m_reel2_scroll[i]);
-			state->m_reel3_tilemap->set_scrolly(i, state->m_reel3_scroll[i]);
+			m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i]);
+			m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i]);
+			m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i]);
 		}
 
 		const rectangle visible1(0*8, (14+48)*8-1,  4*8,  (4+6)*8-1);
 		const rectangle visible2(0*8, (14+48)*8-1, 10*8, (10+6)*8-1);
 		const rectangle visible3(0*8, (14+48)*8-1, 16*8, (16+6)*8-1);
 
-		state->m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
-		state->m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
-		state->m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
+		m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
+		m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
+		m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
 	}
 
-	if (state->m_cm_enable_reg &0x04)
+	if (m_cm_enable_reg &0x04)
 	{
 		// no girls
 	}
 
-	if (state->m_cm_enable_reg &0x02)
+	if (m_cm_enable_reg &0x02)
 	{
-		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 
 	return 0;

@@ -79,6 +79,7 @@ public:
 	DECLARE_READ8_MEMBER(controller_r);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_beaminv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -168,18 +169,17 @@ void beaminv_state::machine_reset()
  *
  *************************************/
 
-static SCREEN_UPDATE_RGB32( beaminv )
+UINT32 beaminv_state::screen_update_beaminv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	beaminv_state *state = screen.machine().driver_data<beaminv_state>();
 	offs_t offs;
 
-	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
+	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{
 		int i;
 
 		UINT8 y = offs;
 		UINT8 x = offs >> 8 << 3;
-		UINT8 data = state->m_videoram[offs];
+		UINT8 data = m_videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
@@ -342,7 +342,7 @@ static MACHINE_CONFIG_START( beaminv, beaminv_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 247, 16, 231)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_STATIC(beaminv)
+	MCFG_SCREEN_UPDATE_DRIVER(beaminv_state, screen_update_beaminv)
 
 MACHINE_CONFIG_END
 

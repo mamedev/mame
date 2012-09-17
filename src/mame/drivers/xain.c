@@ -596,7 +596,7 @@ static MACHINE_CONFIG_START( xsleena, xain_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 8, 248)	/* based on ddragon driver */
-	MCFG_SCREEN_UPDATE_STATIC(xain)
+	MCFG_SCREEN_UPDATE_DRIVER(xain_state, screen_update_xain)
 
 	MCFG_GFXDECODE(xain)
 	MCFG_PALETTE_LENGTH(512)

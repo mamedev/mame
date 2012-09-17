@@ -16,6 +16,7 @@ public:
 		: driver_device(mconfig, type, tag) { }
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_dct11em(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 static ADDRESS_MAP_START( dct11em_mem, AS_PROGRAM, 16, dct11em_state )
@@ -38,7 +39,7 @@ void dct11em_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( dct11em )
+UINT32 dct11em_state::screen_update_dct11em(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -61,7 +62,7 @@ static MACHINE_CONFIG_START( dct11em, dct11em_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_STATIC(dct11em)
+	MCFG_SCREEN_UPDATE_DRIVER(dct11em_state, screen_update_dct11em)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 MACHINE_CONFIG_END

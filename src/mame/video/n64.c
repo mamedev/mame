@@ -3847,14 +3847,13 @@ void n64_state::video_start()
 	}
 }
 
-SCREEN_UPDATE_RGB32(n64)
+UINT32 n64_state::screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	n64_state *state = screen.machine().driver_data<n64_state>();
 	n64_periphs *n64 = screen.machine().device<n64_periphs>("rcp");
-    state->m_rdp->visarea = screen.visible_area();
+    m_rdp->visarea = screen.visible_area();
 
 	//UINT16 *frame_buffer = (UINT16*)&rdram[(n64->vi_origin & 0xffffff) >> 2];
-	//UINT8  *cvg_buffer = &state->m_rdp.HiddenBits[((n64->vi_origin & 0xffffff) >> 2) >> 1];
+	//UINT8  *cvg_buffer = &m_rdp.HiddenBits[((n64->vi_origin & 0xffffff) >> 2) >> 1];
     //int vibuffering = ((n64->vi_control & 2) && fsaa && divot);
 
 	//vibuffering = 0; // Disabled for now
@@ -3891,16 +3890,16 @@ SCREEN_UPDATE_RGB32(n64)
     }
     */
 
-	state->m_rdp->wait();
-	state->m_rdp->AuxBufPtr = 0;
+	m_rdp->wait();
+	m_rdp->AuxBufPtr = 0;
 
     if (n64->vi_blank)
     {
-		bitmap.fill(0, state->m_rdp->visarea);
+		bitmap.fill(0, m_rdp->visarea);
         return 0;
     }
 
-	state->m_rdp->VideoUpdate(n64, bitmap);
+	m_rdp->VideoUpdate(n64, bitmap);
 
 	return 0;
 }

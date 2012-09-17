@@ -354,7 +354,7 @@ static MACHINE_CONFIG_START( atetris, atetris_state )
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_STATIC(atetris)
+	MCFG_SCREEN_UPDATE_DRIVER(atetris_state, screen_update_atetris)
 
 
 	/* sound hardware */
@@ -386,7 +386,7 @@ static MACHINE_CONFIG_START( atetrisb2, atetris_state )
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_STATIC(atetris)
+	MCFG_SCREEN_UPDATE_DRIVER(atetris_state, screen_update_atetris)
 
 
 	/* sound hardware */

@@ -259,6 +259,8 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_pdp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_pdp1(screen_device &screen, bool state);
 };
 
 
@@ -266,8 +268,8 @@ public:
 /*----------- defined in video/pdp1.c -----------*/
 
 
-SCREEN_VBLANK( pdp1 );
-SCREEN_UPDATE_IND16( pdp1 );
+
+
 
 void pdp1_plot(running_machine &machine, int x, int y);
 void pdp1_typewriter_drawchar(running_machine &machine, int character);

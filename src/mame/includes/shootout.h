@@ -26,6 +26,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_shootout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_shootouj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -34,5 +36,5 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( shootout );
-SCREEN_UPDATE_IND16( shootouj );
+
+

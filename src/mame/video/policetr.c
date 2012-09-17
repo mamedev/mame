@@ -343,15 +343,14 @@ WRITE32_MEMBER(policetr_state::policetr_palette_data_w)
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( policetr )
+UINT32 policetr_state::screen_update_policetr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	policetr_state *state = screen.machine().driver_data<policetr_state>();
 	int width = cliprect.width();
 	int y;
 
 	/* render all the scanlines from the dstbitmap to MAME's bitmap */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
-		draw_scanline8(bitmap, cliprect.min_x, y, width, &state->m_dstbitmap[DSTBITMAP_WIDTH * y + cliprect.min_x], NULL);
+		draw_scanline8(bitmap, cliprect.min_x, y, width, &m_dstbitmap[DSTBITMAP_WIDTH * y + cliprect.min_x], NULL);
 
 	return 0;
 }

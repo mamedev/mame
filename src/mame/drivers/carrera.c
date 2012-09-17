@@ -62,6 +62,7 @@ public:
 	required_shared_ptr<UINT8> m_tileram;
 	DECLARE_READ8_MEMBER(unknown_r);
 	virtual void palette_init();
+	UINT32 screen_update_carrera(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -247,9 +248,8 @@ static GFXDECODE_START( carrera )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
-static SCREEN_UPDATE_IND16(carrera)
+UINT32 carrera_state::screen_update_carrera(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	carrera_state *state = screen.machine().driver_data<carrera_state>();
 
 	int x,y;
 	int count = 0;
@@ -258,7 +258,7 @@ static SCREEN_UPDATE_IND16(carrera)
 	{
 		for (x=0;x<64;x++)
 		{
-			int tile = state->m_tileram[count&0x7ff] | state->m_tileram[(count&0x7ff)+0x800]<<8;
+			int tile = m_tileram[count&0x7ff] | m_tileram[(count&0x7ff)+0x800]<<8;
 
 			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],tile,0,0,0,x*8,y*8);
 			count++;
@@ -338,7 +338,7 @@ static MACHINE_CONFIG_START( carrera, carrera_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(carrera)
+	MCFG_SCREEN_UPDATE_DRIVER(carrera_state, screen_update_carrera)
 
 	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / 16, mc6845_intf)
 

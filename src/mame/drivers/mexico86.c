@@ -496,7 +496,7 @@ static MACHINE_CONFIG_START( mexico86, mexico86_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* frames per second, vblank duration */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(mexico86)
+	MCFG_SCREEN_UPDATE_DRIVER(mexico86_state, screen_update_mexico86)
 
 	MCFG_GFXDECODE(mexico86)
 	MCFG_PALETTE_LENGTH(256)
@@ -523,7 +523,7 @@ static MACHINE_CONFIG_DERIVED( knightb, mexico86 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(kikikai)
+	MCFG_SCREEN_UPDATE_DRIVER(mexico86_state, screen_update_kikikai)
 MACHINE_CONFIG_END
 
 
@@ -538,7 +538,7 @@ static MACHINE_CONFIG_DERIVED( kikikai, knightb )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(kikikai)
+	MCFG_SCREEN_UPDATE_DRIVER(mexico86_state, screen_update_kikikai)
 MACHINE_CONFIG_END
 
 

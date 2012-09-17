@@ -17,6 +17,7 @@ public:
 	DECLARE_READ8_MEMBER(beezer_line_r);
 	DECLARE_DRIVER_INIT(beezer);
 	virtual void machine_start();
+	UINT32 screen_update_beezer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -62,4 +63,4 @@ DECLARE_READ8_DEVICE_HANDLER( beezer_noise_r );
 /*----------- defined in video/beezer.c -----------*/
 
 TIMER_DEVICE_CALLBACK( beezer_interrupt );
-SCREEN_UPDATE_IND16( beezer );
+

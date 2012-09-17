@@ -21,6 +21,7 @@ public:
 	required_shared_ptr<UINT8> m_store;
 	UINT8 m_store_line;
 	virtual void machine_reset();
+	UINT32 screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -442,9 +443,8 @@ static void glyph_print(running_machine &machine, bitmap_rgb32 &bitmap, INT32 x,
 	}
 }
 
-static SCREEN_UPDATE_RGB32( ssem )
+UINT32 ssem_state::screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	ssem_state *state = screen.machine().driver_data<ssem_state>();
 	UINT32 line = 0;
 	device_t *ssem_cpu = screen.machine().device("maincpu");
 	UINT32 accum = ssem_cpu->state().state_int(SSEM_A);
@@ -453,19 +453,19 @@ static SCREEN_UPDATE_RGB32( ssem )
 
 	for(line = 0; line < 32; line++)
 	{
-		word = (state->m_store[(line << 2) | 0] << 24) |
-			   (state->m_store[(line << 2) | 1] << 16) |
-			   (state->m_store[(line << 2) | 2] <<  8) |
-			   (state->m_store[(line << 2) | 3] <<  0);
+		word = (m_store[(line << 2) | 0] << 24) |
+			   (m_store[(line << 2) | 1] << 16) |
+			   (m_store[(line << 2) | 2] <<  8) |
+			   (m_store[(line << 2) | 3] <<  0);
 		for(bit = 0; bit < 32; bit++)
 		{
 			if(word & (1 << (31 - bit)))
 			{
-				glyph_print(screen.machine(), bitmap, bit << 3, line << 3, "%c", line == state->m_store_line ? 4 : 2);
+				glyph_print(screen.machine(), bitmap, bit << 3, line << 3, "%c", line == m_store_line ? 4 : 2);
 			}
 			else
 			{
-				glyph_print(screen.machine(), bitmap, bit << 3, line << 3, "%c", line == state->m_store_line ? 3 : 1);
+				glyph_print(screen.machine(), bitmap, bit << 3, line << 3, "%c", line == m_store_line ? 3 : 1);
 			}
 		}
 	}
@@ -482,11 +482,11 @@ static SCREEN_UPDATE_RGB32( ssem )
 		}
 	}
 
-	word = reverse((state->m_store[(state->m_store_line << 2) | 0] << 24) |
-				   (state->m_store[(state->m_store_line << 2) | 1] << 16) |
-				   (state->m_store[(state->m_store_line << 2) | 2] <<  8) |
-				   (state->m_store[(state->m_store_line << 2) | 3] <<  0));
-	glyph_print(screen.machine(), bitmap, 0, 272, "LINE:%02d  VALUE:%08x  HALT:%d", state->m_store_line, word, ssem_cpu->state().state_int(SSEM_HALT));
+	word = reverse((m_store[(m_store_line << 2) | 0] << 24) |
+				   (m_store[(m_store_line << 2) | 1] << 16) |
+				   (m_store[(m_store_line << 2) | 2] <<  8) |
+				   (m_store[(m_store_line << 2) | 3] <<  0));
+	glyph_print(screen.machine(), bitmap, 0, 272, "LINE:%02d  VALUE:%08x  HALT:%d", m_store_line, word, ssem_cpu->state().state_int(SSEM_HALT));
 	return 0;
 }
 
@@ -642,7 +642,7 @@ static MACHINE_CONFIG_START( ssem, ssem_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 279)
-	MCFG_SCREEN_UPDATE_STATIC(ssem)
+	MCFG_SCREEN_UPDATE_DRIVER(ssem_state, screen_update_ssem)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 

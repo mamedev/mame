@@ -55,6 +55,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_cabaret(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -112,14 +113,13 @@ void cabaret_state::video_start()
 }
 
 
-static SCREEN_UPDATE_IND16(cabaret)
+UINT32 cabaret_state::screen_update_cabaret(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cabaret_state *state = screen.machine().driver_data<cabaret_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -345,7 +345,7 @@ static MACHINE_CONFIG_START( cabaret, cabaret_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(cabaret)
+	MCFG_SCREEN_UPDATE_DRIVER(cabaret_state, screen_update_cabaret)
 
 	MCFG_GFXDECODE(cabaret)
 	MCFG_PALETTE_LENGTH(0x800)

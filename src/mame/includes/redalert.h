@@ -37,6 +37,9 @@ public:
 	DECLARE_WRITE8_MEMBER(demoneye_audio_command_w);
 	DECLARE_VIDEO_START(redalert);
 	DECLARE_VIDEO_START(ww3);
+	UINT32 screen_update_redalert(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_demoneye(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_panther(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 

@@ -104,9 +104,8 @@ void carjmbre_state::video_start()
 	save_item(NAME(m_bgcolor));
 }
 
-SCREEN_UPDATE_IND16( carjmbre )
+UINT32 carjmbre_state::screen_update_carjmbre(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	carjmbre_state *state = screen.machine().driver_data<carjmbre_state>();
 	int offs, troffs, sx, sy, flipx, flipy;
 
 	//colorram
@@ -115,7 +114,7 @@ SCREEN_UPDATE_IND16( carjmbre )
 	//-xxx---- unused
 	//----xxxx colour
 
-	state->m_cj_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_cj_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	//spriteram[offs]
 	//+0       y pos
@@ -127,21 +126,21 @@ SCREEN_UPDATE_IND16( carjmbre )
 	//--xx---- unused
 	//----xxxx colour
 	//+3       x pos
-	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		//before copying the sprites to spriteram the game reorders the first
 		//sprite to last, sprite ordering is incorrect if this isn't undone
-		troffs = (offs - 4 + state->m_spriteram.bytes()) % state->m_spriteram.bytes();
+		troffs = (offs - 4 + m_spriteram.bytes()) % m_spriteram.bytes();
 
 		//unused sprites are marked with ypos <= 0x02 (or >= 0xfd if screen flipped)
-		if (state->m_spriteram[troffs] > 0x02 && state->m_spriteram[troffs] < 0xfd)
+		if (m_spriteram[troffs] > 0x02 && m_spriteram[troffs] < 0xfd)
 		{
-			sx = state->m_spriteram[troffs + 3] - 7;
-			sy = 241 - state->m_spriteram[troffs];
-			flipx = (state->m_spriteram[troffs + 2] & 0x40) >> 6;
-			flipy = (state->m_spriteram[troffs + 2] & 0x80) >> 7;
+			sx = m_spriteram[troffs + 3] - 7;
+			sy = 241 - m_spriteram[troffs];
+			flipx = (m_spriteram[troffs + 2] & 0x40) >> 6;
+			flipy = (m_spriteram[troffs + 2] & 0x80) >> 7;
 
-			if (state->m_flipscreen)
+			if (m_flipscreen)
 			{
 				sx = (256 + (226 - sx)) % 256;
 				sy = 242 - sy;
@@ -150,8 +149,8 @@ SCREEN_UPDATE_IND16( carjmbre )
 			}
 
 			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
-					state->m_spriteram[troffs + 1],
-					state->m_spriteram[troffs + 2] & 0xf,
+					m_spriteram[troffs + 1],
+					m_spriteram[troffs + 2] & 0xf,
 					flipx,flipy,
 					sx,sy,0);
 		}

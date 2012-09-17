@@ -917,12 +917,11 @@ void neogeo_state::video_reset()
  *
  *************************************/
 
-SCREEN_UPDATE_RGB32( neogeo )
+UINT32 neogeo_state::screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	neogeo_state *state = screen.machine().driver_data<neogeo_state>();
 
 	/* fill with background color first */
-	bitmap.fill(state->m_pens[0x0fff], cliprect);
+	bitmap.fill(m_pens[0x0fff], cliprect);
 
 	draw_sprites(screen.machine(), bitmap, cliprect.min_y);
 

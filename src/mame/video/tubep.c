@@ -577,16 +577,15 @@ void tubep_vblank_end(running_machine &machine)
 }
 
 
-SCREEN_UPDATE_IND16( tubep )
+UINT32 tubep_state::screen_update_tubep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tubep_state *state = screen.machine().driver_data<tubep_state>();
-	int DISP_ = state->m_DISP^1;
+	int DISP_ = m_DISP^1;
 
 	pen_t pen_base = 32; //change it later
 
 	UINT32 v;
 	UINT8 *text_gfx_base = screen.machine().root_device().memregion("gfx1")->base();
-	UINT8 *romBxx = state->memregion("user1")->base() + 0x2000*state->m_background_romsel;
+	UINT8 *romBxx = memregion("user1")->base() + 0x2000*m_background_romsel;
 
 	/* logerror(" update: from DISP=%i y_min=%3i y_max=%3i\n", DISP_, cliprect.min_y, cliprect.max_y+1); */
 
@@ -602,14 +601,14 @@ SCREEN_UPDATE_IND16( tubep )
 
 			sp_data2 = sp_data1;
 			sp_data1 = sp_data0;
-			sp_data0 = state->m_spritemap[ h + v*256 +(DISP_*256*256) ];
+			sp_data0 = m_spritemap[ h + v*256 +(DISP_*256*256) ];
 
 			text_offs = ((v >> 3) << 6) | ((h >> 3) << 1);
-			text_code = state->m_textram[text_offs];
+			text_code = m_textram[text_offs];
 			text_gfx_data = text_gfx_base[(text_code << 3) | (v & 0x07)];
 
 			if (text_gfx_data & (0x80 >> (h & 0x07)))
-				bitmap.pix16(v, h) = (state->m_textram[text_offs + 1] & 0x0f) | state->m_color_A4;
+				bitmap.pix16(v, h) = (m_textram[text_offs + 1] & 0x0f) | m_color_A4;
 			else
 			{
 				UINT32 bg_data;
@@ -623,10 +622,10 @@ SCREEN_UPDATE_IND16( tubep )
 				UINT8 romB_data_h = romBxx[ 0x4000 + 0x4000*rom_select + romB_addr ];
 				/* romB_data_h = output of LS374 @B3 or @B4 */
 
-				UINT32 VR_addr = ((romB_data_h + state->m_ls175_b7) & 0xfe) << 2;
+				UINT32 VR_addr = ((romB_data_h + m_ls175_b7) & 0xfe) << 2;
 				/* VR_addr = output of LS157s @B1 and @B6 */
 
-				UINT8 xor_logic = (((h^v)&0x80)>>7) ^ (state->m_background_romsel & (((v&0x80)>>7)^1));
+				UINT8 xor_logic = (((h^v)&0x80)>>7) ^ (m_background_romsel & (((v&0x80)>>7)^1));
 
 				/* read from ROMs: B1/2 */
 				UINT8 romB_data_l = romBxx[ romB_addr ] ^ (xor_logic?0xff:0x00);
@@ -634,11 +633,11 @@ SCREEN_UPDATE_IND16( tubep )
 
 				UINT8 ls157_b11 = (romB_data_l >> ((rom_select==0)?4:0))&0x0f;
 
-				UINT8 ls283_b12 = (ls157_b11 + state->m_ls175_e8) & 0x0f;
+				UINT8 ls283_b12 = (ls157_b11 + m_ls175_e8) & 0x0f;
 
 				VR_addr |= (ls283_b12>>1);
 
-				bg_data = state->m_backgroundram[ VR_addr ];
+				bg_data = m_backgroundram[ VR_addr ];
 
 				romB_data_h>>=2;
 
@@ -648,7 +647,7 @@ SCREEN_UPDATE_IND16( tubep )
 					sp_data = sp_data1;
 
 				if (sp_data != 0x0f)
-					bg_data = state->m_prom2[sp_data | state->m_color_A4];
+					bg_data = m_prom2[sp_data | m_color_A4];
 
 				bitmap.pix16(v, h) = pen_base + bg_data*64 + romB_data_h;
 			}
@@ -734,14 +733,13 @@ WRITE8_MEMBER(tubep_state::rjammer_background_page_w)
 }
 
 
-SCREEN_UPDATE_IND16( rjammer )
+UINT32 tubep_state::screen_update_rjammer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tubep_state *state = screen.machine().driver_data<tubep_state>();
-	int DISP_ = state->m_DISP^1;
+	int DISP_ = m_DISP^1;
 
 	UINT32 v;
 	UINT8 *text_gfx_base = screen.machine().root_device().memregion("gfx1")->base();
-	UINT8 *rom13D  = state->memregion("user1")->base();
+	UINT8 *rom13D  = memregion("user1")->base();
 	UINT8 *rom11BD = rom13D+0x1000;
 	UINT8 *rom19C  = rom13D+0x5000;
 
@@ -757,10 +755,10 @@ SCREEN_UPDATE_IND16( rjammer )
 		UINT8 pal14h4_pin18;
 		UINT8 pal14h4_pin13;
 
-		UINT32 addr = (v*2) | state->m_page;
-		UINT32 ram_data = state->m_rjammer_backgroundram[ addr ] + 256*(state->m_rjammer_backgroundram[ addr+1 ]&0x2f);
+		UINT32 addr = (v*2) | m_page;
+		UINT32 ram_data = m_rjammer_backgroundram[ addr ] + 256*(m_rjammer_backgroundram[ addr+1 ]&0x2f);
 
-		addr = (v>>3) | ((state->m_ls377_data&0x1f)<<5);
+		addr = (v>>3) | ((m_ls377_data&0x1f)<<5);
 		pal14h4_pin13 = (rom19C[addr] >> ((v&7)^7) ) &1;
 		pal14h4_pin19 = (ram_data>>13) & 1;
 
@@ -772,14 +770,14 @@ SCREEN_UPDATE_IND16( rjammer )
 
 			sp_data2 = sp_data1;
 			sp_data1 = sp_data0;
-			sp_data0 = state->m_spritemap[ h + v*256 +(DISP_*256*256) ];
+			sp_data0 = m_spritemap[ h + v*256 +(DISP_*256*256) ];
 
 			text_offs = ((v >> 3) << 6) | ((h >> 3) << 1);
-			text_code = state->m_textram[text_offs];
+			text_code = m_textram[text_offs];
 			text_gfx_data = text_gfx_base[(text_code << 3) | (v & 0x07)];
 
 			if (text_gfx_data & (0x80 >> (h & 0x07)))
-				bitmap.pix16(v, h) = 0x10 | (state->m_textram[text_offs + 1] & 0x0f);
+				bitmap.pix16(v, h) = 0x10 | (m_textram[text_offs + 1] & 0x0f);
 			else
 			{
 				UINT32 sp_data;
@@ -814,7 +812,7 @@ SCREEN_UPDATE_IND16( rjammer )
 					else
 						bg_data = (rom11_data>>4) & 0x0f;
 
-					addr = (h>>3) | (state->m_ls377_data<<5);
+					addr = (h>>3) | (m_ls377_data<<5);
 					pal14h4_pin18 = (rom19C[addr] >> ((h&7)^7) ) &1;
 
 					/*

@@ -50,6 +50,7 @@ public:
 	DECLARE_DRIVER_INIT(nexus3d);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_nexus3d(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -183,7 +184,7 @@ void nexus3d_state::video_start()
 
 }
 
-SCREEN_UPDATE_RGB32(nexus3d)
+UINT32 nexus3d_state::screen_update_nexus3d(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -204,7 +205,7 @@ static MACHINE_CONFIG_START( nexus3d, nexus3d_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_STATIC(nexus3d)
+	MCFG_SCREEN_UPDATE_DRIVER(nexus3d_state, screen_update_nexus3d)
 
 	MCFG_PALETTE_LENGTH(256)
 

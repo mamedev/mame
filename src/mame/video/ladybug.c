@@ -278,9 +278,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( ladybug )
+UINT32 ladybug_state::screen_update_ladybug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ladybug_state *state = screen.machine().driver_data<ladybug_state>();
 	int offs;
 
 	// clear the bg bitmap
@@ -291,27 +290,26 @@ SCREEN_UPDATE_IND16( ladybug )
 		int sx = offs % 4;
 		int sy = offs / 4;
 
-		if (state->flip_screen())
-			state->m_bg_tilemap->set_scrollx(offs, -state->m_videoram[32 * sx + sy]);
+		if (flip_screen())
+			m_bg_tilemap->set_scrollx(offs, -m_videoram[32 * sx + sy]);
 		else
-			state->m_bg_tilemap->set_scrollx(offs, state->m_videoram[32 * sx + sy]);
+			m_bg_tilemap->set_scrollx(offs, m_videoram[32 * sx + sy]);
 	}
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
-SCREEN_VBLANK( sraider )	/* update starfield position */
+void ladybug_state::screen_eof_sraider(screen_device &screen, bool state)/* update starfield position */
 {
 	// falling edge
-	if (!vblank_on)
+	if (!state)
 		redclash_update_stars_state(screen.machine());
 }
 
-SCREEN_UPDATE_IND16( sraider )
+UINT32 ladybug_state::screen_update_sraider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ladybug_state *state = screen.machine().driver_data<ladybug_state>();
 
 	// this part is boilerplate from ladybug, not sure if hardware does this,
 	// since it's not used
@@ -324,35 +322,35 @@ SCREEN_UPDATE_IND16( sraider )
 		int sx = offs % 4;
 		int sy = offs / 4;
 
-		if (state->flip_screen())
-			state->m_bg_tilemap->set_scrollx(offs, -state->m_videoram[32 * sx + sy]);
+		if (flip_screen())
+			m_bg_tilemap->set_scrollx(offs, -m_videoram[32 * sx + sy]);
 		else
-			state->m_bg_tilemap->set_scrollx(offs, state->m_videoram[32 * sx + sy]);
+			m_bg_tilemap->set_scrollx(offs, m_videoram[32 * sx + sy]);
 	}
 
 	// clear the bg bitmap
 	bitmap.fill(0, cliprect);
 
 	// draw the stars
-	if (state->flip_screen())
+	if (flip_screen())
 		redclash_draw_stars(screen.machine(), bitmap, cliprect, 0x60, 1, 0x27, 0xff);
 	else
 		redclash_draw_stars(screen.machine(), bitmap, cliprect, 0x60, 1, 0x00, 0xd8);
 
 	// draw the gridlines
-	colortable_palette_set_color(screen.machine().colortable, 0x40, MAKE_RGB(state->m_grid_color & 0x40 ? 0xff : 0,
-		            														 state->m_grid_color & 0x20 ? 0xff : 0,
-		            														 state->m_grid_color & 0x10 ? 0xff : 0));
-	state->m_grid_tilemap->draw(bitmap, cliprect, 0, state->flip_screen());
+	colortable_palette_set_color(screen.machine().colortable, 0x40, MAKE_RGB(m_grid_color & 0x40 ? 0xff : 0,
+		            														 m_grid_color & 0x20 ? 0xff : 0,
+		            														 m_grid_color & 0x10 ? 0xff : 0));
+	m_grid_tilemap->draw(bitmap, cliprect, 0, flip_screen());
 
 	for (i = 0; i < 0x100; i++)
 	{
-		if (state->m_grid_data[i] != 0)
+		if (m_grid_data[i] != 0)
 		{
 			UINT8 x = i;
 			int height = cliprect.max_y - cliprect.min_y + 1;
 
-			if (state->flip_screen())
+			if (flip_screen())
 				x = ~x;
 
 			bitmap.plot_box(x, cliprect.min_y, 1, height, 0x81);
@@ -360,7 +358,7 @@ SCREEN_UPDATE_IND16( sraider )
 	}
 
 	// now the chars
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, state->flip_screen());
+	m_bg_tilemap->draw(bitmap, cliprect, 0, flip_screen());
 
 	// now the sprites
 	draw_sprites(screen.machine(), bitmap, cliprect);

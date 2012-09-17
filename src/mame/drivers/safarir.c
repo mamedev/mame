@@ -78,6 +78,7 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -200,14 +201,13 @@ void safarir_state::video_start()
 }
 
 
-static SCREEN_UPDATE_IND16( safarir )
+UINT32 safarir_state::screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	safarir_state *state = screen.machine().driver_data<safarir_state>();
 
-	state->m_bg_tilemap->set_scrollx(0, *state->m_bg_scroll);
+	m_bg_tilemap->set_scrollx(0, *m_bg_scroll);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -415,7 +415,7 @@ static MACHINE_CONFIG_START( safarir, safarir_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 26*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_STATIC(safarir)
+	MCFG_SCREEN_UPDATE_DRIVER(safarir_state, screen_update_safarir)
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(safarir_audio)

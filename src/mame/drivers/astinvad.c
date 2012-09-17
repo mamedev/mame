@@ -81,6 +81,8 @@ public:
 	DECLARE_MACHINE_START(spaceint);
 	DECLARE_MACHINE_RESET(spaceint);
 	DECLARE_VIDEO_START(spaceint);
+	UINT32 screen_update_astinvad(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_spaceint(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -167,36 +169,34 @@ static void plot_byte( running_machine &machine, bitmap_rgb32 &bitmap, UINT8 y, 
 }
 
 
-static SCREEN_UPDATE_RGB32( astinvad )
+UINT32 astinvad_state::screen_update_astinvad(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	astinvad_state *state = screen.machine().driver_data<astinvad_state>();
-	const UINT8 *color_prom = state->memregion("proms")->base();
-	UINT8 yoffs = state->m_flip_yoffs & state->m_screen_flip;
+	const UINT8 *color_prom = memregion("proms")->base();
+	UINT8 yoffs = m_flip_yoffs & m_screen_flip;
 	int x, y;
 
 	/* render the visible pixels */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		for (x = cliprect.min_x & ~7; x <= cliprect.max_x; x += 8)
 		{
-			UINT8 color = color_prom[((y & 0xf8) << 2) | (x >> 3)] >> (state->m_screen_flip ? 0 : 4);
-			UINT8 data = state->m_videoram[(((y ^ state->m_screen_flip) + yoffs) << 5) | ((x ^ state->m_screen_flip) >> 3)];
-			plot_byte(screen.machine(), bitmap, y, x, data, state->m_screen_red ? 1 : color);
+			UINT8 color = color_prom[((y & 0xf8) << 2) | (x >> 3)] >> (m_screen_flip ? 0 : 4);
+			UINT8 data = m_videoram[(((y ^ m_screen_flip) + yoffs) << 5) | ((x ^ m_screen_flip) >> 3)];
+			plot_byte(screen.machine(), bitmap, y, x, data, m_screen_red ? 1 : color);
 		}
 
 	return 0;
 }
 
 
-static SCREEN_UPDATE_RGB32( spaceint )
+UINT32 astinvad_state::screen_update_spaceint(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	astinvad_state *state = screen.machine().driver_data<astinvad_state>();
-	const UINT8 *color_prom = state->memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int offs;
 
-	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
+	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		UINT8 data = state->m_videoram[offs];
-		UINT8 color = state->m_colorram[offs];
+		UINT8 data = m_videoram[offs];
+		UINT8 color = m_colorram[offs];
 
 		UINT8 y = ~offs;
 		UINT8 x = offs >> 8 << 3;
@@ -601,7 +601,7 @@ static MACHINE_CONFIG_START( kamikaze, astinvad_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 320, 0, 256, 256, 32, 256)
-	MCFG_SCREEN_UPDATE_STATIC(astinvad)
+	MCFG_SCREEN_UPDATE_DRIVER(astinvad_state, screen_update_astinvad)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -637,7 +637,7 @@ static MACHINE_CONFIG_START( spaceint, astinvad_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_STATIC(spaceint)
+	MCFG_SCREEN_UPDATE_DRIVER(astinvad_state, screen_update_spaceint)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

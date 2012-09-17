@@ -96,9 +96,8 @@ VIDEO_START_MEMBER(mc80_state,mc8020)
 {
 }
 
-SCREEN_UPDATE_IND16( mc8020 )
+UINT32 mc80_state::screen_update_mc8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mc80_state *state = screen.machine().driver_data<mc80_state>();
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 
@@ -112,7 +111,7 @@ SCREEN_UPDATE_IND16( mc8020 )
 			{
 				if (ra > 3 && ra < 12)
 				{
-					chr = state->m_p_videoram[x];
+					chr = m_p_videoram[x];
 					gfx = prom[(chr<<3) | (ra-4)];
 				}
 				else
@@ -142,9 +141,8 @@ VIDEO_START_MEMBER(mc80_state,mc8030)
 	m_p_videoram.set_target(memregion("vram")->base(),m_p_videoram.bytes());
 }
 
-SCREEN_UPDATE_IND16( mc8030 )
+UINT32 mc80_state::screen_update_mc8030(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mc80_state *state = screen.machine().driver_data<mc80_state>();
 	UINT8 gfx;
 	UINT16 y=0,ma=0,x;
 
@@ -154,7 +152,7 @@ SCREEN_UPDATE_IND16( mc8030 )
 		{
 			for (x = ma; x < ma + 64; x++)
 			{
-				gfx = state->m_p_videoram[x^0x3fff];
+				gfx = m_p_videoram[x^0x3fff];
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7);

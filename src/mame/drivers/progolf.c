@@ -86,6 +86,7 @@ public:
 	DECLARE_DRIVER_INIT(progolf);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_progolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -101,14 +102,13 @@ void progolf_state::video_start()
 }
 
 
-static SCREEN_UPDATE_IND16( progolf )
+UINT32 progolf_state::screen_update_progolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	progolf_state *state = screen.machine().driver_data<progolf_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int count,color,x,y,xi,yi;
 
 	{
-		int scroll = (state->m_scrollx_lo | ((state->m_scrollx_hi & 0x03) << 8));
+		int scroll = (m_scrollx_lo | ((m_scrollx_hi & 0x03) << 8));
 
 		count = 0;
 
@@ -139,7 +139,7 @@ static SCREEN_UPDATE_IND16( progolf )
 				{
 					for (xi=0;xi<8;xi++)
 					{
-						color = state->m_fg_fb[(xi+yi*8)+count*0x40];
+						color = m_fg_fb[(xi+yi*8)+count*0x40];
 
 						if(color != 0 && cliprect.contains(x+yi, 256-y+xi))
 							bitmap.pix16(x+yi, 256-y+xi) = screen.machine().pens[(color & 0x7)];
@@ -436,7 +436,7 @@ static MACHINE_CONFIG_START( progolf, progolf_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3072))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(progolf)
+	MCFG_SCREEN_UPDATE_DRIVER(progolf_state, screen_update_progolf)
 
 	MCFG_GFXDECODE(progolf)
 	MCFG_PALETTE_LENGTH(32*3)

@@ -167,26 +167,24 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-SCREEN_UPDATE_IND16( shootout )
+UINT32 shootout_state::screen_update_shootout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	shootout_state *state = screen.machine().driver_data<shootout_state>();
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_background->draw(bitmap, cliprect, 0,0);
-	state->m_foreground->draw(bitmap, cliprect, 0,1);
+	m_background->draw(bitmap, cliprect, 0,0);
+	m_foreground->draw(bitmap, cliprect, 0,1);
 	draw_sprites(screen.machine(), bitmap,cliprect,3/*bank bits */);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( shootouj )
+UINT32 shootout_state::screen_update_shootouj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	shootout_state *state = screen.machine().driver_data<shootout_state>();
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_background->draw(bitmap, cliprect, 0,0);
-	state->m_foreground->draw(bitmap, cliprect, 0,1);
+	m_background->draw(bitmap, cliprect, 0,0);
+	m_foreground->draw(bitmap, cliprect, 0,1);
 	draw_sprites(screen.machine(), bitmap,cliprect,2/*bank bits*/);
 	return 0;
 }

@@ -997,7 +997,7 @@ static MACHINE_CONFIG_START( root, cclimber_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(cclimber)
+	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_cclimber)
 
 	MCFG_GFXDECODE(cclimber)
 	MCFG_PALETTE_LENGTH(16*4+8*4)
@@ -1047,7 +1047,7 @@ static MACHINE_CONFIG_DERIVED( yamato, root )
 	MCFG_PALETTE_LENGTH(16*4+8*4+256)
 	MCFG_PALETTE_INIT_OVERRIDE(cclimber_state,yamato)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(yamato)
+	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_yamato)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1073,7 +1073,7 @@ static MACHINE_CONFIG_DERIVED( toprollr, cclimber )
 
 	MCFG_VIDEO_START_OVERRIDE(cclimber_state,toprollr)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(toprollr)
+	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_toprollr)
 MACHINE_CONFIG_END
 
 
@@ -1095,7 +1095,7 @@ static MACHINE_CONFIG_START( swimmer, cclimber_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(swimmer)
+	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_swimmer)
 
 	MCFG_GFXDECODE(swimmer)
 	MCFG_PALETTE_LENGTH(32*8+4*8+1)

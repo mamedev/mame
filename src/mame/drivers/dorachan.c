@@ -35,6 +35,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(dorachan_v128_r);
 	virtual void machine_start();
 	virtual void machine_reset();
+	UINT32 screen_update_dorachan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -81,18 +82,17 @@ static void get_pens(pen_t *pens)
 }
 
 
-static SCREEN_UPDATE_RGB32( dorachan )
+UINT32 dorachan_state::screen_update_dorachan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	dorachan_state *state = screen.machine().driver_data<dorachan_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	const UINT8 *color_map_base;
 
 	get_pens(pens);
 
-	color_map_base = state->memregion("proms")->base();
+	color_map_base = memregion("proms")->base();
 
-	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
+	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{
 		int i;
 		UINT8 fore_color;
@@ -103,9 +103,9 @@ static SCREEN_UPDATE_RGB32( dorachan )
 		/* the need for +1 is extremely unusual, but definetely correct */
 		offs_t color_address = ((((offs << 2) & 0x03e0) | (offs >> 8)) + 1) & 0x03ff;
 
-		UINT8 data = state->m_videoram[offs];
+		UINT8 data = m_videoram[offs];
 
-		if (state->m_flip_screen)
+		if (m_flip_screen)
 			fore_color = (color_map_base[color_address] >> 3) & 0x07;
 		else
 			fore_color = (color_map_base[color_address] >> 0) & 0x07;
@@ -251,7 +251,7 @@ static MACHINE_CONFIG_START( dorachan, dorachan_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_STATIC(dorachan)
+	MCFG_SCREEN_UPDATE_DRIVER(dorachan_state, screen_update_dorachan)
 
 MACHINE_CONFIG_END
 

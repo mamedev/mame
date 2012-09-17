@@ -24,6 +24,7 @@ public:
 	UINT16 m_data;
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_terak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 READ16_MEMBER( terak_state::terak_fdc_status_r )
@@ -77,7 +78,7 @@ void terak_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( terak )
+UINT32 terak_state::screen_update_terak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -100,7 +101,7 @@ static MACHINE_CONFIG_START( terak, terak_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_STATIC(terak)
+	MCFG_SCREEN_UPDATE_DRIVER(terak_state, screen_update_terak)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

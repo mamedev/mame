@@ -70,6 +70,9 @@ public:
 	DECLARE_VIDEO_RESET(hitice);
 	DECLARE_VIDEO_START(realpunc);
 	DECLARE_VIDEO_START(taitob_core);
+	UINT32 screen_update_taitob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_eof_taitob(screen_device &screen, bool state);
 };
 
 
@@ -86,7 +89,7 @@ public:
 
 
 
-SCREEN_UPDATE_RGB32( realpunc );
-SCREEN_UPDATE_IND16( taitob );
 
-SCREEN_VBLANK( taitob );
+
+
+

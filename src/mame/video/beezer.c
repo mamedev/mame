@@ -19,10 +19,9 @@ TIMER_DEVICE_CALLBACK( beezer_interrupt )
 	#endif
 }
 
-SCREEN_UPDATE_IND16( beezer )
+UINT32 beezer_state::screen_update_beezer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	beezer_state *state = screen.machine().driver_data<beezer_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int x,y;
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)

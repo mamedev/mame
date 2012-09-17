@@ -78,6 +78,7 @@ public:
 	DECLARE_READ8_MEMBER(gray5bit_controller1_r);
 	DECLARE_WRITE8_MEMBER(m79amb_8002_w);
 	DECLARE_DRIVER_INIT(m79amb);
+	UINT32 screen_update_ramtek(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -86,16 +87,15 @@ WRITE8_MEMBER(m79amb_state::ramtek_videoram_w)
 	m_videoram[offset] = data & ~*m_mask;
 }
 
-static SCREEN_UPDATE_RGB32( ramtek )
+UINT32 m79amb_state::screen_update_ramtek(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m79amb_state *state = screen.machine().driver_data<m79amb_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{
 		int i;
 
-		UINT8 data = state->m_videoram[offs];
+		UINT8 data = m_videoram[offs];
 		int y = offs >> 5;
 		int x = (offs & 0x1f) << 3;
 
@@ -220,7 +220,7 @@ static MACHINE_CONFIG_START( m79amb, m79amb_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(ramtek)
+	MCFG_SCREEN_UPDATE_DRIVER(m79amb_state, screen_update_ramtek)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

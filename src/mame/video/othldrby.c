@@ -174,24 +174,23 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( othldrby )
+UINT32 othldrby_state::screen_update_othldrby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	othldrby_state *state = screen.machine().driver_data<othldrby_state>();
 	int layer;
 
-	state->flip_screen_set(state->m_vreg[0x0f] & 0x80);
+	flip_screen_set(m_vreg[0x0f] & 0x80);
 
 	for (layer = 0; layer < 3; layer++)
 	{
-		if (state->flip_screen())
+		if (flip_screen())
 		{
-			state->m_bg_tilemap[layer]->set_scrollx(0, state->m_vreg[2 * layer] + 59);
-			state->m_bg_tilemap[layer]->set_scrolly(0, state->m_vreg[2 * layer + 1] + 248);
+			m_bg_tilemap[layer]->set_scrollx(0, m_vreg[2 * layer] + 59);
+			m_bg_tilemap[layer]->set_scrolly(0, m_vreg[2 * layer + 1] + 248);
 		}
 		else
 		{
-			state->m_bg_tilemap[layer]->set_scrollx(0, state->m_vreg[2 * layer] - 58);
-			state->m_bg_tilemap[layer]->set_scrolly(0, state->m_vreg[2 * layer+1] + 9);
+			m_bg_tilemap[layer]->set_scrollx(0, m_vreg[2 * layer] - 58);
+			m_bg_tilemap[layer]->set_scrolly(0, m_vreg[2 * layer+1] + 9);
 		}
 	}
 
@@ -200,33 +199,32 @@ SCREEN_UPDATE_IND16( othldrby )
 	bitmap.fill(0, cliprect);
 
 	for (layer = 0; layer < 3; layer++)
-		state->m_bg_tilemap[layer]->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap[layer]->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
 	for (layer = 0; layer < 3; layer++)
-		state->m_bg_tilemap[layer]->draw(bitmap, cliprect, 1, 0);
+		m_bg_tilemap[layer]->draw(bitmap, cliprect, 1, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 1);
 
 	for (layer = 0; layer < 3; layer++)
-		state->m_bg_tilemap[layer]->draw(bitmap, cliprect, 2, 0);
+		m_bg_tilemap[layer]->draw(bitmap, cliprect, 2, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 2);
 
 	for (layer = 0; layer < 3; layer++)
-		state->m_bg_tilemap[layer]->draw(bitmap, cliprect, 3, 0);
+		m_bg_tilemap[layer]->draw(bitmap, cliprect, 3, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 3);
 
 	return 0;
 }
 
-SCREEN_VBLANK( othldrby )
+void othldrby_state::screen_eof_othldrby(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		othldrby_state *state = screen.machine().driver_data<othldrby_state>();
 
 		/* sprites need to be delayed two frames */
-		memcpy(state->m_buf_spriteram, state->m_buf_spriteram2, SPRITERAM_SIZE * sizeof(state->m_buf_spriteram[0]));
-		memcpy(state->m_buf_spriteram2, &state->m_vram[SPRITERAM_START], SPRITERAM_SIZE * sizeof(state->m_buf_spriteram[0]));
+		memcpy(m_buf_spriteram, m_buf_spriteram2, SPRITERAM_SIZE * sizeof(m_buf_spriteram[0]));
+		memcpy(m_buf_spriteram2, &m_vram[SPRITERAM_START], SPRITERAM_SIZE * sizeof(m_buf_spriteram[0]));
 	}
 }

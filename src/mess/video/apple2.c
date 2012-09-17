@@ -472,64 +472,62 @@ VIDEO_START_MEMBER(apple2_state,apple2e)
 }
 
 
-SCREEN_UPDATE_IND16( apple2 )
+UINT32 apple2_state::screen_update_apple2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	apple2_state *state = screen.machine().driver_data<apple2_state>();
 	int page;
 	UINT32 new_a2;
-	running_machine &machine = screen.machine();
 
-	/* calculate the state->m_flash value */
-	state->m_flash = ((screen.machine().time() * 4).seconds & 1) ? 1 : 0;
+	/* calculate the m_flash value */
+	m_flash = ((screen.machine().time() * 4).seconds & 1) ? 1 : 0;
 
 	/* read out relevant softswitch variables; to see what has changed */
-	new_a2 = effective_a2(state);
+	new_a2 = effective_a2(this);
 	if (new_a2 & VAR_80STORE)
 		new_a2 &= ~VAR_PAGE2;
 	new_a2 &= VAR_TEXT | VAR_MIXED | VAR_HIRES | VAR_DHIRES | VAR_80COL | VAR_PAGE2 | VAR_ALTCHARSET;
 
-	if (ALWAYS_REFRESH || (new_a2 != state->m_old_a2))
+	if (ALWAYS_REFRESH || (new_a2 != m_old_a2))
 	{
-		state->m_old_a2 = new_a2;
+		m_old_a2 = new_a2;
 	}
 
 	/* choose which page to use */
 	page = (new_a2 & VAR_PAGE2) ? 1 : 0;
 
 	/* choose the video mode to draw */
-	if (effective_a2(state) & VAR_TEXT)
+	if (effective_a2(this) & VAR_TEXT)
 	{
 		/* text screen - TK2000 uses HGR for text */
-        if (state->m_machinetype == TK2000)
+        if (m_machinetype == TK2000)
         {
-            apple2_hires_draw(machine, bitmap, cliprect, page, 0, 191);
+            apple2_hires_draw(machine(), bitmap, cliprect, page, 0, 191);
         }
         else
         {
-            apple2_text_draw(machine, bitmap, cliprect, page, 0, 191);
+            apple2_text_draw(machine(), bitmap, cliprect, page, 0, 191);
         }
 	}
-	else if ((effective_a2(state) & VAR_HIRES) && (effective_a2(state) & VAR_MIXED))
+	else if ((effective_a2(this) & VAR_HIRES) && (effective_a2(this) & VAR_MIXED))
 	{
 		/* hi-res on top; text at bottom */
-		apple2_hires_draw(machine, bitmap, cliprect, page, 0, 159);
-		apple2_text_draw(machine, bitmap, cliprect, page, 160, 191);
+		apple2_hires_draw(machine(), bitmap, cliprect, page, 0, 159);
+		apple2_text_draw(machine(), bitmap, cliprect, page, 160, 191);
 	}
-	else if (effective_a2(state) & VAR_HIRES)
+	else if (effective_a2(this) & VAR_HIRES)
 	{
 		/* hi-res screen */
-		apple2_hires_draw(machine, bitmap, cliprect, page, 0, 191);
+		apple2_hires_draw(machine(), bitmap, cliprect, page, 0, 191);
 	}
-	else if (effective_a2(state) & VAR_MIXED)
+	else if (effective_a2(this) & VAR_MIXED)
 	{
 		/* lo-res on top; text at bottom */
-		apple2_lores_draw(machine, bitmap, cliprect, page, 0, 159);
-		apple2_text_draw(machine, bitmap, cliprect, page, 160, 191);
+		apple2_lores_draw(machine(), bitmap, cliprect, page, 0, 159);
+		apple2_text_draw(machine(), bitmap, cliprect, page, 160, 191);
 	}
 	else
 	{
 		/* lo-res screen */
-		apple2_lores_draw(machine, bitmap, cliprect, page, 0, 191);
+		apple2_lores_draw(machine(), bitmap, cliprect, page, 0, 191);
 	}
 	return 0;
 }

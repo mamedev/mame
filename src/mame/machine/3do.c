@@ -976,10 +976,9 @@ VIDEO_START_MEMBER(_3do_state,_3do)
 
 
 /* This is incorrect! Just testing stuff */
-SCREEN_UPDATE_RGB32( _3do )
+UINT32 _3do_state::screen_update__3do(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	_3do_state *state = screen.machine().driver_data<_3do_state>();
-	UINT32 *source_p = state->m_vram + 0x1c0000 / 4;
+	UINT32 *source_p = m_vram + 0x1c0000 / 4;
 
 	for ( int i = 0; i < 120; i++ )
 	{
@@ -993,18 +992,18 @@ SCREEN_UPDATE_RGB32( _3do )
 			UINT32 upper = ( *source_p >> 1 ) & 0x55555555;
 			UINT32 rgb = 0;
 
-			rgb = ( ( state->m_video_bits[upper & 0x1ff] << 3 ) << 8 );
-			rgb |= ( ( state->m_video_bits[ ( upper >> 10 ) & 0x1ff ] << 3 ) << 0 );
-			rgb |= ( ( state->m_video_bits[ ( upper >> 20 ) & 0x1ff ] << 3 ) << 16 );
+			rgb = ( ( m_video_bits[upper & 0x1ff] << 3 ) << 8 );
+			rgb |= ( ( m_video_bits[ ( upper >> 10 ) & 0x1ff ] << 3 ) << 0 );
+			rgb |= ( ( m_video_bits[ ( upper >> 20 ) & 0x1ff ] << 3 ) << 16 );
 
 			dest_p0[0] = rgb;
 			dest_p0[1] = rgb;
 			dest_p0[2] = rgb;
 			dest_p0[3] = rgb;
 
-			rgb = ( ( state->m_video_bits[lower & 0x1ff] << 3 ) << 8 );
-			rgb |= ( ( state->m_video_bits[ ( lower >> 10 ) & 0x1ff ] << 3 ) << 0 );
-			rgb |= ( ( state->m_video_bits[ ( lower >> 20 ) & 0x1ff ] << 3 ) << 16 );
+			rgb = ( ( m_video_bits[lower & 0x1ff] << 3 ) << 8 );
+			rgb |= ( ( m_video_bits[ ( lower >> 10 ) & 0x1ff ] << 3 ) << 0 );
+			rgb |= ( ( m_video_bits[ ( lower >> 20 ) & 0x1ff ] << 3 ) << 16 );
 
 			dest_p1[0] = rgb;
 			dest_p1[1] = rgb;

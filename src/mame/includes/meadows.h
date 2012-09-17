@@ -45,6 +45,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_meadows(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -58,5 +59,5 @@ void meadows_sh_update(running_machine &machine);
 /*----------- defined in video/meadows.c -----------*/
 
 
-SCREEN_UPDATE_IND16( meadows );
+
 

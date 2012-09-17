@@ -47,10 +47,11 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
 	virtual void video_start();
+	UINT32 screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/galastrm.c -----------*/
 
 
-SCREEN_UPDATE_IND16( galastrm );
+

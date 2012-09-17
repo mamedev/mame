@@ -82,10 +82,11 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void palette_init();
+	UINT32 screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 #if !ENABLE_VGA
-static SCREEN_UPDATE_RGB32( taitowlf )
+UINT32 taitowlf_state::screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
 	const UINT8 *blit_ram = screen.machine().root_device().memregion("user5")->base();
@@ -656,7 +657,7 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_SCREEN_UPDATE_STATIC(taitowlf)
+	MCFG_SCREEN_UPDATE_DRIVER(taitowlf_state, screen_update_taitowlf)
 	#endif
 MACHINE_CONFIG_END
 

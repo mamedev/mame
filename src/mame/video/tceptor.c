@@ -510,59 +510,57 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 }
 
 
-SCREEN_UPDATE_IND16( tceptor_2d )
+UINT32 tceptor_state::screen_update_tceptor_2d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tceptor_state *state = screen.machine().driver_data<tceptor_state>();
 	rectangle rect;
 	int pri;
-	int bg_center = 144 - ((((state->m_bg1_scroll_x + state->m_bg2_scroll_x ) & 0x1ff) - 288) / 2);
+	int bg_center = 144 - ((((m_bg1_scroll_x + m_bg2_scroll_x ) & 0x1ff) - 288) / 2);
 
 	// left background
 	rect = cliprect;
 	rect.max_x = bg_center;
-	state->m_bg1_tilemap->set_scrollx(0, state->m_bg1_scroll_x + 12);
-	state->m_bg1_tilemap->set_scrolly(0, state->m_bg1_scroll_y + 20); //32?
-	state->m_bg1_tilemap->draw(bitmap, rect, 0, 0);
+	m_bg1_tilemap->set_scrollx(0, m_bg1_scroll_x + 12);
+	m_bg1_tilemap->set_scrolly(0, m_bg1_scroll_y + 20); //32?
+	m_bg1_tilemap->draw(bitmap, rect, 0, 0);
 
 	// right background
 	rect.min_x = bg_center;
 	rect.max_x = cliprect.max_x;
-	state->m_bg2_tilemap->set_scrollx(0, state->m_bg2_scroll_x + 20);
-	state->m_bg2_tilemap->set_scrolly(0, state->m_bg2_scroll_y + 20); // 32?
-	state->m_bg2_tilemap->draw(bitmap, rect, 0, 0);
+	m_bg2_tilemap->set_scrollx(0, m_bg2_scroll_x + 20);
+	m_bg2_tilemap->set_scrolly(0, m_bg2_scroll_y + 20); // 32?
+	m_bg2_tilemap->draw(bitmap, rect, 0, 0);
 
 	for (pri = 0; pri < 8; pri++)
 	{
-		state->m_c45_road->draw(bitmap, cliprect, pri * 2);
-		state->m_c45_road->draw(bitmap, cliprect, pri * 2 + 1);
+		m_c45_road->draw(bitmap, cliprect, pri * 2);
+		m_c45_road->draw(bitmap, cliprect, pri * 2 + 1);
 		draw_sprites(screen.machine(), bitmap, cliprect, pri);
 	}
 
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( tceptor_3d_left )
+UINT32 tceptor_state::screen_update_tceptor_3d_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if ((screen.frame_number() & 1) == 1)
 		return UPDATE_HAS_NOT_CHANGED;
-	return SCREEN_UPDATE16_CALL( tceptor_2d );
+	return SCREEN_UPDATE16_CALL_MEMBER( tceptor_2d );
 }
 
-SCREEN_UPDATE_IND16( tceptor_3d_right )
+UINT32 tceptor_state::screen_update_tceptor_3d_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if ((screen.frame_number() & 1) == 0)
 		return UPDATE_HAS_NOT_CHANGED;
-	return SCREEN_UPDATE16_CALL( tceptor_2d );
+	return SCREEN_UPDATE16_CALL_MEMBER( tceptor_2d );
 }
 
 
-SCREEN_VBLANK( tceptor )
+void tceptor_state::screen_eof_tceptor(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		tceptor_state *state = screen.machine().driver_data<tceptor_state>();
-		memcpy(state->m_sprite_ram_buffered, state->m_sprite_ram, 0x200);
+		memcpy(m_sprite_ram_buffered, m_sprite_ram, 0x200);
 	}
 }

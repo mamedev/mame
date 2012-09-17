@@ -168,6 +168,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_miniboy7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -211,10 +212,9 @@ void miniboy7_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(miniboy7_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 37, 37);
 }
 
-static SCREEN_UPDATE_IND16( miniboy7 )
+UINT32 miniboy7_state::screen_update_miniboy7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	miniboy7_state *state = screen.machine().driver_data<miniboy7_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -462,7 +462,7 @@ static MACHINE_CONFIG_START( miniboy7, miniboy7_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE((47+1)*8, (39+1)*8)                  /* Taken from MC6845, registers 00 & 04. Normally programmed with (value-1) */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 37*8-1)    /* Taken from MC6845, registers 01 & 06 */
-	MCFG_SCREEN_UPDATE_STATIC(miniboy7)
+	MCFG_SCREEN_UPDATE_DRIVER(miniboy7_state, screen_update_miniboy7)
 
 	MCFG_GFXDECODE(miniboy7)
 

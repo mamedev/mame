@@ -72,6 +72,10 @@ public:
 	DECLARE_VIDEO_START(robokid);
 	DECLARE_MACHINE_RESET(omegaf);
 	DECLARE_VIDEO_START(omegaf);
+	UINT32 screen_update_ninjakd2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_robokid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_omegaf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_ninjakd2(screen_device &screen, bool state);
 };
 
 

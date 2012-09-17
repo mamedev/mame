@@ -50,6 +50,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_tbowl_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_tbowl_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -58,6 +60,6 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( tbowl_left );
-SCREEN_UPDATE_IND16( tbowl_right );
+
+
 

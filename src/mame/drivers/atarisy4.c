@@ -58,6 +58,7 @@ public:
 	virtual void video_start();
 	virtual void video_reset();
 	DECLARE_MACHINE_RESET(airrace);
+	UINT32 screen_update_atarisy4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -155,9 +156,8 @@ void atarisy4_state::video_reset()
 	gpu.vblank_wait = 0;
 }
 
-static SCREEN_UPDATE_RGB32( atarisy4 )
+UINT32 atarisy4_state::screen_update_atarisy4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	atarisy4_state *state = screen.machine().driver_data<atarisy4_state>();
 	int y;
 	UINT32 offset = 0;
 
@@ -174,7 +174,7 @@ static SCREEN_UPDATE_RGB32( atarisy4 )
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT16 *src = &state->m_screen_ram[(offset + (4096 * y)) / 2];
+		UINT16 *src = &m_screen_ram[(offset + (4096 * y)) / 2];
 		UINT32 *dest = &bitmap.pix32(y, cliprect.min_x);
 		int x;
 
@@ -740,7 +740,7 @@ static MACHINE_CONFIG_START( atarisy4, atarisy4_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(32000000/2, 660, 0, 512, 404, 0, 384)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_UPDATE_STATIC(atarisy4)
+	MCFG_SCREEN_UPDATE_DRIVER(atarisy4_state, screen_update_atarisy4)
 	MCFG_PALETTE_LENGTH(256)
 
 MACHINE_CONFIG_END

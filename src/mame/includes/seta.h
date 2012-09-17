@@ -190,6 +190,14 @@ public:
 	DECLARE_MACHINE_START(keroppi);
 	DECLARE_VIDEO_START(oisipuzl_2_layers);
 	DECLARE_PALETTE_INIT(inttoote);
+	UINT32 screen_update_seta_no_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_seta(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_setaroul(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_inttoote(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_seta_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_seta_buffer_sprites(screen_device &screen, bool state);
+	void screen_eof_setaroul(screen_device &screen, bool state);
 };
 
 /*----------- defined in video/seta.c -----------*/
@@ -212,11 +220,11 @@ void seta_coin_lockout_w(running_machine &machine, int data);
 
 
 
-SCREEN_UPDATE_IND16( seta );
-SCREEN_UPDATE_IND16( seta_no_layers );
-SCREEN_UPDATE_IND16( usclssic );
-SCREEN_UPDATE_IND16( inttoote );
-SCREEN_UPDATE_IND16( setaroul );
 
-SCREEN_VBLANK( setaroul );
+
+
+
+
+
+
 

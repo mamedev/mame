@@ -678,7 +678,7 @@ static MACHINE_CONFIG_START( psychic5, psychic5_state )
 	/* frames per second hand tuned to match game and music speed */
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(psychic5)
+	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_psychic5)
 
 	MCFG_GFXDECODE(psychic5)
 	MCFG_PALETTE_LENGTH(768)
@@ -722,7 +722,7 @@ static MACHINE_CONFIG_START( bombsa, psychic5_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(bombsa)
+	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_bombsa)
 
 	MCFG_GFXDECODE(bombsa)
 	MCFG_PALETTE_LENGTH(768)

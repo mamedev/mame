@@ -57,6 +57,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
+	UINT32 screen_update_good(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -95,11 +96,10 @@ void good_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0xf);
 }
 
-static SCREEN_UPDATE_IND16( good )
+UINT32 good_state::screen_update_good(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	good_state *state = screen.machine().driver_data<good_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -288,7 +288,7 @@ static MACHINE_CONFIG_START( good, good_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(1*16, 23*16-1, 0*16, 14*16-1)
-	MCFG_SCREEN_UPDATE_STATIC(good)
+	MCFG_SCREEN_UPDATE_DRIVER(good_state, screen_update_good)
 
 	MCFG_PALETTE_LENGTH(0x400)
 

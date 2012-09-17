@@ -115,6 +115,8 @@ public:
 	DECLARE_VIDEO_START(poundfor);
 	DECLARE_MACHINE_START(kengo);
 	DECLARE_MACHINE_RESET(kengo);
+	UINT32 screen_update_m72(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_majtitle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -129,5 +131,5 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( m72 );
-SCREEN_UPDATE_IND16( majtitle );
+
+

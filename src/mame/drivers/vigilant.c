@@ -496,7 +496,7 @@ static MACHINE_CONFIG_START( vigilant, vigilant_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(16*8, (64-16)*8-1, 0*8, 32*8-1 )
-	MCFG_SCREEN_UPDATE_STATIC(vigilant)
+	MCFG_SCREEN_UPDATE_DRIVER(vigilant_state, screen_update_vigilant)
 
 	MCFG_GFXDECODE(vigilant)
 	MCFG_PALETTE_LENGTH(512+32)	/* 512 real palette, 32 virtual palette */
@@ -536,7 +536,7 @@ static MACHINE_CONFIG_START( buccanrs, vigilant_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(16*8, (64-16)*8-1, 0*8, 32*8-1 )
-	MCFG_SCREEN_UPDATE_STATIC(vigilant)
+	MCFG_SCREEN_UPDATE_DRIVER(vigilant_state, screen_update_vigilant)
 
 	MCFG_GFXDECODE(buccanrs)
 	MCFG_PALETTE_LENGTH(512+32)	/* 512 real palette, 32 virtual palette */
@@ -592,7 +592,7 @@ static MACHINE_CONFIG_START( kikcubic, vigilant_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 0*8, 32*8-1 )
-	MCFG_SCREEN_UPDATE_STATIC(kikcubic)
+	MCFG_SCREEN_UPDATE_DRIVER(vigilant_state, screen_update_kikcubic)
 
 	MCFG_GFXDECODE(kikcubic)
 	MCFG_PALETTE_LENGTH(256)

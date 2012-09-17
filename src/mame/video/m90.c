@@ -292,70 +292,69 @@ WRITE16_MEMBER(m90_state::m90_video_w)
 	markdirty(m_pf2_wide_layer,m_video_control_data[6] & 0x2,offset);
 }
 
-SCREEN_UPDATE_IND16( m90 )
+UINT32 m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m90_state *state = screen.machine().driver_data<m90_state>();
-	UINT8 pf1_base = state->m_video_control_data[5] & 0x3;
-	UINT8 pf2_base = state->m_video_control_data[6] & 0x3;
+	UINT8 pf1_base = m_video_control_data[5] & 0x3;
+	UINT8 pf2_base = m_video_control_data[6] & 0x3;
 	int i,pf1_enable,pf2_enable, video_enable;
 
-	if (state->m_video_control_data[7]&0x04) video_enable=0; else video_enable=1;
-	if (state->m_video_control_data[5]&0x10) pf1_enable=0; else pf1_enable=1;
-	if (state->m_video_control_data[6]&0x10) pf2_enable=0; else pf2_enable=1;
+	if (m_video_control_data[7]&0x04) video_enable=0; else video_enable=1;
+	if (m_video_control_data[5]&0x10) pf1_enable=0; else pf1_enable=1;
+	if (m_video_control_data[6]&0x10) pf2_enable=0; else pf2_enable=1;
 
-// state->m_pf1_layer->enable(pf1_enable);
-// state->m_pf2_layer->enable(pf2_enable);
-// state->m_pf1_wide_layer->enable(pf1_enable);
-// state->m_pf2_wide_layer->enable(pf2_enable);
+// m_pf1_layer->enable(pf1_enable);
+// m_pf2_layer->enable(pf2_enable);
+// m_pf1_wide_layer->enable(pf1_enable);
+// m_pf2_wide_layer->enable(pf2_enable);
 
 	/* Dirty tilemaps if VRAM base changes */
-	if (pf1_base!=state->m_last_pf1)
+	if (pf1_base!=m_last_pf1)
 	{
-		state->m_pf1_layer->mark_all_dirty();
-		state->m_pf1_wide_layer->mark_all_dirty();
+		m_pf1_layer->mark_all_dirty();
+		m_pf1_wide_layer->mark_all_dirty();
 	}
-	if (pf2_base!=state->m_last_pf2)
+	if (pf2_base!=m_last_pf2)
 	{
-		state->m_pf2_layer->mark_all_dirty();
-		state->m_pf2_wide_layer->mark_all_dirty();
+		m_pf2_layer->mark_all_dirty();
+		m_pf2_wide_layer->mark_all_dirty();
 	}
-	state->m_last_pf1=pf1_base;
-	state->m_last_pf2=pf2_base;
+	m_last_pf1=pf1_base;
+	m_last_pf2=pf2_base;
 
 	/* Setup scrolling */
-	if (state->m_video_control_data[5]&0x20)
+	if (m_video_control_data[5]&0x20)
 	{
-		state->m_pf1_layer->set_scroll_rows(512);
-		state->m_pf1_wide_layer->set_scroll_rows(512);
+		m_pf1_layer->set_scroll_rows(512);
+		m_pf1_wide_layer->set_scroll_rows(512);
 
 		for (i=0; i<512; i++)
-			state->m_pf1_layer->set_scrollx(i, state->m_video_data[0xf000/2+i]+2);
+			m_pf1_layer->set_scrollx(i, m_video_data[0xf000/2+i]+2);
 		for (i=0; i<512; i++)
-			state->m_pf1_wide_layer->set_scrollx(i, state->m_video_data[0xf000/2+i]+256+2);
+			m_pf1_wide_layer->set_scrollx(i, m_video_data[0xf000/2+i]+256+2);
 
 	}
 	else
 	{
-		state->m_pf1_layer->set_scroll_rows(1);
-		state->m_pf1_wide_layer->set_scroll_rows(1);
-		state->m_pf1_layer->set_scrollx(0, state->m_video_control_data[1]+2);
-		state->m_pf1_wide_layer->set_scrollx(0, state->m_video_control_data[1]+256+2);
+		m_pf1_layer->set_scroll_rows(1);
+		m_pf1_wide_layer->set_scroll_rows(1);
+		m_pf1_layer->set_scrollx(0, m_video_control_data[1]+2);
+		m_pf1_wide_layer->set_scrollx(0, m_video_control_data[1]+256+2);
 	}
 
 	/* Setup scrolling */
-	if (state->m_video_control_data[6]&0x20)
+	if (m_video_control_data[6]&0x20)
 	{
-		state->m_pf2_layer->set_scroll_rows(512);
-		state->m_pf2_wide_layer->set_scroll_rows(512);
+		m_pf2_layer->set_scroll_rows(512);
+		m_pf2_wide_layer->set_scroll_rows(512);
 		for (i=0; i<512; i++)
-			state->m_pf2_layer->set_scrollx(i, state->m_video_data[0xf400/2+i]-2);
+			m_pf2_layer->set_scrollx(i, m_video_data[0xf400/2+i]-2);
 		for (i=0; i<512; i++)
-			state->m_pf2_wide_layer->set_scrollx(i, state->m_video_data[0xf400/2+i]+256-2);
+			m_pf2_wide_layer->set_scrollx(i, m_video_data[0xf400/2+i]+256-2);
 	} else {
-		state->m_pf2_layer->set_scroll_rows(1);
-		state->m_pf2_wide_layer->set_scroll_rows(1);
-		state->m_pf2_layer->set_scrollx(0, state->m_video_control_data[3]-2);
-		state->m_pf2_wide_layer->set_scrollx(0, state->m_video_control_data[3]+256-2 );
+		m_pf2_layer->set_scroll_rows(1);
+		m_pf2_wide_layer->set_scroll_rows(1);
+		m_pf2_layer->set_scrollx(0, m_video_control_data[3]-2);
+		m_pf2_wide_layer->set_scrollx(0, m_video_control_data[3]+256-2 );
 	}
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
@@ -366,7 +365,7 @@ SCREEN_UPDATE_IND16( m90 )
 		if (pf2_enable)
 		{
 			// use the playfield 2 y-offset table for each scanline
-			if (state->m_video_control_data[6] & 0x40)
+			if (m_video_control_data[6] & 0x40)
 			{
 				int line;
 				rectangle clip;
@@ -377,29 +376,29 @@ SCREEN_UPDATE_IND16( m90 )
 				{
 					clip.min_y = clip.max_y = line;
 
-					if (state->m_video_control_data[6] & 0x4)
+					if (m_video_control_data[6] & 0x4)
 					{
-						state->m_pf2_wide_layer->set_scrolly(0, 0x200 + state->m_video_data[0xfc00/2 + line]);
-						state->m_pf2_wide_layer->draw(bitmap, clip, 0,0);
-						state->m_pf2_wide_layer->draw(bitmap, clip, 1,1);
+						m_pf2_wide_layer->set_scrolly(0, 0x200 + m_video_data[0xfc00/2 + line]);
+						m_pf2_wide_layer->draw(bitmap, clip, 0,0);
+						m_pf2_wide_layer->draw(bitmap, clip, 1,1);
 					} else {
-						state->m_pf2_layer->set_scrolly(0, 0x200 + state->m_video_data[0xfc00/2 + line]);
-						state->m_pf2_layer->draw(bitmap, clip, 0,0);
-						state->m_pf2_layer->draw(bitmap, clip, 1,1);
+						m_pf2_layer->set_scrolly(0, 0x200 + m_video_data[0xfc00/2 + line]);
+						m_pf2_layer->draw(bitmap, clip, 0,0);
+						m_pf2_layer->draw(bitmap, clip, 1,1);
 					}
 				}
 			}
 			else
 			{
-				if (state->m_video_control_data[6] & 0x4)
+				if (m_video_control_data[6] & 0x4)
 				{
-					state->m_pf2_wide_layer->set_scrolly(0, state->m_video_control_data[2] );
-					state->m_pf2_wide_layer->draw(bitmap, cliprect, 0,0);
-					state->m_pf2_wide_layer->draw(bitmap, cliprect, 1,1);
+					m_pf2_wide_layer->set_scrolly(0, m_video_control_data[2] );
+					m_pf2_wide_layer->draw(bitmap, cliprect, 0,0);
+					m_pf2_wide_layer->draw(bitmap, cliprect, 1,1);
 				} else {
-					state->m_pf2_layer->set_scrolly(0, state->m_video_control_data[2] );
-					state->m_pf2_layer->draw(bitmap, cliprect, 0,0);
-					state->m_pf2_layer->draw(bitmap, cliprect, 1,1);
+					m_pf2_layer->set_scrolly(0, m_video_control_data[2] );
+					m_pf2_layer->draw(bitmap, cliprect, 0,0);
+					m_pf2_layer->draw(bitmap, cliprect, 1,1);
 				}
 			}
 		}
@@ -411,7 +410,7 @@ SCREEN_UPDATE_IND16( m90 )
 		if (pf1_enable)
 		{
 			// use the playfield 1 y-offset table for each scanline
-			if (state->m_video_control_data[5] & 0x40)
+			if (m_video_control_data[5] & 0x40)
 			{
 				int line;
 				rectangle clip;
@@ -422,29 +421,29 @@ SCREEN_UPDATE_IND16( m90 )
 				{
 					clip.min_y = clip.max_y = line;
 
-					if (state->m_video_control_data[5] & 0x4)
+					if (m_video_control_data[5] & 0x4)
 					{
-						state->m_pf1_wide_layer->set_scrolly(0, 0x200 + state->m_video_data[0xf800/2 + line]);
-						state->m_pf1_wide_layer->draw(bitmap, clip, 0,0);
-						state->m_pf1_wide_layer->draw(bitmap, clip, 1,1);
+						m_pf1_wide_layer->set_scrolly(0, 0x200 + m_video_data[0xf800/2 + line]);
+						m_pf1_wide_layer->draw(bitmap, clip, 0,0);
+						m_pf1_wide_layer->draw(bitmap, clip, 1,1);
 					} else {
-						state->m_pf1_layer->set_scrolly(0, 0x200 + state->m_video_data[0xf800/2 + line]);
-						state->m_pf1_layer->draw(bitmap, clip, 0,0);
-						state->m_pf1_layer->draw(bitmap, clip, 1,1);
+						m_pf1_layer->set_scrolly(0, 0x200 + m_video_data[0xf800/2 + line]);
+						m_pf1_layer->draw(bitmap, clip, 0,0);
+						m_pf1_layer->draw(bitmap, clip, 1,1);
 					}
 				}
 			}
 			else
 			{
-				if (state->m_video_control_data[5] & 0x4)
+				if (m_video_control_data[5] & 0x4)
 				{
-					state->m_pf1_wide_layer->set_scrolly(0, state->m_video_control_data[0] );
-					state->m_pf1_wide_layer->draw(bitmap, cliprect, 0,0);
-					state->m_pf1_wide_layer->draw(bitmap, cliprect, 1,1);
+					m_pf1_wide_layer->set_scrolly(0, m_video_control_data[0] );
+					m_pf1_wide_layer->draw(bitmap, cliprect, 0,0);
+					m_pf1_wide_layer->draw(bitmap, cliprect, 1,1);
 				} else {
-					state->m_pf1_layer->set_scrolly(0, state->m_video_control_data[0] );
-					state->m_pf1_layer->draw(bitmap, cliprect, 0,0);
-					state->m_pf1_layer->draw(bitmap, cliprect, 1,1);
+					m_pf1_layer->set_scrolly(0, m_video_control_data[0] );
+					m_pf1_layer->draw(bitmap, cliprect, 0,0);
+					m_pf1_layer->draw(bitmap, cliprect, 1,1);
 				}
 			}
 		}
@@ -458,52 +457,51 @@ SCREEN_UPDATE_IND16( m90 )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( bomblord )
+UINT32 m90_state::screen_update_bomblord(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m90_state *state = screen.machine().driver_data<m90_state>();
 	int i;
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	/* Setup scrolling */
-	if (state->m_video_control_data[6]&0x20) {
-		state->m_pf1_layer->set_scroll_rows(512);
-		state->m_pf1_wide_layer->set_scroll_rows(512);
+	if (m_video_control_data[6]&0x20) {
+		m_pf1_layer->set_scroll_rows(512);
+		m_pf1_wide_layer->set_scroll_rows(512);
 		for (i=0; i<512; i++)
-			state->m_pf1_layer->set_scrollx(i, state->m_video_data[0xf400/2+i]-12);
+			m_pf1_layer->set_scrollx(i, m_video_data[0xf400/2+i]-12);
 		for (i=0; i<512; i++)
-			state->m_pf1_wide_layer->set_scrollx(i, state->m_video_data[0xf400/2+i]-12+256);
+			m_pf1_wide_layer->set_scrollx(i, m_video_data[0xf400/2+i]-12+256);
 	} else {
-		state->m_pf1_layer->set_scroll_rows(1);
-		state->m_pf1_wide_layer->set_scroll_rows(1);
-		state->m_pf1_layer->set_scrollx(0,  state->m_video_data[0xf004/2]-12);
-		state->m_pf1_wide_layer->set_scrollx(0, state->m_video_data[0xf004/2]-12 );
+		m_pf1_layer->set_scroll_rows(1);
+		m_pf1_wide_layer->set_scroll_rows(1);
+		m_pf1_layer->set_scrollx(0,  m_video_data[0xf004/2]-12);
+		m_pf1_wide_layer->set_scrollx(0, m_video_data[0xf004/2]-12 );
 	}
 
-	if (state->m_video_control_data[6] & 0x02) {
-		state->m_pf2_wide_layer->mark_all_dirty();
-		state->m_pf2_wide_layer->set_scrollx(0, state->m_video_data[0xf000/2]-16 );
-		state->m_pf2_wide_layer->set_scrolly(0, state->m_video_data[0xf008/2]+388 );
-		state->m_pf2_wide_layer->draw(bitmap, cliprect, 0,0);
-		state->m_pf2_wide_layer->draw(bitmap, cliprect, 1,1);
+	if (m_video_control_data[6] & 0x02) {
+		m_pf2_wide_layer->mark_all_dirty();
+		m_pf2_wide_layer->set_scrollx(0, m_video_data[0xf000/2]-16 );
+		m_pf2_wide_layer->set_scrolly(0, m_video_data[0xf008/2]+388 );
+		m_pf2_wide_layer->draw(bitmap, cliprect, 0,0);
+		m_pf2_wide_layer->draw(bitmap, cliprect, 1,1);
 	} else {
-		state->m_pf2_layer->mark_all_dirty();
-		state->m_pf2_layer->set_scrollx(0, state->m_video_data[0xf000/2]-16 );
-		state->m_pf2_layer->set_scrolly(0, state->m_video_data[0xf008/2]-120 );
-		state->m_pf2_layer->draw(bitmap, cliprect, 0,0);
-		state->m_pf2_layer->draw(bitmap, cliprect, 1,1);
+		m_pf2_layer->mark_all_dirty();
+		m_pf2_layer->set_scrollx(0, m_video_data[0xf000/2]-16 );
+		m_pf2_layer->set_scrolly(0, m_video_data[0xf008/2]-120 );
+		m_pf2_layer->draw(bitmap, cliprect, 0,0);
+		m_pf2_layer->draw(bitmap, cliprect, 1,1);
 	}
 
-	if (state->m_video_control_data[6] & 0x04) {
-		state->m_pf1_wide_layer->mark_all_dirty();
-		state->m_pf1_wide_layer->set_scrolly(0, state->m_video_data[0xf00c/2]+392 );
-		state->m_pf1_wide_layer->draw(bitmap, cliprect, 0,0);
-		state->m_pf1_wide_layer->draw(bitmap, cliprect, 1,1);
+	if (m_video_control_data[6] & 0x04) {
+		m_pf1_wide_layer->mark_all_dirty();
+		m_pf1_wide_layer->set_scrolly(0, m_video_data[0xf00c/2]+392 );
+		m_pf1_wide_layer->draw(bitmap, cliprect, 0,0);
+		m_pf1_wide_layer->draw(bitmap, cliprect, 1,1);
 	} else {
-		state->m_pf1_layer->mark_all_dirty();
-		state->m_pf1_layer->set_scrolly(0, state->m_video_data[0xf00c/2]-116 );
-		state->m_pf1_layer->draw(bitmap, cliprect, 0,0);
-		state->m_pf1_layer->draw(bitmap, cliprect, 1,1);
+		m_pf1_layer->mark_all_dirty();
+		m_pf1_layer->set_scrolly(0, m_video_data[0xf00c/2]-116 );
+		m_pf1_layer->draw(bitmap, cliprect, 0,0);
+		m_pf1_layer->draw(bitmap, cliprect, 1,1);
 	}
 
 	bomblord_draw_sprites(screen.machine(),bitmap,cliprect);
@@ -511,42 +509,41 @@ SCREEN_UPDATE_IND16( bomblord )
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( dynablsb )
+UINT32 m90_state::screen_update_dynablsb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m90_state *state = screen.machine().driver_data<m90_state>();
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if (!(state->m_video_data[0xf008/2] & 0x4000)) {
-		state->m_pf1_wide_layer->mark_all_dirty();
-		state->m_pf1_wide_layer->set_scroll_rows(1);
-		state->m_pf1_wide_layer->set_scrollx(0, state->m_video_data[0xf004/2]+64);
-		state->m_pf1_wide_layer->set_scrolly(0, state->m_video_data[0xf006/2]+512);
-		state->m_pf1_wide_layer->draw(bitmap, cliprect, 0,0);
-		state->m_pf1_wide_layer->draw(bitmap, cliprect, 1,1);
+	if (!(m_video_data[0xf008/2] & 0x4000)) {
+		m_pf1_wide_layer->mark_all_dirty();
+		m_pf1_wide_layer->set_scroll_rows(1);
+		m_pf1_wide_layer->set_scrollx(0, m_video_data[0xf004/2]+64);
+		m_pf1_wide_layer->set_scrolly(0, m_video_data[0xf006/2]+512);
+		m_pf1_wide_layer->draw(bitmap, cliprect, 0,0);
+		m_pf1_wide_layer->draw(bitmap, cliprect, 1,1);
 	} else {
-		state->m_pf1_layer->mark_all_dirty();
-		state->m_pf1_layer->set_scroll_rows(1);
-		state->m_pf1_layer->set_scrollx(0, state->m_video_data[0xf004/2]+64);
-		state->m_pf1_layer->set_scrolly(0, state->m_video_data[0xf006/2]+4);
-		state->m_pf1_layer->draw(bitmap, cliprect, 0,0);
-		state->m_pf1_layer->draw(bitmap, cliprect, 1,1);
+		m_pf1_layer->mark_all_dirty();
+		m_pf1_layer->set_scroll_rows(1);
+		m_pf1_layer->set_scrollx(0, m_video_data[0xf004/2]+64);
+		m_pf1_layer->set_scrolly(0, m_video_data[0xf006/2]+4);
+		m_pf1_layer->draw(bitmap, cliprect, 0,0);
+		m_pf1_layer->draw(bitmap, cliprect, 1,1);
 	}
 
-	if (!(state->m_video_data[0xf008/2] & 0x8000)) {
-		state->m_pf2_wide_layer->mark_all_dirty();
-		state->m_pf2_wide_layer->set_scroll_rows(1);
-		state->m_pf2_wide_layer->set_scrollx(0, state->m_video_data[0xf000/2]+68);
-		state->m_pf2_wide_layer->set_scrolly(0, state->m_video_data[0xf002/2]+512);
-		state->m_pf2_wide_layer->draw(bitmap, cliprect, 0,0);
-		state->m_pf2_wide_layer->draw(bitmap, cliprect, 1,1);
+	if (!(m_video_data[0xf008/2] & 0x8000)) {
+		m_pf2_wide_layer->mark_all_dirty();
+		m_pf2_wide_layer->set_scroll_rows(1);
+		m_pf2_wide_layer->set_scrollx(0, m_video_data[0xf000/2]+68);
+		m_pf2_wide_layer->set_scrolly(0, m_video_data[0xf002/2]+512);
+		m_pf2_wide_layer->draw(bitmap, cliprect, 0,0);
+		m_pf2_wide_layer->draw(bitmap, cliprect, 1,1);
 	} else {
-		state->m_pf2_layer->mark_all_dirty();
-		state->m_pf2_layer->set_scroll_rows(1);
-		state->m_pf2_layer->set_scrollx(0, state->m_video_data[0xf000/2]+68);
-		state->m_pf2_layer->set_scrolly(0, state->m_video_data[0xf002/2]+4);
-		state->m_pf2_layer->draw(bitmap, cliprect, 0,0);
-		state->m_pf2_layer->draw(bitmap, cliprect, 1,1);
+		m_pf2_layer->mark_all_dirty();
+		m_pf2_layer->set_scroll_rows(1);
+		m_pf2_layer->set_scrollx(0, m_video_data[0xf000/2]+68);
+		m_pf2_layer->set_scrolly(0, m_video_data[0xf002/2]+4);
+		m_pf2_layer->draw(bitmap, cliprect, 0,0);
+		m_pf2_layer->draw(bitmap, cliprect, 1,1);
 	}
 
 	dynablsb_draw_sprites(screen.machine(),bitmap,cliprect);

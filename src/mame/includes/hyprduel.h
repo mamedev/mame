@@ -89,6 +89,7 @@ public:
 	DECLARE_MACHINE_START(magerror);
 	DECLARE_VIDEO_START(magerror_14220);
 	DECLARE_VIDEO_START(common_14220);
+	UINT32 screen_update_hyprduel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -99,4 +100,4 @@ public:
 
 
 
-SCREEN_UPDATE_IND16( hyprduel );
+

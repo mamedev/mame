@@ -43,21 +43,20 @@ void bishi_state::video_start()
 	m_layer_colorbase[3] = 0xc0;
 }
 
-SCREEN_UPDATE_RGB32(bishi)
+UINT32 bishi_state::screen_update_bishi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bishi_state *state = screen.machine().driver_data<bishi_state>();
 	int layers[4], layerpri[4], i;/*, old;*/
 /*  int bg_colorbase, new_colorbase, plane, dirty; */
 	static const int pris[4] = { K55_PRIINP_0, K55_PRIINP_3, K55_PRIINP_6, K55_PRIINP_7 };
 	static const int enables[4] = { K55_INP_VRAM_A, K55_INP_VRAM_B, K55_INP_VRAM_C, K55_INP_VRAM_D };
 
-	k054338_update_all_shadows(state->m_k054338, 0);
-	k054338_fill_backcolor(state->m_k054338, bitmap, 0);
+	k054338_update_all_shadows(m_k054338, 0);
+	k054338_fill_backcolor(m_k054338, bitmap, 0);
 
 	for (i = 0; i < 4; i++)
 	{
 		layers[i] = i;
-		layerpri[i] = k055555_read_register(state->m_k055555, pris[i]);
+		layerpri[i] = k055555_read_register(m_k055555, pris[i]);
 	}
 
 	konami_sortlayers4(layers, layerpri);
@@ -66,9 +65,9 @@ SCREEN_UPDATE_RGB32(bishi)
 
 	for (i = 0; i < 4; i++)
 	{
-		if (k055555_read_register(state->m_k055555, K55_INPUT_ENABLES) & enables[layers[i]])
+		if (k055555_read_register(m_k055555, K55_INPUT_ENABLES) & enables[layers[i]])
 		{
-			k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, layers[i], 0, 1 << i);
+			k056832_tilemap_draw(m_k056832, bitmap, cliprect, layers[i], 0, 1 << i);
 		}
 	}
 	return 0;

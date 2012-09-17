@@ -141,10 +141,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_UPDATE_IND16( higemaru )
+UINT32 higemaru_state::screen_update_higemaru(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	higemaru_state *state = screen.machine().driver_data<higemaru_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

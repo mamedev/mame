@@ -347,7 +347,7 @@ static MACHINE_CONFIG_START( tankbust, tankbust_state )
 	MCFG_SCREEN_SIZE   ( 64*8, 32*8 )
 	MCFG_SCREEN_VISIBLE_AREA  ( 16*8, 56*8-1, 1*8, 31*8-1 )
 //  MCFG_SCREEN_VISIBLE_AREA  (  0*8, 64*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_UPDATE_STATIC  ( tankbust )
+	MCFG_SCREEN_UPDATE_DRIVER(tankbust_state, screen_update_tankbust)
 
 	MCFG_GFXDECODE( tankbust )
 

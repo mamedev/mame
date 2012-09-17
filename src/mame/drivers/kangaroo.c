@@ -441,7 +441,7 @@ static MACHINE_CONFIG_START( nomcu, kangaroo_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 320*2, 0*2, 256*2, 260, 8, 248)
-	MCFG_SCREEN_UPDATE_STATIC(kangaroo)
+	MCFG_SCREEN_UPDATE_DRIVER(kangaroo_state, screen_update_kangaroo)
 
 
 	/* sound hardware */

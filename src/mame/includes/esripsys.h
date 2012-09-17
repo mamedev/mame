@@ -92,13 +92,14 @@ public:
 	DECLARE_WRITE8_MEMBER(esripsys_dac_w);
 	DECLARE_DRIVER_INIT(esripsys);
 	virtual void video_start();
+	UINT32 screen_update_esripsys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/esripsys.c -----------*/
 
 
-SCREEN_UPDATE_RGB32( esripsys );
+
 
 INTERRUPT_GEN( esripsys_vblank_irq );
 

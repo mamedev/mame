@@ -290,7 +290,7 @@ static MACHINE_CONFIG_START( cbasebal, cbasebal_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_STATIC(cbasebal)
+	MCFG_SCREEN_UPDATE_DRIVER(cbasebal_state, screen_update_cbasebal)
 
 	MCFG_GFXDECODE(cbasebal)
 	MCFG_PALETTE_LENGTH(1024)

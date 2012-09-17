@@ -48,6 +48,8 @@ public:
 	DECLARE_READ8_MEMBER(nascom1_port_02_r);
 	DECLARE_DRIVER_INIT(nascom1);
 	virtual void machine_reset();
+	UINT32 screen_update_nascom1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_nascom2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -69,8 +71,8 @@ DECLARE_WRITE8_DEVICE_HANDLER( nascom1_hd6402_so );
 
 /*----------- defined in video/nascom1.c -----------*/
 
-SCREEN_UPDATE_IND16( nascom1 );
-SCREEN_UPDATE_IND16( nascom2 );
+
+
 
 
 #endif /* NASCOM1_H_ */

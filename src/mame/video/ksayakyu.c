@@ -120,16 +120,15 @@ void ksayakyu_state::video_start()
 	m_textmap->set_transparent_pen(0);
 }
 
-SCREEN_UPDATE_IND16(ksayakyu)
+UINT32 ksayakyu_state::screen_update_ksayakyu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ksayakyu_state *state = screen.machine().driver_data<ksayakyu_state>();
 
 	bitmap.fill(0, cliprect);
 
-	if (state->m_video_ctrl & 1)
-		state->m_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (m_video_ctrl & 1)
+		m_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	state->m_textmap->draw(bitmap, cliprect, 0, 0);
+	m_textmap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

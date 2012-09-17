@@ -602,7 +602,7 @@ static MACHINE_CONFIG_START( ddragon3, ddragon3_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 448, 0, 320, 272, 8, 248)	/* HTOTAL and VTOTAL are guessed */
-	MCFG_SCREEN_UPDATE_STATIC(ddragon3)
+	MCFG_SCREEN_UPDATE_DRIVER(ddragon3_state, screen_update_ddragon3)
 
 	MCFG_GFXDECODE(ddragon3)
 	MCFG_PALETTE_LENGTH(768)
@@ -636,7 +636,7 @@ static MACHINE_CONFIG_DERIVED( ctribe, ddragon3 )
 	MCFG_CPU_PROGRAM_MAP(ctribe_sound_map)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(ctribe)
+	MCFG_SCREEN_UPDATE_DRIVER(ddragon3_state, screen_update_ctribe)
 
 	MCFG_SOUND_MODIFY("ym2151")
 	MCFG_SOUND_ROUTES_RESET()

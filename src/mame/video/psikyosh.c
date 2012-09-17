@@ -1254,10 +1254,9 @@ void psikyosh_state::video_start()
 }
 
 
-SCREEN_UPDATE_RGB32( psikyosh ) /* Note the z-buffer on each sprite to get correct priority */
+UINT32 psikyosh_state::screen_update_psikyosh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)/* Note the z-buffer on each sprite to get correct priority */
 {
 	int i;
-	psikyosh_state *state = screen.machine().driver_data<psikyosh_state>();
 
 	// show only the priority associated with a given keypress(s) and/or hide sprites/tilemaps
 	int pri_debug = false;
@@ -1281,13 +1280,13 @@ SCREEN_UPDATE_RGB32( psikyosh ) /* Note the z-buffer on each sprite to get corre
 
 #ifdef DEBUG_MESSAGE
 popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
-    state->m_vidregs[0], state->m_vidregs[1],
-    state->m_vidregs[2], state->m_vidregs[3],
-    state->m_vidregs[4], state->m_vidregs[5],
-    state->m_vidregs[6], state->m_vidregs[7]);
+    m_vidregs[0], m_vidregs[1],
+    m_vidregs[2], m_vidregs[3],
+    m_vidregs[4], m_vidregs[5],
+    m_vidregs[6], m_vidregs[7]);
 #endif
 
-	state->m_z_bitmap.fill(0, cliprect); /* z-buffer */
+	m_z_bitmap.fill(0, cliprect); /* z-buffer */
 
 	psikyosh_prelineblend(screen.machine(), bitmap, cliprect); // fills screen
 	for (i = 0; i <= 7; i++)

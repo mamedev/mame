@@ -29,6 +29,7 @@ public:
 	DECLARE_READ8_MEMBER(pk8000_joy_2_r);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_pk8000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -328,7 +329,7 @@ void pk8000_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( pk8000 )
+UINT32 pk8000_state::screen_update_pk8000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return pk8000_video_update(screen, bitmap, cliprect, screen.machine().device<ram_device>(RAM_TAG)->pointer());
 }
@@ -357,7 +358,7 @@ static MACHINE_CONFIG_START( pk8000, pk8000_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(256+32, 192+32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256+32-1, 0, 192+32-1)
-	MCFG_SCREEN_UPDATE_STATIC(pk8000)
+	MCFG_SCREEN_UPDATE_DRIVER(pk8000_state, screen_update_pk8000)
 
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(pk8000)

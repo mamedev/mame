@@ -670,43 +670,42 @@ static void dirty_tiles( running_machine &machine, int layer, UINT16 *vram )
 }
 
 
-SCREEN_UPDATE_IND16( hyprduel )
+UINT32 hyprduel_state::screen_update_hyprduel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	hyprduel_state *state = screen.machine().driver_data<hyprduel_state>();
 	int i, pri, layers_ctrl = -1;
-	UINT16 screenctrl = *state->m_screenctrl;
+	UINT16 screenctrl = *m_screenctrl;
 
 	{
 		int dirty = 0;
 
-		memset(state->m_dirtyindex, 0, state->m_tiletable.bytes() / 4);
-		for (i = 0; i < state->m_tiletable.bytes() / 4; i++)
+		memset(m_dirtyindex, 0, m_tiletable.bytes() / 4);
+		for (i = 0; i < m_tiletable.bytes() / 4; i++)
 		{
-			UINT32 tile_new = (state->m_tiletable[2 * i + 0] << 16 ) + state->m_tiletable[2 * i + 1];
-			UINT32 tile_old = (state->m_tiletable_old[2 * i + 0] << 16 ) + state->m_tiletable_old[2 * i + 1];
+			UINT32 tile_new = (m_tiletable[2 * i + 0] << 16 ) + m_tiletable[2 * i + 1];
+			UINT32 tile_old = (m_tiletable_old[2 * i + 0] << 16 ) + m_tiletable_old[2 * i + 1];
 
 			if ((tile_new ^ tile_old) & 0x0fffffff)
 			{
-				state->m_dirtyindex[i] = 1;
+				m_dirtyindex[i] = 1;
 				dirty = 1;
 			}
 		}
-		memcpy(state->m_tiletable_old, state->m_tiletable, state->m_tiletable.bytes());
+		memcpy(m_tiletable_old, m_tiletable, m_tiletable.bytes());
 
 		if (dirty)
 		{
-			dirty_tiles(screen.machine(), 0, state->m_vram_0);
-			dirty_tiles(screen.machine(), 1, state->m_vram_1);
-			dirty_tiles(screen.machine(), 2, state->m_vram_2);
+			dirty_tiles(screen.machine(), 0, m_vram_0);
+			dirty_tiles(screen.machine(), 1, m_vram_1);
+			dirty_tiles(screen.machine(), 2, m_vram_2);
 		}
 	}
 
-	state->m_sprite_xoffs = state->m_videoregs[0x06 / 2] - screen.width()  / 2;
-	state->m_sprite_yoffs = state->m_videoregs[0x04 / 2] - screen.height() / 2 - state->m_sprite_yoffs_sub;
+	m_sprite_xoffs = m_videoregs[0x06 / 2] - screen.width()  / 2;
+	m_sprite_yoffs = m_videoregs[0x04 / 2] - screen.height() / 2 - m_sprite_yoffs_sub;
 
 	/* The background color is selected by a register */
 	screen.machine().priority_bitmap.fill(0, cliprect);
-	bitmap.fill((state->m_videoregs[0x12 / 2] & 0x0fff) + 0x1000, cliprect);
+	bitmap.fill((m_videoregs[0x12 / 2] & 0x0fff) + 0x1000, cliprect);
 
 	/*  Screen Control Register:
 
@@ -721,7 +720,7 @@ SCREEN_UPDATE_IND16( hyprduel )
         ---- ---- ---- ---0     Flip  Screen    */
 	if (screenctrl & 2)
 		return 0;
-	state->flip_screen_set(screenctrl & 1);
+	flip_screen_set(screenctrl & 1);
 
 #if 0
 if (screen.machine().input().code_pressed(KEYCODE_Z))
@@ -737,9 +736,9 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 	}
 
 	popmessage("%x-%x-%x:%04x %04x %04x",
-				state->m_videoregs[0x10/2]&3,(state->m_videoregs[0x10/2] & 0xc) >> 2, (state->m_videoregs[0x10/2] & 0x30) >> 4,
-				state->m_videoregs[0x02/2], state->m_videoregs[0x08/2],
-				*state->m_screenctrl);
+				m_videoregs[0x10/2]&3,(m_videoregs[0x10/2] & 0xc) >> 2, (m_videoregs[0x10/2] & 0x30) >> 4,
+				m_videoregs[0x02/2], m_videoregs[0x08/2],
+				*m_screenctrl);
 }
 #endif
 

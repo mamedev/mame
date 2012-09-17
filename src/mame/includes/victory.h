@@ -61,12 +61,13 @@ public:
 	DECLARE_READ8_MEMBER(victory_video_control_r);
 	DECLARE_WRITE8_MEMBER(victory_video_control_w);
 	virtual void video_start();
+	UINT32 screen_update_victory(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 /*----------- defined in video/victory.c -----------*/
 
 
-SCREEN_UPDATE_IND16( victory );
+
 INTERRUPT_GEN( victory_vblank_interrupt );
 

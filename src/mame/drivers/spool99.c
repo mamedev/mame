@@ -117,6 +117,7 @@ public:
 	DECLARE_DRIVER_INIT(spool99);
 	TILE_GET_INFO_MEMBER(get_spool99_tile_info);
 	virtual void video_start();
+	UINT32 screen_update_spool99(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 TILE_GET_INFO_MEMBER(spool99_state::get_spool99_tile_info)
@@ -137,11 +138,10 @@ void spool99_state::video_start()
 	m_sc0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spool99_state::get_spool99_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
-static SCREEN_UPDATE_IND16(spool99)
+UINT32 spool99_state::screen_update_spool99(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	spool99_state *state = screen.machine().driver_data<spool99_state>();
 
-	state->m_sc0_tilemap->draw(bitmap, cliprect, 0,0);
+	m_sc0_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -361,7 +361,7 @@ static MACHINE_CONFIG_START( spool99, spool99_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(7*8, 55*8-1, 1*8, 31*8-1) //384x240,raw guess
-	MCFG_SCREEN_UPDATE_STATIC(spool99)
+	MCFG_SCREEN_UPDATE_DRIVER(spool99_state, screen_update_spool99)
 
 	MCFG_PALETTE_LENGTH(0x200)
 

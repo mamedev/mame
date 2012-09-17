@@ -217,6 +217,7 @@ public:
 	DECLARE_DRIVER_INIT(magicard);
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -412,7 +413,7 @@ void magicard_state::video_start()
 
 }
 
-static SCREEN_UPDATE_RGB32(magicard)
+UINT32 magicard_state::screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	magicard_state *state = screen.machine().driver_data<magicard_state>();
 	int x,y;
@@ -433,22 +434,22 @@ static SCREEN_UPDATE_RGB32(magicard)
 			{
 				UINT32 color;
 
-				color = ((state->m_magicram[count]) & 0x000f)>>0;
+				color = ((m_magicram[count]) & 0x000f)>>0;
 
 				if(cliprect.contains((x*4)+3, y))
 					bitmap.pix32(y, (x*4)+3) = screen.machine().pens[color];
 
-				color = ((state->m_magicram[count]) & 0x00f0)>>4;
+				color = ((m_magicram[count]) & 0x00f0)>>4;
 
 				if(cliprect.contains((x*4)+2, y))
 					bitmap.pix32(y, (x*4)+2) = screen.machine().pens[color];
 
-				color = ((state->m_magicram[count]) & 0x0f00)>>8;
+				color = ((m_magicram[count]) & 0x0f00)>>8;
 
 				if(cliprect.contains((x*4)+1, y))
 					bitmap.pix32(y, (x*4)+1) = screen.machine().pens[color];
 
-				color = ((state->m_magicram[count]) & 0xf000)>>12;
+				color = ((m_magicram[count]) & 0xf000)>>12;
 
 				if(cliprect.contains((x*4)+0, y))
 					bitmap.pix32(y, (x*4)+0) = screen.machine().pens[color];
@@ -465,12 +466,12 @@ static SCREEN_UPDATE_RGB32(magicard)
 			{
 				UINT32 color;
 
-				color = ((state->m_magicram[count]) & 0x00ff)>>0;
+				color = ((m_magicram[count]) & 0x00ff)>>0;
 
 				if(cliprect.contains((x*2)+1, y))
 					bitmap.pix32(y, (x*2)+1) = screen.machine().pens[color];
 
-				color = ((state->m_magicram[count]) & 0xff00)>>8;
+				color = ((m_magicram[count]) & 0xff00)>>8;
 
 				if(cliprect.contains((x*2)+0, y))
 					bitmap.pix32(y, (x*2)+0) = screen.machine().pens[color];
@@ -725,7 +726,7 @@ static MACHINE_CONFIG_START( magicard, magicard_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1) //dynamic resolution,TODO
-	MCFG_SCREEN_UPDATE_STATIC(magicard)
+	MCFG_SCREEN_UPDATE_DRIVER(magicard_state, screen_update_magicard)
 
 	MCFG_PALETTE_LENGTH(0x100)
 

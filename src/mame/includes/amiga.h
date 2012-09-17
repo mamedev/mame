@@ -434,6 +434,8 @@ public:
 	DECLARE_VIDEO_START(amiga);
 	DECLARE_PALETTE_INIT(amiga);
 	DECLARE_VIDEO_START(amiga_aga);
+	UINT32 screen_update_amiga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_amiga_aga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -502,7 +504,7 @@ extern const UINT16 amiga_expand_byte[256];
 
 
 
-SCREEN_UPDATE_IND16( amiga );
+
 
 void amiga_copper_setpc(running_machine &machine, UINT32 pc);
 int amiga_copper_execute_next(running_machine &machine, int xpos);
@@ -516,7 +518,7 @@ void amiga_sprite_enable_comparitor(running_machine &machine, int which, int ena
 /*----------- defined in video/amigaaga.c -----------*/
 
 
-SCREEN_UPDATE_RGB32( amiga_aga );
+
 
 void amiga_aga_render_scanline(running_machine &machine, bitmap_rgb32 &bitmap, int scanline);
 void amiga_aga_palette_write(running_machine &machine, int color_reg, UINT16 data);

@@ -92,6 +92,7 @@ public:
 	TILE_GET_INFO_MEMBER(ac_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(ac_get_tx_tile_info);
 	virtual void video_start();
+	UINT32 screen_update_acommand(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -249,21 +250,20 @@ static void draw_led(bitmap_ind16 &bitmap, int x, int y,UINT8 value)
 }
 
 
-static SCREEN_UPDATE_IND16( acommand )
+UINT32 acommand_state::screen_update_acommand(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	acommand_state *state = screen.machine().driver_data<acommand_state>();
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect,0,0);
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 
 	/*Order might be wrong,but these for sure are the led numbers tested*/
-	draw_led(bitmap,  0, 20, (state->m_led0 & 0x0f00) >> 8);
-	draw_led(bitmap,  6, 20, (state->m_led0 & 0x00f0) >> 4);
-	draw_led(bitmap, 12, 20, (state->m_led0 & 0x000f));
+	draw_led(bitmap,  0, 20, (m_led0 & 0x0f00) >> 8);
+	draw_led(bitmap,  6, 20, (m_led0 & 0x00f0) >> 4);
+	draw_led(bitmap, 12, 20, (m_led0 & 0x000f));
 
-	draw_led(bitmap, 256-18,20,(state->m_led0 & 0xf000) >> 12);
-	draw_led(bitmap, 256-12,20,(state->m_led1 & 0xf0) >> 4);
-	draw_led(bitmap, 256-6,20, (state->m_led1 & 0xf));
+	draw_led(bitmap, 256-18,20,(m_led0 & 0xf000) >> 12);
+	draw_led(bitmap, 256-12,20,(m_led1 & 0xf0) >> 4);
+	draw_led(bitmap, 256-6,20, (m_led1 & 0xf));
 	return 0;
 }
 
@@ -609,7 +609,7 @@ static MACHINE_CONFIG_START( acommand, acommand_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(acommand)
+	MCFG_SCREEN_UPDATE_DRIVER(acommand_state, screen_update_acommand)
 
 	MCFG_GFXDECODE(acommand)
 	MCFG_PALETTE_LENGTH(0x4000)

@@ -95,6 +95,7 @@ public:
     void fdc_intrq_w(bool state);
 	DECLARE_DRIVER_INIT(mirage);
 	virtual void video_start();
+	UINT32 screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 const floppy_format_type mirage_state::floppy_formats[] = {
@@ -124,7 +125,7 @@ void mirage_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_RGB32( mirage )
+UINT32 mirage_state::screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -250,7 +251,7 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_STATIC(mirage)
+	MCFG_SCREEN_UPDATE_DRIVER(mirage_state, screen_update_mirage)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
 

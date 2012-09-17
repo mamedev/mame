@@ -321,6 +321,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	DECLARE_PALETTE_INIT(lions);
+	UINT32 screen_update_aristmk4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /* Partial Cashcade protocol */
@@ -370,9 +371,8 @@ INLINE void uBackgroundColour(running_machine &machine)
 	}
 }
 
-static SCREEN_UPDATE_IND16(aristmk4)
+UINT32 aristmk4_state::screen_update_aristmk4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	aristmk4_state *state = screen.machine().driver_data<aristmk4_state>();
 	gfx_element *gfx = screen.machine().gfx[0];
 	int x,y;
 	int count = 0;
@@ -386,14 +386,14 @@ static SCREEN_UPDATE_IND16(aristmk4)
 	{
 		for (x=38;x--;)
 		{
-		color = ((state->m_mkiv_vram[count]) & 0xe0) >> 5;
-			tile = (state->m_mkiv_vram[count+1]|state->m_mkiv_vram[count]<<8) & 0x3ff;
-			bgtile = (state->m_mkiv_vram[count+1]|state->m_mkiv_vram[count]<<8) & 0xff; // first 256 tiles
+		color = ((m_mkiv_vram[count]) & 0xe0) >> 5;
+			tile = (m_mkiv_vram[count+1]|m_mkiv_vram[count]<<8) & 0x3ff;
+			bgtile = (m_mkiv_vram[count+1]|m_mkiv_vram[count]<<8) & 0xff; // first 256 tiles
 			uBackgroundColour(screen.machine());	// read sw7
 			gfx->decode(bgtile);	// force the machine to update only the first 256 tiles.
 								// as we only update the background, not the entire display.
-			flipx = ((state->m_mkiv_vram[count]) & 0x04);
-			flipy = ((state->m_mkiv_vram[count]) & 0x08);
+			flipx = ((m_mkiv_vram[count]) & 0x04);
+			flipy = ((m_mkiv_vram[count]) & 0x08);
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,flipx,flipy,(38-x-1)<<3,(27-y-1)<<3);
 			count+=2;
 		}
@@ -1699,7 +1699,7 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_GFXDECODE(aristmk4)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_SCREEN_UPDATE_STATIC(aristmk4)
+	MCFG_SCREEN_UPDATE_DRIVER(aristmk4_state, screen_update_aristmk4)
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf )
 	MCFG_VIA6522_ADD("via6522_0", 0, via_interface)	/* 1 MHz.(only 1 or 2 MHz.are valid) */

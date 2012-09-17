@@ -463,6 +463,14 @@ public:
 	DECLARE_VIDEO_START(neruton);
 	DECLARE_MACHINE_START(dynax);
 	DECLARE_MACHINE_RESET(adpcm);
+	UINT32 screen_update_ddenlovr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_hanamai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_hnoridur(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_sprtmtch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_mjdialq2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_jantouki_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_jantouki_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_htengoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 //----------- defined in drivers/dynax.c -----------
@@ -483,13 +491,13 @@ void neruton_update_irq(running_machine &machine);
 
 
 
-SCREEN_UPDATE_IND16( hanamai );
-SCREEN_UPDATE_IND16( hnoridur );
-SCREEN_UPDATE_IND16( sprtmtch );
-SCREEN_UPDATE_IND16( mjdialq2 );
-SCREEN_UPDATE_IND16( jantouki_top );
-SCREEN_UPDATE_IND16( jantouki_bottom );
-SCREEN_UPDATE_IND16( htengoku );
+
+
+
+
+
+
+
 
 
 
@@ -497,4 +505,4 @@ SCREEN_UPDATE_IND16( htengoku );
 //----------- defined in drivers/ddenlovr.c -----------
 
 
-SCREEN_UPDATE_IND16(ddenlovr);
+

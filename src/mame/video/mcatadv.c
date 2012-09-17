@@ -198,24 +198,23 @@ static void mcatadv_draw_tilemap_part( UINT16* current_scroll, UINT16* current_v
 	}
 }
 
-SCREEN_UPDATE_IND16( mcatadv )
+UINT32 mcatadv_state::screen_update_mcatadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mcatadv_state *state = screen.machine().driver_data<mcatadv_state>();
 	int i;
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	if (state->m_scroll1[2] != state->m_palette_bank1)
+	if (m_scroll1[2] != m_palette_bank1)
 	{
-		state->m_palette_bank1 = state->m_scroll1[2];
-		state->m_tilemap1->mark_all_dirty();
+		m_palette_bank1 = m_scroll1[2];
+		m_tilemap1->mark_all_dirty();
 	}
 
-	if (state->m_scroll2[2] != state->m_palette_bank2)
+	if (m_scroll2[2] != m_palette_bank2)
 	{
-		state->m_palette_bank2 = state->m_scroll2[2];
-		state->m_tilemap2->mark_all_dirty();
+		m_palette_bank2 = m_scroll2[2];
+		m_tilemap2->mark_all_dirty();
 	}
 
 /*
@@ -231,12 +230,12 @@ SCREEN_UPDATE_IND16( mcatadv )
 	#ifdef MAME_DEBUG
 			if (!screen.machine().input().code_pressed(KEYCODE_Q))
 	#endif
-			mcatadv_draw_tilemap_part(state->m_scroll1,  state->m_videoram1, i, state->m_tilemap1, bitmap, cliprect);
+			mcatadv_draw_tilemap_part(m_scroll1,  m_videoram1, i, m_tilemap1, bitmap, cliprect);
 
 	#ifdef MAME_DEBUG
 			if (!screen.machine().input().code_pressed(KEYCODE_W))
 	#endif
-				mcatadv_draw_tilemap_part(state->m_scroll2, state->m_videoram2, i, state->m_tilemap2, bitmap, cliprect);
+				mcatadv_draw_tilemap_part(m_scroll2, m_videoram2, i, m_tilemap2, bitmap, cliprect);
 	}
 
 	g_profiler.start(PROFILER_USER1);
@@ -266,13 +265,12 @@ void mcatadv_state::video_start()
 	save_pointer(NAME(m_vidregs_old), (0x0f + 1) / 2);
 }
 
-SCREEN_VBLANK( mcatadv )
+void mcatadv_state::screen_eof_mcatadv(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		mcatadv_state *state = screen.machine().driver_data<mcatadv_state>();
-		memcpy(state->m_spriteram_old, state->m_spriteram, state->m_spriteram.bytes());
-		memcpy(state->m_vidregs_old, state->m_vidregs, 0xf);
+		memcpy(m_spriteram_old, m_spriteram, m_spriteram.bytes());
+		memcpy(m_vidregs_old, m_vidregs, 0xf);
 	}
 }

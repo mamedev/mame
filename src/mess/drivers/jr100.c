@@ -42,6 +42,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_jr100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -173,22 +174,21 @@ void jr100_state::video_start()
 {
 }
 
-static SCREEN_UPDATE_IND16( jr100 )
+UINT32 jr100_state::screen_update_jr100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	jr100_state *state = screen.machine().driver_data<jr100_state>();
 	int x,y,xi,yi;
 
-	UINT8 *rom_pcg = state->memregion("maincpu")->base() + 0xe000;
+	UINT8 *rom_pcg = memregion("maincpu")->base() + 0xe000;
 	for (y = 0; y < 24; y++)
 	{
 		for (x = 0; x < 32; x++)
 		{
-			UINT8 tile = state->m_vram[x + y*32];
+			UINT8 tile = m_vram[x + y*32];
 			UINT8 attr = tile >> 7;
 			// ATTR is inverted for normal char or use PCG in case of CMODE1
 			UINT8 *gfx_data = rom_pcg;
-			if (state->m_use_pcg && attr) {
-				gfx_data = state->m_pcg;
+			if (m_use_pcg && attr) {
+				gfx_data = m_pcg;
 				attr = 0; // clear attr so bellow code stay same
 			}
 			tile &= 0x7f;
@@ -365,7 +365,7 @@ static MACHINE_CONFIG_START( jr100, jr100_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(256, 192) /* border size not accurate */
 	MCFG_SCREEN_VISIBLE_AREA(0, 256 - 1, 0, 192 - 1)
-    MCFG_SCREEN_UPDATE_STATIC(jr100)
+	MCFG_SCREEN_UPDATE_DRIVER(jr100_state, screen_update_jr100)
 
 	MCFG_GFXDECODE(jr100)
     MCFG_PALETTE_LENGTH(2)
