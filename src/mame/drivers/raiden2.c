@@ -497,9 +497,11 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 
 	switch(data) {
 	case 0x0205:   // 0205 0006 ffeb 0000 - 0188 0282 0082 0b8e 098e 0000 0000 0000
-		space.write_dword(cop_regs[0] + 4 + offset*4, space.read_dword(cop_regs[0] + 4 + offset*4) + space.read_dword(cop_regs[0] + 16 + offset*4));
+		printf("%08x %08x\n",space.read_dword(cop_regs[0] + 0x1c + offset*4),space.read_dword(cop_regs[0] + 0x10 + offset*4));
+
+		space.write_dword(cop_regs[0] + 4 + offset*4, space.read_dword(cop_regs[0] + 4 + offset*4) + space.read_dword(cop_regs[0] + 0x10 + offset*4));
 		/* TODO: check the following, makes Zero Team to crash as soon as this command is triggered. */
-		//space.write_word(cop_regs[0] + 0x1c + offset*4, space.read_word(cop_regs[0] + 0x1c + offset*4) + space.read_word(cop_regs[0] + 16 + offset*4));
+		space.write_dword(cop_regs[0] + 0x1c + offset*4, space.read_dword(cop_regs[0] + 0x1c + offset*4) + space.read_dword(cop_regs[0] + 0x10 + offset*4));
 		break;
 
 	case 0x0904: { /* X Se Dae and Zero Team uses this variant */
@@ -523,19 +525,25 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 			if(dy<0)
 				cop_angle += 0x80;
 		}
-		dx = dx >> 16;
-		dy = dy >> 16;
-		cop_dist = sqrt((double)(dx*dx+dy*dy));
 
 		if(data & 0x0080) {
 			space.write_byte(cop_regs[0]+0x34, cop_angle);
-			space.write_word(cop_regs[0]+0x38, cop_dist);
 		}
 		break;
 	}
 
+	case 0x3b30:
 	case 0x3bb0: { // 3bb0 0004 007f 0038 - 0f9c 0b9c 0b9c 0b9c 0b9c 0b9c 0b9c 099c
-		// called systematically after 130e/138e, no results expected it seems
+		/* TODO: these are actually internally loaded */
+		int dx = space.read_dword(cop_regs[1]+4) - space.read_dword(cop_regs[0]+4);
+		int dy = space.read_dword(cop_regs[1]+8) - space.read_dword(cop_regs[0]+8);
+
+		dx = dx >> 16;
+		dy = dy >> 16;
+		cop_dist = sqrt((double)(dx*dx+dy*dy));
+
+		if(data & 0x0080)
+			space.write_word(cop_regs[0]+0x38, cop_dist);
 		break;
 	}
 
@@ -1867,10 +1875,8 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate *//2)
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
+//	MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
+	MCFG_SCREEN_RAW_PARAMS(XTAL_32MHz/4,546,0,40*8,264,0,32*8) /* hand-tuned to match ~55.47 */
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 	MCFG_GFXDECODE(raiden2)
 	MCFG_PALETTE_LENGTH(2048)

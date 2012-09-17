@@ -1478,6 +1478,57 @@ dx     dy      angle
 0x1c0  0x00    0x71
 0x1e0  0x00    0x72
 
+
+command 0x3bb0
+dx    dy   | dist
+-----------|-----
+0x00  0x00 | 0xb5
+0x20  0x00 | 0xa0
+0x40  0x00 | 0x8f
+0x60  0x00 | 0x83
+0x80  0x00 | 0x80
+0xa0  0x00 | 0x83
+0xc0  0x00 | 0x8f
+0xe0  0x00 | 0xa0
+
+command 0x42c2
+dx    dy   | stat   dist angle scale  r34(r) r36     r38*  r3a
+-----------|-----------------------------------------------------
+0x00  0x00 | 0x0067 0x20 0x20  0x0000 0x0001 0x0020  0xb5 0x16a0
+0x20  0x00 | 0x0027 0x20 0x26  0x0000 0x0001 0x0026  0xa0 0x1400
+0x40  0x00 | 0x0067 0x20 0x2d  0x0000 0x0001 0x002d  0x8f 0x11e3
+0x60  0x00 | 0x0067 0x20 0x36  0x0000 0x0001 0x0036  0x83 0x107e
+0x80  0x00 | 0x0027 0x20 0x00  0x0000 0x0001 0x0000  0x80 0x1000
+0xa0  0x00 | 0x0067 0x20 0x4a  0x0000 0x0001 0x004a  0x83 0x107e
+0xc0  0x00 | 0x0067 0x20 0x53  0x0000 0x0001 0x0053  0x8f 0x11e3
+0xe0  0x00 | 0x0027 0x20 0x5a  0x0000 0x0001 0x005a  0xa0 0x1400
+
+0x00  0x00 | ****** 0x10 0x20  0x0000 0x0002 0x0020  0xb5 0x0b50
+0x20  0x00 | ****** 0x10 0x26  0x0000 0x0002 0x0026  0xa0 0x0a00
+0x40  0x00 | ****** 0x10 0x2d  0x0000 0x0002 0x002d  0x8f 0x08f1
+0x60  0x00 | ****** 0x10 0x36  0x0000 0x0002 0x0036  0x83 0x083f
+0x80  0x00 | ****** 0x10 0x00  0x0000 0x0002 0x0000  0x80 0x0800
+0xa0  0x00 | ****** 0x10 0x4a  0x0000 0x0002 0x004a  0x83 0x083f
+0xc0  0x00 | ****** 0x10 0x53  0x0000 0x0002 0x0053  0x8f 0x08f1
+0xe0  0x00 | ****** 0x10 0x5a  0x0000 0x0002 0x005a  0xa0 0x0a00
+
+0x00  0x00 | ****** 0x08 0x20  0x0000 0x0004 0x0020  0xb5 0x05a8
+0x20  0x00 | ****** 0x08 0x26  0x0000 0x0004 0x0026  0xa0 0x0500
+
+0x20  0x00 | ****** 0x02 0x26  0x0000 0x0010 0x0026  0xa0 0x0140
+
+0xc0  0x00 | 0x0047 0x01 0x53  0x0000 0x0020 0x0053  0x8f 0x008f
+
+0x60  0x00 | 0x0047 0x00 0x36  0x0000 0x0040 0x0036  0x83 0x0041
+
+0x40  0x00 | 0x0047 0x00 0x2d  0x0000 0x0080 0x002d  0x8f 0x0023
+
+0x40  0x00 | 0x8007 0x00 0x2d  0x0000 0x0400 0x008f  0x8f 0x0000
+
+0x00  0x00 | 0x0067 0x10 0x2d  0x0000 0x0001 0x0020  0xb5 0x0b50
+
+
+*same as 0x3bb0
 */
 
 #include "emu.h"
@@ -1865,10 +1916,23 @@ static void cop_take_hit_box_params(UINT8 offs)
 {
 	INT16 start_x,start_y,end_x,end_y;
 
-	end_y = INT8(cop_collision_info[offs].hitbox_y >> 8);
-	start_y = INT8(cop_collision_info[offs].hitbox_y);
-	end_x = INT8(cop_collision_info[offs].hitbox_x >> 8);
-	start_x = INT8(cop_collision_info[offs].hitbox_x);
+	/* TODO: hack for SD Gundam */
+	#if 0
+	if(cop_collision_info[offs].hitbox_y == 0x2800 && cop_collision_info[offs].hitbox_x == 0xa000)
+	{
+		end_y = 0xff;
+		start_y = -16;
+		end_x = 0xff;
+		start_x = 0;
+	}
+	else
+	#endif
+	{
+		end_y = INT8(cop_collision_info[offs].hitbox_y >> 8);
+		start_y = INT8(cop_collision_info[offs].hitbox_y);
+		end_x = INT8(cop_collision_info[offs].hitbox_x >> 8);
+		start_x = INT8(cop_collision_info[offs].hitbox_x);
+	}
 
 	cop_collision_info[offs].min_x = start_x + (cop_collision_info[offs].x >> 16);
 	cop_collision_info[offs].min_y = start_y + (cop_collision_info[offs].y >> 16);
@@ -1887,8 +1951,14 @@ static UINT8 cop_calculate_collsion_detection(running_machine &machine)
 	if(cop_collision_info[0].max_x >= cop_collision_info[1].min_x && cop_collision_info[0].min_x <= cop_collision_info[1].max_x)
 		res &= ~2;
 
+	if(cop_collision_info[1].max_x >= cop_collision_info[0].min_x && cop_collision_info[1].min_x <= cop_collision_info[0].max_x)
+		res &= ~2;
+
 	/* outbound Y check */
 	if(cop_collision_info[0].max_y >= cop_collision_info[1].min_y && cop_collision_info[0].min_y <= cop_collision_info[1].max_y)
+		res &= ~1;
+
+	if(cop_collision_info[1].max_y >= cop_collision_info[0].min_y && cop_collision_info[1].min_y <= cop_collision_info[0].max_y)
 		res &= ~1;
 
 	cop_hit_val_x = (cop_collision_info[0].x - cop_collision_info[1].x) >> 16;
@@ -1896,11 +1966,12 @@ static UINT8 cop_calculate_collsion_detection(running_machine &machine)
 	cop_hit_val_z = 1;
 	cop_hit_val_unk = res; // TODO: there's also bit 2 and 3 triggered in the tests, no known meaning
 
-
 	//popmessage("%d %d %04x %04x %04x %04x",cop_hit_val_x,cop_hit_val_y,cop_collision_info[0].hitbox_x,cop_collision_info[0].hitbox_y,cop_collision_info[1].hitbox_x,cop_collision_info[1].hitbox_y);
 
 	//if(res == 0)
 	//popmessage("0:%08x %08x %08x 1:%08x %08x %08x\n",cop_collision_info[0].x,cop_collision_info[0].y,cop_collision_info[0].hitbox,cop_collision_info[1].x,cop_collision_info[1].y,cop_collision_info[1].hitbox);
+//	popmessage("0:%08x %08x %08x %08x 1:%08x %08x %08x %08x\n",cop_collision_info[0].min_x,cop_collision_info[0].max_x,cop_collision_info[0].min_y, cop_collision_info[0].max_y,
+//	                                                 cop_collision_info[1].min_x,cop_collision_info[1].max_x,cop_collision_info[1].min_y, cop_collision_info[1].max_y);
 
 	return res;
 }
@@ -2228,9 +2299,8 @@ static WRITE16_HANDLER( generic_cop_w )
 
 				offs = (offset & 3) * 4;
 
-				/* TODO: 0x1c operation? */
-
 				space.write_dword(cop_register[0] + 0x04 + offs, space.read_dword(cop_register[0] + 0x04 + offs) + space.read_dword(cop_register[0] + 0x10 + offs));
+				space.write_dword(cop_register[0] + 0x1c + offs, space.read_dword(cop_register[0] + 0x10 + offs) + space.read_dword(cop_register[0] + 0x1c + offs));
 				return;
 			}
 
@@ -2323,6 +2393,9 @@ static WRITE16_HANDLER( generic_cop_w )
 						cop_angle += 0x80;
 				}
 
+				r0 = dy;
+				r1 = dx;
+
 				//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,cop_angle);
 
 				if(cop_mcu_ram[offset] & 0x80)
@@ -2368,12 +2441,12 @@ static WRITE16_HANDLER( generic_cop_w )
 				int dy = r0;
 				int dx = r1;
 
-				dx = dx >> 16;
-				dy = dy >> 16;
+				dx >>= 16;
+				dy >>= 16;
 				cop_dist = sqrt((double)(dx*dx+dy*dy));
 
 				if(cop_mcu_ram[offset] & 0x80)
-					space.write_word(cop_register[0]+(0x38^2), cop_dist);
+					space.write_word(cop_register[0]+(0x38), cop_dist);
 				return;
 			}
 
@@ -2388,7 +2461,6 @@ static WRITE16_HANDLER( generic_cop_w )
                v2 = (x & 1023)*32
                val = !v1 ? 32767 : trunc(v2/v1+0.5)
             */
-            /* TODO: this is WRONG! */
 			if(COP_CMD(0xf9a,0xb9a,0xb9c,0xb9c,0xb9c,0x29c,0x000,0x000,5,0xfcdd))
 			{
 				int div = space.read_word(cop_register[0]+(0x36^2));
@@ -2400,8 +2472,15 @@ static WRITE16_HANDLER( generic_cop_w )
 					div = 1;
 				}
 
-				res = space.read_word(cop_register[0]+(0x38^2)) / div;
-				res <<= cop_scale + 2; /* TODO: check this */
+				/* TODO: not yet accurate (throws some bits away while converting) */
+				res = cop_dist;
+				res <<= 5 - cop_scale;
+				res /= div;
+
+				cop_dist = (1 << (5 - cop_scale)) / div;
+
+				/* TODO: bits 5-6-15 */
+				cop_status = 7;
 
 				space.write_word(cop_register[0]+(0x38^2), res);
 				return;
