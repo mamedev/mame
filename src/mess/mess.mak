@@ -2154,6 +2154,7 @@ $(MESS_DRIVERS)/llc.o:		$(MESS_LAYOUT)/llc1.lh
 $(MESS_DRIVERS)/lynx.o:		$(MESS_LAYOUT)/lynx.lh
 $(MESS_DRIVERS)/lx800.o:	$(MESS_LAYOUT)/lx800.lh
 $(MESS_DRIVERS)/mac.o:		$(MESS_LAYOUT)/mac.lh
+$(MAME_MACHINE)/megacd.o:	$(MAME_LAYOUT)/megacd.lh
 $(MAME_MACHINE)/megadriv.o:	$(MAME_LAYOUT)/megacd.lh
 $(MESS_DRIVERS)/megadriv.o:	$(MAME_LAYOUT)/megacd.lh
 $(MESS_DRIVERS)/mekd2.o:	$(MESS_LAYOUT)/mekd2.lh
