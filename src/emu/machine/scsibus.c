@@ -105,7 +105,7 @@ UINT8 scsibus_device::scsi_data_r()
 			break;
 
 		case SCSI_PHASE_STATUS:
-			result=status; // return command status
+			result=SCSI_STATUS_OK; // return command status
 			break;
 
 		case SCSI_PHASE_MESSAGE_IN:
@@ -264,38 +264,9 @@ void scsibus_device::scsibus_exec_command()
 	//is_linked=command[cmd_idx-1] & 0x01;
 	is_linked=0;
 
-	// Assume command will succeed, if not set sytatus below.
-	if (command[0]!=SCSI_CMD_REQUEST_SENSE)
-		SET_STATUS_SENSE(SCSI_STATUS_OK,SCSI_SENSE_NO_SENSE);
-
 	// Check for locally executed commands, and if found execute them
 	switch (command[0])
 	{
-		// Recalibrate drive
-		case SCSI_CMD_RECALIBRATE:
-			LOG(1,"SCSIBUS: Recalibrate drive\n");
-			command_local=1;
-			xfer_count=0;
-			data_last=xfer_count;
-			bytes_left=0;
-			devices[last_id]->SetPhase(SCSI_PHASE_STATUS);
-			break;
-
-		// Request sense, return previous error codes
-		case SCSI_CMD_REQUEST_SENSE:
-			LOG(1,"SCSIBUS: request_sense\n");
-			command_local=1;
-			xfer_count=SCSI_SENSE_SIZE;
-			data_last=xfer_count;
-			bytes_left=0;
-			buffer[0]=sense;
-			buffer[1]=0x00;
-			buffer[2]=0x00;
-			buffer[3]=0x00;
-			SET_STATUS_SENSE(SCSI_STATUS_OK,SCSI_SENSE_NO_SENSE);
-			devices[last_id]->SetPhase(SCSI_PHASE_DATAOUT);
-			break;
-
 		// Format unit
 		case SCSI_CMD_FORMAT_UNIT:
 			LOG(1,"SCSIBUS: format unit command[1]=%02X & 0x10\n",(command[1] & 0x10));
@@ -309,16 +280,6 @@ void scsibus_device::scsibus_exec_command()
 			data_last=xfer_count;
 			bytes_left=0;
 			dataout_timer->adjust(attotime::from_seconds(FORMAT_UNIT_TIMEOUT));
-			break;
-
-		// Send diagnostic info
-		case SCSI_CMD_SEND_DIAGNOSTIC:
-			LOG(1,"SCSIBUS: send_diagnostic\n");
-			command_local=1;
-			xfer_count=(command[3]<<8)+command[4];
-			data_last=xfer_count;
-			bytes_left=0;
-			devices[last_id]->SetPhase(SCSI_PHASE_DATAOUT);
 			break;
 
 		case SCSI_CMD_SEARCH_DATA_EQUAL:

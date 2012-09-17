@@ -19,6 +19,8 @@ void scsidev_device::device_start()
 	save_item( NAME( phase ) );
 }
 
+#define SCSI_SENSE_SIZE				4
+
 void scsidev_device::ExecCommand( int *transferLength )
 {
 	UINT8 *command;
@@ -27,15 +29,30 @@ void scsidev_device::ExecCommand( int *transferLength )
 
 	switch( command[ 0 ] )
 	{
-		case 0x00: // TEST UNIT READY
-			SetPhase( SCSI_PHASE_STATUS );
-			*transferLength = 0;
-			break;
+	case SCSI_CMD_TEST_UNIT_READY:
+		SetPhase( SCSI_PHASE_STATUS );
+		*transferLength = 0;
+		break;
 
-		default:
-			logerror( "%s: SCSIDEV unknown command %02x\n", machine().describe_context(), command[ 0 ] );
-			*transferLength = 0;
-			break;
+	case SCSI_CMD_RECALIBRATE:
+		SetPhase( SCSI_PHASE_STATUS );
+		*transferLength = 0;
+		break;
+
+	case SCSI_CMD_REQUEST_SENSE:
+		SetPhase( SCSI_PHASE_DATAOUT );
+		*transferLength = SCSI_SENSE_SIZE;
+		break;
+
+	case SCSI_CMD_SEND_DIAGNOSTIC:
+		SetPhase( SCSI_PHASE_DATAOUT );
+		*transferLength = ( command[ 3 ] << 8 ) + command[ 4 ];
+		break;
+
+	default:
+		logerror( "%s: SCSIDEV unknown command %02x\n", machine().describe_context(), command[ 0 ] );
+		*transferLength = 0;
+		break;
 	}
 }
 
@@ -47,9 +64,15 @@ void scsidev_device::ReadData( UINT8 *data, int dataLength )
 
 	switch( command[ 0 ] )
 	{
-		default:
-			logerror( "%s: SCSIDEV unknown read %02x\n", machine().describe_context(), command[ 0 ] );
-			break;
+	case SCSI_CMD_REQUEST_SENSE:
+		data[ 0 ] = SCSI_SENSE_NO_SENSE;
+		data[ 1 ] = 0x00;
+		data[ 2 ] = 0x00;
+		data[ 3 ] = 0x00;
+		break;
+	default:
+		logerror( "%s: SCSIDEV unknown read %02x\n", machine().describe_context(), command[ 0 ] );
+		break;
 	}
 }
 
@@ -61,9 +84,12 @@ void scsidev_device::WriteData( UINT8 *data, int dataLength )
 
 	switch( command[ 0 ] )
 	{
-		default:
-			logerror( "%s: SCSIDEV unknown write %02x\n", machine().describe_context(), command[ 0 ] );
-			break;
+	case SCSI_CMD_SEND_DIAGNOSTIC:
+		break;
+
+	default:
+		logerror( "%s: SCSIDEV unknown write %02x\n", machine().describe_context(), command[ 0 ] );
+		break;
 	}
 }
 

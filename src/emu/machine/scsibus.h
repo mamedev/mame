@@ -45,12 +45,8 @@
 #define ADAPTEC_BUF_SIZE			1024
 
 // scsidev
-#define SCSI_CMD_RECALIBRATE		0x01
-#define SCSI_CMD_REQUEST_SENSE		0x03
-#define SCSI_CMD_MODE_SELECT    	0x15
-#define SCSI_CMD_SEND_DIAGNOSTIC	0x1D
-#define SCSI_CMD_BUFFER_WRITE   	0x3B
-#define SCSI_CMD_BUFFER_READ    	0x3C
+#define SCSI_CMD_BUFFER_WRITE ( 0x3b )
+#define SCSI_CMD_BUFFER_READ ( 0x3c )
 
 // scsihd
 #define SCSI_CMD_FORMAT_UNIT    	0x04
@@ -61,44 +57,8 @@
 #define IS_COMMAND(cmd)         	(command[0]==cmd)
 #define IS_READ_COMMAND()       	((command[0]==0x08) || (command[0]==0x28) || (command[0]==0xa8))
 #define IS_WRITE_COMMAND()      	((command[0]==0x0a) || (command[0]==0x2a))
-#define SET_STATUS_SENSE(stat,sen)	{ status=(stat); sense=(sen); }
 
 #define FORMAT_UNIT_TIMEOUT			5
-
-//
-// Status / Sense data taken from Adaptec ACB40x0 documentation.
-//
-
-#define SCSI_STATUS_OK				0x00
-#define SCSI_STATUS_CHECK			0x02
-#define SCSI_STATUS_EQUAL			0x04
-#define SCSI_STATUS_BUSY			0x08
-
-#define SCSI_SENSE_ADDR_VALID		0x80
-#define SCSI_SENSE_NO_SENSE			0x00
-#define SCSI_SENSE_NO_INDEX			0x01
-#define SCSI_SENSE_SEEK_NOT_COMP	0x02
-#define SCSI_SENSE_WRITE_FAULT		0x03
-#define SCSI_SENSE_DRIVE_NOT_READY	0x04
-#define SCSI_SENSE_NO_TRACK0		0x06
-#define SCSI_SENSE_ID_CRC_ERROR		0x10
-#define SCSI_SENSE_UNCORRECTABLE	0x11
-#define SCSI_SENSE_ADDRESS_NF		0x12
-#define SCSI_SENSE_RECORD_NOT_FOUND	0x14
-#define SCSI_SENSE_SEEK_ERROR		0x15
-#define SCSI_SENSE_DATA_CHECK_RETRY	0x18
-#define SCSI_SENSE_ECC_VERIFY		0x19
-#define SCSI_SENSE_INTERLEAVE_ERROR	0x1A
-#define SCSI_SENSE_UNFORMATTED		0x1C
-#define SCSI_SENSE_ILLEGAL_COMMAND	0x20
-#define SCSI_SENSE_ILLEGAL_ADDRESS	0x21
-#define SCSI_SENSE_VOLUME_OVERFLOW	0x23
-#define SCSI_SENSE_BAD_ARGUMENT		0x24
-#define SCSI_SENSE_INVALID_LUN		0x25
-#define SCSI_SENSE_CART_CHANGED		0x28
-#define SCSI_SENSE_ERROR_OVERFLOW	0x2C
-
-#define SCSI_SENSE_SIZE				4
 
 struct adaptec_sense_t
 {
@@ -196,9 +156,6 @@ private:
 	UINT8       command[CMD_BUF_SIZE];
 	UINT8       cmd_idx;
 	UINT8       is_linked;
-
-	UINT8       status;
-	UINT8       sense;
 
 	UINT8       buffer[ADAPTEC_BUF_SIZE];
 	UINT16      data_idx;
