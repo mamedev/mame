@@ -120,7 +120,7 @@ READ16_MEMBER(qdrmfgp_state::v_rom_r)
 {
 	device_t *k056832 = machine().device("k056832");
 	UINT8 *mem8 = memregion("gfx1")->base();
-	int bank = k056832_word_r(k056832, 0x34/2, 0xffff);
+	int bank = k056832_word_r(k056832, space, 0x34/2, 0xffff);
 
 	offset += bank * 0x800 * 4;
 
@@ -136,9 +136,9 @@ READ16_MEMBER(qdrmfgp_state::gp2_vram_r)
 	device_t *k056832 = machine().device("k056832");
 
 	if (offset < 0x1000 / 2)
-		return k056832_ram_word_r(k056832, offset * 2 + 1, mem_mask);
+		return k056832_ram_word_r(k056832, space, offset * 2 + 1, mem_mask);
 	else
-		return k056832_ram_word_r(k056832, (offset - 0x1000 / 2) * 2, mem_mask);
+		return k056832_ram_word_r(k056832, space, (offset - 0x1000 / 2) * 2, mem_mask);
 }
 
 READ16_MEMBER(qdrmfgp_state::gp2_vram_mirror_r)
@@ -146,9 +146,9 @@ READ16_MEMBER(qdrmfgp_state::gp2_vram_mirror_r)
 	device_t *k056832 = machine().device("k056832");
 
 	if (offset < 0x1000 / 2)
-		return k056832_ram_word_r(k056832, offset * 2, mem_mask);
+		return k056832_ram_word_r(k056832, space, offset * 2, mem_mask);
 	else
-		return k056832_ram_word_r(k056832, (offset - 0x1000 / 2) * 2 + 1, mem_mask);
+		return k056832_ram_word_r(k056832, space, (offset - 0x1000 / 2) * 2 + 1, mem_mask);
 }
 
 WRITE16_MEMBER(qdrmfgp_state::gp2_vram_w)
@@ -156,9 +156,9 @@ WRITE16_MEMBER(qdrmfgp_state::gp2_vram_w)
 	device_t *k056832 = machine().device("k056832");
 
 	if (offset < 0x1000 / 2)
-		k056832_ram_word_w(k056832, offset * 2 + 1, data, mem_mask);
+		k056832_ram_word_w(k056832, space, offset * 2 + 1, data, mem_mask);
 	else
-		k056832_ram_word_w(k056832, (offset - 0x1000 / 2) * 2, data, mem_mask);
+		k056832_ram_word_w(k056832, space, (offset - 0x1000 / 2) * 2, data, mem_mask);
 }
 
 WRITE16_MEMBER(qdrmfgp_state::gp2_vram_mirror_w)
@@ -166,9 +166,9 @@ WRITE16_MEMBER(qdrmfgp_state::gp2_vram_mirror_w)
 	device_t *k056832 = machine().device("k056832");
 
 	if (offset < 0x1000 / 2)
-		k056832_ram_word_w(k056832, offset * 2, data, mem_mask);
+		k056832_ram_word_w(k056832, space, offset * 2, data, mem_mask);
 	else
-		k056832_ram_word_w(k056832, (offset - 0x1000 / 2) * 2 + 1, data, mem_mask);
+		k056832_ram_word_w(k056832, space, (offset - 0x1000 / 2) * 2 + 1, data, mem_mask);
 }
 
 
@@ -201,25 +201,25 @@ READ16_MEMBER(qdrmfgp_state::ide_std_r)
 {
 	device_t *device = machine().device("ide");
 	if (offset & 0x01)
-		return ide_controller16_r(device, IDE_STD_OFFSET + offset/2, 0xff00) >> 8;
+		return ide_controller16_r(device, space, IDE_STD_OFFSET + offset/2, 0xff00) >> 8;
 	else
-		return ide_controller16_r(device, IDE_STD_OFFSET + offset/2, 0xffff);
+		return ide_controller16_r(device, space, IDE_STD_OFFSET + offset/2, 0xffff);
 }
 
 WRITE16_MEMBER(qdrmfgp_state::ide_std_w)
 {
 	device_t *device = machine().device("ide");
 	if (offset & 0x01)
-		ide_controller16_w(device, IDE_STD_OFFSET + offset/2, data << 8, 0xff00);
+		ide_controller16_w(device, space, IDE_STD_OFFSET + offset/2, data << 8, 0xff00);
 	else
-		ide_controller16_w(device, IDE_STD_OFFSET + offset/2, data, 0xffff);
+		ide_controller16_w(device, space, IDE_STD_OFFSET + offset/2, data, 0xffff);
 }
 
 READ16_MEMBER(qdrmfgp_state::ide_alt_r)
 {
 	device_t *device = machine().device("ide");
 	if (offset == 0)
-		return ide_controller16_r(device, IDE_ALT_OFFSET, 0x00ff);
+		return ide_controller16_r(device, space, IDE_ALT_OFFSET, 0x00ff);
 
 	return 0;
 }
@@ -228,7 +228,7 @@ WRITE16_MEMBER(qdrmfgp_state::ide_alt_w)
 {
 	device_t *device = machine().device("ide");
 	if (offset == 0)
-		ide_controller16_w(device, IDE_ALT_OFFSET, data, 0x00ff);
+		ide_controller16_w(device, space, IDE_ALT_OFFSET, data, 0x00ff);
 }
 
 
@@ -251,9 +251,9 @@ READ16_MEMBER(qdrmfgp_state::gp2_ide_std_r)
 					break;
 			}
 		}
-		return ide_controller16_r(device, IDE_STD_OFFSET + offset/2, 0xff00) >> 8;
+		return ide_controller16_r(device, space, IDE_STD_OFFSET + offset/2, 0xff00) >> 8;
 	} else {
-		return ide_controller16_r(device, IDE_STD_OFFSET + offset/2, 0xffff);
+		return ide_controller16_r(device, space, IDE_STD_OFFSET + offset/2, 0xffff);
 	}
 }
 

@@ -344,9 +344,9 @@ ADDRESS_MAP_END
 static WRITE8_DEVICE_HANDLER( msx_ay8910_w )
 {
 	if ( offset & 1 )
-		ay8910_data_w( device, offset, data );
+		ay8910_data_w( device, space, offset, data );
 	else
-		ay8910_address_w( device, offset, data );
+		ay8910_address_w( device, space, offset, data );
 }
 
 

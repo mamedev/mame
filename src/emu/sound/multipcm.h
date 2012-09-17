@@ -5,8 +5,8 @@
 
 #include "devlegcy.h"
 
-WRITE8_DEVICE_HANDLER( multipcm_w );
-READ8_DEVICE_HANDLER( multipcm_r );
+DECLARE_WRITE8_DEVICE_HANDLER( multipcm_w );
+DECLARE_READ8_DEVICE_HANDLER( multipcm_r );
 
 void multipcm_set_bank(device_t *device, UINT32 leftoffs, UINT32 rightoffs);
 

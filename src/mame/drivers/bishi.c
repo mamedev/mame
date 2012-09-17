@@ -138,7 +138,7 @@ READ16_MEMBER(bishi_state::bishi_K056832_rom_r)
 	if (m_cur_control2 & 0x1000)
 		ouroffs += 4;
 
-	return k056832_bishi_rom_word_r(m_k056832, ouroffs, mem_mask);
+	return k056832_bishi_rom_word_r(m_k056832, space, ouroffs, mem_mask);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bishi_state )

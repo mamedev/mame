@@ -2280,20 +2280,20 @@ ADDRESS_MAP_END
 WRITE16_MEMBER(seta_state::setaroul_spriteylow_w)
 {
 	seta001_device *dev = machine().device<seta001_device>("spritegen");
-	if ((offset&1)==0) spriteylow_w8(dev, offset>>1, (data & 0xff00) >> 8);
+	if ((offset&1)==0) spriteylow_w8(dev, space, offset>>1, (data & 0xff00) >> 8);
 }
 
 WRITE16_MEMBER(seta_state::setaroul_spritectrl_w)
 {
 	seta001_device *dev = machine().device<seta001_device>("spritegen");
-	if ((offset&1)==0) spritectrl_w8(dev, offset>>1, (data & 0xff00) >> 8);
+	if ((offset&1)==0) spritectrl_w8(dev, space, offset>>1, (data & 0xff00) >> 8);
 }
 
 WRITE16_MEMBER(seta_state::setaroul_spritecode_w)
 {
 	seta001_device *dev = machine().device<seta001_device>("spritegen");
-	if ((offset&1)==1) spritecodelow_w8(dev, offset>>1, (data & 0xff00) >> 8);
-	if ((offset&1)==0) spritecodehigh_w8(dev, offset>>1, (data & 0xff00) >> 8);
+	if ((offset&1)==1) spritecodelow_w8(dev, space, offset>>1, (data & 0xff00) >> 8);
+	if ((offset&1)==0) spritecodehigh_w8(dev, space, offset>>1, (data & 0xff00) >> 8);
 }
 
 READ16_MEMBER(seta_state::setaroul_spritecode_r)
@@ -2301,9 +2301,9 @@ READ16_MEMBER(seta_state::setaroul_spritecode_r)
 	UINT16 ret;
 	seta001_device *dev = machine().device<seta001_device>("spritegen");
 	if ((offset&1)==1)
-		ret = spritecodelow_r8(dev, offset>>1);
+		ret = spritecodelow_r8(dev, space, offset>>1);
 	else
-		ret = spritecodehigh_r8(dev, offset>>1);
+		ret = spritecodehigh_r8(dev, space, offset>>1);
 	return ret << 8;
 }
 

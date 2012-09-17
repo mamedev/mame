@@ -725,7 +725,8 @@ static void radarscp_step(running_machine &machine, int line_cnt)
 		state->m_sig30Hz = (1-state->m_sig30Hz);
 
 	/* Now mix with SND02 (sound 2) line - on 74ls259, bit2 */
-	state->m_rflip_sig = latch8_bit2_r(state->m_dev_6h, 0) & state->m_sig30Hz;
+	address_space &space = machine.driver_data()->generic_space();
+	state->m_rflip_sig = latch8_bit2_r(state->m_dev_6h, space, 0) & state->m_sig30Hz;
 
 	sig = state->m_rflip_sig ^ ((line_cnt & 0x80)>>7);
 
@@ -759,7 +760,7 @@ static void radarscp_step(running_machine &machine, int line_cnt)
      *
      * Mixed with ANS line (bit 5) from Port B of 8039
      */
-	if (state->m_grid_on && latch8_bit5_r(state->m_dev_vp2, 0))
+	if (state->m_grid_on && latch8_bit5_r(state->m_dev_vp2, space, 0))
 	{
 		diff = (0.0 - state->m_cv3);
 		diff = diff - diff*exp(0.0 - (1.0/RC32 * dt) );

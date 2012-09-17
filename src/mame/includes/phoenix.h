@@ -55,8 +55,8 @@ public:
 
 DISCRETE_SOUND_EXTERN( phoenix );
 
-WRITE8_DEVICE_HANDLER( phoenix_sound_control_a_w );
-WRITE8_DEVICE_HANDLER( phoenix_sound_control_b_w );
+DECLARE_WRITE8_DEVICE_HANDLER( phoenix_sound_control_a_w );
+DECLARE_WRITE8_DEVICE_HANDLER( phoenix_sound_control_b_w );
 
 class phoenix_sound_device : public device_t,
                                   public device_sound_interface
@@ -92,7 +92,7 @@ extern const device_type PHOENIX;
 SCREEN_UPDATE_IND16( phoenix );
 
 
-READ8_DEVICE_HANDLER( survival_protection_r );
+DECLARE_READ8_DEVICE_HANDLER( survival_protection_r );
 
 READ_LINE_DEVICE_HANDLER( survival_sid_callback );
 

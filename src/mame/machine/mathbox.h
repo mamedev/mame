@@ -20,10 +20,10 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-WRITE8_DEVICE_HANDLER( mathbox_go_w );
-READ8_DEVICE_HANDLER( mathbox_status_r );
-READ8_DEVICE_HANDLER( mathbox_lo_r );
-READ8_DEVICE_HANDLER( mathbox_hi_r );
+DECLARE_WRITE8_DEVICE_HANDLER( mathbox_go_w );
+DECLARE_READ8_DEVICE_HANDLER( mathbox_status_r );
+DECLARE_READ8_DEVICE_HANDLER( mathbox_lo_r );
+DECLARE_READ8_DEVICE_HANDLER( mathbox_hi_r );
 
 /* ----- device interface ----- */
 class mathbox_device : public device_t

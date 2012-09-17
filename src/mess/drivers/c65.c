@@ -193,14 +193,14 @@ READ8_MEMBER( c65_state::sid_potx_r )
 {
 	device_t *sid = machine().device("sid_r");
 
-	return c64_paddle_read(sid, 0);
+	return c64_paddle_read(sid, space, 0);
 }
 
 READ8_MEMBER( c65_state::sid_poty_r )
 {
 	device_t *sid = machine().device("sid_r");
 
-	return c64_paddle_read(sid, 1);
+	return c64_paddle_read(sid, space, 1);
 }
 
 static MOS6581_INTERFACE( sidr_intf )

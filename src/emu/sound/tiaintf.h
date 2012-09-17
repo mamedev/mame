@@ -5,7 +5,7 @@
 
 #include "devlegcy.h"
 
-WRITE8_DEVICE_HANDLER( tia_sound_w );
+DECLARE_WRITE8_DEVICE_HANDLER( tia_sound_w );
 
 class tia_device : public device_t,
                                   public device_sound_interface

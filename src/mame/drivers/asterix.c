@@ -67,7 +67,7 @@ static INTERRUPT_GEN( asterix_interrupt )
 READ8_MEMBER(asterix_state::asterix_sound_r)
 {
 	device_t *device = machine().device("k053260");
-	return k053260_r(device, 2 + offset);
+	return k053260_r(device, space, 2 + offset);
 }
 
 static TIMER_CALLBACK( nmi_callback )

@@ -19,12 +19,12 @@ struct scsp_interface
 void scsp_set_ram_base(device_t *device, void *base);
 
 // SCSP register access
-READ16_DEVICE_HANDLER( scsp_r );
-WRITE16_DEVICE_HANDLER( scsp_w );
+DECLARE_READ16_DEVICE_HANDLER( scsp_r );
+DECLARE_WRITE16_DEVICE_HANDLER( scsp_w );
 
 // MIDI I/O access (used for comms on Model 2/3)
-WRITE16_DEVICE_HANDLER( scsp_midi_in );
-READ16_DEVICE_HANDLER( scsp_midi_out_r );
+DECLARE_WRITE16_DEVICE_HANDLER( scsp_midi_in );
+DECLARE_READ16_DEVICE_HANDLER( scsp_midi_out_r );
 
 extern UINT32* stv_scu;
 

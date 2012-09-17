@@ -76,7 +76,7 @@ WRITE8_MEMBER(kncljoe_state::m6803_port2_w)
 	{
 		/* control or data port? */
 		if (m_port2 & 0x08)
-			ay8910_data_address_w(device, m_port2 >> 2, m_port1);
+			ay8910_data_address_w(device, space, m_port2 >> 2, m_port1);
 	}
 	m_port2 = data;
 }
@@ -86,7 +86,7 @@ READ8_MEMBER(kncljoe_state::m6803_port1_r)
 	device_t *device = machine().device("aysnd");
 
 	if (m_port2 & 0x08)
-		return ay8910_r(device, 0);
+		return ay8910_r(device, space, 0);
 	return 0xff;
 }
 

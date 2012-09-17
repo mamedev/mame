@@ -47,7 +47,7 @@ static void dl1416_update(device_t *device, int index)
 	dl1416_ce_w(device, state->m_pia_a & (0x04 << index));
 	dl1416_wr_w(device, BIT(state->m_pia_a, 7));
 	dl1416_cu_w(device, BIT(state->m_pia_b, 7));
-	dl1416_data_w(device, state->m_pia_a & 0x03, state->m_pia_b & 0x7f);
+	dl1416_data_w(device, state->generic_space(), state->m_pia_a & 0x03, state->m_pia_b & 0x7f);
 }
 
 static void aim65_pia(running_machine &machine)

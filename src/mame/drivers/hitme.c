@@ -194,16 +194,16 @@ WRITE8_MEMBER(hitme_state::output_port_0_w)
 	attotime duration = attotime(0, ATTOSECONDS_PER_SECOND * 0.45 * 6.8e-6 * resistance * (data + 1));
 	m_timeout_time = machine().time() + duration;
 
-	discrete_sound_w(device, HITME_DOWNCOUNT_VAL, data);
-	discrete_sound_w(device, HITME_OUT0, 1);
+	discrete_sound_w(device, space, HITME_DOWNCOUNT_VAL, data);
+	discrete_sound_w(device, space, HITME_OUT0, 1);
 }
 
 
 WRITE8_MEMBER(hitme_state::output_port_1_w)
 {
 	device_t *device = machine().device("discrete");
-	discrete_sound_w(device, HITME_ENABLE_VAL, data);
-	discrete_sound_w(device, HITME_OUT1, 1);
+	discrete_sound_w(device, space, HITME_ENABLE_VAL, data);
+	discrete_sound_w(device, space, HITME_OUT1, 1);
 }
 
 

@@ -171,7 +171,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 		case 0xE4: case 0xE5: case 0xE6: case 0xE7:
 		case 0xE8: case 0xE9: case 0xEA: case 0xEB:
 		case 0xEC: case 0xED: case 0xEE: case 0xEF:
-			result = applefdc_r(fdc, offset);
+			result = applefdc_r(fdc, space, offset);
 			break;
 
 		case 0xF0:
@@ -234,7 +234,7 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 		case 0xE4: case 0xE5: case 0xE6: case 0xE7:
 		case 0xE8: case 0xE9: case 0xEA: case 0xEB:
 		case 0xEC: case 0xED: case 0xEE: case 0xEF:
-			applefdc_w(fdc, offset, data);
+			applefdc_w(fdc, space, offset, data);
 			break;
 
 		case 0xF0:

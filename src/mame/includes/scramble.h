@@ -72,8 +72,8 @@ READ8_HANDLER( triplep_pap_r );
 READ8_HANDLER( hunchbks_mirror_r );
 WRITE8_HANDLER( hunchbks_mirror_w );
 
-READ8_DEVICE_HANDLER( scramble_protection_r );
-WRITE8_DEVICE_HANDLER( scramble_protection_w );
+DECLARE_READ8_DEVICE_HANDLER( scramble_protection_r );
+DECLARE_WRITE8_DEVICE_HANDLER( scramble_protection_w );
 
 
 /*----------- defined in audio/scramble.c -----------*/
@@ -82,13 +82,13 @@ void scramble_sh_init(running_machine &machine);
 WRITE_LINE_DEVICE_HANDLER( scramble_sh_7474_q_callback );
 
 
-READ8_DEVICE_HANDLER( scramble_portB_r );
-READ8_DEVICE_HANDLER( frogger_portB_r );
+DECLARE_READ8_DEVICE_HANDLER( scramble_portB_r );
+DECLARE_READ8_DEVICE_HANDLER( frogger_portB_r );
 
-READ8_DEVICE_HANDLER( hotshock_soundlatch_r );
+DECLARE_READ8_DEVICE_HANDLER( hotshock_soundlatch_r );
 
-WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w );
-WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w );
+DECLARE_WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w );
+DECLARE_WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w );
 
 MACHINE_CONFIG_EXTERN( ad2083_audio );
 

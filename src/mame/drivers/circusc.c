@@ -128,9 +128,9 @@ WRITE8_MEMBER(circusc_state::circusc_sound_w)
 
 		/* CS6 */
 		case 4:
-			discrete_sound_w(m_discrete, NODE_05, (offset & 0x20) >> 5);
-			discrete_sound_w(m_discrete, NODE_06, (offset & 0x18) >> 3);
-			discrete_sound_w(m_discrete, NODE_07, (offset & 0x40) >> 6);
+			discrete_sound_w(m_discrete, space, NODE_05, (offset & 0x20) >> 5);
+			discrete_sound_w(m_discrete, space, NODE_06, (offset & 0x18) >> 3);
+			discrete_sound_w(m_discrete, space, NODE_07, (offset & 0x40) >> 6);
 			break;
 	}
 }

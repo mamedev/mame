@@ -239,7 +239,7 @@ WRITE8_MEMBER(vmetal_state::vmetal_es8712_w)
     16   002a 000e 0083 00ee 000f 0069 0069   0e832a-0f69ee
     */
 
-	es8712_w(device, offset, data);
+	es8712_w(device, space, offset, data);
 	logerror("%s:Writing %04x to ES8712 offset %02x\n", machine().describe_context(), data, offset);
 }
 

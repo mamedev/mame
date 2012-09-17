@@ -566,7 +566,7 @@ WRITE8_MEMBER(equites_state::equites_8155_portb_w)
 	equites_update_dac(machine());
 }
 
-static void equites_msm5232_gate( device_t *device, int state )
+static WRITE_LINE_DEVICE_HANDLER( equites_msm5232_gate )
 {
 }
 
@@ -1113,7 +1113,7 @@ GFXDECODE_END
 static const msm5232_interface equites_5232intf =
 {
 	{ 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6 }, // verified
-	equites_msm5232_gate
+	DEVCB_LINE(equites_msm5232_gate)
 };
 
 

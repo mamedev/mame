@@ -241,18 +241,18 @@ void apollo_csr_set_status_register(UINT16 mask, UINT16 data);
 
 /*----------- machine/apollo_pic.c -----------*/
 
-WRITE8_DEVICE_HANDLER(apollo_pic8259_master_w ) ;
-READ8_DEVICE_HANDLER( apollo_pic8259_master_r );
+DECLARE_WRITE8_DEVICE_HANDLER(apollo_pic8259_master_w ) ;
+DECLARE_READ8_DEVICE_HANDLER( apollo_pic8259_master_r );
 
-WRITE8_DEVICE_HANDLER(apollo_pic8259_slave_w );
-READ8_DEVICE_HANDLER( apollo_pic8259_slave_r );
+DECLARE_WRITE8_DEVICE_HANDLER(apollo_pic8259_slave_w );
+DECLARE_READ8_DEVICE_HANDLER( apollo_pic8259_slave_r );
 
 IRQ_CALLBACK(apollo_pic_acknowledge);
 
 /*----------- machine/apollo_ptm.c -----------*/
 
-WRITE8_DEVICE_HANDLER( apollo_ptm_w );
-READ8_DEVICE_HANDLER( apollo_ptm_r );
+DECLARE_WRITE8_DEVICE_HANDLER( apollo_ptm_w );
+DECLARE_READ8_DEVICE_HANDLER( apollo_ptm_r );
 
 /*----------- machine/apollo_rtc.c -----------*/
 
@@ -261,13 +261,13 @@ READ8_DEVICE_HANDLER( apollo_ptm_r );
 
 void apollo_sio_rx_data( device_t* device, int ch, UINT8 data );
 
-READ8_DEVICE_HANDLER(apollo_sio_r);
-WRITE8_DEVICE_HANDLER(apollo_sio_w);
+DECLARE_READ8_DEVICE_HANDLER(apollo_sio_r);
+DECLARE_WRITE8_DEVICE_HANDLER(apollo_sio_w);
 
 /*----------- machine/apollo_sio2.c -----------*/
 
-READ8_DEVICE_HANDLER(apollo_sio2_r);
-WRITE8_DEVICE_HANDLER(apollo_sio2_w);
+DECLARE_READ8_DEVICE_HANDLER(apollo_sio2_r);
+DECLARE_WRITE8_DEVICE_HANDLER(apollo_sio2_w);
 
 /*----------- machine/apollo_fdc.c -----------*/
 
@@ -360,10 +360,10 @@ extern const device_type APOLLO_MONO15I;
 
 MACHINE_CONFIG_EXTERN( apollo_mono15i );
 
-READ16_DEVICE_HANDLER( apollo_mcr_r ) ;
-WRITE16_DEVICE_HANDLER(apollo_mcr_w );
+DECLARE_READ16_DEVICE_HANDLER( apollo_mcr_r ) ;
+DECLARE_WRITE16_DEVICE_HANDLER(apollo_mcr_w );
 
-READ16_DEVICE_HANDLER( apollo_mgm_r );
-WRITE16_DEVICE_HANDLER( apollo_mgm_w );
+DECLARE_READ16_DEVICE_HANDLER( apollo_mgm_r );
+DECLARE_WRITE16_DEVICE_HANDLER( apollo_mgm_w );
 
 #endif /* APOLLO_H_ */

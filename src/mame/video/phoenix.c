@@ -294,7 +294,7 @@ WRITE8_MEMBER(phoenix_state::pleiads_videoreg_w)
 	m_pleiads_protection_question = data & 0xfc;
 
 	/* send two bits to sound control C (not sure if they are there) */
-	pleiads_sound_control_c_w(machine().device("cust"), offset, data);
+	pleiads_sound_control_c_w(machine().device("cust"), space, offset, data);
 }
 
 

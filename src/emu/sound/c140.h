@@ -7,8 +7,8 @@
 
 #include "devlegcy.h"
 
-READ8_DEVICE_HANDLER( c140_r );
-WRITE8_DEVICE_HANDLER( c140_w );
+DECLARE_READ8_DEVICE_HANDLER( c140_r );
+DECLARE_WRITE8_DEVICE_HANDLER( c140_w );
 
 void c140_set_base(device_t *device, void *base);
 

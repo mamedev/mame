@@ -292,10 +292,10 @@ WRITE8_DEVICE_HANDLER( skyraid_sound_w )
 	/* BIT4 => PLANE ON    */
 	/* BIT5 => ATTRACT     */
 
-	discrete_sound_w(device, SKYRAID_PLANE_SWEEP_EN, data & 0x01);
-	discrete_sound_w(device, SKYRAID_MISSILE_EN, data & 0x02);
-	discrete_sound_w(device, SKYRAID_EXPLOSION_EN, data & 0x04);
+	discrete_sound_w(device, space, SKYRAID_PLANE_SWEEP_EN, data & 0x01);
+	discrete_sound_w(device, space, SKYRAID_MISSILE_EN, data & 0x02);
+	discrete_sound_w(device, space, SKYRAID_EXPLOSION_EN, data & 0x04);
 	set_led_status(device->machine(), 0, !(data & 0x08));
-	discrete_sound_w(device, SKYRAID_PLANE_ON_EN, data & 0x10);
-	discrete_sound_w(device, SKYRAID_ATTRACT_EN, data & 0x20);
+	discrete_sound_w(device, space, SKYRAID_PLANE_ON_EN, data & 0x10);
+	discrete_sound_w(device, space, SKYRAID_ATTRACT_EN, data & 0x20);
 }

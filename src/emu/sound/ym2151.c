@@ -163,7 +163,7 @@ struct YM2151
 	UINT32		noise_tab[32];			/* 17bit Noise Generator periods */
 
 	void (*irqhandler)(device_t *device, int irq);		/* IRQ function handler */
-	write8_device_func porthandler;		/* port write function handler */
+	void (*porthandler)(device_t *, offs_t, UINT8);		/* port write function handler */
 
 	device_t *device;
 	unsigned int clock;					/* chip clock in Hz (passed from 2151intf.c) */
@@ -2492,7 +2492,7 @@ void ym2151_set_irq_handler(void *chip, void(*handler)(device_t *device, int irq
 	PSG->irqhandler = handler;
 }
 
-void ym2151_set_port_write_handler(void *chip, write8_device_func handler)
+void ym2151_set_port_write_handler(void *chip, void (*handler)(device_t *, offs_t, UINT8))
 {
 	YM2151 *PSG = (YM2151 *)chip;
 	PSG->porthandler = handler;

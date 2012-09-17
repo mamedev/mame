@@ -573,7 +573,7 @@ long myo;
 				return acia->data_read(space,0);
 		}
 		if ((myo>=0x10) && (myo<=0x17)) return 0xfe;						/* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) return uPD7002_r(machine().device("upd7002"), myo-0x18);			/* A to D converter */
+		if ((myo>=0x18) && (myo<=0x1f)) return uPD7002_r(machine().device("upd7002"), space, myo-0x18);			/* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23)) return 0xfe;						/* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27)) return bbcm_wd1770l_read(space, myo-0x24); /* 1770 */
 		if ((myo>=0x28) && (myo<=0x2f)) return bbcm_wd1770_read(space, myo-0x28);  /* disc control latch */
@@ -583,7 +583,7 @@ long myo;
 		if ((myo>=0x40) && (myo<=0x5f)) return via_0->read(space,myo-0x40);
 		if ((myo>=0x60) && (myo<=0x7f)) return via_1->read(space,myo-0x60);
 		if ((myo>=0x80) && (myo<=0x9f)) return 0xfe;
-		if ((myo>=0xa0) && (myo<=0xbf)) return mc6854_r(adlc, myo & 0x03);
+		if ((myo>=0xa0) && (myo<=0xbf)) return mc6854_r(adlc, space, myo & 0x03);
 		if ((myo>=0xc0) && (myo<=0xdf)) return 0xfe;
 		if ((myo>=0xe0) && (myo<=0xff)) return 0xfe;
 	}
@@ -613,7 +613,7 @@ long myo;
 				acia->data_write(space, 0, data);
 		}
 		if ((myo>=0x10) && (myo<=0x17)) bbc_SerialULA_w(space, myo-0x10,data);		/* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w(machine().device("upd7002"),myo-0x18,data);			/* A to D converter */
+		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w(machine().device("upd7002"),space,myo-0x18,data);			/* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23)) bbc_videoULA_w(space, myo-0x20,data);			/* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27)) bbcm_wd1770l_write(space, myo-0x24,data);	/* 1770 */
 		if ((myo>=0x28) && (myo<=0x2f)) bbcm_wd1770_write(space, myo-0x28,data);	/* disc control latch */
@@ -623,7 +623,7 @@ long myo;
 		if ((myo>=0x40) && (myo<=0x5f)) via_0->write(space,myo-0x40, data);
 		if ((myo>=0x60) && (myo<=0x7f)) via_1->write(space,myo-0x60, data);
 		//if ((myo>=0x80) && (myo<=0x9f))
-		if ((myo>=0xa0) && (myo<=0xbf)) mc6854_w(adlc, myo & 0x03, data);
+		if ((myo>=0xa0) && (myo<=0xbf)) mc6854_w(adlc, space, myo & 0x03, data);
 		//if ((myo>=0xc0) && (myo<=0xdf))
 		//if ((myo>=0xe0) && (myo<=0xff))
 	}
@@ -814,9 +814,9 @@ INTERRUPT_GEN( bbcm_keyscan )
 
 
 
-static int bbc_keyboard(address_space *space, int data)
+static int bbc_keyboard(address_space &space, int data)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
+	bbc_state *state = space.machine().driver_data<bbc_state>();
 	int bit;
 	int row;
 	int res;
@@ -824,7 +824,7 @@ static int bbc_keyboard(address_space *space, int data)
 		"COL0", "COL1", "COL2", "COL3", "COL4",
 		"COL5", "COL6", "COL7", "COL8", "COL9"
 	};
-	via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
+	via6522_device *via_0 = space.machine().device<via6522_device>("via6522_0");
 
 	state->m_column = data & 0x0f;
 	row = (data>>4) & 0x07;
@@ -833,7 +833,7 @@ static int bbc_keyboard(address_space *space, int data)
 
 	if (state->m_column < 10)
 	{
-		res = space->machine().root_device().ioport(colnames[state->m_column])->read();
+		res = space.machine().root_device().ioport(colnames[state->m_column])->read();
 	}
 	else
 	{
@@ -874,11 +874,11 @@ static void bbcb_IC32_initialise(bbc_state *state)
 
 
 /* This the BBC Masters Real Time Clock and NVRam IC */
-static void MC146818_set(address_space *space)
+static void MC146818_set(address_space &space)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
+	bbc_state *state = space.machine().driver_data<bbc_state>();
 	logerror ("146181 WR=%d DS=%d AS=%d CE=%d \n",state->m_MC146818_WR,state->m_MC146818_DS,state->m_MC146818_AS,state->m_MC146818_CE);
-	mc146818_device *rtc = space->machine().device<mc146818_device>("rtc");
+	mc146818_device *rtc = space.machine().device<mc146818_device>("rtc");
 
 	// if chip enabled
 	if (state->m_MC146818_CE)
@@ -888,12 +888,12 @@ static void MC146818_set(address_space *space)
 		{
 			if (state->m_MC146818_WR)
 			{
-				state->m_via_system_porta=rtc->read(*space, 1);
+				state->m_via_system_porta=rtc->read(space, 1);
 				//logerror("read 146818 data %d \n",state->m_via_system_porta);
 			}
 			else
 			{
-				rtc->write(*space, 1, state->m_via_system_porta);
+				rtc->write(space, 1, state->m_via_system_porta);
 				//logerror("write 146818 data %d \n",state->m_via_system_porta);
 			}
 		}
@@ -901,7 +901,7 @@ static void MC146818_set(address_space *space)
 		// if address select is set then set the address in the 146818
 		if (state->m_MC146818_AS)
 		{
-			rtc->write(*space, 0, state->m_via_system_porta);
+			rtc->write(space, 0, state->m_via_system_porta);
 			//logerror("write 146818 address %d \n",state->m_via_system_porta);
 		}
 	}
@@ -911,14 +911,13 @@ static void MC146818_set(address_space *space)
 static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_porta )
 {
 	bbc_state *state = device->machine().driver_data<bbc_state>();
-	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	//logerror("SYSTEM write porta %d\n",data);
 
 	state->m_via_system_porta = data;
 	if (state->m_b0_sound == 0)
 	{
 		//logerror("Doing an unsafe write to the sound chip %d \n",data);
-		state->m_sn->write(*device->machine().device<legacy_cpu_device>("maincpu")->space(), 0,state->m_via_system_porta);
+		state->m_sn->write(space, 0,state->m_via_system_porta);
 	}
 	if (state->m_b3_keyboard == 0)
 	{
@@ -932,7 +931,6 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_porta )
 static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 {
 	bbc_state *state = device->machine().driver_data<bbc_state>();
-	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int bit, value;
 	bit = data & 0x07;
 	value = (data >> 3) & 0x01;
@@ -1030,7 +1028,7 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 			if (state->m_b0_sound == 1)
 			{
 				state->m_b0_sound = 0;
-				state->m_sn->write(*device->machine().device<legacy_cpu_device>("maincpu")->space(), 0, state->m_via_system_porta);
+				state->m_sn->write(space, 0, state->m_via_system_porta);
 			}
 			break;
 		case 1:
@@ -1176,7 +1174,7 @@ static READ8_DEVICE_HANDLER( bbcb_via_system_read_ca1 )
 /* joystick EOC */
 static READ8_DEVICE_HANDLER( bbcb_via_system_read_cb1 )
 {
-	return uPD7002_EOC_r(device->machine().device("upd7002"),0);
+	return uPD7002_EOC_r(device->machine().device("upd7002"),space,0);
 }
 
 
@@ -1453,11 +1451,11 @@ READ8_MEMBER(bbc_state::bbc_i8271_read)
 		case 2:
 		case 3:
 			/* 8271 registers */
-			ret=i8271_r(i8271, offset);
+			ret=i8271_r(i8271, space, offset);
 			logerror("  %d\n",ret);
 			break;
 		case 4:
-			ret=i8271_data_r(i8271, offset);
+			ret=i8271_data_r(i8271, space, offset);
 			logerror("  %d\n",ret);
 			break;
 		default:
@@ -1480,10 +1478,10 @@ WRITE8_MEMBER(bbc_state::bbc_i8271_write)
 		case 2:
 		case 3:
 			/* 8271 registers */
-			i8271_w(i8271, offset, data);
+			i8271_w(i8271, space, offset, data);
 			return;
 		case 4:
-			i8271_data_w(i8271, offset, data);
+			i8271_data_w(i8271, space, offset, data);
 			return;
 		default:
 			break;
@@ -1617,16 +1615,16 @@ READ8_MEMBER(bbc_state::bbc_wd1770_read)
 	switch (offset)
 	{
 	case 4:
-		retval=wd17xx_status_r(fdc, 0);
+		retval=wd17xx_status_r(fdc, space, 0);
 		break;
 	case 5:
-		retval=wd17xx_track_r(fdc, 0);
+		retval=wd17xx_track_r(fdc, space, 0);
 		break;
 	case 6:
-		retval=wd17xx_sector_r(fdc, 0);
+		retval=wd17xx_sector_r(fdc, space, 0);
 		break;
 	case 7:
-		retval=wd17xx_data_r(fdc, 0);
+		retval=wd17xx_data_r(fdc, space, 0);
 		break;
 	default:
 		break;
@@ -1646,16 +1644,16 @@ WRITE8_MEMBER(bbc_state::bbc_wd1770_write)
 		bbc_wd177x_status_w(space, 0, data);
 		break;
 	case 4:
-		wd17xx_command_w(fdc, 0, data);
+		wd17xx_command_w(fdc, space, 0, data);
 		break;
 	case 5:
-		wd17xx_track_w(fdc, 0, data);
+		wd17xx_track_w(fdc, space, 0, data);
 		break;
 	case 6:
-		wd17xx_sector_w(fdc, 0, data);
+		wd17xx_sector_w(fdc, space, 0, data);
 		break;
 	case 7:
-		wd17xx_data_w(fdc, 0, data);
+		wd17xx_data_w(fdc, space, 0, data);
 		break;
 	default:
 		break;
@@ -1730,13 +1728,13 @@ READ8_MEMBER(bbc_state::bbc_opus_read)
 			switch (offset)
 			{
 				case 0xf8:
-					return wd17xx_status_r(fdc, 0);
+					return wd17xx_status_r(fdc, space, 0);
 				case 0xf9:
-					return wd17xx_track_r(fdc, 0);
+					return wd17xx_track_r(fdc, space, 0);
 				case 0xfa:
-					return wd17xx_sector_r(fdc, 0);
+					return wd17xx_sector_r(fdc, space, 0);
 				case 0xfb:
-					return wd17xx_data_r(fdc, 0);
+					return wd17xx_data_r(fdc, space, 0);
 			}
 
 		}
@@ -1760,16 +1758,16 @@ WRITE8_MEMBER(bbc_state::bbc_opus_write)
 			switch (offset)
 			{
 				case 0xf8:
-					wd17xx_command_w(fdc, 0, data);
+					wd17xx_command_w(fdc, space, 0, data);
 					break;
 				case 0xf9:
-					wd17xx_track_w(fdc, 0, data);
+					wd17xx_track_w(fdc, space, 0, data);
 					break;
 				case 0xfa:
-					wd17xx_sector_w(fdc, 0, data);
+					wd17xx_sector_w(fdc, space, 0, data);
 					break;
 				case 0xfb:
-					wd17xx_data_w(fdc, 0, data);
+					wd17xx_data_w(fdc, space, 0, data);
 					break;
 				case 0xfc:
 					bbc_opus_status_w(space, 0,data);
@@ -1802,16 +1800,16 @@ READ8_MEMBER(bbc_state::bbcm_wd1770_read)
 	switch (offset)
 	{
 	case 0:
-		retval=wd17xx_status_r(fdc, 0);
+		retval=wd17xx_status_r(fdc, space, 0);
 		break;
 	case 1:
-		retval=wd17xx_track_r(fdc, 0);
+		retval=wd17xx_track_r(fdc, space, 0);
 		break;
 	case 2:
-		retval=wd17xx_sector_r(fdc, 0);
+		retval=wd17xx_sector_r(fdc, space, 0);
 		break;
 	case 3:
-		retval=wd17xx_data_r(fdc, 0);
+		retval=wd17xx_data_r(fdc, space, 0);
 		break;
 	default:
 		break;
@@ -1827,16 +1825,16 @@ WRITE8_MEMBER(bbc_state::bbcm_wd1770_write)
 	switch (offset)
 	{
 	case 0:
-		wd17xx_command_w(fdc, 0, data);
+		wd17xx_command_w(fdc, space, 0, data);
 		break;
 	case 1:
-		wd17xx_track_w(fdc, 0, data);
+		wd17xx_track_w(fdc, space, 0, data);
 		break;
 	case 2:
-		wd17xx_sector_w(fdc, 0, data);
+		wd17xx_sector_w(fdc, space, 0, data);
 		break;
 	case 3:
-		wd17xx_data_w(fdc, 0, data);
+		wd17xx_data_w(fdc, space, 0, data);
 		break;
 	default:
 		break;

@@ -32,13 +32,13 @@
 
 WRITE8_DEVICE_HANDLER( crbaloon_audio_set_music_freq )
 {
-	discrete_sound_w(device, CRBALOON_MUSIC_DATA, data);
+	discrete_sound_w(device, space, CRBALOON_MUSIC_DATA, data);
 }
 
 
 WRITE8_DEVICE_HANDLER( crbaloon_audio_set_music_enable )
 {
-	discrete_sound_w(device, CRBALOON_MUSIC_EN, data);
+	discrete_sound_w(device, space, CRBALOON_MUSIC_EN, data);
 }
 
 
@@ -66,7 +66,7 @@ void crbaloon_audio_set_appear_enable(device_t *sn, int enabled)
 
 WRITE8_DEVICE_HANDLER( crbaloon_audio_set_laugh_enable )
 {
-	discrete_sound_w(device, CRBALOON_LAUGH_EN, data);
+	discrete_sound_w(device, space, CRBALOON_LAUGH_EN, data);
 }
 
 

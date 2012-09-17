@@ -150,10 +150,10 @@ WRITE8_MEMBER(svision_state::svision_w)
 			svision_soundport_w(m_sound, 1, offset & 3, data);
 			break;
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c:
-			svision_sounddma_w(m_sound, offset - 0x18, data);
+			svision_sounddma_w(m_sound, space, offset - 0x18, data);
 			break;
 		case 0x28: case 0x29: case 0x2a:
-			svision_noise_w(m_sound, offset - 0x28, data);
+			svision_noise_w(m_sound, space, offset - 0x28, data);
 			break;
 		default:
 			logerror("%.6f svision write %04x %02x\n", machine().time().as_double(), offset, data);

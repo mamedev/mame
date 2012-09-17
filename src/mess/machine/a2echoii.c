@@ -81,7 +81,7 @@ UINT8 a2bus_echoii_device::read_c0nx(address_space &space, UINT8 offset)
     switch (offset)
     {
         case 0:
-            return 0x1f | tms5220_status_r(m_tms, 0);
+            return 0x1f | tms5220_status_r(m_tms, space, 0);
             break;
     }
 
@@ -93,7 +93,7 @@ void a2bus_echoii_device::write_c0nx(address_space &space, UINT8 offset, UINT8 d
     switch (offset)
     {
         case 0:
-            tms5220_data_w(m_tms, offset, data);
+            tms5220_data_w(m_tms, space, offset, data);
             break;
     }
 }

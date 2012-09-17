@@ -22,4 +22,4 @@ private:
 extern const device_type WIPING;
 
 
-WRITE8_DEVICE_HANDLER( wiping_sound_w );
+DECLARE_WRITE8_DEVICE_HANDLER( wiping_sound_w );

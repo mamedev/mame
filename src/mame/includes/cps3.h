@@ -134,5 +134,5 @@ private:
 extern const device_type CPS3;
 
 
-WRITE32_DEVICE_HANDLER( cps3_sound_w );
-READ32_DEVICE_HANDLER( cps3_sound_r );
+DECLARE_WRITE32_DEVICE_HANDLER( cps3_sound_w );
+DECLARE_READ32_DEVICE_HANDLER( cps3_sound_r );

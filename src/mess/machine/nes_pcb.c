@@ -1901,7 +1901,7 @@ static WRITE8_HANDLER( exrom_l_w )
 	/* Send $5000-$5015 to the sound chip */
 	if ((offset >= 0xf00) && (offset <= 0xf15))
 	{
-		nes_psg_w(state->m_sound, offset & 0x1f, data);
+		nes_psg_w(state->m_sound, *space, offset & 0x1f, data);
 		return;
 	}
 

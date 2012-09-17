@@ -286,38 +286,38 @@ static void voodoo_vblank_1(device_t *device, int param)
 READ32_MEMBER(gticlub_state::gticlub_k001604_tile_r)
 {
 	device_t *k001604 = machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
-	return k001604_tile_r(k001604, offset, mem_mask);
+	return k001604_tile_r(k001604, space, offset, mem_mask);
 }
 
 WRITE32_MEMBER(gticlub_state::gticlub_k001604_tile_w)
 {
 	device_t *k001604 = machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
-	k001604_tile_w(k001604, offset, data, mem_mask);
+	k001604_tile_w(k001604, space, offset, data, mem_mask);
 }
 
 
 READ32_MEMBER(gticlub_state::gticlub_k001604_char_r)
 {
 	device_t *k001604 = machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
-	return k001604_char_r(k001604, offset, mem_mask);
+	return k001604_char_r(k001604, space, offset, mem_mask);
 }
 
 WRITE32_MEMBER(gticlub_state::gticlub_k001604_char_w)
 {
 	device_t *k001604 = machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
-	k001604_char_w(k001604, offset, data, mem_mask);
+	k001604_char_w(k001604, space, offset, data, mem_mask);
 }
 
 READ32_MEMBER(gticlub_state::gticlub_k001604_reg_r)
 {
 	device_t *k001604 = machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
-	return k001604_reg_r(k001604, offset, mem_mask);
+	return k001604_reg_r(k001604, space, offset, mem_mask);
 }
 
 WRITE32_MEMBER(gticlub_state::gticlub_k001604_reg_w)
 {
 	device_t *k001604 = machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
-	k001604_reg_w(k001604, offset, data, mem_mask);
+	k001604_reg_w(k001604, space, offset, data, mem_mask);
 }
 
 

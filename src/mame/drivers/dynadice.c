@@ -93,10 +93,10 @@ WRITE8_MEMBER(dynadice_state::sound_control_w)
 
 */
 	if ((data & 7) == 7)
-		ay8910_address_w(device, 0, m_ay_data);
+		ay8910_address_w(device, space, 0, m_ay_data);
 
 	if ((data & 7) == 6)
-		ay8910_data_w(device, 0, m_ay_data);
+		ay8910_data_w(device, space, 0, m_ay_data);
 }
 
 

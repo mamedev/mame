@@ -53,7 +53,8 @@ WRITE16_MEMBER(vaportra_state::vaportra_palette_24bit_b_w)
 SCREEN_UPDATE_IND16( vaportra )
 {
 	vaportra_state *state = screen.machine().driver_data<vaportra_state>();
-	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
+	address_space &space = screen.machine().driver_data()->generic_space();
+	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, space, 0, 0xffff);
 	int pri = state->m_priority[0] & 0x03;
 
 	state->flip_screen_set(!BIT(flip, 7));

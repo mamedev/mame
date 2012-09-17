@@ -1068,6 +1068,7 @@ void spc700_set_volume(device_t *device,int volume)
          I/O for DSP
  ***************************/
 
+static DECLARE_READ8_DEVICE_HANDLER( snes_dsp_io_r );
 static READ8_DEVICE_HANDLER( snes_dsp_io_r )
 {
 	snes_sound_state *spc700 = get_safe_token(device);
@@ -1083,6 +1084,7 @@ static READ8_DEVICE_HANDLER( snes_dsp_io_r )
 	return spc700->dsp_regs[offset & 0x7f];
 }
 
+static DECLARE_WRITE8_DEVICE_HANDLER( snes_dsp_io_w );
 static WRITE8_DEVICE_HANDLER( snes_dsp_io_w )
 {
 	snes_sound_state *spc700 = get_safe_token(device);
@@ -1118,7 +1120,7 @@ READ8_DEVICE_HANDLER( spc_io_r )
 		case 0x2:		/* Register address */
 			return spc700->ram[0xf2];
 		case 0x3:		/* Register data */
-			return snes_dsp_io_r(device, spc700->ram[0xf2]);
+			return snes_dsp_io_r(device, space, spc700->ram[0xf2]);
 		case 0x4:		/* Port 0 */
 		case 0x5:		/* Port 1 */
 		case 0x6:		/* Port 2 */
@@ -1186,7 +1188,7 @@ WRITE8_DEVICE_HANDLER( spc_io_w )
 			break;
 		case 0x3:		/* Register data - 0x80-0xff is a read-only mirror of 0x00-0x7f */
 			if (!(spc700->ram[0xf2] & 0x80))
-				snes_dsp_io_w(device, spc700->ram[0xf2] & 0x7f, data);
+				snes_dsp_io_w(device, space, spc700->ram[0xf2] & 0x7f, data);
 			break;
 		case 0x4:		/* Port 0 */
 		case 0x5:		/* Port 1 */

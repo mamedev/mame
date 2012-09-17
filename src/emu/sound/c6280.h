@@ -11,8 +11,8 @@ struct c6280_interface
 };
 
 /* Function prototypes */
-WRITE8_DEVICE_HANDLER( c6280_w );
-READ8_DEVICE_HANDLER( c6280_r );
+DECLARE_WRITE8_DEVICE_HANDLER( c6280_w );
+DECLARE_READ8_DEVICE_HANDLER( c6280_r );
 
 class c6280_device : public device_t,
                                   public device_sound_interface

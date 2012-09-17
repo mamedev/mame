@@ -82,11 +82,11 @@ struct adc12138_interface
     PROTOTYPES
 ***************************************************************************/
 
-extern WRITE8_DEVICE_HANDLER( adc1213x_di_w );
-extern WRITE8_DEVICE_HANDLER( adc1213x_cs_w );
-extern WRITE8_DEVICE_HANDLER( adc1213x_sclk_w );
-extern WRITE8_DEVICE_HANDLER( adc1213x_conv_w );
-extern READ8_DEVICE_HANDLER( adc1213x_do_r );
-extern READ8_DEVICE_HANDLER( adc1213x_eoc_r );
+extern DECLARE_WRITE8_DEVICE_HANDLER( adc1213x_di_w );
+extern DECLARE_WRITE8_DEVICE_HANDLER( adc1213x_cs_w );
+extern DECLARE_WRITE8_DEVICE_HANDLER( adc1213x_sclk_w );
+extern DECLARE_WRITE8_DEVICE_HANDLER( adc1213x_conv_w );
+extern DECLARE_READ8_DEVICE_HANDLER( adc1213x_do_r );
+extern DECLARE_READ8_DEVICE_HANDLER( adc1213x_eoc_r );
 
 #endif	/* __ADC1213X_H__ */

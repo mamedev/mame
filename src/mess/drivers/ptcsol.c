@@ -522,9 +522,9 @@ static const ay31015_config sol20_ay31015_config =
 	AY_3_1015,
 	4800.0,
 	4800.0,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

@@ -68,7 +68,7 @@ READ8_MEMBER( vic10_state::read )
 	}
 	else if (offset >= 0xdc00 && offset < 0xe000)
 	{
-		data = mos6526_r(m_cia, offset & 0x0f);
+		data = mos6526_r(m_cia, space, offset & 0x0f);
 	}
 	else if (offset >= 0xe000)
 	{
@@ -111,7 +111,7 @@ WRITE8_MEMBER( vic10_state::write )
 	}
 	else if (offset >= 0xdc00 && offset < 0xe000)
 	{
-		mos6526_w(m_cia, offset & 0x0f, data);
+		mos6526_w(m_cia, space, offset & 0x0f, data);
 	}
 
 	m_exp->cd_w(space, offset, data, lorom, uprom, exram);
@@ -251,10 +251,10 @@ static MOS6566_INTERFACE( vic_intf )
 //  sid6581_interface sid_intf
 //-------------------------------------------------
 
-UINT8 vic10_state::paddle_read(int which)
+UINT8 vic10_state::paddle_read(address_space &space, int which)
 {
 	int pot1 = 0xff, pot2 = 0xff, pot3 = 0xff, pot4 = 0xff, temp;
-	UINT8 cia0porta = mos6526_pa_r(m_cia, 0);
+	UINT8 cia0porta = mos6526_pa_r(m_cia, space, 0);
 	int controller1 = ioport("CTRLSEL")->read() & 0x07;
 	int controller2 = ioport("CTRLSEL")->read() & 0x70;
 	// Notice that only a single input is defined for Mouse & Lightpen in both ports
@@ -366,12 +366,12 @@ UINT8 vic10_state::paddle_read(int which)
 
 READ8_MEMBER( vic10_state::sid_potx_r )
 {
-	return paddle_read(0);
+	return paddle_read(space, 0);
 }
 
 READ8_MEMBER( vic10_state::sid_poty_r )
 {
-	return paddle_read(1);
+	return paddle_read(space, 1);
 }
 
 static MOS6581_INTERFACE( sid_intf )
@@ -409,7 +409,7 @@ READ8_MEMBER( vic10_state::cia_pa_r )
 
     */
 
-	UINT8 cia0portb = mos6526_pb_r(m_cia, 0);
+	UINT8 cia0portb = mos6526_pb_r(m_cia, space, 0);
 
 	return cbm_common_cia0_port_a_r(m_cia, cia0portb);
 }
@@ -431,7 +431,7 @@ READ8_MEMBER( vic10_state::cia_pb_r )
 
     */
 
-	UINT8 cia0porta = mos6526_pa_r(m_cia, 0);
+	UINT8 cia0porta = mos6526_pa_r(m_cia, space, 0);
 
 	return cbm_common_cia0_port_b_r(m_cia, cia0porta);
 }

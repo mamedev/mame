@@ -64,15 +64,15 @@ WRITE8_MEMBER( draco_state::sound_g_w )
 	switch (data)
 	{
 	case 0x01:
-		ay8910_data_w(m_psg, 0, m_psg_latch);
+		ay8910_data_w(m_psg, space, 0, m_psg_latch);
 		break;
 
 	case 0x02:
-		m_psg_latch = ay8910_r(m_psg, 0);
+		m_psg_latch = ay8910_r(m_psg, space, 0);
 		break;
 
 	case 0x03:
-		ay8910_address_w(m_psg, 0, m_psg_latch);
+		ay8910_address_w(m_psg, space, 0, m_psg_latch);
 		break;
 	}
 }

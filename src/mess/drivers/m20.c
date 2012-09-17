@@ -231,12 +231,12 @@ WRITE16_MEMBER(m20_state::port21_w)
 
 READ16_MEMBER(m20_state::m20_i8259_r)
 {
-    return pic8259_r(m_i8259, offset)<<1;
+    return pic8259_r(m_i8259, space, offset)<<1;
 }
 
 WRITE16_MEMBER(m20_state::m20_i8259_w)
 {
-    pic8259_w(m_i8259, offset, (data>>1));
+    pic8259_w(m_i8259, space, offset, (data>>1));
 }
 
 WRITE_LINE_MEMBER( m20_state::pic_irq_line_w )
@@ -380,7 +380,7 @@ void m20_state::machine_reset()
 	m_maincpu->set_irq_acknowledge_callback(m20_irq_callback);
 
 	wd17xx_mr_w(m_wd177x, 0);
-	//wd17xx_mr_w(m_wd177x, 1);
+	//wd17xx_mr_w(m_wd177x, space, 1);
 
     memcpy(RAM, ROM, 8);  // we need only the reset vector
     m_maincpu->reset();     // reset the CPU to ensure it picks up the new vector

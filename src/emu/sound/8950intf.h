@@ -7,21 +7,20 @@
 
 struct y8950_interface
 {
-	void (*handler)(device_t *device, int linestate);
-
-	read8_device_func keyboardread;
-	write8_device_func keyboardwrite;
-	read8_device_func portread;
-	write8_device_func portwrite;
+	devcb_write_line handler_cb;
+	devcb_read8 keyboardread_cb;
+	devcb_write8 keyboardwrite_cb;
+	devcb_read8 portread_cb;
+	devcb_write8 portwrite_cb;
 };
 
-READ8_DEVICE_HANDLER( y8950_r );
-WRITE8_DEVICE_HANDLER( y8950_w );
+DECLARE_READ8_DEVICE_HANDLER( y8950_r );
+DECLARE_WRITE8_DEVICE_HANDLER( y8950_w );
 
-READ8_DEVICE_HANDLER( y8950_status_port_r );
-READ8_DEVICE_HANDLER( y8950_read_port_r );
-WRITE8_DEVICE_HANDLER( y8950_control_port_w );
-WRITE8_DEVICE_HANDLER( y8950_write_port_w );
+DECLARE_READ8_DEVICE_HANDLER( y8950_status_port_r );
+DECLARE_READ8_DEVICE_HANDLER( y8950_read_port_r );
+DECLARE_WRITE8_DEVICE_HANDLER( y8950_control_port_w );
+DECLARE_WRITE8_DEVICE_HANDLER( y8950_write_port_w );
 
 class y8950_device : public device_t,
                                   public device_sound_interface
@@ -44,6 +43,12 @@ protected:
 private:
 	// internal state
 	void *m_token;
+public:
+	devcb_resolved_write_line m_handler;
+	devcb_resolved_read8 m_keyboardread;
+	devcb_resolved_write8 m_keyboardwrite;
+	devcb_resolved_read8 m_portread;
+	devcb_resolved_write8 m_portwrite;
 };
 
 extern const device_type Y8950;

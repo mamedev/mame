@@ -194,7 +194,7 @@ static WRITE_LINE_DEVICE_HANDLER(  pc_fdc_hw_interrupt )
 
 
 
-int	pc_fdc_dack_r(running_machine &machine)
+int	pc_fdc_dack_r(running_machine &machine, address_space &space)
 {
 	int data;
 
@@ -204,7 +204,7 @@ int	pc_fdc_dack_r(running_machine &machine)
 	/* if dma is not enabled, dacks are not acknowledged */
 	if ((fdc->digital_output_register & PC_FDC_FLAGS_DOR_DMA_ENABLED)!=0)
 	{
-		data = upd765_dack_r(pc_get_device(machine), 0);
+		data = upd765_dack_r(pc_get_device(machine), space, 0);
 	}
 
 	return data;
@@ -212,13 +212,13 @@ int	pc_fdc_dack_r(running_machine &machine)
 
 
 
-void pc_fdc_dack_w(running_machine &machine, int data)
+void pc_fdc_dack_w(running_machine &machine, address_space &space, int data)
 {
 	/* if dma is not enabled, dacks are not issued */
 	if ((fdc->digital_output_register & PC_FDC_FLAGS_DOR_DMA_ENABLED)!=0)
 	{
 		/* dma acknowledge - and send byte to fdc */
-		upd765_dack_w(pc_get_device(machine), 0,data);
+		upd765_dack_w(pc_get_device(machine), space, 0,data);
 	}
 }
 
@@ -270,15 +270,15 @@ static void pc_fdc_data_rate_w(running_machine &machine, UINT8 data)
      `------------------ 1 = turn floppy drive D motor on
  */
 
-static void pc_fdc_dor_w(running_machine &machine, UINT8 data)
+static WRITE8_HANDLER( pc_fdc_dor_w )
 {
 	int selected_drive;
 	int floppy_count;
 
-	floppy_count = floppy_get_count(machine);
+	floppy_count = floppy_get_count(space->machine());
 
 	if (floppy_count > (fdc->digital_output_register & 0x03))
-		floppy_drive_set_ready_state(floppy_get_device(machine, fdc->digital_output_register & 0x03), 1, 0);
+		floppy_drive_set_ready_state(floppy_get_device(space->machine(), fdc->digital_output_register & 0x03), 1, 0);
 
 	fdc->digital_output_register = data;
 
@@ -286,34 +286,34 @@ static void pc_fdc_dor_w(running_machine &machine, UINT8 data)
 
 	/* set floppy drive motor state */
 	if (floppy_count > 0)
-		floppy_mon_w(floppy_get_device(machine, 0), !BIT(data, 4));
+		floppy_mon_w(floppy_get_device(space->machine(), 0), !BIT(data, 4));
 	if (floppy_count > 1)
-		floppy_mon_w(floppy_get_device(machine, 1), !BIT(data, 5));
+		floppy_mon_w(floppy_get_device(space->machine(), 1), !BIT(data, 5));
 	if (floppy_count > 2)
-		floppy_mon_w(floppy_get_device(machine, 2), !BIT(data, 6));
+		floppy_mon_w(floppy_get_device(space->machine(), 2), !BIT(data, 6));
 	if (floppy_count > 3)
-		floppy_mon_w(floppy_get_device(machine, 3), !BIT(data, 7));
+		floppy_mon_w(floppy_get_device(space->machine(), 3), !BIT(data, 7));
 
 	if ((data>>4) & (1<<selected_drive))
 	{
 		if (floppy_count > selected_drive)
-			floppy_drive_set_ready_state(floppy_get_device(machine, selected_drive), 1, 0);
+			floppy_drive_set_ready_state(floppy_get_device(space->machine(), selected_drive), 1, 0);
 	}
 
 	/* changing the DMA enable bit, will affect the terminal count state
     from reaching the fdc - if dma is enabled this will send it through
     otherwise it will be ignored */
-	pc_fdc_set_tc_state(machine, fdc->tc_state);
+	pc_fdc_set_tc_state(space->machine(), fdc->tc_state);
 
 	/* changing the DMA enable bit, will affect the dma drq state
     from reaching us - if dma is enabled this will send it through
     otherwise it will be ignored */
-	pc_fdc_hw_dma_drq(pc_get_device(machine), fdc->dma_state);
+	pc_fdc_hw_dma_drq(pc_get_device(space->machine()), fdc->dma_state);
 
 	/* changing the DMA enable bit, will affect the irq state
     from reaching us - if dma is enabled this will send it through
     otherwise it will be ignored */
-	pc_fdc_hw_interrupt(pc_get_device(machine), fdc->int_state);
+	pc_fdc_hw_interrupt(pc_get_device(space->machine()), fdc->int_state);
 
 	/* reset? */
 	if ((fdc->digital_output_register & PC_FDC_FLAGS_DOR_FDC_ENABLED)==0)
@@ -336,17 +336,17 @@ static void pc_fdc_dor_w(running_machine &machine, UINT8 data)
         what is not yet clear is if this is a result of the drives ready state
         changing...
         */
-			upd765_ready_w(pc_get_device(machine),1);
+			upd765_ready_w(pc_get_device(space->machine()),1);
 
 		/* set FDC at reset */
-		upd765_reset_w(pc_get_device(machine), 1);
+		upd765_reset_w(pc_get_device(space->machine()), 1);
 	}
 	else
 	{
-		pc_fdc_set_tc_state(machine, 0);
+		pc_fdc_set_tc_state(space->machine(), 0);
 
 		/* release reset on fdc */
-		upd765_reset_w(pc_get_device(machine), 0);
+		upd765_reset_w(pc_get_device(space->machine()), 0);
 	}
 }
 
@@ -377,20 +377,20 @@ static TIMER_CALLBACK( watchdog_timeout )
 	}
 }
 
-static void pcjr_fdc_dor_w(running_machine &machine, UINT8 data)
+static WRITE8_HANDLER( pcjr_fdc_dor_w )
 {
 	int floppy_count;
 
-	floppy_count = floppy_get_count(machine);
+	floppy_count = floppy_get_count(space->machine());
 
 	/* set floppy drive motor state */
 	if (floppy_count > 0)
-		floppy_mon_w(floppy_get_device(machine, 0), BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+		floppy_mon_w(floppy_get_device(space->machine(), 0), BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 
 	if ( data & 0x01 )
 	{
 		if ( floppy_count )
-			floppy_drive_set_ready_state(floppy_get_device(machine, 0), 1, 0);
+			floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0), 1, 0);
 	}
 
 	/* Is the watchdog timer disabled */
@@ -399,7 +399,7 @@ static void pcjr_fdc_dor_w(running_machine &machine, UINT8 data)
 		fdc->watchdog->adjust( attotime::never );
 		if ( fdc->fdc_interface.pc_fdc_interrupt )
 		{
-			fdc->fdc_interface.pc_fdc_interrupt(machine, 0 );
+			fdc->fdc_interface.pc_fdc_interrupt(space->machine(), 0 );
 		}
 	} else {
 		/* Check for 1->0 watchdog trigger */
@@ -431,17 +431,17 @@ static void pcjr_fdc_dor_w(running_machine &machine, UINT8 data)
         what is not yet clear is if this is a result of the drives ready state
         changing...
         */
-			upd765_ready_w(pc_get_device(machine),1);
+			upd765_ready_w(pc_get_device(space->machine()),1);
 
 		/* set FDC at reset */
-		upd765_reset_w(pc_get_device(machine), 1);
+		upd765_reset_w(pc_get_device(space->machine()), 1);
 	}
 	else
 	{
-		pc_fdc_set_tc_state(machine, 0);
+		pc_fdc_set_tc_state(space->machine(), 0);
 
 		/* release reset on fdc */
-		upd765_reset_w(pc_get_device(machine), 0);
+		upd765_reset_w(pc_get_device(space->machine()), 0);
 	}
 
 	logerror("pcjr_fdc_dor_w: changing dor from %02x to %02x\n", fdc->digital_output_register, data);
@@ -498,10 +498,10 @@ READ8_HANDLER ( pc_fdc_r )
 		case 3: /* tape drive select? */
 			break;
 		case 4:
-			data = upd765_status_r(pc_get_device(space->machine()), 0);
+			data = upd765_status_r(pc_get_device(space->machine()), *space, 0);
 			break;
 		case 5:
-			data = upd765_data_r(pc_get_device(space->machine()), offset);
+			data = upd765_data_r(pc_get_device(space->machine()), *space, offset);
 			break;
 		case 6: /* FDC reserved */
 			break;
@@ -531,7 +531,7 @@ WRITE8_HANDLER ( pc_fdc_w )
 		case 1:	/* n/a */
 			break;
 		case 2:
-			pc_fdc_dor_w(space->machine(), data);
+			pc_fdc_dor_w(space, 0, data);
 			break;
 		case 3:
 			/* tape drive select? */
@@ -540,7 +540,7 @@ WRITE8_HANDLER ( pc_fdc_w )
 			pc_fdc_data_rate_w(space->machine(), data);
 			break;
 		case 5:
-			upd765_data_w(pc_get_device(space->machine()), 0, data);
+			upd765_data_w(pc_get_device(space->machine()), *space, 0, data);
 			break;
 		case 6:
 			/* FDC reserved */
@@ -568,7 +568,7 @@ WRITE8_HANDLER ( pcjr_fdc_w )
 	switch(offset)
 	{
 		case 2:
-			pcjr_fdc_dor_w( space->machine(), data );
+			pcjr_fdc_dor_w( space, 0, data );
 			break;
 		case 4:
 		case 7:

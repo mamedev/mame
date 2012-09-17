@@ -181,16 +181,16 @@ WRITE16_MEMBER(warriorb_state::warriorb_sound_w)
 {
 
 	if (offset == 0)
-		tc0140syt_port_w(m_tc0140syt, 0, data & 0xff);
+		tc0140syt_port_w(m_tc0140syt, space, 0, data & 0xff);
 	else if (offset == 1)
-		tc0140syt_comm_w(m_tc0140syt, 0, data & 0xff);
+		tc0140syt_comm_w(m_tc0140syt, space, 0, data & 0xff);
 }
 
 READ16_MEMBER(warriorb_state::warriorb_sound_r)
 {
 
 	if (offset == 1)
-		return ((tc0140syt_comm_r(m_tc0140syt, 0) & 0xff));
+		return ((tc0140syt_comm_r(m_tc0140syt, space, 0) & 0xff));
 	else
 		return 0;
 }
@@ -218,8 +218,8 @@ WRITE8_MEMBER(warriorb_state::warriorb_pancontrol)
 WRITE16_MEMBER(warriorb_state::tc0100scn_dual_screen_w)
 {
 
-	tc0100scn_word_w(m_tc0100scn_1, offset, data, mem_mask);
-	tc0100scn_word_w(m_tc0100scn_2, offset, data, mem_mask);
+	tc0100scn_word_w(m_tc0100scn_1, space, offset, data, mem_mask);
+	tc0100scn_word_w(m_tc0100scn_2, space, offset, data, mem_mask);
 }
 
 /***********************************************************

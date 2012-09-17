@@ -28,8 +28,8 @@
  FUNCTION PROTOTYPES
  ***************************************************************************/
 
-READ8_DEVICE_HANDLER( threecom3c505_r );
-WRITE8_DEVICE_HANDLER( threecom3c505_w );
+DECLARE_READ8_DEVICE_HANDLER( threecom3c505_r );
+DECLARE_WRITE8_DEVICE_HANDLER( threecom3c505_w );
 
 int threecom3c505_receive(device_t *device, const UINT8 *data, int length);
 

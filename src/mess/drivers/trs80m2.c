@@ -334,12 +334,12 @@ WRITE8_MEMBER( trs80m2_state::nmi_w )
 
 READ8_MEMBER( trs80m2_state::fdc_r )
 {
-	return wd17xx_r(m_fdc, offset) ^ 0xff;
+	return wd17xx_r(m_fdc, space, offset) ^ 0xff;
 }
 
 WRITE8_MEMBER( trs80m2_state::fdc_w )
 {
-	wd17xx_w(m_fdc, offset, data ^ 0xff);
+	wd17xx_w(m_fdc, space, offset, data ^ 0xff);
 }
 
 WRITE8_MEMBER( trs80m16_state::tcl_w )

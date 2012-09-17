@@ -127,7 +127,8 @@ static void cninjabl_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 SCREEN_UPDATE_IND16( cninja )
 {
 	cninja_state *state = screen.machine().driver_data<cninja_state>();
-	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
+	address_space &space = screen.machine().driver_data()->generic_space();
+	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, space, 0, 0xffff);
 
 	state->flip_screen_set(BIT(flip, 7));
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
@@ -148,7 +149,8 @@ SCREEN_UPDATE_IND16( cninja )
 SCREEN_UPDATE_IND16( cninjabl )
 {
 	cninja_state *state = screen.machine().driver_data<cninja_state>();
-	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
+	address_space &space = screen.machine().driver_data()->generic_space();
+	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, space, 0, 0xffff);
 
 	/* force layers to be enabled */
 	deco16ic_set_enable(state->m_deco_tilegen2, 0, 1 );
@@ -173,7 +175,8 @@ SCREEN_UPDATE_IND16( cninjabl )
 SCREEN_UPDATE_IND16( edrandy )
 {
 	cninja_state *state = screen.machine().driver_data<cninja_state>();
-	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
+	address_space &space = screen.machine().driver_data()->generic_space();
+	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, space, 0, 0xffff);
 
 	state->flip_screen_set(BIT(flip, 7));
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
@@ -192,8 +195,9 @@ SCREEN_UPDATE_IND16( edrandy )
 SCREEN_UPDATE_IND16( robocop2 )
 {
 	cninja_state *state = screen.machine().driver_data<cninja_state>();
-	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
-	UINT16 priority = decocomn_priority_r(state->m_decocomn, 0, 0xffff);
+	address_space &space = screen.machine().driver_data()->generic_space();
+	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, space, 0, 0xffff);
+	UINT16 priority = decocomn_priority_r(state->m_decocomn, space, 0, 0xffff);
 
 	/* One of the tilemap chips can switch between 2 tilemaps at 4bpp, or 1 at 8bpp */
 	if (priority & 4)
@@ -249,8 +253,9 @@ VIDEO_START_MEMBER(cninja_state,mutantf)
 SCREEN_UPDATE_RGB32( mutantf )
 {
 	cninja_state *state = screen.machine().driver_data<cninja_state>();
-	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
-	UINT16 priority = decocomn_priority_r(state->m_decocomn, 0, 0xffff);
+	address_space &space = screen.machine().driver_data()->generic_space();
+	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, space, 0, 0xffff);
+	UINT16 priority = decocomn_priority_r(state->m_decocomn, space, 0, 0xffff);
 
 
 	state->flip_screen_set(BIT(flip, 7));

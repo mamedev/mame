@@ -85,15 +85,14 @@ struct kr2376_interface
 	int clock;
 
 	/* This will be called for every change of the strobe pin (pin 16). Optional */
-//  kr2376_on_strobe_changed_func       on_strobe_changed;
-	write8_device_func	on_strobe_changed;
+	devcb_write_line on_strobe_changed_cb;
 };
 #define KR2376_INTERFACE(name) const kr2376_interface (name)=
 /* keyboard matrix */
 INPUT_PORTS_EXTERN( kr2376 );
 
 /* keyboard data */
-READ8_DEVICE_HANDLER( kr2376_data_r );
+DECLARE_READ8_DEVICE_HANDLER( kr2376_data_r );
 
 /* Set an input pin */
 void kr2376_set_input_pin( device_t *device, kr2376_input_pin_t pin, int data );

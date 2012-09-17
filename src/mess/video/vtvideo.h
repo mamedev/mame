@@ -62,10 +62,10 @@ struct vt_video_interface
     PROTOTYPES
 ***************************************************************************/
 /* register access */
-READ8_DEVICE_HANDLER  ( vt_video_lba7_r );
-WRITE8_DEVICE_HANDLER ( vt_video_dc012_w );
-WRITE8_DEVICE_HANDLER ( vt_video_dc011_w );
-WRITE8_DEVICE_HANDLER ( vt_video_brightness_w );
+DECLARE_READ8_DEVICE_HANDLER  ( vt_video_lba7_r );
+DECLARE_WRITE8_DEVICE_HANDLER ( vt_video_dc012_w );
+DECLARE_WRITE8_DEVICE_HANDLER ( vt_video_dc011_w );
+DECLARE_WRITE8_DEVICE_HANDLER ( vt_video_brightness_w );
 
 
 /* screen update */

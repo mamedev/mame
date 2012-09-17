@@ -154,7 +154,7 @@ READ8_MEMBER(tvc_hbf_device::io_read)
 	switch((offset>>2) & 0x03)
 	{
 		case 0x00:
-			return wd17xx_r(m_fdc, offset & 3);
+			return wd17xx_r(m_fdc, space, offset & 3);
 		case 0x01:
 			return (wd17xx_drq_r(m_fdc)<<7) | wd17xx_intrq_r(m_fdc);
 		default:
@@ -171,7 +171,7 @@ WRITE8_MEMBER(tvc_hbf_device::io_write)
 	switch((offset>>2) & 0x03)
 	{
 		case 0x00:
-			wd17xx_w(m_fdc, offset & 3, data);
+			wd17xx_w(m_fdc, space, offset & 3, data);
 			break;
 		case 0x01:
 			// bit 0-3   drive select

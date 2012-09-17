@@ -24,14 +24,14 @@ struct pc_lpt_interface
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-READ8_DEVICE_HANDLER( pc_lpt_r );
-WRITE8_DEVICE_HANDLER( pc_lpt_w );
+DECLARE_READ8_DEVICE_HANDLER( pc_lpt_r );
+DECLARE_WRITE8_DEVICE_HANDLER( pc_lpt_w );
 
-READ8_DEVICE_HANDLER( pc_lpt_data_r );
-WRITE8_DEVICE_HANDLER( pc_lpt_data_w );
-READ8_DEVICE_HANDLER( pc_lpt_status_r );
-READ8_DEVICE_HANDLER( pc_lpt_control_r );
-WRITE8_DEVICE_HANDLER( pc_lpt_control_w );
+DECLARE_READ8_DEVICE_HANDLER( pc_lpt_data_r );
+DECLARE_WRITE8_DEVICE_HANDLER( pc_lpt_data_w );
+DECLARE_READ8_DEVICE_HANDLER( pc_lpt_status_r );
+DECLARE_READ8_DEVICE_HANDLER( pc_lpt_control_r );
+DECLARE_WRITE8_DEVICE_HANDLER( pc_lpt_control_w );
 
 
 /***************************************************************************

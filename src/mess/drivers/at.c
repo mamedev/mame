@@ -165,10 +165,10 @@ ADDRESS_MAP_END
 READ32_MEMBER( at_state::ct486_chipset_r )
 {
 	if (ACCESSING_BITS_0_7)
-		return pic8259_r(m_pic8259_master, 0);
+		return pic8259_r(m_pic8259_master, space, 0);
 
 	if (ACCESSING_BITS_8_15)
-		return pic8259_r(m_pic8259_master, 1) << 8;
+		return pic8259_r(m_pic8259_master, space, 1) << 8;
 
 	if (ACCESSING_BITS_24_31)
 		return m_cs4031->data_r(space, 0, 0) << 24;
@@ -179,10 +179,10 @@ READ32_MEMBER( at_state::ct486_chipset_r )
 WRITE32_MEMBER( at_state::ct486_chipset_w )
 {
 	if (ACCESSING_BITS_0_7)
-		pic8259_w(m_pic8259_master, 0, data);
+		pic8259_w(m_pic8259_master, space, 0, data);
 
 	if (ACCESSING_BITS_8_15)
-		pic8259_w(m_pic8259_master, 1, data >> 8);
+		pic8259_w(m_pic8259_master, space, 1, data >> 8);
 
 	if (ACCESSING_BITS_16_23)
 		m_cs4031->address_w(space, 0, data >> 16, 0);

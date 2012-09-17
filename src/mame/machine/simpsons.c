@@ -53,7 +53,7 @@ READ8_MEMBER(simpsons_state::simpsons_sound_interrupt_r)
 
 READ8_DEVICE_HANDLER( simpsons_sound_r )
 {
-	return k053260_r(device, 2 + offset);
+	return k053260_r(device, space, 2 + offset);
 }
 
 

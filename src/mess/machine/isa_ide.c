@@ -11,23 +11,23 @@
 
 static READ16_DEVICE_HANDLER( ide16_r )
 {
-	return ide_controller16_r(device, 0x1f0/2 + offset, mem_mask);
+	return ide_controller16_r(device, space, 0x1f0/2 + offset, mem_mask);
 }
 
 static WRITE16_DEVICE_HANDLER( ide16_w )
 {
-	ide_controller16_w(device, 0x1f0/2 + offset, data, mem_mask);
+	ide_controller16_w(device, space, 0x1f0/2 + offset, data, mem_mask);
 }
 
 
 static READ16_DEVICE_HANDLER( ide16_alt_r )
 {
-	return ide_controller16_r(device, 0x3f6/2 + offset, 0x00ff);
+	return ide_controller16_r(device, space, 0x3f6/2 + offset, 0x00ff);
 }
 
 static WRITE16_DEVICE_HANDLER( ide16_alt_w )
 {
-	ide_controller16_w(device, 0x3f6/2 + offset, data, 0x00ff);
+	ide_controller16_w(device, space, 0x3f6/2 + offset, data, 0x00ff);
 }
 
 static void ide_interrupt(device_t *device, int state)

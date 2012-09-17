@@ -347,13 +347,13 @@ static TIMER_CALLBACK( x68k_led_callback )
 static WRITE16_HANDLER( x68k_dmac_w )
 {
 	device_t* device = space->machine().device("hd63450");
-	hd63450_w(device, offset, data, mem_mask);
+	hd63450_w(device, *space, offset, data, mem_mask);
 }
 
 static READ16_HANDLER( x68k_dmac_r )
 {
 	device_t* device = space->machine().device("hd63450");
-	return hd63450_r(device, offset, mem_mask);
+	return hd63450_r(device, *space, offset, mem_mask);
 }
 
 static void x68k_keyboard_ctrl_w(x68k_state *state, int data)
@@ -974,7 +974,7 @@ static WRITE16_HANDLER( x68k_fdc_w )
 	{
 	case 0x00:
 	case 0x01:
-		upd765_data_w(fdc, 0,data);
+		upd765_data_w(fdc, *space, 0,data);
 		break;
 	case 0x02:  // drive option signal control
 		x = data & 0x0f;
@@ -1054,9 +1054,9 @@ static READ16_HANDLER( x68k_fdc_r )
 	switch(offset)
 	{
 	case 0x00:
-		return upd765_status_r(fdc, 0);
+		return upd765_status_r(fdc, *space, 0);
 	case 0x01:
-		return upd765_data_r(fdc, 0);
+		return upd765_data_r(fdc, *space, 0);
 	case 0x02:
 		ret = 0x00;
 		for(x=0;x<4;x++)
@@ -1103,7 +1103,7 @@ static int x68k_fdc_read_byte(running_machine &machine,int addr)
 	device_t *fdc = machine.device("upd72065");
 
 	if(state->m_fdc.drq_state != 0)
-		data = upd765_dack_r(fdc, 0);
+		data = upd765_dack_r(fdc, state->generic_space(), 0);
 //  logerror("FDC: DACK reading\n");
 	return data;
 }
@@ -1111,7 +1111,7 @@ static int x68k_fdc_read_byte(running_machine &machine,int addr)
 static void x68k_fdc_write_byte(running_machine &machine,int addr, int data)
 {
 	device_t *fdc = machine.device("upd72065");
-	upd765_dack_w(fdc, 0, data);
+	upd765_dack_w(fdc, machine.driver_data()->generic_space(), 0, data);
 }
 
 static WRITE_LINE_DEVICE_HANDLER ( fdc_drq )
@@ -1126,7 +1126,7 @@ static WRITE16_HANDLER( x68k_fm_w )
 	{
 	case 0x00:
 	case 0x01:
-		ym2151_w(space->machine().device("ym2151"), offset, data);
+		ym2151_w(space->machine().device("ym2151"), *space, offset, data);
 		break;
 	}
 }
@@ -1134,7 +1134,7 @@ static WRITE16_HANDLER( x68k_fm_w )
 static READ16_HANDLER( x68k_fm_r )
 {
 	if(offset == 0x01)
-		return ym2151_r(space->machine().device("ym2151"), 1);
+		return ym2151_r(space->machine().device("ym2151"), *space, 1);
 
 	return 0xffff;
 }
@@ -1873,10 +1873,10 @@ static WRITE8_DEVICE_HANDLER( x68030_adpcm_w )
 	switch(offset)
 	{
 		case 0x00:
-			okim6258_ctrl_w(device,0,data);
+			okim6258_ctrl_w(device,space,0,data);
 			break;
 		case 0x01:
-			okim6258_data_w(device,0,data);
+			okim6258_data_w(device,space,0,data);
 			break;
 	}
 }

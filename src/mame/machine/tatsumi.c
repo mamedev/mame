@@ -337,12 +337,11 @@ WRITE16_MEMBER(tatsumi_state::tatsumi_v30_68000_w)
 // self-test in Tatsumi games.  Needs fixed, but hack it here for now.
 READ8_DEVICE_HANDLER(tatsumi_hack_ym2151_r)
 {
-	address_space *space = device->machine().device("audiocpu")->memory().space(AS_PROGRAM);
-	int r=ym2151_status_port_r(device,0);
+	int r=ym2151_status_port_r(device,space,0);
 
-	if (space->device().safe_pc()==0x2aca || space->device().safe_pc()==0x29fe
-		|| space->device().safe_pc()==0xf9721
-		|| space->device().safe_pc()==0x1b96 || space->device().safe_pc()==0x1c65) // BigFight
+	if (space.device().safe_pc()==0x2aca || space.device().safe_pc()==0x29fe
+		|| space.device().safe_pc()==0xf9721
+		|| space.device().safe_pc()==0x1b96 || space.device().safe_pc()==0x1c65) // BigFight
 		return 0x80;
 	return r;
 }
@@ -351,17 +350,16 @@ READ8_DEVICE_HANDLER(tatsumi_hack_ym2151_r)
 // Mame really should emulate the OKI status reads even with Mame sound off.
 READ8_DEVICE_HANDLER(tatsumi_hack_oki_r)
 {
-	address_space *space = device->machine().device("audiocpu")->memory().space(AS_PROGRAM);
-	int r=downcast<okim6295_device *>(device)->read(*space,0);
+	int r=downcast<okim6295_device *>(device)->read(space,0);
 
-	if (space->device().safe_pc()==0x2b70 || space->device().safe_pc()==0x2bb5
-		|| space->device().safe_pc()==0x2acc
-		|| space->device().safe_pc()==0x1c79 // BigFight
-		|| space->device().safe_pc()==0x1cbe // BigFight
-		|| space->device().safe_pc()==0xf9881)
+	if (space.device().safe_pc()==0x2b70 || space.device().safe_pc()==0x2bb5
+		|| space.device().safe_pc()==0x2acc
+		|| space.device().safe_pc()==0x1c79 // BigFight
+		|| space.device().safe_pc()==0x1cbe // BigFight
+		|| space.device().safe_pc()==0xf9881)
 		return 0xf;
-	if (space->device().safe_pc()==0x2ba3 || space->device().safe_pc()==0x2a9b || space->device().safe_pc()==0x2adc
-		|| space->device().safe_pc()==0x1cac) // BigFight
+	if (space.device().safe_pc()==0x2ba3 || space.device().safe_pc()==0x2a9b || space.device().safe_pc()==0x2adc
+		|| space.device().safe_pc()==0x1cac) // BigFight
 		return 0;
 	return r;
 }

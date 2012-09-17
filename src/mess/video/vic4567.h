@@ -164,9 +164,9 @@ extern const device_type VIC3;
 
 /*----------- defined in video/vic4567.c -----------*/
 
-WRITE8_DEVICE_HANDLER( vic3_port_w );
-WRITE8_DEVICE_HANDLER( vic3_palette_w );
-READ8_DEVICE_HANDLER( vic3_port_r );
+DECLARE_WRITE8_DEVICE_HANDLER( vic3_port_w );
+DECLARE_WRITE8_DEVICE_HANDLER( vic3_palette_w );
+DECLARE_READ8_DEVICE_HANDLER( vic3_port_r );
 
 void vic3_raster_interrupt_gen( device_t *device );
 UINT32 vic3_video_update( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect );

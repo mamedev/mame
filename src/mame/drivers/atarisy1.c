@@ -402,14 +402,14 @@ READ8_MEMBER(atarisy1_state::switch_6502_r)
 WRITE8_MEMBER(atarisy1_state::via_pa_w)
 {
 	device_t *device = machine().device("tms");
-	tms5220_data_w(device, 0, data);
+	tms5220_data_w(device, space, 0, data);
 }
 
 
 READ8_MEMBER(atarisy1_state::via_pa_r)
 {
 	device_t *device = machine().device("tms");
-	return tms5220_status_r(device, 0);
+	return tms5220_status_r(device, space, 0);
 }
 
 

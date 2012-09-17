@@ -175,10 +175,10 @@ READ8_MEMBER(r2dtank_state::AY8910_port_r)
 	UINT8 ret = 0;
 
 	if (m_AY8910_selected & 0x08)
-		ret = ay8910_r(machine().device("ay1"), 0);
+		ret = ay8910_r(machine().device("ay1"), space, 0);
 
 	if (m_AY8910_selected & 0x10)
-		ret = ay8910_r(machine().device("ay2"), 0);
+		ret = ay8910_r(machine().device("ay2"), space, 0);
 
 	return ret;
 }
@@ -187,10 +187,10 @@ READ8_MEMBER(r2dtank_state::AY8910_port_r)
 WRITE8_MEMBER(r2dtank_state::AY8910_port_w)
 {
 	if (m_AY8910_selected & 0x08)
-		ay8910_data_address_w(machine().device("ay1"), m_AY8910_selected >> 2, data);
+		ay8910_data_address_w(machine().device("ay1"), space, m_AY8910_selected >> 2, data);
 
 	if (m_AY8910_selected & 0x10)
-		ay8910_data_address_w(machine().device("ay2"), m_AY8910_selected >> 2, data);
+		ay8910_data_address_w(machine().device("ay2"), space, m_AY8910_selected >> 2, data);
 }
 
 
@@ -252,7 +252,7 @@ static const ttl74123_interface ttl74123_intf =
 	1,					/* A pin - driven by the CRTC */
 	1,					/* B pin - pulled high */
 	1,					/* Clear pin - pulled high */
-	ttl74123_output_changed
+	DEVCB_HANDLER(ttl74123_output_changed)
 };
 
 
@@ -387,7 +387,8 @@ static MC6845_UPDATE_ROW( update_row )
 
 WRITE_LINE_MEMBER(r2dtank_state::display_enable_changed)
 {
-	ttl74123_a_w(machine().device("74123"), 0, state);
+	address_space &space = generic_space();
+	ttl74123_a_w(machine().device("74123"), space, 0, state);
 }
 
 

@@ -204,9 +204,9 @@ READ8_DEVICE_HANDLER( pc_lpt_r )
 {
 	switch (offset)
 	{
-	case 0: return pc_lpt_data_r(device, 0);
-	case 1: return pc_lpt_status_r(device, 0);
-	case 2: return pc_lpt_control_r(device, 0);
+	case 0: return pc_lpt_data_r(device, space, 0);
+	case 1: return pc_lpt_status_r(device, space, 0);
+	case 2: return pc_lpt_control_r(device, space, 0);
 	}
 
 	/* if we reach this its an error */
@@ -220,9 +220,9 @@ WRITE8_DEVICE_HANDLER( pc_lpt_w )
 {
 	switch (offset)
 	{
-	case 0: pc_lpt_data_w(device, 0, data); break;
+	case 0: pc_lpt_data_w(device, space, 0, data); break;
 	case 1: break;
-	case 2:	pc_lpt_control_w(device, 0, data); break;
+	case 2:	pc_lpt_control_w(device, space, 0, data); break;
 	}
 }
 

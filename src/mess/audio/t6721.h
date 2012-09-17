@@ -39,8 +39,8 @@ extern const device_type T6721;
 
 /*----------- defined in audio/t6721.c -----------*/
 
-WRITE8_DEVICE_HANDLER(t6721_speech_w);
-READ8_DEVICE_HANDLER(t6721_speech_r);
+DECLARE_WRITE8_DEVICE_HANDLER(t6721_speech_w);
+DECLARE_READ8_DEVICE_HANDLER(t6721_speech_r);
 
 
 #endif /* __TED7360_H__ */

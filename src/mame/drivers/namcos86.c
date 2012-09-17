@@ -306,7 +306,7 @@ WRITE8_MEMBER(namcos86_state::cus115_w)
 		case 1:
 		case 2:
 		case 3:
-			namco_63701x_w(machine().device("namco2"), (offset & 0x1e00) >> 9,data);
+			namco_63701x_w(machine().device("namco2"), space, (offset & 0x1e00) >> 9,data);
 			break;
 
 		case 4:

@@ -207,7 +207,7 @@ WRITE8_MEMBER(exterm_state::ym2151_data_latch_w)
 {
 	device_t *device = machine().device("ymsnd");
 	/* bit 7 of the sound control selects which port */
-	ym2151_w(device, m_sound_control >> 7, data);
+	ym2151_w(device, space, m_sound_control >> 7, data);
 }
 
 

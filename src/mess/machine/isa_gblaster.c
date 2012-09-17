@@ -34,8 +34,8 @@ static WRITE8_DEVICE_HANDLER( saa1099_16_w )
 {
 	switch(offset)
 	{
-		case 0 : saa1099_control_w( device, offset, data ); break;
-		case 1 : saa1099_data_w( device, offset, data ); break;
+		case 0 : saa1099_control_w( device, space, offset, data ); break;
+		case 1 : saa1099_data_w( device, space, offset, data ); break;
 	}
 }
 

@@ -1993,10 +1993,10 @@ READ8_DEVICE_HANDLER( wd17xx_r )
 
 	switch (offset & 0x03)
 	{
-	case 0: data = wd17xx_status_r(device, 0); break;
-	case 1:	data = wd17xx_track_r(device, 0); break;
-	case 2:	data = wd17xx_sector_r(device, 0); break;
-	case 3:	data = wd17xx_data_r(device, 0); break;
+	case 0: data = wd17xx_status_r(device, device->machine().driver_data()->generic_space(), 0); break;
+	case 1:	data = wd17xx_track_r(device, device->machine().driver_data()->generic_space(), 0); break;
+	case 2:	data = wd17xx_sector_r(device, device->machine().driver_data()->generic_space(), 0); break;
+	case 3:	data = wd17xx_data_r(device, device->machine().driver_data()->generic_space(), 0); break;
 	}
 
 	return data;
@@ -2006,10 +2006,10 @@ WRITE8_DEVICE_HANDLER( wd17xx_w )
 {
 	switch (offset & 0x03)
 	{
-	case 0: wd17xx_command_w(device, 0, data); break;
-	case 1:	wd17xx_track_w(device, 0, data);   break;
-	case 2: wd17xx_sector_w(device, 0, data);  break;
-	case 3: wd17xx_data_w(device, 0, data);    break;
+	case 0: wd17xx_command_w(device, device->machine().driver_data()->generic_space(), 0, data); break;
+	case 1:	wd17xx_track_w(device, device->machine().driver_data()->generic_space(), 0, data);   break;
+	case 2: wd17xx_sector_w(device, device->machine().driver_data()->generic_space(), 0, data);  break;
+	case 3: wd17xx_data_w(device, device->machine().driver_data()->generic_space(), 0, data);    break;
 	}
 }
 

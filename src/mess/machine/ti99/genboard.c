@@ -338,7 +338,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 			// clock
 			// tests on the real machine showed that
 			// upper nibble is 0xf (probably because of the location at 0xf130?)
-			value = mm58274c_r(m_clock, offset & 0x000f) | 0xf0;
+			value = mm58274c_r(m_clock, space, offset & 0x000f) | 0xf0;
 			do_wait(1);
 			if (VERBOSE>7) LOG("genboard: Read clock %04x -> %02x\n", offset, value);
 			return value;
@@ -372,7 +372,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 			// Obscure, needs more investigation. We might as well ignore this,
 			// as the high nibble is obviously undefined and takes some past
 			// value floating around.
-			value = mm58274c_r(m_clock, offset & 0x000f);
+			value = mm58274c_r(m_clock, space, offset & 0x000f);
 			value |= ((offset & 0x000f)==0x000f)? 0x20 : 0x10;
 
 			do_wait(1);
@@ -609,7 +609,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		{
 			// clock
 			// ++++ ++++ ++++ ----
-			mm58274c_w(m_clock, offset & 0x00f, data);
+			mm58274c_w(m_clock, space, offset & 0x00f, data);
 			do_wait(1);
 			if (VERBOSE>7) LOG("genboard: Write clock %04x <- %02x\n", offset, data);
 			return;
@@ -630,7 +630,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		if ((offset & 0xfff0)==0x8010)
 		{
 			// clock
-			mm58274c_w(m_clock, offset & 0x00f, data);
+			mm58274c_w(m_clock, space, offset & 0x00f, data);
 			do_wait(1);
 			if (VERBOSE>7) LOG("genboard: Write clock %04x <- %02x\n", offset, data);
 			return;

@@ -65,37 +65,37 @@ private:
 
 /* 16-bit accessors */
 
-WRITE16_DEVICE_HANDLER( deco_bac06_pf_control_0_w );
-READ16_DEVICE_HANDLER( deco_bac06_pf_control_1_r );
-WRITE16_DEVICE_HANDLER( deco_bac06_pf_control_1_w );
+DECLARE_WRITE16_DEVICE_HANDLER( deco_bac06_pf_control_0_w );
+DECLARE_READ16_DEVICE_HANDLER( deco_bac06_pf_control_1_r );
+DECLARE_WRITE16_DEVICE_HANDLER( deco_bac06_pf_control_1_w );
 
-WRITE16_DEVICE_HANDLER( deco_bac06_pf_data_w );
-READ16_DEVICE_HANDLER( deco_bac06_pf_data_r );
-WRITE16_DEVICE_HANDLER( deco_bac06_pf_rowscroll_w );
-READ16_DEVICE_HANDLER( deco_bac06_pf_rowscroll_r );
-WRITE16_DEVICE_HANDLER( deco_bac06_pf_colscroll_w );
-READ16_DEVICE_HANDLER( deco_bac06_pf_colscroll_r );
+DECLARE_WRITE16_DEVICE_HANDLER( deco_bac06_pf_data_w );
+DECLARE_READ16_DEVICE_HANDLER( deco_bac06_pf_data_r );
+DECLARE_WRITE16_DEVICE_HANDLER( deco_bac06_pf_rowscroll_w );
+DECLARE_READ16_DEVICE_HANDLER( deco_bac06_pf_rowscroll_r );
+DECLARE_WRITE16_DEVICE_HANDLER( deco_bac06_pf_colscroll_w );
+DECLARE_READ16_DEVICE_HANDLER( deco_bac06_pf_colscroll_r );
 
 /* 8-bit accessors */
 
 /* for dec8.c, pcktgal.c */
-READ8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_r );
-WRITE8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_w );
+DECLARE_READ8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_r );
+DECLARE_WRITE8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_w );
 
-WRITE8_DEVICE_HANDLER( deco_bac06_pf_control0_8bit_w );
-READ8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_r );
-WRITE8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_w );
+DECLARE_WRITE8_DEVICE_HANDLER( deco_bac06_pf_control0_8bit_w );
+DECLARE_READ8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_r );
+DECLARE_WRITE8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_w );
 
-READ8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_r );
-WRITE8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_w );
+DECLARE_READ8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_r );
+DECLARE_WRITE8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_w );
 
 /* for hippodrm (dec0.c) and actfancr / triothep (H6280 based games)*/
-WRITE8_DEVICE_HANDLER( deco_bac06_pf_control0_8bit_packed_w );
-WRITE8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_swap_w );
-READ8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_swap_r );
-WRITE8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_swap_w );
-READ8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_swap_r );
-WRITE8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_swap_w );
+DECLARE_WRITE8_DEVICE_HANDLER( deco_bac06_pf_control0_8bit_packed_w );
+DECLARE_WRITE8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_swap_w );
+DECLARE_READ8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_swap_r );
+DECLARE_WRITE8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_swap_w );
+DECLARE_READ8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_swap_r );
+DECLARE_WRITE8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_swap_w );
 
 extern const device_type DECO_BAC06;
 

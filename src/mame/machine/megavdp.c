@@ -854,7 +854,7 @@ WRITE16_MEMBER( sega_genesis_vdp_device::megadriv_vdp_w )
 		case 0x12:
 		case 0x14:
 		case 0x16:
-			if (ACCESSING_BITS_0_7) sn76496_w(space.machine().device(":snsnd"), 0, data & 0xff);
+			if (ACCESSING_BITS_0_7) sn76496_w(space.machine().device(":snsnd"), space, 0, data & 0xff);
 			//if (ACCESSING_BITS_8_15) sn76496_w(space->machine().device("snsnd"), 0, (data >>8) & 0xff);
 			break;
 

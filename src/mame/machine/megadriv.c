@@ -110,7 +110,7 @@ READ8_DEVICE_HANDLER( megadriv_68k_YM2612_read)
 	//mame_printf_debug("megadriv_68k_YM2612_read %02x %04x\n",offset,mem_mask);
 	if ( (genz80.z80_has_bus==0) && (genz80.z80_is_reset==0) )
 	{
-		return ym2612_r(device, offset);
+		return ym2612_r(device, space, offset);
 	}
 	else
 	{
@@ -127,7 +127,7 @@ WRITE8_DEVICE_HANDLER( megadriv_68k_YM2612_write)
 	//mame_printf_debug("megadriv_68k_YM2612_write %02x %04x %04x\n",offset,data,mem_mask);
 	if ( (genz80.z80_has_bus==0) && (genz80.z80_is_reset==0) )
 	{
-		ym2612_w(device, offset, data);
+		ym2612_w(device, space, offset, data);
 	}
 	else
 	{
@@ -820,7 +820,7 @@ static WRITE8_HANDLER( megadriv_z80_vdp_write )
 		case 0x13:
 		case 0x15:
 		case 0x17:
-			sn76496_w(space->machine().device("snsnd"), 0, data);
+			sn76496_w(space->machine().device("snsnd"), *space, 0, data);
 			break;
 
 		default:

@@ -1014,7 +1014,7 @@ WRITE32_MEMBER(model2_state::model2_serial_w)
 {
 	if (ACCESSING_BITS_0_7 && (offset == 0))
 	{
-		scsp_midi_in(machine().device("scsp"), 0, data&0xff, 0);
+		scsp_midi_in(machine().device("scsp"), space, 0, data&0xff, 0);
 
 		// give the 68k time to notice
 		space.device().execute().spin_until_time(attotime::from_usec(40));

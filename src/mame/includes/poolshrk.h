@@ -36,10 +36,10 @@ public:
 
 /*----------- defined in audio/poolshrk.c -----------*/
 
-WRITE8_DEVICE_HANDLER( poolshrk_scratch_sound_w );
-WRITE8_DEVICE_HANDLER( poolshrk_score_sound_w );
-WRITE8_DEVICE_HANDLER( poolshrk_click_sound_w );
-WRITE8_DEVICE_HANDLER( poolshrk_bump_sound_w );
+DECLARE_WRITE8_DEVICE_HANDLER( poolshrk_scratch_sound_w );
+DECLARE_WRITE8_DEVICE_HANDLER( poolshrk_score_sound_w );
+DECLARE_WRITE8_DEVICE_HANDLER( poolshrk_click_sound_w );
+DECLARE_WRITE8_DEVICE_HANDLER( poolshrk_bump_sound_w );
 
 DISCRETE_SOUND_EXTERN( poolshrk );
 

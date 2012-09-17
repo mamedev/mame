@@ -311,7 +311,7 @@ WRITE8_MEMBER(mhavoc_state::mhavocrv_speech_data_w)
 WRITE8_MEMBER(mhavoc_state::mhavocrv_speech_strobe_w)
 {
 	device_t *tms = machine().device("tms");
-	tms5220_data_w(tms, 0, m_speech_write_buffer);
+	tms5220_data_w(tms, space, 0, m_speech_write_buffer);
 }
 
 /*************************************

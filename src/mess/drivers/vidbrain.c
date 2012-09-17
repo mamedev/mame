@@ -141,7 +141,7 @@ WRITE8_MEMBER( vidbrain_state::sound_w )
 
 	if (!m_sound_clk && sound_clk)
 	{
-		//discrete_sound_w(m_discrete, NODE_01, m_keylatch & 0x03);
+		//discrete_sound_w(m_discrete, space, NODE_01, m_keylatch & 0x03);
 
 		UINT8 dac_data = 0;
 

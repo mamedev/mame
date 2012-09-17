@@ -460,6 +460,7 @@ a bg layer given priority over some sprites.
 SCREEN_UPDATE_IND16( slapshot )
 {
 	slapshot_state *state = screen.machine().driver_data<slapshot_state>();
+	address_space &space = screen.machine().driver_data()->generic_space();
 	UINT8 layer[5];
 	UINT8 tilepri[5];
 	UINT8 spritepri[4];
@@ -509,18 +510,18 @@ SCREEN_UPDATE_IND16( slapshot )
 	layer[3] = (priority & 0x000f) >>  0;	/* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	tilepri[0] = tc0360pri_r(state->m_tc0360pri, 4) & 0x0f;     /* bg0 */
-	tilepri[1] = tc0360pri_r(state->m_tc0360pri, 4) >> 4;       /* bg1 */
-	tilepri[2] = tc0360pri_r(state->m_tc0360pri, 5) & 0x0f;     /* bg2 */
-	tilepri[3] = tc0360pri_r(state->m_tc0360pri, 5) >> 4;       /* bg3 */
+	tilepri[0] = tc0360pri_r(state->m_tc0360pri, space, 4) & 0x0f;     /* bg0 */
+	tilepri[1] = tc0360pri_r(state->m_tc0360pri, space, 4) >> 4;       /* bg1 */
+	tilepri[2] = tc0360pri_r(state->m_tc0360pri, space, 5) & 0x0f;     /* bg2 */
+	tilepri[3] = tc0360pri_r(state->m_tc0360pri, space, 5) >> 4;       /* bg3 */
 
 /* we actually assume text layer is on top of everything anyway, but FWIW... */
-	tilepri[layer[4]] = tc0360pri_r(state->m_tc0360pri, 7) & 0x0f;    /* fg (text layer) */
+	tilepri[layer[4]] = tc0360pri_r(state->m_tc0360pri, space, 7) & 0x0f;    /* fg (text layer) */
 
-	spritepri[0] = tc0360pri_r(state->m_tc0360pri, 6) & 0x0f;
-	spritepri[1] = tc0360pri_r(state->m_tc0360pri, 6) >> 4;
-	spritepri[2] = tc0360pri_r(state->m_tc0360pri, 7) & 0x0f;
-	spritepri[3] = tc0360pri_r(state->m_tc0360pri, 7) >> 4;
+	spritepri[0] = tc0360pri_r(state->m_tc0360pri, space, 6) & 0x0f;
+	spritepri[1] = tc0360pri_r(state->m_tc0360pri, space, 6) >> 4;
+	spritepri[2] = tc0360pri_r(state->m_tc0360pri, space, 7) & 0x0f;
+	spritepri[3] = tc0360pri_r(state->m_tc0360pri, space, 7) >> 4;
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);

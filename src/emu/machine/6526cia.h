@@ -268,12 +268,12 @@ extern const device_type MOS5710;
 ***************************************************************************/
 
 /* register access */
-READ8_DEVICE_HANDLER( mos6526_r );
-WRITE8_DEVICE_HANDLER( mos6526_w );
+DECLARE_READ8_DEVICE_HANDLER( mos6526_r );
+DECLARE_WRITE8_DEVICE_HANDLER( mos6526_w );
 
 /* port access */
-READ8_DEVICE_HANDLER( mos6526_pa_r );
-READ8_DEVICE_HANDLER( mos6526_pb_r );
+DECLARE_READ8_DEVICE_HANDLER( mos6526_pa_r );
+DECLARE_READ8_DEVICE_HANDLER( mos6526_pb_r );
 
 /* interrupt request */
 READ_LINE_DEVICE_HANDLER( mos6526_irq_r );

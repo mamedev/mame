@@ -1484,25 +1484,25 @@ READ32_MEMBER(ksys573_state::ge765pwbba_r)
 	switch (offset)
 	{
 	case 0x26:
-		upd4701_y_add(upd4701, 0, ioport("uPD4701_y")->read_safe(0), 0xffff);
-		upd4701_switches_set(upd4701, 0, ioport("uPD4701_switches")->read_safe(0));
+		upd4701_y_add(upd4701, space, 0, ioport("uPD4701_y")->read_safe(0), 0xffff);
+		upd4701_switches_set(upd4701, space, 0, ioport("uPD4701_switches")->read_safe(0));
 
-		upd4701_cs_w(upd4701, 0, 0);
-		upd4701_xy_w(upd4701, 0, 1);
+		upd4701_cs_w(upd4701, space, 0, 0);
+		upd4701_xy_w(upd4701, space, 0, 1);
 
 		if (ACCESSING_BITS_0_7)
 		{
-			upd4701_ul_w(upd4701, 0, 0);
-			data |= upd4701_d_r(upd4701, 0, 0xffff) << 0;
+			upd4701_ul_w(upd4701, space, 0, 0);
+			data |= upd4701_d_r(upd4701, space, 0, 0xffff) << 0;
 		}
 
 		if (ACCESSING_BITS_16_23)
 		{
-			upd4701_ul_w(upd4701, 0, 1);
-			data |= upd4701_d_r(upd4701, 0, 0xffff) << 16;
+			upd4701_ul_w(upd4701, space, 0, 1);
+			data |= upd4701_d_r(upd4701, space, 0, 0xffff) << 16;
 		}
 
-		upd4701_cs_w(upd4701, 0, 1);
+		upd4701_cs_w(upd4701, space, 0, 1);
 		break;
 
 	default:
@@ -1539,8 +1539,8 @@ WRITE32_MEMBER(ksys573_state::ge765pwbba_w)
 	case 0x28:
 		if (ACCESSING_BITS_0_7)
 		{
-			upd4701_resety_w(upd4701, 0, 1);
-			upd4701_resety_w(upd4701, 0, 0);
+			upd4701_resety_w(upd4701, space, 0, 1);
+			upd4701_resety_w(upd4701, space, 0, 0);
 		}
 		break;
 

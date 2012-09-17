@@ -182,7 +182,7 @@ public:
 };
 
 
-int c64_paddle_read (device_t *device, int which);
+int c64_paddle_read (device_t *device, address_space &space, int which);
 
 
 #endif

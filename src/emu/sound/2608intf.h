@@ -16,17 +16,17 @@ struct ym2608_interface
 	void ( *handler )( device_t *device, int irq );	/* IRQ handler for the YM2608 */
 };
 
-READ8_DEVICE_HANDLER( ym2608_r );
-WRITE8_DEVICE_HANDLER( ym2608_w );
+DECLARE_READ8_DEVICE_HANDLER( ym2608_r );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2608_w );
 
-READ8_DEVICE_HANDLER( ym2608_read_port_r );
-READ8_DEVICE_HANDLER( ym2608_status_port_a_r );
-READ8_DEVICE_HANDLER( ym2608_status_port_b_r );
+DECLARE_READ8_DEVICE_HANDLER( ym2608_read_port_r );
+DECLARE_READ8_DEVICE_HANDLER( ym2608_status_port_a_r );
+DECLARE_READ8_DEVICE_HANDLER( ym2608_status_port_b_r );
 
-WRITE8_DEVICE_HANDLER( ym2608_control_port_a_w );
-WRITE8_DEVICE_HANDLER( ym2608_control_port_b_w );
-WRITE8_DEVICE_HANDLER( ym2608_data_port_a_w );
-WRITE8_DEVICE_HANDLER( ym2608_data_port_b_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2608_control_port_a_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2608_control_port_b_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2608_data_port_a_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2608_data_port_b_w );
 
 class ym2608_device : public device_t,
                                   public device_sound_interface

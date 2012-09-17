@@ -429,12 +429,12 @@ static Z80CTC_INTERFACE( ctc_intf )
 #if 0
 static const z80sio_interface sio_intf =
 {
-	0,					/* interrupt handler */
-	0,					/* DTR changed handler */
-	0,					/* RTS changed handler */
-	0,					/* BREAK changed handler */
-	0,					/* transmit handler */
-	0					/* receive handler */
+	DEVCB_NULL,					/* interrupt handler */
+	DEVCB_NULL,					/* DTR changed handler */
+	DEVCB_NULL,					/* RTS changed handler */
+	DEVCB_NULL,					/* BREAK changed handler */
+	DEVCB_NULL,					/* transmit handler */
+	DEVCB_NULL					/* receive handler */
 };
 #endif
 

@@ -772,9 +772,9 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::speech_control_w )
 			// bit 3 selects which of the two 8913 to enable
 			// bit 4 goes to the 8913 BC1 pin
 			if ((data & 0x08) != 0)
-				ay8910_data_address_w(m_ay1, data >> 4, m_psg_latch);
+				ay8910_data_address_w(m_ay1, space, data >> 4, m_psg_latch);
 			else
-				ay8910_data_address_w(m_ay2, data >> 4, m_psg_latch);
+				ay8910_data_address_w(m_ay2, space, data >> 4, m_psg_latch);
 		}
 	}
 	else
@@ -786,8 +786,8 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::speech_control_w )
 		else
 		{
 			ay8913_device *ay = (data & 0x08) ? m_ay1 : m_ay2;
-			ay8910_address_w(ay, 0, m_psg_latch);
-			ay8910_data_w(ay, 0, m_psg_data_latch);
+			ay8910_address_w(ay, space, 0, m_psg_latch);
+			ay8910_data_w(ay, space, 0, m_psg_data_latch);
 		}
 	}
 
@@ -795,7 +795,7 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::speech_control_w )
 
 	// bit 6 = speech chip DATA PRESENT pin; high then low to make the chip read data
 	if ((previous & 0x40) == 0 && (data & 0x40) != 0)
-		sp0250_w(m_sp0250, 0, m_sp0250_latch);
+		sp0250_w(m_sp0250, space, 0, m_sp0250_latch);
 
 	// bit 7 goes to the speech chip RESET pin
 	if ((previous ^ data) & 0x80)

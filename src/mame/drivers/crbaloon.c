@@ -167,7 +167,7 @@ WRITE8_MEMBER(crbaloon_state::port_sound_w)
 	machine().sound().system_enable((data & 0x02) ? TRUE : FALSE);
 
 	/* D2 - unlabeled - music enable */
-	crbaloon_audio_set_music_enable(discrete, 0, (data & 0x04) ? TRUE : FALSE);
+	crbaloon_audio_set_music_enable(discrete, space, 0, (data & 0x04) ? TRUE : FALSE);
 
 	/* D3 - EXPLOSION */
 	crbaloon_audio_set_explosion_enable(sn, (data & 0x08) ? TRUE : FALSE);
@@ -179,7 +179,7 @@ WRITE8_MEMBER(crbaloon_state::port_sound_w)
 	crbaloon_audio_set_appear_enable(sn, (data & 0x20) ? TRUE : FALSE);
 
 	/* D6 - unlabeled - laugh enable */
-	crbaloon_audio_set_laugh_enable(discrete, 0, (data & 0x40) ? TRUE : FALSE);
+	crbaloon_audio_set_laugh_enable(discrete, space, 0, (data & 0x40) ? TRUE : FALSE);
 
 	/* D7 - unlabeled - goes to PC3259 pin 16 */
 
@@ -339,12 +339,12 @@ GFXDECODE_END
 
 void crbaloon_state::machine_reset()
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_IO);
 	device_t *discrete = machine().device("discrete");
 
 	pc3092_reset();
-	port_sound_w(*space, 0, 0);
-	crbaloon_audio_set_music_freq(discrete, 0, 0);
+	port_sound_w(space, 0, 0);
+	crbaloon_audio_set_music_freq(discrete, space, 0, 0);
 }
 
 

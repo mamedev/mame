@@ -167,7 +167,7 @@ WRITE8_MEMBER(vega_state::extern_w)
 		case 1: /* 04-07 */
 		{
 			/* AY 3-8910 */
-			ay8910_address_w(m_ay8910, 0, offset);
+			ay8910_address_w(m_ay8910, space, 0, offset);
 		}
 		break;
 
@@ -182,7 +182,7 @@ WRITE8_MEMBER(vega_state::extern_w)
 			else
 			{
 				//register w ?
-				ins8154_w(m_ins8154,offset&0x7f,data);
+				ins8154_w(m_ins8154,space,offset&0x7f,data);
 			}
 		}
 		break;
@@ -296,7 +296,7 @@ READ8_MEMBER(vega_state::extern_r)
 		case 1: /* 04-07 */
 		{
 			/* AY 3-8910 */
-			ay8910_data_w(m_ay8910, 0, offset);
+			ay8910_data_w(m_ay8910, space, 0, offset);
 			return 0xff;//mame_rand(space->machine);
 
 		}
@@ -313,7 +313,7 @@ READ8_MEMBER(vega_state::extern_r)
 			else
 			{
 				//register r ?
-				return ins8154_r(m_ins8154,offset&0x7f);
+				return ins8154_r(m_ins8154,space,offset&0x7f);
 			}
 
 		}

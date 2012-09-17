@@ -194,11 +194,11 @@ Z80CTC_INTERFACE( mc8030_asp_z80ctc_intf )
 // SIO CH A in = keyboard; out = beeper; CH B = IFSS (??)
 const z80sio_interface mc8030_asp_z80sio_intf =
 {
-	0,	/* interrupt handler */
-	0,			/* DTR changed handler */
-	0,			/* RTS changed handler */
-	0,			/* BREAK changed handler */
-	0,			/* transmit handler */
-	0			/* receive handler */
+	DEVCB_NULL,	/* interrupt handler */
+	DEVCB_NULL,			/* DTR changed handler */
+	DEVCB_NULL,			/* RTS changed handler */
+	DEVCB_NULL,			/* BREAK changed handler */
+	DEVCB_NULL,			/* transmit handler */
+	DEVCB_NULL			/* receive handler */
 };
 

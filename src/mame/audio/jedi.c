@@ -143,7 +143,7 @@ WRITE8_MEMBER(jedi_state::speech_strobe_w)
 	if ((new_speech_strobe_state != m_speech_strobe_state) && new_speech_strobe_state)
 	{
 		device_t *tms = machine().device("tms");
-		tms5220_data_w(tms, 0, *m_speech_data);
+		tms5220_data_w(tms, space, 0, *m_speech_data);
 	}
 	m_speech_strobe_state = new_speech_strobe_state;
 }

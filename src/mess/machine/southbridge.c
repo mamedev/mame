@@ -467,12 +467,12 @@ WRITE_LINE_MEMBER( southbridge_device::at_mc146818_irq )
 
 READ8_MEMBER( southbridge_device::at_dma8237_2_r )
 {
-	return i8237_r( m_dma8237_2, offset / 2);
+	return i8237_r( m_dma8237_2, space, offset / 2);
 }
 
 WRITE8_MEMBER( southbridge_device::at_dma8237_2_w )
 {
-	i8237_w( m_dma8237_2, offset / 2, data);
+	i8237_w( m_dma8237_2, space, offset / 2, data);
 }
 
 READ8_MEMBER( southbridge_device::at_keybc_r )

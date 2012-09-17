@@ -124,14 +124,14 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 WRITE8_MEMBER(mermaid_state::mermaid_ay8910_write_port_w)
 {
-	if (m_ay8910_enable[0]) ay8910_data_w(m_ay1, offset, data);
-	if (m_ay8910_enable[1]) ay8910_data_w(m_ay2, offset, data);
+	if (m_ay8910_enable[0]) ay8910_data_w(m_ay1, space, offset, data);
+	if (m_ay8910_enable[1]) ay8910_data_w(m_ay2, space, offset, data);
 }
 
 WRITE8_MEMBER(mermaid_state::mermaid_ay8910_control_port_w)
 {
-	if (m_ay8910_enable[0]) ay8910_address_w(m_ay1, offset, data);
-	if (m_ay8910_enable[1]) ay8910_address_w(m_ay2, offset, data);
+	if (m_ay8910_enable[0]) ay8910_address_w(m_ay1, space, offset, data);
+	if (m_ay8910_enable[1]) ay8910_address_w(m_ay2, space, offset, data);
 }
 
 

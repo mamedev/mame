@@ -105,7 +105,7 @@ public:
 
 /*----------- defined in drivers/mcr.c -----------*/
 
-WRITE8_DEVICE_HANDLER( mcr_ipu_sio_transmit );
+DECLARE_WRITE16_DEVICE_HANDLER( mcr_ipu_sio_transmit );
 
 
 /*----------- defined in machine/mcr.c -----------*/

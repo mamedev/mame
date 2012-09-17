@@ -113,16 +113,16 @@ int voodoo_get_type(device_t *device);
 int voodoo_is_stalled(device_t *device);
 void voodoo_set_init_enable(device_t *device, UINT32 newval);
 
-READ32_DEVICE_HANDLER( voodoo_r );
-WRITE32_DEVICE_HANDLER( voodoo_w );
+DECLARE_READ32_DEVICE_HANDLER( voodoo_r );
+DECLARE_WRITE32_DEVICE_HANDLER( voodoo_w );
 
-READ32_DEVICE_HANDLER( banshee_r );
-WRITE32_DEVICE_HANDLER( banshee_w );
-READ32_DEVICE_HANDLER( banshee_fb_r );
-WRITE32_DEVICE_HANDLER( banshee_fb_w );
-READ32_DEVICE_HANDLER( banshee_io_r );
-WRITE32_DEVICE_HANDLER( banshee_io_w );
-READ32_DEVICE_HANDLER( banshee_rom_r );
+DECLARE_READ32_DEVICE_HANDLER( banshee_r );
+DECLARE_WRITE32_DEVICE_HANDLER( banshee_w );
+DECLARE_READ32_DEVICE_HANDLER( banshee_fb_r );
+DECLARE_WRITE32_DEVICE_HANDLER( banshee_fb_w );
+DECLARE_READ32_DEVICE_HANDLER( banshee_io_r );
+DECLARE_WRITE32_DEVICE_HANDLER( banshee_io_w );
+DECLARE_READ32_DEVICE_HANDLER( banshee_rom_r );
 
 
 /* ----- device interface ----- */

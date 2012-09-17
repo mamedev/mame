@@ -229,7 +229,7 @@ WRITE8_MEMBER( ngp_state::ngp_io_w )
 	case 0x21:		/* t6w28 "left" */
 		if ( m_io_reg[0x38] == 0x55 && m_io_reg[0x39] == 0xAA )
 		{
-			t6w28_w( m_t6w28, 0, data );
+			t6w28_w( m_t6w28, space, 0, data );
 		}
 		break;
 

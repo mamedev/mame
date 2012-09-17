@@ -36,7 +36,7 @@ READ8_MEMBER(surpratk_state::bankedram_r)
 			return m_generic_paletteram_8[offset];
 	}
 	else if (m_videobank & 0x01)
-		return k053245_r(m_k053244, offset);
+		return k053245_r(m_k053244, space, offset);
 	else
 		return m_ram[offset];
 }
@@ -52,7 +52,7 @@ WRITE8_MEMBER(surpratk_state::bankedram_w)
 			paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space,offset,data);
 	}
 	else if (m_videobank & 0x01)
-		k053245_w(m_k053244, offset, data);
+		k053245_w(m_k053244, space, offset, data);
 	else
 		m_ram[offset] = data;
 }

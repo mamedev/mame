@@ -86,7 +86,7 @@ READ8Z_MEMBER(myarc_hfdc_device::readz)
 
 				if ((offset & 0x1fe1)==CLK_ADDR)
 				{
-					*value = mm58274c_r(m_clock, (offset & 0x001e) >> 1);
+					*value = mm58274c_r(m_clock, space, (offset & 0x001e) >> 1);
 					if (VERBOSE>7) LOG("hfdc: read from clock address %04x: %02x\n", offset & 0xffff, *value);
 					return;
 				}
@@ -140,7 +140,7 @@ WRITE8_MEMBER( myarc_hfdc_device::write )
 		if ((offset & 0x1fe1)==CLK_ADDR)
 		{
 			if (VERBOSE>7) LOG("hfdc: write to clock address %04x: %02x\n", offset & 0xffff, data);
-			mm58274c_w(m_clock, (offset & 0x001e) >> 1, data);
+			mm58274c_w(m_clock, space, (offset & 0x001e) >> 1, data);
 			return;
 		}
 

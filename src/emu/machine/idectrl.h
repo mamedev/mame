@@ -172,15 +172,15 @@ void ide_bus_w(device_t *config, int select, int offset, int data);
 UINT32 ide_controller_r(device_t *config, int reg, int size);
 void ide_controller_w(device_t *config, int reg, int size, UINT32 data);
 
-READ32_DEVICE_HANDLER( ide_controller32_r );
-WRITE32_DEVICE_HANDLER( ide_controller32_w );
-READ32_DEVICE_HANDLER( ide_controller32_pcmcia_r );
-WRITE32_DEVICE_HANDLER( ide_controller32_pcmcia_w );
-READ32_DEVICE_HANDLER( ide_bus_master32_r );
-WRITE32_DEVICE_HANDLER( ide_bus_master32_w );
+DECLARE_READ32_DEVICE_HANDLER( ide_controller32_r );
+DECLARE_WRITE32_DEVICE_HANDLER( ide_controller32_w );
+DECLARE_READ32_DEVICE_HANDLER( ide_controller32_pcmcia_r );
+DECLARE_WRITE32_DEVICE_HANDLER( ide_controller32_pcmcia_w );
+DECLARE_READ32_DEVICE_HANDLER( ide_bus_master32_r );
+DECLARE_WRITE32_DEVICE_HANDLER( ide_bus_master32_w );
 
-READ16_DEVICE_HANDLER( ide_controller16_r );
-WRITE16_DEVICE_HANDLER( ide_controller16_w );
+DECLARE_READ16_DEVICE_HANDLER( ide_controller16_r );
+DECLARE_WRITE16_DEVICE_HANDLER( ide_controller16_w );
 
 
 /* ----- device interface ----- */

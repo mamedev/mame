@@ -821,7 +821,12 @@ GFXDECODE_END
 
 
 static const y8950_interface y8950_config = {
-	0 /* TODO */
+	/* TODO */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_CONFIG_START( cybertnk, cybertnk_state )

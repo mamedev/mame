@@ -157,7 +157,7 @@ WRITE8_MEMBER(uapce_state::jamma_if_control_latch_w)
       752 Hz (D-3) square wave to be output on the common audio path.
       (1= Tone output ON, 0= Tone output OFF) */
 
-	discrete_sound_w(machine().device("discrete"), UAPCE_SOUND_EN, BIT(data,3));
+	discrete_sound_w(machine().device("discrete"), space, UAPCE_SOUND_EN, BIT(data,3));
 
 /* D2 : Not latched, though software writes to this bit like it is. */
 

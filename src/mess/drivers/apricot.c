@@ -120,20 +120,20 @@ static const struct pit8253_config apricot_pit8253_intf =
 	}
 };
 
-static void apricot_sio_irq_w(device_t *device, int st)
+static WRITE_LINE_DEVICE_HANDLER( apricot_sio_irq_w )
 {
-	apricot_state *state = device->machine().driver_data<apricot_state>();
-	pic8259_ir5_w(state->m_pic, st);
+	apricot_state *astate = device->machine().driver_data<apricot_state>();
+	pic8259_ir5_w(astate->m_pic, state);
 }
 
 static const z80sio_interface apricot_z80sio_intf =
 {
-	apricot_sio_irq_w,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_LINE(apricot_sio_irq_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

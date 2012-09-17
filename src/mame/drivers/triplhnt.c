@@ -32,11 +32,11 @@ void triplhnt_set_collision(running_machine &machine, int code)
 }
 
 
-static void triplhnt_update_misc(running_machine &machine, int offset)
+static void triplhnt_update_misc(address_space &space, int offset)
 {
-	triplhnt_state *state = machine.driver_data<triplhnt_state>();
-	samples_device *samples = machine.device<samples_device>("samples");
-	device_t *discrete = machine.device("discrete");
+	triplhnt_state *state = space.machine().driver_data<triplhnt_state>();
+	samples_device *samples = space.machine().device<samples_device>("samples");
+	device_t *discrete = space.machine().device("discrete");
 	UINT8 is_witch_hunt;
 	UINT8 bit = offset >> 1;
 
@@ -66,16 +66,16 @@ static void triplhnt_update_misc(running_machine &machine, int offset)
 	state->m_sprite_zoom = (state->m_misc_flags >> 4) & 1;
 	state->m_sprite_bank = (state->m_misc_flags >> 7) & 1;
 
-	set_led_status(machine, 0, state->m_misc_flags & 0x02);
+	set_led_status(space.machine(), 0, state->m_misc_flags & 0x02);
 
-	coin_lockout_w(machine, 0, !(state->m_misc_flags & 0x08));
-	coin_lockout_w(machine, 1, !(state->m_misc_flags & 0x08));
+	coin_lockout_w(space.machine(), 0, !(state->m_misc_flags & 0x08));
+	coin_lockout_w(space.machine(), 1, !(state->m_misc_flags & 0x08));
 
-	discrete_sound_w(discrete, TRIPLHNT_SCREECH_EN, state->m_misc_flags & 0x04);	// screech
-	discrete_sound_w(discrete, TRIPLHNT_LAMP_EN, state->m_misc_flags & 0x02);	// Lamp is used to reset noise
-	discrete_sound_w(discrete, TRIPLHNT_BEAR_EN, state->m_misc_flags & 0x80);	// bear
+	discrete_sound_w(discrete, space, TRIPLHNT_SCREECH_EN, state->m_misc_flags & 0x04);	// screech
+	discrete_sound_w(discrete, space, TRIPLHNT_LAMP_EN, state->m_misc_flags & 0x02);	// Lamp is used to reset noise
+	discrete_sound_w(discrete, space, TRIPLHNT_BEAR_EN, state->m_misc_flags & 0x80);	// bear
 
-	is_witch_hunt = machine.root_device().ioport("0C09")->read() == 0x40;
+	is_witch_hunt = space.machine().root_device().ioport("0C09")->read() == 0x40;
 	bit = ~state->m_misc_flags & 0x40;
 
 	/* if we're not playing the sample yet, start it */
@@ -92,7 +92,7 @@ static void triplhnt_update_misc(running_machine &machine, int offset)
 
 WRITE8_MEMBER(triplhnt_state::triplhnt_misc_w)
 {
-	triplhnt_update_misc(machine(), offset);
+	triplhnt_update_misc(space, offset);
 }
 
 
@@ -113,7 +113,7 @@ READ8_MEMBER(triplhnt_state::triplhnt_input_port_4_r)
 
 READ8_MEMBER(triplhnt_state::triplhnt_misc_r)
 {
-	triplhnt_update_misc(machine(), offset);
+	triplhnt_update_misc(space, offset);
 	return ioport("VBLANK")->read() | m_hit_code;
 }
 

@@ -97,8 +97,8 @@ public:
 
 /* private area */
 
-extern READ8_DEVICE_HANDLER(c64_m6510_port_read);
-extern WRITE8_DEVICE_HANDLER(c64_m6510_port_write);
+extern DECLARE_READ8_DEVICE_HANDLER(c64_m6510_port_read);
+extern DECLARE_WRITE8_DEVICE_HANDLER(c64_m6510_port_write);
 
 READ8_HANDLER ( c64_colorram_read );
 WRITE8_HANDLER ( c64_colorram_write );
@@ -116,7 +116,7 @@ WRITE8_HANDLER(c64_ioarea_w);
 
 WRITE8_HANDLER ( c64_write_io );
 READ8_HANDLER ( c64_read_io );
-int c64_paddle_read (device_t *device, int which);
+int c64_paddle_read (device_t *device, address_space &space, int which);
 
 extern const mos6526_interface c64_ntsc_cia0, c64_pal_cia0;
 extern const mos6526_interface c64_ntsc_cia1, c64_pal_cia1;

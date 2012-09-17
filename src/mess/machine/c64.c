@@ -80,14 +80,14 @@ static void c64_nmi( running_machine &machine )
 
 static READ8_DEVICE_HANDLER( c64_cia0_port_a_r )
 {
-	UINT8 cia0portb = mos6526_pb_r(device->machine().device("cia_0"), 0);
+	UINT8 cia0portb = mos6526_pb_r(device->machine().device("cia_0"), space, 0);
 
 	return cbm_common_cia0_port_a_r(device, cia0portb);
 }
 
 static READ8_DEVICE_HANDLER( c64_cia0_port_b_r )
 {
-	UINT8 cia0porta = mos6526_pa_r(device->machine().device("cia_0"), 0);
+	UINT8 cia0porta = mos6526_pa_r(device->machine().device("cia_0"), space, 0);
 
 	return cbm_common_cia0_port_b_r(device, cia0porta);
 }
@@ -256,17 +256,17 @@ WRITE8_HANDLER( c64_write_io )
 
 	state->m_io_mirror[offset] = data;
 	if (offset < 0x400)
-		vic2_port_w(vic2, offset & 0x3ff, data);
+		vic2_port_w(vic2, *space, offset & 0x3ff, data);
 	else if (offset < 0x800)
 		sid->write(*space, offset & 0x3ff, data);
 	else if (offset < 0xc00)
 		state->m_colorram[offset & 0x3ff] = data | 0xf0;
 	else if (offset < 0xd00)
-		mos6526_w(cia_0, offset, data);
+		mos6526_w(cia_0, *space, offset, data);
 	else if (offset < 0xe00)
 	{
 		if (state->m_cia1_on)
-			mos6526_w(cia_1, offset, data);
+			mos6526_w(cia_1, *space, offset, data);
 		else
 			DBG_LOG(space->machine(), 1, "io write", ("%.3x %.2x\n", offset, data));
 	}
@@ -294,7 +294,7 @@ READ8_HANDLER( c64_read_io )
 	device_t *vic2 = space->machine().device("vic2");
 
 	if (offset < 0x400)
-		return vic2_port_r(vic2, offset & 0x3ff);
+		return vic2_port_r(vic2, *space, offset & 0x3ff);
 
 	else if (offset < 0x800)
 		return sid->read(*space, offset & 0x3ff);
@@ -309,11 +309,11 @@ READ8_HANDLER( c64_read_io )
 			else
 				cia_set_port_mask_value(cia_0, 0, state->ioport("CTRLSEL")->read() & 0x80 ? c64_keyline[8] : c64_keyline[9] );
 
-			return mos6526_r(cia_0, offset);
+			return mos6526_r(cia_0, *space, offset);
 		}
 
 	else if (state->m_cia1_on && (offset < 0xe00))
-		return mos6526_r(cia_1, offset);
+		return mos6526_r(cia_1, *space, offset);
 
 	DBG_LOG(space->machine(), 1, "io read", ("%.3x\n", offset));
 
@@ -611,11 +611,11 @@ READ8_DEVICE_HANDLER(c64_m6510_port_read)
 }
 
 
-int c64_paddle_read( device_t *device, int which )
+int c64_paddle_read( device_t *device, address_space &space, int which )
 {
 	running_machine &machine = device->machine();
 	int pot1 = 0xff, pot2 = 0xff, pot3 = 0xff, pot4 = 0xff, temp;
-	UINT8 cia0porta = mos6526_pa_r(machine.device("cia_0"), 0);
+	UINT8 cia0porta = mos6526_pa_r(machine.device("cia_0"), space, 0);
 	int controller1 = machine.root_device().ioport("CTRLSEL")->read() & 0x07;
 	int controller2 = machine.root_device().ioport("CTRLSEL")->read() & 0x70;
 	/* Notice that only a single input is defined for Mouse & Lightpen in both ports */

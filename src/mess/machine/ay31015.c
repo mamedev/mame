@@ -112,6 +112,10 @@ struct ay31015_t
 	UINT16 tx_pulses;	// total pulses left
 	double tx_clock;
 	emu_timer *tx_timer;
+
+	devcb_resolved_read8	read_si;				/* SI - pin 20 - This will be called whenever the SI pin is sampled. Optional */
+	devcb_resolved_write8	write_so;				/* SO - pin 25 - This will be called whenever data is put on the SO pin. Optional */
+	devcb_resolved_write8	status_changed;			/* This will be called whenever one of the status pins may have changed. Optional */
 };
 
 
@@ -148,8 +152,8 @@ INLINE UINT8 ay31015_get_si( device_t *device )
 {
 	ay31015_t	*ay31015 = get_safe_token( device );
 
-	if ( ay31015->config->read_si )
-		ay31015->pins[AY31015_SI] = (ay31015->config->read_si)( device, 0 ) ? 1 : 0;
+	if ( !ay31015->read_si.isnull() )
+		ay31015->pins[AY31015_SI] = ay31015->read_si( 0 ) ? 1 : 0;
 
 	return ay31015->pins[AY31015_SI];
 }
@@ -161,8 +165,8 @@ INLINE void ay31015_set_so( device_t *device, int data )
 
 	ay31015->pins[AY31015_SO] = data ? 1 : 0;
 
-	if ( ay31015->config->write_so )
-		(ay31015->config->write_so)( device, 0, ay31015->pins[AY31015_SO] );
+	if ( !ay31015->write_so.isnull() )
+		ay31015->write_so( 0, ay31015->pins[AY31015_SO] );
 }
 
 
@@ -197,9 +201,9 @@ static void ay31015_update_status_pins( device_t *device )
 	}
 	status_pins_changed += ay31015_update_status_pin( ay31015, STATUS_EOC, AY31015_EOC );
 
-	if ( status_pins_changed && ay31015->config->status_changed )
+	if ( status_pins_changed && !ay31015->status_changed.isnull() )
 	{
-		(ay31015->config->status_changed)( device, 0, status_pins_changed );
+		ay31015->status_changed( 0, status_pins_changed );
 	}
 }
 
@@ -692,6 +696,10 @@ static DEVICE_START(ay31015)
 	ay31015_t	*ay31015 = get_safe_token(device);
 
 	ay31015->config = (const ay31015_config*)device->static_config();
+
+	ay31015->read_si.resolve(ay31015->config->read_si_cb, *device);
+	ay31015->write_so.resolve(ay31015->config->write_so_cb, *device);
+	ay31015->status_changed.resolve(ay31015->config->status_changed_cb, *device);
 
 	ay31015->tx_clock = ay31015->config->transmitter_clock;
 	ay31015->rx_clock = ay31015->config->receiver_clock;

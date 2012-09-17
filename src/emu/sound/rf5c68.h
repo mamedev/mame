@@ -10,11 +10,11 @@
 #include "devlegcy.h"
 
 /******************************************/
-READ8_DEVICE_HANDLER( rf5c68_r );
-WRITE8_DEVICE_HANDLER( rf5c68_w );
+DECLARE_READ8_DEVICE_HANDLER( rf5c68_r );
+DECLARE_WRITE8_DEVICE_HANDLER( rf5c68_w );
 
-READ8_DEVICE_HANDLER( rf5c68_mem_r );
-WRITE8_DEVICE_HANDLER( rf5c68_mem_w );
+DECLARE_READ8_DEVICE_HANDLER( rf5c68_mem_r );
+DECLARE_WRITE8_DEVICE_HANDLER( rf5c68_mem_w );
 
 struct rf5c68_interface
 {

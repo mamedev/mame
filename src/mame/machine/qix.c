@@ -22,17 +22,17 @@
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( qixmcu_coin_r );
-static WRITE8_DEVICE_HANDLER( qixmcu_coinctrl_w );
-static WRITE8_DEVICE_HANDLER( qixmcu_coin_w );
+static DECLARE_READ8_DEVICE_HANDLER( qixmcu_coin_r );
+static DECLARE_WRITE8_DEVICE_HANDLER( qixmcu_coinctrl_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( qixmcu_coin_w );
 
-static WRITE8_DEVICE_HANDLER( qix_coinctl_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( qix_coinctl_w );
 
-static WRITE8_DEVICE_HANDLER( slither_76489_0_w );
-static WRITE8_DEVICE_HANDLER( slither_76489_1_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( slither_76489_0_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( slither_76489_1_w );
 
-static READ8_DEVICE_HANDLER( slither_trak_lr_r );
-static READ8_DEVICE_HANDLER( slither_trak_ud_r );
+static DECLARE_READ8_DEVICE_HANDLER( slither_trak_lr_r );
+static DECLARE_READ8_DEVICE_HANDLER( slither_trak_ud_r );
 
 
 

@@ -417,7 +417,7 @@ WRITE8_MEMBER( v1050_keyboard_device::kb_p2_w )
 	output_set_led_value(0, BIT(data, 5));
 
 	// speaker output
-	discrete_sound_w(m_discrete, NODE_01, BIT(data, 6));
+	discrete_sound_w(m_discrete, space, NODE_01, BIT(data, 6));
 
 	// serial output
 	m_so = BIT(data, 7);

@@ -110,8 +110,8 @@ static const char *const hdc_command_names[] =
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL  /* 0xF8-0xFF */
 };
 
-static READ8_DEVICE_HANDLER(pc_HDC_r);
-static WRITE8_DEVICE_HANDLER(pc_HDC_w);
+static DECLARE_READ8_DEVICE_HANDLER(pc_HDC_r);
+static DECLARE_WRITE8_DEVICE_HANDLER(pc_HDC_w);
 
 static MACHINE_CONFIG_FRAGMENT( hdc_config )
 	MCFG_HARDDISK_ADD("primary")

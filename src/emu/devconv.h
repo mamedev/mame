@@ -85,23 +85,23 @@
  *
  *************************************/
 
-INLINE UINT16 read16be_with_read8_device_handler(read8_device_func handler, device_t *device, offs_t offset, UINT16 mem_mask)
+INLINE UINT16 read16be_with_read8_device_handler(read8_device_func handler, device_t *device, address_space &space, offs_t offset, UINT16 mem_mask)
 {
 	UINT16 result = 0;
 	if (ACCESSING_BITS_8_15)
-		result |= ((UINT16)(*handler)(device, offset * 2 + 0)) << 8;
+		result |= ((UINT16)(*handler)(device, space, offset * 2 + 0, mem_mask >> 8)) << 8;
 	if (ACCESSING_BITS_0_7)
-		result |= ((UINT16)(*handler)(device, offset * 2 + 1)) << 0;
+		result |= ((UINT16)(*handler)(device, space, offset * 2 + 1, mem_mask >> 0)) << 0;
 	return result;
 }
 
 
-INLINE void write16be_with_write8_device_handler(write8_device_func handler, device_t *device, offs_t offset, UINT16 data, UINT16 mem_mask)
+INLINE void write16be_with_write8_device_handler(write8_device_func handler, device_t *device, address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
-		(*handler)(device, offset * 2 + 0, data >> 8);
+		(*handler)(device, space, offset * 2 + 0, data >> 8, mem_mask >> 8);
 	if (ACCESSING_BITS_0_7)
-		(*handler)(device, offset * 2 + 1, data >> 0);
+		(*handler)(device, space, offset * 2 + 1, data >> 0, mem_mask >> 0);
 }
 
 
@@ -111,23 +111,23 @@ INLINE void write16be_with_write8_device_handler(write8_device_func handler, dev
  *
  *************************************/
 
-INLINE UINT16 read16le_with_read8_device_handler(read8_device_func handler, device_t *device, offs_t offset, UINT16 mem_mask)
+INLINE UINT16 read16le_with_read8_device_handler(read8_device_func handler, device_t *device, address_space &space, offs_t offset, UINT16 mem_mask)
 {
 	UINT16 result = 0;
 	if (ACCESSING_BITS_0_7)
-		result |= ((UINT16) (*handler)(device, offset * 2 + 0)) << 0;
+		result |= ((UINT16) (*handler)(device, space, offset * 2 + 0, mem_mask >> 0)) << 0;
 	if (ACCESSING_BITS_8_15)
-		result |= ((UINT16) (*handler)(device, offset * 2 + 1)) << 8;
+		result |= ((UINT16) (*handler)(device, space, offset * 2 + 1, mem_mask >> 8)) << 8;
 	return result;
 }
 
 
-INLINE void write16le_with_write8_device_handler(write8_device_func handler, device_t *device, offs_t offset, UINT16 data, UINT16 mem_mask)
+INLINE void write16le_with_write8_device_handler(write8_device_func handler, device_t *device, address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-		(*handler)(device, offset * 2 + 0, data >> 0);
+		(*handler)(device, space, offset * 2 + 0, data >> 0, mem_mask >> 0);
 	if (ACCESSING_BITS_8_15)
-		(*handler)(device, offset * 2 + 1, data >> 8);
+		(*handler)(device, space, offset * 2 + 1, data >> 8, mem_mask >> 8);
 }
 
 
@@ -137,23 +137,23 @@ INLINE void write16le_with_write8_device_handler(write8_device_func handler, dev
  *
  *************************************/
 
-INLINE UINT32 read32be_with_read8_device_handler(read8_device_func handler, device_t *device, offs_t offset, UINT32 mem_mask)
+INLINE UINT32 read32be_with_read8_device_handler(read8_device_func handler, device_t *device, address_space &space, offs_t offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 	if (ACCESSING_BITS_16_31)
-		result |= read16be_with_read8_device_handler(handler, device, offset * 2 + 0, mem_mask >> 16) << 16;
+		result |= read16be_with_read8_device_handler(handler, device, space, offset * 2 + 0, mem_mask >> 16) << 16;
 	if (ACCESSING_BITS_0_15)
-		result |= read16be_with_read8_device_handler(handler, device, offset * 2 + 1, mem_mask) << 0;
+		result |= read16be_with_read8_device_handler(handler, device, space, offset * 2 + 1, mem_mask) << 0;
 	return result;
 }
 
 
-INLINE void write32be_with_write8_device_handler(write8_device_func handler, device_t *device, offs_t offset, UINT32 data, UINT32 mem_mask)
+INLINE void write32be_with_write8_device_handler(write8_device_func handler, device_t *device, address_space &space, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
-		write16be_with_write8_device_handler(handler, device, offset * 2 + 0, data >> 16, mem_mask >> 16);
+		write16be_with_write8_device_handler(handler, device, space, offset * 2 + 0, data >> 16, mem_mask >> 16);
 	if (ACCESSING_BITS_0_15)
-		write16be_with_write8_device_handler(handler, device, offset * 2 + 1, data, mem_mask);
+		write16be_with_write8_device_handler(handler, device, space, offset * 2 + 1, data, mem_mask);
 }
 
 
@@ -163,23 +163,23 @@ INLINE void write32be_with_write8_device_handler(write8_device_func handler, dev
  *
  *************************************/
 
-INLINE UINT32 read32le_with_read8_device_handler(read8_device_func handler, device_t *device, offs_t offset, UINT32 mem_mask)
+INLINE UINT32 read32le_with_read8_device_handler(read8_device_func handler, device_t *device, address_space &space, offs_t offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 	if (ACCESSING_BITS_0_15)
-		result |= read16le_with_read8_device_handler(handler, device, offset * 2 + 0, mem_mask) << 0;
+		result |= read16le_with_read8_device_handler(handler, device, space, offset * 2 + 0, mem_mask) << 0;
 	if (ACCESSING_BITS_16_31)
-		result |= read16le_with_read8_device_handler(handler, device, offset * 2 + 1, mem_mask >> 16) << 16;
+		result |= read16le_with_read8_device_handler(handler, device, space, offset * 2 + 1, mem_mask >> 16) << 16;
 	return result;
 }
 
 
-INLINE void write32le_with_write8_device_handler(write8_device_func handler, device_t *device, offs_t offset, UINT32 data, UINT32 mem_mask)
+INLINE void write32le_with_write8_device_handler(write8_device_func handler, device_t *device, address_space &space, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
-		write16le_with_write8_device_handler(handler, device, offset * 2 + 0, data, mem_mask);
+		write16le_with_write8_device_handler(handler, device, space, offset * 2 + 0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		write16le_with_write8_device_handler(handler, device, offset * 2 + 1, data >> 16, mem_mask >> 16);
+		write16le_with_write8_device_handler(handler, device, space, offset * 2 + 1, data >> 16, mem_mask >> 16);
 }
 
 
@@ -189,23 +189,23 @@ INLINE void write32le_with_write8_device_handler(write8_device_func handler, dev
  *
  *************************************/
 
-INLINE UINT32 read32be_with_16be_device_handler(read16_device_func handler, device_t *device, offs_t offset, UINT32 mem_mask)
+INLINE UINT32 read32be_with_16be_device_handler(read16_device_func handler, device_t *device, address_space &space, offs_t offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 	if (ACCESSING_BITS_16_31)
-		result |= (*handler)(device, offset * 2 + 0, mem_mask >> 16) << 16;
+		result |= (*handler)(device, space, offset * 2 + 0, mem_mask >> 16) << 16;
 	if (ACCESSING_BITS_0_15)
-		result |= (*handler)(device, offset * 2 + 1, mem_mask) << 0;
+		result |= (*handler)(device, space, offset * 2 + 1, mem_mask) << 0;
 	return result;
 }
 
 
-INLINE void write32be_with_16be_device_handler(write16_device_func handler, device_t *device, offs_t offset, UINT32 data, UINT32 mem_mask)
+INLINE void write32be_with_16be_device_handler(write16_device_func handler, device_t *device, address_space &space, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
-		(*handler)(device, offset * 2 + 0, data >> 16, mem_mask >> 16);
+		(*handler)(device, space, offset * 2 + 0, data >> 16, mem_mask >> 16);
 	if (ACCESSING_BITS_0_15)
-		(*handler)(device, offset * 2 + 1, data, mem_mask);
+		(*handler)(device, space, offset * 2 + 1, data, mem_mask);
 }
 
 
@@ -215,23 +215,23 @@ INLINE void write32be_with_16be_device_handler(write16_device_func handler, devi
  *
  *************************************/
 
-INLINE UINT32 read32le_with_16le_device_handler(read16_device_func handler, device_t *device, offs_t offset, UINT32 mem_mask)
+INLINE UINT32 read32le_with_16le_device_handler(read16_device_func handler, device_t *device, address_space &space, offs_t offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 	if (ACCESSING_BITS_0_15)
-		result |= (*handler)(device, offset * 2 + 0, mem_mask) << 0;
+		result |= (*handler)(device, space, offset * 2 + 0, mem_mask) << 0;
 	if (ACCESSING_BITS_16_31)
-		result |= (*handler)(device, offset * 2 + 1, mem_mask >> 16) << 16;
+		result |= (*handler)(device, space, offset * 2 + 1, mem_mask >> 16) << 16;
 	return result;
 }
 
 
-INLINE void write32le_with_16le_device_handler(write16_device_func handler, device_t *device, offs_t offset, UINT32 data, UINT32 mem_mask)
+INLINE void write32le_with_16le_device_handler(write16_device_func handler, device_t *device, address_space &space, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
-		(*handler)(device, offset * 2 + 0, data, mem_mask);
+		(*handler)(device, space, offset * 2 + 0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		(*handler)(device, offset * 2 + 1, data >> 16, mem_mask >> 16);
+		(*handler)(device, space, offset * 2 + 1, data >> 16, mem_mask >> 16);
 }
 
 
@@ -241,20 +241,20 @@ INLINE void write32le_with_16le_device_handler(write16_device_func handler, devi
  *
  *************************************/
 
-INLINE UINT32 read32be_with_16le_device_handler(read16_device_func handler, device_t *device, offs_t offset, UINT32 mem_mask)
+INLINE UINT32 read32be_with_16le_device_handler(read16_device_func handler, device_t *device, address_space &space, offs_t offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 	mem_mask = FLIPENDIAN_INT32(mem_mask);
-	result = read32le_with_16le_device_handler(handler, device, offset, mem_mask);
+	result = read32le_with_16le_device_handler(handler, device, space, offset, mem_mask);
 	return FLIPENDIAN_INT32(result);
 }
 
 
-INLINE void write32be_with_16le_device_handler(write16_device_func handler, device_t *device, offs_t offset, UINT32 data, UINT32 mem_mask)
+INLINE void write32be_with_16le_device_handler(write16_device_func handler, device_t *device, address_space &space, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	data = FLIPENDIAN_INT32(data);
 	mem_mask = FLIPENDIAN_INT32(mem_mask);
-	write32le_with_16le_device_handler(handler, device, offset, data, mem_mask);
+	write32le_with_16le_device_handler(handler, device, space, offset, data, mem_mask);
 }
 
 
@@ -264,20 +264,20 @@ INLINE void write32be_with_16le_device_handler(write16_device_func handler, devi
  *
  *************************************/
 
-INLINE UINT32 read32le_with_16be_device_handler(read16_device_func handler, device_t *device, offs_t offset, UINT32 mem_mask)
+INLINE UINT32 read32le_with_16be_device_handler(read16_device_func handler, device_t *device, address_space &space, offs_t offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 	mem_mask = FLIPENDIAN_INT32(mem_mask);
-	result = read32be_with_16be_device_handler(handler, device, offset, mem_mask);
+	result = read32be_with_16be_device_handler(handler, device, space, offset, mem_mask);
 	return FLIPENDIAN_INT32(result);
 }
 
 
-INLINE void write32le_with_16be_device_handler(write16_device_func handler, device_t *device, offs_t offset, UINT32 data, UINT32 mem_mask)
+INLINE void write32le_with_16be_device_handler(write16_device_func handler, device_t *device, address_space &space, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	data = FLIPENDIAN_INT32(data);
 	mem_mask = FLIPENDIAN_INT32(mem_mask);
-	write32be_with_16be_device_handler(handler, device, offset, data, mem_mask);
+	write32be_with_16be_device_handler(handler, device, space, offset, data, mem_mask);
 }
 
 
@@ -287,23 +287,23 @@ INLINE void write32le_with_16be_device_handler(write16_device_func handler, devi
  *
  *************************************/
 
-INLINE UINT64 read64be_with_read8_device_handler(read8_device_func handler, device_t *device, offs_t offset, UINT64 mem_mask)
+INLINE UINT64 read64be_with_read8_device_handler(read8_device_func handler, device_t *device, address_space &space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if (ACCESSING_BITS_32_63)
-		result |= (UINT64)read32be_with_read8_device_handler(handler, device, offset * 2 + 0, mem_mask >> 32) << 32;
+		result |= (UINT64)read32be_with_read8_device_handler(handler, device, space, offset * 2 + 0, mem_mask >> 32) << 32;
 	if (ACCESSING_BITS_0_31)
-		result |= (UINT64)read32be_with_read8_device_handler(handler, device, offset * 2 + 1, mem_mask) << 0;
+		result |= (UINT64)read32be_with_read8_device_handler(handler, device, space, offset * 2 + 1, mem_mask) << 0;
 	return result;
 }
 
 
-INLINE void write64be_with_write8_device_handler(write8_device_func handler, device_t *device, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64be_with_write8_device_handler(write8_device_func handler, device_t *device, address_space &space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
-		write32be_with_write8_device_handler(handler, device, offset * 2 + 0, data >> 32, mem_mask >> 32);
+		write32be_with_write8_device_handler(handler, device, space, offset * 2 + 0, data >> 32, mem_mask >> 32);
 	if (ACCESSING_BITS_0_31)
-		write32be_with_write8_device_handler(handler, device, offset * 2 + 1, data, mem_mask);
+		write32be_with_write8_device_handler(handler, device, space, offset * 2 + 1, data, mem_mask);
 }
 
 
@@ -313,23 +313,23 @@ INLINE void write64be_with_write8_device_handler(write8_device_func handler, dev
  *
  *************************************/
 
-INLINE UINT64 read64le_with_read8_device_handler(read8_device_func handler, device_t *device, offs_t offset, UINT64 mem_mask)
+INLINE UINT64 read64le_with_read8_device_handler(read8_device_func handler, device_t *device, address_space &space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if (ACCESSING_BITS_0_31)
-		result |= (UINT64)read32le_with_read8_device_handler(handler, device, offset * 2 + 0, mem_mask >> 0) << 0;
+		result |= (UINT64)read32le_with_read8_device_handler(handler, device, space, offset * 2 + 0, mem_mask >> 0) << 0;
 	if (ACCESSING_BITS_32_63)
-		result |= (UINT64)read32le_with_read8_device_handler(handler, device, offset * 2 + 1, mem_mask >> 32) << 32;
+		result |= (UINT64)read32le_with_read8_device_handler(handler, device, space, offset * 2 + 1, mem_mask >> 32) << 32;
 	return result;
 }
 
 
-INLINE void write64le_with_write8_device_handler(write8_device_func handler, device_t *device, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64le_with_write8_device_handler(write8_device_func handler, device_t *device, address_space &space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if (ACCESSING_BITS_0_31)
-		write32le_with_write8_device_handler(handler, device, offset * 2 + 0, data >> 0, mem_mask >> 0);
+		write32le_with_write8_device_handler(handler, device, space, offset * 2 + 0, data >> 0, mem_mask >> 0);
 	if (ACCESSING_BITS_32_63)
-		write32le_with_write8_device_handler(handler, device, offset * 2 + 1, data >> 32, mem_mask >> 32);
+		write32le_with_write8_device_handler(handler, device, space, offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
 
 
@@ -339,23 +339,23 @@ INLINE void write64le_with_write8_device_handler(write8_device_func handler, dev
  *
  *************************************/
 
-INLINE UINT32 read64be_with_16be_device_handler(read16_device_func handler, device_t *device, offs_t offset, UINT64 mem_mask)
+INLINE UINT32 read64be_with_16be_device_handler(read16_device_func handler, device_t *device, address_space &space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if (ACCESSING_BITS_32_63)
-		result |= (UINT64)read32be_with_16be_device_handler(handler, device, offset * 2 + 0, mem_mask >> 32) << 32;
+		result |= (UINT64)read32be_with_16be_device_handler(handler, device, space, offset * 2 + 0, mem_mask >> 32) << 32;
 	if (ACCESSING_BITS_0_31)
-		result |= (UINT64)read32be_with_16be_device_handler(handler, device, offset * 2 + 1, mem_mask >> 0) << 0;
+		result |= (UINT64)read32be_with_16be_device_handler(handler, device, space, offset * 2 + 1, mem_mask >> 0) << 0;
 	return result;
 }
 
 
-INLINE void write64be_with_16be_device_handler(write16_device_func handler, device_t *device, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64be_with_16be_device_handler(write16_device_func handler, device_t *device, address_space &space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
-		write32be_with_16be_device_handler(handler, device, offset * 2 + 0, data >> 32, mem_mask >> 32);
+		write32be_with_16be_device_handler(handler, device, space, offset * 2 + 0, data >> 32, mem_mask >> 32);
 	if (ACCESSING_BITS_0_31)
-		write32be_with_16be_device_handler(handler, device, offset * 2 + 1, data >> 0, mem_mask >> 0);
+		write32be_with_16be_device_handler(handler, device, space, offset * 2 + 1, data >> 0, mem_mask >> 0);
 }
 
 
@@ -365,23 +365,23 @@ INLINE void write64be_with_16be_device_handler(write16_device_func handler, devi
  *
  *************************************/
 
-INLINE UINT32 read64le_with_16le_device_handler(read16_device_func handler, device_t *device, offs_t offset, UINT64 mem_mask)
+INLINE UINT32 read64le_with_16le_device_handler(read16_device_func handler, device_t *device, address_space &space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if (ACCESSING_BITS_0_31)
-		result |= (UINT64)read32le_with_16le_device_handler(handler, device, offset * 2 + 0, mem_mask >> 0) << 0;
+		result |= (UINT64)read32le_with_16le_device_handler(handler, device, space, offset * 2 + 0, mem_mask >> 0) << 0;
 	if (ACCESSING_BITS_32_63)
-		result |= (UINT64)read32le_with_16le_device_handler(handler, device, offset * 2 + 1, mem_mask >> 32) << 32;
+		result |= (UINT64)read32le_with_16le_device_handler(handler, device, space, offset * 2 + 1, mem_mask >> 32) << 32;
 	return result;
 }
 
 
-INLINE void write64le_with_16le_device_handler(write16_device_func handler, device_t *device, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64le_with_16le_device_handler(write16_device_func handler, device_t *device, address_space &space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if (ACCESSING_BITS_0_31)
-		write32le_with_16le_device_handler(handler, device, offset * 2 + 0, data >> 0, mem_mask >> 0);
+		write32le_with_16le_device_handler(handler, device, space, offset * 2 + 0, data >> 0, mem_mask >> 0);
 	if (ACCESSING_BITS_32_63)
-		write32le_with_16le_device_handler(handler, device, offset * 2 + 1, data >> 32, mem_mask >> 32);
+		write32le_with_16le_device_handler(handler, device, space, offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
 
 
@@ -391,23 +391,23 @@ INLINE void write64le_with_16le_device_handler(write16_device_func handler, devi
  *
  *************************************/
 
-INLINE UINT32 read64be_with_16le_device_handler(read16_device_func handler, device_t *device, offs_t offset, UINT64 mem_mask)
+INLINE UINT32 read64be_with_16le_device_handler(read16_device_func handler, device_t *device, address_space &space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if (ACCESSING_BITS_32_63)
-		result |= (UINT64)read32be_with_16le_device_handler(handler, device, offset * 2 + 0, mem_mask >> 32) << 32;
+		result |= (UINT64)read32be_with_16le_device_handler(handler, device, space, offset * 2 + 0, mem_mask >> 32) << 32;
 	if (ACCESSING_BITS_0_31)
-		result |= (UINT64)read32be_with_16le_device_handler(handler, device, offset * 2 + 1, mem_mask >> 0) << 0;
+		result |= (UINT64)read32be_with_16le_device_handler(handler, device, space, offset * 2 + 1, mem_mask >> 0) << 0;
 	return result;
 }
 
 
-INLINE void write64be_with_16le_device_handler(write16_device_func handler, device_t *device, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64be_with_16le_device_handler(write16_device_func handler, device_t *device, address_space &space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
-		write32be_with_16le_device_handler(handler, device, offset * 2 + 0, data >> 32, mem_mask >> 32);
+		write32be_with_16le_device_handler(handler, device, space, offset * 2 + 0, data >> 32, mem_mask >> 32);
 	if (ACCESSING_BITS_0_31)
-		write32be_with_16le_device_handler(handler, device, offset * 2 + 1, data >> 0, mem_mask >> 0);
+		write32be_with_16le_device_handler(handler, device, space, offset * 2 + 1, data >> 0, mem_mask >> 0);
 }
 
 
@@ -417,23 +417,23 @@ INLINE void write64be_with_16le_device_handler(write16_device_func handler, devi
  *
  *************************************/
 
-INLINE UINT32 read64le_with_16be_device_handler(read16_device_func handler, device_t *device, offs_t offset, UINT64 mem_mask)
+INLINE UINT32 read64le_with_16be_device_handler(read16_device_func handler, device_t *device, address_space &space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if (ACCESSING_BITS_0_31)
-		result |= (UINT64)read32le_with_16be_device_handler(handler, device, offset * 2 + 0, mem_mask >> 0) << 0;
+		result |= (UINT64)read32le_with_16be_device_handler(handler, device, space, offset * 2 + 0, mem_mask >> 0) << 0;
 	if (ACCESSING_BITS_32_63)
-		result |= (UINT64)read32le_with_16be_device_handler(handler, device, offset * 2 + 1, mem_mask >> 32) << 32;
+		result |= (UINT64)read32le_with_16be_device_handler(handler, device, space, offset * 2 + 1, mem_mask >> 32) << 32;
 	return result;
 }
 
 
-INLINE void write64le_with_16be_device_handler(write16_device_func handler, device_t *device, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64le_with_16be_device_handler(write16_device_func handler, device_t *device, address_space &space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if (ACCESSING_BITS_0_31)
-		write32le_with_16be_device_handler(handler, device, offset * 2 + 0, data >> 0, mem_mask >> 0);
+		write32le_with_16be_device_handler(handler, device, space, offset * 2 + 0, data >> 0, mem_mask >> 0);
 	if (ACCESSING_BITS_32_63)
-		write32le_with_16be_device_handler(handler, device, offset * 2 + 1, data >> 32, mem_mask >> 32);
+		write32le_with_16be_device_handler(handler, device, space, offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
 
 
@@ -443,23 +443,23 @@ INLINE void write64le_with_16be_device_handler(write16_device_func handler, devi
  *
  *************************************/
 
-INLINE UINT64 read64be_with_32be_device_handler(read32_device_func handler, device_t *device, offs_t offset, UINT64 mem_mask)
+INLINE UINT64 read64be_with_32be_device_handler(read32_device_func handler, device_t *device, address_space &space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if (ACCESSING_BITS_32_63)
-		result |= (UINT64)(*handler)(device, offset * 2 + 0, mem_mask >> 32) << 32;
+		result |= (UINT64)(*handler)(device, space, offset * 2 + 0, mem_mask >> 32) << 32;
 	if (ACCESSING_BITS_0_31)
-		result |= (UINT64)(*handler)(device, offset * 2 + 1, mem_mask >> 0) << 0;
+		result |= (UINT64)(*handler)(device, space, offset * 2 + 1, mem_mask >> 0) << 0;
 	return result;
 }
 
 
-INLINE void write64be_with_32be_device_handler(write32_device_func handler, device_t *device, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64be_with_32be_device_handler(write32_device_func handler, device_t *device, address_space &space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
-		(*handler)(device, offset * 2 + 0, data >> 32, mem_mask >> 32);
+		(*handler)(device, space, offset * 2 + 0, data >> 32, mem_mask >> 32);
 	if (ACCESSING_BITS_0_31)
-		(*handler)(device, offset * 2 + 1, data >>  0, mem_mask >>  0);
+		(*handler)(device, space, offset * 2 + 1, data >>  0, mem_mask >>  0);
 }
 
 
@@ -469,23 +469,23 @@ INLINE void write64be_with_32be_device_handler(write32_device_func handler, devi
  *
  *************************************/
 
-INLINE UINT64 read64le_with_32le_device_handler(read32_device_func handler, device_t *device, offs_t offset, UINT64 mem_mask)
+INLINE UINT64 read64le_with_32le_device_handler(read32_device_func handler, device_t *device, address_space &space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if (ACCESSING_BITS_0_31)
-		result |= (UINT64)(*handler)(device, offset * 2 + 0, mem_mask >> 0) << 0;
+		result |= (UINT64)(*handler)(device, space, offset * 2 + 0, mem_mask >> 0) << 0;
 	if (ACCESSING_BITS_32_63)
-		result |= (UINT64)(*handler)(device, offset * 2 + 1, mem_mask >> 32) << 32;
+		result |= (UINT64)(*handler)(device, space, offset * 2 + 1, mem_mask >> 32) << 32;
 	return result;
 }
 
 
-INLINE void write64le_with_32le_device_handler(write32_device_func handler, device_t *device, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64le_with_32le_device_handler(write32_device_func handler, device_t *device, address_space &space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if (ACCESSING_BITS_0_31)
-		(*handler)(device, offset * 2 + 0, data >> 0, mem_mask >> 0);
+		(*handler)(device, space, offset * 2 + 0, data >> 0, mem_mask >> 0);
 	if (ACCESSING_BITS_32_63)
-		(*handler)(device, offset * 2 + 1, data >> 32, mem_mask >> 32);
+		(*handler)(device, space, offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
 
 
@@ -495,20 +495,20 @@ INLINE void write64le_with_32le_device_handler(write32_device_func handler, devi
  *
  *************************************/
 
-INLINE UINT64 read64be_with_32le_device_handler(read32_device_func handler, device_t *device, offs_t offset, UINT64 mem_mask)
+INLINE UINT64 read64be_with_32le_device_handler(read32_device_func handler, device_t *device, address_space &space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result;
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
-	result = read64le_with_32le_device_handler(handler, device, offset, mem_mask);
+	result = read64le_with_32le_device_handler(handler, device, space, offset, mem_mask);
 	return FLIPENDIAN_INT64(result);
 }
 
 
-INLINE void write64be_with_32le_device_handler(write32_device_func handler, device_t *device, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64be_with_32le_device_handler(write32_device_func handler, device_t *device, address_space &space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	data = FLIPENDIAN_INT64(data);
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
-	write64le_with_32le_device_handler(handler, device, offset, data, mem_mask);
+	write64le_with_32le_device_handler(handler, device, space, offset, data, mem_mask);
 }
 
 
@@ -518,20 +518,20 @@ INLINE void write64be_with_32le_device_handler(write32_device_func handler, devi
  *
  *************************************/
 
-INLINE UINT64 read64le_with_32be_device_handler(read32_device_func handler, device_t *device, offs_t offset, UINT64 mem_mask)
+INLINE UINT64 read64le_with_32be_device_handler(read32_device_func handler, device_t *device, address_space &space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result;
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
-	result = read64be_with_32be_device_handler(handler, device, offset, mem_mask);
+	result = read64be_with_32be_device_handler(handler, device, space, offset, mem_mask);
 	return FLIPENDIAN_INT64(result);
 }
 
 
-INLINE void write64le_with_32be_device_handler(write32_device_func handler, device_t *device, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64le_with_32be_device_handler(write32_device_func handler, device_t *device, address_space &space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	data = FLIPENDIAN_INT64(data);
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
-	write64be_with_32be_device_handler(handler, device, offset, data, mem_mask);
+	write64be_with_32be_device_handler(handler, device, space, offset, data, mem_mask);
 }
 
 
@@ -545,28 +545,28 @@ INLINE void write64le_with_32be_device_handler(write32_device_func handler, devi
 #define DEV_READ_TEMPLATE(bits, name, handler, func)				\
 READ##bits##_DEVICE_HANDLER( name##_r )								\
 {																	\
-	return func(handler, device, offset, mem_mask);					\
+	return func(handler, device, space, offset, mem_mask);			\
 }
 
 #define DEV_READ_TEMPLATE_COND(bits, name, handler, func, cond)		\
 READ##bits##_DEVICE_HANDLER( name##_r )								\
 {																	\
 	if (cond)														\
-		return func(handler, device, offset, mem_mask);				\
+		return func(handler, device, space, offset, mem_mask);		\
 	return 0;														\
 }
 
 #define DEV_WRITE_TEMPLATE(bits, name, handler, func)				\
 WRITE##bits##_DEVICE_HANDLER( name##_w )							\
 {																	\
-	func(handler, device, offset, data, mem_mask);					\
+	func(handler, device, space, offset, data, mem_mask);			\
 }
 
 #define DEV_WRITE_TEMPLATE_COND(bits, name, handler, func, cond)	\
 WRITE##bits##_DEVICE_HANDLER( name##_w )							\
 {																	\
 	if (cond)														\
-		func(handler, device, offset, data, mem_mask);				\
+		func(handler, device, space, offset, data, mem_mask);		\
 }
 
 

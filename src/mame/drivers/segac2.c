@@ -174,7 +174,7 @@ static WRITE16_DEVICE_HANDLER( segac2_upd7759_w )
 	/* only works if we're accessing the low byte */
 	if (ACCESSING_BITS_0_7)
 	{
-		upd7759_port_w(device, 0, data & 0xff);
+		upd7759_port_w(device, space, 0, data & 0xff);
 		upd7759_start_w(device, 0);
 		upd7759_start_w(device, 1);
 	}

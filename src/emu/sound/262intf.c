@@ -124,11 +124,11 @@ WRITE8_DEVICE_HANDLER( ymf262_w )
 	ymf262_write(info->chip, offset & 3, data);
 }
 
-READ8_DEVICE_HANDLER ( ymf262_status_r ) { return ymf262_r(device, 0); }
-WRITE8_DEVICE_HANDLER( ymf262_register_a_w ) { ymf262_w(device, 0, data); }
-WRITE8_DEVICE_HANDLER( ymf262_register_b_w ) { ymf262_w(device, 2, data); }
-WRITE8_DEVICE_HANDLER( ymf262_data_a_w ) { ymf262_w(device, 1, data); }
-WRITE8_DEVICE_HANDLER( ymf262_data_b_w ) { ymf262_w(device, 3, data); }
+READ8_DEVICE_HANDLER ( ymf262_status_r ) { return ymf262_r(device, space, 0); }
+WRITE8_DEVICE_HANDLER( ymf262_register_a_w ) { ymf262_w(device, space, 0, data); }
+WRITE8_DEVICE_HANDLER( ymf262_register_b_w ) { ymf262_w(device, space, 2, data); }
+WRITE8_DEVICE_HANDLER( ymf262_data_a_w ) { ymf262_w(device, space, 1, data); }
+WRITE8_DEVICE_HANDLER( ymf262_data_b_w ) { ymf262_w(device, space, 3, data); }
 
 const device_type YMF262 = &device_creator<ymf262_device>;
 

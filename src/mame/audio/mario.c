@@ -494,7 +494,7 @@ READ8_MEMBER(mario_state::mario_sh_tune_r)
 
 static WRITE8_DEVICE_HANDLER( mario_sh_sound_w )
 {
-	discrete_sound_w(device, DS_DAC, data);
+	discrete_sound_w(device, space, DS_DAC, data);
 }
 
 WRITE8_MEMBER(mario_state::mario_sh_p1_w)
@@ -536,13 +536,13 @@ WRITE8_MEMBER(mario_state::mario_sh_tuneselect_w)
 /* Mario running sample */
 WRITE8_DEVICE_HANDLER( mario_sh1_w )
 {
-	discrete_sound_w(device, DS_SOUND0_INP, 0);
+	discrete_sound_w(device, space, DS_SOUND0_INP, 0);
 }
 
 /* Luigi running sample */
 WRITE8_DEVICE_HANDLER( mario_sh2_w )
 {
-	discrete_sound_w(device, DS_SOUND1_INP, 0);
+	discrete_sound_w(device, space, DS_SOUND1_INP, 0);
 }
 
 /* Misc samples */
@@ -576,7 +576,7 @@ WRITE8_MEMBER(mario_state::mario_sh3_w)
 			I8035_P1_W_AH(space, 3, data & 1);
 			break;
 		case 7: /* skid */
-			discrete_sound_w(machine().device("discrete"), DS_SOUND7_INP, data & 1);
+			discrete_sound_w(machine().device("discrete"), space, DS_SOUND7_INP, data & 1);
 			break;
 	}
 }

@@ -66,10 +66,10 @@ static void set_pens( running_machine &machine )
 
 TILE_GET_INFO_MEMBER(labyrunr_state::get_tile_info0)
 {
-	UINT8 ctrl_3 = k007121_ctrlram_r(m_k007121, 3);
-	UINT8 ctrl_4 = k007121_ctrlram_r(m_k007121, 4);
-	UINT8 ctrl_5 = k007121_ctrlram_r(m_k007121, 5);
-	UINT8 ctrl_6 = k007121_ctrlram_r(m_k007121, 6);
+	UINT8 ctrl_3 = k007121_ctrlram_r(m_k007121, generic_space(), 3);
+	UINT8 ctrl_4 = k007121_ctrlram_r(m_k007121, generic_space(), 4);
+	UINT8 ctrl_5 = k007121_ctrlram_r(m_k007121, generic_space(), 5);
+	UINT8 ctrl_6 = k007121_ctrlram_r(m_k007121, generic_space(), 6);
 	int attr = m_videoram1[tile_index];
 	int code = m_videoram1[tile_index + 0x400];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
@@ -95,10 +95,10 @@ TILE_GET_INFO_MEMBER(labyrunr_state::get_tile_info0)
 
 TILE_GET_INFO_MEMBER(labyrunr_state::get_tile_info1)
 {
-	UINT8 ctrl_3 = k007121_ctrlram_r(m_k007121, 3);
-	UINT8 ctrl_4 = k007121_ctrlram_r(m_k007121, 4);
-	UINT8 ctrl_5 = k007121_ctrlram_r(m_k007121, 5);
-	UINT8 ctrl_6 = k007121_ctrlram_r(m_k007121, 6);
+	UINT8 ctrl_3 = k007121_ctrlram_r(m_k007121, generic_space(), 3);
+	UINT8 ctrl_4 = k007121_ctrlram_r(m_k007121, generic_space(), 4);
+	UINT8 ctrl_5 = k007121_ctrlram_r(m_k007121, generic_space(), 5);
+	UINT8 ctrl_6 = k007121_ctrlram_r(m_k007121, generic_space(), 6);
 	int attr = m_videoram2[tile_index];
 	int code = m_videoram2[tile_index + 0x400];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
@@ -179,7 +179,8 @@ WRITE8_MEMBER(labyrunr_state::labyrunr_vram2_w)
 SCREEN_UPDATE_IND16( labyrunr )
 {
 	labyrunr_state *state = screen.machine().driver_data<labyrunr_state>();
-	UINT8 ctrl_0 = k007121_ctrlram_r(state->m_k007121, 0);
+	address_space &space = screen.machine().driver_data()->generic_space();
+	UINT8 ctrl_0 = k007121_ctrlram_r(state->m_k007121, space, 0);
 	rectangle finalclip0, finalclip1;
 
 	set_pens(screen.machine());
@@ -187,7 +188,7 @@ SCREEN_UPDATE_IND16( labyrunr )
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if (~k007121_ctrlram_r(state->m_k007121, 3) & 0x20)
+	if (~k007121_ctrlram_r(state->m_k007121, space, 3) & 0x20)
 	{
 		int i;
 
@@ -203,14 +204,14 @@ SCREEN_UPDATE_IND16( labyrunr )
 		for(i = 0; i < 32; i++)
 		{
 			/* enable colscroll */
-			if((k007121_ctrlram_r(state->m_k007121, 1) & 6) == 6) // it's probably just one bit, but it's only used once in the game so I don't know which it's
-				state->m_layer0->set_scrolly((i + 2) & 0x1f, k007121_ctrlram_r(state->m_k007121, 2) + state->m_scrollram[i]);
+			if((k007121_ctrlram_r(state->m_k007121, space, 1) & 6) == 6) // it's probably just one bit, but it's only used once in the game so I don't know which it's
+				state->m_layer0->set_scrolly((i + 2) & 0x1f, k007121_ctrlram_r(state->m_k007121, space, 2) + state->m_scrollram[i]);
 			else
-				state->m_layer0->set_scrolly((i + 2) & 0x1f, k007121_ctrlram_r(state->m_k007121, 2));
+				state->m_layer0->set_scrolly((i + 2) & 0x1f, k007121_ctrlram_r(state->m_k007121, space, 2));
 		}
 
 		state->m_layer0->draw(bitmap, finalclip0, TILEMAP_DRAW_OPAQUE, 0);
-		k007121_sprites_draw(state->m_k007121, bitmap, cliprect, screen.machine().gfx[0], screen.machine().colortable, state->m_spriteram,(k007121_ctrlram_r(state->m_k007121, 6) & 0x30) * 2, 40,0,(k007121_ctrlram_r(state->m_k007121, 3) & 0x40) >> 5);
+		k007121_sprites_draw(state->m_k007121, bitmap, cliprect, screen.machine().gfx[0], screen.machine().colortable, state->m_spriteram,(k007121_ctrlram_r(state->m_k007121, space, 6) & 0x30) * 2, 40,0,(k007121_ctrlram_r(state->m_k007121, space, 3) & 0x40) >> 5);
 		/* we ignore the transparency because layer1 is drawn only at the top of the screen also covering sprites */
 		state->m_layer1->draw(bitmap, finalclip1, TILEMAP_DRAW_OPAQUE, 0);
 	}
@@ -223,7 +224,7 @@ SCREEN_UPDATE_IND16( labyrunr )
 		finalclip0.min_y = finalclip1.min_y = cliprect.min_y;
 		finalclip0.max_y = finalclip1.max_y = cliprect.max_y;
 
-		if(k007121_ctrlram_r(state->m_k007121, 1) & 1)
+		if(k007121_ctrlram_r(state->m_k007121, space, 1) & 1)
 		{
 			finalclip0.min_x = cliprect.max_x - ctrl_0 + 8;
 			finalclip0.max_x = cliprect.max_x;
@@ -280,7 +281,7 @@ SCREEN_UPDATE_IND16( labyrunr )
 		if(use_clip3[1])
 			state->m_layer1->draw(bitmap, finalclip3, 0, 1);
 
-		k007121_sprites_draw(state->m_k007121, bitmap, cliprect, screen.machine().gfx[0], screen.machine().colortable, state->m_spriteram, (k007121_ctrlram_r(state->m_k007121, 6) & 0x30) * 2,40,0,(k007121_ctrlram_r(state->m_k007121, 3) & 0x40) >> 5);
+		k007121_sprites_draw(state->m_k007121, bitmap, cliprect, screen.machine().gfx[0], screen.machine().colortable, state->m_spriteram, (k007121_ctrlram_r(state->m_k007121, space, 6) & 0x30) * 2,40,0,(k007121_ctrlram_r(state->m_k007121, space, 3) & 0x40) >> 5);
 	}
 	return 0;
 }

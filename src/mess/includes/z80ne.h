@@ -109,11 +109,11 @@ public:
 
 /*----------- defined in machine/z80ne.c -----------*/
 
-READ8_DEVICE_HANDLER(lx388_mc6847_videoram_r);
-READ8_DEVICE_HANDLER(lx390_fdc_r);
-WRITE8_DEVICE_HANDLER(lx390_fdc_w);
-READ8_DEVICE_HANDLER(lx390_reset_bank);
-WRITE8_DEVICE_HANDLER(lx390_motor_w);
+DECLARE_READ8_DEVICE_HANDLER(lx388_mc6847_videoram_r);
+DECLARE_READ8_DEVICE_HANDLER(lx390_fdc_r);
+DECLARE_WRITE8_DEVICE_HANDLER(lx390_fdc_w);
+DECLARE_READ8_DEVICE_HANDLER(lx390_reset_bank);
+DECLARE_WRITE8_DEVICE_HANDLER(lx390_motor_w);
 
 
 

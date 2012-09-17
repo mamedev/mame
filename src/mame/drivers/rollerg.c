@@ -43,9 +43,9 @@ READ8_MEMBER(rollerg_state::rollerg_k051316_r)
 {
 
 	if (m_readzoomroms)
-		return k051316_rom_r(m_k051316, offset);
+		return k051316_rom_r(m_k051316, space, offset);
 	else
-		return k051316_r(m_k051316, offset);
+		return k051316_r(m_k051316, space, offset);
 }
 
 READ8_MEMBER(rollerg_state::rollerg_sound_r)
@@ -53,7 +53,7 @@ READ8_MEMBER(rollerg_state::rollerg_sound_r)
 	device_t *device = machine().device("k053260");
 	/* If the sound CPU is running, read the status, otherwise
        just make it pass the test */
-	return k053260_r(device, 2 + offset);
+	return k053260_r(device, space, 2 + offset);
 }
 
 WRITE8_MEMBER(rollerg_state::soundirq_w)

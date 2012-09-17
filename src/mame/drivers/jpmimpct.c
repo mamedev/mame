@@ -476,7 +476,7 @@ WRITE16_MEMBER(jpmimpct_state::upd7759_w)
 	device_t *device = machine().device("upd");
 	if (ACCESSING_BITS_0_7)
 	{
-		upd7759_port_w(device, 0, data);
+		upd7759_port_w(device, space, 0, data);
 		upd7759_start_w(device, 0);
 		upd7759_start_w(device, 1);
 	}

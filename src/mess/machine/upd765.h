@@ -113,16 +113,16 @@ struct upd765_interface
 ***************************************************************************/
 
 /* read of data register */
-READ8_DEVICE_HANDLER(upd765_data_r);
+DECLARE_READ8_DEVICE_HANDLER(upd765_data_r);
 /* write to data register */
-WRITE8_DEVICE_HANDLER(upd765_data_w);
+DECLARE_WRITE8_DEVICE_HANDLER(upd765_data_w);
 /* read of main status register */
-READ8_DEVICE_HANDLER(upd765_status_r);
+DECLARE_READ8_DEVICE_HANDLER(upd765_status_r);
 
 /* dma acknowledge with write */
-WRITE8_DEVICE_HANDLER(upd765_dack_w);
+DECLARE_WRITE8_DEVICE_HANDLER(upd765_dack_w);
 /* dma acknowledge with read */
-READ8_DEVICE_HANDLER(upd765_dack_r);
+DECLARE_READ8_DEVICE_HANDLER(upd765_dack_r);
 
 /* reset upd765 */
 void upd765_reset(device_t *device, int);

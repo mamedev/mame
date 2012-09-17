@@ -269,12 +269,12 @@ static Z80PIO_INTERFACE( pio_s_intf )
 
 static const z80sio_interface sio_intf =
 {
-	0, //DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	0,			/* DTR changed handler */
-	0,			/* RTS changed handler */
-	0,			/* BREAK changed handler */
-	0,			/* transmit handler */
-	0			/* receive handler */
+	DEVCB_NULL, //DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
+	DEVCB_NULL,			/* DTR changed handler */
+	DEVCB_NULL,			/* RTS changed handler */
+	DEVCB_NULL,			/* BREAK changed handler */
+	DEVCB_NULL,			/* transmit handler */
+	DEVCB_NULL			/* receive handler */
 };
 
 

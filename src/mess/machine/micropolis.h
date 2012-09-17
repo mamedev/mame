@@ -61,14 +61,14 @@ void micropolis_reset(device_t *device);
 
 void micropolis_set_drive(device_t *device, UINT8); // set current drive (0-3)
 
-READ8_DEVICE_HANDLER( micropolis_status_r );
-READ8_DEVICE_HANDLER( micropolis_data_r );
+DECLARE_READ8_DEVICE_HANDLER( micropolis_status_r );
+DECLARE_READ8_DEVICE_HANDLER( micropolis_data_r );
 
-WRITE8_DEVICE_HANDLER( micropolis_command_w );
-WRITE8_DEVICE_HANDLER( micropolis_data_w );
+DECLARE_WRITE8_DEVICE_HANDLER( micropolis_command_w );
+DECLARE_WRITE8_DEVICE_HANDLER( micropolis_data_w );
 
-READ8_DEVICE_HANDLER( micropolis_r );
-WRITE8_DEVICE_HANDLER( micropolis_w );
+DECLARE_READ8_DEVICE_HANDLER( micropolis_r );
+DECLARE_WRITE8_DEVICE_HANDLER( micropolis_w );
 
 extern const micropolis_interface default_micropolis_interface;
 

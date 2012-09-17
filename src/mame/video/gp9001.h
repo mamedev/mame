@@ -101,13 +101,13 @@ extern const device_type GP9001_VDP;
 
 
 // access to VDP
-READ16_DEVICE_HANDLER( gp9001_vdp_r );
-WRITE16_DEVICE_HANDLER( gp9001_vdp_w );
-READ16_DEVICE_HANDLER( gp9001_vdp_alt_r );
-WRITE16_DEVICE_HANDLER( gp9001_vdp_alt_w );
+DECLARE_READ16_DEVICE_HANDLER( gp9001_vdp_r );
+DECLARE_WRITE16_DEVICE_HANDLER( gp9001_vdp_w );
+DECLARE_READ16_DEVICE_HANDLER( gp9001_vdp_alt_r );
+DECLARE_WRITE16_DEVICE_HANDLER( gp9001_vdp_alt_w );
 // this bootleg has strange access
-READ16_DEVICE_HANDLER ( pipibibi_bootleg_videoram16_r );
-WRITE16_DEVICE_HANDLER( pipibibi_bootleg_videoram16_w  );
-READ16_DEVICE_HANDLER ( pipibibi_bootleg_spriteram16_r );
-WRITE16_DEVICE_HANDLER( pipibibi_bootleg_spriteram16_w );
-WRITE16_DEVICE_HANDLER( pipibibi_bootleg_scroll_w );
+DECLARE_READ16_DEVICE_HANDLER ( pipibibi_bootleg_videoram16_r );
+DECLARE_WRITE16_DEVICE_HANDLER( pipibibi_bootleg_videoram16_w  );
+DECLARE_READ16_DEVICE_HANDLER ( pipibibi_bootleg_spriteram16_r );
+DECLARE_WRITE16_DEVICE_HANDLER( pipibibi_bootleg_spriteram16_w );
+DECLARE_WRITE16_DEVICE_HANDLER( pipibibi_bootleg_scroll_w );

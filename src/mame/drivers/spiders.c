@@ -387,7 +387,7 @@ static const ttl74123_interface ic60_intf =
 	1,					/* A pin - driven by the CRTC */
 	1,					/* B pin - pulled high */
 	1,					/* Clear pin - pulled high */
-	ic60_74123_output_changed
+	DEVCB_HANDLER(ic60_74123_output_changed)
 };
 
 
@@ -500,7 +500,8 @@ static MC6845_UPDATE_ROW( update_row )
 
 WRITE_LINE_MEMBER(spiders_state::display_enable_changed)
 {
-	ttl74123_a_w(machine().device("ic60"), 0, state);
+	address_space &space = generic_space();
+	ttl74123_a_w(machine().device("ic60"), space, 0, state);
 }
 
 

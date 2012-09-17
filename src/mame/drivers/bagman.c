@@ -81,16 +81,16 @@ WRITE8_MEMBER(bagman_state::bagman_ls259_w)
 		case 0:
 		case 1:
 		case 2:
-			tmsprom_bit_w(device, 0, 7 - ((m_ls259_buf[0]<<2) | (m_ls259_buf[1]<<1) | (m_ls259_buf[2]<<0)));
+			tmsprom_bit_w(device, space, 0, 7 - ((m_ls259_buf[0]<<2) | (m_ls259_buf[1]<<1) | (m_ls259_buf[2]<<0)));
 			break;
 		case 3:
 			tmsprom_enable_w(device, m_ls259_buf[offset]);
 			break;
 		case 4:
-			tmsprom_rom_csq_w(device, 0, m_ls259_buf[offset]);
+			tmsprom_rom_csq_w(device, space, 0, m_ls259_buf[offset]);
 			break;
 		case 5:
-			tmsprom_rom_csq_w(device, 1, m_ls259_buf[offset]);
+			tmsprom_rom_csq_w(device, space, 1, m_ls259_buf[offset]);
 			break;
 		}
 	}

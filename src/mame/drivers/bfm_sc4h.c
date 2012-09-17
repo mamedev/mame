@@ -192,10 +192,10 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 							return 0x0000;//space.machine().rand();;
 
 						case 0x1244:
-							return ymz280b_r(m_ymz,0);
+							return ymz280b_r(m_ymz,space,0);
 
 						case 0x1246:
-							return ymz280b_r(m_ymz,1);
+							return ymz280b_r(m_ymz,space,1);
 
 						default:
 							logerror("%08x maincpu read access offset %08x mem_mask %04x cs %d (LAMPS etc.)\n", pc, offset*2, mem_mask, cs);
@@ -215,7 +215,7 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 			if ((offset>=base) && (offset<end))
 			{
 				offset-=base;
-				return duart68681_r(m_duart,offset);
+				return duart68681_r(m_duart,space,offset);
 			}
 			else
 			{
@@ -336,11 +336,11 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 							break;
 
 						case 0x1248:
-							ymz280b_w(m_ymz,0, data & 0xff);
+							ymz280b_w(m_ymz,space,0, data & 0xff);
 							break;
 
 						case 0x124a:
-							ymz280b_w(m_ymz,1, data & 0xff);
+							ymz280b_w(m_ymz,space,1, data & 0xff);
 							break;
 
 						case 0x1330:
@@ -367,7 +367,7 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 			if ((offset>=base) && (offset<end))
 			{
 				offset-=base;
-				duart68681_w(m_duart,offset,data&0x00ff);
+				duart68681_w(m_duart,space,offset,data&0x00ff);
 			}
 			else
 			{

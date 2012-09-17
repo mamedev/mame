@@ -246,11 +246,11 @@ READ32_MEMBER(ip22_state::hpc3_pbus6_r)
 	switch( offset )
 	{
 	case 0x004/4:
-		ret8 = pc_lpt_control_r(lpt, 0) ^ 0x0d;
+		ret8 = pc_lpt_control_r(lpt, space, 0) ^ 0x0d;
 		//verboselog(( machine, 0, "Parallel Control Read: %02x\n", ret8 );
 		return ret8;
 	case 0x008/4:
-		ret8 = pc_lpt_status_r(lpt, 0) ^ 0x80;
+		ret8 = pc_lpt_status_r(lpt, space, 0) ^ 0x80;
 		//verboselog(( machine, 0, "Parallel Status Read: %02x\n", ret8 );
 		return ret8;
 	case 0x030/4:
@@ -290,19 +290,19 @@ READ32_MEMBER(ip22_state::hpc3_pbus6_r)
 //      mame_printf_info("INT3: r @ %x mask %08x (PC=%x)\n", offset*4, mem_mask, activecpu_get_pc());
 		return m_int3_regs[offset-0x80/4];
 	case 0xb0/4:
-		ret8 = pit8253_r(machine().device("pit8254"), 0);
+		ret8 = pit8253_r(machine().device("pit8254"), space, 0);
 		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Counter 0 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	case 0xb4/4:
-		ret8 = pit8253_r(machine().device("pit8254"), 1);
+		ret8 = pit8253_r(machine().device("pit8254"), space, 1);
 		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Counter 1 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	case 0xb8/4:
-		ret8 = pit8253_r(machine().device("pit8254"), 2);
+		ret8 = pit8253_r(machine().device("pit8254"), space, 2);
 		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Counter 2 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	case 0xbc/4:
-		ret8 = pit8253_r(machine().device("pit8254"), 3);
+		ret8 = pit8253_r(machine().device("pit8254"), space, 3);
 		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Control Word Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	default:
@@ -321,7 +321,7 @@ WRITE32_MEMBER(ip22_state::hpc3_pbus6_w)
 	{
 	case 0x004/4:
 		//verboselog(( machine, 0, "Parallel Control Write: %08x\n", data );
-		pc_lpt_control_w(lpt, 0, data ^ 0x0d);
+		pc_lpt_control_w(lpt, space, 0, data ^ 0x0d);
 		//m_nIOC_ParCntl = data;
 		break;
 	case 0x030/4:
@@ -395,19 +395,19 @@ WRITE32_MEMBER(ip22_state::hpc3_pbus6_w)
 		break;
 	case 0xb0/4:
 		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Counter 0 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w(machine().device("pit8254"), 0, data & 0x000000ff);
+		pit8253_w(machine().device("pit8254"), space, 0, data & 0x000000ff);
 		return;
 	case 0xb4/4:
 		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Counter 1 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w(machine().device("pit8254"), 1, data & 0x000000ff);
+		pit8253_w(machine().device("pit8254"), space, 1, data & 0x000000ff);
 		return;
 	case 0xb8/4:
 		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Counter 2 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w(machine().device("pit8254"), 2, data & 0x000000ff);
+		pit8253_w(machine().device("pit8254"), space, 2, data & 0x000000ff);
 		return;
 	case 0xbc/4:
 		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Control Word Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w(machine().device("pit8254"), 3, data & 0x000000ff);
+		pit8253_w(machine().device("pit8254"), space, 3, data & 0x000000ff);
 		return;
 	default:
 		//verboselog(( machine, 0, "Unknown HPC PBUS6 Write: 0x%08x: 0x%08x (%08x)\n", 0x1fbd9800 + ( offset << 2 ), data, mem_mask );

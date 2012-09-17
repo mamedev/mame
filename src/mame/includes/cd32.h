@@ -43,8 +43,8 @@ public:
 
 /*----------- defined in machine/cd32.c -----------*/
 
-READ32_DEVICE_HANDLER( amiga_akiko32_r );
-WRITE32_DEVICE_HANDLER( amiga_akiko32_w );
+DECLARE_READ32_DEVICE_HANDLER( amiga_akiko32_r );
+DECLARE_WRITE32_DEVICE_HANDLER( amiga_akiko32_w );
 
 class akiko_device : public device_t
 {

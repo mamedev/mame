@@ -1688,23 +1688,23 @@ WRITE8_MEMBER(pc8801_state::pc8801_rtc_w)
 READ8_MEMBER(pc8801_state::pc8801_sound_board_r)
 {
 	if(m_has_opna)
-		return ym2608_r(machine().device("opna"), offset);
+		return ym2608_r(machine().device("opna"), space, offset);
 
-	return (offset & 2) ? 0xff : ym2203_r(machine().device("opn"), offset);
+	return (offset & 2) ? 0xff : ym2203_r(machine().device("opn"), space, offset);
 }
 
 WRITE8_MEMBER(pc8801_state::pc8801_sound_board_w)
 {
 	if(m_has_opna)
-		ym2608_w(machine().device("opna"), offset,data);
+		ym2608_w(machine().device("opna"), space, offset,data);
 	else if((offset & 2) == 0)
-		ym2203_w(machine().device("opn"), offset,data);
+		ym2203_w(machine().device("opn"), space, offset,data);
 }
 
 READ8_MEMBER(pc8801_state::pc8801_opna_r)
 {
 	if(m_has_opna && (offset & 2) == 0)
-		return ym2608_r(machine().device("opna"), (offset & 1) | ((offset & 4) >> 1));
+		return ym2608_r(machine().device("opna"), space, (offset & 1) | ((offset & 4) >> 1));
 
 	return 0xff;
 }
@@ -1712,7 +1712,7 @@ READ8_MEMBER(pc8801_state::pc8801_opna_r)
 WRITE8_MEMBER(pc8801_state::pc8801_opna_w)
 {
 	if(m_has_opna && (offset & 2) == 0)
-		ym2608_w(machine().device("opna"), (offset & 1) | ((offset & 4) >> 1),data);
+		ym2608_w(machine().device("opna"), space, (offset & 1) | ((offset & 4) >> 1),data);
 	else if(m_has_opna && offset == 2)
 	{
 		m_sound_irq_mask = ((data & 0x80) == 0);

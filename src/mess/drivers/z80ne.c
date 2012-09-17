@@ -410,9 +410,9 @@ static const ay31015_config z80ne_ay31015_config =
 	AY_3_1015,
 	4800.0,
 	4800.0,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const cassette_interface z80ne_cassettea_config =
@@ -436,7 +436,7 @@ static const cassette_interface z80ne_cassetteb_config =
 static const kr2376_interface lx388_kr2376_interface =
 {
 	50000,
-	NULL
+	DEVCB_NULL
 };
 
 static const floppy_interface z80netf_floppy_interface =

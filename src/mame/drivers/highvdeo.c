@@ -266,7 +266,7 @@ WRITE16_MEMBER(highvdeo_state::tv_oki6376_w)
 	if (ACCESSING_BITS_0_7 && okidata != data)
 	{
 		okidata = data;
-		okim6376_w(device, 0, data & ~0x80);
+		okim6376_w(device, space, 0, data & ~0x80);
 		okim6376_st_w (device, data & 0x80);
 	}
 }
@@ -340,7 +340,7 @@ WRITE16_MEMBER(highvdeo_state::tv_ncf_oki6376_w)
 	static int okidata;
 	if (ACCESSING_BITS_0_7 && okidata != data) {
 		okidata = data;
-		okim6376_w(device, 0, data );
+		okim6376_w(device, space, 0, data );
 	}
 }
 

@@ -102,8 +102,8 @@ struct applefdc_interface
     PROTOTYPES
 ***************************************************************************/
 /* read/write handlers */
-READ8_DEVICE_HANDLER(applefdc_r);
-WRITE8_DEVICE_HANDLER(applefdc_w);
+DECLARE_READ8_DEVICE_HANDLER(applefdc_r);
+DECLARE_WRITE8_DEVICE_HANDLER(applefdc_w);
 
 /* accessor */
 UINT8 applefdc_get_lines(device_t *device);

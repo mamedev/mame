@@ -184,7 +184,7 @@ WRITE8_MEMBER(warpwarp_state::geebee_out6_w)
 			/* n.c. */
 			break;
 		case 3:
-			geebee_sound_w(machine().device("geebee"),0,data);
+			geebee_sound_w(machine().device("geebee"),space,0,data);
 			break;
 	}
 }
@@ -268,7 +268,7 @@ WRITE8_MEMBER(warpwarp_state::warpwarp_out0_w)
 			m_ball_v = data;
 			break;
 		case 2:
-			warpwarp_sound_w(machine().device("warpwarp"),0,data);
+			warpwarp_sound_w(machine().device("warpwarp"),space,0,data);
 			break;
 		case 3:
 			watchdog_reset_w(space,0,data);

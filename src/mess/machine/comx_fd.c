@@ -275,7 +275,7 @@ UINT8 comx_fd_device::comx_io_r(offs_t offset)
 		}
 		else
 		{
-			data = wd17xx_r(m_fdc, m_addr);
+			data = wd17xx_r(m_fdc, machine().driver_data()->generic_space(), m_addr);
 		}
 	}
 
@@ -326,7 +326,7 @@ void comx_fd_device::comx_io_w(offs_t offset, UINT8 data)
 		else
 		{
 			// write data to WD1770
-			wd17xx_w(m_fdc, m_addr, data);
+			wd17xx_w(m_fdc, machine().driver_data()->generic_space(), m_addr, data);
 		}
 	}
 }

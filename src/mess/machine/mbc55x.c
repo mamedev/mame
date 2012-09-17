@@ -118,12 +118,12 @@ const struct pic8259_interface mbc55x_pic8259_config =
 
 READ8_MEMBER(mbc55x_state::mbcpic8259_r)
 {
-	return pic8259_r(m_pic, offset>>1);
+	return pic8259_r(m_pic, space, offset>>1);
 }
 
 WRITE8_MEMBER(mbc55x_state::mbcpic8259_w)
 {
-	pic8259_w(m_pic, offset>>1, data);
+	pic8259_w(m_pic, space, offset>>1, data);
 }
 
 static IRQ_CALLBACK(mbc55x_irq_callback)
@@ -157,12 +157,12 @@ const struct pit8253_config mbc55x_pit8253_config =
 
 READ8_MEMBER(mbc55x_state::mbcpit8253_r)
 {
-	return pit8253_r(m_pit, offset>>1);
+	return pit8253_r(m_pit, space, offset>>1);
 }
 
 WRITE8_MEMBER(mbc55x_state::mbcpit8253_w)
 {
-	pit8253_w(m_pit, offset>>1, data);
+	pit8253_w(m_pit, space, offset>>1, data);
 }
 
 WRITE_LINE_MEMBER( mbc55x_state::pit8253_t2 )
@@ -187,12 +187,12 @@ WRITE8_MEMBER( mbc55x_state::vram_page_w )
 
 READ8_MEMBER(mbc55x_state::mbc55x_disk_r)
 {
-	return wd17xx_r(m_fdc, offset>>1);
+	return wd17xx_r(m_fdc, space, offset>>1);
 }
 
 WRITE8_MEMBER(mbc55x_state::mbc55x_disk_w)
 {
-	wd17xx_w(m_fdc, offset>>1, data);
+	wd17xx_w(m_fdc, space, offset>>1, data);
 }
 
 WRITE_LINE_MEMBER( mbc55x_state::mbc55x_fdc_intrq_w )

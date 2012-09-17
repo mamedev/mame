@@ -59,6 +59,20 @@ struct mc6846_t
 	emu_timer *interval; /* interval programmable timer */
 	emu_timer *one_shot; /* 1-us x factor one-shot timer */
 
+	/* CPU write to the outside through chip */
+	devcb_resolved_write8 out_port;  /* 8-bit output */
+	devcb_resolved_write8 out_cp1;   /* 1-bit output */
+	devcb_resolved_write8 out_cp2;   /* 1-bit output */
+
+	/* CPU read from the outside through chip */
+	devcb_resolved_read8 in_port; /* 8-bit input */
+
+	/* asynchronous timer output to outside world */
+	devcb_resolved_write8 out_cto; /* 1-bit output */
+
+	/* timer interrupt */
+	devcb_resolved_write_line irq;
+
 	int old_cif;
 	int old_cto;
 };
@@ -71,7 +85,7 @@ struct mc6846_t
 
 #define PORT								\
 	((mc6846->pdr & mc6846->ddr) |					\
-	 ((mc6846->iface->in_port_func ? mc6846->iface->in_port_func( device, 0 ) : 0) & \
+	 ((!mc6846->in_port.isnull() ? mc6846->in_port( 0 ) : 0) & \
 	  ~mc6846->ddr))
 
 #define CTO								\
@@ -124,14 +138,14 @@ INLINE void mc6846_update_irq( device_t *device )
 	if ( cif )
 	{
 		mc6846->csr |= 0x80;
-		if ( mc6846->iface->irq_func )
-			mc6846->iface->irq_func( device, 1 );
+		if ( !mc6846->irq.isnull() )
+			mc6846->irq( 1 );
 	}
 	else
 	{
 		mc6846->csr &= ~0x80;
-		if ( mc6846->iface->irq_func )
-			mc6846->iface->irq_func( device, 0 );
+		if ( !mc6846->irq.isnull() )
+			mc6846->irq( 0 );
 	}
 }
 
@@ -146,8 +160,8 @@ INLINE void mc6846_update_cto ( device_t *device )
 		LOG (( "%f: mc6846 CTO set to %i\n", device->machine().time().as_double(), cto ));
 		mc6846->old_cto = cto;
 	}
-	if ( mc6846->iface->out_cto_func )
-		mc6846->iface->out_cto_func( device, 0, cto );
+	if ( !mc6846->out_cto.isnull() )
+		mc6846->out_cto( 0, cto );
 }
 
 
@@ -372,8 +386,8 @@ WRITE8_DEVICE_HANDLER ( mc6846_w )
 		if (data & 0x10)
 		{
 			mc6846->cp2_cpu = (data >> 3) & 1;
-			if ( mc6846->iface->out_cp2_func )
-				mc6846->iface->out_cp2_func( device, 0, mc6846->cp2_cpu );
+			if ( !mc6846->out_cp2.isnull() )
+				mc6846->out_cp2( 0, mc6846->cp2_cpu );
 		}
 		else
 			logerror( "$%04x mc6846 acknowledge not implemented\n", device->machine().firstcpu->pcbase( ) );
@@ -385,8 +399,8 @@ WRITE8_DEVICE_HANDLER ( mc6846_w )
 		if ( ! (mc6846->pcr & 0x80) )
 		{
 			mc6846->ddr = data;
-			if ( mc6846->iface->out_port_func )
-				mc6846->iface->out_port_func( device, 0, mc6846->pdr & mc6846->ddr );
+			if ( !mc6846->out_port.isnull() )
+				mc6846->out_port( 0, mc6846->pdr & mc6846->ddr );
 		}
 		break;
 
@@ -395,8 +409,8 @@ WRITE8_DEVICE_HANDLER ( mc6846_w )
 		if ( ! (mc6846->pcr & 0x80) )
 		{
 			mc6846->pdr = data;
-			if ( mc6846->iface->out_port_func )
-				mc6846->iface->out_port_func( device, 0, mc6846->pdr & mc6846->ddr );
+			if ( !mc6846->out_port.isnull() )
+				mc6846->out_port( 0, mc6846->pdr & mc6846->ddr );
 			if ( mc6846->csr1_to_be_cleared && (mc6846->csr & 2) )
 			{
 				mc6846->csr &= ~2;
@@ -589,6 +603,19 @@ static DEVICE_START( mc6846 )
 	mc6846->iface = (const mc6846_interface*)device->static_config();
 	mc6846->interval = device->machine().scheduler().timer_alloc(FUNC(mc6846_timer_expire), (void*) device );
 	mc6846->one_shot = device->machine().scheduler().timer_alloc(FUNC(mc6846_timer_one_shot), (void*) device );
+
+	mc6846->out_port.resolve(mc6846->iface->out_port_func, *device);  /* 8-bit output */
+	mc6846->out_cp1.resolve(mc6846->iface->out_cp1_func, *device);   /* 1-bit output */
+	mc6846->out_cp2.resolve(mc6846->iface->out_cp2_func, *device);   /* 1-bit output */
+
+	/* CPU read from the outside through chip */
+	mc6846->in_port.resolve(mc6846->iface->in_port_func, *device); /* 8-bit input */
+
+	/* asynchronous timer output to outside world */
+	mc6846->out_cto.resolve(mc6846->iface->out_cto_func, *device); /* 1-bit output */
+
+	/* timer interrupt */
+	mc6846->irq.resolve(mc6846->iface->irq_func, *device);
 
 	state_save_register_item( device->machine(), "mc6846", device->tag(), 0, mc6846->csr );
 	state_save_register_item( device->machine(), "mc6846", device->tag(), 0, mc6846->pcr );

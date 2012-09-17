@@ -113,10 +113,10 @@ void mess_init_pc_common( running_machine &machine, UINT32 flags, void (*set_key
 
 
 
-READ8_DEVICE_HANDLER( mc1502_wd17xx_drq_r );
-READ8_DEVICE_HANDLER( mc1502_wd17xx_aux_r );
-READ8_DEVICE_HANDLER( mc1502_wd17xx_motor_r );
-WRITE8_DEVICE_HANDLER( mc1502_wd17xx_aux_w );
+DECLARE_READ8_DEVICE_HANDLER( mc1502_wd17xx_drq_r );
+DECLARE_READ8_DEVICE_HANDLER( mc1502_wd17xx_aux_r );
+DECLARE_READ8_DEVICE_HANDLER( mc1502_wd17xx_motor_r );
+DECLARE_WRITE8_DEVICE_HANDLER( mc1502_wd17xx_aux_w );
 
 
 

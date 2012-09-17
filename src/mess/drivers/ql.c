@@ -268,10 +268,10 @@ READ8_MEMBER( ql_state::disk_io_r )
 
 	switch (offset)
 	{
-		case 0x0000	: result=wd17xx_r(m_fdc, offset); break;
-		case 0x0001	: result=wd17xx_r(m_fdc, offset); break;
-		case 0x0002	: result=wd17xx_r(m_fdc, offset); break;
-		case 0x0003	: result=wd17xx_r(m_fdc, offset); break;
+		case 0x0000	: result=wd17xx_r(m_fdc, space, offset); break;
+		case 0x0001	: result=wd17xx_r(m_fdc, space, offset); break;
+		case 0x0002	: result=wd17xx_r(m_fdc, space, offset); break;
+		case 0x0003	: result=wd17xx_r(m_fdc, space, offset); break;
 		default		: logerror("%s DiskIO undefined read : from %08X\n",machine().describe_context(),m_disk_io_base+offset); break;
 	}
 
@@ -285,10 +285,10 @@ WRITE8_MEMBER( ql_state::disk_io_w )
 
 	switch (offset)
 	{
-		case 0x0000	: wd17xx_w(m_fdc, offset, data); break;
-		case 0x0001	: wd17xx_w(m_fdc, offset, data); break;
-		case 0x0002	: wd17xx_w(m_fdc, offset, data); break;
-		case 0x0003	: wd17xx_w(m_fdc, offset, data); break;
+		case 0x0000	: wd17xx_w(m_fdc, space, offset, data); break;
+		case 0x0001	: wd17xx_w(m_fdc, space, offset, data); break;
+		case 0x0002	: wd17xx_w(m_fdc, space, offset, data); break;
+		case 0x0003	: wd17xx_w(m_fdc, space, offset, data); break;
 		case 0x0004 : if(m_disk_type==DISK_TYPE_SANDY)
 						sandy_set_control(data);break;
 		case 0x0008 : if(m_disk_type==DISK_TYPE_SANDY)

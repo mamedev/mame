@@ -29,9 +29,9 @@ void okim6258_set_divider(device_t *device, int val);
 void okim6258_set_clock(device_t *device, int val);
 int okim6258_get_vclk(device_t *device);
 
-READ8_DEVICE_HANDLER( okim6258_status_r );
-WRITE8_DEVICE_HANDLER( okim6258_data_w );
-WRITE8_DEVICE_HANDLER( okim6258_ctrl_w );
+DECLARE_READ8_DEVICE_HANDLER( okim6258_status_r );
+DECLARE_WRITE8_DEVICE_HANDLER( okim6258_data_w );
+DECLARE_WRITE8_DEVICE_HANDLER( okim6258_ctrl_w );
 
 class okim6258_device : public device_t,
                                   public device_sound_interface

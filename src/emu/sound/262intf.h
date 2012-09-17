@@ -12,14 +12,14 @@ struct ymf262_interface
 };
 
 
-READ8_DEVICE_HANDLER( ymf262_r );
-WRITE8_DEVICE_HANDLER( ymf262_w );
+DECLARE_READ8_DEVICE_HANDLER( ymf262_r );
+DECLARE_WRITE8_DEVICE_HANDLER( ymf262_w );
 
-READ8_DEVICE_HANDLER ( ymf262_status_r );
-WRITE8_DEVICE_HANDLER( ymf262_register_a_w );
-WRITE8_DEVICE_HANDLER( ymf262_register_b_w );
-WRITE8_DEVICE_HANDLER( ymf262_data_a_w );
-WRITE8_DEVICE_HANDLER( ymf262_data_b_w );
+DECLARE_READ8_DEVICE_HANDLER ( ymf262_status_r );
+DECLARE_WRITE8_DEVICE_HANDLER( ymf262_register_a_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ymf262_register_b_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ymf262_data_a_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ymf262_data_b_w );
 
 
 class ymf262_device : public device_t,

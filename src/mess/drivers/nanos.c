@@ -120,19 +120,19 @@ static Z80PIO_INTERFACE( pio2_intf )
 
 /* Z80-SIO Interface */
 
-static void z80daisy_interrupt(device_t *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( z80daisy_interrupt )
 {
 	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, state);
 }
 
 static const z80sio_interface sio_intf =
 {
-	z80daisy_interrupt,	/* interrupt handler */
-	NULL,				/* DTR changed handler */
-	NULL,				/* RTS changed handler */
-	NULL,				/* BREAK changed handler */
-	NULL,				/* transmit handler */
-	NULL				/* receive handler */
+	DEVCB_LINE(z80daisy_interrupt),	/* interrupt handler */
+	DEVCB_NULL,				/* DTR changed handler */
+	DEVCB_NULL,				/* RTS changed handler */
+	DEVCB_NULL,				/* BREAK changed handler */
+	DEVCB_NULL,				/* transmit handler */
+	DEVCB_NULL				/* receive handler */
 };
 
 /* Z80 Daisy Chain */

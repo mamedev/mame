@@ -48,12 +48,12 @@ extern const device_type RP5H01;
     PROTOTYPES
 ***************************************************************************/
 
-WRITE8_DEVICE_HANDLER( rp5h01_enable_w );	/* /CE */
-WRITE8_DEVICE_HANDLER( rp5h01_reset_w );	/* RESET */
-WRITE8_DEVICE_HANDLER( rp5h01_cs_w );	/* CS */
-WRITE8_DEVICE_HANDLER( rp5h01_clock_w );	/* DATA CLOCK (active low) */
-WRITE8_DEVICE_HANDLER( rp5h01_test_w );		/* TEST */
-READ8_DEVICE_HANDLER( rp5h01_counter_r );	/* COUNTER OUT */
-READ8_DEVICE_HANDLER( rp5h01_data_r );		/* DATA */
+DECLARE_WRITE8_DEVICE_HANDLER( rp5h01_enable_w );	/* /CE */
+DECLARE_WRITE8_DEVICE_HANDLER( rp5h01_reset_w );	/* RESET */
+DECLARE_WRITE8_DEVICE_HANDLER( rp5h01_cs_w );	/* CS */
+DECLARE_WRITE8_DEVICE_HANDLER( rp5h01_clock_w );	/* DATA CLOCK (active low) */
+DECLARE_WRITE8_DEVICE_HANDLER( rp5h01_test_w );		/* TEST */
+DECLARE_READ8_DEVICE_HANDLER( rp5h01_counter_r );	/* COUNTER OUT */
+DECLARE_READ8_DEVICE_HANDLER( rp5h01_data_r );		/* DATA */
 
 #endif /* __RP5H01_H__ */

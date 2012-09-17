@@ -17,7 +17,7 @@ struct namco_54xx_config
 	MCFG_DEVICE_CONFIG(_config)
 
 
-WRITE8_DEVICE_HANDLER( namco_54xx_write );
+DECLARE_WRITE8_DEVICE_HANDLER( namco_54xx_write );
 
 
 class namco_54xx_device : public device_t

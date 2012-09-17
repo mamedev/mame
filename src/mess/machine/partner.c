@@ -84,11 +84,11 @@ READ8_MEMBER(partner_state::partner_floppy_r){
 
 	if (offset<0x100) {
 		switch(offset & 3) {
-			case 0x00 : return wd17xx_status_r(fdc,0);
-			case 0x01 : return wd17xx_track_r(fdc,0);
-			case 0x02 : return wd17xx_sector_r(fdc,0);
+			case 0x00 : return wd17xx_status_r(fdc,space, 0);
+			case 0x01 : return wd17xx_track_r(fdc,space, 0);
+			case 0x02 : return wd17xx_sector_r(fdc,space, 0);
 			default   :
-						return wd17xx_data_r(fdc,0);
+						return wd17xx_data_r(fdc,space, 0);
 		}
 	} else {
 		return 0;
@@ -100,10 +100,10 @@ WRITE8_MEMBER(partner_state::partner_floppy_w){
 
 	if (offset<0x100) {
 		switch(offset & 3) {
-			case 0x00 : wd17xx_command_w(fdc,0,data); break;
-			case 0x01 : wd17xx_track_w(fdc,0,data);break;
-			case 0x02 : wd17xx_sector_w(fdc,0,data);break;
-			default   : wd17xx_data_w(fdc,0,data);break;
+			case 0x00 : wd17xx_command_w(fdc,space, 0,data); break;
+			case 0x01 : wd17xx_track_w(fdc,space, 0,data);break;
+			case 0x02 : wd17xx_sector_w(fdc,space, 0,data);break;
+			default   : wd17xx_data_w(fdc,space, 0,data);break;
 		}
 	} else {
 		floppy_mon_w(floppy_get_device(machine(), 0), 1);

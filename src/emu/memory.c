@@ -1998,29 +1998,6 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 				}
 			break;
 
-		case AMH_LEGACY_DEVICE_HANDLER:
-			target_device = device().siblingdevice(data.m_tag);
-			if (target_device == NULL)
-				fatalerror("Attempted to map a non-existent device '%s' in space %s of device '%s'\n", data.m_tag.cstr(), m_name, m_device.tag());
-
-			if (readorwrite == ROW_READ)
-				switch (data.m_bits)
-				{
-					case 8:		install_legacy_read_handler(*target_device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rdevice8, data.m_name, data.m_mask);	break;
-					case 16:	install_legacy_read_handler(*target_device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rdevice16, data.m_name, data.m_mask);	break;
-					case 32:	install_legacy_read_handler(*target_device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rdevice32, data.m_name, data.m_mask);	break;
-					case 64:	install_legacy_read_handler(*target_device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rdevice64, data.m_name, data.m_mask);	break;
-				}
-			else
-				switch (data.m_bits)
-				{
-					case 8:		install_legacy_write_handler(*target_device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wdevice8, data.m_name, data.m_mask);	break;
-					case 16:	install_legacy_write_handler(*target_device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wdevice16, data.m_name, data.m_mask);	break;
-					case 32:	install_legacy_write_handler(*target_device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wdevice32, data.m_name, data.m_mask);	break;
-					case 64:	install_legacy_write_handler(*target_device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wdevice64, data.m_name, data.m_mask);	break;
-				}
-			break;
-
 		case AMH_PORT:
 			install_readwrite_port(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror,
 							(readorwrite == ROW_READ) ? data.m_tag.cstr() : NULL,

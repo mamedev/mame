@@ -90,22 +90,22 @@ struct ay8910_interface
 
 void ay8910_set_volume(device_t *device,int channel,int volume);
 
-READ8_DEVICE_HANDLER( ay8910_r );
-WRITE8_DEVICE_HANDLER( ay8910_address_w );
-WRITE8_DEVICE_HANDLER( ay8910_data_w );
+DECLARE_READ8_DEVICE_HANDLER( ay8910_r );
+DECLARE_WRITE8_DEVICE_HANDLER( ay8910_address_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ay8910_data_w );
 
 /* /RES */
-WRITE8_DEVICE_HANDLER( ay8910_reset_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ay8910_reset_w );
 
 /* use this when BC1 == A0; here, BC1=0 selects 'data' and BC1=1 selects 'latch address' */
-WRITE8_DEVICE_HANDLER( ay8910_data_address_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ay8910_data_address_w );
 
 /* use this when BC1 == !A0; here, BC1=0 selects 'latch address' and BC1=1 selects 'data' */
-WRITE8_DEVICE_HANDLER( ay8910_address_data_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ay8910_address_data_w );
 
 /* AY8914 handlers needed due to different register map */
-READ8_DEVICE_HANDLER( ay8914_r );
-WRITE8_DEVICE_HANDLER( ay8914_w );
+DECLARE_READ8_DEVICE_HANDLER( ay8914_r );
+DECLARE_WRITE8_DEVICE_HANDLER( ay8914_w );
 
 
 /*********** An interface for SSG of YM2203 ***********/

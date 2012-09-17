@@ -39,11 +39,11 @@ enum
 /*static int ready;*/			/* ready line from monochip, role unknown */
 
 /* Via */
-static READ8_DEVICE_HANDLER(via_in_a);
-static WRITE8_DEVICE_HANDLER(via_out_a);
-static READ8_DEVICE_HANDLER(via_in_b);
-static WRITE8_DEVICE_HANDLER(via_out_b);
-static WRITE8_DEVICE_HANDLER(via_out_cb2);
+static DECLARE_READ8_DEVICE_HANDLER(via_in_a);
+static DECLARE_WRITE8_DEVICE_HANDLER(via_out_a);
+static DECLARE_READ8_DEVICE_HANDLER(via_in_b);
+static DECLARE_WRITE8_DEVICE_HANDLER(via_out_b);
+static DECLARE_WRITE8_DEVICE_HANDLER(via_out_cb2);
 static void via_irq_func(device_t *device, int state);
 
 
@@ -312,7 +312,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 		/* calendar R/W */
 		VLOG(("concept_io_r: Calendar read at address 0x03%4.4x\n", offset << 1));
 		if (!m_clock_enable)
-			return mm58274c_r(machine().device("mm58274c"), m_clock_address);
+			return mm58274c_r(machine().device("mm58274c"), space, m_clock_address);
 		break;
 
 	case 7:
@@ -454,7 +454,7 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 		/* calendar R/W */
 		LOG(("concept_io_w: Calendar written to at address 0x03%4.4x, data: 0x%4.4x\n", offset << 1, data));
 		if (!m_clock_enable)
-			mm58274c_w(machine().device("mm58274c"), m_clock_address, data & 0xf);
+			mm58274c_w(machine().device("mm58274c"), space, m_clock_address, data & 0xf);
 		break;
 
 	case 7:
@@ -599,19 +599,19 @@ static  READ8_HANDLER(concept_fdc_reg_r)
 
 	case 8:
 		/* FDC STATUS REG */
-		return wd17xx_status_r(fdc, offset);
+		return wd17xx_status_r(fdc, *space, offset);
 
 	case 9:
 		/* FDC TRACK REG */
-		return wd17xx_track_r(fdc, offset);
+		return wd17xx_track_r(fdc, *space, offset);
 
 	case 10:
 		/* FDC SECTOR REG */
-		return wd17xx_sector_r(fdc, offset);
+		return wd17xx_sector_r(fdc, *space, offset);
 
 	case 11:
 		/* FDC DATA REG */
-		return wd17xx_data_r(fdc, offset);
+		return wd17xx_data_r(fdc, *space, offset);
 	}
 
 	return 0;
@@ -640,22 +640,22 @@ static WRITE8_HANDLER(concept_fdc_reg_w)
 
 	case 8:
 		/* FDC COMMAMD REG */
-		wd17xx_command_w(fdc, offset, data);
+		wd17xx_command_w(fdc, *space, offset, data);
 		break;
 
 	case 9:
 		/* FDC TRACK REG */
-		wd17xx_track_w(fdc, offset, data);
+		wd17xx_track_w(fdc, *space, offset, data);
 		break;
 
 	case 10:
 		/* FDC SECTOR REG */
-		wd17xx_sector_w(fdc, offset, data);
+		wd17xx_sector_w(fdc, *space, offset, data);
 		break;
 
 	case 11:
 		/* FDC DATA REG */
-		wd17xx_data_w(fdc, offset, data);
+		wd17xx_data_w(fdc, *space, offset, data);
 		break;
 	}
 }

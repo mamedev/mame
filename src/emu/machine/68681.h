@@ -40,8 +40,8 @@ extern const device_type DUART68681;
 	MCFG_DEVICE_CONFIG(_config)
 
 
-READ8_DEVICE_HANDLER(duart68681_r);
-WRITE8_DEVICE_HANDLER(duart68681_w);
+DECLARE_READ8_DEVICE_HANDLER(duart68681_r);
+DECLARE_WRITE8_DEVICE_HANDLER(duart68681_w);
 
 void duart68681_rx_data( device_t* device, int ch, UINT8 data );
 

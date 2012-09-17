@@ -1317,7 +1317,7 @@ WRITE16_DEVICE_HANDLER( spb640_w )
 
 	if( offset == 0 )
 	{
-		sp0256_ALD_w( device, 0, data & 0xff );
+		sp0256_ALD_w( device, space, 0, data & 0xff );
 		return;
 	}
 

@@ -1214,7 +1214,7 @@ Addresses found at @0x510, cpu2
 
 static WRITE8_DEVICE_HANDLER( M58817_command_w )
 {
-	tms5110_ctl_w(device, 0, data & 0x0f);
+	tms5110_ctl_w(device, space, 0, data & 0x0f);
 	tms5110_pdc_w(device, (data>>4) & 0x01);
 	/* FIXME 0x20 is CS */
 }
@@ -1234,6 +1234,7 @@ WRITE8_MEMBER(dkong_state::dkong_voice_w)
 	logerror("dkong_speech_w: 0x%02x\n", data);
 }
 
+static DECLARE_READ8_DEVICE_HANDLER( dkong_voice_status_r );
 static READ8_DEVICE_HANDLER( dkong_voice_status_r )
 {
 	/* only provided for documentation purposes
@@ -1245,11 +1246,11 @@ static READ8_DEVICE_HANDLER( dkong_voice_status_r )
 static READ8_DEVICE_HANDLER( dkong_tune_r )
 {
 	dkong_state *state = device->machine().driver_data<dkong_state>();
-	UINT8 page = latch8_r(state->m_dev_vp2, 0) & 0x47;
+	UINT8 page = latch8_r(state->m_dev_vp2, space, 0) & 0x47;
 
 	if ( page & 0x40 )
 	{
-		return (latch8_r(device, 0) & 0x0F) | (dkong_voice_status_r(device, 0) << 4);
+		return (latch8_r(device, space, 0) & 0x0F) | (dkong_voice_status_r(device, space, 0) << 4);
 	}
 	else
 	{
@@ -1260,7 +1261,7 @@ static READ8_DEVICE_HANDLER( dkong_tune_r )
 
 static WRITE8_DEVICE_HANDLER( dkong_p1_w )
 {
-	discrete_sound_w(device,DS_DAC,data);
+	discrete_sound_w(device,space,DS_DAC,data);
 }
 
 

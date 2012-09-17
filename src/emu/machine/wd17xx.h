@@ -255,18 +255,18 @@ void wd17xx_set_side(device_t *device, UINT8);		/* set side wd179x is accessing 
 void wd17xx_set_pause_time(device_t *device, int usec);       /* default is 40 usec if not set */
 void wd17xx_index_pulse_callback(device_t *controller, device_t *img, int state);
 
-READ8_DEVICE_HANDLER( wd17xx_status_r );
-READ8_DEVICE_HANDLER( wd17xx_track_r );
-READ8_DEVICE_HANDLER( wd17xx_sector_r );
-READ8_DEVICE_HANDLER( wd17xx_data_r );
+DECLARE_READ8_DEVICE_HANDLER( wd17xx_status_r );
+DECLARE_READ8_DEVICE_HANDLER( wd17xx_track_r );
+DECLARE_READ8_DEVICE_HANDLER( wd17xx_sector_r );
+DECLARE_READ8_DEVICE_HANDLER( wd17xx_data_r );
 
-WRITE8_DEVICE_HANDLER( wd17xx_command_w );
-WRITE8_DEVICE_HANDLER( wd17xx_track_w );
-WRITE8_DEVICE_HANDLER( wd17xx_sector_w );
-WRITE8_DEVICE_HANDLER( wd17xx_data_w );
+DECLARE_WRITE8_DEVICE_HANDLER( wd17xx_command_w );
+DECLARE_WRITE8_DEVICE_HANDLER( wd17xx_track_w );
+DECLARE_WRITE8_DEVICE_HANDLER( wd17xx_sector_w );
+DECLARE_WRITE8_DEVICE_HANDLER( wd17xx_data_w );
 
-READ8_DEVICE_HANDLER( wd17xx_r );
-WRITE8_DEVICE_HANDLER( wd17xx_w );
+DECLARE_READ8_DEVICE_HANDLER( wd17xx_r );
+DECLARE_WRITE8_DEVICE_HANDLER( wd17xx_w );
 
 WRITE_LINE_DEVICE_HANDLER( wd17xx_mr_w );
 WRITE_LINE_DEVICE_HANDLER( wd17xx_rdy_w );

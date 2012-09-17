@@ -18,7 +18,7 @@ struct namco_53xx_interface
 
 
 void namco_53xx_read_request(device_t *device);
-READ8_DEVICE_HANDLER( namco_53xx_read );
+DECLARE_READ8_DEVICE_HANDLER( namco_53xx_read );
 
 
 class namco_53xx_device : public device_t

@@ -1119,7 +1119,7 @@ BDIR BC1       |
 */
 
 /* PSG function selected */
-static void update_ay(device_t *device)
+static void update_ay(device_t *device, address_space &space)
 {
 	device_t *ay = device->machine().device("ay8913");
 	if (!ay) return;
@@ -1145,7 +1145,7 @@ static void update_ay(device_t *device)
 			{/* CA2 = 0 CB2 = 1? : Write to selected PSG register and write data to Port A */
 				pia6821_device *pia_ic6 = device->machine().device<pia6821_device>("pia_ic6");
 				device_t *ay = device->machine().device("ay8913");
-				ay8910_data_w(ay, 0, pia_ic6->a_output());
+				ay8910_data_w(ay, space, 0, pia_ic6->a_output());
 				LOG(("AY Chip Write \n"));
 				break;
 			}
@@ -1154,7 +1154,7 @@ static void update_ay(device_t *device)
              The register will remain selected until another is chosen.*/
 				pia6821_device *pia_ic6 = device->machine().device<pia6821_device>("pia_ic6");
 				device_t *ay = device->machine().device("ay8913");
-				ay8910_address_w(ay, 0, pia_ic6->a_output());
+				ay8910_address_w(ay, space, 0, pia_ic6->a_output());
 				LOG(("AY Chip Select \n"));
 				break;
 			}
@@ -1170,7 +1170,7 @@ static void update_ay(device_t *device)
 WRITE_LINE_MEMBER(mpu4_state::pia_ic5_cb2_w)
 {
 	device_t *device = machine().device("pia_ic5");
-	update_ay(device);
+	update_ay(device, generic_space());
 }
 
 
@@ -1229,7 +1229,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic6_porta_w)
 	if (m_mod_number <4)
 	{
 		m_ay_data = data;
-		update_ay(device);
+		update_ay(device, space);
 	}
 }
 
@@ -1242,7 +1242,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic6_ca2_w)
 	{
 		if ( state ) m_ay8913_address |=  0x01;
 		else         m_ay8913_address &= ~0x01;
-		update_ay(device);
+		update_ay(device, generic_space());
 	}
 }
 
@@ -1255,7 +1255,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic6_cb2_w)
 	{
 		if ( state ) m_ay8913_address |=  0x02;
 		else         m_ay8913_address &= ~0x02;
-		update_ay(device);
+		update_ay(device, generic_space());
 	}
 }
 
@@ -1461,7 +1461,7 @@ WRITE8_MEMBER(mpu4_state::pia_gb_porta_w)
 {
 	device_t *msm6376 = machine().device("msm6376");
 	LOG_SS(("%s: GAMEBOARD: PIA Port A Set to %2x\n", machine().describe_context(),data));
-	okim6376_w(msm6376, 0, data);
+	okim6376_w(msm6376, space, 0, data);
 }
 
 WRITE8_MEMBER(mpu4_state::pia_gb_portb_w)
@@ -2292,7 +2292,7 @@ READ8_MEMBER(mpu4_state::bwb_characteriser_r)
 WRITE8_MEMBER(mpu4_state::mpu4_ym2413_w)
 {
 	device_t *ym = machine().device("ym2413");
-	if (ym) ym2413_w(ym,offset,data);
+	if (ym) ym2413_w(ym,space,offset,data);
 }
 
 READ8_MEMBER(mpu4_state::mpu4_ym2413_r)

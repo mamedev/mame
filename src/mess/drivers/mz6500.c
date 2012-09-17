@@ -60,13 +60,13 @@ void mz6500_state::video_start()
 
 READ8_MEMBER( mz6500_state::fdc_r )
 {
-	return (offset) ? upd765_data_r(m_fdc, 0) : upd765_status_r(m_fdc, 0);
+	return (offset) ? upd765_data_r(m_fdc, space, 0) : upd765_status_r(m_fdc, space, 0);
 }
 
 WRITE8_MEMBER( mz6500_state::fdc_w )
 {
 	if(offset)
-		upd765_data_w(m_fdc, 0, data);
+		upd765_data_w(m_fdc, space, 0, data);
 }
 
 READ8_MEMBER( mz6500_state::mz6500_vram_r )

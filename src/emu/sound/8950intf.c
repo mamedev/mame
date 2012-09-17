@@ -28,7 +28,7 @@ struct y8950_state
 	emu_timer *		timer[2];
 	void *			chip;
 	const y8950_interface *intf;
-	device_t *device;
+	y8950_device *device;
 };
 
 
@@ -43,7 +43,7 @@ INLINE y8950_state *get_safe_token(device_t *device)
 static void IRQHandler(void *param,int irq)
 {
 	y8950_state *info = (y8950_state *)param;
-	if (info->intf->handler) (info->intf->handler)(info->device, irq ? ASSERT_LINE : CLEAR_LINE);
+	if (!info->device->m_handler.isnull()) info->device->m_handler(irq ? ASSERT_LINE : CLEAR_LINE);
 }
 static TIMER_CALLBACK( timer_callback_0 )
 {
@@ -72,31 +72,31 @@ static void TimerHandler(void *param,int c,attotime period)
 static unsigned char Y8950PortHandler_r(void *param)
 {
 	y8950_state *info = (y8950_state *)param;
-	if (info->intf->portread)
-		return info->intf->portread(info->device,0);
+	if (!info->device->m_portread.isnull())
+		return info->device->m_portread(0);
 	return 0;
 }
 
 static void Y8950PortHandler_w(void *param,unsigned char data)
 {
 	y8950_state *info = (y8950_state *)param;
-	if (info->intf->portwrite)
-		info->intf->portwrite(info->device,0,data);
+	if (!info->device->m_portwrite.isnull())
+		info->device->m_portwrite(0,data);
 }
 
 static unsigned char Y8950KeyboardHandler_r(void *param)
 {
 	y8950_state *info = (y8950_state *)param;
-	if (info->intf->keyboardread)
-		return info->intf->keyboardread(info->device,0);
+	if (!info->device->m_keyboardread.isnull())
+		return info->device->m_keyboardread(0);
 	return 0;
 }
 
 static void Y8950KeyboardHandler_w(void *param,unsigned char data)
 {
 	y8950_state *info = (y8950_state *)param;
-	if (info->intf->keyboardwrite)
-		info->intf->keyboardwrite(info->device,0,data);
+	if (!info->device->m_keyboardwrite.isnull())
+		info->device->m_keyboardwrite(0,data);
 }
 
 static STREAM_UPDATE( y8950_stream_update )
@@ -114,12 +114,12 @@ static void _stream_update(void *param, int interval)
 
 static DEVICE_START( y8950 )
 {
-	static const y8950_interface dummy = { 0 };
+	static const y8950_interface dummy = { DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL };
 	y8950_state *info = get_safe_token(device);
 	int rate = device->clock()/72;
 
 	info->intf = device->static_config() ? (const y8950_interface *)device->static_config() : &dummy;
-	info->device = device;
+	info->device = downcast<y8950_device *>(device);
 
 	/* stream system initialize */
 	info->chip = y8950_init(device,device->clock(),rate);
@@ -167,10 +167,10 @@ WRITE8_DEVICE_HANDLER( y8950_w )
 	y8950_write(info->chip, offset & 1, data);
 }
 
-READ8_DEVICE_HANDLER( y8950_status_port_r ) { return y8950_r(device, 0); }
-READ8_DEVICE_HANDLER( y8950_read_port_r ) { return y8950_r(device, 1); }
-WRITE8_DEVICE_HANDLER( y8950_control_port_w ) { y8950_w(device, 0, data); }
-WRITE8_DEVICE_HANDLER( y8950_write_port_w ) { y8950_w(device, 1, data); }
+READ8_DEVICE_HANDLER( y8950_status_port_r ) { return y8950_r(device, space, 0); }
+READ8_DEVICE_HANDLER( y8950_read_port_r ) { return y8950_r(device, space, 1); }
+WRITE8_DEVICE_HANDLER( y8950_control_port_w ) { y8950_w(device, space, 0, data); }
+WRITE8_DEVICE_HANDLER( y8950_write_port_w ) { y8950_w(device, space, 1, data); }
 
 
 const device_type Y8950 = &device_creator<y8950_device>;
@@ -198,6 +198,16 @@ void y8950_device::device_config_complete()
 
 void y8950_device::device_start()
 {
+	const y8950_interface *intf = (const y8950_interface *)static_config();
+	if (intf != NULL)
+	{
+		m_handler.resolve(intf->handler_cb, *this);
+		m_keyboardread.resolve(intf->keyboardread_cb, *this);
+		m_keyboardwrite.resolve(intf->keyboardwrite_cb, *this);
+		m_portread.resolve(intf->portread_cb, *this);
+		m_portwrite.resolve(intf->portwrite_cb, *this);
+	}
+
 	DEVICE_START_NAME( y8950 )(this);
 }
 

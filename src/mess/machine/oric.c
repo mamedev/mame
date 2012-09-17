@@ -137,7 +137,6 @@ WRITE8_MEMBER(oric_state::oric_psg_porta_write)
 static READ8_DEVICE_HANDLER ( oric_via_in_a_func )
 {
 	oric_state *state = device->machine().driver_data<oric_state>();
-	address_space *space = device->machine().device( "maincpu")->memory().space( AS_PROGRAM );
 
 	/*logerror("port a read\r\n"); */
 
@@ -146,7 +145,7 @@ static READ8_DEVICE_HANDLER ( oric_via_in_a_func )
 	{
 		/* if psg is in read register state return reg data */
 		if (state->m_psg_control==0x01)
-			return ay8910_r(space->machine().device("ay8912"), 0);
+			return ay8910_r(space.machine().device("ay8912"), space, 0);
 
 		/* return high-impedance */
 		return 0x0ff;
@@ -171,9 +170,9 @@ static READ8_DEVICE_HANDLER ( oric_via_in_b_func )
 
 
 /* read/write data depending on state of bdir, bc1 pins and data output to psg */
-static void oric_psg_connection_refresh(running_machine &machine)
+static void oric_psg_connection_refresh(address_space &space)
 {
-	oric_state *state = machine.driver_data<oric_state>();
+	oric_state *state = space.machine().driver_data<oric_state>();
 	if (state->m_psg_control!=0)
 	{
 		switch (state->m_psg_control)
@@ -190,15 +189,15 @@ static void oric_psg_connection_refresh(running_machine &machine)
 			/* write register data */
 			case 2:
 			{
-				device_t *ay8912 = machine.device("ay8912");
-				ay8910_data_w(ay8912, 0, state->m_via_port_a_data);
+				device_t *ay8912 = space.machine().device("ay8912");
+				ay8910_data_w(ay8912, space, 0, state->m_via_port_a_data);
 			}
 			break;
 			/* write register index */
 			case 3:
 			{
-				device_t *ay8912 = machine.device("ay8912");
-				ay8910_address_w(ay8912, 0, state->m_via_port_a_data);
+				device_t *ay8912 = space.machine().device("ay8912");
+				ay8910_address_w(ay8912, space, 0, state->m_via_port_a_data);
 			}
 			break;
 
@@ -215,7 +214,7 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_a_func )
 	oric_state *state = device->machine().driver_data<oric_state>();
 	state->m_via_port_a_data = data;
 
-	oric_psg_connection_refresh(device->machine());
+	oric_psg_connection_refresh(space);
 
 
 	if (state->m_psg_control==0)
@@ -302,7 +301,7 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_b_func )
 	/* centronics STROBE is connected to PB4 */
 	centronics->strobe_w(BIT(data, 4));
 
-	oric_psg_connection_refresh(device->machine());
+	oric_psg_connection_refresh(space);
 	state->m_previous_portb_data = data;
 }
 
@@ -327,7 +326,7 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_ca2_func )
 	if (data)
 		state->m_psg_control |=1;
 
-	oric_psg_connection_refresh(device->machine());
+	oric_psg_connection_refresh(space);
 }
 
 static WRITE8_DEVICE_HANDLER ( oric_via_out_cb2_func )
@@ -338,7 +337,7 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_cb2_func )
 	if (data)
 		state->m_psg_control |=2;
 
-	oric_psg_connection_refresh(device->machine());
+	oric_psg_connection_refresh(space);
 }
 
 
@@ -680,16 +679,16 @@ READ8_MEMBER(oric_state::oric_jasmin_r)
 	{
 		/* jasmin floppy disc interface */
 		case 0x04:
-			data = wd17xx_status_r(fdc, 0);
+			data = wd17xx_status_r(fdc, space, 0);
 			break;
 		case 0x05:
-			data =wd17xx_track_r(fdc, 0);
+			data =wd17xx_track_r(fdc, space, 0);
 			break;
 		case 0x06:
-			data = wd17xx_sector_r(fdc, 0);
+			data = wd17xx_sector_r(fdc, space, 0);
 			break;
 		case 0x07:
-			data = wd17xx_data_r(fdc, 0);
+			data = wd17xx_data_r(fdc, space, 0);
 			break;
 		default:
 			data = via_0->read(space,offset & 0x0f);
@@ -709,16 +708,16 @@ WRITE8_MEMBER(oric_state::oric_jasmin_w)
 	{
 		/* microdisc floppy disc interface */
 		case 0x04:
-			wd17xx_command_w(fdc, 0, data);
+			wd17xx_command_w(fdc, space, 0, data);
 			break;
 		case 0x05:
-			wd17xx_track_w(fdc, 0, data);
+			wd17xx_track_w(fdc, space, 0, data);
 			break;
 		case 0x06:
-			wd17xx_sector_w(fdc, 0, data);
+			wd17xx_sector_w(fdc, space, 0, data);
 			break;
 		case 0x07:
-			wd17xx_data_w(fdc, 0, data);
+			wd17xx_data_w(fdc, space, 0, data);
 			break;
 		/* bit 0 = side */
 		case 0x08:
@@ -898,16 +897,16 @@ READ8_MEMBER(oric_state::oric_microdisc_r)
 	{
 		/* microdisc floppy disc interface */
 		case 0x00:
-			data = wd17xx_status_r(fdc, 0);
+			data = wd17xx_status_r(fdc, space, 0);
 			break;
 		case 0x01:
-			data =wd17xx_track_r(fdc, 0);
+			data =wd17xx_track_r(fdc, space, 0);
 			break;
 		case 0x02:
-			data = wd17xx_sector_r(fdc, 0);
+			data = wd17xx_sector_r(fdc, space, 0);
 			break;
 		case 0x03:
-			data = wd17xx_data_r(fdc, 0);
+			data = wd17xx_data_r(fdc, space, 0);
 			break;
 		case 0x04:
 			data = m_port_314_r | 0x07f;
@@ -937,16 +936,16 @@ WRITE8_MEMBER(oric_state::oric_microdisc_w)
 	{
 		/* microdisc floppy disc interface */
 		case 0x00:
-			wd17xx_command_w(fdc, 0, data);
+			wd17xx_command_w(fdc, space, 0, data);
 			break;
 		case 0x01:
-			wd17xx_track_w(fdc, 0, data);
+			wd17xx_track_w(fdc, space, 0, data);
 			break;
 		case 0x02:
-			wd17xx_sector_w(fdc, 0, data);
+			wd17xx_sector_w(fdc, space, 0, data);
 			break;
 		case 0x03:
-			wd17xx_data_w(fdc, 0, data);
+			wd17xx_data_w(fdc, space, 0, data);
 			break;
 		case 0x04:
 		{

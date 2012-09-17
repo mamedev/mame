@@ -126,8 +126,8 @@ public:
 /*----------- defined in machine/tatsumi.c -----------*/
 
 
-READ8_DEVICE_HANDLER(tatsumi_hack_ym2151_r);
-READ8_DEVICE_HANDLER(tatsumi_hack_oki_r);
+DECLARE_READ8_DEVICE_HANDLER(tatsumi_hack_ym2151_r);
+DECLARE_READ8_DEVICE_HANDLER(tatsumi_hack_oki_r);
 
 
 void tatsumi_reset(running_machine &machine);

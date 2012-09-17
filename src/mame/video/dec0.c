@@ -155,30 +155,31 @@ SCREEN_UPDATE_IND16( automat )
 	// layer enables seem different... where are they?
 
 	// the bootleg doesn't write these registers, I think they're hardcoded?, so fake them for compatibility with our implementation..
-	deco_bac06_pf_control_0_w(state->m_tilegen1,0,0x0003, 0x00ff); // 8x8
-	deco_bac06_pf_control_0_w(state->m_tilegen1,1,0x0003, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen1,2,0x0000, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen1,3,0x0001, 0x00ff); // dimensions
+	address_space &space = screen.machine().driver_data()->generic_space();
+	deco_bac06_pf_control_0_w(state->m_tilegen1,space,0,0x0003, 0x00ff); // 8x8
+	deco_bac06_pf_control_0_w(state->m_tilegen1,space,1,0x0003, 0x00ff);
+	deco_bac06_pf_control_0_w(state->m_tilegen1,space,2,0x0000, 0x00ff);
+	deco_bac06_pf_control_0_w(state->m_tilegen1,space,3,0x0001, 0x00ff); // dimensions
 
-	deco_bac06_pf_control_0_w(state->m_tilegen2,0,0x0082, 0x00ff); // 16x16
-	deco_bac06_pf_control_0_w(state->m_tilegen2,1,0x0000, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen2,2,0x0000, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen2,3,0x0001, 0x00ff); // dimensions
+	deco_bac06_pf_control_0_w(state->m_tilegen2,space,0,0x0082, 0x00ff); // 16x16
+	deco_bac06_pf_control_0_w(state->m_tilegen2,space,1,0x0000, 0x00ff);
+	deco_bac06_pf_control_0_w(state->m_tilegen2,space,2,0x0000, 0x00ff);
+	deco_bac06_pf_control_0_w(state->m_tilegen2,space,3,0x0001, 0x00ff); // dimensions
 
-	deco_bac06_pf_control_0_w(state->m_tilegen3,0,0x0082, 0x00ff); // 16x16
-	deco_bac06_pf_control_0_w(state->m_tilegen3,1,0x0003, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen3,2,0x0000, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen3,3,0x0001, 0x00ff); // dimensions
+	deco_bac06_pf_control_0_w(state->m_tilegen3,space,0,0x0082, 0x00ff); // 16x16
+	deco_bac06_pf_control_0_w(state->m_tilegen3,space,1,0x0003, 0x00ff);
+	deco_bac06_pf_control_0_w(state->m_tilegen3,space,2,0x0000, 0x00ff);
+	deco_bac06_pf_control_0_w(state->m_tilegen3,space,3,0x0001, 0x00ff); // dimensions
 
 	// scroll registers got written elsewhere, copy them across
-	deco_bac06_pf_control_1_w(state->m_tilegen1,0,0x0000, 0xffff); // no scroll?
-	deco_bac06_pf_control_1_w(state->m_tilegen1,1,0x0000, 0xffff); // no scroll?
+	deco_bac06_pf_control_1_w(state->m_tilegen1,space,0,0x0000, 0xffff); // no scroll?
+	deco_bac06_pf_control_1_w(state->m_tilegen1,space,1,0x0000, 0xffff); // no scroll?
 
-	deco_bac06_pf_control_1_w(state->m_tilegen2,0,state->m_automat_scroll_regs[3] - 0x010a, 0xffff);
-	deco_bac06_pf_control_1_w(state->m_tilegen2,1,state->m_automat_scroll_regs[2], 0xffff);
+	deco_bac06_pf_control_1_w(state->m_tilegen2,space,0,state->m_automat_scroll_regs[3] - 0x010a, 0xffff);
+	deco_bac06_pf_control_1_w(state->m_tilegen2,space,1,state->m_automat_scroll_regs[2], 0xffff);
 
-	deco_bac06_pf_control_1_w(state->m_tilegen3,0,state->m_automat_scroll_regs[1] - 0x0108, 0xffff);
-	deco_bac06_pf_control_1_w(state->m_tilegen3,1,state->m_automat_scroll_regs[0], 0xffff);
+	deco_bac06_pf_control_1_w(state->m_tilegen3,space,0,state->m_automat_scroll_regs[1] - 0x0108, 0xffff);
+	deco_bac06_pf_control_1_w(state->m_tilegen3,space,1,state->m_automat_scroll_regs[0], 0xffff);
 
 
 	state->flip_screen_set(state->m_tilegen1->get_flip_state());
@@ -223,30 +224,31 @@ SCREEN_UPDATE_IND16( secretab )
 	// layer enables seem different... where are they?
 
 	// the bootleg doesn't write these registers, I think they're hardcoded?, so fake them for compatibility with our implementation..
-	deco_bac06_pf_control_0_w(state->m_tilegen1,0,0x0003, 0x00ff); // 8x8
-	deco_bac06_pf_control_0_w(state->m_tilegen1,1,0x0003, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen1,2,0x0000, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen1,3,0x0001, 0x00ff); // dimensions
+	address_space &space = screen.machine().driver_data()->generic_space();
+	deco_bac06_pf_control_0_w(state->m_tilegen1,space,0,0x0003, 0x00ff); // 8x8
+	deco_bac06_pf_control_0_w(state->m_tilegen1,space,1,0x0003, 0x00ff);
+	deco_bac06_pf_control_0_w(state->m_tilegen1,space,2,0x0000, 0x00ff);
+	deco_bac06_pf_control_0_w(state->m_tilegen1,space,3,0x0001, 0x00ff); // dimensions
 
-	deco_bac06_pf_control_0_w(state->m_tilegen2,0,0x0082, 0x00ff); // 16x16
-	deco_bac06_pf_control_0_w(state->m_tilegen2,1,0x0000, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen2,2,0x0000, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen2,3,0x0001, 0x00ff); // dimensions
+	deco_bac06_pf_control_0_w(state->m_tilegen2,space,0,0x0082, 0x00ff); // 16x16
+	deco_bac06_pf_control_0_w(state->m_tilegen2,space,1,0x0000, 0x00ff);
+	deco_bac06_pf_control_0_w(state->m_tilegen2,space,2,0x0000, 0x00ff);
+	deco_bac06_pf_control_0_w(state->m_tilegen2,space,3,0x0001, 0x00ff); // dimensions
 
-	deco_bac06_pf_control_0_w(state->m_tilegen3,0,0x0082, 0x00ff); // 16x16
-	deco_bac06_pf_control_0_w(state->m_tilegen3,1,0x0003, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen3,2,0x0000, 0x00ff);
-	deco_bac06_pf_control_0_w(state->m_tilegen3,3,0x0001, 0x00ff); // dimensions
+	deco_bac06_pf_control_0_w(state->m_tilegen3,space,0,0x0082, 0x00ff); // 16x16
+	deco_bac06_pf_control_0_w(state->m_tilegen3,space,1,0x0003, 0x00ff);
+	deco_bac06_pf_control_0_w(state->m_tilegen3,space,2,0x0000, 0x00ff);
+	deco_bac06_pf_control_0_w(state->m_tilegen3,space,3,0x0001, 0x00ff); // dimensions
 
 	// scroll registers got written elsewhere, copy them across
-	deco_bac06_pf_control_1_w(state->m_tilegen1,0,0x0000, 0xffff); // no scroll?
-	deco_bac06_pf_control_1_w(state->m_tilegen1,1,0x0000, 0xffff); // no scroll?
+	deco_bac06_pf_control_1_w(state->m_tilegen1,space,0,0x0000, 0xffff); // no scroll?
+	deco_bac06_pf_control_1_w(state->m_tilegen1,space,1,0x0000, 0xffff); // no scroll?
 
-	deco_bac06_pf_control_1_w(state->m_tilegen2,0,state->m_automat_scroll_regs[3] - 0x010a, 0xffff);
-	deco_bac06_pf_control_1_w(state->m_tilegen2,1,state->m_automat_scroll_regs[2], 0xffff);
+	deco_bac06_pf_control_1_w(state->m_tilegen2,space,0,state->m_automat_scroll_regs[3] - 0x010a, 0xffff);
+	deco_bac06_pf_control_1_w(state->m_tilegen2,space,1,state->m_automat_scroll_regs[2], 0xffff);
 
-	deco_bac06_pf_control_1_w(state->m_tilegen3,0,state->m_automat_scroll_regs[1] - 0x0108, 0xffff);
-	deco_bac06_pf_control_1_w(state->m_tilegen3,1,state->m_automat_scroll_regs[0], 0xffff);
+	deco_bac06_pf_control_1_w(state->m_tilegen3,space,0,state->m_automat_scroll_regs[1] - 0x0108, 0xffff);
+	deco_bac06_pf_control_1_w(state->m_tilegen3,space,1,state->m_automat_scroll_regs[0], 0xffff);
 
 	state->flip_screen_set(state->m_tilegen1->get_flip_state());
 

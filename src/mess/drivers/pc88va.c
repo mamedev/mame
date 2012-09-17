@@ -970,8 +970,8 @@ READ8_MEMBER(pc88va_state::pc88va_fdc_r)
 		/* ---x ---- RDY: (0) Busy (1) Ready */
 		case 0x06: // FDC control port 2
 			return 0;
-		case 0x08: return upd765_status_r(machine().device("upd765"), 0);
-		case 0x0a: return upd765_data_r(machine().device("upd765"), 0);
+		case 0x08: return upd765_status_r(machine().device("upd765"), space, 0);
+		case 0x0a: return upd765_data_r(machine().device("upd765"), space, 0);
 	}
 
 	return 0xff;
@@ -1013,7 +1013,7 @@ WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
 			printf("%02x\n",data);
 			break; // FDC control port 2
 		case 0x08: break; // UPD765 status
-		case 0x0a: upd765_data_w(machine().device("upd765"), 0,data); break;
+		case 0x0a: upd765_data_w(machine().device("upd765"), space, 0,data); break;
 	}
 }
 

@@ -424,7 +424,7 @@ static UINT8 rf5c296_reg_r(ATTR_UNUSED running_machine &machine, UINT8 reg)
 WRITE32_MEMBER(taitogn_state::rf5c296_io_w)
 {
 	if(offset < 2) {
-		ide_controller32_pcmcia_w(machine().device(":card"), offset, data, mem_mask);
+		ide_controller32_pcmcia_w(machine().device(":card"), space, offset, data, mem_mask);
 		return;
 	}
 
@@ -439,7 +439,7 @@ WRITE32_MEMBER(taitogn_state::rf5c296_io_w)
 READ32_MEMBER(taitogn_state::rf5c296_io_r)
 {
 	if(offset < 2)
-		return ide_controller32_pcmcia_r(machine().device(":card"), offset, mem_mask);
+		return ide_controller32_pcmcia_r(machine().device(":card"), space, offset, mem_mask);
 
 	offset *= 4;
 

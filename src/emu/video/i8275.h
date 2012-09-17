@@ -65,13 +65,13 @@ struct i8275_interface
 ***************************************************************************/
 
 /* register access */
-READ8_DEVICE_HANDLER ( i8275_r );
-WRITE8_DEVICE_HANDLER ( i8275_w );
+DECLARE_READ8_DEVICE_HANDLER ( i8275_r );
+DECLARE_WRITE8_DEVICE_HANDLER ( i8275_w );
 
 /* updates the screen */
 void i8275_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-WRITE8_DEVICE_HANDLER( i8275_dack_w );
+DECLARE_WRITE8_DEVICE_HANDLER( i8275_dack_w );
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS

@@ -474,11 +474,11 @@ READ8_MEMBER( pc1512_state::fdc_r )
 	switch (offset)
 	{
 	case 4:
-		data = upd765_status_r(m_fdc, 0);
+		data = upd765_status_r(m_fdc, space, 0);
 		break;
 
 	case 5:
-		data = upd765_data_r(m_fdc, 0);
+		data = upd765_data_r(m_fdc, space, 0);
 		break;
 	}
 
@@ -529,7 +529,7 @@ WRITE8_MEMBER( pc1512_state::fdc_w )
 		break;
 
 	case 5:
-		upd765_data_w(m_fdc, 0, data);
+		upd765_data_w(m_fdc, space, 0, data);
 		break;
 	}
 }
@@ -551,8 +551,8 @@ READ8_MEMBER( pc1640_state::io_r )
 	bool decoded = false;
 
 	if		(                 addr <= 0x00f) { data = m_dmac->read(space, offset & 0x0f); decoded = true; }
-	else if (addr >= 0x020 && addr <= 0x021) { data = pic8259_r(m_pic, offset & 0x01); decoded = true; }
-	else if (addr >= 0x040 && addr <= 0x043) { data = pit8253_r(m_pit, offset & 0x03); decoded = true; }
+	else if (addr >= 0x020 && addr <= 0x021) { data = pic8259_r(m_pic, space, offset & 0x01); decoded = true; }
+	else if (addr >= 0x040 && addr <= 0x043) { data = pit8253_r(m_pit, space, offset & 0x03); decoded = true; }
 	else if (addr >= 0x060 && addr <= 0x06f) { data = system_r(space, offset & 0x0f); decoded = true; }
 	else if (addr >= 0x070 && addr <= 0x073) { data = m_rtc->read(space, offset & 0x01); decoded = true; }
 	else if (addr >= 0x078 && addr <= 0x07f) { data = mouse_r(space, offset & 0x07); decoded = true; }
@@ -910,7 +910,7 @@ READ8_MEMBER( pc1512_state::ior1_r )
 READ8_MEMBER( pc1512_state::ior2_r )
 {
 	if (m_nden)
-		return upd765_dack_r(m_fdc, 0);
+		return upd765_dack_r(m_fdc, space, 0);
 	else
 		return m_bus->dack_r(2);
 }
@@ -934,7 +934,7 @@ WRITE8_MEMBER( pc1512_state::iow1_w )
 WRITE8_MEMBER( pc1512_state::iow2_w )
 {
 	if (m_nden)
-		upd765_dack_w(m_fdc, 0, data);
+		upd765_dack_w(m_fdc, space, 0, data);
 	else
 		m_bus->dack_w(2, data);
 }

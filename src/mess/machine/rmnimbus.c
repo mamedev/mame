@@ -67,10 +67,10 @@ even if you have to use unusual geometry to do so !
 
 #include "includes/rmnimbus.h"
 
-static void sio_interrupt(device_t *device, int state);
-//static WRITE8_DEVICE_HANDLER( sio_dtr_w );
-static WRITE8_DEVICE_HANDLER( sio_serial_transmit );
-static int sio_serial_receive( device_t *device, int channel );
+static WRITE_LINE_DEVICE_HANDLER( sio_interrupt );
+//static DECLARE_WRITE8_DEVICE_HANDLER( sio_dtr_w );
+static DECLARE_WRITE16_DEVICE_HANDLER( sio_serial_transmit );
+static DECLARE_READ16_DEVICE_HANDLER( sio_serial_receive );
 
 
 /*-------------------------------------------------------------------------*/
@@ -113,12 +113,12 @@ static int sio_serial_receive( device_t *device, int channel );
 
 const z80sio_interface nimbus_sio_intf =
 {
-	sio_interrupt,			/* interrupt handler */
-	0, //sio_dtr_w,             /* DTR changed handler */
-	0,						/* RTS changed handler */
-	0,						/* BREAK changed handler */
-	sio_serial_transmit,	/* transmit handler */
-	sio_serial_receive		/* receive handler */
+	DEVCB_LINE(sio_interrupt),			/* interrupt handler */
+	DEVCB_NULL, //sio_dtr_w,             /* DTR changed handler */
+	DEVCB_NULL,						/* RTS changed handler */
+	DEVCB_NULL,						/* BREAK changed handler */
+	DEVCB_HANDLER(sio_serial_transmit),	/* transmit handler */
+	DEVCB_HANDLER(sio_serial_receive)		/* receive handler */
 };
 
 /* Floppy drives WD2793 */
@@ -2194,7 +2194,7 @@ Z80SIO, used for the keyboard interface
 
 /* Z80 SIO/2 */
 
-static void sio_interrupt(device_t *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( sio_interrupt )
 {
 	rmnimbus_state *drvstate = device->machine().driver_data<rmnimbus_state>();
     if(LOG_SIO)
@@ -2219,13 +2219,13 @@ WRITE8_DEVICE_HANDLER( sio_dtr_w )
 }
 #endif
 
-static WRITE8_DEVICE_HANDLER( sio_serial_transmit )
+static WRITE16_DEVICE_HANDLER( sio_serial_transmit )
 {
 }
 
-static int sio_serial_receive( device_t *device, int channel )
+static READ16_DEVICE_HANDLER( sio_serial_receive )
 {
-    if(channel==0)
+    if(offset==0)
     {
         return keyboard_queue_read(device->machine());
     }
@@ -2320,17 +2320,17 @@ READ8_MEMBER(rmnimbus_state::nimbus_disk_r)
 	switch(offset*2)
 	{
 		case 0x08 :
-			result = wd17xx_status_r(fdc, 0);
+			result = wd17xx_status_r(fdc, space, 0);
 			if (LOG_DISK_FDD) logerror("Disk status=%2.2X\n",result);
 			break;
 		case 0x0A :
-			result = wd17xx_track_r(fdc, 0);
+			result = wd17xx_track_r(fdc, space, 0);
 			break;
 		case 0x0C :
-			result = wd17xx_sector_r(fdc, 0);
+			result = wd17xx_sector_r(fdc, space, 0);
 			break;
 		case 0x0E :
-			result = wd17xx_data_r(fdc, 0);
+			result = wd17xx_data_r(fdc, space, 0);
 			break;
 		case 0x10 :
 			m_nimbus_drives.reg410_in &= ~FDC_BITS_410;
@@ -2406,16 +2406,16 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_disk_w)
 
             break;
 		case 0x08 :
-			wd17xx_command_w(fdc, 0, data);
+			wd17xx_command_w(fdc, space, 0, data);
 			break;
 		case 0x0A :
-			wd17xx_track_w(fdc, 0, data);
+			wd17xx_track_w(fdc, space, 0, data);
 			break;
 		case 0x0C :
-			wd17xx_sector_w(fdc, 0, data);
+			wd17xx_sector_w(fdc, space, 0, data);
 			break;
 		case 0x0E :
-			wd17xx_data_w(fdc, 0, data);
+			wd17xx_data_w(fdc, space, 0, data);
 			break;
         case 0x10 :
             hdc_ctrl_write(machine(),data);
@@ -2774,7 +2774,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_r)
     UINT8   result=0;
 
     if ((offset*2)==0)
-        result=ay8910_r(ay8910,0);
+        result=ay8910_r(ay8910,space, 0);
 
     return result;
 }
@@ -2789,8 +2789,8 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_w)
 
     switch (offset*2)
     {
-        case 0x00   : ay8910_data_address_w(ay8910, 1, data); break;
-        case 0x02   : ay8910_data_address_w(ay8910, 0, data); break;
+        case 0x00   : ay8910_data_address_w(ay8910, space, 1, data); break;
+        case 0x02   : ay8910_data_address_w(ay8910, space, 0, data); break;
     }
 
 }

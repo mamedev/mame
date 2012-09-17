@@ -60,7 +60,7 @@ public:
 
 /*----------- defined in audio/gridlee.c -----------*/
 
-WRITE8_DEVICE_HANDLER( gridlee_sound_w );
+DECLARE_WRITE8_DEVICE_HANDLER( gridlee_sound_w );
 
 class gridlee_sound_device : public device_t,
                                   public device_sound_interface

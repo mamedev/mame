@@ -131,16 +131,16 @@ device_t *fdc = machine().device("wd179x");
 	{
 		/* minidisc floppy disc interface */
 		case 0x04:
-			data = wd17xx_status_r(fdc, 0);
+			data = wd17xx_status_r(fdc, space, 0);
 			break;
 		case 0x05:
-			data = wd17xx_track_r(fdc, 0);
+			data = wd17xx_track_r(fdc, space, 0);
 			break;
 		case 0x06:
-			data = wd17xx_sector_r(fdc, 0);
+			data = wd17xx_sector_r(fdc, space, 0);
 			break;
 		case 0x07:
-			data = wd17xx_data_r(fdc, 0);
+			data = wd17xx_data_r(fdc, space, 0);
 			break;
 		default:
 			break;
@@ -155,17 +155,17 @@ switch (offset)
 	{
 		/* minidisc floppy disc interface */
 		case 0x04:
-			wd17xx_command_w(fdc, 0, data);
+			wd17xx_command_w(fdc, space, 0, data);
 			break;
 		case 0x05:
-			wd17xx_track_w(fdc, 0, data);
+			wd17xx_track_w(fdc, space, 0, data);
 			break;
 		case 0x06:
-			wd17xx_sector_w(fdc, 0, data);
+			wd17xx_sector_w(fdc, space, 0, data);
 			break;
 		case 0x07:
 			/*write into command register*/
-			wd17xx_data_w(fdc, 0, data);
+			wd17xx_data_w(fdc, space, 0, data);
 			break;
 		case 0x08:
 			/*General purpose port (0x08) for the minidisk I/O */
@@ -429,7 +429,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_color_b_w)
 	if (data & 0x40) m_hector_color[2] |= 8; else m_hector_color[2] &= 7;
 
 	/* Play bit*/
-	discrete_sound_w(discrete, NODE_01,  (data & 0x80) ? 0:1 );
+	discrete_sound_w(discrete, space, NODE_01,  (data & 0x80) ? 0:1 );
 }
 
 

@@ -369,9 +369,9 @@ WRITE16_MEMBER(ninjaw_state::ninjaw_sound_w)
 {
 
 	if (offset == 0)
-		tc0140syt_port_w(m_tc0140syt, 0, data & 0xff);
+		tc0140syt_port_w(m_tc0140syt, space, 0, data & 0xff);
 	else if (offset == 1)
-		tc0140syt_comm_w(m_tc0140syt, 0, data & 0xff);
+		tc0140syt_comm_w(m_tc0140syt, space, 0, data & 0xff);
 
 #ifdef MAME_DEBUG
 	if (data & 0xff00)
@@ -383,7 +383,7 @@ READ16_MEMBER(ninjaw_state::ninjaw_sound_r)
 {
 
 	if (offset == 1)
-		return ((tc0140syt_comm_r(m_tc0140syt, 0) & 0xff));
+		return ((tc0140syt_comm_r(m_tc0140syt, space, 0) & 0xff));
 	else
 		return 0;
 }
@@ -413,9 +413,9 @@ WRITE8_MEMBER(ninjaw_state::ninjaw_pancontrol)
 WRITE16_MEMBER(ninjaw_state::tc0100scn_triple_screen_w)
 {
 
-	tc0100scn_word_w(m_tc0100scn_1, offset, data, mem_mask);
-	tc0100scn_word_w(m_tc0100scn_2, offset, data, mem_mask);
-	tc0100scn_word_w(m_tc0100scn_3, offset, data, mem_mask);
+	tc0100scn_word_w(m_tc0100scn_1, space, offset, data, mem_mask);
+	tc0100scn_word_w(m_tc0100scn_2, space, offset, data, mem_mask);
+	tc0100scn_word_w(m_tc0100scn_3, space, offset, data, mem_mask);
 }
 
 /***********************************************************

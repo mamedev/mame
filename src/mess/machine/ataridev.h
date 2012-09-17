@@ -67,8 +67,8 @@ extern const device_type ATARI_FDC;
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-READ8_DEVICE_HANDLER( atari_serin_r );
-WRITE8_DEVICE_HANDLER( atari_serout_w );
+DECLARE_READ8_DEVICE_HANDLER( atari_serin_r );
+DECLARE_WRITE8_DEVICE_HANDLER( atari_serout_w );
 WRITE_LINE_DEVICE_HANDLER( atarifdc_pia_cb2_w );
 
 #endif /* _ATARIDEV_H */

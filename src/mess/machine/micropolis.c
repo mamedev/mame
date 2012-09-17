@@ -306,10 +306,10 @@ READ8_DEVICE_HANDLER( micropolis_r )
 
 	switch (offset & 0x03)
 	{
-	case 0: data = micropolis_status_r(device, 0); break;
-	case 1:	data = micropolis_status_r(device, 1); break;
+	case 0: data = micropolis_status_r(device, space, 0); break;
+	case 1:	data = micropolis_status_r(device, space, 1); break;
 	case 2:
-	case 3:	data = micropolis_data_r(device, 0); break;
+	case 3:	data = micropolis_data_r(device, space, 0); break;
 	}
 
 	return data;
@@ -320,9 +320,9 @@ WRITE8_DEVICE_HANDLER( micropolis_w )
 	switch (offset & 0x03)
 	{
 	case 0:
-	case 1:	micropolis_command_w(device, 0, data); break;
+	case 1:	micropolis_command_w(device, space, 0, data); break;
 	case 2:
-	case 3: micropolis_data_w(device, 0, data);    break;
+	case 3: micropolis_data_w(device, space, 0, data);    break;
 	}
 }
 

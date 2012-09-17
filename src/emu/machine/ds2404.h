@@ -128,13 +128,13 @@ extern const device_type DS2404;
 ***************************************************************************/
 
 /* 1-wire interface reset */
-WRITE8_DEVICE_HANDLER( ds2404_1w_reset_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ds2404_1w_reset_w );
 
 /* 3-wire interface reset  */
-WRITE8_DEVICE_HANDLER( ds2404_3w_reset_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ds2404_3w_reset_w );
 
-READ8_DEVICE_HANDLER( ds2404_data_r );
-WRITE8_DEVICE_HANDLER( ds2404_data_w );
-WRITE8_DEVICE_HANDLER( ds2404_clk_w );
+DECLARE_READ8_DEVICE_HANDLER( ds2404_data_r );
+DECLARE_WRITE8_DEVICE_HANDLER( ds2404_data_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ds2404_clk_w );
 
 #endif

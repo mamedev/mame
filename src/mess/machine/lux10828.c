@@ -687,10 +687,10 @@ READ8_MEMBER( luxor_55_10828_device::fdc_r )
 
 	switch (offset & 0x03)
 	{
-	case 0: data = wd17xx_status_r(m_fdc, 0); break;
-	case 1: data = wd17xx_track_r(m_fdc, 0);  break;
-	case 2: data = wd17xx_sector_r(m_fdc, 0); break;
-	case 3: data = wd17xx_data_r(m_fdc, 0);   break;
+	case 0: data = wd17xx_status_r(m_fdc, space, 0); break;
+	case 1: data = wd17xx_track_r(m_fdc, space, 0);  break;
+	case 2: data = wd17xx_sector_r(m_fdc, space, 0); break;
+	case 3: data = wd17xx_data_r(m_fdc, space, 0);   break;
 	}
 
 	return data;
@@ -711,10 +711,10 @@ WRITE8_MEMBER( luxor_55_10828_device::fdc_w )
 
 	switch (offset & 0x03)
 	{
-	case 0: wd17xx_command_w(m_fdc, 0, data); break;
-	case 1: wd17xx_track_w(m_fdc, 0, data);   break;
-	case 2: wd17xx_sector_w(m_fdc, 0, data);  break;
-	case 3: wd17xx_data_w(m_fdc, 0, data);    break;
+	case 0: wd17xx_command_w(m_fdc, space, 0, data); break;
+	case 1: wd17xx_track_w(m_fdc, space, 0, data);   break;
+	case 2: wd17xx_sector_w(m_fdc, space, 0, data);  break;
+	case 3: wd17xx_data_w(m_fdc, space, 0, data);    break;
 	}
 }
 

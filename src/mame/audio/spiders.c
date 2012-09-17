@@ -182,22 +182,22 @@ WRITE8_DEVICE_HANDLER( spiders_audio_command_w )
 
 WRITE8_DEVICE_HANDLER( spiders_audio_a_w )
 {
-	discrete_sound_w(device, SPIDER_WEB_SOUND_MOD_DATA, 1 + (data & 4) * 8 + (data & 2) * 4 + (data & 1) * 2);
+	discrete_sound_w(device, space, SPIDER_WEB_SOUND_MOD_DATA, 1 + (data & 4) * 8 + (data & 2) * 4 + (data & 1) * 2);
 }
 
 WRITE8_DEVICE_HANDLER( spiders_audio_b_w )
 {
-	discrete_sound_w(device, SPIDERS_WEB_SOUND_DATA, data);
+	discrete_sound_w(device, space, SPIDERS_WEB_SOUND_DATA, data);
 }
 
 
 WRITE8_DEVICE_HANDLER( spiders_audio_ctrl_w )
 {
-	discrete_sound_w(device, SPIDERS_FIRE_EN, data & 0x10 ? 1 : 0);
-	discrete_sound_w(device, SPIDERS_EXP_EN, data & 0x08 ? 1 : 0);
-	discrete_sound_w(device, SPIDERS_SUPER_WEB_EXPL_EN, data & 0x04 ? 1 : 0);
-	discrete_sound_w(device, SPIDERS_SUPER_WEB_EN, data & 0x02 ? 1 : 0);
-	discrete_sound_w(device, SPIDERS_X_EN, data & 0x01 ? 1 : 0);
+	discrete_sound_w(device, space, SPIDERS_FIRE_EN, data & 0x10 ? 1 : 0);
+	discrete_sound_w(device, space, SPIDERS_EXP_EN, data & 0x08 ? 1 : 0);
+	discrete_sound_w(device, space, SPIDERS_SUPER_WEB_EXPL_EN, data & 0x04 ? 1 : 0);
+	discrete_sound_w(device, space, SPIDERS_SUPER_WEB_EN, data & 0x02 ? 1 : 0);
+	discrete_sound_w(device, space, SPIDERS_X_EN, data & 0x01 ? 1 : 0);
 }
 
 

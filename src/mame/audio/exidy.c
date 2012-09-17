@@ -533,7 +533,7 @@ static WRITE8_DEVICE_HANDLER( r6532_porta_w )
 	if (state->m_tms != NULL)
 	{
 		logerror("(%f)%s:TMS5220 data write = %02X\n", device->machine().time().as_double(), device->machine().describe_context(), riot6532_porta_out_get(state->m_riot));
-		tms5220_data_w(state->m_tms, 0, data);
+		tms5220_data_w(state->m_tms, space, 0, data);
 	}
 }
 
@@ -542,8 +542,8 @@ static READ8_DEVICE_HANDLER( r6532_porta_r )
 	exidy_sound_state *state = get_safe_token(device);
 	if (state->m_tms != NULL)
 	{
-		logerror("(%f)%s:TMS5220 status read = %02X\n", device->machine().time().as_double(), device->machine().describe_context(), tms5220_status_r(state->m_tms, 0));
-		return tms5220_status_r(state->m_tms, 0);
+		logerror("(%f)%s:TMS5220 status read = %02X\n", device->machine().time().as_double(), device->machine().describe_context(), tms5220_status_r(state->m_tms, space, 0));
+		return tms5220_status_r(state->m_tms, space, 0);
 	}
 	else
 		return 0xff;

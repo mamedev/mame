@@ -524,7 +524,7 @@ READ8_MEMBER(esripsys_state::tms5220_r)
 	{
 		/* TMS5220 core returns status bits in D7-D6 */
 		device_t *tms = machine().device("tms5220nl");
-		UINT8 status = tms5220_status_r(tms, 0);
+		UINT8 status = tms5220_status_r(tms, space, 0);
 
 		status = ((status & 0x80) >> 5) | ((status & 0x40) >> 5) | ((status & 0x20) >> 5);
 		return (tms5220_readyq_r(tms) << 7) | (tms5220_intq_r(tms) << 6) | status;
@@ -540,12 +540,12 @@ WRITE8_MEMBER(esripsys_state::tms5220_w)
 	if (offset == 0)
 	{
 		m_tms_data = data;
-		tms5220_data_w(tms, 0, m_tms_data);
+		tms5220_data_w(tms, space, 0, m_tms_data);
 	}
 #if 0
 	if (offset == 1)
 	{
-		tms5220_data_w(tms, 0, m_tms_data);
+		tms5220_data_w(tms, space, 0, m_tms_data);
 	}
 #endif
 }

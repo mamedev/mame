@@ -277,7 +277,7 @@ static const ttl74123_interface ic48_1_config =
 	1,					/* A pin - driven by the CRTC */
 	1,					/* B pin - pulled high */
 	1,					/* Clear pin - pulled high */
-	ic48_1_74123_output_changed
+	DEVCB_HANDLER(ic48_1_74123_output_changed)
 };
 
 
@@ -420,7 +420,7 @@ static MC6845_END_UPDATE( end_update )
 
 WRITE_LINE_MEMBER(nyny_state::display_enable_changed)
 {
-	ttl74123_a_w(m_ic48_1, 0, state);
+	ttl74123_a_w(m_ic48_1, generic_space(), 0, state);
 }
 
 

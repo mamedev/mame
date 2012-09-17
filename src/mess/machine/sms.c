@@ -859,7 +859,7 @@ WRITE8_MEMBER(sms_state::sms_ym2413_register_port_0_w)
 {
 
 	if (m_has_fm)
-		ym2413_w(m_ym, 0, (data & 0x3f));
+		ym2413_w(m_ym, space, 0, (data & 0x3f));
 }
 
 
@@ -869,7 +869,7 @@ WRITE8_MEMBER(sms_state::sms_ym2413_data_port_0_w)
 	if (m_has_fm)
 	{
 		logerror("data_port_0_w %x %x\n", offset, data);
-		ym2413_w(m_ym, 1, data);
+		ym2413_w(m_ym, space, 1, data);
 	}
 }
 

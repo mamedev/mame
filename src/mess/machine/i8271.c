@@ -1496,13 +1496,13 @@ READ8_DEVICE_HANDLER(i8271_r)
 /* to be completed! */
 READ8_DEVICE_HANDLER(i8271_dack_r)
 {
-	return i8271_data_r(device, offset);
+	return i8271_data_r(device, space, offset);
 }
 
 /* to be completed! */
 WRITE8_DEVICE_HANDLER(i8271_dack_w)
 {
-	i8271_data_w(device, offset, data);
+	i8271_data_w(device, space, offset, data);
 }
 
  READ8_DEVICE_HANDLER(i8271_data_r)

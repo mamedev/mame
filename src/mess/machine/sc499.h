@@ -20,8 +20,8 @@
  FUNCTION PROTOTYPES
  ***************************************************************************/
 
-READ8_DEVICE_HANDLER( sc499_r );
-WRITE8_DEVICE_HANDLER( sc499_w );
+DECLARE_READ8_DEVICE_HANDLER( sc499_r );
+DECLARE_WRITE8_DEVICE_HANDLER( sc499_w );
 
 void sc499_set_tc_state(running_machine *machine, int state);
 UINT8 sc499_dack_r(running_machine *machine);

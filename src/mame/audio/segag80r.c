@@ -376,8 +376,8 @@ WRITE8_MEMBER(segag80r_state::astrob_sound_w)
 static SOUND_START( sega005 );
 static STREAM_UPDATE( sega005_stream_update );
 static TIMER_CALLBACK( sega005_auto_timer );
-static WRITE8_DEVICE_HANDLER( sega005_sound_a_w );
-static WRITE8_DEVICE_HANDLER( sega005_sound_b_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( sega005_sound_a_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( sega005_sound_b_w );
 
 /*
     005
@@ -783,14 +783,14 @@ WRITE8_MEMBER(segag80r_state::spaceod_sound_w)
  *************************************/
 
 static SOUND_START( monsterb );
-static WRITE8_DEVICE_HANDLER( monsterb_sound_a_w );
-static WRITE8_DEVICE_HANDLER( monsterb_sound_b_w );
-static READ8_DEVICE_HANDLER( n7751_status_r );
-static WRITE8_DEVICE_HANDLER( n7751_command_w );
-static WRITE8_DEVICE_HANDLER( n7751_rom_control_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( monsterb_sound_a_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( monsterb_sound_b_w );
+static DECLARE_READ8_DEVICE_HANDLER( n7751_status_r );
+static DECLARE_WRITE8_DEVICE_HANDLER( n7751_command_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( n7751_rom_control_w );
 
 
-static WRITE8_DEVICE_HANDLER( n7751_p2_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( n7751_p2_w );
 
 
 /*
@@ -1032,7 +1032,7 @@ static WRITE8_DEVICE_HANDLER( n7751_p2_w )
 {
 	segag80r_state *state = device->machine().driver_data<segag80r_state>();
 	/* write to P2; low 4 bits go to 8243 */
-	i8243_p2_w(device, offset, data & 0x0f);
+	i8243_p2_w(device, space, offset, data & 0x0f);
 
 	/* output of bit $80 indicates we are ready (1) or busy (0) */
 	/* no other outputs are used */

@@ -585,32 +585,32 @@ READ16_DEVICE_HANDLER( deco16ic_pf_control_r )
 
 READ32_DEVICE_HANDLER ( deco16ic_pf_control_dword_r )
 {
-	return deco16ic_pf_control_r(device, offset, 0xffff)^0xffff0000;
+	return deco16ic_pf_control_r(device, space, offset, 0xffff)^0xffff0000;
 }
 
 WRITE32_DEVICE_HANDLER( deco16ic_pf_control_dword_w )
 {
-	deco16ic_pf_control_w(device, offset, data & 0xffff, mem_mask & 0xffff);
+	deco16ic_pf_control_w(device, space, offset, data & 0xffff, mem_mask & 0xffff);
 }
 
 READ32_DEVICE_HANDLER( deco16ic_pf1_data_dword_r )
 {
-	return deco16ic_pf1_data_r(device, offset, 0xffff)^0xffff0000;
+	return deco16ic_pf1_data_r(device, space, offset, 0xffff)^0xffff0000;
 }
 
 WRITE32_DEVICE_HANDLER( deco16ic_pf1_data_dword_w )
 {
-	deco16ic_pf1_data_w(device, offset, data & 0xffff, mem_mask & 0xffff);
+	deco16ic_pf1_data_w(device, space, offset, data & 0xffff, mem_mask & 0xffff);
 }
 
 READ32_DEVICE_HANDLER( deco16ic_pf2_data_dword_r )
 {
-	return deco16ic_pf2_data_r(device, offset, 0xffff)^0xffff0000;
+	return deco16ic_pf2_data_r(device, space, offset, 0xffff)^0xffff0000;
 }
 
 WRITE32_DEVICE_HANDLER( deco16ic_pf2_data_dword_w )
 {
-	deco16ic_pf2_data_w(device, offset, data & 0xffff, mem_mask & 0xffff);
+	deco16ic_pf2_data_w(device, space, offset, data & 0xffff, mem_mask & 0xffff);
 }
 
 

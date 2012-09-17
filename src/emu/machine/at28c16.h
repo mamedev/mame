@@ -84,8 +84,8 @@ extern const device_type AT28C16;
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE8_DEVICE_HANDLER( at28c16_w );
-READ8_DEVICE_HANDLER( at28c16_r );
+DECLARE_WRITE8_DEVICE_HANDLER( at28c16_w );
+DECLARE_READ8_DEVICE_HANDLER( at28c16_r );
 WRITE_LINE_DEVICE_HANDLER( at28c16_a9_12v );
 WRITE_LINE_DEVICE_HANDLER( at28c16_oe_12v );
 

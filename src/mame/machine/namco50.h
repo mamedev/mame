@@ -8,9 +8,9 @@
 	MCFG_DEVICE_ADD(_tag, NAMCO_50XX, _clock) \
 
 
-READ8_DEVICE_HANDLER( namco_50xx_read );
+DECLARE_READ8_DEVICE_HANDLER( namco_50xx_read );
 void namco_50xx_read_request(device_t *device);
-WRITE8_DEVICE_HANDLER( namco_50xx_write );
+DECLARE_WRITE8_DEVICE_HANDLER( namco_50xx_write );
 
 
 /* device get info callback */

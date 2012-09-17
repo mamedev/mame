@@ -201,7 +201,7 @@ READ8_HANDLER( pc1640_port60_r )
 READ8_HANDLER( pc200_port378_r )
 {
 	device_t *lpt = space->machine().device("lpt_1");
-	UINT8 data = pc_lpt_r(lpt, offset);
+	UINT8 data = pc_lpt_r(lpt, *space, offset);
 
 	if (offset == 1)
 		data = (data & ~7) | (space->machine().root_device().ioport("DSW0")->read() & 7);
@@ -214,7 +214,7 @@ READ8_HANDLER( pc200_port378_r )
 READ8_HANDLER( pc200_port278_r )
 {
 	device_t *lpt = space->machine().device("lpt_2");
-	UINT8 data = pc_lpt_r(lpt, offset);
+	UINT8 data = pc_lpt_r(lpt, *space, offset);
 
 	if (offset == 1)
 		data = (data & ~7) | (space->machine().root_device().ioport("DSW0")->read() & 7);
@@ -228,7 +228,7 @@ READ8_HANDLER( pc200_port278_r )
 READ8_HANDLER( pc1640_port378_r )
 {
 	 device_t *lpt = space->machine().device("lpt_1");
-	 UINT8 data = pc_lpt_r(lpt, offset);
+	 UINT8 data = pc_lpt_r(lpt, *space, offset);
 
 	if (offset == 1)
 		data=(data & ~7) | (space->machine().root_device().ioport("DSW0")->read() & 7);

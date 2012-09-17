@@ -1464,25 +1464,25 @@ static WRITE32_HANDLER( asic_fifo_w )
 
 static READ32_DEVICE_HANDLER( ide_main_r )
 {
-	return ide_controller32_r(device, 0x1f0/4 + offset, mem_mask);
+	return ide_controller32_r(device, space, 0x1f0/4 + offset, mem_mask);
 }
 
 
 static WRITE32_DEVICE_HANDLER( ide_main_w )
 {
-	ide_controller32_w(device, 0x1f0/4 + offset, data, mem_mask);
+	ide_controller32_w(device, space, 0x1f0/4 + offset, data, mem_mask);
 }
 
 
 static READ32_DEVICE_HANDLER( ide_alt_r )
 {
-	return ide_controller32_r(device, 0x3f4/4 + offset, mem_mask);
+	return ide_controller32_r(device, space, 0x3f4/4 + offset, mem_mask);
 }
 
 
 static WRITE32_DEVICE_HANDLER( ide_alt_w )
 {
-	ide_controller32_w(device, 0x3f4/4 + offset, data, mem_mask);
+	ide_controller32_w(device, space, 0x3f4/4 + offset, data, mem_mask);
 }
 
 
@@ -1490,9 +1490,9 @@ static READ32_DEVICE_HANDLER( ethernet_r )
 {
 	UINT32 result = 0;
 	if (ACCESSING_BITS_0_15)
-		result |= smc91c9x_r(device, offset * 2 + 0, mem_mask);
+		result |= smc91c9x_r(device, space, offset * 2 + 0, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		result |= smc91c9x_r(device, offset * 2 + 1, mem_mask >> 16) << 16;
+		result |= smc91c9x_r(device, space, offset * 2 + 1, mem_mask >> 16) << 16;
 	return result;
 }
 
@@ -1500,9 +1500,9 @@ static READ32_DEVICE_HANDLER( ethernet_r )
 static WRITE32_DEVICE_HANDLER( ethernet_w )
 {
 	if (ACCESSING_BITS_0_15)
-		smc91c9x_w(device, offset * 2 + 0, data, mem_mask);
+		smc91c9x_w(device, space, offset * 2 + 0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		smc91c9x_w(device, offset * 2 + 1, data >> 16, mem_mask >> 16);
+		smc91c9x_w(device, space, offset * 2 + 1, data >> 16, mem_mask >> 16);
 }
 
 

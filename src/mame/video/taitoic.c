@@ -1550,7 +1550,7 @@ WRITE16_DEVICE_HANDLER( tc0080vco_word_w )
 	else if (offset < 0x20800 / 2)	/* sprite ram */
 	{}
 	else if (offset < 0x20fff / 2)
-		tc0080vco_scrollram_w(device, offset - (0x20800 / 2), tc0080vco->ram[offset], mem_mask);
+		tc0080vco_scrollram_w(device, space, offset - (0x20800 / 2), tc0080vco->ram[offset], mem_mask);
 }
 
 void tc0080vco_tilemap_update( device_t *device )
@@ -2344,43 +2344,43 @@ WRITE16_DEVICE_HANDLER( tc0100scn_ctrl_word_w )
 
 READ32_DEVICE_HANDLER( tc0100scn_ctrl_long_r )
 {
-	return (tc0100scn_ctrl_word_r(device, offset * 2, 0xffff) << 16) | tc0100scn_ctrl_word_r(device, offset * 2 + 1, 0xffff);
+	return (tc0100scn_ctrl_word_r(device, space, offset * 2, 0xffff) << 16) | tc0100scn_ctrl_word_r(device, space, offset * 2 + 1, 0xffff);
 }
 
 WRITE32_DEVICE_HANDLER( tc0100scn_ctrl_long_w )
 {
 	if (ACCESSING_BITS_16_31)
-		tc0100scn_ctrl_word_w(device, offset * 2, data >> 16, mem_mask >> 16);
+		tc0100scn_ctrl_word_w(device, space, offset * 2, data >> 16, mem_mask >> 16);
 	if (ACCESSING_BITS_0_15)
-		tc0100scn_ctrl_word_w(device, (offset * 2) + 1, data & 0xffff, mem_mask & 0xffff);
+		tc0100scn_ctrl_word_w(device, space, (offset * 2) + 1, data & 0xffff, mem_mask & 0xffff);
 }
 
 READ32_DEVICE_HANDLER( tc0100scn_long_r )
 {
-	return (tc0100scn_word_r(device, offset * 2, 0xffff) << 16) | tc0100scn_word_r(device, offset * 2 + 1, 0xffff);
+	return (tc0100scn_word_r(device, space, offset * 2, 0xffff) << 16) | tc0100scn_word_r(device, space, offset * 2 + 1, 0xffff);
 }
 
 WRITE32_DEVICE_HANDLER( tc0100scn_long_w )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		int oldword = tc0100scn_word_r(device, offset * 2, 0xffff);
+		int oldword = tc0100scn_word_r(device, space, offset * 2, 0xffff);
 		int newword = data >> 16;
 		if (!ACCESSING_BITS_16_23)
 			newword |= (oldword & 0x00ff);
 		if (!ACCESSING_BITS_24_31)
 			newword |= (oldword & 0xff00);
-		tc0100scn_word_w(device, offset * 2, newword, 0xffff);
+		tc0100scn_word_w(device, space, offset * 2, newword, 0xffff);
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		int oldword = tc0100scn_word_r(device, (offset * 2) + 1, 0xffff);
+		int oldword = tc0100scn_word_r(device, space, (offset * 2) + 1, 0xffff);
 		int newword = data& 0xffff;
 		if (!ACCESSING_BITS_0_7)
 			newword |= (oldword & 0x00ff);
 		if (!ACCESSING_BITS_8_15)
 			newword |= (oldword & 0xff00);
-		tc0100scn_word_w(device, (offset * 2) + 1, newword, 0xffff);
+		tc0100scn_word_w(device, space, (offset * 2) + 1, newword, 0xffff);
 	}
 }
 
@@ -2699,17 +2699,17 @@ WRITE16_DEVICE_HANDLER( tc0280grd_ctrl_word_w )
 
 READ16_DEVICE_HANDLER( tc0430grw_word_r )
 {
-	return tc0280grd_word_r(device, offset, mem_mask);
+	return tc0280grd_word_r(device, space, offset, mem_mask);
 }
 
 WRITE16_DEVICE_HANDLER( tc0430grw_word_w )
 {
-	tc0280grd_word_w(device, offset, data, mem_mask);
+	tc0280grd_word_w(device, space, offset, data, mem_mask);
 }
 
 WRITE16_DEVICE_HANDLER( tc0430grw_ctrl_word_w )
 {
-	tc0280grd_ctrl_word_w(device, offset, data, mem_mask);
+	tc0280grd_ctrl_word_w(device, space, offset, data, mem_mask);
 }
 
 void tc0280grd_tilemap_update( device_t *device, int base_color )
@@ -3276,7 +3276,7 @@ WRITE16_DEVICE_HANDLER( tc0480scp_ctrl_word_w )
 
 READ32_DEVICE_HANDLER( tc0480scp_ctrl_long_r )
 {
-	return (tc0480scp_ctrl_word_r(device, offset * 2, 0xffff) << 16) | tc0480scp_ctrl_word_r(device, offset * 2 + 1, 0xffff);
+	return (tc0480scp_ctrl_word_r(device, space, offset * 2, 0xffff) << 16) | tc0480scp_ctrl_word_r(device, space, offset * 2 + 1, 0xffff);
 }
 
 /* TODO: byte access ? */
@@ -3284,37 +3284,37 @@ READ32_DEVICE_HANDLER( tc0480scp_ctrl_long_r )
 WRITE32_DEVICE_HANDLER( tc0480scp_ctrl_long_w )
 {
 	if (ACCESSING_BITS_16_31)
-		tc0480scp_ctrl_word_w(device, offset * 2, data >> 16, mem_mask >> 16);
+		tc0480scp_ctrl_word_w(device, space, offset * 2, data >> 16, mem_mask >> 16);
 	if (ACCESSING_BITS_0_15)
-		tc0480scp_ctrl_word_w(device, (offset * 2) + 1, data & 0xffff, mem_mask & 0xffff);
+		tc0480scp_ctrl_word_w(device, space, (offset * 2) + 1, data & 0xffff, mem_mask & 0xffff);
 }
 
 READ32_DEVICE_HANDLER( tc0480scp_long_r )
 {
-	return (tc0480scp_word_r(device, offset * 2, 0xffff) << 16) | tc0480scp_word_r(device, offset * 2 + 1, 0xffff);
+	return (tc0480scp_word_r(device, space, offset * 2, 0xffff) << 16) | tc0480scp_word_r(device, space, offset * 2 + 1, 0xffff);
 }
 
 WRITE32_DEVICE_HANDLER( tc0480scp_long_w )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		int oldword = tc0480scp_word_r(device, offset * 2, 0xffff);
+		int oldword = tc0480scp_word_r(device, space, offset * 2, 0xffff);
 		int newword = data >> 16;
 		if (!ACCESSING_BITS_16_23)
 			newword |= (oldword & 0x00ff);
 		if (!ACCESSING_BITS_24_31)
 			newword |= (oldword & 0xff00);
-		tc0480scp_word_w(device, offset * 2, newword, 0xffff);
+		tc0480scp_word_w(device, space, offset * 2, newword, 0xffff);
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		int oldword = tc0480scp_word_r(device, (offset * 2) + 1, 0xffff);
+		int oldword = tc0480scp_word_r(device, space, (offset * 2) + 1, 0xffff);
 		int newword = data & 0xffff;
 		if (!ACCESSING_BITS_0_7)
 			newword |= (oldword & 0x00ff);
 		if (!ACCESSING_BITS_8_15)
 			newword |= (oldword & 0xff00);
-		tc0480scp_word_w(device, (offset * 2) + 1, newword, 0xffff);
+		tc0480scp_word_w(device, space, (offset * 2) + 1, newword, 0xffff);
 	}
 }
 

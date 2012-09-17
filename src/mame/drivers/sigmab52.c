@@ -171,7 +171,8 @@ static SCREEN_UPDATE_IND16( jwildb52 )
 
 	int x, y, b, src;
 
-	b = ((hd63484_regs_r(hd63484, 0xcc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(hd63484, 0xce/2, 0xffff);
+	address_space &space = screen.machine().driver_data()->generic_space();
+	b = ((hd63484_regs_r(hd63484, space, 0xcc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(hd63484, space, 0xce/2, 0xffff);
 
 //save vram to file
 #if 0
@@ -186,10 +187,10 @@ static SCREEN_UPDATE_IND16( jwildb52 )
 
 	for (y = 0; y < 480; y++)
 	{
-		for (x = 0; x < (hd63484_regs_r(hd63484, 0xca/2, 0xffff) & 0x0fff) * 4; x += 4)
+		for (x = 0; x < (hd63484_regs_r(hd63484, space, 0xca/2, 0xffff) & 0x0fff) * 4; x += 4)
 		{
 
-			src = hd63484_ram_r(hd63484, b & (HD63484_RAM_SIZE - 1), 0xffff);
+			src = hd63484_ram_r(hd63484, space, b & (HD63484_RAM_SIZE - 1), 0xffff);
 
 			bitmap.pix16(y, x    ) = ((src & 0x000f) >>  0) << 0;
 			bitmap.pix16(y, x + 1) = ((src & 0x00f0) >>  4) << 0;
@@ -200,24 +201,24 @@ static SCREEN_UPDATE_IND16( jwildb52 )
 	}
 
 if (!screen.machine().input().code_pressed(KEYCODE_O))
-	if ((hd63484_regs_r(hd63484, 0x06/2, 0xffff) & 0x0300) == 0x0300)
+	if ((hd63484_regs_r(hd63484, space, 0x06/2, 0xffff) & 0x0300) == 0x0300)
 	{
-		int sy = (hd63484_regs_r(hd63484, 0x94/2, 0xffff) & 0x0fff) - (hd63484_regs_r(hd63484, 0x88/2, 0xffff) >> 8);
-		int h = hd63484_regs_r(hd63484, 0x96/2, 0xffff) & 0x0fff;
-		int sx = ((hd63484_regs_r(hd63484, 0x92/2, 0xffff) >> 8) - (hd63484_regs_r(hd63484, 0x84/2, 0xffff) >> 8)) * 4;
-		int w = (hd63484_regs_r(hd63484, 0x92/2, 0xffff) & 0xff) * 2;
+		int sy = (hd63484_regs_r(hd63484, space, 0x94/2, 0xffff) & 0x0fff) - (hd63484_regs_r(hd63484, space, 0x88/2, 0xffff) >> 8);
+		int h = hd63484_regs_r(hd63484, space, 0x96/2, 0xffff) & 0x0fff;
+		int sx = ((hd63484_regs_r(hd63484, space, 0x92/2, 0xffff) >> 8) - (hd63484_regs_r(hd63484, space, 0x84/2, 0xffff) >> 8)) * 4;
+		int w = (hd63484_regs_r(hd63484, space, 0x92/2, 0xffff) & 0xff) * 2;
 		if (sx < 0) sx = 0;	// not sure about this (shangha2 title screen)
 
-		b = (((hd63484_regs_r(hd63484, 0xdc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(hd63484, 0xde/2, 0xffff));
+		b = (((hd63484_regs_r(hd63484, space, 0xdc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(hd63484, space, 0xde/2, 0xffff));
 
 
 		for (y = sy; y <= sy + h && y < 480; y++)
 		{
-			for (x = 0; x < (hd63484_regs_r(hd63484, 0xca/2, 0xffff) & 0x0fff)* 4; x += 4)
+			for (x = 0; x < (hd63484_regs_r(hd63484, space, 0xca/2, 0xffff) & 0x0fff)* 4; x += 4)
 			{
-					src = hd63484_ram_r(hd63484, b & (HD63484_RAM_SIZE - 1), 0xffff);
+					src = hd63484_ram_r(hd63484, space, b & (HD63484_RAM_SIZE - 1), 0xffff);
 
-				if (x <= w && x + sx >= 0 && x + sx < (hd63484_regs_r(hd63484, 0xca/2, 0xffff) & 0x0fff) * 4)
+				if (x <= w && x + sx >= 0 && x + sx < (hd63484_regs_r(hd63484, space, 0xca/2, 0xffff) & 0x0fff) * 4)
 					{
 						bitmap.pix16(y, x + sx    ) = ((src & 0x000f) >>  0) << 0;
 						bitmap.pix16(y, x + sx + 1) = ((src & 0x00f0) >>  4) << 0;
@@ -249,7 +250,7 @@ WRITE8_MEMBER(sigmab52_state::acrtc_w)
 	if(!offset)
 	{
 		//address select
-		hd63484_address_w(hd63484, 0, data, 0x00ff);
+		hd63484_address_w(hd63484, space, 0, data, 0x00ff);
 		m_latch = 0;
 	}
 	else
@@ -265,7 +266,7 @@ WRITE8_MEMBER(sigmab52_state::acrtc_w)
 			m_acrtc_data <<= 8;
 			m_acrtc_data |= data;
 
-			hd63484_data_w(hd63484, 0, m_acrtc_data, 0xffff);
+			hd63484_data_w(hd63484, space, 0, m_acrtc_data, 0xffff);
 		}
 
 		m_latch ^= 1;
@@ -277,7 +278,7 @@ READ8_MEMBER(sigmab52_state::acrtc_r)
 	if(offset&1)
 	{
 		device_t *hd63484 = machine().device("hd63484");
-		return hd63484_data_r(hd63484, 0, 0xff);
+		return hd63484_data_r(hd63484, space, 0, 0xff);
 	}
 
 	else
@@ -569,9 +570,10 @@ void sigmab52_state::machine_start()
 
 		device_t *hd63484 = machine().device("hd63484");
 
+		address_space &space = generic_space();
 		for(i = 0; i < 0x40000/2; ++i)
 		{
-			hd63484_ram_w(hd63484, i + 0x40000/2, rom[i], 0xffff);
+			hd63484_ram_w(hd63484, space, i + 0x40000/2, rom[i], 0xffff);
 		}
 	}
 }

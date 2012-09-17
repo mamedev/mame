@@ -481,7 +481,7 @@ WRITE8_MEMBER(system1_state::sound_control_w)
 	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* remaining bits are used for video RAM banking */
-	system1_videoram_bank_w(device, offset, data);
+	system1_videoram_bank_w(device, space, offset, data);
 }
 
 

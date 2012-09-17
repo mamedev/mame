@@ -63,7 +63,7 @@ public:
 extern const device_type S3C2410;
 
 
-READ32_DEVICE_HANDLER( s3c2410_lcd_r );
+DECLARE_READ32_DEVICE_HANDLER( s3c2410_lcd_r );
 
 /*******************************************************************************
     TYPE DEFINITIONS

@@ -187,28 +187,28 @@ WRITE8_MEMBER(sprint4_state::sprint4_lockout_w)
 WRITE8_MEMBER(sprint4_state::sprint4_screech_1_w)
 {
 	device_t *device = machine().device("discrete");
-	discrete_sound_w(device, SPRINT4_SCREECH_EN_1, offset & 1);
+	discrete_sound_w(device, space, SPRINT4_SCREECH_EN_1, offset & 1);
 }
 
 
 WRITE8_MEMBER(sprint4_state::sprint4_screech_2_w)
 {
 	device_t *device = machine().device("discrete");
-	discrete_sound_w(device, SPRINT4_SCREECH_EN_2, offset & 1);
+	discrete_sound_w(device, space, SPRINT4_SCREECH_EN_2, offset & 1);
 }
 
 
 WRITE8_MEMBER(sprint4_state::sprint4_screech_3_w)
 {
 	device_t *device = machine().device("discrete");
-	discrete_sound_w(device, SPRINT4_SCREECH_EN_3, offset & 1);
+	discrete_sound_w(device, space, SPRINT4_SCREECH_EN_3, offset & 1);
 }
 
 
 WRITE8_MEMBER(sprint4_state::sprint4_screech_4_w)
 {
 	device_t *device = machine().device("discrete");
-	discrete_sound_w(device, SPRINT4_SCREECH_EN_4, offset & 1);
+	discrete_sound_w(device, space, SPRINT4_SCREECH_EN_4, offset & 1);
 }
 
 
@@ -217,14 +217,14 @@ WRITE8_MEMBER(sprint4_state::sprint4_screech_4_w)
 WRITE8_MEMBER(sprint4_state::sprint4_bang_w)
 {
 	device_t *device = machine().device("discrete");
-	discrete_sound_w(device, SPRINT4_BANG_DATA, data & 0x0f);
+	discrete_sound_w(device, space, SPRINT4_BANG_DATA, data & 0x0f);
 }
 
 
 WRITE8_MEMBER(sprint4_state::sprint4_attract_w)
 {
 	device_t *device = machine().device("discrete");
-	discrete_sound_w(device, SPRINT4_ATTRACT_EN, data & 1);
+	discrete_sound_w(device, space, SPRINT4_ATTRACT_EN, data & 1);
 }
 
 

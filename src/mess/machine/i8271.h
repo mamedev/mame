@@ -46,14 +46,14 @@ struct i8271_interface
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-READ8_DEVICE_HANDLER (i8271_r);
-WRITE8_DEVICE_HANDLER(i8271_w);
+DECLARE_READ8_DEVICE_HANDLER (i8271_r);
+DECLARE_WRITE8_DEVICE_HANDLER(i8271_w);
 
-READ8_DEVICE_HANDLER (i8271_dack_r);
-WRITE8_DEVICE_HANDLER(i8271_dack_w);
+DECLARE_READ8_DEVICE_HANDLER (i8271_dack_r);
+DECLARE_WRITE8_DEVICE_HANDLER(i8271_dack_w);
 
-READ8_DEVICE_HANDLER (i8271_data_r);
-WRITE8_DEVICE_HANDLER(i8271_data_w);
+DECLARE_READ8_DEVICE_HANDLER (i8271_data_r);
+DECLARE_WRITE8_DEVICE_HANDLER(i8271_data_w);
 
 
 /***************************************************************************

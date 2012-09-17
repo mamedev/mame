@@ -49,7 +49,7 @@ struct dl1416_interface
 WRITE_LINE_DEVICE_HANDLER( dl1416_wr_w ); /* write enable */
 WRITE_LINE_DEVICE_HANDLER( dl1416_ce_w ); /* chip enable */
 WRITE_LINE_DEVICE_HANDLER( dl1416_cu_w ); /* cursor enable */
-WRITE8_DEVICE_HANDLER( dl1416_data_w );
+DECLARE_WRITE8_DEVICE_HANDLER( dl1416_data_w );
 
 /* device get info callback */
 class dl1416_device : public device_t

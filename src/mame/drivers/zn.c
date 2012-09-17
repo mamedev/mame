@@ -1216,7 +1216,7 @@ WRITE8_MEMBER(zn_state::fx1a_sound_bankswitch_w)
 READ32_MEMBER(zn_state::taitofx1a_ymsound_r)
 {
 	device_t *tc0140syt = machine().device("tc0140syt");
-	return tc0140syt_comm_r(tc0140syt, 0) << 16;
+	return tc0140syt_comm_r(tc0140syt, space, 0) << 16;
 }
 
 WRITE32_MEMBER(zn_state::taitofx1a_ymsound_w)
@@ -1225,11 +1225,11 @@ WRITE32_MEMBER(zn_state::taitofx1a_ymsound_w)
 
 	if (mem_mask == 0x0000ffff)
 	{
-		tc0140syt_port_w(tc0140syt, 0, data & 0xff);
+		tc0140syt_port_w(tc0140syt, space, 0, data & 0xff);
 	}
 	else
 	{
-		tc0140syt_comm_w(tc0140syt, 0, (data >> 16) & 0xff);
+		tc0140syt_comm_w(tc0140syt, space, 0, (data >> 16) & 0xff);
 	}
 }
 
@@ -1498,9 +1498,10 @@ static void atpsx_dma_read( zn_state *state, UINT32 n_address, INT32 n_size )
 
 	/* dma size is in 32-bit words, convert to bytes */
 	n_size <<= 2;
+	address_space &space = *state->machine().firstcpu->space(AS_PROGRAM);
 	while( n_size > 0 )
 	{
-		psxwritebyte( p_n_psxram, n_address, ide_controller32_r( ide, 0x1f0 / 4, 0x000000ff ) );
+		psxwritebyte( p_n_psxram, n_address, ide_controller32_r( ide, space, 0x1f0 / 4, 0x000000ff ) );
 		n_address++;
 		n_size--;
 	}

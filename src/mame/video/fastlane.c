@@ -49,9 +49,9 @@ static void set_pens( running_machine &machine )
 
 TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info0)
 {
-	UINT8 ctrl_3 = k007121_ctrlram_r(m_k007121, 3);
-	UINT8 ctrl_4 = k007121_ctrlram_r(m_k007121, 4);
-	UINT8 ctrl_5 = k007121_ctrlram_r(m_k007121, 5);
+	UINT8 ctrl_3 = k007121_ctrlram_r(m_k007121, generic_space(), 3);
+	UINT8 ctrl_4 = k007121_ctrlram_r(m_k007121, generic_space(), 4);
+	UINT8 ctrl_5 = k007121_ctrlram_r(m_k007121, generic_space(), 5);
 	int attr = m_videoram1[tile_index];
 	int code = m_videoram1[tile_index + 0x400];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
@@ -77,9 +77,9 @@ TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info0)
 
 TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info1)
 {
-	UINT8 ctrl_3 = k007121_ctrlram_r(m_k007121, 3);
-	UINT8 ctrl_4 = k007121_ctrlram_r(m_k007121, 4);
-	UINT8 ctrl_5 = k007121_ctrlram_r(m_k007121, 5);
+	UINT8 ctrl_3 = k007121_ctrlram_r(m_k007121, generic_space(), 3);
+	UINT8 ctrl_4 = k007121_ctrlram_r(m_k007121, generic_space(), 4);
+	UINT8 ctrl_5 = k007121_ctrlram_r(m_k007121, generic_space(), 5);
 	int attr = m_videoram2[tile_index];
 	int code = m_videoram2[tile_index + 0x400];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
@@ -163,11 +163,12 @@ SCREEN_UPDATE_IND16( fastlane )
 	set_pens(screen.machine());
 
 	/* set scroll registers */
-	xoffs = k007121_ctrlram_r(state->m_k007121, 0);
+	address_space &space = screen.machine().driver_data()->generic_space();
+	xoffs = k007121_ctrlram_r(state->m_k007121, space, 0);
 	for (i = 0; i < 32; i++)
 		state->m_layer0->set_scrollx(i, state->m_k007121_regs[0x20 + i] + xoffs - 40);
 
-	state->m_layer0->set_scrolly(0, k007121_ctrlram_r(state->m_k007121, 2));
+	state->m_layer0->set_scrolly(0, k007121_ctrlram_r(state->m_k007121, space, 2));
 
 	state->m_layer0->draw(bitmap, finalclip0, 0, 0);
 	k007121_sprites_draw(state->m_k007121, bitmap, cliprect, screen.machine().gfx[0], screen.machine().colortable, state->m_spriteram, 0, 40, 0, (UINT32)-1);

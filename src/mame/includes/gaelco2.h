@@ -55,9 +55,9 @@ public:
 /*----------- defined in machine/gaelco2.c -----------*/
 
 TIMER_DEVICE_CALLBACK( bang_irq );
-WRITE16_DEVICE_HANDLER( gaelco2_eeprom_cs_w );
-WRITE16_DEVICE_HANDLER( gaelco2_eeprom_sk_w );
-WRITE16_DEVICE_HANDLER( gaelco2_eeprom_data_w );
+DECLARE_WRITE16_DEVICE_HANDLER( gaelco2_eeprom_cs_w );
+DECLARE_WRITE16_DEVICE_HANDLER( gaelco2_eeprom_sk_w );
+DECLARE_WRITE16_DEVICE_HANDLER( gaelco2_eeprom_data_w );
 
 /*----------- defined in video/gaelco2.c -----------*/
 

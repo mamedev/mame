@@ -6,7 +6,8 @@
 SCREEN_UPDATE_IND16( dietgo )
 {
 	dietgo_state *state = screen.machine().driver_data<dietgo_state>();
-	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
+	address_space &space = screen.machine().driver_data()->generic_space();
+	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, space, 0, 0xffff);
 
 	state->flip_screen_set(BIT(flip, 7));
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);

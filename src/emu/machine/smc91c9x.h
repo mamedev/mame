@@ -44,8 +44,8 @@ struct smc91c9x_config
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-READ16_DEVICE_HANDLER( smc91c9x_r );
-WRITE16_DEVICE_HANDLER( smc91c9x_w );
+DECLARE_READ16_DEVICE_HANDLER( smc91c9x_r );
+DECLARE_WRITE16_DEVICE_HANDLER( smc91c9x_w );
 
 
 /* ----- device interface ----- */

@@ -64,7 +64,7 @@ READ8Z_MEMBER(ti_fdc_device::readz)
 
 			if ((offset & 0x1ff9)==0x1ff0)
 			{
-				reply = wd17xx_r(m_controller, (offset >> 1)&0x03);
+				reply = wd17xx_r(m_controller, space, (offset >> 1)&0x03);
 			}
 			else
 			{
@@ -88,7 +88,7 @@ WRITE8_MEMBER(ti_fdc_device::write)
 			// 0101 1111 1111 1xx0
 			if ((offset & 0x1ff9)==0x1ff8)
 			{
-				wd17xx_w(m_controller, (offset >> 1)&0x03, data);
+				wd17xx_w(m_controller, space, (offset >> 1)&0x03, data);
 			}
 		}
 	}

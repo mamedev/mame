@@ -60,8 +60,8 @@ MACHINE_RESET( seibu_sound );
 void seibu_sound_decrypt(running_machine &machine,const char *cpu,int length);
 
 void seibu_adpcm_decrypt(running_machine &machine, const char *region);
-WRITE8_DEVICE_HANDLER( seibu_adpcm_adr_w );
-WRITE8_DEVICE_HANDLER( seibu_adpcm_ctl_w );
+DECLARE_WRITE8_DEVICE_HANDLER( seibu_adpcm_adr_w );
+DECLARE_WRITE8_DEVICE_HANDLER( seibu_adpcm_ctl_w );
 
 class seibu_adpcm_device : public device_t,
                                   public device_sound_interface

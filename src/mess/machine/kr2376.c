@@ -80,6 +80,7 @@ struct kr2376_t
 
 	/* timers */
 	emu_timer *scan_timer;			/* keyboard scan timer */
+	devcb_resolved_write_line on_strobe_changed;
 };
 
 INLINE kr2376_t *get_safe_token(device_t *device)
@@ -133,8 +134,8 @@ static void change_output_lines(device_t *device)
 			kr2376->pins[KR2376_PO] = kr2376->parity ^ kr2376->pins[KR2376_PII];
 		}
 		kr2376->pins[KR2376_SO] = kr2376->strobe ^ kr2376->pins[KR2376_DSII];
-		if (kr2376->intf->on_strobe_changed)
-			kr2376->intf->on_strobe_changed(device, 0, kr2376->strobe ^ kr2376->pins[KR2376_DSII]);
+		if (!kr2376->on_strobe_changed.isnull())
+			kr2376->on_strobe_changed(kr2376->strobe ^ kr2376->pins[KR2376_DSII]);
 	}
 }
 
@@ -343,9 +344,11 @@ static DEVICE_START( kr2376 )
 	assert(device->tag() != NULL);
 
 	kr2376->intf = (const kr2376_interface*)device->static_config();
-
+	
 	assert(kr2376->intf != NULL);
 	assert(kr2376->intf->clock > 0);
+
+	kr2376->on_strobe_changed.resolve(kr2376->intf->on_strobe_changed_cb, *device);
 
 	/* set initial values */
 	kr2376->ring11 = 0;

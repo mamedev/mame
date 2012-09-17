@@ -128,10 +128,10 @@ extern const device_type MACHINE_CDICDIC;
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ16_DEVICE_HANDLER( cdic_r );
-WRITE16_DEVICE_HANDLER( cdic_w );
-READ16_DEVICE_HANDLER( cdic_ram_r );
-WRITE16_DEVICE_HANDLER( cdic_ram_w );
+DECLARE_READ16_DEVICE_HANDLER( cdic_r );
+DECLARE_WRITE16_DEVICE_HANDLER( cdic_w );
+DECLARE_READ16_DEVICE_HANDLER( cdic_ram_r );
+DECLARE_WRITE16_DEVICE_HANDLER( cdic_ram_w );
 
 
 #endif // __CDICDIC_H__

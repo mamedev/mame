@@ -280,10 +280,10 @@ extern UINT32 *rsp_dmem;
 extern void dp_full_sync(running_machine &machine);
 extern void signal_rcp_interrupt(running_machine &machine, int interrupt);
 
-extern READ32_DEVICE_HANDLER( n64_sp_reg_r );
-extern WRITE32_DEVICE_HANDLER( n64_sp_reg_w );
-extern READ32_DEVICE_HANDLER( n64_dp_reg_r );
-extern WRITE32_DEVICE_HANDLER( n64_dp_reg_w );
+extern DECLARE_READ32_DEVICE_HANDLER( n64_sp_reg_r );
+extern DECLARE_WRITE32_DEVICE_HANDLER( n64_sp_reg_w );
+extern DECLARE_READ32_DEVICE_HANDLER( n64_dp_reg_r );
+extern DECLARE_WRITE32_DEVICE_HANDLER( n64_dp_reg_w );
 
 
 

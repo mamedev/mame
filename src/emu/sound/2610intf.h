@@ -14,17 +14,17 @@ struct ym2610_interface
 	void ( *handler )( device_t *device, int irq );	/* IRQ handler for the YM2610 */
 };
 
-READ8_DEVICE_HANDLER( ym2610_r );
-WRITE8_DEVICE_HANDLER( ym2610_w );
+DECLARE_READ8_DEVICE_HANDLER( ym2610_r );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2610_w );
 
-READ8_DEVICE_HANDLER( ym2610_status_port_a_r );
-READ8_DEVICE_HANDLER( ym2610_status_port_b_r );
-READ8_DEVICE_HANDLER( ym2610_read_port_r );
+DECLARE_READ8_DEVICE_HANDLER( ym2610_status_port_a_r );
+DECLARE_READ8_DEVICE_HANDLER( ym2610_status_port_b_r );
+DECLARE_READ8_DEVICE_HANDLER( ym2610_read_port_r );
 
-WRITE8_DEVICE_HANDLER( ym2610_control_port_a_w );
-WRITE8_DEVICE_HANDLER( ym2610_control_port_b_w );
-WRITE8_DEVICE_HANDLER( ym2610_data_port_a_w );
-WRITE8_DEVICE_HANDLER( ym2610_data_port_b_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2610_control_port_a_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2610_control_port_b_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2610_data_port_a_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2610_data_port_b_w );
 
 
 class ym2610_device : public device_t,

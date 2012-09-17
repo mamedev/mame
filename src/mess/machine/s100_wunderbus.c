@@ -327,7 +327,7 @@ void s100_wunderbus_device::s100_vi2_w(int state)
 //  s100_sinp_r - I/O read
 //-------------------------------------------------
 
-UINT8 s100_wunderbus_device::s100_sinp_r(offs_t offset)
+UINT8 s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
 {
 	UINT8 address = (ioport("7C")->read() & 0x3e) << 2;
 	if ((offset & 0xf8) != address) return 0;
@@ -406,7 +406,7 @@ UINT8 s100_wunderbus_device::s100_sinp_r(offs_t offset)
 
 			case 4: // 8259 0 register
 			case 5: // 8259 1 register
-				data = pic8259_r(m_pic, offset & 0x01);
+				data = pic8259_r(m_pic, space, offset & 0x01);
 				break;
 
 			case 6: // not used
@@ -436,7 +436,7 @@ UINT8 s100_wunderbus_device::s100_sinp_r(offs_t offset)
 //  s100_sout_w - I/O write
 //-------------------------------------------------
 
-void s100_wunderbus_device::s100_sout_w(offs_t offset, UINT8 data)
+void s100_wunderbus_device::s100_sout_w(address_space &space, offs_t offset, UINT8 data)
 {
 	UINT8 address = (ioport("7C")->read() & 0x3e) << 2;
 	if ((offset & 0xf8) != address) return;
@@ -515,7 +515,7 @@ void s100_wunderbus_device::s100_sout_w(offs_t offset, UINT8 data)
 
 			case 4: // 8259 0 register
 			case 5: // 8259 1 register
-				pic8259_w(m_pic, offset & 0x01, data);
+				pic8259_w(m_pic, space, offset & 0x01, data);
 				break;
 
 			case 6: // Par. port cntrl.

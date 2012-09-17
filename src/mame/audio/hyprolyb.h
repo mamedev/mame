@@ -1,5 +1,5 @@
-WRITE8_DEVICE_HANDLER( hyprolyb_adpcm_w );
-READ8_DEVICE_HANDLER( hyprolyb_adpcm_busy_r );
+DECLARE_WRITE8_DEVICE_HANDLER( hyprolyb_adpcm_w );
+DECLARE_READ8_DEVICE_HANDLER( hyprolyb_adpcm_busy_r );
 
 MACHINE_CONFIG_EXTERN( hyprolyb_adpcm );
 

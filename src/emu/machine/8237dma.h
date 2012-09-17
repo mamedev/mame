@@ -189,8 +189,8 @@ extern const device_type I8237;
 ***************************************************************************/
 
 /* register access */
-READ8_DEVICE_HANDLER( i8237_r );
-WRITE8_DEVICE_HANDLER( i8237_w );
+DECLARE_READ8_DEVICE_HANDLER( i8237_r );
+DECLARE_WRITE8_DEVICE_HANDLER( i8237_w );
 
 /* hold acknowledge */
 WRITE_LINE_DEVICE_HANDLER( i8237_hlda_w );

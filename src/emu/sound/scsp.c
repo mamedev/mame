@@ -230,7 +230,7 @@ struct scsp_state
 	device_t *device;
 };
 
-static void dma_scsp(address_space *space, scsp_state *scsp);		/*state DMA transfer function*/
+static void dma_scsp(address_space &space, scsp_state *scsp);		/*state DMA transfer function*/
 #define	scsp_dgate		scsp->scsp_dmactrl & 0x4000
 #define	scsp_ddir		scsp->scsp_dmactrl & 0x2000
 #define scsp_dexe		scsp->scsp_dmactrl & 0x1000
@@ -698,11 +698,8 @@ static void SCSP_UpdateSlotReg(scsp_state *scsp,int s,int r)
 	}
 }
 
-static void SCSP_UpdateReg(scsp_state *scsp, int reg)
+static void SCSP_UpdateReg(scsp_state *scsp, address_space &space, int reg)
 {
-	/* temporary hack until this is converted to a device */
-	address_space *space = scsp->device->machine().firstcpu->space(AS_PROGRAM);
-
 	switch(reg&0x3f)
 	{
 		case 0x0:
@@ -726,7 +723,7 @@ static void SCSP_UpdateReg(scsp_state *scsp, int reg)
 			break;
 		case 0x6:
 		case 0x7:
-			scsp_midi_in(space->machine().device("scsp"), 0, scsp->udata.data[0x6/2]&0xff, 0);
+			scsp_midi_in(space.machine().device("scsp"), space, 0, scsp->udata.data[0x6/2]&0xff, 0);
 			break;
 		case 0x12:
 		case 0x13:
@@ -837,7 +834,7 @@ static void SCSP_UpdateSlotRegR(scsp_state *scsp, int slot,int reg)
 
 }
 
-static void SCSP_UpdateRegR(scsp_state *scsp, int reg)
+static void SCSP_UpdateRegR(scsp_state *scsp, address_space &space, int reg)
 {
 	switch(reg&0x3f)
 	{
@@ -885,7 +882,7 @@ static void SCSP_UpdateRegR(scsp_state *scsp, int reg)
 	}
 }
 
-static void SCSP_w16(scsp_state *scsp,unsigned int addr,unsigned short val)
+static void SCSP_w16(scsp_state *scsp,address_space &space,unsigned int addr,unsigned short val)
 {
 	addr&=0xffff;
 	if(addr<0x400)
@@ -900,7 +897,7 @@ static void SCSP_w16(scsp_state *scsp,unsigned int addr,unsigned short val)
 		if (addr < 0x430)
 		{
 			*((unsigned short *) (scsp->udata.datab+((addr&0x3f)))) = val;
-			SCSP_UpdateReg(scsp, addr&0x3f);
+			SCSP_UpdateReg(scsp, space, addr&0x3f);
 		}
 	}
 	else if(addr<0x700)
@@ -924,7 +921,7 @@ static void SCSP_w16(scsp_state *scsp,unsigned int addr,unsigned short val)
 	}
 }
 
-static unsigned short SCSP_r16(scsp_state *scsp, unsigned int addr)
+static unsigned short SCSP_r16(scsp_state *scsp, address_space &space, unsigned int addr)
 {
 	unsigned short v=0;
 	addr&=0xffff;
@@ -941,7 +938,7 @@ static unsigned short SCSP_r16(scsp_state *scsp, unsigned int addr)
 	{
 		if (addr < 0x430)
 		{
-			SCSP_UpdateRegR(scsp, addr&0x3f);
+			SCSP_UpdateRegR(scsp, space, addr&0x3f);
 			v= *((unsigned short *) (scsp->udata.datab+((addr&0x3f))));
 		}
 	}
@@ -1180,7 +1177,7 @@ static void SCSP_DoMasterSamples(scsp_state *scsp, int nsamples)
 }
 
 /* TODO: this needs to be timer-ized */
-static void dma_scsp(address_space *space, scsp_state *scsp)
+static void dma_scsp(address_space &space, scsp_state *scsp)
 {
 	static UINT16 tmp_dma[3];
 	int i;
@@ -1212,7 +1209,7 @@ static void dma_scsp(address_space *space, scsp_state *scsp)
 	{
 		for(i=0;i < scsp->scsp_dtlg;i+=2)
 		{
-			space->write_word(scsp->scsp_dmea, space->read_word(0x100000|scsp->scsp_drga));
+			space.write_word(scsp->scsp_dmea, space.read_word(0x100000|scsp->scsp_drga));
 			scsp->scsp_dmea+=2;
 			scsp->scsp_drga+=2;
 		}
@@ -1221,7 +1218,7 @@ static void dma_scsp(address_space *space, scsp_state *scsp)
 	{
 		for(i=0;i < scsp->scsp_dtlg;i+=2)
 		{
-			space->write_word(0x100000|scsp->scsp_drga,space->read_word(scsp->scsp_dmea));
+			space.write_word(0x100000|scsp->scsp_drga,space.read_word(scsp->scsp_dmea));
 			scsp->scsp_dmea+=2;
 			scsp->scsp_drga+=2;
 		}
@@ -1240,7 +1237,7 @@ static void dma_scsp(address_space *space, scsp_state *scsp)
 	if(scsp->udata.data[0x1e/2] & 0x10)
 	{
 		popmessage("SCSP DMA IRQ triggered, contact MAMEdev");
-		space->machine().device("audiocpu")->execute().set_input_line(DecodeSCI(scsp,SCIDMA),HOLD_LINE);
+		space.machine().device("audiocpu")->execute().set_input_line(DecodeSCI(scsp,SCIDMA),HOLD_LINE);
 	}
 }
 
@@ -1302,7 +1299,7 @@ READ16_DEVICE_HANDLER( scsp_r )
 
 	scsp->stream->update();
 
-	return SCSP_r16(scsp, offset*2);
+	return SCSP_r16(scsp, space, offset*2);
 }
 
 WRITE16_DEVICE_HANDLER( scsp_w )
@@ -1312,9 +1309,9 @@ WRITE16_DEVICE_HANDLER( scsp_w )
 
 	scsp->stream->update();
 
-	tmp = SCSP_r16(scsp, offset*2);
+	tmp = SCSP_r16(scsp, space, offset*2);
 	COMBINE_DATA(&tmp);
-	SCSP_w16(scsp,offset*2, tmp);
+	SCSP_w16(scsp,space,offset*2, tmp);
 
 	switch(offset*2)
 	{
@@ -1324,7 +1321,7 @@ WRITE16_DEVICE_HANDLER( scsp_w )
 		case 0x416:
 			COMBINE_DATA(&scsp->dma_regs[((offset-0x412)/2) & 3]);
 			if(ACCESSING_BITS_8_15 && offset*2 == 0x416)
-				dma_scsp(device->machine().firstcpu->space(AS_PROGRAM), scsp);
+				dma_scsp(space, scsp);
 			break;
 		case 0x42a:		//check main cpu IRQ
 			scsp->main_irq(1);

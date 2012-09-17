@@ -171,32 +171,32 @@ static MC68328_INTERFACE(palm_dragonball_iface)
 {
 	"maincpu",
 
-	NULL,                   // Port A Output
-	NULL,                   // Port B Output
-	NULL,                   // Port C Output
-	NULL,                   // Port D Output
-	NULL,                   // Port E Output
-	palm_port_f_out,        // Port F Output
-	NULL,                   // Port G Output
-	NULL,                   // Port J Output
-	NULL,                   // Port K Output
-	NULL,                   // Port M Output
+	DEVCB_NULL,                   // Port A Output
+	DEVCB_NULL,                   // Port B Output
+	DEVCB_NULL,                   // Port C Output
+	DEVCB_NULL,                   // Port D Output
+	DEVCB_NULL,                   // Port E Output
+	DEVCB_HANDLER(palm_port_f_out),// Port F Output
+	DEVCB_NULL,                   // Port G Output
+	DEVCB_NULL,                   // Port J Output
+	DEVCB_NULL,                   // Port K Output
+	DEVCB_NULL,                   // Port M Output
 
-	NULL,                   // Port A Input
-	NULL,                   // Port B Input
-	palm_port_c_in,         // Port C Input
-	NULL,                   // Port D Input
-	NULL,                   // Port E Input
-	palm_port_f_in,         // Port F Input
-	NULL,                   // Port G Input
-	NULL,                   // Port J Input
-	NULL,                   // Port K Input
-	NULL,                   // Port M Input
+	DEVCB_NULL,                   // Port A Input
+	DEVCB_NULL,                   // Port B Input
+	DEVCB_HANDLER(palm_port_c_in),// Port C Input
+	DEVCB_NULL,                   // Port D Input
+	DEVCB_NULL,                   // Port E Input
+	DEVCB_HANDLER(palm_port_f_in),// Port F Input
+	DEVCB_NULL,                   // Port G Input
+	DEVCB_NULL,                   // Port J Input
+	DEVCB_NULL,                   // Port K Input
+	DEVCB_NULL,                   // Port M Input
 
-	palm_dac_transition,
+	DEVCB_HANDLER(palm_dac_transition),
 
-	palm_spim_out,
-	palm_spim_in,
+	DEVCB_HANDLER(palm_spim_out),
+	DEVCB_HANDLER(palm_spim_in),
 	palm_spim_exchange
 };
 

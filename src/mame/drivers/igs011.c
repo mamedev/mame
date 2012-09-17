@@ -2461,9 +2461,9 @@ READ16_MEMBER(igs011_state::ics2115_word_r)
 	ics2115_device* ics2115 = machine().device<ics2115_device>("ics");
 	switch(offset)
 	{
-		case 0:	return ics2115_device::read(ics2115, (offs_t)0);
-		case 1:	return ics2115_device::read(ics2115, (offs_t)1);
-		case 2:	return (ics2115_device::read(ics2115, (offs_t)3) << 8) | ics2115_device::read(ics2115, (offs_t)2);
+		case 0:	return ics2115_device::read(ics2115, space, (offs_t)0);
+		case 1:	return ics2115_device::read(ics2115, space, (offs_t)1);
+		case 2:	return (ics2115_device::read(ics2115, space, (offs_t)3) << 8) | ics2115_device::read(ics2115, space, (offs_t)2);
 	}
 	return 0xff;
 }
@@ -2474,11 +2474,11 @@ WRITE16_MEMBER(igs011_state::ics2115_word_w)
 	switch(offset)
 	{
 		case 1:
-			if (ACCESSING_BITS_0_7)		ics2115_device::write(ics2115,1,data);
+			if (ACCESSING_BITS_0_7)		ics2115_device::write(ics2115,space, 1,data);
 			break;
 		case 2:
-			if (ACCESSING_BITS_0_7)		ics2115_device::write(ics2115,2,data);
-			if (ACCESSING_BITS_8_15)	ics2115_device::write(ics2115,3,data>>8);
+			if (ACCESSING_BITS_0_7)		ics2115_device::write(ics2115,space, 2,data);
+			if (ACCESSING_BITS_8_15)	ics2115_device::write(ics2115,space, 3,data>>8);
 			break;
 	}
 }

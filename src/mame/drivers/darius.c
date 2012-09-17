@@ -177,7 +177,7 @@ READ16_MEMBER(darius_state::darius_ioc_r)
 	switch (offset)
 	{
 		case 0x01:
-			return (tc0140syt_comm_r(m_tc0140syt, 0) & 0xff);	/* sound interface read */
+			return (tc0140syt_comm_r(m_tc0140syt, space, 0) & 0xff);	/* sound interface read */
 
 		case 0x04:
 			return ioport("P1")->read();
@@ -207,12 +207,12 @@ WRITE16_MEMBER(darius_state::darius_ioc_w)
 	{
 		case 0x00:	/* sound interface write */
 
-			tc0140syt_port_w(m_tc0140syt, 0, data & 0xff);
+			tc0140syt_port_w(m_tc0140syt, space, 0, data & 0xff);
 			return;
 
 		case 0x01:	/* sound interface write */
 
-			tc0140syt_comm_w(m_tc0140syt, 0, data & 0xff);
+			tc0140syt_comm_w(m_tc0140syt, space, 0, data & 0xff);
 			return;
 
 		case 0x28:	/* unknown, written by both cpus - always 0? */

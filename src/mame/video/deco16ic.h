@@ -74,25 +74,25 @@ extern const device_type DECO16IC;
     DEVICE I/O FUNCTIONS
 ***************************************************************************/
 
-WRITE16_DEVICE_HANDLER( deco16ic_pf1_data_w );
-WRITE16_DEVICE_HANDLER( deco16ic_pf2_data_w );
+DECLARE_WRITE16_DEVICE_HANDLER( deco16ic_pf1_data_w );
+DECLARE_WRITE16_DEVICE_HANDLER( deco16ic_pf2_data_w );
 
-READ16_DEVICE_HANDLER( deco16ic_pf1_data_r );
-READ16_DEVICE_HANDLER( deco16ic_pf2_data_r );
+DECLARE_READ16_DEVICE_HANDLER( deco16ic_pf1_data_r );
+DECLARE_READ16_DEVICE_HANDLER( deco16ic_pf2_data_r );
 
-WRITE16_DEVICE_HANDLER( deco16ic_pf_control_w );
+DECLARE_WRITE16_DEVICE_HANDLER( deco16ic_pf_control_w );
 
-READ16_DEVICE_HANDLER( deco16ic_pf_control_r );
+DECLARE_READ16_DEVICE_HANDLER( deco16ic_pf_control_r );
 
-WRITE32_DEVICE_HANDLER( deco16ic_pf1_data_dword_w );
-WRITE32_DEVICE_HANDLER( deco16ic_pf2_data_dword_w );
+DECLARE_WRITE32_DEVICE_HANDLER( deco16ic_pf1_data_dword_w );
+DECLARE_WRITE32_DEVICE_HANDLER( deco16ic_pf2_data_dword_w );
 
-READ32_DEVICE_HANDLER( deco16ic_pf1_data_dword_r );
-READ32_DEVICE_HANDLER( deco16ic_pf2_data_dword_r );
+DECLARE_READ32_DEVICE_HANDLER( deco16ic_pf1_data_dword_r );
+DECLARE_READ32_DEVICE_HANDLER( deco16ic_pf2_data_dword_r );
 
-WRITE32_DEVICE_HANDLER( deco16ic_pf_control_dword_w );
+DECLARE_WRITE32_DEVICE_HANDLER( deco16ic_pf_control_dword_w );
 
-READ32_DEVICE_HANDLER( deco16ic_pf_control_dword_r );
+DECLARE_READ32_DEVICE_HANDLER( deco16ic_pf_control_dword_r );
 
 void deco16ic_print_debug_info(device_t *device, bitmap_ind16 &bitmap);
 

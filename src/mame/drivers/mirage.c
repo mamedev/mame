@@ -87,7 +87,8 @@ void miragemi_state::video_start()
 static SCREEN_UPDATE_RGB32( mirage )
 {
 	miragemi_state *state = screen.machine().driver_data<miragemi_state>();
-	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
+	address_space &space = screen.machine().driver_data()->generic_space();
+	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, space, 0, 0xffff);
 
 	state->flip_screen_set(BIT(flip, 7));
 

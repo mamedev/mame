@@ -24,8 +24,8 @@ static void subtract_from_counter(running_machine &machine, int counter, int cou
 static TIMER_CALLBACK( mcr68_493_callback );
 static TIMER_CALLBACK( zwackery_493_callback );
 
-static WRITE8_DEVICE_HANDLER( zwackery_pia0_w );
-static WRITE8_DEVICE_HANDLER( zwackery_pia1_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( zwackery_pia0_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( zwackery_pia1_w );
 static WRITE_LINE_DEVICE_HANDLER( zwackery_ca2_w );
 static WRITE_LINE_DEVICE_HANDLER( zwackery_pia_irq );
 

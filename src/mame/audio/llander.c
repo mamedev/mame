@@ -83,14 +83,14 @@ DISCRETE_SOUND_END
 WRITE8_DEVICE_HANDLER( llander_snd_reset_w )
 {
 	/* Resets the LFSR that is used for the white noise generator       */
-	discrete_sound_w(device, LLANDER_NOISE_RESET, 0);				/* Reset */
+	discrete_sound_w(device, space, LLANDER_NOISE_RESET, 0);				/* Reset */
 }
 
 WRITE8_DEVICE_HANDLER( llander_sounds_w )
 {
-	discrete_sound_w(device, LLANDER_THRUST_DATA, data & 0x07);		/* Thrust volume */
-	discrete_sound_w(device, LLANDER_TONE3K_EN, data & 0x10);		/* Tone 3KHz enable */
-	discrete_sound_w(device, LLANDER_TONE6K_EN, data & 0x20);		/* Tone 6KHz enable */
-	discrete_sound_w(device, LLANDER_EXPLOD_EN, data & 0x08);		/* Explosion */
+	discrete_sound_w(device, space, LLANDER_THRUST_DATA, data & 0x07);		/* Thrust volume */
+	discrete_sound_w(device, space, LLANDER_TONE3K_EN, data & 0x10);		/* Tone 3KHz enable */
+	discrete_sound_w(device, space, LLANDER_TONE6K_EN, data & 0x20);		/* Tone 6KHz enable */
+	discrete_sound_w(device, space, LLANDER_EXPLOD_EN, data & 0x08);		/* Explosion */
 }
 

@@ -202,16 +202,15 @@ static READ8_DEVICE_HANDLER(ssystem3_via_read_b)
 static WRITE8_DEVICE_HANDLER(ssystem3_via_write_b)
 {
 	via6522_device *via_0 = device->machine().device<via6522_device>("via6522_0");
-	address_space* space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 d;
 
 	ssystem3_playfield_write(device->machine(), data&1, data&8);
 	ssystem3_lcd_write(device->machine(), data&4, data&2);
 
-	d=ssystem3_via_read_b(via_0, 0)&~0x40;
+	d=ssystem3_via_read_b(via_0, space, 0, mem_mask)&~0x40;
 	if (data&0x80) d|=0x40;
 	//  d&=~0x8f;
-	via_0->write_portb(*space,0, d );
+	via_0->write_portb(space,0, d );
 }
 
 static const via6522_interface ssystem3_via_config=

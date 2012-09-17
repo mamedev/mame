@@ -283,11 +283,11 @@ WRITE8_MEMBER(fuuki32_state::snd_z80_w)
 
 WRITE8_MEMBER(fuuki32_state::snd_ymf278b_w)
 {
-	ymf278b_w(machine().device("ymf1"), offset, data);
+	ymf278b_w(machine().device("ymf1"), space, offset, data);
 
 	// also write to ymf262
 	if (offset < 4)
-		ymf262_w(machine().device("ymf2"), offset, data);
+		ymf262_w(machine().device("ymf2"), space, offset, data);
 }
 
 static ADDRESS_MAP_START( fuuki32_sound_map, AS_PROGRAM, 8, fuuki32_state )

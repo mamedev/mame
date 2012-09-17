@@ -350,6 +350,7 @@ SCREEN_UPDATE_IND16( undrfire )
 {
 	device_t *tc0100scn = screen.machine().device("tc0100scn");
 	device_t *tc0480scp = screen.machine().device("tc0480scp");
+	address_space &space = screen.machine().driver_data()->generic_space();
 	UINT8 layer[5];
 	UINT8 pivlayer[3];
 	UINT16 priority;
@@ -445,7 +446,7 @@ SCREEN_UPDATE_IND16( undrfire )
 #endif
 	/* Sprites have variable priority (we kludge this on road levels) */
 	{
-		if ((tc0480scp_pri_reg_r(tc0480scp, 0) & 0x3) == 3)	/* on road levels kludge sprites up 1 priority */
+		if ((tc0480scp_pri_reg_r(tc0480scp, space, 0) & 0x3) == 3)	/* on road levels kludge sprites up 1 priority */
 		{
 			static const int primasks[4] = {0xfff0, 0xff00, 0x0, 0x0};
 			draw_sprites(screen.machine(), bitmap, cliprect, primasks, 44, -574);
@@ -493,6 +494,7 @@ SCREEN_UPDATE_IND16( cbombers )
 {
 	device_t *tc0100scn = screen.machine().device("tc0100scn");
 	device_t *tc0480scp = screen.machine().device("tc0480scp");
+	address_space &space = screen.machine().driver_data()->generic_space();
 	UINT8 layer[5];
 	UINT8 pivlayer[3];
 	UINT16 priority;
@@ -588,7 +590,7 @@ SCREEN_UPDATE_IND16( cbombers )
 #endif
 	/* Sprites have variable priority (we kludge this on road levels) */
 	{
-		if ((tc0480scp_pri_reg_r(tc0480scp, 0) & 0x3) == 3)	/* on road levels kludge sprites up 1 priority */
+		if ((tc0480scp_pri_reg_r(tc0480scp, space, 0) & 0x3) == 3)	/* on road levels kludge sprites up 1 priority */
 		{
 			static const int primasks[4] = {0xfff0, 0xff00, 0x0, 0x0};
 			draw_sprites_cbombers(screen.machine(), bitmap, cliprect, primasks, 80, -208);

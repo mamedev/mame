@@ -568,7 +568,7 @@ READ8_MEMBER(pmd85_state::pmd85_io_r)
 								case 0x40:      /* 8255 (GPIO/0, GPIO/1) */
 										return machine().device<i8255_device>("ppi8255_1")->read(space, offset & 0x03);
 								case 0x50:	/* 8253 */
-										return pit8253_r( machine().device("pit8253"), offset & 0x03);
+										return pit8253_r( machine().device("pit8253"), space, offset & 0x03);
 								case 0x70:	/* 8255 (IMS-2) */
 										return machine().device<i8255_device>("ppi8255_2")->read(space, offset & 0x03);
 							}
@@ -645,7 +645,7 @@ WRITE8_MEMBER(pmd85_state::pmd85_io_w)
 										machine().device<i8255_device>("ppi8255_1")->write(space, offset & 0x03, data);
 										break;
 								case 0x50:	/* 8253 */
-										pit8253_w(machine().device("pit8253"), offset & 0x03, data);
+										pit8253_w(machine().device("pit8253"), space, offset & 0x03, data);
 										logerror ("8253 writing. Address: %02x, Data: %02x\n", offset, data);
 										break;
 								case 0x70:	/* 8255 (IMS-2) */

@@ -64,8 +64,9 @@ UINT16 rohga_col_callback(UINT16 x)
 SCREEN_UPDATE_IND16( rohga )
 {
 	rohga_state *state = screen.machine().driver_data<rohga_state>();
-	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
-	UINT16 priority = decocomn_priority_r(state->m_decocomn, 0, 0xffff);
+	address_space &space = screen.machine().driver_data()->generic_space();
+	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, space, 0, 0xffff);
+	UINT16 priority = decocomn_priority_r(state->m_decocomn, space, 0, 0xffff);
 
 	/* Update playfields */
 	state->flip_screen_set(BIT(flip, 7));
@@ -167,8 +168,9 @@ static void mixwizdfirelayer(running_machine &machine, bitmap_rgb32 &bitmap, con
 SCREEN_UPDATE_RGB32( wizdfire )
 {
 	rohga_state *state = screen.machine().driver_data<rohga_state>();
-	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
-	UINT16 priority = decocomn_priority_r(state->m_decocomn, 0, 0xffff);
+	address_space &space = screen.machine().driver_data()->generic_space();
+	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, space, 0, 0xffff);
+	UINT16 priority = decocomn_priority_r(state->m_decocomn, space, 0, 0xffff);
 
 	/* draw sprite gfx to temp bitmaps */
 	screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, state->m_spriteram2->buffer(), 0x400, true);
@@ -203,7 +205,8 @@ SCREEN_UPDATE_RGB32( wizdfire )
 SCREEN_UPDATE_RGB32( nitrobal )
 {
 	rohga_state *state = screen.machine().driver_data<rohga_state>();
-	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
+	address_space &space = screen.machine().driver_data()->generic_space();
+	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, space, 0, 0xffff);
 
 	/* draw sprite gfx to temp bitmaps */
 	screen.machine().device<decospr_device>("spritegen1")->set_alt_format(true);

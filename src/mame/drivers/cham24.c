@@ -148,19 +148,19 @@ WRITE8_MEMBER(cham24_state::sprite_dma_w)
 READ8_MEMBER(cham24_state::psg_4015_r)
 {
 	device_t *device = machine().device("nes");
-	return nes_psg_r(device,0x15);
+	return nes_psg_r(device,space,0x15);
 }
 
 WRITE8_MEMBER(cham24_state::psg_4015_w)
 {
 	device_t *device = machine().device("nes");
-	nes_psg_w(device,0x15, data);
+	nes_psg_w(device,space,0x15, data);
 }
 
 WRITE8_MEMBER(cham24_state::psg_4017_w)
 {
 	device_t *device = machine().device("nes");
-	nes_psg_w(device,0x17, data);
+	nes_psg_w(device,space,0x17, data);
 }
 
 

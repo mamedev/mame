@@ -267,7 +267,7 @@ WRITE32_MEMBER(gaelco3d_state::irq_ack32_w)
 	if (mem_mask == 0xffff0000)
 		irq_ack_w(space, offset, data, mem_mask >> 16);
 	else if (ACCESSING_BITS_0_7)
-		gaelco_serial_tr_w(machine().device("serial"), 0, data & 0x01);
+		gaelco_serial_tr_w(machine().device("serial"), space, 0, data & 0x01);
 	else
 		logerror("%06X:irq_ack_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
 }
@@ -290,7 +290,7 @@ READ16_MEMBER(gaelco3d_state::eeprom_data_r)
 		/* bit 0 is clock */
 		/* bit 1 active */
 		result &= ~GAELCOSER_EXT_STATUS_MASK;
-		result |= gaelco_serial_status_r(machine().device("serial"), 0);
+		result |= gaelco_serial_status_r(machine().device("serial"), space, 0);
 	}
 
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
@@ -307,7 +307,7 @@ READ32_MEMBER(gaelco3d_state::eeprom_data32_r)
 		return (eeprom_data_r(space, 0, mem_mask >> 16) << 16) | 0xffff;
 	else if (ACCESSING_BITS_0_7)
 	{
-		UINT8 data = gaelco_serial_data_r(machine().device("serial"),0);
+		UINT8 data = gaelco_serial_data_r(machine().device("serial"),space,0);
 		if (LOG)
 			logerror("%06X:read(%02X) = %08X & %08X\n", machine().device("maincpu")->safe_pc(), offset, data, mem_mask);
 		return  data | 0xffffff00;

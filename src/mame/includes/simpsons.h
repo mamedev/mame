@@ -43,7 +43,7 @@ public:
 
 /*----------- defined in machine/simpsons.c -----------*/
 
-READ8_DEVICE_HANDLER( simpsons_sound_r );
+DECLARE_READ8_DEVICE_HANDLER( simpsons_sound_r );
 
 
 

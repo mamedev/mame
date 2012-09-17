@@ -96,8 +96,8 @@ extern const z80pio_interface kaypro4_pio_s_intf;
 extern const z80sio_interface kaypro_sio_intf;
 extern const wd17xx_interface kaypro_wd1793_interface;
 
-READ8_DEVICE_HANDLER( kaypro_sio_r );
-WRITE8_DEVICE_HANDLER( kaypro_sio_w );
+DECLARE_READ8_DEVICE_HANDLER( kaypro_sio_r );
+DECLARE_WRITE8_DEVICE_HANDLER( kaypro_sio_w );
 
 
 

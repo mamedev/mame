@@ -632,7 +632,7 @@ READ8_MEMBER(z80ne_state::lx388_data_r)
 {
 	UINT8 data;
 
-	data = kr2376_data_r(m_lx388_kr2376, 0) & 0x7f;
+	data = kr2376_data_r(m_lx388_kr2376, space, 0) & 0x7f;
 	data |= kr2376_get_output_pin(m_lx388_kr2376, KR2376_SO) << 7;
 	return data;
 }
@@ -725,27 +725,27 @@ READ8_DEVICE_HANDLER(lx390_fdc_r)
 	switch(offset)
 	{
 	case 0:
-		d = wd17xx_status_r(device, 0) ^ 0xff;
+		d = wd17xx_status_r(device, space, 0) ^ 0xff;
 		LOG(("lx390_fdc_r, WD17xx status: %02x\n", d));
 		break;
 	case 1:
-		d = wd17xx_track_r(device, 0) ^ 0xff;
+		d = wd17xx_track_r(device, space, 0) ^ 0xff;
 		LOG(("lx390_fdc_r, WD17xx track:  %02x\n", d));
 		break;
 	case 2:
-		d = wd17xx_sector_r(device, 0) ^ 0xff;
+		d = wd17xx_sector_r(device, space, 0) ^ 0xff;
 		LOG(("lx390_fdc_r, WD17xx sector: %02x\n", d));
 		break;
 	case 3:
-		d = wd17xx_data_r(device, 0) ^ 0xff;
+		d = wd17xx_data_r(device, space, 0) ^ 0xff;
 		LOG(("lx390_fdc_r, WD17xx data3:  %02x\n", d));
 		break;
 	case 6:
 		d = 0xff;
-		lx390_reset_bank(device, 0);
+		lx390_reset_bank(device, space, 0);
 		break;
 	case 7:
-		d = wd17xx_data_r(device, 3) ^ 0xff;
+		d = wd17xx_data_r(device, space, 3) ^ 0xff;
 		LOG(("lx390_fdc_r, WD17xx data7, force:  %02x\n", d));
 		break;
 	default:
@@ -764,7 +764,7 @@ WRITE8_DEVICE_HANDLER(lx390_fdc_w)
 	{
 	case 0:
 		LOG(("lx390_fdc_w, WD17xx command: %02x\n", d));
-		wd17xx_command_w(device, offset, d ^ 0xff);
+		wd17xx_command_w(device, space, offset, d ^ 0xff);
 		if (state->m_wd17xx_state.drive & 1)
 			output_set_value("drv0", 2);
 		else if (state->m_wd17xx_state.drive & 2)
@@ -772,23 +772,23 @@ WRITE8_DEVICE_HANDLER(lx390_fdc_w)
 		break;
 	case 1:
 		LOG(("lx390_fdc_w, WD17xx track:   %02x\n", d));
-		wd17xx_track_w(device, offset, d ^ 0xff);
+		wd17xx_track_w(device, space, offset, d ^ 0xff);
 		break;
 	case 2:
 		LOG(("lx390_fdc_w, WD17xx sector:  %02x\n", d));
-		wd17xx_sector_w(device, offset, d ^ 0xff);
+		wd17xx_sector_w(device, space, offset, d ^ 0xff);
 		break;
 	case 3:
-		wd17xx_data_w(device, 0, d ^ 0xff);
+		wd17xx_data_w(device, space, 0, d ^ 0xff);
 		LOG(("lx390_fdc_w, WD17xx data3:   %02x\n", d));
 		break;
 	case 6:
 		LOG(("lx390_fdc_w, motor_w:   %02x\n", d));
-		lx390_motor_w(device, 0, d);
+		lx390_motor_w(device, space, 0, d);
 		break;
 	case 7:
 		LOG(("lx390_fdc_w, WD17xx data7, force:   %02x\n", d));
-		wd17xx_data_w(device, 3, d ^ 0xff);
+		wd17xx_data_w(device, space, 3, d ^ 0xff);
 		break;
 	}
 }

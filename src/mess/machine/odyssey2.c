@@ -100,7 +100,7 @@ WRITE8_MEMBER(odyssey2_state::odyssey2_bus_w)
 		if ( offset & 0x80 ) {
 			if ( data & 0x20 ) {
 				logerror("voice write %02X, data = %02X (p1 = %02X)\n", offset, data, m_p1 );
-				sp0256_ALD_w( machine().device("sp0256_speech"), 0, offset & 0x7F );
+				sp0256_ALD_w( machine().device("sp0256_speech"), space, 0, offset & 0x7F );
 			} else {
 				/* TODO: Reset sp0256 in this case */
 			}

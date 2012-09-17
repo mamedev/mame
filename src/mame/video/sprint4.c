@@ -139,10 +139,11 @@ SCREEN_VBLANK( sprint4 )
 
 		/* update sound status */
 
-		discrete_sound_w(discrete, SPRINT4_MOTOR_DATA_1, videoram[0x391] & 15);
-		discrete_sound_w(discrete, SPRINT4_MOTOR_DATA_2, videoram[0x393] & 15);
-		discrete_sound_w(discrete, SPRINT4_MOTOR_DATA_3, videoram[0x395] & 15);
-		discrete_sound_w(discrete, SPRINT4_MOTOR_DATA_4, videoram[0x397] & 15);
+		address_space &space = screen.machine().driver_data()->generic_space();
+		discrete_sound_w(discrete, space, SPRINT4_MOTOR_DATA_1, videoram[0x391] & 15);
+		discrete_sound_w(discrete, space, SPRINT4_MOTOR_DATA_2, videoram[0x393] & 15);
+		discrete_sound_w(discrete, space, SPRINT4_MOTOR_DATA_3, videoram[0x395] & 15);
+		discrete_sound_w(discrete, space, SPRINT4_MOTOR_DATA_4, videoram[0x397] & 15);
 	}
 }
 

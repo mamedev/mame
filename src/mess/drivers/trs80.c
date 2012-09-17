@@ -557,9 +557,9 @@ static const ay31015_config trs80_ay31015_config =
 	AY_3_1015,
 	0.0,
 	0.0,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const floppy_interface trs80_floppy_interface =

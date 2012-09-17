@@ -52,9 +52,9 @@ extern const device_type DS1315;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-READ8_DEVICE_HANDLER( ds1315_r_0 );
-READ8_DEVICE_HANDLER( ds1315_r_1 );
-READ8_DEVICE_HANDLER( ds1315_r_data );
-WRITE8_DEVICE_HANDLER( ds1315_w_data );
+DECLARE_READ8_DEVICE_HANDLER( ds1315_r_0 );
+DECLARE_READ8_DEVICE_HANDLER( ds1315_r_1 );
+DECLARE_READ8_DEVICE_HANDLER( ds1315_r_data );
+DECLARE_WRITE8_DEVICE_HANDLER( ds1315_w_data );
 
 #endif /* __DS1315_H__ */

@@ -426,7 +426,7 @@ WRITE16_MEMBER(neogeo_state::io_control_w)
 	case 0x00: select_controller(machine(), data & 0x00ff); break;
 	case 0x18: set_output_latch(machine(), data & 0x00ff); break;
 	case 0x20: set_output_data(machine(), data & 0x00ff); break;
-	case 0x28: upd4990a_control_16_w(m_upd4990a, 0, data, mem_mask); break;
+	case 0x28: upd4990a_control_16_w(m_upd4990a, space, 0, data, mem_mask); break;
 //  case 0x30: break; // coin counters
 //  case 0x31: break; // coin counters
 //  case 0x32: break; // coin lockout
@@ -476,7 +476,7 @@ READ16_MEMBER(neogeo_state::neogeo_unmapped_r)
 
 CUSTOM_INPUT_MEMBER(neogeo_state::get_calendar_status)
 {
-	return (upd4990a_databit_r(m_upd4990a, 0) << 1) | upd4990a_testbit_r(m_upd4990a, 0);
+	return (upd4990a_databit_r(m_upd4990a, generic_space(), 0) << 1) | upd4990a_testbit_r(m_upd4990a, generic_space(), 0);
 }
 
 

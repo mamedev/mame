@@ -264,8 +264,9 @@ static void draw_framebuffer( running_machine &machine, bitmap_ind16 &bitmap, co
 	taitob_state *state = machine.driver_data<taitob_state>();
 	rectangle myclip = cliprect;
 	int x, y;
-	UINT8 video_control = tc0180vcu_get_videoctrl(state->m_tc0180vcu, 0);
-	UINT8 framebuffer_page = tc0180vcu_get_fb_page(state->m_tc0180vcu, 0);
+	address_space &space = machine.driver_data()->generic_space();
+	UINT8 video_control = tc0180vcu_get_videoctrl(state->m_tc0180vcu, space, 0);
+	UINT8 framebuffer_page = tc0180vcu_get_fb_page(state->m_tc0180vcu, space, 0);
 
 g_profiler.start(PROFILER_USER1);
 
@@ -367,7 +368,8 @@ g_profiler.stop();
 SCREEN_UPDATE_IND16( taitob )
 {
 	taitob_state *state = screen.machine().driver_data<taitob_state>();
-	UINT8 video_control = tc0180vcu_get_videoctrl(state->m_tc0180vcu, 0);
+	address_space &space = screen.machine().driver_data()->generic_space();
+	UINT8 video_control = tc0180vcu_get_videoctrl(state->m_tc0180vcu, space, 0);
 
 	if ((video_control & 0x20) == 0)
 	{
@@ -403,8 +405,9 @@ SCREEN_UPDATE_IND16( taitob )
 SCREEN_UPDATE_RGB32( realpunc )
 {
 	taitob_state *state = screen.machine().driver_data<taitob_state>();
+	address_space &space = screen.machine().driver_data()->generic_space();
 	const rgb_t *palette = palette_entry_list_adjusted(screen.machine().palette);
-	UINT8 video_control = tc0180vcu_get_videoctrl(state->m_tc0180vcu, 0);
+	UINT8 video_control = tc0180vcu_get_videoctrl(state->m_tc0180vcu, space, 0);
 	int x, y;
 
 	/* Video blanked? */
@@ -434,8 +437,8 @@ SCREEN_UPDATE_RGB32( realpunc )
 	{
 		device_t *hd63484 = screen.machine().device("hd63484");
 
-		int base = (hd63484_regs_r(hd63484, 0xcc/2, 0xffff) << 16) + hd63484_regs_r(hd63484, 0xce/2, 0xffff);
-		int stride = hd63484_regs_r(hd63484, 0xca/2, 0xffff);
+		int base = (hd63484_regs_r(hd63484, space, 0xcc/2, 0xffff) << 16) + hd63484_regs_r(hd63484, space, 0xce/2, 0xffff);
+		int stride = hd63484_regs_r(hd63484, space, 0xca/2, 0xffff);
 
 //      scrollx = taitob_scroll[0];
 //      scrolly = taitob_scroll[1];
@@ -446,7 +449,7 @@ SCREEN_UPDATE_RGB32( realpunc )
 			for (x = 0; x <= cliprect.max_x; x++)
 			{
 				int r, g, b;
-				UINT16 srcpix = hd63484_ram_r(hd63484, addr++, 0xffff);
+				UINT16 srcpix = hd63484_ram_r(hd63484, space, addr++, 0xffff);
 
 				r = (BIT(srcpix, 1)) | ((srcpix >> 11) & 0x1e);
 				g = (BIT(srcpix, 2)) | ((srcpix >> 7) & 0x1e);
@@ -498,8 +501,9 @@ SCREEN_VBLANK( taitob )
 	if (vblank_on)
 	{
 		taitob_state *state = screen.machine().driver_data<taitob_state>();
-		UINT8 video_control = tc0180vcu_get_videoctrl(state->m_tc0180vcu, 0);
-		UINT8 framebuffer_page = tc0180vcu_get_fb_page(state->m_tc0180vcu, 0);
+		address_space &space = screen.machine().driver_data()->generic_space();
+		UINT8 video_control = tc0180vcu_get_videoctrl(state->m_tc0180vcu, space, 0);
+		UINT8 framebuffer_page = tc0180vcu_get_fb_page(state->m_tc0180vcu, space, 0);
 
 		if (~video_control & 0x01)
 			state->m_framebuffer[framebuffer_page]->fill(0, screen.machine().primary_screen->visible_area());
@@ -507,7 +511,7 @@ SCREEN_VBLANK( taitob )
 		if (~video_control & 0x80)
 		{
 			framebuffer_page ^= 1;
-			tc0180vcu_set_fb_page(state->m_tc0180vcu, 0, framebuffer_page);
+			tc0180vcu_set_fb_page(state->m_tc0180vcu, space, 0, framebuffer_page);
 		}
 
 		draw_sprites(screen.machine(), *state->m_framebuffer[framebuffer_page], screen.machine().primary_screen->visible_area());

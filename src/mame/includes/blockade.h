@@ -40,4 +40,4 @@ SCREEN_UPDATE_IND16( blockade );
 extern const samples_interface blockade_samples_interface;
 DISCRETE_SOUND_EXTERN( blockade );
 
-WRITE8_DEVICE_HANDLER( blockade_sound_freq_w );
+DECLARE_WRITE8_DEVICE_HANDLER( blockade_sound_freq_w );

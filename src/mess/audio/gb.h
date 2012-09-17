@@ -22,7 +22,7 @@ private:
 extern const device_type GAMEBOY;
 
 
-READ8_DEVICE_HANDLER( gb_sound_r );
-WRITE8_DEVICE_HANDLER( gb_sound_w );
-READ8_DEVICE_HANDLER( gb_wave_r );
-WRITE8_DEVICE_HANDLER( gb_wave_w );
+DECLARE_READ8_DEVICE_HANDLER( gb_sound_r );
+DECLARE_WRITE8_DEVICE_HANDLER( gb_sound_w );
+DECLARE_READ8_DEVICE_HANDLER( gb_wave_r );
+DECLARE_WRITE8_DEVICE_HANDLER( gb_wave_w );

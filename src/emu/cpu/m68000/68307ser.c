@@ -24,7 +24,7 @@ READ8_HANDLER( m68307_internal_serial_r )
 		// if we're piggybacking on the existing 68681 implementation...
 		if (serial->m_duart68681)
 		{
-			if (offset&1) return duart68681_r(serial->m_duart68681, offset>>1);
+			if (offset&1) return duart68681_r(serial->m_duart68681, *m68k->program, offset>>1);
 		}
 		else
 		{
@@ -104,7 +104,7 @@ WRITE8_HANDLER( m68307_internal_serial_w )
 		// if we're piggybacking on the existing 68681 implementation...
 		if (serial->m_duart68681)
 		{
-			if (offset&1) duart68681_w(serial->m_duart68681, offset>>1, data);
+			if (offset&1) duart68681_w(serial->m_duart68681, *m68k->program, offset>>1, data);
 		}
 		else
 		{

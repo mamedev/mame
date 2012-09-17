@@ -855,8 +855,8 @@ WRITE8_MEMBER(toaplan2_state::raizing_oki_bankswitch_w)
 {
 	nmk112_device *nmk112 = machine().device<nmk112_device>("nmk112");
 
-	nmk112_okibank_w(nmk112, offset,     data        & 0x0f);
-	nmk112_okibank_w(nmk112, offset + 1, (data >> 4) & 0x0f);
+	nmk112_okibank_w(nmk112, space, offset,     data        & 0x0f);
+	nmk112_okibank_w(nmk112, space, offset + 1, (data >> 4) & 0x0f);
 }
 
 

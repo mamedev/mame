@@ -1067,11 +1067,11 @@ READ32_DEVICE_HANDLER( midway_ide_asic_r )
 
 	/* offset 0 is a special case */
 	if (offset == 0)
-		result = ide_controller32_r(device, ideoffs, 0x0000ffff);
+		result = ide_controller32_r(device, space, ideoffs, 0x0000ffff);
 
 	/* everything else is byte-sized */
 	else
-		result = ide_controller32_r(device, ideoffs, 0xff << shift) >> shift;
+		result = ide_controller32_r(device, space, ideoffs, 0xff << shift) >> shift;
 	return result;
 }
 
@@ -1084,9 +1084,9 @@ WRITE32_DEVICE_HANDLER( midway_ide_asic_w )
 
 	/* offset 0 is a special case */
 	if (offset == 0)
-		ide_controller32_w(device, ideoffs, data, 0x0000ffff);
+		ide_controller32_w(device, space, ideoffs, data, 0x0000ffff);
 
 	/* everything else is byte-sized */
 	else
-		ide_controller32_w(device, ideoffs, data << shift, 0xff << shift);
+		ide_controller32_w(device, space, ideoffs, data << shift, 0xff << shift);
 }

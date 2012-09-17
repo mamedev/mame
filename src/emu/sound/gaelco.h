@@ -11,8 +11,8 @@ struct gaelcosnd_interface
 	int banks[4];			/* start of each ROM bank */
 };
 
-WRITE16_DEVICE_HANDLER( gaelcosnd_w );
-READ16_DEVICE_HANDLER( gaelcosnd_r );
+DECLARE_WRITE16_DEVICE_HANDLER( gaelcosnd_w );
+DECLARE_READ16_DEVICE_HANDLER( gaelcosnd_r );
 
 class gaelco_gae1_device : public device_t,
                                   public device_sound_interface

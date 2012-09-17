@@ -214,7 +214,7 @@ READ16_MEMBER( compis_state::compis_fdc_dack_r )
 	/* DMA acknowledge if iSBX-218A has DMA enabled */
 	if (ioport("DSW1")->read())
 	{
-		data = upd765_dack_r(m_fdc, 0);
+		data = upd765_dack_r(m_fdc, space, 0);
 	}
 
 	return data;
@@ -225,7 +225,7 @@ WRITE8_MEMBER( compis_state::compis_fdc_w )
 	switch(offset)
 	{
 		case 2:
-			upd765_data_w(m_fdc, 0, data);
+			upd765_data_w(m_fdc, space, 0, data);
 			break;
 		default:
 			printf("FDC Unknown Port Write %04X = %04X\n", offset, data);
@@ -240,10 +240,10 @@ READ8_MEMBER( compis_state::compis_fdc_r )
 	switch(offset)
 	{
 		case 0:
-			data = upd765_status_r(m_fdc, 0);
+			data = upd765_status_r(m_fdc, space, 0);
 			break;
 		case 2:
-			data = upd765_data_r(m_fdc, 0);
+			data = upd765_data_r(m_fdc, space, 0);
 			break;
 		default:
 			printf("FDC Unknown Port Read %04X\n", offset);
@@ -347,12 +347,12 @@ const struct pit8253_config compis_pit8254_config =
 
 READ16_MEMBER( compis_state::compis_osp_pit_r )
 {
-	return pit8253_r(m_8254, offset);
+	return pit8253_r(m_8254, space, offset);
 }
 
 WRITE16_MEMBER( compis_state::compis_osp_pit_w )
 {
-	pit8253_w(m_8254, offset, data);
+	pit8253_w(m_8254, space, offset, data);
 }
 
 

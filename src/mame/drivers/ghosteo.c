@@ -557,7 +557,7 @@ device_t* s3c2410;
 
 READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
 {
-	UINT32 ret = s3c2410_lcd_r(s3c2410, offset+0x10/4, mem_mask);
+	UINT32 ret = s3c2410_lcd_r(s3c2410, space, offset+0x10/4, mem_mask);
 
 
 	int pc = space.device().safe_pc();

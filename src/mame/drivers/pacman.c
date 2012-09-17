@@ -537,11 +537,11 @@ WRITE8_MEMBER(pacman_state::alibaba_sound_w)
 	/* since the sound region in Ali Baba is not contiguous, translate the
        offset into the 0-0x1f range */
 	if (offset < 0x10)
-		pacman_sound_w(machine().device("namco"), offset, data);
+		pacman_sound_w(machine().device("namco"), space, offset, data);
 	else if (offset < 0x20)
 		m_spriteram2[offset - 0x10] = data;
 	else
-		pacman_sound_w(machine().device("namco"), offset - 0x10, data);
+		pacman_sound_w(machine().device("namco"), space, offset - 0x10, data);
 }
 
 READ8_MEMBER(pacman_state::alibaba_mystery_1_r)

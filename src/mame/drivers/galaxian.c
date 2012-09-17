@@ -515,8 +515,8 @@ READ8_MEMBER(galaxian_state::konami_ay8910_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x20) result &= ay8910_r(machine().device("8910.1"), 0);
-	if (offset & 0x80) result &= ay8910_r(machine().device("8910.0"), 0);
+	if (offset & 0x20) result &= ay8910_r(machine().device("8910.1"), space, 0);
+	if (offset & 0x80) result &= ay8910_r(machine().device("8910.0"), space, 0);
 	return result;
 }
 
@@ -526,14 +526,14 @@ WRITE8_MEMBER(galaxian_state::konami_ay8910_w)
 	/* AV 4,5 ==> AY8910 #2 */
 	/* the decoding here is very simplistic, and you can address two simultaneously */
 	if (offset & 0x10)
-		ay8910_address_w(machine().device("8910.1"), 0, data);
+		ay8910_address_w(machine().device("8910.1"), space, 0, data);
 	else if (offset & 0x20)
-		ay8910_data_w(machine().device("8910.1"), 0, data);
+		ay8910_data_w(machine().device("8910.1"), space, 0, data);
 	/* AV6,7 ==> AY8910 #1 */
 	if (offset & 0x40)
-		ay8910_address_w(machine().device("8910.0"), 0, data);
+		ay8910_address_w(machine().device("8910.0"), space, 0, data);
 	else if (offset & 0x80)
-		ay8910_data_w(machine().device("8910.0"), 0, data);
+		ay8910_data_w(machine().device("8910.0"), space, 0, data);
 }
 
 
@@ -604,7 +604,7 @@ WRITE8_MEMBER(galaxian_state::konami_sound_filter_w)
 
 				/* low bit goes to 0.22uF capacitor = 220000pF  */
 				/* high bit goes to 0.047uF capacitor = 47000pF */
-				discrete_sound_w(discrete, NODE(3 * which + chan + 11), bits);
+				discrete_sound_w(discrete, space, NODE(3 * which + chan + 11), bits);
 			}
 }
 
@@ -906,7 +906,7 @@ READ8_MEMBER(galaxian_state::frogger_ay8910_r)
 {
 	/* the decoding here is very simplistic */
 	UINT8 result = 0xff;
-	if (offset & 0x40) result &= ay8910_r(machine().device("8910.0"), 0);
+	if (offset & 0x40) result &= ay8910_r(machine().device("8910.0"), space, 0);
 	return result;
 }
 
@@ -916,9 +916,9 @@ WRITE8_MEMBER(galaxian_state::frogger_ay8910_w)
 	/* the decoding here is very simplistic */
 	/* AV6,7 ==> AY8910 #1 */
 	if (offset & 0x40)
-		ay8910_data_w(machine().device("8910.0"), 0, data);
+		ay8910_data_w(machine().device("8910.0"), space, 0, data);
 	else if (offset & 0x80)
-		ay8910_address_w(machine().device("8910.0"), 0, data);
+		ay8910_address_w(machine().device("8910.0"), space, 0, data);
 }
 
 
@@ -985,9 +985,9 @@ READ8_MEMBER(galaxian_state::scorpion_ay8910_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x08) result &= ay8910_r(machine().device("8910.2"), 0);
-	if (offset & 0x20) result &= ay8910_r(machine().device("8910.1"), 0);
-	if (offset & 0x80) result &= ay8910_r(machine().device("8910.0"), 0);
+	if (offset & 0x08) result &= ay8910_r(machine().device("8910.2"), space, 0);
+	if (offset & 0x20) result &= ay8910_r(machine().device("8910.1"), space, 0);
+	if (offset & 0x80) result &= ay8910_r(machine().device("8910.0"), space, 0);
 	return result;
 }
 
@@ -995,12 +995,12 @@ READ8_MEMBER(galaxian_state::scorpion_ay8910_r)
 WRITE8_MEMBER(galaxian_state::scorpion_ay8910_w)
 {
 	/* the decoding here is very simplistic, and you can address all six simultaneously */
-	if (offset & 0x04) ay8910_address_w(machine().device("8910.2"), 0, data);
-	if (offset & 0x08) ay8910_data_w(machine().device("8910.2"), 0, data);
-	if (offset & 0x10) ay8910_address_w(machine().device("8910.1"), 0, data);
-	if (offset & 0x20) ay8910_data_w(machine().device("8910.1"), 0, data);
-	if (offset & 0x40) ay8910_address_w(machine().device("8910.0"), 0, data);
-	if (offset & 0x80) ay8910_data_w(machine().device("8910.0"), 0, data);
+	if (offset & 0x04) ay8910_address_w(machine().device("8910.2"), space, 0, data);
+	if (offset & 0x08) ay8910_data_w(machine().device("8910.2"), space, 0, data);
+	if (offset & 0x10) ay8910_address_w(machine().device("8910.1"), space, 0, data);
+	if (offset & 0x20) ay8910_data_w(machine().device("8910.1"), space, 0, data);
+	if (offset & 0x40) ay8910_address_w(machine().device("8910.0"), space, 0, data);
+	if (offset & 0x80) ay8910_data_w(machine().device("8910.0"), space, 0, data);
 }
 
 
@@ -1115,7 +1115,7 @@ WRITE8_MEMBER(galaxian_state::zigzag_ay8910_w)
 			/* bit 0 = WRITE */
 			/* bit 1 = C/D */
 			if ((offset & 1) != 0)
-				ay8910_data_address_w(machine().device("aysnd"), offset >> 1, m_zigzag_ay8910_latch);
+				ay8910_data_address_w(machine().device("aysnd"), space, offset >> 1, m_zigzag_ay8910_latch);
 			break;
 
 		case 0x100:
@@ -1208,21 +1208,21 @@ WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_cs_w)
 WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_control_w)
 {
 	if (!m_mshuttle_ay8910_cs)
-		ay8910_address_w(machine().device("aysnd"), offset, data);
+		ay8910_address_w(machine().device("aysnd"), space, offset, data);
 }
 
 
 WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_data_w)
 {
 	if (!m_mshuttle_ay8910_cs)
-		ay8910_data_w(machine().device("aysnd"), offset, data);
+		ay8910_data_w(machine().device("aysnd"), space, offset, data);
 }
 
 
 READ8_MEMBER(galaxian_state::mshuttle_ay8910_data_r)
 {
 	if (!m_mshuttle_ay8910_cs)
-		return ay8910_r(machine().device("aysnd"), offset);
+		return ay8910_r(machine().device("aysnd"), space, offset);
 	return 0xff;
 }
 

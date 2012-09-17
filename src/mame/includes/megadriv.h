@@ -73,8 +73,8 @@ extern READ16_HANDLER( megadriv_68k_io_read );
 extern WRITE16_HANDLER( megadriv_68k_io_write );
 
 /* These handlers are needed by puckpkmn.c for his memory map */
-extern READ8_DEVICE_HANDLER( megadriv_68k_YM2612_read);
-extern WRITE8_DEVICE_HANDLER( megadriv_68k_YM2612_write);
+extern DECLARE_READ8_DEVICE_HANDLER( megadriv_68k_YM2612_read);
+extern DECLARE_WRITE8_DEVICE_HANDLER( megadriv_68k_YM2612_write);
 
 /* These are needed to create external input handlers (see e.g. MESS) */
 /* Regs are also used by Megaplay! */

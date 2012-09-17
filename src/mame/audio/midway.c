@@ -1198,7 +1198,7 @@ WRITE8_MEMBER(midway_squawk_n_talk_device::portb2_w)
 	// write strobe -- pass the current command to the TMS5200
 	if (((data ^ m_tms_strobes) & 0x02) && !(data & 0x02))
 	{
-		tms5220_data_w(m_tms5200, offset, m_tms_command);
+		tms5220_data_w(m_tms5200, space, offset, m_tms_command);
 
 		// DoT expects the ready line to transition on a command/write here, so we oblige
 		m_pia1->ca2_w(1);
@@ -1208,7 +1208,7 @@ WRITE8_MEMBER(midway_squawk_n_talk_device::portb2_w)
 	// read strobe -- read the current status from the TMS5200
 	else if (((data ^ m_tms_strobes) & 0x01) && !(data & 0x01))
 	{
-		m_pia1->porta_w(tms5220_status_r(m_tms5200, offset));
+		m_pia1->porta_w(tms5220_status_r(m_tms5200, space, offset));
 
 		// DoT expects the ready line to transition on a command/write here, so we oblige
 		m_pia1->ca2_w(1);

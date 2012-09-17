@@ -57,10 +57,10 @@ extern const device_type K056800;
     DEVICE I/O FUNCTIONS
 ***************************************************************************/
 
-READ32_DEVICE_HANDLER( k056800_host_r );
-WRITE32_DEVICE_HANDLER( k056800_host_w );
-READ16_DEVICE_HANDLER( k056800_sound_r );
-WRITE16_DEVICE_HANDLER( k056800_sound_w );
+DECLARE_READ32_DEVICE_HANDLER( k056800_host_r );
+DECLARE_WRITE32_DEVICE_HANDLER( k056800_host_w );
+DECLARE_READ16_DEVICE_HANDLER( k056800_sound_r );
+DECLARE_WRITE16_DEVICE_HANDLER( k056800_sound_w );
 
 
 #endif /* __K056800_H__ */

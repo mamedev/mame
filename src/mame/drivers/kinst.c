@@ -304,28 +304,28 @@ static void ide_interrupt(device_t *device, int state)
 READ32_MEMBER(kinst_state::kinst_ide_r)
 {
 	device_t *device = machine().device("ide");
-	return midway_ide_asic_r(device, offset / 2, mem_mask);
+	return midway_ide_asic_r(device, space, offset / 2, mem_mask);
 }
 
 
 WRITE32_MEMBER(kinst_state::kinst_ide_w)
 {
 	device_t *device = machine().device("ide");
-	midway_ide_asic_w(device, offset / 2, data, mem_mask);
+	midway_ide_asic_w(device, space, offset / 2, data, mem_mask);
 }
 
 
 READ32_MEMBER(kinst_state::kinst_ide_extra_r)
 {
 	device_t *device = machine().device("ide");
-	return ide_controller32_r(device, 0x3f6/4, 0x00ff0000) >> 16;
+	return ide_controller32_r(device, space, 0x3f6/4, 0x00ff0000) >> 16;
 }
 
 
 WRITE32_MEMBER(kinst_state::kinst_ide_extra_w)
 {
 	device_t *device = machine().device("ide");
-	ide_controller32_w(device, 0x3f6/4, data << 16, 0x00ff0000);
+	ide_controller32_w(device, space, 0x3f6/4, data << 16, 0x00ff0000);
 }
 
 

@@ -102,6 +102,7 @@ struct mea8000_t
 
 	emu_timer *timer;
 
+	devcb_resolved_write8 req_out;
 };
 
 
@@ -206,8 +207,8 @@ static void mea8000_update_req( device_t *device )
        buffer contains a complete frame and the CPU nees to wait for the next
        frame end to compose a new frame.
     */
-	if (mea8000->iface->req_out_func)
-		mea8000->iface->req_out_func( device, 0, mea8000_accept_byte( mea8000 ) );
+	if (!mea8000->req_out.isnull())
+		mea8000->req_out( 0, mea8000_accept_byte( mea8000 ) );
 }
 
 
@@ -668,6 +669,7 @@ static DEVICE_START( mea8000 )
 	mea8000_t* mea8000 = get_safe_token( device );
 	int i;
 	mea8000->iface = (const mea8000_interface*)device->static_config();
+	mea8000->req_out.resolve(mea8000->iface->req_out_func, *device);
 
 	mea8000_init_tables(device->machine());
 

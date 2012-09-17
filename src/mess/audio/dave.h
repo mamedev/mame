@@ -73,7 +73,7 @@ struct dave_interface
 ***************************************************************************/
 void dave_set_reg(device_t *device, offs_t offset, UINT8 data);
 
-READ8_DEVICE_HANDLER ( dave_reg_r );
-WRITE8_DEVICE_HANDLER ( dave_reg_w );
+DECLARE_READ8_DEVICE_HANDLER ( dave_reg_r );
+DECLARE_WRITE8_DEVICE_HANDLER ( dave_reg_w );
 
 #endif /* __DAVE_H__ */

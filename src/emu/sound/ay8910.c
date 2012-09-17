@@ -1000,7 +1000,7 @@ WRITE8_DEVICE_HANDLER( ay8910_address_w )
 #if ENABLE_REGISTER_TEST
 	return;
 #else
-	ay8910_data_address_w(device, 1, data);
+	ay8910_data_address_w(device, space, 1, data);
 #endif
 }
 
@@ -1009,7 +1009,7 @@ WRITE8_DEVICE_HANDLER( ay8910_data_w )
 #if ENABLE_REGISTER_TEST
 	return;
 #else
-	ay8910_data_address_w(device, 0, data);
+	ay8910_data_address_w(device, space, 0, data);
 #endif
 }
 
@@ -1023,15 +1023,15 @@ static const int mapping8914to8910[16] = { 0, 2, 4, 11, 1, 3, 5, 12, 7, 6, 13, 8
 READ8_DEVICE_HANDLER( ay8914_r )
 {
 	UINT16 rv;
-	ay8910_address_w(device, 0, mapping8914to8910[offset & 0xff]);
-	rv = (UINT16)ay8910_r(device, 0);
+	ay8910_address_w(device, space, 0, mapping8914to8910[offset & 0xff]);
+	rv = (UINT16)ay8910_r(device, space, 0);
 	return rv;
 }
 
 WRITE8_DEVICE_HANDLER( ay8914_w )
 {
-	ay8910_address_w(device, 0, mapping8914to8910[offset & 0xff]);
-	ay8910_data_w(device, 0, data & 0xff);
+	ay8910_address_w(device, space, 0, mapping8914to8910[offset & 0xff]);
+	ay8910_data_w(device, space, 0, data & 0xff);
 }
 
 

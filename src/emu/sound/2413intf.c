@@ -111,8 +111,8 @@ WRITE8_DEVICE_HANDLER( ym2413_w )
 	ym2413_write(info->chip, offset & 1, data);
 }
 
-WRITE8_DEVICE_HANDLER( ym2413_register_port_w ) { ym2413_w(device, 0, data); }
-WRITE8_DEVICE_HANDLER( ym2413_data_port_w ) { ym2413_w(device, 1, data); }
+WRITE8_DEVICE_HANDLER( ym2413_register_port_w ) { ym2413_w(device, space, 0, data); }
+WRITE8_DEVICE_HANDLER( ym2413_data_port_w ) { ym2413_w(device, space, 1, data); }
 
 const device_type YM2413 = &device_creator<ym2413_device>;
 

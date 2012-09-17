@@ -23,17 +23,17 @@
 
 static READ8_DEVICE_HANDLER( psg_4015_r )
 {
-	return nes_psg_r(device, 0x15);
+	return nes_psg_r(device, space, 0x15);
 }
 
 static WRITE8_DEVICE_HANDLER( psg_4015_w )
 {
-	nes_psg_w(device, 0x15, data);
+	nes_psg_w(device, space, 0x15, data);
 }
 
 static WRITE8_DEVICE_HANDLER( psg_4017_w )
 {
-	nes_psg_w(device, 0x17, data);
+	nes_psg_w(device, space, 0x17, data);
 }
 
 WRITE8_MEMBER(nes_state::nes_vh_sprite_dma_w)

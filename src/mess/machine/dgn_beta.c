@@ -113,23 +113,23 @@ static void execute_beta_key_dump(running_machine &machine, int ref, int params,
 
 /* Debugging variables */
 
-static READ8_DEVICE_HANDLER(d_pia0_pa_r);
-static WRITE8_DEVICE_HANDLER(d_pia0_pa_w);
-static READ8_DEVICE_HANDLER(d_pia0_pb_r);
-static WRITE8_DEVICE_HANDLER(d_pia0_pb_w);
-static WRITE8_DEVICE_HANDLER(d_pia0_cb2_w);
+static DECLARE_READ8_DEVICE_HANDLER(d_pia0_pa_r);
+static DECLARE_WRITE8_DEVICE_HANDLER(d_pia0_pa_w);
+static DECLARE_READ8_DEVICE_HANDLER(d_pia0_pb_r);
+static DECLARE_WRITE8_DEVICE_HANDLER(d_pia0_pb_w);
+static DECLARE_WRITE8_DEVICE_HANDLER(d_pia0_cb2_w);
 static WRITE_LINE_DEVICE_HANDLER(d_pia0_irq_a);
 static WRITE_LINE_DEVICE_HANDLER(d_pia0_irq_b);
-static READ8_DEVICE_HANDLER(d_pia1_pa_r);
-static WRITE8_DEVICE_HANDLER(d_pia1_pa_w);
-static READ8_DEVICE_HANDLER(d_pia1_pb_r);
-static WRITE8_DEVICE_HANDLER(d_pia1_pb_w);
+static DECLARE_READ8_DEVICE_HANDLER(d_pia1_pa_r);
+static DECLARE_WRITE8_DEVICE_HANDLER(d_pia1_pa_w);
+static DECLARE_READ8_DEVICE_HANDLER(d_pia1_pb_r);
+static DECLARE_WRITE8_DEVICE_HANDLER(d_pia1_pb_w);
 static WRITE_LINE_DEVICE_HANDLER(d_pia1_irq_a);
 static WRITE_LINE_DEVICE_HANDLER(d_pia1_irq_b);
-static READ8_DEVICE_HANDLER(d_pia2_pa_r);
-static WRITE8_DEVICE_HANDLER(d_pia2_pa_w);
-static READ8_DEVICE_HANDLER(d_pia2_pb_r);
-static WRITE8_DEVICE_HANDLER(d_pia2_pb_w);
+static DECLARE_READ8_DEVICE_HANDLER(d_pia2_pa_r);
+static DECLARE_WRITE8_DEVICE_HANDLER(d_pia2_pa_w);
+static DECLARE_READ8_DEVICE_HANDLER(d_pia2_pb_r);
+static DECLARE_WRITE8_DEVICE_HANDLER(d_pia2_pb_w);
 static WRITE_LINE_DEVICE_HANDLER(d_pia2_irq_a);
 static WRITE_LINE_DEVICE_HANDLER(d_pia2_irq_b);
 
@@ -939,17 +939,17 @@ READ8_HANDLER(dgnbeta_wd2797_r)
 	switch(offset & 0x03)
 	{
 		case 0:
-			result = wd17xx_status_r(fdc, 0);
+			result = wd17xx_status_r(fdc, *space, 0);
 			LOG_DISK(("Disk status=%2.2X\n",result));
 			break;
 		case 1:
-			result = wd17xx_track_r(fdc, 0);
+			result = wd17xx_track_r(fdc, *space, 0);
 			break;
 		case 2:
-			result = wd17xx_sector_r(fdc, 0);
+			result = wd17xx_sector_r(fdc, *space, 0);
 			break;
 		case 3:
-			result = wd17xx_data_r(fdc, 0);
+			result = wd17xx_data_r(fdc, *space, 0);
 			break;
 		default:
 			break;
@@ -972,16 +972,16 @@ WRITE8_HANDLER(dgnbeta_wd2797_w)
 			/* But only for Type 3/4 commands */
 			if(data & 0x80)
 				wd17xx_set_side(fdc,(data & 0x02) ? 1 : 0);
-			wd17xx_command_w(fdc, 0, data);
+			wd17xx_command_w(fdc, *space, 0, data);
 			break;
 		case 1:
-			wd17xx_track_w(fdc, 0, data);
+			wd17xx_track_w(fdc, *space, 0, data);
 			break;
 		case 2:
-			wd17xx_sector_w(fdc, 0, data);
+			wd17xx_sector_w(fdc, *space, 0, data);
 			break;
 		case 3:
-			wd17xx_data_w(fdc, 0, data);
+			wd17xx_data_w(fdc, *space, 0, data);
 			break;
 	};
 }

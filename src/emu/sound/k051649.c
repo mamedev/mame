@@ -276,7 +276,7 @@ WRITE8_DEVICE_HANDLER( k051649_test_w )
 READ8_DEVICE_HANDLER ( k051649_test_r )
 {
 	/* reading the test register sets it to $ff! */
-	k051649_test_w(device, offset, 0xff);
+	k051649_test_w(device, space, offset, 0xff);
 	return 0xff;
 }
 

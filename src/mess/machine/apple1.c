@@ -54,9 +54,9 @@
 static TIMER_CALLBACK(apple1_kbd_poll);
 static TIMER_CALLBACK(apple1_kbd_strobe_end);
 
-static READ8_DEVICE_HANDLER( apple1_pia0_kbdin );
-static WRITE8_DEVICE_HANDLER( apple1_pia0_dspout );
-static WRITE8_DEVICE_HANDLER( apple1_pia0_dsp_write_signal );
+static DECLARE_READ8_DEVICE_HANDLER( apple1_pia0_kbdin );
+static DECLARE_WRITE8_DEVICE_HANDLER( apple1_pia0_dspout );
+static DECLARE_WRITE8_DEVICE_HANDLER( apple1_pia0_dsp_write_signal );
 
 static TIMER_CALLBACK(apple1_dsp_ready_start);
 static TIMER_CALLBACK(apple1_dsp_ready_end);

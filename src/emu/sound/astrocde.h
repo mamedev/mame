@@ -5,7 +5,7 @@
 
 #include "devlegcy.h"
 
-WRITE8_DEVICE_HANDLER( astrocade_sound_w );
+DECLARE_WRITE8_DEVICE_HANDLER( astrocade_sound_w );
 
 class astrocade_device : public device_t,
                                   public device_sound_interface

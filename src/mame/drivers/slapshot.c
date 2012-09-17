@@ -198,7 +198,7 @@ READ16_MEMBER(slapshot_state::slapshot_service_input_r)
 				  (ioport("SERVICE")->read() & 0x10))  << 8;	/* IN3 + service switch */
 
 		default:
-			return tc0640fio_r(m_tc0640fio, offset) << 8;
+			return tc0640fio_r(m_tc0640fio, space, offset) << 8;
 	}
 }
 
@@ -259,9 +259,9 @@ WRITE8_MEMBER(slapshot_state::sound_bankswitch_w)
 WRITE16_MEMBER(slapshot_state::slapshot_msb_sound_w)
 {
 	if (offset == 0)
-		tc0140syt_port_w(m_tc0140syt, 0, (data >> 8) & 0xff);
+		tc0140syt_port_w(m_tc0140syt, space, 0, (data >> 8) & 0xff);
 	else if (offset == 1)
-		tc0140syt_comm_w(m_tc0140syt, 0, (data >> 8) & 0xff);
+		tc0140syt_comm_w(m_tc0140syt, space, 0, (data >> 8) & 0xff);
 
 #ifdef MAME_DEBUG
 	if (data & 0xff)
@@ -272,7 +272,7 @@ WRITE16_MEMBER(slapshot_state::slapshot_msb_sound_w)
 READ16_MEMBER(slapshot_state::slapshot_msb_sound_r)
 {
 	if (offset == 1)
-		return ((tc0140syt_comm_r(m_tc0140syt, 0) & 0xff) << 8);
+		return ((tc0140syt_comm_r(m_tc0140syt, space, 0) & 0xff) << 8);
 	else
 		return 0;
 }

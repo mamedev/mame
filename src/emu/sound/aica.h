@@ -18,12 +18,12 @@ struct aica_interface
 void aica_set_ram_base(device_t *device, void *base, int size);
 
 // AICA register access
-READ16_DEVICE_HANDLER( aica_r );
-WRITE16_DEVICE_HANDLER( aica_w );
+DECLARE_READ16_DEVICE_HANDLER( aica_r );
+DECLARE_WRITE16_DEVICE_HANDLER( aica_w );
 
 // MIDI I/O access
-WRITE16_DEVICE_HANDLER( aica_midi_in );
-READ16_DEVICE_HANDLER( aica_midi_out_r );
+DECLARE_WRITE16_DEVICE_HANDLER( aica_midi_in );
+DECLARE_READ16_DEVICE_HANDLER( aica_midi_out_r );
 
 class aica_device : public device_t,
                                   public device_sound_interface

@@ -21,7 +21,7 @@ struct namco_52xx_interface
 	MCFG_DEVICE_CONFIG(_interface)
 
 
-WRITE8_DEVICE_HANDLER( namco_52xx_write );
+DECLARE_WRITE8_DEVICE_HANDLER( namco_52xx_write );
 
 
 class namco_52xx_device : public device_t

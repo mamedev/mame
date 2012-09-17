@@ -427,7 +427,7 @@ static MOS6567_INTERFACE( vic_intf )
 
 READ8_MEMBER( c64_state::sid_potx_r )
 {
-	UINT8 cia1_pa = mos6526_pa_r(m_cia1, 0);
+	UINT8 cia1_pa = mos6526_pa_r(m_cia1, space, 0);
 
 	int sela = BIT(cia1_pa, 6);
 	int selb = BIT(cia1_pa, 7);
@@ -442,7 +442,7 @@ READ8_MEMBER( c64_state::sid_potx_r )
 
 READ8_MEMBER( c64_state::sid_poty_r )
 {
-	UINT8 cia1_pa = mos6526_pa_r(m_cia1, 0);
+	UINT8 cia1_pa = mos6526_pa_r(m_cia1, space, 0);
 
 	int sela = BIT(cia1_pa, 6);
 	int selb = BIT(cia1_pa, 7);
@@ -490,7 +490,7 @@ READ8_MEMBER( c64_state::cia1_pa_r )
 
     */
 
-	UINT8 cia0portb = mos6526_pb_r(m_cia1, 0);
+	UINT8 cia0portb = mos6526_pb_r(m_cia1, space, 0);
 
 	return cbm_common_cia0_port_a_r(m_cia1, cia0portb);
 }
@@ -512,7 +512,7 @@ READ8_MEMBER( c64_state::cia1_pb_r )
 
     */
 
-	UINT8 cia0porta = mos6526_pa_r(m_cia1, 0);
+	UINT8 cia0porta = mos6526_pa_r(m_cia1, space, 0);
 
 	return cbm_common_cia0_port_b_r(m_cia1, cia0porta);
 }

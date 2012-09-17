@@ -62,7 +62,7 @@ SCREEN_UPDATE_IND16( geebee );
 
 /*----------- defined in audio/geebee.c -----------*/
 
-WRITE8_DEVICE_HANDLER( geebee_sound_w );
+DECLARE_WRITE8_DEVICE_HANDLER( geebee_sound_w );
 
 class geebee_sound_device : public device_t,
                                   public device_sound_interface
@@ -91,9 +91,9 @@ extern const device_type GEEBEE;
 
 /*----------- defined in audio/warpwarp.c -----------*/
 
-WRITE8_DEVICE_HANDLER( warpwarp_sound_w );
-WRITE8_DEVICE_HANDLER( warpwarp_music1_w );
-WRITE8_DEVICE_HANDLER( warpwarp_music2_w );
+DECLARE_WRITE8_DEVICE_HANDLER( warpwarp_sound_w );
+DECLARE_WRITE8_DEVICE_HANDLER( warpwarp_music1_w );
+DECLARE_WRITE8_DEVICE_HANDLER( warpwarp_music2_w );
 
 class warpwarp_sound_device : public device_t,
                                   public device_sound_interface

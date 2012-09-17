@@ -57,25 +57,25 @@ private:
 
 };
 
-WRITE8_DEVICE_HANDLER( spritebgflag_w8 );
+DECLARE_WRITE8_DEVICE_HANDLER( spritebgflag_w8 );
 
 
-READ16_DEVICE_HANDLER( spritectrl_r16 );
-WRITE16_DEVICE_HANDLER( spritectrl_w16 );
-READ8_DEVICE_HANDLER( spritectrl_r8 );
-WRITE8_DEVICE_HANDLER( spritectrl_w8 );
+DECLARE_READ16_DEVICE_HANDLER( spritectrl_r16 );
+DECLARE_WRITE16_DEVICE_HANDLER( spritectrl_w16 );
+DECLARE_READ8_DEVICE_HANDLER( spritectrl_r8 );
+DECLARE_WRITE8_DEVICE_HANDLER( spritectrl_w8 );
 
-READ16_DEVICE_HANDLER( spriteylow_r16 );
-WRITE16_DEVICE_HANDLER( spriteylow_w16 );
-READ8_DEVICE_HANDLER( spriteylow_r8 );
-WRITE8_DEVICE_HANDLER( spriteylow_w8 );
+DECLARE_READ16_DEVICE_HANDLER( spriteylow_r16 );
+DECLARE_WRITE16_DEVICE_HANDLER( spriteylow_w16 );
+DECLARE_READ8_DEVICE_HANDLER( spriteylow_r8 );
+DECLARE_WRITE8_DEVICE_HANDLER( spriteylow_w8 );
 
-READ8_DEVICE_HANDLER( spritecodelow_r8 );
-WRITE8_DEVICE_HANDLER( spritecodelow_w8 );
-READ8_DEVICE_HANDLER( spritecodehigh_r8 );
-WRITE8_DEVICE_HANDLER( spritecodehigh_w8 );
-READ16_DEVICE_HANDLER( spritecode_r16 );
-WRITE16_DEVICE_HANDLER( spritecode_w16 );
+DECLARE_READ8_DEVICE_HANDLER( spritecodelow_r8 );
+DECLARE_WRITE8_DEVICE_HANDLER( spritecodelow_w8 );
+DECLARE_READ8_DEVICE_HANDLER( spritecodehigh_r8 );
+DECLARE_WRITE8_DEVICE_HANDLER( spritecodehigh_w8 );
+DECLARE_READ16_DEVICE_HANDLER( spritecode_r16 );
+DECLARE_WRITE16_DEVICE_HANDLER( spritecode_w16 );
 
 extern const device_type SETA001_SPRITE;
 

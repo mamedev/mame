@@ -69,8 +69,8 @@ public:
 
 /*----------- defined in machine/pokemini.c -----------*/
 
-WRITE8_DEVICE_HANDLER( pokemini_hwreg_w );
-READ8_DEVICE_HANDLER( pokemini_hwreg_r );
+DECLARE_WRITE8_DEVICE_HANDLER( pokemini_hwreg_w );
+DECLARE_READ8_DEVICE_HANDLER( pokemini_hwreg_r );
 
 DEVICE_IMAGE_LOAD( pokemini_cart );
 

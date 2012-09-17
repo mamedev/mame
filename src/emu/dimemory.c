@@ -323,9 +323,9 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 				}
 
 				// make sure all devices exist
-				if (entry->m_read.m_type == AMH_LEGACY_DEVICE_HANDLER && entry->m_read.m_tag && device().siblingdevice(entry->m_read.m_tag) == NULL)
+				if (entry->m_read.m_type == AMH_DEVICE_DELEGATE && entry->m_read.m_tag && device().siblingdevice(entry->m_read.m_tag) == NULL)
 					mame_printf_error("%s space memory map entry references nonexistant device '%s'\n", spaceconfig->m_name, entry->m_read.m_tag.cstr());
-				if (entry->m_write.m_type == AMH_LEGACY_DEVICE_HANDLER && entry->m_write.m_tag && device().siblingdevice(entry->m_write.m_tag) == NULL)
+				if (entry->m_write.m_type == AMH_DEVICE_DELEGATE && entry->m_write.m_tag && device().siblingdevice(entry->m_write.m_tag) == NULL)
 					mame_printf_error("%s space memory map entry references nonexistant device '%s'\n", spaceconfig->m_name, entry->m_write.m_tag.cstr());
 
 				// make sure ports exist

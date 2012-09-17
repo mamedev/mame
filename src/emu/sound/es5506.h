@@ -20,8 +20,8 @@ struct es5505_interface
 	UINT16 (*read_port)(device_t *device);			/* input port read */
 };
 
-READ16_DEVICE_HANDLER( es5505_r );
-WRITE16_DEVICE_HANDLER( es5505_w );
+DECLARE_READ16_DEVICE_HANDLER( es5505_r );
+DECLARE_WRITE16_DEVICE_HANDLER( es5505_w );
 void es5505_voice_bank_w(device_t *device, int voice, int bank);
 
 class es5506_device : public device_t,
@@ -62,8 +62,8 @@ struct es5506_interface
 	UINT16 (*read_port)(device_t *device);			/* input port read */
 };
 
-READ8_DEVICE_HANDLER( es5506_r );
-WRITE8_DEVICE_HANDLER( es5506_w );
+DECLARE_READ8_DEVICE_HANDLER( es5506_r );
+DECLARE_WRITE8_DEVICE_HANDLER( es5506_w );
 void es5506_voice_bank_w(device_t *device, int voice, int bank);
 
 class es5505_device : public es5506_device

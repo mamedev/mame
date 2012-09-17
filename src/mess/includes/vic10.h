@@ -50,7 +50,7 @@ public:
 	virtual void machine_reset();
 
 	void check_interrupts();
-	UINT8 paddle_read(int which);
+	UINT8 paddle_read(address_space &space, int which);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

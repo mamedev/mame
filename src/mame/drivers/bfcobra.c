@@ -1471,7 +1471,7 @@ WRITE8_MEMBER(bfcobra_state::upd_w)
 {
 	device_t *device = machine().device("upd");
 	upd7759_reset_w(device, data & 0x80);
-	upd7759_port_w(device, 0, data & 0x3f);
+	upd7759_port_w(device, space, 0, data & 0x3f);
 	upd7759_start_w(device, data & 0x40 ? 0 : 1);
 }
 

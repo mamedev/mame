@@ -238,7 +238,7 @@ static void gb_init(running_machine &machine)
 			break;
 	}
 
-	gb_sound_w(space->machine().device("custom"), 0x16, 0x00 );       /* Initialize sound hardware */
+	gb_sound_w(space->machine().device("custom"), *space, 0x16, 0x00 );       /* Initialize sound hardware */
 
 	state->m_divcount = 0;
 	state->m_triggering_irq = 0;
@@ -340,9 +340,9 @@ MACHINE_RESET_MEMBER(gb_state,gbpocket)
 	gb_init_regs(machine());
 
 	/* Initialize the Sound registers */
-	gb_sound_w(machine().device("custom"), 0x16,0x80);
-	gb_sound_w(machine().device("custom"), 0x15,0xF3);
-	gb_sound_w(machine().device("custom"), 0x14,0x77);
+	gb_sound_w(machine().device("custom"), generic_space(), 0x16,0x80);
+	gb_sound_w(machine().device("custom"), generic_space(), 0x15,0xF3);
+	gb_sound_w(machine().device("custom"), generic_space(), 0x14,0x77);
 
 	/* Enable BIOS rom if we have one */
 	gb_rom16_0000( machine(), m_ROMMap[m_ROMBank00] ? m_ROMMap[m_ROMBank00] : m_gb_dummy_rom_bank );
@@ -2100,25 +2100,25 @@ static const UINT8 megaduck_sound_offsets[16] = { 0, 2, 1, 3, 4, 6, 5, 7, 8, 9, 
 
 WRITE8_MEMBER(gb_state::megaduck_sound_w1)
 {
-	gb_sound_w(machine().device("custom"), megaduck_sound_offsets[offset], data );
+	gb_sound_w(machine().device("custom"), space, megaduck_sound_offsets[offset], data );
 }
 
 READ8_MEMBER(gb_state::megaduck_sound_r1)
 {
-	return gb_sound_r( machine().device("custom"), megaduck_sound_offsets[offset] );
+	return gb_sound_r( machine().device("custom"), space, megaduck_sound_offsets[offset] );
 }
 
 WRITE8_MEMBER(gb_state::megaduck_sound_w2)
 {
 	switch(offset)
 	{
-		case 0x00:	gb_sound_w(machine().device("custom"), 0x10, data );	break;
-		case 0x01:	gb_sound_w(machine().device("custom"), 0x12, data );	break;
-		case 0x02:	gb_sound_w(machine().device("custom"), 0x11, data );	break;
-		case 0x03:	gb_sound_w(machine().device("custom"), 0x13, data );	break;
-		case 0x04:	gb_sound_w(machine().device("custom"), 0x14, data );	break;
-		case 0x05:	gb_sound_w(machine().device("custom"), 0x16, data );	break;
-		case 0x06:	gb_sound_w(machine().device("custom"), 0x15, data );	break;
+		case 0x00:	gb_sound_w(machine().device("custom"), space, 0x10, data );	break;
+		case 0x01:	gb_sound_w(machine().device("custom"), space, 0x12, data );	break;
+		case 0x02:	gb_sound_w(machine().device("custom"), space, 0x11, data );	break;
+		case 0x03:	gb_sound_w(machine().device("custom"), space, 0x13, data );	break;
+		case 0x04:	gb_sound_w(machine().device("custom"), space, 0x14, data );	break;
+		case 0x05:	gb_sound_w(machine().device("custom"), space, 0x16, data );	break;
+		case 0x06:	gb_sound_w(machine().device("custom"), space, 0x15, data );	break;
 		case 0x07:
 		case 0x08:
 		case 0x09:
@@ -2134,7 +2134,7 @@ WRITE8_MEMBER(gb_state::megaduck_sound_w2)
 
 READ8_MEMBER(gb_state::megaduck_sound_r2)
 {
-	return gb_sound_r(machine().device("custom"), 0x10 + megaduck_sound_offsets[offset]);
+	return gb_sound_r(machine().device("custom"), space, 0x10 + megaduck_sound_offsets[offset]);
 }
 
 WRITE8_MEMBER(gb_state::megaduck_rom_bank_select_type1)

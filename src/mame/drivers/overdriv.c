@@ -137,13 +137,13 @@ WRITE16_MEMBER(overdriv_state::cpuB_ctrl_w)
 READ8_MEMBER(overdriv_state::overdriv_1_sound_r)
 {
 	device_t *device = machine().device("k053260_1");
-	return k053260_r(device, 2 + offset);
+	return k053260_r(device, space, 2 + offset);
 }
 
 READ8_MEMBER(overdriv_state::overdriv_2_sound_r)
 {
 	device_t *device = machine().device("k053260_2");
-	return k053260_r(device, 2 + offset);
+	return k053260_r(device, space, 2 + offset);
 }
 
 WRITE16_MEMBER(overdriv_state::overdriv_soundirq_w)

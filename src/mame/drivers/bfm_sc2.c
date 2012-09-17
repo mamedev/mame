@@ -731,7 +731,7 @@ WRITE8_MEMBER(bfm_sc2_state::nec_latch_w)
 
 	upd7759_set_bank_base(device, bank*0x20000);
 
-	upd7759_port_w(device, 0, data&0x3F);	// setup sample
+	upd7759_port_w(device, space, 0, data&0x3F);	// setup sample
 	upd7759_start_w(device, 0);
 	upd7759_start_w(device, 1);
 }

@@ -680,17 +680,19 @@ static const ym2151_interface dynablsb_ym2151_config =
 static INTERRUPT_GEN( fake_nmi )
 {
 	m90_state *state = device->machine().driver_data<m90_state>();
-	int sample = m72_sample_r(state->m_audio,0);
+	address_space &space = *device->machine().firstcpu->space(AS_PROGRAM);
+	int sample = m72_sample_r(state->m_audio,space,0);
 	if (sample)
-		m72_sample_w(state->m_audio,0,sample);
+		m72_sample_w(state->m_audio,space,0,sample);
 }
 
 static INTERRUPT_GEN( bomblord_fake_nmi )
 {
 	m90_state *state = device->machine().driver_data<m90_state>();
-	int sample = m72_sample_r(state->m_audio,0);
+	address_space &space = *device->machine().firstcpu->space(AS_PROGRAM);
+	int sample = m72_sample_r(state->m_audio,space,0);
 	if (sample != 0x80)
-		m72_sample_w(state->m_audio,0,sample);
+		m72_sample_w(state->m_audio,space,0,sample);
 }
 
 static INTERRUPT_GEN( m90_interrupt )

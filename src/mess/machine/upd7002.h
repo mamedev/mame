@@ -59,9 +59,9 @@ struct uPD7002_interface
 
 /* Standard handlers */
 
-READ8_DEVICE_HANDLER ( uPD7002_EOC_r );
-READ8_DEVICE_HANDLER ( uPD7002_r );
-WRITE8_DEVICE_HANDLER ( uPD7002_w );
+DECLARE_READ8_DEVICE_HANDLER ( uPD7002_EOC_r );
+DECLARE_READ8_DEVICE_HANDLER ( uPD7002_r );
+DECLARE_WRITE8_DEVICE_HANDLER ( uPD7002_w );
 
 
 /***************************************************************************

@@ -157,7 +157,7 @@ UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int 
 
 	if (!scs && m_t6721)
 	{
-		data = t6721_speech_r(m_t6721, offset & 0x03);
+		data = t6721_speech_r(m_t6721, space, offset & 0x03);
 	}
 	else if (!user)
 	{
@@ -286,7 +286,7 @@ WRITE8_MEMBER( plus4_state::write )
 
 	if (!scs && m_t6721)
 	{
-		t6721_speech_w(m_t6721, offset & 0x03, data);
+		t6721_speech_w(m_t6721, space, offset & 0x03, data);
 	}
 	else if (!user && m_spi_user)
 	{

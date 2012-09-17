@@ -442,7 +442,7 @@ READ8_HANDLER( snes_r_io )
 	// APU is mirrored from 2140 to 217f
 	if (offset >= APU00 && offset < WMDATA)
 	{
-		return spc_port_out(state->m_spc700, offset & 0x3);
+		return spc_port_out(state->m_spc700, *space, offset & 0x3);
 	}
 
 	if (state->m_has_addon_chip == HAS_SUPERFX && state->m_superfx != NULL)
@@ -605,7 +605,7 @@ WRITE8_HANDLER( snes_w_io )
 	if (offset >= APU00 && offset < WMDATA)
 	{
 //      printf("816: %02x to APU @ %d (PC=%06x)\n", data, offset & 3,space->device().safe_pc());
-		spc_port_in(state->m_spc700, offset & 0x3, data);
+		spc_port_in(state->m_spc700, *space, offset & 0x3, data);
 		space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 		return;
 	}

@@ -10,8 +10,8 @@
 
 #include "devlegcy.h"
 
-WRITE8_DEVICE_HANDLER( irem_ga20_w );
-READ8_DEVICE_HANDLER( irem_ga20_r );
+DECLARE_WRITE8_DEVICE_HANDLER( irem_ga20_w );
+DECLARE_READ8_DEVICE_HANDLER( irem_ga20_r );
 
 class iremga20_device : public device_t,
                                   public device_sound_interface

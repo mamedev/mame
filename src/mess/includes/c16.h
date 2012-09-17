@@ -52,8 +52,8 @@ public:
 
 /*----------- defined in machine/c16.c -----------*/
 
-extern READ8_DEVICE_HANDLER(c16_m7501_port_read);
-extern WRITE8_DEVICE_HANDLER(c16_m7501_port_write);
+extern DECLARE_READ8_DEVICE_HANDLER(c16_m7501_port_read);
+extern DECLARE_WRITE8_DEVICE_HANDLER(c16_m7501_port_write);
 
 extern WRITE8_HANDLER(c16_6551_port_w);
 extern READ8_HANDLER(c16_6551_port_r);

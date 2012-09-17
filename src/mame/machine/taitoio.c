@@ -162,13 +162,13 @@ WRITE8_DEVICE_HANDLER( tc0220ioc_port_w )
 READ8_DEVICE_HANDLER( tc0220ioc_portreg_r )
 {
 	tc0220ioc_state *tc0220ioc =  tc0220ioc_get_safe_token(device);
-	return tc0220ioc_r(device, tc0220ioc->port);
+	return tc0220ioc_r(device, space, tc0220ioc->port);
 }
 
 WRITE8_DEVICE_HANDLER( tc0220ioc_portreg_w )
 {
 	tc0220ioc_state *tc0220ioc =  tc0220ioc_get_safe_token(device);
-	tc0220ioc_w(device, tc0220ioc->port, data);
+	tc0220ioc_w(device, space, tc0220ioc->port, data);
 }
 
 
@@ -300,29 +300,29 @@ WRITE8_DEVICE_HANDLER( tc0510nio_w )
 
 READ16_DEVICE_HANDLER( tc0510nio_halfword_r )
 {
-	return tc0510nio_r(device, offset);
+	return tc0510nio_r(device, space, offset);
 }
 
 WRITE16_DEVICE_HANDLER( tc0510nio_halfword_w )
 {
 	if (ACCESSING_BITS_0_7)
-		tc0510nio_w(device, offset, data & 0xff);
+		tc0510nio_w(device, space, offset, data & 0xff);
 	else
 	{
 		/* driftout writes the coin counters here - bug? */
 //logerror("CPU #0 PC %06x: warning - write to MSB of TC0510NIO address %02x\n",space->device().safe_pc(),offset);
-		tc0510nio_w(device, offset, (data >> 8) & 0xff);
+		tc0510nio_w(device, space, offset, (data >> 8) & 0xff);
 	}
 }
 
 READ16_DEVICE_HANDLER( tc0510nio_halfword_wordswap_r )
 {
-	return tc0510nio_halfword_r(device, offset ^ 1, mem_mask);
+	return tc0510nio_halfword_r(device, space, offset ^ 1, mem_mask);
 }
 
 WRITE16_DEVICE_HANDLER( tc0510nio_halfword_wordswap_w )
 {
-	tc0510nio_halfword_w(device, offset ^ 1,data, mem_mask);
+	tc0510nio_halfword_w(device, space, offset ^ 1,data, mem_mask);
 }
 
 
@@ -450,32 +450,32 @@ WRITE8_DEVICE_HANDLER( tc0640fio_w )
 
 READ16_DEVICE_HANDLER( tc0640fio_halfword_r )
 {
-	return tc0640fio_r(device, offset);
+	return tc0640fio_r(device, space, offset);
 }
 
 WRITE16_DEVICE_HANDLER( tc0640fio_halfword_w )
 {
 	if (ACCESSING_BITS_0_7)
-		tc0640fio_w(device, offset, data & 0xff);
+		tc0640fio_w(device, space, offset, data & 0xff);
 	else
 	{
-		tc0640fio_w(device, offset, (data >> 8) & 0xff);
+		tc0640fio_w(device, space, offset, (data >> 8) & 0xff);
 //logerror("CPU #0 PC %06x: warning - write to MSB of TC0640FIO address %02x\n",space->device().safe_pc(),offset);
 	}
 }
 
 READ16_DEVICE_HANDLER( tc0640fio_halfword_byteswap_r )
 {
-	return tc0640fio_halfword_r(device, offset, mem_mask) << 8;
+	return tc0640fio_halfword_r(device, space, offset, mem_mask) << 8;
 }
 
 WRITE16_DEVICE_HANDLER( tc0640fio_halfword_byteswap_w )
 {
 	if (ACCESSING_BITS_8_15)
-		tc0640fio_w(device, offset, (data >> 8) & 0xff);
+		tc0640fio_w(device, space, offset, (data >> 8) & 0xff);
 	else
 	{
-		tc0640fio_w(device, offset, data & 0xff);
+		tc0640fio_w(device, space, offset, data & 0xff);
 //logerror("CPU #0 PC %06x: warning - write to LSB of TC0640FIO address %02x\n",space->device().safe_pc(),offset);
 	}
 }

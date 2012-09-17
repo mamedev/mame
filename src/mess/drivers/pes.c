@@ -139,7 +139,7 @@ WRITE8_MEMBER( pes_state::port1_w )
 #ifdef DEBUG_PORTS
 	logerror("port1 write: tms5220 data written: %02X\n", data);
 #endif
-	tms5220_data_w(state->m_speech, 0, data);
+	tms5220_data_w(state->m_speech, space, 0, data);
 
 }
 
@@ -147,7 +147,7 @@ READ8_MEMBER( pes_state::port1_r )
 {
 	UINT8 data = 0xFF;
 	pes_state *state = machine().driver_data<pes_state>();
-	data = tms5220_status_r(state->m_speech, 0);
+	data = tms5220_status_r(state->m_speech, space, 0);
 #ifdef DEBUG_PORTS
 	logerror("port1 read: tms5220 data read: 0x%02X\n", data);
 #endif

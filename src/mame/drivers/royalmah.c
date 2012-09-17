@@ -894,7 +894,7 @@ READ8_MEMBER(royalmah_state::mjifb_rom_io_r)
 	{
 		case 0x8000:	return ioport("DSW4")->read();		// dsw 4
 		case 0x8200:	return ioport("DSW3")->read();		// dsw 3
-		case 0x9001:	return ay8910_r(machine().device("aysnd"), 0);	// inputs
+		case 0x9001:	return ay8910_r(machine().device("aysnd"), space, 0);	// inputs
 		case 0x9011:	return ioport("SYSTEM")->read();
 	}
 
@@ -916,8 +916,8 @@ WRITE8_MEMBER(royalmah_state::mjifb_rom_io_w)
 	switch(offset)
 	{
 		case 0x8e00:	m_palette_base = data & 0x1f;	return;
-		case 0x9002:	ay8910_data_w(machine().device("aysnd"),0,data);			return;
-		case 0x9003:	ay8910_address_w(machine().device("aysnd"),0,data);		return;
+		case 0x9002:	ay8910_data_w(machine().device("aysnd"),space,0,data);			return;
+		case 0x9003:	ay8910_address_w(machine().device("aysnd"),space,0,data);		return;
 		case 0x9010:
 			mjifb_coin_counter_w(space,0,data);
 			return;
@@ -1003,7 +1003,7 @@ READ8_MEMBER(royalmah_state::mjdejavu_rom_io_r)
 	{
 		case 0x8000:	return ioport("DSW2")->read();		// dsw 2
 		case 0x8001:	return ioport("DSW1")->read();		// dsw 1
-		case 0x9001:	return ay8910_r(machine().device("aysnd"), 0);	// inputs
+		case 0x9001:	return ay8910_r(machine().device("aysnd"), space, 0);	// inputs
 		case 0x9011:	return ioport("SYSTEM")->read();
 	}
 
@@ -1024,8 +1024,8 @@ WRITE8_MEMBER(royalmah_state::mjdejavu_rom_io_w)
 	switch(offset)
 	{
 		case 0x8802:	m_palette_base = data & 0x1f;					return;
-		case 0x9002:	ay8910_data_w(machine().device("aysnd"),0,data);		return;
-		case 0x9003:	ay8910_address_w(machine().device("aysnd"),0,data);	return;
+		case 0x9002:	ay8910_data_w(machine().device("aysnd"),space,0,data);		return;
+		case 0x9003:	ay8910_address_w(machine().device("aysnd"),space,0,data);	return;
 		case 0x9010:	mjifb_coin_counter_w(space,0,data);		return;
 		case 0x9011:	input_port_select_w(space,0,data);		return;
 		case 0x9013:

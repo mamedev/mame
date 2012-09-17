@@ -73,12 +73,12 @@ public:
 
 /*----------- defined in audio/zaxxon.c -----------*/
 
-WRITE8_DEVICE_HANDLER( zaxxon_sound_a_w );
-WRITE8_DEVICE_HANDLER( zaxxon_sound_b_w );
-WRITE8_DEVICE_HANDLER( zaxxon_sound_c_w );
+DECLARE_WRITE8_DEVICE_HANDLER( zaxxon_sound_a_w );
+DECLARE_WRITE8_DEVICE_HANDLER( zaxxon_sound_b_w );
+DECLARE_WRITE8_DEVICE_HANDLER( zaxxon_sound_c_w );
 
-WRITE8_DEVICE_HANDLER( congo_sound_b_w );
-WRITE8_DEVICE_HANDLER( congo_sound_c_w );
+DECLARE_WRITE8_DEVICE_HANDLER( congo_sound_b_w );
+DECLARE_WRITE8_DEVICE_HANDLER( congo_sound_c_w );
 
 MACHINE_CONFIG_EXTERN( zaxxon_samples );
 MACHINE_CONFIG_EXTERN( congo_samples );

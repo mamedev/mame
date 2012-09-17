@@ -10,13 +10,13 @@ struct ym3812_interface
 	void (*handler)(device_t *device, int linestate);
 };
 
-READ8_DEVICE_HANDLER( ym3812_r );
-WRITE8_DEVICE_HANDLER( ym3812_w );
+DECLARE_READ8_DEVICE_HANDLER( ym3812_r );
+DECLARE_WRITE8_DEVICE_HANDLER( ym3812_w );
 
-READ8_DEVICE_HANDLER( ym3812_status_port_r );
-READ8_DEVICE_HANDLER( ym3812_read_port_r );
-WRITE8_DEVICE_HANDLER( ym3812_control_port_w );
-WRITE8_DEVICE_HANDLER( ym3812_write_port_w );
+DECLARE_READ8_DEVICE_HANDLER( ym3812_status_port_r );
+DECLARE_READ8_DEVICE_HANDLER( ym3812_read_port_r );
+DECLARE_WRITE8_DEVICE_HANDLER( ym3812_control_port_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ym3812_write_port_w );
 
 class ym3812_device : public device_t,
                                   public device_sound_interface

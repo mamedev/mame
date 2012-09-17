@@ -44,12 +44,12 @@ struct gaelco_serial_interface
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-READ8_DEVICE_HANDLER( gaelco_serial_status_r);
-WRITE8_DEVICE_HANDLER( gaelco_serial_data_w);
-READ8_DEVICE_HANDLER( gaelco_serial_data_r);
-WRITE8_DEVICE_HANDLER( gaelco_serial_rts_w );
+DECLARE_READ8_DEVICE_HANDLER( gaelco_serial_status_r);
+DECLARE_WRITE8_DEVICE_HANDLER( gaelco_serial_data_w);
+DECLARE_READ8_DEVICE_HANDLER( gaelco_serial_data_r);
+DECLARE_WRITE8_DEVICE_HANDLER( gaelco_serial_rts_w );
 /* Set to 1 during transmit, 0 for receive */
-WRITE8_DEVICE_HANDLER( gaelco_serial_tr_w);
+DECLARE_WRITE8_DEVICE_HANDLER( gaelco_serial_tr_w);
 
 
 /* Big questions marks, related to serial i/o */
@@ -57,11 +57,11 @@ WRITE8_DEVICE_HANDLER( gaelco_serial_tr_w);
 /* Not used in surfplnt, but in radikalb
  * Set at beginning of transfer sub, cleared at end
  */
-WRITE8_DEVICE_HANDLER( gaelco_serial_unknown_w);
+DECLARE_WRITE8_DEVICE_HANDLER( gaelco_serial_unknown_w);
 
 
 /* only used in radikalb, set at beginning of receive isr, cleared at end */
-WRITE8_DEVICE_HANDLER( gaelco_serial_irq_enable );
+DECLARE_WRITE8_DEVICE_HANDLER( gaelco_serial_irq_enable );
 
 
 

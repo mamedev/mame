@@ -130,22 +130,22 @@ WRITE8_MEMBER(ultratnk_state::ultratnk_lockout_w)
 WRITE8_MEMBER(ultratnk_state::ultratnk_fire_1_w)
 {
 	device_t *device = machine().device("discrete");
-	discrete_sound_w(device, ULTRATNK_FIRE_EN_1, offset & 1);
+	discrete_sound_w(device, space, ULTRATNK_FIRE_EN_1, offset & 1);
 }
 WRITE8_MEMBER(ultratnk_state::ultratnk_fire_2_w)
 {
 	device_t *device = machine().device("discrete");
-	discrete_sound_w(device, ULTRATNK_FIRE_EN_2, offset & 1);
+	discrete_sound_w(device, space, ULTRATNK_FIRE_EN_2, offset & 1);
 }
 WRITE8_MEMBER(ultratnk_state::ultratnk_attract_w)
 {
 	device_t *device = machine().device("discrete");
-	discrete_sound_w(device, ULTRATNK_ATTRACT_EN, data & 1);
+	discrete_sound_w(device, space, ULTRATNK_ATTRACT_EN, data & 1);
 }
 WRITE8_MEMBER(ultratnk_state::ultratnk_explosion_w)
 {
 	device_t *device = machine().device("discrete");
-	discrete_sound_w(device, ULTRATNK_EXPLOSION_DATA, data & 15);
+	discrete_sound_w(device, space, ULTRATNK_EXPLOSION_DATA, data & 15);
 }
 
 

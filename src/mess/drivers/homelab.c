@@ -642,7 +642,7 @@ static GFXDECODE_START( homelab )
 	GFXDECODE_ENTRY( "chargen", 0x0000, homelab_charlayout, 0, 1 )
 GFXDECODE_END
 
-static const mea8000_interface brailab4_speech_intf = { "speech", NULL };
+static const mea8000_interface brailab4_speech_intf = { "speech", DEVCB_NULL };
 
 static QUICKLOAD_LOAD(homelab)
 {

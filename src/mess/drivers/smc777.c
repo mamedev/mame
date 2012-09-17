@@ -366,13 +366,13 @@ READ8_MEMBER(smc777_state::smc777_fdc1_r)
 	switch(offset)
 	{
 		case 0x00:
-			return wd17xx_status_r(dev,offset) ^ 0xff;
+			return wd17xx_status_r(dev,space, offset) ^ 0xff;
 		case 0x01:
-			return wd17xx_track_r(dev,offset) ^ 0xff;
+			return wd17xx_track_r(dev,space, offset) ^ 0xff;
 		case 0x02:
-			return wd17xx_sector_r(dev,offset) ^ 0xff;
+			return wd17xx_sector_r(dev,space, offset) ^ 0xff;
 		case 0x03:
-			return wd17xx_data_r(dev,offset) ^ 0xff;
+			return wd17xx_data_r(dev,space, offset) ^ 0xff;
 		case 0x04: //irq / drq status
 			//popmessage("%02x %02x\n",m_fdc_irq_flag,m_fdc_drq_flag);
 
@@ -391,16 +391,16 @@ WRITE8_MEMBER(smc777_state::smc777_fdc1_w)
 	switch(offset)
 	{
 		case 0x00:
-			wd17xx_command_w(dev,offset,data ^ 0xff);
+			wd17xx_command_w(dev,space, offset,data ^ 0xff);
 			break;
 		case 0x01:
-			wd17xx_track_w(dev,offset,data ^ 0xff);
+			wd17xx_track_w(dev,space, offset,data ^ 0xff);
 			break;
 		case 0x02:
-			wd17xx_sector_w(dev,offset,data ^ 0xff);
+			wd17xx_sector_w(dev,space, offset,data ^ 0xff);
 			break;
 		case 0x03:
-			wd17xx_data_w(dev,offset,data ^ 0xff);
+			wd17xx_data_w(dev,space, offset,data ^ 0xff);
 			break;
 		case 0x04:
 			// ---- xxxx select floppy drive (yes, 15 of them, A to P)

@@ -232,7 +232,7 @@ int devcb_resolved_read_line::from_port()
 
 int devcb_resolved_read_line::from_read8()
 {
-	return ((*m_helper.read8_device)(m_object.device, 0) & 1) ? ASSERT_LINE : CLEAR_LINE;
+	return ((*m_helper.read8_device)(m_object.device, m_object.device->machine().driver_data()->generic_space(), 0, 0xff) & 1) ? ASSERT_LINE : CLEAR_LINE;
 }
 
 
@@ -336,7 +336,7 @@ void devcb_resolved_write_line::to_port(int state)
 
 void devcb_resolved_write_line::to_write8(int state)
 {
-	(*m_helper.write8_device)(m_object.device, 0, state);
+	(*m_helper.write8_device)(m_object.device, m_object.device->machine().driver_data()->generic_space(), 0, state, 0xff);
 }
 
 
@@ -391,7 +391,10 @@ void devcb_resolved_read8::resolve(const devcb_read8 &desc, device_t &device)
 		case DEVCB_TYPE_DEVICE:
 			m_object.device = devcb_resolver::resolve_device(desc.index, desc.tag, device);
 			if (desc.readdevice != NULL)
-				*static_cast<devcb_read8_delegate *>(this) = devcb_read8_delegate(desc.readdevice, desc.name, m_object.device);
+			{
+			    m_helper.read8_device = desc.readdevice;
+				*static_cast<devcb_read8_delegate *>(this) = devcb_read8_delegate(&devcb_resolved_read8::from_read8, desc.name, this);
+			}
 			else
 			{
 				m_helper.read_line = desc.readline;
@@ -425,6 +428,17 @@ UINT8 devcb_resolved_read8::from_port(offs_t offset)
 
 //-------------------------------------------------
 //  from_read8 - helper to convert from a device
+//  line read value to an 8-bit value
+//-------------------------------------------------
+
+UINT8 devcb_resolved_read8::from_read8(offs_t offset)
+{
+	return (*m_helper.read8_device)(m_object.device, m_object.device->machine().driver_data()->generic_space(), offset, 0xff);
+}
+
+
+//-------------------------------------------------
+//  from_readline - helper to convert from a device
 //  line read value to an 8-bit value
 //-------------------------------------------------
 
@@ -484,7 +498,10 @@ void devcb_resolved_write8::resolve(const devcb_write8 &desc, device_t &device)
 		case DEVCB_TYPE_DEVICE:
 			m_object.device = devcb_resolver::resolve_device(desc.index, desc.tag, device);
 			if (desc.writedevice != NULL)
-				*static_cast<devcb_write8_delegate *>(this) = devcb_write8_delegate(desc.writedevice, desc.name, m_object.device);
+			{
+				m_helper.write8_device = desc.writedevice;
+				*static_cast<devcb_write8_delegate *>(this) = devcb_write8_delegate(&devcb_resolved_write8::to_write8, desc.name, this);
+			}
 			else
 			{
 				m_helper.write_line = desc.writeline;
@@ -523,6 +540,17 @@ void devcb_resolved_write8::to_null(offs_t offset, UINT8 data)
 void devcb_resolved_write8::to_port(offs_t offset, UINT8 data)
 {
 	m_object.port->write(data, 0xff);
+}
+
+
+//-------------------------------------------------
+//  to_write8 - helper to convert to an 8-bit
+//  memory read value from a line value
+//-------------------------------------------------
+
+void devcb_resolved_write8::to_write8(offs_t offset, UINT8 data)
+{
+	(*m_helper.write8_device)(m_object.device, m_object.device->machine().driver_data()->generic_space(), offset, data, 0xff);
 }
 
 
@@ -588,7 +616,10 @@ void devcb_resolved_read16::resolve(const devcb_read16 &desc, device_t &device)
 		case DEVCB_TYPE_DEVICE:
 			m_object.device = devcb_resolver::resolve_device(desc.index, desc.tag, device);
 			if (desc.readdevice != NULL)
-				*static_cast<devcb_read16_delegate *>(this) = devcb_read16_delegate(desc.readdevice, desc.name, m_object.device);
+			{
+				m_helper.read16_device = desc.readdevice;
+				*static_cast<devcb_read16_delegate *>(this) = devcb_read16_delegate(&devcb_resolved_read16::from_read16, desc.name, this);
+			}
 			else
 			{
 				m_helper.read_line = desc.readline;
@@ -617,6 +648,17 @@ void devcb_resolved_read16::resolve(const devcb_read16 &desc, device_t &device)
 UINT16 devcb_resolved_read16::from_port(offs_t offset, UINT16 mask)
 {
 	return m_object.port->read();
+}
+
+
+//-------------------------------------------------
+//  from_read16 - helper to convert from a device
+//  line read value to a 16-bit value
+//-------------------------------------------------
+
+UINT16 devcb_resolved_read16::from_read16(offs_t offset, UINT16 mask)
+{
+	return (*m_helper.read16_device)(m_object.device, m_object.device->machine().driver_data()->generic_space(), offset, mask);
 }
 
 
@@ -681,7 +723,10 @@ void devcb_resolved_write16::resolve(const devcb_write16 &desc, device_t &device
 		case DEVCB_TYPE_DEVICE:
 			m_object.device = devcb_resolver::resolve_device(desc.index, desc.tag, device);
 			if (desc.writedevice != NULL)
-				*static_cast<devcb_write16_delegate *>(this) = devcb_write16_delegate(desc.writedevice, desc.name, m_object.device);
+			{
+				m_helper.write16_device = desc.writedevice;
+				*static_cast<devcb_write16_delegate *>(this) = devcb_write16_delegate(&devcb_resolved_write16::to_write16, desc.name, this);
+			}
 			else
 			{
 				m_helper.write_line = desc.writeline;
@@ -720,6 +765,17 @@ void devcb_resolved_write16::to_null(offs_t offset, UINT16 data, UINT16 mask)
 void devcb_resolved_write16::to_port(offs_t offset, UINT16 data, UINT16 mask)
 {
 	m_object.port->write(data, mask);
+}
+
+
+//-------------------------------------------------
+//  to_write16 - helper to convert to a 16-bit
+//  memory read value from a line value
+//-------------------------------------------------
+
+void devcb_resolved_write16::to_write16(offs_t offset, UINT16 data, UINT16 mask)
+{
+	(*m_helper.write16_device)(m_object.device, m_object.device->machine().driver_data()->generic_space(), offset, data, mask);
 }
 
 

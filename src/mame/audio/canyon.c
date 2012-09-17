@@ -16,25 +16,25 @@
 
 WRITE8_DEVICE_HANDLER( canyon_motor_w )
 {
-	discrete_sound_w(device, NODE_RELATIVE(CANYON_MOTOR1_DATA, (offset & 0x01)), data & 0x0f);
+	discrete_sound_w(device, space, NODE_RELATIVE(CANYON_MOTOR1_DATA, (offset & 0x01)), data & 0x0f);
 }
 
 
 WRITE8_DEVICE_HANDLER( canyon_explode_w )
 {
-	discrete_sound_w(device, CANYON_EXPLODE_DATA, data >> 4);
+	discrete_sound_w(device, space, CANYON_EXPLODE_DATA, data >> 4);
 }
 
 
 WRITE8_DEVICE_HANDLER( canyon_attract_w )
 {
-	discrete_sound_w(device, NODE_RELATIVE(CANYON_ATTRACT1_EN, (offset & 0x01)), offset & 0x02);
+	discrete_sound_w(device, space, NODE_RELATIVE(CANYON_ATTRACT1_EN, (offset & 0x01)), offset & 0x02);
 }
 
 
 WRITE8_DEVICE_HANDLER( canyon_whistle_w )
 {
-	discrete_sound_w(device, NODE_RELATIVE(CANYON_WHISTLE1_EN, (offset & 0x01)), offset & 0x02);
+	discrete_sound_w(device, space, NODE_RELATIVE(CANYON_WHISTLE1_EN, (offset & 0x01)), offset & 0x02);
 }
 
 

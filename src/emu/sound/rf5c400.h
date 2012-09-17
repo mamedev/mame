@@ -7,8 +7,8 @@
 
 #include "devlegcy.h"
 
-READ16_DEVICE_HANDLER( rf5c400_r );
-WRITE16_DEVICE_HANDLER( rf5c400_w );
+DECLARE_READ16_DEVICE_HANDLER( rf5c400_r );
+DECLARE_WRITE16_DEVICE_HANDLER( rf5c400_w );
 
 class rf5c400_device : public device_t,
                                   public device_sound_interface

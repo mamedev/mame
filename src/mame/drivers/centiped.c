@@ -736,15 +736,15 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(centiped_state::caterplr_AY8910_w)
 {
 	device_t *device = machine().device("pokey");
-	ay8910_address_w(device, 0, offset);
-	ay8910_data_w(device, 0, data);
+	ay8910_address_w(device, space, 0, offset);
+	ay8910_data_w(device, space, 0, data);
 }
 
 READ8_MEMBER(centiped_state::caterplr_AY8910_r)
 {
 	device_t *device = machine().device("pokey");
-	ay8910_address_w(device, 0, offset);
-	return ay8910_r(device, 0);
+	ay8910_address_w(device, space, 0, offset);
+	return ay8910_r(device, space, 0);
 }
 
 

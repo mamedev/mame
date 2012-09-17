@@ -59,5 +59,5 @@ extern const device_type TLC34076;
     DEVICE I/O FUNCTIONS
 ***************************************************************************/
 
-WRITE8_DEVICE_HANDLER( tlc34076_w );
-READ8_DEVICE_HANDLER( tlc34076_r );
+DECLARE_WRITE8_DEVICE_HANDLER( tlc34076_w );
+DECLARE_READ8_DEVICE_HANDLER( tlc34076_r );

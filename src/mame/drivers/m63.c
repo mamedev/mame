@@ -390,13 +390,13 @@ WRITE8_MEMBER(m63_state::snddata_w)
 {
 
 	if ((m_p2 & 0xf0) == 0xe0)
-		ay8910_address_w(m_ay1, 0, offset);
+		ay8910_address_w(m_ay1, space, 0, offset);
 	else if ((m_p2 & 0xf0) == 0xa0)
-		ay8910_data_w(m_ay1, 0, offset);
+		ay8910_data_w(m_ay1, space, 0, offset);
 	else if (m_ay2 != NULL && (m_p1 & 0xe0) == 0x60)
-		ay8910_address_w(m_ay2, 0, offset);
+		ay8910_address_w(m_ay2, space, 0, offset);
 	else if (m_ay2 != NULL && (m_p1 & 0xe0) == 0x40)
-		 ay8910_data_w(m_ay2, 0, offset);
+		 ay8910_data_w(m_ay2, space, 0, offset);
 	else if ((m_p2 & 0xf0) == 0x70 )
 		m_sound_status = offset;
 }

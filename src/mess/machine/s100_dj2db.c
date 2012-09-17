@@ -304,7 +304,7 @@ void s100_dj2db_device::device_reset()
 //  s100_smemr_r - memory read
 //-------------------------------------------------
 
-UINT8 s100_dj2db_device::s100_smemr_r(offs_t offset)
+UINT8 s100_dj2db_device::s100_smemr_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
 
@@ -365,7 +365,7 @@ UINT8 s100_dj2db_device::s100_smemr_r(offs_t offset)
 	{
 		m_s100->rdy_w(ASSERT_LINE);
 
-		data = wd17xx_r(m_fdc, offset & 0x03);
+		data = wd17xx_r(m_fdc, space, offset & 0x03);
 	}
 	else if ((offset >= 0xfc00) && (offset < 0x10000))
 	{
@@ -385,7 +385,7 @@ UINT8 s100_dj2db_device::s100_smemr_r(offs_t offset)
 //  s100_mwrt_w - memory write
 //-------------------------------------------------
 
-void s100_dj2db_device::s100_mwrt_w(offs_t offset, UINT8 data)
+void s100_dj2db_device::s100_mwrt_w(address_space &space, offs_t offset, UINT8 data)
 {
 //  if (!(m_board_enbl & m_phantom)) return;
 
@@ -459,7 +459,7 @@ void s100_dj2db_device::s100_mwrt_w(offs_t offset, UINT8 data)
 	}
 	else if ((offset >= 0xfbfc) && (offset < 0xfc00))
 	{
-		wd17xx_w(m_fdc, offset & 0x03, data);
+		wd17xx_w(m_fdc, space, offset & 0x03, data);
 	}
 	else if ((offset >= 0xfc00) && (offset < 0x10000))
 	{
@@ -472,7 +472,7 @@ void s100_dj2db_device::s100_mwrt_w(offs_t offset, UINT8 data)
 //  s100_sinp_r - I/O read
 //-------------------------------------------------
 
-UINT8 s100_dj2db_device::s100_sinp_r(offs_t offset)
+UINT8 s100_dj2db_device::s100_sinp_r(address_space &space, offs_t offset)
 {
 	return 0;
 }
@@ -482,7 +482,7 @@ UINT8 s100_dj2db_device::s100_sinp_r(offs_t offset)
 //  s100_sout_w - I/O write
 //-------------------------------------------------
 
-void s100_dj2db_device::s100_sout_w(offs_t offset, UINT8 data)
+void s100_dj2db_device::s100_sout_w(address_space &space, offs_t offset, UINT8 data)
 {
 	if (offset == 0x41)
 	{

@@ -34,10 +34,11 @@ void playch10_state::machine_reset()
 	m_MMC2_bank_latch[0] = m_MMC2_bank_latch[1] = 0xfe;
 
 	/* reset the security chip */
-	rp5h01_enable_w(rp5h01, 0, 0);
-	rp5h01_reset_w(rp5h01, 0, 0);
-	rp5h01_reset_w(rp5h01, 0, 1);
-	rp5h01_enable_w(rp5h01, 0, 1);
+	address_space &space = generic_space();
+	rp5h01_enable_w(rp5h01, space, 0, 0);
+	rp5h01_reset_w(rp5h01, space, 0, 0);
+	rp5h01_reset_w(rp5h01, space, 0, 1);
+	rp5h01_enable_w(rp5h01, space, 0, 1);
 
 	pc10_set_mirroring(m_mirroring);
 }
@@ -168,10 +169,10 @@ READ8_MEMBER(playch10_state::pc10_prot_r)
 	/* we only support a single cart connected at slot 0 */
 	if (m_cart_sel == 0)
 	{
-		rp5h01_enable_w(rp5h01, 0, 0);
-		data |= ((~rp5h01_counter_r(rp5h01, 0)) << 4) & 0x10;	/* D4 */
-		data |= ((rp5h01_data_r(rp5h01, 0)) << 3) & 0x08;		/* D3 */
-		rp5h01_enable_w(rp5h01, 0, 1);
+		rp5h01_enable_w(rp5h01, space, 0, 0);
+		data |= ((~rp5h01_counter_r(rp5h01, space, 0)) << 4) & 0x10;	/* D4 */
+		data |= ((rp5h01_data_r(rp5h01, space, 0)) << 3) & 0x08;		/* D3 */
+		rp5h01_enable_w(rp5h01, space, 0, 1);
 	}
 	return data;
 }
@@ -182,11 +183,11 @@ WRITE8_MEMBER(playch10_state::pc10_prot_w)
 	/* we only support a single cart connected at slot 0 */
 	if (m_cart_sel == 0)
 	{
-		rp5h01_enable_w(rp5h01, 0, 0);
-		rp5h01_test_w(rp5h01, 0, data & 0x10);		/* D4 */
-		rp5h01_clock_w(rp5h01, 0, data & 0x08);		/* D3 */
-		rp5h01_reset_w(rp5h01, 0, ~data & 0x01);	/* D0 */
-		rp5h01_enable_w(rp5h01, 0, 1);
+		rp5h01_enable_w(rp5h01, space, 0, 0);
+		rp5h01_test_w(rp5h01, space, 0, data & 0x10);		/* D4 */
+		rp5h01_clock_w(rp5h01, space, 0, data & 0x08);		/* D3 */
+		rp5h01_reset_w(rp5h01, space, 0, ~data & 0x01);	/* D0 */
+		rp5h01_enable_w(rp5h01, space, 0, 1);
 
 		/* this thing gets dense at some point                      */
 		/* it wants to jump and execute an opcode at $ffff, wich    */

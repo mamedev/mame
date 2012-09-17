@@ -764,7 +764,7 @@ WRITE8_MEMBER(atarisy2_state::tms5220_w)
 {
 	if (m_has_tms5220)
 	{
-		tms5220_data_w(machine().device("tms"), 0, data);
+		tms5220_data_w(machine().device("tms"), space, 0, data);
 	}
 }
 

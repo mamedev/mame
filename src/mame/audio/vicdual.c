@@ -151,12 +151,12 @@ WRITE8_HANDLER( frogs_audio_w )
 	int new_croak = data & 0x08;
 	int new_buzzz = data & 0x10;
 
-//  discrete_sound_w(discrete, FROGS_HOP_EN, data & 0x01);
-//  discrete_sound_w(discrete, FROGS_JUMP_EN, data & 0x02);
-	discrete_sound_w(discrete, FROGS_TONGUE_EN, data & 0x04);
-//  discrete_sound_w(discrete, FROGS_CAPTURE_EN, data & 0x08);
-//  discrete_sound_w(discrete, FROGS_FLY_EN, data & 0x10);
-//  discrete_sound_w(discrete, FROGS_SPLASH_EN, data & 0x80);
+//  discrete_sound_w(discrete, *space, FROGS_HOP_EN, data & 0x01);
+//  discrete_sound_w(discrete, *space, FROGS_JUMP_EN, data & 0x02);
+	discrete_sound_w(discrete, *space, FROGS_TONGUE_EN, data & 0x04);
+//  discrete_sound_w(discrete, *space, FROGS_CAPTURE_EN, data & 0x08);
+//  discrete_sound_w(discrete, *space, FROGS_FLY_EN, data & 0x10);
+//  discrete_sound_w(discrete, *space, FROGS_SPLASH_EN, data & 0x80);
 
 	if (data & 0x01)
 		samples->start(3, 3);	// Hop
@@ -464,13 +464,13 @@ WRITE8_HANDLER( headon_audio_w )
 	device_t *discrete = space->machine().device("discrete");
 	if (discrete == NULL)
 		return;
-	discrete_sound_w(discrete, HEADON_HISPEED_PC_EN, data & 0x01);
-	discrete_sound_w(discrete, HEADON_SCREECH1_EN, data & 0x02);
-	discrete_sound_w(discrete, HEADON_CRASH_EN, data & 0x04);
-	discrete_sound_w(discrete, HEADON_HISPEED_CC_EN, data & 0x08);
-	discrete_sound_w(discrete, HEADON_SCREECH2_EN, data & 0x10);
-	discrete_sound_w(discrete, HEADON_BONUS_EN, data & 0x20);
-	discrete_sound_w(discrete, HEADON_CAR_ON_EN, data & 0x40);
+	discrete_sound_w(discrete, *space, HEADON_HISPEED_PC_EN, data & 0x01);
+	discrete_sound_w(discrete, *space, HEADON_SCREECH1_EN, data & 0x02);
+	discrete_sound_w(discrete, *space, HEADON_CRASH_EN, data & 0x04);
+	discrete_sound_w(discrete, *space, HEADON_HISPEED_CC_EN, data & 0x08);
+	discrete_sound_w(discrete, *space, HEADON_SCREECH2_EN, data & 0x10);
+	discrete_sound_w(discrete, *space, HEADON_BONUS_EN, data & 0x20);
+	discrete_sound_w(discrete, *space, HEADON_CAR_ON_EN, data & 0x40);
 
 }
 
@@ -479,13 +479,13 @@ WRITE8_HANDLER( invho2_audio_w )
 	device_t *discrete = space->machine().device("discrete");
 	if (discrete == NULL)
 		return;
-	discrete_sound_w(discrete, HEADON_HISPEED_PC_EN, data & 0x10);
-	discrete_sound_w(discrete, HEADON_SCREECH1_EN, data & 0x08);
-	discrete_sound_w(discrete, HEADON_CRASH_EN, data & 0x80);
-	discrete_sound_w(discrete, HEADON_HISPEED_CC_EN, data & 0x40);
-	discrete_sound_w(discrete, HEADON_SCREECH2_EN, data & 0x04);
-	discrete_sound_w(discrete, HEADON_BONUS_EN, data & 0x02);
-	discrete_sound_w(discrete, HEADON_CAR_ON_EN, data & 0x20);
+	discrete_sound_w(discrete, *space, HEADON_HISPEED_PC_EN, data & 0x10);
+	discrete_sound_w(discrete, *space, HEADON_SCREECH1_EN, data & 0x08);
+	discrete_sound_w(discrete, *space, HEADON_CRASH_EN, data & 0x80);
+	discrete_sound_w(discrete, *space, HEADON_HISPEED_CC_EN, data & 0x40);
+	discrete_sound_w(discrete, *space, HEADON_SCREECH2_EN, data & 0x04);
+	discrete_sound_w(discrete, *space, HEADON_BONUS_EN, data & 0x02);
+	discrete_sound_w(discrete, *space, HEADON_CAR_ON_EN, data & 0x20);
 
 }
 

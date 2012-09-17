@@ -68,8 +68,8 @@ extern const device_type VDT911;
 	MCFG_DEVICE_CONFIG(_intf)
 
 
- READ8_DEVICE_HANDLER(vdt911_cru_r);
-WRITE8_DEVICE_HANDLER(vdt911_cru_w);
+ DECLARE_READ8_DEVICE_HANDLER(vdt911_cru_r);
+DECLARE_WRITE8_DEVICE_HANDLER(vdt911_cru_w);
 
 void vdt911_refresh(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y);
 

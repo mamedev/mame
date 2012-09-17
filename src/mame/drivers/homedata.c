@@ -359,10 +359,10 @@ WRITE8_MEMBER(homedata_state::reikaids_upd7807_portc_w)
 	coin_counter_w(machine(), 0, ~data & 0x80);
 
 	if (BIT(m_upd7807_portc, 5) && !BIT(data, 5))	/* write clock 1->0 */
-		ym2203_w(m_ym, BIT(data, 3), m_upd7807_porta);
+		ym2203_w(m_ym, space, BIT(data, 3), m_upd7807_porta);
 
 	if (BIT(m_upd7807_portc, 4) && !BIT(data, 4))	/* read clock 1->0 */
-		m_upd7807_porta = ym2203_r(m_ym, BIT(data, 3));
+		m_upd7807_porta = ym2203_r(m_ym, space, BIT(data, 3));
 
 	m_upd7807_portc = data;
 }

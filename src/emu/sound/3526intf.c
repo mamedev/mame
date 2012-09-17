@@ -138,10 +138,10 @@ WRITE8_DEVICE_HANDLER( ym3526_w )
 	ym3526_write(info->chip, offset & 1, data);
 }
 
-READ8_DEVICE_HANDLER( ym3526_status_port_r ) { return ym3526_r(device, 0); }
-READ8_DEVICE_HANDLER( ym3526_read_port_r ) { return ym3526_r(device, 1); }
-WRITE8_DEVICE_HANDLER( ym3526_control_port_w ) { ym3526_w(device, 0, data); }
-WRITE8_DEVICE_HANDLER( ym3526_write_port_w ) { ym3526_w(device, 1, data); }
+READ8_DEVICE_HANDLER( ym3526_status_port_r ) { return ym3526_r(device, space, 0); }
+READ8_DEVICE_HANDLER( ym3526_read_port_r ) { return ym3526_r(device, space, 1); }
+WRITE8_DEVICE_HANDLER( ym3526_control_port_w ) { ym3526_w(device, space, 0, data); }
+WRITE8_DEVICE_HANDLER( ym3526_write_port_w ) { ym3526_w(device, space, 1, data); }
 
 
 const device_type YM3526 = &device_creator<ym3526_device>;

@@ -80,8 +80,8 @@ struct mc6854_interface
 
 /* ---------- functions ------------ */
 /* interface to CPU via address/data bus*/
-extern READ8_DEVICE_HANDLER  ( mc6854_r );
-extern WRITE8_DEVICE_HANDLER ( mc6854_w );
+extern DECLARE_READ8_DEVICE_HANDLER  ( mc6854_r );
+extern DECLARE_WRITE8_DEVICE_HANDLER ( mc6854_w );
 
 /* low-level, bit-based interface */
 WRITE_LINE_DEVICE_HANDLER( mc6854_set_rx );

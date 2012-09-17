@@ -681,7 +681,7 @@ static void AICA_UpdateSlotReg(aica_state *AICA,int s,int r)
 	}
 }
 
-static void AICA_UpdateReg(aica_state *AICA, int reg)
+static void AICA_UpdateReg(aica_state *AICA, address_space &space, int reg)
 {
 	switch(reg&0xff)
 	{
@@ -702,7 +702,7 @@ static void AICA_UpdateReg(aica_state *AICA, int reg)
 			break;
 		case 0x8:
 		case 0x9:
-			aica_midi_in(AICA->device, 0, AICA->udata.data[0x8/2]&0xff, 0xffff);
+			aica_midi_in(AICA->device, space, 0, AICA->udata.data[0x8/2]&0xff, 0xffff);
 			break;
 		case 0x12:
 		case 0x13:
@@ -823,7 +823,7 @@ static void AICA_UpdateSlotRegR(aica_state *AICA, int slot,int reg)
 
 }
 
-static void AICA_UpdateRegR(aica_state *AICA, int reg)
+static void AICA_UpdateRegR(aica_state *AICA, address_space &space, int reg)
 {
 	switch(reg&0xff)
 	{
@@ -894,7 +894,7 @@ static void AICA_UpdateRegR(aica_state *AICA, int reg)
 	}
 }
 
-static void AICA_w16(aica_state *AICA,unsigned int addr,unsigned short val)
+static void AICA_w16(aica_state *AICA,address_space &space,unsigned int addr,unsigned short val)
 {
 	addr&=0xffff;
 	if(addr<0x2000)
@@ -919,7 +919,7 @@ static void AICA_w16(aica_state *AICA,unsigned int addr,unsigned short val)
 		{
 //          printf("%x to AICA global @ %x\n", val, addr & 0xff);
 			*((unsigned short *) (AICA->udata.datab+((addr&0xff)))) = val;
-			AICA_UpdateReg(AICA, addr&0xff);
+			AICA_UpdateReg(AICA, space, addr&0xff);
 		}
 		else if (addr == 0x2d00)
 		{
@@ -954,7 +954,7 @@ static void AICA_w16(aica_state *AICA,unsigned int addr,unsigned short val)
 	}
 }
 
-static unsigned short AICA_r16(aica_state *AICA, unsigned int addr)
+static unsigned short AICA_r16(aica_state *AICA, address_space &space, unsigned int addr)
 {
 	unsigned short v=0;
 	addr&=0xffff;
@@ -973,7 +973,7 @@ static unsigned short AICA_r16(aica_state *AICA, unsigned int addr)
 		}
 		else if (addr < 0x28be)
 		{
-			AICA_UpdateRegR(AICA, addr&0xff);
+			AICA_UpdateRegR(AICA, space, addr&0xff);
 			v= *((unsigned short *) (AICA->udata.datab+((addr&0xff))));
 			if((addr&0xfffe)==0x2810) AICA->udata.data[0x10/2] &= 0x7FFF;	// reset LP on read
 		}
@@ -1323,7 +1323,7 @@ void aica_set_ram_base(device_t *device, void *base, int size)
 READ16_DEVICE_HANDLER( aica_r )
 {
 	aica_state *AICA = get_safe_token(device);
-	return AICA_r16(AICA, offset*2);
+	return AICA_r16(AICA, space,offset*2);
 }
 
 WRITE16_DEVICE_HANDLER( aica_w )
@@ -1331,9 +1331,9 @@ WRITE16_DEVICE_HANDLER( aica_w )
 	aica_state *AICA = get_safe_token(device);
 	UINT16 tmp;
 
-	tmp = AICA_r16(AICA, offset*2);
+	tmp = AICA_r16(AICA, space, offset*2);
 	COMBINE_DATA(&tmp);
-	AICA_w16(AICA, offset*2, tmp);
+	AICA_w16(AICA, space, offset*2, tmp);
 }
 
 WRITE16_DEVICE_HANDLER( aica_midi_in )

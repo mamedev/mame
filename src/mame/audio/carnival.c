@@ -274,11 +274,11 @@ static WRITE8_DEVICE_HANDLER( carnival_music_port_2_w )
 			break;
 
 		case PSG_BC_WRITE:
-			ay8910_data_w( device, 0, psgData );
+			ay8910_data_w( device, space, 0, psgData );
 			break;
 
 		case PSG_BC_LATCH_ADDRESS:
-			ay8910_address_w( device, 0, psgData );
+			ay8910_address_w( device, space, 0, psgData );
 			break;
 		}
 	}

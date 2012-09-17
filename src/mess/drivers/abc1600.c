@@ -182,8 +182,8 @@ UINT8 abc1600_state::read_ram(offs_t offset)
 	else if (offset < 0x180000)
 	{
 		// video RAM
-		address_space *program = m_maincpu->space(AS_PROGRAM);
-		data = video_ram_r(*program, offset);
+		address_space &program = *m_maincpu->space(AS_PROGRAM);
+		data = video_ram_r(program, offset);
 	}
 	else
 	{
@@ -209,8 +209,8 @@ void abc1600_state::write_ram(offs_t offset, UINT8 data)
 	else if (offset < 0x180000)
 	{
 		// video RAM
-		address_space *program = m_maincpu->space(AS_PROGRAM);
-		video_ram_w(*program, offset, data);
+		address_space &program = *m_maincpu->space(AS_PROGRAM);
+		video_ram_w(program, offset, data);
 	}
 	else
 	{
@@ -242,7 +242,7 @@ UINT8 abc1600_state::read_io(offs_t offset)
 
 UINT8 abc1600_state::read_internal_io(offs_t offset)
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = *m_maincpu->space(AS_PROGRAM);
 	UINT8 data = 0;
 
 	if (X11)
@@ -250,7 +250,7 @@ UINT8 abc1600_state::read_internal_io(offs_t offset)
 		switch (A10_A9_A8)
 		{
 		case IORD0:
-			data = iord0_r(*program, offset);
+			data = iord0_r(program, offset);
 			break;
 
 		default:
@@ -262,18 +262,18 @@ UINT8 abc1600_state::read_internal_io(offs_t offset)
 		switch (A10_A9_A8)
 		{
 		case FLP:
-			data = wd17xx_r(m_fdc, A2_A1);
+			data = wd17xx_r(m_fdc, program, A2_A1);
 			break;
 
 		case CRT:
 			if (A0)
-				data = m_crtc->register_r(*program, offset);
+				data = m_crtc->register_r(program, offset);
 			else
-				data = m_crtc->status_r(*program, offset);
+				data = m_crtc->status_r(program, offset);
 			break;
 
 		case DRT:
-			data = z80dart_ba_cd_r(m_dart, A2_A1 ^ 0x03);
+			data = z80dart_ba_cd_r(m_dart, program, A2_A1 ^ 0x03);
 			break;
 
 		case DMA0:
@@ -289,11 +289,11 @@ UINT8 abc1600_state::read_internal_io(offs_t offset)
 			break;
 
 		case SCC:
-			data = m_scc->reg_r(*program, A1_A2);
+			data = m_scc->reg_r(program, A1_A2);
 			break;
 
 		case CIO:
-			data = m_cio->read(*program, A2_A1);
+			data = m_cio->read(program, A2_A1);
 			break;
 		}
 	}
@@ -467,31 +467,31 @@ void abc1600_state::write_io(offs_t offset, UINT8 data)
 
 void abc1600_state::write_internal_io(offs_t offset, UINT8 data)
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = *m_maincpu->space(AS_PROGRAM);
 
 	if (X11)
 	{
 		switch (A10_A9_A8)
 		{
 		case IOWR0:
-			iowr0_w(*program, offset, data);
+			iowr0_w(program, offset, data);
 			break;
 
 		case IOWR1:
-			iowr1_w(*program, offset, data);
+			iowr1_w(program, offset, data);
 			break;
 
 		case IOWR2:
-			iowr2_w(*program, offset, data);
+			iowr2_w(program, offset, data);
 			break;
 
 		case FW:
 			if (!A7)
 			{
 				if (A0)
-					fw1_w(*program, offset, data);
+					fw1_w(program, offset, data);
 				else
-					fw0_w(*program, offset, data);
+					fw0_w(program, offset, data);
 			}
 			else
 			{
@@ -500,11 +500,11 @@ void abc1600_state::write_internal_io(offs_t offset, UINT8 data)
 			break;
 
 		case DMAMAP:
-			dmamap_w(*program, offset, data);
+			dmamap_w(program, offset, data);
 			break;
 
 		case SPEC_CONTR_REG:
-			spec_contr_reg_w(*program, offset, data);
+			spec_contr_reg_w(program, offset, data);
 			break;
 
 		default:
@@ -516,18 +516,18 @@ void abc1600_state::write_internal_io(offs_t offset, UINT8 data)
 		switch (A10_A9_A8)
 		{
 		case FLP:
-			wd17xx_w(m_fdc, A2_A1, data);
+			wd17xx_w(m_fdc, program, A2_A1, data);
 			break;
 
 		case CRT:
 			if (A0)
-				m_crtc->register_w(*program, offset, data);
+				m_crtc->register_w(program, offset, data);
 			else
-				m_crtc->address_w(*program, offset, data);
+				m_crtc->address_w(program, offset, data);
 			break;
 
 		case DRT:
-			z80dart_ba_cd_w(m_dart, A2_A1 ^ 0x03, data);
+			z80dart_ba_cd_w(m_dart, program, A2_A1 ^ 0x03, data);
 			break;
 
 		case DMA0:
@@ -543,11 +543,11 @@ void abc1600_state::write_internal_io(offs_t offset, UINT8 data)
 			break;
 
 		case SCC:
-			m_scc->reg_w(*program, A1_A2, data);
+			m_scc->reg_w(program, A1_A2, data);
 			break;
 
 		case CIO:
-			m_cio->write(*program, A2_A1, data);
+			m_cio->write(program, A2_A1, data);
 			break;
 		}
 	}
@@ -770,23 +770,23 @@ void abc1600_state::write_user_memory(offs_t offset, UINT8 data)
 
 UINT8 abc1600_state::read_supervisor_memory(offs_t offset)
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = *m_maincpu->space(AS_PROGRAM);
 	UINT8 data = 0;
 
 	if (!A2 && !A1)
 	{
 		// _EP
-		data = page_r(*program, offset);
+		data = page_r(program, offset);
 	}
 	else if (!A2 && A1 && A0)
 	{
 		// _ES
-		data = segment_r(*program, offset);
+		data = segment_r(program, offset);
 	}
 	else if (A2 && A1 && A0)
 	{
 		// _CAUSE
-		data = cause_r(*program, offset);
+		data = cause_r(program, offset);
 	}
 
 	return data;
@@ -799,22 +799,22 @@ UINT8 abc1600_state::read_supervisor_memory(offs_t offset)
 
 void abc1600_state::write_supervisor_memory(offs_t offset, UINT8 data)
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = *m_maincpu->space(AS_PROGRAM);
 
 	if (!A2 && !A1)
 	{
 		// _WEP
-		page_w(*program, offset, data);
+		page_w(program, offset, data);
 	}
 	else if (!A2 && A1 && A0)
 	{
 		// _WES
-		segment_w(*program, offset, data);
+		segment_w(program, offset, data);
 	}
 	else if (A2 && !A1 && A0)
 	{
 		// W(C)
-		task_w(*program, offset, data);
+		task_w(program, offset, data);
 	}
 }
 
@@ -1879,17 +1879,17 @@ void abc1600_state::machine_start()
 
 void abc1600_state::machine_reset()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = *m_maincpu->space(AS_PROGRAM);
 
 	// clear special control register
 	for (int i = 0; i < 8; i++)
 	{
-		spec_contr_reg_w(*program, 0, i);
+		spec_contr_reg_w(program, 0, i);
 	}
 
 	// clear floppy registers
-	fw0_w(*program, 0, 0);
-	fw1_w(*program, 0, 0);
+	fw0_w(program, 0, 0);
+	fw1_w(program, 0, 0);
 
 	// clear task register
 	m_task = 0;

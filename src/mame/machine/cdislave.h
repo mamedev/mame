@@ -119,8 +119,8 @@ extern const device_type MACHINE_CDISLAVE;
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ16_DEVICE_HANDLER( slave_r );
-WRITE16_DEVICE_HANDLER( slave_w );
+DECLARE_READ16_DEVICE_HANDLER( slave_r );
+DECLARE_WRITE16_DEVICE_HANDLER( slave_w );
 
 
 #endif // __CDISLAVE_H__

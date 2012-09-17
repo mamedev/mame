@@ -1452,22 +1452,22 @@ WRITE_LINE_DEVICE_HANDLER( z80dart_rxtxcb_w ) { downcast<z80dart_device *>(devic
 
 READ8_DEVICE_HANDLER( z80dart_cd_ba_r )
 {
-	return (offset & 2) ? z80dart_c_r(device, offset & 1) : z80dart_d_r(device, offset & 1);
+	return (offset & 2) ? z80dart_c_r(device, space, offset & 1) : z80dart_d_r(device, space, offset & 1);
 }
 
 WRITE8_DEVICE_HANDLER( z80dart_cd_ba_w )
 {
 	if (offset & 2)
-		z80dart_c_w(device, offset & 1, data);
+		z80dart_c_w(device, space, offset & 1, data);
 	else
-		z80dart_d_w(device, offset & 1, data);
+		z80dart_d_w(device, space, offset & 1, data);
 }
 
 READ8_DEVICE_HANDLER( z80dart_ba_cd_r )
 {
 	int channel = BIT(offset, 1);
 
-	return (offset & 1) ? z80dart_c_r(device, channel) : z80dart_d_r(device, channel);
+	return (offset & 1) ? z80dart_c_r(device, space, channel) : z80dart_d_r(device, space, channel);
 }
 
 WRITE8_DEVICE_HANDLER( z80dart_ba_cd_w )
@@ -1475,7 +1475,7 @@ WRITE8_DEVICE_HANDLER( z80dart_ba_cd_w )
 	int channel = BIT(offset, 1);
 
 	if (offset & 1)
-		z80dart_c_w(device, channel, data);
+		z80dart_c_w(device, space, channel, data);
 	else
-		z80dart_d_w(device, channel, data);
+		z80dart_d_w(device, space, channel, data);
 }

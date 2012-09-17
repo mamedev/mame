@@ -112,7 +112,7 @@ WRITE_LINE_MEMBER(zaccaria_state::zaccaria_irq0b)
 
 READ8_MEMBER(zaccaria_state::zaccaria_port0a_r)
 {
-	return ay8910_r(machine().device((m_active_8910 == 0) ? "ay1" : "ay2"), 0);
+	return ay8910_r(machine().device((m_active_8910 == 0) ? "ay1" : "ay2"), space, 0);
 }
 
 WRITE8_MEMBER(zaccaria_state::zaccaria_port0a_w)
@@ -127,7 +127,7 @@ WRITE8_MEMBER(zaccaria_state::zaccaria_port0b_w)
 	if ((m_last_port0b & 0x02) == 0x02 && (data & 0x02) == 0x00)
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
-		ay8910_data_address_w(machine().device("ay1"), m_last_port0b, m_port0a);
+		ay8910_data_address_w(machine().device("ay1"), space, m_last_port0b, m_port0a);
 	}
 	else if ((m_last_port0b & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
@@ -139,7 +139,7 @@ WRITE8_MEMBER(zaccaria_state::zaccaria_port0b_w)
 	if ((m_last_port0b & 0x08) == 0x08 && (data & 0x08) == 0x00)
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
-		ay8910_data_address_w(machine().device("ay2"), m_last_port0b >> 2, m_port0a);
+		ay8910_data_address_w(machine().device("ay2"), space, m_last_port0b >> 2, m_port0a);
 	}
 	else if ((m_last_port0b & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{

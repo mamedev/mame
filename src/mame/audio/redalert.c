@@ -86,7 +86,7 @@ static WRITE8_DEVICE_HANDLER( redalert_AY8910_w )
 
 		/* BC1=1, BDIR=0 : read from PSG */
 		case 0x01:
-			state->m_ay8910_latch_1 = ay8910_r(device, 0);
+			state->m_ay8910_latch_1 = ay8910_r(device, space, 0);
 			break;
 
 		/* BC1=0, BDIR=1 : write to PSG */
@@ -94,7 +94,7 @@ static WRITE8_DEVICE_HANDLER( redalert_AY8910_w )
 		case 0x02:
 		case 0x03:
 		default:
-			ay8910_data_address_w(device, data, state->m_ay8910_latch_2);
+			ay8910_data_address_w(device, space, data, state->m_ay8910_latch_2);
 			break;
 	}
 }
@@ -310,28 +310,28 @@ static WRITE8_DEVICE_HANDLER( demoneye_ay8910_data_w )
 	{
 		case 0x00:
 			if (state->m_ay8910_latch_1 & 0x10)
-				ay8910_data_w(ay1, 0, data);
+				ay8910_data_w(ay1, space, 0, data);
 
 			if (state->m_ay8910_latch_1 & 0x20)
-				ay8910_data_w(ay2, 0, data);
+				ay8910_data_w(ay2, space, 0, data);
 
 			break;
 
 		case 0x01:
 			if (state->m_ay8910_latch_1 & 0x10)
-				state->m_ay8910_latch_2 = ay8910_r(ay1, 0);
+				state->m_ay8910_latch_2 = ay8910_r(ay1, space, 0);
 
 			if (state->m_ay8910_latch_1 & 0x20)
-				state->m_ay8910_latch_2 = ay8910_r(ay2, 0);
+				state->m_ay8910_latch_2 = ay8910_r(ay2, space, 0);
 
 			break;
 
 		case 0x03:
 			if (state->m_ay8910_latch_1 & 0x10)
-				ay8910_address_w(ay1, 0, data);
+				ay8910_address_w(ay1, space, 0, data);
 
 			if (state->m_ay8910_latch_1 & 0x20)
-				ay8910_address_w(ay2, 0, data);
+				ay8910_address_w(ay2, space, 0, data);
 
 			break;
 

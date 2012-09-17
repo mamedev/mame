@@ -47,7 +47,7 @@ READ8_MEMBER( osborne1_state::osborne1_2000_r )
 		switch( offset & 0x0F00 )
 		{
 		case 0x100:	/* Floppy */
-			data = wd17xx_r( m_fdc, offset );
+			data = wd17xx_r( m_fdc, space, offset );
 			break;
 		case 0x200:	/* Keyboard */
 			/* Row 0 */
@@ -96,7 +96,7 @@ WRITE8_MEMBER( osborne1_state::osborne1_2000_w )
 		switch( offset & 0x0F00 )
 		{
 		case 0x100:	/* Floppy */
-			wd17xx_w( m_fdc, offset, data );
+			wd17xx_w( m_fdc, space, offset, data );
 			break;
 		case 0x900:	/* IEEE488 PIA */
 			m_pia0->write(space, offset & 0x03, data );

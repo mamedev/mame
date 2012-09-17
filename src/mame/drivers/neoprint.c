@@ -136,12 +136,12 @@ READ16_MEMBER(neoprint_state::neoprint_calendar_r)
 	//if(space.device().safe_pc() != 0x4b38 )//&& space.device().safe_pc() != 0x5f86 && space.device().safe_pc() != 0x5f90)
 	//  printf("%08x\n",space.device().safe_pc());
 
-	return (upd4990a_databit_r(machine().device("upd4990a"), 0) << 15);
+	return (upd4990a_databit_r(machine().device("upd4990a"), space, 0) << 15);
 }
 
 WRITE16_MEMBER(neoprint_state::neoprint_calendar_w)
 {
-	 upd4990a_control_16_w(machine().device("upd4990a"), 0, ((data >> 8) & 7), mem_mask);
+	 upd4990a_control_16_w(machine().device("upd4990a"), space, 0, ((data >> 8) & 7), mem_mask);
 }
 
 READ8_MEMBER(neoprint_state::neoprint_unk_r)

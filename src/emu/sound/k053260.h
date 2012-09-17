@@ -17,8 +17,8 @@ struct k053260_interface {
 };
 
 
-WRITE8_DEVICE_HANDLER( k053260_w );
-READ8_DEVICE_HANDLER( k053260_r );
+DECLARE_WRITE8_DEVICE_HANDLER( k053260_w );
+DECLARE_READ8_DEVICE_HANDLER( k053260_r );
 
 class k053260_device : public device_t,
                                   public device_sound_interface

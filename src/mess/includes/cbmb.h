@@ -72,17 +72,17 @@ public:
 extern const mos6526_interface cbmb_cia;
 
 
-READ8_DEVICE_HANDLER( cbmb_tpi0_port_a_r );
-WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_a_w );
-READ8_DEVICE_HANDLER( cbmb_tpi0_port_b_r );
-WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_b_w );
+DECLARE_READ8_DEVICE_HANDLER( cbmb_tpi0_port_a_r );
+DECLARE_WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_a_w );
+DECLARE_READ8_DEVICE_HANDLER( cbmb_tpi0_port_b_r );
+DECLARE_WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_b_w );
 
-WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_a );
-WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_b );
-WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_c );
-READ8_DEVICE_HANDLER( cbmb_keyboard_line_a );
-READ8_DEVICE_HANDLER( cbmb_keyboard_line_b );
-READ8_DEVICE_HANDLER( cbmb_keyboard_line_c );
+DECLARE_WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_a );
+DECLARE_WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_b );
+DECLARE_WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_c );
+DECLARE_READ8_DEVICE_HANDLER( cbmb_keyboard_line_a );
+DECLARE_READ8_DEVICE_HANDLER( cbmb_keyboard_line_b );
+DECLARE_READ8_DEVICE_HANDLER( cbmb_keyboard_line_c );
 WRITE_LINE_DEVICE_HANDLER( cbmb_irq );
 
 int cbmb_dma_read(running_machine &machine, int offset);

@@ -20,8 +20,8 @@ struct ymz280b_interface
 	devcb_write8 ext_write;		/* external RAM write */
 };
 
-READ8_DEVICE_HANDLER ( ymz280b_r );
-WRITE8_DEVICE_HANDLER( ymz280b_w );
+DECLARE_READ8_DEVICE_HANDLER ( ymz280b_r );
+DECLARE_WRITE8_DEVICE_HANDLER( ymz280b_w );
 
 class ymz280b_device : public device_t,
                                   public device_sound_interface

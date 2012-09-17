@@ -282,7 +282,7 @@ WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_2_w)
 
 WRITE8_DEVICE_HANDLER( indianbt_sh_port_3_w )
 {
-	discrete_sound_w(device, INDIANBT_MUSIC_DATA, data);
+	discrete_sound_w(device, space, INDIANBT_MUSIC_DATA, data);
 }
 
 
@@ -600,27 +600,27 @@ DISCRETE_SOUND_END
 
 WRITE8_DEVICE_HANDLER( polaris_sh_port_1_w )
 {
-	discrete_sound_w(device, POLARIS_MUSIC_DATA, data);
+	discrete_sound_w(device, space, POLARIS_MUSIC_DATA, data);
 }
 
 WRITE8_DEVICE_HANDLER( polaris_sh_port_2_w )
 {
 	/* 0x01 - SX0 - Shot */
-	discrete_sound_w(device, POLARIS_SX0_EN, data & 0x01);
+	discrete_sound_w(device, space, POLARIS_SX0_EN, data & 0x01);
 
 	/* 0x02 - SX1 - Ship Hit (Sub) */
-	discrete_sound_w(device, POLARIS_SX1_EN, data & 0x02);
+	discrete_sound_w(device, space, POLARIS_SX1_EN, data & 0x02);
 
 	/* 0x04 - SX2 - Ship */
-	discrete_sound_w(device, POLARIS_SX2_EN, data & 0x04);
+	discrete_sound_w(device, space, POLARIS_SX2_EN, data & 0x04);
 
 	/* 0x08 - SX3 - Explosion */
-	discrete_sound_w(device, POLARIS_SX3_EN, data & 0x08);
+	discrete_sound_w(device, space, POLARIS_SX3_EN, data & 0x08);
 
 	/* 0x10 - SX4 */
 
 	/* 0x20 - SX5 - Sound Enable */
-	discrete_sound_w(device, POLARIS_SX5_EN, data & 0x20);
+	discrete_sound_w(device, space, POLARIS_SX5_EN, data & 0x20);
 }
 
 WRITE8_DEVICE_HANDLER( polaris_sh_port_3_w )
@@ -632,16 +632,16 @@ WRITE8_DEVICE_HANDLER( polaris_sh_port_3_w )
 	state->m_c8080bw_flip_screen = data & 0x20;		/* SX11 */
 
 	/* 0x01 - SX6 - Plane Down */
-	discrete_sound_w(device, POLARIS_SX6_EN, data & 0x01);
+	discrete_sound_w(device, space, POLARIS_SX6_EN, data & 0x01);
 
 	/* 0x02 - SX7 - Plane Up */
-	discrete_sound_w(device, POLARIS_SX7_EN, data & 0x02);
+	discrete_sound_w(device, space, POLARIS_SX7_EN, data & 0x02);
 
 	/* 0x08 - SX9 - Hit */
-	discrete_sound_w(device, POLARIS_SX9_EN, data & 0x08);
+	discrete_sound_w(device, space, POLARIS_SX9_EN, data & 0x08);
 
 	/* 0x10 - SX10 - Hit */
-	discrete_sound_w(device, POLARIS_SX10_EN, data & 0x10);
+	discrete_sound_w(device, space, POLARIS_SX10_EN, data & 0x10);
 }
 
 
@@ -789,8 +789,8 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_1_w)
        bit 5 - Explosion (SX5) */
 
     //printf( "schaser_sh_port_1_w: %02x\n", data );
-	discrete_sound_w(m_discrete, SCHASER_DOT_EN, data & 0x01);
-	discrete_sound_w(m_discrete, SCHASER_DOT_SEL, data & 0x02);
+	discrete_sound_w(m_discrete, space, SCHASER_DOT_EN, data & 0x01);
+	discrete_sound_w(m_discrete, space, SCHASER_DOT_SEL, data & 0x02);
 
 	/* The effect is a variable rate 555 timer.  A diode/resistor array is used to
      * select the frequency.  Because of the diode voltage drop, we can not use the
@@ -854,9 +854,9 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_2_w)
 
 	//printf( "schaser_sh_port_2_w: %02x\n", data );
 
-	discrete_sound_w(m_discrete, SCHASER_MUSIC_BIT, data & 0x01);
+	discrete_sound_w(m_discrete, space, SCHASER_MUSIC_BIT, data & 0x01);
 
-	discrete_sound_w(m_discrete, SCHASER_SND_EN, data & 0x02);
+	discrete_sound_w(m_discrete, space, SCHASER_SND_EN, data & 0x02);
 	machine().sound().system_enable(data & 0x02);
 
 	coin_lockout_global_w(machine(), data & 0x04);

@@ -35,18 +35,18 @@ extern const device_type MC6846;
 struct mc6846_interface
 {
   /* CPU write to the outside through chip */
-  write8_device_func out_port_func;  /* 8-bit output */
-  write8_device_func out_cp1_func;   /* 1-bit output */
-  write8_device_func out_cp2_func;   /* 1-bit output */
+  devcb_write8 out_port_func;  /* 8-bit output */
+  devcb_write8 out_cp1_func;   /* 1-bit output */
+  devcb_write8 out_cp2_func;   /* 1-bit output */
 
   /* CPU read from the outside through chip */
-  read8_device_func in_port_func; /* 8-bit input */
+  devcb_read8 in_port_func; /* 8-bit input */
 
   /* asynchronous timer output to outside world */
-  write8_device_func out_cto_func; /* 1-bit output */
+  devcb_write8 out_cto_func; /* 1-bit output */
 
   /* timer interrupt */
-  void ( * irq_func ) ( device_t *device, int state );
+  devcb_write_line irq_func;
 };
 
 
@@ -64,8 +64,8 @@ struct mc6846_interface
 
 /* ---------- functions ------------ */
 /* interface to CPU via address/data bus*/
-extern READ8_DEVICE_HANDLER  ( mc6846_r );
-extern WRITE8_DEVICE_HANDLER ( mc6846_w );
+extern DECLARE_READ8_DEVICE_HANDLER  ( mc6846_r );
+extern DECLARE_WRITE8_DEVICE_HANDLER ( mc6846_w );
 
 /* asynchronous write from outside world into interrupt-generating pins */
 extern void mc6846_set_input_cp1 ( device_t *device, int data );

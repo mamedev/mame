@@ -45,8 +45,8 @@ public:
 
 /*----------- defined in audio/flower.c -----------*/
 
-WRITE8_DEVICE_HANDLER( flower_sound1_w );
-WRITE8_DEVICE_HANDLER( flower_sound2_w );
+DECLARE_WRITE8_DEVICE_HANDLER( flower_sound1_w );
+DECLARE_WRITE8_DEVICE_HANDLER( flower_sound2_w );
 
 class flower_sound_device : public device_t,
                                   public device_sound_interface

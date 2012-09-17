@@ -225,12 +225,12 @@ WRITE8_MEMBER(dai_state::dai_io_discrete_devices_w)
 
 READ8_MEMBER(dai_state::dai_pit_r)
 {
-	return pit8253_r(m_pit, (offset>>1) & 3);
+	return pit8253_r(m_pit, space, (offset>>1) & 3);
 }
 
 WRITE8_MEMBER(dai_state::dai_pit_w)
 {
-	pit8253_w(m_pit, (offset>>1) & 3, data);
+	pit8253_w(m_pit, space, (offset>>1) & 3, data);
 }
 
 /***************************************************************************

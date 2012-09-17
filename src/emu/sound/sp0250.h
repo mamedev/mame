@@ -9,7 +9,7 @@ struct sp0250_interface {
 	void (*drq_callback)(device_t *device, int state);
 };
 
-WRITE8_DEVICE_HANDLER( sp0250_w );
+DECLARE_WRITE8_DEVICE_HANDLER( sp0250_w );
 UINT8 sp0250_drq_r(device_t *device);
 
 class sp0250_device : public device_t,

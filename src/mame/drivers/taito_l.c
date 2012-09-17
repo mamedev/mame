@@ -487,7 +487,7 @@ READ8_MEMBER(taitol_state::extport_select_and_ym2203_r)
 {
 	device_t *device = machine().device("ymsnd");
 	m_extport = (offset >> 1) & 1;
-	return ym2203_r(device, offset & 1);
+	return ym2203_r(device, space, offset & 1);
 }
 
 WRITE8_MEMBER(taitol_state::mcu_data_w)

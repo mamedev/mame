@@ -216,7 +216,7 @@ static READ16_HANDLER( amiga_dmac_r )
 		{
 			device_t *tpi = space->machine().device("tpi6525");
 			LOG(( "DMAC: PC=%08x - TPI6525 Read(%d)\n", space->device().safe_pc(), (offset - 0x58) ));
-			return tpi6525_r(tpi, offset - 0x58);
+			return tpi6525_r(tpi, *space, offset - 0x58);
 		}
 		break;
 
@@ -343,7 +343,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 		{
 			device_t *tpi = space->machine().device("tpi6525");
 			LOG(( "DMAC: PC=%08x - TPI6525 Write(%d) - data = %04x\n", space->device().safe_pc(), (offset - 0x58), data ));
-			tpi6525_w(tpi, offset - 0x58, data);
+			tpi6525_w(tpi, *space, offset - 0x58, data);
 		}
 		break;
 

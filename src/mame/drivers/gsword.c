@@ -293,13 +293,13 @@ WRITE8_MEMBER(gsword_state::gsword_nmi_set_w)
 WRITE8_MEMBER(gsword_state::gsword_AY8910_control_port_0_w)
 {
 	device_t *device = machine().device("ay1");
-	ay8910_address_w(device,offset,data);
+	ay8910_address_w(device,space,offset,data);
 	m_fake8910_0 = data;
 }
 WRITE8_MEMBER(gsword_state::gsword_AY8910_control_port_1_w)
 {
 	device_t *device = machine().device("ay2");
-	ay8910_address_w(device,offset,data);
+	ay8910_address_w(device,space,offset,data);
 	m_fake8910_1 = data;
 }
 

@@ -35,7 +35,7 @@ public:
 
 /*----------- defined in video/hanaawas.c -----------*/
 
-WRITE8_DEVICE_HANDLER( hanaawas_portB_w );
+DECLARE_WRITE8_DEVICE_HANDLER( hanaawas_portB_w );
 
 
 

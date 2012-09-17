@@ -178,16 +178,16 @@ public:
 
 
 /*----------- defined in audio/tx1.c -----------*/
-READ8_DEVICE_HANDLER( tx1_pit8253_r );
-WRITE8_DEVICE_HANDLER( tx1_pit8253_w );
+DECLARE_READ8_DEVICE_HANDLER( tx1_pit8253_r );
+DECLARE_WRITE8_DEVICE_HANDLER( tx1_pit8253_w );
 
-WRITE8_DEVICE_HANDLER( bb_ym1_a_w );
-WRITE8_DEVICE_HANDLER( bb_ym2_a_w );
-WRITE8_DEVICE_HANDLER( bb_ym2_b_w );
+DECLARE_WRITE8_DEVICE_HANDLER( bb_ym1_a_w );
+DECLARE_WRITE8_DEVICE_HANDLER( bb_ym2_a_w );
+DECLARE_WRITE8_DEVICE_HANDLER( bb_ym2_b_w );
 
 
-WRITE8_DEVICE_HANDLER( tx1_ay8910_a_w );
-WRITE8_DEVICE_HANDLER( tx1_ay8910_b_w );
+DECLARE_WRITE8_DEVICE_HANDLER( tx1_ay8910_a_w );
+DECLARE_WRITE8_DEVICE_HANDLER( tx1_ay8910_b_w );
 
 class tx1_sound_device : public device_t,
                          public device_sound_interface

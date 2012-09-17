@@ -843,7 +843,7 @@ READ64_DEVICE_HANDLER( dc_aica_reg_r )
 
 //  mame_printf_verbose("AICA REG: [%08x] read %" I64FMT "x, mask %" I64FMT "x\n", 0x700000+reg*4, (UINT64)offset, mem_mask);
 
-	return (UINT64) aica_r(device, offset*2, 0xffff)<<shift;
+	return (UINT64) aica_r(device, space, offset*2, 0xffff)<<shift;
 }
 
 WRITE64_DEVICE_HANDLER( dc_aica_reg_w )
@@ -870,18 +870,18 @@ WRITE64_DEVICE_HANDLER( dc_aica_reg_w )
 		}
     }
 
-	aica_w(device, offset*2, dat, shift ? ((mem_mask>>32)&0xffff) : (mem_mask & 0xffff));
+	aica_w(device, space, offset*2, dat, shift ? ((mem_mask>>32)&0xffff) : (mem_mask & 0xffff));
 
 //  mame_printf_verbose("AICA REG: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x700000+reg*4, dat, data, offset, mem_mask);
 }
 
 READ32_DEVICE_HANDLER( dc_arm_aica_r )
 {
-	return aica_r(device, offset*2, 0xffff) & 0xffff;
+	return aica_r(device, space, offset*2, 0xffff) & 0xffff;
 }
 
 WRITE32_DEVICE_HANDLER( dc_arm_aica_w )
 {
-	aica_w(device, offset*2, data, mem_mask&0xffff);
+	aica_w(device, space, offset*2, data, mem_mask&0xffff);
 }
 

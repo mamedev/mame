@@ -14,28 +14,28 @@ sub sound functions
 
 WRITE8_DEVICE_HANDLER( subs_sonar1_w )
 {
-	discrete_sound_w(device, SUBS_SONAR1_EN, offset & 0x01);
+	discrete_sound_w(device, space, SUBS_SONAR1_EN, offset & 0x01);
 }
 
 WRITE8_DEVICE_HANDLER( subs_sonar2_w )
 {
-	discrete_sound_w(device, SUBS_SONAR2_EN, offset & 0x01);
+	discrete_sound_w(device, space, SUBS_SONAR2_EN, offset & 0x01);
 }
 
 WRITE8_DEVICE_HANDLER( subs_crash_w )
 {
-	discrete_sound_w(device, SUBS_CRASH_EN, offset & 0x01);
+	discrete_sound_w(device, space, SUBS_CRASH_EN, offset & 0x01);
 }
 
 WRITE8_DEVICE_HANDLER( subs_explode_w )
 {
-	discrete_sound_w(device, SUBS_EXPLODE_EN, offset & 0x01);
+	discrete_sound_w(device, space, SUBS_EXPLODE_EN, offset & 0x01);
 }
 
 WRITE8_DEVICE_HANDLER( subs_noise_reset_w )
 {
 	/* Pulse noise reset */
-	discrete_sound_w(device, SUBS_NOISE_RESET, 0);
+	discrete_sound_w(device, space, SUBS_NOISE_RESET, 0);
 }
 
 

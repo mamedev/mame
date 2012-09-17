@@ -47,15 +47,15 @@ extern const device_type BETA_DISK;
 #define MCFG_BETA_DISK_REMOVE(_tag)		\
     MCFG_DEVICE_REMOVE(_tag)
 
-READ8_DEVICE_HANDLER(betadisk_status_r);
-READ8_DEVICE_HANDLER(betadisk_track_r);
-READ8_DEVICE_HANDLER(betadisk_sector_r);
-READ8_DEVICE_HANDLER(betadisk_data_r);
-READ8_DEVICE_HANDLER(betadisk_state_r);
+DECLARE_READ8_DEVICE_HANDLER(betadisk_status_r);
+DECLARE_READ8_DEVICE_HANDLER(betadisk_track_r);
+DECLARE_READ8_DEVICE_HANDLER(betadisk_sector_r);
+DECLARE_READ8_DEVICE_HANDLER(betadisk_data_r);
+DECLARE_READ8_DEVICE_HANDLER(betadisk_state_r);
 
-WRITE8_DEVICE_HANDLER(betadisk_param_w);
-WRITE8_DEVICE_HANDLER(betadisk_command_w);
-WRITE8_DEVICE_HANDLER(betadisk_track_w);
-WRITE8_DEVICE_HANDLER(betadisk_sector_w);
-WRITE8_DEVICE_HANDLER(betadisk_data_w);
+DECLARE_WRITE8_DEVICE_HANDLER(betadisk_param_w);
+DECLARE_WRITE8_DEVICE_HANDLER(betadisk_command_w);
+DECLARE_WRITE8_DEVICE_HANDLER(betadisk_track_w);
+DECLARE_WRITE8_DEVICE_HANDLER(betadisk_sector_w);
+DECLARE_WRITE8_DEVICE_HANDLER(betadisk_data_w);
 #endif /* __BETA_H__ */

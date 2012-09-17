@@ -806,7 +806,7 @@ READ16_MEMBER(namcona1_state::snd_r)
 {
 	device_t *device = machine().device("c140");
 	/* can't use DEVREADWRITE8 for this because it is opposite endianness to the CPU for some reason */
-	return c140_r(device,offset*2+1) | c140_r(device,offset*2)<<8;
+	return c140_r(device,space,offset*2+1) | c140_r(device,space,offset*2)<<8;
 }
 
 WRITE16_MEMBER(namcona1_state::snd_w)
@@ -815,12 +815,12 @@ WRITE16_MEMBER(namcona1_state::snd_w)
 	/* can't use DEVREADWRITE8 for this because it is opposite endianness to the CPU for some reason */
 	if (ACCESSING_BITS_0_7)
 	{
-		c140_w(device,(offset*2)+1, data);
+		c140_w(device,space,(offset*2)+1, data);
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
-		c140_w(device,(offset*2), data>>8);
+		c140_w(device,space,(offset*2), data>>8);
 	}
 }
 

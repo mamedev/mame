@@ -348,11 +348,11 @@ WRITE16_MEMBER(mlanding_state::ml_to_sound_w)
 {
 	device_t *tc0140syt = machine().device("tc0140syt");
 	if (offset == 0)
-		tc0140syt_port_w(tc0140syt, 0, data & 0xff);
+		tc0140syt_port_w(tc0140syt, space, 0, data & 0xff);
 	else if (offset == 1)
 	{
 		//machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		tc0140syt_comm_w(tc0140syt, 0, data & 0xff);
+		tc0140syt_comm_w(tc0140syt, space, 0, data & 0xff);
 	}
 }
 
@@ -360,11 +360,11 @@ WRITE8_MEMBER(mlanding_state::ml_sound_to_main_w)
 {
 	device_t *tc0140syt = machine().device("tc0140syt");
 	if (offset == 0)
-		tc0140syt_slave_port_w(tc0140syt, 0, data & 0xff);
+		tc0140syt_slave_port_w(tc0140syt, space, 0, data & 0xff);
 	else if (offset == 1)
 	{
 		//machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		tc0140syt_slave_comm_w(tc0140syt, 0, data & 0xff);
+		tc0140syt_slave_comm_w(tc0140syt, space, 0, data & 0xff);
 	}
 }
 

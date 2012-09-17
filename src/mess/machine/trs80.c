@@ -704,7 +704,7 @@ READ8_MEMBER( trs80_state::trs80_wd179x_r )
 {
 	UINT8 data = 0xff;
 	if (BIT(ioport("CONFIG")->read(), 7))
-		data = wd17xx_status_r(m_fdc, offset);
+		data = wd17xx_status_r(m_fdc, space, offset);
 
 	return data;
 }

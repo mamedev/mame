@@ -199,15 +199,15 @@ int invaders_is_cabinet_cocktail(running_machine &machine);
 
 /*----------- defined in audio/mw8080bw.c -----------*/
 
-WRITE8_DEVICE_HANDLER( midway_tone_generator_lo_w );
-WRITE8_DEVICE_HANDLER( midway_tone_generator_hi_w );
+DECLARE_WRITE8_DEVICE_HANDLER( midway_tone_generator_lo_w );
+DECLARE_WRITE8_DEVICE_HANDLER( midway_tone_generator_hi_w );
 
 MACHINE_CONFIG_EXTERN( seawolf_audio );
 
 MACHINE_CONFIG_EXTERN( gunfight_audio );
 
 MACHINE_CONFIG_EXTERN( tornbase_audio );
-WRITE8_DEVICE_HANDLER( tornbase_audio_w );
+DECLARE_WRITE8_DEVICE_HANDLER( tornbase_audio_w );
 
 MACHINE_CONFIG_EXTERN( zzzap_audio );
 
@@ -215,59 +215,59 @@ MACHINE_CONFIG_EXTERN( maze_audio );
 void maze_write_discrete(device_t *device, UINT8 maze_tone_timing_state);
 
 MACHINE_CONFIG_EXTERN( boothill_audio );
-WRITE8_DEVICE_HANDLER( boothill_audio_w );
+DECLARE_WRITE8_DEVICE_HANDLER( boothill_audio_w );
 
 MACHINE_CONFIG_EXTERN( checkmat_audio );
-WRITE8_DEVICE_HANDLER( checkmat_audio_w );
+DECLARE_WRITE8_DEVICE_HANDLER( checkmat_audio_w );
 
 MACHINE_CONFIG_EXTERN( desertgu_audio );
-WRITE8_DEVICE_HANDLER( desertgu_audio_1_w );
-WRITE8_DEVICE_HANDLER( desertgu_audio_2_w );
+DECLARE_WRITE8_DEVICE_HANDLER( desertgu_audio_1_w );
+DECLARE_WRITE8_DEVICE_HANDLER( desertgu_audio_2_w );
 
 MACHINE_CONFIG_EXTERN( dplay_audio );
-WRITE8_DEVICE_HANDLER( dplay_audio_w );
+DECLARE_WRITE8_DEVICE_HANDLER( dplay_audio_w );
 
 MACHINE_CONFIG_EXTERN( gmissile_audio );
 
 MACHINE_CONFIG_EXTERN( m4_audio );
 
 MACHINE_CONFIG_EXTERN( clowns_audio );
-WRITE8_DEVICE_HANDLER( clowns_audio_2_w );
+DECLARE_WRITE8_DEVICE_HANDLER( clowns_audio_2_w );
 
 MACHINE_CONFIG_EXTERN( spacwalk_audio );
-WRITE8_DEVICE_HANDLER( spacwalk_audio_1_w );
-WRITE8_DEVICE_HANDLER( spacwalk_audio_2_w );
+DECLARE_WRITE8_DEVICE_HANDLER( spacwalk_audio_1_w );
+DECLARE_WRITE8_DEVICE_HANDLER( spacwalk_audio_2_w );
 
 MACHINE_CONFIG_EXTERN( shuffle_audio );
-WRITE8_DEVICE_HANDLER( shuffle_audio_1_w );
-WRITE8_DEVICE_HANDLER( shuffle_audio_2_w );
+DECLARE_WRITE8_DEVICE_HANDLER( shuffle_audio_1_w );
+DECLARE_WRITE8_DEVICE_HANDLER( shuffle_audio_2_w );
 
 MACHINE_CONFIG_EXTERN( dogpatch_audio );
-WRITE8_DEVICE_HANDLER( dogpatch_audio_w );
+DECLARE_WRITE8_DEVICE_HANDLER( dogpatch_audio_w );
 
 MACHINE_CONFIG_EXTERN( spcenctr_audio );
-WRITE8_DEVICE_HANDLER( spcenctr_audio_1_w );
-WRITE8_DEVICE_HANDLER( spcenctr_audio_2_w );
-WRITE8_DEVICE_HANDLER( spcenctr_audio_3_w );
+DECLARE_WRITE8_DEVICE_HANDLER( spcenctr_audio_1_w );
+DECLARE_WRITE8_DEVICE_HANDLER( spcenctr_audio_2_w );
+DECLARE_WRITE8_DEVICE_HANDLER( spcenctr_audio_3_w );
 
 MACHINE_CONFIG_EXTERN( phantom2_audio );
 
 MACHINE_CONFIG_EXTERN( bowler_audio );
-WRITE8_DEVICE_HANDLER( bowler_audio_1_w );
+DECLARE_WRITE8_DEVICE_HANDLER( bowler_audio_1_w );
 
 MACHINE_CONFIG_EXTERN( invaders_samples_audio );
 MACHINE_CONFIG_EXTERN( invaders_audio );
-WRITE8_DEVICE_HANDLER( invaders_audio_1_w );
-WRITE8_DEVICE_HANDLER( invaders_audio_2_w );
+DECLARE_WRITE8_DEVICE_HANDLER( invaders_audio_1_w );
+DECLARE_WRITE8_DEVICE_HANDLER( invaders_audio_2_w );
 
 MACHINE_CONFIG_EXTERN( blueshrk_audio );
-WRITE8_DEVICE_HANDLER( blueshrk_audio_w );
+DECLARE_WRITE8_DEVICE_HANDLER( blueshrk_audio_w );
 
 MACHINE_CONFIG_EXTERN( invad2ct_audio );
-WRITE8_DEVICE_HANDLER( invad2ct_audio_1_w );
-WRITE8_DEVICE_HANDLER( invad2ct_audio_2_w );
-WRITE8_DEVICE_HANDLER( invad2ct_audio_3_w );
-WRITE8_DEVICE_HANDLER( invad2ct_audio_4_w );
+DECLARE_WRITE8_DEVICE_HANDLER( invad2ct_audio_1_w );
+DECLARE_WRITE8_DEVICE_HANDLER( invad2ct_audio_2_w );
+DECLARE_WRITE8_DEVICE_HANDLER( invad2ct_audio_3_w );
+DECLARE_WRITE8_DEVICE_HANDLER( invad2ct_audio_4_w );
 
 /*----------- defined in video/mw8080bw.c -----------*/
 

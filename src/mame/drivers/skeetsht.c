@@ -93,7 +93,7 @@ READ16_MEMBER(skeetsht_state::ramdac_r)
 	if (offset & 8)
 		offset = (offset & ~8) | 4;
 
-	return tlc34076_r(machine().device("tlc34076"), offset);
+	return tlc34076_r(machine().device("tlc34076"), space, offset);
 }
 
 WRITE16_MEMBER(skeetsht_state::ramdac_w)
@@ -103,7 +103,7 @@ WRITE16_MEMBER(skeetsht_state::ramdac_w)
 	if (offset & 8)
 		offset = (offset & ~8) | 4;
 
-	tlc34076_w(machine().device("tlc34076"), offset, data);
+	tlc34076_w(machine().device("tlc34076"), space, offset, data);
 }
 
 
@@ -163,9 +163,9 @@ WRITE8_MEMBER(skeetsht_state::ay8910_w)
 {
 
 	if (m_ay_sel)
-		ay8910_data_w(m_ay, 0, data);
+		ay8910_data_w(m_ay, space, 0, data);
 	else
-		ay8910_address_w(m_ay, 0, data);
+		ay8910_address_w(m_ay, space, 0, data);
 }
 
 

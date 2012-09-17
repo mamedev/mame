@@ -315,7 +315,7 @@ READ32_MEMBER(nwktr_state::sysreg_r)
 		}
 		if (ACCESSING_BITS_0_7)
 		{
-			r |= adc1213x_do_r(adc12138, 0) | (adc1213x_eoc_r(adc12138, 0) << 2);
+			r |= adc1213x_do_r(adc12138, space, 0) | (adc1213x_eoc_r(adc12138, space, 0) << 2);
 		}
 	}
 	else if (offset == 1)
@@ -352,10 +352,10 @@ WRITE32_MEMBER(nwktr_state::sysreg_w)
 			int di = (data >> 25) & 0x1;
 			int sclk = (data >> 24) & 0x1;
 
-			adc1213x_cs_w(adc12138, 0, cs);
-			adc1213x_conv_w(adc12138, 0, conv);
-			adc1213x_di_w(adc12138, 0, di);
-			adc1213x_sclk_w(adc12138, 0, sclk);
+			adc1213x_cs_w(adc12138, space, 0, cs);
+			adc1213x_conv_w(adc12138, space, 0, conv);
+			adc1213x_di_w(adc12138, space, 0, di);
+			adc1213x_sclk_w(adc12138, space, 0, sclk);
 		}
 		if (ACCESSING_BITS_0_7)
 		{

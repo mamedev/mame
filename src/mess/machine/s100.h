@@ -266,12 +266,12 @@ public:
 	virtual void s100_vi7_w(int state) { };
 
 	// memory access
-	virtual UINT8 s100_smemr_r(offs_t offset) { return 0; };
-	virtual void s100_mwrt_w(offs_t offset, UINT8 data) { };
+	virtual UINT8 s100_smemr_r(address_space &space, offs_t offset) { return 0; };
+	virtual void s100_mwrt_w(address_space &space, offs_t offset, UINT8 data) { };
 
 	// I/O access
-	virtual UINT8 s100_sinp_r(offs_t offset) { return 0; };
-	virtual void s100_sout_w(offs_t offset, UINT8 data) { };
+	virtual UINT8 s100_sinp_r(address_space &space, offs_t offset) { return 0; };
+	virtual void s100_sout_w(address_space &space, offs_t offset, UINT8 data) { };
 
 	// configuration access
 	virtual void s100_phlda_w(int state) { }

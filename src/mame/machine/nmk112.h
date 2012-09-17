@@ -52,8 +52,8 @@ extern const device_type NMK112;
     DEVICE I/O FUNCTIONS
 ***************************************************************************/
 
-WRITE8_DEVICE_HANDLER( nmk112_okibank_w );
-WRITE16_DEVICE_HANDLER( nmk112_okibank_lsb_w );
+DECLARE_WRITE8_DEVICE_HANDLER( nmk112_okibank_w );
+DECLARE_WRITE16_DEVICE_HANDLER( nmk112_okibank_lsb_w );
 
 
 #endif /* __NMK112_H__ */

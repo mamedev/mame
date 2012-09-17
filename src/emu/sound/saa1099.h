@@ -9,8 +9,8 @@
     Philips SAA1099 Sound driver
 **********************************************/
 
-WRITE8_DEVICE_HANDLER( saa1099_control_w );
-WRITE8_DEVICE_HANDLER( saa1099_data_w );
+DECLARE_WRITE8_DEVICE_HANDLER( saa1099_control_w );
+DECLARE_WRITE8_DEVICE_HANDLER( saa1099_data_w );
 
 class saa1099_device : public device_t,
                                   public device_sound_interface

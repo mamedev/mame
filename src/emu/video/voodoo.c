@@ -4064,9 +4064,9 @@ READ32_DEVICE_HANDLER( banshee_r )
 		flush_fifos(v, device->machine().time());
 
 	if (offset < 0x80000/4)
-		result = banshee_io_r(device, offset, mem_mask);
+		result = banshee_io_r(device, space, offset, mem_mask);
 	else if (offset < 0x100000/4)
-		result = banshee_agp_r(device, offset, mem_mask);
+		result = banshee_agp_r(device, space, offset, mem_mask);
 	else if (offset < 0x200000/4)
 		logerror("%s:banshee_r(2D:%X)\n", device->machine().describe_context(), (offset*4) & 0xfffff);
 	else if (offset < 0x600000/4)
@@ -4232,13 +4232,13 @@ READ32_DEVICE_HANDLER( banshee_io_r )
 		case io_vgad0:	case io_vgad4:	case io_vgad8:	case io_vgadc:
 			result = 0;
 			if (ACCESSING_BITS_0_7)
-				result |= banshee_vga_r(device, offset*4+0) << 0;
+				result |= banshee_vga_r(device, space, offset*4+0, mem_mask >> 0) << 0;
 			if (ACCESSING_BITS_8_15)
-				result |= banshee_vga_r(device, offset*4+1) << 8;
+				result |= banshee_vga_r(device, space, offset*4+1, mem_mask >> 8) << 8;
 			if (ACCESSING_BITS_16_23)
-				result |= banshee_vga_r(device, offset*4+2) << 16;
+				result |= banshee_vga_r(device, space, offset*4+2, mem_mask >> 16) << 16;
 			if (ACCESSING_BITS_24_31)
-				result |= banshee_vga_r(device, offset*4+3) << 24;
+				result |= banshee_vga_r(device, space, offset*4+3, mem_mask >> 24) << 24;
 			break;
 
 		default:
@@ -4606,9 +4606,9 @@ WRITE32_DEVICE_HANDLER( banshee_w )
 		flush_fifos(v, device->machine().time());
 
 	if (offset < 0x80000/4)
-		banshee_io_w(device, offset, data, mem_mask);
+		banshee_io_w(device, space, offset, data, mem_mask);
 	else if (offset < 0x100000/4)
-		banshee_agp_w(device, offset, data, mem_mask);
+		banshee_agp_w(device, space, offset, data, mem_mask);
 	else if (offset < 0x200000/4)
 		logerror("%s:banshee_w(2D:%X) = %08X & %08X\n", device->machine().describe_context(), (offset*4) & 0xfffff, data, mem_mask);
 	else if (offset < 0x600000/4)
@@ -4780,13 +4780,13 @@ WRITE32_DEVICE_HANDLER( banshee_io_w )
 		case io_vgac0:	case io_vgac4:	case io_vgac8:	case io_vgacc:
 		case io_vgad0:	case io_vgad4:	case io_vgad8:	case io_vgadc:
 			if (ACCESSING_BITS_0_7)
-				banshee_vga_w(device, offset*4+0, data >> 0);
+				banshee_vga_w(device, space, offset*4+0, data >> 0, mem_mask >> 0);
 			if (ACCESSING_BITS_8_15)
-				banshee_vga_w(device, offset*4+1, data >> 8);
+				banshee_vga_w(device, space, offset*4+1, data >> 8, mem_mask >> 8);
 			if (ACCESSING_BITS_16_23)
-				banshee_vga_w(device, offset*4+2, data >> 16);
+				banshee_vga_w(device, space, offset*4+2, data >> 16, mem_mask >> 16);
 			if (ACCESSING_BITS_24_31)
-				banshee_vga_w(device, offset*4+3, data >> 24);
+				banshee_vga_w(device, space, offset*4+3, data >> 24, mem_mask >> 24);
 			break;
 
 		default:

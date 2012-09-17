@@ -88,10 +88,10 @@ extern const device_type I8243;
     PROTOTYPES
 ***************************************************************************/
 
-READ8_DEVICE_HANDLER( i8243_p2_r );
-WRITE8_DEVICE_HANDLER( i8243_p2_w );
+DECLARE_READ8_DEVICE_HANDLER( i8243_p2_r );
+DECLARE_WRITE8_DEVICE_HANDLER( i8243_p2_w );
 
-WRITE8_DEVICE_HANDLER( i8243_prog_w );
+DECLARE_WRITE8_DEVICE_HANDLER( i8243_prog_w );
 
 
 #endif  /* __I8243_H__ */

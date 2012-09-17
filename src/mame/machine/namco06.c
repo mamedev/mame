@@ -145,7 +145,7 @@ READ8_DEVICE_HANDLER( namco_06xx_data_r )
 
 	for (devnum = 0; devnum < 4; devnum++)
 		if ((state->m_control & (1 << devnum)) && state->m_read[devnum] != NULL)
-			result &= (*state->m_read[devnum])(state->m_device[devnum], 0);
+			result &= (*state->m_read[devnum])(state->m_device[devnum], space, 0, 0xff);
 
 	return result;
 }
@@ -166,7 +166,7 @@ WRITE8_DEVICE_HANDLER( namco_06xx_data_w )
 
 	for (devnum = 0; devnum < 4; devnum++)
 		if ((state->m_control & (1 << devnum)) && state->m_write[devnum] != NULL)
-			(*state->m_write[devnum])(state->m_device[devnum], 0, data);
+			(*state->m_write[devnum])(state->m_device[devnum], space, 0, data, 0xff);
 }
 
 

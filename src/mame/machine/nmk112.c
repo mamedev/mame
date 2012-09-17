@@ -92,7 +92,7 @@ WRITE16_DEVICE_HANDLER( nmk112_okibank_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		nmk112_okibank_w(device, offset, data & 0xff);
+		nmk112_okibank_w(device, space, offset, data & 0xff);
 	}
 }
 

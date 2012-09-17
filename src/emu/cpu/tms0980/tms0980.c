@@ -766,7 +766,7 @@ static void tms0980_set_cki_bus( device_t *device )
 	case 0x008:
 		if ( cpustate->config->read_k )
 		{
-			cpustate->cki_bus = cpustate->config->read_k( device, 0 );
+			cpustate->cki_bus = cpustate->config->read_k( device, *cpustate->program, 0, 0xff );
 		}
 		else
 		{
@@ -930,7 +930,7 @@ static CPU_EXECUTE( tms0980 )
 					cpustate->r = cpustate->r | ( 1 << cpustate->y );
 					if ( cpustate->config->write_r )
 					{
-						cpustate->config->write_r( device, 0, cpustate->r & cpustate->r_mask, 0xffff );
+						cpustate->config->write_r( device, *cpustate->program, 0, cpustate->r & cpustate->r_mask, 0xffff );
 					}
 				}
 				if ( cpustate->decode & F_RSTR )
@@ -938,7 +938,7 @@ static CPU_EXECUTE( tms0980 )
 					cpustate->r = cpustate->r & ( ~( 1 << cpustate->y ) );
 					if ( cpustate->config->write_r )
 					{
-						cpustate->config->write_r( device, 0, cpustate->r & cpustate->r_mask, 0xffff );
+						cpustate->config->write_r( device, *cpustate->program, 0, cpustate->r & cpustate->r_mask, 0xffff );
 					}
 				}
 				if ( cpustate->decode & F_TDO )
@@ -957,7 +957,7 @@ static CPU_EXECUTE( tms0980 )
 
 					if ( cpustate->config->write_o )
 					{
-						cpustate->config->write_o( device, 0, cpustate->o & cpustate->o_mask, 0xffff );
+						cpustate->config->write_o( device, *cpustate->program, 0, cpustate->o & cpustate->o_mask, 0xffff );
 					}
 				}
 				if ( cpustate->decode & F_CLO )
@@ -965,7 +965,7 @@ static CPU_EXECUTE( tms0980 )
 					cpustate->o = 0;
 					if ( cpustate->config->write_o )
 					{
-						cpustate->config->write_o( device, 0, cpustate->o & cpustate->o_mask, 0xffff );
+						cpustate->config->write_o( device, *cpustate->program, 0, cpustate->o & cpustate->o_mask, 0xffff );
 					}
 				}
 				if ( cpustate->decode & F_LDX )

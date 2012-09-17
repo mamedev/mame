@@ -145,9 +145,9 @@ DEVICE_IMAGE_UNLOAD( msx_cart );
 void msx_vdp_interrupt(device_t *, v99x8_device &device, int i);
 
 /* I/O functions */
-READ8_DEVICE_HANDLER( msx_printer_status_r );
-WRITE8_DEVICE_HANDLER( msx_printer_strobe_w );
-WRITE8_DEVICE_HANDLER( msx_printer_data_w );
+DECLARE_READ8_DEVICE_HANDLER( msx_printer_status_r );
+DECLARE_WRITE8_DEVICE_HANDLER( msx_printer_strobe_w );
+DECLARE_WRITE8_DEVICE_HANDLER( msx_printer_data_w );
 
 
 #endif /* __MSX_H__ */

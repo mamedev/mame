@@ -19,31 +19,31 @@ static void williams_main_irq(device_t *device, int state);
 static void williams_main_firq(device_t *device, int state);
 static void williams_snd_irq(device_t *device, int state);
 static void williams_snd_irq_b(device_t *device, int state);
-static WRITE8_DEVICE_HANDLER( williams_snd_cmd_w );
-static WRITE8_DEVICE_HANDLER( playball_snd_cmd_w );
-static WRITE8_DEVICE_HANDLER( blaster_snd_cmd_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( williams_snd_cmd_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( playball_snd_cmd_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( blaster_snd_cmd_w );
 
 /* input port mapping */
-static WRITE8_DEVICE_HANDLER( williams_port_select_w );
-static READ8_DEVICE_HANDLER( williams_input_port_49way_0_5_r );
-static READ8_DEVICE_HANDLER( williams_49way_port_0_r );
+static DECLARE_WRITE8_DEVICE_HANDLER( williams_port_select_w );
+static DECLARE_READ8_DEVICE_HANDLER( williams_input_port_49way_0_5_r );
+static DECLARE_READ8_DEVICE_HANDLER( williams_49way_port_0_r );
 
 /* newer-Williams routines */
-static WRITE8_DEVICE_HANDLER( williams2_snd_cmd_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( williams2_snd_cmd_w );
 static void mysticm_main_irq(device_t *device, int state);
 static void tshoot_main_irq(device_t *device, int state);
 
 /* Lotto Fun-specific code */
-static WRITE8_DEVICE_HANDLER( lottofun_coin_lock_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( lottofun_coin_lock_w );
 
 /* Turkey Shoot-specific code */
-static READ8_DEVICE_HANDLER( tshoot_input_port_0_3_r );
-static WRITE8_DEVICE_HANDLER( tshoot_lamp_w );
-static WRITE8_DEVICE_HANDLER( tshoot_maxvol_w );
+static DECLARE_READ8_DEVICE_HANDLER( tshoot_input_port_0_3_r );
+static DECLARE_WRITE8_DEVICE_HANDLER( tshoot_lamp_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( tshoot_maxvol_w );
 
 /* Joust 2-specific code */
-static WRITE8_DEVICE_HANDLER( joust2_snd_cmd_w );
-static WRITE8_DEVICE_HANDLER( joust2_pia_3_cb1_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( joust2_snd_cmd_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( joust2_pia_3_cb1_w );
 
 
 /*************************************
@@ -658,7 +658,7 @@ READ8_DEVICE_HANDLER( williams_input_port_49way_0_5_r )
 {
 	williams_state *state = device->machine().driver_data<williams_state>();
 	if (state->m_port_select)
-		return williams_49way_port_0_r(device, 0);
+		return williams_49way_port_0_r(device, space, 0);
 	else
 		return state->ioport("IN3")->read();
 }

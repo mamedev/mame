@@ -478,18 +478,18 @@ READ16_MEMBER(taitob_state::pbobble_input_bypass_r)
 			return ioport("COIN")->read() << 8;
 
 		default:
-			return tc0640fio_r(m_tc0640fio, offset) << 8;
+			return tc0640fio_r(m_tc0640fio, space, offset) << 8;
 	}
 }
 
 WRITE16_MEMBER(taitob_state::spacedxo_tc0220ioc_w)
 {
 	if (ACCESSING_BITS_0_7)
-		tc0220ioc_w(m_tc0220ioc, offset, data & 0xff);
+		tc0220ioc_w(m_tc0220ioc, space, offset, data & 0xff);
 	else
 	{
 		/* &spacedxo also writes here - bug? */
-		tc0220ioc_w(m_tc0220ioc, offset, (data >> 8) & 0xff);
+		tc0220ioc_w(m_tc0220ioc, space, offset, (data >> 8) & 0xff);
 	}
 }
 
@@ -731,7 +731,7 @@ static ADDRESS_MAP_START( realpunc_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x300000, 0x300001) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_status_r, hd63484_address_w)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_data_r, hd63484_data_w)
 //  AM_RANGE(0x320000, 0x320001) AM_READ_LEGACY(SMH_NOP) // ?
-	AM_RANGE(0x320002, 0x320003) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, 0xff00)
+	AM_RANGE(0x320002, 0x320003) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_comm_w, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( masterw_sound_map, AS_PROGRAM, 8, taitob_state )

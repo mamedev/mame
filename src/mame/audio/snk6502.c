@@ -957,7 +957,7 @@ WRITE8_HANDLER( fantasy_sound_w )
 		}
 
 		/* BOMB */
-		discrete_sound_w(space->machine().device("discrete"), FANTASY_BOMB_EN, data & 0x80);
+		discrete_sound_w(space->machine().device("discrete"), *space, FANTASY_BOMB_EN, data & 0x80);
 
 		state->m_LastPort1 = data;
 		break;

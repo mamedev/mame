@@ -2686,7 +2686,7 @@ INLINE void iface_i2s_data_w( device_t *device, int ch, UINT16 data)
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->iface->i2s.data_w)
 	{
-		(s3c24xx->iface->i2s.data_w)( device, ch, data, 0);
+		(s3c24xx->iface->i2s.data_w)( device, device->machine().driver_data()->generic_space(), ch, data, 0);
 	}
 }
 
@@ -2949,7 +2949,7 @@ static UINT32 iface_adc_data_r( device_t *device, int ch)
 			offs += 2;
 		}
 		#endif
-		return (s3c24xx->iface->adc.data_r)( device, offs, 0);
+		return (s3c24xx->iface->adc.data_r)( device, device->machine().driver_data()->generic_space(), offs, 0);
 	}
 	else
 	{
@@ -3181,7 +3181,7 @@ INLINE void iface_nand_command_w( device_t *device, UINT8 data)
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->iface->nand.command_w)
 	{
-		(s3c24xx->iface->nand.command_w)( device, 0, data);
+		(s3c24xx->iface->nand.command_w)( device, device->machine().driver_data()->generic_space(), 0, data, 0xff);
 	}
 }
 
@@ -3190,7 +3190,7 @@ INLINE void iface_nand_address_w( device_t *device, UINT8 data)
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->iface->nand.address_w)
 	{
-		(s3c24xx->iface->nand.address_w)( device, 0, data);
+		(s3c24xx->iface->nand.address_w)( device, device->machine().driver_data()->generic_space(), 0, data, 0xff);
 	}
 }
 
@@ -3199,7 +3199,7 @@ INLINE UINT8 iface_nand_data_r( device_t *device)
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->iface->nand.data_r)
 	{
-		return (s3c24xx->iface->nand.data_r)( device, 0);
+		return (s3c24xx->iface->nand.data_r)( device, device->machine().driver_data()->generic_space(), 0, 0xff);
 	}
 	else
 	{
@@ -3212,7 +3212,7 @@ INLINE void iface_nand_data_w( device_t *device, UINT8 data)
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->iface->nand.data_w)
 	{
-		(s3c24xx->iface->nand.data_w)( device, 0, data);
+		(s3c24xx->iface->nand.data_w)( device, device->machine().driver_data()->generic_space(), 0, data, 0xff);
 	}
 }
 

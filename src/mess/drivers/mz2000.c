@@ -293,7 +293,7 @@ static READ8_DEVICE_HANDLER( mz2000_wd17xx_r )
 	mz2000_state *state = device->machine().driver_data<mz2000_state>();
 
 	if(state->m_has_fdc)
-		return wd17xx_r(device, offset) ^ 0xff;
+		return wd17xx_r(device, space, offset) ^ 0xff;
 
 	return 0xff;
 }
@@ -303,7 +303,7 @@ static WRITE8_DEVICE_HANDLER( mz2000_wd17xx_w )
 	mz2000_state *state = device->machine().driver_data<mz2000_state>();
 
 	if(state->m_has_fdc)
-		wd17xx_w(device, offset, data ^ 0xff);
+		wd17xx_w(device, space, offset, data ^ 0xff);
 }
 
 WRITE8_MEMBER(mz2000_state::mz2000_fdc_w)

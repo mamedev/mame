@@ -289,11 +289,11 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 		device_t *fdc = machine().device("upd765");
 		if (offset & 1)
 		{
-			return upd765_data_r(fdc,0);
+			return upd765_data_r(fdc,space, 0);
 		}
 		else
 		{
-			return upd765_status_r(fdc,0);
+			return upd765_status_r(fdc,space, 0);
 		}
 	}
 	else if (!BIT(cs,4))
@@ -347,7 +347,7 @@ WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
 		device_t *fdc = machine().device("upd765");
 		if (offset & 1)
 		{
-			upd765_data_w(fdc, 0, data);
+			upd765_data_w(fdc, space, 0, data);
 		}
 	}
 	else if (!BIT(cs,4))

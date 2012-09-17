@@ -6,8 +6,8 @@
 #include "devlegcy.h"
 
 READ_LINE_DEVICE_HANDLER( sn76496_ready_r );
-WRITE8_DEVICE_HANDLER( sn76496_w );
-WRITE8_DEVICE_HANDLER( sn76496_stereo_w );
+DECLARE_WRITE8_DEVICE_HANDLER( sn76496_w );
+DECLARE_WRITE8_DEVICE_HANDLER( sn76496_stereo_w );
 
 class sn76496_device : public device_t,
                                   public device_sound_interface

@@ -686,8 +686,8 @@ WRITE8_MEMBER(_5clown_state::cpu_d800_w)
 
 WRITE8_MEMBER(_5clown_state::fclown_ay8910_w)
 {
-	ay8910_address_w(m_ay8910, 0, offset);
-	ay8910_data_w(m_ay8910, 0, data);
+	ay8910_address_w(m_ay8910, space, 0, offset);
+	ay8910_data_w(m_ay8910, space, 0, data);
 }
 
 

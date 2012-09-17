@@ -95,7 +95,7 @@ ADDRESS_MAP_END
 READ8_MEMBER( vt100_state::vt100_flags_r )
 {
 	UINT8 ret = 0;
-	ret |= vt_video_lba7_r(m_crtc, 0) << 6;
+	ret |= vt_video_lba7_r(m_crtc, space, 0) << 6;
 	ret |= m_keyboard_int << 7;
 	return ret;
 }

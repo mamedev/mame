@@ -38,18 +38,18 @@ struct tms5110_interface
 	devcb_write_line romclk_func;	/* rom clock - Only used to drive the data lines */
 };
 
-WRITE8_DEVICE_HANDLER( tms5110_ctl_w );
-READ8_DEVICE_HANDLER( tms5110_ctl_r );
+DECLARE_WRITE8_DEVICE_HANDLER( tms5110_ctl_w );
+DECLARE_READ8_DEVICE_HANDLER( tms5110_ctl_r );
 WRITE_LINE_DEVICE_HANDLER( tms5110_pdc_w );
 
 /* this is only used by cvs.c
  * it is not related at all to the speech generation
  * and conflicts with the new rom controller interface.
  */
-READ8_DEVICE_HANDLER( tms5110_romclk_hack_r );
+DECLARE_READ8_DEVICE_HANDLER( tms5110_romclk_hack_r );
 
 /* m58817 status line */
-READ8_DEVICE_HANDLER( m58817_status_r );
+DECLARE_READ8_DEVICE_HANDLER( m58817_status_r );
 
 int tms5110_ready_r(device_t *device);
 
@@ -188,8 +188,8 @@ WRITE_LINE_DEVICE_HANDLER( tmsprom_m0_w );
 READ_LINE_DEVICE_HANDLER( tmsprom_data_r );
 
 /* offset is rom # */
-WRITE8_DEVICE_HANDLER( tmsprom_rom_csq_w );
-WRITE8_DEVICE_HANDLER( tmsprom_bit_w );
+DECLARE_WRITE8_DEVICE_HANDLER( tmsprom_rom_csq_w );
+DECLARE_WRITE8_DEVICE_HANDLER( tmsprom_bit_w );
 WRITE_LINE_DEVICE_HANDLER( tmsprom_enable_w );
 
 class tmsprom_device : public device_t

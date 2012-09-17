@@ -1052,7 +1052,7 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
         case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
 			if ((m_sltromsel & (1 << 6)) == 0)
 			{
-                result = applefdc_r(m_fdc, offset);
+                result = applefdc_r(m_fdc, space, offset);
             }
             else
             {
@@ -1208,7 +1208,7 @@ WRITE8_MEMBER( apple2gs_state::apple2gs_c0xx_w )
         case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
             if ((m_sltromsel & (1 << 6)) == 0)
             {
-                applefdc_w(m_fdc, offset, data);
+                applefdc_w(m_fdc, space, offset, data);
             }
             else
             {

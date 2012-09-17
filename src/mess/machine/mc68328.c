@@ -317,9 +317,9 @@ static TIMER_CALLBACK( mc68328_pwm_transition )
 
     mc68328->regs.pwmc ^= PWMC_PIN;
 
-    if( mc68328->iface->out_pwm_func )
+    if( !mc68328->out_pwm.isnull() )
     {
-        (mc68328->iface->out_pwm_func)( device, 0, (mc68328->regs.pwmc & PWMC_PIN) ? 1 : 0 );
+        mc68328->out_pwm( 0, (mc68328->regs.pwmc & PWMC_PIN) ? 1 : 0 );
     }
 }
 
@@ -779,9 +779,9 @@ WRITE16_DEVICE_HANDLER( mc68328_w )
             {
                 verboselog(device->machine(), 2, "mc68328_w: PADATA = %02x\n", data & 0x00ff);
                 mc68328->regs.padata = data & 0x00ff;
-                if(mc68328->iface->out_port_a_func)
+                if(!mc68328->out_port_a.isnull())
                 {
-                    (mc68328->iface->out_port_a_func)( device, 0, data & 0x00ff );
+                    mc68328->out_port_a( 0, data & 0x00ff );
                 }
             }
             else
@@ -808,9 +808,9 @@ WRITE16_DEVICE_HANDLER( mc68328_w )
             {
                 verboselog(device->machine(), 2, "mc68328_w: PBDATA = %02x\n", data & 0x00ff);
                 mc68328->regs.pbdata = data & 0x00ff;
-                if(mc68328->iface->out_port_b_func)
+                if(!mc68328->out_port_b.isnull())
                 {
-                    (mc68328->iface->out_port_b_func)( device, 0, data & 0x00ff );
+                    mc68328->out_port_b( 0, data & 0x00ff );
                 }
             }
             else
@@ -837,9 +837,9 @@ WRITE16_DEVICE_HANDLER( mc68328_w )
             {
                 verboselog(device->machine(), 2, "mc68328_w: PCDATA = %02x\n", data & 0x00ff);
                 mc68328->regs.pcdata = data & 0x00ff;
-                if(mc68328->iface->out_port_c_func)
+                if(!mc68328->out_port_c.isnull())
                 {
-                    (mc68328->iface->out_port_c_func)( device, 0, data & 0x00ff );
+                    mc68328->out_port_c( 0, data & 0x00ff );
                 }
             }
             else
@@ -920,9 +920,9 @@ WRITE16_DEVICE_HANDLER( mc68328_w )
             {
                 verboselog(device->machine(), 2, "mc68328_w: PEDATA = %02x\n", data & 0x00ff);
                 mc68328->regs.pedata = data & 0x00ff;
-                if(mc68328->iface->out_port_e_func)
+                if(!mc68328->out_port_e.isnull())
                 {
-                    (mc68328->iface->out_port_e_func)( device, 0, data & 0x00ff );
+                    mc68328->out_port_e( 0, data & 0x00ff );
                 }
             }
             else
@@ -951,9 +951,9 @@ WRITE16_DEVICE_HANDLER( mc68328_w )
             {
                 verboselog(device->machine(), 2, "mc68328_w: PFDATA = %02x\n", data & 0x00ff);
                 mc68328->regs.pfdata = data & 0x00ff;
-                if(mc68328->iface->out_port_f_func)
+                if(!mc68328->out_port_f.isnull())
                 {
-                    (mc68328->iface->out_port_f_func)( device, 0, data & 0x00ff );
+                    mc68328->out_port_f( 0, data & 0x00ff );
                 }
             }
             else
@@ -981,9 +981,9 @@ WRITE16_DEVICE_HANDLER( mc68328_w )
             {
                 verboselog(device->machine(), 2, "mc68328_w: PGDATA = %02x\n", data & 0x00ff);
                 mc68328->regs.pgdata = data & 0x00ff;
-                if(mc68328->iface->out_port_g_func)
+                if(!mc68328->out_port_g.isnull())
                 {
-                    (mc68328->iface->out_port_g_func)( device, 0, data & 0x00ff );
+                    mc68328->out_port_g( 0, data & 0x00ff );
                 }
             }
             else
@@ -1011,9 +1011,9 @@ WRITE16_DEVICE_HANDLER( mc68328_w )
             {
                 verboselog(device->machine(), 2, "mc68328_w: PJDATA = %02x\n", data & 0x00ff);
                 mc68328->regs.pjdata = data & 0x00ff;
-                if(mc68328->iface->out_port_j_func)
+                if(!mc68328->out_port_j.isnull())
                 {
-                    (mc68328->iface->out_port_j_func)( device, 0, data & 0x00ff );
+                    mc68328->out_port_j( 0, data & 0x00ff );
                 }
             }
             else
@@ -1040,9 +1040,9 @@ WRITE16_DEVICE_HANDLER( mc68328_w )
             {
                 verboselog(device->machine(), 2, "mc68328_w: PKDATA = %02x\n", data & 0x00ff);
                 mc68328->regs.pkdata = data & 0x00ff;
-                if(mc68328->iface->out_port_k_func)
+                if(!mc68328->out_port_k.isnull())
                 {
-                    (mc68328->iface->out_port_k_func)( device, 0, data & 0x00ff );
+                    mc68328->out_port_k( 0, data & 0x00ff );
                 }
             }
             else
@@ -1070,9 +1070,9 @@ WRITE16_DEVICE_HANDLER( mc68328_w )
             {
                 verboselog(device->machine(), 2, "mc68328_w: PMDATA = %02x\n", data & 0x00ff);
                 mc68328->regs.pmdata = data & 0x00ff;
-                if(mc68328->iface->out_port_m_func)
+                if(!mc68328->out_port_m.isnull())
                 {
-                    (mc68328->iface->out_port_m_func)( device, 0, data & 0x00ff );
+                    mc68328->out_port_m( 0, data & 0x00ff );
                 }
             }
             else
@@ -1249,9 +1249,9 @@ WRITE16_DEVICE_HANDLER( mc68328_w )
 
         case 0x800:
             verboselog(device->machine(), 2, "mc68328_w: SPIMDATA = %04x\n", data);
-            if(mc68328->iface->out_spim_func)
+            if(!mc68328->out_spim.isnull())
             {
-                (mc68328->iface->out_spim_func)( device, 0, data, 0xffff );
+                mc68328->out_spim( 0, data, 0xffff );
             }
             else
             {
@@ -1854,9 +1854,9 @@ READ16_DEVICE_HANDLER( mc68328_r )
             if( mem_mask & 0x00ff )
             {
                 verboselog(device->machine(), 2, "mc68328_r (%04x): PADATA = %02x\n", mem_mask, mc68328->regs.padata);
-                if(mc68328->iface->in_port_a_func)
+                if(!mc68328->in_port_a.isnull())
                 {
-                    return (mc68328->iface->in_port_a_func)( device, 0 );
+                    return mc68328->in_port_a( 0 );
                 }
                 else
                 {
@@ -1886,9 +1886,9 @@ READ16_DEVICE_HANDLER( mc68328_r )
             if( mem_mask & 0x00ff )
             {
                 verboselog(device->machine(), 2, "mc68328_r (%04x): PBDATA = %02x\n", mem_mask, mc68328->regs.pbdata);
-                if(mc68328->iface->in_port_b_func)
+                if(!mc68328->in_port_b.isnull())
                 {
-                    return (mc68328->iface->in_port_b_func)( device, 0 );
+                    return mc68328->in_port_b( 0 );
                 }
                 else
                 {
@@ -1918,9 +1918,9 @@ READ16_DEVICE_HANDLER( mc68328_r )
             if( mem_mask & 0x00ff )
             {
                 verboselog(device->machine(), 2, "mc68328_r (%04x): PCDATA = %02x\n", mem_mask, mc68328->regs.pcdata);
-                if(mc68328->iface->in_port_c_func)
+                if(!mc68328->in_port_c.isnull())
                 {
-                    return (mc68328->iface->in_port_c_func)( device, 0 );
+                    return mc68328->in_port_c( 0 );
                 }
                 else
                 {
@@ -1950,9 +1950,9 @@ READ16_DEVICE_HANDLER( mc68328_r )
             if( mem_mask & 0x00ff )
             {
                 verboselog(device->machine(), 2, "mc68328_r (%04x): PDDATA = %02x\n", mem_mask, mc68328->regs.pddata);
-                if(mc68328->iface->in_port_d_func)
+                if(!mc68328->in_port_d.isnull())
                 {
-                    return (mc68328->iface->in_port_d_func)( device, 0 );
+                    return mc68328->in_port_d( 0 );
                 }
                 else
                 {
@@ -2007,9 +2007,9 @@ READ16_DEVICE_HANDLER( mc68328_r )
             if( mem_mask & 0x00ff )
             {
                 verboselog(device->machine(), 2, "mc68328_r (%04x): PEDATA = %02x\n", mem_mask, mc68328->regs.pedata);
-                if(mc68328->iface->in_port_e_func)
+                if(!mc68328->in_port_e.isnull())
                 {
-                    return (mc68328->iface->in_port_e_func)( device, 0 );
+                    return mc68328->in_port_e( 0 );
                 }
                 else
                 {
@@ -2040,9 +2040,9 @@ READ16_DEVICE_HANDLER( mc68328_r )
             if( mem_mask & 0x00ff )
             {
                 verboselog(device->machine(), 2, "mc68328_r (%04x): PFDATA = %02x\n", mem_mask, mc68328->regs.pfdata);
-                if(mc68328->iface->in_port_f_func)
+                if(!mc68328->in_port_f.isnull())
                 {
-                    return (mc68328->iface->in_port_f_func)( device, 0 );
+                    return mc68328->in_port_f( 0 );
                 }
                 else
                 {
@@ -2073,9 +2073,9 @@ READ16_DEVICE_HANDLER( mc68328_r )
             if( mem_mask & 0x00ff )
             {
                 verboselog(device->machine(), 2, "mc68328_r (%04x): PGDATA = %02x\n", mem_mask, mc68328->regs.pgdata);
-                if(mc68328->iface->in_port_g_func)
+                if(!mc68328->in_port_g.isnull())
                 {
-                    return (mc68328->iface->in_port_g_func)( device, 0 );
+                    return mc68328->in_port_g( 0 );
                 }
                 else
                 {
@@ -2106,9 +2106,9 @@ READ16_DEVICE_HANDLER( mc68328_r )
             if( mem_mask & 0x00ff )
             {
                 verboselog(device->machine(), 2, "mc68328_r (%04x): PJDATA = %02x\n", mem_mask, mc68328->regs.pjdata);
-                if(mc68328->iface->in_port_j_func)
+                if(!mc68328->in_port_j.isnull())
                 {
-                    return (mc68328->iface->in_port_j_func)( device, 0 );
+                    return mc68328->in_port_j( 0 );
                 }
                 else
                 {
@@ -2138,9 +2138,9 @@ READ16_DEVICE_HANDLER( mc68328_r )
             if( mem_mask & 0x00ff )
             {
                 verboselog(device->machine(), 2, "mc68328_r (%04x): PKDATA = %02x\n", mem_mask, mc68328->regs.pkdata);
-                if(mc68328->iface->in_port_k_func)
+                if(!mc68328->in_port_k.isnull())
                 {
-                    return (mc68328->iface->in_port_k_func)( device, 0 );
+                    return mc68328->in_port_k( 0 );
                 }
                 else
                 {
@@ -2171,9 +2171,9 @@ READ16_DEVICE_HANDLER( mc68328_r )
             if( mem_mask & 0x00ff )
             {
                 verboselog(device->machine(), 2, "mc68328_r (%04x): PMDATA = %02x\n", mem_mask, mc68328->regs.pmdata);
-                if(mc68328->iface->in_port_m_func)
+                if(!mc68328->in_port_m.isnull())
                 {
-                    return (mc68328->iface->in_port_m_func)( device, 0 );
+                    return mc68328->in_port_m( 0 );
                 }
                 else
                 {
@@ -2290,9 +2290,9 @@ READ16_DEVICE_HANDLER( mc68328_r )
 
         case 0x800:
             verboselog(device->machine(), 2, "mc68328_r (%04x): SPIMDATA = %04x\n", mem_mask, mc68328->regs.spimdata);
-            if(mc68328->iface->in_spim_func)
+            if(!mc68328->in_spim.isnull())
             {
-                return (mc68328->iface->in_spim_func)( device, 0, 0xffff );
+                return mc68328->in_spim( 0, 0xffff );
             }
             return mc68328->regs.spimdata;
 
@@ -2799,6 +2799,33 @@ static DEVICE_START( mc68328 )
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
 
     mc68328->iface = (const mc68328_interface*)device->static_config();
+
+    mc68328->out_port_a.resolve(mc68328->iface->out_port_a_func, *device);
+    mc68328->out_port_b.resolve(mc68328->iface->out_port_b_func, *device);
+    mc68328->out_port_c.resolve(mc68328->iface->out_port_c_func, *device);
+    mc68328->out_port_d.resolve(mc68328->iface->out_port_d_func, *device);
+    mc68328->out_port_e.resolve(mc68328->iface->out_port_e_func, *device);
+    mc68328->out_port_f.resolve(mc68328->iface->out_port_f_func, *device);
+    mc68328->out_port_g.resolve(mc68328->iface->out_port_g_func, *device);
+    mc68328->out_port_j.resolve(mc68328->iface->out_port_j_func, *device);
+    mc68328->out_port_k.resolve(mc68328->iface->out_port_k_func, *device);
+    mc68328->out_port_m.resolve(mc68328->iface->out_port_m_func, *device);
+
+    mc68328->in_port_a.resolve(mc68328->iface->in_port_a_func, *device);
+    mc68328->in_port_b.resolve(mc68328->iface->in_port_b_func, *device);
+    mc68328->in_port_c.resolve(mc68328->iface->in_port_c_func, *device);
+    mc68328->in_port_d.resolve(mc68328->iface->in_port_d_func, *device);
+    mc68328->in_port_e.resolve(mc68328->iface->in_port_e_func, *device);
+    mc68328->in_port_f.resolve(mc68328->iface->in_port_f_func, *device);
+    mc68328->in_port_g.resolve(mc68328->iface->in_port_g_func, *device);
+    mc68328->in_port_j.resolve(mc68328->iface->in_port_j_func, *device);
+    mc68328->in_port_k.resolve(mc68328->iface->in_port_k_func, *device);
+    mc68328->in_port_m.resolve(mc68328->iface->in_port_m_func, *device);
+
+    mc68328->out_pwm.resolve(mc68328->iface->out_pwm_func, *device);
+
+    mc68328->out_spim.resolve(mc68328->iface->out_spim_func, *device);
+    mc68328->in_spim.resolve(mc68328->iface->in_spim_func, *device);
 
     mc68328->gptimer[0] = device->machine().scheduler().timer_alloc(FUNC(mc68328_timer1_hit));
     mc68328->gptimer[1] = device->machine().scheduler().timer_alloc(FUNC(mc68328_timer2_hit));

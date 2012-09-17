@@ -93,9 +93,9 @@ static WRITE8_HANDLER( namco_54xx_O_w )
 	namco_54xx_state *state = get_safe_token(space->device().owner());
 	UINT8 out = (data & 0x0f);
 	if (data & 0x10)
-		discrete_sound_w(state->m_discrete, NAMCO_54XX_1_DATA(state->m_basenode), out);
+		discrete_sound_w(state->m_discrete, *space, NAMCO_54XX_1_DATA(state->m_basenode), out);
 	else
-		discrete_sound_w(state->m_discrete, NAMCO_54XX_0_DATA(state->m_basenode), out);
+		discrete_sound_w(state->m_discrete, *space, NAMCO_54XX_0_DATA(state->m_basenode), out);
 }
 
 static WRITE8_HANDLER( namco_54xx_R1_w )
@@ -103,7 +103,7 @@ static WRITE8_HANDLER( namco_54xx_R1_w )
 	namco_54xx_state *state = get_safe_token(space->device().owner());
 	UINT8 out = (data & 0x0f);
 
-	discrete_sound_w(state->m_discrete, NAMCO_54XX_2_DATA(state->m_basenode), out);
+	discrete_sound_w(state->m_discrete, *space, NAMCO_54XX_2_DATA(state->m_basenode), out);
 }
 
 

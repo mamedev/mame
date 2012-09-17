@@ -1,8 +1,8 @@
 /*
     990_tap.h: include file for 990_tap.c
 */
-extern READ16_DEVICE_HANDLER(ti990_tpc_r);
-extern WRITE16_DEVICE_HANDLER(ti990_tpc_w);
+extern DECLARE_READ16_DEVICE_HANDLER(ti990_tpc_r);
+extern DECLARE_WRITE16_DEVICE_HANDLER(ti990_tpc_w);
 
 /***************************************************************************
     TYPE DEFINITIONS

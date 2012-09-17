@@ -28,8 +28,8 @@ struct e05a03_interface
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-WRITE8_DEVICE_HANDLER( e05a03_w );
-READ8_DEVICE_HANDLER( e05a03_r );
+DECLARE_WRITE8_DEVICE_HANDLER( e05a03_w );
+DECLARE_READ8_DEVICE_HANDLER( e05a03_r );
 
 WRITE_LINE_DEVICE_HANDLER( e05a03_home_w ); /* home position signal */
 WRITE_LINE_DEVICE_HANDLER( e05a03_fire_w ); /* printhead solenoids trigger */

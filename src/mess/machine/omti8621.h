@@ -39,8 +39,8 @@ struct omti8621_config {
  FUNCTION PROTOTYPES
  ***************************************************************************/
 
-READ16_DEVICE_HANDLER( omti8621_r );
-WRITE16_DEVICE_HANDLER( omti8621_w );
+DECLARE_READ16_DEVICE_HANDLER( omti8621_r );
+DECLARE_WRITE16_DEVICE_HANDLER( omti8621_w );
 
 void omti8621_set_verbose(int on_off);
 

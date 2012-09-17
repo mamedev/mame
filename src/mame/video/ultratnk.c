@@ -142,8 +142,9 @@ SCREEN_VBLANK( ultratnk )
 
 		/* update sound status */
 
-		discrete_sound_w(discrete, ULTRATNK_MOTOR_DATA_1, videoram[0x391] & 15);
-		discrete_sound_w(discrete, ULTRATNK_MOTOR_DATA_2, videoram[0x393] & 15);
+		address_space &space = screen.machine().driver_data()->generic_space();
+		discrete_sound_w(discrete, space, ULTRATNK_MOTOR_DATA_1, videoram[0x391] & 15);
+		discrete_sound_w(discrete, space, ULTRATNK_MOTOR_DATA_2, videoram[0x393] & 15);
 	}
 }
 

@@ -1121,7 +1121,7 @@ void ppccom_execute_mfdcr(powerpc_state *ppc)
 		else
 			ppc->param1 = 0;
 	} else {
-		ppc->param1 = ppc->dcr_read_func(ppc->device,ppc->param0,0xffffffff);
+		ppc->param1 = ppc->dcr_read_func(ppc->device,*ppc->program,ppc->param0,0xffffffff);
 	}
 }
 
@@ -1211,7 +1211,7 @@ void ppccom_execute_mtdcr(powerpc_state *ppc)
 		if (ppc->param0 < ARRAY_LENGTH(ppc->dcr))
 			ppc->dcr[ppc->param0] = ppc->param1;
 	} else {
-		ppc->dcr_write_func(ppc->device,ppc->param0,ppc->param1,0xffffffff);
+		ppc->dcr_write_func(ppc->device,*ppc->program,ppc->param0,ppc->param1,0xffffffff);
 	}
 }
 

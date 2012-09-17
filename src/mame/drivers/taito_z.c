@@ -1106,7 +1106,7 @@ WRITE16_MEMBER(taitoz_state::spacegun_output_bypass_w)
 			break;
 
 		default:
-			tc0220ioc_w(m_tc0220ioc, offset, data);	/* might be a 510NIO ! */
+			tc0220ioc_w(m_tc0220ioc, space, offset, data);	/* might be a 510NIO ! */
 	}
 }
 
@@ -1127,7 +1127,7 @@ READ8_MEMBER(taitoz_state::contcirc_input_bypass_r)
 {
 	/* Bypass TC0220IOC controller for analog input */
 
-	UINT8 port = tc0220ioc_port_r(m_tc0220ioc, 0);	/* read port number */
+	UINT8 port = tc0220ioc_port_r(m_tc0220ioc, space, 0);	/* read port number */
 	UINT16 steer = 0xff80 + ioport("STEER")->read_safe(0x80);
 
 	switch (port)
@@ -1139,7 +1139,7 @@ READ8_MEMBER(taitoz_state::contcirc_input_bypass_r)
 			return steer >> 8;
 
 		default:
-			return tc0220ioc_portreg_r(m_tc0220ioc, offset);
+			return tc0220ioc_portreg_r(m_tc0220ioc, space, offset);
 	}
 }
 
@@ -1148,7 +1148,7 @@ READ8_MEMBER(taitoz_state::chasehq_input_bypass_r)
 {
 	/* Bypass TC0220IOC controller for extra inputs */
 
-	UINT8 port = tc0220ioc_port_r(m_tc0220ioc, 0);	/* read port number */
+	UINT8 port = tc0220ioc_port_r(m_tc0220ioc, space, 0);	/* read port number */
 	UINT16 steer = 0xff80 + ioport("STEER")->read_safe(0x80);
 
 	switch (port)
@@ -1172,7 +1172,7 @@ READ8_MEMBER(taitoz_state::chasehq_input_bypass_r)
 			return steer >> 8;
 
 		default:
-			return tc0220ioc_portreg_r(m_tc0220ioc, offset);
+			return tc0220ioc_portreg_r(m_tc0220ioc, space, offset);
 	}
 }
 
@@ -1261,7 +1261,7 @@ READ16_MEMBER(taitoz_state::spacegun_input_bypass_r)
 			return m_eeprom->read_bit() << 7;
 
 		default:
-			return tc0220ioc_r(m_tc0220ioc, offset);	/* might be a 510NIO ! */
+			return tc0220ioc_r(m_tc0220ioc, space, offset);	/* might be a 510NIO ! */
 	}
 }
 
@@ -1422,9 +1422,9 @@ WRITE8_MEMBER(taitoz_state::sound_bankswitch_w)
 WRITE16_MEMBER(taitoz_state::taitoz_sound_w)
 {
 	if (offset == 0)
-		tc0140syt_port_w(m_tc0140syt, 0, data & 0xff);
+		tc0140syt_port_w(m_tc0140syt, space, 0, data & 0xff);
 	else if (offset == 1)
-		tc0140syt_comm_w(m_tc0140syt, 0, data & 0xff);
+		tc0140syt_comm_w(m_tc0140syt, space, 0, data & 0xff);
 
 #ifdef MAME_DEBUG
 //  if (data & 0xff00)
@@ -1440,7 +1440,7 @@ WRITE16_MEMBER(taitoz_state::taitoz_sound_w)
 READ16_MEMBER(taitoz_state::taitoz_sound_r)
 {
 	if (offset == 1)
-		return (tc0140syt_comm_r(m_tc0140syt, 0) & 0xff);
+		return (tc0140syt_comm_r(m_tc0140syt, space, 0) & 0xff);
 	else
 		return 0;
 }

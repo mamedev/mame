@@ -74,14 +74,14 @@ WRITE8_MEMBER(munchmo_state::sound_nmi_ack_w)
 READ8_MEMBER(munchmo_state::munchmo_ay1reset_r)
 {
 	device_t *device = machine().device("ay1");
-	ay8910_reset_w(device,0,0);
+	ay8910_reset_w(device,space,0,0);
 	return 0;
 }
 
 READ8_MEMBER(munchmo_state::munchmo_ay2reset_r)
 {
 	device_t *device = machine().device("ay2");
-	ay8910_reset_w(device,0,0);
+	ay8910_reset_w(device,space,0,0);
 	return 0;
 }
 /*************************************

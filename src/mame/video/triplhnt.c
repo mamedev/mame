@@ -114,7 +114,8 @@ SCREEN_UPDATE_IND16( triplhnt )
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 
-	discrete_sound_w(discrete, TRIPLHNT_BEAR_ROAR_DATA, state->m_playfield_ram[0xfa] & 15);
-	discrete_sound_w(discrete, TRIPLHNT_SHOT_DATA, state->m_playfield_ram[0xfc] & 15);
+	address_space &space = screen.machine().driver_data()->generic_space();
+	discrete_sound_w(discrete, space, TRIPLHNT_BEAR_ROAR_DATA, state->m_playfield_ram[0xfa] & 15);
+	discrete_sound_w(discrete, space, TRIPLHNT_SHOT_DATA, state->m_playfield_ram[0xfc] & 15);
 	return 0;
 }

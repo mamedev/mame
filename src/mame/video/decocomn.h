@@ -55,13 +55,13 @@ extern const device_type DECOCOMN;
     DEVICE I/O FUNCTIONS
 ***************************************************************************/
 
-WRITE16_DEVICE_HANDLER( decocomn_nonbuffered_palette_w );
-WRITE16_DEVICE_HANDLER( decocomn_buffered_palette_w );
-WRITE16_DEVICE_HANDLER( decocomn_palette_dma_w );
+DECLARE_WRITE16_DEVICE_HANDLER( decocomn_nonbuffered_palette_w );
+DECLARE_WRITE16_DEVICE_HANDLER( decocomn_buffered_palette_w );
+DECLARE_WRITE16_DEVICE_HANDLER( decocomn_palette_dma_w );
 
-WRITE16_DEVICE_HANDLER( decocomn_priority_w );
-READ16_DEVICE_HANDLER( decocomn_priority_r );
+DECLARE_WRITE16_DEVICE_HANDLER( decocomn_priority_w );
+DECLARE_READ16_DEVICE_HANDLER( decocomn_priority_r );
 
-READ16_DEVICE_HANDLER( decocomn_71_r );
+DECLARE_READ16_DEVICE_HANDLER( decocomn_71_r );
 
 #endif

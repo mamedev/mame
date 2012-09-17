@@ -120,8 +120,8 @@ extern const device_type F3853;
     PROTOTYPES
 ***************************************************************************/
 
-READ8_DEVICE_HANDLER( f3853_r );
-WRITE8_DEVICE_HANDLER( f3853_w );
+DECLARE_READ8_DEVICE_HANDLER( f3853_r );
+DECLARE_WRITE8_DEVICE_HANDLER( f3853_w );
 
 void f3853_set_external_interrupt_in_line(device_t *device, int level);
 void f3853_set_priority_in_line(device_t *device, int level);

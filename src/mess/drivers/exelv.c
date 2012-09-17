@@ -381,7 +381,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portd_w)
 {
 	logerror("tms7041_portd_w: data = 0x%02x\n", data);
 
-	tms5220_data_w(m_tms5220c, 0, BITSWAP8(data,0,1,2,3,4,5,6,7));
+	tms5220_data_w(m_tms5220c, space, 0, BITSWAP8(data,0,1,2,3,4,5,6,7));
 	m_tms7041_portd = data;
 }
 

@@ -21,8 +21,8 @@ struct sega_pcm_interface
 	int  bank;
 };
 
-WRITE8_DEVICE_HANDLER( sega_pcm_w );
-READ8_DEVICE_HANDLER( sega_pcm_r );
+DECLARE_WRITE8_DEVICE_HANDLER( sega_pcm_w );
+DECLARE_READ8_DEVICE_HANDLER( sega_pcm_r );
 
 class segapcm_device : public device_t,
                                   public device_sound_interface

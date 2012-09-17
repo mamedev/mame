@@ -53,7 +53,7 @@ public:
 
 INTERRUPT_GEN( stfight_vb_interrupt );
 void stfight_adpcm_int(device_t *device);
-WRITE8_DEVICE_HANDLER( stfight_adpcm_control_w );
+DECLARE_WRITE8_DEVICE_HANDLER( stfight_adpcm_control_w );
 
 
 /*----------- defined in video/stfight.c -----------*/

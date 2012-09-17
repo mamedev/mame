@@ -104,7 +104,7 @@ static READ8_HANDLER( namco_52xx_R1_r )
 static WRITE8_HANDLER( namco_52xx_P_w )
 {
 	namco_52xx_state *state = get_safe_token(space->device().owner());
-	discrete_sound_w(state->m_discrete, NAMCO_52XX_P_DATA(state->m_basenode), data & 0x0f);
+	discrete_sound_w(state->m_discrete, *space, NAMCO_52XX_P_DATA(state->m_basenode), data & 0x0f);
 }
 
 static WRITE8_HANDLER( namco_52xx_R2_w )

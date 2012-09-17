@@ -73,7 +73,7 @@ WRITE8_MEMBER(dambustr_state::dambustr_noise_enable_w)
 	device_t *device = machine().device("GAL_AUDIO");
 	if (data != m_noise_data) {
 		m_noise_data = data;
-		galaxian_noise_enable_w(device, offset, data);
+		galaxian_noise_enable_w(device, space, offset, data);
 	}
 }
 

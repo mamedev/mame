@@ -177,15 +177,15 @@ void ataxx_bankswitch(running_machine &machine);
 void leland_init_eeprom(running_machine &machine, UINT8 default_val, const UINT16 *data, UINT8 serial_offset, UINT8 serial_type);
 void ataxx_init_eeprom(running_machine &machine, const UINT16 *data);
 
-READ8_DEVICE_HANDLER( ataxx_eeprom_r );
-WRITE8_DEVICE_HANDLER( ataxx_eeprom_w );
+DECLARE_READ8_DEVICE_HANDLER( ataxx_eeprom_r );
+DECLARE_WRITE8_DEVICE_HANDLER( ataxx_eeprom_w );
 
 
 
 
 
-READ8_DEVICE_HANDLER( leland_sound_port_r );
-WRITE8_DEVICE_HANDLER( leland_sound_port_w );
+DECLARE_READ8_DEVICE_HANDLER( leland_sound_port_r );
+DECLARE_WRITE8_DEVICE_HANDLER( leland_sound_port_w );
 
 
 
@@ -257,12 +257,12 @@ extern const device_type REDLINE_80186;
 
 void leland_dac_update(device_t *device, int dacnum, UINT8 sample);
 
-READ8_DEVICE_HANDLER( leland_80186_response_r );
+DECLARE_READ8_DEVICE_HANDLER( leland_80186_response_r );
 
-WRITE8_DEVICE_HANDLER( leland_80186_control_w );
-WRITE8_DEVICE_HANDLER( leland_80186_command_lo_w );
-WRITE8_DEVICE_HANDLER( leland_80186_command_hi_w );
-WRITE8_DEVICE_HANDLER( ataxx_80186_control_w );
+DECLARE_WRITE8_DEVICE_HANDLER( leland_80186_control_w );
+DECLARE_WRITE8_DEVICE_HANDLER( leland_80186_command_lo_w );
+DECLARE_WRITE8_DEVICE_HANDLER( leland_80186_command_hi_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ataxx_80186_control_w );
 
 ADDRESS_MAP_EXTERN(leland_80186_map_program, 16);
 ADDRESS_MAP_EXTERN(leland_80186_map_io, 16);
@@ -272,7 +272,7 @@ ADDRESS_MAP_EXTERN(ataxx_80186_map_io, 16);
 
 /*----------- defined in video/leland.c -----------*/
 
-WRITE8_DEVICE_HANDLER( leland_gfx_port_w );
+DECLARE_WRITE8_DEVICE_HANDLER( leland_gfx_port_w );
 
 
 

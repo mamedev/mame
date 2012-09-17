@@ -1039,7 +1039,7 @@ READ16_HANDLER( amiga_cia_r )
 	}
 
 	/* handle the reads */
-	data = mos6526_r(cia, offset >> 7);
+	data = mos6526_r(cia, *space, offset >> 7);
 
 	if (LOG_CIA)
 		logerror("%06x:cia_%c_read(%03x) = %04x & %04x\n", space->device().safe_pc(), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data << shift, mem_mask);
@@ -1081,7 +1081,7 @@ WRITE16_HANDLER( amiga_cia_w )
 	}
 
 	/* handle the writes */
-	mos6526_w(cia, offset >> 7, (UINT8) data);
+	mos6526_w(cia, *space, offset >> 7, (UINT8) data);
 }
 
 

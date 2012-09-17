@@ -35,8 +35,8 @@ public:
 
 	optional_device<roc10937_t> m_vfd;
 
-	DECLARE_WRITE8_MEMBER( ay_w0 ) { ay8910_address_data_w(m_ay, 0, data); }
-	DECLARE_WRITE8_MEMBER( ay_w1 ) { ay8910_address_data_w(m_ay, 1, data); }
+	DECLARE_WRITE8_MEMBER( ay_w0 ) { ay8910_address_data_w(m_ay, space, 0, data); }
+	DECLARE_WRITE8_MEMBER( ay_w1 ) { ay8910_address_data_w(m_ay, space, 1, data); }
 
 	DECLARE_WRITE8_MEMBER( ctc_w0 ) { m_z80ctc->write(space, 0, data); }
 	DECLARE_WRITE8_MEMBER( ctc_w1 ) { m_z80ctc->write(space, 1, data); }
@@ -73,7 +73,7 @@ public:
 	DECLARE_WRITE8_MEMBER( pio5_w2 ) { m_z80pio_5->write(space, 2, data); }
 	DECLARE_WRITE8_MEMBER( pio5_w3 ) { m_z80pio_5->write(space, 3, data); }
 
-	DECLARE_READ8_MEMBER( ay_r0 ) { return ay8910_r(m_ay, 0); }
+	DECLARE_READ8_MEMBER( ay_r0 ) { return ay8910_r(m_ay, space, 0); }
 
 	DECLARE_READ8_MEMBER( ctc_r0 ) { return m_z80ctc->read(space, 0); }
 	DECLARE_READ8_MEMBER( ctc_r1 ) { return m_z80ctc->read(space, 1); }
@@ -307,7 +307,7 @@ static Z80CTC_INTERFACE( ctc_intf )
 	DEVCB_NULL					// ZC/TO2 callback
 };
 
-static WRITE8_DEVICE_HANDLER( serial_transmit )
+static WRITE16_DEVICE_HANDLER( serial_transmit )
 {
 	proconn_state *state = device->machine().driver_data<proconn_state>();
 
@@ -324,20 +324,20 @@ static WRITE8_DEVICE_HANDLER( serial_transmit )
 }
 
 
-static int serial_receive(device_t *device, int channel)
+static READ16_DEVICE_HANDLER( serial_receive )
 {
-	return 0xff;
+	return -1;
 }
 
 
 static const z80sio_interface sio_intf =
 {
-	0,					/* interrupt handler */
-	0,					/* DTR changed handler */
-	0,					/* RTS changed handler */
-	0,					/* BREAK changed handler */
-	serial_transmit,	/* transmit handler */
-	serial_receive		/* receive handler */
+	DEVCB_NULL,					/* interrupt handler */
+	DEVCB_NULL,					/* DTR changed handler */
+	DEVCB_NULL,					/* RTS changed handler */
+	DEVCB_NULL,					/* BREAK changed handler */
+	DEVCB_HANDLER(serial_transmit),	/* transmit handler */
+	DEVCB_HANDLER(serial_receive)		/* receive handler */
 };
 
 static const ay8910_interface ay8910_config =

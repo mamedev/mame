@@ -16,50 +16,50 @@ WRITE8_DEVICE_HANDLER( firetrk_skid_reset_w )
 	state->m_skid[1] = 0;
 
 	// also SUPERBUG_SKID_EN
-	discrete_sound_w(device, FIRETRUCK_SKID_EN, 1);
+	discrete_sound_w(device, space, FIRETRUCK_SKID_EN, 1);
 }
 
 
 WRITE8_DEVICE_HANDLER( montecar_skid_reset_w )
 {
-	discrete_sound_w(device, MONTECAR_SKID_EN, 1);
+	discrete_sound_w(device, space, MONTECAR_SKID_EN, 1);
 }
 
 
 WRITE8_DEVICE_HANDLER( firetrk_crash_snd_w )
 {
 	// also SUPERBUG_CRASH_DATA and MONTECAR_CRASH_DATA
-	discrete_sound_w(device, FIRETRUCK_CRASH_DATA, data >> 4);
+	discrete_sound_w(device, space, FIRETRUCK_CRASH_DATA, data >> 4);
 }
 
 
 WRITE8_DEVICE_HANDLER( firetrk_skid_snd_w )
 {
 	// also SUPERBUG_SKID_EN and MONTECAR_SKID_EN
-	discrete_sound_w(device, FIRETRUCK_SKID_EN, 0);
+	discrete_sound_w(device, space, FIRETRUCK_SKID_EN, 0);
 }
 
 
 WRITE8_DEVICE_HANDLER( firetrk_motor_snd_w )
 {
 	// also MONTECAR_DRONE_MOTOR_DATA
-	discrete_sound_w(device, FIRETRUCK_SIREN_DATA, data >> 4);
+	discrete_sound_w(device, space, FIRETRUCK_SIREN_DATA, data >> 4);
 
 	// also MONTECAR_MOTOR_DATA
-	discrete_sound_w(device, FIRETRUCK_MOTOR_DATA, data & 0x0f);
+	discrete_sound_w(device, space, FIRETRUCK_MOTOR_DATA, data & 0x0f);
 }
 
 
 WRITE8_DEVICE_HANDLER( superbug_motor_snd_w )
 {
-	discrete_sound_w(device, SUPERBUG_SPEED_DATA, data & 0x0f);
+	discrete_sound_w(device, space, SUPERBUG_SPEED_DATA, data & 0x0f);
 }
 
 
 WRITE8_DEVICE_HANDLER( firetrk_xtndply_w )
 {
 	// also SUPERBUG_ASR_EN (extended play)
-	discrete_sound_w(device, FIRETRUCK_XTNDPLY_EN, data);
+	discrete_sound_w(device, space, FIRETRUCK_XTNDPLY_EN, data);
 }
 
 

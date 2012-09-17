@@ -41,7 +41,7 @@ static emu_timer *ipu_watchdog_timer;
  *************************************/
 
 static TIMER_CALLBACK( ipu_watchdog_reset );
-static WRITE8_DEVICE_HANDLER( ipu_break_changed );
+static DECLARE_WRITE8_DEVICE_HANDLER( ipu_break_changed );
 
 
 
@@ -140,11 +140,11 @@ static WRITE_LINE_DEVICE_HANDLER( ipu_ctc_interrupt )
 
 const z80sio_interface nflfoot_sio_intf =
 {
-	ipu_ctc_interrupt,	/* interrupt handler */
-	0,					/* DTR changed handler */
-	0,					/* RTS changed handler */
-	ipu_break_changed,	/* BREAK changed handler */
-	mcr_ipu_sio_transmit/* transmit handler */
+	DEVCB_LINE(ipu_ctc_interrupt),	/* interrupt handler */
+	DEVCB_NULL,					/* DTR changed handler */
+	DEVCB_NULL,					/* RTS changed handler */
+	DEVCB_HANDLER(ipu_break_changed),	/* BREAK changed handler */
+	DEVCB_HANDLER(mcr_ipu_sio_transmit)/* transmit handler */
 };
 
 

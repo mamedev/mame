@@ -126,47 +126,47 @@ extern const device_type LATCH8;
 
 /* write & read full byte */
 
-READ8_DEVICE_HANDLER( latch8_r );
-WRITE8_DEVICE_HANDLER( latch8_w );
+DECLARE_READ8_DEVICE_HANDLER( latch8_r );
+DECLARE_WRITE8_DEVICE_HANDLER( latch8_w );
 
 /* reset the latch */
 
-WRITE8_DEVICE_HANDLER( latch8_reset );
+DECLARE_WRITE8_DEVICE_HANDLER( latch8_reset );
 
 /* read bit x                 */
 /* return (latch >> x) & 0x01 */
 
-READ8_DEVICE_HANDLER( latch8_bit0_r );
-READ8_DEVICE_HANDLER( latch8_bit1_r );
-READ8_DEVICE_HANDLER( latch8_bit2_r );
-READ8_DEVICE_HANDLER( latch8_bit3_r );
-READ8_DEVICE_HANDLER( latch8_bit4_r );
-READ8_DEVICE_HANDLER( latch8_bit5_r );
-READ8_DEVICE_HANDLER( latch8_bit6_r );
-READ8_DEVICE_HANDLER( latch8_bit7_r );
+DECLARE_READ8_DEVICE_HANDLER( latch8_bit0_r );
+DECLARE_READ8_DEVICE_HANDLER( latch8_bit1_r );
+DECLARE_READ8_DEVICE_HANDLER( latch8_bit2_r );
+DECLARE_READ8_DEVICE_HANDLER( latch8_bit3_r );
+DECLARE_READ8_DEVICE_HANDLER( latch8_bit4_r );
+DECLARE_READ8_DEVICE_HANDLER( latch8_bit5_r );
+DECLARE_READ8_DEVICE_HANDLER( latch8_bit6_r );
+DECLARE_READ8_DEVICE_HANDLER( latch8_bit7_r );
 
 /* read inverted bit x        */
 /* return (latch >> x) & 0x01 */
 
-READ8_DEVICE_HANDLER( latch8_bit0_q_r );
-READ8_DEVICE_HANDLER( latch8_bit1_q_r );
-READ8_DEVICE_HANDLER( latch8_bit2_q_r );
-READ8_DEVICE_HANDLER( latch8_bit3_q_r );
-READ8_DEVICE_HANDLER( latch8_bit4_q_r );
-READ8_DEVICE_HANDLER( latch8_bit5_q_r );
-READ8_DEVICE_HANDLER( latch8_bit6_q_r );
-READ8_DEVICE_HANDLER( latch8_bit7_q_r );
+DECLARE_READ8_DEVICE_HANDLER( latch8_bit0_q_r );
+DECLARE_READ8_DEVICE_HANDLER( latch8_bit1_q_r );
+DECLARE_READ8_DEVICE_HANDLER( latch8_bit2_q_r );
+DECLARE_READ8_DEVICE_HANDLER( latch8_bit3_q_r );
+DECLARE_READ8_DEVICE_HANDLER( latch8_bit4_q_r );
+DECLARE_READ8_DEVICE_HANDLER( latch8_bit5_q_r );
+DECLARE_READ8_DEVICE_HANDLER( latch8_bit6_q_r );
+DECLARE_READ8_DEVICE_HANDLER( latch8_bit7_q_r );
 
 /* write bit x from data into bit determined by offset */
 /* latch = (latch & ~(1<<offset)) | (((data >> x) & 0x01) << offset) */
 
-WRITE8_DEVICE_HANDLER( latch8_bit0_w );
-WRITE8_DEVICE_HANDLER( latch8_bit1_w );
-WRITE8_DEVICE_HANDLER( latch8_bit2_w );
-WRITE8_DEVICE_HANDLER( latch8_bit3_w );
-WRITE8_DEVICE_HANDLER( latch8_bit4_w );
-WRITE8_DEVICE_HANDLER( latch8_bit5_w );
-WRITE8_DEVICE_HANDLER( latch8_bit6_w );
-WRITE8_DEVICE_HANDLER( latch8_bit7_w );
+DECLARE_WRITE8_DEVICE_HANDLER( latch8_bit0_w );
+DECLARE_WRITE8_DEVICE_HANDLER( latch8_bit1_w );
+DECLARE_WRITE8_DEVICE_HANDLER( latch8_bit2_w );
+DECLARE_WRITE8_DEVICE_HANDLER( latch8_bit3_w );
+DECLARE_WRITE8_DEVICE_HANDLER( latch8_bit4_w );
+DECLARE_WRITE8_DEVICE_HANDLER( latch8_bit5_w );
+DECLARE_WRITE8_DEVICE_HANDLER( latch8_bit6_w );
+DECLARE_WRITE8_DEVICE_HANDLER( latch8_bit7_w );
 
 #endif /* __LATCH8_H_ */

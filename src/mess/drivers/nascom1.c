@@ -257,9 +257,9 @@ static const ay31015_config nascom1_ay31015_config =
 	AY_3_1015,
 	( XTAL_16MHz / 16 ) / 256,
 	( XTAL_16MHz / 16 ) / 256,
-	nascom1_hd6402_si,
-	nascom1_hd6402_so,
-	NULL
+	DEVCB_HANDLER(nascom1_hd6402_si),
+	DEVCB_HANDLER(nascom1_hd6402_so),
+	DEVCB_NULL
 };
 
 

@@ -696,12 +696,12 @@ static WRITE8_HANDLER( bebox_dma_write_byte )
 
 
 static READ8_DEVICE_HANDLER( bebox_dma8237_fdc_dack_r ) {
-	return pc_fdc_dack_r(device->machine());
+	return pc_fdc_dack_r(device->machine(),space);
 }
 
 
 static WRITE8_DEVICE_HANDLER( bebox_dma8237_fdc_dack_w ) {
-	pc_fdc_dack_w( device->machine(), data );
+	pc_fdc_dack_w( device->machine(), space, data );
 }
 
 

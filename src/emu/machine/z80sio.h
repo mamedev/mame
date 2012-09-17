@@ -32,12 +32,12 @@
 
 struct z80sio_interface
 {
-	void (*m_irq_cb)(device_t *device, int state);
-	write8_device_func m_dtr_changed_cb;
-	write8_device_func m_rts_changed_cb;
-	write8_device_func m_break_changed_cb;
-	write8_device_func m_transmit_cb;
-	int (*m_receive_poll_cb)(device_t *device, int channel);
+	devcb_write_line m_irq_cb;
+	devcb_write8 m_dtr_changed_cb;
+	devcb_write8 m_rts_changed_cb;
+	devcb_write8 m_break_changed_cb;
+	devcb_write16 m_transmit_cb;
+	devcb_read16 m_received_poll_cb;
 };
 
 
@@ -139,6 +139,14 @@ private:
 	// internal state
 	sio_channel					m_channel[2];			// 2 channels
 	UINT8						m_int_state[8];			// interrupt states
+
+	// callbacks
+	devcb_resolved_write_line m_irq;
+	devcb_resolved_write8 m_dtr_changed;
+	devcb_resolved_write8 m_rts_changed;
+	devcb_resolved_write8 m_break_changed;
+	devcb_resolved_write16 m_transmit;
+	devcb_resolved_read16 m_received_poll;
 
 	static const UINT8 k_int_priority[];
 };

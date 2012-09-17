@@ -707,37 +707,37 @@ WRITE8_MEMBER(wecleman_state::hotchase_sound_control_w)
 READ8_MEMBER(wecleman_state::hotchase_1_k007232_r)
 {
 	device_t *device = machine().device("konami1");
-	return k007232_r(device, offset ^ 1);
+	return k007232_r(device, space, offset ^ 1);
 }
 
 WRITE8_MEMBER(wecleman_state::hotchase_1_k007232_w)
 {
 	device_t *device = machine().device("konami1");
-	k007232_w(device, offset ^ 1, data);
+	k007232_w(device, space, offset ^ 1, data);
 }
 
 READ8_MEMBER(wecleman_state::hotchase_2_k007232_r)
 {
 	device_t *device = machine().device("konami2");
-	return k007232_r(device, offset ^ 1);
+	return k007232_r(device, space, offset ^ 1);
 }
 
 WRITE8_MEMBER(wecleman_state::hotchase_2_k007232_w)
 {
 	device_t *device = machine().device("konami2");
-	k007232_w(device, offset ^ 1, data);
+	k007232_w(device, space, offset ^ 1, data);
 }
 
 READ8_MEMBER(wecleman_state::hotchase_3_k007232_r)
 {
 	device_t *device = machine().device("konami3");
-	return k007232_r(device, offset ^ 1);
+	return k007232_r(device, space, offset ^ 1);
 }
 
 WRITE8_MEMBER(wecleman_state::hotchase_3_k007232_w)
 {
 	device_t *device = machine().device("konami3");
-	k007232_w(device, offset ^ 1, data);
+	k007232_w(device, space, offset ^ 1, data);
 }
 
 static ADDRESS_MAP_START( hotchase_sound_map, AS_PROGRAM, 8, wecleman_state )

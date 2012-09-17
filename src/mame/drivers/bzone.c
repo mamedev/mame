@@ -286,7 +286,7 @@ WRITE8_MEMBER(bzone_state::redbaron_joysound_w)
 {
 	device_t *device = machine().device("custom");
 	m_rb_input_select = data & 1;
-	redbaron_sounds_w(device, offset, data);
+	redbaron_sounds_w(device, space, offset, data);
 }
 
 

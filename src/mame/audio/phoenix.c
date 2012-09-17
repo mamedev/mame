@@ -494,12 +494,12 @@ WRITE8_DEVICE_HANDLER( phoenix_sound_control_a_w )
 {
 	phoenix_sound_state *state = get_safe_token(device);
 
-	discrete_sound_w(state->m_discrete, PHOENIX_EFFECT_2_DATA, data & 0x0f);
-	discrete_sound_w(state->m_discrete, PHOENIX_EFFECT_2_FREQ, (data & 0x30) >> 4);
+	discrete_sound_w(state->m_discrete, space, PHOENIX_EFFECT_2_DATA, data & 0x0f);
+	discrete_sound_w(state->m_discrete, space, PHOENIX_EFFECT_2_FREQ, (data & 0x30) >> 4);
 #if 0
 	/* future handling of noise sounds */
-	discrete_sound_w(state->m_discrete, PHOENIX_EFFECT_3_EN  , data & 0x40);
-	discrete_sound_w(state->m_discrete, PHOENIX_EFFECT_4_EN  , data & 0x80);
+	discrete_sound_w(state->m_discrete, space, PHOENIX_EFFECT_3_EN  , data & 0x40);
+	discrete_sound_w(state->m_discrete, space, PHOENIX_EFFECT_4_EN  , data & 0x80);
 #endif
 	state->m_channel->update();
 	state->m_sound_latch_a = data;
@@ -526,9 +526,9 @@ WRITE8_DEVICE_HANDLER( phoenix_sound_control_b_w )
 {
 	phoenix_sound_state *state = get_safe_token(device);
 
-	discrete_sound_w(state->m_discrete, PHOENIX_EFFECT_1_DATA, data & 0x0f);
-	discrete_sound_w(state->m_discrete, PHOENIX_EFFECT_1_FILT, data & 0x20);
-	discrete_sound_w(state->m_discrete, PHOENIX_EFFECT_1_FREQ, data & 0x10);
+	discrete_sound_w(state->m_discrete, space, PHOENIX_EFFECT_1_DATA, data & 0x0f);
+	discrete_sound_w(state->m_discrete, space, PHOENIX_EFFECT_1_FILT, data & 0x20);
+	discrete_sound_w(state->m_discrete, space, PHOENIX_EFFECT_1_FREQ, data & 0x10);
 
 	/* update the tune that the MM6221AA is playing */
 	mm6221aa_tune_w(state->m_tms, data >> 6);

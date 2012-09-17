@@ -655,9 +655,9 @@ WRITE8_MEMBER( msx_state::msx_fmpac_w )
 	if (m_opll_active)
 	{
 		if (offset == 1)
-			ym2413_w (m_ym, 1, data);
+			ym2413_w (m_ym, space, 1, data);
 		else
-			ym2413_w (m_ym, 0, data);
+			ym2413_w (m_ym, space, 0, data);
 	}
 }
 

@@ -774,18 +774,17 @@ static void akiko_update_cdrom(akiko_state *state)
 READ32_DEVICE_HANDLER( amiga_akiko32_r )
 {
 	akiko_state *state = get_safe_token(device);
-	address_space *space = state->m_space;
 	UINT32		retval;
 
 	if ( LOG_AKIKO && offset < (0x30/4) )
 	{
-		logerror( "Reading AKIKO reg %0x [%s] at PC=%06x\n", offset, get_akiko_reg_name(offset), space->device().safe_pc() );
+		logerror( "Reading AKIKO reg %0x [%s] at PC=%06x\n", offset, get_akiko_reg_name(offset), state->m_space->device().safe_pc() );
 	}
 
 	switch( offset )
 	{
 		case 0x00/4:	/* ID */
-			if ( state->m_cdrom != NULL ) cdda_set_cdrom(space->machine().device("cdda"), state->m_cdrom);
+			if ( state->m_cdrom != NULL ) cdda_set_cdrom(state->m_space->machine().device("cdda"), state->m_cdrom);
 			return 0x0000cafe;
 
 		case 0x04/4:	/* CDROM STATUS 1 */
@@ -838,11 +837,10 @@ READ32_DEVICE_HANDLER( amiga_akiko32_r )
 WRITE32_DEVICE_HANDLER( amiga_akiko32_w )
 {
 	akiko_state *state = get_safe_token(device);
-	address_space *space = state->m_space;
 
 	if ( LOG_AKIKO && offset < (0x30/4) )
 	{
-		logerror( "Writing AKIKO reg %0x [%s] with %08x at PC=%06x\n", offset, get_akiko_reg_name(offset), data, space->device().safe_pc() );
+		logerror( "Writing AKIKO reg %0x [%s] with %08x at PC=%06x\n", offset, get_akiko_reg_name(offset), data, state->m_space->device().safe_pc() );
 	}
 
 	switch( offset )

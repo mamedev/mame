@@ -46,11 +46,11 @@ WRITE8_MEMBER(dogfgt_state::dogfgt_soundcontrol_w)
 
 	/* bit 5 goes to 8910 #0 BDIR pin  */
 	if ((m_last_snd_ctrl & 0x20) == 0x20 && (data & 0x20) == 0x00)
-		ay8910_data_address_w(machine().device("ay1"), m_last_snd_ctrl >> 4, m_soundlatch);
+		ay8910_data_address_w(machine().device("ay1"), space, m_last_snd_ctrl >> 4, m_soundlatch);
 
 	/* bit 7 goes to 8910 #1 BDIR pin  */
 	if ((m_last_snd_ctrl & 0x80) == 0x80 && (data & 0x80) == 0x00)
-		ay8910_data_address_w(machine().device("ay2"), m_last_snd_ctrl >> 6, m_soundlatch);
+		ay8910_data_address_w(machine().device("ay2"), space, m_last_snd_ctrl >> 6, m_soundlatch);
 
 	m_last_snd_ctrl = data;
 }

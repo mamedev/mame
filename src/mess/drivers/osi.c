@@ -270,7 +270,7 @@ WRITE8_MEMBER( sb2m600_state::keyboard_w )
 	m_keylatch = data;
 
 	if (ioport("Sound")->read())
-		discrete_sound_w(m_discrete, NODE_01, (data >> 2) & 0x0f);
+		discrete_sound_w(m_discrete, space, NODE_01, (data >> 2) & 0x0f);
 }
 
 WRITE8_MEMBER( uk101_state::keyboard_w )
@@ -298,7 +298,7 @@ WRITE8_MEMBER( sb2m600_state::ctrl_w )
 	m_32 = BIT(data, 0);
 	m_coloren = BIT(data, 1);
 
-	discrete_sound_w(m_discrete, NODE_10, BIT(data, 4));
+	discrete_sound_w(m_discrete, space, NODE_10, BIT(data, 4));
 }
 
 WRITE8_MEMBER( c1p_state::osi630_ctrl_w )

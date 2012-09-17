@@ -25,7 +25,7 @@ void upd7759_set_bank_base(device_t *device, offs_t base);
 void upd7759_reset_w(device_t *device, UINT8 data);
 void upd7759_start_w(device_t *device, UINT8 data);
 int upd7759_busy_r(device_t *device);
-WRITE8_DEVICE_HANDLER( upd7759_port_w );
+DECLARE_WRITE8_DEVICE_HANDLER( upd7759_port_w );
 
 class upd7759_device : public device_t,
                                   public device_sound_interface

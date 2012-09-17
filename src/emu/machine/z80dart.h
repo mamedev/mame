@@ -341,19 +341,19 @@ extern const device_type Z80SIO4;
 //**************************************************************************
 
 // register access
-READ8_DEVICE_HANDLER( z80dart_cd_ba_r );
-WRITE8_DEVICE_HANDLER( z80dart_cd_ba_w );
+DECLARE_READ8_DEVICE_HANDLER( z80dart_cd_ba_r );
+DECLARE_WRITE8_DEVICE_HANDLER( z80dart_cd_ba_w );
 
-READ8_DEVICE_HANDLER( z80dart_ba_cd_r );
-WRITE8_DEVICE_HANDLER( z80dart_ba_cd_w );
+DECLARE_READ8_DEVICE_HANDLER( z80dart_ba_cd_r );
+DECLARE_WRITE8_DEVICE_HANDLER( z80dart_ba_cd_w );
 
 // control register access
-WRITE8_DEVICE_HANDLER( z80dart_c_w );
-READ8_DEVICE_HANDLER( z80dart_c_r );
+DECLARE_WRITE8_DEVICE_HANDLER( z80dart_c_w );
+DECLARE_READ8_DEVICE_HANDLER( z80dart_c_r );
 
 // data register access
-WRITE8_DEVICE_HANDLER( z80dart_d_w );
-READ8_DEVICE_HANDLER( z80dart_d_r );
+DECLARE_WRITE8_DEVICE_HANDLER( z80dart_d_w );
+DECLARE_READ8_DEVICE_HANDLER( z80dart_d_r );
 
 // serial clocks
 WRITE_LINE_DEVICE_HANDLER( z80dart_rxca_w );

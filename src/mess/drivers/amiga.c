@@ -48,9 +48,9 @@ public:
 	DECLARE_MACHINE_RESET(cdtv);
 };
 
-static READ8_DEVICE_HANDLER( amiga_cia_0_portA_r );
-static READ8_DEVICE_HANDLER( amiga_cia_0_cdtv_portA_r );
-static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w );
+static DECLARE_READ8_DEVICE_HANDLER( amiga_cia_0_portA_r );
+static DECLARE_READ8_DEVICE_HANDLER( amiga_cia_0_cdtv_portA_r );
+static DECLARE_WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w );
 
 /***************************************************************************
   Battery Backed-Up Clock (MSM6264)

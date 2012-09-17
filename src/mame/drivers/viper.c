@@ -1527,40 +1527,40 @@ static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, i
 READ64_MEMBER(viper_state::voodoo3_io_r)
 {
 	device_t *device = machine().device("voodoo");
-	return read64be_with_32le_device_handler(banshee_io_r, device, offset, mem_mask);
+	return read64be_with_32le_device_handler(banshee_io_r, device, space, offset, mem_mask);
 }
 WRITE64_MEMBER(viper_state::voodoo3_io_w)
 {
 //  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, space.device().safe_pc());
 
 	device_t *device = machine().device("voodoo");
-	write64be_with_32le_device_handler(banshee_io_w, device, offset, data, mem_mask);
+	write64be_with_32le_device_handler(banshee_io_w, device, space, offset, data, mem_mask);
 }
 
 READ64_MEMBER(viper_state::voodoo3_r)
 {
 	device_t *device = machine().device("voodoo");
-	return read64be_with_32le_device_handler(banshee_r, device, offset, mem_mask);
+	return read64be_with_32le_device_handler(banshee_r, device, space, offset, mem_mask);
 }
 WRITE64_MEMBER(viper_state::voodoo3_w)
 {
 //  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, space.device().safe_pc());
 
 	device_t *device = machine().device("voodoo");
-	write64be_with_32le_device_handler(banshee_w, device,  offset, data, mem_mask);
+	write64be_with_32le_device_handler(banshee_w, device, space, offset, data, mem_mask);
 }
 
 READ64_MEMBER(viper_state::voodoo3_lfb_r)
 {
 	device_t *device = machine().device("voodoo");
-	return read64be_with_32le_device_handler(banshee_fb_r, device, offset, mem_mask);
+	return read64be_with_32le_device_handler(banshee_fb_r, device, space, offset, mem_mask);
 }
 WRITE64_MEMBER(viper_state::voodoo3_lfb_w)
 {
 //  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, space.device().safe_pc());
 
 	device_t *device = machine().device("voodoo");
-	write64be_with_32le_device_handler(banshee_fb_w, device, offset, data, mem_mask);
+	write64be_with_32le_device_handler(banshee_fb_w, device, space, offset, data, mem_mask);
 }
 
 

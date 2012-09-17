@@ -11,7 +11,7 @@ void es8712_play(device_t *device);
 void es8712_set_bank_base(device_t *device, int base);
 void es8712_set_frequency(device_t *device, int frequency);
 
-WRITE8_DEVICE_HANDLER( es8712_w );
+DECLARE_WRITE8_DEVICE_HANDLER( es8712_w );
 
 class es8712_device : public device_t,
                                   public device_sound_interface

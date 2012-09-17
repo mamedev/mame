@@ -66,9 +66,9 @@ TIMER_DEVICE_CALLBACK( bsktball_scanline );
 
 /*----------- defined in audio/bsktball.c -----------*/
 
-WRITE8_DEVICE_HANDLER( bsktball_bounce_w );
-WRITE8_DEVICE_HANDLER( bsktball_note_w );
-WRITE8_DEVICE_HANDLER( bsktball_noise_reset_w );
+DECLARE_WRITE8_DEVICE_HANDLER( bsktball_bounce_w );
+DECLARE_WRITE8_DEVICE_HANDLER( bsktball_note_w );
+DECLARE_WRITE8_DEVICE_HANDLER( bsktball_noise_reset_w );
 
 DISCRETE_SOUND_EXTERN( bsktball );
 

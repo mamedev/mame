@@ -53,11 +53,11 @@ private:
 extern const device_type BEEZER;
 
 
-READ8_DEVICE_HANDLER( beezer_sh6840_r );
-WRITE8_DEVICE_HANDLER( beezer_sh6840_w );
-WRITE8_DEVICE_HANDLER( beezer_sfxctrl_w );
-WRITE8_DEVICE_HANDLER( beezer_timer1_w );
-READ8_DEVICE_HANDLER( beezer_noise_r );
+DECLARE_READ8_DEVICE_HANDLER( beezer_sh6840_r );
+DECLARE_WRITE8_DEVICE_HANDLER( beezer_sh6840_w );
+DECLARE_WRITE8_DEVICE_HANDLER( beezer_sfxctrl_w );
+DECLARE_WRITE8_DEVICE_HANDLER( beezer_timer1_w );
+DECLARE_READ8_DEVICE_HANDLER( beezer_noise_r );
 
 /*----------- defined in video/beezer.c -----------*/
 

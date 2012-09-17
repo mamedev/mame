@@ -82,8 +82,8 @@ struct mos6530_interface
     PROTOTYPES
 ***************************************************************************/
 
-READ8_DEVICE_HANDLER( mos6530_r );
-WRITE8_DEVICE_HANDLER( mos6530_w );
+DECLARE_READ8_DEVICE_HANDLER( mos6530_r );
+DECLARE_WRITE8_DEVICE_HANDLER( mos6530_w );
 
 void mos6530_porta_in_set(device_t *device, UINT8 data, UINT8 mask);
 void mos6530_portb_in_set(device_t *device, UINT8 data, UINT8 mask);

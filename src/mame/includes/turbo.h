@@ -137,16 +137,16 @@ MACHINE_CONFIG_EXTERN( turbo_samples );
 MACHINE_CONFIG_EXTERN( subroc3d_samples );
 MACHINE_CONFIG_EXTERN( buckrog_samples );
 
-WRITE8_DEVICE_HANDLER( turbo_sound_a_w );
-WRITE8_DEVICE_HANDLER( turbo_sound_b_w );
-WRITE8_DEVICE_HANDLER( turbo_sound_c_w );
+DECLARE_WRITE8_DEVICE_HANDLER( turbo_sound_a_w );
+DECLARE_WRITE8_DEVICE_HANDLER( turbo_sound_b_w );
+DECLARE_WRITE8_DEVICE_HANDLER( turbo_sound_c_w );
 
-WRITE8_DEVICE_HANDLER( subroc3d_sound_a_w );
-WRITE8_DEVICE_HANDLER( subroc3d_sound_b_w );
-WRITE8_DEVICE_HANDLER( subroc3d_sound_c_w );
+DECLARE_WRITE8_DEVICE_HANDLER( subroc3d_sound_a_w );
+DECLARE_WRITE8_DEVICE_HANDLER( subroc3d_sound_b_w );
+DECLARE_WRITE8_DEVICE_HANDLER( subroc3d_sound_c_w );
 
-WRITE8_DEVICE_HANDLER( buckrog_sound_a_w );
-WRITE8_DEVICE_HANDLER( buckrog_sound_b_w );
+DECLARE_WRITE8_DEVICE_HANDLER( buckrog_sound_a_w );
+DECLARE_WRITE8_DEVICE_HANDLER( buckrog_sound_b_w );
 
 
 /*----------- defined in video/turbo.c -----------*/

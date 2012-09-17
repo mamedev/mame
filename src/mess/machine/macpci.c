@@ -26,12 +26,12 @@ static TIMER_CALLBACK(mac_6015_tick);
 
 /* VIA1 Handlers */
 
-static READ8_DEVICE_HANDLER(mac_via_in_a);
-static READ8_DEVICE_HANDLER(mac_via_in_b);
-static READ8_DEVICE_HANDLER(mac_adb_via_in_cb2);
-static WRITE8_DEVICE_HANDLER(mac_via_out_a);
-static WRITE8_DEVICE_HANDLER(mac_via_out_b);
-static WRITE8_DEVICE_HANDLER(mac_adb_via_out_cb2);
+static DECLARE_READ8_DEVICE_HANDLER(mac_via_in_a);
+static DECLARE_READ8_DEVICE_HANDLER(mac_via_in_b);
+static DECLARE_READ8_DEVICE_HANDLER(mac_adb_via_in_cb2);
+static DECLARE_WRITE8_DEVICE_HANDLER(mac_via_out_a);
+static DECLARE_WRITE8_DEVICE_HANDLER(mac_via_out_b);
+static DECLARE_WRITE8_DEVICE_HANDLER(mac_adb_via_out_cb2);
 static void mac_via_irq(device_t *device, int state);
 
 const via6522_interface pcimac_via6522_intf =

@@ -455,7 +455,7 @@ READ8_MEMBER( segas16a_state::n7751_p2_r )
 {
 	// read from P2 - 8255's PC0-2 connects to 7751's S0-2 (P24-P26 on an 8048)
 	// bit 0x80 is an alternate way to control the sample on/off; doesn't appear to be used
-	return 0x80 | ((m_n7751_command & 0x07) << 4) | (i8243_p2_r(m_n7751_i8243, offset) & 0x0f);
+	return 0x80 | ((m_n7751_command & 0x07) << 4) | (i8243_p2_r(m_n7751_i8243, space, offset) & 0x0f);
 }
 
 
@@ -466,7 +466,7 @@ READ8_MEMBER( segas16a_state::n7751_p2_r )
 WRITE8_MEMBER( segas16a_state::n7751_p2_w )
 {
 	// write to P2; low 4 bits go to 8243
-	i8243_p2_w(m_n7751_i8243, offset, data & 0x0f);
+	i8243_p2_w(m_n7751_i8243, space, offset, data & 0x0f);
 
 	// output of bit $80 indicates we are ready (1) or busy (0)
 	// no other outputs are used

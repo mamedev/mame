@@ -172,8 +172,8 @@ WRITE8_MEMBER(cliffhgr_state::cliff_sound_overlay_w)
 {
 	device_t *device = machine().device("discrete");
 	/* audio */
-	discrete_sound_w(device, CLIFF_ENABLE_SND_1, data & 1);
-	discrete_sound_w(device, CLIFF_ENABLE_SND_2, (data >> 1) & 1);
+	discrete_sound_w(device, space, CLIFF_ENABLE_SND_1, data & 1);
+	discrete_sound_w(device, space, CLIFF_ENABLE_SND_2, (data >> 1) & 1);
 
 	// bit 4 (data & 0x10) is overlay related?
 }

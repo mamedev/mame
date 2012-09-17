@@ -28,12 +28,12 @@ Audio handlers
 
 static WRITE8_DEVICE_HANDLER( qix_dac_w )
 {
-	discrete_sound_w(device, QIX_DAC_DATA, data);
+	discrete_sound_w(device, space, QIX_DAC_DATA, data);
 }
 
 static WRITE8_DEVICE_HANDLER( qix_vol_w )
 {
-	discrete_sound_w(device, QIX_VOL_DATA, data);
+	discrete_sound_w(device, space, QIX_VOL_DATA, data);
 }
 
 

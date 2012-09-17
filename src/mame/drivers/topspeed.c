@@ -359,7 +359,7 @@ static INTERRUPT_GEN( topspeed_cpub_interrupt )
 
 READ8_MEMBER(topspeed_state::topspeed_input_bypass_r)
 {
-	UINT8 port = tc0220ioc_port_r(m_tc0220ioc, 0);	/* read port number */
+	UINT8 port = tc0220ioc_port_r(m_tc0220ioc, space, 0);	/* read port number */
 	UINT16 steer = 0xff80 + ioport("STEER")->read_safe(0);
 
 	switch (port)
@@ -371,7 +371,7 @@ READ8_MEMBER(topspeed_state::topspeed_input_bypass_r)
 			return steer >> 8;
 
 		default:
-			return tc0220ioc_portreg_r(m_tc0220ioc, offset);
+			return tc0220ioc_portreg_r(m_tc0220ioc, space, offset);
 	}
 }
 
@@ -424,7 +424,7 @@ WRITE8_MEMBER(topspeed_state::sound_bankswitch_w)/* assumes Z80 sandwiched betwe
 static WRITE8_DEVICE_HANDLER( topspeed_tc0140syt_comm_w )
 {
 	device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	tc0140syt_comm_w(device, 0, data);
+	tc0140syt_comm_w(device, space, 0, data);
 }
 
 static void topspeed_msm5205_clock( device_t *device, int chip )

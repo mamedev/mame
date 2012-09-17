@@ -346,16 +346,16 @@ READ8_MEMBER(coco_fdc_device::read)
 	switch(offset & 0xEF)
 	{
 		case 8:
-			result = wd17xx_status_r(m_wd17xx, 0);
+			result = wd17xx_status_r(m_wd17xx, space, 0);
 			break;
 		case 9:
-			result = wd17xx_track_r(m_wd17xx, 0);
+			result = wd17xx_track_r(m_wd17xx, space, 0);
 			break;
 		case 10:
-			result = wd17xx_sector_r(m_wd17xx, 0);
+			result = wd17xx_sector_r(m_wd17xx, space, 0);
 			break;
 		case 11:
-			result = wd17xx_data_r(m_wd17xx, 0);
+			result = wd17xx_data_r(m_wd17xx, space, 0);
 			break;
 	}
 
@@ -369,17 +369,17 @@ READ8_MEMBER(coco_fdc_device::read)
 
 		case 0x38:	/* FF78 */
 			if (real_time_clock() == RTC_CLOUD9)
-				ds1315_r_0(m_ds1315, offset);
+				ds1315_r_0(m_ds1315, space, offset);
 			break;
 
 		case 0x39:	/* FF79 */
 			if (real_time_clock() == RTC_CLOUD9)
-				ds1315_r_1(m_ds1315, offset);
+				ds1315_r_1(m_ds1315, space, offset);
 			break;
 
 		case 0x3C:	/* FF7C */
 			if (real_time_clock() == RTC_CLOUD9)
-				result = ds1315_r_data(m_ds1315, offset);
+				result = ds1315_r_data(m_ds1315, space, offset);
 			break;
 	}
 	return result;
@@ -400,16 +400,16 @@ WRITE8_MEMBER(coco_fdc_device::write)
 			dskreg_w(data);
 			break;
 		case 8:
-			wd17xx_command_w(m_wd17xx, 0, data);
+			wd17xx_command_w(m_wd17xx, space, 0, data);
 			break;
 		case 9:
-			wd17xx_track_w(m_wd17xx, 0, data);
+			wd17xx_track_w(m_wd17xx, space, 0, data);
 			break;
 		case 10:
-			wd17xx_sector_w(m_wd17xx, 0, data);
+			wd17xx_sector_w(m_wd17xx, space, 0, data);
 			break;
 		case 11:
-			wd17xx_data_w(m_wd17xx, 0, data);
+			wd17xx_data_w(m_wd17xx, space, 0, data);
 			break;
 	};
 
@@ -560,16 +560,16 @@ READ8_MEMBER(dragon_fdc_device::read)
 	switch(offset & 0xEF)
 	{
 		case 0:
-			result = wd17xx_status_r(m_wd17xx, 0);
+			result = wd17xx_status_r(m_wd17xx, space, 0);
 			break;
 		case 1:
-			result = wd17xx_track_r(m_wd17xx, 0);
+			result = wd17xx_track_r(m_wd17xx, space, 0);
 			break;
 		case 2:
-			result = wd17xx_sector_r(m_wd17xx, 0);
+			result = wd17xx_sector_r(m_wd17xx, space, 0);
 			break;
 		case 3:
-			result = wd17xx_data_r(m_wd17xx, 0);
+			result = wd17xx_data_r(m_wd17xx, space, 0);
 			break;
 	}
 	return result;
@@ -586,7 +586,7 @@ WRITE8_MEMBER(dragon_fdc_device::write)
 	switch(offset & 0xEF)
 	{
 		case 0:
-			wd17xx_command_w(m_wd17xx, 0, data);
+			wd17xx_command_w(m_wd17xx, space, 0, data);
 
 			/* disk head is encoded in the command byte */
 			/* Only for type 3 & 4 commands */
@@ -594,13 +594,13 @@ WRITE8_MEMBER(dragon_fdc_device::write)
 				wd17xx_set_side(m_wd17xx, (data & 0x02) ? 1 : 0);
 			break;
 		case 1:
-			wd17xx_track_w(m_wd17xx, 0, data);
+			wd17xx_track_w(m_wd17xx, space, 0, data);
 			break;
 		case 2:
-			wd17xx_sector_w(m_wd17xx, 0, data);
+			wd17xx_sector_w(m_wd17xx, space, 0, data);
 			break;
 		case 3:
-			wd17xx_data_w(m_wd17xx, 0, data);
+			wd17xx_data_w(m_wd17xx, space, 0, data);
 			break;
 		case 8: case 9: case 10: case 11:
 		case 12: case 13: case 14: case 15:

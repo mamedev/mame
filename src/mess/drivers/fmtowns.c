@@ -393,25 +393,25 @@ WRITE8_MEMBER(towns_state::towns_sys6c_w)
 READ8_MEMBER(towns_state::towns_dma1_r)
 {
 //  logerror("DMA#1: read register %i\n",offset);
-	return upd71071_r(m_dma_1,offset);
+	return upd71071_r(m_dma_1,space, offset);
 }
 
 WRITE8_MEMBER(towns_state::towns_dma1_w)
 {
 //  logerror("DMA#1: wrote 0x%02x to register %i\n",data,offset);
-	upd71071_w(m_dma_1,offset,data);
+	upd71071_w(m_dma_1,space, offset,data);
 }
 
 READ8_MEMBER(towns_state::towns_dma2_r)
 {
 	logerror("DMA#2: read register %i\n",offset);
-	return upd71071_r(m_dma_2,offset);
+	return upd71071_r(m_dma_2,space, offset);
 }
 
 WRITE8_MEMBER(towns_state::towns_dma2_w)
 {
 	logerror("DMA#2: wrote 0x%02x to register %i\n",data,offset);
-	upd71071_w(m_dma_2,offset,data);
+	upd71071_w(m_dma_2,space, offset,data);
 }
 
 /*
@@ -440,13 +440,13 @@ READ8_MEMBER(towns_state::towns_floppy_r)
 	switch(offset)
 	{
 		case 0x00:
-			return wd17xx_status_r(fdc,offset/2);
+			return wd17xx_status_r(fdc,space, offset/2);
 		case 0x02:
-			return wd17xx_track_r(fdc,offset/2);
+			return wd17xx_track_r(fdc,space, offset/2);
 		case 0x04:
-			return wd17xx_sector_r(fdc,offset/2);
+			return wd17xx_sector_r(fdc,space, offset/2);
 		case 0x06:
-			return wd17xx_data_r(fdc,offset/2);
+			return wd17xx_data_r(fdc,space, offset/2);
 		case 0x08:  // selected drive status?
 			//logerror("FDC: read from offset 0x08\n");
 			ret = 0x80;  // always set
@@ -492,16 +492,16 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 				return;
 			if(data == 0xfe)
 				return;
-			wd17xx_command_w(fdc,offset/2,data);
+			wd17xx_command_w(fdc,space, offset/2,data);
 			break;
 		case 0x02:
-			wd17xx_track_w(fdc,offset/2,data);
+			wd17xx_track_w(fdc,space, offset/2,data);
 			break;
 		case 0x04:
-			wd17xx_sector_w(fdc,offset/2,data);
+			wd17xx_sector_w(fdc,space, offset/2,data);
 			break;
 		case 0x06:
-			wd17xx_data_w(fdc,offset/2,data);
+			wd17xx_data_w(fdc,space, offset/2,data);
 			break;
 		case 0x08:
 			// bit 5 - CLKSEL
@@ -550,14 +550,14 @@ static UINT16 towns_fdc_dma_r(running_machine &machine)
 {
 	towns_state* state = machine.driver_data<towns_state>();
 	device_t* fdc = state->m_fdc;
-	return wd17xx_data_r(fdc,0);
+	return wd17xx_data_r(fdc,state->generic_space(), 0);
 }
 
 static void towns_fdc_dma_w(running_machine &machine, UINT16 data)
 {
 	towns_state* state = machine.driver_data<towns_state>();
 	device_t* fdc = state->m_fdc;
-	wd17xx_data_w(fdc,0,data);
+	wd17xx_data_w(fdc,state->generic_space(), 0,data);
 }
 
 /*

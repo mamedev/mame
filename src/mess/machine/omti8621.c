@@ -1037,10 +1037,10 @@ WRITE16_DEVICE_HANDLER(omti8621_w ) {
 
 	switch (mem_mask) {
 	case 0x00ff:
-		omti8621_w8(device, offset*2+1, data);
+		omti8621_w8(device, space, offset*2+1, data, mem_mask);
 		break;
 	case 0xff00:
-		omti8621_w8(device, offset*2, data>>8);
+		omti8621_w8(device, space, offset*2, data>>8, mem_mask>>8);
 		break;
 	default:
 		LOG3(("writing OMTI 8621 Data Word Register to %0x = %04x & %04x", offset, data, mem_mask));
@@ -1054,10 +1054,10 @@ READ16_DEVICE_HANDLER( omti8621_r ) {
 	UINT16 data;
 	switch (mem_mask) {
 	case 0x00ff:
-		data = omti8621_r8(device, offset*2+1);
+		data = omti8621_r8(device, space, offset*2+1, mem_mask);
 		break;
 	case 0xff00:
-		data = omti8621_r8(device, offset*2) << 8;
+		data = omti8621_r8(device, space, offset*2, mem_mask >> 8) << 8;
 		break;
 	default:
 		data = get_data(state);

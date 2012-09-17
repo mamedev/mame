@@ -247,14 +247,14 @@ static WRITE8_DEVICE_HANDLER( ad2083_tms5110_ctrl_w )
 {
 	static const int tbl[8] = {0,4,2,6,1,5,3,7};
 
-	tmsprom_bit_w(device, 0, tbl[data & 0x07]);
+	tmsprom_bit_w(device, space, 0, tbl[data & 0x07]);
 	switch (data>>3)
 	{
 		case 0x01:
-			tmsprom_rom_csq_w(device, 1, 0);
+			tmsprom_rom_csq_w(device, space, 1, 0);
 			break;
 		case 0x03:
-			tmsprom_rom_csq_w(device, 0, 0);
+			tmsprom_rom_csq_w(device, space, 0, 0);
 			break;
 		case 0x00:
 			/* Rom 2 select */

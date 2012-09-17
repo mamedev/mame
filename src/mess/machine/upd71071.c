@@ -416,8 +416,8 @@ static WRITE8_DEVICE_HANDLER(upd71071_write)
 	}
 }
 
-READ8_DEVICE_HANDLER(upd71071_r) { return upd71071_read(device,offset); }
-WRITE8_DEVICE_HANDLER(upd71071_w) { upd71071_write(device,offset,data); }
+READ8_DEVICE_HANDLER(upd71071_r) { return upd71071_read(device,space,offset,mem_mask); }
+WRITE8_DEVICE_HANDLER(upd71071_w) { upd71071_write(device,space,offset,data,mem_mask); }
 
 const device_type UPD71071 = &device_creator<upd71071_device>;
 

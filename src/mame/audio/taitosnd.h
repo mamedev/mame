@@ -48,15 +48,15 @@ extern const device_type TC0140SYT;
 ***************************************************************************/
 
 /* MASTER (8bit bus) control functions */
-WRITE8_DEVICE_HANDLER( tc0140syt_port_w );
-WRITE8_DEVICE_HANDLER( tc0140syt_comm_w );
-READ8_DEVICE_HANDLER( tc0140syt_comm_r );
+DECLARE_WRITE8_DEVICE_HANDLER( tc0140syt_port_w );
+DECLARE_WRITE8_DEVICE_HANDLER( tc0140syt_comm_w );
+DECLARE_READ8_DEVICE_HANDLER( tc0140syt_comm_r );
 
 
 /* SLAVE (8bit bus) control functions ONLY */
-WRITE8_DEVICE_HANDLER( tc0140syt_slave_port_w );
-READ8_DEVICE_HANDLER( tc0140syt_slave_comm_r );
-WRITE8_DEVICE_HANDLER( tc0140syt_slave_comm_w );
+DECLARE_WRITE8_DEVICE_HANDLER( tc0140syt_slave_port_w );
+DECLARE_READ8_DEVICE_HANDLER( tc0140syt_slave_comm_r );
+DECLARE_WRITE8_DEVICE_HANDLER( tc0140syt_slave_comm_w );
 
 
 #endif /*__TAITOSND_H__*/

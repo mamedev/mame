@@ -72,7 +72,7 @@ WRITE8_MEMBER(_4enraya_state::sound_control_w)
 	device_t *device = machine().device("aysnd");
 
 	if ((m_last_snd_ctrl & m_snd_latch_bit ) == m_snd_latch_bit && (data & m_snd_latch_bit) == 0x00)
-		ay8910_data_address_w(device, m_last_snd_ctrl, m_soundlatch);
+		ay8910_data_address_w(device, space, m_last_snd_ctrl, m_soundlatch);
 
 	m_last_snd_ctrl = data;
 }

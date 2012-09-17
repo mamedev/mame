@@ -54,9 +54,9 @@ struct	ay31015_config
 	ay31015_type_t		type;					/* Type of chip */
 	double				transmitter_clock;		/* TCP - pin 40 */
 	double				receiver_clock;			/* RCP - pin 17 */
-	read8_device_func	read_si;				/* SI - pin 20 - This will be called whenever the SI pin is sampled. Optional */
-	write8_device_func	write_so;				/* SO - pin 25 - This will be called whenever data is put on the SO pin. Optional */
-	write8_device_func	status_changed;			/* This will be called whenever one of the status pins may have changed. Optional */
+	devcb_read8			read_si_cb;				/* SI - pin 20 - This will be called whenever the SI pin is sampled. Optional */
+	devcb_write8		write_so_cb;				/* SO - pin 25 - This will be called whenever data is put on the SO pin. Optional */
+	devcb_write8		status_changed_cb;			/* This will be called whenever one of the status pins may have changed. Optional */
 };
 
 

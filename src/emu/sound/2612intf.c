@@ -146,15 +146,15 @@ WRITE8_DEVICE_HANDLER( ym2612_w )
 }
 
 
-READ8_DEVICE_HANDLER( ym2612_status_port_a_r ) { return ym2612_r(device, 0); }
-READ8_DEVICE_HANDLER( ym2612_status_port_b_r ) { return ym2612_r(device, 2); }
-READ8_DEVICE_HANDLER( ym2612_data_port_a_r ) { return ym2612_r(device, 1); }
-READ8_DEVICE_HANDLER( ym2612_data_port_b_r ) { return ym2612_r(device, 3); }
+READ8_DEVICE_HANDLER( ym2612_status_port_a_r ) { return ym2612_r(device, space, 0); }
+READ8_DEVICE_HANDLER( ym2612_status_port_b_r ) { return ym2612_r(device, space, 2); }
+READ8_DEVICE_HANDLER( ym2612_data_port_a_r ) { return ym2612_r(device, space, 1); }
+READ8_DEVICE_HANDLER( ym2612_data_port_b_r ) { return ym2612_r(device, space, 3); }
 
-WRITE8_DEVICE_HANDLER( ym2612_control_port_a_w ) { ym2612_w(device, 0, data); }
-WRITE8_DEVICE_HANDLER( ym2612_control_port_b_w ) { ym2612_w(device, 2, data); }
-WRITE8_DEVICE_HANDLER( ym2612_data_port_a_w ) { ym2612_w(device, 1, data); }
-WRITE8_DEVICE_HANDLER( ym2612_data_port_b_w ) { ym2612_w(device, 3, data); }
+WRITE8_DEVICE_HANDLER( ym2612_control_port_a_w ) { ym2612_w(device, space, 0, data); }
+WRITE8_DEVICE_HANDLER( ym2612_control_port_b_w ) { ym2612_w(device, space, 2, data); }
+WRITE8_DEVICE_HANDLER( ym2612_data_port_a_w ) { ym2612_w(device, space, 1, data); }
+WRITE8_DEVICE_HANDLER( ym2612_data_port_b_w ) { ym2612_w(device, space, 3, data); }
 
 const device_type YM2612 = &device_creator<ym2612_device>;
 

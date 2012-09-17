@@ -116,11 +116,11 @@ extern const device_type INS8154;
     PROTOTYPES
 ***************************************************************************/
 
-READ8_DEVICE_HANDLER( ins8154_r );
-WRITE8_DEVICE_HANDLER( ins8154_w );
+DECLARE_READ8_DEVICE_HANDLER( ins8154_r );
+DECLARE_WRITE8_DEVICE_HANDLER( ins8154_w );
 
-WRITE8_DEVICE_HANDLER( ins8154_porta_w );
-WRITE8_DEVICE_HANDLER( ins8154_portb_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ins8154_porta_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ins8154_portb_w );
 
 
 #endif /* __INS8154_H__ */

@@ -44,18 +44,18 @@ extern const device_type UPD4701;
     PROTOTYPES
 ***************************************************************************/
 
-extern WRITE8_DEVICE_HANDLER( upd4701_cs_w );
-extern WRITE8_DEVICE_HANDLER( upd4701_xy_w );
-extern WRITE8_DEVICE_HANDLER( upd4701_ul_w );
-extern WRITE8_DEVICE_HANDLER( upd4701_resetx_w );
-extern WRITE8_DEVICE_HANDLER( upd4701_resety_w );
-extern WRITE16_DEVICE_HANDLER( upd4701_x_add );
-extern WRITE16_DEVICE_HANDLER( upd4701_y_add );
-extern WRITE8_DEVICE_HANDLER( upd4701_switches_set );
+extern DECLARE_WRITE8_DEVICE_HANDLER( upd4701_cs_w );
+extern DECLARE_WRITE8_DEVICE_HANDLER( upd4701_xy_w );
+extern DECLARE_WRITE8_DEVICE_HANDLER( upd4701_ul_w );
+extern DECLARE_WRITE8_DEVICE_HANDLER( upd4701_resetx_w );
+extern DECLARE_WRITE8_DEVICE_HANDLER( upd4701_resety_w );
+extern DECLARE_WRITE16_DEVICE_HANDLER( upd4701_x_add );
+extern DECLARE_WRITE16_DEVICE_HANDLER( upd4701_y_add );
+extern DECLARE_WRITE8_DEVICE_HANDLER( upd4701_switches_set );
 
-extern READ16_DEVICE_HANDLER( upd4701_d_r );
-extern READ8_DEVICE_HANDLER( upd4701_cf_r );
-extern READ8_DEVICE_HANDLER( upd4701_sf_r );
+extern DECLARE_READ16_DEVICE_HANDLER( upd4701_d_r );
+extern DECLARE_READ8_DEVICE_HANDLER( upd4701_cf_r );
+extern DECLARE_READ8_DEVICE_HANDLER( upd4701_sf_r );
 
 
 #endif	/* __UPD4701_H__ */

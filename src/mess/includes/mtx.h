@@ -68,14 +68,14 @@ SNAPSHOT_LOAD( mtx );
 
 
 /* Sound */
-READ8_DEVICE_HANDLER( mtx_sound_strobe_r );
+DECLARE_READ8_DEVICE_HANDLER( mtx_sound_strobe_r );
 
 /* Cassette */
-WRITE8_DEVICE_HANDLER( mtx_cst_w );
+DECLARE_WRITE8_DEVICE_HANDLER( mtx_cst_w );
 
 /* Printer */
-READ8_DEVICE_HANDLER( mtx_strobe_r );
-READ8_DEVICE_HANDLER( mtx_prt_r );
+DECLARE_READ8_DEVICE_HANDLER( mtx_strobe_r );
+DECLARE_READ8_DEVICE_HANDLER( mtx_prt_r );
 
 /* Keyboard */
 

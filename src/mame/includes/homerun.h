@@ -57,7 +57,7 @@ public:
 
 /*----------- defined in video/homerun.c -----------*/
 
-WRITE8_DEVICE_HANDLER( homerun_banking_w );
+DECLARE_WRITE8_DEVICE_HANDLER( homerun_banking_w );
 
 
 SCREEN_UPDATE_IND16(homerun);

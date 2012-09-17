@@ -154,7 +154,7 @@ extern const device_type MK48T08;
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE8_DEVICE_HANDLER( timekeeper_w );
-READ8_DEVICE_HANDLER( timekeeper_r );
+DECLARE_WRITE8_DEVICE_HANDLER( timekeeper_w );
+DECLARE_READ8_DEVICE_HANDLER( timekeeper_r );
 
 #endif // __TIMEKPR_H__

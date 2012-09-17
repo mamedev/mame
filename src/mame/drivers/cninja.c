@@ -149,14 +149,14 @@ READ16_MEMBER(cninja_state::robocop2_prot_r)
 WRITE16_MEMBER(cninja_state::cninja_pf12_control_w)
 {
 	machine().primary_screen->update_partial(machine().primary_screen->vpos());
-	deco16ic_pf_control_w(m_deco_tilegen1, offset, data, mem_mask);
+	deco16ic_pf_control_w(m_deco_tilegen1, space, offset, data, mem_mask);
 }
 
 
 WRITE16_MEMBER(cninja_state::cninja_pf34_control_w)
 {
 	machine().primary_screen->update_partial(machine().primary_screen->vpos());
-	deco16ic_pf_control_w(m_deco_tilegen2, offset, data, mem_mask);
+	deco16ic_pf_control_w(m_deco_tilegen2, space, offset, data, mem_mask);
 }
 
 

@@ -200,7 +200,7 @@ WRITE8_MEMBER(pc_state::pc_dma_write_byte)
 
 static READ8_DEVICE_HANDLER( pc_dma8237_fdc_dack_r )
 {
-	return pc_fdc_dack_r(device->machine());
+	return pc_fdc_dack_r(device->machine(), space);
 }
 
 
@@ -212,7 +212,7 @@ static READ8_DEVICE_HANDLER( pc_dma8237_hdc_dack_r )
 
 static WRITE8_DEVICE_HANDLER( pc_dma8237_fdc_dack_w )
 {
-	pc_fdc_dack_w( device->machine(), data );
+	pc_fdc_dack_w( device->machine(), space, data );
 }
 
 

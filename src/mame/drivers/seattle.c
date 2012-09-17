@@ -1068,7 +1068,7 @@ static void galileo_perform_dma(address_space *space, int which)
 				}
 
 				/* write the data and advance */
-				voodoo_w(state->m_voodoo, (dstaddr & 0xffffff) / 4, space->read_dword(srcaddr), 0xffffffff);
+				voodoo_w(state->m_voodoo, *space, (dstaddr & 0xffffff) / 4, space->read_dword(srcaddr), 0xffffffff);
 				srcaddr += srcinc;
 				dstaddr += dstinc;
 				bytesleft -= 4;
@@ -1353,7 +1353,7 @@ WRITE32_MEMBER(seattle_state::seattle_voodoo_w)
 	/* if we're not stalled, just write and get out */
 	if (!m_voodoo_stalled)
 	{
-		voodoo_w(m_voodoo, offset, data, mem_mask);
+		voodoo_w(m_voodoo, space, offset, data, mem_mask);
 		return;
 	}
 
@@ -1419,7 +1419,10 @@ static void voodoo_stall(device_t *device, int stall)
 		{
 			/* if the CPU had a pending write, do it now */
 			if (state->m_cpu_stalled_on_voodoo)
-				voodoo_w(device, state->m_cpu_stalled_offset, state->m_cpu_stalled_data, state->m_cpu_stalled_mem_mask);
+			{
+				address_space &space = *device->machine().firstcpu->space(AS_PROGRAM);
+				voodoo_w(device, space, state->m_cpu_stalled_offset, state->m_cpu_stalled_data, state->m_cpu_stalled_mem_mask);
+			}
 			state->m_cpu_stalled_on_voodoo = FALSE;
 
 			/* resume CPU execution */
@@ -1523,9 +1526,9 @@ READ32_MEMBER(seattle_state::ethernet_r)
 {
 	device_t *device = machine().device("ethernet");
 	if (!(offset & 8))
-		return smc91c9x_r(device, offset & 7, mem_mask & 0xffff);
+		return smc91c9x_r(device, space, offset & 7, mem_mask & 0xffff);
 	else
-		return smc91c9x_r(device, offset & 7, mem_mask & 0x00ff);
+		return smc91c9x_r(device, space, offset & 7, mem_mask & 0x00ff);
 }
 
 
@@ -1533,9 +1536,9 @@ WRITE32_MEMBER(seattle_state::ethernet_w)
 {
 	device_t *device = machine().device("ethernet");
 	if (!(offset & 8))
-		smc91c9x_w(device, offset & 7, data & 0xffff, mem_mask | 0xffff);
+		smc91c9x_w(device, space, offset & 7, data & 0xffff, mem_mask | 0xffff);
 	else
-		smc91c9x_w(device, offset & 7, data & 0x00ff, mem_mask | 0x00ff);
+		smc91c9x_w(device, space, offset & 7, data & 0x00ff, mem_mask | 0x00ff);
 }
 
 
@@ -1589,7 +1592,7 @@ READ32_MEMBER(seattle_state::widget_r)
 			break;
 
 		case WREG_ETHER_DATA:
-			result = smc91c9x_r(device, m_widget.ethernet_addr & 7, mem_mask & 0xffff);
+			result = smc91c9x_r(device, space, m_widget.ethernet_addr & 7, mem_mask & 0xffff);
 			break;
 	}
 
@@ -1621,7 +1624,7 @@ WRITE32_MEMBER(seattle_state::widget_w)
 			break;
 
 		case WREG_ETHER_DATA:
-			smc91c9x_w(device, m_widget.ethernet_addr & 7, data & 0xffff, mem_mask & 0xffff);
+			smc91c9x_w(device, space, m_widget.ethernet_addr & 7, data & 0xffff, mem_mask & 0xffff);
 			break;
 	}
 }
@@ -1784,7 +1787,7 @@ READ32_MEMBER(seattle_state::seattle_ide_r)
 	/* note that blitz times out if we don't have this cycle stealing */
 	if (offset == 0x3f6/4)
 		machine().device("maincpu")->execute().eat_cycles(100);
-	return ide_controller32_r(device, offset, mem_mask);
+	return ide_controller32_r(device, space, offset, mem_mask);
 }
 
 static ADDRESS_MAP_START( seattle_map, AS_PROGRAM, 32, seattle_state )

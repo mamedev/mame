@@ -81,8 +81,8 @@ extern const device_type K033906;
     PROTOTYPES
 ***************************************************************************/
 
-extern READ32_DEVICE_HANDLER( k033906_r );
-extern WRITE32_DEVICE_HANDLER( k033906_w );
+extern DECLARE_READ32_DEVICE_HANDLER( k033906_r );
+extern DECLARE_WRITE32_DEVICE_HANDLER( k033906_w );
 extern WRITE_LINE_DEVICE_HANDLER( k033906_set_reg );
 
 

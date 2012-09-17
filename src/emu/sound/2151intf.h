@@ -11,12 +11,12 @@ struct ym2151_interface
 	devcb_write8 portwritehandler;
 };
 
-READ8_DEVICE_HANDLER( ym2151_r );
-WRITE8_DEVICE_HANDLER( ym2151_w );
+DECLARE_READ8_DEVICE_HANDLER( ym2151_r );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2151_w );
 
-READ8_DEVICE_HANDLER( ym2151_status_port_r );
-WRITE8_DEVICE_HANDLER( ym2151_register_port_w );
-WRITE8_DEVICE_HANDLER( ym2151_data_port_w );
+DECLARE_READ8_DEVICE_HANDLER( ym2151_status_port_r );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2151_register_port_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2151_data_port_w );
 
 class ym2151_device : public device_t,
                                   public device_sound_interface

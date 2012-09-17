@@ -114,8 +114,9 @@ SCREEN_UPDATE_IND16( subs_left )
 	}
 
 	/* Update sound */
-	discrete_sound_w(discrete, SUBS_LAUNCH_DATA, spriteram[5] & 0x0f);	// Launch data
-	discrete_sound_w(discrete, SUBS_CRASH_DATA, spriteram[5] >> 4);		// Crash/explode data
+	address_space &space = screen.machine().driver_data()->generic_space();
+	discrete_sound_w(discrete, space, SUBS_LAUNCH_DATA, spriteram[5] & 0x0f);	// Launch data
+	discrete_sound_w(discrete, space, SUBS_CRASH_DATA, spriteram[5] >> 4);		// Crash/explode data
 	return 0;
 }
 

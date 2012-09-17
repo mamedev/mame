@@ -389,17 +389,17 @@ READ16_DEVICE_HANDLER( deco_bac06_pf_data_r )
 WRITE8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_w )
 {
 	if (offset&1)
-		deco_bac06_pf_data_w(device,offset/2,data,0x00ff);
+		deco_bac06_pf_data_w(device,space,offset/2,data,0x00ff);
 	else
-		deco_bac06_pf_data_w(device,offset/2,data<<8,0xff00);
+		deco_bac06_pf_data_w(device,space,offset/2,data<<8,0xff00);
 }
 
 READ8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_r )
 {
 	if (offset&1) /* MSB */
-		return deco_bac06_pf_data_r(device,offset/2,0x00ff);
+		return deco_bac06_pf_data_r(device,space,offset/2,0x00ff);
 	else
-		return deco_bac06_pf_data_r(device,offset/2,0xff00)>>8;
+		return deco_bac06_pf_data_r(device,space,offset/2,0xff00)>>8;
 }
 
 WRITE16_DEVICE_HANDLER( deco_bac06_pf_rowscroll_w )
@@ -430,18 +430,18 @@ READ16_DEVICE_HANDLER( deco_bac06_pf_colscroll_r )
 WRITE8_DEVICE_HANDLER( deco_bac06_pf_control0_8bit_w )
 {
 	if (offset&1)
-		deco_bac06_pf_control_0_w(device,offset/2,data,0x00ff); // oscar (mirrors?)
+		deco_bac06_pf_control_0_w(device,space,offset/2,data,0x00ff); // oscar (mirrors?)
 	else
-		deco_bac06_pf_control_0_w(device,offset/2,data,0x00ff);
+		deco_bac06_pf_control_0_w(device,space,offset/2,data,0x00ff);
 }
 
 /* used by dec8.c */
 READ8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_r )
 {
 	if (offset&1)
-		return deco_bac06_pf_control_1_r(device,offset/2,0x00ff);
+		return deco_bac06_pf_control_1_r(device,space,offset/2,0x00ff);
 	else
-		return deco_bac06_pf_control_1_r(device,offset/2,0xff00)>>8;
+		return deco_bac06_pf_control_1_r(device,space,offset/2,0xff00)>>8;
 }
 
 /* used by dec8.c */
@@ -450,50 +450,50 @@ WRITE8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_w )
 	if (offset<4) // these registers are 16-bit?
 	{
 		if (offset&1)
-			deco_bac06_pf_control_1_w(device,offset/2,data,0x00ff);
+			deco_bac06_pf_control_1_w(device,space,offset/2,data,0x00ff);
 		else
-			deco_bac06_pf_control_1_w(device,offset/2,data<<8,0xff00);
+			deco_bac06_pf_control_1_w(device,space,offset/2,data<<8,0xff00);
 	}
 	else // these registers are 8-bit and mirror? (triothep vs actfancr)
 	{
 		if (offset&1)
-			deco_bac06_pf_control_1_w(device,offset/2,data,0x00ff);
+			deco_bac06_pf_control_1_w(device,space,offset/2,data,0x00ff);
 		else
-			deco_bac06_pf_control_1_w(device,offset/2,data,0x00ff);
+			deco_bac06_pf_control_1_w(device,space,offset/2,data,0x00ff);
 	}
 }
 
 READ8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_r )
 {
 	if (offset&1)
-		return deco_bac06_pf_rowscroll_r(device,offset/2,0x00ff);
+		return deco_bac06_pf_rowscroll_r(device,space,offset/2,0x00ff);
 	else
-		return deco_bac06_pf_rowscroll_r(device,offset/2,0xff00)>>8;
+		return deco_bac06_pf_rowscroll_r(device,space,offset/2,0xff00)>>8;
 }
 
 
 WRITE8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_w )
 {
 	if (offset&1)
-		deco_bac06_pf_rowscroll_w(device,offset/2,data,0x00ff);
+		deco_bac06_pf_rowscroll_w(device,space,offset/2,data,0x00ff);
 	else
-		deco_bac06_pf_rowscroll_w(device,offset/2,data<<8,0xff00);
+		deco_bac06_pf_rowscroll_w(device,space,offset/2,data<<8,0xff00);
 }
 
 READ8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_swap_r )
 {
 	if (offset&1)
-		return deco_bac06_pf_rowscroll_r(device,offset/2,0xff00)>>8;
+		return deco_bac06_pf_rowscroll_r(device,space,offset/2,0xff00)>>8;
 	else
-		return deco_bac06_pf_rowscroll_r(device,offset/2,0x00ff);
+		return deco_bac06_pf_rowscroll_r(device,space,offset/2,0x00ff);
 }
 
 WRITE8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_swap_w )
 {
 	if (offset&1)
-		deco_bac06_pf_rowscroll_w(device,offset/2,data<<8,0xff00);
+		deco_bac06_pf_rowscroll_w(device,space,offset/2,data<<8,0xff00);
 	else
-		deco_bac06_pf_rowscroll_w(device,offset/2,data,0x00ff);
+		deco_bac06_pf_rowscroll_w(device,space,offset/2,data,0x00ff);
 }
 
 
@@ -502,25 +502,25 @@ WRITE8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_swap_w )
 WRITE8_DEVICE_HANDLER( deco_bac06_pf_control0_8bit_packed_w )
 {
 	if (offset&1)
-		deco_bac06_pf_control_0_w(device,offset/2,data<<8,0xff00);
+		deco_bac06_pf_control_0_w(device,space,offset/2,data<<8,0xff00);
 	else
-		deco_bac06_pf_control_0_w(device,offset/2,data,0x00ff);
+		deco_bac06_pf_control_0_w(device,space,offset/2,data,0x00ff);
 }
 
 /* used by hippodrm */
 WRITE8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_swap_w )
 {
-	deco_bac06_pf_control1_8bit_w(device, offset^1, data);
+	deco_bac06_pf_control1_8bit_w(device,space, offset^1, data);
 }
 
 /* used by hippodrm */
 READ8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_swap_r )
 {
-	return deco_bac06_pf_data_8bit_r(device, offset^1);
+	return deco_bac06_pf_data_8bit_r(device,space, offset^1);
 }
 
 /* used by hippodrm */
 WRITE8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_swap_w )
 {
-	deco_bac06_pf_data_8bit_w(device, offset^1, data);
+	deco_bac06_pf_data_8bit_w(device,space, offset^1, data);
 }

@@ -212,6 +212,33 @@ struct mc68328_t
     emu_timer *gptimer[2];
     emu_timer *rtc;
     emu_timer *pwm;
+
+    devcb_resolved_write8  out_port_a;    /* 8-bit output */
+    devcb_resolved_write8  out_port_b;    /* 8-bit output */
+    devcb_resolved_write8  out_port_c;    /* 8-bit output */
+    devcb_resolved_write8  out_port_d;    /* 8-bit output */
+    devcb_resolved_write8  out_port_e;    /* 8-bit output */
+    devcb_resolved_write8  out_port_f;    /* 8-bit output */
+    devcb_resolved_write8  out_port_g;    /* 8-bit output */
+    devcb_resolved_write8  out_port_j;    /* 8-bit output */
+    devcb_resolved_write8  out_port_k;    /* 8-bit output */
+    devcb_resolved_write8  out_port_m;    /* 8-bit output */
+
+    devcb_resolved_read8   in_port_a;     /* 8-bit input */
+    devcb_resolved_read8   in_port_b;     /* 8-bit input */
+    devcb_resolved_read8   in_port_c;     /* 8-bit input */
+    devcb_resolved_read8   in_port_d;     /* 8-bit input */
+    devcb_resolved_read8   in_port_e;     /* 8-bit input */
+    devcb_resolved_read8   in_port_f;     /* 8-bit input */
+    devcb_resolved_read8   in_port_g;     /* 8-bit input */
+    devcb_resolved_read8   in_port_j;     /* 8-bit input */
+    devcb_resolved_read8   in_port_k;     /* 8-bit input */
+    devcb_resolved_read8   in_port_m;     /* 8-bit input */
+
+    devcb_resolved_write8  out_pwm;       /* 1-bit output */
+
+    devcb_resolved_write16 out_spim;      /* 16-bit output */
+    devcb_resolved_read16  in_spim;       /* 16-bit input */
 };
 
 #define SCR_BETO                0x80

@@ -126,8 +126,9 @@ SCREEN_UPDATE_IND16( gradius3 )
 	gradius3_state *state = screen.machine().driver_data<gradius3_state>();
 
 	/* TODO: this kludge enforces the char banks. For some reason, they don't work otherwise. */
-	k052109_w(state->m_k052109, 0x1d80, 0x10);
-	k052109_w(state->m_k052109, 0x1f00, 0x32);
+	address_space &space = screen.machine().driver_data()->generic_space();
+	k052109_w(state->m_k052109, space, 0x1d80, 0x10);
+	k052109_w(state->m_k052109, space, 0x1f00, 0x32);
 
 	k052109_tilemap_update(state->m_k052109);
 

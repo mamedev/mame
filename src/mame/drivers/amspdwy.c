@@ -65,7 +65,7 @@ READ8_MEMBER(amspdwy_state::amspdwy_wheel_1_r)
 READ8_MEMBER(amspdwy_state::amspdwy_sound_r)
 {
 	device_t *device = machine().device("ymsnd");
-	return (ym2151_status_port_r(device, 0) & ~ 0x30) | machine().root_device().ioport("IN0")->read();
+	return (ym2151_status_port_r(device, space, 0) & ~ 0x30) | machine().root_device().ioport("IN0")->read();
 }
 
 WRITE8_MEMBER(amspdwy_state::amspdwy_sound_w)

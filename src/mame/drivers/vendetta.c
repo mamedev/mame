@@ -145,7 +145,7 @@ WRITE8_MEMBER(vendetta_state::vendetta_eeprom_w)
 
 READ8_MEMBER(vendetta_state::vendetta_K052109_r)
 {
-	return k052109_r(m_k052109, offset + 0x2000);
+	return k052109_r(m_k052109, space, offset + 0x2000);
 }
 
 WRITE8_MEMBER(vendetta_state::vendetta_K052109_w)
@@ -156,8 +156,8 @@ WRITE8_MEMBER(vendetta_state::vendetta_K052109_w)
 	// *  Tilemap MASK-ROM Test       (0x1d80<->0x3d80, 0x1e00<->0x3e00, 0x1f00<->0x3f00)  *
 	// *************************************************************************************
 	if ((offset == 0x1d80) || (offset == 0x1e00) || (offset == 0x1f00))
-		k052109_w(m_k052109, offset, data);
-	k052109_w(m_k052109, offset + 0x2000, data);
+		k052109_w(m_k052109, space, offset, data);
+	k052109_w(m_k052109, space, offset + 0x2000, data);
 }
 
 
@@ -225,7 +225,7 @@ READ8_MEMBER(vendetta_state::vendetta_sound_interrupt_r)
 READ8_MEMBER(vendetta_state::vendetta_sound_r)
 {
 	device_t *device = machine().device("k053260");
-	return k053260_r(device, 2 + offset);
+	return k053260_r(device, space, 2 + offset);
 }
 
 /********************************************/

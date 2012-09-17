@@ -43,9 +43,9 @@
 
 
 /* prototypes of coprocessor functions */
-static WRITE32_DEVICE_HANDLER(arm7_do_callback);
-static READ32_DEVICE_HANDLER(arm7_rt_r_callback);
-static WRITE32_DEVICE_HANDLER(arm7_rt_w_callback);
+static DECLARE_WRITE32_DEVICE_HANDLER(arm7_do_callback);
+static DECLARE_READ32_DEVICE_HANDLER(arm7_rt_r_callback);
+static DECLARE_WRITE32_DEVICE_HANDLER(arm7_rt_w_callback);
 void arm7_dt_r_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *cpustate, UINT32 addr));
 void arm7_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*write32)(arm_state *cpustate, UINT32 addr, UINT32 data));
 

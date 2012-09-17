@@ -141,8 +141,8 @@ static WRITE8_DEVICE_HANDLER( ic8j2_output_changed )
 
 	/* written from /Q to A with slight delight */
 	LOG(("ic8j2: %d\n", data));
-	ttl74123_a_w(device, 0, data);
-	ttl74123_a_w(state->m_ic8j1, 0, data);
+	ttl74123_a_w(device, space, 0, data);
+	ttl74123_a_w(state->m_ic8j1, space, 0, data);
 }
 
 static const ttl74123_interface ic8j1_intf =
@@ -154,7 +154,7 @@ static const ttl74123_interface ic8j1_intf =
 	1,					/* A pin - driven by the CRTC */
 	1,					/* B pin - pulled high */
 	1,					/* Clear pin - pulled high */
-	ic8j1_output_changed
+	DEVCB_HANDLER(ic8j1_output_changed)
 };
 
 static const ttl74123_interface ic8j2_intf =
@@ -166,7 +166,7 @@ static const ttl74123_interface ic8j2_intf =
 	1,					/* A pin - driven by the CRTC */
 	1,					/* B pin - pulled high */
 	1,					/* Clear pin - pulled high */
-	ic8j2_output_changed
+	DEVCB_HANDLER(ic8j2_output_changed)
 };
 
 /*************************************
@@ -476,8 +476,8 @@ READ8_MEMBER(m10_state::m10_a700_r)
 {
 	//LOG(("rd:%d\n",machine().primary_screen->vpos()));
 	LOG(("clear\n"));
-	ttl74123_clear_w(m_ic8j1, 0, 0);
-	ttl74123_clear_w(m_ic8j1, 0, 1);
+	ttl74123_clear_w(m_ic8j1, space, 0, 0);
+	ttl74123_clear_w(m_ic8j1, space, 0, 1);
 	return 0x00;
 }
 
@@ -486,8 +486,8 @@ READ8_MEMBER(m10_state::m11_a700_r)
 	//LOG(("rd:%d\n",machine().primary_screen->vpos()));
 	//m_maincpu->set_input_line(0, CLEAR_LINE);
 	LOG(("clear\n"));
-	ttl74123_clear_w(m_ic8j1, 0, 0);
-	ttl74123_clear_w(m_ic8j1, 0, 1);
+	ttl74123_clear_w(m_ic8j1, space, 0, 0);
+	ttl74123_clear_w(m_ic8j1, space, 0, 1);
 	return 0x00;
 }
 

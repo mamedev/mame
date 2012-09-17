@@ -641,10 +641,10 @@ READ8_MEMBER(pcw_state::pcw_fdc_r)
 	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
 	if (offset & 1)
 	{
-		return upd765_data_r(fdc, 0);
+		return upd765_data_r(fdc, space, 0);
 	}
 
-	return upd765_status_r(fdc, 0);
+	return upd765_status_r(fdc, space, 0);
 }
 
 WRITE8_MEMBER(pcw_state::pcw_fdc_w)
@@ -653,7 +653,7 @@ WRITE8_MEMBER(pcw_state::pcw_fdc_w)
 	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
 	if (offset & 1)
 	{
-		upd765_data_w(fdc, 0,data);
+		upd765_data_w(fdc, space, 0,data);
 	}
 }
 

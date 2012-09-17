@@ -44,8 +44,8 @@ extern const device_type ASR733;
 	MCFG_DEVICE_ADD(_tag, ASR733, 0) \
 	MCFG_DEVICE_CONFIG(_intf)
 
-READ8_DEVICE_HANDLER(asr733_cru_r);
-WRITE8_DEVICE_HANDLER(asr733_cru_w);
+DECLARE_READ8_DEVICE_HANDLER(asr733_cru_r);
+DECLARE_WRITE8_DEVICE_HANDLER(asr733_cru_w);
 
 void asr733_refresh(device_t *device, bitmap_ind16 &bitmap, int x, int y);
 

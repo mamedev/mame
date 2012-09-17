@@ -93,8 +93,8 @@ SCREEN_UPDATE_IND16( mario );
 
 /*----------- defined in audio/mario.c -----------*/
 
-WRITE8_DEVICE_HANDLER( mario_sh1_w );
-WRITE8_DEVICE_HANDLER( mario_sh2_w );
+DECLARE_WRITE8_DEVICE_HANDLER( mario_sh1_w );
+DECLARE_WRITE8_DEVICE_HANDLER( mario_sh2_w );
 
 
 MACHINE_CONFIG_EXTERN( mario_audio );

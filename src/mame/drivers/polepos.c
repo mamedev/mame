@@ -303,8 +303,8 @@ WRITE8_MEMBER(polepos_state::polepos_latch_w)
 			polepos_sound_enable(machine().device("namco"),bit);
 			if (!bit)
 			{
-				polepos_engine_sound_lsb_w(machine().device("polepos"), 0, 0);
-				polepos_engine_sound_msb_w(machine().device("polepos"), 0, 0);
+				polepos_engine_sound_lsb_w(machine().device("polepos"), space, 0, 0);
+				polepos_engine_sound_msb_w(machine().device("polepos"), space, 0, 0);
 			}
 			break;
 

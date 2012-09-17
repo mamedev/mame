@@ -77,8 +77,9 @@ static void mixdassaultlayer(running_machine &machine, bitmap_rgb32 &bitmap, bit
 SCREEN_UPDATE_RGB32( dassault )
 {
 	dassault_state *state = screen.machine().driver_data<dassault_state>();
-	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
-	UINT16 priority = decocomn_priority_r(state->m_decocomn, 0, 0xffff);
+	address_space &space = screen.machine().driver_data()->generic_space();
+	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, space, 0, 0xffff);
+	UINT16 priority = decocomn_priority_r(state->m_decocomn, space, 0, 0xffff);
 
 	screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, state->m_spriteram2->buffer(), 0x400, false);
 	screen.machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, state->m_spriteram->buffer(), 0x400, false);

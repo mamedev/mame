@@ -7,8 +7,8 @@
 #ifndef __ZSG2_H__
 #define __ZSG2_H__
 
-READ16_DEVICE_HANDLER( zsg2_r );
-WRITE16_DEVICE_HANDLER( zsg2_w );
+DECLARE_READ16_DEVICE_HANDLER( zsg2_r );
+DECLARE_WRITE16_DEVICE_HANDLER( zsg2_w );
 
 struct zsg2_interface
 {

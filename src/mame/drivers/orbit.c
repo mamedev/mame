@@ -61,9 +61,9 @@ static INTERRUPT_GEN( orbit_interrupt )
  *
  *************************************/
 
-static void update_misc_flags(running_machine &machine, UINT8 val)
+static void update_misc_flags(address_space &space, UINT8 val)
 {
-	orbit_state *state = machine.driver_data<orbit_state>();
+	orbit_state *state = space.machine().driver_data<orbit_state>();
 
 	state->m_misc_flags = val;
 
@@ -76,13 +76,13 @@ static void update_misc_flags(running_machine &machine, UINT8 val)
 	/* BIT6 => HYPER LED    */
 	/* BIT7 => WARNING SND  */
 
-	discrete_sound_w(state->m_discrete, ORBIT_WARNING_EN, BIT(state->m_misc_flags, 7));
+	discrete_sound_w(state->m_discrete, space, ORBIT_WARNING_EN, BIT(state->m_misc_flags, 7));
 
-	set_led_status(machine, 0, BIT(state->m_misc_flags, 3));
-	set_led_status(machine, 1, BIT(state->m_misc_flags, 6));
+	set_led_status(space.machine(), 0, BIT(state->m_misc_flags, 3));
+	set_led_status(space.machine(), 1, BIT(state->m_misc_flags, 6));
 
-	coin_lockout_w(machine, 0, !BIT(state->m_misc_flags, 1));
-	coin_lockout_w(machine, 1, !BIT(state->m_misc_flags, 1));
+	coin_lockout_w(space.machine(), 0, !BIT(state->m_misc_flags, 1));
+	coin_lockout_w(space.machine(), 1, !BIT(state->m_misc_flags, 1));
 }
 
 
@@ -91,9 +91,9 @@ WRITE8_MEMBER(orbit_state::orbit_misc_w)
 	UINT8 bit = offset >> 1;
 
 	if (offset & 1)
-		update_misc_flags(machine(), m_misc_flags | (1 << bit));
+		update_misc_flags(space, m_misc_flags | (1 << bit));
 	else
-		update_misc_flags(machine(), m_misc_flags & ~(1 << bit));
+		update_misc_flags(space, m_misc_flags & ~(1 << bit));
 }
 
 
@@ -283,8 +283,7 @@ void orbit_state::machine_start()
 
 void orbit_state::machine_reset()
 {
-
-	update_misc_flags(machine(), 0);
+	update_misc_flags(generic_space(), 0);
 	m_flip_screen = 0;
 }
 

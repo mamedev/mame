@@ -393,22 +393,22 @@ INPUT_PORTS_END
 
 READ16_MEMBER(cubeqst_state::read_rotram)
 {
-	return cubeqcpu_rotram_r(machine().device("rotate_cpu"), offset, mem_mask);
+	return cubeqcpu_rotram_r(machine().device("rotate_cpu"), space, offset, mem_mask);
 }
 
 WRITE16_MEMBER(cubeqst_state::write_rotram)
 {
-	cubeqcpu_rotram_w(machine().device("rotate_cpu"), offset, data, mem_mask);
+	cubeqcpu_rotram_w(machine().device("rotate_cpu"), space, offset, data, mem_mask);
 }
 
 READ16_MEMBER(cubeqst_state::read_sndram)
 {
-	return cubeqcpu_sndram_r(machine().device("sound_cpu"), offset, mem_mask);
+	return cubeqcpu_sndram_r(machine().device("sound_cpu"), space, offset, mem_mask);
 }
 
 WRITE16_MEMBER(cubeqst_state::write_sndram)
 {
-	cubeqcpu_sndram_w(machine().device("sound_cpu"), offset, data, mem_mask);
+	cubeqcpu_sndram_w(machine().device("sound_cpu"), space, offset, data, mem_mask);
 }
 
 static ADDRESS_MAP_START( m68k_program_map, AS_PROGRAM, 16, cubeqst_state )

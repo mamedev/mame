@@ -195,11 +195,11 @@ WRITE8_MEMBER(drw80pkr_state::drw80pkr_io_w)
 
 		// ay8910 control port
 		if (m_p1 == 0xfc)
-			ay8910_address_w(machine().device("aysnd"), 0, data);
+			ay8910_address_w(machine().device("aysnd"), space, 0, data);
 
 		// ay8910_write_port_0_w
 		if (m_p1 == 0xfe)
-			ay8910_data_w(machine().device("aysnd"), 0, data);
+			ay8910_data_w(machine().device("aysnd"), space, 0, data);
 	}
 }
 

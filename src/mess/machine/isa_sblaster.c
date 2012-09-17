@@ -129,7 +129,7 @@ static READ8_DEVICE_HANDLER( ym3812_16_r )
 	UINT8 retVal = 0xff;
 	switch(offset)
 	{
-		case 0 : retVal = ym3812_status_port_r( device, offset ); break;
+		case 0 : retVal = ym3812_status_port_r( device, space, offset ); break;
 	}
 	return retVal;
 }
@@ -138,8 +138,8 @@ static WRITE8_DEVICE_HANDLER( ym3812_16_w )
 {
 	switch(offset)
 	{
-		case 0 : ym3812_control_port_w( device, offset, data ); break;
-		case 1 : ym3812_write_port_w( device, offset, data ); break;
+		case 0 : ym3812_control_port_w( device, space, offset, data ); break;
+		case 1 : ym3812_write_port_w( device, space, offset, data ); break;
 	}
 }
 
@@ -152,8 +152,8 @@ static WRITE8_DEVICE_HANDLER( saa1099_16_w )
 {
 	switch(offset)
 	{
-		case 0 : saa1099_control_w( device, offset, data ); break;
-		case 1 : saa1099_data_w( device, offset, data ); break;
+		case 0 : saa1099_control_w( device, space, offset, data ); break;
+		case 1 : saa1099_data_w( device, space, offset, data ); break;
 	}
 }
 

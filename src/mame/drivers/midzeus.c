@@ -158,7 +158,7 @@ WRITE32_MEMBER(midzeus_state::cmos_protect_w)
 READ32_MEMBER(midzeus_state::zeus2_timekeeper_r)
 {
 	device_t *device = machine().device("m48t35");
-	return timekeeper_r(device, offset) | 0xffffff00;
+	return timekeeper_r(device, space, offset) | 0xffffff00;
 }
 
 
@@ -166,7 +166,7 @@ WRITE32_MEMBER(midzeus_state::zeus2_timekeeper_w)
 {
 	device_t *device = machine().device("m48t35");
 	if (bitlatch[2] && !cmos_protected)
-		timekeeper_w(device, offset, data);
+		timekeeper_w(device, space, offset, data);
 	else
 		logerror("%s:zeus2_timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", machine().describe_context(), bitlatch[2], cmos_protected);
 	cmos_protected = TRUE;

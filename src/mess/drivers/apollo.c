@@ -1170,9 +1170,9 @@ static READ8_DEVICE_HANDLER( apollo_kbd_is_german ) {
 }
 
 static APOLLO_KBD_INTERFACE( apollo_kbd_config ) = {
-	apollo_kbd_putchar,
-	apollo_kbd_has_beeper,
-	apollo_kbd_is_german
+	DEVCB_HANDLER(apollo_kbd_putchar),
+	DEVCB_HANDLER(apollo_kbd_has_beeper),
+	DEVCB_HANDLER(apollo_kbd_is_german)
 };
 
 static WRITE8_DEVICE_HANDLER( terminal_kbd_putchar ) {

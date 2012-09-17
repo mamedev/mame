@@ -82,7 +82,7 @@ struct ttl74123_interface
     int m_a;                /* initial/constant value of the A pin */
     int m_b;                /* initial/constant value of the B pin */
     int m_clear;            /* initial/constant value of the Clear pin */
-    write8_device_func  m_output_changed_cb;
+    devcb_write8  m_output_changed_cb;
 };
 
 
@@ -122,6 +122,7 @@ private:
     void clear();
 
     emu_timer *m_timer;
+    devcb_resolved_write8 m_output_changed;
 };
 
 
@@ -134,9 +135,9 @@ extern const device_type TTL74123;
     PROTOTYPES
 ***************************************************************************/
 
-WRITE8_DEVICE_HANDLER( ttl74123_a_w );
-WRITE8_DEVICE_HANDLER( ttl74123_b_w );
-WRITE8_DEVICE_HANDLER( ttl74123_clear_w );
-WRITE8_DEVICE_HANDLER( ttl74123_reset_w ); /* reset the latch */
+DECLARE_WRITE8_DEVICE_HANDLER( ttl74123_a_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ttl74123_b_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ttl74123_clear_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ttl74123_reset_w ); /* reset the latch */
 
 #endif

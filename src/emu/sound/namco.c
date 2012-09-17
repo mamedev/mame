@@ -638,6 +638,7 @@ void mappy_sound_enable(device_t *device, int enable)
 	chip->sound_enable = enable;
 }
 
+static DECLARE_WRITE8_DEVICE_HANDLER( namco_15xx_w );
 static WRITE8_DEVICE_HANDLER( namco_15xx_w )
 {
 	namco_sound *chip = get_safe_token(device);
@@ -704,6 +705,7 @@ static WRITE8_DEVICE_HANDLER( namco_15xx_w )
     0x3c        ch 0    noise sw
 */
 
+static DECLARE_WRITE8_DEVICE_HANDLER( namcos1_sound_w );
 static WRITE8_DEVICE_HANDLER( namcos1_sound_w )
 {
 	namco_sound *chip = get_safe_token(device);
@@ -781,7 +783,7 @@ WRITE8_DEVICE_HANDLER( namcos1_cus30_w )
 		}
 	}
 	else if (offset < 0x140)
-		namcos1_sound_w(device, offset - 0x100,data);
+		namcos1_sound_w(device, space, offset - 0x100,data);
 	else
 		chip->wavedata[offset] = data;
 }
@@ -803,7 +805,7 @@ READ8_DEVICE_HANDLER( namco_snd_sharedram_r )
 WRITE8_DEVICE_HANDLER( namco_snd_sharedram_w )
 {
 	if (offset < 0x40)
-		namco_15xx_w(device, offset, data);
+		namco_15xx_w(device, space, offset, data);
 	else
 	{
 		namco_sound *chip = get_safe_token(device);

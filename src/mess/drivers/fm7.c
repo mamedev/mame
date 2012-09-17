@@ -416,13 +416,13 @@ READ8_MEMBER(fm7_state::fm7_fdc_r)
 	switch(offset)
 	{
 		case 0:
-			return wd17xx_status_r(dev,offset);
+			return wd17xx_status_r(dev,space, offset);
 		case 1:
-			return wd17xx_track_r(dev,offset);
+			return wd17xx_track_r(dev,space, offset);
 		case 2:
-			return wd17xx_sector_r(dev,offset);
+			return wd17xx_sector_r(dev,space, offset);
 		case 3:
-			return wd17xx_data_r(dev,offset);
+			return wd17xx_data_r(dev,space, offset);
 		case 4:
 			return m_fdc_side | 0xfe;
 		case 5:
@@ -448,16 +448,16 @@ WRITE8_MEMBER(fm7_state::fm7_fdc_w)
 	switch(offset)
 	{
 		case 0:
-			wd17xx_command_w(dev,offset,data);
+			wd17xx_command_w(dev,space, offset,data);
 			break;
 		case 1:
-			wd17xx_track_w(dev,offset,data);
+			wd17xx_track_w(dev,space, offset,data);
 			break;
 		case 2:
-			wd17xx_sector_w(dev,offset,data);
+			wd17xx_sector_w(dev,space, offset,data);
 			break;
 		case 3:
-			wd17xx_data_w(dev,offset,data);
+			wd17xx_data_w(dev,space, offset,data);
 			break;
 		case 4:
 			m_fdc_side = data & 0x01;
@@ -824,7 +824,7 @@ READ8_MEMBER(fm7_state::fm77av_boot_mode_r)
 static void fm7_update_psg(running_machine &machine)
 {
 	fm7_state *state = machine.driver_data<fm7_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if(state->m_type == SYS_FM7)
 	{
@@ -835,15 +835,15 @@ static void fm7_update_psg(running_machine &machine)
 				break;
 			case 0x01:
 				// Data read
-				state->m_psg_data = ay8910_r(space->machine().device("psg"),0);
+				state->m_psg_data = ay8910_r(space.machine().device("psg"),space, 0);
 				break;
 			case 0x02:
 				// Data write
-				ay8910_data_w(space->machine().device("psg"),0,state->m_psg_data);
+				ay8910_data_w(space.machine().device("psg"),space, 0,state->m_psg_data);
 				break;
 			case 0x03:
 				// Address latch
-				ay8910_address_w(space->machine().device("psg"),0,state->m_psg_data);
+				ay8910_address_w(space.machine().device("psg"),space, 0,state->m_psg_data);
 				break;
 		}
 	}
@@ -856,25 +856,25 @@ static void fm7_update_psg(running_machine &machine)
 				break;
 			case 0x01:
 				// Data read
-				state->m_psg_data = ym2203_r(space->machine().device("ym"),1);
+				state->m_psg_data = ym2203_r(space.machine().device("ym"),space, 1);
 				break;
 			case 0x02:
 				// Data write
-				ym2203_w(space->machine().device("ym"),1,state->m_psg_data);
+				ym2203_w(space.machine().device("ym"),space, 1,state->m_psg_data);
 				logerror("YM: data write 0x%02x\n",state->m_psg_data);
 				break;
 			case 0x03:
 				// Address latch
-				ym2203_w(space->machine().device("ym"),0,state->m_psg_data);
+				ym2203_w(space.machine().device("ym"),space, 0,state->m_psg_data);
 				logerror("YM: address latch 0x%02x\n",state->m_psg_data);
 				break;
 			case 0x04:
 				// Status register
-				state->m_psg_data = ym2203_r(space->machine().device("ym"),0);
+				state->m_psg_data = ym2203_r(space.machine().device("ym"),space, 0);
 				break;
 			case 0x09:
 				// Joystick port read
-				state->m_psg_data = space->machine().root_device().ioport("joy1")->read();
+				state->m_psg_data = space.machine().root_device().ioport("joy1")->read();
 				break;
 		}
 	}

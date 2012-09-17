@@ -340,7 +340,7 @@ WRITE16_MEMBER(othunder_state::othunder_tc0220ioc_w)
 				break;
 
 			default:
-				tc0220ioc_w(m_tc0220ioc, offset, data & 0xff);
+				tc0220ioc_w(m_tc0220ioc, space, offset, data & 0xff);
 		}
 	}
 }
@@ -359,7 +359,7 @@ READ16_MEMBER(othunder_state::othunder_tc0220ioc_r)
 			return (m_eeprom->read_bit() & 1) << 7;
 
 		default:
-			return tc0220ioc_r(m_tc0220ioc, offset);
+			return tc0220ioc_r(m_tc0220ioc, space, offset);
 	}
 }
 
@@ -406,15 +406,15 @@ WRITE8_MEMBER(othunder_state::sound_bankswitch_w)
 WRITE16_MEMBER(othunder_state::othunder_sound_w)
 {
 	if (offset == 0)
-		tc0140syt_port_w(m_tc0140syt, 0, data & 0xff);
+		tc0140syt_port_w(m_tc0140syt, space, 0, data & 0xff);
 	else if (offset == 1)
-		tc0140syt_comm_w(m_tc0140syt, 0, data & 0xff);
+		tc0140syt_comm_w(m_tc0140syt, space, 0, data & 0xff);
 }
 
 READ16_MEMBER(othunder_state::othunder_sound_r)
 {
 	if (offset == 1)
-		return ((tc0140syt_comm_r(m_tc0140syt, 0) & 0xff));
+		return ((tc0140syt_comm_r(m_tc0140syt, space, 0) & 0xff));
 	else
 		return 0;
 }

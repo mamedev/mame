@@ -4,16 +4,16 @@
 #include "includes/beezer.h"
 
 
-static READ8_DEVICE_HANDLER( b_via_0_pa_r );
-static READ8_DEVICE_HANDLER( b_via_0_pb_r );
-static WRITE8_DEVICE_HANDLER( b_via_0_pa_w );
-static WRITE8_DEVICE_HANDLER( b_via_0_pb_w );
+static DECLARE_READ8_DEVICE_HANDLER( b_via_0_pa_r );
+static DECLARE_READ8_DEVICE_HANDLER( b_via_0_pb_r );
+static DECLARE_WRITE8_DEVICE_HANDLER( b_via_0_pa_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( b_via_0_pb_w );
 static READ_LINE_DEVICE_HANDLER( b_via_0_ca2_r );
 
-static READ8_DEVICE_HANDLER( b_via_1_pa_r );
-static READ8_DEVICE_HANDLER( b_via_1_pb_r );
-static WRITE8_DEVICE_HANDLER( b_via_1_pa_w );
-static WRITE8_DEVICE_HANDLER( b_via_1_pb_w );
+static DECLARE_READ8_DEVICE_HANDLER( b_via_1_pa_r );
+static DECLARE_READ8_DEVICE_HANDLER( b_via_1_pb_r );
+static DECLARE_WRITE8_DEVICE_HANDLER( b_via_1_pa_w );
+static DECLARE_WRITE8_DEVICE_HANDLER( b_via_1_pb_w );
 
 
 /* VIA 0 (aka "PPCNP74", U6 @1C on schematics)
@@ -140,7 +140,7 @@ static READ8_DEVICE_HANDLER( b_via_1_pa_r )
 
 static READ8_DEVICE_HANDLER( b_via_1_pb_r )
 {
-	return 0x1F | (beezer_noise_r(device->machine().device("custom"), 0)?0x40:0);
+	return 0x1F | (beezer_noise_r(device->machine().device("custom"), space, 0)?0x40:0);
 }
 
 static WRITE8_DEVICE_HANDLER( b_via_1_pa_w )
@@ -151,7 +151,7 @@ static WRITE8_DEVICE_HANDLER( b_via_1_pa_w )
 
 static WRITE8_DEVICE_HANDLER( b_via_1_pb_w )
 {
-	beezer_timer1_w(device->machine().device("custom"), 0, data&0x80);
+	beezer_timer1_w(device->machine().device("custom"), space, 0, data&0x80);
 	//if ((data&0x1f) != 0x01)
 	//  popmessage("via1 pb low write of 0x%02x is not supported! contact mamedev!", data&0x1f);
 }

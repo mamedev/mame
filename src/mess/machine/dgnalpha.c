@@ -144,19 +144,19 @@ READ8_MEMBER( dragon_alpha_state::ff20_read )
 			break;
 
 		case 12:
-			result = wd17xx_data_r(m_fdc, 0);
+			result = wd17xx_data_r(m_fdc, space, 0);
 			break;
 
 		case 13:
-			result = wd17xx_sector_r(m_fdc, 0);
+			result = wd17xx_sector_r(m_fdc, space, 0);
 			break;
 
 		case 14:
-			result = wd17xx_track_r(m_fdc, 0);
+			result = wd17xx_track_r(m_fdc, space, 0);
 			break;
 
 		case 15:
-			result = wd17xx_status_r(m_fdc, 0);
+			result = wd17xx_status_r(m_fdc, space, 0);
 			break;
 	}
 	return result;
@@ -185,16 +185,16 @@ WRITE8_MEMBER( dragon_alpha_state::ff20_write )
 			break;
 
 		case 12:
-			wd17xx_data_w(m_fdc, 0, data);
+			wd17xx_data_w(m_fdc, space, 0, data);
 			break;
 		case 13:
-			wd17xx_sector_w(m_fdc, 0, data);
+			wd17xx_sector_w(m_fdc, space, 0, data);
 			break;
 		case 14:
-			wd17xx_track_w(m_fdc, 0, data);
+			wd17xx_track_w(m_fdc, space, 0, data);
 			break;
 		case 15:
-            wd17xx_command_w(m_fdc, 0, data);
+            wd17xx_command_w(m_fdc, space, 0, data);
 
 			/* disk head is encoded in the command byte */
 			wd17xx_set_side(m_fdc,(data & 0x02) ? 1 : 0);
@@ -236,13 +236,13 @@ WRITE8_MEMBER( dragon_alpha_state::pia2_pa_w )
 		case 0x00:		/* Inactive, do nothing */
 			break;
 		case 0x01:		/* Write to selected port */
-			ay8910_data_w(m_ay8912, 0, m_pia_2->b_output());
+			ay8910_data_w(m_ay8912, space, 0, m_pia_2->b_output());
 			break;
 		case 0x02:		/* Read from selected port */
-			m_pia_2->portb_w(ay8910_r(m_ay8912, 0));
+			m_pia_2->portb_w(ay8910_r(m_ay8912, space, 0));
 			break;
 		case 0x03:		/* Select port to write to */
-			ay8910_address_w(m_ay8912, 0, m_pia_2->b_output());
+			ay8910_address_w(m_ay8912, space, 0, m_pia_2->b_output());
 			break;
 	}
 }

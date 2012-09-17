@@ -37,8 +37,8 @@
 #include "formats/pc_dsk.h"
 #include "machine/ram.h"
 
-static READ8_HANDLER(at_dma8237_1_r)  { return i8237_r(space->machine().device("dma8237_2"), offset / 2); }
-static WRITE8_HANDLER(at_dma8237_1_w) { i8237_w(space->machine().device("dma8237_2"), offset / 2, data); }
+static READ8_HANDLER(at_dma8237_1_r)  { return i8237_r(space->machine().device("dma8237_2"), *space, offset / 2); }
+static WRITE8_HANDLER(at_dma8237_1_w) { i8237_w(space->machine().device("dma8237_2"), *space, offset / 2, data); }
 
 static ADDRESS_MAP_START( bebox_mem, AS_PROGRAM, 64, bebox_state )
 	AM_RANGE(0x7FFFF0F0, 0x7FFFF0F7) AM_READWRITE_LEGACY(bebox_cpu0_imask_r, bebox_cpu0_imask_w )

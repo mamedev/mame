@@ -19,10 +19,10 @@ struct namco_06xx_config
 	MCFG_DEVICE_CONFIG(_config)
 
 
-READ8_DEVICE_HANDLER( namco_06xx_data_r );
-WRITE8_DEVICE_HANDLER( namco_06xx_data_w );
-READ8_DEVICE_HANDLER( namco_06xx_ctrl_r );
-WRITE8_DEVICE_HANDLER( namco_06xx_ctrl_w );
+DECLARE_READ8_DEVICE_HANDLER( namco_06xx_data_r );
+DECLARE_WRITE8_DEVICE_HANDLER( namco_06xx_data_w );
+DECLARE_READ8_DEVICE_HANDLER( namco_06xx_ctrl_r );
+DECLARE_WRITE8_DEVICE_HANDLER( namco_06xx_ctrl_w );
 
 
 /* device get info callback */

@@ -1253,13 +1253,13 @@ WRITE8_MEMBER(mz2500_state::palette4096_io_w)
 static READ8_DEVICE_HANDLER( mz2500_wd17xx_r )
 {
 	mz2500_state *state = device->machine().driver_data<mz2500_state>();
-	return wd17xx_r(device, offset) ^ state->m_fdc_reverse;
+	return wd17xx_r(device, space, offset) ^ state->m_fdc_reverse;
 }
 
 static WRITE8_DEVICE_HANDLER( mz2500_wd17xx_w )
 {
 	mz2500_state *state = device->machine().driver_data<mz2500_state>();
-	wd17xx_w(device, offset, data ^ state->m_fdc_reverse);
+	wd17xx_w(device, space, offset, data ^ state->m_fdc_reverse);
 }
 
 READ8_MEMBER(mz2500_state::mz2500_bplane_latch_r)
@@ -2084,12 +2084,12 @@ static RP5C15_INTERFACE( rtc_intf )
 
 static const z80sio_interface mz2500_sio_intf =
 {
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_CONFIG_START( mz2500, mz2500_state )

@@ -234,7 +234,7 @@ void s100_mm65k16s_device::device_reset()
 //  s100_smemr_r - memory read
 //-------------------------------------------------
 
-UINT8 s100_mm65k16s_device::s100_smemr_r(offs_t offset)
+UINT8 s100_mm65k16s_device::s100_smemr_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
 
@@ -251,7 +251,7 @@ UINT8 s100_mm65k16s_device::s100_smemr_r(offs_t offset)
 //  s100_mwrt_w - memory write
 //-------------------------------------------------
 
-void s100_mm65k16s_device::s100_mwrt_w(offs_t offset, UINT8 data)
+void s100_mm65k16s_device::s100_mwrt_w(address_space &space, offs_t offset, UINT8 data)
 {
 	if (offset < 0xf800)
 	{

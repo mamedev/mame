@@ -158,6 +158,7 @@ SCREEN_VBLANK( xmen6p )
 		cliprect.set(0, 64 * 8 - 1, 2 * 8, 30 * 8 - 1);
 
 
+		address_space &space = screen.machine().driver_data()->generic_space();
 		if (screen.machine().primary_screen->frame_number() & 0x01)
 		{
 
@@ -171,7 +172,7 @@ SCREEN_VBLANK( xmen6p )
 			for (offset = 0; offset < (0xc000 / 2); offset++)
 			{
 	//          K052109_lsb_w
-				k052109_w(state->m_k052109, offset, state->m_xmen6p_tilemapright[offset] & 0x00ff);
+				k052109_w(state->m_k052109, space, offset, state->m_xmen6p_tilemapright[offset] & 0x00ff);
 			}
 
 
@@ -190,7 +191,7 @@ SCREEN_VBLANK( xmen6p )
 			for (offset = 0; offset < (0xc000 / 2); offset++)
 			{
 	//          K052109_lsb_w
-				k052109_w(state->m_k052109, offset, state->m_xmen6p_tilemapleft[offset] & 0x00ff);
+				k052109_w(state->m_k052109, space, offset, state->m_xmen6p_tilemapleft[offset] & 0x00ff);
 			}
 
 

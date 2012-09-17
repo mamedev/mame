@@ -7,8 +7,8 @@
 
 /* an interface for the OKIM6376 and similar chips (CPU interface only) */
 
-READ8_DEVICE_HANDLER( okim6376_r );
-WRITE8_DEVICE_HANDLER( okim6376_w );
+DECLARE_READ8_DEVICE_HANDLER( okim6376_r );
+DECLARE_WRITE8_DEVICE_HANDLER( okim6376_w );
 
 class okim6376_device : public device_t,
                                   public device_sound_interface

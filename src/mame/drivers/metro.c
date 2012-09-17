@@ -370,7 +370,7 @@ WRITE8_MEMBER(metro_state::metro_portb_w)
 	{
 		if (!BIT(data, 2))
 		{
-			ym2413_w(m_ymsnd, BIT(data, 1), m_porta);
+			ym2413_w(m_ymsnd, space, BIT(data, 1), m_porta);
 		}
 		m_portb = data;
 		return;
@@ -412,13 +412,13 @@ WRITE8_MEMBER(metro_state::daitorid_portb_w)
 		if (!BIT(data, 2))
 		{
 			/* write */
-			ym2151_w(m_ymsnd, BIT(data, 1), m_porta);
+			ym2151_w(m_ymsnd, space, BIT(data, 1), m_porta);
 		}
 
 		if (!BIT(data, 3))
 		{
 			/* read */
-			m_porta = ym2151_r(m_ymsnd, BIT(data, 1));
+			m_porta = ym2151_r(m_ymsnd, space, BIT(data, 1));
 		}
 
 		m_portb = data;

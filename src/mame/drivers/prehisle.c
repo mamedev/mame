@@ -42,7 +42,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(prehisle_state::D7759_write_port_0_w)
 {
 	device_t *device = machine().device("upd");
-	upd7759_port_w(device, 0, data);
+	upd7759_port_w(device, space, 0, data);
 	upd7759_start_w(device, 0);
 	upd7759_start_w(device, 1);
 }

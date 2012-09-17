@@ -97,10 +97,10 @@ void atarirle_control_w(device_t *device, UINT8 bits);
 void atarirle_command_w(device_t *device, UINT8 command);
 
 /* read/write handlers */
-READ16_DEVICE_HANDLER( atarirle_spriteram_r );
-READ32_DEVICE_HANDLER( atarirle_spriteram32_r );
-WRITE16_DEVICE_HANDLER( atarirle_spriteram_w );
-WRITE32_DEVICE_HANDLER( atarirle_spriteram32_w );
+DECLARE_READ16_DEVICE_HANDLER( atarirle_spriteram_r );
+DECLARE_READ32_DEVICE_HANDLER( atarirle_spriteram32_r );
+DECLARE_WRITE16_DEVICE_HANDLER( atarirle_spriteram_w );
+DECLARE_WRITE32_DEVICE_HANDLER( atarirle_spriteram32_w );
 
 /* render helpers */
 void atarirle_eof(device_t *device);

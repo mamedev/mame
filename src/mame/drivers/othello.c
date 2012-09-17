@@ -225,15 +225,15 @@ WRITE8_MEMBER(othello_state::ack_w)
 WRITE8_MEMBER(othello_state::ay_address_w)
 {
 
-	if (m_ay_select & 1) ay8910_address_w(m_ay1, 0, data);
-	if (m_ay_select & 2) ay8910_address_w(m_ay2, 0, data);
+	if (m_ay_select & 1) ay8910_address_w(m_ay1, space, 0, data);
+	if (m_ay_select & 2) ay8910_address_w(m_ay2, space, 0, data);
 }
 
 WRITE8_MEMBER(othello_state::ay_data_w)
 {
 
-	if (m_ay_select & 1) ay8910_data_w(m_ay1, 0, data);
-	if (m_ay_select & 2) ay8910_data_w(m_ay2, 0, data);
+	if (m_ay_select & 1) ay8910_data_w(m_ay1, space, 0, data);
+	if (m_ay_select & 2) ay8910_data_w(m_ay2, space, 0, data);
 }
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, othello_state )
@@ -300,7 +300,7 @@ WRITE8_MEMBER(othello_state::n7751_p2_w)
 	device_t *device = machine().device("n7751_8243");
 
 	/* write to P2; low 4 bits go to 8243 */
-	i8243_p2_w(device, offset, data & 0x0f);
+	i8243_p2_w(device, space, offset, data & 0x0f);
 
 	/* output of bit $80 indicates we are ready (1) or busy (0) */
 	/* no other outputs are used */

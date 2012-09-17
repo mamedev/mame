@@ -11,20 +11,20 @@ struct namco_interface
 	int stereo;		/* set to 1 to indicate stereo (e.g., System 1) */
 };
 
-WRITE8_DEVICE_HANDLER( pacman_sound_enable_w );
-WRITE8_DEVICE_HANDLER( pacman_sound_w );
+DECLARE_WRITE8_DEVICE_HANDLER( pacman_sound_enable_w );
+DECLARE_WRITE8_DEVICE_HANDLER( pacman_sound_w );
 
 void polepos_sound_enable(device_t *device, int enable);
-READ8_DEVICE_HANDLER( polepos_sound_r );
-WRITE8_DEVICE_HANDLER( polepos_sound_w );
+DECLARE_READ8_DEVICE_HANDLER( polepos_sound_r );
+DECLARE_WRITE8_DEVICE_HANDLER( polepos_sound_w );
 
 void mappy_sound_enable(device_t *device, int enable);
 
-WRITE8_DEVICE_HANDLER( namcos1_cus30_w );	/* wavedata + sound registers + RAM */
-READ8_DEVICE_HANDLER( namcos1_cus30_r );
+DECLARE_WRITE8_DEVICE_HANDLER( namcos1_cus30_w );	/* wavedata + sound registers + RAM */
+DECLARE_READ8_DEVICE_HANDLER( namcos1_cus30_r );
 
-READ8_DEVICE_HANDLER( namco_snd_sharedram_r );
-WRITE8_DEVICE_HANDLER( namco_snd_sharedram_w );
+DECLARE_READ8_DEVICE_HANDLER( namco_snd_sharedram_r );
+DECLARE_WRITE8_DEVICE_HANDLER( namco_snd_sharedram_w );
 
 class namco_device : public device_t,
                                   public device_sound_interface

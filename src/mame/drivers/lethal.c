@@ -266,7 +266,7 @@ READ8_MEMBER(lethal_state::le_4800_r)
 				case 0x4d:
 				case 0x4e:
 				case 0x4f:
-					return k053244_r(m_k053244, offset - 0x40);
+					return k053244_r(m_k053244, space, offset - 0x40);
 
 				case 0x80:
 				case 0x81:
@@ -300,22 +300,22 @@ READ8_MEMBER(lethal_state::le_4800_r)
 				case 0x9d:
 				case 0x9e:
 				case 0x9f:
-					return k054000_r(m_k054000, offset - 0x80);
+					return k054000_r(m_k054000, space, offset - 0x80);
 
 				case 0xca:
 					return sound_status_r(space, 0);
 			}
 		}
 		else if (offset < 0x1800)
-			return k053245_r(m_k053244, (offset - 0x0800) & 0x07ff);
+			return k053245_r(m_k053244, space, (offset - 0x0800) & 0x07ff);
 		else if (offset < 0x2000)
-			return k056832_ram_code_lo_r(m_k056832, offset - 0x1800);
+			return k056832_ram_code_lo_r(m_k056832, space, offset - 0x1800);
 		else if (offset < 0x2800)
-			return k056832_ram_code_hi_r(m_k056832, offset - 0x2000);
+			return k056832_ram_code_hi_r(m_k056832, space, offset - 0x2000);
 		else if (offset < 0x3000)
-			return k056832_ram_attr_lo_r(m_k056832, offset - 0x2800);
+			return k056832_ram_attr_lo_r(m_k056832, space, offset - 0x2800);
 		else // (offset < 0x3800)
-			return k056832_ram_attr_hi_r(m_k056832, offset - 0x3000);
+			return k056832_ram_attr_hi_r(m_k056832, space, offset - 0x3000);
 	}
 
 	return 0;
@@ -358,7 +358,7 @@ WRITE8_MEMBER(lethal_state::le_4800_w)
 				case 0x4d:
 				case 0x4e:
 				case 0x4f:
-					k053244_w(m_k053244, offset - 0x40, data);
+					k053244_w(m_k053244, space, offset - 0x40, data);
 					break;
 
 				case 0x80:
@@ -393,7 +393,7 @@ WRITE8_MEMBER(lethal_state::le_4800_w)
 				case 0x9d:
 				case 0x9e:
 				case 0x9f:
-					k054000_w(m_k054000, offset - 0x80, data);
+					k054000_w(m_k054000, space, offset - 0x80, data);
 					break;
 
 				default:
@@ -402,15 +402,15 @@ WRITE8_MEMBER(lethal_state::le_4800_w)
 			}
 		}
 		else if (offset < 0x1800)
-			k053245_w(m_k053244, (offset - 0x0800) & 0x07ff, data);
+			k053245_w(m_k053244, space, (offset - 0x0800) & 0x07ff, data);
 		else if (offset < 0x2000)
-			k056832_ram_code_lo_w(m_k056832, offset - 0x1800, data);
+			k056832_ram_code_lo_w(m_k056832, space, offset - 0x1800, data);
 		else if (offset < 0x2800)
-			k056832_ram_code_hi_w(m_k056832, offset - 0x2000, data);
+			k056832_ram_code_hi_w(m_k056832, space, offset - 0x2000, data);
 		else if (offset < 0x3000)
-			k056832_ram_attr_lo_w(m_k056832, offset - 0x2800, data);
+			k056832_ram_attr_lo_w(m_k056832, space, offset - 0x2800, data);
 		else // (offset < 0x3800)
-			k056832_ram_attr_hi_w(m_k056832, offset - 0x3000, data);
+			k056832_ram_attr_hi_w(m_k056832, space, offset - 0x3000, data);
 	}
 }
 

@@ -579,7 +579,7 @@ UINT8 c1551_device::plus4_cd_r(address_space &space, offs_t offset, UINT8 data, 
 
 	if (tpi1_selected(offset))
 	{
-		data = tpi6525_r(m_tpi1, offset & 0x07);
+		data = tpi6525_r(m_tpi1, space, offset & 0x07);
 	}
 
 	return data;
@@ -594,7 +594,7 @@ void c1551_device::plus4_cd_w(address_space &space, offs_t offset, UINT8 data, i
 {
 	if (tpi1_selected(offset))
 	{
-		tpi6525_w(m_tpi1, offset & 0x07, data);
+		tpi6525_w(m_tpi1, space, offset & 0x07, data);
 	}
 
 	m_exp->cd_w(space, offset, data, ba, cs0, c1l, c2l, cs1, c1h, c2h);

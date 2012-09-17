@@ -62,11 +62,11 @@ void pandora_eof(device_t *device);
 void pandora_set_clear_bitmap(device_t *device, int clear);
 void pandora_set_bg_pen( device_t *device, int pen );
 
-WRITE8_DEVICE_HANDLER ( pandora_spriteram_w );
-READ8_DEVICE_HANDLER( pandora_spriteram_r );
+DECLARE_WRITE8_DEVICE_HANDLER ( pandora_spriteram_w );
+DECLARE_READ8_DEVICE_HANDLER( pandora_spriteram_r );
 
-WRITE16_DEVICE_HANDLER( pandora_spriteram_LSB_w );
-READ16_DEVICE_HANDLER( pandora_spriteram_LSB_r );
+DECLARE_WRITE16_DEVICE_HANDLER( pandora_spriteram_LSB_w );
+DECLARE_READ16_DEVICE_HANDLER( pandora_spriteram_LSB_r );
 
 #endif /* __KAN_PAND_H__ */
 

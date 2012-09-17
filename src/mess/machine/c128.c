@@ -126,7 +126,7 @@ void c128_state::nmi()
 
 READ8_MEMBER( c128_state::cia1_pa_r )
 {
-	UINT8 cia0portb = mos6526_pb_r(m_cia1, 0);
+	UINT8 cia0portb = mos6526_pb_r(m_cia1, space, 0);
 
 	return cbm_common_cia0_port_a_r(m_cia1, cia0portb);
 }
@@ -134,7 +134,7 @@ READ8_MEMBER( c128_state::cia1_pa_r )
 READ8_MEMBER( c128_state::cia1_pb_r )
 {
 	UINT8 value = 0xff;
-	UINT8 cia0porta = mos6526_pa_r(m_cia1, 0);
+	UINT8 cia0porta = mos6526_pa_r(m_cia1, space, 0);
 	//vic2e_device_interface *intf = dynamic_cast<vic2e_device_interface*>(&m_vic);
 
 	value &= cbm_common_cia0_port_b_r(m_cia1, cia0porta);
@@ -370,10 +370,10 @@ WRITE8_MEMBER( c128_state::write_d000 )
 				m_colorram[(offset & 0x3ff)|((c64_port6510&3)<<10)] = data | 0xf0; // maybe all 8 bit connected!
 		    break;
 		case 0xc:
-			mos6526_w(m_cia1, offset, data);
+			mos6526_w(m_cia1, space, offset, data);
 			break;
 		case 0xd:
-			mos6526_w(m_cia2, offset, data);
+			mos6526_w(m_cia2, space, offset, data);
 			break;
 		case 0xf:
 			dma8726_port_w(space, offset&0xff,data);
@@ -405,17 +405,17 @@ READ8_MEMBER( c128_state::read_io )
 	else if (offset == 0xc00)
 		{
 			cia_set_port_mask_value(m_cia1, 0, ioport("CTRLSEL")->read() & 0x80 ? c64_keyline[8] : c64_keyline[9] );
-			return mos6526_r(m_cia1, offset);
+			return mos6526_r(m_cia1, space, offset);
 		}
 	else if (offset == 0xc01)
 		{
 			cia_set_port_mask_value(m_cia1, 1, ioport("CTRLSEL")->read() & 0x80 ? c64_keyline[9] : c64_keyline[8] );
-			return mos6526_r(m_cia1, offset);
+			return mos6526_r(m_cia1, space, offset);
 		}
 	else if (offset < 0xd00)
-		return mos6526_r(m_cia1, offset);
+		return mos6526_r(m_cia1, space, offset);
 	else if (offset < 0xe00)
-		return mos6526_r(m_cia2, offset);
+		return mos6526_r(m_cia2, space, offset);
 	else if ((offset >= 0xf00) & (offset <= 0xfff))
 		return dma8726_port_r(space, offset&0xff);
 	DBG_LOG(machine(), 1, "io read", ("%.3x\n", offset));

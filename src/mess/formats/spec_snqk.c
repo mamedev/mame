@@ -2357,10 +2357,10 @@ void spectrum_setup_z80(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
             /* Only set up sound registers for 128K machine or TS2068! */
             for (i = 0; i < 16; i++)
             {
-                ay8910_address_w(ay8912, 0, i);
-                ay8910_data_w(ay8912, 0, snapdata[39 + i]);
+                ay8910_address_w(ay8912, state->generic_space(), 0, i);
+                ay8910_data_w(ay8912, state->generic_space(), 0, snapdata[39 + i]);
             }
-            ay8910_address_w(ay8912, 0, snapdata[38]);
+            ay8910_address_w(ay8912, state->generic_space(), 0, snapdata[38]);
         }
 
         pSource = snapdata + header_size;

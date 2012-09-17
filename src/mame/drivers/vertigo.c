@@ -31,7 +31,7 @@ READ16_MEMBER(vertigo_state::vertigo_pit8254_lsb_r)
 {
 	device_t * device = machine().device("pit8254");
 
-	return pit8253_r( device, offset );
+	return pit8253_r( device, space, offset );
 }
 
 WRITE16_MEMBER(vertigo_state::vertigo_pit8254_lsb_w)
@@ -39,7 +39,7 @@ WRITE16_MEMBER(vertigo_state::vertigo_pit8254_lsb_w)
 	device_t * device = machine().device("pit8254");
 
 	if (ACCESSING_BITS_0_7)
-		pit8253_w(device, offset, data);
+		pit8253_w(device, space, offset, data);
 }
 
 static ADDRESS_MAP_START( vertigo_map, AS_PROGRAM, 16, vertigo_state )

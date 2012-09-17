@@ -13,7 +13,7 @@
 
 ************************************************************/
 
-static void kaypro_interrupt(device_t *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( kaypro_interrupt )
 {
 	device->machine().device("maincpu")->execute().set_input_line(0, state);
 }
@@ -227,12 +227,12 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 
 const z80sio_interface kaypro_sio_intf =
 {
-	kaypro_interrupt,	/* interrupt handler */
-	0,			/* DTR changed handler */
-	0,			/* RTS changed handler */
-	0,			/* BREAK changed handler */
-	0,			/* transmit handler - which channel is this for? */
-	0			/* receive handler - which channel is this for? */
+	DEVCB_LINE(kaypro_interrupt),	/* interrupt handler */
+	DEVCB_NULL,			/* DTR changed handler */
+	DEVCB_NULL,			/* RTS changed handler */
+	DEVCB_NULL,			/* BREAK changed handler */
+	DEVCB_NULL,			/* transmit handler - which channel is this for? */
+	DEVCB_NULL			/* receive handler - which channel is this for? */
 };
 
 READ8_DEVICE_HANDLER( kaypro_sio_r )

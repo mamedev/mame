@@ -999,13 +999,13 @@ READ8_MEMBER( x1_state::x1_fdc_r )
 	switch(offset+0xff8)
 	{
 		case 0x0ff8:
-			return wd17xx_status_r(m_fdc,offset);
+			return wd17xx_status_r(m_fdc,space, offset);
 		case 0x0ff9:
-			return wd17xx_track_r(m_fdc,offset);
+			return wd17xx_track_r(m_fdc,space, offset);
 		case 0x0ffa:
-			return wd17xx_sector_r(m_fdc,offset);
+			return wd17xx_sector_r(m_fdc,space, offset);
 		case 0x0ffb:
-			return wd17xx_data_r(m_fdc,offset);
+			return wd17xx_data_r(m_fdc,space, offset);
 		case 0x0ffc:
 			printf("FDC: read FM type\n");
 			return 0xff;
@@ -1028,16 +1028,16 @@ WRITE8_MEMBER( x1_state::x1_fdc_w )
 	switch(offset+0xff8)
 	{
 		case 0x0ff8:
-			wd17xx_command_w(m_fdc,offset,data);
+			wd17xx_command_w(m_fdc,space, offset,data);
 			break;
 		case 0x0ff9:
-			wd17xx_track_w(m_fdc,offset,data);
+			wd17xx_track_w(m_fdc,space, offset,data);
 			break;
 		case 0x0ffa:
-			wd17xx_sector_w(m_fdc,offset,data);
+			wd17xx_sector_w(m_fdc,space, offset,data);
 			break;
 		case 0x0ffb:
-			wd17xx_data_w(m_fdc,offset,data);
+			wd17xx_data_w(m_fdc,space, offset,data);
 			break;
 		case 0x0ffc:
 			wd17xx_set_drive(m_fdc,data & 3);
@@ -1618,7 +1618,7 @@ READ8_MEMBER( x1_state::x1_io_r )
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ return x1_pcg_r(space, offset-0x1400); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return x1_sub_io_r(space, 0); }
 	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ return machine().device<i8255_device>("ppi8255_0")->read(space, (offset-0x1a00) & 3); }
-	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ return ay8910_r(machine().device("ay"), 0); }
+	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ return ay8910_r(machine().device("ay"), space, 0); }
 //  else if(offset >= 0x1f80 && offset <= 0x1f8f)   { return z80dma_r(machine().device("dma"), 0); }
 //  else if(offset >= 0x1f90 && offset <= 0x1f91)   { return z80sio_c_r(machine().device("sio"), (offset-0x1f90) & 1); }
 //  else if(offset >= 0x1f92 && offset <= 0x1f93)   { return z80sio_d_r(machine().device("sio"), (offset-0x1f92) & 1); }
@@ -1654,8 +1654,8 @@ WRITE8_MEMBER( x1_state::x1_io_w )
 	else if(offset == 0x1800 || offset == 0x1801)	{ x1_6845_w(space, offset-0x1800, data); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ x1_sub_io_w(space, 0,data); }
 	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ machine().device<i8255_device>("ppi8255_0")->write(space, (offset-0x1a00) & 3,data); }
-	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ ay8910_data_w(machine().device("ay"), 0,data); }
-	else if(offset >= 0x1c00 && offset <= 0x1cff)	{ ay8910_address_w(machine().device("ay"), 0,data); }
+	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ ay8910_data_w(machine().device("ay"), space, 0,data); }
+	else if(offset >= 0x1c00 && offset <= 0x1cff)	{ ay8910_address_w(machine().device("ay"), space, 0,data); }
 	else if(offset >= 0x1d00 && offset <= 0x1dff)	{ x1_rom_bank_1_w(space,0,data); }
 	else if(offset >= 0x1e00 && offset <= 0x1eff)	{ x1_rom_bank_0_w(space,0,data); }
 //  else if(offset >= 0x1f80 && offset <= 0x1f8f)   { z80dma_w(machine().device("dma"), 0,data); }
@@ -1684,8 +1684,8 @@ READ8_MEMBER( x1_state::x1turbo_io_r )
 	m_io_bank_mode = 0; //any read disables the extended mode.
 
 	// a * at the end states devices used on plain X1 too
-	if(offset == 0x0700)							{ return (ym2151_r(machine().device("ym"), offset-0x0700) & 0x7f) | (ioport("SOUND_SW")->read() & 0x80); }
-	else if(offset == 0x0701)		                { return ym2151_r(machine().device("ym"), offset-0x0700); }
+	if(offset == 0x0700)							{ return (ym2151_r(machine().device("ym"), space, offset-0x0700) & 0x7f) | (ioport("SOUND_SW")->read() & 0x80); }
+	else if(offset == 0x0701)		                { return ym2151_r(machine().device("ym"), space, offset-0x0700); }
 	//0x704 is FM sound detection port on X1 turboZ
 	else if(offset >= 0x0704 && offset <= 0x0707)   { return m_ctc->read(space,offset-0x0704); }
 	else if(offset == 0x0801)						{ printf("Color image board read\n"); return 0xff; } // *
@@ -1702,9 +1702,9 @@ READ8_MEMBER( x1_state::x1turbo_io_r )
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ return x1_pcg_r(space, offset-0x1400); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return x1_sub_io_r(space, 0); }
 	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ return machine().device<i8255_device>("ppi8255_0")->read(space, (offset-0x1a00) & 3); }
-	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ return ay8910_r(machine().device("ay"), 0); }
-	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ return z80dma_r(machine().device("dma"), 0); }
-	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ return z80dart_ba_cd_r(machine().device("sio"), (offset-0x1f90) & 3); }
+	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ return ay8910_r(machine().device("ay"), space, 0); }
+	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ return z80dma_r(machine().device("dma"), space, 0); }
+	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ return z80dart_ba_cd_r(machine().device("sio"), space, (offset-0x1f90) & 3); }
 	else if(offset >= 0x1f98 && offset <= 0x1f9f)	{ printf("Extended SIO/CTC read %04x\n",offset); return 0xff; }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return m_ctc->read(space,offset-0x1fa0); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return m_ctc->read(space,offset-0x1fa8); }
@@ -1730,7 +1730,7 @@ WRITE8_MEMBER( x1_state::x1turbo_io_w )
 {
 	// a * at the end states devices used on plain X1 too
 	if(m_io_bank_mode == 1)                    { x1_ex_gfxram_w(space, offset, data); }
-	else if(offset == 0x0700 || offset == 0x0701)	{ ym2151_w(machine().device("ym"), offset-0x0700,data); }
+	else if(offset == 0x0700 || offset == 0x0701)	{ ym2151_w(machine().device("ym"), space, offset-0x0700,data); }
 	//0x704 is FM sound detection port on X1 turboZ
 	else if(offset >= 0x0704 && offset <= 0x0707)	{ m_ctc->write(space,offset-0x0704,data); }
 	else if(offset == 0x0800)						{ printf("Color image board write %02x\n",data); } // *
@@ -1752,12 +1752,12 @@ WRITE8_MEMBER( x1_state::x1turbo_io_w )
 	else if(offset == 0x1800 || offset == 0x1801)	{ x1_6845_w(space, offset-0x1800, data); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ x1_sub_io_w(space, 0,data); }
 	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ machine().device<i8255_device>("ppi8255_0")->write(space, (offset-0x1a00) & 3,data); }
-	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ ay8910_data_w(machine().device("ay"), 0,data); }
-	else if(offset >= 0x1c00 && offset <= 0x1cff)	{ ay8910_address_w(machine().device("ay"), 0,data); }
+	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ ay8910_data_w(machine().device("ay"), space, 0,data); }
+	else if(offset >= 0x1c00 && offset <= 0x1cff)	{ ay8910_address_w(machine().device("ay"), space, 0,data); }
 	else if(offset >= 0x1d00 && offset <= 0x1dff)	{ x1_rom_bank_1_w(space,0,data); }
 	else if(offset >= 0x1e00 && offset <= 0x1eff)	{ x1_rom_bank_0_w(space,0,data); }
-	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ z80dma_w(machine().device("dma"), 0,data); }
-	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ z80dart_ba_cd_w(machine().device("sio"), (offset-0x1f90) & 3,data); }
+	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ z80dma_w(machine().device("dma"), space, 0,data); }
+	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ z80dart_ba_cd_w(machine().device("sio"), space, (offset-0x1f90) & 3,data); }
 	else if(offset >= 0x1f98 && offset <= 0x1f9f)	{ printf("Extended SIO/CTC write %04x %02x\n",offset,data); }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ m_ctc->write(space,offset-0x1fa0,data); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ m_ctc->write(space,offset-0x1fa8,data); }
@@ -2295,12 +2295,12 @@ static Z80CTC_INTERFACE( ctc_intf )
 #if 0
 static const z80sio_interface sio_intf =
 {
-	0,					/* interrupt handler */
-	0,					/* DTR changed handler */
-	0,					/* RTS changed handler */
-	0,					/* BREAK changed handler */
-	0,					/* transmit handler */
-	0					/* receive handler */
+	DEVCB_NULL,					/* interrupt handler */
+	DEVCB_NULL,					/* DTR changed handler */
+	DEVCB_NULL,					/* RTS changed handler */
+	DEVCB_NULL,					/* BREAK changed handler */
+	DEVCB_NULL,					/* transmit handler */
+	DEVCB_NULL					/* receive handler */
 };
 #endif
 

@@ -137,14 +137,14 @@ WRITE8_MEMBER(fgoal_state::fgoal_row_w)
 {
 
 	m_row = data;
-	mb14241_shift_data_w(m_mb14241, 0, 0);
+	mb14241_shift_data_w(m_mb14241, space, 0, 0);
 }
 
 WRITE8_MEMBER(fgoal_state::fgoal_col_w)
 {
 
 	m_col = data;
-	mb14241_shift_count_w(m_mb14241, 0, data);
+	mb14241_shift_count_w(m_mb14241, space, 0, data);
 }
 
 READ8_MEMBER(fgoal_state::fgoal_address_hi_r)
@@ -159,14 +159,14 @@ READ8_MEMBER(fgoal_state::fgoal_address_lo_r)
 
 READ8_MEMBER(fgoal_state::fgoal_shifter_r)
 {
-	UINT8 v = mb14241_shift_result_r(m_mb14241, 0);
+	UINT8 v = mb14241_shift_result_r(m_mb14241, space, 0);
 
 	return BITSWAP8(v, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
 READ8_MEMBER(fgoal_state::fgoal_shifter_reverse_r)
 {
-	UINT8 v = mb14241_shift_result_r(m_mb14241, 0);
+	UINT8 v = mb14241_shift_result_r(m_mb14241, space, 0);
 
 	return BITSWAP8(v, 0, 1, 2, 3, 4, 5, 6, 7);
 }

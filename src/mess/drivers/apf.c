@@ -388,42 +388,42 @@ WRITE8_MEMBER( apf_state::serial_w)
 
 WRITE8_MEMBER( apf_state::apf_wd179x_command_w)
 {
-	wd17xx_command_w(m_fdc, offset,~data);
+	wd17xx_command_w(m_fdc, space, offset,~data);
 }
 
 WRITE8_MEMBER( apf_state::apf_wd179x_track_w)
 {
-	wd17xx_track_w(m_fdc, offset,~data);
+	wd17xx_track_w(m_fdc, space, offset,~data);
 }
 
 WRITE8_MEMBER( apf_state::apf_wd179x_sector_w)
 {
-	wd17xx_sector_w(m_fdc, offset,~data);
+	wd17xx_sector_w(m_fdc, space, offset,~data);
 }
 
 WRITE8_MEMBER( apf_state::apf_wd179x_data_w)
 {
-	wd17xx_data_w(m_fdc, offset,~data);
+	wd17xx_data_w(m_fdc, space, offset,~data);
 }
 
 READ8_MEMBER( apf_state::apf_wd179x_status_r)
 {
-	return ~wd17xx_status_r(m_fdc, offset);
+	return ~wd17xx_status_r(m_fdc, space, offset);
 }
 
 READ8_MEMBER( apf_state::apf_wd179x_track_r)
 {
-	return ~wd17xx_track_r(m_fdc, offset);
+	return ~wd17xx_track_r(m_fdc, space, offset);
 }
 
 READ8_MEMBER( apf_state::apf_wd179x_sector_r)
 {
-	return ~wd17xx_sector_r(m_fdc, offset);
+	return ~wd17xx_sector_r(m_fdc, space, offset);
 }
 
 READ8_MEMBER( apf_state::apf_wd179x_data_r)
 {
-	return wd17xx_data_r(m_fdc, offset); // should this be inverted like the rest?
+	return wd17xx_data_r(m_fdc, space, offset); // should this be inverted like the rest?
 }
 
 static ADDRESS_MAP_START( apf_imagination_map, AS_PROGRAM, 8, apf_state )

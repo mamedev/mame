@@ -611,11 +611,11 @@ READ8_MEMBER(pc9801_state::pc9801_00_r)
 		if(offset & 0x14)
 			printf("Read to undefined port [%02x]\n",offset+0x00);
 		else
-			return pic8259_r(machine().device((offset & 8) ? "pic8259_slave" : "pic8259_master"), (offset & 2) >> 1);
+			return pic8259_r(machine().device((offset & 8) ? "pic8259_slave" : "pic8259_master"), space, (offset & 2) >> 1);
 	}
 	else // odd
 	{
-		return i8237_r(machine().device("dma8237"), (offset & 0x1e) >> 1);
+		return i8237_r(machine().device("dma8237"), space, (offset & 0x1e) >> 1);
 	}
 
 	return 0xff;
@@ -628,11 +628,11 @@ WRITE8_MEMBER(pc9801_state::pc9801_00_w)
 		if(offset & 0x14)
 			printf("Write to undefined port [%02x] <- %02x\n",offset+0x00,data);
 		else
-			pic8259_w(machine().device((offset & 8) ? "pic8259_slave" : "pic8259_master"), (offset & 2) >> 1, data);
+			pic8259_w(machine().device((offset & 8) ? "pic8259_slave" : "pic8259_master"), space, (offset & 2) >> 1, data);
 	}
 	else // odd
 	{
-		i8237_w(machine().device("dma8237"), (offset & 0x1e) >> 1, data);
+		i8237_w(machine().device("dma8237"), space, (offset & 0x1e) >> 1, data);
 	}
 }
 
@@ -875,7 +875,7 @@ READ8_MEMBER(pc9801_state::pc9801_70_r)
 		if(offset & 0x08)
 			printf("Read to undefined port [%02x]\n",offset+0x70);
 		else
-			return pit8253_r(machine().device("pit8253"), (offset & 6) >> 1);
+			return pit8253_r(machine().device("pit8253"), space, (offset & 6) >> 1);
 	}
 
 	return 0xff;
@@ -892,7 +892,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_70_w)
 	else // odd
 	{
 		if(offset < 0x08)
-			pit8253_w(machine().device("pit8253"), (offset & 6) >> 1, data);
+			pit8253_w(machine().device("pit8253"), space, (offset & 6) >> 1, data);
 		else
 			printf("Write to undefined port [%02x] <- %02x\n",offset+0x70,data);
 	}
@@ -1038,8 +1038,8 @@ READ8_MEMBER(pc9801_state::pc9801_fdc_2hd_r)
 	{
 		switch(offset & 6)
 		{
-			case 0:	return upd765_status_r(machine().device("upd765_2hd"),0);
-			case 2: return upd765_data_r(machine().device("upd765_2hd"),0);
+			case 0:	return upd765_status_r(machine().device("upd765_2hd"),space, 0);
+			case 2: return upd765_data_r(machine().device("upd765_2hd"),space, 0);
 			case 4: return 0x5f; //unknown port meaning
 		}
 	}
@@ -1065,7 +1065,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_fdc_2hd_w)
 		switch(offset & 6)
 		{
 			case 0: printf("Write to undefined port [%02x] <- %02x\n",offset+0x90,data); return;
-			case 2: upd765_data_w(machine().device("upd765_2hd"),0,data); return;
+			case 2: upd765_data_w(machine().device("upd765_2hd"),space, 0,data); return;
 			case 4:
 				printf("%02x ctrl\n",data);
 				if(((m_fdc_2hd_ctrl & 0x80) == 0) && (data & 0x80))
@@ -1099,8 +1099,8 @@ READ8_MEMBER(pc9801_state::pc9801_fdc_2dd_r)
 	{
 		switch(offset & 6)
 		{
-			case 0:	return upd765_status_r(machine().device("upd765_2dd"),0);
-			case 2: return upd765_data_r(machine().device("upd765_2dd"),0);
+			case 0:	return upd765_status_r(machine().device("upd765_2dd"),space, 0);
+			case 2: return upd765_data_r(machine().device("upd765_2dd"),space, 0);
 			case 4: return 0x40; //unknown port meaning, might be 0x70
 		}
 	}
@@ -1121,7 +1121,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_fdc_2dd_w)
 		switch(offset & 6)
 		{
 			case 0: printf("Write to undefined port [%02x] <- %02x\n",offset+0xc8,data); return;
-			case 2: upd765_data_w(machine().device("upd765_2dd"),0,data); return;
+			case 2: upd765_data_w(machine().device("upd765_2dd"),space, 0,data); return;
 			case 4:
 				printf("%02x ctrl\n",data);
 				if(((m_fdc_2dd_ctrl & 0x80) == 0) && (data & 0x80))
@@ -1182,7 +1182,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_gvram_w)
 READ8_MEMBER(pc9801_state::pc9801_opn_r)
 {
 	if((offset & 1) == 0)
-		return ym2203_r(machine().device("opn"),offset >> 1);
+		return ym2203_r(machine().device("opn"),space, offset >> 1);
 	else // odd
 	{
 		printf("Read to undefined port [%02x]\n",offset+0x188);
@@ -1193,7 +1193,7 @@ READ8_MEMBER(pc9801_state::pc9801_opn_r)
 WRITE8_MEMBER(pc9801_state::pc9801_opn_w)
 {
 	if((offset & 1) == 0)
-		ym2203_w(machine().device("opn"),offset >> 1,data);
+		ym2203_w(machine().device("opn"),space, offset >> 1,data);
 	else // odd
 	{
 		printf("Write to undefined port [%02x] %02x\n",offset+0x188,data);
@@ -1411,8 +1411,8 @@ READ8_MEMBER(pc9801_state::pc9801rs_2hd_r)
 	{
 		switch(offset & 6)
 		{
-			case 0:	return upd765_status_r(machine().device("upd765_2hd"),0);
-			case 2: return upd765_data_r(machine().device("upd765_2hd"),0);
+			case 0:	return upd765_status_r(machine().device("upd765_2hd"),space, 0);
+			case 2: return upd765_data_r(machine().device("upd765_2hd"),space, 0);
 			case 4: return 0x40; //2hd flag
 		}
 	}
@@ -1428,7 +1428,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_2hd_w)
 	{
 		switch(offset & 6)
 		{
-			case 2: upd765_data_w(machine().device("upd765_2hd"),0,data); return;
+			case 2: upd765_data_w(machine().device("upd765_2hd"),space, 0,data); return;
 			case 4: printf("%02x FDC ctrl\n",data); return;
 		}
 	}
@@ -1446,8 +1446,8 @@ READ8_MEMBER(pc9801_state::pc9801rs_2dd_r)
 	{
 		switch(offset & 6)
 		{
-			case 0:	return upd765_status_r(machine().device("upd765_2hd"),0);
-			case 2: return upd765_data_r(machine().device("upd765_2hd"),0);
+			case 0:	return upd765_status_r(machine().device("upd765_2hd"),space, 0);
+			case 2: return upd765_data_r(machine().device("upd765_2hd"),space, 0);
 			case 4: return 0x70; //2dd flag
 		}
 	}
@@ -1467,7 +1467,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_2dd_w)
 	{
 		switch(offset & 6)
 		{
-			case 2: upd765_data_w(machine().device("upd765_2hd"),0,data); return;
+			case 2: upd765_data_w(machine().device("upd765_2hd"),space, 0,data); return;
 			case 4: printf("%02x FDC ctrl\n",data); return;
 		}
 	}
@@ -2377,17 +2377,17 @@ static READ8_DEVICE_HANDLER( ppi_fdd_porta_r )
 
 static READ8_DEVICE_HANDLER( ppi_fdd_portb_r )
 {
-	return 0xff; //upd765_status_r(device->machine().device("upd765_2dd"),0);
+	return 0xff; //upd765_status_r(device->machine().device("upd765_2dd"),space, 0);
 }
 
 static READ8_DEVICE_HANDLER( ppi_fdd_portc_r )
 {
-	return 0xff; //upd765_data_r(device->machine().device("upd765_2dd"),0);
+	return 0xff; //upd765_data_r(device->machine().device("upd765_2dd"),space, 0);
 }
 
 static WRITE8_DEVICE_HANDLER( ppi_fdd_portc_w )
 {
-	//upd765_data_w(device->machine().device("upd765_2dd"),0,data);
+	//upd765_data_w(device->machine().device("upd765_2dd"),space, 0,data);
 }
 
 static I8255A_INTERFACE( ppi_fdd_intf )

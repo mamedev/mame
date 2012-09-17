@@ -168,7 +168,7 @@
 
 READ8_MEMBER(mw8080bw_state::mw8080bw_shift_result_rev_r)
 {
-	UINT8 ret = mb14241_shift_result_r(m_mb14241, 0);
+	UINT8 ret = mb14241_shift_result_r(m_mb14241, space, 0);
 
 	return BITSWAP8(ret,0,1,2,3,4,5,6,7);
 }
@@ -184,7 +184,7 @@ READ8_MEMBER(mw8080bw_state::mw8080bw_reversable_shift_result_r)
 	}
 	else
 	{
-		ret = mb14241_shift_result_r(m_mb14241, 0);
+		ret = mb14241_shift_result_r(m_mb14241, space, 0);
 	}
 
 	return ret;
@@ -192,7 +192,7 @@ READ8_MEMBER(mw8080bw_state::mw8080bw_reversable_shift_result_r)
 
 WRITE8_MEMBER(mw8080bw_state::mw8080bw_reversable_shift_count_w)
 {
-	mb14241_shift_count_w(m_mb14241, offset, data);
+	mb14241_shift_count_w(m_mb14241, space, offset, data);
 
 	m_rev_shift_res = data & 0x08;
 }
@@ -425,10 +425,10 @@ WRITE8_MEMBER(mw8080bw_state::gunfight_io_w)
 		gunfight_audio_w(space, 0, data);
 
 	if (offset & 0x02)
-		mb14241_shift_count_w(m_mb14241, 0, data);
+		mb14241_shift_count_w(m_mb14241, space, 0, data);
 
 	if (offset & 0x04)
-		mb14241_shift_data_w(m_mb14241, 0, data);
+		mb14241_shift_data_w(m_mb14241, space, 0, data);
 
 }
 
@@ -618,13 +618,13 @@ WRITE8_MEMBER(mw8080bw_state::tornbase_io_w)
 {
 
 	if (offset & 0x01)
-		tornbase_audio_w(machine().device("discrete"), 0, data);
+		tornbase_audio_w(machine().device("discrete"), space, 0, data);
 
 	if (offset & 0x02)
-		mb14241_shift_count_w(m_mb14241, 0, data);
+		mb14241_shift_count_w(m_mb14241, space, 0, data);
 
 	if (offset & 0x04)
-		mb14241_shift_data_w(m_mb14241, 0, data);
+		mb14241_shift_data_w(m_mb14241, space, 0, data);
 }
 
 
@@ -1070,7 +1070,7 @@ MACHINE_CONFIG_END
 WRITE8_MEMBER(mw8080bw_state::checkmat_io_w)
 {
 
-	if (offset & 0x01)  checkmat_audio_w(m_discrete, 0, data);
+	if (offset & 0x01)  checkmat_audio_w(m_discrete, space, 0, data);
 
 	if (offset & 0x02)  watchdog_reset_w(space, 0, data);
 }
@@ -2165,13 +2165,13 @@ WRITE8_MEMBER(mw8080bw_state::spcenctr_io_w)
 		watchdog_reset_w(space, 0, data);		/*  -  -  -  -  -  0  1  0 */
 
 	else if ((offset & 0x5f) == 0x01)
-		spcenctr_audio_1_w(m_discrete, 0, data);	/*  -  0  -  0  0  0  0  1 */
+		spcenctr_audio_1_w(m_discrete, space, 0, data);	/*  -  0  -  0  0  0  0  1 */
 
 	else if ((offset & 0x5f) == 0x09)
-		spcenctr_audio_2_w(m_discrete, 0, data);	/*  -  0  -  0  1  0  0  1 */
+		spcenctr_audio_2_w(m_discrete, space, 0, data);	/*  -  0  -  0  1  0  0  1 */
 
 	else if ((offset & 0x5f) == 0x11)
-		spcenctr_audio_3_w(m_discrete, 0, data);	/*  -  0  -  1  0  0  0  1 */
+		spcenctr_audio_3_w(m_discrete, space, 0, data);	/*  -  0  -  1  0  0  0  1 */
 
 	else if ((offset & 0x07) == 0x03)
 	{											/*  -  -  -  -  -  0  1  1 */
@@ -2381,7 +2381,7 @@ READ8_MEMBER(mw8080bw_state::bowler_shift_result_r)
        anything unusual on the schematics that would cause
        the bits to flip */
 
-	return ~mb14241_shift_result_r(m_mb14241, 0);
+	return ~mb14241_shift_result_r(m_mb14241, space, 0);
 }
 
 WRITE8_MEMBER(mw8080bw_state::bowler_lights_1_w)

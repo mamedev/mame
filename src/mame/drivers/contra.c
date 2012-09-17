@@ -28,7 +28,8 @@ Dip locations and factory settings verified with manual
 static INTERRUPT_GEN( contra_interrupt )
 {
 	contra_state *state = device->machine().driver_data<contra_state>();
-	if (k007121_ctrlram_r(state->m_k007121_1, 7) & 0x02)
+	address_space &space = state->generic_space();
+	if (k007121_ctrlram_r(state->m_k007121_1, space, 7) & 0x02)
 		device->execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 

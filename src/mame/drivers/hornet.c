@@ -377,38 +377,38 @@ public:
 READ32_MEMBER(hornet_state::hornet_k037122_sram_r)
 {
 	device_t *k037122 = machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
-	return k037122_sram_r(k037122, offset, mem_mask);
+	return k037122_sram_r(k037122, space, offset, mem_mask);
 }
 
 WRITE32_MEMBER(hornet_state::hornet_k037122_sram_w)
 {
 	device_t *k037122 = machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
-	k037122_sram_w(k037122, offset, data, mem_mask);
+	k037122_sram_w(k037122, space, offset, data, mem_mask);
 }
 
 
 READ32_MEMBER(hornet_state::hornet_k037122_char_r)
 {
 	device_t *k037122 = machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
-	return k037122_char_r(k037122, offset, mem_mask);
+	return k037122_char_r(k037122, space, offset, mem_mask);
 }
 
 WRITE32_MEMBER(hornet_state::hornet_k037122_char_w)
 {
 	device_t *k037122 = machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
-	k037122_char_w(k037122, offset, data, mem_mask);
+	k037122_char_w(k037122, space, offset, data, mem_mask);
 }
 
 READ32_MEMBER(hornet_state::hornet_k037122_reg_r)
 {
 	device_t *k037122 = machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
-	return k037122_reg_r(k037122, offset, mem_mask);
+	return k037122_reg_r(k037122, space, offset, mem_mask);
 }
 
 WRITE32_MEMBER(hornet_state::hornet_k037122_reg_w)
 {
 	device_t *k037122 = machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
-	k037122_reg_w(k037122, offset, data, mem_mask);
+	k037122_reg_w(k037122, space, offset, data, mem_mask);
 }
 
 static void voodoo_vblank_0(device_t *device, int param)
@@ -490,7 +490,7 @@ READ8_MEMBER(hornet_state::sysreg_r)
                 0x01 = ADDO (ADC DO)
             */
 			r = 0xf0 | (eeprom->read_bit() << 3);
-			r |= adc1213x_do_r(adc12138, 0) | (adc1213x_eoc_r(adc12138, 0) << 2);
+			r |= adc1213x_do_r(adc12138, space, 0) | (adc1213x_eoc_r(adc12138, space, 0) << 2);
 			break;
 
 		case 4:	/* I/O port 4 - DIP switches */
@@ -544,10 +544,10 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
                 0x02 = ADDI (ADC DI)
                 0x01 = ADDSCLK (ADC SCLK)
             */
-			adc1213x_cs_w(adc12138, 0, (data >> 3) & 0x1);
-			adc1213x_conv_w(adc12138, 0, (data >> 2) & 0x1);
-			adc1213x_di_w(adc12138, 0, (data >> 1) & 0x1);
-			adc1213x_sclk_w(adc12138, 0, data & 0x1);
+			adc1213x_cs_w(adc12138, space, 0, (data >> 3) & 0x1);
+			adc1213x_conv_w(adc12138, space, 0, (data >> 2) & 0x1);
+			adc1213x_di_w(adc12138, space, 0, (data >> 1) & 0x1);
+			adc1213x_sclk_w(adc12138, space, 0, data & 0x1);
 
 			machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 1 = %02X\n", data);

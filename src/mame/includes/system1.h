@@ -113,7 +113,7 @@ public:
 
 
 
-WRITE8_DEVICE_HANDLER( system1_videoram_bank_w );
+DECLARE_WRITE8_DEVICE_HANDLER( system1_videoram_bank_w );
 
 
 

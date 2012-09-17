@@ -209,7 +209,7 @@ WRITE8_MEMBER(rpunch_state::upd_control_w)
 WRITE8_MEMBER(rpunch_state::upd_data_w)
 {
 	device_t *device = machine().device("upd");
-	upd7759_port_w(device, 0, data);
+	upd7759_port_w(device, space, 0, data);
 	upd7759_start_w(device, 0);
 	upd7759_start_w(device, 1);
 }

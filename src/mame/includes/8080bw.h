@@ -83,12 +83,12 @@ public:
 
 extern const samples_interface lrescue_samples_interface;
 
-WRITE8_DEVICE_HANDLER( indianbt_sh_port_3_w );
+DECLARE_WRITE8_DEVICE_HANDLER( indianbt_sh_port_3_w );
 DISCRETE_SOUND_EXTERN( indianbt );
 
-WRITE8_DEVICE_HANDLER( polaris_sh_port_1_w );
-WRITE8_DEVICE_HANDLER( polaris_sh_port_2_w );
-WRITE8_DEVICE_HANDLER( polaris_sh_port_3_w );
+DECLARE_WRITE8_DEVICE_HANDLER( polaris_sh_port_1_w );
+DECLARE_WRITE8_DEVICE_HANDLER( polaris_sh_port_2_w );
+DECLARE_WRITE8_DEVICE_HANDLER( polaris_sh_port_3_w );
 DISCRETE_SOUND_EXTERN( polaris );
 
 

@@ -19,14 +19,16 @@
 static INTERRUPT_GEN( labyrunr_vblank_interrupt )
 {
 	labyrunr_state *state = device->machine().driver_data<labyrunr_state>();
-	if (k007121_ctrlram_r(state->m_k007121, 7) & 0x02)
+	address_space &space = state->generic_space();
+	if (k007121_ctrlram_r(state->m_k007121, space, 7) & 0x02)
 		device->execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( labyrunr_timer_interrupt )
 {
 	labyrunr_state *state = device->machine().driver_data<labyrunr_state>();
-	if (k007121_ctrlram_r(state->m_k007121, 7) & 0x01)
+	address_space &space = state->generic_space();
+	if (k007121_ctrlram_r(state->m_k007121, space, 7) & 0x01)
 		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 

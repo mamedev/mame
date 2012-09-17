@@ -71,8 +71,8 @@ extern const device_type S2636;
    D3 indicates whether the S2636 drew this pixel - 0 = not drawn, 1 = drawn */
 
 bitmap_ind16 &s2636_update( device_t *device, const rectangle &cliprect );
-WRITE8_DEVICE_HANDLER( s2636_work_ram_w );
-READ8_DEVICE_HANDLER( s2636_work_ram_r );
+DECLARE_WRITE8_DEVICE_HANDLER( s2636_work_ram_w );
+DECLARE_READ8_DEVICE_HANDLER( s2636_work_ram_r );
 
 
 #endif /* __S2636_H__ */

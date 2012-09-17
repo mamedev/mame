@@ -91,8 +91,8 @@ extern const device_type SVISION;
 int *svision_dma_finished(device_t *device);
 void svision_sound_decrement(device_t *device);
 void svision_soundport_w(device_t *device, int which, int offset, int data);
-WRITE8_DEVICE_HANDLER( svision_sounddma_w );
-WRITE8_DEVICE_HANDLER( svision_noise_w );
+DECLARE_WRITE8_DEVICE_HANDLER( svision_sounddma_w );
+DECLARE_WRITE8_DEVICE_HANDLER( svision_noise_w );
 
 
 #endif /* SVISION_H_ */

@@ -276,7 +276,7 @@ static READ8_HANDLER ( to7_5p14_r )
 	device_t *fdc = space->machine().device("wd2793");
 
 	if ( offset < 4 )
-		return wd17xx_r( fdc, offset );
+		return wd17xx_r( fdc, *space, offset );
 	else if ( offset == 8 )
 		return to7_5p14_select;
 	else
@@ -290,7 +290,7 @@ static WRITE8_HANDLER( to7_5p14_w )
 {
 	device_t *fdc = space->machine().device("wd2793");
 	if ( offset < 4 )
-		wd17xx_w( fdc, offset, data );
+		wd17xx_w( fdc, *space, offset, data );
 	else if ( offset == 8 )
 	{
 		/* drive select */
@@ -362,7 +362,7 @@ static UINT8 to7_5p14sd_select;
 static READ8_HANDLER ( to7_5p14sd_r )
 {
 	if ( offset < 8 )
-		return mc6843_r( space->machine().device("mc6843"), offset );
+		return mc6843_r( space->machine().device("mc6843"), *space, offset );
 	else if ( offset >= 8 && offset <= 9 )
 		return to7_5p14sd_select;
 	else
@@ -375,7 +375,7 @@ static READ8_HANDLER ( to7_5p14sd_r )
 static WRITE8_HANDLER( to7_5p14sd_w )
 {
 	if ( offset < 8 )
-		mc6843_w( space->machine().device("mc6843"), offset, data );
+		mc6843_w( space->machine().device("mc6843"), *space, offset, data );
 	else if ( offset >= 8 && offset <= 9 )
 	{
 		/* drive select */
@@ -1715,7 +1715,7 @@ static void to7_network_reset( running_machine &machine )
 static READ8_HANDLER ( to7_network_r )
 {
 	if ( offset < 4 )
-		return mc6854_r( space->machine().device("mc6854"), offset );
+		return mc6854_r( space->machine().device("mc6854"), *space, offset );
 
 	if ( offset == 8 )
 	{
@@ -1734,7 +1734,7 @@ static READ8_HANDLER ( to7_network_r )
 static WRITE8_HANDLER ( to7_network_w )
 {
 	if ( offset < 4 )
-		mc6854_w( space->machine().device("mc6854"), offset, data );
+		mc6854_w( space->machine().device("mc6854"), *space, offset, data );
 	else
 	{
 		logerror( "%f $%04x to7_network_w: invalid write offset %i (data=$%02X)\n",

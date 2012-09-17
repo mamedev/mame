@@ -319,7 +319,7 @@ static void thom_irq_0  ( running_machine &machine, int state )
 	thom_set_irq  ( machine, 0, state );
 }
 
-static void thom_dev_irq_0  ( device_t *device, int state )
+static WRITE_LINE_DEVICE_HANDLER( thom_dev_irq_0 )
 {
 	thom_irq_0( device->machine(), state );
 }
@@ -543,9 +543,9 @@ static WRITE8_DEVICE_HANDLER ( to7_timer_tco_out )
 
 const mc6846_interface to7_timer =
 {
-	to7_timer_port_out, NULL, to7_timer_cp2_out,
-	to7_timer_port_in, to7_timer_tco_out,
-	thom_dev_irq_0
+	DEVCB_HANDLER(to7_timer_port_out), DEVCB_NULL, DEVCB_HANDLER(to7_timer_cp2_out),
+	DEVCB_HANDLER(to7_timer_port_in), DEVCB_HANDLER(to7_timer_tco_out),
+	DEVCB_LINE(thom_dev_irq_0)
 };
 
 
@@ -934,7 +934,7 @@ static void to7_modem_init( running_machine &machine )
 /* ------------  dispatch MODEM / speech extension ------------ */
 
 
-const mea8000_interface to7_speech = { "speech", NULL };
+const mea8000_interface to7_speech = { "speech", DEVCB_NULL };
 
 
 READ8_HANDLER ( to7_modem_mea8000_r )
@@ -947,7 +947,7 @@ READ8_HANDLER ( to7_modem_mea8000_r )
 	if ( space->machine().root_device().ioport("mconfig")->read() & 1 )
 	{
 		device_t* device = space->machine().device("mea8000" );
-		return mea8000_r( device, offset );
+		return mea8000_r( device, *space, offset );
 	}
 	else
 	{
@@ -967,7 +967,7 @@ WRITE8_HANDLER ( to7_modem_mea8000_w )
 	if ( space->machine().root_device().ioport("mconfig")->read() & 1 )
 	{
 		device_t* device = space->machine().device("mea8000" );
-		mea8000_w( device, offset, data );
+		mea8000_w( device, *space, offset, data );
 	}
 	else
 	{
@@ -1662,9 +1662,9 @@ static WRITE8_DEVICE_HANDLER ( to770_timer_port_out )
 
 const mc6846_interface to770_timer =
 {
-	to770_timer_port_out, NULL, to7_timer_cp2_out,
-	to7_timer_port_in, to7_timer_tco_out,
-	thom_dev_irq_0
+	DEVCB_HANDLER(to770_timer_port_out), DEVCB_NULL, DEVCB_HANDLER(to7_timer_cp2_out),
+	DEVCB_HANDLER(to7_timer_port_in), DEVCB_HANDLER(to7_timer_tco_out),
+	DEVCB_LINE(thom_dev_irq_0)
 };
 
 
@@ -3104,9 +3104,9 @@ static WRITE8_DEVICE_HANDLER ( to9_timer_port_out )
 
 const mc6846_interface to9_timer =
 {
-	to9_timer_port_out, NULL, to7_timer_cp2_out,
-	to7_timer_port_in, to7_timer_tco_out,
-	thom_dev_irq_0
+	DEVCB_HANDLER(to9_timer_port_out), DEVCB_NULL, DEVCB_HANDLER(to7_timer_cp2_out),
+	DEVCB_HANDLER(to7_timer_port_in), DEVCB_HANDLER(to7_timer_tco_out),
+	DEVCB_LINE(thom_dev_irq_0)
 };
 
 
@@ -4156,9 +4156,9 @@ static WRITE8_DEVICE_HANDLER ( to8_timer_cp2_out )
 
 const mc6846_interface to8_timer =
 {
-	to8_timer_port_out, NULL, to8_timer_cp2_out,
-	to8_timer_port_in, to7_timer_tco_out,
-	thom_dev_irq_0
+	DEVCB_HANDLER(to8_timer_port_out), DEVCB_NULL, DEVCB_HANDLER(to8_timer_cp2_out),
+	DEVCB_HANDLER(to8_timer_port_in), DEVCB_HANDLER(to7_timer_tco_out),
+	DEVCB_LINE(thom_dev_irq_0)
 };
 
 
@@ -4345,9 +4345,9 @@ static WRITE8_DEVICE_HANDLER ( to9p_timer_port_out )
 
 const mc6846_interface to9p_timer =
 {
-	to9p_timer_port_out, NULL, to8_timer_cp2_out,
-	to9p_timer_port_in, to7_timer_tco_out,
-	thom_dev_irq_0
+	DEVCB_HANDLER(to9p_timer_port_out), DEVCB_NULL, DEVCB_HANDLER(to8_timer_cp2_out),
+	DEVCB_HANDLER(to9p_timer_port_in), DEVCB_HANDLER(to7_timer_tco_out),
+	DEVCB_LINE(thom_dev_irq_0)
 };
 
 

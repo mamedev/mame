@@ -305,18 +305,18 @@ WRITE8_MEMBER(grchamp_state::cpu1_outputs_w)
 			/* bit 2-4: ATTACK UP 1-3 */
 			/* bit 5-6: SIFT 1-2 */
 			/* bit 7:   ENGINE CS */
-			discrete_sound_w(discrete, GRCHAMP_ENGINE_CS_EN, data & 0x80);
-			discrete_sound_w(discrete, GRCHAMP_SIFT_DATA, (data >> 5) & 0x03);
-			discrete_sound_w(discrete, GRCHAMP_ATTACK_UP_DATA, (data >> 2) & 0x07);
-			discrete_sound_w(discrete, GRCHAMP_IDLING_EN, data & 0x02);
-			discrete_sound_w(discrete, GRCHAMP_FOG_EN, data & 0x01);
+			discrete_sound_w(discrete, space, GRCHAMP_ENGINE_CS_EN, data & 0x80);
+			discrete_sound_w(discrete, space, GRCHAMP_SIFT_DATA, (data >> 5) & 0x03);
+			discrete_sound_w(discrete, space, GRCHAMP_ATTACK_UP_DATA, (data >> 2) & 0x07);
+			discrete_sound_w(discrete, space, GRCHAMP_IDLING_EN, data & 0x02);
+			discrete_sound_w(discrete, space, GRCHAMP_FOG_EN, data & 0x01);
 			break;
 
 		case 0x0d: /* OUTD */
 			/* bit 0-3: ATTACK SPEED 1-4 */
 			/* bit 4-7: PLAYER SPEED 1-4 */
-			discrete_sound_w(discrete, GRCHAMP_PLAYER_SPEED_DATA, (data >> 4) & 0x0f);
-			discrete_sound_w(discrete, GRCHAMP_ATTACK_SPEED_DATA,  data & 0x0f);
+			discrete_sound_w(discrete, space, GRCHAMP_PLAYER_SPEED_DATA, (data >> 4) & 0x0f);
+			discrete_sound_w(discrete, space, GRCHAMP_ATTACK_SPEED_DATA,  data & 0x0f);
 			break;
 
 		default:
@@ -416,13 +416,13 @@ READ8_MEMBER(grchamp_state::main_to_sub_comm_r)
 WRITE8_MEMBER(grchamp_state::grchamp_portA_0_w)
 {
 	device_t *device = machine().device("discrete");
-	discrete_sound_w(device, GRCHAMP_A_DATA, data);
+	discrete_sound_w(device, space, GRCHAMP_A_DATA, data);
 }
 
 WRITE8_MEMBER(grchamp_state::grchamp_portB_0_w)
 {
 	device_t *device = machine().device("discrete");
-	discrete_sound_w(device, GRCHAMP_B_DATA, 255-data);
+	discrete_sound_w(device, space, GRCHAMP_B_DATA, 255-data);
 }
 
 WRITE8_MEMBER(grchamp_state::grchamp_portA_2_w)

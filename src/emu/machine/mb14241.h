@@ -43,9 +43,9 @@ extern const device_type MB14241;
     DEVICE I/O FUNCTIONS
 ***************************************************************************/
 
-WRITE8_DEVICE_HANDLER ( mb14241_shift_count_w );
-WRITE8_DEVICE_HANDLER ( mb14241_shift_data_w );
-READ8_DEVICE_HANDLER( mb14241_shift_result_r );
+DECLARE_WRITE8_DEVICE_HANDLER ( mb14241_shift_count_w );
+DECLARE_WRITE8_DEVICE_HANDLER ( mb14241_shift_data_w );
+DECLARE_READ8_DEVICE_HANDLER( mb14241_shift_result_r );
 
 
 #endif /* __MB14241_H__ */

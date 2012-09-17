@@ -41,8 +41,8 @@ protected:
     virtual void device_config_complete() { m_shortname = "mm65k16s"; }
 
 	// device_s100_card_interface overrides
-	virtual UINT8 s100_smemr_r(offs_t offset);
-	virtual void s100_mwrt_w(offs_t offset, UINT8 data);
+	virtual UINT8 s100_smemr_r(address_space &space, offs_t offset);
+	virtual void s100_mwrt_w(address_space &space, offs_t offset, UINT8 data);
 	virtual void s100_phantom_w(int state);
 
 private:

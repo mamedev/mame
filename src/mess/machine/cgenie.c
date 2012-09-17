@@ -19,8 +19,8 @@
 #include "machine/ram.h"
 
 #define AYWriteReg(chip,port,value) \
-	ay8910_address_w(ay8910, 0,port);  \
-	ay8910_data_w(ay8910, 0,value)
+	ay8910_address_w(ay8910, *space, 0,port);  \
+	ay8910_data_w(ay8910, *space, 0,value)
 
 #define TAPE_HEADER "Colour Genie - Virtual Tape File"
 
@@ -336,7 +336,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 	/* If the floppy isn't emulated, return 0 */
 	if( (space->machine().root_device().ioport("DSW0")->read() & 0x80) == 0 )
 		return 0;
-	return wd17xx_status_r(fdc, offset);
+	return wd17xx_status_r(fdc, *space, offset);
 }
 
  READ8_HANDLER( cgenie_track_r )
@@ -345,7 +345,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 	/* If the floppy isn't emulated, return 0xff */
 	if( (space->machine().root_device().ioport("DSW0")->read() & 0x80) == 0 )
 		return 0xff;
-	return wd17xx_track_r(fdc, offset);
+	return wd17xx_track_r(fdc, *space, offset);
 }
 
  READ8_HANDLER( cgenie_sector_r )
@@ -354,7 +354,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 	/* If the floppy isn't emulated, return 0xff */
 	if( (space->machine().root_device().ioport("DSW0")->read() & 0x80) == 0 )
 		return 0xff;
-	return wd17xx_sector_r(fdc, offset);
+	return wd17xx_sector_r(fdc, *space, offset);
 }
 
  READ8_HANDLER(cgenie_data_r )
@@ -363,7 +363,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 	/* If the floppy isn't emulated, return 0xff */
 	if( (space->machine().root_device().ioport("DSW0")->read() & 0x80) == 0 )
 		return 0xff;
-	return wd17xx_data_r(fdc, offset);
+	return wd17xx_data_r(fdc, *space, offset);
 }
 
 WRITE8_HANDLER( cgenie_command_w )
@@ -372,7 +372,7 @@ WRITE8_HANDLER( cgenie_command_w )
 	/* If the floppy isn't emulated, return immediately */
 	if( (space->machine().root_device().ioport("DSW0")->read() & 0x80) == 0 )
 		return;
-	wd17xx_command_w(fdc, offset, data);
+	wd17xx_command_w(fdc, *space, offset, data);
 }
 
 WRITE8_HANDLER( cgenie_track_w )
@@ -381,7 +381,7 @@ WRITE8_HANDLER( cgenie_track_w )
 	/* If the floppy isn't emulated, ignore the write */
 	if( (space->machine().root_device().ioport("DSW0")->read() & 0x80) == 0 )
 		return;
-	wd17xx_track_w(fdc, offset, data);
+	wd17xx_track_w(fdc, *space, offset, data);
 }
 
 WRITE8_HANDLER( cgenie_sector_w )
@@ -390,7 +390,7 @@ WRITE8_HANDLER( cgenie_sector_w )
 	/* If the floppy isn't emulated, ignore the write */
 	if( (space->machine().root_device().ioport("DSW0")->read() & 0x80) == 0 )
 		return;
-	wd17xx_sector_w(fdc, offset, data);
+	wd17xx_sector_w(fdc, *space, offset, data);
 }
 
 WRITE8_HANDLER( cgenie_data_w )
@@ -399,7 +399,7 @@ WRITE8_HANDLER( cgenie_data_w )
 	/* If the floppy isn't emulated, ignore the write */
 	if( (space->machine().root_device().ioport("DSW0")->read() & 0x80) == 0 )
 		return;
-	wd17xx_data_w(fdc, offset, data);
+	wd17xx_data_w(fdc, *space, offset, data);
 }
 
  READ8_HANDLER( cgenie_irq_status_r )
@@ -614,5 +614,5 @@ WRITE8_DEVICE_HANDLER( cgenie_sh_control_port_w )
 {
 	cgenie_state *state = device->machine().driver_data<cgenie_state>();
 	state->m_control_port = data;
-	ay8910_address_w(device, offset, data);
+	ay8910_address_w(device, space, offset, data);
 }

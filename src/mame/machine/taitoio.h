@@ -127,30 +127,30 @@ extern const device_type TC0640FIO;
 ***************************************************************************/
 
 /** TC0220IOC **/
-READ8_DEVICE_HANDLER( tc0220ioc_r );
-WRITE8_DEVICE_HANDLER( tc0220ioc_w );
-READ8_DEVICE_HANDLER( tc0220ioc_port_r );
-WRITE8_DEVICE_HANDLER( tc0220ioc_port_w );
-READ8_DEVICE_HANDLER( tc0220ioc_portreg_r );
-WRITE8_DEVICE_HANDLER( tc0220ioc_portreg_w );
+DECLARE_READ8_DEVICE_HANDLER( tc0220ioc_r );
+DECLARE_WRITE8_DEVICE_HANDLER( tc0220ioc_w );
+DECLARE_READ8_DEVICE_HANDLER( tc0220ioc_port_r );
+DECLARE_WRITE8_DEVICE_HANDLER( tc0220ioc_port_w );
+DECLARE_READ8_DEVICE_HANDLER( tc0220ioc_portreg_r );
+DECLARE_WRITE8_DEVICE_HANDLER( tc0220ioc_portreg_w );
 
 
 /** TC0510NIO **/
-READ8_DEVICE_HANDLER( tc0510nio_r );
-WRITE8_DEVICE_HANDLER( tc0510nio_w );
-READ16_DEVICE_HANDLER( tc0510nio_halfword_r );
-WRITE16_DEVICE_HANDLER( tc0510nio_halfword_w );
-READ16_DEVICE_HANDLER( tc0510nio_halfword_wordswap_r );
-WRITE16_DEVICE_HANDLER( tc0510nio_halfword_wordswap_w );
+DECLARE_READ8_DEVICE_HANDLER( tc0510nio_r );
+DECLARE_WRITE8_DEVICE_HANDLER( tc0510nio_w );
+DECLARE_READ16_DEVICE_HANDLER( tc0510nio_halfword_r );
+DECLARE_WRITE16_DEVICE_HANDLER( tc0510nio_halfword_w );
+DECLARE_READ16_DEVICE_HANDLER( tc0510nio_halfword_wordswap_r );
+DECLARE_WRITE16_DEVICE_HANDLER( tc0510nio_halfword_wordswap_w );
 
 
 /** TC0640FIO**/
-READ8_DEVICE_HANDLER( tc0640fio_r );
-WRITE8_DEVICE_HANDLER( tc0640fio_w );
-READ16_DEVICE_HANDLER( tc0640fio_halfword_r );
-WRITE16_DEVICE_HANDLER( tc0640fio_halfword_w );
-READ16_DEVICE_HANDLER( tc0640fio_halfword_byteswap_r );
-WRITE16_DEVICE_HANDLER( tc0640fio_halfword_byteswap_w );
+DECLARE_READ8_DEVICE_HANDLER( tc0640fio_r );
+DECLARE_WRITE8_DEVICE_HANDLER( tc0640fio_w );
+DECLARE_READ16_DEVICE_HANDLER( tc0640fio_halfword_r );
+DECLARE_WRITE16_DEVICE_HANDLER( tc0640fio_halfword_w );
+DECLARE_READ16_DEVICE_HANDLER( tc0640fio_halfword_byteswap_r );
+DECLARE_WRITE16_DEVICE_HANDLER( tc0640fio_halfword_byteswap_w );
 
 
 #endif	/* __TAITOIO_H__ */

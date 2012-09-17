@@ -507,7 +507,7 @@ static WRITE8_DEVICE_HANDLER( ald_w )
 
 	if (!BIT(data, 6))
 	{
-		sp0256_ALD_w(device, 0, data & 0x3f);
+		sp0256_ALD_w(device, space, 0, data & 0x3f);
 	}
 }
 

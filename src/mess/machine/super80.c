@@ -94,7 +94,7 @@ static TIMER_CALLBACK( super80_timer )
 		state->m_cass_data[1] = 0;
 	}
 
-	state->m_pio->port_b_write(pio_port_b_r(state->m_pio,0));
+	state->m_pio->port_b_write(pio_port_b_r(state->m_pio,state->generic_space(),0,0xff));
 }
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */

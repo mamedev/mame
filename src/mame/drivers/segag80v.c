@@ -202,7 +202,7 @@ WRITE8_MEMBER(segag80v_state::mainram_w)
 	m_mainram[decrypt_offset(&space, offset)] = data;
 }
 
-WRITE8_MEMBER(segag80v_state::usb_ram_w){ sega_usb_ram_w(m_usb, decrypt_offset(machine().device("maincpu")->memory().space(AS_PROGRAM), offset), data); }
+WRITE8_MEMBER(segag80v_state::usb_ram_w){ sega_usb_ram_w(m_usb, space, decrypt_offset(machine().device("maincpu")->memory().space(AS_PROGRAM), offset), data); }
 WRITE8_MEMBER(segag80v_state::vectorram_w)
 {
 	m_vectorram[decrypt_offset(&space, offset)] = data;

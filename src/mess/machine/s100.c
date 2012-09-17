@@ -181,7 +181,7 @@ READ8_MEMBER( s100_device::smemr_r )
 
 	while (entry)
 	{
-		data |= entry->s100_smemr_r(offset);
+		data |= entry->s100_smemr_r(space, offset);
 		entry = entry->next();
 	}
 
@@ -199,7 +199,7 @@ WRITE8_MEMBER( s100_device::mwrt_w )
 
 	while (entry)
 	{
-		entry->s100_mwrt_w(offset, data);
+		entry->s100_mwrt_w(space, offset, data);
 		entry = entry->next();
 	}
 }
@@ -217,7 +217,7 @@ READ8_MEMBER( s100_device::sinp_r )
 
 	while (entry)
 	{
-		data |= entry->s100_sinp_r(offset);
+		data |= entry->s100_sinp_r(space, offset);
 		entry = entry->next();
 	}
 
@@ -235,7 +235,7 @@ WRITE8_MEMBER( s100_device::sout_w )
 
 	while (entry)
 	{
-		entry->s100_sout_w(offset, data);
+		entry->s100_sout_w(space, offset, data);
 		entry = entry->next();
 	}
 }

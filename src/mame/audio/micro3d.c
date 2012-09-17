@@ -395,7 +395,7 @@ READ8_MEMBER(micro3d_state::micro3d_sound_io_r)
 
 WRITE8_DEVICE_HANDLER( micro3d_upd7759_w )
 {
-	upd7759_port_w(device, 0, data);
+	upd7759_port_w(device, space, 0, data);
 	upd7759_start_w(device, 0);
 	upd7759_start_w(device, 1);
 }

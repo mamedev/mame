@@ -921,11 +921,11 @@ WRITE8_MEMBER(videopkr_state::baby_sound_p3_w)
 		case 0x00:	break;
 		case 0x01:	break;
 		case 0x02:	break;
-		case 0x03:	ay8910_data_w(device, 1, m_sbp0); break;
+		case 0x03:	ay8910_data_w(device, space, 1, m_sbp0); break;
 		case 0x04:	break;
-		case 0x05:	m_sbp0 = ay8910_r(device, m_sbp0); break;
+		case 0x05:	m_sbp0 = ay8910_r(device, space, m_sbp0); break;
 		case 0x06:	break;
-		case 0x07:	ay8910_address_w(device, 0, m_sbp0); break;
+		case 0x07:	ay8910_address_w(device, space, 0, m_sbp0); break;
 	}
 }
 

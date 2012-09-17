@@ -1601,12 +1601,12 @@ static TIMER_CALLBACK( s3c44b0_sio_timer_exp )
 
 /* IIS */
 
-INLINE void iface_i2s_data_w( device_t *device, int ch, UINT16 data)
+INLINE void iface_i2s_data_w( device_t *device, address_space &space, int ch, UINT16 data)
 {
 	s3c44b0_t *s3c44b0 = get_token( device);
 	if (s3c44b0->iface->i2s.data_w)
 	{
-		(s3c44b0->iface->i2s.data_w)( device, ch, data, 0);
+		(s3c44b0->iface->i2s.data_w)( device, space, ch, data, 0);
 	}
 }
 
@@ -1677,8 +1677,8 @@ static WRITE32_DEVICE_HANDLER( s3c44b0_iis_w )
 			if (s3c44b0->iis.fifo_index == 2)
 			{
 				s3c44b0->iis.fifo_index = 0;
-				iface_i2s_data_w( device, 0, s3c44b0->iis.fifo[0]);
-				iface_i2s_data_w( device, 1, s3c44b0->iis.fifo[1]);
+				iface_i2s_data_w( device, space, 0, s3c44b0->iis.fifo[0]);
+				iface_i2s_data_w( device, space, 1, s3c44b0->iis.fifo[1]);
 			}
 		}
 		break;

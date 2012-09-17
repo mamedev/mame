@@ -352,7 +352,8 @@ static const ay8910_interface ay8910_interface_2 =
 
 static const msm5232_interface msm5232_config =
 {
-	{ 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6 }	/* default 0.39 uF capacitors (not verified) */
+	{ 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6 },	/* default 0.39 uF capacitors (not verified) */
+	DEVCB_NULL
 };
 
 

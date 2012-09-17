@@ -243,8 +243,8 @@ const UINT8 z80sio_device::k_int_priority[] =
 inline void z80sio_device::update_interrupt_state()
 {
 	// if we have a callback, update it with the current state
-	if (m_irq_cb != NULL)
-		(*m_irq_cb)(this, (z80daisy_irq_state() & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
+	if (!m_irq.isnull())
+		m_irq((z80daisy_irq_state() & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -318,17 +318,6 @@ void z80sio_device::device_config_complete()
 	const z80sio_interface *intf = reinterpret_cast<const z80sio_interface *>(static_config());
 	if (intf != NULL)
 		*static_cast<z80sio_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_irq_cb = NULL;
-		m_dtr_changed_cb = NULL;
-		m_rts_changed_cb = NULL;
-		m_break_changed_cb = NULL;
-		m_transmit_cb = NULL;
-		m_receive_poll_cb = NULL;
-	}
 }
 
 
@@ -338,6 +327,13 @@ void z80sio_device::device_config_complete()
 
 void z80sio_device::device_start()
 {
+	m_irq.resolve(m_irq_cb, *this);
+	m_dtr_changed.resolve(m_dtr_changed_cb, *this);
+	m_rts_changed.resolve(m_rts_changed_cb, *this);
+	m_break_changed.resolve(m_break_changed_cb, *this);
+	m_transmit.resolve(m_transmit_cb, *this);
+	m_received_poll.resolve(m_received_poll_cb, *this);
+
 	m_channel[0].start(this, 0);
 	m_channel[1].start(this, 1);
 }
@@ -566,12 +562,12 @@ void z80sio_device::sio_channel::control_write(UINT8 data)
 
 		// SIO write register 5
 		case 5:
-			if (((old ^ data) & SIO_WR5_DTR) && m_device->m_dtr_changed_cb)
-				(*m_device->m_dtr_changed_cb)(m_device, m_index, (data & SIO_WR5_DTR) != 0);
-			if (((old ^ data) & SIO_WR5_SEND_BREAK) && m_device->m_break_changed_cb)
-				(*m_device->m_break_changed_cb)(m_device, m_index, (data & SIO_WR5_SEND_BREAK) != 0);
-			if (((old ^ data) & SIO_WR5_RTS) && m_device->m_rts_changed_cb)
-				(*m_device->m_rts_changed_cb)(m_device, m_index, (data & SIO_WR5_RTS) != 0);
+			if (((old ^ data) & SIO_WR5_DTR) && !m_device->m_dtr_changed.isnull())
+				m_device->m_dtr_changed(m_index, (data & SIO_WR5_DTR) != 0);
+			if (((old ^ data) & SIO_WR5_SEND_BREAK) && !m_device->m_break_changed.isnull())
+				m_device->m_break_changed(m_index, (data & SIO_WR5_SEND_BREAK) != 0);
+			if (((old ^ data) & SIO_WR5_RTS) && !m_device->m_rts_changed.isnull())
+				m_device->m_rts_changed(m_index, (data & SIO_WR5_RTS) != 0);
 			break;
 	}
 }
@@ -741,8 +737,8 @@ void z80sio_device::sio_channel::serial_callback()
 		VPRINTF(("serial_callback(%c): Transmitting %02x\n", 'A' + m_index, m_outbuf));
 
 		// actually transmit the character
-		if (m_device->m_transmit_cb != NULL)
-			(*m_device->m_transmit_cb)(m_device, m_index, m_outbuf);
+		if (!m_device->m_transmit.isnull())
+			m_device->m_transmit(m_index, m_outbuf, 0xffff);
 
 		// update the status register
 		m_status[0] |= SIO_RR0_TX_BUFFER_EMPTY;
@@ -756,8 +752,8 @@ void z80sio_device::sio_channel::serial_callback()
 	}
 
 	// ask the polling callback if there is data to receive
-	if (m_device->m_receive_poll_cb != NULL)
-		data = (*m_device->m_receive_poll_cb)(m_device, m_index);
+	if (!m_device->m_received_poll.isnull())
+		data = INT16(m_device->m_received_poll(m_index, 0xffff));
 
 	// if we have buffered data, pull it
 	if (m_receive_inptr != m_receive_outptr)

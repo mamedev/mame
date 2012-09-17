@@ -72,7 +72,7 @@ static void c65_nmi( running_machine &machine )
 
 static READ8_DEVICE_HANDLER( c65_cia0_port_a_r )
 {
-	UINT8 cia0portb = mos6526_pb_r(device->machine().device("cia_0"), 0);
+	UINT8 cia0portb = mos6526_pb_r(device->machine().device("cia_0"), space, 0);
 
 	return cbm_common_cia0_port_a_r(device, cia0portb);
 }
@@ -81,7 +81,7 @@ static READ8_DEVICE_HANDLER( c65_cia0_port_b_r )
 {
 	c65_state *state = device->machine().driver_data<c65_state>();
 	UINT8 value = 0xff;
-	UINT8 cia0porta = mos6526_pa_r(device->machine().device("cia_0"), 0);
+	UINT8 cia0porta = mos6526_pa_r(device->machine().device("cia_0"), space, 0);
 
 	value &= cbm_common_cia0_port_b_r(device, cia0porta);
 
@@ -654,7 +654,7 @@ static WRITE8_HANDLER( c65_write_io )
 	{
 	case 0x000:
 		if (offset < 0x80)
-			vic3_port_w(vic3, offset & 0x7f, data);
+			vic3_port_w(vic3, *space, offset & 0x7f, data);
 		else if (offset < 0xa0)
 			c65_fdc_w(space->machine(), offset&0x1f,data);
 		else
@@ -666,7 +666,7 @@ static WRITE8_HANDLER( c65_write_io )
 	case 0x100:
 	case 0x200:
 	case 0x300:
-		vic3_palette_w(vic3, offset - 0x100, data);
+		vic3_palette_w(vic3, *space, offset - 0x100, data);
 		break;
 	case 0x400:
 		if (offset<0x420) /* maybe 0x20 */
@@ -696,10 +696,10 @@ static WRITE8_HANDLER( c65_write_io_dc00 )
 	switch (offset & 0xf00)
 	{
 	case 0x000:
-		mos6526_w(cia_0, offset, data);
+		mos6526_w(cia_0, *space, offset, data);
 		break;
 	case 0x100:
-		mos6526_w(cia_1, offset, data);
+		mos6526_w(cia_1, *space, offset, data);
 		break;
 	case 0x200:
 	case 0x300:
@@ -718,7 +718,7 @@ static READ8_HANDLER( c65_read_io )
 	{
 	case 0x000:
 		if (offset < 0x80)
-			return vic3_port_r(vic3, offset & 0x7f);
+			return vic3_port_r(vic3, *space, offset & 0x7f);
 		if (offset < 0xa0)
 			return c65_fdc_r(space->machine(), offset&0x1f);
 		else
@@ -759,9 +759,9 @@ static READ8_HANDLER( c65_read_io_dc00 )
 	switch (offset & 0x300)
 	{
 	case 0x000:
-		return mos6526_r(cia_0, offset);
+		return mos6526_r(cia_0, *space, offset);
 	case 0x100:
-		return mos6526_r(cia_1, offset);
+		return mos6526_r(cia_1, *space, offset);
 	case 0x200:
 	case 0x300:
 		DBG_LOG(space->machine(), 1, "io read", ("%.3x\n", offset+0xc00));

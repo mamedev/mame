@@ -139,11 +139,11 @@ struct cubeqst_rot_config
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-extern READ16_DEVICE_HANDLER( cubeqcpu_sndram_r );
-extern WRITE16_DEVICE_HANDLER( cubeqcpu_sndram_w );
+extern DECLARE_READ16_DEVICE_HANDLER( cubeqcpu_sndram_r );
+extern DECLARE_WRITE16_DEVICE_HANDLER( cubeqcpu_sndram_w );
 
-extern READ16_DEVICE_HANDLER( cubeqcpu_rotram_r );
-extern WRITE16_DEVICE_HANDLER( cubeqcpu_rotram_w );
+extern DECLARE_READ16_DEVICE_HANDLER( cubeqcpu_rotram_r );
+extern DECLARE_WRITE16_DEVICE_HANDLER( cubeqcpu_rotram_w );
 
 void cubeqcpu_swap_line_banks(device_t *device);
 

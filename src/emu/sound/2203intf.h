@@ -15,13 +15,13 @@ struct ym2203_interface
 	devcb_write_line irqhandler;
 };
 
-READ8_DEVICE_HANDLER( ym2203_r );
-WRITE8_DEVICE_HANDLER( ym2203_w );
+DECLARE_READ8_DEVICE_HANDLER( ym2203_r );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2203_w );
 
-READ8_DEVICE_HANDLER( ym2203_status_port_r );
-READ8_DEVICE_HANDLER( ym2203_read_port_r );
-WRITE8_DEVICE_HANDLER( ym2203_control_port_w );
-WRITE8_DEVICE_HANDLER( ym2203_write_port_w );
+DECLARE_READ8_DEVICE_HANDLER( ym2203_status_port_r );
+DECLARE_READ8_DEVICE_HANDLER( ym2203_read_port_r );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2203_control_port_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2203_write_port_w );
 
 class ym2203_device : public device_t,
                                   public device_sound_interface

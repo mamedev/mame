@@ -548,12 +548,12 @@ WRITE8_MEMBER(berzerk_state::berzerk_audio_w)
 
 	/* offset 6 writes to the sfxcontrol latch */
 	case 6:
-		exidy_sfxctrl_w(machine().device("exidy"), data >> 6, data);
+		exidy_sfxctrl_w(machine().device("exidy"), space, data >> 6, data);
 		break;
 
 	/* everything else writes to the 6840 */
 	default:
-		exidy_sh6840_w(machine().device("exidy"), offset, data);
+		exidy_sh6840_w(machine().device("exidy"), space, offset, data);
 		break;
 
 	}
@@ -574,7 +574,7 @@ READ8_MEMBER(berzerk_state::berzerk_audio_r)
 		return 0;
 	/* everything else reads from the 6840 */
 	default:
-		return exidy_sh6840_r(machine().device("exidy"), offset);
+		return exidy_sh6840_r(machine().device("exidy"), space, offset);
 	}
 }
 

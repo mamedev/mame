@@ -415,7 +415,7 @@ WRITE8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_w )
 		case 0x6:
 		case 0x7:
 		{
-			pit8253_w(m_d8253, offset & 3, data);
+			pit8253_w(m_d8253, space, offset & 3, data);
 			break;
 		}
 

@@ -188,7 +188,7 @@ void itech8_state::video_start()
 
 WRITE8_MEMBER(itech8_state::itech8_palette_w)
 {
-	tlc34076_w(machine().device("tlc34076"), offset/2, data);
+	tlc34076_w(machine().device("tlc34076"), space, offset/2, data);
 }
 
 

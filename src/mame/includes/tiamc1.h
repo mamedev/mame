@@ -62,9 +62,9 @@ private:
 extern const device_type TIAMC1;
 
 
-WRITE8_DEVICE_HANDLER( tiamc1_timer0_w );
-WRITE8_DEVICE_HANDLER( tiamc1_timer1_w );
-WRITE8_DEVICE_HANDLER( tiamc1_timer1_gate_w );
+DECLARE_WRITE8_DEVICE_HANDLER( tiamc1_timer0_w );
+DECLARE_WRITE8_DEVICE_HANDLER( tiamc1_timer1_w );
+DECLARE_WRITE8_DEVICE_HANDLER( tiamc1_timer1_gate_w );
 
 
 /*----------- defined in video/tiamc1.c -----------*/

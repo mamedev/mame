@@ -66,7 +66,7 @@ PS4  J8635      PS4  J8541       PS4  J8648
 READ8_MEMBER(mexico86_state::kiki_ym2203_r)
 {
 	device_t *device = machine().device("ymsnd");
-	UINT8 result = ym2203_r(device, offset);
+	UINT8 result = ym2203_r(device, space, offset);
 
 	if (offset == 0)
 		result &= 0x7f;

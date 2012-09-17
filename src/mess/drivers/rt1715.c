@@ -274,12 +274,12 @@ static const z80ctc_interface rt1715_ctc_intf =
 
 static const z80sio_interface rt1715_sio_intf =
 {
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const z80pio_interface rt1715_pio_data_intf =

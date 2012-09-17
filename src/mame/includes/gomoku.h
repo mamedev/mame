@@ -30,8 +30,8 @@ public:
 
 /*----------- defined in audio/gomoku.c -----------*/
 
-WRITE8_DEVICE_HANDLER( gomoku_sound1_w );
-WRITE8_DEVICE_HANDLER( gomoku_sound2_w );
+DECLARE_WRITE8_DEVICE_HANDLER( gomoku_sound1_w );
+DECLARE_WRITE8_DEVICE_HANDLER( gomoku_sound2_w );
 
 class gomoku_sound_device : public device_t,
                                   public device_sound_interface

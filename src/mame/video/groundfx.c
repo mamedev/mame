@@ -198,6 +198,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 SCREEN_UPDATE_IND16( groundfx )
 {
 	groundfx_state *state = screen.machine().driver_data<groundfx_state>();
+	address_space &space = screen.machine().driver_data()->generic_space();
 	device_t *tc0100scn = screen.machine().device("tc0100scn");
 	device_t *tc0480scp = screen.machine().device("tc0480scp");
 	UINT8 layer[5];
@@ -241,8 +242,8 @@ SCREEN_UPDATE_IND16( groundfx )
         it's contents the usual way.
 
     */
-	if (tc0100scn_long_r(tc0100scn, 0x4090 / 4, 0xffffffff) ||
-			tc0480scp_long_r(tc0480scp, 0x20 / 4, 0xffffffff) == 0x240866)  /* Anything in text layer - really stupid hack */
+	if (tc0100scn_long_r(tc0100scn, space, 0x4090 / 4, 0xffffffff) ||
+			tc0480scp_long_r(tc0480scp, space, 0x20 / 4, 0xffffffff) == 0x240866)  /* Anything in text layer - really stupid hack */
 	{
 		tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[1], 0, 2);
 		tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[2], 0, 4);
@@ -250,7 +251,7 @@ SCREEN_UPDATE_IND16( groundfx )
 
 		//tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, 0, pivlayer[2], 0, 0);
 
-		if (tc0480scp_long_r(tc0480scp, 0x20 / 4, 0xffffffff) != 0x240866) /* Stupid hack for start of race */
+		if (tc0480scp_long_r(tc0480scp, space, 0x20 / 4, 0xffffffff) != 0x240866) /* Stupid hack for start of race */
 			tc0480scp_tilemap_draw(tc0480scp, bitmap, state->m_hack_cliprect, layer[0], 0, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, 1, 44, -574);
 	}

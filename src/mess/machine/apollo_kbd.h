@@ -51,9 +51,9 @@ void apollo_kbd_getchar(device_t *device, UINT8 data);
 
 struct apollo_kbd_interface
 {
-	write8_device_func apollo_kbd_putchar;
-	read8_device_func apollo_kbd_has_beeper;
-	read8_device_func apollo_kbd_is_german;
+	devcb_write8 apollo_kbd_putchar_cb;
+	devcb_read8 apollo_kbd_has_beeper_cb;
+	devcb_read8 apollo_kbd_is_german_cb;
 };
 
 #define APOLLO_KBD_INTERFACE(name) const struct apollo_kbd_interface (name)
@@ -191,6 +191,10 @@ private:
 	UINT16 m_last_pressed;  // last key pressed, for repeat key handling
 	int m_keytime[0x80];    // time until next key press (1 ms)
 	UINT8 m_keyon[0x80];    // is 1 if key is pressed
+
+	devcb_resolved_write8 m_putchar;
+	devcb_resolved_read8 m_has_beeper;
+	devcb_resolved_read8 m_is_german;
 
 	static UINT16 m_code_table[];
 };

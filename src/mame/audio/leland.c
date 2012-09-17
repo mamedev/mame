@@ -307,8 +307,8 @@ void leland_dac_update(device_t *device, int dacnum, UINT8 sample)
 
 static void set_dac_frequency(leland_sound_state *state, int which, int frequency);
 
-static READ16_DEVICE_HANDLER( peripheral_r );
-static WRITE16_DEVICE_HANDLER( peripheral_w );
+static DECLARE_READ16_DEVICE_HANDLER( peripheral_r );
+static DECLARE_WRITE16_DEVICE_HANDLER( peripheral_w );
 
 
 
@@ -1441,9 +1441,9 @@ static WRITE16_DEVICE_HANDLER( i80186_internal_port_w )
 
 	/* handle partials */
 	if (!ACCESSING_BITS_8_15)
-		data = (i80186_internal_port_r(device, offset, 0xff00) & 0xff00) | (data & 0x00ff);
+		data = (i80186_internal_port_r(device, space, offset, 0xff00) & 0xff00) | (data & 0x00ff);
 	else if (!ACCESSING_BITS_0_7)
-		data = (i80186_internal_port_r(device, offset, 0x00ff) & 0x00ff) | (data & 0xff00);
+		data = (i80186_internal_port_r(device, space, offset, 0x00ff) & 0x00ff) | (data & 0xff00);
 
 	switch (offset)
 	{
@@ -2118,13 +2118,13 @@ static WRITE16_DEVICE_HANDLER( ataxx_dac_control )
 		case 0x01:
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
-				dac_w(device, offset, data, 0x00ff);
+				dac_w(device, space, offset, data, 0x00ff);
 			return;
 
 		case 0x03:
-			dac_w(device, 0, ((data << 13) & 0xe000) | ((data << 10) & 0x1c00) | ((data << 7) & 0x0300), 0xff00);
-			dac_w(device, 2, ((data << 10) & 0xe000) | ((data <<  7) & 0x1c00) | ((data << 4) & 0x0300), 0xff00);
-			dac_w(device, 4, ((data <<  8) & 0xc000) | ((data <<  6) & 0x3000) | ((data << 4) & 0x0c00) | ((data << 2) & 0x0300), 0xff00);
+			dac_w(device, space, 0, ((data << 13) & 0xe000) | ((data << 10) & 0x1c00) | ((data << 7) & 0x0300), 0xff00);
+			dac_w(device, space, 2, ((data << 10) & 0xe000) | ((data <<  7) & 0x1c00) | ((data << 4) & 0x0300), 0xff00);
+			dac_w(device, space, 4, ((data <<  8) & 0xc000) | ((data <<  6) & 0x3000) | ((data << 4) & 0x0c00) | ((data << 2) & 0x0300), 0xff00);
 			return;
 	}
 
@@ -2159,7 +2159,7 @@ static WRITE16_DEVICE_HANDLER( ataxx_dac_control )
 				return;
 
 			case 0x21:
-				dac_w(device, offset - 0x21 + 7, data, mem_mask);
+				dac_w(device, space, offset - 0x21 + 7, data, mem_mask);
 				return;
 		}
 	}
@@ -2195,20 +2195,20 @@ static READ16_DEVICE_HANDLER( peripheral_r )
 				return ((state->m_clock_active << 1) & 0x7e);
 
 		case 1:
-			return main_to_sound_comm_r(device, offset, mem_mask);
+			return main_to_sound_comm_r(device, space, offset, mem_mask);
 
 		case 2:
-			return pit8254_r(device, offset, mem_mask);
+			return pit8254_r(device, space, offset, mem_mask);
 
 		case 3:
 			if (!state->m_has_ym2151)
-				return pit8254_r(device, offset | 0x40, mem_mask);
+				return pit8254_r(device, space, offset | 0x40, mem_mask);
 			else
-				return ym2151_r(device->machine().device("ymsnd"), offset);
+				return ym2151_r(device->machine().device("ymsnd"), space, offset);
 
 		case 4:
 			if (state->m_is_redline)
-				return pit8254_r(device, offset | 0x80, mem_mask);
+				return pit8254_r(device, space, offset | 0x80, mem_mask);
 			else
 				logerror("%05X:Unexpected peripheral read %d/%02X\n", state->m_i80186.cpu->safe_pc(), select, offset*2);
 			break;
@@ -2230,29 +2230,29 @@ static WRITE16_DEVICE_HANDLER( peripheral_w )
 	switch (select)
 	{
 		case 1:
-			sound_to_main_comm_w(device, offset, data, mem_mask);
+			sound_to_main_comm_w(device, space, offset, data, mem_mask);
 			break;
 
 		case 2:
-			pit8254_w(device, offset, data, mem_mask);
+			pit8254_w(device, space, offset, data, mem_mask);
 			break;
 
 		case 3:
 			if (!state->m_has_ym2151)
-				pit8254_w(device, offset | 0x40, data, mem_mask);
+				pit8254_w(device, space, offset | 0x40, data, mem_mask);
 			else
-				ym2151_w(device->machine().device("ymsnd"), offset, data);
+				ym2151_w(device->machine().device("ymsnd"), space, offset, data);
 			break;
 
 		case 4:
 			if (state->m_is_redline)
-				pit8254_w(device, offset | 0x80, data, mem_mask);
+				pit8254_w(device, space, offset | 0x80, data, mem_mask);
 			else
-				dac_10bit_w(device, offset, data, mem_mask);
+				dac_10bit_w(device, space, offset, data, mem_mask);
 			break;
 
 		case 5:	/* Ataxx/WSF/Indy Heat only */
-			ataxx_dac_control(device, offset, data, mem_mask);
+			ataxx_dac_control(device, space, offset, data, mem_mask);
 			break;
 
 		default:
@@ -2276,7 +2276,7 @@ WRITE8_DEVICE_HANDLER( ataxx_80186_control_w )
 					((data & 0x02) << 5) |
 					((data & 0x04) << 3) |
 					((data & 0x08) << 1);
-	leland_80186_control_w(device, offset, modified);
+	leland_80186_control_w(device, space, offset, modified);
 }
 
 

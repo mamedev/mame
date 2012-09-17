@@ -248,7 +248,7 @@ READ8_HANDLER( hector_disc2_io61_port_r)
 	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
 	UINT8 data;
 	device_t *fdc = space->machine().device("upd765");
-	data = upd765_data_r(fdc,0); //Get the result
+	data = upd765_data_r(fdc,*space, 0); //Get the result
 
 // if ST0 == 0x28 (drive A:) or 0x29 (drive B:) => add 0x40
 // and correct the ST1 and ST2 (patch)
@@ -309,7 +309,7 @@ WRITE8_HANDLER( hector_disc2_io61_port_w)
 #endif
 
 	device_t *fdc = space->machine().device("upd765");
-	upd765_data_w(fdc,0, data);
+	upd765_data_w(fdc,*space, 0, data);
 }
 
 //  AM_RANGE(0x070,0x07f) AM_DEVREADWRITE("upd765",upd765_dack_r,upd765_dack_w)
@@ -317,11 +317,11 @@ READ8_HANDLER( hector_disc2_io70_port_r) // Gestion du DMA
 {
 	UINT8 data;
 	device_t *fdc = space->machine().device("upd765");
-	data = upd765_dack_r(fdc,0);
+	data = upd765_dack_r(fdc,*space, 0);
 	return data;
 }
 WRITE8_HANDLER( hector_disc2_io70_port_w)
 {
 	device_t *fdc = space->machine().device("upd765");
-	upd765_dack_w(fdc,0, data);
+	upd765_dack_w(fdc,*space, 0, data);
 }

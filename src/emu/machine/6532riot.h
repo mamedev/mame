@@ -121,8 +121,8 @@ extern const device_type RIOT6532;
     PROTOTYPES
 ***************************************************************************/
 
-READ8_DEVICE_HANDLER( riot6532_r );
-WRITE8_DEVICE_HANDLER( riot6532_w );
+DECLARE_READ8_DEVICE_HANDLER( riot6532_r );
+DECLARE_WRITE8_DEVICE_HANDLER( riot6532_w );
 
 void riot6532_porta_in_set(device_t *device, UINT8 data, UINT8 mask);
 void riot6532_portb_in_set(device_t *device, UINT8 data, UINT8 mask);

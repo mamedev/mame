@@ -56,7 +56,7 @@ SCREEN_UPDATE_IND16( sprint8 );
 
 DISCRETE_SOUND_EXTERN( sprint8 );
 
-WRITE8_DEVICE_HANDLER( sprint8_crash_w );
-WRITE8_DEVICE_HANDLER( sprint8_screech_w );
-WRITE8_DEVICE_HANDLER( sprint8_attract_w );
-WRITE8_DEVICE_HANDLER( sprint8_motor_w );
+DECLARE_WRITE8_DEVICE_HANDLER( sprint8_crash_w );
+DECLARE_WRITE8_DEVICE_HANDLER( sprint8_screech_w );
+DECLARE_WRITE8_DEVICE_HANDLER( sprint8_attract_w );
+DECLARE_WRITE8_DEVICE_HANDLER( sprint8_motor_w );

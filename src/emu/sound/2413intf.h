@@ -5,10 +5,10 @@
 
 #include "devlegcy.h"
 
-WRITE8_DEVICE_HANDLER( ym2413_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2413_w );
 
-WRITE8_DEVICE_HANDLER( ym2413_register_port_w );
-WRITE8_DEVICE_HANDLER( ym2413_data_port_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2413_register_port_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2413_data_port_w );
 
 class ym2413_device : public device_t,
                                   public device_sound_interface

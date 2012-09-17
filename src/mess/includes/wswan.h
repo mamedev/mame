@@ -200,6 +200,6 @@ private:
 extern const device_type WSWAN;
 
 
-WRITE8_DEVICE_HANDLER( wswan_sound_port_w );
+DECLARE_WRITE8_DEVICE_HANDLER( wswan_sound_port_w );
 
 #endif /* WSWAN_H_ */

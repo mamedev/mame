@@ -5,7 +5,7 @@
 
 #include "devlegcy.h"
 
-WRITE8_DEVICE_HANDLER( namco_63701x_w );
+DECLARE_WRITE8_DEVICE_HANDLER( namco_63701x_w );
 
 class namco_63701x_device : public device_t,
                                   public device_sound_interface

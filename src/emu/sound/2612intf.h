@@ -12,18 +12,18 @@ struct ym2612_interface
 	void (*handler)(device_t *device, int irq);
 };
 
-READ8_DEVICE_HANDLER( ym2612_r );
-WRITE8_DEVICE_HANDLER( ym2612_w );
+DECLARE_READ8_DEVICE_HANDLER( ym2612_r );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2612_w );
 
-READ8_DEVICE_HANDLER( ym2612_status_port_a_r );
-READ8_DEVICE_HANDLER( ym2612_status_port_b_r );
-READ8_DEVICE_HANDLER( ym2612_data_port_a_r );
-READ8_DEVICE_HANDLER( ym2612_data_port_b_r );
+DECLARE_READ8_DEVICE_HANDLER( ym2612_status_port_a_r );
+DECLARE_READ8_DEVICE_HANDLER( ym2612_status_port_b_r );
+DECLARE_READ8_DEVICE_HANDLER( ym2612_data_port_a_r );
+DECLARE_READ8_DEVICE_HANDLER( ym2612_data_port_b_r );
 
-WRITE8_DEVICE_HANDLER( ym2612_control_port_a_w );
-WRITE8_DEVICE_HANDLER( ym2612_control_port_b_w );
-WRITE8_DEVICE_HANDLER( ym2612_data_port_a_w );
-WRITE8_DEVICE_HANDLER( ym2612_data_port_b_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2612_control_port_a_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2612_control_port_b_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2612_data_port_a_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ym2612_data_port_b_w );
 
 
 class ym2612_device : public device_t,

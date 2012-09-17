@@ -48,12 +48,12 @@ void simpsons_sprite_callback( running_machine &machine, int *code, int *color, 
 
 READ8_MEMBER(simpsons_state::simpsons_k052109_r)
 {
-	return k052109_r(m_k052109, offset + 0x2000);
+	return k052109_r(m_k052109, space, offset + 0x2000);
 }
 
 WRITE8_MEMBER(simpsons_state::simpsons_k052109_w)
 {
-	k052109_w(m_k052109, offset + 0x2000, data);
+	k052109_w(m_k052109, space, offset + 0x2000, data);
 }
 
 READ8_MEMBER(simpsons_state::simpsons_k053247_r)

@@ -349,7 +349,7 @@ void hdsnd_init(running_machine &machine);
 
 
 
-WRITE16_DEVICE_HANDLER( hdsnddsp_dac_w );
+DECLARE_WRITE16_DEVICE_HANDLER( hdsnddsp_dac_w );
 
 
 

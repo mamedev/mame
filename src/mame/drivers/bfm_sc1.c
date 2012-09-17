@@ -602,7 +602,7 @@ WRITE8_MEMBER(bfm_sc1_state::nec_reset_w)
 WRITE8_MEMBER(bfm_sc1_state::nec_latch_w)
 {
 	device_t *device = machine().device("upd");
-	upd7759_port_w (device, 0, data&0x3F);	// setup sample
+	upd7759_port_w (device, space, 0, data&0x3F);	// setup sample
 	upd7759_start_w(device, 0);
 	upd7759_start_w(device, 1);			// start
 }

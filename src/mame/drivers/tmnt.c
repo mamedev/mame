@@ -86,7 +86,7 @@ READ16_MEMBER(tmnt_state::k052109_word_noA12_r)
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	return k052109_word_r(m_k052109, offset, mem_mask);
+	return k052109_word_r(m_k052109, space, offset, mem_mask);
 }
 
 WRITE16_MEMBER(tmnt_state::k052109_word_noA12_w)
@@ -95,7 +95,7 @@ WRITE16_MEMBER(tmnt_state::k052109_word_noA12_w)
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	k052109_word_w(m_k052109, offset, data, mem_mask);
+	k052109_word_w(m_k052109, space, offset, data, mem_mask);
 }
 
 WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_w)
@@ -104,9 +104,9 @@ WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_w)
 	/* it seems that a word write is supposed to affect only the MSB. The */
 	/* "ROUND 1" text in punkshtj goes lost otherwise. */
 	if (ACCESSING_BITS_8_15)
-		k052109_w(m_k052109, offset, (data >> 8) & 0xff);
+		k052109_w(m_k052109, space, offset, (data >> 8) & 0xff);
 	else if (ACCESSING_BITS_0_7)
-		k052109_w(m_k052109, offset + 0x2000, data & 0xff);
+		k052109_w(m_k052109, space, offset + 0x2000, data & 0xff);
 }
 
 WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_noA12_w)
@@ -129,7 +129,7 @@ READ16_MEMBER(tmnt_state::k053245_scattered_word_r)
 	else
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x1fc0) >> 3);
-		return k053245_word_r(m_k053245, offset, mem_mask);
+		return k053245_word_r(m_k053245, space, offset, mem_mask);
 	}
 }
 
@@ -141,7 +141,7 @@ WRITE16_MEMBER(tmnt_state::k053245_scattered_word_w)
 	if (!(offset & 0x0031))
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x1fc0) >> 3);
-		k053245_word_w(m_k053245, offset, data, mem_mask);
+		k053245_word_w(m_k053245, space, offset, data, mem_mask);
 	}
 }
 
@@ -150,7 +150,7 @@ READ16_MEMBER(tmnt_state::k053244_word_noA1_r)
 
 	offset &= ~1;	/* handle mirror address */
 
-	return k053244_r(m_k053245, offset + 1) | (k053244_r(m_k053245, offset) << 8);
+	return k053244_r(m_k053245, space, offset + 1) | (k053244_r(m_k053245, space, offset) << 8);
 }
 
 WRITE16_MEMBER(tmnt_state::k053244_word_noA1_w)
@@ -159,9 +159,9 @@ WRITE16_MEMBER(tmnt_state::k053244_word_noA1_w)
 	offset &= ~1;	/* handle mirror address */
 
 	if (ACCESSING_BITS_8_15)
-		k053244_w(m_k053245, offset, (data >> 8) & 0xff);
+		k053244_w(m_k053245, space, offset, (data >> 8) & 0xff);
 	if (ACCESSING_BITS_0_7)
-		k053244_w(m_k053245, offset + 1, data & 0xff);
+		k053244_w(m_k053245, space, offset + 1, data & 0xff);
 }
 
 static INTERRUPT_GEN(cuebrick_interrupt)
@@ -201,13 +201,13 @@ READ8_MEMBER(tmnt_state::punkshot_sound_r)
 	device_t *device = machine().device("k053260");
 	/* If the sound CPU is running, read the status, otherwise
        just make it pass the test */
-	return k053260_r(device, 2 + offset);
+	return k053260_r(device, space, 2 + offset);
 }
 
 WRITE8_MEMBER(tmnt_state::glfgreat_sound_w)
 {
 	device_t *device = machine().device("k053260");
-	k053260_w(device, offset, data);
+	k053260_w(device, space, offset, data);
 
 	if (offset)
 		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
@@ -376,7 +376,7 @@ READ16_MEMBER(tmnt_state::ssriders_protection_r)
 			data = -space.read_word(0x105818);
 			data = ((data / 8 - 4) & 0x1f) * 0x40;
 			data += ((space.read_word(0x105cb0) +
-						256 * k052109_r(m_k052109, 0x1a01) + k052109_r(m_k052109, 0x1a00) - 6) / 8 + 12) & 0x3f;
+						256 * k052109_r(m_k052109, space, 0x1a01) + k052109_r(m_k052109, space, 0x1a00) - 6) / 8 + 12) & 0x3f;
 			return data;
 
 		default:
@@ -403,7 +403,7 @@ WRITE16_MEMBER(tmnt_state::ssriders_protection_w)
 			{
 				if ((space.read_word(0x180006 + 128 * i) >> 8) == logical_pri)
 				{
-					k053245_word_w(m_k053245, 8 * i, hardware_pri, 0x00ff);
+					k053245_word_w(m_k053245, space, 8 * i, hardware_pri, 0x00ff);
 					hardware_pri++;
 				}
 			}
@@ -697,7 +697,7 @@ WRITE16_MEMBER(tmnt_state::k053251_glfgreat_w)
 
 	if (ACCESSING_BITS_8_15)
 	{
-		k053251_w(m_k053251, offset, (data >> 8) & 0xff);
+		k053251_w(m_k053251, space, offset, (data >> 8) & 0xff);
 
 		/* FIXME: in the old code k052109 tilemaps were tilemaps 2,3,4 for k053251
         and got marked as dirty in the write above... how was the original hardware working?!? */
@@ -785,7 +785,7 @@ static void tmnt2_put_word( address_space *space, UINT32 addr, UINT16 data )
 		if (!(offs & 0x0031))
 		{
 			offs = ((offs & 0x000e) >> 1) | ((offs & 0x1fc0) >> 3);
-			k053245_word_w(state->m_k053245, offs, data, 0xffff);
+			k053245_word_w(state->m_k053245, *space, offs, data, 0xffff);
 		}
 	}
 	else if (addr >= 0x104000 / 2 && addr <= 0x107fff / 2)

@@ -208,7 +208,7 @@ READ32_MEMBER(djmain_state::v_rom_r)
 {
 	device_t *k056832 = machine().device("k056832");
 	UINT8 *mem8 = memregion("gfx2")->base();
-	int bank = k056832_word_r(k056832, 0x34/2, 0xffff);
+	int bank = k056832_word_r(k056832, space, 0x34/2, 0xffff);
 
 	offset *= 2;
 
@@ -280,18 +280,18 @@ READ32_MEMBER(djmain_state::ide_std_r)
 {
 	device_t *device = machine().device("ide");
 	if (ACCESSING_BITS_0_7)
-		return ide_controller16_r(device, IDE_STD_OFFSET + offset, 0xff00) >> 8;
+		return ide_controller16_r(device, space, IDE_STD_OFFSET + offset, 0xff00) >> 8;
 	else
-		return ide_controller16_r(device, IDE_STD_OFFSET + offset, 0xffff) << 16;
+		return ide_controller16_r(device, space, IDE_STD_OFFSET + offset, 0xffff) << 16;
 }
 
 WRITE32_MEMBER(djmain_state::ide_std_w)
 {
 	device_t *device = machine().device("ide");
 	if (ACCESSING_BITS_0_7)
-		ide_controller16_w(device, IDE_STD_OFFSET + offset, data << 8, 0xff00);
+		ide_controller16_w(device, space, IDE_STD_OFFSET + offset, data << 8, 0xff00);
 	else
-		ide_controller16_w(device, IDE_STD_OFFSET + offset, data >> 16, 0xffff);
+		ide_controller16_w(device, space, IDE_STD_OFFSET + offset, data >> 16, 0xffff);
 }
 
 
@@ -299,7 +299,7 @@ READ32_MEMBER(djmain_state::ide_alt_r)
 {
 	device_t *device = machine().device("ide");
 	if (offset == 0)
-		return ide_controller16_r(device, IDE_ALT_OFFSET, 0x00ff) << 24;
+		return ide_controller16_r(device, space, IDE_ALT_OFFSET, 0x00ff) << 24;
 
 	return 0;
 }
@@ -308,7 +308,7 @@ WRITE32_MEMBER(djmain_state::ide_alt_w)
 {
 	device_t *device = machine().device("ide");
 	if (offset == 0 && ACCESSING_BITS_16_23)
-		ide_controller16_w(device, IDE_ALT_OFFSET, data >> 24, 0x00ff);
+		ide_controller16_w(device, space, IDE_ALT_OFFSET, data >> 24, 0x00ff);
 }
 
 

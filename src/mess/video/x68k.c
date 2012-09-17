@@ -1306,7 +1306,7 @@ SCREEN_UPDATE_IND16( x68000 )
 //  popmessage("Keyboard buffer position = %i",state->m_keyboard.headpos);
 //  popmessage("IERA = 0x%02x, IERB = 0x%02x",state->m_mfp.iera,state->m_mfp.ierb);
 //  popmessage("IPRA = 0x%02x, IPRB = 0x%02x",state->m_mfp.ipra,state->m_mfp.iprb);
-//  popmessage("uPD72065 status = %02x",upd765_status_r(machine, 0));
+//  popmessage("uPD72065 status = %02x",upd765_status_r(machine, space, 0));
 //  popmessage("Layer enable - 0x%02x",state->m_video.reg[2] & 0xff);
 //  popmessage("Graphic layer scroll - %i, %i - %i, %i - %i, %i - %i, %i",
 //      state->m_crtc.reg[12],state->m_crtc.reg[13],state->m_crtc.reg[14],state->m_crtc.reg[15],state->m_crtc.reg[16],state->m_crtc.reg[17],state->m_crtc.reg[18],state->m_crtc.reg[19]);

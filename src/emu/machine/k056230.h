@@ -80,10 +80,10 @@ extern const device_type K056230;
     PROTOTYPES
 ***************************************************************************/
 
-extern READ32_DEVICE_HANDLER( lanc_ram_r );
-extern WRITE32_DEVICE_HANDLER( lanc_ram_w );
-extern READ8_DEVICE_HANDLER( k056230_r );
-extern WRITE8_DEVICE_HANDLER( k056230_w );
+extern DECLARE_READ32_DEVICE_HANDLER( lanc_ram_r );
+extern DECLARE_WRITE32_DEVICE_HANDLER( lanc_ram_w );
+extern DECLARE_READ8_DEVICE_HANDLER( k056230_r );
+extern DECLARE_WRITE8_DEVICE_HANDLER( k056230_w );
 
 
 #endif	/* __K056230_H__ */

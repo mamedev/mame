@@ -98,6 +98,10 @@ void apollo_kbd_device::device_start()
 	m_device = this;
 	LOG1(("start apollo_kbd"));
 
+	m_putchar.resolve(apollo_kbd_putchar_cb, *this);
+	m_has_beeper.resolve(apollo_kbd_has_beeper_cb, *this);
+	m_is_german.resolve(apollo_kbd_is_german_cb, *this);
+
 	m_beeper.start(this);
 	m_mouse.start(this);
 	m_tx_fifo.start(this);
@@ -200,8 +204,8 @@ void apollo_kbd_device::beeper::on()
 
 int apollo_kbd_device::beeper::keyboard_has_beeper()
 {
-	return m_device->apollo_kbd_has_beeper ?
-			(m_device->apollo_kbd_has_beeper)(m_device, 0) : 0;
+	return !m_device->m_has_beeper.isnull() ?
+			m_device->m_has_beeper(0) : 0;
 }
 
 void apollo_kbd_device::beeper::beeper_callback()
@@ -395,8 +399,8 @@ void apollo_kbd_device::tx_fifo::flush()
 	{
 		m_tx_pending = 1;
 
-		if (m_device->apollo_kbd_putchar)
-			(m_device->apollo_kbd_putchar)(m_device, 0, getchar());
+		if (!m_device->m_putchar.isnull())
+			m_device->m_putchar(0, getchar());
 		// 11 = one start, 8 data, one parity (even), one stop bit
 		m_timer->adjust(attotime::from_hz(m_baud_rate / 11), 0);
 	}
@@ -525,8 +529,8 @@ void apollo_kbd_device::keyboard_tty::putchar(UINT8 data)
 
 int apollo_kbd_device::keyboard_is_german()
 {
-	return apollo_kbd_is_german ?
-			(*apollo_kbd_is_german)(this, 0) : 0;
+	return !m_is_german.isnull() ?
+			m_is_german(0) : 0;
 }
 
 /*-------------------------------------------------

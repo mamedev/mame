@@ -34,25 +34,25 @@ READ8_MEMBER(bottom9_state::k052109_051960_r)
 	if (k052109_get_rmrd_line(m_k052109) == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return k051937_r(m_k051960, offset - 0x3800);
+			return k051937_r(m_k051960, space, offset - 0x3800);
 		else if (offset < 0x3c00)
-			return k052109_r(m_k052109, offset);
+			return k052109_r(m_k052109, space, offset);
 		else
-			return k051960_r(m_k051960, offset - 0x3c00);
+			return k051960_r(m_k051960, space, offset - 0x3c00);
 	}
 	else
-		return k052109_r(m_k052109, offset);
+		return k052109_r(m_k052109, space, offset);
 }
 
 WRITE8_MEMBER(bottom9_state::k052109_051960_w)
 {
 
 	if (offset >= 0x3800 && offset < 0x3808)
-		k051937_w(m_k051960, offset - 0x3800, data);
+		k051937_w(m_k051960, space, offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		k052109_w(m_k052109, offset, data);
+		k052109_w(m_k052109, space, offset, data);
 	else
-		k051960_w(m_k051960, offset - 0x3c00, data);
+		k051960_w(m_k051960, space, offset - 0x3c00, data);
 }
 
 READ8_MEMBER(bottom9_state::bottom9_bankedram1_r)
@@ -63,9 +63,9 @@ READ8_MEMBER(bottom9_state::bottom9_bankedram1_r)
 	else
 	{
 		if (m_zoomreadroms)
-			return k051316_rom_r(m_k051316, offset);
+			return k051316_rom_r(m_k051316, space, offset);
 		else
-			return k051316_r(m_k051316, offset);
+			return k051316_r(m_k051316, space, offset);
 	}
 }
 
@@ -75,7 +75,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_bankedram1_w)
 	if (m_k052109_selected)
 		k052109_051960_w(space, offset, data);
 	else
-		k051316_w(m_k051316, offset, data);
+		k051316_w(m_k051316, space, offset, data);
 }
 
 READ8_MEMBER(bottom9_state::bottom9_bankedram2_r)

@@ -40,7 +40,7 @@ struct mea8000_interface
 	const char *           channel;
 
 	/* 1-bit 'ready' output, not negated */
-	write8_device_func req_out_func;
+	devcb_write8 req_out_func;
 };
 
 
@@ -49,7 +49,7 @@ struct mea8000_interface
 	MCFG_DEVICE_CONFIG(_intrf)
 
 /* interface to CPU via address/data bus*/
-extern READ8_DEVICE_HANDLER  ( mea8000_r );
-extern WRITE8_DEVICE_HANDLER ( mea8000_w );
+extern DECLARE_READ8_DEVICE_HANDLER  ( mea8000_r );
+extern DECLARE_WRITE8_DEVICE_HANDLER ( mea8000_w );
 
 #endif

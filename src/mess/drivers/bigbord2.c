@@ -385,19 +385,19 @@ INPUT_PORTS_END
 
 /* Z80 SIO */
 
-static void bigbord2_interrupt(device_t *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( bigbord2_interrupt )
 {
 	device->machine().device(Z80_TAG)->execute().set_input_line(0, state);
 }
 
 const z80sio_interface sio_intf =
 {
-	bigbord2_interrupt,	/* interrupt handler */
-	0,			/* DTR changed handler */
-	0,			/* RTS changed handler */
-	0,			/* BREAK changed handler */
-	0,			/* transmit handler - which channel is this for? */
-	0			/* receive handler - which channel is this for? */
+	DEVCB_LINE(bigbord2_interrupt),	/* interrupt handler */
+	DEVCB_NULL,			/* DTR changed handler */
+	DEVCB_NULL,			/* RTS changed handler */
+	DEVCB_NULL,			/* BREAK changed handler */
+	DEVCB_NULL,			/* transmit handler - which channel is this for? */
+	DEVCB_NULL			/* receive handler - which channel is this for? */
 };
 
 

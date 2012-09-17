@@ -472,14 +472,14 @@ static void cfunc_get_cop0_reg(void *param)
 	{
 		if(dest)
 		{
-			rsp->r[dest] = (rsp->config->sp_reg_r)(rsp->device, reg, 0x00000000);
+			rsp->r[dest] = (rsp->config->sp_reg_r)(rsp->device, *rsp->program, reg, 0x00000000);
 		}
 	}
 	else if (reg >= 8 && reg < 16)
 	{
 		if(dest)
 		{
-			rsp->r[dest] = (rsp->config->dp_reg_r)(rsp->device, reg - 8, 0x00000000);
+			rsp->r[dest] = (rsp->config->dp_reg_r)(rsp->device, *rsp->program, reg - 8, 0x00000000);
 		}
 	}
 	else
@@ -496,11 +496,11 @@ static void cfunc_set_cop0_reg(void *param)
 
 	if (reg >= 0 && reg < 8)
 	{
-		(rsp->config->sp_reg_w)(rsp->device, reg, data, 0x00000000);
+		(rsp->config->sp_reg_w)(rsp->device, *rsp->program, reg, data, 0x00000000);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		(rsp->config->dp_reg_w)(rsp->device, reg - 8, data, 0x00000000);
+		(rsp->config->dp_reg_w)(rsp->device, *rsp->program, reg - 8, data, 0x00000000);
 	}
 	else
 	{

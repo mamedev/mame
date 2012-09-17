@@ -42,10 +42,10 @@ enum {
 
 *********************************************************************/
 
-static WRITE8_DEVICE_HANDLER (v_via_pa_w);
-static WRITE8_DEVICE_HANDLER(v_via_pb_w);
-static WRITE8_DEVICE_HANDLER (v_via_ca2_w);
-static WRITE8_DEVICE_HANDLER (v_via_cb2_w);
+static DECLARE_WRITE8_DEVICE_HANDLER (v_via_pa_w);
+static DECLARE_WRITE8_DEVICE_HANDLER(v_via_pb_w);
+static DECLARE_WRITE8_DEVICE_HANDLER (v_via_ca2_w);
+static DECLARE_WRITE8_DEVICE_HANDLER (v_via_cb2_w);
 
 
 /*********************************************************************
@@ -399,9 +399,9 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 		device_t *ay8912 = device->machine().device("ay8912");
 
 		if (data & 0x08) /* BC1 (do we select a reg or write it ?) */
-			ay8910_address_w(ay8912, 0, state->m_via_out[PORTA]);
+			ay8910_address_w(ay8912, space, 0, state->m_via_out[PORTA]);
 		else
-			ay8910_data_w(ay8912, 0, state->m_via_out[PORTA]);
+			ay8910_data_w(ay8912, space, 0, state->m_via_out[PORTA]);
 	}
 
 	if (!(data & 0x1) && (state->m_via_out[PORTB] & 0x1))

@@ -221,9 +221,9 @@ READ8_MEMBER( icecold_state::kbd_r )
 WRITE8_MEMBER( icecold_state::snd_ctrl_w )
 {
 	if (m_ay_ctrl & ~data & 0x04)
-		ay8910_data_address_w(m_ay8910_0, m_ay_ctrl & 0x01, m_sound_latch);
+		ay8910_data_address_w(m_ay8910_0, space, m_ay_ctrl & 0x01, m_sound_latch);
 	if (m_ay_ctrl & ~data & 0x20)
-		ay8910_data_address_w(m_ay8910_1, (m_ay_ctrl>>3) & 0x01, m_sound_latch);
+		ay8910_data_address_w(m_ay8910_1, space, (m_ay_ctrl>>3) & 0x01, m_sound_latch);
 
 	m_ay_ctrl = data;
 }
@@ -236,9 +236,9 @@ WRITE8_MEMBER( icecold_state::ay_w )
 READ8_MEMBER( icecold_state::ay_r )
 {
 	if (m_ay_ctrl & 0x02)
-		return ay8910_r(m_ay8910_0, 0);
+		return ay8910_r(m_ay8910_0, space, 0);
 	if (m_ay_ctrl & 0x10)
-		return ay8910_r(m_ay8910_1, 0);
+		return ay8910_r(m_ay8910_1, space, 0);
 
 	return 0;
 }

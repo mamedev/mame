@@ -354,12 +354,12 @@ ADDRESS_MAP_END
 
 static READ8_DEVICE_HANDLER( spc_ram_100_r )
 {
-	return spc_ram_r(device, offset + 0x100);
+	return spc_ram_r(device, space, offset + 0x100);
 }
 
 static WRITE8_DEVICE_HANDLER( spc_ram_100_w )
 {
-	spc_ram_w(device, offset + 0x100, data);
+	spc_ram_w(device, space, offset + 0x100, data);
 }
 
 static ADDRESS_MAP_START( spc_mem, AS_PROGRAM, 8, nss_state )
@@ -465,13 +465,13 @@ READ8_MEMBER(nss_state::nss_prot_r)
 
 	if (m_cart_sel == 0)
 	{
-		rp5h01_enable_w(m_rp5h01, 0, 0);
-		data |= ((~rp5h01_counter_r(m_rp5h01, 0)) << 4) & 0x10;	/* D4 */
-		data |= ((rp5h01_data_r(m_rp5h01, 0)) << 3) & 0x08;		/* D3 */
-		rp5h01_enable_w(m_rp5h01, 0, 1);
+		rp5h01_enable_w(m_rp5h01, space, 0, 0);
+		data |= ((~rp5h01_counter_r(m_rp5h01, space, 0)) << 4) & 0x10;	/* D4 */
+		data |= ((rp5h01_data_r(m_rp5h01, space, 0)) << 3) & 0x08;		/* D3 */
+		rp5h01_enable_w(m_rp5h01, space, 0, 1);
 	}
 	else
-		rp5h01_enable_w(m_rp5h01, 0, 1);
+		rp5h01_enable_w(m_rp5h01, space, 0, 1);
 
 	return data;
 }
@@ -480,14 +480,14 @@ WRITE8_MEMBER(nss_state::nss_prot_w)
 {
 	if (m_cart_sel == 0)
 	{
-		rp5h01_enable_w(m_rp5h01, 0, 0);
-		rp5h01_test_w(m_rp5h01, 0, data & 0x10);		/* D4 */
-		rp5h01_clock_w(m_rp5h01, 0, data & 0x08);		/* D3 */
-		rp5h01_cs_w(m_rp5h01, 0, ~data & 0x01);
-		rp5h01_enable_w(m_rp5h01, 0, 1);
+		rp5h01_enable_w(m_rp5h01, space, 0, 0);
+		rp5h01_test_w(m_rp5h01, space, 0, data & 0x10);		/* D4 */
+		rp5h01_clock_w(m_rp5h01, space, 0, data & 0x08);		/* D3 */
+		rp5h01_cs_w(m_rp5h01, space, 0, ~data & 0x01);
+		rp5h01_enable_w(m_rp5h01, space, 0, 1);
 	}
 	else
-		rp5h01_enable_w(m_rp5h01, 0, 1);
+		rp5h01_enable_w(m_rp5h01, space, 0, 1);
 
 	ioport("EEPROMOUT")->write(data, 0xff);
 }

@@ -252,7 +252,7 @@ READ8_DEVICE_HANDLER(vectrex_via_pa_r)
 	{
 		device_t *ay = device->machine().device("ay8912");
 
-		state->m_via_out[PORTA] = ay8910_r(ay, 0)
+		state->m_via_out[PORTA] = ay8910_r(ay, space, 0)
 			& ~(state->m_imager_pinlevel & 0x80);
 	}
 	return state->m_via_out[PORTA];

@@ -257,7 +257,7 @@ UINT8 c64_sfx_sound_expander_cartridge_device::c64_cd_r(address_space &space, of
 		}
 		else if (BIT(offset, 5))
 		{
-			data = ym3526_r(m_opl, BIT(offset, 4));
+			data = ym3526_r(m_opl, space, BIT(offset, 4));
 		}
 	}
 
@@ -273,7 +273,7 @@ void c64_sfx_sound_expander_cartridge_device::c64_cd_w(address_space &space, off
 {
 	if (!io2 && BIT(offset, 5))
 	{
-		ym3526_w(m_opl, BIT(offset, 4), data);
+		ym3526_w(m_opl, space, BIT(offset, 4), data);
 	}
 
 	m_exp->cd_w(space, offset, data, ba, roml, romh, io1, io2);

@@ -14,8 +14,8 @@ struct k007232_interface
 	void (*portwritehandler)(device_t *, int);
 };
 
-WRITE8_DEVICE_HANDLER( k007232_w );
-READ8_DEVICE_HANDLER( k007232_r );
+DECLARE_WRITE8_DEVICE_HANDLER( k007232_w );
+DECLARE_READ8_DEVICE_HANDLER( k007232_r );
 
 void k007232_set_bank( device_t *device, int chABank, int chBBank );
 

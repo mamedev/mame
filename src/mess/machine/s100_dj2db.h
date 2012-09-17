@@ -51,10 +51,10 @@ protected:
     virtual void device_config_complete() { m_shortname = "dj2db"; }
 
 	// device_s100_card_interface overrides
-	virtual UINT8 s100_smemr_r(offs_t offset);
-	virtual void s100_mwrt_w(offs_t offset, UINT8 data);
-	virtual UINT8 s100_sinp_r(offs_t offset);
-	virtual void s100_sout_w(offs_t offset, UINT8 data);
+	virtual UINT8 s100_smemr_r(address_space &space, offs_t offset);
+	virtual void s100_mwrt_w(address_space &space, offs_t offset, UINT8 data);
+	virtual UINT8 s100_sinp_r(address_space &space, offs_t offset);
+	virtual void s100_sout_w(address_space &space, offs_t offset, UINT8 data);
 	virtual void s100_phantom_w(int state);
 	virtual bool s100_has_terminal() { return true; }
 	virtual void s100_terminal_w(UINT8 data);

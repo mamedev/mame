@@ -5,7 +5,7 @@
 
 #include "devlegcy.h"
 
-WRITE8_DEVICE_HANDLER( t6w28_w );
+DECLARE_WRITE8_DEVICE_HANDLER( t6w28_w );
 
 class t6w28_device : public device_t,
                                   public device_sound_interface

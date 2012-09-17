@@ -69,12 +69,12 @@ READ8_MEMBER(madalien_state::madalien_sound_command_r)
 WRITE8_MEMBER(madalien_state::madalien_portA_w)
 {
 	device_t *device = machine().device("discrete");
-	discrete_sound_w(device, MADALIEN_8910_PORTA, data);
+	discrete_sound_w(device, space, MADALIEN_8910_PORTA, data);
 }
 WRITE8_MEMBER(madalien_state::madalien_portB_w)
 {
 	device_t *device = machine().device("discrete");
-	discrete_sound_w(device, MADALIEN_8910_PORTB, data);
+	discrete_sound_w(device, space, MADALIEN_8910_PORTB, data);
 }
 
 

@@ -36,7 +36,7 @@ public:
 
 SCREEN_UPDATE_IND16( xxmissio );
 
-WRITE8_DEVICE_HANDLER( xxmissio_scroll_x_w );
-WRITE8_DEVICE_HANDLER( xxmissio_scroll_y_w );
+DECLARE_WRITE8_DEVICE_HANDLER( xxmissio_scroll_x_w );
+DECLARE_WRITE8_DEVICE_HANDLER( xxmissio_scroll_y_w );
 
 

@@ -69,7 +69,7 @@ struct msm5232_state {
 
 	double	external_capacity[8]; /* in Farads, eg 0.39e-6 = 0.36 uF (microFarads) */
 	device_t *device;
-	void (*gate_handler)(device_t *device, int state);	/* callback called when the GATE output pin changes state */
+	devcb_resolved_write_line gate_handler;/* callback called when the GATE output pin changes state */
 
 };
 
@@ -260,10 +260,10 @@ static void msm5232_gate_update(msm5232_state *chip)
 {
 	int new_state = (chip->control2 & 0x20) ? chip->voi[7].GF : 0;
 
-	if (chip->gate != new_state && chip->gate_handler)
+	if (chip->gate != new_state && !chip->gate_handler.isnull())
 	{
 		chip->gate = new_state;
-		(*chip->gate_handler)(chip->device, new_state);
+		chip->gate_handler(new_state);
 	}
 }
 
@@ -275,8 +275,8 @@ static DEVICE_RESET( msm5232 )
 
 	for (i=0; i<8; i++)
 	{
-		msm5232_w(device,i,0x80);
-		msm5232_w(device,i,0x00);
+		msm5232_w(device,device->machine().driver_data()->generic_space(),i,0x80);
+		msm5232_w(device,device->machine().driver_data()->generic_space(),i,0x00);
 	}
 	chip->noise_cnt		= 0;
 	chip->noise_rng		= 1;
@@ -309,7 +309,7 @@ static void msm5232_init(msm5232_state *chip, const msm5232_interface *intf, int
 		chip->external_capacity[j] = intf->capacity[j];
 	}
 
-	chip->gate_handler = intf->gate_handler;
+	chip->gate_handler.resolve(intf->gate_handler_cb, *chip->device);
 
 	msm5232_init_tables( chip );
 

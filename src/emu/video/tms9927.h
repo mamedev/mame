@@ -84,8 +84,8 @@ extern const tms9927_interface tms9927_null_interface;
 
 
 /* basic read/write handlers */
-WRITE8_DEVICE_HANDLER( tms9927_w );
-READ8_DEVICE_HANDLER( tms9927_r );
+DECLARE_WRITE8_DEVICE_HANDLER( tms9927_w );
+DECLARE_READ8_DEVICE_HANDLER( tms9927_r );
 
 /* other queries */
 int tms9927_screen_reset(device_t *device);

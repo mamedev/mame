@@ -109,18 +109,18 @@ int devcb_line_stub(device_t *device)
 
 // static template for a read8 stub function that calls through a given READ8_MEMBER
 template<class _Class, UINT8 (_Class::*_Function)(address_space &, offs_t, UINT8)>
-UINT8 devcb_stub(device_t *device, offs_t offset)
+UINT8 devcb_stub(device_t *device, address_space &space, offs_t offset, UINT8 mem_mask)
 {
 	_Class *target = downcast<_Class *>(device);
-	return (target->*_Function)(*device->machine().memory().first_space(), offset, 0xff);
+	return (target->*_Function)(space, offset, mem_mask);
 }
 
 // static template for a read16 stub function that calls through a given READ16_MEMBER
 template<class _Class, UINT16 (_Class::*_Function)(address_space &, offs_t, UINT16)>
-UINT16 devcb_stub16(device_t *device, offs_t offset, UINT16 mask)
+UINT16 devcb_stub16(device_t *device, address_space &space, offs_t offset, UINT16 mem_mask)
 {
 	_Class *target = downcast<_Class *>(device);
-	return (target->*_Function)(*device->machine().memory().first_space(), offset, mask);
+	return (target->*_Function)(space, offset, mem_mask);
 }
 
 // static template for a write_line stub function that calls through a given WRITE_LINE_MEMBER
@@ -133,18 +133,18 @@ void devcb_line_stub(device_t *device, int state)
 
 // static template for a write8 stub function that calls through a given WRITE8_MEMBER
 template<class _Class, void (_Class::*_Function)(address_space &, offs_t, UINT8, UINT8)>
-void devcb_stub(device_t *device, offs_t offset, UINT8 data)
+void devcb_stub(device_t *device, address_space &space, offs_t offset, UINT8 data, UINT8 mem_mask)
 {
 	_Class *target = downcast<_Class *>(device);
-	(target->*_Function)(*device->machine().memory().first_space(), offset, data, 0xff);
+	(target->*_Function)(space, offset, data, mem_mask);
 }
 
 // static template for a write16 stub function that calls through a given WRITE16_MEMBER
 template<class _Class, void (_Class::*_Function)(address_space &, offs_t, UINT16, UINT16)>
-void devcb_stub16(device_t *device, offs_t offset, UINT16 data, UINT16 mask)
+void devcb_stub16(device_t *device, address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	_Class *target = downcast<_Class *>(device);
-	(target->*_Function)(*device->machine().memory().first_space(), offset, data, mask);
+	(target->*_Function)(space, offset, data, mem_mask);
 }
 
 #define DEVCB_NULL								{ DEVCB_TYPE_NULL }
@@ -374,6 +374,7 @@ public:
 private:
 	// internal helpers
 	UINT8 from_port(offs_t offset);
+	UINT8 from_read8(offs_t offset);
 	UINT8 from_readline(offs_t offset);
 	UINT8 from_constant(offs_t offset);
 
@@ -424,6 +425,7 @@ private:
 	// internal helpers
 	void to_null(offs_t offset, UINT8 data);
 	void to_port(offs_t offset, UINT8 data);
+	void to_write8(offs_t offset, UINT8 data);
 	void to_writeline(offs_t offset, UINT8 data);
 	void to_input(offs_t offset, UINT8 data);
 
@@ -473,6 +475,7 @@ public:
 private:
 	// internal helpers
 	UINT16 from_port(offs_t offset, UINT16 mask);
+	UINT16 from_read16(offs_t offset, UINT16 mask);
 	UINT16 from_readline(offs_t offset, UINT16 mask);
 	UINT16 from_constant(offs_t offset, UINT16 mask);
 
@@ -523,6 +526,7 @@ private:
 	// internal helpers
 	void to_null(offs_t offset, UINT16 data, UINT16 mask);
 	void to_port(offs_t offset, UINT16 data, UINT16 mask);
+	void to_write16(offs_t offset, UINT16 data, UINT16 mask);
 	void to_writeline(offs_t offset, UINT16 data, UINT16 mask);
 	void to_input(offs_t offset, UINT16 data, UINT16 mask);
 

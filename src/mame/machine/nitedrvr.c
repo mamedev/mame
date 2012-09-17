@@ -209,9 +209,9 @@ D5 = SKID2
 WRITE8_MEMBER(nitedrvr_state::nitedrvr_out0_w)
 {
 
-	discrete_sound_w(m_discrete, NITEDRVR_MOTOR_DATA, data & 0x0f);	// Motor freq data
-	discrete_sound_w(m_discrete, NITEDRVR_SKID1_EN, data & 0x10);	// Skid1 enable
-	discrete_sound_w(m_discrete, NITEDRVR_SKID2_EN, data & 0x20);	// Skid2 enable
+	discrete_sound_w(m_discrete, space, NITEDRVR_MOTOR_DATA, data & 0x0f);	// Motor freq data
+	discrete_sound_w(m_discrete, space, NITEDRVR_SKID1_EN, data & 0x10);	// Skid1 enable
+	discrete_sound_w(m_discrete, space, NITEDRVR_SKID2_EN, data & 0x20);	// Skid2 enable
 }
 
 /***************************************************************************
@@ -232,8 +232,8 @@ WRITE8_MEMBER(nitedrvr_state::nitedrvr_out1_w)
 
 	m_crash_en = data & 0x01;
 
-	discrete_sound_w(m_discrete, NITEDRVR_CRASH_EN, m_crash_en);	// Crash enable
-	discrete_sound_w(m_discrete, NITEDRVR_ATTRACT_EN, data & 0x02);		// Attract enable (sound disable)
+	discrete_sound_w(m_discrete, space, NITEDRVR_CRASH_EN, m_crash_en);	// Crash enable
+	discrete_sound_w(m_discrete, space, NITEDRVR_ATTRACT_EN, data & 0x02);		// Attract enable (sound disable)
 
 	if (!m_crash_en)
 	{
@@ -244,7 +244,7 @@ WRITE8_MEMBER(nitedrvr_state::nitedrvr_out1_w)
 		palette_set_color(machine(), 1, MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
 		palette_set_color(machine(), 0, MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
 	}
-	discrete_sound_w(m_discrete, NITEDRVR_BANG_DATA, m_crash_data_en ? m_crash_data : 0);	// Crash Volume
+	discrete_sound_w(m_discrete, space, NITEDRVR_BANG_DATA, m_crash_data_en ? m_crash_data : 0);	// Crash Volume
 }
 
 
@@ -255,7 +255,8 @@ TIMER_DEVICE_CALLBACK( nitedrvr_crash_toggle_callback )
 	if (state->m_crash_en && state->m_crash_data_en)
 	{
 		state->m_crash_data--;
-		discrete_sound_w(state->m_discrete, NITEDRVR_BANG_DATA, state->m_crash_data);	// Crash Volume
+		address_space &space = timer.machine().driver_data()->generic_space();
+		discrete_sound_w(state->m_discrete, space, NITEDRVR_BANG_DATA, state->m_crash_data);	// Crash Volume
 		if (!state->m_crash_data)
 			state->m_crash_data_en = 0;	// Done counting?
 

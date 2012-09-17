@@ -10,13 +10,13 @@ struct ym3526_interface
 	devcb_write_line out_int_func;
 };
 
-READ8_DEVICE_HANDLER( ym3526_r );
-WRITE8_DEVICE_HANDLER( ym3526_w );
+DECLARE_READ8_DEVICE_HANDLER( ym3526_r );
+DECLARE_WRITE8_DEVICE_HANDLER( ym3526_w );
 
-READ8_DEVICE_HANDLER( ym3526_status_port_r );
-READ8_DEVICE_HANDLER( ym3526_read_port_r );
-WRITE8_DEVICE_HANDLER( ym3526_control_port_w );
-WRITE8_DEVICE_HANDLER( ym3526_write_port_w );
+DECLARE_READ8_DEVICE_HANDLER( ym3526_status_port_r );
+DECLARE_READ8_DEVICE_HANDLER( ym3526_read_port_r );
+DECLARE_WRITE8_DEVICE_HANDLER( ym3526_control_port_w );
+DECLARE_WRITE8_DEVICE_HANDLER( ym3526_write_port_w );
 
 class ym3526_device : public device_t,
                                   public device_sound_interface

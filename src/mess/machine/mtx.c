@@ -118,7 +118,7 @@ READ8_DEVICE_HANDLER( mtx_sound_strobe_r )
 {
 	mtx_state *state = device->machine().driver_data<mtx_state>();
 
-	sn76496_w(device, 0, state->m_sound_latch);
+	sn76496_w(device, space, 0, state->m_sound_latch);
 
 	return 0xff;
 }

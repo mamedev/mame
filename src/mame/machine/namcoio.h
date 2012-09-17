@@ -59,8 +59,8 @@ extern const device_type NAMCO56XX;
     DEVICE I/O FUNCTIONS
 ***************************************************************************/
 
-READ8_DEVICE_HANDLER( namcoio_r );
-WRITE8_DEVICE_HANDLER( namcoio_w );
+DECLARE_READ8_DEVICE_HANDLER( namcoio_r );
+DECLARE_WRITE8_DEVICE_HANDLER( namcoio_w );
 
 WRITE_LINE_DEVICE_HANDLER( namcoio_set_reset_line );
 READ_LINE_DEVICE_HANDLER( namcoio_read_reset_line );

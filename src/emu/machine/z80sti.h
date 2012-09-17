@@ -183,8 +183,8 @@ extern const device_type Z80STI;
 //**************************************************************************
 
 // register access
-READ8_DEVICE_HANDLER( z80sti_r );
-WRITE8_DEVICE_HANDLER( z80sti_w );
+DECLARE_READ8_DEVICE_HANDLER( z80sti_r );
+DECLARE_WRITE8_DEVICE_HANDLER( z80sti_w );
 
 // receive clock
 WRITE_LINE_DEVICE_HANDLER( z80sti_rc_w );

@@ -598,7 +598,7 @@ WRITE8_MEMBER(astrocde_state::astrocade_data_chip_register_w)
 		case 0x17:	/* noise volume register */
 		case 0x18:	/* sound block transfer */
 			if (m_video_config & AC_SOUND_PRESENT)
-				astrocade_sound_w(machine().device("astrocade1"), offset, data);
+				astrocade_sound_w(machine().device("astrocade1"), space, offset, data);
 			break;
 
 		case 0x19:	/* expand register */

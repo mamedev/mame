@@ -185,7 +185,7 @@ static WRITE8_HANDLER(spectrum_plus3_port_3ffd_w)
 {
 	spectrum_state *state = space->machine().driver_data<spectrum_state>();
 	if (state->m_floppy==1)
-		upd765_data_w(space->machine().device("upd765"), 0,data);
+		upd765_data_w(space->machine().device("upd765"), *space, 0,data);
 }
 
 static  READ8_HANDLER(spectrum_plus3_port_3ffd_r)
@@ -194,7 +194,7 @@ static  READ8_HANDLER(spectrum_plus3_port_3ffd_r)
 	if (state->m_floppy==0)
 		return 0xff;
 	else
-		return upd765_data_r(space->machine().device("upd765"), 0);
+		return upd765_data_r(space->machine().device("upd765"), *space, 0);
 }
 
 
@@ -204,7 +204,7 @@ static  READ8_HANDLER(spectrum_plus3_port_2ffd_r)
 	if (state->m_floppy==0)
 			return 0xff;
 	else
-			return upd765_status_r(space->machine().device("upd765"), 0);
+			return upd765_status_r(space->machine().device("upd765"), *space, 0);
 }
 
 

@@ -332,7 +332,8 @@ MACHINE_RESET_MEMBER(leland_state,leland)
 
 	/* reset globals */
 	m_gfx_control = 0x00;
-	leland_sound_port_w(machine().device("ay8910.1"), 0, 0xff);
+	address_space &space = generic_space();
+	leland_sound_port_w(machine().device("ay8910.1"), space, 0, 0xff);
 	m_wcol_enable = 0;
 
 	m_dangerz_x = 512;
@@ -470,7 +471,7 @@ WRITE8_MEMBER(leland_state::leland_master_alt_bankswitch_w)
 	(*m_update_master_bank)(machine());
 
 	/* sound control is in the rest */
-	leland_80186_control_w(machine().device("custom"), offset, data);
+	leland_80186_control_w(machine().device("custom"), space, offset, data);
 }
 
 
@@ -1103,7 +1104,7 @@ READ8_MEMBER(leland_state::leland_master_input_r)
 
 		case 0x03:	/* /IGID */
 		case 0x13:
-			result = ay8910_r(machine().device("ay8910.1"), offset);
+			result = ay8910_r(machine().device("ay8910.1"), space, offset);
 			break;
 
 		case 0x10:	/* /GIN0 */
@@ -1145,7 +1146,7 @@ WRITE8_MEMBER(leland_state::leland_master_output_w)
 
 		case 0x0a:	/* /OGIA */
 		case 0x0b:	/* /OGID */
-			ay8910_address_data_w(machine().device("ay8910.1"), offset, data);
+			ay8910_address_data_w(machine().device("ay8910.1"), space, offset, data);
 			break;
 
 		case 0x0c:	/* /BKXL */
@@ -1314,7 +1315,7 @@ WRITE8_DEVICE_HANDLER( leland_sound_port_w )
 {
 	leland_state *state = device->machine().driver_data<leland_state>();
 	/* update the graphics banking */
-	leland_gfx_port_w(device, 0, data);
+	leland_gfx_port_w(device, space, 0, data);
 
 	/* set the new value */
 	state->m_gfx_control = data;

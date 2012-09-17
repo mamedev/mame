@@ -79,13 +79,13 @@ DEVICE_IMAGE_LOAD( vectrex_cart );
 
 TIMER_CALLBACK(vectrex_imager_eye);
 void vectrex_configuration(running_machine &machine);
-READ8_DEVICE_HANDLER (vectrex_via_pa_r);
-READ8_DEVICE_HANDLER(vectrex_via_pb_r );
+DECLARE_READ8_DEVICE_HANDLER (vectrex_via_pa_r);
+DECLARE_READ8_DEVICE_HANDLER(vectrex_via_pb_r );
 void vectrex_via_irq (device_t *device, int level);
 
 
 /* for spectrum 1+ */
-READ8_DEVICE_HANDLER( vectrex_s1_via_pb_r );
+DECLARE_READ8_DEVICE_HANDLER( vectrex_s1_via_pb_r );
 
 
 /*----------- defined in video/vectrex.c -----------*/

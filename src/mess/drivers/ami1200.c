@@ -90,7 +90,7 @@ static WRITE8_DEVICE_HANDLER( ami1200_cia_0_porta_w )
 	/* bit 2 = Power Led on Amiga */
 	set_led_status(device->machine(), 0, !BIT(data, 1));
 
-	handle_cd32_joystick_cia(state, data, mos6526_r(device, 2));
+	handle_cd32_joystick_cia(state, data, mos6526_r(device, space, 2));
 }
 
 /*************************************

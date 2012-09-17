@@ -841,7 +841,7 @@ WRITE8_MEMBER(maygay1b_state::m1_latch_w)
 WRITE8_MEMBER(maygay1b_state::latch_ch2_w)
 {
 	device_t *msm6376 = machine().device("msm6376");
-	okim6376_w(msm6376, 0, data&0x7f);
+	okim6376_w(msm6376, space, 0, data&0x7f);
 	okim6376_ch2_w(msm6376,data&0x80);
 }
 

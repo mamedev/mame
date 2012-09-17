@@ -12,11 +12,11 @@ struct x1_010_interface
 };
 
 
-READ8_DEVICE_HANDLER ( seta_sound_r );
-WRITE8_DEVICE_HANDLER( seta_sound_w );
+DECLARE_READ8_DEVICE_HANDLER ( seta_sound_r );
+DECLARE_WRITE8_DEVICE_HANDLER( seta_sound_w );
 
-READ16_DEVICE_HANDLER ( seta_sound_word_r );
-WRITE16_DEVICE_HANDLER( seta_sound_word_w );
+DECLARE_READ16_DEVICE_HANDLER ( seta_sound_word_r );
+DECLARE_WRITE16_DEVICE_HANDLER( seta_sound_word_w );
 
 void seta_sound_enable_w(device_t *device, int data);
 

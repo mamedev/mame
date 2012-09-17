@@ -55,7 +55,6 @@ void ttl74123_device::device_config_complete()
 		m_a = 0;
 		m_b = 0;
 		m_clear = 0;
-    	memset(&m_output_changed_cb, 0, sizeof(m_output_changed_cb));
 	}
 }
 
@@ -66,6 +65,8 @@ void ttl74123_device::device_config_complete()
 
 void ttl74123_device::device_start()
 {
+	m_output_changed.resolve(m_output_changed_cb, *this);
+
 	m_timer = machine().scheduler().timer_alloc(FUNC(clear_callback), (void *)this);
 
 	/* register for state saving */
@@ -145,7 +146,7 @@ TIMER_CALLBACK( ttl74123_device::output_callback )
 
 void ttl74123_device::output(INT32 param)
 {
-	m_output_changed_cb(this, 0, param);
+	m_output_changed(0, param);
 }
 
 
@@ -177,7 +178,7 @@ void ttl74123_device::clear()
 {
 	int output = timer_running();
 
-	m_output_changed_cb(this, 0, output);
+	m_output_changed(0, output);
 }
 
 

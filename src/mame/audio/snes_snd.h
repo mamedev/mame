@@ -46,12 +46,12 @@ extern const device_type SNES;
     I/O PROTOTYPES
 ***************************************************************************/
 
-READ8_DEVICE_HANDLER( spc_io_r );
-WRITE8_DEVICE_HANDLER( spc_io_w );
-READ8_DEVICE_HANDLER( spc_ram_r );
-WRITE8_DEVICE_HANDLER( spc_ram_w );
-READ8_DEVICE_HANDLER( spc_port_out );
-WRITE8_DEVICE_HANDLER( spc_port_in );
+DECLARE_READ8_DEVICE_HANDLER( spc_io_r );
+DECLARE_WRITE8_DEVICE_HANDLER( spc_io_w );
+DECLARE_READ8_DEVICE_HANDLER( spc_ram_r );
+DECLARE_WRITE8_DEVICE_HANDLER( spc_ram_w );
+DECLARE_READ8_DEVICE_HANDLER( spc_port_out );
+DECLARE_WRITE8_DEVICE_HANDLER( spc_port_in );
 
 UINT8 *spc_get_ram(device_t *device);
 void spc700_set_volume(device_t *device,int volume);

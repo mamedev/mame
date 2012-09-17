@@ -549,8 +549,8 @@ READ8_MEMBER( pasopia7_state::pasopia7_fdc_r )
 {
 	switch(offset)
 	{
-		case 4: return upd765_status_r(m_fdc, 0);
-		case 5: return upd765_data_r(m_fdc, 0);
+		case 4: return upd765_status_r(m_fdc, space, 0);
+		case 5: return upd765_data_r(m_fdc, space, 0);
 		//case 6: bit 7 interrupt bit
 	}
 
@@ -563,7 +563,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_fdc_w )
 	{
 		case 0: upd765_tc_w(m_fdc, 0); break;
 		case 2: upd765_tc_w(m_fdc, 1); break;
-		case 5: upd765_data_w(m_fdc, 0, data); break;
+		case 5: upd765_data_w(m_fdc, space, 0, data); break;
 		case 6:
 			upd765_reset_w(m_fdc, data & 0x80);
 			floppy_mon_w(floppy_get_device(machine(), 0), (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);

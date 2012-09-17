@@ -60,15 +60,15 @@ private:
 extern const device_type EXIDY_VICTORY;
 
 
-READ8_DEVICE_HANDLER( exidy_sh6840_r );
-WRITE8_DEVICE_HANDLER( exidy_sh6840_w );
-WRITE8_DEVICE_HANDLER( exidy_sfxctrl_w );
+DECLARE_READ8_DEVICE_HANDLER( exidy_sh6840_r );
+DECLARE_WRITE8_DEVICE_HANDLER( exidy_sh6840_w );
+DECLARE_WRITE8_DEVICE_HANDLER( exidy_sfxctrl_w );
 
 MACHINE_CONFIG_EXTERN( venture_audio );
 
 MACHINE_CONFIG_EXTERN( mtrap_cvsd_audio );
 
 MACHINE_CONFIG_EXTERN( victory_audio );
-READ8_DEVICE_HANDLER( victory_sound_response_r );
-READ8_DEVICE_HANDLER( victory_sound_status_r );
-WRITE8_DEVICE_HANDLER( victory_sound_command_w );
+DECLARE_READ8_DEVICE_HANDLER( victory_sound_response_r );
+DECLARE_READ8_DEVICE_HANDLER( victory_sound_status_r );
+DECLARE_WRITE8_DEVICE_HANDLER( victory_sound_command_w );

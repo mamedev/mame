@@ -1272,11 +1272,11 @@ WRITE8_MEMBER(goldnpkr_state::wcfalcon_snd_w)
 {
 	if (wcfalcon_flag == 0)
 	{
-		ay8910_data_address_w(machine().device("ay8910"), 0, data);
+		ay8910_data_address_w(machine().device("ay8910"), space, 0, data);
 	}
 	else
 	{
-		ay8910_data_address_w(machine().device("ay8910"), 1, data);
+		ay8910_data_address_w(machine().device("ay8910"), space, 1, data);
 	}
 
 	wcfalcon_flag = wcfalcon_flag ^ 1;
@@ -1361,8 +1361,8 @@ WRITE8_MEMBER(goldnpkr_state::sound_w)
 	logerror("Sound Data: %2x\n",data & 0x0f);
 
 	/* discrete sound is connected to PIA1, portA: bits 0-3 */
-	discrete_sound_w(device, NODE_01, data >> 3 & 0x01);
-	discrete_sound_w(device, NODE_10, data & 0x07);
+	discrete_sound_w(device, space, NODE_01, data >> 3 & 0x01);
+	discrete_sound_w(device, space, NODE_10, data & 0x07);
 }
 
 

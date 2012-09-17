@@ -42,8 +42,8 @@ struct mm58274c_interface
 	int	day1;		/* first day of week */
 };
 
-READ8_DEVICE_HANDLER ( mm58274c_r );
-WRITE8_DEVICE_HANDLER( mm58274c_w );
+DECLARE_READ8_DEVICE_HANDLER ( mm58274c_r );
+DECLARE_WRITE8_DEVICE_HANDLER( mm58274c_w );
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS

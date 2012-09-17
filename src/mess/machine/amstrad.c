@@ -518,9 +518,9 @@ static void amstrad_plus_dma_parse(running_machine &machine, int channel)
 	case 0x0000:  // Load PSG register
 		{
 			device_t *ay8910 = state->m_ay;
-			ay8910_address_w(ay8910, 0, (command & 0x0f00) >> 8);
-			ay8910_data_w(ay8910, 0, command & 0x00ff);
-			ay8910_address_w(ay8910, 0, state->m_prev_reg);
+			ay8910_address_w(ay8910, state->generic_space(), 0, (command & 0x0f00) >> 8);
+			ay8910_data_w(ay8910, state->generic_space(), 0, command & 0x00ff);
+			ay8910_address_w(ay8910, state->generic_space(), 0, state->m_prev_reg);
 		}
 		logerror("DMA %i: LOAD %i, %i\n",channel,(command & 0x0f00) >> 8, command & 0x00ff);
 		break;
@@ -1960,10 +1960,10 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 				switch (b8b0)
 				{
 				case 0x02:
-					data = upd765_status_r(fdc, 0);
+					data = upd765_status_r(fdc, space, 0);
 					break;
 				case 0x03:
-					data = upd765_data_r(fdc, 0);
+					data = upd765_data_r(fdc, space, 0);
 					break;
 				default:
 					break;
@@ -2138,7 +2138,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 				  break;
 
 				case 0x03: /* Write Data register of FDC */
-					upd765_data_w(fdc, 0,data);
+					upd765_data_w(fdc, space, 0,data);
 					break;
 
 				default:
@@ -2175,7 +2175,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 static void amstrad_handle_snapshot(running_machine &machine, unsigned char *pSnapshot)
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
-	address_space* space = state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = *state->m_maincpu->space(AS_PROGRAM);
 	mc6845_device *mc6845 = state->m_crtc;
 	device_t *ay8910 = state->m_ay;
 	int RegData;
@@ -2265,30 +2265,30 @@ static void amstrad_handle_snapshot(running_machine &machine, unsigned char *pSn
 	/* init CRTC */
 	for (i=0; i<18; i++)
 	{
-		mc6845->address_w( *space, 0, i );
-		mc6845->register_w( *space, 0, pSnapshot[0x043+i] & 0xff );
+		mc6845->address_w( space, 0, i );
+		mc6845->register_w( space, 0, pSnapshot[0x043+i] & 0xff );
 	}
 
-	mc6845->address_w( *space, 0, i );
+	mc6845->address_w( space, 0, i );
 
 	/* upper rom selection */
 	state->m_gate_array.upper_bank = pSnapshot[0x055];
 
 	/* PPI */
-	state->m_ppi->write(*space, 3, pSnapshot[0x059] & 0x0ff);
+	state->m_ppi->write(space, 3, pSnapshot[0x059] & 0x0ff);
 
-	state->m_ppi->write(*space, 0, pSnapshot[0x056] & 0x0ff);
-	state->m_ppi->write(*space, 1, pSnapshot[0x057] & 0x0ff);
-	state->m_ppi->write(*space, 2, pSnapshot[0x058] & 0x0ff);
+	state->m_ppi->write(space, 0, pSnapshot[0x056] & 0x0ff);
+	state->m_ppi->write(space, 1, pSnapshot[0x057] & 0x0ff);
+	state->m_ppi->write(space, 2, pSnapshot[0x058] & 0x0ff);
 
 	/* PSG */
 	for (i=0; i<16; i++)
 	{
-		ay8910_address_w(ay8910, 0, i);
-		ay8910_data_w(ay8910, 0, pSnapshot[0x05b + i] & 0x0ff);
+		ay8910_address_w(ay8910, space, 0, i);
+		ay8910_data_w(ay8910, space, 0, pSnapshot[0x05b + i] & 0x0ff);
 	}
 
-	ay8910_address_w(ay8910, 0, pSnapshot[0x05a]);
+	ay8910_address_w(ay8910, space, 0, pSnapshot[0x05a]);
 
 	{
 		int MemSize;
@@ -2458,7 +2458,7 @@ BDIR BC1       |
 static void update_psg(running_machine &machine)
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
-	address_space *space = state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = *state->m_maincpu->space(AS_PROGRAM);
 	device_t *ay8910 = state->m_ay;
 	mc146818_device *rtc = state->m_rtc;
 
@@ -2467,13 +2467,13 @@ static void update_psg(running_machine &machine)
 		switch(state->m_aleste_rtc_function)
 		{
 		case 0x02:  // AS
-			rtc->write(*space, 0,state->m_ppi_port_outputs[amstrad_ppi_PortA]);
+			rtc->write(space, 0,state->m_ppi_port_outputs[amstrad_ppi_PortA]);
 			break;
 		case 0x04:  // DS write
-			rtc->write(*space, 1,state->m_ppi_port_outputs[amstrad_ppi_PortA]);
+			rtc->write(space, 1,state->m_ppi_port_outputs[amstrad_ppi_PortA]);
 			break;
 		case 0x05:  // DS read
-			state->m_ppi_port_inputs[amstrad_ppi_PortA] = rtc->read(*space, 1);
+			state->m_ppi_port_inputs[amstrad_ppi_PortA] = rtc->read(space, 1);
 			break;
 		}
 		return;
@@ -2485,17 +2485,17 @@ static void update_psg(running_machine &machine)
 		} break;
 	case 1:
 		{/* b6 = 1 ? : Read from selected PSG register and make the register data available to PPI Port A */
-			state->m_ppi_port_inputs[amstrad_ppi_PortA] = ay8910_r(ay8910, 0);
+			state->m_ppi_port_inputs[amstrad_ppi_PortA] = ay8910_r(ay8910, space, 0);
 		}
 		break;
 	case 2:
 		{/* b7 = 1 ? : Write to selected PSG register and write data to PPI Port A */
-			ay8910_data_w(ay8910, 0, state->m_ppi_port_outputs[amstrad_ppi_PortA]);
+			ay8910_data_w(ay8910, space, 0, state->m_ppi_port_outputs[amstrad_ppi_PortA]);
 		}
 		break;
 	case 3:
 		{/* b6 and b7 = 1 ? : The register will now be selected and the user can read from or write to it.  The register will remain selected until another is chosen.*/
-			ay8910_address_w(ay8910, 0, state->m_ppi_port_outputs[amstrad_ppi_PortA]);
+			ay8910_address_w(ay8910, space, 0, state->m_ppi_port_outputs[amstrad_ppi_PortA]);
 			state->m_prev_reg = state->m_ppi_port_outputs[amstrad_ppi_PortA];
 		}
 		break;
@@ -2832,7 +2832,7 @@ static const UINT8 amstrad_cycle_table_ex[256]=
 static void amstrad_common_init(running_machine &machine)
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
-	address_space *space = state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = *state->m_maincpu->space(AS_PROGRAM);
 	device_t* romexp;
 	rom_image_device* romimage;
 	char str[20];
@@ -2846,29 +2846,29 @@ static void amstrad_common_init(running_machine &machine)
 	state->m_GateArray_RamConfiguration = 0;
 	state->m_gate_array.hsync_counter = 2;
 
-	space->install_read_bank(0x0000, 0x1fff, "bank1");
-	space->install_read_bank(0x2000, 0x3fff, "bank2");
+	space.install_read_bank(0x0000, 0x1fff, "bank1");
+	space.install_read_bank(0x2000, 0x3fff, "bank2");
 
-	space->install_read_bank(0x4000, 0x5fff, "bank3");
-	space->install_read_bank(0x6000, 0x7fff, "bank4");
+	space.install_read_bank(0x4000, 0x5fff, "bank3");
+	space.install_read_bank(0x6000, 0x7fff, "bank4");
 
-	space->install_read_bank(0x8000, 0x9fff, "bank5");
-	space->install_read_bank(0xa000, 0xbfff, "bank6");
+	space.install_read_bank(0x8000, 0x9fff, "bank5");
+	space.install_read_bank(0xa000, 0xbfff, "bank6");
 
-	space->install_read_bank(0xc000, 0xdfff, "bank7");
-	space->install_read_bank(0xe000, 0xffff, "bank8");
+	space.install_read_bank(0xc000, 0xdfff, "bank7");
+	space.install_read_bank(0xe000, 0xffff, "bank8");
 
-	space->install_write_bank(0x0000, 0x1fff, "bank9");
-	space->install_write_bank(0x2000, 0x3fff, "bank10");
+	space.install_write_bank(0x0000, 0x1fff, "bank9");
+	space.install_write_bank(0x2000, 0x3fff, "bank10");
 
-	space->install_write_bank(0x4000, 0x5fff, "bank11");
-	space->install_write_bank(0x6000, 0x7fff, "bank12");
+	space.install_write_bank(0x4000, 0x5fff, "bank11");
+	space.install_write_bank(0x6000, 0x7fff, "bank12");
 
-	space->install_write_bank(0x8000, 0x9fff, "bank13");
-	space->install_write_bank(0xa000, 0xbfff, "bank14");
+	space.install_write_bank(0x8000, 0x9fff, "bank13");
+	space.install_write_bank(0xa000, 0xbfff, "bank14");
 
-	space->install_write_bank(0xc000, 0xdfff, "bank15");
-	space->install_write_bank(0xe000, 0xffff, "bank16");
+	space.install_write_bank(0xc000, 0xdfff, "bank15");
+	space.install_write_bank(0xe000, 0xffff, "bank16");
 
 	/* Set up ROMs, if we have an expansion device connected */
 	romexp = get_expansion_device(machine,"rom");
@@ -2977,7 +2977,7 @@ MACHINE_START_MEMBER(amstrad_state,plus)
 
 MACHINE_RESET_MEMBER(amstrad_state,plus)
 {
-	address_space *space = m_maincpu->space(AS_PROGRAM);
+	address_space &space = *m_maincpu->space(AS_PROGRAM);
 	int i;
 	UINT8 *rom = memregion("maincpu")->base();
 
@@ -3010,10 +3010,10 @@ MACHINE_RESET_MEMBER(amstrad_state,plus)
 	AmstradCPC_GA_SetRamConfiguration(machine());
 	amstrad_GateArray_write(machine(), 0x081); // Epyx World of Sports requires upper ROM to be enabled by default
 
-	space->install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_r),this));
-	space->install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_r),this));
-	space->install_write_handler(0x4000, 0x5fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_w),this));
-	space->install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_w),this));
+	space.install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_r),this));
+	space.install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_r),this));
+	space.install_write_handler(0x4000, 0x5fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_w),this));
+	space.install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_w),this));
 
 	//  multiface_init();
 	machine().scheduler().timer_set( attotime::zero, FUNC(cb_set_resolution));
@@ -3027,7 +3027,7 @@ MACHINE_START_MEMBER(amstrad_state,gx4000)
 
 MACHINE_RESET_MEMBER(amstrad_state,gx4000)
 {
-	address_space *space = m_maincpu->space(AS_PROGRAM);
+	address_space &space = *m_maincpu->space(AS_PROGRAM);
 	int i;
 	UINT8 *rom = memregion("maincpu")->base();
 
@@ -3060,10 +3060,10 @@ MACHINE_RESET_MEMBER(amstrad_state,gx4000)
 	AmstradCPC_GA_SetRamConfiguration(machine());
 	amstrad_GateArray_write(machine(), 0x081); // Epyx World of Sports requires upper ROM to be enabled by default
 	//  multiface_init();
-	space->install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_r),this));
-	space->install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_r),this));
-	space->install_write_handler(0x4000, 0x5fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_w),this));
-	space->install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_w),this));
+	space.install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_r),this));
+	space.install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_r),this));
+	space.install_write_handler(0x4000, 0x5fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_w),this));
+	space.install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_w),this));
 
 	machine().scheduler().timer_set( attotime::zero, FUNC(cb_set_resolution));
 }

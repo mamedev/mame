@@ -1701,7 +1701,7 @@ static CPU_EXECUTE( esrip )
 
 			/* FDT RAM: /Enable, Direction and /RAM OE */
 			else if (!bl44 && !_BIT(cpustate->l2, 3) && bl46)
-				y_bus = cpustate->fdt_r(device, cpustate->fdt_cnt, 0);
+				y_bus = cpustate->fdt_r(device, *cpustate->program, cpustate->fdt_cnt, 0);
 
 			/* IPT RAM: /Enable and /READ */
 			else if (!_BIT(cpustate->l2, 6) && !_BIT(cpustate->l4, 5))
@@ -1728,7 +1728,7 @@ static CPU_EXECUTE( esrip )
 
 		/* FDT RAM */
 		if (!bl44)
-			x_bus = cpustate->fdt_r(device, cpustate->fdt_cnt, 0);
+			x_bus = cpustate->fdt_r(device, *cpustate->program, cpustate->fdt_cnt, 0);
 
 		/* Buffer is enabled - write direction */
 		else if (!BIT(cpustate->l2, 3) && !bl46)
@@ -1753,7 +1753,7 @@ static CPU_EXECUTE( esrip )
 
 		/* Write FDT RAM: /Enable, Direction and WRITE */
 		if (!BIT(cpustate->l2, 3) && !bl46 && !BIT(cpustate->l4, 3))
-			cpustate->fdt_w(device, cpustate->fdt_cnt, x_bus, 0);
+			cpustate->fdt_w(device, *cpustate->program, cpustate->fdt_cnt, x_bus, 0);
 
 		/* Write IPT RAM: /Enable and /WR */
 		if (!BIT(cpustate->l2, 7) && !BIT(cpustate->l4, 5))

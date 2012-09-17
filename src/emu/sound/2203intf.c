@@ -175,10 +175,10 @@ WRITE8_DEVICE_HANDLER( ym2203_w )
 }
 
 
-READ8_DEVICE_HANDLER( ym2203_status_port_r ) { return ym2203_r(device, 0); }
-READ8_DEVICE_HANDLER( ym2203_read_port_r ) { return ym2203_r(device, 1); }
-WRITE8_DEVICE_HANDLER( ym2203_control_port_w ) { ym2203_w(device, 0, data); }
-WRITE8_DEVICE_HANDLER( ym2203_write_port_w ) { ym2203_w(device, 1, data); }
+READ8_DEVICE_HANDLER( ym2203_status_port_r ) { return ym2203_r(device, space, 0); }
+READ8_DEVICE_HANDLER( ym2203_read_port_r ) { return ym2203_r(device, space, 1); }
+WRITE8_DEVICE_HANDLER( ym2203_control_port_w ) { ym2203_w(device, space, 0, data); }
+WRITE8_DEVICE_HANDLER( ym2203_write_port_w ) { ym2203_w(device, space, 1, data); }
 
 const device_type YM2203 = &device_creator<ym2203_device>;
 

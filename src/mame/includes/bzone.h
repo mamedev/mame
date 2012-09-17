@@ -31,13 +31,13 @@ public:
 
 /*----------- defined in audio/bzone.c -----------*/
 
-WRITE8_DEVICE_HANDLER( bzone_sounds_w );
+DECLARE_WRITE8_DEVICE_HANDLER( bzone_sounds_w );
 
 MACHINE_CONFIG_EXTERN( bzone_audio );
 
 /*----------- defined in audio/redbaron.c -----------*/
 
-WRITE8_DEVICE_HANDLER( redbaron_sounds_w );
+DECLARE_WRITE8_DEVICE_HANDLER( redbaron_sounds_w );
 
 class redbaron_sound_device : public device_t,
                                   public device_sound_interface

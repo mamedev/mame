@@ -185,14 +185,14 @@ WRITE8_MEMBER(wiz_state::sound_command_w)
 
 		// explosion sound trigger(analog?)
 		case 0x08:
-			discrete_sound_w(discrete, STINGER_BOOM_EN1, m_dsc1);
-			discrete_sound_w(discrete, STINGER_BOOM_EN2, m_dsc1^=1);
+			discrete_sound_w(discrete, space, STINGER_BOOM_EN1, m_dsc1);
+			discrete_sound_w(discrete, space, STINGER_BOOM_EN2, m_dsc1^=1);
 		break;
 
 		// player shot sound trigger(analog?)
 		case 0x0a:
-			discrete_sound_w(discrete, STINGER_SHOT_EN1, m_dsc0);
-			discrete_sound_w(discrete, STINGER_SHOT_EN2, m_dsc0^=1);
+			discrete_sound_w(discrete, space, STINGER_SHOT_EN1, m_dsc0);
+			discrete_sound_w(discrete, space, STINGER_SHOT_EN2, m_dsc0^=1);
 		break;
 	}
 }

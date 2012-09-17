@@ -163,8 +163,8 @@ extern const device_type VIC2;
 
 /*----------- defined in video/vic6567.c -----------*/
 
-WRITE8_DEVICE_HANDLER ( vic2_port_w );
-READ8_DEVICE_HANDLER ( vic2_port_r );
+DECLARE_WRITE8_DEVICE_HANDLER ( vic2_port_w );
+DECLARE_READ8_DEVICE_HANDLER ( vic2_port_r );
 
 int vic2e_k0_r(device_t *device);
 int vic2e_k1_r(device_t *device);

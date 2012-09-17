@@ -64,8 +64,8 @@ struct k1ge_interface
 PALETTE_INIT( k1ge );
 PALETTE_INIT( k2ge );
 
-WRITE8_DEVICE_HANDLER( k1ge_w );
-READ8_DEVICE_HANDLER( k1ge_r );
+DECLARE_WRITE8_DEVICE_HANDLER( k1ge_w );
+DECLARE_READ8_DEVICE_HANDLER( k1ge_r );
 
 void k1ge_update( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect );
 

@@ -156,7 +156,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_r)
 	if (*m_fo_state)
 		return m_character_ram[(0 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return s2636_work_ram_r(m_s2636_0, offset);
+		return s2636_work_ram_r(m_s2636_0, space, offset);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_w)
@@ -169,7 +169,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_w)
 		machine().gfx[1]->mark_dirty((offset / 8) % 256);
 	}
 	else
-		s2636_work_ram_w(m_s2636_0, offset, data);
+		s2636_work_ram_w(m_s2636_0, space, offset, data);
 }
 
 
@@ -179,7 +179,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_r)
 	if (*m_fo_state)
 		return m_character_ram[(1 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return s2636_work_ram_r(m_s2636_1, offset);
+		return s2636_work_ram_r(m_s2636_1, space, offset);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_w)
@@ -192,7 +192,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_w)
 		machine().gfx[1]->mark_dirty((offset / 8) % 256);
 	}
 	else
-		s2636_work_ram_w(m_s2636_1, offset, data);
+		s2636_work_ram_w(m_s2636_1, space, offset, data);
 }
 
 
@@ -202,7 +202,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_r)
 	if (*m_fo_state)
 		return m_character_ram[(2 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return s2636_work_ram_r(m_s2636_2, offset);
+		return s2636_work_ram_r(m_s2636_2, space, offset);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
@@ -215,7 +215,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
 		machine().gfx[1]->mark_dirty((offset / 8) % 256);
 	}
 	else
-		s2636_work_ram_w(m_s2636_2, offset, data);
+		s2636_work_ram_w(m_s2636_2, space, offset, data);
 }
 
 
@@ -290,7 +290,7 @@ READ8_MEMBER(cvs_state::cvs_393hz_clock_r)
 READ8_MEMBER(cvs_state::tms_clock_r)
 {
 	device_t *device = machine().device("tms");
-	return tms5110_romclk_hack_r(device, 0) ? 0x80 : 0;
+	return tms5110_romclk_hack_r(device, space, 0) ? 0x80 : 0;
 }
 
 static TIMER_CALLBACK( cvs_393hz_timer_cb )
@@ -390,7 +390,7 @@ READ8_MEMBER(cvs_state::cvs_speech_command_r)
 
 	/* FIXME: this was by observation on board ???
      *          -bit 7 is TMS status (active LO) */
-	return ((tms5110_ctl_r(m_tms, 0) ^ 1) << 7) | (soundlatch_byte_r(space, 0) & 0x7f);
+	return ((tms5110_ctl_r(m_tms, space, 0) ^ 1) << 7) | (soundlatch_byte_r(space, 0) & 0x7f);
 }
 
 
@@ -409,7 +409,7 @@ WRITE8_MEMBER(cvs_state::cvs_tms5110_ctl_w)
 		  (m_tms5110_ctl_data[1] << 3);	/* CTL8 */
 
 	LOG(("CVS: Speech CTL = %04x %02x %02x\n",  ctl, offset, data));
-	tms5110_ctl_w(device, 0, ctl);
+	tms5110_ctl_w(device, space, 0, ctl);
 }
 
 

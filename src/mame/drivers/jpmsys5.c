@@ -316,7 +316,7 @@ WRITE16_MEMBER(jpmsys5_state::jpm_upd7759_w)
 	{
 		case 0:
 		{
-			upd7759_port_w(device, 0, data & 0xff);
+			upd7759_port_w(device, space, 0, data & 0xff);
 			upd7759_start_w(device, 0);
 			upd7759_start_w(device, 1);
 			break;

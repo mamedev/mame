@@ -48,10 +48,10 @@ public:
 
 /*----------- defined in audio/orbit.c -----------*/
 
-WRITE8_DEVICE_HANDLER( orbit_note_w );
-WRITE8_DEVICE_HANDLER( orbit_note_amp_w );
-WRITE8_DEVICE_HANDLER( orbit_noise_amp_w );
-WRITE8_DEVICE_HANDLER( orbit_noise_rst_w );
+DECLARE_WRITE8_DEVICE_HANDLER( orbit_note_w );
+DECLARE_WRITE8_DEVICE_HANDLER( orbit_note_amp_w );
+DECLARE_WRITE8_DEVICE_HANDLER( orbit_noise_amp_w );
+DECLARE_WRITE8_DEVICE_HANDLER( orbit_noise_rst_w );
 
 DISCRETE_SOUND_EXTERN( orbit );
 

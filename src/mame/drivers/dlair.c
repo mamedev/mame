@@ -148,24 +148,24 @@ static const UINT8 led_map[16] =
  *
  *************************************/
 
-static void dleuro_interrupt(device_t *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( dleuro_interrupt )
 {
 	device->machine().device("maincpu")->execute().set_input_line(0, state);
 }
 
 
-static WRITE8_DEVICE_HANDLER( serial_transmit )
+static WRITE16_DEVICE_HANDLER( serial_transmit )
 {
 	dlair_state *state = device->machine().driver_data<dlair_state>();
 	state->laserdisc_data_w(data);
 }
 
 
-static int serial_receive(device_t *device, int channel)
+static READ16_DEVICE_HANDLER( serial_receive )
 {
 	dlair_state *state = device->machine().driver_data<dlair_state>();
 	/* if we still have data to send, do it now */
-	if (channel == 0 && state->laserdisc_data_available_r() == ASSERT_LINE)
+	if (offset == 0 && state->laserdisc_data_available_r() == ASSERT_LINE)
 		return state->laserdisc_data_r();
 
 	return -1;
@@ -183,12 +183,12 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 static const z80sio_interface sio_intf =
 {
-	dleuro_interrupt,	/* interrupt handler */
-	0,					/* DTR changed handler */
-	0,					/* RTS changed handler */
-	0,					/* BREAK changed handler */
-	serial_transmit,	/* transmit handler */
-	serial_receive		/* receive handler */
+	DEVCB_LINE(dleuro_interrupt),	/* interrupt handler */
+	DEVCB_NULL,					/* DTR changed handler */
+	DEVCB_NULL,					/* RTS changed handler */
+	DEVCB_NULL,					/* BREAK changed handler */
+	DEVCB_HANDLER(serial_transmit),	/* transmit handler */
+	DEVCB_HANDLER(serial_receive)		/* receive handler */
 };
 
 

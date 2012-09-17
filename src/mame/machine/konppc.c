@@ -413,13 +413,13 @@ READ32_HANDLER( K033906_0_r )
 	if (nwk_device_sel[0] & 0x01)
 		return nwk_fifo_r(space, 0);
 	else
-		return k033906_r(k033906_1, offset, mem_mask);
+		return k033906_r(k033906_1, *space, offset, mem_mask);
 }
 
 WRITE32_HANDLER( K033906_0_w )
 {
 	device_t *k033906_1 = space->machine().device("k033906_1");
-	k033906_w(k033906_1, offset, data, mem_mask);
+	k033906_w(k033906_1, *space, offset, data, mem_mask);
 }
 
 READ32_HANDLER( K033906_1_r )
@@ -428,13 +428,13 @@ READ32_HANDLER( K033906_1_r )
 	if (nwk_device_sel[1] & 0x01)
 		return nwk_fifo_r(space, 1);
 	else
-		return k033906_r(k033906_2, offset, mem_mask);
+		return k033906_r(k033906_2, *space, offset, mem_mask);
 }
 
 WRITE32_HANDLER(K033906_1_w)
 {
 	device_t *k033906_2 = space->machine().device("k033906_2");
-	k033906_w(k033906_2, offset, data, mem_mask);
+	k033906_w(k033906_2, *space, offset, data, mem_mask);
 }
 
 /*****************************************************************************/
@@ -452,7 +452,7 @@ WRITE32_DEVICE_HANDLER(nwk_fifo_0_w)
 	}
 	else
 	{
-		voodoo_w(device, offset ^ 0x80000, data, mem_mask);
+		voodoo_w(device, space, offset ^ 0x80000, data, mem_mask);
 	}
 }
 
@@ -469,7 +469,7 @@ WRITE32_DEVICE_HANDLER(nwk_fifo_1_w)
 	}
 	else
 	{
-		voodoo_w(device, offset ^ 0x80000, data, mem_mask);
+		voodoo_w(device, space, offset ^ 0x80000, data, mem_mask);
 	}
 }
 
@@ -481,7 +481,7 @@ READ32_DEVICE_HANDLER(nwk_voodoo_0_r)
 	}
 	else
 	{
-		return voodoo_r(device, offset, mem_mask);
+		return voodoo_r(device, space, offset, mem_mask);
 	}
 }
 
@@ -493,7 +493,7 @@ READ32_DEVICE_HANDLER(nwk_voodoo_1_r)
 	}
 	else
 	{
-		return voodoo_r(device, offset, mem_mask);
+		return voodoo_r(device, space, offset, mem_mask);
 	}
 }
 
@@ -510,7 +510,7 @@ WRITE32_DEVICE_HANDLER(nwk_voodoo_0_w)
 	}
 	else
 	{
-		voodoo_w(device, offset, data, mem_mask);
+		voodoo_w(device, space, offset, data, mem_mask);
 	}
 }
 
@@ -527,7 +527,7 @@ WRITE32_DEVICE_HANDLER(nwk_voodoo_1_w)
 	}
 	else
 	{
-		voodoo_w(device, offset, data, mem_mask);
+		voodoo_w(device, space, offset, data, mem_mask);
 	}
 }
 

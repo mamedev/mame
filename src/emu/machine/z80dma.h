@@ -168,8 +168,8 @@ extern const device_type Z80DMA;
 //**************************************************************************
 
 // register access
-READ8_DEVICE_HANDLER( z80dma_r );
-WRITE8_DEVICE_HANDLER( z80dma_w );
+DECLARE_READ8_DEVICE_HANDLER( z80dma_r );
+DECLARE_WRITE8_DEVICE_HANDLER( z80dma_w );
 
 // ready
 WRITE_LINE_DEVICE_HANDLER( z80dma_rdy_w );

@@ -30,8 +30,8 @@ public:
 /*----------- defined in audio/avalnche.c -----------*/
 
 DISCRETE_SOUND_EXTERN( avalnche );
-WRITE8_DEVICE_HANDLER( avalnche_noise_amplitude_w );
-WRITE8_DEVICE_HANDLER( avalnche_attract_enable_w );
-WRITE8_DEVICE_HANDLER( avalnche_audio_w );
+DECLARE_WRITE8_DEVICE_HANDLER( avalnche_noise_amplitude_w );
+DECLARE_WRITE8_DEVICE_HANDLER( avalnche_attract_enable_w );
+DECLARE_WRITE8_DEVICE_HANDLER( avalnche_audio_w );
 
 WRITE8_HANDLER( catch_audio_w );

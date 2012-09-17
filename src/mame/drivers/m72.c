@@ -437,9 +437,10 @@ static int find_sample(int num)
 static INTERRUPT_GEN(fake_nmi)
 {
 	m72_state *state = device->machine().driver_data<m72_state>();
-	int sample = m72_sample_r(state->m_audio,0);
+	address_space &space = state->generic_space();
+	int sample = m72_sample_r(state->m_audio,space,0);
 	if (sample)
-		m72_sample_w(state->m_audio,0,sample);
+		m72_sample_w(state->m_audio,space,0,sample);
 }
 
 

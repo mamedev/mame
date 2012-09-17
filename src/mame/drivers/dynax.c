@@ -1636,8 +1636,8 @@ WRITE8_MEMBER(dynax_state::gekisha_8000_w)
 			case 0x8050:	// CRT controller
 			case 0x8051:	return;
 
-			case 0x8070:	ym2413_register_port_w(m_ymsnd, 0, data);	return;
-			case 0x8071:	ym2413_data_port_w(m_ymsnd, 0, data);	return;
+			case 0x8070:	ym2413_register_port_w(m_ymsnd, space, 0, data);	return;
+			case 0x8071:	ym2413_data_port_w(m_ymsnd, space, 0, data);	return;
 
 			case 0x8060:	m_keyb = data;	return;
 

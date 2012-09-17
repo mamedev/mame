@@ -1638,7 +1638,7 @@ WRITE8_MEMBER(model3_state::model3_sound_w)
 			model3_set_irq_line(machine(), 0x40, CLEAR_LINE);
 
 			// send to the sound board
-			scsp_midi_in(machine().device("scsp1"), 0, data, 0);
+			scsp_midi_in(machine().device("scsp1"), space, 0, data, 0);
 
 			if (m_sound_irq_enable)
 			{

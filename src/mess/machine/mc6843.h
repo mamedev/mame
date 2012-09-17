@@ -49,8 +49,8 @@ struct mc6843_interface
 
 /* ---------- functions ------------ */
 
-extern READ8_DEVICE_HANDLER  ( mc6843_r );
-extern WRITE8_DEVICE_HANDLER ( mc6843_w );
+extern DECLARE_READ8_DEVICE_HANDLER  ( mc6843_r );
+extern DECLARE_WRITE8_DEVICE_HANDLER ( mc6843_w );
 
 extern void mc6843_set_drive ( device_t *device, int drive );
 extern void mc6843_set_side  ( device_t *device, int side );

@@ -132,17 +132,17 @@ static TIMER_CALLBACK(mac_6015_tick);
 static int scan_keyboard(running_machine &machine);
 static TIMER_CALLBACK(inquiry_timeout_func);
 static void keyboard_receive(running_machine &machine, int val);
-static READ8_DEVICE_HANDLER(mac_via_in_a);
-static READ8_DEVICE_HANDLER(mac_via_in_b);
-static READ8_DEVICE_HANDLER(mac_adb_via_in_cb2);
-static WRITE8_DEVICE_HANDLER(mac_via_out_a);
-static WRITE8_DEVICE_HANDLER(mac_via_out_b);
-static WRITE8_DEVICE_HANDLER(mac_adb_via_out_cb2);
-static WRITE8_DEVICE_HANDLER(mac_via_out_cb2);
-static READ8_DEVICE_HANDLER(mac_via2_in_a);
-static READ8_DEVICE_HANDLER(mac_via2_in_b);
-static WRITE8_DEVICE_HANDLER(mac_via2_out_a);
-static WRITE8_DEVICE_HANDLER(mac_via2_out_b);
+static DECLARE_READ8_DEVICE_HANDLER(mac_via_in_a);
+static DECLARE_READ8_DEVICE_HANDLER(mac_via_in_b);
+static DECLARE_READ8_DEVICE_HANDLER(mac_adb_via_in_cb2);
+static DECLARE_WRITE8_DEVICE_HANDLER(mac_via_out_a);
+static DECLARE_WRITE8_DEVICE_HANDLER(mac_via_out_b);
+static DECLARE_WRITE8_DEVICE_HANDLER(mac_adb_via_out_cb2);
+static DECLARE_WRITE8_DEVICE_HANDLER(mac_via_out_cb2);
+static DECLARE_READ8_DEVICE_HANDLER(mac_via2_in_a);
+static DECLARE_READ8_DEVICE_HANDLER(mac_via2_in_b);
+static DECLARE_WRITE8_DEVICE_HANDLER(mac_via2_out_a);
+static DECLARE_WRITE8_DEVICE_HANDLER(mac_via2_out_b);
 static void mac_via_irq(device_t *device, int state);
 static void mac_via2_irq(device_t *device, int state);
 static offs_t mac_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
@@ -1155,7 +1155,7 @@ READ16_MEMBER ( mac_state::mac_iwm_r )
 	UINT16 result = 0;
 	device_t *fdc = space.machine().device("fdc");
 
-	result = applefdc_r(fdc, (offset >> 8));
+	result = applefdc_r(fdc, space, (offset >> 8));
 
 	if (LOG_MAC_IWM)
 		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, m_maincpu->pc());
@@ -1171,9 +1171,9 @@ WRITE16_MEMBER ( mac_state::mac_iwm_w )
 		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, m_maincpu->pc());
 
 	if (ACCESSING_BITS_0_7)
-		applefdc_w(fdc, (offset >> 8), data & 0xff);
+		applefdc_w(fdc, space, (offset >> 8), data & 0xff);
 	else
-		applefdc_w(fdc, (offset >> 8), data>>8);
+		applefdc_w(fdc, space, (offset >> 8), data>>8);
 }
 
 static READ8_DEVICE_HANDLER(mac_adb_via_in_cb2)

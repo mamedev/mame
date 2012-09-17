@@ -91,13 +91,13 @@ the drive type (TWIGGY or 3.5'')) */
     a hard disk
 */
 
-static READ8_DEVICE_HANDLER(COPS_via_in_b);
-static WRITE8_DEVICE_HANDLER(COPS_via_out_a);
-static WRITE8_DEVICE_HANDLER(COPS_via_out_b);
-static WRITE8_DEVICE_HANDLER(COPS_via_out_ca2);
-static WRITE8_DEVICE_HANDLER(COPS_via_out_cb2);
+static DECLARE_READ8_DEVICE_HANDLER(COPS_via_in_b);
+static DECLARE_WRITE8_DEVICE_HANDLER(COPS_via_out_a);
+static DECLARE_WRITE8_DEVICE_HANDLER(COPS_via_out_b);
+static DECLARE_WRITE8_DEVICE_HANDLER(COPS_via_out_ca2);
+static DECLARE_WRITE8_DEVICE_HANDLER(COPS_via_out_cb2);
 static void COPS_via_irq_func(device_t *device, int val);
-static READ8_DEVICE_HANDLER(parallel_via_in_b);
+static DECLARE_READ8_DEVICE_HANDLER(parallel_via_in_b);
 
 
 const via6522_interface lisa_via6522_0_intf =
@@ -729,10 +729,9 @@ static WRITE8_DEVICE_HANDLER(COPS_via_out_b)
 {
 	lisa_state *state = device->machine().driver_data<lisa_state>();
 	via6522_device *via_0 = device->machine().device<via6522_device>("via6522_0");
-	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* pull-up */
-	data |= (~ via_0->read(*space,VIA_DDRA)) & 0x01;
+	data |= (~ via_0->read(space,VIA_DDRA)) & 0x01;
 
 	if (data & 0x01)
 	{
@@ -1073,7 +1072,7 @@ void lisa_state::machine_reset()
 
 	{
 		via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
-		COPS_via_out_ca2(via_0, 0, 0);	/* VIA core forgets to do so */
+		COPS_via_out_ca2(via_0, generic_space(), 0, 0);	/* VIA core forgets to do so */
 	}
 
 	/* initialize floppy */
@@ -1256,7 +1255,7 @@ READ8_MEMBER(lisa_state::lisa_fdc_io_r)
 	switch ((offset & 0x0030) >> 4)
 	{
 	case 0:	/* IWM */
-		answer = applefdc_r(fdc, offset);
+		answer = applefdc_r(fdc, space, offset);
 		break;
 
 	case 1:	/* TTL glue */
@@ -1283,7 +1282,7 @@ WRITE8_MEMBER(lisa_state::lisa_fdc_io_w)
 	switch ((offset & 0x0030) >> 4)
 	{
 	case 0:	/* IWM */
-		applefdc_w(fdc, offset, data);
+		applefdc_w(fdc, space, offset, data);
 		break;
 
 	case 1:	/* TTL glue */

@@ -5,10 +5,10 @@
 
 #include "devlegcy.h"
 
-WRITE16_DEVICE_HANDLER( nile_snd_w );
-READ16_DEVICE_HANDLER( nile_snd_r );
-WRITE16_DEVICE_HANDLER( nile_sndctrl_w );
-READ16_DEVICE_HANDLER( nile_sndctrl_r );
+DECLARE_WRITE16_DEVICE_HANDLER( nile_snd_w );
+DECLARE_READ16_DEVICE_HANDLER( nile_snd_r );
+DECLARE_WRITE16_DEVICE_HANDLER( nile_sndctrl_w );
+DECLARE_READ16_DEVICE_HANDLER( nile_sndctrl_r );
 
 class nile_device : public device_t,
                                   public device_sound_interface

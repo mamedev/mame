@@ -58,18 +58,18 @@ READ8_MEMBER(parodius_state::parodius_052109_053245_r)
 {
 
 	if (m_videobank & 0x02)
-		return k053245_r(m_k053245, offset);
+		return k053245_r(m_k053245, space, offset);
 	else
-		return k052109_r(m_k052109, offset);
+		return k052109_r(m_k052109, space, offset);
 }
 
 WRITE8_MEMBER(parodius_state::parodius_052109_053245_w)
 {
 
 	if (m_videobank & 0x02)
-		k053245_w(m_k053245, offset, data);
+		k053245_w(m_k053245, space, offset, data);
 	else
-		k052109_w(m_k052109, offset, data);
+		k052109_w(m_k052109, space, offset, data);
 }
 
 WRITE8_MEMBER(parodius_state::parodius_videobank_w)
@@ -103,7 +103,7 @@ WRITE8_MEMBER(parodius_state::parodius_3fc0_w)
 READ8_MEMBER(parodius_state::parodius_sound_r)
 {
 	device_t *device = machine().device("k053260");
-	return k053260_r(device, 2 + offset);
+	return k053260_r(device, space, 2 + offset);
 }
 
 WRITE8_MEMBER(parodius_state::parodius_sh_irqtrigger_w)

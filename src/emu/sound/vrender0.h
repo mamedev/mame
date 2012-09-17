@@ -13,8 +13,8 @@ struct vr0_interface
 
 void vr0_snd_set_areas(device_t *device,UINT32 *texture,UINT32 *frame);
 
-READ32_DEVICE_HANDLER( vr0_snd_read );
-WRITE32_DEVICE_HANDLER( vr0_snd_write );
+DECLARE_READ32_DEVICE_HANDLER( vr0_snd_read );
+DECLARE_WRITE32_DEVICE_HANDLER( vr0_snd_write );
 
 class vrender0_device : public device_t,
                                   public device_sound_interface

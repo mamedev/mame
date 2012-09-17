@@ -97,7 +97,7 @@ WRITE8_MEMBER(homerun_state::homerun_d7756_sample_w)
 	m_sample = data;
 
 	if (m_d7756 != NULL)
-		upd7759_port_w(m_d7756, 0, data);
+		upd7759_port_w(m_d7756, space, 0, data);
 }
 
 static ADDRESS_MAP_START( homerun_memmap, AS_PROGRAM, 8, homerun_state )

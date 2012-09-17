@@ -4256,8 +4256,8 @@ public:
  *
  *************************************/
 
-WRITE8_DEVICE_HANDLER( discrete_sound_w );
-READ8_DEVICE_HANDLER( discrete_sound_r );
+DECLARE_WRITE8_DEVICE_HANDLER( discrete_sound_w );
+DECLARE_READ8_DEVICE_HANDLER( discrete_sound_r );
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS

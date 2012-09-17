@@ -74,7 +74,7 @@
 
 READ8_MEMBER(malzak_state::fake_VRLE_r)
 {
-	return (s2636_work_ram_r(m_s2636_0, 0xcb) & 0x3f) + (machine().primary_screen->vblank() * 0x40);
+	return (s2636_work_ram_r(m_s2636_0, space, 0xcb) & 0x3f) + (machine().primary_screen->vblank() * 0x40);
 }
 
 READ8_MEMBER(malzak_state::s2636_portA_r)

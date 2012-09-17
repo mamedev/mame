@@ -1,6 +1,6 @@
-WRITE8_DEVICE_HANDLER( pleiads_sound_control_a_w );
-WRITE8_DEVICE_HANDLER( pleiads_sound_control_b_w );
-WRITE8_DEVICE_HANDLER( pleiads_sound_control_c_w );
+DECLARE_WRITE8_DEVICE_HANDLER( pleiads_sound_control_a_w );
+DECLARE_WRITE8_DEVICE_HANDLER( pleiads_sound_control_b_w );
+DECLARE_WRITE8_DEVICE_HANDLER( pleiads_sound_control_c_w );
 
 class pleiads_sound_device : public device_t,
                                   public device_sound_interface

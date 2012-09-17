@@ -298,15 +298,15 @@ static void microtan_snapshot_copy(running_machine &machine, UINT8 *snapshot_buf
         /* first set of AY8910 registers */
         for (i = 0; i < 16; i++ )
         {
-            ay8910_address_w(ay8910, 0, i);
-            ay8910_data_w(ay8910, 0, snapshot_buff[base++]);
+            ay8910_address_w(ay8910, state->generic_space(), 0, i);
+            ay8910_data_w(ay8910, state->generic_space(), 0, snapshot_buff[base++]);
         }
 
         /* second set of AY8910 registers */
         for (i = 0; i < 16; i++ )
         {
-            ay8910_address_w(ay8910, 0, i);
-            ay8910_data_w(ay8910, 0, snapshot_buff[base++]);
+            ay8910_address_w(ay8910, state->generic_space(), 0, i);
+            ay8910_data_w(ay8910, state->generic_space(), 0, snapshot_buff[base++]);
         }
 
         for (i = 0; i < 32*16; i++)

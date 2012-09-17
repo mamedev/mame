@@ -92,7 +92,7 @@ WRITE8_MEMBER(cd32_state::cd32_cia_0_porta_w)
 	/* bit 2 = Power Led on Amiga */
 	set_led_status(machine(), 0, (data & 2) ? 0 : 1);
 
-	handle_cd32_joystick_cia(machine(), data, mos6526_r(device, 2));
+	handle_cd32_joystick_cia(machine(), data, mos6526_r(device, space, 2));
 }
 
 /*************************************

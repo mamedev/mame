@@ -42,8 +42,8 @@ struct nes_interface
 	const char *cpu_tag;  /* CPU tag */
 };
 
-READ8_DEVICE_HANDLER( nes_psg_r );
-WRITE8_DEVICE_HANDLER( nes_psg_w );
+DECLARE_READ8_DEVICE_HANDLER( nes_psg_r );
+DECLARE_WRITE8_DEVICE_HANDLER( nes_psg_w );
 
 class nesapu_device : public device_t,
                                   public device_sound_interface

@@ -247,26 +247,26 @@ static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, in
 READ32_MEMBER(funkball_state::ide_r)
 {
 	device_t *device = machine().device("ide");
-	return ide_controller32_r(device, 0x1f0/4 + offset, mem_mask);
+	return ide_controller32_r(device, space, 0x1f0/4 + offset, mem_mask);
 }
 
 WRITE32_MEMBER(funkball_state::ide_w)
 {
 	device_t *device = machine().device("ide");
-	ide_controller32_w(device, 0x1f0/4 + offset, data, mem_mask);
+	ide_controller32_w(device, space, 0x1f0/4 + offset, data, mem_mask);
 }
 
 READ32_MEMBER(funkball_state::fdc_r)
 {
 	device_t *device = machine().device("ide");
-	return ide_controller32_r(device, 0x3f0/4 + offset, mem_mask);
+	return ide_controller32_r(device, space, 0x3f0/4 + offset, mem_mask);
 }
 
 WRITE32_MEMBER(funkball_state::fdc_w)
 {
 	device_t *device = machine().device("ide");
 	//mame_printf_debug("FDC: write %08X, %08X, %08X\n", data, offset, mem_mask);
-	ide_controller32_w(device, 0x3f0/4 + offset, data, mem_mask);
+	ide_controller32_w(device, space, 0x3f0/4 + offset, data, mem_mask);
 }
 #endif
 
@@ -337,13 +337,13 @@ WRITE8_MEMBER(funkball_state::at_page8_w)
 READ8_MEMBER(funkball_state::at_dma8237_2_r)
 {
 	device_t *device = machine().device("dma8237_2");
-	return i8237_r(device, offset / 2);
+	return i8237_r(device, space, offset / 2);
 }
 
 WRITE8_MEMBER(funkball_state::at_dma8237_2_w)
 {
 	device_t *device = machine().device("dma8237_2");
-	i8237_w(device, offset / 2, data);
+	i8237_w(device, space, offset / 2, data);
 }
 
 WRITE_LINE_MEMBER(funkball_state::pc_dma_hrq_changed)
@@ -436,7 +436,7 @@ READ8_MEMBER(funkball_state::io20_r)
 	}
 	else
 	{
-		r = pic8259_r(device, offset);
+		r = pic8259_r(device, space, offset);
 	}
 	return r;
 }
@@ -456,7 +456,7 @@ WRITE8_MEMBER(funkball_state::io20_w)
 	}
 	else
 	{
-		pic8259_w(device, offset, data);
+		pic8259_w(device, space, offset, data);
 	}
 }
 

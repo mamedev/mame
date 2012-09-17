@@ -13,8 +13,8 @@
 
 #define QSOUND_CLOCK    4000000   /* default 4MHz clock */
 
-WRITE8_DEVICE_HANDLER( qsound_w );
-READ8_DEVICE_HANDLER( qsound_r );
+DECLARE_WRITE8_DEVICE_HANDLER( qsound_w );
+DECLARE_READ8_DEVICE_HANDLER( qsound_r );
 
 class qsound_device : public device_t,
                                   public device_sound_interface

@@ -174,10 +174,10 @@ public:
 
 
 
-READ8_DEVICE_HANDLER( amstrad_ppi_porta_r );
-READ8_DEVICE_HANDLER( amstrad_ppi_portb_r );
-WRITE8_DEVICE_HANDLER( amstrad_ppi_porta_w );
-WRITE8_DEVICE_HANDLER( amstrad_ppi_portc_w );
+DECLARE_READ8_DEVICE_HANDLER( amstrad_ppi_porta_r );
+DECLARE_READ8_DEVICE_HANDLER( amstrad_ppi_portb_r );
+DECLARE_WRITE8_DEVICE_HANDLER( amstrad_ppi_porta_w );
+DECLARE_WRITE8_DEVICE_HANDLER( amstrad_ppi_portc_w );
 
 
 WRITE_LINE_DEVICE_HANDLER( aleste_interrupt );

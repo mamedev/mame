@@ -13,8 +13,8 @@ struct ymf278b_interface
 	void (*irq_callback)(device_t *device, int state);	/* irq callback */
 };
 
-READ8_DEVICE_HANDLER( ymf278b_r );
-WRITE8_DEVICE_HANDLER( ymf278b_w );
+DECLARE_READ8_DEVICE_HANDLER( ymf278b_r );
+DECLARE_WRITE8_DEVICE_HANDLER( ymf278b_w );
 
 class ymf278b_device : public device_t,
                                   public device_sound_interface

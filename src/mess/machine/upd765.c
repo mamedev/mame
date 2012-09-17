@@ -2263,7 +2263,7 @@ WRITE8_DEVICE_HANDLER(upd765_dack_w)
 	upd765_set_dma_drq(device, CLEAR_LINE);
 
 	/* write data */
-	upd765_data_w(device, offset, data);
+	upd765_data_w(device, space, offset, data);
 }
 
 READ8_DEVICE_HANDLER(upd765_dack_r)
@@ -2272,7 +2272,7 @@ READ8_DEVICE_HANDLER(upd765_dack_r)
 	upd765_set_dma_drq(device,CLEAR_LINE);
 
 	/* read data */
-	return upd765_data_r(device, offset);
+	return upd765_data_r(device, space, offset);
 }
 
 static TIMER_CALLBACK( interrupt_callback )

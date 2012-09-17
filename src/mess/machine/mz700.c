@@ -36,10 +36,10 @@
 	} while (0)
 
 
-static READ8_DEVICE_HANDLER ( pio_port_b_r );
-static READ8_DEVICE_HANDLER ( pio_port_c_r );
-static WRITE8_DEVICE_HANDLER ( pio_port_a_w );
-static WRITE8_DEVICE_HANDLER ( pio_port_c_w );
+static DECLARE_READ8_DEVICE_HANDLER ( pio_port_b_r );
+static DECLARE_READ8_DEVICE_HANDLER ( pio_port_c_r );
+static DECLARE_WRITE8_DEVICE_HANDLER ( pio_port_a_w );
+static DECLARE_WRITE8_DEVICE_HANDLER ( pio_port_c_w );
 
 I8255_INTERFACE( mz700_ppi8255_interface )
 {

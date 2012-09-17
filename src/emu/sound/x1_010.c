@@ -269,7 +269,7 @@ READ16_DEVICE_HANDLER( seta_sound_word_r )
 	UINT16	ret;
 
 	ret = info->HI_WORD_BUF[offset]<<8;
-	ret += (seta_sound_r( device, offset )&0xff);
+	ret += (seta_sound_r( device, space, offset )&0xff);
 	LOG_REGISTER_READ(( "%s: Read X1-010 Offset:%04X Data:%04X\n", device->machine().describe_context(), offset, ret ));
 	return ret;
 }
@@ -278,7 +278,7 @@ WRITE16_DEVICE_HANDLER( seta_sound_word_w )
 {
 	x1_010_state *info = get_safe_token(device);
 	info->HI_WORD_BUF[offset] = (data>>8)&0xff;
-	seta_sound_w( device, offset, data&0xff );
+	seta_sound_w( device, space, offset, data&0xff );
 	LOG_REGISTER_WRITE(( "%s: Write X1-010 Offset:%04X Data:%04X\n", device->machine().describe_context(), offset, data ));
 }
 

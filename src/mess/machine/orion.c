@@ -181,13 +181,13 @@ READ8_MEMBER(orion_state::orion128_floppy_r)
 	switch(offset)
 	{
 		case 0x0	:
-		case 0x10 : return wd17xx_status_r(fdc,0);
+		case 0x10 : return wd17xx_status_r(fdc,space, 0);
 		case 0x1	:
-		case 0x11 : return wd17xx_track_r(fdc,0);
+		case 0x11 : return wd17xx_track_r(fdc,space, 0);
 		case 0x2  :
-		case 0x12 : return wd17xx_sector_r(fdc,0);
+		case 0x12 : return wd17xx_sector_r(fdc,space, 0);
 		case 0x3  :
-		case 0x13 : return wd17xx_data_r(fdc,0);
+		case 0x13 : return wd17xx_data_r(fdc,space, 0);
 	}
 	return 0xff;
 }
@@ -199,13 +199,13 @@ WRITE8_MEMBER(orion_state::orion128_floppy_w)
 	switch(offset)
 	{
 		case 0x0	:
-		case 0x10 : wd17xx_command_w(fdc,0,data); break;
+		case 0x10 : wd17xx_command_w(fdc,space, 0,data); break;
 		case 0x1	:
-		case 0x11 : wd17xx_track_w(fdc,0,data);break;
+		case 0x11 : wd17xx_track_w(fdc,space, 0,data);break;
 		case 0x2  :
-		case 0x12 : wd17xx_sector_w(fdc,0,data);break;
+		case 0x12 : wd17xx_sector_w(fdc,space, 0,data);break;
 		case 0x3  :
-		case 0x13 : wd17xx_data_w(fdc,0,data);break;
+		case 0x13 : wd17xx_data_w(fdc,space, 0,data);break;
 		case 0x4  :
 		case 0x14 :
 		case 0x20 : orion_disk_control_w(space, offset, data);break;
@@ -378,7 +378,7 @@ READ8_MEMBER(orion_state::orionz80_io_r)
 {
 	if (offset == 0xFFFD)
 	{
-		return ay8910_r (machine().device("ay8912"), 0);
+		return ay8910_r (machine().device("ay8912"), space, 0);
 	}
 	return 0xff;
 }
@@ -396,10 +396,10 @@ WRITE8_MEMBER(orion_state::orionz80_io_w)
 	}
 	switch(offset)
 	{
-		case 0xfffd : ay8910_address_w(machine().device("ay8912"), 0, data);
+		case 0xfffd : ay8910_address_w(machine().device("ay8912"), space, 0, data);
 					  break;
 		case 0xbffd :
-		case 0xbefd : ay8910_data_w(machine().device("ay8912"), 0, data);
+		case 0xbefd : ay8910_data_w(machine().device("ay8912"), space, 0, data);
 					  break;
 	}
 }
@@ -556,10 +556,10 @@ READ8_MEMBER(orion_state::orionpro_io_r)
 		case 0x08 : return m_orionpro_page;
 		case 0x09 : return m_orionpro_rom2_segment;
 		case 0x0a : return m_orionpro_dispatcher;
-		case 0x10 : return wd17xx_status_r(fdc,0);
-		case 0x11 : return wd17xx_track_r(fdc,0);
-		case 0x12 : return wd17xx_sector_r(fdc,0);
-		case 0x13 : return wd17xx_data_r(fdc,0);
+		case 0x10 : return wd17xx_status_r(fdc,space, 0);
+		case 0x11 : return wd17xx_track_r(fdc,space, 0);
+		case 0x12 : return wd17xx_sector_r(fdc,space, 0);
+		case 0x13 : return wd17xx_data_r(fdc,space, 0);
 		case 0x18 :
 		case 0x19 :
 		case 0x1a :
@@ -572,7 +572,7 @@ READ8_MEMBER(orion_state::orionpro_io_r)
 	}
 	if (offset == 0xFFFD)
 	{
-		return ay8910_r (machine().device("ay8912"), 0);
+		return ay8910_r (machine().device("ay8912"), space, 0);
 	}
 	return 0xff;
 }
@@ -589,10 +589,10 @@ WRITE8_MEMBER(orion_state::orionpro_io_w)
 		case 0x08 : m_orionpro_page = data;		  orionpro_bank_switch(machine()); break;
 		case 0x09 : m_orionpro_rom2_segment = data; orionpro_bank_switch(machine()); break;
 		case 0x0a : m_orionpro_dispatcher = data;   orionpro_bank_switch(machine()); break;
-		case 0x10 : wd17xx_command_w(fdc,0,data); break;
-		case 0x11 : wd17xx_track_w(fdc,0,data);break;
-		case 0x12 : wd17xx_sector_w(fdc,0,data);break;
-		case 0x13 : wd17xx_data_w(fdc,0,data);break;
+		case 0x10 : wd17xx_command_w(fdc,space, 0,data); break;
+		case 0x11 : wd17xx_track_w(fdc,space, 0,data);break;
+		case 0x12 : wd17xx_sector_w(fdc,space, 0,data);break;
+		case 0x13 : wd17xx_data_w(fdc,space, 0,data);break;
 		case 0x14 : orion_disk_control_w(space, 9, data);break;
 		case 0x18 :
 		case 0x19 :
@@ -612,10 +612,10 @@ WRITE8_MEMBER(orion_state::orionpro_io_w)
 	}
 	switch(offset)
 	{
-		case 0xfffd : ay8910_address_w(machine().device("ay8912"), 0, data);
+		case 0xfffd : ay8910_address_w(machine().device("ay8912"), space, 0, data);
 					  break;
 		case 0xbffd :
-		case 0xbefd : ay8910_data_w(machine().device("ay8912"), 0, data);
+		case 0xbefd : ay8910_data_w(machine().device("ay8912"), space, 0, data);
 					  break;
 	}
 }

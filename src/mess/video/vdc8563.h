@@ -59,8 +59,8 @@ extern const device_type VDC8563;
 void vdc8563_set_rastering(device_t *device, int on);
 UINT32 vdc8563_video_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-WRITE8_DEVICE_HANDLER( vdc8563_port_w );
-READ8_DEVICE_HANDLER( vdc8563_port_r );
+DECLARE_WRITE8_DEVICE_HANDLER( vdc8563_port_w );
+DECLARE_READ8_DEVICE_HANDLER( vdc8563_port_r );
 
 
 #endif /* __VDC8563_H__ */

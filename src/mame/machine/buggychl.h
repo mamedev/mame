@@ -1,8 +1,8 @@
 ADDRESS_MAP_EXTERN( buggychl_mcu_map, 8 );
 
-WRITE8_DEVICE_HANDLER( buggychl_mcu_w );
-READ8_DEVICE_HANDLER( buggychl_mcu_r );
-READ8_DEVICE_HANDLER( buggychl_mcu_status_r );
+DECLARE_WRITE8_DEVICE_HANDLER( buggychl_mcu_w );
+DECLARE_READ8_DEVICE_HANDLER( buggychl_mcu_r );
+DECLARE_READ8_DEVICE_HANDLER( buggychl_mcu_status_r );
 
 class buggychl_mcu_device : public device_t
 {
