@@ -10,7 +10,7 @@
 #include "machine/wd17xx.h"
 
 // CRTC 6845
-struct CRTC6845 
+struct CRTC6845
 {
 	UINT8    cursor_address_lo;
 	UINT8    cursor_address_hi;

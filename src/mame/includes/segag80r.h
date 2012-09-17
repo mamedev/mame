@@ -16,10 +16,10 @@ public:
 		m_videoram(*this, "videoram"),
 		m_sn1(*this, "sn1"),
 		m_sn2(*this, "sn2"){ }
-		
+
 	required_shared_ptr<UINT8> m_mainram;
 	required_shared_ptr<UINT8> m_videoram;
-	
+
 	optional_device<sn76496_new_device> m_sn1;
 	optional_device<sn76496_new_device> m_sn2;
 

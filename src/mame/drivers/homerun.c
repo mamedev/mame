@@ -10,9 +10,9 @@
  *weird* hardware - based on NES version
  (gfx bank changed in the middle of screen,
   sprites in NES format etc)
- 
+
  homerun and ganjaja use an extra soundchip for playing voice/samples
- 
+
 Todo :
  - dump homerun sample rom
  - improve controls/dips

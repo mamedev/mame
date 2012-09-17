@@ -54,7 +54,7 @@ union o2_vdc_t {
     } s;
 };
 
-struct ef9341_t 
+struct ef9341_t
 {
 	UINT8	X;
 	UINT8	Y;

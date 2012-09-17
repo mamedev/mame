@@ -24,7 +24,7 @@ TODO:
 
 #include "emu.h"
 
-struct scc68070_i2c_regs_t 
+struct scc68070_i2c_regs_t
 {
 	UINT8 reserved0;
 	UINT8 data_register;
@@ -47,7 +47,7 @@ struct scc68070_i2c_regs_t
 #define ISR_AD0		0x02	// Address Zero
 #define ISR_LRB		0x01	// Last Received Bit
 
-struct scc68070_uart_regs_t 
+struct scc68070_uart_regs_t
 {
 	UINT8 reserved0;
 	UINT8 mode_register;
@@ -90,7 +90,7 @@ struct scc68070_uart_regs_t
 #define USR_TXRDY		0x04
 #define USR_RXRDY		0x01
 
-struct scc68070_timer_regs_t 
+struct scc68070_timer_regs_t
 {
 	UINT8 timer_status_register;
 	UINT8 timer_control_register;
@@ -130,7 +130,7 @@ struct scc68070_timer_regs_t
 #define TCR_M2_CAPTURE	0x02
 #define TCR_M2_COUNT	0x03
 
-struct scc68070_dma_channel_t 
+struct scc68070_dma_channel_t
 {
 	UINT8 channel_status;
 	UINT8 channel_error;
@@ -193,12 +193,12 @@ struct scc68070_dma_channel_t
 #define CCR_INE			0x08
 #define CCR_IPL			0x07
 
-struct scc68070_dma_regs_t 
+struct scc68070_dma_regs_t
 {
 	scc68070_dma_channel_t channel[2];
 };
 
-struct scc68070_mmu_desc_t 
+struct scc68070_mmu_desc_t
 {
 	UINT16 attr;
 	UINT16 length;
@@ -207,7 +207,7 @@ struct scc68070_mmu_desc_t
 	UINT16 base;
 };
 
-struct scc68070_mmu_regs_t 
+struct scc68070_mmu_regs_t
 {
 	UINT8 status;
 	UINT8 control;
@@ -217,7 +217,7 @@ struct scc68070_mmu_regs_t
 	scc68070_mmu_desc_t desc[8];
 };
 
-struct scc68070_regs_t 
+struct scc68070_regs_t
 {
 	UINT16 lir;
 	UINT8 picr1;

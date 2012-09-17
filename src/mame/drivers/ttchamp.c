@@ -73,12 +73,12 @@ public:
 	{
 		return m_peno_mainram[offset];
 	}
-	
+
 	DECLARE_WRITE16_MEMBER( penocup_mainram_w )
 	{
 		offset &=0x7fff;
 		COMBINE_DATA(&m_peno_mainram[offset]);
-//		COMBINE_DATA(&m_peno_vram[offset]);
+//      COMBINE_DATA(&m_peno_vram[offset]);
 	}
 
 
@@ -93,7 +93,7 @@ void ttchamp_state::video_start()
 	m_peno_vram = (UINT16*)auto_alloc_array_clear(machine(), UINT16, 0x10000/2);
 	m_peno_mainram = (UINT16*)auto_alloc_array_clear(machine(), UINT16, 0x10000/2);
 
-	
+
 
 }
 
@@ -173,7 +173,7 @@ static ADDRESS_MAP_START( ttchamp_map, AS_PROGRAM, 16, ttchamp_state )
  /* 0x10000 - 0x1ffff is where it writes most image stuff, but other address get written to 0 where the left edge of 'sprites' would be? why? bad code execution, or some kind of write address based blitter?
    see for example the lines written down the side of where the (not displayed) CREDIT text would go, as well as beside the actual credit number.. also ingame if you can get it to start
  */
-	
+
 	AM_RANGE(0x10000, 0xfffff) AM_WRITE(penocup_vid_w)
 
 	// how are these banked? what are the bank sizes? data needed for startup is at 0x20000-0x2ffff (strings) and 0x30000-0x3ffff (code) the rest seems to be graphics..

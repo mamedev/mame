@@ -34,7 +34,7 @@ struct tlc34076_state
 	rgb_t pens[0x100];
 };
 
-const tlc34076_config tlc34076_6_bit_intf = 
+const tlc34076_config tlc34076_6_bit_intf =
 {
 	TLC34076_6_BIT
 };

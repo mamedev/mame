@@ -72,7 +72,7 @@ Start bit (low), Bit 0, Bit 1... highest bit, Parity bit (if enabled), 1-2 stop 
 #include "emu.h"
 #include "ay31015.h"
 
-enum state_t 
+enum state_t
 {
 	IDLE,
 	START_BIT,

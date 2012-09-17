@@ -1454,14 +1454,14 @@ void rom_init(running_machine &machine)
 
 	/* figure out which BIOS we are using */
 	device_iterator deviter(romdata->machine().config().root_device());
-	for (device_t *device = deviter.first(); device != NULL; device = deviter.next()) {	
+	for (device_t *device = deviter.first(); device != NULL; device = deviter.next()) {
 		if (device->rom_region()) {
 			const char *specbios;
 			astring temp;
 			if (strcmp(device->tag(),":")==0) {
 				specbios = romdata->machine().options().bios();
 			} else {
-				specbios = romdata->machine().options().sub_value(temp,device->owner()->tag()+1,"bios");				
+				specbios = romdata->machine().options().sub_value(temp,device->owner()->tag()+1,"bios");
 			}
 			determine_bios_rom(romdata, device, specbios);
 		}

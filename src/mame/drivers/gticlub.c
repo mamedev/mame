@@ -885,24 +885,24 @@ MACHINE_RESET_MEMBER(gticlub_state,hangplt)
 
 static const voodoo_config voodoo_l_intf =
 {
-	2, //				fbmem;
-	2,//				tmumem0;
-	2,//				tmumem1;
-	"lscreen",//		screen;
-	"dsp",//			cputag;
-	voodoo_vblank_0,//	vblank;
-	NULL,//				stall;
+	2, //               fbmem;
+	2,//                tmumem0;
+	2,//                tmumem1;
+	"lscreen",//        screen;
+	"dsp",//            cputag;
+	voodoo_vblank_0,//  vblank;
+	NULL,//             stall;
 };
 
 static const voodoo_config voodoo_r_intf =
 {
-	2, //				fbmem;
-	2,//				tmumem0;
-	2,//				tmumem1;
-	"rscreen",//		screen;
-	"dsp2",//			cputag;
-	voodoo_vblank_1,//	vblank;
-	NULL,//				stall;
+	2, //               fbmem;
+	2,//                tmumem0;
+	2,//                tmumem1;
+	"rscreen",//        screen;
+	"dsp2",//           cputag;
+	voodoo_vblank_1,//  vblank;
+	NULL,//             stall;
 };
 
 static MACHINE_CONFIG_START( hangplt, gticlub_state )

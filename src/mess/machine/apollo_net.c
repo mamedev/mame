@@ -27,7 +27,7 @@ struct ethernet_header {
 	UINT16 proto;
 };
 
-struct ip_header 
+struct ip_header
 {
 	UINT8 version;
 	UINT8 tos;

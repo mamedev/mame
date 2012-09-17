@@ -26,7 +26,7 @@ author (Karl Stenerud) at karl@higashiyama-unet.ocn.ne.jp.
 #define ADDRESS_65816(A) ((A)&0xffffff)
 
 
-struct opcode_struct 
+struct opcode_struct
 {
 	unsigned char name;
 	unsigned char flag;

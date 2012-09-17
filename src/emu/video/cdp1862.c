@@ -218,6 +218,6 @@ UINT32 cdp1862_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 
 	m_bitmap.fill(m_palette[CDP1862_BACKGROUND_COLOR_SEQUENCE[m_bgcolor] + 8], cliprect);
-	
+
 	return 0;
 }

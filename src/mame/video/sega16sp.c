@@ -137,36 +137,36 @@ sega_hangon_sprite_device::sega_hangon_sprite_device(const machine_config &mconf
 void sega_hangon_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//
-	//	Hang On-style sprites
+	//  Hang On-style sprites
 	//
-	//	    Offs  Bits               Usage
-	//	     +0   bbbbbbbb --------  Bottom scanline of sprite - 1
-	//	     +0   -------- tttttttt  Top scanline of sprite - 1
-	//	     +2   bbbb---- --------  Sprite bank
-	//	     +2   -------x xxxxxxxx  X position of sprite (position $BD is screen position 0)
-	//	     +4   pppppppp pppppppp  Signed 16-bit pitch value between scanlines
-	//	     +6   -ooooooo oooooooo  Offset within selected sprite bank
-	//	     +6   f------- --------  Horizontal flip: read the data backwards if set
-	//	     +8   --cccccc --------  Sprite color palette
-	//	     +8   -------- zzzzzz--  Zoom factor
-	//	     +8   -------- ------pp  Sprite priority
-	//	     +E   dddddddd dddddddd  Scratch space for current address
+	//      Offs  Bits               Usage
+	//       +0   bbbbbbbb --------  Bottom scanline of sprite - 1
+	//       +0   -------- tttttttt  Top scanline of sprite - 1
+	//       +2   bbbb---- --------  Sprite bank
+	//       +2   -------x xxxxxxxx  X position of sprite (position $BD is screen position 0)
+	//       +4   pppppppp pppppppp  Signed 16-bit pitch value between scanlines
+	//       +6   -ooooooo oooooooo  Offset within selected sprite bank
+	//       +6   f------- --------  Horizontal flip: read the data backwards if set
+	//       +8   --cccccc --------  Sprite color palette
+	//       +8   -------- zzzzzz--  Zoom factor
+	//       +8   -------- ------pp  Sprite priority
+	//       +E   dddddddd dddddddd  Scratch space for current address
 	//
-	// 	Final bitmap format:
+	//  Final bitmap format:
 	//
-	// 		      ----pp-- --------  Sprite priority
-	// 		      ------cc cccc----  Sprite color palette
-	// 		      -------- ----llll  4-bit pixel data
+	//            ----pp-- --------  Sprite priority
+	//            ------cc cccc----  Sprite color palette
+	//            -------- ----llll  4-bit pixel data
 	//
-	//	Special notes:
+	//  Special notes:
 	//
-	//	    There is an interaction between the horizonal flip bit and the offset.
-	//	    The offset is maintained as a 16-bit value, even though only the lower
-	//	    15 bits are used for the address. The top bit is used to control flipping.
-	//	    This means that if the low 15 bits overflow during rendering, the sprite
-	//	    data will be read backwards after the overflow. This is important to
-	//	    emulate correctly as many games make use of this feature to render sprites
-	//	    at the beginning of a bank.
+	//      There is an interaction between the horizonal flip bit and the offset.
+	//      The offset is maintained as a 16-bit value, even though only the lower
+	//      15 bits are used for the address. The top bit is used to control flipping.
+	//      This means that if the low 15 bits overflow during rendering, the sprite
+	//      data will be read backwards after the overflow. This is important to
+	//      emulate correctly as many games make use of this feature to render sprites
+	//      at the beginning of a bank.
 	//
 
 	// render the sprites in order
@@ -275,14 +275,14 @@ void sega_hangon_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 							break;
 					}
 				}
-				
+
 				// update bounds
 				if (x > maxx) maxx = x;
 				if (miny == -1) miny = y;
 				maxy = y;
 			}
 		}
-		
+
 		// mark dirty
 		if (miny != -1)
 			mark_dirty(minx, maxx, miny, maxy);
@@ -313,41 +313,41 @@ sega_sharrier_sprite_device::sega_sharrier_sprite_device(const machine_config &m
 void sega_sharrier_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//
-	//	Space Harrier-style sprites
+	//  Space Harrier-style sprites
 	//
-	//		Offs  Bits               Usage
-	//		 +0   bbbbbbbb --------  Bottom scanline of sprite - 1
-	//		 +0   -------- tttttttt  Top scanline of sprite - 1
-	//		 +2   bbbb---- --------  Sprite bank
-	//		 +2   -------x xxxxxxxx  X position of sprite (position $BD is screen position 0)
-	//		 +4   s------- --------  Sprite shadow disable (0=enable, 1=disable)
-	//		 +4   -p------ --------  Sprite priority
-	//		 +4   --cccccc --------  Sprite color palette
-	//		 +4   -------- -ppppppp  Signed 7-bit pitch value between scanlines
-	//		 +6   f------- --------  Horizontal flip: read the data backwards if set
-	//		 +6   -ooooooo oooooooo  Offset within selected sprite bank
-	//		 +8   --zzzzzz --------  Horizontal zoom factor
-	//		 +8   -------- --zzzzzz  Vertical zoom factor
-	//		 +E   dddddddd dddddddd  Scratch space for current address
+	//      Offs  Bits               Usage
+	//       +0   bbbbbbbb --------  Bottom scanline of sprite - 1
+	//       +0   -------- tttttttt  Top scanline of sprite - 1
+	//       +2   bbbb---- --------  Sprite bank
+	//       +2   -------x xxxxxxxx  X position of sprite (position $BD is screen position 0)
+	//       +4   s------- --------  Sprite shadow disable (0=enable, 1=disable)
+	//       +4   -p------ --------  Sprite priority
+	//       +4   --cccccc --------  Sprite color palette
+	//       +4   -------- -ppppppp  Signed 7-bit pitch value between scanlines
+	//       +6   f------- --------  Horizontal flip: read the data backwards if set
+	//       +6   -ooooooo oooooooo  Offset within selected sprite bank
+	//       +8   --zzzzzz --------  Horizontal zoom factor
+	//       +8   -------- --zzzzzz  Vertical zoom factor
+	//       +E   dddddddd dddddddd  Scratch space for current address
 	//
-	// 	Final bitmap format:
+	//  Final bitmap format:
 	//
-	// 		      ----s--- --------  Sprite shadow disable
-	// 		      -----p-- --------  Sprite priority
-	// 		      ------cc cccc----  Sprite color palette
-	// 		      -------- ----llll  4-bit pixel data
+	//            ----s--- --------  Sprite shadow disable
+	//            -----p-- --------  Sprite priority
+	//            ------cc cccc----  Sprite color palette
+	//            -------- ----llll  4-bit pixel data
 	//
-	//	Special notes:
+	//  Special notes:
 	//
-	//		There is an interaction between the horizonal flip bit and the offset.
-	//		The offset is maintained as a 16-bit value, even though only the lower
-	//		15 bits are used for the address. The top bit is used to control flipping.
-	//		This means that if the low 15 bits overflow during rendering, the sprite
-	//		data will be read backwards after the overflow. This is important to
-	//		emulate correctly as many games make use of this feature to render sprites
-	//		at the beginning of a bank.
+	//      There is an interaction between the horizonal flip bit and the offset.
+	//      The offset is maintained as a 16-bit value, even though only the lower
+	//      15 bits are used for the address. The top bit is used to control flipping.
+	//      This means that if the low 15 bits overflow during rendering, the sprite
+	//      data will be read backwards after the overflow. This is important to
+	//      emulate correctly as many games make use of this feature to render sprites
+	//      at the beginning of a bank.
 	//
-	
+
 	// render the sprites in order
 	const UINT32 *spritebase = reinterpret_cast<const UINT32 *>(region()->base());
 	UINT8 numbanks = region()->bytes() / 0x20000;
@@ -462,14 +462,14 @@ void sega_sharrier_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cl
 							break;
 					}
 				}
-				
+
 				// update bounds
 				if (x > maxx) maxx = x;
 				if (miny == -1) miny = y;
 				maxy = y;
 			}
 		}
-		
+
 		// mark dirty
 		if (miny != -1)
 			mark_dirty(minx, maxx, miny, maxy);
@@ -500,35 +500,35 @@ sega_sys16a_sprite_device::sega_sys16a_sprite_device(const machine_config &mconf
 void sega_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//
-	//	System 16A-style sprites
+	//  System 16A-style sprites
 	//
-	//		Offs  Bits               Usage
-	//		 +0   bbbbbbbb --------  Bottom scanline of sprite - 1
-	//		 +0   -------- tttttttt  Top scanline of sprite - 1
-	//		 +2   -------x xxxxxxxx  X position of sprite (position $BD is screen position 0)
-	//		 +4   pppppppp pppppppp  Signed 16-bit pitch value between scanlines
-	//		 +6   -ooooooo oooooooo  Offset within selected sprite bank
-	//		 +6   f------- --------  Horizontal flip: read the data backwards if set
-	//		 +8   --cccccc --------  Sprite color palette
-	//		 +8   -------- -bbb----  Sprite bank
-	//		 +8   -------- ------pp  Sprite priority
-	//		 +E   dddddddd dddddddd  Scratch space for current address
+	//      Offs  Bits               Usage
+	//       +0   bbbbbbbb --------  Bottom scanline of sprite - 1
+	//       +0   -------- tttttttt  Top scanline of sprite - 1
+	//       +2   -------x xxxxxxxx  X position of sprite (position $BD is screen position 0)
+	//       +4   pppppppp pppppppp  Signed 16-bit pitch value between scanlines
+	//       +6   -ooooooo oooooooo  Offset within selected sprite bank
+	//       +6   f------- --------  Horizontal flip: read the data backwards if set
+	//       +8   --cccccc --------  Sprite color palette
+	//       +8   -------- -bbb----  Sprite bank
+	//       +8   -------- ------pp  Sprite priority
+	//       +E   dddddddd dddddddd  Scratch space for current address
 	//
-	// 	Final bitmap format:
+	//  Final bitmap format:
 	//
-	// 		      ----pp-- --------  Sprite priority
-	// 		      ------cc cccc----  Sprite color palette
-	// 		      -------- ----llll  4-bit pixel data
+	//            ----pp-- --------  Sprite priority
+	//            ------cc cccc----  Sprite color palette
+	//            -------- ----llll  4-bit pixel data
 	//
-	//	Special notes:
+	//  Special notes:
 	//
-	//		There is an interaction between the horizonal flip bit and the offset.
-	//		The offset is maintained as a 16-bit value, even though only the lower
-	//		15 bits are used for the address. The top bit is used to control flipping.
-	//		This means that if the low 15 bits overflow during rendering, the sprite
-	//		data will be read backwards after the overflow. This is important to
-	//		emulate correctly as many games make use of this feature to render sprites
-	//		at the beginning of a bank.
+	//      There is an interaction between the horizonal flip bit and the offset.
+	//      The offset is maintained as a 16-bit value, even though only the lower
+	//      15 bits are used for the address. The top bit is used to control flipping.
+	//      This means that if the low 15 bits overflow during rendering, the sprite
+	//      data will be read backwards after the overflow. This is important to
+	//      emulate correctly as many games make use of this feature to render sprites
+	//      at the beginning of a bank.
 	//
 
 	// render the sprites in order
@@ -636,7 +636,7 @@ void sega_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 							break;
 					}
 				}
-				
+
 				// update bounds
 				if (x > maxx) maxx = x;
 				if (x < minx) minx = x;
@@ -644,7 +644,7 @@ void sega_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 				maxy = y;
 			}
 		}
-		
+
 		// mark dirty
 		if (miny != -1)
 			mark_dirty(minx, maxx, miny, maxy);
@@ -677,7 +677,7 @@ bootleg_sys16a_sprite_device::bootleg_sys16a_sprite_device(const machine_config 
 
 //-------------------------------------------------
 //  static_set_remap -- configure sprite address
-//	remapping
+//  remapping
 //-------------------------------------------------
 
 void bootleg_sys16a_sprite_device::static_set_remap(device_t &device, UINT8 offs0, UINT8 offs1, UINT8 offs2, UINT8 offs3, UINT8 offs4, UINT8 offs5, UINT8 offs6, UINT8 offs7)
@@ -701,15 +701,15 @@ void bootleg_sys16a_sprite_device::static_set_remap(device_t &device, UINT8 offs
 void bootleg_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//
-	//	Bootleg System 16A-style sprites
+	//  Bootleg System 16A-style sprites
 	//
-	//	These are identical to regular System 16A sprites (see above), with two exceptions:
+	//  These are identical to regular System 16A sprites (see above), with two exceptions:
 	//
-	//		1. Addresses within each sprite entry are generally shuffled relative
-	//			to the original, and
+	//      1. Addresses within each sprite entry are generally shuffled relative
+	//          to the original, and
 	//
-	//		2. The pitch increment happens at the end, not at the beginning of
-	//			the loop.
+	//      2. The pitch increment happens at the end, not at the beginning of
+	//          the loop.
 	//
 
 	// render the sprites in order
@@ -815,7 +815,7 @@ void bootleg_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &c
 							break;
 					}
 				}
-				
+
 				// update bounds
 				if (x > maxx) maxx = x;
 				if (x < minx) minx = x;
@@ -826,7 +826,7 @@ void bootleg_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &c
 			// advance a row - must be done at the end on the bootlegs!
 			addr += pitch;
 		}
-		
+
 		// mark dirty
 		if (miny != -1)
 			mark_dirty(minx, maxx, miny, maxy);
@@ -848,7 +848,7 @@ sega_sys16b_sprite_device::sega_sys16b_sprite_device(const machine_config &mconf
 {
 	set_origin(184, 0x00);
 }
-	
+
 
 //-------------------------------------------------
 //  draw -- render the sprites within the cliprect
@@ -857,33 +857,33 @@ sega_sys16b_sprite_device::sega_sys16b_sprite_device(const machine_config &mconf
 void sega_sys16b_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//
-	//	System 16B-style sprites
+	//  System 16B-style sprites
 	//
-	//		Offs  Bits               Usage
-	//		 +0   bbbbbbbb --------  Bottom scanline of sprite - 1
-	//		 +0   -------- tttttttt  Top scanline of sprite - 1
-	//		 +2   -------x xxxxxxxx  X position of sprite (position $BD is screen position 0)
-	//		 +2   ---iiii- --------  Sprite/sprite priority for Y-board
-	//		 +4   e------- --------  Signify end of sprite list
-	//		 +4   -h------ --------  Hide this sprite
-	//		 +4   -------f --------  Horizontal flip: read the data backwards if set
-	//		 +4   -------- pppppppp  Signed 8-bit pitch value between scanlines
-	//		 +6   oooooooo oooooooo  Offset within selected sprite bank
-	//		 +8   ----bbbb --------  Sprite bank
-	//		 +8   -------- pp------  Sprite priority, relative to tilemaps
-	//		 +8   -------- --cccccc  Sprite color palette
-	//		 +A   ------vv vvv-----  Vertical zoom factor (0 = full size, 0x10 = half size)
-	//		 +A   -------- ---hhhhh  Horizontal zoom factor (0 = full size, 0x10 = half size)
-	//		 +E   dddddddd dddddddd  Scratch space for current address
+	//      Offs  Bits               Usage
+	//       +0   bbbbbbbb --------  Bottom scanline of sprite - 1
+	//       +0   -------- tttttttt  Top scanline of sprite - 1
+	//       +2   -------x xxxxxxxx  X position of sprite (position $BD is screen position 0)
+	//       +2   ---iiii- --------  Sprite/sprite priority for Y-board
+	//       +4   e------- --------  Signify end of sprite list
+	//       +4   -h------ --------  Hide this sprite
+	//       +4   -------f --------  Horizontal flip: read the data backwards if set
+	//       +4   -------- pppppppp  Signed 8-bit pitch value between scanlines
+	//       +6   oooooooo oooooooo  Offset within selected sprite bank
+	//       +8   ----bbbb --------  Sprite bank
+	//       +8   -------- pp------  Sprite priority, relative to tilemaps
+	//       +8   -------- --cccccc  Sprite color palette
+	//       +A   ------vv vvv-----  Vertical zoom factor (0 = full size, 0x10 = half size)
+	//       +A   -------- ---hhhhh  Horizontal zoom factor (0 = full size, 0x10 = half size)
+	//       +E   dddddddd dddddddd  Scratch space for current address
 	//
-	// 	Final bitmap format:
+	//  Final bitmap format:
 	//
-	// 		      iiii---- --------  Sprite/sprite priority for Y-board
-	// 		      ----pp-- --------  Sprite priority
-	// 		      ------cc cccc----  Sprite color palette
-	// 		      -------- ----llll  4-bit pixel data
+	//            iiii---- --------  Sprite/sprite priority for Y-board
+	//            ----pp-- --------  Sprite priority
+	//            ------cc cccc----  Sprite color palette
+	//            -------- ----llll  4-bit pixel data
 	//
-	//	Note that the zooming described below is 100% accurate to the real board.
+	//  Note that the zooming described below is 100% accurate to the real board.
 	//
 
 	// render the sprites in order
@@ -1008,7 +1008,7 @@ void sega_sys16b_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 							break;
 					}
 				}
-				
+
 				// update bounds
 				if (x > maxx) maxx = x;
 				if (x < minx) minx = x;
@@ -1016,7 +1016,7 @@ void sega_sys16b_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 				maxy = y;
 			}
 		}
-		
+
 		// mark dirty
 		if (miny != -1)
 			mark_dirty(minx, maxx, miny, maxy);
@@ -1065,39 +1065,39 @@ sega_xboard_sprite_device::sega_xboard_sprite_device(const machine_config &mconf
 void sega_outrun_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//
-	//	Out Run/X-Board-style sprites
+	//  Out Run/X-Board-style sprites
 	//
-	//		Offs  Bits               Usage
-	//		 +0   e------- --------  Signify end of sprite list
-	//		 +0   -h-h---- --------  Hide this sprite if either bit is set
-	//		 +0   ----bbb- --------  Sprite bank
-	//		 +0   -------t tttttttt  Top scanline of sprite + 256
-	//		 +2   oooooooo oooooooo  Offset within selected sprite bank
-	//		 +4   ppppppp- --------  Signed 7-bit pitch value between scanlines
-	//		 +4   -------x xxxxxxxx  X position of sprite (position $BE is screen position 0)
-	//		 +6   -s------ --------  Enable shadows
-	//		 +6   --pp---- --------  Sprite priority, relative to tilemaps
-	//		 +6   ------vv vvvvvvvv  Vertical zoom factor (0x200 = full size, 0x100 = half size, 0x300 = 2x size)
-	//		 +8   y------- --------  Render from top-to-bottom (1) or bottom-to-top (0) on screen
-	//		 +8   -f------ --------  Horizontal flip: read the data backwards if set
-	//		 +8   --x----- --------  Render from left-to-right (1) or right-to-left (0) on screen
-	//		 +8   ------hh hhhhhhhh  Horizontal zoom factor (0x200 = full size, 0x100 = half size, 0x300 = 2x size)
-	//		 +E   dddddddd dddddddd  Scratch space for current address
+	//      Offs  Bits               Usage
+	//       +0   e------- --------  Signify end of sprite list
+	//       +0   -h-h---- --------  Hide this sprite if either bit is set
+	//       +0   ----bbb- --------  Sprite bank
+	//       +0   -------t tttttttt  Top scanline of sprite + 256
+	//       +2   oooooooo oooooooo  Offset within selected sprite bank
+	//       +4   ppppppp- --------  Signed 7-bit pitch value between scanlines
+	//       +4   -------x xxxxxxxx  X position of sprite (position $BE is screen position 0)
+	//       +6   -s------ --------  Enable shadows
+	//       +6   --pp---- --------  Sprite priority, relative to tilemaps
+	//       +6   ------vv vvvvvvvv  Vertical zoom factor (0x200 = full size, 0x100 = half size, 0x300 = 2x size)
+	//       +8   y------- --------  Render from top-to-bottom (1) or bottom-to-top (0) on screen
+	//       +8   -f------ --------  Horizontal flip: read the data backwards if set
+	//       +8   --x----- --------  Render from left-to-right (1) or right-to-left (0) on screen
+	//       +8   ------hh hhhhhhhh  Horizontal zoom factor (0x200 = full size, 0x100 = half size, 0x300 = 2x size)
+	//       +E   dddddddd dddddddd  Scratch space for current address
 	//
-	//	Out Run only:
-	//		 +A   hhhhhhhh --------  Height in scanlines - 1
-	//		 +A   -------- -ccccccc  Sprite color palette
+	//  Out Run only:
+	//       +A   hhhhhhhh --------  Height in scanlines - 1
+	//       +A   -------- -ccccccc  Sprite color palette
 	//
 	//  X-Board only:
-	//		 +A   ----hhhh hhhhhhhh  Height in scanlines - 1
-	//		 +C   -------- cccccccc  Sprite color palette
+	//       +A   ----hhhh hhhhhhhh  Height in scanlines - 1
+	//       +C   -------- cccccccc  Sprite color palette
 	//
-	// 	Final bitmap format:
+	//  Final bitmap format:
 	//
-	// 		      -s------ --------  Shadow control
-	// 		      --pp---- --------  Sprite priority
-	// 		      ----cccc cccc----  Sprite color palette
-	// 		      -------- ----llll  4-bit pixel data
+	//            -s------ --------  Shadow control
+	//            --pp---- --------  Sprite priority
+	//            ----cccc cccc----  Sprite color palette
+	//            -------- ----llll  4-bit pixel data
 	//
 
 	// render the sprites in order
@@ -1214,7 +1214,7 @@ void sega_outrun_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 							break;
 					}
 				}
-				
+
 				// update bounds
 				if (x > maxx) maxx = x;
 				if (x < minx) minx = x;
@@ -1227,7 +1227,7 @@ void sega_outrun_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 			addr += pitch * (yacc >> 9);
 			yacc &= 0x1ff;
 		}
-		
+
 		// mark dirty
 		if (miny != -1)
 			mark_dirty(minx, maxx, miny, maxy);
@@ -1258,36 +1258,36 @@ sega_yboard_sprite_device::sega_yboard_sprite_device(const machine_config &mconf
 void sega_yboard_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//
-	//	Y-Board-style sprites
+	//  Y-Board-style sprites
 	//
-	//		Offs  Bits               Usage
-	//		 +0   e------- --------  Signify end of sprite list
-	//		 +0   -----iii iiiiiiii  Address of indirection table (/16)
-	//		 +2   bbbb---- --------  Upper 4 bits of bank index
-	//		 +2   ----xxxx xxxxxxxx  X position of sprite (position $600 is screen position 0)
-	//		 +4   bbbb---- --------  Lower 4 bits of bank index
-	//		 +4   ----yyyy yyyyyyyy  Y position of sprite (position $600 is screen position 0)
-	//		 +6   oooooooo oooooooo  Offset within selected sprite bank
-	//		 +8   hhhhhhhh hhhhhhhh  Height of sprite
-	//		 +A   -y------ --------  Render from top-to-bottom (1) or bottom-to-top (0) on screen
-	//		 +A   --f----- --------  Horizontal flip: read the data backwards if set
-	//		 +A   ---x---- --------  Render from left-to-right (1) or right-to-left (0) on screen
-	//		 +A   -----zzz zzzzzzzz  Zoom factor
-	//		 +C   -ccc---- --------  Sprite color
-	//		 +C   ----rrrr --------  Sprite priority
-	//		 +C   -------- pppppppp  Signed 8-bit pitch value between scanlines
-	//		 +E   ----nnnn nnnnnnnn  Index of next sprite
+	//      Offs  Bits               Usage
+	//       +0   e------- --------  Signify end of sprite list
+	//       +0   -----iii iiiiiiii  Address of indirection table (/16)
+	//       +2   bbbb---- --------  Upper 4 bits of bank index
+	//       +2   ----xxxx xxxxxxxx  X position of sprite (position $600 is screen position 0)
+	//       +4   bbbb---- --------  Lower 4 bits of bank index
+	//       +4   ----yyyy yyyyyyyy  Y position of sprite (position $600 is screen position 0)
+	//       +6   oooooooo oooooooo  Offset within selected sprite bank
+	//       +8   hhhhhhhh hhhhhhhh  Height of sprite
+	//       +A   -y------ --------  Render from top-to-bottom (1) or bottom-to-top (0) on screen
+	//       +A   --f----- --------  Horizontal flip: read the data backwards if set
+	//       +A   ---x---- --------  Render from left-to-right (1) or right-to-left (0) on screen
+	//       +A   -----zzz zzzzzzzz  Zoom factor
+	//       +C   -ccc---- --------  Sprite color
+	//       +C   ----rrrr --------  Sprite priority
+	//       +C   -------- pppppppp  Signed 8-bit pitch value between scanlines
+	//       +E   ----nnnn nnnnnnnn  Index of next sprite
 	//
-	// 	Final bitmap format:
+	//  Final bitmap format:
 	//
-	// 		      ccc----- --------  Sprite color
-	// 		      ---rrrr- --------  Sprite priority
-	// 		      -------i iiiiiiii  Indirected color data
+	//            ccc----- --------  Sprite color
+	//            ---rrrr- --------  Sprite priority
+	//            -------i iiiiiiii  Indirected color data
 	//
-	//	In addition to these parameters, the sprite area is clipped using scanline extents
-	//	stored for every pair of scanlines in the rotation RAM. It's a bit of a cheat for us
-	//	to poke our nose into the rotation structure, but there are no known cases of Y-board
-	//	sprites without rotation RAM.
+	//  In addition to these parameters, the sprite area is clipped using scanline extents
+	//  stored for every pair of scanlines in the rotation RAM. It's a bit of a cheat for us
+	//  to poke our nose into the rotation structure, but there are no known cases of Y-board
+	//  sprites without rotation RAM.
 	//
 
 	// clear out any scanlines we might be using
@@ -1439,7 +1439,7 @@ void sega_yboard_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 								break;
 						}
 					}
-				
+
 					// update bounds
 					if (x > dmaxx) dmaxx = x;
 					if (x < dminx) dminx = x;
@@ -1453,7 +1453,7 @@ void sega_yboard_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 			addr += pitch * (yacc >> 9);
 			yacc &= 0x1ff;
 		}
-		
+
 		// mark dirty
 		if (dminy != -1)
 			mark_dirty(dminx, dmaxx, dminy, dmaxy);

@@ -26,7 +26,7 @@
 
 /* Nimbus sub-bios structures for debugging */
 
-struct t_area_params 
+struct t_area_params
 {
 	UINT16  ofs_brush;
 	UINT16  seg_brush;
@@ -35,7 +35,7 @@ struct t_area_params
 	UINT16  count;
 };
 
-struct t_plot_string_params 
+struct t_plot_string_params
 {
 	UINT16  ofs_font;
 	UINT16  seg_font;
@@ -46,7 +46,7 @@ struct t_plot_string_params
 	UINT16  length;
 };
 
-struct t_nimbus_brush 
+struct t_nimbus_brush
 {
 	UINT16  style;
 	UINT16  style_index;
@@ -110,7 +110,7 @@ struct intr_state
 	UINT16  ext_vector[2]; // external vectors, when in cascade mode
 };
 
-struct i186_state 
+struct i186_state
 {
 	struct timer_state	timer[3];
 	struct dma_state	dma[2];
@@ -118,7 +118,7 @@ struct i186_state
 	struct mem_state	mem;
 };
 
-struct keyboard_t 
+struct keyboard_t
 {
 	UINT8       keyrows[NIMBUS_KEYROWS];
 	emu_timer   *keyscan_timer;
@@ -128,7 +128,7 @@ struct keyboard_t
 };
 
 // Static data related to Floppy and SCSI hard disks
-struct nimbus_drives_t 
+struct nimbus_drives_t
 {
 	UINT8   reg400;
 	UINT8   reg410_in;
@@ -140,7 +140,7 @@ struct nimbus_drives_t
 };
 
 /* 8031 Peripheral controler */
-struct ipc_interface_t 
+struct ipc_interface_t
 {
 	UINT8   ipc_in;
 	UINT8   ipc_out;
@@ -152,7 +152,7 @@ struct ipc_interface_t
 };
 
 /* Mouse/Joystick */
-struct mouse_joy_state 
+struct mouse_joy_state
 {
 	UINT8   m_mouse_px;
 	UINT8   m_mouse_py;

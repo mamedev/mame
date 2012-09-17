@@ -45,10 +45,10 @@ const device_type C64_IDE64 = &device_creator<c64_ide64_cartridge_device>;
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c64_ide64 )
 //-------------------------------------------------
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	NULL, 
-	NULL, 
+	NULL,
+	NULL,
 	0
 };
 

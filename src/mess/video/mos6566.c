@@ -281,7 +281,7 @@ inline void mos6566_device::vic2_clear_interrupt( int mask )
 inline UINT8 mos6566_device::read_videoram(offs_t offset)
 {
 	m_last_data = space(AS_0)->read_byte(offset & 0x3fff);
-	
+
 	return m_last_data;
 }
 
@@ -799,7 +799,7 @@ void mos6566_device::device_reset()
 		m_spr_ptr[i] = 0;
 		m_mc_base[i] = 0;
 		m_mc[i] = 0;
-		
+
 		for (int j = 0; j < 4; j++)
 		{
 			m_spr_draw_data[i][j] = 0;

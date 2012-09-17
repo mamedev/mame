@@ -14,7 +14,7 @@
 #include "rendlay.h"
 
 
-struct PRC 
+struct PRC
 {
 	UINT8		colors_inverted;
 	UINT8		background_enabled;
@@ -31,7 +31,7 @@ struct PRC
 };
 
 
-struct TIMERS 
+struct TIMERS
 {
 	emu_timer	*seconds_timer;
 	emu_timer	*hz256_timer;

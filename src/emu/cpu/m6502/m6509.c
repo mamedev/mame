@@ -155,7 +155,7 @@ static CPU_INIT( m6509 )
 		devcb_write8 nullwcb = DEVCB_NULL;
 
 		cpustate->rdmem_id.resolve(nullrcb, *device);
-		cpustate->wrmem_id.resolve(nullwcb, *device);		
+		cpustate->wrmem_id.resolve(nullwcb, *device);
 	}
 }
 

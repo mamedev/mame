@@ -519,7 +519,7 @@ static FILE *sample[1];
 
 
 /* struct describing a single operator (SLOT) */
-struct FM_SLOT 
+struct FM_SLOT
 {
 	INT32	*DT;		/* detune          :dt_tab[DT] */
 	UINT8	KSR;		/* key scale rate  :3-KSR */
@@ -560,7 +560,7 @@ struct FM_SLOT
 
 };
 
-struct FM_CH 
+struct FM_CH
 {
 	FM_SLOT	SLOT[4];	/* four SLOTs (operators) */
 
@@ -585,7 +585,7 @@ struct FM_CH
 };
 
 
-struct FM_ST 
+struct FM_ST
 {
 	device_t *device;
 	void *		param;				/* this chip parameter  */
@@ -622,7 +622,7 @@ struct FM_ST
 /***********************************************************/
 
 /* OPN 3slot struct */
-struct FM_3SLOT 
+struct FM_3SLOT
 {
 	UINT32  fc[3];			/* fnum3,blk3: calculated */
 	UINT8	fn_h;			/* freq3 latch */
@@ -631,7 +631,7 @@ struct FM_3SLOT
 };
 
 /* OPN/A/B common state */
-struct FM_OPN 
+struct FM_OPN
 {
 	UINT8	type;			/* chip type */
 	FM_ST	ST;				/* general state */
@@ -2089,7 +2089,7 @@ static void OPNPrescaler_w(FM_OPN *OPN , int addr, int pre_divider)
 /*****************************************************************************/
 
 /* here's the virtual YM2203(OPN) */
-struct YM2203 
+struct YM2203
 {
 	UINT8 REGS[256];		/* registers         */
 	FM_OPN OPN;				/* OPN state         */
@@ -2385,7 +2385,7 @@ int ym2203_timer_over(void *chip,int c)
 #if (BUILD_YM2608||BUILD_YM2610||BUILD_YM2610B)
 
 /* ADPCM type A channel struct */
-struct ADPCM_CH 
+struct ADPCM_CH
 {
 	UINT8		flag;			/* port state               */
 	UINT8		flagMask;		/* arrived flag mask        */
@@ -2405,7 +2405,7 @@ struct ADPCM_CH
 };
 
 /* here's the virtual YM2610 */
-struct YM2610 
+struct YM2610
 {
 	UINT8		REGS[512];			/* registers            */
 	FM_OPN		OPN;				/* OPN state            */

@@ -1,4 +1,4 @@
-struct hit_t 
+struct hit_t
 {
 	UINT16 x1p, y1p, z1p, x1s, y1s, z1s;
 	UINT16 x2p, y2p, z2p, x2s, y2s, z2s;

@@ -63,7 +63,7 @@
 
 /***** Video Modes *****/
 
-enum BETA_VID_MODES 
+enum BETA_VID_MODES
 {
 	TEXT_40x25,				/* Text mode 40x25 */
 	TEXT_80x25,				/* Text mode 80x25 */
@@ -74,7 +74,7 @@ enum BETA_VID_MODES
 
 #define iosize	(0xfEFF-0xfc00)
 
-struct PageReg 
+struct PageReg
 {
 	int	    value;			/* Value of the page register */
 	UINT8	*memory;		/* The memory it actually points to */

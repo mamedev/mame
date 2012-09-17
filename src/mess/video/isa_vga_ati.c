@@ -1,8 +1,8 @@
 /*
  * isa_vga_ati.c
  *
- *	Implementation of the ATi Graphics Ultra ISA Video card
- *	 - Uses ATi 28800-6 (VGA Wonder) and ATi 38800-1 (Mach8, 8514/A clone)
+ *  Implementation of the ATi Graphics Ultra ISA Video card
+ *   - Uses ATi 28800-6 (VGA Wonder) and ATi 38800-1 (Mach8, 8514/A clone)
  *
  *  Created on: 9/09/2012
  */

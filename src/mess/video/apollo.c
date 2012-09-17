@@ -843,7 +843,7 @@ const device_type APOLLO_MONO19I = &device_creator<apollo_mono19i_device>;
 
 apollo_mono19i_device::apollo_mono19i_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: apollo_mono_device(mconfig, APOLLO_MONO19I, "Apollo 19\" Monochrome Screen", tag, owner, clock)
-{	
+{
 }
 
 //-------------------------------------------------

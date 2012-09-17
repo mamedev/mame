@@ -583,41 +583,41 @@ READ8_MEMBER(peplus_state::peplus_watchdog_r)
 READ8_MEMBER(peplus_state::peplus_input0_r)
 {
 /*
-		PE+ bill validators have a dip switch setting to switch between ID-022 and ID-023 protocols.
+        PE+ bill validators have a dip switch setting to switch between ID-022 and ID-023 protocols.
 
         Emulating IGT IDO22 Pulse Protocol (IGT Smoke 2.2)
-		ID022 protocol requires a 20ms on/off pulse x times for denomination followed by a 50ms stop pulse.
-		The DBV then waits for at least 3 toggling (ACK) pulses of alternating 20ms each from the game.
-		If no toggling received within 200ms, the bill was rejected by the game (e.g. Max Credits reached).
-		Once toggling received, the DBV stacks the bill and sends a 10ms stacked pulses.
+        ID022 protocol requires a 20ms on/off pulse x times for denomination followed by a 50ms stop pulse.
+        The DBV then waits for at least 3 toggling (ACK) pulses of alternating 20ms each from the game.
+        If no toggling received within 200ms, the bill was rejected by the game (e.g. Max Credits reached).
+        Once toggling received, the DBV stacks the bill and sends a 10ms stacked pulses.
 
         Emulating IGT IDO23 Pulse Protocol (IGT 2.5)
-		ID023 protocol requires a start pulse of 50ms ON followed by a 20ms pause.  Next a 15-bit data stream
-		is sent based on the country code and denomination (see table below).  And finally a 90ms stop pulse.
-		There is then a 200ms pause and the entire sequence is transmitted again two more times.
-		The DBV then waits for the toggling much like the ID-022 protocol above, however ends with two 10ms
-		stack pulses instead of one.
+        ID023 protocol requires a start pulse of 50ms ON followed by a 20ms pause.  Next a 15-bit data stream
+        is sent based on the country code and denomination (see table below).  And finally a 90ms stop pulse.
+        There is then a 200ms pause and the entire sequence is transmitted again two more times.
+        The DBV then waits for the toggling much like the ID-022 protocol above, however ends with two 10ms
+        stack pulses instead of one.
 
-		Ticket handling has not been emulated.
+        Ticket handling has not been emulated.
 
-		IDO23 Country Codes
+        IDO23 Country Codes
         -------------------
-		0x07 = Canada
+        0x07 = Canada
         0x25 = USA
 
         IDO23 USA 15-bit Data Samples:
-		---------+--------------+--------------+-----------+
-		Bill Amt | Country Code |  Denom Code  |  Checksum |
+        ---------+--------------+--------------+-----------+
+        Bill Amt | Country Code |  Denom Code  |  Checksum |
         ---------+--------------+--------------+-----------+
         $1       | 1 0 0 1 0 1  |  0 0 1 1 0   |  1 1 0 0  |
-		$2       | 1 0 0 1 0 1  |  0 0 1 1 1   |  1 0 1 1  |
+        $2       | 1 0 0 1 0 1  |  0 0 1 1 1   |  1 0 1 1  |
         $5       | 1 0 0 1 0 1  |  0 0 1 0 0   |  1 0 1 1  |
         $10      | 1 0 0 1 0 1  |  0 0 1 0 1   |  1 0 1 0  |
         $20      | 1 0 0 1 0 1  |  0 0 0 1 0   |  1 0 1 1  |
         $50      | 1 0 0 1 0 1  |  0 0 0 0 0   |  1 0 1 0  |
         $100     | 1 0 0 1 0 1  |  0 0 0 0 1   |  1 0 0 1  |
-		Ticket   | 1 0 0 1 0 1  |  0 0 0 1 1   |  1 0 1 0  |
-		---------+--------------+--------------+-----------+
+        Ticket   | 1 0 0 1 0 1  |  0 0 0 1 1   |  1 0 1 0  |
+        ---------+--------------+--------------+-----------+
 
         Direction Data
         --------------
@@ -643,7 +643,7 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
 			if (m_bv_protocol == 0) {
 				// ID-022
 				m_bv_denomination = id_022[m_bv_denomination];
-			
+
 				if (m_bv_denomination == 0)
 					m_bv_state = 0x03; // $1 So Skip Credit Pulse
 				else
@@ -657,8 +657,8 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
 
 				m_bv_state = 0x11;
 			}
-			
-			m_bv_cycles = curr_cycles;			
+
+			m_bv_cycles = curr_cycles;
 			m_bv_pulse = 1;
 			m_bv_enable_count = 0;
 		}
@@ -682,7 +682,7 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
 				m_bv_pulse = 1;
 
 				m_bv_denomination--;
-				
+
 				if (m_bv_denomination == 0)
 					m_bv_state++; // Done with Credit Pulse
 				else
@@ -1130,7 +1130,7 @@ static INPUT_PORTS_START( peplus )
 	PORT_CONFSETTING( 0x04, "$20" )
 	PORT_CONFSETTING( 0x05, "$50" )
 	PORT_CONFSETTING( 0x06, "$100" )
-	
+
 	PORT_START("BP")
 	PORT_CONFNAME( 0x1f, 0x00, "Bill Protocol" )
 	PORT_CONFSETTING( 0x00, "ID-022" )

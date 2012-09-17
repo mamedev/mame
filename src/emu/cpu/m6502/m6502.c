@@ -147,7 +147,7 @@ static void m6502_common_init(legacy_cpu_device *device, device_irq_acknowledge_
 		cpustate->wrmem_id.resolve(intf->write_indexed_func, *device);
 		cpustate->in_port_func.resolve(intf->in_port_func, *device);
 		cpustate->out_port_func.resolve(intf->out_port_func, *device);
-		
+
 		cpustate->pullup = intf->external_port_pullup;
 		cpustate->pulldown = intf->external_port_pulldown;
 	}

@@ -240,7 +240,7 @@ inline UINT8 mos7360_device::read_ram(offs_t offset)
 	m_last_data = space(AS_0)->read_byte(offset);
 
 	m_rom = rom;
-	
+
 	return m_last_data;
 }
 
@@ -252,7 +252,7 @@ inline UINT8 mos7360_device::read_rom(offs_t offset)
 	m_last_data = space(AS_0)->read_byte(offset);
 
 	m_rom = rom;
-	
+
 	return m_last_data;
 }
 
@@ -550,7 +550,7 @@ void mos7360_device::draw_bitmap(int ybegin, int yend, int ch, int yoff, int xof
 	for (y = ybegin; y <= yend; y++)
 	{
 		code = read_ram(m_bitmapaddr + ch * 8 + y);
-		
+
 		m_bitmap.pix32(y + yoff, 0 + xoff) = PALETTE[m_c16_bitmap[code >> 7]];
 		m_bitmap.pix32(y + yoff, 1 + xoff) = PALETTE[m_c16_bitmap[(code >> 6) & 1]];
 		m_bitmap.pix32(y + yoff, 2 + xoff) = PALETTE[m_c16_bitmap[(code >> 5) & 1]];
@@ -569,7 +569,7 @@ void mos7360_device::draw_bitmap_multi(int ybegin, int yend, int ch, int yoff, i
 	for (y = ybegin; y <= yend; y++)
 	{
 		code = read_ram(m_bitmapaddr + ch * 8 + y);
-		
+
 		m_bitmap.pix32(y + yoff, 0 + xoff) =
 			m_bitmap.pix32(y + yoff, 1 + xoff) = PALETTE[m_bitmapmulti[code >> 6]];
 		m_bitmap.pix32(y + yoff, 2 + xoff) =
@@ -589,7 +589,7 @@ void mos7360_device::draw_cursor(int ybegin, int yend, int yoff, int xoff, int c
 	{
 		for (int x = 0; x < 8; x++)
 		{
-			m_bitmap.pix32(y + yoff, x + xoff) = PALETTE[color];	
+			m_bitmap.pix32(y + yoff, x + xoff) = PALETTE[color];
 		}
 	}
 }
@@ -617,7 +617,7 @@ void mos7360_device::drawlines(int first, int last)
 		{
 			for (int x = 0; x < m_bitmap.width(); x++)
 			{
-				m_bitmap.pix32(line, x) = PALETTE[0];	
+				m_bitmap.pix32(line, x) = PALETTE[0];
 			}
 		}
 		return;
@@ -637,7 +637,7 @@ void mos7360_device::drawlines(int first, int last)
 		{
 			for (int x = 0; x < m_bitmap.width(); x++)
 			{
-				m_bitmap.pix32(line, x) = PALETTE[FRAMECOLOR];	
+				m_bitmap.pix32(line, x) = PALETTE[FRAMECOLOR];
 			}
 		}
 	}
@@ -733,7 +733,7 @@ void mos7360_device::drawlines(int first, int last)
 		{
 			for (int x = 0; x < xbegin; x++)
 			{
-				m_bitmap.pix32(yoff + i, x) = PALETTE[FRAMECOLOR];	
+				m_bitmap.pix32(yoff + i, x) = PALETTE[FRAMECOLOR];
 			}
 
 			for (int x = xend; x < m_bitmap.width(); x++)
@@ -752,7 +752,7 @@ void mos7360_device::drawlines(int first, int last)
 	{
 		for (int x = 0; x < m_bitmap.width(); x++)
 		{
-			m_bitmap.pix32(line, x) = PALETTE[FRAMECOLOR];	
+			m_bitmap.pix32(line, x) = PALETTE[FRAMECOLOR];
 		}
 	}
 }

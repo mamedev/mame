@@ -24,7 +24,7 @@ TODO:
 
 #include "emu.h"
 
-struct mcd212_channel_t 
+struct mcd212_channel_t
 {
     UINT8 csrr;
     UINT16 csrw;

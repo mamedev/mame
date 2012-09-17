@@ -1044,7 +1044,7 @@ static WRITE16_HANDLER( codemasters_eeprom_w )
 /* ST M95320 32Kbit serial EEPROM implementation */
 
 #define M95320_SIZE 0x1000
-enum STMSTATE 
+enum STMSTATE
 {
 	IDLE = 0,
 	CMD_WRSR,

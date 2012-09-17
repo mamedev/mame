@@ -23,7 +23,7 @@ extern const device_type PERIBOX_GEN;
 
 #define DSRROM "dsrrom"
 
-struct peribox_config 
+struct peribox_config
 {
 	devcb_write_line	inta;
 	devcb_write_line	intb;

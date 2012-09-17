@@ -65,8 +65,8 @@ struct pet_datassette_port_interface
 class device_pet_datassette_port_interface;
 
 class pet_datassette_port_device : public device_t,
-						     	   public pet_datassette_port_interface,
-						     	   public device_slot_interface
+						    	   public pet_datassette_port_interface,
+						    	   public device_slot_interface
 {
 public:
 	// construction/destruction

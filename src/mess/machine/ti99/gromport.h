@@ -18,7 +18,7 @@ extern const device_type GROMPORT;
 #define GROMPORT_CONFIG(name) \
 	const gromport_config(name) =
 
-struct gromport_config 
+struct gromport_config
 {
 	devcb_write_line	ready;
 	devcb_write_line	reset;
@@ -366,7 +366,7 @@ private:
 };
 
 
-struct pcb_type 
+struct pcb_type
 {
 	int id;
 	const char* name;

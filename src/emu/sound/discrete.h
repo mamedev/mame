@@ -4139,7 +4139,7 @@ enum {
  *
  *************************************/
 
-enum discrete_node_type 
+enum discrete_node_type
 {
 	DSS_NULL,			/* Nothing, nill, zippo, only to be used as terminating node */
 	DSS_NOP,			/* just do nothing, placeholder for potential DISCRETE_REPLACE in parent block */

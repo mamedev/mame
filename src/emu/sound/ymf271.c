@@ -33,7 +33,7 @@
 
 //#define log2(n) (log((float) n)/log((float) 2))
 
-struct YMF271Slot 
+struct YMF271Slot
 {
 	INT8  extout;
 	UINT8 lfoFreq;
@@ -82,12 +82,12 @@ struct YMF271Slot
 	double lfo_phasemod;
 };
 
-struct YMF271Group 
+struct YMF271Group
 {
 	INT8 sync, pfm;
 };
 
-struct YMF271Chip 
+struct YMF271Chip
 {
 	YMF271Slot slots[48];
 	YMF271Group groups[12];

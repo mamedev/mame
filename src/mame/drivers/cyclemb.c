@@ -12,7 +12,7 @@
     - sound (controlled by three i8741);
     - add flipscreen;
     - color prom resistor network is guessed, cyclemb yellows are more reddish on pcb video and photos;
-    
+
     BTANB verified on pcb: cyclemb standing cones are reddish-yellow/black instead of red/white
 
 =====================================================================================================

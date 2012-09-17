@@ -665,10 +665,10 @@ void qdrmfgp_state::machine_reset()
  *  Machine driver
  *
  *************************************/
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	ide_interrupt, 
-	NULL, 
+	ide_interrupt,
+	NULL,
 	0
 };
 
@@ -707,10 +707,10 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static const ide_config qdrmfgp2_ide_intf = 
+static const ide_config qdrmfgp2_ide_intf =
 {
-	gp2_ide_interrupt, 
-	NULL, 
+	gp2_ide_interrupt,
+	NULL,
 	0
 };
 static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )

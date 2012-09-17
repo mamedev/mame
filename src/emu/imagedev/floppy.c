@@ -444,7 +444,7 @@ attotime floppy_image_device::get_next_transition(attotime from_when)
 	else
 		next_position = 200000000 + (buf[1] & floppy_image::TIME_MASK);
 
-	//	logerror("Floppy: cuspos=%d nextpos=%d\n", position, next_position);
+	//  logerror("Floppy: cuspos=%d nextpos=%d\n", position, next_position);
 	return base + attotime::from_nsec(UINT64(next_position)*300/rpm);
 }
 

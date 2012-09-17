@@ -1158,7 +1158,7 @@ static TIMER_CALLBACK( h8s_tpu_callback)
 // SERIAL CONTROLLER INTERFACE //
 /////////////////////////////////
 
-struct H8S_SCI_ENTRY 
+struct H8S_SCI_ENTRY
 {
 	UINT32 reg_smr, reg_brr, reg_scr, reg_tdr, reg_ssr, reg_rdr;
 	UINT32 reg_pdr, reg_port;

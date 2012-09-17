@@ -70,7 +70,7 @@ void kaneko_calc3_device::device_start()
 
 
 
-struct calc3_t 
+struct calc3_t
 {
 
 	int data_header[2];

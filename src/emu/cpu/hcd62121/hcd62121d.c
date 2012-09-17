@@ -32,7 +32,7 @@ enum
 	_4,			/* for nibble shifts */
 };
 
-struct hcd62121_dasm 
+struct hcd62121_dasm
 {
 	const char *str;
 	UINT8		arg1;

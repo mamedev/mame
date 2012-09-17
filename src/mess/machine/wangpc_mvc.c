@@ -47,7 +47,7 @@
 #define ATTR_SUBSCRIPT		BIT(attr, 6)
 #define ATTR_SUPERSCRIPT	BIT(attr, 7)
 
-static const rgb_t PALETTE[] = 
+static const rgb_t PALETTE[] =
 {
 	RGB_BLACK,
 	MAKE_RGB(0x00, 0x80, 0x00),

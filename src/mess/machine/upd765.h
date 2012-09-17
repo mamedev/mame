@@ -78,7 +78,7 @@ extern const device_type UPD72065;
 ***************************************************************************/
 
 /* RDY pin connected state */
-enum UPD765_RDY_PIN 
+enum UPD765_RDY_PIN
 {
 	UPD765_RDY_PIN_NOT_CONNECTED = 0,
 	UPD765_RDY_PIN_CONNECTED = 1
@@ -91,7 +91,7 @@ typedef device_t *(*upd765_get_image_func)(device_t *device, int floppy_index);
 #define UPD765_GET_IMAGE(name)	device_t *name(device_t *device, int floppy_index )
 
 
-struct upd765_interface 
+struct upd765_interface
 {
 	/* interrupt issued */
 	devcb_write_line out_int_func;

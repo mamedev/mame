@@ -122,10 +122,10 @@ static MACHINE_CONFIG_FRAGMENT(kc_d004)
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(kc_d004_floppy_interface)
 MACHINE_CONFIG_END
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	NULL, 
-	NULL, 
+	NULL,
+	NULL,
 	0
 };
 

@@ -10,7 +10,7 @@
 #ifndef __MC68328_PRIVATE_H_
 #define __MC68328_PRIVATE_H_
 
-struct mc68328_regs_t 
+struct mc68328_regs_t
 {
     // $(FF)FFF000
     UINT8   scr;        // System Control Register
@@ -203,7 +203,7 @@ struct mc68328_regs_t
     UINT8   unused42[1260];
 };
 
-struct mc68328_t 
+struct mc68328_t
 {
     const mc68328_interface* iface;
 

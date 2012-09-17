@@ -16,7 +16,7 @@ Based on G65C816 CPU Emulator by Karl Stenerud
 
 #define ADDRESS_24BIT(A) ((A)&0xffffff)
 
-struct opcode_struct 
+struct opcode_struct
 {
 	unsigned char name;
 	unsigned char flag;

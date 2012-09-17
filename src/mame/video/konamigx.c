@@ -355,8 +355,8 @@ static void K053936GP_0_zoom_draw(running_machine &machine, bitmap_rgb32 &bitmap
 static void K053936GP_1_zoom_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,
 		tilemap_t *tmap, int tilebpp, int blend, int alpha, int pixeldouble_output)
 {
-//	konamigx_state *state = machine.driver_data<konamigx_state>();
-//	K053936GP_zoom_draw(machine, 1,K053936_1_ctrl,K053936_1_linectrl,bitmap,cliprect,tmap,tilebpp,blend,alpha, pixeldouble_output);
+//  konamigx_state *state = machine.driver_data<konamigx_state>();
+//  K053936GP_zoom_draw(machine, 1,K053936_1_ctrl,K053936_1_linectrl,bitmap,cliprect,tmap,tilebpp,blend,alpha, pixeldouble_output);
 }
 
 

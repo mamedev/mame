@@ -21,7 +21,7 @@ enum
 	MaxKeyMessageLen = 1
 };
 
-struct expansion_slot_t 
+struct expansion_slot_t
 {
 	read8_space_func reg_read;
 	write8_space_func reg_write;

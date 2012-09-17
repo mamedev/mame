@@ -813,7 +813,7 @@ bool core_options::validate_and_set_data(core_options::entry &curentry, const ch
 }
 
 //-------------------------------------------------
-//  options_count - take number of existing 
+//  options_count - take number of existing
 //  number of options in structure
 //-------------------------------------------------
 

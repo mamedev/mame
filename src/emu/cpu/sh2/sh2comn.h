@@ -90,7 +90,7 @@ do {											\
 		sh2_exception(sh2,message,irq);			\
 } while(0)
 
-struct sh2_state 
+struct sh2_state
 {
 	UINT32	ppc;
 	UINT32	pc;

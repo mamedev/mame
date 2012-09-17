@@ -36,7 +36,7 @@ extern const device_type MAPPER8;
 #define SRAM_SIZE 2048
 #define DRAM_SIZE 65536
 
-struct mapper8_list_entry 
+struct mapper8_list_entry
 {
 	const char*	name;				// Name of the device (used for looking up the device)
 	int			mode;				// Mode of the system which applies to this entry
@@ -49,7 +49,7 @@ struct mapper8_list_entry
 #define MAPPER8_CONFIG(name) \
 	const mapper8_config(name) =
 
-struct mapper8_config 
+struct mapper8_config
 {
 	devcb_write_line				ready;
 	const mapper8_list_entry		*devlist;

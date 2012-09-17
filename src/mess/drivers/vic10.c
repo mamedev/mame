@@ -480,11 +480,11 @@ READ8_MEMBER( vic10_state::cpu_r )
         bit     description
 
         P0      EXPANSION PORT
-        P1      
-        P2      
+        P1
+        P2
         P3
         P4      CASS SENS
-        P5		0
+        P5      0
 
     */
 

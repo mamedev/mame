@@ -72,10 +72,10 @@
 
 #define MCFG_BOOTLEG_SYS16A_SPRITES_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, BOOTLEG_SYS16A_SPRITES, 0) \
-	
+
 #define MCFG_BOOTLEG_SYS16A_SPRITES_REMAP(_0,_1,_2,_3,_4,_5,_6,_7) \
 	bootleg_sys16a_sprite_device::static_set_remap(*device, _0,_1,_2,_3,_4,_5,_6,_7);
-	
+
 #define MCFG_BOOTLEG_SYS16A_SPRITES_XORIGIN(_xorigin) \
 	bootleg_sys16a_sprite_device::static_set_xorigin(*device, _xorigin);
 
@@ -85,7 +85,7 @@
 
 #define MCFG_BOOTLEG_SYS16B_SPRITES_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SEGA_SYS16B_SPRITES, 0) \
-	
+
 #define MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(_xorigin) \
 	bootleg_sys16a_sprite_device::static_set_xorigin(*device, _xorigin);
 
@@ -129,7 +129,7 @@ class sega_hangon_sprite_device : public sega_16bit_sprite_device
 public:
 	// construction/destruction
 	sega_hangon_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 protected:
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -143,7 +143,7 @@ class sega_sharrier_sprite_device : public sega_16bit_sprite_device
 public:
 	// construction/destruction
 	sega_sharrier_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 protected:
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -162,7 +162,7 @@ protected:
 
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	// configuration
 	bool			m_is_xboard;
 };
@@ -196,14 +196,14 @@ class bootleg_sys16a_sprite_device : public sega_16bit_sprite_device
 public:
 	// construction/destruction
 	bootleg_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// configuration
 	static void static_set_remap(device_t &device, UINT8 offs0, UINT8 offs1, UINT8 offs2, UINT8 offs3, UINT8 offs4, UINT8 offs5, UINT8 offs6, UINT8 offs7);
 
 protected:
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	// internal state
 	UINT8		m_addrmap[8];
 };
@@ -216,7 +216,7 @@ class sega_sys16b_sprite_device : public sega_16bit_sprite_device
 public:
 	// construction/destruction
 	sega_sys16b_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 protected:
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -230,7 +230,7 @@ class sega_yboard_sprite_device : public sega_16bit_sprite_device
 public:
 	// construction/destruction
 	sega_yboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 protected:
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);

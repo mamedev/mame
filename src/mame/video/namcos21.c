@@ -233,13 +233,13 @@ SCREEN_UPDATE_IND16( namcos21 )
 
 /*********************************************************************************************/
 
-struct vertex 
+struct vertex
 {
 	double x,y;
 	double z;
 };
 
-struct edge 
+struct edge
 {
 	double x;
 	double z;

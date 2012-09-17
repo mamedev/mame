@@ -1537,8 +1537,8 @@ void atarigen_blend_gfx(running_machine &machine, int gfx0, int gfx1, int mask0,
 			c1base += gx1->rowbytes();
 		}
 	}
-	
-//	int newdepth = gx0->depth() * gx1->depth();
+
+//  int newdepth = gx0->depth() * gx1->depth();
 	int granularity = gx0->granularity();
 	gx0->set_raw_layout(srcdata, gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
 	gx0->set_granularity(granularity);

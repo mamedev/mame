@@ -1981,7 +1981,7 @@ static ADDRESS_MAP_START( quizchq_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(0x6000, 0x6fff) AM_RAM												// RAM
 	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")								// RAM (Banked)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")								// ROM (Banked)
-	AM_RANGE(0x8000, 0x81ff) AM_WRITE(rongrong_palette_w)	
+	AM_RANGE(0x8000, 0x81ff) AM_WRITE(rongrong_palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quizchq_portmap, AS_IO, 8, dynax_state )

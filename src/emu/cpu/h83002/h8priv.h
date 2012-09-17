@@ -11,25 +11,25 @@
 
 #define H8_MAX_PORTS (16)  // number of I/O ports defined architecturally (1-9 and A-G = 16)
 
-struct H8S2XXX_TPU_ITEM 
+struct H8S2XXX_TPU_ITEM
 {
 	UINT32 tgr, irq, out;
 };
 
-struct H8S2XXX_TPU 
+struct H8S2XXX_TPU
 {
 	emu_timer *timer;
 	int cycles_per_tick;
 	UINT64 timer_cycles;
 };
 
-struct H8S2XXX_SCI 
+struct H8S2XXX_SCI
 {
 	emu_timer *timer;
 	UINT32 bitrate;
 };
 
-struct H8S2XXX_TMR 
+struct H8S2XXX_TMR
 {
 	emu_timer *timer;
 	int cycles_per_tick;

@@ -3,7 +3,7 @@
 #define CALC3_VERBOSE_OUTPUT 0
 
 
-struct calc3_t 
+struct calc3_t
 {
 	int mcu_status;
 	int mcu_command_offset;

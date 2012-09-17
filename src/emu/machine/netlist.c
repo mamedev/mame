@@ -68,7 +68,7 @@
 #if KEEP_STATISTICS
 #define add_to_stat(v,x)		do { v += (x); } while (0)
 #define inc_stat(v)				add_to_stat(v, 1)
-#define begin_timing(v)	 		do { (v) -= get_profile_ticks(); } while (0)
+#define begin_timing(v)			do { (v) -= get_profile_ticks(); } while (0)
 #define end_timing(v)			do { (v) += get_profile_ticks(); } while (0)
 #else
 #define add_to_stat(v,x)		do { } while (0)
@@ -386,7 +386,7 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_list(INT32 &atime)
 	while ( (atime > 0) && (m_queue.is_not_empty()))
 	{
 		queue_t::entry_t e = m_queue.pop();
- 		netlist_time delta = e.time() - m_time_ps + netlist_time::from_raw(m_rem);
+		netlist_time delta = e.time() - m_time_ps + netlist_time::from_raw(m_rem);
 
 		atime -= divu_64x32_rem(delta.as_raw(), m_div, &m_rem);
 		m_time_ps = e.time();
@@ -583,8 +583,8 @@ void netlist_setup_t::resolve_inputs(void)
 		if (out.object_type(net_output_t::SIGNAL_MASK) == net_output_t::SIGNAL_ANALOG
 				&& in->object_type(net_output_t::SIGNAL_MASK) == net_output_t::SIGNAL_DIGITAL)
 		{
-			// 			fatalerror("connecting analog output %s with %s\n", out.netdev()->name(), in->netdev()->name());
-			// 			fatalerror("connecting analog output %s with %s\n", out.netdev()->name(), in->netdev()->name());
+			//          fatalerror("connecting analog output %s with %s\n", out.netdev()->name(), in->netdev()->name());
+			//          fatalerror("connecting analog output %s with %s\n", out.netdev()->name(), in->netdev()->name());
 			netdev_a_to_d_proxy *proxy = new netdev_a_to_d_proxy(*in);
 			proxy->init(this, "abc");
 			proxy->start();
@@ -933,7 +933,7 @@ void netlist_mame_device::device_reset()
 void netlist_mame_device::device_stop()
 {
 	m_setup->print_stats();
-	
+
 	global_free(m_setup);
 	global_free(m_netlist);
 }
@@ -972,9 +972,9 @@ ATTR_HOT void netlist_mame_device::execute_run()
 	//bool check_debugger = ((device_t::machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
 
 	// debugging
-	//m_ppc = m_pc;	// copy PC to previous PC
+	//m_ppc = m_pc; // copy PC to previous PC
 	//if (check_debugger)
-	//	debugger_instruction_hook(this, 0); //m_pc);
+	//  debugger_instruction_hook(this, 0); //m_pc);
 
 	m_netlist->process_list(m_icount);
 

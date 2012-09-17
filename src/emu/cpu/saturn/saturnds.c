@@ -71,7 +71,7 @@ static const char number_2_hex[]=
 
 
 // don't split branch and return, source relies on this ordering
-enum MNEMONICS 
+enum MNEMONICS
 {
 	Return, ReturnSetXM, ReturnSetCarry, ReturnClearCarry, ReturnFromInterrupt,
 	jump3,jump4,jump,
@@ -584,7 +584,7 @@ enum opcode_adr
 	AdrImmCount
 };
 
-struct OPCODE 
+struct OPCODE
 {
 	opcode_sel sel;
 	opcode_adr adr;

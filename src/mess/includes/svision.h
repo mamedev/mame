@@ -7,13 +7,13 @@
 #ifndef SVISION_H_
 #define SVISION_H_
 
-struct svision_t 
+struct svision_t
 {
 	emu_timer *timer1;
 	int timer_shot;
 };
 
-struct svision_pet_t 
+struct svision_pet_t
 {
 	int state;
 	int on, clock, data;
@@ -21,7 +21,7 @@ struct svision_pet_t
 	emu_timer *timer;
 };
 
-struct tvlink_t 
+struct tvlink_t
 {
 	UINT32 palette[4/*0x40?*/]; /* rgb8 */
 	int palette_on;

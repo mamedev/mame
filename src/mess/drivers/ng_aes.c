@@ -44,7 +44,7 @@ static const char *audio_banks[4] =
 };
 
 // CD-ROM / DMA control registers
-struct neocd_ctrl_t 
+struct neocd_ctrl_t
 {
 	UINT8 area_sel;
 	UINT8 pcm_bank_sel;
@@ -91,7 +91,7 @@ public:
 	DECLARE_MACHINE_START(neocd);
 	DECLARE_MACHINE_START(neogeo);
 	DECLARE_MACHINE_RESET(neogeo);
-	
+
 };
 
 

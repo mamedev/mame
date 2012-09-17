@@ -34,7 +34,7 @@ class amm;
 
 class ymz770_device : public device_t, public device_sound_interface
 {
-    struct ymz_channel 
+    struct ymz_channel
     {
         UINT8 phrase;
         UINT8 pan;

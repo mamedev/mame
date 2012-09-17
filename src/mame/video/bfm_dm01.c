@@ -52,7 +52,7 @@ Standard dm01 memorymap
 
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-struct bfmdm01 
+struct bfmdm01
 {
 	const bfmdm01_interface *intf;
 	int		 data_avail,

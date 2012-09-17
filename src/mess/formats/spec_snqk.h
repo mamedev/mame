@@ -141,7 +141,7 @@ void spectrum_setup_raw(running_machine &machine, UINT8 *quickdata, UINT32 quick
 #define FRZ_HDR    42
 #define FRZ_SIZE   (FRZ_HDR + 8*SPECTRUM_BANK)
 
-enum SPECTRUM_SNAPSHOT_TYPE 
+enum SPECTRUM_SNAPSHOT_TYPE
 {
     SPECTRUM_SNAPSHOT_NONE,
     SPECTRUM_SNAPSHOT_SNA,

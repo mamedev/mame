@@ -14,7 +14,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-enum vic2_type 
+enum vic2_type
 {
 	VIC6567,	// VIC II NTSC
 	VIC6569,	// VIC II PAL

@@ -79,7 +79,7 @@ static const unsigned short vdt911_palette[] =
 	2, 1	/* low intensity, reverse */
 };
 
-struct vdt_t 
+struct vdt_t
 {
 	vdt911_screen_size_t screen_size;	/* char_960 for 960-char, 12-line model; char_1920 for 1920-char, 24-line model */
 	vdt911_model_t model;				/* country code */

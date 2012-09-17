@@ -580,7 +580,7 @@ DRIVER_INIT_MEMBER(boogwing_state,boogwing)
 	deco56_remap_gfx(machine(), "gfx6");
 	deco102_decrypt_cpu(machine(), "maincpu", 0x42ba, 0x00, 0x18);
 	memcpy(dst, src, 0x100000);
-	
+
 	decoprot_reset(machine());
 }
 

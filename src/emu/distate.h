@@ -163,7 +163,7 @@ public:
 	void set_state_int(int index, UINT64 value);
 	void set_state_string(int index, const char *string);
 	void set_pc(offs_t pc) { set_state_int(STATE_GENPC, pc); }
-	
+
 	// deliberately ambiguous functions; if you have the state interface
 	// just use it or pc() and pcbase() directly
 	device_state_interface &state() { return *this; }
@@ -213,7 +213,7 @@ typedef device_interface_iterator<device_state_interface> state_interface_iterat
 
 //-------------------------------------------------
 //  device_t::safe_pc - return the current PC
-//	or 0 if no state object exists
+//  or 0 if no state object exists
 //-------------------------------------------------
 
 inline offs_t device_t::safe_pc()
@@ -223,8 +223,8 @@ inline offs_t device_t::safe_pc()
 
 
 //-------------------------------------------------
-//  device_t::safe_pcbase - return the current PC 
-//	base or 0 if no state object exists
+//  device_t::safe_pcbase - return the current PC
+//  base or 0 if no state object exists
 //-------------------------------------------------
 
 inline offs_t device_t::safe_pcbase()

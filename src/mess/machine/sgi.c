@@ -24,7 +24,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 	}
 }
 
-struct MC_t 
+struct MC_t
 {
 	emu_timer *tUpdateTimer;
 	UINT32 nCPUControl0;

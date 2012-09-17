@@ -5,7 +5,7 @@
 
 #define MAX_VS920A 2
 
-struct sVS920A 
+struct sVS920A
 {
 	tilemap_t* tmap;
 	UINT16* vram;
@@ -18,7 +18,7 @@ struct sVS920A
 
 #define MAX_MB60553 2
 
-struct tMB60553 
+struct tMB60553
 {
 	tilemap_t* tmap;
 	UINT16* vram;
@@ -33,7 +33,7 @@ struct tMB60553
 
 #define MAX_CG10103 2
 
-struct tCG10103 
+struct tCG10103
 {
 	UINT16* vram;
 	UINT16 pal_base;

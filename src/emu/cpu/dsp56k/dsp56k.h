@@ -30,7 +30,7 @@ DECLARE_LEGACY_CPU_DEVICE(DSP56156, dsp56k);
     STRUCTURES & TYPEDEFS
 ***************************************************************************/
 // 5-4 Host Interface
-struct dsp56k_host_interface 
+struct dsp56k_host_interface
 {
 	// **** Dsp56k side **** //
 	// Host Control Register
@@ -65,7 +65,7 @@ struct dsp56k_host_interface
 };
 
 // 1-9 ALU
-struct dsp56k_data_alu 
+struct dsp56k_data_alu
 {
 	// Four 16-bit input registers (can be accessed as 2 32-bit registers)
 	PAIR x;
@@ -82,7 +82,7 @@ struct dsp56k_data_alu
 };
 
 // 1-10 Address Generation Unit (AGU)
-struct dsp56k_agu 
+struct dsp56k_agu
 {
 	// Four address registers
 	UINT16 r0;
@@ -112,7 +112,7 @@ struct dsp56k_agu
 };
 
 // 1-11 Program Control Unit (PCU)
-struct dsp56k_pcu 
+struct dsp56k_pcu
 {
 	// Program Counter
 	UINT16 pc;
@@ -149,7 +149,7 @@ struct dsp56k_pcu
 };
 
 // 1-8 The dsp56156 CORE
-struct dsp56k_core 
+struct dsp56k_core
 {
 	// PROGRAM CONTROLLER
 	dsp56k_pcu PCU;

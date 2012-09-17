@@ -94,7 +94,7 @@ void decoprot_reset(running_machine &machine)
 	deco16_mask=0xffff;
 	decoprot_last_write=decoprot_last_write_val=0;
 	decoprot_buffer_ram_selected=0;
-	
+
 	deco16_prot_ram = reinterpret_cast<UINT16 *>(machine.root_device().memshare("prot16ram")->ptr());
 	deco32_prot_ram = reinterpret_cast<UINT32 *>(machine.root_device().memshare("prot32ram")->ptr());
 

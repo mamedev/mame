@@ -19,12 +19,12 @@
 #define ANALOG_HACK
 
 
-struct SPRITE_HELPER 
+struct SPRITE_HELPER
 {
 	UINT8 bitmap[10],x1,x2,y1,y2, res1, res2;
 };
 
-struct SPRITE 
+struct SPRITE
 {
 	const SPRITE_HELPER *data;
 	int mask;
@@ -37,7 +37,7 @@ struct SPRITE
 	int finished_now;
 };
 
-struct vc4000_video_t 
+struct vc4000_video_t
 {
 	SPRITE sprites[4];
 	int line;

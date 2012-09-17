@@ -1,7 +1,7 @@
 #ifndef __GMASTER_H__
 #define __GMASTER_H__
 
-struct GMASTER_VIDEO 
+struct GMASTER_VIDEO
 {
 	UINT8 data[8];
 	int index;
@@ -11,7 +11,7 @@ struct GMASTER_VIDEO
 	UINT8 pixels[8][64/*>=62 sure*/];
 };
 
-struct GMASTER_MACHINE 
+struct GMASTER_MACHINE
 {
 	UINT8 ports[5];
 };

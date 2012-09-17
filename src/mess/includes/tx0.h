@@ -55,7 +55,7 @@ enum irg_pos_t
 
 
 /* tape reader registers */
-struct tape_reader_t 
+struct tape_reader_t
 {
 	device_image_interface *fd;	/* file descriptor of tape image */
 
@@ -70,7 +70,7 @@ struct tape_reader_t
 
 
 /* tape puncher registers */
-struct tape_puncher_t 
+struct tape_puncher_t
 {
 	device_image_interface *fd;	/* file descriptor of tape image */
 
@@ -80,7 +80,7 @@ struct tape_puncher_t
 
 
 /* typewriter registers */
-struct typewriter_t 
+struct typewriter_t
 {
 	device_image_interface *fd;	/* file descriptor of output image */
 
@@ -89,7 +89,7 @@ struct typewriter_t
 
 
 /* magnetic tape unit registers */
-struct magtape_t 
+struct magtape_t
 {
 	device_image_interface *img;		/* image descriptor */
 

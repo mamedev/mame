@@ -1446,10 +1446,10 @@ static const k056832_interface djmain_k056832_intf =
 	djmain_tile_callback, "none"
 };
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	ide_interrupt, 
-	NULL, 
+	ide_interrupt,
+	NULL,
 	0
 };
 

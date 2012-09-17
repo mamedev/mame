@@ -27,7 +27,7 @@ can be expanded with support for the other drives as needed.
 #define MATSU_STATUS_MEDIA		( 1 << 6 )	/* media present (in caddy or tray) */
 #define MATSU_STATUS_DOORCLOSED	( 1 << 7 )	/* tray status */
 
-struct matsucd 
+struct matsucd
 {
 	UINT8	enabled;		/* /ENABLE - Unit enabled */
 	UINT8	cmd_signal;		/* /CMD - Command mode   */

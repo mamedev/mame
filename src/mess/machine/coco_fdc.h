@@ -13,7 +13,7 @@
 
 // ======================> coco_rtc_type_t
 
-enum coco_rtc_type_t 
+enum coco_rtc_type_t
 {
 	RTC_DISTO	= 0x00,
 	RTC_CLOUD9	= 0x01,

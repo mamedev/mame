@@ -75,7 +75,7 @@
 #define FDC_TAG                 "wd1793"
 
 
-struct keyboard_t 
+struct keyboard_t
 {
 	UINT8       keyrows[MBC55X_KEYROWS];
 	emu_timer   *keyscan_timer;
@@ -161,7 +161,7 @@ public:
 /* IO chips */
 
 
-struct msm_rx_t 
+struct msm_rx_t
 {
 };
 

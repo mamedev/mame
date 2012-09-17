@@ -30,7 +30,7 @@
 #define KEY_MODE_FM16B 1 // FM-16B (FM-77AV and later only)
 #define KEY_MODE_SCAN  2 // Scancode Make/Break (PC-like)
 
-struct fm7_encoder_t 
+struct fm7_encoder_t
 {
 	UINT8 buffer[12];
 	UINT8 tx_count;
@@ -42,7 +42,7 @@ struct fm7_encoder_t
 	UINT8 position;
 };
 
-struct fm7_mmr_t 
+struct fm7_mmr_t
 {
 	UINT8 bank_addr[8][16];
 	UINT8 segment;
@@ -51,7 +51,7 @@ struct fm7_mmr_t
 	UINT8 mode;
 };
 
-struct fm7_video_t 
+struct fm7_video_t
 {
 	UINT8 sub_busy;
 	UINT8 sub_halt;
@@ -77,7 +77,7 @@ struct fm7_video_t
 	UINT8 vsync_flag;
 };
 
-struct fm7_alu_t 
+struct fm7_alu_t
 {
 	UINT8 command;
 	UINT8 lcolour;

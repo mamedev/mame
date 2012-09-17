@@ -419,11 +419,11 @@ void wd33c93_device::dispatch_command()
 	case WD_CMD_RESET:
 		reset_cmd();
 		break;
-		
+
 	case WD_CMD_ABORT:
 		abort_cmd();
 		break;
-		
+
 	case WD_CMD_NEGATE_ACK:
 		negate_ack();
 		break;

@@ -13,7 +13,7 @@
 #include "machine/ieee488.h"
 #include "imagedev/cartslot.h"
 
-struct spet_t 
+struct spet_t
 {
 	int bank; /* rambank to be switched in 0x9000 */
 	int rom; /* rom socket 6502? at 0x9000 */

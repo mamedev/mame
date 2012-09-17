@@ -224,19 +224,19 @@ sega_32x_device::sega_32x_device(const machine_config &mconfig, const char *tag,
 	  m_lch_pwm(*this, "lch_pwm"),
 	  m_rch_pwm(*this, "rch_pwm")
 {
-	
+
 }
 
 sega_32x_ntsc_device::sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_32x_device(mconfig, tag, owner, clock, SEGA_32X_NTSC)
 {
-	
+
 }
 
 sega_32x_pal_device::sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_32x_device(mconfig, tag, owner, clock, SEGA_32X_PAL)
 {
-	
+
 }
 
 TIMER_CALLBACK( _32x_pwm_callback );
@@ -1520,7 +1520,7 @@ ADDRESS_MAP_START( sh2_main_map, AS_PROGRAM, 32, sega_32x_device )
 
 	AM_RANGE(0x00004100, 0x0000410b) AM_READWRITE16(_32x_common_vdp_regs_r, _32x_common_vdp_regs_w , 0xffffffff)
 	AM_RANGE(0x00004200, 0x000043ff) AM_READWRITE16(_32x_68k_palette_r, _32x_68k_palette_w, 0xffffffff)
-	
+
 	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE16(_32x_68k_dram_r, _32x_68k_dram_w, 0xffffffff)
 	AM_RANGE(0x04020000, 0x0403ffff) AM_READWRITE16(_32x_68k_dram_overwrite_r, _32x_68k_dram_overwrite_w, 0xffffffff)
 
@@ -1735,7 +1735,7 @@ static const sh2_cpu_core sh2_conf_slave  = { 1, NULL, _32x_fifo_available_callb
 
 #if 0
 // for now we just use the regular loading because we have 2 different BIOS roms, and you can't use -bios within a device for obvious reasons
-ROM_START( 32x )	
+ROM_START( 32x )
 	ROM_REGION( 0x400000, "32x_master_sh2", 0 )
 	ROM_REGION( 0x400000, "32x_slave_sh2", 0 )
 ROM_END
@@ -1778,7 +1778,7 @@ static MACHINE_CONFIG_FRAGMENT( _32x_ntsc )
 	MCFG_CPU_PROGRAM_MAP(sh2_main_map)
 	MCFG_CPU_CONFIG(sh2_conf_master)
 #endif
-	
+
 	MCFG_DAC_ADD("lch_pwm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":lspeaker", 0.40)
 
@@ -1805,7 +1805,7 @@ static MACHINE_CONFIG_FRAGMENT( _32x_pal )
 	MCFG_CPU_PROGRAM_MAP(sh2_main_map)
 	MCFG_CPU_CONFIG(sh2_conf_master)
 #endif
-	
+
 	MCFG_DAC_ADD("lch_pwm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":lspeaker", 0.40)
 
@@ -1900,7 +1900,7 @@ void sega_32x_device::device_reset()
 	machine().device(":maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa15104, 0xa15105, read16_delegate(FUNC(sega_32x_device::_32x_68k_a15104_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_a15104_w),this)); // 68k BANK rom set
 	machine().device(":maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa15106, 0xa15107, read16_delegate(FUNC(sega_32x_device::_32x_68k_a15106_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_a15106_w),this)); // dreq stuff
 	machine().device(":maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa15108, 0xa15113, read16_delegate(FUNC(sega_32x_device::_32x_dreq_common_r),this), write16_delegate(FUNC(sega_32x_device::_32x_dreq_common_w),this)); // dreq src / dst / length /fifo
-	
+
 	machine().device(":maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa1511a, 0xa1511b, read16_delegate(FUNC(sega_32x_device::_32x_68k_a1511a_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_a1511a_w),this)); // SEGA TV
 
 	machine().device(":maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa15120, 0xa1512f, read16_delegate(FUNC(sega_32x_device::_32x_68k_m_commsram_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_m_commsram_w),this)); // comms reg 0-7

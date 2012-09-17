@@ -576,7 +576,7 @@ READ8_MEMBER(vk100_state::SYSTAT_A)
  * write command -> 0x05 (normal, normal, /RTS is 1, normal, normal, recieve ON, /DTR is 0, transmit off)
  * read SYSTAT B (and xor with 0xe), expect d7 to be SET or jump to error
  * after this it does something and waits for an rxrdy interrupt
- 
+
  shows the results of:
  * ACTS (/CTS)  ?      ?      ?      ?      ?      ?      ?
  * d7           d6     d5     d4     d3     d2     d1     d0

@@ -61,7 +61,7 @@ DECLARE_LEGACY_CPU_DEVICE(TI990_10L, ti990_10l);
     structure with the parameters ti990_10_reset wants.
 */
 
-struct ti990_10reset_param 
+struct ti990_10reset_param
 {
 	ti99xx_idle_func	idle_callback;
 	ti99xx_rset_func	rset_callback;
@@ -87,7 +87,7 @@ DECLARE_LEGACY_CPU_DEVICE(TMS9900L, tms9900l);
 /*
     structure with optional parameters for tms9900_reset.
 */
-struct tms9900reset_param 
+struct tms9900reset_param
 {
 	ti99xx_idle_func	idle_callback;
 };
@@ -99,7 +99,7 @@ struct tms9900reset_param
 /*
     structure with optional parameters for tms9940_reset.
 */
-struct tms9940reset_param 
+struct tms9940reset_param
 {
 	ti99xx_idle_func	idle_callback;
 };
@@ -111,7 +111,7 @@ DECLARE_LEGACY_CPU_DEVICE(TMS9980L, tms9980al);
 /*
     structure with optional parameters for tms9980a_reset.
 */
-struct tms9980areset_param 
+struct tms9980areset_param
 {
 	ti99xx_idle_func	idle_callback;
 };
@@ -123,7 +123,7 @@ struct tms9980areset_param
 /*//
     structure with optional parameters for tms9985_reset.
 */
-struct tms9985reset_param 
+struct tms9985reset_param
 {
 	ti99xx_idle_func	idle_callback;
 };
@@ -135,7 +135,7 @@ struct tms9985reset_param
 /*
     structure with optional parameters for tms9989_reset.
 */
-struct tms9989reset_param 
+struct tms9989reset_param
 {
 	ti99xx_idle_func	idle_callback;
 };
@@ -147,7 +147,7 @@ DECLARE_LEGACY_CPU_DEVICE(TMS9995L, tms9995l);
 /*
   structure with the parameters tms9995_reset wants.
 */
-struct tms9995reset_param 
+struct tms9995reset_param
 {
 	/* auto_wait_state : a non-zero value makes tms9995 generate a wait state automatically on each
        memory access */
@@ -175,7 +175,7 @@ extern WRITE8_HANDLER(tms9995_internal2_w);
 /*
     structure with optional parameters for tms99000_reset.
 */
-struct tms99000reset_param 
+struct tms99000reset_param
 {
 	ti99xx_idle_func	idle_callback;
 };
@@ -187,7 +187,7 @@ struct tms99000reset_param
 /*
     structure with optional parameters for tms99105a_reset.
 */
-struct tms99105areset_param 
+struct tms99105areset_param
 {
 	ti99xx_idle_func	idle_callback;
 };
@@ -199,7 +199,7 @@ struct tms99105areset_param
 /*
     structure with optional parameters for tms99110a_reset.
 */
-struct tms99110areset_param 
+struct tms99110areset_param
 {
 	ti99xx_idle_func	idle_callback;
 };

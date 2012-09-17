@@ -40,7 +40,7 @@
 #include "machine/nvram.h"
 
 
-struct EEPROM 
+struct EEPROM
 {
 	UINT8	mode;		/* eeprom mode */
 	UINT16	address;	/* Read/write address */
@@ -52,7 +52,7 @@ struct EEPROM
 	UINT8	*page;		/* pointer to current sram/eeprom page */
 };
 
-struct RTC 
+struct RTC
 {
 	UINT8	present;	/* Is an RTC present */
 	UINT8	setting;	/* Timer setting byte */
@@ -66,14 +66,14 @@ struct RTC
 	UINT8	index;		/* index for reading/writing of current of alarm time */
 };
 
-struct SoundDMA 
+struct SoundDMA
 {
 	UINT32	source;		/* Source address */
 	UINT16	size;		/* Size */
 	UINT8	enable;		/* Enabled */
 };
 
-struct VDP 
+struct VDP
 {
 	UINT8 layer_bg_enable;			/* Background layer on/off */
 	UINT8 layer_fg_enable;			/* Foreground layer on/off */

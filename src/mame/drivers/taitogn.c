@@ -938,10 +938,10 @@ static void spu_irq(device_t *device, UINT32 data)
 	}
 }
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	NULL, 
-	NULL, 
+	NULL,
+	NULL,
 	0
 };
 

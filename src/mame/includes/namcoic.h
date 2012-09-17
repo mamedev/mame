@@ -142,7 +142,7 @@ protected:
 	TILE_GET_INFO_MEMBER( get_road_info );
 
 	// internal state
-	pen_t 			m_transparent_color;
+	pen_t			m_transparent_color;
 	gfx_element *	m_gfx;
 	tilemap_t *		m_tilemap;
 	UINT16			m_ram[0x20000/2]; // at 0x880000 in Final Lap; at 0xa00000 in Lucky&Wild

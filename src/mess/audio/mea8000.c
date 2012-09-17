@@ -44,7 +44,7 @@
 
 
 /* finite machine state controling frames */
-enum mea8000_state 
+enum mea8000_state
 {
 	MEA8000_STOPPED,    /* nothing to do, timer disabled */
 	MEA8000_WAIT_FIRST, /* received pitch, wait for first full trame, timer disabled */
@@ -55,7 +55,7 @@ enum mea8000_state
 ALLOW_SAVE_TYPE( mea8000_state );
 
 
-struct filter_t 
+struct filter_t
 {
 #ifdef FLOAT_MODE
 	double fm, last_fm;         /* frequency, in Hz */
@@ -70,7 +70,7 @@ struct filter_t
 
 
 
-struct mea8000_t 
+struct mea8000_t
 {
 
 	/* configuration parameters */

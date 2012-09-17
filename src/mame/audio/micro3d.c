@@ -20,13 +20,13 @@
  *
  *************************************/
 
-struct biquad 
+struct biquad
 {
 	double a0, a1, a2;		/* Numerator coefficients */
 	double b0, b1, b2;		/* Denominator coefficients */
 };
 
-struct lp_filter 
+struct lp_filter
 {
 	float *history;
 	float *coef;

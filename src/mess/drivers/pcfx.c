@@ -79,7 +79,7 @@ WRITE8_MEMBER(pcfx_state::extio_w)
 
 static ADDRESS_MAP_START( pcfx_mem, AS_PROGRAM, 32, pcfx_state )
 	AM_RANGE( 0x00000000, 0x001FFFFF ) AM_RAM	/* RAM */
-//	AM_RANGE( 0x80000000, 0x807FFFFF ) AM_READWRITE8(extio_r,extio_w,0xffffffff)	/* EXTIO */
+//  AM_RANGE( 0x80000000, 0x807FFFFF ) AM_READWRITE8(extio_r,extio_w,0xffffffff)    /* EXTIO */
 	AM_RANGE( 0xE0000000, 0xE7FFFFFF ) AM_NOP	/* BackUp RAM */
 	AM_RANGE( 0xE8000000, 0xE9FFFFFF ) AM_NOP	/* Extended BackUp RAM */
 	AM_RANGE( 0xF8000000, 0xF8000007 ) AM_NOP	/* PIO */
@@ -95,9 +95,9 @@ READ16_MEMBER( pcfx_state::pad_r )
 	{
 		// status
 		/*
-		---- x---
-		---- ---x incoming data state (0=available)
-		*/
+        ---- x---
+        ---- ---x incoming data state (0=available)
+        */
 		res = m_pad.status[port_type];
 		//printf("STATUS %d\n",port_type);
 	}
@@ -126,7 +126,7 @@ static TIMER_CALLBACK(pad_func)
 	state->m_pad.status[param] |= 8;
 	state->m_pad.ctrl[param] &= ~1; // ack TX line
 	// TODO: pad IRQ
-//	state->set_irq_line(11, 1);
+//  state->set_irq_line(11, 1);
 }
 
 WRITE16_MEMBER( pcfx_state::pad_w )
@@ -137,10 +137,10 @@ WRITE16_MEMBER( pcfx_state::pad_w )
 	{
 		// control
 		/*
-		---- -x-- receiver enable
-		---- --x- enable multi-tap
-		---- ---x enable send (0->1 transition)
-		*/
+        ---- -x-- receiver enable
+        ---- --x- enable multi-tap
+        ---- ---x enable send (0->1 transition)
+        */
 		if(data & 1 && (!(m_pad.ctrl[port_type] & 1)))
 		{
 			machine().scheduler().timer_set(attotime::from_msec(1), FUNC(pad_func), port_type); // TODO: time
@@ -168,7 +168,7 @@ static ADDRESS_MAP_START( pcfx_io, AS_IO, 32, pcfx_state )
 	AM_RANGE( 0x00000C80, 0x00000C83 ) AM_NOP
 	AM_RANGE( 0x00000E00, 0x00000EFF ) AM_READWRITE16( irq_read, irq_write, 0xffff )	/* Interrupt controller */
 	AM_RANGE( 0x00000F00, 0x00000FFF ) AM_NOP
-//	AM_RANGE( 0x00600000, 0x006FFFFF ) AM_READ(scsi_ctrl_r)
+//  AM_RANGE( 0x00600000, 0x006FFFFF ) AM_READ(scsi_ctrl_r)
 	AM_RANGE( 0x00780000, 0x007FFFFF ) AM_ROM AM_REGION("scsi_rom", 0 )
 	AM_RANGE( 0x80500000, 0x805000FF ) AM_NOP	/* HuC6273 */
 ADDRESS_MAP_END
@@ -176,8 +176,8 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pcfx )
 	/*
-	xxxx ---- ---- ---- ID (0xf = 6 button pad, 0xe = tap, 0xd = ?)
-	*/
+    xxxx ---- ---- ---- ID (0xf = 6 button pad, 0xe = tap, 0xd = ?)
+    */
 	PORT_START("P1")
 	PORT_BIT( 0xf0000000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ID
 	PORT_DIPNAME( 0x01000000, 0x01000000, "1" )

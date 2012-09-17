@@ -25,7 +25,7 @@
 // ======================> diag264_user_port_loopback_device
 
 class diag264_user_port_loopback_device :  public device_t,
-						   				   public device_plus4_user_port_interface
+										   public device_plus4_user_port_interface
 {
 public:
     // construction/destruction

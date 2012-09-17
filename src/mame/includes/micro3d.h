@@ -116,7 +116,7 @@ public:
 	virtual void video_reset();
 };
 
-struct micro3d_vtx 
+struct micro3d_vtx
 {
 	INT32 x, y, z;
 };

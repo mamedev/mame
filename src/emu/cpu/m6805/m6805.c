@@ -45,7 +45,7 @@ enum
 };
 
 /* 6805 Registers */
-struct m6805_Regs 
+struct m6805_Regs
 {
 	/* Pre-pointerafied public globals */
 	int iCount;

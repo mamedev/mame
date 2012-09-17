@@ -19,7 +19,7 @@
 #include "machine/psxcd.h"
 #include "machine/psxcard.h"
 
-struct pad_t 
+struct pad_t
 {
 	UINT8 n_shiftin;
 	UINT8 n_shiftout;

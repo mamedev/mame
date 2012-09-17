@@ -35,7 +35,7 @@ static void schedule_chained_dma_op(SHARC_REGS *cpustate, int channel, UINT32 dm
 	}
 	else						// Receive from external
 	{
-		cpustate->dma_op[channel].src 			= ext_index;
+		cpustate->dma_op[channel].src			= ext_index;
 		cpustate->dma_op[channel].src_modifier	= ext_modifier;
 		cpustate->dma_op[channel].src_count		= ext_count;
 		cpustate->dma_op[channel].dst			= int_index;
@@ -89,7 +89,7 @@ static void dma_op(SHARC_REGS *cpustate, int channel)
 	int src_modifier	= cpustate->dma_op[channel].src_modifier;
 	int dst_modifier	= cpustate->dma_op[channel].dst_modifier;
 	int src_count		= cpustate->dma_op[channel].src_count;
-	//int dst_count		= cpustate->dma_op[channel].dst_count;
+	//int dst_count     = cpustate->dma_op[channel].dst_count;
 	int pmode			= cpustate->dma_op[channel].pmode;
 
 	//printf("dma_op: %08X, %08X, %08X, %08X, %08X, %08X, %d\n", src, dst, src_modifier, dst_modifier, src_count, dst_count, pmode);

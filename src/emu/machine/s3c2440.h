@@ -45,7 +45,7 @@ class s3c2440_device : public device_t
 public:
 	s3c2440_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~s3c2440_device() { global_free(m_token); }
-   
+
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
 protected:
@@ -56,7 +56,7 @@ protected:
 private:
 	// internal state
 	void *m_token;
-public:	
+public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
@@ -527,17 +527,17 @@ static const UINT32 MAP_SUBINT_TO_INT[15] =
     TYPE DEFINITIONS
 *******************************************************************************/
 
-struct s3c24xx_memcon_regs_t 
+struct s3c24xx_memcon_regs_t
 {
 	UINT32 data[0x34/4];
 };
 
-struct s3c24xx_usbhost_regs_t 
+struct s3c24xx_usbhost_regs_t
 {
 	UINT32 data[0x5C/4];
 };
 
-struct s3c24xx_irq_regs_t 
+struct s3c24xx_irq_regs_t
 {
 	UINT32 srcpnd;
 	UINT32 intmod;
@@ -549,7 +549,7 @@ struct s3c24xx_irq_regs_t
 	UINT32 intsubmsk;
 };
 
-struct s3c24xx_dma_regs_t 
+struct s3c24xx_dma_regs_t
 {
 	UINT32 disrc;
 	UINT32 disrcc;
@@ -562,7 +562,7 @@ struct s3c24xx_dma_regs_t
 	UINT32 dmasktrig;
 };
 
-struct s3c24xx_clkpow_regs_t 
+struct s3c24xx_clkpow_regs_t
 {
 	UINT32 locktime;
 	UINT32 mpllcon;
@@ -573,7 +573,7 @@ struct s3c24xx_clkpow_regs_t
 	UINT32 camdivn;
 };
 
-struct s3c24xx_lcd_regs_t 
+struct s3c24xx_lcd_regs_t
 {
 	UINT32 lcdcon1;
 	UINT32 lcdcon2;
@@ -595,12 +595,12 @@ struct s3c24xx_lcd_regs_t
 	UINT32 tconsel;
 };
 
-struct s3c24xx_lcdpal_regs_t 
+struct s3c24xx_lcdpal_regs_t
 {
 	UINT32 data[0x400/4];
 };
 
-struct s3c24xx_nand_regs_t 
+struct s3c24xx_nand_regs_t
 {
 	UINT32 nfconf;
 	UINT32 nfcont;
@@ -620,12 +620,12 @@ struct s3c24xx_nand_regs_t
 	UINT32 nfeblk;
 };
 
-struct s3c24xx_cam_regs_t 
+struct s3c24xx_cam_regs_t
 {
 	UINT32 data[0xA4/4];
 };
 
-struct s3c24xx_uart_regs_t 
+struct s3c24xx_uart_regs_t
 {
 	UINT32 ulcon;
 	UINT32 ucon;
@@ -640,7 +640,7 @@ struct s3c24xx_uart_regs_t
 	UINT32 ubrdiv;
 };
 
-struct s3c24xx_pwm_regs_t 
+struct s3c24xx_pwm_regs_t
 {
 	UINT32 tcfg0;
 	UINT32 tcfg1;
@@ -661,19 +661,19 @@ struct s3c24xx_pwm_regs_t
 	UINT32 tcnto4;
 };
 
-struct s3c24xx_usbdev_regs_t 
+struct s3c24xx_usbdev_regs_t
 {
 	UINT32 data[0x130/4];
 };
 
-struct s3c24xx_wdt_regs_t 
+struct s3c24xx_wdt_regs_t
 {
 	UINT32 wtcon;
 	UINT32 wtdat;
 	UINT32 wtcnt;
 };
 
-struct s3c24xx_iic_regs_t 
+struct s3c24xx_iic_regs_t
 {
 	UINT32 iiccon;
 	UINT32 iicstat;
@@ -682,7 +682,7 @@ struct s3c24xx_iic_regs_t
 	UINT32 iiclc;
 };
 
-struct s3c24xx_iis_regs_t 
+struct s3c24xx_iis_regs_t
 {
 	UINT32 iiscon;
 	UINT32 iismod;
@@ -691,7 +691,7 @@ struct s3c24xx_iis_regs_t
 	UINT32 iisfifo;
 };
 
-struct s3c24xx_gpio_regs_t 
+struct s3c24xx_gpio_regs_t
 {
 	UINT32 gpacon;
 	UINT32 gpadat;
@@ -750,7 +750,7 @@ struct s3c24xx_gpio_regs_t
 	UINT32 gpjup;
 };
 
-struct s3c24xx_rtc_regs_t 
+struct s3c24xx_rtc_regs_t
 {
 	UINT32 rtccon;
 	UINT32 ticnt;
@@ -772,7 +772,7 @@ struct s3c24xx_rtc_regs_t
 	UINT32 bcdyear;
 };
 
-struct s3c24xx_adc_regs_t 
+struct s3c24xx_adc_regs_t
 {
 	UINT32 adccon;
 	UINT32 adctsc;
@@ -782,7 +782,7 @@ struct s3c24xx_adc_regs_t
 	UINT32 adcupdn;
 };
 
-struct s3c24xx_spi_regs_t 
+struct s3c24xx_spi_regs_t
 {
 	UINT32 spcon;
 	UINT32 spsta;
@@ -792,44 +792,44 @@ struct s3c24xx_spi_regs_t
 	UINT32 sprdat;
 };
 
-struct s3c24xx_sdi_regs_t 
+struct s3c24xx_sdi_regs_t
 {
 	UINT32 data[0x44/4];
 };
 
-struct s3c24xx_ac97_regs_t 
+struct s3c24xx_ac97_regs_t
 {
 	UINT32 data[0x20/4];
 };
 
-struct s3c24xx_memcon_t 
+struct s3c24xx_memcon_t
 {
 	s3c24xx_memcon_regs_t regs;
 };
 
-struct s3c24xx_usbhost_t 
+struct s3c24xx_usbhost_t
 {
 	s3c24xx_usbhost_regs_t regs;
 };
 
-struct s3c24xx_irq_t 
+struct s3c24xx_irq_t
 {
 	s3c24xx_irq_regs_t regs;
 	int line_irq, line_fiq;
 };
 
-struct s3c24xx_dma_t 
+struct s3c24xx_dma_t
 {
 	s3c24xx_dma_regs_t regs;
 	emu_timer *timer;
 };
 
-struct s3c24xx_clkpow_t 
+struct s3c24xx_clkpow_t
 {
 	s3c24xx_clkpow_regs_t regs;
 };
 
-struct s3c24xx_lcd_t 
+struct s3c24xx_lcd_t
 {
 	s3c24xx_lcd_regs_t regs;
 	emu_timer *timer;
@@ -848,12 +848,12 @@ struct s3c24xx_lcd_t
 	UINT32 dma_data, dma_bits;
 };
 
-struct s3c24xx_lcdpal_t 
+struct s3c24xx_lcdpal_t
 {
 	s3c24xx_lcdpal_regs_t regs;
 };
 
-struct s3c24xx_nand_t 
+struct s3c24xx_nand_t
 {
 	s3c24xx_nand_regs_t regs;
 	UINT8 mecc[4];
@@ -861,17 +861,17 @@ struct s3c24xx_nand_t
 	int ecc_pos, data_count;
 };
 
-struct s3c24xx_cam_t 
+struct s3c24xx_cam_t
 {
 	s3c24xx_cam_regs_t regs;
 };
 
-struct s3c24xx_uart_t 
+struct s3c24xx_uart_t
 {
 	s3c24xx_uart_regs_t regs;
 };
 
-struct s3c24xx_pwm_t 
+struct s3c24xx_pwm_t
 {
 	s3c24xx_pwm_regs_t regs;
 	emu_timer *timer[5];
@@ -880,25 +880,25 @@ struct s3c24xx_pwm_t
 	UINT32 freq[5];
 };
 
-struct s3c24xx_usbdev_t 
+struct s3c24xx_usbdev_t
 {
 	s3c24xx_usbdev_regs_t regs;
 };
 
-struct s3c24xx_wdt_t 
+struct s3c24xx_wdt_t
 {
 	s3c24xx_wdt_regs_t regs;
 	emu_timer *timer;
 };
 
-struct s3c24xx_iic_t 
+struct s3c24xx_iic_t
 {
 	s3c24xx_iic_regs_t regs;
 	emu_timer *timer;
 	int count;
 };
 
-struct s3c24xx_iis_t 
+struct s3c24xx_iis_t
 {
 	s3c24xx_iis_regs_t regs;
 	emu_timer *timer;
@@ -906,39 +906,39 @@ struct s3c24xx_iis_t
 	int fifo_index;
 };
 
-struct s3c24xx_gpio_t 
+struct s3c24xx_gpio_t
 {
 	s3c24xx_gpio_regs_t regs;
 };
 
-struct s3c24xx_rtc_t 
+struct s3c24xx_rtc_t
 {
 	s3c24xx_rtc_regs_t regs;
 	emu_timer *timer_tick_count;
 	emu_timer *timer_update;
 };
 
-struct s3c24xx_adc_t 
+struct s3c24xx_adc_t
 {
 	s3c24xx_adc_regs_t regs;
 };
 
-struct s3c24xx_spi_t 
+struct s3c24xx_spi_t
 {
 	s3c24xx_spi_regs_t regs;
 };
 
-struct s3c24xx_sdi_t 
+struct s3c24xx_sdi_t
 {
 	s3c24xx_sdi_regs_t regs;
 };
 
-struct s3c24xx_ac97_t 
+struct s3c24xx_ac97_t
 {
 	s3c24xx_ac97_regs_t regs;
 };
 
-struct s3c24xx_t 
+struct s3c24xx_t
 {
 	const s3c2440_interface *iface;
 	UINT8 steppingstone[4*1024];

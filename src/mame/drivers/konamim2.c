@@ -191,7 +191,7 @@ Notes:
 #include "cpu/powerpc/ppc.h"
 
 
-struct CDE_DMA 
+struct CDE_DMA
 {
 	UINT32 dst_addr;
 	int length;
@@ -498,14 +498,14 @@ static void cde_init(running_machine &machine)
 		memcpy(&state->m_cde_toc, toc, sizeof(cdrom_toc));
 
 		/*
-		printf("%d tracks\n", toc->numtrks);
-		for (int i=0; i < toc->numtrks; i++)
-		{
-			const cdrom_track_info *track = &toc->tracks[i];
-			printf("Track %d: type %d, subtype %d, datasize %d, subsize %d, frames %d, extraframes %d, physframeofs %d\n",
-					i, track->trktype, track->subtype, track->datasize, track->subsize,track->frames, track->extraframes, track->physframeofs);
-		}
-		*/
+        printf("%d tracks\n", toc->numtrks);
+        for (int i=0; i < toc->numtrks; i++)
+        {
+            const cdrom_track_info *track = &toc->tracks[i];
+            printf("Track %d: type %d, subtype %d, datasize %d, subsize %d, frames %d, extraframes %d, physframeofs %d\n",
+                    i, track->trktype, track->subtype, track->datasize, track->subsize,track->frames, track->extraframes, track->physframeofs);
+        }
+        */
 
 		cdrom_close(cdfile);
 	}

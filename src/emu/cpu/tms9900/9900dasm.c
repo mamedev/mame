@@ -27,7 +27,7 @@
 #define	MASK	0x0000ffff
 #define BITS(val,n1,n2)	((val>>(15-(n2))) & (MASK>>(15-((n2)-(n1)))))
 
-enum format_t 
+enum format_t
 {
 	format_1,	/* 2 address instructions */
 	format_2a,	/* jump instructions */
@@ -73,7 +73,7 @@ enum
 	sd_11_15	= 0x200		/* bits 11-15 should be cleared in lwpi, limi, idle, rset, rtwp, ckon, ckof, lrex */
 };
 
-struct description_t 
+struct description_t
 {
 	const char *mnemonic;
 	format_t format;

@@ -32,7 +32,7 @@ Theory of operation:
 #include "video/crt.h"
 
 
-struct point 
+struct point
 {
 	int intensity;		/* current intensity of the pixel */
 							/* a node is not in the list when (intensity == -1) */
@@ -44,7 +44,7 @@ enum
 	intensity_pixel_not_in_list = -1	/* special value that tells that the node is not in list */
 };
 
-struct crt_t 
+struct crt_t
 {
 	point *list;		/* array of (crt_window_width*crt_window_height) point */
 	int *list_head;	/* head of the list of lit pixels (index in the array) */

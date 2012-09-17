@@ -60,7 +60,7 @@ enum
     Configuration for the TMS9995. The connections are provided by the
     main board which contains the processor.
 */
-struct tms9995_config 
+struct tms9995_config
 {
 	devcb_write8		external_callback;
 	devcb_write_line	iaq_line;

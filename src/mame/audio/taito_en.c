@@ -284,15 +284,15 @@ static void taito_en_duart_irq_handler(device_t *device, int state, UINT8 vector
  *************************************/
 
 /*
-	68681 I/O pin assignments
-	(according to Gun Buster schematics):
+    68681 I/O pin assignments
+    (according to Gun Buster schematics):
 
-	IP0: 5V			OP0-OP5: N/C
-	IP1: 5V			OP6: ESPHALT
-	IP2: 1MHz		OP7: N/C
-	IP3: 0.5MHz
-	IP4: 0.5MHz
-	IP5: 1MHz
+    IP0: 5V         OP0-OP5: N/C
+    IP1: 5V         OP6: ESPHALT
+    IP2: 1MHz       OP7: N/C
+    IP3: 0.5MHz
+    IP4: 0.5MHz
+    IP5: 1MHz
 */
 static const duart68681_config taito_en_duart68681_config =
 {

@@ -25,7 +25,7 @@
 #include "hd6309.h"
 
 // Opcode structure
-struct opcodeinfo 
+struct opcodeinfo
 {
    UINT8	opcode;		// 8-bit opcode value
    UINT8	length;		// Opcode length in bytes

@@ -554,7 +554,7 @@ static void sprites_draw(running_machine &machine, bitmap_rgb32 &bitmap, const r
 
 	/* the existence of +1 (sprite vs tile layer) is supported by a LOT of games */
 	const int hoffset = 1;
-	
+
 	/* 16 of the 256 pixels of the sprites are hard-clipped at the line buffer */
 	/* according to the schematics, it should be the first 16 pixels */
 	clip.min_x = MAX(clip.min_x, (!state->m_flipscreen_x) * (16 + hoffset) * GALAXIAN_XSCALE);

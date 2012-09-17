@@ -63,7 +63,7 @@ private:
     	C352_FLG_REVERSE	= 0x0001,	// play sample backwards
     };
 
-    struct c352_ch_t 
+    struct c352_ch_t
     {
     	UINT8	vol_l;
     	UINT8	vol_r;

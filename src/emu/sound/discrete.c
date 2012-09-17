@@ -83,7 +83,7 @@ const device_type DISCRETE = &device_creator<discrete_sound_device>;
  *
  *************************************/
 
-struct output_buffer 
+struct output_buffer
 {
 	double						*node_buf;
 	const double				*source;
@@ -91,7 +91,7 @@ struct output_buffer
 	int							node_num;
 };
 
-struct input_buffer 
+struct input_buffer
 {
 	volatile const double		*ptr;				/* pointer into linked_outbuf.nodebuf */
 	output_buffer *				linked_outbuf;		/* what output are we connected to ? */

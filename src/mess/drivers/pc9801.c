@@ -8,7 +8,7 @@
     - floppy interface doesn't seem to work at all with either floppy inserted or not, missing DMA irq?
     - proper 8251 uart hook-up on keyboard
     - boot is too slow right now, might be due of the floppy / HDD devices
-	- investigate on POR bit
+    - investigate on POR bit
 
     TODO (PC-9801RS):
     - floppy disk hook-up;
@@ -17,7 +17,7 @@
 
     TODO (PC-9821):
     - fix CPU for some clones;
-	- PARITY ERROR, presumably it needs a far better emulation of the i8251 ports
+    - PARITY ERROR, presumably it needs a far better emulation of the i8251 ports
 
     TODO: (PC-486MU)
     - Tries to read port C of i8255_sys (-> 0x35) at boot without setting up the control

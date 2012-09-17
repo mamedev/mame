@@ -7,7 +7,7 @@
 #ifndef INTV_H_
 #define INTV_H_
 
-struct intv_sprite_type 
+struct intv_sprite_type
 {
 	int visible;
 	int xpos;

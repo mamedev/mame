@@ -29,7 +29,7 @@ public:
 	/* misc */
 	int         m_adpcm_pos;
 	int         m_adpcm_data;
-	
+
 	optional_shared_ptr<UINT8> m_cadash_shared_ram;
 
 	/* devices */

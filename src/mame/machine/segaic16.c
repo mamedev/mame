@@ -83,7 +83,7 @@ sega_16bit_common_base::sega_16bit_common_base(const machine_config &mconfig, de
 
 //-------------------------------------------------
 //  open_bus_r - return value from reading an
-//	unmapped address
+//  unmapped address
 //-------------------------------------------------
 
 READ16_MEMBER( sega_16bit_common_base::open_bus_r )
@@ -110,28 +110,28 @@ READ16_MEMBER( sega_16bit_common_base::open_bus_r )
 
 //-------------------------------------------------
 //  palette_init - precompute weighted RGB values
-//	for each input value 0-31
+//  for each input value 0-31
 //-------------------------------------------------
 
 void sega_16bit_common_base::palette_init()
 {
 	//
-	//	Color generation details
+	//  Color generation details
 	//
-	//	Each color is made up of 5 bits, connected through one or more resistors like so:
+	//  Each color is made up of 5 bits, connected through one or more resistors like so:
 	//
-	//	Bit 0 = 1 x 3.9K ohm
-	//	Bit 1 = 1 x 2.0K ohm
-	//	Bit 2 = 1 x 1.0K ohm
-	//	Bit 3 = 2 x 1.0K ohm
-	//	Bit 4 = 4 x 1.0K ohm
+	//  Bit 0 = 1 x 3.9K ohm
+	//  Bit 1 = 1 x 2.0K ohm
+	//  Bit 2 = 1 x 1.0K ohm
+	//  Bit 3 = 2 x 1.0K ohm
+	//  Bit 4 = 4 x 1.0K ohm
 	//
-	//	Another data bit is connected by a tristate buffer to the color output through a
-	//	470 ohm resistor. The buffer allows the resistor to have no effect (tristate),
-	//	halve brightness (pull-down) or double brightness (pull-up). The data bit source
-	//	is bit 15 of each color RAM entry.
+	//  Another data bit is connected by a tristate buffer to the color output through a
+	//  470 ohm resistor. The buffer allows the resistor to have no effect (tristate),
+	//  halve brightness (pull-down) or double brightness (pull-up). The data bit source
+	//  is bit 15 of each color RAM entry.
 	//
-	
+
 	// compute weight table for regular palette entries
 	static const int resistances_normal[6] = { 3900, 2000, 1000, 1000/2, 1000/4, 0   };
 	double weights_normal[6];

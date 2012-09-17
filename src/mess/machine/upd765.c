@@ -30,7 +30,7 @@
 #include "machine/upd765.h"
 
 
-enum UPD765_PHASE 
+enum UPD765_PHASE
 {
 	UPD765_COMMAND_PHASE_FIRST_BYTE,
 	UPD765_COMMAND_PHASE_BYTES,
@@ -40,7 +40,7 @@ enum UPD765_PHASE
 };
 
 /* supported versions */
-enum UPD765_VERSION 
+enum UPD765_VERSION
 {
 	TYPE_UPD765A = 0,
 	TYPE_UPD765B = 1,

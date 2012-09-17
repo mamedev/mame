@@ -911,7 +911,7 @@ void namcos2_shared_state::c355_obj_draw(bitmap_ind16 &bitmap, const rectangle &
 	if (pri == 0)
 		machine().priority_bitmap.fill(0, cliprect);
 
-//  if (offs == 0)	// boot
+//  if (offs == 0)  // boot
 		c355_obj_draw_list(bitmap, cliprect, pri, &m_c355_obj_ram[0x02000/2], &m_c355_obj_ram[0x00000/2]);
 //  else
 		c355_obj_draw_list(bitmap, cliprect, pri, &m_c355_obj_ram[0x14000/2], &m_c355_obj_ram[0x10000/2]);
@@ -923,7 +923,7 @@ void namcos2_shared_state::c355_obj_draw(bitmap_rgb32 &bitmap, const rectangle &
 	if (pri == 0)
 		machine().priority_bitmap.fill(0, cliprect);
 
-//  if (offs == 0)	// boot
+//  if (offs == 0)  // boot
 		c355_obj_draw_list(bitmap, cliprect, pri, &m_c355_obj_ram[0x02000/2], &m_c355_obj_ram[0x00000/2]);
 //  else
 		c355_obj_draw_list(bitmap, cliprect, pri, &m_c355_obj_ram[0x14000/2], &m_c355_obj_ram[0x10000/2]);
@@ -1167,13 +1167,13 @@ void namcos2_shared_state::c169_roz_draw_scanline(bitmap_ind16 &bitmap, int line
 		int row = line / 8;
 		int offs = row * 0x100 + (line & 7) * 0x10 + 0xe080;
 		UINT16 *source = &m_c169_roz_videoram[offs / 2];
-		
+
 		// if enabled
 		if ((source[1] & 0x8000) == 0)
 		{
 			roz_parameters params;
 			c169_roz_unpack_params(source, params);
-			
+
 			// check priority
 			if (pri == params.priority)
 			{
@@ -1194,7 +1194,7 @@ void namcos2_shared_state::c169_roz_draw(bitmap_ind16 &bitmap, const rectangle &
 	{
 		const UINT16 *source = &m_c169_roz_control[which * 8];
 		UINT16 attrs = source[1];
-		
+
 		// if enabled
 		if ((attrs & 0x8000) == 0)
 		{
@@ -1212,7 +1212,7 @@ void namcos2_shared_state::c169_roz_draw(bitmap_ind16 &bitmap, const rectangle &
 					c169_roz_draw_helper(bitmap, *m_c169_roz_tilemap[which], cliprect, params);
 			}
 		}
-	} 
+	}
 }
 
 READ16_MEMBER( namcos2_shared_state::c169_roz_control_r )
@@ -1334,11 +1334,11 @@ READ16_MEMBER( namco_c45_road_device::read )
 WRITE16_MEMBER( namco_c45_road_device::write )
 {
 	COMBINE_DATA(&m_ram[offset]);
-	
+
 	// first half maps to the tilemap
 	if (offset < 0x10000/2)
 		m_tilemap->mark_tile_dirty(offset);
-	
+
 	// second half maps to the gfx elements
 	else
 	{
@@ -1379,7 +1379,7 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 			continue;
 
 		// mask off priority bits and sign-extend
-		screenx &= 0x0fff; 
+		screenx &= 0x0fff;
 		if (screenx & 0x0800)
 			screenx |= ~0x7ff;
 
@@ -1388,7 +1388,7 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		int numpixels = (44 * ROAD_TILE_SIZE << 16) / dsourcex;
 		unsigned sourcex = 0;
-		
+
 		// crop left
 		int clip_pixels = cliprect.min_x - screenx;
 		if (clip_pixels > 0)
@@ -1449,7 +1449,7 @@ void namco_c45_road_device::device_start()
 	// create a tilemap for the road
 	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namco_c45_road_device::get_road_info), this),
 		TILEMAP_SCAN_ROWS, ROAD_TILE_SIZE, ROAD_TILE_SIZE, ROAD_COLS, ROAD_ROWS);
-} 
+}
 
 
 //-------------------------------------------------

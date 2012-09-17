@@ -89,7 +89,7 @@ public:
 	DECLARE_PALETTE_INIT(xevious);
 	DECLARE_MACHINE_RESET(xevios);
 	DECLARE_PALETTE_INIT(battles);
-	DECLARE_MACHINE_RESET(battles);		
+	DECLARE_MACHINE_RESET(battles);
 };
 
 
@@ -118,7 +118,7 @@ public:
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	DECLARE_VIDEO_START(bosco);
-	DECLARE_PALETTE_INIT(bosco);	
+	DECLARE_PALETTE_INIT(bosco);
 };
 
 class digdug_state : public galaga_state
@@ -143,7 +143,7 @@ public:
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
 	DECLARE_VIDEO_START(digdug);
-	DECLARE_PALETTE_INIT(digdug);		
+	DECLARE_PALETTE_INIT(digdug);
 };
 
 

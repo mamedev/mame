@@ -18,7 +18,7 @@
 
 /* Components */
 
-struct hd63701y0_t 
+struct hd63701y0_t
 {
 	UINT8 data[8];
 	UINT8 P1DDR;
@@ -57,7 +57,7 @@ struct hd63701y0_t
 	UINT8 P6CSR;
 };
 
-struct rvoicepc_t 
+struct rvoicepc_t
 {
 	UINT8 data[8];
 	UINT8 port1;

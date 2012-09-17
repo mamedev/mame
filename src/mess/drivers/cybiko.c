@@ -342,7 +342,7 @@ static MACHINE_CONFIG_START( cybikov1, cybiko_state )
 	MCFG_RAM_EXTRA_OPTIONS("1M")
 MACHINE_CONFIG_END
 
-const sst39vfx_config cybyko_sst39vfx_intf = 
+const sst39vfx_config cybyko_sst39vfx_intf =
 {
 	16, ENDIANNESS_BIG
 };

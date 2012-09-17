@@ -24,7 +24,7 @@
 #define BORDER_TOP	(16)	// (plus bottom)
 
 
-enum apple2gs_clock_mode 
+enum apple2gs_clock_mode
 {
 	CLOCKMODE_IDLE,
 	CLOCKMODE_TIME,
@@ -34,7 +34,7 @@ enum apple2gs_clock_mode
 };
 
 
-enum adbstate_t 
+enum adbstate_t
 {
 	ADBSTATE_IDLE,
 	ADBSTATE_INCOMMAND,

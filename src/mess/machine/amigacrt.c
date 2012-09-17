@@ -24,7 +24,7 @@ enum
 	ACTION_REPLAY_MKIII
 };
 
-struct amigacrt_t 
+struct amigacrt_t
 {
 	int cart_type;
 	int ar1_spurious;

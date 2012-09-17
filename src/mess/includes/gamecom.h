@@ -149,7 +149,7 @@ enum
 	SM8521_SG1W15	= 0x7F
 };
 
-struct GAMECOM_DMA 
+struct GAMECOM_DMA
 {
 	int enabled;
 	int transfer_mode;
@@ -182,7 +182,7 @@ struct GAMECOM_DMA
 	unsigned int dest_mask;
 };
 
-struct GAMECOM_TIMER 
+struct GAMECOM_TIMER
 {
 	int enabled;
 	int state_count;
@@ -190,7 +190,7 @@ struct GAMECOM_TIMER
 	int check_value;
 };
 
-struct gamecom_sound_t 
+struct gamecom_sound_t
 {
 	UINT8 sgc;
 	UINT8 sg0l;

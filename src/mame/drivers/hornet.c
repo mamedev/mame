@@ -979,13 +979,13 @@ static const k037122_interface hornet_k037122_intf_r =
 
 static const voodoo_config hornet_voodoo_intf =
 {
-	2, //				fbmem;
-	4,//				tmumem0;
-	0,//				tmumem1;
-	"screen",//			screen;
-	"dsp",//			cputag;
-	voodoo_vblank_0,//	vblank;
-	NULL,//				stall;
+	2, //               fbmem;
+	4,//                tmumem0;
+	0,//                tmumem1;
+	"screen",//         screen;
+	"dsp",//            cputag;
+	voodoo_vblank_0,//  vblank;
+	NULL,//             stall;
 };
 
 static MACHINE_CONFIG_START( hornet, hornet_state )
@@ -1058,24 +1058,24 @@ MACHINE_RESET_MEMBER(hornet_state,hornet_2board)
 
 static const voodoo_config voodoo_l_intf =
 {
-	2, //				fbmem;
-	4,//				tmumem0;
-	0,//				tmumem1;
-	"lscreen",//		screen;
-	"dsp",//			cputag;
-	voodoo_vblank_0,//	vblank;
-	NULL,//				stall;
+	2, //               fbmem;
+	4,//                tmumem0;
+	0,//                tmumem1;
+	"lscreen",//        screen;
+	"dsp",//            cputag;
+	voodoo_vblank_0,//  vblank;
+	NULL,//             stall;
 };
 
 static const voodoo_config voodoo_r_intf =
 {
-	2, //				fbmem;
-	4,//				tmumem0;
-	0,//				tmumem1;
-	"rscreen",//		screen;
-	"dsp2",//			cputag;
-	voodoo_vblank_1,//	vblank;
-	NULL,//				stall;
+	2, //               fbmem;
+	4,//                tmumem0;
+	0,//                tmumem1;
+	"rscreen",//        screen;
+	"dsp2",//           cputag;
+	voodoo_vblank_1,//  vblank;
+	NULL,//             stall;
 };
 
 static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )

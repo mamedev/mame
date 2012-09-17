@@ -210,7 +210,7 @@ WRITE_LINE_MEMBER( s3520cf_device::set_cs_line )
 WRITE_LINE_MEMBER( s3520cf_device::write_bit )
 {
 	m_latch = state;
-//	printf("%d LATCH LINE\n",state);
+//  printf("%d LATCH LINE\n",state);
 }
 
 WRITE_LINE_MEMBER( s3520cf_device::set_clock_line )

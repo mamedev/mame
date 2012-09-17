@@ -44,7 +44,7 @@ enum fm_mode_t
 	FM_CONFPART1,	// first half of configuration, awaiting second
 	FM_WRPROTPART1	// first half of protection program, awaiting second
 };
-struct strata_t 
+struct strata_t
 {
 	fm_mode_t mode;				// current operation mode
 	int hard_unlock;	// 1 if RP* pin is at Vhh (not fully implemented)
@@ -229,7 +229,7 @@ int strataflash_save(device_t *device, emu_file *file)
 }
 
 /* bus width for 8/16-bit handlers */
-enum bus_width_t 
+enum bus_width_t
 {
 	bw_8,
 	bw_16

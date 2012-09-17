@@ -391,7 +391,7 @@ TIMER_DEVICE_CALLBACK( dpoker_hopper_callback )
 	{
 		dpoker_coin_status &= ~8;
 	}
-	
+
 	coin_counter_w(timer.machine(), 3, dpoker_coin_status & 8);
 }
 
@@ -443,11 +443,11 @@ WRITE8_MEMBER(mcr_state::dpoker_lamps2_w)
 {
 	// d5: button lamp: service or change
 	output_set_lamp_value(8, data >> 5 & 1);
-	
+
 	// d0-d4: marquee lamps: coin 1 to 5 --> output lamps 9 to 13
 	for (int i = 0; i < 5; i++)
 		output_set_lamp_value(9 + i, data >> i & 1);
-	
+
 	// d6, d7: unused?
 }
 
@@ -456,12 +456,12 @@ WRITE8_MEMBER(mcr_state::dpoker_output_w)
 	// d0: ? coin return
 	// d1: ? divertor (active low)
 	// d3: coin counter?
-	
+
 	// d6: assume hopper coin flow
 	// d7: assume hopper motor
 	if (data & 0x40 & ~dpoker_output)
 		m_dpoker_hopper_timer->adjust(attotime::from_msec(500));
-	
+
 	// other bits: unused?
 
 	dpoker_output = data;
@@ -1051,12 +1051,12 @@ static INPUT_PORTS_START( dpoker )
 	PORT_DIPNAME( 0x80, 0x00, "Background Color" )	PORT_DIPLOCATION("B3:8")
 	PORT_DIPSETTING(    0x80, "Green" )
 	PORT_DIPSETTING(    0x00, "Blue" )
-//	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )	PORT_DIPLOCATION("B3:9")
-//	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-//	PORT_DIPNAME( 0x01, 0x00, "Freeze" )			PORT_DIPLOCATION("B3:10")
-//	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+//  PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )   PORT_DIPLOCATION("B3:9")
+//  PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+//  PORT_DIPNAME( 0x01, 0x00, "Freeze" )            PORT_DIPLOCATION("B3:10")
+//  PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 
 	PORT_START("ssio:IP4")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2811,7 +2811,7 @@ DRIVER_INIT_MEMBER(mcr_state,dpoker)
 	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x30, 0x30, write8_delegate(FUNC(mcr_state::dpoker_lamps2_w),this));
 	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x34, 0x34, write8_delegate(FUNC(mcr_state::dpoker_output_w),this));
 	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(mcr_state::dpoker_meters_w),this));
-	
+
 	dpoker_coin_status = 0;
 	dpoker_output = 0;
 

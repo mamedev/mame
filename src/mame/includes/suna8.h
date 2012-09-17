@@ -39,7 +39,7 @@ public:
 	int m_trombank;
 	int m_page;
 
-	TILE_GET_INFO_MEMBER(get_tile_info);	
+	TILE_GET_INFO_MEMBER(get_tile_info);
 #endif
 
 	INT16 *m_samplebuf;

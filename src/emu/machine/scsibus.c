@@ -1,9 +1,9 @@
 /*
-	SCSIBus.c
+    SCSIBus.c
 
-	Implementation of a raw SCSI/SASI bus for machines that don't use a SCSI
-	controler chip such as the RM Nimbus, which implements it as a bunch of
-	74LS series chips.
+    Implementation of a raw SCSI/SASI bus for machines that don't use a SCSI
+    controler chip such as the RM Nimbus, which implements it as a bunch of
+    74LS series chips.
 
 */
 

@@ -52,7 +52,7 @@ static WRITE32_HANDLER( newport_xmap1_w );
 static READ32_HANDLER( newport_vc2_r );
 static WRITE32_HANDLER( newport_vc2_w );
 
-struct VC2_t 
+struct VC2_t
 {
 	UINT16 nRegister[0x21];
 	UINT16 nRAM[0x8000];
@@ -79,7 +79,7 @@ struct VC2_t
 #define VC2_DISPLAYCTRL		pNVID->VC2.nRegister[0x10]
 #define VC2_CONFIG			pNVID->VC2.nRegister[0x1f]
 
-struct XMAP_t 
+struct XMAP_t
 {
 	UINT32 nRegister[0x08];
 	UINT32 nModeTable[0x20];
@@ -100,7 +100,7 @@ struct XMAP_t
 #define XMAP1_MODETBLIDX	pNVID->XMAP1.nRegister[0x07]
 
 
-struct REX3_t 
+struct REX3_t
 {
 	UINT32 nDrawMode1;
 	UINT32 nDrawMode0;
@@ -180,7 +180,7 @@ struct REX3_t
 };
 
 
-struct CMAP_t 
+struct CMAP_t
 {
 	UINT16 nPaletteIndex;
 	UINT32 nPalette[0x10000];

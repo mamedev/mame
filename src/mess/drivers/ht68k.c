@@ -45,9 +45,9 @@ public:
 	,
 		m_p_ram(*this, "p_ram"){ }
 
-		
+
 	static const floppy_format_type floppy_formats[];
-		
+
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<device_t> m_duart;
@@ -117,10 +117,10 @@ static void duart_output(device_t *device, UINT8 data)
 			if(con)
 				floppy = con->get_device();
 			break;
-		}		
+		}
 	}
 	if (floppy) floppy->ss_w(BIT(data,3) ? 0 : 1);
-	state->m_fdc->set_floppy(floppy);		
+	state->m_fdc->set_floppy(floppy);
 }
 
 WRITE8_MEMBER( ht68k_state::kbd_put )
@@ -162,7 +162,7 @@ static MACHINE_CONFIG_START( ht68k, ht68k_state )
 	MCFG_FLOPPY_DRIVE_ADD("fd0", ht68k_floppies, "525dd", 0, ht68k_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", ht68k_floppies, "525dd", 0, ht68k_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd2", ht68k_floppies, "525dd", 0, ht68k_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd3", ht68k_floppies, "525dd", 0, ht68k_state::floppy_formats)	
+	MCFG_FLOPPY_DRIVE_ADD("fd3", ht68k_floppies, "525dd", 0, ht68k_state::floppy_formats)
 MACHINE_CONFIG_END
 
 /* ROM definition */

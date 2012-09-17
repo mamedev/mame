@@ -13,9 +13,9 @@
 
     TODO:
 
-	- character rounding
-	- remote controller input
-	- boxing
+    - character rounding
+    - remote controller input
+    - boxing
 
 */
 
@@ -237,7 +237,7 @@ void saa5050_device::process_control_character(UINT8 data)
 	case STEADY:
 		m_flash = false;
 		break;
-		
+
 	case END_BOX:
 	case START_BOX:
 		// TODO
@@ -336,7 +336,7 @@ WRITE_LINE_MEMBER( saa5050_device::dew_w )
 	{
 		m_ra = 19;
 		m_double_height_top_row = false;
-		
+
 		m_frame_count++;
 		if (m_frame_count > 50) m_frame_count = 0;
 	}

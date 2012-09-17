@@ -67,7 +67,7 @@ private:
     	MODE_SWAP = 3
     };
 
-    struct ES5503Osc 
+    struct ES5503Osc
     {
     	UINT16 freq;
     	UINT16 wtsize;

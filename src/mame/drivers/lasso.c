@@ -463,8 +463,8 @@ GFXDECODE_END
  *  Sound interface
  *
  *************************************/
- 
- 
+
+
 //-------------------------------------------------
 //  sn76496_config psg_intf
 //-------------------------------------------------
@@ -480,7 +480,7 @@ void lasso_state::machine_start()
 
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
-	
+
 	save_item(NAME(m_gfxbank));
 }
 

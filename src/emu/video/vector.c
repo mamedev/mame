@@ -127,7 +127,7 @@ static render_texture *get_vector_texture(float dx, float dy, float intensity)
 #define VCLIP   2
 
 /* The vertices are buffered here */
-struct point 
+struct point
 {
 	int x; int y;
 	rgb_t col;

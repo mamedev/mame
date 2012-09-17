@@ -14,7 +14,7 @@
 #include "osdcore.h"
 #include "imgtool.h"
 
-enum imgtype_t 
+enum imgtype_t
 {
 	IMG_FILE,
 	IMG_MEM

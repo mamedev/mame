@@ -71,7 +71,7 @@ void sparse_dirty_bitmap::dirty(INT32 left, INT32 right, INT32 top, INT32 bottom
 	// compute a rectangle in dirty space, and fill it with 1
 	rectangle rect(left >> m_granularity, right >> m_granularity, top >> m_granularity, bottom >> m_granularity);
 	m_bitmap.fill(1, rect);
-	
+
 	// invalidate existing rect list
 	invalidate_rect_list();
 }
@@ -93,7 +93,7 @@ void sparse_dirty_bitmap::clean(INT32 left, INT32 right, INT32 top, INT32 bottom
 	// compute a rectangle in dirty space, and fill it with 0
 	rectangle rect((left + round) >> m_granularity, (right - round) >> m_granularity, (top + round) >> m_granularity, (bottom - round) >> m_granularity);
 	m_bitmap.fill(0, rect);
-	
+
 	// invalidate existing rect list
 	invalidate_rect_list();
 }
@@ -108,11 +108,11 @@ void sparse_dirty_bitmap::resize(int width, int height)
 	// set new size
 	m_width = width;
 	m_height = height;
-	
+
 	// resize the bitmap
 	int round = (1 << m_granularity) - 1;
 	m_bitmap.resize((width + round) >> m_granularity, (height + round) >> m_granularity);
-	
+
 	// reset everything
 	dirty_all();
 }
@@ -120,7 +120,7 @@ void sparse_dirty_bitmap::resize(int width, int height)
 
 //-------------------------------------------------
 //  first_dirty_rect -- return the first dirty
-//	rectangle in the list
+//  rectangle in the list
 //-------------------------------------------------
 
 sparse_dirty_rect *sparse_dirty_bitmap::first_dirty_rect(const rectangle &cliprect)
@@ -128,10 +128,10 @@ sparse_dirty_rect *sparse_dirty_bitmap::first_dirty_rect(const rectangle &clipre
 	// if what we have is valid, just return it again
 	if (m_rect_list_bounds == cliprect)
 		return m_rect_list.first();
-	
+
 	// reclaim the dirty list and start over
 	m_rect_allocator.reclaim_all(m_rect_list);
-	
+
 	// compute dirty space rectangle coordinates
 	int sx = cliprect.min_x >> m_granularity;
 	int ex = cliprect.max_x >> m_granularity;
@@ -156,7 +156,7 @@ sparse_dirty_rect *sparse_dirty_bitmap::first_dirty_rect(const rectangle &clipre
 				currect = NULL;
 				continue;
 			}
-		
+
 			// if we can't add to an existing rect, create a new one
 			if (currect == NULL)
 			{

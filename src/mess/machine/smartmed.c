@@ -27,7 +27,7 @@
 #define MAX_SMARTMEDIA	1
 
 /* machine-independent big-endian 32-bit integer */
-struct UINT32BE 
+struct UINT32BE
 {
 	UINT8 bytes[4];
 };
@@ -48,7 +48,7 @@ INLINE void set_UINT32BE(UINT32BE *word, UINT32 data)
 #endif
 
 /* SmartMedia image header */
-struct disk_image_header 
+struct disk_image_header
 {
 	UINT8 version;
 	UINT32BE page_data_size;
@@ -57,7 +57,7 @@ struct disk_image_header
 	UINT32BE log2_pages_per_block;
 };
 
-struct disk_image_format_2_header 
+struct disk_image_format_2_header
 {
 	UINT8 data1[3];
 	UINT8 padding1[256-3];

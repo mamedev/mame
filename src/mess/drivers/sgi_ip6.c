@@ -17,7 +17,7 @@
 #include "cpu/mips/r3000.h"
 
 
-struct ip6_regs_t 
+struct ip6_regs_t
 {
 	UINT16 unknown_half_0;
 	UINT8 unknown_byte_0;

@@ -918,10 +918,10 @@ static void calchase_set_keyb_int(running_machine &machine, int state)
 	pic8259_ir1_w(drvstate->m_pic8259_1, state);
 }
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	ide_interrupt, 
-	NULL, 
+	ide_interrupt,
+	NULL,
 	0
 };
 

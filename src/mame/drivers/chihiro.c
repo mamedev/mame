@@ -1822,10 +1822,10 @@ static SLOT_INTERFACE_START(ide_baseboard)
 	SLOT_INTERFACE("bb", IDE_BASEBOARD)
 SLOT_INTERFACE_END
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	ide_interrupt, 
-	"maincpu", 
+	ide_interrupt,
+	"maincpu",
 	AS_PROGRAM
 };
 

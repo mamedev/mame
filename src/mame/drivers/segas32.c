@@ -4292,7 +4292,7 @@ DRIVER_INIT_MEMBER(segas32_state,f1lap)
 	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x800000, 0x800fff, read16_delegate(FUNC(segas32_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_state::dual_pcb_comms_w),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x801000, 0x801003, read16_delegate(FUNC(segas32_state::dual_pcb_masterslave),this));
 
-//	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x800048, 0x800049, write16_delegate(FUNC(segas32_state::f1en_comms_echo_w),this));
+//  machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x800048, 0x800049, write16_delegate(FUNC(segas32_state::f1en_comms_echo_w),this));
 	m_system32_prot_vblank = f1lap_fd1149_vblank;
 
 	m_sw1_output = f1lap_sw1_output;

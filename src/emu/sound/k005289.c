@@ -31,7 +31,7 @@
 #define FREQBASEBITS	16
 
 /* this structure defines the parameters for a channel */
-struct k005289_sound_channel 
+struct k005289_sound_channel
 {
 	int frequency;
 	int counter;

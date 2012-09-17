@@ -810,18 +810,18 @@ WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_w )
 WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_pa_w )
 {
     /*
-    
+
         bit     description
-    
+
         0       1/2 MHz
-        1       
-        2       
+        1
+        2
         3       35/40 tracks
-        4       
-        5       
-        6       
+        4
+        5
+        6
         7       Hi
-    
+
     */
 }
 

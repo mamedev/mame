@@ -24,7 +24,7 @@
 
 #include "cosmac.h"
 
-enum Adr 
+enum Adr
 {
 	Ill,
 	Imm,

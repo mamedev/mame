@@ -10,7 +10,7 @@
 #ifndef KBDC8042_H
 #define KBDC8042_H
 
-enum kbdc8042_type_t 
+enum kbdc8042_type_t
 {
 	KBDC8042_STANDARD,
 	KBDC8042_PS2,		/* another timing of integrated controller */

@@ -30,7 +30,7 @@ struct msm6242_interface
 	devcb_write_line	m_out_int_cb;
 };
 
-struct rtc_regs_t 
+struct rtc_regs_t
 {
 	UINT8 sec, min, hour, day, wday, month;
 	UINT16 year;

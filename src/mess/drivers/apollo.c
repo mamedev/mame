@@ -1020,12 +1020,12 @@ void apollo_state::machine_reset()
 			memcmp (db+0x22, "APOLLO", 6) == 0 &&
 			omti8621_get_sector(machine().device(APOLLO_WDC_TAG), sector1, db,	sizeof(db), 0) == sizeof(db))
 		{
-//			MLOG2(("machine_reset_dn3500: node ID is %06X (from ROM)", node_id));
+//          MLOG2(("machine_reset_dn3500: node ID is %06X (from ROM)", node_id));
 
 			// set node_id from UID of logical volume 1 of logical unit 0
 			node_id = (((db[0x49] << 8) | db[0x4a]) << 8) | db[0x4b];
 
-//			MLOG2(("machine_reset_dn3500: node ID is %06X (from disk)", node_id));
+//          MLOG2(("machine_reset_dn3500: node ID is %06X (from disk)", node_id));
 		}
 	}
 

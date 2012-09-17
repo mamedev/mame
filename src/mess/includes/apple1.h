@@ -12,7 +12,7 @@
 
 typedef short termchar_t;
 
-struct terminal_t 
+struct terminal_t
 {
 	tilemap_t *tm;
 	int gfx;

@@ -73,7 +73,7 @@
 
 struct YMF278BChip;
 
-struct YMF278BSlot 
+struct YMF278BSlot
 {
 	INT16 wave;		/* wavetable number */
 	INT16 F_NUMBER;	/* frequency */
@@ -115,7 +115,7 @@ struct YMF278BSlot
 	YMF278BChip *chip;	/* pointer back to parent chip */
 };
 
-struct YMF278BChip 
+struct YMF278BChip
 {
 	UINT8 pcmregs[256];
 	YMF278BSlot slots[24];

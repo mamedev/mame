@@ -252,7 +252,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
 
 	DECLARE_WRITE_LINE_MEMBER( clock_out );
-	virtual void machine_start();	
+	virtual void machine_start();
 	virtual void machine_reset();
 
 	// Some values to keep

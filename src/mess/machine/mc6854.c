@@ -57,7 +57,7 @@
 /******************* internal chip data structure ******************/
 
 
-struct mc6854_t 
+struct mc6854_t
 {
 	devcb_resolved_write_line	out_irq_func;
 	devcb_resolved_read_line	in_rxd_func;

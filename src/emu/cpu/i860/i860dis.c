@@ -374,7 +374,7 @@ enum
 };
 
 
-struct decode_tbl_t 
+struct decode_tbl_t
 {
 	/* Disassembly function for this opcode.
        Call with buffer, mnemonic, pc, insn.  */

@@ -901,24 +901,24 @@ static const adsp21xx_config adsp_config =
 
 static const voodoo_config voodoo_1_intf =
 {
-	2, //				fbmem;
-	4,//				tmumem0;
-	0,//				tmumem1;
-	"screen",//			screen;
-	"mips",//			cputag;
-	NULL,//				vblank;
-	NULL,//				stall;
+	2, //               fbmem;
+	4,//                tmumem0;
+	0,//                tmumem1;
+	"screen",//         screen;
+	"mips",//           cputag;
+	NULL,//             vblank;
+	NULL,//             stall;
 };
 
 static const voodoo_config voodoo_2_intf =
 {
-	2, //				fbmem;
-	4,//				tmumem0;
-	0,//				tmumem1;
-	"screen",//			screen;
-	"mips",//			cputag;
-	NULL,//vblank_assert				vblank;
-	NULL,//	voodoo_stall			stall;
+	2, //               fbmem;
+	4,//                tmumem0;
+	0,//                tmumem1;
+	"screen",//         screen;
+	"mips",//           cputag;
+	NULL,//vblank_assert                vblank;
+	NULL,// voodoo_stall            stall;
 };
 /*************************************
  *

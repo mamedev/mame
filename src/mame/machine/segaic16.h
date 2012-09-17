@@ -90,7 +90,7 @@ public:
 
 	// open bus read helpers
 	DECLARE_READ16_MEMBER( open_bus_r );
-	
+
 	// palette helpers
 	DECLARE_WRITE16_MEMBER( paletteram_w );
 
@@ -102,7 +102,7 @@ public: // -- stupid system16.c
 	// memory pointers
 	required_shared_ptr<UINT16> m_paletteram;
 protected:
-	
+
 	// internal state
 	bool		m_open_bus_recurse;			// flag to track recursion through open_bus_r
 	UINT32		m_palette_entries;			// number of palette entries

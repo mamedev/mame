@@ -19,7 +19,7 @@ extern int i386_dasm_one(char *buffer, UINT32 pc, const UINT8 *oprom, int mode);
 
 enum SREGS { ES, CS, SS, DS, FS, GS };
 
-enum BREGS 
+enum BREGS
 {
 	AL = NATIVE_ENDIAN_VALUE_LE_BE(0,3),
 	AH = NATIVE_ENDIAN_VALUE_LE_BE(1,2),
@@ -31,7 +31,7 @@ enum BREGS
 	BH = NATIVE_ENDIAN_VALUE_LE_BE(13,14)
 };
 
-enum WREGS 
+enum WREGS
 {
 	AX = NATIVE_ENDIAN_VALUE_LE_BE(0,1),
 	CX = NATIVE_ENDIAN_VALUE_LE_BE(2,3),
@@ -206,7 +206,7 @@ struct I386_SREG {
 	bool valid;
 };
 
-struct I386_CALL_GATE 
+struct I386_CALL_GATE
 {
 	UINT16 segment;
 	UINT16 selector;

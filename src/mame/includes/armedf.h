@@ -100,7 +100,7 @@ public:
 	DECLARE_READ16_MEMBER(sharedram_r);
 	DECLARE_DRIVER_INIT(bigfghtr);
 	DECLARE_MACHINE_START(bigfghtr);
-	DECLARE_MACHINE_RESET(bigfghtr);	
+	DECLARE_MACHINE_RESET(bigfghtr);
 };
 
 /*----------- defined in video/armedf.c -----------*/

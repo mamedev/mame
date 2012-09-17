@@ -100,7 +100,7 @@
 
 #define SCSI_SENSE_SIZE				4
 
-struct adaptec_sense_t 
+struct adaptec_sense_t
 {
 	// parameter list
 	UINT8		reserved1[3];

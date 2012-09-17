@@ -26,7 +26,7 @@ typedef void (*vic3_port_changed_callback) (running_machine &, int);
 
 typedef UINT8 (*vic3_c64mem_callback)(running_machine &machine, int offset);
 
-enum vic3_type 
+enum vic3_type
 {
 	VIC4567_NTSC,
 	VIC4567_PAL

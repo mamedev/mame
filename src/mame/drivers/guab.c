@@ -78,10 +78,10 @@ public:
 	guab_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_sn(*this, "snsnd") { }
-		
+
 	/* devices */
 	required_device<sn76489_new_device> m_sn;
-	
+
 	struct ef9369 m_pal;
 	emu_timer *m_fdc_timer;
 	struct wd1770 m_fdc;
@@ -784,8 +784,8 @@ INPUT_PORTS_END
  *  Sound interface
  *
  *************************************/
- 
- 
+
+
 //-------------------------------------------------
 //  sn76496_config psg_intf
 //-------------------------------------------------

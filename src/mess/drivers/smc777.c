@@ -35,7 +35,7 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_sn(*this, "sn1")
 	{ }
-		
+
 	optional_device<sn76489a_new_device> m_sn;
 	UINT16 m_cursor_addr;
 	UINT16 m_cursor_raster;
@@ -1060,8 +1060,8 @@ static INTERRUPT_GEN( smc777_vblank_irq )
  *  Sound interface
  *
  *************************************/
- 
- 
+
+
 //-------------------------------------------------
 //  sn76496_config psg_intf
 //-------------------------------------------------

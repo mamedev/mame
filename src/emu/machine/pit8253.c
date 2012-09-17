@@ -82,7 +82,7 @@ struct pit8253_timer
 	UINT32 cycles_to_output;		/* cycles until output callback called */
 };
 
-struct 	pit8253_t
+struct	pit8253_t
 {
 	const pit8253_config *config;
 	int	device_type;

@@ -3660,7 +3660,7 @@ MACHINE_RESET_MEMBER(konamigx_state,konamigx)
 	}
 }
 
-struct GXGameInfoT 
+struct GXGameInfoT
 {
 	const char *romname;
 	UINT32 cfgport;

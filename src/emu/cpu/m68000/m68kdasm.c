@@ -174,7 +174,7 @@ static int   valid_ea(UINT32 opcode, UINT32 mask);
 static int DECL_SPEC compare_nof_true_bits(const void *aptr, const void *bptr);
 
 /* used to build opcode handler jump table */
-struct opcode_struct 
+struct opcode_struct
 {
 	void (*opcode_handler)(void); /* handler function */
 	UINT32 mask;                    /* mask on opcode */

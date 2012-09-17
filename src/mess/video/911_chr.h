@@ -75,7 +75,7 @@ enum
 /* structure used to describe differences between national character sets and
 US character set */
 /* much more compact than defining the complete 128-char vector */
-struct char_override_t 
+struct char_override_t
 {
 	unsigned char char_index;		/* char to replace */
 	unsigned short symbol_index;	/* replacement symbol */

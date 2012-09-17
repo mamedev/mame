@@ -665,7 +665,7 @@ SCREEN_UPDATE_IND16( s16a_bootleg )
 		{
 			UINT16 *dest = &bitmap.pix(y);
 			UINT16 *src = &sprites.pix(y);
-//			UINT8 *pri = &screen.machine().priority_bitmap.pix(y);
+//          UINT8 *pri = &screen.machine().priority_bitmap.pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels
@@ -673,7 +673,7 @@ SCREEN_UPDATE_IND16( s16a_bootleg )
 				if (pix != 0xffff)
 				{
 					// compare sprite priority against tilemap priority
-//					int priority = (pix >> 12) & 3;
+//                  int priority = (pix >> 12) & 3;
 					if (1)
 					{
 						// if the color is set to maximum, shadow pixels underneath us
@@ -737,7 +737,7 @@ SCREEN_UPDATE_IND16( s16a_bootleg_passht4b )
 		{
 			UINT16 *dest = &bitmap.pix(y);
 			UINT16 *src = &sprites.pix(y);
-//			UINT8 *pri = &screen.machine().priority_bitmap.pix(y);
+//          UINT8 *pri = &screen.machine().priority_bitmap.pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels
@@ -745,7 +745,7 @@ SCREEN_UPDATE_IND16( s16a_bootleg_passht4b )
 				if (pix != 0xffff)
 				{
 					// compare sprite priority against tilemap priority
-//					int priority = (pix >> 12) & 3;
+//                  int priority = (pix >> 12) & 3;
 					if (1)
 					{
 						// if the color is set to maximum, shadow pixels underneath us
@@ -818,7 +818,7 @@ SCREEN_UPDATE_IND16( system16 )
 		{
 			UINT16 *dest = &bitmap.pix(y);
 			UINT16 *src = &sprites.pix(y);
-//			UINT8 *pri = &screen.machine().priority_bitmap.pix(y);
+//          UINT8 *pri = &screen.machine().priority_bitmap.pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels
@@ -826,7 +826,7 @@ SCREEN_UPDATE_IND16( system16 )
 				if (pix != 0xffff)
 				{
 					// compare sprite priority against tilemap priority
-//					int priority = (pix >> 12) & 3;
+//                  int priority = (pix >> 12) & 3;
 					if (1)
 					{
 						// if the color is set to maximum, shadow pixels underneath us
@@ -883,7 +883,7 @@ SCREEN_UPDATE_IND16( system18old )
 		{
 			UINT16 *dest = &bitmap.pix(y);
 			UINT16 *src = &sprites.pix(y);
-//			UINT8 *pri = &screen.machine().priority_bitmap.pix(y);
+//          UINT8 *pri = &screen.machine().priority_bitmap.pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels
@@ -891,7 +891,7 @@ SCREEN_UPDATE_IND16( system18old )
 				if (pix != 0xffff)
 				{
 					// compare sprite priority against tilemap priority
-//					int priority = (pix >> 12) & 3;
+//                  int priority = (pix >> 12) & 3;
 					if (1)
 					{
 						// if the color is set to maximum, shadow pixels underneath us

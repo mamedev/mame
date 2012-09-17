@@ -31,7 +31,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 	}
 }
 
-struct smc_t 
+struct smc_t
 {
 	int add_latch;
 	int cmd_latch;

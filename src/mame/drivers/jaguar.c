@@ -1564,10 +1564,10 @@ static const jaguar_cpu_config dsp_config =
 	&jaguar_state::dsp_cpu_int
 };
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	&jaguar_state::external_int, 
-	NULL, 
+	&jaguar_state::external_int,
+	NULL,
 	0
 };
 

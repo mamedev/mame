@@ -180,7 +180,7 @@ protected:
 private:
 	// internal state
 	void *m_token;
-	
+
 	TILEMAP_MAPPER_MEMBER(k007342_scan);
 	TILE_GET_INFO_MEMBER(k007342_get_tile_info0);
 	TILE_GET_INFO_MEMBER(k007342_get_tile_info1);
@@ -224,7 +224,7 @@ protected:
 private:
 	// internal state
 	void *m_token;
-	
+
 	TILE_GET_INFO_MEMBER(k052109_get_tile_info0);
 	TILE_GET_INFO_MEMBER(k052109_get_tile_info1);
 	TILE_GET_INFO_MEMBER(k052109_get_tile_info2);
@@ -330,7 +330,7 @@ protected:
 private:
 	// internal state
 	void *m_token;
-	
+
 	TILE_GET_INFO_MEMBER(k051316_get_tile_info0);
 };
 
@@ -549,7 +549,7 @@ protected:
 private:
 	// internal state
 	void *m_token;
-	
+
 	TILEMAP_MAPPER_MEMBER(k001604_scan_layer_8x8_0_size0);
 	TILEMAP_MAPPER_MEMBER(k001604_scan_layer_8x8_0_size1);
 	TILEMAP_MAPPER_MEMBER(k001604_scan_layer_8x8_1_size0);
@@ -582,7 +582,7 @@ protected:
 private:
 	// internal state
 	void *m_token;
-	
+
 	TILE_GET_INFO_MEMBER(k037122_tile_info_layer0);
 	TILE_GET_INFO_MEMBER(k037122_tile_info_layer1);
 };

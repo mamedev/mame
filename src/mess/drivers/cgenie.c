@@ -626,7 +626,7 @@ ROM_END
 //   GATL GAT Length
 //   GATM GAT Mask
 //   DDGA Disk Directory Granule Allocation
-struct PDRIVE 
+struct PDRIVE
 {
     UINT8 DDSL;      // Disk Directory Start Lump (lump number of GAT)
     UINT8 GATL;      // # of bytes used in the Granule Allocation Table sector

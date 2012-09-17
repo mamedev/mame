@@ -20,7 +20,7 @@ enum hp48_models {
 };
 
 /* memory module configuration */
-struct hp48_module 
+struct hp48_module
 {
 	/* static part */
 	UINT32 off_mask;             /* offset bit-mask, indicates the real size */

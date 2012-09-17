@@ -23,7 +23,7 @@ static FILE * cymfile = NULL;
 
 
 /* struct describing a single operator */
-struct YM2151Operator 
+struct YM2151Operator
 {
 	UINT32		phase;					/* accumulated operator phase */
 	UINT32		freq;					/* operator frequency count */
@@ -76,7 +76,7 @@ struct YM2151Operator
 };
 
 
-struct YM2151 
+struct YM2151
 {
 	signed int chanout[8];
 	signed int m2,c1,c2; /* Phase Modulation input for operators 2,3,4 */

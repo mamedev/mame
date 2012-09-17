@@ -34,7 +34,7 @@ enum
 	asr_scroll_step = 8
 };
 
-struct asr_t 
+struct asr_t
 {
 #if 0
 	UINT8 OutQueue[ASROutQueueSize];

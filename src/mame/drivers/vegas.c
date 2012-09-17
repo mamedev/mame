@@ -442,7 +442,7 @@
 
 
 
-struct dynamic_address 
+struct dynamic_address
 {
 	offs_t			start;
 	offs_t			end;
@@ -2222,27 +2222,27 @@ static const mips3_config r5000_config =
 	SYSTEM_CLOCK	/* system clock rate */
 };
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	ide_interrupt, 
-	"maincpu", 
+	ide_interrupt,
+	"maincpu",
 	AS_PROGRAM
 };
 
-static const smc91c9x_config ethernet_intf = 
+static const smc91c9x_config ethernet_intf =
 {
 	ethernet_interrupt
 };
 
 static const voodoo_config voodoo_intf =
 {
-	2, //				fbmem;
-	4,//				tmumem0;
-	4,//				tmumem1;
-	"screen",//		screen;
-	"maincpu",//			cputag;
-	vblank_assert,//	vblank;
-	NULL,//				stall;
+	2, //               fbmem;
+	4,//                tmumem0;
+	4,//                tmumem1;
+	"screen",//     screen;
+	"maincpu",//            cputag;
+	vblank_assert,//    vblank;
+	NULL,//             stall;
 };
 
 static MACHINE_CONFIG_START( vegascore, vegas_state )
@@ -2292,13 +2292,13 @@ MACHINE_CONFIG_END
 
 static const voodoo_config vegasban_voodoo_intf =
 {
-	16, //				fbmem;
-	0,//				tmumem0;
-	0,//				tmumem1;
-	"screen",//		screen;
-	"maincpu",//			cputag;
-	vblank_assert,//	vblank;
-	NULL,//				stall;
+	16, //              fbmem;
+	0,//                tmumem0;
+	0,//                tmumem1;
+	"screen",//     screen;
+	"maincpu",//            cputag;
+	vblank_assert,//    vblank;
+	NULL,//             stall;
 };
 static MACHINE_CONFIG_DERIVED( vegasban, vegascore )
 	MCFG_FRAGMENT_ADD(dcs2_audio_2104)
@@ -2307,7 +2307,7 @@ static MACHINE_CONFIG_DERIVED( vegasban, vegascore )
 	MCFG_CPU_PROGRAM_MAP(vegas_map_32mb)
 
 	MCFG_DEVICE_REMOVE("voodoo")
-	MCFG_3DFX_VOODOO_BANSHEE_ADD("voodoo", STD_VOODOO_BANSHEE_CLOCK, vegasban_voodoo_intf)	
+	MCFG_3DFX_VOODOO_BANSHEE_ADD("voodoo", STD_VOODOO_BANSHEE_CLOCK, vegasban_voodoo_intf)
 MACHINE_CONFIG_END
 
 

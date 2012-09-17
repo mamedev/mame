@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "socrates.h"
 
-struct SocratesASIC 
+struct SocratesASIC
 {
 	sound_stream *stream;
 	UINT8 freq[2]; /* channel 1,2 frequencies */

@@ -44,7 +44,7 @@ static const char *const duart68681_reg_write_names[0x10] =
 
 #define RX_FIFO_SIZE				3
 
-struct DUART68681_CHANNEL 
+struct DUART68681_CHANNEL
 {
 	/* Registers */
 	UINT8 CR;  /* Command register */
@@ -72,7 +72,7 @@ struct DUART68681_CHANNEL
 
 };
 
-struct duart68681_state 
+struct duart68681_state
 {
 	/* device */
 	device_t *device;

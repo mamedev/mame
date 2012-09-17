@@ -2657,7 +2657,7 @@ void sega_genesis_vdp_device::genesis_render_videobuffer_to_screenbuffer(running
 					}
 				}
 			}
-			
+
 			if (!(dat&0x20000))
 				m_render_line_raw[x] = 0x100;
 			else
@@ -2819,7 +2819,7 @@ void sega_genesis_vdp_device::vdp_handle_scanline_callback(running_machine &mach
 
 		//if (genesis_get_scanline_counter(machine)==0) irq4_on_timer->adjust(attotime::from_usec(2));
 
-	
+
 		if (_32xdev) _32xdev->_32x_scanline_cb1();
 
 

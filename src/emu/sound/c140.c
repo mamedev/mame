@@ -65,7 +65,7 @@ struct voice_registers
 	UINT8 reserved[4];
 };
 
-struct VOICE 
+struct VOICE
 {
 	long	ptoffset;
 	long	pos;

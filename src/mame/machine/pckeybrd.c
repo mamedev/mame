@@ -167,7 +167,7 @@ static const int at_keyboard_scancode_set_2_3[]=
 
 #define AT_KEYBOARD_QUEUE_MAXSIZE	256
 
-struct at_keyboard 
+struct at_keyboard
 {
 	AT_KEYBOARD_TYPE type;
 	int on;
@@ -188,7 +188,7 @@ struct at_keyboard
 
 static at_keyboard keyboard;
 
-struct extended_keyboard_code 
+struct extended_keyboard_code
 {
 	const char *pressed;
 	const char *released;

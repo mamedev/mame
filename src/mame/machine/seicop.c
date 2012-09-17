@@ -1408,7 +1408,7 @@ commands 0x8100/0x8900:
 status always 0x8007 (doesn't seem to care)
 raw | amp | scale | sin       | cos      |
 ------------------------------------------
-y	  0x00     x    0x00000000 0x00000000 (i.e. if amp is 0 then sin/cos are zero too)
+y     0x00     x    0x00000000 0x00000000 (i.e. if amp is 0 then sin/cos are zero too)
 0     0x40     0    0x00000000 0x00020000
 0     0x40     1    0x00000000 0x00040000
 0     0x40     2    0x00000000 0x00080000
@@ -2058,11 +2058,11 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x03c/2): { cop_43c = data; break; }
 		case (0x03e/2):
 			/*
-			0 in all 68k based games
-			0xffff in raiden2 / raidendx
-			0x2000 in zeroteam / xsedae
-			it's always setted up just before the 0x474 register
-			*/
+            0 in all 68k based games
+            0xffff in raiden2 / raidendx
+            0x2000 in zeroteam / xsedae
+            it's always setted up just before the 0x474 register
+            */
 			break;
 
 		/* brightness control */
@@ -2072,14 +2072,14 @@ static WRITE16_HANDLER( generic_cop_w )
 		/* DMA / layer clearing section */
 		case (0x074/2):
 			/*
-			This sets up a DMA mode of some sort
-				0x0e00: grainbow, cupsoc
-				0x0a00: legionna, godzilla, denjinmk
-				0x0600: heatbrl
-				0x1e00: zeroteam, xsedae
-			raiden2 and raidendx doesn't set this up, this could indicate that this is related to the non-private buffer DMAs
-			(both only uses 0x14 and 0x15 as DMAs)
-			*/
+            This sets up a DMA mode of some sort
+                0x0e00: grainbow, cupsoc
+                0x0a00: legionna, godzilla, denjinmk
+                0x0600: heatbrl
+                0x1e00: zeroteam, xsedae
+            raiden2 and raidendx doesn't set this up, this could indicate that this is related to the non-private buffer DMAs
+            (both only uses 0x14 and 0x15 as DMAs)
+            */
 			break;
 
 		/* used in palette DMAs, for fading effects */

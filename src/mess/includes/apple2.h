@@ -72,7 +72,7 @@
 #define APPLE2_MEM_FLOATING	0xFFFFFFFF
 #define APPLE2_MEM_MASK		0x00FFFFFF
 
-enum machine_type_t 
+enum machine_type_t
 {
     APPLE_II,           // Apple II/II+
     APPLE_IIEPLUS,      // Apple IIe/IIc/IIgs/IIc+
@@ -81,7 +81,7 @@ enum machine_type_t
     SPACE84             // "Space 84" with flipped text mode
 };
 
-enum bank_disposition_t 
+enum bank_disposition_t
 {
 	A2MEM_IO		= 0,	/* this is always handlers; never banked memory */
 	A2MEM_MONO		= 1,	/* this is a bank where read and write are always in unison */

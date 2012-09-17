@@ -12,7 +12,7 @@
 
 
 
-struct TRIANGLE 
+struct TRIANGLE
 {
 	poly_vertex v[3];
 	UINT8 texture_x, texture_y;

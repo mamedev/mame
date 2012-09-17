@@ -308,7 +308,7 @@ static void glass_ROM16_split_gfx( running_machine &machine, const char *src_reg
 /* How does the protection work?
 
   We know in World Rally it shares the whole of main RAM with the Dallas, with subtle reads and writes / values being checked.. so I guess this will be similar at least
-  and thus very hard to figure out if done properly 
+  and thus very hard to figure out if done properly
 
  */
 
@@ -323,14 +323,14 @@ READ16_MEMBER( glass_state::glass_mainram_r )
 
 		// there are also various code segments like the one below
 		/*
-		start:
-		tst.b   this address
-		bne     end
-		tst.b   $fede1d.l
-		nop << why?
-		bne     start
-		end:
-		*/
+        start:
+        tst.b   this address
+        bne     end
+        tst.b   $fede1d.l
+        nop << why?
+        bne     start
+        end:
+        */
 		return 0x0000;
 		//printf("%06x read %06x - %04x %04x\n", pc , (offset*2 + 0xfec000), ret, mem_mask);
 	}
@@ -354,7 +354,7 @@ WRITE16_MEMBER( glass_state::glass_mainram_w )
 
 	if (offset == (0xfede02 - 0xfec000)>>1)
 	{
-//		printf("%06x write %06x - %04x %04x\n",  pc, (offset*2 + 0xfec000), data, mem_mask);
+//      printf("%06x write %06x - %04x %04x\n",  pc, (offset*2 + 0xfec000), data, mem_mask);
 		// several checks write here then expect it to appear mirrored, might be some kind of command + command ack
 		if (mem_mask & 0xff00) // sometimes mask 0xff00, but not in cases which poll for change
 		{
@@ -390,7 +390,7 @@ WRITE16_MEMBER( glass_state::glass_mainram_w )
 	}
 
 }
-	
+
 
 DRIVER_INIT_MEMBER(glass_state,glass)
 {

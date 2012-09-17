@@ -39,7 +39,7 @@ enum
 	SHARC_B12,		SHARC_B13,		SHARC_B14,		SHARC_B15,
 };
 
-struct SHARC_DAG 
+struct SHARC_DAG
 {
 	UINT32 i[8];
 	UINT32 m[8];
@@ -47,13 +47,13 @@ struct SHARC_DAG
 	UINT32 l[8];
 };
 
-union SHARC_REG 
+union SHARC_REG
 {
 	INT32 r;
 	float f;
 };
 
-struct DMA_REGS 
+struct DMA_REGS
 {
 	UINT32 control;
 	UINT32 int_index;
@@ -66,14 +66,14 @@ struct DMA_REGS
 	UINT32 ext_count;
 };
 
-struct LADDR 
+struct LADDR
 {
 	UINT32 addr;
 	UINT32 code;
 	UINT32 loop_type;
 };
 
-struct DMA_OP 
+struct DMA_OP
 {
 	UINT32 src;
 	UINT32 dst;
@@ -580,7 +580,7 @@ static CPU_RESET( sharc )
 
 			sharc_dma_exec(cpustate, 6);
 			dma_op(cpustate, 6);
-			
+
 			cpustate->dma_op[6].timer->adjust(attotime::never, 0);
 			break;
 		}
@@ -766,7 +766,7 @@ static CPU_EXECUTE( sharc )
 				}
 			}
 		}
-		
+
 		sharc_op[(cpustate->opcode >> 39) & 0x1ff](cpustate);
 
 

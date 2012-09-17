@@ -75,7 +75,7 @@
     STRUCTURES & TYPEDEFS
 ***************************************************************************/
 
-struct am29000_state 
+struct am29000_state
 {
 	INT32			icount;
 	UINT32			pc;

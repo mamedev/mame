@@ -175,7 +175,7 @@ enum
 
 
 /* Everything we need to know about an opcode */
-struct opcode_struct 
+struct opcode_struct
 {
 	char name[MAX_NAME_LENGTH];           /* opcode handler name */
 	unsigned char size;                   /* Size of operation */
@@ -192,7 +192,7 @@ struct opcode_struct
 
 
 /* All modifications necessary for a specific EA mode of an instruction */
-struct ea_info_struct 
+struct ea_info_struct
 {
 	const char* fname_add;
 	const char* ea_add;
@@ -202,7 +202,7 @@ struct ea_info_struct
 
 
 /* Holds the body of a function */
-struct body_struct 
+struct body_struct
 {
 	char body[MAX_BODY_LENGTH][MAX_LINE_LENGTH+1];
 	int length;
@@ -210,7 +210,7 @@ struct body_struct
 
 
 /* Holds a sequence of search / replace strings */
-struct replace_struct 
+struct replace_struct
 {
 	char replace[MAX_REPLACE_LENGTH][2][MAX_LINE_LENGTH+1];
 	int length;

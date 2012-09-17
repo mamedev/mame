@@ -60,7 +60,7 @@ enum
     Structure that describes the state of a floppy drive, and the associated
     disk image
 */
-struct floppy_t 
+struct floppy_t
 {
 	device_t *img;
 	emu_file *fd;
@@ -80,7 +80,7 @@ struct floppy_t
     int is_400k;                /* drive is single-sided, which means 400K */
 };
 
-struct sonydriv_t 
+struct sonydriv_t
 {
 	int lines;				/* four lines SONY_CA0 - SONY_LSTRB */
 

@@ -3852,7 +3852,7 @@ static void _ZCF(tlcs900_state *cpustate)
 }
 
 
-struct tlcs900inst 
+struct tlcs900inst
 {
 	void (*opfunc)(tlcs900_state *cpustate);
 	int		operand1;

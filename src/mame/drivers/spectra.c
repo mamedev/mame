@@ -1,5 +1,5 @@
 /******************************************************************************************
-  Pinball  
+  Pinball
   Valley Spectra IV
   -----------------
   Rotating game, like Midway's "Rotation VIII".

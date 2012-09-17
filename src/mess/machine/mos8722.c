@@ -24,7 +24,7 @@ enum
 	CR = 0,
 	PCRA, LCRA = PCRA,
 	PCRB, LCRB = PCRB,
-	PCRC, LCRC = PCRC, 
+	PCRC, LCRC = PCRC,
 	PCRD, LCRD = PCRD,
 	MCR,
 	RCR,
@@ -69,7 +69,7 @@ enum
 
 // RAM configuration register
 static const offs_t RCR_BOTTOM_ADDRESS[4] = { 0x0400, 0x1000, 0x0400, 0x1000 };
-static const offs_t RCR_TOP_ADDRESS[4] = 	{ 0xf000, 0xf000, 0xe000, 0xc000 };
+static const offs_t RCR_TOP_ADDRESS[4] =	{ 0xf000, 0xf000, 0xe000, 0xc000 };
 
 enum
 {
@@ -337,7 +337,7 @@ offs_t mos8722_device::ta_r(offs_t offset, int aec, int *ms0, int *ms1, int *ms2
 						*cas1 = P1H_A16 ? 0 : 1;
 					}
 				}
-				
+
 				if ((RCR_BOTTOM && offset < RCR_BOTTOM_ADDRESS[RCR_SHARE]) ||
 					(RCR_TOP && offset >= RCR_TOP_ADDRESS[RCR_SHARE]))
 				{

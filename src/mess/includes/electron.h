@@ -23,7 +23,7 @@
 
 /* ULA context */
 
-struct ULA 
+struct ULA
 {
 	UINT8 interrupt_status;
 	UINT8 interrupt_control;

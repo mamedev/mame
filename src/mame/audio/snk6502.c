@@ -29,7 +29,7 @@
 #define FRAC_ONE	(1 << FRAC_BITS)
 #define FRAC_MASK	(FRAC_ONE - 1)
 
-struct TONE 
+struct TONE
 {
 	int	mute;
 	int	offset;

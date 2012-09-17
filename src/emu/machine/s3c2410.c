@@ -65,7 +65,7 @@ DEVICE_START( s3c2410 )
 	space->install_legacy_readwrite_handler( *device, 0x59000000, 0x59000017, FUNC(s3c24xx_spi_0_r), FUNC(s3c24xx_spi_0_w));
 	space->install_legacy_readwrite_handler( *device, 0x59000020, 0x59000037, FUNC(s3c24xx_spi_1_r), FUNC(s3c24xx_spi_1_w));
 	space->install_legacy_readwrite_handler( *device, 0x5a000000, 0x5a000043, FUNC(s3c24xx_sdi_r), FUNC(s3c24xx_sdi_w));
-	
+
 	s3c24xx_video_start( device, device->machine());
 }
 

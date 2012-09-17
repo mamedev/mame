@@ -130,7 +130,7 @@ public:
 	DECLARE_DRIVER_INIT(dragngun);
 	DECLARE_DRIVER_INIT(lockload);
 	DECLARE_VIDEO_START(dragngun);
-	DECLARE_VIDEO_START(lockload);	
+	DECLARE_VIDEO_START(lockload);
 };
 
 

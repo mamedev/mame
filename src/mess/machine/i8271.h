@@ -36,7 +36,7 @@ extern const device_type I8271;
     TYPE DEFINITIONS
 ***************************************************************************/
 
-struct i8271_interface 
+struct i8271_interface
 {
 	void (*interrupt)(device_t *device, int state);
 	void (*dma_request)(device_t *device, int state, int read_);

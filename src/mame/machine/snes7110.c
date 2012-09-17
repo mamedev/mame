@@ -788,7 +788,7 @@ enum RTC_Mode
 
 static const UINT32 spc7110_months[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-struct snes_spc7110_t 
+struct snes_spc7110_t
 {
 	//==================
 	//decompression unit

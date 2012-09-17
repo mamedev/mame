@@ -40,7 +40,7 @@ for TI990. */
 /* We can use MAME's harddisk.c image format instead. */
 
 /* machine-independent big-endian 32-bit integer */
-struct UINT32BE 
+struct UINT32BE
 {
 	UINT8 bytes[4];
 };
@@ -61,7 +61,7 @@ INLINE void set_UINT32BE(UINT32BE *word, UINT32 data)
 #endif
 
 /* disk image header */
-struct disk_image_header 
+struct disk_image_header
 {
 	UINT32BE cylinders;			/* number of cylinders on hard disk (big-endian) */
 	UINT32BE heads;				/* number of heads on hard disk (big-endian) */
@@ -81,7 +81,7 @@ enum format_t
 };
 
 /* disk drive unit descriptor */
-struct hd_unit_t 
+struct hd_unit_t
 {
 	device_image_interface *img;						/* image descriptor */
 	format_t format;
@@ -94,7 +94,7 @@ struct hd_unit_t
 };
 
 /* disk controller */
-struct hdc_t 
+struct hdc_t
 {
 	UINT16 w[8];
 

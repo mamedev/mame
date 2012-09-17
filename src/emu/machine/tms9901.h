@@ -50,7 +50,7 @@ enum
     CLASS DEFINITION
 ***************************************************************************/
 
-struct tms9901_interface 
+struct tms9901_interface
 {
 	int 				interrupt_mask;			// a bit for each input pin whose state is always notified to the TMS9901 core
 	devcb_read8 		read_handler;			// 4*8 bits, to be selected using the offset (0-3)

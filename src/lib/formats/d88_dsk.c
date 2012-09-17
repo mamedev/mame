@@ -446,7 +446,7 @@ int d88_format::identify(io_generic *io, UINT32 form_factor)
 {
 	int size = io_generic_size(io);
 	UINT8 h[32];
-	
+
 	io_generic_read(io, h, 0, 32);
 	if((LITTLE_ENDIANIZE_INT32(*(UINT32 *)(h+0x1c)) == size) &&
 	   (h[0x1b] == 0x00 || h[0x1b] == 0x10 || h[0x1b] == 0x20 || h[0x1b] == 0x30 || h[0x1b] == 0x40))
@@ -458,7 +458,7 @@ int d88_format::identify(io_generic *io, UINT32 form_factor)
 bool d88_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	UINT8 h[32];
-	
+
 	io_generic_read(io, h, 0, 32);
 
 	int cell_count = 0;

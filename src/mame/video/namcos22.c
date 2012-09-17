@@ -317,7 +317,7 @@ poly3d_NoClip( void )
 	mClip.scissor.set(0, 639, 0, 479);
 }
 
-struct Poly3dVertex 
+struct Poly3dVertex
 {
 	float x,y,z;
 	int u,v; /* 0..0xfff */
@@ -953,7 +953,7 @@ static struct
 	int power;	/* 0.0..1.0 */
 } mCamera;
 
-enum SceneNodeType 
+enum SceneNodeType
 {
 	eSCENENODE_NONLEAF,
 	eSCENENODE_QUAD3D,

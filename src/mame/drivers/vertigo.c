@@ -110,7 +110,7 @@ static INPUT_PORTS_START( vertigo )
 INPUT_PORTS_END
 
 
-static const ttl74148_config vertigo_ttl74148_intf = 
+static const ttl74148_config vertigo_ttl74148_intf =
 {
 	vertigo_update_irq
 };

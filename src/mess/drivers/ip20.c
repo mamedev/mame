@@ -26,7 +26,7 @@
 #include "machine/scsicd.h"
 #include "machine/wd33c93.h"
 
-struct HPC_t 
+struct HPC_t
 {
 	UINT8 nMiscStatus;
 	UINT32 nParBufPtr;
@@ -38,7 +38,7 @@ struct HPC_t
 	UINT32 nSCSI0DMACtrl;
 };
 
-struct RTC_t 
+struct RTC_t
 {
 	UINT8 nRAM[32];
 	UINT8 nTemp;

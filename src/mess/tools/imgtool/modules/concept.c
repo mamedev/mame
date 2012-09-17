@@ -12,7 +12,7 @@
 #include <limits.h>
 #include "imgtool.h"
 
-struct UINT16xE 
+struct UINT16xE
 {
 	UINT8 bytes[2];
 };
@@ -69,7 +69,7 @@ INLINE void set_UINT16xE(int little_endian, UINT16xE *word, UINT16 data)
     device directory record (Disk sector 2-5)
 */
 
-struct concept_vol_hdr_entry 
+struct concept_vol_hdr_entry
 {
 	UINT16xE	first_block;
 	UINT16xE	next_block;
@@ -85,7 +85,7 @@ struct concept_vol_hdr_entry
 	UINT16xE	unused;
 };
 
-struct concept_file_dir_entry 
+struct concept_file_dir_entry
 {
 	UINT16xE	first_block;
 	UINT16xE	next_block;
@@ -96,7 +96,7 @@ struct concept_file_dir_entry
 	UINT16xE	last_access;
 };
 
-struct concept_dev_dir 
+struct concept_dev_dir
 {
 	concept_vol_hdr_entry vol_hdr;
 	concept_file_dir_entry file_dir[77];
@@ -106,7 +106,7 @@ struct concept_dev_dir
 /*
     concept disk image descriptor
 */
-struct concept_image 
+struct concept_image
 {
 	imgtool_stream *file_handle;		/* imgtool file handle */
 	concept_dev_dir dev_dir;	/* cached copy of device directory */
@@ -115,7 +115,7 @@ struct concept_image
 /*
     concept catalog iterator, used when imgtool reads the catalog
 */
-struct concept_iterator 
+struct concept_iterator
 {
 	concept_image *image;
 	int index;							/* current index */

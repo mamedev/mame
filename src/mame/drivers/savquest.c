@@ -537,10 +537,10 @@ void savquest_state::machine_reset()
 	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("bios")->base() + 0x20000);
 }
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	ide_interrupt, 
-	NULL, 
+	ide_interrupt,
+	NULL,
 	0
 };
 

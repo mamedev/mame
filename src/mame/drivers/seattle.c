@@ -2520,22 +2520,22 @@ static const mips3_config r5000_config =
 	SYSTEM_CLOCK	/* system clock rate */
 };
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	ide_interrupt, 
-	"maincpu", 
+	ide_interrupt,
+	"maincpu",
 	AS_PROGRAM
 };
 
 static const voodoo_config voodoo_intf =
 {
-	2, //				fbmem;
-	4,//				tmumem0;
-	0,//				tmumem1;
-	"screen",//			screen;
-	"maincpu",//			cputag;
-	vblank_assert,//	vblank;
-	voodoo_stall,//				stall;
+	2, //               fbmem;
+	4,//                tmumem0;
+	0,//                tmumem1;
+	"screen",//         screen;
+	"maincpu",//            cputag;
+	vblank_assert,//    vblank;
+	voodoo_stall,//             stall;
 };
 
 static MACHINE_CONFIG_START( seattle_common, seattle_state )
@@ -2579,7 +2579,7 @@ static MACHINE_CONFIG_DERIVED( seattle150, seattle_common )
 	MCFG_CPU_PROGRAM_MAP(seattle_map)
 MACHINE_CONFIG_END
 
-static const smc91c9x_config ethernet_intf = 
+static const smc91c9x_config ethernet_intf =
 {
 	ethernet_interrupt
 };
@@ -2604,13 +2604,13 @@ MACHINE_CONFIG_END
 
 static const voodoo_config voodoo_2_intf =
 {
-	2, //				fbmem;
-	4,//				tmumem0;
-	4,//				tmumem1;
-	"screen",//			screen;
-	"maincpu",//			cputag;
-	vblank_assert,//	vblank;
-	voodoo_stall,//				stall;
+	2, //               fbmem;
+	4,//                tmumem0;
+	4,//                tmumem1;
+	"screen",//         screen;
+	"maincpu",//            cputag;
+	vblank_assert,//    vblank;
+	voodoo_stall,//             stall;
 };
 
 static MACHINE_CONFIG_DERIVED( flagstaff, seattle_common )

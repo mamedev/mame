@@ -12,7 +12,7 @@
 
 #define MC_LENGTH 512
 
-struct am2901 
+struct am2901
 {
 	UINT32 ram[16];	  /* internal ram */
 	UINT32 d;		  /* direct data D input */
@@ -50,7 +50,7 @@ private:
 	running_machine *m_machine;
 };
 
-struct microcode 
+struct microcode
 {
 	UINT32 x;
 	UINT32 a;
@@ -70,7 +70,7 @@ struct microcode
 	UINT32 ma;
 };
 
-struct vproc 
+struct vproc
 {
 	UINT16 sram[64]; /* external sram */
 	UINT16 ramlatch; /* latch between 2901 and sram */

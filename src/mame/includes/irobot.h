@@ -6,7 +6,7 @@
 
 #define IR_TIMING				1		/* try to emulate MB and VG running time */
 
-struct irmb_ops 
+struct irmb_ops
 {
 	const struct irmb_ops *nxtop;
 	UINT32 func;

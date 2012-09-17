@@ -22,7 +22,7 @@
 
 extern const device_type JOYPORT;
 
-struct joyport_config 
+struct joyport_config
 {
 	devcb_write_line		interrupt;
 	int						vdp_clock;

@@ -36,7 +36,7 @@ static void update_interrupt(device_t *device);
 
 #define MAX_TAPE_UNIT 4
 
-struct tape_unit_t 
+struct tape_unit_t
 {
 	device_image_interface *img;		/* image descriptor */
 	unsigned int bot : 1;	/* TRUE if we are at the beginning of tape */

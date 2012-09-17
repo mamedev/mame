@@ -9,7 +9,7 @@
 
 #define MAX_CX_TIMERS	16
 
-struct cx_timer_t 
+struct cx_timer_t
 {
 	UINT32 value;
 	UINT32 limit;
@@ -18,7 +18,7 @@ struct cx_timer_t
 	emu_timer *timer;
 };
 
-struct cx_timer_regs_t 
+struct cx_timer_regs_t
 {
 	cx_timer_t timer[MAX_CX_TIMERS];
 	UINT32 timer_irq;

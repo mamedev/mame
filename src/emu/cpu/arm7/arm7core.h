@@ -185,7 +185,7 @@ enum
 
 
 /* CPU state struct */
-struct arm_state 
+struct arm_state
 {
 	ARM7CORE_REGS			// these must be included in your cpu specific register implementation
 	ARM7COPRO_REGS

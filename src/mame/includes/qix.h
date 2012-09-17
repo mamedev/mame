@@ -38,7 +38,7 @@ public:
 	/* devices */
 	optional_device<sn76489_new_device> m_sn1;
 	optional_device<sn76489_new_device> m_sn2;
-	
+
 	/* machine state */
 	optional_shared_ptr<UINT8> m_68705_port_out;
 	optional_shared_ptr<UINT8> m_68705_ddr;

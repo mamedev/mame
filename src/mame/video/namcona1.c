@@ -277,11 +277,11 @@ static void UpdateGfx(running_machine &machine)
 
 void namcona1_state::video_start()
 {
-	static const tilemap_get_info_delegate get_info[4] = { 
-		tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info0),this), 
-		tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info1),this), 
-		tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info2),this), 
-		tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info3),this) 
+	static const tilemap_get_info_delegate get_info[4] = {
+		tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info0),this),
+		tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info1),this),
+		tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info2),this),
+		tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info3),this)
 	};
 	int i;
 

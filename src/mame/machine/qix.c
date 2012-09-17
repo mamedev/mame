@@ -14,8 +14,8 @@
 
 
 
-	
-	
+
+
 /*************************************
  *
  *  Static function prototypes
@@ -501,7 +501,7 @@ static WRITE8_DEVICE_HANDLER( qix_coinctl_w )
  static WRITE8_DEVICE_HANDLER( slither_76489_0_w )
 {
 	qix_state *state = device->machine().driver_data<qix_state>();
-	
+
 	/* write to the sound chip */
 	state->m_sn1->write(*device->machine().device<legacy_cpu_device>("maincpu")->space(), 0, data);
 
@@ -515,7 +515,7 @@ static WRITE8_DEVICE_HANDLER( qix_coinctl_w )
 static WRITE8_DEVICE_HANDLER( slither_76489_1_w )
 {
 	qix_state *state = device->machine().driver_data<qix_state>();
-	
+
 	/* write to the sound chip */
 	state->m_sn2->write(*device->machine().device<legacy_cpu_device>("maincpu")->space(), 0, data);
 

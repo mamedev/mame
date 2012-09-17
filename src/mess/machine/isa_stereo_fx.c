@@ -56,7 +56,7 @@ WRITE8_MEMBER( stereo_fx_device::raise_drq_w )
 }
 
 /* port 0x20 - in ROM (usually) stored in RAM 0x22
- * bit0 - 
+ * bit0 -
  * bit1 -
  * bit2 -
  * bit3 -

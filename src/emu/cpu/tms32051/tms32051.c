@@ -46,7 +46,7 @@ enum
 	TMS32051_AR7,
 };
 
-struct PMST 
+struct PMST
 {
 	UINT16 iptr;
 	UINT16 avis;
@@ -58,7 +58,7 @@ struct PMST
 	UINT16 braf;
 };
 
-struct ST0 
+struct ST0
 {
 	UINT16 dp;
 	UINT16 intm;
@@ -67,7 +67,7 @@ struct ST0
 	UINT16 arp;
 };
 
-struct ST1 
+struct ST1
 {
 	UINT16 arb;
 	UINT16 cnf;

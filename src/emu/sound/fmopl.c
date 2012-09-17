@@ -198,7 +198,7 @@ static FILE * cymfile = NULL;
 
 
 
-struct OPL_SLOT 
+struct OPL_SLOT
 {
 	UINT32	ar;			/* attack rate: AR<<2           */
 	UINT32	dr;			/* decay rate:  DR<<2           */
@@ -239,7 +239,7 @@ struct OPL_SLOT
 	UINT16	wavetable;
 };
 
-struct OPL_CH 
+struct OPL_CH
 {
 	OPL_SLOT SLOT[2];
 	/* phase generator state */
@@ -250,7 +250,7 @@ struct OPL_CH
 };
 
 /* OPL state */
-struct FM_OPL 
+struct FM_OPL
 {
 	/* FM channel slots */
 	OPL_CH	P_CH[9];				/* OPL/OPL2 chips have 9 channels*/

@@ -171,15 +171,15 @@ to use an EEPROM reader, in order to obtain a dump of the whole content.
 
 /*
 
-	TODO:
+    TODO:
 
-	- connect to PLA
-	- clean up ROMs
-	- wire up function ROM softlist
-	- remove banking code from machine/c128.h
-	- inherit from c64_state and use common members from there
-	- clean up inputs
-	- fix fast serial
+    - connect to PLA
+    - clean up ROMs
+    - wire up function ROM softlist
+    - remove banking code from machine/c128.h
+    - inherit from c64_state and use common members from there
+    - clean up inputs
+    - fix fast serial
 
 */
 
@@ -281,14 +281,14 @@ void c128_state::bankswitch_pla(offs_t offset, offs_t ta, offs_t vma, int ba, in
 UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, int ba, int aec, int z80io)
 {
 	int rw = 1, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1, cas0 = 1, cas1 = 1;
-	int sden = 1, dir = 1, gwe = 1, rom1 = 1, rom2 = 1, rom3 = 1, rom4 = 1, charom = 1, colorram = 1, vic = 1, 
+	int sden = 1, dir = 1, gwe = 1, rom1 = 1, rom2 = 1, rom3 = 1, rom4 = 1, charom = 1, colorram = 1, vic = 1,
 		from1 = 1, romh = 1, roml = 1, dwe = 1, ioacc = 1, clrbank = 1, iocs = 1, casenb = 1;
 	int io1 = 1, io2 = 1;
 
 	offs_t ta = m_mmu->ta_r(offset, aec, &ms0, &ms1, &ms2, &ms3, &cas0, &cas1);
 
 	bankswitch_pla(offset, ta, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0,
-		&sden, &dir, &gwe, &rom1, &rom2, &rom3, &rom4, &charom, &colorram, &vic, 
+		&sden, &dir, &gwe, &rom1, &rom2, &rom3, &rom4, &charom, &colorram, &vic,
 		&from1, &romh, &roml, &dwe, &ioacc, &clrbank, &iocs, &casenb);
 
 	UINT8 data = 0xff;
@@ -400,14 +400,14 @@ UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, i
 void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, UINT8 data, int ba, int aec, int z80io)
 {
 	int rw = 0, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1, cas0 = 1, cas1 = 1;
-	int sden = 1, dir = 1, gwe = 1, rom1 = 1, rom2 = 1, rom3 = 1, rom4 = 1, charom = 1, colorram = 1, vic = 1, 
+	int sden = 1, dir = 1, gwe = 1, rom1 = 1, rom2 = 1, rom3 = 1, rom4 = 1, charom = 1, colorram = 1, vic = 1,
 		from1 = 1, romh = 1, roml = 1, dwe = 1, ioacc = 1, clrbank = 1, iocs = 1, casenb = 1;
 	int io1 = 1, io2 = 1;
 
 	offs_t ta = m_mmu->ta_r(offset, aec, &ms0, &ms1, &ms2, &ms3, &cas0, &cas1);
 
 	bankswitch_pla(offset, ta, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0,
-		&sden, &dir, &gwe, &rom1, &rom2, &rom3, &rom4, &charom, &colorram, &vic, 
+		&sden, &dir, &gwe, &rom1, &rom2, &rom3, &rom4, &charom, &colorram, &vic,
 		&from1, &romh, &roml, &dwe, &ioacc, &clrbank, &iocs, &casenb);
 
 	if (!casenb && !dwe)
@@ -483,7 +483,7 @@ WRITE8_MEMBER( c128_state::z80_w )
 {
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
-	
+
 	write_memory(space, offset, vma, data, ba, aec, z80io);
 }
 
@@ -491,7 +491,7 @@ READ8_MEMBER( c128_state::z80_io_r )
 {
 	int ba = 1, aec = 1, z80io = 0;
 	offs_t vma = 0;
-	
+
 	return read_memory(space, offset, vma, ba, aec, z80io);
 }
 
@@ -499,7 +499,7 @@ WRITE8_MEMBER( c128_state::z80_io_w )
 {
 	int ba = 1, aec = 1, z80io = 0;
 	offs_t vma = 0;
-	
+
 	write_memory(space, offset, vma, data, ba, aec, z80io);
 }
 
@@ -507,7 +507,7 @@ READ8_MEMBER( c128_state::read )
 {
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
-	
+
 	return read_memory(space, vma, offset, ba, aec, z80io);
 }
 
@@ -515,7 +515,7 @@ WRITE8_MEMBER( c128_state::write )
 {
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
-	
+
 	write_memory(space, offset, vma, data, ba, aec, z80io);
 }
 
@@ -523,7 +523,7 @@ READ8_MEMBER( c128_state::vic_videoram_r )
 {
 	int ba = 0, aec = 0, z80io = 1;
 	offs_t vma = 0;
-	
+
 	return read_memory(space, offset, vma, ba, aec, z80io);
 }
 
@@ -969,7 +969,7 @@ static const mc6845_interface vdc_intf =
 READ8_MEMBER( c128_state::sid_potx_r )
 {
 	UINT8 cia1_pa = mos6526_pa_r(m_cia1, 0);
-	
+
 	int sela = BIT(cia1_pa, 6);
 	int selb = BIT(cia1_pa, 7);
 
@@ -984,7 +984,7 @@ READ8_MEMBER( c128_state::sid_potx_r )
 READ8_MEMBER( c128_state::sid_poty_r )
 {
 	UINT8 cia1_pa = mos6526_pa_r(m_cia1, 0);
-	
+
 	int sela = BIT(cia1_pa, 6);
 	int selb = BIT(cia1_pa, 7);
 

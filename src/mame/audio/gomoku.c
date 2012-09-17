@@ -19,7 +19,7 @@ static const int defgain = 48;
 
 
 /* this structure defines the parameters for a channel */
-struct sound_channel 
+struct sound_channel
 {
 	int channel;
 	int frequency;

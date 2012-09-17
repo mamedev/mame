@@ -28,14 +28,14 @@
 #include "machine/sst39vfx.h"
 #include "machine/ram.h"
 
-struct CYBIKO_RS232_PINS 
+struct CYBIKO_RS232_PINS
 {
 	int sck; // serial clock
 	int txd; // transmit data
 	int rxd; // receive data
 };
 
-struct CYBIKO_RS232 
+struct CYBIKO_RS232
 {
 	CYBIKO_RS232_PINS pin;
 	UINT8 rx_bits, rx_byte, tx_byte, tx_bits;

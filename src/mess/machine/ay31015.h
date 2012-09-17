@@ -12,7 +12,7 @@
 ***************************************************************************/
 
 
-enum ay31015_type_t 
+enum ay31015_type_t
 {
 	/* For AY-3-1014A, AY-3-1015(D) and HD6402 variants */
 	AY_3_1015,
@@ -22,7 +22,7 @@ enum ay31015_type_t
 };
 
 
-enum ay31015_input_pin_t 
+enum ay31015_input_pin_t
 {
 	AY31015_SWE=16,			/* -SWE  - Pin 16 - Status word enable */
 	AY31015_RDAV=18,		/* -RDAV - Pin 18 - Reset data available */
@@ -37,7 +37,7 @@ enum ay31015_input_pin_t
 };
 
 
-enum ay31015_output_pin_t 
+enum ay31015_output_pin_t
 {
 	AY31015_PE=13,			/* PE   - Pin 13 - Parity error */
 	AY31015_FE=14,			/* FE   - Pin 14 - Framing error */
@@ -49,7 +49,7 @@ enum ay31015_output_pin_t
 };
 
 
-struct 	ay31015_config
+struct	ay31015_config
 {
 	ay31015_type_t		type;					/* Type of chip */
 	double				transmitter_clock;		/* TCP - pin 40 */

@@ -8,7 +8,7 @@ class netdev;
 #define CREATE_NETDEV(name) class netdev *name(const char *ifname, class device_network_interface *ifdev, int rate)
 typedef class netdev *(*create_netdev)(const char *ifname, class device_network_interface *ifdev, int rate);
 
-struct netdev_entry_t 
+struct netdev_entry_t
 {
 	int id;
 	char name[256];

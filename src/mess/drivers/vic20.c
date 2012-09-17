@@ -463,7 +463,7 @@ WRITE8_MEMBER( vic20_state::via0_pa_w )
         PA2
         PA3
         PA4
-        PA5		LITE PEN (FIRE)
+        PA5     LITE PEN (FIRE)
         PA6
         PA7     SERIAL ATN OUT
 
@@ -550,7 +550,7 @@ READ8_MEMBER( vic20_state::via1_pb_r )
 
 	// joystick
 	UINT8 joy = m_joy1->joy_r();
-	
+
 	data &= BIT(joy, 3) << 7;
 
 	return data;
@@ -881,7 +881,7 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE      INPUT      INIT                        COMPANY                             FULLNAME                    FLAGS
-COMP( 1980, vic1001,    0,          0,      ntsc,  		vic1001, 	driver_device,	0,          "Commodore Business Machines",      "VIC-1001 (Japan)",         GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-COMP( 1981, vic20,      vic1001,    0,      ntsc,  		vic20,		driver_device,	0,          "Commodore Business Machines",      "VIC-20 (NTSC)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-COMP( 1981, vic20p,     vic1001,    0,      pal,   		vic20, 		driver_device,	0,          "Commodore Business Machines",      "VIC-20 / VC-20 (PAL)",     GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-COMP( 1981, vic20s,     vic1001,    0,      pal,   		vic20s, 	driver_device,	0,          "Commodore Business Machines",      "VIC-20 (Sweden/Finland)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+COMP( 1980, vic1001,    0,          0,      ntsc,		vic1001,	driver_device,	0,          "Commodore Business Machines",      "VIC-1001 (Japan)",         GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+COMP( 1981, vic20,      vic1001,    0,      ntsc,		vic20,		driver_device,	0,          "Commodore Business Machines",      "VIC-20 (NTSC)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+COMP( 1981, vic20p,     vic1001,    0,      pal,		vic20,		driver_device,	0,          "Commodore Business Machines",      "VIC-20 / VC-20 (PAL)",     GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+COMP( 1981, vic20s,     vic1001,    0,      pal,		vic20s, 	driver_device,	0,          "Commodore Business Machines",      "VIC-20 (Sweden/Finland)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

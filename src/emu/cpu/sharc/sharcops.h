@@ -1,4 +1,4 @@
-struct SHARC_OP 
+struct SHARC_OP
 {
 	UINT32 op_mask;
 	UINT32 op_bits;

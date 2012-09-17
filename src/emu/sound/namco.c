@@ -36,7 +36,7 @@
 
 
 /* this structure defines the parameters for a channel */
-struct sound_channel 
+struct sound_channel
 {
 	UINT32 frequency;
 	UINT32 counter;

@@ -123,8 +123,8 @@ VIDEO_START_MEMBER(madalien_state,madalien)
 
 	static const tilemap_mapper_delegate scan_functions[4] =
 	{
-		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode0),this), 
-		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode1),this), 
+		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode0),this),
+		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode1),this),
 		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode2),this),
 		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode3),this)
 	};

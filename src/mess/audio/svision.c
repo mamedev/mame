@@ -7,13 +7,13 @@
 #include "emu.h"
 #include "includes/svision.h"
 
-enum SVISION_NOISE_Type 
+enum SVISION_NOISE_Type
 {
 	SVISION_NOISE_Type7Bit,
 	SVISION_NOISE_Type14Bit
 };
 
-struct SVISION_NOISE 
+struct SVISION_NOISE
 {
 	UINT8 reg[3];
 	int on, right, left, play;
@@ -25,7 +25,7 @@ struct SVISION_NOISE
 	int value; // currently simple random function
 };
 
-struct SVISION_DMA 
+struct SVISION_DMA
 {
 	UINT8 reg[5];
 	int on, right, left;
@@ -35,7 +35,7 @@ struct SVISION_DMA
 	int finished;
 };
 
-struct SVISION_CHANNEL 
+struct SVISION_CHANNEL
 {
 	UINT8 reg[4];
 	int on;

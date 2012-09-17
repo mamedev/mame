@@ -1037,10 +1037,10 @@ static MACHINE_CONFIG_DERIVED( midvunit, midvcommon )
 	MCFG_FRAGMENT_ADD(dcs_audio_2k)
 MACHINE_CONFIG_END
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	NULL, 
-	NULL, 
+	NULL,
+	NULL,
 	0
 };
 

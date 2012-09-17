@@ -48,7 +48,7 @@
 		</part>
 	</software>
 
-<!-- This was was obtained by removing the MTW header from the available jelda.mtw. 
+<!-- This was was obtained by removing the MTW header from the available jelda.mtw.
      was any info lost? i.e. was the wav inside the mtw the complete content of the MZ tape? -->
 	<software name="jelda" supported="no">
 		<description>Jelda</description>
@@ -61,7 +61,7 @@
 		</part>
 	</software>
 
-<!-- This was was obtained by removing the MTW header from the available jelda.mtw. 
+<!-- This was was obtained by removing the MTW header from the available jelda.mtw.
      was any info lost? i.e. was the wav inside the mtw the complete content of the MZ tape? -->
 	<software name="jelda2" supported="no">
 		<description>Jelda 2</description>

@@ -76,7 +76,7 @@ public:
 	rectangle() { }
 	rectangle(INT32 minx, INT32 maxx, INT32 miny, INT32 maxy)
 		: min_x(minx), max_x(maxx), min_y(miny), max_y(maxy) { }
-	
+
 	// getters
 	INT32 left() const { return min_x; }
 	INT32 right() const { return max_x; }
@@ -102,7 +102,7 @@ public:
 		if (src.max_y > max_y) max_y = src.max_y;
 		return *this;
 	}
-	
+
 	// comparisons
 	bool operator==(const rectangle &rhs) const { return min_x == rhs.min_x && max_x == rhs.max_x && min_y == rhs.min_y && max_y == rhs.max_y; }
 	bool operator!=(const rectangle &rhs) const { return min_x != rhs.min_x || max_x != rhs.max_x || min_y != rhs.min_y || max_y != rhs.max_y; }
@@ -128,7 +128,7 @@ public:
 	void set_height(INT32 height) { max_y = min_y + height - 1; }
 	void set_origin(INT32 x, INT32 y) { max_x += x - min_x; max_y += y - min_y; min_x = x; min_y = y; }
 	void set_size(INT32 width, INT32 height) { set_width(width); set_height(height); }
-	
+
 	// offset helpers
 	void offset(INT32 xdelta, INT32 ydelta) { min_x += xdelta; max_x += xdelta; min_y += ydelta; max_y += ydelta; }
 	void offsetx(INT32 delta) { min_x += delta; max_x += delta; }

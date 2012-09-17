@@ -373,7 +373,7 @@ struct taitotz_polydata
 	int specular_r, specular_g, specular_b;
 };
 
-struct PLANE 
+struct PLANE
 {
 	float x, y, z, d;
 };
@@ -2470,10 +2470,10 @@ static const tlcs900_interface taitotz_tlcs900_interface =
 	DEVCB_DRIVER_MEMBER(taitotz_state, tlcs900_port_write),
 };
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	ide_interrupt, 
-	NULL, 
+	ide_interrupt,
+	NULL,
 	0
 };
 

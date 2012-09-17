@@ -89,7 +89,7 @@ public:
 	DECLARE_DRIVER_INIT(enduror);
 	DECLARE_DRIVER_INIT(endurobl);
 	DECLARE_DRIVER_INIT(endurob2);
-	
+
 	// video updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -120,7 +120,7 @@ protected:
 	required_device<i8255_device> m_i8255_1;
 	required_device<i8255_device> m_i8255_2;
 	required_device<sega_16bit_sprite_device> m_sprites;
-	
+
 	// memory pointers
 	required_shared_ptr<UINT16> m_workram;
 

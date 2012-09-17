@@ -94,7 +94,7 @@ public:
 		COMBINE_DATA(&m_automat_scroll_regs[offset]);
 	}
 	UINT16 m_automat_scroll_regs[4];
-	
+
 	DECLARE_VIDEO_START(automat);
 };
 

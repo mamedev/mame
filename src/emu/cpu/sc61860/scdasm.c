@@ -79,7 +79,7 @@
 */
 
 
-enum Adr 
+enum Adr
 {
 	Ill,
 	Imp,

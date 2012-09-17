@@ -94,7 +94,7 @@
 
 #define TTL_7402_NOR(_name, _I1, _I2)												\
 		NET_REGISTER_DEV(nic7402, _name)											\
-		NET_CONNECT(_name, I1, _I1)		 											\
+		NET_CONNECT(_name, I1, _I1)													\
 		NET_CONNECT(_name, I2, _I2)													\
 
 #define TTL_7404_INVERT(_name, _I1)													\
@@ -147,7 +147,7 @@
 
 #define TTL_7486_XOR(_name, _I1, _I2)												\
 		NET_REGISTER_DEV(nic7486, _name)											\
-		NET_CONNECT(_name, I1, _I1)		 											\
+		NET_CONNECT(_name, I1, _I1)													\
 		NET_CONNECT(_name, I2, _I2)													\
 
 #define TTL_7448(_name, _A0, _A1, _A2, _A3, _LTQ, _BIQ, _RBIQ)						\
@@ -201,7 +201,7 @@
 		NET_CONNECT(_name, K,  _K)													\
 		NET_CONNECT(_name, CLRQ,  _CLRQ)											\
 
-#define TTL_74107(_name, _CLK, _J, _K, _CLRQ)							 			\
+#define TTL_74107(_name, _CLK, _J, _K, _CLRQ)										\
 		TTL_74107A(_name, _CLK, _J, _K, _CLRQ)
 
 #define TTL_74153(_name, _A1, _A2, _A3, _A4, _A, _B, _GA)							\
@@ -408,7 +408,7 @@ class nic74107 : public nic74107A
 {
 public:
 	nic74107()
-	: 	nic74107A() {}
+	:	nic74107A() {}
 
 };
 

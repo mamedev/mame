@@ -2474,7 +2474,7 @@ static astring gba_chip_string( UINT32 chip)
 	return str.trimspace();
 }
 
-struct gba_chip_fix_conflict_item 
+struct gba_chip_fix_conflict_item
 {
 	char game_code[5];
 	UINT32 chip;
@@ -2518,7 +2518,7 @@ static const gba_chip_fix_conflict_item gba_chip_fix_conflict_list[] =
 	{ "BYUJ", GBA_CHIP_EEPROM_64K }, // 2322 - Yggdra Union (JPN)
 };
 
-struct gba_chip_fix_eeprom_item 
+struct gba_chip_fix_eeprom_item
 {
 	char game_code[5];
 };

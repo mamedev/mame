@@ -201,7 +201,7 @@ struct fat_mediatype
 	UINT8 sectors;
 };
 
-enum creation_policy_t 
+enum creation_policy_t
 {
 	CREATE_NONE,
 	CREATE_FILE,
@@ -1395,7 +1395,7 @@ static imgtoolerr_t fat_read_dirent(imgtool_partition *partition, fat_file *file
 
 
 
-enum sfn_disposition_t 
+enum sfn_disposition_t
 {
 	SFN_SUFFICIENT,	/* name fully representable in short file name */
 	SFN_DERIVATIVE,	/* name not fully representable in short file name, but no need to tildize */

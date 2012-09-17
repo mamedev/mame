@@ -1,16 +1,16 @@
 /***************************************************************************
 
-	Mitsubishi M50458 OSD chip
+    Mitsubishi M50458 OSD chip
 
-	device by Angelo Salese
+    device by Angelo Salese
 
-	TODO:
-	- vertical scrolling needs references (might work differently and/or in
-	  "worse" ways, the one currently implemented guesses that the screen is
-	   masked at the top and the end when in scrolling mode).
-	- Understand what the "vertical start position" really does (vblank?)
-	- Check if the ROM source is actually 2bpp once that a redump is made
-	  (the shadow ROM copy doesn't convince me 100%);
+    TODO:
+    - vertical scrolling needs references (might work differently and/or in
+      "worse" ways, the one currently implemented guesses that the screen is
+       masked at the top and the end when in scrolling mode).
+    - Understand what the "vertical start position" really does (vblank?)
+    - Check if the ROM source is actually 2bpp once that a redump is made
+      (the shadow ROM copy doesn't convince me 100%);
 
 ***************************************************************************/
 
@@ -46,7 +46,7 @@ ROM_END
 
 WRITE16_MEMBER( m50458_device::vreg_120_w)
 {
-//	printf("%04x\n",data);
+//  printf("%04x\n",data);
 }
 
 WRITE16_MEMBER( m50458_device::vreg_121_w)
@@ -85,7 +85,7 @@ WRITE16_MEMBER( m50458_device::vreg_123_w)
 	/* char part of vertical scrolling */
 	m_scrr = (data & 0x0f00) >> 8;
 
-//	printf("%02x %02x %02x\n",m_scrr,m_scrf,m_space);
+//  printf("%02x %02x %02x\n",m_scrr,m_scrf,m_space);
 }
 
 WRITE16_MEMBER( m50458_device::vreg_124_w)

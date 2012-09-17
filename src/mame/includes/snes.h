@@ -439,8 +439,8 @@ public:
 	emu_timer             *m_hblank_timer;
 	emu_timer             *m_nmi_timer;
 	emu_timer             *m_hirq_timer;
-//	emu_timer             *m_div_timer;
-//	emu_timer             *m_mult_timer;
+//  emu_timer             *m_div_timer;
+//  emu_timer             *m_mult_timer;
 	emu_timer             *m_io_timer;
 
 	/* DMA/HDMA-related */

@@ -26,7 +26,7 @@
 //**************************************************************************
 
 
-enum rtc9701_state_t 
+enum rtc9701_state_t
 {
 	RTC9701_CMD_WAIT = 0,
 	RTC9701_RTC_READ,
@@ -37,7 +37,7 @@ enum rtc9701_state_t
 
 };
 
-struct rtc_regs_t 
+struct rtc_regs_t
 {
 	UINT8 sec, min, hour, day, wday, month, year;
 };

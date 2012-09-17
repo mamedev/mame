@@ -24,7 +24,7 @@
 
 #include "lh5801.h"
 
-enum Adr 
+enum Adr
 {
 	Imp,
 	Reg,
@@ -46,7 +46,7 @@ enum Adr
 	RelM
 };
 
-enum Regs 
+enum Regs
 {
 	RegNone,
 	A,
@@ -64,7 +64,7 @@ static const char *const RegNames[]= {
 #undef SEC
 #endif
 
-enum Ins 
+enum Ins
 {
 	ILL, ILL2, PREFD, NOP,
 

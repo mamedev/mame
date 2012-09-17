@@ -348,7 +348,7 @@ void gfx_element::set_layout(const gfx_layout &gl, const UINT8 *srcdata)
 		m_pen_usage.resize(m_total_elements);
 	else
 		m_pen_usage.reset();
-	
+
 	// set the source
 	set_source(srcdata);
 }
@@ -402,7 +402,7 @@ void gfx_element::decode(UINT32 code)
 		// zap the data to 0
 		UINT8 *decode_base = m_gfxdata + code * m_char_modulo;
 		memset(decode_base, 0, m_char_modulo);
-		
+
 		// iterate over planes
 		for (int plane = 0; plane < m_layout_planes; plane++)
 		{
@@ -414,7 +414,7 @@ void gfx_element::decode(UINT32 code)
 			{
 				int yoffs = planeoffs + m_layout_yoffset[y];
 				UINT8 *dp = decode_base + y * rowbytes();
-				
+
 				// iterate over columns
 				for (int x = 0; x < m_origwidth; x++)
 					if (readbit(m_srcdata, yoffs + m_layout_xoffset[x]))

@@ -11,7 +11,7 @@
 */
 
 // unfortunatly memory configuration differs with internal rom size
-enum UPD7810_TYPE 
+enum UPD7810_TYPE
 {
 	TYPE_7801,
 	TYPE_78C05,

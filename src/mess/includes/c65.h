@@ -10,13 +10,13 @@
 #include "includes/c64_legacy.h"
 #include "machine/6526cia.h"
 
-struct dma_t 
+struct dma_t
 {
 	int version;
 	UINT8 data[4];
 };
 
-struct fdc_t 
+struct fdc_t
 {
 	int state;
 
@@ -32,7 +32,7 @@ struct fdc_t
 	int head,track,sector;
 };
 
-struct expansion_ram_t 
+struct expansion_ram_t
 {
 	UINT8 reg;
 };

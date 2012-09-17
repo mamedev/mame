@@ -29,7 +29,7 @@
 #include "sound/2203intf.h"
 #include "formats/basicdsk.h"
 
-struct tsp_t 
+struct tsp_t
 {
 	UINT16 tvram_vreg_offset;
 	UINT16 attr_offset;

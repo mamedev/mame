@@ -447,7 +447,7 @@ static void mpc8240_interrupt(running_machine &machine, int irq);
 #define I2C_STATE_DATA_TRANSFER		2
 
 
-struct MPC8240_IRQ 
+struct MPC8240_IRQ
 {
 	UINT32 vector;
 	int priority;
@@ -457,7 +457,7 @@ struct MPC8240_IRQ
 	int mask;
 };
 
-struct MPC8240_GLOBAL_TIMER 
+struct MPC8240_GLOBAL_TIMER
 {
 	UINT32 base_count;
 	int enable;
@@ -466,7 +466,7 @@ struct MPC8240_GLOBAL_TIMER
 
 
 
-struct MPC8240_EPIC 
+struct MPC8240_EPIC
 {
 	UINT32 iack;
 	UINT32 eicr;
@@ -1968,22 +1968,22 @@ void viper_state::machine_reset()
 	ide_features[67*2+1] = 0x00;
 }
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	ide_interrupt, 
-	NULL, 
+	ide_interrupt,
+	NULL,
 	0
 };
 
 static const voodoo_config voodoo_intf =
 {
-	8, //				fbmem;
-	0,//				tmumem0;
-	0,//				tmumem1;
-	"screen",//			screen;
-	"maincpu",//		cputag;
-	voodoo_vblank,//	vblank;
-	NULL,//				stall;
+	8, //               fbmem;
+	0,//                tmumem0;
+	0,//                tmumem1;
+	"screen",//         screen;
+	"maincpu",//        cputag;
+	voodoo_vblank,//    vblank;
+	NULL,//             stall;
 };
 
 static MACHINE_CONFIG_START( viper, viper_state )

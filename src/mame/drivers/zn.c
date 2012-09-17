@@ -1532,10 +1532,10 @@ MACHINE_RESET_MEMBER(zn_state,coh1000w)
 	machine().device("ide")->reset();
 }
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	atpsx_interrupt, 
-	NULL, 
+	atpsx_interrupt,
+	NULL,
 	0
 };
 
@@ -2213,10 +2213,10 @@ static MACHINE_CONFIG_DERIVED( coh1000a, zn1_2mb_vram )
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000a )
 MACHINE_CONFIG_END
 
-static const ide_config jdredd_ide_intf = 
+static const ide_config jdredd_ide_intf =
 {
-	jdredd_ide_interrupt, 
-	NULL, 
+	jdredd_ide_interrupt,
+	NULL,
 	0
 };
 

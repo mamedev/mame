@@ -36,7 +36,7 @@ extern const device_type SMC92X4;
 #define DS_READY	0x02		/* drive ready bit */
 #define DS_WRFAULT	0x01		/* write fault */
 
-struct smc92x4_interface 
+struct smc92x4_interface
 {
 	// Disk format support. This flag allows to choose between the full
 	// FM/MFM format and an abbreviated track layout. The difference results

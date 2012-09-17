@@ -89,7 +89,7 @@ struct i8271_t
 	emu_timer *command_complete_timer;
 };
 
-enum I8271_STATE_t 
+enum I8271_STATE_t
 {
 	I8271_STATE_EXECUTION_READ = 0,
 	I8271_STATE_EXECUTION_WRITE

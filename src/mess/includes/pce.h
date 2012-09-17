@@ -31,7 +31,7 @@
 /* the largest possible cartridge image (street fighter 2 - 2.5MB) */
 #define PCE_ROM_MAXSIZE		0x280000
 
-struct pce_cd_t 
+struct pce_cd_t
 {
 	UINT8	regs[16];
 	UINT8	*bram;

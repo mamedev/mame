@@ -8,10 +8,10 @@
     and http://www.vr32.de/modules/dokuwiki/doku.php?
 
     TODO:
-	- 3dtetris: missing gfxs on gameplay (writes to framebuffer)
+    - 3dtetris: missing gfxs on gameplay (writes to framebuffer)
     - boundh: game is way too fast
     - galactic: ball goes out of bounds sometimes?
-	- golf: missing gfxs on gameplay (writes to framebuffer)
+    - golf: missing gfxs on gameplay (writes to framebuffer)
     - marioten: title screen logo is misplaced if Mario completes his animation
     - nesterfb: once that you hit the pins, animation phase takes a while to start
     - redalarm: gameplay doesn't work
@@ -19,7 +19,7 @@
     - spaceinv: missing shots
     - telerobo: crashes if you die
     - telerobo: hangs after winning first match;
-   	- vlab: doesn't boot (irq issue?)
+    - vlab: doesn't boot (irq issue?)
     - wariolnd: brightness gets suddently darker during intro.
 \
 ****************************************************************************/
@@ -699,7 +699,7 @@ void vboy_state::m_set_brightness(void)
 	if(b > 0xff) { b = 0xff; }
 	if(c > 0xff) { c = 0xff; }
 
-//	popmessage("%02x %02x %02x %02x",m_vip_regs.BRTA,m_vip_regs.BRTB,m_vip_regs.BRTC,m_vip_regs.REST);
+//  popmessage("%02x %02x %02x %02x",m_vip_regs.BRTA,m_vip_regs.BRTB,m_vip_regs.BRTC,m_vip_regs.REST);
 	palette_set_color_rgb(machine(), 1, a,0,0);
 	palette_set_color_rgb(machine(), 2, b,0,0);
 	palette_set_color_rgb(machine(), 3, c,0,0);
@@ -716,17 +716,17 @@ READ16_MEMBER( vboy_state::vip_r )
 					logerror("Error reading INTCLR\n");
 					break;
 /*
-		---- -x-- ---- ---- LOCK (status column table address (CTA) lock)
-		---- --x- ---- ---- SYNCE (status of sync signal enable)
-		---- ---x ---- ---- RE (status of memory refresh cycle)
-		---- ---- x--- ---- FCLK
+        ---- -x-- ---- ---- LOCK (status column table address (CTA) lock)
+        ---- --x- ---- ---- SYNCE (status of sync signal enable)
+        ---- ---x ---- ---- RE (status of memory refresh cycle)
+        ---- ---- x--- ---- FCLK
         ---- ---- -x-- ---- SCANRDY (active low)
-		---- ---- --xx xx-- DPBSY (current framebuffer displayed)
-		---- ---- --10 00-- RFB1
-		---- ---- --01 00-- LFB1
-		---- ---- --00 10-- RFB0
-		---- ---- --00 01-- LFB0
-		---- ---- ---- --x- DISP
+        ---- ---- --xx xx-- DPBSY (current framebuffer displayed)
+        ---- ---- --10 00-- RFB1
+        ---- ---- --01 00-- LFB1
+        ---- ---- --00 10-- RFB0
+        ---- ---- --00 01-- LFB0
+        ---- ---- ---- --x- DISP
 */
 		case 0x20:	//DPSTTS
 		{
@@ -767,9 +767,9 @@ READ16_MEMBER( vboy_state::vip_r )
 		case 0x40:	//XPSTTS, piXel Processor STaTuS
 		{
 			/*
-			x--- ---- ---- ---- SBOUT
-			---x xxxx ---- ---- SBCOUNT
-			---- ---- ---x ---- OVERTIME (process overflow)
+            x--- ---- ---- ---- SBOUT
+            ---x xxxx ---- ---- SBCOUNT
+            ---- ---- ---x ---- OVERTIME (process overflow)
             ---- ---- ---- x--- XPBSY1 (second framebuffer busy flag)
             ---- ---- ---- -x-- XPBSY0 (first framebfuffer busy flag)
             ---- ---- ---- --x- XPEN (starts drawing at beginning of game frame)
@@ -862,11 +862,11 @@ WRITE16_MEMBER( vboy_state::vip_w )
 					logerror("Error writing DPSTTS\n");
 					break;
 /*
-		---- -x-- ---- ---- LOCK (status column table address (CTA) lock)
-		---- --x- ---- ---- SYNCE (status of sync signal enable)
-		---- ---x ---- ---- RE (status of memory refresh cycle)
-		---- ---- ---- --x- DISP
-		---- ---- ---- ---x DPRST (Resets the VIP internal counter)
+        ---- -x-- ---- ---- LOCK (status column table address (CTA) lock)
+        ---- --x- ---- ---- SYNCE (status of sync signal enable)
+        ---- ---x ---- ---- RE (status of memory refresh cycle)
+        ---- ---- ---- --x- DISP
+        ---- ---- ---- ---x DPRST (Resets the VIP internal counter)
 */
 		case 0x22:	//DPCTRL
 					m_vip_regs.DPCTRL = data & 0x0702;
@@ -1085,7 +1085,7 @@ static ADDRESS_MAP_START( vboy_mem, AS_PROGRAM, 32, vboy_state )
 	AM_RANGE( 0x02000000, 0x0200002b ) AM_MIRROR(0x0ffff00) AM_READWRITE(io_r, io_w) // Hardware control registers mask 0xff
 	//AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
 	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM AM_SHARE("wram")// Main RAM - 64K mask 0xffff
-//	AM_RANGE( 0x06000000, 0x06003fff ) AM_RAM AM_SHARE("nvram") // Cart RAM - 8K NVRAM
+//  AM_RANGE( 0x06000000, 0x06003fff ) AM_RAM AM_SHARE("nvram") // Cart RAM - 8K NVRAM
 	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_ROM AM_REGION("cartridge", 0) /* ROM */
 ADDRESS_MAP_END
 
@@ -1157,7 +1157,7 @@ void vboy_state::machine_start()
 	/* add a hook for battery save */
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(vboy_machine_stop),&machine()));
 
-//	m_vboy_sram = auto_alloc_array(machine(), UINT32, 0x10000/4);
+//  m_vboy_sram = auto_alloc_array(machine(), UINT32, 0x10000/4);
 }
 
 void vboy_state::machine_reset()

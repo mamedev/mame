@@ -373,12 +373,12 @@ void s3c44b0_request_eint( device_t *device, UINT32 number);
     TYPE DEFINITIONS
 *******************************************************************************/
 
-struct s3c44b0_memcon_regs_t 
+struct s3c44b0_memcon_regs_t
 {
 	UINT32 data[0x34/4];
 };
 
-struct s3c44b0_irq_regs_t 
+struct s3c44b0_irq_regs_t
 {
 	UINT32 intcon;
 	UINT32 intpnd;
@@ -395,7 +395,7 @@ struct s3c44b0_irq_regs_t
 	UINT32 f_ispc;
 };
 
-struct s3c44b0_dma_regs_t 
+struct s3c44b0_dma_regs_t
 {
 	UINT32 dcon;
 	UINT32 disrc;
@@ -406,7 +406,7 @@ struct s3c44b0_dma_regs_t
 	UINT32 dccnt;
 };
 
-struct s3c44b0_clkpow_regs_t 
+struct s3c44b0_clkpow_regs_t
 {
 	UINT32 pllcon;
 	UINT32 clkcon;
@@ -414,7 +414,7 @@ struct s3c44b0_clkpow_regs_t
 	UINT32 locktime;
 };
 
-struct s3c44b0_lcd_regs_t 
+struct s3c44b0_lcd_regs_t
 {
 	UINT32 lcdcon1;
 	UINT32 lcdcon2;
@@ -429,7 +429,7 @@ struct s3c44b0_lcd_regs_t
 	UINT32 dithmode;
 };
 
-struct s3c44b0_uart_regs_t 
+struct s3c44b0_uart_regs_t
 {
 	UINT32 ulcon;
 	UINT32 ucon;
@@ -444,7 +444,7 @@ struct s3c44b0_uart_regs_t
 	UINT32 ubrdiv;
 };
 
-struct s3c44b0_sio_regs_t 
+struct s3c44b0_sio_regs_t
 {
 	UINT32 siocon;
 	UINT32 siodat;
@@ -453,7 +453,7 @@ struct s3c44b0_sio_regs_t
 	UINT32 dcntz;
 };
 
-struct s3c44b0_pwm_regs_t 
+struct s3c44b0_pwm_regs_t
 {
 	UINT32 tcfg0;
 	UINT32 tcfg1;
@@ -477,14 +477,14 @@ struct s3c44b0_pwm_regs_t
 	UINT32 tcnto5;
 };
 
-struct s3c44b0_wdt_regs_t 
+struct s3c44b0_wdt_regs_t
 {
 	UINT32 wtcon;
 	UINT32 wtdat;
 	UINT32 wtcnt;
 };
 
-struct s3c44b0_iic_regs_t 
+struct s3c44b0_iic_regs_t
 {
 	UINT32 iiccon;
 	UINT32 iicstat;
@@ -492,7 +492,7 @@ struct s3c44b0_iic_regs_t
 	UINT32 iicds;
 };
 
-struct s3c44b0_iis_regs_t 
+struct s3c44b0_iis_regs_t
 {
 	UINT32 iiscon;
 	UINT32 iismod;
@@ -501,7 +501,7 @@ struct s3c44b0_iis_regs_t
 	UINT32 iisfifo;
 };
 
-struct s3c44b0_gpio_regs_t 
+struct s3c44b0_gpio_regs_t
 {
 	UINT32 gpacon;
 	UINT32 gpadat;
@@ -527,7 +527,7 @@ struct s3c44b0_gpio_regs_t
 	UINT32 extintpnd;
 };
 
-struct s3c44b0_rtc_regs_t 
+struct s3c44b0_rtc_regs_t
 {
 	UINT32 rtccon;
 	UINT32 reserved[3];
@@ -549,48 +549,48 @@ struct s3c44b0_rtc_regs_t
 	UINT32 ticnt;
 };
 
-struct s3c44b0_adc_regs_t 
+struct s3c44b0_adc_regs_t
 {
 	UINT32 adccon;
 	UINT32 adcpsr;
 	UINT32 adcdat;
 };
 
-struct s3c44b0_cpuwrap_regs_t 
+struct s3c44b0_cpuwrap_regs_t
 {
 	UINT32 syscfg;
 	UINT32 ncachbe0;
 	UINT32 ncachbe1;
 };
 
-struct s3c44b0_memcon_t 
+struct s3c44b0_memcon_t
 {
 	s3c44b0_memcon_regs_t regs;
 };
 
-struct s3c44b0_irq_t 
+struct s3c44b0_irq_t
 {
 	s3c44b0_irq_regs_t regs;
 	int line_irq, line_fiq;
 };
 
-struct s3c44b0_dma_t 
+struct s3c44b0_dma_t
 {
 	s3c44b0_dma_regs_t regs;
 	emu_timer *timer;
 };
 
-struct s3c44b0_clkpow_t 
+struct s3c44b0_clkpow_t
 {
 	s3c44b0_clkpow_regs_t regs;
 };
 
-struct rectangle_t 
+struct rectangle_t
 {
 	int x1, y1, x2, y2;
 };
 
-struct s3c44b0_lcd_t 
+struct s3c44b0_lcd_t
 {
 	s3c44b0_lcd_regs_t regs;
 	emu_timer *timer;
@@ -609,19 +609,19 @@ struct s3c44b0_lcd_t
 	attoseconds_t frame_period, pixeltime, scantime;
 };
 
-struct s3c44b0_uart_t 
+struct s3c44b0_uart_t
 {
 	s3c44b0_uart_regs_t regs;
 	emu_timer *timer;
 };
 
-struct s3c44b0_sio_t 
+struct s3c44b0_sio_t
 {
 	s3c44b0_sio_regs_t regs;
 	emu_timer *timer;
 };
 
-struct s3c44b0_pwm_t 
+struct s3c44b0_pwm_t
 {
 	s3c44b0_pwm_regs_t regs;
 	emu_timer *timer[6];
@@ -630,20 +630,20 @@ struct s3c44b0_pwm_t
 	UINT32 freq[6];
 };
 
-struct s3c44b0_wdt_t 
+struct s3c44b0_wdt_t
 {
 	s3c44b0_wdt_regs_t regs;
 	emu_timer *timer;
 };
 
-struct s3c44b0_iic_t 
+struct s3c44b0_iic_t
 {
 	s3c44b0_iic_regs_t regs;
 	emu_timer *timer;
 	int count;
 };
 
-struct s3c44b0_iis_t 
+struct s3c44b0_iis_t
 {
 	s3c44b0_iis_regs_t regs;
 	emu_timer *timer;
@@ -651,30 +651,30 @@ struct s3c44b0_iis_t
 	int fifo_index;
 };
 
-struct s3c44b0_gpio_t 
+struct s3c44b0_gpio_t
 {
 	s3c44b0_gpio_regs_t regs;
 };
 
-struct s3c44b0_rtc_t 
+struct s3c44b0_rtc_t
 {
 	s3c44b0_rtc_regs_t regs;
 	emu_timer *timer_tick_count;
 	emu_timer *timer_update;
 };
 
-struct s3c44b0_adc_t 
+struct s3c44b0_adc_t
 {
 	s3c44b0_adc_regs_t regs;
 	emu_timer *timer;
 };
 
-struct s3c44b0_cpuwrap_t 
+struct s3c44b0_cpuwrap_t
 {
 	s3c44b0_cpuwrap_regs_t regs;
 };
 
-struct s3c44b0_t 
+struct s3c44b0_t
 {
 	const s3c44b0_interface *iface;
 	address_space* space;

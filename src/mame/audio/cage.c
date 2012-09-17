@@ -34,7 +34,7 @@
  *************************************/
 
 
-struct cage_t 
+struct cage_t
 {
 	cpu_device *cpu;
 	attotime cpu_h1_clock_period;

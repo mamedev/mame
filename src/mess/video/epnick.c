@@ -43,7 +43,7 @@
 
 /* Nick executes a Display list, in the form of a list of Line Parameter
 Tables, this is the form of the data */
-struct LPT_ENTRY 
+struct LPT_ENTRY
 {
 	unsigned char SC;		/* scanlines in this modeline (two's complement) */
 	unsigned char MB;		/* the MODEBYTE (defines video display mode) */
@@ -56,7 +56,7 @@ struct LPT_ENTRY
 	unsigned char COL[8];	/* COL0..COL7 */
 };
 
-struct NICK_STATE 
+struct NICK_STATE
 {
 	/* horizontal position */
 	unsigned char HorizontalClockCount;

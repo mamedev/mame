@@ -192,9 +192,9 @@ C64 SERIAL BUS
 
 /*
 
-	TODO:
+    TODO:
 
-	- refactor into an actual daisy chain instead of this convenient hack
+    - refactor into an actual daisy chain instead of this convenient hack
 
 */
 

@@ -186,7 +186,7 @@ static terminal_t *terminal_create(
 	terminal_t *term;
 	int char_width, char_height;
 	apple1_state *state = machine.driver_data<apple1_state>();
-	
+
 	char_width = machine.gfx[gfx]->width();
 	char_height = machine.gfx[gfx]->height();
 

@@ -228,8 +228,8 @@ static I8156_INTERFACE(i8156_intf)
  *  Sound interface
  *
  *************************************/
- 
- 
+
+
 //-------------------------------------------------
 //  sn76496_config psg_intf
 //-------------------------------------------------
@@ -265,7 +265,7 @@ static MACHINE_CONFIG_START( sbugger, sbugger_state )
 	MCFG_SOUND_ADD("sn76489.1", SN76489_NEW, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_SOUND_CONFIG(psg_intf)
-	
+
 	MCFG_SOUND_ADD("sn76489.2", SN76489_NEW, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_SOUND_CONFIG(psg_intf)

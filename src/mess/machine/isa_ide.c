@@ -40,10 +40,10 @@ static void ide_interrupt(device_t *device, int state)
 	}
 }
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	ide_interrupt, 
-	NULL, 
+	ide_interrupt,
+	NULL,
 	0
 };
 

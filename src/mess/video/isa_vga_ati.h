@@ -1,7 +1,7 @@
 /*
  * isa_vga_ati.h
  *
- *	Header for ATi Graphics Ultra ISA video card
+ *  Header for ATi Graphics Ultra ISA video card
  *
  *  Created on: 9/09/2012
  */

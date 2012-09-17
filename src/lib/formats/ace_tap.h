@@ -11,7 +11,7 @@
 
 #include "cassimg.h"
 
-struct ace_tape_t 
+struct ace_tape_t
 {
 	UINT8 hdr_type;
 	UINT8 hdr_name[10];

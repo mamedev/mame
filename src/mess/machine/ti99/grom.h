@@ -13,7 +13,7 @@
 
 #include "ti99defs.h"
 
-struct ti99grom_config 
+struct ti99grom_config
 {
 	bool				writable;
 	int 				ident;

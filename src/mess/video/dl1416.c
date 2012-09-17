@@ -266,7 +266,7 @@ WRITE8_DEVICE_HANDLER( dl1416_data_w )
 						if (intf->update)
 							intf->update(device, i, pattern);
 					}
-				}			
+				}
 			}
 		}
 		else /* cursor enable is not set, so standard write */

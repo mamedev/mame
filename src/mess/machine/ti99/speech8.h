@@ -21,7 +21,7 @@ extern const device_type TI99_SPEECH8;
 #define SPEECH8_CONFIG(name) \
 	const speech8_config(name) =
 
-struct speech8_config 
+struct speech8_config
 {
 	devcb_write_line ready;
 };

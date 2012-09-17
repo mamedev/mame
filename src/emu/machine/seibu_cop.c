@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	Seibu COP protection device
+    Seibu COP protection device
 
-	(this header needs expanding)
+    (this header needs expanding)
 
 ***************************************************************************/
 
@@ -116,14 +116,14 @@ WRITE16_MEMBER( seibu_cop_device::write )
 
 		case 0x074/2:
 			/*
-				This sets up a DMA mode of some sort
-					0x0e00: grainbow, cupsoc
-					0x0a00: legionna, godzilla, denjinmk
-					0x0600: heatbrl
-					0x1e00: zeroteam, xsedae
-				raiden2 and raidendx doesn't set this up, this could indicate that this is related to the non-private buffer DMAs
-				(both only uses 0x14 and 0x15 as DMAs)
-			*/
+                This sets up a DMA mode of some sort
+                    0x0e00: grainbow, cupsoc
+                    0x0a00: legionna, godzilla, denjinmk
+                    0x0600: heatbrl
+                    0x1e00: zeroteam, xsedae
+                raiden2 and raidendx doesn't set this up, this could indicate that this is related to the non-private buffer DMAs
+                (both only uses 0x14 and 0x15 as DMAs)
+            */
 			COMBINE_DATA(&m_dma_unk_param);
 			break;
 

@@ -1121,7 +1121,7 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_SHL, 4, 1):
 				shift = PARAM2 & 31;
 				temp32 = PARAM1 << shift;
-				if (shift != 0) 
+				if (shift != 0)
                 {
                     flags = FLAGS32_NZ(temp32);
                     flags |= ((PARAM1 << (shift - 1)) >> 31) & FLAG_C;
@@ -1136,7 +1136,7 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_SHR, 4, 1):
 				shift = PARAM2 & 31;
 				temp32 = PARAM1 >> shift;
-				if (shift != 0) 
+				if (shift != 0)
                 {
                     flags = FLAGS32_NZ(temp32);
                     flags |= (PARAM1 >> (shift - 1)) & FLAG_C;
@@ -1167,7 +1167,7 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_ROL, 4, 1):
 				shift = PARAM2 & 31;
 				temp32 = (PARAM1 << shift) | (PARAM1 >> ((32 - shift) & 31));
-				if (shift != 0) 
+				if (shift != 0)
                 {
                     flags = FLAGS32_NZ(temp32);
                     flags |= ((PARAM1 << (shift - 1)) >> 31) & FLAG_C;

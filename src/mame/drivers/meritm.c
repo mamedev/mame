@@ -164,7 +164,7 @@ Not all regional versions are available for each Megatouch series
 #include "machine/nvram.h"
 
 
-struct ds1204_t 
+struct ds1204_t
 {
 	int state;
 	int read_ptr;

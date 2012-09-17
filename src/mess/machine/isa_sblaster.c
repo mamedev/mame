@@ -497,7 +497,7 @@ void sb_device::process_fifo(UINT8 cmd)
 							m_dsp.dma_throttled = false;
 							drq_w(1);
 							m_dsp.flags = ADPCM3;
-							break;		
+							break;
 						case 0xda: // stop 8-bit autoinit
 							m_dsp.dma_autoinit = 0;
 							break;
@@ -911,7 +911,7 @@ void sb_device::device_reset()
     m_dsp.fifo_r_ptr = 0;
     m_dsp.wbuf_status = 0;
     m_dsp.rbuf_status = 0;
-	m_dsp.frequency = 8000; // per stereo-fx 
+	m_dsp.frequency = 8000; // per stereo-fx
 	m_dsp.irq_active = 0;
 	m_mixer_index = 0;
 	m_dsp.dma_no_irq = false;
@@ -919,7 +919,7 @@ void sb_device::device_reset()
 
 UINT8 sb_device::dack_r(int line)
 {
-   	m_dsp.adc_transferred++;
+	m_dsp.adc_transferred++;
 	if(m_dsp.adc_transferred >= m_dsp.adc_length)
 	{
 		drq_w(0);
@@ -1057,12 +1057,12 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 		case 0: // 8-bit unsigned mono
 			m_dacl->write_unsigned8(m_dsp.data[m_dsp.d_rptr]);
 			m_dacr->write_unsigned8(m_dsp.data[m_dsp.d_rptr]);
-   			m_dsp.data[m_dsp.d_rptr++] = 0x80;
+			m_dsp.data[m_dsp.d_rptr++] = 0x80;
 			break;
 		case SIGNED: // 8-bit signed mono
 			m_dacl->write_unsigned8(m_dsp.data[m_dsp.d_rptr] + 128);
 			m_dacr->write_unsigned8(m_dsp.data[m_dsp.d_rptr] + 128);
-   			m_dsp.data[m_dsp.d_rptr++] = 0x00;
+			m_dsp.data[m_dsp.d_rptr++] = 0x00;
 			break;
 		case STEREO: // 8-bit unsigned stereo
 			m_dacl->write_unsigned8(m_dsp.data[m_dsp.d_rptr]);
@@ -1078,37 +1078,37 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 			break;
 		case SIXTEENBIT: // 16-bit unsigned mono
 			lsample = m_dsp.data[m_dsp.d_rptr] | (m_dsp.data[m_dsp.d_rptr+1] << 8);
-   			m_dsp.data[m_dsp.d_rptr++] = 0x00;
-   			m_dsp.data[m_dsp.d_rptr++] = 0x80;
+			m_dsp.data[m_dsp.d_rptr++] = 0x00;
+			m_dsp.data[m_dsp.d_rptr++] = 0x80;
 			m_dacl->write_unsigned16(lsample);
 			m_dacr->write_unsigned16(lsample);
 			break;
 		case SIXTEENBIT | SIGNED: // 16-bit signed mono
 			lsample = m_dsp.data[m_dsp.d_rptr] | (m_dsp.data[m_dsp.d_rptr+1] << 8);
-   			m_dsp.data[m_dsp.d_rptr++] = 0x00;
-   			m_dsp.data[m_dsp.d_rptr++] = 0x00;
+			m_dsp.data[m_dsp.d_rptr++] = 0x00;
+			m_dsp.data[m_dsp.d_rptr++] = 0x00;
 			m_dacl->write_unsigned16(lsample + 32768);
 			m_dacr->write_unsigned16(lsample + 32768);
 			break;
 		case SIXTEENBIT | STEREO: // 16-bit unsigned stereo
 			lsample = m_dsp.data[m_dsp.d_rptr] | (m_dsp.data[m_dsp.d_rptr+1] << 8);
     		m_dsp.data[m_dsp.d_rptr++] = 0x00;
-   			m_dsp.data[m_dsp.d_rptr++] = 0x80;
+			m_dsp.data[m_dsp.d_rptr++] = 0x80;
 			m_dsp.d_rptr %= 128;
 			rsample = m_dsp.data[m_dsp.d_rptr] | (m_dsp.data[m_dsp.d_rptr+1] << 8);
-	   		m_dsp.data[m_dsp.d_rptr++] = 0x00;
-   			m_dsp.data[m_dsp.d_rptr++] = 0x80;
+			m_dsp.data[m_dsp.d_rptr++] = 0x00;
+			m_dsp.data[m_dsp.d_rptr++] = 0x80;
 			m_dacl->write_unsigned16(lsample);
 			m_dacr->write_unsigned16(rsample);
 			break;
-		case SIXTEENBIT | SIGNED | STEREO: // 16-bit signed stereo 
+		case SIXTEENBIT | SIGNED | STEREO: // 16-bit signed stereo
 			lsample = m_dsp.data[m_dsp.d_rptr] | (m_dsp.data[m_dsp.d_rptr+1] << 8);
     		m_dsp.data[m_dsp.d_rptr++] = 0x00;
-   			m_dsp.data[m_dsp.d_rptr++] = 0x00;
- 			m_dsp.d_rptr %= 128;
+			m_dsp.data[m_dsp.d_rptr++] = 0x00;
+			m_dsp.d_rptr %= 128;
 			rsample = m_dsp.data[m_dsp.d_rptr] | (m_dsp.data[m_dsp.d_rptr+1] << 8);
-   			m_dsp.data[m_dsp.d_rptr++] = 0x00;
-   			m_dsp.data[m_dsp.d_rptr++] = 0x00;
+			m_dsp.data[m_dsp.d_rptr++] = 0x00;
+			m_dsp.data[m_dsp.d_rptr++] = 0x00;
 			m_dacl->write_unsigned16(lsample + 32768);
 			m_dacr->write_unsigned16(rsample + 32768);
 			break;
@@ -1148,7 +1148,7 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 				m_dacl->write_unsigned8(m_dsp.adpcm_ref);
 				m_dacr->write_unsigned8(m_dsp.adpcm_ref);
 				break;
-			}	
+			}
 			lsample = m_dsp.data[m_dsp.d_rptr];
 			switch(m_dsp.adpcm_count++)
 			{
@@ -1173,7 +1173,7 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 				m_dacl->write_unsigned8(m_dsp.adpcm_ref);
 				m_dacr->write_unsigned8(m_dsp.adpcm_ref);
 				break;
-			}	
+			}
 			lsample = m_dsp.data[m_dsp.d_rptr];
 			switch(m_dsp.adpcm_count++)
 			{

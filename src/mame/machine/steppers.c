@@ -47,7 +47,7 @@ static void update_optic(int which);
 
 /* local vars */
 
-struct stepper 
+struct stepper
 {
 	const stepper_interface *intf;
 	UINT8	 pattern,	/* coil pattern */

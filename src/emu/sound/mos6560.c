@@ -156,7 +156,7 @@ static const rgb_t PALETTE[] =
 inline UINT8 mos6560_device::read_videoram(offs_t offset)
 {
 	m_last_data = space(AS_0)->read_byte(offset & 0x3fff);
-	
+
 	return m_last_data;
 }
 

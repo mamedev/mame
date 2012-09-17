@@ -36,7 +36,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-struct AT45DBXX_PINS 
+struct AT45DBXX_PINS
 {
 	int cs;    // chip select
 	int sck;   // serial clock
@@ -47,12 +47,12 @@ struct AT45DBXX_PINS
 	int busy;  // busy
 };
 
-struct AT45DBXX_CMD 
+struct AT45DBXX_CMD
 {
 	UINT8 data[8], size;
 };
 
-struct AT45DBXX_IO 
+struct AT45DBXX_IO
 {
 	UINT8 *data;
 	UINT32 size, pos;

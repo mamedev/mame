@@ -18,7 +18,7 @@ enum
 	TIMEX_CART_HOME
 };
 
-struct timex_cart_t 
+struct timex_cart_t
 {
 	int type;
 	UINT8 chunks;

@@ -24,15 +24,15 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- mos8563
+    - mos8563
 
-		- horizontal scroll
-		- vertical scroll
-		- pixel double width
-		- bitmap modes
-		- display enable begin/end
+        - horizontal scroll
+        - vertical scroll
+        - pixel double width
+        - bitmap modes
+        - display enable begin/end
 
 */
 
@@ -77,10 +77,10 @@ const device_type MOS8568 = &device_creator<mos8568_device>;
 #define HSS_ATTR					BIT(m_horiz_scroll, 6)
 #define HSS_TEXT					BIT(m_horiz_scroll, 7)
 
-#define ATTR_COLOR 					(attr & 0x0f)
-#define ATTR_BLINK 					BIT(attr, 4)
-#define ATTR_UNDERLINE 				BIT(attr, 5)
-#define ATTR_REVERSE 				BIT(attr, 6)
+#define ATTR_COLOR					(attr & 0x0f)
+#define ATTR_BLINK					BIT(attr, 4)
+#define ATTR_UNDERLINE				BIT(attr, 5)
+#define ATTR_REVERSE				BIT(attr, 6)
 #define ATTR_ALTERNATE_CHARSET		BIT(attr, 7)
 
 
@@ -377,21 +377,21 @@ WRITE8_MEMBER( mos8563_device::register_w )
 		case 0x0f:  m_cursor_addr      = ((data & 0xff) << 0) | (m_cursor_addr & 0xff00); break;
 		case 0x10: /* read-only */ break;
 		case 0x11: /* read-only */ break;
-		case 0x12:  m_update_addr 	   = ((data & 0xff) << 8) | (m_update_addr & 0x00ff); break;
-		case 0x13:	m_update_addr 	   = ((data & 0xff) << 0) | (m_update_addr & 0xff00); break;
+		case 0x12:  m_update_addr	   = ((data & 0xff) << 8) | (m_update_addr & 0x00ff); break;
+		case 0x13:	m_update_addr	   = ((data & 0xff) << 0) | (m_update_addr & 0xff00); break;
 		case 0x14:  m_attribute_addr   = ((data & 0xff) << 8) | (m_attribute_addr & 0x00ff); break;
 		case 0x15:  m_attribute_addr   = ((data & 0xff) << 0) | (m_attribute_addr & 0xff00); break;
-		case 0x16: 	m_horiz_char       =   data & 0xff; break;
+		case 0x16:	m_horiz_char       =   data & 0xff; break;
 		case 0x17:	m_vert_char_disp   =   data & 0x1f; break;
 		case 0x18:	m_vert_scroll	   =   data & 0xff; break;
 		case 0x19:	m_horiz_scroll	   =   data & 0xff; break;
-		case 0x1a:	m_color	   		   =   data & 0xff; break;
+		case 0x1a:	m_color			   =   data & 0xff; break;
 		case 0x1b:	m_row_addr_incr	   =   data & 0xff; break;
 		case 0x1c:	m_char_base_addr   =   data & 0xf0; break;
 		case 0x1d:	m_underline_ras    =   data & 0x1f; break;
 		case 0x1e:
 			m_word_count = data & 0xff;
-			
+
 			do
 			{
 				UINT8 byte = VSS_COPY ? read_videoram(m_block_addr++) : m_data;
@@ -404,10 +404,10 @@ WRITE8_MEMBER( mos8563_device::register_w )
 
 			write_videoram(m_update_addr++, m_data);
 			break;
-		case 0x20:  m_block_addr   	   = ((data & 0xff) << 8) | (m_block_addr & 0x00ff); break;
-		case 0x21:  m_block_addr   	   = ((data & 0xff) << 0) | (m_block_addr & 0xff00); break;
-		case 0x22:  m_de_begin   	   = ((data & 0xff) << 8) | (m_de_begin & 0x00ff); break;
-		case 0x23:  m_de_begin   	   = ((data & 0xff) << 0) | (m_de_begin & 0xff00); break;
+		case 0x20:  m_block_addr	   = ((data & 0xff) << 8) | (m_block_addr & 0x00ff); break;
+		case 0x21:  m_block_addr	   = ((data & 0xff) << 0) | (m_block_addr & 0xff00); break;
+		case 0x22:  m_de_begin  	   = ((data & 0xff) << 8) | (m_de_begin & 0x00ff); break;
+		case 0x23:  m_de_begin  	   = ((data & 0xff) << 0) | (m_de_begin & 0xff00); break;
 		case 0x24:	m_dram_refresh     =   data & 0x0f; break;
 		case 0x25:	m_sync_polarity    =   data & 0xc0; break;
 	}

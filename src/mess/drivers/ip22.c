@@ -57,14 +57,14 @@
 #include "machine/scsihd.h"
 #include "machine/wd33c93.h"
 
-struct RTC_t 
+struct RTC_t
 {
 	UINT8 nRegs[0x80];
 	UINT8 nUserRAM[0x200];
 	UINT8 nRAM[0x800];
 };
 
-struct HPC3_t 
+struct HPC3_t
 {
 	UINT32 nenetr_nbdp;
 	UINT32 nenetr_cbp;
@@ -75,13 +75,13 @@ struct HPC3_t
 	UINT32 nSCSI0DMACtrl;
 };
 
-struct HAL2_t 
+struct HAL2_t
 {
 	UINT32 nIAR;
 	UINT32 nIDR[4];
 };
 
-struct PBUS_DMA_t 
+struct PBUS_DMA_t
 {
 	UINT8 nActive;
 	UINT32 nCurPtr;

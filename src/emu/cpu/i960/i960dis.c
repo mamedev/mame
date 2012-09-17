@@ -8,7 +8,7 @@
 #include "i960.h"
 #include "i960dis.h"
 
-struct mnemonic_t 
+struct mnemonic_t
 {
 	const char		*mnem;
 	unsigned short	type;

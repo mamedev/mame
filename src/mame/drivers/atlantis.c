@@ -141,10 +141,10 @@ static const mips3_config r4310_config =
 	16384				/* data cache size */
 };
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	ide_interrupt, 
-	NULL, 
+	ide_interrupt,
+	NULL,
 	0
 };
 

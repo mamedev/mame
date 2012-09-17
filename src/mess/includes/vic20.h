@@ -69,7 +69,7 @@ public:
 	DECLARE_READ8_MEMBER( vic_lightx_cb );
 	DECLARE_READ8_MEMBER( vic_lighty_cb );
 	DECLARE_READ8_MEMBER( vic_lightbut_cb );
-	
+
 	DECLARE_READ8_MEMBER( via0_pa_r );
 	DECLARE_WRITE8_MEMBER( via0_pa_w );
 

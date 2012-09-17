@@ -63,7 +63,7 @@
 */
 enum format_type {branch, shiftl, shiftr, multiply, store, swap, one_address, two_address};
 
-struct instr_desc 
+struct instr_desc
 {
 	const char *mnemonic;
 	format_type format;	/* -> X and Y are format */

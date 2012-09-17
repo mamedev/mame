@@ -30,7 +30,7 @@
 
 
 /* this structure defines the parameters for a channel */
-struct k051649_sound_channel 
+struct k051649_sound_channel
 {
 	unsigned long counter;
 	int frequency;

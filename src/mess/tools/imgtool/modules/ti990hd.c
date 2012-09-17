@@ -35,12 +35,12 @@ that is longer than 39 characters. */
 #define MAX_DIR_LEVEL 25	/* We need to put a recursion limit to avoid endless recursion hazard */
 
 
-struct UINT16BE 
+struct UINT16BE
 {
 	UINT8 bytes[2];
 };
 
-struct UINT32BE 
+struct UINT32BE
 {
 	UINT8 bytes[4];
 };
@@ -72,7 +72,7 @@ INLINE void set_UINT32BE(UINT32BE *word, UINT32 data)
 /*
     disk image header
 */
-struct disk_image_header 
+struct disk_image_header
 {
 	UINT32BE cylinders;			/* number of cylinders on hard disk (big-endian) */
 	UINT32BE heads;				/* number of heads on hard disk (big-endian) */
@@ -101,7 +101,7 @@ enum
 /*
     SC0 record (Disk sector 0)
 */
-struct ti990_sc0 
+struct ti990_sc0
 {
 	char		vnm[8];			/* volume name */
 	UINT16BE	tna;			/* total number of ADUs */
@@ -153,7 +153,7 @@ struct ti990_sc0
 /*
     DOR (Directory Overhead Record)
 */
-struct ti990_dor 
+struct ti990_dor
 {
 	UINT16BE nrc;				/* # records in directory (minus DOR) nrc = nfl + nar (+ tfc???) */
 	UINT16BE nfl;				/* # files currently in directory */
@@ -198,7 +198,7 @@ enum
 /*
     ACE subrecord found in FDR
 */
-struct ti990_ace 
+struct ti990_ace
 {
 	char		agn[8];				/* access group name */
 	UINT16BE	flg;				/* flags */
@@ -207,7 +207,7 @@ struct ti990_ace
 /*
     FDR record
 */
-struct ti990_fdr 
+struct ti990_fdr
 {
 	UINT16BE	hkc;			/* hask key count: the number of file descriptor records that are present in the directory that hashed to this record number */
 	UINT16BE	hkv;			/* hask key value: the result of the hash algorithm for the file name actually covered in this record */
@@ -251,7 +251,7 @@ struct ti990_fdr
     The fields marked here with *** are in the ADR template to maintain
     compatability with the FDR template.
 */
-struct ti990_adr 
+struct ti990_adr
 {
 	UINT16BE	hkc;			/* hask key count */
 	UINT16BE	hkv;			/* hask key value */
@@ -274,7 +274,7 @@ struct ti990_adr
     The CDR is the permanent record of a channel.  It is carried as an alias
     of the program file in which the channel owner task resides.
 */
-struct ti990_cdr 
+struct ti990_cdr
 {
 	UINT16BE	hkc;			/* hask key count */
 	UINT16BE	hkv;			/* hask key value */
@@ -305,7 +305,7 @@ struct ti990_cdr
     field starts at offset 4, and therefore if we try to interpret a KDR as an
     FDR (or ADR, CDR), we will find fnm[0] and assume the FDR is empty.
 */
-union directory_entry 
+union directory_entry
 {
 	ti990_fdr fdr;
 	ti990_adr adr;
@@ -317,7 +317,7 @@ union directory_entry
 /*
     tifile header: stand-alone file
 */
-struct tifile_header 
+struct tifile_header
 {
 	char tifiles[8];		/* always '\7TIFILES' */
 	UINT8 secsused_MSB;		/* file length in sectors (big-endian) */
@@ -335,7 +335,7 @@ struct tifile_header
 /*
     catalog entry (used for in-memory catalog)
 */
-struct catalog_entry 
+struct catalog_entry
 {
 	UINT16 fdr_secnum;
 	char filename[10];
@@ -346,7 +346,7 @@ struct catalog_entry
 /*
     Disk geometry
 */
-struct ti990_geometry 
+struct ti990_geometry
 {
 	unsigned int cylinders, heads, sectors_per_track, bytes_per_sector;
 };
@@ -354,7 +354,7 @@ struct ti990_geometry
 /*
     Physical sector address
 */
-struct ti990_phys_sec_address 
+struct ti990_phys_sec_address
 {
 	int cylinder;
 	int head;
@@ -364,7 +364,7 @@ struct ti990_phys_sec_address
 /*
     ti99 disk image descriptor
 */
-struct ti990_image 
+struct ti990_image
 {
 	imgtool_stream *file_handle;		/* imgtool file handle */
 	ti990_geometry geometry;	/* geometry */
@@ -374,7 +374,7 @@ struct ti990_image
 /*
     ti990 catalog iterator, used when imgtool reads the catalog
 */
-struct ti990_iterator 
+struct ti990_iterator
 {
 	ti990_image *image;
 	int level;							/* current recursion level */

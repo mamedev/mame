@@ -1177,18 +1177,18 @@ TODO: it probably doesn't belong in here. Both CPUs are certainly tmpz84c011 tho
 static ADDRESS_MAP_START( shabdama_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-//	AM_RANGE(0xd000, 0xd1ff) AM_READWRITE(nbmj9195_palette_r,nbmj9195_palette_w)
-//	AM_RANGE(0xd800, 0xdfff) AM_RAM
+//  AM_RANGE(0xd000, 0xd1ff) AM_READWRITE(nbmj9195_palette_r,nbmj9195_palette_w)
+//  AM_RANGE(0xd800, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shabdama_io_map, AS_IO, 8, nbmj9195_state )
-//	ADDRESS_MAP_UNMAP_HIGH
+//  ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
-//	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
-//	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
-//	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
+//  AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
+//  AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
+//  AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
 ADDRESS_MAP_END
 
 /********************************************************************************

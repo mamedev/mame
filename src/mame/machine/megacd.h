@@ -13,10 +13,10 @@ protected:
 	virtual void device_reset();
 
 	// optional information overrides
-//	virtual const rom_entry *device_rom_region() const;
+//  virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 private:
-//	virtual void device_config_complete();
+//  virtual void device_config_complete();
 
 };
 
@@ -34,7 +34,7 @@ class sega_segacd_japan_device : public sega_segacd_device
 	public:
 		sega_segacd_japan_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	protected:
-//		virtual machine_config_constructor device_mconfig_additions() const;
+//      virtual machine_config_constructor device_mconfig_additions() const;
 };
 
 class sega_segacd_europe_device : public sega_segacd_device
@@ -42,7 +42,7 @@ class sega_segacd_europe_device : public sega_segacd_device
 	public:
 		sega_segacd_europe_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	protected:
-//		virtual machine_config_constructor device_mconfig_additions() const;
+//      virtual machine_config_constructor device_mconfig_additions() const;
 };
 
 

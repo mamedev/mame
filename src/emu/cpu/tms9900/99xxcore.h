@@ -394,7 +394,7 @@ a ST_MASK */
 #define R14 28
 #define R15 30
 
-struct map_file_t 
+struct map_file_t
 {
 	UINT16 L[3], B[3];			/* actual registers */
 	UINT32 limit[3], bias[3];	/* equivalent in a more convenient form */
@@ -1993,7 +1993,7 @@ static void set_flag1(tms99xx_state *cpustate, int val)
 
 #endif
 
-enum cru_error_code 
+enum cru_error_code
 {
 	CRU_OK = 0,
 	CRU_PRIVILEGE_VIOLATION = -1

@@ -193,7 +193,7 @@ static const UINT32 banks[4] = { 0, 0x40000/2, 0x20000/2, 0x60000/2 };
 
 #define DRAM_BANK_SEL		(banks[(VREG(DSBA) >> 7) & 3])
 
-struct i82716_t 
+struct i82716_t
 {
 	UINT16	r[16];
 	UINT16	*dram;
@@ -202,7 +202,7 @@ struct i82716_t
 };
 
 
-struct i8279_t 
+struct i8279_t
 {
 	UINT8	command;
 	UINT8	mode;

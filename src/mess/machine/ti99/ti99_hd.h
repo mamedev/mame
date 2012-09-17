@@ -25,7 +25,7 @@ extern const device_type TI99_MFMHD;
     Needed to adapt to higher cylinder numbers. Floppies do not have such
     high numbers.
 */
-struct chrn_id_hd 
+struct chrn_id_hd
 {
 	UINT16 C;
 	UINT8 H;

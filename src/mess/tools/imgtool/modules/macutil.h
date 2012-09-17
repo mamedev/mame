@@ -12,13 +12,13 @@
 
 #include "imgtool.h"
 
-enum mac_fork_t 
+enum mac_fork_t
 {
 	MAC_FORK_DATA,
 	MAC_FORK_RESOURCE
 };
 
-enum mac_filecategory_t 
+enum mac_filecategory_t
 {
 	MAC_FILECATEGORY_DATA,
 	MAC_FILECATEGORY_TEXT,

@@ -227,7 +227,7 @@ enum
 /* Private Data */
 
 /* sArmRegister defines the CPU state */
-struct ARM_REGS 
+struct ARM_REGS
 {
 	int icount;
 	UINT32 sArmRegister[kNumRegisters];

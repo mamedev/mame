@@ -44,7 +44,7 @@ private:
 
 /*****************************************************************************/
 
-struct geneve_keyboard_config 
+struct geneve_keyboard_config
 {
 	devcb_write_line	interrupt;
 };
@@ -110,7 +110,7 @@ private:
 
 /*****************************************************************************/
 
-struct geneve_mapper_config 
+struct geneve_mapper_config
 {
 	devcb_write_line	ready;
 };

@@ -195,7 +195,7 @@ TILEMAP_MAPPER_MEMBER(bwing_state::bwing_scan_cols)
 
 void bwing_state::video_start()
 {
-//	UINT32 *dwptr;
+//  UINT32 *dwptr;
 	int i;
 
 	m_charmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bwing_state::get_charinfo),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
@@ -225,15 +225,15 @@ void bwing_state::video_start()
 //  m_bgfx = machine().gfx[3];
 	machine().gfx[3]->set_source(m_srbase[1] + 0x1000);
 /*
-	WTF??
-	
-	dwptr = machine().gfx[2]->pen_usage();
-	if (dwptr)
-	{
-		dwptr[0] = 0;
-		for(i = 1; i < BW_NTILES; i++)
-			dwptr[i] = -1;
-	}
+    WTF??
+
+    dwptr = machine().gfx[2]->pen_usage();
+    if (dwptr)
+    {
+        dwptr[0] = 0;
+        for(i = 1; i < BW_NTILES; i++)
+            dwptr[i] = -1;
+    }
 */
 }
 

@@ -28,7 +28,7 @@
 /******************* internal chip data structure ******************/
 
 
-struct mc6846_t 
+struct mc6846_t
 {
 
 	const mc6846_interface* iface;

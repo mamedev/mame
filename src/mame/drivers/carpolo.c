@@ -223,12 +223,12 @@ static GFXDECODE_START( carpolo )
 	GFXDECODE_ENTRY( "gfx3", 0, alphalayout,  12*2+2*16, 4 )
 GFXDECODE_END
 
-static const ttl74148_config carpolo_ttl74148_intf = 
+static const ttl74148_config carpolo_ttl74148_intf =
 {
 	carpolo_74148_3s_cb
 };
 
-static const ttl74153_config carpolo_ttl74153_intf = 
+static const ttl74153_config carpolo_ttl74153_intf =
 {
 	NULL
 };

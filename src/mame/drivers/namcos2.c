@@ -1760,7 +1760,7 @@ static MACHINE_CONFIG_START( finallap, namcos2_state )
 	MCFG_PALETTE_LENGTH(0x2000)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, finallap)
-	
+
 	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

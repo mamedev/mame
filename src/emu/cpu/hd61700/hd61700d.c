@@ -39,7 +39,7 @@ enum
 	OP_RSIR,
 };
 
-struct hd61700_dasm 
+struct hd61700_dasm
 {
 	const char *str;
 	UINT8		arg1;

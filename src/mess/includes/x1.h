@@ -44,7 +44,7 @@ private:
 	virtual void z80daisy_irq_reti();
 };
 
-struct scrn_reg_t 
+struct scrn_reg_t
 {
 	UINT8 gfx_bank;
 	UINT8 disp_bank;
@@ -56,7 +56,7 @@ struct scrn_reg_t
 	UINT8 blackclip; // x1 turbo specific
 };
 
-struct turbo_reg_t 
+struct turbo_reg_t
 {
 	UINT8 pal;
 	UINT8 gfx_pal;
@@ -64,7 +64,7 @@ struct turbo_reg_t
 	UINT8 txt_disp;
 };
 
-struct x1_rtc_t 
+struct x1_rtc_t
 {
 	UINT8 sec, min, hour, day, wday, month, year;
 };

@@ -266,12 +266,12 @@ will accept paths of such length). */
     Miscellaneous utilities that are used to handle TI data types
 */
 
-struct UINT16BE 
+struct UINT16BE
 {
 	UINT8 bytes[2];
 };
 
-struct UINT16LE 
+struct UINT16LE
 {
 	UINT8 bytes[2];
 };
@@ -456,7 +456,7 @@ static int check_fpath(const char *fpath)
 /*
     Disk geometry
 */
-struct ti99_geometry 
+struct ti99_geometry
 {
 	int secspertrack;
 	int cylinders;
@@ -466,7 +466,7 @@ struct ti99_geometry
 /*
     Physical sector address
 */
-struct ti99_sector_address 
+struct ti99_sector_address
 {
 	int sector;
 	int cylinder;
@@ -476,7 +476,7 @@ struct ti99_sector_address
 /*
     Time stamp (used in fdr, and WIN VIB/DDR)
 */
-struct ti99_date_time 
+struct ti99_date_time
 {
 	UINT8 time_MSB, time_LSB;/* 0-4: hour, 5-10: minutes, 11-15: seconds/2 */
 	UINT8 date_MSB, date_LSB;/* 0-6: year, 7-10: month, 11-15: day */
@@ -487,7 +487,7 @@ struct ti99_date_time
 
     The HFDC supports up to 3 subdirectories.
 */
-struct dsk_subdir 
+struct dsk_subdir
 {
 	char name[10];			/* subdirectory name (10 characters, pad with spaces) */
 	UINT16BE fdir_aphysrec;	/* aphysrec address of fdir record for this subdirectory */
@@ -499,7 +499,7 @@ struct dsk_subdir
     Most fields in this record are only revelant to level 2 routines, but level
     1 routines need the disk geometry information extracted from the VIB.
 */
-struct dsk_vib 
+struct dsk_vib
 {
 	char name[10];			/* disk volume name (10 characters, pad with spaces) */
 	UINT16BE totphysrecs;	/* total number of physrecs on disk (usually 360, */
@@ -528,7 +528,7 @@ struct dsk_vib
 								/* of byte 1, etc.) */
 };
 
-enum ti99_img_format 
+enum ti99_img_format
 {
 	if_mess,
 	if_v9t9,
@@ -540,7 +540,7 @@ enum ti99_img_format
 /*
     level-1 disk image descriptor
 */
-struct ti99_lvl1_imgref 
+struct ti99_lvl1_imgref
 {
 	ti99_img_format img_format;	/* tells the image format */
 	imgtool_stream *file_handle;		/* imgtool file handle */
@@ -1442,7 +1442,7 @@ struct win_vib_ddr
 /*
     AU format
 */
-struct ti99_AUformat 
+struct ti99_AUformat
 {
 	int totAUs;				/* total number of AUs */
 	int physrecsperAU;		/* number of 256-byte physical records per AU */
@@ -1457,21 +1457,21 @@ struct ti99_AUformat
 /*
     catalog entry (used for in-memory catalog)
 */
-struct dir_entry 
+struct dir_entry
 {
 	UINT16 dir_ptr;			/* DSK: unused */
 							/* WIN: AU address of the DDR for this directory */
 	char name[10];			/* name of this directory (copied from the VIB for DSK, DDR for WIN) */
 };
 
-struct file_entry 
+struct file_entry
 {
 	UINT16 fdr_ptr;			/* DSK: aphysrec address of the FDR for this file */
 							/* WIN: AU address of the FDR for this file */
 	char name[10];			/* name of this file (copied from FDR) */
 };
 
-struct ti99_catalog 
+struct ti99_catalog
 {
 	int num_subdirs;		/* number of subdirectories */
 	int num_files;			/* number of files */
@@ -1482,7 +1482,7 @@ struct ti99_catalog
 /*
     level-2 disk image descriptor
 */
-struct ti99_lvl2_imgref_dsk 
+struct ti99_lvl2_imgref_dsk
 {
 	UINT16 totphysrecs;				/* total number of aphysrecs (extracted from vib record in aphysrec 0) */
 	ti99_catalog catalogs[4];		/* catalog of root directory and up to 3 subdirectories */
@@ -1495,7 +1495,7 @@ enum win_vib_t
 	win_vib_v1,
 	win_vib_v2
 };
-struct ti99_lvl2_imgref_win 
+struct ti99_lvl2_imgref_win
 {
 	win_vib_t vib_version;			/* version of the vib record in aphysrec 0 (see win_vib_ddr) */
 };
@@ -1555,7 +1555,7 @@ enum
 /*
     DSK FDR record
 */
-struct dsk_fdr 
+struct dsk_fdr
 {
 	char name[10];			/* file name (10 characters, pad with spaces) */
 	UINT16BE xreclen;		/* extended record len: if record len is >= 256, */
@@ -1601,7 +1601,7 @@ struct dsk_fdr
 /*
     WIN FDR record
 */
-struct win_fdr 
+struct win_fdr
 {
 	char name[10];			/* file name (10 characters, pad with spaces) */
 	UINT16BE xreclen;		/* extended record len: if record len is >= 256, */
@@ -1663,7 +1663,7 @@ struct win_fdr
 /*
     tifile header: stand-alone file
 */
-struct tifile_header 
+struct tifile_header
 {
 	char tifiles[8];		/* always '\7TIFILES' */
 	UINT16BE fphysrecs;		/* file length in physrecs */
@@ -1703,14 +1703,14 @@ struct tifile_header
 /*
     level-2 file descriptor
 */
-struct ti99_lvl2_fileref_dsk 
+struct ti99_lvl2_fileref_dsk
 {
 	struct ti99_lvl2_imgref *l2_img;
 	int fdr_aphysrec;
 	dsk_fdr fdr;
 };
 
-struct ti99_lvl2_fileref_win 
+struct ti99_lvl2_fileref_win
 {
 	struct ti99_lvl2_imgref *l2_img;
 	unsigned fphysrecs;				/* copy of field in the eldest FDR */
@@ -1719,7 +1719,7 @@ struct ti99_lvl2_fileref_win
 	win_fdr curfdr;					/* buffer with currently open sibling FDR */
 };
 
-struct ti99_lvl2_fileref_tifiles 
+struct ti99_lvl2_fileref_tifiles
 {
 	imgtool_stream *file_handle;
 	tifile_header hdr;
@@ -3696,7 +3696,7 @@ static void current_date_time(ti99_date_time *reply)
     * files with variable-size records (sequential-access)
 */
 
-struct ti99_lvl3_fileref 
+struct ti99_lvl3_fileref
 {
 	ti99_lvl2_fileref l2_file;
 
@@ -3827,7 +3827,7 @@ static int read_next_record(ti99_lvl3_fileref *l3_file, void *dest, int *out_rec
 /*
     ti99 catalog iterator, used when imgtool reads the catalog
 */
-struct dsk_iterator 
+struct dsk_iterator
 {
 	struct ti99_lvl2_imgref *image;
 	int level;
@@ -3836,7 +3836,7 @@ struct dsk_iterator
 	ti99_catalog *cur_catalog;	/* current catalog */
 };
 
-struct win_iterator 
+struct win_iterator
 {
 	struct ti99_lvl2_imgref *image;
 	int level;

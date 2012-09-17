@@ -73,7 +73,7 @@ struct intr_state
 	UINT16	ext[4];
 };
 
-struct i186_state 
+struct i186_state
 {
 	struct timer_state	timer[3];
 	struct dma_state	dma[2];
@@ -83,7 +83,7 @@ struct i186_state
 
 
 /* Keyboard */
-struct TYP_COMPIS_KEYBOARD 
+struct TYP_COMPIS_KEYBOARD
 {
 	UINT8 nationality;   /* Character set, keyboard layout (Swedish) */
 	UINT8 release_time;  /* Autorepeat release time (0.8)   */
@@ -102,14 +102,14 @@ struct TYP_COMPIS_KEYBOARD
 };
 
 /* USART 8251 */
-struct TYP_COMPIS_USART 
+struct TYP_COMPIS_USART
 {
 	UINT8 status;
 	UINT8 bytes_sent;
 };
 
 /* Printer */
-struct TYP_COMPIS_PRINTER 
+struct TYP_COMPIS_PRINTER
 {
 	UINT8 data;
 	UINT8 strobe;
@@ -117,7 +117,7 @@ struct TYP_COMPIS_PRINTER
 
 
 /* Main emulation */
-struct TYP_COMPIS 
+struct TYP_COMPIS
 {
 	TYP_COMPIS_PRINTER	printer;	/* Printer */
 	TYP_COMPIS_USART	usart;		/* USART 8251 */

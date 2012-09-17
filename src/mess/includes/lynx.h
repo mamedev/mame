@@ -15,7 +15,7 @@
 
 
 class lynx_state;
-struct BLITTER 
+struct BLITTER
 {
 	UINT8 *mem;
 	// global
@@ -54,7 +54,7 @@ struct BLITTER
 	int busy;
 };
 
-struct UART 
+struct UART
 {
 	UINT8 serctl;
 	UINT8 data_received, data_to_send, buffer;
@@ -63,7 +63,7 @@ struct UART
 	int buffer_loaded;
 };
 
-struct SUZY 
+struct SUZY
 {
 	UINT8 data[0x100];
 	UINT8 high;
@@ -73,14 +73,14 @@ struct SUZY
 	int accumulate_overflow;
 };
 
-struct MIKEY 
+struct MIKEY
 {
 	UINT8 data[0x100];
 	UINT16 disp_addr;
 	UINT8 vb_rest;
 };
 
-struct LYNX_TIMER 
+struct LYNX_TIMER
 {
 	UINT8	bakup;
 	UINT8	cntrl1;

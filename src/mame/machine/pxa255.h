@@ -163,7 +163,7 @@
 		#define PXA255_DCMD_WIDTH_2	(0x00008000)
 		#define PXA255_DCMD_WIDTH_4	(0x0000c000)
 
-struct PXA255_DMA_Regs 
+struct PXA255_DMA_Regs
 {
 	UINT32 dcsr[16];
 
@@ -230,7 +230,7 @@ struct PXA255_DMA_Regs
 #define PXA255_SADIV			(PXA255_I2S_BASE_ADDR + 0x00000060)
 #define PXA255_SADR				(PXA255_I2S_BASE_ADDR + 0x00000080)
 
-struct PXA255_I2S_Regs 
+struct PXA255_I2S_Regs
 {
 	UINT32 sacr0;
 	UINT32 sacr1;
@@ -279,7 +279,7 @@ struct PXA255_I2S_Regs
 	#define PXA255_OIER_E2		(0x00000004)
 	#define PXA255_OIER_E3		(0x00000008)
 
-struct PXA255_OSTMR_Regs 
+struct PXA255_OSTMR_Regs
 {
 	UINT32 osmr[4];
 	UINT32 oscr;
@@ -331,7 +331,7 @@ struct PXA255_OSTMR_Regs
 #define PXA255_INT_RTC_HZ		(1 << 30)
 #define PXA255_INT_RTC_ALARM	(1 << 31)
 
-struct PXA255_INTC_Regs 
+struct PXA255_INTC_Regs
 {
 	UINT32 icip;
 	UINT32 icmr;
@@ -378,7 +378,7 @@ struct PXA255_INTC_Regs
 #define PXA255_GAFR2_L			(PXA255_GPIO_BASE_ADDR + 0x00000064)
 #define PXA255_GAFR2_U			(PXA255_GPIO_BASE_ADDR + 0x00000068)
 
-struct PXA255_GPIO_Regs 
+struct PXA255_GPIO_Regs
 {
 	UINT32 gplr0; // GPIO Pin-Leve
 	UINT32 gplr1;
@@ -476,7 +476,7 @@ struct PXA255_GPIO_Regs
 #define PXA255_FIDR1			(PXA255_LCD_BASE_ADDR + 0x00000218)
 #define PXA255_LDCMD1			(PXA255_LCD_BASE_ADDR + 0x0000021c)
 
-struct PXA255_LCD_DMA_Regs 
+struct PXA255_LCD_DMA_Regs
 {
 	UINT32 fdadr;
 	UINT32 fsadr;
@@ -485,7 +485,7 @@ struct PXA255_LCD_DMA_Regs
 	emu_timer *eof;
 };
 
-struct PXA255_LCD_Regs 
+struct PXA255_LCD_Regs
 {
 	UINT32 lccr0;
 	UINT32 lccr1;

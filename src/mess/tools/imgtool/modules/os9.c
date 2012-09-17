@@ -13,7 +13,7 @@
 #include "formats/coco_dsk.h"
 #include "iflopimg.h"
 
-enum creation_policy_t 
+enum creation_policy_t
 {
 	CREATE_NONE,
 	CREATE_FILE,

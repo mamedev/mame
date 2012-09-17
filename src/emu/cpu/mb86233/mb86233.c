@@ -23,7 +23,7 @@ CPU_DISASSEMBLE( mb86233 );
     STRUCTURES & TYPEDEFS
 ***************************************************************************/
 
-union MB86233_REG 
+union MB86233_REG
 {
 	INT32	i;
 	UINT32	u;

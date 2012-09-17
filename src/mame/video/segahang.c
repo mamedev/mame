@@ -101,7 +101,7 @@ UINT32 segahang_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			UINT16 *dest = &bitmap.pix(y);
 			UINT16 *src = &sprites.pix(y);
 			UINT8 *pri = &machine().priority_bitmap.pix(y);
-			
+
 			// hangon mixing
 			if (!m_sharrier_video)
 			{
@@ -126,7 +126,7 @@ UINT32 segahang_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 					}
 				}
 			}
-			
+
 			// sharrier mixing
 			else
 			{

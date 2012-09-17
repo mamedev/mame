@@ -1,6 +1,6 @@
 /*  Konami Cobra System
 
-	Driver by Ville Linde
+    Driver by Ville Linde
 
 
     Games on this hardware
@@ -160,14 +160,14 @@
 
         0x0011c:        Same as above?
 
-		0x00454:		(mask 0xff) 0x80000000							Tex related
+        0x00454:        (mask 0xff) 0x80000000                          Tex related
 
         0x00458:        Set to 0x02100000 (0xff) by texselect()
 
-						------xx -------- -------- --------				Texture select (0-3)
-						-------- ---x---- -------- --------				?
+                        ------xx -------- -------- --------             Texture select (0-3)
+                        -------- ---x---- -------- --------             ?
 
-		0x02900:		-------- -------- -------- --------				Texture[0] ?
+        0x02900:        -------- -------- -------- --------             Texture[0] ?
 
         0x02904:        -------- ------xx xx------ --------             Texture[0] mag filter?
                         -------- -------- --xxxx-- --------             Texture[0] min filter?
@@ -184,28 +184,28 @@
 
         0x02914:        xxxxxxxx xxxxxxxx xxxx---- --------             Texture[0] address
 
-		0x02980:		Texture[1] ?
-		0x02984:		Texture[1] min/mag filter
-		0x02988:		Texture[1] wrap
-		0x02990:		Texture[1] width/height/format
-		0x02994:		Texture[1] address
+        0x02980:        Texture[1] ?
+        0x02984:        Texture[1] min/mag filter
+        0x02988:        Texture[1] wrap
+        0x02990:        Texture[1] width/height/format
+        0x02994:        Texture[1] address
 
-		0x02a00:		Texture[2] ?
-		0x02a04:		Texture[2] min/mag filter
-		0x02a08:		Texture[2] wrap
-		0x02a10:		Texture[2] width/height/format
-		0x02a14:		Texture[2] address
+        0x02a00:        Texture[2] ?
+        0x02a04:        Texture[2] min/mag filter
+        0x02a08:        Texture[2] wrap
+        0x02a10:        Texture[2] width/height/format
+        0x02a14:        Texture[2] address
 
-		0x02a80:		Texture[3] ?
-		0x02a84:		Texture[3] min/mag filter
-		0x02a88:		Texture[3] wrap
-		0x02a90:		Texture[3] width/height/format
-		0x02a94:		Texture[3] address
+        0x02a80:        Texture[3] ?
+        0x02a84:        Texture[3] min/mag filter
+        0x02a88:        Texture[3] wrap
+        0x02a90:        Texture[3] width/height/format
+        0x02a94:        Texture[3] address
 
         0x40018:        Set to 0x0001040a (0xc0) by mode_stipple()      (bits 24..27 = stipple pattern?)
         0x400d0:        Set to 0x80000000 (0x80) by mode_stipple()
 
-        0x400f4:        xxx----- -------- -------- --------				Texture select (0-3)
+        0x400f4:        xxx----- -------- -------- --------             Texture select (0-3)
 
         0x40114:        -------- ----x--- -------- --------             Scissor enable
 
@@ -226,14 +226,14 @@
         0x40198:        x------- -------- -------- --------             Alpha test enable?
                         -------- xxx----- -------- --------             Alpha test function (0 = never, 1 = less, 2 = lequal, 3 = greater,
                                                                                              4 = gequal, 5 = equal, 6 = notequal, 7 = always)
-						-------- -------- xxxxxxxx xxxxxxxx				Alpha test reference value?
+                        -------- -------- xxxxxxxx xxxxxxxx             Alpha test reference value?
 
         0x4019c:        x------- -------- -------- --------             Fog enable
                         ----x--- -------- -------- --------             0 = table fog, 1 = linear fog
 
-		0x401a8:		(mask 0xff): 0x2CAB34FD							?
-		0x401ac:		(mask 0xf0): 0x48C70000							?
-		0x401b8:		(mask 0x20): 0x00400000							?
+        0x401a8:        (mask 0xff): 0x2CAB34FD                         ?
+        0x401ac:        (mask 0xf0): 0x48C70000                         ?
+        0x401b8:        (mask 0x20): 0x00400000                         ?
 
         0x401bc:                                                        Texture env mode
                         xxx----- -------- -------- --------             ?
@@ -249,15 +249,15 @@
                                     0xa92b0100 = (equal, 16)
 
                         -------- -------- xxxxxxxx xxxx----             Stencil reference value?
-						----xxxx xxxxxxxx -------- --------				Stencil fill value?
+                        ----xxxx xxxxxxxx -------- --------             Stencil fill value?
                         xxx----- -------- -------- --------             Stencil function?
 
 
         0x80020:        -------- ----xxx- -------- --------             Depth test function (7 = always?)
 
-		0x80040:		(mask 0x0f) 0x00002CAB (same value as 0x401a8)
-		0x80044:		(mask 0x0f) 0x000034FD (same value as 0x401a8)
-		0x80048:		(mask 0x0f) 0x000048C7 (same value as 0x401ac)
+        0x80040:        (mask 0x0f) 0x00002CAB (same value as 0x401a8)
+        0x80044:        (mask 0x0f) 0x000034FD (same value as 0x401a8)
+        0x80048:        (mask 0x0f) 0x000048C7 (same value as 0x401ac)
 
         0x80050:        (mask 0x7c) 0x04445500 = (As, 1-As)             Blend register
                                     0x04111100 = (1, 1)
@@ -407,7 +407,7 @@ private:
 
 	UINT32 *m_gfx_gram;
 	UINT32 *m_gfx_regmask;
-	
+
 	UINT32 m_gfx_register_select;
 	UINT64 *m_gfx_register;
 
@@ -582,7 +582,7 @@ void cobra_jvs_host::write(UINT8 data, const UINT8 *&rec_data, UINT32 &rec_size)
 				commit_encoded();
 
 				get_encoded_reply(rec_data, rec_size);
-	
+
 				m_send_ptr = 0;
 				return;
 			}
@@ -882,7 +882,7 @@ void cobra_renderer::render_texture_scan(INT32 scanline, const extent_t &extent,
 				UINT32 gour = (int)(gr);
 				UINT32 goug = (int)(gg);
 				UINT32 goub = (int)(gb);
-	
+
 				int r = (RGB_RED(texel) * gour) >> 8;
 				int g = (RGB_GREEN(texel) * goug) >> 8;
 				int b = (RGB_BLUE(texel) * goub) >> 8;
@@ -1926,15 +1926,15 @@ static void sub_sound_dma_w(device_t *device, int width, UINT32 data)
 	//printf("DMA write to unknown: size %d, data %08X\n", width, data);
 
 	/*
-	static FILE *out;
-	if (out == NULL)
-		out = fopen("sound.bin", "wb");
+    static FILE *out;
+    if (out == NULL)
+        out = fopen("sound.bin", "wb");
 
-	fputc((data >> 24) & 0xff, out);
-	fputc((data >> 16) & 0xff, out);
-	fputc((data >> 8) & 0xff, out);
-	fputc((data >> 0) & 0xff, out);
-	*/
+    fputc((data >> 24) & 0xff, out);
+    fputc((data >> 16) & 0xff, out);
+    fputc((data >> 8) & 0xff, out);
+    fputc((data >> 0) & 0xff, out);
+    */
 
 	cobra_state *cobra = device->machine().driver_data<cobra_state>();
 
@@ -1948,7 +1948,7 @@ static void sub_sound_dma_w(device_t *device, int width, UINT32 data)
 	if (cobra->m_sound_dma_ptr >= DMA_SOUND_BUFFER_SIZE)
 	{
 		cobra->m_sound_dma_ptr = 0;
-		
+
 		dmadac_transfer(&cobra->m_dmadac[0], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, cobra->m_sound_dma_buffer_l);
 		dmadac_transfer(&cobra->m_dmadac[1], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, cobra->m_sound_dma_buffer_r);
 	}
@@ -2077,7 +2077,7 @@ void cobra_renderer::gfx_exit(running_machine &machine)
         fputc((UINT8)(m_texture_ram[i] >> 0), file);
     }
     fclose(file);
-	*/
+    */
 }
 
 void cobra_renderer::gfx_reset(running_machine &machine)
@@ -2367,7 +2367,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 				}
 
 
-				
+
 				float vp_width		= u2f(m_gfx_gram[0x00090/4]);
 				float vp_height		= u2f(m_gfx_gram[0x000a4/4]);
 				float vp_center_x	= u2f(m_gfx_gram[0x0009c/4]);
@@ -2382,7 +2382,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 #if LOG_DRAW_COMMANDS
 				printf("--- Draw command %08X %08X ---\n", w1, w2);
 #endif
-				
+
 
 				// extract vertex data
 				for (int i=0; i < units; i++)
@@ -3223,10 +3223,10 @@ void cobra_state::machine_reset()
 	dmadac_set_frequency(&m_dmadac[1], 1, 44100);
 }
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	ide_interrupt, 
-	NULL, 
+	ide_interrupt,
+	NULL,
 	0
 };
 
@@ -3383,7 +3383,7 @@ DRIVER_INIT_MEMBER(cobra_state,bujutsu)
 	{
 		UINT8 *rom = (UINT8*)machine().root_device().memregion("m48t58")->base();
 		rom[0x00] = 0x47;		// G
-		rom[0x01] = 0x4e;		// N		// N = 2-player, Q = 1-player?
+		rom[0x01] = 0x4e;		// N        // N = 2-player, Q = 1-player?
 		rom[0x02] = 0x36;		// 6
 		rom[0x03] = 0x34;		// 4
 		rom[0x04] = 0x35;		// 5
@@ -3412,13 +3412,13 @@ DRIVER_INIT_MEMBER(cobra_state,bujutsu)
 
 	// hd patches
 	// (gfx)
-	// 0x18932c = 0x38600000					skips check_one_scene()
+	// 0x18932c = 0x38600000                    skips check_one_scene()
 
 	// (sub)
-	// 0x2d3568 = 0x60000000 [0x4082001c]		skip IRQ fail
+	// 0x2d3568 = 0x60000000 [0x4082001c]       skip IRQ fail
 
 	// (main)
-	// 0x5025ac = 0x60000000 [0x4082055c]		skip IRQ fail...
+	// 0x5025ac = 0x60000000 [0x4082055c]       skip IRQ fail...
 	// 0x503ec4 = 0x60000000 [0x4186fff8]
 	// 0x503f00 = 0x60000000 [0x4186fff8]
 
@@ -3503,16 +3503,16 @@ DRIVER_INIT_MEMBER(cobra_state,racjamdx)
 
 	// hd patches
 	// (gfx)
-	// 0x144354 = 0x38600000 [0x4bfffb91]		skips check_one_scene()
+	// 0x144354 = 0x38600000 [0x4bfffb91]       skips check_one_scene()
 
 	// (sub)
-	// 0x2a5394 = 0x4800001c [0x4182001c]		sound chip check?
-	// 0x2a53f4 = 0x4800001c [0x4082001c]		?
-	// 0x2a546c = 0x60000000 [0x48001a0d]		?
-	// 0x2a5510 = 0x48000014 [0x419e0014]		?
+	// 0x2a5394 = 0x4800001c [0x4182001c]       sound chip check?
+	// 0x2a53f4 = 0x4800001c [0x4082001c]       ?
+	// 0x2a546c = 0x60000000 [0x48001a0d]       ?
+	// 0x2a5510 = 0x48000014 [0x419e0014]       ?
 
 	// (main)
-	// 0x14aa48 = 0x60000000 [0x4182fff4]		?
+	// 0x14aa48 = 0x60000000 [0x4182fff4]       ?
 
 	m_has_psac = true;
 }

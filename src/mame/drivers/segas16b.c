@@ -7123,7 +7123,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( isgsm, system16b, isgsm_state )
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) // no obvious CPU, but seems to be clocked faster than an original system16 based on the boot times
 	MCFG_CPU_PROGRAM_MAP(isgsm_map)
 	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
-	
+
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(isgsm_state,isgsm)

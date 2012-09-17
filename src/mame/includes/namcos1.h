@@ -1,7 +1,7 @@
 #define NAMCOS1_MAX_BANK 0x400
 
 /* Bank handler definitions */
-struct bankhandler 
+struct bankhandler
 {
 	read8_space_func bank_handler_r;
 	write8_space_func bank_handler_w;

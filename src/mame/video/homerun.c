@@ -32,11 +32,11 @@ WRITE8_MEMBER(homerun_state::homerun_scrollx_w)
 WRITE8_DEVICE_HANDLER(homerun_banking_w)
 {
 	homerun_state *state = device->machine().driver_data<homerun_state>();
-	
+
 	// games do mid-screen gfx bank switching
 	int vpos = device->machine().primary_screen->vpos();
 	device->machine().primary_screen->update_partial(vpos);
-	
+
 	// d0-d1: gfx bank
 	// d2-d4: ?
 	// d5-d7: prg bank
@@ -56,15 +56,15 @@ WRITE8_MEMBER(homerun_state::homerun_color_w)
 	m_colorram[offset] = data;
 
 	/* from PCB photo:
-	    bit 7:  470 ohm resistor \
-	    bit 6:  220 ohm resistor -  --> 470 ohm resistor  --> blue
-	    bit 5:  470 ohm resistor \
-	    bit 4:  220 ohm resistor -  --> 470 ohm resistor  --> green
-	    bit 3:  1  kohm resistor /
-	    bit 2:  470 ohm resistor \
-	    bit 1:  220 ohm resistor -  --> 470 ohm resistor  --> red
-	    bit 0:  1  kohm resistor /
-	*/
+        bit 7:  470 ohm resistor \
+        bit 6:  220 ohm resistor -  --> 470 ohm resistor  --> blue
+        bit 5:  470 ohm resistor \
+        bit 4:  220 ohm resistor -  --> 470 ohm resistor  --> green
+        bit 3:  1  kohm resistor /
+        bit 2:  470 ohm resistor \
+        bit 1:  220 ohm resistor -  --> 470 ohm resistor  --> red
+        bit 0:  1  kohm resistor /
+    */
 
 	// let's implement it the old fashioned way until it's found out how exactly the resnet is hooked up
 	int r, g, b;
@@ -124,7 +124,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 				color,
 				flipx,flipy,
 				sx,sy,0);
-		
+
 		// wraparound
 		drawgfx_transpen(bitmap, cliprect, machine.gfx[1],
 				code,

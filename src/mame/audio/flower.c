@@ -20,7 +20,7 @@ TODO:
 
 
 /* this structure defines the parameters for a channel */
-struct sound_channel 
+struct sound_channel
 {
 	UINT32 start;
 	UINT32 pos;

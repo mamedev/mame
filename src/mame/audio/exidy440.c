@@ -38,7 +38,7 @@
 
 
 /* channel_data structure holds info about each 6844 DMA channel */
-struct m6844_channel_data 
+struct m6844_channel_data
 {
 	int active;
 	int address;
@@ -50,7 +50,7 @@ struct m6844_channel_data
 
 
 /* channel_data structure holds info about each active sound channel */
-struct sound_channel_data 
+struct sound_channel_data
 {
 	INT16 *base;
 	int offset;
@@ -59,7 +59,7 @@ struct sound_channel_data
 
 
 /* sound_cache_entry structure contains info on each decoded sample */
-struct sound_cache_entry 
+struct sound_cache_entry
 {
 	struct sound_cache_entry *next;
 	int address;
@@ -71,7 +71,7 @@ struct sound_cache_entry
 
 
 
-struct exidy440_audio_state 
+struct exidy440_audio_state
 {
 	UINT8 sound_command;
 	UINT8 sound_command_ack;

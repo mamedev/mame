@@ -681,7 +681,7 @@ const pia6821_interface to7_pia6821_sys =
 
 
 
-enum to7_io_dev 
+enum to7_io_dev
 {
 	TO7_IO_NONE,
 	TO7_IO_CENTRONICS,

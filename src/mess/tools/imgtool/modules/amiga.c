@@ -33,7 +33,7 @@
 #define MSIZE ((BSIZE/4) - 1) /* Size of bitmaps */
 
 
-enum disk_type 
+enum disk_type
 {
 	DT_UNKNOWN       = -1,
 	DT_OFS           =  0,
@@ -55,7 +55,7 @@ enum
 };
 
 
-enum sec_type 
+enum sec_type
 {
 	ST_INVALID  =  0,
 	ST_ROOT     =  1,

@@ -48,7 +48,7 @@ typedef UINT8         boolean;
 #define QUEUE_SIZE 0x2000
 #define QUEUE_MAX  (QUEUE_SIZE-1)
 
-struct queue_t 
+struct queue_t
 {
 	int pos;
 	unsigned char reg,val;
@@ -84,7 +84,7 @@ struct queue_t
 /* CHANNEL TYPE DEFINITIONS */
 
 /* Square Wave */
-struct square_t 
+struct square_t
 {
 	uint8 regs[4];
 	int vbl_length;
@@ -99,7 +99,7 @@ struct square_t
 };
 
 /* Triangle Wave */
-struct triangle_t 
+struct triangle_t
 {
 	uint8 regs[4]; /* regs[1] unused */
 	int linear_length;
@@ -113,7 +113,7 @@ struct triangle_t
 };
 
 /* Noise Wave */
-struct noise_t 
+struct noise_t
 {
 	uint8 regs[4]; /* regs[1] unused */
 	int cur_pos;
@@ -126,7 +126,7 @@ struct noise_t
 };
 
 /* DPCM Wave */
-struct dpcm_t 
+struct dpcm_t
 {
 	uint8 regs[4];
 	uint32 address;
@@ -142,7 +142,7 @@ struct dpcm_t
 };
 
 /* APU type */
-struct apu_t 
+struct apu_t
 {
 	/* Sound channels */
 	square_t   squ[2];

@@ -271,14 +271,14 @@
 #define UPD1990A_TAG	"upd1990a"
 #define I8251_TAG		"i8251"
 
-struct crtc_t 
+struct crtc_t
 {
 	UINT8 cmd,param_count,cursor_on,status,irq_mask;
 	UINT8 param[8][5];
 	UINT8 inverse;
 };
 
-struct mouse_t 
+struct mouse_t
 {
 	UINT8 phase;
 	UINT8 x,y;
@@ -450,7 +450,7 @@ protected:
 public:
 	DECLARE_MACHINE_RESET(pc8801_clock_speed);
 	DECLARE_MACHINE_RESET(pc8801_dic);
-	DECLARE_MACHINE_RESET(pc8801_cdrom);	
+	DECLARE_MACHINE_RESET(pc8801_cdrom);
 };
 
 

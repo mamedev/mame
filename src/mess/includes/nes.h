@@ -35,7 +35,7 @@ struct nes_input
 #define CHRROM 0
 #define CHRRAM 1
 
-struct chr_bank 
+struct chr_bank
 {
 	int source;	//defines source of base pointer
 	int origin; //defines offset of 0x400 byte segment at base pointer
@@ -53,7 +53,7 @@ struct chr_bank
 #define NES_BATTERY 0
 #define NES_WRAM 1
 
-struct name_table 
+struct name_table
 {
 	int source;		/* defines source of base pointer */
 	int origin;		/* defines offset of 0x400 byte segment at base pointer */

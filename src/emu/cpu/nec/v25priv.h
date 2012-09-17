@@ -35,7 +35,7 @@ enum
 };
 
 /* interrupt sources */
-enum INTSOURCES 
+enum INTSOURCES
 {
 	BRK		= 0,
 	INT_IRQ	= 1,
@@ -60,7 +60,7 @@ enum INTSOURCES
 };
 
 /* internal RAM and register banks */
-union internalram 
+union internalram
 {
 	UINT16 w[128];
 	UINT8  b[256];

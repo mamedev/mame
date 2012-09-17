@@ -71,7 +71,7 @@ enum alu_dst
     STRUCTURES & TYPEDEFS
 ***************************************************************************/
 
-struct cquestsnd_state 
+struct cquestsnd_state
 {
 	/* AM2901 internals */
 	UINT16	ram[16];
@@ -104,7 +104,7 @@ struct cquestsnd_state
 };
 
 
-struct cquestrot_state 
+struct cquestrot_state
 {
 	/* AM2901 internals */
 	UINT16	ram[16];
@@ -146,7 +146,7 @@ struct cquestrot_state
 };
 
 
-struct cquestlin_state 
+struct cquestlin_state
 {
 	/* 12-bit AM2901 internals */
 	UINT16	ram[16];

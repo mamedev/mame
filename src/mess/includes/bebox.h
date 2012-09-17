@@ -13,7 +13,7 @@
 #include "machine/8237dma.h"
 #include "machine/53c810.h"
 
-struct bebox_devices_t 
+struct bebox_devices_t
 {
 	device_t *pic8259_master;
 	device_t *pic8259_slave;

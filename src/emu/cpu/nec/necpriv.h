@@ -19,7 +19,7 @@ enum
 };
 
 /* interrupt sources */
-enum INTSOURCES 
+enum INTSOURCES
 {
 	BRK = 0,
 	INT_IRQ = 1,
@@ -27,7 +27,7 @@ enum INTSOURCES
 };
 
 /* NEC registers */
-union necbasicregs 
+union necbasicregs
 {                   /* eight general registers */
     UINT16 w[8];    /* viewed as 16 bits registers */
     UINT8  b[16];   /* or as 8 bit registers */

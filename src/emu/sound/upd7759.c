@@ -107,7 +107,7 @@
 
     The other chip models don't support slave mode, and have an internal ROM.
     Other than that, they are thought to be nearly identical to uPD7759.
-    
+
     55C    18-pin DIP   96 Kbit ROM
     55G    24-pin SOP   96 Kbit ROM
     56C    18-pin DIP  256 Kbit ROM
@@ -174,7 +174,7 @@ struct upd7759_state
 
 	/* chip configuration */
 	UINT8		sample_offset_shift;		/* header sample address shift (access data > 0xffff) */
-	
+
 	/* internal clock to output sample rate mapping */
 	UINT32		pos;						/* current output sample position */
 	UINT32		step;						/* step value per output sample */
@@ -670,7 +670,7 @@ static DEVICE_START( upd7759 )
 
 	/* chip configuration */
 	chip->sample_offset_shift = (device->type() == UPD7759) ? 1 : 0;
-	
+
 	/* allocate a stream channel */
 	chip->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->clock()/4, chip, upd7759_update);
 

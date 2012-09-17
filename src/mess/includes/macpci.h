@@ -24,7 +24,7 @@
 #define MAC_539X_2_TAG "539x_2"
 
 /* tells which model is being emulated (set by macxxx_init) */
-enum model_t 
+enum model_t
 {
     PCIMODEL_MAC_PM5200,
     PCIMODEL_MAC_PM6200,

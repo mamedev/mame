@@ -98,7 +98,7 @@ public:
 	UINT16 m_serial_frequency;
 	UINT8 m_gpu_irq_state;
 	emu_timer *m_serial_timer;
-	
+
 	// blitter variables
 	UINT32 m_blitter_regs[40];
 	UINT16 m_gpu_regs[0x100/2];
@@ -114,7 +114,7 @@ public:
 	static void (jaguar_state::*const bitmap8[8])(UINT16 *, INT32, INT32, UINT32 *, INT32, UINT16 *);
 	static void (jaguar_state::*const bitmap16[8])(UINT16 *, INT32, INT32, UINT32 *, INT32);
 	static void (jaguar_state::*const bitmap32[8])(UINT16 *, INT32, INT32, UINT32 *, INT32);
-	
+
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_READ32_MEMBER(eeprom_clk);
 	DECLARE_READ32_MEMBER(eeprom_cs);

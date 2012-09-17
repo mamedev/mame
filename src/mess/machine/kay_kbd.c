@@ -64,7 +64,7 @@
  * - "Keypad ," is not mapped
  */
 
-struct kay_kbd_t 
+struct kay_kbd_t
 {
 	device_t *beeper;
 	UINT8 buff[16];

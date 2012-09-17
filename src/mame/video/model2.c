@@ -104,13 +104,13 @@
  *
  *******************************************/
 
-struct plane 
+struct plane
 {
 	poly_vertex	normal;
 	float		distance;
 };
 
-struct texture_parameter 
+struct texture_parameter
 {
 	float	diffuse;
 	float	ambient;
@@ -118,7 +118,7 @@ struct texture_parameter
 	float	specular_scale;
 };
 
-struct triangle 
+struct triangle
 {
 	void *				next;
 	poly_vertex			v[3];
@@ -129,7 +129,7 @@ struct triangle
 	INT16				center[2];
 };
 
-struct quad_m2 
+struct quad_m2
 {
 	poly_vertex			v[4];
 	UINT16				z;

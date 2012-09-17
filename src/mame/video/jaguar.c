@@ -151,9 +151,9 @@
 #define LOG_UNHANDLED_BLITS	0
 
 
-// FIXME: this should be 1, but then MAME performance will be s*** with this 
+// FIXME: this should be 1, but then MAME performance will be s*** with this
 //    (i.e. it drops the performance from 400% to 6% on an i5 machine).
-// But the PIT irq is definitely needed by some games (for example Pitfall refuses 
+// But the PIT irq is definitely needed by some games (for example Pitfall refuses
 //    to enter into gameplay without this enabled).
 const int PIT_MULT_DBG_HACK = 64;
 
@@ -715,11 +715,11 @@ void jaguar_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		case TID_SCANLINE:
 			scanline_update(param);
 			break;
-		
+
 		case TID_BLITTER_DONE:
 			m_blitter_status = 1;
 			break;
-		
+
 		case TID_PIT:
 			m_cpu_irq_state |= 4;
 			update_cpu_irq();
@@ -729,11 +729,11 @@ void jaguar_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 				timer_set(sample_period, TID_PIT);
 			}
 			break;
-		
+
 		case TID_SERIAL:
 			serial_update();
 			break;
-		
+
 		case TID_GPU_SYNC:
 			// if a command is still pending, and we haven't maxed out our timer, set a new one
 			if (m_gpu_command_pending && param < 1000)

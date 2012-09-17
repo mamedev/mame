@@ -2,15 +2,15 @@
 
     Legionnaire / Heated Barrel video hardware (derived from D-Con)
 
-	priority test (preliminary):
-	- OBJ 0
-	- TXT
-	- OBJ 1
-	- BK3
-	- OBJ 2
-	- MBK
-	- OBJ 3
-	- LBK
+    priority test (preliminary):
+    - OBJ 0
+    - TXT
+    - OBJ 1
+    - BK3
+    - OBJ 2
+    - MBK
+    - OBJ 3
+    - LBK
 
 ***************************************************************************/
 
@@ -175,7 +175,7 @@ VIDEO_START_MEMBER(legionna_state,denjinmk)
 	m_has_extended_banking = 1;
 	m_has_extended_priority = 0;
 
-//	m_background_layer->set_transparent_pen(15);
+//  m_background_layer->set_transparent_pen(15);
 	m_midground_layer->set_transparent_pen(15);
 	m_foreground_layer->set_transparent_pen(15);
 	m_text_layer->set_transparent_pen(7);//?

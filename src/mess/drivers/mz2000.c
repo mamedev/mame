@@ -10,8 +10,8 @@
     TODO:
     - cassette interface, basically any program that's bigger than 8kb fails to load;
     - implement remaining video capabilities
-	- add 80b compatibility support;
-	- Vosque (color): keyboard doesn't work properly;
+    - add 80b compatibility support;
+    - Vosque (color): keyboard doesn't work properly;
 
 ****************************************************************************/
 
@@ -607,7 +607,7 @@ static READ8_DEVICE_HANDLER( mz2000_portc_r )
 static WRITE8_DEVICE_HANDLER( mz2000_porta_w )
 {
 	/*
-	These are enabled thru a 0->1 transition
+    These are enabled thru a 0->1 transition
     x--- ---- tape "APSS"
     -x-- ---- tape "APLAY"
     --x- ---- tape "AREW"

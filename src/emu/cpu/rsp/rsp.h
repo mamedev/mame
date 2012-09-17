@@ -138,7 +138,7 @@ void rspdrc_add_imem(device_t *device, UINT32 *base);
 
 #define RSPDRC_STRICT_VERIFY	0x0001			/* verify all instructions */
 
-union VECTOR_REG 
+union VECTOR_REG
 {
 	UINT64 d[2];
 	UINT32 l[4];
@@ -146,7 +146,7 @@ union VECTOR_REG
 	UINT8 b[16];
 };
 
-union ACCUMULATOR_REG 
+union ACCUMULATOR_REG
 {
 	INT64 q;
 	INT32 l[2];

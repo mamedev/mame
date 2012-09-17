@@ -347,7 +347,7 @@ static const struct { write8_space_func func; const char *name; } pcw16_flash1_b
 	{ FUNC(pcw16_flash1_bank_handler3_w) }
 };
 
-enum PCW16_RAM_TYPE 
+enum PCW16_RAM_TYPE
 {
 	/* rom which is really first block of flash0 */
 	PCW16_MEM_ROM,

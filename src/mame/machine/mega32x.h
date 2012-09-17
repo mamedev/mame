@@ -33,7 +33,7 @@ public:
 
 	required_device<dac_device> m_lch_pwm;
 	required_device<dac_device> m_rch_pwm;
-	
+
 	DECLARE_READ32_MEMBER( _32x_sh2_master_4000_common_4002_r );
 	DECLARE_READ32_MEMBER( _32x_sh2_slave_4000_common_4002_r );
 	DECLARE_READ32_MEMBER( _32x_sh2_common_4004_common_4006_r );
@@ -46,7 +46,7 @@ public:
 	DECLARE_WRITE32_MEMBER( _32x_sh2_slave_4014_slave_4016_w );
 	DECLARE_WRITE32_MEMBER( _32x_sh2_slave_4018_slave_401a_w );
 	DECLARE_WRITE32_MEMBER( _32x_sh2_slave_401c_slave_401e_w );
-		
+
 
 	DECLARE_READ16_MEMBER( _32x_68k_palette_r );
 	DECLARE_WRITE16_MEMBER( _32x_68k_palette_w );
@@ -98,7 +98,7 @@ public:
 	DECLARE_WRITE16_MEMBER( _32x_sh2_slave_401c_w );
 	DECLARE_WRITE16_MEMBER( _32x_sh2_master_401e_w );
 	DECLARE_WRITE16_MEMBER( _32x_sh2_slave_401e_w );
-	
+
 	UINT32* _32x_render_videobuffer_to_screenbuffer_helper(running_machine &machine, int scanline);
 	int sh2_master_pwmint_enable, sh2_slave_pwmint_enable;
 
@@ -138,10 +138,10 @@ protected:
 	virtual void device_reset();
 
 	// optional information overrides
-//	virtual const rom_entry *device_rom_region() const;
+//  virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 private:
-//	virtual void device_config_complete();
+//  virtual void device_config_complete();
 	int m_32x_adapter_enabled;
 	int m_32x_access_auth;
 	int m_32x_screenshift;

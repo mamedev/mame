@@ -196,14 +196,14 @@ ADDRESS_MAP_END
 WRITE8_MEMBER( sfcbox_state::port_80_w )
 {
 /*
-	x--- ----   (often same as bit5)
-	-x-- ----   Unknown/unused
-	--x- ----     ??         PLENTY used (often same as bit7)
-	---x ----   ?? pulsed while [C094] is nonzero (0370h timer0 steps)
-	---- x---   Unknown/unused
-	---- -x--   SNES Transfer DATA to SNES  (Bit1 of WRIO/RDIO on SNES side)
-	---- --x-   SNES Transfer CLOCK to SNES (Bit5 of WRIO/RDIO on SNES side)
-	---- ---x   SNES Transfer STAT to SNES  (Bit2 of WRIO/RDIO on SNES side)
+    x--- ----   (often same as bit5)
+    -x-- ----   Unknown/unused
+    --x- ----     ??         PLENTY used (often same as bit7)
+    ---x ----   ?? pulsed while [C094] is nonzero (0370h timer0 steps)
+    ---- x---   Unknown/unused
+    ---- -x--   SNES Transfer DATA to SNES  (Bit1 of WRIO/RDIO on SNES side)
+    ---- --x-   SNES Transfer CLOCK to SNES (Bit5 of WRIO/RDIO on SNES side)
+    ---- ---x   SNES Transfer STAT to SNES  (Bit2 of WRIO/RDIO on SNES side)
 */
 	snes_ram[WRIO] = ((data & 4) >> 1) | (snes_ram[WRIO] & ~0x02); // DATA
 	snes_ram[WRIO] = ((data & 2) << 4) | (snes_ram[WRIO] & ~0x20); // CLOCK
@@ -214,14 +214,14 @@ WRITE8_MEMBER( sfcbox_state::port_80_w )
 READ8_MEMBER( sfcbox_state::port_81_r )
 {
 /*
-	x--- ----   Vblank, Vsync, or Whatever flag (must toggle on/off at whatever speed)
-	-x-- ----   Int1 Request (Joypad is/was accessed by SNES or so?) (0=IRQ, 1=No)
-	--x- ----   Unknown/unused  ;/(for "joy2/slot1" or so, use [A0].4-5)
-	---x ----   Unknown/unused  ;\joy1/slot0 or so, used by an UNUSED function (08A0h)
-	---- x---   Boot mode or so (maybe a jumper, or watchdog-flag, or Bit0 of WRIO/RDIO?)
-	---- -x--   SNES Transfer DATA from SNES (Bit4 of WRIO/RDIO on SNES side)
-	---- --x-   SNES Transfer ACK from SNES  (Bit3 of WRIO/RDIO on SNES side)
-	---- ---x   Int0 Request (Coin-Input, Low for 44ms..80ms) (0=IRQ, 1=No)
+    x--- ----   Vblank, Vsync, or Whatever flag (must toggle on/off at whatever speed)
+    -x-- ----   Int1 Request (Joypad is/was accessed by SNES or so?) (0=IRQ, 1=No)
+    --x- ----   Unknown/unused  ;/(for "joy2/slot1" or so, use [A0].4-5)
+    ---x ----   Unknown/unused  ;\joy1/slot0 or so, used by an UNUSED function (08A0h)
+    ---- x---   Boot mode or so (maybe a jumper, or watchdog-flag, or Bit0 of WRIO/RDIO?)
+    ---- -x--   SNES Transfer DATA from SNES (Bit4 of WRIO/RDIO on SNES side)
+    ---- --x-   SNES Transfer ACK from SNES  (Bit3 of WRIO/RDIO on SNES side)
+    ---- ---x   Int0 Request (Coin-Input, Low for 44ms..80ms) (0=IRQ, 1=No)
 */
 	UINT8 res;
 
@@ -285,11 +285,11 @@ static ADDRESS_MAP_START( sfcbox_io, AS_IO, 8, sfcbox_state )
 	AM_RANGE(0x00, 0x3f) AM_RAM // internal i/o
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("KEY") AM_WRITE(port_80_w) // Keyswitch and Button Inputs / SNES Transfer and Misc Output
 	AM_RANGE(0x81, 0x81) AM_READWRITE(port_81_r,port_81_w) // SNES Transfer and Misc Input / Misc Output
-//	AM_RANGE(0x82, 0x82) // Unknown/unused
+//  AM_RANGE(0x82, 0x82) // Unknown/unused
 	AM_RANGE(0x83, 0x83) AM_READWRITE(port_83_r,port_83_w) // Joypad Input/Status / Joypad Output/Control
-//	AM_RANGE(0x84, 0x84) // Joypad 1, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
-// 	AM_RANGE(0x85, 0x85) // Joypad 1, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
-//	AM_RANGE(0x86, 0x86) // Joypad 2, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
+//  AM_RANGE(0x84, 0x84) // Joypad 1, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
+//  AM_RANGE(0x85, 0x85) // Joypad 1, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
+//  AM_RANGE(0x86, 0x86) // Joypad 2, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
 //  AM_RANGE(0x87, 0x87) // Joypad 2, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
 	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("RTC_R") AM_WRITE_PORT("RTC_W") //  Real Time Clock
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(snes_map_0_w) // SNES Mapping Register 0
@@ -500,8 +500,8 @@ static MACHINE_CONFIG_DERIVED( sfcbox, snes )
 	MCFG_SCREEN_ADD("osd", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-//	MCFG_SCREEN_SIZE(24*12+22, 12*18+22)
-//	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*12-1, 0*8, 12*18-1)
+//  MCFG_SCREEN_SIZE(24*12+22, 12*18+22)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 24*12-1, 0*8, 12*18-1)
 	MCFG_SCREEN_SIZE(24*16+22, 12*16+22)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*16-1, 0*8, 12*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sfcbox_state,screen_update)

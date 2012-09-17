@@ -34,7 +34,7 @@
 #define INT_ENABLE_RX_LINE_STATUS	0x04
 #define INT_ENABLE_MODEM_STATUS		0x08
 
-struct PC16552D_CHANNEL 
+struct PC16552D_CHANNEL
 {
 	UINT16 divisor;
 	UINT8 reg[8];
@@ -50,7 +50,7 @@ struct PC16552D_CHANNEL
 	emu_timer *tx_fifo_timer;
 };
 
-struct PC16552D_REGS 
+struct PC16552D_REGS
 {
 	PC16552D_CHANNEL ch[2];
 	int frequency;

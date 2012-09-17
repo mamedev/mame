@@ -15,7 +15,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-enum ds1315_mode_t 
+enum ds1315_mode_t
 {
 	DS_SEEK_MATCHING,
 	DS_CALENDAR_IO

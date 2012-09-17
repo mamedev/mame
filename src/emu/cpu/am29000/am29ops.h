@@ -61,7 +61,7 @@
     STRUCTS
 ***************************************************************************/
 
-struct op_info 
+struct op_info
 {
 	void (*opcode)(am29000_state *);
 	UINT32 flags;

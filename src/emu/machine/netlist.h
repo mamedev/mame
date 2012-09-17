@@ -58,7 +58,7 @@
 #define USE_DELEGATES			(1)
 #define USE_DELEGATES_A			(0)
 
-#define NETLIST_CLOCK 	      	   (U64(1000000000))
+#define NETLIST_CLOCK	    	   (U64(1000000000))
 
 #define NLTIME_FROM_NS(_t)	netlist_time::from_ns(_t)
 #define NLTIME_FROM_US(_t)	netlist_time::from_us(_t)
@@ -100,11 +100,11 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 
 #define NETLIST_END  }
 
-#define NETLIST_INCLUDE(_name) 														\
+#define NETLIST_INCLUDE(_name)														\
 		NETLIST_NAME(_name)(netlist);												\
 
 
-#define NETLIST_MEMREGION(_name) 													\
+#define NETLIST_MEMREGION(_name)													\
 		netlist.parse((char *)downcast<netlist_t &>(netlist.netlist()).machine().root_device().memregion(_name)->base());		\
 
 #if defined(__GNUC__) && (__GNUC__ >= 3)
@@ -129,7 +129,7 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 #define NETLIB_SIGNAL(_name, _num_input, _check)									\
 	class _name : public net_signal_t<_num_input, _check>							\
 	{																				\
-	public:						 													\
+	public:																			\
 		_name () : net_signal_t<_num_input, _check>() { }							\
 	};																				\
 
@@ -168,15 +168,15 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 
 // MAME specific
 
-#define MCFG_NETLIST_ADD(_tag, _setup )						  						\
-    MCFG_DEVICE_ADD(_tag, NETLIST, NETLIST_CLOCK) 									\
-    MCFG_NETLIST_SETUP(_setup) 														\
+#define MCFG_NETLIST_ADD(_tag, _setup )												\
+    MCFG_DEVICE_ADD(_tag, NETLIST, NETLIST_CLOCK)									\
+    MCFG_NETLIST_SETUP(_setup)														\
 
-#define MCFG_NETLIST_REPLACE(_tag, _setup)						  					\
+#define MCFG_NETLIST_REPLACE(_tag, _setup)											\
     MCFG_DEVICE_REPLACE(_tag, NETLIST, NETLIST_CLOCK)								\
-    MCFG_NETLIST_SETUP(_setup) 														\
+    MCFG_NETLIST_SETUP(_setup)														\
 
-#define MCFG_NETLIST_SETUP(_setup) 													\
+#define MCFG_NETLIST_SETUP(_setup)													\
 	netlist_mame_device::static_set_constructor(*device, NETLIST_NAME(_setup));		\
 
 
@@ -402,7 +402,7 @@ public:
 		TYPE_MASK = 0x03,
 		SIGNAL_DIGITAL = 0x00,
 		SIGNAL_ANALOG =  0x10,
-		SIGNAL_MASK = 	 0x10,
+		SIGNAL_MASK =	 0x10,
 	};
 
 	net_object_t(int atype)
@@ -510,8 +510,8 @@ public:
 
 	friend net_sig_t logic_input_t::Q() const;
 
-	ATTR_HOT inline const net_sig_t last_Q() const	{ return m_last_Q; 	}
-	ATTR_HOT inline const net_sig_t new_Q() const	{ return m_new_Q; 	}
+	ATTR_HOT inline const net_sig_t last_Q() const	{ return m_last_Q;	}
+	ATTR_HOT inline const net_sig_t new_Q() const	{ return m_new_Q;	}
 
 	ATTR_HOT inline const double Q_Analog() const
 	{
@@ -519,14 +519,14 @@ public:
 		{
 		case SIGNAL_DIGITAL:	return m_Q ? m_high_V : m_low_V;
 		case SIGNAL_ANALOG:		return m_Q_analog;
-		default: 				assert(true);
+		default:				assert(true);
 		}
 
 		return 0;
 	}
 
 	inline net_sig_t *Q_ptr()		{ return &m_Q; }
-	inline net_sig_t *new_Q_ptr() 	{ return &m_new_Q; }
+	inline net_sig_t *new_Q_ptr()	{ return &m_new_Q; }
 
 	ATTR_COLD void register_con(net_input_t &inp);
 
@@ -544,9 +544,9 @@ public:
 protected:
 
 	/* prohibit use in device functions
-	 * current (pending) state can be inquired using new_Q()
-	 */
-	ATTR_HOT inline const net_sig_t Q() const	{ return m_Q; 	}
+     * current (pending) state can be inquired using new_Q()
+     */
+	ATTR_HOT inline const net_sig_t Q() const	{ return m_Q;	}
 
 	ATTR_HOT inline void register_in_listPS(const netlist_time &delay_ps);
 
@@ -612,8 +612,8 @@ public:
 	}
 
 	ATTR_COLD void initial(const net_sig_t val) { m_Q = val; m_new_Q = val; m_last_Q = !val; }
-	ATTR_HOT inline void clear() 	{ set_Q_PS(0, netlist_time::zero); }
-	ATTR_HOT inline void set()   	{ set_Q_PS(1, netlist_time::zero); }
+	ATTR_HOT inline void clear()	{ set_Q_PS(0, netlist_time::zero); }
+	ATTR_HOT inline void set()  	{ set_Q_PS(1, netlist_time::zero); }
 	ATTR_HOT inline void setToPS(const UINT8 val, const netlist_time &delay_ps) { set_Q_PS(val, delay_ps); }
 	ATTR_HOT inline void setToNoCheckPS(const UINT8 val, const netlist_time &delay_ps) { set_Q_NoCheckPS(val, delay_ps); }
 	ATTR_COLD inline void set_levels(const double low, const double high)
@@ -768,7 +768,7 @@ public:
 	inline void initial(const double val) { m_param = val; }
 	inline void initial(const int val) { m_param = val; }
 
-	ATTR_HOT inline double Value() const		{ return m_param; 	}
+	ATTR_HOT inline double Value() const		{ return m_param;	}
 	ATTR_HOT inline int    ValueInt() const 	{ return (int) m_param; 	}
 
 	ATTR_HOT inline net_core_device_t &netdev() const { return *m_netdev; }
@@ -922,7 +922,7 @@ public:
 protected:
 	netlist_time m_time_ps;
 	UINT32	 m_rem;
-	UINT32 	m_div;
+	UINT32	m_div;
 
 	queue_t m_queue;
 

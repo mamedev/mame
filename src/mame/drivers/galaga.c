@@ -1653,17 +1653,17 @@ static INTERRUPT_GEN( sub_vblank_irq )
 		device->execute().set_input_line(0, ASSERT_LINE);
 }
 
-const namco_06xx_config bosco_namco_06xx_0_intf = 
+const namco_06xx_config bosco_namco_06xx_0_intf =
 {
 	"maincpu", "51xx",   NULL,   "50xx_1", "54xx"
 };
 
-const namco_06xx_config bosco_namco_06xx_1_intf = 
+const namco_06xx_config bosco_namco_06xx_1_intf =
 {
 	"sub",     "50xx_2", "52xx", NULL,     NULL
 };
 
-const namco_54xx_config namco_54xx_intf = 
+const namco_54xx_config namco_54xx_intf =
 {
 	"discrete", NODE_01
 };
@@ -1723,7 +1723,7 @@ static MACHINE_CONFIG_START( bosco, bosco_state )
 MACHINE_CONFIG_END
 
 
-const namco_06xx_config galaga_namco_06xx_intf = 
+const namco_06xx_config galaga_namco_06xx_intf =
 {
 	"maincpu", "51xx", NULL, NULL, "54xx"
 };
@@ -1778,7 +1778,7 @@ static MACHINE_CONFIG_START( galaga, galaga_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-const namco_06xx_config galagab_namco_06xx_intf = 
+const namco_06xx_config galagab_namco_06xx_intf =
 {
 	"maincpu", "51xx", NULL, NULL, NULL
 };
@@ -1800,7 +1800,7 @@ static MACHINE_CONFIG_DERIVED( galagab, galaga )
 	MCFG_DEVICE_REMOVE("discrete")
 MACHINE_CONFIG_END
 
-const namco_06xx_config xevious_namco_06xx_intf = 
+const namco_06xx_config xevious_namco_06xx_intf =
 {
 	"maincpu", "51xx", NULL, "50xx", "54xx"
 };
@@ -1855,7 +1855,7 @@ static MACHINE_CONFIG_START( xevious, xevious_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-const namco_06xx_config battles_namco_06xx_intf = 
+const namco_06xx_config battles_namco_06xx_intf =
 {
 	"maincpu", "51xx", NULL, NULL, NULL
 };
@@ -1889,7 +1889,7 @@ static MACHINE_CONFIG_DERIVED( battles, xevious )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-const namco_06xx_config digdug_namco_06xx_intf = 
+const namco_06xx_config digdug_namco_06xx_intf =
 {
 	"maincpu", "51xx", "53xx", NULL, NULL
 };

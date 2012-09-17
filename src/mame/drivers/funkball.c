@@ -1140,22 +1140,22 @@ SCREEN_UPDATE_RGB32( funkball )
 	return 0;
 }
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	ide_interrupt, 
-	NULL, 
+	ide_interrupt,
+	NULL,
 	0
 };
 
 static const voodoo_config voodoo_intf =
 {
-	2, //				fbmem;
-	4,//				tmumem0;
-	0,//				tmumem1;
-	"screen",//			screen;
-	"maincpu",//		cputag;
-	NULL,//				vblank;
-	NULL,//				stall;
+	2, //               fbmem;
+	4,//                tmumem0;
+	0,//                tmumem1;
+	"screen",//         screen;
+	"maincpu",//        cputag;
+	NULL,//             vblank;
+	NULL,//             stall;
 };
 
 static MACHINE_CONFIG_START( funkball, funkball_state )

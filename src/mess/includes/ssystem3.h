@@ -8,7 +8,7 @@
 #define SSYSTEM3_H_
 
 
-struct playfield_t 
+struct playfield_t
 {
 	int signal;
 	//  int on;
@@ -26,7 +26,7 @@ struct playfield_t
 	} u;
 };
 
-struct lcd_t 
+struct lcd_t
 {
 	UINT8 data[5];
 	int clock;

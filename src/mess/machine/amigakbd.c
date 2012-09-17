@@ -13,7 +13,7 @@
 
 #define KEYBOARD_BUFFER_SIZE	256
 
-struct amigakbd_t 
+struct amigakbd_t
 {
 	UINT8 *buf;
 	int buf_pos;

@@ -711,13 +711,13 @@ void nwktr_state::machine_reset()
 
 static const voodoo_config voodoo_intf =
 {
-	2, //				fbmem;
-	2,//				tmumem0;
-	2,//				tmumem1;
-	"screen",//			screen;
-	"dsp",//			cputag;
-	voodoo_vblank_0,//	vblank;
-	NULL,//				stall;
+	2, //               fbmem;
+	2,//                tmumem0;
+	2,//                tmumem1;
+	"screen",//         screen;
+	"dsp",//            cputag;
+	voodoo_vblank_0,//  vblank;
+	NULL,//             stall;
 };
 
 static MACHINE_CONFIG_START( nwktr, nwktr_state )

@@ -227,7 +227,7 @@ static pin_fuse_rows pal12l6pinfuserows[] = {
     {14, CNoOutputEnableFuseRow, 240, 264},
     {15, CNoOutputEnableFuseRow, 192, 216},
     {16, CNoOutputEnableFuseRow, 144, 168},
-    {17, CNoOutputEnableFuseRow, 96, 120}, 
+    {17, CNoOutputEnableFuseRow, 96, 120},
     {18, CNoOutputEnableFuseRow, 0, 72}};
 
 static pin_fuse_rows pal12h6pinfuserows[] = {
@@ -235,7 +235,7 @@ static pin_fuse_rows pal12h6pinfuserows[] = {
     {14, CNoOutputEnableFuseRow, 240, 264},
     {15, CNoOutputEnableFuseRow, 192, 216},
     {16, CNoOutputEnableFuseRow, 144, 168},
-    {17, CNoOutputEnableFuseRow, 96, 120}, 
+    {17, CNoOutputEnableFuseRow, 96, 120},
     {18, CNoOutputEnableFuseRow, 0, 72}};
 
 static pin_fuse_rows pal14l4pinfuserows[] = {
@@ -529,7 +529,7 @@ static pin_fuse_columns pal16r4pinfusecolumns[] = {
     {5, 13, 12},
     {6, 17, 16},
     {7, 21, 20},
-    {8, 25, 24}, 
+    {8, 25, 24},
     {9, 29, 28},
     {12, 31, 30},
     {13, 27, 26},
@@ -1702,7 +1702,7 @@ static int command_view(int argc, char *argv[])
     else
     {
         fprintf(stderr, "Viewing product terms not supported for this pal type.");
-        
+
         return 1;
     }
 

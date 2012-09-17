@@ -464,8 +464,8 @@ int device_state_interface::state_string_max_length(int index)
 
 
 //-------------------------------------------------
-//  set_state_int - set the value of the given 
-//	piece of indexed state from a UINT64
+//  set_state_int - set the value of the given
+//  piece of indexed state from a UINT64
 //-------------------------------------------------
 
 void device_state_interface::set_state_int(int index, UINT64 value)

@@ -594,8 +594,8 @@ static TIMER_DEVICE_CALLBACK( littlerb_scanline )
 
 void littlerb_state::video_start()
 {
-//	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites_back);
-//	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites);
+//  machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites_back);
+//  machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites);
 
 	m_temp_bitmap_sprites_back = auto_bitmap_ind16_alloc(machine(),512,512);
 	m_temp_bitmap_sprites = auto_bitmap_ind16_alloc(machine(),512,512);

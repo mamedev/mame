@@ -86,7 +86,7 @@
 ***************************************************************************/
 
 /* MIPS3 Registers */
-struct mips3_regs 
+struct mips3_regs
 {
 	/* core state */
 	mips3_state	core;

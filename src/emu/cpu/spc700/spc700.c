@@ -66,7 +66,7 @@ Address  Function Register  R/W  When Reset          Remarks
 #include "spc700.h"
 
 /* CPU Structure */
-struct spc700i_cpu 
+struct spc700i_cpu
 {
 	uint a;		/* Accumulator */
 	uint x;		/* Index Register X */

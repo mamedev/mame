@@ -12,7 +12,7 @@
 
 
 /* Supported character sets */
-enum imgtool_charset 
+enum imgtool_charset
 {
 	IMGTOOL_CHARSET_UTF8,
 	IMGTOOL_CHARSET_ISO_8859_1,

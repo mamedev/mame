@@ -1,7 +1,7 @@
 #ifndef __SPCHROMS_H
 #define __SPCHROMS_H
 
-struct spchroms_interface 
+struct spchroms_interface
 {
 	const char *memory_region;			/* memory region where the speech ROM is.  NULL means no speech ROM */
 };

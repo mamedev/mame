@@ -113,7 +113,7 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	
+
 	UINT8 reg_r(UINT8 offset);
 	void reg_w(UINT8 offset, UINT8 data);
 

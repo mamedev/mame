@@ -518,7 +518,7 @@ void emu_options::set_system_name(const char *name)
 		add_device_options(true);
 		int num = 0;
 		do {
-			num = options_count();		
+			num = options_count();
 			update_slot_options();
 			while (add_slot_options(false));
 			add_device_options(false);
@@ -568,7 +568,7 @@ bool emu_options::parse_one_ini(const char *basename, int priority, astring *err
 
 
 const char *emu_options::main_value(astring &buffer, const char *name) const
-{	
+{
 	buffer = value(name);
 	int pos = buffer.chr(0,',');
 	if (pos!=-1) {
@@ -578,7 +578,7 @@ const char *emu_options::main_value(astring &buffer, const char *name) const
 }
 
 const char *emu_options::sub_value(astring &buffer, const char *name, const char *subname) const
-{	
+{
 	astring tmp = ",";
 	tmp.cat(subname);
 	tmp.cat("=");

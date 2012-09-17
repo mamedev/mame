@@ -20,7 +20,7 @@
 #define LOG_OCW		0
 #define LOG_GENERAL	 0
 
-enum pic8259_state_t 
+enum pic8259_state_t
 {
 	STATE_ICW1,
 	STATE_ICW2,

@@ -25,7 +25,7 @@ struct df_t {
 	UINT8	osc_clk;		/* Only used by data fetchers 5,6, and 7 */
 };
 
-struct dpc_t 
+struct dpc_t
 {
 	df_t df[8];
 	UINT8	movamt;

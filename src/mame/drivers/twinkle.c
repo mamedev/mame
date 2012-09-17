@@ -898,10 +898,10 @@ static const rtc65271_interface twinkle_rtc =
 	DEVCB_NULL
 };
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	ide_interrupt, 
-	NULL, 
+	ide_interrupt,
+	NULL,
 	0
 };
 

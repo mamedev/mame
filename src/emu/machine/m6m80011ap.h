@@ -24,7 +24,7 @@ Template for skeleton device
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-enum eeprom_cmd_t 
+enum eeprom_cmd_t
 {
 	EEPROM_GET_CMD = 0,
 	EEPROM_READ,

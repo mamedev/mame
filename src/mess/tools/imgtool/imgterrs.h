@@ -10,7 +10,7 @@
 #define IMGTERRS_H
 
 /* Error codes */
-enum imgtoolerr_t 
+enum imgtoolerr_t
 {
 	IMGTOOLERR_SUCCESS,
 	IMGTOOLERR_OUTOFMEMORY,

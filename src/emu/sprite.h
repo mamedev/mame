@@ -55,7 +55,7 @@ class sparse_dirty_rect : public rectangle
 public:
 	// getters
 	const sparse_dirty_rect *next() const { return m_next; }
-	
+
 private:
 	// internal state
 	sparse_dirty_rect *	m_next;
@@ -75,7 +75,7 @@ public:
 	void dirty(const rectangle &rect) { dirty(rect.left(), rect.right(), rect.top(), rect.bottom()); }
 	void dirty(INT32 left, INT32 right, INT32 top, INT32 bottom);
 	void dirty_all() { dirty(0, m_width - 1, 0, m_height - 1); }
-	
+
 	// cleaning operations - partially intersecting tiles are NOT cleaned
 	void clean(const rectangle &rect) { clean(rect.left(), rect.right(), rect.top(), rect.bottom()); }
 	void clean(INT32 left, INT32 right, INT32 top, INT32 bottom);
@@ -85,9 +85,9 @@ public:
 	sparse_dirty_rect *first_dirty_rect() { rectangle fullrect(0, m_width - 1, 0, m_height - 1); return first_dirty_rect(fullrect); }
 	sparse_dirty_rect *first_dirty_rect(const rectangle &cliprect);
 
-	// dynamic resizing	
+	// dynamic resizing
 	void resize(int width, int height);
-	
+
 private:
 	// invalidate cached rect list
 	void invalidate_rect_list() { m_rect_list_bounds.set(0, -1, 0, -1); }
@@ -135,18 +135,18 @@ public:
 	UINT32 spriteram_bytes() const { return m_spriteram_bytes; }
 	UINT32 spriteram_elements() const { return m_spriteram_bytes / sizeof(_SpriteRAMType); }
 	_SpriteRAMType *buffer() { return &m_buffer[0]; }
-	
+
 	// static configuration
 	static void static_set_xorigin(device_t &device, int origin) { downcast<sprite_device &>(device).m_xorigin = origin; }
 	static void static_set_yorigin(device_t &device, int origin) { downcast<sprite_device &>(device).m_yorigin = origin; }
 	static void static_set_origin(device_t &device, int xorigin, int yorigin) { static_set_xorigin(device, xorigin); static_set_yorigin(device, yorigin); }
-	
+
 	// configuration
 	void set_origin(INT32 xorigin = 0, INT32 yorigin = 0) { m_xorigin = xorigin; m_yorigin = yorigin; }
-	
+
 	// buffering
 	void copy_to_buffer() { memcpy(m_buffer, m_spriteram, m_spriteram_bytes); }
-	
+
 	// clearing
 	void clear() { clear(m_bitmap.cliprect()); }
 	void clear(const rectangle &cliprect)
@@ -155,7 +155,7 @@ public:
 			m_bitmap.fill(~0, *rect);
 		m_dirty.clean(cliprect);
 	}
-	
+
 	// force clear (don't use dirty rects)
 	void force_clear()
 	{
@@ -174,18 +174,18 @@ public:
 			m_bitmap.resize(new_width, new_height, BITMAP_SLOP, BITMAP_SLOP);
 			m_dirty.resize(new_width, new_height);
 		}
-		
+
 		// clear out the region
 		if (clearit)
 			clear(cliprect);
-		
+
 		// wrap the bitmap, adjusting for x/y origins
 		_BitmapType wrapped(&m_bitmap.pix(0) - m_xorigin - m_yorigin * m_bitmap.rowpixels(), m_xorigin + cliprect.right() + 1, m_yorigin + cliprect.bottom() + 1, m_bitmap.rowpixels());
 
 		// compute adjusted cliprect in source space
 		rectangle adjusted = cliprect;
 		adjusted.offset(m_xorigin, m_yorigin);
-		
+
 		// render
 		draw(wrapped, adjusted);
 	}
@@ -202,21 +202,21 @@ protected:
 		// set up pointers
 		m_spriteram = reinterpret_cast<_SpriteRAMType *>(spriteram->ptr());
 		m_spriteram_bytes = spriteram->bytes();
-		
+
 		// allocate the double buffer to match the RAM size
 		m_buffer.resize(m_spriteram_bytes / sizeof(_SpriteRAMType));
 
 		// save states
 		save_item(NAME(m_buffer));
 	}
-	
+
 	// subclass overrides
 	virtual void draw(_BitmapType &bitmap, const rectangle &cliprect) = 0;
 
 	// subclass helpers
 	void mark_dirty(const rectangle &rect) { mark_dirty(rect.left(), rect.right(), rect.top(), rect.bottom()); }
 	void mark_dirty(INT32 left, INT32 right, INT32 top, INT32 bottom) { m_dirty.dirty(left - m_xorigin, right - m_xorigin, top - m_yorigin, bottom - m_yorigin); }
-	
+
 private:
 	// configuration
 	INT32							m_xorigin;				// X origin for drawing
@@ -226,7 +226,7 @@ private:
 	_SpriteRAMType *				m_spriteram;			// pointer to spriteram pointer
 	INT32							m_spriteram_bytes;		// size of sprite RAM in bytes
 	dynamic_array<_SpriteRAMType>	m_buffer;				// buffered spriteram for those that use it
-	
+
 	// bitmaps
 	_BitmapType						m_bitmap;				// live bitmap
 	sparse_dirty_bitmap				m_dirty;				// dirty bitmap

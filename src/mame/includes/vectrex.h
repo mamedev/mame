@@ -11,7 +11,7 @@
 
 #define NVECT 10000
 
-struct vectrex_point 
+struct vectrex_point
 {
 	int x; int y;
 	rgb_t col;

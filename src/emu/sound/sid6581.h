@@ -14,7 +14,7 @@
 #include "devlegcy.h"
 
 
-enum SIDTYPE 
+enum SIDTYPE
 {
 	MOS6581,
 	MOS8580

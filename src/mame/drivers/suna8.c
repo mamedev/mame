@@ -706,7 +706,7 @@ WRITE8_MEMBER(suna8_state::brickzn_prot_w)
 	m_spritebank = (data >> 1) & 1;
 
 	logerror("CPU #0 - PC %04X: protection_val = %02X\n",space.device().safe_pc(),data);
-//	if (data & ~0x03)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",space.device().safe_pc(),data);
+//  if (data & ~0x03)   logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",space.device().safe_pc(),data);
 }
 
 /*

@@ -176,7 +176,7 @@ extern const device_type NCR7496_NEW;
 extern const device_type GAMEGEAR_NEW;
 extern const device_type SEGAPSG_NEW;
 
-struct sn76496_config 
+struct sn76496_config
 {
 	devcb_write_line		ready;
 };

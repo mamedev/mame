@@ -13,7 +13,7 @@
 #include "machine/ins8250.h"
 #include "machine/wd17xx.h"
 
-struct SVI_318 
+struct SVI_318
 {
 	/* general */
 	UINT8	svi318;		/* Are we dealing with an SVI-318 or a SVI-328 model. 0 = 328, 1 = 318 */
@@ -37,7 +37,7 @@ struct SVI_318
 	UINT8	*svi806_gfx;
 };
 
-struct SVI318_FDC_STRUCT 
+struct SVI318_FDC_STRUCT
 {
 	UINT8 driveselect;
 	int drq;

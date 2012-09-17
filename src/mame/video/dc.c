@@ -150,7 +150,7 @@ typedef	struct
 	float x, y, w, u, v;
 } vert;
 
-struct strip 
+struct strip
 {
 	int svert, evert;
 	texinfo ti;

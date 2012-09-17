@@ -25,7 +25,7 @@
 // ======================> diag264_serial_loopback_device
 
 class diag264_serial_loopback_device :  public device_t,
-						   				public device_cbm_iec_interface
+										public device_cbm_iec_interface
 {
 public:
     // construction/destruction

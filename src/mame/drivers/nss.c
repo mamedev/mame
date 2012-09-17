@@ -1,20 +1,20 @@
 /***************************************************************************
 
-	Nintendo Super System
+    Nintendo Super System
 
-	driver by Angelo Salese, based off info from Noca$h
+    driver by Angelo Salese, based off info from Noca$h
 
-	TODO:
-	- EEPROM doesn't save?
-	- Fix sound CPU halt / reset lines, particularly needed by this to work
-	  correctly;
-	- Fix continue behaviour, might be the same issue as the one above.
-	- Various M50458 bits
-	- OSD should actually super-impose with the SNES video somehow;
+    TODO:
+    - EEPROM doesn't save?
+    - Fix sound CPU halt / reset lines, particularly needed by this to work
+      correctly;
+    - Fix continue behaviour, might be the same issue as the one above.
+    - Various M50458 bits
+    - OSD should actually super-impose with the SNES video somehow;
 
-	Notes:
-	- Multi-Cart BIOS works only with F-Zero, Super Tennis and Super Mario
-	  World;
+    Notes:
+    - Multi-Cart BIOS works only with F-Zero, Super Tennis and Super Mario
+      World;
 
 ***************************************************************************
 
@@ -505,14 +505,14 @@ ADDRESS_MAP_END
 READ8_MEMBER(nss_state::port_00_r)
 {
 /*
-	x--- ----   SNES Watchdog (0=SNES did read Joypads, 1=Didn't do so) (ack via 07h.W)
-	-x-- ----   Vblank or Vsync or so       (0=What, 1=What?)
-	--x- ----   Button "Joypad Button B?"   (0=Released, 1=Pressed)
-	---x ----   Button "Joypad Button A"    (0=Released, 1=Pressed)
-	---- x---   Button "Joypad Down"        (0=Released, 1=Pressed)
-	---- -x--   Button "Joypad Up"          (0=Released, 1=Pressed)
-	---- --x-   Button "Joypad Left"        (0=Released, 1=Pressed)
-	---- ---x   Button "Joypad Right"       (0=Released, 1=Pressed)
+    x--- ----   SNES Watchdog (0=SNES did read Joypads, 1=Didn't do so) (ack via 07h.W)
+    -x-- ----   Vblank or Vsync or so       (0=What, 1=What?)
+    --x- ----   Button "Joypad Button B?"   (0=Released, 1=Pressed)
+    ---x ----   Button "Joypad Button A"    (0=Released, 1=Pressed)
+    ---- x---   Button "Joypad Down"        (0=Released, 1=Pressed)
+    ---- -x--   Button "Joypad Up"          (0=Released, 1=Pressed)
+    ---- --x-   Button "Joypad Left"        (0=Released, 1=Pressed)
+    ---- ---x   Button "Joypad Right"       (0=Released, 1=Pressed)
 */
 	UINT8 res;
 
@@ -531,11 +531,11 @@ READ8_MEMBER(nss_state::port_00_r)
 WRITE8_MEMBER(nss_state::port_00_w)
 {
 /*
-	xxxx ---- Unknown/unused      (should be always 0)
- 	---- x--- Maybe SNES CPU/PPU reset (usually same as Port 01h.W.Bit1)
-	---- -x-- RAM at 9000h-9FFFh  (0=Disable/Protect, 1=Enable/Unlock)
-	---- --x- Looks like maybe somehow NMI Related ?    ;\or one of these is PC10-style
-	---- ---x Looks like NMI Enable                     ;/hardware-watchdog reload?
+    xxxx ---- Unknown/unused      (should be always 0)
+    ---- x--- Maybe SNES CPU/PPU reset (usually same as Port 01h.W.Bit1)
+    ---- -x-- RAM at 9000h-9FFFh  (0=Disable/Protect, 1=Enable/Unlock)
+    ---- --x- Looks like maybe somehow NMI Related ?    ;\or one of these is PC10-style
+    ---- ---x Looks like NMI Enable                     ;/hardware-watchdog reload?
 */
 	m_wram_wp_flag = (data & 4) >> 2;
 	m_nmi_enable = data & 1;
@@ -545,13 +545,13 @@ WRITE8_MEMBER(nss_state::port_00_w)
 WRITE8_MEMBER(nss_state::port_01_w)
 {
 /*
-	x--- ---- Maybe SNES Joypad Enable? (0=Disable/Demo, 1=Enable/Game)
-	-x-- ---- Unknown/unused        (should be always 0)
-	--x- ---- SNES Sound Mute       (0=Normal, 1=Mute) (for optional mute in demo mode)
-	---x ---- Unknown  ;from INST-ROM flag! (Lo/HiROM, 2-player, zapper, volume or so?)
-	---- xx-- Slot Select        (0..2 for Slot 1..3) (mapping to both SNES and Z80)
-	---- --x- Maybe SNES CPU pause?  (cleared on deposit coin to continue) (1=Run)
-	---- ---x Maybe SNES CPU/PPU reset?   (0=Reset, 1=Run)
+    x--- ---- Maybe SNES Joypad Enable? (0=Disable/Demo, 1=Enable/Game)
+    -x-- ---- Unknown/unused        (should be always 0)
+    --x- ---- SNES Sound Mute       (0=Normal, 1=Mute) (for optional mute in demo mode)
+    ---x ---- Unknown  ;from INST-ROM flag! (Lo/HiROM, 2-player, zapper, volume or so?)
+    ---- xx-- Slot Select        (0..2 for Slot 1..3) (mapping to both SNES and Z80)
+    ---- --x- Maybe SNES CPU pause?  (cleared on deposit coin to continue) (1=Run)
+    ---- ---x Maybe SNES CPU/PPU reset?   (0=Reset, 1=Run)
 */
 	m_input_disabled = ((data & 0x80) >> 7) ^ 1;
 	spc700_set_volume(machine().device("spc700"),data & 0x20 ? 0.0 : 100.0);
@@ -570,32 +570,32 @@ WRITE8_MEMBER(nss_state::port_01_w)
 WRITE8_MEMBER(nss_state::port_02_w)
 {
 /*
-	x--- ----  OSD Clock ?       (usually same as Bit6)  ;\Chip Select when Bit6=Bit7 ?
-	-x-- ----  OSD Clock ?       (usually same as Bit7)  ;/
-	--x- ----  OSD Data Out      (0=Low=Zero, 1=High=One)
-	---x ----  OSD Special       (?)  ... or just /CS ? (or software index DC3F/DD3F?)
-	---- x---  RTC /CLK          (0=Low=Clock,  1=High=Idle)              ;S-3520
-	---- -x--  RTC Data Out      (0=Low=Zero,   1=High=One)
-	---- --x-  RTC Direction     (0=Low=Write,  1=High=Read)
-	---- ---x  RTC /CS           (0=Low/Select, 1=High/No)
+    x--- ----  OSD Clock ?       (usually same as Bit6)  ;\Chip Select when Bit6=Bit7 ?
+    -x-- ----  OSD Clock ?       (usually same as Bit7)  ;/
+    --x- ----  OSD Data Out      (0=Low=Zero, 1=High=One)
+    ---x ----  OSD Special       (?)  ... or just /CS ? (or software index DC3F/DD3F?)
+    ---- x---  RTC /CLK          (0=Low=Clock,  1=High=Idle)              ;S-3520
+    ---- -x--  RTC Data Out      (0=Low=Zero,   1=High=One)
+    ---- --x-  RTC Direction     (0=Low=Write,  1=High=Read)
+    ---- ---x  RTC /CS           (0=Low/Select, 1=High/No)
 */
-//	printf("%02x\n",data & 0xf);
+//  printf("%02x\n",data & 0xf);
 	ioport("RTC_OSD")->write(data, 0xff);
 }
 
 WRITE8_MEMBER(nss_state::port_03_w)
 {
 /*
-	x--- ----     Layer SNES Enable?             (used by token proc, see 7A46h) SNES?
-	-x-- ----     Layer OSD Enable?
-	--xx ---- Unknown/unused (should be always 0)
-	---- x---   LED Instructions (0=Off, 1=On)  ;-glows in demo (prompt for INST button)
-	---- -x--   LED Game 3       (0=Off, 1=On)  ;\
-	---- --x-   LED Game 2       (0=Off, 1=On)  ; blinked when enough credits inserted
-	---- ---x   LED Game 1       (0=Off, 1=On)  ;/
+    x--- ----     Layer SNES Enable?             (used by token proc, see 7A46h) SNES?
+    -x-- ----     Layer OSD Enable?
+    --xx ---- Unknown/unused (should be always 0)
+    ---- x---   LED Instructions (0=Off, 1=On)  ;-glows in demo (prompt for INST button)
+    ---- -x--   LED Game 3       (0=Off, 1=On)  ;\
+    ---- --x-   LED Game 2       (0=Off, 1=On)  ; blinked when enough credits inserted
+    ---- ---x   LED Game 1       (0=Off, 1=On)  ;/
 
 */
-//	popmessage("%02x",data);
+//  popmessage("%02x",data);
 }
 
 WRITE8_MEMBER(nss_state::port_04_w)

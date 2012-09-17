@@ -20,7 +20,7 @@ union pair
 
 /* the VDC context */
 
-struct VDC 
+struct VDC
 {
 	int dvssr_write;			/* Set when the DVSSR register has been written to */
 	int physical_width;			/* Width of the display */

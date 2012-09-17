@@ -121,7 +121,7 @@
 #include "firebeat.lh"
 
 
-struct GCU_REGS 
+struct GCU_REGS
 {
 	UINT32 *vram;
 	UINT32 vram_read_address;
@@ -129,14 +129,14 @@ struct GCU_REGS
 	UINT32 visible_area;
 };
 
-struct IBUTTON_SUBKEY 
+struct IBUTTON_SUBKEY
 {
 	UINT8 identifier[8];
 	UINT8 password[8];
 	UINT8 data[0x30];
 };
 
-struct IBUTTON 
+struct IBUTTON
 {
 	IBUTTON_SUBKEY subkey[3];
 };

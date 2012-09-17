@@ -687,10 +687,10 @@ static const struct pit8253_config gamecstl_pit8254_config =
 	}
 };
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	ide_interrupt, 
-	NULL, 
+	ide_interrupt,
+	NULL,
 	0
 };
 

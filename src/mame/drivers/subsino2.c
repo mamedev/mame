@@ -900,10 +900,10 @@ static TIMER_DEVICE_CALLBACK( h8_timer_irq )
 WRITE16_MEMBER(subsino2_state::bishjan_sel_w)
 {
 	/*
-		sound writes in service mode:
-		01 88 04 00 (coin in)
-		02 89 04 0v (v = voice = 0..3)
-	*/
+        sound writes in service mode:
+        01 88 04 00 (coin in)
+        02 89 04 0v (v = voice = 0..3)
+    */
 	if (ACCESSING_BITS_8_15)
 		m_bishjan_sel = data >> 8;
 }

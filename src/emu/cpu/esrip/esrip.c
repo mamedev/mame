@@ -61,7 +61,7 @@ CPU_DISASSEMBLE( esrip );
     STRUCTURES & TYPEDEFS
 ***************************************************************************/
 
-struct esrip_state 
+struct esrip_state
 {
 	UINT16	ram[32];
 	UINT16	acc;

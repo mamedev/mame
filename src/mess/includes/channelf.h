@@ -13,7 +13,7 @@
 
 
 /* SKR - 2102 RAM chip on carts 10 and 18 I/O ports */
-struct r2102_t 
+struct r2102_t
 {
 	UINT8 d;			/* data bit:inverted logic, but reading/writing cancel out */
 	UINT8 r_w;			/* inverted logic: 0 means read, 1 means write */

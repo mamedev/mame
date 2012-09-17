@@ -20,7 +20,7 @@ author (Karl Stenerud) at karl@higashiyama-unet.ocn.ne.jp.
 
 
 
-struct opcode_struct 
+struct opcode_struct
 {
 	unsigned char name;
 	unsigned char args[2];

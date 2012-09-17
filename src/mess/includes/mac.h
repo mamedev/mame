@@ -37,7 +37,7 @@
 #define ADB_IS_PM_CLASS	((m_model >= MODEL_MAC_PORTABLE && m_model <= MODEL_MAC_PB100) || (m_model >= MODEL_MAC_PB140 && m_model <= MODEL_MAC_PBDUO_270c))
 
 /* for Egret and CUDA streaming MCU commands, command types */
-enum mac_streaming_t 
+enum mac_streaming_t
 {
 	MCU_STREAMING_NONE = 0,
 	MCU_STREAMING_PRAMRD,
@@ -55,7 +55,7 @@ enum
 };
 
 /* tells which model is being emulated (set by macxxx_init) */
-enum model_t 
+enum model_t
 {
 	MODEL_MAC_128K512K,	// 68000 machines
 	MODEL_MAC_512KE,

@@ -681,7 +681,7 @@ WRITE32_MEMBER(hng64_state::hng64_videoram_w)
 }
 
 /* internal set of transparency states for rendering */
-enum hng64trans_t 
+enum hng64trans_t
 {
 	HNG64_TILEMAP_NORMAL = 1,
 	HNG64_TILEMAP_ADDITIVE,

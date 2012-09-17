@@ -618,10 +618,10 @@ void taitowlf_state::palette_init()
 }
 #endif
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	ide_interrupt, 
-	NULL, 
+	ide_interrupt,
+	NULL,
 	0
 };
 

@@ -88,7 +88,7 @@ enum e_operand
 };
 
 
-struct tlcs900inst 
+struct tlcs900inst
 {
 	e_mnemonics	mnemonic;
 	e_operand	operand1;

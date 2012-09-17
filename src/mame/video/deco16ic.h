@@ -41,7 +41,7 @@ public:
 	~deco16ic_device() { global_free(m_token); }
 
 	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }	
+	void *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -55,7 +55,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info_b);
-	TILE_GET_INFO_MEMBER(get_pf1_tile_info_b);	
+	TILE_GET_INFO_MEMBER(get_pf1_tile_info_b);
 };
 
 extern const device_type DECO16IC;

@@ -133,7 +133,7 @@ public:
 	UINT32 colors() const { return m_total_colors; }
 	UINT32 rowbytes() const { return m_line_modulo; }
 	bool has_pen_usage() const { return (m_pen_usage.count() > 0); }
-	
+
 	// a bit gross that people muck with this stuff...
 	const UINT8 *srcdata() const { return m_srcdata; }
 	UINT32 dirtyseq() const { return m_dirtyseq; }
@@ -156,17 +156,17 @@ public:
 	const UINT8 *get_data(UINT32 code)
 	{
 		assert(code < elements());
-		if (code < m_dirty.count() && m_dirty[code]) decode(code); 
+		if (code < m_dirty.count() && m_dirty[code]) decode(code);
 		return m_gfxdata + code * m_char_modulo + m_starty * m_line_modulo + m_startx;
 	}
-	
+
 	UINT32 pen_usage(UINT32 code)
 	{
 		assert(code < m_pen_usage.count());
-		if (m_dirty[code]) decode(code); 
+		if (m_dirty[code]) decode(code);
 		return m_pen_usage[code];
 	}
-	
+
 private:
 	// internal state
 	UINT16			m_width;				// current pixel width of each element (changeble with source clipping)

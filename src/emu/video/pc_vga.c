@@ -992,8 +992,8 @@ SCREEN_UPDATE_RGB32( pc_video_s3 )
 			return 0;  // cursor only works in VGA or SVGA modes
 
 		src = s3.cursor_start_addr * 1024;  // start address is in units of 1024 bytes
-//		for(x=0;x<64;x++)
-//			printf("%08x: %02x %02x %02x %02x\n",src+x*4,vga.memory[src+x*4],vga.memory[src+x*4+1],vga.memory[src+x*4+2],vga.memory[src+x*4+3]);
+//      for(x=0;x<64;x++)
+//          printf("%08x: %02x %02x %02x %02x\n",src+x*4,vga.memory[src+x*4],vga.memory[src+x*4+1],vga.memory[src+x*4+2],vga.memory[src+x*4+3]);
 		for(y=0;y<64;y++)
 		{
 			dst = &bitmap.pix32(cy + y, cx);
@@ -4940,7 +4940,7 @@ static void ati_define_video_mode(running_machine &machine)
 		clock = XTAL_42_9545MHz;
 		logerror("Invalid dot clock %i selected.\n",clock_type);
 	}
-//	logerror("ATI: Clock select type %i (%iHz / %i)\n",clock_type,clock,div);
+//  logerror("ATI: Clock select type %i (%iHz / %i)\n",clock_type,clock,div);
 	recompute_params_clock(machine,divisor,clock / div);
 }
 
@@ -5138,7 +5138,7 @@ WRITE16_HANDLER(mach8_subcontrol_w)
 {
 	ibm8514.subctrl = data;
 	ibm8514.substatus &= ~(data & 0x0f);  // reset interrupts
-//	logerror("8514/A: Subsystem control write %04x\n",data);
+//  logerror("8514/A: Subsystem control write %04x\n",data);
 }
 
 READ16_HANDLER(mach8_subcontrol_r)
@@ -5159,7 +5159,7 @@ READ16_HANDLER(mach8_vtotal_r)
 WRITE16_HANDLER(mach8_vtotal_w)
 {
 	ibm8514.vtotal = data;
-//	vga.crtc.vert_total = data;
+//  vga.crtc.vert_total = data;
 	logerror("8514/A: Vertical total write %04x\n",data);
 }
 
@@ -5171,7 +5171,7 @@ READ16_HANDLER(mach8_vdisp_r)
 WRITE16_HANDLER(mach8_vdisp_w)
 {
 	ibm8514.vdisp = data;
-//	vga.crtc.vert_disp_end = data >> 3;
+//  vga.crtc.vert_disp_end = data >> 3;
 	logerror("8514/A: Vertical Displayed write %04x\n",data);
 }
 

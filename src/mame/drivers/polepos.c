@@ -862,12 +862,12 @@ static const namco_interface namco_config =
 	1				/* stereo */
 };
 
-const namco_06xx_config polepos_namco_06xx_intf = 
+const namco_06xx_config polepos_namco_06xx_intf =
 {
 	"maincpu", "51xx", "53xx", "52xx", "54xx"
 };
 
-const namco_54xx_config polepos_namco_54xx_intf = 
+const namco_54xx_config polepos_namco_54xx_intf =
 {
 	"discrete", NODE_01
 };
@@ -953,7 +953,7 @@ static const namco_51xx_interface namco_51xx_bl_intf =
 	}
 };
 
-const namco_06xx_config topracern_namco_06xx_intf = 
+const namco_06xx_config topracern_namco_06xx_intf =
 {
 	"maincpu", "51xx", NULL, NULL, NULL
 };

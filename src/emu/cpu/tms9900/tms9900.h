@@ -109,7 +109,7 @@ static const char opname[][5] =
 	"*int"
 };
 
-struct tms99xx_config 
+struct tms99xx_config
 {
 	devcb_write8		external_callback;
 	devcb_read8			irq_level;

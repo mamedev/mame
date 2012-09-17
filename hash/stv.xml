@@ -7,7 +7,7 @@
 -->
 
 <softwarelist name="stv" description="Sega Titan Video cartridges">
-  
+
   <!-- Game: Astra SuperStars -->
   <software name="astrass" supported="no" >
     <description>Astra SuperStars (J 980514 V1.002)</description>
@@ -27,7 +27,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Baku Baku Animal -->
   <software name="bakubaku">
     <description>Baku Baku Animal (J 950407 V1.000)</description>
@@ -43,7 +43,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Batman Forever -->
   <software name="batmanfr" supported="no" >
     <description>Batman Forever (JUE 960507 V1.000)</description>
@@ -68,7 +68,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Columns '97 -->
   <software name="colmns97" supported="no">
     <description>Columns '97 (JET 961209 V1.000)</description>
@@ -82,7 +82,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Cotton 2 -->
   <software name="cotton2">
     <description>Cotton 2 (JUET 970902 V1.000)</description>
@@ -101,7 +101,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Cotton Boomerang -->
   <software name="cottonbm" supported="no">
     <description>Cotton Boomerang (JUET 980709 V1.000)</description>
@@ -119,7 +119,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Critter Crusher -->
   <software name="critcrsh" supported="no" >
     <description>Critter Crusher (EA 951204 V1.000)</description>
@@ -134,7 +134,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Danchi de Hanafuda -->
   <software name="danchih" supported="no">
     <description>Danchi de Hanafuda (J 990607 V1.400)</description>
@@ -150,7 +150,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Danchi de Quiz Okusan Yontaku Desuyo! -->
   <software name="danchiq" supported="no">
     <description>Danchi de Quiz Okusan Yontaku Desuyo! (J 001128 V1.200)</description>
@@ -171,7 +171,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Decathlete -->
   <software name="decathlt" supported="no">
     <description>Decathlete (JUET 960709 V1.001)</description>
@@ -188,7 +188,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Decathlete -->
   <software name="decathlto" cloneof="decathlt" supported="no">
     <description>Decathlete (JUET 960424 V1.000)</description>
@@ -205,7 +205,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Die Hard Arcade -->
   <software name="diehard">
     <description>Die Hard Arcade (UET 960515 V1.000)</description>
@@ -221,7 +221,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Dynamite Deka -->
   <software name="dnmtdeka" cloneof="diehard">
     <description>Dynamite Deka (J 960515 V1.000)</description>
@@ -237,7 +237,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Ejihon Tantei Jimusyo -->
   <software name="ejihon">
     <description>Ejihon Tantei Jimusyo (J 950613 V1.000)</description>
@@ -255,7 +255,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Touryuu Densetsu Elan-Doree / Elan Doree - Legend of Dragoon -->
   <software name="elandore" supported="no">
     <description>Touryuu Densetsu Elan-Doree / Elan Doree - Legend of Dragoon (JUET 980922 V1.006)</description>
@@ -274,7 +274,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Final Fight Revenge -->
   <software name="ffreveng" supported="no">
     <description>Final Fight Revenge (JUET 990714 V1.000)</description>
@@ -292,7 +292,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Funky Head Boxers -->
   <software name="fhboxers" supported="no" >
     <description>Funky Head Boxers (JUETBKAL 951218 V1.000)</description>
@@ -313,7 +313,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Find Love -->
   <software name="findlove" supported="no" >
     <description>Find Love (J 971212 V1.000)</description>
@@ -337,7 +337,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Final Arch -->
   <software name="finlarch" cloneof="smleague">
     <description>Final Arch (J 950714 V1.001)</description>
@@ -359,7 +359,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Golden Axe - The Duel -->
   <software name="gaxeduel">
     <description>Golden Axe - The Duel (JUETL 950117 V1.000)</description>
@@ -378,7 +378,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Guardian Force -->
   <software name="grdforce" supported="no">
     <description>Guardian Force (JUET 980318 V0.105)</description>
@@ -395,7 +395,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Groove on Fight - Gouketsuji Ichizoku 3 -->
   <software name="groovef" supported="no">
     <description>Groove on Fight - Gouketsuji Ichizoku 3 (J 970416 V1.001)</description>
@@ -415,7 +415,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Hanagumi Taisen Columns - Sakura Wars -->
   <software name="hanagumi" supported="no">
     <description>Hanagumi Taisen Columns - Sakura Wars (J 971007 V1.010)</description>
@@ -438,7 +438,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Karaoke Quiz Intro Don Don! -->
   <software name="introdon" supported="no">
     <description>Karaoke Quiz Intro Don Don! (J 960213 V1.000)</description>
@@ -458,7 +458,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Pro Mahjong Kiwame S -->
   <!-- Note: you have to init it manually via test mode -->
   <software name="kiwames">
@@ -475,7 +475,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Magical Zunou Power -->
   <software name="magzun" supported="no" >
     <description>Magical Zunou Power (J 961031 V1.000)</description>
@@ -493,7 +493,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Maru-Chan de Goo! -->
   <software name="maruchan">
     <description>Maru-Chan de Goo! (J 971216 V1.000)</description>
@@ -513,7 +513,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Mausuke no Ojama the World -->
   <software name="mausuke">
     <description>Mausuke no Ojama the World (J 960314 V1.000)</description>
@@ -534,7 +534,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Microman Battle Charge -->
   <software name="micrombc" supported="no" >
     <description>Microman Battle Charge (J 990326 V1.000)</description>
@@ -553,7 +553,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Virtual Mahjong 2 - My Fair Lady -->
   <software name="myfairld" supported="no" >
     <description>Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)</description>
@@ -572,7 +572,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Name Club Ver.3 -->
   <software name="nclubv3" supported="no" >
     <description>Name Club Ver.3 (J 970723 V1.000)</description>
@@ -593,7 +593,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Othello Shiyouyo -->
   <software name="othellos" supported="no">
     <description>Othello Shiyouyo (J 980423 V1.002)</description>
@@ -609,7 +609,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Pebble Beach - The Great Shot -->
   <software name="pblbeach">
     <description>Pebble Beach - The Great Shot (JUE 950913 V0.990)</description>
@@ -626,7 +626,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Print Club 2 -->
   <software name="pclub2" supported="no">
     <description>Print Club 2 (U 970921 V1.000)</description>
@@ -642,7 +642,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Print Club 2 Vol. 3 -->
   <software name="pclub2v3" cloneof="pclub2" supported="no">
     <description>Print Club 2 Vol. 3 (U 990310 V1.000)</description>
@@ -658,7 +658,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Print Club Pokemon B -->
   <software name="pclubpok" supported="no">
     <description>Print Club Pokemon B (U 991126 V1.000)</description>
@@ -674,7 +674,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Princess Clara Daisakusen -->
   <software name="prikura">
     <description>Princess Clara Daisakusen (J 960910 V1.000)</description>
@@ -690,7 +690,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Puyo Puyo Sun -->
   <software name="puyosun" supported="no">
     <description>Puyo Puyo Sun (J 961115 V0.001)</description>
@@ -711,7 +711,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Radiant Silvergun -->
   <software name="rsgun" supported="no">
     <description>Radiant Silvergun (JUET 980523 V1.000)</description>
@@ -727,7 +727,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Puzzle &amp; Action: Sando-R -->
   <software name="sandor">
     <description>Puzzle &amp; Action: Sando-R (J 951114 V1.000)</description>
@@ -747,7 +747,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: DaeJeon! SanJeon SuJeon -->
   <software name="sanjeon" cloneof="sasissu" supported="no" >
     <description>DaeJeon! SanJeon SuJeon (AJTUE 990412 V1.000)</description>
@@ -770,7 +770,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Taisen Tanto-R Sashissu!! -->
   <software name="sasissu" supported="no">
     <description>Taisen Tanto-R Sashissu!! (J 980216 V1.000)</description>
@@ -788,7 +788,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Sea Bass Fishing -->
   <software name="seabass" supported="no" >
     <description>Sea Bass Fishing (JUET 971110 V0.001)</description>
@@ -808,7 +808,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Shanghai - The Great Wall / Shanghai Triple Threat -->
   <software name="shanhigw">
     <description>Shanghai - The Great Wall / Shanghai Triple Threat (JUE 950623 V1.005)</description>
@@ -821,7 +821,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Shienryu -->
   <software name="shienryu" supported="no" >
     <description>Shienryu (JUET 961226 V1.000)</description>
@@ -836,7 +836,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Super Major League -->
   <software name="smleague">
     <description>Super Major League (U 960108 V1.000)</description>
@@ -854,7 +854,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Soukyugurentai / Terra Diver -->
   <software name="sokyugrt" supported="no" >
     <description>Soukyugurentai / Terra Diver (JUET 960821 V1.000)</description>
@@ -870,7 +870,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Steep Slope Sliders -->
   <software name="sss" supported="no" >
     <description>Steep Slope Sliders (JUET 981110 V1.000)</description>
@@ -888,7 +888,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Stress Busters -->
   <software name="stress" supported="no" >
     <description>Stress Busters (J 981020 V1.000)</description>
@@ -910,7 +910,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Suikoenbu / Outlaws of the Lost Dynasty -->
   <software name="suikoenb">
     <description>Suikoenbu / Outlaws of the Lost Dynasty (JUETL 950314 V2.001)</description>
@@ -930,7 +930,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Technical Bowling -->
   <software name="techbowl" supported="no" >
     <description>Technical Bowling (J 971212 V1.000)</description>
@@ -946,7 +946,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Puzzle &amp; Action: Treasure Hunt -->
   <software name="thunt" supported="no"  cloneof="sandor">
     <description>Puzzle &amp; Action: Treasure Hunt (JUET 970901 V2.00E)</description>
@@ -963,7 +963,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Puzzle &amp; Action: BoMulEul Chajara -->
   <software name="thuntk" supported="no"  cloneof="sandor">
     <description>Puzzle &amp; Action: BoMulEul Chajara (JUET 970125 V2.00K)</description>
@@ -984,7 +984,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Tecmo World Cup '98 -->
   <software name="twcup98" supported="no" >
     <description>Tecmo World Cup '98 (JUET 980410 V1.000)</description>
@@ -1000,7 +1000,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Virtua Fighter Kids -->
   <software name="vfkids" supported="no" >
     <description>Virtua Fighter Kids (JUET 960319 V0.000)</description>
@@ -1021,7 +1021,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Virtua Fighter Remix -->
   <software name="vfremix">
     <description>Virtua Fighter Remix (JUETBKAL 950428 V1.000)</description>
@@ -1039,7 +1039,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Virtual Mahjong -->
   <software name="vmahjong" supported="no" >
     <description>Virtual Mahjong (J 961214 V1.000)</description>
@@ -1058,7 +1058,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Winter Heat -->
   <software name="winterht" supported="no" >
     <description>Winter Heat (JUET 971012 V1.000)</description>
@@ -1077,7 +1077,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game: Zen Nippon Pro-Wrestling Featuring Virtua -->
   <software name="znpwfv" supported="no" >
     <description>Zen Nippon Pro-Wrestling Featuring Virtua (J 971123 V1.000)</description>

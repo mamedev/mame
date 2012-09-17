@@ -30,7 +30,7 @@ struct imgtool_partition;
 struct imgtool_directory;
 struct imgtool_library;
 
-enum imgtool_suggestion_viability_t 
+enum imgtool_suggestion_viability_t
 {
 	SUGGESTION_END,
 	SUGGESTION_POSSIBLE,
@@ -51,13 +51,13 @@ union filterinfo
 
 typedef void (*filter_getinfoproc)(UINT32 state, union filterinfo *info);
 
-enum imgtool_libsort_t 
+enum imgtool_libsort_t
 {
 	ITLS_NAME,
 	ITLS_DESCRIPTION
 };
 
-struct imgtool_dirent 
+struct imgtool_dirent
 {
 	char filename[1024];
 	char attr[64];
@@ -77,13 +77,13 @@ struct imgtool_dirent
 	unsigned int hardlink : 1;
 };
 
-struct imgtool_chainent 
+struct imgtool_chainent
 {
 	UINT8 level;
 	UINT64 block;
 };
 
-enum imgtool_forktype_t 
+enum imgtool_forktype_t
 {
 	FORK_END,
 	FORK_DATA,
@@ -91,14 +91,14 @@ enum imgtool_forktype_t
 	FORK_ALTERNATE
 };
 
-struct imgtool_forkent 
+struct imgtool_forkent
 {
 	imgtool_forktype_t type;
 	UINT64 size;
 	char forkname[64];
 };
 
-struct imgtool_transfer_suggestion 
+struct imgtool_transfer_suggestion
 {
 	imgtool_suggestion_viability_t viability;
 	filter_getinfoproc filter;
@@ -134,13 +134,13 @@ enum
 	IMGTOOLATTR_TIME_LASTMODIFIED
 };
 
-union imgtool_attribute 
+union imgtool_attribute
 {
 	INT64	i;
 	time_t	t;
 };
 
-struct imgtool_iconinfo 
+struct imgtool_iconinfo
 {
 	unsigned icon16x16_specified : 1;
 	unsigned icon32x32_specified : 1;

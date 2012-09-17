@@ -77,7 +77,7 @@ extern const device_type V9938VIDEO;
 extern const device_type TISOUND_94624;
 extern const device_type TISOUND_76496;
 
-struct ti_sound_config 
+struct ti_sound_config
 {
 	devcb_write_line				ready;
 };

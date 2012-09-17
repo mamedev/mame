@@ -24,7 +24,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 	}
 }
 
-struct lcd_spi_t 
+struct lcd_spi_t
 {
 	int l1;
 	int data;

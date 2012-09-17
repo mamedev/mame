@@ -34,7 +34,7 @@
 #define INT_EINT1      1
 #define INT_EINT0      0
 
-struct s3c240x_lcd_t 
+struct s3c240x_lcd_t
 {
 	UINT32 vramaddr_cur;
 	UINT32 vramaddr_max;
@@ -47,7 +47,7 @@ struct s3c240x_lcd_t
 	int vpos, hpos;
 };
 
-struct smc_t 
+struct smc_t
 {
 	int add_latch;
 	int chip;
@@ -61,21 +61,21 @@ struct smc_t
 	UINT8 datatx;
 };
 
-struct i2s_t 
+struct i2s_t
 {
 	int l3d;
 	int l3m;
 	int l3c;
 };
 
-struct s3c240x_iic_t 
+struct s3c240x_iic_t
 {
 	UINT8 data[4];
 	int data_index;
 	UINT16 address;
 };
 
-struct s3c240x_iis_t 
+struct s3c240x_iis_t
 {
 	UINT16 fifo[16/2];
 	int fifo_index;

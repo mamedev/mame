@@ -3377,7 +3377,7 @@ GAME( 1994, suprtrio, 0,       suprtrio,    suprtrio, tumbleb_state, suprtrio, R
 GAME( 1996, fncywld,  0,       fncywld,     fncywld, tumbleb_state,  fncywld,  ROT0, "Unico",   "Fancy World - Earth of Crisis" , GAME_SUPPORTS_SAVE ) // game says 1996, testmode 1995?
 // Unico - Magic Purple almost certainly goes here
 
-/* First Amusement / Mijin / SemiCom hardware (MCU protected) */ 
+/* First Amusement / Mijin / SemiCom hardware (MCU protected) */
 GAME( 1994, metlsavr, 0,       metlsavr,    metlsavr, tumbleb_state, chokchok, ROT0, "First Amusement", "Metal Saver", GAME_SUPPORTS_SAVE )
 GAME( 1994, magicbal, 0,       metlsavr,    magicbal, tumbleb_state, chokchok, ROT0, "SemiCom", "Magicball Fighting (Korea)", GAME_SUPPORTS_SAVE) // also still has the Metal Saver (c)1994 First Amusement tiles in the GFX
 GAME( 1995, chokchok, 0,       cookbib,     chokchok, tumbleb_state, chokchok, ROT0, "SemiCom", "Choky! Choky!", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE  )

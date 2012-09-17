@@ -49,7 +49,7 @@ class sh4_frontend;
 #endif
 
 
-struct sh4_state 
+struct sh4_state
 {
 	UINT32	ppc;
 	UINT32	pc, spc;

@@ -128,7 +128,7 @@ void (*m68ki_instruction_jump_table[NUM_CPU_TYPES][0x10000])(m68ki_cpu_core *m68
 unsigned char m68ki_cycles[NUM_CPU_TYPES][0x10000]; /* Cycles used by CPU type */
 
 /* This is used to generate the opcode handler jump table */
-struct opcode_handler_struct 
+struct opcode_handler_struct
 {
 	void (*opcode_handler)(m68ki_cpu_core *m68k);        /* handler function */
 	unsigned int  mask;                  /* mask on opcode */

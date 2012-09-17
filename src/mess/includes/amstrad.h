@@ -23,7 +23,7 @@
 /****************************
  * Gate Array data (CPC) -
  ****************************/
-struct gate_array_t 
+struct gate_array_t
 {
 	bitmap_ind16	*bitmap;		/* The bitmap we work on */
 	UINT8	pen_selected;		/* Pen selection */
@@ -60,7 +60,7 @@ struct gate_array_t
 /****************************
  * ASIC data (CPC plus)
  ****************************/
-struct asic_t 
+struct asic_t
 {
 	UINT8	*ram;				/* pointer to RAM used for the CPC+ ASIC memory-mapped registers */
 	UINT8	enabled;			/* Are CPC plus features enabled/unlocked */

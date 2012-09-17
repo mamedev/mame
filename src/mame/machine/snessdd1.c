@@ -178,7 +178,7 @@ static UINT8 SDD1_BG_getBit(SDD1_BG* thisptr, UINT8* endOfRun)
 }
 
 
-struct SDD1_PEM_state 
+struct SDD1_PEM_state
 {
 	UINT8 code_num;
 	UINT8 nextIfMPS;
@@ -222,7 +222,7 @@ static const SDD1_PEM_state SDD1_PEM_evolution_table[33] =
 	{ 7,24,22}
 };
 
-struct SDD1_PEM_ContextInfo 
+struct SDD1_PEM_ContextInfo
 {
 	UINT8 status;
 	UINT8 MPS;

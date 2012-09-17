@@ -30,7 +30,7 @@ enum
 	TELESTRAT_MEM_BLOCK_ROM
 };
 
-struct telestrat_mem_block 
+struct telestrat_mem_block
 {
 	int		MemType;
 	unsigned char *ptr;
@@ -40,7 +40,7 @@ struct telestrat_mem_block
 /* current state of the display */
 /* some attributes persist until they are turned off.
 This structure holds this persistant information */
-struct oric_vh_state 
+struct oric_vh_state
 {
 	/* foreground and background colour used for rendering */
 	/* if flash attribute is set, these two will both be equal to background colour */

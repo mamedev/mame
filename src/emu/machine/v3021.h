@@ -27,7 +27,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-struct rtc_regs_t 
+struct rtc_regs_t
 {
 	UINT8 sec, min, hour, day, wday, month, year;
 };

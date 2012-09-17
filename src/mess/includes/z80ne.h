@@ -26,7 +26,7 @@
 #define LX385_TAPE_SAMPLE_FREQ 38400
 
 /* wave duration threshold */
-enum z80netape_speed 
+enum z80netape_speed
 {
 	TAPE_300BPS  = 300, /*  300 bps */
 	TAPE_600BPS  = 600, /*  600 bps */

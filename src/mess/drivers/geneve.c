@@ -258,9 +258,9 @@ public:
 	WRITE_LINE_MEMBER( mapper_ready );
 
 	DECLARE_DRIVER_INIT(geneve);
-	virtual void machine_start();	
+	virtual void machine_start();
 	virtual void machine_reset();
-	
+
 	void	set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state);
 
 	line_state	m_inta;

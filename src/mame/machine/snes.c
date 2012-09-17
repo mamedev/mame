@@ -577,7 +577,7 @@ READ8_HANDLER( snes_r_io )
                         break;
 	}
 
-//	printf("unsupported read: offset == %08x\n", offset);
+//  printf("unsupported read: offset == %08x\n", offset);
 
 	/* Unsupported reads returns open bus */
 //  printf("%02x %02x\n",offset,snes_open_bus_r(space, 0));
@@ -735,10 +735,10 @@ WRITE8_HANDLER( snes_w_io )
 		case MPYM:		/* Multiplication result (mid) */
 		case MPYH:		/* Multiplication result (high) */
 		case RDIO:
-//		case RDDIVL:
-//		case RDDIVH:
-//		case RDMPYL:
-//		case RDMPYH:
+//      case RDDIVL:
+//      case RDDIVH:
+//      case RDMPYL:
+//      case RDMPYH:
 		case JOY1L:
 		case JOY1H:
 		case JOY2L:
@@ -1681,13 +1681,13 @@ MACHINE_START( snes )
 	state->m_superfx = machine.device<cpu_device>("superfx");
 
 	state->m_maincpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(snes_state::snes_direct), state));
-//	state->m_soundcpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(snes_state::snes_spc_direct), state));
+//  state->m_soundcpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(snes_state::snes_spc_direct), state));
 
 	// power-on sets these registers like this
 	snes_ram[WRIO] = 0xff;
-//	snes_ram[WRMPYA] = 0xff;
-//	snes_ram[WRDIVL] = 0xff;
-//	snes_ram[WRDIVH] = 0xff;
+//  snes_ram[WRMPYA] = 0xff;
+//  snes_ram[WRDIVL] = 0xff;
+//  snes_ram[WRDIVH] = 0xff;
 
 	switch (state->m_has_addon_chip)
 	{

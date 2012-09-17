@@ -226,27 +226,27 @@ static const cassette_interface aim65_2_cassette_interface =
 	NULL
 };
 
-const dl1416_interface aim65_ds1_intf = 
+const dl1416_interface aim65_ds1_intf =
 {
 	aim65_update_ds1
 };
 
-const dl1416_interface aim65_ds2_intf = 
+const dl1416_interface aim65_ds2_intf =
 {
 	aim65_update_ds2
 };
 
-const dl1416_interface aim65_ds3_intf = 
+const dl1416_interface aim65_ds3_intf =
 {
 	aim65_update_ds3
 };
 
-const dl1416_interface aim65_ds4_intf = 
+const dl1416_interface aim65_ds4_intf =
 {
 	aim65_update_ds4
 };
 
-const dl1416_interface aim65_ds5_intf = 
+const dl1416_interface aim65_ds5_intf =
 {
 	aim65_update_ds5
 };

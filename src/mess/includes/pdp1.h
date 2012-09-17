@@ -164,7 +164,7 @@ enum
 };
 
 /* tape reader registers */
-struct tape_reader_t 
+struct tape_reader_t
 {
 	device_image_interface *fd;	/* file descriptor of tape image */
 
@@ -182,7 +182,7 @@ struct tape_reader_t
 
 
 /* tape puncher registers */
-struct tape_puncher_t 
+struct tape_puncher_t
 {
 	device_image_interface *fd;	/* file descriptor of tape image */
 
@@ -192,7 +192,7 @@ struct tape_puncher_t
 
 
 /* typewriter registers */
-struct typewriter_t 
+struct typewriter_t
 {
 	device_image_interface *fd;	/* file descriptor of output image */
 
@@ -202,7 +202,7 @@ struct typewriter_t
 };
 
 /* MIT parallel drum (mostly similar to type 23) */
-struct parallel_drum_t 
+struct parallel_drum_t
 {
 	device_image_interface *fd;	/* file descriptor of drum image */
 
@@ -219,7 +219,7 @@ struct parallel_drum_t
 };
 
 
-struct lightpen_t 
+struct lightpen_t
 {
 	char active;
 	char down;

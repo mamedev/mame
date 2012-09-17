@@ -20,7 +20,7 @@ enum
 GFXDECODE_EXTERN( vdt911 );
 
 enum vdt911_screen_size_t { char_960, char_1920 };
-enum vdt911_model_t 
+enum vdt911_model_t
 {
 	vdt911_model_US,
 	vdt911_model_UK,
@@ -33,7 +33,7 @@ enum vdt911_model_t
 	vdt911_model_FrenchWP	/* French word processing */
 };
 
-struct vdt911_init_params_t 
+struct vdt911_init_params_t
 {
 	vdt911_screen_size_t screen_size;
 	vdt911_model_t model;

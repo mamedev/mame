@@ -91,7 +91,7 @@ struct option_guide
 #define OPTION_ENUM_END
 
 
-enum optreserr_t 
+enum optreserr_t
 {
 	OPTIONRESOLUTION_ERROR_SUCCESS,
 	OPTIONRESOLUTION_ERROR_OUTOFMEMORY,

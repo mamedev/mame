@@ -30,7 +30,7 @@ added external port callback, and functions to set the volume of the channels
 #define  KDAC_A_PCM_MAX    (2)		/* Channels per chip */
 
 
-struct KDAC_A_PCM 
+struct KDAC_A_PCM
 {
 	UINT8			vol[KDAC_A_PCM_MAX][2];	/* volume for the left and right channel */
 	UINT32			addr[KDAC_A_PCM_MAX];

@@ -1828,7 +1828,7 @@ static int ppc4xx_dma_decrement_count(powerpc_state *ppc, int dmachan)
 				ppc->dcr[DCR4XX_DMASR] |= 1 << (7 - dmachan);
 				break;
 		}
-		
+
 		ppc4xx_dma_update_irq_states(ppc);
 
 		INT64 numdata = dmaregs[DCR4XX_DMACT0];
@@ -1952,7 +1952,7 @@ static TIMER_CALLBACK( ppc4xx_buffered_dma_callback )
 				dmaregs[DCR4XX_DMADA0] += destinc;
 			} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
 			break;
-		}	
+		}
 	}
 }
 

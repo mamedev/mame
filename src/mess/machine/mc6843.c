@@ -42,7 +42,7 @@
 
 /******************* internal chip data structure ******************/
 
-struct mc6843_t 
+struct mc6843_t
 {
 
 	/* interface */

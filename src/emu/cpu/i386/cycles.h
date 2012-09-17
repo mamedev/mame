@@ -3,7 +3,7 @@
 #ifndef __CYCLES_H__
 #define __CYCLES_H__
 
-enum X86_CYCLES 
+enum X86_CYCLES
 {
 	CYCLES_MOV_REG_REG,
 	CYCLES_MOV_REG_MEM,
@@ -337,7 +337,7 @@ enum X86_CYCLES
 #define CPU_CYCLES_MEDIAGX		3
 
 
-struct X86_CYCLE_TABLE 
+struct X86_CYCLE_TABLE
 {
 	X86_CYCLES op;
 	UINT8 cpu_cycles[X86_NUM_CPUS][2];

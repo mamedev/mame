@@ -101,7 +101,7 @@ public:
 		  m_c355_obj_gfxbank(0),
 		  m_c355_obj_palxor(0)
 	{ }
-	
+
 	// game type helpers
 	bool is_system21();
 	int m_gametype;
@@ -231,7 +231,7 @@ public:
 	DECLARE_DRIVER_INIT(ordyne);
 	DECLARE_DRIVER_INIT(marvland);
 	DECLARE_DRIVER_INIT(rthun2);
-	
+
 	virtual void video_start();
 	void video_start_finallap();
 	void video_start_luckywld();
@@ -245,7 +245,7 @@ public:
 	UINT32 screen_update_sgunner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TILE_GET_INFO_MEMBER( roz_tile_info );
-	
+
 	DECLARE_READ16_MEMBER( paletteram_word_r );
 	DECLARE_WRITE16_MEMBER( paletteram_word_w );
 	DECLARE_WRITE16_MEMBER( rozram_word_w );

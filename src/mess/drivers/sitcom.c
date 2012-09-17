@@ -91,12 +91,12 @@ void sitcom_update_ds1(device_t *device, int digit, int data)
 	output_set_digit_value(4 + digit, data);
 }
 
-const dl1416_interface sitcom_ds0_intf = 
+const dl1416_interface sitcom_ds0_intf =
 {
 	sitcom_update_ds0
 };
 
-const dl1416_interface sitcom_ds1_intf = 
+const dl1416_interface sitcom_ds1_intf =
 {
 	sitcom_update_ds1
 };

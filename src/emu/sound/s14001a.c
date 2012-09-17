@@ -237,7 +237,7 @@ and off as it normally does during speech). Once START has gone low-high-low, th
 #include "emu.h"
 #include "s14001a.h"
 
-struct S14001AChip 
+struct S14001AChip
 {
 	sound_stream * stream;
 

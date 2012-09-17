@@ -40,7 +40,7 @@ as track map, with one bit for each sector used.
 #define MAX_DIRENTS	(15*8)
 
 /* vzdos directry entry */
-struct vzdos_dirent 
+struct vzdos_dirent
 {
 	char ftype;
 	char delimitor;
@@ -51,7 +51,7 @@ struct vzdos_dirent
 	UINT16 end_address;
 };
 
-struct vz_iterator 
+struct vz_iterator
 {
 	int index;
 	int eof;

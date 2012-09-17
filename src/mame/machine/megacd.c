@@ -19,25 +19,25 @@ const device_type SEGA_SEGACD_EUROPE = &device_creator<sega_segacd_europe_device
 sega_segacd_device::sega_segacd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, device_type type)
 	: device_t(mconfig, type, "sega_segacd_device", tag, owner, clock)
 {
-	
+
 }
 
 sega_segacd_us_device::sega_segacd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_segacd_device(mconfig, tag, owner, clock, SEGA_SEGACD_US)
 {
-	
+
 }
 
 sega_segacd_japan_device::sega_segacd_japan_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_segacd_device(mconfig, tag, owner, clock, SEGA_SEGACD_JAPAN)
 {
-	
+
 }
 
 sega_segacd_europe_device::sega_segacd_europe_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_segacd_device(mconfig, tag, owner, clock, SEGA_SEGACD_EUROPE)
 {
-	
+
 }
 
 
@@ -2305,13 +2305,13 @@ READ16_HANDLER( segacd_stopwatch_timer_r )
 void segacd_init_main_cpu( running_machine& machine )
 {
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	
+
 	segacd_font_bits = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:segacd_font")->ptr());
 	segacd_backupram = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:backupram")->ptr());
 	segacd_dataram = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:dataram")->ptr());
 	segacd_dataram2 = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:dataram2")->ptr());
 	segacd_4meg_prgram = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:segacd_program")->ptr());
-	
+
 	segacd_4meg_prgbank = 0;
 
 

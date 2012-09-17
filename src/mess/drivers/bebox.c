@@ -149,10 +149,10 @@ static SLOT_INTERFACE_START( pci_devices )
 	SLOT_INTERFACE("cirrus", CIRRUS)
 SLOT_INTERFACE_END
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	bebox_ide_interrupt, 
-	NULL, 
+	bebox_ide_interrupt,
+	NULL,
 	0
 };
 

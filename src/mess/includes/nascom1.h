@@ -10,13 +10,13 @@
 #include "imagedev/snapquik.h"
 #include "machine/wd17xx.h"
 
-struct nascom1_portstat_t 
+struct nascom1_portstat_t
 {
 	UINT8	stat_flags;
 	UINT8	stat_count;
 };
 
-struct nascom2_fdc_t 
+struct nascom2_fdc_t
 {
 	UINT8 select;
 	UINT8 irq;

@@ -334,10 +334,10 @@ static const rtc65271_interface ide_rtc_cfg =
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, nouspikel_ide_interface_device, clock_interrupt_callback)
 };
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	ide_interrupt_callback, 
-	NULL, 
+	ide_interrupt_callback,
+	NULL,
 	0
 };
 

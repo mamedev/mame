@@ -31,10 +31,10 @@ const device_type A2BUS_CFFA2_6502 = &device_creator<a2bus_cffa2_6502_device>;
 #define CFFA2_ROM_REGION  "cffa2_rom"
 #define CFFA2_IDE_TAG     "cffa2_ide"
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	NULL, 
-	NULL, 
+	NULL,
+	NULL,
 	0
 };
 

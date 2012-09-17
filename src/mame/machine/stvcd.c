@@ -46,7 +46,7 @@ static void cd_playdata(running_machine &machine);
 #define MAX_BLOCKS	(200)
 #define MAX_DIR_SIZE	(256*1024)
 
-struct direntryT 
+struct direntryT
 {
 	UINT8 record_size;
 	UINT8 xa_record_size;
@@ -66,7 +66,7 @@ struct direntryT
 	UINT8 name[128];
 };
 
-struct filterT 
+struct filterT
 {
    UINT8 mode;
    UINT8 chan;
@@ -81,7 +81,7 @@ struct filterT
    UINT32 range;
 };
 
-struct blockT 
+struct blockT
 {
    INT32 size;	// size of block
    INT32 FAD;	// FAD on disc
@@ -92,7 +92,7 @@ struct blockT
    UINT8 cinf;	// coding information
 };
 
-struct partitionT 
+struct partitionT
 {
    INT32 size;
    blockT *blocks[MAX_BLOCKS];
@@ -101,7 +101,7 @@ struct partitionT
 };
 
 // 16-bit transfer types
-enum transT 
+enum transT
 {
 	XFERTYPE_INVALID,
 	XFERTYPE_TOC,
@@ -112,7 +112,7 @@ enum transT
 };
 
 // 32-bit transfer types
-enum trans32T 
+enum trans32T
 {
 	XFERTYPE32_INVALID,
 	XFERTYPE32_GETSECTOR,

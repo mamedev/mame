@@ -1151,10 +1151,10 @@ static RAMDAC_INTERFACE( ramdac_intf )
 	0
 };
 
-static const ide_config ide_intf = 
+static const ide_config ide_intf =
 {
-	ide_interrupt, 
-	NULL, 
+	ide_interrupt,
+	NULL,
 	0
 };
 

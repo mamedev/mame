@@ -54,7 +54,7 @@ enum
 
 /* Optional interface to set callbacks */
 #define M6510_INTERFACE(name) \
-   	const m6502_interface (name) =
+	const m6502_interface (name) =
 
 struct m6502_interface
 {

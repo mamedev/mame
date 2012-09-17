@@ -1269,14 +1269,14 @@ struct namcos23_poly_entry {
 enum { RENDER_MAX_ENTRIES = 1000, POLY_MAX_ENTRIES = 10000 };
 
 
-struct c417_t 
+struct c417_t
 {
 	UINT16 ram[0x10000];
 	UINT16 adr;
 	UINT32 pointrom_adr;
 };
 
-struct c412_t 
+struct c412_t
 {
 	UINT16 sdram_a[0x100000]; // Framebuffers, probably
 	UINT16 sdram_b[0x100000];
@@ -1285,7 +1285,7 @@ struct c412_t
 	UINT32 adr;
 };
 
-struct c421_t 
+struct c421_t
 {
 	UINT16 dram_a[0x40000];
 	UINT16 dram_b[0x40000];
@@ -1293,18 +1293,18 @@ struct c421_t
 	UINT32 adr;
 };
 
-struct c422_t 
+struct c422_t
 {
 	INT16 regs[0x10];
 };
 
-struct c361_t 
+struct c361_t
 {
 	emu_timer *timer;
 	int scanline;
 };
 
-struct render_t 
+struct render_t
 {
 	poly_manager *polymgr;
 	int cur;

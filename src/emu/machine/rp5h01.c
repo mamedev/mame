@@ -2,9 +2,9 @@
 
     RP5H01
 
-	TODO:
-	- convert to modern and follow the datasheet better (all dumps
-	  presumably needs to be redone from scratch?)
+    TODO:
+    - convert to modern and follow the datasheet better (all dumps
+      presumably needs to be redone from scratch?)
 
     2009-06 Converted to be a device
 

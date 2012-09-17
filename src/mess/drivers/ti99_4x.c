@@ -967,15 +967,15 @@ MACHINE_START_MEMBER(ti99_4x,ti99_4a)
 
 	m_cpu = static_cast<tms9900_device*>(machine().device("maincpu"));
 	m_tms9901 = static_cast<tms9901_device*>(machine().device(TMS9901_TAG));
-    
+
 	m_gromport = static_cast<gromport_device*>(machine().device(GROMPORT_TAG));
 	m_peribox = static_cast<peribox_device*>(machine().device(PERIBOX_TAG));
-    
+
 	m_datamux = static_cast<ti99_datamux_device*>(machine().device(DATAMUX_TAG));
 	m_joyport = static_cast<joyport_device*>(machine().device(JOYPORT_TAG));
 	m_video = static_cast<ti_video_device*>(machine().device(VIDEO_SYSTEM_TAG));
 	m_firstjoy = 6;
-    
+
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
 	m_ready_line = m_ready_line_dmux = ASSERT_LINE;

@@ -139,12 +139,12 @@ READ8_MEMBER( c128_state::cia1_pb_r )
 
 	value &= cbm_common_cia0_port_b_r(m_cia1, cia0porta);
 /*
-	if (!intf->k0_r())
-		value &= m_keyline[0];
-	if (!intf->k1_r())
-		value &= m_keyline[1];
-	if (!intf->k2_r())
-		value &= m_keyline[2];
+    if (!intf->k0_r())
+        value &= m_keyline[0];
+    if (!intf->k1_r())
+        value &= m_keyline[1];
+    if (!intf->k2_r())
+        value &= m_keyline[2];
 */
 	return value;
 }

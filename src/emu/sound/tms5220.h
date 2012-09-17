@@ -121,7 +121,7 @@ extern const device_type TMC0285N;
 extern const device_type TMS5200N;
 
 
-struct tms52xx_config 
+struct tms52xx_config
 {
 	devcb_write_line		irq_func;					// IRQ callback function, active low, i.e. state=0  (TODO: change to ASSERT/CLEAR)
 	devcb_write_line		readyq_func;				// Ready callback function, active low, i.e. state=0

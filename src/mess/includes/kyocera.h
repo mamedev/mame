@@ -113,7 +113,7 @@ public:
 	/* sound state */
 	int m_buzzer;				/* buzzer select */
 	int m_bell;				/* bell output */
-	
+
 	DECLARE_PALETTE_INIT(kc85);
 };
 
