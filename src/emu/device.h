@@ -404,6 +404,9 @@ public:
 	device_finder(device_t &base, const char *tag)
 		: object_finder_base<_DeviceClass>(base, tag) { }
 
+	// make reference use transparent as well
+	operator _DeviceClass &() { assert(object_finder_base<_DeviceClass>::m_target != NULL); return *object_finder_base<_DeviceClass>::m_target; }
+
 	// finder
 	virtual bool findit()
 	{
@@ -446,6 +449,9 @@ public:
 	memory_region_finder(device_t &base, const char *tag)
 		: object_finder_base<memory_region>(base, tag) { }
 
+	// make reference use transparent as well
+	operator memory_region &() { assert(object_finder_base<memory_region>::m_target != NULL); return &object_finder_base<memory_region>::m_target; }
+
 	// finder
 	virtual bool findit()
 	{
@@ -480,6 +486,9 @@ public:
 	memory_bank_finder(device_t &base, const char *tag)
 		: object_finder_base<memory_bank>(base, tag) { }
 
+	// make reference use transparent as well
+	operator memory_bank &() { assert(object_finder_base<memory_bank>::m_target != NULL); return &object_finder_base<memory_bank>::m_target; }
+
 	// finder
 	virtual bool findit()
 	{
@@ -513,6 +522,9 @@ public:
 	// construction/destruction
 	ioport_finder(device_t &base, const char *tag)
 		: object_finder_base<ioport_port>(base, tag) { }
+
+	// make reference use transparent as well
+	operator ioport_port &() { assert(object_finder_base<ioport_port>::m_target != NULL); return &object_finder_base<ioport_port>::m_target; }
 
 	// finder
 	virtual bool findit()

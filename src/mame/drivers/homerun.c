@@ -82,7 +82,7 @@ WRITE8_MEMBER(homerun_state::homerun_control_w)
 
 		if (~data & 0x10 & m_control && !m_samples->playing(0))
 		{
-			samples_iterator iter(*m_samples);
+			samples_iterator iter(m_samples);
 			if (m_sample < iter.count())
 				m_samples->start(0, m_sample);
 		}

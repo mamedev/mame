@@ -323,7 +323,7 @@ INPUT_CHANGED_MEMBER(pntnpuzl_state::coin_inserted)
 
 	/* TODO: change this! */
 	if(newval)
-		generic_pulse_irq_line(*m_maincpu, (UINT8)(FPTR)param, 1);
+		generic_pulse_irq_line(m_maincpu, (UINT8)(FPTR)param, 1);
 }
 
 static INPUT_PORTS_START( pntnpuzl )

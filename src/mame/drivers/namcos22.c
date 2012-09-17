@@ -2691,7 +2691,7 @@ READ8_MEMBER(namcos22_state::propcycle_mcu_adc_r)
 				int i;
 				for (i = 0; i < 16; i++)
 				{
-					generic_pulse_irq_line(*m_mcu, M37710_LINE_TIMERA3TICK, 1);
+					generic_pulse_irq_line(m_mcu, M37710_LINE_TIMERA3TICK, 1);
 				}
 			}
 
