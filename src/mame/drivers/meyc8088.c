@@ -155,10 +155,8 @@ UINT32 meyc8088_state::screen_update_meyc8088(screen_device &screen, bitmap_ind1
 
 void meyc8088_state::screen_eof_meyc8088(screen_device &screen, bool state)
 {
-	device_execute_interface *intf;
-	m_maincpu->interface(intf);
 	// INTR on LC255 (pulses at start and end of vblank), INTA hardwired to $20
-	generic_pulse_irq_line_and_vector(*intf, 0, 0x20, 1);
+	generic_pulse_irq_line_and_vector(m_maincpu, 0, 0x20, 1);
 }
 
 
