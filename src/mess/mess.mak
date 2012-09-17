@@ -1452,6 +1452,7 @@ $(MESSOBJ)/pcshare.a:			\
 	$(MESS_MACHINE)/isa_ibm_mfc.o	\
 	$(MESS_MACHINE)/isa_mpu401.o	\
 	$(MESS_MACHINE)/isa_sblaster.o	\
+	$(MESS_MACHINE)/isa_stereo_fx.o	\
 	$(MESS_MACHINE)/isa_ide.o	\
 	$(MESS_MACHINE)/isa_ide_cd.o	\
 	$(MESS_MACHINE)/isa_aha1542.o	\
