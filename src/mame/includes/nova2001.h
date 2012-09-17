@@ -45,17 +45,3 @@ public:
 	UINT32 screen_update_pkunwar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_raiders5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-/*----------- defined in video/nova2001.c -----------*/
-
-
-extern PALETTE_INIT( nova2001 );
-extern VIDEO_START( nova2001 );
-extern SCREEN_UPDATE_IND16( nova2001 );
-extern VIDEO_START( ninjakun );
-extern SCREEN_UPDATE_IND16( ninjakun );
-extern VIDEO_START( pkunwar );
-extern SCREEN_UPDATE_IND16( pkunwar );
-extern VIDEO_START( raiders5 );
-extern SCREEN_UPDATE_IND16( raiders5 );

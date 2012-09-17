@@ -50,11 +50,3 @@ public:
 	UINT32 screen_update_ddragon3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ctribe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-/*----------- defined in video/ddragon3.c -----------*/
-
-
-extern VIDEO_START( ddragon3 );
-extern SCREEN_UPDATE_IND16( ddragon3 );
-extern SCREEN_UPDATE_IND16( ctribe );

@@ -112,13 +112,3 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_namcona1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-/*----------- defined in video/namcona1.c -----------*/
-
-
-
-
-
-extern SCREEN_UPDATE_IND16( namcona1 );
-extern VIDEO_START( namcona1 );

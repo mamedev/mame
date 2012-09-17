@@ -48,12 +48,3 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_1943(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-
-/*----------- defined in video/1943.c -----------*/
-
-
-extern PALETTE_INIT( 1943 );
-extern VIDEO_START( 1943 );
-extern SCREEN_UPDATE_IND16( 1943 );

@@ -77,19 +77,3 @@ public:
 	UINT32 screen_update_omegaf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_ninjakd2(screen_device &screen, bool state);
 };
-
-
-/*----------- defined in video/ninjakd2.c -----------*/
-
-
-
-extern VIDEO_START( ninjakd2 );
-extern VIDEO_START( mnight );
-extern VIDEO_START( arkarea );
-extern VIDEO_START( robokid );
-extern VIDEO_START( omegaf );
-extern SCREEN_UPDATE_IND16( ninjakd2 );
-extern SCREEN_UPDATE_IND16( robokid );
-extern SCREEN_UPDATE_IND16( omegaf );
-extern SCREEN_VBLANK( ninjakd2 );
-

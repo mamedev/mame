@@ -55,10 +55,3 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_exprraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-/*----------- defined in video/exprraid.c -----------*/
-
-
-extern VIDEO_START( exprraid );
-extern SCREEN_UPDATE_IND16( exprraid );

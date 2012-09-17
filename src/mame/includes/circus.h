@@ -54,13 +54,3 @@ extern const samples_interface circus_samples_interface;
 extern const samples_interface crash_samples_interface;
 extern const samples_interface ripcord_samples_interface;
 extern const samples_interface robotbwl_samples_interface;
-
-/*----------- defined in video/circus.c -----------*/
-
-
-
-extern VIDEO_START( circus );
-extern SCREEN_UPDATE_IND16( crash );
-extern SCREEN_UPDATE_IND16( circus );
-extern SCREEN_UPDATE_IND16( robotbwl );
-extern SCREEN_UPDATE_IND16( ripcord );

@@ -162,9 +162,3 @@ public:
 
 extern void namcos21_ClearPolyFrameBuffer( running_machine &machine );
 extern void namcos21_DrawQuad( running_machine &machine, int sx[4], int sy[4], int zcode[4], int color );
-
-
-
-
-extern VIDEO_START( namcos21 ) ;
-extern SCREEN_UPDATE_IND16( namcos21 );

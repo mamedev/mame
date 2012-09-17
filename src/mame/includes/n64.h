@@ -235,9 +235,6 @@ extern const device_type N64PERIPH;
 
 /*----------- defined in video/n64.c -----------*/
 
-extern VIDEO_START( n64 );
-extern SCREEN_UPDATE_RGB32( n64 );
-
 #define DACRATE_NTSC	(48681812)
 #define DACRATE_PAL	(49656530)
 #define DACRATE_MPAL	(48628316)

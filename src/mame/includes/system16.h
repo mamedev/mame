@@ -194,18 +194,3 @@ public:
 	UINT32 screen_update_s16a_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_s16a_bootleg_passht4b(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-/*----------- defined in video/system16.c -----------*/
-
-extern SCREEN_UPDATE_IND16( s16a_bootleg );
-extern SCREEN_UPDATE_IND16( s16a_bootleg_passht4b );
-
-/* video hardware */
-
-/* "normal" video hardware */
-extern VIDEO_START( system16 );
-extern SCREEN_UPDATE_IND16( system16 );
-
-/* system18 video hardware */
-extern VIDEO_START( system18old );
-extern SCREEN_UPDATE_IND16( system18old );

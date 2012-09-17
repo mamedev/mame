@@ -80,14 +80,3 @@ public:
 	UINT32 screen_update_arkanoid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_hexa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-
-/*----------- defined in video/arkanoid.c -----------*/
-
-
-
-extern VIDEO_START( arkanoid );
-extern SCREEN_UPDATE_IND16( arkanoid );
-extern SCREEN_UPDATE_IND16( hexa );
-
