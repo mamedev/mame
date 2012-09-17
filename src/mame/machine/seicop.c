@@ -1477,6 +1477,7 @@ dx     dy      angle
 0x1a0  0x00    0x6f
 0x1c0  0x00    0x71
 0x1e0  0x00    0x72
+
 */
 
 #include "emu.h"
@@ -2227,7 +2228,9 @@ static WRITE16_HANDLER( generic_cop_w )
 
 				offs = (offset & 3) * 4;
 
-				space->write_dword(cop_register[0] + 4 + offs, space->read_dword(cop_register[0] + 4 + offs) + space->read_dword(cop_register[0] + 16 + offs));
+				/* TODO: 0x1c operation? */
+
+				space->write_dword(cop_register[0] + 0x04 + offs, space->read_dword(cop_register[0] + 0x04 + offs) + space->read_dword(cop_register[0] + 0x10 + offs));
 				return;
 			}
 
@@ -2238,9 +2241,11 @@ static WRITE16_HANDLER( generic_cop_w )
 
 				offs = (offset & 3) * 4;
 
-				//popmessage("%d %d",space->read_dword(cop_register[0] + 0x2c + 0),space->read_dword(cop_register[0] + 0x2c + 4));
+				/* read 0x28 + offs */
+				/* add 0x10 + offs */
+				/* write 0x10 + offs */
 
-				space->write_dword(cop_register[0] + 16 + offs, space->read_dword(cop_register[0] + 16 + offs) + space->read_dword(cop_register[0] + 0x28 + offs));
+				space->write_dword(cop_register[0] + 0x10 + offs, space->read_dword(cop_register[0] + 0x10 + offs) + space->read_dword(cop_register[0] + 0x28 + offs));
 				return;
 			}
 
@@ -2269,7 +2274,7 @@ static WRITE16_HANDLER( generic_cop_w )
 
 				res = int(amp*sin(angle)) << cop_scale;
 
-				space->write_dword(cop_register[0] + 16, res);
+				space->write_dword(cop_register[0] + 0x10, res);
 				return;
 			}
 
@@ -2321,7 +2326,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,cop_angle);
 
 				if(cop_mcu_ram[offset] & 0x80)
-					space->write_byte(cop_register[0]+(0x34^3), cop_angle);
+					space->write_word(cop_register[0]+(0x34^2), cop_angle);
 				return;
 			}
 
@@ -2346,7 +2351,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				r1 = dx;
 
 				if(cop_mcu_ram[offset] & 0x80)
-					space->write_byte(cop_register[0]+(0x34^3), cop_angle);
+					space->write_word(cop_register[0]+(0x34^2), cop_angle);
 				return;
 			}
 
@@ -2367,8 +2372,8 @@ static WRITE16_HANDLER( generic_cop_w )
 				dy = dy >> 16;
 				cop_dist = sqrt((double)(dx*dx+dy*dy));
 
-				/* TODO: bit 7 of macro command says if we have to write on work RAM */
-				space->write_word(cop_register[0]+(0x38^2), cop_dist);
+				if(cop_mcu_ram[offset] & 0x80)
+					space->write_word(cop_register[0]+(0x38^2), cop_dist);
 				return;
 			}
 
@@ -2503,6 +2508,12 @@ static WRITE16_HANDLER( generic_cop_w )
 				int div;
 //              INT16 offs_val;
 
+				/* TODO: [4-7] could be mirrors of [0-3] (this is the only command so far that uses 4-7 actually)*/
+				/* 0 + [4] */
+				/* 4 + [5] */
+				/* 8 + [4] */
+				/* 4 + [6] */
+
 				//printf("%08x %08x %08x %08x %08x %08x %08x\n",cop_register[0],cop_register[1],cop_register[2],cop_register[3],cop_register[4],cop_register[5],cop_register[6]);
 
 				offs = (offset & 3) * 4;
@@ -2521,6 +2532,12 @@ static WRITE16_HANDLER( generic_cop_w )
 			if(COP_CMD(0x3a0,0x3a6,0x380,0xaa0,0x2a6,0x000,0x000,0x000,8,0xf3e7))
 			{
 				INT8 cur_angle;
+
+				/* 0 [1] */
+				/* 0xc [1] */
+				/* 0 [0] */
+				/* 0 [1] */
+				/* 0xc [1] */
 
 				cur_angle = space->read_byte(cop_register[1] + (0xc ^ 3));
 				space->write_byte(cop_register[1] + (0^3),space->read_byte(cop_register[1] + (0^3)) & 0xfb); //correct?
