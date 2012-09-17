@@ -1,6 +1,6 @@
 /* Sega CD / Mega CD */
 
-
+#include "machine/lc89510.h"
 
 class sega_segacd_device : public device_t
 {

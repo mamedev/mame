@@ -46,6 +46,8 @@ static MACHINE_CONFIG_FRAGMENT( segacd_fragment )
 	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(segacd_map)
 
+	MCFG_DEVICE_ADD("cdc", LC89510, 0) // cd controller
+
 	MCFG_TIMER_ADD("sw_timer", NULL) //stopwatch timer
 
 	MCFG_DEFAULT_LAYOUT( layout_megacd )

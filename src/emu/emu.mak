@@ -199,6 +199,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/k056230.o		\
 	$(EMUMACHINE)/latch8.o		\
 	$(EMUMACHINE)/laserdsc.o	\
+	$(EMUMACHINE)/lc89510.o		\
 	$(EMUMACHINE)/ldstub.o		\
 	$(EMUMACHINE)/ldpr8210.o	\
 	$(EMUMACHINE)/ldv1000.o		\
