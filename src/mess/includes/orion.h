@@ -70,21 +70,8 @@ public:
 
 extern const i8255_interface orion128_ppi8255_interface_1;
 
-extern MACHINE_START( orion128 );
-extern MACHINE_RESET( orion128 );
-
-extern MACHINE_START( orionz80 );
-extern MACHINE_RESET( orionz80 );
 extern INTERRUPT_GEN( orionz80_interrupt );
 
-
-extern MACHINE_RESET( orionpro );
-
-/*----------- defined in video/orion.c -----------*/
-
-extern VIDEO_START( orion128 );
-extern SCREEN_UPDATE_IND16( orion128 );
-extern PALETTE_INIT( orion128 );
 
 #endif /* ORION_H_ */
 

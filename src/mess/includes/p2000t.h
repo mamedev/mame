@@ -46,16 +46,4 @@ public:
 	UINT32 screen_update_p2000m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-/*----------- defined in machine/p2000t.c -----------*/
-
-
-
-
-/*----------- defined in video/p2000m.c -----------*/
-
-extern VIDEO_START( p2000m );
-extern SCREEN_UPDATE_IND16( p2000m );
-
-
 #endif /* P2000T_H_ */

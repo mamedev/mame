@@ -39,16 +39,9 @@ public:
 
 /*----------- defined in machine/primo.c -----------*/
 
-extern MACHINE_RESET( primoa );
-extern MACHINE_RESET( primob );
 extern INTERRUPT_GEN( primo_vblank_interrupt );
 extern SNAPSHOT_LOAD( primo );
 extern QUICKLOAD_LOAD( primo );
-
-
-/*----------- defined in video/primo.c -----------*/
-
-extern SCREEN_UPDATE_IND16( primo );
 
 
 #endif /* PRIMO_H_ */

@@ -55,16 +55,9 @@ public:
 
 extern const i8255_interface ut88_ppi8255_interface;
 
-extern MACHINE_RESET( ut88 );
-extern MACHINE_START( ut88mini );
-extern MACHINE_RESET( ut88mini );
-
 /*----------- defined in video/ut88.c -----------*/
 
 extern const gfx_layout ut88_charlayout;
-
-extern VIDEO_START( ut88 );
-extern SCREEN_UPDATE_IND16( ut88 );
 
 
 #endif /* UT88_H_ */

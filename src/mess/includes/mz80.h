@@ -62,7 +62,6 @@ public:
 
 /*----------- defined in machine/mz80.c -----------*/
 
-extern MACHINE_RESET( mz80k );
 extern const i8255_interface mz80k_8255_int;
 extern const struct pit8253_config mz80k_pit8253_config;
 
@@ -71,10 +70,5 @@ extern const struct pit8253_config mz80k_pit8253_config;
 
 extern const gfx_layout mz80k_charlayout;
 extern const gfx_layout mz80kj_charlayout;
-
-extern VIDEO_START( mz80k );
-extern SCREEN_UPDATE_IND16( mz80k );
-extern SCREEN_UPDATE_IND16( mz80kj );
-extern SCREEN_UPDATE_IND16( mz80a );
 
 #endif /* MZ80_H_ */

@@ -60,20 +60,9 @@ public:
 extern const via6522_interface microtan_via6522_0;
 extern const via6522_interface microtan_via6522_1;
 
-
-
 SNAPSHOT_LOAD( microtan );
 QUICKLOAD_LOAD( microtan_hexfile );
 
 INTERRUPT_GEN( microtan_interrupt );
-
-
-
-/*----------- defined in video/microtan.c -----------*/
-
-
-extern VIDEO_START( microtan );
-extern SCREEN_UPDATE_IND16( microtan );
-
 
 #endif /* MICROTAN_H_ */

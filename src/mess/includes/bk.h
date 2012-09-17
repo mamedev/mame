@@ -39,17 +39,4 @@ public:
 	UINT32 screen_update_bk0010(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-/*----------- defined in machine/bk.c -----------*/
-
-extern MACHINE_START( bk0010 );
-extern MACHINE_RESET( bk0010 );
-
-
-
-/*----------- defined in video/bk.c -----------*/
-
-extern VIDEO_START( bk0010 );
-extern SCREEN_UPDATE_IND16( bk0010 );
-
 #endif /* BK_H_ */

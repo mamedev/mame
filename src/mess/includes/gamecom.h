@@ -248,7 +248,6 @@ public:
 
 /*----------- defined in machine/gamecom.c -----------*/
 
-extern MACHINE_RESET( gamecom );
 extern DEVICE_IMAGE_LOAD( gamecom_cart1 );
 extern DEVICE_IMAGE_LOAD( gamecom_cart2 );
 

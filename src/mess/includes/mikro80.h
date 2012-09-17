@@ -41,11 +41,4 @@ public:
 
 extern const i8255_interface mikro80_ppi8255_interface;
 
-extern MACHINE_RESET( mikro80 );
-
-/*----------- defined in video/mikro80.c -----------*/
-
-extern VIDEO_START( mikro80 );
-extern SCREEN_UPDATE_IND16( mikro80 );
-
 #endif /* UT88_H_ */

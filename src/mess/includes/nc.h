@@ -85,10 +85,6 @@ public:
 
 /*----------- defined in video/nc.c -----------*/
 
-extern VIDEO_START( nc );
-extern SCREEN_UPDATE_IND16( nc );
-extern PALETTE_INIT( nc );
-
 void nc200_video_set_backlight(running_machine &machine, int state);
 
 

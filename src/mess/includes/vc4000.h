@@ -103,9 +103,6 @@ public:
 /*----------- defined in video/vc4000.c -----------*/
 
 extern INTERRUPT_GEN( vc4000_video_line );
-extern VIDEO_START( vc4000 );
-extern SCREEN_UPDATE_IND16( vc4000 );
-
 
 /*----------- defined in audio/vc4000.c -----------*/
 

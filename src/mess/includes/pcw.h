@@ -103,13 +103,4 @@ public:
 	UINT32 screen_update_pcw_printer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-/*----------- defined in video/pcw.c -----------*/
-
-extern VIDEO_START( pcw );
-extern SCREEN_UPDATE_IND16( pcw );
-extern SCREEN_UPDATE_IND16( pcw_printer );
-extern PALETTE_INIT( pcw );
-
-
 #endif /* PCW_H_ */

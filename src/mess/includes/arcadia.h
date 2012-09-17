@@ -83,11 +83,5 @@ public:
 	UINT32 screen_update_arcadia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-/*----------- defined in video/arcadia.c -----------*/
-
 extern INTERRUPT_GEN( arcadia_video_line );
-extern VIDEO_START( arcadia );
-extern SCREEN_UPDATE_IND16( arcadia );
-
 #endif /* ARCADIA_H_ */

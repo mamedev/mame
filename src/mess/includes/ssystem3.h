@@ -57,10 +57,6 @@ void ssystem3_playfield_getfigure(running_machine &machine, int x, int y, int *f
 
 /*----------- defined in video/ssystem3.c -----------*/
 
-extern PALETTE_INIT( ssystem3 );
-extern VIDEO_START( ssystem3 );
-extern SCREEN_UPDATE_IND16( ssystem3 );
-
 void ssystem3_lcd_reset(running_machine &machine);
 void ssystem3_lcd_write(running_machine &machine, int clock, int data);
 

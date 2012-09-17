@@ -33,11 +33,4 @@ public:
 	UINT32 screen_update_busicom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-/*----------- defined in video/busicom.c -----------*/
-
-extern PALETTE_INIT( busicom );
-extern VIDEO_START( busicom );
-extern SCREEN_UPDATE_IND16( busicom );
-
 #endif /* BUSICOM_H_ */

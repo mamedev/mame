@@ -132,10 +132,6 @@ public:
 extern const i8255_interface msx_ppi8255_interface;
 extern const wd17xx_interface msx_wd17xx_interface;
 /* start/stop functions */
-extern MACHINE_START( msx );
-extern MACHINE_START( msx2 );
-extern MACHINE_RESET( msx );
-extern MACHINE_RESET( msx2 );
 extern INTERRUPT_GEN( msx_interrupt );
 extern TIMER_DEVICE_CALLBACK( msx2_interrupt );
 

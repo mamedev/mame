@@ -59,20 +59,7 @@ public:
 
 
 /*----------- defined in machine/vtech2.c -----------*/
-
-
-
-
-
 DEVICE_IMAGE_LOAD( laser_cart );
 DEVICE_IMAGE_UNLOAD( laser_cart );
-
-
-
-/*----------- defined in video/vtech2.c -----------*/
-
-extern VIDEO_START( laser );
-extern SCREEN_UPDATE_IND16( laser );
-
 
 #endif /* VTECH2_H_ */

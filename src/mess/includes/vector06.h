@@ -72,16 +72,6 @@ public:
 extern const i8255_interface vector06_ppi8255_interface;
 extern const i8255_interface vector06_ppi8255_2_interface;
 
-extern MACHINE_START( vector06 );
-extern MACHINE_RESET( vector06 );
-
 extern INTERRUPT_GEN( vector06_interrupt );
-
-
-/*----------- defined in video/vector06.c -----------*/
-
-extern PALETTE_INIT( vector06 );
-extern VIDEO_START( vector06 );
-extern SCREEN_UPDATE_IND16( vector06 );
 
 #endif /* VECTOR06_H_ */

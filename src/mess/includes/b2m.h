@@ -60,14 +60,6 @@ extern const i8255_interface b2m_ppi8255_interface_1;
 extern const i8255_interface b2m_ppi8255_interface_2;
 extern const i8255_interface b2m_ppi8255_interface_3;
 
-extern MACHINE_START( b2m );
-extern MACHINE_RESET( b2m );
 extern INTERRUPT_GEN( b2m_vblank_interrupt );
-
-/*----------- defined in video/b2m.c -----------*/
-
-extern VIDEO_START( b2m );
-extern SCREEN_UPDATE_IND16( b2m );
-extern PALETTE_INIT( b2m );
 
 #endif

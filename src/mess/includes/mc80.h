@@ -53,7 +53,6 @@ public:
 /*                            Implementation for MC80.2x                     */
 /*****************************************************************************/
 
-extern MACHINE_RESET(mc8020);
 extern const z80ctc_interface mc8020_ctc_intf;
 extern const z80pio_interface mc8020_z80pio_intf;
 
@@ -62,30 +61,10 @@ extern const z80pio_interface mc8020_z80pio_intf;
 /*****************************************************************************/
 
 
-extern MACHINE_RESET(mc8030);
 extern const z80pio_interface mc8030_zve_z80pio_intf;
 extern const z80pio_interface mc8030_asp_z80pio_intf;
 extern const z80ctc_interface mc8030_zve_z80ctc_intf;
 extern const z80ctc_interface mc8030_asp_z80ctc_intf;
 extern const z80sio_interface mc8030_asp_z80sio_intf;
-
-
-/*----------- defined in video/mc80.c -----------*/
-
-/*****************************************************************************/
-/*                            Implementation for MC80.2x                     */
-/*****************************************************************************/
-
-
-extern VIDEO_START( mc8020 );
-extern SCREEN_UPDATE_IND16( mc8020 );
-
-/*****************************************************************************/
-/*                            Implementation for MC80.3x                     */
-/*****************************************************************************/
-
-
-extern VIDEO_START( mc8030 );
-extern SCREEN_UPDATE_IND16( mc8030 );
 
 #endif /* MC80_H_ */

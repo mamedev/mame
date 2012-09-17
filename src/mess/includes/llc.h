@@ -57,9 +57,6 @@ public:
 
 
 /*----------- defined in machine/llc.c -----------*/
-extern MACHINE_START( llc1 );
-extern MACHINE_RESET( llc1 );
-
 extern const z80pio_interface llc1_z80pio1_intf;
 extern const z80pio_interface llc1_z80pio2_intf;
 extern const z80pio_interface llc2_z80pio1_intf;
@@ -67,13 +64,5 @@ extern const z80pio_interface llc2_z80pio2_intf;
 
 extern const z80ctc_interface llc1_ctc_intf;
 extern const z80ctc_interface llc2_ctc_intf;
-
-extern MACHINE_RESET( llc2 );
-
-/*----------- defined in video/llc.c -----------*/
-
-extern VIDEO_START( llc );
-extern SCREEN_UPDATE_IND16( llc1 );
-extern SCREEN_UPDATE_IND16( llc2 );
 
 #endif

@@ -27,12 +27,4 @@ public:
 	UINT32 screen_update_orao(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-/*----------- defined in machine/orao.c -----------*/
-
-/*----------- defined in video/orao.c -----------*/
-
-extern SCREEN_UPDATE_IND16( orao );
-
-
 #endif /* ORAO_H_ */

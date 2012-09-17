@@ -75,7 +75,6 @@ extern void c16_interrupt(running_machine &machine, int level);
 extern int c16_dma_read(running_machine &machine, int offset);
 extern int c16_dma_read_rom(running_machine &machine, int offset);
 
-extern MACHINE_RESET( c16 );
 extern INTERRUPT_GEN( c16_frame_interrupt );
 
 MACHINE_CONFIG_EXTERN( c16_cartslot );

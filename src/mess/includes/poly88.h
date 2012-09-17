@@ -46,11 +46,5 @@ extern const i8251_interface poly88_usart_interface;
 
 extern SNAPSHOT_LOAD( poly88 );
 
-
-/*----------- defined in video/poly88.c -----------*/
-
-extern VIDEO_START( poly88 );
-extern SCREEN_UPDATE_IND16( poly88 );
-
 #endif /* POLY88_H_ */
 

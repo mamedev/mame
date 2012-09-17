@@ -101,12 +101,4 @@ public:
 	UINT32 screen_update_pcw16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-/*----------- defined in video/pcw16.c -----------*/
-
-extern PALETTE_INIT( pcw16 );
-extern VIDEO_START( pcw16 );
-extern SCREEN_UPDATE_IND16( pcw16 );
-
-
 #endif /* PCW16_H_ */

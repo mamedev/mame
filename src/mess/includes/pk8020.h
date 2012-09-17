@@ -55,8 +55,5 @@ extern const i8255_interface pk8020_ppi8255_interface_3;
 extern const struct pit8253_config pk8020_pit8253_intf;
 extern const struct pic8259_interface pk8020_pic8259_config;
 extern INTERRUPT_GEN( pk8020_interrupt );
-/*----------- defined in video/pk8020.c -----------*/
-
-extern SCREEN_UPDATE_IND16( pk8020 );
 
 #endif /* pk8020_H_ */

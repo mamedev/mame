@@ -46,9 +46,4 @@ public:
 	UINT32 screen_update_sapizps3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-/*----------- defined in video/sapi1.c -----------*/
-
-extern SCREEN_UPDATE_IND16( sapi1 );
-extern SCREEN_UPDATE_IND16( sapizps3 );
-
 #endif

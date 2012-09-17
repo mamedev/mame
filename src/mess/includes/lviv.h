@@ -38,13 +38,9 @@ extern const i8255_interface lviv_ppi8255_interface_1;
 
 SNAPSHOT_LOAD( lviv );
 
-
 /*----------- defined in video/lviv.c -----------*/
 
-extern VIDEO_START( lviv );
-extern SCREEN_UPDATE_IND16( lviv );
 extern const unsigned char lviv_palette[8*3];
-extern PALETTE_INIT( lviv );
 extern void lviv_update_palette(running_machine &, UINT8);
 
 

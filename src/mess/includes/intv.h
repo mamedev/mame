@@ -135,11 +135,6 @@ public:
 };
 
 /*----------- defined in video/intv.c -----------*/
-
-extern VIDEO_START( intv );
-extern SCREEN_UPDATE_IND16( intv );
-extern SCREEN_UPDATE_IND16( intvkbd );
-
 void intv_stic_screenrefresh(running_machine &machine);
 
 /*----------- defined in machine/intv.c -----------*/
@@ -149,12 +144,7 @@ void intv_stic_screenrefresh(running_machine &machine);
 DEVICE_START( intv_cart );
 DEVICE_IMAGE_LOAD( intv_cart );
 
-extern MACHINE_RESET( intv );
 extern INTERRUPT_GEN( intv_interrupt );
-
-// ECS
-extern MACHINE_RESET( intvecs );
-
 /* for the console + keyboard component... */
 
 DEVICE_IMAGE_LOAD( intvkbd_cart );
