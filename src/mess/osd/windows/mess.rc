@@ -1,6 +1,6 @@
 //============================================================
 //
-//	mame.rc - Minimal resource file for Win32 MAME
+//	mess.rc - Minimal resource file for Win32 MAME
 //
 //============================================================
 //
@@ -44,6 +44,6 @@
 #include "commctrl.h"
 #include "mamevers.rc"
 
-1                       24      MOVEABLE PURE   "mame.man"
+1                       24      MOVEABLE PURE   "mess.man"
 
 2                       ICON    DISCARDABLE     "mess.ico"

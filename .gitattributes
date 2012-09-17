@@ -7222,6 +7222,7 @@ src/mess/mess.lst svneol=native#text/plain
 src/mess/mess.mak svneol=native#text/plain
 src/mess/messcore.mak svneol=native#text/plain
 src/mess/osd/windows/mess.ico -text
+src/mess/osd/windows/mess.man svneol=CRLF#text/plain eol=crlf
 src/mess/osd/windows/mess.rc svneol=native#text/plain
 src/mess/osd/windows/windows.mak svneol=native#text/plain
 src/mess/tiny.lst svneol=native#text/plain
