@@ -2608,7 +2608,7 @@ ROM_START( waterski )
 	ROM_LOAD( "a03-14",       0x1000, 0x1000, CRC(31f991ca) SHA1(82cbaa618ac3de6fce12e9dcbb89ab064773b2bd) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime */
-	ROM_LOAD( "a03-08",       0x0000, 0x1000, CRC(c206d870) SHA1(0be09b7da28d60bf23a0b87cff28957bb165bec5) )
+	ROM_LOAD( "a03-08",       0x0000, 0x1000, BAD_DUMP CRC(c206d870) SHA1(0be09b7da28d60bf23a0b87cff28957bb165bec5) ) // small glitches in font gfx
 	ROM_LOAD( "a03-09",       0x1000, 0x1000, CRC(48ac912a) SHA1(09d57b5b76a4416f1ee5eb2077bc969d2afbbf11) )
 	ROM_LOAD( "a03-10",       0x2000, 0x1000, CRC(a056defb) SHA1(15b4202b19f7190bfc953d0958c189db2db928cc) )
 	ROM_LOAD( "a03-11",       0x3000, 0x1000, CRC(f06cddd6) SHA1(483a25880a29552f4b70cd5d41de5cfe4ed64475) )
