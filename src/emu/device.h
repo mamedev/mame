@@ -450,7 +450,7 @@ public:
 		: object_finder_base<memory_region>(base, tag) { }
 
 	// make reference use transparent as well
-	operator memory_region &() { assert(object_finder_base<memory_region>::m_target != NULL); return &object_finder_base<memory_region>::m_target; }
+	operator memory_region &() { assert(object_finder_base<memory_region>::m_target != NULL); return *object_finder_base<memory_region>::m_target; }
 
 	// finder
 	virtual bool findit()
@@ -487,7 +487,7 @@ public:
 		: object_finder_base<memory_bank>(base, tag) { }
 
 	// make reference use transparent as well
-	operator memory_bank &() { assert(object_finder_base<memory_bank>::m_target != NULL); return &object_finder_base<memory_bank>::m_target; }
+	operator memory_bank &() { assert(object_finder_base<memory_bank>::m_target != NULL); return *object_finder_base<memory_bank>::m_target; }
 
 	// finder
 	virtual bool findit()
@@ -524,7 +524,7 @@ public:
 		: object_finder_base<ioport_port>(base, tag) { }
 
 	// make reference use transparent as well
-	operator ioport_port &() { assert(object_finder_base<ioport_port>::m_target != NULL); return &object_finder_base<ioport_port>::m_target; }
+	operator ioport_port &() { assert(object_finder_base<ioport_port>::m_target != NULL); return *object_finder_base<ioport_port>::m_target; }
 
 	// finder
 	virtual bool findit()
