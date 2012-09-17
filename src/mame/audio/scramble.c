@@ -45,7 +45,7 @@ static const int scramble_timer[10] =
 
 READ8_DEVICE_HANDLER( scramble_portB_r )
 {
-	return scramble_timer[(device->machine().device<cpu_device>("audiocpu")->total_cycles()/512) % 10];
+	return scramble_timer[(space.machine().device<cpu_device>("audiocpu")->total_cycles()/512) % 10];
 }
 
 
@@ -74,23 +74,23 @@ static const int frogger_timer[10] =
 
 READ8_DEVICE_HANDLER( frogger_portB_r )
 {
-	return frogger_timer[(device->machine().device<cpu_device>("audiocpu")->total_cycles()/512) % 10];
+	return frogger_timer[(space.machine().device<cpu_device>("audiocpu")->total_cycles()/512) % 10];
 }
 
 WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
 {
-	ttl7474_device *target = device->machine().device<ttl7474_device>("konami_7474");
+	ttl7474_device *target = space.machine().device<ttl7474_device>("konami_7474");
 
 	/* the complement of bit 3 is connected to the flip-flop's clock */
 	target->clock_w((~data & 0x08) >> 3);
 
 	/* bit 4 is sound disable */
-	device->machine().sound().system_mute((data & 0x10) >> 4);
+	space.machine().sound().system_mute((data & 0x10) >> 4);
 }
 
 WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )
 {
-	ttl7474_device *target = device->machine().device<ttl7474_device>("konami_7474");
+	ttl7474_device *target = space.machine().device<ttl7474_device>("konami_7474");
 
 	/* the complement of bit 3 is connected to the flip-flop's clock */
 	target->clock_w((~data & 0x08) >> 3);
@@ -125,9 +125,9 @@ WRITE8_MEMBER(scramble_state::hotshock_sh_irqtrigger_w)
 
 READ8_DEVICE_HANDLER( hotshock_soundlatch_r )
 {
-	driver_device *drvstate = device->machine().driver_data<driver_device>();
-	device->machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
-	return drvstate->soundlatch_byte_r(*device->machine().device("audiocpu")->memory().space(AS_PROGRAM),0);
+	driver_device *drvstate = space.machine().driver_data<driver_device>();
+	space.machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
+	return drvstate->soundlatch_byte_r(*space.machine().device("audiocpu")->memory().space(AS_PROGRAM),0);
 }
 
 static void filter_w(device_t *device, int data)

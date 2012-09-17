@@ -11,7 +11,7 @@
 
 WRITE8_DEVICE_HANDLER( firetrk_skid_reset_w )
 {
-	firetrk_state *state = device->machine().driver_data<firetrk_state>();
+	firetrk_state *state = space.machine().driver_data<firetrk_state>();
 	state->m_skid[0] = 0;
 	state->m_skid[1] = 0;
 

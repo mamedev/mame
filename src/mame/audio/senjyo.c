@@ -14,7 +14,7 @@ const z80_daisy_config senjyo_daisy_chain[] =
 
 static READ8_DEVICE_HANDLER( pio_pa_r )
 {
-	senjyo_state *state = device->machine().driver_data<senjyo_state>();
+	senjyo_state *state = space.machine().driver_data<senjyo_state>();
 
 	return state->m_sound_cmd;
 }

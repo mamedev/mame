@@ -1245,7 +1245,7 @@ static READ8_DEVICE_HANDLER( dkong_voice_status_r )
 
 static READ8_DEVICE_HANDLER( dkong_tune_r )
 {
-	dkong_state *state = device->machine().driver_data<dkong_state>();
+	dkong_state *state = space.machine().driver_data<dkong_state>();
 	UINT8 page = latch8_r(state->m_dev_vp2, space, 0) & 0x47;
 
 	if ( page & 0x40 )
@@ -1254,7 +1254,7 @@ static READ8_DEVICE_HANDLER( dkong_tune_r )
 	}
 	else
 	{
-		/* printf("%s:rom access\n",device->machine().describe_context()); */
+		/* printf("%s:rom access\n",space.machine().describe_context()); */
 		return (state->m_snd_rom[0x1000 + (page & 7) * 256 + offset]);
 	}
 }

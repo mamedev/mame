@@ -1196,7 +1196,7 @@ WRITE8_DEVICE_HANDLER( spc_io_w )
 		case 0x7:		/* Port 3 */
 			// mame_printf_debug("SPC: %02x to APU @ %d (PC=%x)\n", data, offset & 3, space.device().safe_pc());
 			spc700->port_out[offset - 4] = data;
-			device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
+			space.machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 			break;
 		case 0xa:		/* Timer 0 */
 		case 0xb:		/* Timer 1 */

@@ -508,8 +508,8 @@ static SOUND_START( sega005 )
 
 static WRITE8_DEVICE_HANDLER( sega005_sound_a_w )
 {
-	segag80r_state *state = device->machine().driver_data<segag80r_state>();
-	samples_device *samples = device->machine().device<samples_device>("samples");
+	segag80r_state *state = space.machine().driver_data<segag80r_state>();
+	samples_device *samples = space.machine().device<samples_device>("samples");
 	UINT8 diff = data ^ state->m_sound_state[0];
 	state->m_sound_state[0] = data;
 
@@ -567,7 +567,7 @@ INLINE void sega005_update_sound_data(running_machine &machine)
 
 static WRITE8_DEVICE_HANDLER( sega005_sound_b_w )
 {
-	segag80r_state *state = device->machine().driver_data<segag80r_state>();
+	segag80r_state *state = space.machine().driver_data<segag80r_state>();
 	/*
            D6: manual timer clock (0->1)
            D5: 0 = manual timer, 1 = auto timer
@@ -597,7 +597,7 @@ static WRITE8_DEVICE_HANDLER( sega005_sound_b_w )
 		state->m_sound_addr = (state->m_sound_addr & 0x780) | ((state->m_sound_addr + 1) & 0x07f);
 
 	/* update the sound data */
-	sega005_update_sound_data(device->machine());
+	sega005_update_sound_data(space.machine());
 }
 
 
@@ -913,14 +913,14 @@ static SOUND_START( monsterb )
 
 static WRITE8_DEVICE_HANDLER( monsterb_sound_a_w )
 {
-	device_t *tms = device->machine().device("music");
+	device_t *tms = space.machine().device("music");
 	int enable_val;
 
 	/* Lower four data lines get decoded into 13 control lines */
 	tms36xx_note_w(tms, 0, data & 15);
 
 	/* Top four data lines address an 82S123 ROM that enables/disables voices */
-	enable_val = device->machine().root_device().memregion("prom")->base()[(data & 0xF0) >> 4];
+	enable_val = space.machine().root_device().memregion("prom")->base()[(data & 0xF0) >> 4];
 	tms3617_enable_w(tms, enable_val >> 2);
 }
 
@@ -934,8 +934,8 @@ static WRITE8_DEVICE_HANDLER( monsterb_sound_a_w )
 
 static WRITE8_DEVICE_HANDLER( monsterb_sound_b_w )
 {
-	segag80r_state *state = device->machine().driver_data<segag80r_state>();
-	samples_device *samples = device->machine().device<samples_device>("samples");
+	segag80r_state *state = space.machine().driver_data<segag80r_state>();
+	samples_device *samples = space.machine().device<samples_device>("samples");
 	UINT8 diff = data ^ state->m_sound_state[1];
 	state->m_sound_state[1] = data;
 
@@ -958,14 +958,14 @@ static WRITE8_DEVICE_HANDLER( monsterb_sound_b_w )
 
 static READ8_DEVICE_HANDLER( n7751_status_r )
 {
-	segag80r_state *state = device->machine().driver_data<segag80r_state>();
+	segag80r_state *state = space.machine().driver_data<segag80r_state>();
 	return state->m_n7751_busy << 4;
 }
 
 
 static WRITE8_DEVICE_HANDLER( n7751_command_w )
 {
-	segag80r_state *state = device->machine().driver_data<segag80r_state>();
+	segag80r_state *state = space.machine().driver_data<segag80r_state>();
 	/*
         Z80 7751 control port
 
@@ -973,14 +973,14 @@ static WRITE8_DEVICE_HANDLER( n7751_command_w )
         D3    = /INT line
     */
 	state->m_n7751_command = data & 0x07;
-	device->machine().device("audiocpu")->execute().set_input_line(0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
-	device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	space.machine().device("audiocpu")->execute().set_input_line(0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
+	space.machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
 
 static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
 {
-	segag80r_state *state = device->machine().driver_data<segag80r_state>();
+	segag80r_state *state = space.machine().driver_data<segag80r_state>();
 	/* P4 - address lines 0-3 */
 	/* P5 - address lines 4-7 */
 	/* P6 - address lines 8-11 */
@@ -1030,7 +1030,7 @@ READ8_MEMBER(segag80r_state::n7751_command_r)
 
 static WRITE8_DEVICE_HANDLER( n7751_p2_w )
 {
-	segag80r_state *state = device->machine().driver_data<segag80r_state>();
+	segag80r_state *state = space.machine().driver_data<segag80r_state>();
 	/* write to P2; low 4 bits go to 8243 */
 	i8243_p2_w(device, space, offset, data & 0x0f);
 

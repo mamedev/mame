@@ -392,7 +392,7 @@ WRITE8_DEVICE_HANDLER( bzone_sounds_w )
 	discrete_sound_w(device, space, BZ_INPUT, data);
 
 	output_set_value("startled", (data >> 6) & 1);
-	device->machine().sound().system_enable(data & 0x20);
+	space.machine().sound().system_enable(data & 0x20);
 }
 
 

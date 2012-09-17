@@ -152,25 +152,25 @@ WRITE16_DEVICE_HANDLER( m72_sound_command_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		m72_audio_state *state = get_safe_token(device);
-		driver_device *drvstate = device->machine().driver_data<driver_device>();
+		driver_device *drvstate = space.machine().driver_data<driver_device>();
 		drvstate->soundlatch_byte_w(*state->space, offset, data);
-		device->machine().scheduler().synchronize(FUNC(setvector_callback), Z80_ASSERT, state);
+		space.machine().scheduler().synchronize(FUNC(setvector_callback), Z80_ASSERT, state);
 	}
 }
 
 WRITE8_DEVICE_HANDLER( m72_sound_command_byte_w )
 {
 	m72_audio_state *state = get_safe_token(device);
-	driver_device *drvstate = device->machine().driver_data<driver_device>();
+	driver_device *drvstate = space.machine().driver_data<driver_device>();
 	drvstate->soundlatch_byte_w(*state->space, offset, data);
-	device->machine().scheduler().synchronize(FUNC(setvector_callback), Z80_ASSERT, state);
+	space.machine().scheduler().synchronize(FUNC(setvector_callback), Z80_ASSERT, state);
 }
 
 WRITE8_DEVICE_HANDLER( m72_sound_irq_ack_w )
 {
 	m72_audio_state *state = get_safe_token(device);
 
-	device->machine().scheduler().synchronize(FUNC(setvector_callback), Z80_CLEAR, state);
+	space.machine().scheduler().synchronize(FUNC(setvector_callback), Z80_CLEAR, state);
 }
 
 

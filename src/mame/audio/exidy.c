@@ -528,11 +528,11 @@ static WRITE8_DEVICE_HANDLER( r6532_porta_w )
 {
 	exidy_sound_state *state = get_safe_token(device);
 	if (state->m_cvsd != NULL)
-		device->machine().device("cvsdcpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		space.machine().device("cvsdcpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	if (state->m_tms != NULL)
 	{
-		logerror("(%f)%s:TMS5220 data write = %02X\n", device->machine().time().as_double(), device->machine().describe_context(), riot6532_porta_out_get(state->m_riot));
+		logerror("(%f)%s:TMS5220 data write = %02X\n", space.machine().time().as_double(), space.machine().describe_context(), riot6532_porta_out_get(state->m_riot));
 		tms5220_data_w(state->m_tms, space, 0, data);
 	}
 }
@@ -542,7 +542,7 @@ static READ8_DEVICE_HANDLER( r6532_porta_r )
 	exidy_sound_state *state = get_safe_token(device);
 	if (state->m_tms != NULL)
 	{
-		logerror("(%f)%s:TMS5220 status read = %02X\n", device->machine().time().as_double(), device->machine().describe_context(), tms5220_status_r(state->m_tms, space, 0));
+		logerror("(%f)%s:TMS5220 status read = %02X\n", space.machine().time().as_double(), space.machine().describe_context(), tms5220_status_r(state->m_tms, space, 0));
 		return tms5220_status_r(state->m_tms, space, 0);
 	}
 	else
@@ -1074,7 +1074,7 @@ WRITE8_DEVICE_HANDLER( victory_sound_command_w )
 
 	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound command = %02X\n", state->m_maincpu->pcbase(), data);
 
-	device->machine().scheduler().synchronize(FUNC(delayed_command_w), data, state->m_pia1);
+	space.machine().scheduler().synchronize(FUNC(delayed_command_w), data, state->m_pia1);
 }
 
 
@@ -1082,7 +1082,7 @@ static WRITE8_DEVICE_HANDLER( victory_sound_irq_clear_w )
 {
 	exidy_sound_state *state = get_safe_token(device);
 
-	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound IRQ clear = %02X\n", device->machine().describe_context(), data);
+	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound IRQ clear = %02X\n", space.machine().describe_context(), data);
 
 	if (!data) state->m_pia1->ca1_w(1);
 }
@@ -1092,7 +1092,7 @@ static WRITE8_DEVICE_HANDLER( victory_main_ack_w )
 {
 	exidy_sound_state *state = get_safe_token(device);
 
-	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound Main ACK W = %02X\n", device->machine().describe_context(), data);
+	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound Main ACK W = %02X\n", space.machine().describe_context(), data);
 
 	if (state->m_victory_sound_response_ack_clk && !data)
 		state->m_pia1->cb1_w(1);

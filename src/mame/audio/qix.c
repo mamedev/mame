@@ -109,14 +109,14 @@ static TIMER_CALLBACK( deferred_sndpia1_porta_w )
 static WRITE8_DEVICE_HANDLER( sync_sndpia1_porta_w )
 {
 	/* we need to synchronize this so the sound CPU doesn't drop anything important */
-	device->machine().scheduler().synchronize(FUNC(deferred_sndpia1_porta_w), data, (void *)downcast<pia6821_device *>(device));
+	space.machine().scheduler().synchronize(FUNC(deferred_sndpia1_porta_w), data, (void *)downcast<pia6821_device *>(device));
 }
 
 
 static WRITE8_DEVICE_HANDLER( slither_coinctl_w )
 {
-	coin_lockout_w(device->machine(), 0, (~data >> 6) & 1);
-	coin_counter_w(device->machine(), 0, (data >> 5) & 1);
+	coin_lockout_w(space.machine(), 0, (~data >> 6) & 1);
+	coin_counter_w(space.machine(), 0, (data >> 5) & 1);
 }
 
 

@@ -288,23 +288,23 @@ WRITE8_MEMBER(redalert_state::demoneye_audio_command_w)
 
 static WRITE8_DEVICE_HANDLER( demoneye_ay8910_latch_1_w )
 {
-	redalert_state *state = device->machine().driver_data<redalert_state>();
+	redalert_state *state = space.machine().driver_data<redalert_state>();
 	state->m_ay8910_latch_1 = data;
 }
 
 
 static READ8_DEVICE_HANDLER( demoneye_ay8910_latch_2_r )
 {
-	redalert_state *state = device->machine().driver_data<redalert_state>();
+	redalert_state *state = space.machine().driver_data<redalert_state>();
 	return state->m_ay8910_latch_2;
 }
 
 
 static WRITE8_DEVICE_HANDLER( demoneye_ay8910_data_w )
 {
-	redalert_state *state = device->machine().driver_data<redalert_state>();
-	device_t *ay1 = device->machine().device("ay1");
-	device_t *ay2 = device->machine().device("ay2");
+	redalert_state *state = space.machine().driver_data<redalert_state>();
+	device_t *ay1 = space.machine().device("ay1");
+	device_t *ay2 = space.machine().device("ay2");
 
 	switch (state->m_ay8910_latch_1 & 0x03)
 	{

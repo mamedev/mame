@@ -720,7 +720,7 @@ static WRITE8_DEVICE_HANDLER( ym2151_ctl_w )
 {
 	ym2151_ct1 = data&0x1;
 	ym2151_ct2 = (data&0x2)>>1;
-	update_all_volumes(device->machine());
+	update_all_volumes(space.machine());
 }
 
 

@@ -83,7 +83,7 @@ READ8_DEVICE_HANDLER( trackfld_speech_r )
 
 WRITE8_DEVICE_HANDLER( trackfld_sound_w )
 {
-	device_t *audio = device->machine().device("trackfld_audio");
+	device_t *audio = space.machine().device("trackfld_audio");
 	trackfld_audio_state *state = get_safe_token(audio);
 	int changes = offset ^ state->m_last_addr;
 
@@ -116,7 +116,7 @@ READ8_HANDLER( hyperspt_sh_timer_r )
 
 WRITE8_DEVICE_HANDLER( hyperspt_sound_w )
 {
-	device_t *audio = device->machine().device("trackfld_audio");
+	device_t *audio = space.machine().device("trackfld_audio");
 	trackfld_audio_state *state = get_safe_token(audio);
 	int changes = offset ^ state->m_last_addr;
 

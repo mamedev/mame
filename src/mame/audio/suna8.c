@@ -13,7 +13,7 @@
 
 WRITE8_DEVICE_HANDLER( suna8_play_samples_w )
 {
-	suna8_state *state = device->machine().driver_data<suna8_state>();
+	suna8_state *state = space.machine().driver_data<suna8_state>();
 	if( data )
 	{
 		samples_device *samples = downcast<samples_device *>(device);
@@ -31,7 +31,7 @@ WRITE8_DEVICE_HANDLER( suna8_play_samples_w )
 
 WRITE8_DEVICE_HANDLER( rranger_play_samples_w )
 {
-	suna8_state *state = device->machine().driver_data<suna8_state>();
+	suna8_state *state = space.machine().driver_data<suna8_state>();
 	if( data )
 	{
 		if(( state->m_sample != 0 ) && ( ~data & 0x30 ))	// don't play state->m_sample zero when the bit is active
@@ -44,7 +44,7 @@ WRITE8_DEVICE_HANDLER( rranger_play_samples_w )
 
 WRITE8_DEVICE_HANDLER( suna8_samples_number_w )
 {
-	suna8_state *state = device->machine().driver_data<suna8_state>();
+	suna8_state *state = space.machine().driver_data<suna8_state>();
 	state->m_sample = data & 0xf;
 }
 

@@ -625,9 +625,9 @@ WRITE8_DEVICE_HANDLER( polaris_sh_port_2_w )
 
 WRITE8_DEVICE_HANDLER( polaris_sh_port_3_w )
 {
-	_8080bw_state *state = device->machine().driver_data<_8080bw_state>();
+	_8080bw_state *state = space.machine().driver_data<_8080bw_state>();
 
-	coin_lockout_global_w(device->machine(), data & 0x04);  /* SX8 */
+	coin_lockout_global_w(space.machine(), data & 0x04);  /* SX8 */
 
 	state->m_c8080bw_flip_screen = data & 0x20;		/* SX11 */
 

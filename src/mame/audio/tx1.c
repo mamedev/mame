@@ -417,18 +417,18 @@ WRITE8_DEVICE_HANDLER( bb_ym2_a_w )
 WRITE8_DEVICE_HANDLER( bb_ym2_b_w )
 {
 	tx1_sound_state *state = get_safe_token(device);
-	device_t *ym1 = device->machine().device("ym1");
-	device_t *ym2 = device->machine().device("ym2");
+	device_t *ym1 = space.machine().device("ym1");
+	device_t *ym2 = space.machine().device("ym2");
 	double gain;
 
 	state->m_stream->update();
 
 	state->m_ym2_outputb = data ^ 0xff;
 
-	if (!strcmp(device->machine().system().name, "buggyboyjr"))
+	if (!strcmp(space.machine().system().name, "buggyboyjr"))
 	{
-		coin_counter_w(device->machine(), 0, data & 0x01);
-		coin_counter_w(device->machine(), 1, data & 0x02);
+		coin_counter_w(space.machine(), 0, data & 0x01);
+		coin_counter_w(space.machine(), 1, data & 0x02);
 	}
 
 	/*

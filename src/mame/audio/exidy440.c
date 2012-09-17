@@ -377,7 +377,7 @@ static READ8_DEVICE_HANDLER( sound_command_r )
 {
 	exidy440_audio_state *state = get_safe_token(device);
 	/* clear the FIRQ that got us here and acknowledge the read to the main CPU */
-	device->machine().device("audiocpu")->execute().set_input_line(1, CLEAR_LINE);
+	space.machine().device("audiocpu")->execute().set_input_line(1, CLEAR_LINE);
 	state->sound_command_ack = 1;
 
 	return state->sound_command;
@@ -436,7 +436,7 @@ static WRITE8_DEVICE_HANDLER( sound_volume_w )
 
 static WRITE8_DEVICE_HANDLER( sound_interrupt_clear_w )
 {
-	device->machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
+	space.machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 

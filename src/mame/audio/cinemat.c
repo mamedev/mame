@@ -1333,7 +1333,7 @@ static void demon_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_
 
 static READ8_DEVICE_HANDLER( sound_porta_r )
 {
-	cinemat_state *state = device->machine().driver_data<cinemat_state>();
+	cinemat_state *state = space.machine().driver_data<cinemat_state>();
 	/* bits 0-3 are the sound data; bit 4 is the data ready */
 	return state->m_sound_fifo[state->m_sound_fifo_out] | ((state->m_sound_fifo_in != state->m_sound_fifo_out) << 4);
 }
@@ -1341,14 +1341,14 @@ static READ8_DEVICE_HANDLER( sound_porta_r )
 
 static READ8_DEVICE_HANDLER( sound_portb_r )
 {
-	cinemat_state *state = device->machine().driver_data<cinemat_state>();
+	cinemat_state *state = space.machine().driver_data<cinemat_state>();
 	return state->m_last_portb_write;
 }
 
 
 static WRITE8_DEVICE_HANDLER( sound_portb_w )
 {
-	cinemat_state *state = device->machine().driver_data<cinemat_state>();
+	cinemat_state *state = space.machine().driver_data<cinemat_state>();
 	/* watch for a 0->1 edge on bit 0 ("shift out") to advance the data pointer */
 	if ((data & 1) != (state->m_last_portb_write & 1) && (data & 1) != 0)
 		state->m_sound_fifo_out = (state->m_sound_fifo_out + 1) % 16;
@@ -1359,7 +1359,7 @@ static WRITE8_DEVICE_HANDLER( sound_portb_w )
 
 	/* bit 2 controls the global mute */
 	if ((data & 4) != (state->m_last_portb_write & 4))
-		device->machine().sound().system_mute(data & 4);
+		space.machine().sound().system_mute(data & 4);
 
 	/* remember the last value written */
 	state->m_last_portb_write = data;

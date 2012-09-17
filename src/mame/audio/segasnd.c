@@ -315,7 +315,7 @@ WRITE8_DEVICE_HANDLER( sega_speech_data_w )
 {
 	speech_state *state = get_safe_speech(device);
 
-	device->machine().scheduler().synchronize(FUNC(delayed_speech_w), data, state);
+	space.machine().scheduler().synchronize(FUNC(delayed_speech_w), data, state);
 }
 
 
@@ -492,10 +492,10 @@ WRITE8_DEVICE_HANDLER( sega_usb_data_w )
 	usb_state *usb = get_safe_token(device);
 
 	LOG(("%04X:usb_data_w = %02X\n", usb->maincpu->safe_pc(), data));
-	device->machine().scheduler().synchronize(FUNC(delayed_usb_data_w), data, usb);
+	space.machine().scheduler().synchronize(FUNC(delayed_usb_data_w), data, usb);
 
 	/* boost the interleave so that sequences can be sent */
-	device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
+	space.machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
 }
 
 

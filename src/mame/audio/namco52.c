@@ -141,7 +141,7 @@ WRITE8_DEVICE_HANDLER( namco_52xx_write )
 {
 	namco_52xx_state *state = get_safe_token(device);
 
-	device->machine().scheduler().synchronize(FUNC(namco_52xx_latch_callback), data, (void *)device);
+	space.machine().scheduler().synchronize(FUNC(namco_52xx_latch_callback), data, (void *)device);
 
 	state->m_cpu->execute().set_input_line(0, ASSERT_LINE);
 
@@ -153,7 +153,7 @@ WRITE8_DEVICE_HANDLER( namco_52xx_write )
 
 	/* the 52xx uses TSTI to check for an interrupt; it also may be handling
        a timer interrupt, so we need to ensure the IRQ line is held long enough */
-	device->machine().scheduler().timer_set(attotime::from_usec(5*21), FUNC(namco_52xx_irq_clear), 0, (void *)device);
+	space.machine().scheduler().timer_set(attotime::from_usec(5*21), FUNC(namco_52xx_irq_clear), 0, (void *)device);
 }
 
 
