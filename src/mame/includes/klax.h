@@ -21,7 +21,7 @@ public:
 
 /*----------- defined in video/klax.c -----------*/
 
-WRITE16_HANDLER( klax_latch_w );
+DECLARE_WRITE16_HANDLER( klax_latch_w );
 
 
 SCREEN_UPDATE_IND16( klax );

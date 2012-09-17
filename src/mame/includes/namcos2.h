@@ -297,26 +297,26 @@ public:
 
 extern void (*namcos2_kickstart)(running_machine &machine, int internal);
 
-READ16_HANDLER( namcos2_flap_prot_r );
+DECLARE_READ16_HANDLER( namcos2_flap_prot_r );
 
 /**************************************************************/
 /*  EEPROM memory function handlers                           */
 /**************************************************************/
 #define NAMCOS2_68K_eeprom_W	namcos2_68k_eeprom_w
 #define NAMCOS2_68K_eeprom_R	namcos2_68k_eeprom_r
-WRITE16_HANDLER( namcos2_68k_eeprom_w );
-READ16_HANDLER( namcos2_68k_eeprom_r );
+DECLARE_WRITE16_HANDLER( namcos2_68k_eeprom_w );
+DECLARE_READ16_HANDLER( namcos2_68k_eeprom_r );
 
 /**************************************************************/
 /*  Shared data ROM memory handlerhandlers                    */
 /**************************************************************/
-READ16_HANDLER( namcos2_68k_data_rom_r );
+DECLARE_READ16_HANDLER( namcos2_68k_data_rom_r );
 
 /**************************************************************/
 /* Shared protection/random number generator                  */
 /**************************************************************/
-READ16_HANDLER( namcos2_68k_key_r );
-WRITE16_HANDLER( namcos2_68k_key_w );
+DECLARE_READ16_HANDLER( namcos2_68k_key_r );
+DECLARE_WRITE16_HANDLER( namcos2_68k_key_w );
 
 /**************************************************************/
 /* Non-shared memory custom IO device - IRQ/Inputs/Outputs   */
@@ -331,16 +331,16 @@ WRITE16_HANDLER( namcos2_68k_key_w );
 #define NAMCOS2_C148_SERIRQ 	6		/* 0x1cc000 */
 #define NAMCOS2_C148_VBLANKIRQ	7		/* 0x1ce000 */
 
-WRITE16_HANDLER( namcos2_68k_master_C148_w );
-READ16_HANDLER( namcos2_68k_master_C148_r );
+DECLARE_WRITE16_HANDLER( namcos2_68k_master_C148_w );
+DECLARE_READ16_HANDLER( namcos2_68k_master_C148_r );
 INTERRUPT_GEN( namcos2_68k_master_vblank );
 
-WRITE16_HANDLER( namcos2_68k_slave_C148_w );
-READ16_HANDLER( namcos2_68k_slave_C148_r );
+DECLARE_WRITE16_HANDLER( namcos2_68k_slave_C148_w );
+DECLARE_READ16_HANDLER( namcos2_68k_slave_C148_r );
 INTERRUPT_GEN( namcos2_68k_slave_vblank );
 
-WRITE16_HANDLER( namcos2_68k_gpu_C148_w );
-READ16_HANDLER( namcos2_68k_gpu_C148_r );
+DECLARE_WRITE16_HANDLER( namcos2_68k_gpu_C148_w );
+DECLARE_READ16_HANDLER( namcos2_68k_gpu_C148_r );
 INTERRUPT_GEN( namcos2_68k_gpu_vblank );
 
 void namcos2_adjust_posirq_timer( running_machine &machine, int scanline );
@@ -366,22 +366,22 @@ void namcos2_adjust_posirq_timer( running_machine &machine, int scanline );
 /* Sound CPU support handlers - 6809                          */
 /**************************************************************/
 
-WRITE8_HANDLER( namcos2_sound_bankselect_w );
+DECLARE_WRITE8_HANDLER( namcos2_sound_bankselect_w );
 
 /**************************************************************/
 /* MCU Specific support handlers - HD63705                    */
 /**************************************************************/
 
-WRITE8_HANDLER( namcos2_mcu_analog_ctrl_w );
-READ8_HANDLER( namcos2_mcu_analog_ctrl_r );
+DECLARE_WRITE8_HANDLER( namcos2_mcu_analog_ctrl_w );
+DECLARE_READ8_HANDLER( namcos2_mcu_analog_ctrl_r );
 
-WRITE8_HANDLER( namcos2_mcu_analog_port_w );
-READ8_HANDLER( namcos2_mcu_analog_port_r );
+DECLARE_WRITE8_HANDLER( namcos2_mcu_analog_port_w );
+DECLARE_READ8_HANDLER( namcos2_mcu_analog_port_r );
 
-WRITE8_HANDLER( namcos2_mcu_port_d_w );
-READ8_HANDLER( namcos2_mcu_port_d_r );
+DECLARE_WRITE8_HANDLER( namcos2_mcu_port_d_w );
+DECLARE_READ8_HANDLER( namcos2_mcu_port_d_r );
 
-READ8_HANDLER( namcos2_input_port_0_r );
-READ8_HANDLER( namcos2_input_port_10_r );
-READ8_HANDLER( namcos2_input_port_12_r );
+DECLARE_READ8_HANDLER( namcos2_input_port_0_r );
+DECLARE_READ8_HANDLER( namcos2_input_port_10_r );
+DECLARE_READ8_HANDLER( namcos2_input_port_12_r );
 

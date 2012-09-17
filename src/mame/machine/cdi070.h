@@ -234,9 +234,9 @@ struct scc68070_regs_t
 TIMER_CALLBACK( scc68070_timer0_callback );
 TIMER_CALLBACK( scc68070_rx_callback );
 TIMER_CALLBACK( scc68070_tx_callback );
-READ16_HANDLER( scc68070_periphs_r );
-WRITE16_HANDLER( scc68070_periphs_w );
-//READ16_HANDLER( uart_loopback_enable );
+DECLARE_READ16_HANDLER( scc68070_periphs_r );
+DECLARE_WRITE16_HANDLER( scc68070_periphs_w );
+//DECLARE_READ16_HANDLER( uart_loopback_enable );
 
 void scc68070_init(running_machine &machine, scc68070_regs_t *scc68070);
 void scc68070_uart_rx(running_machine &machine, scc68070_regs_t *scc68070, UINT8 data);

@@ -38,24 +38,24 @@ ADDRESS_MAP_EXTERN(seibu_newzeroteam_sound_map, 8);
 ADDRESS_MAP_EXTERN(seibu3_sound_map, 8);
 ADDRESS_MAP_EXTERN(seibu3_adpcm_sound_map, 8);
 
-READ16_HANDLER( seibu_main_word_r );
-READ8_HANDLER( seibu_main_v30_r );
-WRITE16_HANDLER( seibu_main_word_w );
-WRITE8_HANDLER( seibu_main_v30_w );
+DECLARE_READ16_HANDLER( seibu_main_word_r );
+DECLARE_READ8_HANDLER( seibu_main_v30_r );
+DECLARE_WRITE16_HANDLER( seibu_main_word_w );
+DECLARE_WRITE8_HANDLER( seibu_main_v30_w );
 
-WRITE16_HANDLER( seibu_main_mustb_w );
+DECLARE_WRITE16_HANDLER( seibu_main_mustb_w );
 
-WRITE8_HANDLER( seibu_irq_clear_w );
-WRITE8_HANDLER( seibu_rst10_ack_w );
-WRITE8_HANDLER( seibu_rst18_ack_w );
-WRITE8_HANDLER( seibu_bank_w );
-WRITE8_HANDLER( seibu_coin_w );
+DECLARE_WRITE8_HANDLER( seibu_irq_clear_w );
+DECLARE_WRITE8_HANDLER( seibu_rst10_ack_w );
+DECLARE_WRITE8_HANDLER( seibu_rst18_ack_w );
+DECLARE_WRITE8_HANDLER( seibu_bank_w );
+DECLARE_WRITE8_HANDLER( seibu_coin_w );
 void seibu_ym3812_irqhandler(device_t *device, int linestate);
 void seibu_ym2151_irqhandler(device_t *device, int linestate);
 void seibu_ym2203_irqhandler(device_t *device, int linestate);
-READ8_HANDLER( seibu_soundlatch_r );
-READ8_HANDLER( seibu_main_data_pending_r );
-WRITE8_HANDLER( seibu_main_data_w );
+DECLARE_READ8_HANDLER( seibu_soundlatch_r );
+DECLARE_READ8_HANDLER( seibu_main_data_pending_r );
+DECLARE_WRITE8_HANDLER( seibu_main_data_w );
 MACHINE_RESET( seibu_sound );
 void seibu_sound_decrypt(running_machine &machine,const char *cpu,int length);
 

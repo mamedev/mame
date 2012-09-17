@@ -3,17 +3,17 @@
 
 VIDEO_START( pce );
 SCREEN_UPDATE_IND16( pce );
-WRITE8_HANDLER ( vdc_0_w );
-WRITE8_HANDLER ( vdc_1_w );
- READ8_HANDLER ( vdc_0_r );
- READ8_HANDLER ( vdc_1_r );
+DECLARE_WRITE8_HANDLER ( vdc_0_w );
+DECLARE_WRITE8_HANDLER ( vdc_1_w );
+ DECLARE_READ8_HANDLER ( vdc_0_r );
+ DECLARE_READ8_HANDLER ( vdc_1_r );
 PALETTE_INIT( vce );
- READ8_HANDLER ( vce_r );
-WRITE8_HANDLER ( vce_w );
-WRITE8_HANDLER( vpc_w );
- READ8_HANDLER( vpc_r );
-WRITE8_HANDLER( sgx_vdc_w );
- READ8_HANDLER( sgx_vdc_r );
+ DECLARE_READ8_HANDLER ( vce_r );
+DECLARE_WRITE8_HANDLER ( vce_w );
+DECLARE_WRITE8_HANDLER( vpc_w );
+ DECLARE_READ8_HANDLER( vpc_r );
+DECLARE_WRITE8_HANDLER( sgx_vdc_w );
+ DECLARE_READ8_HANDLER( sgx_vdc_r );
 TIMER_DEVICE_CALLBACK( pce_interrupt );
 TIMER_DEVICE_CALLBACK( sgx_interrupt );
 

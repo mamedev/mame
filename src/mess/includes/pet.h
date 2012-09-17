@@ -77,9 +77,9 @@ extern const pia6821_interface petb_pia0;
 extern const pia6821_interface pet_pia1;
 
 
-WRITE8_HANDLER(cbm8096_w);
-extern READ8_HANDLER(superpet_r);
-extern WRITE8_HANDLER(superpet_w);
+DECLARE_WRITE8_HANDLER(cbm8096_w);
+extern DECLARE_READ8_HANDLER(superpet_r);
+extern DECLARE_WRITE8_HANDLER(superpet_w);
 
 
 INTERRUPT_GEN( pet_frame_interrupt );

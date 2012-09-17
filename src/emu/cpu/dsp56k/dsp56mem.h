@@ -235,10 +235,10 @@ void PCDDR_set(dsp56k_core* cpustate, UINT16 value);
 /* Port C Dtaa Register (PCD) */
 void PCD_set(dsp56k_core* cpustate, UINT16 value);
 
-READ16_HANDLER( peripheral_register_r );
-WRITE16_HANDLER( peripheral_register_w );
-READ16_HANDLER( program_r );
-WRITE16_HANDLER( program_w );
+DECLARE_READ16_HANDLER( peripheral_register_r );
+DECLARE_WRITE16_HANDLER( peripheral_register_w );
+DECLARE_READ16_HANDLER( program_r );
+DECLARE_WRITE16_HANDLER( program_w );
 
 } // namespace DSP56K
 

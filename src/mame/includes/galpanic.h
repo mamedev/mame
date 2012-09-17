@@ -30,8 +30,8 @@ public:
 /*----------- defined in video/galpanic.c -----------*/
 
 
-WRITE16_HANDLER( galpanic_bgvideoram_w );
-WRITE16_HANDLER( galpanic_paletteram_w );
+DECLARE_WRITE16_HANDLER( galpanic_bgvideoram_w );
+DECLARE_WRITE16_HANDLER( galpanic_paletteram_w );
 
 SCREEN_UPDATE_IND16( galpanic );
 SCREEN_UPDATE_IND16( comad );

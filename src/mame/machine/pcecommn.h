@@ -11,8 +11,8 @@
 
 #define	PCE_MAIN_CLOCK		21477270
 
-WRITE8_HANDLER ( pce_joystick_w );
- READ8_HANDLER ( pce_joystick_r );
+DECLARE_WRITE8_HANDLER ( pce_joystick_w );
+ DECLARE_READ8_HANDLER ( pce_joystick_r );
 
 #define TG_16_JOY_SIG		0x00
 #define PCE_JOY_SIG			0x40

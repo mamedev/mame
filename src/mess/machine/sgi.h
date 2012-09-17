@@ -11,8 +11,8 @@
 
 void sgi_mc_init(running_machine &machine);
 
-READ32_HANDLER(sgi_mc_r);
-WRITE32_HANDLER(sgi_mc_w);
+DECLARE_READ32_HANDLER(sgi_mc_r);
+DECLARE_WRITE32_HANDLER(sgi_mc_w);
 
 
 #endif /* _SGIMC_H */

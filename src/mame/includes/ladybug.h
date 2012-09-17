@@ -93,14 +93,14 @@ SCREEN_VBLANK( sraider );
 
 /*----------- defined in video/redclash.c -----------*/
 
-WRITE8_HANDLER( redclash_videoram_w );
-WRITE8_HANDLER( redclash_gfxbank_w );
-WRITE8_HANDLER( redclash_flipscreen_w );
+DECLARE_WRITE8_HANDLER( redclash_videoram_w );
+DECLARE_WRITE8_HANDLER( redclash_gfxbank_w );
+DECLARE_WRITE8_HANDLER( redclash_flipscreen_w );
 
-WRITE8_HANDLER( redclash_star0_w );
-WRITE8_HANDLER( redclash_star1_w );
-WRITE8_HANDLER( redclash_star2_w );
-WRITE8_HANDLER( redclash_star_reset_w );
+DECLARE_WRITE8_HANDLER( redclash_star0_w );
+DECLARE_WRITE8_HANDLER( redclash_star1_w );
+DECLARE_WRITE8_HANDLER( redclash_star2_w );
+DECLARE_WRITE8_HANDLER( redclash_star_reset_w );
 
 
 

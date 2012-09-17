@@ -213,16 +213,16 @@ void atarigen_update_interrupts(running_machine &machine);
 
 void atarigen_scanline_int_set(screen_device &screen, int scanline);
 INTERRUPT_GEN( atarigen_scanline_int_gen );
-WRITE16_HANDLER( atarigen_scanline_int_ack_w );
-WRITE32_HANDLER( atarigen_scanline_int_ack32_w );
+DECLARE_WRITE16_HANDLER( atarigen_scanline_int_ack_w );
+DECLARE_WRITE32_HANDLER( atarigen_scanline_int_ack32_w );
 
 INTERRUPT_GEN( atarigen_sound_int_gen );
-WRITE16_HANDLER( atarigen_sound_int_ack_w );
-WRITE32_HANDLER( atarigen_sound_int_ack32_w );
+DECLARE_WRITE16_HANDLER( atarigen_sound_int_ack_w );
+DECLARE_WRITE32_HANDLER( atarigen_sound_int_ack32_w );
 
 INTERRUPT_GEN( atarigen_video_int_gen );
-WRITE16_HANDLER( atarigen_video_int_ack_w );
-WRITE32_HANDLER( atarigen_video_int_ack32_w );
+DECLARE_WRITE16_HANDLER( atarigen_video_int_ack_w );
+DECLARE_WRITE32_HANDLER( atarigen_video_int_ack32_w );
 
 
 /*---------------------------------------------------------------
@@ -231,14 +231,14 @@ WRITE32_HANDLER( atarigen_video_int_ack32_w );
 
 void atarigen_eeprom_reset(atarigen_state *state);
 
-WRITE16_HANDLER( atarigen_eeprom_enable_w );
-WRITE16_HANDLER( atarigen_eeprom_w );
-READ16_HANDLER( atarigen_eeprom_r );
-READ16_HANDLER( atarigen_eeprom_upper_r );
+DECLARE_WRITE16_HANDLER( atarigen_eeprom_enable_w );
+DECLARE_WRITE16_HANDLER( atarigen_eeprom_w );
+DECLARE_READ16_HANDLER( atarigen_eeprom_r );
+DECLARE_READ16_HANDLER( atarigen_eeprom_upper_r );
 
-WRITE32_HANDLER( atarigen_eeprom_enable32_w );
-WRITE32_HANDLER( atarigen_eeprom32_w );
-READ32_HANDLER( atarigen_eeprom_upper32_r );
+DECLARE_WRITE32_HANDLER( atarigen_eeprom_enable32_w );
+DECLARE_WRITE32_HANDLER( atarigen_eeprom32_w );
+DECLARE_READ32_HANDLER( atarigen_eeprom_upper32_r );
 
 
 /*---------------------------------------------------------------
@@ -248,8 +248,8 @@ READ32_HANDLER( atarigen_eeprom_upper32_r );
 void atarigen_slapstic_init(device_t *device, offs_t base, offs_t mirror, int chipnum);
 void atarigen_slapstic_reset(atarigen_state *state);
 
-WRITE16_HANDLER( atarigen_slapstic_w );
-READ16_HANDLER( atarigen_slapstic_r );
+DECLARE_WRITE16_HANDLER( atarigen_slapstic_w );
+DECLARE_READ16_HANDLER( atarigen_slapstic_r );
 
 
 /*---------------------------------------------------------------
@@ -259,23 +259,23 @@ READ16_HANDLER( atarigen_slapstic_r );
 void atarigen_sound_io_reset(device_t *device);
 
 INTERRUPT_GEN( atarigen_6502_irq_gen );
-READ8_HANDLER( atarigen_6502_irq_ack_r );
-WRITE8_HANDLER( atarigen_6502_irq_ack_w );
+DECLARE_READ8_HANDLER( atarigen_6502_irq_ack_r );
+DECLARE_WRITE8_HANDLER( atarigen_6502_irq_ack_w );
 
 void atarigen_ym2151_irq_gen(device_t *device, int irq);
 
-WRITE16_HANDLER( atarigen_sound_w );
-READ16_HANDLER( atarigen_sound_r );
-WRITE16_HANDLER( atarigen_sound_upper_w );
-READ16_HANDLER( atarigen_sound_upper_r );
+DECLARE_WRITE16_HANDLER( atarigen_sound_w );
+DECLARE_READ16_HANDLER( atarigen_sound_r );
+DECLARE_WRITE16_HANDLER( atarigen_sound_upper_w );
+DECLARE_READ16_HANDLER( atarigen_sound_upper_r );
 
-WRITE32_HANDLER( atarigen_sound_upper32_w );
-READ32_HANDLER( atarigen_sound_upper32_r );
+DECLARE_WRITE32_HANDLER( atarigen_sound_upper32_w );
+DECLARE_READ32_HANDLER( atarigen_sound_upper32_r );
 
 void atarigen_sound_reset(running_machine &machine);
-WRITE16_HANDLER( atarigen_sound_reset_w );
-WRITE8_HANDLER( atarigen_6502_sound_w );
-READ8_HANDLER( atarigen_6502_sound_r );
+DECLARE_WRITE16_HANDLER( atarigen_sound_reset_w );
+DECLARE_WRITE8_HANDLER( atarigen_6502_sound_w );
+DECLARE_READ8_HANDLER( atarigen_6502_sound_r );
 
 
 /*---------------------------------------------------------------
@@ -309,20 +309,20 @@ INLINE void atarivc_update_pf_xscrolls(atarigen_state *state)
     PLAYFIELD/ALPHA MAP HELPERS
 ---------------------------------------------------------------*/
 
-WRITE16_HANDLER( atarigen_alpha_w );
-WRITE32_HANDLER( atarigen_alpha32_w );
-WRITE16_HANDLER( atarigen_alpha2_w );
+DECLARE_WRITE16_HANDLER( atarigen_alpha_w );
+DECLARE_WRITE32_HANDLER( atarigen_alpha32_w );
+DECLARE_WRITE16_HANDLER( atarigen_alpha2_w );
 void atarigen_set_playfield_latch(atarigen_state *state, int data);
 void atarigen_set_playfield2_latch(atarigen_state *state, int data);
-WRITE16_HANDLER( atarigen_playfield_w );
-WRITE32_HANDLER( atarigen_playfield32_w );
-WRITE16_HANDLER( atarigen_playfield_large_w );
-WRITE16_HANDLER( atarigen_playfield_upper_w );
-WRITE16_HANDLER( atarigen_playfield_dual_upper_w );
-WRITE16_HANDLER( atarigen_playfield_latched_lsb_w );
-WRITE16_HANDLER( atarigen_playfield_latched_msb_w );
-WRITE16_HANDLER( atarigen_playfield2_w );
-WRITE16_HANDLER( atarigen_playfield2_latched_msb_w );
+DECLARE_WRITE16_HANDLER( atarigen_playfield_w );
+DECLARE_WRITE32_HANDLER( atarigen_playfield32_w );
+DECLARE_WRITE16_HANDLER( atarigen_playfield_large_w );
+DECLARE_WRITE16_HANDLER( atarigen_playfield_upper_w );
+DECLARE_WRITE16_HANDLER( atarigen_playfield_dual_upper_w );
+DECLARE_WRITE16_HANDLER( atarigen_playfield_latched_lsb_w );
+DECLARE_WRITE16_HANDLER( atarigen_playfield_latched_msb_w );
+DECLARE_WRITE16_HANDLER( atarigen_playfield2_w );
+DECLARE_WRITE16_HANDLER( atarigen_playfield2_latched_msb_w );
 
 
 /*---------------------------------------------------------------
@@ -332,9 +332,9 @@ WRITE16_HANDLER( atarigen_playfield2_latched_msb_w );
 void atarigen_scanline_timer_reset(screen_device &screen, atarigen_scanline_func update_graphics, int frequency);
 int atarigen_get_hblank(screen_device &screen);
 void atarigen_halt_until_hblank_0(screen_device &screen);
-WRITE16_HANDLER( atarigen_666_paletteram_w );
-WRITE16_HANDLER( atarigen_expanded_666_paletteram_w );
-WRITE32_HANDLER( atarigen_666_paletteram32_w );
+DECLARE_WRITE16_HANDLER( atarigen_666_paletteram_w );
+DECLARE_WRITE16_HANDLER( atarigen_expanded_666_paletteram_w );
+DECLARE_WRITE32_HANDLER( atarigen_666_paletteram32_w );
 
 
 /*---------------------------------------------------------------

@@ -160,20 +160,20 @@ extern const device_type NAMCO_C45_ROAD;
 
 void namco_tilemap_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 void namco_tilemap_invalidate( void );
-WRITE16_HANDLER( namco_tilemapvideoram16_w );
-READ16_HANDLER( namco_tilemapvideoram16_r );
-WRITE16_HANDLER( namco_tilemapcontrol16_w );
-READ16_HANDLER( namco_tilemapcontrol16_r );
+DECLARE_WRITE16_HANDLER( namco_tilemapvideoram16_w );
+DECLARE_READ16_HANDLER( namco_tilemapvideoram16_r );
+DECLARE_WRITE16_HANDLER( namco_tilemapcontrol16_w );
+DECLARE_READ16_HANDLER( namco_tilemapcontrol16_r );
 
-READ32_HANDLER( namco_tilemapvideoram32_r );
-WRITE32_HANDLER( namco_tilemapvideoram32_w );
-READ32_HANDLER( namco_tilemapcontrol32_r );
-WRITE32_HANDLER( namco_tilemapcontrol32_w );
+DECLARE_READ32_HANDLER( namco_tilemapvideoram32_r );
+DECLARE_WRITE32_HANDLER( namco_tilemapvideoram32_w );
+DECLARE_READ32_HANDLER( namco_tilemapcontrol32_r );
+DECLARE_WRITE32_HANDLER( namco_tilemapcontrol32_w );
 
-READ32_HANDLER( namco_tilemapvideoram32_le_r );
-WRITE32_HANDLER( namco_tilemapvideoram32_le_w );
-READ32_HANDLER( namco_tilemapcontrol32_le_r );
-WRITE32_HANDLER( namco_tilemapcontrol32_le_w );
+DECLARE_READ32_HANDLER( namco_tilemapvideoram32_le_r );
+DECLARE_WRITE32_HANDLER( namco_tilemapvideoram32_le_w );
+DECLARE_READ32_HANDLER( namco_tilemapcontrol32_le_r );
+DECLARE_WRITE32_HANDLER( namco_tilemapcontrol32_le_w );
 
 /***********************************************************************************/
 

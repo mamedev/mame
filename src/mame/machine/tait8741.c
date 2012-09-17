@@ -177,7 +177,7 @@ static void taito8741_update(address_space &space, int num)
 					else
 					{ /* port select */
 						st->parallelselect = data & 0x07;
-						taito8741_hostdata_w(st,st->portHandler ? st->portHandler(space,st->parallelselect) : st->portName ? space.machine().root_device().ioport(st->portName)->read() : 0);
+						taito8741_hostdata_w(st,st->portHandler ? st->portHandler(space,st->parallelselect,0xff) : st->portName ? space.machine().root_device().ioport(st->portName)->read() : 0);
 					}
 				}
 			}
@@ -188,7 +188,7 @@ static void taito8741_update(address_space &space, int num)
 			case -1: /* no command data */
 				break;
 			case 0x00: /* read from parallel port */
-				taito8741_hostdata_w(st,st->portHandler ? st->portHandler(space,0) : st->portName ? space.machine().root_device().ioport(st->portName)->read() : 0 );
+				taito8741_hostdata_w(st,st->portHandler ? st->portHandler(space,0,0xff) : st->portName ? space.machine().root_device().ioport(st->portName)->read() : 0 );
 				break;
 			case 0x01: /* read receive buffer 0 */
 			case 0x02: /* read receive buffer 1 */
@@ -201,7 +201,7 @@ static void taito8741_update(address_space &space, int num)
 				taito8741_hostdata_w(st,st->rxd[data-1]);
 				break;
 			case 0x08:	/* latch received serial data */
-				st->txd[0] = st->portHandler ? st->portHandler(space,0) : st->portName ? space.machine().root_device().ioport(st->portName)->read() : 0;
+				st->txd[0] = st->portHandler ? st->portHandler(space,0,0xff) : st->portName ? space.machine().root_device().ioport(st->portName)->read() : 0;
 				if( sst )
 				{
 					space.machine().scheduler().synchronize(FUNC(taito8741_serial_tx), num);
@@ -295,7 +295,7 @@ static int I8741_data_r(address_space &space, int num)
 	switch( st->mode )
 	{
 	case TAITO8741_PORT: /* parallel data */
-		taito8741_hostdata_w(st,st->portHandler ? st->portHandler(space, st->parallelselect) : st->portName ? space.machine().root_device().ioport(st->portName)->read() : 0);
+		taito8741_hostdata_w(st,st->portHandler ? st->portHandler(space, st->parallelselect, 0xff) : st->portName ? space.machine().root_device().ioport(st->portName)->read() : 0);
 		break;
 	}
 	return ret;

@@ -119,7 +119,7 @@ SCREEN_UPDATE_IND16( secretab );
 
 /*----------- defined in machine/dec0.c -----------*/
 
-READ16_HANDLER( slyspy_controls_r );
+DECLARE_READ16_HANDLER( slyspy_controls_r );
 
 
 extern void dec0_i8751_write(running_machine &machine, int data);

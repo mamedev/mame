@@ -73,13 +73,13 @@ TIMER_DEVICE_CALLBACK( atarisy1_int3_callback );
 TIMER_DEVICE_CALLBACK( atarisy1_int3off_callback );
 TIMER_DEVICE_CALLBACK( atarisy1_reset_yscroll_callback );
 
-READ16_HANDLER( atarisy1_int3state_r );
+DECLARE_READ16_HANDLER( atarisy1_int3state_r );
 
-WRITE16_HANDLER( atarisy1_spriteram_w );
-WRITE16_HANDLER( atarisy1_bankselect_w );
-WRITE16_HANDLER( atarisy1_xscroll_w );
-WRITE16_HANDLER( atarisy1_yscroll_w );
-WRITE16_HANDLER( atarisy1_priority_w );
+DECLARE_WRITE16_HANDLER( atarisy1_spriteram_w );
+DECLARE_WRITE16_HANDLER( atarisy1_bankselect_w );
+DECLARE_WRITE16_HANDLER( atarisy1_xscroll_w );
+DECLARE_WRITE16_HANDLER( atarisy1_yscroll_w );
+DECLARE_WRITE16_HANDLER( atarisy1_priority_w );
 
 
 SCREEN_UPDATE_IND16( atarisy1 );

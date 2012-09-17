@@ -88,7 +88,7 @@ READ8_DEVICE_HANDLER( latch8_r )
 			if (latch8->intf->devread[i].read_handler != NULL)
 			{
 				res &= ~( 1 << i);
-				res |= ((latch8->intf->devread[i].read_handler(space, 0) >> latch8->intf->devread[i].from_bit) & 0x01) << i;
+				res |= ((latch8->intf->devread[i].read_handler(space, 0, 0xff) >> latch8->intf->devread[i].from_bit) & 0x01) << i;
 			}
 		}
 	}

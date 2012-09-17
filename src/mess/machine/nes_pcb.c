@@ -1209,7 +1209,7 @@ static WRITE8_HANDLER( fxrom_w )
 			prg16_89ab(space.machine(), data);
 			break;
 		default:
-			pxrom_w(space, offset, data);
+			pxrom_w(space, offset, data, mem_mask);
 			break;
 	}
 }
@@ -1451,7 +1451,7 @@ static WRITE8_HANDLER( hkrom_w )
 			break;
 
 		default:
-			txrom_w(space, offset, data);
+			txrom_w(space, offset, data, mem_mask);
 			break;
 	}
 }
@@ -1504,7 +1504,7 @@ static WRITE8_HANDLER( txsrom_w )
 			break;
 
 		default:
-			txrom_w(space, offset, data);
+			txrom_w(space, offset, data, mem_mask);
 			break;
 	}
 }
@@ -1582,7 +1582,7 @@ static WRITE8_HANDLER( tqrom_w )
 			break;
 
 		default:
-			txrom_w(space, offset, data);
+			txrom_w(space, offset, data, mem_mask);
 			break;
 	}
 }
@@ -2618,7 +2618,7 @@ static WRITE8_HANDLER( namcot3453_w )
 	if (!(offset & 1))
 		set_nt_mirroring(space.machine(), BIT(data, 6) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 
-	dxrom_w(space, offset, data);
+	dxrom_w(space, offset, data, mem_mask);
 }
 
 /*************************************************************
@@ -2884,7 +2884,7 @@ static WRITE8_HANDLER( lz93d50_m_w )
 	LOG_MMC(("lz93d50_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (!state->m_battery && !state->m_wram)
-		lz93d50_w(space, offset & 0x0f, data);
+		lz93d50_w(space, offset & 0x0f, data, mem_mask);
 	else if (state->m_battery)
 		state->m_battery_ram[offset] = data;
 	else
@@ -2921,7 +2921,7 @@ static WRITE8_HANDLER( fjump2_w )
 			fjump2_set_prg(space.machine());
 			break;
 		default:
-			lz93d50_m_w(space, offset & 0x0f, data);
+			lz93d50_m_w(space, offset & 0x0f, data, mem_mask);
 			break;
 	}
 }
@@ -4167,7 +4167,7 @@ static WRITE8_HANDLER( tc0190fmc_p16_w )
 		case 0x2001:
 		case 0x2002:
 		case 0x2003:
-			tc0190fmc_w(space, offset, data);
+			tc0190fmc_w(space, offset, data, mem_mask);
 			break;
 		case 0x4000:
 			state->m_IRQ_count_latch = (0x100 - data) & 0xff;
@@ -4290,7 +4290,7 @@ static WRITE8_HANDLER( x1005a_m_w )
 			break;
 	}
 
-	x1005_m_w(space, offset, data);
+	x1005_m_w(space, offset, data, mem_mask);
 }
 
 /*************************************************************
@@ -5769,7 +5769,7 @@ static WRITE8_HANDLER( kay_pp_w )
 	switch (offset & 0x6003)
 	{
 		case 0x0000:
-			txrom_w(space, offset, data);
+			txrom_w(space, offset, data, mem_mask);
 			mmc3_set_prg(space.machine(), state->m_mmc_prg_base, state->m_mmc_prg_mask);
 			break;
 
@@ -5778,19 +5778,19 @@ static WRITE8_HANDLER( kay_pp_w )
 								| (BIT(data, 3) << 2) | (BIT(data, 4) << 1) | BIT(data, 5);
 			if (!state->m_mmc_reg[7])
 				kay_pp_update_regs(space.machine());
-			txrom_w(space, offset, data);
+			txrom_w(space, offset, data, mem_mask);
 			mmc3_set_prg(space.machine(), state->m_mmc_prg_base, state->m_mmc_prg_mask);
 			break;
 
 		case 0x0003:
 			state->m_mmc_reg[5] = data;
 			kay_pp_update_regs(space.machine());
-			txrom_w(space, 0x0000, data);
+			txrom_w(space, 0x0000, data, mem_mask);
 			mmc3_set_prg(space.machine(), state->m_mmc_prg_base, state->m_mmc_prg_mask);
 			break;
 
 		default:
-			txrom_w(space, offset, data);
+			txrom_w(space, offset, data, mem_mask);
 			break;
 	}
 }
@@ -5985,7 +5985,7 @@ static WRITE8_HANDLER( nitra_w )
 {
 	LOG_MMC(("nitra_w, offset: %04x, data: %02x\n", offset, data));
 
-	txrom_w(space, (offset & 0x6000) | ((offset & 0x400) >> 10), offset & 0xff);
+	txrom_w(space, (offset & 0x6000) | ((offset & 0x400) >> 10), offset & 0xff, mem_mask);
 }
 
 /*************************************************************
@@ -6387,7 +6387,7 @@ static WRITE8_HANDLER( rex_sl1632_w )
 				break;
 
 			default:
-				txrom_w(space, offset, data);
+				txrom_w(space, offset, data, mem_mask);
 				break;
 		}
 	}
@@ -6811,14 +6811,14 @@ static WRITE8_HANDLER( tcu01_m_w )
 {
 	LOG_MMC(("tcu01_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	tcu01_l_w(space, (offset + 0x100) & 0xfff, data);
+	tcu01_l_w(space, (offset + 0x100) & 0xfff, data, mem_mask);
 }
 
 static WRITE8_HANDLER( tcu01_w )
 {
 	LOG_MMC(("tcu01_w, offset: %04x, data: %02x\n", offset, data));
 
-	tcu01_l_w(space, (offset + 0x100) & 0xfff, data);
+	tcu01_l_w(space, (offset + 0x100) & 0xfff, data, mem_mask);
 }
 
 /*************************************************************
@@ -7047,57 +7047,57 @@ static WRITE8_HANDLER( sgame_boog_w )
 	{
 		case 0x0000:
 			if (!state->m_mmc_reg[2])
-				txrom_w(space, 0x0000, data);
+				txrom_w(space, 0x0000, data, mem_mask);
 			break;
 
 		case 0x0001:
 			if (!state->m_mmc_reg[2])
-				txrom_w(space, 0x0001, data);
+				txrom_w(space, 0x0001, data, mem_mask);
 			else if (state->m_mmc_reg[3] && ((state->m_mmc_reg[0] & 0x80) == 0 || (state->m_mmc_latch1 & 0x07) < 6))	// if we use the prg16 banks and cmd=6,7 DON'T enter!
 			{
 				state->m_mmc_reg[3] = 0;
-				txrom_w(space, 0x0001, data);
+				txrom_w(space, 0x0001, data, mem_mask);
 			}
 			break;
 
 		case 0x2000:
 			if (!state->m_mmc_reg[2])
-				txrom_w(space, 0x2000, data);
+				txrom_w(space, 0x2000, data, mem_mask);
 			else
 			{
 				data = (data & 0xc0) | conv_table[data & 0x07];
 				state->m_mmc_reg[3] = 1;
-				txrom_w(space, 0x0000, data);
+				txrom_w(space, 0x0000, data, mem_mask);
 				break;
 			}
 			break;
 
 		case 0x4000:
 			if (!state->m_mmc_reg[2])
-				txrom_w(space, 0x4000, data);
+				txrom_w(space, 0x4000, data, mem_mask);
 			else
 				set_nt_mirroring(space.machine(), ((data >> 7) | data) & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x4001:
 			if (!state->m_mmc_reg[2])
-				txrom_w(space, 0x4001, data);
+				txrom_w(space, 0x4001, data, mem_mask);
 			else
-				txrom_w(space, 0x6001, data);
+				txrom_w(space, 0x6001, data, mem_mask);
 			break;
 
 		case 0x6001:
 			if (!state->m_mmc_reg[2])
-				txrom_w(space, 0x6001, data);
+				txrom_w(space, 0x6001, data, mem_mask);
 			else
 			{
-				txrom_w(space, 0x4000, data);
-				txrom_w(space, 0x4001, data);
+				txrom_w(space, 0x4000, data, mem_mask);
+				txrom_w(space, 0x4001, data, mem_mask);
 			}
 			break;
 
 		default:
-			txrom_w(space, offset, data);
+			txrom_w(space, offset, data, mem_mask);
 			break;
 	}
 }
@@ -7149,13 +7149,13 @@ static WRITE8_HANDLER( sgame_lion_w )
 			case 0x2000:
 				state->m_map114_reg_enabled = 1;
 				data = (data & 0xc0) | conv_table[data & 0x07];
-				txrom_w(space, 0x0000, data);
+				txrom_w(space, 0x0000, data, mem_mask);
 				break;
 			case 0x4000:
 				if (state->m_map114_reg_enabled && (state->m_map114_reg & 0x80) == 0)
 				{
 					state->m_map114_reg_enabled = 0;
-					txrom_w(space, 0x0001, data);
+					txrom_w(space, 0x0001, data, mem_mask);
 				}
 				break;
 		}
@@ -7165,12 +7165,12 @@ static WRITE8_HANDLER( sgame_lion_w )
 		switch (offset & 0x03)
 		{
 			case 0x02:
-				txrom_w(space, 0x6000, data);
+				txrom_w(space, 0x6000, data, mem_mask);
 				break;
 			case 0x03:
-				txrom_w(space, 0x6001, data);
-				txrom_w(space, 0x4000, data);
-				txrom_w(space, 0x4001, data);
+				txrom_w(space, 0x6001, data, mem_mask);
+				txrom_w(space, 0x4000, data, mem_mask);
+				txrom_w(space, 0x4001, data, mem_mask);
 				break;
 		}
 	}
@@ -7452,7 +7452,7 @@ static WRITE8_HANDLER( tengen_800037_w )
 			break;
 
 		default:
-			tengen_800032_w(space, offset, data);
+			tengen_800032_w(space, offset, data, mem_mask);
 			break;
 	}
 }
@@ -7577,7 +7577,7 @@ static WRITE8_HANDLER( txc_tw_m_w )
 {
 	LOG_MMC(("txctw_m_w, offset: %04x, data: %04x\n", offset, data));
 
-	txc_tw_l_w(space, offset & 0xff, data);	// offset does not really count for this mapper
+	txc_tw_l_w(space, offset & 0xff, data, mem_mask);	// offset does not really count for this mapper
 }
 
 /* writes to 0x8000-0xffff are like MMC3 but no PRG bankswitch (beacuse it is handled by low writes) */
@@ -7705,7 +7705,7 @@ static WRITE8_HANDLER( waixing_a_w )
 			break;
 
 		default:
-			txrom_w(space, offset, data);
+			txrom_w(space, offset, data, mem_mask);
 			break;
 	}
 }
@@ -7829,11 +7829,11 @@ static WRITE8_HANDLER( waixing_f_w )
 				mmc3_set_prg(space.machine(), state->m_mmc_prg_base, state->m_mmc_prg_mask);
 			}
 			else
-				waixing_a_w(space, offset, data);
+				waixing_a_w(space, offset, data, mem_mask);
 			break;
 
 		default:
-			waixing_a_w(space, offset, data);
+			waixing_a_w(space, offset, data, mem_mask);
 			break;
 	}
 }
@@ -7919,7 +7919,7 @@ static WRITE8_HANDLER( waixing_g_w )
 			break;
 
 		default:
-			waixing_a_w(space, offset, data);
+			waixing_a_w(space, offset, data, mem_mask);
 			break;
 	}
 }
@@ -7961,9 +7961,9 @@ static WRITE8_HANDLER( waixing_h_w )
 				state->m_mmc_prg_base = (data << 5) & 0x40;
 				state->m_mmc_prg_mask = 0x3f;
 				mmc3_set_prg(space.machine(), state->m_mmc_prg_base, state->m_mmc_prg_mask);
-				txrom_w(space, offset, data);
+				txrom_w(space, offset, data, mem_mask);
 			default:
-				txrom_w(space, offset, data);
+				txrom_w(space, offset, data, mem_mask);
 				break;
 			}
 			break;
@@ -7972,7 +7972,7 @@ static WRITE8_HANDLER( waixing_h_w )
 			break;
 
 		default:
-			txrom_w(space, offset, data);
+			txrom_w(space, offset, data, mem_mask);
 			break;
 	}
 }
@@ -8399,7 +8399,7 @@ static WRITE8_HANDLER( unl_8237_w )
 		case 0x3000:
 			state->m_mmc_reg[2] = 1;
 			data = (data & 0xc0) | conv_table[data & 0x07];
-			txrom_w(space, 0x0000, data);
+			txrom_w(space, 0x0000, data, mem_mask);
 			break;
 
 		case 0x4000:
@@ -8407,7 +8407,7 @@ static WRITE8_HANDLER( unl_8237_w )
 			if (state->m_mmc_reg[2])
 			{
 				state->m_mmc_reg[2] = 0;
-				txrom_w(space, 0x0001, data);
+				txrom_w(space, 0x0001, data, mem_mask);
 			}
 			break;
 
@@ -8415,9 +8415,9 @@ static WRITE8_HANDLER( unl_8237_w )
 			break;
 
 		case 0x7000:
-			txrom_w(space, 0x6001, data);
-			txrom_w(space, 0x4000, data);
-			txrom_w(space, 0x4001, data);
+			txrom_w(space, 0x6001, data, mem_mask);
+			txrom_w(space, 0x4000, data, mem_mask);
+			txrom_w(space, 0x4001, data, mem_mask);
 			break;
 	}
 }
@@ -8538,22 +8538,22 @@ static WRITE8_HANDLER( unl_kof97_w )
 	if (offset == 0x1000)
 	{
 		data = unl_kof97_unscramble(data);
-		txrom_w(space, 0x0001, data);
+		txrom_w(space, 0x0001, data, mem_mask);
 	}
 	else if (offset == 0x2000)
 	{
 		data = unl_kof97_unscramble(data);
-		txrom_w(space, 0x0000, data);
+		txrom_w(space, 0x0000, data, mem_mask);
 	}
 	else if (offset == 0x5000)
 	{
 		data = unl_kof97_unscramble(data);
-		txrom_w(space, 0x4001, data);
+		txrom_w(space, 0x4001, data, mem_mask);
 	}
 	else if (offset == 0x7000)
 	{
 		data = unl_kof97_unscramble(data);
-		txrom_w(space, 0x6001, data);
+		txrom_w(space, 0x6001, data, mem_mask);
 	}
 	else		/* Other addresses behaves like MMC3, up to unscrambling data */
 	{
@@ -8568,7 +8568,7 @@ static WRITE8_HANDLER( unl_kof97_w )
 			case 0x2000:	/* are these ever called?!? */
 			case 0x2001:
 				data = unl_kof97_unscramble(data);
-				txrom_w(space, offset, data);
+				txrom_w(space, offset, data, mem_mask);
 				break;
 		}
 	}
@@ -8590,7 +8590,7 @@ static WRITE8_HANDLER( ks7057_w )
 {
 	LOG_MMC(("ks7057_w, offset: %04x, data: %02x\n", offset, data));
 	offset = (BIT(offset, 0) << 1) | BIT(offset, 1) | (offset & ~0x03);
-	txrom_w(space, offset, data);
+	txrom_w(space, offset, data, mem_mask);
 }
 
 /*************************************************************
@@ -8785,12 +8785,12 @@ static WRITE8_HANDLER( kof96_w )
 	{
 		case 0x0000:
 			state->m_mmc_reg[2] = 1;
-			txrom_w(space, 0x0000, data);
+			txrom_w(space, 0x0000, data, mem_mask);
 			break;
 
 		case 0x0001:
 			if (state->m_mmc_reg[2])
-				txrom_w(space, 0x0001, data);
+				txrom_w(space, 0x0001, data, mem_mask);
 			break;
 
 		case 0x0002:
@@ -8806,7 +8806,7 @@ static WRITE8_HANDLER( kof96_w )
 			break;
 
 		default:
-			txrom_w(space, offset, data);
+			txrom_w(space, offset, data, mem_mask);
 			break;
 	}
 }
@@ -9172,7 +9172,7 @@ static WRITE8_HANDLER( unl_sf3_w )
 			break;
 
 		default:
-			txrom_w(space, offset, data);
+			txrom_w(space, offset, data, mem_mask);
 			break;
 	}
 }
@@ -9290,7 +9290,7 @@ static WRITE8_HANDLER( btl_smb11_w )
 {
 	LOG_MMC(("btl_smb11_w, offset: %04x, data: %02x\n", offset, data));
 
-	txrom_w(space, (offset & 0x6000) | ((offset & 0x04) >> 2), data);
+	txrom_w(space, (offset & 0x6000) | ((offset & 0x04) >> 2), data, mem_mask);
 }
 
 /*************************************************************
@@ -9589,7 +9589,7 @@ static WRITE8_HANDLER( btl_pika_y2k_w )
 		case 0x2000:
 			state->m_mmc_reg[0] = 0;
 		default:
-			txrom_w(space, offset, data);
+			txrom_w(space, offset, data, mem_mask);
 			break;
 	}
 }
@@ -9759,7 +9759,7 @@ static WRITE8_HANDLER( fk23c_w )
 					fk23c_set_chr(space.machine());
 				}
 				else
-					txrom_w(space, offset, data);
+					txrom_w(space, offset, data, mem_mask);
 				break;
 
 			case 0x2000:
@@ -9767,7 +9767,7 @@ static WRITE8_HANDLER( fk23c_w )
 				break;
 
 			default:
-				txrom_w(space, offset, data);
+				txrom_w(space, offset, data, mem_mask);
 				break;
 		}
 	}
@@ -10684,7 +10684,7 @@ static WRITE8_HANDLER( bmc_sbig7_w )
 			break;
 
 		default:
-			txrom_w(space, offset, data);
+			txrom_w(space, offset, data, mem_mask);
 			break;
 	}
 }
@@ -11033,7 +11033,7 @@ static WRITE8_HANDLER( bmc_gc6in1_w )
 				break;
 
 			default:
-				txrom_w(space, offset, data);
+				txrom_w(space, offset, data, mem_mask);
 				break;
 		}
 	}
@@ -11042,7 +11042,7 @@ static WRITE8_HANDLER( bmc_gc6in1_w )
 		switch (offset & 0x6001)
 		{
 			case 0x0000:
-				txrom_w(space, 0x4000, data);
+				txrom_w(space, 0x4000, data, mem_mask);
 				break;
 
 			case 0x0001:
@@ -11088,7 +11088,7 @@ static WRITE8_HANDLER( bmc_gc6in1_w )
 				break;
 
 			default:
-				txrom_w(space, offset, data);
+				txrom_w(space, offset, data, mem_mask);
 				break;
 		}
 	}
@@ -11382,11 +11382,11 @@ static WRITE8_HANDLER( h2288_w )
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
-			txrom_w(space, 0x0000, (data & 0xc0) | conv_table[data & 0x07]);
+			txrom_w(space, 0x0000, (data & 0xc0) | conv_table[data & 0x07], mem_mask);
 			break;
 
 		default:
-			txrom_w(space, offset, data);
+			txrom_w(space, offset, data, mem_mask);
 			break;
 	}
 }
@@ -11802,9 +11802,9 @@ static WRITE8_HANDLER( someri_w )
 
 	switch (state->m_mmc_cmd1)
 	{
-		case 0x00: someri_vrc2_w(space, offset, data); break;
-		case 0x01: someri_mmc3_w(space, offset, data); break;
-		case 0x02: someri_mmc1_w(space, offset, data); break;
+		case 0x00: someri_vrc2_w(space, offset, data, mem_mask); break;
+		case 0x01: someri_mmc3_w(space, offset, data, mem_mask); break;
+		case 0x02: someri_mmc1_w(space, offset, data, mem_mask); break;
 	}
 }
 

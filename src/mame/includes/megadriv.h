@@ -69,8 +69,8 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine &machine, const
 
 
 /* These handlers are needed by megaplay.c */
-extern READ16_HANDLER( megadriv_68k_io_read );
-extern WRITE16_HANDLER( megadriv_68k_io_write );
+extern DECLARE_READ16_HANDLER( megadriv_68k_io_read );
+extern DECLARE_WRITE16_HANDLER( megadriv_68k_io_write );
 
 /* These handlers are needed by puckpkmn.c for his memory map */
 extern DECLARE_READ8_DEVICE_HANDLER( megadriv_68k_YM2612_read);
@@ -472,8 +472,8 @@ MACHINE_START( md_sram );
 /*----------- defined in drivers/megadriv.c -----------*/
 
 /* These are needed to handle J-Cart inputs */
-extern WRITE16_HANDLER( jcart_ctrl_w );
-extern READ16_HANDLER( jcart_ctrl_r );
+extern DECLARE_WRITE16_HANDLER( jcart_ctrl_w );
+extern DECLARE_READ16_HANDLER( jcart_ctrl_r );
 
 /* machine/megavdp.c */
 extern UINT16 (*vdp_get_word_from_68k_mem)(running_machine &machine, UINT32 source, address_space* space);

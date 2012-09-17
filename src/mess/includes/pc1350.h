@@ -42,8 +42,8 @@ MACHINE_START( pc1350 );
 
 /*----------- defined in video/pc1350.c -----------*/
 
-READ8_HANDLER(pc1350_lcd_read);
-WRITE8_HANDLER(pc1350_lcd_write);
+DECLARE_READ8_HANDLER(pc1350_lcd_read);
+DECLARE_WRITE8_HANDLER(pc1350_lcd_write);
 SCREEN_UPDATE_IND16( pc1350 );
 
 int pc1350_keyboard_line_r(running_machine &machine);

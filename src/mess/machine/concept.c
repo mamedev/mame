@@ -276,7 +276,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 			{
 				int slot = ((offset >> 4) & 7) - 1;
 				if (m_expansion_slots[slot].reg_read)
-					return m_expansion_slots[slot].reg_read(space, offset & 0xf);
+					return m_expansion_slots[slot].reg_read(space, offset & 0xf, mem_mask);
 			}
 			break;
 
@@ -299,7 +299,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 			int slot = ((offset >> 8) & 7) - 1;
 			LOG(("concept_io_r: Slot ROM memory accessed for slot %d at address 0x03%4.4x\n", slot, offset << 1));
 			if (m_expansion_slots[slot].rom_read)
-				return m_expansion_slots[slot].rom_read(space, offset & 0xff);
+				return m_expansion_slots[slot].rom_read(space, offset & 0xff, mem_mask);
 		}
 		break;
 
@@ -418,7 +418,7 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 				LOG(("concept_io_w: Slot I/O register written for slot %d at address 0x03%4.4x, data: 0x%4.4x\n",
 					slot, offset << 1, data));
 				if (m_expansion_slots[slot].reg_write)
-					m_expansion_slots[slot].reg_write(space, offset & 0xf, data);
+					m_expansion_slots[slot].reg_write(space, offset & 0xf, data, mem_mask);
 			}
 			break;
 
@@ -441,7 +441,7 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 			int slot = ((offset >> 8) & 7) - 1;
 			LOG(("concept_io_w: Slot ROM memory written to for slot %d at address 0x03%4.4x, data: 0x%4.4x\n", slot, offset << 1, data));
 			if (m_expansion_slots[slot].rom_write)
-				m_expansion_slots[slot].rom_write(space, offset & 0xff, data);
+				m_expansion_slots[slot].rom_write(space, offset & 0xff, data, mem_mask);
 		}
 		break;
 
@@ -548,9 +548,9 @@ enum
 };
 
 
-static  READ8_HANDLER(concept_fdc_reg_r);
-static WRITE8_HANDLER(concept_fdc_reg_w);
-static  READ8_HANDLER(concept_fdc_rom_r);
+static  DECLARE_READ8_HANDLER(concept_fdc_reg_r);
+static DECLARE_WRITE8_HANDLER(concept_fdc_reg_w);
+static  DECLARE_READ8_HANDLER(concept_fdc_rom_r);
 
 static void concept_fdc_init(running_machine &machine, int slot)
 {
@@ -670,9 +670,9 @@ static  READ8_HANDLER(concept_fdc_rom_r)
  *  Concept Hard Disk Controller (hdc)
  */
 
-static  READ8_HANDLER(concept_hdc_reg_r);
-static WRITE8_HANDLER(concept_hdc_reg_w);
-static  READ8_HANDLER(concept_hdc_rom_r);
+static  DECLARE_READ8_HANDLER(concept_hdc_reg_r);
+static DECLARE_WRITE8_HANDLER(concept_hdc_reg_w);
+static  DECLARE_READ8_HANDLER(concept_hdc_rom_r);
 
 /*
  *  Hook up the Register and ROM R/W routines into the Slot I/O Space

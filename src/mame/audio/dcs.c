@@ -376,32 +376,32 @@ static dcs_state dcs;
  *
  *************************************/
 
-static READ16_HANDLER( dcs_dataram_r );
-static WRITE16_HANDLER( dcs_dataram_w );
-static WRITE16_HANDLER( dcs_data_bank_select_w );
+static DECLARE_READ16_HANDLER( dcs_dataram_r );
+static DECLARE_WRITE16_HANDLER( dcs_dataram_w );
+static DECLARE_WRITE16_HANDLER( dcs_data_bank_select_w );
 
 static void sdrc_reset(running_machine &machine);
-static READ16_HANDLER( sdrc_r );
-static WRITE16_HANDLER( sdrc_w );
+static DECLARE_READ16_HANDLER( sdrc_r );
+static DECLARE_WRITE16_HANDLER( sdrc_w );
 
 static void dsio_reset(running_machine &machine);
-static READ16_HANDLER( dsio_r );
-static WRITE16_HANDLER( dsio_w );
+static DECLARE_READ16_HANDLER( dsio_r );
+static DECLARE_WRITE16_HANDLER( dsio_w );
 
 static void denver_reset(running_machine &machine);
-static READ16_HANDLER( denver_r );
-static WRITE16_HANDLER( denver_w );
+static DECLARE_READ16_HANDLER( denver_r );
+static DECLARE_WRITE16_HANDLER( denver_w );
 
-static READ16_HANDLER( adsp_control_r );
-static WRITE16_HANDLER( adsp_control_w );
+static DECLARE_READ16_HANDLER( adsp_control_r );
+static DECLARE_WRITE16_HANDLER( adsp_control_w );
 
-static READ16_HANDLER( latch_status_r );
-static READ16_HANDLER( fifo_input_r );
-static READ16_HANDLER( input_latch_r );
-static WRITE16_HANDLER( input_latch_ack_w );
-static WRITE16_HANDLER( output_latch_w );
-static READ16_HANDLER( output_control_r );
-static WRITE16_HANDLER( output_control_w );
+static DECLARE_READ16_HANDLER( latch_status_r );
+static DECLARE_READ16_HANDLER( fifo_input_r );
+static DECLARE_READ16_HANDLER( input_latch_r );
+static DECLARE_WRITE16_HANDLER( input_latch_ack_w );
+static DECLARE_WRITE16_HANDLER( output_latch_w );
+static DECLARE_READ16_HANDLER( output_control_r );
+static DECLARE_WRITE16_HANDLER( output_control_w );
 
 static void timer_enable_callback(adsp21xx_device &device, int enable);
 static TIMER_DEVICE_CALLBACK( internal_timer_callback );
@@ -410,8 +410,8 @@ static TIMER_DEVICE_CALLBACK( sport0_irq );
 static void recompute_sample_rate(running_machine &machine);
 static void sound_tx_callback(adsp21xx_device &device, int port, INT32 data);
 
-static READ16_HANDLER( dcs_polling_r );
-static WRITE16_HANDLER( dcs_polling_w );
+static DECLARE_READ16_HANDLER( dcs_polling_r );
+static DECLARE_WRITE16_HANDLER( dcs_polling_w );
 
 static TIMER_DEVICE_CALLBACK( transfer_watchdog_callback );
 static int preprocess_write(running_machine &machine, UINT16 data);

@@ -137,10 +137,10 @@
 #define LOG_FDS(x) do { if (VERBOSE) logerror x; } while (0)
 
 static void ffe_irq( device_t *device, int scanline, int vblank, int blanked );
-static WRITE8_HANDLER( mapper6_l_w );
-static WRITE8_HANDLER( mapper6_w );
-static WRITE8_HANDLER( mapper8_w );
-static WRITE8_HANDLER( mapper17_l_w );
+static DECLARE_WRITE8_HANDLER( mapper6_l_w );
+static DECLARE_WRITE8_HANDLER( mapper6_w );
+static DECLARE_WRITE8_HANDLER( mapper8_w );
+static DECLARE_WRITE8_HANDLER( mapper17_l_w );
 
 /*************************************************************
 
@@ -222,7 +222,7 @@ WRITE8_HANDLER( nes_low_mapper_w )
 	nes_state *state = space.machine().driver_data<nes_state>();
 
 	if (state->m_mmc_write_low)
-		(*state->m_mmc_write_low)(space, offset, data);
+		(*state->m_mmc_write_low)(space, offset, data, mem_mask);
 	else
 		logerror("Unimplemented LOW mapper write, offset: %04x, data: %02x\n", offset + 0x4100, data);
 }
@@ -232,7 +232,7 @@ READ8_HANDLER( nes_low_mapper_r )
 	nes_state *state = space.machine().driver_data<nes_state>();
 
 	if (state->m_mmc_read_low)
-		return (*state->m_mmc_read_low)(space, offset);
+		return (*state->m_mmc_read_low)(space, offset, mem_mask);
 	else
 		logerror("Unimplemented LOW mapper read, offset: %04x\n", offset + 0x4100);
 

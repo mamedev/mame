@@ -184,30 +184,28 @@ public:
 
 
 
-WRITE8_HANDLER( decocass_coin_counter_w );
-WRITE8_HANDLER( decocass_sound_command_w );
-READ8_HANDLER( decocass_sound_data_r );
-READ8_HANDLER( decocass_sound_ack_r );
-WRITE8_HANDLER( decocass_sound_data_w );
-READ8_HANDLER( decocass_sound_command_r );
+DECLARE_WRITE8_HANDLER( decocass_coin_counter_w );
+DECLARE_WRITE8_HANDLER( decocass_sound_command_w );
+DECLARE_READ8_HANDLER( decocass_sound_data_r );
+DECLARE_READ8_HANDLER( decocass_sound_ack_r );
+DECLARE_WRITE8_HANDLER( decocass_sound_data_w );
+DECLARE_READ8_HANDLER( decocass_sound_command_r );
 TIMER_DEVICE_CALLBACK( decocass_audio_nmi_gen );
-WRITE8_HANDLER( decocass_sound_nmi_enable_w );
-READ8_HANDLER( decocass_sound_nmi_enable_r );
-READ8_HANDLER( decocass_sound_data_ack_reset_r );
-WRITE8_HANDLER( decocass_sound_data_ack_reset_w );
-WRITE8_HANDLER( decocass_nmi_reset_w );
-WRITE8_HANDLER( decocass_quadrature_decoder_reset_w );
-WRITE8_HANDLER( decocass_adc_w );
-READ8_HANDLER( decocass_input_r );
+DECLARE_WRITE8_HANDLER( decocass_sound_nmi_enable_w );
+DECLARE_READ8_HANDLER( decocass_sound_nmi_enable_r );
+DECLARE_READ8_HANDLER( decocass_sound_data_ack_reset_r );
+DECLARE_WRITE8_HANDLER( decocass_sound_data_ack_reset_w );
+DECLARE_WRITE8_HANDLER( decocass_nmi_reset_w );
+DECLARE_WRITE8_HANDLER( decocass_quadrature_decoder_reset_w );
+DECLARE_WRITE8_HANDLER( decocass_adc_w );
+DECLARE_READ8_HANDLER( decocass_input_r );
 
-WRITE8_HANDLER( decocass_reset_w );
+DECLARE_WRITE8_HANDLER( decocass_reset_w );
 
-READ8_HANDLER( decocass_e5xx_r );
-WRITE8_HANDLER( decocass_e5xx_w );
-WRITE8_HANDLER( decocass_de0091_w );
-WRITE8_HANDLER( decocass_e900_w );
-
-
+DECLARE_READ8_HANDLER( decocass_e5xx_r );
+DECLARE_WRITE8_HANDLER( decocass_e5xx_w );
+DECLARE_WRITE8_HANDLER( decocass_de0091_w );
+DECLARE_WRITE8_HANDLER( decocass_e900_w );
 
 
 
@@ -243,36 +241,38 @@ WRITE8_HANDLER( decocass_e900_w );
 
 
 
-WRITE8_HANDLER( i8041_p1_w );
-READ8_HANDLER( i8041_p1_r );
-WRITE8_HANDLER( i8041_p2_w );
-READ8_HANDLER( i8041_p2_r );
+
+
+DECLARE_WRITE8_HANDLER( i8041_p1_w );
+DECLARE_READ8_HANDLER( i8041_p1_r );
+DECLARE_WRITE8_HANDLER( i8041_p2_w );
+DECLARE_READ8_HANDLER( i8041_p2_r );
 
 void decocass_machine_state_save_init(running_machine &machine);
 
 
 /*----------- defined in video/decocass.c -----------*/
 
-WRITE8_HANDLER( decocass_paletteram_w );
-WRITE8_HANDLER( decocass_charram_w );
-WRITE8_HANDLER( decocass_fgvideoram_w );
-WRITE8_HANDLER( decocass_colorram_w );
-WRITE8_HANDLER( decocass_bgvideoram_w );
-WRITE8_HANDLER( decocass_tileram_w );
-WRITE8_HANDLER( decocass_objectram_w );
+DECLARE_WRITE8_HANDLER( decocass_paletteram_w );
+DECLARE_WRITE8_HANDLER( decocass_charram_w );
+DECLARE_WRITE8_HANDLER( decocass_fgvideoram_w );
+DECLARE_WRITE8_HANDLER( decocass_colorram_w );
+DECLARE_WRITE8_HANDLER( decocass_bgvideoram_w );
+DECLARE_WRITE8_HANDLER( decocass_tileram_w );
+DECLARE_WRITE8_HANDLER( decocass_objectram_w );
 
-WRITE8_HANDLER( decocass_watchdog_count_w );
-WRITE8_HANDLER( decocass_watchdog_flip_w );
-WRITE8_HANDLER( decocass_color_missiles_w );
-WRITE8_HANDLER( decocass_mode_set_w );
-WRITE8_HANDLER( decocass_color_center_bot_w );
-WRITE8_HANDLER( decocass_back_h_shift_w );
-WRITE8_HANDLER( decocass_back_vl_shift_w );
-WRITE8_HANDLER( decocass_back_vr_shift_w );
-WRITE8_HANDLER( decocass_part_h_shift_w );
-WRITE8_HANDLER( decocass_part_v_shift_w );
-WRITE8_HANDLER( decocass_center_h_shift_space_w );
-WRITE8_HANDLER( decocass_center_v_shift_w );
+DECLARE_WRITE8_HANDLER( decocass_watchdog_count_w );
+DECLARE_WRITE8_HANDLER( decocass_watchdog_flip_w );
+DECLARE_WRITE8_HANDLER( decocass_color_missiles_w );
+DECLARE_WRITE8_HANDLER( decocass_mode_set_w );
+DECLARE_WRITE8_HANDLER( decocass_color_center_bot_w );
+DECLARE_WRITE8_HANDLER( decocass_back_h_shift_w );
+DECLARE_WRITE8_HANDLER( decocass_back_vl_shift_w );
+DECLARE_WRITE8_HANDLER( decocass_back_vr_shift_w );
+DECLARE_WRITE8_HANDLER( decocass_part_h_shift_w );
+DECLARE_WRITE8_HANDLER( decocass_part_v_shift_w );
+DECLARE_WRITE8_HANDLER( decocass_center_h_shift_space_w );
+DECLARE_WRITE8_HANDLER( decocass_center_v_shift_w );
 
 
 SCREEN_UPDATE_IND16( decocass );

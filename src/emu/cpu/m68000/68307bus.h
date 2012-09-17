@@ -4,8 +4,8 @@
 #define m68307BUS_MBSR (0x07)
 #define m68307BUS_MBDR (0x09)
 
-READ8_HANDLER( m68307_internal_mbus_r );
-WRITE8_HANDLER( m68307_internal_mbus_w );
+DECLARE_READ8_HANDLER( m68307_internal_mbus_r );
+DECLARE_WRITE8_HANDLER( m68307_internal_mbus_w );
 
 class m68307_mbus
 {

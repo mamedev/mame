@@ -11,8 +11,8 @@
 
 #include "emu.h"
 
-READ8_HANDLER ( pc_JOY_r );
-WRITE8_HANDLER ( pc_JOY_w );
+DECLARE_READ8_HANDLER ( pc_JOY_r );
+DECLARE_WRITE8_HANDLER ( pc_JOY_w );
 
 INPUT_PORTS_EXTERN( pc_joystick_none );
 INPUT_PORTS_EXTERN( pc_joystick );

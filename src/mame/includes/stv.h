@@ -243,23 +243,23 @@ int stv_vdp1_start ( running_machine &machine );
 void video_update_vdp1(running_machine &machine);
 void stv_vdp2_dynamic_res_change(running_machine &machine);
 
-READ16_HANDLER ( saturn_vdp1_regs_r );
-READ32_HANDLER ( saturn_vdp1_vram_r );
-READ32_HANDLER ( saturn_vdp1_framebuffer0_r );
+DECLARE_READ16_HANDLER ( saturn_vdp1_regs_r );
+DECLARE_READ32_HANDLER ( saturn_vdp1_vram_r );
+DECLARE_READ32_HANDLER ( saturn_vdp1_framebuffer0_r );
 
-WRITE16_HANDLER ( saturn_vdp1_regs_w );
-WRITE32_HANDLER ( saturn_vdp1_vram_w );
-WRITE32_HANDLER ( saturn_vdp1_framebuffer0_w );
+DECLARE_WRITE16_HANDLER ( saturn_vdp1_regs_w );
+DECLARE_WRITE32_HANDLER ( saturn_vdp1_vram_w );
+DECLARE_WRITE32_HANDLER ( saturn_vdp1_framebuffer0_w );
 
 /*----------- defined in video/stvvdp2.c -----------*/
 
-READ32_HANDLER ( saturn_vdp2_vram_r );
-READ32_HANDLER ( saturn_vdp2_cram_r );
-READ16_HANDLER ( saturn_vdp2_regs_r );
+DECLARE_READ32_HANDLER ( saturn_vdp2_vram_r );
+DECLARE_READ32_HANDLER ( saturn_vdp2_cram_r );
+DECLARE_READ16_HANDLER ( saturn_vdp2_regs_r );
 
-WRITE32_HANDLER ( saturn_vdp2_vram_w );
-WRITE32_HANDLER ( saturn_vdp2_cram_w );
-WRITE16_HANDLER ( saturn_vdp2_regs_w );
+DECLARE_WRITE32_HANDLER ( saturn_vdp2_vram_w );
+DECLARE_WRITE32_HANDLER ( saturn_vdp2_cram_w );
+DECLARE_WRITE16_HANDLER ( saturn_vdp2_regs_w );
 
 
 SCREEN_UPDATE_RGB32( stv_vdp2 );

@@ -25,10 +25,10 @@ public:
 
 /*----------- defined in video/skullxbo.c -----------*/
 
-WRITE16_HANDLER( skullxbo_playfieldlatch_w );
-WRITE16_HANDLER( skullxbo_xscroll_w );
-WRITE16_HANDLER( skullxbo_yscroll_w );
-WRITE16_HANDLER( skullxbo_mobmsb_w );
+DECLARE_WRITE16_HANDLER( skullxbo_playfieldlatch_w );
+DECLARE_WRITE16_HANDLER( skullxbo_xscroll_w );
+DECLARE_WRITE16_HANDLER( skullxbo_yscroll_w );
+DECLARE_WRITE16_HANDLER( skullxbo_mobmsb_w );
 
 
 SCREEN_UPDATE_IND16( skullxbo );

@@ -1013,7 +1013,7 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 		case 0x3D:	/* C03D - SOUNDDATA */
 		case 0x3E:	/* C03E - SOUNDADRL */
 		case 0x3F:	/* C03F - SOUNDADRH */
-			result = gssnd_r(space, offset & 0x03);
+			result = gssnd_r(space, offset & 0x03, mem_mask);
 			break;
 
 		case 0x41:	/* C041 - INTEN */
@@ -1174,7 +1174,7 @@ WRITE8_MEMBER( apple2gs_state::apple2gs_c0xx_w )
 		case 0x3D:	/* C03D - SOUNDDATA */
 		case 0x3E:	/* C03E - SOUNDADRL */
 		case 0x3F:	/* C03F - SOUNDADRH */
-			gssnd_w(space, offset & 0x03, data);
+			gssnd_w(space, offset & 0x03, data, mem_mask);
 			break;
 
 		case 0x41:	/* C041 - INTEN */
@@ -1763,10 +1763,10 @@ static WRITE8_HANDLER( apple2gs_Exxxxx_w )
 	state->m_slowmem[offset] = data;
 }
 
-static WRITE8_HANDLER( apple2gs_E004xx_w ) { apple2gs_Exxxxx_w(space, offset + 0x00400, data); }
-static WRITE8_HANDLER( apple2gs_E02xxx_w ) { apple2gs_Exxxxx_w(space, offset + 0x02000, data); }
-static WRITE8_HANDLER( apple2gs_E104xx_w ) { apple2gs_Exxxxx_w(space, offset + 0x10400, data); }
-static WRITE8_HANDLER( apple2gs_E12xxx_w ) { apple2gs_Exxxxx_w(space, offset + 0x12000, data); }
+static WRITE8_HANDLER( apple2gs_E004xx_w ) { apple2gs_Exxxxx_w(space, offset + 0x00400, data, mem_mask); }
+static WRITE8_HANDLER( apple2gs_E02xxx_w ) { apple2gs_Exxxxx_w(space, offset + 0x02000, data, mem_mask); }
+static WRITE8_HANDLER( apple2gs_E104xx_w ) { apple2gs_Exxxxx_w(space, offset + 0x10400, data, mem_mask); }
+static WRITE8_HANDLER( apple2gs_E12xxx_w ) { apple2gs_Exxxxx_w(space, offset + 0x12000, data, mem_mask); }
 
 static WRITE8_HANDLER( apple2gs_slowmem_w )
 {

@@ -227,116 +227,116 @@ public:
 
 
 INTERRUPT_GEN( hd68k_irq_gen );
-WRITE16_HANDLER( hd68k_irq_ack_w );
+DECLARE_WRITE16_HANDLER( hd68k_irq_ack_w );
 void hdgsp_irq_gen(device_t *device, int state);
 void hdmsp_irq_gen(device_t *device, int state);
 
-READ16_HANDLER( hd68k_gsp_io_r );
-WRITE16_HANDLER( hd68k_gsp_io_w );
+DECLARE_READ16_HANDLER( hd68k_gsp_io_r );
+DECLARE_WRITE16_HANDLER( hd68k_gsp_io_w );
 
-READ16_HANDLER( hd68k_msp_io_r );
-WRITE16_HANDLER( hd68k_msp_io_w );
+DECLARE_READ16_HANDLER( hd68k_msp_io_r );
+DECLARE_WRITE16_HANDLER( hd68k_msp_io_w );
 
-READ16_HANDLER( hd68k_port0_r );
-READ16_HANDLER( hd68k_adc8_r );
-READ16_HANDLER( hd68k_adc12_r );
-READ16_HANDLER( hdc68k_port1_r );
-READ16_HANDLER( hda68k_port1_r );
-READ16_HANDLER( hdc68k_wheel_r );
-READ16_HANDLER( hd68k_sound_reset_r );
+DECLARE_READ16_HANDLER( hd68k_port0_r );
+DECLARE_READ16_HANDLER( hd68k_adc8_r );
+DECLARE_READ16_HANDLER( hd68k_adc12_r );
+DECLARE_READ16_HANDLER( hdc68k_port1_r );
+DECLARE_READ16_HANDLER( hda68k_port1_r );
+DECLARE_READ16_HANDLER( hdc68k_wheel_r );
+DECLARE_READ16_HANDLER( hd68k_sound_reset_r );
 
-WRITE16_HANDLER( hd68k_adc_control_w );
-WRITE16_HANDLER( hd68k_wr0_write );
-WRITE16_HANDLER( hd68k_wr1_write );
-WRITE16_HANDLER( hd68k_wr2_write );
-WRITE16_HANDLER( hd68k_nwr_w );
-WRITE16_HANDLER( hdc68k_wheel_edge_reset_w );
+DECLARE_WRITE16_HANDLER( hd68k_adc_control_w );
+DECLARE_WRITE16_HANDLER( hd68k_wr0_write );
+DECLARE_WRITE16_HANDLER( hd68k_wr1_write );
+DECLARE_WRITE16_HANDLER( hd68k_wr2_write );
+DECLARE_WRITE16_HANDLER( hd68k_nwr_w );
+DECLARE_WRITE16_HANDLER( hdc68k_wheel_edge_reset_w );
 
-READ16_HANDLER( hd68k_zram_r );
-WRITE16_HANDLER( hd68k_zram_w );
+DECLARE_READ16_HANDLER( hd68k_zram_r );
+DECLARE_WRITE16_HANDLER( hd68k_zram_w );
 
 void harddriv_duart_irq_handler(device_t *device, int state, UINT8 vector);
 
-WRITE16_HANDLER( hdgsp_io_w );
+DECLARE_WRITE16_HANDLER( hdgsp_io_w );
 
-WRITE16_HANDLER( hdgsp_protection_w );
+DECLARE_WRITE16_HANDLER( hdgsp_protection_w );
 
 
 /* ADSP board */
-READ16_HANDLER( hd68k_adsp_program_r );
-WRITE16_HANDLER( hd68k_adsp_program_w );
+DECLARE_READ16_HANDLER( hd68k_adsp_program_r );
+DECLARE_WRITE16_HANDLER( hd68k_adsp_program_w );
 
-READ16_HANDLER( hd68k_adsp_data_r );
-WRITE16_HANDLER( hd68k_adsp_data_w );
+DECLARE_READ16_HANDLER( hd68k_adsp_data_r );
+DECLARE_WRITE16_HANDLER( hd68k_adsp_data_w );
 
-READ16_HANDLER( hd68k_adsp_buffer_r );
-WRITE16_HANDLER( hd68k_adsp_buffer_w );
+DECLARE_READ16_HANDLER( hd68k_adsp_buffer_r );
+DECLARE_WRITE16_HANDLER( hd68k_adsp_buffer_w );
 
-WRITE16_HANDLER( hd68k_adsp_control_w );
-WRITE16_HANDLER( hd68k_adsp_irq_clear_w );
-READ16_HANDLER( hd68k_adsp_irq_state_r );
+DECLARE_WRITE16_HANDLER( hd68k_adsp_control_w );
+DECLARE_WRITE16_HANDLER( hd68k_adsp_irq_clear_w );
+DECLARE_READ16_HANDLER( hd68k_adsp_irq_state_r );
 
-READ16_HANDLER( hdadsp_special_r );
-WRITE16_HANDLER( hdadsp_special_w );
+DECLARE_READ16_HANDLER( hdadsp_special_r );
+DECLARE_WRITE16_HANDLER( hdadsp_special_w );
 
 /* DS III board */
-WRITE16_HANDLER( hd68k_ds3_control_w );
-READ16_HANDLER( hd68k_ds3_girq_state_r );
-READ16_HANDLER( hd68k_ds3_sirq_state_r );
-READ16_HANDLER( hd68k_ds3_gdata_r );
-WRITE16_HANDLER( hd68k_ds3_gdata_w );
-READ16_HANDLER( hd68k_ds3_sdata_r );
-WRITE16_HANDLER( hd68k_ds3_sdata_w );
+DECLARE_WRITE16_HANDLER( hd68k_ds3_control_w );
+DECLARE_READ16_HANDLER( hd68k_ds3_girq_state_r );
+DECLARE_READ16_HANDLER( hd68k_ds3_sirq_state_r );
+DECLARE_READ16_HANDLER( hd68k_ds3_gdata_r );
+DECLARE_WRITE16_HANDLER( hd68k_ds3_gdata_w );
+DECLARE_READ16_HANDLER( hd68k_ds3_sdata_r );
+DECLARE_WRITE16_HANDLER( hd68k_ds3_sdata_w );
 
-READ16_HANDLER( hdds3_special_r );
-WRITE16_HANDLER( hdds3_special_w );
-READ16_HANDLER( hdds3_control_r );
-WRITE16_HANDLER( hdds3_control_w );
+DECLARE_READ16_HANDLER( hdds3_special_r );
+DECLARE_WRITE16_HANDLER( hdds3_special_w );
+DECLARE_READ16_HANDLER( hdds3_control_r );
+DECLARE_WRITE16_HANDLER( hdds3_control_w );
 
-READ16_HANDLER( hd68k_ds3_program_r );
-WRITE16_HANDLER( hd68k_ds3_program_w );
+DECLARE_READ16_HANDLER( hd68k_ds3_program_r );
+DECLARE_WRITE16_HANDLER( hd68k_ds3_program_w );
 
 /* DSK board */
 void hddsk_update_pif(dsp32c_device &device, UINT32 pins);
-WRITE16_HANDLER( hd68k_dsk_control_w );
-READ16_HANDLER( hd68k_dsk_ram_r );
-WRITE16_HANDLER( hd68k_dsk_ram_w );
-READ16_HANDLER( hd68k_dsk_zram_r );
-WRITE16_HANDLER( hd68k_dsk_zram_w );
-READ16_HANDLER( hd68k_dsk_small_rom_r );
-READ16_HANDLER( hd68k_dsk_rom_r );
-WRITE16_HANDLER( hd68k_dsk_dsp32_w );
-READ16_HANDLER( hd68k_dsk_dsp32_r );
-WRITE32_HANDLER( rddsp32_sync0_w );
-WRITE32_HANDLER( rddsp32_sync1_w );
+DECLARE_WRITE16_HANDLER( hd68k_dsk_control_w );
+DECLARE_READ16_HANDLER( hd68k_dsk_ram_r );
+DECLARE_WRITE16_HANDLER( hd68k_dsk_ram_w );
+DECLARE_READ16_HANDLER( hd68k_dsk_zram_r );
+DECLARE_WRITE16_HANDLER( hd68k_dsk_zram_w );
+DECLARE_READ16_HANDLER( hd68k_dsk_small_rom_r );
+DECLARE_READ16_HANDLER( hd68k_dsk_rom_r );
+DECLARE_WRITE16_HANDLER( hd68k_dsk_dsp32_w );
+DECLARE_READ16_HANDLER( hd68k_dsk_dsp32_r );
+DECLARE_WRITE32_HANDLER( rddsp32_sync0_w );
+DECLARE_WRITE32_HANDLER( rddsp32_sync1_w );
 
 /* DSPCOM board */
-WRITE16_HANDLER( hddspcom_control_w );
+DECLARE_WRITE16_HANDLER( hddspcom_control_w );
 
-WRITE16_HANDLER( rd68k_slapstic_w );
-READ16_HANDLER( rd68k_slapstic_r );
+DECLARE_WRITE16_HANDLER( rd68k_slapstic_w );
+DECLARE_READ16_HANDLER( rd68k_slapstic_r );
 
 /* Game-specific protection */
-WRITE16_HANDLER( st68k_sloop_w );
-READ16_HANDLER( st68k_sloop_r );
-READ16_HANDLER( st68k_sloop_alt_r );
-WRITE16_HANDLER( st68k_protosloop_w );
-READ16_HANDLER( st68k_protosloop_r );
+DECLARE_WRITE16_HANDLER( st68k_sloop_w );
+DECLARE_READ16_HANDLER( st68k_sloop_r );
+DECLARE_READ16_HANDLER( st68k_sloop_alt_r );
+DECLARE_WRITE16_HANDLER( st68k_protosloop_w );
+DECLARE_READ16_HANDLER( st68k_protosloop_r );
 
 /* GSP optimizations */
-READ16_HANDLER( hdgsp_speedup_r );
-WRITE16_HANDLER( hdgsp_speedup1_w );
-WRITE16_HANDLER( hdgsp_speedup2_w );
-READ16_HANDLER( rdgsp_speedup1_r );
-WRITE16_HANDLER( rdgsp_speedup1_w );
+DECLARE_READ16_HANDLER( hdgsp_speedup_r );
+DECLARE_WRITE16_HANDLER( hdgsp_speedup1_w );
+DECLARE_WRITE16_HANDLER( hdgsp_speedup2_w );
+DECLARE_READ16_HANDLER( rdgsp_speedup1_r );
+DECLARE_WRITE16_HANDLER( rdgsp_speedup1_w );
 
 /* MSP optimizations */
-READ16_HANDLER( hdmsp_speedup_r );
-WRITE16_HANDLER( hdmsp_speedup_w );
+DECLARE_READ16_HANDLER( hdmsp_speedup_r );
+DECLARE_WRITE16_HANDLER( hdmsp_speedup_w );
 
 /* ADSP optimizations */
-READ16_HANDLER( hdadsp_speedup_r );
-READ16_HANDLER( hdds3_speedup_r );
+DECLARE_READ16_HANDLER( hdadsp_speedup_r );
+DECLARE_READ16_HANDLER( hdds3_speedup_r );
 
 
 /*----------- defined in audio/harddriv.c -----------*/
@@ -359,19 +359,19 @@ DECLARE_WRITE16_DEVICE_HANDLER( hdsnddsp_dac_w );
 void hdgsp_write_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
 void hdgsp_read_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
 
-READ16_HANDLER( hdgsp_control_lo_r );
-WRITE16_HANDLER( hdgsp_control_lo_w );
-READ16_HANDLER( hdgsp_control_hi_r );
-WRITE16_HANDLER( hdgsp_control_hi_w );
+DECLARE_READ16_HANDLER( hdgsp_control_lo_r );
+DECLARE_WRITE16_HANDLER( hdgsp_control_lo_w );
+DECLARE_READ16_HANDLER( hdgsp_control_hi_r );
+DECLARE_WRITE16_HANDLER( hdgsp_control_hi_w );
 
-READ16_HANDLER( hdgsp_vram_2bpp_r );
-WRITE16_HANDLER( hdgsp_vram_1bpp_w );
-WRITE16_HANDLER( hdgsp_vram_2bpp_w );
+DECLARE_READ16_HANDLER( hdgsp_vram_2bpp_r );
+DECLARE_WRITE16_HANDLER( hdgsp_vram_1bpp_w );
+DECLARE_WRITE16_HANDLER( hdgsp_vram_2bpp_w );
 
-READ16_HANDLER( hdgsp_paletteram_lo_r );
-WRITE16_HANDLER( hdgsp_paletteram_lo_w );
-READ16_HANDLER( hdgsp_paletteram_hi_r );
-WRITE16_HANDLER( hdgsp_paletteram_hi_w );
+DECLARE_READ16_HANDLER( hdgsp_paletteram_lo_r );
+DECLARE_WRITE16_HANDLER( hdgsp_paletteram_lo_w );
+DECLARE_READ16_HANDLER( hdgsp_paletteram_hi_r );
+DECLARE_WRITE16_HANDLER( hdgsp_paletteram_hi_w );
 
 void harddriv_scanline_driver(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);
 void harddriv_scanline_multisync(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);

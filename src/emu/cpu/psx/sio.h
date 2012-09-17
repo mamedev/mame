@@ -87,7 +87,7 @@ private:
 	psx_sio port[2];
 };
 
-WRITE32_HANDLER( psx_sio_w );
-READ32_HANDLER( psx_sio_r );
+DECLARE_WRITE32_HANDLER( psx_sio_w );
+DECLARE_READ32_HANDLER( psx_sio_r );
 
 #endif

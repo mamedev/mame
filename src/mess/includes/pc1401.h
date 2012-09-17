@@ -44,8 +44,8 @@ MACHINE_START( pc1401 );
 
 /*----------- defined in video/pc1401.c -----------*/
 
-READ8_HANDLER(pc1401_lcd_read);
-WRITE8_HANDLER(pc1401_lcd_write);
+DECLARE_READ8_HANDLER(pc1401_lcd_read);
+DECLARE_WRITE8_HANDLER(pc1401_lcd_write);
 SCREEN_UPDATE_IND16( pc1401 );
 
 

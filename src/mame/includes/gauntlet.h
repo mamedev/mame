@@ -35,8 +35,8 @@ public:
 
 /*----------- defined in video/gauntlet.c -----------*/
 
-WRITE16_HANDLER( gauntlet_xscroll_w );
-WRITE16_HANDLER( gauntlet_yscroll_w );
+DECLARE_WRITE16_HANDLER( gauntlet_xscroll_w );
+DECLARE_WRITE16_HANDLER( gauntlet_yscroll_w );
 
 
 SCREEN_UPDATE_IND16( gauntlet );

@@ -20,9 +20,9 @@ INPUT_PORTS_EXTERN( pcvideo_pc1512 );
 
 
 /* Used in machine/pc.c */
-READ16_HANDLER( pc1512_16le_r );
-WRITE16_HANDLER( pc1512_16le_w );
-WRITE16_HANDLER( pc1512_videoram16le_w );
+DECLARE_READ16_HANDLER( pc1512_16le_r );
+DECLARE_WRITE16_HANDLER( pc1512_16le_w );
+DECLARE_WRITE16_HANDLER( pc1512_videoram16le_w );
 
 MACHINE_CONFIG_EXTERN( pcvideo_poisk2 );
 

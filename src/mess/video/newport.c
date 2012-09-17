@@ -42,15 +42,15 @@ INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, c
 	}
 }
 
-static READ32_HANDLER( newport_cmap0_r );
-static WRITE32_HANDLER( newport_cmap0_w );
-static READ32_HANDLER( newport_cmap1_r );
-static READ32_HANDLER( newport_xmap0_r );
-static WRITE32_HANDLER( newport_xmap0_w );
-static READ32_HANDLER( newport_xmap1_r );
-static WRITE32_HANDLER( newport_xmap1_w );
-static READ32_HANDLER( newport_vc2_r );
-static WRITE32_HANDLER( newport_vc2_w );
+static DECLARE_READ32_HANDLER( newport_cmap0_r );
+static DECLARE_WRITE32_HANDLER( newport_cmap0_w );
+static DECLARE_READ32_HANDLER( newport_cmap1_r );
+static DECLARE_READ32_HANDLER( newport_xmap0_r );
+static DECLARE_WRITE32_HANDLER( newport_xmap0_w );
+static DECLARE_READ32_HANDLER( newport_xmap1_r );
+static DECLARE_WRITE32_HANDLER( newport_xmap1_w );
+static DECLARE_READ32_HANDLER( newport_vc2_r );
+static DECLARE_WRITE32_HANDLER( newport_vc2_w );
 
 struct VC2_t
 {

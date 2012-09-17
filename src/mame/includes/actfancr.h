@@ -38,12 +38,12 @@ public:
 
 /*----------- defined in video/actfancr.c -----------*/
 
-WRITE8_HANDLER( actfancr_pf1_data_w );
-READ8_HANDLER( actfancr_pf1_data_r );
-WRITE8_HANDLER( actfancr_pf1_control_w );
-WRITE8_HANDLER( actfancr_pf2_data_w );
-READ8_HANDLER( actfancr_pf2_data_r );
-WRITE8_HANDLER( actfancr_pf2_control_w );
+DECLARE_WRITE8_HANDLER( actfancr_pf1_data_w );
+DECLARE_READ8_HANDLER( actfancr_pf1_data_r );
+DECLARE_WRITE8_HANDLER( actfancr_pf1_control_w );
+DECLARE_WRITE8_HANDLER( actfancr_pf2_data_w );
+DECLARE_READ8_HANDLER( actfancr_pf2_data_r );
+DECLARE_WRITE8_HANDLER( actfancr_pf2_control_w );
 
 
 SCREEN_UPDATE_IND16( actfancr );

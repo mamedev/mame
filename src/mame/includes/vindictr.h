@@ -27,7 +27,7 @@ public:
 
 /*----------- defined in video/vindictr.c -----------*/
 
-WRITE16_HANDLER( vindictr_paletteram_w );
+DECLARE_WRITE16_HANDLER( vindictr_paletteram_w );
 
 
 SCREEN_UPDATE_IND16( vindictr );

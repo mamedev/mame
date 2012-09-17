@@ -134,15 +134,15 @@ i am not sure if keypad enter delivers the mf2 keycode
 
 /*----------- defined in machine/europc.c -----------*/
 
-WRITE8_HANDLER( europc_pio_w );
- READ8_HANDLER( europc_pio_r );
+DECLARE_WRITE8_HANDLER( europc_pio_w );
+ DECLARE_READ8_HANDLER( europc_pio_r );
 
-extern WRITE8_HANDLER ( europc_jim_w );
-extern  READ8_HANDLER ( europc_jim_r );
-extern  READ8_HANDLER ( europc_jim2_r );
+extern DECLARE_WRITE8_HANDLER ( europc_jim_w );
+extern  DECLARE_READ8_HANDLER ( europc_jim_r );
+extern  DECLARE_READ8_HANDLER ( europc_jim2_r );
 
-extern  READ8_HANDLER( europc_rtc_r );
-extern WRITE8_HANDLER( europc_rtc_w );
+extern  DECLARE_READ8_HANDLER( europc_rtc_r );
+extern DECLARE_WRITE8_HANDLER( europc_rtc_w );
 extern NVRAM_HANDLER( europc_rtc );
 
 void europc_rtc_set_time(running_machine &machine);

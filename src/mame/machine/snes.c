@@ -35,8 +35,8 @@ static void snes_dma(address_space &space, UINT8 channels);
 static void snes_hdma_init(address_space &space);
 static void snes_hdma(address_space &space);
 
-static READ8_HANDLER(snes_io_dma_r);
-static WRITE8_HANDLER(snes_io_dma_w);
+static DECLARE_READ8_HANDLER(snes_io_dma_r);
+static DECLARE_WRITE8_HANDLER(snes_io_dma_w);
 
 struct snes_cart_info snes_cart;
 
@@ -604,7 +604,7 @@ WRITE8_HANDLER( snes_w_io )
 	// APU is mirrored from 2140 to 217f
 	if (offset >= APU00 && offset < WMDATA)
 	{
-//      printf("816: %02x to APU @ %d (PC=%06x)\n", data, offset & 3,space->device().safe_pc());
+//      printf("816: %02x to APU @ %d (PC=%06x)\n", data, offset & 3,space.device().safe_pc());
 		spc_port_in(state->m_spc700, space, offset & 0x3, data);
 		space.machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 		return;
@@ -849,7 +849,7 @@ READ8_HANDLER( snes_r_bank1 )
 	else if (address < 0x6000)										/* I/O */
 	{
 		if (state->m_cart[0].mode == SNES_MODE_BSX && address >= 0x5000)
-			value = bsx_read(space, offset);
+			value = bsx_read(space, offset, mem_mask);
 		else
 			value = snes_r_io(space, address);
 	}
@@ -863,7 +863,7 @@ READ8_HANDLER( snes_r_bank1 )
 				value = snes_open_bus_r(space, 0);
 		}
 		else if (state->m_has_addon_chip == HAS_OBC1)
-			value = obc1_read(space, offset);
+			value = obc1_read(space, offset, mem_mask);
 		else if ((state->m_cart[0].mode == SNES_MODE_21) && (state->m_has_addon_chip == HAS_DSP1) && (offset < 0x100000))
 			value = (address < 0x7000) ? dsp_get_dr() : dsp_get_sr();
 		else if (state->m_has_addon_chip == HAS_CX4)
@@ -903,7 +903,7 @@ READ8_HANDLER( snes_r_bank2 )
 	else if (address < 0x6000)										/* I/O */
 	{
 		if (state->m_cart[0].mode == SNES_MODE_BSX && address >= 0x5000)
-			value = bsx_read(space, 0x300000 + offset);
+			value = bsx_read(space, 0x300000 + offset, mem_mask);
 		else
 			value = snes_r_io(space, address);
 	}
@@ -917,7 +917,7 @@ READ8_HANDLER( snes_r_bank2 )
 				value = snes_open_bus_r(space, 0);
 		}
 		else if (state->m_has_addon_chip == HAS_OBC1)
-			value = obc1_read (space, offset);
+			value = obc1_read (space, offset, mem_mask);
 		else if (state->m_has_addon_chip == HAS_CX4)
 			value = CX4_read(address - 0x6000);
 		else if (state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC)
@@ -1184,7 +1184,7 @@ WRITE8_HANDLER( snes_w_bank1 )
 	else if (address < 0x6000)						/* I/O */
 	{
 		if (state->m_cart[0].mode == SNES_MODE_BSX && address >= 0x5000)
-			bsx_write(space, offset, data);
+			bsx_write(space, offset, data, mem_mask);
 		else
 			snes_w_io(space, address, data);
 	}
@@ -1193,7 +1193,7 @@ WRITE8_HANDLER( snes_w_bank1 )
 		if (state->m_has_addon_chip == HAS_SUPERFX)
 			snes_ram[0xf00000 + (offset & 0x1fff)] = data;	// here it should be 0xe00000 but there are mirroring issues
 		else if (state->m_has_addon_chip == HAS_OBC1)
-			obc1_write(space, offset, data);
+			obc1_write(space, offset, data, mem_mask);
 		else if ((state->m_cart[0].mode == SNES_MODE_21) && (state->m_has_addon_chip == HAS_DSP1) && (offset < 0x100000))
 			dsp_set_dr(data);
 		else if (state->m_has_addon_chip == HAS_CX4)
@@ -1235,7 +1235,7 @@ WRITE8_HANDLER( snes_w_bank2 )
 	else if (address < 0x6000)						/* I/O */
 	{
 		if (state->m_cart[0].mode == SNES_MODE_BSX && address >= 0x5000)
-			bsx_write(space, 0x300000 + offset, data);
+			bsx_write(space, 0x300000 + offset, data, mem_mask);
 		else
 			snes_w_io(space, address, data);
 	}
@@ -1244,7 +1244,7 @@ WRITE8_HANDLER( snes_w_bank2 )
 		if (state->m_has_addon_chip == HAS_SUPERFX)
 			snes_ram[0xf00000 + (offset & 0x1fff)] = data;	// here it should be 0xe00000 but there are mirroring issues
 		else if (state->m_has_addon_chip == HAS_OBC1)
-			obc1_write(space, offset, data);
+			obc1_write(space, offset, data, mem_mask);
 		else if (state->m_has_addon_chip == HAS_CX4)
 			CX4_write(space.machine(), address - 0x6000, data);
 		else if (state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC)

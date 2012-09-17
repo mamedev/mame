@@ -150,10 +150,10 @@ public:
 
 /*----------- defined in video/bosco.c -----------*/
 
-WRITE8_HANDLER( bosco_videoram_w );
-WRITE8_HANDLER( bosco_scrollx_w );
-WRITE8_HANDLER( bosco_scrolly_w );
-WRITE8_HANDLER( bosco_starclr_w );
+DECLARE_WRITE8_HANDLER( bosco_videoram_w );
+DECLARE_WRITE8_HANDLER( bosco_scrollx_w );
+DECLARE_WRITE8_HANDLER( bosco_scrolly_w );
+DECLARE_WRITE8_HANDLER( bosco_starclr_w );
 
 SCREEN_UPDATE_IND16( bosco );
 
@@ -182,13 +182,13 @@ SCREEN_VBLANK( galaga );	/* update starfield */
 
 /*----------- defined in video/xevious.c -----------*/
 
-WRITE8_HANDLER( xevious_fg_videoram_w );
-WRITE8_HANDLER( xevious_fg_colorram_w );
-WRITE8_HANDLER( xevious_bg_videoram_w );
-WRITE8_HANDLER( xevious_bg_colorram_w );
-WRITE8_HANDLER( xevious_vh_latch_w );
-WRITE8_HANDLER( xevious_bs_w );
-READ8_HANDLER( xevious_bb_r );
+DECLARE_WRITE8_HANDLER( xevious_fg_videoram_w );
+DECLARE_WRITE8_HANDLER( xevious_fg_colorram_w );
+DECLARE_WRITE8_HANDLER( xevious_bg_videoram_w );
+DECLARE_WRITE8_HANDLER( xevious_bg_colorram_w );
+DECLARE_WRITE8_HANDLER( xevious_vh_latch_w );
+DECLARE_WRITE8_HANDLER( xevious_bs_w );
+DECLARE_READ8_HANDLER( xevious_bb_r );
 
 
 SCREEN_UPDATE_IND16( xevious );
@@ -200,25 +200,25 @@ SCREEN_UPDATE_IND16( xevious );
 void battles_customio_init(running_machine &machine);
 TIMER_DEVICE_CALLBACK( battles_nmi_generate );
 
-READ8_HANDLER( battles_customio0_r );
-READ8_HANDLER( battles_customio_data0_r );
-READ8_HANDLER( battles_customio3_r );
-READ8_HANDLER( battles_customio_data3_r );
-READ8_HANDLER( battles_input_port_r );
+DECLARE_READ8_HANDLER( battles_customio0_r );
+DECLARE_READ8_HANDLER( battles_customio_data0_r );
+DECLARE_READ8_HANDLER( battles_customio3_r );
+DECLARE_READ8_HANDLER( battles_customio_data3_r );
+DECLARE_READ8_HANDLER( battles_input_port_r );
 
-WRITE8_HANDLER( battles_customio0_w );
-WRITE8_HANDLER( battles_customio_data0_w );
-WRITE8_HANDLER( battles_customio3_w );
-WRITE8_HANDLER( battles_customio_data3_w );
-WRITE8_HANDLER( battles_CPU4_coin_w );
-WRITE8_HANDLER( battles_noise_sound_w );
+DECLARE_WRITE8_HANDLER( battles_customio0_w );
+DECLARE_WRITE8_HANDLER( battles_customio_data0_w );
+DECLARE_WRITE8_HANDLER( battles_customio3_w );
+DECLARE_WRITE8_HANDLER( battles_customio_data3_w );
+DECLARE_WRITE8_HANDLER( battles_CPU4_coin_w );
+DECLARE_WRITE8_HANDLER( battles_noise_sound_w );
 
 INTERRUPT_GEN( battles_interrupt_4 );
 
 /*----------- defined in video/digdug.c -----------*/
 
-WRITE8_HANDLER( digdug_videoram_w );
-WRITE8_HANDLER( digdug_PORT_w );
+DECLARE_WRITE8_HANDLER( digdug_videoram_w );
+DECLARE_WRITE8_HANDLER( digdug_PORT_w );
 
 SCREEN_UPDATE_IND16( digdug );
 

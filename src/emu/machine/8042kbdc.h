@@ -34,10 +34,10 @@ struct kbdc8042_interface
 
 void kbdc8042_init(running_machine &machine, const struct kbdc8042_interface *intf);
 
-READ8_HANDLER(kbdc8042_8_r);
-WRITE8_HANDLER(kbdc8042_8_w);
-READ64_HANDLER(kbdc8042_64be_r);
-WRITE64_HANDLER(kbdc8042_64be_w);
+DECLARE_READ8_HANDLER(kbdc8042_8_r);
+DECLARE_WRITE8_HANDLER(kbdc8042_8_w);
+DECLARE_READ64_HANDLER(kbdc8042_64be_r);
+DECLARE_WRITE64_HANDLER(kbdc8042_64be_w);
 
 #endif /* KBDC8042_H */
 

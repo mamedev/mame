@@ -820,8 +820,8 @@ void k051960_set_sprite_offsets(device_t *device, int dx, int dy);
 
 #if 0 // to be moved in the specific drivers!
 /* special handling for the chips sharing address space */
-READ8_HANDLER( k052109_051960_r );
-WRITE8_HANDLER( k052109_051960_w );
+DECLARE_READ8_HANDLER( k052109_051960_r );
+DECLARE_WRITE8_HANDLER( k052109_051960_w );
 #endif
 
 

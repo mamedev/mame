@@ -1,17 +1,17 @@
 /*----------- defined in video/pk8000.c -----------*/
 
-READ8_HANDLER(pk8000_video_color_r);
-WRITE8_HANDLER(pk8000_video_color_w);
-READ8_HANDLER(pk8000_text_start_r);
-WRITE8_HANDLER(pk8000_text_start_w);
-READ8_HANDLER(pk8000_chargen_start_r);
-WRITE8_HANDLER(pk8000_chargen_start_w);
-READ8_HANDLER(pk8000_video_start_r);
-WRITE8_HANDLER(pk8000_video_start_w);
-READ8_HANDLER(pk8000_color_start_r);
-WRITE8_HANDLER(pk8000_color_start_w);
-READ8_HANDLER(pk8000_color_r);
-WRITE8_HANDLER(pk8000_color_w);
+DECLARE_READ8_HANDLER(pk8000_video_color_r);
+DECLARE_WRITE8_HANDLER(pk8000_video_color_w);
+DECLARE_READ8_HANDLER(pk8000_text_start_r);
+DECLARE_WRITE8_HANDLER(pk8000_text_start_w);
+DECLARE_READ8_HANDLER(pk8000_chargen_start_r);
+DECLARE_WRITE8_HANDLER(pk8000_chargen_start_w);
+DECLARE_READ8_HANDLER(pk8000_video_start_r);
+DECLARE_WRITE8_HANDLER(pk8000_video_start_w);
+DECLARE_READ8_HANDLER(pk8000_color_start_r);
+DECLARE_WRITE8_HANDLER(pk8000_color_start_w);
+DECLARE_READ8_HANDLER(pk8000_color_r);
+DECLARE_WRITE8_HANDLER(pk8000_color_w);
 
 extern UINT8 pk8000_video_mode;
 extern UINT8 pk8000_video_enable;

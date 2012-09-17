@@ -111,18 +111,18 @@ int atarimo_get_xscroll(int map);
 int atarimo_get_yscroll(int map);
 
 /* read/write handlers */
-READ16_HANDLER( atarimo_0_spriteram_r );
-READ16_HANDLER( atarimo_0_slipram_r );
+DECLARE_READ16_HANDLER( atarimo_0_spriteram_r );
+DECLARE_READ16_HANDLER( atarimo_0_slipram_r );
 
-READ16_HANDLER( atarimo_1_spriteram_r );
-READ16_HANDLER( atarimo_1_slipram_r );
+DECLARE_READ16_HANDLER( atarimo_1_spriteram_r );
+DECLARE_READ16_HANDLER( atarimo_1_slipram_r );
 
-WRITE16_HANDLER( atarimo_0_spriteram_w );
-WRITE16_HANDLER( atarimo_0_spriteram_expanded_w );
-WRITE16_HANDLER( atarimo_0_slipram_w );
+DECLARE_WRITE16_HANDLER( atarimo_0_spriteram_w );
+DECLARE_WRITE16_HANDLER( atarimo_0_spriteram_expanded_w );
+DECLARE_WRITE16_HANDLER( atarimo_0_slipram_w );
 
-WRITE16_HANDLER( atarimo_1_spriteram_w );
-WRITE16_HANDLER( atarimo_1_slipram_w );
+DECLARE_WRITE16_HANDLER( atarimo_1_spriteram_w );
+DECLARE_WRITE16_HANDLER( atarimo_1_slipram_w );
 
 void atarimo_mark_high_palette(bitmap_ind16 &bitmap, UINT16 *pf, UINT16 *mo, int x, int y);
 

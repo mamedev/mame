@@ -40,7 +40,7 @@ public:
 
 SCREEN_UPDATE_IND16( epnick );
 
-WRITE8_HANDLER( epnick_reg_w );
+DECLARE_WRITE8_HANDLER( epnick_reg_w );
 
 
 #endif /* __ENTERP_H__ */

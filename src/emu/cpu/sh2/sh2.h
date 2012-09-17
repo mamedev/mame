@@ -67,8 +67,8 @@ struct sh2_cpu_core
 DECLARE_LEGACY_CPU_DEVICE(SH1, sh1);
 DECLARE_LEGACY_CPU_DEVICE(SH2, sh2);
 
-WRITE32_HANDLER( sh2_internal_w );
-READ32_HANDLER( sh2_internal_r );
+DECLARE_WRITE32_HANDLER( sh2_internal_w );
+DECLARE_READ32_HANDLER( sh2_internal_r );
 
 void sh2_set_ftcsr_read_callback(device_t *device, void (*callback)(UINT32));
 void sh2_set_frt_input(device_t *device, int state);

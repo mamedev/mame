@@ -59,10 +59,10 @@ public:
 
 SCREEN_UPDATE_IND16( galpani2 );
 
-WRITE16_HANDLER( galpani2_palette_0_w );
-WRITE16_HANDLER( galpani2_palette_1_w );
+DECLARE_WRITE16_HANDLER( galpani2_palette_0_w );
+DECLARE_WRITE16_HANDLER( galpani2_palette_1_w );
 
-WRITE16_HANDLER( galpani2_bg8_0_w );
-WRITE16_HANDLER( galpani2_bg8_1_w );
+DECLARE_WRITE16_HANDLER( galpani2_bg8_0_w );
+DECLARE_WRITE16_HANDLER( galpani2_bg8_1_w );
 
-WRITE16_HANDLER( galpani2_bg15_w );
+DECLARE_WRITE16_HANDLER( galpani2_bg15_w );

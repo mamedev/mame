@@ -223,8 +223,8 @@ WRITE_LINE_MEMBER( luxor_55_21046_device::dma_int_w )
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_fdc_irq | m_dma_irq);
 }
 
-static UINT8 memory_read_byte(address_space &space, offs_t address) { return space.read_byte(address); }
-static void memory_write_byte(address_space &space, offs_t address, UINT8 data) { space.write_byte(address, data); }
+static UINT8 memory_read_byte(address_space &space, offs_t address, UINT8 mem_mask) { return space.read_byte(address); }
+static void memory_write_byte(address_space &space, offs_t address, UINT8 data, UINT8 mem_mask) { space.write_byte(address, data); }
 
 static Z80DMA_INTERFACE( dma_intf )
 {

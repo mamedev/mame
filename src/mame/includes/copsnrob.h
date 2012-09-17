@@ -41,7 +41,7 @@ public:
 
 /*----------- defined in machine/copsnrob.c -----------*/
 
-READ8_HANDLER( copsnrob_gun_position_r );
+DECLARE_READ8_HANDLER( copsnrob_gun_position_r );
 
 
 /*----------- defined in video/copsnrob.c -----------*/

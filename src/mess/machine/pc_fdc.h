@@ -43,9 +43,9 @@ void pc_fdc_set_tc_state(running_machine &machine, int state);
 int	pc_fdc_dack_r(running_machine &machine, address_space &space);
 void pc_fdc_dack_w(running_machine &machine, address_space &space, int data);
 
-READ8_HANDLER(pc_fdc_r);
-WRITE8_HANDLER(pc_fdc_w);
-WRITE8_HANDLER ( pcjr_fdc_w );
+DECLARE_READ8_HANDLER(pc_fdc_r);
+DECLARE_WRITE8_HANDLER(pc_fdc_w);
+DECLARE_WRITE8_HANDLER ( pcjr_fdc_w );
 
 #endif /* PC_FDC_H */
 

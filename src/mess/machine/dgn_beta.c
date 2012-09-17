@@ -73,23 +73,23 @@
 
 
 // Ram banking handlers.
-static WRITE8_HANDLER( dgnbeta_ram_b0_w );
-static WRITE8_HANDLER( dgnbeta_ram_b1_w );
-static WRITE8_HANDLER( dgnbeta_ram_b2_w );
-static WRITE8_HANDLER( dgnbeta_ram_b3_w );
-static WRITE8_HANDLER( dgnbeta_ram_b4_w );
-static WRITE8_HANDLER( dgnbeta_ram_b5_w );
-static WRITE8_HANDLER( dgnbeta_ram_b6_w );
-static WRITE8_HANDLER( dgnbeta_ram_b7_w );
-static WRITE8_HANDLER( dgnbeta_ram_b8_w );
-static WRITE8_HANDLER( dgnbeta_ram_b9_w );
-static WRITE8_HANDLER( dgnbeta_ram_bA_w );
-static WRITE8_HANDLER( dgnbeta_ram_bB_w );
-static WRITE8_HANDLER( dgnbeta_ram_bC_w );
-static WRITE8_HANDLER( dgnbeta_ram_bD_w );
-static WRITE8_HANDLER( dgnbeta_ram_bE_w );
-static WRITE8_HANDLER( dgnbeta_ram_bF_w );
-static WRITE8_HANDLER( dgnbeta_ram_bG_w );
+static DECLARE_WRITE8_HANDLER( dgnbeta_ram_b0_w );
+static DECLARE_WRITE8_HANDLER( dgnbeta_ram_b1_w );
+static DECLARE_WRITE8_HANDLER( dgnbeta_ram_b2_w );
+static DECLARE_WRITE8_HANDLER( dgnbeta_ram_b3_w );
+static DECLARE_WRITE8_HANDLER( dgnbeta_ram_b4_w );
+static DECLARE_WRITE8_HANDLER( dgnbeta_ram_b5_w );
+static DECLARE_WRITE8_HANDLER( dgnbeta_ram_b6_w );
+static DECLARE_WRITE8_HANDLER( dgnbeta_ram_b7_w );
+static DECLARE_WRITE8_HANDLER( dgnbeta_ram_b8_w );
+static DECLARE_WRITE8_HANDLER( dgnbeta_ram_b9_w );
+static DECLARE_WRITE8_HANDLER( dgnbeta_ram_bA_w );
+static DECLARE_WRITE8_HANDLER( dgnbeta_ram_bB_w );
+static DECLARE_WRITE8_HANDLER( dgnbeta_ram_bC_w );
+static DECLARE_WRITE8_HANDLER( dgnbeta_ram_bD_w );
+static DECLARE_WRITE8_HANDLER( dgnbeta_ram_bE_w );
+static DECLARE_WRITE8_HANDLER( dgnbeta_ram_bF_w );
+static DECLARE_WRITE8_HANDLER( dgnbeta_ram_bG_w );
 
 
 #define VERBOSE 0

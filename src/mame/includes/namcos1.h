@@ -111,11 +111,11 @@ void namcos1_init_DACs(running_machine &machine);
 
 /*----------- defined in video/namcos1.c -----------*/
 
-READ8_HANDLER( namcos1_videoram_r );
-WRITE8_HANDLER( namcos1_videoram_w );
-WRITE8_HANDLER( namcos1_paletteram_w );
-READ8_HANDLER( namcos1_spriteram_r );
-WRITE8_HANDLER( namcos1_spriteram_w );
+DECLARE_READ8_HANDLER( namcos1_videoram_r );
+DECLARE_WRITE8_HANDLER( namcos1_videoram_w );
+DECLARE_WRITE8_HANDLER( namcos1_paletteram_w );
+DECLARE_READ8_HANDLER( namcos1_spriteram_r );
+DECLARE_WRITE8_HANDLER( namcos1_spriteram_w );
 
 
 SCREEN_UPDATE_IND16( namcos1 );

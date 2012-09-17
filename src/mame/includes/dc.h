@@ -100,21 +100,21 @@ class dc_state : public driver_device
 
 /*----------- defined in machine/dc.c -----------*/
 
-READ64_HANDLER( pvr_ctrl_r );
-WRITE64_HANDLER( pvr_ctrl_w );
+DECLARE_READ64_HANDLER( pvr_ctrl_r );
+DECLARE_WRITE64_HANDLER( pvr_ctrl_w );
 
-READ64_HANDLER( dc_sysctrl_r );
-WRITE64_HANDLER( dc_sysctrl_w );
-READ64_HANDLER( dc_gdrom_r );
-WRITE64_HANDLER( dc_gdrom_w );
-READ64_HANDLER( dc_g1_ctrl_r );
-WRITE64_HANDLER( dc_g1_ctrl_w );
-READ64_HANDLER( dc_g2_ctrl_r );
-WRITE64_HANDLER( dc_g2_ctrl_w );
-READ64_HANDLER( dc_modem_r );
-WRITE64_HANDLER( dc_modem_w );
-READ64_HANDLER( dc_rtc_r );
-WRITE64_HANDLER( dc_rtc_w );
+DECLARE_READ64_HANDLER( dc_sysctrl_r );
+DECLARE_WRITE64_HANDLER( dc_sysctrl_w );
+DECLARE_READ64_HANDLER( dc_gdrom_r );
+DECLARE_WRITE64_HANDLER( dc_gdrom_w );
+DECLARE_READ64_HANDLER( dc_g1_ctrl_r );
+DECLARE_WRITE64_HANDLER( dc_g1_ctrl_w );
+DECLARE_READ64_HANDLER( dc_g2_ctrl_r );
+DECLARE_WRITE64_HANDLER( dc_g2_ctrl_w );
+DECLARE_READ64_HANDLER( dc_modem_r );
+DECLARE_WRITE64_HANDLER( dc_modem_w );
+DECLARE_READ64_HANDLER( dc_rtc_r );
+DECLARE_WRITE64_HANDLER( dc_rtc_w );
 DECLARE_READ64_DEVICE_HANDLER( dc_aica_reg_r );
 DECLARE_WRITE64_DEVICE_HANDLER( dc_aica_reg_w );
 
@@ -296,16 +296,16 @@ extern UINT64 *pvr2_texture_ram;
 extern UINT64 *pvr2_framebuffer_ram;
 extern UINT64 *elan_ram;
 
-READ64_HANDLER( pvr_ta_r );
-WRITE64_HANDLER( pvr_ta_w );
-READ64_HANDLER( pvr2_ta_r );
-WRITE64_HANDLER( pvr2_ta_w );
-READ64_HANDLER( pvrs_ta_r );
-WRITE64_HANDLER( pvrs_ta_w );
-READ32_HANDLER( elan_regs_r );
-WRITE32_HANDLER( elan_regs_w );
-WRITE64_HANDLER( ta_fifo_poly_w );
-WRITE64_HANDLER( ta_fifo_yuv_w );
+DECLARE_READ64_HANDLER( pvr_ta_r );
+DECLARE_WRITE64_HANDLER( pvr_ta_w );
+DECLARE_READ64_HANDLER( pvr2_ta_r );
+DECLARE_WRITE64_HANDLER( pvr2_ta_w );
+DECLARE_READ64_HANDLER( pvrs_ta_r );
+DECLARE_WRITE64_HANDLER( pvrs_ta_w );
+DECLARE_READ32_HANDLER( elan_regs_r );
+DECLARE_WRITE32_HANDLER( elan_regs_w );
+DECLARE_WRITE64_HANDLER( ta_fifo_poly_w );
+DECLARE_WRITE64_HANDLER( ta_fifo_yuv_w );
 
 SCREEN_UPDATE_RGB32(dc);
 

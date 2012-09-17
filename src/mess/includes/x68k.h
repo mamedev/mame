@@ -286,20 +286,20 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq);
 TIMER_CALLBACK(x68k_hsync);
 
 
-READ16_HANDLER( x68k_spritereg_r );
-WRITE16_HANDLER( x68k_spritereg_w );
-READ16_HANDLER( x68k_spriteram_r );
-WRITE16_HANDLER( x68k_spriteram_w );
-WRITE16_HANDLER( x68k_crtc_w );
-READ16_HANDLER( x68k_crtc_r );
-WRITE16_HANDLER( x68k_gvram_w );
-READ16_HANDLER( x68k_gvram_r );
-WRITE16_HANDLER( x68k_tvram_w );
-READ16_HANDLER( x68k_tvram_r );
-WRITE32_HANDLER( x68k_gvram32_w );
-READ32_HANDLER( x68k_gvram32_r );
-WRITE32_HANDLER( x68k_tvram32_w );
-READ32_HANDLER( x68k_tvram32_r );
+DECLARE_READ16_HANDLER( x68k_spritereg_r );
+DECLARE_WRITE16_HANDLER( x68k_spritereg_w );
+DECLARE_READ16_HANDLER( x68k_spriteram_r );
+DECLARE_WRITE16_HANDLER( x68k_spriteram_w );
+DECLARE_WRITE16_HANDLER( x68k_crtc_w );
+DECLARE_READ16_HANDLER( x68k_crtc_r );
+DECLARE_WRITE16_HANDLER( x68k_gvram_w );
+DECLARE_READ16_HANDLER( x68k_gvram_r );
+DECLARE_WRITE16_HANDLER( x68k_tvram_w );
+DECLARE_READ16_HANDLER( x68k_tvram_r );
+DECLARE_WRITE32_HANDLER( x68k_gvram32_w );
+DECLARE_READ32_HANDLER( x68k_gvram32_r );
+DECLARE_WRITE32_HANDLER( x68k_tvram32_w );
+DECLARE_READ32_HANDLER( x68k_tvram32_r );
 SCREEN_UPDATE_IND16( x68000 );
 
 

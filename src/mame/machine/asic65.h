@@ -11,8 +11,8 @@
 
 void asic65_config(running_machine &machine, int asictype);
 void asic65_reset(running_machine &machine, int state);
-WRITE16_HANDLER( asic65_data_w );
-READ16_HANDLER( asic65_r );
-READ16_HANDLER( asic65_io_r );
+DECLARE_WRITE16_HANDLER( asic65_data_w );
+DECLARE_READ16_HANDLER( asic65_r );
+DECLARE_READ16_HANDLER( asic65_io_r );
 
 MACHINE_CONFIG_EXTERN( asic65 );

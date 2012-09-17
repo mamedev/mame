@@ -28,26 +28,26 @@ int  TAITO8741_start(const struct TAITO8741interface *taito8741intf);
 void TAITO8741_reset(int num);
 
 /* write handler */
-WRITE8_HANDLER( TAITO8741_0_w );
-WRITE8_HANDLER( TAITO8741_1_w );
-WRITE8_HANDLER( TAITO8741_2_w );
-WRITE8_HANDLER( TAITO8741_3_w );
+DECLARE_WRITE8_HANDLER( TAITO8741_0_w );
+DECLARE_WRITE8_HANDLER( TAITO8741_1_w );
+DECLARE_WRITE8_HANDLER( TAITO8741_2_w );
+DECLARE_WRITE8_HANDLER( TAITO8741_3_w );
 /* read handler */
-READ8_HANDLER( TAITO8741_0_r );
-READ8_HANDLER( TAITO8741_1_r );
-READ8_HANDLER( TAITO8741_2_r );
-READ8_HANDLER( TAITO8741_3_r );
+DECLARE_READ8_HANDLER( TAITO8741_0_r );
+DECLARE_READ8_HANDLER( TAITO8741_1_r );
+DECLARE_READ8_HANDLER( TAITO8741_2_r );
+DECLARE_READ8_HANDLER( TAITO8741_3_r );
 
 /****************************************************************************
   joshi Volleyball set.
 ****************************************************************************/
 
 void josvolly_8741_reset(void);
-WRITE8_HANDLER( josvolly_8741_0_w );
-WRITE8_HANDLER( josvolly_8741_1_w );
-READ8_HANDLER( josvolly_8741_0_r );
-READ8_HANDLER( josvolly_8741_1_r );
-WRITE8_HANDLER( josvolly_nmi_enable_w );
+DECLARE_WRITE8_HANDLER( josvolly_8741_0_w );
+DECLARE_WRITE8_HANDLER( josvolly_8741_1_w );
+DECLARE_READ8_HANDLER( josvolly_8741_0_r );
+DECLARE_READ8_HANDLER( josvolly_8741_1_r );
+DECLARE_WRITE8_HANDLER( josvolly_nmi_enable_w );
 
 #endif
 

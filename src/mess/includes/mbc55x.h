@@ -203,8 +203,8 @@ extern const i8251_interface mbc55x_i8251b_interface;
 #define RAM_BANK_COUNT	15
 
 
-READ8_HANDLER(ppi8255_r);
-WRITE8_HANDLER(ppi8255_w);
+DECLARE_READ8_HANDLER(ppi8255_r);
+DECLARE_WRITE8_HANDLER(ppi8255_w);
 
 /* Floppy drive interface */
 
@@ -217,8 +217,8 @@ extern const wd17xx_interface mbc55x_wd17xx_interface;
 
 extern const mc6845_interface mb55x_mc6845_intf;
 
-READ16_HANDLER (mbc55x_video_io_r);
-WRITE16_HANDLER (mbc55x_video_io_w);
+DECLARE_READ16_HANDLER (mbc55x_video_io_r);
+DECLARE_WRITE16_HANDLER (mbc55x_video_io_w);
 
 
 SCREEN_VBLANK( mbc55x );

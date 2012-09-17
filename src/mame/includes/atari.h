@@ -535,8 +535,8 @@ extern ANTIC antic;
 
 void antic_reset(void);
 
- READ8_HANDLER ( atari_antic_r );
-WRITE8_HANDLER ( atari_antic_w );
+ DECLARE_READ8_HANDLER ( atari_antic_r );
+DECLARE_WRITE8_HANDLER ( atari_antic_w );
 
 #define ANTIC_RENDERER(name) void name(address_space &space, VIDEO *video)
 

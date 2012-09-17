@@ -63,18 +63,18 @@ public:
 
 /*----------- defined in machine/maniach.c -----------*/
 
-READ8_HANDLER( maniach_68705_port_a_r );
-WRITE8_HANDLER( maniach_68705_port_a_w );
-READ8_HANDLER( maniach_68705_port_b_r );
-WRITE8_HANDLER( maniach_68705_port_b_w );
-READ8_HANDLER( maniach_68705_port_c_r );
-WRITE8_HANDLER( maniach_68705_port_c_w );
-WRITE8_HANDLER( maniach_68705_ddr_a_w );
-WRITE8_HANDLER( maniach_68705_ddr_b_w );
-WRITE8_HANDLER( maniach_68705_ddr_c_w );
-WRITE8_HANDLER( maniach_mcu_w );
-READ8_HANDLER( maniach_mcu_r );
-READ8_HANDLER( maniach_mcu_status_r );
+DECLARE_READ8_HANDLER( maniach_68705_port_a_r );
+DECLARE_WRITE8_HANDLER( maniach_68705_port_a_w );
+DECLARE_READ8_HANDLER( maniach_68705_port_b_r );
+DECLARE_WRITE8_HANDLER( maniach_68705_port_b_w );
+DECLARE_READ8_HANDLER( maniach_68705_port_c_r );
+DECLARE_WRITE8_HANDLER( maniach_68705_port_c_w );
+DECLARE_WRITE8_HANDLER( maniach_68705_ddr_a_w );
+DECLARE_WRITE8_HANDLER( maniach_68705_ddr_b_w );
+DECLARE_WRITE8_HANDLER( maniach_68705_ddr_c_w );
+DECLARE_WRITE8_HANDLER( maniach_mcu_w );
+DECLARE_READ8_HANDLER( maniach_mcu_r );
+DECLARE_READ8_HANDLER( maniach_mcu_status_r );
 
 
 /*----------- defined in video/matmania.c -----------*/

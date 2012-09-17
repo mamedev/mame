@@ -35,10 +35,10 @@
 // things from mess/machine/dc.c
 void dreamcast_atapi_init(running_machine &machine);
 void dreamcast_atapi_reset(running_machine &machine);
-extern READ64_HANDLER( dc_mess_gdrom_r );
-extern WRITE64_HANDLER( dc_mess_gdrom_w );
-extern READ64_HANDLER( dc_mess_g1_ctrl_r );
-extern WRITE64_HANDLER( dc_mess_g1_ctrl_w );
+extern DECLARE_READ64_HANDLER( dc_mess_gdrom_r );
+extern DECLARE_WRITE64_HANDLER( dc_mess_gdrom_w );
+extern DECLARE_READ64_HANDLER( dc_mess_g1_ctrl_r );
+extern DECLARE_WRITE64_HANDLER( dc_mess_g1_ctrl_w );
 
 static READ64_HANDLER( dcus_idle_skip_r )
 {

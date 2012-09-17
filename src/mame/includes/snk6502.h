@@ -76,12 +76,12 @@ extern const sn76477_interface vanguard_sn76477_intf_1;
 extern const sn76477_interface vanguard_sn76477_intf_2;
 extern const sn76477_interface fantasy_sn76477_intf;
 
-extern WRITE8_HANDLER( sasuke_sound_w );
-extern WRITE8_HANDLER( satansat_sound_w );
-extern WRITE8_HANDLER( vanguard_sound_w );
-extern WRITE8_HANDLER( vanguard_speech_w );
-extern WRITE8_HANDLER( fantasy_sound_w );
-extern WRITE8_HANDLER( fantasy_speech_w );
+extern DECLARE_WRITE8_HANDLER( sasuke_sound_w );
+extern DECLARE_WRITE8_HANDLER( satansat_sound_w );
+extern DECLARE_WRITE8_HANDLER( vanguard_sound_w );
+extern DECLARE_WRITE8_HANDLER( vanguard_speech_w );
+extern DECLARE_WRITE8_HANDLER( fantasy_sound_w );
+extern DECLARE_WRITE8_HANDLER( fantasy_speech_w );
 
 class snk6502_sound_device : public device_t,
                                   public device_sound_interface

@@ -67,16 +67,16 @@ extern const pia6821_interface mo5nr_pia6821_game;
 
 /* cartridge bank-switching */
 extern DEVICE_IMAGE_LOAD( to7_cartridge );
-extern WRITE8_HANDLER ( to7_cartridge_w );
-extern READ8_HANDLER  ( to7_cartridge_r );
+extern DECLARE_WRITE8_HANDLER ( to7_cartridge_w );
+extern DECLARE_READ8_HANDLER  ( to7_cartridge_r );
 
 /* dispatch MODEM or speech synthesis extension */
-extern READ8_HANDLER ( to7_modem_mea8000_r );
-extern WRITE8_HANDLER ( to7_modem_mea8000_w );
+extern DECLARE_READ8_HANDLER ( to7_modem_mea8000_r );
+extern DECLARE_WRITE8_HANDLER ( to7_modem_mea8000_w );
 
 /* MIDI extension (actually an 6850 ACIA) */
-extern READ8_HANDLER  ( to7_midi_r );
-extern WRITE8_HANDLER ( to7_midi_w );
+extern DECLARE_READ8_HANDLER  ( to7_midi_r );
+extern DECLARE_WRITE8_HANDLER ( to7_midi_w );
 
 extern MACHINE_START ( to7 );
 extern MACHINE_RESET ( to7 );
@@ -98,8 +98,8 @@ extern const acia6850_interface to7_modem;
 /***************************** TO7/70 ******************************/
 
 /* gate-array */
-extern READ8_HANDLER  ( to770_gatearray_r );
-extern WRITE8_HANDLER ( to770_gatearray_w );
+extern DECLARE_READ8_HANDLER  ( to770_gatearray_r );
+extern DECLARE_WRITE8_HANDLER ( to770_gatearray_w );
 
 extern MACHINE_START ( to770 );
 extern MACHINE_RESET ( to770 );
@@ -109,14 +109,14 @@ extern const mc6846_interface to770_timer;
 /***************************** MO5 ******************************/
 
 /* gate-array */
-extern READ8_HANDLER  ( mo5_gatearray_r );
-extern WRITE8_HANDLER ( mo5_gatearray_w );
+extern DECLARE_READ8_HANDLER  ( mo5_gatearray_r );
+extern DECLARE_WRITE8_HANDLER ( mo5_gatearray_w );
 
 /* cartridge / extended RAM bank-switching */
 extern DEVICE_IMAGE_LOAD( mo5_cartridge );
-extern WRITE8_HANDLER ( mo5_ext_w );
-extern WRITE8_HANDLER ( mo5_cartridge_w );
-extern READ8_HANDLER  ( mo5_cartridge_r );
+extern DECLARE_WRITE8_HANDLER ( mo5_ext_w );
+extern DECLARE_WRITE8_HANDLER ( mo5_cartridge_w );
+extern DECLARE_READ8_HANDLER  ( mo5_cartridge_r );
 
 extern MACHINE_START ( mo5 );
 extern MACHINE_RESET ( mo5 );
@@ -125,24 +125,24 @@ extern MACHINE_RESET ( mo5 );
 /***************************** TO9 ******************************/
 
 /* IEEE extension */
-extern WRITE8_HANDLER ( to9_ieee_w );
-extern READ8_HANDLER  ( to9_ieee_r );
+extern DECLARE_WRITE8_HANDLER ( to9_ieee_w );
+extern DECLARE_READ8_HANDLER  ( to9_ieee_r );
 
 /* ROM bank-switching */
-extern WRITE8_HANDLER ( to9_cartridge_w );
-extern READ8_HANDLER  ( to9_cartridge_r );
+extern DECLARE_WRITE8_HANDLER ( to9_cartridge_w );
+extern DECLARE_READ8_HANDLER  ( to9_cartridge_r );
 
 /* system gate-array */
-extern READ8_HANDLER  ( to9_gatearray_r );
-extern WRITE8_HANDLER ( to9_gatearray_w );
+extern DECLARE_READ8_HANDLER  ( to9_gatearray_r );
+extern DECLARE_WRITE8_HANDLER ( to9_gatearray_w );
 
 /* video gate-array */
-extern READ8_HANDLER  ( to9_vreg_r );
-extern WRITE8_HANDLER ( to9_vreg_w );
+extern DECLARE_READ8_HANDLER  ( to9_vreg_r );
+extern DECLARE_WRITE8_HANDLER ( to9_vreg_w );
 
 /* keyboard */
-extern READ8_HANDLER  ( to9_kbd_r );
-extern WRITE8_HANDLER ( to9_kbd_w );
+extern DECLARE_READ8_HANDLER  ( to9_kbd_r );
+extern DECLARE_WRITE8_HANDLER ( to9_kbd_w );
 
 extern MACHINE_START ( to9 );
 extern MACHINE_RESET ( to9 );
@@ -162,20 +162,20 @@ extern const mc6846_interface to9_timer;
 extern UINT8 to8_data_vpage;
 extern UINT8 to8_cart_vpage;
 
-extern WRITE8_HANDLER ( to8_cartridge_w );
-extern READ8_HANDLER  ( to8_cartridge_r );
+extern DECLARE_WRITE8_HANDLER ( to8_cartridge_w );
+extern DECLARE_READ8_HANDLER  ( to8_cartridge_r );
 
 /* system gate-array */
-extern READ8_HANDLER  ( to8_gatearray_r );
-extern WRITE8_HANDLER ( to8_gatearray_w );
+extern DECLARE_READ8_HANDLER  ( to8_gatearray_r );
+extern DECLARE_WRITE8_HANDLER ( to8_gatearray_w );
 
 /* video gate-array */
-extern READ8_HANDLER  ( to8_vreg_r );
-extern WRITE8_HANDLER ( to8_vreg_w );
+extern DECLARE_READ8_HANDLER  ( to8_vreg_r );
+extern DECLARE_WRITE8_HANDLER ( to8_vreg_w );
 
 /* floppy */
-extern READ8_HANDLER  ( to8_floppy_r );
-extern WRITE8_HANDLER ( to8_floppy_w );
+extern DECLARE_READ8_HANDLER  ( to8_floppy_r );
+extern DECLARE_WRITE8_HANDLER ( to8_floppy_w );
 
 extern MACHINE_START ( to8 );
 extern MACHINE_RESET ( to8 );
@@ -193,17 +193,17 @@ extern const mc6846_interface to9p_timer;
 
 /***************************** MO6 ******************************/
 
-extern READ8_HANDLER  ( mo6_cartridge_r );
-extern WRITE8_HANDLER ( mo6_cartridge_w );
-extern WRITE8_HANDLER ( mo6_ext_w );
+extern DECLARE_READ8_HANDLER  ( mo6_cartridge_r );
+extern DECLARE_WRITE8_HANDLER ( mo6_cartridge_w );
+extern DECLARE_WRITE8_HANDLER ( mo6_ext_w );
 
 /* system gate-array */
-extern READ8_HANDLER  ( mo6_gatearray_r );
-extern WRITE8_HANDLER ( mo6_gatearray_w );
+extern DECLARE_READ8_HANDLER  ( mo6_gatearray_r );
+extern DECLARE_WRITE8_HANDLER ( mo6_gatearray_w );
 
 /* video gate-array */
-extern READ8_HANDLER  ( mo6_vreg_r );
-extern WRITE8_HANDLER ( mo6_vreg_w );
+extern DECLARE_READ8_HANDLER  ( mo6_vreg_r );
+extern DECLARE_WRITE8_HANDLER ( mo6_vreg_w );
 
 extern MACHINE_START ( mo6 );
 extern MACHINE_RESET ( mo6 );
@@ -212,12 +212,12 @@ extern MACHINE_RESET ( mo6 );
 /***************************** MO5 NR ******************************/
 
 /* network */
-extern READ8_HANDLER  ( mo5nr_net_r );
-extern WRITE8_HANDLER ( mo5nr_net_w );
+extern DECLARE_READ8_HANDLER  ( mo5nr_net_r );
+extern DECLARE_WRITE8_HANDLER ( mo5nr_net_w );
 
 /* printer */
-extern READ8_HANDLER  ( mo5nr_prn_r );
-extern WRITE8_HANDLER ( mo5nr_prn_w );
+extern DECLARE_READ8_HANDLER  ( mo5nr_prn_r );
+extern DECLARE_WRITE8_HANDLER ( mo5nr_prn_w );
 
 extern MACHINE_START ( mo5nr );
 extern MACHINE_RESET ( mo5nr );
@@ -343,26 +343,26 @@ extern void thom_floppy_active ( running_machine &machine, int write );
 
 /***************************** TO7 / T9000 *************************/
 
-extern WRITE8_HANDLER ( to7_vram_w );
+extern DECLARE_WRITE8_HANDLER ( to7_vram_w );
 
 
 /***************************** TO7/70 ******************************/
 
-extern WRITE8_HANDLER ( to770_vram_w );
+extern DECLARE_WRITE8_HANDLER ( to770_vram_w );
 
 
 /***************************** TO8 ******************************/
 
 /* write to video memory through system space (always page 1) */
-WRITE8_HANDLER ( to8_sys_lo_w );
-WRITE8_HANDLER ( to8_sys_hi_w );
+DECLARE_WRITE8_HANDLER ( to8_sys_lo_w );
+DECLARE_WRITE8_HANDLER ( to8_sys_hi_w );
 
 /* write to video memory through data space */
-WRITE8_HANDLER ( to8_data_lo_w );
-WRITE8_HANDLER ( to8_data_hi_w );
+DECLARE_WRITE8_HANDLER ( to8_data_lo_w );
+DECLARE_WRITE8_HANDLER ( to8_data_hi_w );
 
 /* write to video memory page through cartridge addresses space */
-WRITE8_HANDLER ( to8_vcart_w );
+DECLARE_WRITE8_HANDLER ( to8_vcart_w );
 
 
 

@@ -41,12 +41,12 @@
 
 
 
-READ16_HANDLER( m68340_internal_sim_r );
-WRITE16_HANDLER( m68340_internal_sim_w );
-READ32_HANDLER( m68340_internal_sim_cs_r );
-WRITE32_HANDLER( m68340_internal_sim_cs_w );
-READ8_HANDLER( m68340_internal_sim_ports_r );
-WRITE8_HANDLER( m68340_internal_sim_ports_w );
+DECLARE_READ16_HANDLER( m68340_internal_sim_r );
+DECLARE_WRITE16_HANDLER( m68340_internal_sim_w );
+DECLARE_READ32_HANDLER( m68340_internal_sim_cs_r );
+DECLARE_WRITE32_HANDLER( m68340_internal_sim_cs_w );
+DECLARE_READ8_HANDLER( m68340_internal_sim_ports_r );
+DECLARE_WRITE8_HANDLER( m68340_internal_sim_ports_w );
 
 
 

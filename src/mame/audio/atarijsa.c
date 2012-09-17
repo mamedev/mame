@@ -73,12 +73,12 @@ static UINT8 ym2151_ct2;
 
 static void update_all_volumes(running_machine &machine);
 
-static READ8_HANDLER( jsa1_io_r );
-static WRITE8_HANDLER( jsa1_io_w );
-static READ8_HANDLER( jsa2_io_r );
-static WRITE8_HANDLER( jsa2_io_w );
-static READ8_HANDLER( jsa3_io_r );
-static WRITE8_HANDLER( jsa3_io_w );
+static DECLARE_READ8_HANDLER( jsa1_io_r );
+static DECLARE_WRITE8_HANDLER( jsa1_io_w );
+static DECLARE_READ8_HANDLER( jsa2_io_r );
+static DECLARE_WRITE8_HANDLER( jsa2_io_w );
+static DECLARE_READ8_HANDLER( jsa3_io_r );
+static DECLARE_WRITE8_HANDLER( jsa3_io_w );
 
 
 /*************************************

@@ -35,7 +35,7 @@ public:
 
 /*----------- defined in video/badlands.c -----------*/
 
-WRITE16_HANDLER( badlands_pf_bank_w );
+DECLARE_WRITE16_HANDLER( badlands_pf_bank_w );
 
 
 SCREEN_UPDATE_IND16( badlands );

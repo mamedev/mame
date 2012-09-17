@@ -47,16 +47,16 @@ void archimedes_clear_irq_a(running_machine &machine, int mask);
 void archimedes_clear_irq_b(running_machine &machine, int mask);
 void archimedes_clear_fiq(running_machine &machine, int mask);
 
-extern READ32_HANDLER(aristmk5_drame_memc_logical_r);
-extern READ32_HANDLER(archimedes_memc_logical_r);
-extern WRITE32_HANDLER(archimedes_memc_logical_w);
-extern READ32_HANDLER(archimedes_memc_r);
-extern WRITE32_HANDLER(archimedes_memc_w);
-extern WRITE32_HANDLER(archimedes_memc_page_w);
-extern READ32_HANDLER(archimedes_ioc_r);
-extern WRITE32_HANDLER(archimedes_ioc_w);
-extern READ32_HANDLER(archimedes_vidc_r);
-extern WRITE32_HANDLER(archimedes_vidc_w);
+extern DECLARE_READ32_HANDLER(aristmk5_drame_memc_logical_r);
+extern DECLARE_READ32_HANDLER(archimedes_memc_logical_r);
+extern DECLARE_WRITE32_HANDLER(archimedes_memc_logical_w);
+extern DECLARE_READ32_HANDLER(archimedes_memc_r);
+extern DECLARE_WRITE32_HANDLER(archimedes_memc_w);
+extern DECLARE_WRITE32_HANDLER(archimedes_memc_page_w);
+extern DECLARE_READ32_HANDLER(archimedes_ioc_r);
+extern DECLARE_WRITE32_HANDLER(archimedes_ioc_w);
+extern DECLARE_READ32_HANDLER(archimedes_vidc_r);
+extern DECLARE_WRITE32_HANDLER(archimedes_vidc_w);
 
 extern UINT8 i2c_clk;
 extern INT16 memc_pages[0x2000];	// the logical RAM area is 32 megs, and the smallest page size is 4k

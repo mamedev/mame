@@ -126,10 +126,10 @@ INLINE tms7000_state *get_safe_token(device_t *device)
 #define SETZ		pSR |= SR_Z
 #define SETN		pSR |= SR_N
 
-static READ8_HANDLER( tms7000_internal_r );
-static WRITE8_HANDLER( tms7000_internal_w );
-static READ8_HANDLER( tms70x0_pf_r );
-static WRITE8_HANDLER( tms70x0_pf_w );
+static DECLARE_READ8_HANDLER( tms7000_internal_r );
+static DECLARE_WRITE8_HANDLER( tms7000_internal_w );
+static DECLARE_READ8_HANDLER( tms70x0_pf_r );
+static DECLARE_WRITE8_HANDLER( tms70x0_pf_w );
 
 static ADDRESS_MAP_START(tms7000_mem, AS_PROGRAM, 8, legacy_cpu_device )
 	AM_RANGE(0x0000, 0x007f)	AM_READWRITE_LEGACY(tms7000_internal_r, tms7000_internal_w)	/* tms7000 internal RAM */

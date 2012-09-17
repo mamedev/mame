@@ -320,8 +320,8 @@ void sh4_common_init(device_t *device);
 UINT32 sh4_getsqremap(sh4_state *sh4, UINT32 address);
 void sh4_handler_ipra_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask);
 
-READ64_HANDLER( sh4_tlb_r );
-WRITE64_HANDLER( sh4_tlb_w );
+DECLARE_READ64_HANDLER( sh4_tlb_r );
+DECLARE_WRITE64_HANDLER( sh4_tlb_w );
 
 
 INLINE void sh4_check_pending_irq(sh4_state *sh4, const char *message) // look for highest priority active exception and handle it

@@ -273,11 +273,11 @@ public:
 
 
 
-static READ16_HANDLER( characteriser16_r );
-static WRITE16_HANDLER( characteriser16_w );
+static DECLARE_READ16_HANDLER( characteriser16_r );
+static DECLARE_WRITE16_HANDLER( characteriser16_w );
 
-static READ16_HANDLER( bwb_characteriser16_r );
-static WRITE16_HANDLER( bwb_characteriser16_w );
+static DECLARE_READ16_HANDLER( bwb_characteriser16_r );
+static DECLARE_WRITE16_HANDLER( bwb_characteriser16_w );
 
 /*************************************
  *

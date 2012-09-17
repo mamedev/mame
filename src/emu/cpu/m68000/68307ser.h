@@ -18,8 +18,8 @@
 #define m68307SER_UOP0       (0x1f)
 
 
-READ8_HANDLER( m68307_internal_serial_r );
-WRITE8_HANDLER( m68307_internal_serial_w );
+DECLARE_READ8_HANDLER( m68307_internal_serial_r );
+DECLARE_WRITE8_HANDLER( m68307_internal_serial_w );
 
 class m68307_serial
 {

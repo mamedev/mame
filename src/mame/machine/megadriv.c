@@ -95,13 +95,13 @@ static WRITE8_HANDLER(megadriv_z80_z80_bank_w)
 }
 
 
-static READ16_HANDLER( megadriv_68k_check_z80_bus );
-static WRITE16_HANDLER(megadriv_68k_req_z80_bus);
+static DECLARE_READ16_HANDLER( megadriv_68k_check_z80_bus );
+static DECLARE_WRITE16_HANDLER(megadriv_68k_req_z80_bus);
 
-static READ16_HANDLER( megadriv_68k_read_z80_ram );
-static WRITE16_HANDLER( megadriv_68k_write_z80_ram );
+static DECLARE_READ16_HANDLER( megadriv_68k_read_z80_ram );
+static DECLARE_WRITE16_HANDLER( megadriv_68k_write_z80_ram );
 
-static WRITE16_HANDLER( megadriv_68k_req_z80_reset );
+static DECLARE_WRITE16_HANDLER( megadriv_68k_req_z80_reset );
 
 
 

@@ -141,7 +141,7 @@ SCREEN_UPDATE_IND16( profpac );
 
 extern const char *const wow_sample_names[];
 
-READ8_HANDLER( wow_speech_r );
+DECLARE_READ8_HANDLER( wow_speech_r );
 CUSTOM_INPUT( wow_speech_status_r );
 
 
@@ -149,5 +149,5 @@ CUSTOM_INPUT( wow_speech_status_r );
 
 extern const char *const gorf_sample_names[];
 
-READ8_HANDLER( gorf_speech_r );
+DECLARE_READ8_HANDLER( gorf_speech_r );
 CUSTOM_INPUT( gorf_speech_status_r );

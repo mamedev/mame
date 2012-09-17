@@ -335,10 +335,10 @@ INTERRUPT_GEN( ygv608_timed_interrupt );
 VIDEO_START( ygv608 );
 SCREEN_UPDATE_IND16( ygv608 );
 
-READ16_HANDLER( ygv608_r );
-WRITE16_HANDLER( ygv608_w );
+DECLARE_READ16_HANDLER( ygv608_r );
+DECLARE_WRITE16_HANDLER( ygv608_w );
 
 // to be removed
-READ16_HANDLER( ygv608_debug_trigger );
+DECLARE_READ16_HANDLER( ygv608_debug_trigger );
 
 #endif

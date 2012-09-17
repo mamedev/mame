@@ -53,11 +53,11 @@ public:
 
 /*----------- defined in machine/bonzeadv.c -----------*/
 
-READ16_HANDLER( bonzeadv_cchip_ctrl_r );
-READ16_HANDLER( bonzeadv_cchip_ram_r );
-WRITE16_HANDLER( bonzeadv_cchip_ctrl_w );
-WRITE16_HANDLER( bonzeadv_cchip_bank_w );
-WRITE16_HANDLER( bonzeadv_cchip_ram_w );
+DECLARE_READ16_HANDLER( bonzeadv_cchip_ctrl_r );
+DECLARE_READ16_HANDLER( bonzeadv_cchip_ram_r );
+DECLARE_WRITE16_HANDLER( bonzeadv_cchip_ctrl_w );
+DECLARE_WRITE16_HANDLER( bonzeadv_cchip_bank_w );
+DECLARE_WRITE16_HANDLER( bonzeadv_cchip_ram_w );
 
 
 /*----------- defined in video/asuka.c -----------*/

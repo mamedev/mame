@@ -84,8 +84,8 @@ UINT32 sst39vfx_get_size( device_t *device );
 
 // read/write handler
 #if 0
-READ8_HANDLER( sst39vfx_r );
-WRITE8_HANDLER( sst39vfx_w );
+DECLARE_READ8_HANDLER( sst39vfx_r );
+DECLARE_WRITE8_HANDLER( sst39vfx_w );
 #endif
 
 // load/save

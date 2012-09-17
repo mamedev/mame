@@ -4984,7 +4984,7 @@ UINT16 handler_entry_read::read_stub_16(address_space &space, offs_t offset, UIN
 			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
 			UINT8 val;
 			if (m_sub_is_legacy[index])
-				val = m_sublegacy_info[index].handler.space8(*m_sublegacy_info[index].object.space, aoffset);
+				val = m_sublegacy_info[index].handler.space8(*m_sublegacy_info[index].object.space, aoffset, submask);
 			else
 				val = m_subread[index].r8(space, aoffset, submask);
 			result |= val << si.m_shift;
@@ -5015,7 +5015,7 @@ UINT32 handler_entry_read::read_stub_32(address_space &space, offs_t offset, UIN
 				switch (si.m_size)
 				{
 				case 8:
-					val = m_sublegacy_info[index].handler.space8(*m_sublegacy_info[index].object.space, aoffset);
+					val = m_sublegacy_info[index].handler.space8(*m_sublegacy_info[index].object.space, aoffset, submask);
 					break;
 				case 16:
 					val = m_sublegacy_info[index].handler.space16(*m_sublegacy_info[index].object.space, aoffset, submask);
@@ -5062,7 +5062,7 @@ UINT64 handler_entry_read::read_stub_64(address_space &space, offs_t offset, UIN
 				switch (si.m_size)
 				{
 				case 8:
-					val = m_sublegacy_info[index].handler.space8(*m_sublegacy_info[index].object.space, aoffset);
+					val = m_sublegacy_info[index].handler.space8(*m_sublegacy_info[index].object.space, aoffset, submask);
 					break;
 				case 16:
 					val = m_sublegacy_info[index].handler.space16(*m_sublegacy_info[index].object.space, aoffset, submask);
@@ -5101,7 +5101,7 @@ UINT64 handler_entry_read::read_stub_64(address_space &space, offs_t offset, UIN
 
 UINT8 handler_entry_read::read_stub_legacy(address_space &space, offs_t offset, UINT8 mask)
 {
-	return m_legacy_info.handler.space8(*m_legacy_info.object.space, offset);
+	return m_legacy_info.handler.space8(*m_legacy_info.object.space, offset, mask);
 }
 
 UINT16 handler_entry_read::read_stub_legacy(address_space &space, offs_t offset, UINT16 mask)
@@ -5438,7 +5438,7 @@ void handler_entry_write::write_stub_16(address_space &space, offs_t offset, UIN
 			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
 			UINT8 adata = data >> si.m_shift;
 			if (m_sub_is_legacy[index])
-				m_sublegacy_info[index].handler.space8(*m_sublegacy_info[index].object.space, aoffset, adata);
+				m_sublegacy_info[index].handler.space8(*m_sublegacy_info[index].object.space, aoffset, adata, submask);
 			else
 				m_subwrite[index].w8(space, aoffset, adata, submask);
 		}
@@ -5466,7 +5466,7 @@ void handler_entry_write::write_stub_32(address_space &space, offs_t offset, UIN
 				switch (si.m_size)
 				{
 				case 8:
-					m_sublegacy_info[index].handler.space8(*m_sublegacy_info[index].object.space, aoffset, adata);
+					m_sublegacy_info[index].handler.space8(*m_sublegacy_info[index].object.space, aoffset, adata, submask);
 					break;
 				case 16:
 					m_sublegacy_info[index].handler.space16(*m_sublegacy_info[index].object.space, aoffset, adata, submask);
@@ -5510,7 +5510,7 @@ void handler_entry_write::write_stub_64(address_space &space, offs_t offset, UIN
 				switch (si.m_size)
 				{
 				case 8:
-					m_sublegacy_info[index].handler.space8(*m_sublegacy_info[index].object.space, aoffset, adata);
+					m_sublegacy_info[index].handler.space8(*m_sublegacy_info[index].object.space, aoffset, adata, submask);
 					break;
 				case 16:
 					m_sublegacy_info[index].handler.space16(*m_sublegacy_info[index].object.space, aoffset, adata, submask);
@@ -5547,7 +5547,7 @@ void handler_entry_write::write_stub_64(address_space &space, offs_t offset, UIN
 
 void handler_entry_write::write_stub_legacy(address_space &space, offs_t offset, UINT8 data, UINT8 mask)
 {
-	m_legacy_info.handler.space8(*m_legacy_info.object.space, offset, data);
+	m_legacy_info.handler.space8(*m_legacy_info.object.space, offset, data, mask);
 }
 
 void handler_entry_write::write_stub_legacy(address_space &space, offs_t offset, UINT16 data, UINT16 mask)

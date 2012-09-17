@@ -167,11 +167,11 @@ void jumpshot_decode(running_machine &machine);
 
 
 
-READ8_HANDLER( theglobp_decrypt_rom );
+DECLARE_READ8_HANDLER( theglobp_decrypt_rom );
 
 
 /*----------- defined in machine/acitya.c -------------*/
 
 
 
-READ8_HANDLER( acitya_decrypt_rom );
+DECLARE_READ8_HANDLER( acitya_decrypt_rom );

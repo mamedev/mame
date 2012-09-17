@@ -1,7 +1,7 @@
 /* 68307 SIM module */
 
-READ16_HANDLER( m68307_internal_sim_r );
-WRITE16_HANDLER( m68307_internal_sim_w );
+DECLARE_READ16_HANDLER( m68307_internal_sim_r );
+DECLARE_WRITE16_HANDLER( m68307_internal_sim_w );
 
 /* ports */
 #define m68307SIM_PACNT (0x10)

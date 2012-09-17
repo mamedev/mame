@@ -185,8 +185,8 @@ struct mcd212_ab_t
 };
 
 // Member functions
-READ16_HANDLER( mcd212_r );
-WRITE16_HANDLER( mcd212_w );
+DECLARE_READ16_HANDLER( mcd212_r );
+DECLARE_WRITE16_HANDLER( mcd212_w );
 TIMER_CALLBACK( mcd212_perform_scan );
 VIDEO_START( cdimono1 );
 SCREEN_UPDATE_RGB32( cdimono1 );

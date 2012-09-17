@@ -235,7 +235,7 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 	return 0x0000;
 }
 
-static WRITE8_HANDLER( bfm_sc4_reel4_w );
+static DECLARE_WRITE8_HANDLER( bfm_sc4_reel4_w );
 
 WRITE8_MEMBER(sc4_state::mux_output_w)
 {
@@ -561,7 +561,7 @@ void bfm_sc4_68307_portb_w(address_space &space, bool dedicated, UINT16 data, UI
 
 		bfm_sc4_write_serial_vfd(space.machine(), (data & 0x4000)?1:0, (data & 0x1000)?1:0, !(data & 0x2000)?1:0);
 
-		bfm_sc4_reel3_w(space, 0, (data&0x0f00)>>8);
+		bfm_sc4_reel3_w(space, 0, (data&0x0f00)>>8, 0xff);
 	}
 
 }

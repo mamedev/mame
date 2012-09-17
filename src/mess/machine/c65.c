@@ -217,6 +217,7 @@ const mos6526_interface c65_cia1 =
 /* processor has only 1 mega address space !? */
 /* and system 8 megabyte */
 /* dma controller and bankswitch hardware ?*/
+static DECLARE_READ8_HANDLER( c65_read_mem );
 static READ8_HANDLER( c65_read_mem )
 {
 	c65_state *state = space.machine().driver_data<c65_state>();
@@ -228,6 +229,7 @@ static READ8_HANDLER( c65_read_mem )
 	return result;
 }
 
+static DECLARE_WRITE8_HANDLER( c65_write_mem );
 static WRITE8_HANDLER( c65_write_mem )
 {
 	c65_state *state = space.machine().driver_data<c65_state>();
@@ -659,7 +661,7 @@ static WRITE8_HANDLER( c65_write_io )
 			c65_fdc_w(space.machine(), offset&0x1f,data);
 		else
 		{
-			c65_ram_expansion_w(space, offset&0x1f, data);
+			c65_ram_expansion_w(space, offset&0x1f, data, mem_mask);
 			/*ram expansion crtl optional */
 		}
 		break;
@@ -723,7 +725,7 @@ static READ8_HANDLER( c65_read_io )
 			return c65_fdc_r(space.machine(), offset&0x1f);
 		else
 		{
-			return c65_ram_expansion_r(space, offset&0x1f);
+			return c65_ram_expansion_r(space, offset&0x1f, mem_mask);
 			/*return; ram expansion crtl optional */
 		}
 		break;

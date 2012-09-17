@@ -1372,10 +1372,10 @@ static WRITE16_HANDLER( scd_a12002_memory_mode_w )
 	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 
 	if (ACCESSING_BITS_8_15)
-		scd_a12002_memory_mode_w_8_15(space, 0, data>>8);
+		scd_a12002_memory_mode_w_8_15(space, 0, data>>8, mem_mask>>8);
 
 	if (ACCESSING_BITS_0_7)
-		scd_a12002_memory_mode_w_0_7(space, 0, data&0xff);
+		scd_a12002_memory_mode_w_0_7(space, 0, data&0xff, mem_mask&0xff);
 }
 
 
@@ -1468,10 +1468,10 @@ static WRITE16_HANDLER( segacd_sub_memory_mode_w )
 	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
 
 	if (ACCESSING_BITS_8_15)
-		segacd_sub_memory_mode_w_8_15(space, 0, data>>8);
+		segacd_sub_memory_mode_w_8_15(space, 0, data>>8, mem_mask>>8);
 
 	if (ACCESSING_BITS_0_7)
-		segacd_sub_memory_mode_w_0_7(space, 0, data&0xff);
+		segacd_sub_memory_mode_w_0_7(space, 0, data&0xff, mem_mask&0xff);
 }
 
 
@@ -2305,13 +2305,13 @@ READ16_HANDLER( segacd_stopwatch_timer_r )
 void segacd_init_main_cpu( running_machine& machine )
 {
 	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
-
+	
 	segacd_font_bits = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:segacd_font")->ptr());
 	segacd_backupram = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:backupram")->ptr());
 	segacd_dataram = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:dataram")->ptr());
 	segacd_dataram2 = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:dataram2")->ptr());
 	segacd_4meg_prgram = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:segacd_program")->ptr());
-
+	
 	segacd_4meg_prgbank = 0;
 
 

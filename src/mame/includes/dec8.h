@@ -144,7 +144,7 @@ SCREEN_UPDATE_IND16( oscar );
 
 
 
-WRITE8_HANDLER( dec8_bac06_0_w );
-WRITE8_HANDLER( dec8_bac06_1_w );
-WRITE8_HANDLER( dec8_pf1_data_w );
-READ8_HANDLER( dec8_pf1_data_r );
+DECLARE_WRITE8_HANDLER( dec8_bac06_0_w );
+DECLARE_WRITE8_HANDLER( dec8_bac06_1_w );
+DECLARE_WRITE8_HANDLER( dec8_pf1_data_w );
+DECLARE_READ8_HANDLER( dec8_pf1_data_r );

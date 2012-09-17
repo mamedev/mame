@@ -1824,19 +1824,19 @@ READ8_HANDLER ( to7_floppy_r )
 	{
 
 	case 1:
-		return to7_5p14sd_r( space, offset );
+		return to7_5p14sd_r( space, offset, mem_mask );
 
 	case 2:
-		return to7_5p14_r( space, offset );
+		return to7_5p14_r( space, offset, mem_mask );
 
 	case 3:
 		return thmfc_floppy_r( space, offset );
 
 	case 4:
-		return to7_qdd_r( space, offset );
+		return to7_qdd_r( space, offset, mem_mask );
 
 	case 5:
-		return to7_network_r( space, offset );
+		return to7_network_r( space, offset, mem_mask );
 	}
 
 	return 0;
@@ -1850,11 +1850,11 @@ WRITE8_HANDLER ( to7_floppy_w )
 	{
 
 	case 1:
-		to7_5p14sd_w( space, offset, data );
+		to7_5p14sd_w( space, offset, data, mem_mask );
 		return;
 
 	case 2:
-		to7_5p14_w( space, offset, data );
+		to7_5p14_w( space, offset, data, mem_mask );
 		break;
 
 	case 3:
@@ -1869,11 +1869,11 @@ WRITE8_HANDLER ( to7_floppy_w )
 		break;
 
 	case 4:
-		to7_qdd_w( space, offset, data );
+		to7_qdd_w( space, offset, data, mem_mask );
 		break;
 
 	case 5:
-		to7_network_w( space, offset, data );
+		to7_network_w( space, offset, data, mem_mask );
 		break;
 	}
 }
@@ -1918,7 +1918,7 @@ READ8_HANDLER ( to9_floppy_r )
 	if ( THOM_FLOPPY_EXT )
 		return to7_floppy_r( space, offset );
 	else
-		return  to7_5p14_r( space, offset );
+		return  to7_5p14_r( space, offset, mem_mask );
 }
 
 WRITE8_HANDLER ( to9_floppy_w )
@@ -1926,7 +1926,7 @@ WRITE8_HANDLER ( to9_floppy_w )
 	if ( THOM_FLOPPY_EXT )
 		to7_floppy_w( space, offset, data );
 	else
-		to7_5p14_w( space, offset, data );
+		to7_5p14_w( space, offset, data, mem_mask );
 }
 
 WRITE_LINE_DEVICE_HANDLER(thomson_index_callback)

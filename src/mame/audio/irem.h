@@ -1,4 +1,4 @@
-WRITE8_HANDLER( irem_sound_cmd_w );
+DECLARE_WRITE8_HANDLER( irem_sound_cmd_w );
 
 MACHINE_CONFIG_EXTERN( m52_sound_c_audio );
 MACHINE_CONFIG_EXTERN( m52_large_audio );

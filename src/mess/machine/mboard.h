@@ -52,17 +52,17 @@ struct MOUSE_HOLD {
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-READ8_HANDLER( mboard_read_board_8 );
-WRITE8_HANDLER( mboard_write_board_8 );
-WRITE8_HANDLER( mboard_write_LED_8 );
+DECLARE_READ8_HANDLER( mboard_read_board_8 );
+DECLARE_WRITE8_HANDLER( mboard_write_board_8 );
+DECLARE_WRITE8_HANDLER( mboard_write_LED_8 );
 
-READ16_HANDLER( mboard_read_board_16 );
-WRITE16_HANDLER( mboard_write_board_16 );
-WRITE16_HANDLER( mboard_write_LED_16 );
+DECLARE_READ16_HANDLER( mboard_read_board_16 );
+DECLARE_WRITE16_HANDLER( mboard_write_board_16 );
+DECLARE_WRITE16_HANDLER( mboard_write_LED_16 );
 
-READ32_HANDLER( mboard_read_board_32 );
-WRITE32_HANDLER( mboard_write_board_32 );
-WRITE32_HANDLER( mboard_write_LED_32 );
+DECLARE_READ32_HANDLER( mboard_read_board_32 );
+DECLARE_WRITE32_HANDLER( mboard_write_board_32 );
+DECLARE_WRITE32_HANDLER( mboard_write_LED_32 );
 
 TIMER_DEVICE_CALLBACK( mboard_update_artwork );
 

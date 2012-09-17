@@ -814,7 +814,7 @@ static struct {
 // but now cga and mda are splitted in mess
 WRITE8_HANDLER( pc200_cga_w )
 {
-	pc_aga_cga_w(space, offset,data);
+	pc_aga_cga_w(space, offset,data,mem_mask);
 	switch(offset) {
 	case 4:
 		pc200.portd |= 0x20;
@@ -872,7 +872,7 @@ READ8_HANDLER ( pc200_cga_r )
 		break;
 
 	default:
-		result = pc_aga_cga_r(space, offset);
+		result = pc_aga_cga_r(space, offset, mem_mask);
 		break;
 	}
 	return result;

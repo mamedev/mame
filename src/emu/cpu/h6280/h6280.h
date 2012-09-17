@@ -75,11 +75,11 @@ struct h6280_Regs
 
 DECLARE_LEGACY_CPU_DEVICE(H6280, h6280);
 
-READ8_HANDLER( h6280_irq_status_r );
-WRITE8_HANDLER( h6280_irq_status_w );
+DECLARE_READ8_HANDLER( h6280_irq_status_r );
+DECLARE_WRITE8_HANDLER( h6280_irq_status_w );
 
-READ8_HANDLER( h6280_timer_r );
-WRITE8_HANDLER( h6280_timer_w );
+DECLARE_READ8_HANDLER( h6280_timer_r );
+DECLARE_WRITE8_HANDLER( h6280_timer_w );
 
 /* functions for use by the PSG and joypad port only! */
 UINT8 h6280io_get_buffer(device_t*);

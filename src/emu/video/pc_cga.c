@@ -168,8 +168,8 @@ INPUT_PORTS_END
 #define CGA_CHIPSET_PARADISE    0x80    /* Paradise (used in PC1640) */
 
 
-static READ8_HANDLER( pc_cga8_r );
-static WRITE8_HANDLER( pc_cga8_w );
+static DECLARE_READ8_HANDLER( pc_cga8_r );
+static DECLARE_WRITE8_HANDLER( pc_cga8_w );
 static MC6845_UPDATE_ROW( cga_update_row );
 static WRITE_LINE_DEVICE_HANDLER( cga_hsync_changed );
 static WRITE_LINE_DEVICE_HANDLER( cga_vsync_changed );

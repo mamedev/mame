@@ -36,8 +36,8 @@ void segaic16_tilemap_set_flip(running_machine &machine, int which, int flip);
 void segaic16_tilemap_set_rowscroll(running_machine &machine, int which, int enable);
 void segaic16_tilemap_set_colscroll(running_machine &machine, int which, int enable);
 
-WRITE16_HANDLER( segaic16_tileram_0_w );
-WRITE16_HANDLER( segaic16_textram_0_w );
+DECLARE_WRITE16_HANDLER( segaic16_tileram_0_w );
+DECLARE_WRITE16_HANDLER( segaic16_textram_0_w );
 
 /* road systems */
 #define SEGAIC16_MAX_ROADS			1
@@ -52,8 +52,8 @@ WRITE16_HANDLER( segaic16_textram_0_w );
 
 void segaic16_road_init(running_machine &machine, int which, int type, int colorbase1, int colorbase2, int colorbase3, int xoffs);
 void segaic16_road_draw(int which, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
-READ16_HANDLER( segaic16_road_control_0_r );
-WRITE16_HANDLER( segaic16_road_control_0_w );
+DECLARE_READ16_HANDLER( segaic16_road_control_0_r );
+DECLARE_WRITE16_HANDLER( segaic16_road_control_0_w );
 
 /* rotation systems */
 #define SEGAIC16_MAX_ROTATE			1
@@ -62,7 +62,7 @@ WRITE16_HANDLER( segaic16_road_control_0_w );
 
 void segaic16_rotate_init(running_machine &machine, int which, int type, int colorbase);
 void segaic16_rotate_draw(running_machine &machine, int which, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind16 &srcbitmap);
-READ16_HANDLER( segaic16_rotate_control_0_r );
+DECLARE_READ16_HANDLER( segaic16_rotate_control_0_r );
 
 /*************************************
  *

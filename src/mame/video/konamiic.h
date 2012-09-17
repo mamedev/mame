@@ -5,8 +5,8 @@
 
 void K055673_vh_start(running_machine &machine, const char *gfx_memory_region, int alt_layout, int dx, int dy,
 		void (*callback)(running_machine &machine, int *code,int *color,int *priority));
-READ16_HANDLER( K055673_rom_word_r );
-READ16_HANDLER( K055673_GX6bpp_rom_word_r );
+DECLARE_READ16_HANDLER( K055673_rom_word_r );
+DECLARE_READ16_HANDLER( K055673_GX6bpp_rom_word_r );
 
 /*
 Callback procedures for non-standard shadows:
@@ -18,19 +18,19 @@ Callback procedures for non-standard shadows:
 #define K053247_CUSTOMSHADOW	0x20000000
 #define K053247_SHDSHIFT		20
 
-READ16_HANDLER( K053247_word_r );
-WRITE16_HANDLER( K053247_word_w );
-READ32_HANDLER( K053247_long_r );
-WRITE32_HANDLER( K053247_long_w );
-WRITE16_HANDLER( K053247_reg_word_w ); // "OBJSET2" registers
-WRITE32_HANDLER( K053247_reg_long_w );
+DECLARE_READ16_HANDLER( K053247_word_r );
+DECLARE_WRITE16_HANDLER( K053247_word_w );
+DECLARE_READ32_HANDLER( K053247_long_r );
+DECLARE_WRITE32_HANDLER( K053247_long_w );
+DECLARE_WRITE16_HANDLER( K053247_reg_word_w ); // "OBJSET2" registers
+DECLARE_WRITE32_HANDLER( K053247_reg_long_w );
 
 int K053247_read_register(int regnum);
 void K053247_set_SpriteOffset(int offsx, int offsy);
 void K053247_export_config(UINT16 **ram, gfx_element **gfx, void (**callback)(running_machine &, int *, int *, int *), int *dx, int *dy);
 
-WRITE16_HANDLER( K053246_word_w );
-WRITE32_HANDLER( K053246_long_w );
+DECLARE_WRITE16_HANDLER( K053246_word_w );
+DECLARE_WRITE32_HANDLER( K053246_long_w );
 void K053246_set_OBJCHA_line(int state);
 int K053246_is_IRQ_enabled(void);
 int K053246_read_register(int regnum);
@@ -47,9 +47,9 @@ void K053936_set_offset(int chip, int xoffs, int yoffs);
   when some palette index changes. If ALL_TILEMAPS is too expensive, use
   K053251_set_tilemaps() to indicate which tilemap is associated with each index.
  */
-WRITE8_HANDLER( K053251_w );
-WRITE16_HANDLER( K053251_lsb_w );
-WRITE16_HANDLER( K053251_msb_w );
+DECLARE_WRITE8_HANDLER( K053251_w );
+DECLARE_WRITE16_HANDLER( K053251_lsb_w );
+DECLARE_WRITE16_HANDLER( K053251_msb_w );
 enum { K053251_CI0=0,K053251_CI1,K053251_CI2,K053251_CI3,K053251_CI4 };
 int K053251_get_priority(int ci);
 int K053251_get_palette_index(int ci);
@@ -57,8 +57,8 @@ void K053251_set_tilemaps(tilemap_t *ci0,tilemap_t *ci1,tilemap_t *ci2,tilemap_t
 void K053251_vh_start(running_machine &machine);
 
 
-WRITE16_HANDLER( K054000_lsb_w );
-READ16_HANDLER( K054000_lsb_r );
+DECLARE_WRITE16_HANDLER( K054000_lsb_w );
+DECLARE_READ16_HANDLER( K054000_lsb_r );
 
 
 #define K056382_DRAW_FLAG_FORCE_XYSCROLL		0x00800000
@@ -67,13 +67,13 @@ void K056832_vh_start(running_machine &machine, const char *gfx_memory_region, i
 			int (*scrolld)[4][2],
 			void (*callback)(running_machine &machine, int layer, int *code, int *color, int *flags),
 			int djmain_hack);
-READ16_HANDLER( K056832_ram_word_r );
-WRITE16_HANDLER( K056832_ram_word_w );
-READ32_HANDLER( K056832_5bpp_rom_long_r );
-READ32_HANDLER( K056832_6bpp_rom_long_r );
-READ16_HANDLER( K056832_mw_rom_word_r );
-WRITE16_HANDLER( K056832_word_w ); // "VRAM" registers
-WRITE16_HANDLER( K056832_b_word_w );
+DECLARE_READ16_HANDLER( K056832_ram_word_r );
+DECLARE_WRITE16_HANDLER( K056832_ram_word_w );
+DECLARE_READ32_HANDLER( K056832_5bpp_rom_long_r );
+DECLARE_READ32_HANDLER( K056832_6bpp_rom_long_r );
+DECLARE_READ16_HANDLER( K056832_mw_rom_word_r );
+DECLARE_WRITE16_HANDLER( K056832_word_w ); // "VRAM" registers
+DECLARE_WRITE16_HANDLER( K056832_b_word_w );
 void K056832_mark_plane_dirty(int num);
 void K056832_MarkAllTilemapsDirty(void);
 void K056832_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
@@ -81,10 +81,10 @@ int  K056832_get_LayerAssociation(void);
 void K056832_set_LayerOffset(int layer, int offsx, int offsy);
 void K056832_set_UpdateMode(int mode);
 
-READ32_HANDLER( K056832_ram_long_r );
-WRITE32_HANDLER( K056832_ram_long_w );
-WRITE32_HANDLER( K056832_long_w );
-WRITE32_HANDLER( K056832_b_long_w );
+DECLARE_READ32_HANDLER( K056832_ram_long_r );
+DECLARE_WRITE32_HANDLER( K056832_ram_long_w );
+DECLARE_WRITE32_HANDLER( K056832_long_w );
+DECLARE_WRITE32_HANDLER( K056832_b_long_w );
 
 /* bit depths for the 56832 */
 #define K056832_BPP_4	0
@@ -97,8 +97,8 @@ WRITE32_HANDLER( K056832_b_long_w );
 
 void K055555_vh_start(running_machine &machine); // "PCU2"
 void K055555_write_reg(UINT8 regnum, UINT8 regdat);
-WRITE16_HANDLER( K055555_word_w );
-WRITE32_HANDLER( K055555_long_w );
+DECLARE_WRITE16_HANDLER( K055555_word_w );
+DECLARE_WRITE32_HANDLER( K055555_long_w );
 int K055555_read_register(int regnum);
 int K055555_get_palette_index(int idx);
 
@@ -169,8 +169,8 @@ int K055555_get_palette_index(int idx);
 
 /* K054338 mixer/alpha blender */
 void K054338_vh_start(running_machine &machine);
-WRITE16_HANDLER( K054338_word_w ); // "CLCT" registers
-WRITE32_HANDLER( K054338_long_w );
+DECLARE_WRITE16_HANDLER( K054338_word_w ); // "CLCT" registers
+DECLARE_WRITE32_HANDLER( K054338_long_w );
 int K054338_read_register(int reg);
 void K054338_update_all_shadows(running_machine &machine, int rushingheroes_hack);			// called at the beginning of SCREEN_UPDATE()
 void K054338_fill_solid_bg(bitmap_ind16 &bitmap);				// solid backcolor fill
@@ -194,5 +194,5 @@ void K054338_export_config(int **shdRGB);
 #define K338_CTL_CLIPSL		0x20
 
 // K053252 CRT and interrupt control unit
-WRITE16_HANDLER( K053252_word_w );
+DECLARE_WRITE16_HANDLER( K053252_word_w );
 

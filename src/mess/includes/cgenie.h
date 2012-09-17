@@ -81,44 +81,44 @@ DECLARE_WRITE8_DEVICE_HANDLER( cgenie_sh_control_port_w );
 extern const wd17xx_interface cgenie_wd17xx_interface;
 
 
-READ8_HANDLER ( cgenie_psg_port_a_r );
-READ8_HANDLER ( cgenie_psg_port_b_r );
-WRITE8_HANDLER ( cgenie_psg_port_a_w );
-WRITE8_HANDLER ( cgenie_psg_port_b_w );
+DECLARE_READ8_HANDLER ( cgenie_psg_port_a_r );
+DECLARE_READ8_HANDLER ( cgenie_psg_port_b_r );
+DECLARE_WRITE8_HANDLER ( cgenie_psg_port_a_w );
+DECLARE_WRITE8_HANDLER ( cgenie_psg_port_b_w );
 
 
 
 
-READ8_HANDLER ( cgenie_colorram_r );
-READ8_HANDLER ( cgenie_fontram_r );
+DECLARE_READ8_HANDLER ( cgenie_colorram_r );
+DECLARE_READ8_HANDLER ( cgenie_fontram_r );
 
-WRITE8_HANDLER ( cgenie_colorram_w );
-WRITE8_HANDLER ( cgenie_fontram_w );
+DECLARE_WRITE8_HANDLER ( cgenie_colorram_w );
+DECLARE_WRITE8_HANDLER ( cgenie_fontram_w );
 
-WRITE8_HANDLER ( cgenie_port_ff_w );
- READ8_HANDLER ( cgenie_port_ff_r );
+DECLARE_WRITE8_HANDLER ( cgenie_port_ff_w );
+ DECLARE_READ8_HANDLER ( cgenie_port_ff_r );
 int cgenie_port_xx_r(int offset);
 
 INTERRUPT_GEN( cgenie_timer_interrupt );
 INTERRUPT_GEN( cgenie_frame_interrupt );
 
- READ8_HANDLER ( cgenie_status_r );
- READ8_HANDLER ( cgenie_track_r );
- READ8_HANDLER ( cgenie_sector_r );
- READ8_HANDLER ( cgenie_data_r );
+ DECLARE_READ8_HANDLER ( cgenie_status_r );
+ DECLARE_READ8_HANDLER ( cgenie_track_r );
+ DECLARE_READ8_HANDLER ( cgenie_sector_r );
+ DECLARE_READ8_HANDLER ( cgenie_data_r );
 
-WRITE8_HANDLER ( cgenie_command_w );
-WRITE8_HANDLER ( cgenie_track_w );
-WRITE8_HANDLER ( cgenie_sector_w );
-WRITE8_HANDLER ( cgenie_data_w );
+DECLARE_WRITE8_HANDLER ( cgenie_command_w );
+DECLARE_WRITE8_HANDLER ( cgenie_track_w );
+DECLARE_WRITE8_HANDLER ( cgenie_sector_w );
+DECLARE_WRITE8_HANDLER ( cgenie_data_w );
 
- READ8_HANDLER ( cgenie_irq_status_r );
+ DECLARE_READ8_HANDLER ( cgenie_irq_status_r );
 
-WRITE8_HANDLER ( cgenie_motor_w );
+DECLARE_WRITE8_HANDLER ( cgenie_motor_w );
 
- READ8_HANDLER ( cgenie_keyboard_r );
+ DECLARE_READ8_HANDLER ( cgenie_keyboard_r );
 int cgenie_videoram_r(running_machine &machine,int offset);
-WRITE8_HANDLER ( cgenie_videoram_w );
+DECLARE_WRITE8_HANDLER ( cgenie_videoram_w );
 
 
 /*----------- defined in video/cgenie.c -----------*/
@@ -126,11 +126,11 @@ WRITE8_HANDLER ( cgenie_videoram_w );
 
 SCREEN_UPDATE_IND16( cgenie );
 
-READ8_HANDLER ( cgenie_index_r );
-READ8_HANDLER ( cgenie_register_r );
+DECLARE_READ8_HANDLER ( cgenie_index_r );
+DECLARE_READ8_HANDLER ( cgenie_register_r );
 
-WRITE8_HANDLER ( cgenie_index_w );
-WRITE8_HANDLER ( cgenie_register_w );
+DECLARE_WRITE8_HANDLER ( cgenie_index_w );
+DECLARE_WRITE8_HANDLER ( cgenie_register_w );
 
 int cgenie_get_register(running_machine &machine, int indx);
 void cgenie_mode_select(running_machine &machine, int graphics);

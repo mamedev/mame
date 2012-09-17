@@ -99,12 +99,12 @@ void itech8_update_interrupts(running_machine &machine, int periodic, int tms340
 
 /*----------- defined in machine/slikshot.c -----------*/
 
-READ8_HANDLER( slikz80_port_r );
-WRITE8_HANDLER( slikz80_port_w );
+DECLARE_READ8_HANDLER( slikz80_port_r );
+DECLARE_WRITE8_HANDLER( slikz80_port_w );
 
-READ8_HANDLER( slikshot_z80_r );
-READ8_HANDLER( slikshot_z80_control_r );
-WRITE8_HANDLER( slikshot_z80_control_w );
+DECLARE_READ8_HANDLER( slikshot_z80_r );
+DECLARE_READ8_HANDLER( slikshot_z80_control_r );
+DECLARE_WRITE8_HANDLER( slikshot_z80_control_w );
 
 
 SCREEN_UPDATE_RGB32( slikshot );

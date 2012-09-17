@@ -59,26 +59,26 @@ extern const ins8250_interface bebox_uart_inteface_3;
 
 
 
-READ64_HANDLER( bebox_cpu0_imask_r );
-READ64_HANDLER( bebox_cpu1_imask_r );
-READ64_HANDLER( bebox_interrupt_sources_r );
-READ64_HANDLER( bebox_crossproc_interrupts_r );
-READ8_HANDLER( bebox_800001F0_r );
-READ64_HANDLER( bebox_800003F0_r );
-READ64_HANDLER( bebox_interrupt_ack_r );
-READ8_HANDLER( bebox_page_r );
-READ8_HANDLER( bebox_80000480_r );
-READ8_HANDLER( bebox_flash_r );
+DECLARE_READ64_HANDLER( bebox_cpu0_imask_r );
+DECLARE_READ64_HANDLER( bebox_cpu1_imask_r );
+DECLARE_READ64_HANDLER( bebox_interrupt_sources_r );
+DECLARE_READ64_HANDLER( bebox_crossproc_interrupts_r );
+DECLARE_READ8_HANDLER( bebox_800001F0_r );
+DECLARE_READ64_HANDLER( bebox_800003F0_r );
+DECLARE_READ64_HANDLER( bebox_interrupt_ack_r );
+DECLARE_READ8_HANDLER( bebox_page_r );
+DECLARE_READ8_HANDLER( bebox_80000480_r );
+DECLARE_READ8_HANDLER( bebox_flash_r );
 
-WRITE64_HANDLER( bebox_cpu0_imask_w );
-WRITE64_HANDLER( bebox_cpu1_imask_w );
-WRITE64_HANDLER( bebox_crossproc_interrupts_w );
-WRITE64_HANDLER( bebox_processor_resets_w );
-WRITE8_HANDLER( bebox_800001F0_w );
-WRITE64_HANDLER( bebox_800003F0_w );
-WRITE8_HANDLER( bebox_page_w );
-WRITE8_HANDLER( bebox_80000480_w );
-WRITE8_HANDLER( bebox_flash_w );
+DECLARE_WRITE64_HANDLER( bebox_cpu0_imask_w );
+DECLARE_WRITE64_HANDLER( bebox_cpu1_imask_w );
+DECLARE_WRITE64_HANDLER( bebox_crossproc_interrupts_w );
+DECLARE_WRITE64_HANDLER( bebox_processor_resets_w );
+DECLARE_WRITE8_HANDLER( bebox_800001F0_w );
+DECLARE_WRITE64_HANDLER( bebox_800003F0_w );
+DECLARE_WRITE8_HANDLER( bebox_page_w );
+DECLARE_WRITE8_HANDLER( bebox_80000480_w );
+DECLARE_WRITE8_HANDLER( bebox_flash_w );
 
 void bebox_ide_interrupt(device_t *device, int state);
 void bebox_set_irq_bit(running_machine &machine, unsigned int interrupt_bit, int val);

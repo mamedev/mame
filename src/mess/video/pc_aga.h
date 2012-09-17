@@ -28,16 +28,16 @@ MACHINE_CONFIG_EXTERN( pcvideo_pc200 );
 enum AGA_MODE  { AGA_OFF, AGA_COLOR, AGA_MONO };
 void pc_aga_set_mode(running_machine &machine, AGA_MODE mode);
 
-READ8_HANDLER( pc_aga_videoram_r );
-WRITE8_HANDLER( pc_aga_videoram_w );
+DECLARE_READ8_HANDLER( pc_aga_videoram_r );
+DECLARE_WRITE8_HANDLER( pc_aga_videoram_w );
 
-READ8_HANDLER( pc200_videoram_r );
-WRITE8_HANDLER( pc200_videoram_w );
-READ16_HANDLER( pc200_videoram16le_r );
-WRITE16_HANDLER( pc200_videoram16le_w );
+DECLARE_READ8_HANDLER( pc200_videoram_r );
+DECLARE_WRITE8_HANDLER( pc200_videoram_w );
+DECLARE_READ16_HANDLER( pc200_videoram16le_r );
+DECLARE_WRITE16_HANDLER( pc200_videoram16le_w );
 
-READ8_HANDLER( pc200_cga_r );
-WRITE8_HANDLER( pc200_cga_w );
-READ16_HANDLER( pc200_cga16le_r );
-WRITE16_HANDLER( pc200_cga16le_w );
+DECLARE_READ8_HANDLER( pc200_cga_r );
+DECLARE_WRITE8_HANDLER( pc200_cga_w );
+DECLARE_READ16_HANDLER( pc200_cga16le_r );
+DECLARE_WRITE16_HANDLER( pc200_cga16le_w );
 

@@ -100,8 +100,8 @@ public:
 extern DECLARE_READ8_DEVICE_HANDLER(c64_m6510_port_read);
 extern DECLARE_WRITE8_DEVICE_HANDLER(c64_m6510_port_write);
 
-READ8_HANDLER ( c64_colorram_read );
-WRITE8_HANDLER ( c64_colorram_write );
+DECLARE_READ8_HANDLER ( c64_colorram_read );
+DECLARE_WRITE8_HANDLER ( c64_colorram_write );
 
 MACHINE_START( c64 );
 MACHINE_RESET( c64 );
@@ -109,13 +109,13 @@ INTERRUPT_GEN( c64_frame_interrupt );
 TIMER_CALLBACK( c64_tape_timer );
 
 /* private area */
-WRITE8_HANDLER(c64_roml_w);
+DECLARE_WRITE8_HANDLER(c64_roml_w);
 
-READ8_HANDLER(c64_ioarea_r);
-WRITE8_HANDLER(c64_ioarea_w);
+DECLARE_READ8_HANDLER(c64_ioarea_r);
+DECLARE_WRITE8_HANDLER(c64_ioarea_w);
 
-WRITE8_HANDLER ( c64_write_io );
-READ8_HANDLER ( c64_read_io );
+DECLARE_WRITE8_HANDLER ( c64_write_io );
+DECLARE_READ8_HANDLER ( c64_read_io );
 int c64_paddle_read (device_t *device, address_space &space, int which);
 
 extern const mos6526_interface c64_ntsc_cia0, c64_pal_cia0;

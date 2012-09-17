@@ -30,10 +30,10 @@ void midway_ioasic_reset(running_machine &machine);
 void midway_ioasic_fifo_w(running_machine &machine, UINT16 data);
 void midway_ioasic_fifo_reset_w(running_machine &machine, int state);
 void midway_ioasic_fifo_full_w(running_machine &machine, UINT16 data);
-READ32_HANDLER( midway_ioasic_r );
-WRITE32_HANDLER( midway_ioasic_w );
-READ32_HANDLER( midway_ioasic_packed_r );
-WRITE32_HANDLER( midway_ioasic_packed_w );
+DECLARE_READ32_HANDLER( midway_ioasic_r );
+DECLARE_WRITE32_HANDLER( midway_ioasic_w );
+DECLARE_READ32_HANDLER( midway_ioasic_packed_r );
+DECLARE_WRITE32_HANDLER( midway_ioasic_packed_w );
 
 enum
 {

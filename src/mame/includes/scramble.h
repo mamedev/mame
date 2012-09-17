@@ -66,11 +66,11 @@ extern const i8255_interface(stratgyx_ppi_1_intf);
 
 
 
-READ8_HANDLER( triplep_pip_r );
-READ8_HANDLER( triplep_pap_r );
+DECLARE_READ8_HANDLER( triplep_pip_r );
+DECLARE_READ8_HANDLER( triplep_pap_r );
 
-READ8_HANDLER( hunchbks_mirror_r );
-WRITE8_HANDLER( hunchbks_mirror_w );
+DECLARE_READ8_HANDLER( hunchbks_mirror_r );
+DECLARE_WRITE8_HANDLER( hunchbks_mirror_w );
 
 DECLARE_READ8_DEVICE_HANDLER( scramble_protection_r );
 DECLARE_WRITE8_DEVICE_HANDLER( scramble_protection_w );

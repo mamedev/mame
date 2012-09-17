@@ -122,26 +122,26 @@ enum {
 /*----------- defined in machine/nb1413m3.c -----------*/
 
 MACHINE_RESET( nb1413m3 );
-WRITE8_HANDLER( nb1413m3_nmi_clock_w );
+DECLARE_WRITE8_HANDLER( nb1413m3_nmi_clock_w );
 INTERRUPT_GEN( nb1413m3_interrupt );
-READ8_HANDLER( nb1413m3_sndrom_r );
-WRITE8_HANDLER( nb1413m3_sndrombank1_w );
-WRITE8_HANDLER( nb1413m3_sndrombank2_w );
-READ8_HANDLER( nb1413m3_gfxrom_r );
-WRITE8_HANDLER( nb1413m3_gfxrombank_w );
-WRITE8_HANDLER( nb1413m3_gfxradr_l_w );
-WRITE8_HANDLER( nb1413m3_gfxradr_h_w );
-WRITE8_HANDLER( nb1413m3_inputportsel_w );
-READ8_HANDLER( nb1413m3_inputport0_r );
-READ8_HANDLER( nb1413m3_inputport1_r );
-READ8_HANDLER( nb1413m3_inputport2_r );
-READ8_HANDLER( nb1413m3_inputport3_r );
-READ8_HANDLER( nb1413m3_dipsw1_r );
-READ8_HANDLER( nb1413m3_dipsw2_r );
-READ8_HANDLER( nb1413m3_dipsw3_l_r );
-READ8_HANDLER( nb1413m3_dipsw3_h_r );
-WRITE8_HANDLER( nb1413m3_outcoin_w );
-WRITE8_HANDLER( nb1413m3_vcrctrl_w );
+DECLARE_READ8_HANDLER( nb1413m3_sndrom_r );
+DECLARE_WRITE8_HANDLER( nb1413m3_sndrombank1_w );
+DECLARE_WRITE8_HANDLER( nb1413m3_sndrombank2_w );
+DECLARE_READ8_HANDLER( nb1413m3_gfxrom_r );
+DECLARE_WRITE8_HANDLER( nb1413m3_gfxrombank_w );
+DECLARE_WRITE8_HANDLER( nb1413m3_gfxradr_l_w );
+DECLARE_WRITE8_HANDLER( nb1413m3_gfxradr_h_w );
+DECLARE_WRITE8_HANDLER( nb1413m3_inputportsel_w );
+DECLARE_READ8_HANDLER( nb1413m3_inputport0_r );
+DECLARE_READ8_HANDLER( nb1413m3_inputport1_r );
+DECLARE_READ8_HANDLER( nb1413m3_inputport2_r );
+DECLARE_READ8_HANDLER( nb1413m3_inputport3_r );
+DECLARE_READ8_HANDLER( nb1413m3_dipsw1_r );
+DECLARE_READ8_HANDLER( nb1413m3_dipsw2_r );
+DECLARE_READ8_HANDLER( nb1413m3_dipsw3_l_r );
+DECLARE_READ8_HANDLER( nb1413m3_dipsw3_h_r );
+DECLARE_WRITE8_HANDLER( nb1413m3_outcoin_w );
+DECLARE_WRITE8_HANDLER( nb1413m3_vcrctrl_w );
 CUSTOM_INPUT( nb1413m3_busyflag_r );
 CUSTOM_INPUT( nb1413m3_outcoin_flag_r );
 

@@ -447,18 +447,18 @@ void amiga_machine_config(running_machine &machine, const amiga_machine_interfac
 
 
 
-READ16_HANDLER( amiga_cia_r );
-WRITE16_HANDLER( amiga_cia_w );
+DECLARE_READ16_HANDLER( amiga_cia_r );
+DECLARE_WRITE16_HANDLER( amiga_cia_w );
 
-READ16_HANDLER( amiga_custom_r );
-WRITE16_HANDLER( amiga_custom_w );
+DECLARE_READ16_HANDLER( amiga_custom_r );
+DECLARE_WRITE16_HANDLER( amiga_custom_w );
 
 void amiga_serial_in_w(running_machine &machine, UINT16 data);
 attotime amiga_get_serial_char_period(running_machine &machine);
 
 void amiga_add_autoconfig(running_machine &machine, const amiga_autoconfig_device *device);
-READ16_HANDLER( amiga_autoconfig_r );
-WRITE16_HANDLER( amiga_autoconfig_w );
+DECLARE_READ16_HANDLER( amiga_autoconfig_r );
+DECLARE_WRITE16_HANDLER( amiga_autoconfig_w );
 
 void amiga_cia_0_irq(device_t *device, int state);
 void amiga_cia_1_irq(device_t *device, int state);

@@ -66,8 +66,8 @@ UINT8 tms34061_r(address_space &space, int col, int row, int func);
 void tms34061_w(address_space &space, int col, int row, int func, UINT8 data);
 
 /* latch settings */
-READ8_HANDLER( tms34061_latch_r );
-WRITE8_HANDLER( tms34061_latch_w );
+DECLARE_READ8_HANDLER( tms34061_latch_r );
+DECLARE_WRITE8_HANDLER( tms34061_latch_w );
 
 /* video update handling */
 void tms34061_get_display_state(struct tms34061_display *state);

@@ -449,7 +449,7 @@ WRITE_LINE_MEMBER( vidbrain_state::hblank_w )
 	}
 }
 
-static UINT8 memory_read_byte(address_space &space, offs_t address) { return space.read_byte(address); }
+static UINT8 memory_read_byte(address_space &space, offs_t address, UINT8 mem_mask) { return space.read_byte(address); }
 
 static UV201_INTERFACE( uv_intf )
 {

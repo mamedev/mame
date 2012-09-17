@@ -68,10 +68,10 @@ INTERRUPT_GEN( cyberbal_sound_68k_irq_gen );
 
 /*----------- defined in video/cyberbal.c -----------*/
 
-READ16_HANDLER( cyberbal_paletteram_0_r );
-READ16_HANDLER( cyberbal_paletteram_1_r );
-WRITE16_HANDLER( cyberbal_paletteram_0_w );
-WRITE16_HANDLER( cyberbal_paletteram_1_w );
+DECLARE_READ16_HANDLER( cyberbal_paletteram_0_r );
+DECLARE_READ16_HANDLER( cyberbal_paletteram_1_r );
+DECLARE_WRITE16_HANDLER( cyberbal_paletteram_0_w );
+DECLARE_WRITE16_HANDLER( cyberbal_paletteram_1_w );
 
 
 

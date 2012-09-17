@@ -2,10 +2,10 @@
 #define __AVGDVG__
 
 CUSTOM_INPUT( avgdvg_done_r );
-WRITE8_HANDLER( avgdvg_go_w );
-WRITE8_HANDLER( avgdvg_reset_w );
-WRITE16_HANDLER( avgdvg_go_word_w );
-WRITE16_HANDLER( avgdvg_reset_word_w );
+DECLARE_WRITE8_HANDLER( avgdvg_go_w );
+DECLARE_WRITE8_HANDLER( avgdvg_reset_w );
+DECLARE_WRITE16_HANDLER( avgdvg_go_word_w );
+DECLARE_WRITE16_HANDLER( avgdvg_reset_word_w );
 
 /* Tempest and Quantum use this capability */
 void avg_set_flip_x(int flip);

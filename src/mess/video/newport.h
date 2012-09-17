@@ -9,7 +9,7 @@
 extern VIDEO_START( newport );
 extern SCREEN_UPDATE_RGB32( newport );
 
-READ32_HANDLER( newport_rex3_r );
-WRITE32_HANDLER( newport_rex3_w );
+DECLARE_READ32_HANDLER( newport_rex3_r );
+DECLARE_WRITE32_HANDLER( newport_rex3_w );
 
 #endif

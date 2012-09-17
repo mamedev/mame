@@ -15,7 +15,7 @@
 INLINE UINT8 bank_r(address_space &space, offs_t offset, int bank)
 {
 	namcos1_state *state = space.machine().driver_data<namcos1_state>();
-	return (*state->m_active_bank[bank].bank_handler_r )(space, offset + state->m_active_bank[bank].bank_offset);
+	return (*state->m_active_bank[bank].bank_handler_r )(space, offset + state->m_active_bank[bank].bank_offset, 0xff);
 }
 
 static READ8_HANDLER( bank1_r )  { return bank_r(space, offset, 0); }
@@ -38,7 +38,7 @@ static READ8_HANDLER( bank16_r ) { return bank_r(space, offset, 15); }
 INLINE void bank_w(address_space &space, offs_t offset, UINT8 data, int bank)
 {
 	namcos1_state *state = space.machine().driver_data<namcos1_state>();
-	(*state->m_active_bank[bank].bank_handler_w )(space, offset + state->m_active_bank[bank].bank_offset, data);
+	(*state->m_active_bank[bank].bank_handler_w )(space, offset + state->m_active_bank[bank].bank_offset, data, 0xff);
 }
 
 static WRITE8_HANDLER( bank1_w )  { bank_w(space, offset, data, 0); }
@@ -84,7 +84,7 @@ static WRITE8_HANDLER( namcos1_3dcs_w )
 
 
 // used by faceoff and tankforce 4 player (input multiplex)
-static READ8_HANDLER( faceoff_inputs_r );
+static DECLARE_READ8_HANDLER( faceoff_inputs_r );
 
 static READ8_HANDLER( no_key_r )
 {

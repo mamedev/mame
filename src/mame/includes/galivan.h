@@ -62,8 +62,8 @@ public:
 
 /*----------- defined in video/galivan.c -----------*/
 
-WRITE8_HANDLER( ninjemak_scrollx_w );
-WRITE8_HANDLER( ninjemak_scrolly_w );
+DECLARE_WRITE8_HANDLER( ninjemak_scrollx_w );
+DECLARE_WRITE8_HANDLER( ninjemak_scrolly_w );
 
 
 

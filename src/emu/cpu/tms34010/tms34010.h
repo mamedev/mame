@@ -222,12 +222,12 @@ int			tms34010_host_r(device_t *cpu, int reg);
 
 
 /* Reads & writes to the 34010 I/O registers; place at 0xc0000000 */
-WRITE16_HANDLER( tms34010_io_register_w );
-READ16_HANDLER( tms34010_io_register_r );
+DECLARE_WRITE16_HANDLER( tms34010_io_register_w );
+DECLARE_READ16_HANDLER( tms34010_io_register_r );
 
 /* Reads & writes to the 34020 I/O registers; place at 0xc0000000 */
-WRITE16_HANDLER( tms34020_io_register_w );
-READ16_HANDLER( tms34020_io_register_r );
+DECLARE_WRITE16_HANDLER( tms34020_io_register_w );
+DECLARE_READ16_HANDLER( tms34020_io_register_r );
 
 
 /* Use this macro in the memory definitions to specify bit-based addresses */

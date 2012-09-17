@@ -1242,7 +1242,7 @@ READ8_HANDLER( decocass_e5xx_r )
 	else
 	{
 		if (state->m_dongle_r)
-			data = (*state->m_dongle_r)(space, offset);
+			data = (*state->m_dongle_r)(space, offset, mem_mask);
 		else
 			data = 0xff;
 	}
@@ -1254,7 +1254,7 @@ WRITE8_HANDLER( decocass_e5xx_w )
 	decocass_state *state = space.machine().driver_data<decocass_state>();
 	if (state->m_dongle_w)
 	{
-		(*state->m_dongle_w)(space, offset, data);
+		(*state->m_dongle_w)(space, offset, data, mem_mask);
 		return;
 	}
 

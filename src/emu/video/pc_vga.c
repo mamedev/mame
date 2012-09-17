@@ -1533,7 +1533,7 @@ READ8_HANDLER( vga_port_03b0_r )
 {
 	UINT8 data = 0xff;
 	if (CRTC_PORT_ADDR==0x3b0)
-		data=vga_crtc_r(space, offset);
+		data=vga_crtc_r(space, offset, mem_mask);
 	return data;
 }
 
@@ -1607,19 +1607,19 @@ READ8_HANDLER( vga_port_03c0_r )
 			switch ((vga.miscellaneous_output>>2)&3)
 			{
 				case 3:
-					if (vga.read_dipswitch && vga.read_dipswitch(space, 0) & 0x01)
+					if (vga.read_dipswitch && vga.read_dipswitch(space, 0, mem_mask) & 0x01)
 						data |= 0x10;
 					break;
 				case 2:
-					if (vga.read_dipswitch && vga.read_dipswitch(space, 0) & 0x02)
+					if (vga.read_dipswitch && vga.read_dipswitch(space, 0, mem_mask) & 0x02)
 						data |= 0x10;
 					break;
 				case 1:
-					if (vga.read_dipswitch && vga.read_dipswitch(space, 0) & 0x04)
+					if (vga.read_dipswitch && vga.read_dipswitch(space, 0, mem_mask) & 0x04)
 						data |= 0x10;
 					break;
 				case 0:
-					if (vga.read_dipswitch && vga.read_dipswitch(space, 0) & 0x08)
+					if (vga.read_dipswitch && vga.read_dipswitch(space, 0, mem_mask) & 0x08)
 						data |= 0x10;
 					break;
 			}
@@ -1697,7 +1697,7 @@ READ8_HANDLER(vga_port_03d0_r)
 {
 	UINT8 data = 0xff;
 	if (CRTC_PORT_ADDR == 0x3d0)
-		data = vga_crtc_r(space, offset);
+		data = vga_crtc_r(space, offset, mem_mask);
 	if(offset == 8)
 	{
 		logerror("VGA: 0x3d8 read at %08x\n",space.device().safe_pc());
@@ -1713,7 +1713,7 @@ WRITE8_HANDLER( vga_port_03b0_w )
 		logerror("vga_port_03b0_w(): port=0x%04x data=0x%02x\n", offset + 0x3b0, data);
 
 	if (CRTC_PORT_ADDR == 0x3b0)
-		vga_crtc_w(space, offset, data);
+		vga_crtc_w(space, offset, data, mem_mask);
 }
 
 static void attribute_reg_write(UINT8 index, UINT8 data)
@@ -1876,7 +1876,7 @@ WRITE8_HANDLER(vga_port_03d0_w)
 		logerror("vga_port_03d0_w(): port=0x%04x data=0x%02x\n", offset + 0x3d0, data);
 
 	if (CRTC_PORT_ADDR == 0x3d0)
-		vga_crtc_w(space, offset, data);
+		vga_crtc_w(space, offset, data, mem_mask);
 }
 
 void pc_vga_reset(running_machine &machine)

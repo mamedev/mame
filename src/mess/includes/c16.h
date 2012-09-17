@@ -55,19 +55,19 @@ public:
 extern DECLARE_READ8_DEVICE_HANDLER(c16_m7501_port_read);
 extern DECLARE_WRITE8_DEVICE_HANDLER(c16_m7501_port_write);
 
-extern WRITE8_HANDLER(c16_6551_port_w);
-extern READ8_HANDLER(c16_6551_port_r);
+extern DECLARE_WRITE8_HANDLER(c16_6551_port_w);
+extern DECLARE_READ8_HANDLER(c16_6551_port_r);
 
-extern READ8_HANDLER(c16_fd1x_r);
-extern WRITE8_HANDLER(plus4_6529_port_w);
-extern READ8_HANDLER(plus4_6529_port_r);
+extern DECLARE_READ8_HANDLER(c16_fd1x_r);
+extern DECLARE_WRITE8_HANDLER(plus4_6529_port_w);
+extern DECLARE_READ8_HANDLER(plus4_6529_port_r);
 
-extern WRITE8_HANDLER(c16_6529_port_w);
-extern READ8_HANDLER(c16_6529_port_r);
+extern DECLARE_WRITE8_HANDLER(c16_6529_port_w);
+extern DECLARE_READ8_HANDLER(c16_6529_port_r);
 
-extern WRITE8_HANDLER(c16_select_roms);
-extern WRITE8_HANDLER(c16_switch_to_rom);
-extern WRITE8_HANDLER(c16_switch_to_ram);
+extern DECLARE_WRITE8_HANDLER(c16_select_roms);
+extern DECLARE_WRITE8_HANDLER(c16_switch_to_rom);
+extern DECLARE_WRITE8_HANDLER(c16_switch_to_ram);
 
 /* ted reads (passed to the device interface) */
 extern UINT8 c16_read_keyboard(running_machine &machine, int databus);

@@ -393,7 +393,7 @@ void devcb_resolved_read8::resolve(const devcb_read8 &desc, device_t &device)
 			if (desc.readdevice != NULL)
 			{
 			    m_helper.read8_device = desc.readdevice;
-				*static_cast<devcb_read8_delegate *>(this) = devcb_read8_delegate(&devcb_resolved_read8::from_read8, desc.name, this);
+				*static_cast<devcb_read8_delegate *>(this) = devcb_read8_delegate(&devcb_resolved_read8::from_read8device, desc.name, this);
 			}
 			else
 			{
@@ -404,7 +404,8 @@ void devcb_resolved_read8::resolve(const devcb_read8 &desc, device_t &device)
 
 		case DEVCB_TYPE_LEGACY_SPACE:
 			m_object.space = &devcb_resolver::resolve_space(desc.index, desc.tag, device);
-			*static_cast<devcb_read8_delegate *>(this) = devcb_read8_delegate(desc.readspace, desc.name, m_object.space);
+		    m_helper.read8_space = desc.readspace;
+			*static_cast<devcb_read8_delegate *>(this) = devcb_read8_delegate(&devcb_resolved_read8::from_read8space, desc.name, this);
 			break;
 
 		case DEVCB_TYPE_CONSTANT:
@@ -420,20 +421,31 @@ void devcb_resolved_read8::resolve(const devcb_read8 &desc, device_t &device)
 //  value to an 8-bit value
 //-------------------------------------------------
 
-UINT8 devcb_resolved_read8::from_port(offs_t offset)
+UINT8 devcb_resolved_read8::from_port(offs_t offset, UINT8 mem_mask)
 {
 	return m_object.port->read();
 }
 
 
 //-------------------------------------------------
-//  from_read8 - helper to convert from a device
+//  from_read8space - helper to convert from a device
 //  line read value to an 8-bit value
 //-------------------------------------------------
 
-UINT8 devcb_resolved_read8::from_read8(offs_t offset)
+UINT8 devcb_resolved_read8::from_read8space(offs_t offset, UINT8 mem_mask)
 {
 	return (*m_helper.read8_device)(m_object.device, m_object.device->machine().driver_data()->generic_space(), offset, 0xff);
+}
+
+
+//-------------------------------------------------
+//  from_read8device - helper to convert from a device
+//  line read value to an 8-bit value
+//-------------------------------------------------
+
+UINT8 devcb_resolved_read8::from_read8device(offs_t offset, UINT8 mem_mask)
+{
+	return (*m_helper.read8_device)(m_object.device, m_object.device->machine().driver_data()->generic_space(), offset, mem_mask);
 }
 
 
@@ -442,7 +454,7 @@ UINT8 devcb_resolved_read8::from_read8(offs_t offset)
 //  line read value to an 8-bit value
 //-------------------------------------------------
 
-UINT8 devcb_resolved_read8::from_readline(offs_t offset)
+UINT8 devcb_resolved_read8::from_readline(offs_t offset, UINT8 mem_mask)
 {
 	return (*m_helper.read_line)(m_object.device);
 }
@@ -453,7 +465,7 @@ UINT8 devcb_resolved_read8::from_readline(offs_t offset)
 //  constant value to an 8-bit value
 //-------------------------------------------------
 
-UINT8 devcb_resolved_read8::from_constant(offs_t offset)
+UINT8 devcb_resolved_read8::from_constant(offs_t offset, UINT8 mem_mask)
 {
 	return m_object.constant;
 }
@@ -500,7 +512,7 @@ void devcb_resolved_write8::resolve(const devcb_write8 &desc, device_t &device)
 			if (desc.writedevice != NULL)
 			{
 				m_helper.write8_device = desc.writedevice;
-				*static_cast<devcb_write8_delegate *>(this) = devcb_write8_delegate(&devcb_resolved_write8::to_write8, desc.name, this);
+				*static_cast<devcb_write8_delegate *>(this) = devcb_write8_delegate(&devcb_resolved_write8::to_write8device, desc.name, this);
 			}
 			else
 			{
@@ -511,7 +523,8 @@ void devcb_resolved_write8::resolve(const devcb_write8 &desc, device_t &device)
 
 		case DEVCB_TYPE_LEGACY_SPACE:
 			m_object.space = &devcb_resolver::resolve_space(desc.index, desc.tag, device);
-			*static_cast<devcb_write8_delegate *>(this) = devcb_write8_delegate(desc.writespace, desc.name, m_object.space);
+			m_helper.write8_space = desc.writespace;
+			*static_cast<devcb_write8_delegate *>(this) = devcb_write8_delegate(&devcb_resolved_write8::to_write8space, desc.name, this);
 			break;
 
 		case DEVCB_TYPE_INPUT_LINE:
@@ -527,7 +540,7 @@ void devcb_resolved_write8::resolve(const devcb_write8 &desc, device_t &device)
 //  to_null - helper to handle a NULL write
 //-------------------------------------------------
 
-void devcb_resolved_write8::to_null(offs_t offset, UINT8 data)
+void devcb_resolved_write8::to_null(offs_t offset, UINT8 data, UINT8 mem_mask)
 {
 }
 
@@ -537,9 +550,31 @@ void devcb_resolved_write8::to_null(offs_t offset, UINT8 data)
 //  value from a line value
 //-------------------------------------------------
 
-void devcb_resolved_write8::to_port(offs_t offset, UINT8 data)
+void devcb_resolved_write8::to_port(offs_t offset, UINT8 data, UINT8 mem_mask)
 {
-	m_object.port->write(data, 0xff);
+	m_object.port->write(data, mem_mask);
+}
+
+
+//-------------------------------------------------
+//  to_write8space - helper to convert to an 8-bit
+//  memory read value from a line value
+//-------------------------------------------------
+
+void devcb_resolved_write8::to_write8space(offs_t offset, UINT8 data, UINT8 mem_mask)
+{
+	(*m_helper.write8_space)(*m_object.space, offset, data, mem_mask);
+}
+
+
+//-------------------------------------------------
+//  to_write8device - helper to convert to an 8-bit
+//  memory read value from a line value
+//-------------------------------------------------
+
+void devcb_resolved_write8::to_write8device(offs_t offset, UINT8 data, UINT8 mem_mask)
+{
+	(*m_helper.write8_device)(m_object.device, m_object.device->machine().driver_data()->generic_space(), offset, data, mem_mask);
 }
 
 
@@ -548,18 +583,7 @@ void devcb_resolved_write8::to_port(offs_t offset, UINT8 data)
 //  memory read value from a line value
 //-------------------------------------------------
 
-void devcb_resolved_write8::to_write8(offs_t offset, UINT8 data)
-{
-	(*m_helper.write8_device)(m_object.device, m_object.device->machine().driver_data()->generic_space(), offset, data, 0xff);
-}
-
-
-//-------------------------------------------------
-//  to_write8 - helper to convert to an 8-bit
-//  memory read value from a line value
-//-------------------------------------------------
-
-void devcb_resolved_write8::to_writeline(offs_t offset, UINT8 data)
+void devcb_resolved_write8::to_writeline(offs_t offset, UINT8 data, UINT8 mem_mask)
 {
 	(*m_helper.write_line)(m_object.device, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -570,7 +594,7 @@ void devcb_resolved_write8::to_writeline(offs_t offset, UINT8 data)
 //  value from a line value
 //-------------------------------------------------
 
-void devcb_resolved_write8::to_input(offs_t offset, UINT8 data)
+void devcb_resolved_write8::to_input(offs_t offset, UINT8 data, UINT8 mem_mask)
 {
 	m_object.execute->set_input_line(m_helper.input_line, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }

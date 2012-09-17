@@ -264,10 +264,10 @@ void apple2_init_common(running_machine &machine);
 
 
 UINT8 apple2_getfloatingbusvalue(running_machine &machine);
-READ8_HANDLER( apple2_c0xx_r );
-WRITE8_HANDLER( apple2_c0xx_w );
-READ8_HANDLER( apple2_c080_r );
-WRITE8_HANDLER( apple2_c080_w );
+DECLARE_READ8_HANDLER( apple2_c0xx_r );
+DECLARE_WRITE8_HANDLER( apple2_c0xx_w );
+DECLARE_READ8_HANDLER( apple2_c080_r );
+DECLARE_WRITE8_HANDLER( apple2_c080_w );
 
 TIMER_DEVICE_CALLBACK( apple2_interrupt );
 

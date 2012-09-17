@@ -1479,9 +1479,9 @@ static WRITE8_HANDLER( K053246_w )
 WRITE16_HANDLER( K053246_word_w )
 {
 	if (ACCESSING_BITS_8_15)
-		K053246_w(space, offset<<1,(data >> 8) & 0xff);
+		K053246_w(space, offset<<1,(data >> 8) & 0xff, (mem_mask >> 8) & 0xff);
 	if (ACCESSING_BITS_0_7)
-		K053246_w(space, (offset<<1) + 1,data & 0xff);
+		K053246_w(space, (offset<<1) + 1,data & 0xff, mem_mask & 0xff);
 }
 
 WRITE32_HANDLER( K053246_long_w )
@@ -1710,13 +1710,13 @@ if (K054000_ram[0x0c] == 0xff) Acy+=3;
 
 READ16_HANDLER( K054000_lsb_r )
 {
-	return K054000_r(space, offset);
+	return K054000_r(space, offset, mem_mask & 0xff);
 }
 
 WRITE16_HANDLER( K054000_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
-		K054000_w(space, offset, data & 0xff);
+		K054000_w(space, offset, data & 0xff, mem_mask & 0xff);
 }
 
 

@@ -694,8 +694,8 @@ static TRS80M2_KEYBOARD_INTERFACE( kb_intf )
 //  Z80DMA_INTERFACE( dma_intf )
 //-------------------------------------------------
 
-static UINT8 memory_read_byte(address_space &space, offs_t address) { return space.read_byte(address); }
-static void memory_write_byte(address_space &space, offs_t address, UINT8 data) { space.write_byte(address, data); }
+static UINT8 memory_read_byte(address_space &space, offs_t address, UINT8 mem_mask) { return space.read_byte(address); }
+static void memory_write_byte(address_space &space, offs_t address, UINT8 data, UINT8 mem_mask) { space.write_byte(address, data); }
 
 static Z80DMA_INTERFACE( dma_intf )
 {

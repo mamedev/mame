@@ -89,9 +89,9 @@ INLINE UINT16 read16be_with_read8_handler(read8_space_func handler, address_spac
 {
 	UINT16 result = 0;
 	if (ACCESSING_BITS_8_15)
-		result |= ((UINT16)(*handler)(space, offset * 2 + 0)) << 8;
+		result |= ((UINT16)(*handler)(space, offset * 2 + 0, mem_mask >> 8)) << 8;
 	if (ACCESSING_BITS_0_7)
-		result |= ((UINT16)(*handler)(space, offset * 2 + 1)) << 0;
+		result |= ((UINT16)(*handler)(space, offset * 2 + 1, mem_mask >> 0)) << 0;
 	return result;
 }
 
@@ -99,9 +99,9 @@ INLINE UINT16 read16be_with_read8_handler(read8_space_func handler, address_spac
 INLINE void write16be_with_write8_handler(write8_space_func handler, address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
-		(*handler)(space, offset * 2 + 0, data >> 8);
+		(*handler)(space, offset * 2 + 0, data >> 8, mem_mask >> 8);
 	if (ACCESSING_BITS_0_7)
-		(*handler)(space, offset * 2 + 1, data >> 0);
+		(*handler)(space, offset * 2 + 1, data >> 0, mem_mask >> 0);
 }
 
 
@@ -115,9 +115,9 @@ INLINE UINT16 read16le_with_read8_handler(read8_space_func handler, address_spac
 {
 	UINT16 result = 0;
 	if (ACCESSING_BITS_0_7)
-		result |= ((UINT16) (*handler)(space, offset * 2 + 0)) << 0;
+		result |= ((UINT16) (*handler)(space, offset * 2 + 0, mem_mask >> 0)) << 0;
 	if (ACCESSING_BITS_8_15)
-		result |= ((UINT16) (*handler)(space, offset * 2 + 1)) << 8;
+		result |= ((UINT16) (*handler)(space, offset * 2 + 1, mem_mask >> 8)) << 8;
 	return result;
 }
 
@@ -125,9 +125,9 @@ INLINE UINT16 read16le_with_read8_handler(read8_space_func handler, address_spac
 INLINE void write16le_with_write8_handler(write8_space_func handler, address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-		(*handler)(space, offset * 2 + 0, data >> 0);
+		(*handler)(space, offset * 2 + 0, data >> 0, mem_mask >> 0);
 	if (ACCESSING_BITS_8_15)
-		(*handler)(space, offset * 2 + 1, data >> 8);
+		(*handler)(space, offset * 2 + 1, data >> 8, mem_mask >> 8);
 }
 
 

@@ -248,7 +248,7 @@ extern reverb_params *spu_reverb_cfg;
 extern const device_type SPU;
 
 // MAME old-style interface
-READ16_HANDLER( spu_r );
-WRITE16_HANDLER( spu_w );
+DECLARE_READ16_HANDLER( spu_r );
+DECLARE_WRITE16_HANDLER( spu_w );
 
 #endif

@@ -1769,7 +1769,7 @@ READ8_MEMBER(lynx_state::mikey_read)
 
 	case 0x8c:
 	case 0x8d:
-		value = lynx_uart_r(space, offset);
+		value = lynx_uart_r(space, offset, mem_mask);
 		break;
 
 	default:

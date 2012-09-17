@@ -595,31 +595,31 @@ enum
 extern MACHINE_START( snes );
 extern MACHINE_RESET( snes );
 
-READ8_HANDLER( snes_open_bus_r );
+DECLARE_READ8_HANDLER( snes_open_bus_r );
 
-extern READ8_HANDLER( snes_r_io );
-extern WRITE8_HANDLER( snes_w_io );
+extern DECLARE_READ8_HANDLER( snes_r_io );
+extern DECLARE_WRITE8_HANDLER( snes_w_io );
 
-extern READ8_HANDLER( snes_r_bank1 );
-extern READ8_HANDLER( snes_r_bank2 );
-extern READ8_HANDLER( snes_r_bank3 );
-extern READ8_HANDLER( snes_r_bank4 );
-extern READ8_HANDLER( snes_r_bank5 );
-extern READ8_HANDLER( snes_r_bank6 );
-extern READ8_HANDLER( snes_r_bank7 );
-extern WRITE8_HANDLER( snes_w_bank1 );
-extern WRITE8_HANDLER( snes_w_bank2 );
-extern WRITE8_HANDLER( snes_w_bank4 );
-extern WRITE8_HANDLER( snes_w_bank5 );
-extern WRITE8_HANDLER( snes_w_bank6 );
-extern WRITE8_HANDLER( snes_w_bank7 );
+extern DECLARE_READ8_HANDLER( snes_r_bank1 );
+extern DECLARE_READ8_HANDLER( snes_r_bank2 );
+extern DECLARE_READ8_HANDLER( snes_r_bank3 );
+extern DECLARE_READ8_HANDLER( snes_r_bank4 );
+extern DECLARE_READ8_HANDLER( snes_r_bank5 );
+extern DECLARE_READ8_HANDLER( snes_r_bank6 );
+extern DECLARE_READ8_HANDLER( snes_r_bank7 );
+extern DECLARE_WRITE8_HANDLER( snes_w_bank1 );
+extern DECLARE_WRITE8_HANDLER( snes_w_bank2 );
+extern DECLARE_WRITE8_HANDLER( snes_w_bank4 );
+extern DECLARE_WRITE8_HANDLER( snes_w_bank5 );
+extern DECLARE_WRITE8_HANDLER( snes_w_bank6 );
+extern DECLARE_WRITE8_HANDLER( snes_w_bank7 );
 
-extern READ8_HANDLER( superfx_r_bank1 );
-extern READ8_HANDLER( superfx_r_bank2 );
-extern READ8_HANDLER( superfx_r_bank3 );
-extern WRITE8_HANDLER( superfx_w_bank1 );
-extern WRITE8_HANDLER( superfx_w_bank2 );
-extern WRITE8_HANDLER( superfx_w_bank3 );
+extern DECLARE_READ8_HANDLER( superfx_r_bank1 );
+extern DECLARE_READ8_HANDLER( superfx_r_bank2 );
+extern DECLARE_READ8_HANDLER( superfx_r_bank3 );
+extern DECLARE_WRITE8_HANDLER( superfx_w_bank1 );
+extern DECLARE_WRITE8_HANDLER( superfx_w_bank2 );
+extern DECLARE_WRITE8_HANDLER( superfx_w_bank3 );
 
 WRITE_LINE_DEVICE_HANDLER( snes_extern_irq_w );
 
@@ -745,7 +745,7 @@ extern void snes_latch_counters(running_machine &machine);
 extern VIDEO_START( snes );
 extern SCREEN_UPDATE_RGB32( snes );
 
-extern READ8_HANDLER( snes_ppu_read );
-extern WRITE8_HANDLER( snes_ppu_write );
+extern DECLARE_READ8_HANDLER( snes_ppu_read );
+extern DECLARE_WRITE8_HANDLER( snes_ppu_write );
 
 #endif /* _SNES_H_ */

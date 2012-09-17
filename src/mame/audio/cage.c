@@ -147,7 +147,7 @@ static const char *const register_names[] =
 static TIMER_DEVICE_CALLBACK( dma_timer_callback );
 static TIMER_DEVICE_CALLBACK( cage_timer_callback );
 static void update_timer(int which);
-static WRITE32_HANDLER( speedup_w );
+static DECLARE_WRITE32_HANDLER( speedup_w );
 
 
 

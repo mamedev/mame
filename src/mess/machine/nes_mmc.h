@@ -117,19 +117,19 @@ void pcb_handlers_setup(running_machine &machine);
 int nes_pcb_reset(running_machine &machine);
 
 
-WRITE8_HANDLER( nes_low_mapper_w );
-READ8_HANDLER( nes_low_mapper_r );
-WRITE8_HANDLER( nes_chr_w );
-READ8_HANDLER( nes_chr_r );
-WRITE8_HANDLER( nes_nt_w );
-READ8_HANDLER( nes_nt_r );
+DECLARE_WRITE8_HANDLER( nes_low_mapper_w );
+DECLARE_READ8_HANDLER( nes_low_mapper_r );
+DECLARE_WRITE8_HANDLER( nes_chr_w );
+DECLARE_READ8_HANDLER( nes_chr_r );
+DECLARE_WRITE8_HANDLER( nes_nt_w );
+DECLARE_READ8_HANDLER( nes_nt_r );
 
-WRITE8_HANDLER( smb2jb_extra_w );
-WRITE8_HANDLER( ks7017_extra_w );
-READ8_HANDLER( ks7017_extra_r );
-WRITE8_HANDLER( unl_6035052_extra_w );
-READ8_HANDLER( unl_6035052_extra_r );
-READ8_HANDLER( waixing_sh2_chr_r );
+DECLARE_WRITE8_HANDLER( smb2jb_extra_w );
+DECLARE_WRITE8_HANDLER( ks7017_extra_w );
+DECLARE_READ8_HANDLER( ks7017_extra_r );
+DECLARE_WRITE8_HANDLER( unl_6035052_extra_w );
+DECLARE_READ8_HANDLER( unl_6035052_extra_r );
+DECLARE_READ8_HANDLER( waixing_sh2_chr_r );
 
 //TEMPORARY PPU STUFF
 

@@ -531,7 +531,7 @@ WRITE8_HANDLER ( pc_fdc_w )
 		case 1:	/* n/a */
 			break;
 		case 2:
-			pc_fdc_dor_w(space, 0, data);
+			pc_fdc_dor_w(space, 0, data, mem_mask);
 			break;
 		case 3:
 			/* tape drive select? */
@@ -568,7 +568,7 @@ WRITE8_HANDLER ( pcjr_fdc_w )
 	switch(offset)
 	{
 		case 2:
-			pcjr_fdc_dor_w( space, 0, data );
+			pcjr_fdc_dor_w( space, 0, data, mem_mask );
 			break;
 		case 4:
 		case 7:

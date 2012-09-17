@@ -96,32 +96,32 @@ SCREEN_UPDATE_RGB32( vicdual_bw_or_color );
 
 MACHINE_CONFIG_EXTERN( frogs_audio );
 MACHINE_CONFIG_EXTERN( headon_audio );
-WRITE8_HANDLER( frogs_audio_w );
-WRITE8_HANDLER( headon_audio_w );
-WRITE8_HANDLER( invho2_audio_w );
+DECLARE_WRITE8_HANDLER( frogs_audio_w );
+DECLARE_WRITE8_HANDLER( headon_audio_w );
+DECLARE_WRITE8_HANDLER( invho2_audio_w );
 
 
 /*----------- defined in audio/depthch.c -----------*/
 
 MACHINE_CONFIG_EXTERN( depthch_audio );
-WRITE8_HANDLER( depthch_audio_w );
+DECLARE_WRITE8_HANDLER( depthch_audio_w );
 
 
 /*----------- defined in audio/carnival.c -----------*/
 
 MACHINE_CONFIG_EXTERN( carnival_audio );
-WRITE8_HANDLER( carnival_audio_1_w );
-WRITE8_HANDLER( carnival_audio_2_w );
+DECLARE_WRITE8_HANDLER( carnival_audio_1_w );
+DECLARE_WRITE8_HANDLER( carnival_audio_2_w );
 
 
 /*----------- defined in audio/invinco.c -----------*/
 
 MACHINE_CONFIG_EXTERN( invinco_audio );
-WRITE8_HANDLER( invinco_audio_w );
+DECLARE_WRITE8_HANDLER( invinco_audio_w );
 
 
 /*----------- defined in audio/pulsar.c -----------*/
 
 MACHINE_CONFIG_EXTERN( pulsar_audio );
-WRITE8_HANDLER( pulsar_audio_1_w );
-WRITE8_HANDLER( pulsar_audio_2_w );
+DECLARE_WRITE8_HANDLER( pulsar_audio_1_w );
+DECLARE_WRITE8_HANDLER( pulsar_audio_2_w );

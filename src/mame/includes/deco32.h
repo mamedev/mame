@@ -152,9 +152,9 @@ SCREEN_UPDATE_RGB32( dragngun );
 SCREEN_UPDATE_RGB32( nslasher );
 
 
-WRITE32_HANDLER( deco32_pf1_data_w );
-WRITE32_HANDLER( deco32_pf2_data_w );
-WRITE32_HANDLER( deco32_pf3_data_w );
-WRITE32_HANDLER( deco32_pf4_data_w );
+DECLARE_WRITE32_HANDLER( deco32_pf1_data_w );
+DECLARE_WRITE32_HANDLER( deco32_pf2_data_w );
+DECLARE_WRITE32_HANDLER( deco32_pf3_data_w );
+DECLARE_WRITE32_HANDLER( deco32_pf4_data_w );
 
 

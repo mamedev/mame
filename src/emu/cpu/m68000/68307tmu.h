@@ -1,6 +1,6 @@
 
-READ16_HANDLER( m68307_internal_timer_r );
-WRITE16_HANDLER( m68307_internal_timer_w );
+DECLARE_READ16_HANDLER( m68307_internal_timer_r );
+DECLARE_WRITE16_HANDLER( m68307_internal_timer_w );
 
 #define m68307TIMER_TMR (0x0)
 #define m68307TIMER_TRR (0x1)

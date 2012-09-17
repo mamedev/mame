@@ -353,7 +353,7 @@ struct devcb_read8
 // ======================> devcb_resolved_read8
 
 // base delegate type for a read8
-typedef delegate<UINT8 (offs_t)> devcb_read8_delegate;
+typedef delegate<UINT8 (offs_t, UINT8)> devcb_read8_delegate;
 
 // class which wraps resolving a devcb_read8 into a delegate
 class devcb_resolved_read8 : public devcb_read8_delegate
@@ -371,12 +371,16 @@ public:
 	// override parent class' notion of NULL
 	bool isnull() const { return m_helper.null_indicator == &s_null; }
 
+	// provide default for mem_mask
+	UINT8 operator()(offs_t offset, UINT8 mem_mask = 0xff) const { return devcb_read8_delegate::operator()(offset, mem_mask); }
+
 private:
 	// internal helpers
-	UINT8 from_port(offs_t offset);
-	UINT8 from_read8(offs_t offset);
-	UINT8 from_readline(offs_t offset);
-	UINT8 from_constant(offs_t offset);
+	UINT8 from_port(offs_t offset, UINT8 mem_mask);
+	UINT8 from_read8space(offs_t offset, UINT8 mem_mask);
+	UINT8 from_read8device(offs_t offset, UINT8 mem_mask);
+	UINT8 from_readline(offs_t offset, UINT8 mem_mask);
+	UINT8 from_constant(offs_t offset, UINT8 mem_mask);
 
 	// internal state
 	devcb_resolved_objects			m_object;
@@ -403,7 +407,7 @@ struct devcb_write8
 // ======================> devcb_resolved_write8
 
 // base delegate type for a write8
-typedef delegate<void (offs_t, UINT8)> devcb_write8_delegate;
+typedef delegate<void (offs_t, UINT8, UINT8)> devcb_write8_delegate;
 
 // class which wraps resolving a devcb_write8 into a delegate
 class devcb_resolved_write8 : public devcb_write8_delegate
@@ -421,13 +425,17 @@ public:
 	// override parent class' notion of NULL
 	bool isnull() const { return m_helper.null_indicator == &s_null; }
 
+	// provide default for mem_mask
+	void operator()(offs_t offset, UINT8 data, UINT8 mem_mask = 0xff) const { devcb_write8_delegate::operator()(offset, data, mem_mask); }
+
 private:
 	// internal helpers
-	void to_null(offs_t offset, UINT8 data);
-	void to_port(offs_t offset, UINT8 data);
-	void to_write8(offs_t offset, UINT8 data);
-	void to_writeline(offs_t offset, UINT8 data);
-	void to_input(offs_t offset, UINT8 data);
+	void to_null(offs_t offset, UINT8 data, UINT8 mem_mask);
+	void to_port(offs_t offset, UINT8 data, UINT8 mem_mask);
+	void to_write8space(offs_t offset, UINT8 data, UINT8 mem_mask);
+	void to_write8device(offs_t offset, UINT8 data, UINT8 mem_mask);
+	void to_writeline(offs_t offset, UINT8 data, UINT8 mem_mask);
+	void to_input(offs_t offset, UINT8 data, UINT8 mem_mask);
 
 	// internal state
 	devcb_resolved_objects			m_object;
@@ -471,6 +479,9 @@ public:
 
 	// override parent class' notion of NULL
 	bool isnull() const { return m_helper.null_indicator == &s_null; }
+
+	// provide default for mem_mask
+	UINT16 operator()(offs_t offset, UINT16 mem_mask = 0xffff) const { return devcb_read16_delegate::operator()(offset, mem_mask); }
 
 private:
 	// internal helpers
@@ -521,6 +532,9 @@ public:
 
 	// override parent class' notion of NULL
 	bool isnull() const { return m_helper.null_indicator == &s_null; }
+
+	// provide default for mem_mask
+	void operator()(offs_t offset, UINT16 data, UINT16 mem_mask = 0xffff) const { devcb_write16_delegate::operator()(offset, data, mem_mask); }
 
 private:
 	// internal helpers

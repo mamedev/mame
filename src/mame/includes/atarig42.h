@@ -61,7 +61,7 @@ public:
 SCREEN_VBLANK( atarig42 );
 SCREEN_UPDATE_IND16( atarig42 );
 
-WRITE16_HANDLER( atarig42_mo_control_w );
+DECLARE_WRITE16_HANDLER( atarig42_mo_control_w );
 
 void atarig42_scanline_update(screen_device &screen, int scanline);
 
