@@ -218,7 +218,7 @@ static MACHINE_CONFIG_START( sapi3, sapi1_state )
 	//MCFG_SCREEN_SIZE(80*6, 24*9)
 	//MCFG_SCREEN_VISIBLE_AREA(0, 80*6-1, 0, 24*9-1)
 	//MCFG_VIDEO_START_OVERRIDE(sapi1_state,sapizps3)
-	MCFG_SCREEN_UPDATE_DRIVER(sapi1_state, screen_update_sapizps3)
+	//MCFG_SCREEN_UPDATE_DRIVER(sapi1_state, screen_update_sapizps3)
 	//MCFG_PALETTE_LENGTH(2)
 	//MCFG_PALETTE_INIT(black_and_white)
 
