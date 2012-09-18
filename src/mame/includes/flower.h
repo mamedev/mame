@@ -73,11 +73,3 @@ private:
 
 extern const device_type FLOWER;
 
-
-
-/*----------- defined in video/flower.c -----------*/
-
-
-
-
-

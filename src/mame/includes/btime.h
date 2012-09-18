@@ -115,25 +115,3 @@ public:
 	UINT32 screen_update_zoar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_disco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-/*----------- defined in machine/btime.c -----------*/
-
-
-
-/*----------- defined in video/btime.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -49,16 +49,5 @@ public:
 	UINT32 screen_update_dcheese(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in drivers/dcheese.c -----------*/
-
 void dcheese_signal_irq(running_machine &machine, int which);
-
-
-/*----------- defined in video/dcheese.c -----------*/
-
-
-
-
-
-

@@ -48,16 +48,8 @@ void crbaloon_audio_set_explosion_enable(device_t *sn, int enabled);
 void crbaloon_audio_set_breath_enable(device_t *sn, int enabled);
 void crbaloon_audio_set_appear_enable(device_t *sn, int enabled);
 DECLARE_WRITE8_DEVICE_HANDLER( crbaloon_audio_set_laugh_enable );
-
 MACHINE_CONFIG_EXTERN( crbaloon_audio );
 
-
 /*----------- defined in video/crbaloon.c -----------*/
-
-
-
-
-
-
 UINT16 crbaloon_get_collision_address(running_machine &machine);
 void crbaloon_set_clear_collision_address(running_machine &machine, int _crbaloon_collision_address_clear);

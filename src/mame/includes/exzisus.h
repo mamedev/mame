@@ -38,11 +38,3 @@ public:
 	DECLARE_WRITE8_MEMBER(exzisus_objectram_1_w);
 	UINT32 screen_update_exzisus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-/*----------- defined in video/exzisus.c -----------*/
-
-
-
-
-

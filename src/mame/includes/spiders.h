@@ -31,9 +31,7 @@ public:
 	virtual void machine_start();
 };
 
-
 /*----------- defined in audio/spiders.c -----------*/
-
 DECLARE_WRITE8_DEVICE_HANDLER( spiders_audio_command_w );
 DECLARE_WRITE8_DEVICE_HANDLER( spiders_audio_a_w );
 DECLARE_WRITE8_DEVICE_HANDLER( spiders_audio_b_w );

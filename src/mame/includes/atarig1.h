@@ -53,12 +53,5 @@ public:
 	void screen_eof_atarig1(screen_device &screen, bool state);
 };
 
-
 /*----------- defined in video/atarig1.c -----------*/
-
-
-
-
-
-
 void atarig1_scanline_update(screen_device &screen, int scanline);

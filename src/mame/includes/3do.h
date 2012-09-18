@@ -201,7 +201,4 @@ void _3do_madam_init( running_machine &machine );
 void _3do_clio_init( running_machine &machine, screen_device *screen );
 
 
-
-
-
 #endif /* _3DO_H_ */

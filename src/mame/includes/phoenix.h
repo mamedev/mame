@@ -82,18 +82,6 @@ private:
 
 extern const device_type PHOENIX;
 
-
-
 /*----------- defined in video/phoenix.c -----------*/
-
-
-
-
-
-
-
-
 DECLARE_READ8_DEVICE_HANDLER( survival_protection_r );
-
 READ_LINE_DEVICE_HANDLER( survival_sid_callback );
-

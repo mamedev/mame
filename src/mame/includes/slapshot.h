@@ -68,9 +68,3 @@ public:
 	void screen_eof_taito_no_buffer(screen_device &screen, bool state);
 };
 
-
-/*----------- defined in video/slapshot.c -----------*/
-
-
-
-

@@ -138,42 +138,14 @@ public:
 	UINT32 screen_update_s2650games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-/*----------- defined in video/pacman.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*----------- defined in machine/pacplus.c -----------*/
-
 void pacplus_decode(running_machine &machine);
 
-
 /*----------- defined in machine/jumpshot.c -----------*/
-
 void jumpshot_decode(running_machine &machine);
 
-
 /*----------- defined in machine/theglobp.c -----------*/
-
-
-
 DECLARE_READ8_HANDLER( theglobp_decrypt_rom );
 
-
 /*----------- defined in machine/acitya.c -------------*/
-
-
-
 DECLARE_READ8_HANDLER( acitya_decrypt_rom );

@@ -263,14 +263,7 @@ public:
 	void screen_eof_pdp1(screen_device &screen, bool state);
 };
 
-
-
 /*----------- defined in video/pdp1.c -----------*/
-
-
-
-
-
 void pdp1_plot(running_machine &machine, int x, int y);
 void pdp1_typewriter_drawchar(running_machine &machine, int character);
 void pdp1_update_lightpen_state(running_machine &machine, const lightpen_t *new_state);

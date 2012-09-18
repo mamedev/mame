@@ -204,25 +204,5 @@ public:
 };
 
 /*----------- defined in video/cave.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 void cave_get_sprite_info(running_machine &machine);
 void sailormn_tilebank_w(running_machine &machine, int bank);

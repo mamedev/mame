@@ -36,20 +36,10 @@ public:
 
 
 /*----------- defined in machine/galaxy.c -----------*/
-
-
 INTERRUPT_GEN( galaxy_interrupt );
 SNAPSHOT_LOAD( galaxy );
 
-
-
-
-
 /*----------- defined in video/galaxy.c -----------*/
-
-
-
-
 void galaxy_set_timer(running_machine &machine);
 
 #endif /* GALAXY_H_ */

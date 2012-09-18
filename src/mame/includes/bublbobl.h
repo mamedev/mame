@@ -111,16 +111,6 @@ public:
 	UINT32 screen_update_bublbobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-
 /*----------- defined in machine/bublbobl.c -----------*/
-
-
-
 // for 68705 bootleg
 INTERRUPT_GEN( bublbobl_m68705_interrupt );
-
-
-/*----------- defined in video/bublbobl.c -----------*/
-
-

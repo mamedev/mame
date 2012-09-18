@@ -116,19 +116,5 @@ enum
 
 
 /*----------- defined in video/alpha68k.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-
-
 void alpha68k_V_video_bank_w(running_machine &machine, int bank);
 void alpha68k_flipscreen_w(running_machine &machine, int flip);
-

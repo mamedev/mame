@@ -102,18 +102,4 @@ public:
 
 
 /*----------- defined in machine/tnzs.c -----------*/
-
 INTERRUPT_GEN( arknoid2_interrupt );
-
-
-
-
-
-
-
-
-/*----------- defined in video/tnzs.c -----------*/
-
-
-
-

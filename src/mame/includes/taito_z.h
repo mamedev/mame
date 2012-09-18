@@ -86,17 +86,3 @@ public:
 	UINT32 screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_racingb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-/*----------- defined in video/taito_z.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-

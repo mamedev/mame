@@ -83,19 +83,6 @@ public:
 	void screen_eof_redclash(screen_device &screen, bool state);
 };
 
-
-/*----------- defined in video/ladybug.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
 /*----------- defined in video/redclash.c -----------*/
 
 DECLARE_WRITE8_HANDLER( redclash_videoram_w );
@@ -106,11 +93,6 @@ DECLARE_WRITE8_HANDLER( redclash_star0_w );
 DECLARE_WRITE8_HANDLER( redclash_star1_w );
 DECLARE_WRITE8_HANDLER( redclash_star2_w );
 DECLARE_WRITE8_HANDLER( redclash_star_reset_w );
-
-
-
-
-
 
 /* sraider uses the zerohour star generator board */
 void redclash_set_stars_enable(running_machine &machine, UINT8 on);

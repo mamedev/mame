@@ -71,25 +71,3 @@ public:
 	UINT32 screen_update_yamato(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_toprollr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-/*----------- defined in machine/cclimber.c -----------*/
-
-
-/*----------- defined in video/cclimber.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

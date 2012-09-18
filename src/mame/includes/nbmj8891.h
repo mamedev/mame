@@ -75,11 +75,3 @@ public:
 	DECLARE_VIDEO_START(nbmj8891_1layer);
 	UINT32 screen_update_nbmj8891(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-/*----------- defined in video/nbmj8891.c -----------*/
-
-
-
-
-

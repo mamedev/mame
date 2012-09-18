@@ -81,20 +81,9 @@ public:
 };
 
 /*----------- defined in machine/irobot.c -----------*/
-
-
-
 TIMER_DEVICE_CALLBACK( irobot_irvg_done_callback );
 TIMER_DEVICE_CALLBACK( irobot_irmb_done_callback );
 
-
-
 /*----------- defined in video/irobot.c -----------*/
-
-
-
-
-
-
 void irobot_poly_clear(running_machine &machine);
 void irobot_run_video(running_machine &machine);

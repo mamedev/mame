@@ -107,20 +107,7 @@ public:
 	UINT32 screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-/*----------- defined in drivers/cvs.c -----------*/
-
-
-
-
 /*----------- defined in video/cvs.c -----------*/
-
-
-
 void cvs_init_stars( running_machine &machine );
 void cvs_scroll_stars( running_machine &machine );
 void cvs_update_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const pen_t star_pen, bool update_always);
-
-
-
-

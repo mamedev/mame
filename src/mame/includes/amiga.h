@@ -502,10 +502,6 @@ void amiga_audio_data_w(device_t *device, int which, UINT16 data);
 
 extern const UINT16 amiga_expand_byte[256];
 
-
-
-
-
 void amiga_copper_setpc(running_machine &machine, UINT32 pc);
 int amiga_copper_execute_next(running_machine &machine, int xpos);
 
@@ -516,9 +512,6 @@ void amiga_sprite_dma_reset(running_machine &machine, int which);
 void amiga_sprite_enable_comparitor(running_machine &machine, int which, int enable);
 
 /*----------- defined in video/amigaaga.c -----------*/
-
-
-
 
 void amiga_aga_render_scanline(running_machine &machine, bitmap_rgb32 &bitmap, int scanline);
 void amiga_aga_palette_write(running_machine &machine, int color_reg, UINT16 data);

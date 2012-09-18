@@ -262,7 +262,6 @@ public:
 	UINT32 screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in machine/nes.c -----------*/
 
 
@@ -273,20 +272,9 @@ DEVICE_START(nes_disk);
 DEVICE_IMAGE_LOAD(nes_disk);
 DEVICE_IMAGE_UNLOAD(nes_disk);
 
-
-
-
-
-
 int nes_ppu_vidaccess( device_t *device, int address, int data );
 
 void nes_partialhash(hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
-
-/*----------- defined in video/nes.c -----------*/
-
-
-
-
 
 
 #endif /* NES_H_ */

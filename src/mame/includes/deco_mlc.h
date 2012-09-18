@@ -39,10 +39,3 @@ public:
 	UINT32 screen_update_mlc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_mlc(screen_device &screen, bool state);
 };
-
-
-/*----------- defined in video/deco_mlc.c -----------*/
-
-
-
-

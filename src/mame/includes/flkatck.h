@@ -40,13 +40,3 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_flkatck(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-//static rectangle k007121_clip[2];
-
-
-/*----------- defined in video/flkatck.c -----------*/
-
-
-
-

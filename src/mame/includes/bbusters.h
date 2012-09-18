@@ -58,12 +58,3 @@ public:
 	UINT32 screen_update_mechatt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_bbuster(screen_device &screen, bool state);
 };
-
-
-/*----------- defined in video/bbusters.c -----------*/
-
-
-
-
-
-

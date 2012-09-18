@@ -61,11 +61,5 @@ public:
 	DECLARE_PALETTE_INIT(stactics);
 	UINT32 screen_update_stactics(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
 /*----------- defined in video/stactics.c -----------*/
-
 MACHINE_CONFIG_EXTERN( stactics_video );
-
-
-

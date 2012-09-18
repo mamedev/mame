@@ -28,11 +28,3 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 };
-
-
-/*----------- defined in machine/namcond1.c -----------*/
-
-
-
-
-

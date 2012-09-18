@@ -52,8 +52,6 @@ public:
 	void screen_eof_asuka(screen_device &screen, bool state);
 };
 
-
-
 /*----------- defined in machine/bonzeadv.c -----------*/
 
 DECLARE_READ16_HANDLER( bonzeadv_cchip_ctrl_r );
@@ -61,10 +59,3 @@ DECLARE_READ16_HANDLER( bonzeadv_cchip_ram_r );
 DECLARE_WRITE16_HANDLER( bonzeadv_cchip_ctrl_w );
 DECLARE_WRITE16_HANDLER( bonzeadv_cchip_bank_w );
 DECLARE_WRITE16_HANDLER( bonzeadv_cchip_ram_w );
-
-
-/*----------- defined in video/asuka.c -----------*/
-
-
-
-

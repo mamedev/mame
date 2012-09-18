@@ -139,28 +139,8 @@ public:
 	void screen_eof_dragngun(screen_device &screen, bool state);
 };
 
-
-
 /*----------- defined in video/deco32.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 DECLARE_WRITE32_HANDLER( deco32_pf1_data_w );
 DECLARE_WRITE32_HANDLER( deco32_pf2_data_w );
 DECLARE_WRITE32_HANDLER( deco32_pf3_data_w );
 DECLARE_WRITE32_HANDLER( deco32_pf4_data_w );
-
-

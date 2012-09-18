@@ -57,6 +57,4 @@ public:
 };
 
 /*----------- defined in video/crgolf.c -----------*/
-
-
 MACHINE_CONFIG_EXTERN( crgolf_video );

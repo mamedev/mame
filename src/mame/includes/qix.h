@@ -97,18 +97,8 @@ extern const pia6821_interface qixmcu_pia_2_intf;
 extern const pia6821_interface slither_pia_1_intf;
 extern const pia6821_interface slither_pia_2_intf;
 
-
-
-
-
-
-
-
-
 DECLARE_WRITE8_DEVICE_HANDLER( qix_pia_w );
-
 WRITE_LINE_DEVICE_HANDLER( qix_vsync_changed );
-
 
 /*----------- defined in video/qix.c -----------*/
 
@@ -117,7 +107,6 @@ MACHINE_CONFIG_EXTERN( zookeep_video );
 MACHINE_CONFIG_EXTERN( slither_video );
 
 DECLARE_WRITE8_DEVICE_HANDLER( qix_flip_screen_w );
-
 
 /*----------- defined in audio/qix.c -----------*/
 

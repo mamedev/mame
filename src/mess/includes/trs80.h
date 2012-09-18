@@ -129,29 +129,7 @@ public:
 
 extern const wd17xx_interface trs80_wd17xx_interface;
 
-
-
-
-
-
-
 INTERRUPT_GEN( trs80_rtc_interrupt );
 INTERRUPT_GEN( trs80_fdc_interrupt );
-
-
-
-/*----------- defined in video/trs80.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-
 
 #endif	/* TRS80_H_ */

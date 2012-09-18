@@ -48,10 +48,3 @@ DECLARE_WRITE8_DEVICE_HANDLER( canyon_attract_w );
 DECLARE_WRITE8_DEVICE_HANDLER( canyon_whistle_w );
 
 DISCRETE_SOUND_EXTERN( canyon );
-
-
-/*----------- defined in video/canyon.c -----------*/
-
-
-
-

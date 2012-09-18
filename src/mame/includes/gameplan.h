@@ -72,7 +72,6 @@ public:
 	UINT32 screen_update_leprechn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in video/gameplan.c -----------*/
 
 extern const via6522_interface gameplan_via_0_interface;

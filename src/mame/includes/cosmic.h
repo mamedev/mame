@@ -76,20 +76,3 @@ public:
 	UINT32 screen_update_devzone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_nomnlnd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-/*----------- defined in video/cosmic.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-

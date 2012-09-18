@@ -157,22 +157,3 @@ extern void thndrx2_sprite_callback(running_machine &machine, int *code,int *col
 extern void lgtnfght_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);
 extern void blswhstl_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);
 extern void prmrsocr_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

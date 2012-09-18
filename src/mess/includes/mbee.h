@@ -149,12 +149,6 @@ public:
 extern const wd17xx_interface mbee_wd17xx_interface;
 extern const z80pio_interface mbee_z80pio_intf;
 
-
-
-
-
-
-
 INTERRUPT_GEN( mbee_interrupt );
 QUICKLOAD_LOAD( mbee );
 
@@ -166,15 +160,6 @@ MC6845_UPDATE_ROW( mbeeic_update_row );
 MC6845_UPDATE_ROW( mbeeppc_update_row );
 MC6845_ON_UPDATE_ADDR_CHANGED( mbee_update_addr );
 MC6845_ON_UPDATE_ADDR_CHANGED( mbee256_update_addr );
-
-
-
-
-
-
-
-
-
 
 
 #endif /* MBEE_H_ */

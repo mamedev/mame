@@ -166,14 +166,4 @@ public:
 
 
 /*----------- defined in video/metro.c -----------*/
-
-
-
-
-
-
-
-
-
-
 void metro_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);

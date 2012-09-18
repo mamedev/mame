@@ -112,4 +112,3 @@ protected:
 	UINT16 m_misc_control;
 	int m_xcount;
 };
-

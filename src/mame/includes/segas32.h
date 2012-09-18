@@ -179,31 +179,10 @@ public:
 	UINT32 screen_update_multi32_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in machine/segas32.c -----------*/
-
-
-
 void darkedge_fd1149_vblank(device_t *device);
 void f1lap_fd1149_vblank(device_t *device);
-
-
 extern const UINT8 ga2_v25_opcode_table[];
 void decrypt_ga2_protrom(running_machine &machine);
-
-
-
-
 /*----------- defined in video/segas32.c -----------*/
-
-
-
-
-
-
 void system32_set_vblank(running_machine &machine, int state);
-
-
-
-
-

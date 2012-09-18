@@ -152,13 +152,6 @@ void ts2068_update_memory(running_machine &machine);
 /*----------- defined in video/spectrum.c -----------*/
 
 
-
-
-
-
-
-
-
 void spectrum_border_force_redraw (running_machine &machine);
 void spectrum_border_set_last_color (running_machine &machine, int NewColor);
 void spectrum_border_draw(running_machine &machine, bitmap_ind16 &bitmap, int full_refresh,
@@ -173,12 +166,5 @@ void spectrum_EventList_SetOffsetStartTime(running_machine &machine, int StartTi
 void spectrum_EventList_AddItemOffset(running_machine &machine, int ID, int Data,int Time);
 int spectrum_EventList_NumEvents(running_machine &machine);
 EVENT_LIST_ITEM *spectrum_EventList_GetFirstItem(running_machine &machine);
-
-/*----------- defined in video/timex.c -----------*/
-
-
-
-
-
 
 #endif /* __SPECTRUM_H__ */

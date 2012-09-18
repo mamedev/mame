@@ -83,24 +83,10 @@ WRITE_LINE_DEVICE_HANDLER( carpolo_7474_2s_2_q_cb );
 WRITE_LINE_DEVICE_HANDLER( carpolo_7474_2u_1_q_cb );
 WRITE_LINE_DEVICE_HANDLER( carpolo_7474_2u_2_q_cb );
 
-
-
-
-
-
 INTERRUPT_GEN( carpolo_timer_interrupt );
-
 
 void carpolo_generate_car_car_interrupt(running_machine &machine, int car1, int car2);
 void carpolo_generate_ball_screen_interrupt(running_machine &machine, UINT8 cause);
 void carpolo_generate_car_goal_interrupt(running_machine &machine, int car, int right_goal);
 void carpolo_generate_car_ball_interrupt(running_machine &machine, int car, int car_x, int car_y);
 void carpolo_generate_car_border_interrupt(running_machine &machine, int car, int horizontal_border);
-
-
-/*----------- defined in video/carpolo.c -----------*/
-
-
-
-
-

@@ -35,9 +35,3 @@ public:
 	DECLARE_VIDEO_START(offtwall);
 	UINT32 screen_update_offtwall(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-/*----------- defined in video/offtwall.c -----------*/
-
-
-

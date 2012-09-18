@@ -106,22 +106,4 @@ extern const pia6821_interface zwackery_pia0_intf;
 extern const pia6821_interface zwackery_pia1_intf;
 extern const pia6821_interface zwackery_pia2_intf;
 
-
-
-
-
-
-
-
 INTERRUPT_GEN( mcr68_interrupt );
-
-
-/*----------- defined in video/mcr68.c -----------*/
-
-
-
-
-
-
-
-

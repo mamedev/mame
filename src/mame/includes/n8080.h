@@ -83,22 +83,7 @@ public:
 	void screen_eof_helifire(screen_device &screen, bool state);
 };
 
-
-
 /*----------- defined in video/n8080.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-
-
 void spacefev_start_red_cannon(running_machine &machine);
 
 /*----------- defined in audio/n8080.c -----------*/
@@ -106,11 +91,3 @@ void spacefev_start_red_cannon(running_machine &machine);
 MACHINE_CONFIG_EXTERN( spacefev_sound );
 MACHINE_CONFIG_EXTERN( sheriff_sound );
 MACHINE_CONFIG_EXTERN( helifire_sound );
-
-
-
-
-
-
-
-

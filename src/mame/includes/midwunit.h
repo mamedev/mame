@@ -42,14 +42,3 @@ public:
 	DECLARE_MACHINE_RESET(midwunit);
 	DECLARE_VIDEO_START(midwunit);
 };
-
-/*----------- defined in machine/midwunit.c -----------*/
-
-
-
-
-
-
-
-
-

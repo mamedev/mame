@@ -160,21 +160,5 @@ public:
 	UINT32 screen_update_itech32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in drivers/itech32.c -----------*/
-
 void itech32_update_interrupts(running_machine &machine, int vint, int xint, int qint);
-
-
-/*----------- defined in video/itech32.c -----------*/
-
-
-
-
-
-
-
-
-
-
-

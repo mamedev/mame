@@ -106,24 +106,10 @@ public:
 
 
 /*----------- defined in machine/ti85.c -----------*/
-
-
-
-
-
-
 NVRAM_HANDLER( ti83p );
 NVRAM_HANDLER( ti86 );
 
 SNAPSHOT_LOAD( ti8x );
-
-
-/*----------- defined in video/ti85.c -----------*/
-
-
-
-
-
 
 
 #endif /* TI85_H_ */

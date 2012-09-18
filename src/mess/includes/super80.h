@@ -90,21 +90,8 @@ public:
 
 
 /*----------- defined in video/super80.c -----------*/
-
-
-
-
-
-
-
-
-
-
 MC6845_UPDATE_ROW( super80v_update_row );
 
 /*----------- defined in machine/super80.c -----------*/
 
-
-
 extern const z80pio_interface super80_pio_intf;
-

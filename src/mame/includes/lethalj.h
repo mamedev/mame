@@ -31,11 +31,5 @@ public:
 	virtual void video_start();
 };
 
-
 /*----------- defined in video/lethalj.c -----------*/
-
-
-
-
-
 void lethalj_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);

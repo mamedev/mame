@@ -125,23 +125,10 @@ extern const gfx_layout mcr_sprite_layout;
 extern UINT32 mcr_cpu_board;
 extern UINT32 mcr_sprite_board;
 
-
-
-
-
 TIMER_DEVICE_CALLBACK( mcr_interrupt );
 TIMER_DEVICE_CALLBACK( mcr_ipu_interrupt );
-
-
-
 
 /*----------- defined in video/mcr.c -----------*/
 
 extern INT8 mcr12_sprite_xoffs;
 extern INT8 mcr12_sprite_xoffs_flip;
-
-
-
-
-
-

@@ -166,23 +166,6 @@ TIMER_DEVICE_CALLBACK( williams_count240_callback );
 TIMER_DEVICE_CALLBACK( williams2_va11_callback );
 TIMER_DEVICE_CALLBACK( williams2_endscreen_callback );
 
-/* initialization */
-
-
-
-
-
-
-
-
-
-
-
-/* banking */
-
-/* Mayday protection */
-
-
 /*----------- defined in video/williams.c -----------*/
 
 #define WILLIAMS_BLITTER_NONE		0		/* no blitter */
@@ -192,14 +175,4 @@ TIMER_DEVICE_CALLBACK( williams2_endscreen_callback );
 #define WILLIAMS_TILEMAP_MYSTICM	0		/* IC79 is a 74LS85 comparator */
 #define WILLIAMS_TILEMAP_TSHOOT		1		/* IC79 is a 74LS157 selector jumpered to be enabled */
 #define WILLIAMS_TILEMAP_JOUST2		2		/* IC79 is a 74LS157 selector jumpered to be disabled */
-
-
-
-
-
-
-
-
-
-
 

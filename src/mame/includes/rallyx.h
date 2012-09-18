@@ -65,17 +65,3 @@ public:
 	UINT32 screen_update_jungler(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_locomotn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-/*----------- defined in video/rallyx.c -----------*/
-
-
-
-
-
-
-
-
-
-
-

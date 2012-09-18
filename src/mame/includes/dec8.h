@@ -133,26 +133,6 @@ public:
 };
 
 /*----------- defined in video/dec8.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 DECLARE_WRITE8_HANDLER( dec8_bac06_0_w );
 DECLARE_WRITE8_HANDLER( dec8_bac06_1_w );
 DECLARE_WRITE8_HANDLER( dec8_pf1_data_w );

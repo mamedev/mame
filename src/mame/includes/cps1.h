@@ -225,27 +225,13 @@ GFXDECODE_EXTERN( cps1 );
 
 
 /*----------- defined in video/cps1.c -----------*/
-
-
-
-
-
-
-
-
-
 void cps1_get_video_base(running_machine &machine);
 void cps2_set_sprite_priorities(running_machine &machine);
 void cps2_objram_latch(running_machine &machine);
 
-
 /*************************************
  *  Encryption
  *************************************/
-
-/*----------- defined in machine/cps2crpt.c -----------*/
-
-
 
 /*----------- defined in machine/kabuki.c -----------*/
 

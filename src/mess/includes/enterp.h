@@ -36,12 +36,6 @@ public:
 
 
 /*----------- defined in video/epnick.c -----------*/
-
-
-
-
-
 DECLARE_WRITE8_HANDLER( epnick_reg_w );
-
 
 #endif /* __ENTERP_H__ */

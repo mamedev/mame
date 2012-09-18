@@ -52,15 +52,5 @@ public:
 	UINT32 screen_update_spacefb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in audio/spacefb.c -----------*/
-
 MACHINE_CONFIG_EXTERN( spacefb_audio );
-
-
-
-/*----------- defined in video/spacefb.c -----------*/
-
-
-
-

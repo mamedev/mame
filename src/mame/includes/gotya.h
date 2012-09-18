@@ -39,15 +39,3 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_gotya(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-/*----------- defined in audio/gotya.c -----------*/
-
-
-
-/*----------- defined in video/gotya.c -----------*/
-
-
-
-
-

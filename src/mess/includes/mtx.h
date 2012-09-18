@@ -77,8 +77,5 @@ DECLARE_WRITE8_DEVICE_HANDLER( mtx_cst_w );
 DECLARE_READ8_DEVICE_HANDLER( mtx_strobe_r );
 DECLARE_READ8_DEVICE_HANDLER( mtx_prt_r );
 
-/* Keyboard */
-
-/* HRX */
 
 #endif /* __MTX_H__ */

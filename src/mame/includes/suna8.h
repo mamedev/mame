@@ -106,20 +106,9 @@ public:
 	UINT32 screen_update_suna8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in audio/suna8.c -----------*/
 
 DECLARE_WRITE8_DEVICE_HANDLER( suna8_play_samples_w );
 DECLARE_WRITE8_DEVICE_HANDLER( rranger_play_samples_w );
 DECLARE_WRITE8_DEVICE_HANDLER( suna8_samples_number_w );
 SAMPLES_START( suna8_sh_start );
-
-
-/*----------- defined in video/suna8.c -----------*/
-
-
-
-
-
-
-

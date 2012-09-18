@@ -258,15 +258,7 @@ public:
 	UINT32 screen_update_namcos22(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in video/namcos22.c -----------*/
-
-
-
-
-
-
-
 void namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource );
 UINT32 namcos22_point_rom_r( running_machine &machine, offs_t offs );
 void namcos22_enable_slave_simulation( running_machine &machine, int enable );

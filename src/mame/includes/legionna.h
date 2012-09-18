@@ -54,12 +54,6 @@ public:
 	UINT32 screen_update_grainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in video/legionna.c -----------*/
-
 void heatbrl_setgfxbank(running_machine &machine, UINT16 data);
 void denjinmk_setgfxbank(running_machine &machine, UINT16 data);
-
-
-
-

@@ -35,8 +35,6 @@ public:
 
 /*----------- defined in machine/gamepock.c -----------*/
 
-
-
 int gamepock_io_callback( device_t *device, int ioline, int state );
 
 #endif

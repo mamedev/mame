@@ -303,6 +303,4 @@ DECLARE_WRITE32_HANDLER( x68k_tvram32_w );
 DECLARE_READ32_HANDLER( x68k_tvram32_r );
 
 
-
-
 #endif /* X68K_H_ */

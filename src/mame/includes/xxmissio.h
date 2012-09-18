@@ -31,13 +31,5 @@ public:
 	UINT32 screen_update_xxmissio(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-/*----------- defined in video/xxmissio.c -----------*/
-
-
-
-
 DECLARE_WRITE8_DEVICE_HANDLER( xxmissio_scroll_x_w );
 DECLARE_WRITE8_DEVICE_HANDLER( xxmissio_scroll_y_w );
-
-

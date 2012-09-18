@@ -41,19 +41,13 @@ public:
 	UINT32 screen_update_demoneye(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_panther(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
-
-
 /*----------- defined in audio/redalert.c -----------*/
-
-
 
 MACHINE_CONFIG_EXTERN( redalert_audio );
 MACHINE_CONFIG_EXTERN( ww3_audio );
 MACHINE_CONFIG_EXTERN( demoneye_audio );
 
-
 /*----------- defined in video/redalert.c -----------*/
-
 
 MACHINE_CONFIG_EXTERN( ww3_video );
 MACHINE_CONFIG_EXTERN( panther_video );

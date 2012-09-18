@@ -56,14 +56,7 @@ public:
 	void screen_eof_atarig42(screen_device &screen, bool state);
 };
 
-
 /*----------- defined in video/atarig42.c -----------*/
-
-
-
-
-
 DECLARE_WRITE16_HANDLER( atarig42_mo_control_w );
-
 void atarig42_scanline_update(screen_device &screen, int scanline);
 

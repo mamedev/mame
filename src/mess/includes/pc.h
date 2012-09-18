@@ -118,21 +118,12 @@ DECLARE_READ8_DEVICE_HANDLER( mc1502_wd17xx_aux_r );
 DECLARE_READ8_DEVICE_HANDLER( mc1502_wd17xx_motor_r );
 DECLARE_WRITE8_DEVICE_HANDLER( mc1502_wd17xx_aux_w );
 
-
-
-
-
-
-
-
 DEVICE_IMAGE_LOAD( pcjr_cartridge );
 
 TIMER_DEVICE_CALLBACK( pc_frame_interrupt );
 TIMER_DEVICE_CALLBACK( pc_vga_frame_interrupt );
 TIMER_DEVICE_CALLBACK( pcjr_frame_interrupt );
 TIMER_DEVICE_CALLBACK( null_frame_interrupt );
-
-
 
 
 void pc_rtc_init(running_machine &machine);

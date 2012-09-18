@@ -112,19 +112,11 @@ public:
 
 INTERRUPT_GEN( twincobr_interrupt );
 INTERRUPT_GEN( wardner_interrupt );
-
-
-
-
 extern void twincobr_driver_savestate(running_machine &machine);
-
 
 /*----------- defined in video/twincobr.c -----------*/
 
 extern const mc6845_interface twincobr_mc6845_intf;
-
 extern void twincobr_flipscreen(running_machine &machine, int flip);
 extern void twincobr_display(running_machine &machine, int enable);
-
-
 

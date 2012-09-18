@@ -56,12 +56,3 @@ private:
 };
 
 extern const device_type GOMOKU;
-
-
-
-/*----------- defined in video/gomoku.c -----------*/
-
-
-
-
-

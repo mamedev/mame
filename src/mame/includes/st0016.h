@@ -60,14 +60,8 @@ public:
 #define ST0016_CHAR_BANK_MASK (ST0016_MAX_CHAR_BANK-1)
 #define ST0016_PAL_BANK_MASK  (ST0016_MAX_PAL_BANK-1)
 
-/*----------- defined in drivers/st0016.c -----------*/
-
-
-
 /*----------- defined in video/st0016.c -----------*/
 
 extern UINT8 macs_cart_slot;
 extern UINT32 st0016_game;
 extern UINT8 *st0016_charram;
-
-

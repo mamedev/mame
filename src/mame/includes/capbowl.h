@@ -42,10 +42,3 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_capbowl(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
-
-/*----------- defined in video/capbowl.c -----------*/
-
-
-
-
-

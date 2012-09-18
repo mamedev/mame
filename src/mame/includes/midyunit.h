@@ -108,30 +108,7 @@ public:
 	DECLARE_VIDEO_START(mkyawdim);
 	DECLARE_VIDEO_START(common);
 };
-
-
-/*----------- defined in machine/midyunit.c -----------*/
-
-
-
-
-
-
-
-
-
 /*----------- defined in video/midyunit.c -----------*/
-
-
-
-
-
-
-
-
 void midyunit_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
 void midyunit_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
-
-
-
 void midyunit_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);

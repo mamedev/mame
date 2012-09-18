@@ -40,9 +40,5 @@ public:
 };
 
 /*----------- defined in video/rollerg.c -----------*/
-
 extern void rollerg_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);
 extern void rollerg_zoom_callback(running_machine &machine, int *code,int *color,int *flags);
-
-
-

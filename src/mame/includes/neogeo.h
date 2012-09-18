@@ -307,16 +307,9 @@ void matrimbl_decrypt(running_machine &machine);
 
 /*----------- defined in video/neogeo.c -----------*/
 
-
-
-
-
-
 void neogeo_set_palette_bank(running_machine &machine, UINT8 data);
 void neogeo_set_screen_dark(running_machine &machine, UINT8 data);
 
 void neogeo_set_fixed_layer_source(running_machine &machine, UINT8 data);
 
 UINT8 neogeo_get_auto_animation_counter(running_machine &machine);
-
-

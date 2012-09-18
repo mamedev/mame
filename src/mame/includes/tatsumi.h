@@ -126,27 +126,8 @@ public:
 	UINT32 screen_update_bigfight(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in machine/tatsumi.c -----------*/
-
-
 DECLARE_READ8_DEVICE_HANDLER(tatsumi_hack_ym2151_r);
 DECLARE_READ8_DEVICE_HANDLER(tatsumi_hack_oki_r);
 
-
 void tatsumi_reset(running_machine &machine);
-
-/*----------- defined in video/tatsumi.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-
-

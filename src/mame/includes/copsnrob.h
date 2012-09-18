@@ -39,17 +39,8 @@ public:
 	UINT32 screen_update_copsnrob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in machine/copsnrob.c -----------*/
-
 DECLARE_READ8_HANDLER( copsnrob_gun_position_r );
 
-
-/*----------- defined in video/copsnrob.c -----------*/
-
-
-
-
 /*----------- defined in audio/copsnrob.c -----------*/
-
 DISCRETE_SOUND_EXTERN( copsnrob );

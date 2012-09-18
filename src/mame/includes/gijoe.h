@@ -48,9 +48,5 @@ public:
 };
 
 /*----------- defined in video/gijoe.c -----------*/
-
 extern void gijoe_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);
 extern void gijoe_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
-
-
-

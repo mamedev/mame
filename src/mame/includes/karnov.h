@@ -71,11 +71,4 @@ enum {
 
 
 /*----------- defined in video/karnov.c -----------*/
-
-
 void karnov_flipscreen_w(running_machine &machine, int data);
-
-
-
-
-

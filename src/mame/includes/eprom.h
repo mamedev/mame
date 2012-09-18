@@ -35,13 +35,5 @@ public:
 	UINT32 screen_update_guts(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in video/eprom.c -----------*/
-
-
-
-
-
-
-
 void eprom_scanline_update(screen_device &screen, int scanline);

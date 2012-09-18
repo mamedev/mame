@@ -41,10 +41,3 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_lucky74(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-/*----------- defined in video/lucky74.c -----------*/
-
-
-
-

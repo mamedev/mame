@@ -86,20 +86,3 @@ DECLARE_WRITE8_DEVICE_HANDLER( congo_sound_c_w );
 
 MACHINE_CONFIG_EXTERN( zaxxon_samples );
 MACHINE_CONFIG_EXTERN( congo_samples );
-
-
-/*----------- defined in video/zaxxon.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-

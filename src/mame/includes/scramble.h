@@ -62,10 +62,6 @@ extern const i8255_interface(scramble_ppi_0_intf);
 extern const i8255_interface(scramble_ppi_1_intf);
 extern const i8255_interface(stratgyx_ppi_1_intf);
 
-
-
-
-
 DECLARE_READ8_HANDLER( triplep_pip_r );
 DECLARE_READ8_HANDLER( triplep_pap_r );
 

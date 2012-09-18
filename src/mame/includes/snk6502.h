@@ -114,16 +114,3 @@ int snk6502_music0_playing(running_machine &machine);
 
 DISCRETE_SOUND_EXTERN( fantasy );
 
-
-/*----------- defined in video/snk6502.c -----------*/
-
-
-
-
-
-
-
-
-
-
-

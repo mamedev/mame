@@ -58,12 +58,9 @@ public:
 	UINT32 screen_update_bsktball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-
 /*----------- defined in machine/bsktball.c -----------*/
 
 TIMER_DEVICE_CALLBACK( bsktball_scanline );
-
 
 /*----------- defined in audio/bsktball.c -----------*/
 
@@ -72,9 +69,3 @@ DECLARE_WRITE8_DEVICE_HANDLER( bsktball_note_w );
 DECLARE_WRITE8_DEVICE_HANDLER( bsktball_noise_reset_w );
 
 DISCRETE_SOUND_EXTERN( bsktball );
-
-/*----------- defined in video/bsktball.c -----------*/
-
-
-
-

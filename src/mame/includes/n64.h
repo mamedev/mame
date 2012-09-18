@@ -283,7 +283,4 @@ extern DECLARE_WRITE32_DEVICE_HANDLER( n64_sp_reg_w );
 extern DECLARE_READ32_DEVICE_HANDLER( n64_dp_reg_r );
 extern DECLARE_WRITE32_DEVICE_HANDLER( n64_dp_reg_w );
 
-
-
-
 #endif

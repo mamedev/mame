@@ -146,13 +146,7 @@ public:
 
 
 /*----------- defined in machine/pce.c -----------*/
-
 DEVICE_IMAGE_LOAD(pce_cart);
-
 extern const msm5205_interface pce_cd_msm5205_interface;
-
-
-
-
 
 #endif /* PCE_H_ */

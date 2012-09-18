@@ -94,14 +94,6 @@ public:
 	void screen_eof_psikyo(screen_device &screen, bool state);
 };
 
-
 /*----------- defined in video/psikyo.c -----------*/
 
 void psikyo_switch_banks(running_machine &machine, int tmap, int bank);
-
-
-
-
-
-
-

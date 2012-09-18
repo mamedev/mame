@@ -135,7 +135,6 @@ public:
 
 
 /*----------- defined in audio/turbo.c -----------*/
-
 MACHINE_CONFIG_EXTERN( turbo_samples );
 MACHINE_CONFIG_EXTERN( subroc3d_samples );
 MACHINE_CONFIG_EXTERN( buckrog_samples );
@@ -150,18 +149,3 @@ DECLARE_WRITE8_DEVICE_HANDLER( subroc3d_sound_c_w );
 
 DECLARE_WRITE8_DEVICE_HANDLER( buckrog_sound_a_w );
 DECLARE_WRITE8_DEVICE_HANDLER( buckrog_sound_b_w );
-
-
-/*----------- defined in video/turbo.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-

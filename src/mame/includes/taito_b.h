@@ -74,22 +74,3 @@ public:
 	UINT32 screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_taitob(screen_device &screen, bool state);
 };
-
-
-/*----------- defined in video/taito_b.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

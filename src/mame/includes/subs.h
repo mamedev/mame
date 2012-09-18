@@ -48,10 +48,7 @@ public:
 
 
 /*----------- defined in machine/subs.c -----------*/
-
-
 INTERRUPT_GEN( subs_interrupt );
-
 
 /*----------- defined in audio/subs.c -----------*/
 
@@ -62,10 +59,3 @@ DECLARE_WRITE8_DEVICE_HANDLER( subs_crash_w );
 DECLARE_WRITE8_DEVICE_HANDLER( subs_explode_w );
 
 DISCRETE_SOUND_EXTERN( subs );
-
-
-/*----------- defined in video/subs.c -----------*/
-
-
-
-

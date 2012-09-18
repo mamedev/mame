@@ -84,16 +84,7 @@ public:
 	UINT32 screen_update_senjyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in audio/senjyo.c -----------*/
-
 extern const z80_daisy_config senjyo_daisy_chain[];
 extern const z80pio_interface senjyo_pio_intf;
 extern const z80ctc_interface senjyo_ctc_intf;
-
-
-/*----------- defined in video/senjyo.c -----------*/
-
-
-
-

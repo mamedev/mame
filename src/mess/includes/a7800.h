@@ -71,24 +71,15 @@ public:
 
 /*----------- defined in video/a7800.c -----------*/
 
-
-
 TIMER_DEVICE_CALLBACK( a7800_interrupt );
-
 
 /*----------- defined in machine/a7800.c -----------*/
 
 extern const riot6532_interface a7800_r6532_interface;
 
-
-
-
 void a7800_partialhash(hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
 
 DEVICE_START( a7800_cart );
 DEVICE_IMAGE_LOAD( a7800_cart );
-
-
-
 
 #endif /* A7800_H_ */

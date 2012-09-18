@@ -50,7 +50,6 @@ public:
 	UINT32 screen_update_bagman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- timings -----------*/
 
 #define BAGMAN_MAIN_CLOCK	XTAL_18_432MHz
@@ -70,15 +69,3 @@ public:
  */
 #define VBEND				(0x0f)
 #define VBSTART				(0xef)
-
-/*----------- defined in machine/bagman.c -----------*/
-
-
-
-
-/*----------- defined in video/bagman.c -----------*/
-
-
-
-
-

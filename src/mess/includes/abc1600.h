@@ -258,5 +258,4 @@ public:
 MACHINE_CONFIG_EXTERN( abc1600_video );
 
 
-
 #endif

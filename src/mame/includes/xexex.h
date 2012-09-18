@@ -67,11 +67,7 @@ public:
 	UINT32 screen_update_xexex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in video/xexex.c -----------*/
 
 extern void xexex_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);
 extern void xexex_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
-
-
-

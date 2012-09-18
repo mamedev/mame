@@ -58,16 +58,10 @@ public:
 	UINT32 screen_update_cyberbal2p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-
 /*----------- defined in audio/cyberbal.c -----------*/
 
 void cyberbal_sound_reset(running_machine &machine);
-
 INTERRUPT_GEN( cyberbal_sound_68k_irq_gen );
-
-
-
 
 /*----------- defined in video/cyberbal.c -----------*/
 
@@ -75,11 +69,5 @@ DECLARE_READ16_HANDLER( cyberbal_paletteram_0_r );
 DECLARE_READ16_HANDLER( cyberbal_paletteram_1_r );
 DECLARE_WRITE16_HANDLER( cyberbal_paletteram_0_w );
 DECLARE_WRITE16_HANDLER( cyberbal_paletteram_1_w );
-
-
-
-
-
-
 
 void cyberbal_scanline_update(screen_device &screen, int scanline);

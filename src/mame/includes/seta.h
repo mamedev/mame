@@ -201,30 +201,4 @@ public:
 };
 
 /*----------- defined in video/seta.c -----------*/
-
 void seta_coin_lockout_w(running_machine &machine, int data);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

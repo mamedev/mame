@@ -97,19 +97,9 @@ public:
 	void screen_eof_namcos1(screen_device &screen, bool state);
 };
 
-
 /*----------- defined in drivers/namcos1.c -----------*/
 
 void namcos1_init_DACs(running_machine &machine);
-
-
-/*----------- defined in machine/namcos1.c -----------*/
-
-
-
-
-
-
 
 /*----------- defined in video/namcos1.c -----------*/
 
@@ -118,7 +108,3 @@ DECLARE_WRITE8_HANDLER( namcos1_videoram_w );
 DECLARE_WRITE8_HANDLER( namcos1_paletteram_w );
 DECLARE_READ8_HANDLER( namcos1_spriteram_r );
 DECLARE_WRITE8_HANDLER( namcos1_spriteram_w );
-
-
-
-

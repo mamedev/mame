@@ -79,16 +79,6 @@ public:
 
 
 /*----------- defined in machine/electron.c -----------*/
-
-
-
 void electron_interrupt_handler(running_machine &machine, int mode, int interrupt);
-
-
-/*----------- defined in video/electron.c -----------*/
-
-
-
-
 
 #endif /* ELECTRON_H_ */

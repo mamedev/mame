@@ -29,13 +29,6 @@ public:
 	UINT32 screen_update_blockade(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-/*----------- defined in video/blockade.c -----------*/
-
-
-
-
-
 /*----------- defined in audio/blockade.c -----------*/
 
 extern const samples_interface blockade_samples_interface;

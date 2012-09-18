@@ -43,11 +43,5 @@ public:
 	UINT32 screen_update_battlera(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in video/battlera.c -----------*/
-
-
-
 TIMER_DEVICE_CALLBACK( battlera_irq );
-
-

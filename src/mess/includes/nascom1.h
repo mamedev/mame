@@ -61,18 +61,7 @@ DEVICE_IMAGE_LOAD( nascom1_cassette );
 DEVICE_IMAGE_UNLOAD( nascom1_cassette );
 SNAPSHOT_LOAD( nascom1 );
 
-
-
 DECLARE_READ8_DEVICE_HANDLER( nascom1_hd6402_si );
 DECLARE_WRITE8_DEVICE_HANDLER( nascom1_hd6402_so );
-
-
-
-
-/*----------- defined in video/nascom1.c -----------*/
-
-
-
-
 
 #endif /* NASCOM1_H_ */

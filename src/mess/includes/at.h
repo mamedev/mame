@@ -193,10 +193,4 @@ extern const struct pit8253_config at_pit8254_config;
 extern const am9517a_interface at_dma8237_1_config;
 extern const am9517a_interface at_dma8237_2_config;
 
-
-
-
-
-
-
 #endif /* AT_H_ */

@@ -72,18 +72,3 @@ public:
 	UINT32 screen_update_dadandrn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_martchmp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
-
-
-/*----------- defined in video/mystwarr.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-

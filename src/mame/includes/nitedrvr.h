@@ -59,23 +59,8 @@ public:
 	UINT32 screen_update_nitedrvr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in machine/nitedrvr.c -----------*/
-
-
 TIMER_DEVICE_CALLBACK( nitedrvr_crash_toggle_callback );
 
-
-
-
-
 /*----------- defined in audio/nitedrvr.c -----------*/
-
 DISCRETE_SOUND_EXTERN( nitedrvr );
-
-
-/*----------- defined in video/nitedrvr.c -----------*/
-
-
-
-

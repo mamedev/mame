@@ -57,15 +57,6 @@ public:
 	UINT32 screen_update_kikikai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in machine/mexico86.c -----------*/
-
 INTERRUPT_GEN( kikikai_interrupt );
 INTERRUPT_GEN( mexico86_m68705_interrupt );
-
-
-/*----------- defined in video/mexico86.c -----------*/
-
-
-
-

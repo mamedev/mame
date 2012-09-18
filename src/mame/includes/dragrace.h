@@ -56,12 +56,5 @@ public:
 	UINT32 screen_update_dragrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in audio/dragrace.c -----------*/
-
 DISCRETE_SOUND_EXTERN( dragrace );
-
-/*----------- defined in video/dragrace.c -----------*/
-
-
-

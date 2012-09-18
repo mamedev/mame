@@ -25,16 +25,11 @@ public:
 
 /*----------- defined in machine/kramermc.c -----------*/
 
-
-
 extern const z80pio_interface kramermc_z80pio_intf;
 
 /*----------- defined in video/kramermc.c -----------*/
 
 extern const gfx_layout kramermc_charlayout;
-
-
-
 
 
 #endif /* KRAMERMC_h_ */

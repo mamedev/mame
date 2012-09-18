@@ -54,14 +54,3 @@ public:
 	UINT32 screen_update_goal92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_goal92(screen_device &screen, bool state);
 };
-
-
-
-
-
-/*----------- defined in video/goal92.c -----------*/
-
-
-
-
-

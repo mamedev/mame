@@ -118,11 +118,6 @@ public:
 	UINT32 screen_update_gaelco3d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in video/gaelco3d.c -----------*/
 
 void gaelco3d_render(screen_device &screen);
-
-
-
-

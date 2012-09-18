@@ -103,17 +103,9 @@ DECLARE_READ8_DEVICE_HANDLER( kaypro_sio_r );
 DECLARE_WRITE8_DEVICE_HANDLER( kaypro_sio_w );
 
 
-
-
-
 QUICKLOAD_LOAD( kayproii );
 QUICKLOAD_LOAD( kaypro2x );
 
 /*----------- defined in video/kaypro.c -----------*/
 
 MC6845_UPDATE_ROW( kaypro2x_update_row );
-
-
-
-
-

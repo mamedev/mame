@@ -41,9 +41,3 @@ public:
 	DECLARE_VIDEO_START(eolith);
 	UINT32 screen_update_eolith(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-/*----------- defined in video/eolith.c -----------*/
-
-
-

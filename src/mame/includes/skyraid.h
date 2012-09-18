@@ -28,15 +28,7 @@ public:
 	UINT32 screen_update_skyraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in audio/skyraid.c -----------*/
-
 DISCRETE_SOUND_EXTERN( skyraid );
-
 DECLARE_WRITE8_DEVICE_HANDLER( skyraid_sound_w );
-
-
-/*----------- defined in video/skyraid.c -----------*/
-
-
 

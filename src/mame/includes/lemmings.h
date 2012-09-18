@@ -46,12 +46,3 @@ public:
 	UINT32 screen_update_lemmings(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_lemmings(screen_device &screen, bool state);
 };
-
-
-/*----------- defined in video/lemmings.c -----------*/
-
-
-
-
-
-

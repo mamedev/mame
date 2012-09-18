@@ -41,11 +41,5 @@ public:
 	UINT32 screen_update_tail2nos(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in video/tail2nos.c -----------*/
-
 extern void tail2nos_zoom_callback(running_machine &machine, int *code,int *color,int *flags);
-
-
-
-

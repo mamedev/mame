@@ -216,10 +216,6 @@ void model3_tap_reset(running_machine &machine);
 
 /*----------- defined in video/model3.c -----------*/
 
-
-
-
-
 void real3d_display_list_end(running_machine &machine);
 void real3d_display_list1_dma(address_space &space, UINT32 src, UINT32 dst, int length, int byteswap);
 void real3d_display_list2_dma(address_space &space, UINT32 src, UINT32 dst, int length, int byteswap);

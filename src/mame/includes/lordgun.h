@@ -66,12 +66,6 @@ public:
 	UINT32 screen_update_lordgun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in video/lordgun.c -----------*/
-
-
 float lordgun_crosshair_mapper(const ioport_field *field, float linear_value);
 void lordgun_update_gun(running_machine &machine, int i);
-
-
-

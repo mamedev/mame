@@ -46,9 +46,6 @@ public:
 };
 
 /*----------- defined in video/overdriv.c -----------*/
-
 extern void overdriv_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);
 extern void overdriv_zoom_callback_0(running_machine &machine, int *code,int *color,int *flags);
 extern void overdriv_zoom_callback_1(running_machine &machine, int *code,int *color,int *flags);
-
-

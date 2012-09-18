@@ -45,11 +45,5 @@ public:
 	UINT32 screen_update_jackal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in video/jackal.c -----------*/
-
 void jackal_mark_tile_dirty(running_machine &machine, int offset);
-
-
-
-

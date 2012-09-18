@@ -55,11 +55,6 @@ public:
 
 
 /*----------- defined in video/galpani2.c -----------*/
-
-
-
-
-
 DECLARE_WRITE16_HANDLER( galpani2_palette_0_w );
 DECLARE_WRITE16_HANDLER( galpani2_palette_1_w );
 

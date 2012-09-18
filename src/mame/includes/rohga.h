@@ -61,21 +61,7 @@ public:
 	UINT32 screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
-
-
-
 /*----------- defined in video/rohga.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
 UINT16 rohga_pri_callback(UINT16 x);
 UINT16 schmeisr_col_callback(UINT16 x);
 UINT16 rohga_col_callback(UINT16 x);

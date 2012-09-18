@@ -53,17 +53,3 @@ public:
 	UINT32 screen_update_phozon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_mappy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-/*----------- defined in video/mappy.c -----------*/
-
-
-
-
-
-
-
-
-
-
-

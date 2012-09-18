@@ -72,12 +72,7 @@ extern const via6522_interface apple3_via_1_intf;
 
 INTERRUPT_GEN( apple3_interrupt );
 
-
-
-
 /*----------- defined in video/apple3.c -----------*/
-
-
 
 void apple3_write_charmem(running_machine &machine);
 

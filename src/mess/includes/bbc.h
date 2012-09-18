@@ -295,35 +295,12 @@ extern const via6522_interface bbcb_system_via;
 extern const via6522_interface bbcb_user_via;
 extern const wd17xx_interface bbc_wd17xx_interface;
 
-
-
-
-
-
-
-
-
-
-
 INTERRUPT_GEN( bbcb_keyscan );
 INTERRUPT_GEN( bbcm_keyscan );
-
-
-
-
-
-
-
 
 /* disc support */
 
 DEVICE_IMAGE_LOAD ( bbcb_cart );
-
-
-
-
-
-
 
 /* tape support */
 
@@ -333,18 +310,8 @@ extern const uPD7002_interface bbc_uPD7002;
 
 /*----------- defined in video/bbc.c -----------*/
 
-
-
-
-
-
-
 void bbc_set_video_memory_lookups(running_machine &machine, int ramsize);
 void bbc_setscreenstart(running_machine &machine, int b4, int b5);
 void bbcbp_setvideoshadow(running_machine &machine, int vdusel);
-
-
-
-
 
 #endif /* BBC_H_ */

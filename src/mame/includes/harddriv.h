@@ -342,15 +342,7 @@ DECLARE_READ16_HANDLER( hdds3_speedup_r );
 /*----------- defined in audio/harddriv.c -----------*/
 
 void hdsnd_init(running_machine &machine);
-
-
-
-
-
-
-
 DECLARE_WRITE16_DEVICE_HANDLER( hdsnddsp_dac_w );
-
 
 
 /*----------- defined in video/harddriv.c -----------*/

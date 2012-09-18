@@ -39,10 +39,6 @@ INTERRUPT_GEN( asterock_interrupt );
 INTERRUPT_GEN( llander_interrupt );
 
 
-
-
-
-
 /*----------- defined in audio/asteroid.c -----------*/
 
 DISCRETE_SOUND_EXTERN( asteroid );

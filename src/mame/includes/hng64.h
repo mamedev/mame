@@ -190,11 +190,5 @@ public:
 	void screen_eof_hng64(screen_device &screen, bool state);
 };
 
-
 /*----------- defined in video/hng64.c -----------*/
-
 void hng64_command3d(running_machine& machine, const UINT16* packet);
-
-
-
-

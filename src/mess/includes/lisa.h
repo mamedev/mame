@@ -172,17 +172,9 @@ public:
 extern const via6522_interface lisa_via6522_0_intf;
 extern const via6522_interface lisa_via6522_1_intf;
 
-
-
-
 extern NVRAM_HANDLER(lisa);
 
-
-
-
-
 INTERRUPT_GEN( lisa_interrupt );
-
 
 
 #endif /* LISA_H_ */

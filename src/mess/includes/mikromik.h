@@ -121,5 +121,4 @@ public:
 MACHINE_CONFIG_EXTERN( mm1m6_video );
 
 
-
 #endif

@@ -52,11 +52,5 @@ public:
 
 
 /*----------- defined in video/atarigx2.c -----------*/
-
-
-
-
-
 DECLARE_WRITE16_HANDLER( atarigx2_mo_control_w );
-
 void atarigx2_scanline_update(screen_device &screen, int scanline);

@@ -77,13 +77,3 @@ public:
 	UINT32 screen_update_f1gpb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_f1gp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-/*----------- defined in video/f1gp.c -----------*/
-
-
-
-
-
-
-
-

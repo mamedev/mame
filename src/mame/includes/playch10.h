@@ -119,22 +119,6 @@ public:
 	UINT32 screen_update_playch10_single(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-/*----------- defined in machine/playch10.c -----------*/
-
-
-
-
-
-
-
 /*----------- defined in video/playch10.c -----------*/
-
 extern const ppu2c0x_interface playch10_ppu_interface;
 extern const ppu2c0x_interface playch10_ppu_interface_hboard;
-
-
-
-
-
-

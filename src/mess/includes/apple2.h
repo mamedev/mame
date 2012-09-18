@@ -281,14 +281,9 @@ int apple2_pressed_specialkey(running_machine &machine, UINT8 key);
 void apple2_setup_memory(running_machine &machine, const apple2_memmap_config *config);
 void apple2_update_memory(running_machine &machine);
 
-
-
 /*----------- defined in video/apple2.c -----------*/
 
 void apple2_video_start(running_machine &machine, const UINT8 *vram, size_t vram_size, UINT32 ignored_softswitches, int hires_modulo);
-
-
-
 
 
 #endif /* APPLE2_H_ */

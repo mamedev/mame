@@ -29,14 +29,6 @@ public:
 	void screen_eof_galpanic(screen_device &screen, bool state);
 };
 
-
 /*----------- defined in video/galpanic.c -----------*/
-
-
 DECLARE_WRITE16_HANDLER( galpanic_bgvideoram_w );
 DECLARE_WRITE16_HANDLER( galpanic_paletteram_w );
-
-
-
-
-

@@ -44,10 +44,3 @@ public:
 	UINT32 screen_update_mcatadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_mcatadv(screen_device &screen, bool state);
 };
-
-/*----------- defined in video/mcatadv.c -----------*/
-
-
-
-
-

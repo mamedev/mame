@@ -135,19 +135,4 @@ public:
 	DECLARE_DRIVER_INIT(brapboys);
 };
 
-/*----------- defined in drivers/kaneko16.c -----------*/
-
-
-
-/*----------- defined in video/kaneko16.c -----------*/
-
-
-
-
-
-
-
-
-
-
 #endif

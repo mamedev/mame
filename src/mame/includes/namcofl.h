@@ -59,10 +59,3 @@ public:
 	DECLARE_VIDEO_START(namcofl);
 	UINT32 screen_update_namcofl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-/*----------- defined in video/namcofl.c -----------*/
-
-
-
-

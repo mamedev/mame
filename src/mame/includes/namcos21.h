@@ -157,8 +157,6 @@ public:
 	UINT32 screen_update_namcos21(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in video/namcos21.c -----------*/
-
 extern void namcos21_ClearPolyFrameBuffer( running_machine &machine );
 extern void namcos21_DrawQuad( running_machine &machine, int sx[4], int sy[4], int zcode[4], int color );

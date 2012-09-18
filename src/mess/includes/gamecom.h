@@ -254,10 +254,4 @@ extern DEVICE_IMAGE_LOAD( gamecom_cart2 );
 extern void gamecom_handle_dma( device_t *device, int cycles );
 extern void gamecom_update_timers( device_t *device, int cycles );
 
-
-/*----------- defined in video/gamecom.c -----------*/
-
-
-
-
 #endif /* GAMECOM_H_ */

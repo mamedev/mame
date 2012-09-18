@@ -48,13 +48,3 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_cop01(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-
-/*----------- defined in video/cop01.c -----------*/
-
-
-
-
-
-

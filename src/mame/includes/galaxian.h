@@ -228,17 +228,6 @@ public:
 
 
 /*----------- defined in video/galaxian.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
 TIMER_DEVICE_CALLBACK( galaxian_stars_blink_timer );
 
 /* special purpose background rendering */

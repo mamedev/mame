@@ -26,18 +26,9 @@ public:
 
 
 /*----------- defined in machine/ac1.c -----------*/
-
-
-
 extern const z80pio_interface ac1_z80pio_intf;
 
 /*----------- defined in video/ac1.c -----------*/
-
 extern const gfx_layout ac1_charlayout;
-
-
-
-
-
 
 #endif /* AC1_h_ */

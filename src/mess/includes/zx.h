@@ -59,24 +59,9 @@ public:
 	DECLARE_MACHINE_RESET(pow3000);
 	void screen_eof_zx(screen_device &screen, bool state);
 };
-
-
-/*----------- defined in machine/zx.c -----------*/
-
-
-
-
-
 /*----------- defined in video/zx.c -----------*/
-
-
-
 
 void zx_ula_bkgnd(running_machine &machine, int color);
 void zx_ula_r(running_machine &machine, int offs, const char *region, const UINT8 param);
-
-//extern int ula_nmi_active;
-//extern int ula_scancode_count;
-
 
 #endif /* ZX_H_ */

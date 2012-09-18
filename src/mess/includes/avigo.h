@@ -106,11 +106,4 @@ public:
 	UINT8 * 			m_ram_base;
 	virtual void palette_init();
 };
-
-
-/*----------- defined in video/avigo.c -----------*/
-
-extern PALETTE_INIT( avigo );
-
-
 #endif /* AVIGO_H_ */

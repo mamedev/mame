@@ -60,18 +60,6 @@ public:
 	UINT32 screen_update_midzeus2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
-
-/*----------- defined in video/midzeus.c -----------*/
-
-
-
-
-
 /*----------- defined in video/midzeus2.c -----------*/
-
-
-
-
 DECLARE_READ32_HANDLER( zeus2_r );
 DECLARE_WRITE32_HANDLER( zeus2_w );
-

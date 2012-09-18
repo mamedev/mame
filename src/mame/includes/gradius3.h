@@ -52,10 +52,5 @@ public:
 };
 
 /*----------- defined in video/gradius3.c -----------*/
-
 extern void gradius3_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask,int *shadow);
 extern void gradius3_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-
-
-
-

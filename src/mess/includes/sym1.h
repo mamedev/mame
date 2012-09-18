@@ -43,12 +43,6 @@ public:
 	virtual void machine_reset();
 };
 
-
-/*----------- defined in drivers/sym1.c -----------*/
-
-/* Pointer to the monitor ROM, which includes the reset vectors for the CPU */
-
-
 /*----------- defined in machine/sym1.c -----------*/
 
 extern const riot6532_interface sym1_r6532_interface;
@@ -56,8 +50,6 @@ extern const ttl74145_interface sym1_ttl74145_intf;
 extern const via6522_interface sym1_via0;
 extern const via6522_interface sym1_via1;
 extern const via6522_interface sym1_via2;
-
-
 
 
 #endif /* SYM1_H_ */

@@ -89,9 +89,6 @@ public:
 
 
 /*----------- defined in audio/8080bw.c -----------*/
-
-
-
 extern const samples_interface lrescue_samples_interface;
 
 DECLARE_WRITE8_DEVICE_HANDLER( indianbt_sh_port_3_w );
@@ -102,25 +99,5 @@ DECLARE_WRITE8_DEVICE_HANDLER( polaris_sh_port_2_w );
 DECLARE_WRITE8_DEVICE_HANDLER( polaris_sh_port_3_w );
 DISCRETE_SOUND_EXTERN( polaris );
 
-
-
 extern const sn76477_interface schaser_sn76477_interface;
 DISCRETE_SOUND_EXTERN( schaser );
-
-
-/*----------- defined in video/8080bw.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -48,15 +48,5 @@ public:
 
 
 /*----------- defined in machine/volfied.c -----------*/
-
 void volfied_cchip_init(running_machine &machine);
 void volfied_cchip_reset(running_machine &machine);
-
-
-
-/*----------- defined in video/volfied.c -----------*/
-
-
-
-
-

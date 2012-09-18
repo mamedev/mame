@@ -124,28 +124,12 @@ public:
 	UINT32 screen_update_profpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-/*----------- defined in video/astrocde.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*----------- defined in audio/wow.c -----------*/
 
 extern const char *const wow_sample_names[];
 
 DECLARE_READ8_HANDLER( wow_speech_r );
 CUSTOM_INPUT( wow_speech_status_r );
-
 
 /*----------- defined in audio/gorf.c -----------*/
 

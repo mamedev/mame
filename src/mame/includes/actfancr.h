@@ -45,7 +45,3 @@ DECLARE_WRITE8_HANDLER( actfancr_pf1_control_w );
 DECLARE_WRITE8_HANDLER( actfancr_pf2_data_w );
 DECLARE_READ8_HANDLER( actfancr_pf2_data_r );
 DECLARE_WRITE8_HANDLER( actfancr_pf2_control_w );
-
-
-
-

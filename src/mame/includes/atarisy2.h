@@ -92,6 +92,3 @@ DECLARE_WRITE16_HANDLER( atarisy2_yscroll_w );
 DECLARE_WRITE16_HANDLER( atarisy2_xscroll_w );
 DECLARE_WRITE16_HANDLER( atarisy2_videoram_w );
 DECLARE_WRITE16_HANDLER( atarisy2_paletteram_w );
-
-
-

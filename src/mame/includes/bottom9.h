@@ -54,6 +54,3 @@ public:
 extern void bottom9_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
 extern void bottom9_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);
 extern void bottom9_zoom_callback(running_machine &machine, int *code,int *color,int *flags);
-
-
-

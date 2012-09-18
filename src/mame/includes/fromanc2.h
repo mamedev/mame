@@ -107,15 +107,5 @@ public:
 	UINT32 screen_update_fromanc2_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-
-
 /*----------- defined in video/fromanc2.c -----------*/
-
-
-
-
-
-
-
 void fromancr_gfxbank_w(running_machine &machine, int data);

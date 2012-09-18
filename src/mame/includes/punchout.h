@@ -68,15 +68,3 @@ public:
 	UINT32 screen_update_armwrest_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_armwrest_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-/*----------- defined in video/punchout.c -----------*/
-
-
-
-
-
-
-
-
-

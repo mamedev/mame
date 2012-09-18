@@ -131,13 +131,4 @@ public:
 };
 
 /*----------- defined in video/ssv.c -----------*/
-
 void ssv_enable_video(running_machine &machine, int enable);
-
-
-
-
-
-
-
-

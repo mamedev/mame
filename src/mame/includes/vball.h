@@ -37,8 +37,6 @@ public:
 
 /*----------- defined in video/vball.c -----------*/
 
-
-
 void vb_bgprombank_w(running_machine &machine, int bank);
 void vb_spprombank_w(running_machine &machine, int bank);
 void vb_mark_all_dirty(running_machine &machine);

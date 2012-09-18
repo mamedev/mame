@@ -44,12 +44,3 @@ public:
 	DECLARE_VIDEO_START(roadf);
 	UINT32 screen_update_hyperspt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-/*----------- defined in video/hyperspt.c -----------*/
-
-
-
-
-
-
-

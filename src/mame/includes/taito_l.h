@@ -125,10 +125,6 @@ public:
 
 /*----------- defined in video/taito_l.c -----------*/
 
-
-
-
-
 void taitol_chardef14_m(running_machine &machine, int offset);
 void taitol_chardef15_m(running_machine &machine, int offset);
 void taitol_chardef16_m(running_machine &machine, int offset);
@@ -141,4 +137,3 @@ void taitol_bg18_m(running_machine &machine, int offset);
 void taitol_bg19_m(running_machine &machine, int offset);
 void taitol_char1a_m(running_machine &machine, int offset);
 void taitol_obj1b_m(running_machine &machine, int offset);
-

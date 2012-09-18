@@ -68,20 +68,7 @@ public:
 	void screen_eof_sprint2(screen_device &screen, bool state);
 };
 
-
 /*----------- defined in audio/sprint2.c -----------*/
-
 DISCRETE_SOUND_EXTERN( sprint2 );
 DISCRETE_SOUND_EXTERN( sprint1 );
 DISCRETE_SOUND_EXTERN( dominos );
-
-
-/*----------- defined in video/sprint2.c -----------*/
-
-
-
-
-
-
-
-

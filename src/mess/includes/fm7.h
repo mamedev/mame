@@ -241,23 +241,7 @@ public:
 	UINT32 screen_update_fm7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-/*----------- defined in drivers/fm7.c -----------*/
-
-
-
 /*----------- defined in video/fm7.c -----------*/
-
 TIMER_CALLBACK( fm77av_vsync );
-
-
-
-
-
-
-
-
-
-
 
 #endif /*FM7_H_*/

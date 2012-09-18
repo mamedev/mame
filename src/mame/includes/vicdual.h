@@ -80,29 +80,17 @@ public:
 	UINT32 screen_update_vicdual_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in drivers/vicdual.c -----------*/
 
 int vicdual_is_cabinet_color(running_machine &machine);
 
-
-/*----------- defined in video/vicdual.c -----------*/
-
-
-
-
-
-
-
 /*----------- defined in audio/vicdual.c -----------*/
-
 
 MACHINE_CONFIG_EXTERN( frogs_audio );
 MACHINE_CONFIG_EXTERN( headon_audio );
 DECLARE_WRITE8_HANDLER( frogs_audio_w );
 DECLARE_WRITE8_HANDLER( headon_audio_w );
 DECLARE_WRITE8_HANDLER( invho2_audio_w );
-
 
 /*----------- defined in audio/depthch.c -----------*/
 

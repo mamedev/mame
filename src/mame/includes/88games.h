@@ -49,11 +49,7 @@ public:
 	UINT32 screen_update_88games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in video/88games.c -----------*/
-
 void _88games_sprite_callback(running_machine &machine, int *code, int *color, int *priority, int *shadow);
 void _88games_tile_callback(running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority);
 void _88games_zoom_callback(running_machine &machine, int *code, int *color, int *flags);
-
-

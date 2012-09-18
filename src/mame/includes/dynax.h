@@ -474,35 +474,7 @@ public:
 };
 
 //----------- defined in drivers/dynax.c -----------
-
 void sprtmtch_update_irq(running_machine &machine);
 void jantouki_update_irq(running_machine &machine);
 void mjelctrn_update_irq(running_machine &machine);
 void neruton_update_irq(running_machine &machine);
-
-//----------- defined in video/dynax.c -----------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//----------- defined in drivers/ddenlovr.c -----------
-
-
-

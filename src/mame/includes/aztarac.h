@@ -30,14 +30,4 @@ public:
 };
 
 /*----------- defined in audio/aztarac.c -----------*/
-
-
-
 INTERRUPT_GEN( aztarac_snd_timed_irq );
-
-
-/*----------- defined in video/aztarac.c -----------*/
-
-
-
-

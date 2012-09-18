@@ -54,21 +54,12 @@ public:
 /*----------- defined in machine/apple1.c -----------*/
 
 extern const pia6821_interface apple1_pia0;
-
-
 SNAPSHOT_LOAD( apple1 );
 
-
-
 /*----------- defined in video/apple1.c -----------*/
-
-
-
-
 void apple1_vh_dsp_w (running_machine &machine, int data);
 void apple1_vh_dsp_clr (running_machine &machine);
 attotime apple1_vh_dsp_time_to_ready (running_machine &machine);
-
 
 
 /*----------- defined in drivers/apple1.c -----------*/

@@ -66,32 +66,11 @@ public:
 	DECLARE_MACHINE_RESET(midtunit);
 	DECLARE_VIDEO_START(midtunit);
 };
-
-/*----------- defined in machine/midtunit.c -----------*/
-
-
-
-
-
-
-
-
 /*----------- defined in video/midtunit.c -----------*/
-
 extern UINT8 midtunit_gfx_rom_large;
-
-
-
-
-
-
-
 
 void midtunit_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
 void midtunit_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
-
-
-
 
 void midtunit_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);
 void midxunit_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);

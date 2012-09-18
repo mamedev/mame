@@ -258,26 +258,10 @@ public:
 	UINT32 screen_update_spclforc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-/*----------- defined in video/dkong.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*----------- defined in audio/dkong.c -----------*/
-
 
 MACHINE_CONFIG_EXTERN( radarscp_audio );
 MACHINE_CONFIG_EXTERN( dkong2b_audio );
 MACHINE_CONFIG_EXTERN( dkongjr_audio );
 MACHINE_CONFIG_EXTERN( dkong3_audio );
 MACHINE_CONFIG_EXTERN( radarscp1_audio );
-

@@ -64,9 +64,6 @@ public:
 extern const via6522_interface concept_via6522_intf;
 extern const wd17xx_interface concept_wd17xx_interface;
 
-
-
-
 INTERRUPT_GEN( concept_interrupt );
 
 

@@ -58,7 +58,5 @@ public:
 };
 
 
-
 /*----------- defined in video/20pacgal.c -----------*/
-
 MACHINE_CONFIG_EXTERN( 20pacgal_video );

@@ -146,18 +146,6 @@ public:
 
 
 /*----------- defined in machine/apple2gs.c -----------*/
-
-
-
-
-
 void apple2gs_doc_irq(device_t *device, int state);
-
-
-/*----------- defined in video/apple2gs.c -----------*/
-
-
-
-
 
 #endif /* APPLE2GS_H_ */

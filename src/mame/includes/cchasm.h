@@ -34,18 +34,7 @@ public:
 	virtual void video_start();
 };
 
-
-/*----------- defined in machine/cchasm.c -----------*/
-
-
 /*----------- defined in audio/cchasm.c -----------*/
 
 extern const z80ctc_interface cchasm_ctc_intf;
-
 SOUND_START( cchasm );
-
-
-/*----------- defined in video/cchasm.c -----------*/
-
-
-

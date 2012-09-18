@@ -152,8 +152,6 @@ public:
 	UINT32 screen_update_digdug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-
 /*----------- defined in video/bosco.c -----------*/
 
 DECLARE_WRITE8_HANDLER( bosco_videoram_w );
@@ -187,11 +185,6 @@ DECLARE_WRITE8_HANDLER( xevious_vh_latch_w );
 DECLARE_WRITE8_HANDLER( xevious_bs_w );
 DECLARE_READ8_HANDLER( xevious_bb_r );
 
-
-
-
-
-
 /*----------- defined in machine/xevious.c -----------*/
 
 void battles_customio_init(running_machine &machine);
@@ -216,6 +209,3 @@ INTERRUPT_GEN( battles_interrupt_4 );
 
 DECLARE_WRITE8_HANDLER( digdug_videoram_w );
 DECLARE_WRITE8_HANDLER( digdug_PORT_w );
-
-
-

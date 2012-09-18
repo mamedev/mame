@@ -65,17 +65,8 @@ public:
 	void screen_eof_twin16(screen_device &screen, bool state);
 };
 
-
 /*----------- defined in drivers/twin16.c -----------*/
-
 int twin16_spriteram_process_enable( running_machine &machine );
 
-
 /*----------- defined in video/twin16.c -----------*/
-
-
-
-
-
-
 void twin16_spriteram_process( running_machine &machine );

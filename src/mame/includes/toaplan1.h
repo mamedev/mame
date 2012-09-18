@@ -149,26 +149,6 @@ public:
 /*----------- defined in machine/toaplan1.c -----------*/
 
 INTERRUPT_GEN( toaplan1_interrupt );
-
-
-
-
-
-
 void toaplan1_driver_savestate(running_machine &machine);
 void demonwld_driver_savestate(running_machine &machine);
 void vimana_driver_savestate(running_machine &machine);
-
-
-/*----------- defined in video/toaplan1.c -----------*/
-
-
-
-
-
-
-
-
-
-
-

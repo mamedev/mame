@@ -80,13 +80,6 @@ public:
 	UINT32 screen_update_hotchase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in video/wecleman.c -----------*/
-
-
-
-
-
-
 void hotchase_zoom_callback_0(running_machine &machine, int *code,int *color,int *flags);
 void hotchase_zoom_callback_1(running_machine &machine, int *code,int *color,int *flags);

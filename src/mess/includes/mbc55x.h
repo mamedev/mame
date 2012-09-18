@@ -222,9 +222,6 @@ DECLARE_READ16_HANDLER (mbc55x_video_io_r);
 DECLARE_WRITE16_HANDLER (mbc55x_video_io_w);
 
 
-
-
-
 #define RED                     0
 #define GREEN                   1
 #define BLUE                    2

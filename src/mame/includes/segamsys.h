@@ -65,8 +65,3 @@ extern void init_smsgg(running_machine &machine);
 INPUT_PORTS_EXTERN(sms);
 INPUT_PORTS_EXTERN(gamegear);
 extern UINT8* smsgg_backupram;
-
-
-
-
-

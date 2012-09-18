@@ -112,21 +112,16 @@ public:
 	virtual void machine_reset();
 };
 
-
 /*----------- defined in machine/vertigo.c -----------*/
 
 void vertigo_update_irq(device_t *device);
 
 extern const struct pit8253_config vertigo_pit8254_config;
 
-
 INTERRUPT_GEN( vertigo_interrupt );
-
-
 
 /*----------- defined in video/vertigo.c -----------*/
 
 void vertigo_vproc_init(running_machine &machine);
 void vertigo_vproc_reset(running_machine &machine);
 void vertigo_vproc(running_machine &machine, int cycles, int irq4);
-

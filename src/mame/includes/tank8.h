@@ -63,23 +63,9 @@ public:
 	void screen_eof_tank8(screen_device &screen, bool state);
 };
 
-
 /*----------- defined in audio/tank8.c -----------*/
 
 DISCRETE_SOUND_EXTERN( tank8 );
 
-
 /*----------- defined in drivers/tank8.c -----------*/
-
 void tank8_set_collision(running_machine &machine, int index);
-
-
-/*----------- defined in video/tank8.c -----------*/
-
-
-
-
-
-
-
-

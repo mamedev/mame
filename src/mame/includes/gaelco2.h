@@ -61,11 +61,3 @@ TIMER_DEVICE_CALLBACK( bang_irq );
 DECLARE_WRITE16_DEVICE_HANDLER( gaelco2_eeprom_cs_w );
 DECLARE_WRITE16_DEVICE_HANDLER( gaelco2_eeprom_sk_w );
 DECLARE_WRITE16_DEVICE_HANDLER( gaelco2_eeprom_data_w );
-
-/*----------- defined in video/gaelco2.c -----------*/
-
-
-
-
-
-

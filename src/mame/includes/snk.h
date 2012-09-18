@@ -170,14 +170,3 @@ public:
 	UINT32 screen_update_gwar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_tdfever(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-/*----------- defined in video/snk.c -----------*/
-extern SCREEN_UPDATE_IND16( marvins );
-extern SCREEN_UPDATE_IND16( tnk3 );
-extern SCREEN_UPDATE_IND16( ikari );
-extern SCREEN_UPDATE_IND16( gwar );
-extern SCREEN_UPDATE_IND16( tdfever );
-
-
-

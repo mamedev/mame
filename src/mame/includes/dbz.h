@@ -53,12 +53,6 @@ public:
 	UINT32 screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in video/dbz.c -----------*/
-
 extern void dbz_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);
 extern void dbz_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
-
-
-
-

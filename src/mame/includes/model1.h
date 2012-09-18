@@ -142,20 +142,8 @@ public:
 /*----------- defined in machine/model1.c -----------*/
 
 extern const mb86233_cpu_core model1_vr_tgp_config;
-
-
-
 ADDRESS_MAP_EXTERN( model1_vr_tgp_map, 32 );
-
-
 
 void model1_vr_tgp_reset( running_machine &machine );
 void model1_tgp_reset(running_machine &machine, int swa);
-
-
-/*----------- defined in video/model1.c -----------*/
-
-
-
-
 

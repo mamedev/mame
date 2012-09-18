@@ -32,9 +32,3 @@ public:
 	virtual void machine_start();
 	UINT32 screen_update_tumblep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-
-/*----------- defined in video/tumblep.c -----------*/
-
-

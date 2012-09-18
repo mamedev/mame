@@ -129,9 +129,6 @@ UINT8 micro3d_duart_input_r(device_t *device);
 void micro3d_duart_output_w(device_t *device, UINT8 data);
 void micro3d_duart_tx(device_t *device, int channel, UINT8 data);
 
-
-
-
 /*----------- defined in audio/micro3d.c -----------*/
 
 DECLARE_WRITE8_DEVICE_HANDLER( micro3d_upd7759_w );
@@ -162,15 +159,8 @@ private:
 
 extern const device_type MICRO3D;
 
-
-
 /*----------- defined in video/micro3d.c -----------*/
-
-
-
-
 void micro3d_tms_interrupt(device_t *device, int state);
 void micro3d_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);
-
 
 INTERRUPT_GEN( micro3d_vblank );

@@ -33,10 +33,5 @@ public:
 	UINT32 screen_update_badlands(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in video/badlands.c -----------*/
-
 DECLARE_WRITE16_HANDLER( badlands_pf_bank_w );
-
-
-

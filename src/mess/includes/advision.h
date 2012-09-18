@@ -67,8 +67,4 @@ public:
 	virtual void palette_init();
 };
 
-/*----------- defined in video/advision.c -----------*/
-
-
-
 #endif

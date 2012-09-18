@@ -85,14 +85,3 @@ private:
 };
 
 extern const device_type GRIDLEE;
-
-
-
-/*----------- defined in video/gridlee.c -----------*/
-
-/* video driver data & functions */
-
-
-
-
-

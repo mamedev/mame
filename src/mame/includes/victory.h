@@ -66,8 +66,4 @@ public:
 
 
 /*----------- defined in video/victory.c -----------*/
-
-
-
 INTERRUPT_GEN( victory_vblank_interrupt );
-

@@ -109,17 +109,7 @@ private:
 
 extern const device_type POLEPOS;
 
-
 DECLARE_WRITE8_DEVICE_HANDLER( polepos_engine_sound_lsb_w );
 DECLARE_WRITE8_DEVICE_HANDLER( polepos_engine_sound_msb_w );
 
 DISCRETE_SOUND_EXTERN( polepos );
-
-
-/*----------- defined in video/polepos.c -----------*/
-
-
-
-
-
-

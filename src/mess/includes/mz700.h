@@ -91,21 +91,4 @@ extern const struct pit8253_config mz800_pit8253_config;
 extern const i8255_interface mz700_ppi8255_interface;
 extern const z80pio_interface mz800_z80pio_config;
 
-
-
-/* bank switching */
-
-/* bankswitching, mz800 only */
-
-
-
-
-/*----------- defined in video/mz700.c -----------*/
-
-
-
-
-
-
-
 #endif /* MZ700_H_ */

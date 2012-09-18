@@ -143,35 +143,3 @@ public:
 	void screen_eof_nmk(screen_device &screen, bool state);
 	void screen_eof_strahl(screen_device &screen, bool state);
 };
-
-
-/*----------- defined in video/nmk16.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

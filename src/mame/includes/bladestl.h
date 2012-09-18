@@ -37,13 +37,6 @@ public:
 	UINT32 screen_update_bladestl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-
 /*----------- defined in video/bladestl.c -----------*/
-
-
-
-
-
 void bladestl_tile_callback(running_machine &machine, int layer, int bank, int *code, int *color, int *flags);
 void bladestl_sprite_callback(running_machine &machine, int *code, int *color);

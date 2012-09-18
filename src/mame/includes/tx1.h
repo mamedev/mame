@@ -179,13 +179,6 @@ public:
 	void screen_eof_buggyboy(screen_device &screen, bool state);
 };
 
-
-/*----------- defined in machine/tx1.c -----------*/
-
-
-
-
-
 /*----------- defined in audio/tx1.c -----------*/
 DECLARE_READ8_DEVICE_HANDLER( tx1_pit8253_r );
 DECLARE_WRITE8_DEVICE_HANDLER( tx1_pit8253_w );
@@ -240,23 +233,3 @@ private:
 };
 
 extern const device_type BUGGYBOY;
-
-
-/*----------- defined in video/tx1.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

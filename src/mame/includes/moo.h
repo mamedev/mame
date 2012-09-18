@@ -56,12 +56,6 @@ public:
 	UINT32 screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
-
-
 /*----------- defined in video/moo.c -----------*/
-
 extern void moo_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
 extern void moo_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);
-
-
-

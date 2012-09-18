@@ -120,17 +120,3 @@ DECLARE_WRITE8_DEVICE_HANDLER( firetrk_xtndply_w );
 DISCRETE_SOUND_EXTERN( firetrk );
 DISCRETE_SOUND_EXTERN( superbug );
 DISCRETE_SOUND_EXTERN( montecar );
-
-
-/*----------- defined in video/firetrk.c -----------*/
-
-
-
-
-
-
-
-
-
-
-

@@ -81,6 +81,3 @@ DECLARE_WRITE16_HANDLER( atarisy1_bankselect_w );
 DECLARE_WRITE16_HANDLER( atarisy1_xscroll_w );
 DECLARE_WRITE16_HANDLER( atarisy1_yscroll_w );
 DECLARE_WRITE16_HANDLER( atarisy1_priority_w );
-
-
-

@@ -75,13 +75,5 @@ public:
 	void screen_eof_atarigt(screen_device &screen, bool state);
 };
 
-
 /*----------- defined in video/atarigt.c -----------*/
-
-
-
-
-
-
-
 void atarigt_scanline_update(screen_device &screen, int scanline);

@@ -304,13 +304,7 @@ public:
 	UINT32 screen_update_gottlieb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in video/gottlieb.c -----------*/
-
-
-
-
-
 
 #if USE_FAKE_VOTRAX
 MACHINE_CONFIG_EXTERN( reactor_samples );

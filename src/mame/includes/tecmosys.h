@@ -82,15 +82,5 @@ public:
 	UINT32 screen_update_tecmosys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in machine/tecmosys.c -----------*/
-
 void tecmosys_prot_init(running_machine &machine, int which);
-
-
-
-/*----------- defined in video/tecmosys.c -----------*/
-
-
-
-

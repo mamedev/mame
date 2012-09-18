@@ -195,13 +195,6 @@ UINT8 tornbase_get_cabinet_type(running_machine &machine);
 
 int invaders_is_cabinet_cocktail(running_machine &machine);
 
-
-/*----------- defined in machine/mw8080bw.c -----------*/
-
-
-
-
-
 /*----------- defined in audio/mw8080bw.c -----------*/
 
 DECLARE_WRITE8_DEVICE_HANDLER( midway_tone_generator_lo_w );
@@ -273,14 +266,3 @@ DECLARE_WRITE8_DEVICE_HANDLER( invad2ct_audio_1_w );
 DECLARE_WRITE8_DEVICE_HANDLER( invad2ct_audio_2_w );
 DECLARE_WRITE8_DEVICE_HANDLER( invad2ct_audio_3_w );
 DECLARE_WRITE8_DEVICE_HANDLER( invad2ct_audio_4_w );
-
-/*----------- defined in video/mw8080bw.c -----------*/
-
-
-
-
-
-
-
-
-

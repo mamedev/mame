@@ -76,11 +76,9 @@ public:
 
 void exidy440_bank_select(running_machine &machine, UINT8 bank);
 
-
 /*----------- defined in video/exidy440.c -----------*/
 
 INTERRUPT_GEN( exidy440_vblank_interrupt );
-
 
 MACHINE_CONFIG_EXTERN( exidy440_video );
 MACHINE_CONFIG_EXTERN( topsecex_video );

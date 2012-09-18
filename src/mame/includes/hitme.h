@@ -45,5 +45,4 @@ public:
 
 
 /*----------- defined in audio/hitme.c -----------*/
-
 DISCRETE_SOUND_EXTERN( hitme );

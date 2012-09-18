@@ -116,21 +116,7 @@ public:
 	UINT32 screen_update_spi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_sys386f2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
-
-
 /*----------- defined in machine/spisprit.c -----------*/
-
 void seibuspi_sprite_decrypt(UINT8 *src, int romsize);
-
-
 /*----------- defined in video/seibuspi.c -----------*/
-
-
-
-
-
-
-
-
 void rf2_set_layer_banks(running_machine &machine, int banks);
-

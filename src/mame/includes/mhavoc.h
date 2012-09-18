@@ -64,13 +64,5 @@ public:
 	virtual void machine_reset();
 };
 
-
 /*----------- defined in machine/mhavoc.c -----------*/
-
 TIMER_DEVICE_CALLBACK( mhavoc_cpu_irq_clock );
-
-
-
-
-
-

@@ -90,11 +90,6 @@ public:
 
 
 /*----------- defined in machine/sorcerer.c -----------*/
-
-
-
-
-
 SNAPSHOT_LOAD( sorcerer );
 
 #endif /* SORCERER_H_ */

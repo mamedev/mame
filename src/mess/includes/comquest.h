@@ -27,11 +27,4 @@ public:
 	UINT32 screen_update_comquest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);	
 };
 
-
-/*----------- defined in video/comquest.c -----------*/
-
-
-
-
-
 #endif /* COMQUEST_H_ */

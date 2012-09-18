@@ -69,6 +69,4 @@ void aim65_update_ds4(device_t *device, int digit, int data);
 void aim65_update_ds5(device_t *device, int digit, int data);
 
 
-
-
 #endif /* AIM65_H_ */

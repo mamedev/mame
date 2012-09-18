@@ -103,10 +103,3 @@ public:
 	DECLARE_MACHINE_START(bigfghtr);
 	DECLARE_MACHINE_RESET(bigfghtr);
 };
-
-/*----------- defined in video/armedf.c -----------*/
-
-
-
-
-

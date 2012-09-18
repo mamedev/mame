@@ -113,15 +113,6 @@ public:
 	UINT32 screen_update_nbmj9195(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in video/nbmj9195.c -----------*/
-
-
-
-
-
-
-
-
 void nbmj9195_clutsel_w(address_space &space, int data);
 void nbmj9195_gfxflag2_w(address_space &space, int data);

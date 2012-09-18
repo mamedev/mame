@@ -82,17 +82,6 @@ public:
 	void screen_eof_starshp1(screen_device &screen, bool state);
 };
 
-
-/*----------- defined in video/starshp1.c -----------*/
-
-
-
-
-
-
-
-
-
 /*----------- defined in audio/starshp1.c -----------*/
 
 DISCRETE_SOUND_EXTERN( starshp1 );

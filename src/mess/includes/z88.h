@@ -88,10 +88,4 @@ public:
 	virtual void palette_init();
 };
 
-
-/*----------- defined in video/z88.c -----------*/
-
-extern PALETTE_INIT( z88 );
-
-
 #endif /* Z88_H_ */

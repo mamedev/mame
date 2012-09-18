@@ -43,13 +43,5 @@ public:
 	UINT32 screen_update_suprridr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in video/suprridr.c -----------*/
-
-
-
-
 int suprridr_is_screen_flipped(running_machine &machine);
-
-
-

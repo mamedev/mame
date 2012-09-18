@@ -28,8 +28,3 @@ public:
 	DECLARE_MACHINE_START(dealer);
 	UINT32 screen_update_epos(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
-
-
-/*----------- defined in video/epos.c -----------*/
-
-

@@ -43,6 +43,3 @@ public:
 
 extern void blockhl_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color, int *flags, int *priority);
 extern void blockhl_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);
-
-
-

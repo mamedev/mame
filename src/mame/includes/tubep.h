@@ -82,16 +82,4 @@ public:
 
 
 /*----------- defined in video/tubep.c -----------*/
-
 void tubep_vblank_end(running_machine &machine);
-
-
-
-
-
-
-
-
-
-
-

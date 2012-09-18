@@ -84,14 +84,6 @@ public:
 	UINT32 screen_update_mario(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-/*----------- defined in video/mario.c -----------*/
-
-
-
-
-
-
-
 /*----------- defined in audio/mario.c -----------*/
 
 DECLARE_WRITE8_DEVICE_HANDLER( mario_sh1_w );

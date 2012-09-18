@@ -59,9 +59,3 @@ public:
 
 void xmen_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
 void xmen_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);
-
-
-
-
-
-

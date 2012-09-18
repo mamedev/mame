@@ -54,16 +54,3 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_chaknpop(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-
-/*----------- defined in machine/chaknpop.c -----------*/
-
-
-
-/*----------- defined in video/chaknpop.c -----------*/
-
-
-
-
-

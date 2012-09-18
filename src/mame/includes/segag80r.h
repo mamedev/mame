@@ -109,9 +109,6 @@ MACHINE_CONFIG_EXTERN( 005_sound_board );
 MACHINE_CONFIG_EXTERN( spaceod_sound_board );
 MACHINE_CONFIG_EXTERN( monsterb_sound_board );
 
-
-
-
 /*----------- defined in video/segag80r.c -----------*/
 
 #define G80_BACKGROUND_NONE			0
@@ -120,20 +117,5 @@ MACHINE_CONFIG_EXTERN( monsterb_sound_board );
 #define G80_BACKGROUND_PIGNEWT		3
 #define G80_BACKGROUND_SINDBADM		4
 
-
 INTERRUPT_GEN( segag80r_vblank_start );
-
-
-
-
-
-
-
-
-
-
-
-
-
 INTERRUPT_GEN( sindbadm_vblank_start );
-

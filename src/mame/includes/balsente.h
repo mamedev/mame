@@ -200,30 +200,11 @@ public:
 
 TIMER_DEVICE_CALLBACK( balsente_interrupt_timer );
 
-
-
-
 void balsente_noise_gen(device_t *device, int count, short *buffer);
-
-
-
-
-
 
 INTERRUPT_GEN( balsente_update_analog_inputs );
 
 TIMER_DEVICE_CALLBACK( balsente_counter_callback );
 
-
 TIMER_DEVICE_CALLBACK( balsente_clock_counter_0_ff );
-
-
-
-
-
-
-/*----------- defined in video/balsente.c -----------*/
-
-
-
 

@@ -138,17 +138,10 @@ public:
 	void screen_eof_skns(screen_device &screen, bool state);
 };
 
-
 /*----------- defined in video/suprnova.c -----------*/
-
 void skns_sprite_kludge(int x, int y);
 void skns_draw_sprites(
 	running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect,
 	UINT32* spriteram_source, size_t spriteram_size,
 	UINT8* gfx_source, size_t gfx_length,
 	UINT32* sprite_regs );
-
-
-
-
-

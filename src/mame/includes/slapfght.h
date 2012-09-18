@@ -143,23 +143,4 @@ public:
 
 
 /*----------- defined in machine/slapfght.c -----------*/
-
-
-
-
-
-
-
-
-
-
 INTERRUPT_GEN( getstar_interrupt );
-
-
-/*----------- defined in video/slapfght.c -----------*/
-
-
-
-
-
-

@@ -393,10 +393,7 @@ INPUT_PORTS_EXTERN( kovsh );
 /* emulations */
 MACHINE_CONFIG_EXTERN( pgm_arm_type2 );
 
-
 /* simulations (or missing) */
-
-
 INPUT_PORTS_EXTERN( ddp2 );
 INPUT_PORTS_EXTERN( kov2 );
 INPUT_PORTS_EXTERN( martmast );
@@ -406,30 +403,15 @@ INPUT_PORTS_EXTERN( dw2001 );
 
 MACHINE_CONFIG_EXTERN( pgm_arm_type3 );
 
-
 /*----------- defined in machine/pgmprot4.c -----------*/
 
 MACHINE_CONFIG_EXTERN( pgm_022_025_kb );
 MACHINE_CONFIG_EXTERN( pgm_022_025_dw );
 
-
 INPUT_PORTS_EXTERN( killbld );
 INPUT_PORTS_EXTERN( dw3 );
-
-/*----------- defined in machine/pgmprot5.c -----------*/
-
 
 /*----------- defined in machine/pgmprot6.c -----------*/
 
 MACHINE_CONFIG_EXTERN( pgm_028_025_ol );
-
-
 INPUT_PORTS_EXTERN( olds );
-
-
-/*----------- defined in video/pgm.c -----------*/
-
-
-
-
-

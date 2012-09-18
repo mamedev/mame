@@ -88,9 +88,3 @@ public:
 /*----------- defined in audio/grchamp.c -----------*/
 
 DISCRETE_SOUND_EXTERN( grchamp );
-
-/*----------- defined in video/grchamp.c -----------*/
-
-
-
-

@@ -36,6 +36,3 @@ DECLARE_WRITE16_HANDLER( toobin_intensity_w );
 DECLARE_WRITE16_HANDLER( toobin_xscroll_w );
 DECLARE_WRITE16_HANDLER( toobin_yscroll_w );
 DECLARE_WRITE16_HANDLER( toobin_slip_w );
-
-
-

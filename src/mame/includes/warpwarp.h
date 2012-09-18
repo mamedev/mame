@@ -50,19 +50,6 @@ public:
 };
 
 
-/*----------- defined in video/warpwarp.c -----------*/
-
-
-
-
-
-
-
-
-
-
-/*----------- defined in audio/geebee.c -----------*/
-
 DECLARE_WRITE8_DEVICE_HANDLER( geebee_sound_w );
 
 class geebee_sound_device : public device_t,
@@ -87,7 +74,6 @@ private:
 };
 
 extern const device_type GEEBEE;
-
 
 
 /*----------- defined in audio/warpwarp.c -----------*/

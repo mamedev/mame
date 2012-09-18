@@ -111,15 +111,4 @@ public:
 
 
 /*----------- defined in video/system1.c -----------*/
-
-
-
-
-
 DECLARE_WRITE8_DEVICE_HANDLER( system1_videoram_bank_w );
-
-
-
-
-
-

@@ -151,8 +151,6 @@ public:
 	UINT32 screen_update_raiden2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in machine/r2crypt.c -----------*/
-
 void raiden2_decrypt_sprites(running_machine &machine);
 void zeroteam_decrypt_sprites(running_machine &machine);

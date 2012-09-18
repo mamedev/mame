@@ -38,15 +38,3 @@ public:
 	DECLARE_MACHINE_RESET(midxunit);
 	DECLARE_VIDEO_START(midxunit);
 };
-
-
-/*----------- defined in machine/midxunit.c -----------*/
-
-
-
-
-
-
-
-
-

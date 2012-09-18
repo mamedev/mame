@@ -271,8 +271,6 @@ extern DEVICE_IMAGE_LOAD(megaduck_cart);
 
 /*----------- defined in video/gb.c -----------*/
 
-
-
 enum
 {
 	GB_VIDEO_DMG = 1,
@@ -280,14 +278,6 @@ enum
 	GB_VIDEO_SGB,
 	GB_VIDEO_CGB
 };
-
-
-
-
-
-
-
-
 
 void gb_video_reset( running_machine &machine, int mode );
 UINT8 *gb_get_vram_ptr(running_machine &machine);

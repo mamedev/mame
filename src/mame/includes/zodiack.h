@@ -76,6 +76,3 @@ public:
 		: zodiack_state(mconfig, type, tag)
 	{ m_percuss_hardware = 1; }
 };
-
-// in video/zodiack.c
-

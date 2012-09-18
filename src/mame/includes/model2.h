@@ -165,10 +165,5 @@ public:
 	UINT32 screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in video/model2.c -----------*/
-
-
-
-
 void model2_3d_set_zclip( running_machine &machine, UINT8 clip );

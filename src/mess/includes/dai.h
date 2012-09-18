@@ -91,16 +91,9 @@ extern const i8255_interface dai_ppi82555_intf;
 extern const tms5501_interface dai_tms5501_interface;
 
 
-
-
-
 /*----------- defined in video/dai.c -----------*/
 
 extern const unsigned char dai_palette[16*3];
-
-
-
-
 
 
 /*----------- defined in audio/dai.c -----------*/

@@ -44,15 +44,5 @@ public:
 	UINT32 screen_update_videopin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in audio/videopin.c -----------*/
-
 DISCRETE_SOUND_EXTERN( videopin );
-
-
-/*----------- defined in video/videopin.c -----------*/
-
-
-
-
-

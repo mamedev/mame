@@ -43,15 +43,10 @@ public:
 };
 
 /*----------- defined in machine/simpsons.c -----------*/
-
 DECLARE_READ8_DEVICE_HANDLER( simpsons_sound_r );
 
-
-
 /*----------- defined in video/simpsons.c -----------*/
-
 void simpsons_video_banking( running_machine &machine, int select );
-
 
 extern void simpsons_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
 extern void simpsons_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);
