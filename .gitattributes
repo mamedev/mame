@@ -3761,7 +3761,6 @@ src/mame/includes/gauntlet.h svneol=native#text/plain
 src/mame/includes/gberet.h svneol=native#text/plain
 src/mame/includes/gbusters.h svneol=native#text/plain
 src/mame/includes/gcpinbal.h svneol=native#text/plain
-src/mame/includes/genesis.h svneol=native#text/plain
 src/mame/includes/gijoe.h svneol=native#text/plain
 src/mame/includes/ginganin.h svneol=native#text/plain
 src/mame/includes/gladiatr.h svneol=native#text/plain

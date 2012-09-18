@@ -36,7 +36,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/genesis.h"
 #include "includes/segas18.h"
 
 
