@@ -42,7 +42,7 @@
 #define NOWINRES
 #include "windows.h"
 #include "commctrl.h"
-#include "mamevers.rc"
+#include "messvers.rc"
 
 1                       24      MOVEABLE PURE   "mess.man"
 
