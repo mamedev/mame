@@ -97,6 +97,7 @@ VIDEO_START_MEMBER(midtunit_state,midtunit)
 
 	memset(dma_register, 0, sizeof(dma_register));
 	memset(&dma_state, 0, sizeof(dma_state));
+	dma_state.gfxrom = m_gfxrom->base();
 
 	/* register for state saving */
 	state_save_register_global(machine(), midtunit_control);
