@@ -1230,7 +1230,7 @@ static MACHINE_CONFIG_START( cps2, cps_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
 	MCFG_CPU_PROGRAM_MAP(qsound_sub_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 251)	/* 251 is good (see 'mercy mercy mercy'section of sgemf attract mode for accurate sound sync */
+	MCFG_CPU_PERIODIC_INT_DRIVER(cps_state, irq0_line_hold, 251)	/* 251 is good (see 'mercy mercy mercy'section of sgemf attract mode for accurate sound sync */
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state,cps2)
 

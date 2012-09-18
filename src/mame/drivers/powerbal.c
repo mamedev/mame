@@ -484,7 +484,7 @@ static MACHINE_CONFIG_START( powerbal, playmark_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(powerbal_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state, irq2_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,powerbal)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,powerbal)
@@ -514,7 +514,7 @@ static MACHINE_CONFIG_START( magicstk, playmark_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(magicstk_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state, irq2_line_hold)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 	MCFG_EEPROM_DEFAULT_VALUE(0)
