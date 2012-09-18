@@ -229,7 +229,7 @@ UINT32 cinemat_state::screen_update_spacewar(screen_device &screen, bitmap_rgb32
 {
 	int sw_option = machine().root_device().ioport("INPUTS")->read();
 
-	SCREEN_UPDATE32_CALL_MEMBER(cinemat);
+	screen_update_cinemat(screen, bitmap, cliprect);
 
 	/* set the state of the artwork */
 	output_set_value("pressed3", (~sw_option >> 0) & 1);

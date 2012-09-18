@@ -972,13 +972,13 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 ssv_state::screen_update_eaglshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return SCREEN_UPDATE16_CALL_MEMBER(ssv);
+	return screen_update_ssv(screen, bitmap, cliprect);
 }
 
 UINT32 ssv_state::screen_update_gdfs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	SCREEN_UPDATE16_CALL_MEMBER(ssv);
+	screen_update_ssv(screen, bitmap, cliprect);
 
 	// draw zooming sprites
 	m_gdfs_st0020->st0020_draw_all(machine(), bitmap, cliprect);

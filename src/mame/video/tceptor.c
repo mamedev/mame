@@ -545,14 +545,14 @@ UINT32 tceptor_state::screen_update_tceptor_3d_left(screen_device &screen, bitma
 {
 	if ((screen.frame_number() & 1) == 1)
 		return UPDATE_HAS_NOT_CHANGED;
-	return SCREEN_UPDATE16_CALL_MEMBER( tceptor_2d );
+	return screen_update_tceptor_2d(screen, bitmap, cliprect);
 }
 
 UINT32 tceptor_state::screen_update_tceptor_3d_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if ((screen.frame_number() & 1) == 0)
 		return UPDATE_HAS_NOT_CHANGED;
-	return SCREEN_UPDATE16_CALL_MEMBER( tceptor_2d );
+	return screen_update_tceptor_2d(screen, bitmap, cliprect);
 }
 
 

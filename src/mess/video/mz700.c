@@ -86,7 +86,7 @@ UINT32 mz_state::screen_update_mz800(screen_device &screen, bitmap_ind16 &bitmap
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if (m_mz700_mode)
-		return SCREEN_UPDATE16_CALL_MEMBER(mz700);
+		return screen_update_mz700(screen, bitmap, cliprect);
 	else
 	{
 		if (m_hires_mode)

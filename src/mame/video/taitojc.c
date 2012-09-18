@@ -373,7 +373,7 @@ UINT32 taitojc_state::screen_update_dendego(screen_device &screen, bitmap_ind16 
 	if (level != output_get_value("counter1"))
 		output_set_value("counter1", level);
 
-	return SCREEN_UPDATE16_CALL_MEMBER(taitojc);
+	return screen_update_taitojc(screen, bitmap, cliprect);
 }
 
 

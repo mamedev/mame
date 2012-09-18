@@ -1073,19 +1073,19 @@ void seta_state::screen_eof_setaroul(screen_device &screen, bool state)
 UINT32 seta_state::screen_update_seta(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	set_pens(machine());
-	return SCREEN_UPDATE16_CALL_MEMBER(seta_layers);
+	return screen_update_seta_layers(screen, bitmap, cliprect);
 }
 
 
 UINT32 seta_state::screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	usclssic_set_pens(machine());
-	return SCREEN_UPDATE16_CALL_MEMBER(seta_layers);
+	return screen_update_seta_layers(screen, bitmap, cliprect);
 }
 
 
 UINT32 seta_state::screen_update_inttoote(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* no palette to set */
-	return SCREEN_UPDATE16_CALL_MEMBER(seta_layers);
+	return screen_update_seta_layers(screen, bitmap, cliprect);
 }

@@ -554,7 +554,7 @@ UINT32 itech8_state::screen_update_slikshot(screen_device &screen, bitmap_rgb32 
 	int temp, i;
 
 	/* draw the normal video first */
-	SCREEN_UPDATE32_CALL_MEMBER(itech8_2page);
+	screen_update_itech8_2page(screen, bitmap, cliprect);
 
 	/* add the current X,Y positions to the list */
 	m_xbuffer[m_ybuffer_next % YBUFFER_COUNT] = ioport("FAKEX")->read_safe(0);

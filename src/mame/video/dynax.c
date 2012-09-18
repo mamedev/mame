@@ -1404,5 +1404,5 @@ UINT32 dynax_state::screen_update_htengoku(screen_device &screen, bitmap_ind16 &
 				m_ddenlovr_pixmap[3 - layer][y * 512 + x] = (UINT8)(bitmap.pix16(y, x));
 	}
 
-	return SCREEN_UPDATE16_CALL_MEMBER(ddenlovr);
+	return screen_update_ddenlovr(screen, bitmap, cliprect);
 }

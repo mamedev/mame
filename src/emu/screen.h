@@ -352,8 +352,6 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 #define SCREEN_UPDATE_RGB32(name)		UINT32 SCREEN_UPDATE_NAME(name)(device_t *, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 #define SCREEN_UPDATE16_CALL(name)		SCREEN_UPDATE_NAME(name)(NULL, screen, bitmap, cliprect)
 #define SCREEN_UPDATE32_CALL(name)		SCREEN_UPDATE_NAME(name)(NULL, screen, bitmap, cliprect)
-#define SCREEN_UPDATE16_CALL_MEMBER(name)		SCREEN_UPDATE_NAME(name)(screen, bitmap, cliprect)
-#define SCREEN_UPDATE32_CALL_MEMBER(name)		SCREEN_UPDATE_NAME(name)(screen, bitmap, cliprect)
 
 #define SCREEN_VBLANK_NAME(name)		screen_vblank_##name
 #define SCREEN_VBLANK(name)				void SCREEN_VBLANK_NAME(name)(device_t *, screen_device &screen, bool vblank_on)

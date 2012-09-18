@@ -73,7 +73,7 @@ UINT32 kaneko16_state::screen_update_kaneko16(screen_device &screen, bitmap_ind1
 	// if the display is disabled, do nothing?
 	if (!m_disp_enable) return 0;
 
-	SCREEN_UPDATE16_CALL_MEMBER(common);
+	screen_update_common(screen, bitmap, cliprect);
 	m_kaneko_spr->kaneko16_render_sprites(machine(),bitmap,cliprect, m_spriteram, m_spriteram.bytes());
 	return 0;
 }
@@ -197,7 +197,7 @@ UINT32 kaneko16_berlwall_state::screen_update_berlwall(screen_device &screen, bi
 	// if the display is disabled, do nothing?
 	if (!m_disp_enable) return 0;
 
-	SCREEN_UPDATE16_CALL_MEMBER(common);
+	screen_update_common(screen, bitmap, cliprect);
 	m_kaneko_spr->kaneko16_render_sprites(machine(),bitmap,cliprect, m_spriteram, m_spriteram.bytes());
 	return 0;
 }

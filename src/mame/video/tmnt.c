@@ -760,7 +760,7 @@ UINT32 tmnt_state::screen_update_tmnt2(screen_device &screen, bitmap_ind16 &bitm
 			palette_set_shadow_mode(machine(), 0);
 	}
 
-	SCREEN_UPDATE16_CALL_MEMBER(lgtnfght);
+	screen_update_lgtnfght(screen, bitmap, cliprect);
 	return 0;
 }
 

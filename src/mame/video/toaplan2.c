@@ -422,8 +422,7 @@ UINT32 toaplan2_state::screen_update_toaplan2(screen_device &screen, bitmap_ind1
 
 UINT32 toaplan2_state::screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
-	SCREEN_UPDATE16_CALL_MEMBER(toaplan2);
+	screen_update_toaplan2(screen, bitmap, cliprect);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -431,8 +430,7 @@ UINT32 toaplan2_state::screen_update_truxton2(screen_device &screen, bitmap_ind1
 
 UINT32 toaplan2_state::screen_update_batrider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
-	SCREEN_UPDATE16_CALL_MEMBER( toaplan2 );
+	screen_update_toaplan2(screen, bitmap, cliprect);
 
 	int line;
 	rectangle clip;
@@ -462,13 +460,13 @@ UINT32 toaplan2_state::screen_update_batrider(screen_device &screen, bitmap_ind1
 
 UINT32 toaplan2_state::screen_update_dogyuun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	SCREEN_UPDATE16_CALL_MEMBER( toaplan2_dual );
+	screen_update_toaplan2_dual(screen, bitmap, cliprect);
 	return 0;
 }
 
 UINT32 toaplan2_state::screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	SCREEN_UPDATE16_CALL_MEMBER( toaplan2_mixed );
+	screen_update_toaplan2_mixed(screen, bitmap, cliprect);
 	return 0;
 }
 

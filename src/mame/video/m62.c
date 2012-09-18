@@ -555,7 +555,7 @@ WRITE8_MEMBER(m62_state::ldrun3_topbottom_mask_w)
 
 UINT32 m62_state::screen_update_ldrun3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	SCREEN_UPDATE16_CALL_MEMBER(ldrun);
+	screen_update_ldrun(screen, bitmap, cliprect);
 
 	if (m_ldrun3_topbottom_mask)
 	{

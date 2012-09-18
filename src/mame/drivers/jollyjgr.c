@@ -553,7 +553,7 @@ UINT32 jollyjgr_state::screen_update_fspider(screen_device &screen, bitmap_ind16
 {
 
 	// Draw bg and sprites
-	SCREEN_UPDATE16_CALL_MEMBER(jollyjgr);
+	screen_update_jollyjgr(screen, bitmap, cliprect);
 
 	/* Draw bullets
     16 bytes, 2 bytes per bullet (y,x). 2 player bullets, 6 enemy bullets.
