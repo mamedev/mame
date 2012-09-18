@@ -1754,8 +1754,8 @@ static MACHINE_CONFIG_START( galaga, galaga_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(bosco_state, screen_update_galaga)
-	MCFG_SCREEN_VBLANK_DRIVER(bosco_state, screen_eof_galaga)
+	MCFG_SCREEN_UPDATE_DRIVER(galaga_state, screen_update_galaga)
+	MCFG_SCREEN_VBLANK_DRIVER(galaga_state, screen_eof_galaga)
 
 	MCFG_GFXDECODE(galaga)
 	MCFG_PALETTE_LENGTH(64*4+64*4+64)
