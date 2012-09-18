@@ -452,7 +452,6 @@ located at I/O port 0x3CE, and a data register located at I/O port 0x3CF.
 /*
     Prototypes
 */
-static SCREEN_UPDATE_IND16( pc_ega );
 static CRTC_EGA_UPDATE_ROW( ega_update_row );
 
 static CRTC_EGA_INTERFACE( crtc_ega_ega_intf )
@@ -472,7 +471,7 @@ static CRTC_EGA_INTERFACE( crtc_ega_ega_intf )
 MACHINE_CONFIG_FRAGMENT( pcvideo_ega )
 	MCFG_SCREEN_ADD(EGA_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(16257000,912,0,640,262,0,200)
-	MCFG_SCREEN_UPDATE_STATIC( pc_ega )
+	MCFG_SCREEN_UPDATE_DEVICE(EGA_CRTC_NAME, crtc_ega_device, screen_update)
 
 	MCFG_PALETTE_LENGTH( 64 )
 	MCFG_CRTC_EGA_ADD(EGA_CRTC_NAME, 16257000/8, crtc_ega_ega_intf)
@@ -724,14 +723,6 @@ void isa8_ega_device::install_banks()
 		break;
 	}
 }
-
-static SCREEN_UPDATE_IND16( pc_ega )
-{
-	isa8_ega_device *ega = dynamic_cast<isa8_ega_device*>(screen.owner());
-	ega->m_crtc_ega->screen_update( screen, bitmap, cliprect);
-	return 0;
-}
-
 
 static CRTC_EGA_UPDATE_ROW( ega_update_row )
 {
