@@ -12,6 +12,9 @@
 #include "machine/am9517a.h"
 #include "machine/isa.h"
 #include "machine/pc_kbdc.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "sound/speaker.h"
 #include "imagedev/cassette.h"
 
 #define MCFG_IBM5160_MOTHERBOARD_ADD(_tag, _cputag) \
@@ -40,11 +43,11 @@ protected:
 	void install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler);
 public:
 	required_device<cpu_device>  m_maincpu;
-	required_device<device_t>  m_pic8259;
+	required_device<pic8259_device>  m_pic8259;
 	required_device<am9517a_device>  m_dma8237;
-	required_device<device_t>  m_pit8253;
+	required_device<pit8253_device>  m_pit8253;
 	required_device<i8255_device>  m_ppi8255;
-	required_device<device_t>  m_speaker;
+	required_device<speaker_sound_device>  m_speaker;
 	required_device<isa8_device>  m_isabus;
 	required_device<pc_kbdc_device>  m_pc_kbdc;
 

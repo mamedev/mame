@@ -349,10 +349,6 @@ public:
 			read16_space_func		space16;
 			read32_space_func		space32;
 			read64_space_func		space64;
-			read8_device_func		device8;
-			read16_device_func		device16;
-			read32_device_func		device32;
-			read64_device_func		device64;
 		} handler;
 	};
 
@@ -389,12 +385,6 @@ public:
 	void set_legacy_func(address_space &space, read16_space_func func, const char *name, UINT64 mask = 0);
 	void set_legacy_func(address_space &space, read32_space_func func, const char *name, UINT64 mask = 0);
 	void set_legacy_func(address_space &space, read64_space_func func, const char *name, UINT64 mask = 0);
-
-	// configure legacy device functions
-	void set_legacy_func(device_t &device, read8_device_func func, const char *name, UINT64 mask = 0);
-	void set_legacy_func(device_t &device, read16_device_func func, const char *name, UINT64 mask = 0);
-	void set_legacy_func(device_t &device, read32_device_func func, const char *name, UINT64 mask = 0);
-	void set_legacy_func(device_t &device, read64_device_func func, const char *name, UINT64 mask = 0);
 
 	// configure I/O port access
 	void set_ioport(ioport_port &ioport);
@@ -456,10 +446,6 @@ public:
 			write16_space_func		space16;
 			write32_space_func		space32;
 			write64_space_func		space64;
-			write8_device_func		device8;
-			write16_device_func		device16;
-			write32_device_func		device32;
-			write64_device_func		device64;
 		} handler;
 	};
 
@@ -496,12 +482,6 @@ public:
 	void set_legacy_func(address_space &space, write16_space_func func, const char *name, UINT64 mask = 0);
 	void set_legacy_func(address_space &space, write32_space_func func, const char *name, UINT64 mask = 0);
 	void set_legacy_func(address_space &space, write64_space_func func, const char *name, UINT64 mask = 0);
-
-	// configure legacy device functions
-	void set_legacy_func(device_t &device, write8_device_func func, const char *name, UINT64 mask = 0);
-	void set_legacy_func(device_t &device, write16_device_func func, const char *name, UINT64 mask = 0);
-	void set_legacy_func(device_t &device, write32_device_func func, const char *name, UINT64 mask = 0);
-	void set_legacy_func(device_t &device, write64_device_func func, const char *name, UINT64 mask = 0);
 
 	// configure I/O port access
 	void set_ioport(ioport_port &ioport);
@@ -562,12 +542,6 @@ public:
 	template<typename _func> void set_legacy_func(address_space &space, _func func, const char *name) const {
 		for (typename std::list<_HandlerEntry *>::const_iterator i = handlers.begin(); i != handlers.end(); i++)
 			(*i)->set_legacy_func(space, func, name, mask);
-	}
-
-	// forward legacy device functions configuration
-	template<typename _func> void set_legacy_func(device_t &device, _func func, const char *name) const {
-		for (typename std::list<_HandlerEntry *>::const_iterator i = handlers.begin(); i != handlers.end(); i++)
-			(*i)->set_legacy_func(device, func, name, mask);
 	}
 
 	// forward I/O port access configuration
@@ -2527,42 +2501,6 @@ UINT8 *address_space::install_legacy_readwrite_handler(offs_t addrstart, offs_t 
 
 
 //-------------------------------------------------
-//  install_legacy_handler - install 8-bit read/
-//  write legacy device handlers for the space
-//-------------------------------------------------
-
-UINT8 *address_space::install_legacy_read_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, const char *rname, UINT64 unitmask)
-{
-	VPRINTF(("address_space::install_legacy_read_handler(%s-%s mask=%s mirror=%s, %s, %s, \"%s\") [read8]\n",
-			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
-			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
-			 rname, core_i64_hex_format(unitmask, data_width() / 4), device.tag()));
-
-	read().handler_map_range(addrstart, addrend, addrmask, addrmirror, unitmask).set_legacy_func(device, rhandler, rname);
-	generate_memdump(machine());
-	return reinterpret_cast<UINT8 *>(find_backing_memory(addrstart, addrend));
-}
-
-UINT8 *address_space::install_legacy_write_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write8_device_func whandler, const char *wname, UINT64 unitmask)
-{
-	VPRINTF(("address_space::install_legacy_write_handler(%s-%s mask=%s mirror=%s, %s, %s, \"%s\") [write8]\n",
-			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
-			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
-			 wname, core_i64_hex_format(unitmask, data_width() / 4), device.tag()));
-
-	write().handler_map_range(addrstart, addrend, addrmask, addrmirror, unitmask).set_legacy_func(device, whandler, wname);
-	generate_memdump(machine());
-	return reinterpret_cast<UINT8 *>(find_backing_memory(addrstart, addrend));
-}
-
-UINT8 *address_space::install_legacy_readwrite_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, const char *rname, write8_device_func whandler, const char *wname, UINT64 unitmask)
-{
-	install_legacy_read_handler(device, addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
-	return install_legacy_write_handler(device, addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
-}
-
-
-//-------------------------------------------------
 //  install_handler - install 16-bit read/write
 //  delegate handlers for the space
 //-------------------------------------------------
@@ -2612,32 +2550,6 @@ UINT16 *address_space::install_legacy_readwrite_handler(offs_t addrstart, offs_t
 {
 	install_legacy_read_handler(addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
 	return install_legacy_write_handler(addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
-}
-
-
-//-------------------------------------------------
-//  install_legacy_handler - install 16-bit read/
-//  write legacy device handlers for the space
-//-------------------------------------------------
-
-UINT16 *address_space::install_legacy_read_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, const char *rname, UINT64 unitmask)
-{
-	read().handler_map_range(addrstart, addrend, addrmask, addrmirror, unitmask).set_legacy_func(device, rhandler, rname);
-	generate_memdump(machine());
-	return reinterpret_cast<UINT16 *>(find_backing_memory(addrstart, addrend));
-}
-
-UINT16 *address_space::install_legacy_write_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write16_device_func whandler, const char *wname, UINT64 unitmask)
-{
-	write().handler_map_range(addrstart, addrend, addrmask, addrmirror, unitmask).set_legacy_func(device, whandler, wname);
-	generate_memdump(machine());
-	return reinterpret_cast<UINT16 *>(find_backing_memory(addrstart, addrend));
-}
-
-UINT16 *address_space::install_legacy_readwrite_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, const char *rname, write16_device_func whandler, const char *wname, UINT64 unitmask)
-{
-	install_legacy_read_handler(device, addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
-	return install_legacy_write_handler(device, addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
 }
 
 
@@ -2695,32 +2607,6 @@ UINT32 *address_space::install_legacy_readwrite_handler(offs_t addrstart, offs_t
 
 
 //-------------------------------------------------
-//  install_legacy_handler - install 32-bit read/
-//  write legacy device handlers for the space
-//-------------------------------------------------
-
-UINT32 *address_space::install_legacy_read_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, const char *rname, UINT64 unitmask)
-{
-	read().handler_map_range(addrstart, addrend, addrmask, addrmirror, unitmask).set_legacy_func(device, rhandler, rname);
-	generate_memdump(machine());
-	return reinterpret_cast<UINT32 *>(find_backing_memory(addrstart, addrend));
-}
-
-UINT32 *address_space::install_legacy_write_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write32_device_func whandler, const char *wname, UINT64 unitmask)
-{
-	write().handler_map_range(addrstart, addrend, addrmask, addrmirror, unitmask).set_legacy_func(device, whandler, wname);
-	generate_memdump(machine());
-	return reinterpret_cast<UINT32 *>(find_backing_memory(addrstart, addrend));
-}
-
-UINT32 *address_space::install_legacy_readwrite_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, const char *rname, write32_device_func whandler, const char *wname, UINT64 unitmask)
-{
-	install_legacy_read_handler(device, addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
-	return install_legacy_write_handler(device, addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
-}
-
-
-//-------------------------------------------------
 //  install_handler64 - install 64-bit read/write
 //  delegate handlers for the space
 //-------------------------------------------------
@@ -2770,32 +2656,6 @@ UINT64 *address_space::install_legacy_readwrite_handler(offs_t addrstart, offs_t
 {
 	install_legacy_read_handler(addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
 	return install_legacy_write_handler(addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
-}
-
-
-//-------------------------------------------------
-//  install_legacy_handler - install 64-bit read/
-//  write legacy device handlers for the space
-//-------------------------------------------------
-
-UINT64 *address_space::install_legacy_read_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, const char *rname, UINT64 unitmask)
-{
-	read().handler_map_range(addrstart, addrend, addrmask, addrmirror, unitmask).set_legacy_func(device, rhandler, rname);
-	generate_memdump(machine());
-	return reinterpret_cast<UINT64 *>(find_backing_memory(addrstart, addrend));
-}
-
-UINT64 *address_space::install_legacy_write_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write64_device_func whandler, const char *wname, UINT64 unitmask)
-{
-	write().handler_map_range(addrstart, addrend, addrmask, addrmirror, unitmask).set_legacy_func(device, whandler, wname);
-	generate_memdump(machine());
-	return reinterpret_cast<UINT64 *>(find_backing_memory(addrstart, addrend));
-}
-
-UINT64 *address_space::install_legacy_readwrite_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, const char *rname, write64_device_func whandler, const char *wname, UINT64 unitmask)
-{
-	install_legacy_read_handler(device, addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
-	return install_legacy_write_handler(device, addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
 }
 
 
@@ -4911,44 +4771,6 @@ void handler_entry_read::set_legacy_func(address_space &space, read64_space_func
 
 
 //-------------------------------------------------
-//  set_legacy_func - configure a legacy device
-//  stub of the appropriate size
-//-------------------------------------------------
-
-void handler_entry_read::set_legacy_func(device_t &device, read8_device_func func, const char *name, UINT64 mask)
-{
-	legacy_info info;
-	info.handler.device8 = func;
-	info.object.device = &device;
-	set_delegate(read8_delegate(&handler_entry_read::read_stub_legacy, name, this), mask, &info);
-}
-
-void handler_entry_read::set_legacy_func(device_t &device, read16_device_func func, const char *name, UINT64 mask)
-{
-	legacy_info info;
-	info.handler.device16 = func;
-	info.object.device = &device;
-	set_delegate(read16_delegate(&handler_entry_read::read_stub_legacy, name, this), mask, &info);
-}
-
-void handler_entry_read::set_legacy_func(device_t &device, read32_device_func func, const char *name, UINT64 mask)
-{
-	legacy_info info;
-	info.handler.device32 = func;
-	info.object.device = &device;
-	set_delegate(read32_delegate(&handler_entry_read::read_stub_legacy, name, this), mask, &info);
-}
-
-void handler_entry_read::set_legacy_func(device_t &device, read64_device_func func, const char *name, UINT64 mask)
-{
-	legacy_info info;
-	info.handler.device64 = func;
-	info.object.device = &device;
-	set_delegate(read64_delegate(&handler_entry_read::read_stub_legacy, name, this), mask, &info);
-}
-
-
-//-------------------------------------------------
 //  set_ioport - configure an I/O port read stub
 //  of the appropriate size
 //-------------------------------------------------
@@ -5361,44 +5183,6 @@ void handler_entry_write::set_legacy_func(address_space &space, write64_space_fu
 	legacy_info info;
 	info.handler.space64 = func;
 	info.object.space = &space;
-	set_delegate(write64_delegate(&handler_entry_write::write_stub_legacy, name, this), mask, &info);
-}
-
-
-//-------------------------------------------------
-//  set_legacy_func - configure a legacy device
-//  stub of the appropriate size
-//-------------------------------------------------
-
-void handler_entry_write::set_legacy_func(device_t &device, write8_device_func func, const char *name, UINT64 mask)
-{
-	legacy_info info;
-	info.handler.device8 = func;
-	info.object.device = &device;
-	set_delegate(write8_delegate(&handler_entry_write::write_stub_legacy, name, this), mask, &info);
-}
-
-void handler_entry_write::set_legacy_func(device_t &device, write16_device_func func, const char *name, UINT64 mask)
-{
-	legacy_info info;
-	info.handler.device16 = func;
-	info.object.device = &device;
-	set_delegate(write16_delegate(&handler_entry_write::write_stub_legacy, name, this), mask, &info);
-}
-
-void handler_entry_write::set_legacy_func(device_t &device, write32_device_func func, const char *name, UINT64 mask)
-{
-	legacy_info info;
-	info.handler.device32 = func;
-	info.object.device = &device;
-	set_delegate(write32_delegate(&handler_entry_write::write_stub_legacy, name, this), mask, &info);
-}
-
-void handler_entry_write::set_legacy_func(device_t &device, write64_device_func func, const char *name, UINT64 mask)
-{
-	legacy_info info;
-	info.handler.device64 = func;
-	info.object.device = &device;
 	set_delegate(write64_delegate(&handler_entry_write::write_stub_legacy, name, this), mask, &info);
 }
 
