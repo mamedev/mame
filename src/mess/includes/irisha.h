@@ -46,6 +46,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	UINT32 screen_update_irisha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -55,5 +56,4 @@ extern const i8255_interface irisha_ppi8255_interface;
 extern const struct pit8253_config irisha_pit8253_intf;
 extern const struct pic8259_interface irisha_pic8259_config;
 
-extern SCREEN_UPDATE_IND16( irisha );
 #endif /* IRISHA_H_ */

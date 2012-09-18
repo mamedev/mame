@@ -62,18 +62,17 @@ VIDEO_START_MEMBER(vsnes_state,vsdual )
   Display refresh
 
 ***************************************************************************/
-SCREEN_UPDATE_IND16( vsnes )
+UINT32 vsnes_state::screen_update_vsnes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* render the ppu */
-	ppu2c0x_device *ppu = screen.machine().device<ppu2c0x_device>("ppu1");
+	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu1");
 	ppu->render(bitmap, 0, 0, 0, 0);
 	return 0;
 }
 
-
-SCREEN_UPDATE_IND16( vsnes_bottom )
+UINT32 vsnes_state::screen_update_vsnes_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ppu2c0x_device *ppu = screen.machine().device<ppu2c0x_device>("ppu2");
+	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu2");
 	ppu->render(bitmap, 0, 0, 0, 0);
 	return 0;
 }

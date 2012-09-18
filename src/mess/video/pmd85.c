@@ -56,11 +56,11 @@ static void pmd85_draw_scanline(running_machine &machine,bitmap_ind16 &bitmap, i
 	}
 }
 
-SCREEN_UPDATE_IND16( pmd85 )
+UINT32 pmd85_state::screen_update_pmd85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int pmd85_scanline;
 
 	for (pmd85_scanline=0; pmd85_scanline<256; pmd85_scanline++)
-		pmd85_draw_scanline (screen.machine(),bitmap, pmd85_scanline);
+		pmd85_draw_scanline (machine(),bitmap, pmd85_scanline);
 	return 0;
 }

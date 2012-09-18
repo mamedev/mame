@@ -39,6 +39,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	UINT32 screen_update_pmd85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -51,7 +52,6 @@ extern const i8255_interface mato_ppi8255_interface;
 
 /*----------- defined in video/pmd85.c -----------*/
 
-extern SCREEN_UPDATE_IND16( pmd85 );
 extern const unsigned char pmd85_palette[3*3];
 
 

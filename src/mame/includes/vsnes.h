@@ -99,12 +99,10 @@ public:
 	DECLARE_MACHINE_RESET(vsdual);
 	DECLARE_VIDEO_START(vsdual);
 	DECLARE_PALETTE_INIT(vsdual);
+	UINT32 screen_update_vsnes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_vsnes_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
 /*----------- defined in video/vsnes.c -----------*/
-SCREEN_UPDATE_IND16( vsnes );
-SCREEN_UPDATE_IND16( vsnes_bottom );
-
 extern const ppu2c0x_interface vsnes_ppu_interface_1;
 extern const ppu2c0x_interface vsnes_ppu_interface_2;

@@ -15,12 +15,12 @@ void irisha_state::video_start()
 {
 }
 
-SCREEN_UPDATE_IND16( irisha )
+UINT32 irisha_state::screen_update_irisha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 code1; //, code2;
 	UINT8 col;
 	int y, x, b;
-	address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	// draw image
 	for (y = 0; y < 200; y++)
