@@ -29,8 +29,10 @@ struct sid6581_interface
 	devcb_read8 in_poty_cb;
 };
 
+struct SID6581_t;
+
 class sid6581_device : public device_t,
-                                  public device_sound_interface
+                       public device_sound_interface
 {
 public:
 	sid6581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -53,7 +55,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 private:
 	// internal state
-	void *m_token;
+	SID6581_t *m_token;
 };
 
 extern const device_type SID6581;
