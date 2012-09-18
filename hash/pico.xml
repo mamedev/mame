@@ -90,7 +90,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * おせわしましょ! あかちゃんピコ - Osewashimasho! Akachan Pico (Sega Toys - 20020701 - HPC-6109)
 * ミニモニ。テレビにでるんだぴょん! - Mini Moni. Terebi ni Derundapyon! (Sega Toys - 20020613 - HPC-6110)
 * コスメピコ もっとかわいくなりたいな - Kosume Pico Motto Kawai Kunaritaina! (Sega Toys - 20020604 - HPC-6112)
-* ポケットモンスター すうじをつかまえよう! - Pocket Monsters Suuji wo Tsukamaeyou! (Sega Toys - 200208xx - HPC-6113)
 * トミカ・ピコ レスキューパーキング きんきゅうしゅつどう! はたらくのりもの <初回･トミカ付属> - Tomica Pico Rescue Parking Kinkyuushutsudou! Hataraku Norimono ~Shokai-Tomica Fuzoku~ (Sega Toys - 200207xx - HPC-6114)
 * ハローキティのたのしいおみせやさん - Hello Kitty no Tanoshii Omiseyasan (Sega Toys - 200211xx - HPC-6117)
 * ダンスピコ はしっておどって超ハッピー! - Dance Pico with Hashitte Odotte Chou Happy! (Sega Toys - 200302xx - HPC-6118)
@@ -147,7 +146,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * BFビーファイターカブト - BF B-Fighter Kabuto (Bandai - 1996xxxx - T-133170)
 * ゲゲゲの鬼太郎 - Gegege no Kitarou (Bandai - ???? - T-133180)
 * 電磁戦隊メガレンジャー - Denji Sentai Megaranger (Bandai - 1997xxxx - T-133220)
-* キューティーハニー - Cutey Honey (Bandai - 1997xxxx - T-133230)
 * それいけ!アンパンマンのみんなできょうそうアンパンマン! - Soreike! Anpanman no Minna de Kyousou Anpanman! (Bandai - 1996xxxx - T-133250)
 * ウルトラマンダイナ - Ultraman Dyna (Bandai - 1998xxxx - T-133260)
 * 夢のクレヨン王国 - Yume no Crayon Oukoku (Bandai - 1998xxxx - T-133270)
@@ -169,7 +167,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 仮面ライダーファイズ555 - Kamen Rider Fives 555 (Bandai - 200305xx - T-133450)
 * それいけ!アンパンマンの メダリンピックワールド2 <Best Selection> - Soreike! Anpanman no Medarin Pikku World 2 Best Selection (Bandai - 20040713 - T-133460) [reprint T-133300]
 * 特捜戦隊デカレンジャー - Tokusou Sentai Dekaranger (Bandai - 200406xx - T-133470)
-* ふたりはプリキュア - Futari wa Pretty Cure (Bandai - 200406xx - T-133480)
 * いっしょにはしろうきかんしゃトーマス <Best Selection> - Issho ni Hashirou Kikansha Thomas Best Selection (Bandai - 20040713 - T-133490) [reprint T-133140]
 * 学研のおべんきょうソフト たしざん ひきざん - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1995xxxx - T-169030)
 * はじめまシリーズ4 学研のおべんきょうソフト たしざん ひきざん - Hajimema Series 4 - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1998xxxx - T-169070)
@@ -222,6 +219,20 @@ Games for the MIXT BOOK PLAYER COPERA
 -->
 
 <!-- Releases -->
+
+<!-- This was also released together with many prototypes as Proto build 1996-08-17 B, meaning that after that date development was complete -->
+	<software name="101dalma">
+		<description>Math Antics With 101 Dalmatians (USA)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49047-00"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="math antics with disney's 101 dalmatians (usa).bin" size="1048576" crc="d271f727" sha1="bbbb351396ae9c636092efc6780dd1f80f4ca854" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="101dalmaj" cloneof="101dalma">
 		<description>101piki Wanchan - Wanchan Dai Koushin (Jpn)</description>
 		<year>1997</year>
@@ -445,6 +456,21 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
+	<software name="cuteyhon">
+		<description>Cutey Honey (Jpn)</description>
+		<year>1997</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133230"/>
+		<info name="alt_title" value="キューティーハニー"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-19960-S" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-19960-s.ic1" size="524288" crc="f5c3fe17" sha1="02aa1df927a9a1ffed62ad042f348afe2810a509" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- This same file had also been released as Prototype, but it just means it was a final build... -->
 	<software name="dolucky">
 		<description>Dolucky no Oekaki House (Jpn)</description>
@@ -597,6 +623,22 @@ Games for the MIXT BOOK PLAYER COPERA
 			<feature name="ic1" value="MPR-17853-H" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-17853-h.ic1" size="524288" crc="8130f126" sha1="fa9b1f7602dca7d3ac3d579421b41da4ceb943a7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="futaripc">
+		<description>Futari wa Pretty Cure (Jpan)</description>
+		<year>2004</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133480"/>
+		<info name="release" value="200406xx"/>
+		<info name="alt_title" value="ふたりはプリキュア"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK IC1" />
+			<dataarea name="rom" size="2097152">
+				<rom name="epoxy block ic1.ic1" size="2097152" crc="9b99dc02" sha1="a57f509065126118abf065edf2c4189631aeeb73" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -854,6 +896,20 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="hucklowlg" cloneof="hucklowl">
+		<description>Richard Scarry's - Viel zu tun für Huckleberry und Egon. (Fra)</description>
+		<year>199?</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49028-18" />
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6586A" />
+			<feature name="ic1" value="MPR-17780 J20" />
+			<dataarea name="flop" size="1048576">
+				<rom name="mpr-17780 j20.ic1" size="1048576" crc="659d7fee" sha1="d1e3e9d3dba32c39d53cfbe76f0d233ec36bab79" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hucklowli" cloneof="hucklowl">
 		<description>Richard Scarry's - La Giornata Indaffaratissima di Sandrino e Zigo-Zago (Ita)</description>
 		<year>199?</year>
@@ -1022,6 +1078,21 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="ic1" value="MPR-18098 J15" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-18098 j15.ic1" size="1048576" crc="2c0db3b9" sha1="2da72b5ab41d95675163850bab11e38d7e8a098d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkingg" cloneof="lionking" supported="no">
+		<description>Die Abenteuer des Löwen Königs (Ger)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49037-18"/>
+		<info name="alt_title" value="Der König der Löwen - Abenteuer"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18568 J33" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18568 j33.ic1" size="1048576" crc="1102c039" sha1="d0a352378c5ce9baacb9d161cb04f63d4913ce50"  offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1299,6 +1370,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 	</software>
 
 	<software name="pokemon">
+		<description>Pocket Monsters Suuji wo Tsukamaeyou! (Jpn)</description>
+		<year>2002</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6113"/>
+		<info name="release" value="200208xx"/>
+		<info name="alt_title" value="ポケットモンスター すうじをつかまえよう!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK U1" />
+			<dataarea name="rom" size="2097152">
+				<rom name="epoxy block u1.ic1" size="2097152" crc="bb46bb44" sha1="42f0b341e99ebf1596d7c4f239425ebe2e9cfb77" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokeadv">
 		<description>Pocket Monsters Advance Generation - Minna De Pico - Pokemon Waiwai Battle! (Jpn)</description>
 		<year>2004</year>
 		<publisher>Sega Toys</publisher>
@@ -1721,8 +1808,8 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 	</software>
 
 <!-- Prototypes -->
-	<software name="101dalma">
-		<description>101 Dalmatians (Prototype, 19960817-U)</description>
+	<software name="101dalmap1" cloneof="101dalma">
+		<description>Math Antics With 101 Dalmatians (Prototype, 19960817-U)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="pico_cart">
@@ -1732,19 +1819,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="101dalma2" cloneof="101dalma">
-	<!-- is this the released version too? -->
-		<description>Math Antics With 101 Dalmatians (Prototype, 19960817-B)</description>
-		<year>1996</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="101 dalmatians (prototype - aug 17, 1996 - b).bin" size="1048576" crc="d271f727" sha1="bbbb351396ae9c636092efc6780dd1f80f4ca854" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="101dalma3" cloneof="101dalma">
+	<software name="101dalmap2" cloneof="101dalma">
 		<description>Math Antics With 101 Dalmatians (Prototype, 19960816)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -1755,7 +1830,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="101dalma4" cloneof="101dalma">
+	<software name="101dalmap3" cloneof="101dalma">
 		<description>Math Antics With 101 Dalmatians (Prototype, 19960814)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -1766,7 +1841,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="101dalma5" cloneof="101dalma">
+	<software name="101dalmap4" cloneof="101dalma">
 		<description>Math Antics With 101 Dalmatians (Prototype, 19960718)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -1777,7 +1852,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="101dalma6" cloneof="101dalma">
+	<software name="101dalmap5" cloneof="101dalma">
 		<description>Math Antics With 101 Dalmatians (Prototype, 19960705)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -1788,7 +1863,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="101dalma7" cloneof="101dalma">
+	<software name="101dalmap6" cloneof="101dalma">
 		<description>Math Antics With 101 Dalmatians (Prototype, 19960703)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -1799,7 +1874,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="101dalma8" cloneof="101dalma">
+	<software name="101dalmap7" cloneof="101dalma">
 		<description>Math Antics With 101 Dalmatians (Prototype, 19960531)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -1810,7 +1885,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="101dalma9" cloneof="101dalma">
+	<software name="101dalmap8" cloneof="101dalma">
 		<description>Math Antics With 101 Dalmatians (Prototype, 19960521)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -1821,8 +1896,8 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="101pikiwp" cloneof="101dalma">
-		<description>101 Piki Wan-chan (Jpn, Prototype, 19960817)</description> <!-- aka Math Antics With 101 Dalmatians (Prototype, 19960817-J) -->
+	<software name="101dalmajp" cloneof="101dalma">
+		<description>101piki Wanchan - Wanchan Dai Koushin (Jpn, Prototype, 19960817)</description> <!-- aka Math Antics With 101 Dalmatians (Prototype, 19960817-J) -->
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="pico_cart">
@@ -2729,9 +2804,12 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<description>Sonic the Hedgehog's Gameworld (USA)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="49049-00"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-19297-T" />
 			<dataarea name="rom" size="524288">
-				<rom name="sonic the hedgehog's gameworld (1996)(sega)(us).bin" size="524288" crc="e472a795" sha1="839d8be99eabf371bb992166471c877db6f6e265" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-19297-t.ic1" size="524288" crc="e472a795" sha1="839d8be99eabf371bb992166471c877db6f6e265" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
