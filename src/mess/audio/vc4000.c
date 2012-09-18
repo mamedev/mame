@@ -87,7 +87,7 @@ vc4000_sound_device::vc4000_sound_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, VC4000, "VC 4000 Custom", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(vc4000_sound));
+	m_token = global_alloc_clear(vc4000_sound);
 }
 
 //-------------------------------------------------

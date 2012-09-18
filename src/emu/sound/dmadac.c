@@ -239,7 +239,7 @@ dmadac_sound_device::dmadac_sound_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, DMADAC, "DMA-driven DAC", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(dmadac_state));
+	m_token = global_alloc_clear(dmadac_state);
 }
 
 //-------------------------------------------------

@@ -437,7 +437,7 @@ const device_type MOS6530 = &device_creator<mos6530_device>;
 mos6530_device::mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MOS6530, "MOS6530", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(mos6530_state));
+	m_token = global_alloc_clear(mos6530_state);
 }
 
 //-------------------------------------------------

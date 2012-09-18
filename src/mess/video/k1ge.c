@@ -896,13 +896,13 @@ const device_type K1GE = &device_creator<k1ge_device>;
 k1ge_device::k1ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K1GE, "", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof( k1ge_t ));
+	m_token = global_alloc_clear(k1ge_t);
 }
 
 k1ge_device::k1ge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof( k1ge_t ));
+	m_token = global_alloc_clear(k1ge_t);
 }
 
 //-------------------------------------------------

@@ -423,7 +423,7 @@ speaker_sound_device::speaker_sound_device(const machine_config &mconfig, const 
 	: device_t(mconfig, SPEAKER_SOUND, "Speaker", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(speaker_state));
+	m_token = global_alloc_clear(speaker_state);
 }
 
 //-------------------------------------------------

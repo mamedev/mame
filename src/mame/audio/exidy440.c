@@ -995,7 +995,7 @@ exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, cons
 	: device_t(mconfig, EXIDY440, "Exidy 440 CVSD", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(exidy440_audio_state));
+	m_token = global_alloc_clear(exidy440_audio_state);
 }
 
 //-------------------------------------------------

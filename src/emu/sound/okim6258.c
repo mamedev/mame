@@ -358,7 +358,7 @@ okim6258_device::okim6258_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, OKIM6258, "OKI6258", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(okim6258_state));
+	m_token = global_alloc_clear(okim6258_state);
 }
 
 //-------------------------------------------------

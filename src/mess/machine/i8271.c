@@ -1579,7 +1579,7 @@ const device_type I8271 = &device_creator<i8271_device>;
 i8271_device::i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, I8271, "Intel 8271", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(i8271_t));
+	m_token = global_alloc_clear(i8271_t);
 }
 
 //-------------------------------------------------

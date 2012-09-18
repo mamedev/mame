@@ -2472,7 +2472,7 @@ sn76477_device::sn76477_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, SN76477, "SN76477", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(sn76477_state));
+	m_token = global_alloc_clear(sn76477_state);
 }
 
 //-------------------------------------------------

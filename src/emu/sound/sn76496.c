@@ -491,13 +491,13 @@ sn76496_device::sn76496_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, SN76496, "SN76496", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(sn76496_state));
+	m_token = global_alloc_clear(sn76496_state);
 }
 sn76496_device::sn76496_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(sn76496_state));
+	m_token = global_alloc_clear(sn76496_state);
 }
 
 //-------------------------------------------------

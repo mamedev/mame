@@ -693,7 +693,7 @@ vlm5030_device::vlm5030_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, VLM5030, "VLM5030", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(vlm5030_state));
+	m_token = global_alloc_clear(vlm5030_state);
 }
 
 //-------------------------------------------------

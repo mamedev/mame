@@ -196,7 +196,7 @@ renegade_adpcm_device::renegade_adpcm_device(const machine_config &mconfig, cons
 	: device_t(mconfig, RENEGADE_ADPCM, "Renegade Custom ADPCM", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(renegade_adpcm_state));
+	m_token = global_alloc_clear(renegade_adpcm_state);
 }
 
 //-------------------------------------------------

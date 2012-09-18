@@ -2248,7 +2248,7 @@ const device_type DECOCASS_TAPE = &device_creator<decocass_tape_device>;
 decocass_tape_device::decocass_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECOCASS_TAPE, "DECO Cassette Tape", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tape_state));
+	m_token = global_alloc_clear(tape_state);
 }
 
 //-------------------------------------------------

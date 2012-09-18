@@ -182,12 +182,12 @@ const device_type SST39VF020 = &device_creator<sst39vf020_device>;
 sst39vf020_device::sst39vf020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SST39VF020, "SST39VF020", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(sst39vfx_t));
+	m_token = global_alloc_clear(sst39vfx_t);
 }
 sst39vf020_device::sst39vf020_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(sst39vfx_t));
+	m_token = global_alloc_clear(sst39vfx_t);
 }
 
 //-------------------------------------------------

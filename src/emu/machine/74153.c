@@ -180,7 +180,7 @@ const device_type TTL74153 = &device_creator<ttl74153_device>;
 ttl74153_device::ttl74153_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TTL74153, "74153", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(ttl74153_state));
+	m_token = global_alloc_clear(ttl74153_state);
 }
 
 //-------------------------------------------------

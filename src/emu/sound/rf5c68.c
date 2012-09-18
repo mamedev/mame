@@ -262,7 +262,7 @@ rf5c68_device::rf5c68_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, RF5C68, "RF5C68", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(rf5c68_state));
+	m_token = global_alloc_clear(rf5c68_state);
 }
 
 //-------------------------------------------------

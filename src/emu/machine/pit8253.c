@@ -1158,12 +1158,12 @@ const device_type PIT8253 = &device_creator<pit8253_device>;
 pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PIT8253, "Intel PIT8253", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(pit8253_t));
+	m_token = global_alloc_clear(pit8253_t);
 }
 pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(pit8253_t));
+	m_token = global_alloc_clear(pit8253_t);
 }
 
 //-------------------------------------------------

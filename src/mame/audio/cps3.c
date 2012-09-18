@@ -175,7 +175,7 @@ cps3_sound_device::cps3_sound_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, CPS3, "CPS3 Custom", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(cps3_sound_state));
+	m_token = global_alloc_clear(cps3_sound_state);
 }
 
 //-------------------------------------------------

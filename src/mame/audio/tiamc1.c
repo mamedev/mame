@@ -335,7 +335,7 @@ tiamc1_sound_device::tiamc1_sound_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, TIAMC1, "TIA-MC1 Custom", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tiamc1_sound_state));
+	m_token = global_alloc_clear(tiamc1_sound_state);
 }
 
 //-------------------------------------------------

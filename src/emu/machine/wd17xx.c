@@ -2247,12 +2247,12 @@ const device_type WD1770 = &device_creator<wd1770_device>;
 wd1770_device::wd1770_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, WD1770, "WD1770", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(wd1770_state));
+	m_token = global_alloc_clear(wd1770_state);
 }
 wd1770_device::wd1770_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(wd1770_state));
+	m_token = global_alloc_clear(wd1770_state);
 }
 
 //-------------------------------------------------

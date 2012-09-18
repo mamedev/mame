@@ -2154,7 +2154,7 @@ const device_type VIC3 = &device_creator<vic3_device>;
 vic3_device::vic3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VIC3, "4567 VIC III", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(vic3_state));
+	m_token = global_alloc_clear(vic3_state);
 }
 
 //-------------------------------------------------

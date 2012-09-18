@@ -868,7 +868,7 @@ legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mco
 	  device_image_interface(mconfig, *this),
 	  m_token(NULL)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(floppy_drive));
+	m_token = global_alloc_clear(floppy_drive);
 }
 
 legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
@@ -876,7 +876,7 @@ legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mco
 	  device_image_interface(mconfig, *this),
 	  m_token(NULL)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(floppy_drive));
+	m_token = global_alloc_clear(floppy_drive);
 }
 
 //-------------------------------------------------

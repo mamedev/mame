@@ -761,7 +761,7 @@ gameboy_sound_device::gameboy_sound_device(const machine_config &mconfig, const 
 	: device_t(mconfig, GAMEBOY, "LR35902", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(gb_sound_t));
+	m_token = global_alloc_clear(gb_sound_t);
 }
 
 //-------------------------------------------------

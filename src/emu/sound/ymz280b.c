@@ -1051,7 +1051,7 @@ ymz280b_device::ymz280b_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, YMZ280B, "YMZ280B", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(ymz280b_state));
+	m_token = global_alloc_clear(ymz280b_state);
 }
 
 //-------------------------------------------------

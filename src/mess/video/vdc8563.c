@@ -662,7 +662,7 @@ const device_type VDC8563 = &device_creator<vdc8563_device>;
 vdc8563_device::vdc8563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VDC8563, "8563 / 8568 VDC", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(vdc8563_state));
+	m_token = global_alloc_clear(vdc8563_state);
 }
 
 //-------------------------------------------------

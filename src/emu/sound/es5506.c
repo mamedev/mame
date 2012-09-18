@@ -2137,14 +2137,14 @@ es5506_device::es5506_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, ES5506, "ES5506", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(es5506_state));
+	m_token = global_alloc_clear(es5506_state);
 }
 
 es5506_device::es5506_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(es5506_state));
+	m_token = global_alloc_clear(es5506_state);
 }
 
 //-------------------------------------------------

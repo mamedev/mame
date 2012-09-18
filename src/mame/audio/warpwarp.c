@@ -247,7 +247,7 @@ warpwarp_sound_device::warpwarp_sound_device(const machine_config &mconfig, cons
 	: device_t(mconfig, WARPWARP, "Warp Warp Custom", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(warpwarp_sound_state));
+	m_token = global_alloc_clear(warpwarp_sound_state);
 }
 
 //-------------------------------------------------

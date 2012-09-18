@@ -243,7 +243,7 @@ const device_type DS1315 = &device_creator<ds1315_device>;
 ds1315_device::ds1315_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DS1315, "Dallas Semiconductor DS1315", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(ds1315_t));
+	m_token = global_alloc_clear(ds1315_t);
 }
 
 //-------------------------------------------------

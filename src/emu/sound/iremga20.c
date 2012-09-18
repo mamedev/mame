@@ -269,7 +269,7 @@ iremga20_device::iremga20_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, IREMGA20, "Irem GA20", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(ga20_state));
+	m_token = global_alloc_clear(ga20_state);
 }
 
 //-------------------------------------------------

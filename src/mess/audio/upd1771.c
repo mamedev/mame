@@ -464,7 +464,7 @@ upd1771c_device::upd1771c_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, UPD1771C, "NEC uPD1771C 017", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(upd1771_state));
+	m_token = global_alloc_clear(upd1771_state);
 }
 
 //-------------------------------------------------

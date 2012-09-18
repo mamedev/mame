@@ -141,7 +141,7 @@ hyprolyb_adpcm_device::hyprolyb_adpcm_device(const machine_config &mconfig, cons
 	: device_t(mconfig, HYPROLYB_ADPCM, "Hyper Olympics Audio", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(hyprolyb_adpcm_state));
+	m_token = global_alloc_clear(hyprolyb_adpcm_state);
 }
 
 //-------------------------------------------------

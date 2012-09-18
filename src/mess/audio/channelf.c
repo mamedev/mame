@@ -137,7 +137,7 @@ channelf_sound_device::channelf_sound_device(const machine_config &mconfig, cons
 	: device_t(mconfig, CHANNELF, "Channel F", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(channelf_sound_state));
+	m_token = global_alloc_clear(channelf_sound_state);
 }
 
 //-------------------------------------------------

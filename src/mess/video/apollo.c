@@ -836,7 +836,7 @@ static DEVICE_RESET( apollo_mono15i ) {
 apollo_mono_device::apollo_mono_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(screen_data_t));
+	m_token = global_alloc_clear(screen_data_t);
 }
 
 const device_type APOLLO_MONO19I = &device_creator<apollo_mono19i_device>;

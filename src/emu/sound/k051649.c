@@ -286,7 +286,7 @@ k051649_device::k051649_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, K051649, "K051649", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(k051649_state));
+	m_token = global_alloc_clear(k051649_state);
 }
 
 //-------------------------------------------------

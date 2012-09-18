@@ -222,13 +222,13 @@ ym2610_device::ym2610_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, YM2610, "YM2610", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(ym2610_state));
+	m_token = global_alloc_clear(ym2610_state);
 }
 ym2610_device::ym2610_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(ym2610_state));
+	m_token = global_alloc_clear(ym2610_state);
 }
 
 //-------------------------------------------------

@@ -635,7 +635,7 @@ s14001a_device::s14001a_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, S14001A, "S14001A", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(S14001AChip));
+	m_token = global_alloc_clear(S14001AChip);
 }
 
 //-------------------------------------------------

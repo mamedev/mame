@@ -213,7 +213,7 @@ const device_type UPD7002 = &device_creator<uPD7002_device>;
 uPD7002_device::uPD7002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, UPD7002, "uPD7002", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(uPD7002_t));
+	m_token = global_alloc_clear(uPD7002_t);
 }
 
 //-------------------------------------------------

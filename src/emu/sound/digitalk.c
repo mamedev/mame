@@ -696,7 +696,7 @@ digitalker_device::digitalker_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, DIGITALKER, "Digitalker", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(digitalker));
+	m_token = global_alloc_clear(digitalker);
 }
 
 //-------------------------------------------------

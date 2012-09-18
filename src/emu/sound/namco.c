@@ -819,14 +819,14 @@ namco_device::namco_device(const machine_config &mconfig, const char *tag, devic
 	: device_t(mconfig, NAMCO, "Namco", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(namco_sound));
+	m_token = global_alloc_clear(namco_sound);
 }
 
 namco_device::namco_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(namco_sound));
+	m_token = global_alloc_clear(namco_sound);
 }
 
 //-------------------------------------------------

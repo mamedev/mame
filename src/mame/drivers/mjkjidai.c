@@ -106,7 +106,7 @@ mjkjidai_adpcm_device::mjkjidai_adpcm_device(const machine_config &mconfig, cons
 	: device_t(mconfig, MJKJIDAI, "Custom ADPCM", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(mjkjidai_adpcm_state));
+	m_token = global_alloc_clear(mjkjidai_adpcm_state);
 }
 
 //-------------------------------------------------

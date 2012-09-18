@@ -770,7 +770,7 @@ static DEVICE_START(swim)
 applefdc_base_device::applefdc_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(applefdc_token));
+	m_token = global_alloc_clear(applefdc_token);
 }
 
 //-------------------------------------------------

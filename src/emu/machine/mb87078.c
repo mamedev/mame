@@ -270,7 +270,7 @@ const device_type MB87078 = &device_creator<mb87078_device>;
 mb87078_device::mb87078_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MB87078, "Fujitsu MB87078", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(mb87078_state));
+	m_token = global_alloc_clear(mb87078_state);
 }
 
 //-------------------------------------------------

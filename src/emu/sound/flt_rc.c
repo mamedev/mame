@@ -116,7 +116,7 @@ filter_rc_device::filter_rc_device(const machine_config &mconfig, const char *ta
 	: device_t(mconfig, FILTER_RC, "RC Filter", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(filter_rc_state));
+	m_token = global_alloc_clear(filter_rc_state);
 }
 
 //-------------------------------------------------

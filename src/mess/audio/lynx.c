@@ -506,14 +506,14 @@ lynx_sound_device::lynx_sound_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, LYNX, "Mikey", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(lynx_sound_state));
+	m_token = global_alloc_clear(lynx_sound_state);
 }
 
 lynx_sound_device::lynx_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(lynx_sound_state));
+	m_token = global_alloc_clear(lynx_sound_state);
 }
 
 //-------------------------------------------------

@@ -467,7 +467,7 @@ const device_type HD63450 = &device_creator<hd63450_device>;
 hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HD63450, "Hitachi HD63450", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(hd63450_t));
+	m_token = global_alloc_clear(hd63450_t);
 }
 
 //-------------------------------------------------

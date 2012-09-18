@@ -185,7 +185,7 @@ gridlee_sound_device::gridlee_sound_device(const machine_config &mconfig, const 
 	: device_t(mconfig, GRIDLEE, "Gridlee Custom", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(gridlee_sound_state));
+	m_token = global_alloc_clear(gridlee_sound_state);
 }
 
 //-------------------------------------------------

@@ -236,7 +236,7 @@ const device_type LATCH8 = &device_creator<latch8_device>;
 latch8_device::latch8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
        : device_t(mconfig, LATCH8, "8 bit latch", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(latch8_t));
+	m_token = global_alloc_clear(latch8_t);
 	memset((void*)&m_inline_config,0,sizeof(m_inline_config));
 }
 

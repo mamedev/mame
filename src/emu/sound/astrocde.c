@@ -307,7 +307,7 @@ astrocade_device::astrocade_device(const machine_config &mconfig, const char *ta
 	: device_t(mconfig, ASTROCADE, "Astrocade", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(astrocade_state));
+	m_token = global_alloc_clear(astrocade_state);
 }
 
 //-------------------------------------------------

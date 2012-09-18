@@ -149,7 +149,7 @@ geebee_sound_device::geebee_sound_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, GEEBEE, "Gee Bee Custom", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(geebee_sound_state));
+	m_token = global_alloc_clear(geebee_sound_state);
 }
 
 //-------------------------------------------------

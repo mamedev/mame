@@ -124,7 +124,7 @@ ym2151_device::ym2151_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, YM2151, "YM2151", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(ym2151_state));
+	m_token = global_alloc_clear(ym2151_state);
 }
 
 //-------------------------------------------------

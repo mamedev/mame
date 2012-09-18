@@ -562,7 +562,7 @@ cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, CEM3394, "CEM3394", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(cem3394_state));
+	m_token = global_alloc_clear(cem3394_state);
 }
 
 //-------------------------------------------------

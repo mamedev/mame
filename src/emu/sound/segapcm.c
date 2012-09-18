@@ -153,7 +153,7 @@ segapcm_device::segapcm_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, SEGAPCM, "Sega PCM", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(segapcm_state));
+	m_token = global_alloc_clear(segapcm_state);
 }
 
 //-------------------------------------------------

@@ -903,7 +903,7 @@ const device_type DECO16IC = &device_creator<deco16ic_device>;
 deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO16IC, "Data East IC 55 / 56 / 74 / 141", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(deco16ic_state));
+	m_token = global_alloc_clear(deco16ic_state);
 }
 
 //-------------------------------------------------

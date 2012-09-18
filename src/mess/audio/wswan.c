@@ -254,7 +254,7 @@ wswan_sound_device::wswan_sound_device(const machine_config &mconfig, const char
 	: device_t(mconfig, WSWAN, "WonderSwan Custom", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(wswan_sound_state));
+	m_token = global_alloc_clear(wswan_sound_state);
 }
 
 //-------------------------------------------------

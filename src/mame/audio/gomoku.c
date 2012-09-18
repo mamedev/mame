@@ -282,7 +282,7 @@ gomoku_sound_device::gomoku_sound_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, GOMOKU, "Gomoku Custom", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(gomoku_sound_state));
+	m_token = global_alloc_clear(gomoku_sound_state);
 }
 
 //-------------------------------------------------

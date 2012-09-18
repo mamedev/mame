@@ -156,7 +156,7 @@ const device_type NMK112 = &device_creator<nmk112_device>;
 nmk112_device::nmk112_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NMK112, "NMK 112", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(nmk112_state));
+	m_token = global_alloc_clear(nmk112_state);
 }
 
 //-------------------------------------------------

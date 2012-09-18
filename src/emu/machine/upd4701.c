@@ -305,7 +305,7 @@ const device_type UPD4701 = &device_creator<upd4701_device>;
 upd4701_device::upd4701_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, UPD4701, "NEC uPD4701 Encoder", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(upd4701_state));
+	m_token = global_alloc_clear(upd4701_state);
 }
 
 //-------------------------------------------------

@@ -451,7 +451,7 @@ const device_type PIC8259 = &device_creator<pic8259_device>;
 pic8259_device::pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PIC8259, "Intel PIC8259", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(pic8259_t));
+	m_token = global_alloc_clear(pic8259_t);
 }
 
 //-------------------------------------------------

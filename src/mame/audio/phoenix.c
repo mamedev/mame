@@ -576,7 +576,7 @@ phoenix_sound_device::phoenix_sound_device(const machine_config &mconfig, const 
 	: device_t(mconfig, PHOENIX, "Phoenix Custom", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(phoenix_sound_state));
+	m_token = global_alloc_clear(phoenix_sound_state);
 }
 
 //-------------------------------------------------

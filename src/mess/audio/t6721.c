@@ -288,7 +288,7 @@ const device_type T6721 = &device_creator<t6721_device>;
 t6721_device::t6721_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, T6721, "Toshiba 6721A", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(t6721_state));
+	m_token = global_alloc_clear(t6721_state);
 }
 
 //-------------------------------------------------

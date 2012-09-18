@@ -1337,7 +1337,7 @@ const device_type OMTI8621 = &device_creator<omti8621_device>;
 omti8621_device::omti8621_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, OMTI8621, "OMTI 8621", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(omti8621_state));
+	m_token = global_alloc_clear(omti8621_state);
 }
 
 //-------------------------------------------------

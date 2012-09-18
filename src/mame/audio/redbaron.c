@@ -231,7 +231,7 @@ redbaron_sound_device::redbaron_sound_device(const machine_config &mconfig, cons
 	: device_t(mconfig, REDBARON, "Red Baron Custom", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(redbaron_sound_state));
+	m_token = global_alloc_clear(redbaron_sound_state);
 }
 
 //-------------------------------------------------

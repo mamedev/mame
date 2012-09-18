@@ -350,7 +350,7 @@ c6280_device::c6280_device(const machine_config &mconfig, const char *tag, devic
 	: device_t(mconfig, C6280, "HuC6280", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(c6280_t));
+	m_token = global_alloc_clear(c6280_t);
 }
 
 //-------------------------------------------------

@@ -835,7 +835,7 @@ const device_type MC6843 = &device_creator<mc6843_device>;
 mc6843_device::mc6843_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MC6843, "Motorola MC6843 floppy controller", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(mc6843_t));
+	m_token = global_alloc_clear(mc6843_t);
 }
 
 //-------------------------------------------------

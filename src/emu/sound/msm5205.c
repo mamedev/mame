@@ -346,13 +346,13 @@ msm5205_device::msm5205_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, MSM5205, "MSM5205", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(msm5205_state));
+	m_token = global_alloc_clear(msm5205_state);
 }
 msm5205_device::msm5205_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(msm5205_state));
+	m_token = global_alloc_clear(msm5205_state);
 }
 
 //-------------------------------------------------

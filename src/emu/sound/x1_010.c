@@ -289,7 +289,7 @@ x1_010_device::x1_010_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, X1_010, "X1-010", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(x1_010_state));
+	m_token = global_alloc_clear(x1_010_state);
 }
 
 //-------------------------------------------------

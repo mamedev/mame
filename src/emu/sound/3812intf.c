@@ -146,7 +146,7 @@ ym3812_device::ym3812_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, YM3812, "YM3812", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(ym3812_state));
+	m_token = global_alloc_clear(ym3812_state);
 }
 
 //-------------------------------------------------

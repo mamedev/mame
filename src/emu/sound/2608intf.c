@@ -209,7 +209,7 @@ ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, YM2608, "YM2608", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(ym2608_state));
+	m_token = global_alloc_clear(ym2608_state);
 }
 
 //-------------------------------------------------

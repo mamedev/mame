@@ -770,7 +770,7 @@ nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, NES, "N2A03", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(nesapu_state));
+	m_token = global_alloc_clear(nesapu_state);
 }
 
 //-------------------------------------------------

@@ -973,7 +973,7 @@ const device_type PC080SN = &device_creator<pc080sn_device>;
 pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PC080SN, "Taito PC080SN", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(pc080sn_state));
+	m_token = global_alloc_clear(pc080sn_state);
 }
 
 //-------------------------------------------------
@@ -1238,7 +1238,7 @@ const device_type PC090OJ = &device_creator<pc090oj_device>;
 pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PC090OJ, "Taito PC090OJ", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(pc090oj_state));
+	m_token = global_alloc_clear(pc090oj_state);
 }
 
 //-------------------------------------------------
@@ -1904,7 +1904,7 @@ const device_type TC0080VCO = &device_creator<tc0080vco_device>;
 tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0080VCO, "Taito TC0080VCO", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tc0080vco_state));
+	m_token = global_alloc_clear(tc0080vco_state);
 }
 
 //-------------------------------------------------
@@ -2489,7 +2489,7 @@ const device_type TC0100SCN = &device_creator<tc0100scn_device>;
 tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0100SCN, "Taito TC0100SCN", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tc0100scn_state));
+	m_token = global_alloc_clear(tc0100scn_state);
 }
 
 //-------------------------------------------------
@@ -2777,7 +2777,7 @@ const device_type TC0280GRD = &device_creator<tc0280grd_device>;
 tc0280grd_device::tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0280GRD, "Taito TC0280GRD & TC0430GRW", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tc0280grd_state));
+	m_token = global_alloc_clear(tc0280grd_state);
 }
 
 //-------------------------------------------------
@@ -2898,7 +2898,7 @@ const device_type TC0360PRI = &device_creator<tc0360pri_device>;
 tc0360pri_device::tc0360pri_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0360PRI, "Taito TC0360PRI", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tc0360pri_state));
+	m_token = global_alloc_clear(tc0360pri_state);
 }
 
 //-------------------------------------------------
@@ -3780,7 +3780,7 @@ const device_type TC0480SCP = &device_creator<tc0480scp_device>;
 tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0480SCP, "Taito TC0480SCP", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tc0480scp_state));
+	m_token = global_alloc_clear(tc0480scp_state);
 }
 
 //-------------------------------------------------
@@ -4724,7 +4724,7 @@ const device_type TC0150ROD = &device_creator<tc0150rod_device>;
 tc0150rod_device::tc0150rod_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0150ROD, "Taito TC0150ROD", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tc0150rod_state));
+	m_token = global_alloc_clear(tc0150rod_state);
 }
 
 //-------------------------------------------------
@@ -4972,7 +4972,7 @@ const device_type TC0110PCR = &device_creator<tc0110pcr_device>;
 tc0110pcr_device::tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0110PCR, "Taito TC0110PCR", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tc0110pcr_state));
+	m_token = global_alloc_clear(tc0110pcr_state);
 }
 
 //-------------------------------------------------
@@ -5304,7 +5304,7 @@ const device_type TC0180VCU = &device_creator<tc0180vcu_device>;
 tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0180VCU, "Taito TC0180VCU", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tc0180vcu_state));
+	m_token = global_alloc_clear(tc0180vcu_state);
 }
 
 //-------------------------------------------------

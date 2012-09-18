@@ -162,13 +162,13 @@ ym2612_device::ym2612_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, YM2612, "YM2612", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(ym2612_state));
+	m_token = global_alloc_clear(ym2612_state);
 }
 ym2612_device::ym2612_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(ym2612_state));
+	m_token = global_alloc_clear(ym2612_state);
 }
 
 //-------------------------------------------------

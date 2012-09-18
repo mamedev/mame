@@ -182,7 +182,7 @@ speech_sound_device::speech_sound_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, SEGASPEECH, "Sega Speech Sound Board", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(speech_state));
+	m_token = global_alloc_clear(speech_state);
 }
 
 //-------------------------------------------------
@@ -885,7 +885,7 @@ usb_sound_device::usb_sound_device(const machine_config &mconfig, const char *ta
 	: device_t(mconfig, SEGAUSB, "Sega Universal Sound Board", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(usb_state));
+	m_token = global_alloc_clear(usb_state);
 }
 
 //-------------------------------------------------

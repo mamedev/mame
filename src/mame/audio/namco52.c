@@ -228,7 +228,7 @@ const device_type NAMCO_52XX = &device_creator<namco_52xx_device>;
 namco_52xx_device::namco_52xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NAMCO_52XX, "Namco 52xx", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(namco_52xx_state));
+	m_token = global_alloc_clear(namco_52xx_state);
 }
 
 //-------------------------------------------------

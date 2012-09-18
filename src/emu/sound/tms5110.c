@@ -1501,13 +1501,13 @@ tms5110_device::tms5110_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, TMS5110, "TMS5110", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tms5110_state));
+	m_token = global_alloc_clear(tms5110_state);
 }
 tms5110_device::tms5110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tms5110_state));
+	m_token = global_alloc_clear(tms5110_state);
 }
 
 //-------------------------------------------------
@@ -1717,7 +1717,7 @@ const device_type TMSPROM = &device_creator<tmsprom_device>;
 tmsprom_device::tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMSPROM, "TMSPROM", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tmsprom_state));
+	m_token = global_alloc_clear(tmsprom_state);
 }
 
 //-------------------------------------------------

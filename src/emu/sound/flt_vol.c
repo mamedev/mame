@@ -49,7 +49,7 @@ filter_volume_device::filter_volume_device(const machine_config &mconfig, const 
 	: device_t(mconfig, FILTER_VOLUME, "Volume Filter", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(filter_volume_state));
+	m_token = global_alloc_clear(filter_volume_state);
 }
 
 //-------------------------------------------------

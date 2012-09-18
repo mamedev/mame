@@ -179,7 +179,7 @@ y8950_device::y8950_device(const machine_config &mconfig, const char *tag, devic
 	: device_t(mconfig, Y8950, "Y8950", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(y8950_state));
+	m_token = global_alloc_clear(y8950_state);
 }
 
 //-------------------------------------------------

@@ -512,7 +512,7 @@ const device_type TC0220IOC = &device_creator<tc0220ioc_device>;
 tc0220ioc_device::tc0220ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0220IOC, "Taito TC0220IOC", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tc0220ioc_state));
+	m_token = global_alloc_clear(tc0220ioc_state);
 }
 
 //-------------------------------------------------
@@ -549,7 +549,7 @@ const device_type TC0510NIO = &device_creator<tc0510nio_device>;
 tc0510nio_device::tc0510nio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0510NIO, "Taito TC0510NIO", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tc0510nio_state));
+	m_token = global_alloc_clear(tc0510nio_state);
 }
 
 //-------------------------------------------------
@@ -586,7 +586,7 @@ const device_type TC0640FIO = &device_creator<tc0640fio_device>;
 tc0640fio_device::tc0640fio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0640FIO, "Taito TC0640FIO", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tc0640fio_state));
+	m_token = global_alloc_clear(tc0640fio_state);
 }
 
 //-------------------------------------------------

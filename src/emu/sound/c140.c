@@ -480,7 +480,7 @@ c140_device::c140_device(const machine_config &mconfig, const char *tag, device_
 	: device_t(mconfig, C140, "C140", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(c140_state));
+	m_token = global_alloc_clear(c140_state);
 }
 
 //-------------------------------------------------

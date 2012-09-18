@@ -369,7 +369,7 @@ const device_type S2636 = &device_creator<s2636_device>;
 s2636_device::s2636_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, S2636, "Signetics 2636", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(s2636_state));
+	m_token = global_alloc_clear(s2636_state);
 }
 
 //-------------------------------------------------

@@ -227,7 +227,7 @@ const device_type ER59256 = &device_creator<er59256_device>;
 er59256_device::er59256_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ER59256, "Microchip ER59256 serial eeprom.", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(er59256_t));
+	m_token = global_alloc_clear(er59256_t);
 }
 
 //-------------------------------------------------

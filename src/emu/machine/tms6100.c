@@ -264,12 +264,12 @@ const device_type TMS6100 = &device_creator<tms6100_device>;
 tms6100_device::tms6100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS6100, "TMS6100", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tms6100_state));
+	m_token = global_alloc_clear(tms6100_state);
 }
 tms6100_device::tms6100_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tms6100_state));
+	m_token = global_alloc_clear(tms6100_state);
 }
 
 //-------------------------------------------------

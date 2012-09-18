@@ -823,7 +823,7 @@ dave_sound_device::dave_sound_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, DAVE, "Dave", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(dave_t));
+	m_token = global_alloc_clear(dave_t);
 }
 
 //-------------------------------------------------

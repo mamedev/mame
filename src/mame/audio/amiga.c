@@ -282,7 +282,7 @@ amiga_sound_device::amiga_sound_device(const machine_config &mconfig, const char
 	: device_t(mconfig, AMIGA, "Amiga Paula", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(amiga_audio));
+	m_token = global_alloc_clear(amiga_audio);
 }
 
 //-------------------------------------------------

@@ -916,7 +916,7 @@ const device_type AKIKO = &device_creator<akiko_device>;
 akiko_device::akiko_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AKIKO, "Akiko", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(akiko_state));
+	m_token = global_alloc_clear(akiko_state);
 }
 
 //-------------------------------------------------

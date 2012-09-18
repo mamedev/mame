@@ -149,7 +149,7 @@ socrates_snd_device::socrates_snd_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, SOCRATES, "Socrates Sound", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(SocratesASIC));
+	m_token = global_alloc_clear(SocratesASIC);
 }
 
 //-------------------------------------------------

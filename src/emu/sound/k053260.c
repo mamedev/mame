@@ -441,7 +441,7 @@ k053260_device::k053260_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, K053260, "K053260", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(k053260_state));
+	m_token = global_alloc_clear(k053260_state);
 }
 
 //-------------------------------------------------

@@ -441,7 +441,7 @@ saa1099_device::saa1099_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, SAA1099, "SAA1099", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(saa1099_state));
+	m_token = global_alloc_clear(saa1099_state);
 }
 
 //-------------------------------------------------

@@ -708,7 +708,7 @@ const device_type MEA8000 = &device_creator<mea8000_device>;
 mea8000_device::mea8000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MEA8000, "Philips / Signetics MEA 8000 speech synthesizer", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(mea8000_t));
+	m_token = global_alloc_clear(mea8000_t);
 }
 
 //-------------------------------------------------

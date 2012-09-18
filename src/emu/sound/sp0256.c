@@ -1370,7 +1370,7 @@ sp0256_device::sp0256_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, SP0256, "SP0256", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(sp0256_state));
+	m_token = global_alloc_clear(sp0256_state);
 }
 
 //-------------------------------------------------

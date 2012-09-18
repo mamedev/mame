@@ -342,7 +342,7 @@ const device_type MATHBOX = &device_creator<mathbox_device>;
 mathbox_device::mathbox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MATHBOX, "MATHBOX", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(mathbox_state));
+	m_token = global_alloc_clear(mathbox_state);
 }
 
 //-------------------------------------------------

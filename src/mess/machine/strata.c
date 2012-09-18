@@ -104,7 +104,7 @@ const device_type STRATAFLASH = &device_creator<strataflash_device>;
 strataflash_device::strataflash_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, STRATAFLASH, "Intel 28F640J5", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(strata_t));
+	m_token = global_alloc_clear(strata_t);
 }
 
 //-------------------------------------------------

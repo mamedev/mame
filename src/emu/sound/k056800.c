@@ -168,7 +168,7 @@ const device_type K056800 = &device_creator<k056800_device>;
 k056800_device::k056800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K056800, "Konami 056800 MIRAC", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(k056800_state));
+	m_token = global_alloc_clear(k056800_state);
 }
 
 //-------------------------------------------------

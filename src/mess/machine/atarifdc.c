@@ -817,7 +817,7 @@ const device_type ATARI_FDC = &device_creator<atari_fdc_device>;
 atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ATARI_FDC, "Atari FDC", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(atari_fdc_t));
+	m_token = global_alloc_clear(atari_fdc_t);
 }
 
 //-------------------------------------------------

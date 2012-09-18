@@ -226,7 +226,7 @@ const device_type RP5H01 = &device_creator<rp5h01_device>;
 rp5h01_device::rp5h01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RP5H01, "RP5H01", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(rp5h01_state));
+	m_token = global_alloc_clear(rp5h01_state);
 }
 
 //-------------------------------------------------

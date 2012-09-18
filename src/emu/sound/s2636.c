@@ -87,7 +87,7 @@ s2636_sound_device::s2636_sound_device(const machine_config &mconfig, const char
 	: device_t(mconfig, S2636_SOUND, "S2636", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(s2636_sound));
+	m_token = global_alloc_clear(s2636_sound);
 }
 
 //-------------------------------------------------

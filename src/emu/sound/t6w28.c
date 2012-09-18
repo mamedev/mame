@@ -370,7 +370,7 @@ t6w28_device::t6w28_device(const machine_config &mconfig, const char *tag, devic
 	: device_t(mconfig, T6W28, "T6W28", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(t6w28_state));
+	m_token = global_alloc_clear(t6w28_state);
 }
 
 //-------------------------------------------------

@@ -374,12 +374,12 @@ const device_type ADC12138 = &device_creator<adc12138_device>;
 adc12138_device::adc12138_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ADC12138, "A/D Converter 12138", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(adc12138_state));
+	m_token = global_alloc_clear(adc12138_state);
 }
 adc12138_device::adc12138_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(adc12138_state));
+	m_token = global_alloc_clear(adc12138_state);
 }
 
 //-------------------------------------------------

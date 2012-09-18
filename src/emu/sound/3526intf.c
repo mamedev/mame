@@ -150,7 +150,7 @@ ym3526_device::ym3526_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, YM3526, "YM3526", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(ym3526_state));
+	m_token = global_alloc_clear(ym3526_state);
 }
 
 //-------------------------------------------------

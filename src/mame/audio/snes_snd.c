@@ -1366,7 +1366,7 @@ snes_sound_device::snes_sound_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, SNES, "SNES Custom DSP (SPC700)", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(snes_sound_state));
+	m_token = global_alloc_clear(snes_sound_state);
 }
 
 //-------------------------------------------------

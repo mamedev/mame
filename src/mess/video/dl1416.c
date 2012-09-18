@@ -296,7 +296,7 @@ WRITE8_DEVICE_HANDLER( dl1416_data_w )
 dl1416_device::dl1416_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(dl1416_state));
+	m_token = global_alloc_clear(dl1416_state);
 }
 
 //-------------------------------------------------

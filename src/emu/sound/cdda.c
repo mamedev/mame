@@ -318,7 +318,7 @@ cdda_device::cdda_device(const machine_config &mconfig, const char *tag, device_
 	: device_t(mconfig, CDDA, "CD/DA", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(cdda_info));
+	m_token = global_alloc_clear(cdda_info);
 }
 
 //-------------------------------------------------

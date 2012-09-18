@@ -1069,7 +1069,7 @@ const device_type TI990_TAPE_CTRL = &device_creator<tap_990_device>;
 tap_990_device::tap_990_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TI990_TAPE_CTRL, "Generic TI990 Tape Controller", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tap_990_t));
+	m_token = global_alloc_clear(tap_990_t);
 }
 
 //-------------------------------------------------

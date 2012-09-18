@@ -607,7 +607,7 @@ seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char
 	: device_t(mconfig, SEIBU_ADPCM, "Seibu ADPCM", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(seibu_adpcm_state));
+	m_token = global_alloc_clear(seibu_adpcm_state);
 }
 
 //-------------------------------------------------

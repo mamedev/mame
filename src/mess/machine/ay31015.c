@@ -728,7 +728,7 @@ const device_type AY31015 = &device_creator<ay31015_device>;
 ay31015_device::ay31015_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AY31015, "AY-3-1015", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(ay31015_t));
+	m_token = global_alloc_clear(ay31015_t);
 }
 
 //-------------------------------------------------

@@ -791,13 +791,13 @@ upd7759_device::upd7759_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, UPD7759, "uPD7759", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(upd7759_state));
+	m_token = global_alloc_clear(upd7759_state);
 }
 upd7759_device::upd7759_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(upd7759_state));
+	m_token = global_alloc_clear(upd7759_state);
 }
 
 //-------------------------------------------------

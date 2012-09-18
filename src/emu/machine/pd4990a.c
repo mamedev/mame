@@ -525,7 +525,7 @@ const device_type UPD4990A = &device_creator<upd4990a_device>;
 upd4990a_device::upd4990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, UPD4990A, "NEC uPD4990A", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(upd4990a_state));
+	m_token = global_alloc_clear(upd4990a_state);
 }
 
 //-------------------------------------------------

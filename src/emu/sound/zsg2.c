@@ -235,7 +235,7 @@ zsg2_device::zsg2_device(const machine_config &mconfig, const char *tag, device_
 	: device_t(mconfig, ZSG2, "ZSG-2", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(zsg2_state));
+	m_token = global_alloc_clear(zsg2_state);
 }
 
 //-------------------------------------------------

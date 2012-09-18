@@ -1816,7 +1816,7 @@ ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, YMF271, "YMF271", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(YMF271Chip));
+	m_token = global_alloc_clear(YMF271Chip);
 }
 
 //-------------------------------------------------

@@ -500,7 +500,7 @@ const device_type GAELCO_SERIAL = &device_creator<gaelco_serial_device>;
 gaelco_serial_device::gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GAELCO_SERIAL, "gaelco_serial", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(gaelco_serial_state));
+	m_token = global_alloc_clear(gaelco_serial_state);
 }
 
 //-------------------------------------------------

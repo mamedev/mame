@@ -624,7 +624,7 @@ okim6376_device::okim6376_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, OKIM6376, "OKI6376", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(okim6376_state));
+	m_token = global_alloc_clear(okim6376_state);
 }
 
 //-------------------------------------------------

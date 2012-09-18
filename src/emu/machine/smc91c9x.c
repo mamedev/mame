@@ -586,7 +586,7 @@ static DEVICE_RESET( smc91c9x )
 smc91c9x_device::smc91c9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(smc91c9x_state));
+	m_token = global_alloc_clear(smc91c9x_state);
 }
 
 //-------------------------------------------------

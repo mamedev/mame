@@ -2036,13 +2036,13 @@ tms5220_device::tms5220_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, TMS5220, "TMS5220", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tms5220_state));
+	m_token = global_alloc_clear(tms5220_state);
 }
 tms5220_device::tms5220_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tms5220_state));
+	m_token = global_alloc_clear(tms5220_state);
 }
 
 //-------------------------------------------------

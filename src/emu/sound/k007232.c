@@ -449,7 +449,7 @@ k007232_device::k007232_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, K007232, "K007232", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(KDAC_A_PCM));
+	m_token = global_alloc_clear(KDAC_A_PCM);
 }
 
 //-------------------------------------------------

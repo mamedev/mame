@@ -605,7 +605,7 @@ const device_type VIDEO_VRENDER0 = &device_creator<vr0video_device>;
 vr0video_device::vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VIDEO_VRENDER0, "VRender0", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(vr0video_state));
+	m_token = global_alloc_clear(vr0video_state);
 }
 
 //-------------------------------------------------

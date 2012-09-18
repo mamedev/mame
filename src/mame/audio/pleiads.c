@@ -685,14 +685,14 @@ pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, const 
 	: device_t(mconfig, PLEIADS, "Pleiads Custom", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(pleiads_sound_state));
+	m_token = global_alloc_clear(pleiads_sound_state);
 }
 
 pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(pleiads_sound_state));
+	m_token = global_alloc_clear(pleiads_sound_state);
 }
 
 //-------------------------------------------------

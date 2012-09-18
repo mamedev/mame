@@ -1359,7 +1359,7 @@ aica_device::aica_device(const machine_config &mconfig, const char *tag, device_
 	: device_t(mconfig, AICA, "AICA", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(aica_state));
+	m_token = global_alloc_clear(aica_state);
 }
 
 //-------------------------------------------------

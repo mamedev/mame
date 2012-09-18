@@ -600,7 +600,7 @@ const device_type TPI6525 = &device_creator<tpi6525_device>;
 tpi6525_device::tpi6525_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TPI6525, "6525 TPI", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tpi6525_state));
+	m_token = global_alloc_clear(tpi6525_state);
 }
 
 //-------------------------------------------------

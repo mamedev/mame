@@ -375,7 +375,7 @@ qsound_device::qsound_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, QSOUND, "Q-Sound", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(qsound_state));
+	m_token = global_alloc_clear(qsound_state);
 }
 
 //-------------------------------------------------

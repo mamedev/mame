@@ -400,7 +400,7 @@ beezer_sound_device::beezer_sound_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, BEEZER, "beezer SFX", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(beezer_sound_state));
+	m_token = global_alloc_clear(beezer_sound_state);
 }
 
 //-------------------------------------------------

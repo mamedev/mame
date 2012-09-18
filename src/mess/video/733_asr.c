@@ -221,7 +221,7 @@ const device_type ASR733 = &device_creator<asr733_device>;
 asr733_device::asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ASR733, "733 ASR", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(asr_t));
+	m_token = global_alloc_clear(asr_t);
 }
 
 //-------------------------------------------------

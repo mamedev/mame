@@ -2804,7 +2804,7 @@ const device_type VIC2 = &device_creator<vic2_device>;
 vic2_device::vic2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VIC2, "6567 / 6569 VIC II", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(vic2_state));
+	m_token = global_alloc_clear(vic2_state);
 }
 
 //-------------------------------------------------

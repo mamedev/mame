@@ -452,7 +452,7 @@ const device_type VT100_VIDEO = &device_creator<vt100_video_device>;
 vt100_video_device::vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VT100_VIDEO, "VT100 Video", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(vt_video_t));
+	m_token = global_alloc_clear(vt_video_t);
 }
 
 //-------------------------------------------------

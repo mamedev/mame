@@ -166,7 +166,7 @@ trackfld_audio_device::trackfld_audio_device(const machine_config &mconfig, cons
 	: device_t(mconfig, TRACKFLD_AUDIO, "Track And Field Audio", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(trackfld_audio_state));
+	m_token = global_alloc_clear(trackfld_audio_state);
 }
 
 //-------------------------------------------------

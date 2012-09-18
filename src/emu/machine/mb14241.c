@@ -72,7 +72,7 @@ const device_type MB14241 = &device_creator<mb14241_device>;
 mb14241_device::mb14241_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MB14241, "MB14241", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(mb14241_state));
+	m_token = global_alloc_clear(mb14241_state);
 }
 
 //-------------------------------------------------

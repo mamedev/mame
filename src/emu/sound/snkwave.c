@@ -164,7 +164,7 @@ snkwave_device::snkwave_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, SNKWAVE, "SNK Wave", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(snkwave_state));
+	m_token = global_alloc_clear(snkwave_state);
 }
 
 //-------------------------------------------------

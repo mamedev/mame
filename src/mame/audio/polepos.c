@@ -356,7 +356,7 @@ polepos_sound_device::polepos_sound_device(const machine_config &mconfig, const 
 	: device_t(mconfig, POLEPOS, "Pole Position Custom", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(polepos_sound_state));
+	m_token = global_alloc_clear(polepos_sound_state);
 }
 
 //-------------------------------------------------

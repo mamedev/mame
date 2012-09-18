@@ -2840,7 +2840,7 @@ const device_type MC68328 = &device_creator<mc68328_device>;
 mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MC68328, "Motorola MC68328 (DragonBall) Integrated Processor", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(mc68328_t));
+	m_token = global_alloc_clear(mc68328_t);
 }
 
 //-------------------------------------------------

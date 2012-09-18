@@ -624,14 +624,14 @@ tx1_sound_device::tx1_sound_device(const machine_config &mconfig, const char *ta
 	: device_t(mconfig, TX1, "TX-1 Custom", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tx1_sound_state));
+	m_token = global_alloc_clear(tx1_sound_state);
 }
 
 tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tx1_sound_state));
+	m_token = global_alloc_clear(tx1_sound_state);
 }
 //-------------------------------------------------
 //  device_config_complete - perform any

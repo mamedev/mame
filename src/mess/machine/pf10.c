@@ -136,7 +136,7 @@ const device_type PF10 = &device_creator<pf10_device>;
 pf10_device::pf10_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PF10, "PF-10", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(pf10_state));
+	m_token = global_alloc_clear(pf10_state);
 }
 
 //-------------------------------------------------

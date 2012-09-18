@@ -1361,7 +1361,7 @@ scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_
 	: device_t(mconfig, SCSP, "SCSP", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(scsp_state));
+	m_token = global_alloc_clear(scsp_state);
 }
 
 //-------------------------------------------------

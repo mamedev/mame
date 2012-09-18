@@ -418,12 +418,12 @@ const device_type AT45DB041 = &device_creator<at45db041_device>;
 at45db041_device::at45db041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AT45DB041, "AT45DB041", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(at45dbxx_t));
+	m_token = global_alloc_clear(at45dbxx_t);
 }
 at45db041_device::at45db041_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(at45dbxx_t));
+	m_token = global_alloc_clear(at45dbxx_t);
 }
 
 //-------------------------------------------------

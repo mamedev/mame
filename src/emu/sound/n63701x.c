@@ -159,7 +159,7 @@ namco_63701x_device::namco_63701x_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, NAMCO_63701X, "Namco 63701X", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(namco_63701x));
+	m_token = global_alloc_clear(namco_63701x);
 }
 
 //-------------------------------------------------

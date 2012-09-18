@@ -266,7 +266,7 @@ timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, const 
 	: device_t(mconfig, TIMEPLT_AUDIO, "Time Pilot Audio", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(timeplt_audio_state));
+	m_token = global_alloc_clear(timeplt_audio_state);
 }
 
 //-------------------------------------------------

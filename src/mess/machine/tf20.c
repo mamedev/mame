@@ -362,7 +362,7 @@ const device_type TF20 = &device_creator<tf20_device>;
 tf20_device::tf20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TF20, "TF-20", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tf20_state));
+	m_token = global_alloc_clear(tf20_state);
 }
 
 //-------------------------------------------------

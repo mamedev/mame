@@ -678,7 +678,7 @@ multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, MULTIPCM, "Sega/Yamaha 315-5560", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(MultiPCM));
+	m_token = global_alloc_clear(MultiPCM);
 }
 
 //-------------------------------------------------

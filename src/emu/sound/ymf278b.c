@@ -1093,7 +1093,7 @@ ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, YMF278B, "YMF278B", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(YMF278BChip));
+	m_token = global_alloc_clear(YMF278BChip);
 }
 
 //-------------------------------------------------

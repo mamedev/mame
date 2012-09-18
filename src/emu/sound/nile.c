@@ -235,7 +235,7 @@ nile_device::nile_device(const machine_config &mconfig, const char *tag, device_
 	: device_t(mconfig, NILE, "NiLe", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(nile_state));
+	m_token = global_alloc_clear(nile_state);
 }
 
 //-------------------------------------------------

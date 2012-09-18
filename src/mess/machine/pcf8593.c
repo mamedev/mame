@@ -449,7 +449,7 @@ const device_type PCF8593 = &device_creator<pcf8593_device>;
 pcf8593_device::pcf8593_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PCF8593, "PCF8593 RTC", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(pcf8593_t));
+	m_token = global_alloc_clear(pcf8593_t);
 }
 
 //-------------------------------------------------

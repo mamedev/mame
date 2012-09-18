@@ -562,7 +562,7 @@ rf5c400_device::rf5c400_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, RF5C400, "RF5C400", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(rf5c400_state));
+	m_token = global_alloc_clear(rf5c400_state);
 }
 
 //-------------------------------------------------
