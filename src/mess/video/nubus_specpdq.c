@@ -31,11 +31,9 @@
 
 #define VRAM_SIZE	(0x400000)
 
-static SCREEN_UPDATE_RGB32( specpdq );
-
 MACHINE_CONFIG_FRAGMENT( specpdq )
 	MCFG_SCREEN_ADD( SPECPDQ_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_STATIC(specpdq)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_specpdq_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
 	MCFG_SCREEN_SIZE(1280,1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 844-1)
@@ -153,22 +151,21 @@ void nubus_specpdq_device::device_timer(emu_timer &timer, device_timer_id tid, i
 
 ***************************************************************************/
 
-static SCREEN_UPDATE_RGB32( specpdq )
+UINT32 nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 *scanline;
 	int x, y;
-	nubus_specpdq_device *card = downcast<nubus_specpdq_device *>(screen.owner());
 	UINT8 pixels, *vram;
 
 	// first time?  kick off the VBL timer
-	if (!card->m_screen)
+	if (!m_screen)
 	{
-		card->m_screen = &screen;
-		card->m_timer->adjust(card->m_screen->time_until_pos(843, 0), 0);
+		m_screen = &screen;
+		m_timer->adjust(m_screen->time_until_pos(843, 0), 0);
 	}
-	vram = card->m_vram + 0x9000;
+	vram = m_vram + 0x9000;
 
-	switch (card->m_mode)
+	switch (m_mode)
 	{
 		case 0: // 1 bpp
 			for (y = 0; y < 844; y++)
@@ -178,14 +175,14 @@ static SCREEN_UPDATE_RGB32( specpdq )
 				{
 					pixels = vram[(y * 512) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = card->m_palette[(pixels&0x80)];
-					*scanline++ = card->m_palette[((pixels<<1)&0x80)];
-					*scanline++ = card->m_palette[((pixels<<2)&0x80)];
-					*scanline++ = card->m_palette[((pixels<<3)&0x80)];
-					*scanline++ = card->m_palette[((pixels<<4)&0x80)];
-					*scanline++ = card->m_palette[((pixels<<5)&0x80)];
-					*scanline++ = card->m_palette[((pixels<<6)&0x80)];
-					*scanline++ = card->m_palette[((pixels<<7)&0x80)];
+					*scanline++ = m_palette[(pixels&0x80)];
+					*scanline++ = m_palette[((pixels<<1)&0x80)];
+					*scanline++ = m_palette[((pixels<<2)&0x80)];
+					*scanline++ = m_palette[((pixels<<3)&0x80)];
+					*scanline++ = m_palette[((pixels<<4)&0x80)];
+					*scanline++ = m_palette[((pixels<<5)&0x80)];
+					*scanline++ = m_palette[((pixels<<6)&0x80)];
+					*scanline++ = m_palette[((pixels<<7)&0x80)];
 				}
 			}
 			break;
@@ -198,10 +195,10 @@ static SCREEN_UPDATE_RGB32( specpdq )
 				{
 					pixels = vram[(y * 512) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = card->m_palette[(pixels&0xc0)];
-					*scanline++ = card->m_palette[((pixels<<2)&0xc0)];
-					*scanline++ = card->m_palette[((pixels<<4)&0xc0)];
-					*scanline++ = card->m_palette[((pixels<<6)&0xc0)];
+					*scanline++ = m_palette[(pixels&0xc0)];
+					*scanline++ = m_palette[((pixels<<2)&0xc0)];
+					*scanline++ = m_palette[((pixels<<4)&0xc0)];
+					*scanline++ = m_palette[((pixels<<6)&0xc0)];
 				}
 			}
 			break;
@@ -215,8 +212,8 @@ static SCREEN_UPDATE_RGB32( specpdq )
 				{
 					pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = card->m_palette[(pixels&0xf0)];
-					*scanline++ = card->m_palette[((pixels<<4)&0xf0)];
+					*scanline++ = m_palette[(pixels&0xf0)];
+					*scanline++ = m_palette[((pixels<<4)&0xf0)];
 				}
 			}
 			break;
@@ -229,13 +226,13 @@ static SCREEN_UPDATE_RGB32( specpdq )
 				for (x = 0; x < 1152; x++)
 				{
 					pixels = vram[(y * 1152) + (BYTE4_XOR_BE(x))];
-					*scanline++ = card->m_palette[pixels];
+					*scanline++ = m_palette[pixels];
 				}
 			}
 			break;
 
 		default:
-			fatalerror("specpdq: unknown video mode %d\n", card->m_mode);
+			fatalerror("specpdq: unknown video mode %d\n", m_mode);
 			break;
 	}
 	return 0;

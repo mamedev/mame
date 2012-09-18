@@ -26,6 +26,7 @@ public:
 		virtual const rom_entry *device_rom_region() const;
         virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
+		UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 protected:
         // device-level overrides
         virtual void device_start();

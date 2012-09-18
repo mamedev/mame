@@ -19,11 +19,9 @@
 
 #define VRAM_SIZE	(0x200000)	// 2 megs, maxed out
 
-static SCREEN_UPDATE_RGB32( cb264 );
-
 MACHINE_CONFIG_FRAGMENT( cb264 )
 	MCFG_SCREEN_ADD( CB264_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_STATIC(cb264)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_cb264_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
 	MCFG_SCREEN_SIZE(1024,768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
@@ -127,19 +125,18 @@ void nubus_cb264_device::device_reset()
 
 ***************************************************************************/
 
-static SCREEN_UPDATE_RGB32( cb264 )
+UINT32 nubus_cb264_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 *scanline, *base;
 	int x, y;
-	nubus_cb264_device *card = downcast<nubus_cb264_device *>(screen.owner());
 	UINT8 pixels;
 
-	if (!card->m_cb264_vbl_disable)
+	if (!m_cb264_vbl_disable)
 	{
-		card->raise_slot_irq();
+		raise_slot_irq();
 	}
 
-	switch (card->m_cb264_mode)
+	switch (m_cb264_mode)
 	{
 		case 0: // 1 bpp
 			for (y = 0; y < 480; y++)
@@ -147,16 +144,16 @@ static SCREEN_UPDATE_RGB32( cb264 )
 				scanline = &bitmap.pix32(y);
 				for (x = 0; x < 640/8; x++)
 				{
-					pixels = card->m_vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					pixels = m_vram[(y * 1024) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = card->m_palette[pixels&0x80];
-					*scanline++ = card->m_palette[(pixels<<1)&0x80];
-					*scanline++ = card->m_palette[(pixels<<2)&0x80];
-					*scanline++ = card->m_palette[(pixels<<3)&0x80];
-					*scanline++ = card->m_palette[(pixels<<4)&0x80];
-					*scanline++ = card->m_palette[(pixels<<5)&0x80];
-					*scanline++ = card->m_palette[(pixels<<6)&0x80];
-					*scanline++ = card->m_palette[(pixels<<7)&0x80];
+					*scanline++ = m_palette[pixels&0x80];
+					*scanline++ = m_palette[(pixels<<1)&0x80];
+					*scanline++ = m_palette[(pixels<<2)&0x80];
+					*scanline++ = m_palette[(pixels<<3)&0x80];
+					*scanline++ = m_palette[(pixels<<4)&0x80];
+					*scanline++ = m_palette[(pixels<<5)&0x80];
+					*scanline++ = m_palette[(pixels<<6)&0x80];
+					*scanline++ = m_palette[(pixels<<7)&0x80];
 				}
 			}
 			break;
@@ -167,12 +164,12 @@ static SCREEN_UPDATE_RGB32( cb264 )
 				scanline = &bitmap.pix32(y);
 				for (x = 0; x < 640/4; x++)
 				{
-					pixels = card->m_vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					pixels = m_vram[(y * 1024) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = card->m_palette[pixels&0xc0];
-					*scanline++ = card->m_palette[(pixels<<2)&0xc0];
-					*scanline++ = card->m_palette[(pixels<<4)&0xc0];
-					*scanline++ = card->m_palette[(pixels<<6)&0xc0];
+					*scanline++ = m_palette[pixels&0xc0];
+					*scanline++ = m_palette[(pixels<<2)&0xc0];
+					*scanline++ = m_palette[(pixels<<4)&0xc0];
+					*scanline++ = m_palette[(pixels<<6)&0xc0];
 				}
 			}
 			break;
@@ -184,10 +181,10 @@ static SCREEN_UPDATE_RGB32( cb264 )
 
 				for (x = 0; x < 640/2; x++)
 				{
-					pixels = card->m_vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					pixels = m_vram[(y * 1024) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = card->m_palette[pixels&0xf0];
-					*scanline++ = card->m_palette[(pixels<<4)&0xf0];
+					*scanline++ = m_palette[pixels&0xf0];
+					*scanline++ = m_palette[(pixels<<4)&0xf0];
 				}
 			}
 			break;
@@ -199,8 +196,8 @@ static SCREEN_UPDATE_RGB32( cb264 )
 
 				for (x = 0; x < 640; x++)
 				{
-					pixels = card->m_vram[(y * 1024) + (BYTE4_XOR_BE(x))];
-					*scanline++ = card->m_palette[pixels];
+					pixels = m_vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					*scanline++ = m_palette[pixels];
 				}
 			}
 			break;
@@ -208,7 +205,7 @@ static SCREEN_UPDATE_RGB32( cb264 )
 		case 4:	// 24 bpp
 		case 7: // ???
 			{
-				UINT32 *vram32 = (UINT32 *)card->m_vram;
+				UINT32 *vram32 = (UINT32 *)m_vram;
 
 				for (y = 0; y < 480; y++)
 				{
@@ -223,7 +220,7 @@ static SCREEN_UPDATE_RGB32( cb264 )
 			break;
 
 		default:
-			fatalerror("cb264: unknown video mode %d\n", card->m_cb264_mode);
+			fatalerror("cb264: unknown video mode %d\n", m_cb264_mode);
 			break;
 	}
 

@@ -14,11 +14,9 @@
 
 #define VRAM_SIZE	(0x200000)	// 2 megs, maxed out
 
-static SCREEN_UPDATE_RGB32( mac_48gc );
-
 MACHINE_CONFIG_FRAGMENT( macvideo_48gc )
 	MCFG_SCREEN_ADD( GC48_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_STATIC( mac_48gc )
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, jmfb_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
 //  MCFG_SCREEN_SIZE(1152, 870)
 //  MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 870-1)
@@ -141,93 +139,92 @@ void jmfb_device::device_reset()
 
 ***************************************************************************/
 
-static SCREEN_UPDATE_RGB32( mac_48gc )
+UINT32 jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	jmfb_device *card = downcast<jmfb_device *>(screen.owner());
 	UINT32 *scanline, *base;
 	int x, y;
-	UINT8 *vram8 = (UINT8 *)card->m_vram;
+	UINT8 *vram8 = (UINT8 *)m_vram;
 	UINT8 pixels;
 
-	if (!card->m_vbl_disable)
+	if (!m_vbl_disable)
 	{
-		card->raise_slot_irq();
+		raise_slot_irq();
 	}
 
 	vram8 += 0xa00;
 
-	switch (card->m_mode)
+	switch (m_mode)
 	{
 		case 0:	// 1bpp
-			for (y = 0; y < card->m_yres; y++)
+			for (y = 0; y < m_yres; y++)
 			{
 				scanline = &bitmap.pix32(y);
-				for (x = 0; x < card->m_xres/8; x++)
+				for (x = 0; x < m_xres/8; x++)
 				{
-					pixels = vram8[(y * card->m_stride) + (BYTE4_XOR_BE(x))];
+					pixels = vram8[(y * m_stride) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = card->m_palette[(pixels>>7)&1];
-					*scanline++ = card->m_palette[(pixels>>6)&1];
-					*scanline++ = card->m_palette[(pixels>>5)&1];
-					*scanline++ = card->m_palette[(pixels>>4)&1];
-					*scanline++ = card->m_palette[(pixels>>3)&1];
-					*scanline++ = card->m_palette[(pixels>>2)&1];
-					*scanline++ = card->m_palette[(pixels>>1)&1];
-					*scanline++ = card->m_palette[pixels&1];
+					*scanline++ = m_palette[(pixels>>7)&1];
+					*scanline++ = m_palette[(pixels>>6)&1];
+					*scanline++ = m_palette[(pixels>>5)&1];
+					*scanline++ = m_palette[(pixels>>4)&1];
+					*scanline++ = m_palette[(pixels>>3)&1];
+					*scanline++ = m_palette[(pixels>>2)&1];
+					*scanline++ = m_palette[(pixels>>1)&1];
+					*scanline++ = m_palette[pixels&1];
 				}
 			}
 			break;
 
 		case 1:	// 2bpp
-			for (y = 0; y < card->m_yres; y++)
+			for (y = 0; y < m_yres; y++)
 			{
 				scanline = &bitmap.pix32(y);
-				for (x = 0; x < card->m_xres/4; x++)
+				for (x = 0; x < m_xres/4; x++)
 				{
-					pixels = vram8[(y * card->m_stride) + (BYTE4_XOR_BE(x))];
+					pixels = vram8[(y * m_stride) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = card->m_palette[(pixels>>6)&0x3];
-					*scanline++ = card->m_palette[(pixels>>4)&0x3];
-					*scanline++ = card->m_palette[(pixels>>2)&0x3];
-					*scanline++ = card->m_palette[pixels&3];
+					*scanline++ = m_palette[(pixels>>6)&0x3];
+					*scanline++ = m_palette[(pixels>>4)&0x3];
+					*scanline++ = m_palette[(pixels>>2)&0x3];
+					*scanline++ = m_palette[pixels&3];
 				}
 			}
 			break;
 
 		case 2: // 4 bpp
-			for (y = 0; y < card->m_yres; y++)
+			for (y = 0; y < m_yres; y++)
 			{
 				scanline = &bitmap.pix32(y);
 
-				for (x = 0; x < card->m_xres/2; x++)
+				for (x = 0; x < m_xres/2; x++)
 				{
-					pixels = vram8[(y * card->m_stride) + (BYTE4_XOR_BE(x))];
+					pixels = vram8[(y * m_stride) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = card->m_palette[(pixels>>4)&0xf];
-					*scanline++ = card->m_palette[pixels&0xf];
+					*scanline++ = m_palette[(pixels>>4)&0xf];
+					*scanline++ = m_palette[pixels&0xf];
 				}
 			}
 			break;
 
 		case 3: // 8 bpp
-			for (y = 0; y < card->m_yres; y++)
+			for (y = 0; y < m_yres; y++)
 			{
 				scanline = &bitmap.pix32(y);
 
-				for (x = 0; x < card->m_xres; x++)
+				for (x = 0; x < m_xres; x++)
 				{
-					pixels = vram8[(y * card->m_stride) + (BYTE4_XOR_BE(x))];
-					*scanline++ = card->m_palette[pixels];
+					pixels = vram8[(y * m_stride) + (BYTE4_XOR_BE(x))];
+					*scanline++ = m_palette[pixels];
 				}
 			}
 			break;
 
 		case 4: // 24 bpp
-			for (y = 0; y < card->m_yres; y++)
+			for (y = 0; y < m_yres; y++)
 			{
 				scanline = &bitmap.pix32(y);
-				base = (UINT32 *)&card->m_vram[y * card->m_stride];
-				for (x = 0; x < card->m_xres; x++)
+				base = (UINT32 *)&m_vram[y * m_stride];
+				for (x = 0; x < m_xres; x++)
 				{
 					*scanline++ = *base++;
 				}

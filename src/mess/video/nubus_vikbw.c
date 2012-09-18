@@ -16,11 +16,9 @@
 
 #define VRAM_SIZE	(0x18000)  // 1024x768 @ 1bpp is 98,304 bytes (0x18000)
 
-static SCREEN_UPDATE_RGB32( vikbw );
-
 MACHINE_CONFIG_FRAGMENT( vikbw )
 	MCFG_SCREEN_ADD( VIKBW_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_STATIC(vikbw)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_vikbw_device, screen_update)
 	MCFG_SCREEN_SIZE(1024,768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
 	MCFG_SCREEN_REFRESH_RATE(70)
@@ -122,16 +120,15 @@ void nubus_vikbw_device::device_reset()
 
 ***************************************************************************/
 
-static SCREEN_UPDATE_RGB32( vikbw )
+UINT32 nubus_vikbw_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 *scanline;
 	int x, y;
-	nubus_vikbw_device *card = downcast<nubus_vikbw_device *>(screen.owner());
 	UINT8 pixels;
 
-	if (!card->m_vbl_disable)
+	if (!m_vbl_disable)
 	{
-		card->raise_slot_irq();
+		raise_slot_irq();
 	}
 
 	for (y = 0; y < 768; y++)
@@ -139,16 +136,16 @@ static SCREEN_UPDATE_RGB32( vikbw )
 		scanline = &bitmap.pix32(y);
 		for (x = 0; x < 1024/8; x++)
 		{
-			pixels = card->m_vram[(y * 128) + (BYTE4_XOR_BE(x))];
+			pixels = m_vram[(y * 128) + (BYTE4_XOR_BE(x))];
 
-			*scanline++ = card->m_palette[(pixels>>7)&1];
-			*scanline++ = card->m_palette[(pixels>>6)&1];
-			*scanline++ = card->m_palette[(pixels>>5)&1];
-			*scanline++ = card->m_palette[(pixels>>4)&1];
-			*scanline++ = card->m_palette[(pixels>>3)&1];
-			*scanline++ = card->m_palette[(pixels>>2)&1];
-			*scanline++ = card->m_palette[(pixels>>1)&1];
-			*scanline++ = card->m_palette[(pixels&1)];
+			*scanline++ = m_palette[(pixels>>7)&1];
+			*scanline++ = m_palette[(pixels>>6)&1];
+			*scanline++ = m_palette[(pixels>>5)&1];
+			*scanline++ = m_palette[(pixels>>4)&1];
+			*scanline++ = m_palette[(pixels>>3)&1];
+			*scanline++ = m_palette[(pixels>>2)&1];
+			*scanline++ = m_palette[(pixels>>1)&1];
+			*scanline++ = m_palette[(pixels&1)];
 		}
 	}
 

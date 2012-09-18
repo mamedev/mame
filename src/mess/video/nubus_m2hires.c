@@ -16,11 +16,9 @@
 
 #define VRAM_SIZE	(0x80000)	// 512k max
 
-static SCREEN_UPDATE_RGB32( m2hires );
-
 MACHINE_CONFIG_FRAGMENT( m2hires )
 	MCFG_SCREEN_ADD( M2HIRES_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_STATIC(m2hires)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_m2hires_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
 	MCFG_SCREEN_SIZE(1024,768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
@@ -140,23 +138,22 @@ void nubus_m2hires_device::device_timer(emu_timer &timer, device_timer_id tid, i
 
 ***************************************************************************/
 
-static SCREEN_UPDATE_RGB32( m2hires )
+UINT32 nubus_m2hires_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 *scanline;
 	int x, y;
-	nubus_m2hires_device *card = downcast<nubus_m2hires_device *>(screen.owner());
 	UINT8 pixels, *vram;
 
 	// first time?  kick off the VBL timer
-	if (!card->m_screen)
+	if (!m_screen)
 	{
-		card->m_screen = &screen;
-		card->m_timer->adjust(card->m_screen->time_until_pos(479, 0), 0);
+		m_screen = &screen;
+		m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
 	}
 
-	vram = card->m_vram + 0x20;
+	vram = m_vram + 0x20;
 
-	switch (card->m_mode)
+	switch (m_mode)
 	{
 		case 0: // 1 bpp?
 			for (y = 0; y < 480; y++)
@@ -166,14 +163,14 @@ static SCREEN_UPDATE_RGB32( m2hires )
 				{
 					pixels = vram[(y * 128) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = card->m_palette[((pixels>>7)&0x1)];
-					*scanline++ = card->m_palette[((pixels>>6)&0x1)];
-					*scanline++ = card->m_palette[((pixels>>5)&0x1)];
-					*scanline++ = card->m_palette[((pixels>>4)&0x1)];
-					*scanline++ = card->m_palette[((pixels>>3)&0x1)];
-					*scanline++ = card->m_palette[((pixels>>2)&0x1)];
-					*scanline++ = card->m_palette[((pixels>>1)&0x1)];
-					*scanline++ = card->m_palette[(pixels&1)];
+					*scanline++ = m_palette[((pixels>>7)&0x1)];
+					*scanline++ = m_palette[((pixels>>6)&0x1)];
+					*scanline++ = m_palette[((pixels>>5)&0x1)];
+					*scanline++ = m_palette[((pixels>>4)&0x1)];
+					*scanline++ = m_palette[((pixels>>3)&0x1)];
+					*scanline++ = m_palette[((pixels>>2)&0x1)];
+					*scanline++ = m_palette[((pixels>>1)&0x1)];
+					*scanline++ = m_palette[(pixels&1)];
 				}
 			}
 			break;
@@ -186,10 +183,10 @@ static SCREEN_UPDATE_RGB32( m2hires )
 				{
 					pixels = vram[(y * 256) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = card->m_palette[((pixels>>6)&3)];
-					*scanline++ = card->m_palette[((pixels>>4)&3)];
-					*scanline++ = card->m_palette[((pixels>>2)&3)];
-					*scanline++ = card->m_palette[(pixels&3)];
+					*scanline++ = m_palette[((pixels>>6)&3)];
+					*scanline++ = m_palette[((pixels>>4)&3)];
+					*scanline++ = m_palette[((pixels>>2)&3)];
+					*scanline++ = m_palette[(pixels&3)];
 				}
 			}
 			break;
@@ -203,8 +200,8 @@ static SCREEN_UPDATE_RGB32( m2hires )
 				{
 					pixels = vram[(y * 512) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = card->m_palette[((pixels&0xf0)>>4)];
-					*scanline++ = card->m_palette[(pixels&0xf)];
+					*scanline++ = m_palette[((pixels&0xf0)>>4)];
+					*scanline++ = m_palette[(pixels&0xf)];
 				}
 			}
 			break;
@@ -217,13 +214,13 @@ static SCREEN_UPDATE_RGB32( m2hires )
 				for (x = 0; x < 640; x++)
 				{
 					pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
-					*scanline++ = card->m_palette[pixels];
+					*scanline++ = m_palette[pixels];
 				}
 			}
 			break;
 
 		default:
-			fatalerror("m2hires: unknown video mode %d\n", card->m_mode);
+			fatalerror("m2hires: unknown video mode %d\n", m_mode);
 			break;
 	}
 	return 0;

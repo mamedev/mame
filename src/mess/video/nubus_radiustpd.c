@@ -16,11 +16,9 @@
 
 #define VRAM_SIZE	(0x40000)	// 256k.  1152x880 1 bit per pixel fits nicely.
 
-static SCREEN_UPDATE_RGB32( radiustpd );
-
 MACHINE_CONFIG_FRAGMENT( radiustpd )
 	MCFG_SCREEN_ADD( RADIUSTPD_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_STATIC(radiustpd)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_radiustpd_device, screen_update)
 	MCFG_SCREEN_SIZE(1280, 960)
 	MCFG_SCREEN_REFRESH_RATE(70)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 880-1)
@@ -141,21 +139,20 @@ void nubus_radiustpd_device::device_timer(emu_timer &timer, device_timer_id tid,
 
 ***************************************************************************/
 
-static SCREEN_UPDATE_RGB32( radiustpd )
+UINT32 nubus_radiustpd_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 *scanline;
 	int x, y;
-	nubus_radiustpd_device *card = downcast<nubus_radiustpd_device *>(screen.owner());
 	UINT8 pixels, *vram;
 
 	// first time?  kick off the VBL timer
-	if (!card->m_screen)
+	if (!m_screen)
 	{
-		card->m_screen = &screen;
-		card->m_timer->adjust(card->m_screen->time_until_pos(479, 0), 0);
+		m_screen = &screen;
+		m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
 	}
 
-	vram = card->m_vram + 0x200;
+	vram = m_vram + 0x200;
 
 	for (y = 0; y < 880; y++)
 	{
@@ -164,14 +161,14 @@ static SCREEN_UPDATE_RGB32( radiustpd )
 		{
 			pixels = vram[(y * (1152/8)) + (BYTE4_XOR_BE(x))];
 
-			*scanline++ = card->m_palette[((pixels>>7)&0x1)];
-			*scanline++ = card->m_palette[((pixels>>6)&0x1)];
-			*scanline++ = card->m_palette[((pixels>>5)&0x1)];
-			*scanline++ = card->m_palette[((pixels>>4)&0x1)];
-			*scanline++ = card->m_palette[((pixels>>3)&0x1)];
-			*scanline++ = card->m_palette[((pixels>>2)&0x1)];
-			*scanline++ = card->m_palette[((pixels>>1)&0x1)];
-			*scanline++ = card->m_palette[(pixels&1)];
+			*scanline++ = m_palette[((pixels>>7)&0x1)];
+			*scanline++ = m_palette[((pixels>>6)&0x1)];
+			*scanline++ = m_palette[((pixels>>5)&0x1)];
+			*scanline++ = m_palette[((pixels>>4)&0x1)];
+			*scanline++ = m_palette[((pixels>>3)&0x1)];
+			*scanline++ = m_palette[((pixels>>2)&0x1)];
+			*scanline++ = m_palette[((pixels>>1)&0x1)];
+			*scanline++ = m_palette[(pixels&1)];
 		}
 	}
 
