@@ -473,7 +473,7 @@ void sega_genesis_vdp_device::update_m_vdp_code_and_address(void)
 
 UINT16 (*vdp_get_word_from_68k_mem)(running_machine &machine, UINT32 source, address_space& space68k);
 
-UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source, address_space * space68k)
+UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source, address_space & space68k)
 {
 	// should we limit the valid areas here?
 	// how does this behave with the segacd etc?
@@ -495,11 +495,11 @@ UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source
 			source -= 2;
 		}
 
-		return space68k->read_word(source);
+		return space68k.read_word(source);
 	}
 	else if (( source >= 0xe00000 ) && ( source <= 0xffffff ))
 	{
-		return space68k->read_word(source);
+		return space68k.read_word(source);
 	}
 	else
 	{

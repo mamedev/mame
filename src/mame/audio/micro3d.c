@@ -56,7 +56,7 @@ struct noise_state
 
 	float				gain;
 	UINT32				noise_shift;
-	UINT8				noise_state;
+	UINT8				noise_value;
 	UINT8				noise_subcount;
 
 	filter_state		noise_filters[4];
@@ -247,11 +247,11 @@ static STREAM_UPDATE( micro3d_stream_update )
 		for (step = 2000000 / (2000000/8); step >= state->noise_subcount; step -= state->noise_subcount)
 		{
 			state->noise_shift = (state->noise_shift << 1) | (((state->noise_shift >> 13) ^ (state->noise_shift >> 16)) & 1);
-			state->noise_state = (state->noise_shift >> 16) & 1;
+			state->noise_value = (state->noise_shift >> 16) & 1;
 			state->noise_subcount = 2000000 / MM5837_CLOCK;
 		}
 		state->noise_subcount -= step;
-		input = (float)state->noise_state - 0.5;
+		input = (float)state->noise_value - 0.5;
 		white = input;
 
 		/* Pink noise filtering */

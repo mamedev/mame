@@ -113,7 +113,7 @@ enum
 //  GLOBALS
 //============================================================
 
-static d3d *				d3dintf; // FIX ME
+static d3d_base *				d3dintf; // FIX ME
 
 static const line_aa_step line_aa_1step[] =
 {

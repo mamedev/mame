@@ -104,7 +104,7 @@ public:
 	hlsl_info();
 	~hlsl_info();
 
-	void init(d3d *d3dintf, win_window_info *window);
+	void init(d3d_base *d3dintf, win_window_info *window);
 	void init_fsfx_quad(void *vertbuf);
 
 	bool enabled() { return master_enable; }
@@ -143,7 +143,7 @@ private:
 
 	bool					screen_encountered[9];		// whether a given screen was encountered this frame
 
-	d3d *                   d3dintf;					// D3D interface
+	d3d_base *              d3dintf;					// D3D interface
 	win_window_info *       window;						// D3D window info
 
 	bool					master_enable;				// overall enable flag

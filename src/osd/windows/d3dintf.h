@@ -74,7 +74,7 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-struct d3d;
+struct d3d_base;
 struct d3d_device;
 struct d3d_surface;
 struct d3d_texture;
@@ -154,17 +154,17 @@ enum d3d_caps_index
 
 struct d3d_interface
 {
-	HRESULT  (*check_device_format)(d3d *d3dptr, UINT adapter, D3DDEVTYPE devtype, D3DFORMAT adapterformat, DWORD usage, D3DRESOURCETYPE restype, D3DFORMAT format);
-	HRESULT  (*check_device_type)(d3d *d3dptr, UINT adapter, D3DDEVTYPE devtype, D3DFORMAT format, D3DFORMAT backformat, BOOL windowed);
-	HRESULT  (*create_device)(d3d *d3dptr, UINT adapter, D3DDEVTYPE devtype, HWND focus, DWORD behavior, d3d_present_parameters *params, d3d_device **dev);
-	HRESULT  (*enum_adapter_modes)(d3d *d3dptr, UINT adapter, D3DFORMAT format, UINT index, D3DDISPLAYMODE *mode);
-	UINT     (*get_adapter_count)(d3d *d3dptr);
-	HRESULT  (*get_adapter_display_mode)(d3d *d3dptr, UINT adapter, D3DDISPLAYMODE *mode);
-	HRESULT  (*get_adapter_identifier)(d3d *d3dptr, UINT adapter, DWORD flags, d3d_adapter_identifier *identifier);
-	UINT     (*get_adapter_mode_count)(d3d *d3dptr, UINT adapter, D3DFORMAT format);
-	HMONITOR (*get_adapter_monitor)(d3d *d3dptr, UINT adapter);
-	HRESULT  (*get_caps_dword)(d3d *d3dptr, UINT adapter, D3DDEVTYPE devtype, d3d_caps_index which, DWORD *value);
-	ULONG    (*release)(d3d *d3dptr);
+	HRESULT  (*check_device_format)(d3d_base *d3dptr, UINT adapter, D3DDEVTYPE devtype, D3DFORMAT adapterformat, DWORD usage, D3DRESOURCETYPE restype, D3DFORMAT format);
+	HRESULT  (*check_device_type)(d3d_base *d3dptr, UINT adapter, D3DDEVTYPE devtype, D3DFORMAT format, D3DFORMAT backformat, BOOL windowed);
+	HRESULT  (*create_device)(d3d_base *d3dptr, UINT adapter, D3DDEVTYPE devtype, HWND focus, DWORD behavior, d3d_present_parameters *params, d3d_device **dev);
+	HRESULT  (*enum_adapter_modes)(d3d_base *d3dptr, UINT adapter, D3DFORMAT format, UINT index, D3DDISPLAYMODE *mode);
+	UINT     (*get_adapter_count)(d3d_base *d3dptr);
+	HRESULT  (*get_adapter_display_mode)(d3d_base *d3dptr, UINT adapter, D3DDISPLAYMODE *mode);
+	HRESULT  (*get_adapter_identifier)(d3d_base *d3dptr, UINT adapter, DWORD flags, d3d_adapter_identifier *identifier);
+	UINT     (*get_adapter_mode_count)(d3d_base *d3dptr, UINT adapter, D3DFORMAT format);
+	HMONITOR (*get_adapter_monitor)(d3d_base *d3dptr, UINT adapter);
+	HRESULT  (*get_caps_dword)(d3d_base *d3dptr, UINT adapter, D3DDEVTYPE devtype, d3d_caps_index which, DWORD *value);
+	ULONG    (*release)(d3d_base *d3dptr);
 };
 
 
@@ -262,7 +262,7 @@ struct d3d_effect_interface
 //  Core D3D object
 //============================================================
 
-struct d3d
+struct d3d_base
 {
 	// internal objects
 	int							version;
@@ -285,9 +285,9 @@ struct d3d
 //============================================================
 
 #if DIRECT3D_VERSION < 0x0900
-d3d *drawd3d8_init(void);
+d3d_base *drawd3d8_init(void);
 #endif
-d3d *drawd3d9_init(void);
+d3d_base *drawd3d9_init(void);
 
 
 #endif

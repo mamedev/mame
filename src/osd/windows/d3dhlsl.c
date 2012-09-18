@@ -615,7 +615,7 @@ void hlsl_info::set_texture(d3d_texture_info *texture)
 //  hlsl_info::init
 //============================================================
 
-void hlsl_info::init(d3d *d3dintf, win_window_info *window)
+void hlsl_info::init(d3d_base *d3dintf, win_window_info *window)
 {
 	if (!d3dintf->post_fx_available)
 		return;
