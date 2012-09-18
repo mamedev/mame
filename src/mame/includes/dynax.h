@@ -476,6 +476,13 @@ public:
 	INTERRUPT_GEN_MEMBER(jantouki_sound_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(yarunara_clock_interrupt);
 	INTERRUPT_GEN_MEMBER(mjelctrn_vblank_interrupt);
+	INTERRUPT_GEN_MEMBER(quizchq_irq);
+	INTERRUPT_GEN_MEMBER(mmpanic_irq);
+	INTERRUPT_GEN_MEMBER(hanakanz_irq);
+	INTERRUPT_GEN_MEMBER(mjchuuka_irq);
+	INTERRUPT_GEN_MEMBER(hginga_irq);
+	INTERRUPT_GEN_MEMBER(mjflove_irq);
+	INTERRUPT_GEN_MEMBER(hparadis_irq);
 };
 
 //----------- defined in drivers/dynax.c -----------
